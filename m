@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-38696-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38698-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B822A3DBAC
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 14:49:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A16CA3DBAE
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 14:50:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BF02F7AAE29
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 13:48:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB1F219C19DB
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 13:50:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98BB31FC0FC;
-	Thu, 20 Feb 2025 13:49:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CAF61FE449;
+	Thu, 20 Feb 2025 13:49:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RDRDzYNd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iPYIIRTN"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEA3E1FA851;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7731FAC48;
 	Thu, 20 Feb 2025 13:49:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740059354; cv=none; b=lelXiqajAJ2J89dc7qNmhA9PMguAUe9VKrfZej41AAeaHgSXNaboIi+Ci499N6xHlmcbN71bkIn5jO9uexoRtlVuSJygdkLmYuIl4IWecXUxiR0Zwlo6UkE5EV3noHVDD8H5nCgycsdxFzLfZr56u6uWJBu4tgQY5SFuedZOWkA=
+	t=1740059355; cv=none; b=GLFkmdHLMb1gLBq+wAHhkt/MHZBSUJmJawWKz4rcR+Wnu1sqMapuXk3XgTnbDUEs9GNGAFHjYVlA4zEgWBWAeQKEvG7l7k5TzY0pDmtbQkFZAs2Ap4bRyWx6ff2tYOpYYkfJ1EsXN6cLGXYtFoet5bj47ZE+ns9oxkrExEnvaHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740059354; c=relaxed/simple;
-	bh=4L9e3x4dCeFSSHA1otQ4XS7vmrkCkOdcXz3bm7vANK0=;
+	s=arc-20240116; t=1740059355; c=relaxed/simple;
+	bh=hLX78IQJhSjho4blNERHsZLoh+IQBUydLUQRnCHy3Bg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Z8YuDsaTolQMVYFWAe8z0NQk6AEEQ7yv7reCJQQu943xXR3jroAGeb4/VFzrQnXT+6LLpkb8928rqHfpuxKYbFtdSBb5AUdSjc5bDFlSKaZEtWRi9ScWic0qawMUP65c4MCW5A08QQadnZkeAG29xKO813lpvA4sptWyIX/j6BY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RDRDzYNd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FAEDC4CED1;
+	 MIME-Version; b=SYM1bcKkYHfP57AjFu80dIhg1SumKVgqxDl1eY6YB3vUokkGIB/aXGBNrNuHDbsMaWaJ2h7HBs+8NhClF3+V/VacYssnRHnXeNCezxRi6o8XwXlI8vekPCMr2mCUMBAycBsIEO5sALxPhMy10fhInUeLWj3D772R6d5ftH3OQEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iPYIIRTN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0A9CC4CEDD;
 	Thu, 20 Feb 2025 13:49:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1740059354;
-	bh=4L9e3x4dCeFSSHA1otQ4XS7vmrkCkOdcXz3bm7vANK0=;
+	bh=hLX78IQJhSjho4blNERHsZLoh+IQBUydLUQRnCHy3Bg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RDRDzYNdjy42OOJyWBgWmxqB0to6d0ML42uNMqLtYV4qCjTG+2pLRA0zFV8MYBhev
-	 dg5n4UySvizp3QlEBCmE7O7czFFlfU3bhAtHsJR0q7NVwynDav+Xn8XBcsdC2yQijv
-	 Gfs6QuNU66gMRmzQ8iIjYKBL8+BwGHr88e7y0+/UgvIsjm9TD9d3XVowMq2aNg6b69
-	 g+N+o2pz5OWgNQrKQJJ/EN2iVshPlr6SKNkaEgrvwuZIK4k+4AnxCTsSXbXAv5/2aR
-	 3J3D46nx8VnEUF47CiW0X1W2ePO/LiHRq/D8eWAtVlEahkIj2NCxawhm5Ufwna6Ckl
-	 nrUCnRieP4vYA==
+	b=iPYIIRTNVqeMFiMlGsrveziYs/FAPq/tsRf1aGRuKJWBjsBpcqrUq7ZXO0FCA/1dV
+	 4O5p8lUcoyxepZOSqU9fsMZFdMlO8oKymJTf2SPpVQOTCqSsZ+TbmoNwQOH6mBoIeb
+	 pAvs/K/diNS3rID6Wg5OsBKTyy9aGOhTKipYejkwiOWCNp34o9EynI5VaocOY1FxlZ
+	 AsHkHGvw5dHy6jsy7qqIj83v3WPV042D1lIp93SF/AnH/akMfMIVhtBBeemYv/RURK
+	 laWUV9zzz+LcwwtFlTa3QtMKGu6L5N+gEqb2E866P8db9jDbSVTqQD3GXNQU8TcE19
+	 /qfUBc920zGxg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tl6vQ-006DXp-KR;
+	id 1tl6vQ-006DXp-QN;
 	Thu, 20 Feb 2025 13:49:12 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -57,9 +57,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Eric Auger <eric.auger@redhat.com>,
 	gankulkarni@os.amperecomputing.com
-Subject: [PATCH v2 05/14] KVM: arm64: Advertise NV2 in the boot messages
-Date: Thu, 20 Feb 2025 13:48:58 +0000
-Message-Id: <20250220134907.554085-6-maz@kernel.org>
+Subject: [PATCH v2 06/14] KVM: arm64: Consolidate idreg callbacks
+Date: Thu, 20 Feb 2025 13:48:59 +0000
+Message-Id: <20250220134907.554085-7-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250220134907.554085-1-maz@kernel.org>
 References: <20250220134907.554085-1-maz@kernel.org>
@@ -75,33 +75,100 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Make it a bit easier to understand what people are running by
-adding a +NV2 string to the successful KVM initialisation.
+Most of the ID_DESC() users use the same callbacks, with only a few
+overrides. Consolidate the common callbacks in a macro, and consistently
+use it everywhere.
+
+Whilst we're at it, give ID_UNALLOCATED() a .name string, so that we can
+easily decode traces.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arm.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 28 ++++++++++------------------
+ 1 file changed, 10 insertions(+), 18 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index b8e55a441282f..5ea09f13c7bc0 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2806,11 +2806,12 @@ static __init int kvm_arm_init(void)
- 	if (err)
- 		goto out_hyp;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 9f10dbd26e348..678213dc15513 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2267,35 +2267,33 @@ static bool bad_redir_trap(struct kvm_vcpu *vcpu,
+  * from userspace.
+  */
  
--	kvm_info("%s%sVHE mode initialized successfully\n",
-+	kvm_info("%s%sVHE%s mode initialized successfully\n",
- 		 in_hyp_mode ? "" : (is_protected_kvm_enabled() ?
- 				     "Protected " : "Hyp "),
- 		 in_hyp_mode ? "" : (cpus_have_final_cap(ARM64_KVM_HVHE) ?
--				     "h" : "n"));
-+				     "h" : "n"),
-+		 cpus_have_final_cap(ARM64_HAS_NESTED_VIRT) ? "+NV2": "");
++#define ID_DESC_DEFAULT_CALLBACKS		\
++	.access	= access_id_reg,		\
++	.get_user = get_id_reg,			\
++	.set_user = set_id_reg,			\
++	.visibility = id_visibility,		\
++	.reset = kvm_read_sanitised_id_reg
++
+ #define ID_DESC(name)				\
+ 	SYS_DESC(SYS_##name),			\
+-	.access	= access_id_reg,		\
+-	.get_user = get_id_reg			\
++	ID_DESC_DEFAULT_CALLBACKS
  
- 	/*
- 	 * FIXME: Do something reasonable if kvm_init() fails after pKVM
+ /* sys_reg_desc initialiser for known cpufeature ID registers */
+ #define ID_SANITISED(name) {			\
+ 	ID_DESC(name),				\
+-	.set_user = set_id_reg,			\
+-	.visibility = id_visibility,		\
+-	.reset = kvm_read_sanitised_id_reg,	\
+ 	.val = 0,				\
+ }
+ 
+ /* sys_reg_desc initialiser for known cpufeature ID registers */
+ #define AA32_ID_SANITISED(name) {		\
+ 	ID_DESC(name),				\
+-	.set_user = set_id_reg,			\
+ 	.visibility = aa32_id_visibility,	\
+-	.reset = kvm_read_sanitised_id_reg,	\
+ 	.val = 0,				\
+ }
+ 
+ /* sys_reg_desc initialiser for writable ID registers */
+ #define ID_WRITABLE(name, mask) {		\
+ 	ID_DESC(name),				\
+-	.set_user = set_id_reg,			\
+-	.visibility = id_visibility,		\
+-	.reset = kvm_read_sanitised_id_reg,	\
+ 	.val = mask,				\
+ }
+ 
+@@ -2303,8 +2301,6 @@ static bool bad_redir_trap(struct kvm_vcpu *vcpu,
+ #define ID_FILTERED(sysreg, name, mask) {	\
+ 	ID_DESC(sysreg),				\
+ 	.set_user = set_##name,				\
+-	.visibility = id_visibility,			\
+-	.reset = kvm_read_sanitised_id_reg,		\
+ 	.val = (mask),					\
+ }
+ 
+@@ -2314,12 +2310,10 @@ static bool bad_redir_trap(struct kvm_vcpu *vcpu,
+  * (1 <= crm < 8, 0 <= Op2 < 8).
+  */
+ #define ID_UNALLOCATED(crm, op2) {			\
++	.name = "S3_0_0_" #crm "_" #op2,		\
+ 	Op0(3), Op1(0), CRn(0), CRm(crm), Op2(op2),	\
+-	.access = access_id_reg,			\
+-	.get_user = get_id_reg,				\
+-	.set_user = set_id_reg,				\
++	ID_DESC_DEFAULT_CALLBACKS,			\
+ 	.visibility = raz_visibility,			\
+-	.reset = kvm_read_sanitised_id_reg,		\
+ 	.val = 0,					\
+ }
+ 
+@@ -2330,9 +2324,7 @@ static bool bad_redir_trap(struct kvm_vcpu *vcpu,
+  */
+ #define ID_HIDDEN(name) {			\
+ 	ID_DESC(name),				\
+-	.set_user = set_id_reg,			\
+ 	.visibility = raz_visibility,		\
+-	.reset = kvm_read_sanitised_id_reg,	\
+ 	.val = 0,				\
+ }
+ 
 -- 
 2.39.2
 
