@@ -1,124 +1,112 @@
-Return-Path: <kvm+bounces-38767-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38768-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BAB8A3E2E6
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 18:46:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2B8AA3E2F1
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 18:46:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5406A189FA20
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 17:45:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40433189FA4E
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 17:46:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5679E213E75;
-	Thu, 20 Feb 2025 17:44:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B48C213E6E;
+	Thu, 20 Feb 2025 17:46:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uk2jw35O"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XrVel7+R"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AA6021324F;
-	Thu, 20 Feb 2025 17:44:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B25BA17BCE
+	for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 17:46:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740073460; cv=none; b=Br5d3Kte2M6mnlXhXi4yW8GO2kg+GgXptGlqEPytlAYa3d9HxHmeVxWO0Z4vX0Tfl3lnI79XJlKkOcFOxW5niIPHF4N5AhscBcAnE8rzGszw3JMJjiOuUjGquX9GNFl926Z8QO1R2K7OiQFwuZRssOLFb/3dvGvYJ/krriH/8RQ=
+	t=1740073562; cv=none; b=KAOenrBR/p3libbqltLP+QFz4foLSHb3CQZFLiCQabiIlHyY9VKkeorgwmkoFLgkQIoAorbljjd60DDI6a30O0V++Z2oJ7wXrFp6vWtyOIPSPf9JUCPbVrG+hYZKZ1w5b9of4JHoZjgme1Vfg4sI5dUh1l5pULud8uYz6vgVBKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740073460; c=relaxed/simple;
-	bh=JG9qAobTzeeNJhvrxW9wlpTi2Gx0CaoQMhNmfQShIEA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZMdSX3jLgf5jPQ6QZ/4JptuE+7jbO+htz0lYsko59lL9BGpbx8AkHAJtWh62aTpN/leM1rXGWF+XSl4qgclJMKX4GofHRsByss9UZ/1oc3uNY3XyP46xyQl7CEJHDyuDy1H9We8paNWyCOXx0SwMPUW+ZedFO6RMTIH7Ed1d6HM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uk2jw35O; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9D8DC4CED1;
-	Thu, 20 Feb 2025 17:44:19 +0000 (UTC)
+	s=arc-20240116; t=1740073562; c=relaxed/simple;
+	bh=rHp8N8Gnyyy4+Kqcj2tYc3E4gN+u4EqOQL8n6jsxPfs=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=n6Hy2T6AXL0/xmy/JTI5v9oGOMPPJaHy/voMiDF22ph4z1QTLS5xpDgNKuZ9N+5aiis0J1Y+jhGih2pvo5tJZocMlYu0RAa9SyLhsiJLGvxXbfdmIq+6/kt8/GBY7O8/R2uWEAziRKBJq+X+rfzoWy0WlmcKAHl0ecU61NnGHVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XrVel7+R; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2F1CEC4CEE8
+	for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 17:46:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740073459;
-	bh=JG9qAobTzeeNJhvrxW9wlpTi2Gx0CaoQMhNmfQShIEA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Uk2jw35ObtTTcxrptF2N88WVGFylhY2GEZlmBKieFMZC8RHGgcmyLDvZ8E05TlDjx
-	 ZEFwUacTcTMXzvoYTkd+xqv2v6mG9o7IVQEjcVJNme+iDErOrMNDrT8EWo3E2UqjGL
-	 ghzzM3LLFHaA02J676iF8uKFoQSk479xKBDiOw1jE3PNsq3pXkdV9pIb99hynzq+V+
-	 pwmTlOszNT4vtYc3PmwxYhZbM1qgn+nkGXW49jGiGEU+m+j3UhTII6c+QJebY1ygB6
-	 aaG5LbXp1O6RMuNLxE+JU4GFIf9Gki5b2XPmqsBvFC/LpnoFlJIuC0E16ySSCeTWgF
-	 HAZJ1ixyiS26Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tlAau-006J9w-EF;
-	Thu, 20 Feb 2025 17:44:17 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Vladimir Murzin <vladimir.murzin@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 fixes for 6.14, take #3
-Date: Thu, 20 Feb 2025 17:44:06 +0000
-Message-Id: <20250220174406.749490-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	s=k20201202; t=1740073562;
+	bh=rHp8N8Gnyyy4+Kqcj2tYc3E4gN+u4EqOQL8n6jsxPfs=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=XrVel7+RRBj5Zszne2lYSOw03PW3TAptGE5V76ohMqxYb9wYeWQRejsyReIwGXttg
+	 Mrx2NsjOY/tgiNohubdw2rUguNijsyh/gxPIAIOHFsSOPt3BbdyaIxdnZ6gUNCmfW4
+	 N7QJlHqNkqtYI4BduYrDfOdMZBa210Bgqv1wTRAP6fDV3on95xLEr/SzEuHW2+/WjT
+	 8i6lzIeI67BB5hoRoIjQ9/zdwiKjxNEYTirGBsy3QOiRt8qWF721NWbEwjvccUd/nr
+	 W0W290aQ3mk0DFTFQ3Dirv4AsQf17fTMsPZ57SzKGFuM01aazsCqxwVcGRfbgu8II7
+	 FXYWCwmCanVHg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 27CD4C3279F; Thu, 20 Feb 2025 17:46:02 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 219787] Guest's applications crash with EXCEPTION_SINGLE_STEP
+ (0x80000004)
+Date: Thu, 20 Feb 2025 17:46:01 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: whanos@sergal.fun
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-219787-28872-nA978xoyPB@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219787-28872@https.bugzilla.kernel.org/>
+References: <bug-219787-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, oliver.upton@linux.dev, vladimir.murzin@arm.com, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Paolo,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219787
 
-Another week, another set of fixes.
+--- Comment #7 from whanos@sergal.fun ---
+(In reply to Sean Christopherson from comment #5)
+> On Thu, Feb 20, 2025, bugzilla-daemon@kernel.org wrote:
+> > https://bugzilla.kernel.org/show_bug.cgi?id=3D219787
+> >=20
+> > whanos@sergal.fun changed:
+> >=20
+> >            What    |Removed                     |Added
+> >
+> -------------------------------------------------------------------------=
+---
+> >                  CC|                            |whanos@sergal.fun
+> >=20
+> > --- Comment #3 from whanos@sergal.fun ---
+> > I have been able to reproduce this bug too on Linux 6.13.3 - Specifical=
+ly
+> > whilst attempting to download/install any game via Steam in a GPU
+> passthrough
+> > enabled Windows KVM guest.
+>=20
+> Are you also running an AMD system?
 
-This time around, we have a focus on MMU bugs, with one bug affecting
-hVHE EL2 stage-1 and picking the ASID from the wrong register, while
-the other affects VHE and allows it to run with a stale VMID value.
+Yep. I am running a 9800X3D in an X670E chipset motherboard.=20
+I honestly wonder if this bug only affects people using a 9800X3D.
 
-Either way, this is ugly.
+--=20
+You may reply to this email to add a comment.
 
-Please pull,
-
-	M.
-
-The following changes since commit 0ad2507d5d93f39619fc42372c347d6006b64319:
-
-  Linux 6.14-rc3 (2025-02-16 14:02:44 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.14-3
-
-for you to fetch changes up to fa808ed4e199ed17d878eb75b110bda30dd52434:
-
-  KVM: arm64: Ensure a VMID is allocated before programming VTTBR_EL2 (2025-02-20 16:29:28 +0000)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.14, take #3
-
-- Fix TCR_EL2 configuration to not use the ASID in TTBR1_EL2
-  and not mess-up T1SZ/PS by using the HCR_EL2.E2H==0 layout.
-
-- Bring back the VMID allocation to the vcpu_load phase, ensuring
-  that we only setup VTTBR_EL2 once on VHE. This cures an ugly
-  race that would lead to running with an unallocated VMID.
-
-----------------------------------------------------------------
-Oliver Upton (1):
-      KVM: arm64: Ensure a VMID is allocated before programming VTTBR_EL2
-
-Will Deacon (1):
-      KVM: arm64: Fix tcr_el2 initialisation in hVHE mode
-
- arch/arm64/include/asm/kvm_arm.h  |  2 +-
- arch/arm64/include/asm/kvm_host.h |  2 +-
- arch/arm64/kvm/arm.c              | 37 +++++++++++++++++--------------------
- arch/arm64/kvm/vmid.c             | 11 +++--------
- 4 files changed, 22 insertions(+), 30 deletions(-)
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
