@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-38718-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38719-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13942A3DE77
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 16:28:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C1016A3DECF
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 16:38:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 261C63B620F
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 15:24:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C2BE3A9F76
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 15:34:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D2C1FE46F;
-	Thu, 20 Feb 2025 15:23:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BCB01DFE09;
+	Thu, 20 Feb 2025 15:34:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DQ2c/Vss"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aq+W4kP5"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FB3A1FDA62;
-	Thu, 20 Feb 2025 15:23:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B36BE1D5AA0;
+	Thu, 20 Feb 2025 15:34:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740065036; cv=none; b=NxUnYH/wkZ85ivspiLJsMh37znmRl1G9vnSD7vID3JEBseAiZAXFriqwQFbsooTUPlUaez4Mu9iZBDdq8BA+wZ1jQo2Xxp8g2oAi78Vu9tC4EQ8LcRsIOHM8Y0SN6L5VN/mZ/esWEsMkMxeVbEJHGCt2sMOyJcZnh/8NWARP04E=
+	t=1740065692; cv=none; b=W4V2/FHUg7NLikYlJ/fLdRFS/ap0+g/Tgh4S9FibXDBwKqFF+JSqcCBLoI3Z7HEWiC4HamaqGFBUFJWZQntP4Rbk6tstSezi2oAATU7EYhfYlx3LPltz6px05NnXFqnJHioKf6N8V8vAZanZeWAWx16+qTlOwUecwrieYa4Icr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740065036; c=relaxed/simple;
-	bh=4S3rXkPwX/qQwDVbpYloUGGWNrnrxI6LSqRoTIH2e+U=;
+	s=arc-20240116; t=1740065692; c=relaxed/simple;
+	bh=ccXvnfX2hSpdEAMuKnx2TrENdrP/yxjQUKZq2MkVuk0=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OSBfLljft7LW7ry+LcfeT2aUnX4OXWe+xbr76LKZBqpPGI5kV1+yp8iOINN/93T7eaZ3frhZ20XbyfYMbAwpn19QXxkQ6gipDnj3D9ipsJWtrYudHRYis8KM34fQ6TzxrEyXgwhCfgvWHFY6NQKiPo1zPIrI+hwgUyFjofxkkFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DQ2c/Vss; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD21CC4CED1;
-	Thu, 20 Feb 2025 15:23:55 +0000 (UTC)
+	 MIME-Version:Content-Type; b=gX7pIPLi1sUjk4PJE4sa+ixBliTYUTSYSAK/ADGaO1OOAGOU0NxzymUeue4bGcOPxB35yXjEpK+xDSQEy1bf+pCkSJDHt5+TZ5LJKesZls0cD52FNpMUW0buMYplLNqxs5gOVI2zm4If81B47oQtRUEtA7CbWimsARk2HZVB4V0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aq+W4kP5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A9D1C4CED1;
+	Thu, 20 Feb 2025 15:34:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740065035;
-	bh=4S3rXkPwX/qQwDVbpYloUGGWNrnrxI6LSqRoTIH2e+U=;
+	s=k20201202; t=1740065692;
+	bh=ccXvnfX2hSpdEAMuKnx2TrENdrP/yxjQUKZq2MkVuk0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DQ2c/VssDF/nS3hlaanCheULrRx/xW+iE5Js80EY01XxDTcsZvZGjKreORfzqRGaI
-	 5F/rl8+K9R3wnhDxxabpB382VGDUrPLzMJ331d9JaoBwmFAOwM4u4aY5AAdrM4u1VX
-	 9lpZiBywWYVNcH02pQqgI4dG/bSWM29xfPMlG1C9nyQESH4Sn5UUIL3op7EhU2h1p7
-	 gWm8BC/S1qsj/TGIrqZsUY+G6+PbJdxV22bUs+W1x0sgvloKsGHcaVDYGIlV8nlapB
-	 elEbFUa7VIODJvPeof24hsPSuFmhe2fRSP6QKCevLL8Rg3E8K5Fe1qQwO/2cEcIlB9
-	 l/chTU3WS0pfw==
+	b=aq+W4kP5gkC4VW/u1lU879F/SMxPkvamxTxTnd/v5SmR5ZqI9QZ8PjlR0+u4UQL5Y
+	 d7BONj6pRzBp5ZhHSK58xrsFR4/I93BHK0TrMkjNYu6X6rW0B5zyb+HmbIk6YkLp/S
+	 quBd00eBz6tHFiIQ8M1fAw49RF4STvKt/HK/5HysB/2xMwU7OUJqocidIfTqJselq7
+	 DX8XTpbgKMeBRm3tPV6HC855YfFcWQmIg6DEd3ataUXV4yqlnjXFmMFc/b3fNhEihj
+	 QO4NI/lfBoMxt1aQ1vxWn8OKNGIxnRh4lM2PQtoNAkHD8jXsF6J31xMH69NWuyT8AB
+	 mhEps+KRF4q+Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tl8P3-006Fq6-Qz;
-	Thu, 20 Feb 2025 15:23:53 +0000
-Date: Thu, 20 Feb 2025 15:23:53 +0000
-Message-ID: <86tt8or65y.wl-maz@kernel.org>
+	id 1tl8Zd-006G4V-Ps;
+	Thu, 20 Feb 2025 15:34:50 +0000
+Date: Thu, 20 Feb 2025 15:34:49 +0000
+Message-ID: <86seo8r5nq.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Joey Gouly <joey.gouly@arm.com>
 Cc: kvm@vger.kernel.org,
@@ -56,10 +56,10 @@ Cc: kvm@vger.kernel.org,
 	drjones@redhat.com,
 	kvmarm@lists.linux.dev,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [kvm-unit-tests PATCH v1 1/7] arm64: drop to EL1 if booted at EL2
-In-Reply-To: <20250220141354.2565567-2-joey.gouly@arm.com>
+Subject: Re: [kvm-unit-tests PATCH v1 7/7] arm64: run at EL2 if supported
+In-Reply-To: <20250220141354.2565567-8-joey.gouly@arm.com>
 References: <20250220141354.2565567-1-joey.gouly@arm.com>
-	<20250220141354.2565567-2-joey.gouly@arm.com>
+	<20250220141354.2565567-8-joey.gouly@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -75,78 +75,38 @@ X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvm@vger.kernel.org, alexandru.elisei@arm
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 20 Feb 2025 14:13:48 +0000,
+On Thu, 20 Feb 2025 14:13:54 +0000,
 Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> EL2 is not currently supported, drop to EL1 to conitnue booting.
+> If VHE is supported, continue booting at EL2, otherwise continue booting at
+> EL1.
 > 
 > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 > ---
->  arm/cstart64.S | 27 +++++++++++++++++++++++++--
->  1 file changed, 25 insertions(+), 2 deletions(-)
+>  arm/cstart64.S         | 28 ++++++++++++++++++++++++++++
+>  lib/arm64/asm/sysreg.h |  5 +++++
+>  2 files changed, 33 insertions(+)
 > 
 > diff --git a/arm/cstart64.S b/arm/cstart64.S
-> index b480a552..3a305ad0 100644
+> index 3a305ad0..2a15c03d 100644
 > --- a/arm/cstart64.S
 > +++ b/arm/cstart64.S
-> @@ -57,14 +57,25 @@ start:
->  	add     x6, x6, :lo12:reloc_end
->  1:
->  	cmp	x5, x6
-> -	b.hs	1f
-> +	b.hs	reloc_done
->  	ldr	x7, [x5]			// r_offset
->  	ldr	x8, [x5, #16]			// r_addend
->  	add	x8, x8, x4			// val = base + r_addend
->  	str	x8, [x4, x7]			// base[r_offset] = val
->  	add	x5, x5, #24
->  	b	1b
-> -
-> +reloc_done:
-> +	mrs	x4, CurrentEL
-> +	cmp	x4, CurrentEL_EL2
-> +	b.ne	1f
-> +drop_to_el1:
-> +	mov	x4, 4
+> @@ -68,6 +68,20 @@ reloc_done:
+>  	mrs	x4, CurrentEL
+>  	cmp	x4, CurrentEL_EL2
+>  	b.ne	1f
+> +	/* EL2 setup */
+> +	mrs	x4, mpidr_el1
+> +	msr	vmpidr_el2, x4
+> +	mrs	x4, midr_el1
+> +	msr	vpidr_el2, x4
+> +	/* check VHE is supported */
+> +	mrs	x4, ID_AA64MMFR1_EL1
+> +	ubfx	x4, x4, ID_AA64MMFR1_EL1_VH_SHIFT, #4
+> +	cmp	x4, #0
+> +	b.eq	drop_to_el1
 
-It'd be nice to have a symbolic constant denoting EL1t.
-
-> +	msr	spsr_el2, x4
-> +	adrp	x4, 1f
-> +	add	x4, x4, :lo12:1f
-> +	msr	elr_el2, x4
-> +	isb
-
-You can drop this ISB, as the following ERET has the same context
-synchronisation properties.
-
-> +	eret
->  1:
->  	/* zero BSS */
->  	adrp	x4, bss
-> @@ -186,6 +197,18 @@ get_mmu_off:
->  
->  .globl secondary_entry
->  secondary_entry:
-> +	mrs	x0, CurrentEL
-> +	cmp	x0, CurrentEL_EL2
-> +	b.ne	1f
-> +drop_to_el1_secondary:
-> +	mov	x0, 4
-> +	msr	spsr_el2, x0
-> +	adrp	x0, 1f
-> +	add	x0, x0, :lo12:1f
-> +	msr	elr_el2, x0
-> +	isb
-> +	eret
-
-Maybe move this into a macro and use it in the two instances of
-EL2->EL1 drop.
-
-> +1:
->  	/* enable FP/ASIMD and SVE */
->  	mov	x0, #(3 << 20)
->  	orr	x0, x0, #(3 << 16)
+nit: you can replace these cmp/b.eq with a cbz.
 
 Thanks,
 
