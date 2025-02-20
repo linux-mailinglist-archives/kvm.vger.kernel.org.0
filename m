@@ -1,387 +1,221 @@
-Return-Path: <kvm+bounces-38802-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38803-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EC4BA3E7A3
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 23:40:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80B7DA3E7C8
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 23:51:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6BC73B8EEE
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 22:40:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56FF2422CB7
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 22:51:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6FD8264F9E;
-	Thu, 20 Feb 2025 22:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C46E7264F8A;
+	Thu, 20 Feb 2025 22:51:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KkTcK18a"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Igsmd4k1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2042.outbound.protection.outlook.com [40.107.237.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6D4E1E9B35
-	for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 22:40:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740091208; cv=none; b=SFH+aPa4HQZkKqyPWaCD2EfuHk0IiwCkMiKUyAJqeo4Jw7hPFJVhTagzvpzBq8aRXlNTb3HkrEjPXdAXwuFL/zprtSMpObJHiByaEU16qdfgubf8mEk1I1Ji7An8vE19UBfcUrMuEVTG66qNwX95HM9kSoyxvGPTg3tJpRaf/yc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740091208; c=relaxed/simple;
-	bh=MA+xHDdqUq1yk2Ez9s2XXu1J75s7bgUJ74/iEEmrWOM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RHSQNXeAnB9cWcLQXFY98YO6LNoz56jkqQlRDgdKnR8rBSG0L4ZE1SQKv4NjQQYq0VvUJ2AX8+UzTRmo25Lk65BO865/w011KkCPRJtB+u1lo1a6fzX8vUJWMOWncaDMOVLmXFCOQqJdDPvswbIUFi20HvwkL1AiPzDFmqBLzHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KkTcK18a; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-abbd96bef64so238349266b.3
-        for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 14:40:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740091204; x=1740696004; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/EvYv+aj8j+zTCkL7ssEiUCbMGAzEqKBKYb0x2hzdFs=;
-        b=KkTcK18aLdjPfPHwrO8RYr3X7+wR+jLEFyotyJTnwIsNaAxQ0YvSTe9JO/fJxvfAzb
-         AkRrpWoPk8oefTeMujZCpWzykCVjx2XwRjLN4koFTBoVTMNMqt0sx+OUvr7LzyTAa0Uo
-         6XiFvMZGRypRc/y4mzpWgJB4rNLL17B/BMDt6LmUY2goEPWmLcYufn8pvCjhcw6jbTGo
-         z7xQ48RJ0IxJ6iP8zM8ajZoDhvbKUIjK9yIns0gP2rn4exhtsdjTvTE4tu+nI2UDxP8v
-         t35UuPbG8rwbSX6o5+NI81YEKQI03YSQUSn5M7CzgE6hf3q0Wg4L19ZpI0JJr4syRckD
-         Lciw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740091204; x=1740696004;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/EvYv+aj8j+zTCkL7ssEiUCbMGAzEqKBKYb0x2hzdFs=;
-        b=SRI05uj6kcR43e9fOM++zv1EOHjUyJMCfwGz9w8mXGtW7Y5GYXaeisOC/nPhZpQ4ez
-         ll0F968yN3fNtVY6oQd0PEYKawcoCgStUvLGgJUK9k0LtgUoz2uzwVAGJKs+nQM8lBwJ
-         DsQy6WFNeUjfSPTGJdPbLCL/Tz5mAeDgZIagvOSWPOKOFHOyrb+y81307OWhGyGKUIbm
-         RUqOMrCM16zYHN61r3OlHM4sQ/kwh4mD5ZMNAyosYgMXGEmTtakWGtzdePPGt0F7yTpI
-         5fx0qm09OzvN4oHm1YkQ69aXnFt87VczDKgFTSJMzOtbf+zteCNT5xVEkGcbfyWxWMBK
-         AzcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUKOCTrcPoSM7fv0kouGmAwuiLTF1MwV3j+bOSX0WdYDZDYBAkyVAVf8n8SvVxxzMSFo1A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHZLJSEuAAOesM0+dP2SvygdZlJj0hTixQxS9NMe6MhjyWq6rW
-	/LwrHghQomkiyXXgYqu8h3Il6BOvAl+g6DUzTAzU2O+FNSc3EQY9H/+v0tW/Lc+Ru0hGQA95zpw
-	OieSmnutdZMUCWhDSxvqQ2NBg4cEuyf8c8wQG
-X-Gm-Gg: ASbGncsBAgMt/hhN2SFNANBYJK2mAazMD6QQE1Ka062BUtwJAyxrzfOfo664Fr0mlAf
-	CFjE3Je0jwez6SMOA5YKROr1UfASzLky11xr7M5RQ0Muh4dGqCxZoZ+OAMcHz/zmed16YFPyoTc
-	90lJMuPE4NBVTS2dBfvRgYzWVa6aY=
-X-Google-Smtp-Source: AGHT+IH4Qv0+6KZvpi+1uMXLZPhezmGXC7uR+1Xj4tehYbACfpkqO8/vS0CgMXXyCsoXJGBUSjhJxEbyphd2GOB9Mpc=
-X-Received: by 2002:a17:907:72c8:b0:ab7:e52a:1467 with SMTP id
- a640c23a62f3a-abc09aff659mr125332966b.30.1740091203960; Thu, 20 Feb 2025
- 14:40:03 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C935F1C5D67;
+	Thu, 20 Feb 2025 22:51:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740091870; cv=fail; b=sv2Q3ftluL1dqdeSXK9MLq6hsnugWGBsOQ1aY7nGzZuxu1RMiFLJ7dwoxRSG5BQ4hbaerBT+JZfbHA5k/Xrzm+gI9wRDiJYK5KZ1WfEN09BtMujx1ZbBCzrkuaULc7wH8vHbiWfs1t0oNql7zm54t3OE/gUqc+Q3H0nM6SiLYz4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740091870; c=relaxed/simple;
+	bh=aBMvUgn9hcbp+VnrPKGAxGg3iCPL+AG0nMYm8uHSyT4=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=LJ9iX5EI7q7EnTgQfEFxnZSWSgl1JHIjreqdM8g+NJ69pniO76Yrnm9sU1LMxr/Uh4/OoGHt6K8V/u/zPTn8cg1vFz/fJocV1zIAtOeIJquGgN9IHIxi8njivWgOC0NJ55MdFpDZ6JSWHqDcgOitXv7JLCJ7ad6FdD7pn1lVhqE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Igsmd4k1; arc=fail smtp.client-ip=40.107.237.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=V86eLQSUnQmE8j3AteJBuTqbUTFnNjaG/+yvARemAwhIT7qt5Fe6IN3zVmRbgpvNhyQP0jQqvLjACZ20U7rcfrUMQ2t3+n8197f6K7t+/Xw4XDkoBFyYZuSotm61GP2s+dsGlrbbrI7fEWPbTKzgNx6waQIb67a1+kYnKrdLwQ3JOHV81fBQdt4kSyrPDRQ9lVRAAmPHzjPGAoBB+ShSMxanFrFygfuElF7HqgL2R2ikOXUv7BoicXlUUnukhPQl3zBGO3C88k3GlcJYPB+bydIspsF6UZFMHD8lAbPF37xcDPQMEd017QfPSQqzVYlV+OIeQ7vQVoTWCUgNdtS5ew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xFWxDaJdVT8XVO/wVOHRfv8zuDXj4/yGMAxuKSRRFCE=;
+ b=rxUY4ZmWeeYGQ+oNqbNRSedY7heAATH4K7M3Y4j9SqUnvIUCGQe9tzB1etkk4j92ItgSPW+RYq6psiF4QZ3nOysNjvoN0eBxD+gkS89Xj3jiRu/x+MUBbvtYm7wUm7bQ9rew9Gqdipdat/EF0PI/hq1BhK79sWrVIEFVduG1BdbYsRTmyXsdvUZiiAeRpEvTNtXc+82V3KiKI2B96MntYhHR4vZAy2m2JRuqFfjl6q86OnPsOHWgRGqAyNaLMG7oFxq1SVOapOApizjulWBORHmmqpgh94leDmqy/ssA/LZ1Xnt9ZYI993JqFfRO+qHL6KLxfgPDs2V0lQAIfgcerQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xFWxDaJdVT8XVO/wVOHRfv8zuDXj4/yGMAxuKSRRFCE=;
+ b=Igsmd4k1xluGGktP4IH6itMC5sSoM31cVW5a7Y2zYRC8XmOt7sHh4wlx6rF0ncpr5lFDMRQKg+6fHUEVfNH3m1QbwKGoOjyT6b+1pm6L5F8h35Jx7nvty9YwVwn56AELcRZhjGf8UlKT5iXvhz5Tvao0U320/1akukAJX0TiSIU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
+ by MN0PR12MB5907.namprd12.prod.outlook.com (2603:10b6:208:37b::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.19; Thu, 20 Feb
+ 2025 22:51:04 +0000
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e%7]) with mapi id 15.20.8466.016; Thu, 20 Feb 2025
+ 22:51:03 +0000
+Message-ID: <a9d70abe-d229-81cb-4d9a-6106cef612a4@amd.com>
+Date: Thu, 20 Feb 2025 16:51:01 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH 00/10] KVM: SVM: Attempt to cleanup SEV_FEATURES
+Content-Language: en-US
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Naveen N Rao <naveen@kernel.org>, Kim Phillips <kim.phillips@amd.com>,
+ Alexey Kardashevskiy <aik@amd.com>
+References: <20250219012705.1495231-1-seanjc@google.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <20250219012705.1495231-1-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA9PR03CA0015.namprd03.prod.outlook.com
+ (2603:10b6:806:20::20) To DM4PR12MB5070.namprd12.prod.outlook.com
+ (2603:10b6:5:389::22)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1739997129.git.ashish.kalra@amd.com> <f1caff4423a46c50564e625fd98932fde2a9a3fc.1739997129.git.ashish.kalra@amd.com>
- <CAAH4kHab8rvWCPX2x8cvv6Dm+uhZQxpJgwrrn2GAKzn8sqS9Kg@mail.gmail.com>
- <27d63f0a-f840-42df-a31c-28c8cb457222@amd.com> <CAAH4kHYXGNTFABo7hWCQvvebiv4VkXfT8HvV-FPneyQcrHA-9w@mail.gmail.com>
- <f227fa9a-f609-41f3-a63b-1c37ded33134@amd.com>
-In-Reply-To: <f227fa9a-f609-41f3-a63b-1c37ded33134@amd.com>
-From: Dionna Amalie Glaze <dionnaglaze@google.com>
-Date: Thu, 20 Feb 2025 14:39:51 -0800
-X-Gm-Features: AWEUYZmXe-AfsDb9SasqOdujPJo2AOjKzPGzkt9ECuWbb2oibMH6xOtCbdo7MV8
-Message-ID: <CAAH4kHaM6BDD3Ry5KQJn0rVi7m+FCy2auQPnFNSxnMMeLziGhQ@mail.gmail.com>
-Subject: Re: [PATCH v4 2/7] crypto: ccp: Ensure implicit SEV/SNP init and
- shutdown in ioctls
-To: "Kalra, Ashish" <ashish.kalra@amd.com>
-Cc: seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de, 
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
-	hpa@zytor.com, thomas.lendacky@amd.com, john.allen@amd.com, 
-	herbert@gondor.apana.org.au, michael.roth@amd.com, nikunj@amd.com, 
-	ardb@kernel.org, kevinloughlin@google.com, Neeraj.Upadhyay@amd.com, 
-	aik@amd.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-coco@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|MN0PR12MB5907:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0fba0a7e-cef6-41f3-7a5f-08dd52010dc3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?VHRmRXFwV1F6OUdHbTlGdWU1NVU1MmRKbStiTWYyL2o5VENUS3ppMWJMWTgr?=
+ =?utf-8?B?ZGl3R0Zvb0M2cUM1OTlHQUhLUnR5c3FJaDhJckUvRmJJSGdadlR4WTJ6UFVM?=
+ =?utf-8?B?emJ1eWF4NnFNWERIeXl0bks5WENGdElXYyswSm5iNmdYVFpla2crcE1tSExB?=
+ =?utf-8?B?Qk8zVVZaaGR3OXNuK1RFS0QwVVVuenE3Y3YwandzNFFyd1A5Rk5XQlhSeWhn?=
+ =?utf-8?B?TnBzdDZaVmJIM1Y1NjBJUG1lNitkM3ZmR3FOMEN3WjV3Z0Fwb0N2WlpRMzdF?=
+ =?utf-8?B?RlZJcGdxNE8rbkIxbEdaVUtLejFmNjk5dHJQZlZ1cDJ1aFZkbDRDV0pPdWZK?=
+ =?utf-8?B?NnEvVFlSbHhzK1lIUE05aWdZd1BoeUFmcnY5MFNoRTdxUER6MjhuQkJPWFRC?=
+ =?utf-8?B?Y0R5cWxoZzRpRTNsMXBiMG56SlBJaXMxMTJJVWVOZGM1V0cwUVN5WDRURmgv?=
+ =?utf-8?B?OXRrbGd2NE4vbWUrcDdFZzA5V24yK2lWczNvb0dFbDhKVm9qT01YWmtLN1dm?=
+ =?utf-8?B?UkFRWHU0T3N1Z2RCTkNuWlNDN0RrQzFjUW52N1ZoSU1YTzljZzNVMFlxL0JL?=
+ =?utf-8?B?bDI1SUl3NXlhNGt3NWVoMVhaR05DR3lyVUJZWnBVZmdDanc2L1gxV2J5bk9t?=
+ =?utf-8?B?SXE5U0xlTUlId25kV3Axd3BPa2dTN2dPZTlMMHhhenVuYTh3TDYvNWY2U2dG?=
+ =?utf-8?B?NHMxMkZaeW81YW9CQVcxUVd5cGhVZ1FXZzAyQXhKK2gwMW1iWG96YnBub3BL?=
+ =?utf-8?B?anRKekdrb0tVd25JdFZuazErRGVDckpaWXR1UzlaSnhxQktONHBnWU52Z1o0?=
+ =?utf-8?B?cm5ONytYUHBVbGc4VXNLdDFFRnBnOXZCK3BrY1lnS0g5TkFYbEpSNXFlcDNa?=
+ =?utf-8?B?NDI5WnVXNUoxY0FXS3MvalJqdlVTK0pwSS9ldC9VTWRWYklWRkJyRlFLSERj?=
+ =?utf-8?B?Ty9xWTM0NzlNb0M3c2l5b1lmSDdhL082R0pzRlVaVjAzMFdQZThTYWkzNll0?=
+ =?utf-8?B?THV6dmsyZWN1SzN1Qmlac3JqZkNuTjdBSURTa21NenFjOGR4L2FyNi83Zkgw?=
+ =?utf-8?B?VXlieS9EQjY2U3haOUhYcVVuK1NoeDRIOFFVVzFqMUMwc1dnVS9Pd3BYektE?=
+ =?utf-8?B?ZEJVTDlsV3k4ZUJ3WExyNWpRQnBvM0NXeVFlUk5idXVEalZDT0xkYTZNMU5K?=
+ =?utf-8?B?MEM2Q2JuOWNoajdPcC9MeUtiMlZlaWxiWkYwUE9pWTE1Wkp6cXVMWkE3Mkd1?=
+ =?utf-8?B?cFA5bVZPVWhpdUhFbDBhQVMyYmU4Y25NSndoVzdhMkxHZm9iR21rUGk4bzNj?=
+ =?utf-8?B?bE5QcHJsQXdLM3N4MGltRWhIT1FqRVdPRkpsaEhWcFN3bTVQc2xpSnRFK0c2?=
+ =?utf-8?B?MW51Wnd4Y0JCRUcxSUM2UW1lTVpGbzdlS3phcnVlTkRoRTVuQWprUHU5ZHpi?=
+ =?utf-8?B?azlweFZuR2thcFlsOS85MHBNTVBhZ2V0dEF3ZE43dnEyaFZ1NkpQd1d2dkE3?=
+ =?utf-8?B?NXRWOXZDT2tiNi9KdlltZUxHZkExSDdoeFZic2crUjAvSG9VSlBRUld3UlVN?=
+ =?utf-8?B?VDd6eDZDRDhNNERSdWlNa1RzMXQ1Mk4vZVplcmIwaG1RM1RzcEQyUWFTcXI5?=
+ =?utf-8?B?NWR2ZDJsQlFCQ3BHbzZlWFdWUXRsdDdMbEMxMUZyK0RZZWprZjRXZ0Mrclll?=
+ =?utf-8?B?MVl3TjA5cjZTbDNEaWpoTVREcSs1OTFQN0diQm53eVhkY0EzTXpzM29jdjZD?=
+ =?utf-8?B?TC9OUnI3dFNmNHdFbjFldjNWT3Aza3BiZURSL3hjSEJyd3hSNDdYZHJKaHNa?=
+ =?utf-8?B?aXdPelhWYUoyMytRQndWcDdxL004RFZrNjlFSW9uTi83bi9qWEEyNVZCS1R6?=
+ =?utf-8?Q?C96Exiv2gDqIt?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?dHNSTXlHYzZNWk5CSVZvdVJIa240eVNZS0gwbWo5dnZ0MjMyY2Q2WU1jK2x0?=
+ =?utf-8?B?c0FDL09wOU4xVEZ6RGhpRXRYVHR6UFZwdllTeHhqdWk2Uk43bzF0b1RXRlVH?=
+ =?utf-8?B?NTVNWnE5SXdBMEZoWjRZNnRXVFEycEZKSUZ4RXJkbEx2OEF5YTN2aDQ4OUNM?=
+ =?utf-8?B?MDVURURIQWYzc2p5bU1XeCtaRlRGMEU2aGxJSGpRdXd1THRSemNjbWZ4VTk1?=
+ =?utf-8?B?OWZMemtWOENETlIwOGZtVGpNR1BsN052OVhmaXZxYk5XdU10RmZTbU11ajVx?=
+ =?utf-8?B?OEdlMWNFL1BtazBZd0xNcm94NjZrRVVJMndObTRpTXIyZjR0VFlEcm93Zklx?=
+ =?utf-8?B?VUJPVnFObldJeWpsb3ZOVXBCdktsSFJ2R1FPaFdnR3Q3Q1VJeDUxbVlJR09l?=
+ =?utf-8?B?VmZGSmEvSHg1MEMzN2JvL1l1c2JvZVpEYWViNDFpc1FrdXpvNEYxM0lOQXFQ?=
+ =?utf-8?B?Qzd1Y1NUUmVSVDd5dmtON0p3WC8weitsTW1GbG12NlgrQzhhTVEweUdMQXpV?=
+ =?utf-8?B?ajBuOEc3R3JxMjd4NjZ2WEtwMXI1UjlJby85SnptNHNPLys1RVFDcHEwLzNJ?=
+ =?utf-8?B?OFVxc0xMWkExVWVNbzRHMUJ2dE93OWw5b1h5RC9rSi9Xa0lQbHdUMGxrNGMx?=
+ =?utf-8?B?UVBmcUpNU1JhbVpBZ1IvdU1WU1lyYTR2Um1zWGFwc1hWQmRHUW45THJTWUNP?=
+ =?utf-8?B?U3JyREZYcDBXZS9seFA2a01KdUpZYnVoWE9vVm0rdFZ4bXpJN0d2TU1tUTlI?=
+ =?utf-8?B?eW5heFQ5SDNXSDhldE4vVUNiS2VCOVBYT291bWExSFhQSGJ0ZVh2SmpmWlda?=
+ =?utf-8?B?TW5ONjFjOEMvYmZpNk93aGJtV3BoNjd1YnYyaGdwc1Mzc21pa3FmcjRQRndB?=
+ =?utf-8?B?RGZzYVdkaXJsNklub2tmSVp0UWRjYW80d2ZGb3NvSFJua2paQitDSjhEQ2Vl?=
+ =?utf-8?B?bk96algrUmF1bzhTZHNTNmFtdklCd1pTTit5eGZjTTJEOXg0QStTWlNPZnAr?=
+ =?utf-8?B?YnlLSDluVUNYU1RnSlN3eXVCd2NET2RXRlEyemVDaU9yNnJHTi91WnpMb1VE?=
+ =?utf-8?B?dDRTVWwvOWYvWndwWHBNa2djU1F0ektxK3NkLzR0Wm5YY25VOVIzeDkxYTJP?=
+ =?utf-8?B?V1crQVArcnJRMlhBcUZFK2dwQjJuVTBCM0xaZjJScW1YK01KMEtNaHBVUEhj?=
+ =?utf-8?B?cnV6a2hqTWVubTFuL1RHMnRXVFNUVEUrVU1zR3h0QUN0OWQwUHZFbzl2dVZk?=
+ =?utf-8?B?ZFlPZEZRNTBYNHlIQlRnZEFxNXh5cGR6elpKVVBnbk81NFkrRGlTbVZCTGZl?=
+ =?utf-8?B?WTRjcGc0WUhJSFZOVmd6bFhNNWlUb3d3VGVLQVU4ekRLK3djRCtjSS9zVy9D?=
+ =?utf-8?B?cFd3RGxsaFFmTVM4aEE2bVQzZmZUL3lkSVBYcGdod1ZzV1dxRmJsRlpqRS82?=
+ =?utf-8?B?RDNneUlLWkRKbFFGejY4K2gwTVBUamwwRnNhVDBMaFpYRG40bjhwQnd4UlJI?=
+ =?utf-8?B?QUJPdDBIVzFvR01HemZQQ3BHeEo3YmJHUVVTWmFmVDhuTFN3SGZjRVdFelAx?=
+ =?utf-8?B?Rk9qNEY1YnYwN0pFWVh6VXNlQnMzR1daUzBmQ0hkT0ZqdU1McVNXaUZhcm9B?=
+ =?utf-8?B?cG1TTVpsTTVxLzZLOGVBTTVja0EwRnM5ZEJkaDVqWmV5d3dZT3poM0R1K0FX?=
+ =?utf-8?B?a3I1Y1hhVkhwcjVJOUt1azBLYmR0amdWUWZENjVSOXo3clJCU0VlZ1d1ak9z?=
+ =?utf-8?B?ZWdKRG03a2pmVm9NSDRRUXlaYjB1UG9kTklGOVZYbmgvSjJVRkJiT0tpMVNI?=
+ =?utf-8?B?YXdBNW0yQTE3bGh2dUlpcmNHUHkwN2RyTHVMSFlNU0xsZnpXb1U1dFdhaGVz?=
+ =?utf-8?B?OGY3OFY1a2tOWEpGd0gwaWxuTzhCc2FjYWlHZGZRVHIwZHM1ZlU2cHZtVGlL?=
+ =?utf-8?B?SzdjdVFMRGxYYTBOQjBWWlBsNzBCMVUvYUJ5RXpaL3Q2THFOQmR4MUVEUVlR?=
+ =?utf-8?B?b2pESnNJdnRvQVR2Z0I5ZWtMcmZQUXdlV09hUS9oaGhxQlFuS0c2NnZmUkFP?=
+ =?utf-8?B?aUVnRVRMaTcrMmMvMndBQ2p3ZEZvSnczVEhWY1lZclZ6T0lLWDBBa2gxQWpo?=
+ =?utf-8?Q?HHf0MzLv0f+ROTEYFQkctDqAP?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0fba0a7e-cef6-41f3-7a5f-08dd52010dc3
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2025 22:51:03.7701
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jF1lodbbmey2jG1Pqh4G+3C2zOJFxzzqqjuLDAyAj69JFcACoXt07vqTuuWDfm0WPleJ1sb8+Z/4enqT65pplA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5907
 
-On Thu, Feb 20, 2025 at 2:18=E2=80=AFPM Kalra, Ashish <ashish.kalra@amd.com=
-> wrote:
->
-> On 2/20/2025 3:37 PM, Dionna Amalie Glaze wrote:
-> > On Thu, Feb 20, 2025 at 12:07=E2=80=AFPM Kalra, Ashish <ashish.kalra@am=
-d.com> wrote:
-> >>
-> >> Hello Dionna,
-> >>
-> >> On 2/20/2025 10:44 AM, Dionna Amalie Glaze wrote:
-> >>> On Wed, Feb 19, 2025 at 12:53=E2=80=AFPM Ashish Kalra <Ashish.Kalra@a=
-md.com> wrote:
-> >>>>
-> >>>> From: Ashish Kalra <ashish.kalra@amd.com>
-> >>>>
-> >>>> Modify the behavior of implicit SEV initialization in some of the
-> >>>> SEV ioctls to do both SEV initialization and shutdown and add
-> >>>> implicit SNP initialization and shutdown to some of the SNP ioctls
-> >>>> so that the change of SEV/SNP platform initialization not being
-> >>>> done during PSP driver probe time does not break userspace tools
-> >>>> such as sevtool, etc.
-> >>>>
-> >>>> Prior to this patch, SEV has always been initialized before these
-> >>>> ioctls as SEV initialization is done as part of PSP module probe,
-> >>>> but now with SEV initialization being moved to KVM module load inste=
-ad
-> >>>> of PSP driver probe, the implied SEV INIT actually makes sense and g=
-ets
-> >>>> used and additionally to maintain SEV platform state consistency
-> >>>> before and after the ioctl SEV shutdown needs to be done after the
-> >>>> firmware call.
-> >>>>
-> >>>> It is important to do SEV Shutdown here with the SEV/SNP initializat=
-ion
-> >>>> moving to KVM, an implicit SEV INIT here as part of the SEV ioctls n=
-ot
-> >>>> followed with SEV Shutdown will cause SEV to remain in INIT state an=
-d
-> >>>> then a future SNP INIT in KVM module load will fail.
-> >>>>
-> >>>> Similarly, prior to this patch, SNP has always been initialized befo=
-re
-> >>>> these ioctls as SNP initialization is done as part of PSP module pro=
-be,
-> >>>> therefore, to keep a consistent behavior, SNP init needs to be done
-> >>>> here implicitly as part of these ioctls followed with SNP shutdown
-> >>>> before returning from the ioctl to maintain the consistent platform
-> >>>> state before and after the ioctl.
-> >>>>
-> >>>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> >>>> ---
-> >>>>  drivers/crypto/ccp/sev-dev.c | 117 ++++++++++++++++++++++++++++----=
----
-> >>>>  1 file changed, 93 insertions(+), 24 deletions(-)
-> >>>>
-> >>>> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-d=
-ev.c
-> >>>> index 8f5c474b9d1c..b06f43eb18f7 100644
-> >>>> --- a/drivers/crypto/ccp/sev-dev.c
-> >>>> +++ b/drivers/crypto/ccp/sev-dev.c
-> >>>> @@ -1461,7 +1461,8 @@ static int sev_ioctl_do_platform_status(struct=
- sev_issue_cmd *argp)
-> >>>>  static int sev_ioctl_do_pek_pdh_gen(int cmd, struct sev_issue_cmd *=
-argp, bool writable)
-> >>>>  {
-> >>>>         struct sev_device *sev =3D psp_master->sev_data;
-> >>>> -       int rc;
-> >>>> +       bool shutdown_required =3D false;
-> >>>> +       int rc, error;
-> >>>>
-> >>>>         if (!writable)
-> >>>>                 return -EPERM;
-> >>>> @@ -1470,19 +1471,26 @@ static int sev_ioctl_do_pek_pdh_gen(int cmd,=
- struct sev_issue_cmd *argp, bool wr
-> >>>>                 rc =3D __sev_platform_init_locked(&argp->error);
-> >>>>                 if (rc)
-> >>>>                         return rc;
-> >>>> +               shutdown_required =3D true;
-> >>>>         }
-> >>>>
-> >>>> -       return __sev_do_cmd_locked(cmd, NULL, &argp->error);
-> >>>> +       rc =3D __sev_do_cmd_locked(cmd, NULL, &argp->error);
-> >>>> +
-> >>>> +       if (shutdown_required)
-> >>>> +               __sev_platform_shutdown_locked(&error);
-> >>>
-> >>> This error is discarded. Is that by design? If so, It'd be better to
-> >>> call this ignored_error.
-> >>>
-> >>
-> >> This is by design, we cannot overwrite the error for the original comm=
-and being issued
-> >> here which in this case is do_pek_pdh_gen, hence we use a local error =
-for the shutdown command.
-> >> And __sev_platform_shutdown_locked() has it's own error logging code, =
-so it will be printing
-> >> the error message for the shutdown command failure, so the shutdown er=
-ror is not eventually
-> >> being ignored, that error log will assist in any inconsistent SEV/SNP =
-platform state and
-> >> subsequent errors.
-> >>
-> >>>> +
-> >>>> +       return rc;
-> >>>>  }
-> >>>>
-> >>>>  static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool wr=
-itable)
-> >>>>  {
-> >>>>         struct sev_device *sev =3D psp_master->sev_data;
-> >>>>         struct sev_user_data_pek_csr input;
-> >>>> +       bool shutdown_required =3D false;
-> >>>>         struct sev_data_pek_csr data;
-> >>>>         void __user *input_address;
-> >>>>         void *blob =3D NULL;
-> >>>> -       int ret;
-> >>>> +       int ret, error;
-> >>>>
-> >>>>         if (!writable)
-> >>>>                 return -EPERM;
-> >>>> @@ -1513,6 +1521,7 @@ static int sev_ioctl_do_pek_csr(struct sev_iss=
-ue_cmd *argp, bool writable)
-> >>>>                 ret =3D __sev_platform_init_locked(&argp->error);
-> >>>>                 if (ret)
-> >>>>                         goto e_free_blob;
-> >>>> +               shutdown_required =3D true;
-> >>>>         }
-> >>>>
-> >>>>         ret =3D __sev_do_cmd_locked(SEV_CMD_PEK_CSR, &data, &argp->e=
-rror);
-> >>>> @@ -1531,6 +1540,9 @@ static int sev_ioctl_do_pek_csr(struct sev_iss=
-ue_cmd *argp, bool writable)
-> >>>>         }
-> >>>>
-> >>>>  e_free_blob:
-> >>>> +       if (shutdown_required)
-> >>>> +               __sev_platform_shutdown_locked(&error);
-> >>>
-> >>> Another discarded error. This function is called in different
-> >>> locations in sev-dev.c with and without checking the result, which
-> >>> seems problematic.
-> >>
-> >> Not really, if shutdown fails for any reason, the error is printed.
-> >> The return value here reflects the value of the original command/funct=
-ion.
-> >> The command/ioctl could have succeeded but the shutdown failed, hence,
-> >> shutdown error is printed, but the return value reflects that the ioct=
-l succeeded.
-> >>
-> >> Additionally, in case of INIT before the command is issued, the comman=
-d may
-> >> have failed without the SEV state being in INIT state, hence the error=
- for the
-> >> INIT command failure is returned back from the ioctl.
-> >>
-> >>>
-> >>>> +
-> >>>>         kfree(blob);
-> >>>>         return ret;
-> >>>>  }
-> >>>> @@ -1747,8 +1759,9 @@ static int sev_ioctl_do_pek_import(struct sev_=
-issue_cmd *argp, bool writable)
-> >>>>         struct sev_device *sev =3D psp_master->sev_data;
-> >>>>         struct sev_user_data_pek_cert_import input;
-> >>>>         struct sev_data_pek_cert_import data;
-> >>>> +       bool shutdown_required =3D false;
-> >>>>         void *pek_blob, *oca_blob;
-> >>>> -       int ret;
-> >>>> +       int ret, error;
-> >>>>
-> >>>>         if (!writable)
-> >>>>                 return -EPERM;
-> >>>> @@ -1780,11 +1793,15 @@ static int sev_ioctl_do_pek_import(struct se=
-v_issue_cmd *argp, bool writable)
-> >>>>                 ret =3D __sev_platform_init_locked(&argp->error);
-> >>>>                 if (ret)
-> >>>>                         goto e_free_oca;
-> >>>> +               shutdown_required =3D true;
-> >>>>         }
-> >>>>
-> >>>>         ret =3D __sev_do_cmd_locked(SEV_CMD_PEK_CERT_IMPORT, &data, =
-&argp->error);
-> >>>>
-> >>>>  e_free_oca:
-> >>>> +       if (shutdown_required)
-> >>>> +               __sev_platform_shutdown_locked(&error);
-> >>>
-> >>> Again.
-> >>>
-> >>>> +
-> >>>>         kfree(oca_blob);
-> >>>>  e_free_pek:
-> >>>>         kfree(pek_blob);
-> >>>> @@ -1901,17 +1918,8 @@ static int sev_ioctl_do_pdh_export(struct sev=
-_issue_cmd *argp, bool writable)
-> >>>>         struct sev_data_pdh_cert_export data;
-> >>>>         void __user *input_cert_chain_address;
-> >>>>         void __user *input_pdh_cert_address;
-> >>>> -       int ret;
-> >>>> -
-> >>>> -       /* If platform is not in INIT state then transition it to IN=
-IT. */
-> >>>> -       if (sev->state !=3D SEV_STATE_INIT) {
-> >>>> -               if (!writable)
-> >>>> -                       return -EPERM;
-> >>>> -
-> >>>> -               ret =3D __sev_platform_init_locked(&argp->error);
-> >>>> -               if (ret)
-> >>>> -                       return ret;
-> >>>> -       }
-> >>>> +       bool shutdown_required =3D false;
-> >>>> +       int ret, error;
-> >>>>
-> >>>>         if (copy_from_user(&input, (void __user *)argp->data, sizeof=
-(input)))
-> >>>>                 return -EFAULT;
-> >>>> @@ -1952,6 +1960,16 @@ static int sev_ioctl_do_pdh_export(struct sev=
-_issue_cmd *argp, bool writable)
-> >>>>         data.cert_chain_len =3D input.cert_chain_len;
-> >>>>
-> >>>>  cmd:
-> >>>> +       /* If platform is not in INIT state then transition it to IN=
-IT. */
-> >>>> +       if (sev->state !=3D SEV_STATE_INIT) {
-> >>>> +               if (!writable)
-> >>>> +                       goto e_free_cert;
-> >>>> +               ret =3D __sev_platform_init_locked(&argp->error);
-> >>>
-> >>> Using argp->error for init instead of the ioctl-requested command
-> >>> means that the user will have difficulty distinguishing which process
-> >>> is at fault, no?
-> >>>
-> >>
-> >> Not really, in case the SEV command has still not been issued, argp->e=
-rror is still usable
-> >> and returned back to the caller (no need to use a local error here), w=
-e are not overwriting
-> >> the argp->error used for the original command/ioctl here.
-> >>
-> >
-> > I mean in the case that argp->error is set to a value shared by the
-> > command and init, it's hard to know what the problem was.
-> > I'd like to ensure that the documentation is updated to reflect that
-> > (in this case) if PDH_CERT_EXPORT returns INVALID_PLATFORM_STATE, then
-> > it's because the platform was not in PSTATE.UNINIT state.
-> > The new behavior of initializing when you need to now means that you
-> > should have ruled out INVALID_PLATFORM_STATE as a possible value from
-> > PDH_EXPORT_CERT. Same for SNP_CONFIG.
-> >
-> > There is not a 1-to-1 mapping between the ioctl commands and the SEV
-> > commands now, so I think you need extra documentation to clarify the
-> > new error space for at least pdh_export and set_config
-> >
-> > SNP_PLATFORM_STATUS, VLEK_LOAD, and SNP_COMMIT appear to not
-> > necessarily have a provenance confusion after looking closer.
-> >
-> >
->
-> I am more of less trying to match the current behavior of sev_ioctl_do_pe=
-k_import()
-> or sev_ioctl_do_pdh_export().
->
-> All this is implementation specific handling so we can't update SEV/SNP f=
-irmware
-> API specs documentation for this new error space, this is not a firmware =
-specific return code.
->
+On 2/18/25 19:26, Sean Christopherson wrote:
+> This is a hastily thrown together series, barely above RFC, to try and
+> address the worst of the issues that arise with guest controlled SEV
+> features (thanks AP creation)[1].
+> 
+> In addition to the initial flaws with DebugSwap, I came across a variety
+> of issues when trying to figure out how best to handle SEV features in
+> general.  E.g. AFAICT, KVM doesn't guard against userspace manually making
+> a vCPU RUNNABLE after it has been DESTROYED (or after a failed CREATE).
+> 
+> This is essentially compile-tested only, as I don't have easy access to a
+> system with SNP enabled.  I ran the SEV-ES selftests, but that's not much
+> in the way of test coverage.
+> 
+> AMD folks, I would greatly appreciate reviews, testing, and most importantly,
+> confirmation that all of this actually works the way I think it does.
 
-I was just talking about the uapi for the ioctls, not AMD reference
-documentation.
+A quick test of a 64 vCPU SNP guest booted successfully, so that's a
+good start. I'll take a closer look at these patches over the next few days.
 
-> But to maintain 1-to-1 mapping between the ioctl commands and the SEV/SNP=
- commands,
-> i think it will be better to handle this INIT in the same way as SHUTDOWN=
-, which
-> is to use a local error for INIT and in case of implicit INIT failures, l=
-et the
-> error logs from __sev_platform_init_locked() OR __sev_snp_init_locked() b=
-e printed
-> and always return INVALID_PLATFORM_STATE as error back to the caller.
->
-> Thanks,
-> Ashish
->
+Thanks,
+Tom
 
-
---=20
--Dionna Glaze, PhD, CISSP, CCSP (she/her)
+> 
+> [1] https://lore.kernel.org/all/Z7TSef290IQxQhT2@google.com
+> 
+> Sean Christopherson (10):
+>   KVM: SVM: Save host DR masks but NOT DRs on CPUs with DebugSwap
+>   KVM: SVM: Don't rely on DebugSwap to restore host DR0..DR3
+>   KVM: SVM: Terminate the VM if a SEV-ES+ guest is run with an invalid
+>     VMSA
+>   KVM: SVM: Don't change target vCPU state on AP Creation VMGEXIT error
+>   KVM: SVM: Require AP's "requested" SEV_FEATURES to match KVM's view
+>   KVM: SVM: Simplify request+kick logic in SNP AP Creation handling
+>   KVM: SVM: Use guard(mutex) to simplify SNP AP Creation error handling
+>   KVM: SVM: Mark VMCB dirty before processing incoming snp_vmsa_gpa
+>   KVM: SVM: Use guard(mutex) to simplify SNP vCPU state updates
+>   KVM: SVM: Invalidate "next" SNP VMSA GPA even on failure
+> 
+>  arch/x86/kvm/svm/sev.c | 218 +++++++++++++++++++----------------------
+>  arch/x86/kvm/svm/svm.c |   7 +-
+>  arch/x86/kvm/svm/svm.h |   2 +-
+>  3 files changed, 106 insertions(+), 121 deletions(-)
+> 
+> 
+> base-commit: fed48e2967f402f561d80075a20c5c9e16866e53
 
