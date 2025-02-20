@@ -1,150 +1,281 @@
-Return-Path: <kvm+bounces-38656-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38657-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77B83A3D3AD
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 09:51:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7ECAEA3D4A7
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 10:27:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD9E1189E362
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 08:51:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52B1D16B51E
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 09:27:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47B1E1EDA0D;
-	Thu, 20 Feb 2025 08:50:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDD6C1EE7A3;
+	Thu, 20 Feb 2025 09:27:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="ibRQdlT7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ug4jVr/A"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A23971EBFFF
-	for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 08:50:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E281E9B38
+	for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 09:26:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740041411; cv=none; b=jGykHI3QEnFrKsb9+UOvs4WO5kb2ltpZSsvwEFtkJt/MOOpkbLWhIJMfXVzXQvdWE+K4EEU0jRFb2bS64SmdaV1ddaJj09iEENX7ox7Dx4ASoI42NWOrJRyrYlhSNMRm9w8xXHfHs9T3BhNElj4UF3Yg8xEfAJS+cLGD48/tOnE=
+	t=1740043620; cv=none; b=ncAIccevixH7hxyfxpPIkj7mqNXxoFINgX+A+y2MKT34lCb3Bkx7hOb3Ye91+9o98UBsgNVOKO/LlsfEkJ3/s4tqBSvhUYDWSI/pf8D97lFKIkG/yzrLS19caggIrsBDCaOQKQJSNsefJcIC1nx0d6CvxHKkkbfd3UsqbV9oqTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740041411; c=relaxed/simple;
-	bh=GgaM6vvIOpqR7NE3Jr5ncvGl66QjYPZHcGTUZgOMyR8=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=eh5Y8TEMKFIWep7ttGPt+SGLQaEDqHifO/2hWdgtg0yqK2u6EpTbTLITZWUb/R/ipwyNCRLqynqTYHhp2+2SNDm1ilEwozAPptTmsdxtZNeISQbTqXb8MMKWp5wt0dKLSwekJpqyn+HlatLAkvaSp7Vd7gk2p+QS1WhWJ2zOSmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=ibRQdlT7; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43987d046caso906535e9.0
-        for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 00:50:09 -0800 (PST)
+	s=arc-20240116; t=1740043620; c=relaxed/simple;
+	bh=kUOvrm7ywT6NunS23y63stOK1S527Ajdt060Q4v8QLY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RLqxaYuAjzrzCIQhGAMCZHoSUtCQndLp2ILFycUpedvtJ61u3kxoZKUa43D9WHo4HHaoG3dHEUgv71+MnDuCcweJEwjiXebPo+0HOPei5L0xUMg/WBJp3mnxZ0rpo8GMWaPT9NkA9ee382wfB1VRCKwy3Y1pxsmW7H8Zf5YvuRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ug4jVr/A; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-471fbfe8b89so289841cf.0
+        for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 01:26:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1740041408; x=1740646208; darn=vger.kernel.org;
-        h=in-reply-to:references:from:to:cc:subject:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X4cSnvn9ljr1+95vro6JQ9OboRp/UL3qAMCfprqMPPM=;
-        b=ibRQdlT7UpoqfFO6a0krzGXimdbtF2N28m2BNujdnNIWSNpIObUg7Wf3TNeIp8sUMh
-         zG2p6/vMw1wSlTAjqx7YcXABJPXQxmwLXVSILL8D3jI4gTfz6AdT/T8tu2oOTE+rAZn6
-         f6cShWOzYuKZlwl2bEzZWoVwlsn5KyQoMi+/MhF/Li4phLTLn+2ScRG/woXuvX2QirF0
-         Hg57p0/yzU6O87CqInpeAi3ZQhdr1mEMwYCDqNGl1J98nULLRvJ636Lic76Oe9/hzfJJ
-         85jYqjnINNIpMw0bnA5LqOuPrb78hce44xb68eabcQp/I3gzITITH83COahMiZo+bICA
-         X17A==
+        d=google.com; s=20230601; t=1740043617; x=1740648417; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=DnhcIOH335Rs5OhBGYZtd9oahr5TV1ZZB9arTSRJ0/c=;
+        b=ug4jVr/AARzIBO4b5TcnAphWVqbU2tooroGHTTetuzjpGirCFTnAw2cLE/3OlvBsD+
+         MNdGDZZ8FO+5bzk9qilCsRCya1Ns0x+reXdWCXThvGIvM6qAKfNEmTDSc0ieX5v2DN3B
+         +L8+nTD7sEtZnZnfINSJp01lGl3JSjTJqC5mq8+cd5K4eA4T8bfMztMguokNbLeVgFNO
+         bxbK5BmWyMsdUynaXB4xW0cMmBFktEExasmnJTIUKxdpGHuVBtlRieCHTpfhcsPEUIvI
+         idKnHAIqQKlmzm+s9uDfzcpt3NiHYnRG/8cb0wTnVWetJSY/bubEGr+KTV67YKkPFw9y
+         T46A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740041408; x=1740646208;
-        h=in-reply-to:references:from:to:cc:subject:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=X4cSnvn9ljr1+95vro6JQ9OboRp/UL3qAMCfprqMPPM=;
-        b=DfvuNq+R7SODjlrCXbCqtFN/3IXY4Y9gZU73150gx5zFC+2mzOvflyx5bL6JZyrC9Z
-         Xf0nfgr443RlB5MgK3wmIIJ5cKke65fwE2lJizt3PvaQA6yr+Cc8wQGxmaME5kONEy7X
-         3bTD8auHUn0hSWusnk3Cl9hKojXnlOI/QkJ9aySc/StFzMnhuupuIe+gLHBPWSsXKTuL
-         h9UvuxsO88ZOzifRIvbfE3Pv4kyP8m0cA6g3lhhQSlf/akORYvJiBRK9Z78rE7PTu5LA
-         2GFQRcsWsGIkuAyRyulqnGvFqjOT1UtjoRSi/a6b206Afw3Y2ljaOBedVmYrCHWnqUPc
-         zKZw==
-X-Forwarded-Encrypted: i=1; AJvYcCXzPfMvhaVUW4Piwq7xAXbRfo6xNQdWMb7FYpE2l5hosVW0aN3GYs23AYDrc3SsS/O9ITU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7Yw6AdYB9EUGnrOM0GCtrUJrNuOQ80jWeKuTS91PypINOmrMy
-	c0uPqIZ2veBqzvnim7aF0ILnZZ4u4vD5PHZkh40o8+bhGx2njFKE7eRFs2J4oks=
-X-Gm-Gg: ASbGncvkCR4o3mHgnF5NK4Kc03XCjnmDN5poKFVkkU4Td4Twjx0XI5yeZM5rK4JmFoN
-	T0WCun9zBNqpnWVX+f3nGPwUu9buWyWxoAKwTxhSqOv8p9b/n0WEK7g/n5UWR/tPTXdTCeRNjsS
-	37G5TZOe2RsBKpG8Xz1zJt0IlEN6X1kwmOV4YC68B6rntKsEFK4i2nIcqXFGGo+vBj+ukbVObbV
-	O2LcdgOQiTfDrznVPWE++8AdZczsh8ftglcu6CCCDFzuT/AGcPjx2Ycd1K8kx+gx+sXO5OWM/vy
-	EHnFuUUx7GzjDqdbFQy3dzqgwZNs/FshM7oIChISzZqGeWxWu6k=
-X-Google-Smtp-Source: AGHT+IHfThnNuH0h6beaOQ5rYMykdsdyrSk1TPSC2gmbY63W9HKJJCP1ryph8gsbU1Jj4BNeY7MpCQ==
-X-Received: by 2002:a05:600c:2d04:b0:439:84d3:f7fd with SMTP id 5b1f17b1804b1-43984d3fb0bmr51487845e9.4.1740041407801;
-        Thu, 20 Feb 2025 00:50:07 -0800 (PST)
-Received: from localhost (ip-89-103-73-235.bb.vodafone.cz. [89.103.73.235])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-439918273dbsm81894325e9.20.2025.02.20.00.50.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Feb 2025 00:50:07 -0800 (PST)
+        d=1e100.net; s=20230601; t=1740043617; x=1740648417;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DnhcIOH335Rs5OhBGYZtd9oahr5TV1ZZB9arTSRJ0/c=;
+        b=GtSpf3Gf3lduT6k20UFVdFjQSW0lDJLpeK21A3wTNLGczklHdUYHdFypi+B3H6hsPb
+         ucDBTIzbueimURJzdqyxz05EjkXma6VJaPNRXkqegd4kZf8rQGpdp1eyGuzn+o+wWdKX
+         a84B9mKeH5/VAXx/Of2omBUbupr4k9rr9B1wp8rTKVZ6DfP5kTxQNdOFjtcqH6cQuRdG
+         bobcRDzhNlQ08eFUPRtxIlK19tbO8QPFENULvJhcmM7NbktjZlMxFV5OB5SiL3MRw1/s
+         tlgDJ/0UCV+usPBr767e7Vt1cutstjcvtuEKo8tnkkm2wXZo1QLNpnHxQRtPfc/ofRQL
+         3SiA==
+X-Gm-Message-State: AOJu0YwOCrJMbRPROwdlayBj7L6XhQvcM9v5jvxuoERcXNPSW6+WGdqt
+	EnulN5+AEg9/6HrSUd4qn1WFwudXDj6QOwIt6ejz9VEgjZJO3pmc857HMSXIXzcl5yhwKC15pi2
+	0pv4V7R5wH1WESZ1V3SjQmN18yYYUdz00m2rD
+X-Gm-Gg: ASbGnct0+n/mZIJysDeTRRv9xGXThDUgZD/8uFKvO2NE/SuHP+ZUU+7CKDT5B2kjy6M
+	jdygzsQYa9VHXR7Kyy+m0uwFuOfHMej7q5l0Tybr1jl6CDw5QoJLFSMJMJNG0TGo1P0uRUm4=
+X-Google-Smtp-Source: AGHT+IHyDFIVnCUigZ5bTkPpCdEKaSVO4OwYmEPkXXA0PRmebGTdWF4mHE1UGnZ53ZRMMA9fc4Pg5u7vW6FF1gU07aI=
+X-Received: by 2002:ac8:5e06:0:b0:46c:78e4:a9cc with SMTP id
+ d75a77b69052e-472171339e4mr2235621cf.25.1740043616801; Thu, 20 Feb 2025
+ 01:26:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 20 Feb 2025 09:50:06 +0100
-Message-Id: <D7X576NHG512.2HBBO3JLIA1JH@ventanamicro.com>
-Subject: Re: [PATCH] riscv: KVM: Remove unnecessary vcpu kick
-Cc: <anup@brainfault.org>, <kvm-riscv@lists.infradead.org>,
- <kvm@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
- <linux-kernel@vger.kernel.org>, <atishp@atishpatra.org>,
- <paul.walmsley@sifive.com>, <palmer@dabbelt.com>, <aou@eecs.berkeley.edu>,
- "linux-riscv" <linux-riscv-bounces@lists.infradead.org>
-To: "xiangwencheng" <xiangwencheng@lanxincomputing.com>, "Andrew Jones"
- <ajones@ventanamicro.com>
-From: =?utf-8?q?Radim_Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@ventanamicro.com>
-References: <20250219015426.1939-1-xiangwencheng@lanxincomputing.com>
- <D7WALEFMK28X.13HQ0UL1S3NM5@ventanamicro.com>
- <38cc241c40a8ef2775e304d366bcd07df733ecf0.f7f1d4c7.545f.42a8.90f5.c5d09b1d32ec@feishu.cn> <20250220-f9c4c4b3792a66999ea5b385@orel> <38cc241c40a8ef2775e304d366bcd07df733ecf0.818d94fe.c229.4f42.a074.e64851f0591b@feishu.cn>
-In-Reply-To: <38cc241c40a8ef2775e304d366bcd07df733ecf0.818d94fe.c229.4f42.a074.e64851f0591b@feishu.cn>
+MIME-Version: 1.0
+References: <20250117163001.2326672-6-tabba@google.com> <diqzzfih8q7r.fsf@ackerleytng-ctop.c.googlers.com>
+In-Reply-To: <diqzzfih8q7r.fsf@ackerleytng-ctop.c.googlers.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 20 Feb 2025 09:26:20 +0000
+X-Gm-Features: AWEUYZkXWRg--vw_yP0RUaHbdTHUxGGOdXbhDT85cTXg1nmxQFtS7oDEzDq2-QI
+Message-ID: <CA+EHjTwmbK916i=W7WkDQc+kGGee_rvwUGfhbWiJQRsfB0ZW0w@mail.gmail.com>
+Subject: Re: [RFC PATCH v5 05/15] KVM: guest_memfd: Folio mappability states
+ and functions that manage their transition
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-2025-02-20T16:17:33+08:00, xiangwencheng <xiangwencheng@lanxincomputing.com=
->:
->> From: "Andrew Jones"<ajones@ventanamicro.com>
->> On Thu, Feb 20, 2025 at 03:12:58PM +0800, xiangwencheng wrote:
->> > In kvm_arch_vcpu_blocking it will enable guest external interrupt, whi=
-ch
+Hi Ackerley,
+
+On Wed, 19 Feb 2025 at 23:33, Ackerley Tng <ackerleytng@google.com> wrote:
 >
->> > means wirting to VS_FILE will cause an interrupt. And the interrupt ha=
-ndler
+> Fuad Tabba <tabba@google.com> writes:
 >
->> > hgei_interrupt which is setted in aia_hgei_init will finally call kvm_=
-vcpu_kick
+> This question should not block merging of this series since performance
+> can be improved in a separate series:
 >
->> > to wake up vCPU.
+> > <snip>
+> >
+> > +
+> > +/*
+> > + * Marks the range [start, end) as mappable by both the host and the guest.
+> > + * Usually called when guest shares memory with the host.
+> > + */
+> > +static int gmem_set_mappable(struct inode *inode, pgoff_t start, pgoff_t end)
+> > +{
+> > +     struct xarray *mappable_offsets = &kvm_gmem_private(inode)->mappable_offsets;
+> > +     void *xval = xa_mk_value(KVM_GMEM_ALL_MAPPABLE);
+> > +     pgoff_t i;
+> > +     int r = 0;
+> > +
+> > +     filemap_invalidate_lock(inode->i_mapping);
+> > +     for (i = start; i < end; i++) {
+>
+> Were any alternative data structures considered, or does anyone have
+> suggestions for alternatives? Doing xa_store() in a loop here will take
+> a long time for large ranges.
+>
+> I looked into the following:
+>
+> Option 1: (preferred) Maple trees
+>
+> Maple tree has a nice API, though it would be better if it can combine
+> ranges that have the same value.
+>
+> I will have to dig into performance, but I'm assuming that even large
+> ranges are stored in a few nodes so this would be faster than iterating
+> over indices in an xarray.
+>
+> void explore_maple_tree(void)
+> {
+>         DEFINE_MTREE(mt);
+>
+>         mt_init_flags(&mt, MT_FLAGS_LOCK_EXTERN | MT_FLAGS_USE_RCU);
+>
+>         mtree_store_range(&mt, 0, 16, xa_mk_value(0x20), GFP_KERNEL);
+>         mtree_store_range(&mt, 8, 24, xa_mk_value(0x32), GFP_KERNEL);
+>         mtree_store_range(&mt, 5, 10, xa_mk_value(0x32), GFP_KERNEL);
+>
+>         {
+>                 void *entry;
+>                 MA_STATE(mas, &mt, 0, 0);
+>
+>                 mas_for_each(&mas, entry, ULONG_MAX) {
+>                         pr_err("[%ld, %ld]: 0x%lx\n", mas.index, mas.last, xa_to_value(entry));
+>                 }
+>         }
+>
+>         mtree_destroy(&mt);
+> }
+>
+> stdout:
+>
+> [0, 4]: 0x20
+> [5, 10]: 0x32
+> [11, 24]: 0x32
+>
+> Option 2: Multi-index xarray
+>
+> The API is more complex than maple tree's, and IIUC multi-index xarrays
+> are not generalizable to any range, so the range can't be 8 1G pages + 1
+> 4K page for example. The size of the range has to be a power of 2 that
+> is greater than 4K.
+>
+> Using multi-index xarrays would mean computing order to store
+> multi-index entries. This can be computed from the size of the range to
+> be added, but is an additional source of errors.
+>
+> Option 3: Interval tree, which is built on top of red-black trees
+>
+> The API is set up at a lower level. A macro is used to define interval
+> trees, the user has to deal with nodes in the tree directly and
+> separately define functions to override sub-ranges in larger ranges.
 
-(Configure your mail client, so it doesn't add a newline between each
- quoted line when replying.)
+I didn't consider any other data structures, mainly out of laziness :)
+What I mean by that is, xarrays is what is already used in guest_memfd
+for tracking other gfn related items, even though many have talked
+about in the future replacing it with something else.
 
->> > So I still think is not necessary to call another kvm_vcpu_kick after =
-writing to
->> > VS_FILE.
+I agree with you that it's not the ideal data structure, but also,
+like you said, this isn't part of the interface, and it would be easy
+to replace in the future. As you mention, one of the challenges is
+figuring out the performance impact in practice, and once things have
+settled down and the interface is more or less settled, some
+benchmarking would be useful to guide us here.
 
-So the kick wasn't there to mask some other bug, thanks.
+Thanks!
+/fuad
 
->> Right, we don't need anything since hgei_interrupt() kicks for us, but i=
-f
->> we do
->>=C2=A0
->> @@ -973,8 +973,8 @@ int kvm_riscv_vcpu_aia_imsic_inject(struct kvm_vcpu =
-*vcpu,
->> =C2=A0 =C2=A0 =C2=A0 =C2=A0 read_lock_irqsave(&imsic->vsfile_lock, flags=
-);
->>=C2=A0
->> =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (imsic->vsfile_cpu >=3D 0) {
->> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 kvm_vcpu_wake_up(vcpu=
-);
->> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 writel(iid, imsi=
-c->vsfile_va + IMSIC_MMIO_SETIPNUM_LE);
->> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 kvm_vcpu_kick(vcpu);
->> =C2=A0 =C2=A0 =C2=A0 =C2=A0 } else {
->> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 eix =3D &imsic->=
-swfile->eix[iid / BITS_PER_TYPE(u64)];
->> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 set_bit(iid & (B=
-ITS_PER_TYPE(u64) - 1), eix->eip);
->>=C2=A0
->> then we should be able to avoid taking a host interrupt.
-
-The wakeup is asynchronous, and this would practically never avoid the
-host interrupt, but we'd do extra pointless work...
-I think it's much better just with the write.  (The wakeup would again
-make KVM look like it has a bug elsewhere.)
+> > +             r = xa_err(xa_store(mappable_offsets, i, xval, GFP_KERNEL));
+> > +             if (r)
+> > +                     break;
+> > +     }
+> > +     filemap_invalidate_unlock(inode->i_mapping);
+> > +
+> > +     return r;
+> > +}
+> > +
+> > +/*
+> > + * Marks the range [start, end) as not mappable by the host. If the host doesn't
+> > + * have any references to a particular folio, then that folio is marked as
+> > + * mappable by the guest.
+> > + *
+> > + * However, if the host still has references to the folio, then the folio is
+> > + * marked and not mappable by anyone. Marking it is not mappable allows it to
+> > + * drain all references from the host, and to ensure that the hypervisor does
+> > + * not transition the folio to private, since the host still might access it.
+> > + *
+> > + * Usually called when guest unshares memory with the host.
+> > + */
+> > +static int gmem_clear_mappable(struct inode *inode, pgoff_t start, pgoff_t end)
+> > +{
+> > +     struct xarray *mappable_offsets = &kvm_gmem_private(inode)->mappable_offsets;
+> > +     void *xval_guest = xa_mk_value(KVM_GMEM_GUEST_MAPPABLE);
+> > +     void *xval_none = xa_mk_value(KVM_GMEM_NONE_MAPPABLE);
+> > +     pgoff_t i;
+> > +     int r = 0;
+> > +
+> > +     filemap_invalidate_lock(inode->i_mapping);
+> > +     for (i = start; i < end; i++) {
+> > +             struct folio *folio;
+> > +             int refcount = 0;
+> > +
+> > +             folio = filemap_lock_folio(inode->i_mapping, i);
+> > +             if (!IS_ERR(folio)) {
+> > +                     refcount = folio_ref_count(folio);
+> > +             } else {
+> > +                     r = PTR_ERR(folio);
+> > +                     if (WARN_ON_ONCE(r != -ENOENT))
+> > +                             break;
+> > +
+> > +                     folio = NULL;
+> > +             }
+> > +
+> > +             /* +1 references are expected because of filemap_lock_folio(). */
+> > +             if (folio && refcount > folio_nr_pages(folio) + 1) {
+> > +                     /*
+> > +                      * Outstanding references, the folio cannot be faulted
+> > +                      * in by anyone until they're dropped.
+> > +                      */
+> > +                     r = xa_err(xa_store(mappable_offsets, i, xval_none, GFP_KERNEL));
+> > +             } else {
+> > +                     /*
+> > +                      * No outstanding references. Transition the folio to
+> > +                      * guest mappable immediately.
+> > +                      */
+> > +                     r = xa_err(xa_store(mappable_offsets, i, xval_guest, GFP_KERNEL));
+> > +             }
+> > +
+> > +             if (folio) {
+> > +                     folio_unlock(folio);
+> > +                     folio_put(folio);
+> > +             }
+> > +
+> > +             if (WARN_ON_ONCE(r))
+> > +                     break;
+> > +     }
+> > +     filemap_invalidate_unlock(inode->i_mapping);
+> > +
+> > +     return r;
+> > +}
+> > +
+> >
+> > <snip>
 
