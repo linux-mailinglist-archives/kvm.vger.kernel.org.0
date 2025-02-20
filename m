@@ -1,73 +1,72 @@
-Return-Path: <kvm+bounces-38755-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38757-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7511FA3E211
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 18:18:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83BF1A3E232
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 18:21:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A8FC1888CFB
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 17:14:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A89E4700487
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 17:14:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B69DB22A4D5;
-	Thu, 20 Feb 2025 17:06:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3F45213E7A;
+	Thu, 20 Feb 2025 17:07:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A6/WpAm6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eTZp45pS"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B069922578E
-	for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 17:06:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 504EE212D69
+	for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 17:07:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740071216; cv=none; b=KySuOK6uSydpWCruMmS1yvg1x3WjCJ2/ILDMrQm+3wcUyLExHilGPkUI2N4c3nfUZBAs09FvFVJjAcETn43tVcqxj38YRNDtl09GLPIBCtQDG4Kp8r/+uV2XoZ7G5dBBZm3jvp8qXrK0Fog9wZ6djUnWg0DC/3wo/+HgUxvNki8=
+	t=1740071227; cv=none; b=qaWU6DdT8IDoF/8PR1IvSVH2K7FTA3aYKojU3za3OPLsVueFxixynqSzLsg9hz8ghszE7HI7k0KfJq07EoEQwRZd5zzjtdzagTo7Je/VD9pBSUmi4unnYjnkh7Eo6CJam4r/RxAFO7FZp8v+cGL4qB9cxEKqngMxxxq6eWCD9Vo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740071216; c=relaxed/simple;
-	bh=aMUphNUgwDKVfyLvoSO130Sb6SyuzmF+GoT1s4np2+8=;
+	s=arc-20240116; t=1740071227; c=relaxed/simple;
+	bh=WjyPZsuYt/J1ZXDdahnzCeLRanspFNYQ0w02lSCEdig=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qT210YPNjdamipFd8N51LlA6dwPWntXl9Bs3thGWEpkb/AFyKlF3prSmcmqfMEXwZFuLOmN3ge4YuebeV+e+Jk1ezMPK24BEdiNtSsb5ECI39RLCDbqmfdcs7T+3Bq6vobD7uOX2Z7cnr87s7a1JFVImXL754uh0BEeJhCixYkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A6/WpAm6; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version:Content-Type; b=dvcWlp0Mcf3Mww9h6cNfAxHj0iHshk1QtHebyLeLSCtJ1tbkqoZjTLyB8MoU0yq86oVEkwmP8jKvr2aj2PKyvtxR9F72Nq6ioJ29zyD+H2tI9EK8VxYgTJPrghUXl4qsF3HEr49FYDEG4B3JERDksK3gaCiz59zGGo7JmkO/QE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eTZp45pS; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740071213;
+	s=mimecast20190719; t=1740071225;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=KjWv5fSjEg41LoJNB4shPeDKoZz0HqWV9KX3dmsD1Xg=;
-	b=A6/WpAm6iaN9jIyqOyzsqcUbQC0lg6ncfAo3yXfZgesm0bM9rG++v4aToiCVzpOMDx7ium
-	PgHwtyftoXHnXnKvEphpPrW6yWq9DIClRfCIEDKQD2VMtLSPrKuow15mfXzwXiHIzm6mqJ
-	b8zmwitqzfQKW/N1xbFJySe3LDyfG/0=
+	bh=Yw+GWEMGktTe2EG3idQ1LE3+Xb5+a50/AkTUJ8BT5dQ=;
+	b=eTZp45pSGSWe2V4LESuOVt3ICtQs2zqcRdmXXP4N4lfU94v1D4AHIIABMyiB0CfZ7mpOBg
+	Dxd/5W9kgL1ftnS5pus/yQtZft/F5QvXcamiWPV21tbOqI2GTNtFYf1HbtKpMmM2sQmjV3
+	QBOK/7/tpZnzh8+BbXDdhsBLNy3GYoI=
 Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-226-V_3Sx4BTPCKiY-Lx_FNbJw-1; Thu,
- 20 Feb 2025 12:06:49 -0500
-X-MC-Unique: V_3Sx4BTPCKiY-Lx_FNbJw-1
-X-Mimecast-MFC-AGG-ID: V_3Sx4BTPCKiY-Lx_FNbJw_1740071207
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-271-2GvadszLNS-7OACkx05beA-1; Thu,
+ 20 Feb 2025 12:06:50 -0500
+X-MC-Unique: 2GvadszLNS-7OACkx05beA-1
+X-Mimecast-MFC-AGG-ID: 2GvadszLNS-7OACkx05beA_1740071209
 Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CB00F1800874;
-	Thu, 20 Feb 2025 17:06:47 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 056B31800872;
+	Thu, 20 Feb 2025 17:06:49 +0000 (UTC)
 Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B302E19412A3;
-	Thu, 20 Feb 2025 17:06:46 +0000 (UTC)
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0AF8819412A4;
+	Thu, 20 Feb 2025 17:06:47 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
 Cc: seanjc@google.com,
 	Yan Zhao <yan.y.zhao@intel.com>,
 	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	Xiaoyao Li <xiaoyao.li@intel.com>,
-	Tony Lindgren <tony.lindgren@linux.intel.com>
-Subject: [PATCH 28/30] KVM: x86: Introduce KVM_TDX_GET_CPUID
-Date: Thu, 20 Feb 2025 12:06:02 -0500
-Message-ID: <20250220170604.2279312-29-pbonzini@redhat.com>
+	Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: [PATCH 29/30] KVM: x86/mmu: Taking guest pa into consideration when calculate tdp level
+Date: Thu, 20 Feb 2025 12:06:03 -0500
+Message-ID: <20250220170604.2279312-30-pbonzini@redhat.com>
 In-Reply-To: <20250220170604.2279312-1-pbonzini@redhat.com>
 References: <20250220170604.2279312-1-pbonzini@redhat.com>
 Precedence: bulk
@@ -82,294 +81,83 @@ X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 
-Implement an IOCTL to allow userspace to read the CPUID bit values for a
-configured TD.
+For TDX, the maxpa (CPUID.0x80000008.EAX[7:0]) is fixed as native and
+the max_gpa (CPUID.0x80000008.EAX[23:16]) is configurable and used
+to configure the EPT level and GPAW.
 
-The TDX module doesn't provide the ability to set all CPUID bits. Instead
-some are configured indirectly, or have fixed values. But it does allow
-for the final resulting CPUID bits to be read. This information will be
-useful for userspace to understand the configuration of the TD, and set
-KVM's copy via KVM_SET_CPUID2.
+Use max_gpa to determine the TDP level.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-Co-developed-by: Tony Lindgren <tony.lindgren@linux.intel.com>
-Signed-off-by: Tony Lindgren <tony.lindgren@linux.intel.com>
 Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
----
- - Fix subleaf mask check (Binbin)
- - Search all possible sub-leafs (Francesco Lavra)
- - Reduce off-by-one error sensitve code (Francesco, Xiaoyao)
- - Handle buffers too small from userspace (Xiaoyao)
- - Read max CPUID from TD instead of using fixed values (Xiaoyao)
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/include/uapi/asm/kvm.h |   1 +
- arch/x86/kvm/vmx/tdx.c          | 191 ++++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/tdx_arch.h     |   5 +
- arch/x86/kvm/vmx/tdx_errno.h    |   1 +
- 4 files changed, 198 insertions(+)
+ arch/x86/kvm/cpuid.c   | 14 ++++++++++++++
+ arch/x86/kvm/cpuid.h   |  1 +
+ arch/x86/kvm/mmu/mmu.c |  9 ++++++++-
+ 3 files changed, 23 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 9316afbd4a88..cd55484e3f0c 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -932,6 +932,7 @@ enum kvm_tdx_cmd_id {
- 	KVM_TDX_CAPABILITIES = 0,
- 	KVM_TDX_INIT_VM,
- 	KVM_TDX_INIT_VCPU,
-+	KVM_TDX_GET_CPUID,
- 
- 	KVM_TDX_CMD_NR_MAX,
- };
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 7dfb0b486dd9..1c88f577ec2b 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -3,6 +3,7 @@
- #include <asm/cpufeature.h>
- #include <asm/tdx.h>
- #include "capabilities.h"
-+#include "mmu.h"
- #include "x86_ops.h"
- #include "lapic.h"
- #include "tdx.h"
-@@ -858,6 +859,103 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
- 	return ret;
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 936c5dd13bd5..7ff84079c1f4 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -494,6 +494,20 @@ int cpuid_query_maxphyaddr(struct kvm_vcpu *vcpu)
+ 	return 36;
  }
  
-+static u64 tdx_td_metadata_field_read(struct kvm_tdx *tdx, u64 field_id,
-+				      u64 *data)
++int cpuid_query_maxguestphyaddr(struct kvm_vcpu *vcpu)
 +{
-+	u64 err;
++	struct kvm_cpuid_entry2 *best;
 +
-+	err = tdh_mng_rd(&tdx->td, field_id, data);
-+
-+	return err;
-+}
-+
-+#define TDX_MD_UNREADABLE_LEAF_MASK	GENMASK(30, 7)
-+#define TDX_MD_UNREADABLE_SUBLEAF_MASK	GENMASK(31, 7)
-+
-+static int tdx_read_cpuid(struct kvm_vcpu *vcpu, u32 leaf, u32 sub_leaf,
-+			  bool sub_leaf_set, int *entry_index,
-+			  struct kvm_cpuid_entry2 *out)
-+{
-+	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
-+	u64 field_id = TD_MD_FIELD_ID_CPUID_VALUES;
-+	u64 ebx_eax, edx_ecx;
-+	u64 err = 0;
-+
-+	if (sub_leaf > 0b1111111)
-+		return -EINVAL;
-+
-+	if (*entry_index >= KVM_MAX_CPUID_ENTRIES)
-+		return -EINVAL;
-+
-+	if (leaf & TDX_MD_UNREADABLE_LEAF_MASK ||
-+	    sub_leaf & TDX_MD_UNREADABLE_SUBLEAF_MASK)
-+		return -EINVAL;
-+
-+	/*
-+	 * bit 23:17, REVSERVED: reserved, must be 0;
-+	 * bit 16,    LEAF_31: leaf number bit 31;
-+	 * bit 15:9,  LEAF_6_0: leaf number bits 6:0, leaf bits 30:7 are
-+	 *                      implicitly 0;
-+	 * bit 8,     SUBLEAF_NA: sub-leaf not applicable flag;
-+	 * bit 7:1,   SUBLEAF_6_0: sub-leaf number bits 6:0. If SUBLEAF_NA is 1,
-+	 *                         the SUBLEAF_6_0 is all-1.
-+	 *                         sub-leaf bits 31:7 are implicitly 0;
-+	 * bit 0,     ELEMENT_I: Element index within field;
-+	 */
-+	field_id |= ((leaf & 0x80000000) ? 1 : 0) << 16;
-+	field_id |= (leaf & 0x7f) << 9;
-+	if (sub_leaf_set)
-+		field_id |= (sub_leaf & 0x7f) << 1;
-+	else
-+		field_id |= 0x1fe;
-+
-+	err = tdx_td_metadata_field_read(kvm_tdx, field_id, &ebx_eax);
-+	if (err) //TODO check for specific errors
-+		goto err_out;
-+
-+	out->eax = (u32) ebx_eax;
-+	out->ebx = (u32) (ebx_eax >> 32);
-+
-+	field_id++;
-+	err = tdx_td_metadata_field_read(kvm_tdx, field_id, &edx_ecx);
-+	/*
-+	 * It's weird that reading edx_ecx fails while reading ebx_eax
-+	 * succeeded.
-+	 */
-+	if (WARN_ON_ONCE(err))
-+		goto err_out;
-+
-+	out->ecx = (u32) edx_ecx;
-+	out->edx = (u32) (edx_ecx >> 32);
-+
-+	out->function = leaf;
-+	out->index = sub_leaf;
-+	out->flags |= sub_leaf_set ? KVM_CPUID_FLAG_SIGNIFCANT_INDEX : 0;
-+
-+	/*
-+	 * Work around missing support on old TDX modules, fetch
-+	 * guest maxpa from gfn_direct_bits.
-+	 */
-+	if (leaf == 0x80000008) {
-+		gpa_t gpa_bits = gfn_to_gpa(kvm_gfn_direct_bits(vcpu->kvm));
-+		unsigned int g_maxpa = __ffs(gpa_bits) + 1;
-+
-+		out->eax = tdx_set_guest_phys_addr_bits(out->eax, g_maxpa);
-+	}
-+
-+	(*entry_index)++;
-+
-+	return 0;
-+
-+err_out:
-+	out->eax = 0;
-+	out->ebx = 0;
-+	out->ecx = 0;
-+	out->edx = 0;
-+
-+	return -EIO;
-+}
-+
- static int tdx_td_init(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
- {
- 	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-@@ -1051,6 +1149,96 @@ static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
- 	return ret;
- }
- 
-+/* Sometimes reads multipple subleafs. Return how many enties were written. */
-+static int tdx_vcpu_get_cpuid_leaf(struct kvm_vcpu *vcpu, u32 leaf, int *entry_index,
-+				   struct kvm_cpuid_entry2 *output_e)
-+{
-+	int sub_leaf = 0;
-+	int ret;
-+
-+	/* First try without a subleaf */
-+	ret = tdx_read_cpuid(vcpu, leaf, 0, false, entry_index, output_e);
-+
-+	/* If success, or invalid leaf, just give up */
-+	if (ret != -EIO)
-+		return ret;
-+
-+	/*
-+	 * If the try without a subleaf failed, try reading subleafs until
-+	 * failure. The TDX module only supports 6 bits of subleaf index.
-+	 */
-+	while (1) {
-+		/* Keep reading subleafs until there is a failure. */
-+		if (tdx_read_cpuid(vcpu, leaf, sub_leaf, true, entry_index, output_e))
-+			return !sub_leaf;
-+
-+		sub_leaf++;
-+		output_e++;
-+	}
-+
++	best = kvm_find_cpuid_entry(vcpu, 0x80000000);
++	if (!best || best->eax < 0x80000008)
++		goto not_found;
++	best = kvm_find_cpuid_entry(vcpu, 0x80000008);
++	if (best)
++		return (best->eax >> 16) & 0xff;
++not_found:
 +	return 0;
 +}
 +
-+static int tdx_vcpu_get_cpuid(struct kvm_vcpu *vcpu, struct kvm_tdx_cmd *cmd)
-+{
-+	struct kvm_cpuid2 __user *output, *td_cpuid;
-+	int r = 0, i = 0, leaf;
-+	u32 level;
-+
-+	output = u64_to_user_ptr(cmd->data);
-+	td_cpuid = kzalloc(sizeof(*td_cpuid) +
-+			sizeof(output->entries[0]) * KVM_MAX_CPUID_ENTRIES,
-+			GFP_KERNEL);
-+	if (!td_cpuid)
-+		return -ENOMEM;
-+
-+	if (copy_from_user(td_cpuid, output, sizeof(*output))) {
-+		r = -EFAULT;
-+		goto out;
-+	}
-+
-+	/* Read max CPUID for normal range */
-+	if (tdx_vcpu_get_cpuid_leaf(vcpu, 0, &i, &td_cpuid->entries[i])) {
-+		r = -EIO;
-+		goto out;
-+	}
-+	level = td_cpuid->entries[0].eax;
-+
-+	for (leaf = 1; leaf <= level; leaf++)
-+		tdx_vcpu_get_cpuid_leaf(vcpu, leaf, &i, &td_cpuid->entries[i]);
-+
-+	/* Read max CPUID for extended range */
-+	if (tdx_vcpu_get_cpuid_leaf(vcpu, 0x80000000, &i, &td_cpuid->entries[i])) {
-+		r = -EIO;
-+		goto out;
-+	}
-+	level = td_cpuid->entries[i - 1].eax;
-+
-+	for (leaf = 0x80000001; leaf <= level; leaf++)
-+		tdx_vcpu_get_cpuid_leaf(vcpu, leaf, &i, &td_cpuid->entries[i]);
-+
-+	if (td_cpuid->nent < i)
-+		r = -E2BIG;
-+	td_cpuid->nent = i;
-+
-+	if (copy_to_user(output, td_cpuid, sizeof(*output))) {
-+		r = -EFAULT;
-+		goto out;
-+	}
-+
-+	if (r == -E2BIG)
-+		goto out;
-+
-+	if (copy_to_user(output->entries, td_cpuid->entries,
-+			 td_cpuid->nent * sizeof(struct kvm_cpuid_entry2)))
-+		r = -EFAULT;
-+
-+out:
-+	kfree(td_cpuid);
-+
-+	return r;
-+}
-+
- static int tdx_vcpu_init(struct kvm_vcpu *vcpu, struct kvm_tdx_cmd *cmd)
- {
- 	u64 apic_base;
-@@ -1100,6 +1288,9 @@ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
- 	case KVM_TDX_INIT_VCPU:
- 		ret = tdx_vcpu_init(vcpu, &cmd);
- 		break;
-+	case KVM_TDX_GET_CPUID:
-+		ret = tdx_vcpu_get_cpuid(vcpu, &cmd);
-+		break;
- 	default:
- 		ret = -EINVAL;
- 		break;
-diff --git a/arch/x86/kvm/vmx/tdx_arch.h b/arch/x86/kvm/vmx/tdx_arch.h
-index cb9a638fa398..b6fe458a4224 100644
---- a/arch/x86/kvm/vmx/tdx_arch.h
-+++ b/arch/x86/kvm/vmx/tdx_arch.h
-@@ -122,4 +122,9 @@ struct td_params {
- 
- #define MD_FIELD_ID_FEATURES0_TOPOLOGY_ENUM	BIT_ULL(20)
- 
-+/*
-+ * TD scope metadata field ID.
-+ */
-+#define TD_MD_FIELD_ID_CPUID_VALUES		0x9410000300000000ULL
-+
- #endif /* __KVM_X86_TDX_ARCH_H */
-diff --git a/arch/x86/kvm/vmx/tdx_errno.h b/arch/x86/kvm/vmx/tdx_errno.h
-index dc3fa2a58c2c..f9dbb3a065cc 100644
---- a/arch/x86/kvm/vmx/tdx_errno.h
-+++ b/arch/x86/kvm/vmx/tdx_errno.h
-@@ -23,6 +23,7 @@
- #define TDX_FLUSHVP_NOT_DONE			0x8000082400000000ULL
- #define TDX_EPT_WALK_FAILED			0xC0000B0000000000ULL
- #define TDX_EPT_ENTRY_STATE_INCORRECT		0xC0000B0D00000000ULL
-+#define TDX_METADATA_FIELD_NOT_READABLE		0xC0000C0200000000ULL
- 
  /*
-  * TDX module operand ID, appears in 31:0 part of error code as
+  * This "raw" version returns the reserved GPA bits without any adjustments for
+  * encryption technologies that usurp bits.  The raw mask should be used if and
+diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
+index 91bde94519f9..46e059b47825 100644
+--- a/arch/x86/kvm/cpuid.h
++++ b/arch/x86/kvm/cpuid.h
+@@ -37,6 +37,7 @@ void __init kvm_init_xstate_sizes(void);
+ u32 xstate_required_size(u64 xstate_bv, bool compacted);
+ 
+ int cpuid_query_maxphyaddr(struct kvm_vcpu *vcpu);
++int cpuid_query_maxguestphyaddr(struct kvm_vcpu *vcpu);
+ u64 kvm_vcpu_reserved_gpa_bits_raw(struct kvm_vcpu *vcpu);
+ 
+ static inline int cpuid_maxphyaddr(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index d4ac4a1f8b81..c1c54a7a7735 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -5416,12 +5416,19 @@ void __kvm_mmu_refresh_passthrough_bits(struct kvm_vcpu *vcpu,
+ 
+ static inline int kvm_mmu_get_tdp_level(struct kvm_vcpu *vcpu)
+ {
++	int maxpa;
++
++	if (vcpu->kvm->arch.vm_type == KVM_X86_TDX_VM)
++		maxpa = cpuid_query_maxguestphyaddr(vcpu);
++	else
++		maxpa = cpuid_maxphyaddr(vcpu);
++
+ 	/* tdp_root_level is architecture forced level, use it if nonzero */
+ 	if (tdp_root_level)
+ 		return tdp_root_level;
+ 
+ 	/* Use 5-level TDP if and only if it's useful/necessary. */
+-	if (max_tdp_level == 5 && cpuid_maxphyaddr(vcpu) <= 48)
++	if (max_tdp_level == 5 && maxpa <= 48)
+ 		return 4;
+ 
+ 	return max_tdp_level;
 -- 
 2.43.5
 
