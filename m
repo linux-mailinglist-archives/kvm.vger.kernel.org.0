@@ -1,50 +1,51 @@
-Return-Path: <kvm+bounces-38692-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38693-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D06EA3DBA5
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 14:49:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 43BD9A3DBA6
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 14:49:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F850173FBD
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 13:49:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B293177C24
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 13:49:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12DA71FAC54;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 257C01FBC85;
 	Thu, 20 Feb 2025 13:49:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jgxh1cra"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K/6aooAI"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 341F135942;
-	Thu, 20 Feb 2025 13:49:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4746C1E5B9D;
+	Thu, 20 Feb 2025 13:49:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740059354; cv=none; b=ETQnPq/TPF3DSqgEGVyrkAlr65FY36RzZ9t7PEZc3khM7dz2Kyen/jpb+oesUXWNo8Dh6wCVrXP0HCxHjeKVIK0v2PJrKPYv07VJh3a1kVA/HhnK7Z/WpnbdCq0kNsoZ24JDXb8/kqjUelbbXMn0/FLuO24rc4gBMIteCv4zfa0=
+	t=1740059354; cv=none; b=CFCiq/ZiogZ2ZIRQ3kspbSab4XlwfEi5rxCBFJKMim5x+VVs4PPeY4UYWerDurVx/IqSrD/qPbRT8RocXkbP5U1lXChEG/IPVyBRykwGutQZrEMFIVfRcYFl4HRlGfMQyJxLAy6kyea3Rhs0RclQcs/VhKG0cI/I9j6hOHFULq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1740059354; c=relaxed/simple;
-	bh=N/EBcfocF2jAgM4+X74I03y0WoHjhT/GxBKRJNbjoSs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KD+BgXFSa+vYzRlSFXnk2GueOctq/VE9QyAeFGAZ3VFSzt71eGP+S25TRgLZsUp5gMu7s6IXdOwKtiLEMrVWiGQ5AY6fwKb59k3vpm6n88Ltm4hUD3h/7jVO6r4fYR0h4vxVNhCkVF2osgsLkb7dd88bEW/B3Px/sciUAgVYxeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jgxh1cra; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6E85C4CED1;
+	bh=3qNcw3CYfOVceSuJucDGYdwSv7d2QqdCWmHzIgDUP9I=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=qHN4O8N+vAGgBz/fRJxXNFMK6V4cDEcrc+GS/toQETRfaIB5bKC9vKGNhkmWN7kDbbb8K8nEu3dYHvc89wRow/6eYTEutoyA+D72qqdOgQhbuboZgUj5fl0fVCQuXlV3024kW1BV3MF/ODqCGUS1SOylCJV5Bi/plJ9H6k1WI00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K/6aooAI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E18DDC4CEDD;
 	Thu, 20 Feb 2025 13:49:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1740059353;
-	bh=N/EBcfocF2jAgM4+X74I03y0WoHjhT/GxBKRJNbjoSs=;
-	h=From:To:Cc:Subject:Date:From;
-	b=jgxh1cra+QS4uqhA65BA/gGRjhEHqQndwlTa3KAD89C3k8U24BlOlU8cQZU6aJeFR
-	 1HQqN2xn8uXJsn3+RvryeQ7fdtqWzaCZ13y8eWl/RiwRPgWjU6ESSh6dzJWlWT85fP
-	 WuzEZNAWimYZTHTixldeSYw3mOur8kiROa+904F5Qk5kR3PLEH6QtIi1GmMidGLDDm
-	 oE+OP40Fxsx06zrJCCB0BYCaalaaCy4SMuj3r6Y9lP9c/S0kFxJwpXaP2VXrQek8Xs
-	 SoOYygGYhEF27zezsTu9uLGq/49ZSZvlpjUTRqf5rQpqMdBaeQf6/Q+/tYJXjOlbYu
-	 g2yGNZys6ZvJg==
+	bh=3qNcw3CYfOVceSuJucDGYdwSv7d2QqdCWmHzIgDUP9I=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=K/6aooAIhiXxTctJONavfFDjCW3rhD6X9uNsmzmW4ou1JqzOnzeG3gwCX4X9ae6kQ
+	 XQIdnayTsbMil2PcKQpj9pfGtsAXbPWLiAQMoE6qy7Cfa5/ViutIM+FL+NBnZ/UOc+
+	 D4l7Cdvztwp99qCh70BOlMOyCbXSzUKrJBINE3rQaMOw92LpAkFcymP5y+h5/k2voW
+	 njHCI9uVPVssJeGkvhEqEDky2Mmce54KVc2JLA08alt3Qivz0VhJ7z23cApEVZlOiy
+	 bpvfarCubn+6IzxUgfj3jGDhqJowHv3v6bOz/j7An9IPOL0EkchqT7Maw6tJAzMXxw
+	 pOFfRBAKdMbcQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tl6vP-006DXp-Hp;
+	id 1tl6vP-006DXp-Ov;
 	Thu, 20 Feb 2025 13:49:11 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -56,10 +57,12 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Eric Auger <eric.auger@redhat.com>,
 	gankulkarni@os.amperecomputing.com
-Subject: [PATCH v2 00/14] KVM: arm64: NV userspace ABI
-Date: Thu, 20 Feb 2025 13:48:53 +0000
-Message-Id: <20250220134907.554085-1-maz@kernel.org>
+Subject: [PATCH v2 01/14] arm64: cpufeature: Handle NV_frac as a synonym of NV2
+Date: Thu, 20 Feb 2025 13:48:54 +0000
+Message-Id: <20250220134907.554085-2-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20250220134907.554085-1-maz@kernel.org>
+References: <20250220134907.554085-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -72,69 +75,62 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Since the previous incarnation of the ABI was proved to be subtly
-wrong, I have reworked it to be more in line with the current way KVM
-operates.
+With ARMv9.5, an implementation supporting Nested Virtualization
+is allowed to only support NV2, and to avoid supporting the old
+(and useless) ARMv8.3 variant.
 
-No more late NV-specific adjustment nor writable ID_AA64MMFR0_EL1.VH.
-The NV configuration is now entirely selected from the vcpu flags.
-I've preserved the KVM_ARM_VCPU_EL2 flag which enables NV with VHE,
-and added KVM_ARM_VCPU_EL2_E2H0 which alters the NV behaviour to only
-allow nVHE guests without recursive NV support.
+This is indicated by ID_AA64MMFR2_EL1.NV being 0 (as if NV wasn't
+implemented) and ID_AA64MMDR4_EL1.NV_frac being 1 (indicating that
+NV2 is actually supported).
 
-This series is actually very little new code. The bulk of it is
-converting the feature downgrade to be per-idreg, essentially going
-back to the state before 44241f34fac96 ("KVM: arm64: nv: Use accessors
-for modifying ID registers"), only slightly modernised. This then
-becomes part of the reset value computing.
+Given that KVM only deals with NV2 and refuses to use the old NV,
+detecting NV2 or NV_frac is what we need to enable it.
 
-The rest is simply what you'd expect in terms of being able to write
-the ID_AA64MMFR4_EL1.NV_frac field, making the correct bits RES0 when
-needed, probing for capabilities and handling the init flags.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kernel/cpufeature.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-Patches on top of -rc3, with the integration branch at the usual
-location.
-
-* From v1 [1]
-
-  - Fixed mishandling of ID_UNALLOCATED(), resulting in extra
-    consolidation and simplify the macro maze a bit
-
-  - Picked up Oliver's RBs (thanks!)
-
-  - Rebased on top of -rc3
-
-[1] https://lore.kernel.org/r/20250215173816.3767330-1-maz@kernel.org
-
-Marc Zyngier (14):
-  arm64: cpufeature: Handle NV_frac as a synonym of NV2
-  KVM: arm64: Hide ID_AA64MMFR2_EL1.NV from guest and userspace
-  KVM: arm64: Mark HCR.EL2.E2H RES0 when ID_AA64MMFR1_EL1.VH is zero
-  KVM: arm64: Mark HCR.EL2.{NV*,AT} RES0 when ID_AA64MMFR4_EL1.NV_frac
-    is 0
-  KVM: arm64: Advertise NV2 in the boot messages
-  KVM: arm64: Consolidate idreg callbacks
-  KVM: arm64: Make ID_REG_LIMIT_FIELD_ENUM() more widely available
-  KVM: arm64: Enforce NV limits on a per-idregs basis
-  KVM: arm64: Move NV-specific capping to idreg sanitisation
-  KVM: arm64: Allow userspace to limit NV support to nVHE
-  KVM: arm64: Make ID_AA64MMFR4_EL1.NV_frac writable
-  KVM: arm64: Advertise FEAT_ECV when possible
-  KVM: arm64: Allow userspace to request KVM_ARM_VCPU_EL2*
-  KVM: arm64: Document NV caps and vcpu flags
-
- Documentation/virt/kvm/api.rst      |  14 +-
- arch/arm64/include/asm/kvm_host.h   |   2 +-
- arch/arm64/include/asm/kvm_nested.h |   1 +
- arch/arm64/include/uapi/asm/kvm.h   |   1 +
- arch/arm64/kernel/cpufeature.c      |  15 +-
- arch/arm64/kvm/arm.c                |  11 +-
- arch/arm64/kvm/nested.c             | 285 +++++++++++++++-------------
- arch/arm64/kvm/sys_regs.c           |  44 ++---
- arch/arm64/kvm/sys_regs.h           |  10 +
- include/uapi/linux/kvm.h            |   2 +
- 10 files changed, 217 insertions(+), 168 deletions(-)
-
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index d561cf3b8ac7b..2c198cd4f9405 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -497,6 +497,7 @@ static const struct arm64_ftr_bits ftr_id_aa64mmfr3[] = {
+ 
+ static const struct arm64_ftr_bits ftr_id_aa64mmfr4[] = {
+ 	S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR4_EL1_E2H0_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR4_EL1_NV_frac_SHIFT, 4, 0),
+ 	ARM64_FTR_END,
+ };
+ 
+@@ -2162,7 +2163,7 @@ static bool has_nested_virt_support(const struct arm64_cpu_capabilities *cap,
+ 	if (kvm_get_mode() != KVM_MODE_NV)
+ 		return false;
+ 
+-	if (!has_cpuid_feature(cap, scope)) {
++	if (!cpucap_multi_entry_cap_matches(cap, scope)) {
+ 		pr_warn("unavailable: %s\n", cap->desc);
+ 		return false;
+ 	}
+@@ -2519,7 +2520,17 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.capability = ARM64_HAS_NESTED_VIRT,
+ 		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+ 		.matches = has_nested_virt_support,
+-		ARM64_CPUID_FIELDS(ID_AA64MMFR2_EL1, NV, NV2)
++		.match_list = (const struct arm64_cpu_capabilities []){
++			{
++				.matches = has_cpuid_feature,
++				ARM64_CPUID_FIELDS(ID_AA64MMFR2_EL1, NV, NV2)
++			},
++			{
++				.matches = has_cpuid_feature,
++				ARM64_CPUID_FIELDS(ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY)
++			},
++			{ /* Sentinel */ }
++		},
+ 	},
+ 	{
+ 		.capability = ARM64_HAS_32BIT_EL0_DO_NOT_USE,
 -- 
 2.39.2
 
