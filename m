@@ -1,149 +1,173 @@
-Return-Path: <kvm+bounces-38651-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38652-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29F63A3D2B5
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 09:01:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A5CEA3D2E1
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 09:14:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42DF03B8BA7
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 08:01:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4137C189B90E
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 08:14:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C2381E9B29;
-	Thu, 20 Feb 2025 08:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3DF21EA7FC;
+	Thu, 20 Feb 2025 08:13:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="fYwLcoQa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="heF0dm3M"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8AC522F11
-	for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 08:01:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840921E9B15;
+	Thu, 20 Feb 2025 08:13:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740038494; cv=none; b=gsFc1lqlDhE0UJm+vB8Nn81who37wAIbxqXWxdg3z00B9CcNMWeH9GzdVdoBOu1hXwhforsS9KAw5uhg9dBmrz1gQiSFDqP0b4orac6QtKH0hPQFP1MborRVXLTfO3B8hsbYpFSElwSr83fPuH46PoGoK7G7fy2UVFr4XInSNSo=
+	t=1740039221; cv=none; b=fFd+PLov0zswtLL97awYp+oAIw9+l6Nan89h4Tgl4nVYX43ddrnJvl85aUaUufa4SDLAOrG/FjlZQOSOs8aBAXBVzBx6kebvcq86YjSmhaquf7jC4NmwVSiX3cGJ73IHF9u7oqfCWitO5otEWvHvos0gBtRMD85igQpjW0t8sf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740038494; c=relaxed/simple;
-	bh=kirYADeuKfKliqL7qNUWgrccufMUQj6DEyxaVPr/5Wg=;
+	s=arc-20240116; t=1740039221; c=relaxed/simple;
+	bh=NR1AzEHW3X4hTDfCdv4wws5y6bJ4IHoskvMdZyfEWxQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mHjHSlBct0E2H4mC1BQu1GLliSdsrSpTNpECU+kB+nhHjK2j45Y5YIucxKv4JI+Ap9sVOxOo6GgrZiLipOnJCtcjHlFkkAmZVQDk2ZkZlUYl8Of655TdMKci9H8RrnlYF8pZ0Q9o7n3YFEK04U8Mf840C578FjK/4e3V9A6RJtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=fYwLcoQa; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-38f2f748128so294384f8f.1
-        for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 00:01:32 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=hBx6E2PMbdkAEpbuHT/p0u9c5tSw6GZi7dbs53iuWm79rWUXiV2Wd3lFwm6+W9Qe9acpqXQAdFPm8FpTcmC2SbJZvCjMA6lD0jMWudB1+m4I1rXDSno9YdhF62ET1dvTB/4Mzl7xRTkIHa1+3HJTWnAA0uueWk3wiLhOro9OjjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=heF0dm3M; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-21f2339dcfdso11382835ad.1;
+        Thu, 20 Feb 2025 00:13:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1740038491; x=1740643291; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=qd7KqhH3kfPjHtgw/90Ms4Puk/b53LCg7WjeYOFj6kI=;
-        b=fYwLcoQam0uxPFwr0VgVCWo+6kBTY5hQy7P9Bqry6+C91iWgIqGHKPk0+9Q+ammUtq
-         LLfF/JecRTrMM7AzTrey135fkzNFJi8sqdyPuChvr5HaHZMW9zfrKywwLC80uwLdsu13
-         SoDAxDaca1RlNyelNu149B6tAS6t8PQSIQ2dIi3oSUQkznJFUYMnWYfowK9HdCvNBhfY
-         YvfVqTWTyENHraQoNQsh5yoHsL4Ze6M/6NaEWNk/x55+1m/E3RspOnJvnMrdDbHBRtUh
-         Orr72jDPR8W9qb6wxBvACYNmfJGSjUG9L6FkJSUAG/L4C7PoC+LWk+LM6kfiwaSIPAVG
-         Gc3A==
+        d=gmail.com; s=20230601; t=1740039220; x=1740644020; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Hz/pGvR+evldl5mhlvuI0J68W2mI9FP4/s36oM1FYLQ=;
+        b=heF0dm3MjHXMA7y+n0ZoAaOZzdbNAxYTWs2GjGgDNo/uYJQ6lO2hsvafXPpn7nZ1is
+         T/knW3AAniz+tpZihfOqP0QzRErEyLTZhuOm/CUJFE++/vVhJrxKvTmXFa7VB73am/Bu
+         L6fRTACx215w+S24yeFLoFfAHQQSRaulBQ7Rku0+xRlb8AfhY4oQ+oW0KUOcsVUXCy0q
+         paf3otP6lzxnJyJZ2txSeuZFrbsp0M8/Q6gOreMc0u6YeY3pi5OCt5vp1CQlnjuOK3tL
+         hbZU47/3NsogqWH9eMn41qazt53EZncx89MVf9f7u0j3+x1J2NrHI3s6mkmy6jmtmHQe
+         g0vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740038491; x=1740643291;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qd7KqhH3kfPjHtgw/90Ms4Puk/b53LCg7WjeYOFj6kI=;
-        b=RpgRt8dSvB51ND2LRLHhwsRMSaVnKeTkCNCVEEPyB/r6Av9gAojrFfm29+Yn01ta1w
-         j+Cygima0hOelgLjOoxUCMTfgqffcJCm+HenUu5eOvCmAKCbOmiv1iG9bNbKkXMrvLdd
-         5uk9k7k1N+4dh6PELoKNNE1F/t63G4Y1sC4ul9w8lz7SerhB0C7+hnLPJj/GCx6bQIxB
-         7b4vkh2uqJcF1MdtCo1YMFPUTpZ+b6m0ZLgD+R1S7Kuyf8fyd6BfbgjllyfZ13R+tCc9
-         OCEywyoJ/dQd5c0oDiKd3D9/5Y9MJC7W+Xcv9If874PUe1nDZmbgXarKb0MCDTFVulSp
-         UeAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVeICtlxnVcCBe+G6S3TG5+EoXF5FO0kPXI7MEMczqpKOJYWnVfivuo15PovMGXL6zFvCk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGS4R4UvpzspkRDvOpRESsJP5pC7mSeag8qiE7i+b52wNOCaev
-	z9GVFHfroWjNsnst4T7YFbVJAq1aHGf7oalfzA57Ub44TIfvjrVZ9+842HO018E=
-X-Gm-Gg: ASbGncv0ore7T83hpanK/5T0aTmsNpa4mWKk280HS402TFLxQOkkDe47Hpm7Pda9hpZ
-	5Y+f7Qk0hPRhZe7NHfadtADHgqoMGtlb1OVAtEmg7UzPtQNREvMW6JkylN+9sXhrPGJAg7nHlAe
-	wqwNQg+gvsXgXxviutBqsmf3qFvH7QsIS1UfI5KoS+tCn1JiQKgGxbdB1KzkVJdKDFs5F3zCRf0
-	KsqZfCQnHMn8qBag+ZUWCyTDpuwUZCEtmJQdziHx4uldbOBRg/nTmLVbyHf/JeDP/agl6nLw2aR
-	7Os=
-X-Google-Smtp-Source: AGHT+IFM6700LK+74HpOeXyoMgkggOf0cRqXu8y6ZzQbVQm2qqlIWdH1erTmldYEmvvOPb18VleqSg==
-X-Received: by 2002:a05:6000:1f87:b0:38d:e6b6:5096 with SMTP id ffacd0b85a97d-38f33f3d4bamr20173510f8f.15.1740038490670;
-        Thu, 20 Feb 2025 00:01:30 -0800 (PST)
-Received: from localhost ([2a02:8308:a00c:e200::766e])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f259d5e9esm20195560f8f.61.2025.02.20.00.01.29
+        d=1e100.net; s=20230601; t=1740039220; x=1740644020;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Hz/pGvR+evldl5mhlvuI0J68W2mI9FP4/s36oM1FYLQ=;
+        b=lwZm7CtAYxy1m75x9tC8mhNCbh2FrlEArGk7rmk8JoyM2rLY8lAD5rpdwMAy6VFy3V
+         jv6uJ+0h6lHqFAjPdJ3ltZiTwn3QKR/CY1X5CFiPqP4FJeW/thliTW6oPtW3H+Rn3Gxh
+         yVthrGiF8zQunOARlulL7lOL4BmvJHAlrx3Zp9Tv4XAZoX2TSovXn06xaW+8ycyUfR2/
+         UeoR1Vi4HiwKLw3MAycf5DY7X2TKWZy9ba9tJJc+T38eEwAJVrtAoVQvO++OtsYmSXyB
+         1sG9dveRIRAG7P0XI/inAk+CWvBRI2hEGWU+ch2qtRfTZjKJlCPRaKbZWVEFyzs38zAD
+         dgOw==
+X-Forwarded-Encrypted: i=1; AJvYcCWPr/S2BkV5INySGwSqhG0sY5Nbks7dAafdVTfQMmsfRNFc411joUmKW6hWWyO2tPuk0K74RG9P@vger.kernel.org, AJvYcCWR31zaeVcuEM0bqAnDtUe1iIK2kHlfeuwtOFvgkGehAWptniK/A6TgLzNOflXLBKZ/N9s=@vger.kernel.org, AJvYcCWr4oLApZxYM5iStMQfO4rcDc6InW6ekEb5J/vopmjfAVIU6JlYbLdDLCIL+gL3VVwOG1uCO9R/UqYg@vger.kernel.org, AJvYcCWuC5bV4zUpc49+qC4Fa0eHPFhIoBgS+pUzu7H28Jy3QfvU4kAoB29u1qB/Vw7S6muiX0Vx+TZLF5pJ/Qvg7nA+@vger.kernel.org, AJvYcCXWrZKjCAXN5HOKHUyMl2wUM9dbsFbgNroODSjQpDTlaV+7MSwiD9pesFXJU0YaDiyj9To7I/48Wa15R7gm@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3ydxZhvy+b8PtpCQaTY1VSmt+yEq3kJudHGtprE6dKq9cK7fq
+	lEOCBOk5/aWRrnRm9JWT+7fqCOzN4l/LLiEfBIM2WZK+HqtIJA68
+X-Gm-Gg: ASbGncsdZ241q4QnLQ30TNpK+bwBKY8bq3ekRWjsk9Z1Qi6ztWQ2ZJYWDdu04kcfrMw
+	LihueXm0WPHbWpP832Duih6aV3Iv07gxYlKNRHPVrETjU52ZUupuB//V0+72cSRzMlQSivr4NyE
+	H6caGlD5P3iA0xkfO0aEvCM9nqCaGlTQrbbAln2UOJ2SVeIWtHqD7FzwoQGwaL+QCymnWAOS7C2
+	A1chNYqgwSJndpinPTjFatGvIOmYbXAs5y5lc6myL+W+m4fY1+V5pClGP4TN6CZADKs1BlEMaN3
+	yod3JTm0XeWeHBA=
+X-Google-Smtp-Source: AGHT+IF3zZoqfKWUfFNv+FPNQ0UuIwZSkcWXCgHzMPO8Q84I63xMG6/s+7OLxm4EjnPNFrOg1ROUQQ==
+X-Received: by 2002:a17:903:40cc:b0:215:58be:3349 with SMTP id d9443c01a7336-2218c41f67dmr48108495ad.14.1740039219629;
+        Thu, 20 Feb 2025 00:13:39 -0800 (PST)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-220d5349634sm114661275ad.31.2025.02.20.00.13.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Feb 2025 00:01:29 -0800 (PST)
-Date: Thu, 20 Feb 2025 09:01:28 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: xiangwencheng <xiangwencheng@lanxincomputing.com>
-Cc: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>, 
-	anup@brainfault.org, kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, atishp@atishpatra.org, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	linux-riscv <linux-riscv-bounces@lists.infradead.org>
-Subject: Re: [PATCH] riscv: KVM: Remove unnecessary vcpu kick
-Message-ID: <20250220-f9c4c4b3792a66999ea5b385@orel>
-References: <20250219015426.1939-1-xiangwencheng@lanxincomputing.com>
- <D7WALEFMK28X.13HQ0UL1S3NM5@ventanamicro.com>
- <38cc241c40a8ef2775e304d366bcd07df733ecf0.f7f1d4c7.545f.42a8.90f5.c5d09b1d32ec@feishu.cn>
+        Thu, 20 Feb 2025 00:13:38 -0800 (PST)
+Received: by archie.me (Postfix, from userid 1000)
+	id C04B84208FB6; Thu, 20 Feb 2025 15:13:35 +0700 (WIB)
+Date: Thu, 20 Feb 2025 15:13:35 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	virtualization@lists.linux.dev, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	Shailend Chand <shailend@google.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Willem de Bruijn <willemb@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Neal Cardwell <ncardwell@google.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me,
+	asml.silence@gmail.com, dw@davidwei.uk,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Victor Nogueira <victor@mojatatu.com>,
+	Pedro Tammela <pctammela@mojatatu.com>,
+	Samiullah Khawaja <skhawaja@google.com>
+Subject: Re: [PATCH net-next v4 5/9] net: add devmem TCP TX documentation
+Message-ID: <Z7bkL7uuy8prxfTe@archie.me>
+References: <20250220020914.895431-1-almasrymina@google.com>
+ <20250220020914.895431-6-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="j3ck8zPX3Nllt0fQ"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <38cc241c40a8ef2775e304d366bcd07df733ecf0.f7f1d4c7.545f.42a8.90f5.c5d09b1d32ec@feishu.cn>
+In-Reply-To: <20250220020914.895431-6-almasrymina@google.com>
 
-On Thu, Feb 20, 2025 at 03:12:58PM +0800, xiangwencheng wrote:
-...
-> As "KVM:  WFI wake-up using IMSIC VS-files" that described in [1], writing to 
-> VS-FILE will wake up vCPU.
-> 
-> KVM has also handled the situation of WFI. Here is the WFI emulation process:
-> kvm_riscv_vcpu_exit 
->     -> kvm_riscv_vcpu_virtual_insn 
->          -> system_opcode_insn 
->               -> wfi_insn 
->                  -> kvm_riscv_vcpu_wfi
->                      -> kvm_vcpu_halt
->                          -> kvm_vcpu_block
->                              -> kvm_arch_vcpu_blocking
->                                    -> kvm_riscv_aia_wakeon_hgei
->                                          -> csr_set(CSR_HGEIE, BIT(hgei));
->                              -> set_current_state(TASK_INTERRUPTIBLE);
->                              -> schedule
-> 
-> In kvm_arch_vcpu_blocking it will enable guest external interrupt, which
-> means wirting to VS_FILE will cause an interrupt. And the interrupt handler
-> hgei_interrupt which is setted in aia_hgei_init will finally call kvm_vcpu_kick
-> to wake up vCPU.
-> 
-> So I still think is not necessary to call another kvm_vcpu_kick after writing to
-> VS_FILE.
-> 
-> Waiting for more info. Thanks.
-> 
-> [1]  https://kvm-forum.qemu.org/2022/AIA_Virtualization_in_KVM_RISCV_final.pdf
->
 
-Right, we don't need anything since hgei_interrupt() kicks for us, but if
-we do
+--j3ck8zPX3Nllt0fQ
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-@@ -973,8 +973,8 @@ int kvm_riscv_vcpu_aia_imsic_inject(struct kvm_vcpu *vcpu,
-        read_lock_irqsave(&imsic->vsfile_lock, flags);
+On Thu, Feb 20, 2025 at 02:09:10AM +0000, Mina Almasry wrote:
+> +The user application must use MSG_ZEROCOPY flag when sending devmem TCP.=
+ Devmem
+> +cannot be copied by the kernel, so the semantics of the devmem TX are si=
+milar
+> +to the semantics of MSG_ZEROCOPY.
+> +
+> +	setsockopt(socket_fd, SOL_SOCKET, SO_ZEROCOPY, &opt, sizeof(opt));
+> +
+> +It is also recommended that the user binds the TX socket to the same int=
+erface
+> +the dma-buf has been bound to via SO_BINDTODEVICE.
+> +
+> +	setsockopt(socket_fd, SOL_SOCKET, SO_BINDTODEVICE, ifname, strlen(ifnam=
+e) + 1);
+> +
 
-        if (imsic->vsfile_cpu >= 0) {
-+               kvm_vcpu_wake_up(vcpu);
-                writel(iid, imsic->vsfile_va + IMSIC_MMIO_SETIPNUM_LE);
--               kvm_vcpu_kick(vcpu);
-        } else {
-                eix = &imsic->swfile->eix[iid / BITS_PER_TYPE(u64)];
-                set_bit(iid & (BITS_PER_TYPE(u64) - 1), eix->eip);
+Wrap both setsockopts above in literal code-block (just like other snippets
+for consistency).
 
-then we should be able to avoid taking a host interrupt.
+> +The user should create a msghdr where,
+> +
+> +iov_base is set to the offset into the dmabuf to start sending from.
+> +iov_len is set to the number of bytes to be sent from the dmabuf.
 
-Thanks,
-drew
+Should above be bullet list?
+
+Thanks.
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--j3ck8zPX3Nllt0fQ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZ7bkKQAKCRD2uYlJVVFO
+o2s0AQCqEcmu39fAQOLMTwOYkn6NbqUyjT/e6q34LK5lpFeB7gEAw4iw+0dFGzFm
+S+/rpVCO8Pfw8Mt4Xg/RDLmSlwuOhgs=
+=QlMN
+-----END PGP SIGNATURE-----
+
+--j3ck8zPX3Nllt0fQ--
 
