@@ -1,74 +1,72 @@
-Return-Path: <kvm+bounces-38753-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38752-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BD72A3E20B
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 18:16:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7110A3E204
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 18:16:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98EC517864A
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 17:13:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8C2A16F206
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 17:13:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08599228CA9;
-	Thu, 20 Feb 2025 17:06:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEC192236E8;
+	Thu, 20 Feb 2025 17:06:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Otg+QY53"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EeWQxbwd"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8647223708
-	for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 17:06:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F5F7222589
+	for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 17:06:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740071215; cv=none; b=TdEG2UL4dKBvQLsMA/U2Jbl9OJOGaHktoZSXGYty8sh0QL3nrealPmZ0wDIhDlq7oKD9ySLHARggvIW/C/mWW8cf7fUMHgQAsVhUe1t5hss2TVezWH5U7A1sgRg4YOdDj4Iy8E3D67IMuip5tzUsVAd4crmeK5ctOMQTX6bPbdA=
+	t=1740071213; cv=none; b=pL9191UKOHWvxw+YbHJZUcpfoNTZQiRWwRtzg30icCSubA7EyRhAjSjP9vHz5upnhxz357ryv8gUDvEgRpFXBdr6DKnDkD1UiJMm5ZITMJzdlDTBEqCrhPbrQxR6fjdOv3upgI3DE2X0edElnpFmrrkxt0Zk9Fb6koXf8ciNcyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740071215; c=relaxed/simple;
-	bh=aOe0kBWT/SMLYV/wZaMc0z+GF6EZcZUqsRf5Y3fJ0NM=;
+	s=arc-20240116; t=1740071213; c=relaxed/simple;
+	bh=RrNygcpIAuAzeObQdp+KD0lcfXt/GLIRnw0/L7SoIOY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X2cHcJvgxWaI110RaNyuvZPuyOQJVk5SYz9bZNIpN8Ap5+yQk6MZPhcMBJIf7Seb+7q4jrICfDb8QRPdt0uErW+uFnR0kgLWlzG9uF/18lCEx0iL0KVa9FxNiBLlrC50gI91Lurd1yLKGmkR9VZFnZb25B697PLCtxML2Nwl49w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Otg+QY53; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version:Content-Type; b=duXMPqhuWMQsWiTpJ4nldNjNAVrJyWQcImgBudrUnkVfQEeKSU8JRa+AQiEYQZSWSdPeIgqd7R4WXfvx+5PLp9jPn8pH7J5qaGy2cXUOAHR8Ib6OqxtV2rc3Egt31qoozEocZoguL3bB66d5pljQV/wBtn87TC3V1pJSEecQqTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EeWQxbwd; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740071211;
+	s=mimecast20190719; t=1740071210;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OK4+tjkqFGEwtmhx8CZ6Jsa93KLzas0PPqSsxfoBC1I=;
-	b=Otg+QY53Hbfr9d8+EopC9yohtU+MQwaKX06khm4loDDayvpv1uR3fuf3APqbWgfBHNzGBL
-	IPUxNB0T887EUzqn52YU11KIB0ckzFmpKFAHyQxqicUbo9DWSspapW2LqTjdeHplGDvAzJ
-	2lu5ppFP7XpxiXSm0/eiUYCmnftPxqA=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+	bh=L1fUPJ+H1OTlS8BptC5w8m7YAt+/dSD1KgBgoTJ7MWc=;
+	b=EeWQxbwdAm0xuvMPHa1ccgUW/C7QGFpRdLttz1XARu/NNdeie4kYIh70C6gQjmxGp+bmUq
+	zimVzGno2xW3zIy3ZVWdbVfrPbQG/P0f9xV4qKMFdRq+RtcH9vaBZZ88MkLHam4aJ0T0Ur
+	7qyN6S3e9IFhJTn85QUourES4Un5s4k=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-453-H9-SsvULO2WCcGZVV25XkQ-1; Thu,
- 20 Feb 2025 12:06:45 -0500
-X-MC-Unique: H9-SsvULO2WCcGZVV25XkQ-1
-X-Mimecast-MFC-AGG-ID: H9-SsvULO2WCcGZVV25XkQ_1740071203
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-92-0tjMAvXYN-i0tlfN556epQ-1; Thu,
+ 20 Feb 2025 12:06:46 -0500
+X-MC-Unique: 0tjMAvXYN-i0tlfN556epQ-1
+X-Mimecast-MFC-AGG-ID: 0tjMAvXYN-i0tlfN556epQ_1740071205
 Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B79591800570;
-	Thu, 20 Feb 2025 17:06:43 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E7C0D1800264;
+	Thu, 20 Feb 2025 17:06:44 +0000 (UTC)
 Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8263C19412A3;
-	Thu, 20 Feb 2025 17:06:42 +0000 (UTC)
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id ECD6119412A3;
+	Thu, 20 Feb 2025 17:06:43 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
 Cc: seanjc@google.com,
 	Yan Zhao <yan.y.zhao@intel.com>,
 	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	Kai Huang <kai.huang@intel.com>,
-	Binbin Wu <binbin.wu@linux.intel.com>
-Subject: [PATCH 25/30] KVM: TDX: Don't offline the last cpu of one package when there's TDX guest
-Date: Thu, 20 Feb 2025 12:05:59 -0500
-Message-ID: <20250220170604.2279312-26-pbonzini@redhat.com>
+	Isaku Yamahata <isaku.yamahata@intel.com>
+Subject: [PATCH 26/30] KVM: TDX: create/free TDX vcpu structure
+Date: Thu, 20 Feb 2025 12:06:00 -0500
+Message-ID: <20250220170604.2279312-27-pbonzini@redhat.com>
 In-Reply-To: <20250220170604.2279312-1-pbonzini@redhat.com>
 References: <20250220170604.2279312-1-pbonzini@redhat.com>
 Precedence: bulk
@@ -83,112 +81,160 @@ X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Destroying TDX guest requires there's at least one cpu online for each
-package, because reclaiming the TDX KeyID of the guest (as part of the
-teardown process) requires to call some SEAMCALL (on any cpu) on all
-packages.
+Implement vcpu related stubs for TDX for create, reset and free.
 
-Do not offline the last cpu of one package when there's any TDX guest
-running, otherwise KVM may not be able to teardown TDX guest resulting
-in leaking of TDX KeyID and other resources like TDX guest control
-structure pages.
+For now, create only the features that do not require the TDX SEAMCALL.
+The TDX specific vcpu initialization will be handled by KVM_TDX_INIT_VCPU.
 
-Implement the TDX version 'offline_cpu()' to prevent the cpu from going
-offline if it is the last cpu on the package.
-
-Co-developed-by: Kai Huang <kai.huang@intel.com>
-Signed-off-by: Kai Huang <kai.huang@intel.com>
-Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+---
+ - Use lapic_in_kernel() (Nikolay Borisov)
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 43 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 42 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/main.c    | 42 ++++++++++++++++++++++++++++++++++----
+ arch/x86/kvm/vmx/tdx.c     | 35 +++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/x86_ops.h |  8 ++++++++
+ 3 files changed, 81 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index ec8864453787..f794cd914050 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -131,6 +131,8 @@ static int init_kvm_tdx_caps(const struct tdx_sys_info_td_conf *td_conf,
-  */
- static DEFINE_MUTEX(tdx_lock);
- 
-+static atomic_t nr_configured_hkid;
-+
- /* Maximum number of retries to attempt for SEAMCALLs. */
- #define TDX_SEAMCALL_RETRIES	10000
- 
-@@ -138,6 +140,7 @@ static inline void tdx_hkid_free(struct kvm_tdx *kvm_tdx)
- {
- 	tdx_guest_keyid_free(kvm_tdx->hkid);
- 	kvm_tdx->hkid = -1;
-+	atomic_dec(&nr_configured_hkid);
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index 83f0d4d34a4a..d06f9f0519bd 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -64,6 +64,40 @@ static void vt_vm_free(struct kvm *kvm)
+ 		tdx_vm_free(kvm);
  }
  
- static inline bool is_hkid_assigned(struct kvm_tdx *kvm_tdx)
-@@ -617,6 +620,8 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
- 
- 	ret = -ENOMEM;
- 
-+	atomic_inc(&nr_configured_hkid);
-+
- 	tdr_page = alloc_page(GFP_KERNEL);
- 	if (!tdr_page)
- 		goto free_hkid;
-@@ -913,6 +918,42 @@ static int tdx_online_cpu(unsigned int cpu)
- 	return r;
- }
- 
-+static int tdx_offline_cpu(unsigned int cpu)
++static int vt_vcpu_precreate(struct kvm *kvm)
 +{
-+	int i;
-+
-+	/* No TD is running.  Allow any cpu to be offline. */
-+	if (!atomic_read(&nr_configured_hkid))
++	if (is_td(kvm))
 +		return 0;
 +
-+	/*
-+	 * In order to reclaim TDX HKID, (i.e. when deleting guest TD), need to
-+	 * call TDH.PHYMEM.PAGE.WBINVD on all packages to program all memory
-+	 * controller with pconfig.  If we have active TDX HKID, refuse to
-+	 * offline the last online cpu.
-+	 */
-+	for_each_online_cpu(i) {
-+		/*
-+		 * Found another online cpu on the same package.
-+		 * Allow to offline.
-+		 */
-+		if (i != cpu && topology_physical_package_id(i) ==
-+				topology_physical_package_id(cpu))
-+			return 0;
-+	}
-+
-+	/*
-+	 * This is the last cpu of this package.  Don't offline it.
-+	 *
-+	 * Because it's hard for human operator to understand the
-+	 * reason, warn it.
-+	 */
-+#define MSG_ALLPKG_ONLINE \
-+	"TDX requires all packages to have an online CPU. Delete all TDs in order to offline all CPUs of a package.\n"
-+	pr_warn_ratelimited(MSG_ALLPKG_ONLINE);
-+	return -EBUSY;
++	return vmx_vcpu_precreate(kvm);
 +}
 +
- static void __do_tdx_cleanup(void)
++static int vt_vcpu_create(struct kvm_vcpu *vcpu)
++{
++	if (is_td_vcpu(vcpu))
++		return tdx_vcpu_create(vcpu);
++
++	return vmx_vcpu_create(vcpu);
++}
++
++static void vt_vcpu_free(struct kvm_vcpu *vcpu)
++{
++	if (is_td_vcpu(vcpu)) {
++		tdx_vcpu_free(vcpu);
++		return;
++	}
++
++	vmx_vcpu_free(vcpu);
++}
++
++static void vt_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
++{
++	if (is_td_vcpu(vcpu))
++		return;
++
++	vmx_vcpu_reset(vcpu, init_event);
++}
++
+ static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
  {
- 	/*
-@@ -938,7 +979,7 @@ static int __init __do_tdx_bringup(void)
- 	 */
- 	r = cpuhp_setup_state_cpuslocked(CPUHP_AP_ONLINE_DYN,
- 					 "kvm/cpu/tdx:online",
--					 tdx_online_cpu, NULL);
-+					 tdx_online_cpu, tdx_offline_cpu);
- 	if (r < 0)
- 		return r;
+ 	if (!is_td(kvm))
+@@ -100,10 +134,10 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.vm_destroy = vt_vm_destroy,
+ 	.vm_free = vt_vm_free,
  
+-	.vcpu_precreate = vmx_vcpu_precreate,
+-	.vcpu_create = vmx_vcpu_create,
+-	.vcpu_free = vmx_vcpu_free,
+-	.vcpu_reset = vmx_vcpu_reset,
++	.vcpu_precreate = vt_vcpu_precreate,
++	.vcpu_create = vt_vcpu_create,
++	.vcpu_free = vt_vcpu_free,
++	.vcpu_reset = vt_vcpu_reset,
+ 
+ 	.prepare_switch_to_guest = vmx_prepare_switch_to_guest,
+ 	.vcpu_load = vmx_vcpu_load,
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index f794cd914050..4ab5c994d877 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -4,6 +4,7 @@
+ #include <asm/tdx.h>
+ #include "capabilities.h"
+ #include "x86_ops.h"
++#include "lapic.h"
+ #include "tdx.h"
+ 
+ #pragma GCC poison to_vmx
+@@ -420,6 +421,40 @@ int tdx_vm_init(struct kvm *kvm)
+ 	return 0;
+ }
+ 
++int tdx_vcpu_create(struct kvm_vcpu *vcpu)
++{
++	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
++
++	if (kvm_tdx->state != TD_STATE_INITIALIZED)
++		return -EIO;
++
++	/* TDX module mandates APICv, which requires an in-kernel local APIC. */
++	if (!lapic_in_kernel(vcpu))
++		return -EINVAL;
++
++	fpstate_set_confidential(&vcpu->arch.guest_fpu);
++
++	vcpu->arch.efer = EFER_SCE | EFER_LME | EFER_LMA | EFER_NX;
++
++	vcpu->arch.cr0_guest_owned_bits = -1ul;
++	vcpu->arch.cr4_guest_owned_bits = -1ul;
++
++	vcpu->arch.tsc_offset = kvm_tdx->tsc_offset;
++	vcpu->arch.l1_tsc_offset = vcpu->arch.tsc_offset;
++	vcpu->arch.guest_state_protected =
++		!(to_kvm_tdx(vcpu->kvm)->attributes & TDX_TD_ATTR_DEBUG);
++
++	if ((kvm_tdx->xfam & XFEATURE_MASK_XTILE) == XFEATURE_MASK_XTILE)
++		vcpu->arch.xfd_no_write_intercept = true;
++
++	return 0;
++}
++
++void tdx_vcpu_free(struct kvm_vcpu *vcpu)
++{
++	/* This is stub for now.  More logic will come. */
++}
++
+ static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
+ {
+ 	const struct tdx_sys_info_td_conf *td_conf = &tdx_sysinfo->td_conf;
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index 917473c6bf3c..6e1ff7d88b61 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -125,12 +125,20 @@ void vmx_setup_mce(struct kvm_vcpu *vcpu);
+ int tdx_vm_init(struct kvm *kvm);
+ void tdx_mmu_release_hkid(struct kvm *kvm);
+ void tdx_vm_free(struct kvm *kvm);
++
+ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
++
++int tdx_vcpu_create(struct kvm_vcpu *vcpu);
++void tdx_vcpu_free(struct kvm_vcpu *vcpu);
+ #else
+ static inline int tdx_vm_init(struct kvm *kvm) { return -EOPNOTSUPP; }
+ static inline void tdx_mmu_release_hkid(struct kvm *kvm) {}
+ static inline void tdx_vm_free(struct kvm *kvm) {}
++
+ static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOPNOTSUPP; }
++
++static inline int tdx_vcpu_create(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
++static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
+ #endif
+ 
+ #endif /* __KVM_X86_VMX_X86_OPS_H */
 -- 
 2.43.5
 
