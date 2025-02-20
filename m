@@ -1,73 +1,73 @@
-Return-Path: <kvm+bounces-38662-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38664-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1A9CA3D6F0
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 11:40:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5BD9A3D79E
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 12:01:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B523B165917
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 10:40:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B65C3BFAF7
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 10:59:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 696631F1312;
-	Thu, 20 Feb 2025 10:40:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 110851F153E;
+	Thu, 20 Feb 2025 10:58:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QvMnMTO5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MMV4a0yT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA271CAA9C
-	for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 10:40:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEB771EE032
+	for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 10:58:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740048005; cv=none; b=GaEFpyYBFxjriP5FnYkoylEqQRrxLUgU0wLZSKisgNlJaXpdKmwNnjJizx+KIdT11MIsStjDCH4uoeUn0BbNlWSHAIosZYVVjhcxlGXwezRZqMT/GvRZY9/wzAPtIy6omwOGyi+QSo2THB5cnVHMPby2+v91xAfUIHIlKf9cajw=
+	t=1740049129; cv=none; b=pBZCR7EKmeiKqvjsIvkQmG/gwrRwyJaeS1008eNkywPtzHiRsMwDyebJH0amCTC9sjKAAvjantXpMPCAJWFM9jYorElAngeBEfMWUQxJpBiM6/odXh55+r9AXRJlFfTPoJ/MOEuuUrHRgN6bHbFK6QNl1eCwW9kdcRQRV+20t2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740048005; c=relaxed/simple;
-	bh=TdzYaPLHZ16bLzvmwwZ5c+AojcvTSJL6pVcmyKLeuvE=;
+	s=arc-20240116; t=1740049129; c=relaxed/simple;
+	bh=peXBWKLlJoZ0te86jGaqhSVx6k4fQXBrx/kZt4Y3dFo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qSeJFLFZA+4t5vP0QP/KHSxh9+buUy/E3jtaPf9g4OJkwr+3yNhNMABYmEqmoIR2bTEcpg75gAzHHJI/xKdnjHNvwWoqe6xHQsPw0Kh5scqBWfYlOhnWSMYUJHfwKiUpYG0kRvmewPyO7KeQrfSTwkr/V8uJzhWkd4IPH3GYQN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QvMnMTO5; arc=none smtp.client-ip=192.198.163.14
+	 Content-Type:Content-Disposition:In-Reply-To; b=O/gHsgeKEyf9PU/rFQeluiBDPzlC29LGZqp9xZR6Ewyu30DlW623XwzLb84CQXRlEzrNKlVZ1AMWM+bo+xVP/MI6mr73X8T/D8EsQhypOMD38TOcN190jpAVDJJU5XiUdFSo2VZ/D13+Kh4JzHp2lqIwz3muv3l4Mu0ejeJTfW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MMV4a0yT; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740048004; x=1771584004;
+  t=1740049127; x=1771585127;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=TdzYaPLHZ16bLzvmwwZ5c+AojcvTSJL6pVcmyKLeuvE=;
-  b=QvMnMTO5zBY6w+lryG+S9vwDpuRVqMuAu4t1uNXkBMvOvHjazskMyUyg
-   YQTzG3FnOxNgY9f90fZN8wCYLmwUU28kCb0v7a53eLZD7phNDzaZKPVgr
-   LsQJeIQyrSE4FzGVvICNHhR1f6FGOi2QQpIZJXB6IDA9U6ipuos9mnW4y
-   k36/ALtKSHDUk3O9imji1VtWKIzUvCiqnY2ly2sfVbX+QEHFdoH+NNadH
-   0mhfVcwGRw9Y5TanF3MD1wJDDjKOC38OX5tsLXkgA/fiTXSNb9seF5NFW
-   Jr9oeb8gtBR4ud3aNOSsXxexx/qwhr3r1Q/R2UX9DE8Fhcy/jVh1DSwc3
-   g==;
-X-CSE-ConnectionGUID: mVSasrVsQ4mCoUxbfY7BQQ==
-X-CSE-MsgGUID: 8yMfpfIySueG4YqX3w96OA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11350"; a="41076447"
+  bh=peXBWKLlJoZ0te86jGaqhSVx6k4fQXBrx/kZt4Y3dFo=;
+  b=MMV4a0yTSLUTNzuTgrZV9xUXKIkI1PdT+rRtI2Zyk0Lotx/ytOLI37LB
+   usc0QKCVxKVLzCK9E7qg4m0R0BSn78VBiGUmA7aS9dXw7Q/MT5QoX4c0M
+   F8YhjVcIjqv67114Hq78BjWbfUgFW9w8ki4vcRY7TdpX/sdk05xlT44gk
+   xbWvalGE+ag1SgVCPLYCz+zoMjGodjNfWkPF8ZEW+TehKPE6A+nKFDliT
+   KwLR8F3vdRipWjgLxp5ITZYYk4RApYQ4U52zeSoC3rv/vNrqo+7rOQlSC
+   VzpnEatL7nCzCEMVV20BUySFdZ90r/oWakjCz6A7Pl8KOQrCb7AZSwu18
+   Q==;
+X-CSE-ConnectionGUID: pZk5DOe7S32+TVuy8YSj+w==
+X-CSE-MsgGUID: +z1qFi3CQ0+YQMyM3NosLQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11350"; a="40959994"
 X-IronPort-AV: E=Sophos;i="6.13,301,1732608000"; 
-   d="scan'208";a="41076447"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2025 02:40:02 -0800
-X-CSE-ConnectionGUID: 4Io3i1pjTgiuFU3HtpbDOw==
-X-CSE-MsgGUID: Yo7MKmgDTMi9F1FsY5heQg==
+   d="scan'208";a="40959994"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2025 02:58:46 -0800
+X-CSE-ConnectionGUID: X65XWnxYRJ6my0mf/THp2Q==
+X-CSE-MsgGUID: XqCrPXq5T1uDp7bf4/7ASQ==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="114856938"
+X-IronPort-AV: E=Sophos;i="6.13,301,1732608000"; 
+   d="scan'208";a="114737261"
 Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
-  by orviesa010.jf.intel.com with ESMTP; 20 Feb 2025 02:40:00 -0800
-Date: Thu, 20 Feb 2025 18:59:34 +0800
+  by orviesa009.jf.intel.com with ESMTP; 20 Feb 2025 02:58:45 -0800
+Date: Thu, 20 Feb 2025 19:18:19 +0800
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Babu Moger <babu.moger@amd.com>
 Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org,
 	davydov-max@yandex-team.ru
-Subject: Re: [PATCH v5 1/6] target/i386: Update EPYC CPU model for Cache
+Subject: Re: [PATCH v5 2/6] target/i386: Update EPYC-Rome CPU model for Cache
  property, RAS, SVM feature bits
-Message-ID: <Z7cLFrIPmrUGuqp4@intel.com>
+Message-ID: <Z7cPeyLAuNDL0Oc4@intel.com>
 References: <cover.1738869208.git.babu.moger@amd.com>
- <c777bf763a636c8922164a174685b4f03864452f.1738869208.git.babu.moger@amd.com>
+ <8e40e18b433d2d152433724a15bddcacdecbf154.1738869208.git.babu.moger@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -76,9 +76,57 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c777bf763a636c8922164a174685b4f03864452f.1738869208.git.babu.moger@amd.com>
+In-Reply-To: <8e40e18b433d2d152433724a15bddcacdecbf154.1738869208.git.babu.moger@amd.com>
 
-> +static CPUCaches epyc_v5_cache_info = {
+On Thu, Feb 06, 2025 at 01:28:35PM -0600, Babu Moger wrote:
+> Date: Thu, 6 Feb 2025 13:28:35 -0600
+> From: Babu Moger <babu.moger@amd.com>
+> Subject: [PATCH v5 2/6] target/i386: Update EPYC-Rome CPU model for Cache
+>  property, RAS, SVM feature bits
+> X-Mailer: git-send-email 2.34.1
+> 
+> Found that some of the cache properties are not set correctly for EPYC models.
+> 
+> l1d_cache.no_invd_sharing should not be true.
+> l1i_cache.no_invd_sharing should not be true.
+> 
+> L2.self_init should be true.
+> L2.inclusive should be true.
+> 
+> L3.inclusive should not be true.
+> L3.no_invd_sharing should be true.
+> 
+> Fix these cache properties.
+> 
+> Also add the missing RAS and SVM features bits on AMD EPYC-Rome. The SVM
+> feature bits are used in nested guests.
+> 
+> succor		: Software uncorrectable error containment and recovery capability.
+> overflow-recov	: MCA overflow recovery support.
+> lbrv		: LBR virtualization
+> tsc-scale	: MSR based TSC rate control
+> vmcb-clean	: VMCB clean bits
+> flushbyasid	: Flush by ASID
+> pause-filter	: Pause intercept filter
+> pfthreshold	: PAUSE filter threshold
+> v-vmsave-vmload	: Virtualized VMLOAD and VMSAVE
+> vgif		: Virtualized GIF
+> 
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> Reviewed-by: Maksim Davydov <davydov-max@yandex-team.ru>
+> ---
+>  target/i386/cpu.c | 73 +++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 73 insertions(+)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 94292bfaa2..e2c3c797ed 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -2342,6 +2342,60 @@ static const CPUCaches epyc_rome_v3_cache_info = {
+>      },
+>  };
+>  
+> +static const CPUCaches epyc_rome_v5_cache_info = {
 > +    .l1d_cache = &(CPUCacheInfo) {
 > +        .type = DATA_CACHE,
 > +        .level = 1,
@@ -90,69 +138,31 @@ In-Reply-To: <c777bf763a636c8922164a174685b4f03864452f.1738869208.git.babu.moger
 > +        .lines_per_tag = 1,
 > +        .self_init = 1,
 
-For consistency as the below parts, it's better to code `true` for all
-boolean types.
+This field could be true,
 
 > +        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
 > +    },
 > +    .l1i_cache = &(CPUCacheInfo) {
 > +        .type = INSTRUCTION_CACHE,
 > +        .level = 1,
-> +        .size = 64 * KiB,
+> +        .size = 32 * KiB,
 > +        .line_size = 64,
-> +        .associativity = 4,
+> +        .associativity = 8,
 > +        .partitions = 1,
-> +        .sets = 256,
+> +        .sets = 64,
 > +        .lines_per_tag = 1,
 > +        .self_init = 1,
 
-ditto.
+ditto,
 
-Others are fine for me, so,
+Compared to the previous cache model version, the differences can be
+checked. I feel that in the future, when we introduce a new cache model,
+it's better to avoid omitting items that default to false. This way, the
+cache model can correspond to the output of the cpuid tool, making it
+easier to compare and check.
+
+Overall, LGTM,
 
 Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
-
-
-And one more thing :-) ...
-
->  static const CPUCaches epyc_rome_cache_info = {
->      .l1d_cache = &(CPUCacheInfo) {
->          .type = DATA_CACHE,
-> @@ -5207,6 +5261,25 @@ static const X86CPUDefinition builtin_x86_defs[] = {
->                  },
->                  .cache_info = &epyc_v4_cache_info
->              },
-> +            {
-> +                .version = 5,
-> +                .props = (PropValue[]) {
-> +                    { "overflow-recov", "on" },
-> +                    { "succor", "on" },
-
-When I checks the "overflow-recov" and "succor" enabling, I find these 2
-bits are set unconditionally.
-
-I'm not sure if all AMD platforms support both bits, do you think it's
-necessary to check the host support?
-
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 6c749d4ee812..03e463076632 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -555,7 +555,10 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
-         cpuid_1_edx = kvm_arch_get_supported_cpuid(s, 1, 0, R_EDX);
-         ret |= cpuid_1_edx & CPUID_EXT2_AMD_ALIASES;
-     } else if (function == 0x80000007 && reg == R_EBX) {
--        ret |= CPUID_8000_0007_EBX_OVERFLOW_RECOV | CPUID_8000_0007_EBX_SUCCOR;
-+        uint32_t ebx;
-+        host_cpuid(0x80000007, 0, &unused, &ebx, &unused, &unused);
-+
-+        ret |= ebx & (CPUID_8000_0007_EBX_OVERFLOW_RECOV | CPUID_8000_0007_EBX_SUCCOR);
-     } else if (function == KVM_CPUID_FEATURES && reg == R_EAX) {
-         /* kvm_pv_unhalt is reported by GET_SUPPORTED_CPUID, but it can't
-          * be enabled without the in-kernel irqchip
-
-Thanks,
-Zhao
-
 
 
