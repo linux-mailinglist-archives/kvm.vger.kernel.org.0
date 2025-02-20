@@ -1,143 +1,121 @@
-Return-Path: <kvm+bounces-38688-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38689-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 484C3A3DA65
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 13:49:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 873F6A3DADF
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 14:07:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52AB93B2FA6
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 12:48:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEA3A1891985
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 13:07:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7BE81F63FE;
-	Thu, 20 Feb 2025 12:48:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7FBC1F76C0;
+	Thu, 20 Feb 2025 13:07:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XhH3Rxw/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hfii3kW8"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2BF32862BD;
-	Thu, 20 Feb 2025 12:48:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08B121F7060;
+	Thu, 20 Feb 2025 13:07:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740055712; cv=none; b=gHk0N0/PJMM6Spb1pJwQ7y1LwGYRrKf//nAZdpZHfV4L5iELf5L7wd8lsUKOWnU4D6MmlkH54pxE7oFSBCye7t2kBjGrodl/oO1IwPBfKFIhaO7px2rMIX7bCm6r1Sx+sCVmxQwaX2+Yd/u7Tp9GSxmSca/b87PFOs0H8nPiTT0=
+	t=1740056867; cv=none; b=VLhBpX9q7tbutHPI/RwoTC6XdJu5/jPL1RzuoVp2ASByWlzZVAT9D5GG9hddkP7lN+Pn2d6aNS2VWWcaWIiY3YitAtEsecuXPQTmAM8XxHVL3j+A0XEpMF0pKFzzAvnw60x4xG5bDiP50mKeL7fzZrr5+k8ueDFf8BWmYizmhio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740055712; c=relaxed/simple;
-	bh=1Iv3ATubl6AG/lSG1TPOh5GEc+mnunYnUNognONLHrM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fDbvlA/Jhqg/b8gRMEoTrL3oTYbgsRjfMZE/YO3nb8CejGVbFWT4h8ifkPTH+/CJ1KaVQMEceDysCs09nXK6TgevjGpCh8SqgHjJcE0DWUTZJNaiDwzYrEjp3IVUh6t96GSc9Mgoglod+QzPOUyfWY8/63rebM00fN/e1Iyz8Zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XhH3Rxw/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C882DC4CED1;
-	Thu, 20 Feb 2025 12:48:30 +0000 (UTC)
+	s=arc-20240116; t=1740056867; c=relaxed/simple;
+	bh=3phxBuPQl5IUqfsL5Bd0aEC9fruBA7I5u9sq4ctskxE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=f3Y+UO+GqWAE0TZeWCLHJOmx6K8/gmRF0JM30Sz6OZCzk5GWVYQyXl5J23Sn6T+mRUElX4Unf9+/4w2OqLh2R37+hguDlIzoBrKK7Hk2ky/XoxgRCLABFYY3ZFXHcMN8e3GigF4xXY42Fgc7pxDTOni5XXDagE8rEIW9u1h/Jvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hfii3kW8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80C50C4CED1;
+	Thu, 20 Feb 2025 13:07:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740055711;
-	bh=1Iv3ATubl6AG/lSG1TPOh5GEc+mnunYnUNognONLHrM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XhH3Rxw/fU4NMM8JUKPDYre9d9LQaru2HtlbuSSUNzkHB8eWhqMM23vtegnTWn+BS
-	 9+H0GOfdzn1LNx9IHcWfvcpB8EXNSp57Achx+q1U7ozbfXzho3FO9ENmdtK+fnEJTx
-	 1mX2B9KcxOTwRBNfDJoEWHPpCPDk48cyZC7xwNx3D4HZ/eDzhk1UYs1ByD6cWBCggg
-	 PbJi1s5B2/FkYeMMfisRgyehbN8fd3in3TvHNeTh17NIjIy8rndGPwyK8hEYOJ4woC
-	 z5Pq6b+6BoM66BA9VpnFOLzal49GAHK/nFhBZx9kerNsCt2/b4psBlXL8nvsynNOoP
-	 upH4tKmvy4K+A==
-Date: Thu, 20 Feb 2025 14:48:27 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Robin Murphy <robin.murphy@arm.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH v7 00/17] Provide a new two step DMA mapping API
-Message-ID: <20250220124827.GR53094@unreal>
-References: <cover.1738765879.git.leonro@nvidia.com>
+	s=k20201202; t=1740056866;
+	bh=3phxBuPQl5IUqfsL5Bd0aEC9fruBA7I5u9sq4ctskxE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hfii3kW8/0vshJPsTE+wkZxwjJtaIZlTEqiJM7ICrdaSR6troIiL4Cq+KFY+PY9OA
+	 9yfVhYpoY4s1ak4pD+m2UbF+TwZQIlU2LlJlEOqanRHiVdu0JcP/xctki+F7WLRKbK
+	 lymCEnTOd5qzT+Ri6BkVf3a+5qp/8cVKXleRsfC9qJ7AhwK23rn0BmpLMuAkKdO2yg
+	 zcVnkod0cXzKKcfeNqpK3mwCzC79IAnucXI9L6c02Tyl8mUqprr/bix5z5ZG9Gpf9F
+	 eXkY0lwbdzyR5NIDLUZXiPf/vqrIKtzkK3yczVmmHjFTvY1ZKg/uKbJU7qFFpz7SBm
+	 EjjUhGOS6Ah9Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tl6HI-006Cfk-7T;
+	Thu, 20 Feb 2025 13:07:44 +0000
+Date: Thu, 20 Feb 2025 13:07:43 +0000
+Message-ID: <86v7t4rcgw.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH 00/14] KVM: arm64: NV userspace ABI
+In-Reply-To: <Z7Zmi0WAkudX5h0h@linux.dev>
+References: <20250215173816.3767330-1-maz@kernel.org>
+	<Z7Zmi0WAkudX5h0h@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1738765879.git.leonro@nvidia.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, eric.auger@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Feb 05, 2025 at 04:40:20PM +0200, Leon Romanovsky wrote:
-> From: Leon Romanovsky <leonro@nvidia.com>
+On Wed, 19 Feb 2025 23:17:31 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Changelog:
-> v7:
->  * Rebased to v6.14-rc1
+> On Sat, Feb 15, 2025 at 05:38:02PM +0000, Marc Zyngier wrote:
+> > Since the previous incarnation of the ABI was proved to be subtly
+> > wrong, I have reworked it to be more in line with the current way KVM
+> > operates.
+> > 
+> > No more late NV-specific adjustment nor writable ID_AA64MMFR0_EL1.VH.
+> > The NV configuration is now entirely selected from the vcpu flags.
+> > I've preserved the KVM_ARM_VCPU_EL2 flag which enables NV with VHE,
+> > and added KVM_ARM_VCPU_EL2_E2H0 which alters the NV behaviour to only
+> > allow nVHE guests without recursive NV support.
+> > 
+> > This series is actually very little new code. The bulk of it is
+> > converting the feature downgrade to be per-idreg, essentially going
+> > back to the state before 44241f34fac96 ("KVM: arm64: nv: Use accessors
+> > for modifying ID registers"), only slightly modernised. This then
+> > becomes part of the reset value computing.
+> > 
+> > The rest is simply what you'd expect in terms of being able to write
+> > the ID_AA64MMFR4_EL1.NV_frac field, making the correct bits RES0 when
+> > needed, probing for capabilities and handling the init flags.
+> > 
+> > Patches on top of -rc2, with the integration branch at the usual
+> > location.
+> 
+> This all looks reasonable to me. NV won't be ready for the limelight
+> this time around so unless someone shouts I plan on taking the first 12
+> patches of this series in 6.15.
 
-<...>
+Let me repost it first, as I fixed an embarrassing bug that led to
+mishandling of ID_UNALLOCATED() registers (solved by consolidating the
+ID_DESC() macro maze a bit further).
 
-> Christoph Hellwig (6):
->   PCI/P2PDMA: Refactor the p2pdma mapping helpers
->   dma-mapping: move the PCI P2PDMA mapping helpers to pci-p2pdma.h
->   iommu: generalize the batched sync after map interface
->   iommu/dma: Factor out a iommu_dma_map_swiotlb helper
->   dma-mapping: add a dma_need_unmap helper
->   docs: core-api: document the IOVA-based API
-> 
-> Leon Romanovsky (11):
->   iommu: add kernel-doc for iommu_unmap and iommu_unmap_fast
->   dma-mapping: Provide an interface to allow allocate IOVA
->   dma-mapping: Implement link/unlink ranges API
->   mm/hmm: let users to tag specific PFN with DMA mapped bit
->   mm/hmm: provide generic DMA managing logic
->   RDMA/umem: Store ODP access mask information in PFN
->   RDMA/core: Convert UMEM ODP DMA mapping to caching IOVA and page
->     linkage
->   RDMA/umem: Separate implicit ODP initialization from explicit ODP
->   vfio/mlx5: Explicitly use number of pages instead of allocated length
->   vfio/mlx5: Rewrite create mkey flow to allow better code reuse
->   vfio/mlx5: Enable the DMA link API
-> 
->  Documentation/core-api/dma-api.rst   |  70 ++++
->  drivers/infiniband/core/umem_odp.c   | 250 +++++---------
->  drivers/infiniband/hw/mlx5/mlx5_ib.h |  12 +-
->  drivers/infiniband/hw/mlx5/odp.c     |  65 ++--
->  drivers/infiniband/hw/mlx5/umr.c     |  12 +-
->  drivers/iommu/dma-iommu.c            | 468 +++++++++++++++++++++++----
->  drivers/iommu/iommu.c                |  84 ++---
->  drivers/pci/p2pdma.c                 |  38 +--
->  drivers/vfio/pci/mlx5/cmd.c          | 375 +++++++++++----------
->  drivers/vfio/pci/mlx5/cmd.h          |  35 +-
->  drivers/vfio/pci/mlx5/main.c         |  87 +++--
->  include/linux/dma-map-ops.h          |  54 ----
->  include/linux/dma-mapping.h          |  85 +++++
->  include/linux/hmm-dma.h              |  33 ++
->  include/linux/hmm.h                  |  21 ++
->  include/linux/iommu.h                |   4 +
->  include/linux/pci-p2pdma.h           |  84 +++++
->  include/rdma/ib_umem_odp.h           |  25 +-
->  kernel/dma/direct.c                  |  44 +--
->  kernel/dma/mapping.c                 |  18 ++
->  mm/hmm.c                             | 264 +++++++++++++--
->  21 files changed, 1435 insertions(+), 693 deletions(-)
->  create mode 100644 include/linux/hmm-dma.h
+Thanks,
 
-Kind reminder.
+	M.
 
-Thanks
-
-> 
-> -- 
-> 2.48.1
-> 
-> 
+-- 
+Without deviation from the norm, progress is not possible.
 
