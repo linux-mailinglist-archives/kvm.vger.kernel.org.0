@@ -1,249 +1,252 @@
-Return-Path: <kvm+bounces-38780-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38781-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6B18A3E4D6
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 20:14:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74440A3E4F9
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 20:22:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6D4B19C06CC
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 19:14:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A8EA420320
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 19:22:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EEDD2641C3;
-	Thu, 20 Feb 2025 19:13:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 164762641CD;
+	Thu, 20 Feb 2025 19:22:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nKE0F6Ne"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="XfOTlS3I"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2050.outbound.protection.outlook.com [40.107.220.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C19371FECA7;
-	Thu, 20 Feb 2025 19:13:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740078833; cv=none; b=nfgAmBgJ2899WkI0ZOeUNtSQMyVdhgz5KBhaIST6EvbdQ9TUzvrzQAutrxnTvmK++lUcn1cbntQUdz5SlDZJUlbyoBPn1Yy36T0NlReXMvCeM9sLzlOmBcPJgp6YOT2KLsNQTeoliZ6wTWTztj3x3qK46c/zh86t819HxquIn84=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740078833; c=relaxed/simple;
-	bh=bYvpIuR6+4V4p0e3j5E3/HYm2LJSdnNVx04OJcQ01F4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bVUySxgwvgAKlsrvbv3WZVqB6NKgsIZmnlsR7gUc5OkZq8y+6WN/eD93vQUkh/G415gbduFqlRaeCynZMLd8/K0yFkYw8JoXIuO6sAYz8wL9Cx8g2xHxlH5hYzzvrqcGLOwWPHR2k6WcoAzyWQT3BPM3nJDSmLCXXEzAz5Wd4as=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nKE0F6Ne; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2211cd4463cso27547715ad.2;
-        Thu, 20 Feb 2025 11:13:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740078831; x=1740683631; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JkQa+dhEgsqTxqH9wwhvXJ34Tn9uVSWrpA8SXTi2VJk=;
-        b=nKE0F6NeXynndNVd3hQr1eiP1FL2HrKiC06fMbYu8a71gCHXUlA+Gsjww+ZW09R9GK
-         W1AxVclq+3cq83pEnWHXk4dRy2z9gzZ9rDrjTKY9awm9vqBgV/6eZuFuTKtUrVLvMQ66
-         bzpwm7OeyhsDs4UhOx9h+n84+wLoSuTtVoLl/C2WWLwd9u3D9mrGukkeieiOixQDRqtY
-         kEOy0d4EAEM8cKYlb81/htheWAztmsaOtU7lLz7Z+Twr7ADfmULwmb34h+Q4hrv+0UiA
-         ythRo4G2nw79IpaQEB2jfWOnvcts3fw7/6DRYxGQFUMQtheTeDapXNjaCEv4MDs1LZXo
-         zhfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740078831; x=1740683631;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JkQa+dhEgsqTxqH9wwhvXJ34Tn9uVSWrpA8SXTi2VJk=;
-        b=FryN6RK5Z75TFmYmjMDk1AstbuyVjKaIX71gPL+OfKOVJkQ+Y3PzEpKGpc9u5V+GAY
-         8DCikX7hME5WWyZIZWVksMXLObfvq+BGeROs5Y6+Mm1gCVL/3DoT/iGSHxPk8FVa1Tgc
-         BQzgncaajnUK/eIoUZ8jSsBjBYXEbMMKzqqdxB5xp9qNBlGtbHyb12fFAIpvuo0u6p/2
-         V1mZVs3wJ9b+EEM996VQoRF9dOmf9x8tmvaZUyXWxucK8fkqIy2CPV2HllJeJD3Cg+DS
-         XlFUUOp2eyCVPRgoA7HRFJ/GOvTEmVuJApHbAGpIamOPuJKRmWpUHvcJNUIsna/CfZXE
-         0BkA==
-X-Forwarded-Encrypted: i=1; AJvYcCUPjLLSvD61Y7JiDaPkjO7kb9KCngMoz9aBR8Ahsk2yZbJDWn6uCTG9jJulRvWNL9KELshGsbWMJcZrnga8ZGmr@vger.kernel.org, AJvYcCUymBoW7YfhwoKo9G2WH2UnaT8TXN5jrU17hIxE27XHke4puFoIdUBsbbUMVPiQUhDJuqM=@vger.kernel.org, AJvYcCW148DbidwNi3PMc+Wu/7WuypCa+2XJOMMPkzUVG9kaAgFBnWB0kH2Whgj0kniFgLVH/qjteRy+R9os@vger.kernel.org, AJvYcCX4pI0A1ZV0YNR5rt+77qsTJKu98JQp8OvWPXvPY4ZihGKvh6MIu/PsRfU5mpRIZTW01YWrfz0foLeWClQk@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFXMcfk9n4+DKVUnPB6JCWUdmxtm3JpLcNyzHFgq6CzndG1iss
-	XCU+/fQ/vAAixRt5i31Es7HsII8fpP55wW2fweMAXRs3Neah/7o=
-X-Gm-Gg: ASbGncuhJiPw1O09eEYLi8b/19Ofn3DGgVkn67tmbqXlbU2Eo4K4ui2SG7ava9jLudf
-	ieB9dy4XMikH2MCVAHcDx23Sy38tqWezd7CdWvpc5fWoEFbEIH+8IEmJITHpkIRDj0JY1v7Cpr0
-	eQ///LQ1LAy9U9hM6lSaULC1t4fgS1SNhcrpttZhFI3Gam502EGbeQ/psALdwKQjjIHKAcP4V23
-	Ca11iB9l23K4H264c+D9SzKEkCUQfBxRVNsjPc06oDJ/MMnXbbDiEtBwNrcTHcy+7MHJoHHxdQ4
-	RbU8F8Rje/A9GiM=
-X-Google-Smtp-Source: AGHT+IHIIuxiMZMBBkbPNcC5zirNHq1feMk9yHBECVzOv1p5m8kEN9+wL54cjusKTa4cy0GyMsGD0w==
-X-Received: by 2002:a05:6a21:7002:b0:1ee:cd18:d3f5 with SMTP id adf61e73a8af0-1eef3cb9b92mr517626637.23.1740078830809;
-        Thu, 20 Feb 2025 11:13:50 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-add2e0ad0dfsm10759682a12.78.2025.02.20.11.13.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Feb 2025 11:13:50 -0800 (PST)
-Date: Thu, 20 Feb 2025 11:13:48 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, virtualization@lists.linux.dev,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Shailend Chand <shailend@google.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Willem de Bruijn <willemb@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	Neal Cardwell <ncardwell@google.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me,
-	asml.silence@gmail.com, dw@davidwei.uk,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Victor Nogueira <victor@mojatatu.com>,
-	Pedro Tammela <pctammela@mojatatu.com>,
-	Samiullah Khawaja <skhawaja@google.com>
-Subject: Re: [PATCH net-next v4 6/9] net: enable driver support for netmem TX
-Message-ID: <Z7d-7P8kPthyr3bG@mini-arch>
-References: <20250220020914.895431-1-almasrymina@google.com>
- <20250220020914.895431-7-almasrymina@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B82EF20B1F1;
+	Thu, 20 Feb 2025 19:21:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740079319; cv=fail; b=ph1Jx+F3PQPQyD20lQ4IyiWeT1mPjugUTKZcywj8OfY4MjV7OQhK6IKCv4uOkaS3SsQR8NCWuC9d3BMKaV8DFRD6KzeieF3PM653BhBFDSNKFDyxCjO9ihAxEDY+lfwOGQ2FMirx2Kjr3yVnI+i5I/m0JZ47mnpTsff0tjlOo+s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740079319; c=relaxed/simple;
+	bh=nCQIwdIOkdQekHH9q9FbXzoJ08qKWEz6eZe5SpdfPuY=;
+	h=Message-ID:Date:To:Cc:References:From:Subject:In-Reply-To:
+	 Content-Type:MIME-Version; b=afp+0mCRIQUTDX1Iz6uev5mjhCMHOqPbN6IdEPouYK7jvcRN0hsdHSoJxp7bHWcVjS9dUlhu0JhEHJRHxqhRNgmn7YJbF19VtJuCVXXAv1t88hSoiZgN0jbMPnY91x8qO8MGW7sCowQp3m1WYQ14QgSiaoeP/UORKbnYtJwZhTM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=XfOTlS3I; arc=fail smtp.client-ip=40.107.220.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=e4uq2Ic9xTjkE8JPUcCgKrwx+CVsHDN1Vp1zFG+cMRFIavXQPToj5NWw6rzdwBsJyJ4WR1JDqg6FkJrUxPiUvuc/Rz2ZWPApoSnxWOlhsl55sBSuxKtW92mdkdCfoIvbgNitCGuiU/zGa2N6MZ94j8E931bwEDNz2J7ut88/T/klnh/jCCHYxJYuZZhyRKI2+SyXF2pM0HvQHkqE/NBJYUOmMEuZm78a4Lyk0Fkpu6fCNSU7SXUoTTWW6Ci7z38ojq3pCfVKxCHuaqKcBcQL1Vn89xu8RfufggUpB0gnGtu9HeLPtwp1eHEF3b2wIXxXIYoul6ria/MTCrTIqLGnNQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AXkdUsTPdhi8C2p21/iW5hqFGvgCb6L8eTXmzo7CVJI=;
+ b=WK8nolLcXixuvHBOEXuGSiBymeUzQ+tUmBOulxfgi8qgtoksSC6nEBymycAjomACBp9H3DqaVWYDSrKsBa9OIgYKYTc4Yqo0fWXXHYPSjLLwmfR+e86ldDBrPoPLwf0LhsFA41x+6ptFs0qpr2kyzsiZ2QP0xzTxpvsS2Vv93XF3GgrUKW33g2YM9HR6QWiD+J8viz6Epw2kw6Qfg7T9xg92Z5Tl9Tx2OBfjgsMFRmSIZBSDs+yAkvBiuZiKOWUzyq/1LU+69yCW3Jo2+VfsP2nCHcFt2cOHilI/tp466BdP3cwRrNulpZiAeJyuEqfEHKSIRsYF3tNQndUWtJ6fVw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AXkdUsTPdhi8C2p21/iW5hqFGvgCb6L8eTXmzo7CVJI=;
+ b=XfOTlS3I0gBuM8cgWoNuY7cVE53dqAne8F1N+BxcxJAkL9mQIg0qh+09kvMZobI9k+OuPTOq6T+mzGynGAzbtI52bIirdlCWeoydu2ju4xBuhL+tQ/Hy2C/3MVu/MA6nt5DiBsYnGcH5OQxJC8GUfMZxztVRYYslLGXlyqQkXhc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
+ by DS0PR12MB7972.namprd12.prod.outlook.com (2603:10b6:8:14f::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.15; Thu, 20 Feb
+ 2025 19:21:54 +0000
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e%7]) with mapi id 15.20.8466.016; Thu, 20 Feb 2025
+ 19:21:53 +0000
+Message-ID: <a6f653d2-a75f-44d0-587a-e57fef0164ad@amd.com>
+Date: Thu, 20 Feb 2025 13:21:50 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Content-Language: en-US
+To: Ashish Kalra <Ashish.Kalra@amd.com>, seanjc@google.com,
+ pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ john.allen@amd.com, herbert@gondor.apana.org.au
+Cc: michael.roth@amd.com, dionnaglaze@google.com, nikunj@amd.com,
+ ardb@kernel.org, kevinloughlin@google.com, Neeraj.Upadhyay@amd.com,
+ aik@amd.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-coco@lists.linux.dev
+References: <cover.1739997129.git.ashish.kalra@amd.com>
+ <3751510d09c0811811e46e857942bf238aa52d05.1739997129.git.ashish.kalra@amd.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH v4 5/7] crypto: ccp: Add new SEV/SNP platform shutdown API
+In-Reply-To: <3751510d09c0811811e46e857942bf238aa52d05.1739997129.git.ashish.kalra@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN7PR04CA0010.namprd04.prod.outlook.com
+ (2603:10b6:806:f2::15) To DM4PR12MB5070.namprd12.prod.outlook.com
+ (2603:10b6:5:389::22)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250220020914.895431-7-almasrymina@google.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|DS0PR12MB7972:EE_
+X-MS-Office365-Filtering-Correlation-Id: afd07071-7800-4a54-a2c4-08dd51e3d550
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|7416014|376014|1800799024|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?RDVNNEpmY2JJQUlibmdYWEM4MG9IS1VwcW90dmtyQU1ENFl1YjNodFJYZ2xO?=
+ =?utf-8?B?ZzUxOXkvdGhScm00R0lxZ1ZrMWxkNEhVSkdtZW0vd1NFVE5vbk5seTFYRno3?=
+ =?utf-8?B?OU9XNEVFS3JHMVB1SHlJVUtvc0VyZ24yQXRMM2dnYkhiOUhKMkE1cmZFK2Fq?=
+ =?utf-8?B?OGlHVnNXbkFTVVBkcUpZRmh0dnBRTzdVUzk1akI1aG5hcGtpdG91Vkd3SUlP?=
+ =?utf-8?B?Z2RDNmVzUjl6SjJLVW1qeUFyZU5zK25IYlNOeU5HQWxFMytGTTYvWDhINnEx?=
+ =?utf-8?B?R1hmNDlJYWtZVVlURjdsdThhTUh3bXhVYXNCbkU1MG0rSlppUUMvZUczVnJR?=
+ =?utf-8?B?TEVxSkxTYXdVTUFKYnJmNDNqMnlJaEJXeC9IL0JXejRTMERyN3QzMXhibTFO?=
+ =?utf-8?B?V0cxQ0hKQXUwVkFpTkdOVmVoOEswTDhqekZEdEMzN0h2RTJnenlCTG9Bb3dl?=
+ =?utf-8?B?V2owOVRHOUcrTEF0UjdGaXZkNGl0VXJ0VEdoYzdzRUJreHJEOGhacGNvSVBN?=
+ =?utf-8?B?TjJLWE1JRGRZMjVlMS9TNS9tVXhBTGJvUXBMYXdUL1pWOHBzazlCdXR2dlVS?=
+ =?utf-8?B?Rlk2bmYyMlVPajNET1RjSFJ6bVBPVTlET3ZaRWtDN0tSaWxKeGdVbFc5Y1lY?=
+ =?utf-8?B?bUExb3lJU2NqTlpMUDNXemNDSC85MVIvUWUvbDQxemNNVFFDeEVyNFphUGp2?=
+ =?utf-8?B?UmtPc3A1cVJQSTRSSTB3WVF2Sy9mQ1Fhc1JtLzh3MVllNHIrZXd2ek5YTFUx?=
+ =?utf-8?B?dWNyaHpZWlRWSm9ZdlEwREwrSllDQm1QWlRZNUpZZCtCYnd6c253Z29YNlh3?=
+ =?utf-8?B?aEdDaklNSS9QdFVETGR3MVJJTkNxS0dQR29yMUR4VWpzTFRzd0NkN2dGZEV2?=
+ =?utf-8?B?UXk4TUV1UDZ3TURkbENab0xhWG5IVmtTenF5bjY1bkZieHMvMFkramIvVzVO?=
+ =?utf-8?B?aXNEbVlISVJZcW51cnBtZUdwb1o3RHZpVXpBcEQxSUthbFVuZGcvRHNqVElr?=
+ =?utf-8?B?WnhZTDlNVWNjTDVLVzJrenVXYVNMdmV6OUdUbzZyZU5LSFcvaUJuUS9zdnNo?=
+ =?utf-8?B?MzRSU0gxNVNhMnozUG8xblZneEdlSVpTSC9mNGp4MThoWmRaaU8vNjMzMFYv?=
+ =?utf-8?B?OTljNWZrYlN6aHdXdWRtbWNCWitZbUxGT2hmSWRUZEVLN3plTDFHVEw0ejJ6?=
+ =?utf-8?B?T25rb0tUT0FEdVh4NzFrSnF4VDdWb0szdzJzSndtREdzR2Zjc3RRbjBDVk1l?=
+ =?utf-8?B?T0JGWk54M3dnTjV1UjBtMFpuY3l2Z0NrYVJkb0pFR1Zpc3FvRlExdG1DME0y?=
+ =?utf-8?B?MVNiWVV5UEg3b3JYeTAySEI0R1JBV01BVGlxVFRZSElSSlhPL2JCLzhXSXlt?=
+ =?utf-8?B?VklZdkpwbTRwaXk1S1FYTUozazZwRXFaMnZ5ZmYxZGpvelVWc1JaS00yMzMz?=
+ =?utf-8?B?VUhPdjhqeGN4MnViNVFwTGw4a3NlQVA4U2lYSHdIZFJ1Z2xPYUpSQmxqb1BG?=
+ =?utf-8?B?ajV6RVhZZ2xwUEZYazdwV2hMcjN1Z3I4TU95NEtESnVQMzNrMUQ2NXVnVjdk?=
+ =?utf-8?B?Znc5cXlTamdoS1RCdFpJZFppc2c5VmxoZCtMRFdIanBkL3QrRGRlQVJTRDhs?=
+ =?utf-8?B?dWF3Y2FwZ0hNUjZhOWVVWjIwQjRRaTBLUXFrV3FjS245WUMwemQydzIwekhI?=
+ =?utf-8?B?MDh1ZnpxS1VlUUEzcGx0eVdydWFxOWRVZDljM1lxU3BmSllaRUlFR2t1Zlhw?=
+ =?utf-8?B?Z3U1YXpiYXhJeU5IRk9yTm5DMzJjZ0lsUXpJazROTjZXNXZ4dTRVMlR5dE8y?=
+ =?utf-8?B?REpibUZ3NDVxOFNoY0NVdDRsMWtZeGFXM3R5bzUzWDlWWDArVWZzWmhNTmhV?=
+ =?utf-8?B?WjZOZnRpOGxDOWQvVHMwVDIxWDhTamU0SGFXcUg0K21UeUs2VlJJZmZVenRM?=
+ =?utf-8?Q?jRqLUiFNDT0=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?amRtNVJJRm9FdVlFZWtRRTdvZ2pNWmRyeURkVmx3aENTRlowcEZsbjFHdEI3?=
+ =?utf-8?B?Uk1BVXJBK0YzNEFvcncyL0JRZmhOSHUyNG5rNTFDZ1BsYlpFdnA1VEFFRmtO?=
+ =?utf-8?B?bEMramVlVVU1ZFp6RGlsQ0FYbWVRTkh2SWhBc2l2eEpaRmlhNWRXWjVXUGZ3?=
+ =?utf-8?B?TVJ1MXVCc0gwYmtWV3ErMlVIdG1Sc2NKWklWNGhuSjFwTkN6S2ovaDZITVl3?=
+ =?utf-8?B?L1pzeVplbFBNMDFLYWdDcDBtTXZBSmtjZFNFQ09aUUlWc2FNd0N4TlhPcDJJ?=
+ =?utf-8?B?aWkyeXRyYXB1cTlCMVNMd2dHTmZ2U1lyWlRaVW5ndW5Wd080UkR5WGJOMlVj?=
+ =?utf-8?B?MS9UVVcrY1RtSzJ6ZXViUTAvMGhqQk5yS25lcm5vK1pRVHRZcEJndkRDMEJT?=
+ =?utf-8?B?U1o0SWNYMEkvbThvdlhkSCtWeWVNb2FzM29OSEdmdmN0VGI1SEx3dVJvejh1?=
+ =?utf-8?B?OVNZRUc2bUNYRnc1ODRCYUs2elllblhkRVROL2pIV3BydDR0NjZnSWVGWEE3?=
+ =?utf-8?B?RmRSN0NGb2hZMklySENwcU1pRGdzNU9hNDdxMUUvLzMycnFndFcxTDJ0YjdB?=
+ =?utf-8?B?MHBsdUdNdzBOemYrSFowTWZVeEtCcDhyQ1BkdjQyenBtVlArcnoyTFMwNm1x?=
+ =?utf-8?B?SmtEUEpyR3MwemxoMmk0T0Qzdm51TUQ3SnZBVU90ZGEyNjZEMytjcG1PQkM1?=
+ =?utf-8?B?aDlkVU5KRnE4M2hheldOdzV6K0dobHc0N0pUM3NDV1RJczNhMm5NQ1JjMFh3?=
+ =?utf-8?B?REMxVTV2NmlSMlA5dEhsUjBTaEtkcGU2SU1LRFAyUnVSbUNkWExhZkw0RTRU?=
+ =?utf-8?B?bldieFBnc1RucHNtZ3VlMmtOWEx1UWV0VnVFcGYxQUVtWlRGdDQ1Q0NLa3Zu?=
+ =?utf-8?B?QzQya1pPY1ZaWnJ2MlhSSTI3dU1YankySS9JU0ZBdzNEbVdDUkxhVmp0elNu?=
+ =?utf-8?B?QlBBUjFWaitZVnZ3VzFONlJQZjBFcFVreEloQk8wclpvdGxUVk5ub1ZvNUZ4?=
+ =?utf-8?B?cFg0Y0N5ckEyOUJUcmE5R0NpM2tGOUFyQ3F6ZnZrdHJuaU9GY3dVRlFJRXdW?=
+ =?utf-8?B?RmVydWpERVRWbUN2ZlZKUklxTGQxOVJQOHlSc3NsTDR1SlJKU0FZeDlZQjRX?=
+ =?utf-8?B?V1dvYlMycjd2UFBSQ1pPbTlpRVFvZWpMSVRHbE9COGJBUjNkVEl5YjJ2cFJS?=
+ =?utf-8?B?ZldITXRMcmJjMDdnaVR4bkx2WjFsQUh4YzZjTjZHZTNyaVFJNkRCdHpxNFJa?=
+ =?utf-8?B?YXlDQ1dhRkNmdkJQaGdPd2cybm5kVVZZa25vb0NlWitLNFg4eGFzdVh2YnRk?=
+ =?utf-8?B?anJzUGU3SWVHcGtvRFptZ2J3eFJRUjVPQmpCZmdSOHBFOEEyRXZYN1Qzdmo3?=
+ =?utf-8?B?YlZ3MWcvcS85NW40Nm1HUjIvdDRFbEhpa1JtN04rZ3B5dHZQWGNCZzFMS2J1?=
+ =?utf-8?B?citWaXZjL285TlZKUXp2clBIVDBBQ3lWVVJwSGRTNGgvYlVEODJqUFFWcXh6?=
+ =?utf-8?B?eXZzV1k4OVp4cFhrVjRsMjR3NHlUWUo3R2hRWlAraUEzUWRmRERWUC9tc0JO?=
+ =?utf-8?B?Qkp5M2wyRkRSRlhmQUVXNWlESXJKUWErcDR2REs1aW9BbDJkcXRuekZ6NWox?=
+ =?utf-8?B?ZGxFYmE4QnpJN0RqR0ZYdzV2R3pjN0RuQ3BxMDlNWG5xaTRxQzhIMXo0YVBy?=
+ =?utf-8?B?bnZMYWlneFBWUWZuK1J4NjBpSmhnZkZlNU9BN0Y4ZFg2MmZtbGlSQnNDc3B4?=
+ =?utf-8?B?U3RMaCtVNXhvaklMNWFaY3o2NmhyR1BsSGNyYjV0eGRjc2xyTUJpcTBDTGFo?=
+ =?utf-8?B?TkxTRjhLbnNiWi9zQ3MzOGtDVzB5REhyN0EyRW5kMlZYMDEyT0pzeFdlTXVx?=
+ =?utf-8?B?MFVsWHRDMU1IMlJwdGFvalBUcVZMMjh4UzJwenpXY1pNQXcxc2ozdXUrcWNy?=
+ =?utf-8?B?S3Vla3hrZEhGa3RucDVYYlFKdWtXU2IrWUhMYXZyMG02eGpmcFRrSzBWcG1K?=
+ =?utf-8?B?aHVZQUNCNllPOVFQMW00ek5LMjQxNHl2UE9pM0JOcnVSLzRzREpNeHA5cmVD?=
+ =?utf-8?B?VDFxaktRelhFUzBRZHJ0Wk1hdGVDSUhCOWpPb0xuaTFSd3pmc1B1T3puelgx?=
+ =?utf-8?Q?UZo7mxjNLwv9NU8KUpVv9SV12?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: afd07071-7800-4a54-a2c4-08dd51e3d550
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2025 19:21:53.6537
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OH/ttG+HFDpBmBq7k6DFvFhSYIyLZkcpQdkoYojj3l3JwWM/s7dmSSAjAuwV6hWHkWRGd4vywpgq8mlL/oNCcQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7972
 
-On 02/20, Mina Almasry wrote:
-> Drivers need to make sure not to pass netmem dma-addrs to the
-> dma-mapping API in order to support netmem TX.
+On 2/19/25 14:54, Ashish Kalra wrote:
+> From: Ashish Kalra <ashish.kalra@amd.com>
 > 
-> Add helpers and netmem_dma_*() helpers that enables special handling of
-> netmem dma-addrs that drivers can use.
+> Add new API interface to do SEV/SNP platform shutdown when KVM module
+> is unloaded.
+
+Just a nit below if you have to respin. Otherwise:
+
+Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+
 > 
-> Document in netmem.rst what drivers need to do to support netmem TX.
-> 
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
-> 
+> Reviewed-by: Dionna Glaze <dionnaglaze@google.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 > ---
+>  drivers/crypto/ccp/sev-dev.c | 13 +++++++++++++
+>  include/linux/psp-sev.h      |  3 +++
+>  2 files changed, 16 insertions(+)
 > 
-> v4:
-> - New patch
-> ---
->  .../networking/net_cachelines/net_device.rst  |  1 +
->  Documentation/networking/netdev-features.rst  |  5 +++++
->  Documentation/networking/netmem.rst           | 14 +++++++++++--
->  include/linux/netdevice.h                     |  2 ++
->  include/net/netmem.h                          | 20 +++++++++++++++++++
->  5 files changed, 40 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/networking/net_cachelines/net_device.rst b/Documentation/networking/net_cachelines/net_device.rst
-> index 15e31ece675f..e3043b033647 100644
-> --- a/Documentation/networking/net_cachelines/net_device.rst
-> +++ b/Documentation/networking/net_cachelines/net_device.rst
-> @@ -10,6 +10,7 @@ Type                                Name                        fastpath_tx_acce
->  =================================== =========================== =================== =================== ===================================================================================
->  unsigned_long:32                    priv_flags                  read_mostly                             __dev_queue_xmit(tx)
->  unsigned_long:1                     lltx                        read_mostly                             HARD_TX_LOCK,HARD_TX_TRYLOCK,HARD_TX_UNLOCK(tx)
-> +unsigned long:1			    netmem_tx:1;	        read_mostly
->  char                                name[16]
->  struct netdev_name_node*            name_node
->  struct dev_ifalias*                 ifalias
-> diff --git a/Documentation/networking/netdev-features.rst b/Documentation/networking/netdev-features.rst
-> index 5014f7cc1398..02bd7536fc0c 100644
-> --- a/Documentation/networking/netdev-features.rst
-> +++ b/Documentation/networking/netdev-features.rst
-> @@ -188,3 +188,8 @@ Redundancy) frames from one port to another in hardware.
->  This should be set for devices which duplicate outgoing HSR (High-availability
->  Seamless Redundancy) or PRP (Parallel Redundancy Protocol) tags automatically
->  frames in hardware.
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index 582304638319..f0f3e6d29200 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -2445,6 +2445,19 @@ static void sev_firmware_shutdown(struct sev_device *sev)
+>  	mutex_unlock(&sev_cmd_mutex);
+>  }
+>  
+> +void sev_platform_shutdown(void)
+> +{
+> +	struct sev_device *sev;
 > +
-> +* netmem-tx
+> +	if (!psp_master || !psp_master->sev_data)
+> +		return;
 > +
-> +This should be set for devices which support netmem TX. See
-> +Documentation/networking/netmem.rst
-> diff --git a/Documentation/networking/netmem.rst b/Documentation/networking/netmem.rst
-> index 7de21ddb5412..43054d44c407 100644
-> --- a/Documentation/networking/netmem.rst
-> +++ b/Documentation/networking/netmem.rst
-> @@ -19,8 +19,8 @@ Benefits of Netmem :
->  * Simplified Development: Drivers interact with a consistent API,
->    regardless of the underlying memory implementation.
->  
-> -Driver Requirements
-> -===================
-> +Driver RX Requirements
-> +======================
->  
->  1. The driver must support page_pool.
->  
-> @@ -77,3 +77,13 @@ Driver Requirements
->     that purpose, but be mindful that some netmem types might have longer
->     circulation times, such as when userspace holds a reference in zerocopy
->     scenarios.
+> +	sev = psp_master->sev_data;
 > +
-> +Driver TX Requirements
-> +======================
+> +	sev_firmware_shutdown(sev);
+
+	sev_firmware_shutdown(psp->master->sev_data);
+
+and then you can get rid of the sev variable.
+
+Thanks,
+Tom
+
+> +}
+> +EXPORT_SYMBOL_GPL(sev_platform_shutdown);
 > +
-> +1. Driver should use netmem_dma_unmap_page_attrs() in lieu of
-> +   dma_unmap_page[_attrs](), and netmem_dma_unmap_addr_set() in lieu of
-> +   dma_unmap_addr_set(). The netmem variants will handle netmems that should
-> +   not be dma-unmapped by the driver, such as dma-buf netmems.
-
-Not all drivers use dma_unmap_addr_xxx APIs (looking at mlx5). Might
-be worth mentioning that for the drivers managing the mappings
-differently, care might be taken to not unmap netmems?
-
-> +2. Driver should declare support by setting `netdev->netmem_tx = true`
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index fccc03cd2164..d8cfd5d69ddf 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -1753,6 +1753,7 @@ enum netdev_reg_state {
->   *	@lltx:		device supports lockless Tx. Deprecated for real HW
->   *			drivers. Mainly used by logical interfaces, such as
->   *			bonding and tunnels
-> + *	@netmem_tx:	device support netmem_tx.
->   *
->   *	@name:	This is the first field of the "visible" part of this structure
->   *		(i.e. as seen by users in the "Space.c" file).  It is the name
-> @@ -2061,6 +2062,7 @@ struct net_device {
->  	struct_group(priv_flags_fast,
->  		unsigned long		priv_flags:32;
->  		unsigned long		lltx:1;
-> +		unsigned long		netmem_tx:1;
->  	);
->  	const struct net_device_ops *netdev_ops;
->  	const struct header_ops *header_ops;
-> diff --git a/include/net/netmem.h b/include/net/netmem.h
-> index a2148ffb203d..1fb39ad63290 100644
-> --- a/include/net/netmem.h
-> +++ b/include/net/netmem.h
-> @@ -8,6 +8,7 @@
->  #ifndef _NET_NETMEM_H
->  #define _NET_NETMEM_H
+>  void sev_dev_destroy(struct psp_device *psp)
+>  {
+>  	struct sev_device *sev = psp->sev_data;
+> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> index f3cad182d4ef..0b3a36bdaa90 100644
+> --- a/include/linux/psp-sev.h
+> +++ b/include/linux/psp-sev.h
+> @@ -954,6 +954,7 @@ int sev_do_cmd(int cmd, void *data, int *psp_ret);
+>  void *psp_copy_user_blob(u64 uaddr, u32 len);
+>  void *snp_alloc_firmware_page(gfp_t mask);
+>  void snp_free_firmware_page(void *addr);
+> +void sev_platform_shutdown(void);
 >  
-> +#include <linux/dma-mapping.h>
->  #include <linux/mm.h>
->  #include <net/net_debug.h>
+>  #else	/* !CONFIG_CRYPTO_DEV_SP_PSP */
 >  
-> @@ -267,4 +268,23 @@ static inline unsigned long netmem_get_dma_addr(netmem_ref netmem)
->  void get_netmem(netmem_ref netmem);
->  void put_netmem(netmem_ref netmem);
+> @@ -988,6 +989,8 @@ static inline void *snp_alloc_firmware_page(gfp_t mask)
 >  
-
-[..]
-
-> +#define netmem_dma_unmap_addr_set(NETMEM, PTR, ADDR_NAME, VAL)   \
-> +	do {                                                     \
-> +		if (!netmem_is_net_iov(NETMEM))                  \
-> +			dma_unmap_addr_set(PTR, ADDR_NAME, VAL); \
-> +		else                                             \
-> +			dma_unmap_addr_set(PTR, ADDR_NAME, 0);   \
-> +	} while (0)
-
-Any reason not do to static inline instaed?
+>  static inline void snp_free_firmware_page(void *addr) { }
+>  
+> +static inline void sev_platform_shutdown(void) { }
+> +
+>  #endif	/* CONFIG_CRYPTO_DEV_SP_PSP */
+>  
+>  #endif	/* __PSP_SEV_H__ */
 
