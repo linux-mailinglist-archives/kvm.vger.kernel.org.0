@@ -1,148 +1,120 @@
-Return-Path: <kvm+bounces-38685-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38686-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07D5FA3D99A
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 13:14:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1F49A3D9AB
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 13:18:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 422033BD6ED
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 12:14:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D14B7189E71E
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 12:18:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A184D1F4E56;
-	Thu, 20 Feb 2025 12:14:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 166851F55FA;
+	Thu, 20 Feb 2025 12:18:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="KGq8p2Sl"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="SF0fAFAs"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 100CE1F4626
-	for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 12:14:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B22E61F428C
+	for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 12:18:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740053678; cv=none; b=Heo3eTUOK3rFYo1N+74ptE1MsYSuwnvLbsafcefv82cIaGhVs54Ke6UETWIlVRSYXXlaXOOCUIXWFCX8To+jUhY/Zf3+b3wWKe0rdjrMKyTyhVGbTn4RlK2m6qqO/57NghjAzcsHaZAYiKRgzqkmsnD9V3c7yY4efKnDv2Xc180=
+	t=1740053883; cv=none; b=Ykkc1qO3G8xVqWb9OJi+RzhY5Yx3FLI0q+1ID4KQdCL8f28TB1YxZ+QyYwchnlc7sP0bpIWT8xK80H/yOMh5a3oRflH9aBIl8NI2PwQXd81CTiFV1by/9X2P5hQIBZAgZWO3dyODw+jUdHLhgRwVio6hLVMRJf4iireTRWW2iXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740053678; c=relaxed/simple;
-	bh=ZrSW3WlFsoq4+pWbmw5nXV2YhyzQXMLfxD78lA6xThE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oxyP8rzVZNuINLSYtRqShUUbf0EfottG7Pbfr8ZJzsVqn/KDf1e5tOaUkdyKero1LYinKVvahLSuiVGCxNVCI+YVMGrrDHGSUOTY7AbP0yqmr4GZGajBoge3P/+RNh2+6VY4p16/jbTb91uErSW+L1hDtu40Ve5hhENqV229JVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=KGq8p2Sl; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-38f403edb4eso463695f8f.3
-        for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 04:14:36 -0800 (PST)
+	s=arc-20240116; t=1740053883; c=relaxed/simple;
+	bh=6m3pn5teB6D33EiP9PjyRNzHejwBzfVH65xximy5EQU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=p3BFETxeyPfPldzs1jF12PK6XGuJw8PkTZdSyIOoOmpe8PBXZfTuZEym1A/Rv7PfbEFjNkUrsacAd6Hx8PVe9IMWQUzfyf5RIH0HBr4hatbnP1O4JkzM2p8+SPDLqPE7oSIYzg11jwrGXe0XQKex7DvAavIm6r2EuHXZLb0RVaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=SF0fAFAs; arc=none smtp.client-ip=209.85.166.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-855a095094fso22242439f.1
+        for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 04:18:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1740053675; x=1740658475; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=hGUCY7fitgab0ytTT0Om1EzRQzqjeCpPDOFA2YcYuWg=;
-        b=KGq8p2SlE9lGyKwo4KR4SRbF18g7v3cAIylOvrFSmGGhiDQdq36duUd0DrqygZxipQ
-         6C2qnAyWlcroug/Mukv4Nz1dJkFyFZs/IMeReYcLpj9zePqAuK84qIIgxaINYmsRTg/s
-         6lGrNZZlzaG1wZHtNVseHA3w5Co6W/POSsYUU9mIsJEdLUlOkXyv4238DhvmNoSzg58X
-         E8WqJH7Po2MjJyBz4pcsq6ldyHb/yV+lrEy/ndDwRJXD4t9qJ8E1TKVOG3SLc90WCu/l
-         a6l/tvoeaeF2JdQl5/XzmnWmOc2w3ewIMN5hk3Emo9jdiCAxSZVU+F0AZThAMtJlWg/G
-         5/DA==
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1740053881; x=1740658681; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rmI+w9rW7xuxQgzQY4zgyZiBf+VpYD43wlkF4w4/Fxk=;
+        b=SF0fAFAss56S5/kldJcO5bNJILxkssyS1ga/tzhkdUQFpBVB590jWwLiJ7+E/iAuQU
+         3JGWKPr81N7OzTonmnzjWbQqGsxt/mHQyDEBAG2Hr/+1aOON3SIX8PppB8LcXfoLqQwP
+         vKkT8Ald8KMtl9lkMRI2B0j/83OK6smXaFF8vr8SCA9fkSXNh8DpG5uOZJ813LUTNvnc
+         iC1BLBzzb+W0sa0z1wDPV2Yr7Y9ZC+9MutpF+5yUvTXEIJojFqC/QWA8ZivI0IlamuAi
+         xtf428dOypj71Ev8mcTG3ZvvDS4+h3CcwX5HyQuohPeE4NQlI/Y71jx1O7K6aJ77H9RY
+         EldQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740053675; x=1740658475;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hGUCY7fitgab0ytTT0Om1EzRQzqjeCpPDOFA2YcYuWg=;
-        b=VBa7lDqLc4yxxwTwzPyRYGdTSE/rNzmWkAPpupPOO3IecF4hnajsFDHMi6VEL8SWOR
-         Yfb+Ab6XjGbm7MMg+mGDhfp9A9H376Io2jzKgQ6GScfhKNem3GaJkQ5U3CCE+kkm+CLV
-         KUW6/UAg9zWyHcOnx/3NvN8yaHFj72iSj0aSXBIAMkOm+7Y/ba8PA54rleD2JFmtgsg+
-         uYAVZzTgLOeJi0XckejArZQBBrvmPlnTJ+Ocgg6023ZflLi0gQVRnYV/2ooN7NTSASyk
-         hqw6VGgQBTod71ZjZgj0DtMRKwIz1owtn1ue0u9T7+EhcvSv0PpUVFXF5kDPGjvcKrbZ
-         U6hg==
-X-Forwarded-Encrypted: i=1; AJvYcCU5HhrwuNr4lIgDhXGP/xQcOm6b5WW84FvzJRT1loccFUTKWVJPatnlHGMItbxUOFSlSlg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRAn47Em2WR8TtoIDkLPC09qQ8qopVuZ7L2wk1+enbd5lsgRSs
-	Ax2jSqHdePDGhsDglwD7eaxYolEaaCxZvdl6NezkHHff88Aml4z0MoXhLeRmOPA=
-X-Gm-Gg: ASbGncvqrCrvUbZnlM/tQ4j2bDAQ/f5ZQjU+ovBpRzQsfq/joS7DzNJ2FoUSDeK509u
-	vcYQ1yjyUvDNgz+zxffhSVjxtdsR1ZZrkKrPXa6RH+Gx6BrrWafIyV3VXFOSQAi0UaF/G2WET25
-	Sgpo9l+XVJWCaXo01IpYr/ehz4PUzKy5YgJ052RGouw9VaXNSpXfL+CfBcVkoqLlF2uVN6Q9LFa
-	28VjPECan8H7ODnTeYETIServddJUxZTZS50Y/VPPmB2uwiJhJU+qD/TTzLXlA1YRWeoqCcoBvq
-	LX8=
-X-Google-Smtp-Source: AGHT+IEmpbegrxw5t/KNdPkGK27oe1/PS+rd7I9A+5GvQsjNYkwQPD+h7mTbFOVdsQ9qj72tvmQ1qQ==
-X-Received: by 2002:a05:6000:188c:b0:38d:d7a4:d447 with SMTP id ffacd0b85a97d-38f33f52ee9mr22748723f8f.34.1740053675184;
-        Thu, 20 Feb 2025 04:14:35 -0800 (PST)
-Received: from localhost ([2a02:8308:a00c:e200::766e])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-439ac276ef7sm4896085e9.40.2025.02.20.04.14.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Feb 2025 04:14:34 -0800 (PST)
-Date: Thu, 20 Feb 2025 13:14:33 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>
-Cc: xiangwencheng <xiangwencheng@lanxincomputing.com>, anup@brainfault.org, 
-	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, atishp@atishpatra.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	linux-riscv <linux-riscv-bounces@lists.infradead.org>
-Subject: Re: [PATCH] riscv: KVM: Remove unnecessary vcpu kick
-Message-ID: <20250220-1581569f8559049399549cae@orel>
-References: <20250219015426.1939-1-xiangwencheng@lanxincomputing.com>
- <D7WALEFMK28X.13HQ0UL1S3NM5@ventanamicro.com>
- <38cc241c40a8ef2775e304d366bcd07df733ecf0.f7f1d4c7.545f.42a8.90f5.c5d09b1d32ec@feishu.cn>
- <20250220-f9c4c4b3792a66999ea5b385@orel>
- <38cc241c40a8ef2775e304d366bcd07df733ecf0.818d94fe.c229.4f42.a074.e64851f0591b@feishu.cn>
- <D7X576NHG512.2HBBO3JLIA1JH@ventanamicro.com>
+        d=1e100.net; s=20230601; t=1740053881; x=1740658681;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rmI+w9rW7xuxQgzQY4zgyZiBf+VpYD43wlkF4w4/Fxk=;
+        b=rAdzur/fgWgAqfWJPwjufo37HipFJckkENs1z0TAXrD7QDBDRH9RFDG/7n8y19RP+A
+         RUvXUNzOH3By4/zKjgHECZRpSBLAaGvjEfg3Uvly72ttImvkMvOGF4MDP1/XUcyXCW3J
+         lQiusZFMXF/yjbHXcrmEJ6slYcMHjeI5f+NHCsLg0g1DsHt2gzohxrgNM1IglVq/M2bC
+         HTOod4jMasjb/b8mWZaOGW8uGbXBk2oGLXuWc2WbBltdG+PMhE4IvC8iteN341WOr0/s
+         km4r0lPekB5kirHzYs0esMhZTMtq4if5Qk0JbIZSYFuc8mjbllUe1Vo2pVzk/zbZlMq5
+         Lbfw==
+X-Gm-Message-State: AOJu0YwsOpWa9P/fmTcjJ0nJqWoOItU1AOakFmxnGlor/ALIQizRA0SS
+	LR7/FIWbJi16TEs1HZ+brq9SkTkGc1lNjdmef/b5Tn5sPVNKSD3Jd+J7oK2gevYZv8dkrjECNMl
+	yaaod/pGwvOkMWlsFgYXhJ7dJPuiwx7NuMXGL4w==
+X-Gm-Gg: ASbGncta0r4buL1JIh/bBxnBIEwYThbEuYFAa3veI6ky+plSkVJGXVdlUof3paOz/oE
+	1DBx6AnXtnKlOOO6Xnrz8G48CKBobWWJ9HMU/CrQ5KtfxdyjVU5+46aEEwMkVTjqxeYAFDjegHw
+	==
+X-Google-Smtp-Source: AGHT+IHL3+9MtLF5+UaRybyEp8BV4Gc3bjSjy3kw4hdoypBWleJFfSGz7eyOLjRCOfAS7PzLJ2idDqWgGFTRfAm5dPo=
+X-Received: by 2002:a05:6e02:152d:b0:3d1:9236:ca52 with SMTP id
+ e9e14a558f8ab-3d2b5131279mr59896385ab.0.1740053880695; Thu, 20 Feb 2025
+ 04:18:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <D7X576NHG512.2HBBO3JLIA1JH@ventanamicro.com>
+References: <20250217084506.18763-7-ajones@ventanamicro.com>
+In-Reply-To: <20250217084506.18763-7-ajones@ventanamicro.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Thu, 20 Feb 2025 17:47:49 +0530
+X-Gm-Features: AWEUYZmV63eOiG44RnPBMnqx1Uo6sIZHLWWs9x29seXyEVn1h53Dh8XbVUUsj0U
+Message-ID: <CAAhSdy0cqoN5MehwDtQEtK7EYSTXPekwYEJWgPvAK+Y4uk=40Q@mail.gmail.com>
+Subject: Re: [PATCH 0/5] riscv: KVM: Fix a few SBI issues
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	atishp@atishpatra.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, cleger@rivosinc.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 20, 2025 at 09:50:06AM +0100, Radim Krčmář wrote:
-> 2025-02-20T16:17:33+08:00, xiangwencheng <xiangwencheng@lanxincomputing.com>:
-> >> From: "Andrew Jones"<ajones@ventanamicro.com>
-> >> On Thu, Feb 20, 2025 at 03:12:58PM +0800, xiangwencheng wrote:
-> >> > In kvm_arch_vcpu_blocking it will enable guest external interrupt, which
-> >
-> >> > means wirting to VS_FILE will cause an interrupt. And the interrupt handler
-> >
-> >> > hgei_interrupt which is setted in aia_hgei_init will finally call kvm_vcpu_kick
-> >
-> >> > to wake up vCPU.
-> 
-> (Configure your mail client, so it doesn't add a newline between each
->  quoted line when replying.)
-> 
-> >> > So I still think is not necessary to call another kvm_vcpu_kick after writing to
-> >> > VS_FILE.
-> 
-> So the kick wasn't there to mask some other bug, thanks.
-> 
-> >> Right, we don't need anything since hgei_interrupt() kicks for us, but if
-> >> we do
-> >> 
-> >> @@ -973,8 +973,8 @@ int kvm_riscv_vcpu_aia_imsic_inject(struct kvm_vcpu *vcpu,
-> >>         read_lock_irqsave(&imsic->vsfile_lock, flags);
-> >> 
-> >>         if (imsic->vsfile_cpu >= 0) {
-> >> +               kvm_vcpu_wake_up(vcpu);
-> >>                 writel(iid, imsic->vsfile_va + IMSIC_MMIO_SETIPNUM_LE);
-> >> -               kvm_vcpu_kick(vcpu);
-> >>         } else {
-> >>                 eix = &imsic->swfile->eix[iid / BITS_PER_TYPE(u64)];
-> >>                 set_bit(iid & (BITS_PER_TYPE(u64) - 1), eix->eip);
-> >> 
-> >> then we should be able to avoid taking a host interrupt.
-> 
-> The wakeup is asynchronous, and this would practically never avoid the
-> host interrupt, but we'd do extra pointless work...
-> I think it's much better just with the write.  (The wakeup would again
-> make KVM look like it has a bug elsewhere.)
+On Mon, Feb 17, 2025 at 2:15=E2=80=AFPM Andrew Jones <ajones@ventanamicro.c=
+om> wrote:
+>
+> Fix issues found with kvm-unit-tests[1], which is currently focused
+> on SBI.
+>
+> [1] https://gitlab.com/jones-drew/kvm-unit-tests/-/commits/riscv/sbi
+>
+> Andrew Jones (5):
+>   riscv: KVM: Fix hart suspend status check
+>   riscv: KVM: Fix hart suspend_type use
+>   riscv: KVM: Fix SBI IPI error generation
+>   riscv: KVM: Fix SBI TIME error generation
+>   riscv: KVM: Fix SBI sleep_type use
 
-Ah yes, the wakeup is asynchronous. Just dropping the kick is the right
-way to go then.
+Queued these fixes for Linux-6.14-rcX.
 
-Thanks,
-drew
+Regards,
+Anup
+
+>
+>  arch/riscv/kvm/vcpu_sbi_hsm.c     | 11 ++++++-----
+>  arch/riscv/kvm/vcpu_sbi_replace.c | 15 ++++++++++++---
+>  arch/riscv/kvm/vcpu_sbi_system.c  |  3 ++-
+>  3 files changed, 20 insertions(+), 9 deletions(-)
+>
+> --
+> 2.48.1
+>
 
