@@ -1,121 +1,148 @@
-Return-Path: <kvm+bounces-38771-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38772-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19DC7A3E40F
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 19:36:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78D39A3E42F
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 19:49:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C2461895B1D
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 18:36:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AE573B489A
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 18:49:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0BF32135B2;
-	Thu, 20 Feb 2025 18:36:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FC59263890;
+	Thu, 20 Feb 2025 18:49:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qzaldBYj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WGmpSk0J"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E22204864
-	for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 18:36:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9BB8247DF0
+	for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 18:49:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740076605; cv=none; b=LddVtMnqhg62raH+7NFjOncyC00xAE1apOmN/onr/s+d4gTJOVSfTA6k+b0ILfO1tPup5+OlqpoqhosMWUC8lxJH3amlkA0R3UaU5h4/XY1yIXbeOLww0nYK1QN4Hf0RhU+0K+iwclrbDSCrixOquWxqHz4l9EbTHqMn1dQBtFY=
+	t=1740077345; cv=none; b=BPUYeAO8xYEBl55QgmqI1Ss4LEuESK1ltCA0f5ehuGkhHKzg9rCehGZNDvg/5LujDm8KBjb8TuV2LbnViqygehwl87xxmeJpe90poaTBoz9NJpkatlo2E9FLi7y2jirGvtPgFzg7eb77+a9+HEerZH8MNX4zWfmJ4pccguJG1Tw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740076605; c=relaxed/simple;
-	bh=KlLfu1MkFZm5HEQhrB3pQU86Of3CyX4PnSBkP+c7phk=;
+	s=arc-20240116; t=1740077345; c=relaxed/simple;
+	bh=HhmUsnUAA9FXfyyFZW1O/vQBTW1dafCygMEgR1PSV2w=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gMIdvTQnTpvGBCz++lkijzOB6QRxcSQrnNDjZurkpBpKvAFFFlXYIVbk6DBGhq8OrXMNoQDKhTLBHzEyMcJiwPJq24vEwiG1eg3V0ke8hURONdy1QmnMZ+0AxjOOzjeGIj4dbqOKtlm/sgC5vKk64eBMfUNUtx7B08caiBYe4e8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qzaldBYj; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=UYwWVsntCR3YRiFXGPe8P53IVPPsiGs0l0k9TbFqKcEoFQtbr5NajwlfepBmWINf5ivUBIOYX9SJFMbFbr5N19jqHKHO9+Djnpt7HXTLrd85uAB4CSyqh6LpJitqmWBv3buSEnzje3hkv86juBni5Ou23W3+SJh4bWXRhaNROJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WGmpSk0J; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-221063a808dso24935045ad.1
-        for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 10:36:43 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fbff6426f5so2712118a91.3
+        for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 10:49:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740076603; x=1740681403; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1740077343; x=1740682143; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UDNUvxXFmySrAvdSQJQ7oCShATU6CPkIP5Amx5DX2gM=;
-        b=qzaldBYju7YKzjPMKoymufxXkvBPr898YFr8OTVCCbKQeAYu6M1wG82mWyh3yAeEcD
-         /oEtLexkyXIhJ2pf5O8+QJ1yOmAI8TPWBsU0xAl1lYa3KcTdx2b8VJYpBibVB/BuKgva
-         ht0HDLb8f61a7zSXzHVWpPaqrIffWFS6FwKBZYqWk5wsCGp3elbzIE7QHvZM33WZHXet
-         G5LWREAXiqoMZUBIAvmlJKzey4ccpfhBpJqcxLkCqFkelM/Paz/QR4wW4UO4wt/7tOsN
-         RgHJKQ3zvBzgZULV/14NEQG/i+IIF6EcO71C3LDhEj0h3DAvvKWdGrLXx5eP7Mg+MQT5
-         cAUw==
+        bh=nrIXE8v94l6Qz63J0EW6oWgUR3NGdxme+Ofja+voZ/I=;
+        b=WGmpSk0JTG4rZuTDErNhp7zDGK93oHpE2qdZiC2KwW9Pjm/fVHPXObRNy4G/r9ygwI
+         LwWVefCZ+FrWf/MD//EMXRcmwdTQq4s0g/aMIamzf5pGUZu3OkZUKgvavaD91L3Ovai2
+         y0NSspvRMCz0glu3CHPlQ5prwa8I5oAiYxhhVUe3TddmORLnH8Ksat0WVeU+Gb/dNw1y
+         Dxp1jPyRrulCuLsPcm0x8mNw26hDEX88FN7hLr/ul//Q+k/C4g5Y34mo6eai92Ss7DG6
+         d467FSILgsPA4P0Y1rQl9ujj5Kz0RBlwvfcRS9vdZpR3xHs8H+uqoHF2gxp3et64ipBd
+         g3FA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740076603; x=1740681403;
+        d=1e100.net; s=20230601; t=1740077343; x=1740682143;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UDNUvxXFmySrAvdSQJQ7oCShATU6CPkIP5Amx5DX2gM=;
-        b=XkJYwL2eD09r+10Bd+QkXqqkaY0wYfELOSypMIrhxKJ0GboZltJcFKSk7lMZzurlsQ
-         i1ane00dnmZVyr8AQA1k4gSHZ5Q2B+mdlTCMqkBWv344HscX4ncHJlKLMLZJa6Vuzd3P
-         GKtc/8HMHQY9Hf5ENuNvMHkOy/YKux9aJ468ATMe6gQv0GjBI/3qTKct1uFP/INyFGQq
-         k08Jj8XX/DbW3E7y7hpB2un1lUVzL996AVRoS6dbDQ1M+UnHbx9eR808LsWWYvWZ3xD5
-         c8tVRYDZ1C0aYTdKlRxQeqpppkrWeOGVu/NxRPA+2VrLbXkPvKOVBjiQT6CwLUnkijpw
-         8kAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVwfhBSB5DBbzSkzQPBC+dGeLQHWJ9cMd8nfFZ5hzn06wys40mGvBRqE6hetJ+8M0djaxI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmlL2glw4eA9KUp/rSOYVisSTHOu9P1JHToS5DAwk5aHk6Tj0T
-	U3Kki5XuLcVPvyiffC8OYODMvObB97L2tBNgyTref4/+se6CZQ1wdz4gp4AEhlo2setCqlLJ/4F
-	oAw==
-X-Google-Smtp-Source: AGHT+IEJil2ZW7pHAGLzwraa/fR/QRtEg4mHPzfjLeTf/sMrCYQHYA2Opge3qlpebbm4GGfgfIrW2itPA/c=
-X-Received: from pjbsy7.prod.google.com ([2002:a17:90b:2d07:b0:2ea:4a74:ac2])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:32c5:b0:220:e63c:5b10
- with SMTP id d9443c01a7336-221a0015676mr2719115ad.34.1740076602974; Thu, 20
- Feb 2025 10:36:42 -0800 (PST)
-Date: Thu, 20 Feb 2025 10:36:41 -0800
-In-Reply-To: <DC438DC0-CC4B-4EE2-ABA8-8E0F9D15DD46@infradead.org>
+        bh=nrIXE8v94l6Qz63J0EW6oWgUR3NGdxme+Ofja+voZ/I=;
+        b=nRcn/ruqK9ErdPHW+cU1YpQPw5u3wAKCOHOkIauWGRfKS4Zjf7AFNa6KolMUidH6NM
+         fMbPhuX01xxPcc7LzerRzUw8Iu7sWVXBUanrGvxdowToxVBSO9jxZfB7Ilu0HoNfcMO2
+         jVh5f2NE3AJLO4ViDKgGfvg/ZvM45qlNsdbwAelLXjVkic140niapDhGMDlGOvikSbtI
+         Mu77fDdFSjNbK0jq/Wl/9tczIA+0sQ5idDj8JkyHo4k7WiNeHBnbklR4lrp58KJx+mQd
+         rqsX9EhJnKicoYXznZPtcOtqeAGb6hYbPhc7LlFLZz7CfNyqQ3PiSMVQK+ITJAO3S20d
+         7LHA==
+X-Forwarded-Encrypted: i=1; AJvYcCWgHPYWosBKTNuGVgOv3T1nHqKM6ADGdR5WO2oRStwBqmACMIeyMbbKV9hUoGlY2cleKwo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxuNWL2GWTWp3cwQDcArboNkN1zyWrbCg1gay6aru2a4B+j6eIL
+	nBqUUwEWbz2/jAK8SHBJVINI8qVyTV1Bj0qfCnd86OkyULQgXhxInNayMWgX6HeZQWVNtZZY5vx
+	uOQ==
+X-Google-Smtp-Source: AGHT+IHkerbpaVTlWjWkXbgwvL2U1KNbZ8XETkgVM++qObug4lOq8hnkxEb0uReFtMabhh0VMSMpaVYDsx0=
+X-Received: from pjboh5.prod.google.com ([2002:a17:90b:3a45:b0:2ef:82c0:cb8d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3848:b0:2f9:d9fe:e72e
+ with SMTP id 98e67ed59e1d1-2fce78d3e37mr429085a91.16.1740077343307; Thu, 20
+ Feb 2025 10:49:03 -0800 (PST)
+Date: Thu, 20 Feb 2025 10:49:01 -0800
+In-Reply-To: <6eddd049-7c7a-406d-b763-78fa1e7d921b@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250215011437.1203084-1-seanjc@google.com> <20250215011437.1203084-2-seanjc@google.com>
- <DC438DC0-CC4B-4EE2-ABA8-8E0F9D15DD46@infradead.org>
-Message-ID: <Z7d2OSNSXIi5PAiR@google.com>
-Subject: Re: [PATCH v2 1/5] KVM: x86/xen: Restrict hypercall MSR to unofficial
- synthetic range
+References: <20241118123948.4796-1-kalyazin@amazon.com> <Z6u-WdbiW3n7iTjp@google.com>
+ <a7080c07-0fc5-45ce-92f7-5f432a67bc63@amazon.com> <Z7X2EKzgp_iN190P@google.com>
+ <6eddd049-7c7a-406d-b763-78fa1e7d921b@amazon.com>
+Message-ID: <Z7d5HT7FpE-ZsHQ9@google.com>
+Subject: Re: [RFC PATCH 0/6] KVM: x86: async PF user
 From: Sean Christopherson <seanjc@google.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Paul Durrant <paul@xen.org>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Joao Martins <joao.m.martins@oracle.com>, 
-	David Woodhouse <dwmw@amazon.co.uk>
+To: Nikita Kalyazin <kalyazin@amazon.com>
+Cc: pbonzini@redhat.com, corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, 
+	bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, rostedt@goodmis.org, 
+	mhiramat@kernel.org, mathieu.desnoyers@efficios.com, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, jthoughton@google.com, david@redhat.com, 
+	peterx@redhat.com, oleg@redhat.com, vkuznets@redhat.com, gshan@redhat.com, 
+	graf@amazon.de, jgowans@amazon.com, roypat@amazon.co.uk, derekmn@amazon.com, 
+	nsaenz@amazon.es, xmarcalx@amazon.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Sat, Feb 15, 2025, David Woodhouse wrote:
-> On 15 February 2025 02:14:33 CET, Sean Christopherson <seanjc@google.com> wrote:
-> >Reject userspace attempts to set the Xen hypercall page MSR to an index
-> >outside of the "standard" virtualization range [0x40000000, 0x4fffffff],
-> >as KVM is not equipped to handle collisions with real MSRs, e.g. KVM
-> >doesn't update MSR interception, conflicts with VMCS/VMCB fields, special
-> >case writes in KVM, etc.
-> >
-> >While the MSR index isn't strictly ABI, i.e. can theoretically float to
-> >any value, in practice no known VMM sets the MSR index to anything other
-> >than 0x40000000 or 0x40000200.
+On Thu, Feb 20, 2025, Nikita Kalyazin wrote:
+> On 19/02/2025 15:17, Sean Christopherson wrote:
+> > On Wed, Feb 12, 2025, Nikita Kalyazin wrote:
+> > The conundrum with userspace async #PF is that if userspace is given only a single
+> > bit per gfn to force an exit, then KVM won't be able to differentiate between
+> > "faults" that will be handled synchronously by the vCPU task, and faults that
+> > usersepace will hand off to an I/O task.  If the fault is handled synchronously,
+> > KVM will needlessly inject a not-present #PF and a present IRQ.
+> 
+> Right, but from the guest's point of view, async PF means "it will probably
+> take a while for the host to get the page, so I may consider doing something
+> else in the meantime (ie schedule another process if available)".
 
-...
+Except in this case, the guest never gets a chance to run, i.e. it can't do
+something else.  From the guest point of view, if KVM doesn't inject what is
+effectively a spurious async #PF, the VM-Exiting instruction simply took a (really)
+long time to execute.
 
-> This patch should probably have a docs update too.
+> If we are exiting to userspace, it isn't going to be quick anyway, so we can
+> consider all such faults "long" and warranting the execution of the async PF
+> protocol.  So always injecting a not-present #PF and page ready IRQ doesn't
+> look too wrong in that case.
 
-To avoid sending an entirely new version only to discover I suck at writing docs,
-how does this look?
+There is no "wrong", it's simply wasteful.  The fact that the userspace exit is
+"long" is completely irrelevant.  Decompressing zswap is also slow, but it is
+done on the current CPU, i.e. is not background I/O, and so doesn't trigger async
+#PFs.
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 2b52eb77e29c..5fe84f2427b5 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -1000,6 +1000,10 @@ blobs in userspace.  When the guest writes the MSR, kvm copies one
- page of a blob (32- or 64-bit, depending on the vcpu mode) to guest
- memory.
- 
-+The MSR index must be in the range [0x40000000, 0x4fffffff], i.e. must reside
-+in the range that is unofficially reserved for use by hypervisors.  The min/max
-+values are enumerated via KVM_XEN_MSR_MIN_INDEX and KVM_XEN_MSR_MAX_INDEX.
-+
- ::
- 
-   struct kvm_xen_hvm_config {
+In the guest, if host userspace resolves the fault before redoing KVM_RUN, the
+vCPU will get two events back-to-back: an async #PF, and an IRQ signalling completion
+of that #PF.
+
+> > > What advantage can you see in it over exiting to userspace (which already exists
+> > > in James's series)?
+> > 
+> > It doesn't exit to userspace :-)
+> > 
+> > If userspace simply wakes a different task in response to the exit, then KVM
+> > should be able to wake said task, e.g. by signalling an eventfd, and resume the
+> > guest much faster than if the vCPU task needs to roundtrip to userspace.  Whether
+> > or not such an optimization is worth the complexity is an entirely different
+> > question though.
+> 
+> This reminds me of the discussion about VMA-less UFFD that was coming up
+> several times, such as [1], but AFAIK hasn't materialised into something
+> actionable.  I may be wrong, but James was looking into that and couldn't
+> figure out a way to scale it sufficiently for his use case and had to stick
+> with the VM-exit-based approach.  Can you see a world where VM-exit
+> userfaults coexist with no-VM-exit way of handling async PFs?
+
+The issue with UFFD is that it's difficult to provide a generic "point of contact",
+whereas with KVM userfault, signalling can be tied to the vCPU, and KVM can provide
+per-vCPU buffers/structures to aid communication.
+
+That said, supporting "exitless" KVM userfault would most definitely be premature
+optimization without strong evidence it would benefit a real world use case.
 
