@@ -1,60 +1,73 @@
-Return-Path: <kvm+bounces-38658-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38659-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E845FA3D5F6
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 11:07:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FC37A3D683
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 11:26:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0577F7AB83B
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 10:03:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B669189AF92
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 10:26:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A79D21F460F;
-	Thu, 20 Feb 2025 10:01:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C8C41F12ED;
+	Thu, 20 Feb 2025 10:26:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="oCyaz1bY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f2fcYsjR"
 X-Original-To: kvm@vger.kernel.org
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70A9A1EC016;
-	Thu, 20 Feb 2025 10:01:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A17FD1EF080;
+	Thu, 20 Feb 2025 10:26:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740045713; cv=none; b=qwsfi88P2OgJS1xX/iqYIYaPEhGHHCW+JZBOO4tY4ud6jB+0w5AAmrTTNBfEzmGsnoIf17i9cqEIcAzOCZNSfxq8HPU/G+kWtue6MBaXDX0aE5+i5+UHzX9iibSaAYtc+IjOQxeAerJxXJbvEQ/A5Xe3xHdEWmgNrWJEJScAa5g=
+	t=1740047169; cv=none; b=PSUbwErR4d5tqd34kS10MinqrJ3jTzomyss5/gOMmkcWMOeSfZnFF7eLSoQWM8PnqGr9DGXAMhD3mbHUyPC5aoV1hUft7VHsow2P/5FafB8xIEuGSdRWiGELjOL6QgLbSifvBSCCemjJsW7Beojn//BQArU83iAnNOf42gYvbY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740045713; c=relaxed/simple;
-	bh=KP7cyJ3gu1QZQaDa/HFXE6qvzDjdIAo2lfmI8PjViwg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Qu1IiSomi5tYa7lVv7N9dIbGoCDHlSSPP3FyTbvB8gPea234vRT1DPkA3aIdLqR2O4y+qOpRXusLsw/HcvmrqiwH2tVavrorTk7d7WtrRZe+l+gQCj4FttEcWq0ZjAKjJQ5k50RSXwZ4OVn+6FIw9rA6wNUjSmiH4zUFN7txfSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=oCyaz1bY; arc=none smtp.client-ip=115.124.30.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1740045701; h=From:To:Subject:Date:Message-ID:MIME-Version;
-	bh=GA/73K69kDMtluT7S4W4e0CwzpthWlK7JcslQYOWFBU=;
-	b=oCyaz1bY0RNtNg5QgI3eU5Edmm5GivgMijC60u7t43KSlVI8qzTO1BHU+U989dx+L7Cn41wLDwvxUKvk7Vf9pKMVJfM3qmIUY0KvhLaniA1MWle2gZG68l04pHJEGC0AjMlZxGJdTdG+ObL7trUm4Skp1kyp6GMBdiiJYm02DPs=
-Received: from localhost(mailfrom:zijie.wei@linux.alibaba.com fp:SMTPD_---0WPsKysT_1740045694 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 20 Feb 2025 18:01:40 +0800
-From: weizijie <zijie.wei@linux.alibaba.com>
-To: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H . Peter Anvin" <hpa@zytor.com>,
+	s=arc-20240116; t=1740047169; c=relaxed/simple;
+	bh=wdo52PAMmFLPMVI5gq85cT42hoFnmWHUUnIJwJEQGeY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lMSbjT/qMEMyj7c3OuXRx6FHnNcbbgpon8dn2JEouQ1OxQlC1KW4T3xBAnd7M8lcFkxvQKExmAvV1QQICjWIJavz6TA3TsLDCC8LEW5kKwmgVhtn2+XSI+5ViDaFMJgPXtyk5eEU6KTNrL31i+Czxf07dM+1Kllqav5uVZ3BtC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f2fcYsjR; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740047168; x=1771583168;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=wdo52PAMmFLPMVI5gq85cT42hoFnmWHUUnIJwJEQGeY=;
+  b=f2fcYsjRt2r2LiLutAom1bnQWNSvTbjqeFBljf2uJQ+OjOgMIvv0QeW9
+   toQw+cFXnKeaomkIEP3/lDj5eWOWvjKkvLI69ew/lTFV5aCBjn0ty3eEK
+   bixdsNh/uvPH4s4mbAe9o2uc498FL1RGqspzoSGrTmvDBI5FvI8lHJrna
+   FJ9VqM48RErt869nkNGmPFX/64c0NN0BZ1520T1QSvEYA2ktmM2v9/X38
+   qMjBDYIWrZCsav4B/dF6czNdK7L5TugMURAqD/Llr8gb5ljgkiYjB1aqQ
+   HlEyKHwgmK1A9bRzF+GbVlj8peS8UAN9w0Yb12+NHlwY2MgiwCmxSi8s3
+   g==;
+X-CSE-ConnectionGUID: MAHjjVZfTPKKKyCz+Ko7ZA==
+X-CSE-MsgGUID: FbQK5lghS3aKOe8cdPX9Zg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11350"; a="28415272"
+X-IronPort-AV: E=Sophos;i="6.13,301,1732608000"; 
+   d="scan'208";a="28415272"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2025 02:26:07 -0800
+X-CSE-ConnectionGUID: ZdM3o7BITy6pIJKc420feA==
+X-CSE-MsgGUID: 9+qF8MieSEq1JfuTmggczA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="115897699"
+Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2025 02:26:05 -0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: pbonzini@redhat.com,
+	seanjc@google.com
+Cc: rick.p.edgecombe@intel.com,
+	linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: weizijie <zijie.wei@linux.alibaba.com>,
-	xuyun <xuyun_xy.xy@linux.alibaba.com>
-Subject: [PATCH v2 Resend] KVM: x86: ioapic: Optimize EOI handling to reduce unnecessary VM exits
-Date: Thu, 20 Feb 2025 18:01:26 +0800
-Message-ID: <20250220100126.299845-1-zijie.wei@linux.alibaba.com>
-X-Mailer: git-send-email 2.43.5
+	Yan Zhao <yan.y.zhao@intel.com>
+Subject: [PATCH v2 0/2] two KVM MMU fixes for TDX
+Date: Thu, 20 Feb 2025 18:24:36 +0800
+Message-ID: <20250220102436.24373-1-yan.y.zhao@intel.com>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -63,116 +76,39 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Address performance issues caused by a vector being reused by a
-non-IOAPIC source.
+Hi, 
 
-commit 0fc5a36dd6b3
-("KVM: x86: ioapic: Fix level-triggered EOI and IOAPIC reconfigure race")
-addressed the issues related to EOI and IOAPIC reconfiguration races.
-However, it has introduced some performance concerns:
+There are two fixes to KVM MMU for TDX in response to two hypothetically
+triggered errors:
+(1) errors in tdh_mem_page_add(),
+(2) fatal errors in tdh_mem_sept_add()/tdh_mem_page_aug().
 
-Configuring IOAPIC interrupts while an interrupt request (IRQ) is
-already in service can unintentionally trigger a VM exit for other
-interrupts that normally do not require one, due to the settings of
-`ioapic_handled_vectors`. If the IOAPIC is not reconfigured during
-runtime, this issue persists, continuing to adversely affect
-performance.
+Patch 1 handles the error in SEPT zap resulting from error (1).
+Patch 2 fixes a possible stuck in the kernel loop introduced by error (2).
 
-Simple Fix Proposal:
-A straightforward solution is to record highest in-service IRQ that
-is pending at the time of the last scan. Then, upon the next guest
-exit, do a full KVM_REQ_SCAN_IOAPIC. This ensures that a re-scan of
-the ioapic occurs only when the recorded vector is EOI'd, and
-subsequently, the extra bit in the eoi_exit_bitmap are cleared,
-avoiding unnecessary VM exits.
+The two errors are not observed in any real workloads yet.
+The series is tested by faking the error in the SEAMCALL wrapper while
+bypassing the real SEAMCALLs.
 
-Co-developed-by: xuyun <xuyun_xy.xy@linux.alibaba.com>
-Signed-off-by: xuyun <xuyun_xy.xy@linux.alibaba.com>
-Signed-off-by: weizijie <zijie.wei@linux.alibaba.com>
----
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/ioapic.c           | 10 ++++++++--
- arch/x86/kvm/irq_comm.c         |  9 +++++++--
- arch/x86/kvm/vmx/vmx.c          |  9 +++++++++
- 4 files changed, 25 insertions(+), 4 deletions(-)
+v2:
+- Use kvm_check_request(KVM_REQ_VM_DEAD) to detect VM dead in patch 2.
+  (Sean)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index e159e44a6a1b..f84a4881afa4 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1041,6 +1041,7 @@ struct kvm_vcpu_arch {
- #if IS_ENABLED(CONFIG_HYPERV)
- 	hpa_t hv_root_tdp;
- #endif
-+	u8 last_pending_vector;
- };
- 
- struct kvm_lpage_info {
-diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
-index 995eb5054360..40252a800897 100644
---- a/arch/x86/kvm/ioapic.c
-+++ b/arch/x86/kvm/ioapic.c
-@@ -297,10 +297,16 @@ void kvm_ioapic_scan_entry(struct kvm_vcpu *vcpu, ulong *ioapic_handled_vectors)
- 			u16 dm = kvm_lapic_irq_dest_mode(!!e->fields.dest_mode);
- 
- 			if (kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT,
--						e->fields.dest_id, dm) ||
--			    kvm_apic_pending_eoi(vcpu, e->fields.vector))
-+						e->fields.dest_id, dm))
- 				__set_bit(e->fields.vector,
- 					  ioapic_handled_vectors);
-+			else if (kvm_apic_pending_eoi(vcpu, e->fields.vector)) {
-+				__set_bit(e->fields.vector,
-+					  ioapic_handled_vectors);
-+				vcpu->arch.last_pending_vector = e->fields.vector >
-+					vcpu->arch.last_pending_vector ? e->fields.vector :
-+					vcpu->arch.last_pending_vector;
-+			}
- 		}
- 	}
- 	spin_unlock(&ioapic->lock);
-diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
-index 8136695f7b96..1d23c52576e1 100644
---- a/arch/x86/kvm/irq_comm.c
-+++ b/arch/x86/kvm/irq_comm.c
-@@ -426,9 +426,14 @@ void kvm_scan_ioapic_routes(struct kvm_vcpu *vcpu,
- 
- 			if (irq.trig_mode &&
- 			    (kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT,
--						 irq.dest_id, irq.dest_mode) ||
--			     kvm_apic_pending_eoi(vcpu, irq.vector)))
-+						 irq.dest_id, irq.dest_mode)))
- 				__set_bit(irq.vector, ioapic_handled_vectors);
-+			else if (kvm_apic_pending_eoi(vcpu, irq.vector)) {
-+				__set_bit(irq.vector, ioapic_handled_vectors);
-+				vcpu->arch.last_pending_vector = irq.vector >
-+					vcpu->arch.last_pending_vector ? irq.vector :
-+					vcpu->arch.last_pending_vector;
-+			}
- 		}
- 	}
- 	srcu_read_unlock(&kvm->irq_srcu, idx);
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 893366e53732..cd0db1496ce7 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5702,6 +5702,15 @@ static int handle_apic_eoi_induced(struct kvm_vcpu *vcpu)
- 
- 	/* EOI-induced VM exit is trap-like and thus no need to adjust IP */
- 	kvm_apic_set_eoi_accelerated(vcpu, vector);
-+
-+	/* When there are instances where ioapic_handled_vectors is
-+	 * set due to pending interrupts, clean up the record and do
-+	 * a full KVM_REQ_SCAN_IOAPIC.
-+	 */
-+	if (vcpu->arch.last_pending_vector == vector) {
-+		vcpu->arch.last_pending_vector = 0;
-+		kvm_make_request(KVM_REQ_SCAN_IOAPIC, vcpu);
-+	}
- 	return 1;
- }
- 
+v1: https://lore.kernel.org/all/20250217085535.19614-1-yan.y.zhao@intel.com
+
+Thanks
+Yan
+
+
+Yan Zhao (2):
+  KVM: TDX: Handle SEPT zap error due to page add error in premap
+  KVM: x86/mmu: Bail out kvm_tdp_map_page() when VM dead
+
+ arch/x86/kvm/mmu/mmu.c |  4 +++
+ arch/x86/kvm/vmx/tdx.c | 64 +++++++++++++++++++++++++++++-------------
+ 2 files changed, 49 insertions(+), 19 deletions(-)
+
 -- 
-2.43.5
+2.43.2
 
 
