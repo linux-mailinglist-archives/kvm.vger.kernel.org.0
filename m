@@ -1,78 +1,81 @@
-Return-Path: <kvm+bounces-38831-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38832-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B6DBA3EC45
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 06:43:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57394A3EC47
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 06:44:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F831421DF9
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 05:43:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8214270255E
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 05:43:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13CEE1FBEA4;
-	Fri, 21 Feb 2025 05:43:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 731CA1FC7E6;
+	Fri, 21 Feb 2025 05:43:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U0n9GcLa"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a6dPec//"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0D8D4207F
-	for <kvm@vger.kernel.org>; Fri, 21 Feb 2025 05:43:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 368B51FC0F0
+	for <kvm@vger.kernel.org>; Fri, 21 Feb 2025 05:43:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740116621; cv=none; b=HZLUCmtWMpLN+SlPPTN6Q7Jb8ows9NK2f1OK2k5fmt1CuQWPbkGy7LwsGR6iFoBvGBeN8KqcEHRvg3Zi0K+ikQTMGz8yoGK6yHwklWSOFzypKDylu4ID5d4jm/VGhyDB8alsKGDD+kaBtcveQzNpNQ2+iDefRmVUmAJKrpW3inI=
+	t=1740116624; cv=none; b=oITttCsP8EOAgFvBFGwwB060l+YXTguZu628CCr/ju0vSchcxALpDcj/1X9bJKZYhHvuShEREAaOqApHLrzBCGC7LPn8z5AShqR5PIoo+Ep1QmEO9175Xg0hl54CDgvrfRXOWuxvkgUYaNcejriKjZOlCNyWESagZmA8LsumcDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740116621; c=relaxed/simple;
-	bh=yGRsKQbAUF8yX6yPNg1x0BnaoKv1g2xJ0ViVAAluE/I=;
-	h=Date:Message-Id:Mime-Version:Subject:From:To:Cc:Content-Type; b=Otd222VEVUC8Mp+NW2Y61uuDCtXP2MqqX8cVLiCQWNvj1za2oeOjOzhh3LQtPkB93e6gICfOMCjln6ryc+ePY9yj+oZI4eA1AX0jVPr2e/YmsT6nBVTI4KV4mFH2EYbzXr/P8EoRrlFtGyirTAJQupDXVXXQnh79z39dUNPa220=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--suleiman.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U0n9GcLa; arc=none smtp.client-ip=209.85.219.202
+	s=arc-20240116; t=1740116624; c=relaxed/simple;
+	bh=1a8ijpCYc6RmVjTqi7drawTGlzgmOc63SH03Xi08U2s=;
+	h=Date:In-Reply-To:Message-Id:Mime-Version:References:Subject:From:
+	 To:Cc:Content-Type; b=ua5YusoyPzhe4gYg9UnYSMSRdMLhjxkCL01Hr4WaXEQbC1hw/SLU3nM5kq8O9y6lsq17lgv5KwtINlepnW2Sou8Tz3q+1wEzeht8xyo3H7SfUEQV89Ao5KEHhDNYuxLTVGuQcVvHSfYpGm8pWJBCxdO3kUopPEFhrDhOKi/EuVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--suleiman.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a6dPec//; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--suleiman.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e3a1bc0c875so2129775276.2
-        for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 21:43:39 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2210121ac27so37191695ad.1
+        for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 21:43:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740116619; x=1740721419; darn=vger.kernel.org;
-        h=cc:to:from:subject:mime-version:message-id:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=s9Uv+a28OGAxYy+jIkS9p7JciuptkwlOHtkNxL0+CyU=;
-        b=U0n9GcLae8ONmtEJuhsEUXpok77kWyR52K+nZZbpwIU1VDtwItlJjAB+HxjUP6ZKS5
-         NdoS41Zb1L+B/u1Fu1J40vDenKtJhySzt1B0VduA2vltftQafPQ/dbhsMEsvIb5Q9fWw
-         NiJMJRdaMvr7rkbuqiEXEl//1rrkxoOROjUEL4lMV7cHXsvy3Bc51pKaNjqESNRZ7gbD
-         5qeRVXYs6RJ2oVQTn4jKndK5LZLJh6nBd2h+VV6QRdMKVd+WRNgzbkLnqA4HeWg7plDx
-         dgfqq1zSXAdkaKBTzHRHEbpfk+sWN2zmDOhiAbRygDNazXtBhnwyXmvz/Rj5UdKMX7nF
-         0iCA==
+        d=google.com; s=20230601; t=1740116622; x=1740721422; darn=vger.kernel.org;
+        h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Udbv9b6jdKxC3izwrmuI5snJMV9vCpcArcbYsxBnyHI=;
+        b=a6dPec//qB6IEhMf0ZhX5kHD25xGPhE00jELOmiIozUiWvy1RC0sKS4xYTy8r1/dYQ
+         RrLz24dJQBp8Gkb2gxvVfjXKk24fZExSOr3EWAqfS/3fLzrAscDYK6G4xegtZnS9BIQ4
+         5B3E2GpjEn4cEiLJukzJjL312yKTAr7DTQFeDZWVKtaAFdTTht2xVheAA+t9bzSznIrM
+         II8vlghDkCOTzpb80vPgYNMtDBOvPyHi15hD9Jt5VNPRTob5KtL8x9ByoYPHgtcBAuj3
+         UK/8lFSRVD86uuoFtp74/+INjrDsVpOUe/kxQKl7RZBXQCcOCrMzewQLUJ3t9Yzg9F0B
+         FNdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740116619; x=1740721419;
-        h=cc:to:from:subject:mime-version:message-id:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=s9Uv+a28OGAxYy+jIkS9p7JciuptkwlOHtkNxL0+CyU=;
-        b=MyqZh8KwVOtevu0PiofdY1KcQ9Yw3c56wnCLdrz8mLhIuw0QdLYcp+reKY9F1XkYPy
-         6MW2XR8Bl4fht3oq0CVbJes46gek01rbpoqdTTDfZElT2FVYnzgxQSIwI+Do2T0cXcZj
-         154nc8fCdm6wwgLo6s0XRpS/VMuvD47jb0VblfMloz1QeUQDf81V8jAbJVCurrIX+1O6
-         EGG6mYnWTxZTzXgzBQ+3sevUhiSDFUaAQZBC50BHIgXriknQXwNiWZW0iee+XQ7grw+m
-         zTAsU26sr78sECXWQrPnKO/KkuQpzlBa+m1gRdKw7ZpP1+anofHO/qdmd82N54mYFW2S
-         ye5w==
-X-Forwarded-Encrypted: i=1; AJvYcCWaoBpKfGDMHdane57JTnG/ARCdgMPtHuyHePe0FPYHOgLz7ALsKmLy3KAHV22Ny9ms4wA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yza2Q9oAZ/HaBAxCibDemXbpFf/9y3lYZ4AUnRTZ1WgqtBHzQwD
-	7kyTwjvuh/FCzUDUJm2FG2pGRhaaJYKXXWBk+MQ1CH5p/uTtd1Yl5sYThTf20TJps2U/yKDxBEI
-	RsPk1vYgpJw==
-X-Google-Smtp-Source: AGHT+IH4jso55cJhGbebGnuGmz3X5bTEqwPxcrgzCSj9Dcx5pOhp/DK4jr2l+1mNhLMw21o+4ggWGoXjiPG3PA==
+        d=1e100.net; s=20230601; t=1740116622; x=1740721422;
+        h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Udbv9b6jdKxC3izwrmuI5snJMV9vCpcArcbYsxBnyHI=;
+        b=hEyLhASGM5r307FqhbzfSBqRi910TJw/AMbeR10xrBsXAcqjNwfDAywjWqDgea4umU
+         reKZgJ+1qG1qLW2mEr9q1Y6zIJovnaP/rkF0tTYrmH4V4oOYEQJsISQeHdM0OUC0lupf
+         XxUb/fFopq1v97BVsQOw3ioFQx+R6xkn7UvdZ94j4BdV8kHtyCT0wG99MJQ5ljfRcY5o
+         LDsTjIOifHC+FnIXs/yTnHkUQhUCZ9Dau38RCGu6g9kHUGOV4UD8IeXpzARBniAKixER
+         ONWN+GLi34rhYb3tPcNEOsP4+g+xGz6h8zZzVdpcMi0jJWyL3zwuOWOHu1RHgp1A1Qqd
+         nf6g==
+X-Forwarded-Encrypted: i=1; AJvYcCWVbWh+f/x214O/+xo/UnAxsNs4b4fqW65Fed2WvJZBRu4EN4FJMpX0pCqcMdHgx8E0bZk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzG4iCPDIieAm9wYkcuR0/psOCxM+ZiaGqX44LO2JxH5iJCtmyd
+	m0WS5JUdQ2hcYzPK+5DtUGIi5ahtgRmTujawoH0rWKt/WLRi22f8XCFshMwXfcU7QoO8hkBFTbs
+	8SuIjgaQonA==
+X-Google-Smtp-Source: AGHT+IHMoc9h+uPEnyZwMQWn8CzNzAyDDl2T1OAcnERx4Ce7JVL+Csh6R44GQLlYoTpR1L9zhIJjNNB278WFDA==
 X-Received: from suleiman1.tok.corp.google.com ([2401:fa00:8f:203:62aa:45ca:6f53:8c2a])
- (user=suleiman job=sendgmr) by 2002:a25:8184:0:b0:e5b:13ec:b38b with SMTP id
- 3f1490d57ef6-e5e8b073744mr9935276.6.1740116618579; Thu, 20 Feb 2025 21:43:38
- -0800 (PST)
-Date: Fri, 21 Feb 2025 14:39:25 +0900
-Message-Id: <20250221053927.486476-1-suleiman@google.com>
+ (user=suleiman job=sendgmr) by 2002:a17:902:d0c1:b0:21f:449e:8995 with SMTP
+ id d9443c01a7336-2219ff50decmr12925ad.3.1740116622506; Thu, 20 Feb 2025
+ 21:43:42 -0800 (PST)
+Date: Fri, 21 Feb 2025 14:39:26 +0900
+In-Reply-To: <20250221053927.486476-1-suleiman@google.com>
+Message-Id: <20250221053927.486476-2-suleiman@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250221053927.486476-1-suleiman@google.com>
 X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
-Subject: [PATCH v4 0/2]  KVM: x86: Include host suspended time in steal time
+Subject: [PATCH v4 1/2] KVM: x86: Advance guest TSC after deep suspend.
 From: Suleiman Souhlal <suleiman@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
 Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
@@ -83,52 +86,85 @@ Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borisl
 	Suleiman Souhlal <suleiman@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This series makes it so that the time that the host is suspended is
-included in guests' steal time.
+Advance guest TSC to current time after suspend when the host
+TSCs went backwards.
 
-When the host resumes from a suspend, the guest thinks any task
-that was running during the suspend ran for a long time, even though
-the effective run time was much shorter, which can end up having
-negative effects with scheduling.
+This makes the behavior consistent between suspends where host TSC
+resets and suspends where it doesn't, such as suspend-to-idle, where
+in the former case if the host TSC resets, the guests' would
+previously be "frozen" due to KVM's backwards TSC prevention, while
+in the latter case they would advance.
 
-To mitigate this issue, we include the time that the host was
-suspended in steal time, which lets the guest can subtract the
-duration from the tasks' runtime.
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Suleiman Souhlal <suleiman@google.com>
+---
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/x86.c              | 33 ++++++++++++++++++++++++++++++++-
+ 2 files changed, 33 insertions(+), 1 deletion(-)
 
-In addition, we make the guest TSC behavior consistent whether the
-host TSC went backwards or not.
-
-v4:
-- Advance guest TSC on suspends where host TSC goes backwards.
-- Block vCPUs from running until resume notifier.
-- Move suspend duration accounting out of machine-independent kvm to
-  x86.
-- Merge code and documentation patches.
-- Reworded documentation.
-
-v3: https://lore.kernel.org/kvm/Z5AB-6bLRNLle27G@google.com/T/
-- Use PM notifier instead of syscore ops (kvm_suspend()/kvm_resume()),
-  because the latter doesn't get called on shallow suspend.
-- Don't call function under UACCESS.
-- Whitespace.
-
-v2: https://lore.kernel.org/lkml/20241118043745.1857272-1-suleiman@google.com/
-- Accumulate suspend time at machine-independent kvm layer and track per-VCPU
-  instead of per-VM.
-- Document changes.
-
-v1: https://lore.kernel.org/kvm/20240710074410.770409-1-suleiman@google.com/
-
-
-Suleiman Souhlal (2):
-  KVM: x86: Advance guest TSC after deep suspend.
-  KVM: x86: Include host suspended time in steal time
-
- Documentation/virt/kvm/x86/msr.rst |  9 +++-
- arch/x86/include/asm/kvm_host.h    |  7 +++
- arch/x86/kvm/x86.c                 | 84 +++++++++++++++++++++++++++++-
- 3 files changed, 97 insertions(+), 3 deletions(-)
-
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 0b7af5902ff757..452dd0204609af 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1398,6 +1398,7 @@ struct kvm_arch {
+ 	u64 cur_tsc_offset;
+ 	u64 cur_tsc_generation;
+ 	int nr_vcpus_matched_tsc;
++	bool host_was_suspended;
+ 
+ 	u32 default_tsc_khz;
+ 	bool user_set_tsc;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 02159c967d29e5..06464ec0d1c8d2 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4971,7 +4971,37 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 
+ 	/* Apply any externally detected TSC adjustments (due to suspend) */
+ 	if (unlikely(vcpu->arch.tsc_offset_adjustment)) {
+-		adjust_tsc_offset_host(vcpu, vcpu->arch.tsc_offset_adjustment);
++		unsigned long flags;
++		struct kvm *kvm;
++		bool advance;
++		u64 kernel_ns, l1_tsc, offset, tsc_now;
++
++		kvm = vcpu->kvm;
++		advance = kvm_get_time_and_clockread(&kernel_ns,
++		    &tsc_now);
++		raw_spin_lock_irqsave(&kvm->arch.tsc_write_lock, flags);
++		/*
++		 * Advance the guest's TSC to current time instead of only
++		 * preventing it from going backwards, while making sure
++		 * all the vCPUs use the same offset.
++		 */
++		if (kvm->arch.host_was_suspended && advance) {
++			l1_tsc = nsec_to_cycles(vcpu,
++			    vcpu->kvm->arch.kvmclock_offset +
++			    kernel_ns);
++			offset = kvm_compute_l1_tsc_offset(vcpu,
++			    l1_tsc);
++			kvm->arch.cur_tsc_offset = offset;
++			kvm_vcpu_write_tsc_offset(vcpu, offset);
++		} else if (advance)
++			kvm_vcpu_write_tsc_offset(vcpu,
++			    vcpu->kvm->arch.cur_tsc_offset);
++		else
++			adjust_tsc_offset_host(vcpu,
++			    vcpu->arch.tsc_offset_adjustment);
++		kvm->arch.host_was_suspended = 0;
++		raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock,
++		    flags);
+ 		vcpu->arch.tsc_offset_adjustment = 0;
+ 		kvm_make_request(KVM_REQ_CLOCK_UPDATE, vcpu);
+ 	}
+@@ -12638,6 +12668,7 @@ int kvm_arch_enable_virtualization_cpu(void)
+ 				kvm_make_request(KVM_REQ_MASTERCLOCK_UPDATE, vcpu);
+ 			}
+ 
++			kvm->arch.host_was_suspended = 1;
+ 			/*
+ 			 * We have to disable TSC offset matching.. if you were
+ 			 * booting a VM while issuing an S4 host suspend....
 -- 
 2.48.1.601.g30ceb7b040-goog
 
