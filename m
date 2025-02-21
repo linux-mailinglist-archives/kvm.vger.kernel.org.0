@@ -1,136 +1,136 @@
-Return-Path: <kvm+bounces-38880-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38881-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E785DA3FCDA
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 18:07:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5F03A3FD2A
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 18:16:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFCC5162D0E
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 17:06:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2655707C63
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 17:08:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C234124C661;
-	Fri, 21 Feb 2025 17:06:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C10B924C67F;
+	Fri, 21 Feb 2025 17:07:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="D/bAUEqR"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="TA/exw/C"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
+Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BB2E24BCF0
-	for <kvm@vger.kernel.org>; Fri, 21 Feb 2025 17:06:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8514020469D
+	for <kvm@vger.kernel.org>; Fri, 21 Feb 2025 17:07:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740157600; cv=none; b=Yks/IEsxe1fJii1K6eED46/Q5H7GDMwD2lrte2BKZDjUb8EmUtfNVNlglYYpulYaZ+5WTNT4h1rpK8IEgdg2/YyvogFtqWxemstdWnt9wXFbK0unZ+GabYJZqzd9XlF5BSlu06ulotgEJqa8zmwPGWn6LvKe8GuFp/GuxwtOmps=
+	t=1740157676; cv=none; b=H7A26vK2IkKqWZVnxTLpQ4hzrH0aW0dEaFOm6v0HGE2lupkgUMiSZJc1tkqX5Qoxbn4+bqm+0hHa7uVXlly9oAc4mS/V1pBPcrP7ilXOHkALjd/MgckvPp49RyMBrarKILlda7GqOX2JFF9qF+vxBu6X5R95sYsjoaI1QkjY8MM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740157600; c=relaxed/simple;
-	bh=OdnitUOyPuNq7QGRt6IU8iiEd7Hok2Poyde+e07pzAk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JFEUOHcICXEDy28Cf27mQdVSOaDXEAUjPE72JfveR5tT/ksJF33poB0NL2dLtyIdMrxJCeUIx3ET/nT5A347iiXtL+GWH7aO8UEkMihcqsZSRFTsG75f0qKPmdP9w7xRq6p3gz8MMUWBjMErXPzU6Jtxlb7DXMCwVu99aAWflFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=D/bAUEqR; arc=none smtp.client-ip=209.85.166.174
+	s=arc-20240116; t=1740157676; c=relaxed/simple;
+	bh=lY9CMNbXAHvzVurerM1ZSh2jzfXQVBN+2tpO4GQogA4=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=gCrwGLrdoJ+mVxl+4uc+2GRfBBajUv6y1SLPov6Jdt4Sdyq0w+8WproxJ1ZFTfUJGLRsOVIRnEWp7Zbq+wO5hGQX2bpI2BUiFRdcB8blzBjKTB2KKCmUPfOcJrKRcs/idWlMUzMFtoa7xfrDoGvPUaWs3A2oHzyLprWHIAwmEeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=TA/exw/C; arc=none smtp.client-ip=209.85.166.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3d03ac846a7so7458875ab.2
-        for <kvm@vger.kernel.org>; Fri, 21 Feb 2025 09:06:37 -0800 (PST)
+Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-855923e7f53so164727939f.2
+        for <kvm@vger.kernel.org>; Fri, 21 Feb 2025 09:07:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1740157597; x=1740762397; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i0/CbgssrY9MdmhvaS9VAi8CgxuGoYSwiPbuLyClY14=;
-        b=D/bAUEqRuvFS8c/jO3iHl+yFcRQm9XO/ZJy0HlVvSfBKfJO/QhUNNmhpJjhq9UtdJ5
-         rJpHxPPR4twgaqztAi+ZdQUb8sZ5fZSUij6oFkFBRajpTZgYyd+RE2pYhzBZv0QcigfN
-         yrtDocAt89wLyHZEtJFXRkvrPjZlcYLGd0tBX5O95ADS0lSpnA9XLSaAdn1M/EVIXXy7
-         90Ju9l6LFuBipYUXxUOVXtvSmw2w0AkWn3KqsrUFVX/INOVyOoa9as3vrV4ruCUhmEov
-         Hl9HH//nZnIsyl9g1OgP6znYQII1FdyHN0fLjcx6amksKYgF/96TQ1cNd+rxUnnDk6qe
-         0YlQ==
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1740157673; x=1740762473; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=CBn06bjrraG0RKUpLcfzoygq710m6p9nGy5k5/eorm8=;
+        b=TA/exw/CmWSs1TY9Lutsy8TsVirlvd8U3M17f7xqgNnJAxsp5DFdbHeTx7HagbR3AP
+         z/bWU4Sa8/yPZkeG3DY0ERL5vve0lvB3N91x49RuH+Z9tk2Vl262xwuq/FzKk/M0LGYG
+         nuuPwcNg0tjp9NUSaYQwGNFVP4Y6ZCPsG1AoJ3XEUE+XA+vrgbHR/U3yIKQjDXW+H4su
+         Ciq7UGMGCRGILJ0gc+LAiQQZhote6h4GRZhZebtfpDOAssd12s3rHOFQBBjKvWu7JJqL
+         6fQii+Lca7KJKI5jhooQZflov+5a+BxUIBP7JKyde+QnJmKHDuA6aVOcXX8XkvZNFp7V
+         l/8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740157597; x=1740762397;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=i0/CbgssrY9MdmhvaS9VAi8CgxuGoYSwiPbuLyClY14=;
-        b=VIabbNaLNgdnsm8FZl6Ctt/eT6fuVxSnSez6y57Jwst7yrEGp+5Cr7gPYK7FUuKMGz
-         D2s9OgyEsYQ84Tbjv4qlPEz4Mhsk5BUIS9LCchbbEYylj6iWwLIsDDdqBzcoAc6vDW3v
-         n4ct5m+xVPI0d4ae2tNfdDPJKm0DS3tBIEgPaSqSQJ4Lit/t8KF6BmNcfmKHVWrQF+wC
-         udDc256G3PhgxluBnWC8c27t9Qbso0i2ZaO7nMp8Tn98YaOLPhak71TkGzRJw4Vl8Ds3
-         jo1JVukGkSS118J3WV63SmGhbgjKgdnTpqr/Z966kxLs57Ka7l0nFTZ6uwpAE5tx2FAl
-         LeIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWZdRpTi4xN4Tn7UJV1UdewGbUI6REsvdL1AWzp3qpG8npJHiSVvD81v1pKkc70nxjiNIY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwuuYvVx2m2qA1Oyv/hqIL2IPoadO5WmY4KymNu8AG2cIiSb9d2
-	Q7zfDzpGljp0GIKEiS2bLEpACmh+eWfmwMOAtPkA53eH5bPrtpTw0X+beCRewfwRZAIfwxrgcIN
-	EXQL64TxWfFD/vSmoO4M+p+399NPWVgEAXxTw+Q==
-X-Gm-Gg: ASbGncsguTFzMHxuXfkO49RzNMTEEXFQdBbp/wuQcY3O1+Be0CAI/3qebNPE/DDtDkc
-	JrVxhpxnrsB+3IE0b148m6/BD8DX6i6+Q9euAAB2rT9aIwZgIGe+ebKR8FLX/e0Uw6ayW1KEPRQ
-	2cq5G6YVKb
-X-Google-Smtp-Source: AGHT+IFddscccecyBJuHpMIYpYRvh9YlBuKsbg2+gt14j7YH3RYxnm5jBOsEYz0eMa2s6iOMS/G/TbnvC9T8+ye2EXw=
-X-Received: by 2002:a05:6e02:1cac:b0:3d0:4b3d:75ba with SMTP id
- e9e14a558f8ab-3d2cb42daddmr41475585ab.4.1740157597175; Fri, 21 Feb 2025
- 09:06:37 -0800 (PST)
+        d=1e100.net; s=20230601; t=1740157673; x=1740762473;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CBn06bjrraG0RKUpLcfzoygq710m6p9nGy5k5/eorm8=;
+        b=ikkTCwvXPGTWfb0TL5bcDSlzMep53nMZ5DaF056+Rcq4PR54r6WsX6gARSUQn5vZQB
+         63myaVO2uqpshYjPqmWR65OqvjNoT6EDUoon/IdPxfzcYEWtmGr2G1iRuVgug/ORQoR8
+         t+w6bcBrvujaooxaXwcUA0FNcysJQvsFGUfvy/f4rZ6Y+4hxjWiOaaYqKil73d7bhI6G
+         /fZR/vaKt2xc4JJxKcrVVNLevgbw/xVldfyJgs/wQFiAhbGJWsyJ34LSiP4jk57Ug3GK
+         x5QjbY+cSqCEGDfGmcRVGYvF8ZdIZlyRQmIJKV+fdnwcsulm9voZyVhnlcMSBKT4cRD6
+         24KQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV8+hU9SW09+mRqzAAUwxGEo8qpPtQR+MfOeqjX6dNHXfQYwxNkrPQOdIH27+9eokEcVBQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQ6SJzw0F2855SUUKhwwqqiLTdDcUJzYv0fCjZYK2zniyON8y2
+	qCQjuXRqiywwCxFOh4AZISsbKs+QpUrYIGoCyRrDbOCDmcmmkVzCQqxPYaPN7p8EJolDtEyHxvG
+	vh5ygu0MezBJm1GvWn9HIcEt5qpv7l4jBmGyLYw==
+X-Gm-Gg: ASbGncv/iBh+5DGzjwKTXsDGBm4bbADosYusdlrNfIhP0mghXkzFEi8O99FNlvxJoV2
+	/e5fXzwq5fWNtLiunJ0JXX+eONhhul7YaEuQJtpXZG83b6SbFJV0vs4N3mmw4wQmfb8SaPsvzl7
+	nAm0Zq6Uey
+X-Google-Smtp-Source: AGHT+IGRxDMuamLyFFZPWt36k9Xy7MsZrVjV0LfEUgQJUkul59kYRBL0tFtgmbSG0/iAJTc+eQ8iAXGUsji68pO/JiE=
+X-Received: by 2002:a05:6e02:1a67:b0:3d0:3851:c3cc with SMTP id
+ e9e14a558f8ab-3d2caf19e17mr41489945ab.16.1740157673541; Fri, 21 Feb 2025
+ 09:07:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250221104538.2147-1-xiangwencheng@lanxincomputing.com>
-In-Reply-To: <20250221104538.2147-1-xiangwencheng@lanxincomputing.com>
 From: Anup Patel <anup@brainfault.org>
-Date: Fri, 21 Feb 2025 22:36:25 +0530
-X-Gm-Features: AWEUYZko5N5M7hatn6QenhvKduK_Aqv3UdJMpX2Lv711NP2hVkEu-tpphWsd27g
-Message-ID: <CAAhSdy34iNEqcVOziJcjnhS5xTYx3o+iXex8bEAwmUDApXWAcg@mail.gmail.com>
-Subject: Re: [PATCH v2] riscv: KVM: Remove unnecessary vcpu kick
-To: BillXiang <xiangwencheng@lanxincomputing.com>
-Cc: ajones@ventanamicro.com, kvm-riscv@lists.infradead.org, 
-	kvm@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, atishp@atishpatra.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, rkrcmar@ventanamicro.com
+Date: Fri, 21 Feb 2025 22:37:42 +0530
+X-Gm-Features: AWEUYZlRnrCyat69poKdznrr9iSVNpvCW9gvd_ViAEmY7eEE9K8GiF7Y3M7YyjA
+Message-ID: <CAAhSdy0Wo4hQ=gnhpJGU-khA4g-0VkfkMECDjnAsq4Fg6xfWjw@mail.gmail.com>
+Subject: [GIT PULL] KVM/riscv fixes for 6.14 take #1
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>, Palmer Dabbelt <palmer@rivosinc.com>, 
+	Atish Patra <atishp@atishpatra.org>, Atish Patra <atishp@rivosinc.com>, 
+	Andrew Jones <ajones@ventanamicro.com>, KVM General <kvm@vger.kernel.org>, 
+	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, 
+	linux-riscv <linux-riscv@lists.infradead.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 21, 2025 at 4:16=E2=80=AFPM BillXiang
-<xiangwencheng@lanxincomputing.com> wrote:
->
-> Remove the unnecessary kick to the vCPU after writing to the vs_file
-> of IMSIC in kvm_riscv_vcpu_aia_imsic_inject.
->
-> For vCPUs that are running, writing to the vs_file directly forwards
-> the interrupt as an MSI to them and does not need an extra kick.
->
-> For vCPUs that are descheduled after emulating WFI, KVM will enable
-> the guest external interrupt for that vCPU in
-> kvm_riscv_aia_wakeon_hgei. This means that writing to the vs_file
-> will cause a guest external interrupt, which will cause KVM to wake
-> up the vCPU in hgei_interrupt to handle the interrupt properly.
->
-> Signed-off-by: BillXiang <xiangwencheng@lanxincomputing.com>
+Hi Paolo,
 
-Queued this patch as a fix for Linux-6.14-rcX.
+We have a bunch of SBI related fixes and one fix to remove
+a redundant vcpu kick for the 6.14 kernel.
 
-Thanks,
+Please pull.
+
+Regards,
 Anup
 
-> ---
-> v2: Revise the commit message to ensure it meets the required
->     standards for acceptance
->
->  arch/riscv/kvm/aia_imsic.c | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/arch/riscv/kvm/aia_imsic.c b/arch/riscv/kvm/aia_imsic.c
-> index a8085cd8215e..29ef9c2133a9 100644
-> --- a/arch/riscv/kvm/aia_imsic.c
-> +++ b/arch/riscv/kvm/aia_imsic.c
-> @@ -974,7 +974,6 @@ int kvm_riscv_vcpu_aia_imsic_inject(struct kvm_vcpu *=
-vcpu,
->
->         if (imsic->vsfile_cpu >=3D 0) {
->                 writel(iid, imsic->vsfile_va + IMSIC_MMIO_SETIPNUM_LE);
-> -               kvm_vcpu_kick(vcpu);
->         } else {
->                 eix =3D &imsic->swfile->eix[iid / BITS_PER_TYPE(u64)];
->                 set_bit(iid & (BITS_PER_TYPE(u64) - 1), eix->eip);
-> --
-> 2.46.2
+The following changes since commit 0ad2507d5d93f39619fc42372c347d6006b64319:
+
+  Linux 6.14-rc3 (2025-02-16 14:02:44 -0800)
+
+are available in the Git repository at:
+
+  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-fixes-6.14-1
+
+for you to fetch changes up to d252435aca44d647d57b84de5108556f9c97614a:
+
+  riscv: KVM: Remove unnecessary vcpu kick (2025-02-21 17:27:32 +0530)
+
+----------------------------------------------------------------
+KVM/riscv fixes for 6.14, take #1
+
+- Fix hart status check in SBI HSM extension
+- Fix hart suspend_type usage in SBI HSM extension
+- Fix error returned by SBI IPI and TIME extensions for
+  unsupported function IDs
+- Fix suspend_type usage in SBI SUSP extension
+- Remove unnecessary vcpu kick after injecting interrupt
+  via IMSIC guest file
+
+----------------------------------------------------------------
+Andrew Jones (5):
+      riscv: KVM: Fix hart suspend status check
+      riscv: KVM: Fix hart suspend_type use
+      riscv: KVM: Fix SBI IPI error generation
+      riscv: KVM: Fix SBI TIME error generation
+      riscv: KVM: Fix SBI sleep_type use
+
+BillXiang (1):
+      riscv: KVM: Remove unnecessary vcpu kick
+
+ arch/riscv/kvm/aia_imsic.c        |  1 -
+ arch/riscv/kvm/vcpu_sbi_hsm.c     | 11 ++++++-----
+ arch/riscv/kvm/vcpu_sbi_replace.c | 15 ++++++++++++---
+ arch/riscv/kvm/vcpu_sbi_system.c  |  3 ++-
+ 4 files changed, 20 insertions(+), 10 deletions(-)
 
