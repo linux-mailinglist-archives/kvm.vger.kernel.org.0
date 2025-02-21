@@ -1,275 +1,302 @@
-Return-Path: <kvm+bounces-38853-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38855-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1D6BA3F75A
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 15:36:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C42EA3F7FD
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 16:06:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53D79863262
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 14:35:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A336F189DC48
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 15:06:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 168A621128B;
-	Fri, 21 Feb 2025 14:35:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA3FA210190;
+	Fri, 21 Feb 2025 15:06:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EUY56ZfT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dOFYx0pg"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 352A120F09A;
-	Fri, 21 Feb 2025 14:35:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC861208962;
+	Fri, 21 Feb 2025 15:06:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740148536; cv=none; b=k6FYyxrHDhK/QUwrexfmJdSTKAIS3iCb1Bb187WuPsat7DNTGGMg3V+Qm+ad0tu1Ru0T2lw7FR9FIqLvX6eqiwiNgCdh8VxoGVBgpllKPW8i9rEOKPIkLTNsIu8Ab6iwxuQ1dojaRBAyvtrtJLoqO+G2SDlKBYe3tv/exn+lM+8=
+	t=1740150367; cv=none; b=Z2JiP+f2xFS9JmOX4M9/1spfrtCjfkQ6+7hbtivVuJnzpyxG3kEDOgN8v/Jj7297OJf7fIb6rF5Od78oHir/vNmnvLSz/32Yhw6JA5O8LHr0cB0m8lNJS3S91i7sdUAhb2ODPhjoByGDd3R2qHlPaIlNWa0EVi2RiR80QVyqFHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740148536; c=relaxed/simple;
-	bh=AQ9WzOYUSOnYMTazRzBE5e9v5mAHVFCFpf347WZ2D04=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZAVOeDdYTwRTw7qRDMhlVuaS0zphSbQeF/JWrjFT9tKYTQTDYUQBFtSSANTwh6N+ZBqfqihzjwrvEvN5OpgItrmowubNFseDIL5dvJEyQRxX+oQTxW6VXho1NXsEkaok65OKNMLCd/2GBBN8BaMfUeJdi1t7G2t+h1DeUwLyi+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EUY56ZfT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7840CC4CED6;
-	Fri, 21 Feb 2025 14:35:35 +0000 (UTC)
+	s=arc-20240116; t=1740150367; c=relaxed/simple;
+	bh=z949hO3MwOXAyFCNa2KF23enIns2zrbW6wuKQGwpDGA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=utg6fF5EnQteeWxGdikI/VE1GjzVJ5s+MSk6mYNg9e1n9LhPLQ8Phb015v0EO2A0805WtP8G0KCxZkTgORfdyIvJtc9NiqgW7GV3gD+elDkEhyEuXUOyGTHRqZyZ3dHCJI8MfEz4EPfGJIkw5H3Vf7kZp/wvs+XdJ4yN7l/A6q8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dOFYx0pg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D99FC4CED6;
+	Fri, 21 Feb 2025 15:06:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740148535;
-	bh=AQ9WzOYUSOnYMTazRzBE5e9v5mAHVFCFpf347WZ2D04=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EUY56ZfThEjFLKTfjTaPZ/BGcHBHmG9blswNKQY1wj8rGAtDvYmqZ6CJpPcyvfiIB
-	 jea4ip78WD0MwCHkeylG16Q01dzV4MFg3PKUEV87WmlIl5OnocLgAD0tSssIWZE/pK
-	 VXxGJpvgDT10SKyXb66+2tkjUOnt1RWX87ObszXqoIt2Vv1cdXgw9pKtwm+zDDEcD/
-	 jSUMebdGAtUbEM6JTCijNip34k/QWHSCyOU8FZV76ZOGwGYn6wHIGTCGpKbw47R7RP
-	 Ke11csf5pXgFuIZdCRvKfQWA2pMouxw/CE6rAVkG1W3KhtP7Y9+3gPCtBMHO0fosl5
-	 rxPHYMuQfh5IA==
-Received: from mchehab by mail.kernel.org with local (Exim 4.98)
-	(envelope-from <mchehab+huawei@kernel.org>)
-	id 1tlU7m-00000002jDv-325r;
-	Fri, 21 Feb 2025 15:35:30 +0100
+	s=k20201202; t=1740150367;
+	bh=z949hO3MwOXAyFCNa2KF23enIns2zrbW6wuKQGwpDGA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dOFYx0pgtFeJmTDUukXY6GQOXqGl42lq6X+gMyonqBl7FP/gI2aE7zyqxwN4APq6h
+	 efrKTQV+HKkN3efyqi6hxldj2F7rjr0EkRw7oaZK6JzvA/JiV4P7Bj8byzy1fGfCdD
+	 ed5jCTOWU8OUlPSHlcha20IJR2ag4JxtU3kLWzFAVnirVJlhycVVgJncDfEqFPqbtY
+	 iXPYRp1lkIxi84zpv3yiQDORVzRqo6J0dg1idG7DlkAVYRTJtqEjlizqIFo/k/snA6
+	 kqmihHXgKf7btUIGuChUjsAz0/f1X9yG59Jwb/IFb5qNUVtAYahtOmI9FB5lRXTS3C
+	 o/q4eQhxcYLvg==
+Date: Fri, 21 Feb 2025 16:05:59 +0100
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Igor Mammedov <imammedo@redhat.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>
-Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Shiju Jose <shiju.jose@huawei.com>,
-	qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org,
-	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-	Ani Sinha <anisinha@redhat.com>,
-	Dongjiu Geng <gengdongjiu1@gmail.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v4 06/14] acpi/ghes: create an ancillary acpi_ghes_get_state() function
-Date: Fri, 21 Feb 2025 15:35:15 +0100
-Message-ID: <2288cfe02f8cfec4b35759fd748366c885018b59.1740148260.git.mchehab+huawei@kernel.org>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <cover.1740148260.git.mchehab+huawei@kernel.org>
-References: <cover.1740148260.git.mchehab+huawei@kernel.org>
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin"
+ <mst@redhat.com>, Shiju Jose <shiju.jose@huawei.com>,
+ <qemu-arm@nongnu.org>, <qemu-devel@nongnu.org>, Philippe =?UTF-8?B?TWF0?=
+ =?UTF-8?B?aGlldS1EYXVkw6k=?= <philmd@linaro.org>, Ani Sinha
+ <anisinha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Dongjiu Geng
+ <gengdongjiu1@gmail.com>, Eduardo Habkost <eduardo@habkost.net>, Eric Blake
+ <eblake@redhat.com>, John Snow <jsnow@redhat.com>, Marcel Apfelbaum
+ <marcel.apfelbaum@gmail.com>, "Markus Armbruster" <armbru@redhat.com>,
+ Michael Roth <michael.roth@amd.com>, "Paolo Bonzini" <pbonzini@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Shannon Zhao
+ <shannon.zhaosl@gmail.com>, Yanan Wang <wangyanan55@huawei.com>, Zhao Liu
+ <zhao1.liu@intel.com>, <kvm@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v3 00/14] Change ghes to use HEST-based offsets and add
+ support for error inject
+Message-ID: <20250221160530.020f6cec@foz.lan>
+In-Reply-To: <20250221132306.77800dbf@sal.lan>
+References: <cover.1738345063.git.mchehab+huawei@kernel.org>
+	<20250203110934.000038d8@huawei.com>
+	<20250203162236.7d5872ff@imammedo.users.ipa.redhat.com>
+	<20250221073823.061a1039@foz.lan>
+	<20250221102127.000059e6@huawei.com>
+	<20250221132306.77800dbf@sal.lan>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Instead of having a function to check if ACPI is enabled
-(acpi_ghes_present), change its logic to be more generic,
-returing a pointed to AcpiGhesState.
+Em Fri, 21 Feb 2025 13:23:06 +0100
+Mauro Carvalho Chehab <mchehab+huawei@kernel.org> escreveu:
 
-Such change allows cleanup the ghes GED state code, avoiding
-to read it multiple times, and simplifying the code.
+> Em Fri, 21 Feb 2025 10:21:27 +0000
+> Jonathan Cameron <Jonathan.Cameron@huawei.com> escreveu:
+> 
+> > On Fri, 21 Feb 2025 07:38:23 +0100
+> > Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
+> >   
+> > > Em Mon, 3 Feb 2025 16:22:36 +0100
+> > > Igor Mammedov <imammedo@redhat.com> escreveu:
+> > >     
+> > > > On Mon, 3 Feb 2025 11:09:34 +0000
+> > > > Jonathan Cameron <Jonathan.Cameron@huawei.com> wrote:
+> > > >       
+> > > > > On Fri, 31 Jan 2025 18:42:41 +0100
+> > > > > Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
+> > > > >         
+> > > > > > Now that the ghes preparation patches were merged, let's add support
+> > > > > > for error injection.
+> > > > > > 
+> > > > > > On this series, the first 6 patches chang to the math used to calculate offsets at HEST
+> > > > > > table and hardware_error firmware file, together with its migration code. Migration tested
+> > > > > > with both latest QEMU released kernel and upstream, on both directions.
+> > > > > > 
+> > > > > > The next patches add a new QAPI to allow injecting GHESv2 errors, and a script using such QAPI
+> > > > > >    to inject ARM Processor Error records.
+> > > > > > 
+> > > > > > If I'm counting well, this is the 19th submission of my error inject patches.          
+> > > > > 
+> > > > > Looks good to me. All remaining trivial things are in the category
+> > > > > of things to consider only if you are doing another spin.  The code
+> > > > > ends up how I'd like it at the end of the series anyway, just
+> > > > > a question of the precise path to that state!        
+> > > > 
+> > > > if you look at series as a whole it's more or less fine (I guess you
+> > > > and me got used to it)
+> > > > 
+> > > > however if you take it patch by patch (as if you've never seen it)
+> > > > ordering is messed up (the same would apply to everyone after a while
+> > > > when it's forgotten)
+> > > > 
+> > > > So I'd strongly suggest to restructure the series (especially 2-6/14).
+> > > > re sum up my comments wrt ordering:
+> > > > 
+> > > > 0  add testcase for HEST table with current HEST as expected blob
+> > > >    (currently missing), so that we can be sure that we haven't messed
+> > > >    existing tables during refactoring.      
+> > 
+> > To potentially save time I think Igor is asking that before you do anything
+> > at all you plug the existing test hole which is that we don't test HEST
+> > at all.   Even after this series I think we don't test HEST.   
+> 
+> On a previous review (v2, I guess), Igor requested me to do the DSDT
+> test just before and after the patch which is actually changing its
+> content (patch 11). The HEST table is inside DSDT firmware, and it is
+> already tested.
+> 
+> > You add
+> > a stub hest and exclusion but then in patch 12 the HEST stub is deleted whereas
+> > it should be replaced with the example data for the test.  
+> 
+> This was actually a misinterpretation from my side: patch 10 adds the
+> etc/hardware_errors table (mistakenly naming it as HEST), but this
+> was never tested. For the next submission, I'll drop etc/hardware_errors
+> table from patches 10 and 12.
+> 
+> > That indeed doesn't address testing the error data storage which would be
+> > a different problem.  
+> > > 
+> > > Not sure if I got this one. The HEST table is part of etc/acpi/tables,
+> > > which is already tested, as you pointed at the previous reviews. Doing
+> > > changes there is already detected. That's basically why we added patches
+> > > 10 and 12:
+> > > 
+> > > 	[PATCH v3 10/14] tests/acpi: virt: allow acpi table changes for a new table: HEST
+> > > 	[PATCH v3 12/14] tests/acpi: virt: add a HEST table to aarch64 virt and update DSDT
+> > > 
+> > > What tests don't have is a check for etc/hardware_errors firmware inside 
+> > > tests/data/acpi/aarch64/virt/, but, IMO, we shouldn't add it there.
+> > > 
+> > > See, hardware_errors table contains only some skeleton space to
+> > > store:
+> > > 
+> > > 	- 1 or more error block address offsets;
+> > > 	- 1 or more read ack register;
+> > > 	- 1 or more HEST source entries containing CPER blocks.
+> > > 
+> > > There's nothing there to be actually checked: it is just some
+> > > empty spaces with a variable number of fields.
+> > > 
+> > > With the new code, the actual number of CPER blocks and their
+> > > corresponding offsets and read ack registers can be different on 
+> > > different architectures. So, for instance, when we add x86 support,
+> > > we'll likely start with just one error source entry, while arm will
+> > > have two after this changeset.
+> > > 
+> > > Also, one possibility to address the issues reported by Gavin Shan at
+> > > https://lore.kernel.org/qemu-devel/20250214041635.608012-1-gshan@redhat.com/
+> > > would be to have one entry per each CPU. So, the size of such firmware
+> > > could be dependent on the number of CPUs.
+> > > 
+> > > So, adding any validation to it would just cause pain and probably
+> > > won't detect any problems.    
+> > 
+> > If we did do this the test would use a fixed number of CPUs so
+> > would just verify we didn't break a small number of variants. Useful
+> > but to me a follow up to this series not something that needs to
+> > be part of it - particularly as Gavin's work may well change that!  
+> 
+> I don't think that testing etc/hardware_errors would detect any
+> regressions. It will just create a test scenario that will require
+> constant changes, as adding any entry to HEST would hit it. 
 
-Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Reviewed-by:  Igor Mammedov <imammedo@redhat.com>
----
- hw/acpi/ghes-stub.c    |  7 ++++---
- hw/acpi/ghes.c         | 38 ++++++++++----------------------------
- include/hw/acpi/ghes.h | 14 ++++++++------
- target/arm/kvm.c       |  7 +++++--
- 4 files changed, 27 insertions(+), 39 deletions(-)
+Btw, there is just one patch on this series touching 
+etc/hardware_errors:
 
-diff --git a/hw/acpi/ghes-stub.c b/hw/acpi/ghes-stub.c
-index 7cec1812dad9..40f660c246fe 100644
---- a/hw/acpi/ghes-stub.c
-+++ b/hw/acpi/ghes-stub.c
-@@ -11,12 +11,13 @@
- #include "qemu/osdep.h"
- #include "hw/acpi/ghes.h"
- 
--int acpi_ghes_memory_errors(uint16_t source_id, uint64_t physical_address)
-+int acpi_ghes_memory_errors(AcpiGhesState *ags, uint16_t source_id,
-+                            uint64_t physical_address)
- {
-     return -1;
- }
- 
--bool acpi_ghes_present(void)
-+AcpiGhesState *acpi_ghes_get_state(void)
- {
--    return false;
-+    return NULL;
- }
-diff --git a/hw/acpi/ghes.c b/hw/acpi/ghes.c
-index f2d1cc7369f4..401789259f60 100644
---- a/hw/acpi/ghes.c
-+++ b/hw/acpi/ghes.c
-@@ -425,10 +425,6 @@ static void get_hw_error_offsets(uint64_t ghes_addr,
-                                  uint64_t *cper_addr,
-                                  uint64_t *read_ack_register_addr)
- {
--    if (!ghes_addr) {
--        return;
--    }
--
-     /*
-      * non-HEST version supports only one source, so no need to change
-      * the start offset based on the source ID. Also, we can't validate
-@@ -517,27 +513,16 @@ static void get_ghes_source_offsets(uint16_t source_id,
- NotifierList acpi_generic_error_notifiers =
-     NOTIFIER_LIST_INITIALIZER(error_device_notifiers);
- 
--void ghes_record_cper_errors(const void *cper, size_t len,
-+void ghes_record_cper_errors(AcpiGhesState *ags, const void *cper, size_t len,
-                              uint16_t source_id, Error **errp)
- {
-     uint64_t cper_addr = 0, read_ack_register_addr = 0, read_ack_register;
--    AcpiGedState *acpi_ged_state;
--    AcpiGhesState *ags;
- 
-     if (len > ACPI_GHES_MAX_RAW_DATA_LENGTH) {
-         error_setg(errp, "GHES CPER record is too big: %zd", len);
-         return;
-     }
- 
--    acpi_ged_state = ACPI_GED(object_resolve_path_type("", TYPE_ACPI_GED,
--                                                       NULL));
--    if (!acpi_ged_state) {
--        error_setg(errp, "Can't find ACPI_GED object");
--        return;
--    }
--    ags = &acpi_ged_state->ghes_state;
--
--
-     if (!ags->use_hest_addr) {
-         get_hw_error_offsets(le64_to_cpu(ags->hw_error_le),
-                              &cper_addr, &read_ack_register_addr);
-@@ -546,11 +531,6 @@ void ghes_record_cper_errors(const void *cper, size_t len,
-                                 &cper_addr, &read_ack_register_addr, errp);
-     }
- 
--    if (!cper_addr) {
--        error_setg(errp, "can not find Generic Error Status Block");
--        return;
--    }
--
-     cpu_physical_memory_read(read_ack_register_addr,
-                              &read_ack_register, sizeof(read_ack_register));
- 
-@@ -576,7 +556,8 @@ void ghes_record_cper_errors(const void *cper, size_t len,
-     notifier_list_notify(&acpi_generic_error_notifiers, NULL);
- }
- 
--int acpi_ghes_memory_errors(uint16_t source_id, uint64_t physical_address)
-+int acpi_ghes_memory_errors(AcpiGhesState *ags, uint16_t source_id,
-+                            uint64_t physical_address)
- {
-     /* Memory Error Section Type */
-     const uint8_t guid[] =
-@@ -602,7 +583,7 @@ int acpi_ghes_memory_errors(uint16_t source_id, uint64_t physical_address)
-     acpi_ghes_build_append_mem_cper(block, physical_address);
- 
-     /* Report the error */
--    ghes_record_cper_errors(block->data, block->len, source_id, &errp);
-+    ghes_record_cper_errors(ags, block->data, block->len, source_id, &errp);
- 
-     g_array_free(block, true);
- 
-@@ -614,7 +595,7 @@ int acpi_ghes_memory_errors(uint16_t source_id, uint64_t physical_address)
-     return 0;
- }
- 
--bool acpi_ghes_present(void)
-+AcpiGhesState *acpi_ghes_get_state(void)
- {
-     AcpiGedState *acpi_ged_state;
-     AcpiGhesState *ags;
-@@ -623,11 +604,12 @@ bool acpi_ghes_present(void)
-                                                        NULL));
- 
-     if (!acpi_ged_state) {
--        return false;
-+        return NULL;
-     }
-     ags = &acpi_ged_state->ghes_state;
--    if (!ags->hw_error_le && !ags->hest_addr_le)
--        return false;
- 
--    return true;
-+    if (!ags->hw_error_le && !ags->hest_addr_le) {
-+        return NULL;
-+    }
-+    return ags;
- }
-diff --git a/include/hw/acpi/ghes.h b/include/hw/acpi/ghes.h
-index 219aa7ab4fe0..276f9dc076d9 100644
---- a/include/hw/acpi/ghes.h
-+++ b/include/hw/acpi/ghes.h
-@@ -99,15 +99,17 @@ void acpi_build_hest(AcpiGhesState *ags, GArray *table_data,
-                      const char *oem_id, const char *oem_table_id);
- void acpi_ghes_add_fw_cfg(AcpiGhesState *vms, FWCfgState *s,
-                           GArray *hardware_errors);
--int acpi_ghes_memory_errors(uint16_t source_id, uint64_t error_physical_addr);
--void ghes_record_cper_errors(const void *cper, size_t len,
-+int acpi_ghes_memory_errors(AcpiGhesState *ags, uint16_t source_id,
-+                            uint64_t error_physical_addr);
-+void ghes_record_cper_errors(AcpiGhesState *ags, const void *cper, size_t len,
-                              uint16_t source_id, Error **errp);
- 
- /**
-- * acpi_ghes_present: Report whether ACPI GHES table is present
-+ * acpi_ghes_get_state: Get a pointer for ACPI ghes state
-  *
-- * Returns: true if the system has an ACPI GHES table and it is
-- * safe to call acpi_ghes_memory_errors() to record a memory error.
-+ * Returns: a pointer to ghes state if the system has an ACPI GHES table,
-+ * it is enabled and it is safe to call acpi_ghes_memory_errors() to record
-+ * a memory error. Returns false, otherwise.
-  */
--bool acpi_ghes_present(void);
-+AcpiGhesState *acpi_ghes_get_state(void);
- #endif
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index da30bdbb2349..80ca7779797b 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -2366,10 +2366,12 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
- {
-     ram_addr_t ram_addr;
-     hwaddr paddr;
-+    AcpiGhesState *ags;
- 
-     assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
- 
--    if (acpi_ghes_present() && addr) {
-+    ags = acpi_ghes_get_state();
-+    if (ags && addr) {
-         ram_addr = qemu_ram_addr_from_host(addr);
-         if (ram_addr != RAM_ADDR_INVALID &&
-             kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
-@@ -2387,7 +2389,8 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
-              */
-             if (code == BUS_MCEERR_AR) {
-                 kvm_cpu_synchronize_state(c);
--                if (!acpi_ghes_memory_errors(ACPI_HEST_SRC_ID_SEA, paddr)) {
-+                if (!acpi_ghes_memory_errors(ags, ACPI_HEST_SRC_ID_SEA,
-+                                             paddr)) {
-                     kvm_inject_arm_sea(c);
-                 } else {
-                     error_report("failed to record the error");
--- 
-2.48.1
+	https://lore.kernel.org/qemu-devel/647f9c974e606924b6b881a83e047d1d4dff47d5.1740148260.git.mchehab+huawei@kernel.org/T/#u
 
+The table change is due to this simple hunk:
+
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 4f174795ed60..7b6e90d69298 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -896,6 +896,7 @@ static void acpi_align_size(GArray *blob, unsigned align)
+ 
+ static const AcpiNotificationSourceId hest_ghes_notify[] = {
+     { ACPI_HEST_SRC_ID_SYNC, ACPI_GHES_NOTIFY_SEA },
++    { ACPI_HEST_SRC_ID_QMP, ACPI_GHES_NOTIFY_GPIO },
+ };
+
+
+Before such patch, /etc/hardware_errors has:
+
+	- 1 error block offset;
+	- 1 ack register;
+	- 1 GHESv2 entry for SEA
+
+After the change:
+
+- for virt-9.2: nothing changes, as hw/arm/virt-acpi-build.c will
+  use the backward-compatible table with a single entry to be
+  added to HEST:
+
+	static const AcpiNotificationSourceId hest_ghes_notify_9_2[] = {
+	    { ACPI_HEST_SRC_ID_SYNC, ACPI_GHES_NOTIFY_SEA },
+	};
+
+- for virt-latest/virt-10.0, it will use the new table to create two
+  sources:
+
+	static const AcpiNotificationSourceId hest_ghes_notify[] = {
+	    { ACPI_HEST_SRC_ID_SYNC, ACPI_GHES_NOTIFY_SEA },
+	    { ACPI_HEST_SRC_ID_QMP, ACPI_GHES_NOTIFY_GPIO },
+	};
+
+  which will actually mean that /etc/hardware_errors will now have:
+
+	- 2 error block offsets (one for SEA, one for GED);
+	- 2 ack registers (one for SEA, one for GED);
+	- 1 GHESv2 entry for SEA notifier;
+	- 1 GHESv2 entry for GED GPIO notifier.
+
+With the discussions with Gavin, for virt-10.0 and above, we may end changing 
+the new table (hest_ghes_notify) to have one SEA entry per CPU, plus the GPIO 
+one, and add an extra logic at the error injection logic to select the SEA
+entry based on the CPU ID and/or based on having an already acked
+SEA notifier.
+ 
+> 
+> Besides that, I don't think adding support for it would be a simple
+> matter of adding another table. See, after this series, there are two 
+> different scenarios for the /etc/hardware_errors:
+> 
+> - one with a single GHESv2 entry, for virt-9.2;
+> - another one with two GHESv2 entries for virt-10.0 and above that
+>   will dynamically change its size (starting from 2) depending on
+>   the features we add, and if we'll have one entry per CPU or not.
+> 
+> Right now, the tests there are only for "virt-latest": there's no
+> test directory for "virt-9.2". Adding support for virt-legacy will 
+> very likely require lots of changes there at the test infrastructure,
+> as it will require some virt migration support. 
+> 
+> > > What could be done instead is to have a different type of tests that
+> > > would use the error injection script to check if regressions are 
+> > > introduced after QEMU 10.0. Such new kind of test would require
+> > > this series to be merged first. It would also require the usage of
+> > > an OSPM image with some testing tools on it. This is easier said 
+> > > than done, as besides the complexity of having an OSPM test image,
+> > > such kind of tests would require extra logic, specially if it would
+> > > check regressions for SEA and other notification sources.
+> > >     
+> > Agreed that a more end to end test is even better, but those are
+> > quite a bit more complex so definitely a follow up.  
+> 
+> Yes, but it could be simpler than modifying ACPI tests to handle
+> migration.
+> 
+> The way I see is that such kind of integration could be done by some
+> gitlab workflow that would run an error injection script inside a
+> pre-defined image emulating both virt-9.2 and virt-latest and checking
+> if the HEST tables were properly generated for both SEA and GED
+> sources.
+> 
+> This is probably easier for GED, as the QMP interface already
+> detects that the read ack register was changed by the OSPM. For
+> SEA, it may require either some additional instrumentation or to
+> capture OSPM logs.
+> 
+> Anyway, ether way, a change like that is IMO outside the escope of
+> this series, as it will require lots of unrelated changes.
+> 
+> Regards,
+> Mauro
+> 
+
+
+
+Thanks,
+Mauro
 
