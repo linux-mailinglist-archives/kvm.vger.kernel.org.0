@@ -1,176 +1,182 @@
-Return-Path: <kvm+bounces-38840-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38841-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC839A3F065
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 10:35:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1368CA3F12B
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 10:59:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E8C697AB375
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 09:34:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0048D7019AA
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 09:57:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30ECD204C37;
-	Fri, 21 Feb 2025 09:34:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F9F820469D;
+	Fri, 21 Feb 2025 09:57:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Dgm2Flvx"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBFBD2045BC;
-	Fri, 21 Feb 2025 09:34:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 367891E0DD8;
+	Fri, 21 Feb 2025 09:57:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740130475; cv=none; b=nkn5hnSjvnb1hnRAD/aQEN5qR+Sl0X80VAslbPS4y4el6CvUu9wJ/BtRzeVCUw59TD9+PPr2SSzcwqkpLtxF3m0f8ThvfhyIUxK64PFI5d/9OhtMq6BAUwEpFzFV3TAdCVT8QiYcm/SIzZCkAEMswIKhba583JUjU9fVDwF2yko=
+	t=1740131856; cv=none; b=KHngZUWjxyuZjexcyWqGM9Bwszl+g1Onqj2RhUujkflfLJGcRP9Fk7a8+ohdYYQVgsLWA5R6kNbAJKr1NLuNEqyUYWv3xOd/dGMPX9kHP8wflZUdh1isRFdDOaXddNFXhHPe9Y4Y0qNCqOxvsMQQ681ZNbrkoeMBz4GKSXPD5uA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740130475; c=relaxed/simple;
-	bh=UrE4zNeA6rGUajNEitvvWzIh6MglysOpeI2P5JxANP8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=WU55k9ffti/1mCydPUJ82xGOQpXMrMkL5tnQreBqwBJyw/yr5pNBA/VfG6kTwdGxpgmd+hwh+OoTse7BVfPFREkMsWM7KmPnya/X3cLlI1v7OoD4ttF1EeXO8+KXe9RXjdijPcO5BNcAROYNCi1I7irotd+LMukh7XNENgOq3mo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4YzlG03WHwzdb9B;
-	Fri, 21 Feb 2025 17:29:44 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 57A03140158;
-	Fri, 21 Feb 2025 17:34:23 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 21 Feb 2025 17:34:22 +0800
-Message-ID: <e55e4dd4-9f80-4b2b-a84e-4bcfa4cf40be@huawei.com>
-Date: Fri, 21 Feb 2025 17:34:22 +0800
+	s=arc-20240116; t=1740131856; c=relaxed/simple;
+	bh=sXVw593ZoC57ceMork7Q3pTrmmGOhTUQ6LtS88ZFKaw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tOPjWzlQy/URFI6qaTi+G0vQnIAHiP5j3bPoLKU+QrvqHFpH2gzYm//flgczk+8CSNn81EfkDAKu/iVcee1dtOs646HUkBM0o4PBesPX/I4V7WG0q6RbFyKk8xC4/CZona3BUR/eLey8a4T/Wb0vU844Kk02RWdRixcdy5lexMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Dgm2Flvx; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51L21f7W003042;
+	Fri, 21 Feb 2025 09:57:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=NI12m+UKWkD+/nsc1GrJ/rdFIwb5em
+	pNDly47W5Tu6g=; b=Dgm2FlvxbI0rVlJsHTUoBjwzrYWTLyBrCao6PDXzpjRaWd
+	DKeNhY6q2AcCpYKwlwfHKS7eX7N0LIf3Va84MiDAfgnRR8ye3SdLRWzmwL3/xelt
+	l9JeUklrNfP/1W1XHBR5E+8NurIxqxg7SZtFPRZ2OkdZ3d1jvNgZa5Ct/gJWM/cc
+	Wmy4X7DKKebRm9jKA27dPoHICgL7Da88l234pvbHT1ZhHv97WYLOjsLbpvBJ4zHr
+	C57ucMx8AXrPgjaTSbFMSDTu8IPgfwVuymasYCTjJLp6sbyTF636Q0VoLn+cCorv
+	G3N3RhOdjF2UdOhh7apIbQCuOSbsvYCLhQS8uJog==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44xgb09t08-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 21 Feb 2025 09:57:30 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51L9CtSm029303;
+	Fri, 21 Feb 2025 09:57:30 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44w024q6dq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 21 Feb 2025 09:57:30 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51L9vObT35848822
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 21 Feb 2025 09:57:24 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1ACDC201E6;
+	Fri, 21 Feb 2025 09:57:24 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F359820158;
+	Fri, 21 Feb 2025 09:57:20 +0000 (GMT)
+Received: from osiris (unknown [9.179.14.8])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri, 21 Feb 2025 09:57:20 +0000 (GMT)
+Date: Fri, 21 Feb 2025 10:57:19 +0100
+From: Heiko Carstens <hca@linux.ibm.com>
+To: Anthony Krowiak <akrowiak@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, jjherne@linux.ibm.com, borntraeger@de.ibm.com,
+        pasic@linux.ibm.com, pbonzini@redhat.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com, alex.williamson@redhat.com,
+        kwankhede@nvidia.com, agordeev@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH] s390/vio-ap: Fix no AP queue sharing allowed message
+ written to kernel log
+Message-ID: <20250221095719.11661Ba2-hca@linux.ibm.com>
+References: <20250220000742.2930832-1-akrowiak@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] mm: alloc_pages_bulk: remove assumption of populating only
- NULL elements
-To: Chuck Lever <chuck.lever@oracle.com>, Yishai Hadas <yishaih@nvidia.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Shameer Kolothum
-	<shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>, Chris Mason <clm@fb.com>, Josef
- Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>, Gao Xiang
-	<xiang@kernel.org>, Chao Yu <chao@kernel.org>, Yue Hu <zbestahu@gmail.com>,
-	Jeffle Xu <jefflexu@linux.alibaba.com>, Sandeep Dhavale <dhavale@google.com>,
-	Carlos Maiolino <cem@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>, Jesper Dangaard Brouer
-	<hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker
-	<anna@kernel.org>, Jeff Layton <jlayton@kernel.org>, Neil Brown
-	<neilb@suse.de>, Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo
-	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>
-CC: Luiz Capitulino <luizcap@redhat.com>, Mel Gorman
-	<mgorman@techsingularity.net>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
-	<linux-btrfs@vger.kernel.org>, <linux-erofs@lists.ozlabs.org>,
-	<linux-xfs@vger.kernel.org>, <linux-mm@kvack.org>, <netdev@vger.kernel.org>,
-	<linux-nfs@vger.kernel.org>
-References: <20250217123127.3674033-1-linyunsheng@huawei.com>
- <abc3ae0b-620a-4e4a-8dd8-f8e7d3764b3a@oracle.com>
- <cc6fc730-e5f4-485b-b0b6-ec70374b3ab1@huawei.com>
- <7b7492c0-a3a7-470b-b7aa-697ac790a94b@oracle.com>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <7b7492c0-a3a7-470b-b7aa-697ac790a94b@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250220000742.2930832-1-akrowiak@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 5QZpml_tscZqj1DV_1L5BLOlkKU3zM-t
+X-Proofpoint-ORIG-GUID: 5QZpml_tscZqj1DV_1L5BLOlkKU3zM-t
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-21_01,2025-02-20_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=934
+ malwarescore=0 clxscore=1011 lowpriorityscore=0 suspectscore=0
+ impostorscore=0 priorityscore=1501 phishscore=0 adultscore=0 mlxscore=0
+ bulkscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502100000 definitions=main-2502210072
 
-On 2025/2/18 22:17, Chuck Lever wrote:
-> On 2/18/25 4:16 AM, Yunsheng Lin wrote:
->> On 2025/2/17 22:20, Chuck Lever wrote:
->>> On 2/17/25 7:31 AM, Yunsheng Lin wrote:
->>>> As mentioned in [1], it seems odd to check NULL elements in
->>>> the middle of page bulk allocating,
->>>
->>> I think I requested that check to be added to the bulk page allocator.
->>>
->>> When sending an RPC reply, NFSD might release pages in the middle of
->>
->> It seems there is no usage of the page bulk allocation API in fs/nfsd/
->> or fs/nfs/, which specific fs the above 'NFSD' is referring to?
-> 
-> NFSD is in fs/nfsd/, and it is the major consumer of
-> net/sunrpc/svc_xprt.c.
-> 
-> 
->>> the rq_pages array, marking each of those array entries with a NULL
->>> pointer. We want to ensure that the array is refilled completely in this
->>> case.
->>>
->>
->> I did some researching, it seems you requested that in [1]?
->> It seems the 'holes are always at the start' for the case in that
->> discussion too, I am not sure if the case is referring to the caller
->> in net/sunrpc/svc_xprt.c? If yes, it seems caller can do a better
->> job of bulk allocating pages into a whole array sequentially without
->> checking NULL elements first before doing the page bulk allocation
->> as something below:
->>
->> +++ b/net/sunrpc/svc_xprt.c
->> @@ -663,9 +663,10 @@ static bool svc_alloc_arg(struct svc_rqst *rqstp)
->>                 pages = RPCSVC_MAXPAGES;
->>         }
->>
->> -       for (filled = 0; filled < pages; filled = ret) {
->> -               ret = alloc_pages_bulk(GFP_KERNEL, pages, rqstp->rq_pages);
->> -               if (ret > filled)
->> +       for (filled = 0; filled < pages; filled += ret) {
->> +               ret = alloc_pages_bulk(GFP_KERNEL, pages - filled,
->> +                                      rqstp->rq_pages + filled);
->> +               if (ret)
->>                         /* Made progress, don't sleep yet */
->>                         continue;
->>
->> @@ -674,7 +675,7 @@ static bool svc_alloc_arg(struct svc_rqst *rqstp)
->>                         set_current_state(TASK_RUNNING);
->>                         return false;
->>                 }
->> -               trace_svc_alloc_arg_err(pages, ret);
->> +               trace_svc_alloc_arg_err(pages, filled);
->>                 memalloc_retry_wait(GFP_KERNEL);
->>         }
->>         rqstp->rq_page_end = &rqstp->rq_pages[pages];
->>
->>
->> 1. https://lkml.iu.edu/hypermail/linux/kernel/2103.2/09060.html
-> 
-> I still don't see what is broken about the current API.
+On Wed, Feb 19, 2025 at 07:07:38PM -0500, Anthony Krowiak wrote:
+> -#define MDEV_SHARING_ERR "Userspace may not re-assign queue %02lx.%04lx " \
+> -			 "already assigned to %s"
+> +#define MDEV_SHARING_ERR "Userspace may not assign queue %02lx.%04lx " \
+> +			 "to mdev: already assigned to %s"
 
-As mentioned in [1], the page bulk alloc API before this patch may
-have some space for improvement from performance and easy-to-use
-perspective as the most existing calllers of page bulk alloc API
-are trying to bulk allocate the page for the whole array sequentially.
+Please do not split error messages across several lines, so it is easy
+to grep such for messages. If this would have been used for printk
+directly checkpatch would have emitted a message.
 
-1. https://lore.kernel.org/all/c9950a79-7bcb-41c2-a59e-af315dc6d7ff@huawei.com/
+> +#define MDEV_IN_USE_ERR "Can not reserve queue %02lx.%04lx for host driver: " \
+> +			"in use by mdev"
 
-> 
-> Anyway, any changes in svc_alloc_arg() will need to be run through the
-> upstream NFSD CI suite before they are merged.
+Same here.
 
-Is there any web link pointing to the above NFSD CI suite, so that I can
-test it if removing assumption of populating only NULL elements is indeed
-possible?
+>  	for_each_set_bit_inv(apid, apm, AP_DEVICES)
+>  		for_each_set_bit_inv(apqi, aqm, AP_DOMAINS)
+> -			dev_warn(dev, MDEV_SHARING_ERR, apid, apqi, mdev_name);
+> +			dev_warn(mdev_dev(assignee->mdev), MDEV_SHARING_ERR,
+> +				 apid, apqi, dev_name(mdev_dev(assigned_to->mdev)));
 
-Look more closely, it seems svc_rqst_release_pages()/svc_rdma_save_io_pages()
-does set rqstp->rq_respages[i] to NULL based on rqstp->rq_next_page,
-and the original code before using the page bulk alloc API does seem to only
-allocate page for NULL elements as can see from the below patch：
-https://lore.kernel.org/all/20210325114228.27719-8-mgorman@techsingularity.net/T/#u
+Braces are missing. Even it the above is not a bug: bodies of for
+statements must be enclosed with braces if they have more than one
+line:
 
-The clearing of rqstp->rq_respages[] to NULL does seems sequentially, is it
-possible to only pass NULL elements in rqstp->rq_respages[] to alloc_pages_bulk()
-so that bulk alloc API does not have to do the NULL checking and use the array only
-as output parameter?
+  	for_each_set_bit_inv(apid, apm, AP_DEVICES) {
+  		for_each_set_bit_inv(apqi, aqm, AP_DOMAINS) {
+			dev_warn(mdev_dev(assignee->mdev), MDEV_SHARING_ERR,
+				 apid, apqi, dev_name(mdev_dev(assigned_to->mdev))
+		}
+	}
 
-> 
-> 
+> +static void vfio_ap_mdev_log_in_use_err(struct ap_matrix_mdev *assignee,
+> +					unsigned long *apm, unsigned long *aqm)
+> +{
+> +	unsigned long apid, apqi;
+> +
+> +	for_each_set_bit_inv(apid, apm, AP_DEVICES)
+> +		for_each_set_bit_inv(apqi, aqm, AP_DOMAINS)
+> +			dev_warn(mdev_dev(assignee->mdev), MDEV_IN_USE_ERR,
+> +				 apid, apqi);
+> +}
+
+Same here.
+
+> +
+> +/**assigned
+>   * vfio_ap_mdev_verify_no_sharing - verify APQNs are not shared by matrix mdevs
+
+Stray "assigned" - as a result this is not kernel doc anymore.
+
+> + * @assignee the matrix mdev to which @mdev_apm and @mdev_aqm are being
+> + *           assigned; or, NULL if this function was called by the AP bus driver
+> + *           in_use callback to verify none of the APQNs being reserved for the
+> + *           host device driver are in use by a vfio_ap mediated device
+>   * @mdev_apm: mask indicating the APIDs of the APQNs to be verified
+>   * @mdev_aqm: mask indicating the APQIs of the APQNs to be verified
+
+Missing ":" behind @assignee. Please keep this consistent.
+
+> @@ -912,17 +930,21 @@ static int vfio_ap_mdev_verify_no_sharing(unsigned long *mdev_apm,
+>  
+>  		/*
+>  		 * We work on full longs, as we can only exclude the leftover
+> -		 * bits in non-inverse order. The leftover is all zeros.
+> +		 * bits in non-inverse order. The leftover is all zeros.assigned
+>  		 */
+
+Another random "assigned" word.
+
+> +		if (assignee)
+> +			vfio_ap_mdev_log_sharing_err(assignee, assigned_to,
+> +						     apm, aqm);
+> +		else
+> +			vfio_ap_mdev_log_in_use_err(assigned_to, apm, aqm);
+
+if body with multiple lines -> braces. Or better make that
+vfio_ap_mdev_log_sharing_err() call a long line. If you want to keep
+the line-break add braces to both the if and else branch.
 
