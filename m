@@ -1,53 +1,53 @@
-Return-Path: <kvm+bounces-38824-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38825-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16010A3EA0E
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 02:32:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A7E0A3EA11
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 02:32:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4113F3AE04D
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 01:31:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC5DF7A6183
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 01:31:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E94341760;
-	Fri, 21 Feb 2025 01:31:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C541838F80;
+	Fri, 21 Feb 2025 01:32:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OxY5YK7w"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oYh111H5"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32FDA125B9
-	for <kvm@vger.kernel.org>; Fri, 21 Feb 2025 01:31:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF8078821
+	for <kvm@vger.kernel.org>; Fri, 21 Feb 2025 01:32:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740101510; cv=none; b=i6ScdpobtUT8047VY+htookGmYdCBVq+0+JaG7L/u4nKq/9ZM2RbxzjjNBUW1uV6uuXjCjEcHEtODtQjyR7mn9+V7w8A3AjtHME/Bi84jeNlr+du+qJmIvqJipNen40NUsO9XJ/mKtcjP8ySlUidUODhCByAYKq9XzoHgOqSyAs=
+	t=1740101543; cv=none; b=GQ54L/rCuphBV2Nn/LH8mQaS/aFDDBRIt+29NLE31+fVoxNQKf094FagiLd0wsUjEK9+FK/pG5tdPNEtnOCNCZ/EIotdUH2i3EYlD3861BRZNBYRPNgl3WyzbKauh/+5dBya5/FwKSZpT2TmjHgiihcLy/8ZReeIwRPCFSig0Kk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740101510; c=relaxed/simple;
-	bh=YZGQUA6A9EdAu4S3ugymIiiJ0SRmPoCz2dEKYxo904U=;
+	s=arc-20240116; t=1740101543; c=relaxed/simple;
+	bh=756RzFQZtzS4DCv9av5iw4wVT7jbXJWYzNmX4VwaN7E=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=a6KNNKNjTV99ZrA0nf6FA591Wass6AI4LXfNqMhS4EAX6MSdXNCoPtmsas2cjfkK9wov9QkH+xvfa9WhLrKKbxXzeP7/Bt1QNTMfCxHU6sgc5mX0LQH4GDSuRaAYD4+k9oK1J4z94u4qezFX3NQyVW3VLgNgjsBWBn9SdUSLaIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OxY5YK7w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 114AAC4CEE8
-	for <kvm@vger.kernel.org>; Fri, 21 Feb 2025 01:31:50 +0000 (UTC)
+	 Content-Type:MIME-Version; b=fMN9QKmKpZgchfG2+bHFHrt4QuM+u/11SnT1yVliWmcL1M2ltEdGPx8b0iOoR+R2LQgxkJoqJ6LIu+i3AkkJ5Uke7NQnuNjG2TPUHbbZnCtFFyaH9DbP3csypnDsdHCulmcuwGeAxbCvtqhns17uLwP6HBa42QBWEKsKAQCIdcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oYh111H5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D0174C4CEE6
+	for <kvm@vger.kernel.org>; Fri, 21 Feb 2025 01:32:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740101510;
-	bh=YZGQUA6A9EdAu4S3ugymIiiJ0SRmPoCz2dEKYxo904U=;
+	s=k20201202; t=1740101542;
+	bh=756RzFQZtzS4DCv9av5iw4wVT7jbXJWYzNmX4VwaN7E=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=OxY5YK7wZNXosSO15rfnikLxtmv5aCpFURxgiIj99pp5xB4AJmd81YNlsGqhlyEAj
-	 7F8SGAYpRFlMrs50hvwg+iGphfu3UlVxdHJkaFfXBu6cZJxgwR4gFoH4mg9pD9GA9R
-	 pg9kqaHoiwC15Jh6V+IniZOM9XTb2hWfo5n6gsIH0qex0GXQHrMwSrcJV6zcd6sFHt
-	 HQJ+2r+eWoo3EH8fOTrC2RYRAPtK8amZaBiuANwji+0FLqunIo/Wn9O6JLwmm8qwxf
-	 wHimYa06CrNt5Co+v+9D0h48bV40qKnXS1QnHv5+JpsZbWpJ7HGbWkZxnbFptEP4vV
-	 E/1l7auNwbLgA==
+	b=oYh111H5zWgoZ+TEWbnXlVP+nTgirwj3HIYPvRmaEDhp6mYJLdQ82C8skFEzQghQT
+	 9PJ2IDl8hB17Yvfdo+1qYZ3NFJBV0lHgOohcXGtiM1OqmTJAhvKSOq50aJC3iFIZJr
+	 Xi7M5Oal2MpAxgjjSe34cAHnTu9LrMzBRcaFu48MhWcaUi3OuoF1FJ12rGcnr2rHun
+	 uT8gr5KYZxqq7SYglDMBACaKOAfU5cx5YRKYzRHUSuiTejzNI5+aQgR3TniWTbopo9
+	 UW5Qhqge3LwW5Gr3SYzYdNSBGDD6rv1OTZAa3dlqjYtZODu7pDXlkcbK16kRRWrMtY
+	 5NBrS/bm/RY+Q==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 07D79C3279F; Fri, 21 Feb 2025 01:31:50 +0000 (UTC)
+	id C8E46C41606; Fri, 21 Feb 2025 01:32:22 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: kvm@vger.kernel.org
 Subject: [Bug 219787] Guest's applications crash with EXCEPTION_SINGLE_STEP
  (0x80000004)
-Date: Fri, 21 Feb 2025 01:31:49 +0000
+Date: Fri, 21 Feb 2025 01:32:22 +0000
 X-Bugzilla-Reason: None
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
@@ -62,8 +62,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: attachments.created
-Message-ID: <bug-219787-28872-JRvIzBFXYb@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-219787-28872-aDsI6bzjsW@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-219787-28872@https.bugzilla.kernel.org/>
 References: <bug-219787-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -79,10 +79,16 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D219787
 
---- Comment #10 from rangemachine@gmail.com ---
-Created attachment 307691
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D307691&action=3Dedit
-bisection-config-culprit
+--- Comment #11 from rangemachine@gmail.com ---
+Here we go:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?=
+id=3D408eb7417a92c5354c7be34f7425b305dfe30ad9
+
+Double-checked both reverting commit or unsetting X86_BUS_LOCK_DETECT fixes=
+ the
+problem.
+
+Added bisection log and config to attachments.
 
 --=20
 You may reply to this email to add a comment.
