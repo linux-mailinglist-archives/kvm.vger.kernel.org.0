@@ -1,160 +1,121 @@
-Return-Path: <kvm+bounces-38820-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38821-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C50F3A3E9A7
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 02:09:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA95AA3E9B3
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 02:13:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B7FC189ECF8
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 01:09:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0797A16B359
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 01:13:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97F75381A3;
-	Fri, 21 Feb 2025 01:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B62F738FA3;
+	Fri, 21 Feb 2025 01:12:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Np/yl9h5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OtyeFnfC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BCC3EEC8
-	for <kvm@vger.kernel.org>; Fri, 21 Feb 2025 01:08:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E2232C8E
+	for <kvm@vger.kernel.org>; Fri, 21 Feb 2025 01:12:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740100131; cv=none; b=lrQTAxviS+uQdmUICNvjd2X0s6xVT84J2K1FOpKud2OJLQJTxAH+3GoD8q0VSueghzlUpTUYrEwpNbYw8sYRgNhtNaIS5U9jQKAto9bjjNY1/yQCsADVXLE4x9YrzcHPWmNSD5X6PPrqSD8C/zezxmB/ryhIVvJQANhpWrL5uKg=
+	t=1740100379; cv=none; b=rQ9FCTGYvSi9zwI5Z2OJCn5sNfnWOb/K1mTPz15DbdNusG5+jnFqLwW5OSdGhn18kMpU0KUC2yxD/hOqtAwtFxd/weYrsM4PtyCccbEZKvJJDD3+yEverW/CPz5285aZVBRZ+u0ZmKdyW8jqmhTz9VFUNRAN+s/7MaQuvUXkfmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740100131; c=relaxed/simple;
-	bh=3fHapjZeNh1VjYeXTfp2z5nti+mCkYcx8zwxVW4YXrE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sHNEwC8hn7hmvwghDswH/kA/QAzWfs/NpDcfezhawK3qFNG1xbqjlShfOsAZ2Ax7+sI+rn5y3+8Yl1mpn/p49ToIDaaIYdjzUo6oNjysqeIAmu2/HZwaG2f13EoWBZ9ouwvJLk9w2t3zt7Yyh+JU8VUFz3RIWcqcW5iQjztwsGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Np/yl9h5; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fc17c3eeb5so3515755a91.1
-        for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 17:08:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740100129; x=1740704929; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FQFtq5zh8p2czyGe6VdUykaj2fCcZy9a/aoX6y/tI5o=;
-        b=Np/yl9h5Yd6gWoxEpEaPokQRUS3jucWrtyPrv2c8KZLPLGxoFZyEOiIrGetC+z/a82
-         8fgbhW22fTtFVWLox2XlRGqddOf52BULDb9oKsC7FJl0cjl27cGfTeaViiYDBTKGVr8/
-         8parOVaU1lPROa1PtZxx5uZza/dJBgqZoXb6Ab54Fh2UlLeBgnvp8aKHW7tx2intX5+F
-         SJNZ8a1cnHg9ZLKZyfvIzLBFHXOmcRPzv43zxyI8AncylB2A8eCRLxM72HOnwZWwTzCq
-         kHaF8JJLJrRCFP7UepaJcL/T3D6rdtefm7AOlas2e2RjphAwOBbeUAlXArmFfxjQZwaP
-         GZOA==
+	s=arc-20240116; t=1740100379; c=relaxed/simple;
+	bh=Uq7GzPfQ3uC0UiGgLsywtL1UAOYX+nwobFKbFtjrYR8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fVXYM9JEBCBgkWpTPKiXGR7LypSRKyxikimh5gNzZMZGQ/waD+bHhrxrrBV1s3rCGUie4O/Hi+MlL8So/6zFuAiKECBRd2YFUbpsO210jF1FiXY9FHUKNN8vSIvDxBk7TcZcxyj2cKAZ/Jo07ukmEKC20r4eZfs7PuUkk50oMPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OtyeFnfC; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740100376;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Uq7GzPfQ3uC0UiGgLsywtL1UAOYX+nwobFKbFtjrYR8=;
+	b=OtyeFnfC8vKGfAnuluA76oPk7WRVorGwCp7JFvzZY+wZ/6p8VUy6Lv9dqrt/sZkgb2neDb
+	/iZjiOL0/yx8BSAq4lREaQ5D5LG99p55MFxNZ2Uokb0xx98P3rYZl/by2gJndJO9nk6UDQ
+	3KzFo3rjhwScsSDwqbhKTYeWYM9IcHQ=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-591-fTud-3uDMAyEzPhHSueISQ-1; Thu, 20 Feb 2025 20:12:54 -0500
+X-MC-Unique: fTud-3uDMAyEzPhHSueISQ-1
+X-Mimecast-MFC-AGG-ID: fTud-3uDMAyEzPhHSueISQ_1740100374
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2fc1cb0c2cbso5077811a91.1
+        for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 17:12:54 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740100129; x=1740704929;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FQFtq5zh8p2czyGe6VdUykaj2fCcZy9a/aoX6y/tI5o=;
-        b=mJohZLT22+JDAwABKdmo8CRQe0/FAlRQ9J/pna9O3GxNc8K6DzAf7ZUFtBIQwniESK
-         MTpxLoqyDD0kyAFVg4MV6sADu2YLjLRGqRGUba/f2/gi2gwknOnpwBPJ9bjFJSB8BoAc
-         6wOwAYPYBoaN+moQm6oLSNZsBLukLNOTyYLkfQl4ksIv/PT1XSafUV6QgwgBeUPE8JpD
-         LDHzR9BIrgilTCf+b3/QXLulAz8lxvnuwyO8E+Z21BZt6kUZS33ca9Fv+WhzddlD6C8v
-         G5kLbNpqvFDb8yw3QadGKrbQyaIISmWcNnNl4WGJG4aJmdsnazxV/9OMRusuCvYdDnFV
-         GVdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW1DyFNVsyF8teMOU+/8RZfhSE85mZ8MaskDkA9jfJqPjr/fZN4KaSOT4dcDKu+aQDCZo8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/ElRDkZ3BoUxBohmqZHsPo6DgSG8J+dfHWZjbbaD4ODZinFp5
-	3Sl+QBMkbap+7cy5InneLzVv6+j8SvC0OgPtVWUf8U6MyIokXw43W//XHDMazYBHrG9LJoznD3E
-	few==
-X-Google-Smtp-Source: AGHT+IGvGA5L3s3OecPlM4JUTxJyjvxBe691JnF9OIkyTKNxVRjzLqxhj39XqoXWXYt1NKhGI05T1/JGVwI=
-X-Received: from pjbsy7.prod.google.com ([2002:a17:90b:2d07:b0:2ea:5084:5297])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4c10:b0:2ee:b4bf:2d06
- with SMTP id 98e67ed59e1d1-2fce86d0e70mr1396072a91.19.1740100129598; Thu, 20
- Feb 2025 17:08:49 -0800 (PST)
-Date: Thu, 20 Feb 2025 17:08:48 -0800
-In-Reply-To: <Z7fO9gqzgaETeMYB@google.com>
+        d=1e100.net; s=20230601; t=1740100373; x=1740705173;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Uq7GzPfQ3uC0UiGgLsywtL1UAOYX+nwobFKbFtjrYR8=;
+        b=KknCGQswSM7KIPqPqnMWtzgZHL203Sdj6i6JAW0cUlBtuxACLT16wPup5wvGxpIqkn
+         L/qtOcDyzgJic9q0V2YtL6rSsw8ZHjFVACsnJtTvUl6SGvdGUG1pdaR46dXI/242diR5
+         ZYaHLdhckG+OqFnjwS63fN+cyut2equyfCt35sCSgwATlunkhfbIbm03OnRxOPjmDeyg
+         jydZEy/cgdmifa0y6EXVJVXb06eNo7gQqvjRmjp3PiE/gQdKMcVr1jIvghjExBAXXbBf
+         wcCY3dzyv7Rw+cF20jlAA0v10N94unO4CZwzng/OVrx4eg1US5mpnoHqppSlvbOvszWG
+         ysyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU4vwvgjHJ/8XSCVAj1SEq6bPvlxdhbY12LYGn1UXbOBaGIvTDsqs82f6x2gdM/3p583k8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzzympHTCNuJUaMYCvtBk1KyfD4dAmlmAMhnb+dCRLV1sepDUVG
+	hHgoPGjNn4IbIFuzgBdlEb32XFxZTos3mx0aO9kCKIvKIdz8jJ0GZUKXBAxstr00mwFgPvKl8LN
+	1BH3VU9yX4/i5RS7DbqtqHI0R7V4GOrM40EKAIBeHBne/0woVo920RQuVsus6rj8LJuSrQqiMbW
+	zMJHCi4gz9JvEBqMmhNsUgprFFaaqX0YhVzMLIwQ==
+X-Gm-Gg: ASbGncsX+ob3IyWcPQNf/4olCU209H2uEd3xaSwxGuGi4+DMMlXup82KIjXA17D51/5
+	pLcFXUPCjNzKczBu6o7AAC7NHbNhJkpf/rbsyXEuKakOkg/3k172FlVzqXpB/OMg=
+X-Received: by 2002:a17:90b:5310:b0:2ea:696d:732f with SMTP id 98e67ed59e1d1-2fce7b271a4mr2148901a91.29.1740100373608;
+        Thu, 20 Feb 2025 17:12:53 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGnQJ9hWU4v+2TwwECUtm6Pf8c9YX7B6ZUHd/Hqnqd2kx0Bc2ftH5qx2hCH5z2BE+GZRURxv4Goas3NlmOaXUg=
+X-Received: by 2002:a17:90b:5310:b0:2ea:696d:732f with SMTP id
+ 98e67ed59e1d1-2fce7b271a4mr2148854a91.29.1740100372927; Thu, 20 Feb 2025
+ 17:12:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250220170604.2279312-1-pbonzini@redhat.com> <20250220170604.2279312-21-pbonzini@redhat.com>
- <Z7fO9gqzgaETeMYB@google.com>
-Message-ID: <Z7fSIMABm4jp5ADA@google.com>
-Subject: Re: [PATCH 20/30] KVM: TDX: create/destroy VM structure
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Yan Zhao <yan.y.zhao@intel.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, Tony Lindgren <tony.lindgren@linux.intel.com>, 
-	Sean Christopherson <sean.j.christopherson@intel.com>, Kai Huang <kai.huang@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20250220193732.521462-2-dtatulea@nvidia.com>
+In-Reply-To: <20250220193732.521462-2-dtatulea@nvidia.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Fri, 21 Feb 2025 09:12:41 +0800
+X-Gm-Features: AWEUYZkw-CTw854l_MFE994dYvtfLs30K1XdrnaRr8wNLayyzmZm48vwiDxgk6A
+Message-ID: <CACGkMEuUsh-wH=fWPp66XAFeE_xux-drf1gatSQSiGuS_rO_zQ@mail.gmail.com>
+Subject: Re: [PATCH vhost v2] vdpa/mlx5: Fix oversized null mkey longer than 32bit
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, virtualization@lists.linux.dev, 
+	Eugenio Perez Martin <eperezma@redhat.com>, Si-Wei Liu <si-wei.liu@oracle.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Gal Pressman <gal@nvidia.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, stable@vger.kernel.org, 
+	Cong Meng <cong.meng@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 20, 2025, Sean Christopherson wrote:
-> TL;DR: Please don't merge this patch to kvm/next or kvm/queue.
-> 
-> On Thu, Feb 20, 2025, Paolo Bonzini wrote:
-> > @@ -72,8 +94,10 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
-> >  	.has_emulated_msr = vmx_has_emulated_msr,
-> >  
-> >  	.vm_size = sizeof(struct kvm_vmx),
-> > -	.vm_init = vmx_vm_init,
-> > -	.vm_destroy = vmx_vm_destroy,
-> > +
-> > +	.vm_init = vt_vm_init,
-> > +	.vm_destroy = vt_vm_destroy,
-> > +	.vm_free = vt_vm_free,
-> >  
-> >  	.vcpu_precreate = vmx_vcpu_precreate,
-> >  	.vcpu_create = vmx_vcpu_create,
-> 
-> ...
-> 
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 374d89e6663f..e0b9b845df58 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -12884,6 +12884,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
-> >  	kvm_page_track_cleanup(kvm);
-> >  	kvm_xen_destroy_vm(kvm);
-> >  	kvm_hv_destroy_vm(kvm);
-> > +	static_call_cond(kvm_x86_vm_free)(kvm);
-> >  }
-> 
-> Sorry to throw a wrench in things, but I have a fix that I want to send for 6.14[1],
-> i.e. before this code, and to land that fix I need/want to destroy vCPUs before
-> calling kvm_x86_ops.vm_destroy().  *sigh*
-> 
-> The underlying issue is that both nVMX and nSVM suck and access all manner of VM-wide
-> state when destroying a vCPU that is currently in nested guest mode, and I want
-> to fix the most pressing issue of destroying vCPUs at a random time once and for
-> all.  nVMX and nSVM also need to be cleaned up to not access so much darn state,
-> but I'm worried that "fixing" the nested cases will only whack the biggest mole.
+On Fri, Feb 21, 2025 at 3:40=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia.com=
+> wrote:
+>
+> From: Si-Wei Liu <si-wei.liu@oracle.com>
+>
+> create_user_mr() has correct code to count the number of null keys
+> used to fill in a hole for the memory map. However, fill_indir()
+> does not follow the same to cap the range up to the 1GB limit
+> correspondingly. Fill in more null keys for the gaps in between,
+> so that null keys are correctly populated.
+>
+> Fixes: 94abbccdf291 ("vdpa/mlx5: Add shared memory registration code")
+> Cc: stable@vger.kernel.org
+> Reported-by: Cong Meng <cong.meng@oracle.com>
+> Signed-off-by: Si-Wei Liu <si-wei.liu@oracle.com>
+> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Acked-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
 
-...
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-> And so my plan is to carved out a kvm_destroy_mmus() helper, which can then call
-> the TDX hook to release/reclaim the HKID, which I assume needs to be done after
-> KVM's general MMU destruction, but before vCPUs are freed.
+Thanks
 
-...
-
-> void kvm_arch_destroy_vm(struct kvm *kvm)
-> {
-> 	/*
-> 	 * WARNING!  MMUs must be destroyed before vCPUs, and vCPUs must be
-> 	 * destroyed before any VM state.  Most MMU state is VM-wide, but is
-> 	 * tracked per-vCPU, and so must be unloaded/freed in its entirety
-> 	 * before any one vCPU is destroyed.
-
-Argh, after digging more, this isn't actually true.  The separate "unload MMUs"
-code is leftover from when KVM rather stupidly tried to free all MMU pages when
-freeing a vCPU.
-
-Commit 7b53aa565084 ("KVM: Fix vcpu freeing for guest smp") "fixed" things by
-unloading MMUs before destroying vCPUs, but the underlying problem was trying to
-free _all_ MMU pages when destroying a single vCPU.  That eventually got fixed
-for good (haven't checked when), but the separate MMU unloading never got cleaned
-up.
-
-So, scratch the mmu_destroy() idea.  But I still want/need to move vCPU destruction
-before vm_destroy.
-
-Now that kvm_arch_pre_destroy_vm() is a thing, one idea would be to add
-kvm_x86_ops.pre_destroy_vm(), which would pair decently well with the existing
-call to kvm_mmu_pre_destroy_vm().
 
