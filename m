@@ -1,110 +1,96 @@
-Return-Path: <kvm+bounces-38913-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38914-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22B77A40317
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 23:57:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F89FA40381
+	for <lists+kvm@lfdr.de>; Sat, 22 Feb 2025 00:34:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6332719E106D
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 22:58:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7AA1E19C5DE8
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2025 23:35:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 967BC2512D7;
-	Fri, 21 Feb 2025 22:57:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A843720AF8E;
+	Fri, 21 Feb 2025 23:34:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UG+fppPl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lceo4LSs"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EF2E1EE028
-	for <kvm@vger.kernel.org>; Fri, 21 Feb 2025 22:57:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BD7A2066DB
+	for <kvm@vger.kernel.org>; Fri, 21 Feb 2025 23:34:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740178670; cv=none; b=qK1STf1IPXUfTpFn8WeFbjuClOrUJOLZ+2X9cmil5cwVOCcgDWv43Epl9bXuilkCH765r/lYZeVxIalvZMGX+Q2LZDuMXQjL9Lg+ajbC+Cgn0kw+vL3CN0KcBfggmUfCVbiWqVvdeloHdN2Zu2n0Qix38VwkXF7odr6AsiSjD+Y=
+	t=1740180885; cv=none; b=PRSJ3eiYaXE12ezHtJE4iS2nMK0YYqRWT/Qw7vRsLtC29C8MV+D6L4f6bxTdFV4wyTt7AI2M9iwiICNrean1n36fVodzwR13fPInghg13DCGVDl4FaR1qgakKlWPpV70kp257O/+UeAZqGzw279LImrcGGXdR895GHeJG2Q58qs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740178670; c=relaxed/simple;
-	bh=lFo4JUPYMsFO7Lsbh8vNtNm2eGGY0s1hy/av1rJDtU4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=FOIhO4F1IjEifJnj4huEOKQPF3HWsTJoqElmWtqdV9NxcMRoKTxryhRZZfpkIcYQx1Wm7HOTFqcHjSYHpCbkOp064GE3UQR6G8rCToOdKhv38oK8pgI0kljLr15z+xU+rR1nVhjIErxCA8G995snp+Bve8fWmmemLxml7VDkx8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UG+fppPl; arc=none smtp.client-ip=209.85.214.202
+	s=arc-20240116; t=1740180885; c=relaxed/simple;
+	bh=sLcN+WrAzZsqWywRxIulrOAkH6iiocquDgSNtXtUZY8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Content-Type; b=HEDwPHye6xA8PWep+LlxVWFRozAohShwTFxJn6lf4fW7mJFHLsh32ZXc1k+HIF832q4h4S65gJ8B8gbdUyXi+TcyUGtN2DE1zb/CYGwPTynmRWTj4GpTg5m8YKmNr9robrurRrgJyfSyljd81Y/m7RE1HTlXSTjTEb6IgJgeX4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Lceo4LSs; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-220f0382404so50147875ad.1
-        for <kvm@vger.kernel.org>; Fri, 21 Feb 2025 14:57:49 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-22119b07d52so35034895ad.1
+        for <kvm@vger.kernel.org>; Fri, 21 Feb 2025 15:34:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740178669; x=1740783469; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=su5RCnPwYbw2U6fhjLj3rvvSBHFZckaAgbFdJ2/uW6w=;
-        b=UG+fppPlSOByfhbITIwLIeJ6qRd+4HbI2t0Lt+Iu8VU9y+RcaCqvT1TFOIL2LD+2go
-         /dgrmNMNcVgqkawbWgL+2VVf+rRY5vwefu3t77DA0itutWqG9tHLxX6v5nRAE8H3jvqZ
-         gpde6GYrRbVLn5L+tq51s5anSdqlCHB5FGK+O4YODyymAc9AngCL4N5NK7ZezhlNv9Wv
-         9hrS8PGUTGV8Fx9JXXtWi6PlnnQvD6zwHSVXKctuG0NRwm/3AWAiwGplykTkchzfaeIK
-         mFAt/aRS6JIzsFdTqn6GvxGFN3uytKHFx4J6pWxz2FjK/3BmhkanYb1J5vD/428nM48k
-         d2vA==
+        d=google.com; s=20230601; t=1740180884; x=1740785684; darn=vger.kernel.org;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PPibVXWvp4DoY9G+kf9mR9h729oRmuO7481VoJ3ZIhk=;
+        b=Lceo4LSsPa1aVmUuLOdi7jDvVOCCnx7GdtsaCqZOXsWn8t0VReErmVzbVw5rrGlbC0
+         SR6y3ksr38/lzvlzydcBwzADZQr4rthybLufvRr0BdK2LH0h0avG0k8xk8n11xBenH8O
+         gN4j7JtjDNyHWNyptrgT1fHdRzk3mfXVgTEe7KenMCOON1QUSrxvF/CWcTa//uBWAR+f
+         Wdh/FBuVKL8Ovfh4/LR997JcH2eQ40qAnHUjEN14ApDT57+PaTRGlU6l0hvEWWNmsyUj
+         E3nN5WqzGHG5is6tr4gYW1eD3ISVETBTFwIUv+i4PPGwiCm0WuCeWyWbuh4OqGM1sN6L
+         i7AQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740178669; x=1740783469;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+        d=1e100.net; s=20230601; t=1740180884; x=1740785684;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=su5RCnPwYbw2U6fhjLj3rvvSBHFZckaAgbFdJ2/uW6w=;
-        b=uMCA4hNWwzZdNWH/L/9XiVuOmBiyrdwm/XLhTS7Mqpknz2OmOEITJMjg6tTNBXy6ZC
-         oXn0yJy6QW4AanyhirxUU+8rJuUlBjymtQleIV8d+WzYEfktAo0IRDu7do73UCbG52cU
-         +KmhwaJKGy4yLyH1AoT/8zoB+gnv9Bvy8Ep+kjjMetZ3+fum7mS/hSD5Fs2zHr1eGtAR
-         634ec8heL4aBXBTVTBiX3Ju3hjriWMoNkOE0jn72kyii+hFW57LytFAhyPrwZwPCYF2o
-         ByIDc3HkIjxOwk1mtXGmsb3v5UKxh3KZsk6KxCk4T8iY7vC894nAQLysQsjSQHvWfOME
-         T4ow==
-X-Gm-Message-State: AOJu0YzVdzS4B1YXEbCMK8PO/tQrUOoGi5dtGMaga/W7RhRV+MWq8K36
-	V30kWJmM6LhiSN+NdVOMiqaVL3QJSq9oVdR6E9g74W5NgZ2zEde4jlHam/r5I+cpW7HXd7xUBYM
-	GUQ==
-X-Google-Smtp-Source: AGHT+IEKjAky/MNUT16y7h7fZHZUHbWng2wYzvFDZ0uVPO+njMMAMC1cdDN77T85JWvz0yaFk8Gx7jQs0Pk=
-X-Received: from pjbsn3.prod.google.com ([2002:a17:90b:2e83:b0:2ea:5be5:da6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f689:b0:20d:cb6:11e
- with SMTP id d9443c01a7336-2219ff61211mr69550575ad.26.1740178668693; Fri, 21
- Feb 2025 14:57:48 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 21 Feb 2025 14:57:44 -0800
+        bh=PPibVXWvp4DoY9G+kf9mR9h729oRmuO7481VoJ3ZIhk=;
+        b=Qggre/DgkB8khdhOmUZGMR1kfUnvhi4jz1VHBhKAB9q9XQBl7qS5EE/IDDtIpfZaMC
+         ILIpzJG6wUNiAYusT1etzj84Y9m5Ksuidop6ZmRasyP7YwRyg4Wi7xk8D1jo6A7YcaIv
+         H34mghJD6qyDkHvC8Qvd3NoHGlwGRrnLvbajgv5pn9nu4q5NYXP6N62iF6XOZctLDESI
+         KbLx9koBO8Rnk1L7plV+poVh5fIY3v7Z6hH9RPcIOPFpm9vQU1j/O0bFVNGAFi49p/ci
+         jxRSwjvYpp43O+5YdLvcwbqRlj92/95u+KzxLJCAZAMSuWUFFvvvsCwgU8Ok+shtbII4
+         zPFw==
+X-Forwarded-Encrypted: i=1; AJvYcCX/MLEexfVKLE5SHJozZmDAs6x7fop+rNJK13qXSxfptCp/PVEzwib66nI5enLWVsKWvaY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4sczaT0mhDKKmWgK1l20l6l3ohB/ij9kKcE3+T+fIvIJEccc+
+	59uP59iR/ye1wh8YwSa6ACa7LWHWE+xIG5x9tOozxi0i5spSnRln1Zd8Odn9yFvKQY8qZTTnd49
+	14w==
+X-Google-Smtp-Source: AGHT+IHC94y33dtc3E0c8AoQS1InIa0oMPBZcc1PAQaC5SDYjLj76IBWdM8eSy/g+hFozAENWXjtFldes58=
+X-Received: from pjbsv12.prod.google.com ([2002:a17:90b:538c:b0:2e9:38ea:ca0f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f650:b0:216:1543:195d
+ with SMTP id d9443c01a7336-2219ff6301cmr95240685ad.25.1740180883787; Fri, 21
+ Feb 2025 15:34:43 -0800 (PST)
+Date: Fri, 21 Feb 2025 15:34:42 -0800
+In-Reply-To: <20250221225406.2228938-4-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
-Message-ID: <20250221225744.2231975-1-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH] x86: Drop "enabled" field from "struct kvm_vcpu_pv_apf_data"
+References: <20250221225406.2228938-1-seanjc@google.com> <20250221225406.2228938-4-seanjc@google.com>
+Message-ID: <Z7kNkpcMZfbopCMH@google.com>
+Subject: Re: [kvm-unit-tests PATCH 3/3] x86: replace segment selector magic
+ number with macro definition
 From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+To: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	Hang SU <darcy.sh@antgroup.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Remove the now-defunct (and never used in KVM-Unit-Tests) "enabled" field
-from kvm_vcpu_pv_apf_data.  The field was removed from KVM by commit
-ccb2280ec2f9 ("x86/kvm: Use separate percpu variable to track the enabling
-of asyncpf").
+On Fri, Feb 21, 2025, Sean Christopherson wrote:
+> @@ -15,7 +17,7 @@ sipi_entry:
+>  	or $1, %eax
+>  	mov %eax, %cr0
+>  	lgdtl ap_rm_gdt_descr - sipi_entry
+> -	ljmpl $8, $ap_start32
+> +	ljmpl $KERNEL_CS32, $ap_start32
 
-Suggested-by: Xiaoyao Li <xiaoyao.li@intel.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- x86/asyncpf.c | 1 -
- 1 file changed, 1 deletion(-)
+Gah, this is wrong, it should be KERNEL_CS, not KERNEL_CS32.  It was wrong in the
+original posting as well.  Not sure how I missed it the first time around.
 
-diff --git a/x86/asyncpf.c b/x86/asyncpf.c
-index 6474fede..0e6eb6ff 100644
---- a/x86/asyncpf.c
-+++ b/x86/asyncpf.c
-@@ -50,7 +50,6 @@ struct kvm_vcpu_pv_apf_data {
-       uint32_t  token;
- 
-       uint8_t  pad[56];
--      uint32_t  enabled;
- } apf_reason __attribute__((aligned(64)));
- 
- char *buf;
-
-base-commit: f77fb696cfd0e4a5562cdca189be557946bf522f
--- 
-2.48.1.601.g30ceb7b040-goog
-
+I'll fixup when applying.
 
