@@ -1,62 +1,63 @@
-Return-Path: <kvm+bounces-38926-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38927-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43267A404C1
-	for <lists+kvm@lfdr.de>; Sat, 22 Feb 2025 02:41:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BD9FA404C3
+	for <lists+kvm@lfdr.de>; Sat, 22 Feb 2025 02:41:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E4F019E1262
-	for <lists+kvm@lfdr.de>; Sat, 22 Feb 2025 01:41:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6EE217939D
+	for <lists+kvm@lfdr.de>; Sat, 22 Feb 2025 01:41:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 272721DDA1B;
-	Sat, 22 Feb 2025 01:40:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D76D81F7919;
+	Sat, 22 Feb 2025 01:40:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SkwpKLsv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Bn7SRBpZ"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C2C02F37;
-	Sat, 22 Feb 2025 01:40:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 575F21E2847;
+	Sat, 22 Feb 2025 01:40:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740188455; cv=none; b=OELebd0zKj3EISImF6Q4alTyHQkHpvvelo1hpX2AaN8aoqCKtrzYDZcEolKrxERUfeTKgcX/Iq7RsUFFHddusA+c+ZtC4xmg5IURUavbTfD3xjSrIY2i6klEaIHnQnspxTYyoik8r/P2SyT2moXqF+lE3IN54j482JVhrvczAl4=
+	t=1740188458; cv=none; b=CuNSaj9x115N/RJcmYUfHm76ggHOHj6bYn6lBg3JOUzGZ5A5UaJ7CaeQb5VXz6QzyBAXPGF8LwOa+4Y4reEoerG50Ce+lTOekXEZbKny+ojGYN4zjQaHdhs17dZMwOhc0pSo/g1RTiWVZBP68JQNbZeaDeHQOHOp4tP3LuMx/9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740188455; c=relaxed/simple;
-	bh=JGond0o9Enkv6CDaMoiMQ3cTsRIW9uAw4u91ZbAjHPk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WwcgcjUEwZ5ckKuOCSpjl+2wXeonTjLv/hV1zENhoCXW8esJbNSyb6kwj6BgjIRk/yYpPfNHJDTbgGDEqdEG93sEqLhLc9FXi6NeJo3tbf6Fm0wmzbEaH5gXDJ/+KHU3uJu5hprQXyDsyIUwj0xXE0na/4SWzgf0u5S9GCYhIVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SkwpKLsv; arc=none smtp.client-ip=192.198.163.17
+	s=arc-20240116; t=1740188458; c=relaxed/simple;
+	bh=cMGVQk/B4sh5x7ZgVUEmqPIMM1GzcauaGKpabgrjf9Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=P4BKXrkz/g9E63ccx9d4Ivhf1VlWwwtRNMXp6FzaI9rvBl6gdmPriECkukE0pQ8qRlm9j5sQufuU9wL0ZmUm4dgea/tA5L3xLQAS+ByNRBEMD5Ru9tYAoe7XK5kDw1OCxUzov0+qhNF7yXPYZes87S4o3ZqkAiexdTb8nWt0UUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Bn7SRBpZ; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740188453; x=1771724453;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=JGond0o9Enkv6CDaMoiMQ3cTsRIW9uAw4u91ZbAjHPk=;
-  b=SkwpKLsv+ebICaTQbVeLq5xQ2PfYDV6q+h9JDhsMICRhFJJq09TaDIMs
-   oYWu9ZfL0dw4+oFV8kCaZBmFFY1Y50AeQfDmML/e7V4pA0Q1A5QvgiBNF
-   neqOKkNNA3t8tH6yD0DOQ+dGsxdERxyWVZV4Jbb3xftbSp+ls7xowQ8br
-   pkAW5731/YdBsJNzuVJzS1U8s8PqKkxssejw872zHG9rAJYfi4Yz9SEyS
-   hIavy2hqSGVZMvbKzB7+dP7pNGvbxykcC3UmAQ8ZAtfskO+6Iu9JSZl7c
-   C+Wv3ZjnmHd0Q1kKIOguaD06nfnmHdNj7TUGH2eVsMAgIniFlmab9KdmF
-   g==;
-X-CSE-ConnectionGUID: AckHM4QFTGGkKhIJXn6SrQ==
-X-CSE-MsgGUID: 7hez98s8RxuGjFbuE2n7yg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11352"; a="40893243"
+  t=1740188456; x=1771724456;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=cMGVQk/B4sh5x7ZgVUEmqPIMM1GzcauaGKpabgrjf9Q=;
+  b=Bn7SRBpZH6tqFycPY1DJzCIGBcvd+amjmG3FB1MH0eZ8mT+PP7O4EPOO
+   JmBu3DFHFZtCVQKPqzPR+Ulz8cjEl7OvDHhshy7sGroQeZZ1Kz9Bd+eco
+   orZhvYwRHWfTN48XpK3WSX8lGFwlDE6TN6OAXig0tLlDxVJ7xwAmEeC0S
+   b4r0b30mBAWUPfXH3aL+AhYuwSRKdmTG91q3UaRqCz/o9HGsF3pVnCXQr
+   xHVPlJucZ4MNX/73rdTdes84uKOoHSdPvGXF/06Vh7HaT89GurlJ/+0Xq
+   mXany81cX1X6CLQDlx29ojeSvntm1usvprEwof9sgNWUOLKxWgNNu/2Fv
+   w==;
+X-CSE-ConnectionGUID: 2o//q4wLQuuzUYOeyKziJA==
+X-CSE-MsgGUID: vHIDQ8IbRFi6E3I78XgvsQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11352"; a="40893250"
 X-IronPort-AV: E=Sophos;i="6.13,306,1732608000"; 
-   d="scan'208";a="40893243"
+   d="scan'208";a="40893250"
 Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 17:40:52 -0800
-X-CSE-ConnectionGUID: oOUYLlOZTHONte3vcfiIuw==
-X-CSE-MsgGUID: dWstVZfRRaCqcnRfuaBISg==
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 17:40:56 -0800
+X-CSE-ConnectionGUID: Pktr7dBZQg6sorfNrTgZrA==
+X-CSE-MsgGUID: PknHIJhURECoi7jVnMx5eQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,306,1732608000"; 
-   d="scan'208";a="146370220"
+   d="scan'208";a="146370229"
 Received: from litbin-desktop.sh.intel.com ([10.239.156.93])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 17:40:49 -0800
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 17:40:53 -0800
 From: Binbin Wu <binbin.wu@linux.intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com,
@@ -72,10 +73,12 @@ Cc: rick.p.edgecombe@intel.com,
 	chao.gao@intel.com,
 	linux-kernel@vger.kernel.org,
 	binbin.wu@linux.intel.com
-Subject: [PATCH v3 0/9] KVM: TDX: TDX hypercalls may exit to userspace
-Date: Sat, 22 Feb 2025 09:42:16 +0800
-Message-ID: <20250222014225.897298-1-binbin.wu@linux.intel.com>
+Subject: [PATCH v3 1/9] KVM: x86: Have ____kvm_emulate_hypercall() read the GPRs
+Date: Sat, 22 Feb 2025 09:42:17 +0800
+Message-ID: <20250222014225.897298-2-binbin.wu@linux.intel.com>
 X-Mailer: git-send-email 2.46.0
+In-Reply-To: <20250222014225.897298-1-binbin.wu@linux.intel.com>
+References: <20250222014225.897298-1-binbin.wu@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,144 +87,107 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi,
+Have ____kvm_emulate_hypercall() read the GPRs instead of passing them
+in via the macro.
 
-When executing in the TD, TDX can exit to the host VMM (KVM) for many
-reasons. These reasons are analogous to the exit reasons for VMX. Some of
-the exits will be handled within KVM in later changes. This series handles
-just the TDX exits that may be passed to userspace to handle, which are all
-via the TDCALL exit code. Although, these userspace exits have the same TDX
-exit code, they result in several different types of exits to userspace.
+When emulating KVM hypercalls via TDVMCALL, TDX will marshall registers of
+TDVMCALL ABI into KVM's x86 registers to match the definition of KVM
+hypercall ABI _before_ ____kvm_emulate_hypercall() gets called.  Therefore,
+____kvm_emulate_hypercall() can just read registers internally based on KVM
+hypercall ABI, and those registers can be removed from the
+__kvm_emulate_hypercall() macro.
 
-This patch set is one of several patch sets that are all needed to provide
-the ability to run a functioning TD VM.  We think this is in pretty good
-shape at this point and ready for handoff to Paolo.
+Also, op_64_bit can be determined inside ____kvm_emulate_hypercall(),
+remove it from the __kvm_emulate_hypercall() macro as well.
 
+No functional change intended.
 
-Base of this series
-===================
-This series is based on kvm-coco-queue up to the end of "TD vcpu
-enter/exit". Stack is:
- - '3bd69dc8a4a9 ("KVM: x86: Add a switch_db_regs flag to handle TDX's
-   auto-switched behavior")'.
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
+Reviewed-by: Kai Huang <kai.huang@intel.com>
+---
+Hypercalls exit to userspace v3:
+- Add RB from Kai.
+---
+ arch/x86/kvm/x86.c | 15 ++++++++-------
+ arch/x86/kvm/x86.h | 26 +++++++++-----------------
+ 2 files changed, 17 insertions(+), 24 deletions(-)
 
-
-Notable changes since v2 [1]
-============================
-Add a patch to move pv_unhaulted check out of kvm_vcpu_has_events().
-
-Use kvm_vcpu_has_events() for checking pending interrupts when handling
-TDG.VP.VMCALL<MapGPA>.
-
-Only morph the limited TDCALL leafs, which are instruction-execution
-sub-functions defined in TDX Guest-Host Communication Interface (GHCI)
-specification [2] and implemented in KVM, to other VMX exit reasons.
-
-Dump all 16 general-purpose registers to userspace when handling
-TDG.VP.VMCALL<ReportFatalError>.
-
-
-TDX hypercalls
-==============
-The TDX module specification defines TDG.VP.VMCALL API (TDVMCALL) for the
-guest TDs to make hypercall to VMM.  When a guest TD issues a TDVMCALL, it
-exits to VMM with a new exit reason.  The arguments from the guest TD and
-return values from the VMM are passed through the guest registers.  The
-ABI details for the guest TD hypercalls are specified in the TDX GHCI
-specification.
-
-There are two types of hypercalls defined in the GHCI specification:
-- Standard TDVMCALLs: When input of R10 from guest TD is set to 0, it
-  indicates that the TDVMCALL sub-function used in R11 is defined in GHCI
-  specification.
-- Vendor-Specific TDVMCALLs: When input of R10 from guest TD is non-zero,
-  it indicates a vendor-specific TDVMCALL. For KVM hypercalls from guest
-  TDs, KVM uses R10 as KVM hypercall number and R11-R14 as 4 arguments,
-  with the error code returned in R10.
-
-KVM hypercalls
---------------
-This series supports KVM hypercalls from guest TDs following the 
-vendor-specific interface described above.  The KVM_HC_MAP_GPA_RANGE
-hypercall will need to exit to userspace for handling.
-
-Standard TDVMCALLs exiting to userspace
----------------------------------------
-To support basic functionality of TDX,  this series includes the following
-standard TDVMCALL sub-functions, which reuse exist exit reasons when they
-need to exit to userspace for handling:
-- TDG.VP.VMCALL<MapGPA> reuses exit reason KVM_EXIT_HYPERCALL with the
-  hypercall number KVM_HC_MAP_GPA_RANGE.
-- TDG.VP.VMCALL<ReportFatalError> reuses exit reason KVM_EXIT_SYSTEM_EVENT
-  with a new event type KVM_SYSTEM_EVENT_TDX_FATAL.
-- TDG.VP.VMCALL<Instruction.IO> reuses exit reason KVM_EXIT_IO.
-- TDG.VP.VMCALL<#VE.RequestMMIO> reuses exit reason KVM_EXIT_MMIO.
-
-Support for TD attestation is currently excluded from the TDX basic
-enabling, so handling for TDG.VP.VMCALL<SetupEventNotifyInterrupt> and
-TDG.VP.VMCALL<GetQuote> is not included in this patch series.
-
-
-Repos
-=====
-Due to "KVM: VMX: Move common fields of struct" in "TDX vcpu enter/exit" v2
-[3], subsequent patches require changes to use new struct vcpu_vt, refer to
-the full KVM branch below.
-
-It requires TDX module 1.5.06.00.0744 [4], or later as mentioned in [3].
-A working edk2 commit is 95d8a1c ("UnitTestFrameworkPkg: Use TianoCore
-mirror of subhook submodule").
-
-The full KVM branch is here:
-https://github.com/intel/tdx/tree/tdx_kvm_dev-2025-02-21
-
-A matching QEMU is here:
-https://github.com/intel-staging/qemu-tdx/tree/tdx-qemu-wip-2025-02-18
-
-
-Testing 
-=======
-It has been tested as part of the development branch for the TDX base
-series. The testing consisted of TDX kvm-unit-tests and booting a Linux
-TD, and TDX enhanced KVM selftests.
-
-[1] https://lore.kernel.org/kvm/20250211025442.3071607-1-binbin.wu@linux.intel.com
-[2] https://cdrdv2.intel.com/v1/dl/getContent/726792
-[3] https://lore.kernel.org/kvm/20250129095902.16391-1-adrian.hunter@intel.com
-[4] https://github.com/intel/tdx-module/releases/tag/TDX_1.5.06
-
-Binbin Wu (4):
-  KVM: x86: Have ____kvm_emulate_hypercall() read the GPRs
-  KVM: x86: Move pv_unhaulted check out of kvm_vcpu_has_events()
-  KVM: TDX: Handle TDG.VP.VMCALL<MapGPA>
-  KVM: TDX: Handle TDG.VP.VMCALL<ReportFatalError>
-
-Isaku Yamahata (4):
-  KVM: TDX: Add a place holder to handle TDX VM exit
-  KVM: TDX: Add a place holder for handler of TDX hypercalls
-    (TDG.VP.VMCALL)
-  KVM: TDX: Handle KVM hypercall with TDG.VP.VMCALL
-  KVM: TDX: Handle TDX PV port I/O hypercall
-
-Sean Christopherson (1):
-  KVM: TDX: Handle TDX PV MMIO hypercall
-
- Documentation/virt/kvm/api.rst    |   9 +-
- arch/x86/include/asm/shared/tdx.h |   1 +
- arch/x86/include/asm/tdx.h        |   1 +
- arch/x86/include/uapi/asm/vmx.h   |   4 +-
- arch/x86/kvm/vmx/main.c           |  38 ++-
- arch/x86/kvm/vmx/tdx.c            | 524 +++++++++++++++++++++++++++++-
- arch/x86/kvm/vmx/tdx.h            |   5 +
- arch/x86/kvm/vmx/tdx_errno.h      |   3 +
- arch/x86/kvm/vmx/x86_ops.h        |   8 +
- arch/x86/kvm/x86.c                |  27 +-
- arch/x86/kvm/x86.h                |  26 +-
- include/linux/kvm_host.h          |   1 +
- include/uapi/linux/kvm.h          |   1 +
- virt/kvm/kvm_main.c               |   1 +
- 14 files changed, 611 insertions(+), 38 deletions(-)
-
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 0bf1727d9f72..62dded70932d 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10022,13 +10022,16 @@ static int complete_hypercall_exit(struct kvm_vcpu *vcpu)
+ 	return kvm_skip_emulated_instruction(vcpu);
+ }
+ 
+-int ____kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+-			      unsigned long a0, unsigned long a1,
+-			      unsigned long a2, unsigned long a3,
+-			      int op_64_bit, int cpl,
++int ____kvm_emulate_hypercall(struct kvm_vcpu *vcpu, int cpl,
+ 			      int (*complete_hypercall)(struct kvm_vcpu *))
+ {
+ 	unsigned long ret;
++	unsigned long nr = kvm_rax_read(vcpu);
++	unsigned long a0 = kvm_rbx_read(vcpu);
++	unsigned long a1 = kvm_rcx_read(vcpu);
++	unsigned long a2 = kvm_rdx_read(vcpu);
++	unsigned long a3 = kvm_rsi_read(vcpu);
++	int op_64_bit = is_64_bit_hypercall(vcpu);
+ 
+ 	++vcpu->stat.hypercalls;
+ 
+@@ -10131,9 +10134,7 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+ 	if (kvm_hv_hypercall_enabled(vcpu))
+ 		return kvm_hv_hypercall(vcpu);
+ 
+-	return __kvm_emulate_hypercall(vcpu, rax, rbx, rcx, rdx, rsi,
+-				       is_64_bit_hypercall(vcpu),
+-				       kvm_x86_call(get_cpl)(vcpu),
++	return __kvm_emulate_hypercall(vcpu, kvm_x86_call(get_cpl)(vcpu),
+ 				       complete_hypercall_exit);
+ }
+ EXPORT_SYMBOL_GPL(kvm_emulate_hypercall);
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 91e50a513100..8b27f70c6321 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -621,25 +621,17 @@ static inline bool user_exit_on_hypercall(struct kvm *kvm, unsigned long hc_nr)
+ 	return kvm->arch.hypercall_exit_enabled & BIT(hc_nr);
+ }
+ 
+-int ____kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+-			      unsigned long a0, unsigned long a1,
+-			      unsigned long a2, unsigned long a3,
+-			      int op_64_bit, int cpl,
++int ____kvm_emulate_hypercall(struct kvm_vcpu *vcpu, int cpl,
+ 			      int (*complete_hypercall)(struct kvm_vcpu *));
+ 
+-#define __kvm_emulate_hypercall(_vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl, complete_hypercall)	\
+-({												\
+-	int __ret;										\
+-												\
+-	__ret = ____kvm_emulate_hypercall(_vcpu,						\
+-					  kvm_##nr##_read(_vcpu), kvm_##a0##_read(_vcpu),	\
+-					  kvm_##a1##_read(_vcpu), kvm_##a2##_read(_vcpu),	\
+-					  kvm_##a3##_read(_vcpu), op_64_bit, cpl,		\
+-					  complete_hypercall);					\
+-												\
+-	if (__ret > 0)										\
+-		__ret = complete_hypercall(_vcpu);						\
+-	__ret;											\
++#define __kvm_emulate_hypercall(_vcpu, cpl, complete_hypercall)			\
++({										\
++	int __ret;								\
++	__ret = ____kvm_emulate_hypercall(_vcpu, cpl, complete_hypercall);	\
++										\
++	if (__ret > 0)								\
++		__ret = complete_hypercall(_vcpu);				\
++	__ret;									\
+ })
+ 
+ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu);
 -- 
 2.46.0
 
