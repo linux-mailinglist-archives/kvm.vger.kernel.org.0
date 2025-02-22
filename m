@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-38953-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38954-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C11EA404FE
-	for <lists+kvm@lfdr.de>; Sat, 22 Feb 2025 02:52:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B184A404FD
+	for <lists+kvm@lfdr.de>; Sat, 22 Feb 2025 02:51:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00EC919E3762
-	for <lists+kvm@lfdr.de>; Sat, 22 Feb 2025 01:51:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B5D617D8CF
+	for <lists+kvm@lfdr.de>; Sat, 22 Feb 2025 01:51:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD86A207653;
-	Sat, 22 Feb 2025 01:47:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB811207A03;
+	Sat, 22 Feb 2025 01:47:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g2cQMhCr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cHplnZpb"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64773206F38;
-	Sat, 22 Feb 2025 01:47:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9500E20766A;
+	Sat, 22 Feb 2025 01:47:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740188835; cv=none; b=LcT/mQRC01auRXGFb8KHyigH16IoGYti8C0Bysfr6BSvFlPfD5GZXeQgOOVU2K/qvDNvxmkxz+T6QY5RyhHHPQNpH4WunojuICaMcUEF/fUrEfQhOxRu9KN++pA2Wl5nJWKNpTU3uhNsCz9hYYs6RnyEPM1bNwjlgi9Sw1ma3u4=
+	t=1740188838; cv=none; b=QuLuHIKyvFErmRsFA51J8D7ijq7me4VhgbXTG+rYABIcWPqu9+g/Qq552QZX82yjrF5nIH/9uj246oEqmAKhnoUfujE6SBkPgpzt8Ui/PEv007M3UGIoRCRGpaiBJR3vrGXkW+KP6KluIZVqByzb9KcFMDMTa7nKCYhkOMGVMGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740188835; c=relaxed/simple;
-	bh=EkBgGxrkvF0Lmifejs8w0hReg99N3w5FozZhXN+nFzg=;
+	s=arc-20240116; t=1740188838; c=relaxed/simple;
+	bh=J2sIVb+E0KESOFxsXNIk/sv4uLCGBRMwRyAKo+HWNqo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dECrcQDtlrwbKad8BRlbMvj/Mm1eeD17ev1JdW1CMfdsgm2+tiY+AcOSXYUq7dlpUTpsIohgkY56TOeMDzh5biWDfgydnM+MPhWhKqQO40LqNWJrlmHRZ4BUWOwRM5MCVLNm2FyhnCPddUnZGG+u+VBzZ8GYiaVo/4QmbO0SkJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g2cQMhCr; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=AdPMsyHUpOSRKLZ6Liv0yy29B6J5VQm2wTG8J7Qt1L+32KWfXRN5yGEeG+KTIP41NCqm5lFugUHnXA90ezGHiPiuf3Wpmz2xRK6ZHengz0mxnuBnPNCNIAvr97L6dkX/jBJfsEvtRC7kK8EBe9LCKhMBBTgiqRZjIY7kPoxV2pk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cHplnZpb; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740188833; x=1771724833;
+  t=1740188837; x=1771724837;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=EkBgGxrkvF0Lmifejs8w0hReg99N3w5FozZhXN+nFzg=;
-  b=g2cQMhCrYBdjCll1SPALuetvQ+Q4n99Da5SDOaOhgPd7ShxDzKsiEI2f
-   5KRFJf0pA8/e3zOiZpWmyjsokKrzMcrqODHVbu5daCYAd/i6i2pw54ZXl
-   6ivn/1WfmcbqpQSvqPp8oGEl0Bw32efZbdu71y8xlR07yCwP09dAA3DUg
-   R62N5k1rVPPtkzhzDIzW6hkZbRP38sq8vk9CosW6Tf6JWwrXGfq6aArWv
-   k3YY8NmuvoHnLL/aAbwJarUdMsH5XXJuqwnr+eoO5T6R6ztsDtctVYlgV
-   dA/HEJ6GczSV3sp9zECzRFXfhUp9AogNUixvl838RluAaMYBBWBLkI74l
-   A==;
-X-CSE-ConnectionGUID: ktLasY+ZQZ2yXb1q0FBRoQ==
-X-CSE-MsgGUID: xvVTVtD5SJutI/oHTAn/xw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="52449076"
+  bh=J2sIVb+E0KESOFxsXNIk/sv4uLCGBRMwRyAKo+HWNqo=;
+  b=cHplnZpb6FOZQmDw6b0iGtcg7qjjBLaFygWCYOh3pJNHzS6902lbmT8/
+   7b0+t2MnnSlSz1yeEdBzi5ldECZabFfZldcqVIblV5SfDVhOSmX/Uwy14
+   eLm481gyt3GxdtCFgI2rciffBC59zGRxn2jrqytiPx3/qmzF5mHHmcd8K
+   +EAqgT704DVPI16GhCBoTnkdz/r9e+THqy375CU2UIq3g1daxPvtYYZIM
+   uyTjATDxhYlEftQvVYQ6nFck4nGslLT7fqPbWbBQ+3bxN3lqt66BvNKNm
+   fdsedUhEirXw+7DTc9W/i34s7hFiUcu4X1aSB80vQRNPAR5pobcGmqJBU
+   w==;
+X-CSE-ConnectionGUID: fe6iK7X2T8i1QYVjbMomtg==
+X-CSE-MsgGUID: KsCZSZBQTCKZHPXUPyrUBg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="52449079"
 X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="52449076"
+   d="scan'208";a="52449079"
 Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 17:47:13 -0800
-X-CSE-ConnectionGUID: KAQr/NnMTmy3Rl0XmAD6QA==
-X-CSE-MsgGUID: Mj4FDzpoRhOpPkP04D2tJQ==
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 17:47:16 -0800
+X-CSE-ConnectionGUID: RGnKI1A0SIKwNi07XZ22uQ==
+X-CSE-MsgGUID: vyikwM8nSL2IS5vjzSzT0A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,306,1732608000"; 
-   d="scan'208";a="120621742"
+   d="scan'208";a="120621747"
 Received: from litbin-desktop.sh.intel.com ([10.239.156.93])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 17:47:09 -0800
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 17:47:13 -0800
 From: Binbin Wu <binbin.wu@linux.intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com,
@@ -73,9 +73,9 @@ Cc: rick.p.edgecombe@intel.com,
 	chao.gao@intel.com,
 	linux-kernel@vger.kernel.org,
 	binbin.wu@linux.intel.com
-Subject: [PATCH v3 15/16] KVM: TDX: Handle EXCEPTION_NMI and EXTERNAL_INTERRUPT
-Date: Sat, 22 Feb 2025 09:47:56 +0800
-Message-ID: <20250222014757.897978-16-binbin.wu@linux.intel.com>
+Subject: [PATCH v3 16/16] KVM: TDX: Handle EXIT_REASON_OTHER_SMI
+Date: Sat, 22 Feb 2025 09:47:57 +0800
+Message-ID: <20250222014757.897978-17-binbin.wu@linux.intel.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20250222014757.897978-1-binbin.wu@linux.intel.com>
 References: <20250222014757.897978-1-binbin.wu@linux.intel.com>
@@ -89,33 +89,36 @@ Content-Transfer-Encoding: 8bit
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Handle EXCEPTION_NMI and EXTERNAL_INTERRUPT exits for TDX.
+Handle VM exit caused by "other SMI" for TDX, by returning back to
+userspace for Machine Check System Management Interrupt (MSMI) case or
+ignoring it and resume vCPU for non-MSMI case.
 
-NMI Handling: Just like the VMX case, NMI remains blocked after exiting
-from TDX guest for NMI-induced exits [*].  Handle NMI-induced exits for
-TDX guests in the same way as they are handled for VMX guests, i.e.,
-handle NMI in tdx_vcpu_enter_exit() by calling the vmx_handle_nmi()
-helper.
+For VMX, SMM transition can happen in both VMX non-root mode and VMX
+root mode.  Unlike VMX, in SEAM root mode (TDX module), all interrupts
+are blocked. If an SMI occurs in SEAM non-root mode (TD guest), the SMI
+causes VM exit to TDX module, then SEAMRET to KVM. Once it exits to KVM,
+SMI is delivered and handled by kernel handler right away.
 
-Interrupt and Exception Handling: Similar to the VMX case, external
-interrupts and exceptions (machine check is the only exception type
-KVM handles for TDX guests) are handled in the .handle_exit_irqoff()
-callback.
+An SMI can be "I/O SMI" or "other SMI".  For TDX, there will be no I/O SMI
+because I/O instructions inside TDX guest trigger #VE and TDX guest needs
+to use TDVMCALL to request VMM to do I/O emulation.
 
-For other exceptions, because TDX guest state is protected, exceptions in
-TDX guests can't be intercepted.  TDX VMM isn't supposed to handle these
-exceptions.  If unexpected exception occurs, exit to userspace with
-KVM_EXIT_EXCEPTION.
-
-For external interrupt, increase the statistics, same as the VMX case.
-
-[*]: Some old TDX modules have a bug which makes NMI unblocked after
-exiting from TDX guest for NMI-induced exits.  This could potentially
-lead to nested NMIs: a new NMI arrives when KVM is manually calling the
-host NMI handler.  This is an architectural violation, but it doesn't
-have real harm until FRED is enabled together with TDX (for non-FRED,
-the host NMI handler can handle nested NMIs).  Given this is rare to
-happen and has no real harm, ignore this for the initial TDX support.
+For "other SMI", there are two cases:
+- MSMI case.  When BIOS eMCA MCE-SMI morphing is enabled, the #MC occurs in
+  TDX guest will be delivered as an MSMI.  It causes an
+  EXIT_REASON_OTHER_SMI VM exit with MSMI (bit 0) set in the exit
+  qualification.  On VM exit, TDX module checks whether the "other SMI" is
+  caused by an MSMI or not.  If so, TDX module marks TD as fatal,
+  preventing further TD entries, and then completes the TD exit flow to KVM
+  with the TDH.VP.ENTER outputs indicating TDX_NON_RECOVERABLE_TD.  After
+  TD exit, the MSMI is delivered and eventually handled by the kernel
+  machine check handler (7911f145de5f x86/mce: Implement recovery for
+  errors in TDX/SEAM non-root mode), i.e., the memory page is marked as
+  poisoned and it won't be freed to the free list when the TDX guest is
+  terminated.  Since the TDX guest is dead, follow other non-recoverable
+  cases, exit to userspace.
+- For non-MSMI case, KVM doesn't need to do anything, just continue TDX
+  vCPU execution.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Co-developed-by: Binbin Wu <binbin.wu@linux.intel.com>
@@ -123,101 +126,67 @@ Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
 TDX interrupts v3:
-- Drop kvm_pr_unimpl() usage in tdx_handle_exception_nmi() (Sean)
+ - No change.
 
 TDX interrupts v2:
-- Drop tdx_handle_exit_irqoff(), make vmx_handle_exit_irqoff()  the common
-  handle_exit_irqoff() callback for both VMX/TDX.
-- Open code tdx_handle_external_interrupt(). (Sean)
-- Use helper vmx_handle_nmi() to handle NMI for TDX.
-- Update the changelog to reflect the latest TDX NMI arch update.
+ - No change.
 
 TDX interrupts v1:
-- Renamed from "KVM: TDX: handle EXCEPTION_NMI and EXTERNAL_INTERRUPT"
-  to "KVM: TDX: Handle EXCEPTION_NMI and EXTERNAL_INTERRUPT".
-- Update changelog.
-- Rename tdx_handle_exception() to tdx_handle_exception_nmi() to reflect
-  that NMI is also checked. (Binbin)
-- Add comments in tdx_handle_exception_nmi() about why NMI and machine
-  checks are ignored. (Chao)
-- Exit to userspace with KVM_EXIT_EXCEPTION when unexpected exception
-  occurs instead of returning -EFAULT. (Chao, Isaku)
-- Switch to vp_enter_ret.
-- Move the handling of NMI, exception and external interrupt from
-  "KVM: TDX: Add a place holder to handle TDX VM exit" to this patch.
-- Use helper __vmx_handle_nmi() to handle NMI, which including the
-  support for FRED.
+ - Squashed "KVM: TDX: Handle EXIT_REASON_OTHER_SMI" and
+   "KVM: TDX: Handle EXIT_REASON_OTHER_SMI with MSMI". (Chao)
+ - Rewrite the changelog.
+ - Remove the explicit call of kvm_machine_check() because the MSMI can
+   be handled by host #MC handler.
+ - Update comments according to the code change.
 ---
- arch/x86/kvm/vmx/tdx.c | 26 ++++++++++++++++++++++++++
- arch/x86/kvm/vmx/vmx.c |  4 +---
- 2 files changed, 27 insertions(+), 3 deletions(-)
+ arch/x86/include/uapi/asm/vmx.h |  1 +
+ arch/x86/kvm/vmx/tdx.c          | 21 +++++++++++++++++++++
+ 2 files changed, 22 insertions(+)
 
+diff --git a/arch/x86/include/uapi/asm/vmx.h b/arch/x86/include/uapi/asm/vmx.h
+index 6a9f268a2d2c..f0f4a4cf84a7 100644
+--- a/arch/x86/include/uapi/asm/vmx.h
++++ b/arch/x86/include/uapi/asm/vmx.h
+@@ -34,6 +34,7 @@
+ #define EXIT_REASON_TRIPLE_FAULT        2
+ #define EXIT_REASON_INIT_SIGNAL			3
+ #define EXIT_REASON_SIPI_SIGNAL         4
++#define EXIT_REASON_OTHER_SMI           6
+ 
+ #define EXIT_REASON_INTERRUPT_WINDOW    7
+ #define EXIT_REASON_NMI_WINDOW          8
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 532c2557ca0d..2eed02dec17b 100644
+index 2eed02dec17b..ea5b26872e68 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -898,6 +898,8 @@ static noinstr void tdx_vcpu_enter_exit(struct kvm_vcpu *vcpu)
- 	tdx->exit_gpa = tdx->vp_enter_args.r8;
- 	vt->exit_intr_info = tdx->vp_enter_args.r9;
- 
-+	vmx_handle_nmi(vcpu);
-+
- 	guest_state_exit_irqoff();
- }
- 
-@@ -1017,6 +1019,25 @@ void tdx_inject_nmi(struct kvm_vcpu *vcpu)
- 	vcpu->arch.nmi_pending = 0;
- }
- 
-+static int tdx_handle_exception_nmi(struct kvm_vcpu *vcpu)
-+{
-+	u32 intr_info = vmx_get_intr_info(vcpu);
-+
-+	/*
-+	 * Machine checks are handled by handle_exception_irqoff(), or by
-+	 * tdx_handle_exit() with TDX_NON_RECOVERABLE set if a #MC occurs on
-+	 * VM-Entry.  NMIs are handled by tdx_vcpu_enter_exit().
-+	 */
-+	if (is_nmi(intr_info) || is_machine_check(intr_info))
+@@ -1747,6 +1747,27 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
+ 		return tdx_emulate_io(vcpu);
+ 	case EXIT_REASON_EPT_MISCONFIG:
+ 		return tdx_emulate_mmio(vcpu);
++	case EXIT_REASON_OTHER_SMI:
++		/*
++		 * Unlike VMX, SMI in SEAM non-root mode (i.e. when
++		 * TD guest vCPU is running) will cause VM exit to TDX module,
++		 * then SEAMRET to KVM.  Once it exits to KVM, SMI is delivered
++		 * and handled by kernel handler right away.
++		 *
++		 * The Other SMI exit can also be caused by the SEAM non-root
++		 * machine check delivered via Machine Check System Management
++		 * Interrupt (MSMI), but it has already been handled by the
++		 * kernel machine check handler, i.e., the memory page has been
++		 * marked as poisoned and it won't be freed to the free list
++		 * when the TDX guest is terminated (the TDX module marks the
++		 * guest as dead and prevent it from further running when
++		 * machine check happens in SEAM non-root).
++		 *
++		 * - A MSMI will not reach here, it's handled as non_recoverable
++		 *   case above.
++		 * - If it's not an MSMI, no need to do anything here.
++		 */
 +		return 1;
-+
-+	vcpu->run->exit_reason = KVM_EXIT_EXCEPTION;
-+	vcpu->run->ex.exception = intr_info & INTR_INFO_VECTOR_MASK;
-+	vcpu->run->ex.error_code = 0;
-+
-+	return 0;
-+}
-+
- static int complete_hypercall_exit(struct kvm_vcpu *vcpu)
- {
- 	tdvmcall_set_return_code(vcpu, vcpu->run->hypercall.ret);
-@@ -1713,6 +1734,11 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
- 		vcpu->run->exit_reason = KVM_EXIT_SHUTDOWN;
- 		vcpu->mmio_needed = 0;
- 		return 0;
-+	case EXIT_REASON_EXCEPTION_NMI:
-+		return tdx_handle_exception_nmi(vcpu);
-+	case EXIT_REASON_EXTERNAL_INTERRUPT:
-+		++vcpu->stat.irq_exits;
-+		return 1;
- 	case EXIT_REASON_TDCALL:
- 		return handle_tdvmcall(vcpu);
- 	case EXIT_REASON_VMCALL:
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 8152560f519a..3d95bc80099a 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6965,9 +6965,7 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu,
- 
- void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
- {
--	struct vcpu_vmx *vmx = to_vmx(vcpu);
--
--	if (vmx->vt.emulation_required)
-+	if (to_vt(vcpu)->emulation_required)
- 		return;
- 
- 	if (vmx_get_exit_reason(vcpu).basic == EXIT_REASON_EXTERNAL_INTERRUPT)
+ 	default:
+ 		break;
+ 	}
 -- 
 2.46.0
 
