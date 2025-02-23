@@ -1,96 +1,146 @@
-Return-Path: <kvm+bounces-38968-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38969-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D119A40D02
-	for <lists+kvm@lfdr.de>; Sun, 23 Feb 2025 07:42:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70751A41248
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 00:40:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 652E3189CB9D
-	for <lists+kvm@lfdr.de>; Sun, 23 Feb 2025 06:42:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 270EF7A7AC0
+	for <lists+kvm@lfdr.de>; Sun, 23 Feb 2025 23:39:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BC891DB122;
-	Sun, 23 Feb 2025 06:42:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5F50204F8B;
+	Sun, 23 Feb 2025 23:39:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VYA6fXFK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jb5yWmsM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA43FDDDC
-	for <kvm@vger.kernel.org>; Sun, 23 Feb 2025 06:42:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C25317588
+	for <kvm@vger.kernel.org>; Sun, 23 Feb 2025 23:39:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740292929; cv=none; b=sPpY5GlojRuCzU1+Iq7VXP0sSQbZMpBruVlSA8Qooy/SWfUX2plc4+EuaG1NhP2j9xnlh90SQykhTy8LvtA/faJKKgworHCGzh6DIphKtAqXl0y5++m3r4c69FW0cZXLgz7ol8GYbzpHCFpVHKJwoxxLereo0H/QBjloODuVYq8=
+	t=1740353995; cv=none; b=KfRT6/kQxn1xF42z4FLwNnc189zVaJM9ZTnOzqAoBdXjHJCFgjjKSrUOH08YNDHhWdMORlrkLioCw6vREx1aBQRde4NT1hRbm6ozHTuXSkS16ozZWD9J20aRrwZ7OuQkmgrJvthatVokiRXo7SiVv4XjLyzdQOLbn1OfCYzb4OY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740292929; c=relaxed/simple;
-	bh=evK1eCc0v1ctO0+60eOEHU54/BssEl2+DAaOaGXXyYs=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=sskRaQQ04kFCyJ4YKwGOmyUsbQp5ICG3xC6gQ71/rv4phdI74d1/CRMeo7KrUgishWmmhq556DisdJnBnNfzu5UtYT60jUqZKEXxw0ZEc3TVpbm/LWm7fReycsTXcvjSdOvi99GOos4p88G0ZV/TIq/Dc8GdXaYDblXtNFhiOmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VYA6fXFK; arc=none smtp.client-ip=209.85.219.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-e5dab3f372aso3034013276.1
-        for <kvm@vger.kernel.org>; Sat, 22 Feb 2025 22:42:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740292926; x=1740897726; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=evK1eCc0v1ctO0+60eOEHU54/BssEl2+DAaOaGXXyYs=;
-        b=VYA6fXFKRestOymYfXDvNKE3ogvzBhZqSwxM/sBhCA/jXCCCxAY2388qx+t4R3T7Bl
-         zFwt3eGQG5fTDis3MhsHUP4w9bZQUFuV2BH2x7QkegEp0Ae1ZBg4ksf7Prt246PdcAA8
-         AKcaU1pTPDXG1SzNjkBaBvN8MQkvRkQe1dITO9Z7qVCN4gHWHfwWUU22lfFakY5byjDG
-         B/PlqIS19Q0BDGml5C1+uBrCU/Op0sGDRfUB3fXWS31a1ilQUyvBgH1xYqp1ZZ9B92qp
-         13qnG7nRhwUongasBB7baxD+Ff6P5P9FIeN28M6fhzo86RvbkbsURWDJIcoZuT2apfU2
-         7b3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740292926; x=1740897726;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=evK1eCc0v1ctO0+60eOEHU54/BssEl2+DAaOaGXXyYs=;
-        b=DXhXMlXujMRjBYLQLcxGWQmI7hbwBxAR4eFhnJScNTGQg6iQP0cn8bkNJTCs/VBR6O
-         yMjbwxhiLv8VDa10wj4M2YIX/59D2UXZ9yBd3gwMRu+siPiedd2rsKZip0F+3197qnGH
-         NEB5+ZbEoDBu3KsVHhrSZYnNHg7r2mQhoKVh66eznmM0BkSw2GKS7kfdksN7uo+728xo
-         DXA9m7FtgPR6seseChQbjvRDuUjrTijtbNHCJsX6yhARiBEtoSzWj6P4ja74pLFNFTc7
-         9Rb9j5uzmbZPSmblb+AL/jOpwbN13toyjJVQibKt2cErzUoZf1ibYzJ6MKZ0S5vVMtp4
-         H2zw==
-X-Gm-Message-State: AOJu0YyJxOKQTSTFLDfW9QoDjamR+di1USgMLmNSb5tr7AODxfWq8dJK
-	xCKmx8RNl2DUD31LTHVVcqEkpl90txO0weYCcfFNe26+j69a0J1AR1qcAFOemwaIEPJCmfIFGX3
-	FHO2iDrU6llhiRbkW7TfagQEBa9oTyPHGNT0=
-X-Gm-Gg: ASbGncuLzJFgXLxOSk+bZTjJc9VpCii6hqLmPX1CqosxqsSC2PeCJgN01SKga/pDaZe
-	1lSQBJkcBm0dkqm/NGEzZUqNOzd2lsemEeSSOGIS9HhcYNHpYtL7NIhyl8p6ua+T8cAFZIDurQV
-	CAjm+Ucm8EU46yywqZhrHypUqfS/zMDB0vTPmBnP40
-X-Google-Smtp-Source: AGHT+IHdky3zTVeaQD0nyGXWWNuxh77R3cG8bVkq+0qJezGBzkIGYGd2biMKdI57BK05HXT9jGnzSZq3ZEzjsCvPxMs=
-X-Received: by 2002:a05:6902:220a:b0:e5b:32f5:e38c with SMTP id
- 3f1490d57ef6-e5e1918edffmr10521389276.8.1740292926550; Sat, 22 Feb 2025
- 22:42:06 -0800 (PST)
+	s=arc-20240116; t=1740353995; c=relaxed/simple;
+	bh=hzCL0wIUvmBcBhuuc3gsWODoNAycfhMCTUXDCPb41Wo=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=e7QpAJiIfb7znBACmhTqn75SFpNzswQe37UixDfCLFQtSmnlTSsAIDuSuO64ql9PJwttlksev6GwMToYoC3mzUKJc2QX39dvzeKSGR0hcRlA3JVwwkvUARqCXkuT4H+nKLZC5O9wZsgUlE2UrlMTQMmliP3fnTbignabr1fMQKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jb5yWmsM; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740353992; x=1771889992;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=hzCL0wIUvmBcBhuuc3gsWODoNAycfhMCTUXDCPb41Wo=;
+  b=jb5yWmsMPdn8iYWxbLzaafI1N3HhfpCHimxexdlKBHKOK0cpSfUvq6xb
+   EfGWGGQDX3MoVxSWdqlZWpwiry0YKhGmSeNiCuT8HEuyUi1UXdYERbOIp
+   JR8/AAK54fSykYuwLPdfzrllqCIZ+qN0NqBP+9TvsjMA9dhgCkN4E87s1
+   UjsKTBl5p+hOoAlEC5jvOBvNYHeRQmPU3xb0AGlWoVSsQdG0edRI1TLtv
+   KwVzm38h+FhS26EbMtWDMP7u+vgL742JMpooaK4oDoC1M7lFzBjB0O8wM
+   t2grjMhzCCD9Y8Atw5BE7O2DMl6lnQ/rpb0TFZjM1VZNG1KWwX3hVZa5r
+   A==;
+X-CSE-ConnectionGUID: +PcUy3WESkO6PNSgliEzsw==
+X-CSE-MsgGUID: aKqRhXy3ToW1743Ta+fD/A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11354"; a="58517710"
+X-IronPort-AV: E=Sophos;i="6.13,309,1732608000"; 
+   d="scan'208";a="58517710"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2025 15:39:51 -0800
+X-CSE-ConnectionGUID: BPnuqFCAQseOTp6NxUr3xQ==
+X-CSE-MsgGUID: CpAuFQekSleKlr7kNt142A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,309,1732608000"; 
+   d="scan'208";a="115876309"
+Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
+  by orviesa006.jf.intel.com with ESMTP; 23 Feb 2025 15:39:49 -0800
+Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tmLZb-0007fV-0j;
+	Sun, 23 Feb 2025 23:39:47 +0000
+Date: Mon, 24 Feb 2025 07:39:35 +0800
+From: kernel test robot <lkp@intel.com>
+To: Zhiming Hu <zhiming.hu@intel.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	kvm@vger.kernel.org, Farrah Chen <farrah.chen@intel.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Isaku Yamahata <isaku.yamahata@intel.com>
+Subject: [kvm:kvm-coco-queue 30/121] arch/x86/include/asm/tdx.h:183:12:
+ error: unused function 'tdx_get_nr_guest_keyids'
+Message-ID: <202502240742.C79LoViU-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: kinshuk <kinshukkataria4@gmail.com>
-Date: Sun, 23 Feb 2025 06:41:55 +0000
-X-Gm-Features: AWEUYZlBC4mPhGmg2yAwWmBjBtMMuY4eonK7LQedQcLTPNZOhaJlZ0yvAF2K1T4
-Message-ID: <CAODyg8K+L0wNPwCqU=Me6WGAD7K5ufzaD1y7mOb8Tbr7sN967A@mail.gmail.com>
-Subject: [RFC]: Zeroing out mem immediately when the vm closes
-To: kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-I have been reading kvm related code and what I found was that pages
-don't zero out immediately when the vm closes but rather marks it as
-free for other processes to use and override.
+tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git kvm-coco-queue
+head:   ff2046f9bcd0883c72158404a1466eb96781ccca
+commit: 5c017bb4d89f65807c56d652443b53e7765b8b35 [30/121] KVM: TDX: Register TDX host key IDs to cgroup misc controller
+config: x86_64-randconfig-004-20250224 (https://download.01.org/0day-ci/archive/20250224/202502240742.C79LoViU-lkp@intel.com/config)
+compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250224/202502240742.C79LoViU-lkp@intel.com/reproduce)
 
-While that is great, memory can be zeroed out by utilizing the free
-threads unallocated by the vm and using memset upon vm exit and
-depending on how much mem is in need to be zeroed out it can takes
-milliseconds to a few seconds which mainly comes with a memory
-bandwidth cost which isn't a huge deal unless the machine is doing
-memory intensive tasks which can be solved by adding a flag to disable
-automatic zeroing mem?
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202502240742.C79LoViU-lkp@intel.com/
 
-And using something like intel tdx might not be viable since they are
-mainly for datacenter cpus and most likely not available in consumer
-cpus
+All errors (new ones prefixed by >>):
+
+   In file included from <built-in>:4:
+   In file included from drivers/gpu/drm/xe/compat-i915-headers/i915_utils.h:6:
+   In file included from drivers/gpu/drm/xe/compat-i915-headers/../../i915/i915_utils.h:37:
+   In file included from arch/x86/include/asm/hypervisor.h:37:
+   In file included from arch/x86/include/asm/kvm_para.h:10:
+>> arch/x86/include/asm/tdx.h:183:12: error: unused function 'tdx_get_nr_guest_keyids' [-Werror,-Wunused-function]
+     183 | static u32 tdx_get_nr_guest_keyids(void) { return 0; }
+         |            ^~~~~~~~~~~~~~~~~~~~~~~
+   1 error generated.
+
+Kconfig warnings: (for reference only)
+   WARNING: unmet direct dependencies detected for FB_IOMEM_HELPERS
+   Depends on [n]: HAS_IOMEM [=y] && FB_CORE [=n]
+   Selected by [m]:
+   - DRM_XE_DISPLAY [=y] && HAS_IOMEM [=y] && DRM [=m] && DRM_XE [=m] && DRM_XE [=m]=m [=m] && HAS_IOPORT [=y]
+
+
+vim +/tdx_get_nr_guest_keyids +183 arch/x86/include/asm/tdx.h
+
+   162	
+   163	u64 tdh_mng_addcx(struct tdx_td *td, struct page *tdcs_page);
+   164	u64 tdh_vp_addcx(struct tdx_vp *vp, struct page *tdcx_page);
+   165	u64 tdh_mng_key_config(struct tdx_td *td);
+   166	u64 tdh_mng_create(struct tdx_td *td, u16 hkid);
+   167	u64 tdh_vp_create(struct tdx_td *td, struct tdx_vp *vp);
+   168	u64 tdh_mng_rd(struct tdx_td *td, u64 field, u64 *data);
+   169	u64 tdh_vp_flush(struct tdx_vp *vp);
+   170	u64 tdh_mng_vpflushdone(struct tdx_td *td);
+   171	u64 tdh_mng_key_freeid(struct tdx_td *td);
+   172	u64 tdh_mng_init(struct tdx_td *td, u64 td_params, u64 *extended_err);
+   173	u64 tdh_vp_init(struct tdx_vp *vp, u64 initial_rcx, u32 x2apicid);
+   174	u64 tdh_vp_rd(struct tdx_vp *vp, u64 field, u64 *data);
+   175	u64 tdh_vp_wr(struct tdx_vp *vp, u64 field, u64 data, u64 mask);
+   176	u64 tdh_phymem_page_reclaim(struct page *page, u64 *tdx_pt, u64 *tdx_owner, u64 *tdx_size);
+   177	u64 tdh_phymem_cache_wb(bool resume);
+   178	u64 tdh_phymem_page_wbinvd_tdr(struct tdx_td *td);
+   179	#else
+   180	static inline void tdx_init(void) { }
+   181	static inline int tdx_cpu_enable(void) { return -ENODEV; }
+   182	static inline int tdx_enable(void)  { return -ENODEV; }
+ > 183	static u32 tdx_get_nr_guest_keyids(void) { return 0; }
+   184	static inline const char *tdx_dump_mce_info(struct mce *m) { return NULL; }
+   185	static inline const struct tdx_sys_info *tdx_get_sysinfo(void) { return NULL; }
+   186	#endif	/* CONFIG_INTEL_TDX_HOST */
+   187	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
