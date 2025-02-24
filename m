@@ -1,115 +1,144 @@
-Return-Path: <kvm+bounces-39001-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39002-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB45AA42663
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 16:36:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7165A4273D
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 17:04:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FB453B19DF
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 15:28:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF5E03B8B53
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 15:57:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3595823BCE6;
-	Mon, 24 Feb 2025 15:28:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1CD0261378;
+	Mon, 24 Feb 2025 15:57:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qY8ILijp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DE07uZ97"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0944B23371B
-	for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 15:28:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B00C019C54F
+	for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 15:57:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740410907; cv=none; b=VDv/2fgU4gNcxgE1B1oZeE4TaCtPImiF/LgfGuvTvMTfmIvtEV/rid/ijSbl3+wnDvePZ8vTfRowxvO3edNLLJD3vGIkVwZy6HUk2JRrUPoN16ilg9f3jPeGja8ELPutw9wJ1g7xLe5CDpjx4oQy/5MoL+y30o7/JfD1ZJ7PNno=
+	t=1740412670; cv=none; b=Msp28InjyhVx9a2QC6aTzw0D1F18muNO50l9DRHrot4rDTxsKdA54GN/a+MQPK9nNwe0zOsAHt8AktuBZScAALP32a1DAhu7WqzguXiFbd5GBb5GLfSzDH1/i9qWhSyvUdZ9zqfeyPRo1ng3ak4xxc3eeSmSpv1sjyaXLw4r/Do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740410907; c=relaxed/simple;
-	bh=9/LiUsNGXiMWWBMnJccgIJTiYuSBlmo0m5F5ia7qwlA=;
+	s=arc-20240116; t=1740412670; c=relaxed/simple;
+	bh=2t59lsYG4BqwtnauANqi9S05hHamW9pvVdmQnLPMB5Y=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WhiDmhOujX3e5ZRLjBzl2E4aRDDRyTgonONG5ydJpD5El+4YGYrVJMb6MdnumaX0WwKMUOfvsDiPn9BIG3NqH8dUpeS+9C00q4owl6HuiQPBwa1G2uIZuN57KImbvJ5od3SOVQv5Pz9sFZqFJ9IS7G+TDzymoEtorBUS7ajd6QU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qY8ILijp; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=MDDEAjprL0iOtZzpP/HIY99uvKAkiFEy/Ce3ZWZDetSiocpQeRVurNJuDqG1s4yhoCSjFYG2eiT79mWkyFh7uM2xBiTA8iqqysaVkb/ryEe1/JNRwMM/uZ6/msDDJfOZsifz5JyS97ClyjvF/Rh8QI3AINPKEGSvpo8A6P9e3YU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DE07uZ97; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fc0bc05bb5so9446026a91.2
-        for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 07:28:25 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-220e62c4f27so109546585ad.0
+        for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 07:57:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740410905; x=1741015705; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BZ9WRhhDp4EpcPuZC6wdG80ENu6Nv4RwOVFsbFBTA9c=;
-        b=qY8ILijppFMksIjnstrvQmTCnOgzMvXClhGMuexGxwBpEVz+2oZQTy+QIG6gnO+Iry
-         Sr4nCwPMSJnwClqKGEndUFr86QQMOV0Qj6XlCAOIfpwD0ZDy9YKlL2TTtBFvClG9oNaG
-         OM+fqM8aS+Iijmgf+nzg3BOx54uo899RQ5JajkH/qD21roA5Liv5d4er2sKWGAT2HgW4
-         QdJvsoY/QlHF0xmY469+alGL9KBo7wc2cCsZ2LY/DXqD06xhH/m/QnWvwiWLl9tGQxyQ
-         Pl2qYFSsYyrLwxH+J4e6I6/uLPKpvZULAYqnhugzn0YoHkifOu+e9CsFnl/EhK+QNQR3
-         c9hA==
+        d=google.com; s=20230601; t=1740412667; x=1741017467; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ql4hG9y/ji9r+lB2NHuF+yH9db63u51S51cV8RgKCFE=;
+        b=DE07uZ97SuDwFBiE6d6ieELH7EE7tkAGbtQcdsA5/fgNCHpljX/n7PprNLq9HmdZEV
+         9lKewl967RJwkFOtYu2LPTlz2kxEPbKwlokH6qAguYmk7DVk0WlzRHO/E5Vf43YZxQpz
+         9obzG/cDXlr1u84xcEVi3REMX9bRQPC5lAnfIbLRcnVw95xgENHKETMKpzETCnxpIREJ
+         ccGFHCNPic6xdlbEXrKcVuEbGdmVVss2KkL3aKRQ1hSiNZ9hL1E6ZGe7dCCw7YcIeZ5G
+         Uy1H1a7R2T6W5ZyZKOmCHE4RvS1rpWjviENtY4Hc9xC+Hqyt+HtC0jmd1H6dawlOhh4f
+         hW8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740410905; x=1741015705;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BZ9WRhhDp4EpcPuZC6wdG80ENu6Nv4RwOVFsbFBTA9c=;
-        b=oQCmqt2isgvf0dCxvewYyqUMXKFiyETWmlTOtAkaSq7kVK1twjfZu+znxExb/UtTHu
-         3sAjBZ5DmFyJbF0ttXAQ6jH02bi6tKmgq94Z2oKBmorTY1QfGwzdTG2B+U12K1OQhSkB
-         j2bRGXuohrXc8tlooSOpSb7sullbAMb8maFhyGEXZ66KBoLGv8G0Oy+13swI7cfQ+NgC
-         veuDkc7Gh6ZnAT4CDCyk9osdTLvBbGRFIjtHldNmY8ZyKN9tOSBgi16T2jVC1COS2oYk
-         iY2OoEb/xo+fVPKsrd9OpCk86DedEFnz/fnD1514UQx7a1PiioN3u/qyyJtsAOFhiR0r
-         uiFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX6duJrDoMCmsoqM92Du5qXrtGKts9yaudqS/WcyS6f5ksYdXQIUocbgd+PL9f0BxVou4w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyw3xtodrHelacCukOFvBTizN+BMVaD6/gAY+KCkhMxgUCt6jmq
-	HuEUACtPlue7q0tFaWZS2u7vg+cQb5mEYN+/4JfDe4qvhfjielU+kvHWO3JZ09P/g5lb9A6884r
-	8Ug==
-X-Google-Smtp-Source: AGHT+IEcNlTzfDmVspxLgOlDSsK8M9jOUb8JLbfZBhzhCGil5fTbECy927wxDJUWNzfYdgpZIatsSwLs8K0=
-X-Received: from pjl4.prod.google.com ([2002:a17:90b:2f84:b0:2e5:5ffc:1c36])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:ec8d:b0:2ee:f677:aa14
- with SMTP id 98e67ed59e1d1-2fce78b05b0mr22786916a91.13.1740410905241; Mon, 24
- Feb 2025 07:28:25 -0800 (PST)
-Date: Mon, 24 Feb 2025 07:28:23 -0800
-In-Reply-To: <20250224112601.6504-1-ravi.bangoria@amd.com>
+        d=1e100.net; s=20230601; t=1740412667; x=1741017467;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ql4hG9y/ji9r+lB2NHuF+yH9db63u51S51cV8RgKCFE=;
+        b=bIKrZB0ZzKsVrzFTpySbSMNmbrAtSN5ZQfz0TcGp8ZI9W1fdPw/1PnVIsxTtnNJJ3+
+         KAvrEG09skO3en32Tb506uftLJbO09fOkc5sRtGNQsjQjTAeBzQVbZjSy40AFs7MnGbH
+         FNjj/XRjPjKo0Gza8XNaKOBVV36FqJnTosx8oKIBmKXCmptIvGmrgjqz4mWXg36tTMqw
+         mka8ZbpAOZq2eSFxbGK65a0LuZP8c8O1w1SWBtGI9RXsSAl8j2iLezoavaeBQsLd1tf6
+         nzQDtgKM9tvtTJZqNDnaHKL3srMstm1mGEVSgVpzuMxBRF5MtgOzuPA7uzTQr/eP7tGa
+         4Ziw==
+X-Forwarded-Encrypted: i=1; AJvYcCXSRkNTulk2+HyW7vafjZJT2C2ApKADsR+7EJUn6i/4RVta118SjNGF32jcSoYL+KAKBG0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyclLjPs346Znoi9+OhqN4PFL9/dQFbRhSy8scZiMAzhcFyo4WY
+	AiXR6HUXv7wnllIjOf/JeWKuN2sEx4LLc+0R63sE1vtfUjEUPesJ6D5vNmvsk7BZU7Y1J95CImO
+	Bcw==
+X-Google-Smtp-Source: AGHT+IFkxCGkRNpNw+UlQYXfNBv6PhblpOoOHAO6bny9WcoQpJVMrpTux0exDkoFpvccE+QSh69xIrDiPgM=
+X-Received: from pfbhx1.prod.google.com ([2002:a05:6a00:8981:b0:732:5b2e:4735])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:4f88:b0:730:a40f:e6ce
+ with SMTP id d2e1a72fcca58-73426d85439mr18693077b3a.17.1740412666826; Mon, 24
+ Feb 2025 07:57:46 -0800 (PST)
+Date: Mon, 24 Feb 2025 07:57:45 -0800
+In-Reply-To: <20250221071624.1356899-1-suhui@nfschina.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250224112601.6504-1-ravi.bangoria@amd.com>
-Message-ID: <Z7yQFz3niLKXIdOQ@google.com>
-Subject: Re: [kvm-unit-tests RFC] x86: Fix "debug" test on AMD uArch
+References: <20250221071624.1356899-1-suhui@nfschina.com>
+Message-ID: <Z7yW-aNXV1sK6eQN@google.com>
+Subject: Re: [PATCH] include/linux/log2.h: mark is_power_of_2() with __always_inline
 From: Sean Christopherson <seanjc@google.com>
-To: Ravi Bangoria <ravi.bangoria@amd.com>
-Cc: pbonzini@redhat.com, nikunj.dadhania@amd.com, manali.shukla@amd.com, 
-	dapeng1.mi@intel.com, srikanth.aithal@amd.com, kvm@vger.kernel.org, 
-	santosh.shukla@amd.com
-Content-Type: text/plain; charset="us-ascii"
+To: Su Hui <suhui@nfschina.com>, Andrew Morton <akpm@linux-foundation.org>
+Cc: binbin.wu@linux.intel.com, pbonzini@redhat.com, 
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 24, 2025, Ravi Bangoria wrote:
-> As per the AMD APM[1], DR6[BusLockDetect] bit is unmodified for any source
-> of #DB exception other than Bus Lock (and AMD HW is working correctly as
-> per the spec).
-> 
-> KUT debug test initializes DR6[BusLockDetect] with 0 before executing each
-> test and thus the bit remains 0 at the #DB exception for sources other
-> than Bus Lock. Since DR6[BusLockDetect] bit has opposite polarity, as in,
-> value 0 indicates the condition, KUT tests are interpreting it as #DB due
-> to Bus Lock and thus they are failing.
-> 
-> Fix this by initializing DR6 with a valid default value before running the
-> test.
++Andrew
 
-The test is weird, but as-is it's correct.  The APM does a poor job of stating
-the exact behavior, but DR6[11] should never go to '0' if BusLockTrap is disabled,
-even if software explicitly writes '0'.  Any other behavior would break backwards
-compatibility with existing software (as evidenced by the test failing).
+On Fri, Feb 21, 2025, Su Hui wrote:
+> When build kernel with randconfig, there is an error:
+>=20
+> In function =E2=80=98kvm_is_cr4_bit_set=E2=80=99,inlined from
+> =E2=80=98kvm_update_cpuid_runtime=E2=80=99 at arch/x86/kvm/cpuid.c:310:9:
+>=20
+> include/linux/compiler_types.h:542:38: error: call to
+> =E2=80=98__compiletime_assert_380=E2=80=99 declared with attribute error:
+> BUILD_BUG_ON failed: !is_power_of_2(cr4_bit).
 
-Editing to omit irrelevant snippets: 
+Andrew, do you want to grab this?  Looks like you've taken the last few cha=
+nges
+to log2.h, and KVM isn't the only subsystem that expects is_power_of_2() to=
+ yield
+a compile-time constant; taking this through the KVM tree feels wrong.
 
-  Software enables bus lock trap by setting DebugCtl MSR[BLCKDB] (bit 2) to 1
-  When bus lock trap is enabled, ... The processor indicates that this #DB was
-  caused by a bus lock by clearing DR6[BLD] (bit 11). DR6[11] previously had
-  been defined to be always 1.
-  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  arch/x86/kvm/kvm_cache_regs.h:	BUILD_BUG_ON(!is_power_of_2(cr0_bit));
+  arch/x86/kvm/kvm_cache_regs.h:	BUILD_BUG_ON(!is_power_of_2(cr4_bit));
+  arch/x86/kvm/x86.c:	BUILD_BUG_ON(!is_power_of_2(ASYNC_PF_PER_VCPU));
+  drivers/net/ipa/gsi.c:	BUILD_BUG_ON(!is_power_of_2(GSI_RING_ELEMENT_SIZE)=
+);
+  drivers/vfio/pci/virtio/legacy_io.c:	BUILD_BUG_ON(!is_power_of_2(virtvdev=
+->bar0_virtual_buf_size));
+  kernel/kcov.c:		BUILD_BUG_ON(!is_power_of_2(KCOV_WORDS_PER_CMP));
+  mm/sparse.c:	BUILD_BUG_ON(!is_power_of_2(sizeof(struct mem_section)));
+  mm/swap_cgroup.c:	BUILD_BUG_ON(!is_power_of_2(ID_PER_SC));
 
-The test fails because the host leaves DebugCtl.BLCKDB, a.k.a. BusLockDetect,
-enabled.  With my to-be-posted change to manually clear DebugCtl prior to VMRUN,
-the test passes.
+> '!is_power_of_2(X86_CR4_OSXSAVE)' is False, but gcc treats is_power_of_2(=
+)
+> as non-inline function and a compilation error happens. Fix this by marki=
+ng
+> is_power_of_2() with __always_inline.
+>=20
+> Signed-off-by: Su Hui <suhui@nfschina.com>
+> ---
+>  include/linux/log2.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/include/linux/log2.h b/include/linux/log2.h
+> index 9f30d087a128..1366cb688a6d 100644
+> --- a/include/linux/log2.h
+> +++ b/include/linux/log2.h
+> @@ -41,7 +41,7 @@ int __ilog2_u64(u64 n)
+>   * *not* considered a power of two.
+>   * Return: true if @n is a power of 2, otherwise false.
+>   */
+> -static inline __attribute__((const))
+> +static __always_inline __attribute__((const))
+>  bool is_power_of_2(unsigned long n)
+>  {
+>  	return (n !=3D 0 && ((n & (n - 1)) =3D=3D 0));
+> --=20
+> 2.30.2
+>=20
 
