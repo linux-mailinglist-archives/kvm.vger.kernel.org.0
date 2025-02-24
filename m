@@ -1,235 +1,267 @@
-Return-Path: <kvm+bounces-39068-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39069-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADB55A4316F
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 00:57:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33454A43173
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 01:00:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A34C173186
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 23:57:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F02DF16DFCD
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 23:58:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75F1B212F8F;
-	Mon, 24 Feb 2025 23:56:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CD4620D51E;
+	Mon, 24 Feb 2025 23:56:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CIBugYDJ"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ktk59DSF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2052.outbound.protection.outlook.com [40.107.94.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09EB7211A06
-	for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 23:55:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740441359; cv=none; b=r8bfFPf6mYgJoJ01FrsjFyq+KaJlMoLVkXkjYbLLd4ACWZKFSWA/VwwYIpav6nCY+cWmN7kA0K8ne1Anf6yVxaXlyyHfmFCb6k9jhbk4peJZfetP5NtOOWg764SgjJqznRlomlamPYSC36Q4fEDHhREBMqXcwUNsrhldz3K6YC0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740441359; c=relaxed/simple;
-	bh=FzPHzxKck26ULHcvqQmiQmgEbS2iBAXavvGHTfk/ScE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=in8VclL3GQTfnxRxSTFegn0VMT0fov+iPD57D7k2PD+SUnQQT8/RfR0OzdK3+ld4M/FkH7yqKa/3Z1BL/SgVmAa7B3qaHeW+R+QXjKJ8umMIBE8lKslqgi0Kq2Z9GkSxkitokokmtaYpOSHx5015+kDHLtkTAzBlTmxckXJErcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CIBugYDJ; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fc404aaed5so16606712a91.3
-        for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 15:55:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740441357; x=1741046157; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=N18ZDDRfnjFxKJiD7qnA09wciuUkX/DOLJoxqyHk2n8=;
-        b=CIBugYDJZGG3BGtMpDZXa3jBhg8fECWqoXxuXKtRkt3oLu6TfpFnQ1l4EEgAf85m/6
-         LT+8P1yc+xQJFIVNGhqzTkJMvT3MTCWNsMdl5MaljUHDooFsaslO+S5GEpNuvFXfEk1N
-         18K9dqTfTtavZesV4pMcbfzaFKPLttNi0wA6sWg3ECE2Ki+NjPfL5DFqg5gET5uOZnMI
-         c/0Fkcc4G2VnbAddft/Jw01/bAc/N+zO0ktpSWhlqI/wWVAwvP2lNzqZfgm8NwpMn51E
-         7vj6hOYXb3q0fEwGlQZHMrevKh3xnt2LoWqZOvvm2rsWSbfCoO6Evk7M0z2aTNXYvcCi
-         +stQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740441357; x=1741046157;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=N18ZDDRfnjFxKJiD7qnA09wciuUkX/DOLJoxqyHk2n8=;
-        b=urb8J4sxUvoi4h9sMjEtykJVYVEXHEfV27u2daPPc31lysihvocIx7nRaXPTpTGLQr
-         6HVC/FX8mxc9+3QFtn08kDJkSaitfSuQ+sJiyMu+yGcBb2VD5GFU3dHpijAf5qCfbIYT
-         epvLcaTwKA8DQ5peChZHawbHjHBxqpTPxoak+N2ANrHGCrvRhC1v8q53UbvyRfGVTWpT
-         JcduN6+b5RHi4DOgp6DvBW1xz3TntIGGA3GIMiM6ohQajUeSlhcv3t0pyJSkUxq5XGwH
-         3Q7iGsCQ8RYKrmjPMtONxn76p1W4zSDMd7fbbIBxqBwjfxhJll1xvNy0/19YC306Uvws
-         Vdkg==
-X-Forwarded-Encrypted: i=1; AJvYcCWXBzyGIgrv6oqWRiidfbbdSSToA9eRcQ6xjnGNEWflWksmyn39W5RXbczh3GIdic74QYk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFWTkSRKd1srRNk/bzf77H/afndFStyEIdzmT/kn/uvuzzwGkL
-	GmNletskPd9FJaHozWssARjNs87fRu3R7l+NEMJKp1kBLrPKnbmpAULFw/GwCK/u2i2vxxW1+rJ
-	TKg==
-X-Google-Smtp-Source: AGHT+IFBRvTh2AoRMsZzInrrN+gn6icsuEOKduQCozj1AYhvRpYSpNqeaxExZSkYlXTQzmgl2LLloh+gErw=
-X-Received: from pjbpb10.prod.google.com ([2002:a17:90b:3c0a:b0:2fc:11a0:c54d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4ec6:b0:2ee:70cb:a500
- with SMTP id 98e67ed59e1d1-2fce77a00c5mr23270511a91.1.1740441357604; Mon, 24
- Feb 2025 15:55:57 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Mon, 24 Feb 2025 15:55:42 -0800
-In-Reply-To: <20250224235542.2562848-1-seanjc@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0157520D4E6;
+	Mon, 24 Feb 2025 23:56:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740441370; cv=fail; b=Q5MBMrKuJd3wmTVm2eQn0wRtiG8nPDI/GwbLFv1tb7D6CTPDGssnnbAzOMt4bRwKIAPsk2f7bzd3AYfsbN/4IFYa0gbwsNIUrVm08vZfAp6mSpP6dkJ69iBfRhcfm/JG7P4Picg/TcoR4bcVjQFFJAGPUbajSWlxvaWUEesJXnQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740441370; c=relaxed/simple;
+	bh=fWTN6Ec5O7+nlzK1Zm7b6HOeUp0JxDkSzNyH3e8WJFk=;
+	h=Message-ID:Date:To:Cc:References:From:Subject:In-Reply-To:
+	 Content-Type:MIME-Version; b=DRt9dXY6iFxzVsQr9OqbuuLk4hMj4EzgP1zqTsXPLRnKbNsWjqc1Nji1OFVsfYye3t9T+uEoMZhw6tWfohtPDzg8Gnt1q5uLtUq6AzBU1LWiAIq8lbfZ1lQEQlV/bhJYKhS/eKJFiBICi4grNTl8SFb/dhcuLJbfXCFCnc3OrJk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ktk59DSF; arc=fail smtp.client-ip=40.107.94.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=rAoegMyRVBL52UldAe9vLABp+hC/TGaRqTOhXEDs1/srv4Sy9+LZYLNx9kbLIRfM4EXWO8g7YlOy1jOMw4NOrcCwrtlrN8W5yauSl/fZYFFfy2IYuaZZJDeix46BRLhy8xr5QKvRNh2R2seu/x6UXsBfOVeLRPbZRhNQYbCsB0C5SpOXLY34IuESmw2fPh9lIUxY7lLuPFFMFYXybR+iVUFh9kZGsx2a3NUs7sHAi08ckkoc6TFInBvPUx1yh/sm7ZK6bFkcTQl1QQY9unVrv4pvLLShKZki8aQJQCQwfos1A2Mslf6IyDO3ugRwLrYULDyAF5nob50nk7V6crL98Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=74mnIWHIdWOe62LIKzKT/jYh82TsJH5NhAsdxK6r+mc=;
+ b=oXvBYHNS8ye6gTfgm2I+4Utv9WqAvV6l2wTleH9W5xpFq3e0lLVZWvNLun8P/8bdvNPSIZnXd0MYjE9zcUI66mIU/6M4No/iHrlq9ULV3czdNOypr82qRVLmbiOxT8RuRZw6DrhHlT1VWcyzZ505OkbYKqOg3LnrS0DSRHoTT1xLqHfGG6/R3xVpjQS8oimdsfF9RsMoTVUZ7RpMvZjgf5vviNNzEZyETuxsYn4y8pUw1f9pwOX6SGGnegqrwJJiuy9YUAABSWNe3sAFTeiEDpS9JX/HpP4mzcrUMitsChTKrWTYol6EcnihYFP3UVsAc8ZFAdLyYyfBXdO1ikPxgw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=74mnIWHIdWOe62LIKzKT/jYh82TsJH5NhAsdxK6r+mc=;
+ b=ktk59DSFna9AV+bokDnEbK8QpOis7qf3LYs8M2fWaGkrcQsHsibGy9N0y534qFQfU70iN9QB3XAWE1sYIAOGBcXSWpDtdyzUKnKxoW7+1CtN4RETDQ1iFgd80jtj6RX2NS6stW5V+06jW5oYdNg7Mi3LSWhnQ/9IJIrTCfIAeSY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
+ by SA1PR12MB6896.namprd12.prod.outlook.com (2603:10b6:806:24f::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.21; Mon, 24 Feb
+ 2025 23:55:58 +0000
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e%7]) with mapi id 15.20.8466.020; Mon, 24 Feb 2025
+ 23:55:58 +0000
+Message-ID: <f9050ee1-3f82-7ae0-68b0-eccae6059fde@amd.com>
+Date: Mon, 24 Feb 2025 17:55:57 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Content-Language: en-US
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Naveen N Rao <naveen@kernel.org>,
+ Kim Phillips <kim.phillips@amd.com>, Alexey Kardashevskiy <aik@amd.com>
+References: <20250219012705.1495231-1-seanjc@google.com>
+ <20250219012705.1495231-4-seanjc@google.com>
+ <4e762d94-97d4-2822-4935-2f5ab409ab29@amd.com> <Z7z43JVe2C4a7ElJ@google.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH 03/10] KVM: SVM: Terminate the VM if a SEV-ES+ guest is
+ run with an invalid VMSA
+In-Reply-To: <Z7z43JVe2C4a7ElJ@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN6PR16CA0050.namprd16.prod.outlook.com
+ (2603:10b6:805:ca::27) To DM4PR12MB5070.namprd12.prod.outlook.com
+ (2603:10b6:5:389::22)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250224235542.2562848-1-seanjc@google.com>
-X-Mailer: git-send-email 2.48.1.658.g4767266eb4-goog
-Message-ID: <20250224235542.2562848-8-seanjc@google.com>
-Subject: [PATCH 7/7] KVM: Drop kvm_arch_sync_events() now that all
- implementations are nops
-From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Sean Christopherson <seanjc@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Aaron Lewis <aaronlewis@google.com>, Jim Mattson <jmattson@google.com>, 
-	Yan Zhao <yan.y.zhao@intel.com>, Rick P Edgecombe <rick.p.edgecombe@intel.com>, 
-	Kai Huang <kai.huang@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|SA1PR12MB6896:EE_
+X-MS-Office365-Filtering-Correlation-Id: d14570d3-27e7-4b82-5509-08dd552ec908
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?VXhmbXZlNE5Xd0k0NWxXaEJPVkdkMVBpZ213cVZHTUNSdUJxNG9ua0tjZU55?=
+ =?utf-8?B?YjN6OHp5eXQwNGRtRWRFVEpMN0tEcVExNE5YclNWMlhDT0IrWlgvUTlzZVBq?=
+ =?utf-8?B?M0JPdmdJd1IyYy9UNW44bEFZVmFkQUpmNndiUHNJQmN2OGdxZmU4OVZsa1Rp?=
+ =?utf-8?B?NE9mbTBMZFBBSU0xNE1mVWE0WmpIdXN4OEVYVkE1NGVPRXB5NFFDVG9lSUJ3?=
+ =?utf-8?B?MnZTQnVWclQ1MlVlTkhQTjgxYno5cmhxRWtCT3crakhFZzU5SmpZaUdkdkw5?=
+ =?utf-8?B?djRTZ013V2VGaWZLU3hJMWpuNXZJdjBpUG1uSmlMejZTazFUSjlPeUdsTmQw?=
+ =?utf-8?B?NHNGM2NQVGt1TStoYTdMWjh3T093Mk1XcUlZdEdKQndmTFQzTTRKaUV1S082?=
+ =?utf-8?B?OHNhclhiRFRmS3RheVp4OExVYXgwbkRwRDR1Y21DNUsyMDRvQ1lkKzBSMmJl?=
+ =?utf-8?B?bW9CLzFlTEpZS0k0Unk1ZUVXaHpnbUVuOXNSTDdmdEZOakJvbFJzazJpcjAv?=
+ =?utf-8?B?TVNOWGNja0UwZVc1R2paT2RhVDl0VHNLNUJVV1ZaMGxzMEh6b2xTZ25STVIz?=
+ =?utf-8?B?bE1KYXZEbVdVT1FiUHdmWkhreTVrMVF5K0Jkbmh0Q3lhTnNIdXByemwyY3do?=
+ =?utf-8?B?TTJ1Z2JFSW1ydHNPaUpXanhOR2tkd3FFeW1ibWlSSGQ0S216bTNFQ0VlUlpG?=
+ =?utf-8?B?ZlBDRlFFWTRnY2ZLMnJudkN1RHF2SW5qSXk1dXJxM1I0bm9CSEY4NkF6UlZV?=
+ =?utf-8?B?VENpV0F6bWlOeG9KalNncDd0VlBjUDlOTGNTWDBtUFZCdkJaQ3k0bDE1NGVo?=
+ =?utf-8?B?eGdlR1NOSHRibjVEa2owREVuWXRxY0t1NFJGV1FJS0t6bVZncXhIM3A5Z3BN?=
+ =?utf-8?B?UmRMUmx6QjFaZ1ZQVmhwY0xyNDBJZnh2cmRKN2Z6SUVkUmVNVWpvVnp0dDQ1?=
+ =?utf-8?B?elBzSlNaSGRzbHNFdmNaL2VHdVo1U1BtTnMyOUhDUTdiQU83OXkzSzVXM09t?=
+ =?utf-8?B?ak9WVGlyMU1PVmtDWkJ1Q1VORUJMOGtZVHZzYUoxcTdWcENuYU55b2FtWTV2?=
+ =?utf-8?B?Z0xGWGxUSk56RGdRYXJnc1ZTQXN3dFVDZFFnRThGZnBqQzNhaC9wZ1Y4SS94?=
+ =?utf-8?B?THRMSmIvZE1sb0dyeWdSeDhjREVKOEpnTG80ZUlWSVN3SW10cFVjc0FtZXpm?=
+ =?utf-8?B?QU5MV0Q5MlpsVTMxNXNyeTBWQUpRMm5pSEExWGxlZjdFajA1UXpHWE9hL1hZ?=
+ =?utf-8?B?anhYTkt3L3RWRzNoVVk1aXUyL0N6RTNlelNjZXhhTUFFU3dsS0xIVG8yd1ZK?=
+ =?utf-8?B?YXJ5ek5RRUtZOFZkN2FScG9DUCtWL2xuaG5ZMVhHaW9xZ0YxRloyeTlXeUNt?=
+ =?utf-8?B?aG94WnVLeENrdWdzTFcvWG5OcXpMcnI4WlV0c05xL3dRYXF5cVRMcnlaeUpJ?=
+ =?utf-8?B?bU1oZzNmUm1TNGplTHV6dWdRalBTMzhRQW1DUlFQWUc4NmdDLyt6OEljc0ha?=
+ =?utf-8?B?YWRWZjJxZ2puTTZOdXBxLzZEOThndlFKZXpET3hWdFMzWEtCb0l3ejZXYURq?=
+ =?utf-8?B?MFErTmJFSlFnRkRXOEM2VWgvc0wyNGpZNzdsazNuenlzVXRoOU11TGNmenph?=
+ =?utf-8?B?RzB0LzNCTk9TSytOVlVaazY1cUEyYkx4SFJnZ3JoWTlKNXhqaXRDS3g0NU5Y?=
+ =?utf-8?B?YlBTbVZOWG45dHFHZkJXYzFYK1NhMUg3czNycnZLY1YyU3BhNHJ5ZVN1MGtp?=
+ =?utf-8?B?Wnluc09nUXRwQTVNQWJCdWwxTmhBS0xGZmY4YkgwUzNWNUJUYzIzcWJpbXBL?=
+ =?utf-8?B?UU5lZExsM2RPc05CekxPOVY3dWJqOW52M1d4Y1JmeEozRlFJblNabUhRRzZC?=
+ =?utf-8?Q?mpthvClFgxU0D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?RHhKN1pRQUI1SWw3b3B1blJvOHdLN1hybitOdkJRRXBUemwwcnQwNHU1MGJP?=
+ =?utf-8?B?ZlZmdkdwUjQyZzgxaExoRDZzdVlsbzRKNnFCdkQwQW5EcmFpeFMyR0NvaGN5?=
+ =?utf-8?B?OVJzUk54aEVnQkgrLzRBU1YyOWNGcW5xalZOZk5UNGZXSmUvQ2dyOExldnpQ?=
+ =?utf-8?B?Tm1ua3AzazF3UE4wMmRXZHcrNlU1ODN5T29MNllzQVEyTzJWRmdWWW9wUHdW?=
+ =?utf-8?B?TlMwK3FVVDdSSjVWTUpDUldacDZ3RmJwdk9yYXZhRWJnelZacDMyT1RLQTZk?=
+ =?utf-8?B?TTNsM0gyQnR3Q0FpckJTcm1KWmkyRUxEcWdqTExXQzBpQ2JvNzZ4bktjTFla?=
+ =?utf-8?B?WVRSbzdyc01jbGxCWmdhWEVDcUpKYmswTDlXWjdWYzNRaTBMdDNYSzE2RzBm?=
+ =?utf-8?B?NDRVSGtuaVh6dERaVHFBbmxxRW5VdmtmRGl0RGVXVjhzM244WHNzajJ5Ymh6?=
+ =?utf-8?B?ZEppQ3BKTTFWNnJWaHBhMVlSbVRrT1ltMFJVTkFyRUZVam82QjY4Z2dmTDVp?=
+ =?utf-8?B?eGNwK2wwcDJKUWhCOUc3WWp6K1RRRjYrRVo3WllDdkc4TEVvZTZCRTNOVVhh?=
+ =?utf-8?B?QXJYZDc1anVjZ1U5MTE2WlQyQlRHTzR4Mk5scGdrczF0R3JOYjV4VHhxOXY5?=
+ =?utf-8?B?UUhTSGRjZ1EvOUtJZ0tYNWZybEFzbkxmOEhwejl3TmtjUUxHaGVzUzd2VkZW?=
+ =?utf-8?B?encvWnc1VDVUUythd2pSNWg3cVgwVmt5c2U3SnlKajZVTlE0c0t0Z1RKUjho?=
+ =?utf-8?B?SVNmdEtmR3NhcWVhcG9pbm5QQXpLYWZXRE9rLzJNRHVVOWVnZnVraTNYS3NQ?=
+ =?utf-8?B?bGF0UEliZ1Fac1ZNenBJVkV5K1Jzeno2Q2hBY25TRTVIOGNTd055eGJ2V2xt?=
+ =?utf-8?B?V1BZTE41SHZ1TTV0UG1rY0pBRUdJcmdHNlE5Mkx5U0lpblhxZkFrQm1zaXE3?=
+ =?utf-8?B?WWZSdHRoa0VEd3d4MTRNUys3L2JmcGM0M1NkbVA4OUtGNjljREkxRnlMT3hz?=
+ =?utf-8?B?Y2tCNnYwZm0vbFMraFlzckpucE9QbVJLTHdCN2pwT0dzaEFMNndMT2NCR1pY?=
+ =?utf-8?B?UnNFU0wyM1pSR0VJbjMyekFVUzQ3UlZtYkZJWURpUDFQZG9QWVVDTmVOajdJ?=
+ =?utf-8?B?Wm13a1lxZmFjSTFjYys2cVJ1UllEaXVFTlowcDJCR29jZzY2elU0UHNkYzA5?=
+ =?utf-8?B?TEtLeENFMnUra3JTbUVkemxJekVJb1F6ZmJBYUxSZ0lPSDJxaUdtV1F4TTdn?=
+ =?utf-8?B?bEIxcGJTaldMVkZMVURuakdlM0Z3amJlQ1BXaTVtNW55djBJSFgvY2s5M3pJ?=
+ =?utf-8?B?RnE5cHZrblhpYW9RL2EwY1dFeTlHQ2gyQUw5a0Fma2VXV2o0bHZmTVV1V2Fo?=
+ =?utf-8?B?bWV6enlMQUIxbzZUd1l5UUxBcHJ6aUh0OGxxRnRoU3BjUGt0R1JjYjV3R0pM?=
+ =?utf-8?B?ZUVsTEVsYVBpY0JQREQrNmNLcXh2U1EyYW0yODVTVXUrSzhodTgyZHF6dmxF?=
+ =?utf-8?B?eVpzUzRVbzloaHJFdi95S0ZIRm43djdxcUoyQktCbi9oVU8rQ2hZMTI3Ulg0?=
+ =?utf-8?B?TlRHS2dxbVBrM1NRTzZPZGZQZGZZZTgzdWdzaVhUcTZ6ak5zbzBVMDBGQjZn?=
+ =?utf-8?B?OUFtbzFjQzI4aFlDVy8vZVZTcFpwWUQyRDdRUmtGQWVtSjBvVSt1dS96ZFc3?=
+ =?utf-8?B?ak5oVDd3NDBMbVBEb2pQRGNENlk2bXMySVBUek1yYm91T3QyTEwwbGRvVDUz?=
+ =?utf-8?B?S1NHaDRYY3VLeEwxZml3ZkhlZUhaMzRzUE42ak5OSVdQaWkySDcvNXBVUTVw?=
+ =?utf-8?B?V2tLYkFxNitLYUFaekZIcjVWZGt1WTZ0enBBOHMxU0NEaE5WVTN4ajVqWDBU?=
+ =?utf-8?B?aVlJWUlXSlB6M2Q0dEtCYnVPS2orVkJJSGlJbDYyaGZ0bVhlT05mWVR6OWMx?=
+ =?utf-8?B?bTZqZ242V29LSjl2cncyVERSNWFlZzhSSXVheCs2cDNiTzFETmVoYkI1VUdk?=
+ =?utf-8?B?WTJpMk9kSnhOOWx6ZHZ1TTRlZWpPbGduQUFYUi9xOVF0Nk04OE50MzdVSTBD?=
+ =?utf-8?B?QW92czA1U0lnZHRxNDU1UnFOYS9pOVdUUlVhQ3FhTmx4NU1SWFJvT0pkRS9P?=
+ =?utf-8?Q?tTDoxqhNzkwhK/7OJjpGPpkOY?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d14570d3-27e7-4b82-5509-08dd552ec908
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2025 23:55:58.7683
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: DJPrGrWWNk1KK7GVyn2eTUWaWOxOnrUvUDyJlsqnrlnV94oZU+nm5O5eG76GnvAoMy3mFkBTP9TSGKPYBHEQxg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6896
 
-Remove kvm_arch_sync_events() now that x86 no longer uses it (no other
-arch has ever used it).
+On 2/24/25 16:55, Sean Christopherson wrote:
+> On Mon, Feb 24, 2025, Tom Lendacky wrote:
+>> On 2/18/25 19:26, Sean Christopherson wrote:
+>>> -void pre_sev_run(struct vcpu_svm *svm, int cpu)
+>>> +int pre_sev_run(struct vcpu_svm *svm, int cpu)
+>>>  {
+>>>  	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, cpu);
+>>> -	unsigned int asid = sev_get_asid(svm->vcpu.kvm);
+>>> +	struct kvm *kvm = svm->vcpu.kvm;
+>>> +	unsigned int asid = sev_get_asid(kvm);
+>>> +
+>>> +	/*
+>>> +	 * Terminate the VM if userspace attempts to run the vCPU with an
+>>> +	 * invalid VMSA, e.g. if userspace forces the vCPU to be RUNNABLE after
+>>> +	 * an SNP AP Destroy event.
+>>> +	 */
+>>> +	if (sev_es_guest(kvm) && !VALID_PAGE(svm->vmcb->control.vmsa_pa)) {
+>>> +		kvm_vm_dead(kvm);
+>>> +		return -EIO;
+>>> +	}
+>>
+>> If a VMRUN is performed with the vmsa_pa value set to INVALID_PAGE, the
+>> VMRUN will fail and KVM will dump the VMCB and exit back to userspace
+> 
+> I haven't tested, but based on what the APM says, I'm pretty sure this would crash
+> the host due to a #GP on VMRUN, i.e. due to the resulting kvm_spurious_fault().
+> 
+>   IF (rAX contains an unsupported physical address)
+>     EXCEPTION [#GP]
 
-No functional change intended.
+Well that's for the VMCB, the VMSA is pointed to by the VMCB and results
+in a VMEXIT code of -1 if you don't supply a proper page-aligned,
+physical address.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/arm64/include/asm/kvm_host.h     | 2 --
- arch/loongarch/include/asm/kvm_host.h | 1 -
- arch/mips/include/asm/kvm_host.h      | 1 -
- arch/powerpc/include/asm/kvm_host.h   | 1 -
- arch/riscv/include/asm/kvm_host.h     | 2 --
- arch/s390/include/asm/kvm_host.h      | 1 -
- arch/x86/kvm/x86.c                    | 5 -----
- include/linux/kvm_host.h              | 1 -
- virt/kvm/kvm_main.c                   | 1 -
- 9 files changed, 15 deletions(-)
+> 
+>> with KVM_EXIT_INTERNAL_ERROR.
+>>
+>> Is doing this preferrable to that?
+> 
+> Even if AMD guaranteed that the absolute worst case scenario is a failed VMRUN
+> with zero side effects, doing VMRUN with a bad address should be treated as a
+> KVM bug.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7cfa024de4e3..40897bd2b4a3 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1346,8 +1346,6 @@ static inline bool kvm_system_needs_idmapped_vectors(void)
- 	return cpus_have_final_cap(ARM64_SPECTRE_V3A);
- }
- 
--static inline void kvm_arch_sync_events(struct kvm *kvm) {}
--
- void kvm_init_host_debug_data(void);
- void kvm_vcpu_load_debug(struct kvm_vcpu *vcpu);
- void kvm_vcpu_put_debug(struct kvm_vcpu *vcpu);
-diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
-index 590982cd986e..ab5b7001e2ff 100644
---- a/arch/loongarch/include/asm/kvm_host.h
-+++ b/arch/loongarch/include/asm/kvm_host.h
-@@ -320,7 +320,6 @@ static inline bool kvm_is_ifetch_fault(struct kvm_vcpu_arch *arch)
- 
- /* Misc */
- static inline void kvm_arch_hardware_unsetup(void) {}
--static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
- static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
-diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-index f7222eb594ea..c14b10821817 100644
---- a/arch/mips/include/asm/kvm_host.h
-+++ b/arch/mips/include/asm/kvm_host.h
-@@ -886,7 +886,6 @@ extern unsigned long kvm_mips_get_ramsize(struct kvm *kvm);
- extern int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu,
- 			     struct kvm_mips_interrupt *irq);
- 
--static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- static inline void kvm_arch_free_memslot(struct kvm *kvm,
- 					 struct kvm_memory_slot *slot) {}
- static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
-diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-index 6e1108f8fce6..2d139c807577 100644
---- a/arch/powerpc/include/asm/kvm_host.h
-+++ b/arch/powerpc/include/asm/kvm_host.h
-@@ -902,7 +902,6 @@ struct kvm_vcpu_arch {
- #define __KVM_HAVE_ARCH_WQP
- #define __KVM_HAVE_CREATE_DEVICE
- 
--static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
- static inline void kvm_arch_flush_shadow_all(struct kvm *kvm) {}
- static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
-diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-index cc33e35cd628..0e9c2fab6378 100644
---- a/arch/riscv/include/asm/kvm_host.h
-+++ b/arch/riscv/include/asm/kvm_host.h
-@@ -301,8 +301,6 @@ static inline bool kvm_arch_pmi_in_guest(struct kvm_vcpu *vcpu)
- 	return IS_ENABLED(CONFIG_GUEST_PERF_EVENTS) && !!vcpu;
- }
- 
--static inline void kvm_arch_sync_events(struct kvm *kvm) {}
--
- #define KVM_RISCV_GSTAGE_TLB_MIN_ORDER		12
- 
- void kvm_riscv_local_hfence_gvma_vmid_gpa(unsigned long vmid,
-diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-index 9a367866cab0..424f899d8163 100644
---- a/arch/s390/include/asm/kvm_host.h
-+++ b/arch/s390/include/asm/kvm_host.h
-@@ -1056,7 +1056,6 @@ bool kvm_s390_pv_cpu_is_protected(struct kvm_vcpu *vcpu);
- extern int kvm_s390_gisc_register(struct kvm *kvm, u32 gisc);
- extern int kvm_s390_gisc_unregister(struct kvm *kvm, u32 gisc);
- 
--static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- static inline void kvm_arch_free_memslot(struct kvm *kvm,
- 					 struct kvm_memory_slot *slot) {}
- static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ea445e6579f1..454fd6b8f3db 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12770,11 +12770,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	return ret;
- }
- 
--void kvm_arch_sync_events(struct kvm *kvm)
--{
--
--}
--
- /**
-  * __x86_set_memory_region: Setup KVM internal memory slot
-  *
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index c28a6aa1f2ed..5438a1b446a6 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1747,7 +1747,6 @@ static inline void kvm_unregister_perf_callbacks(void) {}
- 
- int kvm_arch_init_vm(struct kvm *kvm, unsigned long type);
- void kvm_arch_destroy_vm(struct kvm *kvm);
--void kvm_arch_sync_events(struct kvm *kvm);
- 
- int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu);
- 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 991e8111e88b..55153494ac70 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1271,7 +1271,6 @@ static void kvm_destroy_vm(struct kvm *kvm)
- 	kvm_destroy_pm_notifier(kvm);
- 	kvm_uevent_notify_change(KVM_EVENT_DESTROY_VM, kvm);
- 	kvm_destroy_vm_debugfs(kvm);
--	kvm_arch_sync_events(kvm);
- 	mutex_lock(&kvm_lock);
- 	list_del(&kvm->vm_list);
- 	mutex_unlock(&kvm_lock);
--- 
-2.48.1.658.g4767266eb4-goog
+Fair.
+
+> 
+>> If so, should a vcpu_unimpl() message be issued, too, to better identify the
+>> reason for marking the VM dead?
+> 
+> My vote is no.  At some point we need to assume userspace possesess a reasonable
+> level of competency and sanity.
+> 
+>>>  static void svm_inject_nmi(struct kvm_vcpu *vcpu)
+>>> @@ -4231,7 +4233,8 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu,
+>>>  	if (force_immediate_exit)
+>>>  		smp_send_reschedule(vcpu->cpu);
+>>>  
+>>> -	pre_svm_run(vcpu);
+>>> +	if (pre_svm_run(vcpu))
+>>> +		return EXIT_FASTPATH_EXIT_USERSPACE;
+
+In testing this out, I think userspace continues on because I eventually
+get:
+
+KVM_GET_PIT2 failed: Input/output error
+/tmp/cmdline.98112: line 1: 98163 Aborted (core dumped) ...
+
+Haven't looked too close, but maybe an exit_reason needs to be set to
+get qemu to quit sooner?
+
+Thanks,
+Tom
+
+
+>>
+>> Since the return code from pre_svm_run() is never used, should it just
+>> be a bool function, then?
+> 
+> Hard no.  I strongly dislike boolean returns for functions that aren't obviously
+> predicates, because it's impossible to determine the polarity of the return value
+> based solely on the prototype.  This leads to bugs that are easier to detect with
+> 0/-errno return, e.g. returning -EINVAL in a happy path stands out more than
+> returning the wrong false/true value.
+> 
+> Case in point (because I just responded to another emain about this function),
+> what's the polarity of this helper?  :-)
+> 
+>   static bool sanity_check_entries(struct kvm_cpuid_entry2 __user *entries,
+> 				   __u32 num_entries, unsigned int ioctl_type)
 
 
