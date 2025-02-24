@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-39030-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39031-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 874A6A42A2B
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 18:43:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B248AA42A43
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 18:47:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8862A16424B
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 17:42:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 898503A803A
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 17:47:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 235E9264A81;
-	Mon, 24 Feb 2025 17:42:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41FEB266B79;
+	Mon, 24 Feb 2025 17:45:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j+ULiqkz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P7AGe+dT"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092E41A704B
-	for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 17:41:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDDB326659E
+	for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 17:45:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740418921; cv=none; b=TS9PPHEOxIQYVB9+DWwlXOZlXr6kOl5Z04AHojC2Aix7+M6a73QvrAi127l1SkwbM08xDe+IIKnSR78knR8iqSqaC6k/FCDp4PJw8kWJlgl2OWLo7xmzNAMbEBOcCN67oC1t/5GEbGA5toG4slPK4mbgtB5CXiTPpg+yZiOw55c=
+	t=1740419127; cv=none; b=YyE94Ah28BM7LiI5Y4ZjTiHDQj2RfhyFOW/Rli9rKEnf1/1E/5hhL67TcscJnF346YX8MTJfoqK6TY6lsSFxay3uE4gMAq9ABR0BmlXQtUk+zllHKbRRrWKQ8PUVIKsmh7+Ke6KQMH5xk/1WV/RUCozmVVu++NgZhEFYoQaXsJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740418921; c=relaxed/simple;
-	bh=3IFadXaUYj7sdZ/YoFBbGyfHNpr1yxv29eaIHoixx3w=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=R2G2gxpH8dY69tUAvhafKd1UbMjqJoeyglc8y0iieKbsz3YrlQpCyZLwaratckCoWamP+0hkCuU62OWjn7lSMcqoxAneJ3A13yGM16zfA406d4KDvlGzaNaObo9E7G+zIdFzlMcNxpcAIeTXm86o8W15AM4AlauCzTkiUa2zl9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j+ULiqkz; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1740419127; c=relaxed/simple;
+	bh=l5ZgNCYskiqkSoA/TUMNtF9JvJdQrEdFRT/eNswpPGQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=M2qMSuxBVZgtDOW0P4e5wm7frx8g8y/NTQusug6y1ayidV619Adk+COugQDWrnjoQXYZ8Q/sFwYrPrwdZJ4ox7SgQ7LUDjbrDs+od8WTJxQrd7tywaQLcHJ6HV3qMnveSt6OGMaQ2MN0ctMUrQrGaPYcWIdHMTpQ1SoxbJWYWhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=P7AGe+dT; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fc45101191so9020062a91.1
-        for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 09:41:59 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fc17c3eeb5so9645306a91.1
+        for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 09:45:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740418919; x=1741023719; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1740419125; x=1741023925; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=e1EZBmSe2im3juqrZK3CYkAhncBM5TtZhAUdFg3KflY=;
-        b=j+ULiqkzVJUHePkxzUuurPaTkSW8k50eUp1nwfd6iH50R/+0UbpZBByCxvYGL3+ESb
-         lL6r0QWIzUvgOl55jUUxk+/2DhKzCcY2EfOLspVHlxTaomWZT5IP44Roqndyp/9Sloiz
-         5bA0Zj4WeMjKR5+H/GsEvqKjhueQ/hpoW9HP0WjSgEPWPPqS8KsdBMs6GaZ3FAvzPkQd
-         23J4CIz4aeNCbPRvnjffGm5zeGOt06AnW5y5lqMLm/yARDFRGwxYwAAdwc3mXEDzRYj7
-         /7UWlbQwAzK8au19wc9yxOrHO/VDjT9adz7KHNxAvfCsTPiU2tNflbnu4Z0PX3uyCweG
-         J9QA==
+        bh=XWA+FxxVK+hkRyqbtAFCYtZ9HKJOeSYLUKlQGx7IIeQ=;
+        b=P7AGe+dTHSHzj/9XHZuQHEd45MkDhBFBfB7Kl/4TLJSf4s/l8k3nxS2h+1CxRjRn2H
+         NL4iLV+4d8gbhg+VNGdsS6UDiRBgDAPBV1dN5yyb3OmyhmhrSH5AzmAYsGBpeE/TZCea
+         hgkHfPwE4Ne/uYl82eYx3Xa2SedS8x3JG+p9UtP3RBIkbI8JH09CCUSGU9DEKfiO/PWk
+         30TVvNX0RjUbUkAqiHiRKIduL3BKOX8eR8c/VsrxJRU2pPMFB9nao8sv9I9N21ytznu5
+         PWecxle8UxDoR2MpWBA5Y6Iuezl3NF/Ef2MN3VX0EGqk7775TriHAhQPPfaHTH8CcZs2
+         9Zug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740418919; x=1741023719;
+        d=1e100.net; s=20230601; t=1740419125; x=1741023925;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=e1EZBmSe2im3juqrZK3CYkAhncBM5TtZhAUdFg3KflY=;
-        b=k1NOrmUcqbKEBsDgTJ7ntXbhfdKaVpwJJaJKmaAwu2dqUWmumadO+Dl5Byfssyucr6
-         g1pgwrTGyACMITHVF2RJ2iScX+O6xi3IYU+Pb15H5rxXvM1MkOQuanZEPwumeyoDw6+w
-         chOFnn5wQCW/G78dnsreZTXJmS5kcCUomQFY7AeABUbMAE8iGj9aIaulLxmYK3SDlZYg
-         srPMuBx1WUhwnf7umvHnUYgByvSoGFL87tg1PXrKWZMmarv7IaXphRsobsKNgJi38/5Y
-         aS0XWjEJ6iqIoG6kPB+qvgTFXNWyOC/O/KIhoykE0aJrLVmwtMX3Adn47eYek7D6WLNA
-         wqog==
-X-Gm-Message-State: AOJu0YzvlTEZ9DdAFWm+DPNnh2G/0YYxqSHQAwrLn+W8BALhVGNc6WVs
-	eCCCCD/ej+NmbqfHrV35s7grVJ2175n1Y2UcNVA9i54a0EONOPnOnVwGdgjTOSkRNWkUuWbwGtC
-	IJQ==
-X-Google-Smtp-Source: AGHT+IHFioBGXOxzm41NcBknr4shVziaEDjiaSXZYk4bXNvmJxj5hrZDjUahvq4dTClGOKbh+vDVlxvAwxw=
-X-Received: from pjbpt3.prod.google.com ([2002:a17:90b:3d03:b0:2fc:13d6:b4cb])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4a41:b0:2f4:47fc:7f18
- with SMTP id 98e67ed59e1d1-2fce78a2965mr24749658a91.10.1740418919237; Mon, 24
- Feb 2025 09:41:59 -0800 (PST)
+        bh=XWA+FxxVK+hkRyqbtAFCYtZ9HKJOeSYLUKlQGx7IIeQ=;
+        b=NsL/guLA1eroJVJZrnRo5CZYu5NvQZ+Ti4Gpc38n84y38ed1hBGgl6OxR9Q1LNTyqZ
+         o1TbJbVAMc2Uv8r1f2u/K1NSeOFrhT05lz6zouAYWwZ2J/UVwGND4s1EpvEgeJQQG0lm
+         J78k73sojhAKePbxorSIvpplhVBpEGrPq+2S94jDU7CKsBv49ETZg3mEUqgVA8J6myH9
+         N4CouphX45d4qbY5NGEuLUeoDl5pMppylTT8lTUcvCvPoqRlAPCVDcTakeNGNjGoVQyq
+         XsisEHApp8ORzjNiFPHpI7QMcX2hEEypcPRS2KAET0hHtrMhP9TqwOhHbt/x/WuA4jnm
+         hbAw==
+X-Gm-Message-State: AOJu0YyaRqBDaQz0nJd1S4YKb6T2mfGYapGhgtHiWAZfh/p55mqL4Mnm
+	84MDoMaESTsiR/UHxfe4vEif4dpkXD3EXyM35t2gc6+HpxmsChYrxVLJfoy26LZWPnQbaoB2fAa
+	2Aw==
+X-Google-Smtp-Source: AGHT+IFA/iTKhpk1su7Z2GppPGgcs4f0AD+MLglFgL17N3OCminF65QjQemKGEfNHudWQOxGA3dEOxpzkcI=
+X-Received: from pjyp8.prod.google.com ([2002:a17:90a:e708:b0:2fc:d2ac:1724])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5148:b0:2ee:c9b6:4c42
+ with SMTP id 98e67ed59e1d1-2fce86cf0ebmr25680660a91.16.1740419125015; Mon, 24
+ Feb 2025 09:45:25 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Mon, 24 Feb 2025 09:41:56 -0800
+Date: Mon, 24 Feb 2025 09:45:22 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,46 +71,58 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.48.1.658.g4767266eb4-goog
-Message-ID: <20250224174156.2362059-1-seanjc@google.com>
-Subject: [PATCH] KVM: x86: Always set mp_state to RUNNABLE on wakeup from HLT
+Message-ID: <20250224174522.2363400-1-seanjc@google.com>
+Subject: [PATCH] KVM: SVM: Inject #GP if memory operand for INVPCID is non-canonical
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Babu Moger <babu.moger@amd.com>, Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-When emulating HLT and a wake event is already pending, explicitly mark
-the vCPU RUNNABLE (via kvm_set_mp_state()) instead of assuming the vCPU is
-already in the appropriate state.  Barring a KVM bug, it should be
-impossible for the vCPU to be in a non-RUNNABLE state, but there is no
-advantage to relying on that to hold true, and ensuring the vCPU is made
-RUNNABLE avoids non-deterministic behavior with respect to pv_unhalted.
+Inject a #GP if the memory operand received by INVCPID is non-canonical.
+The APM clearly states that the intercept takes priority over all #GP
+checks except the CPL0 restriction.
 
-E.g. if the vCPU is not already RUNNABLE, then depending on when
-pv_unhalted is set, KVM could either leave the vCPU in the non-RUNNABLE
-state (set before __kvm_emulate_halt()), or transition the vCPU to HALTED
-and then RUNNABLE (pv_unhalted set after the kvm_vcpu_has_events() check).
+Of course, that begs the question of how the CPU generates a linear
+address in the first place.  Tracing confirms that EXITINFO1 does hold a
+linear address, at least for 64-bit mode guests (hooray GS prefix).
+Unfortunately, the APM says absolutely nothing about the EXITINFO fields
+for INVPCID intercepts, so it's not at all clear what's supposed to
+happen.
 
+Add a FIXME to call out that KVM still does the wrong thing for 32-bit
+guests, and if the stack segment is used for the memory operand.
+
+Cc: Babu Moger <babu.moger@amd.com>
+Cc: Jim Mattson <jmattson@google.com>
+Fixes: 4407a797e941 ("KVM: SVM: Enable INVPCID feature on AMD")
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ arch/x86/kvm/svm/svm.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 58b82d6fd77c..7f5abdaab935 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11310,9 +11310,8 @@ static int __kvm_emulate_halt(struct kvm_vcpu *vcpu, int state, int reason)
- 	++vcpu->stat.halt_exits;
- 	if (lapic_in_kernel(vcpu)) {
- 		if (kvm_vcpu_has_events(vcpu))
--			vcpu->arch.pv.pv_unhalted = false;
--		else
--			kvm_set_mp_state(vcpu, state);
-+			state = KVM_MP_STATE_RUNNABLE;
-+		kvm_set_mp_state(vcpu, state);
- 		return 1;
- 	} else {
- 		vcpu->run->exit_reason = reason;
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index b8aa0f36850f..63268d940ce1 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3272,6 +3272,17 @@ static int invpcid_interception(struct kvm_vcpu *vcpu)
+ 	type = svm->vmcb->control.exit_info_2;
+ 	gva = svm->vmcb->control.exit_info_1;
+ 
++	/*
++	 * FIXME: Perform segment checks for 32-bit mode, and inject #SS if the
++	 *        stack segment is used.  The intercept takes priority over all
++	 *        #GP checks except CPL>0, but somehow still generates a linear
++	 *        address?  The APM is sorely lacking.
++	 */
++	if (is_noncanonical_address(gva, vcpu, 0)) {
++		kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
++		return 1;
++	}
++
+ 	return kvm_handle_invpcid(vcpu, type, gva);
+ }
+ 
 
 base-commit: fed48e2967f402f561d80075a20c5c9e16866e53
 -- 
