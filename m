@@ -1,224 +1,137 @@
-Return-Path: <kvm+bounces-39054-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39055-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CC1BA42F9F
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 22:59:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CCC3DA43029
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 23:32:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27191189416A
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 21:58:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD7101892024
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 22:32:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F53B1EE7B3;
-	Mon, 24 Feb 2025 21:58:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5EF2207A2D;
+	Mon, 24 Feb 2025 22:32:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="rV1v0j7C"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tLCG/Uhd"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2040.outbound.protection.outlook.com [40.107.92.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E245C19ABB6;
-	Mon, 24 Feb 2025 21:58:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.40
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740434317; cv=fail; b=Z2pwWZjNPY0RYb6TckfWJZt0nCbICrdJL/2HXniJOsqITS4/aHdrjeR8J0mMFIg+1kq9uQ9Pw9C+ayp4BLo/qImXsDz33tAF63KyePcNDp+xVqOpifQ2gvW4rcCLnI3wzXj/46Bs6DZonrASxy+Umqe6mdl8FqAEdXypcvCYAmg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740434317; c=relaxed/simple;
-	bh=X0b8lVftd8B6B9JGpG8Mf3GQrVFtNS598ZuLiolsHBk=;
-	h=Message-ID:Date:To:Cc:References:From:Subject:In-Reply-To:
-	 Content-Type:MIME-Version; b=usaxmORkiwC6xdBHDIpkm+w8Ha+D/faXusjjj0EGwDx7CIVA3Nzl83Dnqsgq/cd44nv0RkIKLEKzCmAgr6Rp5i5V+vvhlBD0SNRKploscQybeSgoWMADYh53NsBDQqCPmX5qbZwmeM/h1wV4/o76do95ic5n4006Ckke8Xu36kc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=rV1v0j7C; arc=fail smtp.client-ip=40.107.92.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UsW5nRdL1w5PNfi2MRhDrKpKn7yIxIXT3ySM8FO8ZWZ+kqQSAMT8loannKMKnFX3yy/XjNqClgIjba6+wZChQk+6M1qvG+2OTpaVujwHkUOt/c/2Vmp2Qz/z4bmUjlNzXJAJGhU9Zvebm3y3MbxFKQ0lRxuV+lB2zt+aANfMBtjgNrs2JoCbOyoeef5Q5+h3PLch3C1EBxJ+VJIYQ6KGyY0anjFtDTqPh1qouWeGsTWXXGDO6D04Y5aqaABMYi7LZVsbMK557igqDIkWRf44Ait2gLkfH0pYvpTlasw6Yn8atIEuNZbFDKnzFihx2QVODg9lXOLye8WZ2v0bM4XH2w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=K1DYQR8MM8YqJ7b7bngqOVD1Vm1+2QZtjl7gqdcreKI=;
- b=U0qvq/pcKjobM1xtssynBcsXQzlxQxwER8QhCK4b/clPZJFQPpD3Oa31pzm1eoi2sh19lpre1zTkppZWaMAoz5lCuxr+R2AzSJCJAZJs0nHhErGBUnpTVbXxzmuRfyDqS2B0adDkKuHIABgCfJsDpqshG21rax24BzzK7noJMQcHfIk5unnzE5qjDK35SSPP8XGZMlx+7eEqNZBBqi+LAP22BGUZH3tn0d+ih7K/dffELQkmF2QmqFRzSLqCMNXiedosq5JNn+glTvXxgO3qlo9SldpVXH7eYqQCosY3BBlM5vKaQFZ06Ynr43JseFkDX6E4gBw6aKKX/Fl+oZ0YCg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=K1DYQR8MM8YqJ7b7bngqOVD1Vm1+2QZtjl7gqdcreKI=;
- b=rV1v0j7C3O6Ndo598Olk7ztMPXiMkGHbwQdZ1SstRHhnnjgJFOc9egBvvpu54fUCFa8Miew+fFN3clX23+NaS3DYrYW9gFtQ0zYR6JMZU3/g+iRERQO3IE1SDEFC9B4eTNqH36YKyw9A0oLs7vJlzFbGRSgcgY6RaAl07hADeXM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
- by MN2PR12MB4301.namprd12.prod.outlook.com (2603:10b6:208:1d4::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.20; Mon, 24 Feb
- 2025 21:58:29 +0000
-Received: from DM4PR12MB5070.namprd12.prod.outlook.com
- ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
- ([fe80::20a9:919e:fd6b:5a6e%7]) with mapi id 15.20.8466.020; Mon, 24 Feb 2025
- 21:58:29 +0000
-Message-ID: <d9c8f6e2-36fd-7c6f-c755-e74e9d862714@amd.com>
-Date: Mon, 24 Feb 2025 15:58:27 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Naveen N Rao <naveen@kernel.org>, Kim Phillips <kim.phillips@amd.com>,
- Alexey Kardashevskiy <aik@amd.com>
-References: <20250219012705.1495231-1-seanjc@google.com>
- <20250219012705.1495231-9-seanjc@google.com>
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH 08/10] KVM: SVM: Mark VMCB dirty before processing
- incoming snp_vmsa_gpa
-In-Reply-To: <20250219012705.1495231-9-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA1P222CA0171.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:806:3c3::8) To DM4PR12MB5070.namprd12.prod.outlook.com
- (2603:10b6:5:389::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC077469D
+	for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 22:32:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740436359; cv=none; b=lUsbuw9hLRqLpAqm8W1MVdEOYpiPYfnJiB55gD3CEl92AK6JWhQxA9AemsDL63aisvLt0F+GrjG04cnaNJD1O75zpfCdnUohV5cD1HnWP2WxOTGbCB12Ahigll7xMrsPu771FLmNHXCjcNToQ2qg8Rx35tYTzB+7ixnY0x6YVjc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740436359; c=relaxed/simple;
+	bh=lR5+K2O0C7fa3hblXHm0+cUXI+NHjy4Oog7sgRxfZDA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=fKTUdobDp5oqh3RbHK9EEtQexEizR2fnkTb2RlWIaSJqdQ5TBxBpk3c9i0wsqcd7RFv2pVj8TOagJCUYyjsuvpIAntE8JdVqmX0h1HU1TgBTvapy05bzFZhaUZ1llh0Ld754V3fJl+zDq8qiY/5ho0CfIe4Me/h/Fwi5T979TbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tLCG/Uhd; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2210305535bso163449775ad.1
+        for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 14:32:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740436356; x=1741041156; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rJ602F89Qrv98s0dTpyvrapFlWCXZ4Q+ukdN0YogNYc=;
+        b=tLCG/UhdftbDpTzcxPLk+q3MhOnF0jbS5KzVBsWCsPtq6XpjxbDfEfSDeX081pBW0Y
+         tq8g/IIqVqpg3GZa3x41efGjPXppBXxEkonn1BjIffkSItuVqACahhemD17rQy3nJ65H
+         kNMZxTEmQpBtwn8fxxtpqxPHnJjTR4uaU+jjZ3svRXCCUsplGHJsovSIczOTJmUapjEW
+         Nyv6iUABFlQP+deJVqoZiT2+9wLXtQxG4DfcLXUVlft6bJuXD6sb/iopU+CqsQevDuPz
+         C3GSStgQdMcQ2PtYn7cFMXGB2/eIB0In/s1Ksd7LY8K2otZWrmu3mbxZHhzKqaDxOe3G
+         bgoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740436356; x=1741041156;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rJ602F89Qrv98s0dTpyvrapFlWCXZ4Q+ukdN0YogNYc=;
+        b=tXZRV9z+ypz36RhOh7RjoegCCakEy4RKPed4lOGJgglVrzFLoojg+8gbEq0vRtaUJp
+         ze/OfRtPGSBl5NU1q3Q2u6A2fnu7Gv/BI/lTzWE0WbpLdvia4IsLdeQ94c2+VYeKiAIN
+         CM4J7MS3n9rh/0e85C0Wtpe4VJRzM+A6ejX10iewe8hvuJr1QZwlgbs0y3mkzGBI9h/A
+         W76CMkOw6KDqOeVmx0p1mB21ZcNR3vJGFytZEHttzM6qrXNfq+OglhnD7qZoHOnNho1n
+         L73R3ZtFo8ArC+EKwJsbUghJiDsy2TU6FUkIywA4Bls2KLMpfteHf7BXJPqSB0i0pcil
+         3yrA==
+X-Forwarded-Encrypted: i=1; AJvYcCW000JaMjxDowUmzOdXQ/4ThqSPkFJAYAPpeIRs4p6Iv+HGKOWMTnR8e3W89qs4UNXb7D0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyqwBvHhHzU8n+XUyS6ATtQlWohLLCWPyhSXK+1GAHJ6rcasE8
+	dsH3lJpNJbXpnQzwmTEllEd+szlU8V9iBnPN1d0GsvyPPITu4fucjJrn7X0dqM33q4MOi/POABY
+	baQ==
+X-Google-Smtp-Source: AGHT+IFqOEUKQsuWHVPpQJ0lKf4SviNWdzaOb6PyYguj4zrO83Ubft771/46kQy1zz7pRXushkp2tdi5FeE=
+X-Received: from pjyp12.prod.google.com ([2002:a17:90a:e70c:b0:2fb:fa85:1678])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:db0f:b0:21f:52e:939e
+ with SMTP id d9443c01a7336-221a10deb2amr283318145ad.28.1740436356245; Mon, 24
+ Feb 2025 14:32:36 -0800 (PST)
+Date: Mon, 24 Feb 2025 14:32:34 -0800
+In-Reply-To: <7794af2d-b3c2-e1f2-6a55-ecd58a1fcc77@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|MN2PR12MB4301:EE_
-X-MS-Office365-Filtering-Correlation-Id: 101d30e1-6117-4dad-8029-08dd551e5f58
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?ZVZDRktNRXhNM2E0UGdVM0x3cFFnNE9WVjYzRTVpemUxbjdkSHBIU09YY0lU?=
- =?utf-8?B?UjdtUnk3RVNLU1ozbFRsT3NvVVpzUkVka2k0N3lLNHYvR3lkTGd1YWZGcDBp?=
- =?utf-8?B?UzR4WlFJNm9CcTJwUlRhcUdpY1RGNkh4b0VPZEE5WHREeHNoZG1aNHhrSVQ3?=
- =?utf-8?B?VTBIWGFjeTMrVHpydHJnbzBHdCs1b1IvWGw0NXNSVXJsTUkzbzhEZ2dIdGtV?=
- =?utf-8?B?TUdxRXZ3anR1YVA2V2JVQlhnd2FFRFBVZ2NNU0ZIQU0yQWFSM3Z3cXQzK29n?=
- =?utf-8?B?NUxMQ3FFVWNLWWg4dGdhczdBQnVQenZoZmJzTGRkWENicGF1c2dtVHA5MDJ5?=
- =?utf-8?B?WjduVGFVRlkvT0drNlg5bCt4bWVrVWhpSVFJVm1tbmF5YW1wMzJIdzJsOHpK?=
- =?utf-8?B?bnRKU21PNjdHQStyUldJR3RmMTNQbTNLQ3VhNERRMHg2dlM5YTlITHZOQjNM?=
- =?utf-8?B?UnNxQTFOdWtlVlpVa2JxdktiaDBqS2N5ZGVTRFhwNTJkN2N0d2hjcEdDVWJL?=
- =?utf-8?B?SkE2OFR4VVFFVE8zcy8xQzUzWmc2TVF4TjVhZStTazZVN2RHT29zdTFRQStW?=
- =?utf-8?B?UGppTDBaU3BRTjdPU3VpS25ESXRNeHp1emZUVU9qd0FSU3phaGV0dDVDYkcz?=
- =?utf-8?B?NDJVcUtXblpQanV4SzZGT0NkS3hBaW9UY1pwNGZRMEpJSWhGNm9ycnJvWmFk?=
- =?utf-8?B?K1VKRytKR1YrMmh0eC9VcFFlcUFOTUdzSU1NRFVWTE9OWEhwWDhkbDVKWGFH?=
- =?utf-8?B?MzVmRTVzY0FXUk1MMDIzancxSnJtYjZEcUJ4UE9DUjBLcE45bWt3Mzd4cExo?=
- =?utf-8?B?d09md1lYdm1wTzMydXV6WDRjNUVVTzloUndHbHkxb1U4WVV0b1o4bkRBanZB?=
- =?utf-8?B?UCs1bVU0T3ZGazJCWnJjd3RUS25hRENSRWV0TTRHcDBKcUFQUHFwSXNKcEJi?=
- =?utf-8?B?Z0dBc2VkQ2pheWhOMVhZRlJZYVJKYWc5NVdmV0x2NDUzalNnNWxET3o4VU9S?=
- =?utf-8?B?T0FFRWR3N0FUa3BuUXZ4V1JhdDVOMlUyenUveUZneEFUSlg3TWVoWkpLUWJT?=
- =?utf-8?B?bzc5SGVQMzFpcmxuMGt2WFlnc0RVVERpZnhFbWhtRkt0b0xXRHJPMTdvLzAz?=
- =?utf-8?B?ZEtVYkZiKzhRd0lZcFJmVHZUcUZtTG5veGl2ZmFnV0tpOFRGY1c4S09QdktD?=
- =?utf-8?B?ZnFYeGVNVkE5RUxCWGZZWDBGZlJ3UFpBL2RTRWpYTFFtSWFjSC9ObGRGVlVZ?=
- =?utf-8?B?N1lUcThSRzlZT0hTdzI1Q3ZDNlgyZnUzQlByOWM2blVHU0tDakQ5UFZ2UUEv?=
- =?utf-8?B?a1dOSzJiTml2NHUxRk9DNW1MdXlqT3NBTnBlbDdNdC9ab3JSMCs0UFZnSGVL?=
- =?utf-8?B?SmZIbHU3LzRtbTZqV0RwNFl2a3FzUk85ajh1TG5VK2xEb09vK2tTdWR1OGlH?=
- =?utf-8?B?eUF0WXEzeGoyMUlOejFhSU40ZWdaMlZkbk1ZL3hSNk9rREk2bmlxRGRIZVJQ?=
- =?utf-8?B?cExPMjQyM1lYU2NRT2VCUEdzKzZEeDc3cUZTQjk4ZTY0d3l4MmthZnl2VWU2?=
- =?utf-8?B?K01FMDNBdjd3WEZ5cGtiK0ZaRm9YWTRGZi94OFhvbTluRDVVa3dTUnZ5RGQ5?=
- =?utf-8?B?YTZkUC9UZFh2b2JxSkFzM2tVNnVvcXhUV240UDh0WHRieEpZTjZmdEVESFM1?=
- =?utf-8?B?WGdPNTRyLytYcDI5QXBFZUVOVEQxRUFWV01kVXVKQklWN2h4TlpwbVhzTkdp?=
- =?utf-8?B?VHNuaElPSDd3LzhRQzZYUGJyWUM1WW5yVS9pTHpIRWR4NkVsd1VkWHhCY21B?=
- =?utf-8?B?WEZ5K1Bzb0JtZ2N0T0o4NjNaQVo3dDZ4eXN3aUlhM3ptZm9jbGYxa21GRndU?=
- =?utf-8?Q?O/YnZ+Ek/4nVy?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Y3EzNUNTNFBxWDN0ZzJ5Wmlsb05PRnhGV05PYnZYOU1MVllRZ3FLQUZqTVZW?=
- =?utf-8?B?dWtwUUs2cUhrcllud1NsU2JjV3NaMWlBRjZDY3Y0QUM5L1hCZ2tHUGg4YXhO?=
- =?utf-8?B?UjFqZkdNMW5MY05UMHp1TW1HQkl0dTZSckZnNmpyWEJaNXl3d1doWGs3TThO?=
- =?utf-8?B?emZhNExQWHRNNzZkWENPeE9LWlpMbnBLcnA1aExIYWZMMFU1akowYmQvUjVJ?=
- =?utf-8?B?ZWFBVGdyYUNFbm9vYlZ0SXh4T0tpNEgzcTdqbXJyVnhzMm1SclNNcGdBN0JQ?=
- =?utf-8?B?WFh5aEY2eSs4NmV4L2hTRDNKbHptM3AvNjlVU3NZeEFNNEpjUzA0bWpNSEND?=
- =?utf-8?B?YkMvU0NzS3lzZi90bDJTTVFBTXhnakUrNm5QdGZKZkRjMGs2ZStHMUdVOUkw?=
- =?utf-8?B?TUlSUU1PSENtUHR5MGxUclZMZUlOQkJZY2I4Y3RweUtEamVxSmN1bzVub3FD?=
- =?utf-8?B?WEw5bFE3ckMxQld5WW1HRStnRXV5bHVBb1QvYnd5RHZhTlpaQWIveHYreTk0?=
- =?utf-8?B?WU80bjBPb1I2VTRPVWpDRGp3Wk5NYitJczI3OEhTTU52ajA1WHNjeC9mSE5W?=
- =?utf-8?B?K1JaVHZseHpLdjUycmNMM1ptTy9NMHNSZ3ppMFZGMXhkWDZHYXZnZ2JEMXc2?=
- =?utf-8?B?UnlRNzFHWVNXODA1QVYxS3ZpZzZtNXdnTStIdEw3YWNVYlprOHJIbzQ0ZVVB?=
- =?utf-8?B?U3A4UURtWDVsZ0QvOC9TYW5aUTVrV0k4dFJIT2tEK2hmZm9renJ2ZlRKMjQ3?=
- =?utf-8?B?MVhjM3FwSEhWMlptZVFFTVVqRVdxWHREZWp3ekRLb0JaamlidDNXNElVazk4?=
- =?utf-8?B?NDFwbWhMSFAzbWdZdGxXaEZ2bnJOMUNXYzFCTTVhRUFSQ2FjQWVxTjdGMTBF?=
- =?utf-8?B?bEtHU3NqYVAwU0hqbVBQQjF0cXkwY2tQeHh1L21wRGJtNUMzSm80TW9SRHRQ?=
- =?utf-8?B?MHI3b01HL2t2UmtpU0ZyY1lNbmJob0QybWNsV2ZITXUwK3VmOVM4NXVtSHpu?=
- =?utf-8?B?SWtWRkRMNEtuT2dXUjY5L2dIWHJBUXpDbUxVeTBHWmtJUXBpUERUQ0lscGxr?=
- =?utf-8?B?TGlpVmRqQUNuSStTcEVBV2pDa2laRzlJbURjbGtiak5UUVJ3NjdWWGJOdGxO?=
- =?utf-8?B?RnNTTWlQL2lXaU81ZjBrQk9kYzI5UDRmcm12emZwdWtVV2hpSGo1bUVBTkFN?=
- =?utf-8?B?S2U1UlpEbkFKOHE3N1ZmZ1pLZi9kNW1tZ1h2ZmVla3R0MFk1S2tpUjVYMXdy?=
- =?utf-8?B?WmZObGl6N1VKZjFRQk5hYUxQRzlTVnl4cGtWMXVBOHBjR2JFbHd4NWhtT0hv?=
- =?utf-8?B?aVFETXV0c1V1MWwwZ0kxR0FBc2lkQk9wRURTd0hmTjNhdWkxVE5NcEhNQzFC?=
- =?utf-8?B?anBaMDFIR1hrbE5ZOGk1ZjlVc2EvcE1NMWZpR0JrUk94Z29ZTm5IVzVDWXNN?=
- =?utf-8?B?WUI2YXc1K2ZQSUhTdzFXZzJEMEk1aElnRmhhNERFYnF4c1VRVCt1eEF4RmRL?=
- =?utf-8?B?OUlrWlIwRU1rK2R1clhsd0pEQm9IWjdoMVp6SFJpenR6L2VGdDM5d083cWs5?=
- =?utf-8?B?ZXh0Um1XQWFWQTFNVzhLK09xZ1podkdMVzdhNmJ5RlNaR1hoQkhzWkEvOUtl?=
- =?utf-8?B?RXhPMjI3MlIvVnNCWUkxTm1ZUzQxMzZOcmhFd3EzYnUySGU5YmFlekJ2OXc3?=
- =?utf-8?B?VEtVSTQ2N1Z5aHM4Rmw5OE9xMmxZdmxPR3pkaWpjQWoyQWNNVWNNeXFhMHdv?=
- =?utf-8?B?RXBsdC81WTlpKzREeWcrNWRHNzdWT01TTzNnUCt6cEJ5LzhRV0N1QVZiRmJ6?=
- =?utf-8?B?dXFhbFNYU0FlSFZPYmJxZWJvK0htcW9kVnlQaWZDK0MxMDI0UktUYTNyTm1q?=
- =?utf-8?B?RjZxYmNwZGl4V21HWTVvVkpHMUVPM25HbWlSbkpTS0RzNnJHblJJeWNVSVhu?=
- =?utf-8?B?ODhDVHhVODNyR1AydWs4S1FTaXZIZlpaU1FOVzgwZmxnWGprTm11RmVhSkY3?=
- =?utf-8?B?bUVlS1J3UmZqdHEzVlhSNWNhaXBneHZWQ3RHNVZESG1YdldOSFFFUDRmbVNW?=
- =?utf-8?B?RDk5YVhrS2lUTURFMUUzbzVJeHYreUY0dlkvSlhTZWFtWkQvWXdrWHJ6YjJl?=
- =?utf-8?Q?cJreMyFOl5c3VwlEOchqQiQk3?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 101d30e1-6117-4dad-8029-08dd551e5f58
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2025 21:58:29.4993
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jq647goONcA5VohGp+vCbvNT/n5FG7dwnz0uDejgIfqKtyDlMLUcgwAHIBwmMEbgh4zJn8BvozXWLNET7JcYGw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4301
+Mime-Version: 1.0
+References: <20250219012705.1495231-1-seanjc@google.com> <20250219012705.1495231-3-seanjc@google.com>
+ <7794af2d-b3c2-e1f2-6a55-ecd58a1fcc77@amd.com>
+Message-ID: <Z7zzgtS-iu0YHwia@google.com>
+Subject: Re: [PATCH 02/10] KVM: SVM: Don't rely on DebugSwap to restore host DR0..DR3
+From: Sean Christopherson <seanjc@google.com>
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Naveen N Rao <naveen@kernel.org>, Kim Phillips <kim.phillips@amd.com>, 
+	Alexey Kardashevskiy <aik@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 2/18/25 19:27, Sean Christopherson wrote:
-> Mark the VMCB dirty, i.e. zero control.clean, prior to handling the new
-> VMSA.  Nothing in the VALID_PAGE() case touches control.clean, and
-> isolating the VALID_PAGE() code will allow simplifying the overall logic.
+On Mon, Feb 24, 2025, Tom Lendacky wrote:
+> On 2/18/25 19:26, Sean Christopherson wrote:
+> > Never rely on the CPU to restore/load host DR0..DR3 values, even if the
+> > CPU supports DebugSwap, as there are no guarantees that SNP guests will
+> > actually enable DebugSwap on APs.  E.g. if KVM were to rely on the CPU to
+> > load DR0..DR3 and skipped them during hw_breakpoint_restore(), KVM would
+> > run with clobbered-to-zero DRs if an SNP guest created APs without
+> > DebugSwap enabled.
+> > 
+> > Update the comment to explain the dangers, and hopefully prevent breaking
+> > KVM in the future.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > 
-> Note, the VMCB probably doesn't need to be marked dirty when the VMSA is
-> invalid, as KVM will disallow running the vCPU in such a state.  But it
-> also doesn't hurt anything.
+> See comment below about the Type-A vs Type-B thing, but functionally:
+> 
+> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+> 
+> > ---
+> >  arch/x86/kvm/svm/sev.c | 21 ++++++++++++---------
+> >  1 file changed, 12 insertions(+), 9 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> > index e3606d072735..6c6d45e13858 100644
+> > --- a/arch/x86/kvm/svm/sev.c
+> > +++ b/arch/x86/kvm/svm/sev.c
+> > @@ -4594,18 +4594,21 @@ void sev_es_prepare_switch_to_guest(struct vcpu_svm *svm, struct sev_es_save_are
+> >  	/*
+> >  	 * If DebugSwap is enabled, debug registers are loaded but NOT saved by
+> >  	 * the CPU (Type-B). If DebugSwap is disabled/unsupported, the CPU both
+> > -	 * saves and loads debug registers (Type-A).  Sadly, on CPUs without
+> > -	 * ALLOWED_SEV_FEATURES, KVM can't prevent SNP guests from enabling
+> > -	 * DebugSwap on secondary vCPUs without KVM's knowledge via "AP Create",
+> > -	 * and so KVM must save DRs if DebugSwap is supported to prevent DRs
+> > -	 * from being clobbered by a misbehaving guest.
+> > +	 * saves and loads debug registers (Type-A).  Sadly, KVM can't prevent
+> 
+> This mention of Type-A was bothering me, so I did some investigation on
+> this. If DebugSwap (DebugVirtualization in the latest APM) is
+> disabled/unsupported, DR0-3 and DR0-3 Mask registers are left alone and
+> the guest sees the host values, they are not fully restored and fully
+> saved. When DebugVirtualization is enabled, at that point the registers
+> become Type-B.
 
-Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+Good catch.  I completely glossed over that; I'm pretty sure my subconcious simply
+rejected that statement as wrong.
 
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/svm/sev.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 241cf7769508..3a531232c3a1 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -3852,6 +3852,12 @@ static int __sev_snp_update_protected_guest_state(struct kvm_vcpu *vcpu)
->  	/* Clear use of the VMSA */
->  	svm->vmcb->control.vmsa_pa = INVALID_PAGE;
->  
-> +	/*
-> +	 * When replacing the VMSA during SEV-SNP AP creation,
-> +	 * mark the VMCB dirty so that full state is always reloaded.
-> +	 */
-> +	vmcb_mark_all_dirty(svm->vmcb);
-> +
->  	if (VALID_PAGE(svm->sev_es.snp_vmsa_gpa)) {
->  		gfn_t gfn = gpa_to_gfn(svm->sev_es.snp_vmsa_gpa);
->  		struct kvm_memory_slot *slot;
-> @@ -3897,12 +3903,6 @@ static int __sev_snp_update_protected_guest_state(struct kvm_vcpu *vcpu)
->  		kvm_release_page_clean(page);
->  	}
->  
-> -	/*
-> -	 * When replacing the VMSA during SEV-SNP AP creation,
-> -	 * mark the VMCB dirty so that full state is always reloaded.
-> -	 */
-> -	vmcb_mark_all_dirty(svm->vmcb);
-> -
->  	return 0;
->  }
->  
+> I'm not sure whether it is best to update the comment here or in the
+> first patch.
+
+Probably first patch.
 
