@@ -1,193 +1,106 @@
-Return-Path: <kvm+bounces-39003-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39004-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE8EDA427CF
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 17:24:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2C76A42865
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 17:54:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D86BC16D6DD
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 16:23:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 374FD7A7D9D
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 16:54:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A8C8262D07;
-	Mon, 24 Feb 2025 16:23:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70406263F5D;
+	Mon, 24 Feb 2025 16:54:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ffvY7N0p";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="y67nHpQK";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ffvY7N0p";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="y67nHpQK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jDChtEOW"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8BD318B46C
-	for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 16:23:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31CBE1917F1
+	for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 16:54:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740414204; cv=none; b=DYDnE3vV7Sblma2qIU0z2s1aRuf98pIUXka+xPhBSQkWjxp3Nr5Uqs24FZVkhCVnqX9O4n2LZiGun7zYYoWAZw/0gRwXNQzk3vABiAcMIW8ZAVHRp1+esprUKOwSXqq83baIeBd03csY9VPasS8K9tkwSTuVsyt2LPlSuwE2Wjg=
+	t=1740416086; cv=none; b=WGtWeywR9DGMfvQbuorLKcClAasTkJlgA+3pXy0fhlGkuijP1YTCQWHXK/iO+huVRT1I/+CY5iXfG9aqyAGct51StXsQSlSH8Cnr+aaqg2Wa7NGkWcVJnzgytcdKXss/JogfsC9YDhWnTt3o+q5FIha5Fk+wuLT++uZEqWFA1ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740414204; c=relaxed/simple;
-	bh=MRVXIfI9UG2BXzOG7tv7V/b1GbukpjVr4eoLmQQzA1Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jF4xxjMt3HlUoHXtrRFggHQnGkHfe7LsHCHPmmxHHorgMNozuEauGdqdgqku2wveMZd1bDSXJ2zu+6hTxffmaEbeQWitp0EVo3LcKhVV1NXM9kvuLjacscEDWmPLOeXsZJ5lCi5ioz/PfeTg2ED+H9Z48kGAffKx6nCMjBsqf3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ffvY7N0p; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=y67nHpQK; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ffvY7N0p; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=y67nHpQK; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 0DC331F44F;
-	Mon, 24 Feb 2025 16:23:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1740414201; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PAktyz2Hln0u1wP32xCnt0b/m1o4I8DHrPaK7s3SeXw=;
-	b=ffvY7N0pIsMHXBWzK/7TCFsjF57cMzfXSdmxHflB10fTjf2nI3Gv8/LMYFArDh1zhyDp2L
-	p5QzGpRkEbrtqiYXrxohREzzTbtPftteaDEzHbq9msRUdXRG9n8vm+cwAjGVzikRzCa1fW
-	xk5Q+5R1xrhUsnFOgTtiE3bgCbMwAqU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1740414201;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PAktyz2Hln0u1wP32xCnt0b/m1o4I8DHrPaK7s3SeXw=;
-	b=y67nHpQKZ6A37WCLnocVuAPvBNsF5ldexO64bHfLe+MwZzDNiSqa0WvrZSFLctQkWtB/uN
-	X2Pi8A15ykI+LdBA==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=ffvY7N0p;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=y67nHpQK
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1740414201; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PAktyz2Hln0u1wP32xCnt0b/m1o4I8DHrPaK7s3SeXw=;
-	b=ffvY7N0pIsMHXBWzK/7TCFsjF57cMzfXSdmxHflB10fTjf2nI3Gv8/LMYFArDh1zhyDp2L
-	p5QzGpRkEbrtqiYXrxohREzzTbtPftteaDEzHbq9msRUdXRG9n8vm+cwAjGVzikRzCa1fW
-	xk5Q+5R1xrhUsnFOgTtiE3bgCbMwAqU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1740414201;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PAktyz2Hln0u1wP32xCnt0b/m1o4I8DHrPaK7s3SeXw=;
-	b=y67nHpQKZ6A37WCLnocVuAPvBNsF5ldexO64bHfLe+MwZzDNiSqa0WvrZSFLctQkWtB/uN
-	X2Pi8A15ykI+LdBA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B4AED13707;
-	Mon, 24 Feb 2025 16:23:20 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id TB2GKvicvGd1bQAAD6G6ig
-	(envelope-from <jroedel@suse.de>); Mon, 24 Feb 2025 16:23:20 +0000
-Date: Mon, 24 Feb 2025 17:23:15 +0100
-From: Joerg Roedel <jroedel@suse.de>
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-	linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-	seanjc@google.com, thomas.lendacky@amd.com, ashish.kalra@amd.com,
-	liam.merwick@oracle.com, pankaj.gupta@amd.com,
-	dionnaglaze@google.com, huibo.wang@amd.com
-Subject: Re: [PATCH v5 1/1] KVM: Introduce KVM_EXIT_SNP_REQ_CERTS for SNP
- certificate-fetching
-Message-ID: <Z7yc8-QXXVPzr2K8@suse.de>
-References: <20250219151505.3538323-1-michael.roth@amd.com>
- <20250219151505.3538323-2-michael.roth@amd.com>
+	s=arc-20240116; t=1740416086; c=relaxed/simple;
+	bh=qMqS5eEfht6kZYvGjtkUVdSw27+r0jMN/tKHjQa2x00=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=UrKYrj2lsGRMhx3lflxaH+YfWJ9EltLUjfJKJtB8XYE9R99/mx/j7Vvga4iqbrz+5TZkD9MoIqdKCoer98zc0I7U3GT5cGZxfdX8inUcgwy5dIhe/3uy2yTqjwr9SH9ZVvhP0juHCfXi080WZpqpqfiZKqoCRWCxJpGlpwg5UJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jDChtEOW; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fc3e239675so15108244a91.0
+        for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 08:54:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740416084; x=1741020884; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mO++5hfTZIp7IqLdPpH8usJ/YROL6etz3YUnuU1xDcQ=;
+        b=jDChtEOWamrjaXAXnf5OtYZz1WeXSs6iwFh466WPSD46mHWmaHE6t5BOBO9w3TSHW5
+         P15fDON3VP9cUr3q+jfqjVWOxspP45P9KWXMwDwJgEtPYM1wcBx/duDG0BI/bZZEHZ+x
+         /Kkm+vfrn7js/wMWUH7TARsQUjwiCVQlVDKp4wPXRHvEhbj5Z3gZyzRc0xXNRSbvW964
+         UURJ2WZ3muM53n+7YBDiMTS8GRBpjH26gaEIq0vcFqVKhtH/k/YvHBH7PJkQbuo3eY5Q
+         y9fL+imvsaHCfGyZ8qQF61pjxRab0X5ipdhc1BYUG8tX1OvYZPmLLvOq01HepGfk/3tm
+         3BDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740416084; x=1741020884;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mO++5hfTZIp7IqLdPpH8usJ/YROL6etz3YUnuU1xDcQ=;
+        b=a1ZuvekSdELE533gEMxETTY2J+yDcsAE4XmbvgDN6/BsDCY7DH80kR4NFTU9McSlYa
+         cPcA9qEzwau1aEBgR6gu3geU7qEGrq5e+CgmmvkML8UlU+dUHHpmIouVYnsnDFqE0N2p
+         KlZoJtrHgIYOVdnUgO1HAWKuqlmMB8m4kwHPNRUl4NsoVm9baey7B4oUQnifp7I1jwIE
+         yNwSExhvRUCEaEXg7LpKxIwem9n6Zqxd5tRnf14g5nf/2Wdx5ejGYd5y500JgSvzw/29
+         M71YP/DqXF9UVKhHgfHp744YIDjCkXFCGY28nnehhbMGC74EkS4SnYZXpYYA9/eAFPwt
+         cimw==
+X-Gm-Message-State: AOJu0YzQhw7MjRa+WdIdAYCI5P/aiy8V+MLurfCz88T1tZzyc2kKAgTf
+	J2jLHx3CixZ3Fsi5RXSZsM6vDzM2lDxMUzir0Q+/RxOsQhFkag3fEQy3JhtutqBwj4YkMtmyC7J
+	loA==
+X-Google-Smtp-Source: AGHT+IGb+f7j2I0nb12t7zmDGMmEI0YCFwJ+uRhnZXJ8MRHxJkt6TTRNK3XmV8KQPwwgSN4ciXRzHh216so=
+X-Received: from pjboe12.prod.google.com ([2002:a17:90b:394c:b0:2fa:1fac:2695])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d40c:b0:2ee:fdf3:38ea
+ with SMTP id 98e67ed59e1d1-2fce87243b6mr19543865a91.23.1740416084497; Mon, 24
+ Feb 2025 08:54:44 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Mon, 24 Feb 2025 08:54:40 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250219151505.3538323-2-michael.roth@amd.com>
-X-Rspamd-Queue-Id: 0DC331F44F
-X-Spam-Score: -4.51
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,suse.de:email,suse.com:url];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
-X-Spam-Level: 
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
+Message-ID: <20250224165442.2338294-1-seanjc@google.com>
+Subject: [PATCH v2 0/2] KVM: SVM: Fix an STI shadow on VMRUN bug
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Doug Covelli <doug.covelli@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Michael,
+Fix a bug where KVM puts VMRUN in an STI shadow, which AMD CPUs bleed
+into guest state if a #VMEXIT occurs before completing the VMRUN, e.g.
+if vectoring an injected exception triggers an exit.
 
-On Wed, Feb 19, 2025 at 09:15:05AM -0600, Michael Roth wrote:
-> +  - If some other error occurred, userspace must set `ret` to ``EIO``.
-> +    (This is to reserve special meaning for unused error codes in the
-> +    future.)
+v2: Use "raw" variants to avoid tracing in noinstr code. [kernel test robot]
 
-[...]
+v1: https://lore.kernel.org/all/20250215010946.1201353-1-seanjc@google.com
 
-> +static int snp_complete_req_certs(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vcpu_svm *svm = to_svm(vcpu);
-> +	struct vmcb_control_area *control = &svm->vmcb->control;
-> +
-> +	if (vcpu->run->snp_req_certs.ret) {
-> +		if (vcpu->run->snp_req_certs.ret == ENOSPC) {
-> +			vcpu->arch.regs[VCPU_REGS_RBX] = vcpu->run->snp_req_certs.npages;
-> +			ghcb_set_sw_exit_info_2(svm->sev_es.ghcb,
-> +						SNP_GUEST_ERR(SNP_GUEST_VMM_ERR_INVALID_LEN, 0));
-> +		} else if (vcpu->run->snp_req_certs.ret == EAGAIN) {
-> +			ghcb_set_sw_exit_info_2(svm->sev_es.ghcb,
-> +						SNP_GUEST_ERR(SNP_GUEST_VMM_ERR_BUSY, 0));
-> +		} else {
-> +			ghcb_set_sw_exit_info_2(svm->sev_es.ghcb,
-> +						SNP_GUEST_ERR(SNP_GUEST_VMM_ERR_GENERIC, 0));
-> +		}
+Sean Christopherson (2):
+  KVM: SVM: Set RFLAGS.IF=1 in C code, to get VMRUN out of the STI
+    shadow
+  KVM: selftests: Assert that STI blocking isn't set after event
+    injection
 
-According to the documentation above, there should be a block checking
-for EIO which injects SNP_GUEST_VMM_ERR_GENERIC and the else block
-should return with EINVAL to user-space, no?
+ arch/x86/kvm/svm/svm.c                             | 14 ++++++++++++++
+ arch/x86/kvm/svm/vmenter.S                         | 10 +---------
+ .../selftests/kvm/x86/nested_exceptions_test.c     |  2 ++
+ 3 files changed, 17 insertions(+), 9 deletions(-)
 
-Regards,
 
+base-commit: fed48e2967f402f561d80075a20c5c9e16866e53
 -- 
-Jörg Rödel
-jroedel@suse.de
+2.48.1.601.g30ceb7b040-goog
 
-SUSE Software Solutions Germany GmbH
-Frankenstraße 146
-90461 Nürnberg
-Germany
-https://www.suse.com/
-
-Geschäftsführer: Ivo Totev, Andrew McDonald, Werner Knoblich
-(HRB 36809, AG Nürnberg)
 
