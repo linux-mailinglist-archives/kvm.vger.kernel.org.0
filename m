@@ -1,144 +1,193 @@
-Return-Path: <kvm+bounces-39002-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39003-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7165A4273D
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 17:04:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE8EDA427CF
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 17:24:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF5E03B8B53
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 15:57:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D86BC16D6DD
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 16:23:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1CD0261378;
-	Mon, 24 Feb 2025 15:57:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A8C8262D07;
+	Mon, 24 Feb 2025 16:23:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DE07uZ97"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ffvY7N0p";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="y67nHpQK";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ffvY7N0p";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="y67nHpQK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B00C019C54F
-	for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 15:57:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8BD318B46C
+	for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 16:23:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740412670; cv=none; b=Msp28InjyhVx9a2QC6aTzw0D1F18muNO50l9DRHrot4rDTxsKdA54GN/a+MQPK9nNwe0zOsAHt8AktuBZScAALP32a1DAhu7WqzguXiFbd5GBb5GLfSzDH1/i9qWhSyvUdZ9zqfeyPRo1ng3ak4xxc3eeSmSpv1sjyaXLw4r/Do=
+	t=1740414204; cv=none; b=DYDnE3vV7Sblma2qIU0z2s1aRuf98pIUXka+xPhBSQkWjxp3Nr5Uqs24FZVkhCVnqX9O4n2LZiGun7zYYoWAZw/0gRwXNQzk3vABiAcMIW8ZAVHRp1+esprUKOwSXqq83baIeBd03csY9VPasS8K9tkwSTuVsyt2LPlSuwE2Wjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740412670; c=relaxed/simple;
-	bh=2t59lsYG4BqwtnauANqi9S05hHamW9pvVdmQnLPMB5Y=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MDDEAjprL0iOtZzpP/HIY99uvKAkiFEy/Ce3ZWZDetSiocpQeRVurNJuDqG1s4yhoCSjFYG2eiT79mWkyFh7uM2xBiTA8iqqysaVkb/ryEe1/JNRwMM/uZ6/msDDJfOZsifz5JyS97ClyjvF/Rh8QI3AINPKEGSvpo8A6P9e3YU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DE07uZ97; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-220e62c4f27so109546585ad.0
-        for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 07:57:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740412667; x=1741017467; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ql4hG9y/ji9r+lB2NHuF+yH9db63u51S51cV8RgKCFE=;
-        b=DE07uZ97SuDwFBiE6d6ieELH7EE7tkAGbtQcdsA5/fgNCHpljX/n7PprNLq9HmdZEV
-         9lKewl967RJwkFOtYu2LPTlz2kxEPbKwlokH6qAguYmk7DVk0WlzRHO/E5Vf43YZxQpz
-         9obzG/cDXlr1u84xcEVi3REMX9bRQPC5lAnfIbLRcnVw95xgENHKETMKpzETCnxpIREJ
-         ccGFHCNPic6xdlbEXrKcVuEbGdmVVss2KkL3aKRQ1hSiNZ9hL1E6ZGe7dCCw7YcIeZ5G
-         Uy1H1a7R2T6W5ZyZKOmCHE4RvS1rpWjviENtY4Hc9xC+Hqyt+HtC0jmd1H6dawlOhh4f
-         hW8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740412667; x=1741017467;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ql4hG9y/ji9r+lB2NHuF+yH9db63u51S51cV8RgKCFE=;
-        b=bIKrZB0ZzKsVrzFTpySbSMNmbrAtSN5ZQfz0TcGp8ZI9W1fdPw/1PnVIsxTtnNJJ3+
-         KAvrEG09skO3en32Tb506uftLJbO09fOkc5sRtGNQsjQjTAeBzQVbZjSy40AFs7MnGbH
-         FNjj/XRjPjKo0Gza8XNaKOBVV36FqJnTosx8oKIBmKXCmptIvGmrgjqz4mWXg36tTMqw
-         mka8ZbpAOZq2eSFxbGK65a0LuZP8c8O1w1SWBtGI9RXsSAl8j2iLezoavaeBQsLd1tf6
-         nzQDtgKM9tvtTJZqNDnaHKL3srMstm1mGEVSgVpzuMxBRF5MtgOzuPA7uzTQr/eP7tGa
-         4Ziw==
-X-Forwarded-Encrypted: i=1; AJvYcCXSRkNTulk2+HyW7vafjZJT2C2ApKADsR+7EJUn6i/4RVta118SjNGF32jcSoYL+KAKBG0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyclLjPs346Znoi9+OhqN4PFL9/dQFbRhSy8scZiMAzhcFyo4WY
-	AiXR6HUXv7wnllIjOf/JeWKuN2sEx4LLc+0R63sE1vtfUjEUPesJ6D5vNmvsk7BZU7Y1J95CImO
-	Bcw==
-X-Google-Smtp-Source: AGHT+IFkxCGkRNpNw+UlQYXfNBv6PhblpOoOHAO6bny9WcoQpJVMrpTux0exDkoFpvccE+QSh69xIrDiPgM=
-X-Received: from pfbhx1.prod.google.com ([2002:a05:6a00:8981:b0:732:5b2e:4735])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:4f88:b0:730:a40f:e6ce
- with SMTP id d2e1a72fcca58-73426d85439mr18693077b3a.17.1740412666826; Mon, 24
- Feb 2025 07:57:46 -0800 (PST)
-Date: Mon, 24 Feb 2025 07:57:45 -0800
-In-Reply-To: <20250221071624.1356899-1-suhui@nfschina.com>
+	s=arc-20240116; t=1740414204; c=relaxed/simple;
+	bh=MRVXIfI9UG2BXzOG7tv7V/b1GbukpjVr4eoLmQQzA1Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jF4xxjMt3HlUoHXtrRFggHQnGkHfe7LsHCHPmmxHHorgMNozuEauGdqdgqku2wveMZd1bDSXJ2zu+6hTxffmaEbeQWitp0EVo3LcKhVV1NXM9kvuLjacscEDWmPLOeXsZJ5lCi5ioz/PfeTg2ED+H9Z48kGAffKx6nCMjBsqf3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ffvY7N0p; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=y67nHpQK; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ffvY7N0p; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=y67nHpQK; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 0DC331F44F;
+	Mon, 24 Feb 2025 16:23:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1740414201; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PAktyz2Hln0u1wP32xCnt0b/m1o4I8DHrPaK7s3SeXw=;
+	b=ffvY7N0pIsMHXBWzK/7TCFsjF57cMzfXSdmxHflB10fTjf2nI3Gv8/LMYFArDh1zhyDp2L
+	p5QzGpRkEbrtqiYXrxohREzzTbtPftteaDEzHbq9msRUdXRG9n8vm+cwAjGVzikRzCa1fW
+	xk5Q+5R1xrhUsnFOgTtiE3bgCbMwAqU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1740414201;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PAktyz2Hln0u1wP32xCnt0b/m1o4I8DHrPaK7s3SeXw=;
+	b=y67nHpQKZ6A37WCLnocVuAPvBNsF5ldexO64bHfLe+MwZzDNiSqa0WvrZSFLctQkWtB/uN
+	X2Pi8A15ykI+LdBA==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=ffvY7N0p;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=y67nHpQK
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1740414201; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PAktyz2Hln0u1wP32xCnt0b/m1o4I8DHrPaK7s3SeXw=;
+	b=ffvY7N0pIsMHXBWzK/7TCFsjF57cMzfXSdmxHflB10fTjf2nI3Gv8/LMYFArDh1zhyDp2L
+	p5QzGpRkEbrtqiYXrxohREzzTbtPftteaDEzHbq9msRUdXRG9n8vm+cwAjGVzikRzCa1fW
+	xk5Q+5R1xrhUsnFOgTtiE3bgCbMwAqU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1740414201;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PAktyz2Hln0u1wP32xCnt0b/m1o4I8DHrPaK7s3SeXw=;
+	b=y67nHpQKZ6A37WCLnocVuAPvBNsF5ldexO64bHfLe+MwZzDNiSqa0WvrZSFLctQkWtB/uN
+	X2Pi8A15ykI+LdBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B4AED13707;
+	Mon, 24 Feb 2025 16:23:20 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id TB2GKvicvGd1bQAAD6G6ig
+	(envelope-from <jroedel@suse.de>); Mon, 24 Feb 2025 16:23:20 +0000
+Date: Mon, 24 Feb 2025 17:23:15 +0100
+From: Joerg Roedel <jroedel@suse.de>
+To: Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+	linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+	seanjc@google.com, thomas.lendacky@amd.com, ashish.kalra@amd.com,
+	liam.merwick@oracle.com, pankaj.gupta@amd.com,
+	dionnaglaze@google.com, huibo.wang@amd.com
+Subject: Re: [PATCH v5 1/1] KVM: Introduce KVM_EXIT_SNP_REQ_CERTS for SNP
+ certificate-fetching
+Message-ID: <Z7yc8-QXXVPzr2K8@suse.de>
+References: <20250219151505.3538323-1-michael.roth@amd.com>
+ <20250219151505.3538323-2-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250221071624.1356899-1-suhui@nfschina.com>
-Message-ID: <Z7yW-aNXV1sK6eQN@google.com>
-Subject: Re: [PATCH] include/linux/log2.h: mark is_power_of_2() with __always_inline
-From: Sean Christopherson <seanjc@google.com>
-To: Su Hui <suhui@nfschina.com>, Andrew Morton <akpm@linux-foundation.org>
-Cc: binbin.wu@linux.intel.com, pbonzini@redhat.com, 
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250219151505.3538323-2-michael.roth@amd.com>
+X-Rspamd-Queue-Id: 0DC331F44F
+X-Spam-Score: -4.51
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,suse.de:email,suse.com:url];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-+Andrew
+Hi Michael,
 
-On Fri, Feb 21, 2025, Su Hui wrote:
-> When build kernel with randconfig, there is an error:
->=20
-> In function =E2=80=98kvm_is_cr4_bit_set=E2=80=99,inlined from
-> =E2=80=98kvm_update_cpuid_runtime=E2=80=99 at arch/x86/kvm/cpuid.c:310:9:
->=20
-> include/linux/compiler_types.h:542:38: error: call to
-> =E2=80=98__compiletime_assert_380=E2=80=99 declared with attribute error:
-> BUILD_BUG_ON failed: !is_power_of_2(cr4_bit).
+On Wed, Feb 19, 2025 at 09:15:05AM -0600, Michael Roth wrote:
+> +  - If some other error occurred, userspace must set `ret` to ``EIO``.
+> +    (This is to reserve special meaning for unused error codes in the
+> +    future.)
 
-Andrew, do you want to grab this?  Looks like you've taken the last few cha=
-nges
-to log2.h, and KVM isn't the only subsystem that expects is_power_of_2() to=
- yield
-a compile-time constant; taking this through the KVM tree feels wrong.
+[...]
 
-  arch/x86/kvm/kvm_cache_regs.h:	BUILD_BUG_ON(!is_power_of_2(cr0_bit));
-  arch/x86/kvm/kvm_cache_regs.h:	BUILD_BUG_ON(!is_power_of_2(cr4_bit));
-  arch/x86/kvm/x86.c:	BUILD_BUG_ON(!is_power_of_2(ASYNC_PF_PER_VCPU));
-  drivers/net/ipa/gsi.c:	BUILD_BUG_ON(!is_power_of_2(GSI_RING_ELEMENT_SIZE)=
-);
-  drivers/vfio/pci/virtio/legacy_io.c:	BUILD_BUG_ON(!is_power_of_2(virtvdev=
-->bar0_virtual_buf_size));
-  kernel/kcov.c:		BUILD_BUG_ON(!is_power_of_2(KCOV_WORDS_PER_CMP));
-  mm/sparse.c:	BUILD_BUG_ON(!is_power_of_2(sizeof(struct mem_section)));
-  mm/swap_cgroup.c:	BUILD_BUG_ON(!is_power_of_2(ID_PER_SC));
+> +static int snp_complete_req_certs(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vcpu_svm *svm = to_svm(vcpu);
+> +	struct vmcb_control_area *control = &svm->vmcb->control;
+> +
+> +	if (vcpu->run->snp_req_certs.ret) {
+> +		if (vcpu->run->snp_req_certs.ret == ENOSPC) {
+> +			vcpu->arch.regs[VCPU_REGS_RBX] = vcpu->run->snp_req_certs.npages;
+> +			ghcb_set_sw_exit_info_2(svm->sev_es.ghcb,
+> +						SNP_GUEST_ERR(SNP_GUEST_VMM_ERR_INVALID_LEN, 0));
+> +		} else if (vcpu->run->snp_req_certs.ret == EAGAIN) {
+> +			ghcb_set_sw_exit_info_2(svm->sev_es.ghcb,
+> +						SNP_GUEST_ERR(SNP_GUEST_VMM_ERR_BUSY, 0));
+> +		} else {
+> +			ghcb_set_sw_exit_info_2(svm->sev_es.ghcb,
+> +						SNP_GUEST_ERR(SNP_GUEST_VMM_ERR_GENERIC, 0));
+> +		}
 
-> '!is_power_of_2(X86_CR4_OSXSAVE)' is False, but gcc treats is_power_of_2(=
-)
-> as non-inline function and a compilation error happens. Fix this by marki=
-ng
-> is_power_of_2() with __always_inline.
->=20
-> Signed-off-by: Su Hui <suhui@nfschina.com>
-> ---
->  include/linux/log2.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/include/linux/log2.h b/include/linux/log2.h
-> index 9f30d087a128..1366cb688a6d 100644
-> --- a/include/linux/log2.h
-> +++ b/include/linux/log2.h
-> @@ -41,7 +41,7 @@ int __ilog2_u64(u64 n)
->   * *not* considered a power of two.
->   * Return: true if @n is a power of 2, otherwise false.
->   */
-> -static inline __attribute__((const))
-> +static __always_inline __attribute__((const))
->  bool is_power_of_2(unsigned long n)
->  {
->  	return (n !=3D 0 && ((n & (n - 1)) =3D=3D 0));
-> --=20
-> 2.30.2
->=20
+According to the documentation above, there should be a block checking
+for EIO which injects SNP_GUEST_VMM_ERR_GENERIC and the else block
+should return with EINVAL to user-space, no?
+
+Regards,
+
+-- 
+Jörg Rödel
+jroedel@suse.de
+
+SUSE Software Solutions Germany GmbH
+Frankenstraße 146
+90461 Nürnberg
+Germany
+https://www.suse.com/
+
+Geschäftsführer: Ivo Totev, Andrew McDonald, Werner Knoblich
+(HRB 36809, AG Nürnberg)
 
