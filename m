@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-39005-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39006-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23A1BA42867
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 17:55:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E70DA4286A
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 17:55:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4B9C1894B9A
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 16:55:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 531471892BA8
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 16:55:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 774A42641EB;
-	Mon, 24 Feb 2025 16:54:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F223C264A62;
+	Mon, 24 Feb 2025 16:54:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rHko1+FC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MMbXH3+4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08955263F21
-	for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 16:54:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2FAC2641CD
+	for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 16:54:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740416088; cv=none; b=LRO8QYxh8KxqyQxC6WtthCl+bFJfAetUMqgMs5teNogd3PybQfARAi08611/Wn59umqBCHobYR/xtZ7nJjn9aviSsKCkum+qLZVeFnR6/eisY2oX8OIEyAdr/mMK4fzVnF62jhJEKRj3yZnNoqZNTRdJcgJnIuwq6zhRwinMBCM=
+	t=1740416090; cv=none; b=phhYqCLinju0MbqHrNPWHoOsSEsC6L80WdrQ2BvPO7FWcc4ugA/BC920HtrtZm2+oSCPJvyQcq/HYGMgfTr2lbOVFcwMkggGL79/YeUroSXWpETYVD47gCheksgQfub6hrFeKYXXvtXpY5X9dVctaMZnBKLc4uU0e6RJpaVL8II=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740416088; c=relaxed/simple;
-	bh=l6+UgceNnntZd11WS3K/VkPrhV4bTFxROks7VDhHDt4=;
+	s=arc-20240116; t=1740416090; c=relaxed/simple;
+	bh=k08kYOr5amr0PMaAsg/vb1TyI0SEHxFgH5fDVqymMUA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ud5HF/gb2bu4xARzVvLr/oC8jpdG+am20U0cC8RxHSHvcIZ5raItDJj3o+1AsVD6Q+S2mTIRF8E2hbyiccAeklKUKpFlmcUYtQoSYi8Lm9Kl/eHihX4/XtWodlrFYe8C49qDMgYSWqNdufAoK2fUTvmtIjCWlcz8ZvsxmvGpIk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rHko1+FC; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=XPponZkoaX9+h8HfISd3uC9isYe2FNnq2so8DGwanAbwKGoeLTM77N4g/rpzMvfuApx7DhEWnYx6lI8zu5yMehpjRBSl3wpsXtxuZcF4SMc8ZwUU9X5FDegBd2q20JbGfB2CSV8jvdXrxsrAcFZWxhLBUn7MSuQ7gSk4B1udE68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MMbXH3+4; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fc1c7c8396so9562014a91.0
-        for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 08:54:46 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fc45101191so8925709a91.1
+        for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 08:54:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740416086; x=1741020886; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1740416088; x=1741020888; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=FdhSq59XhU0FyUWTPTJyf9MJm43UgRUBo6YYKsIpDDY=;
-        b=rHko1+FCbxIDa+I+dAipTsXiGoWo4jNsScjxf7jmcgyb8GggeMn9hKnBXv3IagRHpm
-         8KeZbNMWKyolmSQjRoSaloS48mOXBanFH3TeOuaNft/USHrFR05gu4WOyVk8Z/wARD5J
-         GzisB+E630P7Txx9GdfVRf73fJAhc4OGh419qKXv137S+p5F5DmyvLtYND+2W7NY0G4M
-         QlWOtEsSpe/yOc9yNk7DvfkpLYtE2VBXUHe2NUxdfy2x4SPafYO/vqhpD22Yy3WE5SHk
-         Rqix70MgA1xt1qWAk5zu6/0+0ffgelsnQ1MyiGEjG0PwUWzzWqMcY5erQhQWbEr0NH7v
-         r7hg==
+        bh=daGjRlPn538a7Mhk1b9p32Ju5z76xxGZiL/mJoi1gQY=;
+        b=MMbXH3+4Cd25m4zUu8rlIwOsLWg1shCbPrnLq7G9j0EJ2Bc9IZMOSCBG8BlfoOxBrc
+         RBV1JQxM+r8t2kq6c9yHhbBt7en12r+NqFt/sliGytUKFvcuKr7WdzGbzjlnsE8o1Dog
+         pQ3fUYztFjPKNAbuCbD9ippC3aXN2E9ZFnzSOiD6iJMtH1rvErpSsHaKWHeqAGIAuGpB
+         osgTa1EdELifo5ANHs+FJMz+azHYJ56ziUVY+53BRApfJdcpRXU/lcmngpZOVFr14qjw
+         4EpZKb4ZoLoTGhdZCz/V8jM5L4cmexo2snduVTGAwzslRdyay+/2OBLwQjeyfOTStEFV
+         37Sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740416086; x=1741020886;
+        d=1e100.net; s=20230601; t=1740416088; x=1741020888;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=FdhSq59XhU0FyUWTPTJyf9MJm43UgRUBo6YYKsIpDDY=;
-        b=Srun38+OuosdI4Ddb7Ct3eeGJHop6pgifDX8Z4hv10xPDqPTU5tFTzRhdpQ0h32r16
-         LaG99PLhADzzDldcpv7u9UakuvXRU1DvZVJCCrMNA8rKsZJAwjxyzJVfB0n/ff45Ct6X
-         zfZCZJZ8Anael+LrSd1mZyUzq8QhGangvdmItpSR80umoXrahDenyLmybj23ovvWNvOk
-         UHxHkCtw4mwJ4SsMluZFU0cfBW+A8QfBnK1mW+babVrW3RzD+3JDCgu8woo88TZf8QOj
-         ALM9habEj2Iq+vpVO7/p/nTc0o7LsHQpfEjHhBHSa2AyAk7viARUmwMcfNHm8nxKi9/u
-         uljA==
-X-Gm-Message-State: AOJu0Yx2zcH1+EhU3AGduy+lEcO7TjkwdmXRcJrEUjJGjEMrtPKF10Pq
-	EKQmWhacrbpfQrTtTuhJRwBOwEwMhrcC1s0R7Hsex6flUl+gUrQBA+8j1VUelp8ZnalrsrLB9BX
-	ohg==
-X-Google-Smtp-Source: AGHT+IFSrtAKmj8Gq/INI+PFQV3lvbZ1NNr6PG1+wrG9VH16gYz3Az2kA6DLNGmb/eanLpAY4R2Dm5bmv6U=
-X-Received: from pjbsx15.prod.google.com ([2002:a17:90b:2ccf:b0:2fb:fa62:d40])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4d0d:b0:2ee:8430:b831
- with SMTP id 98e67ed59e1d1-2fce868c84cmr23717052a91.2.1740416086342; Mon, 24
- Feb 2025 08:54:46 -0800 (PST)
+        bh=daGjRlPn538a7Mhk1b9p32Ju5z76xxGZiL/mJoi1gQY=;
+        b=sGe6njSUkuSfMujVXrULV0E0OSNP4SBul/EUJJ8187EuD3oiWDKZSoP1JvGXEZ1m2Y
+         +PWm3h66KtXw1XyqQwQ9TlL4bPVMyzzPlob9TbEyz2JcxK0kP7CXBZ/gSoz02v3TPJqC
+         6AXMHgd5opIiDtBgwNjzvxNNF/T/9UJoOObHKvR85dgEJI+M7Hu4Sj7ks1IsB9fDReuC
+         Titm7X7XGHm2ULIODGm/LhPSmxHGB/GsAzaGHTTLTWyWPjHUzhWZzCR+Jvw6CspMu6lh
+         OaPh41M3jsS3xS6CE0rvGGjTMz0q9RgGPkoaB7WhoBFD6fqMDZQQMzi9eX+m6mJLiw72
+         AAWw==
+X-Gm-Message-State: AOJu0YzDJ+HRiDSvdzDfiiFaXDFrCBnxvRlBG1bweZlsRG4tqtmEbw4L
+	/Ks1oqyiSsL/thetQk8yyj/+j1qo/YMtklXHJgGMjdk24wtUcIiGQurFzyA+xs3157TuZc/xhVP
+	XNg==
+X-Google-Smtp-Source: AGHT+IH+KEvQ9vCv7mHp7B4rZulwnRTcTJdx+Vfa7nofNtJtLF+U/LGwZGdzx9zvN5HOlsBR7jE4qNXI9oA=
+X-Received: from pjbdb16.prod.google.com ([2002:a17:90a:d650:b0:2fa:1b0c:4150])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:17cd:b0:2f9:c139:b61f
+ with SMTP id 98e67ed59e1d1-2fce78a3812mr27531134a91.14.1740416088081; Mon, 24
+ Feb 2025 08:54:48 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Mon, 24 Feb 2025 08:54:41 -0800
+Date: Mon, 24 Feb 2025 08:54:42 -0800
 In-Reply-To: <20250224165442.2338294-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,121 +75,46 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250224165442.2338294-1-seanjc@google.com>
 X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
-Message-ID: <20250224165442.2338294-2-seanjc@google.com>
-Subject: [PATCH v2 1/2] KVM: SVM: Set RFLAGS.IF=1 in C code, to get VMRUN out
- of the STI shadow
+Message-ID: <20250224165442.2338294-3-seanjc@google.com>
+Subject: [PATCH v2 2/2] KVM: selftests: Assert that STI blocking isn't set
+ after event injection
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Doug Covelli <doug.covelli@broadcom.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Enable/disable local IRQs, i.e. set/clear RFLAGS.IF, in the common
-svm_vcpu_enter_exit() just after/before guest_state_{enter,exit}_irqoff()
-so that VMRUN is not executed in an STI shadow.  AMD CPUs have a quirk
-(some would say "bug"), where the STI shadow bleeds into the guest's
-intr_state field if a #VMEXIT occurs during injection of an event, i.e. if
-the VMRUN doesn't complete before the subsequent #VMEXIT.
+Add an L1 (guest) assert to the nested exceptions test to verify that KVM
+doesn't put VMRUN in an STI shadow (AMD CPUs bleed the shadow into the
+guest's int_state if a #VMEXIT occurs before VMRUN fully completes).
 
-The spurious "interrupts masked" state is relatively benign, as it only
-occurs during event injection and is transient.  Because KVM is already
-injecting an event, the guest can't be in HLT, and if KVM is querying IRQ
-blocking for injection, then KVM would need to force an immediate exit
-anyways since injecting multiple events is impossible.
+Add a similar assert to the VMX side as well, because why not.
 
-However, because KVM copies int_state verbatim from vmcb02 to vmcb12, the
-spurious STI shadow is visible to L1 when running a nested VM, which can
-trip sanity checks, e.g. in VMware's VMM.
-
-Hoist the STI+CLI all the way to C code, as the aforementioned calls to
-guest_state_{enter,exit}_irqoff() already inform lockdep that IRQs are
-enabled/disabled, and taking a fault on VMRUN with RFLAGS.IF=1 is already
-possible.  I.e. if there's kernel code that is confused by running with
-RFLAGS.IF=1, then it's already a problem.  In practice, since GIF=0 also
-blocks NMIs, the only change in exposure to non-KVM code (relative to
-surrounding VMRUN with STI+CLI) is exception handling code, and except for
-the kvm_rebooting=1 case, all exception in the core VM-Enter/VM-Exit path
-are fatal.
-
-Use the "raw" variants to enable/disable IRQs to avoid tracing in the
-"no instrumentation" code; the guest state helpers also take care of
-tracing IRQ state.
-
-Oppurtunstically document why KVM needs to do STI in the first place.
-
-Reported-by: Doug Covelli <doug.covelli@broadcom.com>
-Closes: https://lore.kernel.org/all/CADH9ctBs1YPmE4aCfGPNBwA10cA8RuAk2gO7542DjMZgs4uzJQ@mail.gmail.com
-Fixes: f14eec0a3203 ("KVM: SVM: move more vmentry code to assembly")
-Cc: stable@vger.kernel.org
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/svm.c     | 14 ++++++++++++++
- arch/x86/kvm/svm/vmenter.S | 10 +---------
- 2 files changed, 15 insertions(+), 9 deletions(-)
+ tools/testing/selftests/kvm/x86/nested_exceptions_test.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index b8aa0f36850f..df5c23613b95 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4189,6 +4189,18 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu, bool spec_ctrl_in
+diff --git a/tools/testing/selftests/kvm/x86/nested_exceptions_test.c b/tools/testing/selftests/kvm/x86/nested_exceptions_test.c
+index 3eb0313ffa39..3641a42934ac 100644
+--- a/tools/testing/selftests/kvm/x86/nested_exceptions_test.c
++++ b/tools/testing/selftests/kvm/x86/nested_exceptions_test.c
+@@ -85,6 +85,7 @@ static void svm_run_l2(struct svm_test_data *svm, void *l2_code, int vector,
  
- 	guest_state_enter_irqoff();
- 
-+	/*
-+	 * Set RFLAGS.IF prior to VMRUN, as the host's RFLAGS.IF at the time of
-+	 * VMRUN controls whether or not physical IRQs are masked (KVM always
-+	 * runs with V_INTR_MASKING_MASK).  Toggle RFLAGS.IF here to avoid the
-+	 * temptation to do STI+VMRUN+CLI, as AMD CPUs bleed the STI shadow
-+	 * into guest state if delivery of an event during VMRUN triggers a
-+	 * #VMEXIT, and the guest_state transitions already tell lockdep that
-+	 * IRQs are being enabled/disabled.  Note!  GIF=0 for the entirety of
-+	 * this path, so IRQs aren't actually unmasked while running host code.
-+	 */
-+	raw_local_irq_enable();
-+
- 	amd_clear_divider();
- 
- 	if (sev_es_guest(vcpu->kvm))
-@@ -4197,6 +4209,8 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu, bool spec_ctrl_in
- 	else
- 		__svm_vcpu_run(svm, spec_ctrl_intercepted);
- 
-+	raw_local_irq_disable();
-+
- 	guest_state_exit_irqoff();
+ 	GUEST_ASSERT_EQ(ctrl->exit_code, (SVM_EXIT_EXCP_BASE + vector));
+ 	GUEST_ASSERT_EQ(ctrl->exit_info_1, error_code);
++	GUEST_ASSERT(!ctrl->int_state);
  }
  
-diff --git a/arch/x86/kvm/svm/vmenter.S b/arch/x86/kvm/svm/vmenter.S
-index 2ed80aea3bb1..0c61153b275f 100644
---- a/arch/x86/kvm/svm/vmenter.S
-+++ b/arch/x86/kvm/svm/vmenter.S
-@@ -170,12 +170,8 @@ SYM_FUNC_START(__svm_vcpu_run)
- 	mov VCPU_RDI(%_ASM_DI), %_ASM_DI
+ static void l1_svm_code(struct svm_test_data *svm)
+@@ -122,6 +123,7 @@ static void vmx_run_l2(void *l2_code, int vector, uint32_t error_code)
+ 	GUEST_ASSERT_EQ(vmreadz(VM_EXIT_REASON), EXIT_REASON_EXCEPTION_NMI);
+ 	GUEST_ASSERT_EQ((vmreadz(VM_EXIT_INTR_INFO) & 0xff), vector);
+ 	GUEST_ASSERT_EQ(vmreadz(VM_EXIT_INTR_ERROR_CODE), error_code);
++	GUEST_ASSERT(!vmreadz(GUEST_INTERRUPTIBILITY_INFO));
+ }
  
- 	/* Enter guest mode */
--	sti
--
- 3:	vmrun %_ASM_AX
- 4:
--	cli
--
- 	/* Pop @svm to RAX while it's the only available register. */
- 	pop %_ASM_AX
- 
-@@ -340,12 +336,8 @@ SYM_FUNC_START(__svm_sev_es_vcpu_run)
- 	mov KVM_VMCB_pa(%rax), %rax
- 
- 	/* Enter guest mode */
--	sti
--
- 1:	vmrun %rax
--
--2:	cli
--
-+2:
- 	/* IMPORTANT: Stuff the RSB immediately after VM-Exit, before RET! */
- 	FILL_RETURN_BUFFER %rax, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_VMEXIT
- 
+ static void l1_vmx_code(struct vmx_pages *vmx)
 -- 
 2.48.1.601.g30ceb7b040-goog
 
