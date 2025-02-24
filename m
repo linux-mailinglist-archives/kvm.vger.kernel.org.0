@@ -1,127 +1,84 @@
-Return-Path: <kvm+bounces-38981-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38982-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4DD5A418AE
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 10:20:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85AB3A4196D
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 10:45:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF835188D14A
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 09:18:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D24B166C3C
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 09:45:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F50724BBFA;
-	Mon, 24 Feb 2025 09:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02D6624502A;
+	Mon, 24 Feb 2025 09:44:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qpzZXn8L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZzRW7iYP"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BD86243364
-	for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 09:10:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 263F0802;
+	Mon, 24 Feb 2025 09:44:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740388218; cv=none; b=ggAAoJ7nAgaWUNAeR7OOrf4StR7nTI0e86qQPrrRK6YQXbVhdB4jaw84vI/Vfn77EmMyRzrLB0FJYtZvQzyhlyOPwjI+0B2W3y+G3bB/CazQXOUVSCblbr0Mhtfq0DRakKd7OAOhIJaO0zfb3b7ce+sfB3L4ImnTSAsQ5rSaKMs=
+	t=1740390293; cv=none; b=VbcIPNK/tEa28mG2GXQOB8RGTjM6VoE9I/DK2zDlwWWrT0kGQWy1S+JkfzGE01prgho4byz+r18hmQ8Lt3nvXHZaPjXQyWXx+NJjdrz1tHeTw/TCHHg5eQDx5RFK64aOuK4lVmXJDRlTSk7S+Wpq9fB14kj0feCXlWaEyjUWNjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740388218; c=relaxed/simple;
-	bh=25WXkM/8rWEaoR8LFVp2KbNEahjJte6M9YZgoly96/k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QZKlJ2i6m0zuJpxqvy54LIsV2TeEV0skY1ef9zmOjE5QkprsYanWwcr2DG9rbSLDNnASA64/3vZwXlfbELibyn7zh/vOyQWRGeJSMse7Rfc1DbS3CYGj5NZ6oiH+Rw68JdCE1VF6wGt9RHEnoMBnRFyWH+OTyWy9VBO/2+a2WOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qpzZXn8L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26196C4CED6;
-	Mon, 24 Feb 2025 09:10:14 +0000 (UTC)
+	s=arc-20240116; t=1740390293; c=relaxed/simple;
+	bh=Oy30/9mZEn7bUDinnc0MnPc95uAajJprYdB66FJ2hCs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=GHLJBhk+WNbCmw5lwgjhhtV57VWcszFS3GRN8dL501RjhlkoOxK/BVn0zd1484gcusjr19jsxKjwHykaI87hdyf8kwL6bRVRwF1AByGdI0p6AkHvYEk1AwpNnN6axg9E8Pf3SF/PNQuJgvM65QQ/wM5RUaH52EVjRvNPGu6XvAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZzRW7iYP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70987C4CED6;
+	Mon, 24 Feb 2025 09:44:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740388218;
-	bh=25WXkM/8rWEaoR8LFVp2KbNEahjJte6M9YZgoly96/k=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qpzZXn8L1aQBqOsvb+yp/83lYCIJyb70RwcmdBiwXcxpdAg52ilg5B7wSCx8SEoZb
-	 qLqxnFHjdNqS+yz2YD0r4EoNboQCFNK4SpMumjVmpQzli70bmSz8/prZV6Duebd4or
-	 O3R3cClzegFyUcE9e6MEGS/PYRhHMJQ0QVjAQ8EgynerK4ambFJ+OP63pQFuRWPvyV
-	 UbVk5I9YxrWA9HXB2hu+Fnzw9+ZwCa29OJZ0ZymsDz4tmr7ZtMBdVLwMr75TL2jbhM
-	 93JM0+3UmG8OHrGn7eM+TFk8CVGcNTYHuJYhS3KfVY0Yo3Yoxgq2/SA88IyVy+sxVg
-	 4LqgCzIwgTBWg==
-From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-To: kvm@vger.kernel.org
-Cc: Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Julien Thierry <julien.thierry.kdev@gmail.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-Subject: [PATCH kvmtool v2 2/2] cpu: vmexit: Handle KVM_EXIT_MEMORY_FAULT in KVM_RUN ioctl return
-Date: Mon, 24 Feb 2025 14:40:00 +0530
-Message-ID: <20250224091000.3925918-2-aneesh.kumar@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250224091000.3925918-1-aneesh.kumar@kernel.org>
-References: <20250224091000.3925918-1-aneesh.kumar@kernel.org>
+	s=k20201202; t=1740390291;
+	bh=Oy30/9mZEn7bUDinnc0MnPc95uAajJprYdB66FJ2hCs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=ZzRW7iYPehAt4rl2l5x8kO9GrbI3DA+cEo6LuHgroln05qBr+x3k7Iu+UBZtGq6CJ
+	 NZjxXQYOU1LX19IF0G7wVIBzhlGfaJggIV2co5mGNCNC4TYP13qC0dpsq3d72P0sAt
+	 ziVbsWv3TTPCoAVh1dNAet91w8X01FmFm3Hu32FXF7BznloWziRPwM6MCg6iEaybaM
+	 s5KVkJ/joeYbskA8UNWDmcxzv3j+PDdsNmXqS8QlVieRqFb2X6PlSjArl5HEiM5xtd
+	 Vka1QE1vNd1iIusYL8J1TWHGVReDLPEnl8CRuIUJsG7Jt3Ezt0BwkAMtPLiVdgiIC+
+	 hOGNJku6qPvBg==
+X-Mailer: emacs 30.1 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	gankulkarni@os.amperecomputing.com
+Subject: Re: [PATCH v2 10/14] KVM: arm64: Allow userspace to limit NV
+ support to nVHE
+In-Reply-To: <20250220134907.554085-11-maz@kernel.org>
+References: <20250220134907.554085-1-maz@kernel.org>
+ <20250220134907.554085-11-maz@kernel.org>
+Date: Mon, 24 Feb 2025 15:14:44 +0530
+Message-ID: <yq5a4j0jhe2b.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Linux kernel documentation states:
+Marc Zyngier <maz@kernel.org> writes:
 
-"Note! KVM_EXIT_MEMORY_FAULT is unique among all KVM exit reasons in
-that it accompanies a return code of '-1', not '0'! errno will always be
-set to EFAULT or EHWPOISON when KVM exits with KVM_EXIT_MEMORY_FAULT,
-userspace should assume kvm_run.exit_reason is stale/undefined for all
-other error numbers." "
+> NV is hard. No kidding.
+>
+> In order to make things simpler, we have established that NV would
+> support two mutually exclusive configurations:
+>
+> - VHE-only, and supporting recursive virtualisation
+>
+> - mVHE-only, and not supporting recursive virtualisation
+>
 
-Update KVM_RUN ioctl error handling to correctly handle
-KVM_EXIT_MEMORY_FAULT. This enables the memory fault exit handlers in
-the kernel to return -EFAULT as the return value. VMM support is
-still required to handle these memory fault exits, but that is not
-included in this change
+mVHE-only -> nVHE-only 
 
-Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
----
- kvm-cpu.c | 15 +++++++++++++--
- kvm.c     |  1 +
- 2 files changed, 14 insertions(+), 2 deletions(-)
-
-diff --git a/kvm-cpu.c b/kvm-cpu.c
-index 7c62bfc56679..c0b10b1534ab 100644
---- a/kvm-cpu.c
-+++ b/kvm-cpu.c
-@@ -41,8 +41,19 @@ void kvm_cpu__run(struct kvm_cpu *vcpu)
- 		return;
- 
- 	err = ioctl(vcpu->vcpu_fd, KVM_RUN, 0);
--	if (err < 0 && (errno != EINTR && errno != EAGAIN))
--		die_perror("KVM_RUN failed");
-+	if (err < 0) {
-+		switch (errno) {
-+		case EINTR:
-+		case EAGAIN:
-+			return;
-+		case EFAULT:
-+			if (vcpu->kvm_run->exit_reason == KVM_EXIT_MEMORY_FAULT)
-+				return;
-+			/* faullthrough */
-+		default:
-+			die_perror("KVM_RUN failed");
-+		}
-+	}
- }
- 
- static void kvm_cpu_signal_handler(int signum)
-diff --git a/kvm.c b/kvm.c
-index 42b881217df6..172d951bfe4e 100644
---- a/kvm.c
-+++ b/kvm.c
-@@ -55,6 +55,7 @@ const char *kvm_exit_reasons[] = {
- #ifdef CONFIG_PPC64
- 	DEFINE_KVM_EXIT_REASON(KVM_EXIT_PAPR_HCALL),
- #endif
-+	DEFINE_KVM_EXIT_REASON(KVM_EXIT_MEMORY_FAULT),
- };
- 
- static int pause_event;
--- 
-2.43.0
-
+-aneesh
 
