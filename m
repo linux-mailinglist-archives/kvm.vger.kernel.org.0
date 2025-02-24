@@ -1,81 +1,82 @@
-Return-Path: <kvm+bounces-39047-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39048-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA5A7A42E8D
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 22:03:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61C0CA42F12
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 22:29:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87539188166F
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 21:03:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80EC6176D72
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 21:29:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9D571957FC;
-	Mon, 24 Feb 2025 21:03:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37D3C1DDC37;
+	Mon, 24 Feb 2025 21:29:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ZkYF3d2d"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="PespLxNB"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2063.outbound.protection.outlook.com [40.107.93.63])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2087.outbound.protection.outlook.com [40.107.237.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FE531F5FA;
-	Mon, 24 Feb 2025 21:03:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.63
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922822571B2;
+	Mon, 24 Feb 2025 21:29:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.87
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740431007; cv=fail; b=SfkalLS1F/c3M61D3EK2/3M0PQNMSDo+kDSRvvFxZ4L6w8/wVcvBmz2ionnZnAiPvP1nuh1/NuxJc2u0OkTcfPGHbbCFBrMTdYb0TE2wo2cCJ1VQiYCIACaOPnu0jNoXgcZPCxL70bTofq11iunTl/cFxJyUh14wCJ/yA3YQR5w=
+	t=1740432545; cv=fail; b=D2rzGW4W/ERmV4DaaT9PRJ03Ru9J+aJldyyowX3hwD5VVCQiSPevasq9V9dxf9cYea6SkOZkF+GOD9KSyA5INr3jP17RLxnvhbzf2jqloHQUEU/pF9gNl6zkBITaxG6c3TGTvASbirOmzmHafvbUW9t4BFWOxeqdeJP1VIQ0tpI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740431007; c=relaxed/simple;
-	bh=T4bM/N1mzlDJtzTe58Ixs7/YQ9D3cR1h/iZTdzlRJ9c=;
-	h=Message-ID:Date:To:Cc:References:From:Subject:In-Reply-To:
-	 Content-Type:MIME-Version; b=QttFvbXpg2VgDTyFbSq+1xNZ3wyFgfgLc6xIQOLVVgmfi0XKFInRquoyjsplHaAVpXNqO4QncmmpAvrHwDARta/q+/j43Hy8smRpDA4qUfd+vmrfSVHXkX1MgedLzS939Fw1/SfbNuBhMIoqSI+4CkAn0CotpxI04rvY+OW7Pyw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ZkYF3d2d; arc=fail smtp.client-ip=40.107.93.63
+	s=arc-20240116; t=1740432545; c=relaxed/simple;
+	bh=iiHaHi5dqptjZrBrk5tPfwn66aYQS5LNw2EQRhd2gRQ=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=UiUKNYM8/2Fw/uzAuw9xUbd5ovxW0crg8eJB7ST6cpwiUz/A/yn0XELGmqBGR9Xbzzbps3BGxepBaGD83GI4YO45QCxcQ1S6IAJhqoy3j4AvpWWkB5dhtrzC5xSxXAQuta3+Vz0+7bqq2oabQYNWXfnLIvuX4h6c3rJUKK8ZIcM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=PespLxNB; arc=fail smtp.client-ip=40.107.237.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Rtj3vTjzmxPNnLTJkQNmdcGNVNKCGm7jkQ5HKOCUlX8/TYGG+kgRyT2SK4x2fnxWnhZt453D6+KhIppU9revXz6KH3AMLNy6CXYqocrwL5LTgBEY4ON5/pdJWGRXJ9uWvKj+tmug3UeC/9PzCdPbLIG6YG5g/s8YIgLfvrNQHG8v68FPFaG3ZX/edQDOFk7L2iJPmJCf24R5TinbvLjI3IPYG/DckRhDn2BYl0Fe12mkgBS74qizRYz0+MFnaNwsoKYRaIvLszpeaXkD4MJjAxV04fTxOwxZS8wmPDuZfZYGLi4P+kShKUaPkGyflzXbZ6IkDkQsTbH+8U4/a9RVww==
+ b=JhUzDG2DyxsZCVG60sp6UhBomyopb/pMxDuHsc69p6nt+kFDADs4O4BHyIOxXRkJkQ2l3QH0AAJOzsUgp+xQQw9YGX1wSnyLUPpehnOm0P2VKp31Y+0KUVEGWB45mSSLY3PfKZ4BezMlh/ytOLZ7/NzsYz0maORIrjPZZcjsdygg3DvkNkUgXzR2Om/kbZzaBCJtbGsZDvfYebMTYpxzgooBP1dTNVft3XsckV2Hi8KUr63jFViIbtLwKm4MqhUSZTHecKTwFj/+3NLc/PWhsZVguNt4/exCzYQgDXaDwLObKoGCgUBZszDEJ7Dz6u3YrFPIcyYOovRRvnJYEddW7g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RFZFWBF/vUAv7pI9XEu3QHhRL3zGwnM6Ii2zCydY13M=;
- b=NNIGofwx8sIrBkBQWS9adNF8JhXxZQ6kkLG+4/C7Be+4M32K54kPrJwaOEXqRICmZW9/STUwH+eYGV9BTa08iuxTMbn9P3eyft9LU3s/BiCF9wLl8bo1ZxOrhFqWbYeWfZahjU7Qwi/EdP5B5ogPO8Td9XWXO3eEuzvRXrlmxjfQuQRDN8c6/APQs3+mQBTXgiPh5kYzymRppKFDhkOgC/QsLEE1rcaNtfh02sTOBFdhxCH0Bqg33aFdV4eURxUODwS2uIKQ4UcCHKpjyFWXTrmSOvHAaeYyk9olSJvwkETiPUQMolj1BG82ORQkoP4Pr25uaCRJejmizfNHxa+njQ==
+ bh=6HKl5x7sgGUI0Ckr98jtpMbkcJZBmVf5YSuCrbzRrMk=;
+ b=xXAevV8PjFxFwU+N3aRMUD/WAfWdzpFX1VpJOm/SJlYBb2xrMrjZ9CA+/Ienk3hoUr8a+ycZc6IoKzBkeGNB2qPgvKicbl2p5XllaaSPvBUstQWVDeftP3m0iN7ICOeMTD5pjpAbohsiFxLGO+N/LQtvltOXOpJkPOs74vQD77lPW4DC8g1AzUkuITotWCfvx4x8fp+BQ1Hk/x5ohQXnWgkqTY7EeTfgeYt/JrOWZdnCPF6O0oUZMbNBjtgM39XWMpOUMyiIRFcatgwhmoX5GxGwGFTy/X6ebsUZ16jNgl6wgE0iz41lAmjSXOprZQXQjOS8eNpwVkWc9TEKRcTnHA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RFZFWBF/vUAv7pI9XEu3QHhRL3zGwnM6Ii2zCydY13M=;
- b=ZkYF3d2d3mzhQ/9SFMthSecXzMv0hH408fZaqMx95+gBoYDCAwRQlyYg7t9j68m4Ibp6ZHrtwWQbi7fwuWQQVxi7HmebS65yWtH6ZxaKfbQRQih4lWGO8d88jhaB8FfQ2BS/s9F3TusG6MQ/LUiC8dK+1fdEOxpSZqqhazLYETw=
+ bh=6HKl5x7sgGUI0Ckr98jtpMbkcJZBmVf5YSuCrbzRrMk=;
+ b=PespLxNBI6Aq9FRJxX2pfU41LxV4LfIIThdWcfQbRNY2m+gYnxn9BU7h/+W3mCP6BTucE5NGnoRykyJkKcFCl0MtYuUf2tTTz8ys7HImB+P53Ive6EgfTAwQq/GvhT2+sOV8L1mish6+34G4nsJuDSKJ2qYGAB7mvzk42IW8xdc=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
- by BN5PR12MB9462.namprd12.prod.outlook.com (2603:10b6:408:2ac::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.20; Mon, 24 Feb
- 2025 21:03:18 +0000
+ by DS0PR12MB8344.namprd12.prod.outlook.com (2603:10b6:8:fe::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8466.20; Mon, 24 Feb 2025 21:28:56 +0000
 Received: from DM4PR12MB5070.namprd12.prod.outlook.com
  ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
  ([fe80::20a9:919e:fd6b:5a6e%7]) with mapi id 15.20.8466.020; Mon, 24 Feb 2025
- 21:03:18 +0000
-Message-ID: <4e762d94-97d4-2822-4935-2f5ab409ab29@amd.com>
-Date: Mon, 24 Feb 2025 15:03:16 -0600
+ 21:28:54 +0000
+Message-ID: <88fc49a9-d801-5d8f-f156-28fa06910cd6@amd.com>
+Date: Mon, 24 Feb 2025 15:28:52 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.15.1
+Subject: Re: [PATCH v7 01/10] KVM: SEV: Disable SEV-SNP support on
+ initialization failure
 Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Naveen N Rao <naveen@kernel.org>, Kim Phillips <kim.phillips@amd.com>,
- Alexey Kardashevskiy <aik@amd.com>
-References: <20250219012705.1495231-1-seanjc@google.com>
- <20250219012705.1495231-4-seanjc@google.com>
+To: "Pratik R. Sampat" <prsampat@amd.com>, linux-kernel@vger.kernel.org,
+ x86@kernel.org, kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+Cc: seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
+ mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+ shuah@kernel.org, pgonda@google.com, ashish.kalra@amd.com, nikunj@amd.com,
+ pankaj.gupta@amd.com, michael.roth@amd.com, sraithal@amd.com
+References: <20250221210200.244405-1-prsampat@amd.com>
+ <20250221210200.244405-2-prsampat@amd.com>
 From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH 03/10] KVM: SVM: Terminate the VM if a SEV-ES+ guest is
- run with an invalid VMSA
-In-Reply-To: <20250219012705.1495231-4-seanjc@google.com>
+In-Reply-To: <20250221210200.244405-2-prsampat@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN7PR04CA0228.namprd04.prod.outlook.com
- (2603:10b6:806:127::23) To DM4PR12MB5070.namprd12.prod.outlook.com
+X-ClientProxiedBy: SN7PR04CA0070.namprd04.prod.outlook.com
+ (2603:10b6:806:121::15) To DM4PR12MB5070.namprd12.prod.outlook.com
  (2603:10b6:5:389::22)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -84,213 +85,176 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|BN5PR12MB9462:EE_
-X-MS-Office365-Filtering-Correlation-Id: ebbb19ff-ad5c-484a-9c9e-08dd5516a9a6
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|DS0PR12MB8344:EE_
+X-MS-Office365-Filtering-Correlation-Id: a0f50310-a7a7-4678-22fb-08dd551a3d91
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7053199007;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?S3MyZ29nWmhIem82RFVCSHFTZldFSkRzSjNIL0dmSC9Fa24xSUo1UUh0N2c2?=
- =?utf-8?B?S0Fka25xNm1QRC90VVlGeUt5Y2ZhWmlMakVxUm03dWRiT2tUVzNyc29sdmFQ?=
- =?utf-8?B?eWpHeDB3MGRTRzVGdFZEZTBmZFlOZ0Y3dlNud0czekVnS2dBaUVxTmlLOVB4?=
- =?utf-8?B?N1dXRTN4Q2FGMHI3MDVVd1BBWEU2dUticmJrdDRqL3A0NG02NGRoNU9wOElo?=
- =?utf-8?B?U1pvQ2xoWXVyZnBKN0hWWG1QZ1JoUFhKbmJxQnNleVlvaTNqRWwwbmNVRXhh?=
- =?utf-8?B?QzNJUnhPY1JmSzBEaVVyVFVNL3hxVXUwa25zbnVTMXJWTjFiKzFiTGhiMnow?=
- =?utf-8?B?ZWdRMUVoSWt0SGloSHdHb1BFeUdDU1RIMzZrNjdjdzgxVDc3MlBxSm9hY0t4?=
- =?utf-8?B?cHVtL1dxL0ZKRGR6UjVMdlVNQWoxS3RveS9qZjMzVFpFTnJKVVpXU3JTU0hF?=
- =?utf-8?B?QjNyNlRFMVNVL0kwQUF5OXhvL3FKQ2F6WjRRK1c5eU1UR3EyREVUbDhsVFcv?=
- =?utf-8?B?UStaYTMyUVRrM1V5eHBlSXJsUGJwLzFWekNXTFFEWXI0MDNhVUdhWThhU2hK?=
- =?utf-8?B?R0NIVU0rNzFGcUN4N201T0pnellFM0Faek5XUlBmSGhxNitUaVRBaXdocjhj?=
- =?utf-8?B?ZVlMb3hoZm1uZkJ2MlFaUVRVN2VVWDlCUFpQSklqamx2WlJQNEpMVVFFK3A2?=
- =?utf-8?B?VHZRd2dKSjdoajRCQ2NCcFJqbnhNYUlxWXZOM1V0Q3M2VUZqTjMya2ZSdm1E?=
- =?utf-8?B?cnBMazlKTGJBSVdFa1VldUdwSG9VQ1hONDBtN0xkQ1JvbnVTNkVoMFhGeFVZ?=
- =?utf-8?B?NkhkZEI3RGdkcDIrM3RKK1hacDRCSW1CUEMwREVPUDVDb1haSXp1WEMrYUlz?=
- =?utf-8?B?MHBMM2hTa1dGbER4emh1bytnWVRXOWpjSnd4QjV5TDB4eVJNeXlrWnIzOXlO?=
- =?utf-8?B?VWtPL1QzQWczRms4N0RUdkhvcGxncTlvMzNEK3UzZU5SNmU0dXhIQ2t3bTJt?=
- =?utf-8?B?WEpuTHpXbkk3NHZzSkN5VnVCbnRyTEdIWHQ1L1dRNnhJZEVSYjN4TVpEbDVl?=
- =?utf-8?B?S2hqT0I2L0h0UitsMHpiem9na3Nrd1lZSkpKbnp3QU9ocVlzWDd1VjVjMGc0?=
- =?utf-8?B?ZnVBQmZnK1V6U1JtZEEvNlk0ODRKazdvRzZmS3pYaW01cDM2QkcwSHYzN3BJ?=
- =?utf-8?B?NThyc2drbldCVllHMXNOMDdDR1ZnbTlFM0dDUDdJdHRhS2VoRXYrOUlUWkVj?=
- =?utf-8?B?WklHbURWWVNDalJ0bGVlZm9BQkNRM3VtYTZqOTZyeXFIWERiM2RMM3daczhC?=
- =?utf-8?B?ejZoUWF0QmRNb3ZXVUZ5dEZUUkxYb1hYN2o3bWJ3TUhvUlowUDdERlFkOFc5?=
- =?utf-8?B?SFp2UnNKdFpKR3dVU3UvYWJJVTJNd1E5SGM3aUQyMXVMN2dqZ3hQQnRJVi9y?=
- =?utf-8?B?UWxsTURPVy9ZaGl6bXB6NjV5TVpQdGxLWnd5TEh1bzZ5QUhLWUZzdnhBaWU2?=
- =?utf-8?B?U3hrTGptYklHVnRlaEJpZTFmbmFhR0wwVTdNRWtQREFDekVSMWVKNE10aE53?=
- =?utf-8?B?MHZwY1BnNlVGS1dvYmlvTFVWYlVLUCtOVEltRVVKb1oyc1ROMDJ4d0w1ZXlm?=
- =?utf-8?B?ZVBCTnB5Vy9tUWlSblRqWjZHSG8vZkVoMEk5WkxtWWZVdTVYdnNET2dLenZ5?=
- =?utf-8?B?ZFdNUHIxVVRoMndNVUs0bHJrVzA4THp5c2FjbUFXOU1WQzMvc29ObkQzNWI5?=
- =?utf-8?B?WHhmSTVKYW9XWDBSNnVmRGs5ZmtFejhUcnlTYVo0R0xjRVErSXQ2VENpajdO?=
- =?utf-8?B?TldjbFNwbFgza1FnRHpVUFJFeHI5eTZUdWsyMWlRSFRXTFlTeStjYzVZTjVR?=
- =?utf-8?Q?pB2J1haGVCEcd?=
+	=?utf-8?B?Si9hek9JMWVRUEY5KytBVktvaG5XT1RpcUYyZmhhZk1JcDMrbmx3MEZ2dXpE?=
+ =?utf-8?B?aHJSZkswWitDYUZyMlpsWGJlREFNT2hvSHphZStGZloxYnZKWkZ6RVpkRW5J?=
+ =?utf-8?B?UjUyeXE5SkpxNy93SEhLRE5EV3ZmbWJONnJzZVMxVFhqWThPVnY0bEFlTHhS?=
+ =?utf-8?B?Q2Z6blZINTZXTlZpODNsVE9kOU5sTXlGaXBwL21WV2ljRERmZmxiS0FIRklL?=
+ =?utf-8?B?N0h4aXBlR0VUc3BJQWZYaWJNWUt2VDJZVkpvaWx0cXlxS2VGUlUzbC8wcFNr?=
+ =?utf-8?B?OFE4Y3hmb3BaUzNXSXJFVzhGVWdVTVpxSHpHVWFGVGFYTGZ6M0VXc0pWd3pJ?=
+ =?utf-8?B?M01veXRBM1RYVFVsaVN0WXFleC9pM1Bva2VScVpEaGFQdGNwa2FGdE9aQ1A4?=
+ =?utf-8?B?L2tiRUNPOXQzZHRXNjNBY0pHUC9zYXVvVUlsaUlCT1l6YkZUdms5OFZzRlNy?=
+ =?utf-8?B?MGoxTnBlQTRJbHBNU0Vab2hoS2NDTzlWcWNpcU01NW5GZytOVWZxUyt1VmNa?=
+ =?utf-8?B?U2luMXpmOERIU0QycTNuQVNDM3hyN2ErZTJEYytIckJTNmQ4Z3BTU2hZNm8z?=
+ =?utf-8?B?VzNNM3RvOW5nUENuUWEybmFVVXpXRkM0c1lPb3liTkk2YW9CSFIzQ1UyMk5M?=
+ =?utf-8?B?aFdNcGkza2VXSlZlaHFOYm53SzduWjh2ZS8wazRuUTlXQ2xFTWQvTUpTa2xJ?=
+ =?utf-8?B?Y0VpVkhWdEg0ZEZPMFlMb29Cd043UUJLVXFBZ1RpeUJNdFllVmhRRTE0RGVi?=
+ =?utf-8?B?VGEyVW5HZ0FJR1ZVWjNIMDRzTFMwVVpDdTBGV0tacTUyNjhZTC9tTk10UXp6?=
+ =?utf-8?B?Z0lSSENlOFdVWnlld3Y4NnEzU0d2RVJHU3BZczhoWWNIcmdCQ2s4OUZHNEY2?=
+ =?utf-8?B?a1I1S09jQ3lKN084RHQ5akNJY0o5cnFaRkFpdlpEWFMvY2JQVzl2UEtlVGJC?=
+ =?utf-8?B?SWkyUGhTRnYrbW45cVl2MTAyYkxLNXB4SUpOMUxxa21sYmlJOXhvU3VveUFl?=
+ =?utf-8?B?VUQwTHdUTERtQ1NlSHdwR3RXY09NWVdkUEFpa2FpODBkZm54TEVwQmpPSzM5?=
+ =?utf-8?B?RElQeXpaWTc2SGVzOGkvMkdicys2TXJDMUlqZ2FmU0xma3ZicTIvOUFzRHlN?=
+ =?utf-8?B?VUlNNlROZXhpNzhubXFZbGNzWkl1cGpmNWJwUGUxcjJlcEZKQ0RSSENQRVls?=
+ =?utf-8?B?SkFwU3REWGdHY0FLRDltUVdUenhVemFhMjBLQmJuSHQrY2pVMU5lOExoVFpw?=
+ =?utf-8?B?MGZuMzM5enFIS3B0aFlUSTR4cnRCUklKaFp4N0dWMXlwTDZCNXk2NTNJY3g5?=
+ =?utf-8?B?b3NtN0RyK25udHQ4K1BaY05IMm5QcGFMMXhoZ0J6dVVCaVJyc29RcEJGeCs4?=
+ =?utf-8?B?RjdTK2ZzWms0QlR4NXZLeGoxZEZjcUtKZkd2ZnZFd0ZqenY4OHZ2ZmN4Q05h?=
+ =?utf-8?B?clN2cVUyWk81bjErWDNZclduZW9TOWhBWVRaaEZGMVAwUGxxRUFSaTdyWWRq?=
+ =?utf-8?B?TVBKcnBFTFhjUjhGM04yeGVNcnVtR1A2YUtCM2VPMWdNVDVXcU5HejdxYWZD?=
+ =?utf-8?B?M3pqUzhwTCtwc3lIVkZHSzNidjJNRkxzaTBGYTljUFcwOGVCSUI5TzdhRzNX?=
+ =?utf-8?B?OWFzUFV0YnJXVHhzeVhaK2xuOU54SlprOTZldXdwd1o0L0ZPekxXWkhzZGtU?=
+ =?utf-8?B?ajErRHpIKzB2SjNyblJWbW5kRUJWNi96T3QzYysvUXFFYkpzNnpETlVjTTZR?=
+ =?utf-8?B?OW56ZWFBTW02SmRRbnhOVHJxenZVRXBnR1ZMKzB6TlZ3VllSMVRQRUxUdDhw?=
+ =?utf-8?B?RjUxVk1PZk5PdGpBR1hNZndkUXI5ZGRROW45Q3FHUW9KQXc2Z0tBMUhuZTRS?=
+ =?utf-8?Q?Vi6J0ulK7kNY4?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?TWgzU2UvaHZHc2RES1RCYkNHbWxEdUNNd21WUzBTTEFzWG00NTBzQ1dQWks4?=
- =?utf-8?B?NkJhcTdwSVZLT0QxemYrTXhZMW5MMzlwazd1RmxiRzAwdlA1WGNqUTlWZkl5?=
- =?utf-8?B?ZUJlNDFwR3NvNTk3ZDRlMU1kRzdjaENRSnRIeFp3UkpodHk2ekNXSnNDK3R1?=
- =?utf-8?B?OElUM0JDOXBtL0RpZ1k1WFNSQ2N0dTRWSGVYUnMrNUNHRk0zeGRnWHB1S0NQ?=
- =?utf-8?B?WkhOTWpYSFdoL2cvd1RVY0hjaUk0Mk13OTFLYjNtcWRVMURCbWlNMlExZUNu?=
- =?utf-8?B?Y3dwekFYZ3grREFuZDJIZC8wWmwxN1JvRUpBNm4wdjBEb0w3V2xBSjhsSDlN?=
- =?utf-8?B?bHJpNUw3ZkFmTmlGTUxTMFZtS2hVWGhLSjBZZFpjUkloczV3QVN6Sk1qTHNW?=
- =?utf-8?B?V1ZpdnRHTjYvOWQ0RGtaRVIwQW9yRjliUU5QMzJJemZZMk94THJ5U2pIeUxI?=
- =?utf-8?B?K0pmK2J0VHl4TkhlK29JSzNKdFFnZ3NwVmpyZ255SWFhMjBWSWRXb3dvZ1Z4?=
- =?utf-8?B?enFONCtSc2RDYTltQmZkNzY3WHVwQU1qT1Nva0diN2lQUXlBNWp2T3JNSmdX?=
- =?utf-8?B?b0x2M2tKK29iaGZGYzRxSTg3b0dOdExvcDFXL0YzamhQUmxNM21KZHdGcE9k?=
- =?utf-8?B?U1d0TE9GTmxra0JTVS80UnFzdnVPd3p3R0xzQVhWdDBtTzRaUDhYL1c1R2xI?=
- =?utf-8?B?MzNNTkVOdm5RSzhxelFQOWFQZWMyWFRmTDc5TU1OTkhjRXJtNDRVMEhmS1VK?=
- =?utf-8?B?T3FkejRMd2NyVHlzc1UvanQ2N2tZQm9UeDJMd1lybVpaL0JVSkl5V3U4ck9H?=
- =?utf-8?B?VVU3QUpaeFgyOUs2OG5aWEJUblArZHI4RFc2K0pHRGwyOGlqY2xrblhSL3dG?=
- =?utf-8?B?anF3SzJQWXV3YytpVWtPQkFDMXVaOHlydXNROVZVdTFQVElmUU1DWCtTY2dP?=
- =?utf-8?B?ZVdWT0hwMk8wc0RXQkxhS1cycG5jR1dPTUg0VTNYc05laURGc1Rvby9MbkFM?=
- =?utf-8?B?bzZKYmlPS0FIZ2xpajhoU0hJLzNxV3YzandsOFJXak0xRTh2RG9HK1c1R1NW?=
- =?utf-8?B?amlibTA5dndJTzBwZTJyc3NkWHZtU3lTTWg2TkErNm9oSzMvKzk4U0VnWTk5?=
- =?utf-8?B?ZTFTT3AwNFR0NTNqbDdNUTFpMjBQMTF4RnVlaW9sb245VVJsaWR0eXhISXdF?=
- =?utf-8?B?ZStvY00wL2k4dDIzS0JOcGZuU0xiUGlWeWVqS0YxUTBvbDRGZ3BmdmRCOVp0?=
- =?utf-8?B?eFg3dm9RV3pucUpMczZLeUFBRkp3UUQvYTRsYSt3d0l5amExRnNMZVVQZzVX?=
- =?utf-8?B?RXpkQVorRTRPeGl0ZjNFRm12Y2Jpc2FWUWRFRE0rSmErdGJXUDlIRFZOWUZz?=
- =?utf-8?B?amkzZDd6VDk1bDhVcUhCQkFSVy9BVUlsU3pGVTE4SS9DQVMrVjBnYU40dXVu?=
- =?utf-8?B?MUozTzJ6cmt3ME5BN1F2UzdvNVZnZ2pTTHRDWHVscm0yeW9MVkJmSmJ3cjJI?=
- =?utf-8?B?ZlpmV3VSeXBmbzAzSEh5ZXg3V0tjTUxtOVZEUnRwR2g3MVJPU090bnozQTlC?=
- =?utf-8?B?UWVlWWhIekpKTTJIMkFTdG1QVU8vS253MHgrMXkwUTBZS2trSlNhTE1yVFZh?=
- =?utf-8?B?aHZ1aWlTbkFoT1ZxbEh0S3Z0aVZXQWZRSkVrRUZ6eGFEWE1oTHo1ZlZLWlVN?=
- =?utf-8?B?Z1lKWWU3SmJGYkZRUGhvQXh3MWMzQ3p1VXI0eXl1Yk1WVVlaQlIxWG92dUpv?=
- =?utf-8?B?YzFYRWgxKytDbHRnWWZmY1FmREdCYzBXUjNRYWRUeU1zc2FQNkNTVktxK1c5?=
- =?utf-8?B?NVNzZXFMaXZkRW5wcVJIRmxKektpZXN2aVlLQ0U5Z2dhamlGMlN2Ym41YWti?=
- =?utf-8?B?L242WHR2bWFydGZvcjdydTFJZ3B3Q0VMSm1WYm5mYmE1WlVJS3lQYjhnV2Fi?=
- =?utf-8?B?ZG4vcFlENCtDMm9saEoySjlkSElTUGRPcDF3MVFKMDQwV2hGZkptUGhzRmIw?=
- =?utf-8?B?aU44MHl5RFgzaEt3TVZNMHNFc0dXd0dCdXVkZlIwMk1XZnZ4YW9hRzFMbnhR?=
- =?utf-8?B?L3NYd0xtSmlhZTg5bnE1MlBFWnpLQmhGOVk4TzAyL1Z2WlNRTXNKQUFXbGpT?=
- =?utf-8?Q?AIziHoM9IDHh6f6O1PmDYfF7B?=
+	=?utf-8?B?bW5rQ3lCbTV6UHBGT1I3UWhtMXFYOTFPNnEyd2hrd0ZXdUJRYUNxb21oYkFu?=
+ =?utf-8?B?UlBBdjF3MG9yWGg3bG9NNnIzcHZjYWV5dFhzYnUzN0FwNjdMeWFOdU5qMHBY?=
+ =?utf-8?B?Qk1DQis3bWs1UlkrQ3ZkNm53Vmw3UjJNL0I0T0RhOHBLb3YvQ0JTM09DdjNj?=
+ =?utf-8?B?VkFMZ3dlWDN4WWpFRTNtVTYrT3EySndCdjJPdE0wRFNkUytISTdBKzJHVHBu?=
+ =?utf-8?B?cU5LTnpqQVZoYi9QY2lxZVp3cjJQcXI0QUxXdHBRanB1VXE1M0RFR1NwUFV5?=
+ =?utf-8?B?bHgrd0V0WjBYVVBsSWxIdk1JaW5tR0xBTVVxbjdld2RxbnRZdldaV1M1ek9u?=
+ =?utf-8?B?VTlKWGF2U1J3RmZwc25VYnJMbHAvMlR4bDZtWTJtOTAyTVZRQ3dEWEd4c2k2?=
+ =?utf-8?B?ME5vQXQwKzJoUVFSSnJsblhYbURpYjJtL2dZY2k0L2xuVGIzb0ZTNFpMbXVh?=
+ =?utf-8?B?NE1GLzhKSkVnNitvV2F0dU85T2l3YloxYW1kL3hKK1BTa2o0U3Y2TlpxSDNE?=
+ =?utf-8?B?MUFyKzlqcEEyLzF4L2NMaDJSK05rWlhIRkxvYWxJb0ZzYjluQzhaVXB5ZVYw?=
+ =?utf-8?B?ajRNOTZBM2lMNU83MXBvQ1AwdzJGVFk1cTF0ZnJSM29TdVU0d3ZrM1ljOG1a?=
+ =?utf-8?B?VDZwRi8rREpqQy9wY2k5MzNUdXlxQjZqZ0tscG9neHNUYnYyQ2xNMWFHOFNk?=
+ =?utf-8?B?UkhVUUsxODFsUDJYNFFkTjNWUlFDWkVWWHRmc25NZ1N3L1VhdWZZOHB4bnpI?=
+ =?utf-8?B?dGVKZ0tHdFhZQjMxTk1DdEM3bTJNekNDekJOVFFYKzd6Wlo1MHh2VHhhVFNH?=
+ =?utf-8?B?T2lHbkM1cXIvR3dEajd3TnVjTVVlMWsrcVdTQytORktNempFdWJ1VGhYdXdT?=
+ =?utf-8?B?Z3dYWG5aakkrWTFZM2FyVmlkV3drUmxpMC9QeTVidGJ1elVNcThYWU9PcjFM?=
+ =?utf-8?B?dk54ZDJIb3V5T05lWUNRSm9lVTN1WlNTdlN4ME5acDR1ejlDazZ6cWNaMjZB?=
+ =?utf-8?B?UHNBNXJWeG5yeE9sdk9MREt0Z3ZFcDFaWE1DT2NicWtqZTg2ajB1YWZhbUdt?=
+ =?utf-8?B?VEhqZU9VWTJHWm54eUdaMk9IRWphakJQbnptL2JCMUxvR0U3S0V3K3dOb2RR?=
+ =?utf-8?B?NjVUNFd3aGRQci9DVzN4SlI4NVIxTHpxUjFBRW9LZU5hRlpuNG9CN3FLNG5r?=
+ =?utf-8?B?SVBZaHpseXdPcU5NTWJkSnlCMzNLK3IyRkYvNnYrUEljQnpJQktxTVdmTmdP?=
+ =?utf-8?B?VG9NTGhUYWpVbUUyaUxJa0NwNDBkbmh2U3B2bnRiblJsWXIyWEsrcXlBMkdr?=
+ =?utf-8?B?UFhWdzFVK2pRb0EvWmlyMkVWM3FJRHF2NVorT2d6djE0b1F6M2tOZldBTm00?=
+ =?utf-8?B?UmVEbXcxMXM1REgxVTRvRnJ4ek15M0tlL0pNVUticUgraXZKN1FMdUFKaWtj?=
+ =?utf-8?B?RDNBaVN6cmZib0thRXVrdldUOFhESmZvM0pxTE9TdnRCa2pnbmllN0ZuMmEx?=
+ =?utf-8?B?VXV4aFFPRXJHT2U1RWwyWVk3YXBCQzNpRmk1NnRjSG1adGhFOFI5QTdsYTVh?=
+ =?utf-8?B?U1pmanEvTTNMZ1pRU3U1dFNjemNJc3EvdjEyZDhXMEI2YnV4UzhnY1R4WWZr?=
+ =?utf-8?B?VXR0YlJnZ2VCN0p5UlFnRjdzaUxyeHdqYlVHLzVLMlAzeWFza2FjbEdOY3RV?=
+ =?utf-8?B?c3NRdWFLWnJzNitJWUpFZ3ZsSCt4d29BZHV5WHJ0UHhMcEZ0TnRNbTZYdklw?=
+ =?utf-8?B?TEhxeHcrOVJsYXpKa3NJZitDV2J6TlBvbStaN0pRSThQM0wxcEpCQ0Myenp5?=
+ =?utf-8?B?S0V6eHd0Q0xDSXZNNHc5WkNtbUR4MDl6TExwVmpsNzZuQTUwRXpDeHo5aDFC?=
+ =?utf-8?B?S1grMVNiaWorMEZoWjMreFVMaWg2NFVsbkxoM3c5d3p2SkswcHhrU3hpRFVO?=
+ =?utf-8?B?dzNSSTdWc1RoaUhYNk9sNkpUdnRYUmwwM29SeXdkVWMxR3pqV05aRGtNL3J6?=
+ =?utf-8?B?VUNielhlZERuNmhub2xuRnA3NjRIK2VHci9ZNjBUbXpxckRGbUNGL0oxN09R?=
+ =?utf-8?B?VklvMnZWMDdmd2lsUWNhWWFzVmNRS2hrNEZiSFZzYnJVRTA0OHhma2dJQ2d5?=
+ =?utf-8?Q?xPmCUSOMD5Fjqqcyszi0rUBvr?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ebbb19ff-ad5c-484a-9c9e-08dd5516a9a6
+X-MS-Exchange-CrossTenant-Network-Message-Id: a0f50310-a7a7-4678-22fb-08dd551a3d91
 X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2025 21:03:18.1914
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2025 21:28:54.8811
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MvxCiiRfcBAGmXLIferagJek72bmzGERMsRtpn0wkLOasZv3JRdSqgZbauu6d1DKOybW2wNCEIKiaPlRD583/w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN5PR12MB9462
+X-MS-Exchange-CrossTenant-UserPrincipalName: WachUw2quuYa7nTlnNj4JFjH865XeitNIXoz3bbkTC9/ZZJhlqPGG7SciUBo63z8N5oeXdhECaEb69qCn67qcQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8344
 
-On 2/18/25 19:26, Sean Christopherson wrote:
-> Terminate the VM if userspace attempts to run an SEV-SNP (or -ES) vCPU
-> that has an invalid VMSA.  With SNP's AP Create/Destroy hypercalls, it's
-> possible for an SNP vCPU to end up with an invalid VMSA, e.g. through a
-> deliberate Destroy or a failed Create event.  KVM marks the vCPU HALTED so
-> that *KVM* doesn't run the vCPU, but nothing prevents a misbehaving VMM
-> from manually making the vCPU RUNNABLE via KVM_SET_MP_STATE.
-> 
-> Fixes: e366f92ea99e ("KVM: SEV: Support SEV-SNP AP Creation NAE event")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/svm/sev.c | 18 +++++++++++++++---
->  arch/x86/kvm/svm/svm.c |  7 +++++--
->  arch/x86/kvm/svm/svm.h |  2 +-
->  3 files changed, 21 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 6c6d45e13858..e14a37dbc6ea 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -3452,10 +3452,21 @@ void sev_es_unmap_ghcb(struct vcpu_svm *svm)
->  	svm->sev_es.ghcb = NULL;
->  }
->  
-> -void pre_sev_run(struct vcpu_svm *svm, int cpu)
-> +int pre_sev_run(struct vcpu_svm *svm, int cpu)
->  {
->  	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, cpu);
-> -	unsigned int asid = sev_get_asid(svm->vcpu.kvm);
-> +	struct kvm *kvm = svm->vcpu.kvm;
-> +	unsigned int asid = sev_get_asid(kvm);
-> +
-> +	/*
-> +	 * Terminate the VM if userspace attempts to run the vCPU with an
-> +	 * invalid VMSA, e.g. if userspace forces the vCPU to be RUNNABLE after
-> +	 * an SNP AP Destroy event.
-> +	 */
-> +	if (sev_es_guest(kvm) && !VALID_PAGE(svm->vmcb->control.vmsa_pa)) {
-> +		kvm_vm_dead(kvm);
-> +		return -EIO;
-> +	}
+On 2/21/25 15:01, Pratik R. Sampat wrote:
+> During platform init, SNP initialization may fail for several reasons,
+> such as firmware command failures and incompatible versions. However,
+> the KVM capability may continue to advertise support for it. Export this
+> information to KVM and withdraw SEV-SNP support if has not been
+> successfully initialized.
 
-If a VMRUN is performed with the vmsa_pa value set to INVALID_PAGE, the
-VMRUN will fail and KVM will dump the VMCB and exit back to userspace
-with KVM_EXIT_INTERNAL_ERROR.
-
-Is doing this preferrable to that? If so, should a vcpu_unimpl() message
-be issued, too, to better identify the reason for marking the VM dead?
-
->  
->  	/* Assign the asid allocated with this SEV guest */
->  	svm->asid = asid;
-> @@ -3468,11 +3479,12 @@ void pre_sev_run(struct vcpu_svm *svm, int cpu)
->  	 */
->  	if (sd->sev_vmcbs[asid] == svm->vmcb &&
->  	    svm->vcpu.arch.last_vmentry_cpu == cpu)
-> -		return;
-> +		return 0;
->  
->  	sd->sev_vmcbs[asid] = svm->vmcb;
->  	svm->vmcb->control.tlb_ctl = TLB_CONTROL_FLUSH_ASID;
->  	vmcb_mark_dirty(svm->vmcb, VMCB_ASID);
-> +	return 0;
->  }
->  
->  #define GHCB_SCRATCH_AREA_LIMIT		(16ULL * PAGE_SIZE)
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index b8aa0f36850f..46e0b65a9fec 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -3587,7 +3587,7 @@ static int svm_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
->  	return svm_invoke_exit_handler(vcpu, exit_code);
->  }
->  
-> -static void pre_svm_run(struct kvm_vcpu *vcpu)
-> +static int pre_svm_run(struct kvm_vcpu *vcpu)
->  {
->  	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, vcpu->cpu);
->  	struct vcpu_svm *svm = to_svm(vcpu);
-> @@ -3609,6 +3609,8 @@ static void pre_svm_run(struct kvm_vcpu *vcpu)
->  	/* FIXME: handle wraparound of asid_generation */
->  	if (svm->current_vmcb->asid_generation != sd->asid_generation)
->  		new_asid(svm, sd);
-> +
-> +	return 0;
->  }
->  
->  static void svm_inject_nmi(struct kvm_vcpu *vcpu)
-> @@ -4231,7 +4233,8 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu,
->  	if (force_immediate_exit)
->  		smp_send_reschedule(vcpu->cpu);
->  
-> -	pre_svm_run(vcpu);
-> +	if (pre_svm_run(vcpu))
-> +		return EXIT_FASTPATH_EXIT_USERSPACE;
-
-Since the return code from pre_svm_run() is never used, should it just
-be a bool function, then?
+Hmmm... rather than creating a new API, can you just issue an
+SNP_PLATFORM_STATUS command and see if the SNP is not in the UNINIT state?
 
 Thanks,
 Tom
 
+> 
+> Fixes: 1dfe571c12cf ("KVM: SEV: Add initial SEV-SNP support")
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Pratik R. Sampat <prsampat@amd.com>
+> ---
+> v6..v7:
+> 
+> * Replace FW version check with sev->snp_initialized (Sean)
+> ---
+>  arch/x86/kvm/svm/sev.c       | 4 +++-
+>  drivers/crypto/ccp/sev-dev.c | 8 ++++++++
+>  include/linux/psp-sev.h      | 3 +++
+>  3 files changed, 14 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 0dbb25442ec1..87b5d63a5817 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -3050,7 +3050,9 @@ void __init sev_hardware_setup(void)
+>  	sev_es_asid_count = min_sev_asid - 1;
+>  	WARN_ON_ONCE(misc_cg_set_capacity(MISC_CG_RES_SEV_ES, sev_es_asid_count));
+>  	sev_es_supported = true;
+> -	sev_snp_supported = sev_snp_enabled && cc_platform_has(CC_ATTR_HOST_SEV_SNP);
+> +	sev_snp_supported = (sev_snp_enabled &&
+> +			    cc_platform_has(CC_ATTR_HOST_SEV_SNP) &&
+> +			    snp_initialized());
 >  
->  	sync_lapic_to_cr8(vcpu);
+>  out:
+>  	if (boot_cpu_has(X86_FEATURE_SEV))
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index 2e87ca0e292a..8d2cf8552bc2 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -1352,6 +1352,14 @@ int sev_platform_init(struct sev_platform_init_args *args)
+>  }
+>  EXPORT_SYMBOL_GPL(sev_platform_init);
 >  
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 5b159f017055..e51852977b70 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -713,7 +713,7 @@ void avic_refresh_virtual_apic_mode(struct kvm_vcpu *vcpu);
+> +bool snp_initialized(void)
+> +{
+> +	struct sev_device *sev = psp_master->sev_data;
+> +
+> +	return sev->snp_initialized;
+> +}
+> +EXPORT_SYMBOL_GPL(snp_initialized);
+> +
+>  static int __sev_platform_shutdown_locked(int *error)
+>  {
+>  	struct psp_device *psp = psp_master;
+> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> index f3cad182d4ef..d34068c87a28 100644
+> --- a/include/linux/psp-sev.h
+> +++ b/include/linux/psp-sev.h
+> @@ -954,6 +954,7 @@ int sev_do_cmd(int cmd, void *data, int *psp_ret);
+>  void *psp_copy_user_blob(u64 uaddr, u32 len);
+>  void *snp_alloc_firmware_page(gfp_t mask);
+>  void snp_free_firmware_page(void *addr);
+> +bool snp_initialized(void);
 >  
->  /* sev.c */
+>  #else	/* !CONFIG_CRYPTO_DEV_SP_PSP */
 >  
-> -void pre_sev_run(struct vcpu_svm *svm, int cpu);
-> +int pre_sev_run(struct vcpu_svm *svm, int cpu);
->  void sev_init_vmcb(struct vcpu_svm *svm);
->  void sev_vcpu_after_set_cpuid(struct vcpu_svm *svm);
->  int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in);
+> @@ -988,6 +989,8 @@ static inline void *snp_alloc_firmware_page(gfp_t mask)
+>  
+>  static inline void snp_free_firmware_page(void *addr) { }
+>  
+> +static inline bool snp_initialized(void) { return false; }
+> +
+>  #endif	/* CONFIG_CRYPTO_DEV_SP_PSP */
+>  
+>  #endif	/* __PSP_SEV_H__ */
 
