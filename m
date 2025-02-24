@@ -1,107 +1,140 @@
-Return-Path: <kvm+bounces-39027-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39013-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AA51A429C2
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 18:31:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA31FA42982
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 18:25:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77B0A3A59E9
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 17:27:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0798A16B4A2
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 17:25:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0128264F9D;
-	Mon, 24 Feb 2025 17:26:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD00A264FB0;
+	Mon, 24 Feb 2025 17:24:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nJdN0OUg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1sd66+l/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96D86263F5F
-	for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 17:26:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05F3E264FA9
+	for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 17:24:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740417980; cv=none; b=PbQH5Suxxez7wXJd1Pxa58X53bFOevykz5VXnlcM9BjBJEpyb6FjaHO5Ac7cb+mubgTi17RqxxLR3hAUaaIYefuF9wEW+73mQSocXnQsEFASDXoGocHhoqQKKyTempSQuNfnXKtGDA8dtThHCWHn8sg6ImUa+KUrPcodcqLPozY=
+	t=1740417881; cv=none; b=Hs/3Hw42wJKL+aEXB5cr/DF2M9AmGyBoePcmKxH13YKP59Rec4t0OJdMHCPPYSclkngcyA0vHG5FK+F4RNhS0d37cz/XyrTdRmTiKjQTHzvlZwRGyD8qXDK3FNow1V199nclZM4+mroS8I3sSGcNsWN0E+LjjzqbsEnvrgAVSrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740417980; c=relaxed/simple;
-	bh=TY41t8R5RHv8kmnjmK5dzy+xr7BH9RgoOiEPIeC4w0o=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=X5qIm6/6ETtCsH3S4ejYPUGJGCgUhfJ9ouljLMlSVxhM4HyGmAn1dtM+Wtyf5ljKIm4gRpawezhXMGyKmH7B079a2iIKS6KAwc7tW3IwsD5+hTXRKkWzJrqAb2BCmkdOICFYCeBSKVqjIdLNJApwULW4zVaVos5s2EXfADREEI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nJdN0OUg; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1740417881; c=relaxed/simple;
+	bh=j8o5OPFQDdp5ed8gL+HidM6ulcc/XNNFd6l4na/fMKQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LdZOQLcUNz5Poieku3MdqUuGL+59Z7tDOfcowEiNX7gkzQx+L+MQ9V80bwANof/j/oiVB7P+GwTGtwK5YOf0xL2JbWFTjiiH0kkB6lzELEmWdHb7mLAlwqwShBUcA+X0N6jIqltdGEwx1EqlWZfE/O8o/Z2EtoJym98Syg9Xqww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1sd66+l/; arc=none smtp.client-ip=209.85.208.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fc43be27f8so15505377a91.1
-        for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 09:26:18 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5ded4a3bf0bso17266a12.0
+        for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 09:24:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740417978; x=1741022778; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CO4ECFGk0nuCQJyTl2dhtSVdd+PXhhF54f+97kGu+yU=;
-        b=nJdN0OUgebgg75Nil2uG/gY6Dn+qPRmxI9ZvrTXan1g1Q9ng2smhedcA3VhzB5F6sg
-         V0eAX24mQvf5W3PuA3HVH8aV8OWdFPXcbjeIlToB7r8NY2jlhd7U6hmPuztAfKmqxYn6
-         mRtGzwWvQmngc7W9dFafxFmPY+qDLUBllNcFbfIDYPu+NI7jWBioFiA/d8ddvF+R57Rf
-         3ChzQusquMFZ4dUZOSymWDatJMC+s0/tNGXmu4fgC1IjdzFiVb0PBU7HG4xtZPGMGqFz
-         +KBMBrdMrjbIDyyIkt29pVN+V3KFXsvBSXPxKAsgOd23dlcMypbBv6VYbqo7mmKrAKSL
-         45hw==
+        d=google.com; s=20230601; t=1740417878; x=1741022678; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kJhGd7GaLmZRvvcyvB5aQANV1c8QojfLDrKr0YA9JN8=;
+        b=1sd66+l/Nt+gNZLkRwiEKHzKayIISadI0kpcqJ//z7R12mcMz6SIFYpgqRHquDssAn
+         AD2DiF1763bTVkjY2uF9llDpXGlYKIV3gvuLgbxpGEj6YV8V39B5P9ARan+rXPpOYBN8
+         BMIkAA73oa4obW4zfDPQasXz9ScChUaZiOf7SzeNaetHGz4Sbx49cm5ewOTDfIeU4Qto
+         agP1LOyU1OSKUYcXHDbYzxTNw1138ALG/gz80CgcNGi73ywACNpUrD130H2GIiFCG97I
+         UzVlESJ6I3CUUM4S5nPlojoqkYz3SovAU3MEz7PRil7I37rk8NR6GM1iKVDwUzCfy+iD
+         mF9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740417978; x=1741022778;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CO4ECFGk0nuCQJyTl2dhtSVdd+PXhhF54f+97kGu+yU=;
-        b=cT8hHMpSvrBGGwn+ougzfosD000Qap/jJ763FhRceXXD03MNTaa8Jak1M8NxN0kBzk
-         jIgNHf+ltq7qsYLrVWiJmEH71ypb64u/5en+JIhDkiC8ZkrNM/BoOIa+BxeLK96zGKE+
-         yjYMwDomX5gmu063tEc60/A3FXjlHrKiDE8FKmxl0gikD+bnGdDsy+EXVP8gXyHRvYO+
-         GUjd/iF8qW7MnuTCIdObcCrUHsXJwd75JOdk4TEPvRI7SR87yBJVAWh0dLbLSXbGn/Bz
-         aPfTqcM/BrA8d1U9PeEAcT/Em+cqKJPfqFkYIbq7mm/uqRkDpQMSUPC8C4ApwhcYH570
-         HfIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWBVfDcCov9Z7+2xDcCFkcXw4SFsEyNxp5O5fjz7blu7sDnb3A1bgiei2jORvOfrgBP+a4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYj0sulFN+mC4PVvrxFdaHF5Fs54qSQvaGBAySAxudGiMeBEgE
-	gKnYr3L6zlTrE75Kjrx9TUZ0JwWfPLbLcrCPXB3nUXKQe5m0D1hHAPshCOQ0Av3f+Wekb4rENcM
-	UXA==
-X-Google-Smtp-Source: AGHT+IFG/zdsijF0B0boJe5MmJ/K69oaTqYcRTYyuMEjVigITkHTGntGc7MOhKSjKVJFYSlWE+rOBMG8lfg=
-X-Received: from pgjf6.prod.google.com ([2002:a63:dc46:0:b0:ad8:3be5:88d4])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:6a0d:b0:1ee:be88:f5cf
- with SMTP id adf61e73a8af0-1eef3d92022mr30219642637.32.1740417977882; Mon, 24
- Feb 2025 09:26:17 -0800 (PST)
-Date: Mon, 24 Feb 2025 09:24:15 -0800
-In-Reply-To: <20241118225207.16596-1-zide.chen@intel.com>
+        d=1e100.net; s=20230601; t=1740417878; x=1741022678;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kJhGd7GaLmZRvvcyvB5aQANV1c8QojfLDrKr0YA9JN8=;
+        b=HJBOUvXTdkw1wzPBDHhwRc/DQE4JenVyQRsBmo30aX/yBe9LvFclkckVXAoM8z1Ytf
+         O1igd49hUmKIKjo/MsAxktd3LRu/C4m5ZkJ90nWLvevjl5YeIUdDrStxtkRfzMbRvW0p
+         2OE1pjET1kS8JtE/XcR+mYWntkpYNdEoYPJvxgWkubWPlKHAZ0t3vaWB06ngmYOfExog
+         hDov49q0FOpbnX9y2O2GN+/T0i44wpK9QiRV0t1NSP8NTzC0E8BCgYqyGx+HXJIeoGbp
+         Rp/FGf3G4MDIeFIkmgZnf3Gqouu2giBXuotpN4tiq8Ch4zCLT4L7KnN8lNla0TFUhvOP
+         RHYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWCHzgAWzfF+IGOCNojTtF/dM54mOhIFtcf9YG08lhzvap1FViN7RKuvGGfmeAtH0XGqZM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwpcHZHbZrtvPxPHEB6sz+qLNWwRsjG6FBqWpyafT+UX/RYzb/W
+	YUy+KNU/vWWHXtUSeS/evHnJsoVz0qHUgw3AkDEm1jlORDLxVaF2i3qsTeiVJLdDr/aEngZGHfU
+	upMgd6F5pCEkJYBw8oJBTAFhksvstZV7wPtv0
+X-Gm-Gg: ASbGnctfshiPxnM0i8yBZYZ0sD7y+ueyyK1reez2e0Pir3nNPyDmJlEwTX7044ib3Dv
+	VVxszpSFqjG5GAkfEazOEfZOLSUH6r6gCt00tigXMTJxsooy7r0l2T2pVXXVjw25rdK6iISR+g2
+	fR8USRTf8=
+X-Google-Smtp-Source: AGHT+IHwP5mLIh5JF9uVa/AqGrOYMKVMNcBxn0db4r4HdhthzzRBzjToV2A2Ak6OXdT6On9YzvaQ/WzXS/ZwnTxH8XQ=
+X-Received: by 2002:aa7:c943:0:b0:5dc:59ca:8f3b with SMTP id
+ 4fb4d7f45d1cf-5e407be4a8emr1151a12.3.1740417877968; Mon, 24 Feb 2025 09:24:37
+ -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241118225207.16596-1-zide.chen@intel.com>
-X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
-Message-ID: <174041749542.2351666.15343179210684942856.b4-ty@google.com>
-Subject: Re: [kvm-unit-test PATCH 1/3] nVMX: fixed-function performance
- counters could be not contiguous
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, Zide Chen <zide.chen@intel.com>
-Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+References: <20250224165442.2338294-1-seanjc@google.com> <20250224165442.2338294-2-seanjc@google.com>
+In-Reply-To: <20250224165442.2338294-2-seanjc@google.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Mon, 24 Feb 2025 09:24:25 -0800
+X-Gm-Features: AWEUYZl-SRtwzgdVLwsp3huQVpOnyENCsoMsqbLaDuQc7dlYTDuJpWqYE0Iiv_0
+Message-ID: <CALMp9eRfU7b_4080ku-z2w+pQT0dZyenBb=9rM6m2kH-9-5WLA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] KVM: SVM: Set RFLAGS.IF=1 in C code, to get VMRUN
+ out of the STI shadow
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Doug Covelli <doug.covelli@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 18 Nov 2024 14:52:05 -0800, Zide Chen wrote:
-> The fixed counters may not be contiguous.  Intel SDM recommends how to
-> use CPUID.0AH to determine if a Fixed Counter is supported:
-> 	FxCtr[i]_is_supported := ECX[i] || (EDX[4:0] > i);
-> 
-> For example, it's perfectly valid to have CPUID.0AH.EDX[4:0] == 3 and
-> CPUID.0AH.ECX == 0x77, but checking the fixed counter index against
-> CPUID.0AH.EDX[4:0] only, will deem that FxCtr[6:4] are not supported.
-> 
-> [...]
+On Mon, Feb 24, 2025 at 8:55=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> Enable/disable local IRQs, i.e. set/clear RFLAGS.IF, in the common
+> svm_vcpu_enter_exit() just after/before guest_state_{enter,exit}_irqoff()
+> so that VMRUN is not executed in an STI shadow.  AMD CPUs have a quirk
+> (some would say "bug"), where the STI shadow bleeds into the guest's
+> intr_state field if a #VMEXIT occurs during injection of an event, i.e. i=
+f
+> the VMRUN doesn't complete before the subsequent #VMEXIT.
+>
+> The spurious "interrupts masked" state is relatively benign, as it only
+> occurs during event injection and is transient.  Because KVM is already
+> injecting an event, the guest can't be in HLT, and if KVM is querying IRQ
+> blocking for injection, then KVM would need to force an immediate exit
+> anyways since injecting multiple events is impossible.
+>
+> However, because KVM copies int_state verbatim from vmcb02 to vmcb12, the
+> spurious STI shadow is visible to L1 when running a nested VM, which can
+> trip sanity checks, e.g. in VMware's VMM.
+>
+> Hoist the STI+CLI all the way to C code, as the aforementioned calls to
+> guest_state_{enter,exit}_irqoff() already inform lockdep that IRQs are
+> enabled/disabled, and taking a fault on VMRUN with RFLAGS.IF=3D1 is alrea=
+dy
+> possible.  I.e. if there's kernel code that is confused by running with
+> RFLAGS.IF=3D1, then it's already a problem.  In practice, since GIF=3D0 a=
+lso
+> blocks NMIs, the only change in exposure to non-KVM code (relative to
+> surrounding VMRUN with STI+CLI) is exception handling code, and except fo=
+r
+> the kvm_rebooting=3D1 case, all exception in the core VM-Enter/VM-Exit pa=
+th
+> are fatal.
+>
+> Use the "raw" variants to enable/disable IRQs to avoid tracing in the
+> "no instrumentation" code; the guest state helpers also take care of
+> tracing IRQ state.
+>
+> Oppurtunstically document why KVM needs to do STI in the first place.
+>
+> Reported-by: Doug Covelli <doug.covelli@broadcom.com>
+> Closes: https://lore.kernel.org/all/CADH9ctBs1YPmE4aCfGPNBwA10cA8RuAk2gO7=
+542DjMZgs4uzJQ@mail.gmail.com
+> Fixes: f14eec0a3203 ("KVM: SVM: move more vmentry code to assembly")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Applied to kvm-x86 next (and now pulled by Paolo), thanks!
-
-[1/3] nVMX: fixed-function performance counters could be not contiguous
-      https://github.com/kvm-x86/kvm-unit-tests/commit/d5a6cfacc5ba
-[2/3] x86/pmu: Fixed PEBS basic record parsing issue
-      https://github.com/kvm-x86/kvm-unit-tests/commit/1006feddb2b6
-[3/3] x86/pmu: Execute PEBS test only if PEBSRecordFormat >= 4
-      https://github.com/kvm-x86/kvm-unit-tests/commit/e67ba872d947
-
---
-https://github.com/kvm-x86/kvm-unit-tests/tree/next
+Reviewed-by: Jim Mattson <jmattson@google.com>
 
