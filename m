@@ -1,53 +1,53 @@
-Return-Path: <kvm+bounces-38988-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38989-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CEA3A41DE0
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 12:57:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A3903A41DE4
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 12:57:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7DC41886191
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 11:52:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B3F51891876
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 11:52:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3137B25EFA4;
-	Mon, 24 Feb 2025 11:33:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C78BF25EFB1;
+	Mon, 24 Feb 2025 11:36:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sn6ejOFq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iTGM26gU"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4120C802
-	for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 11:33:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0130023F419
+	for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 11:36:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740396824; cv=none; b=BZCRlUp3waw8J+nKJt+wgk5mm76rR5BNeOZPqnPhqnAOCI5Ci5EW0XVuT0KweJ6YxOhixYkq457hkQ/a1GHrzOy+ciV+lUbM+1rjaED5vVi7bPmF4BAKipPozflBUmpKjz9Aek+okPVDZRC4kxiavCt5UHcGni6QOOuiI7bB6J4=
+	t=1740396964; cv=none; b=KzaY041UsH5aN9o5ZTv5S3t51QL+MoJfbj8NmIadLIiB0lPsVw7T8cKih6v0AN2afXqS0iZyqWNBzAy7NAU7WbkZUl/iA1PTd3LvcLt2DzJOBYmTRTwXsHH1RFimJlzNeouUQ2xHwufae+cTXOpU7s8O1Eq45Ml87j3PO5jtBZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740396824; c=relaxed/simple;
-	bh=lGwWXfwKz4pV5Ukv+kyUjyCqMU1NFTAZURglECm1cjc=;
+	s=arc-20240116; t=1740396964; c=relaxed/simple;
+	bh=U2X+wUVZ6C0GkTV9rTTeNKNicFl50o1rVTxmmDyVUGY=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=EHXMqHeidXeG3Ko58jXzD9pMUWG18DIQ1SGEidgPoUb6cOrf5qn/WVVGUj+crQsibgplTHe/GFXO10X1/BjqItYPl4oux4MTh4+OLGItvCt9dDTp+c/f1W4wrok/oc1qyfWavA9EsePcIWPGU8m8ouHN3hTMMFOCDoQoPp/X0zc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sn6ejOFq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A8E4BC4CEED
-	for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 11:33:43 +0000 (UTC)
+	 Content-Type:MIME-Version; b=fzEo/gp4Xsfv0Cf8tcFCaAYkVc8K98UxL/Xc5TM1E5hkdMZ9h/O49VvOErOYyplbPCypM1Jq60MIoa4U6K9K5sHlIFD1z3jn9XHlvW8JTKD55yrm/i8QgnhzF36y24Na8sCF/UvxN3Cx1NSZD/daJpSK8oPSGPKI40q7L+esbQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iTGM26gU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 76D6EC4CEEC
+	for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 11:36:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740396823;
-	bh=lGwWXfwKz4pV5Ukv+kyUjyCqMU1NFTAZURglECm1cjc=;
+	s=k20201202; t=1740396963;
+	bh=U2X+wUVZ6C0GkTV9rTTeNKNicFl50o1rVTxmmDyVUGY=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=sn6ejOFqGCvdtOrsgrbb3Mkvx5J79xhef5FPLFTceaEzE90FcBmQy/N3BegRVclWo
-	 PWP9wIdTTg16men+1qRsONVpgH6gkqZEtTZfc8H2Hpz0yAaGEAkJD0gv/m42OzYC6v
-	 PESDPoxhoJW9q1VNQIVAtwYE7oylw9poCCuJ/plwArdXxyKQC0tZVDMB90I3Z0y+T7
-	 jvBMRgT3eloFoTRU/ty2uoYbjhP9ypwaHZ7IquPoMr+19BMFjpAQwr89bA0buyUm4U
-	 3UR25akbAnhHQ5edtvcXEu2B8TwycO6UMAGbLA9UuS5Tqz4cpH17o+1R/+FkX8lVlY
-	 rD1K3SUovnusw==
+	b=iTGM26gUBg3bG+ZRaaRBqChit8CVQOGcVk4k0fbMVLY+ziZkc8Pxa2eZfSRAD/B3K
+	 Wb5IQUrKe6sWpO8mo9Nni5DlO9d9uFs74bivTX2LV0koNCGPbJGVUn7CPI8f3QAQnS
+	 irx83eKpC+O6YEhvEcoqZXWHqsGfX1RYIZScjzJ1L9+xk/d+ukF+4hNtMQAU3r+jP4
+	 EFQZ6KFiFIcT22xT9OeZUp3oJ7bgSOYhl0b18KmBfL3uabwVXOmOEY6dXoFMVziTKZ
+	 kVC8rLY2GhRhM/UCo0/INIjA7PMhDHFuyrM+tsBBK9a7YYjH8GLwS4TmpCa0XIDV9q
+	 twsVX3EvZuBrg==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id A06F3C41616; Mon, 24 Feb 2025 11:33:43 +0000 (UTC)
+	id 6D4D6C41606; Mon, 24 Feb 2025 11:36:03 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: kvm@vger.kernel.org
 Subject: [Bug 219787] Guest's applications crash with EXCEPTION_SINGLE_STEP
  (0x80000004)
-Date: Mon, 24 Feb 2025 11:33:43 +0000
+Date: Mon, 24 Feb 2025 11:36:03 +0000
 X-Bugzilla-Reason: None
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
@@ -56,14 +56,14 @@ X-Bugzilla-Component: kvm
 X-Bugzilla-Version: unspecified
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: high
-X-Bugzilla-Who: jonbetti@gmail.com
+X-Bugzilla-Who: ravi.bangoria@amd.com
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-219787-28872-2DarJnAZeG@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-219787-28872-kTq8MgTJ0N@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-219787-28872@https.bugzilla.kernel.org/>
 References: <bug-219787-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -79,31 +79,17 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D219787
 
-Jon Betti (jonbetti@gmail.com) changed:
+--- Comment #18 from Ravi Bangoria (ravi.bangoria@amd.com) ---
+(In reply to Ravi Bangoria from comment #16)
+> It seems, the CPU is preserving SW written DR6[BusLockDetected] while
+> generating the #DB when the CPL is 0 and DEBUGCTL[BusLockTrapEn] is set.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |jonbetti@gmail.com
+My bad, the behavior is same for CPL 3 as well. Apparently, it's a correct
+behavior as documented in the AMD Architecture Programmer's Manual. I've po=
+sted
+a KUT patch to KVM mailing list. (More details in the patch). Please review.
 
---- Comment #17 from Jon Betti (jonbetti@gmail.com) ---
-(In reply to whanos from comment #7)
-> I honestly wonder if this bug only affects people using a 9800X3D.
-
-I'm running a 9950X and had repro as another data point. (I had this issue =
-for
-a few weeks but thought it was Steam until I started looking at crash dumps=
- in
-Windows... and I thankfully stumbled onto this bug which restored my sanity
-:).)
-
-(In reply to rangemachine from comment #15)
-> (In reply to Sean Christopherson from comment #13)
-> > Bug reporters, can you test the attached patches?
-> Tested, these 2 patches solves the issue.
-
-+1. Patched my kernel and the issue went away (again: 'twas Steam for me th=
-at
-threw the exception).
+https://lore.kernel.org/r/20250224112601.6504-1-ravi.bangoria@amd.com
 
 --=20
 You may reply to this email to add a comment.
