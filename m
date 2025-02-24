@@ -1,84 +1,99 @@
-Return-Path: <kvm+bounces-38982-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38983-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85AB3A4196D
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 10:45:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C62BA419CA
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 10:58:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D24B166C3C
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 09:45:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16A051739AB
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 09:57:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02D6624502A;
-	Mon, 24 Feb 2025 09:44:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZzRW7iYP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19ADA24E4CA;
+	Mon, 24 Feb 2025 09:56:26 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 263F0802;
-	Mon, 24 Feb 2025 09:44:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD60224A05B;
+	Mon, 24 Feb 2025 09:56:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740390293; cv=none; b=VbcIPNK/tEa28mG2GXQOB8RGTjM6VoE9I/DK2zDlwWWrT0kGQWy1S+JkfzGE01prgho4byz+r18hmQ8Lt3nvXHZaPjXQyWXx+NJjdrz1tHeTw/TCHHg5eQDx5RFK64aOuK4lVmXJDRlTSk7S+Wpq9fB14kj0feCXlWaEyjUWNjk=
+	t=1740390985; cv=none; b=GXheKnPI0RU7vxsAlOCMseaNZFkUu091/KxXJW4Y4A5vVP7OErt13gIKx66k3Qx4URqvhyS/upXbaaBlJpV0jkVGC4LlHcRZGS1XUwyiWc7d0VTciuMporpitL+H97WQSI/ceQmL1XW/01UGLf5t0oF0Lh+ksgFaBmt8LwG6gl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740390293; c=relaxed/simple;
-	bh=Oy30/9mZEn7bUDinnc0MnPc95uAajJprYdB66FJ2hCs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=GHLJBhk+WNbCmw5lwgjhhtV57VWcszFS3GRN8dL501RjhlkoOxK/BVn0zd1484gcusjr19jsxKjwHykaI87hdyf8kwL6bRVRwF1AByGdI0p6AkHvYEk1AwpNnN6axg9E8Pf3SF/PNQuJgvM65QQ/wM5RUaH52EVjRvNPGu6XvAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZzRW7iYP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70987C4CED6;
-	Mon, 24 Feb 2025 09:44:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740390291;
-	bh=Oy30/9mZEn7bUDinnc0MnPc95uAajJprYdB66FJ2hCs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=ZzRW7iYPehAt4rl2l5x8kO9GrbI3DA+cEo6LuHgroln05qBr+x3k7Iu+UBZtGq6CJ
-	 NZjxXQYOU1LX19IF0G7wVIBzhlGfaJggIV2co5mGNCNC4TYP13qC0dpsq3d72P0sAt
-	 ziVbsWv3TTPCoAVh1dNAet91w8X01FmFm3Hu32FXF7BznloWziRPwM6MCg6iEaybaM
-	 s5KVkJ/joeYbskA8UNWDmcxzv3j+PDdsNmXqS8QlVieRqFb2X6PlSjArl5HEiM5xtd
-	 Vka1QE1vNd1iIusYL8J1TWHGVReDLPEnl8CRuIUJsG7Jt3Ezt0BwkAMtPLiVdgiIC+
-	 hOGNJku6qPvBg==
-X-Mailer: emacs 30.1 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	gankulkarni@os.amperecomputing.com
-Subject: Re: [PATCH v2 10/14] KVM: arm64: Allow userspace to limit NV
- support to nVHE
-In-Reply-To: <20250220134907.554085-11-maz@kernel.org>
-References: <20250220134907.554085-1-maz@kernel.org>
- <20250220134907.554085-11-maz@kernel.org>
-Date: Mon, 24 Feb 2025 15:14:44 +0530
-Message-ID: <yq5a4j0jhe2b.fsf@kernel.org>
+	s=arc-20240116; t=1740390985; c=relaxed/simple;
+	bh=NUpup4TJeKNS+74UwtNoKP/hHdEekNejv7N+QbJBI2Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=s/MYOVPVvwBiCDrZFFdoh6dCnAspWomn7ZOIOQzlgzJVGG7p1mBtB9PpjGHN7aDoJeiUch+x9BQ35EZ6MJJfmZ9AIjjr+WgD7pzKKXacnhruqYYnDXTrpZ/Hre/RmswJJFeAfLR9LDPO+sRTTdPU0M3fuzCjg2f5E13iOxD13ws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.2.5.213])
+	by gateway (Coremail) with SMTP id _____8CxLGtDQrxnIq+AAA--.24313S3;
+	Mon, 24 Feb 2025 17:56:19 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.213])
+	by front1 (Coremail) with SMTP id qMiowMBxXsVCQrxnRBkmAA--.9703S2;
+	Mon, 24 Feb 2025 17:56:18 +0800 (CST)
+From: Bibo Mao <maobibo@loongson.cn>
+To: Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Huacai Chen <chenhuacai@kernel.org>
+Cc: WANG Xuerui <kernel@xen0n.name>,
+	kvm@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/3] Add perf event support for guest VM
+Date: Mon, 24 Feb 2025 17:56:15 +0800
+Message-Id: <20250224095618.1436016-1-maobibo@loongson.cn>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMBxXsVCQrxnRBkmAA--.9703S2
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
+	nUUI43ZEXa7xR_UUUUUUUUU==
 
-Marc Zyngier <maz@kernel.org> writes:
+From perf pmu interrupt is normal IRQ rather than NMI, so code cannot be
+profiled if interrupt is disabled. However it is possible to profile
+guest kernel in this situation from host side, profile result is more
+accurate from host than that from guest.
 
-> NV is hard. No kidding.
->
-> In order to make things simpler, we have established that NV would
-> support two mutually exclusive configurations:
->
-> - VHE-only, and supporting recursive virtualisation
->
-> - mVHE-only, and not supporting recursive virtualisation
->
+Perf event support for guest VM is added here, and the below is the
+example:
+perf kvm --host --guest --guestkallsyms=guest-kallsyms
+     --guestmodules=guest-modules  top
 
-mVHE-only -> nVHE-only 
+Overhead  Shared Object               Symbol
+  20.02%  [guest.kernel]              [g] __arch_cpu_idle
+  16.74%  [guest.kernel]              [g] queued_spin_lock_slowpath
+  10.05%  [kernel]                    [k] __arch_cpu_idle
+   2.00%  [guest.kernel]              [g] clear_page
+   1.62%  [guest.kernel]              [g] copy_page
+   1.50%  [guest.kernel]              [g] next_uptodate_folio
+   1.41%  [guest.kernel]              [g] queued_write_lock_slowpath
+   1.41%  [guest.kernel]              [g] unmap_page_range
+   1.36%  [guest.kernel]              [g] mod_objcg_state
+   1.30%  [guest.kernel]              [g] osq_lock
+   1.28%  [guest.kernel]              [g] __slab_free
+   0.98%  [guest.kernel]              [g] copy_page_range
 
--aneesh
+Bibo Mao (3):
+  LoongArch: KVM: Add stub for kvm_arch_vcpu_preempted_in_kernel
+  LoongArch: KVM: Implement arch specified functions for guest perf
+  LoongArch: KVM: Register perf callback for guest
+
+ arch/loongarch/include/asm/kvm_host.h |  2 ++
+ arch/loongarch/kvm/Kconfig            |  1 +
+ arch/loongarch/kvm/main.c             |  2 ++
+ arch/loongarch/kvm/vcpu.c             | 31 +++++++++++++++++++++++++++
+ 4 files changed, 36 insertions(+)
+
+
+base-commit: 2408a807bfc3f738850ef5ad5e3fd59d66168996
+-- 
+2.39.3
+
 
