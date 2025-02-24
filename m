@@ -1,122 +1,114 @@
-Return-Path: <kvm+bounces-39038-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39039-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FBFFA42B33
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 19:25:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0416FA42B1C
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 19:23:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A8E018935A5
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 18:23:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 467B03B0AA6
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 18:22:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B6DD26657D;
-	Mon, 24 Feb 2025 18:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EC07265CAE;
+	Mon, 24 Feb 2025 18:21:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XbqaJPa/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DOkw7SwU"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A639226562A
-	for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 18:20:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F37352627E1
+	for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 18:21:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740421231; cv=none; b=QEWaJ2o9f1Srxx/6kIPVK0i2s0/4q+ldPKoswXxM4Kj/XbazK+R0A6uh3tNmhx42ID/lZWwfzq801lsod/p+L5LLmx0B6RQKlFBICHZYWsrZof0qyHC4vdO15rmj1ljBLyLEx1klh0GwufMETs28Cn0FC2bCOJ7QcsX4+c86T4Y=
+	t=1740421266; cv=none; b=RnvdowEJ4ajrcJkME99ZSXXah98EUsqHXlGUmSuaw6walj1yPBeClmRd7xezSYmsay9CgilkSm2a75MUunUA4/tyyk6jB3TEztgd2VAbt01Ip1qOqWfeRx+89kSrDlp49Dud48fW0XhrI4hJmWRSxpjjZMCWV6zLXXXzUhA0y7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740421231; c=relaxed/simple;
-	bh=+fWjvOFql4MYXWqia/zzl1L9GGvJoE/FTf4HrGaezp4=;
+	s=arc-20240116; t=1740421266; c=relaxed/simple;
+	bh=xIvDScXvMEmQdhnemor3X46f4p4XIbBib+VHQFBc4ws=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YnBBTwPgIlkPPHd6F+4JjPM754iO3IlwKjzn/D/FrUa67bnzUcCwZS0pDVqGSnoIQT5KLrt6cQuUQ8KAbWiq2joktyJoOzNwtUFcnHzQSc3eONli66MbEBxS8YESu2vKAoDV9WHLH7iBh12rPRCHVKXN9OzF90WucSgwphUsSWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XbqaJPa/; arc=none smtp.client-ip=170.10.133.124
+	 To:Cc:Content-Type; b=LW1+sD2ymze2nfpEvhPqYjwYuMFWyA3JqbvkW2lzuP0nsZ9omMRg1zepKFS5LwTOpN2TPWAEc83DifHodiC4GQpK8Or/H9/tNeUddF5hL7omAk/lhrCgtZI/VMUNc73gt0RKlVVgKdvvYpJRtfy7fwLz7EnNQvqnzBXJqyU0Ejc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DOkw7SwU; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740421228;
+	s=mimecast20190719; t=1740421261;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=iZrFNI4C7gp68g9l+kDtLtosIj+17mZI2t4068Zb7/k=;
-	b=XbqaJPa/sUTQMNZZP9lDWr0Ej+xGDju8x7q4c1csViPQB3DaEzBvQwW34wX9g2Iwy0BcoI
-	WLO7X7+mKvStSlc8VSijMQNq4k401ck6Kyao5mzrlhU1lFhpVYer1WeUnq3Es3JEr2Dpsh
-	WR8VCzOmPNutp7+226fmeusy4m7dRpQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=u7xELZHJie6Fl0P2HGMVjkjGrKUGnwvDBmjOpl74Jkg=;
+	b=DOkw7SwU2Pu9B/3KCGO8vMJC/HEsnJO9AcZRoRthDbLLwzrmCe7M34rhiL5WZ2lJF1EUcm
+	HZTHDJ0kUVMrpWwrKwEq480+FcvHLvX1LMM8k1A4VNm2L91KSu/VkK6U2qNgxlRajpuHQz
+	35NH6EPf2AiLTRbceQ0YEc3hNc46PH0=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-142-DuyEye_qOA24bt3XfRAQUA-1; Mon, 24 Feb 2025 13:20:27 -0500
-X-MC-Unique: DuyEye_qOA24bt3XfRAQUA-1
-X-Mimecast-MFC-AGG-ID: DuyEye_qOA24bt3XfRAQUA_1740421226
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4398e841963so39551355e9.3
-        for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 10:20:26 -0800 (PST)
+ us-mta-191-4BonyNgvNeqslLnfYdOtQA-1; Mon, 24 Feb 2025 13:20:59 -0500
+X-MC-Unique: 4BonyNgvNeqslLnfYdOtQA-1
+X-Mimecast-MFC-AGG-ID: 4BonyNgvNeqslLnfYdOtQA_1740421258
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-38f34b3f9f1so3526262f8f.0
+        for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 10:20:59 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740421226; x=1741026026;
+        d=1e100.net; s=20230601; t=1740421258; x=1741026058;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=iZrFNI4C7gp68g9l+kDtLtosIj+17mZI2t4068Zb7/k=;
-        b=V2G19dp8/QhYwoJrR8b2uFiEaxc7/q36gpFgnkHUbD/vy6HpW8uR6DXTEB0qwUcMvZ
-         XIPZbh7yTBrrMykKuJVKc3qzrs5MBkApXeK2tRjFW5ll38uIlwPzrKEfBZPsceKDrD3Y
-         +OA8mA+HMg6pNzc17wFkxetysYRgbLiZ6D7xhraBE2k61iN3+xOd47QNvvMdst6eohVU
-         83TlK56iZ2HEzUen7g/EE85hmqwbby/1VQgtCyQTtAOLQpHlCek+lKxuK8IJa6oG+oOD
-         e8bXang3DkfGzafQGcOK6j+B6sQy/vF+LATvEpmdtr3TKvP1y3Hv4G7OaHE7p2YtDo97
-         AP2A==
-X-Forwarded-Encrypted: i=1; AJvYcCUCobDY3jcStL5HYwTQv3AUnGQxvhtSHOy1B+rqNaEA7gVxPGKKm5WNh7jAKMbgQeuTB54=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+LSuznEJv/DxilWKldcdvjN0SiTFeyfSg7xqZgcc4d3jqb3eL
-	einhLdcanUefSrEzEU2OzvNNxlW/bGwM5ABentY+lgdKqfCZGxqMc+XMMvlhGHFrhZPpPGDIdWH
-	PXjOqZySzUBEClXLPjHKufHnBaP7xeeufufRAtyhrhqiJM+igITqP7LSdANC7a4nZwZNEpcGAsf
-	BfRec5SQcSEbqa4BJDov4nGTpR
-X-Gm-Gg: ASbGncu4XZ7Z9mXo/RYY9g+x5AUApbTME3Q+KNd1CNe3LZfjZasI1TWb8iKr/KcUd+r
-	EluZeF+TYrZOIJzl9EKzq41QtzbidvtmtYAGdUZ+S9tTT9484UzSUu4/AbWwM4yjKxj3R9sai3g
+        bh=u7xELZHJie6Fl0P2HGMVjkjGrKUGnwvDBmjOpl74Jkg=;
+        b=U3iu2KnQC7WNr/DRAnQoObTj698ColWSuL9hI1q7oV1VFbQvfqcfI2EyqynyyFq4i/
+         n9XJ3+ZBTEbERbOy+TwIZc7GDmA1VMT/XItpMtJEhTo9tq2ZJRL3lXTHCbFhM/iONDeq
+         PJUjFfXulAyRdrjCKAurrD1eAneATZ3eHBEIPbdq9TxpiIfWvB78dl2x7cwgyKFKH/j0
+         F9CIRL6NvJspS+e3lYgemRRJrn2qCzda/W6pfXa1io40H0nGQeB9hhGEBle+WPpI3M16
+         m+KRc7OHyN26Ao8IBB2ScF7ulGYkHsS5kKUGNMQ8Os7N1wlqqCrcXT/VTvpaNo6pl9q1
+         jzLA==
+X-Forwarded-Encrypted: i=1; AJvYcCVbVp3tHvTD17Tcjgdg1OHyGsrRE0Xa3VUsaIyHIZZ1FHaM/P+6j6wniDGyPMbDwao7TT0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyH1vn6yA0+pQoEYe1JsM36zL0hoQuknHcJzW6Pfhy+X++WhMIS
+	jOnpXGxHINM8/kvWuweSmxBsskY5q7SYldq47eFYslN8Da62Ckp7oxQuM9t2ooBeawJBL8b3/0i
+	dHTSUthj5AfgRIL462N4DZ4yE35d8Tj5baZQJLxxBll0bOeLBbeKSS8HhN+m9SWbGok6oKLmgeB
+	2Vq06a2m3FW6UVElo8XdiBngWM
+X-Gm-Gg: ASbGncsfiMopOlkZxfhNEpvwqOY/Sa68wytuOaLWLmfvzWOnVe169iprtujMSaKPH8h
+	6VgIMxyurOuMAjuSYWIoGAmkN8bKLDKHWb3nSHT2aKY0TYmybgR8/S0hxTyH53WswY9AdNwiSvw
 	==
-X-Received: by 2002:a05:600c:1e15:b0:439:9cbc:7753 with SMTP id 5b1f17b1804b1-439b03246d2mr120217875e9.10.1740421225752;
-        Mon, 24 Feb 2025 10:20:25 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEPgI3aLartuC/rneTquTEdyzyQpc0037VQO5E4VWeS/fDSQrV1vC9WSFvHP9NH6aMpcflu8dbApUxYsLMrEGk=
-X-Received: by 2002:a05:600c:1e15:b0:439:9cbc:7753 with SMTP id
- 5b1f17b1804b1-439b03246d2mr120217535e9.10.1740421225383; Mon, 24 Feb 2025
- 10:20:25 -0800 (PST)
+X-Received: by 2002:a5d:47cb:0:b0:38d:de92:adad with SMTP id ffacd0b85a97d-38f6e95c4aemr9698939f8f.22.1740421258494;
+        Mon, 24 Feb 2025 10:20:58 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEdoqcjY6M2ITOtK0J4C8ZZqwTjbsEXxZzmRUh3glHKJRit9eR6FaDOe3JruMVtsoM71Am043xhfFfSHW4WvTE=
+X-Received: by 2002:a5d:47cb:0:b0:38d:de92:adad with SMTP id
+ ffacd0b85a97d-38f6e95c4aemr9698920f8f.22.1740421258135; Mon, 24 Feb 2025
+ 10:20:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250220174406.749490-1-maz@kernel.org>
-In-Reply-To: <20250220174406.749490-1-maz@kernel.org>
+References: <CAAhSdy0Wo4hQ=gnhpJGU-khA4g-0VkfkMECDjnAsq4Fg6xfWjw@mail.gmail.com>
+In-Reply-To: <CAAhSdy0Wo4hQ=gnhpJGU-khA4g-0VkfkMECDjnAsq4Fg6xfWjw@mail.gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 24 Feb 2025 19:20:14 +0100
-X-Gm-Features: AWEUYZlnPj-9rOwF2Mzb1qT313FEPSpFv0way0dOS9rLvuEZKU9Q-G2Q2GVG6xs
-Message-ID: <CABgObfbG1wWT0rCynqZOYr8mzqrAdZeTYiG+EDOy1BOqa3k+aA@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.14, take #3
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Vladimir Murzin <vladimir.murzin@arm.com>, 
-	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org
+Date: Mon, 24 Feb 2025 19:20:46 +0100
+X-Gm-Features: AWEUYZmirAbaCLPAASL9k1ey1yRhraHtQYqh2iKwvRPu6z7rtoFlwTs6G6HOStc
+Message-ID: <CABgObfbKPQ807vchetgjdFbzFiBgSCXXHCTu-Qq-XgA2dzuDCg@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/riscv fixes for 6.14 take #1
+To: Anup Patel <anup@brainfault.org>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>, Palmer Dabbelt <palmer@rivosinc.com>, 
+	Atish Patra <atishp@atishpatra.org>, Atish Patra <atishp@rivosinc.com>, 
+	Andrew Jones <ajones@ventanamicro.com>, KVM General <kvm@vger.kernel.org>, 
+	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, 
+	linux-riscv <linux-riscv@lists.infradead.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 20, 2025 at 6:44=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote=
-:
+On Fri, Feb 21, 2025 at 6:08=E2=80=AFPM Anup Patel <anup@brainfault.org> wr=
+ote:
 >
-> Paolo,
+> Hi Paolo,
 >
-> Another week, another set of fixes.
+> We have a bunch of SBI related fixes and one fix to remove
+> a redundant vcpu kick for the 6.14 kernel.
 >
-> This time around, we have a focus on MMU bugs, with one bug affecting
-> hVHE EL2 stage-1 and picking the ASID from the wrong register, while
-> the other affects VHE and allows it to run with a stale VMID value.
+> Please pull.
 >
-> Either way, this is ugly.
->
-> Please pull,
-
-Pulled, thanks.
-
-Paolo
-
->         M.
+> Regards,
+> Anup
 >
 > The following changes since commit 0ad2507d5d93f39619fc42372c347d6006b643=
 19:
@@ -125,37 +117,43 @@ Paolo
 >
 > are available in the Git repository at:
 >
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
-marm-fixes-6.14-3
+>   https://github.com/kvm-riscv/linux.git tags/kvm-riscv-fixes-6.14-1
 >
-> for you to fetch changes up to fa808ed4e199ed17d878eb75b110bda30dd52434:
+> for you to fetch changes up to d252435aca44d647d57b84de5108556f9c97614a:
 >
->   KVM: arm64: Ensure a VMID is allocated before programming VTTBR_EL2 (20=
-25-02-20 16:29:28 +0000)
+>   riscv: KVM: Remove unnecessary vcpu kick (2025-02-21 17:27:32 +0530)
+
+Pulled, thanks.
+
+Paolo
+
+> ----------------------------------------------------------------
+> KVM/riscv fixes for 6.14, take #1
+>
+> - Fix hart status check in SBI HSM extension
+> - Fix hart suspend_type usage in SBI HSM extension
+> - Fix error returned by SBI IPI and TIME extensions for
+>   unsupported function IDs
+> - Fix suspend_type usage in SBI SUSP extension
+> - Remove unnecessary vcpu kick after injecting interrupt
+>   via IMSIC guest file
 >
 > ----------------------------------------------------------------
-> KVM/arm64 fixes for 6.14, take #3
+> Andrew Jones (5):
+>       riscv: KVM: Fix hart suspend status check
+>       riscv: KVM: Fix hart suspend_type use
+>       riscv: KVM: Fix SBI IPI error generation
+>       riscv: KVM: Fix SBI TIME error generation
+>       riscv: KVM: Fix SBI sleep_type use
 >
-> - Fix TCR_EL2 configuration to not use the ASID in TTBR1_EL2
->   and not mess-up T1SZ/PS by using the HCR_EL2.E2H=3D=3D0 layout.
+> BillXiang (1):
+>       riscv: KVM: Remove unnecessary vcpu kick
 >
-> - Bring back the VMID allocation to the vcpu_load phase, ensuring
->   that we only setup VTTBR_EL2 once on VHE. This cures an ugly
->   race that would lead to running with an unallocated VMID.
->
-> ----------------------------------------------------------------
-> Oliver Upton (1):
->       KVM: arm64: Ensure a VMID is allocated before programming VTTBR_EL2
->
-> Will Deacon (1):
->       KVM: arm64: Fix tcr_el2 initialisation in hVHE mode
->
->  arch/arm64/include/asm/kvm_arm.h  |  2 +-
->  arch/arm64/include/asm/kvm_host.h |  2 +-
->  arch/arm64/kvm/arm.c              | 37 +++++++++++++++++----------------=
-----
->  arch/arm64/kvm/vmid.c             | 11 +++--------
->  4 files changed, 22 insertions(+), 30 deletions(-)
+>  arch/riscv/kvm/aia_imsic.c        |  1 -
+>  arch/riscv/kvm/vcpu_sbi_hsm.c     | 11 ++++++-----
+>  arch/riscv/kvm/vcpu_sbi_replace.c | 15 ++++++++++++---
+>  arch/riscv/kvm/vcpu_sbi_system.c  |  3 ++-
+>  4 files changed, 20 insertions(+), 10 deletions(-)
 >
 
 
