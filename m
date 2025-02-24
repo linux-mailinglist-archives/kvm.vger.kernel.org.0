@@ -1,131 +1,98 @@
-Return-Path: <kvm+bounces-39011-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39012-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5558A42956
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 18:20:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07655A4297B
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 18:24:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A4B27A81EA
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 17:19:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F44A1680A7
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2025 17:24:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F749265617;
-	Mon, 24 Feb 2025 17:19:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21B962641CB;
+	Mon, 24 Feb 2025 17:24:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X0qlPV1l"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EGbiGq28"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E78E9265602
-	for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 17:19:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01B26261370
+	for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 17:24:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740417570; cv=none; b=JEn75PpyKA9U1FhTuem8er2OJDY/xC36fsga1v1G3j6ljNCBtCFGJz6JEBtyabk7EOQTFXUG0lhXRJpCgQKcBjigP69UVDE2WOlK8alb1dUhrVAMBiH8yIbRe7Jkhi0O+481oLjQOKw4yQtxrFfNDFxhgegomX5BqIlmPvx16wM=
+	t=1740417848; cv=none; b=uLU8q6g2Wdl2ep4lhwLVVyfbtrqD0qvzKwNvqc0i9/vR7NbCbaIG9dSdiogD099qajYXOG9NTn77/vDRnqJKvVNsxxAdXQTo2A0ErkLSIQCT3wvgF2fcmGpxtdG8m4fmmf9kPpolFpkPew8P+zDECL+8b0QI0+V5QQDzpM8m3A0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740417570; c=relaxed/simple;
-	bh=YkGfGRHPFOGIrjt7CW0/60RcoF2CYhgcQyUVsVMlKsk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=geOg6NhEpOAJiNC5U2F6gX0Vq0vrjNj6NNc03ADjQqWyWt6uUvzAqBmMQmV3m6qgGpXtQY5Fauuehe1zFlM4Zbayo1bqGpkenT3HnIriqnhl0zkUAJviY0SrcY38yRRLcSt29yKnc9AfzfYYUYvIBIV6rxk++8efnVbJ1wL00kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X0qlPV1l; arc=none smtp.client-ip=209.85.214.173
+	s=arc-20240116; t=1740417848; c=relaxed/simple;
+	bh=1FVHBn23tB0rQwYmHKEB1Ylo5s3SGKfLEmvTVgdTdZ0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=N8eWzkdD7lpY138gF7FOxBQE7Kd/XtEYT8V8FRxzQD2Xeau6bJNvK/ojZrdrk1Dpuxh0NM2wYxRB44Is/TmBhs2EPN/kYsBRGPFAJ2s40XvDOsFUo5d9hFgi4JBzGRltKMNifNQggUYYsWVa0zkRaRXKlS4gsRruWKO/BY8n8XA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EGbiGq28; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2212222d4cdso301045ad.0
-        for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 09:19:28 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fc1a70935fso9703962a91.1
+        for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 09:24:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740417568; x=1741022368; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YkGfGRHPFOGIrjt7CW0/60RcoF2CYhgcQyUVsVMlKsk=;
-        b=X0qlPV1la16N2wIxMgPlQUNfOJW4/YElrqRWi9AAj1U/B/YeYINNNj5tltvzUDOaHc
-         v7YESB7QbhQZKJonqTHW2jiKmaUaNyZBwAHPFwoKwRMspeA7LVc41Yywp8R/qwtZ4R3P
-         b6jlKRpfiEd/d+kOk5eRS0QApvdawvMBpJjaL8XIJJTyiRRG5346yIWE0XOc/eABIVNO
-         IF5geENcRcU8HdffymqXe5lhtYq4lA7Yo3+xzqcUmTZKejGhSCPxkoew7Xtzd4MyPY7q
-         P9+LdiTlIU45uCcWHtgvyLRzqX/HjgbCM6U2nav6EsHM1vu3CroxsH4rNzGfTEKjxHLy
-         EMgg==
+        d=google.com; s=20230601; t=1740417846; x=1741022646; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=S6yGacMjAHVAQBR3S7ZtK+/8LMlUXsjUPpKPbieNgj0=;
+        b=EGbiGq28+XxZnvzsjkaJnXNYn9KANFCVYqUbQcw7xaivU07Wl5eRRk4q3Vjuld8nE3
+         Gpi7BpEo3jYXTO7zZQ0Wo9xrv+FwYMCuY3HbsIvbOCQgZBL3h8OUxBMP8pPTej5fjHxb
+         R/218xDiDhkvvIi8NJsVAao7IS3wtVCyZ4TxDTQNnja185BNq5oNdRJJ0+8XhmbEoCZF
+         rICFya9W4EJMj9varLThz+f81oING+an9Po3SeovlQfAWNXi7Wom9lC373MhM9IRCsyf
+         BPE+BD4C5w5Qllqr68a0H4tSLI8jMjgLzkbyX6HB6ndT6LYNCuMoQO1/WqFonHRS10/E
+         klXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740417568; x=1741022368;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YkGfGRHPFOGIrjt7CW0/60RcoF2CYhgcQyUVsVMlKsk=;
-        b=LC+jZZnfMtiP0Ibbzij8B8eLZk9Och94mPthibBi+cSfQXCgMGE0dndFkVYRxMesIF
-         oyaAU+l1RhTeN+TNaUKhmq3OjuGo2FIdfVP0jqzv/8ButvSMW3UC1b+4vzJTm1r+Be4f
-         pm2eJmN+P2ZrSE6/zVh0Vffip2J9lMdV90ZWQqrAgIUqndEWYgPFClsCT0T/AdyabJj6
-         RYuzcPEmPap0YgWkbAISP3fA0TRbCn5BtHUzgDBwvWiWjMU3+ILHAqAR6T3MZGiWglmS
-         RlwlUm1Zfhm72XbG734UsJVdczZLK9nNmuDK+icpRGr0YPHLLTHKcwxYer+tQfiSjzQO
-         l/+A==
-X-Forwarded-Encrypted: i=1; AJvYcCVoDFmCzE393RfUiy4PKuzSFNaJ1YFkX8joVrVJ9ZUutrJ7mPFXD/YiUFJ377n8fhtb88w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKCLMW61DxBGrIRYcxdHAPrjmTurOea2xy18aZEJ4pF93xjWfe
-	rZjYNfZC2n6/pUB3aMW50rlW+rBrpYuQm7LrcVMOJQkCFvc/+BeDLjorHpakM0v54sYGm+fOFek
-	y/QAyNZ7CS+9g0VgfcYQVadHjR2lgjJ7uvnv5
-X-Gm-Gg: ASbGnctVsrZ3FRjXYwdfjmTZMhsFF9LFNQPTy/m34gyWdHf4dcEIpqWE145LaqHMyPK
-	VxYG44UIBwqZz7gltWwsjSDNxpvGzgohBbnPCmxx+Dc79HkjvESm5ufCaD6ypb4HDKyjnRsMDTL
-	mgTa2XKbc=
-X-Google-Smtp-Source: AGHT+IHTAwfAEIHfGaanz2ImJIv6TFBo6hJ0pV+jmXwD7kT/u4LNJh///oPwcVt2cEUyOMZ5KobtdpSb6LmndtBex80=
-X-Received: by 2002:a17:902:db0f:b0:216:7aaa:4c5f with SMTP id
- d9443c01a7336-22307a2f1ccmr89755ad.3.1740417568009; Mon, 24 Feb 2025 09:19:28
- -0800 (PST)
+        d=1e100.net; s=20230601; t=1740417846; x=1741022646;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=S6yGacMjAHVAQBR3S7ZtK+/8LMlUXsjUPpKPbieNgj0=;
+        b=g+lKzD4zurAAeH3p7n3/HIEVRLzSRrA0ZdhDibVskK49WwKYSpAotOscb+4hCTEx9E
+         mcIEhA3kd8FNKewq15qSug9q67Z3T3JOPo0Vd23TVEOdehvcg5jj1+GH1SvXETh/iITR
+         3a90VRYvKzHYR7f14suqTCymBh0b8Iw2W60dmBrU1gGr26ys0NOc3Ct8GoG9OE6fghdE
+         vrvK59cEkVlGTcrDcghUOR8WkxlVCAJ6GBI8nn+327vYgq9aZA1JCJzBftRYBSWAvPBY
+         fi0YsHPsI4ntOjV1dmDf4MPhYT2yxrLbdS/hnX510Gs/x5njjVDuWNcq+RoRSXDb/F0s
+         uukg==
+X-Forwarded-Encrypted: i=1; AJvYcCVwN4VRz4mxfB3F4CPk+ttjZx6EM/idHAbkjIendOhrCTsjVvoM7DWvTb/flH/CbvVqpXU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxlir0shp3flMY5eh/WPMkDIPmDu6dILvPdVvQA8vgrfeH+2aMV
+	ASIJBeWuUwivaN/SInVUIKkHfLXDee6+G2Su+xKpLtqIAztTuA87WqKUMDKu5WUgBuOgHMIhzVp
+	APw==
+X-Google-Smtp-Source: AGHT+IFTL09cz6hxGCXclZd3xzWLMnsZM1ABe9RAGKRipaOw0uqK5fj9TZ6aZCXqfvOOJIeL8QeN0eCSDvk=
+X-Received: from pjbhl14.prod.google.com ([2002:a17:90b:134e:b0:2fc:2828:dbca])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5202:b0:2ee:e518:c1cb
+ with SMTP id 98e67ed59e1d1-2fce789de87mr25621134a91.7.1740417846290; Mon, 24
+ Feb 2025 09:24:06 -0800 (PST)
+Date: Mon, 24 Feb 2025 09:23:47 -0800
+In-Reply-To: <20241010153922.1049039-2-aaronlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250222191517.743530-1-almasrymina@google.com>
- <20250222191517.743530-10-almasrymina@google.com> <Z7ypMjORvm99q6L0@mini-arch>
-In-Reply-To: <Z7ypMjORvm99q6L0@mini-arch>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 24 Feb 2025 09:19:13 -0800
-X-Gm-Features: AWEUYZkSIiPtvI8VObRXZQvcc3R--20e8PUb_X-ZIgU5euHjlp4NxpuUlOVfZXU
-Message-ID: <CAHS8izM9xMqWnJB5Cm=DMMBV1BuUemFjKSv9So8V_xQ8ToTRqA@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 9/9] selftests: ncdevmem: Implement devmem TCP TX
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, virtualization@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Jeroen de Borst <jeroendb@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20241010153922.1049039-2-aaronlewis@google.com>
+X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
+Message-ID: <174041736773.2349692.11010469798708147862.b4-ty@google.com>
+Subject: Re: [kvm-unit-tests PATCH v2] x86: Increase the timeout for the test "vmx_apicv_test"
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
+	Aaron Lewis <aaronlewis@google.com>
+Cc: pbonzini@redhat.com
+Content-Type: text/plain; charset="utf-8"
 
-On Mon, Feb 24, 2025 at 9:15=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
-l.com> wrote:
->
-> On 02/22, Mina Almasry wrote:
-> > Add support for devmem TX in ncdevmem.
-> >
-> > This is a combination of the ncdevmem from the devmem TCP series RFCv1
-> > which included the TX path, and work by Stan to include the netlink API
-> > and refactored on top of his generic memory_provider support.
-> >
-> > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
->
-> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
->
-> We need exit_wait=3DTrue for check_rx as well, but I'll send this change
-> separately.
+On Thu, 10 Oct 2024 15:39:23 +0000, Aaron Lewis wrote:
+> This test can take over 10 seconds to run on IvyBridge in debug.
+> Increase the timeout to give this test the time it needs to complete.
+> 
+> 
 
-Yes, I discovered the same thing, and I have that change locally along
-with some other fix ups I'm readying up for review in a separate
-series.
+Applied to kvm-x86 next (and now pulled by Paolo), thanks!
 
-Thanks for the reviews!
+[1/1] x86: Increase the timeout for the test "vmx_apicv_test"
+      https://github.com/kvm-x86/kvm-unit-tests/commit/30c13080e274
 
---=20
-Thanks,
-Mina
+--
+https://github.com/kvm-x86/kvm-unit-tests/tree/next
 
