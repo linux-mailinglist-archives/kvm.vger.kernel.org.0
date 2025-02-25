@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-39153-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39152-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F3AAA448E1
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 18:51:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFA75A4484E
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 18:35:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 297BD3B9747
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 17:35:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 387B17A236A
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 17:34:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C0F7215786;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3502421577D;
 	Tue, 25 Feb 2025 17:29:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ntbXKJ9w"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qljzcvIE"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C34D620E01F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E013620E317;
 	Tue, 25 Feb 2025 17:29:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740504587; cv=none; b=memSRPMeIeJUXkzuyscahG4lK6Tb62w1jGYeQMI9IIYDd0JaXb8nktkKL7j9GwteYuU0VyBj8J4ncUMKhO6pTI0a3Z1xCedsXZimm63QNICG0jFzuMB9xZI1ViIP1+Ru8ZZXqLjPxY+5QAHwm1A0d+sjPfPm/o2F8RGOAPmiD1c=
+	t=1740504588; cv=none; b=c/xTilzl7pg5sASEHPab3ohJDf95mLAme3UOHNt33pOzXloc4LMhN+zdljdDPVhfHY7pddTEFifdoS5PBzlIu7WKwfsNlUAbytdMVA7F0MAyhkzk99bkIgnXCBvn5ENjaIL8FvlwIhaIdoaKJOQEGtwuY9eIr0iCPeJlH8exRVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740504587; c=relaxed/simple;
-	bh=72XqEPX1zId4CcUK/Ah9AwDghJvNGnFuzi01nVVJvcw=;
+	s=arc-20240116; t=1740504588; c=relaxed/simple;
+	bh=X1ouQwIM1LuKv3rYNR+JevvdRSlVzOdYhPiP43piFsc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ivUgYSBeADd/msswHUc06QXdKt7nYPDIABY3RgIGtUEjWVOH1Axe3rlLDyNQA/rCdwuRAcTMXNY+ydffF0JNnfwqd5t45ugz5xynH/a3N9sP6R+5PLb/bhosAqg0KXnOGXo/u8irVsgiFi4Css2cMdk/gqWLEhjPXoXOc2yZSlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ntbXKJ9w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2C0FC4CEDD;
+	 MIME-Version; b=ua2uF9t+P9EcO4p6dCzyLyfNATIbcJkUxA7PAUBKi2k1NNbxUL25yHpxPQE8ThJcumbBJCP4gUaAWS1HVYGd5BEomPFCOYOoZcglcjrok7NNDP91ejEK/mstRzfIHdWhYBuYJ6Oo/nKOQgXoAGBG3IIPvnplkvO8Bo2Vf5w0heE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qljzcvIE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3246C4CEE7;
 	Tue, 25 Feb 2025 17:29:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1740504587;
-	bh=72XqEPX1zId4CcUK/Ah9AwDghJvNGnFuzi01nVVJvcw=;
+	bh=X1ouQwIM1LuKv3rYNR+JevvdRSlVzOdYhPiP43piFsc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ntbXKJ9w1z40KZ9jRupbXbAbf4l32PXcOXMoZKmzX7KeB5zjbCbm6QJDMVAZvlqRU
-	 3pzA7G1hf/FxUhTZHTOnS+ULrBzUM1OtYpx7S+sLsL2jYYj67eqPpcKWIgkfcKSAid
-	 MvApacq1yf3NBQ4IlkHdf650rlfvjE1l+N2y1/kEc8MFHMiqL1xnDOCGkCgeDXjMJ/
-	 BFhY4fiia9E2xwoyxeEWL1F8/IEfOuuEWLt9wX6P3MLwmiFNDfE+dpKUDfg/a34h+P
-	 UsxiRJ3KvykUX788YHoGfFXLS9ZeMLelfWBtjz06HMdGSzw85aDJ1FpwjqDTUPYQ+Q
-	 z3gWicONPd8tw==
+	b=qljzcvIEYj9E+SQzDIl6zyMMKnGiBs21m9RFBbrHZ4C2GBJacRvK0lf+ErvcuRtxL
+	 zqMMT3Hse408k1pIqQNbtrxhP5JP+hI49JYlDuKEs7NvxveSZRHW9mBNe+cTBBIwaH
+	 5lNRehd9Q33QTL6/fHHxGVcrVRNHOFC24qg4jzFnenokYUKfuZiviIhSsncFECu8Xp
+	 zudL5O1k+7J9JNzu6EiGXy3eQrfCOhPZ+STNf0QGCqoS2yngYssOehlxWBSsvfLUPf
+	 SRpRcuweIwA5N1kbzWEUM/enz6w59JE3vCWe5zY+7NLnsS2m+2Xqbzo6mteBQckEfI
+	 e91utl4/s/1bQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tmykb-007rKs-TU;
-	Tue, 25 Feb 2025 17:29:45 +0000
+	id 1tmykc-007rKs-3s;
+	Tue, 25 Feb 2025 17:29:46 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -57,9 +57,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Andre Przywara <andre.przywara@arm.com>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v4 11/16] KVM: arm64: nv: Respect virtual HCR_EL2.TWx setting
-Date: Tue, 25 Feb 2025 17:29:25 +0000
-Message-Id: <20250225172930.1850838-12-maz@kernel.org>
+Subject: [PATCH v4 12/16] KVM: arm64: nv: Request vPE doorbell upon nested ERET to L2
+Date: Tue, 25 Feb 2025 17:29:26 +0000
+Message-Id: <20250225172930.1850838-13-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250225172930.1850838-1-maz@kernel.org>
 References: <20250225172930.1850838-1-maz@kernel.org>
@@ -75,60 +75,105 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Jintack Lim <jintack.lim@linaro.org>
+From: Oliver Upton <oliver.upton@linux.dev>
 
-Forward exceptions due to WFI or WFE instructions to the virtual EL2 if
-they are not coming from the virtual EL2 and virtual HCR_EL2.TWx is set.
+Running an L2 guest with GICv4 enabled goes absolutely nowhere, and gets
+into a vicious cycle of nested ERET followed by nested exception entry
+into the L1.
 
-Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+When KVM does a put on a runnable vCPU, it marks the vPE as nonresident
+but does not request a doorbell IRQ. Behind the scenes in the ITS
+driver's view of the vCPU, its_vpe::pending_last gets set to true to
+indicate that context is still runnable.
+
+This comes to a head when doing the nested ERET into L2. The vPE doesn't
+get scheduled on the redistributor as it is exclusively part of the L1's
+VGIC context. kvm_vgic_vcpu_pending_irq() returns true because the vPE
+appears runnable, and KVM does a nested exception entry into the L1
+before L2 ever gets off the ground.
+
+This issue can be papered over by requesting a doorbell IRQ when
+descheduling a vPE as part of a nested ERET. KVM needs this anyway to
+kick the vCPU out of the L2 when an IRQ becomes pending for the L1.
+
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+Link: https://lore.kernel.org/r/20240823212703.3576061-4-oliver.upton@linux.dev
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 13 +++++++++++++
- arch/arm64/kvm/handle_exit.c         |  6 +++++-
- 2 files changed, 18 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_host.h |  2 ++
+ arch/arm64/kvm/emulate-nested.c   |  2 ++
+ arch/arm64/kvm/vgic/vgic-v4.c     | 18 +++++++++++++++++-
+ 3 files changed, 21 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 78ec1ef2cfe82..d4e4212ff5967 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -275,6 +275,19 @@ static __always_inline u64 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu)
- 	return vcpu->arch.fault.esr_el2;
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 86519a73971ed..74be23236aaca 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -946,6 +946,8 @@ struct kvm_vcpu_arch {
+ #define PMUSERENR_ON_CPU	__vcpu_single_flag(sflags, BIT(5))
+ /* WFI instruction trapped */
+ #define IN_WFI			__vcpu_single_flag(sflags, BIT(6))
++/* KVM is currently emulating a nested ERET */
++#define IN_NESTED_ERET		__vcpu_single_flag(sflags, BIT(7))
+ 
+ 
+ /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 9986bb88c2597..834c587500699 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -2503,6 +2503,7 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+ 	}
+ 
+ 	preempt_disable();
++	vcpu_set_flag(vcpu, IN_NESTED_ERET);
+ 	kvm_arch_vcpu_put(vcpu);
+ 
+ 	if (!esr_iss_is_eretax(esr))
+@@ -2514,6 +2515,7 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+ 	*vcpu_cpsr(vcpu) = spsr;
+ 
+ 	kvm_arch_vcpu_load(vcpu, smp_processor_id());
++	vcpu_clear_flag(vcpu, IN_NESTED_ERET);
+ 	preempt_enable();
+ 
+ 	kvm_pmu_nested_transition(vcpu);
+diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+index eedecbbbcf31b..0d9fb235c0180 100644
+--- a/arch/arm64/kvm/vgic/vgic-v4.c
++++ b/arch/arm64/kvm/vgic/vgic-v4.c
+@@ -336,6 +336,22 @@ void vgic_v4_teardown(struct kvm *kvm)
+ 	its_vm->vpes = NULL;
  }
  
-+static inline bool guest_hyp_wfx_traps_enabled(const struct kvm_vcpu *vcpu)
++static inline bool vgic_v4_want_doorbell(struct kvm_vcpu *vcpu)
 +{
-+	u64 esr = kvm_vcpu_get_esr(vcpu);
-+	bool is_wfe = !!(esr & ESR_ELx_WFx_ISS_WFE);
-+	u64 hcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
++	if (vcpu_get_flag(vcpu, IN_WFI))
++		return true;
 +
-+	if (!vcpu_has_nv(vcpu) || vcpu_is_el2(vcpu))
++	if (likely(!vcpu_has_nv(vcpu)))
 +		return false;
 +
-+	return ((is_wfe && (hcr_el2 & HCR_TWE)) ||
-+		(!is_wfe && (hcr_el2 & HCR_TWI)));
++	/*
++	 * GICv4 hardware is only ever used for the L1. Mark the vPE (i.e. the
++	 * L1 context) nonresident and request a doorbell to kick us out of the
++	 * L2 when an IRQ becomes pending.
++	 */
++	return vcpu_get_flag(vcpu, IN_NESTED_ERET);
 +}
 +
- static __always_inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
+ int vgic_v4_put(struct kvm_vcpu *vcpu)
  {
- 	u64 esr = kvm_vcpu_get_esr(vcpu);
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 512d152233ff2..b73dc26bc44b4 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -129,8 +129,12 @@ static int kvm_handle_fpasimd(struct kvm_vcpu *vcpu)
- static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
- {
- 	u64 esr = kvm_vcpu_get_esr(vcpu);
-+	bool is_wfe = !!(esr & ESR_ELx_WFx_ISS_WFE);
+ 	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
+@@ -343,7 +359,7 @@ int vgic_v4_put(struct kvm_vcpu *vcpu)
+ 	if (!vgic_supports_direct_msis(vcpu->kvm) || !vpe->resident)
+ 		return 0;
  
--	if (esr & ESR_ELx_WFx_ISS_WFE) {
-+	if (guest_hyp_wfx_traps_enabled(vcpu))
-+		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-+
-+	if (is_wfe) {
- 		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), true);
- 		vcpu->stat.wfe_exit_stat++;
- 	} else {
+-	return its_make_vpe_non_resident(vpe, !!vcpu_get_flag(vcpu, IN_WFI));
++	return its_make_vpe_non_resident(vpe, vgic_v4_want_doorbell(vcpu));
+ }
+ 
+ int vgic_v4_load(struct kvm_vcpu *vcpu)
 -- 
 2.39.2
 
