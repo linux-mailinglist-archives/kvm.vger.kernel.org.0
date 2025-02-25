@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-39178-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39179-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE51AA44E27
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 22:00:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB75FA44E3F
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 22:03:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D0B247AB22A
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 20:59:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E9D8719C703F
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 21:01:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6F5E20C022;
-	Tue, 25 Feb 2025 21:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71CD72139B1;
+	Tue, 25 Feb 2025 21:00:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="FhfMrn1W"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="BjGeK4Pu"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2046.outbound.protection.outlook.com [40.107.243.46])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2059.outbound.protection.outlook.com [40.107.94.59])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 595781A2567;
-	Tue, 25 Feb 2025 21:00:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D577E1A9B46;
+	Tue, 25 Feb 2025 21:00:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.59
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740517204; cv=fail; b=cdjKlwMb2JDS+5lcSEz/XvzpCQ3QgwVGaZ3xz2JjnUh15eCt7YF9JKOiTGdtRfp5IOFS2+PtYCWlU/Gu3FfxDVn9D++uNb22R01DQLWi8EefmPMqyGW80rFAooK3aEoA+UyXU3PIZwx8fGT+nY70417osQnESliJEU0HEZcmmPI=
+	t=1740517230; cv=fail; b=oXitd6pC7pynr4Dz+vBzByLwP7sbt+wZkOFwO/XrUSKyFB0r+79Eqe03/+wlitk5ZcNnubLgfJstrvx7w4CfsckVXhNgHYxNKoRCU4Ogy20XanJkdN2ZDU55RV6PiRfRuj/zV6uyZF2K8aU+abTVQoUz+TI5L9LDyI3KloRZryQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740517204; c=relaxed/simple;
-	bh=bEyFiy3ekGlFAljPhFCJa0E+PVtUvdJYtCZqfqL9bPw=;
+	s=arc-20240116; t=1740517230; c=relaxed/simple;
+	bh=6CDhjWJYn1EfXkD3bfYs7kB3C5YO7TKwy+jKrYyspOc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jRy4RMuEHJ+i/96HeRUmqTySs6y3LnGd1C5Yx7gHLI4J5LInM5+mc5RsIPKTt74egqX1HZcxSx5WPMhzYF7JbNe57IULR3m9aC/IswGf2teiTTm+XUKB+rvdJEz4eMlI5HcPWW3/F+v3g33XkrBurbnqUmUVOox+UMrcm7tEJYg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=FhfMrn1W; arc=fail smtp.client-ip=40.107.243.46
+	 MIME-Version:Content-Type; b=n2nM68YBFNE+EfvJX+CIy09KJ/HH4Z1M7DB4C7WeNK0+9AUXHmZUfqiMw/wg/jE7AzQKp3rMORWP7MKXjd+xS+/MCHYKYDx/CiT2MWLE7KI1q1ssWHrioXKogZdMUwiKH0oSgre8FsBnxGrN0rheLeYepxstgj2st6x9CJFzCn8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=BjGeK4Pu; arc=fail smtp.client-ip=40.107.94.59
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=boQQV+EY6iQtpIvG7o85yNL8WACuKC6v2tRkan7G4zEsHNv1xGNJdIL1k/Hf8iu4W7JNeeF4APyjrIQdZno00nnMjN2jmgi6YIv6E0DrNRv8v0NQaN5MbQfAa7JhEq85awa5aFI9+pSrdfRjaea1r0mm3v9bXHiaYO777f1RiQ9egbuo7UhE8eunec+7oTPlbGJWvnMiSmh/kexOQqzu0m+gghPrLJaQ4ObEwRUQ97hZHU3Wja7+66zX7h6jC3WPpTm9fp6H7QeyvindBJksbZmKdXgjg8ixsbJXhJEtDTt5PW9y+B338QH46CWNLnA6gcC/E4kCTM2A2wZHCdVRIQ==
+ b=tRZpm4h1xDpk8nItz2nj3ZG5x7yWk+Hb/9MRwrK27DpIwwN4NhEu9FJM7anYRVLkZOw8HiBm0SddeZ5MWNJiB8Vak75h5XjFDXfkdSuZYrU/Nl1Zb5acdqVPzujTtg+YcA9x53zaQoMyCZBuZuHQfBu5WGGswmL1dx1CBF224+d6bIQmdVj29utvox2JR0ft8ZM77TBG1q6hYmvmWsi9g/U11/58vCre9ny0sJLu4qN7xnoADOoOL9t4TJ1+CjrawVoL1cD/mDSwkCT5LwsXhaln9cJdOqPDLAfMt8Kp8h8pP7gMWyV8WucrM/On2PH16hk/CIwUipm+KBfYDt4JSQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6aLZfhr+XVgYPjl49TVnBIX6s1uS+Y+CGkVb5FAvXzk=;
- b=WczRCcxekCt2W1DC/HjY7UT2Whmvp0/sXheKZwVF5ZyeNZLZkhX+G0Q4R7m6Ump2+gSD6Ulw4GDA+AhnjtHfgQWFyuksyyFiEErsEpXl+r2JOtg4QdGyjEbilFRRf8E+D7hcCLuGQ0yfgVPjKHTSF6hqcJkpto3V7ExHXWY1JvKqVgrhvednBA1MPFyG5GAMy2T6whQARMj3p8KUVrwbJh7fywWo7iFQTr6C7QaVQ9peiGwvzV74l7q006EJBx8dkQAnOF0DKK9R6qPTGblLjS7ElmXVW0lzJ3J5X6+JgqUCHg2/a18nYINuLm9XGlLQgfS0CU5jtm8h2g/ZhOkieQ==
+ bh=9VkwU7vFimV1arO5EjDIioS83t8NaVrIuA8G83ZSp4s=;
+ b=nj7COtQctXAyYIqkDXkYN/9VFEtYHE7JW9epCkTLbWGJw6CTZ+lz4zfE4XXDZr41azlMzyVKGl+j+IcyPkTXh2crl0VWy359aj4N8fEO8dJMX/dfWJDyPEi3uNC5OvHXdOXExnDIvCcVCaLr0X8M59uyZaWvZVSuM0J8FVlyao/RlPryJU/2o/FRp0DPpoFvAiIgbpPZ/rJdYDEvvMGwCU78LMVWEye+REwjz0+jMnIM0kgL1XOM1tOpxIQF93BgrFjSgXPmR4Ww9c1AITuz7tSj3RC9uR412Xe07PYiiGXH7B6TNrIi7uatbIYSp7WD3LS+VilixfJLDzWkFxGotQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6aLZfhr+XVgYPjl49TVnBIX6s1uS+Y+CGkVb5FAvXzk=;
- b=FhfMrn1Ws5FYFqaTELo/YJiwSVnKMYQ2vnJEAObyS94qCkDgOrg3036g3BF8HRM8vAbGBVQqaO2HvD8Z2i6Lf+9uZZjpL7Hlz9DlTA9lJiH1vTepQTn1EUcu3W102sf1ApQc02JsXmXt0zEQ5bBQkDdsNxw2FcPGQf82hZQCa0Y=
-Received: from BY1P220CA0015.NAMP220.PROD.OUTLOOK.COM (2603:10b6:a03:5c3::10)
- by SJ2PR12MB9138.namprd12.prod.outlook.com (2603:10b6:a03:565::9) with
+ bh=9VkwU7vFimV1arO5EjDIioS83t8NaVrIuA8G83ZSp4s=;
+ b=BjGeK4PuV/GgdW/Rn7+CKqyYkL5yAFwNIu3UDJ7Tb+9/uQTghCl2ttM0yHwg3qTuxLA7Bzy+A7L+guR18EbFa9AmMlqyDw5kEDUMpGAIcE2zIJ8RLNroi/eQOebABOHDOG3PvyjEMaGAKo34CpuGPyaRJqyzLac38F4GbqaC0W0=
+Received: from SJ0PR13CA0055.namprd13.prod.outlook.com (2603:10b6:a03:2c2::30)
+ by MW4PR12MB7117.namprd12.prod.outlook.com (2603:10b6:303:221::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.20; Tue, 25 Feb
- 2025 20:59:58 +0000
-Received: from CO1PEPF000042AC.namprd03.prod.outlook.com
- (2603:10b6:a03:5c3:cafe::c2) by BY1P220CA0015.outlook.office365.com
- (2603:10b6:a03:5c3::10) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8489.19 via Frontend Transport; Tue,
- 25 Feb 2025 20:59:58 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.18; Tue, 25 Feb
+ 2025 21:00:20 +0000
+Received: from CO1PEPF000042A7.namprd03.prod.outlook.com
+ (2603:10b6:a03:2c2:cafe::62) by SJ0PR13CA0055.outlook.office365.com
+ (2603:10b6:a03:2c2::30) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8489.15 via Frontend Transport; Tue,
+ 25 Feb 2025 21:00:20 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,13 +63,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1PEPF000042AC.mail.protection.outlook.com (10.167.243.41) with Microsoft
+ CO1PEPF000042A7.mail.protection.outlook.com (10.167.243.36) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8489.16 via Frontend Transport; Tue, 25 Feb 2025 20:59:57 +0000
+ 15.20.8489.16 via Frontend Transport; Tue, 25 Feb 2025 21:00:19 +0000
 Received: from ethanolx7e2ehost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 25 Feb
- 2025 14:59:56 -0600
+ 2025 15:00:18 -0600
 From: Ashish Kalra <Ashish.Kalra@amd.com>
 To: <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
 	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
@@ -79,9 +79,9 @@ CC: <michael.roth@amd.com>, <dionnaglaze@google.com>, <nikunj@amd.com>,
 	<ardb@kernel.org>, <kevinloughlin@google.com>, <Neeraj.Upadhyay@amd.com>,
 	<aik@amd.com>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<linux-crypto@vger.kernel.org>, <linux-coco@lists.linux.dev>
-Subject: [PATCH v5 1/7] crypto: ccp: Move dev_info/err messages for SEV/SNP init and shutdown
-Date: Tue, 25 Feb 2025 20:59:47 +0000
-Message-ID: <52a878930a84fa0d5905a26d230baeb0ce554fc1.1740512583.git.ashish.kalra@amd.com>
+Subject: [PATCH v5 2/7] crypto: ccp: Ensure implicit SEV/SNP init and shutdown in ioctls
+Date: Tue, 25 Feb 2025 21:00:09 +0000
+Message-ID: <1d7b31af0eb36d860907c1e89e553e642f3882e0.1740512583.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <cover.1740512583.git.ashish.kalra@amd.com>
 References: <cover.1740512583.git.ashish.kalra@amd.com>
@@ -97,190 +97,385 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000042AC:EE_|SJ2PR12MB9138:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3f6a8747-afda-4f48-ecdf-08dd55df5cbe
+X-MS-TrafficTypeDiagnostic: CO1PEPF000042A7:EE_|MW4PR12MB7117:EE_
+X-MS-Office365-Filtering-Correlation-Id: 87f456f8-1821-4b6d-9152-08dd55df69f7
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|1800799024|7416014|36860700013|921020;
+	BCL:0;ARA:13230040|1800799024|376014|82310400026|7416014|36860700013|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?CDBTGAnKLzUkR9O2w4xy6KofZcHlZ90cvb45gdifZc3KXX/W0HUUdvNKXb5C?=
- =?us-ascii?Q?NKkAAJxmpNUB8wuVjT21l7nryzq/A3vMPyjdYKBOTO5t8k+E7ofwpndZslGh?=
- =?us-ascii?Q?B0stcY1xtEGyG1ZYas36IvuTefGnLLe0rwJ9n3ws/lF717H9WnszbQQpm4uu?=
- =?us-ascii?Q?fgBlKZ1aFIA5uC9s5G4jiF+gLD8b3zQMT2EpVGsFs0tvze1RwRqHQIkGG2GU?=
- =?us-ascii?Q?vfmJEu8rp6ReAL3/FfSHhiPVsYX37IzSSNSQ0ZQEhjnHqFJcIR2hsXFvRybq?=
- =?us-ascii?Q?q2M+OV1DHPQNS5Ufd7LcaukUSocLajJCGKmHFMuc8RbHteCurcO9hf8mYc0o?=
- =?us-ascii?Q?Wy68NKdVEmf2VraQ2B4PFgzVUfryDV7kXqea5+Jjxi6ZtNaxUwr8IU7EpWi2?=
- =?us-ascii?Q?ZJd/a3Yl7+7FbV0jjtwlAjzVw1DqzCKcV2fpCF7XoyNUAAImITFaRHz0xeSB?=
- =?us-ascii?Q?qb6GWv4Ifmah++tPbNGySqZBEiJQOBtB1CBezXlgLXK6sEtS9ap9+pM4A6Pj?=
- =?us-ascii?Q?ChWstyMu+rF/Cj4iSwH1JiYVQxhx0mqORc3efYJ8NsZoHSycxnhch8dEt7Bd?=
- =?us-ascii?Q?/ote1MfAsg/fWvK64AbF9b74d38DS0G5QBCEOg+IDvKh3NZQKLWqm0L1rb+m?=
- =?us-ascii?Q?8PE461zotQT/+CBue9WpTmnYqSTyIM7jBy/GUXE/Us2f1JvIGWsSP849j01X?=
- =?us-ascii?Q?DvEjmbvBAXhMUA1uXSzAnWmO6f4B+Xoqxo4/ojxxGQbVBWPqfehjRZQiI8Yx?=
- =?us-ascii?Q?+pB6r8ftFfLPps/HwA6AVSUDc7RjAp4hk0+J840ol+ih3nErOWCsXGfY0TlK?=
- =?us-ascii?Q?va5A8XUnJ/yKiaIrW6kfR3I8gqNIPr/N9io3tCSd5sdLGQEe6lTqkNxzxB4A?=
- =?us-ascii?Q?6HZXgHIPWtke1HWcgikAgq0s0DMJD4MQhme/g+JaiqgCFyGimgRssGXp4t6c?=
- =?us-ascii?Q?GEkkqbBcHjO3r8HcvRSylbLYqHtZuGV3oXpJkqQvJSfovQloJ/iJKbssaA5j?=
- =?us-ascii?Q?mq+s1IzJuN6mZFp+fdut1z0ceSFwsWWY8bV2E5VKT1IFMzj6pOxLQtdsL7o7?=
- =?us-ascii?Q?L9jammZE2e5o1NxIcOGheV3RVklUeD/a97X+dS9/YzqluVhi1lz3g1oxWJQy?=
- =?us-ascii?Q?mly1MZY/j20PMSUW/ivVGTkYxYDTly1v5lDhm2jRP4L+dscCzZ8tkCCav2+K?=
- =?us-ascii?Q?LrPItEmV2Q1ZfUhouhsayGhOWcGhRSIf75LZcDFOa+UhNcLDU874EMIT+Q5m?=
- =?us-ascii?Q?6sj3TLQRwXL0QVJg7QrpQPOv6qbonXC0Z9MH1785RakdriilaUXZEmQrVYHK?=
- =?us-ascii?Q?FMBTpFpVFI3GPs/cFkJ/T/KvymWEgSnQ+iRt9SR+iLx0r9OUVg6zjkQqjaqR?=
- =?us-ascii?Q?y8n8XRt557f84ldEFJS2ID5WdvQr/5+YP64u+gpWuFGwxMBDAetu5i/0r0Dp?=
- =?us-ascii?Q?zZV+IfSh51uvFAGRs5STSM6j5eXpVf64c1z7zQ9zDIUP2TsClr4KOU4nihZd?=
- =?us-ascii?Q?26fs3KYIzh9J1Hhc9QAev2Nscko3K7OzRduA?=
+	=?us-ascii?Q?yZhx80rpk7pG9vOdU263IHv6nl3mwvabPPbUQtsXYsV0ALB+/O6Nr4oEgRTS?=
+ =?us-ascii?Q?f3kgS4ZPCnoZSFaBQNJpN6iaVu9UVV/n7WunV++jT7SJq25KZhqxOo2g415v?=
+ =?us-ascii?Q?JKNDRzMq0mR3o2kV8+tOiDOB7G+6gi8Y9cjibBCEekOX5rb+NOF8C+k9c/8H?=
+ =?us-ascii?Q?ZlqVYXHlWhMkUEgRN46EqvA8bkA/6ILIrxApoAQyPZyIZmnji0rQtJdV8G1K?=
+ =?us-ascii?Q?mi5K9fN2IhawphoXdPsoZNdQDoc9B6eFCn0uk0mr4eYBG6MZ89KbwQvdFeZz?=
+ =?us-ascii?Q?VdBudxxuXGEwHkoKCZH/WNfwyiZleSKzsRiMnNvZQCqAXngRvv8gkkmdSF7m?=
+ =?us-ascii?Q?fg7U+DmvDjA+XRwd3qL2jbWunwKSoBj6qmpFrDWnYWyx7+AZFS4SvF2Wl5DG?=
+ =?us-ascii?Q?SNz4qcawN1InYSKyM+EgwPQytWNmJxss9N9iHB/iIQGAfMVYDwJJm21Pxd31?=
+ =?us-ascii?Q?5zVjb/Q4gFtN8r/KU1k/TwoSjLCfvKSbHcGbieThiQg9b/XOL2VzSBugUI/E?=
+ =?us-ascii?Q?UMMN2JNgcg5QsjCKftQebz+dGbwaOwasuYK6x5sPcJaq8dEL/EEAiQkqEFNv?=
+ =?us-ascii?Q?r89KOM6F0F0sKF7PHmvjeP+5DYKW85ywi6K8OdN1CqfL4sLVqvdYP0TuyhOf?=
+ =?us-ascii?Q?sp08DuNtie7mBRsQxxDe1UgI9hwfpwQonw0GhcL9No1SYRB0HWqrBvy1Cr7K?=
+ =?us-ascii?Q?kZgH21dNN2tEOW4QWnB7B/q1mmFXhEYtF5Xl+Y0fL1oFJuHgtMToFA86i+DS?=
+ =?us-ascii?Q?mV3QiWmKSqzQ0ErJBHgPscNLYIYBccgnNJ+v/DJnN6vU0Fy6MFqR4xXHC2hY?=
+ =?us-ascii?Q?P8ysQE2046kTsjegt1u734SLfbPNKNS8Tw6uN0LjazQGaQv/3DIPWtr11VmP?=
+ =?us-ascii?Q?6XpweJKUYL0Aqdl3u/JurZ2u0lqQCW58BoESbcaHl7p9Kpwu/E0kJigSz9+3?=
+ =?us-ascii?Q?I4w3Tk9ee6L1eVWw7M1QM7gGqrsy+B3z/MgekvnYD+WLElQgT6zFmzFGkb/2?=
+ =?us-ascii?Q?ruZBMMpFWqE3/EGy1cIgg+yj/DdMJfcCJb6kNNpA9qg0mCjFev6mEy8hJ4Mr?=
+ =?us-ascii?Q?e4237fsDJdvwWBK+DEnHdzve3R3CHkqdrUGQWax6/mdVCiZdAz3gt2+aJ88E?=
+ =?us-ascii?Q?nrA5Uejz6bWmt9R6EuLVK9+tOvqp8cb7ARBRro4+CqaFg01GZw3YiUkwJkaG?=
+ =?us-ascii?Q?grC4eRZBnkuRy9yC3FLJXjegfo4HKkd5cae88tjVwNpcEu5R69+CcJbRWrHu?=
+ =?us-ascii?Q?nK/8mvqf1QwxfaySqhPM8wleVctW18c61aChynMbjcV1swSu0ervTHfpFc8m?=
+ =?us-ascii?Q?dwa9W4Rq1KvtxAB71Qz9UEy3a04lVDz9UzWNQ8CqGiypZ1LC0lpzCB8WggdZ?=
+ =?us-ascii?Q?qC9EU2APb6Y+GylS+s6h9MQs9jn1U6yHxqpYv+oUH5zrff7pON0AfmW5pmqq?=
+ =?us-ascii?Q?KwdZWHzlyyM9Y/75Q2hyONd+YtVSRgb/zvycjR+UFyfrXO4o18jAyevg3/Nj?=
+ =?us-ascii?Q?4VtQfZiywLW8p0allTyDkTe41aMf0+K1lluk?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(7416014)(36860700013)(921020);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(82310400026)(7416014)(36860700013)(921020);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2025 20:59:57.7000
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2025 21:00:19.8816
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3f6a8747-afda-4f48-ecdf-08dd55df5cbe
+X-MS-Exchange-CrossTenant-Network-Message-Id: 87f456f8-1821-4b6d-9152-08dd55df69f7
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000042AC.namprd03.prod.outlook.com
+	CO1PEPF000042A7.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB9138
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7117
 
 From: Ashish Kalra <ashish.kalra@amd.com>
 
-Move dev_info and dev_err messages related to SEV/SNP initialization
-and shutdown into __sev_platform_init_locked(), __sev_snp_init_locked()
-and __sev_platform_shutdown_locked(), __sev_snp_shutdown_locked() so
-that they don't need to be issued from callers.
+Modify the behavior of implicit SEV initialization in some of the
+SEV ioctls to do both SEV initialization and shutdown and add
+implicit SNP initialization and shutdown to some of the SNP ioctls
+so that the change of SEV/SNP platform initialization not being
+done during PSP driver probe time does not break userspace tools
+such as sevtool, etc.
 
-This allows both _sev_platform_init_locked() and various SEV/SNP ioctls
-to call __sev_platform_init_locked(), __sev_snp_init_locked() and
-__sev_platform_shutdown_locked(), __sev_snp_shutdown_locked() for
-implicit SEV/SNP initialization and shutdown without additionally
-printing any errors/success messages.
+Prior to this patch, SEV has always been initialized before these
+ioctls as SEV initialization is done as part of PSP module probe,
+but now with SEV initialization being moved to KVM module load instead
+of PSP driver probe, the implied SEV INIT actually makes sense and gets
+used and additionally to maintain SEV platform state consistency
+before and after the ioctl SEV shutdown needs to be done after the
+firmware call.
 
+It is important to do SEV Shutdown here with the SEV/SNP initialization
+moving to KVM, an implicit SEV INIT here as part of the SEV ioctls not
+followed with SEV Shutdown will cause SEV to remain in INIT state and
+then a future SNP INIT in KVM module load will fail.
+
+Similarly, prior to this patch, SNP has always been initialized before
+these ioctls as SNP initialization is done as part of PSP module probe,
+therefore, to keep a consistent behavior, SNP init needs to be done
+here implicitly as part of these ioctls followed with SNP shutdown
+before returning from the ioctl to maintain the consistent platform
+state before and after the ioctl.
+
+Suggested-by: Tom Lendacky <thomas.lendacky@amd.com>
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 ---
- drivers/crypto/ccp/sev-dev.c | 44 ++++++++++++++++++++++++++----------
- 1 file changed, 32 insertions(+), 12 deletions(-)
+ drivers/crypto/ccp/sev-dev.c | 145 +++++++++++++++++++++++++++--------
+ 1 file changed, 115 insertions(+), 30 deletions(-)
 
 diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 2e87ca0e292a..8962a0dbc66f 100644
+index 8962a0dbc66f..14847f1c05fc 100644
 --- a/drivers/crypto/ccp/sev-dev.c
 +++ b/drivers/crypto/ccp/sev-dev.c
-@@ -1176,21 +1176,31 @@ static int __sev_snp_init_locked(int *error)
- 	wbinvd_on_all_cpus();
+@@ -1459,28 +1459,38 @@ static int sev_ioctl_do_platform_status(struct sev_issue_cmd *argp)
+ static int sev_ioctl_do_pek_pdh_gen(int cmd, struct sev_issue_cmd *argp, bool writable)
+ {
+ 	struct sev_device *sev = psp_master->sev_data;
+-	int rc;
++	bool shutdown_required = false;
++	int rc, error;
  
- 	rc = __sev_do_cmd_locked(cmd, arg, error);
--	if (rc)
-+	if (rc) {
-+		dev_err(sev->dev, "SEV-SNP: %s failed rc %d, error %#x\n",
-+			cmd == SEV_CMD_SNP_INIT_EX ? "SNP_INIT_EX" : "SNP_INIT",
-+			rc, *error);
- 		return rc;
-+	}
+ 	if (!writable)
+ 		return -EPERM;
  
- 	/* Prepare for first SNP guest launch after INIT. */
- 	wbinvd_on_all_cpus();
- 	rc = __sev_do_cmd_locked(SEV_CMD_SNP_DF_FLUSH, NULL, error);
--	if (rc)
-+	if (rc) {
-+		dev_err(sev->dev, "SEV-SNP: SNP_DF_FLUSH failed rc %d, error %#x\n",
-+			rc, *error);
- 		return rc;
-+	}
+ 	if (sev->state == SEV_STATE_UNINIT) {
+-		rc = __sev_platform_init_locked(&argp->error);
+-		if (rc)
++		rc = __sev_platform_init_locked(&error);
++		if (rc) {
++			argp->error = SEV_RET_INVALID_PLATFORM_STATE;
+ 			return rc;
++		}
++		shutdown_required = true;
+ 	}
  
- 	sev->snp_initialized = true;
- 	dev_dbg(sev->dev, "SEV-SNP firmware initialized\n");
- 
-+	dev_info(sev->dev, "SEV-SNP API:%d.%d build:%d\n", sev->api_major,
-+		 sev->api_minor, sev->build);
+-	return __sev_do_cmd_locked(cmd, NULL, &argp->error);
++	rc = __sev_do_cmd_locked(cmd, NULL, &argp->error);
 +
- 	sev_es_tmr_size = SNP_TMR_SIZE;
- 
--	return rc;
-+	return 0;
++	if (shutdown_required)
++		__sev_platform_shutdown_locked(&error);
++
++	return rc;
  }
  
- static void __sev_platform_init_handle_tmr(struct sev_device *sev)
-@@ -1287,16 +1297,22 @@ static int __sev_platform_init_locked(int *error)
- 	if (error)
- 		*error = psp_ret;
- 
--	if (rc)
-+	if (rc) {
-+		dev_err(sev->dev, "SEV: %s failed %#x, rc %d\n",
-+			sev_init_ex_buffer ? "INIT_EX" : "INIT", psp_ret, rc);
- 		return rc;
-+	}
- 
- 	sev->state = SEV_STATE_INIT;
- 
- 	/* Prepare for first SEV guest launch after INIT */
- 	wbinvd_on_all_cpus();
- 	rc = __sev_do_cmd_locked(SEV_CMD_DF_FLUSH, NULL, error);
--	if (rc)
-+	if (rc) {
-+		dev_err(sev->dev, "SEV: DF_FLUSH failed %#x, rc %d\n",
-+			*error, rc);
- 		return rc;
-+	}
- 
- 	dev_dbg(sev->dev, "SEV firmware initialized\n");
- 
-@@ -1329,8 +1345,7 @@ static int _sev_platform_init_locked(struct sev_platform_init_args *args)
- 		 * Don't abort the probe if SNP INIT failed,
- 		 * continue to initialize the legacy SEV firmware.
- 		 */
--		dev_err(sev->dev, "SEV-SNP: failed to INIT rc %d, error %#x\n",
--			rc, args->error);
-+		dev_err(sev->dev, "SEV-SNP: failed to INIT, continue SEV INIT\n");
- 	}
- 
- 	/* Defer legacy SEV/SEV-ES support if allowed by caller/module. */
-@@ -1367,8 +1382,11 @@ static int __sev_platform_shutdown_locked(int *error)
- 		return 0;
- 
- 	ret = __sev_do_cmd_locked(SEV_CMD_SHUTDOWN, NULL, error);
--	if (ret)
-+	if (ret) {
-+		dev_err(sev->dev, "SEV: failed to SHUTDOWN error %#x, rc %d\n",
-+			*error, ret);
- 		return ret;
-+	}
- 
- 	sev->state = SEV_STATE_UNINIT;
- 	dev_dbg(sev->dev, "SEV firmware shutdown\n");
-@@ -1654,7 +1672,7 @@ static int __sev_snp_shutdown_locked(int *error, bool panic)
- 	struct psp_device *psp = psp_master;
- 	struct sev_device *sev;
- 	struct sev_data_snp_shutdown_ex data;
+ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
+ {
+ 	struct sev_device *sev = psp_master->sev_data;
+ 	struct sev_user_data_pek_csr input;
++	bool shutdown_required = false;
+ 	struct sev_data_pek_csr data;
+ 	void __user *input_address;
+ 	void *blob = NULL;
 -	int ret;
-+	int ret, psp_error;
++	int ret, error;
  
- 	if (!psp || !psp->sev_data)
- 		return 0;
-@@ -1682,9 +1700,10 @@ static int __sev_snp_shutdown_locked(int *error, bool panic)
- 	ret = __sev_do_cmd_locked(SEV_CMD_SNP_SHUTDOWN_EX, &data, error);
- 	/* SHUTDOWN may require DF_FLUSH */
- 	if (*error == SEV_RET_DFFLUSH_REQUIRED) {
--		ret = __sev_do_cmd_locked(SEV_CMD_SNP_DF_FLUSH, NULL, NULL);
-+		ret = __sev_do_cmd_locked(SEV_CMD_SNP_DF_FLUSH, NULL, &psp_error);
- 		if (ret) {
--			dev_err(sev->dev, "SEV-SNP DF_FLUSH failed\n");
-+			dev_err(sev->dev, "SEV-SNP DF_FLUSH failed, ret = %d, error = %#x\n",
-+				ret, psp_error);
- 			return ret;
- 		}
- 		/* reissue the shutdown command */
-@@ -1692,7 +1711,8 @@ static int __sev_snp_shutdown_locked(int *error, bool panic)
- 					  error);
- 	}
- 	if (ret) {
--		dev_err(sev->dev, "SEV-SNP firmware shutdown failed\n");
-+		dev_err(sev->dev, "SEV-SNP firmware shutdown failed, rc %d, error %#x\n",
-+			ret, *error);
- 		return ret;
+ 	if (!writable)
+ 		return -EPERM;
+@@ -1508,9 +1518,12 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
+ 
+ cmd:
+ 	if (sev->state == SEV_STATE_UNINIT) {
+-		ret = __sev_platform_init_locked(&argp->error);
+-		if (ret)
++		ret = __sev_platform_init_locked(&error);
++		if (ret) {
++			argp->error = SEV_RET_INVALID_PLATFORM_STATE;
+ 			goto e_free_blob;
++		}
++		shutdown_required = true;
  	}
  
+ 	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CSR, &data, &argp->error);
+@@ -1529,6 +1542,9 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
+ 	}
+ 
+ e_free_blob:
++	if (shutdown_required)
++		__sev_platform_shutdown_locked(&error);
++
+ 	kfree(blob);
+ 	return ret;
+ }
+@@ -1746,8 +1762,9 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
+ 	struct sev_device *sev = psp_master->sev_data;
+ 	struct sev_user_data_pek_cert_import input;
+ 	struct sev_data_pek_cert_import data;
++	bool shutdown_required = false;
+ 	void *pek_blob, *oca_blob;
+-	int ret;
++	int ret, error;
+ 
+ 	if (!writable)
+ 		return -EPERM;
+@@ -1776,14 +1793,20 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
+ 
+ 	/* If platform is not in INIT state then transition it to INIT */
+ 	if (sev->state != SEV_STATE_INIT) {
+-		ret = __sev_platform_init_locked(&argp->error);
+-		if (ret)
++		ret = __sev_platform_init_locked(&error);
++		if (ret) {
++			argp->error = SEV_RET_INVALID_PLATFORM_STATE;
+ 			goto e_free_oca;
++		}
++		shutdown_required = true;
+ 	}
+ 
+ 	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CERT_IMPORT, &data, &argp->error);
+ 
+ e_free_oca:
++	if (shutdown_required)
++		__sev_platform_shutdown_locked(&error);
++
+ 	kfree(oca_blob);
+ e_free_pek:
+ 	kfree(pek_blob);
+@@ -1900,17 +1923,8 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+ 	struct sev_data_pdh_cert_export data;
+ 	void __user *input_cert_chain_address;
+ 	void __user *input_pdh_cert_address;
+-	int ret;
+-
+-	/* If platform is not in INIT state then transition it to INIT. */
+-	if (sev->state != SEV_STATE_INIT) {
+-		if (!writable)
+-			return -EPERM;
+-
+-		ret = __sev_platform_init_locked(&argp->error);
+-		if (ret)
+-			return ret;
+-	}
++	bool shutdown_required = false;
++	int ret, error;
+ 
+ 	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
+ 		return -EFAULT;
+@@ -1951,6 +1965,18 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+ 	data.cert_chain_len = input.cert_chain_len;
+ 
+ cmd:
++	/* If platform is not in INIT state then transition it to INIT. */
++	if (sev->state != SEV_STATE_INIT) {
++		if (!writable)
++			goto e_free_cert;
++		ret = __sev_platform_init_locked(&error);
++		if (ret) {
++			argp->error = SEV_RET_INVALID_PLATFORM_STATE;
++			goto e_free_cert;
++		}
++		shutdown_required = true;
++	}
++
+ 	ret = __sev_do_cmd_locked(SEV_CMD_PDH_CERT_EXPORT, &data, &argp->error);
+ 
+ 	/* If we query the length, FW responded with expected data. */
+@@ -1977,6 +2003,9 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+ 	}
+ 
+ e_free_cert:
++	if (shutdown_required)
++		__sev_platform_shutdown_locked(&error);
++
+ 	kfree(cert_blob);
+ e_free_pdh:
+ 	kfree(pdh_blob);
+@@ -1986,12 +2015,13 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+ static int sev_ioctl_do_snp_platform_status(struct sev_issue_cmd *argp)
+ {
+ 	struct sev_device *sev = psp_master->sev_data;
++	bool shutdown_required = false;
+ 	struct sev_data_snp_addr buf;
+ 	struct page *status_page;
++	int ret, error;
+ 	void *data;
+-	int ret;
+ 
+-	if (!sev->snp_initialized || !argp->data)
++	if (!argp->data)
+ 		return -EINVAL;
+ 
+ 	status_page = alloc_page(GFP_KERNEL_ACCOUNT);
+@@ -2000,6 +2030,15 @@ static int sev_ioctl_do_snp_platform_status(struct sev_issue_cmd *argp)
+ 
+ 	data = page_address(status_page);
+ 
++	if (!sev->snp_initialized) {
++		ret = __sev_snp_init_locked(&error);
++		if (ret) {
++			argp->error = SEV_RET_INVALID_PLATFORM_STATE;
++			goto cleanup;
++		}
++		shutdown_required = true;
++	}
++
+ 	/*
+ 	 * Firmware expects status page to be in firmware-owned state, otherwise
+ 	 * it will report firmware error code INVALID_PAGE_STATE (0x1A).
+@@ -2028,6 +2067,9 @@ static int sev_ioctl_do_snp_platform_status(struct sev_issue_cmd *argp)
+ 		ret = -EFAULT;
+ 
+ cleanup:
++	if (shutdown_required)
++		__sev_snp_shutdown_locked(&error, false);
++
+ 	__free_pages(status_page, 0);
+ 	return ret;
+ }
+@@ -2036,21 +2078,36 @@ static int sev_ioctl_do_snp_commit(struct sev_issue_cmd *argp)
+ {
+ 	struct sev_device *sev = psp_master->sev_data;
+ 	struct sev_data_snp_commit buf;
++	bool shutdown_required = false;
++	int ret, error;
+ 
+-	if (!sev->snp_initialized)
+-		return -EINVAL;
++	if (!sev->snp_initialized) {
++		ret = __sev_snp_init_locked(&error);
++		if (ret) {
++			argp->error = SEV_RET_INVALID_PLATFORM_STATE;
++			return ret;
++		}
++		shutdown_required = true;
++	}
+ 
+ 	buf.len = sizeof(buf);
+ 
+-	return __sev_do_cmd_locked(SEV_CMD_SNP_COMMIT, &buf, &argp->error);
++	ret = __sev_do_cmd_locked(SEV_CMD_SNP_COMMIT, &buf, &argp->error);
++
++	if (shutdown_required)
++		__sev_snp_shutdown_locked(&error, false);
++
++	return ret;
+ }
+ 
+ static int sev_ioctl_do_snp_set_config(struct sev_issue_cmd *argp, bool writable)
+ {
+ 	struct sev_device *sev = psp_master->sev_data;
+ 	struct sev_user_data_snp_config config;
++	bool shutdown_required = false;
++	int ret, error;
+ 
+-	if (!sev->snp_initialized || !argp->data)
++	if (!argp->data)
+ 		return -EINVAL;
+ 
+ 	if (!writable)
+@@ -2059,17 +2116,32 @@ static int sev_ioctl_do_snp_set_config(struct sev_issue_cmd *argp, bool writable
+ 	if (copy_from_user(&config, (void __user *)argp->data, sizeof(config)))
+ 		return -EFAULT;
+ 
+-	return __sev_do_cmd_locked(SEV_CMD_SNP_CONFIG, &config, &argp->error);
++	if (!sev->snp_initialized) {
++		ret = __sev_snp_init_locked(&error);
++		if (ret) {
++			argp->error = SEV_RET_INVALID_PLATFORM_STATE;
++			return ret;
++		}
++		shutdown_required = true;
++	}
++
++	ret = __sev_do_cmd_locked(SEV_CMD_SNP_CONFIG, &config, &argp->error);
++
++	if (shutdown_required)
++		__sev_snp_shutdown_locked(&error, false);
++
++	return ret;
+ }
+ 
+ static int sev_ioctl_do_snp_vlek_load(struct sev_issue_cmd *argp, bool writable)
+ {
+ 	struct sev_device *sev = psp_master->sev_data;
+ 	struct sev_user_data_snp_vlek_load input;
++	bool shutdown_required = false;
++	int ret, error;
+ 	void *blob;
+-	int ret;
+ 
+-	if (!sev->snp_initialized || !argp->data)
++	if (!argp->data)
+ 		return -EINVAL;
+ 
+ 	if (!writable)
+@@ -2088,8 +2160,21 @@ static int sev_ioctl_do_snp_vlek_load(struct sev_issue_cmd *argp, bool writable)
+ 
+ 	input.vlek_wrapped_address = __psp_pa(blob);
+ 
++	if (!sev->snp_initialized) {
++		ret = __sev_snp_init_locked(&error);
++		if (ret) {
++			argp->error = SEV_RET_INVALID_PLATFORM_STATE;
++			goto cleanup;
++		}
++		shutdown_required = true;
++	}
++
+ 	ret = __sev_do_cmd_locked(SEV_CMD_SNP_VLEK_LOAD, &input, &argp->error);
+ 
++	if (shutdown_required)
++		__sev_snp_shutdown_locked(&error, false);
++
++cleanup:
+ 	kfree(blob);
+ 
+ 	return ret;
 -- 
 2.34.1
 
