@@ -1,60 +1,61 @@
-Return-Path: <kvm+bounces-39177-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39178-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE26FA44E25
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 22:00:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE51AA44E27
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 22:00:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF8BB17B2E3
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 21:00:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D0B247AB22A
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 20:59:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 797A920F096;
-	Tue, 25 Feb 2025 20:59:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6F5E20C022;
+	Tue, 25 Feb 2025 21:00:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="o2WuwRBV"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="FhfMrn1W"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2054.outbound.protection.outlook.com [40.107.244.54])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2046.outbound.protection.outlook.com [40.107.243.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE93220F094;
-	Tue, 25 Feb 2025 20:59:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 595781A2567;
+	Tue, 25 Feb 2025 21:00:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.46
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740517190; cv=fail; b=u4w3sO+c2GTi1kCaPoDOGScdMqrs82Ns10gK11ybmkHQiC4A0ipMLUcTpYcgD4JSk9CW3HGgt63QKkQojGB0hYe52xguzED1gZxfKOCZzei98/rqg4BoupUHR77+kp+c3q71Riv9i+0wHuzWED70J7YvONZXTKNNA5Va4/gIv08=
+	t=1740517204; cv=fail; b=cdjKlwMb2JDS+5lcSEz/XvzpCQ3QgwVGaZ3xz2JjnUh15eCt7YF9JKOiTGdtRfp5IOFS2+PtYCWlU/Gu3FfxDVn9D++uNb22R01DQLWi8EefmPMqyGW80rFAooK3aEoA+UyXU3PIZwx8fGT+nY70417osQnESliJEU0HEZcmmPI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740517190; c=relaxed/simple;
-	bh=xzwQZMEFXII+TDSG3NyHaqSkqapTgmQTgy9ge4RIcfU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nFP6B5mB6G4HpOh5Q5Vsl6T68PHTIysvCGEguNsOmGpIH6x7oKXB5rzJutQgX1AQ8ksp19s9RgPCZQvorBVM4RqmhrVb6PHGZLKLyqNa+sqE8549WiqGsAPKi7SUrpmvQ0lYjog0K2cffJ5ygexnNDo5BhcOaHOb/bPceGoRnuE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=o2WuwRBV; arc=fail smtp.client-ip=40.107.244.54
+	s=arc-20240116; t=1740517204; c=relaxed/simple;
+	bh=bEyFiy3ekGlFAljPhFCJa0E+PVtUvdJYtCZqfqL9bPw=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jRy4RMuEHJ+i/96HeRUmqTySs6y3LnGd1C5Yx7gHLI4J5LInM5+mc5RsIPKTt74egqX1HZcxSx5WPMhzYF7JbNe57IULR3m9aC/IswGf2teiTTm+XUKB+rvdJEz4eMlI5HcPWW3/F+v3g33XkrBurbnqUmUVOox+UMrcm7tEJYg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=FhfMrn1W; arc=fail smtp.client-ip=40.107.243.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LG6Il13U3DI3N6t+IYWSPr27udqyRe02KjXBlw6IBCQZILBMT5pG78B1sauT6/tDXguU6ED2dDZk8gUSYRMfCfnK4ROp9ORvqJ5y8Ga2g8FPqj1GsyLyEyUGXv+wHJtNYGCAbcxrejMuJ3FYPe5PVxvuJ4skxHyyPZ+x0k6EWRmeiMr27NzBeDVz21tofRBvLMsEJqR1asuRqkn3i0bQ08YSd4iGoW0Z0gJiDq4vXD4ju7Pcb5MT4y53R1w0J3aa3k1GyFYWJS5e7ewtRoB1H6jBnPOA+o+1hHG16VNj7f7YdCAyGTrWJ3nANDpJPBirjjGOz8+86xNJO0aYMlZt/Q==
+ b=boQQV+EY6iQtpIvG7o85yNL8WACuKC6v2tRkan7G4zEsHNv1xGNJdIL1k/Hf8iu4W7JNeeF4APyjrIQdZno00nnMjN2jmgi6YIv6E0DrNRv8v0NQaN5MbQfAa7JhEq85awa5aFI9+pSrdfRjaea1r0mm3v9bXHiaYO777f1RiQ9egbuo7UhE8eunec+7oTPlbGJWvnMiSmh/kexOQqzu0m+gghPrLJaQ4ObEwRUQ97hZHU3Wja7+66zX7h6jC3WPpTm9fp6H7QeyvindBJksbZmKdXgjg8ixsbJXhJEtDTt5PW9y+B338QH46CWNLnA6gcC/E4kCTM2A2wZHCdVRIQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pqaLRWR6+WuYx8imf/6yFnrKilQAc0iF9LQxjK5Yg/I=;
- b=IqBOCwFsizeig7cK7tDDgPDmbiYeedj0971AcYGALHHzdvMKk4GNv3zev4tyou03qvci9l0/5iYAf+r3zGXvEDRSsD6GvLNzGrSCbjJQh0UKE6whZY8WZT4UXJIeYCtdoQZ+eqmYbNK2ivn8/GmKq/1CvU6t4dplai/s00E9IA4kDTCUcr9SKzyIro98/4hOAyrdO0nqoQZbf26oB06RXrnAHzd1Getphv+Doaujm2apLnl7Gv5VzOY8cX06H1HyBkIKueW0vLGImMCmeizsXIxY3arMtyfsgjO8Fza2qcpFzbYiMNrqlBifFV38JXbiEuPH6raJfUkc0wIZSAeleA==
+ bh=6aLZfhr+XVgYPjl49TVnBIX6s1uS+Y+CGkVb5FAvXzk=;
+ b=WczRCcxekCt2W1DC/HjY7UT2Whmvp0/sXheKZwVF5ZyeNZLZkhX+G0Q4R7m6Ump2+gSD6Ulw4GDA+AhnjtHfgQWFyuksyyFiEErsEpXl+r2JOtg4QdGyjEbilFRRf8E+D7hcCLuGQ0yfgVPjKHTSF6hqcJkpto3V7ExHXWY1JvKqVgrhvednBA1MPFyG5GAMy2T6whQARMj3p8KUVrwbJh7fywWo7iFQTr6C7QaVQ9peiGwvzV74l7q006EJBx8dkQAnOF0DKK9R6qPTGblLjS7ElmXVW0lzJ3J5X6+JgqUCHg2/a18nYINuLm9XGlLQgfS0CU5jtm8h2g/ZhOkieQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pqaLRWR6+WuYx8imf/6yFnrKilQAc0iF9LQxjK5Yg/I=;
- b=o2WuwRBV1/vdC0MYx7T51JSilP0Pt+vQsMiqvb2VwopvZ/o+h1CuM6hBaUqjYg3JG+JVE9m0Yzl1DaO5dcyWuO+gkW5df2SotNpX/AeUHk09/OlCd2gUo6dselaqIODLaFw17oNLtkBDFx+LUtcFYxVW6G01/MTP4yQt562isTs=
-Received: from BY3PR05CA0009.namprd05.prod.outlook.com (2603:10b6:a03:254::14)
- by SA1PR12MB8599.namprd12.prod.outlook.com (2603:10b6:806:254::7) with
+ bh=6aLZfhr+XVgYPjl49TVnBIX6s1uS+Y+CGkVb5FAvXzk=;
+ b=FhfMrn1Ws5FYFqaTELo/YJiwSVnKMYQ2vnJEAObyS94qCkDgOrg3036g3BF8HRM8vAbGBVQqaO2HvD8Z2i6Lf+9uZZjpL7Hlz9DlTA9lJiH1vTepQTn1EUcu3W102sf1ApQc02JsXmXt0zEQ5bBQkDdsNxw2FcPGQf82hZQCa0Y=
+Received: from BY1P220CA0015.NAMP220.PROD.OUTLOOK.COM (2603:10b6:a03:5c3::10)
+ by SJ2PR12MB9138.namprd12.prod.outlook.com (2603:10b6:a03:565::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.18; Tue, 25 Feb
- 2025 20:59:44 +0000
-Received: from CO1PEPF000042AB.namprd03.prod.outlook.com
- (2603:10b6:a03:254:cafe::44) by BY3PR05CA0009.outlook.office365.com
- (2603:10b6:a03:254::14) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8489.15 via Frontend Transport; Tue,
- 25 Feb 2025 20:59:43 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.20; Tue, 25 Feb
+ 2025 20:59:58 +0000
+Received: from CO1PEPF000042AC.namprd03.prod.outlook.com
+ (2603:10b6:a03:5c3:cafe::c2) by BY1P220CA0015.outlook.office365.com
+ (2603:10b6:a03:5c3::10) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8489.19 via Frontend Transport; Tue,
+ 25 Feb 2025 20:59:58 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -62,13 +63,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1PEPF000042AB.mail.protection.outlook.com (10.167.243.40) with Microsoft
+ CO1PEPF000042AC.mail.protection.outlook.com (10.167.243.41) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8489.16 via Frontend Transport; Tue, 25 Feb 2025 20:59:43 +0000
+ 15.20.8489.16 via Frontend Transport; Tue, 25 Feb 2025 20:59:57 +0000
 Received: from ethanolx7e2ehost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 25 Feb
- 2025 14:59:42 -0600
+ 2025 14:59:56 -0600
 From: Ashish Kalra <Ashish.Kalra@amd.com>
 To: <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
 	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
@@ -78,10 +79,12 @@ CC: <michael.roth@amd.com>, <dionnaglaze@google.com>, <nikunj@amd.com>,
 	<ardb@kernel.org>, <kevinloughlin@google.com>, <Neeraj.Upadhyay@amd.com>,
 	<aik@amd.com>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<linux-crypto@vger.kernel.org>, <linux-coco@lists.linux.dev>
-Subject: [PATCH v5 0/7] Move initializing SEV/SNP functionality to KVM
-Date: Tue, 25 Feb 2025 20:59:31 +0000
-Message-ID: <cover.1740512583.git.ashish.kalra@amd.com>
+Subject: [PATCH v5 1/7] crypto: ccp: Move dev_info/err messages for SEV/SNP init and shutdown
+Date: Tue, 25 Feb 2025 20:59:47 +0000
+Message-ID: <52a878930a84fa0d5905a26d230baeb0ce554fc1.1740512583.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <cover.1740512583.git.ashish.kalra@amd.com>
+References: <cover.1740512583.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -94,131 +97,190 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000042AB:EE_|SA1PR12MB8599:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0ce20c92-ffdd-49c7-72f1-08dd55df542f
+X-MS-TrafficTypeDiagnostic: CO1PEPF000042AC:EE_|SJ2PR12MB9138:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3f6a8747-afda-4f48-ecdf-08dd55df5cbe
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|36860700013|82310400026|7416014|1800799024|921020;
+	BCL:0;ARA:13230040|376014|82310400026|1800799024|7416014|36860700013|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?XUue7HW7UmE3CkdyM2rVdbRUFnxBHNpmqP8wHBbFTsv8UVve27eJ7DVP6WJ7?=
- =?us-ascii?Q?bFxRIb0EdFFgHY0L8rogi0uB7X4HcFJegEb0zzOipIxxKtBfImr3YonYM3Ya?=
- =?us-ascii?Q?4NbzcAs60xS0gQsqHfXr1Iw6j09xuZZQtN0mvAqNPeBIYfh2JKoIEQUmlsKY?=
- =?us-ascii?Q?AoNj6mE2cIvm/vIjyyVbaPLQk4PSAmEdVTvEDu7T8tsWQhiuMe8WQyeyQeuC?=
- =?us-ascii?Q?Iv8t0F1a4eFQu0ZCIDdZrVjmotiWMCkRdvKcxhQ4Ueuii5j2Xi+xoVJctLBP?=
- =?us-ascii?Q?gn5yQD4nryn6qtVHs8juAQLr9semxYc0e7JhX5y9rbBe3jVIyUhEK/p2t7JK?=
- =?us-ascii?Q?smm+O7uKL7ecFTpW3Rv6AlfvY+nOe8PkFYH42a9jOrqpHuTBdYOuhv/SQPCZ?=
- =?us-ascii?Q?Na9w3iHDBvAz2q7hblBeXdj4N/dsIBq9bczs63191EH1exp7WBQzzAmFu6di?=
- =?us-ascii?Q?iwAj8AI/cJ2RBJkQUnxjN0wqa6NxT/yAyOc30bmzecnuN9mtLnzR55DYSPk/?=
- =?us-ascii?Q?lTLJu4Ar+YqAa76wLK/64pQS4qv2eyiTJxL+F+tiLXHu89mH1Tf6Rr6tYU3P?=
- =?us-ascii?Q?06arclOKVlYfL3Tp7uNrtcZmo1qAhBGVG7RQREHQWySYJPoaiwH0FZRDDOnn?=
- =?us-ascii?Q?6Qup4EzZ3bslHkZPzH/5b6MLMtHjUvwoN/iWcS7KbRirsa++ps5t2H0dy38M?=
- =?us-ascii?Q?V6iAnZ0o5oj96ag0CLMA+DkuzN4wsBzHS/Vr78XKFHja9hhYN9IOAtpoZX12?=
- =?us-ascii?Q?eGrvCI3xtMbpn91As6try6VgC+eohWSTd557OsExct5/wRFq6ZJC4oH79va9?=
- =?us-ascii?Q?rYDvYKez+a4ebFBR4Vs+1hs9FT81Q/FdlDS84sntAACRxZ0hsA4dfiTjyx+H?=
- =?us-ascii?Q?CYRkCUb5TtqYjuo1tqGLPh/7usPDycJTe8FVXZuCaA68yLNA7oxJ9nOw6l3Z?=
- =?us-ascii?Q?J6Vpr24Ofurz+AUb6cg5g7ybSRAaKbRYuCXhnUGZK027eI5fvM//kHuXyQvM?=
- =?us-ascii?Q?RuAXiiBUPeB0rm+ILCh7DrYN534J8YtSG4YU0HfB4nX6+3e+wUWuZNz0jUM5?=
- =?us-ascii?Q?3zHPpxbBdBkk3vwvRtpfq6r0VAVEjLde5/2ca2YEcl3oq0ndoM7O+iHshH+g?=
- =?us-ascii?Q?AKQYjugGQ9yh/7SW2cpdlFC0RZFzAOf4MS7Xb9Hv9mfe92kE1S+1SvozXFLI?=
- =?us-ascii?Q?9OEhGcNWyq24RSXt1urk5LKt6nEMRch94dZmBe44RDOv6vx/JX0Vz/1A/F1G?=
- =?us-ascii?Q?+AIvyyR0CGx61RfuTOBukZ8OYCYkC2gjeQQa2rOC9o16xOM7vrbd8Se0Hrpi?=
- =?us-ascii?Q?723EU4f5MQwR+eAoov/FMs8uVJ1I5c6yRwqOp4JfA4rlsgw3s3bvq9LtDrGV?=
- =?us-ascii?Q?NF5hd5BO3w4zdla5Jwctk1jTvkXTp5/FZXde5Qt46lby8YXFE/XCr0w9/T33?=
- =?us-ascii?Q?dsn0bbyjupKrvAKI+Y+cXsmVdKbA5Wqm0GRuMJEiEr6EEm2j3MWxjWJiIDER?=
- =?us-ascii?Q?S0W43OuCArW7DYXOcB3dK8clu8C4W21TzRUS?=
+	=?us-ascii?Q?CDBTGAnKLzUkR9O2w4xy6KofZcHlZ90cvb45gdifZc3KXX/W0HUUdvNKXb5C?=
+ =?us-ascii?Q?NKkAAJxmpNUB8wuVjT21l7nryzq/A3vMPyjdYKBOTO5t8k+E7ofwpndZslGh?=
+ =?us-ascii?Q?B0stcY1xtEGyG1ZYas36IvuTefGnLLe0rwJ9n3ws/lF717H9WnszbQQpm4uu?=
+ =?us-ascii?Q?fgBlKZ1aFIA5uC9s5G4jiF+gLD8b3zQMT2EpVGsFs0tvze1RwRqHQIkGG2GU?=
+ =?us-ascii?Q?vfmJEu8rp6ReAL3/FfSHhiPVsYX37IzSSNSQ0ZQEhjnHqFJcIR2hsXFvRybq?=
+ =?us-ascii?Q?q2M+OV1DHPQNS5Ufd7LcaukUSocLajJCGKmHFMuc8RbHteCurcO9hf8mYc0o?=
+ =?us-ascii?Q?Wy68NKdVEmf2VraQ2B4PFgzVUfryDV7kXqea5+Jjxi6ZtNaxUwr8IU7EpWi2?=
+ =?us-ascii?Q?ZJd/a3Yl7+7FbV0jjtwlAjzVw1DqzCKcV2fpCF7XoyNUAAImITFaRHz0xeSB?=
+ =?us-ascii?Q?qb6GWv4Ifmah++tPbNGySqZBEiJQOBtB1CBezXlgLXK6sEtS9ap9+pM4A6Pj?=
+ =?us-ascii?Q?ChWstyMu+rF/Cj4iSwH1JiYVQxhx0mqORc3efYJ8NsZoHSycxnhch8dEt7Bd?=
+ =?us-ascii?Q?/ote1MfAsg/fWvK64AbF9b74d38DS0G5QBCEOg+IDvKh3NZQKLWqm0L1rb+m?=
+ =?us-ascii?Q?8PE461zotQT/+CBue9WpTmnYqSTyIM7jBy/GUXE/Us2f1JvIGWsSP849j01X?=
+ =?us-ascii?Q?DvEjmbvBAXhMUA1uXSzAnWmO6f4B+Xoqxo4/ojxxGQbVBWPqfehjRZQiI8Yx?=
+ =?us-ascii?Q?+pB6r8ftFfLPps/HwA6AVSUDc7RjAp4hk0+J840ol+ih3nErOWCsXGfY0TlK?=
+ =?us-ascii?Q?va5A8XUnJ/yKiaIrW6kfR3I8gqNIPr/N9io3tCSd5sdLGQEe6lTqkNxzxB4A?=
+ =?us-ascii?Q?6HZXgHIPWtke1HWcgikAgq0s0DMJD4MQhme/g+JaiqgCFyGimgRssGXp4t6c?=
+ =?us-ascii?Q?GEkkqbBcHjO3r8HcvRSylbLYqHtZuGV3oXpJkqQvJSfovQloJ/iJKbssaA5j?=
+ =?us-ascii?Q?mq+s1IzJuN6mZFp+fdut1z0ceSFwsWWY8bV2E5VKT1IFMzj6pOxLQtdsL7o7?=
+ =?us-ascii?Q?L9jammZE2e5o1NxIcOGheV3RVklUeD/a97X+dS9/YzqluVhi1lz3g1oxWJQy?=
+ =?us-ascii?Q?mly1MZY/j20PMSUW/ivVGTkYxYDTly1v5lDhm2jRP4L+dscCzZ8tkCCav2+K?=
+ =?us-ascii?Q?LrPItEmV2Q1ZfUhouhsayGhOWcGhRSIf75LZcDFOa+UhNcLDU874EMIT+Q5m?=
+ =?us-ascii?Q?6sj3TLQRwXL0QVJg7QrpQPOv6qbonXC0Z9MH1785RakdriilaUXZEmQrVYHK?=
+ =?us-ascii?Q?FMBTpFpVFI3GPs/cFkJ/T/KvymWEgSnQ+iRt9SR+iLx0r9OUVg6zjkQqjaqR?=
+ =?us-ascii?Q?y8n8XRt557f84ldEFJS2ID5WdvQr/5+YP64u+gpWuFGwxMBDAetu5i/0r0Dp?=
+ =?us-ascii?Q?zZV+IfSh51uvFAGRs5STSM6j5eXpVf64c1z7zQ9zDIUP2TsClr4KOU4nihZd?=
+ =?us-ascii?Q?26fs3KYIzh9J1Hhc9QAev2Nscko3K7OzRduA?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(36860700013)(82310400026)(7416014)(1800799024)(921020);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(7416014)(36860700013)(921020);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2025 20:59:43.3223
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2025 20:59:57.7000
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0ce20c92-ffdd-49c7-72f1-08dd55df542f
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3f6a8747-afda-4f48-ecdf-08dd55df5cbe
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000042AB.namprd03.prod.outlook.com
+	CO1PEPF000042AC.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8599
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB9138
 
 From: Ashish Kalra <ashish.kalra@amd.com>
 
-Remove initializing SEV/SNP functionality from PSP driver and instead add
-support to KVM to explicitly initialize the PSP if KVM wants to use
-SEV/SNP functionality.
+Move dev_info and dev_err messages related to SEV/SNP initialization
+and shutdown into __sev_platform_init_locked(), __sev_snp_init_locked()
+and __sev_platform_shutdown_locked(), __sev_snp_shutdown_locked() so
+that they don't need to be issued from callers.
 
-This removes SEV/SNP initialization at PSP module probe time and does
-on-demand SEV/SNP initialization when KVM really wants to use 
-SEV/SNP functionality. This will allow running legacy non-confidential
-VMs without initializating SEV functionality. 
+This allows both _sev_platform_init_locked() and various SEV/SNP ioctls
+to call __sev_platform_init_locked(), __sev_snp_init_locked() and
+__sev_platform_shutdown_locked(), __sev_snp_shutdown_locked() for
+implicit SEV/SNP initialization and shutdown without additionally
+printing any errors/success messages.
 
-This will assist in adding SNP CipherTextHiding support and SEV firmware
-hotloading support in KVM without sharing SEV ASID management and SNP
-guest context support between PSP driver and KVM and keeping all that
-support only in KVM.
+Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+---
+ drivers/crypto/ccp/sev-dev.c | 44 ++++++++++++++++++++++++++----------
+ 1 file changed, 32 insertions(+), 12 deletions(-)
 
-To support SEV firmware hotloading, SEV Shutdown will be done explicitly
-prior to DOWNLOAD_FIRMWARE_EX and SEV INIT post it to work with the
-requirement of SEV to be in UNINIT state for DOWNLOAD_FIRMWARE_EX.
-NOTE: SEV firmware hotloading will only be supported if there are no
-active SEV/SEV-ES guests. 
-
-v5:
-- To maintain 1-to-1 mapping between the ioctl commands and the SEV/SNP commands, 
-handle the implicit INIT in the same way as SHUTDOWN, which is to use a local error
-for INIT and in case of implicit INIT failures, let the error logs from 
-__sev_platform_init_locked() OR __sev_snp_init_locked() be printed and always return
-INVALID_PLATFORM_STATE as error back to the caller.
-- Add better error logging for SEV/SNP INIT and SHUTDOWN commands.
-- Fix commit logs.
-- Add more acked-by's, reviewed-by's, suggested-by's.
-
-v4:
-- Rebase on linux-next which has the fix for SNP broken with kvm_amd
-module built-in.
-- Fix commit logs.
-- Add explicit SEV/SNP initialization and shutdown error logs instead
-of using a common exit point.
-- Move SEV/SNP shutdown error logs from callers into __sev_platform_shutdown_locked()
-and __sev_snp_shutdown_locked().
-- Make sure that we continue to support both the probe field and psp_init_on_probe
-module parameter for PSP module to support SEV INIT_EX.
-- Add reviewed-by's.
-
-v3:
-- Move back to do both SNP and SEV platform initialization at KVM module
-load time instead of SEV initialization on demand at SEV/SEV-ES VM launch
-to prevent breaking QEMU which has a check for SEV to be initialized 
-prior to launching SEV/SEV-ES VMs. 
-- As both SNP and SEV platform initialization and shutdown is now done at
-KVM module load and unload time remove patches for separate SEV and SNP
-platform initialization and shutdown.
-
-v2:
-- Added support for separate SEV and SNP platform initalization, while
-SNP platform initialization is done at KVM module load time, SEV 
-platform initialization is done on demand at SEV/SEV-ES VM launch.
-- Added support for separate SEV and SNP platform shutdown, both 
-SEV and SNP shutdown done at KVM module unload time, only SEV
-shutdown down when all SEV/SEV-ES VMs have been destroyed, this
-allows SEV firmware hotloading support anytime during system lifetime.
-- Updated commit messages for couple of patches in the series with
-reference to the feedback received on v1 patches.
-
-Ashish Kalra (7):
-  crypto: ccp: Move dev_info/err messages for SEV/SNP init and shutdown
-  crypto: ccp: Ensure implicit SEV/SNP init and shutdown in ioctls
-  crypto: ccp: Reset TMR size at SNP Shutdown
-  crypto: ccp: Register SNP panic notifier only if SNP is enabled
-  crypto: ccp: Add new SEV/SNP platform shutdown API
-  KVM: SVM: Add support to initialize SEV/SNP functionality in KVM
-  crypto: ccp: Move SEV/SNP Platform initialization to KVM
-
- arch/x86/kvm/svm/sev.c       |  15 +++
- drivers/crypto/ccp/sev-dev.c | 239 +++++++++++++++++++++++++----------
- include/linux/psp-sev.h      |   3 +
- 3 files changed, 190 insertions(+), 67 deletions(-)
-
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 2e87ca0e292a..8962a0dbc66f 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -1176,21 +1176,31 @@ static int __sev_snp_init_locked(int *error)
+ 	wbinvd_on_all_cpus();
+ 
+ 	rc = __sev_do_cmd_locked(cmd, arg, error);
+-	if (rc)
++	if (rc) {
++		dev_err(sev->dev, "SEV-SNP: %s failed rc %d, error %#x\n",
++			cmd == SEV_CMD_SNP_INIT_EX ? "SNP_INIT_EX" : "SNP_INIT",
++			rc, *error);
+ 		return rc;
++	}
+ 
+ 	/* Prepare for first SNP guest launch after INIT. */
+ 	wbinvd_on_all_cpus();
+ 	rc = __sev_do_cmd_locked(SEV_CMD_SNP_DF_FLUSH, NULL, error);
+-	if (rc)
++	if (rc) {
++		dev_err(sev->dev, "SEV-SNP: SNP_DF_FLUSH failed rc %d, error %#x\n",
++			rc, *error);
+ 		return rc;
++	}
+ 
+ 	sev->snp_initialized = true;
+ 	dev_dbg(sev->dev, "SEV-SNP firmware initialized\n");
+ 
++	dev_info(sev->dev, "SEV-SNP API:%d.%d build:%d\n", sev->api_major,
++		 sev->api_minor, sev->build);
++
+ 	sev_es_tmr_size = SNP_TMR_SIZE;
+ 
+-	return rc;
++	return 0;
+ }
+ 
+ static void __sev_platform_init_handle_tmr(struct sev_device *sev)
+@@ -1287,16 +1297,22 @@ static int __sev_platform_init_locked(int *error)
+ 	if (error)
+ 		*error = psp_ret;
+ 
+-	if (rc)
++	if (rc) {
++		dev_err(sev->dev, "SEV: %s failed %#x, rc %d\n",
++			sev_init_ex_buffer ? "INIT_EX" : "INIT", psp_ret, rc);
+ 		return rc;
++	}
+ 
+ 	sev->state = SEV_STATE_INIT;
+ 
+ 	/* Prepare for first SEV guest launch after INIT */
+ 	wbinvd_on_all_cpus();
+ 	rc = __sev_do_cmd_locked(SEV_CMD_DF_FLUSH, NULL, error);
+-	if (rc)
++	if (rc) {
++		dev_err(sev->dev, "SEV: DF_FLUSH failed %#x, rc %d\n",
++			*error, rc);
+ 		return rc;
++	}
+ 
+ 	dev_dbg(sev->dev, "SEV firmware initialized\n");
+ 
+@@ -1329,8 +1345,7 @@ static int _sev_platform_init_locked(struct sev_platform_init_args *args)
+ 		 * Don't abort the probe if SNP INIT failed,
+ 		 * continue to initialize the legacy SEV firmware.
+ 		 */
+-		dev_err(sev->dev, "SEV-SNP: failed to INIT rc %d, error %#x\n",
+-			rc, args->error);
++		dev_err(sev->dev, "SEV-SNP: failed to INIT, continue SEV INIT\n");
+ 	}
+ 
+ 	/* Defer legacy SEV/SEV-ES support if allowed by caller/module. */
+@@ -1367,8 +1382,11 @@ static int __sev_platform_shutdown_locked(int *error)
+ 		return 0;
+ 
+ 	ret = __sev_do_cmd_locked(SEV_CMD_SHUTDOWN, NULL, error);
+-	if (ret)
++	if (ret) {
++		dev_err(sev->dev, "SEV: failed to SHUTDOWN error %#x, rc %d\n",
++			*error, ret);
+ 		return ret;
++	}
+ 
+ 	sev->state = SEV_STATE_UNINIT;
+ 	dev_dbg(sev->dev, "SEV firmware shutdown\n");
+@@ -1654,7 +1672,7 @@ static int __sev_snp_shutdown_locked(int *error, bool panic)
+ 	struct psp_device *psp = psp_master;
+ 	struct sev_device *sev;
+ 	struct sev_data_snp_shutdown_ex data;
+-	int ret;
++	int ret, psp_error;
+ 
+ 	if (!psp || !psp->sev_data)
+ 		return 0;
+@@ -1682,9 +1700,10 @@ static int __sev_snp_shutdown_locked(int *error, bool panic)
+ 	ret = __sev_do_cmd_locked(SEV_CMD_SNP_SHUTDOWN_EX, &data, error);
+ 	/* SHUTDOWN may require DF_FLUSH */
+ 	if (*error == SEV_RET_DFFLUSH_REQUIRED) {
+-		ret = __sev_do_cmd_locked(SEV_CMD_SNP_DF_FLUSH, NULL, NULL);
++		ret = __sev_do_cmd_locked(SEV_CMD_SNP_DF_FLUSH, NULL, &psp_error);
+ 		if (ret) {
+-			dev_err(sev->dev, "SEV-SNP DF_FLUSH failed\n");
++			dev_err(sev->dev, "SEV-SNP DF_FLUSH failed, ret = %d, error = %#x\n",
++				ret, psp_error);
+ 			return ret;
+ 		}
+ 		/* reissue the shutdown command */
+@@ -1692,7 +1711,8 @@ static int __sev_snp_shutdown_locked(int *error, bool panic)
+ 					  error);
+ 	}
+ 	if (ret) {
+-		dev_err(sev->dev, "SEV-SNP firmware shutdown failed\n");
++		dev_err(sev->dev, "SEV-SNP firmware shutdown failed, rc %d, error %#x\n",
++			ret, *error);
+ 		return ret;
+ 	}
+ 
 -- 
 2.34.1
 
