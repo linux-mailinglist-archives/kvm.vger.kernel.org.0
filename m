@@ -1,60 +1,61 @@
-Return-Path: <kvm+bounces-39187-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39188-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F484A44F09
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 22:40:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12482A44F0C
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 22:40:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C6A416F1D6
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 21:40:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 985437A71DC
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 21:39:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B6E920FA9B;
-	Tue, 25 Feb 2025 21:39:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEA2720FA9E;
+	Tue, 25 Feb 2025 21:40:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="uP5D6uYA"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="RckF+1JD"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2073.outbound.protection.outlook.com [40.107.220.73])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2081.outbound.protection.outlook.com [40.107.223.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9BB51925B8;
-	Tue, 25 Feb 2025 21:39:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66C2719CD0B;
+	Tue, 25 Feb 2025 21:40:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.81
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740519595; cv=fail; b=UHSZhiXysKyXd9eMjDuCJM2ZUQgSpMBo5374AA4/FMxl3yqAtIzxQZWQHrcJBidLRAOP37BqO/wVCOILHg1ey8Sby3Z6l8557UQS7ePMztcr27pAMOWWkDLcNverbZWeQ3zFLNHJwPNSpAnw5MFzSEWZTnxaX0j5toxPB8xkYWY=
+	t=1740519616; cv=fail; b=Y7m0RJTxvZdxY/8fw0DenDiOwl3iIyDpnf7bzH3QgbI8px9qdh6EpuXRnb5Wy1af9FPcf44/QG/Zz/Enk65BleS+hDQ5vbOk6/Y57YbLneMVavLIU/dOeGTVTzf7KZdsap69RxG6k0Qy8HnOXbnT7iyb981K9AGITEw1EKqr9hI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740519595; c=relaxed/simple;
-	bh=FSA9uzl/SPN7OFMyhljhAPW17X7uE7Ad7ZkrQdvZeHc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZOTx+z5qp8jFfzgyEGzAZWewy8xPLm1o6gdmb+A8lYW9v4ETjUYFiNEwlTXdZXlMOZeI41byqCKTCWRjhbESFv6FU4xva9BtnNzrHBvS3Wk+WI2Q1S8ovE5j+OH8pH/ZG8wu3LON4WoF1NvSOVppyixyE1KC6EFl+/4E8Hz+lqU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=uP5D6uYA; arc=fail smtp.client-ip=40.107.220.73
+	s=arc-20240116; t=1740519616; c=relaxed/simple;
+	bh=A/iAN1K+dksNwKIzn9Pes37wOiqK7+W107Aw+Kaqq68=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rtIS4rUulCa8jzWsB6XsrZu3IqhbxYm5P5Cuml/uIzL7cbrcISnucAuwOy0QWDUCEq8gEoCWeKFd40OBLJSLPMRVBDf9diMSTtd0rDHSXlvotp5IdtAo2n1r6+LV9ME0C+gFVBl9rt8+RotybYNZYWFz6WHN8KuJRkJjaDy2DSk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=RckF+1JD; arc=fail smtp.client-ip=40.107.223.81
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=B/RUu7xKOGo7YbDbrz4mTO6UVhcbiLy75Giw7kguf/NmyNxBfRLw7iJs1Mb/KLrF9a9MkfcE74k+j3czKyqJpacJJtxycsn/702Sr/fgpKSTLoTMIj/T3zuYVc5VaFVqcFsI/4iZRnyK16XIr7/xcSoDDsUkOhD2mk/93n9+ZbMXVFBbItcEXk+IVao6B/rMniE6qSUVLPlyf1iHjBg5YEDdzO/fURBofzsj9DVjkiuwf4/EDdj0rodTtfPWkzVsUXODZ9GX3z+Amh2uxYWftoP4YZRjhyHN5mzaGDmxdBB1RNC04EXZfpBaA646rbrdQ4UX6x9NFXTl4CMYSIG5bw==
+ b=bVtEz+XSK8SLhpJF48nHqBLt9Smq9cM7u74nb+QFdECf0vqnjmnjHKf+dJkysdUmbIzYTcoNcZvCMnVgm+hM+IcBebH+071iw0F+CBmwKlACiHcAh7JvU5eys+2KmJCTu3c2eTz0roRBPbo46i34LMXV198XwGbMFbSlu9ier919EOXH1X3VcJE3dUXsFbqehPG+DSjcMWKfOtdTOfoyiciIlXC4/geyYz6axqV0xn28KT7DcRytbmoqYgh1Y4pTjzezo2UsmAm7+n9gqnxQXUs8LssUAhDtg5pm814sgBK1x5cmcs6ZQMXBgKEXX0myNruX73YMCW69QCU65KowLQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Wv3wJdB53HnkFG/eBG6BXhYDKS3AfM63sWiNK+RtS80=;
- b=jkvahOGh9ll6ywwmhJX4tZ8mV1puJ0T5htNBfCUkvX9iNjkxqBGhDKJtfzIT+XjARThEcC6CQDjVA6VnkQeJfEDJfUDzIh6AnziETQ1Zhigf5ymFz3cCVHUbGhvJLCPHm14Bn+Q+9YPJUCB8NSPXoy+1m+eNq8W7ZSUmDtTEFeoaZNzIwRYPTmbSqyPkGvxMc8q+gW5ctNf8aRzkDtyMuaIemJzpYihbaD40ffOeUCTCt5p8Yg7nqRGRL/fwGi5Ar8GPOLuSENpOEuxpmuA0WPD2GPKBUuHwxnvTcdBvUGIZqJV7HVtKPqtsHNhAg3ZhD1hgFWSaUc0UCLEnfg/DwQ==
+ bh=i/lWliKjhINwW1telRXSKn30EsfU7Qk80tiRjzklLSI=;
+ b=FCE61R0+a73FcoxZs89qsnveerAy2rQ1gTeR1mjlP8uKsdkXv6/nWwmiX3DKyckdiKwwVncGYllX2PKmN2wPML1fQxHlNGl3UcxScm8Y91dtM0oj2NGwD9TgXmiNculGKtaNP5ipRRlXYl4YyU8H1mrW4bJUXkiApNW2KfhOffPTa9+seDT1saBw9dOxYNpF6u3NwytZ5aQNyu0LtCxubRFlan8lO7rbepfrK8FxTnO/CVaeQtRCUV96bepV3LV6f9/bC1H78VIl32W7a/BaKaTQ6SVzciOyXo3VmzYdgouGsCasYodGSddWwq5B6XxcJr6xS847oB3/Bxx8io4O1A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Wv3wJdB53HnkFG/eBG6BXhYDKS3AfM63sWiNK+RtS80=;
- b=uP5D6uYABHK9rBvPwwfaIYlD+DRuj7Hr5ezNbSYBa98rqiWXW+sKyBS6inkgFKwZgeSrisQE06FsM+SC4JpG2pUv0hf2eWuSr1S7C2gM2BuwmM+6XFdMAv0+Av4IuIQj9dhEAPE7sIi+yI60u/b6lXVCLvGPUWgRwRH8iepw/TE=
-Received: from SN7PR18CA0021.namprd18.prod.outlook.com (2603:10b6:806:f3::12)
- by PH8PR12MB6915.namprd12.prod.outlook.com (2603:10b6:510:1bc::21) with
+ bh=i/lWliKjhINwW1telRXSKn30EsfU7Qk80tiRjzklLSI=;
+ b=RckF+1JDtakZ6yGEGle2rsfA4R5lCSlG6USCNwQLnX8X1Fetsp229HEWvpl5PUfr5sNiprsDr5mEv1ScdoBj6XHXsnBKGhipDOd0ryyat+x1EmqjOYSWA9rCaFxoLYTlx+aUVr4cFQuqAXrocqT+7tP+Sh0m92fxPaS4Yxk3zYw=
+Received: from PH7P220CA0004.NAMP220.PROD.OUTLOOK.COM (2603:10b6:510:326::16)
+ by CYXPR12MB9278.namprd12.prod.outlook.com (2603:10b6:930:e5::11) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.20; Tue, 25 Feb
- 2025 21:39:51 +0000
-Received: from SN1PEPF00036F3E.namprd05.prod.outlook.com
- (2603:10b6:806:f3:cafe::e4) by SN7PR18CA0021.outlook.office365.com
- (2603:10b6:806:f3::12) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8489.18 via Frontend Transport; Tue,
- 25 Feb 2025 21:39:51 +0000
+ 2025 21:40:09 +0000
+Received: from SN1PEPF00036F3D.namprd05.prod.outlook.com
+ (2603:10b6:510:326:cafe::fe) by PH7P220CA0004.outlook.office365.com
+ (2603:10b6:510:326::16) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8466.20 via Frontend Transport; Tue,
+ 25 Feb 2025 21:40:09 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -62,23 +63,25 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SN1PEPF00036F3E.mail.protection.outlook.com (10.167.248.22) with Microsoft
+ SN1PEPF00036F3D.mail.protection.outlook.com (10.167.248.21) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8489.16 via Frontend Transport; Tue, 25 Feb 2025 21:39:51 +0000
+ 15.20.8489.16 via Frontend Transport; Tue, 25 Feb 2025 21:40:08 +0000
 Received: from ethanolx5646host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 25 Feb
- 2025 15:39:50 -0600
+ 2025 15:40:07 -0600
 From: Melody Wang <huibo.wang@amd.com>
 To: Sean Christopherson <seanjc@google.com>
 CC: Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>, LKML
 	<linux-kernel@vger.kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>,
 	Paluri PavanKumar <pavankumar.paluri@amd.com>, Melody Wang
-	<huibo.wang@amd.com>
-Subject: [PATCH v5 0/2] KVM: SVM: Make VMGEXIT GHCB exit codes more readable
-Date: Tue, 25 Feb 2025 21:39:35 +0000
-Message-ID: <20250225213937.2471419-1-huibo.wang@amd.com>
+	<huibo.wang@amd.com>, Pavan Kumar Paluri <papaluri@amd.com>
+Subject: [PATCH v5 1/2] KVM: SVM: Convert plain error code numbers to defines
+Date: Tue, 25 Feb 2025 21:39:36 +0000
+Message-ID: <20250225213937.2471419-2-huibo.wang@amd.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250225213937.2471419-1-huibo.wang@amd.com>
+References: <20250225213937.2471419-1-huibo.wang@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -91,90 +94,156 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF00036F3E:EE_|PH8PR12MB6915:EE_
-X-MS-Office365-Filtering-Correlation-Id: 70571d52-42a2-43b2-f57c-08dd55e4ef79
+X-MS-TrafficTypeDiagnostic: SN1PEPF00036F3D:EE_|CYXPR12MB9278:EE_
+X-MS-Office365-Filtering-Correlation-Id: eae84d0b-4a77-4774-2807-08dd55e4f991
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|82310400026|36860700013;
+	BCL:0;ARA:13230040|376014|1800799024|82310400026|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?LIajJvrW5lJ6WX4iTsHG1dTCUicDUdgauu8EfM9olWG/Lz01CRAXbVHkW2Cx?=
- =?us-ascii?Q?Ahrso7LuJ7EBbliFi1UVGxcwXino/OoheFedoui2QTuacC1Z1OJVkTOw2PFM?=
- =?us-ascii?Q?9mJF35Z1FZYpXosoSc9nxOwNiBfVtTnZ9DxGuRPyBX5Te0RozUADJ5VAn1Wa?=
- =?us-ascii?Q?ms24nESOhRlaQP0EmMDx1Ac10L3cIjd0b/Pr39U1X3tIdUWkLRDEJxWC8cEb?=
- =?us-ascii?Q?EKwTkMvjQFKN/PoUCV6kyzeyJ0g0GowgjGpjME2fyH4gx+kmuXDYwAJXrViX?=
- =?us-ascii?Q?9vI/7yB0WcrV+8sHtcwcVyjG1KPnw0uHAQA/kVzt0/9qEXKMTxFMo/SIPMp1?=
- =?us-ascii?Q?/0vr9aoRyBsSJ0s0FAk0T4duw84ZaQDkcjZrY+yf+co+tI9SZkJoPfABGB0b?=
- =?us-ascii?Q?utoIuNqGo42CTT1gmd9RSQVEHXP1wCNV3VIDvgnjn4tmLhRf5jiZx6ubJeur?=
- =?us-ascii?Q?0OI5jLKdNA88m0D5U6ky6q6rGfjSz91kw/Wq45VBskcpVq3ZBIA3vpRpmGC/?=
- =?us-ascii?Q?3LYrZrm0Us8y5CLZ/JWnP+fvaZhFmf9vMsO5sgcZlxGMEmS/T3ftEvfrbOKC?=
- =?us-ascii?Q?4a5X3qBZ+n3rY2RgFIoycIHH8Z0H7V5ezlULYet6J3Pt4sy3Y16jdaI4erR1?=
- =?us-ascii?Q?AjrRH7aEgLaULEY1s3p0rvpHSqZQrmP4yzSQ/HmO+ruK2mATqo9MITxvAqzi?=
- =?us-ascii?Q?4nZGtv75e60yBRzs3Dz+J2Kl6l6bQMJrQ7K4QoVGnLem8Lrf4NVnDDFS3QK8?=
- =?us-ascii?Q?bdd+YbMSyJksn8fTFaQezkreAiuhUGWk/MPB8+LDMeGJiM9kbfkLYj3aMfj+?=
- =?us-ascii?Q?Hibf17ZScvIWO7YkdG5h/68tNyvqayfFv6Wv7gJq3zvnqHoRdQCxUINPqMFd?=
- =?us-ascii?Q?pBMCaZuQY0FuqGbHjnn4hVKWOR2duBoFljRtTcySmK51mVWYwYiLsd7DinLQ?=
- =?us-ascii?Q?KQ2x3cQJYnUq7A0MGbzh6ZzbZmT1G7TCin9CZXH4ujqTBrp34sY3CGVZYQQq?=
- =?us-ascii?Q?X0HWHoC9AOT/Fe1EP3iZyexQSf7Dfhp0+UQbmCuhdOUc/Pk41wMrJPRDOX79?=
- =?us-ascii?Q?XKK+5KC6c5qPiK5eJ17ZjS0uVPUaPBq5+t3gtfwmWT5npOQD4y1aIF5EFQ7k?=
- =?us-ascii?Q?/hBNF6HUF+nZR5Rlt5oI1+zeVfjHrmNiiRDY8TLAS92Rcp1QKu3oDQQWsiRn?=
- =?us-ascii?Q?+agExSy2HEYpmjtxFPPxTth3rCpT5tXqwwDDE48J/0C5MbyurAM8ryx1YpWz?=
- =?us-ascii?Q?tASkqxZYwOfgFk8mGbUiO/hniIz02rBR0ru28hDD0dL4Q/08QOrFI0LvXM13?=
- =?us-ascii?Q?Zg5j9H2wt6SH9d5/Mvw1RxlBvn72GR92c3/fAhxrRs+b54R/XxWI59kShDje?=
- =?us-ascii?Q?d7hm96jaaDSAuv25uW+6z9IauyA1mrByjo2huaueAN5wjDqyLg6tUyY8Cwpb?=
- =?us-ascii?Q?H7GEiCAeo1x/jeNL1XLpgBcdLk08jtff0nVHPCxd27WxQEUCIDU9wXH05pWI?=
- =?us-ascii?Q?Q2xaNVfRB6377L4=3D?=
+	=?us-ascii?Q?6TdbDKGhFOIain0AwwifQSGkdBnny9n+qVksVVYWMtNdTTwaq58dM3dcZKt3?=
+ =?us-ascii?Q?p+KEG7I41CkktCmQJ3Lttez/yJBnsRCOFWVMRu/4Xc+zephBQ65fJS7U7NBa?=
+ =?us-ascii?Q?zZFNIv8WAv3w3tyJ05c1hN/8rZEPPES1yF9qBotc1ycEsIWoG65YmFQnYS1p?=
+ =?us-ascii?Q?kt1HWUk0dfv17pCYrKQuvRSxcydObsZLhTOHjoXK2U9zzb0krTyguYRJHtB0?=
+ =?us-ascii?Q?1hv7aF61byk+o1ilFkxXH+faZy0H+IFG9pQz5IvG3Yr13zRQK2gNEa1+qyQ4?=
+ =?us-ascii?Q?gkf1O68iJpOc0M5tTPoEYD7xgozaqfQ5NlgFazTxIq44e8gfGTlI9fyN9MEL?=
+ =?us-ascii?Q?1sKSmxyNUcwWI3xHWW8pQb0lbz4ZcRybQA4KLCOnyw1SrgMpkIt2bNQN1RqQ?=
+ =?us-ascii?Q?Kfjh1lYCj2S3gqA8y/FC+Jo9GiTCA2czjgpUp84J/fhRJqFWOMeW//7AUg7P?=
+ =?us-ascii?Q?VymfYy52p0eKOs0mUso+GwdaEgT+l7U9MpFKyD0uZ4Wg3V+PbCh6aPisE6g6?=
+ =?us-ascii?Q?echU7F5zpTSYF1hyWpgh5yuoMx4ZKI/TDtENLEzPLY5oIwn/rCepYxaE9KzN?=
+ =?us-ascii?Q?oSH7b2e838St7WgDOvhYTN5jxAa3QqZbVL/3s8nMsJnPwhDHsFHSOn+3xgiK?=
+ =?us-ascii?Q?mfTKhvPfv/2HjH3d/vnNbdgayERwdR/y7/UigvZETWozZlf2DfNYdDuvf1sr?=
+ =?us-ascii?Q?DMRAGVL2NwqpJr7m5bZChlcTpyFIh1MJlSuYV8Ou8gw0BNW7fTTsIqiXaxGu?=
+ =?us-ascii?Q?uF1Zzwjr/H8Afepi5YEz0m/DjlTAiOgT2hu73zt95poNKYEvrzvwAKnEM1qY?=
+ =?us-ascii?Q?awLGEd5AJmk8m2+1v3l7LPger80L94G/hZ9u10nYrw2EYYSIFvIZ3kGTPx+p?=
+ =?us-ascii?Q?H2c2hqxVrQ315LpbCZb5FkjyBaV9i720Zv44Sh4PDzAnbeQb+sICoaTZpOgx?=
+ =?us-ascii?Q?p/IWuGdtqYwNg8nrSBDcC8OeOEjQTAHnZUVBewhJtvjUKjNTMEx0NOHJpKj0?=
+ =?us-ascii?Q?VTuddyIwv8psz1WuBgrV3iF4+MplFrJwUoT7rvhxP63nwcdpQe1kBHjZ3wIs?=
+ =?us-ascii?Q?rpoc0t+FxpjLBZfC7s5sLKBR12E0wJEOTCMD0G3JvF+W0sJIkC8W4TYRNOtp?=
+ =?us-ascii?Q?S9mSokF9auEvsrlB8j1b13XCuXcFDcHqhzzjjWhjbfVOzfftpvL0yDvY3QJE?=
+ =?us-ascii?Q?ktNZGqxjQRpDdVcvFji66KiZqHEFPy6ZJ8/WakU3QRarcpxqpWsmvk50CR+0?=
+ =?us-ascii?Q?2qRPpdlq73wc/RXeufFn4OdOQ8wcH+vvKHbpxLAdzvHs5nW0MzSnLnZTuNMn?=
+ =?us-ascii?Q?NDV28BWeEfcZdXO9l+Fv6up7ZqVHSRtd2G4XXFwykNuXYn/xU5m5aIMsiDhT?=
+ =?us-ascii?Q?qjzffIxCUJ15RqYyTkaJsJwWjkNSDul7YL59duq1VVeHS+uL0PfP7mwLbRxT?=
+ =?us-ascii?Q?zRApcE/JrIAoMAohCdvcLiQYVktqKoVuX3a8w6r+2p3jgRxmGYbKgrRV+ohr?=
+ =?us-ascii?Q?11Pq7e2MwRZJ6Sc=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(82310400026)(36860700013);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(1800799024)(82310400026)(36860700013);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2025 21:39:51.4349
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2025 21:40:08.3641
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 70571d52-42a2-43b2-f57c-08dd55e4ef79
+X-MS-Exchange-CrossTenant-Network-Message-Id: eae84d0b-4a77-4774-2807-08dd55e4f991
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF00036F3E.namprd05.prod.outlook.com
+	SN1PEPF00036F3D.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6915
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR12MB9278
 
-This patchset includes two patches to make VMGEXIT GHCB exit codes returned by the
-hypervisor more readable. One patch coverts plain error code numbers to defines, the
-other one adds helpers to set the error code.
+Convert VMGEXIT SW_EXITINFO1 codes from plain numbers to proper defines.
 
 No functionality changed.
 
-Thanks,
-Melody
+Signed-off-by: Melody Wang <huibo.wang@amd.com>
+Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+Reviewed-by: Pavan Kumar Paluri <papaluri@amd.com>
+---
+ arch/x86/include/asm/sev-common.h |  8 ++++++++
+ arch/x86/kvm/svm/sev.c            | 12 ++++++------
+ arch/x86/kvm/svm/svm.c            |  2 +-
+ 3 files changed, 15 insertions(+), 7 deletions(-)
 
-Changelog:
-
-Changes since v4:
-* Add explanation comment about svm_vmgexit_no_action() is corresponding to SW_EXITINFO1.
-* Add explanation comment about svm_vmgexit_no_action() when the request failed due to a firmware error.
-
-Changes since v3:
-* Document the weirdness with PSC's SW_EXITINFO1.
-* Add svm_vmgexit_no_action() helper along with svm_vmgexit_success() to clarify meaning.
-* Change GHCB_HV_RESP_SUCCESS to GHCB_HV_RESP_NO_ACTION to avoid the confusion.
-
-Changes since v2:
-* Add one patch for providing helpers to set the error code when converting VMGEXIT SW_EXITINFO1 and
-SW_EXITINFO2 codes from plain numbers to proper defines.
-* Add comments for better code readability.
-
-Changes since v1: Rebase with the latest KVM next.
-
-Melody Wang (2):
-  KVM: SVM: Convert plain error code numbers to defines
-  KVM: SVM: Provide helpers to set the error code
-
- arch/x86/include/asm/sev-common.h |  8 +++++++
- arch/x86/kvm/svm/sev.c            | 39 +++++++++++++++++--------------
- arch/x86/kvm/svm/svm.c            |  6 +----
- arch/x86/kvm/svm/svm.h            | 29 +++++++++++++++++++++++
- 4 files changed, 59 insertions(+), 23 deletions(-)
-
+diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+index dcbccdb280f9..3aca97d22cdc 100644
+--- a/arch/x86/include/asm/sev-common.h
++++ b/arch/x86/include/asm/sev-common.h
+@@ -211,6 +211,14 @@ struct snp_psc_desc {
+ 
+ #define GHCB_RESP_CODE(v)		((v) & GHCB_MSR_INFO_MASK)
+ 
++/*
++ * Error codes of the GHCB SW_EXITINFO1 related to GHCB input that can be
++ * communicated back to the guest
++ */
++#define GHCB_HV_RESP_NO_ACTION		0
++#define GHCB_HV_RESP_ISSUE_EXCEPTION	1
++#define GHCB_HV_RESP_MALFORMED_INPUT	2
++
+ /*
+  * Error codes related to GHCB input that can be communicated back to the guest
+  * by setting the lower 32-bits of the GHCB SW_EXITINFO1 field to 2.
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 0dbb25442ec1..bc42c93d2b97 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -3430,7 +3430,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+ 		dump_ghcb(svm);
+ 	}
+ 
+-	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, 2);
++	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, GHCB_HV_RESP_MALFORMED_INPUT);
+ 	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, reason);
+ 
+ 	/* Resume the guest to "return" the error code. */
+@@ -3574,7 +3574,7 @@ static int setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
+ 	return 0;
+ 
+ e_scratch:
+-	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, 2);
++	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, GHCB_HV_RESP_MALFORMED_INPUT);
+ 	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, GHCB_ERR_INVALID_SCRATCH_AREA);
+ 
+ 	return 1;
+@@ -4135,7 +4135,7 @@ static int snp_handle_ext_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t r
+ 	return snp_handle_guest_req(svm, req_gpa, resp_gpa);
+ 
+ request_invalid:
+-	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, 2);
++	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, GHCB_HV_RESP_MALFORMED_INPUT);
+ 	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, GHCB_ERR_INVALID_INPUT);
+ 	return 1; /* resume guest */
+ }
+@@ -4328,7 +4328,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+ 	if (ret)
+ 		return ret;
+ 
+-	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, 0);
++	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, GHCB_HV_RESP_NO_ACTION);
+ 	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, 0);
+ 
+ 	exit_code = kvm_ghcb_get_sw_exit_code(control);
+@@ -4378,7 +4378,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+ 		default:
+ 			pr_err("svm: vmgexit: unsupported AP jump table request - exit_info_1=%#llx\n",
+ 			       control->exit_info_1);
+-			ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, 2);
++			ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, GHCB_HV_RESP_MALFORMED_INPUT);
+ 			ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, GHCB_ERR_INVALID_INPUT);
+ 		}
+ 
+@@ -4408,7 +4408,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+ 	case SVM_VMGEXIT_AP_CREATION:
+ 		ret = sev_snp_ap_creation(svm);
+ 		if (ret) {
+-			ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, 2);
++			ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, GHCB_HV_RESP_MALFORMED_INPUT);
+ 			ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, GHCB_ERR_INVALID_INPUT);
+ 		}
+ 
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index a713c803a3a3..e14f8ae7d868 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -2973,7 +2973,7 @@ static int svm_complete_emulated_msr(struct kvm_vcpu *vcpu, int err)
+ 	if (!err || !sev_es_guest(vcpu->kvm) || WARN_ON_ONCE(!svm->sev_es.ghcb))
+ 		return kvm_complete_insn_gp(vcpu, err);
+ 
+-	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, 1);
++	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, GHCB_HV_RESP_ISSUE_EXCEPTION);
+ 	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb,
+ 				X86_TRAP_GP |
+ 				SVM_EVTINJ_TYPE_EXEPT |
 -- 
 2.34.1
 
