@@ -1,181 +1,280 @@
-Return-Path: <kvm+bounces-39092-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39091-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95DD1A4359C
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 07:46:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EBE66A4358E
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 07:43:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD313189474A
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 06:44:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2DF2E189A5B8
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 06:43:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21399257443;
-	Tue, 25 Feb 2025 06:43:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A921257436;
+	Tue, 25 Feb 2025 06:43:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="nlETZ7mc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O2OkrZlE"
 X-Original-To: kvm@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF4A254855;
-	Tue, 25 Feb 2025 06:43:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF8314D2BB;
+	Tue, 25 Feb 2025 06:43:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740465831; cv=none; b=E3EX5cKm94sH68ofu4uzwLpiC6ZZE7Zv+sC/4KfbyPDeuQKTV7svmytFdw0/i4Cc3ok5BdB5tzs4sLkrDVw7xm2wQWXulS2wCDX4BHGXxGoLURIRsclybMt5B755vGVFl/W1mOB66ygK58Oke+e95CnfZkPWy6h9P4iDwRlhcXY=
+	t=1740465804; cv=none; b=fkohm8cQsl4OesKFajtd2FuQQleCwSqGluR0yDzZUgXIArbffKPVsSRWqamSd578dJDXpnnNTvnBUttfpbaDt4WXthdS0ace+5QjLGfRNQ6fh5U5kKGZTdYe70s4mMjjQ0+qR5oYqXcqLLulaSvX90i69Fverp25EUbrZKIL0EA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740465831; c=relaxed/simple;
-	bh=PXabjfpfBOXq8tRWvKo6GYiCmy3eNq/J97iav18nkas=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hpkkj+wh8A1tPFD6vODXq0yjvTVWAPzSyGqlTn7im/Ua3Rl3AE7FN+52Mp80uO8CdlZJGsQ5pFk0tJccS3hH6dtqN2UUqju3uq0LUzwGApn7jUCv/P3Zk7DP6xPaToWIoD5Nmvcsx+bQPjBG9FMQnOLvTm5HFelbUCGHB/nNvpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=nlETZ7mc; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1740465824; h=From:To:Subject:Date:Message-ID:MIME-Version;
-	bh=dtWtcCos5TZoKRFTrhJZTu555UIWcx8R/sCLOdoDYxc=;
-	b=nlETZ7mcJkSYR9/YamcGFR+t/ZbRp1eocv7vl7CFkHLhk4sLxN4PGVliUQ7SLWBP3WlHB2/Crxn+i0jZLkg176SIN3tagFuMDjthcHk9nvbFm45Dk/ODeBZCtHlyOxOm+Z1g39DFCwK52OoJ9XqmwFAjdMVqtez8AQKWGXWvitA=
-Received: from localhost(mailfrom:zijie.wei@linux.alibaba.com fp:SMTPD_---0WQDdazp_1740465817 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 25 Feb 2025 14:43:43 +0800
-From: weizijie <zijie.wei@linux.alibaba.com>
-To: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H . Peter Anvin" <hpa@zytor.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: weizijie <zijie.wei@linux.alibaba.com>,
-	xuyun <xuyun_xy.xy@linux.alibaba.com>
-Subject: [PATCH Resend] KVM: x86: ioapic: Optimize EOI handling to reduce unnecessary VM exits
-Date: Tue, 25 Feb 2025 14:42:53 +0800
-Message-ID: <20250225064253.309334-1-zijie.wei@linux.alibaba.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <Z6uo24Wf3LoetUMc@google.com>
-References: <Z6uo24Wf3LoetUMc@google.com>
+	s=arc-20240116; t=1740465804; c=relaxed/simple;
+	bh=zhSa0y8IU1iJ0MvV+FSzR83Oi1hhyhyeq0st+ZunzWA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=psAcVYSzAoxnDRQ9bWVl84Nz52UM8RmD+asBWxHqiJUygI5vnXtBtLOPCewJxu7tT1s5Rd/3VHBsbn+8lIk7EE7FhBIYKvwHcEiF4lVECW7PxC8kSQzacpUl40WsWvwCLbH9Jsw/sNzvfggMY9zPYaKh6L1E+ZekILkVDcc9piw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O2OkrZlE; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740465804; x=1772001804;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=zhSa0y8IU1iJ0MvV+FSzR83Oi1hhyhyeq0st+ZunzWA=;
+  b=O2OkrZlEv3hFUxRIhkhKiT8II0Y9T015h+lWX5Ka08lkKCI1pPRNpiuY
+   DNEHweeoYOKn8wdpiu2n8wSEXO7Iol5Fga2OJxGkhRD/xKPhpoQ7+DMCr
+   /fk2uaHw6FfHhUh18gamYK60tu69nNFPaVp0TYWqUOBtQO4BsM2CTmjOY
+   HEzf34e/+DZ9fqo9aiQ5+Cb+hHdamrvhrtQ8iFgmo3c8isPgMQZZ8Er0E
+   c3bFA0B4Np4z60uaCfKwRB2/1wFiYTjW2yz6U5P2JaWHOjr9O401wGVIP
+   Tn1bXRt7j/xfQogw9FSzWDXNZ0BYhgc20M9TXLxpILTEJW01lm74HoU57
+   g==;
+X-CSE-ConnectionGUID: L4k/Mr8pR/KrDiLkz+TY0g==
+X-CSE-MsgGUID: tBDgIpEWQZ2hDOTPdj+VPg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11355"; a="41101477"
+X-IronPort-AV: E=Sophos;i="6.13,313,1732608000"; 
+   d="scan'208";a="41101477"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2025 22:43:23 -0800
+X-CSE-ConnectionGUID: LxPxWLFrQf6SAGthAv49eA==
+X-CSE-MsgGUID: trZNmStcS9WTJllyoPVHvw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,313,1732608000"; 
+   d="scan'208";a="147130898"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2025 22:43:17 -0800
+Message-ID: <5cbb181c-f226-4d50-8b92-04775e8b65e0@intel.com>
+Date: Tue, 25 Feb 2025 14:43:14 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2 07/12] KVM: TDX: restore host xsave state when exit
+ from the guest TD
+To: Adrian Hunter <adrian.hunter@intel.com>, pbonzini@redhat.com,
+ seanjc@google.com
+Cc: kvm@vger.kernel.org, rick.p.edgecombe@intel.com, kai.huang@intel.com,
+ reinette.chatre@intel.com, tony.lindgren@linux.intel.com,
+ binbin.wu@linux.intel.com, dmatlack@google.com, isaku.yamahata@intel.com,
+ nik.borisov@suse.com, linux-kernel@vger.kernel.org, yan.y.zhao@intel.com,
+ chao.gao@intel.com, weijiang.yang@intel.com
+References: <20250129095902.16391-1-adrian.hunter@intel.com>
+ <20250129095902.16391-8-adrian.hunter@intel.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20250129095902.16391-8-adrian.hunter@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Address performance issues caused by a vector being reused by a
-non-IOAPIC source.
+On 1/29/2025 5:58 PM, Adrian Hunter wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> 
+> On exiting from the guest TD, xsave state is clobbered.  Restore xsave
+> state on TD exit.
+> 
+> Set up guest state so that existing kvm_load_host_xsave_state() can be
+> used. Do not allow VCPU entry if guest state conflicts with the TD's
+> configuration.
+> 
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+> ---
+> TD vcpu enter/exit v2:
+>   - Drop PT and CET feature flags (Chao)
+>   - Use cpu_feature_enabled() instead of static_cpu_has() (Chao)
+>   - Restore PKRU only if the host value differs from defined
+>     exit value (Chao)
+>   - Use defined masks to separate XFAM bits into XCR0/XSS (Adrian)
+>   - Use existing kvm_load_host_xsave_state() in place of
+>     tdx_restore_host_xsave_state() by defining guest CR4, XCR0, XSS
+>     and PKRU (Sean)
+>   - Do not enter if vital guest state is invalid (Adrian)
+> 
+> TD vcpu enter/exit v1:
+>   - Remove noinstr on tdx_vcpu_enter_exit() (Sean)
+>   - Switch to kvm_host struct for xcr0 and xss
+> 
+> v19:
+>   - Add EXPORT_SYMBOL_GPL(host_xcr0)
+> 
+> v15 -> v16:
+>   - Added CET flag mask
+> ---
+>   arch/x86/kvm/vmx/tdx.c | 72 ++++++++++++++++++++++++++++++++++++++----
+>   1 file changed, 66 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index 3f3d61935a58..e4355553569a 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -83,16 +83,21 @@ static u64 tdx_get_supported_attrs(const struct tdx_sys_info_td_conf *td_conf)
+>   	return val;
+>   }
+>   
+> +/*
+> + * Before returning from TDH.VP.ENTER, the TDX Module assigns:
+> + *   XCR0 to the TD’s user-mode feature bits of XFAM (bits 7:0, 9, 18:17)
+> + *   IA32_XSS to the TD's supervisor-mode feature bits of XFAM (bits 8, 16:10)
+> + */
+> +#define TDX_XFAM_XCR0_MASK	(GENMASK(7, 0) | BIT(9) | GENMASK(18, 17))
+> +#define TDX_XFAM_XSS_MASK	(BIT(8) | GENMASK(16, 10))
+> +#define TDX_XFAM_MASK		(TDX_XFAM_XCR0_MASK | TDX_XFAM_XSS_MASK)
 
-Commit 0fc5a36dd6b3
-("KVM: x86: ioapic: Fix level-triggered EOI and IOAPIC reconfigure race")
-addressed the issues related to EOI and IOAPIC reconfiguration races.
-However, it has introduced some performance concerns:
+No need to define TDX-specific mask for XFAM. kernel defines 
+XFEATURE_MASK_* and you can define XFEATURE_XCR0_MASK and 
+XFEATURE_XSS_MASK with XFEATURE_MASK_*.
 
-Configuring IOAPIC interrupts while an interrupt request (IRQ) is
-already in service can unintentionally trigger a VM exit for other
-interrupts that normally do not require one, due to the settings of
-`ioapic_handled_vectors`. If the IOAPIC is not reconfigured during
-runtime, this issue persists, continuing to adversely affect
-performance.
+>   static u64 tdx_get_supported_xfam(const struct tdx_sys_info_td_conf *td_conf)
+>   {
+>   	u64 val = kvm_caps.supported_xcr0 | kvm_caps.supported_xss;
+>   
+> -	/*
+> -	 * PT and CET can be exposed to TD guest regardless of KVM's XSS, PT
+> -	 * and, CET support.
+> -	 */
+> -	val |= XFEATURE_MASK_PT | XFEATURE_MASK_CET_USER |
+> -	       XFEATURE_MASK_CET_KERNEL;
+> +	/* Ensure features are in the masks */
+> +	val &= TDX_XFAM_MASK;
 
-Simple Fix Proposal:
-A straightforward solution is to record highest in-service IRQ that
-is pending at the time of the last scan. Then, upon the next guest
-exit, do a full KVM_REQ_SCAN_IOAPIC. This ensures that a re-scan of
-the ioapic occurs only when the recorded vector is EOI'd, and
-subsequently, the extra bit in the eoi_exit_bitmap are cleared,
-avoiding unnecessary VM exits.
+It's unncessary.
 
-Co-developed-by: xuyun <xuyun_xy.xy@linux.alibaba.com>
-Signed-off-by: xuyun <xuyun_xy.xy@linux.alibaba.com>
-Signed-off-by: weizijie <zijie.wei@linux.alibaba.com>
----
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/ioapic.c           | 10 ++++++++--
- arch/x86/kvm/irq_comm.c         |  9 +++++++--
- arch/x86/kvm/vmx/vmx.c          |  9 +++++++++
- 4 files changed, 25 insertions(+), 4 deletions(-)
+kvm_caps.supported_xcr0 | kvm_caps.supported_xss must be the subset of 
+TDX_XFAM_MASK;
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 0b7af5902ff7..8c50e7b4a96f 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1062,6 +1062,7 @@ struct kvm_vcpu_arch {
- #if IS_ENABLED(CONFIG_HYPERV)
- 	hpa_t hv_root_tdp;
- #endif
-+	u8 last_pending_vector;
- };
- 
- struct kvm_lpage_info {
-diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
-index 995eb5054360..40252a800897 100644
---- a/arch/x86/kvm/ioapic.c
-+++ b/arch/x86/kvm/ioapic.c
-@@ -297,10 +297,16 @@ void kvm_ioapic_scan_entry(struct kvm_vcpu *vcpu, ulong *ioapic_handled_vectors)
- 			u16 dm = kvm_lapic_irq_dest_mode(!!e->fields.dest_mode);
- 
- 			if (kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT,
--						e->fields.dest_id, dm) ||
--			    kvm_apic_pending_eoi(vcpu, e->fields.vector))
-+						e->fields.dest_id, dm))
- 				__set_bit(e->fields.vector,
- 					  ioapic_handled_vectors);
-+			else if (kvm_apic_pending_eoi(vcpu, e->fields.vector)) {
-+				__set_bit(e->fields.vector,
-+					  ioapic_handled_vectors);
-+				vcpu->arch.last_pending_vector = e->fields.vector >
-+					vcpu->arch.last_pending_vector ? e->fields.vector :
-+					vcpu->arch.last_pending_vector;
-+			}
- 		}
- 	}
- 	spin_unlock(&ioapic->lock);
-diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
-index 8136695f7b96..1d23c52576e1 100644
---- a/arch/x86/kvm/irq_comm.c
-+++ b/arch/x86/kvm/irq_comm.c
-@@ -426,9 +426,14 @@ void kvm_scan_ioapic_routes(struct kvm_vcpu *vcpu,
- 
- 			if (irq.trig_mode &&
- 			    (kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT,
--						 irq.dest_id, irq.dest_mode) ||
--			     kvm_apic_pending_eoi(vcpu, irq.vector)))
-+						 irq.dest_id, irq.dest_mode)))
- 				__set_bit(irq.vector, ioapic_handled_vectors);
-+			else if (kvm_apic_pending_eoi(vcpu, irq.vector)) {
-+				__set_bit(irq.vector, ioapic_handled_vectors);
-+				vcpu->arch.last_pending_vector = irq.vector >
-+					vcpu->arch.last_pending_vector ? irq.vector :
-+					vcpu->arch.last_pending_vector;
-+			}
- 		}
- 	}
- 	srcu_read_unlock(&kvm->irq_srcu, idx);
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 6c56d5235f0f..047cdd5964e5 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5712,6 +5712,15 @@ static int handle_apic_eoi_induced(struct kvm_vcpu *vcpu)
- 
- 	/* EOI-induced VM exit is trap-like and thus no need to adjust IP */
- 	kvm_apic_set_eoi_accelerated(vcpu, vector);
-+
-+	/* When there are instances where ioapic_handled_vectors is
-+	 * set due to pending interrupts, clean up the record and do
-+	 * a full KVM_REQ_SCAN_IOAPIC.
-+	 */
-+	if (vcpu->arch.last_pending_vector == vector) {
-+		vcpu->arch.last_pending_vector = 0;
-+		kvm_make_request(KVM_REQ_SCAN_IOAPIC, vcpu);
-+	}
- 	return 1;
- }
- 
--- 
-2.43.5
+>   	if ((val & td_conf->xfam_fixed1) != td_conf->xfam_fixed1)
+>   		return 0;
+> @@ -724,6 +729,19 @@ int tdx_vcpu_pre_run(struct kvm_vcpu *vcpu)
+>   	return 1;
+>   }
+>   
+> +static bool tdx_guest_state_is_invalid(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
+> +
+> +	return vcpu->arch.xcr0 != (kvm_tdx->xfam & TDX_XFAM_XCR0_MASK) ||
+> +	       vcpu->arch.ia32_xss != (kvm_tdx->xfam & TDX_XFAM_XSS_MASK) ||
+> +	       vcpu->arch.pkru ||
+> +	       (cpu_feature_enabled(X86_FEATURE_XSAVE) &&
+> +		!kvm_is_cr4_bit_set(vcpu, X86_CR4_OSXSAVE)) ||
+> +	       (cpu_feature_enabled(X86_FEATURE_XSAVES) &&
+> +		!guest_cpu_cap_has(vcpu, X86_FEATURE_XSAVES));
+
+guest_cpu_cap_has() is better to put into the path when userspace 
+configures the vcpu model. So that KVM can return error to userspace 
+earlier before running the vcpu.
+
+ > +}> +
+>   static noinstr void tdx_vcpu_enter_exit(struct kvm_vcpu *vcpu)
+>   {
+>   	struct vcpu_tdx *tdx = to_tdx(vcpu);
+> @@ -740,6 +758,8 @@ static noinstr void tdx_vcpu_enter_exit(struct kvm_vcpu *vcpu)
+>   
+>   fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediate_exit)
+>   {
+> +	struct vcpu_tdx *tdx = to_tdx(vcpu);
+> +
+>   	/*
+>   	 * force_immediate_exit requires vCPU entering for events injection with
+>   	 * an immediately exit followed. But The TDX module doesn't guarantee
+> @@ -750,10 +770,22 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediate_exit)
+>   	 */
+>   	WARN_ON_ONCE(force_immediate_exit);
+>   
+> +	if (WARN_ON_ONCE(tdx_guest_state_is_invalid(vcpu))) {
+> +		/*
+> +		 * Invalid exit_reason becomes KVM_EXIT_INTERNAL_ERROR, refer
+> +		 * tdx_handle_exit().
+> +		 */
+> +		tdx->vt.exit_reason.full = -1u;
+> +		tdx->vp_enter_ret = -1u;
+> +		return EXIT_FASTPATH_NONE;
+> +	}
+> +
+>   	trace_kvm_entry(vcpu, force_immediate_exit);
+>   
+>   	tdx_vcpu_enter_exit(vcpu);
+>   
+> +	kvm_load_host_xsave_state(vcpu);
+> +
+>   	vcpu->arch.regs_avail &= ~TDX_REGS_UNSUPPORTED_SET;
+>   
+>   	trace_kvm_exit(vcpu, KVM_ISA_VMX);
+> @@ -1878,9 +1910,23 @@ static int tdx_vcpu_get_cpuid(struct kvm_vcpu *vcpu, struct kvm_tdx_cmd *cmd)
+>   	return r;
+>   }
+>   
+> +static u64 tdx_guest_cr0(struct kvm_vcpu *vcpu, u64 cr4)
+> +{
+> +	u64 cr0 = ~CR0_RESERVED_BITS;
+> +
+> +	if (cr4 & X86_CR4_CET)
+> +		cr0 |= X86_CR0_WP;
+> +
+> +	cr0 |= X86_CR0_PE | X86_CR0_NE;
+> +	cr0 &= ~(X86_CR0_NW | X86_CR0_CD);
+> +
+> +	return cr0;
+> +}
+> +
+>   static int tdx_vcpu_init(struct kvm_vcpu *vcpu, struct kvm_tdx_cmd *cmd)
+>   {
+>   	u64 apic_base;
+> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
+>   	struct vcpu_tdx *tdx = to_tdx(vcpu);
+>   	int ret;
+>   
+> @@ -1903,6 +1949,20 @@ static int tdx_vcpu_init(struct kvm_vcpu *vcpu, struct kvm_tdx_cmd *cmd)
+>   	if (ret)
+>   		return ret;
+>   
+> +	vcpu->arch.cr4 = ~vcpu->arch.cr4_guest_rsvd_bits;
+
+when userspace doesn't configure XFEATURE_MASK_PKRU in XFAM, it seems 
+kvm_load_host_xsave_state() will skip restore host's PKRU value.
+
+Besides, vcpu->arch.cr4_guest_rsvd_bits depends on KVM_SET_CPUID*, we 
+need enfore the dependency that tdx_vcpu_init() needs to be called after 
+vcpu model is configured.
+
+> +	vcpu->arch.cr0 = tdx_guest_cr0(vcpu, vcpu->arch.cr4);
+> +	/*
+> +	 * On return from VP.ENTER, the TDX Module sets XCR0 and XSS to the
+> +	 * maximal values supported by the guest, and zeroes PKRU, so from
+> +	 * KVM's perspective, those are the guest's values at all times.
+> +	 */
+
+It's better to also call out that this is only to make 
+kvm_load_host_xsave_state() work for TDX. They don't represent the real 
+guest value.
+
+> +	vcpu->arch.ia32_xss = kvm_tdx->xfam & TDX_XFAM_XSS_MASK;
+> +	vcpu->arch.xcr0 = kvm_tdx->xfam & TDX_XFAM_XCR0_MASK;
+> +	vcpu->arch.pkru = 0;
+> +
+> +	/* TODO: freeze vCPU model before kvm_update_cpuid_runtime() */
+> +	kvm_update_cpuid_runtime(vcpu);
+> +
+>   	tdx->state = VCPU_TD_STATE_INITIALIZED;
+>   
+>   	return 0;
 
 
