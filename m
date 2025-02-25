@@ -1,227 +1,221 @@
-Return-Path: <kvm+bounces-39081-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39082-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E477A434DA
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 06:57:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C678FA434DE
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 07:00:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2D2A3B4189
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 05:56:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 817B93B69AD
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 06:00:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E34642566EE;
-	Tue, 25 Feb 2025 05:56:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LavnUCvB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57F57256C68;
+	Tue, 25 Feb 2025 06:00:29 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D389C36124;
-	Tue, 25 Feb 2025 05:56:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252771DFDE;
+	Tue, 25 Feb 2025 06:00:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740463013; cv=none; b=EbtKpM/mzMnxMVHDvew3SE5dQSJbRmPzs7CfNfpngxAlRc+jP5oz4Hu1o1BSXKm/+PwT03mb0+FpeETJB8UEC8E8nc8jCqzW5VvWBxSMqhwVEkQCKhLJv/XC2lww4S5A7EevnaLGBJ3M4kDeGh1c6YKrJnEW9XKLSi7lDOCeA1c=
+	t=1740463228; cv=none; b=qi0zGObUukYdQ4d4JeS3aRBlqKHfjrHHh2xG/69yDYgdnrPb/LkmvLUrOt22BNb5dLnBvoGB7TvWriLzMWp32LKoWAbnmHkdXoZ+qFwLANK3AYPrel6m8Ta/DRqDN7TELQp+AFRG8eiTy7t/D4BDqsv7fHSGBVz7eNRh/yjQwLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740463013; c=relaxed/simple;
-	bh=O0AZLPEFBpzWrpkL052RWCLjQ6UGpoQ8F1HUT4GvX3k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BS2Ka/0UJErT2LAnpTFzMBG4F5/d7VMR+tb4qt851/mNWVXc97muWlzroRWqfTxcS6hlfltmtog2mFiYU/EOZL9RpBoRJch3QYVQMi4htuNcPkMezH9zu3iiuVl9cPKV3Xo46r7qlZbgST8HUjYpz2cgs/TOgMWoxGXep49COkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LavnUCvB; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740463011; x=1771999011;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=O0AZLPEFBpzWrpkL052RWCLjQ6UGpoQ8F1HUT4GvX3k=;
-  b=LavnUCvBkSxBMD2ECAv3/MkAggFidI1RVQf5lCzO/goLSV10ZBHcuwzw
-   GAo4odL/dIrOhHnGqZRmO1R0rEdkUgklVMbgZzc8v7AFcEVxSn+3+2t5o
-   U/N6rwLCbFwnOBge2adCBlCKFi3x7lLAY34rsNGONWOpShwp6vUIbHFnE
-   NLfEUDRNuSAO4pTVN+xFJ6NASZxG6NPecVzhDxJUpmQye3VBaPi11QgOq
-   PT/dOd7NZSb1ThKnXkfU3LnvVR5enuFoRDwGg+etxNH1aoSre8z9kpphR
-   XnURgB7p5T40b7cSp7c9+sDYoNVuB5m+do0naCGF6YZ36gy2VwHksIIsq
-   A==;
-X-CSE-ConnectionGUID: 0KdYGRkcQ22pRVDtk6BV0A==
-X-CSE-MsgGUID: mbzzeHMKTw2+tG4OKuicow==
-X-IronPort-AV: E=McAfee;i="6700,10204,11355"; a="45036319"
-X-IronPort-AV: E=Sophos;i="6.13,313,1732608000"; 
-   d="scan'208";a="45036319"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2025 21:56:51 -0800
-X-CSE-ConnectionGUID: KJw0J1VNTSuc+ODJm2wyyw==
-X-CSE-MsgGUID: Zr07HMDJRJqXKEkpzNv7Iw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,313,1732608000"; 
-   d="scan'208";a="121386643"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2025 21:56:45 -0800
-Message-ID: <27e31afd-2f8e-4f2e-92e3-92e52b956751@intel.com>
-Date: Tue, 25 Feb 2025 13:56:41 +0800
+	s=arc-20240116; t=1740463228; c=relaxed/simple;
+	bh=GiCntbztcJoYYRu+cvSL1nLThkSKrwrJZdfQBGs+u14=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=bQZvg+CGlTp1IzFFXYPIQp1zfgAs2pjSrEoYvcShB52gGBM03tS7rf0hsg0UQip7SKw9osnV1GQR1jpYQaFD50DqSy95U0ZhVdR40dbSyItbxYDoFchyRWMYz1IOPBFdDXE4LloqIyc4fZHk4uhthgoDYJ+3qfHsMZe6BgZErls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Z26M147Hlz21p6T;
+	Tue, 25 Feb 2025 13:57:17 +0800 (CST)
+Received: from kwepemg500006.china.huawei.com (unknown [7.202.181.43])
+	by mail.maildlp.com (Postfix) with ESMTPS id A3B231401F3;
+	Tue, 25 Feb 2025 14:00:21 +0800 (CST)
+Received: from [10.67.121.110] (10.67.121.110) by
+ kwepemg500006.china.huawei.com (7.202.181.43) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 25 Feb 2025 14:00:21 +0800
+Subject: Re: [PATCH 1/3] migration: update BAR space size
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com"
+	<jgg@nvidia.com>, Jonathan Cameron <jonathan.cameron@huawei.com>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linuxarm@openeuler.org" <linuxarm@openeuler.org>
+References: <20250218021507.40740-1-liulongfang@huawei.com>
+ <20250218021507.40740-2-liulongfang@huawei.com>
+ <e756bb3a8ee94cf78a28231afb1eeb92@huawei.com>
+From: liulongfang <liulongfang@huawei.com>
+Message-ID: <dc5c2f1a-181e-4f91-0f8a-ede622b9d1dc@huawei.com>
+Date: Tue, 25 Feb 2025 14:00:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2 02/12] KVM: x86: Allow the use of
- kvm_load_host_xsave_state() with guest_state_protected
-To: Adrian Hunter <adrian.hunter@intel.com>, pbonzini@redhat.com,
- seanjc@google.com
-Cc: kvm@vger.kernel.org, rick.p.edgecombe@intel.com, kai.huang@intel.com,
- reinette.chatre@intel.com, tony.lindgren@linux.intel.com,
- binbin.wu@linux.intel.com, dmatlack@google.com, isaku.yamahata@intel.com,
- nik.borisov@suse.com, linux-kernel@vger.kernel.org, yan.y.zhao@intel.com,
- chao.gao@intel.com, weijiang.yang@intel.com
-References: <20250129095902.16391-1-adrian.hunter@intel.com>
- <20250129095902.16391-3-adrian.hunter@intel.com>
- <01e85b96-db63-4de2-9f49-322919e054ec@intel.com>
- <96cc48a7-157b-4c42-a7d4-79181f55eed8@intel.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <96cc48a7-157b-4c42-a7d4-79181f55eed8@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <e756bb3a8ee94cf78a28231afb1eeb92@huawei.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemg500006.china.huawei.com (7.202.181.43)
 
-On 2/24/2025 7:38 PM, Adrian Hunter wrote:
-> On 20/02/25 12:50, Xiaoyao Li wrote:
->> On 1/29/2025 5:58 PM, Adrian Hunter wrote:
->>> From: Sean Christopherson <seanjc@google.com>
->>>
->>> Allow the use of kvm_load_host_xsave_state() with
->>> vcpu->arch.guest_state_protected == true. This will allow TDX to reuse
->>> kvm_load_host_xsave_state() instead of creating its own version.
->>>
->>> For consistency, amend kvm_load_guest_xsave_state() also.
->>>
->>> Ensure that guest state that kvm_load_host_xsave_state() depends upon,
->>> such as MSR_IA32_XSS, cannot be changed by user space, if
->>> guest_state_protected.
->>>
->>> [Adrian: wrote commit message]
->>>
->>> Link: https://lore.kernel.org/r/Z2GiQS_RmYeHU09L@google.com
->>> Signed-off-by: Sean Christopherson <seanjc@google.com>
->>> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
->>> ---
->>> TD vcpu enter/exit v2:
->>>    - New patch
->>> ---
->>>    arch/x86/kvm/svm/svm.c |  7 +++++--
->>>    arch/x86/kvm/x86.c     | 18 +++++++++++-------
->>>    2 files changed, 16 insertions(+), 9 deletions(-)
->>>
->>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
->>> index 7640a84e554a..b4bcfe15ad5e 100644
->>> --- a/arch/x86/kvm/svm/svm.c
->>> +++ b/arch/x86/kvm/svm/svm.c
->>> @@ -4253,7 +4253,9 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu,
->>>            svm_set_dr6(svm, DR6_ACTIVE_LOW);
->>>          clgi();
->>> -    kvm_load_guest_xsave_state(vcpu);
->>> +
->>> +    if (!vcpu->arch.guest_state_protected)
->>> +        kvm_load_guest_xsave_state(vcpu);
->>>          kvm_wait_lapic_expire(vcpu);
->>>    @@ -4282,7 +4284,8 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu,
->>>        if (unlikely(svm->vmcb->control.exit_code == SVM_EXIT_NMI))
->>>            kvm_before_interrupt(vcpu, KVM_HANDLING_NMI);
->>>    -    kvm_load_host_xsave_state(vcpu);
->>> +    if (!vcpu->arch.guest_state_protected)
->>> +        kvm_load_host_xsave_state(vcpu);
->>>        stgi();
->>>          /* Any pending NMI will happen here */
->>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->>> index bbb6b7f40b3a..5cf9f023fd4b 100644
->>> --- a/arch/x86/kvm/x86.c
->>> +++ b/arch/x86/kvm/x86.c
->>> @@ -1169,11 +1169,9 @@ EXPORT_SYMBOL_GPL(kvm_lmsw);
->>>      void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu)
->>>    {
->>> -    if (vcpu->arch.guest_state_protected)
->>> -        return;
->>> +    WARN_ON_ONCE(vcpu->arch.guest_state_protected);
->>>          if (kvm_is_cr4_bit_set(vcpu, X86_CR4_OSXSAVE)) {
->>> -
->>>            if (vcpu->arch.xcr0 != kvm_host.xcr0)
->>>                xsetbv(XCR_XFEATURE_ENABLED_MASK, vcpu->arch.xcr0);
->>>    @@ -1192,13 +1190,11 @@ EXPORT_SYMBOL_GPL(kvm_load_guest_xsave_state);
->>>      void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu)
->>>    {
->>> -    if (vcpu->arch.guest_state_protected)
->>> -        return;
->>> -
->>>        if (cpu_feature_enabled(X86_FEATURE_PKU) &&
->>>            ((vcpu->arch.xcr0 & XFEATURE_MASK_PKRU) ||
->>>             kvm_is_cr4_bit_set(vcpu, X86_CR4_PKE))) {
->>> -        vcpu->arch.pkru = rdpkru();
->>> +        if (!vcpu->arch.guest_state_protected)
->>> +            vcpu->arch.pkru = rdpkru();
->>
->> this needs justification.
+On 2025/2/18 18:20, Shameerali Kolothum Thodi wrote:
 > 
-> It was proposed by Sean here:
 > 
-> 	https://lore.kernel.org/all/Z2WZ091z8GmGjSbC@google.com/
+>> -----Original Message-----
+>> From: liulongfang <liulongfang@huawei.com>
+>> Sent: Tuesday, February 18, 2025 2:15 AM
+>> To: alex.williamson@redhat.com; jgg@nvidia.com; Shameerali Kolothum
+>> Thodi <shameerali.kolothum.thodi@huawei.com>; Jonathan Cameron
+>> <jonathan.cameron@huawei.com>
+>> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+>> linuxarm@openeuler.org; liulongfang <liulongfang@huawei.com>
+>> Subject: [PATCH 1/3] migration: update BAR space size
+>>
+>> On the new hardware platform, the live migration configuration region
+>> is moved from VF to PF. The VF's own configuration space is
+>> restored to the complete 64KB, and there is no need to divide the
+>> size of the BAR configuration space equally.
+>>
+>> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+>> ---
+>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 41 +++++++++++++++----
+>>  1 file changed, 32 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> index 451c639299eb..599905dbb707 100644
+>> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> @@ -1195,6 +1195,33 @@ static struct hisi_qm *hisi_acc_get_pf_qm(struct
+>> pci_dev *pdev)
+>>  	return !IS_ERR(pf_qm) ? pf_qm : NULL;
+>>  }
+>>
+>> +static size_t hisi_acc_get_resource_len(struct vfio_pci_core_device *vdev,
+>> +					unsigned int index)
+>> +{
+>> +	struct hisi_acc_vf_core_device *hisi_acc_vdev =
+>> +			hisi_acc_drvdata(vdev->pdev);
+>> +
+>> +	/*
+>> +	 * ACC VF dev 64KB BAR2 region consists of both functional
+>> +	 * register space and migration control register space, each
+>> +	 * uses 32KB BAR2 region, on the system with more than 64KB
+>> +	 * page size, even if the migration control register space
+>> +	 * is written by VM, it will only affects the VF.
+>> +	 *
+>> +	 * In order to support the live migration function in the
+>> +	 * system with a page size above 64KB, the driver needs
+>> +	 * to ensure that the VF region size is aligned with the
+>> +	 * system page size.
 > 
-> which is part of the email thread referenced by the "Link:" tag above
+> I didn't get this. Are you referring to kernel with 64K page size? And this is 
+> for new hardware or QM_HW_V3 one?
+>
 
-IMHO, this change needs to be put in patch 07, which is the better place 
-to justify it.
+This 64KB page refers to the 64KB page size of BAR2.
+If the configuration space of the live migration device is not
+aligned to the 64KB page (for example, only 32KB on the QM_HW_V3 platform),
+when the host kernel page is 64KB, multiple VF devices will fail during VFIO
+enumeration.
+Therefore, on the new hardware platform, the live migration configuration
+space is moved to the PF, which can align the 64KB memory space and solve
+this problem.
 
+>> +	 *
+>> +	 * On the new hardware platform, the live migration control register
+>> +	 * has been moved from VF to PF.
+>> +	 */
+>> +	if (hisi_acc_vdev->pf_qm->ver == QM_HW_V3)
+>> +		return (pci_resource_len(vdev->pdev, index) >> 1);
+>> +
+>> +	return pci_resource_len(vdev->pdev, index);
+>> +}
+>> +
+>>  static int hisi_acc_pci_rw_access_check(struct vfio_device *core_vdev,
+>>  					size_t count, loff_t *ppos,
+>>  					size_t *new_count)
+>> @@ -1205,8 +1232,9 @@ static int hisi_acc_pci_rw_access_check(struct
+>> vfio_device *core_vdev,
 >>
->>>            if (vcpu->arch.pkru != vcpu->arch.host_pkru)
->>>                wrpkru(vcpu->arch.host_pkru);
->>>        }
+>>  	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
+>>  		loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
+>> -		resource_size_t end = pci_resource_len(vdev->pdev, index) /
+>> 2;
+>> +		resource_size_t end;
 >>
+>> +		end = hisi_acc_get_resource_len(vdev, index);
+>>  		/* Check if access is for migration control region */
+>>  		if (pos >= end)
+>>  			return -EINVAL;
+>> @@ -1227,8 +1255,9 @@ static int hisi_acc_vfio_pci_mmap(struct
+>> vfio_device *core_vdev,
+>>  	index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
+>>  	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
+>>  		u64 req_len, pgoff, req_start;
+>> -		resource_size_t end = pci_resource_len(vdev->pdev, index) /
+>> 2;
+>> +		resource_size_t end;
 >>
->>> @@ -3916,6 +3912,10 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->>>            if (!msr_info->host_initiated &&
->>>                !guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))
->>>                return 1;
->>> +
->>> +        if (vcpu->arch.guest_state_protected)
->>> +            return 1;
->>> +
->>
->> this and below change need to be a separate patch. So that we can discuss independently.
->>
->> I see no reason to make MSR_IA32_XSS special than other MSRs. When guest_state_protected, most of the MSRs that aren't emulated by KVM are inaccessible by KVM.
+>> +		end = PAGE_ALIGN(hisi_acc_get_resource_len(vdev, index));
 > 
-> Yes, TDX will block access to MSR_IA32_XSS anyway because
-> tdx_has_emulated_msr() will return false for MSR_IA32_XSS.
+> So here, the whole BAR2 will be mapped to Guest in case of QM_HW_V3 &&
+> 64K kernel as well, right?
+>
+
+
+Here, the length of BAR2 is mapped to the Guest OS according to the actual
+situation of the platform. If it is QM_HW_V3, only 32KB is mapped.
+Others are mapped 64KB.
+
+Thanks.
+
+> Thanks,
+> Shameer
 > 
-> However kvm_load_host_xsave_state() is not TDX-specific code and it
-> relies upon vcpu->arch.ia32_xss, so there is reason to block
-> access to it when vcpu->arch.guest_state_protected is true.
-
-It is TDX specific logic that TDX requires vcpu->arch.ia32_xss unchanged 
-since TDX is going to utilize kvm_load_host_xsave_state() to restore 
-host xsave state and relies on vcpu->arch.ia32_xss to be always the 
-value of XFAM & XSS_MASK.
-
-So please put this change into the TDX specific patch with the clear 
-justfication.
-
+>>  		req_len = vma->vm_end - vma->vm_start;
+>>  		pgoff = vma->vm_pgoff &
+>>  			((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
+>> @@ -1275,7 +1304,6 @@ static long hisi_acc_vfio_pci_ioctl(struct
+>> vfio_device *core_vdev, unsigned int
+>>  	if (cmd == VFIO_DEVICE_GET_REGION_INFO) {
+>>  		struct vfio_pci_core_device *vdev =
+>>  			container_of(core_vdev, struct vfio_pci_core_device,
+>> vdev);
+>> -		struct pci_dev *pdev = vdev->pdev;
+>>  		struct vfio_region_info info;
+>>  		unsigned long minsz;
 >>
->>>            /*
->>>             * KVM supports exposing PT to the guest, but does not support
->>>             * IA32_XSS[bit 8]. Guests have to use RDMSR/WRMSR rather than
->>> @@ -4375,6 +4375,10 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->>>            if (!msr_info->host_initiated &&
->>>                !guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))
->>>                return 1;
->>> +
->>> +        if (vcpu->arch.guest_state_protected)
->>> +            return 1;
->>> +
->>>            msr_info->data = vcpu->arch.ia32_xss;
->>>            break;
->>>        case MSR_K7_CLK_CTL:
+>> @@ -1290,12 +1318,7 @@ static long hisi_acc_vfio_pci_ioctl(struct
+>> vfio_device *core_vdev, unsigned int
+>>  		if (info.index == VFIO_PCI_BAR2_REGION_INDEX) {
+>>  			info.offset =
+>> VFIO_PCI_INDEX_TO_OFFSET(info.index);
 >>
+>> -			/*
+>> -			 * ACC VF dev BAR2 region consists of both
+>> functional
+>> -			 * register space and migration control register
+>> space.
+>> -			 * Report only the functional region to Guest.
+>> -			 */
+>> -			info.size = pci_resource_len(pdev, info.index) / 2;
+>> +			info.size = hisi_acc_get_resource_len(vdev,
+>> info.index);
+>>
+>>  			info.flags = VFIO_REGION_INFO_FLAG_READ |
+>>  					VFIO_REGION_INFO_FLAG_WRITE |
+>> --
+>> 2.24.0
 > 
-
+> .
+> 
 
