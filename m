@@ -1,65 +1,54 @@
-Return-Path: <kvm+bounces-39129-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39130-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4452A445FC
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 17:27:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 358C6A44676
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 17:43:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0238F176072
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 16:25:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 593D416F28E
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 16:38:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D56E918E054;
-	Tue, 25 Feb 2025 16:24:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 419571991CB;
+	Tue, 25 Feb 2025 16:37:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iyrFVoNO"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="fTqGZNfd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98746166F1A;
-	Tue, 25 Feb 2025 16:24:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D1C195381;
+	Tue, 25 Feb 2025 16:37:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740500699; cv=none; b=o+HcP1w8KQUGB8RMSjYOvd1zKMxPoAO2o1ftR3gDHYQwf83CK6C6bN1iNne9mPSv15Gk2BCiKQ5vzRVcQaYk9sqLTdhG5L1qM+o6F0aDhi2lvYNdCGBFtqmTSnIsZi14+Z4xMN07gT2FJ5EMj+4Zz9dynB7X6XoP208K3J4/+Sk=
+	t=1740501477; cv=none; b=AafO0rIyViGyFgLmya0lqHC7cdiqNgKXVF2831QmAqoePAoYIelWL52pzZJnwmvZN9v46thaTZb034+kOKpZJOS0nxTuZov4oJYGQA3LxyPmT9pJ+hJaVoMjIIlCzQHWDSYTsPr2ZMcJgEURlUjEGNLgyiqPZvy3xE+RQuqqce4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740500699; c=relaxed/simple;
-	bh=d5Im4SoxuvcPh6FtOq83T6W8t4LFklHxofjadqDgeZ8=;
+	s=arc-20240116; t=1740501477; c=relaxed/simple;
+	bh=H/E8/zOdQB5+3nRF7glG3nTMzCTMycHK60guJbAspIA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nQFgGtoOzQuTfunwSkwLwo21Y6+Ei08tz7q335RRA7tS5ao5WOc3T2WlL+OsJuWQuhf8zij7MQ5W97H1YnzhEfmI9BfsTIQfdF5Ijiknlcec8OgOQ/wrrtmNOhPUs4kAXbj4hnJym8x3fqizL+UDVXMMCgTC0KdyN2paTfAmzcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iyrFVoNO; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740500698; x=1772036698;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=d5Im4SoxuvcPh6FtOq83T6W8t4LFklHxofjadqDgeZ8=;
-  b=iyrFVoNOo6eeHLCtid19ubjWWoEaYudxIdyLKGpe08CJw7iu7F9YRdy/
-   sx8wTZxNmQb0DLLzwkydt2zP+a7PX4RNmPZ0/gLKR5Lmy40COXq5HFjaS
-   LGDRmn15VVMEHXpoDGqa4tGPPz6NCvHsMRKLGejdNcLri5UDGsYpKz2NE
-   4hXZAV7wMGhI3bcG1rd6BpcAcTqAahpkvlB7j2gl0z3lMOVGJo72dO9ne
-   ItaZxYuYgDc4uQOcw4A+UjXCJ9y4mvuaVivDp2IrJrLepJG2mgnzGeaMq
-   bFngN9iXBN7EthLbgx4pTc1mXtrWI0e2f+MKrn24U/RUdO3Fd47orMj7s
-   g==;
-X-CSE-ConnectionGUID: 70k5ztAGQ5y6cDbPxlqOIw==
-X-CSE-MsgGUID: kKTB0uPWSAmZ5MmL3SkY9Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11356"; a="66684022"
-X-IronPort-AV: E=Sophos;i="6.13,314,1732608000"; 
-   d="scan'208";a="66684022"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2025 08:24:57 -0800
-X-CSE-ConnectionGUID: Z8f2P4wrSOqORlw23tXdVw==
-X-CSE-MsgGUID: Rrujtc9uQU2VlV04wPxkmw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="116922429"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2025 08:24:54 -0800
-Message-ID: <1fd5ede5-e6a9-4aee-b540-0c9b75489917@intel.com>
-Date: Wed, 26 Feb 2025 00:24:51 +0800
+	 In-Reply-To:Content-Type; b=L1Q9aWO55Mhxg1zduewCZkvT0xUbhZe97EuU3WLd3MpSXa41pfeSkIjag0qvwu3KqDXwbiqs17FLQmhkppMtubVHlaWEa4etzCtHo84F0ritlVafNdDEqH2JlVK+YVZ5wtlCAMHCqtTyN94Tx6lVEbREeIWHYJG5tLi7zsyX0ao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=fTqGZNfd; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.202] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 51PGbH181348914
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Tue, 25 Feb 2025 08:37:18 -0800
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 51PGbH181348914
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025021701; t=1740501441;
+	bh=hTvIuL7TkYaRh8K4AIyjHgUBq3PLd1QAa0CgjSUthkE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=fTqGZNfdJgn+YIy3GrjdKR+Yvun08nyEKppdaIxCfGBBF5VbT4Duw+dMywKZ48Mpm
+	 OxWHl2fn7hwgS6ZqtbwvE+8C7RbNNNlSojahY5vM8TKDciZeyqIcC025pD/3g+yrLc
+	 pv/LYMQY4fjhwrGDcrkh4mx9s+8BmBXOdoNEW4mXcqRysgIm1O2+4uJQ5hDydwPyKI
+	 ZrGzr6NkQRI7v9+Yb5bxUL5ScM3udBh5rNXgHLDbw9P9/7WqHy/PL/sIztG9kLpp0y
+	 i2qCmG6jH02/I/NhIicyIsG8HtxQSWTFs5xzpiHTHkqhLtezLKSv0WJRTRhD+uSZEA
+	 R0I3fzaZJxInQ==
+Message-ID: <5b63fb37-bb1a-45f9-a6f9-58f6bf5b869e@zytor.com>
+Date: Tue, 25 Feb 2025 08:37:16 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,39 +56,86 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 20/30] KVM: TDX: create/destroy VM structure
-To: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
-Cc: seanjc@google.com, Yan Zhao <yan.y.zhao@intel.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>,
- Tony Lindgren <tony.lindgren@linux.intel.com>,
- Sean Christopherson <sean.j.christopherson@intel.com>,
- Kai Huang <kai.huang@intel.com>
-References: <20250220170604.2279312-1-pbonzini@redhat.com>
- <20250220170604.2279312-21-pbonzini@redhat.com>
+Subject: Re: [PATCH v3 24/27] KVM: nVMX: Add a prerequisite to existence of
+ VMCS fields
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        luto@kernel.org, peterz@infradead.org, andrew.cooper3@citrix.com
+References: <20241001050110.3643764-1-xin@zytor.com>
+ <20241001050110.3643764-25-xin@zytor.com> <Z73uK5IzVoBej3mi@google.com>
 Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250220170604.2279312-21-pbonzini@redhat.com>
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <Z73uK5IzVoBej3mi@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 2/21/2025 1:05 AM, Paolo Bonzini wrote:
+On 2/25/2025 8:22 AM, Sean Christopherson wrote:
+> On Mon, Sep 30, 2024, Xin Li (Intel) wrote:
+>> Add a prerequisite to existence of VMCS fields as some of them exist
+>> only on processors that support certain CPU features.
+>>
+>> This is required to fix KVM unit test VMX_VMCS_ENUM.MAX_INDEX.
+> 
+> If making the KVM-Unit-Test pass is the driving force for this code, then NAK.
+> We looked at this in detail a few years back, and came to the conclusion that
+> trying to precisely track which fields are/aren't supported would likely do more
+> harm than good.
 
-...
+I have to agree, it's no fun to track a VMCS field is added by which 
+feature(s), and worst part is that one VMCS field could depend on 2+ 
+totally irrelevant features, e.g., the secondary VM exit controls field 
+exits on CPU that supports:
 
-> +int tdx_vm_init(struct kvm *kvm)
-> +{
-> +	kvm->arch.has_private_mem = true;
+1) FRED
+2) Prematurely busy shadow stack
 
-If it's going to have a next version, I think we can squash below patch 
-into current:
+Thanks for making the ground rule clear.
 
-https://lore.kernel.org/all/20250129095902.16391-4-adrian.hunter@intel.com/
+BTW, why don't we just remove this VMX_VMCS_ENUM.MAX_INDEX test?
 
-> +	/* Place holder for TDX specific logic. */
-> +	return __tdx_td_init(kvm);
-> +}
-> +
+     Xin
+
+
+> 
+> https://lore.kernel.org/all/1629192673-9911-4-git-send-email-robert.hu@linux.intel.com
+> 
+
 
 
