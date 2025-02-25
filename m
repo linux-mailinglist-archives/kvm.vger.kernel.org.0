@@ -1,154 +1,157 @@
-Return-Path: <kvm+bounces-39173-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39175-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F1D9A44C1F
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 21:13:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCC3BA44DC3
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 21:39:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9AB9C7A53BE
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 20:11:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8F043B7C89
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 20:36:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D4CA20E713;
-	Tue, 25 Feb 2025 20:12:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A097521148F;
+	Tue, 25 Feb 2025 20:35:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cHK31Bb8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u1o+YzKQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C38D20E32B;
-	Tue, 25 Feb 2025 20:12:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF8571448E3;
+	Tue, 25 Feb 2025 20:35:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740514338; cv=none; b=pG89Q6rmvNNVtd/gGBaYwrOwiNHmBpyWKSYz9A1VGM9jBWT7RE5l9Yl/+pTGaVkCBxOJosDuTP5OmXrQR663QN86cWthE67QRMAWDMIjivFL6GLeJA9GK7lq1ffbfoX9Ldh0CLW9vmIqKfIpfNG+7nLhUJU9Qc2axMkZVoDdalE=
+	t=1740515726; cv=none; b=sAopNrkMYS+SNcrEPCtupiUD23TLIGfeUxN0Qtk3GR1TqzsT+YQqOpgP9eJQgxpyLqtkLpg4lYn9E60I64Jj3ywtd0aXHdjENd1foqXP5ZTzpBWjhGWqi8u7xu89/kbV5JVH4pmcpCYpM94wVfIZ4T2N3h5/Iv04U15JgciLcw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740514338; c=relaxed/simple;
-	bh=Ult+jCe8V+RK2OSVBLS7kPBk2d9BSot4j1pHvtVAPX4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nXGHMrdsY2Wk7jV+y/djL6kjYgBKcZa8se9f/hfjmbcaWx928LTh9YS/LxbSr+NFdxev8vImpswtLnMuUjPwn2r5j7e5EIdOkQ8DRQwe2TKReDHW5Z2OZlFu4DQoBeEL9rPq+GbISz1Ek5dYNmz3I+oqmcoo0zfb6PBrnkfHDZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=cHK31Bb8; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51PDjY62026891;
-	Tue, 25 Feb 2025 20:12:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=BagUnjM7IFd8MM1CI
-	k7jDa6LhSJ/+lrqaAtDxWexNw8=; b=cHK31Bb8dyRx/dVi1Z64gQdlZXE5SyWLg
-	zuc/hueIFIlBHYb861LJi9+TG6gXep1phVrnk/GpHQ7k59EBzrcbU+lPMiN/cxNb
-	8A+5fcp8Lu9LZsEM2lATO1Z0avFLNRVghXj+CEiOukuC8IjMchoZLqqrlmFOv7gd
-	hzzBsCd63t3WC8kGDFjGIPGu7xtc1vUsUAKe2aj1bDBRCA3+n9VHd1aGhxxes9rz
-	VZTcgetGQx7zgTk5L9bWXgPoy1JGlYjNMjoQfJxhT6cR12DSEt3L7jmr9CrOQf7B
-	xEpWS6PBDLZL0DLVM2pHON82XZmuSLbchNcnwv9pAQnCDbqc6B/EA==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4513x9w8xv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 25 Feb 2025 20:12:14 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51PJeOVX012597;
-	Tue, 25 Feb 2025 20:12:13 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44ys9yf33y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 25 Feb 2025 20:12:13 +0000
-Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51PKCBBZ23134876
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 25 Feb 2025 20:12:11 GMT
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8B9F558052;
-	Tue, 25 Feb 2025 20:12:11 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C275A58056;
-	Tue, 25 Feb 2025 20:12:10 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.61.252.67])
-	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 25 Feb 2025 20:12:10 +0000 (GMT)
-From: Rorie Reyes <rreyes@linux.ibm.com>
-To: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc: hca@linux.ibm.com, borntraeger@de.ibm.com, agordeev@linux.ibm.com,
-        gor@linux.ibm.com, pasic@linux.ibm.com, jjherne@linux.ibm.com,
-        alex.williamson@redhat.com, akrowiak@linux.ibm.com,
-        rreyes@linux.ibm.com
-Subject: [RFC PATCH v2 2/2] s390/vfio-ap: Fixing mdev remove notification
-Date: Tue, 25 Feb 2025 15:12:08 -0500
-Message-ID: <20250225201208.45998-3-rreyes@linux.ibm.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250225201208.45998-1-rreyes@linux.ibm.com>
-References: <20250225201208.45998-1-rreyes@linux.ibm.com>
+	s=arc-20240116; t=1740515726; c=relaxed/simple;
+	bh=7Wg1p0f2ypkxnC0TFBuDHULqBARMpNOuEl5fgz8O5K4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=OKkkLlMrIiTBLy2y30CoeHBqDTIjkPSOumJE9yiUVQkGPbFtIu/pZnlXTns8oLTN4+SsOGU/41F7c2KNjpPnC08YXs2R1uwnej0LEuamYL3DAljoG9S3+uL1dszuCx5Z3B3Aar5jvvfJW5qBPIKvkeVeEf1A9yK9le/TxF5nxdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u1o+YzKQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F4012C4CEDD;
+	Tue, 25 Feb 2025 20:35:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740515726;
+	bh=7Wg1p0f2ypkxnC0TFBuDHULqBARMpNOuEl5fgz8O5K4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=u1o+YzKQTjiHFa378K9/JNzh8aDmB6+8eSlzj2e0oqKfk3HNpjqojfcknEQf7dasY
+	 03hMuuQtgsENKquMorrWqUGoeNDbnhT8OWNv2SkWWLV2eGDqCJKtwkf01YgUUcP3em
+	 0vF1gkPM7D3w3aowShgQuXbYAygbru0he6FEP1lpDrHz9VHeTVcmNxKMqIdyJgFqm4
+	 XCKGzWr5q/xPyIjix/RGoEOSV0Bbd2ZAqusDGXt9sZ/henPtK7X/J0rhcR9MmW6NaV
+	 yjkjWzQ+We+5C2wMW9aH5ZtmatdkVY+qCKe3UQk5io0s0ECF90mFWsoYbS4vjIrMLR
+	 29Dh1G9eqw+eQ==
+Date: Tue, 25 Feb 2025 14:35:24 -0600
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Niklas Schnelle <schnelle@linux.ibm.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Alexandra Winter <wintera@linux.ibm.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Gerd Bayer <gbayer@linux.ibm.com>,
+	Matthew Rosato <mjrosato@linux.ibm.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Thorsten Winkler <twinkler@linux.ibm.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Julian Ruess <julianr@linux.ibm.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-pci@vger.kernel.org
+Subject: Re: [PATCH v6 0/3] vfio/pci: s390: Fix issues preventing
+ VFIO_PCI_MMAP=y for s390 and enable it
+Message-ID: <20250225203524.GA516498@bhelgaas>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: bD9oICB7dc-ZRKhfL9AR1Yx2UjYm_HG2
-X-Proofpoint-GUID: bD9oICB7dc-ZRKhfL9AR1Yx2UjYm_HG2
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-25_06,2025-02-25_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- suspectscore=0 mlxscore=0 priorityscore=1501 spamscore=0
- lowpriorityscore=0 adultscore=0 malwarescore=0 impostorscore=0
- mlxlogscore=937 clxscore=1015 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2502100000 definitions=main-2502250120
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7bcd6de5f40b2ee6d4d6758e3d2473172bd9b990.camel@linux.ibm.com>
 
-Removed eventfd from vfio_ap_mdev_unset_kvm
-Update and release locks along with the eventfd added
-to vfio_ap_mdev_request
+On Tue, Feb 25, 2025 at 09:59:13AM +0100, Niklas Schnelle wrote:
+> On Mon, 2025-02-24 at 14:53 -0600, Bjorn Helgaas wrote:
+> > On Fri, Feb 14, 2025 at 02:10:51PM +0100, Niklas Schnelle wrote:
+> > > With the introduction of memory I/O (MIO) instructions enbaled in commit
+> > > 71ba41c9b1d9 ("s390/pci: provide support for MIO instructions") s390
+> > > gained support for direct user-space access to mapped PCI resources.
+> > > Even without those however user-space can access mapped PCI resources
+> > > via the s390 specific MMIO syscalls. There is thus nothing fundamentally
+> > > preventing s390 from supporting VFIO_PCI_MMAP, allowing user-space
+> > > drivers to access PCI resources without going through the pread()
+> > > interface. To actually enable VFIO_PCI_MMAP a few issues need fixing
+> > > however.
+> > > 
+> > > Firstly the s390 MMIO syscalls do not cause a page fault when
+> > > follow_pte() fails due to the page not being present. This breaks
+> > > vfio-pci's mmap() handling which lazily maps on first access.
+> > > 
+> > > Secondly on s390 there is a virtual PCI device called ISM which has
+> > > a few oddities. For one it claims to have a 256 TiB PCI BAR (not a typo)
+> > > which leads to any attempt to mmap() it fail with the following message:
+> > > 
+> > >     vmap allocation for size 281474976714752 failed: use vmalloc=<size> to increase size
+> > > 
+> > > Even if one tried to map this BAR only partially the mapping would not
+> > > be usable on systems with MIO support enabled. So just block mapping
+> > > BARs which don't fit between IOREMAP_START and IOREMAP_END. Solve this
+> > > by keeping the vfio-pci mmap() blocking behavior around for this
+> > > specific device via a PCI quirk and new pdev->non_mappable_bars
+> > > flag.
+> > > 
+> > > As noted by Alex Williamson With mmap() enabled in vfio-pci it makes
+> > > sense to also enable HAVE_PCI_MMAP with the same restriction for pdev->
+> > > non_mappable_bars. So this is added in patch 3 and I tested this with
+> > > another small test program.
+> > > 
+> > > Note:
+> > > For your convenience the code is also available in the tagged
+> > > b4/vfio_pci_mmap branch on my git.kernel.org site below:
+> > > https://git.kernel.org/pub/scm/linux/kernel/git/niks/linux.git/
+> > > 
+> > > Thanks,
+> > > Niklas
+> > > 
+> > > Link: https://lore.kernel.org/all/c5ba134a1d4f4465b5956027e6a4ea6f6beff969.camel@linux.ibm.com/
+> > > Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
+> > > ---
+> > > Changes in v6:
+> > > - Add a patch to also enable PCI resource mmap() via sysfs and proc
+> > >   exlcluding pdev->non_mappable_bars devices (Alex Williamson)
+> > > - Added Acks
+> > > - Link to v5: https://lore.kernel.org/r/20250212-vfio_pci_mmap-v5-0-633ca5e056da@linux.ibm.com
+> > 
+> > I think the series would be more readable if patch 2/3 included all
+> > the core changes (adding pci_dev.non_mappable_bars, the 3/3
+> > pci-sysfs.c and proc.c changes to test it, and I suppose the similar
+> > vfio_pci_core.c change), and we moved all the s390 content from 2/3 to
+> > 3/3.
+> 
+> Maybe we could do the following:
+> 
+> 1/3: As is
+> 
+> 2/3: Introduces pdev->non_mappable_bars and the checks in vfio and
+> proc.c/pci-sysfs.c. To make the flag handle the vfio case with
+> VFIO_PCI_MMAP gone, a one-line change in s390 will set pdev-
+> >non_mappable_bars = 1 for all PCI devices.
 
-Signed-off-by: Rorie Reyes <rreyes@linux.ibm.com>
----
- drivers/s390/crypto/vfio_ap_ops.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+What if you moved the vfio_pci_core.c change to patch 3?  Then I think
+patch 2 would do nothing at all (since there's nothing that sets
+non_mappable_bars), and all the s390 stuff would be in patch 3?
 
-diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-index c6ff4ab13f16..e0237ea27d7e 100644
---- a/drivers/s390/crypto/vfio_ap_ops.c
-+++ b/drivers/s390/crypto/vfio_ap_ops.c
-@@ -1870,7 +1870,6 @@ static void vfio_ap_mdev_unset_kvm(struct ap_matrix_mdev *matrix_mdev)
- 		get_update_locks_for_kvm(kvm);
- 
- 		kvm_arch_crypto_clear_masks(kvm);
--		signal_guest_ap_cfg_changed(matrix_mdev);
- 		vfio_ap_mdev_reset_queues(matrix_mdev);
- 		kvm_put_kvm(kvm);
- 		matrix_mdev->kvm = NULL;
-@@ -2057,6 +2056,14 @@ static void vfio_ap_mdev_request(struct vfio_device *vdev, unsigned int count)
- 
- 	matrix_mdev = container_of(vdev, struct ap_matrix_mdev, vdev);
- 
-+	if (matrix_mdev->kvm) {
-+		get_update_locks_for_kvm(matrix_mdev->kvm);
-+		kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
-+		signal_guest_ap_cfg_changed(matrix_mdev);
-+	} else {
-+		mutex_lock(&matrix_dev->mdevs_lock);
-+	}
-+
- 	if (matrix_mdev->req_trigger) {
- 		if (!(count % 10))
- 			dev_notice_ratelimited(dev,
-@@ -2068,6 +2075,12 @@ static void vfio_ap_mdev_request(struct vfio_device *vdev, unsigned int count)
- 		dev_notice(dev,
- 			   "No device request registered, blocked until released by user\n");
- 	}
-+
-+	if (matrix_mdev->kvm)
-+		release_update_locks_for_kvm(matrix_mdev->kvm);
-+	else
-+		mutex_unlock(&matrix_dev->mdevs_lock);
-+
- }
- 
- static int vfio_ap_mdev_get_device_info(unsigned long arg)
--- 
-2.39.5 (Apple Git-154)
+Not sure if that's possible, but I think it's a little confusing to
+have the s390 changes split across patch 2 and 3.
 
+> 3/3: Changes setting pdev->non_mappable_bars = 1 in s390 to only the
+> ISM device using the quirk handling and adds HAVE_PCI_MMAP.
+> 
+> Thanks,
+> Niklas
 
