@@ -1,114 +1,145 @@
-Return-Path: <kvm+bounces-39156-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39158-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C19FA448CB
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 18:47:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8B13A4489F
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 18:42:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37C6E883D53
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 17:35:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC8D319E4AB7
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 17:38:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 163C421770D;
-	Tue, 25 Feb 2025 17:29:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C631A5BAC;
+	Tue, 25 Feb 2025 17:35:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s26eJsZ4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="22e4g97n"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4F3320F079;
-	Tue, 25 Feb 2025 17:29:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03EED1A23BC
+	for <kvm@vger.kernel.org>; Tue, 25 Feb 2025 17:35:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740504588; cv=none; b=K0qZXKEsSSHlKpO5vTW89MIFRg4oWRX6wqQOl5adliGdAAhoHunABpjscl9G+Q5zs/zE7xaddzDGGjzGhoDFqbxMPvhwaUKCczVBZz4xy6pN85bqAVkbuVBH3sV80/FRKXy/7QGHRDPxnoeYwzfbHLswBUjRB0JMWPIOqjULmUo=
+	t=1740504922; cv=none; b=Gm7Fy2Fj4KqrH/EtnMdXWLdV62XSQYmXTGl/57boaslrlUtVlieAnBXwYQaVugbgpYduBlj8b06ntRnY0JjQ5sdWunT2XvURfIsZYkzGtxY80oVlvmV6uW4ZZX0qW8vzoEW3lA3Mas3epGtvaxp6C/Vq7bDMkkvP+kC42q6miL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740504588; c=relaxed/simple;
-	bh=EcrOufC+9HluOly/HaFks9e5qYg1mD0Q7YaQCzKYfj8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rw9Lrg5DTgyzfc52bubGG+G9ayOUfos3WAGBXXogDvxEEI/cb0Vz/Zf5K5UfaloC5TwNRwxd0+jv00eyVd5qT7NF6H05sBJJE26W7o7C4BGhsknWizPTOk1rJbVGj/IWiagLG8VSCltyK4iWyCUVlnYdNsZMU2sCJsrc6wkT8t8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s26eJsZ4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99ECAC4CEE8;
-	Tue, 25 Feb 2025 17:29:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740504588;
-	bh=EcrOufC+9HluOly/HaFks9e5qYg1mD0Q7YaQCzKYfj8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=s26eJsZ4ZCkUr40JDqjXSQMziL3UsOHOVQ1WIuizgLPCCHPydJaq+ImDk7P25+99M
-	 RmVA4tATAqADohH0lvgld1cpUd9UVhhbkcKo+/tRnzxj6JrSl2C4LvPLcUA6dBvSLB
-	 rpRwDNFFME4tffYzvNENvm4Vnm6y98isqRBY3HHO+ultJHcIqgehxvhv+pEUzkpnKZ
-	 +y0GRXw5YbRdJGv6v6rZEI2GGCJro/gDMfjEBiGwN3SFNi6wWOehbwToC7FgpkVj7k
-	 Fb53GYm6pHdMaH4ipVI4l0E55hYZO1WedMutCe4IjppDq7rsY3UWTz30nSlsgkq8bF
-	 hDj7mZ0BARaLg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tmykc-007rKs-TI;
-	Tue, 25 Feb 2025 17:29:46 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v4 16/16] KVM: arm64: nv: Fail KVM init if asking for NV without GICv3
-Date: Tue, 25 Feb 2025 17:29:30 +0000
-Message-Id: <20250225172930.1850838-17-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250225172930.1850838-1-maz@kernel.org>
-References: <20250225172930.1850838-1-maz@kernel.org>
+	s=arc-20240116; t=1740504922; c=relaxed/simple;
+	bh=DCj+7jqMyXQfbY2xp2rvzhQWlsMYVO7zaB44y+WoB/4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=QqQBKScq1YaLkb8PjnoZEAe8/fJwzbGUwvwW5J8jK1pNKX0omzrURrYYYJkt4MHBW/JnAXM38aZnJBuDHjt+ACnu/0KUiobjOw3hfmU16RVwDJisVSyC5Z18EESpWS8zhOeuFODS8S0fRq6MakcPIZBdWS9cvM5GMZQOO3sG5Bw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=22e4g97n; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2217a4bfcc7so124312035ad.3
+        for <kvm@vger.kernel.org>; Tue, 25 Feb 2025 09:35:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740504920; x=1741109720; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WmPVK+L+lkct4my4gWXOH7349iAbiLDSdgIlILE/gx4=;
+        b=22e4g97neCm8yw41ONcrauyntt+5VswzU5AUngctfJ9y4Nn78LKP3UqO/0mWFyIxxh
+         o2Tldizy34LiAEkUavi0Ifsk3d6XaTSeklXAYYGIrWReaTFoVhtJwI3hdbqQxhipLdP3
+         x/rpo2ods/7KkAuE2ApAF5AVtWRB3wrmlweiW3Mecn2fjzibvkXulqnu2v154hKllWlh
+         GpmLk2FMgZ/Gp8mHT2DLysr53QuOvp8p1QVQF/6D6hOrvu6R7B7nC2lSEVmxEud9ERdg
+         8mUNOUNLrGOZft90LXZ53PQnSrsAWkPigAlgwInZEH+AysL0Q1W6f5j4B49nef3vG9zK
+         A82Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740504920; x=1741109720;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WmPVK+L+lkct4my4gWXOH7349iAbiLDSdgIlILE/gx4=;
+        b=h/Srbp4fJmCuNqzQnqRXRo2yQRgaNh13dl8XWjHjSFYC1REGDuK2gq7MwHyPZVJk/q
+         MtEwqmxGf8Mzq3R1l8pqryu3/l8Q6bFbtvN2K9hdr/oyyrUrKcGCNreFq2Z2B8sfWyR8
+         rSG6MTz5XiIspbR8LsAcOPGSEd+3WWhnvsKEHtgAisN56uRJiSDVLurQ8rl7MGtVkMKa
+         PLC9MnKonb0XM9dxnkO1aDHcQQkwX4eN/lpIPXfVxU4OTTbeDMjDqg8tWbLX8uhIw+nX
+         y/oni81wrvCuOz2DXZERYKiNJbLQf1DOYpXGLhYLCfw5A7pWU6z+xET1RDAVXkvoa5g7
+         PPuQ==
+X-Gm-Message-State: AOJu0YygHcSsPRQaX8aavUeQLJB3sxlxDAJo87TrlBFn82UsOv1pSgar
+	gD1Tk4eB2lJ/xZkEfEnWW4SVKnhgl9fQqrEx8Wr+DsQT/kf02r6WBw4C4/kw8pPIo/Z7A4HtlJq
+	ECw==
+X-Google-Smtp-Source: AGHT+IHDF07aCt7qpFwpvTs1RpT9A9C3sPRgbFPhlXEj6AO9EgopLjMJSD4qeqFfHqD0Sv4+QnSbcOjcYsQ=
+X-Received: from pjbqo14.prod.google.com ([2002:a17:90b:3dce:b0:2fa:a101:755])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d506:b0:216:501e:e314
+ with SMTP id d9443c01a7336-221a0edda05mr242845745ad.20.1740504920269; Tue, 25
+ Feb 2025 09:35:20 -0800 (PST)
+Date: Tue, 25 Feb 2025 09:35:11 -0800
+In-Reply-To: <b1f0f8f3-515f-4fde-b779-43ef93484ab3@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, andre.przywara@arm.com, eric.auger@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20241001050110.3643764-1-xin@zytor.com> <22d4574b-7e2d-4cd8-91bd-f5208e82369e@zytor.com>
+ <Z73gxklugkYpwJiZ@google.com> <b1f0f8f3-515f-4fde-b779-43ef93484ab3@zytor.com>
+Message-ID: <Z73_TwUgIsceWyzQ@google.com>
+Subject: Re: [PATCH v3 00/27] Enable FRED with KVM VMX
+From: Sean Christopherson <seanjc@google.com>
+To: Xin Li <xin@zytor.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, Chao Gao <chao.gao@intel.com>, pbonzini@redhat.com, 
+	corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, luto@kernel.org, 
+	peterz@infradead.org, andrew.cooper3@citrix.com
+Content-Type: text/plain; charset="us-ascii"
 
-Although there is nothing in NV that is fundamentally incompatible
-with the lack of GICv3, there is no HW implementation without one,
-at least on the virtual side (yes, even fruits have some form of
-vGICv3).
+On Tue, Feb 25, 2025, Xin Li wrote:
+> On 2/25/2025 7:24 AM, Sean Christopherson wrote:
+> > On Tue, Feb 18, 2025, Xin Li wrote:
+> > > On 9/30/2024 10:00 PM, Xin Li (Intel) wrote:
+> > > While I'm waiting for the CET patches for native Linux and KVM to be
+> > > upstreamed, do you think if it's worth it for you to take the cleanup
+> > > and some of the preparation patches first?
+> > 
+> > Yes, definitely.  I'll go through the series and see what I can grab now.
+> 
+> I planned to do a rebase and fix the conflicts due to the reordering.
+> But I'm more than happy you do a first round.
 
-We therefore make the decision to require GICv3, which will only
-affect models such as QEMU. Booting with a GICv2 or something
-even more exotic while asking for NV will result in KVM being
-disabled.
+For now, I'm only going to grab these:
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/arm.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+  KVM: VMX: Pass XFD_ERR as pseudo-payload when injecting #NM
+  KVM: VMX: Don't modify guest XFD_ERR if CR0.TS=1
+  KVM: x86: Use a dedicated flow for queueing re-injected exceptions
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index dc27eb66d4e90..cae93fac60703 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2321,6 +2321,13 @@ static int __init init_subsystems(void)
- 		goto out;
- 	}
- 
-+	if (kvm_mode == KVM_MODE_NV &&
-+	   !(vgic_present && kvm_vgic_global_state.type == VGIC_V3)) {
-+		kvm_err("NV support requires GICv3, giving up\n");
-+		err = -EINVAL;
-+		goto out;
-+	}
-+
- 	/*
- 	 * Init HYP architected timer support
- 	 */
--- 
-2.39.2
+and the WRMSRNS patch.  I'll post (and apply, if it looks good) the entry/exit
+pairs patch separately.
 
+Easiest thing would be to rebase when all of those hit kvm-x86/next.
+
+> BTW, if you plan to take
+> 	KVM: VMX: Virtualize nested exception tracking
+
+I'm not planning on grabbing this in advance of the FRED series, especially if
+it's adding new uAPI.  The code doesn't need to exist without FRED, and doesn't
+really make much sense to readers without the context of FRED.
+
+> > > Top of my mind are:
+> > >      KVM: x86: Use a dedicated flow for queueing re-injected exceptions
+> > >      KVM: VMX: Don't modify guest XFD_ERR if CR0.TS=1
+> > >      KVM: VMX: Pass XFD_ERR as pseudo-payload when injecting #NM
+
+As above, I'll grab these now.
+
+> > >      KVM: nVMX: Add a prerequisite to existence of VMCS fields
+> > >      KVM: nVMX: Add a prerequisite to SHADOW_FIELD_R[OW] macros
+
+Unless there's a really, really good reason to add precise checking, I strongly
+prefer to skip these entirely.
+
+> > > 
+> > > Then specially, the nested exception tracking patch seems a good one as
+> > > Chao Gao suggested to decouple the nested tracking from FRED:
+> > >      KVM: VMX: Virtualize nested exception tracking
+> > > 
+> > > Lastly the patches to add support for the secondary VM exit controls might
+> > > go in early as well:
+> > >      KVM: VMX: Add support for the secondary VM exit controls
+> > >      KVM: nVMX: Add support for the secondary VM exit controls
+
+Unless there's another feature on the horizon that depends on secondary exit controls,
+(and y'all will be posted patches soon), I'd prefer just grab these in the FRED
+series.  With the pairs check prep work out of the way, adding support for the
+new controls should be very straightforward, and shouldn't conflict with anything.
 
