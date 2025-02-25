@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-39157-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39154-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC6AFA448FD
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 18:53:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F25E1A44852
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 18:35:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A386A3BB277
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 17:35:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23A8B7A1B55
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 17:34:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16408217718;
-	Tue, 25 Feb 2025 17:29:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 515AC215787;
+	Tue, 25 Feb 2025 17:29:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ACY99rcK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L9/vMZGV"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EA4E20F065;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53ACB20E6FB;
 	Tue, 25 Feb 2025 17:29:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740504588; cv=none; b=detYsJcAbo8xZ5e5+fDpIzMLmbML0ihW+pPBqSv3cuByj6vrjMc2zCMs3S8McxB5LnLK5WhJenBEYry0JyJNKeDrU4JiofdMrckuSHYHnPYF17XKXY2wO4tH1v35+QxXFMvSbntEDxJ/BskNZ7bhcRNIl8lF/zmA9B3KScOOybw=
+	t=1740504588; cv=none; b=D01Qjkd3RHsjmP9DJUVPLvkgenTW+GhwyPrflGHLZBM9Ls9RAOMKZvQb0MAL42DhXSE4+hINlgKevAjVUKwtRmADiH1uoogjHwg3OeqXn6albRRYxOCHT/s5JlcJ/TBYG84m8dM+5udd3kyqD6V0syuIg03jRHkp0Fp1/BLrQXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1740504588; c=relaxed/simple;
-	bh=Za1PNQ3sjrTQ/q3busy2dbutshSkyGMY6U7X8BZk2rs=;
+	bh=ScLfH9JCdakxFSIYbsxrMFuSUWUanHf/RQHVMVBJ67Y=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=H9vtCHJXnmm5oTuWtnaWPXIBl6EPmQl0LfsIeyPdon5PAlDHvmHw/sma0yqDyL+yzFXgyb0UP7poX/JTE2Z5a2Ju7DuPEnolYlFunyMo3fy2P2vbphUoSgRmsEFfM2e8V3VYqiltRxqIsX3X/BODjc7CJ8ybSmfJHo+881BoJmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ACY99rcK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 061EAC4CEDD;
+	 MIME-Version; b=RyuINoB3kvOaf0JCouxbCDdXlQMkG0V8bYu5iolQ1CSn7gQ5bLNoZ4pbC/Bham9GxQ1EIGNKoYytozX99G6B65PR6A1KVpyM1rjrVkUFQSUGpTLNY1C/EB7COK6fsp1WMWwu2Ut2rl8fGUjqmcrDoMb5wbsaGWy/JhEXFl5eOdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L9/vMZGV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3238FC4CEE8;
 	Tue, 25 Feb 2025 17:29:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1740504588;
-	bh=Za1PNQ3sjrTQ/q3busy2dbutshSkyGMY6U7X8BZk2rs=;
+	bh=ScLfH9JCdakxFSIYbsxrMFuSUWUanHf/RQHVMVBJ67Y=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ACY99rcK0DuGRZdtniydEASmz/sbtD0XRaQPdoI39jrPhAM2ZHnX0YgyFEO77oZ+i
-	 GTh3HXD9PejDK1ZBVZhKboApxIvqKGEsQso/za2qSTnQpk+XrKNzcgb44TafePyK/d
-	 OVhObh5rH7A9P5P+9DD7CNq5Y+j2CB5vEtzVwEU0P6Dbkyuc7FBskZV6t7IVKrqh9L
-	 zSgx/YMVaJz7xV1qPQyrdqqpMWAejTj6+/+r2KTWFnYZxnu6HsmzxBBHKp1w+dVNCO
-	 eMTGKePFb9yzHDgnMfZH8OHbJJoyvbwjBSF3kOytWfyKDleWS2fANZWpxqmXq5nBG2
-	 IIPNnlTLbf0hA==
+	b=L9/vMZGVMRvIX5vSwF20iBu3E/4YII6Nlt3AevDzdXbQTZ3E2qT31LPhj78ipCK8q
+	 J0WKT5E9KxAiz4bFiA9Md5cHS6zXep6hRNTCE+DUlmQE56Eo6cZkryBcZz8kjquQZq
+	 OIwvecw8yXDh1mDEi0EUJw2lcka9VC5lcip6NFDQOQrb25xQksO+zbbpbnEVtoNQhM
+	 u9aMf/EGk2JEAeR/guAwA+lIMWGLpaYV1ijBH2VGaGjPSlfXOq61wLL0CTUfJ3Fw76
+	 3bjI2US53Tzv8FBlH655gW1K15rb3rmiCkoef9kJQpcpPX69PiG0VoiAC8ZonNz9Mf
+	 +pOucL4l+3MdQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tmykc-007rKs-AL;
+	id 1tmykc-007rKs-Fj;
 	Tue, 25 Feb 2025 17:29:46 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -57,9 +57,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Andre Przywara <andre.przywara@arm.com>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v4 13/16] KVM: arm64: nv: Propagate used_lrs between L1 and L0 contexts
-Date: Tue, 25 Feb 2025 17:29:27 +0000
-Message-Id: <20250225172930.1850838-14-maz@kernel.org>
+Subject: [PATCH v4 14/16] KVM: arm64: nv: Fold GICv3 host trapping requirements into guest setup
+Date: Tue, 25 Feb 2025 17:29:28 +0000
+Message-Id: <20250225172930.1850838-15-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250225172930.1850838-1-maz@kernel.org>
 References: <20250225172930.1850838-1-maz@kernel.org>
@@ -75,54 +75,76 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We have so far made sure that L1 and L0 vgic contexts were
-totally independent. There is however one spot of bother with
-this approach, and that's in the GICv3 emulation code required by
-our fruity friends.
+Popular HW that is able to use NV also has a broken vgic implementation
+that requires trapping.
 
-The issue is that the emulation code needs to know how many LRs
-are in flight. And while it is easy to reach the L0 version through
-the vcpu pointer, doing so for the L1 is much more complicated,
-as these structures are private to the nested code.
+On such HW, propagate the host trap bits into the guest's shadow
+ICH_HCR_EL2 register, making sure we don't allow an L2 guest to bring
+the system down.
 
-We could simply expose that structure and pick one or the other
-depending on the context, but this seems extra complexity for not
-much benefit.
-
-Instead, just propagate the number of used LRs from the nested code
-into the L0 context, and be done with it. Should this become a burden,
-it can be easily rectified.
+This involves a bit of tweaking so that the emulation code correctly
+poicks up the shadow state as needed, and to only partially sync
+ICH_HCR_EL2 back with the guest state to capture EOIcount.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-v3-nested.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ arch/arm64/kvm/vgic/vgic-v3-nested.c | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-index e72be14d99d55..643bd8a8e0669 100644
+index 643bd8a8e0669..5350a4650b7a5 100644
 --- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
 +++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-@@ -323,6 +323,12 @@ void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
- 	__vgic_v3_activate_traps(cpu_if);
+@@ -296,9 +296,19 @@ static void vgic_v3_create_shadow_state(struct kvm_vcpu *vcpu,
+ 					struct vgic_v3_cpu_if *s_cpu_if)
+ {
+ 	struct vgic_v3_cpu_if *host_if = &vcpu->arch.vgic_cpu.vgic_v3;
++	u64 val = 0;
+ 	int i;
  
- 	__vgic_v3_restore_state(cpu_if);
-+
+-	s_cpu_if->vgic_hcr = __vcpu_sys_reg(vcpu, ICH_HCR_EL2);
 +	/*
-+	 * Propagate the number of used LRs for the benefit of the HYP
-+	 * GICv3 emulation code. Yes, this is a pretty sorry hack.
++	 * If we're on a system with a broken vgic that requires
++	 * trapping, propagate the trapping requirements.
++	 *
++	 * Ah, the smell of rotten fruits...
 +	 */
-+	vcpu->arch.vgic_cpu.vgic_v3.used_lrs = cpu_if->used_lrs;
- }
++	if (static_branch_unlikely(&vgic_v3_cpuif_trap))
++		val = host_if->vgic_hcr & (ICH_HCR_EL2_TALL0 | ICH_HCR_EL2_TALL1 |
++					   ICH_HCR_EL2_TC | ICH_HCR_EL2_TDIR);
++	s_cpu_if->vgic_hcr = __vcpu_sys_reg(vcpu, ICH_HCR_EL2) | val;
+ 	s_cpu_if->vgic_vmcr = __vcpu_sys_reg(vcpu, ICH_VMCR_EL2);
+ 	s_cpu_if->vgic_sre = host_if->vgic_sre;
  
- void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
-@@ -358,6 +364,7 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
+@@ -335,6 +345,7 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
+ {
+ 	struct shadow_if *shadow_if = get_shadow_if();
+ 	struct vgic_v3_cpu_if *s_cpu_if = &shadow_if->cpuif;
++	u64 val;
+ 	int i;
+ 
+ 	__vgic_v3_save_vmcr_aprs(s_cpu_if);
+@@ -345,7 +356,10 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
+ 	 * Translate the shadow state HW fields back to the virtual ones
+ 	 * before copying the shadow struct back to the nested one.
+ 	 */
+-	__vcpu_sys_reg(vcpu, ICH_HCR_EL2) = s_cpu_if->vgic_hcr;
++	val = __vcpu_sys_reg(vcpu, ICH_HCR_EL2);
++	val &= ~ICH_HCR_EL2_EOIcount_MASK;
++	val |= (s_cpu_if->vgic_hcr & ICH_HCR_EL2_EOIcount_MASK);
++	__vcpu_sys_reg(vcpu, ICH_HCR_EL2) = val;
+ 	__vcpu_sys_reg(vcpu, ICH_VMCR_EL2) = s_cpu_if->vgic_vmcr;
+ 
+ 	for (i = 0; i < 4; i++) {
+@@ -354,7 +368,7 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
  	}
  
- 	shadow_if->lr_map = 0;
-+	vcpu->arch.vgic_cpu.vgic_v3.used_lrs = 0;
- }
+ 	for_each_set_bit(i, &shadow_if->lr_map, kvm_vgic_global_state.nr_lr) {
+-		u64 val = __vcpu_sys_reg(vcpu, ICH_LRN(i));
++		val = __vcpu_sys_reg(vcpu, ICH_LRN(i));
  
- /*
+ 		val &= ~ICH_LR_STATE;
+ 		val |= s_cpu_if->vgic_lr[i] & ICH_LR_STATE;
 -- 
 2.39.2
 
