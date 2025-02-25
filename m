@@ -1,97 +1,112 @@
-Return-Path: <kvm+bounces-39161-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39162-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA6C7A44972
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 19:06:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5D01A449C3
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 19:11:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B1B13B5F65
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 17:59:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65B863ADEF0
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 18:05:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA142156F3A;
-	Tue, 25 Feb 2025 17:59:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B35220CCFD;
+	Tue, 25 Feb 2025 18:03:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HTqETPDh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gVmnxV6o"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3C3F19EED7;
-	Tue, 25 Feb 2025 17:59:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7744A15445D;
+	Tue, 25 Feb 2025 18:03:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740506364; cv=none; b=U1WDZNmbdU1PISSqOdCYo/+nEDr9bs5s6Tc+A6UIEGzz++KiksJjh+m8plSRFGGeqBBNc0GCvj8+6V5GdSap0H/S7EmFDyM+Et0CX0Vupp+7OuCY1dky5rcwNYQzip1y16ioX2wgUm3ZAvtWTZIyNTODQmxGictbLp88GGhrvy8=
+	t=1740506610; cv=none; b=qh447+iMZhDHmNpTqYZ/UlC7DTg15GO4WRMevk59h1h2kdwmc2yXE/33j1BLvIO2tV45u2WENNj+JYHgjq7MsNJCvalXYNvEMZEks8Cwv9BM1UmrSEGL9Jt5OPhMSlctFCewoYf/zv+t4s0W2zy4RHTgJqL5QQqYGc8hO8auaWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740506364; c=relaxed/simple;
-	bh=Bc9bNYPj8tmaG3ScZCQNJLwNiDFq9wrrnUMkVEcbyBA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=QHwgc+B4KEshR+XTlyzRIWJhthXrzTNh9HImDZpLWxQHFEsV87kB7WGqym6cE2MYqgMOAfKW1izCucqfh9gmeZk+XnRPKnnCvmC2p93G4hxa1mjcjkGDetTZWilmG8kGELZQPtvPh4nxV815Qg2L7YQry9ItBZRSRLXrz/uiPqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HTqETPDh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EC32C4CEE2;
-	Tue, 25 Feb 2025 17:59:23 +0000 (UTC)
+	s=arc-20240116; t=1740506610; c=relaxed/simple;
+	bh=DCOUoVzVNSydpQ/dS03bguPxoI1g9gTndpvRpxQgL5U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=srth9ON8cS7uxndXqUHBDmn9wpykmuZ+mn7qV5y1maA+YtJAU7Mx5QyF9K42QD+sYLEzHKYXXrKvvBHfDdlWluSJXAAjFEUWGE4kfCHe+cmYGfhPAAriq6CXlhiglvjXI6Kyz3mZz7vnDLrb/bQAo2hyrHwRrDrs4TgY5lwEF94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gVmnxV6o; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 989D2C4CEDD;
+	Tue, 25 Feb 2025 18:03:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740506363;
-	bh=Bc9bNYPj8tmaG3ScZCQNJLwNiDFq9wrrnUMkVEcbyBA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=HTqETPDh780yct8+L4Jr9YB0BctNv2+9RaZJ1m6+daz+h7ikUGJq9j093GA8952MX
-	 X5krnLjgfOE3VpTBXNAXXUu54EncW5ne5cm+1Dy3BchNW8pjjZUv9EoZ+ZalqpUfXU
-	 VQL6JSGBxOyJFLP0RYy8HlyzT83y9jvEQNJ8zNpcOSx+sssTGNkdtnCd9ytjxlKqf0
-	 uineQFgV3CDt+inex/zq3rNz/Qr5DZ3smd0hRsYXVKxCPJUuN01vx3a5dQkxYqJZpU
-	 LQRZxA3TzeWkKNAtt1On/qrzolgSotaAgfn5fi31AuVX6rhw31UgtKKkC9DL4lShza
-	 /DNJb+6pS7qWQ==
-Date: Tue, 25 Feb 2025 11:59:21 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, Precific <precification@posteo.de>,
-	Athul Krishna <athul.krishna.kr@protonmail.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	Linux PCI <linux-pci@vger.kernel.org>,
-	"regressions@lists.linux.dev" <regressions@lists.linux.dev>
-Subject: Re: [bugzilla-daemon@kernel.org: [Bug 219619] New: vfio-pci: screen
- graphics artifacts after 6.12 kernel upgrade]
-Message-ID: <20250225175921.GA511617@bhelgaas>
+	s=k20201202; t=1740506610;
+	bh=DCOUoVzVNSydpQ/dS03bguPxoI1g9gTndpvRpxQgL5U=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=gVmnxV6oNNkD0+ncPquUaGL++hfjCkZTHvhFuvpdtUabzc6pemipfQ4iZYzu83xon
+	 pRwkkf5xh/DVcSTsBOX65vog+SrmsoUmcy6ISp3y3vPCDVurmE28vRuAbOA/+Ya32A
+	 JKlciHKttoak86VlLAj2HyuQbfVQNMDQmXlqq6l7ILI7CC/yt2TIsGXOa7JBex7k9t
+	 65QZV1j/M3zjdFuI0UtXgEQwMl9DrT46m6rptwZ/UblGoodb8aOozG/rzaulK2Gabh
+	 4Pk7Gy6R/BzrOashE02ihMAjxNzjWR1VF0rYixW9TLQ5/hZRNb8Zwm8AQ0/nOtbqBq
+	 3Lfft0A1FtP7A==
+Message-ID: <a003b144-0abf-4274-abff-a6e391a3e20b@kernel.org>
+Date: Tue, 25 Feb 2025 11:03:27 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250102113832.4d5c101a.alex.williamson@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 3/9] net: devmem: Implement TX path
+Content-Language: en-US
+To: Mina Almasry <almasrymina@google.com>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, virtualization@lists.linux.dev,
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Jeroen de Borst <jeroendb@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn
+ <willemb@google.com>, Neal Cardwell <ncardwell@google.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin"
+ <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Shuah Khan <shuah@kernel.org>, sdf@fomichev.me,
+ asml.silence@gmail.com, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Victor Nogueira <victor@mojatatu.com>, Pedro Tammela
+ <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>,
+ Kaiyuan Zhang <kaiyuanz@google.com>
+References: <20250222191517.743530-1-almasrymina@google.com>
+ <20250222191517.743530-4-almasrymina@google.com>
+ <a814c41a-40f9-4632-a5bb-ad3da5911fb6@redhat.com>
+ <CAHS8izNfNJLrMtdR0je3DsXDAvP2Hs8HfKf5Jq7_kQJsVUbrzg@mail.gmail.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <CAHS8izNfNJLrMtdR0je3DsXDAvP2Hs8HfKf5Jq7_kQJsVUbrzg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 02, 2025 at 11:38:32AM -0700, Alex Williamson wrote:
-> On Thu, 2 Jan 2025 10:04:02 -0700
-> Alex Williamson <alex.williamson@redhat.com> wrote:
+On 2/25/25 10:41 AM, Mina Almasry wrote:
+> On Tue, Feb 25, 2025 at 5:04 AM Paolo Abeni <pabeni@redhat.com> wrote:
+>>
+>> On 2/22/25 8:15 PM, Mina Almasry wrote:
+>> [...]
+>>> @@ -119,6 +122,13 @@ void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *binding)
+>>>       unsigned long xa_idx;
+>>>       unsigned int rxq_idx;
+>>>
+>>> +     xa_erase(&net_devmem_dmabuf_bindings, binding->id);
+>>> +
+>>> +     /* Ensure no tx net_devmem_lookup_dmabuf() are in flight after the
+>>> +      * erase.
+>>> +      */
+>>> +     synchronize_net();
+>>
+>> Is the above statement always true? can the dmabuf being stuck in some
+>> qdisc? or even some local socket due to redirect?
+>>
 > 
-> > On Thu, 2 Jan 2025 11:39:23 -0500
-> > Peter Xu <peterx@redhat.com> wrote:
-> > > OTOH, a pure question here is whether we should check pfn+pgoff instead of
-> > > pgoff alone.  I have no idea how firmware would allocate BAR resources,
-> > > especially on start address alignments.  I assume that needs to be somehow
-> > > relevant to the max size of the bar, probably the start address should
-> > > always be aligned to that max bar size?  If so, there should have no
-> > > functional difference checking either pfn+pgoff or pgoff.  It could be a
-> > > matter of readability in that case, saying that the limitation is about pfn
-> > > (of pgtable) rather than directly relevant to the offset of the bar.  
-> > 
-> > Yes, I'm working on the proper patch now that we have a root cause and
-> > I'm changing this to test alignment of pfn+pgoff.  The PCI BARs
-> > themselves are required to have natural alignment, but the vma mapping
-> > the BAR could be at an offset from the base of the BAR, which is
-> > accounted for in our local vma_to_pfn() function.  So I agree that
-> > pfn+pgoff is the more complete fix, which I'll post soon, and hope that
-> > Precific can re-verify the fix.  Thanks,
-> 
-> The proposed fix is now posted here:
-> 
-> https://lore.kernel.org/all/20250102183416.1841878-1-alex.williamson@redhat.com
-> 
-> Please reply there with Tested-by and Reviewed-by as available.  Thanks,
+> Yes, we could have have netmems in the TX path in the qdisc or waiting
+> for retransmits that still have references to the dmabuf, and that's
+> fine here I think.
 
-#regzbot fix: 09dfc8a5f2ce ("vfio/pci: Fallback huge faults for unaligned pfn")
+skbs with references to netmem from a dmabuf can get stuck in retransmit
+queues for a long time. The comment should at least acknowledge that.
 
-09dfc8a5f2ce appeared in v6.13-rc7.
+
 
