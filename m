@@ -1,104 +1,127 @@
-Return-Path: <kvm+bounces-39171-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39172-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0760A44BD5
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 20:51:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E574CA44C1C
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 21:13:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4F5A19E07C4
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 19:50:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 284EA177740
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 20:12:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39C4E1DFD96;
-	Tue, 25 Feb 2025 19:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A27E820E71E;
+	Tue, 25 Feb 2025 20:12:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xx4qPyv7"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ch7kuwyJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE2E20D517
-	for <kvm@vger.kernel.org>; Tue, 25 Feb 2025 19:50:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 432FE20DD79;
+	Tue, 25 Feb 2025 20:12:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740513032; cv=none; b=AZFpTvU2Kuvtdiv5CLJ4D/AmJFrNry+6BTGEZPzkobSOJnW+Jxqah74Las/+y2LX93qYerFwVETXqqvmIzdR/ujxOcmO1mCe+rg8eEKFnkIuZwZ7NNWyi5t4eS5bIS2CEx6ujK9NafKV2u/M6fBILydJUKEFOnNiXCLcTFo0F4U=
+	t=1740514337; cv=none; b=E3Pv9++9TXTfwP4+1gHlmMrCGfByZTLMekH+tPJoco7wJRGNSG5nOfB2xkF2PUfOoybG39QDRNhHi03pjALfV7ALrr90DSMpBI29YWEgOstdOu/C7EeV+DqAfvmqh7m7IjjQrqAq+rULFvk9GK+FYFGajpUlhlAtz+vvVbt3/0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740513032; c=relaxed/simple;
-	bh=1Zy2XDxcWg+1LkmYMbs1r3piUQe9Sjreh7wFFivRA54=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=jYVu7qGyp6/xKMuGUKSAAQ+r9iy41Hlr2yX9JLf6RPKetEd3CrPuoq+PCP14NNCYv+oyuN/fI90Rg/YrfgC085jDWBui+0LUIG46ewF7rkjoCEZUlI7ISOwNTygYCWe1j9QkWPJgNZJZ4iHhReEPoptr2Dc2F6zLBpcaqfRbggA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xx4qPyv7; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fc2fee4425so19910935a91.0
-        for <kvm@vger.kernel.org>; Tue, 25 Feb 2025 11:50:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740513030; x=1741117830; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=a6Et9fr82xY+XYRvIYbqLbXzncb7Clblhbzo1eZXaAE=;
-        b=Xx4qPyv7S3IPT8sT48IvG07WH2dWb4yBzLVUdO6eQawYS4VlUN8EpVByzGvjO1cIsX
-         MwbYxCcFcTiAkgXaoWOcRUNKMwiEiqhdh5OhIS4XRVHFrQzZ2C59EKVsarsMY6etmrSf
-         cEdcaCv6z8EUSPbh9dCesZPUoYTkWQ2Jurq0NIBYznQDeETU/owdSdnlxsP5GNAh2fzk
-         HEU7hNq6RDCKoUycUeL6RO24LxghEZ7l9uCPvanDa+Pjbqn2wmpNX0/HpAu/GavSH+gr
-         EaokrFFrhXnDhC9g4aaTkjFY0bFTG6EZB5vOQ8NazAxLvLZvP02CVvs0u/79yygmBUnh
-         QXsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740513030; x=1741117830;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=a6Et9fr82xY+XYRvIYbqLbXzncb7Clblhbzo1eZXaAE=;
-        b=k0Gdq5fKN/PIBhlFQu2+LW43jI1aUsabHm/ySLyv6CVdQKAEsWQ0PHtQKu2BrRqzFQ
-         HGe6pKoZlW6FQdvrJAEWYmOdD8dycXNm24m77R06iwqDajUekyWaD6h2NI805C+4b/xt
-         wL8vo73/k3RFbSNJxoVyH1qWjpjuEOYqPVLgCJF3gTsGKeAaaSgbOUEt0kl5dxSmZCmC
-         G/JFrIF6DgSVu8BbFjx1gxi7kjf79QOH35L2cj0iy6083YtRKnfTMT74VN2F5yB3ez/4
-         qX6b02CexBRwLvKVNGadxYFsSnhVRtMrdkwXGbwNk66kycWQLhv3og3P48mVe9q2hSMh
-         9Zgg==
-X-Forwarded-Encrypted: i=1; AJvYcCUjwgGAWB/9m1i7I32wD79p9dyB7u2ren1uhNH77gPBDBjATApuOkN0xXt0hZCqgIqIMYQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLA/Sc6g4Nonh0c2XuTj5qu7/ybncBQJgMypgDoh4ovFabYRB3
-	+Hn/N8PfLb6Z1JsYYy1gj0f3hX2TuY7Wjo/30+XzecEiqu0rH09p4BVNkZ29RZq1T7dYpGGnuL0
-	kcg==
-X-Google-Smtp-Source: AGHT+IFG+wtu4XcbCmspoDw9L7aeoOS3H04Pvzf76WDj3NCQXzv9+gVkzgnl5jM4Kix+lDfLumAY6Da7HIU=
-X-Received: from pjbqn6.prod.google.com ([2002:a17:90b:3d46:b0:2fc:201d:6026])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:548c:b0:2ee:6d04:9dac
- with SMTP id 98e67ed59e1d1-2fe7e3b3228mr829766a91.32.1740513030464; Tue, 25
- Feb 2025 11:50:30 -0800 (PST)
-Date: Tue, 25 Feb 2025 11:50:29 -0800
-In-Reply-To: <20250219220826.2453186-6-yosry.ahmed@linux.dev>
+	s=arc-20240116; t=1740514337; c=relaxed/simple;
+	bh=lqRgiM8UKKa/qnLQeupFH5hkkFUg2xcJa1AOOU+0YZk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PXCDBtqQcyHVOFWXoXQ9G+u1y3g5SCJhxlUNViZcp+6+kmzja7pEwcxd4MgceanaNefmrbTz74Fsgo2/aEEqGBxQkjN/HRqfmPovVbl6ALLI2ASowRAm1+J7NrIEMrk3UIWfn7fmQIcxo6Zwabx6EYJClgkSDUqKKsHMW2VIBF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ch7kuwyJ; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51PDjZ29022645;
+	Tue, 25 Feb 2025 20:12:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=LREirHOGGUHKPFwpdp5anEmPVt2NwJOT7yIWk7g11
+	FY=; b=ch7kuwyJtirBH1TFXypnApPjEl9lSelj/oMJEvYCl7L6H7py4zLqEKcKr
+	h7P49SebqsAvy8t0LUmo0lvQNCXEQrQQdrjg4i2RxQPnBK+kNgdBtYEsxrhylhS0
+	zEGMM3iNjdKfE89wOMjz4z7esMHIZIsNIq2It/XSVwfEtH4WPK7VQGtM9gLwGlWY
+	p1xAlB7e0jP7p2EkyKnQA3F7qDBk48cY8eDdUfBRIv0ehFBgXOsGZ+wk3dkHv9Nx
+	E2GyuiWJrvLa1uAN4fAv8KP3lTXW1wAiTISc5iVf/qT7/ooBypWerziebAMfE3h0
+	lutL6PMioRs1qZL7YsHBbGUdlmWiQ==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4511wadnub-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 25 Feb 2025 20:12:12 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51PIjngd027333;
+	Tue, 25 Feb 2025 20:12:11 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 44yum1xf2c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 25 Feb 2025 20:12:11 +0000
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51PKC9HV21758670
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 25 Feb 2025 20:12:10 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C368058052;
+	Tue, 25 Feb 2025 20:12:09 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F282358056;
+	Tue, 25 Feb 2025 20:12:08 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.61.252.67])
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 25 Feb 2025 20:12:08 +0000 (GMT)
+From: Rorie Reyes <rreyes@linux.ibm.com>
+To: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc: hca@linux.ibm.com, borntraeger@de.ibm.com, agordeev@linux.ibm.com,
+        gor@linux.ibm.com, pasic@linux.ibm.com, jjherne@linux.ibm.com,
+        alex.williamson@redhat.com, akrowiak@linux.ibm.com,
+        rreyes@linux.ibm.com
+Subject: [RFC PATCH v2 0/2] Eventfd signal on guest AP configuration change
+Date: Tue, 25 Feb 2025 15:12:06 -0500
+Message-ID: <20250225201208.45998-1-rreyes@linux.ibm.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250219220826.2453186-1-yosry.ahmed@linux.dev> <20250219220826.2453186-6-yosry.ahmed@linux.dev>
-Message-ID: <Z74fBQLeXxuiBC-U@google.com>
-Subject: Re: [PATCH 5/6] KVM: nVMX: Always use IBPB to properly virtualize IBRS
-From: Sean Christopherson <seanjc@google.com>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	"H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Josh Poimboeuf <jpoimboe@kernel.org>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
-	Andy Lutomirski <luto@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: QA3rBfCXyNOsWXfF6j-mMiWX2Lt0kuVE
+X-Proofpoint-ORIG-GUID: QA3rBfCXyNOsWXfF6j-mMiWX2Lt0kuVE
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-25_06,2025-02-25_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=730 mlxscore=0
+ malwarescore=0 spamscore=0 impostorscore=0 lowpriorityscore=0
+ priorityscore=1501 bulkscore=0 suspectscore=0 phishscore=0 clxscore=1015
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502100000 definitions=main-2502250120
 
-On Wed, Feb 19, 2025, Yosry Ahmed wrote:
-> On synthesized nested VM-exits in VMX, an IBPB is performed if IBRS is
-> advertised to the guest to properly provide separate prediction domains
-> for L1 and L2. However, this is currently conditional on
-> X86_FEATURE_USE_IBPB, which depends on the host spectre_v2_user
-> mitigation.
-> 
-> In short, if spectre_v2_user=no, IBRS is not virtualized correctly and
-> L1 becomes suspectible to attacks from L2. Fix this by performing the
-> IBPB regardless of X86_FEATURE_USE_IBPB.
-> 
-> Fixes: 2e7eab81425a ("KVM: VMX: Execute IBPB on emulated VM-exit when guest has IBRS")
-> Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
-> ---
+Changelog:
 
-Acked-by: Sean Christopherson <seanjc@google.com>
+v2:
+- Fixing remove notification for AP configuration
+
+--------------------------------------------------------------------------
+
+The purpose of this patch is to provide immediate notification of changes
+made to a guest's AP configuration by the vfio_ap driver. This will enable
+the guest to take immediate action rather than relying on polling or some
+other inefficient mechanism to detect changes to its AP configuration.
+
+Note that there are corresponding QEMU patches that will be shipped along
+with this patch (see vfio-ap: Report vfio-ap configuration changes) that
+will pick up the eventfd signal.
+
+Rorie Reyes (2):
+  s390/vfio-ap: Signal eventfd when guest AP configuration is changed
+  s390/vfio-ap: Fixing mdev remove notification
+
+ drivers/s390/crypto/vfio_ap_ops.c     | 65 ++++++++++++++++++++++++++-
+ drivers/s390/crypto/vfio_ap_private.h |  2 +
+ include/uapi/linux/vfio.h             |  1 +
+ 3 files changed, 67 insertions(+), 1 deletion(-)
+
+-- 
+2.39.5 (Apple Git-154)
+
 
