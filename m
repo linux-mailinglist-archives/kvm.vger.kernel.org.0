@@ -1,271 +1,215 @@
-Return-Path: <kvm+bounces-39074-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39075-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0123A4320B
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 01:47:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 343B8A4321F
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 01:54:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 921B417B9A8
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 00:47:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B38AF189EC7F
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 00:54:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC6214C76;
-	Tue, 25 Feb 2025 00:47:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FF7617BBF;
+	Tue, 25 Feb 2025 00:54:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="z5IXbhf/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jJwD2Cd1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4754411713
-	for <kvm@vger.kernel.org>; Tue, 25 Feb 2025 00:47:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A813171CD
+	for <kvm@vger.kernel.org>; Tue, 25 Feb 2025 00:54:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740444443; cv=none; b=NvW594yknRAsXBPWXMRtM67aWzFzRBWiuIaBn2WGs5Co54h08j3QjKvwVkHwf2PYOOkM8fG6vRWgOtLgT9ehLPqSct0qVsuUqMHBc0UH55UqZ2L9HMMmjKaE9O/32Na0rPekrsYJmKEFRcvXbLhG98WgXgAoLeqnB413WPt6Be8=
+	t=1740444851; cv=none; b=s3xe98r3oEjnX/V4MiCkl1sDJImPtbwublE6Le7qMmdvY0AJ63IjEVxN4zKVXGdTf/RopEQ18HdEA9JrZLqchUA3EBYbNhEqTzj0c4hBZelN0d2rIQZWcAUhcT5kmAw8eoQGRUL6bB2gbK4zfc0epOX1ASY8x41YF1adXpFZR9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740444443; c=relaxed/simple;
-	bh=9VyoE5rqBPdWDwAYMqaw+sWflGZ3yC3uju/Z14kM9NY=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Bx1mD9qvGUsdMrfSs+liniPHtbV/y9MBPxZZPRAIorpZl9pTVLMWOJnxXvNbUIGpQ9+U/Dj7bxjxgyB6hH1bjjynNrHqMRq2M+Jc5VojZg+5R+Umm97HzqTw0i/xjl404gMXH1/k7FAtwN5UiwqMjUCnu9uVggZJ1nUxTY2BmqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=z5IXbhf/; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1740444851; c=relaxed/simple;
+	bh=eSNE9SpqsMKJGUnfQSYvUpz0ITo6/+EEEAk6+jIriYs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=NnWrMDxCUSeiNlWuoJDyJtwWkPRJ8T4p6UUlsjzMovvPiWorH07B1pUUyboZbxlMrpd6SfqZXGWCtyHbJL4KYnjxSYiGLU6L0HviZqqZO+WUR8f1PvSzrAV5bB55UUUx1liXpZW1OkDJMSQWM/1biDV9gFuFQ5sLzNq0V4x2Ng8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jJwD2Cd1; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fc46431885so16640467a91.2
-        for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 16:47:21 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fc1c3b3dc7so9700675a91.2
+        for <kvm@vger.kernel.org>; Mon, 24 Feb 2025 16:54:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740444440; x=1741049240; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=LLn0ouDWavOo+k23cGEFyx3GWlevLRlbuFWAFagmycY=;
-        b=z5IXbhf/nQjcWLgu+y/jY0SxM9qVtFd/QPIZ7I+2c6dCzyx5LeUIDW9fLcjdV2O8HQ
-         17ue8TTUhwB/WQee/a2Ci0soVpS5z7ADu2tvOSaODb3cUnctylWZiVVEYbS1Mpe7dlkE
-         8fqRnZQPWgjQf7q9wTSJftzcfUUHewdIkOZmbFwuuHzhfwgmhgN+chutifBHHpkQVq6E
-         LUFG+pl1ENKaT2EaPcOZ7IRjULh3X45foarB8FBfuvp11Co67jUCVzeRXkxzZAjRBRdy
-         SpEa8o7SiBOPupUAeXHiFCaoHhW4MFIoY3KpD61Srv8sY3KdrKm5ULQM5O9jG6I1EIiz
-         y08A==
+        d=google.com; s=20230601; t=1740444849; x=1741049649; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WMj3ogmbSNHf4nwGWlr5jLmxfUU0ZTeLt3VrAyHhBlI=;
+        b=jJwD2Cd1QhpGtc2rCCYkWPnQ3dQH0wRLDlW5KsoHb7mrW5kEVf5or0+AUdLoN0jyIk
+         n9Q3qgww3I4y6fiFCY+K6Jt56RxretwcsfN2RJl52ZDuzhGu0Q0M2RvTv4pkFqNZp5jh
+         1Qi4kIPlcFjetMC1YsFEK0tC9975jN0KQaHUu9WYqhFJ6Z1MOnRg7bP/HtLE0Dc4f/wU
+         5u0PNTqgl4BfR736lWgY4rTvHjgjeb7L3rOORW+Zr3c+oHHf42FEl4PWFZbisN5q2VHw
+         ++PNKss75yN4CtJu1CHK7HFzr/Lxd4yWHOx3nxtzEYfwv7v/JQldTTop5RLfWbvUJn1i
+         xuSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740444440; x=1741049240;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LLn0ouDWavOo+k23cGEFyx3GWlevLRlbuFWAFagmycY=;
-        b=C3iWFLuVlRLji8WPo8m/PJX7OtFn8bytnRKJ7QqD3dGrjLuxRF0KXTWm/R3u+iSFly
-         GmrZAzJegDZYnxRPiXbqpn8kVWSuLpAzyp+ZUR8iiASDvrm0IQ+HqXSWX7k+0LMW1Tu5
-         BxGDE29fsNtxgCPPOxOJhTWO4LtuCecfypcj6sf4kKRG/XBjwKd2UO+c6TTFFedanb7h
-         pnGbV8UqrbGk84J46crlayBSYTEV17vHGDzaXDZ0BKHJUWIfWJ0YisfCm+hTg6XrwoMm
-         o+uuDuzJdH5Rr50RW53zfn7zSGj+413vG8vODIQ4jU6zE+G2BlRNpuJDN/Wb+VcdHqX+
-         ka0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVE2i4BPpNC9AiHIoCSeKJbxTTHfvMRgUsfirfJF00jG0Yn/f/9yIxKOy3bIDxwi5cj7hc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7MDg1E1Eu3pkt6efKAVBQnhRpAGR68oXx+k8uutpm+t6wwcg8
-	/cs6V9UvU3fX1+mgFxtL7ukeRQGb/q3jgzug9xX25YypL/lk48e+YuvhQczGibiQxzMBQ/fVfC1
-	oTHaZ2ws3gg==
-X-Google-Smtp-Source: AGHT+IGjTB7OqTkNMNzcfyv0LdWUXTWhbdIyRa+cJKyKRwTrcEIT6xduBck8PQaOscdeB6AJZA6OXuOCQQ8MTQ==
-X-Received: from pjbqx15.prod.google.com ([2002:a17:90b:3e4f:b0:2fc:3022:36b8])
- (user=jmattson job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:3b83:b0:2f6:d266:f45c with SMTP id 98e67ed59e1d1-2fce868c637mr26094804a91.2.1740444440607;
- Mon, 24 Feb 2025 16:47:20 -0800 (PST)
-Date: Mon, 24 Feb 2025 16:45:45 -0800
+        d=1e100.net; s=20230601; t=1740444849; x=1741049649;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WMj3ogmbSNHf4nwGWlr5jLmxfUU0ZTeLt3VrAyHhBlI=;
+        b=oCj9708/p/BD1P2RWp92fuI4SzyFbsdwTSrQ6zt6izHjdj+vFVw2LHx7r707aMSNdd
+         AHz5u5bZRJK7254pVNXozQ5rX4znqQhB9q6O+AiPoS+L2b2pkLWfW50cG2zFy377ZVnz
+         9c7byLquWdXns6L1Ov2xQ9iNtEfjhr8KDTYR0d8lTCwzo6YBDeArHMrEYGKhpMGBX1oJ
+         hY3l10KsqROYW2r9SrdQqwauhtEF5scybFlIELs2OXzBTVWXQ8ShO/kwm9wjhrGom45l
+         d8WUKZ+JVPRaDsNEp4ktxnkU7YAJ/iUPka0leN5ORzton8dwIa92COrykxBIvidJLR1N
+         hF0g==
+X-Forwarded-Encrypted: i=1; AJvYcCXPyPk7eMjSy721LZUA41xCfKsZ3HIjY985aeib7Me36rb4FRqzRtVgR7c1Q32FysFV5YE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx659HCi9E4P+WvqVmyeb01CqzfdfQH5O8cIrS7ns8wi8XUTS6z
+	0LxC5rlr48MUPWOEN5go9u0t8gtajDbifsY5V3EkXrjI4rMVZRhTghtSh/amtvEHnUOEjTtPYWx
+	GmA==
+X-Google-Smtp-Source: AGHT+IFwU4tsgKfQpQ0F9TpDCTa6nuPqHf5O1NRFL7byHKxAWJgpMYV1Sek68AsT2p2rXJmmuIZbuGqbSY8=
+X-Received: from pjbsd8.prod.google.com ([2002:a17:90b:5148:b0:2ea:5613:4d5d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:528f:b0:2ee:741c:e9f4
+ with SMTP id 98e67ed59e1d1-2fce78ab918mr27279855a91.11.1740444849479; Mon, 24
+ Feb 2025 16:54:09 -0800 (PST)
+Date: Mon, 24 Feb 2025 16:54:08 -0800
+In-Reply-To: <f9050ee1-3f82-7ae0-68b0-eccae6059fde@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.48.1.658.g4767266eb4-goog
-Message-ID: <20250225004708.1001320-1-jmattson@google.com>
-Subject: [PATCH] KVM: x86: Provide a capability to disable APERF/MPERF read intercepts
-From: Jim Mattson <jmattson@google.com>
-To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20250219012705.1495231-1-seanjc@google.com> <20250219012705.1495231-4-seanjc@google.com>
+ <4e762d94-97d4-2822-4935-2f5ab409ab29@amd.com> <Z7z43JVe2C4a7ElJ@google.com> <f9050ee1-3f82-7ae0-68b0-eccae6059fde@amd.com>
+Message-ID: <Z70UsI0kgcZu844d@google.com>
+Subject: Re: [PATCH 03/10] KVM: SVM: Terminate the VM if a SEV-ES+ guest is
+ run with an invalid VMSA
+From: Sean Christopherson <seanjc@google.com>
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Naveen N Rao <naveen@kernel.org>, Kim Phillips <kim.phillips@amd.com>, 
+	Alexey Kardashevskiy <aik@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Allow a guest to read the physical IA32_APERF and IA32_MPERF MSRs
-without interception.
+On Mon, Feb 24, 2025, Tom Lendacky wrote:
+> On 2/24/25 16:55, Sean Christopherson wrote:
+> > On Mon, Feb 24, 2025, Tom Lendacky wrote:
+> >> On 2/18/25 19:26, Sean Christopherson wrote:
+> >>> -void pre_sev_run(struct vcpu_svm *svm, int cpu)
+> >>> +int pre_sev_run(struct vcpu_svm *svm, int cpu)
+> >>>  {
+> >>>  	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, cpu);
+> >>> -	unsigned int asid = sev_get_asid(svm->vcpu.kvm);
+> >>> +	struct kvm *kvm = svm->vcpu.kvm;
+> >>> +	unsigned int asid = sev_get_asid(kvm);
+> >>> +
+> >>> +	/*
+> >>> +	 * Terminate the VM if userspace attempts to run the vCPU with an
+> >>> +	 * invalid VMSA, e.g. if userspace forces the vCPU to be RUNNABLE after
+> >>> +	 * an SNP AP Destroy event.
+> >>> +	 */
+> >>> +	if (sev_es_guest(kvm) && !VALID_PAGE(svm->vmcb->control.vmsa_pa)) {
+> >>> +		kvm_vm_dead(kvm);
+> >>> +		return -EIO;
+> >>> +	}
+> >>
+> >> If a VMRUN is performed with the vmsa_pa value set to INVALID_PAGE, the
+> >> VMRUN will fail and KVM will dump the VMCB and exit back to userspace
+> > 
+> > I haven't tested, but based on what the APM says, I'm pretty sure this would crash
+> > the host due to a #GP on VMRUN, i.e. due to the resulting kvm_spurious_fault().
+> > 
+> >   IF (rAX contains an unsupported physical address)
+> >     EXCEPTION [#GP]
+> 
+> Well that's for the VMCB, the VMSA is pointed to by the VMCB and results
+> in a VMEXIT code of -1 if you don't supply a proper page-aligned,
+> physical address.
 
-The IA32_APERF and IA32_MPERF MSRs are not virtualized. Writes are not
-handled at all. The MSR values are not zeroed on vCPU creation, saved
-on suspend, or restored on resume. No accommodation is made for
-processor migration or for sharing a logical processor with other
-tasks. No adjustments are made for non-unit TSC multipliers. The MSRs
-do not account for time the same way as the comparable PMU events,
-whether the PMU is virtualized by the traditional emulation method or
-the new mediated pass-through approach.
+Ah, good to know (and somewhat of a relief :-) ).
 
-Nonetheless, in a properly constrained environment, this capability
-can be combined with a guest CPUID table that advertises support for
-CPUID.6:ECX.APERFMPERF[bit 0] to induce a Linux guest to report the
-effective physical CPU frequency in /proc/cpuinfo. Moreover, there is
-no performance cost for this capability.
+> >>>  static void svm_inject_nmi(struct kvm_vcpu *vcpu)
+> >>> @@ -4231,7 +4233,8 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu,
+> >>>  	if (force_immediate_exit)
+> >>>  		smp_send_reschedule(vcpu->cpu);
+> >>>  
+> >>> -	pre_svm_run(vcpu);
+> >>> +	if (pre_svm_run(vcpu))
+> >>> +		return EXIT_FASTPATH_EXIT_USERSPACE;
+> 
+> In testing this out, I think userspace continues on because I eventually
+> get:
+> 
+> KVM_GET_PIT2 failed: Input/output error
+> /tmp/cmdline.98112: line 1: 98163 Aborted (core dumped) ...
+> 
+> Haven't looked too close, but maybe an exit_reason needs to be set to
+> get qemu to quit sooner?
 
-Signed-off-by: Jim Mattson <jmattson@google.com>
----
- Documentation/virt/kvm/api.rst  | 1 +
- arch/x86/include/asm/kvm_host.h | 1 +
- arch/x86/kvm/svm/svm.c          | 7 +++++++
- arch/x86/kvm/svm/svm.h          | 2 +-
- arch/x86/kvm/vmx/vmx.c          | 4 ++++
- arch/x86/kvm/x86.c              | 7 +++++--
- arch/x86/kvm/x86.h              | 5 +++++
- include/uapi/linux/kvm.h        | 1 +
- tools/include/uapi/linux/kvm.h  | 4 +++-
- 9 files changed, 28 insertions(+), 4 deletions(-)
+Oh, the irony.  In trying to do the right thing (exit to userspace), I managed to
+do the wrong thing.
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 2b52eb77e29c..6431cd33f06a 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -7684,6 +7684,7 @@ Valid bits in args[0] are::
-   #define KVM_X86_DISABLE_EXITS_HLT              (1 << 1)
-   #define KVM_X86_DISABLE_EXITS_PAUSE            (1 << 2)
-   #define KVM_X86_DISABLE_EXITS_CSTATE           (1 << 3)
-+  #define KVM_X86_DISABLE_EXITS_APERFMPERF       (1 << 4)
- 
- Enabling this capability on a VM provides userspace with a way to no
- longer intercept some instructions for improved latency in some
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 0b7af5902ff7..53de91fccc20 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1380,6 +1380,7 @@ struct kvm_arch {
- 	bool hlt_in_guest;
- 	bool pause_in_guest;
- 	bool cstate_in_guest;
-+	bool aperfmperf_in_guest;
- 
- 	unsigned long irq_sources_bitmap;
- 	s64 kvmclock_offset;
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index a713c803a3a3..5ebcbff341bc 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -111,6 +111,8 @@ static const struct svm_direct_access_msrs {
- 	{ .index = MSR_IA32_CR_PAT,			.always = false },
- 	{ .index = MSR_AMD64_SEV_ES_GHCB,		.always = true  },
- 	{ .index = MSR_TSC_AUX,				.always = false },
-+	{ .index = MSR_IA32_APERF,			.always = false },
-+	{ .index = MSR_IA32_MPERF,			.always = false },
- 	{ .index = X2APIC_MSR(APIC_ID),			.always = false },
- 	{ .index = X2APIC_MSR(APIC_LVR),		.always = false },
- 	{ .index = X2APIC_MSR(APIC_TASKPRI),		.always = false },
-@@ -1359,6 +1361,11 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
- 	if (boot_cpu_has(X86_FEATURE_V_SPEC_CTRL))
- 		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_SPEC_CTRL, 1, 1);
- 
-+	if (kvm_aperfmperf_in_guest(vcpu->kvm)) {
-+		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_APERF, 1, 0);
-+		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_MPERF, 1, 0);
-+	}
-+
- 	if (kvm_vcpu_apicv_active(vcpu))
- 		avic_init_vmcb(svm, vmcb);
- 
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 9d7cdb8fbf87..3ee2b7e07395 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -44,7 +44,7 @@ static inline struct page *__sme_pa_to_page(unsigned long pa)
- #define	IOPM_SIZE PAGE_SIZE * 3
- #define	MSRPM_SIZE PAGE_SIZE * 2
- 
--#define MAX_DIRECT_ACCESS_MSRS	48
-+#define MAX_DIRECT_ACCESS_MSRS	50
- #define MSRPM_OFFSETS	32
- extern u32 msrpm_offsets[MSRPM_OFFSETS] __read_mostly;
- extern bool npt_enabled;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 6c56d5235f0f..88a555328932 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7597,6 +7597,10 @@ int vmx_vcpu_create(struct kvm_vcpu *vcpu)
- 		vmx_disable_intercept_for_msr(vcpu, MSR_CORE_C6_RESIDENCY, MSR_TYPE_R);
- 		vmx_disable_intercept_for_msr(vcpu, MSR_CORE_C7_RESIDENCY, MSR_TYPE_R);
- 	}
-+	if (kvm_aperfmperf_in_guest(vcpu->kvm)) {
-+		vmx_disable_intercept_for_msr(vcpu, MSR_IA32_APERF, MSR_TYPE_R);
-+		vmx_disable_intercept_for_msr(vcpu, MSR_IA32_MPERF, MSR_TYPE_R);
-+	}
- 
- 	vmx->loaded_vmcs = &vmx->vmcs01;
- 
+If KVM tried to re-enter the guest, vcpu_enter_guest() would have encountered
+the KVM_REQ_DEAD and exited with -EIO.
+
+		if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu)) {
+			r = -EIO;
+			goto out;
+		}
+
+By returning EXIT_FASTPATH_EXIT_USERSPACE, KVM exited to userspace more directly
+and returned '0' instead of -EIO.
+
+Getting KVM to return -EIO is easy, but doing so feels wrong, especially if we
+take the quick-and-dirty route like so:
+
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 02159c967d29..98f3df24ac9a 100644
+index 454fd6b8f3db..9c8b400e04f2 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -4533,7 +4533,7 @@ static inline bool kvm_can_mwait_in_guest(void)
+@@ -11102,7 +11102,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+                kvm_lapic_sync_from_vapic(vcpu);
  
- static u64 kvm_get_allowed_disable_exits(void)
- {
--	u64 r = KVM_X86_DISABLE_EXITS_PAUSE;
-+	u64 r = KVM_X86_DISABLE_EXITS_PAUSE | KVM_X86_DISABLE_EXITS_APERFMPERF;
+        if (unlikely(exit_fastpath == EXIT_FASTPATH_EXIT_USERSPACE))
+-               return 0;
++               return kvm_test_request(KVM_REQ_VM_DEAD, vcpu) ? -EIO : 0;
  
- 	if (!mitigate_smt_rsb) {
- 		r |= KVM_X86_DISABLE_EXITS_HLT |
-@@ -6543,7 +6543,8 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 
- 		if (!mitigate_smt_rsb && boot_cpu_has_bug(X86_BUG_SMT_RSB) &&
- 		    cpu_smt_possible() &&
--		    (cap->args[0] & ~KVM_X86_DISABLE_EXITS_PAUSE))
-+		    (cap->args[0] & ~(KVM_X86_DISABLE_EXITS_PAUSE |
-+				      KVM_X86_DISABLE_EXITS_APERFMPERF)))
- 			pr_warn_once(SMT_RSB_MSG);
- 
- 		if (cap->args[0] & KVM_X86_DISABLE_EXITS_PAUSE)
-@@ -6554,6 +6555,8 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 			kvm->arch.hlt_in_guest = true;
- 		if (cap->args[0] & KVM_X86_DISABLE_EXITS_CSTATE)
- 			kvm->arch.cstate_in_guest = true;
-+		if (cap->args[0] & KVM_X86_DISABLE_EXITS_APERFMPERF)
-+			kvm->arch.aperfmperf_in_guest = true;
- 		r = 0;
- disable_exits_unlock:
- 		mutex_unlock(&kvm->lock);
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 91e50a513100..0c3ac99454e5 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -488,6 +488,11 @@ static inline bool kvm_cstate_in_guest(struct kvm *kvm)
- 	return kvm->arch.cstate_in_guest;
- }
- 
-+static inline bool kvm_aperfmperf_in_guest(struct kvm *kvm)
-+{
-+	return kvm->arch.aperfmperf_in_guest;
-+}
-+
- static inline bool kvm_notify_vmexit_enabled(struct kvm *kvm)
- {
- 	return kvm->arch.notify_vmexit_flags & KVM_X86_NOTIFY_VMEXIT_ENABLED;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 45e6d8fca9b9..b4a4eb52f6df 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -617,6 +617,7 @@ struct kvm_ioeventfd {
- #define KVM_X86_DISABLE_EXITS_HLT            (1 << 1)
- #define KVM_X86_DISABLE_EXITS_PAUSE          (1 << 2)
- #define KVM_X86_DISABLE_EXITS_CSTATE         (1 << 3)
-+#define KVM_X86_DISABLE_EXITS_APERFMPERF     (1 << 4)
- 
- /* for KVM_ENABLE_CAP */
- struct kvm_enable_cap {
-diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-index 502ea63b5d2e..9b60f0509cdc 100644
---- a/tools/include/uapi/linux/kvm.h
-+++ b/tools/include/uapi/linux/kvm.h
-@@ -617,10 +617,12 @@ struct kvm_ioeventfd {
- #define KVM_X86_DISABLE_EXITS_HLT            (1 << 1)
- #define KVM_X86_DISABLE_EXITS_PAUSE          (1 << 2)
- #define KVM_X86_DISABLE_EXITS_CSTATE         (1 << 3)
-+#define KVM_X86_DISABLE_EXITS_APERFMPERF     (1 << 4)
- #define KVM_X86_DISABLE_VALID_EXITS          (KVM_X86_DISABLE_EXITS_MWAIT | \
-                                               KVM_X86_DISABLE_EXITS_HLT | \
-                                               KVM_X86_DISABLE_EXITS_PAUSE | \
--                                              KVM_X86_DISABLE_EXITS_CSTATE)
-+					      KVM_X86_DISABLE_EXITS_CSTATE | \
-+					      KVM_X86_DISABLE_EXITS_APERFMPERF)
- 
- /* for KVM_ENABLE_CAP */
- struct kvm_enable_cap {
--- 
-2.48.1.658.g4767266eb4-goog
+        r = kvm_x86_call(handle_exit)(vcpu, exit_fastpath);
+        return r;
 
+Given that, IIUC, KVM would eventually return KVM_EXIT_FAIL_ENTRY, I like your
+idea of returning meaningful information.  And unless I'm missing something, that
+would obviate any need to terminate the VM, which would address your earlier point
+of whether terminating the VM is truly better than returning than returning a
+familiar error code.
+
+So this? (completely untested)
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 7345cac6f93a..71b340cbe561 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -3463,10 +3463,8 @@ int pre_sev_run(struct vcpu_svm *svm, int cpu)
+         * invalid VMSA, e.g. if userspace forces the vCPU to be RUNNABLE after
+         * an SNP AP Destroy event.
+         */
+-       if (sev_es_guest(kvm) && !VALID_PAGE(svm->vmcb->control.vmsa_pa)) {
+-               kvm_vm_dead(kvm);
+-               return -EIO;
+-       }
++       if (sev_es_guest(kvm) && !VALID_PAGE(svm->vmcb->control.vmsa_pa))
++               return -EINVAL;
+ 
+        /* Assign the asid allocated with this SEV guest */
+        svm->asid = asid;
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 46e0b65a9fec..f72bcf2e590e 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4233,8 +4233,12 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu,
+        if (force_immediate_exit)
+                smp_send_reschedule(vcpu->cpu);
+ 
+-       if (pre_svm_run(vcpu))
++       if (pre_svm_run(vcpu)) {
++               vcpu->run->exit_reason = KVM_EXIT_FAIL_ENTRY;
++               vcpu->run->fail_entry.hardware_entry_failure_reason = SVM_EXIT_ERR;
++               vcpu->run->fail_entry.cpu = vcpu->cpu;
+                return EXIT_FASTPATH_EXIT_USERSPACE;
++       }
+ 
+        sync_lapic_to_cr8(vcpu);
 
