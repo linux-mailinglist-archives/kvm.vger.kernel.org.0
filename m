@@ -1,151 +1,274 @@
-Return-Path: <kvm+bounces-39125-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39126-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B76DA44541
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 17:01:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5064DA445CB
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 17:19:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12622862275
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 16:01:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70F31189AD78
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 16:17:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B869189F3F;
-	Tue, 25 Feb 2025 16:01:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08F8C195FE5;
+	Tue, 25 Feb 2025 16:16:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c/6l+hEt"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="PePPDQuD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A43170A37
-	for <kvm@vger.kernel.org>; Tue, 25 Feb 2025 16:01:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66ED8192D63;
+	Tue, 25 Feb 2025 16:16:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740499287; cv=none; b=UZ7CIXlCYl7jC9OJom2ywBMBWghSNrmVWpGlA3awyaPaPijOWcOIUZXNtq+lra2AjH5E3BOl1yW+8vT2slvBmh4crD3mIsJt0g7IHYd5fbOVhZEynLy50M0mkdYsFqAWPv6wXBIRkcR02M9HbwUE4/t2qO63xALN3cxwFhByU5M=
+	t=1740500197; cv=none; b=s/LAeEHDlcj7WKLHBkc3v7movkWnwUF+CaP2TAf/MwbDDHRwHUSkVddCUAD6NKv5nlZ6W1/4V4VtvEd0qxbousHrs95qah6eJEjM3EQwcHHmGK19uDUuK/j2/zVeCdYMebADhlT3X/s5Vlbqx0BPs/xZfdC4y2V87vmyGuGf25A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740499287; c=relaxed/simple;
-	bh=p7TD3Go22x7b2dc7NZP8nHVeDDYqMnRGFaDWmNw/XHs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WYdk1OrEm5lFYkXmYD0tYwnt9tgc4cO05hddKjadsR1v6BNScCuFuU9693YxaUdhxpazwv5pbhg/H7Aqvq2YxwzhtQHnC/hR0RK83EjVXeUVBlbCwPh5kLPuWdFfFJHGpINZkbtGFrUV68/dx0kulb305FKvca5TI/BhPh1HO64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c/6l+hEt; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-22109f29c99so115452615ad.1
-        for <kvm@vger.kernel.org>; Tue, 25 Feb 2025 08:01:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740499285; x=1741104085; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1LxD0tQorOHIkEX1Wne9NF5WWRrn54kUL0zS9HrlpVk=;
-        b=c/6l+hEtrexqRLjIibdArlV4tq23vAQDhIhQeB7fa1VY2FLyTIoxRHtg3TWcCAUqqz
-         WOJ1RC6hXflwL2AMaMui98Wih3LcqFQuCHT7NvwPjr/CE50BjeLyREcC3RzIysK6pfN4
-         91JIiEsDHgwOnG8/ahRKb+LXFpDBuZgFg9AzuTMgvbMUrGEk/jdvM5bKjRzqcXv+Gke0
-         ceINbRwG4y+bQ46ClVFzJqeNW8kc1/KTI87SNr+U0zcvztyzQ/mkjqvmqnJobpu3k2XX
-         0YRHiNneOuHBCk/sQqcYYRx3mPCy3y1v4LsL7uaQh17pUFPAQ0qg1tyhGuIqsTS6W2UL
-         hdKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740499285; x=1741104085;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1LxD0tQorOHIkEX1Wne9NF5WWRrn54kUL0zS9HrlpVk=;
-        b=D8cRSoj2/fugDhCEqeGHNC6txNeMCwNKKD4yKDeZuPdHvSTgyxvC/M5kx9FmyTqQwL
-         by34snMMaqxzma8MKA/UDcAnJEvoFwelCEe22SIwbPJC+EILBKox8J0c3OBGPlS3B6IJ
-         Wic7W36klLRqHG7A4bvpxQuADdJp4sLiqcukTaSlekxot+KfYouVbAYEpXR1YOHhdyB9
-         LyFkscAx//bf9NanWnOfaOIiS32qjivME49ZJWhZHJNDy6cv8XF8QPcuznV9QQiX+ZOL
-         c3/Qw2nICniUFaEoGRDtLFGA5S+/U6vzfhONzvQ+A3J1VnfJ4vLFfGSPNKptkjW+6P/f
-         aJXw==
-X-Forwarded-Encrypted: i=1; AJvYcCVrcoSZV4oTS3uyzH8ZtXSHsWffHSl0eMaHb93MO0M6Az492BC6Lsc4QsPGfiPrhk5RQw0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXVk71IeWLXuAetKyKsfhUG+p125iSNHd0FzYIhCdJ3RXmDQvc
-	3Mx2rQzd8kaRVFsi8MjKBeZZiL33MzwWewMSAk5AUuPF1kvOsLkvPo8CXXA5FWw9h/GpK1/4FI6
-	4yw==
-X-Google-Smtp-Source: AGHT+IEBXqMORvCpUqsfkZoTABv8DWEBYtiJakKmy5X9+czevxUoPIQVz54F8dk3PSNGmGOA4AqRgSPCRVw=
-X-Received: from pjbsy7.prod.google.com ([2002:a17:90b:2d07:b0:2ea:5084:5297])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f542:b0:220:d909:1734
- with SMTP id d9443c01a7336-22307b52281mr68919445ad.14.1740499284799; Tue, 25
- Feb 2025 08:01:24 -0800 (PST)
-Date: Tue, 25 Feb 2025 08:01:23 -0800
-In-Reply-To: <edcdad12-bbb7-46b9-8914-9bbb36b44597@zytor.com>
+	s=arc-20240116; t=1740500197; c=relaxed/simple;
+	bh=cErrfXom+s5pVkXQLiiVjTzZPrY+mFw7aipCxQfEmaY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MIXyzmbuisLD95T0XDyCq8QpnHiIGpFFC4ybxtbpKNPvLQyb6ON8+fEoVJzIgED1bFXMwCPMbyejo4PZeiq50Fz0kemfp0OIOza1Cy6WPRLi6/ysrxU9idApyKiAi3bJVlabobed7SMfRMSQqvG1KhjiCMq/k3AWsCNXG+m+WC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=PePPDQuD; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51PDjY8u011012;
+	Tue, 25 Feb 2025 16:15:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=EB5xjS
+	HoX3r4ods50zGkpSGZkJJvGI3sQjehgnGJBSo=; b=PePPDQuDji4R5cS+e2V1L2
+	z0JCj0LuK/xrDfeO46zmjIF3tGJgtoBeM4FgD5lYzomRRMeymyFRQ1N+COj4+n3z
+	zhEh1DIkK25owLsjddnGuriJp+VNxa6TBp8Rqe92T59nFrOI7ZEJ/STGVfcZT+f4
+	w5Vkh8iT36VQgba/UrWh/IbdwEpnNF1cpE72Ep3nuf6eryElWG6187EYNn2YUBzB
+	/xjn4vT9fw//W5Q2vkK1bLOBHbvGSrYvCT45nvnMlQfN9pA0ot3+nAKgP2j7p90s
+	BhZNP6wxViFEBdCttUtxJVgzsm+4N0qgG/8wgEaR+9yaWQmjIPQfV92dQlq6+8Eg
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4514q0brm5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 25 Feb 2025 16:15:55 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 51PG36en010783;
+	Tue, 25 Feb 2025 16:15:54 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4514q0brm3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 25 Feb 2025 16:15:54 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51PF0EdW002578;
+	Tue, 25 Feb 2025 16:15:53 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 44yu4jnfxu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 25 Feb 2025 16:15:53 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51PGFoBR33358422
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 25 Feb 2025 16:15:50 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E488120043;
+	Tue, 25 Feb 2025 16:15:49 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3319720040;
+	Tue, 25 Feb 2025 16:15:48 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.171.32.179])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Tue, 25 Feb 2025 16:15:48 +0000 (GMT)
+Date: Tue, 25 Feb 2025 17:15:44 +0100
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+        Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Madhavan Srinivasan
+ <maddy@linux.ibm.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley
+ <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou
+ <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, loongarch@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, Aaron Lewis
+ <aaronlewis@google.com>,
+        Jim Mattson <jmattson@google.com>, Yan Zhao
+ <yan.y.zhao@intel.com>,
+        Rick P Edgecombe <rick.p.edgecombe@intel.com>,
+        Kai
+ Huang <kai.huang@intel.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>
+Subject: Re: [PATCH 7/7] KVM: Drop kvm_arch_sync_events() now that all
+ implementations are nops
+Message-ID: <20250225171544.40477437@p-imbrenda>
+In-Reply-To: <20250224235542.2562848-8-seanjc@google.com>
+References: <20250224235542.2562848-1-seanjc@google.com>
+	<20250224235542.2562848-8-seanjc@google.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241001050110.3643764-1-xin@zytor.com> <20241001050110.3643764-22-xin@zytor.com>
- <Zxn8BX6vxQKY+YNF@intel.com> <edcdad12-bbb7-46b9-8914-9bbb36b44597@zytor.com>
-Message-ID: <Z73pU45jzA8e2i0S@google.com>
-Subject: Re: [PATCH v3 21/27] KVM: VMX: Invoke vmx_set_cpu_caps() before
- nested setup
-From: Sean Christopherson <seanjc@google.com>
-To: Xin Li <xin@zytor.com>
-Cc: Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, luto@kernel.org, 
-	peterz@infradead.org, andrew.cooper3@citrix.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 4oNEms2UIOy6dhSLXf3MQHQxp5QC-fsG
+X-Proofpoint-GUID: XwTFU_1fd0Y_Q4qJBAUmVROi_e0umdsT
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-25_05,2025-02-25_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 mlxscore=0 phishscore=0 bulkscore=0 impostorscore=0
+ spamscore=0 mlxlogscore=999 malwarescore=0 clxscore=1011
+ priorityscore=1501 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2502100000 definitions=main-2502250103
 
-On Fri, Oct 25, 2024, Xin Li wrote:
-> On 10/24/2024 12:49 AM, Chao Gao wrote:
-> > On Mon, Sep 30, 2024 at 10:01:04PM -0700, Xin Li (Intel) wrote:
-> > > From: Xin Li <xin3.li@intel.com>
-> > > 
-> > > Set VMX CPU capabilities before initializing nested instead of after,
-> > > as it needs to check VMX CPU capabilities to setup the VMX basic MSR
-> > > for nested.
-> > 
-> > Which VMX CPU capabilities are needed? after reading patch 25, I still
-> > don't get that.
+On Mon, 24 Feb 2025 15:55:42 -0800
+Sean Christopherson <seanjc@google.com> wrote:
 
-Heh, I had the same question.  I was worried this was fixing a bug.
+> Remove kvm_arch_sync_events() now that x86 no longer uses it (no other
+> arch has ever used it).
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-> Sigh, in v2 I had 'if (kvm_cpu_cap_has(X86_FEATURE_FRED))' in
-> nested_vmx_setup_basic(), which is changed to 'if (cpu_has_vmx_fred())'
-> in v3.  So the reason for the change is gone.  But I think logically
-> the change is still needed; nested setup should be after VMX setup.
+Acked-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-Hmm, no, I don't think we want to allow nested_vmx_setup_ctls_msrs() to consume
-any "output" from vmx_set_cpu_caps().  vmx_set_cpu_caps() is called only on the
-CPU that loads kvm-intel.ko, whereas nested_vmx_setup_ctls_msrs() is called on
-all CPUs to check for consistency between CPUs.
+> ---
+>  arch/arm64/include/asm/kvm_host.h     | 2 --
+>  arch/loongarch/include/asm/kvm_host.h | 1 -
+>  arch/mips/include/asm/kvm_host.h      | 1 -
+>  arch/powerpc/include/asm/kvm_host.h   | 1 -
+>  arch/riscv/include/asm/kvm_host.h     | 2 --
+>  arch/s390/include/asm/kvm_host.h      | 1 -
+>  arch/x86/kvm/x86.c                    | 5 -----
+>  include/linux/kvm_host.h              | 1 -
+>  virt/kvm/kvm_main.c                   | 1 -
+>  9 files changed, 15 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 7cfa024de4e3..40897bd2b4a3 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1346,8 +1346,6 @@ static inline bool kvm_system_needs_idmapped_vectors(void)
+>  	return cpus_have_final_cap(ARM64_SPECTRE_V3A);
+>  }
+>  
+> -static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+> -
+>  void kvm_init_host_debug_data(void);
+>  void kvm_vcpu_load_debug(struct kvm_vcpu *vcpu);
+>  void kvm_vcpu_put_debug(struct kvm_vcpu *vcpu);
+> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
+> index 590982cd986e..ab5b7001e2ff 100644
+> --- a/arch/loongarch/include/asm/kvm_host.h
+> +++ b/arch/loongarch/include/asm/kvm_host.h
+> @@ -320,7 +320,6 @@ static inline bool kvm_is_ifetch_fault(struct kvm_vcpu_arch *arch)
+>  
+>  /* Misc */
+>  static inline void kvm_arch_hardware_unsetup(void) {}
+> -static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+>  static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
+>  static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+> diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
+> index f7222eb594ea..c14b10821817 100644
+> --- a/arch/mips/include/asm/kvm_host.h
+> +++ b/arch/mips/include/asm/kvm_host.h
+> @@ -886,7 +886,6 @@ extern unsigned long kvm_mips_get_ramsize(struct kvm *kvm);
+>  extern int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu,
+>  			     struct kvm_mips_interrupt *irq);
+>  
+> -static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+>  static inline void kvm_arch_free_memslot(struct kvm *kvm,
+>  					 struct kvm_memory_slot *slot) {}
+>  static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
+> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+> index 6e1108f8fce6..2d139c807577 100644
+> --- a/arch/powerpc/include/asm/kvm_host.h
+> +++ b/arch/powerpc/include/asm/kvm_host.h
+> @@ -902,7 +902,6 @@ struct kvm_vcpu_arch {
+>  #define __KVM_HAVE_ARCH_WQP
+>  #define __KVM_HAVE_CREATE_DEVICE
+>  
+> -static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+>  static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
+>  static inline void kvm_arch_flush_shadow_all(struct kvm *kvm) {}
+>  static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+> index cc33e35cd628..0e9c2fab6378 100644
+> --- a/arch/riscv/include/asm/kvm_host.h
+> +++ b/arch/riscv/include/asm/kvm_host.h
+> @@ -301,8 +301,6 @@ static inline bool kvm_arch_pmi_in_guest(struct kvm_vcpu *vcpu)
+>  	return IS_ENABLED(CONFIG_GUEST_PERF_EVENTS) && !!vcpu;
+>  }
+>  
+> -static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+> -
+>  #define KVM_RISCV_GSTAGE_TLB_MIN_ORDER		12
+>  
+>  void kvm_riscv_local_hfence_gvma_vmid_gpa(unsigned long vmid,
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index 9a367866cab0..424f899d8163 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -1056,7 +1056,6 @@ bool kvm_s390_pv_cpu_is_protected(struct kvm_vcpu *vcpu);
+>  extern int kvm_s390_gisc_register(struct kvm *kvm, u32 gisc);
+>  extern int kvm_s390_gisc_unregister(struct kvm *kvm, u32 gisc);
+>  
+> -static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+>  static inline void kvm_arch_free_memslot(struct kvm *kvm,
+>  					 struct kvm_memory_slot *slot) {}
+>  static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index ea445e6579f1..454fd6b8f3db 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12770,11 +12770,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  	return ret;
+>  }
+>  
+> -void kvm_arch_sync_events(struct kvm *kvm)
+> -{
+> -
+> -}
+> -
+>  /**
+>   * __x86_set_memory_region: Setup KVM internal memory slot
+>   *
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index c28a6aa1f2ed..5438a1b446a6 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1747,7 +1747,6 @@ static inline void kvm_unregister_perf_callbacks(void) {}
+>  
+>  int kvm_arch_init_vm(struct kvm *kvm, unsigned long type);
+>  void kvm_arch_destroy_vm(struct kvm *kvm);
+> -void kvm_arch_sync_events(struct kvm *kvm);
+>  
+>  int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu);
+>  
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 991e8111e88b..55153494ac70 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1271,7 +1271,6 @@ static void kvm_destroy_vm(struct kvm *kvm)
+>  	kvm_destroy_pm_notifier(kvm);
+>  	kvm_uevent_notify_change(KVM_EVENT_DESTROY_VM, kvm);
+>  	kvm_destroy_vm_debugfs(kvm);
+> -	kvm_arch_sync_events(kvm);
+>  	mutex_lock(&kvm_lock);
+>  	list_del(&kvm->vm_list);
+>  	mutex_unlock(&kvm_lock);
 
-And thinking more about the relevant flows, there's a flaw with kvm_cpu_caps and
-vendor module reload.  KVM zeroes kvm_cpu_caps during init, but not until
-kvm_set_cpu_caps() is called, i.e. quite some time after KVM has started doing
-setup.  If KVM had a bug where it checked a feature kvm_set_cpu_caps(), the bug
-could potentially go unnoticed until just the "right" combination of hardware,
-module params, and/or Kconfig exposed semi-uninitialized data.
-
-I'll post the below (assuming it actually works) to guard against that.  Ideally,
-kvm_cpu_cap_get() would WARN if it's used before caps are finalized, but I don't
-think the extra protection would be worth the increase in code footprint.
-
---
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 97a90689a9dc..8fd48119bd41 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -817,7 +817,8 @@ do {                                                                        \
- 
- void kvm_set_cpu_caps(void)
- {
--       memset(kvm_cpu_caps, 0, sizeof(kvm_cpu_caps));
-+       WARN_ON_ONCE(!bitmap_empty((void *)kvm_cpu_caps,
-+                                  sizeof(kvm_cpu_caps) * BITS_PER_BYTE));
- 
-        BUILD_BUG_ON(sizeof(kvm_cpu_caps) - (NKVMCAPINTS * sizeof(*kvm_cpu_caps)) >
-                     sizeof(boot_cpu_data.x86_capability));
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index f5685f153e08..075a07412893 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9737,6 +9737,7 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
-        }
- 
-        memset(&kvm_caps, 0, sizeof(kvm_caps));
-+       memset(kvm_cpu_caps, 0, sizeof(kvm_cpu_caps));
- 
-        x86_emulator_cache = kvm_alloc_emulator_cache();
-        if (!x86_emulator_cache) {
 
