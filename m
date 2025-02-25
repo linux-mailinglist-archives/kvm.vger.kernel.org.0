@@ -1,55 +1,63 @@
-Return-Path: <kvm+bounces-39090-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39092-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1205A43551
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 07:32:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95DD1A4359C
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 07:46:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BD40178FC4
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 06:32:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD313189474A
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 06:44:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22C65257ACA;
-	Tue, 25 Feb 2025 06:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21399257443;
+	Tue, 25 Feb 2025 06:43:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="nlETZ7mc"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A403E25744F;
-	Tue, 25 Feb 2025 06:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF4A254855;
+	Tue, 25 Feb 2025 06:43:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740465029; cv=none; b=C7uNkUllEdynnGUgS/SO+ZLO+BREQpYIoEYQ+KyBrCDAtpqOAaqx3c/Po/uFHDbOW8AVMAXYe98WIfKO8woWA70UFuYwKTMXDyYkO3EYor3hSG17tr0+Fj0eyoRVyITspYP1o18lRT2uNRR9FpL8HGG9/eYpRkc1mgEuQvgPIsM=
+	t=1740465831; cv=none; b=E3EX5cKm94sH68ofu4uzwLpiC6ZZE7Zv+sC/4KfbyPDeuQKTV7svmytFdw0/i4Cc3ok5BdB5tzs4sLkrDVw7xm2wQWXulS2wCDX4BHGXxGoLURIRsclybMt5B755vGVFl/W1mOB66ygK58Oke+e95CnfZkPWy6h9P4iDwRlhcXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740465029; c=relaxed/simple;
-	bh=LYJLg5Jyt5Ks2wCf8HwrPZgFvnbCRrQVia1PUKQ5eZM=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iZPcvcmxlKRMItgudQvMfqIH/ThMmkkeEmUlRuCK+vdk5BwjoFeHSNGaDleMD9L8gIo18wT5TzoXiF3QrKTuWxiYHCnrDyPAeXfFOS4REjIwLGFncfG7GDM3njPqBKzo7DvANkuDDo8IGZfJnmKCSx9wSVjBZ9rGIJ4ghMC7hyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Z271h4DqKz9w89;
-	Tue, 25 Feb 2025 14:27:20 +0800 (CST)
-Received: from kwepemg500006.china.huawei.com (unknown [7.202.181.43])
-	by mail.maildlp.com (Postfix) with ESMTPS id E019F1402CA;
-	Tue, 25 Feb 2025 14:30:24 +0800 (CST)
-Received: from huawei.com (10.50.165.33) by kwepemg500006.china.huawei.com
- (7.202.181.43) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 25 Feb
- 2025 14:30:24 +0800
-From: Longfang Liu <liulongfang@huawei.com>
-To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <jonathan.cameron@huawei.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linuxarm@openeuler.org>, <liulongfang@huawei.com>
-Subject: [PATCH v4 5/5] hisi_acc_vfio_pci: bugfix live migration function without VF device driver
-Date: Tue, 25 Feb 2025 14:27:57 +0800
-Message-ID: <20250225062757.19692-6-liulongfang@huawei.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20250225062757.19692-1-liulongfang@huawei.com>
-References: <20250225062757.19692-1-liulongfang@huawei.com>
+	s=arc-20240116; t=1740465831; c=relaxed/simple;
+	bh=PXabjfpfBOXq8tRWvKo6GYiCmy3eNq/J97iav18nkas=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=hpkkj+wh8A1tPFD6vODXq0yjvTVWAPzSyGqlTn7im/Ua3Rl3AE7FN+52Mp80uO8CdlZJGsQ5pFk0tJccS3hH6dtqN2UUqju3uq0LUzwGApn7jUCv/P3Zk7DP6xPaToWIoD5Nmvcsx+bQPjBG9FMQnOLvTm5HFelbUCGHB/nNvpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=nlETZ7mc; arc=none smtp.client-ip=115.124.30.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1740465824; h=From:To:Subject:Date:Message-ID:MIME-Version;
+	bh=dtWtcCos5TZoKRFTrhJZTu555UIWcx8R/sCLOdoDYxc=;
+	b=nlETZ7mcJkSYR9/YamcGFR+t/ZbRp1eocv7vl7CFkHLhk4sLxN4PGVliUQ7SLWBP3WlHB2/Crxn+i0jZLkg176SIN3tagFuMDjthcHk9nvbFm45Dk/ODeBZCtHlyOxOm+Z1g39DFCwK52OoJ9XqmwFAjdMVqtez8AQKWGXWvitA=
+Received: from localhost(mailfrom:zijie.wei@linux.alibaba.com fp:SMTPD_---0WQDdazp_1740465817 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 25 Feb 2025 14:43:43 +0800
+From: weizijie <zijie.wei@linux.alibaba.com>
+To: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: weizijie <zijie.wei@linux.alibaba.com>,
+	xuyun <xuyun_xy.xy@linux.alibaba.com>
+Subject: [PATCH Resend] KVM: x86: ioapic: Optimize EOI handling to reduce unnecessary VM exits
+Date: Tue, 25 Feb 2025 14:42:53 +0800
+Message-ID: <20250225064253.309334-1-zijie.wei@linux.alibaba.com>
+X-Mailer: git-send-email 2.43.5
+In-Reply-To: <Z6uo24Wf3LoetUMc@google.com>
+References: <Z6uo24Wf3LoetUMc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -57,85 +65,117 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemg500006.china.huawei.com (7.202.181.43)
 
-If the driver of the VF device is not loaded in the Guest OS,
-then perform device data migration. The migrated data address will
-be NULL.
-The live migration recovery operation on the destination side will
-access a null address value, which will cause access errors.
+Address performance issues caused by a vector being reused by a
+non-IOAPIC source.
 
-Therefore, live migration of VMs without added VF device drivers
-does not require device data migration.
-In addition, when the queue address data obtained by the destination
-is empty, device queue recovery processing will not be performed.
+Commit 0fc5a36dd6b3
+("KVM: x86: ioapic: Fix level-triggered EOI and IOAPIC reconfigure race")
+addressed the issues related to EOI and IOAPIC reconfiguration races.
+However, it has introduced some performance concerns:
 
-Fixes: b0eed085903e ("hisi_acc_vfio_pci: Add support for VFIO live migration")
-Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+Configuring IOAPIC interrupts while an interrupt request (IRQ) is
+already in service can unintentionally trigger a VM exit for other
+interrupts that normally do not require one, due to the settings of
+`ioapic_handled_vectors`. If the IOAPIC is not reconfigured during
+runtime, this issue persists, continuing to adversely affect
+performance.
+
+Simple Fix Proposal:
+A straightforward solution is to record highest in-service IRQ that
+is pending at the time of the last scan. Then, upon the next guest
+exit, do a full KVM_REQ_SCAN_IOAPIC. This ensures that a re-scan of
+the ioapic occurs only when the recorded vector is EOI'd, and
+subsequently, the extra bit in the eoi_exit_bitmap are cleared,
+avoiding unnecessary VM exits.
+
+Co-developed-by: xuyun <xuyun_xy.xy@linux.alibaba.com>
+Signed-off-by: xuyun <xuyun_xy.xy@linux.alibaba.com>
+Signed-off-by: weizijie <zijie.wei@linux.alibaba.com>
 ---
- drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/ioapic.c           | 10 ++++++++--
+ arch/x86/kvm/irq_comm.c         |  9 +++++++--
+ arch/x86/kvm/vmx/vmx.c          |  9 +++++++++
+ 4 files changed, 25 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-index 3f0bcd855839..77872fc4cd34 100644
---- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-@@ -440,6 +440,7 @@ static int vf_qm_get_match_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
- 				struct acc_vf_data *vf_data)
- {
- 	struct hisi_qm *pf_qm = hisi_acc_vdev->pf_qm;
-+	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
- 	struct device *dev = &pf_qm->pdev->dev;
- 	int vf_id = hisi_acc_vdev->vf_id;
- 	int ret;
-@@ -466,6 +467,13 @@ static int vf_qm_get_match_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
- 		return ret;
- 	}
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 0b7af5902ff7..8c50e7b4a96f 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1062,6 +1062,7 @@ struct kvm_vcpu_arch {
+ #if IS_ENABLED(CONFIG_HYPERV)
+ 	hpa_t hv_root_tdp;
+ #endif
++	u8 last_pending_vector;
+ };
  
-+	/* Get VF driver insmod state */
-+	ret = qm_read_regs(vf_qm, QM_VF_STATE, &vf_data->vf_qm_state, 1);
-+	if (ret) {
-+		dev_err(dev, "failed to read QM_VF_STATE!\n");
-+		return ret;
-+	}
+ struct kvm_lpage_info {
+diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
+index 995eb5054360..40252a800897 100644
+--- a/arch/x86/kvm/ioapic.c
++++ b/arch/x86/kvm/ioapic.c
+@@ -297,10 +297,16 @@ void kvm_ioapic_scan_entry(struct kvm_vcpu *vcpu, ulong *ioapic_handled_vectors)
+ 			u16 dm = kvm_lapic_irq_dest_mode(!!e->fields.dest_mode);
+ 
+ 			if (kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT,
+-						e->fields.dest_id, dm) ||
+-			    kvm_apic_pending_eoi(vcpu, e->fields.vector))
++						e->fields.dest_id, dm))
+ 				__set_bit(e->fields.vector,
+ 					  ioapic_handled_vectors);
++			else if (kvm_apic_pending_eoi(vcpu, e->fields.vector)) {
++				__set_bit(e->fields.vector,
++					  ioapic_handled_vectors);
++				vcpu->arch.last_pending_vector = e->fields.vector >
++					vcpu->arch.last_pending_vector ? e->fields.vector :
++					vcpu->arch.last_pending_vector;
++			}
+ 		}
+ 	}
+ 	spin_unlock(&ioapic->lock);
+diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
+index 8136695f7b96..1d23c52576e1 100644
+--- a/arch/x86/kvm/irq_comm.c
++++ b/arch/x86/kvm/irq_comm.c
+@@ -426,9 +426,14 @@ void kvm_scan_ioapic_routes(struct kvm_vcpu *vcpu,
+ 
+ 			if (irq.trig_mode &&
+ 			    (kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT,
+-						 irq.dest_id, irq.dest_mode) ||
+-			     kvm_apic_pending_eoi(vcpu, irq.vector)))
++						 irq.dest_id, irq.dest_mode)))
+ 				__set_bit(irq.vector, ioapic_handled_vectors);
++			else if (kvm_apic_pending_eoi(vcpu, irq.vector)) {
++				__set_bit(irq.vector, ioapic_handled_vectors);
++				vcpu->arch.last_pending_vector = irq.vector >
++					vcpu->arch.last_pending_vector ? irq.vector :
++					vcpu->arch.last_pending_vector;
++			}
+ 		}
+ 	}
+ 	srcu_read_unlock(&kvm->irq_srcu, idx);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 6c56d5235f0f..047cdd5964e5 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5712,6 +5712,15 @@ static int handle_apic_eoi_induced(struct kvm_vcpu *vcpu)
+ 
+ 	/* EOI-induced VM exit is trap-like and thus no need to adjust IP */
+ 	kvm_apic_set_eoi_accelerated(vcpu, vector);
 +
- 	return 0;
++	/* When there are instances where ioapic_handled_vectors is
++	 * set due to pending interrupts, clean up the record and do
++	 * a full KVM_REQ_SCAN_IOAPIC.
++	 */
++	if (vcpu->arch.last_pending_vector == vector) {
++		vcpu->arch.last_pending_vector = 0;
++		kvm_make_request(KVM_REQ_SCAN_IOAPIC, vcpu);
++	}
+ 	return 1;
  }
  
-@@ -505,6 +513,12 @@ static int vf_qm_load_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
- 	qm->qp_base = vf_data->qp_base;
- 	qm->qp_num = vf_data->qp_num;
- 
-+	if (!vf_data->eqe_dma || !vf_data->aeqe_dma ||
-+	    !vf_data->sqc_dma || !vf_data->cqc_dma) {
-+		dev_err(dev, "resume dma addr is NULL!\n");
-+		return -EINVAL;
-+	}
-+
- 	ret = qm_set_regs(qm, vf_data);
- 	if (ret) {
- 		dev_err(dev, "set VF regs failed\n");
-@@ -727,6 +741,9 @@ static int hisi_acc_vf_load_state(struct hisi_acc_vf_core_device *hisi_acc_vdev)
- 	struct hisi_acc_vf_migration_file *migf = hisi_acc_vdev->resuming_migf;
- 	int ret;
- 
-+	if (hisi_acc_vdev->vf_qm_state != QM_READY)
-+		return 0;
-+
- 	/* Recover data to VF */
- 	ret = vf_qm_load_data(hisi_acc_vdev, migf);
- 	if (ret) {
-@@ -1530,6 +1547,7 @@ static int hisi_acc_vfio_pci_migrn_init_dev(struct vfio_device *core_vdev)
- 	hisi_acc_vdev->vf_id = pci_iov_vf_id(pdev) + 1;
- 	hisi_acc_vdev->pf_qm = pf_qm;
- 	hisi_acc_vdev->vf_dev = pdev;
-+	hisi_acc_vdev->vf_qm_state = QM_NOT_READY;
- 	mutex_init(&hisi_acc_vdev->state_mutex);
- 	mutex_init(&hisi_acc_vdev->open_mutex);
- 
 -- 
-2.24.0
+2.43.5
 
 
