@@ -1,219 +1,107 @@
-Return-Path: <kvm+bounces-39168-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39169-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1711A44BBE
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 20:45:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADA72A44BC7
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 20:48:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A394D7AAF1C
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 19:44:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC552420849
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 19:48:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C18E15E90;
-	Tue, 25 Feb 2025 19:45:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1F0220D513;
+	Tue, 25 Feb 2025 19:47:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="y2dk9jy2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WLRVPjjZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2056.outbound.protection.outlook.com [40.107.92.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99A051A7045;
-	Tue, 25 Feb 2025 19:45:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.56
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740512718; cv=fail; b=dlUIy+/IvPwT736FdW+ca7507QboFmL2518jqpeChoeJ3LcuM7iN9RtIiFaiexj0M2UI6U2oXbOzYiYmSrVF8JxHgkH5gKdmEVZaNklP77TuV8tjw0Cig9qjrUqc1ISpYGCdTqr/3ofreo9WyBkn+7+Jnyn/GZFEKOOq0rtFshQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740512718; c=relaxed/simple;
-	bh=LdRLnZIlyiO3BnY8Gr8zSHyB9MHTyj2Vu5IvHUZfDbc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=F1EJqoJhDHLcjPZR9YyhEDNSg3R9ssGJVB8My7foAiVYaC2IeoKm1/9nHcqzxwJjMkLBFbUw17oG/jJJu1W3ljewJmSB6NV2Gb3cX5I42bhXKPEPiiXY1kLi3dUaC0hQwQaOR6gAZ0PRpdV/kJht0Vn0BkpgGeJwJZKgRcQ5vcc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=y2dk9jy2; arc=fail smtp.client-ip=40.107.92.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=iA2WI6GoQUlx6Wz51wMApjKLk8y3CYhm2VbNGXxlgc9c6c5a4yKDm+oJOayakO1ErvZYPN8bCQxe4q4zZhxDpEHRte1fN5QgVYYKWo/BV+pupLUY6wpiA/pfW0ItvZfZRP86KmnWSJiDz29aCmZLVtebBNBfxM1W2yp1p9ujd1zcEScPaTclOZoEcPA1xvNy3/0yc6oLY5Hu/idD28HxOzwO8SpjQVa4Arie1b6DTLsh3Di1q+0+MpHrqb66c/Gy3CFqJclTP9eKWdnfJskZTSJ883I0FLkJA5KBsuDyTEWfbMSsZp+gAYpeAPqLc6UHgnjD0Tvgv/t3If7RtX2OtA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nYo4UfYkYq2Uka5FO/9IZdOXRnt4fMoszkj8X9hpjks=;
- b=ZrdI5OfjnC0gLwaU6g383HYZEvtWJz/6QvzIpcRgFq8EPC+YJb5nCxq8cDsRDyUjWWL92AEKYNBQaueCo1clHPRIye4QQSVuuIz99f8eq+ge6dGsxKj96anWT3RN9RlUyQX47rZ+/aHP3zQMd1PQzTCMvVONk/5wTsR1sY2vecoROD90aXAGsRvXwlj/68s/gCAHjOlwfbdOiaidopZOlkHlrVNHhJCyewEsu9M9GmaF3GkPry7MtVbBjqtSyiGMYPFTCq/mcbemHzdWC8x/oo3TJ296qb7kXlnL5XERM5632BfKXXJrFIBpLdW3L4yR26EdJ1FG19xMW9XkeAiM2Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nYo4UfYkYq2Uka5FO/9IZdOXRnt4fMoszkj8X9hpjks=;
- b=y2dk9jy23iPQ+hLKBXa+lSl9ojVqAmeLWmWNGD+GKBVMkzpfTZ2iIfH9b/z8XG4xH9naAOXQEgnzmq11vEA1QXfL5ltzGmU1R674dgcs3DhZjTrUaifyBfOQEjL0nXA1A6pXFwlQAefGWNUqYT7Cm2S+iHAGO2PMvoeU0OKhIc8=
-Received: from PH7P220CA0171.NAMP220.PROD.OUTLOOK.COM (2603:10b6:510:33b::32)
- by IA0PR12MB8349.namprd12.prod.outlook.com (2603:10b6:208:407::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.18; Tue, 25 Feb
- 2025 19:45:12 +0000
-Received: from SN1PEPF000252A3.namprd05.prod.outlook.com
- (2603:10b6:510:33b:cafe::82) by PH7P220CA0171.outlook.office365.com
- (2603:10b6:510:33b::32) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8466.20 via Frontend Transport; Tue,
- 25 Feb 2025 19:45:12 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SN1PEPF000252A3.mail.protection.outlook.com (10.167.242.10) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8489.16 via Frontend Transport; Tue, 25 Feb 2025 19:45:12 +0000
-Received: from [10.236.185.178] (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 25 Feb
- 2025 13:45:09 -0600
-Message-ID: <6c497385-6447-4d81-8d93-20c46cad29f9@amd.com>
-Date: Tue, 25 Feb 2025 13:45:04 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7A971DC9BB
+	for <kvm@vger.kernel.org>; Tue, 25 Feb 2025 19:47:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740512877; cv=none; b=mSQCxVLLp1pTyim32Jb4u8ow7ae94LNRGRTcRutDjbyys7IHUriz3/D3lotsSosXaTjU3OnHhJ5U5kQX2Hw+I8L7jzKoik/3rojdeoJ8SHwYe8VAzvosjgxGo0qEEXG2k4EcX7ghi8kVKPie6U542V8g+qRSfcwTF9bx8ZetBPI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740512877; c=relaxed/simple;
+	bh=6qCdJz4B+2z2Px4qOVSRUC7in+OKQIKekBClkmwavY8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=T1WQ20mRhqd+b/Fh9HRVjRkm/8KXfbGuZBRm84kU9UBOj+T+ZwAivJBLOx4gVvoti0qXTplbsP4nDjNSp1goZNeNmrlMz6WOFWJ0YuKev0KAWq2nchs0jRbGnZVm2pPNE7PUQmLakUWb9zxyWwS1WQVdWCQunkT/o0tEW+yUD1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WLRVPjjZ; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fc4fc93262so12866917a91.1
+        for <kvm@vger.kernel.org>; Tue, 25 Feb 2025 11:47:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740512875; x=1741117675; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y78W5TbVqCuEDrDaoAlNFzvev5wkePUo+u/A7Uw3WAs=;
+        b=WLRVPjjZClktOnR3mVoK323+RasFm/ojvF0y1tfoNnRfxgHINq8ri4FRM5f9pyIoTX
+         O+W4+vns4K5d3rqJMuuEtTUxALI71BFHd3vipi+dimdCl2kd8sOUdtm/WrPOQ6OH5NbT
+         Vob8wyu7gWF1HRrINh5V0mpK343BytjEr2vL8oXVHH+Gnngkv2ZtHry9HVtxWiaRUB41
+         wzklAaH7t2yRvrnd1XrTwzMNIkmmMqpYtlu/Fh2Dd58sF4qwpYC4Pf6ltjQ/GYo1I5e3
+         PMbqcuG16GbBMYRkY1pRQs+dsc4jQJc8ibZnn8EiJmygJI9PLD8U/dq5+aBAnB8QLzLz
+         y7qA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740512875; x=1741117675;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y78W5TbVqCuEDrDaoAlNFzvev5wkePUo+u/A7Uw3WAs=;
+        b=C8YrA3g3s4rVXSmeQxmFmgqTVzX19eZgRcv9djwogQuB9UPbwMbtc86MjCfgfvXlqp
+         ORaImCekprn3jZBPl6B7J2xYyOBux1C4SoiQ7uS4UdRFkhOOa51gMWmYEIMK09gmAiOa
+         JA+N2dBCYdkrTHMQwWWarc0ezaFMa1gXNM/L4B4xF2x4r/OdLQn+0QIN9HlhwVoB4vHJ
+         O7xKQk1/DrRbXGbuZuc8dHsnz+h7GdwEKNKbtsQRf7Lls8dxvkI3RMt/u7XUWSk0bXet
+         jOSh1FJ2u7tLJCiZqd5Dl9E0BZvUENkUqoQ9sMFJ+Wo0ahbD/9xdFyoAJzKtkxh6P7++
+         lsEw==
+X-Forwarded-Encrypted: i=1; AJvYcCUG2IPySLBR0nzSvHnIdan53MYDUCntalaODU3cmVVr4n7bRvjJFrx8bpqv3dzSxU89YhA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHDMAyao1Q3rvrKJ5HzN8pwLLgu04/EoGGEHTsWpl4TDJR37I7
+	vDUrWfVL2l5lpcn8qW6y0P4hpyJQDjI9IDgfDffH4NdR/Od7Mfzf2/36i8TlHoLWEIkB39T2eOc
+	pmQ==
+X-Google-Smtp-Source: AGHT+IEEgLN5F1SoLE3ebL4WKG9OHMPRtlKdbeTcRThXQ9v7WzznZ0dUT9yEAWY750vCq7jSTBxQdPDCfQ8=
+X-Received: from pjbqn3.prod.google.com ([2002:a17:90b:3d43:b0:2ea:5469:76c2])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:524f:b0:2ee:b2fe:eeeb
+ with SMTP id 98e67ed59e1d1-2fe7e36c761mr817940a91.22.1740512874967; Tue, 25
+ Feb 2025 11:47:54 -0800 (PST)
+Date: Tue, 25 Feb 2025 11:47:53 -0800
+In-Reply-To: <20250219220826.2453186-2-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 01/10] KVM: SEV: Disable SEV-SNP support on
- initialization failure
-To: Tom Lendacky <thomas.lendacky@amd.com>, <linux-kernel@vger.kernel.org>,
-	<x86@kernel.org>, <kvm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>
-CC: <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
-	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
-	<shuah@kernel.org>, <pgonda@google.com>, <ashish.kalra@amd.com>,
-	<nikunj@amd.com>, <pankaj.gupta@amd.com>, <michael.roth@amd.com>,
-	<sraithal@amd.com>
-References: <20250221210200.244405-1-prsampat@amd.com>
- <20250221210200.244405-2-prsampat@amd.com>
- <88fc49a9-d801-5d8f-f156-28fa06910cd6@amd.com>
- <9480ce1b-2c35-499c-b60f-1c02ea9cdc16@amd.com>
- <a84a3d32-9cf7-4c24-87db-99132a450557@amd.com>
- <b0fe42da-b257-bf1a-94e5-77cd8c090341@amd.com>
-Content-Language: en-US
-From: "Pratik R. Sampat" <prsampat@amd.com>
-In-Reply-To: <b0fe42da-b257-bf1a-94e5-77cd8c090341@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF000252A3:EE_|IA0PR12MB8349:EE_
-X-MS-Office365-Filtering-Correlation-Id: 23e1df12-5325-4d37-ecb1-08dd55d4eb46
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|1800799024|82310400026|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?WGdmMDBrdWxqd2paN2FIMUd2NGVKTDlNb0ZMZ09ZdytYdDcyUk42MlJZbE5E?=
- =?utf-8?B?c2RhQityNzUwRUE1TDZWMzkyNndheGhmTEhhUkFzQWJoMXVXdi9XRTNOQ0N5?=
- =?utf-8?B?M3AxUVo0WDZVeFhMVHE5Y0E1dlZoYll2WWRuVFhsazd5a2JnS3g2NmZKVDMy?=
- =?utf-8?B?SDU2NWd5aEl0SnZ0L0Rna3VXOWY4WXEzS291c2hWRnFlcUNiUnVxWHlVRkRF?=
- =?utf-8?B?bDYvYlMrYithQnFMSm83Z3MrWDVJTGlvY0owU1lOMk03OC9rRS9EZ1k1M1F5?=
- =?utf-8?B?WTlUVEJ2b2xhRHZ5TnZBbDRTMzZDOEJjbmxDY2E5OVgzK0FkY3N2a1hUMUMz?=
- =?utf-8?B?cUJPN3dCblBQWWZYQjNiZjJ6NFNVb3lHWG1jQWw4T0JaQ3NNS2JrcE1xSm40?=
- =?utf-8?B?TWdpYjlhZ093TWJlZWRBQmdSVjZxZThYRWd5dGtUMksycXFZVmVJQUcyMG5B?=
- =?utf-8?B?ZDdlOHprQSswUlF6VlA3OFY2Q0R5aFdpNTB0RE9wRXphbm9QZFVQbE43V2xV?=
- =?utf-8?B?WFV0TmxDQWlhYlhIOWN1Q3BzdktiRXlDQm1KTWt6R2RzZGFvbVNYWDJyOEdi?=
- =?utf-8?B?QVBJbisrTHhnQStXN1hick1yb3BORGVMSDJ4RU5oZ21WQjIraTJiYXhtcDdn?=
- =?utf-8?B?WHpBVFI1bWVBK3JVMEJ4aFNvSlhCZTlDQVJnMWRBMWttUXlic3pFYXBMaWk5?=
- =?utf-8?B?Rm93NUFncE9DdVg0ai83SmlpOTNaM3ludE5QMXZOWmdUbFllR3gwOXAwOUll?=
- =?utf-8?B?QXRaVi9ERC81bTZ6TFJPSDc5MTNKUWM5NU40SmM2QlBwZG9pOWhoQUxuc251?=
- =?utf-8?B?alVrb3lYeGJMWUlHckdSUEdxT2dwVVU5ZTUyemZ4TW9EZVMwUWplK1pOMDQ2?=
- =?utf-8?B?UDhuczd0cnVnOHUxT1FuQUNqWmZDU0wyaUpxNC9XK0tpQ3FVZnYrWVAzWm1w?=
- =?utf-8?B?b1k1VE4xK3V4L3FEQW40SlV3L05PVENDUzNNKzNFemRrR21NZTdNcXo1U2NP?=
- =?utf-8?B?N09QbTdSWmVobEJKci9IbVNiNDdVZDFqSmY1YjhScXhSdVQ0ZitKbEVYMVYw?=
- =?utf-8?B?UlFPR21nbVByem44UGxYQ0ZLSVpudmhoeVVzWENUN1NYVHhZTG9oa2JpUXdY?=
- =?utf-8?B?b0F6RGhjVndvQ0wzUUZIODN3Y3NRVHh2SEhZYUJyVEFwMUJBUGdNUVhBOFJW?=
- =?utf-8?B?RFZlV1FTc3dxUHpONG1vQUIyTDg4dnFWbjBXdmZvTmRlZVRMNlFtRGZzcXRo?=
- =?utf-8?B?MkptcmhsaWFnOFhoZVJxRExWZnAzNEZwYVcxZE9RM1VZTTN2dzY2WVZUa1Ro?=
- =?utf-8?B?b2ZDMnhYeEpBSGFWeXRWbHJUUUVSUG5vKzA3THd6U3RRNVp2eDkyVFFSdkh3?=
- =?utf-8?B?WDRwQ1JlZ3N3TktnbHdWSjdNemgxQXJ4eThoOGhseDZlTzZBR24vOUJTUGNt?=
- =?utf-8?B?d1MvM01tbWFPcnkwV09rZ0E2Tzd3Tk1nZzkwY3lOR3VhaHo5ZjhwQ1FRZGwz?=
- =?utf-8?B?ZmI4ekI3OHpXRXpXZm5xRHVMRHY5T0tOSXN3N0dkbVU3bWpiVTVpUUxBMjdv?=
- =?utf-8?B?eSs5cTJDYjV0NFlJUFFXVDBEcHVZK2Y3anpoNU5QL0R0TmJ3WXFTM2RGc1dM?=
- =?utf-8?B?TE5zOHhIbjVmRFd1MUtNWFlVNEpQSUpKTGZVZzh1cDRuOFhyaVBTLzQvZzZB?=
- =?utf-8?B?M0tnZmtMdHU1c1JWUGlLUGFGdWxWZzQ1eEZ1b2pDL0VVK2hCYk9jbVFhREZL?=
- =?utf-8?B?NzVsZTZteU04NThIMjBmTlBnQTM5aEwzc1cvREJVTmU4dWVpSmw4WjVZVG9i?=
- =?utf-8?B?aGNsRUtFMTVGL1VRYVBIY0s0ZlBzdzk5c2s0dGtxZG5qbzJiaVZvS0ZyWXBG?=
- =?utf-8?B?d1ZwWjhIQ2w3ZUJEVlI3SE52M0twcTVtYzhSenduOEp0UlB1ZDZZdnFaQjJx?=
- =?utf-8?B?cXZaTmhkU3IwMC9BQktBOVNEMUt6S2FZOERMeU5aTHZiSm1kT2NVNnloT3ZP?=
- =?utf-8?Q?1Cdpl+atIWHR5aTriBKzrp6DgUrfGQ=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(82310400026)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2025 19:45:12.4262
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 23e1df12-5325-4d37-ecb1-08dd55d4eb46
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF000252A3.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8349
+Mime-Version: 1.0
+References: <20250219220826.2453186-1-yosry.ahmed@linux.dev> <20250219220826.2453186-2-yosry.ahmed@linux.dev>
+Message-ID: <Z74eaeYm_EgHbmNn@google.com>
+Subject: Re: [PATCH 1/6] x86/bugs: Move the X86_FEATURE_USE_IBPB check into callers
+From: Sean Christopherson <seanjc@google.com>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Josh Poimboeuf <jpoimboe@kernel.org>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
+	Andy Lutomirski <luto@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
+On Wed, Feb 19, 2025, Yosry Ahmed wrote:
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 6c56d5235f0f3..729a8ee24037b 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -1478,7 +1478,8 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
+>  		 * may switch the active VMCS multiple times).
+>  		 */
+>  		if (!buddy || WARN_ON_ONCE(buddy->vmcs != prev))
+> -			indirect_branch_prediction_barrier();
+> +			if (cpu_feature_enabled(X86_FEATURE_USE_IBPB))
 
+Combine this into a single if-statement, to make it readable and because as-is
+the outer if would need curly braces.
 
-On 2/25/2025 1:09 PM, Tom Lendacky wrote:
-> On 2/25/25 11:45, Pratik R. Sampat wrote:
->> On 2/25/2025 10:41 AM, Pratik R. Sampat wrote:
->>> Hi Tom,
->>>
->>> On 2/24/2025 3:28 PM, Tom Lendacky wrote:
->>>> On 2/21/25 15:01, Pratik R. Sampat wrote:
->>>>> During platform init, SNP initialization may fail for several reasons,
->>>>> such as firmware command failures and incompatible versions. However,
->>>>> the KVM capability may continue to advertise support for it. Export this
->>>>> information to KVM and withdraw SEV-SNP support if has not been
->>>>> successfully initialized.
->>>>
->>>> Hmmm... rather than creating a new API, can you just issue an
->>>> SNP_PLATFORM_STATUS command and see if the SNP is not in the UNINIT state?
->>>>
->>>
->>> Although reading sev->snp_initialized is probably cheaper to do, it is
->>> cleaner to query the platform status.
->>>
->>> Querying SNP_PLATFORM_STATUS requires the pages to transition to
->>> firmware-owned and back, and the helpers for it are implemented within
->>> sev-dev.c. So, similar to sev_platform_status(), I'm thinking it is
->>> probably better to create the snp_platform_status() API as well and use
->>> that within KVM to check the state.
->>>
->>
->> Although I am guessing the initial intent was to not have an API exposed
->> at all from CCP and only make the SNP_PLATFORM_STATUS call instead?
->>
->> Since that may not be cleanly possible (we have helpers for page state
->> conversions such as rmp_mark_pages_firmware() in ccp) without
->> duplicating functionality in KVM as well, I guess the question really
->> boils down to whether we export the cheaper snp_initialized() or the
->> snp_platform_status() API instead?
-> 
-> Taking a closer look, we do already have APIs that KVM uses to allocate
-> firmware pages (output pages for SNP APIs) that can be used:
-> snp_alloc_firmware_page() and snp_free_firmware_page().
-> 
-> I think that should be enough to use sev_do_cmd() to perform the
-> SEV_CMD_SNP_PLATFORM_STATUS command without exposing a new API.
-> 
-
-Ah, I had missed that! Calling the SNP_PLATFORM_STATUS this way works.
-
-Pratik
-
-> Thanks,
-> Tom
-> 
->>
->> Thanks again!
->> Pratik
-
+And since this check will stay around in the form of a static_branch, I vote to
+check it first so that the checks on "buddy" are elided if vcpu_load_ibpb is disabled.
+That'll mean the WARN_ON_ONCE() won't fire if we have a bug and someone is running
+with mitigations disabled, but I'm a-ok with that.
 
