@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-39144-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39145-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2950AA448BD
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 18:46:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9B10A4487E
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 18:39:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D406A8863E4
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 17:34:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4858A1892900
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 17:34:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B136120DD79;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1D7620E019;
 	Tue, 25 Feb 2025 17:29:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BkywAXEH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TrmrLfkE"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2A061A5BAC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29B11A5B94;
 	Tue, 25 Feb 2025 17:29:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740504586; cv=none; b=uIpkj8Bw9y/TXoKXrFd6ByJvqN5BdnIPjUbdlYk+ANzJuqZyoaDD1C9CW4gpr8NdIi4/btpG1r8zj162EtPHsUxe4x3dfKRGb/7l3UzVNLR3P5Ei6dCitYn47lLt3x7kKIDfmq2DJwCLlf4R7zMSmw4s6P1joLbrnNBbWgP4A4w=
+	t=1740504586; cv=none; b=E2ro7GrNw4pKRadhO8FfF+KDGmKAuaIINcNgfCLP9FKe8KZEdgX9tgX+aAbCE3f/pEdo6wRo/9PI+DsAy4r9bJn+yikF3X1buOIQ0YkBCDTyZhIokmjHhzVea2c+I4ZzOOVa2NQwBICn5IhEKW55BqXfHAk5xSiyeaKZ8U9EKVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1740504586; c=relaxed/simple;
-	bh=yuFlDaL+lICxdp2tle8fmEhBUnWIS+5Z4d11toXNzuA=;
+	bh=ESwX6EF3BCC2lwWOyls+2h12qkuPf4F6Nzx6z8FG6xE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=W4bKO8iiVaJUyUtL8m7yF7e3GKJeA+5k1o1knngMS0rlPi4IwzpN5BrEmDMxkzIzAa+BiNONsoEFe8DU7B8fHRHFey6SzCpcr6AV4sgnRg97q7JKNWbTJuATK6AcanGicJB2hQrka9zX+OpYy8BtE6bHJSk354Qw9T5SvVxKCec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BkywAXEH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7183FC4CEDD;
+	 MIME-Version; b=XjSHi+hahjXbT0q1POrjvU0GvOd9yLrXQvLXSM9ju9cAJA/Wmj/vmF39mzDZLWQHTVQuKtGpWJLoMYRc5sb6jZyuM5qbu1HZacrYBus9vXD+9FkRGQafmXs8FpE5hmSGfmcUdBFwhrTCy8qG5mOEahWfV3fM6eA5X6N2VS1WO9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TrmrLfkE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72268C4CEE7;
 	Tue, 25 Feb 2025 17:29:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1740504586;
-	bh=yuFlDaL+lICxdp2tle8fmEhBUnWIS+5Z4d11toXNzuA=;
+	bh=ESwX6EF3BCC2lwWOyls+2h12qkuPf4F6Nzx6z8FG6xE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BkywAXEHE+vXVsJO8cTN+uazJApsc5KRhQlVX7lPa2dFPqVNu2vGKtxcow1GVV5Cg
-	 prluah5FAkTD1Th87m7x9ytzEp2g+xU7svlXR3yL2+8IeZoI7yH6yWkGO2sDFvFP9p
-	 72I+4Qcoana3Svzygo+AvAWM/21DFs/eM9CLvX40uDgRJUAlCKy1IIi13vwieOCyL5
-	 rMd0IetCSibR6N8Wop4r6mcgttuDenMAYreLL2gmmydC6h7vKKW3aXZz986fnVWW4l
-	 raIoL6er8hEJRLf92GxwQBHujlihfgWfjadJpuUKJwfap9bcPjvmRHe8uLDmkwlnCc
-	 6XYISfjL6DQaA==
+	b=TrmrLfkE3MXvktJ1qmq9aaNk2MKuMwqxqdwltXNdTiJMsL54zz3H3MoFcgS2jcy9T
+	 xbJFFQrWs/b/HTSNIjUDy166HhoKaMyiSqCfEuPOVjWNA1SUBQ4xVXs8FU0rjO2ny9
+	 OTkq3wttKNrLsI/l6B4ilXS9qqbs0V7mu2tVxkgrUryosYCxWF4KyQVbhs9X/DDLt9
+	 yr1xF9fmiSTjmmm1XgLf30NZpmnf/UwHa5+pYJULd4LCMM8edA0CUQNZHEybs578nR
+	 jlPJ+rg7tX0X+SpgY5n2TABhuKWEyhOZcN4YEyPdMMi0jy2umA58KK6pJhfKMOD07z
+	 A+8UvNkh/ZWXQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tmyka-007rKs-B5;
+	id 1tmyka-007rKs-Gk;
 	Tue, 25 Feb 2025 17:29:44 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -57,9 +57,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Andre Przywara <andre.przywara@arm.com>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v4 03/16] arm64: sysreg: Add layout for ICH_MISR_EL2
-Date: Tue, 25 Feb 2025 17:29:17 +0000
-Message-Id: <20250225172930.1850838-4-maz@kernel.org>
+Subject: [PATCH v4 04/16] KVM: arm64: nv: Load timer before the GIC
+Date: Tue, 25 Feb 2025 17:29:18 +0000
+Message-Id: <20250225172930.1850838-5-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250225172930.1850838-1-maz@kernel.org>
 References: <20250225172930.1850838-1-maz@kernel.org>
@@ -75,88 +75,36 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The ICH_MISR_EL2-related macros are missing a number of status
-bits that we are about to handle. Take this opportunity to fully
-describe the layout of that register as part of the automatic
-generation infrastructure.
+In order for vgic_v3_load_nested to be able to observe which timer
+interrupts have the HW bit set for the current context, the timers
+must have been loaded in the new mode and the right timer mapped
+to their corresponding HW IRQs.
 
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+At the moment, we load the GIC first, meaning that timer interrupts
+injected to an L2 guest will never have the HW bit set (we see the
+old configuration).
+
+Swapping the two loads solves this particular problem.
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/sysreg.h       |  5 -----
- arch/arm64/tools/sysreg               | 12 ++++++++++++
- tools/arch/arm64/include/asm/sysreg.h |  5 -----
- 3 files changed, 12 insertions(+), 10 deletions(-)
+ arch/arm64/kvm/arm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index b59b2c680e977..9511f3faac462 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -562,7 +562,6 @@
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index b8e55a441282f..f678a77438cc0 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -576,8 +576,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ nommu:
+ 	vcpu->cpu = cpu;
  
- #define SYS_ICH_VSEIR_EL2		sys_reg(3, 4, 12, 9, 4)
- #define SYS_ICC_SRE_EL2			sys_reg(3, 4, 12, 9, 5)
--#define SYS_ICH_MISR_EL2		sys_reg(3, 4, 12, 11, 2)
- #define SYS_ICH_EISR_EL2		sys_reg(3, 4, 12, 11, 3)
- #define SYS_ICH_ELRSR_EL2		sys_reg(3, 4, 12, 11, 5)
- #define SYS_ICH_VMCR_EL2		sys_reg(3, 4, 12, 11, 7)
-@@ -983,10 +982,6 @@
- #define SYS_MPIDR_SAFE_VAL	(BIT(31))
- 
- /* GIC Hypervisor interface registers */
--/* ICH_MISR_EL2 bit definitions */
--#define ICH_MISR_EOI		(1 << 0)
--#define ICH_MISR_U		(1 << 1)
--
- /* ICH_LR*_EL2 bit definitions */
- #define ICH_LR_VIRTUAL_ID_MASK	((1ULL << 32) - 1)
- 
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 3e82a072eb493..2c63662c1a489 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -3071,6 +3071,18 @@ Res0	17:5
- Field	4:0	ListRegs
- EndSysreg
- 
-+Sysreg	ICH_MISR_EL2	3	4	12	11	2
-+Res0	63:8
-+Field	7	VGrp1D
-+Field	6	VGrp1E
-+Field	5	VGrp0D
-+Field	4	VGrp0E
-+Field	3	NP
-+Field	2	LRENP
-+Field	1	U
-+Field	0	EOI
-+EndSysreg
-+
- Sysreg	CONTEXTIDR_EL2	3	4	13	0	1
- Fields	CONTEXTIDR_ELx
- EndSysreg
-diff --git a/tools/arch/arm64/include/asm/sysreg.h b/tools/arch/arm64/include/asm/sysreg.h
-index 5d9d7e394b254..b6c5ece4fdee7 100644
---- a/tools/arch/arm64/include/asm/sysreg.h
-+++ b/tools/arch/arm64/include/asm/sysreg.h
-@@ -558,7 +558,6 @@
- 
- #define SYS_ICH_VSEIR_EL2		sys_reg(3, 4, 12, 9, 4)
- #define SYS_ICC_SRE_EL2			sys_reg(3, 4, 12, 9, 5)
--#define SYS_ICH_MISR_EL2		sys_reg(3, 4, 12, 11, 2)
- #define SYS_ICH_EISR_EL2		sys_reg(3, 4, 12, 11, 3)
- #define SYS_ICH_ELRSR_EL2		sys_reg(3, 4, 12, 11, 5)
- #define SYS_ICH_VMCR_EL2		sys_reg(3, 4, 12, 11, 7)
-@@ -979,10 +978,6 @@
- #define SYS_MPIDR_SAFE_VAL	(BIT(31))
- 
- /* GIC Hypervisor interface registers */
--/* ICH_MISR_EL2 bit definitions */
--#define ICH_MISR_EOI		(1 << 0)
--#define ICH_MISR_U		(1 << 1)
--
- /* ICH_LR*_EL2 bit definitions */
- #define ICH_LR_VIRTUAL_ID_MASK	((1ULL << 32) - 1)
- 
+-	kvm_vgic_load(vcpu);
+ 	kvm_timer_vcpu_load(vcpu);
++	kvm_vgic_load(vcpu);
+ 	kvm_vcpu_load_debug(vcpu);
+ 	if (has_vhe())
+ 		kvm_vcpu_load_vhe(vcpu);
 -- 
 2.39.2
 
