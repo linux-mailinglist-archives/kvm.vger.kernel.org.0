@@ -1,108 +1,104 @@
-Return-Path: <kvm+bounces-39123-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39124-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4752A444A3
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 16:42:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3794A4451C
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 16:57:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 963178600C5
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 15:41:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B9747AB06C
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 15:56:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE51A15852E;
-	Tue, 25 Feb 2025 15:41:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13090188A0E;
+	Tue, 25 Feb 2025 15:57:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lvpEHwrX"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vMr7zURB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A096E14AD0D
-	for <kvm@vger.kernel.org>; Tue, 25 Feb 2025 15:41:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 779E22AEE4;
+	Tue, 25 Feb 2025 15:57:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740498077; cv=none; b=X9KbbDxqAPCCs+DJW5IvUHuNIbEGR8GMrXq9R13gwo6KOW0DMR5p8KMK1l3dA8xrFr9i45HmWIxvycLNSq/JeKh/qBQHBGW3jyTzbQ/dmeOCpr9gAd7vjYjRq63OJjEFJpapxWCge9zO9+KSp7OHNCEq9sVXWsH6HIGvWYfKlAQ=
+	t=1740499023; cv=none; b=hEzS2biDU5l52I7ogatLfqd6P4g/OZK2YoP+P2vrXgr1E0tAUeXZNhY900LsPKTIjv/raG+TLGpSchLjEam4uoSMCHcR/jKH8vZiAl/Oad/pXFDDVtu0WWyGOAZM3VgnB2XCKXulhQO4mcB+KXOyBLpDmnxeDs/BvmFFg8AlUPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740498077; c=relaxed/simple;
-	bh=h0k6Bw8oebc5YQIbZ75hirrCib3mxXfTLg5zcaiUPQU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ezeq8L2k8CcahKqsVzDXTSS/eL9lrrQXMwXM9OkbkL/iXvY6CxTJtI2vcykKHcJRFXRD4ZV51a+9YWrKjQiZxuxe2Mbznk/q+modkYiq3HNadCwQPe8aw4V3mMnzPZxs/UpUV33MEcDfBKUrpdU9ktnTHZOMTaoMzA2pGeAvFJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lvpEHwrX; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fc1a70935fso12005518a91.1
-        for <kvm@vger.kernel.org>; Tue, 25 Feb 2025 07:41:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740498075; x=1741102875; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9gith30kTBfPn10AwyFeCKv7JIoJKUJTfhcaJAgn5H8=;
-        b=lvpEHwrXZMafR5bjJMMb/R0J7wbSws4Ye2WMk1fS+rUsdeN7iGm8r7jJsWa+4G+xoU
-         Sz5T5bjLekDkQtOPdVnzZSHB96XbjTGvPeuQOv0BkT9rg3A2RejXPFEHNzp5zKaGhZEE
-         ai+QMEI0cNmJwsv7CcO7O9wMkLRTBt9TCVAFqt9DibPPwcadBut8WasGHIZAejgbEiv1
-         eQ2z10bP+q9CDsnLIoPnS2VwmEwIQ5HxaW+s2TD/YvXzk+94xLq70MyfJmeL4R6/l/Vf
-         qRd64KdU5RGPoXUkqEXVzeF5bvhWqWHqTZFyF4IH0ohtDAvkmXo9oLsLxssjMFTlIPz8
-         ABDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740498075; x=1741102875;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9gith30kTBfPn10AwyFeCKv7JIoJKUJTfhcaJAgn5H8=;
-        b=UvOFU9kTyW+Qt1I1EpxmDwb2yZtCY36/9KOmUX/im5XhVMnfMe7M6IYb9u6B6SB7qE
-         TTNz8E1QKPbP0aBL42c5tP9qQwiS+0l26sbcpXQmeFE5MER3CyW25rlWsakQq4dTkfJn
-         7C6ucu0HVsI4vgpdO5h/SfJXy3mUW8uDk/Jy8YyP6Ohn2ZHwjLT63fEv4SphRR3pgNHD
-         PGMn9etKs6qLWGfA6DovALiViXbYL/kLJ3aerIn069MVbq00/gfr5iUZ1QBREUNq8rrF
-         9pMBpcpRkf2TQKdAPibDjt4oNPRnnt6eYas7pHVogBgCtfAG8A+ZARb+pStKmWc+Gy6B
-         94ww==
-X-Gm-Message-State: AOJu0YyZO/MQAU2rbCpESCg9hgqDfDGcJRIhpvuSVocntCeWCyDiHbSB
-	u771v+vTNPeM/8iK0ZiLhqq93RJ95TM9YqJ4hiopcZ/ixfUKs1Y3ggUk1OkSArtyooCIleLunV8
-	a3Q==
-X-Google-Smtp-Source: AGHT+IGZkp+roO0TVp3rz40ka6O9p/N9EvFel5/ggMinuedWjO6jtk5+r13X1rdCPxFnx16CfV0N9Na/IiI=
-X-Received: from pjbpv16.prod.google.com ([2002:a17:90b:3c90:b0:2fc:11a0:c53f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2e4f:b0:2f1:3355:4a8f
- with SMTP id 98e67ed59e1d1-2fe68ac94a8mr5754618a91.4.1740498074970; Tue, 25
- Feb 2025 07:41:14 -0800 (PST)
-Date: Tue, 25 Feb 2025 07:41:13 -0800
-In-Reply-To: <20241001050110.3643764-21-xin@zytor.com>
+	s=arc-20240116; t=1740499023; c=relaxed/simple;
+	bh=yu6wXpbijbvoprV7cAUlfR90pWJ4tsCo/nY0611s5OQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NkwuYDbKTJUWgQ3WzdDL00YPS6L50K1Ph4XsPFzf71PCMM+7yPWMrvKjacIOw7GMY4G5L+Mx7RUB4sRdvaqK1Ni/lhNX3miFnyUaOeuhce2EFKQDz6mjEkpvplnyDpfVoUQJWDLF5pFLQ1UZ+2/cZ0gYW9rccJ84TJGcQnVy/m0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=vMr7zURB; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=VN/3A6vgb56W0tilRktJHT6BmmHqRIi/ngh2AhRM5Lw=; b=vMr7zURBonPoMkDkO+7eSER6rL
+	pCwqXqAO33W7UHrux3BNm1V62PG09EmLrLvg2hR4LTU4Y2hgybNPu/M4WI6WCCarx4beg3iZSFMDo
+	MC9/VGxIBE9AJzXY4jMkkgSWG2/bGuz4vYLs7DQIsok9BDqqIShw9RAl3GNmzG4klBIPETOYSdBJp
+	EOhdxTzkOQd01nxYOVjO2dgpAdWX5Y2163Aj5RDnvluWQzdosVXsZaPEUOx8AaV1uoRUtDM7RCGj9
+	C813cuTkW2o041P7/Vrm7f3KY/t2WvZ+Ts6ImZqBvtfK0EmTqKk81P+vZscn/cUT+EJDSzZrbl2LC
+	NdLSSr2Q==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1tmxIn-0000000BoqX-3LBB;
+	Tue, 25 Feb 2025 15:56:58 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id A5FB9300472; Tue, 25 Feb 2025 16:56:56 +0100 (CET)
+Date: Tue, 25 Feb 2025 16:56:56 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, rangemachine@gmail.com,
+	whanos@sergal.fun, Ravi Bangoria <ravi.bangoria@amd.com>
+Subject: Re: [PATCH 0/3] KVM: SVM: Zero DEBUGCTL before VMRUN if necessary
+Message-ID: <20250225155656.GE34233@noisy.programming.kicks-ass.net>
+References: <20250224181315.2376869-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241001050110.3643764-1-xin@zytor.com> <20241001050110.3643764-21-xin@zytor.com>
-Message-ID: <Z73kmRwZFJJAVkiZ@google.com>
-Subject: Re: [PATCH v3 20/27] KVM: x86: Allow WRMSRNS to be advertised to guests
-From: Sean Christopherson <seanjc@google.com>
-To: "Xin Li (Intel)" <xin@zytor.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, luto@kernel.org, 
-	peterz@infradead.org, andrew.cooper3@citrix.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250224181315.2376869-1-seanjc@google.com>
 
-On Mon, Sep 30, 2024, Xin Li (Intel) wrote:
-> From: Xin Li <xin3.li@intel.com>
+On Mon, Feb 24, 2025 at 10:13:12AM -0800, Sean Christopherson wrote:
+> PeterZ,
 > 
-> Allow WRMSRNS to be advertised to guests.
+> Can you confirm that the last patch (snapshot and restore DEBUGCTL with
+> IRQs disabled) is actually necessary?  I'm 99% certain it is, but I'm
+> holding out hope that it somehow isn't, because I don't love the idea of
+> adding a RDMSR to every VM-Entry.
 
-The shortlog and this sentence are incorrect.  Assuming there are no controls for
-WRMSRNS, then KVM isn't allowing anything.  Userspace can advertise WRMSRNS support
-whenever it wants, and the guest can cleanly execute WRMSRNS regardless of whether
-or not it's advertised in CPUID.  KVM is simply advertising support to userspace.
+I think you're right. I mean, I'd have to go double check and trace the
+various call paths again, but I'd be very surprised if we can't change
+DEBUGCTL from NMI context.
 
-> WRMSRNS behaves exactly like WRMSR with the only difference being
+> Assuming DEBUGCTL can indeed get modified in IRQ context, it probably
+> makes sense to add a per-CPU cache to eliminate the RDMSR.  Unfortunately,
+> there are quite a few open-coded WRMSRs, so it's not a trivial change.
 
-Nope, not the only difference.
+This, I'm surprised we've not yet done that.
 
-  WRMSR and WRMSRNS use the same basic exit reason (see Appendix C). For WRMSR,
-  the exit qualification is 0, while for WRMSRNS it is 1.
+> On to the main event...
+> 
+> Fix a long-lurking bug in SVM where KVM runs the guest with the host's
+> DEBUGCTL if LBR virtualization is disabled.  AMD CPUs rather stupidly
+> context switch DEBUGCTL if and only if LBR virtualization is enabled (not
+> just supported, but fully enabled).
+> 
+> The bug has gone unnoticed because until recently, the only bits that
+> KVM would leave set were things like BTF, which are guest visible but
+> won't cause functional problems unless guest software is being especially
+> particular about #DBs.
+> 
+> The bug was exposed by the addition of BusLockTrap ("Detect" in the kernel),
+> as the resulting #DBs due to split-lock accesses in guest userspace (lol
+> Steam) get reflected into the guest by KVM.
 
-And the whole reaosn I went spelunking was to verify that WRMSRNS honors all MSR
-exiting controls and generates the same exits.  That information needs to be
-explicitly stated.
-
-I'll rewrite the shortlog and changelog when applying.
+Hehe, yeah, games. Yeah we ran into that with bus-lock on intel too :-)
 
