@@ -1,145 +1,227 @@
-Return-Path: <kvm+bounces-39158-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39159-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8B13A4489F
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 18:42:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BD5DA44903
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 18:54:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC8D319E4AB7
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 17:38:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E4658831A2
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2025 17:42:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C631A5BAC;
-	Tue, 25 Feb 2025 17:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D2BE19D88F;
+	Tue, 25 Feb 2025 17:42:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="22e4g97n"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fhpO8Rmx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03EED1A23BC
-	for <kvm@vger.kernel.org>; Tue, 25 Feb 2025 17:35:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4C15197A67
+	for <kvm@vger.kernel.org>; Tue, 25 Feb 2025 17:41:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740504922; cv=none; b=Gm7Fy2Fj4KqrH/EtnMdXWLdV62XSQYmXTGl/57boaslrlUtVlieAnBXwYQaVugbgpYduBlj8b06ntRnY0JjQ5sdWunT2XvURfIsZYkzGtxY80oVlvmV6uW4ZZX0qW8vzoEW3lA3Mas3epGtvaxp6C/Vq7bDMkkvP+kC42q6miL0=
+	t=1740505319; cv=none; b=WFaXmPy7crDkuj7oHn0PHh0IgNJTt22VwbShq15C096uP8c+8ezPRCETsWWI1oqs36CiSOI+8qoQ9hDF3/EnVdCS1VbhW0PXutHDCTCIai5rePtpVQpUcyXUcyX8JsNyprj/GjlH84nlNJwXt4O675gtewbj33OqmpnB/YSDjb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740504922; c=relaxed/simple;
-	bh=DCj+7jqMyXQfbY2xp2rvzhQWlsMYVO7zaB44y+WoB/4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=QqQBKScq1YaLkb8PjnoZEAe8/fJwzbGUwvwW5J8jK1pNKX0omzrURrYYYJkt4MHBW/JnAXM38aZnJBuDHjt+ACnu/0KUiobjOw3hfmU16RVwDJisVSyC5Z18EESpWS8zhOeuFODS8S0fRq6MakcPIZBdWS9cvM5GMZQOO3sG5Bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=22e4g97n; arc=none smtp.client-ip=209.85.214.201
+	s=arc-20240116; t=1740505319; c=relaxed/simple;
+	bh=iCX+nG23CjC2fxQmPixSN8EXGqI2yLXhnVoBGQ220Lk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JkhP1bs+/GqOH+e39cSXG1g/LuJdOUlvETmtYJambjF8vlIYB8ea1g/5Cuf4EaimU3EMnfh9RuWS9M5duDJ68wlWUEN/MX9jkv5fWuPYsTcbfUcBRoqA6Q7lzldo4jLIob35funYGBu9AaFWVCckBDJhpZJzYGifFGr6IqekQDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fhpO8Rmx; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2217a4bfcc7so124312035ad.3
-        for <kvm@vger.kernel.org>; Tue, 25 Feb 2025 09:35:20 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2212222d4cdso3455ad.0
+        for <kvm@vger.kernel.org>; Tue, 25 Feb 2025 09:41:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740504920; x=1741109720; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WmPVK+L+lkct4my4gWXOH7349iAbiLDSdgIlILE/gx4=;
-        b=22e4g97neCm8yw41ONcrauyntt+5VswzU5AUngctfJ9y4Nn78LKP3UqO/0mWFyIxxh
-         o2Tldizy34LiAEkUavi0Ifsk3d6XaTSeklXAYYGIrWReaTFoVhtJwI3hdbqQxhipLdP3
-         x/rpo2ods/7KkAuE2ApAF5AVtWRB3wrmlweiW3Mecn2fjzibvkXulqnu2v154hKllWlh
-         GpmLk2FMgZ/Gp8mHT2DLysr53QuOvp8p1QVQF/6D6hOrvu6R7B7nC2lSEVmxEud9ERdg
-         8mUNOUNLrGOZft90LXZ53PQnSrsAWkPigAlgwInZEH+AysL0Q1W6f5j4B49nef3vG9zK
-         A82Q==
+        d=google.com; s=20230601; t=1740505315; x=1741110115; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Vqjq5AFXxwlxfq4VPVA6M5Ee2CpyweWj+2y/hfe9AzE=;
+        b=fhpO8RmxBeBGKT/5ZKbYywJBbdjJlmt3ng8Wjc4s/xgU+uY7xS01nlIK/TUBh6YfxA
+         dMg04rKf1e6n12Aq9NXmheY6VKIokCil6E/Cn6Dt1d0bsyOlT8ODB/9XEAm4JcQPT3ZB
+         Dhto1cUSl6rI9dZly5XAVVQSDEkOlMNtfNbF1AxgMbSmatvMLQR7mpKdD+6Mq4hv+D/6
+         Rktp688V8SegHs1CqB2RF1hNZjq2TgXtIQt6bAXicdTVTn4MHN42Ds++qsKdCkYASL2E
+         q0s7RUrtkkIkdmIabrI68/KioDWhOPMPpFp2Ig6fRmct79NFZedPvxpDISLltrLfgb91
+         c9+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740504920; x=1741109720;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WmPVK+L+lkct4my4gWXOH7349iAbiLDSdgIlILE/gx4=;
-        b=h/Srbp4fJmCuNqzQnqRXRo2yQRgaNh13dl8XWjHjSFYC1REGDuK2gq7MwHyPZVJk/q
-         MtEwqmxGf8Mzq3R1l8pqryu3/l8Q6bFbtvN2K9hdr/oyyrUrKcGCNreFq2Z2B8sfWyR8
-         rSG6MTz5XiIspbR8LsAcOPGSEd+3WWhnvsKEHtgAisN56uRJiSDVLurQ8rl7MGtVkMKa
-         PLC9MnKonb0XM9dxnkO1aDHcQQkwX4eN/lpIPXfVxU4OTTbeDMjDqg8tWbLX8uhIw+nX
-         y/oni81wrvCuOz2DXZERYKiNJbLQf1DOYpXGLhYLCfw5A7pWU6z+xET1RDAVXkvoa5g7
-         PPuQ==
-X-Gm-Message-State: AOJu0YygHcSsPRQaX8aavUeQLJB3sxlxDAJo87TrlBFn82UsOv1pSgar
-	gD1Tk4eB2lJ/xZkEfEnWW4SVKnhgl9fQqrEx8Wr+DsQT/kf02r6WBw4C4/kw8pPIo/Z7A4HtlJq
-	ECw==
-X-Google-Smtp-Source: AGHT+IHDF07aCt7qpFwpvTs1RpT9A9C3sPRgbFPhlXEj6AO9EgopLjMJSD4qeqFfHqD0Sv4+QnSbcOjcYsQ=
-X-Received: from pjbqo14.prod.google.com ([2002:a17:90b:3dce:b0:2fa:a101:755])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d506:b0:216:501e:e314
- with SMTP id d9443c01a7336-221a0edda05mr242845745ad.20.1740504920269; Tue, 25
- Feb 2025 09:35:20 -0800 (PST)
-Date: Tue, 25 Feb 2025 09:35:11 -0800
-In-Reply-To: <b1f0f8f3-515f-4fde-b779-43ef93484ab3@zytor.com>
+        d=1e100.net; s=20230601; t=1740505315; x=1741110115;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Vqjq5AFXxwlxfq4VPVA6M5Ee2CpyweWj+2y/hfe9AzE=;
+        b=Ncj+Q3nvdxpQehYqWtzJmACJfe0SWKgH3G0K68MKk78mbpqtWt7QlJ/Tr/ZQ7JHHba
+         TFOo+F0Egk05m6+7vrFyP56Us6XmYx3oiDmRJjGsa2KrXfLtNzCRbJzTl9bKkCSM2yQI
+         AEEkpTEL5lAp0lNLzaYIlq/mQjEtocsFYe2sCrEysaFnka887KCvuMAgnNC7b0jA5rXJ
+         tD87EJ2cMa8iCBZ2tbY+RzhF8wuwANymR+tS7rQOyseC2l+5KN3Eqqa2/U7DiFCAJblk
+         /pajvhdh/m2YFG2qbWEssAPNyVij4SMMNAxb7rw9VAGCAC+Fwu1xhKjaniO4vx+0Pon6
+         IC+g==
+X-Forwarded-Encrypted: i=1; AJvYcCUAtrOVPquTGNiFD8LghXN2RHZ5xeZJCaAIjqD1qpYXkHiEQnpW7wmrhlzcI4GQjjJlUMA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+lC3Yh42eJAru4a+wvoZLoH4b9oBRk+Pt0j03kyj4I1fqN/Ba
+	nA5hI2YgW0XA+EEdoCBbrx/Ytt3rVbKWrvPu05sCptLowImIPuEz0fkjuKJZGBuSeZQxWrkxoqr
+	uZ+d+3w3iLr3af+lMNKXou1zofGkivJPLNk8R
+X-Gm-Gg: ASbGncthlFTFzubwFNAYwlSMbsh42onwWZxgF88mMbSDL4vRMJQpquMPHKm+AR2LTN7
+	87TjJHruSmwAACn/SZZhPb6Ai3fP6kc28ReSl3dADwM8z4+f2YGygyABvMSC7iES7oWotmUT6bE
+	PcWgxe8Gg=
+X-Google-Smtp-Source: AGHT+IHPa/zeMhv5rS+FoFIXRfGiR3W5Ojq1INXwGU+EkhH1BWbASSdZ3ThN+JgVulgi4m91g+jKNlJGa8ARq6KoZcI=
+X-Received: by 2002:a17:902:d50a:b0:21f:3e29:9cd4 with SMTP id
+ d9443c01a7336-22307a98cbcmr3805795ad.20.1740505314655; Tue, 25 Feb 2025
+ 09:41:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241001050110.3643764-1-xin@zytor.com> <22d4574b-7e2d-4cd8-91bd-f5208e82369e@zytor.com>
- <Z73gxklugkYpwJiZ@google.com> <b1f0f8f3-515f-4fde-b779-43ef93484ab3@zytor.com>
-Message-ID: <Z73_TwUgIsceWyzQ@google.com>
-Subject: Re: [PATCH v3 00/27] Enable FRED with KVM VMX
-From: Sean Christopherson <seanjc@google.com>
-To: Xin Li <xin@zytor.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, Chao Gao <chao.gao@intel.com>, pbonzini@redhat.com, 
-	corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, luto@kernel.org, 
-	peterz@infradead.org, andrew.cooper3@citrix.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20250222191517.743530-1-almasrymina@google.com>
+ <20250222191517.743530-4-almasrymina@google.com> <a814c41a-40f9-4632-a5bb-ad3da5911fb6@redhat.com>
+In-Reply-To: <a814c41a-40f9-4632-a5bb-ad3da5911fb6@redhat.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 25 Feb 2025 09:41:41 -0800
+X-Gm-Features: AWEUYZlYYSHH7_9N4ByWFALTxxtUrWQmHLefEElJbkJw4zmyNRZgN3GST52xcig
+Message-ID: <CAHS8izNfNJLrMtdR0je3DsXDAvP2Hs8HfKf5Jq7_kQJsVUbrzg@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 3/9] net: devmem: Implement TX path
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, virtualization@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Jeroen de Borst <jeroendb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 25, 2025, Xin Li wrote:
-> On 2/25/2025 7:24 AM, Sean Christopherson wrote:
-> > On Tue, Feb 18, 2025, Xin Li wrote:
-> > > On 9/30/2024 10:00 PM, Xin Li (Intel) wrote:
-> > > While I'm waiting for the CET patches for native Linux and KVM to be
-> > > upstreamed, do you think if it's worth it for you to take the cleanup
-> > > and some of the preparation patches first?
-> > 
-> > Yes, definitely.  I'll go through the series and see what I can grab now.
-> 
-> I planned to do a rebase and fix the conflicts due to the reordering.
-> But I'm more than happy you do a first round.
+On Tue, Feb 25, 2025 at 5:04=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> On 2/22/25 8:15 PM, Mina Almasry wrote:
+> [...]
+> > @@ -119,6 +122,13 @@ void net_devmem_unbind_dmabuf(struct net_devmem_dm=
+abuf_binding *binding)
+> >       unsigned long xa_idx;
+> >       unsigned int rxq_idx;
+> >
+> > +     xa_erase(&net_devmem_dmabuf_bindings, binding->id);
+> > +
+> > +     /* Ensure no tx net_devmem_lookup_dmabuf() are in flight after th=
+e
+> > +      * erase.
+> > +      */
+> > +     synchronize_net();
+>
+> Is the above statement always true? can the dmabuf being stuck in some
+> qdisc? or even some local socket due to redirect?
+>
 
-For now, I'm only going to grab these:
+Yes, we could have have netmems in the TX path in the qdisc or waiting
+for retransmits that still have references to the dmabuf, and that's
+fine here I think.
 
-  KVM: VMX: Pass XFD_ERR as pseudo-payload when injecting #NM
-  KVM: VMX: Don't modify guest XFD_ERR if CR0.TS=1
-  KVM: x86: Use a dedicated flow for queueing re-injected exceptions
+What is happening here is that tcp_sendmsg_locked() will look for a
+binding in net_devmem_dmabuf_bindings with binding->id =3D=3D
+sockc.dmabuf_id, and then grab a reference on it.
 
-and the WRMSRNS patch.  I'll post (and apply, if it looks good) the entry/exit
-pairs patch separately.
+In parallel, net_devmem_unbind_dmabuf will remove the binding from
+net_devmem_dmabuf_bindings, and then drop its refcount (which may be
+the last one if the 'get' in tcp_sendmsg_locked has not yet executed,
+triggering the binding to be freed).
 
-Easiest thing would be to rebase when all of those hit kvm-x86/next.
+I need to make sure the lookup + get of the dmabuf in
+net_devmem_lookup_dmabuf() doesn't race with the erase + put in
+net_devmem_unbind_dmabuf() in a way that causes UAF, and I use
+rcu_read_lock for that coupled with synchronize_net().
 
-> BTW, if you plan to take
-> 	KVM: VMX: Virtualize nested exception tracking
+Note that net_devmem_dmabuf_binding_put() won't free the dmabuf unless
+we put the last ref, so any netmems stuck in retransmit paths or qdisc
+will still pin the underlying dmabuf.
 
-I'm not planning on grabbing this in advance of the FRED series, especially if
-it's adding new uAPI.  The code doesn't need to exist without FRED, and doesn't
-really make much sense to readers without the context of FRED.
+Let me know if you still see an issue here.
 
-> > > Top of my mind are:
-> > >      KVM: x86: Use a dedicated flow for queueing re-injected exceptions
-> > >      KVM: VMX: Don't modify guest XFD_ERR if CR0.TS=1
-> > >      KVM: VMX: Pass XFD_ERR as pseudo-payload when injecting #NM
 
-As above, I'll grab these now.
+> > @@ -252,13 +261,23 @@ net_devmem_bind_dmabuf(struct net_device *dev, un=
+signed int dmabuf_fd,
+> >        * binding can be much more flexible than that. We may be able to
+> >        * allocate MTU sized chunks here. Leave that for future work...
+> >        */
+> > -     binding->chunk_pool =3D
+> > -             gen_pool_create(PAGE_SHIFT, dev_to_node(&dev->dev));
+> > +     binding->chunk_pool =3D gen_pool_create(PAGE_SHIFT,
+> > +                                           dev_to_node(&dev->dev));
+> >       if (!binding->chunk_pool) {
+> >               err =3D -ENOMEM;
+> >               goto err_unmap;
+> >       }
+> >
+> > +     if (direction =3D=3D DMA_TO_DEVICE) {
+> > +             binding->tx_vec =3D kvmalloc_array(dmabuf->size / PAGE_SI=
+ZE,
+> > +                                              sizeof(struct net_iov *)=
+,
+> > +                                              GFP_KERNEL);
+> > +             if (!binding->tx_vec) {
+> > +                     err =3D -ENOMEM;
+> > +                     goto err_free_chunks;
+>
+> Possibly my comment on v3 has been lost:
+>
+> """
+> It looks like the later error paths (in the for_each_sgtable_dma_sg()
+> loop) could happen even for 'direction =3D=3D DMA_TO_DEVICE', so I guess =
+an
+> additional error label is needed to clean tx_vec on such paths.
+> """
+>
 
-> > >      KVM: nVMX: Add a prerequisite to existence of VMCS fields
-> > >      KVM: nVMX: Add a prerequisite to SHADOW_FIELD_R[OW] macros
+I think I fixed the issue pointed to in v3, but please correct me if I
+missed anything. I added kvfree(), but we don't really need an
+additional error label.
 
-Unless there's a really, really good reason to add precise checking, I strongly
-prefer to skip these entirely.
+If we hit any of the error paths conditions in
+for_each_sgtable_dma_sg, we will `goto err_free_chunks;`, which will
+free all the genpool chunks, destroy the gen pool, then do
+`kvfree(binding->tx_vec);` to free the memory allocated for tx_vec.
 
-> > > 
-> > > Then specially, the nested exception tracking patch seems a good one as
-> > > Chao Gao suggested to decouple the nested tracking from FRED:
-> > >      KVM: VMX: Virtualize nested exception tracking
-> > > 
-> > > Lastly the patches to add support for the secondary VM exit controls might
-> > > go in early as well:
-> > >      KVM: VMX: Add support for the secondary VM exit controls
-> > >      KVM: nVMX: Add support for the secondary VM exit controls
+> [...]
+> > @@ -1071,6 +1072,16 @@ int tcp_sendmsg_locked(struct sock *sk, struct m=
+sghdr *msg, size_t size)
+> >
+> >       flags =3D msg->msg_flags;
+> >
+> > +     sockc =3D (struct sockcm_cookie){ .tsflags =3D READ_ONCE(sk->sk_t=
+sflags),
+> > +                                     .dmabuf_id =3D 0 };
+> > +     if (msg->msg_controllen) {
+> > +             err =3D sock_cmsg_send(sk, msg, &sockc);
+> > +             if (unlikely(err)) {
+> > +                     err =3D -EINVAL;
+> > +                     goto out_err;
+> > +             }
+> > +     }
+>
+> I'm unsure how much that would be a problem, but it looks like that
+> unblocking sendmsg(MSG_FASTOPEN) with bad msg argument will start to
+> fail on top of this patch, while they should be successful (EINPROGRESS)
+> before.
+>
 
-Unless there's another feature on the horizon that depends on secondary exit controls,
-(and y'all will be posted patches soon), I'd prefer just grab these in the FRED
-series.  With the pairs check prep work out of the way, adding support for the
-new controls should be very straightforward, and shouldn't conflict with anything.
+Thanks for catching indeed. I guess what I can do here is record that
+the cmsg is invalid, then process up to MSG_FASTOPEN, and return
+EINVAL after that.
+
+Although that complicates this already complicated function a bit. Let
+me know if you have a better/different solution in mind.
+
+--
+Thanks,
+Mina
 
