@@ -1,207 +1,125 @@
-Return-Path: <kvm+bounces-39302-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39303-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 958A4A46761
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 18:06:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1191DA4677F
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 18:10:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2E23179665
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 16:53:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA6054279AD
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 16:58:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77C2421E097;
-	Wed, 26 Feb 2025 16:53:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 260232236ED;
+	Wed, 26 Feb 2025 16:58:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J+gLlw62"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QNYH2H2v"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5C8821D583
-	for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 16:52:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCFB521CA01;
+	Wed, 26 Feb 2025 16:58:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740588779; cv=none; b=f8ZCybtwu5/k1KLBN6Vc4kBGAznDJJjkZg/q0Dr9IpWoqmxiWBW4sEL14wuWA4e8Z+186R7Go1Z/78f7dnM31C9JjOA4otVsLlGR4IRcQWvnnKA4QwZGJd9wJGFfmYkV2YSztgSEJOEEvyfTS6ANh2Pi9E+XtK+gTzx0AH7P0Ro=
+	t=1740589125; cv=none; b=ZSf6HAW9id7e++tJ46t8W6v0r8TAqnn6Cj0F2k9ZsAWbzP7z4VvfIph4lv7xMYtcsMi5MF9Uf4z82w4GGDz69f8ygNuzPvXtoyyaLXaEtWYAdpismasZhApmuWkr5tkJTy8AYuqGTxCL0n5RdEn6TLd1QAo9u1I0zbZusOjp/0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740588779; c=relaxed/simple;
-	bh=Qf/Qm0nkzf7U3vlvRsLDs3vQoV9ABJSWnA6WtOiN2ig=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=D+58hBp18OmDeZCFEqakEaqutkwmrX8DtPYDjTlAuSdBGYHLKcmxoMv4f1FHlZFRZnLD3kyvCEcIU02GG63pERlP9qjhyrHPTXsajXPXknR9H+qrcI1fmRNELnAAM2JkCZPCqpinD0vVUyLCTArcsMIIJEICihsPdvPczPsdXnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J+gLlw62; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740588776;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Qf/Qm0nkzf7U3vlvRsLDs3vQoV9ABJSWnA6WtOiN2ig=;
-	b=J+gLlw62K7t4nQLqh/eCztgxf5Fg2RUFnZfalzbLz7G4JkaSaI98fxLoJofLamUdKiq9lF
-	AR5TImaky7EeD9LjA8lc2AfffaIe1F5zPSAVzupIlXI8hJbREi5Xvylty0oavr+Tqbm+xj
-	K1XIY0YigzYySnTUVOWTEqhsAoXWxVI=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-221-YtJCUKRZNWWM9Y8wCJxjdA-1; Wed, 26 Feb 2025 11:52:55 -0500
-X-MC-Unique: YtJCUKRZNWWM9Y8wCJxjdA-1
-X-Mimecast-MFC-AGG-ID: YtJCUKRZNWWM9Y8wCJxjdA_1740588774
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4399c32efb4so4856805e9.1
-        for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 08:52:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740588774; x=1741193574;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qf/Qm0nkzf7U3vlvRsLDs3vQoV9ABJSWnA6WtOiN2ig=;
-        b=OC43SOzGCE32IZnzdshs9EroKPPVr9I7DMtu35lsnxA5T515W4Ah5yzwb7hMNyk9pE
-         UJOWx46259+/s/N1PyplwATJKUh5Z49BUCcQmqEvH5Hh8MEzzgI78FdDAvNwxF9ZYDn/
-         +xn+3c3hbNpYfzdS+/OkCkHHrrmtV7fxKgPkeSXFzfxQxu5krPJW6beS/u1nzNrEOSNg
-         fLJiTgPRN8DkjaaPA/4nfq2cmPq9WQ9+y+gbt9GKRvPxq17pbjD5ncucah17etihEWUm
-         JUew+OwkuurwFq5o3oy9D+HIBOT+ARVF/p8ZADBVlVQE9+zEbJ89lYNMzyJ9MZp/Rr8U
-         +aqg==
-X-Forwarded-Encrypted: i=1; AJvYcCVqesP0sWbnp1NeiWgeckW4cM7vk7Qi1LO3H9h9qHuCu5FDEuIZE5mjR7sU4rKhQcixGL8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxA4TtqWH9U4p811KCkYA14a5jFxiThAOiQUKZoVdsl/O3uwDWf
-	/txOIJZxI0NRPFF8vne7Xw/fNAJ2Fyok0lBMLipsoqY2TBIeYlQ7YzwXX6cN72lPncAtfTQdyl0
-	aqtq4lY85VbXCk5S5Zn7F22MjEzgDCuPVeZr1FBpg89TcfUXNUw==
-X-Gm-Gg: ASbGncsWg56zXGl98TtxAnIGU/p6ztnArUaeG4EUjPcn/Z+QqT6N9YP2kCAOOzZsntD
-	MfqcEgnEN+YeLVjTyPeVxgYH6T+zciAFBW0Lwj91zb30WnfeWYWZ0ZYBUo4Vq9vI/b6W+4RZnSb
-	nU0xbWcejAjEx0KTVHWLgJwQbrIaObiZP4dbvhwe2XxBKAk6yJCCFFfOWc4pmJuWveJN7ECjcfs
-	tMIUjgGgiuycQAfVrjiWqLvT4cG6Dt2WkrErO2faHX7Zx12sGn/OkRrQUTH5tgQHGzXttMsq1gP
-	z1O6oiQof22AK4VOL9/cPtVzkm87H8exxvoyuwgI2LYv47WrW5AjBifEBNkI4AD4MJxW0H/TMa6
-	M
-X-Received: by 2002:a05:600c:ca:b0:439:91c7:895a with SMTP id 5b1f17b1804b1-43afddc6489mr797895e9.7.1740588774312;
-        Wed, 26 Feb 2025 08:52:54 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGWpDWParbyEFSiQubNArY/pYMHk4T+vY7Yfjqs/xu0tXoSgFv+Leti7F7TfR+hujI+3HmBjw==
-X-Received: by 2002:a05:600c:ca:b0:439:91c7:895a with SMTP id 5b1f17b1804b1-43afddc6489mr797035e9.7.1740588773857;
-        Wed, 26 Feb 2025 08:52:53 -0800 (PST)
-Received: from vschneid-thinkpadt14sgen2i.remote.csb (213-44-141-166.abo.bbox.fr. [213.44.141.166])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-390d98c0642sm2242326f8f.81.2025.02.26.08.52.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Feb 2025 08:52:53 -0800 (PST)
-From: Valentin Schneider <vschneid@redhat.com>
-To: Dave Hansen <dave.hansen@intel.com>, Jann Horn <jannh@google.com>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
- virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- loongarch@lists.linux.dev, linux-riscv@lists.infradead.org,
- linux-perf-users@vger.kernel.org, xen-devel@lists.xenproject.org,
- kvm@vger.kernel.org, linux-arch@vger.kernel.org, rcu@vger.kernel.org,
- linux-hardening@vger.kernel.org, linux-mm@kvack.org,
- linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
- bcm-kernel-feedback-list@broadcom.com, Juergen Gross <jgross@suse.com>,
- Ajay Kaher <ajay.kaher@broadcom.com>, Alexey Makhalov
- <alexey.amakhalov@broadcom.com>, Russell King <linux@armlinux.org.uk>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, Paul
- Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave
- Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Peter Zijlstra <peterz@infradead.org>, Arnaldo Carvalho de Melo
- <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Mark Rutland
- <mark.rutland@arm.com>, Alexander Shishkin
- <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, Ian
- Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>,
- "Liang, Kan" <kan.liang@linux.intel.com>, Boris Ostrovsky
- <boris.ostrovsky@oracle.com>, Josh Poimboeuf <jpoimboe@kernel.org>, Pawan
- Gupta <pawan.kumar.gupta@linux.intel.com>, Sean Christopherson
- <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, Andy Lutomirski
- <luto@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Frederic Weisbecker
- <frederic@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>, Jason
- Baron <jbaron@akamai.com>, Steven Rostedt <rostedt@goodmis.org>, Ard
- Biesheuvel <ardb@kernel.org>, Neeraj Upadhyay
- <neeraj.upadhyay@kernel.org>, Joel Fernandes <joel@joelfernandes.org>,
- Josh Triplett <josh@joshtriplett.org>, Boqun Feng <boqun.feng@gmail.com>,
- Uladzislau Rezki <urezki@gmail.com>, Mathieu Desnoyers
- <mathieu.desnoyers@efficios.com>, Lai Jiangshan <jiangshanlai@gmail.com>,
- Zqiang <qiang.zhang1211@gmail.com>, Juri Lelli <juri.lelli@redhat.com>,
- Clark Williams <williams@redhat.com>, Yair Podemsky <ypodemsk@redhat.com>,
- Tomas Glozar <tglozar@redhat.com>, Vincent Guittot
- <vincent.guittot@linaro.org>, Dietmar Eggemann <dietmar.eggemann@arm.com>,
- Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, Kees Cook
- <kees@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Christoph
- Hellwig <hch@infradead.org>, Shuah Khan <shuah@kernel.org>, Sami Tolvanen
- <samitolvanen@google.com>, Miguel Ojeda <ojeda@kernel.org>, Alice Ryhl
- <aliceryhl@google.com>, "Mike Rapoport (Microsoft)" <rppt@kernel.org>,
- Samuel Holland <samuel.holland@sifive.com>, Rong Xu <xur@google.com>,
- Nicolas Saenz Julienne <nsaenzju@redhat.com>, Geert Uytterhoeven
- <geert@linux-m68k.org>, Yosry Ahmed <yosryahmed@google.com>, "Kirill A.
- Shutemov" <kirill.shutemov@linux.intel.com>, "Masami Hiramatsu (Google)"
- <mhiramat@kernel.org>, Jinghao Jia <jinghao7@illinois.edu>, Luis
- Chamberlain <mcgrof@kernel.org>, Randy Dunlap <rdunlap@infradead.org>,
- Tiezhu Yang <yangtiezhu@loongson.cn>
-Subject: Re: [PATCH v4 29/30] x86/mm, mm/vmalloc: Defer
- flush_tlb_kernel_range() targeting NOHZ_FULL CPUs
-In-Reply-To: <408ebd8b-4bfb-4c4f-b118-7fe853c6e897@intel.com>
-References: <20250114175143.81438-1-vschneid@redhat.com>
- <20250114175143.81438-30-vschneid@redhat.com>
- <CAG48ez1Mh+DOy0ysOo7Qioxh1W7xWQyK9CLGNU9TGOsLXbg=gQ@mail.gmail.com>
- <xhsmh34hhh37q.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
- <CAG48ez3H8OVP1GxBLdmFgusvT1gQhwu2SiXbgi8T9uuCYVK52w@mail.gmail.com>
- <xhsmh5xlhk5p2.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
- <CAG48ez1EAATYcX520Nnw=P8XtUDSr5pe+qGH1YVNk3xN2LE05g@mail.gmail.com>
- <xhsmh34gkk3ls.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
- <352317e3-c7dc-43b4-b4cb-9644489318d0@intel.com>
- <xhsmhjz9mj2qo.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
- <d0450bc8-6585-49ca-9cad-49e65934bd5c@intel.com>
- <xhsmhh64qhssj.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
- <eef09bdc-7546-462b-9ac0-661a44d2ceae@intel.com>
- <xhsmhfrk84k5k.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
- <408ebd8b-4bfb-4c4f-b118-7fe853c6e897@intel.com>
-Date: Wed, 26 Feb 2025 17:52:50 +0100
-Message-ID: <xhsmhfrk0lkbh.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+	s=arc-20240116; t=1740589125; c=relaxed/simple;
+	bh=Fg223SHibQKgebDMBsGFZaFDHofVBllGK7dAM65Pxp8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=igs1vXd001Jw+N8eh5q/GFp2ziBAlEwWxkJv0WqcPChcnRKcGq+nWUUnzb76ScaovBHHIpTwfpXFlLK6QbGRSn0NuIfK/AMvxRuGsHzY9O5a6bHa9nDhIExXdhZhkWVzQ4ot8ifFXjewju9cKtKRzHbZ00i1SGDsG1MTcYR1474=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=QNYH2H2v; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51Q7WpHM005964;
+	Wed, 26 Feb 2025 16:58:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=Qqkvw5
+	sVdc4OjLjsPlTA9mIkdFACVA5E9/VNX7SLR5A=; b=QNYH2H2v2uxFzuF3CLBqmI
+	aDqSzrJJKnbPw+NbLv86zizCq4kQhLSKP5ND8LZb62B/Q6rqO3GdtCsvyS3mn38w
+	4H3AXRIRPO/c6gYdLICeco9TRc/IgWamioOkVOqZDObqQDO/MPCzkSf3YrCB1g2z
+	3oBTRAfQwFc/dGPAZwCs3S58ltICHBzx+XByYmQ/gf0CqoPTrQHg5Z8pIIJg2woW
+	ICrctI3/Ttdb1ug4cXuHzRuqnG7ztuSzXv0hIfHsNf9pQyjyU9OGO4KuFInDXZr3
+	J3+iabHam7lLJ0OBRtiMaqd8XU+5YdnsGT7clnYXvmLuMK7h0LmaqVOtso6mqDcg
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 451xnp2nat-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 26 Feb 2025 16:58:40 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51QE5xIF027372;
+	Wed, 26 Feb 2025 16:58:39 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 44yum23amq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 26 Feb 2025 16:58:39 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51QGwadU10486202
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 26 Feb 2025 16:58:36 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DE98B20040;
+	Wed, 26 Feb 2025 16:58:35 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3C62E2004D;
+	Wed, 26 Feb 2025 16:58:35 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.171.9.246])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Wed, 26 Feb 2025 16:58:35 +0000 (GMT)
+Date: Wed, 26 Feb 2025 17:58:33 +0100
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        borntraeger@de.ibm.com, nrb@linux.ibm.com, seiden@linux.ibm.com,
+        nsg@linux.ibm.com, schlameuss@linux.ibm.com, hca@linux.ibm.com
+Subject: Re: [PATCH v2 1/1] KVM: s390: pv: fix race when making a page
+ secure
+Message-ID: <20250226175833.16a7a970@p-imbrenda>
+In-Reply-To: <0dfeabca-5c41-4555-a43b-341a54096036@redhat.com>
+References: <20250226123725.247578-1-imbrenda@linux.ibm.com>
+	<20250226123725.247578-2-imbrenda@linux.ibm.com>
+	<0dfeabca-5c41-4555-a43b-341a54096036@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: WrNXnQvLPCPgrc_P8En33TtwvtL5axnM
+X-Proofpoint-GUID: WrNXnQvLPCPgrc_P8En33TtwvtL5axnM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-26_04,2025-02-26_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ priorityscore=1501 suspectscore=0 mlxlogscore=827 spamscore=0 phishscore=0
+ mlxscore=0 adultscore=0 malwarescore=0 bulkscore=0 clxscore=1015
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502100000 definitions=main-2502260131
 
-On 20/02/25 09:38, Dave Hansen wrote:
-> On 2/20/25 09:10, Valentin Schneider wrote:
->>> The LDT and maybe the PEBS buffers are the only implicit supervisor
->>> accesses to vmalloc()'d memory that I can think of. But those are both
->>> handled specially and shouldn't ever get zapped while in use. The LDT
->>> replacement has its own IPIs separate from TLB flushing.
->>>
->>> But I'm actually not all that worried about accesses while actually
->>> running userspace. It's that "danger zone" in the kernel between entry
->>> and when the TLB might have dangerous garbage in it.
->>>
->> So say we have kPTI, thus no vmalloc() mapped in CR3 when running
->> userspace, and do a full TLB flush right before switching to userspace -
->> could the TLB still end up with vmalloc()-range-related entries when we're
->> back in the kernel and going through the danger zone?
->
-> Yes, because the danger zone includes the switch back to the kernel CR3
-> with vmalloc() fully mapped. All bets are off about what's in the TLB
-> the moment that CR3 write occurs.
->
-> Actually, you could probably use that.
->
-> If a mapping is in the PTI user page table, you can't defer the flushes
-> for it. Basically the same rule for text poking in the danger zone.
->
-> If there's a deferred flush pending, make sure that all of the
-> SWITCH_TO_KERNEL_CR3's fully flush the TLB. You'd need something similar
-> to user_pcid_flush_mask.
->
+On Wed, 26 Feb 2025 16:05:11 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-Right, that's what I (roughly) had in mind...
+> > +int make_hva_secure(struct mm_struct *mm, unsigned long hva, struct uv_cb_header *uvcb)
+> > +{
+> > +	struct folio *folio;
+> > +	spinlock_t *ptelock;
+> > +	pte_t *ptep;
+> > +	int rc;
+> > +
+> > +	ptep = get_locked_valid_pte(mm, hva, &ptelock);
+> > +	if (!ptep)
+> > +		return -ENXIO;  
+> 
+> You very likely need a pte_write() check we had there before, as you 
+> might effectively modify page content by clearing the page.
 
-> But, honestly, I'm still not sure this is worth all the trouble. If
-> folks want to avoid IPIs for TLB flushes, there are hardware features
-> that *DO* that. Just get new hardware instead of adding this complicated
-> pile of software that we have to maintain forever. In 10 years, we'll
-> still have this software *and* 95% of our hardware has the hardware
-> feature too.
-
-... But yeah, it pretty much circumvents arch_context_tracking_work, or at
-the very least adds an early(er) flushing of the context tracking
-work... Urgh.
-
-Thank you for grounding my wild ideas into reality. I'll try to think some
-more see if I see any other way out (other than "buy hardware that does
-what you want and ditch the one that doesn't").
-
+it's not really needed, but it doesn't hurt either, I'll add a check
 
