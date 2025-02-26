@@ -1,243 +1,197 @@
-Return-Path: <kvm+bounces-39390-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39392-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B4D7A46BB7
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 21:03:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2100DA46BE5
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 21:06:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 203F5188D036
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 20:03:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8930318858C2
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 20:06:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B02525FA41;
-	Wed, 26 Feb 2025 19:56:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64962236A74;
+	Wed, 26 Feb 2025 20:06:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HOYJgp8n"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cgr0cl4J"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6020D281379
-	for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 19:56:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E615921CC79
+	for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 20:06:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740599777; cv=none; b=FkUF3OMRJxKj7ONidsDE4f9YVQyJjAuMt/IoFpNdtSMqHmiigMLcY3xxSa0tAvGCYVObwJ9ioyYgBzM/H+1bFJfuCRsLcR9+gY1vtwqxLhvtW3yJlY0wYjQ1ilgSl0skL2t3oINlTQV9ROJ3z6hpRsYD6U5MozaY30HCl7cmcgU=
+	t=1740600366; cv=none; b=bIIDllt/+Mp+vp+Teif5F+hHrpM6tKnHFer8faMyDlnbD2RUdVZd6459/guxZf+eAmPm+JPb/MJRZNfUmDNGKd+mkfhhvpH+FbEWqmWsdOxcOZDpyPiN4U1O7Lt0Xx4DmC5ip7OCLVsQZ8RK3gDkrMQSGfm2KD0YcItJMyZDNws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740599777; c=relaxed/simple;
-	bh=NETAek9P6jFoRao+0v3DspO+//m8Dy5rDDzZs9yl4fk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jWIaSzFAkdU/7u4zy4TfPcPPLcr19+F4olaclQ8muEPdPrjxHz6LdCUNVgW6Evbc0Dg61NrFigk4xd0mfvoDGZ8OoDrWqEsovSY0EHSbSf2IAHgBfrARTHk5mOe08qCdNL46uxQwZi192tD+gtJtH+TUyB2U6HKAHLIylnUECFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HOYJgp8n; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1740600366; c=relaxed/simple;
+	bh=yfQM1CqTfquiWJhwLZj9JaiA7Bh+UIirxNzXo464XAU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RAezyzUpYj10cqSIs67ZQ796KOQ41pNk4h9XHYnGc366E7Bxe4R+ZDtBE0sOBHfRstTP2Iqj3WJsJSTnCN4ceU2JFSrBW8tUok52JeztbydgyNyywbjA60lC32LXrT1MI+RS3O4wbRCFu5QEoMwsy7XKzt8gcKo9W9/MqIGim1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cgr0cl4J; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740599774;
+	s=mimecast20190719; t=1740600363;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9x3o+9ZxYY1IDIcV6p0SSKe8rNG8+39lVVVMoUGc4IQ=;
-	b=HOYJgp8nFV9soylr8EiBERIiOiWQ/kADhzDTmF/tEZOf9dvZYXxNHKK6bpUsf6Yt4wSzsC
-	+YdLrWXdsi8Byti8MWjUpH9ge9Q3uhybuZneuu7wEniTriqPdOiSYEzE99deohZS4WdbQ5
-	V7/Qdcz1rJlRqV7srbcUm8eeBUdq6VI=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-644-1kRGc817PPy9WEX6XFbSrQ-1; Wed,
- 26 Feb 2025 14:56:12 -0500
-X-MC-Unique: 1kRGc817PPy9WEX6XFbSrQ-1
-X-Mimecast-MFC-AGG-ID: 1kRGc817PPy9WEX6XFbSrQ_1740599771
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5CCF31800873;
-	Wed, 26 Feb 2025 19:56:09 +0000 (UTC)
-Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8125C1955E79;
-	Wed, 26 Feb 2025 19:56:08 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Cc: seanjc@google.com,
-	Yan Zhao <yan.y.zhao@intel.com>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>
-Subject: [PATCH 29/29] KVM: TDX: Handle SEPT zap error due to page add error in premap
-Date: Wed, 26 Feb 2025 14:55:29 -0500
-Message-ID: <20250226195529.2314580-30-pbonzini@redhat.com>
-In-Reply-To: <20250226195529.2314580-1-pbonzini@redhat.com>
-References: <20250226195529.2314580-1-pbonzini@redhat.com>
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=VkP4TuFVcedC8r8X6iUSdW1moEur4w/J0xKrd7lJWeA=;
+	b=cgr0cl4JyGILmdMqaia6RBFIkBiU6Wyqu1kQuzIHHUcH7SdKABEQjYt9lxnB+Fpt/Y5e17
+	meJaea0+343TeiNPBQUt9lxuarF6PwcIxfvh3DNYtbJ7eQ7Cerp7wnecxxSteni7yNgl9s
+	T5XHwiF4cRzUdKXNODgRVPUVg9UH6sI=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-413-L9VU3pIjNPSJ8zCt010V_A-1; Wed, 26 Feb 2025 15:06:02 -0500
+X-MC-Unique: L9VU3pIjNPSJ8zCt010V_A-1
+X-Mimecast-MFC-AGG-ID: L9VU3pIjNPSJ8zCt010V_A_1740600361
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43947979ce8so832435e9.0
+        for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 12:06:02 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740600361; x=1741205161;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=VkP4TuFVcedC8r8X6iUSdW1moEur4w/J0xKrd7lJWeA=;
+        b=b42yMVMUsN3pirUesp/GqXbjaX8FjSUBG6UVM9WGqo06nDtsnYnPs8PwGAN6KnYFVJ
+         iVKED7erUlvoqththrbYx/YrfkNo8UaCkdDIdZ8qRsrpgZfhwr1TcQRPuDUTSaRUS4Hu
+         Npc9n7ZaP1WbdChgvGnsVBJgiQJrTxMqdK3QWqfmoP06vDqScGYr6/kvDo2Voz+0iJd3
+         ONnWDNcchcNtbJqWBbxXXDXS6FId8Zo4f6YQqDsrcnUBR4X/mvz2bj5ub7scQuA3njkG
+         UrbUOLOtN1LnwHb1kX6o7SuWcrj34EvRAF1B/NCV31tEoEiP3UkCObsDJ/v/4a8QnaoD
+         /54Q==
+X-Gm-Message-State: AOJu0YyEv9dEWnGo/e+JMs71DHqdXZNh6gAqFDrGaGVG7G3tf4OdJ6x7
+	6NIPXg3nmzmu/BtXcVqFtDCpj8vbNTmJ0IFxu/d3w5vQGaCLCoaKWMwkAYPL/c6lTSs8Bp2az28
+	LaZU6g1ykEz74ADh2/iitpJWizsqriFtvzH4Wm3BLxwndpoV+ig==
+X-Gm-Gg: ASbGncs053YrNIyMnpAADppTCIrcYCz1lWu9GpjnzD8WfBgwmVrXRBqadrPMpJVl9mS
+	ohbjuxsyExjLEfkyPCpD2EQbBmmEzzrROZOuhATiCcyi4z2wIDzMICptjPCiiKq/taXyQfhVCWv
+	z5LbZ3vS+a9aa6X3tWfyAoF6OSZ6hVmoFbFeWE+PjjXBgnu588gYK/P0LPAN5IgCDsCI2oh+vjc
+	orf0ngQ94UzLzRT4f5zeZwFg0w3o4l2ZLSE9gJWQKhiIMleL9FT+dDhNSy1KxP4fWoUh4x6RLFF
+	JnUNt9Kbqh3yiUFy0WH8Tk5OWJxb2Vmw2QVMpnW6/LIE
+X-Received: by 2002:a05:600c:4ed1:b0:439:a155:549d with SMTP id 5b1f17b1804b1-439ae1eacfdmr199361655e9.12.1740600361055;
+        Wed, 26 Feb 2025 12:06:01 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGSLrbCY8KNtNI+AO0sxh7vDOX9ToRLiD06mZNoQeMc6k2mNBytgFCMdXePpXFhkuvOF0ZMYA==
+X-Received: by 2002:a05:600c:4ed1:b0:439:a155:549d with SMTP id 5b1f17b1804b1-439ae1eacfdmr199361515e9.12.1740600360655;
+        Wed, 26 Feb 2025 12:06:00 -0800 (PST)
+Received: from [192.168.3.141] (p5b0c6611.dip0.t-ipconnect.de. [91.12.102.17])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43aba5711dfsm32306775e9.27.2025.02.26.12.05.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Feb 2025 12:06:00 -0800 (PST)
+Message-ID: <2be79033-187f-4dff-af2b-d97a52a450a8@redhat.com>
+Date: Wed, 26 Feb 2025 21:05:59 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 5/6] mm: Provide address mask in struct
+ follow_pfnmap_args
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, peterx@redhat.com,
+ mitchell.augustin@canonical.com, clg@redhat.com, jgg@nvidia.com,
+ akpm@linux-foundation.org, linux-mm@kvack.org
+References: <20250218222209.1382449-1-alex.williamson@redhat.com>
+ <20250218222209.1382449-6-alex.williamson@redhat.com>
+ <3d1315ab-ba94-46c2-8dbf-ef26454f7007@redhat.com>
+ <20250226125435.72bbb00a.alex.williamson@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+ dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+ QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+ XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+ Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+ PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+ WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+ UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+ jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+ B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
+ ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZgEEwEIAEICGwMGCwkIBwMCBhUIAgkKCwQW
+ AgMBAh4BAheAAhkBFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl8Ox4kFCRKpKXgACgkQTd4Q
+ 9wD/g1oHcA//a6Tj7SBNjFNM1iNhWUo1lxAja0lpSodSnB2g4FCZ4R61SBR4l/psBL73xktp
+ rDHrx4aSpwkRP6Epu6mLvhlfjmkRG4OynJ5HG1gfv7RJJfnUdUM1z5kdS8JBrOhMJS2c/gPf
+ wv1TGRq2XdMPnfY2o0CxRqpcLkx4vBODvJGl2mQyJF/gPepdDfcT8/PY9BJ7FL6Hrq1gnAo4
+ 3Iv9qV0JiT2wmZciNyYQhmA1V6dyTRiQ4YAc31zOo2IM+xisPzeSHgw3ONY/XhYvfZ9r7W1l
+ pNQdc2G+o4Di9NPFHQQhDw3YTRR1opJaTlRDzxYxzU6ZnUUBghxt9cwUWTpfCktkMZiPSDGd
+ KgQBjnweV2jw9UOTxjb4LXqDjmSNkjDdQUOU69jGMUXgihvo4zhYcMX8F5gWdRtMR7DzW/YE
+ BgVcyxNkMIXoY1aYj6npHYiNQesQlqjU6azjbH70/SXKM5tNRplgW8TNprMDuntdvV9wNkFs
+ 9TyM02V5aWxFfI42+aivc4KEw69SE9KXwC7FSf5wXzuTot97N9Phj/Z3+jx443jo2NR34XgF
+ 89cct7wJMjOF7bBefo0fPPZQuIma0Zym71cP61OP/i11ahNye6HGKfxGCOcs5wW9kRQEk8P9
+ M/k2wt3mt/fCQnuP/mWutNPt95w9wSsUyATLmtNrwccz63XOwU0EVcufkQEQAOfX3n0g0fZz
+ Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
+ T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
+ 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
+ CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
+ NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
+ 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
+ 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
+ lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
+ AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
+ N7eop7uh+6bezi+rugUI+w6DABEBAAHCwXwEGAEIACYCGwwWIQQb2cqtc1xMOkYN/MpN3hD3
+ AP+DWgUCXw7HsgUJEqkpoQAKCRBN3hD3AP+DWrrpD/4qS3dyVRxDcDHIlmguXjC1Q5tZTwNB
+ boaBTPHSy/Nksu0eY7x6HfQJ3xajVH32Ms6t1trDQmPx2iP5+7iDsb7OKAb5eOS8h+BEBDeq
+ 3ecsQDv0fFJOA9ag5O3LLNk+3x3q7e0uo06XMaY7UHS341ozXUUI7wC7iKfoUTv03iO9El5f
+ XpNMx/YrIMduZ2+nd9Di7o5+KIwlb2mAB9sTNHdMrXesX8eBL6T9b+MZJk+mZuPxKNVfEQMQ
+ a5SxUEADIPQTPNvBewdeI80yeOCrN+Zzwy/Mrx9EPeu59Y5vSJOx/z6OUImD/GhX7Xvkt3kq
+ Er5KTrJz3++B6SH9pum9PuoE/k+nntJkNMmQpR4MCBaV/J9gIOPGodDKnjdng+mXliF3Ptu6
+ 3oxc2RCyGzTlxyMwuc2U5Q7KtUNTdDe8T0uE+9b8BLMVQDDfJjqY0VVqSUwImzTDLX9S4g/8
+ kC4HRcclk8hpyhY2jKGluZO0awwTIMgVEzmTyBphDg/Gx7dZU1Xf8HFuE+UZ5UDHDTnwgv7E
+ th6RC9+WrhDNspZ9fJjKWRbveQgUFCpe1sa77LAw+XFrKmBHXp9ZVIe90RMe2tRL06BGiRZr
+ jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20250226125435.72bbb00a.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Yan Zhao <yan.y.zhao@intel.com>
+On 26.02.25 20:54, Alex Williamson wrote:
+> On Wed, 19 Feb 2025 09:31:48 +0100
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> On 18.02.25 23:22, Alex Williamson wrote:
+>>> follow_pfnmap_start() walks the page table for a given address and
+>>> fills out the struct follow_pfnmap_args in pfnmap_args_setup().
+>>> The address mask of the page table level is already provided to this
+>>> latter function for calculating the pfn.  This address mask can also
+>>> be useful for the caller to determine the extent of the contiguous
+>>> mapping.
+>>>
+>>> For example, vfio-pci now supports huge_fault for pfnmaps and is able
+>>> to insert pud and pmd mappings.  When we DMA map these pfnmaps, ex.
+>>> PCI MMIO BARs, we iterate follow_pfnmap_start() to get each pfn to test
+>>> for a contiguous pfn range.  Providing the mapping address mask allows
+>>> us to skip the extent of the mapping level.  Assuming a 1GB pud level
+>>> and 4KB page size, iterations are reduced by a factor of 256K.  In wall
+>>> clock time, mapping a 32GB PCI BAR is reduced from ~1s to <1ms.
+>>>
+>>> Cc: Andrew Morton <akpm@linux-foundation.org>
+>>> Cc: David Hildenbrand <david@redhat.com>
+>>> Cc: linux-mm@kvack.org
+>>> Reviewed-by: Peter Xu <peterx@redhat.com>
+>>> Reviewed-by: "Mitchell Augustin" <mitchell.augustin@canonical.com>
+>>> Tested-by: "Mitchell Augustin" <mitchell.augustin@canonical.com>
+>>> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+>>> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+>>> ---
+>>
+>> Acked-by: David Hildenbrand <david@redhat.com>
+> 
+> Thanks, David!
+> 
+> Is there any objection from mm folks to bring this in through the vfio
+> tree?
 
-Move the handling of SEPT zap errors caused by unsuccessful execution of
-tdh_mem_page_add() in KVM_TDX_INIT_MEM_REGION from
-tdx_sept_drop_private_spte() to tdx_sept_zap_private_spte(). Introduce a
-new helper function tdx_is_sept_zap_err_due_to_premap() to detect this
-specific error.
+I assume it's fine. Andrew is on CC, so he should be aware of it. I'm 
+not aware of possible clashes.
 
-During the IOCTL KVM_TDX_INIT_MEM_REGION, KVM premaps leaf SPTEs in the
-mirror page table before the corresponding entry in the private page table
-is successfully installed by tdh_mem_page_add(). If an error occurs during
-the invocation of tdh_mem_page_add(), a mismatch between the mirror and
-private page tables results in SEAMCALLs for SEPT zap returning the error
-code TDX_EPT_ENTRY_STATE_INCORRECT.
-
-The error TDX_EPT_WALK_FAILED is not possible because, during
-KVM_TDX_INIT_MEM_REGION, KVM only premaps leaf SPTEs after successfully
-mapping non-leaf SPTEs. Unlike leaf SPTEs, there is no mismatch in non-leaf
-PTEs between the mirror and private page tables. Therefore, during zap,
-SEAMCALLs should find an empty leaf entry in the private EPT, leading to
-the error TDX_EPT_ENTRY_STATE_INCORRECT instead of TDX_EPT_WALK_FAILED.
-
-Since tdh_mem_range_block() is always invoked before tdh_mem_page_remove(),
-move the handling of SEPT zap errors from tdx_sept_drop_private_spte() to
-tdx_sept_zap_private_spte(). In tdx_sept_zap_private_spte(), return 0 for
-errors due to premap to skip executing other SEAMCALLs for zap, which are
-unnecessary. Return 1 to indicate no other errors, allowing the execution
-of other zap SEAMCALLs to continue.
-
-The failure of tdh_mem_page_add() is uncommon and has not been observed in
-real workloads. Currently, this failure is only hypothetically triggered by
-skipping the real SEAMCALL and faking the add error in the SEAMCALL
-wrapper. Additionally, without this fix, there will be no host crashes or
-other severe issues.
-
-Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-Message-ID: <20250217085642.19696-1-yan.y.zhao@intel.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/vmx/tdx.c | 66 ++++++++++++++++++++++++++++++------------
- 1 file changed, 47 insertions(+), 19 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index a6696448cb53..f2cbd8c440e9 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -775,20 +775,6 @@ static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
- 					  &level_state);
- 	} while (unlikely(tdx_operand_busy(err)));
- 
--	if (unlikely(kvm_tdx->state != TD_STATE_RUNNABLE &&
--		     err == (TDX_EPT_WALK_FAILED | TDX_OPERAND_ID_RCX))) {
--		/*
--		 * Page is mapped by KVM_TDX_INIT_MEM_REGION, but hasn't called
--		 * tdh_mem_page_add().
--		 */
--		if ((!is_last_spte(entry, level) || !(entry & VMX_EPT_RWX_MASK)) &&
--		    !KVM_BUG_ON(!atomic64_read(&kvm_tdx->nr_premapped), kvm)) {
--			atomic64_dec(&kvm_tdx->nr_premapped);
--			tdx_unpin(kvm, page);
--			return 0;
--		}
--	}
--
- 	if (KVM_BUG_ON(err, kvm)) {
- 		pr_tdx_error_2(TDH_MEM_PAGE_REMOVE, err, entry, level_state);
- 		return -EIO;
-@@ -826,8 +812,41 @@ int tdx_sept_link_private_spt(struct kvm *kvm, gfn_t gfn,
- 	return 0;
- }
- 
-+/*
-+ * Check if the error returned from a SEPT zap SEAMCALL is due to that a page is
-+ * mapped by KVM_TDX_INIT_MEM_REGION without tdh_mem_page_add() being called
-+ * successfully.
-+ *
-+ * Since tdh_mem_sept_add() must have been invoked successfully before a
-+ * non-leaf entry present in the mirrored page table, the SEPT ZAP related
-+ * SEAMCALLs should not encounter err TDX_EPT_WALK_FAILED. They should instead
-+ * find TDX_EPT_ENTRY_STATE_INCORRECT due to an empty leaf entry found in the
-+ * SEPT.
-+ *
-+ * Further check if the returned entry from SEPT walking is with RWX permissions
-+ * to filter out anything unexpected.
-+ *
-+ * Note: @level is pg_level, not the tdx_level. The tdx_level extracted from
-+ * level_state returned from a SEAMCALL error is the same as that passed into
-+ * the SEAMCALL.
-+ */
-+static int tdx_is_sept_zap_err_due_to_premap(struct kvm_tdx *kvm_tdx, u64 err,
-+					     u64 entry, int level)
-+{
-+	if (!err || kvm_tdx->state == TD_STATE_RUNNABLE)
-+		return false;
-+
-+	if (err != (TDX_EPT_ENTRY_STATE_INCORRECT | TDX_OPERAND_ID_RCX))
-+		return false;
-+
-+	if ((is_last_spte(entry, level) && (entry & VMX_EPT_RWX_MASK)))
-+		return false;
-+
-+	return true;
-+}
-+
- static int tdx_sept_zap_private_spte(struct kvm *kvm, gfn_t gfn,
--				     enum pg_level level)
-+				     enum pg_level level, struct page *page)
- {
- 	int tdx_level = pg_level_to_tdx_sept_level(level);
- 	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-@@ -840,11 +859,19 @@ static int tdx_sept_zap_private_spte(struct kvm *kvm, gfn_t gfn,
- 	err = tdh_mem_range_block(&kvm_tdx->td, gpa, tdx_level, &entry, &level_state);
- 	if (unlikely(tdx_operand_busy(err)))
- 		return -EBUSY;
-+
-+	if (tdx_is_sept_zap_err_due_to_premap(kvm_tdx, err, entry, level) &&
-+	    !KVM_BUG_ON(!atomic64_read(&kvm_tdx->nr_premapped), kvm)) {
-+		atomic64_dec(&kvm_tdx->nr_premapped);
-+		tdx_unpin(kvm, page);
-+		return 0;
-+	}
-+
- 	if (KVM_BUG_ON(err, kvm)) {
- 		pr_tdx_error_2(TDH_MEM_RANGE_BLOCK, err, entry, level_state);
- 		return -EIO;
- 	}
--	return 0;
-+	return 1;
- }
- 
- /*
-@@ -918,6 +945,7 @@ int tdx_sept_free_private_spt(struct kvm *kvm, gfn_t gfn,
- int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
- 				 enum pg_level level, kvm_pfn_t pfn)
- {
-+	struct page *page = pfn_to_page(pfn);
- 	int ret;
- 
- 	/*
-@@ -928,8 +956,8 @@ int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
- 	if (KVM_BUG_ON(!is_hkid_assigned(to_kvm_tdx(kvm)), kvm))
- 		return -EINVAL;
- 
--	ret = tdx_sept_zap_private_spte(kvm, gfn, level);
--	if (ret)
-+	ret = tdx_sept_zap_private_spte(kvm, gfn, level, page);
-+	if (ret <= 0)
- 		return ret;
- 
- 	/*
-@@ -938,7 +966,7 @@ int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
- 	 */
- 	tdx_track(kvm);
- 
--	return tdx_sept_drop_private_spte(kvm, gfn, level, pfn_to_page(pfn));
-+	return tdx_sept_drop_private_spte(kvm, gfn, level, page);
- }
- 
- static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
 -- 
-2.43.5
+Cheers,
+
+David / dhildenb
 
 
