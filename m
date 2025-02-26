@@ -1,161 +1,187 @@
-Return-Path: <kvm+bounces-39202-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39203-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACE23A451C1
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 01:51:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 383FDA451C8
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 01:59:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A30CE17D888
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 00:51:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8AC83B0CCC
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 00:59:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EBD1153BF0;
-	Wed, 26 Feb 2025 00:51:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21B49154C0D;
+	Wed, 26 Feb 2025 00:59:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EnbrudHx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kvMIoC7o"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59394145B27
-	for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 00:50:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B01D825771
+	for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 00:59:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740531059; cv=none; b=PwvyF2qJNhzDU+OA2gk4vJBtOfRHEp6WDy9IDhX9kxKC1pntr9yNW3yXV+W8rrfzRi56PyO0sXmRVdjiSaXE9ouqlEbRKeHvdKxm95lQ6eId1aHaAmHcEGoau7BjwvGQgLyuniM9u+oyJxvF6X/CyVqrFLpPuoUHEGKHCiGBoDI=
+	t=1740531543; cv=none; b=OspS5rvqMkR5wjXc5rWYHxUZPCFhiWQeCLifmDHMRh1adEZ215sQlOu5r/fimsOOmvEqX4mfmR8TTUwY5s2Kq2BuTcunHr04WdeDxoRKeOKHZlmkkW+YMORuMr3xpQ3ydj6Gz3zyjnrcVOWGcq5cnw5JIin7Vfym7uZlIEbqYY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740531059; c=relaxed/simple;
-	bh=z4otdrdsn2fsyB2Bvll9tjCAMDpiUsb7HJylJFqs8UQ=;
+	s=arc-20240116; t=1740531543; c=relaxed/simple;
+	bh=pEtfZVCVm3/XOugzU8Ltx4f7z/cLwxmkARQ2R+6a/Qc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Z4qoDdBpTTkBmup69ycDAF1fe2zkQ4Tg/FA67TlbAc6K3UPxUn+msgDshqGKQcPEwSIJSyyjVcomGKa7ZonafDe7mJpFyFy0H+/QmGEWlNLW8kgO0v7B3Z9n8pmIK9TZ/d7oc9cHGlAtV7GxKRXgefcl292/lIMcvZ05szSV/lE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EnbrudHx; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=JhtvNTM0o5mk4rWaqedhT76R5HLmfLQdbOkuU0Vhe8dOzWoP5g9IfpBzsIgrvISuPTANZtxjhEAYkOTO/dTtC6UzlMuhYkSpdQ5mQnJC+7eG6kID2X6ixdeE8tvbXjpUgBTMGvJm7Imo0EOa5CrhnoBcWhICvMekJ+8ou8BpDwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kvMIoC7o; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2f2a9f056a8so13299680a91.2
-        for <kvm@vger.kernel.org>; Tue, 25 Feb 2025 16:50:58 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fe86c01f4aso63911a91.2
+        for <kvm@vger.kernel.org>; Tue, 25 Feb 2025 16:59:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740531057; x=1741135857; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1740531541; x=1741136341; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JXtm2iNAeoRBljTe88BgfoaNePq6nOE+XaOff3sfo/g=;
-        b=EnbrudHx6FPi5eSeSmmrEYqNQUwTyQ6W1ZPT9kRed74bbvv0C3GkMxqoxqyb9qyHdR
-         qiSkFtwemWb+8DYk7VWJ9AdSCy6ghNEo7K66iDtXSpwnw27iIbgb9t/PhXs+7BIlPsp2
-         nE+Iv8xZ21/vvmHt6ZM3FgFz2f+jLvKsj/XN+I+kpCi0Bxf2KhyGNPV4q7qLjCw68FA5
-         a4UmmyYxS58ZQvMsJs0d/W6jmngE344AMXriGRQ5Qv/JqCZMEeov0sNRGOkp0RrA/1XH
-         5Aabc9jBNxFKrEfQdG/UtJoQbdjWQkVedUk7ICRAK3Wr+b27qRW/Ur7FrzHiteXMiJ0z
-         FV5g==
+        bh=BfE+FYiAOd9DAOybGgX5laywdzU/CIqHsXJrp0PBGSY=;
+        b=kvMIoC7onJ9el6359P2kksBcw1fUyvFQ5BG00eaS6r6g7Lk+2z3Iq1cKWUEIegi8G3
+         FNgUCWwkwwLUasxSDULJOataRitRltGWLhdiEw9uGw5eNLMcnLv/16ekUoZJN80HORm9
+         skeNhoAkG2HWFo6Zq39yfiw2VmdSGzhnbbc8gFZjVa3iu49iiZg6hpNcjkG9qw/yyTDO
+         9IvwBR/wVDP6ybkDGJDaEJKM7JEDJS3KGkOOsbNq/cXaXX0BCoAnMbA+WPAJDHfP5EwA
+         6hQ5TreFgBS6aWqyegaV+NZ70Ir2udjvuBb1eUyIt7Yqo1ocyGXOWOMdO+tAWHhQpzes
+         2E9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740531057; x=1741135857;
+        d=1e100.net; s=20230601; t=1740531541; x=1741136341;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JXtm2iNAeoRBljTe88BgfoaNePq6nOE+XaOff3sfo/g=;
-        b=pCXCvw2zoKBiHigfpYT33vyAxDXqEd+XYdtQmJuaAiej16taPWodWdcsJ+jkeQfKi9
-         D2Bop71bIej8gatgk+AH8MbIUZrSik8Bc5uFLiGjqjgE7i0oy5SePtfswRkx198Cxqba
-         D/1KVYit4UMHPlTbIPrP3zU3FV+i4fkS2dRABqAWFUf7hbWyFPQwTqqkLCD3vGEbMVLm
-         pc83n6199Ukegnq4CqShJK9kSLtqeRcOW6BX/kXF3UTJh+pj1kSntf0k57yzOPCqLUno
-         cF9qgW+PxBiWXCf/kTTmBEJKteI1mozKfeQWgKtytkgbX91RLguKobeErukGtvLKf8No
-         y19Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX+FzaonM9+7xtBHbMbZ2wtiXOgj9zZtE//zPaGJrChIWg3SxzIl20GeTvGMCJlqwEJDTQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8awqhBY3OSUDtCeJmnFJKWfik59dBsWyjwUxGzoyXVV5ndApH
-	8AapurOAkZUHyvoi7YKt2V9p2LE/9YXhdPKA7Qcn0ENbrFf4UvYAN5mLki1wBQCqOTu6SQ9HxeN
-	QWA==
-X-Google-Smtp-Source: AGHT+IEGXofKw7PxDUXKaR4FAQmTtG03BfGhA63qxjzop1MVKo/p8/lL+ozSw4uxIKofwjdQ6x2HR5WCrE4=
-X-Received: from pjb16.prod.google.com ([2002:a17:90b:2f10:b0:2fa:1803:2f9f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4f42:b0:2ea:2a8d:dd2a
- with SMTP id 98e67ed59e1d1-2fe7e36c869mr2169059a91.27.1740531057669; Tue, 25
- Feb 2025 16:50:57 -0800 (PST)
-Date: Tue, 25 Feb 2025 16:50:56 -0800
-In-Reply-To: <07788b85473e24627131ffe1a8d1d01856dd9cb5.camel@redhat.com>
+        bh=BfE+FYiAOd9DAOybGgX5laywdzU/CIqHsXJrp0PBGSY=;
+        b=FauLMLSLfWncmPragia860RW9oe/5MLepZTOBfU/zlBVKn9cMFFyRdlIXmHQ/7DObH
+         rKfdlcA6fRlW9GifjM3O4Yg0qH6PdwVcCjC8JFga7NlY9IsEeBgfOlUQjm41GE94IZm/
+         fEPi4KEKZe61zffysxfpOs+nOHxp45OhB9XQ9k6XSC5G0rH6ReBfFK0YcGTc4Yzu9zXX
+         y/3vXX/10iuwCpjqvFXboBmQ9VvjbZgZYbj9xv3XLsJPsXfp3Q7BybEgv1NXi83PG6Au
+         5/2vShUgSoZW/+0eG08pbtxbjadLVScJ2yRPFDqbBS7r1QcfvEiBHmvq9ZSHoWJQgDUb
+         QpYw==
+X-Forwarded-Encrypted: i=1; AJvYcCVIhzlFV5dLImg91ZweEKEIDdkDEF/fWJVYJsTv/VRjhesow0TmpFq9p57oJ72Y7PrJ0tA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzROH9Qx6Kt/cffLMTHPr5zXCuZ0xThoz0PyHz7PJxugkB8i9Te
+	dwy4riXj3Dv/hRl0SjHEDZgcdyxoifljDQ35G7LPRAsyAKykRHHERsCRbPRUdJnYzWYyFa5eokk
+	9Zw==
+X-Google-Smtp-Source: AGHT+IFyXk03Mdjf7OBLIfTSLB6+EQPz/jBslrwK2d8KkEi7ba7NS0D3gxx1v5rFfPJNkg1JKx26oqdIPiY=
+X-Received: from pjbqb10.prod.google.com ([2002:a17:90b:280a:b0:2e0:915d:d594])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2708:b0:2f2:3efd:96da
+ with SMTP id 98e67ed59e1d1-2fe7e39f297mr2345354a91.24.1740531541052; Tue, 25
+ Feb 2025 16:59:01 -0800 (PST)
+Date: Tue, 25 Feb 2025 16:58:47 -0800
+In-Reply-To: <f820b630-13c1-4164-baa8-f5e8231612d1@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250204004038.1680123-1-jthoughton@google.com>
- <025b409c5ca44055a5f90d2c67e76af86617e222.camel@redhat.com>
- <Z7UwI-9zqnhpmg30@google.com> <07788b85473e24627131ffe1a8d1d01856dd9cb5.camel@redhat.com>
-Message-ID: <Z75lcJOEFfBMATAf@google.com>
-Subject: Re: [PATCH v9 00/11] KVM: x86/mmu: Age sptes locklessly
+References: <20241118123948.4796-1-kalyazin@amazon.com> <Z6u-WdbiW3n7iTjp@google.com>
+ <a7080c07-0fc5-45ce-92f7-5f432a67bc63@amazon.com> <Z7X2EKzgp_iN190P@google.com>
+ <6eddd049-7c7a-406d-b763-78fa1e7d921b@amazon.com> <Z7d5HT7FpE-ZsHQ9@google.com>
+ <f820b630-13c1-4164-baa8-f5e8231612d1@amazon.com>
+Message-ID: <Z75nRwSBxpeMwbsR@google.com>
+Subject: Re: [RFC PATCH 0/6] KVM: x86: async PF user
 From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: James Houghton <jthoughton@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Wei Xu <weixugc@google.com>, Yu Zhao <yuzhao@google.com>, 
-	Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+To: Nikita Kalyazin <kalyazin@amazon.com>
+Cc: pbonzini@redhat.com, corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, 
+	bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, rostedt@goodmis.org, 
+	mhiramat@kernel.org, mathieu.desnoyers@efficios.com, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, jthoughton@google.com, david@redhat.com, 
+	peterx@redhat.com, oleg@redhat.com, vkuznets@redhat.com, gshan@redhat.com, 
+	graf@amazon.de, jgowans@amazon.com, roypat@amazon.co.uk, derekmn@amazon.com, 
+	nsaenz@amazon.es, xmarcalx@amazon.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Feb 25, 2025, Maxim Levitsky wrote:
-> On Tue, 2025-02-18 at 17:13 -0800, Sean Christopherson wrote:
-> > My understanding is that the behavior is deliberate.  Per Yu[1], page_idle/bitmap
-> > effectively isn't supported by MGLRU.
+On Fri, Feb 21, 2025, Nikita Kalyazin wrote:
+> On 20/02/2025 18:49, Sean Christopherson wrote:
+> > On Thu, Feb 20, 2025, Nikita Kalyazin wrote:
+> > > On 19/02/2025 15:17, Sean Christopherson wrote:
+> > > > On Wed, Feb 12, 2025, Nikita Kalyazin wrote:
+> > > > The conundrum with userspace async #PF is that if userspace is given only a single
+> > > > bit per gfn to force an exit, then KVM won't be able to differentiate between
+> > > > "faults" that will be handled synchronously by the vCPU task, and faults that
+> > > > usersepace will hand off to an I/O task.  If the fault is handled synchronously,
+> > > > KVM will needlessly inject a not-present #PF and a present IRQ.
+> > > 
+> > > Right, but from the guest's point of view, async PF means "it will probably
+> > > take a while for the host to get the page, so I may consider doing something
+> > > else in the meantime (ie schedule another process if available)".
 > > 
-> > [1] https://lore.kernel.org/all/CAOUHufZeADNp_y=Ng+acmMMgnTR=ZGFZ7z-m6O47O=CmJauWjw@mail.gmail.com
+> > Except in this case, the guest never gets a chance to run, i.e. it can't do
+> > something else.  From the guest point of view, if KVM doesn't inject what is
+> > effectively a spurious async #PF, the VM-Exiting instruction simply took a (really)
+> > long time to execute.
 > 
-> Hi,
+> Sorry, I didn't get that.  If userspace learns from the
+> kvm_run::memory_fault::flags that the exit is due to an async PF, it should
+> call kvm run immediately, inject the not-present PF and allow the guest to
+> reschedule.  What do you mean by "the guest never gets a chance to run"?
+
+What I'm saying is that, as proposed, the API doesn't precisely tell userspace
+an exit happened due to an "async #PF".  KVM has absolutely zero clue as to
+whether or not userspace is going to do an async #PF, or if userspace wants to
+intercept the fault for some entirely different purpose.
+
+> > > If we are exiting to userspace, it isn't going to be quick anyway, so we can
+> > > consider all such faults "long" and warranting the execution of the async PF
+> > > protocol.  So always injecting a not-present #PF and page ready IRQ doesn't
+> > > look too wrong in that case.
+> > 
+> > There is no "wrong", it's simply wasteful.  The fact that the userspace exit is
+> > "long" is completely irrelevant.  Decompressing zswap is also slow, but it is
+> > done on the current CPU, i.e. is not background I/O, and so doesn't trigger async
+> > #PFs.
+> > 
+> > In the guest, if host userspace resolves the fault before redoing KVM_RUN, the
+> > vCPU will get two events back-to-back: an async #PF, and an IRQ signalling completion
+> > of that #PF.
 > 
-> Reading this mail makes me think that the page idle interface isn't really
-> used anymore.
+> Is this practically likely?
 
-I'm sure it's still used in production somewhere.  And even if it's being phased
-out in favor of MGLRU, it's still super useful for testing purposes, because it
-gives userspace much more direct control over aging.
+Yes, I think's it's quite possible.
 
-> Maybe we should redo the access_tracking_perf_test to only use the MGLRU
-> specific interfaces/mode, and remove its classical page_idle mode altogher?
+> At least in our scenario (Firecracker snapshot restore) and probably in live
+> migration postcopy, if a vCPU hits a fault, it's probably because the content
+> of the page is somewhere remote (eg on the source machine or wherever the
+> snapshot data is stored) and isn't going to be available quickly.
 
-I don't want to take a hard dependency on MGLRU (unless page_idle gets fully
-deprecated/removed by the kernel), and I also don't think page_idle is the main
-problem with the test.
-   
-> The point I am trying to get across is that currently
-> access_tracking_perf_test main purpose is to test that page_idle works with
-> secondary paging and the fact is that it doesn't work well due to more that
-> one reason:
+Unless the remote page was already requested, e.g. by a different vCPU, or by a
+prefetching algorithim.
 
-The primary purpose of the test is to measure performance.  Asserting that 90%+
-pages were dirtied is a sanity check, not an outright goal.
+> Conversely, if the page content is available, it must have already been
+> prepopulated into guest memory pagecache, the bit in the bitmap is cleared
+> and no exit to userspace occurs.
 
-> The mere fact that we don't flush TLB already necessitated hacks like the 90%
-> check, which for example doesn't work nested so another hack was needed, to
-> skip the check completely when hypervisor is detected, etc, etc.
+But that doesn't happen instantaneously.  Even if the VMM somehow atomically
+receives the page and marks it present, it's still possible for marking the page
+present to race with KVM checking the bitmap.
 
-100% agreed here.
-
-> And now as of 6.13, we don't propagate accessed bit when KVM zaps the SPTE at
-> all, which can happen at least in theory due to other reasons than NUMA balancing.
+> > > > > What advantage can you see in it over exiting to userspace (which already exists
+> > > > > in James's series)?
+> > > > 
+> > > > It doesn't exit to userspace :-)
+> > > > 
+> > > > If userspace simply wakes a different task in response to the exit, then KVM
+> > > > should be able to wake said task, e.g. by signalling an eventfd, and resume the
+> > > > guest much faster than if the vCPU task needs to roundtrip to userspace.  Whether
+> > > > or not such an optimization is worth the complexity is an entirely different
+> > > > question though.
+> > > 
+> > > This reminds me of the discussion about VMA-less UFFD that was coming up
+> > > several times, such as [1], but AFAIK hasn't materialised into something
+> > > actionable.  I may be wrong, but James was looking into that and couldn't
+> > > figure out a way to scale it sufficiently for his use case and had to stick
+> > > with the VM-exit-based approach.  Can you see a world where VM-exit
+> > > userfaults coexist with no-VM-exit way of handling async PFs?
+> > 
+> > The issue with UFFD is that it's difficult to provide a generic "point of contact",
+> > whereas with KVM userfault, signalling can be tied to the vCPU, and KVM can provide
+> > per-vCPU buffers/structures to aid communication.
+> > 
+> > That said, supporting "exitless" KVM userfault would most definitely be premature
+> > optimization without strong evidence it would benefit a real world use case.
 > 
-> Tomorrow there will be something else that will cause KVM to zap the SPTEs,
-> and the test will fail again, and again...
-> 
-> What do you think?
+> Does that mean that the "exitless" solution for async PF is a long-term one
+> (if required), while the short-term would still be "exitful" (if we find a
+> way to do it sensibly)?
 
-What if we make the assertion user controllable?  I.e. let the user opt-out (or
-off-by-default and opt-in) via command line?  We did something similar for the
-rseq test, because the test would run far fewer iterations than expected if the
-vCPU task was migrated to CPU(s) in deep sleep states.
-
-	TEST_ASSERT(skip_sanity_check || i > (NR_TASK_MIGRATIONS / 2),
-		    "Only performed %d KVM_RUNs, task stalled too much?\n\n"
-		    "  Try disabling deep sleep states to reduce CPU wakeup latency,\n"
-		    "  e.g. via cpuidle.off=1 or setting /dev/cpu_dma_latency to '0',\n"
-		    "  or run with -u to disable this sanity check.", i);
-
-This is quite similar, because as you say, it's impractical for the test to account
-for every possible environmental quirk.
-
-> > Aha!  I wonder if in the failing case, the vCPU gets migrated to a pCPU on a
-> > different node, and that causes NUMA balancing to go crazy and zap pretty much
-> > all of guest memory.  If that's what's happening, then a better solution for the
-> > NUMA balancing issue would be to affine the vCPU to a single NUMA node (or hard
-> > pin it to a single pCPU?).
-> 
-> Nope. I pinned main thread to  CPU 0 and VM thread to  CPU 1 and the problem
-> persists.  On 6.13, the only way to make the test consistently work is to
-> disable NUMA balancing.
-
-Well that's odd.  While I'm quite curious as to what's happening, my stance is
-that enabling NUMA balancing with KVM is a terrible idea, so my vote is to sweep
-it under the rug and let the user disable the sanity check.
+My question on exitless support was purely exploratory, just ignore it for now.
 
