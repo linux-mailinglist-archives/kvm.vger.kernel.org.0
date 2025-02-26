@@ -1,108 +1,99 @@
-Return-Path: <kvm+bounces-39265-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39266-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DACCCA45A30
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 10:36:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA538A45A95
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 10:50:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBBCE16DF89
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 09:36:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB758172BF4
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 09:50:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5333226D0F;
-	Wed, 26 Feb 2025 09:36:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 114A6238172;
+	Wed, 26 Feb 2025 09:50:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OvLi49DY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uuv/YtZl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3913C20E302;
-	Wed, 26 Feb 2025 09:36:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C19323814D
+	for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 09:50:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740562597; cv=none; b=YctwC09uzU0emWpyVBikpMa9emyR3VMQR3In65iMxTQNwUhTADP6Q08wNvg8UxszQcMACHfZ2BcUKz1EuXcsgjAj5l/T53xGe+eVT0bcPVllRDv6uZYI/GJ1fyts72tZIUv0xlccrVQNI5xofnyifE/e6NmoNFVkFnvm82Z/nyE=
+	t=1740563422; cv=none; b=DteUo+pvs4kNH4n+RT7nhtexgsz8GKm4/rHI9+gUqKOdUj8rfth+vnjMn0IOqCwWpoUrq+Cn2Gt4YqLceJD6JA/mmh/51Gf430PhnFbFC5YWMu5h+2wGq1zY/S+nLyROZy6nkciLANduNBUFWLm22niICfhaumMVDR7jJIuh96g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740562597; c=relaxed/simple;
-	bh=dRGPgXSlsmGm/cpvYopV/a54JFonx+29DpE/VBF/K3I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SeUaTzoLMk3XF/FQc4/6CIpGVVeWhVMfpyPYDwTeDOCM1MO/4DReAxRtE0YOBUqs8S7ti4Gbj4SdJxw8GQyuzynVHGj+Mq6lMOJKfZiO48kvGMOutYYjEhdMDWXJxRfHU42Bz0ig2c5wBJEGpEZM5T+lv6RMGdf8lGTNwM/2+f4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OvLi49DY; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740562596; x=1772098596;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=dRGPgXSlsmGm/cpvYopV/a54JFonx+29DpE/VBF/K3I=;
-  b=OvLi49DYQfkAsd82YMeTb0KJ5Zr9OzohYx51eogxvfvv7puI8OnT+b+Z
-   jibD8bk8B0YdHCCkW7cdOKyrYYMeVW6ln+xGHKn5RKsZt37AD+RAdsiaj
-   eu6tbXiMzlgBHmpR3y14ECbgustYHsyAvjXBN0imvNsR4sImF7d0NHci/
-   piIy3mhpLPV5xoWh3mqV42veWgqSJ53QnMi6JxqVAA0YFtMF1KkuFtAL8
-   Url4uLgNcrUAvwqyhRIr9SS6PHulAhDsJqXDD9xavPe10gO48skK8KknR
-   5YAijhHvw+pQVlxa02fek71maZaRsuRkZxFhbmTIdZ04b5W8qqJEp4Fvt
-   Q==;
-X-CSE-ConnectionGUID: Feo6Uuw7SdGrRKOAOJdP2w==
-X-CSE-MsgGUID: 1OY+cWqjTHen4SvLkE3mhQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11356"; a="44224204"
-X-IronPort-AV: E=Sophos;i="6.13,316,1732608000"; 
-   d="scan'208";a="44224204"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 01:36:35 -0800
-X-CSE-ConnectionGUID: jFeAnA6nSWa4BN/gDJ3S8w==
-X-CSE-MsgGUID: iU31LXULTYqiQVUHxfsLaA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,316,1732608000"; 
-   d="scan'208";a="121751577"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 01:36:32 -0800
-Message-ID: <68f771b1-0a7e-44e7-8db6-956b8cfb4112@intel.com>
-Date: Wed, 26 Feb 2025 17:36:28 +0800
+	s=arc-20240116; t=1740563422; c=relaxed/simple;
+	bh=G83Jwu0nvoM6PGrBR8GYYByw3gSz7rZfi8USNVsZTMA=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=pD8LXfkfI8N0BEXpC1qY3BhCdw0V3Ayq7DT280PK/W6ZXQcrVxSUw19e+PzcsASGI4cs+xt7kOKk/rb8vBH1F1+aXabVFU6rrL4XV1Phgqrq1+a3RMkWb+KqIv1ZTxAC7xL548K4SyaiJ2r5ZqSS5KqRqUka+PFTPRjsN68YFhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uuv/YtZl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B2741C4CEE7
+	for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 09:50:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740563421;
+	bh=G83Jwu0nvoM6PGrBR8GYYByw3gSz7rZfi8USNVsZTMA=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=Uuv/YtZlu4Ob6bl1SSe7dodAmteNGI67yJBvzFoDocBe1D8FzExhdWM3IMX19johs
+	 f+iroWXmNKOz6CDY6bjTdRF0jcNgJZMWXDm0N+pXLpJRtxfrr5Y7rObVZ75sfQJ5D9
+	 1WQSC6UnrhnHZZicqidBZucX9a9tNX2vj50gAyMhIoG66HIsPP4Rzn/qWiLxtjO6cO
+	 azVNpCB5VHw/QZsXnN9bZGT4SLBs2H9ElelbgPOgU+bwCG145CXIUfqGIpWfbH3Jk8
+	 4hwMWHuBOnPsEavs5sVWZ5Sinw8e3xQ403vVeFEr9qAiKQoLg3XUExLDPA7WN3sc5W
+	 uA6MyCtenKHGw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id A5DE3C3279F; Wed, 26 Feb 2025 09:50:21 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 219009] Random host reboots on Ryzen 7000/8000 using nested VMs
+ (vls suspected)
+Date: Wed, 26 Feb 2025 09:50:20 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: chaefeli@angband.ch
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: CODE_FIX
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-219009-28872-RaUvhhHo2u@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219009-28872@https.bugzilla.kernel.org/>
+References: <bug-219009-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 7/9] KVM: TDX: Handle TDG.VP.VMCALL<ReportFatalError>
-To: Binbin Wu <binbin.wu@linux.intel.com>, pbonzini@redhat.com,
- seanjc@google.com, kvm@vger.kernel.org
-Cc: rick.p.edgecombe@intel.com, kai.huang@intel.com, adrian.hunter@intel.com,
- reinette.chatre@intel.com, tony.lindgren@intel.com,
- isaku.yamahata@intel.com, yan.y.zhao@intel.com, chao.gao@intel.com,
- linux-kernel@vger.kernel.org
-References: <20250222014225.897298-1-binbin.wu@linux.intel.com>
- <20250222014225.897298-8-binbin.wu@linux.intel.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250222014225.897298-8-binbin.wu@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-On 2/22/2025 9:42 AM, Binbin Wu wrote:
-> @@ -6849,9 +6850,11 @@ Valid values for 'type' are:
->      reset/shutdown of the VM.
->    - KVM_SYSTEM_EVENT_SEV_TERM -- an AMD SEV guest requested termination.
->      The guest physical address of the guest's GHCB is stored in `data[0]`.
-> - - KVM_SYSTEM_EVENT_WAKEUP -- the exiting vCPU is in a suspended state and
-> -   KVM has recognized a wakeup event. Userspace may honor this event by
-> -   marking the exiting vCPU as runnable, or deny it and call KVM_RUN again.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219009
 
-It deletes the description of KVM_SYSTEM_EVENT_WAKEUP by mistake;
+--- Comment #49 from Christian Haefeli (chaefeli@angband.ch) ---
+(In reply to Ben Hirlston from comment #48)
+> I haven't had issues with this since 6.11 6.12 fixed this for me. for
+> context I have an Ryzen 9 7900X3D
 
-(Maybe we can fix the order of the descriptions by the way, 
-KVM_SYSTEM_EVENT_SEV_TERM gets put in front of KVM_SYSTEM_EVENT_WAKEUP 
-and KVM_SYSTEM_EVENT_SUSPEND)
+Yes you most likely own an affected CPU. This in-kernel change fixes the
+stabiliy issue you have encountered but at the cost of performance. And for
+people like me, whose CPUs are not affected it is even worse. We lose
+performance for just nothing. IMHO the proper way would be if AMD would off=
+er
+a CPU swap for affected customers.
 
-> + - KVM_SYSTEM_EVENT_TDX_FATAL -- a TDX guest reported a fatal error state.
-> +   KVM doesn't do any parsing or conversion, it just dumps 16 general-purpose
-> +   registers to userspace, in ascending order of the 4-bit indices for x86-64
-> +   general-purpose registers in instruction encoding, as defined in the Intel
-> +   SDM.
->    - KVM_SYSTEM_EVENT_SUSPEND -- the guest has requested a suspension of
->      the VM.
+--=20
+You may reply to this email to add a comment.
 
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
