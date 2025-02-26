@@ -1,443 +1,144 @@
-Return-Path: <kvm+bounces-39283-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39284-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35D1CA45F6C
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 13:38:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AFD0EA4603E
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 14:08:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C830165E38
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 12:37:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1BB216806B
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 13:08:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AECE21A44B;
-	Wed, 26 Feb 2025 12:37:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F79D219304;
+	Wed, 26 Feb 2025 13:08:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BfKM0Q3d"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="T/QbiIKv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75BAE1DFF8;
-	Wed, 26 Feb 2025 12:37:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F0A13EFE3
+	for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 13:08:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740573461; cv=none; b=g+creSTsCZ7SSv9QiZ25B+/OzDNyz1HG9yKrHUoOKDS8zIXv6t+4JjH26Ww1XVV2jHnyk6VwcGn/z6v1ahJN41TLMB9O5bMBnCd9iTZRXZDT5Rf+klIlOwBN28aweGr1/ASpAfwxISIHSPQwPzd0It+5PyC9JSMR5QvB2ixOFoI=
+	t=1740575288; cv=none; b=pxblraaWaiKR0ImUyuvDmbV6W84Vg+vNFZPjlbdIelpl+E/lQ2v0nG/60NCZWQL7hpmwSwG2hxa5LWDZsvu8cgUB07R9fZEIkOQa7ccWwZgyyJUQYF9RtEbB7a7EmDw7yn4EMxxOJ0NgkYd21SMHtFCL2o1gunXTbiTi67Riwqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740573461; c=relaxed/simple;
-	bh=mKN5SoUkR4/5AJFb40laCctekOjxYDUYSZsINu5WVS8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DuO+BII7GvbUril9TBBStN4GxZbFIdW8ZZz2VEf7Umu7blONm52iHyknriO2P9sN25fqHAAbu7BoMZMZU4FQvGSKQVpbEz4dVo/OcGVonTHgmRz2IX8CJ45qf9R6uVy+hjwPeva7jZGO0L/YgYBHumjnimzDpwXhyEHaP7G6jE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=BfKM0Q3d; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51Q7WgRe005895;
-	Wed, 26 Feb 2025 12:37:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=xB3yYs2Iq3nA/8v23
-	H2KTqh4IiUbxZFaulVoXTuv8KQ=; b=BfKM0Q3dmG+LMri2eJyIlaAnD7VvJeBrb
-	hwBKo0T7LqXtkz9lV+ICARRH/3y4a7nRuij+rZsggP50BKAFHfisgXs37GHtEXcj
-	GJnz6Q/x/kJvz32f/AVIyQyYLDLZOCPgMx+hdfTTWKuOOH8H9oIWWk9FzUHL8wKA
-	s+7WA/7BMvoJgfupZkcAymi3l4+phhRcSz4yvQDXW94rNTDvagbT7Sbkb/0VDT5C
-	JuCMRoQnSY2wDUHaODKDdd6fa3NizquVF1jOA9T5iTdUcR9o7C4NEfPrAMmA1d0E
-	FJzAc+9pYtgDVJhokJ5kAbHZ3yr9fQePtHlI/8N0q1EHATiKz/aLA==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 451xnp198w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 26 Feb 2025 12:37:36 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51QCSEUL026404;
-	Wed, 26 Feb 2025 12:37:36 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44yswnjkjd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 26 Feb 2025 12:37:35 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51QCbWRV48497054
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 26 Feb 2025 12:37:32 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1BC1C2004B;
-	Wed, 26 Feb 2025 12:37:32 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2F09220040;
-	Wed, 26 Feb 2025 12:37:31 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.171.9.246])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 26 Feb 2025 12:37:31 +0000 (GMT)
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, borntraeger@de.ibm.com, david@redhat.com,
-        nrb@linux.ibm.com, seiden@linux.ibm.com, nsg@linux.ibm.com,
-        schlameuss@linux.ibm.com, hca@linux.ibm.com
-Subject: [PATCH v2 1/1] KVM: s390: pv: fix race when making a page secure
-Date: Wed, 26 Feb 2025 13:37:25 +0100
-Message-ID: <20250226123725.247578-2-imbrenda@linux.ibm.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250226123725.247578-1-imbrenda@linux.ibm.com>
-References: <20250226123725.247578-1-imbrenda@linux.ibm.com>
+	s=arc-20240116; t=1740575288; c=relaxed/simple;
+	bh=gZlf2V4DZl06PCel9kKPigzKNxKnfgpO2YLnb7fz6Tg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mgLrExG4RD7ZeWH3HZ4cQoAraeHGTNgDXw1pSMqb6EvkObw0viDx6HOw2WETfmqNaJGkiPD1z+kdXEG3GH+p0iJLgbUefebGjoCtnBW9n9gYG3TS3rPdsSp6iIO8d432CzkRDP18mGsAWZxodCdhfDDCZgiQldgRw2Ofj3tpwYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=T/QbiIKv; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-7c0a4b030f2so873260885a.0
+        for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 05:08:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1740575285; x=1741180085; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9ECSFx2fiYRGYbPUPOKEj5uQjkNpa71sMCoCExCmYew=;
+        b=T/QbiIKvtcqcqQSWAzZogMWpsvqW+MI/HTEr2rnGR+RwQZ9gmuTns4FjikIKYrcMze
+         4FJMlwQCBDA+2A++4l1iyFsZYKWksJ55MgCltjETpB4KXpMP2UB+UUdUr4JoNrxVpNt/
+         ELA1o4PGTsQmKZgR77zNp8cVXLbpRGexH2ALUw/bkZ+arvQw+JoETdEeUG2bLQ/wIITc
+         fiLAcA65IEtHSJ/NA0jKRPWwTHgQyPhNVJ9V1BZTXxvoMn2S6pN4DaauGRgO8LlqJGVm
+         a77QBoeHa0ihVuzWgR0h+w8mUy7w83ixeRqFPZaVUu8Oe4/BkxuzBv2ZajAEDbYKcmzo
+         OBUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740575285; x=1741180085;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9ECSFx2fiYRGYbPUPOKEj5uQjkNpa71sMCoCExCmYew=;
+        b=kqrMl8i+zv1wXFiBzJPNMG5KI7ooGWy3Q7KwiGrg/JTVDGc0PNTpnpy70Wh+Nwo3z2
+         wUXjy5pXrSJijw+eeMox/sYw2Iu0Bqdgxqx/Wl6VwOPgn9q2OlAh9ZqQhs1VUgDiYL1H
+         w3S9sCqW76nXil1w3n2Q+vjpccWlNL+oFIG8Wb800qcSuEGPC+vLQXTXjRvgS6wJAD4r
+         U6f7VEOcVJ4YCkS6Lh15lwNmc5E2VhTxcHi8+BeswlpwwWMgnJH5UGVUza4idwPQSgGh
+         I850QIwoSLWeAcHWedvr6pvbknxUxww6eqWcmTzvS5J0luhgQcy5h90yKy6dWvwoOd/m
+         6VVA==
+X-Forwarded-Encrypted: i=1; AJvYcCU+JjOt4YvUyqSzASbNtobtPVTzLcB3DHwlztwBeGAVr6SOh4DsuPJ6Tg1uk4ecE3mGnk4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwceJFQXXYnrd9l3BGjkm1U4HynJsbiEeIOc0vtvCUbljD2wgFu
+	2cuj+wozfE2wJ5U3XtqnPW9eIql9WWZg6TCpvmio9rMch8cGqoVjaU+n/fKznA4=
+X-Gm-Gg: ASbGncsooYVhs2QCHyjyPz7IkME0vMLekkodzTYaB13ysp4DbTlquWVIVSfXPu0S95u
+	gp+DyKWc4tl+rrQ5tgotsjT0ttyemNQ2mKUHJ7zhGXqs4wnr38LPOrN1T0j284pbpXU9vSc1IQ2
+	tjidT+Eu2q+OeRFhOQnntmHeftZBceumtr4Q3LblKgqLlGFR3bxlOUe+zRd46RLcbsbhGg8q9DO
+	kZZNK+InyuMBJa0ljgjK9vcW8MWCW/70K+r2PzK47O/GaPtgZ0zKooz7hzNX3jYKQ5hF79NB7Ba
+	ZhTQp5mUW5HZOwCKMYxFfz1cxGeX5jPeln0t/ELeGP4+U42NbiTyBb65cq37uojrxx5eZq/2no0
+	=
+X-Google-Smtp-Source: AGHT+IHSaPI2di23wd/r7DmUcJvEuSIfSDJiLalxe/seFWwJNz69RZ6l150d7LgWyVVQcH9URorRQA==
+X-Received: by 2002:a05:620a:44c1:b0:7c0:c650:e243 with SMTP id af79cd13be357-7c0cf8ea459mr3058987685a.30.1740575285615;
+        Wed, 26 Feb 2025 05:08:05 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c23c2c0fb4sm237968885a.56.2025.02.26.05.08.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Feb 2025 05:08:04 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1tnH8u-000000007Mk-0RRT;
+	Wed, 26 Feb 2025 09:08:04 -0400
+Date: Wed, 26 Feb 2025 09:08:04 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Alexey Kardashevskiy <aik@amd.com>
+Cc: Xu Yilun <yilun.xu@linux.intel.com>, x86@kernel.org,
+	kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>,
+	Joao Martins <joao.m.martins@oracle.com>,
+	Nicolin Chen <nicolinc@nvidia.com>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Steve Sistare <steven.sistare@oracle.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
+	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
+	Zhi Wang <zhiw@nvidia.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: Re: [RFC PATCH v2 14/22] iommufd: Add TIO calls
+Message-ID: <20250226130804.GG5011@ziepe.ca>
+References: <20250218111017.491719-1-aik@amd.com>
+ <20250218111017.491719-15-aik@amd.com>
+ <Z72GmixR6NkzXAl7@yilunxu-OptiPlex-7050>
+ <2fe6b3c6-3eed-424d-87f0-34c4e7e1c906@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: M4rQPuTgZcwr3bEXJMPlGGCv-9BXGWWk
-X-Proofpoint-GUID: M4rQPuTgZcwr3bEXJMPlGGCv-9BXGWWk
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-26_02,2025-02-26_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- priorityscore=1501 suspectscore=0 mlxlogscore=999 spamscore=0 phishscore=0
- mlxscore=0 adultscore=0 malwarescore=0 bulkscore=0 clxscore=1015
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502100000 definitions=main-2502260100
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2fe6b3c6-3eed-424d-87f0-34c4e7e1c906@amd.com>
 
-Holding the pte lock for the page that is being converted to secure is
-needed to avoid races. A previous commit removed the locking, which
-caused issues. Fix by locking the pte again.
+On Wed, Feb 26, 2025 at 11:12:32AM +1100, Alexey Kardashevskiy wrote:
+> > I still have concern about the vdevice interface for bind. Bind put the
+> > device to LOCKED state, so is more of a device configuration rather
+> > than an iommu configuration. So seems more reasonable put the API in VFIO?
+> 
+> IOMMUFD means pretty much VFIO (in the same way "VFIO means KVM" as 95+% of
+> VFIO users use it from KVM, although VFIO works fine without KVM) so not
+> much difference where to put this API and can be done either way. VFIO is
+> reasonable, the immediate problem is that IOMMUFD's vIOMMU knows the guest
+> BDFn (well, for AMD) and VFIO PCI does not.
 
-Fixes: 5cbe24350b7d ("KVM: s390: move pv gmap functions into kvm")
-Reported-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
----
- arch/s390/include/asm/uv.h |   2 +-
- arch/s390/kernel/uv.c      | 105 ++++++++++++++++++++++++++++++++++---
- arch/s390/kvm/gmap.c       |  99 +++-------------------------------
- arch/s390/kvm/kvm-s390.c   |  25 +++++----
- 4 files changed, 121 insertions(+), 110 deletions(-)
+I would re-enforce what I said before, VFIO & iommufd alone should be
+able to operate a TDISP device and get device encrpytion without
+requiring KVM.
 
-diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-index b11f5b6d0bd1..46fb0ef6f984 100644
---- a/arch/s390/include/asm/uv.h
-+++ b/arch/s390/include/asm/uv.h
-@@ -631,7 +631,7 @@ int uv_pin_shared(unsigned long paddr);
- int uv_destroy_folio(struct folio *folio);
- int uv_destroy_pte(pte_t pte);
- int uv_convert_from_secure_pte(pte_t pte);
--int make_folio_secure(struct folio *folio, struct uv_cb_header *uvcb);
-+int make_hva_secure(struct mm_struct *mm, unsigned long hva, struct uv_cb_header *uvcb);
- int uv_convert_from_secure(unsigned long paddr);
- int uv_convert_from_secure_folio(struct folio *folio);
- 
-diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-index 9f05df2da2f7..6c6e81daa839 100644
---- a/arch/s390/kernel/uv.c
-+++ b/arch/s390/kernel/uv.c
-@@ -206,6 +206,39 @@ int uv_convert_from_secure_pte(pte_t pte)
- 	return uv_convert_from_secure_folio(pfn_folio(pte_pfn(pte)));
- }
- 
-+/**
-+ * should_export_before_import - Determine whether an export is needed
-+ * before an import-like operation
-+ * @uvcb: the Ultravisor control block of the UVC to be performed
-+ * @mm: the mm of the process
-+ *
-+ * Returns whether an export is needed before every import-like operation.
-+ * This is needed for shared pages, which don't trigger a secure storage
-+ * exception when accessed from a different guest.
-+ *
-+ * Although considered as one, the Unpin Page UVC is not an actual import,
-+ * so it is not affected.
-+ *
-+ * No export is needed also when there is only one protected VM, because the
-+ * page cannot belong to the wrong VM in that case (there is no "other VM"
-+ * it can belong to).
-+ *
-+ * Return: true if an export is needed before every import, otherwise false.
-+ */
-+static bool should_export_before_import(struct uv_cb_header *uvcb, struct mm_struct *mm)
-+{
-+	/*
-+	 * The misc feature indicates, among other things, that importing a
-+	 * shared page from a different protected VM will automatically also
-+	 * transfer its ownership.
-+	 */
-+	if (uv_has_feature(BIT_UV_FEAT_MISC))
-+		return false;
-+	if (uvcb->cmd == UVC_CMD_UNPIN_PAGE_SHARED)
-+		return false;
-+	return atomic_read(&mm->context.protected_count) > 1;
-+}
-+
- /*
-  * Calculate the expected ref_count for a folio that would otherwise have no
-  * further pins. This was cribbed from similar functions in other places in
-@@ -228,7 +261,7 @@ static int expected_folio_refs(struct folio *folio)
- }
- 
- /**
-- * make_folio_secure() - make a folio secure
-+ * __make_folio_secure() - make a folio secure
-  * @folio: the folio to make secure
-  * @uvcb: the uvcb that describes the UVC to be used
-  *
-@@ -243,14 +276,13 @@ static int expected_folio_refs(struct folio *folio)
-  *         -EINVAL if the UVC failed for other reasons.
-  *
-  * Context: The caller must hold exactly one extra reference on the folio
-- *          (it's the same logic as split_folio())
-+ *          (it's the same logic as split_folio()), and the folio must be
-+ *          locked.
-  */
--int make_folio_secure(struct folio *folio, struct uv_cb_header *uvcb)
-+static int __make_folio_secure(struct folio *folio, struct uv_cb_header *uvcb)
- {
- 	int expected, cc = 0;
- 
--	if (folio_test_large(folio))
--		return -E2BIG;
- 	if (folio_test_writeback(folio))
- 		return -EBUSY;
- 	expected = expected_folio_refs(folio) + 1;
-@@ -277,7 +309,68 @@ int make_folio_secure(struct folio *folio, struct uv_cb_header *uvcb)
- 		return -EAGAIN;
- 	return uvcb->rc == 0x10a ? -ENXIO : -EINVAL;
- }
--EXPORT_SYMBOL_GPL(make_folio_secure);
-+
-+static int make_folio_secure(struct mm_struct *mm, struct folio *folio, struct uv_cb_header *uvcb)
-+{
-+	int rc;
-+
-+	if (!folio_trylock(folio))
-+		return -EAGAIN;
-+	if (should_export_before_import(uvcb, mm))
-+		uv_convert_from_secure(folio_to_phys(folio));
-+	rc = __make_folio_secure(folio, uvcb);
-+	folio_unlock(folio);
-+
-+	return rc;
-+}
-+
-+static pte_t *get_locked_valid_pte(struct mm_struct *mm, unsigned long hva, spinlock_t **ptl)
-+{
-+	pte_t *ptep = get_locked_pte(mm, hva, ptl);
-+
-+	if (ptep && (pte_val(*ptep) & _PAGE_INVALID)) {
-+		pte_unmap_unlock(ptep, *ptl);
-+		ptep = NULL;
-+	}
-+	return ptep;
-+}
-+
-+int make_hva_secure(struct mm_struct *mm, unsigned long hva, struct uv_cb_header *uvcb)
-+{
-+	struct folio *folio;
-+	spinlock_t *ptelock;
-+	pte_t *ptep;
-+	int rc;
-+
-+	ptep = get_locked_valid_pte(mm, hva, &ptelock);
-+	if (!ptep)
-+		return -ENXIO;
-+
-+	folio = page_folio(pte_page(*ptep));
-+	folio_get(folio);
-+	/*
-+	 * Secure pages cannot be huge and userspace should not combine both.
-+	 * In case userspace does it anyway this will result in an -EFAULT for
-+	 * the unpack. The guest is thus never reaching secure mode.
-+	 * If userspace plays dirty tricks and decides to map huge pages at a
-+	 * later point in time, it will receive a segmentation fault or
-+	 * KVM_RUN will return -EFAULT.
-+	 */
-+	if (folio_test_hugetlb(folio))
-+		rc =  -EFAULT;
-+	else if (folio_test_large(folio))
-+		rc = -E2BIG;
-+	else
-+		rc = make_folio_secure(mm, folio, uvcb);
-+	pte_unmap_unlock(ptep, ptelock);
-+
-+	if (rc == -E2BIG || rc == -EBUSY)
-+		rc = kvm_s390_wiggle_split_folio(mm, folio, rc == -E2BIG);
-+	folio_put(folio);
-+
-+	return rc;
-+}
-+EXPORT_SYMBOL_GPL(make_hva_secure);
- 
- /*
-  * To be called with the folio locked or with an extra reference! This will
-diff --git a/arch/s390/kvm/gmap.c b/arch/s390/kvm/gmap.c
-index 02adf151d4de..c08950b4301c 100644
---- a/arch/s390/kvm/gmap.c
-+++ b/arch/s390/kvm/gmap.c
-@@ -22,92 +22,6 @@
- 
- #include "gmap.h"
- 
--/**
-- * should_export_before_import - Determine whether an export is needed
-- * before an import-like operation
-- * @uvcb: the Ultravisor control block of the UVC to be performed
-- * @mm: the mm of the process
-- *
-- * Returns whether an export is needed before every import-like operation.
-- * This is needed for shared pages, which don't trigger a secure storage
-- * exception when accessed from a different guest.
-- *
-- * Although considered as one, the Unpin Page UVC is not an actual import,
-- * so it is not affected.
-- *
-- * No export is needed also when there is only one protected VM, because the
-- * page cannot belong to the wrong VM in that case (there is no "other VM"
-- * it can belong to).
-- *
-- * Return: true if an export is needed before every import, otherwise false.
-- */
--static bool should_export_before_import(struct uv_cb_header *uvcb, struct mm_struct *mm)
--{
--	/*
--	 * The misc feature indicates, among other things, that importing a
--	 * shared page from a different protected VM will automatically also
--	 * transfer its ownership.
--	 */
--	if (uv_has_feature(BIT_UV_FEAT_MISC))
--		return false;
--	if (uvcb->cmd == UVC_CMD_UNPIN_PAGE_SHARED)
--		return false;
--	return atomic_read(&mm->context.protected_count) > 1;
--}
--
--static int __gmap_make_secure(struct gmap *gmap, struct page *page, void *uvcb)
--{
--	struct folio *folio = page_folio(page);
--	int rc;
--
--	/*
--	 * Secure pages cannot be huge and userspace should not combine both.
--	 * In case userspace does it anyway this will result in an -EFAULT for
--	 * the unpack. The guest is thus never reaching secure mode.
--	 * If userspace plays dirty tricks and decides to map huge pages at a
--	 * later point in time, it will receive a segmentation fault or
--	 * KVM_RUN will return -EFAULT.
--	 */
--	if (folio_test_hugetlb(folio))
--		return -EFAULT;
--	if (folio_test_large(folio)) {
--		mmap_read_unlock(gmap->mm);
--		rc = kvm_s390_wiggle_split_folio(gmap->mm, folio, true);
--		mmap_read_lock(gmap->mm);
--		if (rc)
--			return rc;
--		folio = page_folio(page);
--	}
--
--	if (!folio_trylock(folio))
--		return -EAGAIN;
--	if (should_export_before_import(uvcb, gmap->mm))
--		uv_convert_from_secure(folio_to_phys(folio));
--	rc = make_folio_secure(folio, uvcb);
--	folio_unlock(folio);
--
--	/*
--	 * In theory a race is possible and the folio might have become
--	 * large again before the folio_trylock() above. In that case, no
--	 * action is performed and -EAGAIN is returned; the callers will
--	 * have to try again later.
--	 * In most cases this implies running the VM again, getting the same
--	 * exception again, and make another attempt in this function.
--	 * This is expected to happen extremely rarely.
--	 */
--	if (rc == -E2BIG)
--		return -EAGAIN;
--	/* The folio has too many references, try to shake some off */
--	if (rc == -EBUSY) {
--		mmap_read_unlock(gmap->mm);
--		kvm_s390_wiggle_split_folio(gmap->mm, folio, false);
--		mmap_read_lock(gmap->mm);
--		return -EAGAIN;
--	}
--
--	return rc;
--}
--
- /**
-  * gmap_make_secure() - make one guest page secure
-  * @gmap: the guest gmap
-@@ -120,17 +34,16 @@ static int __gmap_make_secure(struct gmap *gmap, struct page *page, void *uvcb)
- int gmap_make_secure(struct gmap *gmap, unsigned long gaddr, void *uvcb)
- {
- 	struct kvm *kvm = gmap->private;
--	struct page *page;
-+	unsigned long vmaddr;
- 	int rc = 0;
- 
- 	lockdep_assert_held(&kvm->srcu);
- 
--	page = gfn_to_page(kvm, gpa_to_gfn(gaddr));
--	mmap_read_lock(gmap->mm);
--	if (page)
--		rc = __gmap_make_secure(gmap, page, uvcb);
--	kvm_release_page_clean(page);
--	mmap_read_unlock(gmap->mm);
-+	vmaddr = gfn_to_hva(kvm, gpa_to_gfn(gaddr));
-+	if (kvm_is_error_hva(vmaddr))
-+		rc = -ENXIO;
-+	else
-+		rc = make_hva_secure(gmap->mm, vmaddr, uvcb);
- 
- 	return rc;
- }
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index ebecb96bacce..020502af7dc9 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -4952,6 +4952,7 @@ static int vcpu_post_run_handle_fault(struct kvm_vcpu *vcpu)
- {
- 	unsigned int flags = 0;
- 	unsigned long gaddr;
-+	int rc;
- 
- 	gaddr = current->thread.gmap_teid.addr * PAGE_SIZE;
- 	if (kvm_s390_cur_gmap_fault_is_write())
-@@ -4961,16 +4962,6 @@ static int vcpu_post_run_handle_fault(struct kvm_vcpu *vcpu)
- 	case 0:
- 		vcpu->stat.exit_null++;
- 		break;
--	case PGM_NON_SECURE_STORAGE_ACCESS:
--		kvm_s390_assert_primary_as(vcpu);
--		/*
--		 * This is normal operation; a page belonging to a protected
--		 * guest has not been imported yet. Try to import the page into
--		 * the protected guest.
--		 */
--		if (gmap_convert_to_secure(vcpu->arch.gmap, gaddr) == -EINVAL)
--			send_sig(SIGSEGV, current, 0);
--		break;
- 	case PGM_SECURE_STORAGE_ACCESS:
- 	case PGM_SECURE_STORAGE_VIOLATION:
- 		kvm_s390_assert_primary_as(vcpu);
-@@ -4995,6 +4986,20 @@ static int vcpu_post_run_handle_fault(struct kvm_vcpu *vcpu)
- 			send_sig(SIGSEGV, current, 0);
- 		}
- 		break;
-+	case PGM_NON_SECURE_STORAGE_ACCESS:
-+		kvm_s390_assert_primary_as(vcpu);
-+		/*
-+		 * This is normal operation; a page belonging to a protected
-+		 * guest has not been imported yet. Try to import the page into
-+		 * the protected guest.
-+		 */
-+		rc = gmap_convert_to_secure(vcpu->arch.gmap, gaddr);
-+		if (rc == -EINVAL)
-+			send_sig(SIGSEGV, current, 0);
-+		if (rc != -ENXIO)
-+			break;
-+		flags = FAULT_FLAG_WRITE;
-+		fallthrough;
- 	case PGM_PROTECTION:
- 	case PGM_SEGMENT_TRANSLATION:
- 	case PGM_PAGE_TRANSLATION:
--- 
-2.48.1
+It makes sense that if the secure firmware object handles (like the
+viommu, vdevice, vBDF) are accessed through iommufd then iommufd will
+relay operations against those handles.
 
+Jason
 
