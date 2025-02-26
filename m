@@ -1,150 +1,115 @@
-Return-Path: <kvm+bounces-39215-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39216-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 021CDA452FB
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 03:20:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24D85A452FD
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 03:20:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 118BA3A77FB
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 02:17:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB871189A4F4
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 02:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DACE218EB9;
-	Wed, 26 Feb 2025 02:17:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1765121A430;
+	Wed, 26 Feb 2025 02:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="babI3YOP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zMHw9PEH"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ECD423CE
-	for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 02:17:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E360C218ADD
+	for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 02:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740536242; cv=none; b=qhroKePyGsSbXDRLbrS8RullWunb/pVCxCjB1chHnhwPNV8FmTz6BnWrloB7EBzVZYsS5kOMMCZIgC0voxfRuw/sXCY06iVXTgTI/ADIT+0FxgeiEAAWct2UaKctA3zEv2K3f7OKUsDJ6DxOpxMNZ+Ld8ulrlzaO8CHG1IoEAPM=
+	t=1740536406; cv=none; b=gy+pHfDItMXRNyVpyZm4t/OuThG5nEAgd+tGpmvef2WYGyFQSTUxZ858vkH6N2sl8WArn9X4dVMQ8C+fjl3PTOOwy6mb38AYa/NHNscWwGy8CVnwLLVbhz6SaLDTVy9/l/4Vj1pXXc4SyYajfGjMZlQjZHM5Qr21PC5rClQUIE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740536242; c=relaxed/simple;
-	bh=5Shs29vFnsTdfRPK1do1DpzdyueIIk8IoPkKYFH6cwI=;
+	s=arc-20240116; t=1740536406; c=relaxed/simple;
+	bh=8FH5pIuvy1Jac6/lG3x6E2PJ8f8DqbB/+e+//FMv740=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=alMG1FlUTEtyRKNuvqs9ON8yV/BVDPr/LWyGAfBepBvamFrhoTeD5FL1qZ3vosrkWimScXEPBnT1tW5wqictxDdbc7FvLRQwHJbJ3QVp9KMeG4kIE1iZMh2Mh85VbKFteKTb8VUAbsdSVgHe7wbzZWKDkeADlLxBJBPEGeWp3BA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=babI3YOP; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=sjxT6j90zmJlzqOtdqhQAFa/uRvbxXTh+G+KxeHXL3qlfznHJ9eGPsADWwdXPBI4eXYEOg70ePOsQbvONPlkfjsxmgMaiGcIOn4sNDWi9+n9ljwFGzqL0iYU82za4mYefe8A1doQ7IAZS42UVNpjnmQKuI+tlUnnCYX2tzoJbts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zMHw9PEH; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fc404aaed5so20810585a91.3
-        for <kvm@vger.kernel.org>; Tue, 25 Feb 2025 18:17:20 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fe862ea448so393543a91.3
+        for <kvm@vger.kernel.org>; Tue, 25 Feb 2025 18:20:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740536240; x=1741141040; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1740536404; x=1741141204; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hEnXDJtrtWgIV8UK2eQVwYwkNADKUtEKEpksO/7JGns=;
-        b=babI3YOP6gIAzm5D/1UQJchu6f3Py4/4Lyklx8D45KlMs6xqQmr2Uodz+7uieZ+k88
-         ZxWSSRvRvMQNNE9rEV56qMsDM8N93tgoN0D951SUVknVG7iyX71VbXfUC8DHBVie4Oqs
-         aFBh/Dwa3QMnq2rXZE0xvqppvRZ13EyiiDOC9Jobw6r9ybKbEG8RZTrApeG5+rgeJksz
-         dLfrdBJmX3rK+TRVzWytNbRBFp+YlttUJyoyysDptVGQnUM8me+90CsjLu0d6prKcdB5
-         CdE300ve7rss6u6CeW3w723xSBTJGnpp/HtP+ngOMpmsciCpgsdTJRSBf1NAv8P5C9N0
-         4BYQ==
+        bh=U+U3kxkwkHHzAe5cXbK7f0ULstgU63GdnX7RFz40oJY=;
+        b=zMHw9PEHQu+hs+z7irRop0MvCnmM20rZkSxANkjqd4+mzO/jzXgx+eEQ4bKewLyYa7
+         Xf1m8An14BKFjFFbAQ/lxwhoU0j3vAeQRoiA0si8XrKO+CMx9MLMm90uOU1qOOFSMdDa
+         m3QsFDb2+GgBN3D6XuJ/ES/TQyOO0LUdaY1Yc5nVOGNEpyHSuNBx1IQsVo8sPPaZ4IRh
+         pldFZzUVXm4iw4RwGI45QkpGbk/wgjrE5w6jYKSXOXhv7GE8K3Z1AJyQ7Wykp6tITdUi
+         ZMs4a89ec5do7ktNti3YtNJUeqOfaRCOvW7ovHSFKKYqrHdnUdQm9BBnuf3DCHL6iHpg
+         0zMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740536240; x=1741141040;
+        d=1e100.net; s=20230601; t=1740536404; x=1741141204;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hEnXDJtrtWgIV8UK2eQVwYwkNADKUtEKEpksO/7JGns=;
-        b=R4Pd4RaWqyCyiq/lIGWLOLF4J5Bgg4KX0Ew3QiykreGZzH0gxCbAWDrmTpdxso3tNV
-         nb2Ps0xPQDr2f8ZKwmf2ODCVd0u2O7JSjghRrV1n7hDp3Lr1X7/CUM10s74ZrF6EGbj8
-         HB0bUPlvn3GY9XPHMmwo4riZaoV+JX4zxwUUhZWdjS5ATDk3jhoxKYFb1YGFSpwsdMX9
-         RCr9QPcm66vfwGE42p6HxYKktOPh6EnJ0r9ub2R3gJcfUu6BNWsCFb6m01dd6sy8Vj8q
-         i2g2Kk7mD7/LGD4poiZRicbulDUSrbCt7LzNKjtTu7QAnSWVCduSzU39Nf+t+SERGlYy
-         WJHg==
-X-Forwarded-Encrypted: i=1; AJvYcCVwf3X2eZ8ODjwDuajzjNPuUJgQlO3I/JdtO4srKB3ZYPqOwmakQyz87KogUMHKZcbqVOk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzn59C3BgN9plms2GUYVrAFymr8yKOSZpctlcvJQbIvW0EwtJm+
-	WPd/pxA/kohBfXJhEZx/hqwDXoZLcr7iNntHxB3jXtwGTDgPo4rSqE77vA+9yPyqR+gC9tkiFDM
-	xRA==
-X-Google-Smtp-Source: AGHT+IF2FQtMVrCY2dMFVtyt04GwyNa3km0HRPrZ7dWjyUTUEzPcz0hdtDq1rWlVDZkTb9plo164752uosw=
-X-Received: from pjbst5.prod.google.com ([2002:a17:90b:1fc5:b0:2e9:ee22:8881])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2dc5:b0:2f6:be57:49d2
- with SMTP id 98e67ed59e1d1-2fe7e32b7c8mr3043599a91.17.1740536240487; Tue, 25
- Feb 2025 18:17:20 -0800 (PST)
-Date: Tue, 25 Feb 2025 18:17:19 -0800
-In-Reply-To: <20250218202618.567363-1-sieberf@amazon.com>
+        bh=U+U3kxkwkHHzAe5cXbK7f0ULstgU63GdnX7RFz40oJY=;
+        b=O2NzZBrqdhDU5kNu9N/PePc/j/6XD+KYpcQIHFvbfRg/f2s6PrGIjb+1Rm0NqaJ72B
+         +bZYoF61eWneVZm5bwspSGXz8tAhEaLcQDtVf9Up27cfCObdJuhI5dPR6Ok9sb+ZiwDA
+         EsnIxGyTlj+qRs3Zeg8oF4ACZVyJiwwt5RZwYtAPEEAENnQbpW3Sy0nFxSODG15Uayj3
+         6gwKMSZZ9lBl9orvjMWgMJcmxHUklJW8F4ievaAvH6q7G6+iraPU5XzizMqA2RFx8bKp
+         43R1693brSLYTahHWO8eseYi2wbhQ+LUPkrh5yi4iPjBwan6ya6wjVCFCwuIy46wgZ/C
+         LXRg==
+X-Forwarded-Encrypted: i=1; AJvYcCVWPKkhRIWO9HQdXj5XyEFWRbubWZVh+0AAGBbHytHpB/aZCQ5/F9wR+GqNsPcNP7OgQwI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbyNOv+AxSgsNEbCWY8swPCoxBrvMoHjrDpk+ZpH2C+pSPg1vM
+	1geF9Py52QFHEPf9kvCdZQum3yS2yDRq56DhP4Lv/VlxWJRmpJJfIWO2qlmFXj9bqt7ogA6ZI/J
+	6zg==
+X-Google-Smtp-Source: AGHT+IHv0DOH83fHjVuw42bSimWjWgTNGc2uJt+qXrf5Xmz4kGUc9ioLEA4EM3FcRkNofpV39I+3+EFaEg0=
+X-Received: from pjbeu5.prod.google.com ([2002:a17:90a:f945:b0:2ef:82c0:cb8d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:6cc:b0:2ee:ad18:b309
+ with SMTP id 98e67ed59e1d1-2fe68accf77mr8037822a91.3.1740536404233; Tue, 25
+ Feb 2025 18:20:04 -0800 (PST)
+Date: Tue, 25 Feb 2025 18:20:02 -0800
+In-Reply-To: <Z753eenv5NKkw2j/@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250218202618.567363-1-sieberf@amazon.com>
-Message-ID: <Z755r4S_7BLbHlWa@google.com>
-Subject: Re: [RFC PATCH 0/3] kvm,sched: Add gtime halted
+References: <20250208105318.16861-1-yan.y.zhao@intel.com> <23ea46d54e423b30fa71503a823c97213a864a98.camel@intel.com>
+ <Z6qrEHDviKB2Hf6o@yzhao56-desk.sh.intel.com> <69a1443e73dc1c10a23cf0632a507c01eece9760.camel@intel.com>
+ <Z750LaPTDS6z6DAK@google.com> <Z753eenv5NKkw2j/@yzhao56-desk.sh.intel.com>
+Message-ID: <Z756Usy6JNkf43PP@google.com>
+Subject: Re: [PATCH] KVM: selftests: Wait mprotect_ro_done before write to RO
+ in mmu_stress_test
 From: Sean Christopherson <seanjc@google.com>
-To: Fernand Sieber <sieberf@amazon.com>
-Cc: Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, nh-open-source@amazon.com
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Feb 18, 2025, Fernand Sieber wrote:
-> With guest hlt, pause and mwait pass through, the hypervisor loses
-> visibility on real guest cpu activity. From the point of view of the
-> host, such vcpus are always 100% active even when the guest is
-> completely halted.
-> 
-> Typically hlt, pause and mwait pass through is only implemented on
-> non-timeshared pcpus. However, there are cases where this assumption
-> cannot be strictly met as some occasional housekeeping work needs to be
+On Wed, Feb 26, 2025, Yan Zhao wrote:
+> On Tue, Feb 25, 2025 at 05:53:49PM -0800, Sean Christopherson wrote:
+> > On Tue, Feb 11, 2025, Rick P Edgecombe wrote:
+> > > On Tue, 2025-02-11 at 09:42 +0800, Yan Zhao wrote:
+> > > > > On the fix though, doesn't this remove the coverage of writing to a
+> > > > > region that is in the process of being made RO? I'm thinking about
+> > > > > warnings, etc that may trigger intermittently based on bugs with a race
+> > > > > component. I don't know if we could fix the test and still leave the
+> > > > > write while the "mprotect(PROT_READ) is underway". It seems to be
+> > > > > deliberate.
+> > > > Write before "mprotect(PROT_READ)" has been tested in stage 0.
+> > > > Not sure it's deliberate to test write in the process of being made RO.
+> > 
+> > Writing while VMAs are being made RO is 100% intended.  The goal is to stress
+> > KVM's interactions with the mmu_notifier, and to verify KVM delivers -EFAULT to
+> > userspace.
+> > 
+> > Something isn't quite right in the original analysis.  We need to drill down on
+> > that before change anything.
+> > 
+> > FWIW, I run this test frequently on large systems and have never observed failures.
+> Could you try adding CONFIG_LOCK_STAT=y?
 
-What housekeeping work?
+Will do, though it'll probably be a few days before I can take a look.
 
-> scheduled on such cpus while we generally want to preserve the pass
-> through performance gains. This applies for system which don't have
-> dedicated cpus for housekeeping purposes.
-> 
-> In such cases, the lack of visibility of the hypervisor is problematic
-> from a load balancing point of view. In the absence of a better signal,
-> it will preemt vcpus at random. For example it could decide to interrupt
-> a vcpu doing critical idle poll work while another vcpu sits idle.
-> 
-> Another motivation for gaining visibility into real guest cpu activity
-> is to enable the hypervisor to vend metrics about it for external
-> consumption.
-
-Such as?
-
-> In this RFC we introduce the concept of guest halted time to address
-> these concerns. Guest halted time (gtime_halted) accounts for cycles
-> spent in guest mode while the cpu is halted. gtime_halted relies on
-> measuring the mperf msr register (x86) around VM enter/exits to compute
-> the number of unhalted cycles; halted cycles are then derived from the
-> tsc difference minus the mperf difference.
-
-IMO, there are better ways to solve this than having KVM sample MPERF on every
-entry and exit.
-
-The kernel already samples APERF/MPREF on every tick and provides that information
-via /proc/cpuinfo, just use that.  If your userspace is unable to use /proc/cpuinfo
-or similar, that needs to be explained.
-
-And if you're running vCPUs on tickless CPUs, and you're doing HLT/MWAIT passthrough,
-*and* you want to schedule other tasks on those CPUs, then IMO you're abusing all
-of those things and it's not KVM's problem to solve, especially now that sched_ext
-is a thing.
-
-> gtime_halted is exposed to proc/<pid>/stat as a new entry, which enables
-> users to monitor real guest activity.
-> 
-> gtime_halted is also plumbed to the scheduler infrastructure to discount
-> halted cycles from fair load accounting. This enlightens the load
-> balancer to real guest activity for better task placement.
-> 
-> This initial RFC has a few limitations and open questions:
-> * only the x86 infrastructure is supported as it relies on architecture
->   dependent registers. Future development will extend this to ARM.
-> * we assume that mperf accumulates as the same rate as tsc. While I am
->   not certain whether this assumption is ever violated, the spec doesn't
->   seem to offer this guarantee [1] so we may want to calibrate mperf.
-> * the sched enlightenment logic relies on periodic gtime_halted updates.
->   As such, it is incompatible with nohz full because this could result
->   in long periods of no update followed by a massive halted time update
->   which doesn't play well with the existing PELT integration. It is
->   possible to address this limitation with generalized, more complex
->   accounting.
+> With this config, the failure rate is more than 90% in my SPR non-TDX machine,
+> and 20%~80% in my TDX machine.
 
