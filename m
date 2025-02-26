@@ -1,178 +1,157 @@
-Return-Path: <kvm+bounces-39207-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39208-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D0DCA4521A
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 02:21:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C00BA4522D
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 02:27:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F0CFB7A3DF7
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 01:20:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CD813A37BC
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 01:27:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74EC817E015;
-	Wed, 26 Feb 2025 01:21:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D26DC188CAE;
+	Wed, 26 Feb 2025 01:26:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JF8J6OZH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4YtLOw+S"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379F0154BF0
-	for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 01:21:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF55E56A
+	for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 01:26:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740532862; cv=none; b=XWnREOr/JGh20AWl0OfRXKC73hJt+O0QfET1bVXjizUygaetIGInVG+kAP/nInYdmLkMVwCDsbsH/egPtzLmOgEmkSEyRzyGgNr0ItyZzRXOaLLHKQiwqW9K4i1PbpMOXxF+KxQT+MU2buFrxPx5IKUjqBLeNWvH2Qgvzto5vhI=
+	t=1740533218; cv=none; b=GtgurFvL38U42ETBaz45ZimDV7MqFwp2ABxq7SIxkx7uifhDULYZrwUJ3QYIsLTJd9m2G9p213fJQGpgngOoi710c/fjJ/0LEAvZcDYHceSL69IOwtOEbfTnlB68Hg0Rdw+7x7Ocijf7AuGwrGdD2olhTsCymrig21aQAeayhJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740532862; c=relaxed/simple;
-	bh=ej9DtK6/GIC7P6gUFFvgcMeLI/e2OMKxKBwv3JUqlfA=;
+	s=arc-20240116; t=1740533218; c=relaxed/simple;
+	bh=zlFEyC5JeqNAQZFtKzotM5zUfFmUiborem5NGUXLCd0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=b/KG+I4B3aUksQbOiy5DXr7L0zIH2Dlo6p9kNt3HrInOhDeBSRIhTy8jGxYXAv/I1aSMO/JJei6MVGxGHZG4bv9KpJjk07fVWIbVmw6ewWnu2N8qMpO7nHHEU5xhNWyln2WJfThgTovnTiGNMhG+tKV4JHHDjchnI9rPlYRiSRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JF8J6OZH; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=V7gxjIgZuaIMAXFMQLU5a2EDK2B/4dtlNgb4E3WWW9N4AlKPjcqYJ7OQG6xC9fGxQEomMmeClLRzgeBKVPEG0vRfpXHVjKABN7mNu9qtGe0EKeqV5q3LBh2VcZCWpO12jsxniwgY1/koK/Z/r4lUOxo1vF7reJyzn+WqLWds32w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4YtLOw+S; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fc0bc05afdso13602336a91.0
-        for <kvm@vger.kernel.org>; Tue, 25 Feb 2025 17:21:00 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fbff6426f5so12942959a91.3
+        for <kvm@vger.kernel.org>; Tue, 25 Feb 2025 17:26:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740532860; x=1741137660; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1740533214; x=1741138014; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=p2evnJTAT7xA7jPdud/d0boBZNUrVlDGplkZhVlal7I=;
-        b=JF8J6OZHs3i/gprr3UH6HFCXbV2H8SxYVBS1/TrmeLbPBZBVoKZhQHe1tOrziB2AC0
-         a4fm7XlKk/bKfIJjGlZ/tv/2AHSAl5Zs9DRgcHtbih6aRM7ME0MwbMSNNAE3fbl7EGSY
-         lO21Qt6+3XHZKtc4lae6iy/C3VSKza8D156/ePu4kpwEXdNT3pqepIcQEJS5la8wposL
-         xzGyXDSAQ117ZPS6ROVcp/glKCS/0zGMALiS7K3+hI0pLNPsOKA8U1Iq5cEvZutOkSbb
-         /sl/F8eV1dIP9fDl6VDMqkQD8W8sDVrKc+mM1m7Lwv0OZl5cUKld0My8gXb9MMZxVDFj
-         ACqA==
+        bh=P5aQ9/mYNTRs5PTgmLo7iB4ydZJA2zvGbKJjvdE0VlI=;
+        b=4YtLOw+SrPQOhO3zYMYgKU04iCFUo8p9kFS2r1DCcMyOClYnCiLoz58fdvquj6bmFm
+         osI53bhCk+k/5V1b7/H5WFKr5RQEceim7n2S6zBSnn0kJ5O7d1zNJEkhqRhPkXGKcXSC
+         PqnuVkVdUi0II/rrJDVqcq31Dp7LJbNoky/9uQ7K/AWdJal/LsP+/NH/jsqlfRKBE5AC
+         a2DIKhI5iIxRw6VZf4INOd/jO2RhQ9mkl+XTJWdUb4GoQQjNth/850/QrvWBGBw25+CP
+         5t72W5LX/CC6W/2r5egHqKsCpTCqyk7AYEr7LLNThyptcXy8P7tw7sGzUT0H63twoP2Q
+         2wjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740532860; x=1741137660;
+        d=1e100.net; s=20230601; t=1740533214; x=1741138014;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=p2evnJTAT7xA7jPdud/d0boBZNUrVlDGplkZhVlal7I=;
-        b=M2T4fGOCw21TNZk4fljH8FUbsAX3h65K+f1kfbt/JFYdy+3NNhHzw4imB0hZ29xT8e
-         aP8OBHJhZabS4JBKiSw+67VUrbHE7ptNu4fgxlni10MmdT4Ho6OeQRG4Mb/xJwxlXGFw
-         pjyc7y1FeCHbuXwNvgp49VOpfujWiioGUnHQTzhwkpA/XSrLdDPC5brkkRxQmWb6ihBV
-         8c6tArBCIG8Eo9Av8genGO6tNC5BgPwPHJVcrnCGxmhzSpdmhO/iQ/p9emDQCQNtr+Fs
-         FVtNxST1+v0QmMihwpOy3MYr/36KuZqFkOGbOCGUlIuKzmkcFB2qnDOxat2kZSu/aOrC
-         jVDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWNC+Swf7R8xQx3XoBXmjqw7TcoriG3eDfvLkOTi8VZS9F22S3M1IM0n6ppySLnKVSK2QY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9VQ9XcsUQHDToeqR6TH8N5K7jzSjs2eGAIm7yW72uMIRvOhQ4
-	1jRxfSadxU7l1/Z8tc849n0YXR8OlSMLKVBN3mCaBxI3cmoOk+h3O31IjXDXtIxwdlZsC2rPcPk
-	+sQ==
-X-Google-Smtp-Source: AGHT+IHg18aY5r8Tckm8ifppI9xalzebABi31M7tGArAxnDvvCsGP5kXSFQLYelbvQ5IR8I5g7C00iuW5NM=
-X-Received: from pjbsw12.prod.google.com ([2002:a17:90b:2c8c:b0:2fa:284f:adae])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:f944:b0:2ee:f440:53ed
- with SMTP id 98e67ed59e1d1-2fe68d058e5mr7870141a91.31.1740532860549; Tue, 25
- Feb 2025 17:21:00 -0800 (PST)
-Date: Tue, 25 Feb 2025 17:20:59 -0800
-In-Reply-To: <20250128015345.7929-4-szy0127@sjtu.edu.cn>
+        bh=P5aQ9/mYNTRs5PTgmLo7iB4ydZJA2zvGbKJjvdE0VlI=;
+        b=L0FQyEc77pvcOdK92Rfvy5i5wb9sNKmCJa+CudEigg1Oz3+ylXaa+knIMBdGpxvtxA
+         2dBpYbgk9tBJ6Isngl78HwSiG3F6Q+9B7EWUOP+Bd9Bg2K52OuJ3AFB3W4dA/bL1BCyg
+         a3X/ELtDem9Re8Sp5aVHBRcY8PHxCwMlLG9lEhpd8aH+BrhORtkKpLHMzdANnsd6u9CB
+         TpetRULF+uq0cBr8rBb88hgiMoNRAz+ij4ucrzIzK4Hv+Vi40mAjONAwlEDtnfPyAiqv
+         pYDw5cqXZeyuX+qJ4eNkLnblkuVbPl1KTy+BQ5+agHPfhaK7yW926mzOW+ZkEs9heNJM
+         nDmA==
+X-Forwarded-Encrypted: i=1; AJvYcCXOlFslLn4NyhOX2LgM6cVS20YcfclM+x94QAvJ969VwivzmXdQ9qRbjAeoexcudx+ielg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhqX4NN1KdCfJtgU9vgg/a/3N/EGnRNhDsTyPzBtDodfVRDdMt
+	Ey7LYjUuODSOFn0dIOpPflkJXl7KQllBcgIrb9BE4cjTntbsJ+AJKHBHVEJO3UVK4LxAwYcjckE
+	AGA==
+X-Google-Smtp-Source: AGHT+IHlNQ5IiZOzlAdmwX5lSgim2XgHtoN9cYmDSibC0w1TZnTWCxGEQ0ilxIU3H83+4BpiEAN/Z5oPYmg=
+X-Received: from pjbsf2.prod.google.com ([2002:a17:90b:51c2:b0:2fe:7f7a:74b2])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1f8e:b0:2ee:c9b6:c26a
+ with SMTP id 98e67ed59e1d1-2fe68ada3bemr9005257a91.11.1740533214601; Tue, 25
+ Feb 2025 17:26:54 -0800 (PST)
+Date: Tue, 25 Feb 2025 17:26:53 -0800
+In-Reply-To: <20250201000259.3289143-2-kevinloughlin@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250128015345.7929-1-szy0127@sjtu.edu.cn> <20250128015345.7929-4-szy0127@sjtu.edu.cn>
-Message-ID: <Z75se_OZQvaeQE-4@google.com>
-Subject: Re: [PATCH v7 3/3] KVM: SVM: Flush cache only on CPUs running SEV guest
+References: <20250123002422.1632517-1-kevinloughlin@google.com>
+ <20250201000259.3289143-1-kevinloughlin@google.com> <20250201000259.3289143-2-kevinloughlin@google.com>
+Message-ID: <Z75t3d1EXQpmim9m@google.com>
+Subject: Re: [PATCH v6 1/2] x86, lib: Add WBNOINVD helper functions
 From: Sean Christopherson <seanjc@google.com>
-To: Zheyun Shen <szy0127@sjtu.edu.cn>
-Cc: thomas.lendacky@amd.com, pbonzini@redhat.com, tglx@linutronix.de, 
-	kevinloughlin@google.com, mingo@redhat.com, bp@alien8.de, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+To: Kevin Loughlin <kevinloughlin@google.com>
+Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, 
+	bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
+	pbonzini@redhat.com, kirill.shutemov@linux.intel.com, kai.huang@intel.com, 
+	ubizjak@gmail.com, jgross@suse.com, kvm@vger.kernel.org, 
+	thomas.lendacky@amd.com, pgonda@google.com, sidtelang@google.com, 
+	mizhang@google.com, rientjes@google.com, manalinandan@google.com, 
+	szy0127@sjtu.edu.cn
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Jan 28, 2025, Zheyun Shen wrote:
-> On AMD CPUs without ensuring cache consistency, each memory page
-> reclamation in an SEV guest triggers a call to wbinvd_on_all_cpus(),
-> thereby affecting the performance of other programs on the host.
-> 
-> Typically, an AMD server may have 128 cores or more, while the SEV guest
-> might only utilize 8 of these cores. Meanwhile, host can use qemu-affinity
-> to bind these 8 vCPUs to specific physical CPUs.
-> 
-> Therefore, keeping a record of the physical core numbers each time a vCPU
-> runs can help avoid flushing the cache for all CPUs every time.
-> 
-> Signed-off-by: Zheyun Shen <szy0127@sjtu.edu.cn>
-> ---
->  arch/x86/kvm/svm/sev.c | 30 +++++++++++++++++++++++++++---
->  arch/x86/kvm/svm/svm.c |  2 ++
->  arch/x86/kvm/svm/svm.h |  5 ++++-
->  3 files changed, 33 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 1ce67de9d..4b80ecbe7 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -252,6 +252,27 @@ static void sev_asid_free(struct kvm_sev_info *sev)
->  	sev->misc_cg = NULL;
->  }
->  
-> +void sev_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-
-And now I'm very confused.
-
-v1 and v2 marked the CPU dirty in pre_sev_run(), which AFAICT is exactly when a
-CPU should be recorded as having dirtied memory.  v3 fixed a bug with using
-get_cpu(), but otherwise was unchanged.  Tom even gave a Tested-by for v3.
-
-Then v4 comes along, and without explanation, moved the code to vcpu_load().
-
-  Changed the time of recording the CPUs from pre_sev_run() to vcpu_load().
-
-Why?  If there's a good reason, then that absolutely, positively belongs in the
-changelog and in the code as a comment.  If there's no good reason, then...
-
-Unless I hear otherwise, my plan is to move this back to pre_sev_run().
-
+On Sat, Feb 01, 2025, Kevin Loughlin wrote:
+> +static inline int wbnoinvd_on_all_cpus(void)
 > +{
-> +	/*
-> +	 * To optimize cache flushes when memory is reclaimed from an SEV VM,
-> +	 * track physical CPUs that enter the guest for SEV VMs and thus can
-> +	 * have encrypted, dirty data in the cache, and flush caches only for
-> +	 * CPUs that have entered the guest.
-> +	 */
-> +	cpumask_set_cpu(cpu, to_kvm_sev_info(vcpu->kvm)->wbinvd_dirty_mask);
+> +	wbnoinvd();
+> +	return 0;
+
+Returning anything is silly.  I'll prepend a patch (I'm going to send a combined
+version of this and the targeted flushing series) to remove the return value
+from wbinvd_on_all_cpus(), which I'm guessing is the source of the silliness.
+
+>  static inline struct cpumask *cpu_llc_shared_mask(int cpu)
+>  {
+>  	return (struct cpumask *)cpumask_of(0);
+> diff --git a/arch/x86/include/asm/special_insns.h b/arch/x86/include/asm/special_insns.h
+> index 03e7c2d49559..86a903742139 100644
+> --- a/arch/x86/include/asm/special_insns.h
+> +++ b/arch/x86/include/asm/special_insns.h
+> @@ -117,7 +117,24 @@ static inline void wrpkru(u32 pkru)
+>  
+>  static __always_inline void wbinvd(void)
+>  {
+> -	asm volatile("wbinvd": : :"memory");
+> +	asm volatile("wbinvd" : : : "memory");
 > +}
 > +
-> +static void sev_do_wbinvd(struct kvm *kvm)
-> +{
-> +	/*
-> +	 * TODO: Clear CPUs from the bitmap prior to flushing.  Doing so
-> +	 * requires serializing multiple calls and having CPUs mark themselves
-> +	 * "dirty" if they are currently running a vCPU for the VM.
-> +	 */
+> +/* Instruction encoding provided for binutils backwards compatibility. */
+> +#define WBNOINVD ".byte 0xf3,0x0f,0x09"
 
-A comment is definitely warranted, but I don't think we should mark it TODO.  I'm
-not convinced the benefits justify the complexity, and I don't want someone trying
-to "fix" the code because it has a TODO.
+Argh.  This causes problems for KVM, because KVM's newfangled CPUID macros heavily
+use token pasting with X86_FEATURE_xxx, and so KVM's usage of:
 
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 43fa6a16e..82ec80cf4 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -112,6 +112,8 @@ struct kvm_sev_info {
->  	void *guest_req_buf;    /* Bounce buffer for SNP Guest Request input */
->  	void *guest_resp_buf;   /* Bounce buffer for SNP Guest Request output */
->  	struct mutex guest_req_mutex; /* Must acquire before using bounce buffers */
-> +	/* CPUs invoked VMRUN call wbinvd after guest memory is reclaimed */
-> +	struct cpumask *wbinvd_dirty_mask;
+	F(WBNOINVD)
 
-This needs to be cpumask_var_t, as the cpumask APIs expect the mask to be
-statically allocated when CONFIG_CPUMASK_OFFSTACK=n.  E.g. this will hit a NULL
-pointer deref.
+causes explosions.  Somewhat amusingly, this is the second time today I ran into
+this problem, as WRMSRNS as the safe issue.
 
-  static __always_inline bool zalloc_cpumask_var(cpumask_var_t *mask, gfp_t flags)
-  {
-	cpumask_clear(*mask);
-	return true;
-  }
+Dave (and others),
 
-The wbinvd_dirty_mask name also turns out to be less than good.  In part because
-of the looming WBNOINVD change, but also because it kinda sorta collides with
-wbinvd_dirty_mask in kvm_vcpu_arch, which gets really confusing when trying to
-read the code.
+Any thoughts on the best way forward?  I hacked around a similar collision in
+commit 8d862c270bf1 ("KVM: x86: #undef SPEC_CTRL_SSBD in cpuid.c to avoid macro
+collisions"), but (a) that scares me less because KVM should never use the
+SPEC_CTRL_SSBD macro, and (b) I really, really don't want that to be the long-term
+solution.  The only reason I committed the hack was because it was the only
+blocking issue for a massive rework, and I couldn't get traction on renaming
+the MSR macro.
 
-I don't have any great ideas, the best I came up with was have_run_cpus.
+For WBNOINVD, WRMSRNS, and any other instructions that come along, what about this?
+Quite ugly, but it's at least descriptive.  And more importantly, the chances of
+unwanted behavior are quite low.
+
+
+/* Instruction encoding provided for binutils backwards compatibility. */
+#define ASM_WBNOINVD ".byte 0xf3,0x0f,0x09"
+
+/*
+ * Cheaper version of wbinvd(). Call when caches need to be written back but
+ * not invalidated.
+ */
+static __always_inline void wbnoinvd(void)
+{
+	/*
+	 * If WBNOINVD is unavailable, fall back to the compatible but
+	 * more destructive WBINVD (which still writes the caches back
+	 * but also invalidates them).
+	 */
+	alternative("wbinvd", ASM_WBNOINVD, X86_FEATURE_WBNOINVD);
+}
 
