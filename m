@@ -1,96 +1,75 @@
-Return-Path: <kvm+bounces-39287-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39288-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DC68A46178
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 14:58:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4ADAA4621B
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 15:16:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FECE189C809
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 13:58:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8C2D3B021C
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 14:16:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE41522173F;
-	Wed, 26 Feb 2025 13:57:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E39C622171D;
+	Wed, 26 Feb 2025 14:16:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="f6aC9r7h";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="kWvAXcYU";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="f6aC9r7h";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="kWvAXcYU"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="EVH3VIsz"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57791221556
-	for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 13:57:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F01D219E8D;
+	Wed, 26 Feb 2025 14:16:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740578271; cv=none; b=GcK06rRTpEltkUXNMhjlT52Mnh9380KMTeSgNWUkncvW4doU/iz4Yz1T/VTc6/jwggEEw5Mip+Tt/KvD7wFQCCjfvpRcvRvYUzacH83Lnv7OWOU+Wd2ef7nmJHR2c20B900K91TsugeGAT1Qf2X8/UtL7cSjo2ACHVKr5S0wsJk=
+	t=1740579410; cv=none; b=LlMT49m95rlaPQfCoFVc3HqLSC17Sx7idlW23HpzE7sA7XJZy2fG/YhsSJNwB/PNQ3ItFSjj1dxCz2Z2CcSwZm+DC/bLdYm+tC9QnhMdovDkYCPa07dd16tN7gnN65c2okyiLPB8GPkY+PSYyWHfwOEJgCashEfunmuTOSCvFA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740578271; c=relaxed/simple;
-	bh=sOsAhVl3Pth7b6HVc96vFlxzXU6gEn4y6aryJYUr7r8=;
+	s=arc-20240116; t=1740579410; c=relaxed/simple;
+	bh=be0DhVHXvIrbwG6S18TC34vLnBjIVVQE+vn71Evrd4o=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W7AtFedx2nsOLabprMtCXFMyEBtiL/LeSk95U/5SgE89IgsRJjM6B858p0UHJkB8UFHEI9P1OIVeTomDTAmP68uR2hs/zTf1K92faqZMuVOdrd+5yiLZkeNrMKAip7bWiIFgEjokJbAbPvMaRqhG9MfnNYRyVOucI28oagF38Bc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=f6aC9r7h; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=kWvAXcYU; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=f6aC9r7h; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=kWvAXcYU; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 77A8C1F388;
-	Wed, 26 Feb 2025 13:57:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1740578266; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4IhlMQLU7O+/3cgB5SqnTRbXuJ/IQuGdZmOILhsLwm0=;
-	b=f6aC9r7hbfE5be4MYPaoQ3QEKQLeMGfx1A8Jq0wP9B0QUYVmlSQOkyKbJV8dTM9hmO0rgp
-	JSh9+W7ZcPSOuAtnVDIsXkjLDL/KN78VsMxOs3ICguiRLRV4Bf8PPo02qQlWJQGJgiwtm9
-	5TOgz69VrOYYvfDZyQWox44rwWSoT5I=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1740578266;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4IhlMQLU7O+/3cgB5SqnTRbXuJ/IQuGdZmOILhsLwm0=;
-	b=kWvAXcYUdWO7rp5uJCpRO10JpeXohnZ7b05tEUtJqzgb9/jQDs1tWc3wlEIhh9NzthI/T1
-	TukaERVLfsFzvnAA==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=f6aC9r7h;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=kWvAXcYU
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1740578266; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4IhlMQLU7O+/3cgB5SqnTRbXuJ/IQuGdZmOILhsLwm0=;
-	b=f6aC9r7hbfE5be4MYPaoQ3QEKQLeMGfx1A8Jq0wP9B0QUYVmlSQOkyKbJV8dTM9hmO0rgp
-	JSh9+W7ZcPSOuAtnVDIsXkjLDL/KN78VsMxOs3ICguiRLRV4Bf8PPo02qQlWJQGJgiwtm9
-	5TOgz69VrOYYvfDZyQWox44rwWSoT5I=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1740578266;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4IhlMQLU7O+/3cgB5SqnTRbXuJ/IQuGdZmOILhsLwm0=;
-	b=kWvAXcYUdWO7rp5uJCpRO10JpeXohnZ7b05tEUtJqzgb9/jQDs1tWc3wlEIhh9NzthI/T1
-	TukaERVLfsFzvnAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5BC9B13A53;
-	Wed, 26 Feb 2025 13:57:46 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id inElFtodv2drOQAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Wed, 26 Feb 2025 13:57:46 +0000
-Message-ID: <6e9d4d95-a132-46a0-89c3-e39ace6bcb2a@suse.cz>
-Date: Wed, 26 Feb 2025 14:59:29 +0100
+	 In-Reply-To:Content-Type; b=e/7vgeerqMj4Y8Byaenl30l6YtAZNnC1GkTohHBVQ6ZJU95QnqvX6Hjm23ZSMtDkNcFHo1zizgwWmApvwVZvg5q7fHBbeEx48FxXoxJ932NHOHRJ2i49rzEjAwgR2q8ORZ5ckJmopYdkn/ORjstm0t/wRsiSRVxvmMXSXszPtgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=EVH3VIsz; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51QBa54k013048;
+	Wed, 26 Feb 2025 14:16:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=WQbQEI
+	sUUMA0rfA6FA7CYmCh7tbVL9N0aY72lMm5jZU=; b=EVH3VIszWpMrqgBUg5xaZH
+	Me4RBU2MnV6mZiwgr8vsszAGjPGjOrqtu2asnGtNKf4OaQ0Z202wuoJcb3KnZWEg
+	Ce5DgxH+ECWwt7jNFvMZtKuaVjZNh+Qo30MIVd5fx7QwjavI03fVs2y+MSqXazlY
+	FSCCIT8wIEQhWv8AhgZjL0Ijm5PoDqDBp7ONCJNC1QB0bFaSj1lioQL3+Nkvqwsq
+	e3H92Bo0IeOHQbH+pcwGGC6NrHvIxOLZ1akkwFqKUaxh8d9Mc7nbsdAbOfwfqQhu
+	qs+1cs23CiLkdV7ZeFRJyUY6dRoE0zogrfkaraGs4XZsTHGu6+nOGliGn2Ypk14w
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 451s19b57a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 26 Feb 2025 14:16:44 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51QCs8LD026964;
+	Wed, 26 Feb 2025 14:16:43 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44ytdkjwr3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 26 Feb 2025 14:16:43 +0000
+Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51QEGgTi65274326
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 26 Feb 2025 14:16:42 GMT
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 70CE65804E;
+	Wed, 26 Feb 2025 14:16:42 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 47D645803F;
+	Wed, 26 Feb 2025 14:16:41 +0000 (GMT)
+Received: from [9.61.107.75] (unknown [9.61.107.75])
+	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 26 Feb 2025 14:16:41 +0000 (GMT)
+Message-ID: <86e40763-f76a-4f71-bb50-d1b1a4c77509@linux.ibm.com>
+Date: Wed, 26 Feb 2025 09:16:40 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -98,126 +77,102 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 2/5] mm/mempolicy: export memory policy symbols
-To: Shivank Garg <shivankg@amd.com>, akpm@linux-foundation.org,
- willy@infradead.org, pbonzini@redhat.com
-Cc: linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-coco@lists.linux.dev, chao.gao@intel.com, seanjc@google.com,
- ackerleytng@google.com, david@redhat.com, bharata@amd.com, nikunj@amd.com,
- michael.day@amd.com, Neeraj.Upadhyay@amd.com, thomas.lendacky@amd.com,
- michael.roth@amd.com, tabba@google.com
-References: <20250226082549.6034-1-shivankg@amd.com>
- <20250226082549.6034-3-shivankg@amd.com>
-From: Vlastimil Babka <vbabka@suse.cz>
+Subject: Re: [RFC PATCH v2 2/2] s390/vfio-ap: Fixing mdev remove notification
+To: Rorie Reyes <rreyes@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc: hca@linux.ibm.com, borntraeger@de.ibm.com, agordeev@linux.ibm.com,
+        gor@linux.ibm.com, pasic@linux.ibm.com, jjherne@linux.ibm.com,
+        alex.williamson@redhat.com
+References: <20250225201208.45998-1-rreyes@linux.ibm.com>
+ <20250225201208.45998-3-rreyes@linux.ibm.com>
 Content-Language: en-US
-In-Reply-To: <20250226082549.6034-3-shivankg@amd.com>
-Content-Type: text/plain; charset=UTF-8
+From: Anthony Krowiak <akrowiak@linux.ibm.com>
+In-Reply-To: <20250225201208.45998-3-rreyes@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 77A8C1F388
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	TO_DN_SOME(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:email,suse.cz:dkim,suse.cz:mid];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.cz:+]
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -4.51
-X-Spam-Flag: NO
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: hTygt1-RlUXqBhFcRAgTHoN_vB5gyXfK
+X-Proofpoint-ORIG-GUID: hTygt1-RlUXqBhFcRAgTHoN_vB5gyXfK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-26_03,2025-02-26_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 suspectscore=0
+ phishscore=0 adultscore=0 impostorscore=0 lowpriorityscore=0
+ mlxlogscore=999 mlxscore=0 spamscore=0 clxscore=1015 priorityscore=1501
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502100000 definitions=main-2502260112
 
 
 
-On 2/26/25 9:25 AM, Shivank Garg wrote:
-> KVM guest_memfd wants to implement support for NUMA policies just like
-> shmem already does using the shared policy infrastructure. As
-> guest_memfd currently resides in KVM module code, we have to export the
-> relevant symbols.
-> 
-> In the future, guest_memfd might be moved to core-mm, at which point the
-> symbols no longer would have to be exported. When/if that happens is
-> still unclear.
-> 
-> Acked-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: Shivank Garg <shivankg@amd.com>
 
-Acked-by: Vlastimil Babka <vbabka@suse.cz>
+On 2/25/25 3:12 PM, Rorie Reyes wrote:
+> Removed eventfd from vfio_ap_mdev_unset_kvm
+> Update and release locks along with the eventfd added
+> to vfio_ap_mdev_request
 
+This patch doesn't really fix anything, it just undoes a line of code 
+that was added in
+patch 1/2 (see my comment below).
+
+By my reckoning, the purpose for this patch
+is to signal an AP config change event to the guest when the crypto 
+devices are
+removed from the guest's AP configuration as a result of a request to 
+remove the
+mediated device.
+
+
+>
+> Signed-off-by: Rorie Reyes <rreyes@linux.ibm.com>
 > ---
->  mm/mempolicy.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/mm/mempolicy.c b/mm/mempolicy.c
-> index bbaadbeeb291..d9c5dcdadcd0 100644
-> --- a/mm/mempolicy.c
-> +++ b/mm/mempolicy.c
-> @@ -214,6 +214,7 @@ struct mempolicy *get_task_policy(struct task_struct *p)
->  
->  	return &default_policy;
->  }
-> +EXPORT_SYMBOL_GPL(get_task_policy);
->  
->  static const struct mempolicy_operations {
->  	int (*create)(struct mempolicy *pol, const nodemask_t *nodes);
-> @@ -347,6 +348,7 @@ void __mpol_put(struct mempolicy *pol)
->  		return;
->  	kmem_cache_free(policy_cache, pol);
->  }
-> +EXPORT_SYMBOL_GPL(__mpol_put);
->  
->  static void mpol_rebind_default(struct mempolicy *pol, const nodemask_t *nodes)
->  {
-> @@ -2736,6 +2738,7 @@ struct mempolicy *mpol_shared_policy_lookup(struct shared_policy *sp,
->  	read_unlock(&sp->lock);
->  	return pol;
->  }
-> +EXPORT_SYMBOL_GPL(mpol_shared_policy_lookup);
->  
->  static void sp_free(struct sp_node *n)
->  {
-> @@ -3021,6 +3024,7 @@ void mpol_shared_policy_init(struct shared_policy *sp, struct mempolicy *mpol)
->  		mpol_put(mpol);	/* drop our incoming ref on sb mpol */
->  	}
->  }
-> +EXPORT_SYMBOL_GPL(mpol_shared_policy_init);
->  
->  int mpol_set_shared_policy(struct shared_policy *sp,
->  			struct vm_area_struct *vma, struct mempolicy *pol)
-> @@ -3039,6 +3043,7 @@ int mpol_set_shared_policy(struct shared_policy *sp,
->  		sp_free(new);
->  	return err;
->  }
-> +EXPORT_SYMBOL_GPL(mpol_set_shared_policy);
->  
->  /* Free a backing policy store on inode delete. */
->  void mpol_free_shared_policy(struct shared_policy *sp)
-> @@ -3057,6 +3062,7 @@ void mpol_free_shared_policy(struct shared_policy *sp)
->  	}
->  	write_unlock(&sp->lock);
->  }
-> +EXPORT_SYMBOL_GPL(mpol_free_shared_policy);
->  
->  #ifdef CONFIG_NUMA_BALANCING
->  static int __initdata numabalancing_override;
+>   drivers/s390/crypto/vfio_ap_ops.c | 15 ++++++++++++++-
+>   1 file changed, 14 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index c6ff4ab13f16..e0237ea27d7e 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -1870,7 +1870,6 @@ static void vfio_ap_mdev_unset_kvm(struct ap_matrix_mdev *matrix_mdev)
+>   		get_update_locks_for_kvm(kvm);
+>   
+>   		kvm_arch_crypto_clear_masks(kvm);
+> -		signal_guest_ap_cfg_changed(matrix_mdev);
+
+Why remove a line of code that was added in patch 1/2. Why not just 
+rebase patch 1/2 and
+remove this line of code from that patch rather than here if it was 
+added in error?
+
+>   		vfio_ap_mdev_reset_queues(matrix_mdev);
+>   		kvm_put_kvm(kvm);
+>   		matrix_mdev->kvm = NULL;
+> @@ -2057,6 +2056,14 @@ static void vfio_ap_mdev_request(struct vfio_device *vdev, unsigned int count)
+>   
+>   	matrix_mdev = container_of(vdev, struct ap_matrix_mdev, vdev);
+>   
+> +	if (matrix_mdev->kvm) {
+> +		get_update_locks_for_kvm(matrix_mdev->kvm);
+> +		kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
+> +		signal_guest_ap_cfg_changed(matrix_mdev);
+> +	} else {
+> +		mutex_lock(&matrix_dev->mdevs_lock);
+> +	}
+> +
+>   	if (matrix_mdev->req_trigger) {
+>   		if (!(count % 10))
+>   			dev_notice_ratelimited(dev,
+> @@ -2068,6 +2075,12 @@ static void vfio_ap_mdev_request(struct vfio_device *vdev, unsigned int count)
+>   		dev_notice(dev,
+>   			   "No device request registered, blocked until released by user\n");
+>   	}
+> +
+> +	if (matrix_mdev->kvm)
+> +		release_update_locks_for_kvm(matrix_mdev->kvm);
+> +	else
+> +		mutex_unlock(&matrix_dev->mdevs_lock);
+> +
+>   }
+>   
+>   static int vfio_ap_mdev_get_device_info(unsigned long arg)
 
 
