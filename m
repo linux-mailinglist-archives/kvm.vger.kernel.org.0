@@ -1,195 +1,108 @@
-Return-Path: <kvm+bounces-39264-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39265-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFAF4A45A13
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 10:26:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DACCCA45A30
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 10:36:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 267023AC8B9
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 09:26:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBBCE16DF89
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 09:36:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31C9226CF6;
-	Wed, 26 Feb 2025 09:26:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5333226D0F;
+	Wed, 26 Feb 2025 09:36:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OvLi49DY"
 X-Original-To: kvm@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2924215189;
-	Wed, 26 Feb 2025 09:26:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3913C20E302;
+	Wed, 26 Feb 2025 09:36:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740561973; cv=none; b=WVqqoUNsKprQv3KPcYyxR8evjuJc8p9A/jR35aaLorNcXiEnKy4OdRHvSTWVELmMZ0R1Yz6BpD+OciptqlicmtPiRcCccnKcaMVgzh3gznhKjPSzVoUhYbUsOjRa8vWhgwm2QELGB7IOUL0OGmKjVDJm96P+UHRcMtu1HFt4lLE=
+	t=1740562597; cv=none; b=YctwC09uzU0emWpyVBikpMa9emyR3VMQR3In65iMxTQNwUhTADP6Q08wNvg8UxszQcMACHfZ2BcUKz1EuXcsgjAj5l/T53xGe+eVT0bcPVllRDv6uZYI/GJ1fyts72tZIUv0xlccrVQNI5xofnyifE/e6NmoNFVkFnvm82Z/nyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740561973; c=relaxed/simple;
-	bh=snXsEhf+LNi9fdlosqnbK4Qm4UNaUVu8+oUbUR/A6+M=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ce68aP8A0HTTc4W08baic+o3oINx26Lpf1Ak+qLubh20zDdD8P1SCf8E39bdHqQOgq0saNpbo3re6w3VjxtwceiuXYWS77C7/HtJm+mgHuK6KjhFup+R0xg7eI64OndqHt4m829ws/ajw7B06Oxrb3XQ0Igt6BajoyQz1TG4hbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Z2pvJ1wwcz6K9Fn;
-	Wed, 26 Feb 2025 17:24:12 +0800 (CST)
-Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
-	by mail.maildlp.com (Postfix) with ESMTPS id 72B0814097D;
-	Wed, 26 Feb 2025 17:26:07 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (7.182.85.71) by
- frapeml500005.china.huawei.com (7.182.85.13) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 26 Feb 2025 10:26:07 +0100
-Received: from frapeml500008.china.huawei.com ([7.182.85.71]) by
- frapeml500008.china.huawei.com ([7.182.85.71]) with mapi id 15.01.2507.039;
- Wed, 26 Feb 2025 10:26:07 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: liulongfang <liulongfang@huawei.com>, "alex.williamson@redhat.com"
-	<alex.williamson@redhat.com>, "jgg@nvidia.com" <jgg@nvidia.com>, "Jonathan
- Cameron" <jonathan.cameron@huawei.com>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linuxarm@openeuler.org" <linuxarm@openeuler.org>
-Subject: RE: [PATCH v4 5/5] hisi_acc_vfio_pci: bugfix live migration function
- without VF device driver
-Thread-Topic: [PATCH v4 5/5] hisi_acc_vfio_pci: bugfix live migration function
- without VF device driver
-Thread-Index: AQHbh07C3f9e7H+vQ0mq3v4m2vU4obNZTIOQ
-Date: Wed, 26 Feb 2025 09:26:07 +0000
-Message-ID: <fa8cd8c1cdbe4849b445ffd8f4894515@huawei.com>
-References: <20250225062757.19692-1-liulongfang@huawei.com>
- <20250225062757.19692-6-liulongfang@huawei.com>
-In-Reply-To: <20250225062757.19692-6-liulongfang@huawei.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1740562597; c=relaxed/simple;
+	bh=dRGPgXSlsmGm/cpvYopV/a54JFonx+29DpE/VBF/K3I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SeUaTzoLMk3XF/FQc4/6CIpGVVeWhVMfpyPYDwTeDOCM1MO/4DReAxRtE0YOBUqs8S7ti4Gbj4SdJxw8GQyuzynVHGj+Mq6lMOJKfZiO48kvGMOutYYjEhdMDWXJxRfHU42Bz0ig2c5wBJEGpEZM5T+lv6RMGdf8lGTNwM/2+f4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OvLi49DY; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740562596; x=1772098596;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=dRGPgXSlsmGm/cpvYopV/a54JFonx+29DpE/VBF/K3I=;
+  b=OvLi49DYQfkAsd82YMeTb0KJ5Zr9OzohYx51eogxvfvv7puI8OnT+b+Z
+   jibD8bk8B0YdHCCkW7cdOKyrYYMeVW6ln+xGHKn5RKsZt37AD+RAdsiaj
+   eu6tbXiMzlgBHmpR3y14ECbgustYHsyAvjXBN0imvNsR4sImF7d0NHci/
+   piIy3mhpLPV5xoWh3mqV42veWgqSJ53QnMi6JxqVAA0YFtMF1KkuFtAL8
+   Url4uLgNcrUAvwqyhRIr9SS6PHulAhDsJqXDD9xavPe10gO48skK8KknR
+   5YAijhHvw+pQVlxa02fek71maZaRsuRkZxFhbmTIdZ04b5W8qqJEp4Fvt
+   Q==;
+X-CSE-ConnectionGUID: Feo6Uuw7SdGrRKOAOJdP2w==
+X-CSE-MsgGUID: 1OY+cWqjTHen4SvLkE3mhQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11356"; a="44224204"
+X-IronPort-AV: E=Sophos;i="6.13,316,1732608000"; 
+   d="scan'208";a="44224204"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 01:36:35 -0800
+X-CSE-ConnectionGUID: jFeAnA6nSWa4BN/gDJ3S8w==
+X-CSE-MsgGUID: iU31LXULTYqiQVUHxfsLaA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,316,1732608000"; 
+   d="scan'208";a="121751577"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 01:36:32 -0800
+Message-ID: <68f771b1-0a7e-44e7-8db6-956b8cfb4112@intel.com>
+Date: Wed, 26 Feb 2025 17:36:28 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 7/9] KVM: TDX: Handle TDG.VP.VMCALL<ReportFatalError>
+To: Binbin Wu <binbin.wu@linux.intel.com>, pbonzini@redhat.com,
+ seanjc@google.com, kvm@vger.kernel.org
+Cc: rick.p.edgecombe@intel.com, kai.huang@intel.com, adrian.hunter@intel.com,
+ reinette.chatre@intel.com, tony.lindgren@intel.com,
+ isaku.yamahata@intel.com, yan.y.zhao@intel.com, chao.gao@intel.com,
+ linux-kernel@vger.kernel.org
+References: <20250222014225.897298-1-binbin.wu@linux.intel.com>
+ <20250222014225.897298-8-binbin.wu@linux.intel.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20250222014225.897298-8-binbin.wu@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 2/22/2025 9:42 AM, Binbin Wu wrote:
+> @@ -6849,9 +6850,11 @@ Valid values for 'type' are:
+>      reset/shutdown of the VM.
+>    - KVM_SYSTEM_EVENT_SEV_TERM -- an AMD SEV guest requested termination.
+>      The guest physical address of the guest's GHCB is stored in `data[0]`.
+> - - KVM_SYSTEM_EVENT_WAKEUP -- the exiting vCPU is in a suspended state and
+> -   KVM has recognized a wakeup event. Userspace may honor this event by
+> -   marking the exiting vCPU as runnable, or deny it and call KVM_RUN again.
 
+It deletes the description of KVM_SYSTEM_EVENT_WAKEUP by mistake;
 
-> -----Original Message-----
-> From: liulongfang <liulongfang@huawei.com>
-> Sent: Tuesday, February 25, 2025 6:28 AM
-> To: alex.williamson@redhat.com; jgg@nvidia.com; Shameerali Kolothum
-> Thodi <shameerali.kolothum.thodi@huawei.com>; Jonathan Cameron
-> <jonathan.cameron@huawei.com>
-> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> linuxarm@openeuler.org; liulongfang <liulongfang@huawei.com>
-> Subject: [PATCH v4 5/5] hisi_acc_vfio_pci: bugfix live migration function
-> without VF device driver
->=20
-> If the driver of the VF device is not loaded in the Guest OS,
-> then perform device data migration. The migrated data address will
-> be NULL.
+(Maybe we can fix the order of the descriptions by the way, 
+KVM_SYSTEM_EVENT_SEV_TERM gets put in front of KVM_SYSTEM_EVENT_WAKEUP 
+and KVM_SYSTEM_EVENT_SUSPEND)
 
-May be rephrase:
-
-If the VF device driver is not loaded in the Guest OS and we attempt to
-perform device data migration, the address of the migrated data will
-be NULL.
-
-> The live migration recovery operation on the destination side will
-> access a null address value, which will cause access errors.
-=20
-> Therefore, live migration of VMs without added VF device drivers
-> does not require device data migration.
-> In addition, when the queue address data obtained by the destination
-> is empty, device queue recovery processing will not be performed.
->=20
-> Fixes: b0eed085903e ("hisi_acc_vfio_pci: Add support for VFIO live
-> migration")
-> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
-> ---
->  drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
->=20
-> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> index 3f0bcd855839..77872fc4cd34 100644
-> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> @@ -440,6 +440,7 @@ static int vf_qm_get_match_data(struct
-> hisi_acc_vf_core_device *hisi_acc_vdev,
->  				struct acc_vf_data *vf_data)
->  {
->  	struct hisi_qm *pf_qm =3D hisi_acc_vdev->pf_qm;
-> +	struct hisi_qm *vf_qm =3D &hisi_acc_vdev->vf_qm;
->  	struct device *dev =3D &pf_qm->pdev->dev;
->  	int vf_id =3D hisi_acc_vdev->vf_id;
->  	int ret;
-> @@ -466,6 +467,13 @@ static int vf_qm_get_match_data(struct
-> hisi_acc_vf_core_device *hisi_acc_vdev,
->  		return ret;
->  	}
->=20
-> +	/* Get VF driver insmod state */
-> +	ret =3D qm_read_regs(vf_qm, QM_VF_STATE, &vf_data->vf_qm_state,
-> 1);
-
-We already have qm_wait_dev_not_ready() function that checks the QM_VF_STAT=
-E.=20
-Why can't we use that here?
-
-Also we are getting this vf_qm_state already in vf_qm_state_save(). And you=
- don't
-seem to check the vf_qm_state in vf_qm_check_match(). So why it is read=20
-early in this function?
-
-
-Thanks,
-Shameer
-
-> +	if (ret) {
-> +		dev_err(dev, "failed to read QM_VF_STATE!\n");
-> +		return ret;
-> +	}
-> +
->  	return 0;
->  }
->=20
-> @@ -505,6 +513,12 @@ static int vf_qm_load_data(struct
-> hisi_acc_vf_core_device *hisi_acc_vdev,
->  	qm->qp_base =3D vf_data->qp_base;
->  	qm->qp_num =3D vf_data->qp_num;
->=20
-> +	if (!vf_data->eqe_dma || !vf_data->aeqe_dma ||
-> +	    !vf_data->sqc_dma || !vf_data->cqc_dma) {
-> +		dev_err(dev, "resume dma addr is NULL!\n");
-> +		return -EINVAL;
-> +	}
-> +
->  	ret =3D qm_set_regs(qm, vf_data);
->  	if (ret) {
->  		dev_err(dev, "set VF regs failed\n");
-> @@ -727,6 +741,9 @@ static int hisi_acc_vf_load_state(struct
-> hisi_acc_vf_core_device *hisi_acc_vdev)
->  	struct hisi_acc_vf_migration_file *migf =3D hisi_acc_vdev-
-> >resuming_migf;
->  	int ret;
->=20
-> +	if (hisi_acc_vdev->vf_qm_state !=3D QM_READY)
-> +		return 0;
-> +
->  	/* Recover data to VF */
->  	ret =3D vf_qm_load_data(hisi_acc_vdev, migf);
->  	if (ret) {
-> @@ -1530,6 +1547,7 @@ static int hisi_acc_vfio_pci_migrn_init_dev(struct
-> vfio_device *core_vdev)
->  	hisi_acc_vdev->vf_id =3D pci_iov_vf_id(pdev) + 1;
->  	hisi_acc_vdev->pf_qm =3D pf_qm;
->  	hisi_acc_vdev->vf_dev =3D pdev;
-> +	hisi_acc_vdev->vf_qm_state =3D QM_NOT_READY;
->  	mutex_init(&hisi_acc_vdev->state_mutex);
->  	mutex_init(&hisi_acc_vdev->open_mutex);
->=20
-> --
-> 2.24.0
+> + - KVM_SYSTEM_EVENT_TDX_FATAL -- a TDX guest reported a fatal error state.
+> +   KVM doesn't do any parsing or conversion, it just dumps 16 general-purpose
+> +   registers to userspace, in ascending order of the 4-bit indices for x86-64
+> +   general-purpose registers in instruction encoding, as defined in the Intel
+> +   SDM.
+>    - KVM_SYSTEM_EVENT_SUSPEND -- the guest has requested a suspension of
+>      the VM.
 
 
