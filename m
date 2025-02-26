@@ -1,213 +1,247 @@
-Return-Path: <kvm+bounces-39270-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39271-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9FBAA45CED
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 12:21:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CC92A45CF2
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 12:23:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 042F0189537D
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 11:21:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D81007A651C
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 11:22:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAFFD215078;
-	Wed, 26 Feb 2025 11:21:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EA9C21507A;
+	Wed, 26 Feb 2025 11:23:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tJE2M1d5"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53A318BC3F;
-	Wed, 26 Feb 2025 11:21:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C479F18C034;
+	Wed, 26 Feb 2025 11:23:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740568884; cv=none; b=dlFJN6J2KGkcPZaJpnekj+7S+Pz/94PisGr6uOUpM1Sj8kfZg1w7sAAy6TY2NpHLjouRnlUad9EzykBvGKk40sVtj9e7O1QaAsfmtw8faU+nZrnRe8sOl2hIws/6Ts+jYAfZMqumRkBH2H72h93HbQApj9l0w2M4uSgPn0f4drU=
+	t=1740568991; cv=none; b=kOtnX9465zkce/gaGCQv3otRgovEJA6YEsWlPergXMr6zKDGyI/+Dhibru5xO8RVepxpkU+RNEb6j1s0f0SFQ4xEoqmoHWNOImis40S1cyPEoMZP6jBE8RPy29AnJpXU5gLmQs+F8D0GmbLfxGALD8CBzRLnIUepNXhHa+SwSr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740568884; c=relaxed/simple;
-	bh=CoxQ8RbiWma3QVldiRP0+KsnCNFY2EMIgbwlVS/+J4o=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=fbGlIVT7I0LsxwNvheu12WITZdwMR2YqGhVGODZfgTdUsIonLHbFAWDi9kRzkXw9QF+9w6DRi1rCx0tvfe7VXDxuZkxXGJ/+yJbBg/H8w1kLjBBNvJm3QLefBPQmwgAhj7Jq9CdeOL8cdK3XYwBTRRb2uqGblt6LxXxQUCxz3Qo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Z2sSf2NWCzTmrh;
-	Wed, 26 Feb 2025 19:19:46 +0800 (CST)
-Received: from kwepemg500006.china.huawei.com (unknown [7.202.181.43])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5650F18009E;
-	Wed, 26 Feb 2025 19:21:18 +0800 (CST)
-Received: from [10.67.121.110] (10.67.121.110) by
- kwepemg500006.china.huawei.com (7.202.181.43) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 26 Feb 2025 19:21:17 +0800
-Subject: Re: [PATCH v4 1/5] hisi_acc_vfio_pci: fix XQE dma address error
-To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <jonathan.cameron@huawei.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linuxarm@openeuler.org>
-References: <20250225062757.19692-1-liulongfang@huawei.com>
- <20250225062757.19692-2-liulongfang@huawei.com>
-From: liulongfang <liulongfang@huawei.com>
-Message-ID: <bc8b5917-53e6-cf4f-2666-82274c86b606@huawei.com>
-Date: Wed, 26 Feb 2025 19:21:17 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1740568991; c=relaxed/simple;
+	bh=703UKprGGQpR0HDpKp0gIymTag7yafrb372oYXJMNek=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OSp4oP+e+98jGhwkwfOQYRJiNUCAI6K8iyPvuyvbGphb7nqmxog1SfvoGvdnr61lopeFghRh/jwZgsgv0NOE/tn6TwXe5C2r7OYbbEqAoit98ETIi3oZZjzG6+W2Telu6yHwLwWNqhDmFvey9CadOir+IJ46eBAhZaQ6U1aYtmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tJE2M1d5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9482C4CED6;
+	Wed, 26 Feb 2025 11:23:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740568991;
+	bh=703UKprGGQpR0HDpKp0gIymTag7yafrb372oYXJMNek=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tJE2M1d5GdnKvGF1N6IS1+Fqs1+GkWn5HTPUN6deuWEkUOsv0NgY2U39dE4euzCCO
+	 j8dfBEa0jwmGlt0krOdObiwyBGBdDDmloHLuZ1HvGdVOCLwJB4Il3EglaBJlkPEQvJ
+	 dFPMUGmqiCLkYv3962YSxSKGbCvxylhsOD4nIGk4gvMqVNsJtQy9Z02dWsbINWT5r1
+	 t3HO5ktlT8unHlHTEwPZZ4CxaW4nCRv5P4hC3QbXPaFD3Gkg3E62jvLcFBtBKnGZCr
+	 Xt+RS1egXezY0+IMHLnten5h19ick8VZbbP7nopvWMjHhulkfX560MYKIxn5IFw3l/
+	 lvTm09yD7EQ4g==
+Date: Wed, 26 Feb 2025 12:23:03 +0100
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>, "Michael S . Tsirkin"
+ <mst@redhat.com>, Shiju Jose <shiju.jose@huawei.com>,
+ <qemu-arm@nongnu.org>, <qemu-devel@nongnu.org>, Philippe =?UTF-8?B?TWF0?=
+ =?UTF-8?B?aGlldS1EYXVkw6k=?= <philmd@linaro.org>, Ani Sinha
+ <anisinha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Dongjiu Geng
+ <gengdongjiu1@gmail.com>, Eduardo Habkost <eduardo@habkost.net>, Eric Blake
+ <eblake@redhat.com>, John Snow <jsnow@redhat.com>, Marcel Apfelbaum
+ <marcel.apfelbaum@gmail.com>, "Markus Armbruster" <armbru@redhat.com>,
+ Michael Roth <michael.roth@amd.com>, "Paolo Bonzini" <pbonzini@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Shannon Zhao
+ <shannon.zhaosl@gmail.com>, Yanan Wang <wangyanan55@huawei.com>, Zhao Liu
+ <zhao1.liu@intel.com>, <kvm@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v3 00/14] Change ghes to use HEST-based offsets and add
+ support for error inject
+Message-ID: <20250226122303.0131ce8b@foz.lan>
+In-Reply-To: <20250226105628.7e60f952@foz.lan>
+References: <cover.1738345063.git.mchehab+huawei@kernel.org>
+	<20250203110934.000038d8@huawei.com>
+	<20250203162236.7d5872ff@imammedo.users.ipa.redhat.com>
+	<20250221073823.061a1039@foz.lan>
+	<20250221102127.000059e6@huawei.com>
+	<20250225110115.6090e416@imammedo.users.ipa.redhat.com>
+	<20250226105628.7e60f952@foz.lan>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250225062757.19692-2-liulongfang@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemg500006.china.huawei.com (7.202.181.43)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 2025/2/25 14:27, Longfang Liu wrote:
-> The dma addresses of EQE and AEQE are wrong after migration and
-> results in guest kernel-mode encryption services  failure.
-> Comparing the definition of hardware registers, we found that
-> there was an error when the data read from the register was
-> combined into an address. Therefore, the address combination
-> sequence needs to be corrected.
-> 
-> Even after fixing the above problem, we still have an issue
-> where the Guest from an old kernel can get migrated to
-> new kernel and may result in wrong data.
-> 
-> In order to ensure that the address is correct after migration,
-> if an old magic number is detected, the dma address needs to be
-> updated.
-> 
-> Fixes: b0eed085903e ("hisi_acc_vfio_pci: Add support for VFIO live migration")
-> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
-> ---
->  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 40 ++++++++++++++++---
->  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    | 14 ++++++-
->  2 files changed, 46 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> index 451c639299eb..35316984089b 100644
-> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> @@ -350,6 +350,31 @@ static int vf_qm_func_stop(struct hisi_qm *qm)
->  	return hisi_qm_mb(qm, QM_MB_CMD_PAUSE_QM, 0, 0, 0);
->  }
->  
-> +static int vf_qm_version_check(struct acc_vf_data *vf_data, struct device *dev)
-> +{
-> +	switch (vf_data->acc_magic) {
-> +	case ACC_DEV_MAGIC_V2:
-> +		if (vf_data->major_ver < ACC_DRV_MAJOR_VER ||
-> +		    vf_data->minor_ver < ACC_DRV_MINOR_VER)
-> +			dev_info(dev, "migration driver version not match!\n");
-> +			return -EINVAL;
-> +		break;
-> +	case ACC_DEV_MAGIC_V1:
-> +		/* Correct dma address */
-> +		vf_data->eqe_dma = vf_data->qm_eqc_dw[QM_XQC_ADDR_HIGH];
-> +		vf_data->eqe_dma <<= QM_XQC_ADDR_OFFSET;
-> +		vf_data->eqe_dma |= vf_data->qm_eqc_dw[QM_XQC_ADDR_LOW];
-> +		vf_data->aeqe_dma = vf_data->qm_aeqc_dw[QM_XQC_ADDR_HIGH];
-> +		vf_data->aeqe_dma <<= QM_XQC_ADDR_OFFSET;
-> +		vf_data->aeqe_dma |= vf_data->qm_aeqc_dw[QM_XQC_ADDR_LOW];
-> +		break;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static int vf_qm_check_match(struct hisi_acc_vf_core_device *hisi_acc_vdev,
->  			     struct hisi_acc_vf_migration_file *migf)
->  {
-> @@ -363,7 +388,8 @@ static int vf_qm_check_match(struct hisi_acc_vf_core_device *hisi_acc_vdev,
->  	if (migf->total_length < QM_MATCH_SIZE || hisi_acc_vdev->match_done)
->  		return 0;
->  
-> -	if (vf_data->acc_magic != ACC_DEV_MAGIC) {
-> +	ret = vf_qm_version_check(vf_data, dev);
-> +	if (ret) {
->  		dev_err(dev, "failed to match ACC_DEV_MAGIC\n");
->  		return -EINVAL;
->  	}
-> @@ -418,7 +444,9 @@ static int vf_qm_get_match_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
->  	int vf_id = hisi_acc_vdev->vf_id;
->  	int ret;
->  
-> -	vf_data->acc_magic = ACC_DEV_MAGIC;
-> +	vf_data->acc_magic = ACC_DEV_MAGIC_V2;
-> +	vf_data->major_ver = ACC_DRV_MAR;
-> +	vf_data->minor_ver = ACC_DRV_MIN;
+Em Wed, 26 Feb 2025 10:56:28 +0100
+Mauro Carvalho Chehab <mchehab+huawei@kernel.org> escreveu:
 
-The values ​​here should be ACC_DRV_MAJOR_VER and ACC_DRV_MINOR_VER
-I will fix this in the next version.
-
-Thanks.
-Longfang.
-
->  	/* Save device id */
->  	vf_data->dev_id = hisi_acc_vdev->vf_dev->device;
->  
-> @@ -496,12 +524,12 @@ static int vf_qm_read_data(struct hisi_qm *vf_qm, struct acc_vf_data *vf_data)
->  		return -EINVAL;
->  
->  	/* Every reg is 32 bit, the dma address is 64 bit. */
-> -	vf_data->eqe_dma = vf_data->qm_eqc_dw[1];
-> +	vf_data->eqe_dma = vf_data->qm_eqc_dw[QM_XQC_ADDR_HIGH];
->  	vf_data->eqe_dma <<= QM_XQC_ADDR_OFFSET;
-> -	vf_data->eqe_dma |= vf_data->qm_eqc_dw[0];
-> -	vf_data->aeqe_dma = vf_data->qm_aeqc_dw[1];
-> +	vf_data->eqe_dma |= vf_data->qm_eqc_dw[QM_XQC_ADDR_LOW];
-> +	vf_data->aeqe_dma = vf_data->qm_aeqc_dw[QM_XQC_ADDR_HIGH];
->  	vf_data->aeqe_dma <<= QM_XQC_ADDR_OFFSET;
-> -	vf_data->aeqe_dma |= vf_data->qm_aeqc_dw[0];
-> +	vf_data->aeqe_dma |= vf_data->qm_aeqc_dw[QM_XQC_ADDR_LOW];
->  
->  	/* Through SQC_BT/CQC_BT to get sqc and cqc address */
->  	ret = qm_get_sqc(vf_qm, &vf_data->sqc_dma);
-> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-> index 245d7537b2bc..91002ceeebc1 100644
-> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-> @@ -39,6 +39,9 @@
->  #define QM_REG_ADDR_OFFSET	0x0004
->  
->  #define QM_XQC_ADDR_OFFSET	32U
-> +#define QM_XQC_ADDR_LOW	0x1
-> +#define QM_XQC_ADDR_HIGH	0x2
-> +
->  #define QM_VF_AEQ_INT_MASK	0x0004
->  #define QM_VF_EQ_INT_MASK	0x000c
->  #define QM_IFC_INT_SOURCE_V	0x0020
-> @@ -50,10 +53,15 @@
->  #define QM_EQC_DW0		0X8000
->  #define QM_AEQC_DW0		0X8020
->  
-> +#define ACC_DRV_MAJOR_VER 1
-> +#define ACC_DRV_MINOR_VER 0
-> +
-> +#define ACC_DEV_MAGIC_V1	0XCDCDCDCDFEEDAACC
-> +#define ACC_DEV_MAGIC_V2	0xAACCFEEDDECADEDE
-> +
->  struct acc_vf_data {
->  #define QM_MATCH_SIZE offsetofend(struct acc_vf_data, qm_rsv_state)
->  	/* QM match information */
-> -#define ACC_DEV_MAGIC	0XCDCDCDCDFEEDAACC
->  	u64 acc_magic;
->  	u32 qp_num;
->  	u32 dev_id;
-> @@ -61,7 +69,9 @@ struct acc_vf_data {
->  	u32 qp_base;
->  	u32 vf_qm_state;
->  	/* QM reserved match information */
-> -	u32 qm_rsv_state[3];
-> +	u16 major_ver;
-> +	u16 minor_ver;
-> +	u32 qm_rsv_state[2];
->  
->  	/* QM RW regs */
->  	u32 aeq_int_mask;
+> Em Tue, 25 Feb 2025 11:01:15 +0100
+> Igor Mammedov <imammedo@redhat.com> escreveu:
 > 
+> > On Fri, 21 Feb 2025 10:21:27 +0000
+> > Jonathan Cameron <Jonathan.Cameron@huawei.com> wrote:
+> >   
+> > > On Fri, 21 Feb 2025 07:38:23 +0100
+> > > Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
+> > >     
+> > > > Em Mon, 3 Feb 2025 16:22:36 +0100
+> > > > Igor Mammedov <imammedo@redhat.com> escreveu:
+> > > >       
+> > > > > On Mon, 3 Feb 2025 11:09:34 +0000
+> > > > > Jonathan Cameron <Jonathan.Cameron@huawei.com> wrote:
+> > > > >         
+> > > > > > On Fri, 31 Jan 2025 18:42:41 +0100
+> > > > > > Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
+> > > > > >           
+> > > > > > > Now that the ghes preparation patches were merged, let's add support
+> > > > > > > for error injection.
+> > > > > > > 
+> > > > > > > On this series, the first 6 patches chang to the math used to calculate offsets at HEST
+> > > > > > > table and hardware_error firmware file, together with its migration code. Migration tested
+> > > > > > > with both latest QEMU released kernel and upstream, on both directions.
+> > > > > > > 
+> > > > > > > The next patches add a new QAPI to allow injecting GHESv2 errors, and a script using such QAPI
+> > > > > > >    to inject ARM Processor Error records.
+> > > > > > > 
+> > > > > > > If I'm counting well, this is the 19th submission of my error inject patches.            
+> > > > > > 
+> > > > > > Looks good to me. All remaining trivial things are in the category
+> > > > > > of things to consider only if you are doing another spin.  The code
+> > > > > > ends up how I'd like it at the end of the series anyway, just
+> > > > > > a question of the precise path to that state!          
+> > > > > 
+> > > > > if you look at series as a whole it's more or less fine (I guess you
+> > > > > and me got used to it)
+> > > > > 
+> > > > > however if you take it patch by patch (as if you've never seen it)
+> > > > > ordering is messed up (the same would apply to everyone after a while
+> > > > > when it's forgotten)
+> > > > > 
+> > > > > So I'd strongly suggest to restructure the series (especially 2-6/14).
+> > > > > re sum up my comments wrt ordering:
+> > > > > 
+> > > > > 0  add testcase for HEST table with current HEST as expected blob
+> > > > >    (currently missing), so that we can be sure that we haven't messed
+> > > > >    existing tables during refactoring.        
+> > > 
+> > > To potentially save time I think Igor is asking that before you do anything
+> > > at all you plug the existing test hole which is that we don't test HEST
+> > > at all.   Even after this series I think we don't test HEST.  You add
+> > > a stub hest and exclusion but then in patch 12 the HEST stub is deleted whereas
+> > > it should be replaced with the example data for the test.    
+> > 
+> > that's what I was saying.
+> > HEST table should be in DSDT, but it's optional and one has to use
+> > 'ras=on' option to enable that, which we aren't doing ATM.
+> > So whatever changes are happening we aren't seeing them in tests
+> > nor will we see any regression for the same reason.
+> > 
+> > While white listing tables before change should happen and then updating them
+> > is the right thing to do, it's not sufficient since none of tests
+> > run with 'ras' enabled, hence code is not actually executed.   
+> 
+> Ok. Well, again we're not modifying HEST table structure on this
+> changeset. The only change affecting HEST is when the number of entries
+> increased from 1 to 2.
+> 
+> Now, looking at bios-tables-test.c, if I got it right, I should be doing
+> something similar to the enclosed patch, right?
+> 
+> If so, I have a couple of questions:
+> 
+> 1. from where should I get the HEST table? dumping the table from the
+>    running VM?
+> 
+> 2. what values should I use to fill those variables:
+> 
+> 	int hest_offset = 40 /* HEST */;
+> 	int hest_entry_size = 4;
+
+Thanks,
+Mauro
+
+As a reference, this is the HEST table before the patch series:
+
+/*
+ * Intel ACPI Component Architecture
+ * AML/ASL+ Disassembler version 20240927 (64-bit version)
+ * Copyright (c) 2000 - 2023 Intel Corporation
+ * 
+ * Disassembly of hest.dat
+ *
+ * ACPI Data Table [HEST]
+ *
+ * Format: [HexOffset DecimalOffset ByteLength]  FieldName : FieldValue (in hex)
+ */
+
+[000h 0000 004h]                   Signature : "HEST"    [Hardware Error Source Table]
+[004h 0004 004h]                Table Length : 00000084
+[008h 0008 001h]                    Revision : 01
+[009h 0009 001h]                    Checksum : E0
+[00Ah 0010 006h]                      Oem ID : "BOCHS "
+[010h 0016 008h]                Oem Table ID : "BXPC    "
+[018h 0024 004h]                Oem Revision : 00000001
+[01Ch 0028 004h]             Asl Compiler ID : "BXPC"
+[020h 0032 004h]       Asl Compiler Revision : 00000001
+
+[024h 0036 004h]          Error Source Count : 00000001
+
+[028h 0040 002h]               Subtable Type : 000A [Generic Hardware Error Source V2]
+[02Ah 0042 002h]                   Source Id : 0000
+[02Ch 0044 002h]           Related Source Id : FFFF
+[02Eh 0046 001h]                    Reserved : 00
+[02Fh 0047 001h]                     Enabled : 01
+[030h 0048 004h]      Records To Preallocate : 00000001
+[034h 0052 004h]     Max Sections Per Record : 00000001
+[038h 0056 004h]         Max Raw Data Length : 00000400
+
+[03Ch 0060 00Ch]        Error Status Address : [Generic Address Structure]
+[03Ch 0060 001h]                    Space ID : 00 [SystemMemory]
+[03Dh 0061 001h]                   Bit Width : 40
+[03Eh 0062 001h]                  Bit Offset : 00
+[03Fh 0063 001h]        Encoded Access Width : 04 [QWord Access:64]
+[040h 0064 008h]                     Address : 0000000139E40000
+
+[048h 0072 01Ch]                      Notify : [Hardware Error Notification Structure]
+[048h 0072 001h]                 Notify Type : 08 [SEA]
+[049h 0073 001h]               Notify Length : 1C
+[04Ah 0074 002h]  Configuration Write Enable : 0000
+[04Ch 0076 004h]                PollInterval : 00000000
+[050h 0080 004h]                      Vector : 00000000
+[054h 0084 004h]     Polling Threshold Value : 00000000
+[058h 0088 004h]    Polling Threshold Window : 00000000
+[05Ch 0092 004h]       Error Threshold Value : 00000000
+[060h 0096 004h]      Error Threshold Window : 00000000
+
+[064h 0100 004h]   Error Status Block Length : 00000400
+[068h 0104 00Ch]           Read Ack Register : [Generic Address Structure]
+[068h 0104 001h]                    Space ID : 00 [SystemMemory]
+[069h 0105 001h]                   Bit Width : 40
+[06Ah 0106 001h]                  Bit Offset : 00
+[06Bh 0107 001h]        Encoded Access Width : 04 [QWord Access:64]
+[06Ch 0108 008h]                     Address : 0000000139E40008
+
+[074h 0116 008h]           Read Ack Preserve : FFFFFFFFFFFFFFFE
+[07Ch 0124 008h]              Read Ack Write : 0000000000000001
+
+Raw Table Data: Length 132 (0x84)
+
+    0000: 48 45 53 54 84 00 00 00 01 E0 42 4F 43 48 53 20  // HEST......BOCHS 
+    0010: 42 58 50 43 20 20 20 20 01 00 00 00 42 58 50 43  // BXPC    ....BXPC
+    0020: 01 00 00 00 01 00 00 00 0A 00 00 00 FF FF 00 01  // ................
+    0030: 01 00 00 00 01 00 00 00 00 04 00 00 00 40 00 04  // .............@..
+    0040: 00 00 E4 39 01 00 00 00 08 1C 00 00 00 00 00 00  // ...9............
+    0050: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  // ................
+    0060: 00 00 00 00 00 04 00 00 00 40 00 04 08 00 E4 39  // .........@.....9
+    0070: 01 00 00 00 FE FF FF FF FF FF FF FF 01 00 00 00  // ................
+    0080: 00 00 00 00  
+
+
+
 
