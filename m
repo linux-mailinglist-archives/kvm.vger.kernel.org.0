@@ -1,58 +1,83 @@
-Return-Path: <kvm+bounces-39357-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39358-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78388A46A90
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 20:03:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 267E4A46A91
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 20:04:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD5C616D689
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 19:03:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33CDB3AC83F
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 19:03:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4355237A3C;
-	Wed, 26 Feb 2025 19:03:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25C1D2376F2;
+	Wed, 26 Feb 2025 19:04:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q62ayx/6"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F1A1183CCA;
-	Wed, 26 Feb 2025 19:03:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D177021E096
+	for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 19:04:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740596588; cv=none; b=lkPNoINELxJBmEks0mg/W+8SY6bDxiBMNr6WuXg+mgh1GHCTAuTvFhhNre3B8i6RuvZ8nWY7G4ikP0yrb7KunOL5Pd/M82AWKlmiZViUcC2bleFSyl52wgTkwINiuHul/QnnoETWKZgj623bUbdQA4mddUpntSswjjdMlFLTvJc=
+	t=1740596642; cv=none; b=Qvv9hHxaRGnxjwf1BB5bSmRnm3Fp5nCdoJcCxb1iw75nfCrjZ+pU3qm5+1h+AtCpmpsMTOAm08QWEr89YWKXIo9sKtbMYI0lHkEPi3xg15j8GrozXL09zUhMv6NNbezFoOdvfb31XqQpWyJQIA3UzT44KEXzx9NB4ier1DY6lP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740596588; c=relaxed/simple;
-	bh=0PqRmrErNpl4Jtg6yBGuNZ5C5vDip9QFb3/+TQ9Hbns=;
+	s=arc-20240116; t=1740596642; c=relaxed/simple;
+	bh=CP1ZQTGcS1XGDk8705yrsyn1P0HHQp7ZwLXpNdZVTts=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EHugK4h00dVZhLUzgc8Vj60i9Bn6kdrIEDXWR+kOz2rrPYIASKcdmH6SWSLO55s3jtW13mEvh07xEPcVTAWGTYq3ceulOw1lZtOjLsHBPpDSa36lroEeF5d3pM9X9wPpYlQhqZ4BatvJFZVjXWqc6/zl+ixJx7bsH+pbbf2pkFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D290C4CED6;
-	Wed, 26 Feb 2025 19:03:04 +0000 (UTC)
-Date: Wed, 26 Feb 2025 19:03:01 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Steven Price <steven.price@arm.com>
-Cc: "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v7 09/11] arm64: Enable memory encrypt for Realms
-Message-ID: <Z79lZdYqWINaHfrp@arm.com>
-References: <20241017131434.40935-1-steven.price@arm.com>
- <20241017131434.40935-10-steven.price@arm.com>
- <5aeb6f47-12be-40d5-be6f-847bb8ddc605@arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=EC+8L3tH2o0FpnMsAveMY8h0Z1S4xUyJuIXnILKHjOQLDzZj7TlTHReOz7oQBm63vIEj7JDD9tN4DY22cVkY/uBedeXO/hyKuECMrvHgGdjt9e+ozYxFsvm38LutKXzNv/93Nx5H4Uj4j55kYX3jVGOnE1ntw7Wo7/1iV/RsgZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q62ayx/6; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740596639;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PIunKPS4UZCFjPvS7Od7AUtu0dxUhH3F4cLQKO6l55Y=;
+	b=Q62ayx/6LKdVu0I4f+gULfekrfEKVRMrrfWnrH2CCOZyahyZLuveulxqbXDaMPAi14pRbn
+	vFkvxVVYkNdwQDrJTRdv5Iam+gc3ze8opA+olT0HtUhCVvy178n7V0tQAPKDzk3oKKLJJQ
+	9IBMMLMqhEIzy21fvuPOo3c5RrpBbXs=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-172-ITJtCnapMwyKxZSD11cetQ-1; Wed,
+ 26 Feb 2025 14:03:58 -0500
+X-MC-Unique: ITJtCnapMwyKxZSD11cetQ-1
+X-Mimecast-MFC-AGG-ID: ITJtCnapMwyKxZSD11cetQ_1740596637
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5B2AD1800874;
+	Wed, 26 Feb 2025 19:03:57 +0000 (UTC)
+Received: from dhcp-27-174.brq.redhat.com (unknown [10.45.226.247])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with SMTP id 2D49E1800352;
+	Wed, 26 Feb 2025 19:03:53 +0000 (UTC)
+Received: by dhcp-27-174.brq.redhat.com (nbSMTP-1.00) for uid 1000
+	oleg@redhat.com; Wed, 26 Feb 2025 20:03:27 +0100 (CET)
+Date: Wed, 26 Feb 2025 20:03:23 +0100
+From: Oleg Nesterov <oleg@redhat.com>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	"Eric W. Biederman" <ebiederm@xmission.com>,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [GIT PULL] KVM changes for Linux 6.14
+Message-ID: <20250226190322.GL8995@redhat.com>
+References: <20250126142034.GA28135@redhat.com>
+ <CAHk-=wiOSyfW3sgccrfVtanZGUSnjFidSbaP3tg9wapydb-u6g@mail.gmail.com>
+ <20250126185354.GB28135@redhat.com>
+ <CAHk-=wiA7wzJ9TLMbC6vfer+0F6S91XghxrdKGawO6uMQCfjtQ@mail.gmail.com>
+ <20250127140947.GA22160@redhat.com>
+ <CABgObfaar9uOx7t6vR0pqk6gU-yNOHX3=R1UHY4mbVwRX_wPkA@mail.gmail.com>
+ <20250204-liehen-einmal-af13a3c66a61@brauner>
+ <CABgObfaBizrwP6mh82U20Y0h9OwYa6OFn7QBspcGKak2r+5kUw@mail.gmail.com>
+ <20250205-bauhof-fraktionslos-b1bedfe50db2@brauner>
+ <20250226-portieren-staudamm-10823e224307@brauner>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -61,99 +86,27 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5aeb6f47-12be-40d5-be6f-847bb8ddc605@arm.com>
+In-Reply-To: <20250226-portieren-staudamm-10823e224307@brauner>
+User-Agent: Mutt/1.5.24 (2015-08-30)
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Wed, Feb 19, 2025 at 02:30:28PM +0000, Steven Price wrote:
-> On 17/10/2024 14:14, Steven Price wrote:
-> > From: Suzuki K Poulose <suzuki.poulose@arm.com>
-> > 
-> > Use the memory encryption APIs to trigger a RSI call to request a
-> > transition between protected memory and shared memory (or vice versa)
-> > and updating the kernel's linear map of modified pages to flip the top
-> > bit of the IPA. This requires that block mappings are not used in the
-> > direct map for realm guests.
-> > 
-> > Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> > Reviewed-by: Gavin Shan <gshan@redhat.com>
-> > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> > Co-developed-by: Steven Price <steven.price@arm.com>
-> > Signed-off-by: Steven Price <steven.price@arm.com>
-> > ---
-> [...]
-> > diff --git a/arch/arm64/mm/pageattr.c b/arch/arm64/mm/pageattr.c
-> > index 547a9e0b46c2..6ae6ae806454 100644
-> > --- a/arch/arm64/mm/pageattr.c
-> > +++ b/arch/arm64/mm/pageattr.c
-> > @@ -5,10 +5,12 @@
-> >  #include <linux/kernel.h>
-> >  #include <linux/mm.h>
-> >  #include <linux/module.h>
-> > +#include <linux/mem_encrypt.h>
-> >  #include <linux/sched.h>
-> >  #include <linux/vmalloc.h>
-> >  
-> >  #include <asm/cacheflush.h>
-> > +#include <asm/pgtable-prot.h>
-> >  #include <asm/set_memory.h>
-> >  #include <asm/tlbflush.h>
-> >  #include <asm/kfence.h>
-> > @@ -23,14 +25,16 @@ bool rodata_full __ro_after_init = IS_ENABLED(CONFIG_RODATA_FULL_DEFAULT_ENABLED
-> >  bool can_set_direct_map(void)
-> >  {
-> >  	/*
-> > -	 * rodata_full and DEBUG_PAGEALLOC require linear map to be
-> > -	 * mapped at page granularity, so that it is possible to
-> > +	 * rodata_full, DEBUG_PAGEALLOC and a Realm guest all require linear
-> > +	 * map to be mapped at page granularity, so that it is possible to
-> >  	 * protect/unprotect single pages.
-> >  	 *
-> >  	 * KFENCE pool requires page-granular mapping if initialized late.
-> > +	 *
-> > +	 * Realms need to make pages shared/protected at page granularity.
-> >  	 */
-> >  	return rodata_full || debug_pagealloc_enabled() ||
-> > -	       arm64_kfence_can_set_direct_map();
-> > +		arm64_kfence_can_set_direct_map() || is_realm_world();
-> >  }
-> 
-> Aneesh pointed out that this call to is_realm_world() is now too early 
-> since the decision to delay the RSI detection. The upshot is that a 
-> realm guest which doesn't have page granularity forced for other reasons 
-> will fail to share pages with the host.
-> 
-> At the moment I can think of a couple of options:
-> 
-> (1) Make rodata_full a requirement for realm guests. 
->     CONFIG_RODATA_FULL_DEFAULT_ENABLED is already "default y" so this 
->     isn't a big ask.
-> 
-> (2) Revisit the idea of detecting when running as a realm guest early. 
->     This has the advantage of also "fixing" earlycon (no need to 
->     manually specify the shared-alias of an unprotected UART).
-> 
-> I'm currently leaning towards (1) because it's the default anyway. But 
-> if we're going to need to fix earlycon (or indeed find other similar 
-> issues) then (2) would obviously make sense.
+Sorry, didn't have time to actually read this patch, but after a quick
+glance...
 
-I'd go with (1) since the end result is the same even if we implemented
-(2) - i.e. we still avoid block mappings in realms.
+On 02/26, Christian Brauner wrote:
+>
+> @@ -3949,7 +3955,7 @@ static int proc_task_readdir(struct file *file, struct dir_context *ctx)
+>  	tid = (int)(intptr_t)file->private_data;
+>  	file->private_data = NULL;
+>  	for (task = first_tid(proc_pid(inode), tid, ctx->pos - 2, ns);
+> -	     task;
+> +	     task && !(task->flags & PF_USER_WORKER);
 
-> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
-> index ce4778141ec7..48a6ef0f401c 100644
-> --- a/arch/arm64/kernel/rsi.c
-> +++ b/arch/arm64/kernel/rsi.c
-> @@ -126,6 +126,10 @@ void __init arm64_rsi_init(void)
->  		return;
->  	if (!rsi_version_matches())
->  		return;
-> +	if (!can_set_direct_map()) {
-> +		pr_err("rodata_full disabled, unable to run as a realm guest. Please enable CONFIG_RODATA_FULL_DEFAULT_ENABLED\n");
+unless I am totally confused this looks "obviously wrong".
 
-It's a bit strange to complain about rodata since, in principle, it
-doesn't have anything to do with realms. Its only side-effect is that we
-avoid block kernel mappings. Maybe "cannot set the kernel direct map,
-consider rodata=full" or something like that.
+proc_task_readdir() should not stop if it sees a PF_USER_WORKER task, this
+check should go into first_tid/next_tid.
 
--- 
-Catalin
+Oleg.
+
 
