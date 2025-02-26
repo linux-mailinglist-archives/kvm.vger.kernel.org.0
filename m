@@ -1,324 +1,297 @@
-Return-Path: <kvm+bounces-39280-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39281-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A487A45EB1
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 13:23:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14C19A45F08
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 13:30:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 901EF188B35C
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 12:19:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3184161C10
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 12:30:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5F8A21CA02;
-	Wed, 26 Feb 2025 12:14:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93EEA21CA15;
+	Wed, 26 Feb 2025 12:29:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UpyhS0QE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GIf4v6Ma"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED639217670;
-	Wed, 26 Feb 2025 12:14:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2EF41ADC8F
+	for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 12:29:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740572077; cv=none; b=hULJNiGVq6GiokTwVfEl5sRWOghZDKjAC/xD0UQk+XohiLtGCRtLv7SBKgHNggU9t9RGJR6vQnY8Drch2kfLErsfmkkSWMBixIoGjH5vLI/9JVTc04jhFLgjM2w86C8dQ/Xc/Mcva0yJAj64uUyGJOUYlOnHGXlQTp15AA6OmP0=
+	t=1740572953; cv=none; b=lY7CFUjsWs6WgN7OLqWqNmdxcihlw1yHsfc2hmfVjskSQ21ZgxAn6cRwqTk4CCp9yv11t4rtG1mMgtm6o3pl6rNQnF7ZWyQF1h9XKvp77Z5WxHnSRjqTW/OlWq8xgTh8/2tnaQ11Y2WwUdGJYRRP/dsonF/jTjm8+v9BpZVR72U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740572077; c=relaxed/simple;
-	bh=dw8RKuOuBbZ3OPX6aFcUgjkDc62wOApZJuJQGPQATPo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kaFLKr1EECycu1jFykDhCpy44lssaPwG7CkXCJjSld/C68MiNNSEnekF/SDel6AHdVXg3OrSkwNumJ2GzlqLE3uew5qEELxcPapa9ABfLujXNlz0st9BcmeuEnhxk9yqqUcqyFgRlUJB2fVskPMX1FZ3Qh/XpxFtdF0Ki5AzCEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UpyhS0QE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1ED0C4CED6;
-	Wed, 26 Feb 2025 12:14:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740572076;
-	bh=dw8RKuOuBbZ3OPX6aFcUgjkDc62wOApZJuJQGPQATPo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UpyhS0QEk3eIXFiHz+SzhlE0ZxDDQs98OgkE/+hgERQ/tBnnHv+mqQgThnFQt+hZn
-	 qDPQ95i6PfHtSk+jmcynOUJiZtIOJRcMF6EpTHxf8/LiAh/+5utWnLsCZNYI5CdJs5
-	 JuyoictNbBaeopc+8eLDZvl0+yIdlQdUHa+B5UbdfzGvfQU5d0peUS86UXM5GfVYu7
-	 6Zm+F98gJzj/E9KOCsdrwAlEPzLKrRvaxHHBpYMoCSbzTMjPHM5tPT8ddu6uajiN7Y
-	 87BeCeLlzcprmLMQ+F5KX9gdW7jNdOvvGGSE68fwS5HJaqg0VeWsRQjFAxBBffBzST
-	 RRhYFBXoVWXzw==
-Date: Wed, 26 Feb 2025 13:14:32 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Oleg Nesterov <oleg@redhat.com>, 
-	Linus Torvalds <torvalds@linux-foundation.org>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	"Eric W. Biederman" <ebiederm@xmission.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [GIT PULL] KVM changes for Linux 6.14
-Message-ID: <20250226-portieren-staudamm-10823e224307@brauner>
-References: <CAHk-=wg4Wm4x9GoUk6M8BhLsrhLj4+n8jA2Kg8XUQF=kxgNL9g@mail.gmail.com>
- <20250126142034.GA28135@redhat.com>
- <CAHk-=wiOSyfW3sgccrfVtanZGUSnjFidSbaP3tg9wapydb-u6g@mail.gmail.com>
- <20250126185354.GB28135@redhat.com>
- <CAHk-=wiA7wzJ9TLMbC6vfer+0F6S91XghxrdKGawO6uMQCfjtQ@mail.gmail.com>
- <20250127140947.GA22160@redhat.com>
- <CABgObfaar9uOx7t6vR0pqk6gU-yNOHX3=R1UHY4mbVwRX_wPkA@mail.gmail.com>
- <20250204-liehen-einmal-af13a3c66a61@brauner>
- <CABgObfaBizrwP6mh82U20Y0h9OwYa6OFn7QBspcGKak2r+5kUw@mail.gmail.com>
- <20250205-bauhof-fraktionslos-b1bedfe50db2@brauner>
+	s=arc-20240116; t=1740572953; c=relaxed/simple;
+	bh=3tPTH0OfW1bXXoDhOFEtxf7pDN2l1bHuBEJiQV3Y4kc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=idSUe2EYEx2RSvdC5ngdQa1uSD4oIJ/bZMy2PZL8TJYLRS7NSZ32t+jAmDVBQ86BlbWiOCFl2FdbxLAj6v8IoEvYQKIEKgHMPdXw8JUkmSo3lCsQzi1jKfwiYqbw/OW3lTpc2gyQVOwBZIx/9lPt9KA6Y4yMqhSANx8AUN2edZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GIf4v6Ma; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740572950;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YqtUsmTYfSl8QjL4A92EdoUfNd8iKRnEclZHB/5oJQc=;
+	b=GIf4v6MaC8EmwdwyunN157x5d0PciwgSfRDwuLacPOPDKs3bgUSgL/upyrt60uFWt9Duzb
+	bqim0vcGg5T0qV2FNES6nccmnbrdQ5SNlxxdCBuuXlD0uifbeocibCuXM4UM9k3sDxxcXk
+	RXq4dp61DUMCTLIvFN8vgFj6IC5Smw8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-447-wqWTOn8rPwytpM5T5OUEGw-1; Wed, 26 Feb 2025 07:29:08 -0500
+X-MC-Unique: wqWTOn8rPwytpM5T5OUEGw-1
+X-Mimecast-MFC-AGG-ID: wqWTOn8rPwytpM5T5OUEGw_1740572948
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43942e82719so48672245e9.2
+        for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 04:29:08 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740572947; x=1741177747;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YqtUsmTYfSl8QjL4A92EdoUfNd8iKRnEclZHB/5oJQc=;
+        b=f3ZKNDWUddxBbQ2IxpOV2xWzFpTdpWpBN+4LaYTxoqWuUjyz2STp9BTiBdJeCVAcrP
+         ch69mtdHtNw01M33hUeokNqUyFRiFM71W83r4FtvpyQ+Ube7vdcvv/XS85x+6RzD0dj8
+         Dt9JAWlp0mFUwe5Rxz/qDgGFFQscagztWH7DpHTZ1HrGtWRpWw77jfxwRqtyFkiHghRb
+         6TYvEGx7p2CeC0SCvzwWMUSN+h/pBXeOIpk0rzm+ivKklsHDBQc3Mf13f0NO6FXbRJb3
+         70OJ2PphO6NSVrr2515EpUV+75YZ38QrH0rzQelGi8EmCM39uRSeBnW8TQrdhd5DJNr7
+         K91w==
+X-Forwarded-Encrypted: i=1; AJvYcCX2dJ9fv19K8dH2goqXaqzMfpyTQo1wNpH0SG5YqPoHaLInpD1MCUbbdhSpCdiB5m/I40g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXSSW+qHNYA62QrNzdEn/e8HXK2JIZtY61j9wCa5OaXbc1ci8S
+	OLg2jSK/TDZG7ryKw1go9DSgrOQJFDKgzrBa+tvVHMs58mvdaRvL3Tg2r7T6zCHAV+2aMMyqV+/
+	rdzU9qHljKNjtkfAB3I4GoAkq+3OdEJnc7NxgZftG2wwYyWEQIA==
+X-Gm-Gg: ASbGnctsF/KBvvjrE/IkBFDz1vaegnJuGzSv5c/g+q5DzeIbPxjfxb4DHSgZF3+izxc
+	zwbgAZRVbdBi2AVocRyISKQZZt5qqE/jPGbNeVmIDNeVsmEzaLY7rR9d2g8O0Zv3bgmu9H7bE12
+	WaBTy4G65jcgoCKV/I/l5oTbPNU8mtytHYzHCtE7OJ/BRRznvrMTSH7dWphzpl25caGlCN+GdgA
+	lWAkcifuTFzNH1m4W6ZnL80mvH0uo8qNBzETRG2GlL5UwhVxpPgonlr+32EKWKA0IU6cC3zmQh1
+	UwtRObrtrtsR8qfhkwDu0DbbmKRERfJ92LvCDz4AlX6/FfjA+9Mzye2slshfA6s=
+X-Received: by 2002:a05:600c:35d6:b0:439:985b:17d6 with SMTP id 5b1f17b1804b1-43ab903603emr23927875e9.27.1740572947507;
+        Wed, 26 Feb 2025 04:29:07 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEOqU6+YvkXlQ4vuTagbuCtwCjwmj0H5+Xta6YoRzeguoUafKp6W738/ohg4cf/c9smG6tt4g==
+X-Received: by 2002:a05:600c:35d6:b0:439:985b:17d6 with SMTP id 5b1f17b1804b1-43ab903603emr23927655e9.27.1740572947018;
+        Wed, 26 Feb 2025 04:29:07 -0800 (PST)
+Received: from imammedo.users.ipa.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43aba5711dfsm19946945e9.27.2025.02.26.04.29.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Feb 2025 04:29:06 -0800 (PST)
+Date: Wed, 26 Feb 2025 13:29:05 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>, "Michael S . Tsirkin"
+ <mst@redhat.com>, Shiju Jose <shiju.jose@huawei.com>,
+ <qemu-arm@nongnu.org>, <qemu-devel@nongnu.org>, Philippe =?UTF-8?B?TWF0?=
+ =?UTF-8?B?aGlldS1EYXVkw6k=?= <philmd@linaro.org>, Ani Sinha
+ <anisinha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Dongjiu Geng
+ <gengdongjiu1@gmail.com>, Eduardo Habkost <eduardo@habkost.net>, Eric Blake
+ <eblake@redhat.com>, John Snow <jsnow@redhat.com>, Marcel Apfelbaum
+ <marcel.apfelbaum@gmail.com>, "Markus Armbruster" <armbru@redhat.com>,
+ Michael Roth <michael.roth@amd.com>, "Paolo Bonzini" <pbonzini@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Shannon Zhao
+ <shannon.zhaosl@gmail.com>, Yanan Wang <wangyanan55@huawei.com>, Zhao Liu
+ <zhao1.liu@intel.com>, <kvm@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v3 00/14] Change ghes to use HEST-based offsets and add
+ support for error inject
+Message-ID: <20250226132905.47aa50d2@imammedo.users.ipa.redhat.com>
+In-Reply-To: <20250226105628.7e60f952@foz.lan>
+References: <cover.1738345063.git.mchehab+huawei@kernel.org>
+	<20250203110934.000038d8@huawei.com>
+	<20250203162236.7d5872ff@imammedo.users.ipa.redhat.com>
+	<20250221073823.061a1039@foz.lan>
+	<20250221102127.000059e6@huawei.com>
+	<20250225110115.6090e416@imammedo.users.ipa.redhat.com>
+	<20250226105628.7e60f952@foz.lan>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250205-bauhof-fraktionslos-b1bedfe50db2@brauner>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Feb 05, 2025 at 12:49:30PM +0100, Christian Brauner wrote:
-> On Tue, Feb 04, 2025 at 05:05:06PM +0100, Paolo Bonzini wrote:
-> > On Tue, Feb 4, 2025 at 3:19 PM Christian Brauner <brauner@kernel.org> wrote:
-> > >
-> > > On Mon, Jan 27, 2025 at 04:15:01PM +0100, Paolo Bonzini wrote:
-> > > > On Mon, Jan 27, 2025 at 3:10 PM Oleg Nesterov <oleg@redhat.com> wrote:
-> > > > > On 01/26, Linus Torvalds wrote:
-> > > > > > On Sun, 26 Jan 2025 at 10:54, Oleg Nesterov <oleg@redhat.com> wrote:
-> > > > > > >
-> > > > > > > I don't think we even need to detect the /proc/self/ or /proc/self-thread/
-> > > > > > > case, next_tid() can just check same_thread_group,
-> > > > > >
-> > > > > > That was my thinking yes.
-> > > > > >
-> > > > > > If we exclude them from /proc/*/task entirely, I'd worry that it would
-> > > > > > hide it from some management tool and be used for nefarious purposes
-> > > > >
-> > > > > Agreed,
-> > > > >
-> > > > > > (even if they then show up elsewhere that the tool wouldn't look at).
-> > > > >
-> > > > > Even if we move them from /proc/*/task to /proc ?
-> > > >
-> > > > Indeed---as long as they show up somewhere, it's not worse than it
-> > > > used to be. The reason why I'd prefer them to stay in /proc/*/task is
-> > > > that moving them away at least partly negates the benefits of the
-> > > > "workers are children of the starter" model. For example it
-> > > > complicates measuring their cost within the process that runs the VM.
-> > > > Maybe it's more of a romantic thing than a real practical issue,
-> > > > because in the real world resource accounting for VMs is done via
-> > > > cgroups. But unlike the lazy creation in KVM, which is overall pretty
-> > > > self-contained, I am afraid the ugliness in procfs would be much worse
-> > > > compared to the benefit, if there's a benefit at all.
-> > > >
-> > > > > Perhaps, I honestly do not know what will/can confuse userspace more.
-> > > >
-> > > > At the very least, marking workers as "Kthread: 1" makes sense and
+On Wed, 26 Feb 2025 10:56:28 +0100
+Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
+
+> Em Tue, 25 Feb 2025 11:01:15 +0100
+> Igor Mammedov <imammedo@redhat.com> escreveu:
 > 
-> You mean in /proc/<pid>/status? Yeah, we can do that. This expands the
-> definition of Kthread a bit. It would now mean anything that the kernel
-> spawned for userspace. But that is probably fine.
-> 
-> But it won't help with the problem of just checking /proc/<pid>/task/ to
-> figure out whether the caller is single-threaded or not. If the caller
-> has more than 1 entry in there they need to walk through all of them and
-> parse through /proc/<pid>/status to discount them if they're kernel
-> threads.
-> 
-> > > > should not cause too much confusion. I wouldn't go beyond that unless
-> > > > we get more reports of similar issues, and I'm not even sure how
-> > > > common it is for userspace libraries to check for single-threadedness.
-> > >
-> > > Sorry, just saw this thread now.
-> > >
-> > > What if we did what Linus suggests and hide (odd) user workers from
-> > > /proc/<pid>/task/* but also added /proc/<pid>/workers/*. The latter
-> > > would only list the workers that got spawned by the kernel for that
-> > > particular task? This would acknowledge their somewhat special status
-> > > and allow userspace to still detect them as "Hey, I didn't actually
-> > > spawn those, they got shoved into my workload by the kernel for me.".
+> > On Fri, 21 Feb 2025 10:21:27 +0000
+> > Jonathan Cameron <Jonathan.Cameron@huawei.com> wrote:
+> >   
+> > > On Fri, 21 Feb 2025 07:38:23 +0100
+> > > Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
+> > >     
+> > > > Em Mon, 3 Feb 2025 16:22:36 +0100
+> > > > Igor Mammedov <imammedo@redhat.com> escreveu:
+> > > >       
+> > > > > On Mon, 3 Feb 2025 11:09:34 +0000
+> > > > > Jonathan Cameron <Jonathan.Cameron@huawei.com> wrote:
+> > > > >         
+> > > > > > On Fri, 31 Jan 2025 18:42:41 +0100
+> > > > > > Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
+> > > > > >           
+> > > > > > > Now that the ghes preparation patches were merged, let's add support
+> > > > > > > for error injection.
+> > > > > > > 
+> > > > > > > On this series, the first 6 patches chang to the math used to calculate offsets at HEST
+> > > > > > > table and hardware_error firmware file, together with its migration code. Migration tested
+> > > > > > > with both latest QEMU released kernel and upstream, on both directions.
+> > > > > > > 
+> > > > > > > The next patches add a new QAPI to allow injecting GHESv2 errors, and a script using such QAPI
+> > > > > > >    to inject ARM Processor Error records.
+> > > > > > > 
+> > > > > > > If I'm counting well, this is the 19th submission of my error inject patches.            
+> > > > > > 
+> > > > > > Looks good to me. All remaining trivial things are in the category
+> > > > > > of things to consider only if you are doing another spin.  The code
+> > > > > > ends up how I'd like it at the end of the series anyway, just
+> > > > > > a question of the precise path to that state!          
+> > > > > 
+> > > > > if you look at series as a whole it's more or less fine (I guess you
+> > > > > and me got used to it)
+> > > > > 
+> > > > > however if you take it patch by patch (as if you've never seen it)
+> > > > > ordering is messed up (the same would apply to everyone after a while
+> > > > > when it's forgotten)
+> > > > > 
+> > > > > So I'd strongly suggest to restructure the series (especially 2-6/14).
+> > > > > re sum up my comments wrt ordering:
+> > > > > 
+> > > > > 0  add testcase for HEST table with current HEST as expected blob
+> > > > >    (currently missing), so that we can be sure that we haven't messed
+> > > > >    existing tables during refactoring.        
+> > > 
+> > > To potentially save time I think Igor is asking that before you do anything
+> > > at all you plug the existing test hole which is that we don't test HEST
+> > > at all.   Even after this series I think we don't test HEST.  You add
+> > > a stub hest and exclusion but then in patch 12 the HEST stub is deleted whereas
+> > > it should be replaced with the example data for the test.    
 > > 
-> > Wouldn't the workers then disappear completely from ps, top or other
-> > tools that look at /proc/$PID/task? That seems a bit too underhanded
-> > towards userspace...
+> > that's what I was saying.
+> > HEST table should be in DSDT, but it's optional and one has to use
+> > 'ras=on' option to enable that, which we aren't doing ATM.
+> > So whatever changes are happening we aren't seeing them in tests
+> > nor will we see any regression for the same reason.
+> > 
+> > While white listing tables before change should happen and then updating them
+> > is the right thing to do, it's not sufficient since none of tests
+> > run with 'ras' enabled, hence code is not actually executed.   
 > 
-> So maybe, but then there's also the possibility to do:
+> Ok. Well, again we're not modifying HEST table structure on this
+> changeset. The only change affecting HEST is when the number of entries
+> increased from 1 to 2.
 > 
-> - Have /proc/<pid>/status list all tasks.
-> - Have /proc/<pid>/worker only list user workers spawned by the kernel for userspace.
+> Now, looking at bios-tables-test.c, if I got it right, I should be doing
+> something similar to the enclosed patch, right?
 > 
-> count(/proc/<pid>/status) - count(/proc/<pid>/workers) == 1 => (userspace) single threaded
+> If so, I have a couple of questions:
 > 
-> My wider point is that I would prefer we add something that is
-> consistent and doesn't have to give the caller a different view than a
-> foreign task. I think that will just create confusion in the long run.
+> 1. from where should I get the HEST table? dumping the table from the
+>    running VM?
 
-So what I had in mind was (quickly sketched) the rough draft below. This
-will unconditionally skip PF_USER_WORKER tasks in /proc/<pid>/task and
-will only list them in /proc/<pid>/worker.
 
- fs/proc/base.c | 122 ++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 116 insertions(+), 6 deletions(-)
+> 
+> 2. what values should I use to fill those variables:
+> 
+> 	int hest_offset = 40 /* HEST */;
+> 	int hest_entry_size = 4;
+you don't need to do that,
+bios-tables-test will dump all ACPI tables for you automatically,
+you only need to add or extend a test with ras=on option.
 
-diff --git a/fs/proc/base.c b/fs/proc/base.c
-index cd89e956c322..60e6b2cea259 100644
---- a/fs/proc/base.c
-+++ b/fs/proc/base.c
-@@ -3315,10 +3315,13 @@ static int proc_stack_depth(struct seq_file *m, struct pid_namespace *ns,
-  * Thread groups
-  */
- static const struct file_operations proc_task_operations;
-+static const struct file_operations proc_worker_operations;
- static const struct inode_operations proc_task_inode_operations;
-+static const struct inode_operations proc_worker_inode_operations;
- 
- static const struct pid_entry tgid_base_stuff[] = {
- 	DIR("task",       S_IRUGO|S_IXUGO, proc_task_inode_operations, proc_task_operations),
-+	DIR("worker",     S_IRUGO|S_IXUGO, proc_worker_inode_operations, proc_worker_operations),
- 	DIR("fd",         S_IRUSR|S_IXUSR, proc_fd_inode_operations, proc_fd_operations),
- 	DIR("map_files",  S_IRUSR|S_IXUSR, proc_map_files_inode_operations, proc_map_files_operations),
- 	DIR("fdinfo",     S_IRUGO|S_IXUGO, proc_fdinfo_inode_operations, proc_fdinfo_operations),
-@@ -3835,11 +3838,14 @@ static struct dentry *proc_task_lookup(struct inode *dir, struct dentry * dentry
- 
- 	fs_info = proc_sb_info(dentry->d_sb);
- 	ns = fs_info->pid_ns;
--	rcu_read_lock();
--	task = find_task_by_pid_ns(tid, ns);
--	if (task)
--		get_task_struct(task);
--	rcu_read_unlock();
-+	scoped_guard(rcu) {
-+		task = find_task_by_pid_ns(tid, ns);
-+		if (task) {
-+			if (task->flags & PF_USER_WORKER)
-+				goto out;
-+			get_task_struct(task);
-+		}
-+	}
- 	if (!task)
- 		goto out;
- 	if (!same_thread_group(leader, task))
-@@ -3949,7 +3955,7 @@ static int proc_task_readdir(struct file *file, struct dir_context *ctx)
- 	tid = (int)(intptr_t)file->private_data;
- 	file->private_data = NULL;
- 	for (task = first_tid(proc_pid(inode), tid, ctx->pos - 2, ns);
--	     task;
-+	     task && !(task->flags & PF_USER_WORKER);
- 	     task = next_tid(task), ctx->pos++) {
- 		char name[10 + 1];
- 		unsigned int len;
-@@ -3987,6 +3993,97 @@ static int proc_task_getattr(struct mnt_idmap *idmap,
- 	return 0;
+   1: 1st add empty table and whitelist it ("tests/data/acpi/aarch64/virt/HEST")
+   2: enable ras in existing tescase
+
+--- a/tests/qtest/bios-tables-test.c
++++ b/tests/qtest/bios-tables-test.c
+@@ -2123,7 +2123,8 @@ static void test_acpi_aarch64_virt_tcg(void)
+     data.smbios_cpu_max_speed = 2900;
+     data.smbios_cpu_curr_speed = 2700;
+     test_acpi_one("-cpu cortex-a57 "
+-                  "-smbios type=4,max-speed=2900,current-speed=2700", &data);
++                  "-smbios type=4,max-speed=2900,current-speed=2700 "
++                  "-machine ras=on", &data);
+     free_test_data(&data);
  }
- 
-+static struct dentry *
-+proc_worker_lookup(struct inode *dir, struct dentry *dentry, unsigned int flags)
-+{
-+	struct task_struct *task;
-+	struct task_struct *leader = get_proc_task(dir);
-+	unsigned tid;
-+	struct proc_fs_info *fs_info;
-+	struct pid_namespace *ns;
-+	struct dentry *result = ERR_PTR(-ENOENT);
-+
-+	if (!leader)
-+		goto out_no_task;
-+
-+	tid = name_to_int(&dentry->d_name);
-+	if (tid == ~0U)
-+		goto out;
-+
-+	fs_info = proc_sb_info(dentry->d_sb);
-+	ns = fs_info->pid_ns;
-+	scoped_guard(rcu) {
-+		task = find_task_by_pid_ns(tid, ns);
-+		if (task) {
-+			if (!(task->flags & PF_USER_WORKER))
-+				goto out;
-+			get_task_struct(task);
-+		}
-+	}
-+	if (!task)
-+		goto out;
-+	if (!same_thread_group(leader, task))
-+		goto out_drop_task;
-+
-+	result = proc_task_instantiate(dentry, task, NULL);
-+out_drop_task:
-+	put_task_struct(task);
-+out:
-+	put_task_struct(leader);
-+out_no_task:
-+	return result;
-+}
-+
-+static int proc_worker_getattr(struct mnt_idmap *idmap, const struct path *path,
-+			       struct kstat *stat, u32 request_mask,
-+			       unsigned int query_flags)
-+{
-+	generic_fillattr(&nop_mnt_idmap, request_mask, d_inode(path->dentry), stat);
-+	return 0;
-+}
-+
-+static int proc_worker_readdir(struct file *file, struct dir_context *ctx)
-+{
-+	struct inode *inode = file_inode(file);
-+	struct task_struct *task;
-+	struct pid_namespace *ns;
-+	int tid;
-+
-+	if (proc_inode_is_dead(inode))
-+		return -ENOENT;
-+
-+	if (!dir_emit_dots(file, ctx))
-+		return 0;
-+
-+	/* We cache the tgid value that the last readdir call couldn't
-+	 * return and lseek resets it to 0.
-+	 */
-+	ns = proc_pid_ns(inode->i_sb);
-+	tid = (int)(intptr_t)file->private_data;
-+	file->private_data = NULL;
-+	for (task = first_tid(proc_pid(inode), tid, ctx->pos - 2, ns);
-+	     task && (task->flags & PF_USER_WORKER);
-+	     task = next_tid(task), ctx->pos++) {
-+		char name[10 + 1];
-+		unsigned int len;
-+
-+		tid = task_pid_nr_ns(task, ns);
-+		if (!tid)
-+			continue;	/* The task has just exited. */
-+		len = snprintf(name, sizeof(name), "%u", tid);
-+		if (!proc_fill_cache(file, ctx, name, len,
-+				proc_task_instantiate, task, NULL)) {
-+			/* returning this tgid failed, save it as the first
-+			 * pid for the next readir call */
-+			file->private_data = (void *)(intptr_t)tid;
-+			put_task_struct(task);
-+			break;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- /*
-  * proc_task_readdir() set @file->private_data to a positive integer
-  * value, so casting that to u64 is safe. generic_llseek_cookie() will
-@@ -4005,6 +4102,19 @@ static loff_t proc_dir_llseek(struct file *file, loff_t offset, int whence)
- 	return off;
- }
- 
-+static const struct inode_operations proc_worker_inode_operations = {
-+	.lookup		= proc_worker_lookup,
-+	.getattr	= proc_worker_getattr,
-+	.setattr	= proc_setattr,
-+	.permission	= proc_pid_permission,
-+};
-+
-+static const struct file_operations proc_worker_operations = {
-+	.read		= generic_read_dir,
-+	.iterate_shared	= proc_worker_readdir,
-+	.llseek		= proc_dir_llseek,
-+};
-+
- static const struct inode_operations proc_task_inode_operations = {
- 	.lookup		= proc_task_lookup,
- 	.getattr	= proc_task_getattr,
--- 
-2.47.2
+     
+  then with installed IASL run
+    V=1 QTEST_QEMU_BINARY=./qemu-system-aarch64  ./tests/qtest/bios-tables-test
+  to see diff
+
+  3: rebuild tables and follow the rest of procedure to update expected blobs
+     as described in comment at the top of (tests/qtest/bios-tables-test.c)
+
+I'd recommend to add 3 patches as the beginning of the series,
+that way we can be sure that if something changes unintentionally
+it won't go unnoticed.
+
+> 
+> >   
+> > > 
+> > > That indeed doesn't address testing the error data storage which would be
+> > > a different problem.    
+> > 
+> > I'd skip hardware_errors/CPER testing from QEMU unit tests.
+> > That's basically requires functioning 'APEI driver' to test that.
+> > 
+> > Maybe we can use Ani's framework to parse HEST and all the way
+> > towards CPER record(s) traversal, but that's certainly out of
+> > scope of this series.
+> > It could be done on top, but I won't insist even on that
+> > since Mauro's out of tree error injection testing will
+> > cover that using actual guest (which I assume he would
+> > like to run periodically).  
+> 
+> Yeah, my plan is to periodically test it. I intend to setup somewhere
+> a CI to test Kernel, QEMU and rasdaemon altogether.
+> 
+> Thanks,
+> Mauro
+> 
+> ---
+> 
+> diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
+> index 0a333ec43536..31e69d906db4 100644
+> --- a/tests/qtest/bios-tables-test.c
+> +++ b/tests/qtest/bios-tables-test.c
+> @@ -210,6 +210,8 @@ static void test_acpi_fadt_table(test_data *data)
+>      uint32_t val;
+>      int dsdt_offset = 40 /* DSDT */;
+>      int dsdt_entry_size = 4;
+> +    int hest_offset = 40 /* HEST */;
+> +    int hest_entry_size = 4;
+>  
+>      g_assert(compare_signature(&table, "FACP"));
+>  
+> @@ -242,6 +244,12 @@ static void test_acpi_fadt_table(test_data *data)
+>      /* update checksum */
+>      fadt_aml[9 /* Checksum */] = 0;
+>      fadt_aml[9 /* Checksum */] -= acpi_calc_checksum(fadt_aml, fadt_len);
+> +
+> +
+> +
+> +    acpi_fetch_table(data->qts, &table.aml, &table.aml_len,
+> +                     fadt_aml + hest_offset, hest_entry_size, "HEST", true);
+> +    g_array_append_val(data->tables, table);
+>  }
+>  
+>  static void dump_aml_files(test_data *data, bool rebuild)
+> @@ -2411,7 +2419,7 @@ static void test_acpi_aarch64_virt_oem_fields(void)
+>      };
+>      char *args;
+>  
+> -    args = test_acpi_create_args(&data, "-cpu cortex-a57 "OEM_TEST_ARGS);
+> +    args = test_acpi_create_args(&data, "-ras on -cpu cortex-a57 "OEM_TEST_ARGS);
+>      data.qts = qtest_init(args);
+>      test_acpi_load_tables(&data);
+>      test_oem_fields(&data);
+> 
 
 
