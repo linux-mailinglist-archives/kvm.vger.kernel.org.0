@@ -1,135 +1,164 @@
-Return-Path: <kvm+bounces-39307-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39308-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53454A4682D
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 18:36:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 311D5A4688F
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 18:56:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D292A3A6BC2
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 17:36:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B36381888B63
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2025 17:56:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0175E2253FD;
-	Wed, 26 Feb 2025 17:36:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F40822A7E3;
+	Wed, 26 Feb 2025 17:55:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QmUTRCZR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04082248BA
-	for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 17:36:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 963B722A4D9
+	for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 17:55:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740591390; cv=none; b=qefxavreIchCk2db77bp9WWRP0C3BEmGn7UfvXzHpLidCcIHQr06BhlQD+hzRXL/8bPERfLXD1RffBIxlHtMHpslM/wq63JGTM7qIoyGuAZpzXaVbp7t/FpbArvRIOdkyjUf8tmMQ95foG6voiKqEHhoJAmHt+P7wKl6gnI2QSQ=
+	t=1740592551; cv=none; b=bU7nZ1WfvJmP8/RRot2YF0Jf9itsUB7prJjysydx5nXIFZdglXZ1YzEhVl+phAv1SdQck30+q0GkSG+gjEGr7dj1fSf8sdTx3kh6XLfo5/lIv9YKDy/XgL8/+7+3JzYnGiNqaIhaCIkscWcna89WXwqYCIYqdlWh3DrG9ut+Vzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740591390; c=relaxed/simple;
-	bh=e+i6rV8bnvdaOdZMGG8E7aVduGGJr6r/p7P1kLeU6TA=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=bK0hfjhTjQutrKXuSYb6bT+Kr1EZGt1nbnS9NKeMPr7ScMr/mTwtvNRLB9m1HJeBqnScpCnQ7CFk1ab5ItTb7eFT6pGUtUsawFI0N9H/6PXpPELut5JcV7N4m/uChXcPg1jJeO9MnyrMUJ1l36H7pHtEmFYpaZ7/VNtppGP0vQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3d2a6b4b2d4so1361335ab.2
-        for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 09:36:28 -0800 (PST)
+	s=arc-20240116; t=1740592551; c=relaxed/simple;
+	bh=jKWuuJWv6A+vUltg7krISG4nDtKKTEvwhC3/E1ZD+sY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=J97Z0muQvt/VAuAunOX8G6zrvotbNu2KbPLY6/TUjY+ebSAV+CSUrrtDqLJxpjhXhp34D0CRbjYJFPKmjfIeVoWBYzVfW58XRWjyo3aysa4Nha/6T6smdGH2wyLfoVqizOmOBS7QTP3wNM8VxDz7UqZnNJnZx6IGFnGxUBt0sww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QmUTRCZR; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740592548;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=l5deIFWf7QW+foShMtc0J6gQh0z1hOsU2aErwIMaqEs=;
+	b=QmUTRCZRzq18DPHSDt8Nx/ChUGy1Q+IR4ZkBgEuFYxfDHYS2tdz/QOyi5/X1XYGBc8t8S4
+	yudu4DT/RQRincn2VCdavEOkQ1Yqlh46jL0tjWzwSSZt68BtjJ5eNYrvQmqFWd1OTlJGda
+	MwxAAmbas9ZoihrSs+LXbZ2opO/KTaY=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-626-1C4sUJY-NyW4vbRPEPPQTg-1; Wed, 26 Feb 2025 12:55:45 -0500
+X-MC-Unique: 1C4sUJY-NyW4vbRPEPPQTg-1
+X-Mimecast-MFC-AGG-ID: 1C4sUJY-NyW4vbRPEPPQTg_1740592545
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-855b7b526fbso860839f.1
+        for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 09:55:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740591388; x=1741196188;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+q4GdZWiHBa/CThULyd8lsKbAHJG3bjf0bUeD0uC9yM=;
-        b=XIu7tnt+tWplfhJVZ05Lq9won27Cg/ThQPLi/tvoU6veVQSuo9TPUUR0dPfCE0x3FQ
-         C9Onja4kG/48vv9Gh+ENt7i39Kvmj5PFGmjJC5eqx0t8A4S/opxdwTS9uIBGndeKstYJ
-         dBjt9mL9ItL0C+HfL6pk/+ltc5ZNV1E3jugpJgEsm5NAZ76IbCueTf/J5BCwETee83rR
-         enVUPCzAUrwwMWrtEAyMbdALWpK2ddC5CITeXWfmY91QQHzGJV20AeLgez7jYXWFA2g9
-         ZxH31M6ZJo+E/Jp1CFUQSfFqxqInWzEf9/VXjIR5JStK/RiBZcg5aKBeGfd16/S9oCqe
-         VM0g==
-X-Gm-Message-State: AOJu0YyjMRo9Xt+qabQY9uV8w6z0hDE/r4e68WgkqCXBPEgh0rvB/FJL
-	S/T4wZFGZGzezDtS58PGrS/0nxv+LI0mvq2oAnPDnM7Qrx9+ra+Ua+3oD7KgXbjwz44g4IuzhP1
-	g6MSLf+oNzr93aYTRcH74HcBt8fvD3eqNXz+R+zOlFRQFYqdutSUh0f4CqA==
-X-Google-Smtp-Source: AGHT+IH8OscwrueCtU/1Y4FWyajXUpY58peZNa4sv9HhOUyxIaP6pZYNMQLX6O72LReQtrsEHkmAVi5EovNuV4Av1NOnZFXXQI+7
+        d=1e100.net; s=20230601; t=1740592545; x=1741197345;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=l5deIFWf7QW+foShMtc0J6gQh0z1hOsU2aErwIMaqEs=;
+        b=N/XkgoCyJ6sl6S7aFSLVk0FFxlUITQTVOFekQtND8AtqR6mR1X4x5febmn9SovYDYk
+         XFUFloiWzstAy+M6ykqw7amDrvzM0sqkvlJ5b+W5feVFace4Wphi4ese+eEk66Jo46X7
+         Z0E0XqGpvhb8LaxDffFni9swVy/yLnvaldcVzhnTnssSzMeRvNEfhHyldKFMmCXkil2N
+         uwAjCJvFLdt28RSnytEL4HMWpi8sZinXzbHlknj+Q9qT0PfCZPTlKmvLr9ZNfXX4cqjR
+         Vz5qnhPNtc+mz5r4L5OXs17HB8U5/4sTcivqNsvUYfOeDR9QtuGo0H0qmJ1/6QIdAuCM
+         gTJg==
+X-Forwarded-Encrypted: i=1; AJvYcCXr82xhHpAOGBs8WeKVywscsC1Zi6T2lbW8Mvqe/4T7OG4Z/2GMJP3DtVC28bzrxtxDvNI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzwxq91GO/6xk04NN6daD8J9RpB/ntSDK0jLA/6qvvgo7ffSkas
+	m0KItNGsXsYCY2Bk/W4OCwT3/Awuf/7cTSLcy7mKtgsbLaP8uMCpRx/JxqBUPG3lb3FcAmTjVpk
+	cVDUOjlSkqyCbfLpDYE8bXo7+1jtpvoCkubvSxsONXt5XOcqTkQ==
+X-Gm-Gg: ASbGncvnBn13P45w9wDoC56v1VUH5tzXXOHmM6Hcmz4F7dzs+VULdIs8brb/Wk748Hr
+	EEBHt4vj7m3kk1Py+Y8m2KbJZU5mMfJy8zP20gMfBmb9SEUw8KPxU3zcY+xREZJQOOxtXZGclpf
+	EmoY+Zn6ZG9LiqpL5TuzCGtFUIAdsjt8nH8yGP8tnmmQH3jcWsAQhmCYIjeDTxnnEmw1Qo/dRTn
+	53CezjdGwBuMFNKzfvZkbHU6fyXGQ0tfl9CLKJB0udr7UiePwOnfYw5Uwl1syysy9/KSjBSk1Tq
+	Pzh2LA5Xc8I5nGfYOvE=
+X-Received: by 2002:a92:ca48:0:b0:3d3:dcd5:cde5 with SMTP id e9e14a558f8ab-3d3dcd5cfddmr1419245ab.4.1740592544904;
+        Wed, 26 Feb 2025 09:55:44 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGLi9toGQNcAOsQjLNocJqsr2fmMBl60KY6Tab7NdzqDWlTOWNKvbA3zWCXMh0ikHg+n0TqbA==
+X-Received: by 2002:a92:ca48:0:b0:3d3:dcd5:cde5 with SMTP id e9e14a558f8ab-3d3dcd5cfddmr1419175ab.4.1740592544567;
+        Wed, 26 Feb 2025 09:55:44 -0800 (PST)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d367fef1f5sm8799375ab.62.2025.02.26.09.55.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Feb 2025 09:55:43 -0800 (PST)
+Date: Wed, 26 Feb 2025 10:55:40 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Mitchell Augustin <mitchell.augustin@canonical.com>
+Cc: Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, clg@redhat.com, jgg@nvidia.com,
+ willy@infradead.org
+Subject: Re: [PATCH v2 6/6] vfio/type1: Use mapping page mask for pfnmaps
+Message-ID: <20250226105540.696a4b80.alex.williamson@redhat.com>
+In-Reply-To: <CAHTA-ubiguHnrQQH7uML30LsVc+wk-b=zTCioVTs3368eWkmeg@mail.gmail.com>
+References: <20250218222209.1382449-1-alex.williamson@redhat.com>
+	<20250218222209.1382449-7-alex.williamson@redhat.com>
+	<Z7UOEpgH5pdTBcJP@x1.local>
+	<20250218161407.6ae2b082.alex.williamson@redhat.com>
+	<CAHTA-ua8mTgNkDs0g=_8gMyT1NkgZqCE0J7QjOU=+cmZ2xqd7Q@mail.gmail.com>
+	<20250219080808.0e22215c.alex.williamson@redhat.com>
+	<CAHTA-ubiguHnrQQH7uML30LsVc+wk-b=zTCioVTs3368eWkmeg@mail.gmail.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:18cc:b0:3d3:dcac:909c with SMTP id
- e9e14a558f8ab-3d3dcac942emr5762105ab.18.1740591388070; Wed, 26 Feb 2025
- 09:36:28 -0800 (PST)
-Date: Wed, 26 Feb 2025 09:36:28 -0800
-In-Reply-To: <6776570e.050a0220.3a8527.0036.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67bf511c.050a0220.38b081.0263.GAE@google.com>
-Subject: Re: [syzbot] [kvm?] WARNING in __kvm_gpc_refresh (3)
-From: syzbot <syzbot+cde12433b6c56f55d9ed@syzkaller.appspotmail.com>
-To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-syzbot has found a reproducer for the following issue on:
+On Wed, 19 Feb 2025 14:32:35 -0600
+Mitchell Augustin <mitchell.augustin@canonical.com> wrote:
 
-HEAD commit:    e5d3fd687aac Add linux-next specific files for 20250218
-git tree:       linux-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=11e1003f980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=4e945b2fe8e5992f
-dashboard link: https://syzkaller.appspot.com/bug?extid=cde12433b6c56f55d9ed
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=145af7a4580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17e966e4580000
+> > Thanks for the review and testing!  
+> 
+> Sure thing, thanks for the patch set!
+> 
+> If you happen to have a few minutes, I'm struggling to understand the
+> epfn computation and would appreciate some insight.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/ef079ccd2725/disk-e5d3fd68.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/99f2123d6831/vmlinux-e5d3fd68.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/eadfc9520358/bzImage-e5d3fd68.xz
+Sorry, this slipped off my todo list for a few days.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+cde12433b6c56f55d9ed@syzkaller.appspotmail.com
+> My current understanding (very possibly incorrect):
+> - epfn is intended to be the last page frame number that can be
+> represented at the mapping level corresponding to addr_mask. (so, if
+> addr_mask == PUD_MASK, epfn would be the highest pfn still in PUD
+> level).
 
-kvm_intel: L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 5835 at arch/x86/kvm/../../../virt/kvm/pfncache.c:267 __kvm_gpc_refresh+0x11ff/0x1380 virt/kvm/pfncache.c:267
-Modules linked in:
-CPU: 1 UID: 0 PID: 5835 Comm: syz-executor401 Not tainted 6.14.0-rc3-next-20250218-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
-RIP: 0010:__kvm_gpc_refresh+0x11ff/0x1380 virt/kvm/pfncache.c:267
-Code: c6 05 69 55 f0 0e 01 48 c7 c7 89 2e 2b 8e be 24 04 00 00 48 c7 c2 a0 eb 21 8c e8 3c 36 66 00 e9 78 f1 ff ff e8 62 c0 8a 00 90 <0f> 0b 90 41 be ea ff ff ff e9 51 fe ff ff e8 4e c0 8a 00 90 0f 0b
-RSP: 0018:ffffc9000406f140 EFLAGS: 00010293
-RAX: ffffffff81373e7e RBX: ffffffffffffff01 RCX: ffff888035118000
-RDX: 0000000000000000 RSI: ffff888000000000 RDI: ffff887fffffffff
-RBP: ffffc9000406f2d0 R08: ffffffff81372d49 R09: 1ffffffff207b48e
-R10: dffffc0000000000 R11: fffffbfff207b48f R12: ffff887fffffffff
-R13: dffffc0000000000 R14: ffff888000000000 R15: ffffc900030f73f8
-FS:  0000555565e72380(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00005654f4befc30 CR3: 000000007ecca000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- kvm_gpc_refresh+0xc6/0x110 virt/kvm/pfncache.c:382
- kvm_xen_set_evtchn+0x165/0x230 arch/x86/kvm/xen.c:1933
- kvm_xen_hvm_evtchn_send+0x1fa/0x370 arch/x86/kvm/xen.c:2013
- kvm_arch_vm_ioctl+0xe4d/0x17c0 arch/x86/kvm/x86.c:7262
- kvm_vm_ioctl+0x876/0xd70 virt/kvm/kvm_main.c:5285
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:906 [inline]
- __se_sys_ioctl+0xf1/0x160 fs/ioctl.c:892
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f2a11846429
-Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fff5d46cb48 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 0000400000000000 RCX: 00007f2a11846429
-RDX: 0000400000000180 RSI: 00000000400caed0 RDI: 0000000000000001
-RBP: 00007f2a118b9610 R08: 00007fff5d46cd18 R09: 00007fff5d46cd18
-R10: 00007fff5d46cd18 R11: 0000000000000246 R12: 0000000000000001
-R13: 00007fff5d46cd08 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
+Actually epfn is the first pfn of the next addr_mask level page.  The
+value in the parens (*pfn | (~addr_mask >> PAGE_SHIFT)) is the last pfn
+within the same level page.  We could do it either way, it's just a
+matter of where the +1 gets added.
 
+> - ret should be == npages if all pfns in the requested vma are within
+> the memory hierarchy level denoted by addr_mask. If npages is more
+> than can be represented at that level, ret == the max number of page
+> frames representable at addr_mask level.
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Yes.
+
+> - - (if the second case is true, that means we were not able to obtain
+> all requested pages due to running out of PFNs at the current mapping
+> level)
+
+vaddr_get_pfns() is called again if we haven't reached npage.
+Specifically, from vfio_pin_pages_remote() we hit the added continue
+under the !batch->size branch.  If the pfnmaps are fully PUD aligned,
+we'll call vaddr_get_pfns() once per PUD_SIZE, vfio_pin_pages_remote()
+will only return with the full requested npage value, and we'll only
+call vfio_iommu_map() once.  The latter has always been true, the
+difference is the number of times we iterate calling vaddr_get_pfns().
+
+> If the above is all correct, what is confusing me is where the "(*pfn)
+> | " comes into this equation. If epfn is meant to be the last pfn
+> representable at addr_mask level of the hierarchy, wouldn't that be
+> represented by (~pgmask >> PAGE_SHIFT) alone?
+
+(~addr_mask >> PAGE_SHIFT) gives us the last pfn relative to zero.  We
+want the last pfn relative to *pfn, therefore we OR in *pfn.  The OR
+handles any offset that *pfn might have within the addr_mask page, so
+this operation always provides the last pfn of the addr_mask page
+relative to *pfn.  +1 because we want to calculate the number of pfns
+until the next page.  Thanks,
+
+Alex
+
 
