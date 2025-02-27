@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-39474-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39475-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B0DFA47162
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:41:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72256A47175
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:44:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 493357AD2B3
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:37:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A5853A7DDB
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:38:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFA461B07AE;
-	Thu, 27 Feb 2025 01:27:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAF85233129;
+	Thu, 27 Feb 2025 01:27:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ncq2TKQZ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="l+sTLXDX"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 695BA1AF0C7
-	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 01:27:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F671232384;
+	Thu, 27 Feb 2025 01:27:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740619665; cv=none; b=l6FsKmPWUcSyaOWaCMHJDZr7hX6eQb/vvghLOm0Fd2xcrpgevhyYvrEon9e2mmdoEtO/tOLVg4PANfPZDVIW7sAip8NkVHZygJny41hQjq8YveQE9CX6kdT0rbjm0xhsQIo+7UDG012Pw0YsmzV2w5NUNpm+aZZWC6Q6GGR3XKg=
+	t=1740619668; cv=none; b=mV3D70Ibu6FPB4gAVNaLFlVoejZLfIPwmvVTNdMUDlOtFqr0E/03kRPn0aCtoD2yH+u485cRzwbJjuFIoyhaK9giAw8C8TJVESbPaW/7BKCbPrh4neffsjzVJksyeaTJq/+tLxCH7xhCKgfshxDfUP6GNLjLWS/Uo2WuYPTzmmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740619665; c=relaxed/simple;
-	bh=MJUfF7p26znqsRd71QkxiKuEqw5hwNIYx869VTuAzqo=;
+	s=arc-20240116; t=1740619668; c=relaxed/simple;
+	bh=mIdsMYHzPWGKfQ76gyR0od074LQLBhdNIqzTXep/9HM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=c5Z7pf8gjw2A9VQSF05Boi/eWQXoKTz6xnkte2RHf7BGmg4Ap6DgGwQlxrNTOKjKm+WyzBkwuhqx4jbdF3BQyZi75QQoB+zmdVyXbFK7IKc5BMET6HYCK6+GP7zdryumV7QVp2FpGb4hxAHcqwfXfYctMwzQBlrZhS7PiTEkb14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ncq2TKQZ; arc=none smtp.client-ip=91.218.175.172
+	 MIME-Version; b=md0+EoaPqWW0nG4yrMOuWFuitQAXmc+K5NzQOKTspU2Wv1ZSlKjjEYfpsU0KGcq0lMfFEnSTka9sa9FGVxFkak8qY2hFpgrv3NGNntfA40HPgQmMe1DT54FWnyAN4zl2duTG5cvIesOoojebTOReIIknCSrUKJyhMxbr8Lp/lno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=l+sTLXDX; arc=none smtp.client-ip=91.218.175.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740619660;
+	t=1740619663;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=inZTcE9vZsNLhguAg/kTgyLxoDkWmzTqzRa3pZ8DdDU=;
-	b=Ncq2TKQZ/IJ4xbucbqtQ7Beux11X1pjvnfVY+U0kCSVGvTO2fh6RYFffg9vO0ewt4tRLi7
-	pgezoU0Ggb5KW42/8wnJJMfkfgXr2F/F0jVX46IoKddNU1yg6y2WTURBQSoS0u5UAfhJMh
-	2MmYTEqBrhiJOL3niq/CfB5xAx0L/es=
+	bh=3dfUQyumxQMDUJXdJGU+sofO81aPkdWCO0PVYPcYWac=;
+	b=l+sTLXDX0jv/vF96NEG6CtwsLDiN/112u7a0wPuQsum56JdJSXtEas3d0xJ3Akl/F5JhjP
+	5RvOtKJb5g9WVBYwI2Ixujbl2q6sx7dsOSX3DfQgzJA+lBVId0zCCJmy5fsS4WQEIubraF
+	6rPPWYyQp7SmFyT7WrIWLG8LG9JxiAM=
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: x86@kernel.org,
 	Sean Christopherson <seanjc@google.com>
@@ -59,9 +59,9 @@ Cc: Thomas Gleixner <tglx@linutronix.de>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Yosry Ahmed <yosry.ahmed@linux.dev>
-Subject: [PATCH v2 4/6] x86/bugs: Use a static branch to guard IBPB on vCPU switch
-Date: Thu, 27 Feb 2025 01:27:10 +0000
-Message-ID: <20250227012712.3193063-5-yosry.ahmed@linux.dev>
+Subject: [PATCH v2 5/6] KVM: nVMX: Always use IBPB to properly virtualize IBRS
+Date: Thu, 27 Feb 2025 01:27:11 +0000
+Message-ID: <20250227012712.3193063-6-yosry.ahmed@linux.dev>
 In-Reply-To: <20250227012712.3193063-1-yosry.ahmed@linux.dev>
 References: <20250227012712.3193063-1-yosry.ahmed@linux.dev>
 Precedence: bulk
@@ -73,87 +73,39 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Instead of using X86_FEATURE_USE_IBPB to guard the IBPB execution in KVM
-when a new vCPU is loaded, introduce a static branch, similar to
-switch_mm_*_ibpb.
+On synthesized nested VM-exits in VMX, an IBPB is performed if IBRS is
+advertised to the guest to properly provide separate prediction domains
+for L1 and L2. However, this is currently conditional on
+X86_FEATURE_USE_IBPB, which depends on the host spectre_v2_user
+mitigation.
 
-This makes it obvious in spectre_v2_user_select_mitigation() what
-exactly is being toggled, instead of the unclear X86_FEATURE_USE_IBPB
-(which will be shortly removed). It also provides more fine-grained
-control, making it simpler to change/add paths that control the IBPB in
-the vCPU switch path without affecting other IBPBs.
+In short, if spectre_v2_user=no, IBRS is not virtualized correctly and
+L1 becomes susceptible to attacks from L2. Fix this by performing the
+IBPB regardless of X86_FEATURE_USE_IBPB.
 
+Fixes: 2e7eab81425a ("KVM: VMX: Execute IBPB on emulated VM-exit when guest has IBRS")
 Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+Reviewed-by: Jim Mattson <jmattson@google.com>
 Acked-by: Josh Poimboeuf <jpoimboe@kernel.org>
+Acked-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/nospec-branch.h | 2 ++
- arch/x86/kernel/cpu/bugs.c           | 5 +++++
- arch/x86/kvm/svm/svm.c               | 2 +-
- arch/x86/kvm/vmx/vmx.c               | 2 +-
- 4 files changed, 9 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
-index 7cbb76a2434b9..36bc395bdef32 100644
---- a/arch/x86/include/asm/nospec-branch.h
-+++ b/arch/x86/include/asm/nospec-branch.h
-@@ -552,6 +552,8 @@ DECLARE_STATIC_KEY_FALSE(switch_to_cond_stibp);
- DECLARE_STATIC_KEY_FALSE(switch_mm_cond_ibpb);
- DECLARE_STATIC_KEY_FALSE(switch_mm_always_ibpb);
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 504f328907ad4..ca18c3eec76d8 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -5026,8 +5026,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+ 	 * doesn't isolate different VMCSs, i.e. in this case, doesn't provide
+ 	 * separate modes for L2 vs L1.
+ 	 */
+-	if (guest_cpu_cap_has(vcpu, X86_FEATURE_SPEC_CTRL) &&
+-	    cpu_feature_enabled(X86_FEATURE_USE_IBPB))
++	if (guest_cpu_cap_has(vcpu, X86_FEATURE_SPEC_CTRL))
+ 		indirect_branch_prediction_barrier();
  
-+DECLARE_STATIC_KEY_FALSE(switch_vcpu_ibpb);
-+
- DECLARE_STATIC_KEY_FALSE(mds_idle_clear);
- 
- DECLARE_STATIC_KEY_FALSE(switch_mm_cond_l1d_flush);
-diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-index 1d7afc40f2272..7f904d0b0b04f 100644
---- a/arch/x86/kernel/cpu/bugs.c
-+++ b/arch/x86/kernel/cpu/bugs.c
-@@ -113,6 +113,10 @@ DEFINE_STATIC_KEY_FALSE(switch_mm_cond_ibpb);
- /* Control unconditional IBPB in switch_mm() */
- DEFINE_STATIC_KEY_FALSE(switch_mm_always_ibpb);
- 
-+/* Control IBPB on vCPU load */
-+DEFINE_STATIC_KEY_FALSE(switch_vcpu_ibpb);
-+EXPORT_SYMBOL_GPL(switch_vcpu_ibpb);
-+
- /* Control MDS CPU buffer clear before idling (halt, mwait) */
- DEFINE_STATIC_KEY_FALSE(mds_idle_clear);
- EXPORT_SYMBOL_GPL(mds_idle_clear);
-@@ -1365,6 +1369,7 @@ spectre_v2_user_select_mitigation(void)
- 	/* Initialize Indirect Branch Prediction Barrier */
- 	if (boot_cpu_has(X86_FEATURE_IBPB)) {
- 		setup_force_cpu_cap(X86_FEATURE_USE_IBPB);
-+		static_branch_enable(&switch_vcpu_ibpb);
- 
- 		spectre_v2_user_ibpb = mode;
- 		switch (cmd) {
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 57222c3b56592..a73875ffbc3df 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1566,7 +1566,7 @@ static void svm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 		sd->current_vmcb = svm->vmcb;
- 
- 		if (!cpu_feature_enabled(X86_FEATURE_IBPB_ON_VMEXIT) &&
--		    cpu_feature_enabled(X86_FEATURE_USE_IBPB))
-+		    static_branch_likely(&switch_vcpu_ibpb))
- 			indirect_branch_prediction_barrier();
- 	}
- 	if (kvm_vcpu_apicv_active(vcpu))
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 042b7a88157b0..956f9143a3c4c 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1477,7 +1477,7 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
- 		 * performs IBPB on nested VM-Exit (a single nested transition
- 		 * may switch the active VMCS multiple times).
- 		 */
--		if (cpu_feature_enabled(X86_FEATURE_USE_IBPB) &&
-+		if (static_branch_likely(&switch_vcpu_ibpb) &&
- 		    (!buddy || WARN_ON_ONCE(buddy->vmcs != prev)))
- 			indirect_branch_prediction_barrier();
- 	}
+ 	/* Update any VMCS fields that might have changed while L2 ran */
 -- 
 2.48.1.658.g4767266eb4-goog
 
