@@ -1,129 +1,154 @@
-Return-Path: <kvm+bounces-39436-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39437-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 433F7A470C2
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:14:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43E47A470C4
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:15:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3904716CC85
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:14:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30C6716DFFA
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:15:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E54D316F8E5;
-	Thu, 27 Feb 2025 01:13:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFE1A38DD3;
+	Thu, 27 Feb 2025 01:14:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4TX8+M5Q"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="ct9TI772"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4C69155A4D
-	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 01:13:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E544DECF;
+	Thu, 27 Feb 2025 01:14:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740618817; cv=none; b=mB7YxVOT+Ekt/G00416X/mnb1ZCAPydpMOAkXmJjl3e8rHvWAqbn7/eWX7PBETpcLxXFhq+TdKQrmQM8WJTsj+PUQcUjwzFBo2WYg+PbcUYcuEgfTmER9eaYae6jQ6otlQIgPJrSfYgGalzvIxVU1cj2O+JCufbu33MdbHKFuss=
+	t=1740618879; cv=none; b=tR2j0e2yJVs/nAhu47zRMkA5g75xjg+g0qWZKPFuKiN7RtP5VJfIMWvAXbU/V05igNZZcc/vAkdLnCJ0H0FBxfUYqdRwfB4ZUBlWjMm0T6H/RnjGKBmrlvyyDhGHzIvYDzd7K65CNzcCuyjget9HC4H0jdupbY49KXOiqdC/dLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740618817; c=relaxed/simple;
-	bh=yu8TyCy5IstIMoYy9ePpidWG2ruXcYEZUf6VlP2oCYw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Ma6AgKynlr4uLQiX6v/bWPftZOc2I9Rk0o0UBoVsruUjtSUAlYCnqhSkcVYNDicjpsuPEdu3Mwf45oCMLJJ6z+ZiRMHOGTTq0/2XN/etLpH1abAR7jv52oWLDYrSEFrcGAt/UJRCXuB2Xy9GszJrwqVOlidetbQCcMS9kf3KbEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4TX8+M5Q; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fe86c01e2bso921374a91.2
-        for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 17:13:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740618815; x=1741223615; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=qmb3CzVJbBaqSWe8exsC1ZsMXmS+Kv6YmMHciuGnSnM=;
-        b=4TX8+M5Q2qdpx05UcqzrpHMy/GCCBxOa2ARRRQlbLLsYcDjA1KPP3r1DLNRtZdzYT0
-         gOvcdk9foygKhwP6N0CKc34GUMjts+durzLeVC7R2t/0aECsHBej++xqEUxDKdhKGtEu
-         wZySBq4dRCp1OyDcC1i5bHr6tP7WRwgqYO7PJTLjKnNA08/ztuEX7gHEo5tHUyRYj6td
-         5a7XrHlpVRbLJVPrW9XviqV7RCN5FUcsME51yQKx0OaAMyPTdwDHyxULmmtMRTHSWCl+
-         JdLohSj0QtNejR1rA4fn4f87b5TToUWVWpVL9Xams7Pg2qF0UQFriU9HQ2QvpsGZwVGS
-         nurw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740618815; x=1741223615;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qmb3CzVJbBaqSWe8exsC1ZsMXmS+Kv6YmMHciuGnSnM=;
-        b=iOfjUHFeBnZOq4rv8gTaCZPFjZ8nIVbxxCGXv4n1Isnr8auy/LcLbSPrZvHHZBjyeE
-         KGiK39TeuEOmC4ne8L2EcboDrtvl/GRSg6ZFERwdA6sQ20LXW8QVCBYSUMvi5ScfDMI1
-         R/M7Uzpra2ECbj/1MAF6HF6Oexp7plQxqZTYKWclqMxR3N+rhgjK54v3mZ+SKid/GouL
-         Kd65Y6qU8UjZ/hkplGQjVjynnftFRUWBk7Fv94yVDpj9lhRpqXO+xswan3nqL5wEiAET
-         vT2pgkbuOz193J1opCdoLSXJ2G9C5AFa22/StE679nei4FgzlZbLsZeV9a+j8X68Xp+c
-         m3fA==
-X-Gm-Message-State: AOJu0YxJzhBGnLJPFAdEur9LF8NIvcP3h3I9ZfXD674aEldGdRhE7Q0R
-	zujdWgKjEZOk35G8SMbfryrRDYfmhjn8ZbDgsyr6VZG/nAll4uOPB29/ZHw63qRZ1CriHDUKEMH
-	r+Q==
-X-Google-Smtp-Source: AGHT+IHbWmibGgYDxG0pPNvCP7ncWv5pWbcPv0vknPBvkXfOX2PBqWehwjnJxrxNDIGlFBQGAA28ThhFG8Q=
-X-Received: from pjuw13.prod.google.com ([2002:a17:90a:d60d:b0:2f9:dc36:b11])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5148:b0:2ee:c9b6:4c42
- with SMTP id 98e67ed59e1d1-2fce86cf0ebmr41513310a91.16.1740618815327; Wed, 26
- Feb 2025 17:13:35 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 26 Feb 2025 17:13:21 -0800
-In-Reply-To: <20250227011321.3229622-1-seanjc@google.com>
+	s=arc-20240116; t=1740618879; c=relaxed/simple;
+	bh=Xs/OLWRjVopl+PBKhxfySZxwwvTxhF09wzNSJg4riJU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=inP+Tne5Y8sqvy5EMBi23QrrZLVG5gM0lSv7FbSbRfuSWVq9DyU29+f/hbNUPg2rOiYrYUSrKxietrU1sBkzQ82y/exTLpdX8tLtNjRqk0gVOCbmyM53SopEOAf62yMmXjKsIYcIckPKX/mb/CbIyVko3MM3Su5kxFjXveJHtzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=ct9TI772; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.202] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 51R1EM2l1932536
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Wed, 26 Feb 2025 17:14:25 -0800
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 51R1EM2l1932536
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025021701; t=1740618865;
+	bh=t7YiWUUV1Y0WB51uUogsknfyM0MzRH9BPzhjedNHqHM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ct9TI772GPkCMLNGWtqx5yztYlsqCAN59L8juN2tpJ8zhGl676NX2hgL0kWUR4brS
+	 BSksI+F8muDwrP5oox1YOsSTnYr0hnSP4k3w1srqI0n5Y+pwQ7uOSK0x/+bljFRsJl
+	 n6Qa4Y9fvaJ/Tw405Yzxu5VOew3+vcXo8M/whodutGTPJUocBwxvEA97hGv3sZg99b
+	 fQ+Fd1KjGKwwpE/DpQ8uqvjlyG85jXpKQVBm1OC1uEN0ewI1hINNOi7tb6KsXLGGfK
+	 haJZUDnpj2yD/D2SJn4qIRyO87JEHJJmt1u1263lMCpND+53xMWAoaMjQaKTcZEB40
+	 hAaipNCOkRpbg==
+Message-ID: <ab5ded74-91b4-46ae-b360-b372ff790fa6@zytor.com>
+Date: Wed, 26 Feb 2025 17:14:21 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250227011321.3229622-1-seanjc@google.com>
-X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <20250227011321.3229622-6-seanjc@google.com>
-Subject: [PATCH v2 5/5] KVM: SVM: Treat DEBUGCTL[5:2] as reserved
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Ravi Bangoria <ravi.bangoria@amd.com>, Xiaoyao Li <xiaoyao.li@intel.com>, rangemachine@gmail.com, 
-	whanos@sergal.fun
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] x86/msr: Rename the WRMSRNS opcode macro to
+ ASM_WRMSRNS (for KVM)
+To: Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250227010111.3222742-1-seanjc@google.com>
+ <20250227010111.3222742-2-seanjc@google.com>
+Content-Language: en-US
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <20250227010111.3222742-2-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Stop ignoring DEBUGCTL[5:2] on AMD CPUs and instead treat them as reserved.
-KVM has never properly virtualized AMD's legacy PBi bits, but did allow
-the guest (and host userspace) to set the bits.  To avoid breaking guests
-when running on CPUs with BusLockTrap, which redefined bit 2 to BLCKDB and
-made bits 5:3 reserved, a previous KVM change ignored bits 5:3, e.g. so
-that legacy guest software wouldn't inadvertently enable BusLockTrap or
-hit a VMRUN failure due to setting reserved.
+On 2/26/2025 5:01 PM, Sean Christopherson wrote:
+> Rename the WRMSRNS instruction opcode macro so that it doesn't collide
+> with X86_FEATURE_WRMSRNS when using token pasting to generate references
+> to X86_FEATURE_WRMSRNS.  KVM heavily uses token pasting to generate KVM's
+> set of support feature bits, and adding WRMSRNS support in KVM will run
+> will run afoul of the opcode macro.
+> 
+>    arch/x86/kvm/cpuid.c:719:37: error: pasting "X86_FEATURE_" and "" "" does not
+>                                        give a valid preprocessing token
+>    719 |         u32 __leaf = __feature_leaf(X86_FEATURE_##name);                \
+>        |                                     ^~~~~~~~~~~~
+> 
+> KVM has worked around one such collision in the past by #undef'ing the
+> problematic macro in order to avoid blocking a KVM rework, but such games
+> are generally undesirable, e.g. requires bleeding macro details into KVM,
+> risks weird behavior if what KVM is #undef'ing changes, etc.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/include/asm/msr.h | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/msr.h b/arch/x86/include/asm/msr.h
+> index 001853541f1e..60b80a36d045 100644
+> --- a/arch/x86/include/asm/msr.h
+> +++ b/arch/x86/include/asm/msr.h
+> @@ -300,7 +300,7 @@ do {							\
+>   #endif	/* !CONFIG_PARAVIRT_XXL */
+>   
+>   /* Instruction opcode for WRMSRNS supported in binutils >= 2.40 */
+> -#define WRMSRNS _ASM_BYTES(0x0f,0x01,0xc6)
+> +#define ASM_WRMSRNS _ASM_BYTES(0x0f,0x01,0xc6)
+>   
+>   /* Non-serializing WRMSR, when available.  Falls back to a serializing WRMSR. */
+>   static __always_inline void wrmsrns(u32 msr, u64 val)
+> @@ -309,7 +309,7 @@ static __always_inline void wrmsrns(u32 msr, u64 val)
+>   	 * WRMSR is 2 bytes.  WRMSRNS is 3 bytes.  Pad WRMSR with a redundant
+>   	 * DS prefix to avoid a trailing NOP.
+>   	 */
+> -	asm volatile("1: " ALTERNATIVE("ds wrmsr", WRMSRNS, X86_FEATURE_WRMSRNS)
+> +	asm volatile("1: " ALTERNATIVE("ds wrmsr", ASM_WRMSRNS, X86_FEATURE_WRMSRNS)
+>   		     "2: " _ASM_EXTABLE_TYPE(1b, 2b, EX_TYPE_WRMSR)
+>   		     : : "c" (msr), "a" ((u32)val), "d" ((u32)(val >> 32)));
+>   }
 
-To allow for virtualizing BusLockTrap and whatever future features may use
-bits 5:3, treat bits 5:2 as reserved (and hope that doing so doesn't break
-any existing guests).
+I hit the same build issue, thanks for fixing it.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/svm.c | 11 -----------
- 1 file changed, 11 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 3924b9b198f4..7fc99c30d2cc 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3166,17 +3166,6 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
- 			break;
- 		}
- 
--		/*
--		 * AMD changed the architectural behavior of bits 5:2.  On CPUs
--		 * without BusLockTrap, bits 5:2 control "external pins", but
--		 * on CPUs that support BusLockDetect, bit 2 enables BusLockTrap
--		 * and bits 5:3 are reserved-to-zero.  Sadly, old KVM allowed
--		 * the guest to set bits 5:2 despite not actually virtualizing
--		 * Performance-Monitoring/Breakpoint external pins.  Drop bits
--		 * 5:2 for backwards compatibility.
--		 */
--		data &= ~GENMASK(5, 2);
--
- 		if (data & DEBUGCTL_RESERVED_BITS)
- 			return 1;
- 
--- 
-2.48.1.711.g2feabab25a-goog
-
+Reviewed-by: Xin Li (Intel) <xin@zytor.com>
 
