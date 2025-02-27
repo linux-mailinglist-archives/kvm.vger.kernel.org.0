@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-39466-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39467-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A91ABA4715B
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:40:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 531A4A47166
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:42:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7E0A3B78FC
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:35:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37A0316CA58
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:36:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BDC322DF8E;
-	Thu, 27 Feb 2025 01:25:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F6EA22E413;
+	Thu, 27 Feb 2025 01:26:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1y5yYQbJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="27shFyFa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD4501CDFCC
-	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 01:25:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1D622DF81
+	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 01:25:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740619557; cv=none; b=twNGsODgofmpr6VgM+QjwQYBJirj6SCahzTDiSLHiTB1pToF1xdup//Z/rGpZDVafc23Ee6YwIKSjg3B+w79eusuJijSp6LG4+e8YtXKF0GzOryG1FdA77Hl1sufdla12BleoT3rdblDFKVpQH4uXpPBR8EQjQ5RIGUSXCVTTJY=
+	t=1740619559; cv=none; b=OqugKevDbZW0ceONdR8OaAn4H2W4gJ8K5wgN2sXelVBoQjSa+iYGCEfX2l8o/63DPocgTRZ4I1fYCwhiaDDO6ttlFuiPHRC82oYhPJH94y3l/pMq70plBlq87f72M09jC8HQy2kei14rg4fJ/Kfqf5IWZyB6xNmjAhBAGNlGr1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740619557; c=relaxed/simple;
-	bh=ihlJ9tzG+mbom6E97CofCJ2twZFC8ydoAcNMa4ieq/g=;
+	s=arc-20240116; t=1740619559; c=relaxed/simple;
+	bh=3rMdxdgx2qWe5YUgeEwNff8fTKobVmh249Xk/BEEAbw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=abIY4/97pBztDFqtum86EIa2ypF1oqJl/wtntQRVTWjprge7/bJhmHZUI/6xSjPXMbjC/PTG91AAE+anKI14gzcsTRJBRS59icjJPLst02wBB8gUlx1Zr7U4gy5R3eXgNaxx74o11I5jCxwrJl8e1QsyoVfZzEWmjLI/C1fgoMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1y5yYQbJ; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=V/p3CGKVvUxTeBhEh7hcYNaA+rNI2d7l3fiwgLj4OapHPMAz+1E4nd2oBnKK7ffLdoX7kB3RIqKDqO+h6g5B5zZrMyKs9Yeb5tWTw+YSPd1O7m+gYLWShodEAJFQXZGPFzvNVWsj4cBMfckIjB2HCU9O3OP/ovMSSZT0Kb0gYQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=27shFyFa; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fe8de1297eso925486a91.0
-        for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 17:25:55 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2234c09241fso10834255ad.2
+        for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 17:25:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740619555; x=1741224355; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1740619557; x=1741224357; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=BEh4czcyv0mwjR2KnuYAlHnHA3zyOkXJCuOnzE1/d90=;
-        b=1y5yYQbJIZe7LrJamcdgKbiKDM1gPax2kmBZlGbVuISqYPUr5DzcJmczf/VOsqMyXw
-         n9QpFnxmkNF0Of3cxcFb0HU3BsLjmLDtPU/f28oqXLHYiQqiA5TuLx9gu8QxWblXNlEm
-         QZSTAIv7bgc+n/Dwj7JtTmPV205sNYqGFOechCs1o/VU1IUFb0VBFogmfHGehx64n/QO
-         OkgV5ot0orbQ6rylpCwLHshubY5j557zgamF/iaFGlSkWVKq3uq0EKhjROU3lT+YYBnA
-         /oWlEwsxvDiTgDvn8EvubnbDYwHfvK49layanvqeRslra155l4y1Rob6kgyhuuI4nYO0
-         Rwgw==
+        bh=lmdAwPEyCZdB0cvoeTHRqa3iDsz832lsztWM5iTizzQ=;
+        b=27shFyFa7us91YMSdCLNQFswgRfPh3a60qe4ZSGaUmrTexGUEHhGJq9E7wpAcy0A3X
+         CWumEerMK5luUsBakwMWHBMPujn4G1dFkx47+CO8YM0keftCapeTcH5BfeQyEwLg54Qs
+         RvsF1mAC1xFrU5YNtOTkRoNDTVbc9bx81Xc123nvzwvAwzuikUqBgWYNMrRF8muYqE3e
+         d67MMFx4zJkbTmibnG40wwRlPYEqM6smB5aaaIJctBJon8vS9qAcfiSA+esPa9ULN+86
+         f4GdKWzXV4aTA7YH7PvIP0xLgaUmWiJnVjV9coFVdA5WfUajXLBPa0LD1rZbk8k8e1VM
+         YpLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740619555; x=1741224355;
+        d=1e100.net; s=20230601; t=1740619557; x=1741224357;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=BEh4czcyv0mwjR2KnuYAlHnHA3zyOkXJCuOnzE1/d90=;
-        b=WbIulFX4S0Oj3tu2PjaMKEOD7iEgMogBMn8PZ72IsPLSN5gFHtBXLsctJOpoehWbET
-         Jvj6Inn68JTrffg3A6dKrLgcc46bD7FsAd5WW+rPtd2ZbFJ3iFC/i6/NGr4Xs/oseQU/
-         kf/TY/GslkwUFr1k2tXAgcMvEcBqGCqPSd3QlTQJHEb0m8pCLLHl6rlLq/jckDfe1fRX
-         JktjPcWt5k7k/3FHPP7NiKEoTqH/EwPlQMDD6HlPzFI8SQPYPEcvDRYVveasafqaXgoS
-         fwk01fAy843rx60GhVZRDg2u4XKku5iVQRaIyTDnDJleioP4p39ERc5fz3uNnQhMTEH1
-         TUCA==
-X-Gm-Message-State: AOJu0YwJ1o3pPXzjOPJnINlRTp1T15tZlc9q7PQf17mf+rAcmEjVj2u7
-	PPocyDnpCcPMtjk7MpgTRzC08AdB7qZcak16xVCpg+DxuY8M5MtF5Z1gyUjsSepLFxWizjlzbTB
-	/ZA==
-X-Google-Smtp-Source: AGHT+IExjvD2wlKO1qXHAmeJHBp9Socb/v6Efvhq9YmZiRdyzuZ7b7PT/K+5yF4GkgpWs3T5dFKOYmAE6Qs=
-X-Received: from pjbtd3.prod.google.com ([2002:a17:90b:5443:b0:2ef:d283:5089])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:38d2:b0:2f6:e47c:1750
- with SMTP id 98e67ed59e1d1-2fea12f2a2amr2349083a91.13.1740619555492; Wed, 26
- Feb 2025 17:25:55 -0800 (PST)
+        bh=lmdAwPEyCZdB0cvoeTHRqa3iDsz832lsztWM5iTizzQ=;
+        b=D2DDmkpNMgtAGrfQFxX0pNG2ggBluldydhXM/KT2KuCwSuLMIVsVehPm/z/0U8K5k2
+         b+vyHvLgDks3j1ezEiGQsQW2EtSOr9cp4/ScpU92sSW1TLFiatQSEs4da/+xi5wC1fub
+         SSYYyrbXGLMb4Kkjz3+Hm7uvpeuqBTCOhoSjEeHsyEyyyjbc/KwIAqxbopXY78kzqKeR
+         35Ev9vd//xzA6bXSHADwnVE7c/DWu+wwpv2omUBJCXhRb7ErtgNHwx6efEgZx0qj3mL+
+         t66dQpRDlS6iFxcEjVFIkd8Fzr/OR2ObzCtklCLA5/CXJmf9/afPs2pHjdLvltxNXJkx
+         hwyA==
+X-Gm-Message-State: AOJu0YxrEtmaz+TTdz0qwr9A6PwThK0fTKBbtvXgaCc2Xi8SVnMv9Mdo
+	wlzbMwpgF1qbUMM6x0s8ZChowzwoi9lvDuQcFhWpn1Up6mO97ep4DYm/AIah9txi4y+dAt/CpGT
+	ZYA==
+X-Google-Smtp-Source: AGHT+IGyW+IanDv2gn10X8mgRJgrQ6dxChAv+7NcHxpQspV9qJhboJEE29I20MwBycuSfUIjaysnSToTWm4=
+X-Received: from pfbik10.prod.google.com ([2002:a05:6a00:8d0a:b0:730:4672:64ac])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1709:b0:732:2967:400
+ with SMTP id d2e1a72fcca58-7347910977emr15073690b3a.12.1740619557217; Wed, 26
+ Feb 2025 17:25:57 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 26 Feb 2025 17:25:38 -0800
+Date: Wed, 26 Feb 2025 17:25:39 -0800
 In-Reply-To: <20250227012541.3234589-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250227012541.3234589-1-seanjc@google.com>
 X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <20250227012541.3234589-8-seanjc@google.com>
-Subject: [PATCH v2 07/10] KVM: SVM: Use guard(mutex) to simplify SNP AP
- Creation error handling
+Message-ID: <20250227012541.3234589-9-seanjc@google.com>
+Subject: [PATCH v2 08/10] KVM: SVM: Mark VMCB dirty before processing incoming snp_vmsa_gpa
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -86,92 +85,50 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Pankaj Gupta <pankaj.gupta@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Use guard(mutex) in sev_snp_ap_creation() and modify the error paths to
-return directly instead of jumping to a common exit point.
+Mark the VMCB dirty, i.e. zero control.clean, prior to handling the new
+VMSA.  Nothing in the VALID_PAGE() case touches control.clean, and
+isolating the VALID_PAGE() code will allow simplifying the overall logic.
 
-No functional change intended.
+Note, the VMCB probably doesn't need to be marked dirty when the VMSA is
+invalid, as KVM will disallow running the vCPU in such a state.  But it
+also doesn't hurt anything.
 
 Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/sev.c | 22 ++++++----------------
- 1 file changed, 6 insertions(+), 16 deletions(-)
+ arch/x86/kvm/svm/sev.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index ccac840ee7be..dd9511a2254b 100644
+index dd9511a2254b..c74cc64ceb81 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -3938,7 +3938,6 @@ static int sev_snp_ap_creation(struct vcpu_svm *svm)
- 	struct vcpu_svm *target_svm;
- 	unsigned int request;
- 	unsigned int apic_id;
--	int ret;
+@@ -3850,6 +3850,12 @@ static int __sev_snp_update_protected_guest_state(struct kvm_vcpu *vcpu)
+ 	/* Clear use of the VMSA */
+ 	svm->vmcb->control.vmsa_pa = INVALID_PAGE;
  
- 	request = lower_32_bits(svm->vmcb->control.exit_info_1);
- 	apic_id = upper_32_bits(svm->vmcb->control.exit_info_1);
-@@ -3951,11 +3950,9 @@ static int sev_snp_ap_creation(struct vcpu_svm *svm)
- 		return -EINVAL;
++	/*
++	 * When replacing the VMSA during SEV-SNP AP creation,
++	 * mark the VMCB dirty so that full state is always reloaded.
++	 */
++	vmcb_mark_all_dirty(svm->vmcb);
++
+ 	if (VALID_PAGE(svm->sev_es.snp_vmsa_gpa)) {
+ 		gfn_t gfn = gpa_to_gfn(svm->sev_es.snp_vmsa_gpa);
+ 		struct kvm_memory_slot *slot;
+@@ -3895,12 +3901,6 @@ static int __sev_snp_update_protected_guest_state(struct kvm_vcpu *vcpu)
+ 		kvm_release_page_clean(page);
  	}
  
--	ret = 0;
+-	/*
+-	 * When replacing the VMSA during SEV-SNP AP creation,
+-	 * mark the VMCB dirty so that full state is always reloaded.
+-	 */
+-	vmcb_mark_all_dirty(svm->vmcb);
 -
- 	target_svm = to_svm(target_vcpu);
- 
--	mutex_lock(&target_svm->sev_es.snp_vmsa_mutex);
-+	guard(mutex)(&target_svm->sev_es.snp_vmsa_mutex);
- 
- 	switch (request) {
- 	case SVM_VMGEXIT_AP_CREATE_ON_INIT:
-@@ -3963,15 +3960,13 @@ static int sev_snp_ap_creation(struct vcpu_svm *svm)
- 		if (vcpu->arch.regs[VCPU_REGS_RAX] != sev->vmsa_features) {
- 			vcpu_unimpl(vcpu, "vmgexit: mismatched AP sev_features [%#lx] != [%#llx] from guest\n",
- 				    vcpu->arch.regs[VCPU_REGS_RAX], sev->vmsa_features);
--			ret = -EINVAL;
--			goto out;
-+			return -EINVAL;
- 		}
- 
- 		if (!page_address_valid(vcpu, svm->vmcb->control.exit_info_2)) {
- 			vcpu_unimpl(vcpu, "vmgexit: invalid AP VMSA address [%#llx] from guest\n",
- 				    svm->vmcb->control.exit_info_2);
--			ret = -EINVAL;
--			goto out;
-+			return -EINVAL;
- 		}
- 
- 		/*
-@@ -3985,8 +3980,7 @@ static int sev_snp_ap_creation(struct vcpu_svm *svm)
- 			vcpu_unimpl(vcpu,
- 				    "vmgexit: AP VMSA address [%llx] from guest is unsafe as it is 2M aligned\n",
- 				    svm->vmcb->control.exit_info_2);
--			ret = -EINVAL;
--			goto out;
-+			return -EINVAL;
- 		}
- 
- 		target_svm->sev_es.snp_vmsa_gpa = svm->vmcb->control.exit_info_2;
-@@ -3997,8 +3991,7 @@ static int sev_snp_ap_creation(struct vcpu_svm *svm)
- 	default:
- 		vcpu_unimpl(vcpu, "vmgexit: invalid AP creation request [%#x] from guest\n",
- 			    request);
--		ret = -EINVAL;
--		goto out;
-+		return -EINVAL;
- 	}
- 
- 	target_svm->sev_es.snp_ap_waiting_for_reset = true;
-@@ -4012,10 +4005,7 @@ static int sev_snp_ap_creation(struct vcpu_svm *svm)
- 		kvm_vcpu_kick(target_vcpu);
- 	}
- 
--out:
--	mutex_unlock(&target_svm->sev_es.snp_vmsa_mutex);
--
--	return ret;
-+	return 0;
+ 	return 0;
  }
  
- static int snp_handle_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t resp_gpa)
 -- 
 2.48.1.711.g2feabab25a-goog
 
