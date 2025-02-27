@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-39428-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39429-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0667A4709F
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:01:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C996A470A2
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:02:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0C0716E97F
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:01:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B71316EA63
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:02:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C746D22F01;
-	Thu, 27 Feb 2025 01:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B112D145B3F;
+	Thu, 27 Feb 2025 01:01:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jGTj5zd7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h5bwLIWn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 881FA74040
-	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 01:01:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548601DA5F
+	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 01:01:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740618079; cv=none; b=GGMUkopp1F6ToLoFAEb1zIzLvag6V0J6dLqwYUyQCZ6Qn+zyOCdWBHzi1PycZmNGDA+370prJwvIhv84BZXpn3lduywH9LXZ2+DcLj0aNtwk9oymHCI79kmcDGnYkM1sDPceJ5ArfGZbVePbGk0gnAhs6Pslnm1HSYS8NMxJYLA=
+	t=1740618080; cv=none; b=Pzb+MZ0GfZilU5BzpgoDhSrZAaqyu0ST681Wc5CS8z/JUeaI9ahcmW2rWPRzDPdClPeFIa65yMPmHMh/qzq9Nrs/VGjQNiDeGykxT7qS8r+JMmhhso8z8j4R6COIB8kJ4hLfND9BSmaGjlGVnR+gwQHndTXl+DNdDtqjJSXNMpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740618079; c=relaxed/simple;
-	bh=GZ6qMOoOVuiq1MAFI9FkQ+kQcduE2jvLA2wNIUu2RL4=;
+	s=arc-20240116; t=1740618080; c=relaxed/simple;
+	bh=WlG71nbfhMG+iZLSreFus8KOoSWVnI0WTDVJb/q9jyI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VmF+Fzk869R9+exrYXJ58bhJSAMpqbBrGSGxRWz6LY+GPOIzPCHW9CYy/Rqmcl5awKof0AmLDbfO0rJVrfop/PZ495kI6VgBGSmVWGznSeY681RTrQN3wXYA5tAn4a8/sln0WG/d8/I6EdnJ4qzHsF1sgAghmfwRU9eFo1sNzu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jGTj5zd7; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=tv+qFJ9lVyYWg6FRZYdVgnv7KeRDn6XpekDlu7M/uwhSUA2EIjGkFhx+LflU5mVQHIg8dkVWQRlXJC1GpN1UH8EhqUX0nfdRQPExhUERZwVILv0ZLCV8hbD9oFl/kndYPyX5/IUwgUe5Q1XRKuGpUiuoc+aHeIjwqvR0c4By8eQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h5bwLIWn; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2f83e54432dso1334018a91.2
-        for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 17:01:16 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-22349ce68a9so10545105ad.0
+        for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 17:01:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740618076; x=1741222876; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1740618077; x=1741222877; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=RDoWSiiBmUA4Cvc4ko+cuVneWh/qlxcsIoQ/Ggi5MbQ=;
-        b=jGTj5zd7Pl7Sjfe3lxYdK3cPRnlbeKCHyeOl4JzzQRM5+RX/cqOMH98XLyVndS9JN1
-         Q8VSThw7CWrJVAwb/xpCZYkKk22v6PMk94gTJj7RAoVnaO0uWoL9uSKbORHF/VQohTE3
-         jnMBpTxB5cfwzMJGs/7/VVQj70B4AGaUCofjb+TzOV9YTUbCXXXG9zDoROIynInqFc4D
-         Knet/4v7FlJwDrEvHnz+jC93UFaRQWgYR8nKvgeXwq9v/uF9iBoqb2aNvRZeXgdcQtlY
-         oc6Dt5i5IlrZ7ZwO7kf/jZBbYKSsZs2AZB9MkQpTdFVf2z6NTxip0gJ7xyFE+8hLl1se
-         tHXw==
+        bh=vBrLV0hVNi1a5D0W6BOn6trR5W1NotqikKgQ5Tv/tAA=;
+        b=h5bwLIWnwuwrVytdM2CbIkyHDKiwxHsBucwH/HVkYoAGvzRRf2ExPXlMyntnUdjoas
+         QobhzuDj107Ca/zGaDS+w8BQFr4aSwDVqMKP3XztP9CbtwtNVGlmpelAT2ovNx+GajMm
+         MW2gB//r/0CeMbPWGRG9avSqFq6QfKj/zmv+4MgIL9RTU8bo18I1u6ZRNezMD64Pd+AZ
+         N/m+tHyM9GIw+bIwKehFhe/KSUdgemEDxI44vQrKaHbMakUVB9awcY8nIHSsZKgi5LWS
+         pogQZ+xysPF02k+tial2LdtKDUuLvHQJ/awgaLnsIvwGX+oUiAzO6f50wXg4+AtF/DPw
+         orjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740618076; x=1741222876;
+        d=1e100.net; s=20230601; t=1740618077; x=1741222877;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=RDoWSiiBmUA4Cvc4ko+cuVneWh/qlxcsIoQ/Ggi5MbQ=;
-        b=fFEX9QZCeptc5vFYBv0uGiVHyxYz0CMlU6Q5f55uN53Y4LBG2R/BOV8CdXiKUlO2H0
-         xZEJsN2qgv8xRKR53sCJqESQWikRW+lELnsJN0E5qYT8hwJMnEL5dJDDQ8c9E4e03tX/
-         eEV2TWhOr8hWY/g52Lj9l+jSk0vtbbqWJyyJibaqOH1J+HN2y3CcnS7wR6JSiUQ+cHjV
-         3duVFrU84QkPyf3fNF0tU8oELpIxiu+qXWOP3zZi5APEI38xqXjsWASehc+fIjkRMWXu
-         DE1RQxrKY86OGY/fclfpZFLEzpYwwHsWb80kczsQrzbSKD4H0hkAzd0UfiI7thvfzOJY
-         G0Fw==
-X-Gm-Message-State: AOJu0YyWthXol8STja0hVVBohybW0y6wOIAsKqAZ6FqUmq7BAh/RA6pA
-	sWS7yQC1iCIrQBjKU0s/AfTAxaNhEaFsYmlKkrEPxrYNnz6Y6+XVmSKmZiqNPYPGE4LFIIL9Mmr
-	mkg==
-X-Google-Smtp-Source: AGHT+IH1hWe5Okz6/gdiRccw2sOEjxHYPXs3ilAyiVOoy2RH4ZzxsE7mftj9onRF83A6Ybwzulh3XobBvzI=
-X-Received: from pjbtb8.prod.google.com ([2002:a17:90b:53c8:b0:2fc:ccfe:368])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5686:b0:2ee:aed6:9ec2
- with SMTP id 98e67ed59e1d1-2fe7e30045emr10064662a91.14.1740618075925; Wed, 26
- Feb 2025 17:01:15 -0800 (PST)
+        bh=vBrLV0hVNi1a5D0W6BOn6trR5W1NotqikKgQ5Tv/tAA=;
+        b=cmdgSEFKzqRTvnLf3IopSI9H+sxWD2OG2uBDGyj2Mz9ohbtcJJ3Nliw48fWyJbyuai
+         k7RCE2e+MwehtUsYoWZPnDzSlNgXO//et1VA3ImfxT41iYB5DV1EN6xl1tfXnLGSJlUc
+         bwEShWxJIoBUULtQX2es2DamB8qM0FsUVJiEW5Xa3oYTKGrecDDBf1aArEKAK9N42oRK
+         xcApNKeHOlfDAUQwa96NQ0DUZQTedqoijZF89dQIUAE8Fmeel9JBb4cUkS0xkVw5q2vy
+         1Tk7SpilqDG7KxwvNTrF2JKgsvxkne5b8CqGKUWhRhjU2P4/ZJ9zpj7PaWSoHgNksxf5
+         IzLw==
+X-Gm-Message-State: AOJu0YxhT6jiIVtw0IL3VX2lJvHPAbnZw2bX1Ox575QgSTMRTlOynIhw
+	MEiYmCwBKBqUH1NNYrTbd5qy0rfVQBE83PCaduGcFc2T6aB7CSuKRSHP5FgEsXQEKrUbZQYvAnS
+	xhw==
+X-Google-Smtp-Source: AGHT+IHs7OvM6rkyJG6uPTB8OuiiFrOfEIijhU66O7j1sKQRSBCikrQVvi/YgsIilD/6fEgCFLkFRZL+ErE=
+X-Received: from pfbfb26.prod.google.com ([2002:a05:6a00:2d9a:b0:734:4341:5d97])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:eccb:b0:220:ea90:1925
+ with SMTP id d9443c01a7336-221a1148e99mr409270715ad.35.1740618077666; Wed, 26
+ Feb 2025 17:01:17 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 26 Feb 2025 17:01:10 -0800
+Date: Wed, 26 Feb 2025 17:01:11 -0800
 In-Reply-To: <20250227010111.3222742-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,57 +75,48 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250227010111.3222742-1-seanjc@google.com>
 X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <20250227010111.3222742-2-seanjc@google.com>
-Subject: [PATCH 1/2] x86/msr: Rename the WRMSRNS opcode macro to ASM_WRMSRNS
- (for KVM)
+Message-ID: <20250227010111.3222742-3-seanjc@google.com>
+Subject: [PATCH 2/2] KVM: x86: Advertise support for WRMSRNS
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Xin Li <xin@zytor.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Rename the WRMSRNS instruction opcode macro so that it doesn't collide
-with X86_FEATURE_WRMSRNS when using token pasting to generate references
-to X86_FEATURE_WRMSRNS.  KVM heavily uses token pasting to generate KVM's
-set of support feature bits, and adding WRMSRNS support in KVM will run
-will run afoul of the opcode macro.
+Advertise support for WRMSRNS (WRMSR non-serializing) to userspace if the
+instruction is supported by the underlying CPU.  From a virtualization
+perspective, the only difference between WRMSRNS and WRMSR is that VM-Exits
+due to WRMSRNS set EXIT_QUALIFICATION to '1'.  WRMSRNS doesn't require a
+new enabling control, shares the same basic exit reason, and behaves the
+same as WRMSR with respect to MSR interception.
 
-  arch/x86/kvm/cpuid.c:719:37: error: pasting "X86_FEATURE_" and "" "" does not
-                                      give a valid preprocessing token
-  719 |         u32 __leaf = __feature_leaf(X86_FEATURE_##name);                \
-      |                                     ^~~~~~~~~~~~
+  WRMSR and WRMSRNS use the same basic exit reason (see Appendix C). For
+  WRMSR, the exit qualification is 0, while for WRMSRNS it is 1.
 
-KVM has worked around one such collision in the past by #undef'ing the
-problematic macro in order to avoid blocking a KVM rework, but such games
-are generally undesirable, e.g. requires bleeding macro details into KVM,
-risks weird behavior if what KVM is #undef'ing changes, etc.
+Don't do anything different when emulating WRMSRNS vs. WRMSR, as KVM can't
+do anything less, i.e. can't make emulation non-serializing.  The
+motivation for the guest to use WRMSRNS instead of WRMSR is to avoid
+immediately serializing the CPU when the necessary serialization is
+guaranteed by some other mechanism, i.e. WRMSRNS being fully serializing
+isn't guest-visible, just less performant.
 
+Suggested-by: Xin Li (Intel) <xin@zytor.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/msr.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/x86/kvm/cpuid.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/x86/include/asm/msr.h b/arch/x86/include/asm/msr.h
-index 001853541f1e..60b80a36d045 100644
---- a/arch/x86/include/asm/msr.h
-+++ b/arch/x86/include/asm/msr.h
-@@ -300,7 +300,7 @@ do {							\
- #endif	/* !CONFIG_PARAVIRT_XXL */
- 
- /* Instruction opcode for WRMSRNS supported in binutils >= 2.40 */
--#define WRMSRNS _ASM_BYTES(0x0f,0x01,0xc6)
-+#define ASM_WRMSRNS _ASM_BYTES(0x0f,0x01,0xc6)
- 
- /* Non-serializing WRMSR, when available.  Falls back to a serializing WRMSR. */
- static __always_inline void wrmsrns(u32 msr, u64 val)
-@@ -309,7 +309,7 @@ static __always_inline void wrmsrns(u32 msr, u64 val)
- 	 * WRMSR is 2 bytes.  WRMSRNS is 3 bytes.  Pad WRMSR with a redundant
- 	 * DS prefix to avoid a trailing NOP.
- 	 */
--	asm volatile("1: " ALTERNATIVE("ds wrmsr", WRMSRNS, X86_FEATURE_WRMSRNS)
-+	asm volatile("1: " ALTERNATIVE("ds wrmsr", ASM_WRMSRNS, X86_FEATURE_WRMSRNS)
- 		     "2: " _ASM_EXTABLE_TYPE(1b, 2b, EX_TYPE_WRMSR)
- 		     : : "c" (msr), "a" ((u32)val), "d" ((u32)(val >> 32)));
- }
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 97a90689a9dc..ebecfe4bea1e 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -992,6 +992,7 @@ void kvm_set_cpu_caps(void)
+ 		F(FZRM),
+ 		F(FSRS),
+ 		F(FSRC),
++		F(WRMSRNS),
+ 		F(AMX_FP16),
+ 		F(AVX_IFMA),
+ 		F(LAM),
 -- 
 2.48.1.711.g2feabab25a-goog
 
