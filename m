@@ -1,150 +1,136 @@
-Return-Path: <kvm+bounces-39423-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39424-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E92CEA47078
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:46:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 859E5A4708C
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:52:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51E963A7023
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 00:46:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A53F16E9A8
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 00:52:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5B991DA5F;
-	Thu, 27 Feb 2025 00:46:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38F804D8CE;
+	Thu, 27 Feb 2025 00:52:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PzZt9R+f"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wNILA9DJ"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1456270037
-	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 00:46:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B03938FA6
+	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 00:51:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740617170; cv=none; b=bPoEhXoaIAS3K0W+utrTq6o4NKZI72eaCT67h2LHJH+OY3ijGLz0wpPT7ssBNZWXIkeM6lREQUHjG/jJZHESExzZc9FV3VKn63KszdM4RNyX0/TTbVE7DjEinNXfYQWRlJ1+qUMAyzIE3jSibCrG9SOKdOJJY+clPJPOTuXDvAQ=
+	t=1740617519; cv=none; b=VPZhVhGiH1EF2xqF8YgIAIkbizYkn0we/ipfl1NRUP6b62TE0VtDLQlMuGwiBDZLaVUjhP5Se1sunOh6e9HI9JnYZdqG0ZQhVDZtkLvu7z1d66p84oqgluLmJcjdqaJKtGtlySbj8QFIcctGWzGEB7MHp5/XiOApHq6oJFPNQY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740617170; c=relaxed/simple;
-	bh=GsbplUyiPzK2RcL3j5EFMOXrQypLBGL/7X0N4yL3uTU=;
+	s=arc-20240116; t=1740617519; c=relaxed/simple;
+	bh=Q7mNOkHjkgMmZIP6NY5cOonhJIgXhPCJV3iNp/QtlhY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VPQ7j0er/FeM7pwu0UX3cnEtTLVChuclQ7Iu30GlXMFFPnCL60qS/gkpMr9zvcAoUFK163tf1IUWbZYAR2Rf/0fwOmUzPPgDUXFaUOAqE2nZjCjhQdxOM2wVtClAgEJM46Q3izwOlKVtWdsdOoy8p7csh7LtcPaQq3wM1kuYxf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PzZt9R+f; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=kMlMYXfrYs+JsSuyfnvDEMMLOAhc8esotFYTX8gxW1CQSmWx4HNhvkC/XPYNTgKMEd1vBkN+vlIZuGMtJj4Z8Iy5urq++ruvzeACEhnnHwBPTYmHuvNBuRUkwFEmOPHimlGdYAQ3hiODkqgv3j4W29CX3hI4gj+gmsG45e2DiVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wNILA9DJ; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-22334230880so4580515ad.1
-        for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 16:46:08 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2233b764fc8so6215545ad.3
+        for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 16:51:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740617168; x=1741221968; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1740617517; x=1741222317; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hn0Pk7DdXD560KhFHLztox3NbezGKbjUTRJg0LOXoPE=;
-        b=PzZt9R+f6xxBf/dMwTjShxK5wSWpB1JgMRIs7Pg0nRFDx26CVNwrs2P+8Ght4SjjHj
-         GYIwjZ5uWCC3v/0qtMWvrdAz3X3GTrrhC4OSfXyLuK5d/RZn5Gh4qxpFJwkW59gXhk3D
-         5MQiCL0EAYfKGRADs2QTsBBGPnOOlGB3cYOiv6hY9TYrDKq6+ygTqWulCvsUjtOeXAkT
-         KqBEkcRLdgcV2bs7Xinm18k4qZ+1BbuxAad7nCZtjgZMX3nWh14tqXDp2v1a/rTvnudN
-         EYWyKVmZE7Ov41rG+mb+M26OHgWMJWmV8lGCacZ3Kuj6YBxSrBOmnacLLncBMnH1kiGH
-         0hyw==
+        bh=EJotyZiERuL6yZQBDvDnm5IddJUBCXFIUhbBusTXxps=;
+        b=wNILA9DJwSfaz+/FgVDFsta5xGuj+gnGpK6sHsfci7ZXNns9WBL6UM+2o6J+Kqu61g
+         WxZZzY8vPV51whMMcnPQhK6dqbafOlE5cbqOsIEBWvJ3xhy4K0wRAcgr8RqsDNIZVTzx
+         2VBGJlqcaDa3q7aQmlKahTx5jvvtSeR2mHP61nbsKnucGHwH78hPFppZf31AlQndSVIR
+         tMF5GruKGgNthtNdrL2EEUzK/2/WxDPoV/f76xi98vKHzr2MQM3uW3C+NQzTweiHhYq8
+         PoJYYnLVBk6CiEtZR/d7InKoSjo8FcFNWr0X62Nc21GIEZg1/SZYuEaY++bqpnF5+Tpb
+         WM3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740617168; x=1741221968;
+        d=1e100.net; s=20230601; t=1740617517; x=1741222317;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hn0Pk7DdXD560KhFHLztox3NbezGKbjUTRJg0LOXoPE=;
-        b=utu0jZrfZilYSnk3etKOIdVhty64j/BPe+/6twLPBJ93tOz4SPhawFu/sMHvPOAIaR
-         NIRA1PEmBlc5HpCFvUmMQ/6b5tfRFLmLP8/P+D33HpB5Z0W3NS+JOO/yIJc+pFEX98RF
-         wIcYmgjn4m4Utb/g4RRSlnwc0THaoruqHHQV23YCCBOc9PKjc8tRl8P/X26vD/KAkmyH
-         YBQ0U+OnGREHq9+vtuIb5YVbUiyb6ZrZzYJjIC0kCdGP3JJHBR0hfl6yfhFWzz0IEYOe
-         QKz++Me9onuux+v30MuPhjqQB95T7e3T5mfelh+Go4wmnVZ7pQ9ZpuRobJxZW4cZxCns
-         aQdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUk0ioYvEnDahH31DB7nTaCMkShTEHu7SCR8ljvTq6VobQqXD3yba8WdHDQR3zw3GPJETU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVB2Ra3HNGOma8vZDTzgDYhR8zrLMVGt9iHRVRR46ekrVGekrS
-	qjifFytAjezhQeEloCzMckEHpklf9GvXo76Wrlm6qdJmBkF9P8rMZrMYjyZdji6kaKICFrGiSc0
-	OpQ==
-X-Google-Smtp-Source: AGHT+IH2WM4xX/I/9Cf4I8pfwJJDfsSS1+XA6ioOiO3B1DczWxFPo2dPJfXNJSjcedJwObmWHzjhXzfgUGI=
-X-Received: from pjbnc5.prod.google.com ([2002:a17:90b:37c5:b0:2fc:11a0:c54d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:983:b0:21f:14c1:d58e
- with SMTP id d9443c01a7336-2219ff8279dmr394871355ad.1.1740617168076; Wed, 26
- Feb 2025 16:46:08 -0800 (PST)
-Date: Wed, 26 Feb 2025 16:46:06 -0800
-In-Reply-To: <Z76BTqmAJPV7lBbA@google.com>
+        bh=EJotyZiERuL6yZQBDvDnm5IddJUBCXFIUhbBusTXxps=;
+        b=ojGjnu/x02hjAG+ygAnrnOMY6x41b8WrOoMXnqsFw57Ytaz5oWwMT1LrA0ofaf3jgq
+         nI1S+hPNcgmgEE+ZLi+OYPT8imW6JDBtc+8itURlhwuRwaDMsn5wuxJ3jLr4tgAQJCoT
+         xosG8EEcAkoPN6aqPQHtpCDG9duQzgsnCjGu+w3bHxNTuQAEdSrrBnGQ4UW1sOAXnY94
+         8LhX0PqVJ6cwwi2Ilrbmo0y6ty30v1gXA1n0XHa5Chl0AYv4ymXS5Ku6anowuxqq1bGU
+         OmdC8qo232uZnXQe5vfvtvf/y3voHGzUBltxcXvZJ/Y7BOlsvllgrYCceHyLpVzI/IAh
+         EZkw==
+X-Forwarded-Encrypted: i=1; AJvYcCXwEIXKkVb1Bs28kkHbVym8yNbLGaE8mll+3o2mGYfbfsRq3wHTUb1WMYKq2Z7Q9Vk7tHE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsFFwCguznCAs87ZAsaDdc/aEc5C3isX0cyYvpLzxqPbI45jcR
+	w3eLNSiWjHXkA+aXxqPigwtVT6UKise2gmm88IFFWLH6jWO3iVZVrB2z4tHgH0WdPlQTxr1mEyi
+	4Ug==
+X-Google-Smtp-Source: AGHT+IEL51u+VHZPqDrfRj4ysQhapPxjeZQ1gDCkR3XNIivE5W3G5YIUboDt4EBORJQZsRkmkIxq982vmL4=
+X-Received: from pjbeu5.prod.google.com ([2002:a17:90a:f945:b0:2ef:82c0:cb8d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d502:b0:21a:8300:b9ce
+ with SMTP id d9443c01a7336-221a002afb5mr402718905ad.49.1740617517337; Wed, 26
+ Feb 2025 16:51:57 -0800 (PST)
+Date: Wed, 26 Feb 2025 16:51:55 -0800
+In-Reply-To: <4c605b4e395a3538d9a2790918b78f4834912d72.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250219220826.2453186-1-yosry.ahmed@linux.dev>
- <20250219220826.2453186-5-yosry.ahmed@linux.dev> <Z74exImxJpQI9iyA@google.com>
- <59ea1984b2893be8a3a72855b022d16c67b857e9@linux.dev> <Z75G2L6N1vR3DslT@google.com>
- <Z76BTqmAJPV7lBbA@google.com>
-Message-ID: <Z7-1zv3Pb659rTj6@google.com>
-Subject: Re: [PATCH 4/6] x86/bugs: Use a static branch to guard IBPB on vCPU load
+References: <20250204004038.1680123-1-jthoughton@google.com>
+ <025b409c5ca44055a5f90d2c67e76af86617e222.camel@redhat.com>
+ <Z7UwI-9zqnhpmg30@google.com> <07788b85473e24627131ffe1a8d1d01856dd9cb5.camel@redhat.com>
+ <Z75lcJOEFfBMATAf@google.com> <4c605b4e395a3538d9a2790918b78f4834912d72.camel@redhat.com>
+Message-ID: <Z7-3K-CXnoqHhmgC@google.com>
+Subject: Re: [PATCH v9 00/11] KVM: x86/mmu: Age sptes locklessly
 From: Sean Christopherson <seanjc@google.com>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	"H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Josh Poimboeuf <jpoimboe@kernel.org>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
-	Andy Lutomirski <luto@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: James Houghton <jthoughton@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Wei Xu <weixugc@google.com>, Yu Zhao <yuzhao@google.com>, 
+	Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org, 
 	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Feb 26, 2025, Yosry Ahmed wrote:
-> On Tue, Feb 25, 2025 at 02:40:24PM -0800, Sean Christopherson wrote:
-> > On Tue, Feb 25, 2025, Yosry Ahmed wrote:
-> > > February 25, 2025 at 11:49 AM, "Sean Christopherson" <seanjc@google.com> wrote:
-> > > >
-> > > > On Wed, Feb 19, 2025, Yosry Ahmed wrote:
-> > > > > 
-> > > > > Instead of using X86_FEATURE_USE_IBPB to guard the IBPB execution in the
-> > > > >  vCPU load path, introduce a static branch, similar to switch_mm_*_ibpb. 
-> > > > > 
-> > > > >  This makes it obvious in spectre_v2_user_select_mitigation() what
-> > > > >  exactly is being toggled, instead of the unclear X86_FEATURE_USE_IBPB
-> > > > >  (which will be shortly removed). It also provides more fine-grained
-> > > > >  control, making it simpler to change/add paths that control the IBPB in
-> > > > >  the vCPU load path without affecting other IBPBs.
-> > > > > 
-> > > > >  Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
-> > > > > 
-> > > > >  ---
-> > > > > 
-> > > > >  arch/x86/include/asm/nospec-branch.h | 2 ++
-> > > > >  arch/x86/kernel/cpu/bugs.c | 5 +++++
-> > > > >  arch/x86/kvm/svm/svm.c | 2 +-
-> > > > >  arch/x86/kvm/vmx/vmx.c | 2 +-
-> > > > >  4 files changed, 9 insertions(+), 2 deletions(-)
-> > > > > 
-> > > > >  diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
-> > > > >  index 7cbb76a2434b9..a22836c5fb338 100644
-> > > > >  --- a/arch/x86/include/asm/nospec-branch.h
-> > > > >  +++ b/arch/x86/include/asm/nospec-branch.h
-> > > > >  @@ -552,6 +552,8 @@ DECLARE_STATIC_KEY_FALSE(switch_to_cond_stibp);
-> > > > >  DECLARE_STATIC_KEY_FALSE(switch_mm_cond_ibpb);
-> > > > > 
-> > > DECLARE_STATIC_KEY_FALSE(switch_mm_always_ibpb);
-> > > > >  
-> > > +DECLARE_STATIC_KEY_FALSE(vcpu_load_ibpb);
-> > > > > 
-> > > > 
-> > > > How about ibpb_on_vcpu_load? To make it easy for readers to understand exactly
-> > > > what the knob controls.
-> > > 
-> > > I was trying to remain consistent with the existing static branches' names,
-> > > but I am fine with ibpb_on_vcpu_load if others don't object.
+On Wed, Feb 26, 2025, Maxim Levitsky wrote:
+> On Tue, 2025-02-25 at 16:50 -0800, Sean Christopherson wrote:
+> > On Tue, Feb 25, 2025, Maxim Levitsky wrote:
+> > What if we make the assertion user controllable?  I.e. let the user opt-out (or
+> > off-by-default and opt-in) via command line?  We did something similar for the
+> > rseq test, because the test would run far fewer iterations than expected if the
+> > vCPU task was migrated to CPU(s) in deep sleep states.
 > > 
-> > I assumed as much :-)  I'm ok with vcpu_load_ibpb if that's what others prefer.
+> > 	TEST_ASSERT(skip_sanity_check || i > (NR_TASK_MIGRATIONS / 2),
+> > 		    "Only performed %d KVM_RUNs, task stalled too much?\n\n"
+> > 		    "  Try disabling deep sleep states to reduce CPU wakeup latency,\n"
+> > 		    "  e.g. via cpuidle.off=1 or setting /dev/cpu_dma_latency to '0',\n"
+> > 		    "  or run with -u to disable this sanity check.", i);
+> > 
+> > This is quite similar, because as you say, it's impractical for the test to account
+> > for every possible environmental quirk.
 > 
-> To be honest looking at this again I think I prefer consistency, so if
-> you don't mind and others don't chime in I'd rather keep it as-is.
+> No objections in principle, especially if sanity check is skipped by default, 
+> although this does sort of defeats the purpose of the check. 
+> I guess that the check might still be used for developers.
 
-Works for me.
+A middle ground would be to enable the check by default if NUMA balancing is off.
+We can always revisit the default setting if it turns out there are other problematic
+"features".
 
-Actually, looking at the names again, wouldn't "switch_vcpu_ibpb" be better?
-KVM doesn't do IBPB on every vCPU load or even every VMCS load, only when a
-different vCPU is being loaded.
+> > > > Aha!  I wonder if in the failing case, the vCPU gets migrated to a pCPU on a
+> > > > different node, and that causes NUMA balancing to go crazy and zap pretty much
+> > > > all of guest memory.  If that's what's happening, then a better solution for the
+> > > > NUMA balancing issue would be to affine the vCPU to a single NUMA node (or hard
+> > > > pin it to a single pCPU?).
+> > > 
+> > > Nope. I pinned main thread to  CPU 0 and VM thread to  CPU 1 and the problem
+> > > persists.  On 6.13, the only way to make the test consistently work is to
+> > > disable NUMA balancing.
+> > 
+> > Well that's odd.  While I'm quite curious as to what's happening,
 
-> Alternatively I can rename all the static branches (e.g.
-> ibpb_always_on_switch_mm) :P
+Gah, chatting about this offline jogged my memory.  NUMA balancing doesn't zap
+(mark PROT_NONE/PROT_NUMA) PTEs for paging the kernel thinks are being accessed
+remotely, it zaps PTEs to see if they're are being accessed remotely.  So yeah,
+whenever NUMA balancing kicks in, the guest will see a large amount of its memory
+get re-faulted.
 
-LOL, also works for me.
+Which is why it's such a terribly feature to pair with KVM, at least as-is.  NUMA
+balancing is predicated on inducing and resolving the #PF being relatively cheap,
+but that doesn't hold true for secondary MMUs due to the coarse nature of mmu_notifiers.
 
