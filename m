@@ -1,127 +1,169 @@
-Return-Path: <kvm+bounces-39431-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39432-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C74B2A470B8
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:13:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDB37A470B9
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:13:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC0AB16CC49
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:13:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E5173AFC73
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:13:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DDB545038;
-	Thu, 27 Feb 2025 01:13:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82415137742;
+	Thu, 27 Feb 2025 01:13:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="veH0IRC7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wRd89/ii"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5088D8BEC
-	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 01:13:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D7CB54764
+	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 01:13:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740618807; cv=none; b=GVOHYKhH1YBm2ArelC/LLl73CaMUCLEPA9yrPZW/yW+5HqVA9WdKZbtnd47469fbKFMtjZx98PcnRK4aqxKDeiKHeuHU/qPNQwqnbKF0yB2k8V45icVeiJ3SkbFPEeKjLmCFo63+QUuV5Z3ivyFjWeDJkm/X9kw8xg+wfP+kiUk=
+	t=1740618810; cv=none; b=V892ULX6Of6YhVhvEL0omPuW3tT/wNv8k+AqfG64gsrn9OQS9Bdw9cljeKQ6YdgKCVI7K147wF4XUNbtOX5zhy30h40arick1fFcEReKJZdWQLkSrXkBXp34mDNrHoknFLv13NJw5akkWWCTaCR/MfEFvvOzc+fmsylB7yaSaDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740618807; c=relaxed/simple;
-	bh=Lor6SfZp2UjEyAoJzhwqvgbGSJZTBeb4Jom36JXMyHM=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=hzvL8SPRXWjrM4MLKb2QbkctAVq562jgVp10X5mOl7F2MNp39VJsAUh7mDwAj4N9eHkgeQczcUimRiPrFuIMjN9cUlDT/8F0OdkF22HgQ22bFhP7OMWh9fwpNYDZboG3WFjTSaWu6cgqbuKYSqgc707BIpbzhvG0967JWhBRKMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=veH0IRC7; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1740618810; c=relaxed/simple;
+	bh=zm2QaR360KIl6iSEbDz2zLo3X3lN7lh4lpL7RxCk81I=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=l3dg2rM7PJJUmQTPlVLagxsW0m8SmDzxEmoUNm7s3jNgdnw8JAK8xoHWSnPmy6Pxk54z0Q0DpmJVEb2KxzWYVsACNGy0qsXfU0qgu72mvjkmDHth2ia6pAAA5MtbyTQJ3OUOhRGLE6wOmlb0qb/yWKyMXLIMFXIaDTn7YILVrsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wRd89/ii; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fc4fc93262so882623a91.1
-        for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 17:13:26 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fc518f0564so972993a91.2
+        for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 17:13:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740618805; x=1741223605; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JjnOSkXxka3TSv8G5RQWCjyM7vwr1n8JaR1Ewf7JVQg=;
-        b=veH0IRC7JKA8gbbsEAFBFISxByG32MYaQOpkt1qA1DOjsiu2jt69hGiRAroWvrqR1h
-         gFBQInEnQmPP14nXJ1k7XJyqr2a+zRqEJH3iHpovOCl9RfZmKtvN7N2qT83yzA1GETO8
-         lS3wxSTIMyWPbAn9LjHY4h6I4nC9sc57pKfZlonXFLS6fpPv1RkQ1H3AqABFGnbID+sA
-         1GCuuSL/9HB/Szx683fPqQI+WbgHTjb+eUh05kc+woaiD/lG0jphW3u3IWkQad0SUyzM
-         hbrrc+zgQ6hsqxleCJbvf3CrZXUt50owS1cs/J/j/clvCn9HNGPo8qJmKy+UjoN9rc2V
-         IO5Q==
+        d=google.com; s=20230601; t=1740618808; x=1741223608; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:reply-to:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0b+q4LTl32D7RG/ClIETiGyEI98jipo9UuVZ1dxYatM=;
+        b=wRd89/iii27OqFapIVMolJmD9T0c5Dy3zTnftS1MoFzmPRE4KydgURruYpBG5PNHJN
+         t+uYDGWKxesHEg81ljVNJwFdWnPleG43Sj70vFtKr5mON2aLmTuQvWhi0b7kq4buOoL4
+         qkI9tdHUdfp12IJj+1dZnK8zT9nXb5KE3RM9FYpYi97LeencG+HLQdzq+yK+BdbHYtEy
+         V6fZNMyZE1J/MspMkON4upRIpBONxjQQ3JUQaLqJmgWGGO6R1oU3u3nkDOZALQoUszS9
+         tqY9VzFrolqSnH6jVxWbqynJy+OjsHA4DqNpvrQZ0QgZzfVthdpIQgrKGi2l24zOA2ci
+         i11g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740618805; x=1741223605;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JjnOSkXxka3TSv8G5RQWCjyM7vwr1n8JaR1Ewf7JVQg=;
-        b=LThoxZeIVEHBdMAECTNrV5MD1X0wdg+rgUgQuB8GrFmUuW9Eb4GXIPKNywpriYsNPk
-         ZFvx7GcnVR8spxXRGl3m3YPPND1ztey8RNjH3cAIYrK6Ie07AQMFWRyY39Oh1XOvZVWr
-         p4aXFn/qj+uzkmqalP1oFyAmUzsaiJ6KmB46eH3/NYRnnYUWHnzTcAxGKzR17x9AWd1C
-         LnQv/+vW24/URo3GW6ix8ZsWns/gvtatdnaMB27NF6sV3XPW19o2t+GKH+O/01DEw/p7
-         dQVTF+it9CcXu7uqnTS0hzd4fqRfDHgwJhEnI/mQGu99NQ7vaoIQ+JyGm4zclhfcDrRt
-         CSuw==
-X-Gm-Message-State: AOJu0YyIxO2bfdkxtPb8H9NnERB3Uof/++NeIr//mvip3X43qymzXz1A
-	K2lzhYHgPeY1wmy45FnAbRC5l74SHn421NY4BuwaDXwvXNE0UJSFuvUue9k4DIMq+ky/S2RUu/r
-	5rQ==
-X-Google-Smtp-Source: AGHT+IF+SiLDo6I/7KX+GUDAeZrbAeuXqpvDOf7PYTATYP/HNqTRbWNERG9q4U91Ijj8cK+Z0sZXhGwU2PA=
-X-Received: from pjh15.prod.google.com ([2002:a17:90b:3f8f:b0:2fc:c98:ea47])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:7895:b0:1ee:8a68:f83e
- with SMTP id adf61e73a8af0-1f10ad7cff7mr8351116637.20.1740618805598; Wed, 26
- Feb 2025 17:13:25 -0800 (PST)
+        d=1e100.net; s=20230601; t=1740618808; x=1741223608;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:reply-to:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=0b+q4LTl32D7RG/ClIETiGyEI98jipo9UuVZ1dxYatM=;
+        b=H/j00qMoMh7h0Q4ADC0OQlzgxCxC6UQYHAryrAL3f9gu91/RQRcL0mTcO5xtSgwvDN
+         ITC2/BZS8KGDb7uroxOXvRCuOGOGnOLnEMSnD1Jfof8cq2BI8ctKAqXcGd508CUJxkjD
+         OFY7SF6pV5KpR75K0l8MlYYIO584ULnMNot9mXpHcHQT2fwHEwV9VVcH83breZ/e5/MH
+         OjrjnyjFTS8w/vdcbFuhnsxrzTewC8GZp1Hv1F0Gka84al3+2DVsfodXj54Y1qbKg2DX
+         FaNpy2cG4HOvbWVRPqv6Pv9eVbXloHl3h6AMYNkkFcMd8V/Yu3PxJfAPpXgtnlXFcdX2
+         dQAA==
+X-Gm-Message-State: AOJu0YyLdgMZQoQhCrVkIjAfZ7Dq4A8mHnk6vM212ApmAeNOwDosawzJ
+	F6HgW+IsjTX5rk59KfGh03rQjugMB8G96j+BcJuSgRX37wpVkC3WdVD2jVr4TES0Ru5nIr3PwFe
+	SKA==
+X-Google-Smtp-Source: AGHT+IH4j2hz+QG3bfdUby9AHcMKdde1f0mz0Lh4hjfInlOzv66k2GVgHs1NibxtzgfdBTAmj0DWWrBKdCc=
+X-Received: from pgzz124.prod.google.com ([2002:a63:3382:0:b0:801:d5e9:804f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:3287:b0:1ee:d06c:cddc
+ with SMTP id adf61e73a8af0-1f0fc78fb84mr17684149637.30.1740618808506; Wed, 26
+ Feb 2025 17:13:28 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 26 Feb 2025 17:13:16 -0800
+Date: Wed, 26 Feb 2025 17:13:17 -0800
+In-Reply-To: <20250227011321.3229622-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250227011321.3229622-1-seanjc@google.com>
 X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <20250227011321.3229622-1-seanjc@google.com>
-Subject: [PATCH v2 0/5] KVM: SVM: Fix DEBUGCTL bugs
+Message-ID: <20250227011321.3229622-2-seanjc@google.com>
+Subject: [PATCH v2 1/5] KVM: SVM: Drop DEBUGCTL[5:2] from guest's effective value
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Ravi Bangoria <ravi.bangoria@amd.com>, Xiaoyao Li <xiaoyao.li@intel.com>, rangemachine@gmail.com, 
 	whanos@sergal.fun
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Fix a long-lurking bug in SVM where KVM runs the guest with the host's
-DEBUGCTL if LBR virtualization is disabled.  AMD CPUs rather stupidly
-context switch DEBUGCTL if and only if LBR virtualization is enabled (not
-just supported, but fully enabled).
+Drop bits 5:2 from the guest's effective DEBUGCTL value, as AMD changed
+the architectural behavior of the bits and broke backwards compatibility.
+On CPUs without BusLockTrap (or at least, in APMs from before ~2023),
+bits 5:2 controlled the behavior of external pins:
 
-The bug has gone unnoticed because until recently, the only bits that
-KVM would leave set were things like BTF, which are guest visible but
-won't cause functional problems unless guest software is being especially
-particular about #DBs.
+  Performance-Monitoring/Breakpoint Pin-Control (PBi)=E2=80=94Bits 5:2, rea=
+d/write.
+  Software uses thesebits to control the type of information reported by
+  the four external performance-monitoring/breakpoint pins on the
+  processor. When a PBi bit is cleared to 0, the corresponding external pin
+  (BPi) reports performance-monitor information. When a PBi bit is set to
+  1, the corresponding external pin (BPi) reports breakpoint information.
 
-The bug was exposed by the addition of BusLockTrap ("Detect" in the kernel),
-as the resulting #DBs due to split-lock accesses in guest userspace (lol
-Steam) get reflected into the guest by KVM.
+With the introduction of BusLockTrap, presumably to be compatible with
+Intel CPUs, AMD redefined bit 2 to be BLCKDB:
 
-v2:
- - Load the guest's DEBUGCTL instead of simply zeroing it on VMRUN.
- - Drop bits 5:3 from guest DEBUGCTL so that KVM doesn't let the guest
-   unintentionally enable BusLockTrap (AMD repurposed bits). [Ravi]
- - Collect a review. [Xiaoyao]
- - Make bits 5:3 fully reserved, in a separate not-for-stable patch.
+  Bus Lock #DB Trap (BLCKDB)=E2=80=94Bit 2, read/write. Software sets this =
+bit to
+  enable generation of a #DB trap following successful execution of a bus
+  lock when CPL is > 0.
 
-v1: https://lore.kernel.org/all/20250224181315.2376869-1-seanjc@google.com
+and redefined bits 5:3 (and bit 6) as "6:3 Reserved MBZ".
 
-Sean Christopherson (5):
-  KVM: SVM: Drop DEBUGCTL[5:2] from guest's effective value
-  KVM: x86: Snapshot the host's DEBUGCTL in common x86
-  KVM: SVM: Manually context switch DEBUGCTL if LBR virtualization is
-    disabled
-  KVM: x86: Snapshot the host's DEBUGCTL after disabling IRQs
-  KVM: SVM: Treat DEBUGCTL[5:2] as reserved
+Ideally, KVM would treat bits 5:2 as reserved.  Defer that change to a
+feature cleanup to avoid breaking existing guest in LTS kernels.  For now,
+drop the bits to retain backwards compatibility (of a sort).
 
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/svm/svm.c          | 15 +++++++++++++++
- arch/x86/kvm/svm/svm.h          |  2 +-
- arch/x86/kvm/vmx/vmx.c          |  8 ++------
- arch/x86/kvm/vmx/vmx.h          |  2 --
- arch/x86/kvm/x86.c              |  2 ++
- 6 files changed, 21 insertions(+), 9 deletions(-)
+Note, dropping bits 5:2 is still a guest-visible change, e.g. if the guest
+is enabling LBRs *and* the legacy PBi bits, then the state of the PBi bits
+is visible to the guest, whereas now the guest will always see '0'.
 
+Reported-by: Ravi Bangoria <ravi.bangoria@amd.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/svm/svm.c | 12 ++++++++++++
+ arch/x86/kvm/svm/svm.h |  2 +-
+ 2 files changed, 13 insertions(+), 1 deletion(-)
 
-base-commit: fed48e2967f402f561d80075a20c5c9e16866e53
--- 
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index b8aa0f36850f..2280bd1d0863 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3165,6 +3165,18 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct=
+ msr_data *msr)
+ 			kvm_pr_unimpl_wrmsr(vcpu, ecx, data);
+ 			break;
+ 		}
++
++		/*
++		 * AMD changed the architectural behavior of bits 5:2.  On CPUs
++		 * without BusLockTrap, bits 5:2 control "external pins", but
++		 * on CPUs that support BusLockDetect, bit 2 enables BusLockTrap
++		 * and bits 5:3 are reserved-to-zero.  Sadly, old KVM allowed
++		 * the guest to set bits 5:2 despite not actually virtualizing
++		 * Performance-Monitoring/Breakpoint external pins.  Drop bits
++		 * 5:2 for backwards compatibility.
++		 */
++		data &=3D ~GENMASK(5, 2);
++
+ 		if (data & DEBUGCTL_RESERVED_BITS)
+ 			return 1;
+=20
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 5b159f017055..f573548b7b41 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -582,7 +582,7 @@ static inline bool is_vnmi_enabled(struct vcpu_svm *svm=
+)
+ /* svm.c */
+ #define MSR_INVALID				0xffffffffU
+=20
+-#define DEBUGCTL_RESERVED_BITS (~(0x3fULL))
++#define DEBUGCTL_RESERVED_BITS (~(DEBUGCTLMSR_BTF | DEBUGCTLMSR_LBR))
+=20
+ extern bool dump_invalid_vmcb;
+=20
+--=20
 2.48.1.711.g2feabab25a-goog
 
 
