@@ -1,160 +1,202 @@
-Return-Path: <kvm+bounces-39620-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39621-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D86F5A4872C
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 19:01:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 265E2A487B8
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 19:24:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 457E518805CC
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 18:01:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92C9B3AD4D2
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 18:24:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67C811F583D;
-	Thu, 27 Feb 2025 18:01:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF8D51F584B;
+	Thu, 27 Feb 2025 18:24:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eZry2d5r"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="G3/XvC/X"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 858401B85D1;
-	Thu, 27 Feb 2025 18:01:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E98831B424D;
+	Thu, 27 Feb 2025 18:24:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740679275; cv=none; b=oQsELHG8eJt/7NJZdOCrAU6JMMf898xNIUrLO/oj0mjC9alh90ICGjAv8G/C7v+npbROerys3UBb339a/DlIesD2WIb/bm/RsE+jZqcGIDGjm6qr0XqLiUO6i1Dxy8y0urDXFFUuBc03HXGVfX7Kwo8rVk40bfyRHuMeSQWDmbw=
+	t=1740680655; cv=none; b=IAQzqka42/KsxeK8w11pbhtw1AAzWqHwSFYxP4VpEAsjwc/KbUxVCpeJebWfhXu3akz8h4RWJkftNFN0h+kK/8FFlh/HbHCHEPAvbN7A7pTmxY7tnycFFczsE//9FMTO83y9ZXfWx/4QxDbBXkA8B/gGmb1ahUIJj6d4LxyiMIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740679275; c=relaxed/simple;
-	bh=3XVFYbbjNamhUDzQJ1R+kHQaWqC9SxhecKBhmHXEdwU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bhDE+IyseBxRmh+2KjXFrt3zxDRcgIIC/b8B4uCbeZY4cn101iLFZlJybsMHU6wjuKpmdHCBYDMWD+25NlbAjUnykKRTGvkJ45/w5YWJHtOXBt/20l4M6faxWx/OvOrnlwAGvaV3SYqIuF7nBKUuMObxdiPbZj5qJNBKbKhn2+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eZry2d5r; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740679274; x=1772215274;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=3XVFYbbjNamhUDzQJ1R+kHQaWqC9SxhecKBhmHXEdwU=;
-  b=eZry2d5rOkKoFkLbFYbMKMutmkUP+SlhezKMdtU0c1VhCCmdCZlpGcsR
-   7bduBeUsMoaHBhkAp5nHfm++UKIIYsqzL74AUYlLhAkJpyJTiSBElu0GX
-   y0Im5q3vfzEDj3aBPehd6b4nqTI+dGjaFHeoSxPXvr6qCpB5Dde30kvqP
-   zgepH6Is5Z3EzQ3DyuqC1jPzkhmKTMTSdzWXd24IkQ9YniZtE1Fsfx2Tv
-   RYJwZ+iU7ZkCiN/xFOa9jKui4GVFmmeGLyX70n32v6ulIUJh5buYT3ikT
-   VEDtWbdvJfl0ccNKDAzmWWBFQooAiPSNNAzadnbQQrzGCa3lpeTW3AeGf
-   w==;
-X-CSE-ConnectionGUID: 0XzKtTjZSSCzS6Nb8mOuLQ==
-X-CSE-MsgGUID: vYlRsMUbTDKBpFooupSwDQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11358"; a="41716243"
-X-IronPort-AV: E=Sophos;i="6.13,320,1732608000"; 
-   d="scan'208";a="41716243"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2025 10:01:13 -0800
-X-CSE-ConnectionGUID: T7NanKZkRee0egOgOybplw==
-X-CSE-MsgGUID: /jHVGTofTdOOaYGs+DVVvA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,320,1732608000"; 
-   d="scan'208";a="122222209"
-Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
-  by fmviesa004.fm.intel.com with ESMTP; 27 Feb 2025 10:01:10 -0800
-Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tniC4-000DoM-1b;
-	Thu, 27 Feb 2025 18:01:08 +0000
-Date: Fri, 28 Feb 2025 02:00:40 +0800
-From: kernel test robot <lkp@intel.com>
-To: Longfang Liu <liulongfang@huawei.com>, alex.williamson@redhat.com,
-	jgg@nvidia.com, shameerali.kolothum.thodi@huawei.com,
-	jonathan.cameron@huawei.com
-Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linuxarm@openeuler.org,
-	liulongfang@huawei.com
-Subject: Re: [PATCH v4 1/5] hisi_acc_vfio_pci: fix XQE dma address error
-Message-ID: <202502280126.kuSX5nFF-lkp@intel.com>
-References: <20250225062757.19692-2-liulongfang@huawei.com>
+	s=arc-20240116; t=1740680655; c=relaxed/simple;
+	bh=I1CbooREzLYn9AAlLO5H4sUKHJxW7EPg7nEEHpyFmNQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=FFWuTyj8wYmrxXFj150GVeZijiDkf2/ls5hy3WKQPM1CYAZAQDivcgg0BiJGNSCm6FujP44nrXNASqqaqd//MVmGnH7OWWGKGJnxADAz4td94Zw6B1ADugjappO5nuTQXu2YzDqPx81cKIQwmCVeIimaXVT6GB9IUZ6I82VD3yE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=G3/XvC/X; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1740680653; x=1772216653;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=j3OPBGuyioaxsCKCSnyqb+F4cY9H+pA8vNbT+Ls4f/A=;
+  b=G3/XvC/X20YPL2O+wFXBQjsinccl8Xrr8olD/DNvb4u9vyeruoSySQ6O
+   j2XE1DuRKasNrTmRWGl4HI4hV/kULyXW60nyLoBj62xFDeO1k0AhNIZal
+   Q2Bk5rO+fxMlNcLuG1XSiVin7/Ci8M97xlPAKA9SzeoIkc+659CB2Jrff
+   g=;
+X-IronPort-AV: E=Sophos;i="6.13,320,1732579200"; 
+   d="scan'208";a="69833984"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2025 18:24:10 +0000
+Received: from EX19MTAEUC002.ant.amazon.com [10.0.43.254:43332]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.1.85:2525] with esmtp (Farcaster)
+ id a2951172-87b8-49fe-bd0f-813ab7bbf005; Thu, 27 Feb 2025 18:24:08 +0000 (UTC)
+X-Farcaster-Flow-ID: a2951172-87b8-49fe-bd0f-813ab7bbf005
+Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
+ EX19MTAEUC002.ant.amazon.com (10.252.51.245) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 27 Feb 2025 18:24:08 +0000
+Received: from [192.168.19.93] (10.106.83.21) by EX19D022EUC002.ant.amazon.com
+ (10.252.51.137) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14; Thu, 27 Feb 2025
+ 18:24:07 +0000
+Message-ID: <7f2b25c9-c92b-4b0a-bfd9-dda8b0b7a244@amazon.com>
+Date: Thu, 27 Feb 2025 18:24:05 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250225062757.19692-2-liulongfang@huawei.com>
+User-Agent: Mozilla Thunderbird
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [RFC PATCH 0/6] KVM: x86: async PF user
+To: Sean Christopherson <seanjc@google.com>
+CC: <pbonzini@redhat.com>, <corbet@lwn.net>, <tglx@linutronix.de>,
+	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
+	<hpa@zytor.com>, <rostedt@goodmis.org>, <mhiramat@kernel.org>,
+	<mathieu.desnoyers@efficios.com>, <kvm@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-trace-kernel@vger.kernel.org>, <jthoughton@google.com>,
+	<david@redhat.com>, <peterx@redhat.com>, <oleg@redhat.com>,
+	<vkuznets@redhat.com>, <gshan@redhat.com>, <graf@amazon.de>,
+	<jgowans@amazon.com>, <roypat@amazon.co.uk>, <derekmn@amazon.com>,
+	<nsaenz@amazon.es>, <xmarcalx@amazon.com>
+References: <20241118123948.4796-1-kalyazin@amazon.com>
+ <Z6u-WdbiW3n7iTjp@google.com>
+ <a7080c07-0fc5-45ce-92f7-5f432a67bc63@amazon.com>
+ <Z7X2EKzgp_iN190P@google.com>
+ <6eddd049-7c7a-406d-b763-78fa1e7d921b@amazon.com>
+ <Z7d5HT7FpE-ZsHQ9@google.com>
+ <f820b630-13c1-4164-baa8-f5e8231612d1@amazon.com>
+ <Z75nRwSBxpeMwbsR@google.com>
+ <946fc0f5-4306-4aa9-9b63-f7ccbaff8003@amazon.com>
+ <Z8CWUiAYVvNKqzfK@google.com>
+Content-Language: en-US
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
+ CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
+ i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
+In-Reply-To: <Z8CWUiAYVvNKqzfK@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D006EUA002.ant.amazon.com (10.252.50.65) To
+ EX19D022EUC002.ant.amazon.com (10.252.51.137)
 
-Hi Longfang,
+On 27/02/2025 16:44, Sean Christopherson wrote:
+> On Wed, Feb 26, 2025, Nikita Kalyazin wrote:
+>> On 26/02/2025 00:58, Sean Christopherson wrote:
+>>> On Fri, Feb 21, 2025, Nikita Kalyazin wrote:
+>>>> On 20/02/2025 18:49, Sean Christopherson wrote:
+>>>>> On Thu, Feb 20, 2025, Nikita Kalyazin wrote:
+>>>>>> On 19/02/2025 15:17, Sean Christopherson wrote:
+>>>>>>> On Wed, Feb 12, 2025, Nikita Kalyazin wrote:
+>>>>>>> The conundrum with userspace async #PF is that if userspace is given only a single
+>>>>>>> bit per gfn to force an exit, then KVM won't be able to differentiate between
+>>>>>>> "faults" that will be handled synchronously by the vCPU task, and faults that
+>>>>>>> usersepace will hand off to an I/O task.  If the fault is handled synchronously,
+>>>>>>> KVM will needlessly inject a not-present #PF and a present IRQ.
+>>>>>>
+>>>>>> Right, but from the guest's point of view, async PF means "it will probably
+>>>>>> take a while for the host to get the page, so I may consider doing something
+>>>>>> else in the meantime (ie schedule another process if available)".
+>>>>>
+>>>>> Except in this case, the guest never gets a chance to run, i.e. it can't do
+>>>>> something else.  From the guest point of view, if KVM doesn't inject what is
+>>>>> effectively a spurious async #PF, the VM-Exiting instruction simply took a (really)
+>>>>> long time to execute.
+>>>>
+>>>> Sorry, I didn't get that.  If userspace learns from the
+>>>> kvm_run::memory_fault::flags that the exit is due to an async PF, it should
+>>>> call kvm run immediately, inject the not-present PF and allow the guest to
+>>>> reschedule.  What do you mean by "the guest never gets a chance to run"?
+>>>
+>>> What I'm saying is that, as proposed, the API doesn't precisely tell userspace
+>                                                                           ^^^^^^^^^
+>                                                                           KVM
+>>> an exit happened due to an "async #PF".  KVM has absolutely zero clue as to
+>>> whether or not userspace is going to do an async #PF, or if userspace wants to
+>>> intercept the fault for some entirely different purpose.
+>>
+>> Userspace is supposed to know whether the PF is async from the dedicated
+>> flag added in the memory_fault structure:
+>> KVM_MEMORY_EXIT_FLAG_ASYNC_PF_USER.  It will be set when KVM managed to
+>> inject page-not-present.  Are you saying it isn't sufficient?
+> 
+> Gah, sorry, typo.  The API doesn't tell *KVM* that userfault exit is due to an
+> async #PF.
+> 
+>>> Unless the remote page was already requested, e.g. by a different vCPU, or by a
+>>> prefetching algorithim.
+>>>
+>>>> Conversely, if the page content is available, it must have already been
+>>>> prepopulated into guest memory pagecache, the bit in the bitmap is cleared
+>>>> and no exit to userspace occurs.
+>>>
+>>> But that doesn't happen instantaneously.  Even if the VMM somehow atomically
+>>> receives the page and marks it present, it's still possible for marking the page
+>>> present to race with KVM checking the bitmap.
+>>
+>> That looks like a generic problem of the VM-exit fault handling.  Eg when
+> 
+> Heh, it's a generic "problem" for faults in general.  E.g. modern x86 CPUs will
+> take "spurious" page faults on write accesses if a PTE is writable in memory but
+> the CPU has a read-only mapping cached in its TLB.
+> 
+> It's all a matter of cost.  E.g. pre-Nehalem Intel CPUs didn't take such spurious
+> read-only faults as they would re-walk the in-memory page tables, but that ended
+> up being a net negative because the cost of re-walking for all read-only faults
+> outweighed the benefits of avoiding spurious faults in the unlikely scenario the
+> fault had already been fixed.
+> 
+> For a spurious async #PF + IRQ, the cost could be signficant, e.g. due to causing
+> unwanted context switches in the guest, in addition to the raw overhead of the
+> faults, interrupts, and exits.
+> 
+>> one vCPU exits, userspace handles the fault and races setting the bitmap
+>> with another vCPU that is about to fault the same page, which may cause a
+>> spurious exit.
+>>
+>> On the other hand, is it malignant?  The only downside is additional
+>> overhead of the async PF protocol, but if the race occurs infrequently, it
+>> shouldn't be a problem.
+> 
+> When it comes to uAPI, I want to try and avoid statements along the lines of
+> "IF 'x' holds true, then 'y' SHOULDN'T be a problem".  If this didn't impact uAPI,
+> I wouldn't care as much, i.e. I'd be much more willing iterate as needed.
+> 
+> I'm not saying we should go straight for a complex implementation.  Quite the
+> opposite.  But I do want us to consider the possible ramifications of using a
+> single bit for all userfaults, so that we can at least try to design something
+> that is extensible and won't be a pain to maintain.
 
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on awilliam-vfio/next]
-[also build test WARNING on awilliam-vfio/for-linus linus/master v6.14-rc4 next-20250227]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Longfang-Liu/hisi_acc_vfio_pci-fix-XQE-dma-address-error/20250225-143347
-base:   https://github.com/awilliam/linux-vfio.git next
-patch link:    https://lore.kernel.org/r/20250225062757.19692-2-liulongfang%40huawei.com
-patch subject: [PATCH v4 1/5] hisi_acc_vfio_pci: fix XQE dma address error
-config: loongarch-allyesconfig (https://download.01.org/0day-ci/archive/20250228/202502280126.kuSX5nFF-lkp@intel.com/config)
-compiler: loongarch64-linux-gcc (GCC) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250228/202502280126.kuSX5nFF-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202502280126.kuSX5nFF-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c: In function 'vf_qm_version_check':
->> drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c:357:17: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
-     357 |                 if (vf_data->major_ver < ACC_DRV_MAJOR_VER ||
-         |                 ^~
-   drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c:360:25: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
-     360 |                         return -EINVAL;
-         |                         ^~~~~~
-   drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c: In function 'vf_qm_get_match_data':
-   drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c:448:30: error: 'ACC_DRV_MAR' undeclared (first use in this function)
-     448 |         vf_data->major_ver = ACC_DRV_MAR;
-         |                              ^~~~~~~~~~~
-   drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c:448:30: note: each undeclared identifier is reported only once for each function it appears in
-   drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c:449:30: error: 'ACC_DRV_MIN' undeclared (first use in this function)
-     449 |         vf_data->minor_ver = ACC_DRV_MIN;
-         |                              ^~~~~~~~~~~
-
-
-vim +/if +357 drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-
-   352	
-   353	static int vf_qm_version_check(struct acc_vf_data *vf_data, struct device *dev)
-   354	{
-   355		switch (vf_data->acc_magic) {
-   356		case ACC_DEV_MAGIC_V2:
- > 357			if (vf_data->major_ver < ACC_DRV_MAJOR_VER ||
-   358			    vf_data->minor_ver < ACC_DRV_MINOR_VER)
-   359				dev_info(dev, "migration driver version not match!\n");
-   360				return -EINVAL;
-   361			break;
-   362		case ACC_DEV_MAGIC_V1:
-   363			/* Correct dma address */
-   364			vf_data->eqe_dma = vf_data->qm_eqc_dw[QM_XQC_ADDR_HIGH];
-   365			vf_data->eqe_dma <<= QM_XQC_ADDR_OFFSET;
-   366			vf_data->eqe_dma |= vf_data->qm_eqc_dw[QM_XQC_ADDR_LOW];
-   367			vf_data->aeqe_dma = vf_data->qm_aeqc_dw[QM_XQC_ADDR_HIGH];
-   368			vf_data->aeqe_dma <<= QM_XQC_ADDR_OFFSET;
-   369			vf_data->aeqe_dma |= vf_data->qm_aeqc_dw[QM_XQC_ADDR_LOW];
-   370			break;
-   371		default:
-   372			return -EINVAL;
-   373		}
-   374	
-   375		return 0;
-   376	}
-   377	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+So you would've liked more the "two-bit per gfn" approach as in: provide 
+2 interception points, for sync and async exits, with the former chosen 
+by userspace when it "knows" that the content is already in memory? 
+What makes it a conundrum then?  It looks like an incremental change to 
+what has already been proposed.  There is a complication that 2-bit 
+operations aren't atomic, but even 1 bit is racy between KVM and userspace.
 
