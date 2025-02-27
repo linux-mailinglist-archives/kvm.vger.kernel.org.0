@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-39455-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39456-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B103A470EF
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:24:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F9CCA470F2
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:24:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C280E16F671
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:23:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 527CB188A5B6
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:24:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3AB21BD03F;
-	Thu, 27 Feb 2025 01:19:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1C0F1C6FE6;
+	Thu, 27 Feb 2025 01:19:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z4+Js9zr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TZ+oJogq"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7240214B965;
-	Thu, 27 Feb 2025 01:19:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893951C07DA;
+	Thu, 27 Feb 2025 01:19:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740619186; cv=none; b=XY8annml1qjJ04rGFsS952YYP2a7Xwfg+43trX+TI/OTz6YfNhUOyJJp7rNmqPj5NTdKI/2EsBOWBWp9Ur/kJbx2jlHNfH0AnOYrQ3IQLpODG/HRsXZM2Wc3nojko5iWtN8NW7NYhpgWbJHo/62SEzbSXqSU+9AoRKFOvOpEUAs=
+	t=1740619189; cv=none; b=TMY+Qrm6I3+8CcL/ZCihOiBhIRElN1fxJ/F4+3s1Hh5UfvdptVzgnya6bsvSU7CUqpXqz/R2riq+LeLkbuhJDgMfHphtyOuBwfja8oZZ2Lqpw4BgZEiS3LkAKDXgA21mmq+wNCxvir9R+EYaHr8VF3keunNXbh+4ygiCv7R1+AE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740619186; c=relaxed/simple;
-	bh=1FiDmvpnC4DRyC4nO4hfG0+/4Ilohx50+cijVzK/D84=;
+	s=arc-20240116; t=1740619189; c=relaxed/simple;
+	bh=XJaBTgpvmUOYXvblbK+evXNJHErt7dbEPe57+h9OFdA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Q8mOJ0WCGIZ1FrRHFSKBq/nKkTpmTjEfNBLJeuCp3b9uHGoU3c1JOu7aotLcZRaSvHXgl0zrQab3ihilX/6f+v00mud1vRCzPKB1kuhr3gFs/8EcJwbSQlvWZG1LPZyy+sXw5g58F9gWpKyXY+6/8Fs/V/bpeKHpF6c5ELiXPDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z4+Js9zr; arc=none smtp.client-ip=198.175.65.9
+	 MIME-Version; b=egLnN5bH3bwBcXzmxYudYXcFDtsRuGu/WHacEy7ALquBtF4MC+mW4PLgYw+wpih2RGp8DjHq54vlDeoeKqjLICQaX8oOomfcLrliAsaBTV+H8/wC2GmyWDjxxj9nWVo3TlMKif7c7X8HdXpi9PRkIJWTpnBiABT+LRUmZFd/TO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TZ+oJogq; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740619185; x=1772155185;
+  t=1740619189; x=1772155189;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=1FiDmvpnC4DRyC4nO4hfG0+/4Ilohx50+cijVzK/D84=;
-  b=Z4+Js9zr0GbskW+f1BXxNsTd7kYV72fmilMFftevKvUk+zxG8ITwaTzC
-   FXfGHuFmQ+yJvts3CfPSm2WUyGoG1RLbNW9wjOAX3mv3CYTXJZaCmElBM
-   d9yX48CGcipLaMPCJCvcOqlal3Ry4Pi8AZOoq4uKf7yg+qJcYhaKo3pcc
-   emXjjmeU+pOE1eIXBW9io9wGUWZV+xlzrC+RXhS7LP6/oJ0n/Rl8ZPzHY
-   7qB5GNRd+RIp7uXrOes5xVb0+Pg36jBE1n59IXF+5mJOKP8dFQpjCHYvP
-   EeUJ/UZ2Ah9SONzZBOg8KODE2/Qo2L2kpzXBE6RGB9VqU724DSVCSb4qe
-   g==;
-X-CSE-ConnectionGUID: HToI0uZgTbmUo8PjBibOJQ==
-X-CSE-MsgGUID: F6TwHFvaRX29bFmURnD6xA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11357"; a="63959689"
+  bh=XJaBTgpvmUOYXvblbK+evXNJHErt7dbEPe57+h9OFdA=;
+  b=TZ+oJogq8qu4MVLVQPO0wrOSru5DurmAbmTeQs/XhNRV9X9vff/KqDSQ
+   XXjTRlLCEEKzfyMiLuwr2tGdLjUvLKVVNcUG7g0IyW1H7ZRMse8P+SGmK
+   siG2ycJ7LfmBAtkeFHRoHtR8pBopyokg11pgfr7XkMutjP7dK3zfLZ8z3
+   OkPK7FICKCO/c7WxQpCR1V71OxmYn1Botiu8D8Tm2q/NjrxPSA9PcHlVN
+   JDvC2jE0Npb6sXpS0on6IMHtA3Ukfl+tgg4C/u6hm6ra3OnQ6/dNUqhmb
+   e6Zism2VSbw2nFUguQ/hBGRHONxsBcH/UNuAsQjvsJNJmPNZgKuHHAZmN
+   Q==;
+X-CSE-ConnectionGUID: BYKBpeBKQTuUWI45+sEEoQ==
+X-CSE-MsgGUID: bgYJCz4MRoWzSm6kfllh9g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11357"; a="63959695"
 X-IronPort-AV: E=Sophos;i="6.13,318,1732608000"; 
-   d="scan'208";a="63959689"
+   d="scan'208";a="63959695"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 17:19:45 -0800
-X-CSE-ConnectionGUID: iSPkmwjEQY2LeeHmHd6tNg==
-X-CSE-MsgGUID: AC5V+EonQRCorckgj1u9Lw==
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 17:19:48 -0800
+X-CSE-ConnectionGUID: dkpu7eQWTFucAns7gVrD+g==
+X-CSE-MsgGUID: Um/k5dJ0TI2X3mXmyP3P0A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,318,1732608000"; 
-   d="scan'208";a="116674928"
+   d="scan'208";a="116674931"
 Received: from litbin-desktop.sh.intel.com ([10.239.156.93])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 17:19:41 -0800
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 17:19:45 -0800
 From: Binbin Wu <binbin.wu@linux.intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com,
@@ -73,9 +73,9 @@ Cc: rick.p.edgecombe@intel.com,
 	chao.gao@intel.com,
 	linux-kernel@vger.kernel.org,
 	binbin.wu@linux.intel.com
-Subject: [PATCH v2 17/20] KVM: TDX: Add a method to ignore hypercall patching
-Date: Thu, 27 Feb 2025 09:20:18 +0800
-Message-ID: <20250227012021.1778144-18-binbin.wu@linux.intel.com>
+Subject: [PATCH v2 18/20] KVM: TDX: Enable guest access to MTRR MSRs
+Date: Thu, 27 Feb 2025 09:20:19 +0800
+Message-ID: <20250227012021.1778144-19-binbin.wu@linux.intel.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20250227012021.1778144-1-binbin.wu@linux.intel.com>
 References: <20250227012021.1778144-1-binbin.wu@linux.intel.com>
@@ -87,63 +87,37 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+Allow TDX guests to access MTRR MSRs as what KVM does for normal VMs, i.e.,
+KVM emulates accesses to MTRR MSRs, but doesn't virtualize guest MTRR
+memory types.
 
-Because guest TD memory is protected, VMM patching guest binary for
-hypercall instruction isn't possible.  Add a method to ignore hypercall
-patching.  Note: guest TD kernel needs to be modified to use
-TDG.VP.VMCALL for hypercall.
+TDX module exposes MTRR feature to TDX guests unconditionally.  KVM needs
+to support MTRR MSRs accesses for TDX guests to match the architectural
+behavior.
 
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
 ---
 TDX "the rest" v2:
-- No change.
-
-TDX "the rest" v1:
-- Renamed from
-  "KVM: TDX: Add a method to ignore for TDX to ignore hypercall patch"
-  to "KVM: TDX: Add a method to ignore hypercall patching".
-- Dropped KVM_BUG_ON() in vt_patch_hypercall(). (Rick)
-- Remove "with a warning" from "Add a method to ignore hypercall
-  patching with a warning." in changelog to reflect code change.
+- Add the MTRR access support back, but drop the special handling for
+  TDX guests, just align with what KVM does for normal VMs.
 ---
- arch/x86/kvm/vmx/main.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/tdx.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index d73ea9ce750d..fa8b5f609666 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -673,6 +673,19 @@ static u32 vt_get_interrupt_shadow(struct kvm_vcpu *vcpu)
- 	return vmx_get_interrupt_shadow(vcpu);
- }
- 
-+static void vt_patch_hypercall(struct kvm_vcpu *vcpu,
-+				  unsigned char *hypercall)
-+{
-+	/*
-+	 * Because guest memory is protected, guest can't be patched. TD kernel
-+	 * is modified to use TDG.VP.VMCALL for hypercall.
-+	 */
-+	if (is_td_vcpu(vcpu))
-+		return;
-+
-+	vmx_patch_hypercall(vcpu, hypercall);
-+}
-+
- static void vt_inject_irq(struct kvm_vcpu *vcpu, bool reinjected)
- {
- 	if (is_td_vcpu(vcpu))
-@@ -952,7 +965,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.update_emulated_instruction = vmx_update_emulated_instruction,
- 	.set_interrupt_shadow = vt_set_interrupt_shadow,
- 	.get_interrupt_shadow = vt_get_interrupt_shadow,
--	.patch_hypercall = vmx_patch_hypercall,
-+	.patch_hypercall = vt_patch_hypercall,
- 	.inject_irq = vt_inject_irq,
- 	.inject_nmi = vt_inject_nmi,
- 	.inject_exception = vt_inject_exception,
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index dbc9fffcbc26..5b957e5e503d 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -2049,6 +2049,9 @@ bool tdx_has_emulated_msr(u32 index)
+ 	case MSR_IA32_ARCH_CAPABILITIES:
+ 	case MSR_IA32_POWER_CTL:
+ 	case MSR_IA32_CR_PAT:
++	case MSR_MTRRcap:
++	case MTRRphysBase_MSR(0) ... MSR_MTRRfix4K_F8000:
++	case MSR_MTRRdefType:
+ 	case MSR_IA32_TSC_DEADLINE:
+ 	case MSR_IA32_MISC_ENABLE:
+ 	case MSR_PLATFORM_INFO:
 -- 
 2.46.0
 
