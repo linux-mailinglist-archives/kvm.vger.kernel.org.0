@@ -1,138 +1,100 @@
-Return-Path: <kvm+bounces-39476-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39477-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFEEEA4717C
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:45:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41770A471A3
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:50:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 724F61663E3
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:39:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FAE2162B61
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:44:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DFDD232384;
-	Thu, 27 Feb 2025 01:27:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E27EA1ADC7B;
+	Thu, 27 Feb 2025 01:41:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dleod8m2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZYDIKWt0"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BF60233133
-	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 01:27:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0068C1ABEC5
+	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 01:41:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740619670; cv=none; b=lvKusZ+WV2kqghEWRUTW9D/3XkaIJ9bn/JqszLJO7xJaqVZWgIF0ASDaGE5jn90v9IwU+BWhe3UUqsVR6FcmnhQpdX5kMDAMfePWdiKyzCOyRnGDDcHwKBVczxTK+XjAgAR3aodBPHo8jpr66Jk+CIXObcDaPjO3Z5SoTbak/s0=
+	t=1740620486; cv=none; b=KN7KgoNrqWCiGeO9tHuKD5jd6E5/6GRvC8MZjAFuoVZSU9BMi2DhvlJQOmA4pMe6zME9CzOt+kxVSZ/nJiEjAmxrRFWlTDXOgHfBS604qOWMpxC3/RXLUGgC5IRoSMW+q54ZPHHspkfcXC27H3IS0ebCFozik9LFB3OUYGxn9yY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740619670; c=relaxed/simple;
-	bh=QUgGWqklPPosGsyZ3Z7EXMRiIvGCTPkrFA3wnDmEsLs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dGNtwGIfHvpANuFVq036B8NISp3z5BepIG/tusWkkrnPkzCzZ1i+fkRRe8yk16i8fTv/AcpCsz3AGXslffhbmUzu85lvk7KHzs71vCJyaP4wm8w5OsQB5UzXDDNN1scyENdUBRrRHU+vD4AdP6RTfPoBdakcrBDuFPKz9ZX5Uog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dleod8m2; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740619667;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ty8akjPjzreCygqHdAJtAp6Bdr+8wKY9U5PWbWuBGmQ=;
-	b=dleod8m2cczArYaABu+5pJLQHAUA7zeXWbXUbqEKn21Gpi7il9G8M3i/H8pv/+AuKRz1WU
-	4myNSwPgg9QdKVkHpZ475BnX+7fmNAHslL/j2untrpYpNPJeqnpfPXlKndh2k8QM68Ya0P
-	t6JFiFUAlTTgyPueDjIfd/HClVK5DjY=
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: x86@kernel.org,
-	Sean Christopherson <seanjc@google.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jim Mattson <jmattson@google.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yosry Ahmed <yosry.ahmed@linux.dev>
-Subject: [PATCH v2 6/6] x86/bugs: Remove X86_FEATURE_USE_IBPB
-Date: Thu, 27 Feb 2025 01:27:12 +0000
-Message-ID: <20250227012712.3193063-7-yosry.ahmed@linux.dev>
-In-Reply-To: <20250227012712.3193063-1-yosry.ahmed@linux.dev>
-References: <20250227012712.3193063-1-yosry.ahmed@linux.dev>
+	s=arc-20240116; t=1740620486; c=relaxed/simple;
+	bh=Uh8v7nQ+Ir93Sl+r18zQm8iu7CgR5AwBCEP9ygizBTY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=DZHyd7flRwcklTtExci7RJib6rkUvh/7VU7sTKw9M7kHekjhzrVETVUPVi0bLv5Nwi7hfVqouSF9wSOeAIK1oitJ1vAJT2gq/lSiJvUNR9fF9Ty4USIjIZUPMwxJHs4DdbfCDv8hutoLvFiQDSX4niKOc3EcLERt0U0ngaDnuoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZYDIKWt0; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2233b154004so8732645ad.0
+        for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 17:41:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740620483; x=1741225283; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=w6l9m6fqMlLq1/610gDj8nnv1xOjQhHIjHJq9ELM5lQ=;
+        b=ZYDIKWt0a3DJh789OwAxCYpKnXq8f8tF3Qdfl9/FAUHBUyMmjnGH4LskoC6NGDGrFA
+         /KFxQ0zbg1QWZq5Om9QW1C2RL8wotsX/wyqd2Y8Uv7DaB5yDOjrCjJpbMiN7UGvh4CB6
+         Sfp+w2B1zYjWTac8Rtq/0dia5XT2aiL9CUl802QljwRTBjUDqiu3wCyh7wVUZPJeJfg0
+         xwcBFjZ2X6vv4A7CQdxOAkPuR/hQ0qLnypas1VstZU3tbca+sb9ts/jZKITYRfuxVywQ
+         Nwspw1LPwDZmjEHU33fnjDh4cfC0YUuuKpgRkkC6l6bHaTvLYBqzLct8nGH+KmmqsqH9
+         j1pQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740620483; x=1741225283;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=w6l9m6fqMlLq1/610gDj8nnv1xOjQhHIjHJq9ELM5lQ=;
+        b=ivr7SWuCtsIlLFka/j2XkUyPWge3OByiazLn5TeCqOvjUpUMz/wKWxSxprQys4nuNl
+         z29oW6xdw2lkC3jUrdWzumug82h4NXzAYscMXiqJYxGw9T6LtyfpQJsS50AaYvZFe0qu
+         JDKS+QUhgcmpNhQzbdZIczwJX40dXCAYy7ThU0ODDJbrUhwruU/WAOF1MAxQNw9R21Me
+         mtyzIbvwsPRJ2/xlHSL3ZmQdGrn5hh2WbdfN/hsHdCpjcqbkdMXeDKT0pzDIyQHD3L0o
+         EKNKbTm5C91GA+PkylJqhXD5+Eat4DfNg5VGE2scHM7ASZlP8hknBLk/GIHDBKF7dzQ3
+         3pvA==
+X-Forwarded-Encrypted: i=1; AJvYcCX+5JF/dW52pTQK1MFgnC10sPU5025ZIix7JojzC6kqmZoDsI52dL/96dHZYTzIW2WgxiI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFugbMi3FFy/qf1PxMI/ZvngdQN6yMHXVohF0pD9wOlso82KfM
+	ZIqiqN4D8GkEW8lHPGjSfIxyW6ZR+PjVv7fW4sAfXosFIYNMTZZeILozKiwyVJ83fw9agWGk3T+
+	90A==
+X-Google-Smtp-Source: AGHT+IG7Q8fN8EDpqtDnTkX2BbBCR1zsNJUiVjHqyfD/MBJpG4F8JviC5cGF5Cwpg0N7gFMxU1nBPseGqls=
+X-Received: from pfop3.prod.google.com ([2002:a05:6a00:b43:b0:730:92d9:52e3])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e887:b0:220:faa2:c917
+ with SMTP id d9443c01a7336-22320208770mr95991285ad.34.1740620483177; Wed, 26
+ Feb 2025 17:41:23 -0800 (PST)
+Date: Wed, 26 Feb 2025 17:41:21 -0800
+In-Reply-To: <20250227012712.3193063-2-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20250227012712.3193063-1-yosry.ahmed@linux.dev> <20250227012712.3193063-2-yosry.ahmed@linux.dev>
+Message-ID: <Z7_CwVbA3yyk6iF2@google.com>
+Subject: Re: [PATCH v2 1/6] x86/bugs: Move the X86_FEATURE_USE_IBPB check into callers
+From: Sean Christopherson <seanjc@google.com>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
+	Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
+	Josh Poimboeuf <jpoimboe@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-X86_FEATURE_USE_IBPB was introduced in commit 2961298efe1e
-("x86/cpufeatures: Clean up Spectre v2 related CPUID flags") to have
-separate flags for when the CPU supports IBPB (i.e. X86_FEATURE_IBPB)
-and when an IBPB is actually used to mitigate Spectre v2.
+On Thu, Feb 27, 2025, Yosry Ahmed wrote:
+> indirect_branch_prediction_barrier() only performs the MSR write if
+> X86_FEATURE_USE_IBPB is set, using alternative_msr_write(). In
+> preparation for removing X86_FEATURE_USE_IBPB, move the feature check
+> into the callers so that they can be addressed one-by-one, and use
+> X86_FEATURE_IBPB instead to guard the MSR write.
+> 
+> Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> Acked-by: Josh Poimboeuf <jpoimboe@kernel.org>
+> ---
 
-Ever since then, the uses of IBPB expanded. The name became confusing
-because it does not control all IBPB executions in the kernel.
-Furthermore, because its name is generic and it's buried within
-indirect_branch_prediction_barrier(), it's easy to use it not knowing
-that it is specific to Spectre v2.
-
-X86_FEATURE_USE_IBPB is no longer needed because all the IBPB executions
-it used to control are now controlled through other means (e.g.
-switch_mm_*_ibpb static branches). Remove the unused feature bit.
-
-Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
-Acked-by: Josh Poimboeuf <jpoimboe@kernel.org>
----
- arch/x86/include/asm/cpufeatures.h       | 1 -
- arch/x86/kernel/cpu/bugs.c               | 1 -
- tools/arch/x86/include/asm/cpufeatures.h | 1 -
- 3 files changed, 3 deletions(-)
-
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index 43653f2704c93..c8701abb77524 100644
---- a/arch/x86/include/asm/cpufeatures.h
-+++ b/arch/x86/include/asm/cpufeatures.h
-@@ -210,7 +210,6 @@
- #define X86_FEATURE_MBA			( 7*32+18) /* "mba" Memory Bandwidth Allocation */
- #define X86_FEATURE_RSB_CTXSW		( 7*32+19) /* Fill RSB on context switches */
- #define X86_FEATURE_PERFMON_V2		( 7*32+20) /* "perfmon_v2" AMD Performance Monitoring Version 2 */
--#define X86_FEATURE_USE_IBPB		( 7*32+21) /* Indirect Branch Prediction Barrier enabled */
- #define X86_FEATURE_USE_IBRS_FW		( 7*32+22) /* Use IBRS during runtime firmware calls */
- #define X86_FEATURE_SPEC_STORE_BYPASS_DISABLE	( 7*32+23) /* Disable Speculative Store Bypass. */
- #define X86_FEATURE_LS_CFG_SSBD		( 7*32+24)  /* AMD SSBD implementation via LS_CFG MSR */
-diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-index 7f904d0b0b04f..5397d0afac089 100644
---- a/arch/x86/kernel/cpu/bugs.c
-+++ b/arch/x86/kernel/cpu/bugs.c
-@@ -1368,7 +1368,6 @@ spectre_v2_user_select_mitigation(void)
- 
- 	/* Initialize Indirect Branch Prediction Barrier */
- 	if (boot_cpu_has(X86_FEATURE_IBPB)) {
--		setup_force_cpu_cap(X86_FEATURE_USE_IBPB);
- 		static_branch_enable(&switch_vcpu_ibpb);
- 
- 		spectre_v2_user_ibpb = mode;
-diff --git a/tools/arch/x86/include/asm/cpufeatures.h b/tools/arch/x86/include/asm/cpufeatures.h
-index 17b6590748c00..ec9911379c617 100644
---- a/tools/arch/x86/include/asm/cpufeatures.h
-+++ b/tools/arch/x86/include/asm/cpufeatures.h
-@@ -210,7 +210,6 @@
- #define X86_FEATURE_MBA			( 7*32+18) /* "mba" Memory Bandwidth Allocation */
- #define X86_FEATURE_RSB_CTXSW		( 7*32+19) /* Fill RSB on context switches */
- #define X86_FEATURE_PERFMON_V2		( 7*32+20) /* "perfmon_v2" AMD Performance Monitoring Version 2 */
--#define X86_FEATURE_USE_IBPB		( 7*32+21) /* Indirect Branch Prediction Barrier enabled */
- #define X86_FEATURE_USE_IBRS_FW		( 7*32+22) /* Use IBRS during runtime firmware calls */
- #define X86_FEATURE_SPEC_STORE_BYPASS_DISABLE	( 7*32+23) /* Disable Speculative Store Bypass. */
- #define X86_FEATURE_LS_CFG_SSBD		( 7*32+24)  /* AMD SSBD implementation via LS_CFG MSR */
--- 
-2.48.1.658.g4767266eb4-goog
-
+Acked-by: Sean Christopherson <seanjc@google.com>
 
