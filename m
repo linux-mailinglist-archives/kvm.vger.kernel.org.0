@@ -1,285 +1,170 @@
-Return-Path: <kvm+bounces-39526-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39527-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF4FCA472DA
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 03:32:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 834A6A473EB
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 05:01:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9FBE3A6411
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:32:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5D03188BE78
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 04:01:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C1C925D1FB;
-	Thu, 27 Feb 2025 02:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8B461E51EF;
+	Thu, 27 Feb 2025 04:01:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kInpiMw5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Pd9X2fgw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89D2724339C
-	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 02:20:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6323A1FAA;
+	Thu, 27 Feb 2025 04:01:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740622811; cv=none; b=A0kq9t6kjEp/nalC80vvnq6l/4nqYASVxePZctiNp0I1ipG9V0fLLevzPotdcau+7XDewyF9mFYRsFwjGMpPRjhVGg6+bTyHaT9ItVJTYzGZCOr4SQ9kG6XMle7bpIpTTPflqi5FAAh3DFVlef3G6dSziyBhtSznpzS+MiVT3dw=
+	t=1740628879; cv=none; b=auZhcbYP/KuDtPbjDJrFW/Hjc9C/uGn+fLF6dhMvAyncA8etykoGrIOKJyWIBu5c1H2At1JkE/+lJDrttvk8c67miyclfjnE0YoOSnlSrU+5cKllwe7BGfVHtAv4GxhEltyKlR/Yy5xloiF8018qujmjEiklaXrArdbrcRxP1BQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740622811; c=relaxed/simple;
-	bh=hxlTZC8hhB/2jCSFfc8NfglIDRkf8SaM4Ur2KmgRPXU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=UtnWH3aYhZf5AGvO+O9B7+3WGhDwNrcfNEPHFMIA3c10i4LdczUDkoVda89KvfkudzLSV14AGTsUOknuMHd7Ilxm4ntF8J3AUf8GbgyYIpH4e5m/7w7xueKI4vh67biym3odRYobrXtYdDCaXYBq6RrVh5qneDw5J1efg5YK31k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kInpiMw5; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fc1cb0c2cbso1527805a91.1
-        for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 18:20:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740622809; x=1741227609; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=7QXAixlOaLHnLrPcLZCTebtwCxVmNNMI9kZmebDzK/g=;
-        b=kInpiMw5cFJpmKPKzQWqgAYgEFH7NA5HxAfNs+JX3x7c2qEI6Uk36skqLbrkXzYmFr
-         +FCW/m70MEJIr4OxPaqOyTxBLImJt78g6Yj29Cxf3p6CMNbKr1a2exuVPPjOqmkVVA3u
-         bE7ycJhluAYX2g/2mwoGSt778RLrsjxbfHnkx+BG6/xDYsp4CfXcMpuDcLhPWUUtDzWn
-         LLJXrEMfC7nFwMOa6oSyKtMuKi1U5VcLIVIK+3LlVzBTwTAxMMzalNbG6DFwY2qDrvrj
-         m1aqtvJtyh2cAzFSrndlfPwxuOCZZUNX5TTQZTG5QRHW68SfAJx6WLQ4XnOPDGyYCU+p
-         Prqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740622809; x=1741227609;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7QXAixlOaLHnLrPcLZCTebtwCxVmNNMI9kZmebDzK/g=;
-        b=trl/dboAJfH/vS9wtIX2vUnqS4xbups3cx1oLme5XymbpdZBids6zGkwBEygpjFSM+
-         P4RjNUas8w0Y2AIUdllOmEyOQxBz67PJO3TXGAllvf0XIKjZQoW0r3bS78+TIiT7SNQS
-         h+Ih64+HTby4ZT+trMlXTRC9AL4r3eKXroGawrFHz3OBfUvJsgQI6jIm0kQMwmWhpFRa
-         9MN6i2+kpDchwHyaJ3CvPL6aEpAAh4AIBOKrobEA0DC2J/I455mmpPCYEKORpm1OTo1J
-         Gd6raUoikOeycOMdBsh0SHqHzCiLbJ3l5RiAsca+VEvodPb1f6aRMnlRfApjxH/BsLNz
-         xoyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUNVQ1sn3UIA7DFaNzSwxQYeVRyAN8ZDu1Y6WiPL8Nhos3MmuFRHn59bsmlvBiRLU5ugFg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyC0BQUjKc6+8gzHVFh5P5YiTRZMDH5lLQ9QdBq5LplrEAXtz7T
-	EsYNtd5B53GaAuBKUC1EC5zP1DN0Jm9u69mk7Pwja7kZus9jDEnCSZ1WiKgARrcnfgtA38tTw+K
-	Faw==
-X-Google-Smtp-Source: AGHT+IHi4d1QOUfXEPfDRjR4DxqWNosFyXVnkFi4SDlf4Oxmtkdi3La4kP/2IDxMG83GHnzWpK766unKU5E=
-X-Received: from pjz6.prod.google.com ([2002:a17:90b:56c6:b0:2fc:3022:36b8])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5688:b0:2ee:d63f:d77
- with SMTP id 98e67ed59e1d1-2fe68adec61mr16362401a91.9.1740622809153; Wed, 26
- Feb 2025 18:20:09 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 26 Feb 2025 18:18:54 -0800
-In-Reply-To: <20250227021855.3257188-1-seanjc@google.com>
+	s=arc-20240116; t=1740628879; c=relaxed/simple;
+	bh=IEjTmlHtu/G6YONIHp7Nc7Bjed+wo/mNljfTGEMgYoU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Cf/ADUtpFTbKXGWi+64014aaIzxWC0yjw2JYA1XfVq0jbwL/WHeWvvkiWuNHg25RGRa/uJvX3Nf9QVVkhi6NJFL2j1Y+8Ho+ftSMB4osm88tIYKl5TmJXpkf2PdyuEU8oT61upZvY7KXbcVMHMIMpKIBSn1NgeDlT1PNFjAN22I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Pd9X2fgw; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740628878; x=1772164878;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=IEjTmlHtu/G6YONIHp7Nc7Bjed+wo/mNljfTGEMgYoU=;
+  b=Pd9X2fgwid4qKtl0iI2E/iRAqmnOmn+3x5xPGvTWN2R6nzmHr296/85n
+   Iik76mRPuhyb2W1PUFsUIPFiJn5wGvALoXHhAXu14heH35hm48Y7hc5J7
+   0PY0eEHJmekgymiXLCJOZlPpleYv0KFbmkyW9UQItSKFccl2vG0rui9Gd
+   cPiBlFvqogNyB+/VoMIzwBlJssOVfxZjUhEZTyLAYVlrhCWXGvS2mDlXX
+   XNYWKJ0c+CX81emJ1Jc98fbW9CPh+HkIeZNMq5e4P+j5LmsJjCb0Ve4JQ
+   oBJwxWoPwlBkanLlos+TxTsSs7ZPzzfa0Q9Xo76O0LWAVokazAOAKkRGW
+   A==;
+X-CSE-ConnectionGUID: fBgsCYisS8Gz5Ly79cBOxw==
+X-CSE-MsgGUID: n4Dwb/ZFQKOzB8RAi26kaA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11357"; a="59039514"
+X-IronPort-AV: E=Sophos;i="6.13,319,1732608000"; 
+   d="scan'208";a="59039514"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 20:01:17 -0800
+X-CSE-ConnectionGUID: 28vhRiITRbmufxYLAhfSWw==
+X-CSE-MsgGUID: Lc4yBGteRBCDAlNlAOIahA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,319,1732608000"; 
+   d="scan'208";a="117075567"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by fmviesa008.fm.intel.com with ESMTP; 26 Feb 2025 20:01:10 -0800
+Date: Thu, 27 Feb 2025 11:59:18 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Alexey Kardashevskiy <aik@amd.com>, x86@kernel.org, kvm@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-arch@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>,
+	Joao Martins <joao.m.martins@oracle.com>,
+	Nicolin Chen <nicolinc@nvidia.com>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Steve Sistare <steven.sistare@oracle.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
+	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
+	Zhi Wang <zhiw@nvidia.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: Re: [RFC PATCH v2 14/22] iommufd: Add TIO calls
+Message-ID: <Z7/jFhlsBrbrloia@yilunxu-OptiPlex-7050>
+References: <20250218111017.491719-1-aik@amd.com>
+ <20250218111017.491719-15-aik@amd.com>
+ <Z72GmixR6NkzXAl7@yilunxu-OptiPlex-7050>
+ <2fe6b3c6-3eed-424d-87f0-34c4e7e1c906@amd.com>
+ <Z77xrqLtJfB84dJF@yilunxu-OptiPlex-7050>
+ <20250226131202.GH5011@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250227021855.3257188-1-seanjc@google.com>
-X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <20250227021855.3257188-39-seanjc@google.com>
-Subject: [PATCH v2 38/38] x86/paravirt: kvmclock: Setup kvmclock early iff
- it's sched_clock
-From: Sean Christopherson <seanjc@google.com>
-To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Sean Christopherson <seanjc@google.com>, Juergen Gross <jgross@suse.com>, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Ajay Kaher <ajay.kaher@broadcom.com>, 
-	Jan Kiszka <jan.kiszka@siemens.com>, Andy Lutomirski <luto@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Daniel Lezcano <daniel.lezcano@linaro.org>, 
-	John Stultz <jstultz@google.com>
-Cc: linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev, 
-	kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	linux-hyperv@vger.kernel.org, xen-devel@lists.xenproject.org, 
-	Tom Lendacky <thomas.lendacky@amd.com>, Nikunj A Dadhania <nikunj@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250226131202.GH5011@ziepe.ca>
 
-Rework the seemingly generic x86_cpuinit_ops.early_percpu_clock_init hook
-into a dedicated PV sched_clock hook, as the only reason the hook exists
-is to allow kvmclock to enable its PV clock on secondary CPUs before the
-kernel tries to reference sched_clock, e.g. when grabbing a timestamp for
-printk.
+On Wed, Feb 26, 2025 at 09:12:02AM -0400, Jason Gunthorpe wrote:
+> On Wed, Feb 26, 2025 at 06:49:18PM +0800, Xu Yilun wrote:
+> 
+> > E.g. I don't think VFIO driver would expect its MMIO access suddenly
+> > failed without knowing what happened.
+> 
+> What do people expect to happen here anyhow? Do you still intend to
+> mmap any of the MMIO into the hypervisor? No, right? It is all locked
 
-Rearranging the hook doesn't exactly reduce complexity; arguably it does
-the opposite.  But as-is, it's practically impossible to understand *why*
-kvmclock needs to do early configuration.
+Not expecting mmap the MMIO, but I switched to another way. VFIO doesn't
+disallow mmap until bind, and if there is mmap on bind, bind failed.
+That's my understanding of your comments.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/include/asm/paravirt.h | 10 ++++++++--
- arch/x86/include/asm/x86_init.h |  2 --
- arch/x86/kernel/kvmclock.c      | 13 ++++++-------
- arch/x86/kernel/paravirt.c      | 18 +++++++++++++++++-
- arch/x86/kernel/smpboot.c       |  2 +-
- arch/x86/kernel/x86_init.c      |  1 -
- 6 files changed, 32 insertions(+), 14 deletions(-)
+https://lore.kernel.org/kvm/Z4Hp9jvJbhW0cqWY@yilunxu-OptiPlex-7050/#t
 
-diff --git a/arch/x86/include/asm/paravirt.h b/arch/x86/include/asm/paravirt.h
-index 5de31b22aa5f..8550262fc710 100644
---- a/arch/x86/include/asm/paravirt.h
-+++ b/arch/x86/include/asm/paravirt.h
-@@ -29,13 +29,14 @@ DECLARE_STATIC_CALL(pv_steal_clock, dummy_steal_clock);
- DECLARE_STATIC_CALL(pv_sched_clock, dummy_sched_clock);
- 
- int __init __paravirt_set_sched_clock(u64 (*func)(void), bool stable,
--				      void (*save)(void), void (*restore)(void));
-+				      void (*save)(void), void (*restore)(void),
-+				      void (*start_secondary));
- 
- static __always_inline void paravirt_set_sched_clock(u64 (*func)(void),
- 						     void (*save)(void),
- 						     void (*restore)(void))
- {
--	(void)__paravirt_set_sched_clock(func, true, save, restore);
-+	(void)__paravirt_set_sched_clock(func, true, save, restore, NULL);
- }
- 
- static __always_inline u64 paravirt_sched_clock(void)
-@@ -43,6 +44,8 @@ static __always_inline u64 paravirt_sched_clock(void)
- 	return static_call(pv_sched_clock)();
- }
- 
-+void paravirt_sched_clock_start_secondary(void);
-+
- struct static_key;
- extern struct static_key paravirt_steal_enabled;
- extern struct static_key paravirt_steal_rq_enabled;
-@@ -756,6 +759,9 @@ void native_pv_lock_init(void) __init;
- static inline void native_pv_lock_init(void)
- {
- }
-+static inline void paravirt_sched_clock_start_secondary(void)
-+{
-+}
- #endif
- #endif /* !CONFIG_PARAVIRT */
- 
-diff --git a/arch/x86/include/asm/x86_init.h b/arch/x86/include/asm/x86_init.h
-index 213cf5379a5a..e3456def5aea 100644
---- a/arch/x86/include/asm/x86_init.h
-+++ b/arch/x86/include/asm/x86_init.h
-@@ -187,13 +187,11 @@ struct x86_init_ops {
- /**
-  * struct x86_cpuinit_ops - platform specific cpu hotplug setups
-  * @setup_percpu_clockev:	set up the per cpu clock event device
-- * @early_percpu_clock_init:	early init of the per cpu clock event device
-  * @fixup_cpu_id:		fixup function for cpuinfo_x86::topo.pkg_id
-  * @parallel_bringup:		Parallel bringup control
-  */
- struct x86_cpuinit_ops {
- 	void (*setup_percpu_clockev)(void);
--	void (*early_percpu_clock_init)(void);
- 	void (*fixup_cpu_id)(struct cpuinfo_x86 *c, int node);
- 	bool parallel_bringup;
- };
-diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
-index 280bb964f30a..11f078b91f22 100644
---- a/arch/x86/kernel/kvmclock.c
-+++ b/arch/x86/kernel/kvmclock.c
-@@ -126,12 +126,13 @@ static void kvm_save_sched_clock_state(void)
- 	kvmclock_disable();
- }
- 
--#ifdef CONFIG_SMP
--static void kvm_setup_secondary_clock(void)
-+static void kvm_setup_secondary_sched_clock(void)
- {
-+	if (WARN_ON_ONCE(!IS_ENABLED(CONFIG_SMP)))
-+		return;
-+
- 	kvm_register_clock("secondary cpu, sched_clock setup");
- }
--#endif
- 
- static void kvm_restore_sched_clock_state(void)
- {
-@@ -367,7 +368,8 @@ static void __init kvm_sched_clock_init(bool stable)
- {
- 	if (__paravirt_set_sched_clock(kvm_sched_clock_read, stable,
- 				       kvm_save_sched_clock_state,
--				       kvm_restore_sched_clock_state))
-+				       kvm_restore_sched_clock_state,
-+				       kvm_setup_secondary_sched_clock))
- 		return;
- 
- 	kvm_sched_clock_offset = kvm_clock_read();
-@@ -452,9 +454,6 @@ void __init kvmclock_init(void)
- 
- 	x86_platform.get_wallclock = kvm_get_wallclock;
- 	x86_platform.set_wallclock = kvm_set_wallclock;
--#ifdef CONFIG_SMP
--	x86_cpuinit.early_percpu_clock_init = kvm_setup_secondary_clock;
--#endif
- 	kvm_get_preset_lpj();
- 
- 	clocksource_register_hz(&kvm_clock, NSEC_PER_SEC);
-diff --git a/arch/x86/kernel/paravirt.c b/arch/x86/kernel/paravirt.c
-index c538c608d9fb..f93278ddb1d2 100644
---- a/arch/x86/kernel/paravirt.c
-+++ b/arch/x86/kernel/paravirt.c
-@@ -86,8 +86,13 @@ static u64 native_steal_clock(int cpu)
- DEFINE_STATIC_CALL(pv_steal_clock, native_steal_clock);
- DEFINE_STATIC_CALL(pv_sched_clock, native_sched_clock);
- 
-+#ifdef CONFIG_SMP
-+static void (*pv_sched_clock_start_secondary)(void) __ro_after_init;
-+#endif
-+
- int __init __paravirt_set_sched_clock(u64 (*func)(void), bool stable,
--				      void (*save)(void), void (*restore)(void))
-+				      void (*save)(void), void (*restore)(void),
-+				      void (*start_secondary))
- {
- 	/*
- 	 * Don't replace TSC with a PV clock when running as a CoCo guest and
-@@ -104,9 +109,20 @@ int __init __paravirt_set_sched_clock(u64 (*func)(void), bool stable,
- 	static_call_update(pv_sched_clock, func);
- 	x86_platform.save_sched_clock_state = save;
- 	x86_platform.restore_sched_clock_state = restore;
-+#ifdef CONFIG_SMP
-+	pv_sched_clock_start_secondary = start_secondary;
-+#endif
- 	return 0;
- }
- 
-+#ifdef CONFIG_SMP
-+void paravirt_sched_clock_start_secondary(void)
-+{
-+	if (pv_sched_clock_start_secondary)
-+		pv_sched_clock_start_secondary();
-+}
-+#endif
-+
- /* These are in entry.S */
- static struct resource reserve_ioports = {
- 	.start = 0,
-diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
-index c10850ae6f09..e6fff67dd264 100644
---- a/arch/x86/kernel/smpboot.c
-+++ b/arch/x86/kernel/smpboot.c
-@@ -278,7 +278,7 @@ static void notrace start_secondary(void *unused)
- 	cpu_init();
- 	fpu__init_cpu();
- 	rcutree_report_cpu_starting(raw_smp_processor_id());
--	x86_cpuinit.early_percpu_clock_init();
-+	paravirt_sched_clock_start_secondary();
- 
- 	ap_starting();
- 
-diff --git a/arch/x86/kernel/x86_init.c b/arch/x86/kernel/x86_init.c
-index 0a2bbd674a6d..1d4cf071c74b 100644
---- a/arch/x86/kernel/x86_init.c
-+++ b/arch/x86/kernel/x86_init.c
-@@ -128,7 +128,6 @@ struct x86_init_ops x86_init __initdata = {
- };
- 
- struct x86_cpuinit_ops x86_cpuinit = {
--	.early_percpu_clock_init	= x86_init_noop,
- 	.setup_percpu_clockev		= setup_secondary_APIC_clock,
- 	.parallel_bringup		= true,
- };
--- 
-2.48.1.711.g2feabab25a-goog
 
+Another concern is about dma-buf importer (e.g. KVM) mapping the MMIO.
+Recall we are working on the VFIO dma-buf solution, on bind/unbind the
+MMIO accessibility is being changed and importers should be notified to
+remove their mapping beforehand, and rebuild later if possible.
+An immediate requirement for Intel TDX is, KVM should remove secure EPT
+mapping for MMIO before unbind.
+
+So I think device is all locked down into CC mode AFTER bind and BEFORE
+unbind. It doesn't seems viommu/vdevice could control bind/unbind.
+
+There are other bus error handling cases, like AER when TDISP/SPDM/IDE
+state broken, that I don't have a clear solution now. But I cannot
+imagine they could be correctly handled without pci_driver support.
+
+> down?
+> 
+> So perhaps the answer is that the VFIO side has to put the device into
+> CC mode which disables MMAP/etc, then the viommu/vdevice iommufd
+> object can control it.
+> 
+> > Back to your concern, I don't think it is a problem. From your patch,
+> > vIOMMU doesn't know the guest BDFn by nature, it is just the user
+> > stores the id in vdevice via iommufd_vdevice_alloc_ioctl(). A proper
+> > VFIO API could also do this work.
+> 
+> We don't want duplication though. If the viommu/vdevice/vbdf are owned
+> and lifecycle controlled by iommufd then the operations against them
+> must go through iommufd and through it's locking regime.
+> > 
+> > The implementation is basically no difference from:
+> > 
+> > +       vdev = container_of(iommufd_get_object(ucmd->ictx, cmd->vdevice_id,
+> > +                                              IOMMUFD_OBJ_VDEVICE),
+> > 
+> > The real concern is the device owner, VFIO, should initiate the bind.
+> 
+> There is a big different, the above has correct locking, the other
+> does not :)
+
+Could you elaborate more on that? Any locking problem if we implement
+bind/unbind outside iommufd. Thanks in advance.
+
+Thanks,
+Yilun
+
+> 
+> Jason
 
