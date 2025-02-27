@@ -1,136 +1,115 @@
-Return-Path: <kvm+bounces-39586-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39587-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3922CA4819F
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 15:39:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5FCCA481D7
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 15:45:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 248597A8AEE
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 14:32:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7784C189AB3E
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 14:34:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D884232367;
-	Thu, 27 Feb 2025 14:32:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FD8923645F;
+	Thu, 27 Feb 2025 14:33:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tl6wkvrI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QNZmdHDp"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CD6F2309AA
-	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 14:32:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF1BA2356CA
+	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 14:33:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740666778; cv=none; b=lNNC8ppWJ1rsuARCYO21rQmMHuo6pI06XR4ySEz0AgLaX7u+mIqG1Ut3IoOLJkc00JtAtN+0g69mbOIDamo+a6yC9cUN1YVJTYYACY01hJmfWxKmF5xo+ZDL2X4N52YLgtxtJ7KnW+zHSO5V3qO08N5mmAquAAiVPbvvKapEnU8=
+	t=1740666827; cv=none; b=e4/7qrsRwKSZB9XEn1wvH8gTp+JWbncaB7XNxEMxkGI5ehAU1BvTpuwLodZoJH0xfIaS0g7Nnr+hZfoXH8lY3gn7u+DJQvk3jPUTy1nzpHchGi4IR9zZOnx2nNynFZHu0TBjDz11v829P6soKnKJE0PTqszwJdnbCUr4e5sYkAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740666778; c=relaxed/simple;
-	bh=nwUmpwjVHRe61AX1sa2fDIX4r9ggEykHzNM3puJmYlA=;
+	s=arc-20240116; t=1740666827; c=relaxed/simple;
+	bh=zWtqNmASXXzhNQSxrXA22fXpE03X8yWrh0pFugMTKS0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GewcFOqhQhIenj6BDTRH9wmIXXmxsr4wGfJTONUDM//Kdir8eZ+tEFR9QkNTQpS/6iJXuaabOEBXRZc+9c2OHKxtWIKQbQjuN5W0txYrAkeIDu7G4c7y90KQSguEGffA6VN+MXSSRrt6+9Elico4Fy86xrpSctESQqsiwXAA5Wo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tl6wkvrI; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=HWfE2e5lp4ypO4SsbesnwtHEsoH68ttqdhrpp+YMI7DE+KDsP8Bgjiyp4ttLaFKMkIm3j8lTs+8oLY0WnfdjRdZcyrgxLTS/WJxvQMWnM/POLzuooUsuImtMSCfkBWPZXFevSICKPR8ImReegtrLri6UdtmTVxXC3XnmJw4bkec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QNZmdHDp; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fe916ba298so2260370a91.1
-        for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 06:32:57 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fe8c5dbdb0so2342892a91.3
+        for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 06:33:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740666776; x=1741271576; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1740666825; x=1741271625; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GzX6RifgECI79FHPbY0or0NYOknovZYzIoHacFEQfXE=;
-        b=tl6wkvrIOZ+kQTTAeh8FiavqnTxXx5WRhXN0ZsUNeIg2fx3h4ViJg6Szo6y/+CfIZ3
-         cF1wHtDDrK9wg/saRt47t80BBwK5krmiqeaLhCcqSQWfd3iD5oSBhd1bcAgDpHyVXCJZ
-         hI6R/yOtSI2vKW/ri4NlzNtZi3jBLN8pBkIvgLoF+hL9fEglXQuFnThkEVf+OB8RtHso
-         qy6Y8gF1o2hg57Gh4MCEbuK1QgJrX3B35cipTC0djCIZjfbv30vNQUqcv/dYLna23E9c
-         AFllXe8UVjCHYK8iGUsKSX4wOtudIvDy56rYjQgiXAwAcSfC6g13UAneuNo6xq8JxaFN
-         Bvcw==
+        bh=aM4IOWsMOsUKGOueBo8hs5YRr3VMSWUcLW0YRBjc3QQ=;
+        b=QNZmdHDpZmCof3C6los9oJXYHWRFnLqjdC0Y0X/z99dzrlF6DeaBCPMXNEMoKGJnJx
+         /qv3w25Ac3WjewLzYoB+DcQzaODQ+XNnSwjmNDWzLKxgtPNDZe21nNNelovKYVYVpGhk
+         lar+jRWbJ7bWReytZpFKpEo+HUzzlwf6FWmZky0lXS0m71HqmEVWSZe1vi36q4Rh/17m
+         OTKmpw8zN6sw2TEvtZsDxp4yEB0VkScjzQCALRqwkYchhUGOkVxaHmO79CY1VVj1eBLu
+         Ac9BGt4VZZ/8doPIapYasxpP4Qhck4iW3tyz0pKhOY6G6rJJmf2Zd7hNBbSHXYSrCb2i
+         8enQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740666776; x=1741271576;
+        d=1e100.net; s=20230601; t=1740666825; x=1741271625;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GzX6RifgECI79FHPbY0or0NYOknovZYzIoHacFEQfXE=;
-        b=HCGx/kNYj0FK1fMJ+ojF7SYgGYvtuhOgjow+zO06aB+JyAuZ9VEv5AUbLMtT12m1lN
-         +4tC8T+m7t3DcwdPl/gGIlwCpbNZfurZo4HXB/ex5Vs5d8jXqx3iPejTc3bUg9rUlVWg
-         zRxzQH+R5QAGcZLcX3Kg8tCz/m+9ivEfodvM7s9iGHi65BpKEtrrV9cSTXrZ9tr1akC5
-         AAvAogKO69WmkJNvfkLhEGCLnuE9BQ9p5zbphb5S7xPmj2s8+jKkndnI3HWsMXPusnMe
-         7bgGVnCtIQjpWuSVLRslGoFHxEY4n4RfyKs6j8LDcRG53gXs2hBwsZ521ad/jf34AitS
-         UsxQ==
-X-Gm-Message-State: AOJu0YxGz9GEvGNJfegPD1rsXjw4tMIziptRZhCvzanU5LUAvRfx12oU
-	H/h4zY3z0BGeVWo6cUbbvVZqMxE/J6Wqnvemq5hwPCqsDM5G41GAFY6gIreSy4PnrjtoHW9zlyf
-	TTQ==
-X-Google-Smtp-Source: AGHT+IFLgt1HXgLiOKtKDvHYRpSTc3CznmCb5CmKQq3WTADWz9n0nIbP0qGZSkrWbsy0knvFAOa1tCwXrI8=
-X-Received: from pjboh11.prod.google.com ([2002:a17:90b:3a4b:b0:2fe:800f:23a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3cc4:b0:2ee:ee77:227c
- with SMTP id 98e67ed59e1d1-2fce868cbb8mr36260845a91.3.1740666776586; Thu, 27
- Feb 2025 06:32:56 -0800 (PST)
-Date: Thu, 27 Feb 2025 06:32:55 -0800
-In-Reply-To: <454ba4ae-4be7-49ae-a9b9-3b25cad8433a@amd.com>
+        bh=aM4IOWsMOsUKGOueBo8hs5YRr3VMSWUcLW0YRBjc3QQ=;
+        b=CBvUZCwrNfAsrfa+hSt9SdtqJP7bRm/G8zO0bLsCLQBlA5XMiCcMN8geNyFbH1T6yB
+         7+uKNKtoTy2mCW7IWwsdV1VLmSvw6pOqYlEgHfh7tq4U/zroukNIONyCUPsNGCEiCkmp
+         j8JRsFokPeYfwgw3gTHrKDgc9B0D7WlTDlaqi0BP3NiIZWhAt9kIarBJmQQ5wgYy/RNz
+         wWhqGkabbap1wZWaBaGMAtw+YFQbPF2mGm6j1ZWVoUcyhuWCWnDnLk53PatwJkhdgbEu
+         s8vPjJ9PVLgaT12aunOCn6HKYWaeHxb1S3dCZPcNeQyF9YBbXVtFlPaum8FqETZv4TjL
+         LkSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWmE1w5TrdDGzAgBLcg67bs0C1NmJhc5najJPzCvWRcO73DvBhSZJwn8m/ZK5KXkBo13pA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz32RKpVKDF1qMFpKLHZNtk51im7yjpbBsWqOoHv/WfoLKcN8qA
+	sqcamhW/++eqHWS8KHEwvm85+eDiNkpv/Pv8Nh2jlbErNRy+s8CAuCp2eiPeg0HWOpZjA/p87uJ
+	QdA==
+X-Google-Smtp-Source: AGHT+IFZ+eorGQKaIMnkNpp4Xl3k6BgEN9l2wHIf66/VZpDtmvSIB9msMN4tFIyCy4McBL5BVgjT+8kRCEo=
+X-Received: from pjb16.prod.google.com ([2002:a17:90b:2f10:b0:2fa:1803:2f9f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:518b:b0:2ee:741c:e9f4
+ with SMTP id 98e67ed59e1d1-2fe7e31f509mr12297010a91.11.1740666825142; Thu, 27
+ Feb 2025 06:33:45 -0800 (PST)
+Date: Thu, 27 Feb 2025 06:33:43 -0800
+In-Reply-To: <4443bdf2-c8ea-4245-a23f-bb561c7e734e@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250128124812.7324-1-manali.shukla@amd.com> <20250128124812.7324-3-manali.shukla@amd.com>
- <Z74_HQaQ1jY4eKBB@google.com> <454ba4ae-4be7-49ae-a9b9-3b25cad8433a@amd.com>
-Message-ID: <Z8B3l8VGA2RHRI1j@google.com>
-Subject: Re: [PATCH v6 2/3] KVM: SVM: Add Idle HLT intercept support
+References: <20250227012541.3234589-1-seanjc@google.com> <20250227012541.3234589-6-seanjc@google.com>
+ <4443bdf2-c8ea-4245-a23f-bb561c7e734e@amd.com>
+Message-ID: <Z8B3x7EPYY8j8o7F@google.com>
+Subject: Re: [PATCH v2 05/10] KVM: SVM: Require AP's "requested" SEV_FEATURES
+ to match KVM's view
 From: Sean Christopherson <seanjc@google.com>
-To: Manali Shukla <manali.shukla@amd.com>
-Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, pbonzini@redhat.com, 
-	shuah@kernel.org, nikunj@amd.com, thomas.lendacky@amd.com, 
-	vkuznets@redhat.com, bp@alien8.de, babu.moger@amd.com, 
-	neeraj.upadhyay@amd.com
+To: Pankaj Gupta <pankaj.gupta@amd.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Naveen N Rao <naveen@kernel.org>, Kim Phillips <kim.phillips@amd.com>, 
+	Tom Lendacky <thomas.lendacky@amd.com>, Alexey Kardashevskiy <aik@amd.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Feb 27, 2025, Manali Shukla wrote:
-> On 2/26/2025 3:37 AM, Sean Christopherson wrote:
-> >> @@ -5225,6 +5230,8 @@ static __init void svm_set_cpu_caps(void)
-> >>  		if (vnmi)
-> >>  			kvm_cpu_cap_set(X86_FEATURE_VNMI);
-> >>  
-> >> +		kvm_cpu_cap_check_and_set(X86_FEATURE_IDLE_HLT);
-> > 
-> > I am 99% certain this is wrong.  Or at the very least, severly lacking an
-> > explanation of why it's correct.  If L1 enables Idle HLT but not HLT interception,
-> > then it is KVM's responsibility to NOT exit to L1 if there is a pending V_IRQ or
-> > V_NMI.
-> > 
-> > Yeah, it's buggy.  But, it's buggy in part because *existing* KVM support is buggy.
-> > If L1 disables HLT exiting, but it's enabled in KVM, then KVM will run L2 with
-> > HLT exiting and so it becomes KVM's responsibility to check for valid L2 wake events
-> > prior to scheduling out the vCPU if L2 executes HLT.  E.g. nVMX handles this by
-> > reading vmcs02.GUEST_INTERRUPT_STATUS.RVI as part of vmx_has_nested_events().  I
-> > don't see the equivalent in nSVM.
-> > 
-> > Amusingly, that means Idle HLT is actually a bug fix to some extent.  E.g. if there
-> > is a pending V_IRQ/V_NMI in vmcb02, then running with Idle HLT will naturally do
-> > the right thing, i.e. not hang the vCPU.
-> > 
-> > Anyways, for now, I think the easiest and best option is to simply skip full nested
-> > support for the moment.
-> > 
+On Thu, Feb 27, 2025, Pankaj Gupta wrote:
+> On 2/27/2025 2:25 AM, Sean Christopherson wrote:
+> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> > index 9aad0dae3a80..bad5834ec143 100644
+> > --- a/arch/x86/kvm/svm/sev.c
+> > +++ b/arch/x86/kvm/svm/sev.c
+> > @@ -3932,6 +3932,7 @@ void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu)
+> >   static int sev_snp_ap_creation(struct vcpu_svm *svm)
+> >   {
+> > +	struct kvm_sev_info *sev = to_kvm_sev_info(svm->vcpu.kvm);
+> >   	struct kvm_vcpu *vcpu = &svm->vcpu;
+> >   	struct kvm_vcpu *target_vcpu;
+> >   	struct vcpu_svm *target_svm;
+> > @@ -3963,26 +3964,18 @@ static int sev_snp_ap_creation(struct vcpu_svm *svm)
+> >   	mutex_lock(&target_svm->sev_es.snp_vmsa_mutex);
+> > -	/* Interrupt injection mode shouldn't change for AP creation */
+> > -	if (request < SVM_VMGEXIT_AP_DESTROY) {
+> > -		u64 sev_features;
+> > -
+> > -		sev_features = vcpu->arch.regs[VCPU_REGS_RAX];
+> > -		sev_features ^= to_kvm_sev_info(svm->vcpu.kvm)->vmsa_features;
+> > -
+> > -		if (sev_features & SVM_SEV_FEAT_INT_INJ_MODES) {
 > 
-> Got it, I see the issue you're talking about. I'll need to look into it a bit more to
-> fully understand it. So yeah, we can hold off on full nested support for idle HLT 
-> intercept for now.
-> 
-> Since we are planning to disable Idle HLT support on nested guests, should we do
-> something like this ?
-> 
-> @@ -167,10 +167,15 @@ void recalc_intercepts(struct vcpu_svm *svm)
->         if (!nested_svm_l2_tlb_flush_enabled(&svm->vcpu))
->                 vmcb_clr_intercept(c, INTERCEPT_VMMCALL);
-> 
-> +       if (!guest_cpu_cap_has(&svm->vcpu, X86_FEATURE_IDLE_HLT))
-> +               vmcb_clr_intercept(c, INTERCEPT_IDLE_HLT);
-> +
-> 
-> When recalc_intercepts copies the intercept values from vmc01 to vmcb02, it also copies
-> the IDLE HLT intercept bit, which is set to 1 in vmcb01. Normally, this isn't a problem 
-> because the HLT intercept takes priority when it's on. But if the HLT intercept gets 
-> turned off for some reason, the IDLE HLT intercept will stay on, which is not what we
-> want.
+> 'SVM_SEV_FEAT_INT_INJ_MODES' would even be required in any future use-case,
+> maybe?
 
-Why don't we want that?
+Can you elaborate?  I don't quite follow what you're suggesting.
 
