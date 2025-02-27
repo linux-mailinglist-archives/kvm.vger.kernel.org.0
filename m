@@ -1,187 +1,208 @@
-Return-Path: <kvm+bounces-39555-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39556-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C0C0A47896
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 10:04:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 57686A479A0
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 10:55:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99852188B338
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 09:04:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7C2E1889533
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 09:55:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD8B6227B95;
-	Thu, 27 Feb 2025 09:04:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B823229B00;
+	Thu, 27 Feb 2025 09:55:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lL8Y66jD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a3+nueta"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4341215DBB3
-	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 09:04:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D6742065
+	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 09:55:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740647053; cv=none; b=jzsRM4JwUNQ1XAO2J/zq2rJhLhs9j0cNk7uPnFwFmNxlYyR1df4hoJ0s55te2+ozl+hz6+laJMYoHS/QVaKuvy7+AGwOh1pEd4QGwtjDuyakZOGW2hZw81HKit/EliYAwvlAW9cTe1OIQ0vr7SUoabs+h9nvS6xeVEbdi0SSGQc=
+	t=1740650102; cv=none; b=hoKUVs3Pth+Ot4FwfUr/veBZ6dGdD0VgeCWqFvzHj//T2lOJg5wndgwHRdczQiYCb3oT8WyGN4cINRLC+jT2hV1v+cuMNVloZEkMhUvJPIPNuPclIkbLsgFod+lOIVDqfP2lF2vv5uhRlbLB/ee3/uxicE4ylGEm65t89PF0qIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740647053; c=relaxed/simple;
-	bh=9UELi51ewmWIjHiA7B4nlgq4NGyPCYajQTc5lxmZ59Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mdiklzSBroyl+kVnzCAjBAGLmc4pZE7LuGktgfjdU8x6kPsQhGl6fcKmYniNT5/ilL3ck+2zcIFv6ag3cLAauk4iAaYHqcRrFoaamrb8UDgyJo+oZskuC/M9PpGmcMw/CRyXPTsMZADjQhum4je7200ZjBoAzzd7Ky/1PjMmyRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=lL8Y66jD; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5ded69e6134so1055986a12.0
-        for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 01:04:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1740647049; x=1741251849; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=9UELi51ewmWIjHiA7B4nlgq4NGyPCYajQTc5lxmZ59Y=;
-        b=lL8Y66jDOUwgyUv8f42uWlPPXupIM5tWbRmnJmZxpfNDTafi0Vq2Za3VKHogQU4jU0
-         bVJZulC4NsjfHUprNjon4vIxfEi++1z10QMQwow1/1KIUS3TuoSYZmVe/ihwjjaBACwT
-         ea2+GrwVzJNb9X/u2saiYrRD6zaZ3Y/wvMh6Q//Se6Wkp4kNf6D8iu/+jS5/R2uWKQfj
-         fxM9scyFrR/7O9pvpzv0Ti/IJsTkg5bEtTlvgk9rSqfRtdXPT5G2mLZg2fDljogYbFOH
-         M8GrXPjrNTYQW9nFzUckyJl2PbaJCfovMqDDxmSVsJGdMqYvjbHWYRe9OBCjiUP6g4Pg
-         uXWQ==
+	s=arc-20240116; t=1740650102; c=relaxed/simple;
+	bh=nNy/XI7LSsI3A4lshOd/X1+NFMLZUoE26TwjOAgGz+Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BOpiHBrLXL9lFIPofZDiTNc66UkJd+GFjzI/uazv+weZYHs5K9UL2hlTBUrePN9bAYDCRkqYGS7MM/eKVa9NTFGUXdpuMOCYHwk6ECQuwyBafSD+QLxOBMvnv2PcZPWLz1NXvGnwB5/1KUpVjatiS3dvYE/StHXSAwW+D6OUCJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a3+nueta; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740650100;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sM37GoCBrelHpecugQ7DvbegVqt19Ri+N9wNIK8C7vQ=;
+	b=a3+nuetapw9s7EuMln8BW2dhK8vIH/G9I/rwefekIbPo/p8LDT8YmO/PpYK1eLTWRLX6xX
+	2Q4ipXhdUl8CLDNozt8QRRvUFc1uDfUQjSnlFhDc3BCzhxl4p0YirBOOAusrd29wtn7L/r
+	UQSrdqsKPK3V0R5asg182XdMkZekjQw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-441--K7GYzEhNKev8iXsYvz2Vg-1; Thu, 27 Feb 2025 04:54:58 -0500
+X-MC-Unique: -K7GYzEhNKev8iXsYvz2Vg-1
+X-Mimecast-MFC-AGG-ID: -K7GYzEhNKev8iXsYvz2Vg_1740650097
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4393e89e910so3763535e9.0
+        for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 01:54:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740647049; x=1741251849;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9UELi51ewmWIjHiA7B4nlgq4NGyPCYajQTc5lxmZ59Y=;
-        b=H8WdT72XUWxI+RokX3BoclIMcWRVjbucXwMjfLvh4Z54L/zLJqJl2AQr+aLl7WFPGK
-         X3+u2468Yjn+7sWp7g0zovOZEhhcvrk6mTK1/vfD4uzt4WHMiqALdGLqub7ZY3GU69IG
-         y8kZB0UejlFWBurVILVLIsTYu+Ltaz9yKV5NIgSTJnSvB+bAevL6Ns3qX3EHHkwrhUvU
-         ZnWcp+tbsMjQbDYXId10nHsGrO0urEh6Oyzd6a0biUOw8K5XW+oyludB6AX9aNE9BBM9
-         fslwUpf8GYm+1OsJSq7egajUi69rpjgkTuF/2p2zwsC10vZHC71G7X4a6jFGj4xKw7U9
-         katg==
-X-Forwarded-Encrypted: i=1; AJvYcCUYgbKYDK+4t6XxoUbnyHSlOBvi3YRkT6WRUvES7qQp/MDUhqRoHpzjRmZaQhgNkV25fDg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOkBCE/pe+LrdQVM/oq2jCGE3UkO3GRXCHnlYryq8a82W96XtT
-	9Aq/cXu6G6C3Y8F9f8HWyqbCXrsKaQMYUv67A0WAg0K0sABSvGElRN3GulCQX/BVmGT4ncOqAGF
-	HdoTMWmaM0yyfnhgY7+zRoCGPi8BF3HOYMWF0YA==
-X-Gm-Gg: ASbGnctq9s9NZqA23eAW3bGZ8TGII3Vua2zc4ADGpbLWsIG/C3f8ZghZpTu3PrseRGx
-	9NyUDHz8BQ0Z5yQRX2eo/5xgStGOYZvjAWCbESkctyXlOpzy+YzXv48Q4XMDN2g6N8E4aWyHoRT
-	1huVt9VitujmOdtqUXBDpYcnl/IB3hl+BJP6MX
-X-Google-Smtp-Source: AGHT+IEL8jwJ7+Gx3xJdJeHDsZTHpaCquM4MW1jp1zytycJLxfwfsjyTlAbBkYEONnTUZIEzwyZgbc0AuBqEo7yItF8=
-X-Received: by 2002:a05:6402:26ce:b0:5db:f423:19c5 with SMTP id
- 4fb4d7f45d1cf-5e4a0d45ba9mr8937725a12.5.1740647049379; Thu, 27 Feb 2025
- 01:04:09 -0800 (PST)
+        d=1e100.net; s=20230601; t=1740650097; x=1741254897;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sM37GoCBrelHpecugQ7DvbegVqt19Ri+N9wNIK8C7vQ=;
+        b=byC3vfHi0Pbn4l/YVehZD65m1rpEGRIDfuxOud/TBkt65sSFWFCecDtNgq5XDm6Y7L
+         HNayN3NM7q2CSnj9LiXuFUo1b/qr5VgMK+mpz0Pob4bOk4Xz3SwueEVCoRdjpX5F5B9J
+         DE2IL7v878d1yYn5JMNGzvnxEuc8hZL2pzxtlWHKCfrmDVFsUrnyU/ZKxm09iwrXHHXI
+         LdQlfYaoz6ifM2pfzWoSuLFavhCgCNX0uWTdwofkbK4HM8olvHq0OGywXpxLWvT+6GNy
+         h0HGw/s5goUr0yWaBIk5mNB2YupoeUBul0ctCTlgZD12Tkx9DGa2G9/Kf00wtLtXb4fk
+         LXIA==
+X-Forwarded-Encrypted: i=1; AJvYcCVieZpOui5jeH+O+W81TwbNgCRcJzploU0r7gfKCDt/KCiHoT8Xfb5m6+aXnJJL2YUuFy0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxlch48DzbkQ4T0DfMzoeiWqf/4Eszib0uiM5RZr444cpTdnUA3
+	Hpcfre4laZam8Daa8gKECR7CiLBQ1Y9zlmpPcZGBaRGx130pHYeumREzOTpp/ALiIuwiglPR2OU
+	Nriw0+4xd/wVvZuZeGbDjruPaREAl1iwlkAFgmMo/x1r5sic9Kw==
+X-Gm-Gg: ASbGncux2/FZOeJV/1yg2VGlG69xxQBt0RDHQKbojUArH0Q02XVK5b8YvO7cBTzlp0a
+	CSPrCFXB5HQMvEIv+Se062vgskfvXWTbp0ovVc85jPZrdq3fXlyF1YyiNsOHDRlbOjAVySGmlFL
+	Gy3XLTckhvD1uTlEda0OY6OFJSoCpdQlUHeR6jrNv2oUrDvV7fMj4O7qwHFYQCKi1nYxGeE+I+B
+	bh+kQvD1SPsnCXc+3n5DxZKckFY6vEQu2O/bok+3tQsnZ/7JIkttp24xLqV1sWj/RXyoHkr9Wdn
+	QAbR3DMZF5EtwgAN1yxRnz+uaTthgefDuequU23R6kwqgwBOmsSgQ/aM8OWlXSE=
+X-Received: by 2002:a05:600c:b97:b0:43b:8198:f6fc with SMTP id 5b1f17b1804b1-43b8198f8efmr17561975e9.11.1740650096849;
+        Thu, 27 Feb 2025 01:54:56 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEIPu5VQ/hiL8z8t1cKtb2pjMgTWX7upe4WwktQRFRpTNjOGTmG0PLGgfQJU7qJUE349QFvTg==
+X-Received: by 2002:a05:600c:b97:b0:43b:8198:f6fc with SMTP id 5b1f17b1804b1-43b8198f8efmr17561605e9.11.1740650096489;
+        Thu, 27 Feb 2025 01:54:56 -0800 (PST)
+Received: from imammedo.users.ipa.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43b73718e2asm17268555e9.21.2025.02.27.01.54.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Feb 2025 01:54:55 -0800 (PST)
+Date: Thu, 27 Feb 2025 10:54:54 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Jonathan Cameron
+ <Jonathan.Cameron@huawei.com>, Shiju Jose <shiju.jose@huawei.com>,
+ qemu-arm@nongnu.org, qemu-devel@nongnu.org, Philippe =?UTF-8?B?TWF0aGll?=
+ =?UTF-8?B?dS1EYXVkw6k=?= <philmd@linaro.org>, Ani Sinha
+ <anisinha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Dongjiu Geng
+ <gengdongjiu1@gmail.com>, Eduardo Habkost <eduardo@habkost.net>, Eric Blake
+ <eblake@redhat.com>, John Snow <jsnow@redhat.com>, Marcel Apfelbaum
+ <marcel.apfelbaum@gmail.com>, Markus Armbruster <armbru@redhat.com>,
+ Michael Roth <michael.roth@amd.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Shannon Zhao
+ <shannon.zhaosl@gmail.com>, Yanan Wang <wangyanan55@huawei.com>, Zhao Liu
+ <zhao1.liu@intel.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 00/14] Change ghes to use HEST-based offsets and add
+ support for error inject
+Message-ID: <20250227105454.69e3d459@imammedo.users.ipa.redhat.com>
+In-Reply-To: <cover.1740148260.git.mchehab+huawei@kernel.org>
+References: <cover.1740148260.git.mchehab+huawei@kernel.org>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250218202618.567363-1-sieberf@amazon.com> <20250218202618.567363-4-sieberf@amazon.com>
- <CAKfTPtDx3vVK1ZgBwicTeP82wL=wGOKdxheuBHCBjzM6mSDPOQ@mail.gmail.com> <591b12f8c31264d1b7c7417ed916541196eddd58.camel@amazon.com>
-In-Reply-To: <591b12f8c31264d1b7c7417ed916541196eddd58.camel@amazon.com>
-From: Vincent Guittot <vincent.guittot@linaro.org>
-Date: Thu, 27 Feb 2025 10:03:58 +0100
-X-Gm-Features: AQ5f1JpPsBJHinsoIgFp7A0EoT2EP8A_Ofo81ZptF2TzVMQisI0TKNHfxPF_aj0
-Message-ID: <CAKfTPtBoVCnoO+vScNXRqXXWwRBT0MGOqeeAZ4VeAB+pPZVrCw@mail.gmail.com>
-Subject: Re: [RFC PATCH 3/3] sched, x86: Make the scheduler guest unhalted aware
-To: "Sieber, Fernand" <sieberf@amazon.com>
-Cc: "peterz@infradead.org" <peterz@infradead.org>, "mingo@redhat.com" <mingo@redhat.com>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>, 
-	"nh-open-source@amazon.com" <nh-open-source@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, 27 Feb 2025 at 09:27, Sieber, Fernand <sieberf@amazon.com> wrote:
->
-> On Thu, 2025-02-27 at 08:34 +0100, Vincent Guittot wrote:
-> > On Tue, 18 Feb 2025 at 21:27, Fernand Sieber <sieberf@amazon.com>
-> > wrote:
-> > >
-> > > With guest hlt/mwait/pause pass through, the scheduler has no
-> > > visibility into
-> > > real vCPU activity as it sees them all 100% active. As such, load
-> > > balancing
-> > > cannot make informed decisions on where it is preferrable to
-> > > collocate
-> > > tasks when necessary. I.e as far as the load balancer is concerned,
-> > > a
-> > > halted vCPU and an idle polling vCPU look exactly the same so it
-> > > may decide
-> > > that either should be preempted when in reality it would be
-> > > preferrable to
-> > > preempt the idle one.
-> > >
-> > > This commits enlightens the scheduler to real guest activity in
-> > > this
-> > > situation. Leveraging gtime unhalted, it adds a hook for kvm to
-> > > communicate
-> > > to the scheduler the duration that a vCPU spends halted. This is
-> > > then used in
-> > > PELT accounting to discount it from real activity. This results in
-> > > better
-> > > placement and overall steal time reduction.
-> >
-> > NAK, PELT account for time spent by se on the CPU.
->
-> I was essentially aiming to adjust this concept to "PELT account for
-> the time spent by se *unhalted* on the CPU". Would such an adjustments
-> of the definition cause problems?
+On Fri, 21 Feb 2025 15:35:09 +0100
+Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
 
-Yes, It's not in the scope of PELT to know that a se is a vcpu and if
-this vcpu is halted or not
+> Now that the ghes preparation patches were merged, let's add support
+> for error injection.
+> 
+> On this series, the first 6 patches chang to the math used to calculate offsets at HEST
+> table and hardware_error firmware file, together with its migration code. Migration tested
+> with both latest QEMU released kernel and upstream, on both directions.
+> 
+> The next patches add a new QAPI to allow injecting GHESv2 errors, and a script using such QAPI
+>    to inject ARM Processor Error records.
+> 
+> ---
+> v4:
+> - added an extra comment for AcpiGhesState structure;
+> - patches reordered;
+> - no functional changes, just code shift between the patches in this series.
+> 
+> v3:
+> - addressed more nits;
+> - hest_add_le now points to the beginning of HEST table;
+> - removed HEST from tests/data/acpi;
+> - added an extra patch to not use fw_cfg with virt-10.0 for hw_error_le
+> 
+> v2: 
+> - address some nits;
+> - improved ags cleanup patch and removed ags.present field;
+> - added some missing le*_to_cpu() calls;
+> - update date at copyright for new files to 2024-2025;
+> - qmp command changed to: inject-ghes-v2-error ans since updated to 10.0;
+> - added HEST and DSDT tables after the changes to make check target happy.
+>   (two patches: first one whitelisting such tables; second one removing from
+>    whitelist and updating/adding such tables to tests/data/acpi)
+> 
+> 
+> 
+> Mauro Carvalho Chehab (14):
+>   acpi/ghes: prepare to change the way HEST offsets are calculated
+>   acpi/ghes: add a firmware file with HEST address
+>   acpi/ghes: Use HEST table offsets when preparing GHES records
+>   acpi/ghes: don't hard-code the number of sources for HEST table
+>   acpi/ghes: add a notifier to notify when error data is ready
+>   acpi/ghes: create an ancillary acpi_ghes_get_state() function
+>   acpi/generic_event_device: Update GHES migration to cover hest addr
+>   acpi/generic_event_device: add logic to detect if HEST addr is
+>     available
+>   acpi/generic_event_device: add an APEI error device
+>   tests/acpi: virt: allow acpi table changes for a new table: HEST
+>   arm/virt: Wire up a GED error device for ACPI / GHES
+>   tests/acpi: virt: add a HEST table to aarch64 virt and update DSDT
+>   qapi/acpi-hest: add an interface to do generic CPER error injection
+>   scripts/ghes_inject: add a script to generate GHES error inject
+> 
+>  MAINTAINERS                                   |  10 +
+>  hw/acpi/Kconfig                               |   5 +
+>  hw/acpi/aml-build.c                           |  10 +
+>  hw/acpi/generic_event_device.c                |  43 ++
+>  hw/acpi/ghes-stub.c                           |   7 +-
+>  hw/acpi/ghes.c                                | 231 ++++--
+>  hw/acpi/ghes_cper.c                           |  38 +
+>  hw/acpi/ghes_cper_stub.c                      |  19 +
+>  hw/acpi/meson.build                           |   2 +
+>  hw/arm/virt-acpi-build.c                      |  37 +-
+>  hw/arm/virt.c                                 |  19 +-
+>  hw/core/machine.c                             |   2 +
+>  include/hw/acpi/acpi_dev_interface.h          |   1 +
+>  include/hw/acpi/aml-build.h                   |   2 +
+>  include/hw/acpi/generic_event_device.h        |   1 +
+>  include/hw/acpi/ghes.h                        |  54 +-
+>  include/hw/arm/virt.h                         |   2 +
+>  qapi/acpi-hest.json                           |  35 +
+>  qapi/meson.build                              |   1 +
+>  qapi/qapi-schema.json                         |   1 +
+>  scripts/arm_processor_error.py                | 476 ++++++++++++
+>  scripts/ghes_inject.py                        |  51 ++
+>  scripts/qmp_helper.py                         | 702 ++++++++++++++++++
+>  target/arm/kvm.c                              |   7 +-
+>  tests/data/acpi/aarch64/virt/DSDT             | Bin 5196 -> 5240 bytes
+>  .../data/acpi/aarch64/virt/DSDT.acpihmatvirt  | Bin 5282 -> 5326 bytes
+>  tests/data/acpi/aarch64/virt/DSDT.memhp       | Bin 6557 -> 6601 bytes
+>  tests/data/acpi/aarch64/virt/DSDT.pxb         | Bin 7679 -> 7723 bytes
+>  tests/data/acpi/aarch64/virt/DSDT.topology    | Bin 5398 -> 5442 bytes
+>  29 files changed, 1677 insertions(+), 79 deletions(-)
+>  create mode 100644 hw/acpi/ghes_cper.c
+>  create mode 100644 hw/acpi/ghes_cper_stub.c
+>  create mode 100644 qapi/acpi-hest.json
+>  create mode 100644 scripts/arm_processor_error.py
+>  create mode 100755 scripts/ghes_inject.py
+>  create mode 100755 scripts/qmp_helper.py
+> 
 
->
-> > If your thread/vcpu doesn't do anything but burn cycles, find another
-> > way to report thatto the host
->
-> The main advantage of hooking into PELT is that it means that load
-> balancing will just work out of the box as it immediately adjusts the
-> sched_group util/load/runnable values.
->
-> It may be possible to scope down my change to load balancing without
-> touching PELT if that is not viable. For example instead of using PELT
-> we could potentially adjust the calculation of sgs->avg_load in
-> update_sg_lb_stats for overloaded groups to include a correcting factor
-> based on recent halted cycles of the CPU. The comparison of two
-> overloaded groups would then favor pulling tasks on the one that has
-> the most halted cycles. This approach is more scoped down as it doesn't
-> change the classification of scheduling groups, instead it just changes
-> how overloaded groups are compared. I would need to prototype to see if
-> it works.
+once you enable, ras in tests as 1st patches and fixup minor issues
+please try to do patch by patch compile/bios-tables-test testing, to avoid
+unnecessary respin in case at table change crept in somewhere unnoticed. 
 
-This is not better than PELT
-
->
-> Let me know if this would go in the right direction or if you have any
-> other ideas of alternate options?
-
-The below should give you some insights
-
-https://lore.kernel.org/kvm/CAO7JXPhMfibNsX6Nx902PRo7_A2b4Rnc3UP=bpKYeOuQnHvtrw@mail.gmail.com/
-
-I don't think that you need any change in the scheduler. Use the
-current public scheduler interfaces to adjust the priority of your
-vcpu. As an example switching your thread to SCHED_IDLE is a good way
-to say that your thread has a very low priority and the scheduler is
-able to handle such information
-
->
-> > Furthermore this breaks all the hierarchy dependency
->
-> I am not understanding the meaning of this comment, could you please
-> provide more details?
->
-> >
-> > >
-> > > This initial implementation assumes that non-idle CPUs are ticking
-> > > as it
-> > > hooks the unhalted time the PELT decaying load accounting. As such
-> > > it
-> > > doesn't work well if PELT is updated infrequenly with large chunks
-> > > of
-> > > halted time. This is not a fundamental limitation but more complex
-> > > accounting is needed to generalize the use case to nohz full.
->
->
->
-> Amazon Development Centre (South Africa) (Proprietary) Limited
-> 29 Gogosoa Street, Observatory, Cape Town, Western Cape, 7925, South Africa
-> Registration Number: 2004 / 034463 / 07
 
