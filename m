@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-39447-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39448-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 959CBA470DE
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:21:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69665A470E0
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:21:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01749188DE4E
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:21:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57D5616F157
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:21:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A89D719C552;
-	Thu, 27 Feb 2025 01:19:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 091FC1A5BAB;
+	Thu, 27 Feb 2025 01:19:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nsgDY+01"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QnFIBP4I"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58E5B1917FB;
-	Thu, 27 Feb 2025 01:19:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C0231A0730;
+	Thu, 27 Feb 2025 01:19:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740619160; cv=none; b=rvnAFTalUS75SmfY4VUlgrSXkMzka7qCAVmwc2xIYT3m2luhPQJXcEJy0b0o01tvU8cUyltXGUutwBe0iXovS4nu8FbPRfmSxMyrXtoiqrm/tUkT9rXEBlZq4nCg6bCeU00P6pamylftPQHXjl5WGpldriDUbWdFldsusj6hrt4=
+	t=1740619164; cv=none; b=KFWF6irqNeGuhQplHUc42CtwWY21J7DjCmB1kZuqpUypapHNOfnKs5RPtqtRaQGnnsy1/EwAzT/+O5bLfIjUQq3MxI1M/SOJs1l7IaU8gPl9aqUCefERUnhyyKkAJCIQsbB2syewHNFdp646202LPaclYjEhg+fTLLYOp/PO1vM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740619160; c=relaxed/simple;
-	bh=ri6AyiRTtAQTnjyYiC0FobX78tZ80oBXhVhCjzKkk9I=;
+	s=arc-20240116; t=1740619164; c=relaxed/simple;
+	bh=vMUAeJTPBCoxwqnHG1I/vI/AaVpM8hcMwkiv2EGrwSY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=puTnHtNxW8jCARZjEmR5LiHLYo2TH/gglIC4nEXC0XuGr8HHFmFAElzYTKBU+3vYX4EYH5r4dZh2g3kwM/I92nLpWdpx8Pt4cduUHqYUUuGvSZsOdJNt4bQHcCM5iUHX8wLhDQxpGWzNL36TRGf4ZeohC9KoyYpChVu/yp2V7Zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nsgDY+01; arc=none smtp.client-ip=198.175.65.9
+	 MIME-Version; b=cp6+OsNYHLS0OAgUHKFaPa70UJF4W8YO9jbwgr0AGQn8i6FVp2h2xKLyAslR4odfAh6cEj8pffSjgk/0vyHQc7uMM68HxnmG9L48sc8geTOrmkD/krfVGBU6aiXVdLS3y6HNi1OTp0DYrUFnPG2wszYbRGQ0G93/jqW8iTH2gzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QnFIBP4I; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740619159; x=1772155159;
+  t=1740619163; x=1772155163;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ri6AyiRTtAQTnjyYiC0FobX78tZ80oBXhVhCjzKkk9I=;
-  b=nsgDY+01bk4nyLptcTnvweZ7dV9SXqs0L6KatVTwnDlSdbpYWuZ63iDM
-   jt1Mli2Npbt9MLdGI2cGJrn1E43za2P6FI+1DLMepyLmRHTJ4dg33PJQS
-   0gWRO7WNau66VgjonU/u3XWnJnMeCkWfBKxe+oq4xUXgR3iW5QOMxJOCD
-   5ZVtPUVkdmrc8RyHY2oCP7b06N+8BbSapJVQxF3+MzmnmotT48yxH4cqB
-   GJLwaOuaWClHPQIdqyJYH5yDM9jBXEIp3Wh4FnQhW9Rj9+33R3Ej6OE4i
-   gjpcxpsh3Z/snAJ5TFdxT7/yMETbYshnWZ2nq4zK7DKce4F9Fy+QMx81g
-   Q==;
-X-CSE-ConnectionGUID: y6eDhVYXRneWQ1vcVZ+u2Q==
-X-CSE-MsgGUID: d/6uD2QASiab12tkYbH2mg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11357"; a="63959626"
+  bh=vMUAeJTPBCoxwqnHG1I/vI/AaVpM8hcMwkiv2EGrwSY=;
+  b=QnFIBP4Iq5FUlxuVLLTm/6/JwdFIupoFs4jjiXS9HagofIAyUNe6Rt/V
+   OQTICO81E8s04joeQFgLy3L/TGjPj/PTeAkNl/OPOzzS9UVXLH2KQpEPo
+   o5C3i2mHDOg/H+ydDnKg5lbFx28y/VtkT2KIxwj/M92bIgrp0IZygj+qs
+   OJhr9ruah5NI/gtcNMDmhhFfyfvmEs7ZMxC7SZlxAjysF4KKVBqoOL2Fm
+   ta/PG8z9NRmE4bM2EnYTotMgxD4RNlIfxYnN4VTnPFLE7C69tGQKPOoIs
+   AHJeUuBUpH9xhVjxSFhfjRF3CJJcJ2Fgw/gN+r2AjxAEQbPqKLHPdXrZI
+   w==;
+X-CSE-ConnectionGUID: VAQziL1gQmeyGhXFnEhQxw==
+X-CSE-MsgGUID: 95E1klA2TVa93KWQ1YQdqg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11357"; a="63959629"
 X-IronPort-AV: E=Sophos;i="6.13,318,1732608000"; 
-   d="scan'208";a="63959626"
+   d="scan'208";a="63959629"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 17:19:19 -0800
-X-CSE-ConnectionGUID: tLI6RLXxRxqkpvfZtvvDqg==
-X-CSE-MsgGUID: msoI5mqTQQyrheb4v1ne9Q==
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 17:19:22 -0800
+X-CSE-ConnectionGUID: B9a286aRSqSCybPrJlJGOw==
+X-CSE-MsgGUID: IBjaz6nsSIqmXyBFootrVw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,318,1732608000"; 
-   d="scan'208";a="116674900"
+   d="scan'208";a="116674903"
 Received: from litbin-desktop.sh.intel.com ([10.239.156.93])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 17:19:15 -0800
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 17:19:18 -0800
 From: Binbin Wu <binbin.wu@linux.intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com,
@@ -73,9 +73,9 @@ Cc: rick.p.edgecombe@intel.com,
 	chao.gao@intel.com,
 	linux-kernel@vger.kernel.org,
 	binbin.wu@linux.intel.com
-Subject: [PATCH v2 09/20] KVM: TDX: Handle TDX PV rdmsr/wrmsr hypercall
-Date: Thu, 27 Feb 2025 09:20:10 +0800
-Message-ID: <20250227012021.1778144-10-binbin.wu@linux.intel.com>
+Subject: [PATCH v2 10/20] KVM: TDX: Enable guest access to LMCE related MSRs
+Date: Thu, 27 Feb 2025 09:20:11 +0800
+Message-ID: <20250227012021.1778144-11-binbin.wu@linux.intel.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20250227012021.1778144-1-binbin.wu@linux.intel.com>
 References: <20250227012021.1778144-1-binbin.wu@linux.intel.com>
@@ -89,133 +89,112 @@ Content-Transfer-Encoding: 8bit
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Morph PV RDMSR/WRMSR hypercall to EXIT_REASON_MSR_{READ,WRITE} and
-wire up KVM backend functions.
+Allow TDX guest to configure LMCE (Local Machine Check Event) by handling
+MSR IA32_FEAT_CTL and IA32_MCG_EXT_CTL.
 
-For complete_emulated_msr() callback, instead of injecting #GP on error,
-implement tdx_complete_emulated_msr() to set return code on error.  Also
-set return value on MSR read according to the values from kvm x86
-registers.
+MCE and MCA are advertised via cpuid based on the TDX module spec.  Guest
+kernel can access IA32_FEAT_CTL to check whether LMCE is opted-in by the
+platform or not.  If LMCE is opted-in by the platform, guest kernel can
+access IA32_MCG_EXT_CTL to enable/disable LMCE.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
+Handle MSR IA32_FEAT_CTL and IA32_MCG_EXT_CTL for TDX guests to avoid
+failure when a guest accesses them with TDG.VP.VMCALL<MSR> on #VE.  E.g.,
+Linux guest will treat the failure as a #GP(0).
+
+Userspace VMM may not opt-in LMCE by default, e.g., QEMU disables it by
+default, "-cpu lmce=on" is needed in QEMU command line to opt-in it.
+
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+[binbin: rework changelog]
 Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
 TDX "the rest" v2:
-- Morph PV RDMSR/WRMSR hypercall to EXIT_REASON_MSR_{READ,WRITE}. (Sean)
-- Rebased to use tdcall_to_vmx_exit_reason().
-- Marshall values to the appropriate x86 registers to leverage the existing
-  kvm_emulate_{rdmsr,wrmsr}(). (Sean)
-- Implement complete_emulated_msr() callback for TDX to set return value
-  and return code to vp_enter_args.
-- Update changelog.
+- No Change.
 
 TDX "the rest" v1:
-- Use TDVMCALL_STATUS prefix for TDX call status codes (Binbin)
+- Renamed from "KVM: TDX: Handle MSR IA32_FEAT_CTL MSR and IA32_MCG_EXT_CTL"
+  to "KVM: TDX: Enable guest access to LMCE related MSRs".
+- Update changelog.
+- Check reserved bits are not set when set MSR_IA32_MCG_EXT_CTL.
 ---
- arch/x86/kvm/vmx/main.c | 10 +++++++++-
- arch/x86/kvm/vmx/tdx.c  | 24 ++++++++++++++++++++++++
- arch/x86/kvm/vmx/tdx.h  |  2 ++
- 3 files changed, 35 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/tdx.c | 46 +++++++++++++++++++++++++++++++++---------
+ 1 file changed, 37 insertions(+), 9 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 463de3add3bd..7f3be1b65ce1 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -235,6 +235,14 @@ static void vt_msr_filter_changed(struct kvm_vcpu *vcpu)
- 	vmx_msr_filter_changed(vcpu);
- }
- 
-+static int vt_complete_emulated_msr(struct kvm_vcpu *vcpu, int err)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return tdx_complete_emulated_msr(vcpu, err);
-+
-+	return kvm_complete_insn_gp(vcpu, err);
-+}
-+
- #ifdef CONFIG_KVM_SMM
- static int vt_smi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
- {
-@@ -686,7 +694,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.migrate_timers = vmx_migrate_timers,
- 
- 	.msr_filter_changed = vt_msr_filter_changed,
--	.complete_emulated_msr = kvm_complete_insn_gp,
-+	.complete_emulated_msr = vt_complete_emulated_msr,
- 
- 	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
- 
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 5b556af0f139..85ff6e040cf3 100644
+index 85ff6e040cf3..76764bf5ba29 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -878,6 +878,8 @@ static __always_inline u32 tdcall_to_vmx_exit_reason(struct kvm_vcpu *vcpu)
- 	case EXIT_REASON_CPUID:
- 	case EXIT_REASON_HLT:
- 	case EXIT_REASON_IO_INSTRUCTION:
-+	case EXIT_REASON_MSR_READ:
-+	case EXIT_REASON_MSR_WRITE:
- 		return tdvmcall_leaf(vcpu);
- 	case EXIT_REASON_EPT_VIOLATION:
- 		return EXIT_REASON_EPT_MISCONFIG;
-@@ -1880,6 +1882,20 @@ static int tdx_handle_ept_violation(struct kvm_vcpu *vcpu)
- 	return ret;
+@@ -2039,6 +2039,7 @@ bool tdx_has_emulated_msr(u32 index)
+ 	case MSR_MISC_FEATURES_ENABLES:
+ 	case MSR_IA32_APICBASE:
+ 	case MSR_EFER:
++	case MSR_IA32_FEAT_CTL:
+ 	case MSR_IA32_MCG_CAP:
+ 	case MSR_IA32_MCG_STATUS:
+ 	case MSR_IA32_MCG_CTL:
+@@ -2071,26 +2072,53 @@ bool tdx_has_emulated_msr(u32 index)
+ 
+ static bool tdx_is_read_only_msr(u32 index)
+ {
+-	return  index == MSR_IA32_APICBASE || index == MSR_EFER;
++	return  index == MSR_IA32_APICBASE || index == MSR_EFER ||
++		index == MSR_IA32_FEAT_CTL;
  }
  
-+int tdx_complete_emulated_msr(struct kvm_vcpu *vcpu, int err)
-+{
-+	if (err) {
-+		tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_INVALID_OPERAND);
-+		return 1;
-+	}
-+
-+	if (vmx_get_exit_reason(vcpu).basic == EXIT_REASON_MSR_READ)
-+		tdvmcall_set_return_val(vcpu, kvm_read_edx_eax(vcpu));
-+
-+	return 1;
-+}
-+
-+
- int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
+ int tdx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
  {
- 	struct vcpu_tdx *tdx = to_tdx(vcpu);
-@@ -1945,6 +1961,14 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
- 		return tdx_emulate_vmcall(vcpu);
- 	case EXIT_REASON_IO_INSTRUCTION:
- 		return tdx_emulate_io(vcpu);
-+	case EXIT_REASON_MSR_READ:
-+		kvm_rcx_write(vcpu, tdx->vp_enter_args.r12);
-+		return kvm_emulate_rdmsr(vcpu);
-+	case EXIT_REASON_MSR_WRITE:
-+		kvm_rcx_write(vcpu, tdx->vp_enter_args.r12);
-+		kvm_rax_write(vcpu, tdx->vp_enter_args.r13 & -1u);
-+		kvm_rdx_write(vcpu, tdx->vp_enter_args.r13 >> 32);
-+		return kvm_emulate_wrmsr(vcpu);
- 	case EXIT_REASON_EPT_MISCONFIG:
- 		return tdx_emulate_mmio(vcpu);
- 	case EXIT_REASON_EPT_VIOLATION:
-diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-index cb9014b7a4f1..8f8070d0f55e 100644
---- a/arch/x86/kvm/vmx/tdx.h
-+++ b/arch/x86/kvm/vmx/tdx.h
-@@ -171,6 +171,7 @@ static __always_inline void td_##lclass##_clearbit##bits(struct vcpu_tdx *tdx,	\
+-	if (!tdx_has_emulated_msr(msr->index))
+-		return 1;
++	switch (msr->index) {
++	case MSR_IA32_FEAT_CTL:
++		/*
++		 * MCE and MCA are advertised via cpuid. Guest kernel could
++		 * check if LMCE is enabled or not.
++		 */
++		msr->data = FEAT_CTL_LOCKED;
++		if (vcpu->arch.mcg_cap & MCG_LMCE_P)
++			msr->data |= FEAT_CTL_LMCE_ENABLED;
++		return 0;
++	case MSR_IA32_MCG_EXT_CTL:
++		if (!msr->host_initiated && !(vcpu->arch.mcg_cap & MCG_LMCE_P))
++			return 1;
++		msr->data = vcpu->arch.mcg_ext_ctl;
++		return 0;
++	default:
++		if (!tdx_has_emulated_msr(msr->index))
++			return 1;
  
+-	return kvm_get_msr_common(vcpu, msr);
++		return kvm_get_msr_common(vcpu, msr);
++	}
+ }
  
- bool tdx_interrupt_allowed(struct kvm_vcpu *vcpu);
-+int tdx_complete_emulated_msr(struct kvm_vcpu *vcpu, int err);
+ int tdx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+ {
+-	if (tdx_is_read_only_msr(msr->index))
+-		return 1;
++	switch (msr->index) {
++	case MSR_IA32_MCG_EXT_CTL:
++		if ((!msr->host_initiated && !(vcpu->arch.mcg_cap & MCG_LMCE_P)) ||
++		    (msr->data & ~MCG_EXT_CTL_LMCE_EN))
++			return 1;
++		vcpu->arch.mcg_ext_ctl = msr->data;
++		return 0;
++	default:
++		if (tdx_is_read_only_msr(msr->index))
++			return 1;
  
- TDX_BUILD_TDVPS_ACCESSORS(16, VMCS, vmcs);
- TDX_BUILD_TDVPS_ACCESSORS(32, VMCS, vmcs);
-@@ -194,6 +195,7 @@ struct vcpu_tdx {
- };
+-	if (!tdx_has_emulated_msr(msr->index))
+-		return 1;
++		if (!tdx_has_emulated_msr(msr->index))
++			return 1;
  
- static inline bool tdx_interrupt_allowed(struct kvm_vcpu *vcpu) { return false; }
-+static inline int tdx_complete_emulated_msr(struct kvm_vcpu *vcpu, int err) { return 0; }
+-	return kvm_set_msr_common(vcpu, msr);
++		return kvm_set_msr_common(vcpu, msr);
++	}
+ }
  
- #endif
- 
+ static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
 -- 
 2.46.0
 
