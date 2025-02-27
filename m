@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-39441-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39442-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C03C5A470D3
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:19:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66F50A470D5
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:20:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D9E927A95B9
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:18:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E75E8188DB7D
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:20:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAB4314F9F4;
-	Thu, 27 Feb 2025 01:19:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6574315CD55;
+	Thu, 27 Feb 2025 01:19:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Wy2zMwuI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nqGUi7QG"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE1422F01;
-	Thu, 27 Feb 2025 01:18:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04DA814B96E;
+	Thu, 27 Feb 2025 01:19:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740619141; cv=none; b=qC81KS+wOaotP2jPaeMGYEb55SOYGndy+ZYnhuCDcxOMUXMUP/8FA6UY3smtPq94VS2SkouWJHBBIAkPYuFhwOU8+RaErQ004nNnYBOcCbvJcPSknr+3KXwI/tgxQobgTtWFaETkyoHOxsusRfKSI3KURGiBNL/xaFl84+Deq3o=
+	t=1740619144; cv=none; b=RbtHi03G3Tth7YhoSkJOSIXqj3qj65NNRqx9FuOjw22QzelD/87CAGHTJ2pHJgUeL5Beit0pbBWEjduOLSYJe6NBgSPWjUrE14PrdoLnhcBbOpoXeXbQ2hcAygCo2g9IT2DLl28HRLH171GowzfahO1zPUwPkl+m1x3Un+CohZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740619141; c=relaxed/simple;
-	bh=DmK8LRAGl5CcObJpm47+U2I+JjTgigBYqYk/CcW5jq0=;
+	s=arc-20240116; t=1740619144; c=relaxed/simple;
+	bh=qXfVJSCufMdZGiMGONaIm/kQ0o1b85tXM8RtmwjYVvM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WVGOfFN/phTb8ImFQtvq+HBCc3V8vtEeXE/0AYtUwXP3IPL4AT3lN6MV/JFngrdOhVMcxGrR+jq319X5dHYwU5Kay0IFQTaoHro5uR+utQLu8K8tAU7j9AFOey7RHswPTHEp68+WsLY0y4DRFCpxD33GN8C4pAab7tZRfQOnIe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Wy2zMwuI; arc=none smtp.client-ip=198.175.65.9
+	 MIME-Version; b=ergCAsyJe4I/GOoMRypqPGi3QxsrxTCECP/djqMgvhMJhOC0OP+eCpywcQstz57nCqxG6fAVy2WuCXHetvtNEaaMVH/Bw5Y9od7kglE7WOub5R/dkeXZUDxLXLQepLfc47RT6w2xCvQALUhpmhn8NDmxkw3yBA7FaDdzWylbHKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nqGUi7QG; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740619139; x=1772155139;
+  t=1740619143; x=1772155143;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=DmK8LRAGl5CcObJpm47+U2I+JjTgigBYqYk/CcW5jq0=;
-  b=Wy2zMwuIYkoX7P/6lxwbCp6DzNVLCwqlmA3aEmQsfHwti4WPC1n9+L2y
-   Crrmo+IIbrZGWI7jQB+/ccCMTLCSSUxW0LZsj/tnC4m4oNVihubDxbZXc
-   +cQe0PD7RR3Cq1/WYGG/fgb+eFF0JuYGOnjfYbFYiZqWfmMZKPl/ak9uD
-   jFE4ZD3LnAt4cSu4eM4PN/Wqb9T7nfydP4EasqxFhcwe8e2oAyF/75pja
-   tFLU/9bUOrIcxQ61TibAmVLuZoktzHQ5Ptq4aVTcZ73Pwq5YkRZjxwybg
-   B1I9LBKMzrBN1Wyef5Ieiw5k4nrC/ytUxnebyHzrRSTy4T/+eWFFLCXpK
+  bh=qXfVJSCufMdZGiMGONaIm/kQ0o1b85tXM8RtmwjYVvM=;
+  b=nqGUi7QGIQWYpUx8zPOe8VZHbBAzUD70TEpaVKEEgS/tvCM2ymdI5bKT
+   XNU4/R2Y8GRBjKosKNqbktbGmbqLYm7I6w4Q1j3fKeSbQLWZNB+2QfGxy
+   YB5htETgeV7IvmgJhTteLTu7s++3eAFr5jQXWwXYHP2PfKaKPqW5tyXpp
+   MfjE3JJKAPg7kIsNnu1z9k/94Gc+0sZuITEi+V7GRFnPMv3jog7nrdzX0
+   7nTh4OqP6vhli4Bg2VgyQ3/L13ctZn9m0avA3z4XsD4ZBvY1xwtyqZluM
+   rqV4/nt3oFETc8O65ieWjwIYVicwR4k3E2yOd1MlN6ZiQgybdbxif6Lox
    w==;
-X-CSE-ConnectionGUID: ZIiosn3LTs+mc5GAAlNdIw==
-X-CSE-MsgGUID: h6nPWl5hSoKZGIONPm0w8w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11357"; a="63959598"
+X-CSE-ConnectionGUID: zAaU9LMrReqQJ73hno7NzA==
+X-CSE-MsgGUID: MmYIAqU/RvSMvE9ZPXdnSg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11357"; a="63959604"
 X-IronPort-AV: E=Sophos;i="6.13,318,1732608000"; 
-   d="scan'208";a="63959598"
+   d="scan'208";a="63959604"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 17:18:59 -0800
-X-CSE-ConnectionGUID: jvspfqGaTo21I7sy2NgkcA==
-X-CSE-MsgGUID: c8rykWehTv+q2chbFli9SA==
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 17:19:02 -0800
+X-CSE-ConnectionGUID: xJftErw0Rr6ZlA/zdj9X9Q==
+X-CSE-MsgGUID: 0yfIO+L4QOOCyhMvH6sjcA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,318,1732608000"; 
-   d="scan'208";a="116674839"
+   d="scan'208";a="116674858"
 Received: from litbin-desktop.sh.intel.com ([10.239.156.93])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 17:18:55 -0800
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 17:18:59 -0800
 From: Binbin Wu <binbin.wu@linux.intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com,
@@ -73,9 +73,9 @@ Cc: rick.p.edgecombe@intel.com,
 	chao.gao@intel.com,
 	linux-kernel@vger.kernel.org,
 	binbin.wu@linux.intel.com
-Subject: [PATCH v2 03/20] KVM: TDX: Retry locally in TDX EPT violation handler on RET_PF_RETRY
-Date: Thu, 27 Feb 2025 09:20:04 +0800
-Message-ID: <20250227012021.1778144-4-binbin.wu@linux.intel.com>
+Subject: [PATCH v2 04/20] KVM: TDX: Kick off vCPUs when SEAMCALL is busy during TD page removal
+Date: Thu, 27 Feb 2025 09:20:05 +0800
+Message-ID: <20250227012021.1778144-5-binbin.wu@linux.intel.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20250227012021.1778144-1-binbin.wu@linux.intel.com>
 References: <20250227012021.1778144-1-binbin.wu@linux.intel.com>
@@ -89,161 +89,173 @@ Content-Transfer-Encoding: 8bit
 
 From: Yan Zhao <yan.y.zhao@intel.com>
 
-Retry locally in the TDX EPT violation handler for private memory to reduce
-the chances for tdh_mem_sept_add()/tdh_mem_page_aug() to contend with
-tdh_vp_enter().
+Kick off all vCPUs and prevent tdh_vp_enter() from executing whenever
+tdh_mem_range_block()/tdh_mem_track()/tdh_mem_page_remove() encounters
+contention, since the page removal path does not expect error and is less
+sensitive to the performance penalty caused by kicking off vCPUs.
 
-TDX EPT violation installs private pages via tdh_mem_sept_add() and
-tdh_mem_page_aug(). The two may have contention with tdh_vp_enter() or
-TDCALLs.
+Although KVM has protected SEPT zap-related SEAMCALLs with kvm->mmu_lock,
+KVM may still encounter TDX_OPERAND_BUSY due to the contention in the TDX
+module.
+- tdh_mem_track() may contend with tdh_vp_enter().
+- tdh_mem_range_block()/tdh_mem_page_remove() may contend with
+  tdh_vp_enter() and TDCALLs.
 
-Resources    SHARED  users      EXCLUSIVE users
+Resources     SHARED users      EXCLUSIVE users
 ------------------------------------------------------------
-SEPT tree  tdh_mem_sept_add     tdh_vp_enter(0-step mitigation)
-           tdh_mem_page_aug
+TDCS epoch    tdh_vp_enter      tdh_mem_track
 ------------------------------------------------------------
-SEPT entry                      tdh_mem_sept_add (Host lock)
-                                tdh_mem_page_aug (Host lock)
+SEPT tree  tdh_mem_page_remove  tdh_vp_enter (0-step mitigation)
+                                tdh_mem_range_block
+------------------------------------------------------------
+SEPT entry                      tdh_mem_range_block (Host lock)
+                                tdh_mem_page_remove (Host lock)
                                 tdg_mem_page_accept (Guest lock)
                                 tdg_mem_page_attr_rd (Guest lock)
                                 tdg_mem_page_attr_wr (Guest lock)
 
-Though the contention between tdh_mem_sept_add()/tdh_mem_page_aug() and
-TDCALLs may be removed in future TDX module, their contention with
-tdh_vp_enter() due to 0-step mitigation still persists.
+Use a TDX specific per-VM flag wait_for_sept_zap along with
+KVM_REQ_OUTSIDE_GUEST_MODE to kick off vCPUs and prevent them from entering
+TD, thereby avoiding the potential contention. Apply the kick-off and no
+vCPU entering only after each SEAMCALL busy error to minimize the window of
+no TD entry, as the contention due to 0-step mitigation or TDCALLs is
+expected to be rare.
 
-The TDX module may trigger 0-step mitigation in SEAMCALL TDH.VP.ENTER,
-which works as follows:
-0. Each TDH.VP.ENTER records the guest RIP on TD entry.
-1. When the TDX module encounters a VM exit with reason EPT_VIOLATION, it
-   checks if the guest RIP is the same as last guest RIP on TD entry.
-   -if yes, it means the EPT violation is caused by the same instruction
-            that caused the last VM exit.
-            Then, the TDX module increases the guest RIP no-progress count.
-            When the count increases from 0 to the threshold (currently 6),
-            the TDX module records the faulting GPA into a
-            last_epf_gpa_list.
-   -if no,  it means the guest RIP has made progress.
-            So, the TDX module resets the RIP no-progress count and the
-            last_epf_gpa_list.
-2. On the next TDH.VP.ENTER, the TDX module (after saving the guest RIP on
-   TD entry) checks if the last_epf_gpa_list is empty.
-   -if yes, TD entry continues without acquiring the lock on the SEPT tree.
-   -if no,  it triggers the 0-step mitigation by acquiring the exclusive
-            lock on SEPT tree, walking the EPT tree to check if all page
-            faults caused by the GPAs in the last_epf_gpa_list have been
-            resolved before continuing TD entry.
-
-Since KVM TDP MMU usually re-enters guest whenever it exits to userspace
-(e.g. for KVM_EXIT_MEMORY_FAULT) or encounters a BUSY, it is possible for a
-tdh_vp_enter() to be called more than the threshold count before a page
-fault is addressed, triggering contention when tdh_vp_enter() attempts to
-acquire exclusive lock on SEPT tree.
-
-Retry locally in TDX EPT violation handler to reduce the count of invoking
-tdh_vp_enter(), hence reducing the possibility of its contention with
-tdh_mem_sept_add()/tdh_mem_page_aug(). However, the 0-step mitigation and
-the contention are still not eliminated due to KVM_EXIT_MEMORY_FAULT,
-signals/interrupts, and cases when one instruction faults more GFNs than
-the threshold count.
-
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
-Changes from "KVM: TDX SEPT SEAMCALL retry" series [1]
-- Use kvm_vcpu_has_events() to replace "pi_has_pending_interrupt(vcpu) ||
-  kvm_test_request(KVM_REQ_NMI, vcpu) || vcpu->arch.nmi_pending)" [2].
-  (Sean)
-- Update code comment to explain why break out for false positive of
-  interrupt injection is fine (Sean).
-
-[1]: https://lore.kernel.org/all/20250113021218.18922-1-yan.y.zhao@intel.com
-[2]: https://lore.kernel.org/all/Z4rIGv4E7Jdmhl8P@google.com
+Rebased to use helper tdx_operand_busy().
 ---
- arch/x86/kvm/vmx/tdx.c | 57 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 56 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/tdx.c | 63 ++++++++++++++++++++++++++++++++++++------
+ arch/x86/kvm/vmx/tdx.h |  7 +++++
+ 2 files changed, 61 insertions(+), 9 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index b8701e343e80..6fa6f7e13e15 100644
+index 6fa6f7e13e15..25ae2c2826d0 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1698,6 +1698,8 @@ static int tdx_handle_ept_violation(struct kvm_vcpu *vcpu)
- {
- 	unsigned long exit_qual;
- 	gpa_t gpa = to_tdx(vcpu)->exit_gpa;
-+	bool local_retry = false;
-+	int ret;
- 
- 	if (vt_is_tdx_private_gpa(vcpu->kvm, gpa)) {
- 		if (tdx_is_sept_violation_unexpected_pending(vcpu)) {
-@@ -1716,6 +1718,9 @@ static int tdx_handle_ept_violation(struct kvm_vcpu *vcpu)
- 		 * due to aliasing a single HPA to multiple GPAs.
- 		 */
- 		exit_qual = EPT_VIOLATION_ACC_WRITE;
-+
-+		/* Only private GPA triggers zero-step mitigation */
-+		local_retry = true;
- 	} else {
- 		exit_qual = vmx_get_exit_qual(vcpu);
- 		/*
-@@ -1728,7 +1733,57 @@ static int tdx_handle_ept_violation(struct kvm_vcpu *vcpu)
- 	}
- 
- 	trace_kvm_page_fault(vcpu, gpa, exit_qual);
--	return __vmx_handle_ept_violation(vcpu, gpa, exit_qual);
-+
-+	/*
-+	 * To minimize TDH.VP.ENTER invocations, retry locally for private GPA
-+	 * mapping in TDX.
-+	 *
-+	 * KVM may return RET_PF_RETRY for private GPA due to
-+	 * - contentions when atomically updating SPTEs of the mirror page table
-+	 * - in-progress GFN invalidation or memslot removal.
-+	 * - TDX_OPERAND_BUSY error from TDH.MEM.PAGE.AUG or TDH.MEM.SEPT.ADD,
-+	 *   caused by contentions with TDH.VP.ENTER (with zero-step mitigation)
-+	 *   or certain TDCALLs.
-+	 *
-+	 * If TDH.VP.ENTER is invoked more times than the threshold set by the
-+	 * TDX module before KVM resolves the private GPA mapping, the TDX
-+	 * module will activate zero-step mitigation during TDH.VP.ENTER. This
-+	 * process acquires an SEPT tree lock in the TDX module, leading to
-+	 * further contentions with TDH.MEM.PAGE.AUG or TDH.MEM.SEPT.ADD
-+	 * operations on other vCPUs.
-+	 *
-+	 * Breaking out of local retries for kvm_vcpu_has_events() is for
-+	 * interrupt injection. kvm_vcpu_has_events() should not see pending
-+	 * events for TDX. Since KVM can't determine if IRQs (or NMIs) are
-+	 * blocked by TDs, false positives are inevitable i.e., KVM may re-enter
-+	 * the guest even if the IRQ/NMI can't be delivered.
-+	 *
-+	 * Note: even without breaking out of local retries, zero-step
-+	 * mitigation may still occur due to
-+	 * - invoking of TDH.VP.ENTER after KVM_EXIT_MEMORY_FAULT,
-+	 * - a single RIP causing EPT violations for more GFNs than the
-+	 *   threshold count.
-+	 * This is safe, as triggering zero-step mitigation only introduces
-+	 * contentions to page installation SEAMCALLs on other vCPUs, which will
-+	 * handle retries locally in their EPT violation handlers.
-+	 */
-+	while (1) {
-+		ret = __vmx_handle_ept_violation(vcpu, gpa, exit_qual);
-+
-+		if (ret != RET_PF_RETRY || !local_retry)
-+			break;
-+
-+		if (kvm_vcpu_has_events(vcpu) || signal_pending(current))
-+			break;
-+
-+		if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu)) {
-+			ret = -EIO;
-+			break;
-+		}
-+
-+		cond_resched();
-+	}
-+	return ret;
+@@ -294,6 +294,26 @@ static void tdx_clear_page(struct page *page)
+ 	__mb();
  }
  
- int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
++static void tdx_no_vcpus_enter_start(struct kvm *kvm)
++{
++	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
++
++	lockdep_assert_held_write(&kvm->mmu_lock);
++
++	WRITE_ONCE(kvm_tdx->wait_for_sept_zap, true);
++
++	kvm_make_all_cpus_request(kvm, KVM_REQ_OUTSIDE_GUEST_MODE);
++}
++
++static void tdx_no_vcpus_enter_stop(struct kvm *kvm)
++{
++	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
++
++	lockdep_assert_held_write(&kvm->mmu_lock);
++
++	WRITE_ONCE(kvm_tdx->wait_for_sept_zap, false);
++}
++
+ /* TDH.PHYMEM.PAGE.RECLAIM is allowed only when destroying the TD. */
+ static int __tdx_reclaim_page(struct page *page)
+ {
+@@ -953,6 +973,14 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediate_exit)
+ 		return EXIT_FASTPATH_NONE;
+ 	}
+ 
++	/*
++	 * Wait until retry of SEPT-zap-related SEAMCALL completes before
++	 * allowing vCPU entry to avoid contention with tdh_vp_enter() and
++	 * TDCALLs.
++	 */
++	if (unlikely(READ_ONCE(to_kvm_tdx(vcpu->kvm)->wait_for_sept_zap)))
++		return EXIT_FASTPATH_EXIT_HANDLED;
++
+ 	trace_kvm_entry(vcpu, force_immediate_exit);
+ 
+ 	if (pi_test_on(&vt->pi_desc)) {
+@@ -1467,15 +1495,24 @@ static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
+ 	if (KVM_BUG_ON(!is_hkid_assigned(kvm_tdx), kvm))
+ 		return -EINVAL;
+ 
+-	do {
++	/*
++	 * When zapping private page, write lock is held. So no race condition
++	 * with other vcpu sept operation.
++	 * Race with TDH.VP.ENTER due to (0-step mitigation) and Guest TDCALLs.
++	 */
++	err = tdh_mem_page_remove(&kvm_tdx->td, gpa, tdx_level, &entry,
++				  &level_state);
++
++	if (unlikely(tdx_operand_busy(err))) {
+ 		/*
+-		 * When zapping private page, write lock is held. So no race
+-		 * condition with other vcpu sept operation.  Race only with
+-		 * TDH.VP.ENTER.
++		 * The second retry is expected to succeed after kicking off all
++		 * other vCPUs and prevent them from invoking TDH.VP.ENTER.
+ 		 */
++		tdx_no_vcpus_enter_start(kvm);
+ 		err = tdh_mem_page_remove(&kvm_tdx->td, gpa, tdx_level, &entry,
+ 					  &level_state);
+-	} while (unlikely(tdx_operand_busy(err)));
++		tdx_no_vcpus_enter_stop(kvm);
++	}
+ 
+ 	if (KVM_BUG_ON(err, kvm)) {
+ 		pr_tdx_error_2(TDH_MEM_PAGE_REMOVE, err, entry, level_state);
+@@ -1559,9 +1596,13 @@ static int tdx_sept_zap_private_spte(struct kvm *kvm, gfn_t gfn,
+ 	WARN_ON_ONCE(level != PG_LEVEL_4K);
+ 
+ 	err = tdh_mem_range_block(&kvm_tdx->td, gpa, tdx_level, &entry, &level_state);
+-	if (unlikely(tdx_operand_busy(err)))
+-		return -EBUSY;
+ 
++	if (unlikely(tdx_operand_busy(err))) {
++		/* After no vCPUs enter, the second retry is expected to succeed */
++		tdx_no_vcpus_enter_start(kvm);
++		err = tdh_mem_range_block(&kvm_tdx->td, gpa, tdx_level, &entry, &level_state);
++		tdx_no_vcpus_enter_stop(kvm);
++	}
+ 	if (tdx_is_sept_zap_err_due_to_premap(kvm_tdx, err, entry, level) &&
+ 	    !KVM_BUG_ON(!atomic64_read(&kvm_tdx->nr_premapped), kvm)) {
+ 		atomic64_dec(&kvm_tdx->nr_premapped);
+@@ -1611,9 +1652,13 @@ static void tdx_track(struct kvm *kvm)
+ 
+ 	lockdep_assert_held_write(&kvm->mmu_lock);
+ 
+-	do {
++	err = tdh_mem_track(&kvm_tdx->td);
++	if (unlikely(tdx_operand_busy(err))) {
++		/* After no vCPUs enter, the second retry is expected to succeed */
++		tdx_no_vcpus_enter_start(kvm);
+ 		err = tdh_mem_track(&kvm_tdx->td);
+-	} while (unlikely(tdx_operand_busy(err)));
++		tdx_no_vcpus_enter_stop(kvm);
++	}
+ 
+ 	if (KVM_BUG_ON(err, kvm))
+ 		pr_tdx_error(TDH_MEM_TRACK, err);
+diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+index 4e1e71d5d8e8..c6bafac31d4d 100644
+--- a/arch/x86/kvm/vmx/tdx.h
++++ b/arch/x86/kvm/vmx/tdx.h
+@@ -36,6 +36,13 @@ struct kvm_tdx {
+ 
+ 	/* For KVM_TDX_INIT_MEM_REGION. */
+ 	atomic64_t nr_premapped;
++
++	/*
++	 * Prevent vCPUs from TD entry to ensure SEPT zap related SEAMCALLs do
++	 * not contend with tdh_vp_enter() and TDCALLs.
++	 * Set/unset is protected with kvm->mmu_lock.
++	 */
++	bool wait_for_sept_zap;
+ };
+ 
+ /* TDX module vCPU states */
 -- 
 2.46.0
 
