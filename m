@@ -1,168 +1,127 @@
-Return-Path: <kvm+bounces-39420-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39421-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BD5FA46FD9
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:08:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BF6FA47028
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:24:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 491C23AA403
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 00:07:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D14F116A28E
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 00:23:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 463DC28373;
-	Thu, 27 Feb 2025 00:07:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C30FF4C62;
+	Thu, 27 Feb 2025 00:23:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e2kX9+pl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r2xqihso"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14259EEC3
-	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 00:07:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB926A47;
+	Thu, 27 Feb 2025 00:23:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740614837; cv=none; b=cxr7UgfnnUr1geQSuZDgoi/csGHZrMJpABkeUn+87eIpUyr3Ywnl8/0j5kT5PEREAXHz6QtFnB3p6SEe0PVU9eh1o9StF+o33KLbTiGWtofkQ7Vn5q+sn5a9emN9+NMST1W/vrRUQH5qjjy+FQAA3r2m9InOhCZYkL0KYmgTyGY=
+	t=1740615819; cv=none; b=C8A6QN000qp6vcC3jd8GhCiqX2UbdoiUCT0VmmyQwBGe1t0oKVwHO6ko/CNyn2Bc01uYDauMdJ1JdYN+vgPdi5H/TiZ+GwR8eO/B5PQWigkfEfTyXIqqCFr1YabZFTn63oEZKZB93RFpFQmgpI5YTJFLk1GRQPhGpgMDPDx9B3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740614837; c=relaxed/simple;
-	bh=0OcKgr3Czng9NbWaBwLaNoKEDdd3fZmUTwyjhXF8x4s=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RXoHnHUmdRvII+PvSwzLHBVba6dMPMxGR/CkgPK9m2lwtRu4elUt0fgH0ZWnEAC6iiOOp1PWvQE+TCdCQ3mzivNaF3BA8MtEsWNHU6L+R6b6exE5wEVQmuvS7KnN5SkM1g9rkxbG8fySX7xvDRJIJPR6UYY9AA/B7GEfG7cyMIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e2kX9+pl; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fc5a9f18afso820878a91.1
-        for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 16:07:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740614835; x=1741219635; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=OpBLcBPrSK39J8xwLKbfB7MiuFNa+KhFkiMUhKQTXu4=;
-        b=e2kX9+pl//35VPfbGU0jT0oZFwAwprk2IhdW5VOdvxXkvoM0o79YWRKxfhUMQQDWCJ
-         /2L+jmImp2xRicbqR3WtLzbUZJeKTzs10WDZ/7/TViGZuqmHiQP9YWtvvabPqn4kOgKl
-         /wN6jIRIXByfVa7Q8XvtztfbC5fmbMJ30mBEDsPyQkZgYgVuDTLlvHEKtCQhH+6Eh9mg
-         ziS3rnyE84rsTmb88VJFEX6xTQC1PtZTkDfi8U0+oq3oZzoV3F20cZhlCJ3P1LGgxgIj
-         CDqvgh7TuuCAc6b6WEsVhLhvCjRguHi4RoVA3ShXM8OGnio8PV9s3QR8JvvIhi2XY6Nb
-         2xlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740614835; x=1741219635;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OpBLcBPrSK39J8xwLKbfB7MiuFNa+KhFkiMUhKQTXu4=;
-        b=vDw4Ugqo8BpDVpXulS45V3yRHdoqSoc9j94kKBkRQzdYCfz5KoFPRWorqMtVQLjQHF
-         SVubHkx3XfjXX85HhJ4lwWPwfCQExp43VvHoGMWgUK4otFiWaRwC5w/Kwr04SOcxZCtt
-         2lm4a8Zq/BBoASQ4cpvcVmNFSpMNhZ6vtbK6mN5M34Gaw4sy7BUJ8sO/cfPl0jBf9vtL
-         0UTXNzI5RD4VwRyaRHntOUv5W/429Waf1PU4hcIE+qL9jTiuZAai6TONGSk1kgmv6/VE
-         TkNSKT/CKMNBAdW1WasCkI/+i+cdk60LUMqocdtH7rnEGmyMX47eSxUnhDLdyDPR5v6d
-         5C4Q==
-X-Gm-Message-State: AOJu0YwYhUQMAOCtYCICqEVra1PHNT6aFHpvBfUy/1wcMTP42mdzJ3Y1
-	GiZ7Ix/v7Kd0zB1cNXWotBghjZtYStE1BhsumxUtKkcoX7tgqRSOF1f4sYUGPDQWyD3BfMFOFr9
-	c1w==
-X-Google-Smtp-Source: AGHT+IHvRvyrfuq3N6aeKsAExnrfi6YmDK+XDqxdTsUoJhVn44XGuxYyjmOc7xmxw6spYnjHOgtwHqwO+MQ=
-X-Received: from pjbqi7.prod.google.com ([2002:a17:90b:2747:b0:2f5:4762:e778])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:518b:b0:2ee:741c:e9f4
- with SMTP id 98e67ed59e1d1-2fe7e31f509mr8554685a91.11.1740614835389; Wed, 26
- Feb 2025 16:07:15 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 26 Feb 2025 16:07:05 -0800
-In-Reply-To: <20250227000705.3199706-1-seanjc@google.com>
+	s=arc-20240116; t=1740615819; c=relaxed/simple;
+	bh=arZMEBXiCeOAemtlaMD2whA3gu7IqKG3QKa02itcVOg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ct1419r43mslC0blzX6OXIPuTiXVNFfJlPURZaP9biX3RN7zSa4rhZ7ulpIT3w/9ziCd3UEBt+pTn0rKC6Q+VYgdFpdBiAoo/INEzXN7/iKeCW9yuY4wTNgxHA1LyfUM39qe/IJC0pxIW67EcYrveipfylEMZhNEduyuGpemk4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r2xqihso; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD563C4CED6;
+	Thu, 27 Feb 2025 00:23:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740615818;
+	bh=arZMEBXiCeOAemtlaMD2whA3gu7IqKG3QKa02itcVOg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=r2xqihsoUtx0mnh8RLLIjEAjPgloTP001LONjPAwoV/xeiJy8u+h01ej7a1b68K+7
+	 jUWOnoHeJxZDumCmTj/ZzoZaZG9ydutU8FnLZBzWkpQMicwuNBvJXS2zrYCAs4X0PK
+	 9kteFfAcP9iTwJz0s6ulQ9jOb9Lt2ihSF97X8Vw3k+vC3npgDNha5RcKi1axciDgWl
+	 bQ11PamfREIi44x+J2k4VjfstgeKYqFPYJi2np1bifjKJWgWJtGvY9/9IF2ysvlNd/
+	 vbi3gA4SceTDZaht2tDFNVSpwr3sVxPgE21Im3ifhTnJ3VD2AkKkqxicmsGA5ts9Yd
+	 gDhpiL5fqcsDw==
+Date: Thu, 27 Feb 2025 00:23:31 +0000
+From: Will Deacon <will@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Steven Price <steven.price@arm.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v7 09/11] arm64: Enable memory encrypt for Realms
+Message-ID: <20250227002330.GA24899@willie-the-truck>
+References: <20241017131434.40935-1-steven.price@arm.com>
+ <20241017131434.40935-10-steven.price@arm.com>
+ <5aeb6f47-12be-40d5-be6f-847bb8ddc605@arm.com>
+ <Z79lZdYqWINaHfrp@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250227000705.3199706-1-seanjc@google.com>
-X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <20250227000705.3199706-3-seanjc@google.com>
-Subject: [PATCH v2 2/2] KVM: nVMX: Decouple EPT RWX bits from EPT Violation
- protection bits
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Nikolay Borisov <nik.borisov@suse.com>, Jon Kohler <jon@nutanix.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z79lZdYqWINaHfrp@arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Define independent macros for the RWX protection bits that are enumerated
-via EXIT_QUALIFICATION for EPT Violations, and tie them to the RWX bits in
-EPT entries via compile-time asserts.  Piggybacking the EPTE defines works
-for now, but it creates holes in the EPT_VIOLATION_xxx macros and will
-cause headaches if/when KVM emulates Mode-Based Execution (MBEC), or any
-other features that introduces additional protection information.
+On Wed, Feb 26, 2025 at 07:03:01PM +0000, Catalin Marinas wrote:
+> On Wed, Feb 19, 2025 at 02:30:28PM +0000, Steven Price wrote:
+> > > @@ -23,14 +25,16 @@ bool rodata_full __ro_after_init = IS_ENABLED(CONFIG_RODATA_FULL_DEFAULT_ENABLED
+> > >  bool can_set_direct_map(void)
+> > >  {
+> > >  	/*
+> > > -	 * rodata_full and DEBUG_PAGEALLOC require linear map to be
+> > > -	 * mapped at page granularity, so that it is possible to
+> > > +	 * rodata_full, DEBUG_PAGEALLOC and a Realm guest all require linear
+> > > +	 * map to be mapped at page granularity, so that it is possible to
+> > >  	 * protect/unprotect single pages.
+> > >  	 *
+> > >  	 * KFENCE pool requires page-granular mapping if initialized late.
+> > > +	 *
+> > > +	 * Realms need to make pages shared/protected at page granularity.
+> > >  	 */
+> > >  	return rodata_full || debug_pagealloc_enabled() ||
+> > > -	       arm64_kfence_can_set_direct_map();
+> > > +		arm64_kfence_can_set_direct_map() || is_realm_world();
+> > >  }
+> > 
+> > Aneesh pointed out that this call to is_realm_world() is now too early 
+> > since the decision to delay the RSI detection. The upshot is that a 
+> > realm guest which doesn't have page granularity forced for other reasons 
+> > will fail to share pages with the host.
+> > 
+> > At the moment I can think of a couple of options:
+> > 
+> > (1) Make rodata_full a requirement for realm guests. 
+> >     CONFIG_RODATA_FULL_DEFAULT_ENABLED is already "default y" so this 
+> >     isn't a big ask.
+> > 
+> > (2) Revisit the idea of detecting when running as a realm guest early. 
+> >     This has the advantage of also "fixing" earlycon (no need to 
+> >     manually specify the shared-alias of an unprotected UART).
+> > 
+> > I'm currently leaning towards (1) because it's the default anyway. But 
+> > if we're going to need to fix earlycon (or indeed find other similar 
+> > issues) then (2) would obviously make sense.
+> 
+> I'd go with (1) since the end result is the same even if we implemented
+> (2) - i.e. we still avoid block mappings in realms.
 
-Opportunistically rename EPT_VIOLATION_RWX_MASK to EPT_VIOLATION_PROT_MASK
-so that it doesn't become stale if/when MBEC support is added.
+Is it, though? The config option is about the default behaviour but there's
+still an "rodata=" option on the command-line.
 
-No functional change intended.
-
-Cc: Jon Kohler <jon@nutanix.com>
-Cc: Nikolay Borisov <nik.borisov@suse.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/include/asm/vmx.h     | 13 +++++++++++--
- arch/x86/kvm/mmu/paging_tmpl.h |  3 +--
- arch/x86/kvm/vmx/vmx.c         |  2 +-
- 3 files changed, 13 insertions(+), 5 deletions(-)
-
-diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-index aabc223c6498..8707361b24da 100644
---- a/arch/x86/include/asm/vmx.h
-+++ b/arch/x86/include/asm/vmx.h
-@@ -580,14 +580,23 @@ enum vm_entry_failure_code {
- /*
-  * Exit Qualifications for EPT Violations
-  */
--#define EPT_VIOLATION_RWX_SHIFT		3
- #define EPT_VIOLATION_ACC_READ		BIT(0)
- #define EPT_VIOLATION_ACC_WRITE		BIT(1)
- #define EPT_VIOLATION_ACC_INSTR		BIT(2)
--#define EPT_VIOLATION_RWX_MASK		(VMX_EPT_RWX_MASK << EPT_VIOLATION_RWX_SHIFT)
-+#define EPT_VIOLATION_PROT_READ		BIT(3)
-+#define EPT_VIOLATION_PROT_WRITE	BIT(4)
-+#define EPT_VIOLATION_PROT_EXEC		BIT(5)
-+#define EPT_VIOLATION_PROT_MASK		(EPT_VIOLATION_PROT_READ  | \
-+					 EPT_VIOLATION_PROT_WRITE | \
-+					 EPT_VIOLATION_PROT_EXEC)
- #define EPT_VIOLATION_GVA_IS_VALID	BIT(7)
- #define EPT_VIOLATION_GVA_TRANSLATED	BIT(8)
- 
-+#define EPT_VIOLATION_RWX_TO_PROT(__epte) (((__epte) & VMX_EPT_RWX_MASK) << 3)
-+
-+static_assert(EPT_VIOLATION_RWX_TO_PROT(VMX_EPT_RWX_MASK) ==
-+	      (EPT_VIOLATION_PROT_READ | EPT_VIOLATION_PROT_WRITE | EPT_VIOLATION_PROT_EXEC));
-+
- /*
-  * Exit Qualifications for NOTIFY VM EXIT
-  */
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index f4711674c47b..68e323568e95 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -510,8 +510,7 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
- 		 * Note, pte_access holds the raw RWX bits from the EPTE, not
- 		 * ACC_*_MASK flags!
- 		 */
--		walker->fault.exit_qualification |= (pte_access & VMX_EPT_RWX_MASK) <<
--						     EPT_VIOLATION_RWX_SHIFT;
-+		walker->fault.exit_qualification |= EPT_VIOLATION_RWX_TO_PROT(pte_access);
- 	}
- #endif
- 	walker->fault.address = addr;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index b71392989609..049f28f1b2bc 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5821,7 +5821,7 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
- 	error_code |= (exit_qualification & EPT_VIOLATION_ACC_INSTR)
- 		      ? PFERR_FETCH_MASK : 0;
- 	/* ept page table entry is present? */
--	error_code |= (exit_qualification & EPT_VIOLATION_RWX_MASK)
-+	error_code |= (exit_qualification & EPT_VIOLATION_PROT_MASK)
- 		      ? PFERR_PRESENT_MASK : 0;
- 
- 	if (error_code & EPT_VIOLATION_GVA_IS_VALID)
--- 
-2.48.1.711.g2feabab25a-goog
-
+Will
 
