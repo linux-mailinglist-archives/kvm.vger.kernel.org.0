@@ -1,146 +1,117 @@
-Return-Path: <kvm+bounces-39634-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39635-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A924A48A5D
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 22:21:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1164A48B21
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 23:09:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 458A518903CE
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 21:21:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6699E7A6BF7
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 22:08:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74C8D27126F;
-	Thu, 27 Feb 2025 21:21:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65739272908;
+	Thu, 27 Feb 2025 22:08:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BKlnf1fr"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62581E51D;
-	Thu, 27 Feb 2025 21:21:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFBE426E968;
+	Thu, 27 Feb 2025 22:08:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740691280; cv=none; b=fFqrqqtolPusjpsWgwJJml/sj2XrFpeufD2z+nPQEQF1nHWMEYFBeKxcfiA2+lbMbhh5yeeiGjlR3/A7oQexZd0Cg2ZCBYGW8GY/FMf16/dD+2kyepeYoa42Li3j161YMHz0XfTtuXoGfMY0erFzOBn3bbYIGlIQemiRfUMTIWs=
+	t=1740694137; cv=none; b=RHs6Pj0X8Z8z6Z6el/E/2LyRuK6enZr7z0uHEMvhJ1yzLnndajQgyPs2bSLZIoHAa7+fXT+a+IxlLvvwCj40eTfDI2+1qKmaGDjjDsLMH7rnMyVXozZsvGoMZNKzqFRn5bkvL76HTkvOLQejqzO6XtZpqSYAfZmZStsqIJ10HGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740691280; c=relaxed/simple;
-	bh=9RuxKDhoCVghKe6t6lWWrGTd2D0g9nNObPR+vAUEIuo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cmEKJP/5N82imX7xoWUfb9rw67Lo6lhtBgJZEsg+wNFM4PWupJuKoo1icc8TiYDmUeyAV+1ZP1t4pJqkPzN+3I92evjY6Te2bLzTnXuFJzec9uVc1LBYo3UWKG4RNUoeVcimYjAt1G+Jiubg0LVUlIrlmdFf6U1wgwBiTPxtuE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE34DC4CEDD;
-	Thu, 27 Feb 2025 21:21:13 +0000 (UTC)
-Date: Thu, 27 Feb 2025 21:21:11 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Will Deacon <will@kernel.org>
-Cc: Steven Price <steven.price@arm.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v7 09/11] arm64: Enable memory encrypt for Realms
-Message-ID: <Z8DXRwVrTpDVVMO2@arm.com>
-References: <20241017131434.40935-1-steven.price@arm.com>
- <20241017131434.40935-10-steven.price@arm.com>
- <5aeb6f47-12be-40d5-be6f-847bb8ddc605@arm.com>
- <Z79lZdYqWINaHfrp@arm.com>
- <20250227002330.GA24899@willie-the-truck>
- <Z8BEhK8P7FXgG11f@arm.com>
- <20250227172254.GB25617@willie-the-truck>
+	s=arc-20240116; t=1740694137; c=relaxed/simple;
+	bh=RtonItbxRqN5tUy3koSsiE+b6epQ5IsKPLHg4/gwsj4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=X++lrABkfb4GvCnNB2GVjPSFkDPPY01cqQoMDFSEuiXseVgC1mzANunwevneaREMbS6DImLW3G1t4RB6+hDEmX+b4V2feYGYql1Az3syoDBAzJeJJ+M9h5lPXwhH51v3YaQejowsICPb7LJ7OagnjnXZG3xwn2WvVxu5e/bvidU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BKlnf1fr; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-390df942558so1083023f8f.2;
+        Thu, 27 Feb 2025 14:08:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740694134; x=1741298934; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lEaZnjEGW+dXEB2fycgaBpMAJRVwO79ROy1KwTNDGTA=;
+        b=BKlnf1fr6zZ8QkTAgpp49+W9W9rNb06+YH/jv/9KZQM21g/BEZC9/tTR8Ys7WB7U80
+         K0MuvDOhImc7jxv8fL6ChRiDBFxBAIy5hoHSecC6ln8ptAFkBQFjml+1Itov0EUVOjNt
+         Wi3tgMqzKwFXpsTG9/fYUXO8lhUGPIZdc5173FLJTA7quuo8626xAr7IgrY5S/VV3z6P
+         DHivF5Fm5zll9wlizqy21U/Ds+4iiaXqKzfeHx6Be5nZ6jiKzTXApC1dbogiXZCB13Uo
+         q7AmnWZxeEqSehAnjNogp4uwRHseHXUrk1rRqxub/QSm7qmzez8BsHU8wn1XnpC7jE9P
+         d74A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740694134; x=1741298934;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lEaZnjEGW+dXEB2fycgaBpMAJRVwO79ROy1KwTNDGTA=;
+        b=rm6VATS5T5MVYfE7iA4/KMCn5Rhz9fzPlpvT8WkXtpSei81PsnSoqmropnrUGnkILp
+         edo7x3PjYhTFzqCLqJgG91vgo7DOqR330wThCs/GLbE7xjJixBYMPd53FuOlbv/mXrFk
+         LdYHeU/etdPyXAlkFO1a05Li+HhXECOLpl5cdZ9iZVAjAxPjj0wubkd/HXgywF+5RdN8
+         nPf1BKiSHBvI/aOPLgcMTJwFZA8MYG/6aiUJuvY0mNGzB4iGL6rLvLuo3xHGPciscVq9
+         trGcIjrJGFqr1bk5R3LDHTanJ3IKvf9Cow2iJ6IYNSxcy/5Wv6aqh6UKKIXMHnmlv7Et
+         MgBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVVJoHJ2Gl7xpKubD7wXqN6h9sjzJOeoDGM+X1lioJQx9eqUS2//9WxzSp8ksURCm2XtSU=@vger.kernel.org, AJvYcCVfGaBivkrLgOTAnuUXszVZSuUSJ7IsKNuwqIMLmX2+wDzx3HauZID9lrswxbrgVU/0hKy3xuqaIMNZmG8C/BTa@vger.kernel.org, AJvYcCVvTIkZn2ks5kHm7JK+FLG2hgU1pPwsyLADzOGZWLTBawfHCXxKg+qEJH3BcC2IBYFMmzEmr4XaEQM3+a+j@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzd3XFzCu/lSlycZGOTelTBWkPYvzFf3LVm44FL5kBOLvZXp6uw
+	ZO5iKDpyc50vuTZp8btwhRxR4jO2TW75ZbHz+J9VnqyVMzcYAp1c
+X-Gm-Gg: ASbGncuB3nm8yX2dECj1Ak6ZGbBV2hHstJNe02egBxJJCM9T8w0HChNMUofCJTKlwDd
+	fbNthStO0DK1B4yXhSXFBan3RwGlN7Yv+Hm5clZwpTe1+r3xYYrwdAGxbmk09dJPQVf/5Yr1d0T
+	79KhncGg+uH1qf53qI7HCaUN8cdt7hOLDmnVRsGTPZ5GmR7zBqoJ3thWISX9N17xzs/lhxkdTIr
+	aXziKcN+YYTJ4hCwCPIxeK1HrUPBRyadYRN9W+F7VYRiKfEmS50rE0JeOJiBlR/2LmUkO8woy30
+	tYJ/QOPpuInvtHYovKkrs0MLnDs=
+X-Google-Smtp-Source: AGHT+IFZa9dboOaE6stYPiILmPTLGm8NPOEro5l2YZ8uwZslwXyNX9MgmlcGxKnCIReGCaskMePG2w==
+X-Received: by 2002:a5d:5f91:0:b0:38f:3c8a:4bf4 with SMTP id ffacd0b85a97d-390ec7cd27fmr661579f8f.6.1740694134109;
+        Thu, 27 Feb 2025 14:08:54 -0800 (PST)
+Received: from localhost ([194.120.133.72])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-390e4796084sm3303760f8f.19.2025.02.27.14.08.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Feb 2025 14:08:53 -0800 (PST)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH]][next] KVM: selftests: Fix spelling mistake "UFFDIO_CONINUE" -> "UFFDIO_CONTINUE"
+Date: Thu, 27 Feb 2025 22:08:19 +0000
+Message-ID: <20250227220819.656780-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250227172254.GB25617@willie-the-truck>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Thu, Feb 27, 2025 at 05:22:55PM +0000, Will Deacon wrote:
-> On Thu, Feb 27, 2025 at 10:55:00AM +0000, Catalin Marinas wrote:
-> > On Thu, Feb 27, 2025 at 12:23:31AM +0000, Will Deacon wrote:
-> > > On Wed, Feb 26, 2025 at 07:03:01PM +0000, Catalin Marinas wrote:
-> > > > On Wed, Feb 19, 2025 at 02:30:28PM +0000, Steven Price wrote:
-> > > > > > @@ -23,14 +25,16 @@ bool rodata_full __ro_after_init = IS_ENABLED(CONFIG_RODATA_FULL_DEFAULT_ENABLED
-> > > > > >  bool can_set_direct_map(void)
-> > > > > >  {
-> > > > > >  	/*
-> > > > > > -	 * rodata_full and DEBUG_PAGEALLOC require linear map to be
-> > > > > > -	 * mapped at page granularity, so that it is possible to
-> > > > > > +	 * rodata_full, DEBUG_PAGEALLOC and a Realm guest all require linear
-> > > > > > +	 * map to be mapped at page granularity, so that it is possible to
-> > > > > >  	 * protect/unprotect single pages.
-> > > > > >  	 *
-> > > > > >  	 * KFENCE pool requires page-granular mapping if initialized late.
-> > > > > > +	 *
-> > > > > > +	 * Realms need to make pages shared/protected at page granularity.
-> > > > > >  	 */
-> > > > > >  	return rodata_full || debug_pagealloc_enabled() ||
-> > > > > > -	       arm64_kfence_can_set_direct_map();
-> > > > > > +		arm64_kfence_can_set_direct_map() || is_realm_world();
-> > > > > >  }
-> > > > > 
-> > > > > Aneesh pointed out that this call to is_realm_world() is now too early 
-> > > > > since the decision to delay the RSI detection. The upshot is that a 
-> > > > > realm guest which doesn't have page granularity forced for other reasons 
-> > > > > will fail to share pages with the host.
-> > > > > 
-> > > > > At the moment I can think of a couple of options:
-> > > > > 
-> > > > > (1) Make rodata_full a requirement for realm guests. 
-> > > > >     CONFIG_RODATA_FULL_DEFAULT_ENABLED is already "default y" so this 
-> > > > >     isn't a big ask.
-> > > > > 
-> > > > > (2) Revisit the idea of detecting when running as a realm guest early. 
-> > > > >     This has the advantage of also "fixing" earlycon (no need to 
-> > > > >     manually specify the shared-alias of an unprotected UART).
-> > > > > 
-> > > > > I'm currently leaning towards (1) because it's the default anyway. But 
-> > > > > if we're going to need to fix earlycon (or indeed find other similar 
-> > > > > issues) then (2) would obviously make sense.
-> > > > 
-> > > > I'd go with (1) since the end result is the same even if we implemented
-> > > > (2) - i.e. we still avoid block mappings in realms.
-> > > 
-> > > Is it, though? The config option is about the default behaviour but there's
-> > > still an "rodata=" option on the command-line.
-> > 
-> > Yeah, that's why I suggested the pr_err() to only state that it cannot
-> > set the direct map and consider rodata=full rather than a config option.
-> > We already force CONFIG_STRICT_KERNEL_RWX.
-> 
-> rodata=full has absolutely nothing to do with realms, though.
+There is a spelling mistake in a PER_PAGE_DEBUG debug message. Fix it.
 
-I fully agree, that's what I said a couple of emails earlier (towards
-the end, not quoted above).
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ tools/testing/selftests/kvm/lib/userfaultfd_util.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> It just
-> happens to result in the linear map being created at page granularity
-> and I don't think we should expose that implementation detail like this.
-
-I wasn't keen on adding a new realms=on or whatever command line option,
-so I suggested the lazy but confusing rodata=full.
-
-> > But we can also revisit the decision not to probe the RSI early.
-> 
-> Alternatively, could we predicate realm support on BBM level-3 w/o TLB
-> conflicts? Then we could crack the blocks in the linear map.
-
-Long term, I agree that's a better option. It needs wiring up though,
-with some care to handle page table allocation failures at run-time. I
-think most callers already handle the return code from set_memory_*().
-
+diff --git a/tools/testing/selftests/kvm/lib/userfaultfd_util.c b/tools/testing/selftests/kvm/lib/userfaultfd_util.c
+index 7c9de8414462..5bde176cedd5 100644
+--- a/tools/testing/selftests/kvm/lib/userfaultfd_util.c
++++ b/tools/testing/selftests/kvm/lib/userfaultfd_util.c
+@@ -114,7 +114,7 @@ struct uffd_desc *uffd_setup_demand_paging(int uffd_mode, useconds_t delay,
+ 
+ 	PER_PAGE_DEBUG("Userfaultfd %s mode, faults resolved with %s\n",
+ 		       is_minor ? "MINOR" : "MISSING",
+-		       is_minor ? "UFFDIO_CONINUE" : "UFFDIO_COPY");
++		       is_minor ? "UFFDIO_CONTINUE" : "UFFDIO_COPY");
+ 
+ 	uffd_desc = malloc(sizeof(struct uffd_desc));
+ 	TEST_ASSERT(uffd_desc, "Failed to malloc uffd descriptor");
 -- 
-Catalin
+2.47.2
+
 
