@@ -1,123 +1,395 @@
-Return-Path: <kvm+bounces-39429-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39430-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C996A470A2
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:02:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64FD0A470B0
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:05:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B71316EA63
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:02:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 245117A8A7B
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:04:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B112D145B3F;
-	Thu, 27 Feb 2025 01:01:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA93873477;
+	Thu, 27 Feb 2025 01:05:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h5bwLIWn"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="lnHLPhFi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548601DA5F
-	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 01:01:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F54D54670
+	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 01:05:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740618080; cv=none; b=Pzb+MZ0GfZilU5BzpgoDhSrZAaqyu0ST681Wc5CS8z/JUeaI9ahcmW2rWPRzDPdClPeFIa65yMPmHMh/qzq9Nrs/VGjQNiDeGykxT7qS8r+JMmhhso8z8j4R6COIB8kJ4hLfND9BSmaGjlGVnR+gwQHndTXl+DNdDtqjJSXNMpg=
+	t=1740618319; cv=none; b=RsRI3PJQQ4+ufO8M6FkyEUkDqW6SDUMf/S1gz+ACGUjVsZicnuefkuOO1Azr4bP/f/5qS70zaGdq/YZ7AnNpVN/5HhwpedA76/6ieySuJEEctSryv4e37Kx2slKMX2Ary+bjvMIlXhnVVdoWHUjRrY9hwnQyBPTUnCMdtbaUALE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740618080; c=relaxed/simple;
-	bh=WlG71nbfhMG+iZLSreFus8KOoSWVnI0WTDVJb/q9jyI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tv+qFJ9lVyYWg6FRZYdVgnv7KeRDn6XpekDlu7M/uwhSUA2EIjGkFhx+LflU5mVQHIg8dkVWQRlXJC1GpN1UH8EhqUX0nfdRQPExhUERZwVILv0ZLCV8hbD9oFl/kndYPyX5/IUwgUe5Q1XRKuGpUiuoc+aHeIjwqvR0c4By8eQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h5bwLIWn; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-22349ce68a9so10545105ad.0
-        for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 17:01:18 -0800 (PST)
+	s=arc-20240116; t=1740618319; c=relaxed/simple;
+	bh=GRHohmURlG1J0vCfqtMiE4OfWdA8l+xtBbsvFxNKx/s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nq/TBzPmGR4XzFgO8G/S/GWiVjsxbjJziw/kMFEM8TAzz3vkmBf1H1jwjVic2iYxamncgWP8+hs0B7AxxGkoSera2mANOz5r4ysmGzIfvl6iM1wRID/rnaLiqEolqC8xS32YMMVsSFu/aw/iavRTaJVwE+U7Z9MalrDD2RQNnXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=lnHLPhFi; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-223480ea43aso8575575ad.1
+        for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 17:05:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740618077; x=1741222877; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=vBrLV0hVNi1a5D0W6BOn6trR5W1NotqikKgQ5Tv/tAA=;
-        b=h5bwLIWnwuwrVytdM2CbIkyHDKiwxHsBucwH/HVkYoAGvzRRf2ExPXlMyntnUdjoas
-         QobhzuDj107Ca/zGaDS+w8BQFr4aSwDVqMKP3XztP9CbtwtNVGlmpelAT2ovNx+GajMm
-         MW2gB//r/0CeMbPWGRG9avSqFq6QfKj/zmv+4MgIL9RTU8bo18I1u6ZRNezMD64Pd+AZ
-         N/m+tHyM9GIw+bIwKehFhe/KSUdgemEDxI44vQrKaHbMakUVB9awcY8nIHSsZKgi5LWS
-         pogQZ+xysPF02k+tial2LdtKDUuLvHQJ/awgaLnsIvwGX+oUiAzO6f50wXg4+AtF/DPw
-         orjQ==
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1740618316; x=1741223116; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OPhlc9bmrf/baBUYMBCbtsRt7KZ0PJ5cb4Ib6su88Rg=;
+        b=lnHLPhFijyHRvkkOPm3MymgpuIllImcuvfCfhJpXO1Ak62eQz8A6fpJH7TDbWW5Y2h
+         5Cij8YrgzM9d/gNHPHgeL2764ukOrs9CmM+iqF7Fh6YUCCIm2uBnJrQ8hOa9BFG0ZViF
+         dqtlACZguZ2TA1xXiP4XqYLko5NNURfGYDXj9Srj37jnZEM4PsBqNOgCxp75SlzLha6Y
+         gBF5RHWp+r0W8KW/kvfcPysWDdRX0yRSmQ5w/WXLOI3n8VWP5+3rSYXP1KT1+r19kmry
+         RSgQqMjgheLe8oFoqEsRoJp3NbMAy5tnKJw8GkC3Vmhvgqer1/VRRS2viIcxzXvdImFH
+         dTgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740618077; x=1741222877;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vBrLV0hVNi1a5D0W6BOn6trR5W1NotqikKgQ5Tv/tAA=;
-        b=cmdgSEFKzqRTvnLf3IopSI9H+sxWD2OG2uBDGyj2Mz9ohbtcJJ3Nliw48fWyJbyuai
-         k7RCE2e+MwehtUsYoWZPnDzSlNgXO//et1VA3ImfxT41iYB5DV1EN6xl1tfXnLGSJlUc
-         bwEShWxJIoBUULtQX2es2DamB8qM0FsUVJiEW5Xa3oYTKGrecDDBf1aArEKAK9N42oRK
-         xcApNKeHOlfDAUQwa96NQ0DUZQTedqoijZF89dQIUAE8Fmeel9JBb4cUkS0xkVw5q2vy
-         1Tk7SpilqDG7KxwvNTrF2JKgsvxkne5b8CqGKUWhRhjU2P4/ZJ9zpj7PaWSoHgNksxf5
-         IzLw==
-X-Gm-Message-State: AOJu0YxhT6jiIVtw0IL3VX2lJvHPAbnZw2bX1Ox575QgSTMRTlOynIhw
-	MEiYmCwBKBqUH1NNYrTbd5qy0rfVQBE83PCaduGcFc2T6aB7CSuKRSHP5FgEsXQEKrUbZQYvAnS
-	xhw==
-X-Google-Smtp-Source: AGHT+IHs7OvM6rkyJG6uPTB8OuiiFrOfEIijhU66O7j1sKQRSBCikrQVvi/YgsIilD/6fEgCFLkFRZL+ErE=
-X-Received: from pfbfb26.prod.google.com ([2002:a05:6a00:2d9a:b0:734:4341:5d97])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:eccb:b0:220:ea90:1925
- with SMTP id d9443c01a7336-221a1148e99mr409270715ad.35.1740618077666; Wed, 26
- Feb 2025 17:01:17 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 26 Feb 2025 17:01:11 -0800
-In-Reply-To: <20250227010111.3222742-1-seanjc@google.com>
+        d=1e100.net; s=20230601; t=1740618316; x=1741223116;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OPhlc9bmrf/baBUYMBCbtsRt7KZ0PJ5cb4Ib6su88Rg=;
+        b=N96lqZQxddi/XVpqrIZjVvqUpx1jxhjpcVqw406cj+Ba/z/VnYlHpFk5Skt1Ny9zHc
+         +J2jLwamMWUP9oz4nCxCJdLjh2uoSICEIUS/SbWM75aynX3yEdDURkz7tO3UzC9zavTA
+         Umn3tm0H2jP4OJRZomkHakALLtm6Fz18J6bJECXmlNPbDzurFW+/K5d5se4t5EPjjKsv
+         uchUZ7eaa6+UVzl2xksSHnXnuBglyiCZ6Geu9sjSVJl6HW24OqvWIFKRifJYrdRwbzer
+         rD7HSAt2jqT96uH67GAYFu1rGkHiv+U7vY1VmsPTFigmqJ2rZMZ12zzIu7tTGEOIvAx1
+         agOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXUVS2/Bq5p+EzUDTbVcJ728P+rmlIn/vEiX953IEhlKUxOUQnKfzIl1OeUkhcdRhdcKIM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKF3ATqLZcdhwOS43Spv3TyuOamU5ezwzYM6ikfcJSnKCZ+JWH
+	+8aFV8XgIWSWo/jO2exR8FOnFCGcKKCJx+ZvftK92cUX9syIw1kwhww9IDrdyE2mtupiWQ9thjW
+	VM0W7K5Zc1+ak4Mw/0JQO3aS1sxXEQbUetqehXA==
+X-Gm-Gg: ASbGnctsvua5BGRtVIFq/SFtEuGg0icvHMNep/dRvXo6Gn4jOP9g++IZS7wxQJFH6C2
+	lNt8quIR7wGbnXmLQYMxUTefG581wXyogeGtcKsyoibAjf0wTmucuEW5AC03Wr4wKCFpF7qQkFA
+	y9e9Cmjg==
+X-Google-Smtp-Source: AGHT+IEmzNz0icfWLpez1BUsW/bodw4yxi3kEJGu2T9c7GZ0fGiTA+k8NPv9fX34ISAbJbxPgbyIN7vFEs0p7/UvZxk=
+X-Received: by 2002:a05:6a00:2445:b0:731:e974:f9c2 with SMTP id
+ d2e1a72fcca58-73426af3a2dmr33707676b3a.0.1740618315744; Wed, 26 Feb 2025
+ 17:05:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250227010111.3222742-1-seanjc@google.com>
-X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <20250227010111.3222742-3-seanjc@google.com>
-Subject: [PATCH 2/2] KVM: x86: Advertise support for WRMSRNS
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Xin Li <xin@zytor.com>
+MIME-Version: 1.0
+References: <20250205-counter_delegation-v4-0-835cfa88e3b1@rivosinc.com>
+ <20250205-counter_delegation-v4-12-835cfa88e3b1@rivosinc.com> <586dc43d-74cd-413b-86e2-545384ad796f@rivosinc.com>
+In-Reply-To: <586dc43d-74cd-413b-86e2-545384ad796f@rivosinc.com>
+From: Atish Kumar Patra <atishp@rivosinc.com>
+Date: Wed, 26 Feb 2025 17:05:02 -0800
+X-Gm-Features: AQ5f1Jpcwi9qlqm9BYyz76VdGTMqDksYTZy-kqauaAcNToAAh7JyG1DiMAREibo
+Message-ID: <CAHBxVyGAtZV8mJdcLtSHKHCrtrx3ygUG16onhpPRUUPk6_WJuA@mail.gmail.com>
+Subject: Re: [PATCH v4 12/21] RISC-V: perf: Modify the counter discovery mechanism
+To: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+Cc: Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, weilin.wang@intel.com, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Conor Dooley <conor@kernel.org>, devicetree@vger.kernel.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
+	linux-perf-users@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Advertise support for WRMSRNS (WRMSR non-serializing) to userspace if the
-instruction is supported by the underlying CPU.  From a virtualization
-perspective, the only difference between WRMSRNS and WRMSR is that VM-Exits
-due to WRMSRNS set EXIT_QUALIFICATION to '1'.  WRMSRNS doesn't require a
-new enabling control, shares the same basic exit reason, and behaves the
-same as WRMSR with respect to MSR interception.
+On Fri, Feb 7, 2025 at 2:29=E2=80=AFAM Cl=C3=A9ment L=C3=A9ger <cleger@rivo=
+sinc.com> wrote:
+>
+>
+>
+> On 06/02/2025 08:23, Atish Patra wrote:
+> > If both counter delegation and SBI PMU is present, the counter
+> > delegation will be used for hardware pmu counters while the SBI PMU
+> > will be used for firmware counters. Thus, the driver has to probe
+> > the counters info via SBI PMU to distinguish the firmware counters.
+> >
+> > The hybrid scheme also requires improvements of the informational
+> > logging messages to indicate the user about underlying interface
+> > used for each use case.
+> >
+> > Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> > ---
+> >  drivers/perf/riscv_pmu_dev.c | 118 ++++++++++++++++++++++++++++++++---=
+--------
+> >  1 file changed, 88 insertions(+), 30 deletions(-)
+> >
+> > diff --git a/drivers/perf/riscv_pmu_dev.c b/drivers/perf/riscv_pmu_dev.=
+c
+> > index 6b43d844eaea..5ddf4924c5b3 100644
+> > --- a/drivers/perf/riscv_pmu_dev.c
+> > +++ b/drivers/perf/riscv_pmu_dev.c
+> > @@ -66,6 +66,10 @@ static bool sbi_v2_available;
+> >  static DEFINE_STATIC_KEY_FALSE(sbi_pmu_snapshot_available);
+> >  #define sbi_pmu_snapshot_available() \
+> >       static_branch_unlikely(&sbi_pmu_snapshot_available)
+> > +static DEFINE_STATIC_KEY_FALSE(riscv_pmu_sbi_available);
+> > +static DEFINE_STATIC_KEY_FALSE(riscv_pmu_cdeleg_available);
+> > +static bool cdeleg_available;
+> > +static bool sbi_available;
+> >
+> >  static struct attribute *riscv_arch_formats_attr[] =3D {
+> >       &format_attr_event.attr,
+> > @@ -88,7 +92,8 @@ static int sysctl_perf_user_access __read_mostly =3D =
+SYSCTL_USER_ACCESS;
+> >
+> >  /*
+> >   * This structure is SBI specific but counter delegation also require =
+counter
+> > - * width, csr mapping. Reuse it for now.
+> > + * width, csr mapping. Reuse it for now we can have firmware counters =
+for
+> > + * platfroms with counter delegation support.
+> >   * RISC-V doesn't have heterogeneous harts yet. This need to be part o=
+f
+> >   * per_cpu in case of harts with different pmu counters
+> >   */
+> > @@ -100,6 +105,8 @@ static unsigned int riscv_pmu_irq;
+> >
+> >  /* Cache the available counters in a bitmask */
+> >  static unsigned long cmask;
+> > +/* Cache the available firmware counters in another bitmask */
+> > +static unsigned long firmware_cmask;
+> >
+> >  struct sbi_pmu_event_data {
+> >       union {
+> > @@ -778,35 +785,49 @@ static int rvpmu_sbi_find_num_ctrs(void)
+> >               return sbi_err_map_linux_errno(ret.error);
+> >  }
+> >
+> > -static int rvpmu_sbi_get_ctrinfo(int nctr, unsigned long *mask)
+> > +static int rvpmu_deleg_find_ctrs(void)
+> > +{
+> > +     /* TODO */
+> > +     return -1;
+> > +}
+> > +
+> > +static int rvpmu_sbi_get_ctrinfo(int nsbi_ctr, int ndeleg_ctr)
+>
+> Hi Atish,
+>
+> These parameters could be unsigned I think.
+>
 
-  WRMSR and WRMSRNS use the same basic exit reason (see Appendix C). For
-  WRMSR, the exit qualification is 0, while for WRMSRNS it is 1.
+sure. Changed it to u32.
 
-Don't do anything different when emulating WRMSRNS vs. WRMSR, as KVM can't
-do anything less, i.e. can't make emulation non-serializing.  The
-motivation for the guest to use WRMSRNS instead of WRMSR is to avoid
-immediately serializing the CPU when the necessary serialization is
-guaranteed by some other mechanism, i.e. WRMSRNS being fully serializing
-isn't guest-visible, just less performant.
+> >  {
+> >       struct sbiret ret;
+> > -     int i, num_hw_ctr =3D 0, num_fw_ctr =3D 0;
+> > +     int i, num_hw_ctr =3D 0, num_fw_ctr =3D 0, num_ctr =3D 0;
+> >       union sbi_pmu_ctr_info cinfo;
+> >
+> > -     pmu_ctr_list =3D kcalloc(nctr, sizeof(*pmu_ctr_list), GFP_KERNEL)=
+;
+> > -     if (!pmu_ctr_list)
+> > -             return -ENOMEM;
+> > -
+> > -     for (i =3D 0; i < nctr; i++) {
+> > +     for (i =3D 0; i < nsbi_ctr; i++) {
+> >               ret =3D sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_GET_IN=
+FO, i, 0, 0, 0, 0, 0);
+> >               if (ret.error)
+> >                       /* The logical counter ids are not expected to be=
+ contiguous */
+> >                       continue;
+> >
+> > -             *mask |=3D BIT(i);
+> > -
+> >               cinfo.value =3D ret.value;
+> >               if (cinfo.type =3D=3D SBI_PMU_CTR_TYPE_FW)
+> >                       num_fw_ctr++;
+> > -             else
+> > +
+> > +             if (!cdeleg_available) {
+>
+> What is the rationale for using additional boolean identical to the
+> static keys ? Reducing the amount of code patch site in cold path ? If
 
-Suggested-by: Xin Li (Intel) <xin@zytor.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/cpuid.c | 1 +
- 1 file changed, 1 insertion(+)
+yes.
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 97a90689a9dc..ebecfe4bea1e 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -992,6 +992,7 @@ void kvm_set_cpu_caps(void)
- 		F(FZRM),
- 		F(FSRS),
- 		F(FSRC),
-+		F(WRMSRNS),
- 		F(AMX_FP16),
- 		F(AVX_IFMA),
- 		F(LAM),
--- 
-2.48.1.711.g2feabab25a-goog
+> so, I guess you can use static_key_enabled(&riscv_pmu_cdeleg_available).
+> But your solution is fine as well, it just duplicates two identical value=
+s.
+>
 
+good point. I will change it. Thanks!
+
+> >                       num_hw_ctr++;
+> > -             pmu_ctr_list[i].value =3D cinfo.value;
+> > +                     cmask |=3D BIT(i);
+> > +                     pmu_ctr_list[i].value =3D cinfo.value;
+> > +             } else if (cinfo.type =3D=3D SBI_PMU_CTR_TYPE_FW) {
+> > +                     /* Track firmware counters in a different mask */
+> > +                     firmware_cmask |=3D BIT(i);
+> > +                     pmu_ctr_list[i].value =3D cinfo.value;
+> > +             }
+> > +
+> >       }
+> >
+> > -     pr_info("%d firmware and %d hardware counters\n", num_fw_ctr, num=
+_hw_ctr);
+> > +     if (cdeleg_available) {
+> > +             pr_info("%d firmware and %d hardware counters\n", num_fw_=
+ctr, ndeleg_ctr);
+> > +             num_ctr =3D num_fw_ctr + ndeleg_ctr;
+> > +     } else {
+> > +             pr_info("%d firmware and %d hardware counters\n", num_fw_=
+ctr, num_hw_ctr);
+> > +             num_ctr =3D nsbi_ctr;
+> > +     }
+> >
+> > -     return 0;
+> > +     return num_ctr;
+> >  }
+> >
+> >  static inline void rvpmu_sbi_stop_all(struct riscv_pmu *pmu)
+> > @@ -1067,16 +1088,33 @@ static void rvpmu_ctr_stop(struct perf_event *e=
+vent, unsigned long flag)
+> >       /* TODO: Counter delegation implementation */
+> >  }
+> >
+> > -static int rvpmu_find_num_ctrs(void)
+> > +static int rvpmu_find_ctrs(void)
+> >  {
+> > -     return rvpmu_sbi_find_num_ctrs();
+> > -     /* TODO: Counter delegation implementation */
+> > -}
+> > +     int num_sbi_counters =3D 0, num_deleg_counters =3D 0, num_counter=
+s =3D 0;
+> >
+> > -static int rvpmu_get_ctrinfo(int nctr, unsigned long *mask)
+> > -{
+> > -     return rvpmu_sbi_get_ctrinfo(nctr, mask);
+> > -     /* TODO: Counter delegation implementation */
+> > +     /*
+> > +      * We don't know how many firmware counters available. Just alloc=
+ate
+> > +      * for maximum counters driver can support. The default is 64 any=
+ways.
+> > +      */
+> > +     pmu_ctr_list =3D kcalloc(RISCV_MAX_COUNTERS, sizeof(*pmu_ctr_list=
+),
+> > +                            GFP_KERNEL);
+> > +     if (!pmu_ctr_list)
+> > +             return -ENOMEM;
+> > +
+> > +     if (cdeleg_available)
+> > +             num_deleg_counters =3D rvpmu_deleg_find_ctrs();
+> > +
+> > +     /* This is required for firmware counters even if the above is tr=
+ue */
+> > +     if (sbi_available)
+> > +             num_sbi_counters =3D rvpmu_sbi_find_num_ctrs();
+> > +
+> > +     if (num_sbi_counters >=3D RISCV_MAX_COUNTERS || num_deleg_counter=
+s >=3D RISCV_MAX_COUNTERS)
+> > +             return -ENOSPC;
+>
+> Why is this using '>=3D' ? You allocated space for RISCV_MAX_COUNTERS, so
+> RISCV_MAX_COUNTERS should fit right ?
+>
+Yeah. That's a typo. Thanks for catching it.
+
+> > +
+> > +     /* cache all the information about counters now */
+> > +     num_counters =3D rvpmu_sbi_get_ctrinfo(num_sbi_counters, num_dele=
+g_counters);
+> > +
+> > +     return num_counters;
+>
+> return rvpmu_sbi_get_ctrinfo(num_sbi_counters, num_deleg_counters);
+>
+> >  }
+> >
+> >  static int rvpmu_event_map(struct perf_event *event, u64 *econfig)
+> > @@ -1377,12 +1415,21 @@ static int rvpmu_device_probe(struct platform_d=
+evice *pdev)
+> >       int ret =3D -ENODEV;
+> >       int num_counters;
+> >
+> > -     pr_info("SBI PMU extension is available\n");
+> > +     if (cdeleg_available) {
+> > +             pr_info("hpmcounters will use the counter delegation ISA =
+extension\n");
+> > +             if (sbi_available)
+> > +                     pr_info("Firmware counters will be use SBI PMU ex=
+tension\n");
+>
+> s/will be use/will use
+>
+> > +             else
+> > +                     pr_info("Firmware counters will be not available =
+as SBI PMU extension is not present\n");
+>
+> s/will be not/will not
+>
+
+Fixed.
+
+> > +     } else if (sbi_available) {
+> > +             pr_info("Both hpmcounters and firmware counters will use =
+SBI PMU extension\n");
+> > +     }
+> > +
+> >       pmu =3D riscv_pmu_alloc();
+> >       if (!pmu)
+> >               return -ENOMEM;
+> >
+> > -     num_counters =3D rvpmu_find_num_ctrs();
+> > +     num_counters =3D rvpmu_find_ctrs();
+> >       if (num_counters < 0) {
+> >               pr_err("SBI PMU extension doesn't provide any counters\n"=
+);
+> >               goto out_free;
+> > @@ -1394,9 +1441,6 @@ static int rvpmu_device_probe(struct platform_dev=
+ice *pdev)
+> >               pr_info("SBI returned more than maximum number of counter=
+s. Limiting the number of counters to %d\n", num_counters);
+> >       }
+> >
+> > -     /* cache all the information about counters now */
+> > -     if (rvpmu_get_ctrinfo(num_counters, &cmask))
+> > -             goto out_free;
+> >
+> >       ret =3D rvpmu_setup_irqs(pmu, pdev);
+> >       if (ret < 0) {
+> > @@ -1486,13 +1530,27 @@ static int __init rvpmu_devinit(void)
+> >       int ret;
+> >       struct platform_device *pdev;
+> >
+> > -     if (sbi_spec_version < sbi_mk_version(0, 3) ||
+> > -         !sbi_probe_extension(SBI_EXT_PMU)) {
+> > -             return 0;
+> > +     if (sbi_spec_version >=3D sbi_mk_version(0, 3) &&
+> > +         sbi_probe_extension(SBI_EXT_PMU)) {
+> > +             static_branch_enable(&riscv_pmu_sbi_available);
+> > +             sbi_available =3D true;
+> >       }
+> >
+> >       if (sbi_spec_version >=3D sbi_mk_version(2, 0))
+> >               sbi_v2_available =3D true;
+> > +     /*
+> > +      * We need all three extensions to be present to access the count=
+ers
+> > +      * in S-mode via Supervisor Counter delegation.
+> > +      */
+> > +     if (riscv_isa_extension_available(NULL, SSCCFG) &&
+> > +         riscv_isa_extension_available(NULL, SMCDELEG) &&
+> > +         riscv_isa_extension_available(NULL, SSCSRIND)) {
+> > +             static_branch_enable(&riscv_pmu_cdeleg_available);
+> > +             cdeleg_available =3D true;
+> > +     }
+> > +
+> > +     if (!(sbi_available || cdeleg_available))
+> > +             return 0;
+> >
+> >       ret =3D cpuhp_setup_state_multi(CPUHP_AP_PERF_RISCV_STARTING,
+> >                                     "perf/riscv/pmu:starting",
+> >
+>
 
