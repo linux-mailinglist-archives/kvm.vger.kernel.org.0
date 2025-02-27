@@ -1,102 +1,362 @@
-Return-Path: <kvm+bounces-39593-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39594-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F110FA4831C
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 16:37:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF33EA48356
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 16:43:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0602F165DF6
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 15:37:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 814927A7C55
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 15:42:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7836626B94A;
-	Thu, 27 Feb 2025 15:36:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F40C326E154;
+	Thu, 27 Feb 2025 15:41:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aXHmHcil"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kNKBtjjU"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0AE32356AE
-	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 15:36:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EECA231A4D
+	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 15:41:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740670589; cv=none; b=Trbba0o0gtFYNm+/BLwWBGsPIB/lJpHS9oUfyO5DqFfBpfDxJ7fBe6gOHjSI0ceI1vT0TyMr7YNTyhWP7m5u5ZtUAynMVQJ/FICl57OBhw8FteMDcfgpOqiFIGkGsnvG9UGKNwun5Uv+bmBOkXb/9CrbwCTj0W34+MdBCi/yKUI=
+	t=1740670889; cv=none; b=fvRH4yfRnZVpSU0KKw6m3/im+UDSwIQYoRRZaM6q+GAUE2IhDK0mUyGrDzG/YIHMevpfGyWWoSRMd+dswCcD5u9RJzEZ87hrDI405RVS4V1IjQ0bXkEEujS5e9/TWY/vpo2mJXVxLRRWnI/rrlERJVOuQbljI2cffO6Je/viwHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740670589; c=relaxed/simple;
-	bh=aIgRRLSLxCQtLw3ka8XL3uGcWMR6P5+JSFsjaPltxGg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lNnYN3xZsFW35HI2x1NgIN0l5lOhOCoz4E0a0zg/MZOkn3mORsVb0N60MYhKh5o5j9onW8wuXRSli1DV2XBrNI0VzwEaiEpQO4lfpCyxQ8Z5Jmuy+W+Q6a5jfA57gDTB/i6By3jF8WYQ1jgF72Px2FtSebsoiHLOQjt0B/wLbuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aXHmHcil; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Thu, 27 Feb 2025 16:36:21 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740670583;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7K+2652/2JPqs5KtXhCAPsJQsXoPDx6afoG7BlPfQS4=;
-	b=aXHmHcilHp8+1yrcDjrSBW6wUsJH3hgJ7hMiLqfOoF7R2hdCNd9sZ98XMO0HaEWykHJrNj
-	tub0RKTAtgI4CD5kziXZwcCW+lbNtMKTRGPasIXVARhnFaGCUC8mtJoN28mma7uVMmyOOJ
-	d0MzHaKsEs3LtgKYiplbzSyu6p/v7hE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	Andrew Jones <ajones@ventanamicro.com>, Anup Patel <apatel@ventanamicro.com>, 
-	Atish Patra <atishp@rivosinc.com>, npiggin@gmail.com
-Subject: Re: [kvm-unit-tests PATCH v7 2/6] riscv: Set .aux.o files as
- .PRECIOUS
-Message-ID: <20250227-99cd90f3ad775b89fd9fc262@orel>
-References: <20250214114423.1071621-1-cleger@rivosinc.com>
- <20250214114423.1071621-3-cleger@rivosinc.com>
+	s=arc-20240116; t=1740670889; c=relaxed/simple;
+	bh=Da5AnvMmGpZ4+PRGJTdejXKPe0Mw/BATivoU7g5Y1W4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Sx2pUVEAqw5CztNwImwfU49G0C2l0NHSsJqiXe3hU4LAUcJuId4ENkTSkyL35qSJIpaas7vvTJTbnt+Tzb3VziUyVFk7GZO7cGpdgf5BHb0/OI0J1iXk2vFOuMg1D0jSDy0A9AbZfPI+SaleXa7rEIjre1nRy5W/PwA8uL214hM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kNKBtjjU; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fc1a4c14d4so2442690a91.0
+        for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 07:41:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740670886; x=1741275686; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RpWebaG6ta7C4r+/QTI9Hpf7yd202gY2ilwfhDkC51w=;
+        b=kNKBtjjU13WpJoaIoPawp0ckzfYmLmHUODsrBzdw3sAWug+nXB0W+shDByC+MmXNuN
+         Z9uKB1HJIGDLoqX6EbpZ58TD/MJWvq858B8f3N4fSPpq4exUjzmuZfxuxxp6XXu++Zhu
+         4KbLDMYgj6tdri1AmAE58l17q0ZDWFbAvg4ER1po5W3tn2ImHlMpMjMycbsTxMTNcPgG
+         X5hieD3BT4cf632JuiPRP9J/HMKIc1icRAMsPHiTJXBdEbtbMawsO8vjLrub+tO1qIZB
+         41M4289/6PxItFiYSCtXdPVCjkIrqS0fo3AP4rYeDGqIIgY5xT1KlId9EdY1SES8Rk2D
+         2Abw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740670886; x=1741275686;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RpWebaG6ta7C4r+/QTI9Hpf7yd202gY2ilwfhDkC51w=;
+        b=qBSup9CZlJz7EnSZtcTmnTUy72GJR8uRtsAtWM2ypoeMazPJTtkmfm6zv49oyL4ZMl
+         9EqYB8cFmN1F53tGMTeYxvTA52MWyXvyDSKnfFTE5wNyDiCW1aMv7y1pN42F/CnNatIY
+         jSWqnP9uoWJLk5HvJu+fp64Au+ujiwxMOimRGGDRbWeCI3MOo6n40wTTO2BU5Cq2n1Cy
+         nvsZ4q2WNHQYdHag0+vC2ReH84pL58pIdBseNRSG+fgnflkdZIC2iOmoXpO8WtkC/TG8
+         TKG+92IGb5hVMMsU6yIm0+vPUcn3Oqn9yFd6g40gK8oaOvtkerPUBBJx9tVWDemDupl4
+         bQ/A==
+X-Gm-Message-State: AOJu0Yx4QWSahV34VPqBiC+88hXBvJv4N9QFdCXnAsqf8EPEPVLwhAaB
+	mdYUad2Q+Kh34xVB2iMEv6MYkuoTMj9pH04ay7k0OHlRfpGRTDUMBcl4WSgDNAauZiq4N/XMSBc
+	pMw==
+X-Google-Smtp-Source: AGHT+IFr2Hi5hWjqDrFkQXi/BpmSscvvgpC48vIgUsBffnpafInukRPQsN67WY8M/RuByhyUtG6LR6vx2wo=
+X-Received: from pjbov6.prod.google.com ([2002:a17:90b:2586:b0:2fa:a30a:3382])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:fc44:b0:2f6:f107:fae6
+ with SMTP id 98e67ed59e1d1-2fe68cf3f5fmr15885811a91.23.1740670885945; Thu, 27
+ Feb 2025 07:41:25 -0800 (PST)
+Date: Thu, 27 Feb 2025 07:41:24 -0800
+In-Reply-To: <20250227041522.1734260-1-mlevitsk@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250214114423.1071621-3-cleger@rivosinc.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20250227041522.1734260-1-mlevitsk@redhat.com>
+Message-ID: <Z8CHpJMdhWNDBr0E@google.com>
+Subject: Re: [PATCH] KVM: selftests: access_tracking_perf_test: add option to
+ skip the sanity check
+From: Sean Christopherson <seanjc@google.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: kvm@vger.kernel.org, Shuah Khan <shuah@kernel.org>, 
+	James Houghton <jthoughton@google.com>, Muhammad Usama Anjum <usama.anjum@collabora.com>, 
+	Anup Patel <anup@brainfault.org>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Feb 14, 2025 at 12:44:15PM +0100, Clément Léger wrote:
-> When compiling, we need to keep .aux.o file or they will be removed
-> after the compilation which leads to dependent files to be recompiled.
-> Set these files as .PRECIOUS to keep them.
-
-There was a thread[1] about this 7 months ago or so. I've CC'ed Nicholas
-to see if there were any more thoughts on how we should proceed.
-
-[1] https://lore.kernel.org/all/20240612044234.212156-1-npiggin@gmail.com/
-
-Thanks,
-drew
-
+On Wed, Feb 26, 2025, Maxim Levitsky wrote:
+> Add an option to skip sanity check of number of still idle pages,
+> and force it on, in case hypervisor or NUMA balancing
+> is detected.
 > 
-> Signed-off-by: Clément Léger <cleger@rivosinc.com>
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 > ---
->  riscv/Makefile | 1 +
->  1 file changed, 1 insertion(+)
+>  .../selftests/kvm/access_tracking_perf_test.c | 23 +++++++++++++++++--
+>  .../testing/selftests/kvm/include/test_util.h |  1 +
+>  tools/testing/selftests/kvm/lib/test_util.c   | 22 ++++++++++++++++++
+>  3 files changed, 44 insertions(+), 2 deletions(-)
 > 
-> diff --git a/riscv/Makefile b/riscv/Makefile
-> index 52718f3f..ae9cf02a 100644
-> --- a/riscv/Makefile
-> +++ b/riscv/Makefile
-> @@ -90,6 +90,7 @@ CFLAGS += -I $(SRCDIR)/lib -I $(SRCDIR)/lib/libfdt -I lib -I $(SRCDIR)/riscv
->  asm-offsets = lib/riscv/asm-offsets.h
->  include $(SRCDIR)/scripts/asm-offsets.mak
+> diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> index 3c7defd34f56..eafaecf086c4 100644
+> --- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> +++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> @@ -65,6 +65,8 @@ static int vcpu_last_completed_iteration[KVM_MAX_VCPUS];
+>  /* Whether to overlap the regions of memory vCPUs access. */
+>  static bool overlap_memory_access;
 >  
-> +.PRECIOUS: %.aux.o
->  %.aux.o: $(SRCDIR)/lib/auxinfo.c
->  	$(CC) $(CFLAGS) -c -o $@ $< \
->  		-DPROGNAME=\"$(notdir $(@:.aux.o=.$(exe)))\" -DAUXFLAGS=$(AUXFLAGS)
-> -- 
-> 2.47.2
-> 
+> +static bool skip_sanity_check;
+
+I think it makes sense to keep the sanity check, but to warn instead of asserting,
+which is already the proposed behavior.  I.e. the sanity check is still there,
+it's only the assert that's being "skipped".  So maybe something like this?
+
+static bool warn_on_too_many_idle_pages;
+
+> +
+>  struct test_params {
+>  	/* The backing source for the region of memory. */
+>  	enum vm_mem_backing_src_type backing_src;
+> @@ -185,7 +187,7 @@ static void mark_vcpu_memory_idle(struct kvm_vm *vm,
+>  	 */
+>  	if (still_idle >= pages / 10) {
+>  #ifdef __x86_64__
+
+Gah, the assert needs to be applied to all architectures.  Commit 6336a810db5c
+("KVM: selftests: replace assertion with warning in access_tracking_perf_test")
+dropped it entirely.  It got restored by 8fcee0421386 ("KVM: selftests: Restore
+assert for non-nested VMs in access tracking test"), but only for x86.
+
+Maybe do that in a follow-up patch?  Or alternatively, introduce the boolean in a
+prep patch, then enable the assert for !x86, and then finally add the command
+line option to make it controllable.
+
+I'd probably vote for the second option?
+
+> -		TEST_ASSERT(this_cpu_has(X86_FEATURE_HYPERVISOR),
+> +		TEST_ASSERT(skip_sanity_check,
+>  			    "vCPU%d: Too many pages still idle (%lu out of %lu)",
+>  			    vcpu_idx, still_idle, pages);
+>  #endif
+> @@ -342,6 +344,8 @@ static void help(char *name)
+>  	printf(" -v: specify the number of vCPUs to run.\n");
+>  	printf(" -o: Overlap guest memory accesses instead of partitioning\n"
+>  	       "     them into a separate region of memory for each vCPU.\n");
+> +	printf(" -u: Skip check that after dirtying the guest memory, most (90%%) of\n"
+
+Maybe '-w' if we go with something along the lines of "warn_on..."
+
+> +	       "it is reported as dirty again");
+>  	backing_src_help("-s");
+>  	puts("");
+>  	exit(0);
+> @@ -359,7 +363,7 @@ int main(int argc, char *argv[])
+>  
+>  	guest_modes_append_default();
+>  
+> -	while ((opt = getopt(argc, argv, "hm:b:v:os:")) != -1) {
+> +	while ((opt = getopt(argc, argv, "hm:b:v:os:u")) != -1) {
+>  		switch (opt) {
+>  		case 'm':
+>  			guest_modes_cmdline(optarg);
+> @@ -376,6 +380,9 @@ int main(int argc, char *argv[])
+>  		case 's':
+>  			params.backing_src = parse_backing_src_type(optarg);
+>  			break;
+> +		case 'u':
+> +			skip_sanity_check = true;
+
+Do we want to allow the user to force the assert?  E.g. move the logic that sets
+the default value to before the parsing of the command line, and then make this
+something like:
+
+			warn_on_too_many_idle_pages = atoi_positive(optarg);
+			break;
+
+> +			break;
+>  		case 'h':
+>  		default:
+>  			help(argv[0]);
+> @@ -386,6 +393,18 @@ int main(int argc, char *argv[])
+>  	page_idle_fd = open("/sys/kernel/mm/page_idle/bitmap", O_RDWR);
+>  	__TEST_REQUIRE(page_idle_fd >= 0,
+>  		       "CONFIG_IDLE_PAGE_TRACKING is not enabled");
+> +
+
+Extra newline.
+
+> +
+> +	if (skip_sanity_check == false) {
+
+	if (!skip_sanity_check) {
+
+> +		if (this_cpu_has(X86_FEATURE_HYPERVISOR)) {
+
+This needs to be guarded with __x86_64__.
+
+> +			printf("Skipping idle page count sanity check, because the test is run nested\n");
+> +			skip_sanity_check = true;
+> +		} else if (is_numa_balancing_enabled()) {
+> +			printf("Skipping idle page count sanity check, because NUMA balance is enabled\n");
+> +			skip_sanity_check = true;
+> +		}
+> +	}
+> +
+>  	close(page_idle_fd);
+>  
+>  	for_each_guest_mode(run_test, &params);
+> diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
+> index 3e473058849f..1bc9b0a92427 100644
+> --- a/tools/testing/selftests/kvm/include/test_util.h
+> +++ b/tools/testing/selftests/kvm/include/test_util.h
+> @@ -153,6 +153,7 @@ bool is_backing_src_hugetlb(uint32_t i);
+>  void backing_src_help(const char *flag);
+>  enum vm_mem_backing_src_type parse_backing_src_type(const char *type_name);
+>  long get_run_delay(void);
+> +bool is_numa_balancing_enabled(void);
+>  
+>  /*
+>   * Whether or not the given source type is shared memory (as opposed to
+> diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
+> index 8ed0b74ae837..1271863613fa 100644
+> --- a/tools/testing/selftests/kvm/lib/test_util.c
+> +++ b/tools/testing/selftests/kvm/lib/test_util.c
+> @@ -163,6 +163,28 @@ size_t get_trans_hugepagesz(void)
+>  	return size;
+>  }
+>  
+> +
+
+Extra newline.
+
+> +bool is_numa_balancing_enabled(void)
+> +{
+> +	int ret;
+> +	int val;
+> +	struct stat statbuf;
+> +	FILE *f;
+> +
+> +	ret = stat("/proc/sys/kernel/numa_balancing", &statbuf);
+> +	TEST_ASSERT(ret == 0 || (ret == -1 && errno == ENOENT),
+> +			"Error in stating /proc/sys/kernel/numa_balancing");
+
+Align indentation.
+
+> +	if (ret != 0)
+
+	if (ret)
+
+> +		return false;
+> +
+> +	f = fopen("/proc/sys/kernel/numa_balancing", "r");
+
+Pretty sure this needs to assert on f being valid.
+
+> +	ret = fscanf(f, "%d", &val);
+
+file needs to be closed.
+
+Actually, rather than fix these things, extract the mechanical aspects of the THP
+code to helpers (patch at the bottom), and then this can be:
+
+bool is_numa_balancing_enabled(void)
+{
+	const char *numa_balancing = "/proc/sys/kernel/numa_balancing";
+
+	return test_sysfs_path(numa_balancing) && get_sysfs_val(numa_balancing);
+}
+
+> +	TEST_ASSERT(val == 0 || val == 1, "Unexpected value in /proc/sys/kernel/numa_balancing");
+
+I vote to omit this sanity check.  The odds of numa_balancing having a different
+value *and* the bad value going unnoticed are quite low, so I'd prefer to make
+the helper short and simple.
+
+---
+From: Sean Christopherson <seanjc@google.com>
+Date: Thu, 27 Feb 2025 07:31:09 -0800
+Subject: [PATCH] KVM: selftests: Extract guts of THP accessor to standalone
+ sysfs helpers
+
+Extract the guts of thp_configured() and get_trans_hugepagesz() to
+standalone helpers so that the core logic can be reused for other sysfs
+files, e.g. to query numa_balancing.
+
+Opportunistically assert that the initial fscanf() read at least one byte,
+and add a comment explaining the second call to fscanf().
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ tools/testing/selftests/kvm/lib/test_util.c | 35 ++++++++++++++-------
+ 1 file changed, 24 insertions(+), 11 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
+index 8ed0b74ae837..3dc8538f5d69 100644
+--- a/tools/testing/selftests/kvm/lib/test_util.c
++++ b/tools/testing/selftests/kvm/lib/test_util.c
+@@ -132,37 +132,50 @@ void print_skip(const char *fmt, ...)
+ 	puts(", skipping test");
+ }
+ 
+-bool thp_configured(void)
++static bool test_sysfs_path(const char *path)
+ {
+-	int ret;
+ 	struct stat statbuf;
++	int ret;
+ 
+-	ret = stat("/sys/kernel/mm/transparent_hugepage", &statbuf);
++	ret = stat(path, &statbuf);
+ 	TEST_ASSERT(ret == 0 || (ret == -1 && errno == ENOENT),
+-		    "Error in stating /sys/kernel/mm/transparent_hugepage");
++		    "Error in stat()ing '%s'", path);
+ 
+ 	return ret == 0;
+ }
+ 
+-size_t get_trans_hugepagesz(void)
++bool thp_configured(void)
++{
++	return test_sysfs_path("/sys/kernel/mm/transparent_hugepage");
++}
++
++static size_t get_sysfs_val(const char *path)
+ {
+ 	size_t size;
+ 	FILE *f;
+ 	int ret;
+ 
+-	TEST_ASSERT(thp_configured(), "THP is not configured in host kernel");
+-
+-	f = fopen("/sys/kernel/mm/transparent_hugepage/hpage_pmd_size", "r");
+-	TEST_ASSERT(f != NULL, "Error in opening transparent_hugepage/hpage_pmd_size");
++	f = fopen(path, "r");
++	TEST_ASSERT(f, "Error opening '%s'", path);
+ 
+ 	ret = fscanf(f, "%ld", &size);
++	TEST_ASSERT(ret > 0, "Error reading '%s'", path);
++
++	/* Re-scan the input stream to verify the entire file was read. */
+ 	ret = fscanf(f, "%ld", &size);
+-	TEST_ASSERT(ret < 1, "Error reading transparent_hugepage/hpage_pmd_size");
++	TEST_ASSERT(ret < 1, "Error reading '%s'", path);
++
+ 	fclose(f);
+-
+ 	return size;
+ }
+ 
++size_t get_trans_hugepagesz(void)
++{
++	TEST_ASSERT(thp_configured(), "THP is not configured in host kernel");
++
++	return get_sysfs_val("/sys/kernel/mm/transparent_hugepage/hpage_pmd_size");
++}
++
+ size_t get_def_hugetlb_pagesz(void)
+ {
+ 	char buf[64];
+
+base-commit: c2b800261f01eda7e811b588eaa6324cfcfdecc6
+-- 
+
 
