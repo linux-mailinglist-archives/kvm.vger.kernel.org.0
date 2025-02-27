@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-39453-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39454-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BCB3A470F0
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:24:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CBA1A470ED
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:23:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF7EE7A5176
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:22:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6714D3B44E4
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:23:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FC3A1B3952;
-	Thu, 27 Feb 2025 01:19:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 632AF1B4F0A;
+	Thu, 27 Feb 2025 01:19:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j+HpiFm6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QICB+FfM"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3FFF1B21B4;
-	Thu, 27 Feb 2025 01:19:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BD9F1B4159;
+	Thu, 27 Feb 2025 01:19:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740619180; cv=none; b=iu1dlNHK2AFi9RMKTW71VIsL5s93intz+BE2p1EoI43Y4YzgzKg1vXNjE+vCY5yQAcXFfsj46JT3+2wSCxnOfToqx3Uxt9NqPLYZxAhecawXKKY5CvTtAo/9O1kMCNb1GptM0E35zPWBW4g3AB15g30hquQWyZxnGTVTrHaHj/0=
+	t=1740619183; cv=none; b=MqHgssW6giF+QIG6074ZZEAjiDwCE1PT47pihcZ7yBkX8ZvReOnCboNDhvIoCcAe7uiaODy3t9un6WfFFj/QvZv78y2Jqc5eocBhgs5tgUN1nwvAWqmUrjI/LggzDOSzWM0hP9Jj56MWy9JcNcRJUrxfcYefqPizQ+D9uVIc4ZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740619180; c=relaxed/simple;
-	bh=pVYU29wbge2aVLiMpQm4eg0isUm9O54M4ws6Q27APC8=;
+	s=arc-20240116; t=1740619183; c=relaxed/simple;
+	bh=zItX0PUquswBbQehRZ9Mq2klvkqoMesHQu9V+fBv0nQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Xlz/nDuZnv9i/UIXOU0Ujjs5EAE2vOQkr1iaRiOfIm7ik0MMP8RhK3GKFk6lMrReA2MTwXVC/lpxxofihzdJxDmF3K1Qrxly9qF5cAgdi5DbTZCy9WMNRGhZ5Lav2KSvL91ZIa9yF9qyYkZmgb1BMkp0eKNRm467SN8DRu3qBvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=j+HpiFm6; arc=none smtp.client-ip=198.175.65.9
+	 MIME-Version; b=pIiB7i9cOM6P0bPxQR0xWgm28e96GZWxNLrIH0wWu0Dap3TX17c1Qx6w0i6WKipmU+I617BvhomJmoAA6mN39OAStkxwoHzV/9HQ+ETjR4No8Fa8v96+9pXekIQ9MXkiK3pmAXJQpTaf/g/+Jkka9ELvY0yKdL5bA0jlPrPZwcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QICB+FfM; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740619179; x=1772155179;
+  t=1740619182; x=1772155182;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=pVYU29wbge2aVLiMpQm4eg0isUm9O54M4ws6Q27APC8=;
-  b=j+HpiFm6L317UN6Sc06JUZgSliK5eu1k0Ca3351Xgp0X1GENYTR3ZNfR
-   13YidBTLx2ItiJ/PS7drsAJRSHi+OB70f9s/YHvhkIZGajvZYbLl0aQIX
-   dVz2Lm3jy4OZhOd/P1LwmF2ucqOP4CNYqjG7lOxlf4Kd5wgMjklpeJ1Ka
-   YREGhEea3ueYo33LDLzWOQTsDxlw0zvs5ninxNUi+bk3ef7sYWmn1h4Ki
-   IQA2uYP4KX65netuEhiuhB1yVQlztkIMXqMr9zmotBniqYeo33MI3Q9Vb
-   C4rDM84MeooNE0erCejjsIJ9e1NB7e9nX98Yr7aEPwX2jSyZsu23d5x2d
-   w==;
-X-CSE-ConnectionGUID: 2D1yOiLIQza/HQ10SWXJYw==
-X-CSE-MsgGUID: LfslKYtDSMOjGcWXU1d6fw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11357"; a="63959667"
+  bh=zItX0PUquswBbQehRZ9Mq2klvkqoMesHQu9V+fBv0nQ=;
+  b=QICB+FfMN4SgBmFcCZBl8h8VA8Bqh/YukE7YhV8rXZezz9NMRGWWpNLX
+   +bhdk225ejeQCXHCOMIpG0Fiyi0El6rhJEsb2WV/vT+8YIi6sKTYglO/m
+   PRJC/HRGJCiaz6zcuQ7TNW6CXRHJFxFTGkeLBEm9jIMLRVSZUQNjnATi5
+   CgRI1c56g6Aiku52JMzT/MbpsLVnncYkDNiK6oJ27TFJ6bciampSB9HTq
+   FW8qdrrz+EJ7F8qS5aT1SoURyN3lHepk//sdKAV/gvDTieImMvAsS/3Nc
+   waquQWDhT1CV4iDv2765RU8VZfWBGRIpnXhp4rcUenCcwN9xUeq5ww/E+
+   g==;
+X-CSE-ConnectionGUID: 0VFseoftTSiiw/Y4Vszj2Q==
+X-CSE-MsgGUID: ZHefEP26SyqDCpr61Z+3Iw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11357"; a="63959676"
 X-IronPort-AV: E=Sophos;i="6.13,318,1732608000"; 
-   d="scan'208";a="63959667"
+   d="scan'208";a="63959676"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 17:19:39 -0800
-X-CSE-ConnectionGUID: DuHM7DIRS9yW1xpL5/TXvQ==
-X-CSE-MsgGUID: PM5BR6GrQOqJNSmSQQdX7Q==
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 17:19:42 -0800
+X-CSE-ConnectionGUID: IQQQZUV3S5m+DHW4GByRnA==
+X-CSE-MsgGUID: i6SFevVcQGO/Tdq1ptKaqQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,318,1732608000"; 
-   d="scan'208";a="116674920"
+   d="scan'208";a="116674923"
 Received: from litbin-desktop.sh.intel.com ([10.239.156.93])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 17:19:35 -0800
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 17:19:38 -0800
 From: Binbin Wu <binbin.wu@linux.intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com,
@@ -73,9 +73,9 @@ Cc: rick.p.edgecombe@intel.com,
 	chao.gao@intel.com,
 	linux-kernel@vger.kernel.org,
 	binbin.wu@linux.intel.com
-Subject: [PATCH v2 15/20] KVM: TDX: Add methods to ignore accesses to TSC
-Date: Thu, 27 Feb 2025 09:20:16 +0800
-Message-ID: <20250227012021.1778144-16-binbin.wu@linux.intel.com>
+Subject: [PATCH v2 16/20] KVM: TDX: Ignore setting up mce
+Date: Thu, 27 Feb 2025 09:20:17 +0800
+Message-ID: <20250227012021.1778144-17-binbin.wu@linux.intel.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20250227012021.1778144-1-binbin.wu@linux.intel.com>
 References: <20250227012021.1778144-1-binbin.wu@linux.intel.com>
@@ -89,83 +89,46 @@ Content-Transfer-Encoding: 8bit
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-TDX protects TDX guest TSC state from VMM.  Implement access methods to
-ignore guest TSC.
+Because vmx_set_mce function is VMX specific and it cannot be used for TDX.
+Add vt stub to ignore setting up mce for TDX.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
 ---
 TDX "the rest" v2:
 - No change.
-
-TDX "the rest" v1:
-- Dropped KVM_BUG_ON() in vt_get_l2_tsc_offset(). (Rick)
 ---
- arch/x86/kvm/vmx/main.c | 44 +++++++++++++++++++++++++++++++++++++----
- 1 file changed, 40 insertions(+), 4 deletions(-)
+ arch/x86/kvm/vmx/main.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 75e7fef7914e..554975f053ff 100644
+index 554975f053ff..d73ea9ce750d 100644
 --- a/arch/x86/kvm/vmx/main.c
 +++ b/arch/x86/kvm/vmx/main.c
-@@ -786,6 +786,42 @@ static int vt_set_identity_map_addr(struct kvm *kvm, u64 ident_addr)
- 	return vmx_set_identity_map_addr(kvm, ident_addr);
+@@ -843,6 +843,14 @@ static void vt_cancel_hv_timer(struct kvm_vcpu *vcpu)
  }
+ #endif
  
-+static u64 vt_get_l2_tsc_offset(struct kvm_vcpu *vcpu)
++static void vt_setup_mce(struct kvm_vcpu *vcpu)
 +{
-+	/* TDX doesn't support L2 guest at the moment. */
-+	if (is_td_vcpu(vcpu))
-+		return 0;
-+
-+	return vmx_get_l2_tsc_offset(vcpu);
-+}
-+
-+static u64 vt_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu)
-+{
-+	/* TDX doesn't support L2 guest at the moment. */
-+	if (is_td_vcpu(vcpu))
-+		return 0;
-+
-+	return vmx_get_l2_tsc_multiplier(vcpu);
-+}
-+
-+static void vt_write_tsc_offset(struct kvm_vcpu *vcpu)
-+{
-+	/* In TDX, tsc offset can't be changed. */
 +	if (is_td_vcpu(vcpu))
 +		return;
 +
-+	vmx_write_tsc_offset(vcpu);
++	vmx_setup_mce(vcpu);
 +}
 +
-+static void vt_write_tsc_multiplier(struct kvm_vcpu *vcpu)
-+{
-+	/* In TDX, tsc multiplier can't be changed. */
-+	if (is_td_vcpu(vcpu))
-+		return;
-+
-+	vmx_write_tsc_multiplier(vcpu);
-+}
-+
- #ifdef CONFIG_X86_64
- static int vt_set_hv_timer(struct kvm_vcpu *vcpu, u64 guest_deadline_tsc,
- 			      bool *expired)
-@@ -944,10 +980,10 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+ {
+ 	if (!is_td(kvm))
+@@ -1002,7 +1010,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.cancel_hv_timer = vt_cancel_hv_timer,
+ #endif
  
- 	.has_wbinvd_exit = cpu_has_vmx_wbinvd_exit,
+-	.setup_mce = vmx_setup_mce,
++	.setup_mce = vt_setup_mce,
  
--	.get_l2_tsc_offset = vmx_get_l2_tsc_offset,
--	.get_l2_tsc_multiplier = vmx_get_l2_tsc_multiplier,
--	.write_tsc_offset = vmx_write_tsc_offset,
--	.write_tsc_multiplier = vmx_write_tsc_multiplier,
-+	.get_l2_tsc_offset = vt_get_l2_tsc_offset,
-+	.get_l2_tsc_multiplier = vt_get_l2_tsc_multiplier,
-+	.write_tsc_offset = vt_write_tsc_offset,
-+	.write_tsc_multiplier = vt_write_tsc_multiplier,
- 
- 	.load_mmu_pgd = vt_load_mmu_pgd,
- 
+ #ifdef CONFIG_KVM_SMM
+ 	.smi_allowed = vt_smi_allowed,
 -- 
 2.46.0
 
