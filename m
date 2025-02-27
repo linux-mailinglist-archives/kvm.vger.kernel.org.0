@@ -1,360 +1,199 @@
-Return-Path: <kvm+bounces-39596-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39597-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5D90A4837E
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 16:49:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E89B9A48427
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 17:04:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C993318948F3
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 15:49:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 946E53B0470
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 16:03:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8753E1A83F4;
-	Thu, 27 Feb 2025 15:48:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 399A41B21B8;
+	Thu, 27 Feb 2025 16:01:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="bhB7HFJJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jJXtzZCQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66F1418D63A;
-	Thu, 27 Feb 2025 15:48:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B6C41A83F4;
+	Thu, 27 Feb 2025 16:01:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740671332; cv=none; b=JHKqMdbu1xl8Ns/Tj5Yii3my1ry44Lib9FTQ2M/Hac2J4hSlqB+sgw4/Chy3HCC279wNuCIYxg6d4J0/PX6ST1dKgguPrO2xDeKQ2GLwDZ9LuczwjuhzoWOoIkLJcwDg7cb9yjwyHtnVoT6Jjrzitr6+HWEMRQB8VA0X1s4YMz4=
+	t=1740672063; cv=none; b=LFNzkJPoeCg9ZjkVsRZe9riw5W8kI/9mocLsaAC0c/8VckBDDpCiy2l5lZlNFGLVhOqnMr/K3QJfHMXeIlrsneQKDuZRFXJzIO0LLphmdGPpqrrXQFIAyFMvbSwKm3FmI5jWzycTWqrC4yUd+DVL5lp8MWJdFoCFjh6AcJ59xsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740671332; c=relaxed/simple;
-	bh=0wcPQPb2fNJUO+Eb0zzXVRSq1giqQ/8OloyEuJ66EuU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e5A6g+OKUkJnpr4xiqTrHGTP1bE/2t49E9vOiKvnO/in/rSMby56zAkuFL7FhBvZd0F22UtMAoVUY4cY1qb0Mjooeott98NT+4H4o80A8Smi2DlnpcI2pbxvu9gRCFpcJndItqPbTz5jpDRndeuLAuuPhq25pCQJf4SsOHjx24E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=bhB7HFJJ; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id C698740E0202;
-	Thu, 27 Feb 2025 15:48:47 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id BNABbrUU7UVH; Thu, 27 Feb 2025 15:48:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1740671322; bh=RfLqHPbgshcEvdoRTouaG0WtklGb1Cpk3e2N6dqyufI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bhB7HFJJTzYFiNtEQ7Ry4AOSt+vubFQzRFpl8pLH6lPdQY/vQZbECcxmJVRXwDmP+
-	 Ty0v2D0PZSVvAiKSlknFOnYeY6hmAdymwquUcvE8s+lnlKzU5oN6xiCKrGigmQHZlA
-	 HUKlzBCh2DSBLhqseypFt3nfP87QHViv09pPRZ9cStHVwu9Ra7yxH0iUukeCynPVfu
-	 pE0hWYT3MCM8WDmTZNIZ0pGVkm0lIbvDE+kkqcjQyVp3Q+8NOl6yqga2XySI3G2d8d
-	 Hk0iNfyWnrbHCnkOEWfR5Zo7Jgk0tbkq6z34pfF5c6TYjT3xUD+aZKxjk+XKGlnJtS
-	 F507b++2ioSacDGZCMftapo8KZpR9qMEs8SaaLG+bm2KBuqO1tJBr9kHV3xAJXLhGU
-	 MjN69DOjsUWpB369Cg+waI3WeAJbXZLnmOjtn1OwfrU9zgtbmwJmAv++V62xOSjkWu
-	 FzpO1lFiY2aGpM9CKQt/N1KqdBR7XbmF7R6/Qwrp3Oaz6e+cJUIMKND2uwUfkzvWgx
-	 F8mCAiny/KwMv+psAH0hvJIKcvgFo+z4ic3PdzQtIdB8K8LZy49D2Qdu5hBzdb22m7
-	 dL77myrMRKlvcfeXqdmanb+iCtPV1R+CJeNIDaG59kRGo9BR0uzrxrPQOuxkN0HhFH
-	 7ihXLCSdSnOlQm3BClQguJvM=
-Received: from zn.tnic (pd95303ce.dip0.t-ipconnect.de [217.83.3.206])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id EBBA240E01A3;
-	Thu, 27 Feb 2025 15:48:06 +0000 (UTC)
-Date: Thu, 27 Feb 2025 16:48:00 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Alexey Kardashevskiy <aik@amd.com>
-Cc: x86@kernel.org, kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Robin Murphy <robin.murphy@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
+	s=arc-20240116; t=1740672063; c=relaxed/simple;
+	bh=CJdMczjk8lJZY4gc13JYCbZZS+ZSJu7ONYadUHYeag4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZGeL8YJ3hQXsLRUtRBo4GiMnae7gD/bCYLARK+n/T3s8MIBVjTd/xF8WJsFMAVTy5J1q+H5kQkXplHFn/QGv3DSA3qJyuR/vauA+9GzsmtZ7rdTQqfMlIf2XKzt5qAtDZWXFfQ5JGG6hPiDggFz4Fd2U10cbEV1nOB5fG7PquEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jJXtzZCQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BB39C4CEE8;
+	Thu, 27 Feb 2025 16:01:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740672062;
+	bh=CJdMczjk8lJZY4gc13JYCbZZS+ZSJu7ONYadUHYeag4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=jJXtzZCQLcwj/jUPm+PjdxzJ73q43BlFWguSoLtcrJG1h6JLuEQuIwndzAeMxUYgu
+	 Xy/JT83rak+iP5q3yncs3eVKFBKPd4U7IWSY/S9UbWVQz9brVzV8LvVC4hjg5hs3rf
+	 wbBPipMcaAYIbAGt3X+AwPNDbt//TQskMGWh4xjS8ZRXI+zv9ncr7CZAXsXX2gS+aI
+	 kUcTzOfZEmyZCq9to6J3SSYhf5ArKOUxo+9yVZs742w1Sa4PUVDb18Al0dY6kzhRPo
+	 iv/uVQqs4u9d8up0LYNKcxZ7ozF2TULbrXr/FCv5GRmTLSLdBpeU6ZxXDfvqEn+Ud9
+	 8M2M2UoB/7Ong==
+Received: from mchehab by mail.kernel.org with local (Exim 4.98)
+	(envelope-from <mchehab+huawei@kernel.org>)
+	id 1tngJo-000000023ai-2zLr;
+	Thu, 27 Feb 2025 17:01:00 +0100
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Igor Mammedov <imammedo@redhat.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>
+Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Shiju Jose <shiju.jose@huawei.com>,
+	qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org,
+	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Ani Sinha <anisinha@redhat.com>,
+	Cleber Rosa <crosa@redhat.com>,
+	Dongjiu Geng <gengdongjiu1@gmail.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Eric Blake <eblake@redhat.com>,
+	John Snow <jsnow@redhat.com>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Markus Armbruster <armbru@redhat.com>,
 	Michael Roth <michael.roth@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>,
-	Joao Martins <joao.m.martins@oracle.com>,
-	Nicolin Chen <nicolinc@nvidia.com>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Steve Sistare <steven.sistare@oracle.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
-	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
-	Zhi Wang <zhiw@nvidia.com>, AXu Yilun <yilun.xu@linux.intel.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-Subject: Re: [RFC PATCH v2 00/22] TSM: Secure VFIO, TDISP, SEV TIO
-Message-ID: <20250227154800.GBZ8CJMCH9wIptw1jd@fat_crate.local>
-References: <20250218111017.491719-1-aik@amd.com>
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Shannon Zhao <shannon.zhaosl@gmail.com>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	Zhao Liu <zhao1.liu@intel.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v6 00/19] Change ghes to use HEST-based offsets and add support for error inject
+Date: Thu, 27 Feb 2025 17:00:38 +0100
+Message-ID: <cover.1740671863.git.mchehab+huawei@kernel.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250218111017.491719-1-aik@amd.com>
+Content-Transfer-Encoding: 8bit
+Sender: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 
-FWIW,
+Now that the ghes preparation patches were merged, let's add support
+for error injection.
 
-I really appreciate this mail which explains to unenlightened people like me
-what this is all about.
+On this version, HEST table got added to ACPI tables testing for aarch64 virt.
 
-Especially the Acronyms, Flow, Specs pointers etc. I wish I could see this
-type of writeups in all patchsets' 0th messages, leading in the reader into
-the topic while not expecting the latter to actually *know* all those things
-because, d0h, it is obvious. You can read my mind, right? :-)
+There are also some patch reorder to help reviewers to check the changes.
 
-So thanks for taking the time - it is very helpful!
+The code itself is almost identical to v4, with just a few minor nits addressed.
 
-On Tue, Feb 18, 2025 at 10:09:47PM +1100, Alexey Kardashevskiy wrote:
-> Here are some patches to enable SEV-TIO on AMD Turin. It's been a while
-> and got quiet and I kept fixing my tree and wondering if I am going in
-> the right direction.
-> 
-> SEV-TIO allow a guest to establish trust in a device that supports TEE
-> Device Interface Security Protocol (TDISP, defined in PCIe r6.0+) and
-> then interact with the device via private memory.
-> 
-> These include both guest and host support. QEMU also requires changes.
-> This is more to show what it takes on AMD EPYC to pass through TDISP
-> devices, hence "RFC".
-> 
-> Components affected:
-> KVM
-> IOMMUFD
-> CCP (AMD)
-> SEV-GUEST (AMD)
-> 
-> New components:
-> PCI IDE
-> PCI TSM
-> VIRT CoCo TSM
-> VIRT CoCo TSM-HOST
-> VIRT CoCo TSM-GUEST
-> 
-> 
-> This is based on a merge of Lukas'es CMA and 1 week old upstream + some of Dan's patches:
-> 
-> https://github.com/aik/linux/tree/tsm
-> https://github.com/aik/qemu/tree/tsm
-> 
-> Not using "[PATCH 03/11] coco/tsm: Introduce a class device for TEE Security Managers"
-> yet as may be (may be) my approach makes sense too. Tried to stick to the terminology.
-> I have done some changes on top of that, these are on github, not posting here as
-> I expect those to be addressed in that thread:
-> https://lore.kernel.org/linux-coco/173343739517.1074769.13134786548545925484.stgit@dwillia2-xfh.jf.intel.com/T/
-> 
-> 
-> SEV TIO spec:
-> https://www.amd.com/content/dam/amd/en/documents/epyc-technical-docs/specifications/58271_0_70.pdf
-> Whitepaper:
-> https://www.amd.com/content/dam/amd/en/documents/epyc-business-docs/white-papers/sev-tio-whitepaper.pdf
-> 
-> 
-> Acronyms:
-> 
-> TEE - Trusted Execution Environments, a concept of managing trust between the host
-> 	and devices
-> TSM - TEE Security Manager (TSM), an entity which ensures security on the host
-> PSP - AMD platform secure processor (also "ASP", "AMD-SP"), acts as TSM on AMD.
-> SEV TIO - the TIO protocol implemented by the PSP and used by the host
-> GHCB - guest/host communication block - a protocol for guest-to-host communication
-> 	via a shared page
-> TDISP - TEE Device Interface Security Protocol (PCIe).
-> 
-> 
-> Flow:
-> 
-> - Boot host OS, load CCP and PCI TSM (they will load TSM-HOST too)
-> - PCI TSM creates sysfs nodes in "coco/tsm: Add tsm and tsm-host modules" for all TDISP-capable devices
-> - Enable IDE via "echo 0 > /sys/bus/pci/devices/0000:e1:00.0/tsm-dev/tdev:0000:e1:00.0/tsm_dev_connect"
-> - Examine certificates/measurements/status via sysfs
-> 
-> - run an SNP VM _without_ VFIO PCI device, wait till it is booted
-> - hotplug a TDISP-capable PCI function, IOMMUFD must be used (not a VFIO container)
-> - QEMU pins all guest memory via IOMMUFD map-from-fd ioctl()
-> - the VM detects a TDISP-capable device, creates sysfs nodes in "coco/tsm: Add tsm-guest module"
-> - the VM loads the device driver which goes as usual till enabling bus master (for convinience)
-> - TSM-GUEST modules listens for bus master event (hacked in "pci: Add BUS_NOTIFY_PCI_BUS_MASTER event")
-> - TSM-GUEST requests TDI ("trusted PCI VF") info, traps into QEMU
-> - QEMU binds the VF to the Coco VM in the secure fw (AMD PSP) via IOMMUFD ioctl
-> - QEMU reads certificates/measurements/interface report from the hosts sysfs and writes to the guest memory
-> - the guest receives all the data, examines it (not in this series though)
-> - the guest enables secure DMA and MMIO by calling GHCB which traps into QEMU
-> - QEMU calls IOMMUFD ioctl to enable secure DMA and MMIO
-> - the guest can now stop sharing memory for DMA (and expect DMA to encrypted memory to work) and
-> start accessing validated MMIO with Cbit set.
-> 
-> 
-> 
-> Assumptions
-> 
-> This requires hotpligging into the VM vs passing the device via the command line as
-> VFIO maps all guest memory as the device init step which is too soon as
-> SNP LAUNCH UPDATE happens later and will fail if VFIO maps private memory before that.
-> 
-> This requires the BME hack as MMIO and BusMaster enable bits cannot be 0 after MMIO
-> validation is done and there are moments in the guest OS booting process when this
-> appens.
-> 
-> SVSM could help addressing these (not implemented).
-> 
-> QEMU advertises TEE-IO capability to the VM. An additional x-tio flag is added to
-> vfio-pci.
-> 
-> Trying to avoid the device driver modification as much as possible at
-> the moment as my test devices already exist in non-TDISP form and need to work without
-> modification. Arguably this may not be always the case.
-> 
-> 
-> TODOs
-> 
-> Deal with PCI reset. Hot unplug+plug? Power states too.
-> Actually collaborate with CMA.
-> Other tons of things.
-> 
-> 
-> The previous conversation is here:
-> https://lore.kernel.org/r/20240823132137.336874-1-aik@amd.com
-> 
-> 
-> Changes:
-> v2:
-> * redid the whole thing pretty much
-> * RMPUPDATE API for QEMU
-> * switched to IOMMUFD
-> * mapping guest memory via IOMMUFD map-from-fd
-> * marking resouces as validated
-> * more modules
-> * moved tons to the userspace (QEMU), such as TDI bind and GHCB guest requests
-> 
-> 
-> Sean, get_maintainer.pl produced more than 100 emails for the entire
-> patchset, should I have posted them all anyway?
-> 
-> Please comment. Thanks.
-> 
-> 
-> 
-> Alexey Kardashevskiy (22):
->   pci/doe: Define protocol types and make those public
->   PCI/IDE: Fixes to make it work on AMD SNP-SEV
->   PCI/IDE: Init IDs on all IDE streams beforehand
->   iommu/amd: Report SEV-TIO support
->   crypto: ccp: Enable SEV-TIO feature in the PSP when supported
->   KVM: X86: Define tsm_get_vmid
->   coco/tsm: Add tsm and tsm-host modules
->   pci/tsm: Add PCI driver for TSM
->   crypto/ccp: Implement SEV TIO firmware interface
->   KVM: SVM: Add uAPI to change RMP for MMIO
->   KVM: SEV: Add TIO VMGEXIT
->   iommufd: Allow mapping from guest_memfd
->   iommufd: amd-iommu: Add vdevice support
->   iommufd: Add TIO calls
->   KVM: X86: Handle private MMIO as shared
->   coco/tsm: Add tsm-guest module
->   resource: Mark encrypted MMIO resource on validation
->   coco/sev-guest: Implement the guest support for SEV TIO
->   RFC: pci: Add BUS_NOTIFY_PCI_BUS_MASTER event
->   sev-guest: Stop changing encrypted page state for TDISP devices
->   pci: Allow encrypted MMIO mapping via sysfs
->   pci: Define pci_iomap_range_encrypted
-> 
->  drivers/crypto/ccp/Makefile                 |   13 +
->  drivers/pci/Makefile                        |    3 +
->  drivers/virt/coco/Makefile                  |    2 +
->  drivers/virt/coco/guest/Makefile            |    3 +
->  drivers/virt/coco/host/Makefile             |    6 +
->  drivers/virt/coco/sev-guest/Makefile        |    2 +-
->  arch/x86/include/asm/kvm-x86-ops.h          |    1 +
->  arch/x86/include/asm/kvm_host.h             |    2 +
->  arch/x86/include/asm/sev.h                  |   31 +
->  arch/x86/include/uapi/asm/kvm.h             |   11 +
->  arch/x86/include/uapi/asm/svm.h             |    2 +
->  drivers/crypto/ccp/sev-dev-tio.h            |  111 ++
->  drivers/crypto/ccp/sev-dev.h                |   19 +
->  drivers/iommu/amd/amd_iommu_types.h         |    3 +
->  drivers/iommu/iommufd/iommufd_private.h     |    3 +
->  include/asm-generic/pci_iomap.h             |    4 +
->  include/linux/amd-iommu.h                   |    2 +
->  include/linux/device.h                      |    4 +
->  include/linux/device/bus.h                  |    3 +
->  include/linux/dma-direct.h                  |    8 +
->  include/linux/ioport.h                      |    2 +
->  include/linux/kvm_host.h                    |    2 +
->  include/linux/pci-doe.h                     |    4 +
->  include/linux/pci-ide.h                     |   19 +-
->  include/linux/pci.h                         |    2 +-
->  include/linux/psp-sev.h                     |   61 +-
->  include/linux/swiotlb.h                     |    8 +
->  include/linux/tsm.h                         |  315 ++++
->  include/uapi/linux/iommufd.h                |   26 +
->  include/uapi/linux/kvm.h                    |   24 +
->  include/uapi/linux/pci_regs.h               |    5 +-
->  include/uapi/linux/psp-sev.h                |    6 +-
->  include/uapi/linux/sev-guest.h              |   39 +
->  arch/x86/coco/sev/core.c                    |   19 +-
->  arch/x86/kvm/mmu/mmu.c                      |    6 +-
->  arch/x86/kvm/svm/sev.c                      |  205 +++
->  arch/x86/kvm/svm/svm.c                      |   12 +
->  arch/x86/mm/ioremap.c                       |    2 +
->  arch/x86/mm/mem_encrypt.c                   |    6 +
->  arch/x86/virt/svm/sev.c                     |   34 +-
->  drivers/crypto/ccp/sev-dev-tio.c            | 1664 ++++++++++++++++++++
->  drivers/crypto/ccp/sev-dev-tsm.c            |  709 +++++++++
->  drivers/crypto/ccp/sev-dev.c                |   94 +-
->  drivers/iommu/amd/init.c                    |    9 +
->  drivers/iommu/amd/iommu.c                   |   60 +-
->  drivers/iommu/iommufd/main.c                |    6 +
->  drivers/iommu/iommufd/pages.c               |   88 +-
->  drivers/iommu/iommufd/viommu.c              |  112 ++
->  drivers/pci/doe.c                           |    2 -
->  drivers/pci/ide.c                           |  103 +-
->  drivers/pci/iomap.c                         |   24 +
->  drivers/pci/mmap.c                          |   11 +-
->  drivers/pci/pci-sysfs.c                     |   27 +-
->  drivers/pci/pci.c                           |    3 +
->  drivers/pci/proc.c                          |    2 +-
->  drivers/pci/tsm.c                           |  233 +++
->  drivers/virt/coco/guest/tsm-guest.c         |  326 ++++
->  drivers/virt/coco/host/tsm-host.c           |  551 +++++++
->  drivers/virt/coco/sev-guest/sev_guest.c     |   10 +
->  drivers/virt/coco/sev-guest/sev_guest_tio.c |  738 +++++++++
->  drivers/virt/coco/tsm.c                     |  638 ++++++++
->  kernel/resource.c                           |   48 +
->  virt/kvm/kvm_main.c                         |    6 +
->  Documentation/virt/coco/tsm.rst             |  132 ++
->  drivers/crypto/ccp/Kconfig                  |    2 +
->  drivers/pci/Kconfig                         |   15 +
->  drivers/virt/coco/Kconfig                   |   14 +
->  drivers/virt/coco/guest/Kconfig             |    3 +
->  drivers/virt/coco/host/Kconfig              |    6 +
->  drivers/virt/coco/sev-guest/Kconfig         |    1 +
->  70 files changed, 6614 insertions(+), 53 deletions(-)
->  create mode 100644 drivers/virt/coco/host/Makefile
->  create mode 100644 drivers/crypto/ccp/sev-dev-tio.h
->  create mode 100644 drivers/crypto/ccp/sev-dev-tio.c
->  create mode 100644 drivers/crypto/ccp/sev-dev-tsm.c
->  create mode 100644 drivers/pci/tsm.c
->  create mode 100644 drivers/virt/coco/guest/tsm-guest.c
->  create mode 100644 drivers/virt/coco/host/tsm-host.c
->  create mode 100644 drivers/virt/coco/sev-guest/sev_guest_tio.c
->  create mode 100644 drivers/virt/coco/tsm.c
->  create mode 100644 Documentation/virt/coco/tsm.rst
->  create mode 100644 drivers/virt/coco/host/Kconfig
-> 
-> -- 
-> 2.47.1
-> 
+---
+v6:
+- some minor nits addressed:
+   - use GPA instead of offset;
+   - merged two patches;
+   - fixed a couple of long line coding style issues;
+   - the HEST/DSDT diff inside a patch was changed to avoid troubles
+     applying it.
+
+v5:
+- make checkpatch happier;
+- HEST table is now tested;
+- some changes at HEST spec documentation to align with code changes;
+- extra care was taken with regards to git bisectability.
+
+v4:
+- added an extra comment for AcpiGhesState structure;
+- patches reordered;
+- no functional changes, just code shift between the patches in this series.
+
+v3:
+- addressed more nits;
+- hest_add_le now points to the beginning of HEST table;
+- removed HEST from tests/data/acpi;
+- added an extra patch to not use fw_cfg with virt-10.0 for hw_error_le
+
+v2: 
+- address some nits;
+- improved ags cleanup patch and removed ags.present field;
+- added some missing le*_to_cpu() calls;
+- update date at copyright for new files to 2024-2025;
+- qmp command changed to: inject-ghes-v2-error ans since updated to 10.0;
+- added HEST and DSDT tables after the changes to make check target happy.
+  (two patches: first one whitelisting such tables; second one removing from
+   whitelist and updating/adding such tables to tests/data/acpi)
+
+
+
+Mauro Carvalho Chehab (19):
+  tests/acpi: virt: add an empty HEST file
+  tests/qtest/bios-tables-test: extend to also check HEST table
+  tests/acpi: virt: update HEST file with its current data
+  acpi/ghes: Cleanup the code which gets ghes ged state
+  acpi/ghes: prepare to change the way HEST offsets are calculated
+  acpi/ghes: add a firmware file with HEST address
+  acpi/ghes: Use HEST table offsets when preparing GHES records
+  acpi/ghes: don't hard-code the number of sources for HEST table
+  acpi/ghes: add a notifier to notify when error data is ready
+  acpi/generic_event_device: Update GHES migration to cover hest addr
+  acpi/generic_event_device: add logic to detect if HEST addr is
+    available
+  acpi/generic_event_device: add an APEI error device
+  tests/acpi: virt: allow acpi table changes at DSDT and HEST tables
+  arm/virt: Wire up a GED error device for ACPI / GHES
+  qapi/acpi-hest: add an interface to do generic CPER error injection
+  acpi/generic_event_device.c: enable use_hest_addr for QEMU 10.x
+  tests/acpi: virt: update HEST and DSDT tables
+  docs: hest: add new "etc/acpi_table_hest_addr" and update workflow
+  scripts/ghes_inject: add a script to generate GHES error inject
+
+ MAINTAINERS                                   |  10 +
+ docs/specs/acpi_hest_ghes.rst                 |  28 +-
+ hw/acpi/Kconfig                               |   5 +
+ hw/acpi/aml-build.c                           |  10 +
+ hw/acpi/generic_event_device.c                |  44 ++
+ hw/acpi/ghes-stub.c                           |   7 +-
+ hw/acpi/ghes.c                                | 231 ++++--
+ hw/acpi/ghes_cper.c                           |  38 +
+ hw/acpi/ghes_cper_stub.c                      |  19 +
+ hw/acpi/meson.build                           |   2 +
+ hw/arm/virt-acpi-build.c                      |  35 +-
+ hw/arm/virt.c                                 |  19 +-
+ hw/core/machine.c                             |   2 +
+ include/hw/acpi/acpi_dev_interface.h          |   1 +
+ include/hw/acpi/aml-build.h                   |   2 +
+ include/hw/acpi/generic_event_device.h        |   1 +
+ include/hw/acpi/ghes.h                        |  51 +-
+ include/hw/arm/virt.h                         |   2 +
+ qapi/acpi-hest.json                           |  35 +
+ qapi/meson.build                              |   1 +
+ qapi/qapi-schema.json                         |   1 +
+ scripts/arm_processor_error.py                | 476 ++++++++++++
+ scripts/ghes_inject.py                        |  51 ++
+ scripts/qmp_helper.py                         | 703 ++++++++++++++++++
+ target/arm/kvm.c                              |   7 +-
+ tests/data/acpi/aarch64/virt/DSDT             | Bin 5196 -> 5240 bytes
+ .../data/acpi/aarch64/virt/DSDT.acpihmatvirt  | Bin 5282 -> 5326 bytes
+ tests/data/acpi/aarch64/virt/DSDT.memhp       | Bin 6557 -> 6601 bytes
+ tests/data/acpi/aarch64/virt/DSDT.pxb         | Bin 7679 -> 7723 bytes
+ tests/data/acpi/aarch64/virt/DSDT.topology    | Bin 5398 -> 5442 bytes
+ tests/data/acpi/aarch64/virt/HEST             | Bin 0 -> 224 bytes
+ tests/qtest/bios-tables-test.c                |   2 +-
+ 32 files changed, 1692 insertions(+), 91 deletions(-)
+ create mode 100644 hw/acpi/ghes_cper.c
+ create mode 100644 hw/acpi/ghes_cper_stub.c
+ create mode 100644 qapi/acpi-hest.json
+ create mode 100644 scripts/arm_processor_error.py
+ create mode 100755 scripts/ghes_inject.py
+ create mode 100755 scripts/qmp_helper.py
+ create mode 100644 tests/data/acpi/aarch64/virt/HEST
 
 -- 
-Regards/Gruss,
-    Boris.
+2.48.1
 
-https://people.kernel.org/tglx/notes-about-netiquette
+
 
