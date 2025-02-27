@@ -1,170 +1,310 @@
-Return-Path: <kvm+bounces-39527-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39528-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 834A6A473EB
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 05:01:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C40EA4740C
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 05:13:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5D03188BE78
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 04:01:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F0F2188BCD3
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 04:12:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8B461E51EF;
-	Thu, 27 Feb 2025 04:01:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 210811EDA1D;
+	Thu, 27 Feb 2025 04:12:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Pd9X2fgw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PVKUrzeV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f73.google.com (mail-ot1-f73.google.com [209.85.210.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6323A1FAA;
-	Thu, 27 Feb 2025 04:01:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8015C1D934B
+	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 04:12:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740628879; cv=none; b=auZhcbYP/KuDtPbjDJrFW/Hjc9C/uGn+fLF6dhMvAyncA8etykoGrIOKJyWIBu5c1H2At1JkE/+lJDrttvk8c67miyclfjnE0YoOSnlSrU+5cKllwe7BGfVHtAv4GxhEltyKlR/Yy5xloiF8018qujmjEiklaXrArdbrcRxP1BQ=
+	t=1740629536; cv=none; b=C9AcMwbaQ0lQFldMG5ArxK3lBHnVwSxrTvYceweJ/mkTADyR3jYiD49wZZH+ZV/Ca21CaCP0c0nBBDSUsAL9ftF97zw6VuhcdTnHtHPlZlkCp/wjr/m/PaqxxS+V2K3ZSDKx/WBSJdcMH+P/r/SvOFeeBIAunR6v26oIgDz4dBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740628879; c=relaxed/simple;
-	bh=IEjTmlHtu/G6YONIHp7Nc7Bjed+wo/mNljfTGEMgYoU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Cf/ADUtpFTbKXGWi+64014aaIzxWC0yjw2JYA1XfVq0jbwL/WHeWvvkiWuNHg25RGRa/uJvX3Nf9QVVkhi6NJFL2j1Y+8Ho+ftSMB4osm88tIYKl5TmJXpkf2PdyuEU8oT61upZvY7KXbcVMHMIMpKIBSn1NgeDlT1PNFjAN22I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Pd9X2fgw; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740628878; x=1772164878;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=IEjTmlHtu/G6YONIHp7Nc7Bjed+wo/mNljfTGEMgYoU=;
-  b=Pd9X2fgwid4qKtl0iI2E/iRAqmnOmn+3x5xPGvTWN2R6nzmHr296/85n
-   Iik76mRPuhyb2W1PUFsUIPFiJn5wGvALoXHhAXu14heH35hm48Y7hc5J7
-   0PY0eEHJmekgymiXLCJOZlPpleYv0KFbmkyW9UQItSKFccl2vG0rui9Gd
-   cPiBlFvqogNyB+/VoMIzwBlJssOVfxZjUhEZTyLAYVlrhCWXGvS2mDlXX
-   XNYWKJ0c+CX81emJ1Jc98fbW9CPh+HkIeZNMq5e4P+j5LmsJjCb0Ve4JQ
-   oBJwxWoPwlBkanLlos+TxTsSs7ZPzzfa0Q9Xo76O0LWAVokazAOAKkRGW
-   A==;
-X-CSE-ConnectionGUID: fBgsCYisS8Gz5Ly79cBOxw==
-X-CSE-MsgGUID: n4Dwb/ZFQKOzB8RAi26kaA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11357"; a="59039514"
-X-IronPort-AV: E=Sophos;i="6.13,319,1732608000"; 
-   d="scan'208";a="59039514"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 20:01:17 -0800
-X-CSE-ConnectionGUID: 28vhRiITRbmufxYLAhfSWw==
-X-CSE-MsgGUID: Lc4yBGteRBCDAlNlAOIahA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,319,1732608000"; 
-   d="scan'208";a="117075567"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmviesa008.fm.intel.com with ESMTP; 26 Feb 2025 20:01:10 -0800
-Date: Thu, 27 Feb 2025 11:59:18 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Alexey Kardashevskiy <aik@amd.com>, x86@kernel.org, kvm@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-arch@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
-	Michael Roth <michael.roth@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>,
-	Joao Martins <joao.m.martins@oracle.com>,
-	Nicolin Chen <nicolinc@nvidia.com>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Steve Sistare <steven.sistare@oracle.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
-	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
-	Zhi Wang <zhiw@nvidia.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-Subject: Re: [RFC PATCH v2 14/22] iommufd: Add TIO calls
-Message-ID: <Z7/jFhlsBrbrloia@yilunxu-OptiPlex-7050>
-References: <20250218111017.491719-1-aik@amd.com>
- <20250218111017.491719-15-aik@amd.com>
- <Z72GmixR6NkzXAl7@yilunxu-OptiPlex-7050>
- <2fe6b3c6-3eed-424d-87f0-34c4e7e1c906@amd.com>
- <Z77xrqLtJfB84dJF@yilunxu-OptiPlex-7050>
- <20250226131202.GH5011@ziepe.ca>
+	s=arc-20240116; t=1740629536; c=relaxed/simple;
+	bh=Z1x9cBAckNAGgXsh1KnLoyHiDSqdyqilemzDU/Dtrzw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=QXFPVrC1Oq/IA3sczJN4C6uhutnpo+cJrOKm3eYJ9tqjqRmdrQNbirFDF7iqPK5kOLqfcQEzyMyOlTt7EjyZdnYWD5aGmaDscq8CpYxFv+R46RUFym9iQPnBTqeykhm2IY4LMyFi7kdQSP+CH7DIWWIGYosssh4ooBz7j8WQZpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PVKUrzeV; arc=none smtp.client-ip=209.85.210.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-ot1-f73.google.com with SMTP id 46e09a7af769-7273bfeb806so243000a34.0
+        for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 20:12:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740629531; x=1741234331; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=3g5LjBldgpfT3/dJj9/PNfchsdoxXJ5s3FXfsdFv20U=;
+        b=PVKUrzeVeAtM5IhujWcTBhshzUSqPoLhuQuTgfeEL9bTeULUUCUm/X/ugp8keQSIIi
+         A0OPz33GYAxh6jleS8fbW6Cyg7Ub1LfiHqcrdUe/XfgMb1RyCj+irFj8ADTmkmBfnSGp
+         64adCads07Zb6YWcRXyvpLYk+OAwOV58zImpwSILI5/v6FiGadb0C26hSGMWFjmfcn7D
+         4eqT5E4etlVF52/QgAMtxViMk5su/oVk+Hsd4PWy30I/BIDkyyG7fW+GbWkt+BdJvGHj
+         DZ8GqyaL85GHtoNetXUuIdjsbhSUTuHALBs6qVaWTOm+G3Bf4ilauI83scBI6uMTBKVX
+         dbdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740629531; x=1741234331;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3g5LjBldgpfT3/dJj9/PNfchsdoxXJ5s3FXfsdFv20U=;
+        b=s08Y509F0F6E8VMwKJ+TN9PUIIOLAiBakoONFIa/WZunFYe/FJSZBLl9eecDLDa0Ic
+         tFD/KPqfjO5OvNJhe1Z8IskMuIRK3ivog24s2KtGqQAQeJL+VooGKfyhqab6j2AZyqaJ
+         R4KzZOXJQdweIXWMVbHeHtiYq7YhlsevTzJfk/kAFDlrElR6hjCeir+TwFrKC4p7xBtM
+         HQhU94kPUCt25NarZ1Dfp2xbYLQ305KUVGGvMpHPx9mtQ8s8s28KXS1x6CO7rJHE1TTa
+         IJyS0CZCeJR88Uz14h+xjw6vnfStHQ6S3zcLMfBb8bKAmnTfgq7nYaXWD2thexkLCxY2
+         E6Ww==
+X-Forwarded-Encrypted: i=1; AJvYcCXGK1ji+ntV6lT+XEM3kSK9gbQMfCGMIV++2F7YDvtWhN5ttGyL4iQZzMyMW4IorSq/bLI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYmbsBmtFbW/YBGrn9qbX1WDa5IkZtJE1BNoHdtvL1Ww1CA/GB
+	fHosVO+OzG9OEPj2cLYBIGOfz11hSSS2iKRNAgMm5+mrQHr4gca36CXd4pmLwjKmyshuVwkKT+3
+	SwBv8bpKpbbp+SRVmY1Ag0g==
+X-Google-Smtp-Source: AGHT+IH783qYzy8zqnAN9qy+ZgGK9lxDY+qeDhB++EerNVKBi0iW0nYVUAd0UY8jwXAselzgbS5EQUX7E0eXV9iZuQ==
+X-Received: from oabxe11.prod.google.com ([2002:a05:6870:ce8b:b0:295:f44d:8dfa])
+ (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6830:6a90:b0:727:2f79:ce32 with SMTP id 46e09a7af769-7274c563d40mr15643474a34.22.1740629531553;
+ Wed, 26 Feb 2025 20:12:11 -0800 (PST)
+Date: Thu, 27 Feb 2025 04:12:01 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250226131202.GH5011@ziepe.ca>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.658.g4767266eb4-goog
+Message-ID: <20250227041209.2031104-1-almasrymina@google.com>
+Subject: [PATCH net-next v6 0/8] Device memory TCP TX
+From: Mina Almasry <almasrymina@google.com>
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org
+Cc: Mina Almasry <almasrymina@google.com>, Donald Hunter <donald.hunter@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Jeroen de Borst <jeroendb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	"=?UTF-8?q?Eugenio=20P=C3=A9rez?=" <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, 
+	asml.silence@gmail.com, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
+	Samiullah Khawaja <skhawaja@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Feb 26, 2025 at 09:12:02AM -0400, Jason Gunthorpe wrote:
-> On Wed, Feb 26, 2025 at 06:49:18PM +0800, Xu Yilun wrote:
-> 
-> > E.g. I don't think VFIO driver would expect its MMIO access suddenly
-> > failed without knowing what happened.
-> 
-> What do people expect to happen here anyhow? Do you still intend to
-> mmap any of the MMIO into the hypervisor? No, right? It is all locked
+v6: https://lore.kernel.org/netdev/20250222191517.743530-1-almasrymina@google.com/
+===
 
-Not expecting mmap the MMIO, but I switched to another way. VFIO doesn't
-disallow mmap until bind, and if there is mmap on bind, bind failed.
-That's my understanding of your comments.
+v6 has no major changes. Addressed a few issues from Paolo and David,
+and collected Acks from Stan. Thank you everyone for the review!
 
-https://lore.kernel.org/kvm/Z4Hp9jvJbhW0cqWY@yilunxu-OptiPlex-7050/#t
+Changes:
+- retain behavior to process MSG_FASTOPEN even if the provided cmsg is
+  invalid (Paolo).
+- Rework the freeing of tx_vec slightly (it now has its own err label).
+  (Paolo).
+- Squash the commit that makes dmabuf unbinding scheduled work into the
+  same one which implements the TX path so we don't run into future
+  errors on bisecting (Paolo).
+- Fix/add comments to explain how dmabuf binding refcounting works
+  (David).
+
+v5: https://lore.kernel.org/netdev/20250220020914.895431-1-almasrymina@google.com/
+===
+
+v5 has no major changes; it clears up the relatively minor issues
+pointed out to in v4, and rebases the series on top of net-next to
+resolve the conflict with a patch that raced to the tree. It also
+collects the review tags from v4.
+
+Changes:
+- Rebase to net-next
+- Fix issues in selftest (Stan).
+- Address comments in the devmem and netmem driver docs (Stan and Bagas)
+- Fix zerocopy_fill_skb_from_devmem return error code (Stan).
+
+v4: https://lore.kernel.org/netdev/20250203223916.1064540-1-almasrymina@google.com/
+===
+
+v4 mainly addresses the critical driver support issue surfaced in v3 by
+Paolo and Stan. Drivers aiming to support netmem_tx should make sure not
+to pass the netmem dma-addrs to the dma-mapping APIs, as these dma-addrs
+may come from dma-bufs.
+
+Additionally other feedback from v3 is addressed.
+
+Major changes:
+- Add helpers to handle netmem dma-addrs. Add GVE support for
+  netmem_tx.
+- Fix binding->tx_vec not being freed on error paths during the
+  tx binding.
+- Add a minimal devmem_tx test to devmem.py.
+- Clean up everything obsolete from the cover letter (Paolo).
+
+v3: https://patchwork.kernel.org/project/netdevbpf/list/?series=929401&state=*
+===
+
+Address minor comments from RFCv2 and fix a few build warnings and
+ynl-regen issues. No major changes.
+
+RFC v2: https://patchwork.kernel.org/project/netdevbpf/list/?series=920056&state=*
+=======
+
+RFC v2 addresses much of the feedback from RFC v1. I plan on sending
+something close to this as net-next  reopens, sending it slightly early
+to get feedback if any.
+
+Major changes:
+--------------
+
+- much improved UAPI as suggested by Stan. We now interpret the iov_base
+  of the passed in iov from userspace as the offset into the dmabuf to
+  send from. This removes the need to set iov.iov_base = NULL which may
+  be confusing to users, and enables us to send multiple iovs in the
+  same sendmsg() call. ncdevmem and the docs show a sample use of that.
+
+- Removed the duplicate dmabuf iov_iter in binding->iov_iter. I think
+  this is good improvment as it was confusing to keep track of
+  2 iterators for the same sendmsg, and mistracking both iterators
+  caused a couple of bugs reported in the last iteration that are now
+  resolved with this streamlining.
+
+- Improved test coverage in ncdevmem. Now multiple sendmsg() are tested,
+  and sending multiple iovs in the same sendmsg() is tested.
+
+- Fixed issue where dmabuf unmapping was happening in invalid context
+  (Stan).
+
+====================================================================
+
+The TX path had been dropped from the Device Memory TCP patch series
+post RFCv1 [1], to make that series slightly easier to review. This
+series rebases the implementation of the TX path on top of the
+net_iov/netmem framework agreed upon and merged. The motivation for
+the feature is thoroughly described in the docs & cover letter of the
+original proposal, so I don't repeat the lengthy descriptions here, but
+they are available in [1].
+
+Full outline on usage of the TX path is detailed in the documentation
+included with this series.
+
+Test example is available via the kselftest included in the series as well.
+
+The series is relatively small, as the TX path for this feature largely
+piggybacks on the existing MSG_ZEROCOPY implementation.
+
+Patch Overview:
+---------------
+
+1. Documentation & tests to give high level overview of the feature
+   being added.
+
+1. Add netmem refcounting needed for the TX path.
+
+2. Devmem TX netlink API.
+
+3. Devmem TX net stack implementation.
+
+4. Make dma-buf unbinding scheduled work to handle TX cases where it gets
+   freed from contexts where we can't sleep.
+
+5. Add devmem TX documentation.
+
+6. Add scaffolding enabling driver support for netmem_tx. Add helpers, driver
+feature flag, and docs to enable drivers to declare netmem_tx support.
+
+7. Guard netmem_tx against being enabled against drivers that don't
+   support it.
+
+8. Add devmem_tx selftests. Add TX path to ncdevmem and add a test to
+   devmem.py.
+
+Testing:
+--------
+
+Testing is very similar to devmem TCP RX path. The ncdevmem test used
+for the RX path is now augemented with client functionality to test TX
+path.
+
+* Test Setup:
+
+Kernel: net-next with this RFC and memory provider API cherry-picked
+locally.
+
+Hardware: Google Cloud A3 VMs.
+
+NIC: GVE with header split & RSS & flow steering support.
+
+Performance results are not included with this version, unfortunately.
+I'm having issues running the dma-buf exporter driver against the
+upstream kernel on my test setup. The issues are specific to that
+dma-buf exporter and do not affect this patch series. I plan to follow
+up this series with perf fixes if the tests point to issues once they're
+up and running.
+
+Special thanks to Stan who took a stab at rebasing the TX implementation
+on top of the netmem/net_iov framework merged. Parts of his proposal [2]
+that are reused as-is are forked off into their own patches to give full
+credit.
+
+[1] https://lore.kernel.org/netdev/20240909054318.1809580-1-almasrymina@google.com/
+[2] https://lore.kernel.org/netdev/20240913150913.1280238-2-sdf@fomichev.me/T/#m066dd407fbed108828e2c40ae50e3f4376ef57fd
+
+Cc: sdf@fomichev.me
+Cc: asml.silence@gmail.com
+Cc: dw@davidwei.uk
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Victor Nogueira <victor@mojatatu.com>
+Cc: Pedro Tammela <pctammela@mojatatu.com>
+Cc: Samiullah Khawaja <skhawaja@google.com>
 
 
-Another concern is about dma-buf importer (e.g. KVM) mapping the MMIO.
-Recall we are working on the VFIO dma-buf solution, on bind/unbind the
-MMIO accessibility is being changed and importers should be notified to
-remove their mapping beforehand, and rebuild later if possible.
-An immediate requirement for Intel TDX is, KVM should remove secure EPT
-mapping for MMIO before unbind.
+Mina Almasry (7):
+  net: add get_netmem/put_netmem support
+  net: devmem: Implement TX path
+  net: add devmem TCP TX documentation
+  net: enable driver support for netmem TX
+  gve: add netmem TX support to GVE DQO-RDA mode
+  net: check for driver support in netmem TX
+  selftests: ncdevmem: Implement devmem TCP TX
 
-So I think device is all locked down into CC mode AFTER bind and BEFORE
-unbind. It doesn't seems viommu/vdevice could control bind/unbind.
+Stanislav Fomichev (1):
+  net: devmem: TCP tx netlink api
 
-There are other bus error handling cases, like AER when TDISP/SPDM/IDE
-state broken, that I don't have a clear solution now. But I cannot
-imagine they could be correctly handled without pci_driver support.
+ Documentation/netlink/specs/netdev.yaml       |  12 +
+ Documentation/networking/devmem.rst           | 150 ++++++++-
+ .../networking/net_cachelines/net_device.rst  |   1 +
+ Documentation/networking/netdev-features.rst  |   5 +
+ Documentation/networking/netmem.rst           |  23 +-
+ drivers/net/ethernet/google/gve/gve_main.c    |   4 +
+ drivers/net/ethernet/google/gve/gve_tx_dqo.c  |   8 +-
+ include/linux/netdevice.h                     |   2 +
+ include/linux/skbuff.h                        |  17 +-
+ include/linux/skbuff_ref.h                    |   4 +-
+ include/net/netmem.h                          |  23 ++
+ include/net/sock.h                            |   1 +
+ include/uapi/linux/netdev.h                   |   1 +
+ net/core/datagram.c                           |  48 ++-
+ net/core/dev.c                                |   3 +
+ net/core/devmem.c                             | 115 ++++++-
+ net/core/devmem.h                             |  77 ++++-
+ net/core/netdev-genl-gen.c                    |  13 +
+ net/core/netdev-genl-gen.h                    |   1 +
+ net/core/netdev-genl.c                        |  73 ++++-
+ net/core/skbuff.c                             |  48 ++-
+ net/core/sock.c                               |   6 +
+ net/ipv4/ip_output.c                          |   3 +-
+ net/ipv4/tcp.c                                |  50 ++-
+ net/ipv6/ip6_output.c                         |   3 +-
+ net/vmw_vsock/virtio_transport_common.c       |   5 +-
+ tools/include/uapi/linux/netdev.h             |   1 +
+ .../selftests/drivers/net/hw/devmem.py        |  26 +-
+ .../selftests/drivers/net/hw/ncdevmem.c       | 300 +++++++++++++++++-
+ 29 files changed, 950 insertions(+), 73 deletions(-)
 
-> down?
-> 
-> So perhaps the answer is that the VFIO side has to put the device into
-> CC mode which disables MMAP/etc, then the viommu/vdevice iommufd
-> object can control it.
-> 
-> > Back to your concern, I don't think it is a problem. From your patch,
-> > vIOMMU doesn't know the guest BDFn by nature, it is just the user
-> > stores the id in vdevice via iommufd_vdevice_alloc_ioctl(). A proper
-> > VFIO API could also do this work.
-> 
-> We don't want duplication though. If the viommu/vdevice/vbdf are owned
-> and lifecycle controlled by iommufd then the operations against them
-> must go through iommufd and through it's locking regime.
-> > 
-> > The implementation is basically no difference from:
-> > 
-> > +       vdev = container_of(iommufd_get_object(ucmd->ictx, cmd->vdevice_id,
-> > +                                              IOMMUFD_OBJ_VDEVICE),
-> > 
-> > The real concern is the device owner, VFIO, should initiate the bind.
-> 
-> There is a big different, the above has correct locking, the other
-> does not :)
 
-Could you elaborate more on that? Any locking problem if we implement
-bind/unbind outside iommufd. Thanks in advance.
+base-commit: 80c4a0015ce249cf0917a04dbb3cc652a6811079
+-- 
+2.48.1.658.g4767266eb4-goog
 
-Thanks,
-Yilun
-
-> 
-> Jason
 
