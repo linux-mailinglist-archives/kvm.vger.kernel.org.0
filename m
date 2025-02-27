@@ -1,136 +1,122 @@
-Return-Path: <kvm+bounces-39567-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39568-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D941A47E89
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 14:07:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63123A47E94
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 14:10:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1ABBD188C9B5
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 13:07:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 47B2B7A3195
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 13:09:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345B122F14C;
-	Thu, 27 Feb 2025 13:07:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C50C22F39C;
+	Thu, 27 Feb 2025 13:10:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Ta/XMbp0"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QhLAkZrp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C508822E3F7
-	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 13:07:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B2A121ABBE;
+	Thu, 27 Feb 2025 13:10:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740661641; cv=none; b=kG4yLtT4EvWNn2KkC2QQQ0jUIGeCVKf03B0OMakvOnWf/tQkom+5qgNl6lYnu22duA4K4XzggdfUy/aeP4lhdyh8YQ86Obc04VfFGY8ja3m11A1qNwZ2ivM1l2smMVOVz8RRe9oWlRBUjiTkRD3gW3CgyLYxcjNhzaRQmRu/e54=
+	t=1740661812; cv=none; b=OJg5EjuVkGcWTTqsdzu7pM6fV6m9LZxNLICPkJQVsTK0d3zJ/SbZ06rfaF1MLvuZM5aEiU8brhnjlrT4wIlpq2cJP+Y+1rxrSXNdIebvxRrooVGNlfnaUyvF1GdjJ5cTo7JxJMsI1SdfO+r5fjl8NLrRvgjqGRPf6augtBYJ80E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740661641; c=relaxed/simple;
-	bh=z5nansO47ETzXypSi+Fx4hXGPjukljqk01STgcLu8Ao=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=HBh2ei039L5DzX3x12oyF+YcbKKaXlTetlcGwDrX8O/8EHyH25bYAesyPZYpCFe83pVJpfd3JvLOqOEJhxbuniULvffe4hju8H1fTlvqXCQlApKzrh9ucFfyy0lhhTu4y4tGeoWY7mTkflnjffDXInZ++UNxSoVoa7LuYtJ3TUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Ta/XMbp0; arc=none smtp.client-ip=148.163.158.5
+	s=arc-20240116; t=1740661812; c=relaxed/simple;
+	bh=iPvFzfHv+HaNq9V4wJmNEOwKFfb6l7kprXjTDtXTkPI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M8aVHW6NWhtk1/lxO1ZkwmkHsCs7bZYSrNIhK9Cqt/iv995EfpwhnqIXWPAL373ikHLP+kwISu1Rz2TdMbvbRlXK1w5FaIOq1jkN13H9WvVHC+CqPevIgOa+lf938K5sZVk2zLO2FHwFKGC50LO5KTsTYYSVORoSU9/YT7KfZnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=QhLAkZrp; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51R7WmJY017870;
-	Thu, 27 Feb 2025 13:07:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	content-type:date:from:message-id:mime-version:subject:to; s=
-	pp1; bh=tnlHUn6Ri5yxdjt2GtLWm9yjkPAfiYuFnH4/z8MYybg=; b=Ta/XMbp0
-	+R4B9CCVqLRgJjiZ1+fuGE7NzrYJ+SEBBmcp66o5s+tcymDPKUkviOElkLn2tNgy
-	Fu6Lg1EODL50j9K924/Y+JpCwMpKUxsdJxmASs7y80cZl4zCvPeWP1YN68b7in3Z
-	f6UnUo1lsYR+EZR63lMtMAU5q5PsMwbkYu7quCObm5EsyCPa554/cie4snUpDEM2
-	n7H81qNeXTw7kte2hXBYDAgWiuAWhDAckkZKXMd4Ux1qOCkOdlcudpfbtt9KGxGg
-	BINaDJUtn02BxdDayCQDL745O4vxf4sJG+KMa9yvXYMhRi+8GFxFXOtiywQ6tFKG
-	Vefxi51SjvvCvA==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 452krp9ha7-1
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51R5Nvs8019668;
+	Thu, 27 Feb 2025 13:10:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=djq0q+esNrh+kOSfQi0l2ic8Sep7q3DI+XN3MAExA
+	Ds=; b=QhLAkZrp79RMZEdk1Q/6m+3p25/57zvAgWIBx7UHmHz63UaBytHKDBA14
+	iPEhxuNOptvTTOM/Dxy6sP81sfdy2l17pSCzCEWhOJK8f2tSMU26cob/fwJP7cXY
+	Gju7c14H4oubPyhHMfnIvHHj/bFxOERMFSRcPfIGSpxAU8oSl9GgbLWAQS+eqn6s
+	zyE0Urd3GCx8TPP/xedhabDtN65eYDEY5rqLG5Dop/ae0Xl4pNDrWDN/6g/IeyRQ
+	CYwPnDJ8ke0LCffhrSpUcU/jPnwk71rJI+0XHAwTScwfD74blMG+m/HOfjs5VHDN
+	TbKY9ApPOe0FXYFFXkI6ikqidINCw==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 452hv8t51p-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 27 Feb 2025 13:07:08 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51RC9Mdf012491;
-	Thu, 27 Feb 2025 13:07:08 GMT
+	Thu, 27 Feb 2025 13:10:07 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51RBZw96012741;
+	Thu, 27 Feb 2025 13:10:06 GMT
 Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44ys9yrx0x-1
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 44yrwt0ynm-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 27 Feb 2025 13:07:08 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51RD76CS36962584
+	Thu, 27 Feb 2025 13:10:06 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51RDA31N33227066
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 27 Feb 2025 13:07:06 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1E5B720043;
-	Thu, 27 Feb 2025 13:07:06 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DC5E520040;
-	Thu, 27 Feb 2025 13:07:05 +0000 (GMT)
-Received: from localhost (unknown [9.171.86.210])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 27 Feb 2025 13:07:05 +0000 (GMT)
-Date: Thu, 27 Feb 2025 14:07:05 +0100
-From: Andreas Grapentin <gra@linux.ibm.com>
-To: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Huth <thuth@redhat.com>, Andrew Jones <andrew.jones@linux.dev>
-Subject: [kvm-unit-tests PATCH] arch-run: fix test skips when /dev/stderr
- does not point to /proc/self/fd/2
-Message-ID: <ld5vg3ytv252ceaymg4mnq5jpnmklfvt2xkoldg67vkjl4awba@w3gc24eqeoxc>
+	Thu, 27 Feb 2025 13:10:03 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 319F620043;
+	Thu, 27 Feb 2025 13:10:03 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8BCD720040;
+	Thu, 27 Feb 2025 13:10:02 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.171.9.246])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 27 Feb 2025 13:10:02 +0000 (GMT)
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, borntraeger@de.ibm.com, david@redhat.com,
+        nrb@linux.ibm.com, seiden@linux.ibm.com, nsg@linux.ibm.com,
+        schlameuss@linux.ibm.com, hca@linux.ibm.com
+Subject: [PATCH v3 0/1] KVM: s390: fix a newly introduced bug
+Date: Thu, 27 Feb 2025 14:09:53 +0100
+Message-ID: <20250227130954.440821-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: m2R1HVjBpbMaoryBA_px7w7FJCSTj-3I
-X-Proofpoint-GUID: m2R1HVjBpbMaoryBA_px7w7FJCSTj-3I
+X-Proofpoint-ORIG-GUID: omlANLICp4pbfohSvFTLFyMzRNiayfA3
+X-Proofpoint-GUID: omlANLICp4pbfohSvFTLFyMzRNiayfA3
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-02-27_06,2025-02-27_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
- lowpriorityscore=0 spamscore=0 impostorscore=0 priorityscore=1501
- mlxscore=0 bulkscore=0 mlxlogscore=999 clxscore=1011 suspectscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502100000 definitions=main-2502270099
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ phishscore=0 lowpriorityscore=0 malwarescore=0 adultscore=0 spamscore=0
+ impostorscore=0 mlxlogscore=529 priorityscore=1501 mlxscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2502100000
+ definitions=main-2502270099
 
-In configurations where /dev/stderr does not link to /proc/self/fd/2,
-run_qemu in arch-run.bash leaks the stderr of the invoked qemu command
-to /dev/stderr, instead of it being captured to the log variable in
-premature_failure in runtime.bash.
+Fix race when making a page secure (hold pte lock again)
 
-This causes all tests to be skipped since the output required for the
-grep command in that function to indicate success is never present.
+This should fix the issues I have seen, which I think/hope are also the same
+issues that David found.
 
-As a possible fix, this patch gives stderr the same treatment as stdout
-in run_qemu, producing a dedicated file descriptor and handing it into
-the subshell.
+v2->v3:
+* added check for pte_write() in make_hva_secure() [thanks David]
 
-Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
----
- scripts/arch-run.bash | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+v1->v2:
+* major refactoring
+* walk the page tables only once
+* when importing, manually fault in pages if needed
 
-diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-index 2e4820c2..362aa1c5 100644
---- a/scripts/arch-run.bash
-+++ b/scripts/arch-run.bash
-@@ -33,11 +33,13 @@ run_qemu ()
- 	[ "$ENVIRON_DEFAULT" = "yes" ] && echo -n " #"
- 	echo " $INITRD"
- 
--	# stdout to {stdout}, stderr to $errors and stderr
-+	# stdout to {stdout}, stderr to $errors and {stderr}
- 	exec {stdout}>&1
--	errors=$("${@}" $INITRD </dev/null 2> >(tee /dev/stderr) > /dev/fd/$stdout)
-+	exec {stderr}>&2
-+	errors=$("${@}" $INITRD </dev/null 2> >(tee /dev/fd/$stderr) > /dev/fd/$stdout)
- 	ret=$?
- 	exec {stdout}>&-
-+	exec {stderr}>&-
- 
- 	[ $ret -eq 134 ] && echo "QEMU Aborted" >&2
- 
+Claudio Imbrenda (1):
+  KVM: s390: pv: fix race when making a page secure
+
+ arch/s390/include/asm/uv.h |   2 +-
+ arch/s390/kernel/uv.c      | 107 ++++++++++++++++++++++++++++++++++---
+ arch/s390/kvm/gmap.c       |  99 +++-------------------------------
+ arch/s390/kvm/kvm-s390.c   |  25 +++++----
+ 4 files changed, 123 insertions(+), 110 deletions(-)
+
 -- 
 2.48.1
 
