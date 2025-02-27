@@ -1,121 +1,360 @@
-Return-Path: <kvm+bounces-39595-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39596-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AD90A48363
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 16:45:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C5D90A4837E
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 16:49:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA04F18966E1
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 15:44:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C993318948F3
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 15:49:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAD0E26D5AD;
-	Thu, 27 Feb 2025 15:42:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8753E1A83F4;
+	Thu, 27 Feb 2025 15:48:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lFtNwmpS"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="bhB7HFJJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A7F26BDBB
-	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 15:42:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66F1418D63A;
+	Thu, 27 Feb 2025 15:48:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740670959; cv=none; b=KMBSwrGO55Fil3jrPyYeQzPtbQaEy+ZTyDdjyr3YOEHLyFND9GbGdPhVpixxqOrrKEJLj9u0YMh/ZjwYaA8aK1BqzjDIyw9LdHmo13iRvkV/OdukpLT3SGvcdLnZ8tGfw+tHpxMPJYdq2YjT4m5pCqIOKBtGzAWloTjtrcrIF9s=
+	t=1740671332; cv=none; b=JHKqMdbu1xl8Ns/Tj5Yii3my1ry44Lib9FTQ2M/Hac2J4hSlqB+sgw4/Chy3HCC279wNuCIYxg6d4J0/PX6ST1dKgguPrO2xDeKQ2GLwDZ9LuczwjuhzoWOoIkLJcwDg7cb9yjwyHtnVoT6Jjrzitr6+HWEMRQB8VA0X1s4YMz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740670959; c=relaxed/simple;
-	bh=UuoWkiqtC0aOxbaIb+t32Rqp0zelh31Ws+VURGNU74U=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=a1G/F42Yoa67kQ8vQYlHL3xh0WylW9gazagho1oiv55HExXszNQW09bZWRUdeRF+L2wO1wiG4XrHjCnCLMZ54vN12Q/mLnerh9DvoQdmKrNNnuV/Aha1YfCDr2JLtyo+gRyVWuj4yE2cJaNEXexeVO68/JwssRSHLv1R/RBxFIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lFtNwmpS; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fc1cb0c2cbso3553048a91.1
-        for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 07:42:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740670957; x=1741275757; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CTxXQgz7Yxbc/eAAimpjcsGV9z/4hM21fqn8fXkikhY=;
-        b=lFtNwmpSjBIDmPYLbnaBZAeaS7Bdol/QV6/Di1ZbYw9aPjQKJCDI4082rKNFm3AF08
-         utqNacWRoVYbNPGHRzXlTQR5a7DAvmAxEDSyMZyF7aMj5DnkdrKQiw/9ost/Lt6XUEJe
-         GwVUD0lnuLBhDWEaJMk2mEH53QhNaXAG+WUa9PpsJHAUGU4ja8WtEs05rAOYsJocXAVN
-         aSytUk67DMoP1k7Un+DHG8bHmZ6tGOAYnN5LTWtbHIra662hgpeyFk/h6+A/ao8EmGLW
-         J/KrNWcmtpvV3+P/sQXJIeeMQCihgNSuuVQRD5fhdt3Q6GQDMHtzp/Bd0+pr2xO5owUP
-         Kuwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740670957; x=1741275757;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CTxXQgz7Yxbc/eAAimpjcsGV9z/4hM21fqn8fXkikhY=;
-        b=jQrlUCvs5vjGGaGLRNDQLczL1XFvxohlwmagHfkPjWWznbcS4iZPisi/0xOFztreVE
-         CgLOIaooa3b/Vpj/We/747LqK2/rjYA+dorwHFBPIX1Wq5kyLMWjFKg5W6CdsMRdyHfW
-         1piCsQaxP8No5vwyHB6WQyxVaHGMnKQbgcUJLc9gEiwvtWk+qdQD25ukIACikTzFbCWx
-         8wVtcL4UJXgUCB1CR+YO+/G7UTuJzg6ttNfnBIHp+wYZjhoaKnwd8TCznDFwsI3idXDk
-         volIDn2+Y61/3mENa/qcWKn/inAtzwvHrm3gOguLsHaNjMIL23Eo46q4A2bp81PoOrCj
-         v/tQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVNRmY0UUO5WalEHoi3V2XJc65GYUuUa1ghNqVBdV/pZ6NDppcc1B9OVDJXuYurk+cLy7k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yya/hrYdgjxF+EgAN42iy9OQKI4jQdWz6d/LnsqakVRWYANgOVH
-	1E2ENGI2UsKz1GBIwUHVuN/HLSTRv2hkg/eEOCdN8+2Shu4Zl1m+R5XR2sCl78eZ0ljwO9o98TI
-	LDQ==
-X-Google-Smtp-Source: AGHT+IGO+W9sfErnn/5UJ2Mtcl1Knk5QkM6rEM8nO1qZYe/AqOfxoeKMz4uPwgmxxOQVDkvbyEA4XinzfOo=
-X-Received: from pjz4.prod.google.com ([2002:a17:90b:56c4:b0:2fc:1158:9fe5])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d445:b0:2fe:a742:51a7
- with SMTP id 98e67ed59e1d1-2fea7425341mr3837296a91.23.1740670957036; Thu, 27
- Feb 2025 07:42:37 -0800 (PST)
-Date: Thu, 27 Feb 2025 07:42:35 -0800
-In-Reply-To: <f59991ed-e24d-4bf4-8739-b314327ca1d3@amd.com>
+	s=arc-20240116; t=1740671332; c=relaxed/simple;
+	bh=0wcPQPb2fNJUO+Eb0zzXVRSq1giqQ/8OloyEuJ66EuU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e5A6g+OKUkJnpr4xiqTrHGTP1bE/2t49E9vOiKvnO/in/rSMby56zAkuFL7FhBvZd0F22UtMAoVUY4cY1qb0Mjooeott98NT+4H4o80A8Smi2DlnpcI2pbxvu9gRCFpcJndItqPbTz5jpDRndeuLAuuPhq25pCQJf4SsOHjx24E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=bhB7HFJJ; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id C698740E0202;
+	Thu, 27 Feb 2025 15:48:47 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id BNABbrUU7UVH; Thu, 27 Feb 2025 15:48:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1740671322; bh=RfLqHPbgshcEvdoRTouaG0WtklGb1Cpk3e2N6dqyufI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bhB7HFJJTzYFiNtEQ7Ry4AOSt+vubFQzRFpl8pLH6lPdQY/vQZbECcxmJVRXwDmP+
+	 Ty0v2D0PZSVvAiKSlknFOnYeY6hmAdymwquUcvE8s+lnlKzU5oN6xiCKrGigmQHZlA
+	 HUKlzBCh2DSBLhqseypFt3nfP87QHViv09pPRZ9cStHVwu9Ra7yxH0iUukeCynPVfu
+	 pE0hWYT3MCM8WDmTZNIZ0pGVkm0lIbvDE+kkqcjQyVp3Q+8NOl6yqga2XySI3G2d8d
+	 Hk0iNfyWnrbHCnkOEWfR5Zo7Jgk0tbkq6z34pfF5c6TYjT3xUD+aZKxjk+XKGlnJtS
+	 F507b++2ioSacDGZCMftapo8KZpR9qMEs8SaaLG+bm2KBuqO1tJBr9kHV3xAJXLhGU
+	 MjN69DOjsUWpB369Cg+waI3WeAJbXZLnmOjtn1OwfrU9zgtbmwJmAv++V62xOSjkWu
+	 FzpO1lFiY2aGpM9CKQt/N1KqdBR7XbmF7R6/Qwrp3Oaz6e+cJUIMKND2uwUfkzvWgx
+	 F8mCAiny/KwMv+psAH0hvJIKcvgFo+z4ic3PdzQtIdB8K8LZy49D2Qdu5hBzdb22m7
+	 dL77myrMRKlvcfeXqdmanb+iCtPV1R+CJeNIDaG59kRGo9BR0uzrxrPQOuxkN0HhFH
+	 7ihXLCSdSnOlQm3BClQguJvM=
+Received: from zn.tnic (pd95303ce.dip0.t-ipconnect.de [217.83.3.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id EBBA240E01A3;
+	Thu, 27 Feb 2025 15:48:06 +0000 (UTC)
+Date: Thu, 27 Feb 2025 16:48:00 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Alexey Kardashevskiy <aik@amd.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Robin Murphy <robin.murphy@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>,
+	Joao Martins <joao.m.martins@oracle.com>,
+	Nicolin Chen <nicolinc@nvidia.com>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Steve Sistare <steven.sistare@oracle.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
+	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
+	Zhi Wang <zhiw@nvidia.com>, AXu Yilun <yilun.xu@linux.intel.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: Re: [RFC PATCH v2 00/22] TSM: Secure VFIO, TDISP, SEV TIO
+Message-ID: <20250227154800.GBZ8CJMCH9wIptw1jd@fat_crate.local>
+References: <20250218111017.491719-1-aik@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250227012541.3234589-1-seanjc@google.com> <20250227012541.3234589-6-seanjc@google.com>
- <4443bdf2-c8ea-4245-a23f-bb561c7e734e@amd.com> <Z8B3x7EPYY8j8o7F@google.com> <f59991ed-e24d-4bf4-8739-b314327ca1d3@amd.com>
-Message-ID: <Z8CH6_hYMKYk0doi@google.com>
-Subject: Re: [PATCH v2 05/10] KVM: SVM: Require AP's "requested" SEV_FEATURES
- to match KVM's view
-From: Sean Christopherson <seanjc@google.com>
-To: Pankaj Gupta <pankaj.gupta@amd.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Naveen N Rao <naveen@kernel.org>, Kim Phillips <kim.phillips@amd.com>, 
-	Tom Lendacky <thomas.lendacky@amd.com>, Alexey Kardashevskiy <aik@amd.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250218111017.491719-1-aik@amd.com>
 
-On Thu, Feb 27, 2025, Pankaj Gupta wrote:
-> 
-> > > > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> > > > index 9aad0dae3a80..bad5834ec143 100644
-> > > > --- a/arch/x86/kvm/svm/sev.c
-> > > > +++ b/arch/x86/kvm/svm/sev.c
-> > > > @@ -3932,6 +3932,7 @@ void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu)
-> > > >    static int sev_snp_ap_creation(struct vcpu_svm *svm)
-> > > >    {
-> > > > +	struct kvm_sev_info *sev = to_kvm_sev_info(svm->vcpu.kvm);
-> > > >    	struct kvm_vcpu *vcpu = &svm->vcpu;
-> > > >    	struct kvm_vcpu *target_vcpu;
-> > > >    	struct vcpu_svm *target_svm;
-> > > > @@ -3963,26 +3964,18 @@ static int sev_snp_ap_creation(struct vcpu_svm *svm)
-> > > >    	mutex_lock(&target_svm->sev_es.snp_vmsa_mutex);
-> > > > -	/* Interrupt injection mode shouldn't change for AP creation */
-> > > > -	if (request < SVM_VMGEXIT_AP_DESTROY) {
-> > > > -		u64 sev_features;
-> > > > -
-> > > > -		sev_features = vcpu->arch.regs[VCPU_REGS_RAX];
-> > > > -		sev_features ^= to_kvm_sev_info(svm->vcpu.kvm)->vmsa_features;
-> > > > -
-> > > > -		if (sev_features & SVM_SEV_FEAT_INT_INJ_MODES) {
-> > > 
-> > > 'SVM_SEV_FEAT_INT_INJ_MODES' would even be required in any future use-case,
-> > > maybe?
-> > 
-> > Can you elaborate?  I don't quite follow what you're suggesting.
-> 
-> SVM_SEV_FEAT_INT_INJ_MODES macro is not used anymore? If there is no plan to
-> use it, maybe we can remove that as well?
+FWIW,
 
-Ah, gotcha.  I didn't realize it was a compound macro.  Yeah, unless someone
-objects, I'll remove it when applying.
+I really appreciate this mail which explains to unenlightened people like me
+what this is all about.
+
+Especially the Acronyms, Flow, Specs pointers etc. I wish I could see this
+type of writeups in all patchsets' 0th messages, leading in the reader into
+the topic while not expecting the latter to actually *know* all those things
+because, d0h, it is obvious. You can read my mind, right? :-)
+
+So thanks for taking the time - it is very helpful!
+
+On Tue, Feb 18, 2025 at 10:09:47PM +1100, Alexey Kardashevskiy wrote:
+> Here are some patches to enable SEV-TIO on AMD Turin. It's been a while
+> and got quiet and I kept fixing my tree and wondering if I am going in
+> the right direction.
+> 
+> SEV-TIO allow a guest to establish trust in a device that supports TEE
+> Device Interface Security Protocol (TDISP, defined in PCIe r6.0+) and
+> then interact with the device via private memory.
+> 
+> These include both guest and host support. QEMU also requires changes.
+> This is more to show what it takes on AMD EPYC to pass through TDISP
+> devices, hence "RFC".
+> 
+> Components affected:
+> KVM
+> IOMMUFD
+> CCP (AMD)
+> SEV-GUEST (AMD)
+> 
+> New components:
+> PCI IDE
+> PCI TSM
+> VIRT CoCo TSM
+> VIRT CoCo TSM-HOST
+> VIRT CoCo TSM-GUEST
+> 
+> 
+> This is based on a merge of Lukas'es CMA and 1 week old upstream + some of Dan's patches:
+> 
+> https://github.com/aik/linux/tree/tsm
+> https://github.com/aik/qemu/tree/tsm
+> 
+> Not using "[PATCH 03/11] coco/tsm: Introduce a class device for TEE Security Managers"
+> yet as may be (may be) my approach makes sense too. Tried to stick to the terminology.
+> I have done some changes on top of that, these are on github, not posting here as
+> I expect those to be addressed in that thread:
+> https://lore.kernel.org/linux-coco/173343739517.1074769.13134786548545925484.stgit@dwillia2-xfh.jf.intel.com/T/
+> 
+> 
+> SEV TIO spec:
+> https://www.amd.com/content/dam/amd/en/documents/epyc-technical-docs/specifications/58271_0_70.pdf
+> Whitepaper:
+> https://www.amd.com/content/dam/amd/en/documents/epyc-business-docs/white-papers/sev-tio-whitepaper.pdf
+> 
+> 
+> Acronyms:
+> 
+> TEE - Trusted Execution Environments, a concept of managing trust between the host
+> 	and devices
+> TSM - TEE Security Manager (TSM), an entity which ensures security on the host
+> PSP - AMD platform secure processor (also "ASP", "AMD-SP"), acts as TSM on AMD.
+> SEV TIO - the TIO protocol implemented by the PSP and used by the host
+> GHCB - guest/host communication block - a protocol for guest-to-host communication
+> 	via a shared page
+> TDISP - TEE Device Interface Security Protocol (PCIe).
+> 
+> 
+> Flow:
+> 
+> - Boot host OS, load CCP and PCI TSM (they will load TSM-HOST too)
+> - PCI TSM creates sysfs nodes in "coco/tsm: Add tsm and tsm-host modules" for all TDISP-capable devices
+> - Enable IDE via "echo 0 > /sys/bus/pci/devices/0000:e1:00.0/tsm-dev/tdev:0000:e1:00.0/tsm_dev_connect"
+> - Examine certificates/measurements/status via sysfs
+> 
+> - run an SNP VM _without_ VFIO PCI device, wait till it is booted
+> - hotplug a TDISP-capable PCI function, IOMMUFD must be used (not a VFIO container)
+> - QEMU pins all guest memory via IOMMUFD map-from-fd ioctl()
+> - the VM detects a TDISP-capable device, creates sysfs nodes in "coco/tsm: Add tsm-guest module"
+> - the VM loads the device driver which goes as usual till enabling bus master (for convinience)
+> - TSM-GUEST modules listens for bus master event (hacked in "pci: Add BUS_NOTIFY_PCI_BUS_MASTER event")
+> - TSM-GUEST requests TDI ("trusted PCI VF") info, traps into QEMU
+> - QEMU binds the VF to the Coco VM in the secure fw (AMD PSP) via IOMMUFD ioctl
+> - QEMU reads certificates/measurements/interface report from the hosts sysfs and writes to the guest memory
+> - the guest receives all the data, examines it (not in this series though)
+> - the guest enables secure DMA and MMIO by calling GHCB which traps into QEMU
+> - QEMU calls IOMMUFD ioctl to enable secure DMA and MMIO
+> - the guest can now stop sharing memory for DMA (and expect DMA to encrypted memory to work) and
+> start accessing validated MMIO with Cbit set.
+> 
+> 
+> 
+> Assumptions
+> 
+> This requires hotpligging into the VM vs passing the device via the command line as
+> VFIO maps all guest memory as the device init step which is too soon as
+> SNP LAUNCH UPDATE happens later and will fail if VFIO maps private memory before that.
+> 
+> This requires the BME hack as MMIO and BusMaster enable bits cannot be 0 after MMIO
+> validation is done and there are moments in the guest OS booting process when this
+> appens.
+> 
+> SVSM could help addressing these (not implemented).
+> 
+> QEMU advertises TEE-IO capability to the VM. An additional x-tio flag is added to
+> vfio-pci.
+> 
+> Trying to avoid the device driver modification as much as possible at
+> the moment as my test devices already exist in non-TDISP form and need to work without
+> modification. Arguably this may not be always the case.
+> 
+> 
+> TODOs
+> 
+> Deal with PCI reset. Hot unplug+plug? Power states too.
+> Actually collaborate with CMA.
+> Other tons of things.
+> 
+> 
+> The previous conversation is here:
+> https://lore.kernel.org/r/20240823132137.336874-1-aik@amd.com
+> 
+> 
+> Changes:
+> v2:
+> * redid the whole thing pretty much
+> * RMPUPDATE API for QEMU
+> * switched to IOMMUFD
+> * mapping guest memory via IOMMUFD map-from-fd
+> * marking resouces as validated
+> * more modules
+> * moved tons to the userspace (QEMU), such as TDI bind and GHCB guest requests
+> 
+> 
+> Sean, get_maintainer.pl produced more than 100 emails for the entire
+> patchset, should I have posted them all anyway?
+> 
+> Please comment. Thanks.
+> 
+> 
+> 
+> Alexey Kardashevskiy (22):
+>   pci/doe: Define protocol types and make those public
+>   PCI/IDE: Fixes to make it work on AMD SNP-SEV
+>   PCI/IDE: Init IDs on all IDE streams beforehand
+>   iommu/amd: Report SEV-TIO support
+>   crypto: ccp: Enable SEV-TIO feature in the PSP when supported
+>   KVM: X86: Define tsm_get_vmid
+>   coco/tsm: Add tsm and tsm-host modules
+>   pci/tsm: Add PCI driver for TSM
+>   crypto/ccp: Implement SEV TIO firmware interface
+>   KVM: SVM: Add uAPI to change RMP for MMIO
+>   KVM: SEV: Add TIO VMGEXIT
+>   iommufd: Allow mapping from guest_memfd
+>   iommufd: amd-iommu: Add vdevice support
+>   iommufd: Add TIO calls
+>   KVM: X86: Handle private MMIO as shared
+>   coco/tsm: Add tsm-guest module
+>   resource: Mark encrypted MMIO resource on validation
+>   coco/sev-guest: Implement the guest support for SEV TIO
+>   RFC: pci: Add BUS_NOTIFY_PCI_BUS_MASTER event
+>   sev-guest: Stop changing encrypted page state for TDISP devices
+>   pci: Allow encrypted MMIO mapping via sysfs
+>   pci: Define pci_iomap_range_encrypted
+> 
+>  drivers/crypto/ccp/Makefile                 |   13 +
+>  drivers/pci/Makefile                        |    3 +
+>  drivers/virt/coco/Makefile                  |    2 +
+>  drivers/virt/coco/guest/Makefile            |    3 +
+>  drivers/virt/coco/host/Makefile             |    6 +
+>  drivers/virt/coco/sev-guest/Makefile        |    2 +-
+>  arch/x86/include/asm/kvm-x86-ops.h          |    1 +
+>  arch/x86/include/asm/kvm_host.h             |    2 +
+>  arch/x86/include/asm/sev.h                  |   31 +
+>  arch/x86/include/uapi/asm/kvm.h             |   11 +
+>  arch/x86/include/uapi/asm/svm.h             |    2 +
+>  drivers/crypto/ccp/sev-dev-tio.h            |  111 ++
+>  drivers/crypto/ccp/sev-dev.h                |   19 +
+>  drivers/iommu/amd/amd_iommu_types.h         |    3 +
+>  drivers/iommu/iommufd/iommufd_private.h     |    3 +
+>  include/asm-generic/pci_iomap.h             |    4 +
+>  include/linux/amd-iommu.h                   |    2 +
+>  include/linux/device.h                      |    4 +
+>  include/linux/device/bus.h                  |    3 +
+>  include/linux/dma-direct.h                  |    8 +
+>  include/linux/ioport.h                      |    2 +
+>  include/linux/kvm_host.h                    |    2 +
+>  include/linux/pci-doe.h                     |    4 +
+>  include/linux/pci-ide.h                     |   19 +-
+>  include/linux/pci.h                         |    2 +-
+>  include/linux/psp-sev.h                     |   61 +-
+>  include/linux/swiotlb.h                     |    8 +
+>  include/linux/tsm.h                         |  315 ++++
+>  include/uapi/linux/iommufd.h                |   26 +
+>  include/uapi/linux/kvm.h                    |   24 +
+>  include/uapi/linux/pci_regs.h               |    5 +-
+>  include/uapi/linux/psp-sev.h                |    6 +-
+>  include/uapi/linux/sev-guest.h              |   39 +
+>  arch/x86/coco/sev/core.c                    |   19 +-
+>  arch/x86/kvm/mmu/mmu.c                      |    6 +-
+>  arch/x86/kvm/svm/sev.c                      |  205 +++
+>  arch/x86/kvm/svm/svm.c                      |   12 +
+>  arch/x86/mm/ioremap.c                       |    2 +
+>  arch/x86/mm/mem_encrypt.c                   |    6 +
+>  arch/x86/virt/svm/sev.c                     |   34 +-
+>  drivers/crypto/ccp/sev-dev-tio.c            | 1664 ++++++++++++++++++++
+>  drivers/crypto/ccp/sev-dev-tsm.c            |  709 +++++++++
+>  drivers/crypto/ccp/sev-dev.c                |   94 +-
+>  drivers/iommu/amd/init.c                    |    9 +
+>  drivers/iommu/amd/iommu.c                   |   60 +-
+>  drivers/iommu/iommufd/main.c                |    6 +
+>  drivers/iommu/iommufd/pages.c               |   88 +-
+>  drivers/iommu/iommufd/viommu.c              |  112 ++
+>  drivers/pci/doe.c                           |    2 -
+>  drivers/pci/ide.c                           |  103 +-
+>  drivers/pci/iomap.c                         |   24 +
+>  drivers/pci/mmap.c                          |   11 +-
+>  drivers/pci/pci-sysfs.c                     |   27 +-
+>  drivers/pci/pci.c                           |    3 +
+>  drivers/pci/proc.c                          |    2 +-
+>  drivers/pci/tsm.c                           |  233 +++
+>  drivers/virt/coco/guest/tsm-guest.c         |  326 ++++
+>  drivers/virt/coco/host/tsm-host.c           |  551 +++++++
+>  drivers/virt/coco/sev-guest/sev_guest.c     |   10 +
+>  drivers/virt/coco/sev-guest/sev_guest_tio.c |  738 +++++++++
+>  drivers/virt/coco/tsm.c                     |  638 ++++++++
+>  kernel/resource.c                           |   48 +
+>  virt/kvm/kvm_main.c                         |    6 +
+>  Documentation/virt/coco/tsm.rst             |  132 ++
+>  drivers/crypto/ccp/Kconfig                  |    2 +
+>  drivers/pci/Kconfig                         |   15 +
+>  drivers/virt/coco/Kconfig                   |   14 +
+>  drivers/virt/coco/guest/Kconfig             |    3 +
+>  drivers/virt/coco/host/Kconfig              |    6 +
+>  drivers/virt/coco/sev-guest/Kconfig         |    1 +
+>  70 files changed, 6614 insertions(+), 53 deletions(-)
+>  create mode 100644 drivers/virt/coco/host/Makefile
+>  create mode 100644 drivers/crypto/ccp/sev-dev-tio.h
+>  create mode 100644 drivers/crypto/ccp/sev-dev-tio.c
+>  create mode 100644 drivers/crypto/ccp/sev-dev-tsm.c
+>  create mode 100644 drivers/pci/tsm.c
+>  create mode 100644 drivers/virt/coco/guest/tsm-guest.c
+>  create mode 100644 drivers/virt/coco/host/tsm-host.c
+>  create mode 100644 drivers/virt/coco/sev-guest/sev_guest_tio.c
+>  create mode 100644 drivers/virt/coco/tsm.c
+>  create mode 100644 Documentation/virt/coco/tsm.rst
+>  create mode 100644 drivers/virt/coco/host/Kconfig
+> 
+> -- 
+> 2.47.1
+> 
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
