@@ -1,71 +1,137 @@
-Return-Path: <kvm+bounces-39566-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39567-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29EC3A47E27
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 13:46:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D941A47E89
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 14:07:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05C951622CE
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 12:46:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1ABBD188C9B5
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 13:07:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB00F22D7B4;
-	Thu, 27 Feb 2025 12:46:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345B122F14C;
+	Thu, 27 Feb 2025 13:07:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Ta/XMbp0"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp237.sjtu.edu.cn (smtp237.sjtu.edu.cn [202.120.2.237])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D88CFA48;
-	Thu, 27 Feb 2025 12:46:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.120.2.237
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C508822E3F7
+	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 13:07:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740660377; cv=none; b=TWA81HnAadRl2OuCEVEWOQuPRVhvWFRUv3X8bmTktFXuz5WH3WyNyQTstPAEWXDCGoixveRkA9wXqtTTrSg8ZyJcyq9Wiwif25DXworTiYbKZrnBsdT/s48I1Po3jlqvJp68iHIrlB0I2C//qYoK2EfHKygYc9nqLKWp+RKw/nU=
+	t=1740661641; cv=none; b=kG4yLtT4EvWNn2KkC2QQQ0jUIGeCVKf03B0OMakvOnWf/tQkom+5qgNl6lYnu22duA4K4XzggdfUy/aeP4lhdyh8YQ86Obc04VfFGY8ja3m11A1qNwZ2ivM1l2smMVOVz8RRe9oWlRBUjiTkRD3gW3CgyLYxcjNhzaRQmRu/e54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740660377; c=relaxed/simple;
-	bh=vyeS/IwiUlda8zCLrI2wORo53ZhuYkNx2sKDFaPcHPU=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=fBIo+DRY6XFCo78rkN0+gvRQh6Tf8Cy2EjxiMqr9m3S1itWmeZ7u+twWcfyxnkLOj6CmJTz2CJ69HR8H1IraUuP8J4fJ17RGivcwAq4oxwbsjnQe4DFt78OBQvBWsdSVMMACjH8oBIfReoR61UVhbTxMvpqsI7dT2yyW+ZFDpiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sjtu.edu.cn; spf=pass smtp.mailfrom=sjtu.edu.cn; arc=none smtp.client-ip=202.120.2.237
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sjtu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sjtu.edu.cn
-Received: from proxy189.sjtu.edu.cn (smtp189.sjtu.edu.cn [202.120.2.189])
-	by smtp237.sjtu.edu.cn (Postfix) with ESMTPS id 4E7C182475;
-	Thu, 27 Feb 2025 20:45:59 +0800 (CST)
-Received: from smtpclient.apple (unknown [222.67.181.225])
-	by proxy189.sjtu.edu.cn (Postfix) with ESMTPSA id 0B29B3FC5E9;
-	Thu, 27 Feb 2025 20:45:56 +0800 (CST)
-Content-Type: text/plain;
-	charset=us-ascii
+	s=arc-20240116; t=1740661641; c=relaxed/simple;
+	bh=z5nansO47ETzXypSi+Fx4hXGPjukljqk01STgcLu8Ao=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=HBh2ei039L5DzX3x12oyF+YcbKKaXlTetlcGwDrX8O/8EHyH25bYAesyPZYpCFe83pVJpfd3JvLOqOEJhxbuniULvffe4hju8H1fTlvqXCQlApKzrh9ucFfyy0lhhTu4y4tGeoWY7mTkflnjffDXInZ++UNxSoVoa7LuYtJ3TUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Ta/XMbp0; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51R7WmJY017870;
+	Thu, 27 Feb 2025 13:07:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	content-type:date:from:message-id:mime-version:subject:to; s=
+	pp1; bh=tnlHUn6Ri5yxdjt2GtLWm9yjkPAfiYuFnH4/z8MYybg=; b=Ta/XMbp0
+	+R4B9CCVqLRgJjiZ1+fuGE7NzrYJ+SEBBmcp66o5s+tcymDPKUkviOElkLn2tNgy
+	Fu6Lg1EODL50j9K924/Y+JpCwMpKUxsdJxmASs7y80cZl4zCvPeWP1YN68b7in3Z
+	f6UnUo1lsYR+EZR63lMtMAU5q5PsMwbkYu7quCObm5EsyCPa554/cie4snUpDEM2
+	n7H81qNeXTw7kte2hXBYDAgWiuAWhDAckkZKXMd4Ux1qOCkOdlcudpfbtt9KGxGg
+	BINaDJUtn02BxdDayCQDL745O4vxf4sJG+KMa9yvXYMhRi+8GFxFXOtiywQ6tFKG
+	Vefxi51SjvvCvA==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 452krp9ha7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 27 Feb 2025 13:07:08 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51RC9Mdf012491;
+	Thu, 27 Feb 2025 13:07:08 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44ys9yrx0x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 27 Feb 2025 13:07:08 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51RD76CS36962584
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 27 Feb 2025 13:07:06 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1E5B720043;
+	Thu, 27 Feb 2025 13:07:06 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DC5E520040;
+	Thu, 27 Feb 2025 13:07:05 +0000 (GMT)
+Received: from localhost (unknown [9.171.86.210])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 27 Feb 2025 13:07:05 +0000 (GMT)
+Date: Thu, 27 Feb 2025 14:07:05 +0100
+From: Andreas Grapentin <gra@linux.ibm.com>
+To: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Huth <thuth@redhat.com>, Andrew Jones <andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH] arch-run: fix test skips when /dev/stderr
+ does not point to /proc/self/fd/2
+Message-ID: <ld5vg3ytv252ceaymg4mnq5jpnmklfvt2xkoldg67vkjl4awba@w3gc24eqeoxc>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.200.121\))
-Subject: Re: [PATCH 6/7] x86, lib: Add wbinvd and wbnoinvd helpers to target
- multiple CPUs
-From: Zheyun Shen <szy0127@sjtu.edu.cn>
-In-Reply-To: <20250227014858.3244505-7-seanjc@google.com>
-Date: Thu, 27 Feb 2025 20:45:45 +0800
-Cc: linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <725F7D42-D23D-4033-AF52-7B4013B04992@sjtu.edu.cn>
-References: <20250227014858.3244505-1-seanjc@google.com>
- <20250227014858.3244505-7-seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>
-X-Mailer: Apple Mail (2.3826.200.121)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: m2R1HVjBpbMaoryBA_px7w7FJCSTj-3I
+X-Proofpoint-GUID: m2R1HVjBpbMaoryBA_px7w7FJCSTj-3I
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-27_06,2025-02-27_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
+ lowpriorityscore=0 spamscore=0 impostorscore=0 priorityscore=1501
+ mlxscore=0 bulkscore=0 mlxlogscore=999 clxscore=1011 suspectscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502100000 definitions=main-2502270099
 
-Hi Sean,
-Thank you for reviewing and combining the codes. 
-> +static inline wbnoinvd_on_many_cpus(struct cpumask *cpus)
-> +{
-> + wbnoinvd();
-> +}
-The code above is missing the void return type.
+In configurations where /dev/stderr does not link to /proc/self/fd/2,
+run_qemu in arch-run.bash leaks the stderr of the invoked qemu command
+to /dev/stderr, instead of it being captured to the log variable in
+premature_failure in runtime.bash.
 
-Thank you!
+This causes all tests to be skipped since the output required for the
+grep command in that function to indicate success is never present.
 
+As a possible fix, this patch gives stderr the same treatment as stdout
+in run_qemu, producing a dedicated file descriptor and handing it into
+the subshell.
+
+Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
+---
+ scripts/arch-run.bash | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+index 2e4820c2..362aa1c5 100644
+--- a/scripts/arch-run.bash
++++ b/scripts/arch-run.bash
+@@ -33,11 +33,13 @@ run_qemu ()
+ 	[ "$ENVIRON_DEFAULT" = "yes" ] && echo -n " #"
+ 	echo " $INITRD"
+ 
+-	# stdout to {stdout}, stderr to $errors and stderr
++	# stdout to {stdout}, stderr to $errors and {stderr}
+ 	exec {stdout}>&1
+-	errors=$("${@}" $INITRD </dev/null 2> >(tee /dev/stderr) > /dev/fd/$stdout)
++	exec {stderr}>&2
++	errors=$("${@}" $INITRD </dev/null 2> >(tee /dev/fd/$stderr) > /dev/fd/$stdout)
+ 	ret=$?
+ 	exec {stdout}>&-
++	exec {stderr}>&-
+ 
+ 	[ $ret -eq 134 ] && echo "QEMU Aborted" >&2
+ 
+-- 
+2.48.1
 
 
