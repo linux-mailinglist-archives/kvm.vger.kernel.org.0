@@ -1,273 +1,179 @@
-Return-Path: <kvm+bounces-39607-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39608-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF193A48572
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 17:43:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41B8EA485A2
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 17:49:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B417D7A5418
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 16:42:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B42A6188A28A
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 16:44:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3CA81B4140;
-	Thu, 27 Feb 2025 16:43:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B47BD1B85D1;
+	Thu, 27 Feb 2025 16:44:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q6fPEnZx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sV9MPrcz"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 342E51A9B5B
-	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 16:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E031B21AC
+	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 16:44:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740674610; cv=none; b=hEFoRhE+JBUTozF+9vypvvAVy9yyN+a9dwGbwuLKi6F3ILMnwxo4qN1Hp7sk+2m7z3Qk38uYC/jvKrBPn3ybOZ2HiUpwcCEPKrugh3hV9UHQPpZtH9yqlUVd1qLdsGMTe46wA+C5oXnJnf9M+hOK/L2NVdKv0dZTEwECtsitIS4=
+	t=1740674645; cv=none; b=bvGwP5VjzVULtUMzpDNbdE4VT+jR4naCpfzLxcdon1tc78qUYo7b/Qt0yuMRCSWJht/T4p340U54AM04bFjYZosDOeR/3xgJErJD9nU1B/iO5mQY1SOK/7/Nj9UFOLveNMWFQIy/hCo13Yd4qrli9bQuMm5CoG5ZKqP7Dne2j7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740674610; c=relaxed/simple;
-	bh=N2U6Xyj+9lJkd79UADYQfgAlIIyD7zVtVL/LKmWPx0g=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Bh+OFFH3rGi0/54Md6fPvbPpIkUpE7wsfu0BTs8nS+emvjZKKFox9qrNkDJK5zo1vdFXBmNoiZPCnoIK17K1IB1MXpv7A7mAoF42KCrPO8dIxM3bHGFLFt1RmN9xwlij4/SpReHnhG9EW7WAdIjoanap57KcJ21+7estY6qjEHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q6fPEnZx; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740674607;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TQNCbBxi7eD7idYstTcVVTcDcXqJ3+FMvik+jAH6Dos=;
-	b=Q6fPEnZx8nLEFQPAzBX7CCyKjB0JIFhgqsLYEMbMBhX8iq9ds9berfAbIIavAvAV9OlMHT
-	dOkvXaoyGN1BCwy4K+YgLRYQtxbv7i0/B7bK9izLbf/u9Bw1tXxJPRfaKuuX2QiAbYOeNo
-	Gq/7EZ3SLkqZsV4G0WLkRG/TISrqt70=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-141-30oMhKpIPRadwgBRm-Kpow-1; Thu, 27 Feb 2025 11:43:26 -0500
-X-MC-Unique: 30oMhKpIPRadwgBRm-Kpow-1
-X-Mimecast-MFC-AGG-ID: 30oMhKpIPRadwgBRm-Kpow_1740674605
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-439a5c4dfb2so5949045e9.1
-        for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 08:43:26 -0800 (PST)
+	s=arc-20240116; t=1740674645; c=relaxed/simple;
+	bh=fB6w7SixAEXD/myhXo99GjY8ysGqb9qy7aUzN37BOJI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=twUT0B8URbLO6309vFhgio03y4L7XdyvbuPNnaNBYWmowUdG20VY4wUoaVauVXxgNezgHBz10hCHiHm1/0s7pK87ZFsJESZ0t0uD5O2tgWzdixXbqzucq6ObEzq6K3EHC7hT2vFc4Iyt57P03h6r3qyO+/ZABaHAf/r+5sSf57U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sV9MPrcz; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2feb8d29740so388733a91.1
+        for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 08:44:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740674643; x=1741279443; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/JYB8oqoHOpfjOcYGs25VQ09uupMqax+pANsHT7Jb3g=;
+        b=sV9MPrczf/OH2eRBMcbqd/3Q9N8Gy14BewsPtX4mbiWxM/82Lp95dU2vXVmUSKOgGI
+         VFLmoJV2+dqLgWrvERXHh8TWkERvMGQ3WZFs3wavjfCTYuN1QmF6YZHPuvgEimSinUmU
+         nIVHzy4r3FhkT/UVePWfgHaHSC+aDltxvscU3On3CAbTQMufkc2S1XSWHO45wy21wUYp
+         GYrqQX3ION6kWCh0zFIvR0fLKnDH5PK6GdkmUcNgiA6Cmg1B6V8+YFN3dXJH6ssvv0B3
+         dVkQeidtGtSMIDZ024VsYJlTU2eYlqIHZg0+7YWCf+aSsrcjNqG/1zcA3Pyr7n2IOmee
+         3INA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740674605; x=1741279405;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TQNCbBxi7eD7idYstTcVVTcDcXqJ3+FMvik+jAH6Dos=;
-        b=Wy2389gFQftDRVmwwHy15NiJktegEGre9+EWXZ8Yv1of7H786NjxkCHI67erxbRYyI
-         Hv3enwpvWEmYsNhRRu3RrDM7KA9DIbUOp8fygWhbQ6Cu9Myeuv5HTJFPjCZXRaFmoYn8
-         TJ0qEGYrx1i7georqxT1Mqm+hvhL5PoP/iUZ6Ms4pXEfc4tT4KlzyTMRAaPHLV/xGwjW
-         ifgbTZYXUfktG6beYoRkntWtQYoYHGWZ2e8IRqfBPAXZFnInXjOS6j9MLhfMJCQTJI65
-         t/5tw/oX7TKcyRGTdWXFkPD1vb2vuks/05g5nHSOXBNvB98gnP0T9FJOzxgvjS0ssKlm
-         c+bA==
-X-Forwarded-Encrypted: i=1; AJvYcCXmnEsGTb32qJ5yWz89S69kG4nlzn1tgK97kmnNL6ojnx3v8vHkJu8huXKhqBBsybou6jA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjLjIe8DU1n/jROBqMMzxtBPW2bfzrwUlsYWfnbPPYEpZC779c
-	99otLJYgNL9QGNSfIr6UTdprdOlkwEWEAaRfu9gq2nTjQqjjgJBWrUR20idVDcU46ETNIkUWJqr
-	0JPwwdz8wWoD7Yx20hLIYLqSWLHDJxCxfqAZ3z4OGernN7+/Qzw==
-X-Gm-Gg: ASbGncsoeHVuT1FelK5sp/zxY0OvSthbluaJoNNc+RJE3uAp6kKHqZb4fk2bN+JoIiD
-	E8ZpEKUiap2zbLUGxuRh1/1cUTWbmF5FRPsyXWKelnT6Wc/eS8FcoJRy8G3S6ykll6A1aKaqFnz
-	6ufNAwCqC84cY44ppbqYrIgrYwdicqnWWsDkl2f2noAm+oKFmxwz+5blt5A+RYIcY4FqVGhv6YL
-	j/u7fJGZTVYtPR3lcb2HNk7TgKrz2ycM0xbu6HbyksO181lTaqQwbntyn/+k+kU4RCRlYpcjdrN
-	RUEk/SLq+YEg1Y2ab3iECxow+6FlxNuwa8k0otISvSzR+JaIxHvi++mBG2ae7B8=
-X-Received: by 2002:a05:600c:3c83:b0:439:82de:9166 with SMTP id 5b1f17b1804b1-43ab8fd1e8dmr64031115e9.1.1740674605051;
-        Thu, 27 Feb 2025 08:43:25 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFrTKA/tq7v3HDQicW7l4zuzGDkJqwkvaaj/r610R8fS1dVqhjB9P9yfyCOg58tOjH/0/jlEQ==
-X-Received: by 2002:a05:600c:3c83:b0:439:82de:9166 with SMTP id 5b1f17b1804b1-43ab8fd1e8dmr64030785e9.1.1740674604620;
-        Thu, 27 Feb 2025 08:43:24 -0800 (PST)
-Received: from imammedo.users.ipa.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43b737074d8sm29172345e9.16.2025.02.27.08.43.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Feb 2025 08:43:24 -0800 (PST)
-Date: Thu, 27 Feb 2025 17:43:21 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Jonathan Cameron
- <Jonathan.Cameron@huawei.com>, Shiju Jose <shiju.jose@huawei.com>,
- qemu-arm@nongnu.org, qemu-devel@nongnu.org, Philippe =?UTF-8?B?TWF0aGll?=
- =?UTF-8?B?dS1EYXVkw6k=?= <philmd@linaro.org>, Ani Sinha
- <anisinha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Dongjiu Geng
- <gengdongjiu1@gmail.com>, Eduardo Habkost <eduardo@habkost.net>, Eric Blake
- <eblake@redhat.com>, John Snow <jsnow@redhat.com>, Marcel Apfelbaum
- <marcel.apfelbaum@gmail.com>, Markus Armbruster <armbru@redhat.com>,
- Michael Roth <michael.roth@amd.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Shannon Zhao
- <shannon.zhaosl@gmail.com>, Yanan Wang <wangyanan55@huawei.com>, Zhao Liu
- <zhao1.liu@intel.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 00/19] Change ghes to use HEST-based offsets and add
- support for error inject
-Message-ID: <20250227174321.0162a10f@imammedo.users.ipa.redhat.com>
-In-Reply-To: <cover.1740671863.git.mchehab+huawei@kernel.org>
-References: <cover.1740671863.git.mchehab+huawei@kernel.org>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+        d=1e100.net; s=20230601; t=1740674643; x=1741279443;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/JYB8oqoHOpfjOcYGs25VQ09uupMqax+pANsHT7Jb3g=;
+        b=AkNy+bSdXIvZyrN6q3PylX+tedR/+G3Q5v8EPLn8Le1o4oFRj+u69F9qnBOhzholHL
+         wKVT5F9GPKcyII8WYEfrSIzG+20PYQnSSiGxxGvCnzFzn+gglOsqlp78AEy+M1vCZjHD
+         DXLHEF16Oo9y24ie6WeYbE2L2/chWQheDLmQ5F/ZUYd4+eUFXBgO3wFucgxn/uqVmzAI
+         o9/ySR8mxwF1P8h/+FrzJA7mOd97kg4o3qR42qvYAIOIM262D/hq+w8HiKqFubi/q1UQ
+         LyJs564GcEcoAwmd62K0okfvVSrY356/3UwP5HWU14Sy149QyWyk7IXEh0s/nQmpgSe8
+         +YHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUn0SqrCYUQUha/eemcfCVYBimOrsN+pzyXgpGrNSg4PP1Nxx16ei6A/fciF84VbGDdLLo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yze22AsbG7QUvRrUH8dyf0hWBKDcJ3PcsONSIbR+nf7w8VwGyiy
+	/JVUawrYZr3YiFaY4ZAIJC+/mk2gfcDq0IWNW7ULnYPPAq+aehbLYOt4erEQmr/HCNvSXuQfBCT
+	EzA==
+X-Google-Smtp-Source: AGHT+IGw5yzNreu/xypo2hwjbTNx8tGBWmfy+nhlosdcH+FG5or9oFqBfp6TM2HlecegwTm2+w+cuJ+tpv4=
+X-Received: from pjbsd5.prod.google.com ([2002:a17:90b:5145:b0:2fc:3022:36b4])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d008:b0:2ea:3f34:f18f
+ with SMTP id 98e67ed59e1d1-2fe7e33d416mr11321462a91.19.1740674643568; Thu, 27
+ Feb 2025 08:44:03 -0800 (PST)
+Date: Thu, 27 Feb 2025 08:44:02 -0800
+In-Reply-To: <946fc0f5-4306-4aa9-9b63-f7ccbaff8003@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20241118123948.4796-1-kalyazin@amazon.com> <Z6u-WdbiW3n7iTjp@google.com>
+ <a7080c07-0fc5-45ce-92f7-5f432a67bc63@amazon.com> <Z7X2EKzgp_iN190P@google.com>
+ <6eddd049-7c7a-406d-b763-78fa1e7d921b@amazon.com> <Z7d5HT7FpE-ZsHQ9@google.com>
+ <f820b630-13c1-4164-baa8-f5e8231612d1@amazon.com> <Z75nRwSBxpeMwbsR@google.com>
+ <946fc0f5-4306-4aa9-9b63-f7ccbaff8003@amazon.com>
+Message-ID: <Z8CWUiAYVvNKqzfK@google.com>
+Subject: Re: [RFC PATCH 0/6] KVM: x86: async PF user
+From: Sean Christopherson <seanjc@google.com>
+To: Nikita Kalyazin <kalyazin@amazon.com>
+Cc: pbonzini@redhat.com, corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, 
+	bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, rostedt@goodmis.org, 
+	mhiramat@kernel.org, mathieu.desnoyers@efficios.com, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, jthoughton@google.com, david@redhat.com, 
+	peterx@redhat.com, oleg@redhat.com, vkuznets@redhat.com, gshan@redhat.com, 
+	graf@amazon.de, jgowans@amazon.com, roypat@amazon.co.uk, derekmn@amazon.com, 
+	nsaenz@amazon.es, xmarcalx@amazon.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, 27 Feb 2025 17:00:38 +0100
-Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
-
-> Now that the ghes preparation patches were merged, let's add support
-> for error injection.
+On Wed, Feb 26, 2025, Nikita Kalyazin wrote:
+> On 26/02/2025 00:58, Sean Christopherson wrote:
+> > On Fri, Feb 21, 2025, Nikita Kalyazin wrote:
+> > > On 20/02/2025 18:49, Sean Christopherson wrote:
+> > > > On Thu, Feb 20, 2025, Nikita Kalyazin wrote:
+> > > > > On 19/02/2025 15:17, Sean Christopherson wrote:
+> > > > > > On Wed, Feb 12, 2025, Nikita Kalyazin wrote:
+> > > > > > The conundrum with userspace async #PF is that if userspace is given only a single
+> > > > > > bit per gfn to force an exit, then KVM won't be able to differentiate between
+> > > > > > "faults" that will be handled synchronously by the vCPU task, and faults that
+> > > > > > usersepace will hand off to an I/O task.  If the fault is handled synchronously,
+> > > > > > KVM will needlessly inject a not-present #PF and a present IRQ.
+> > > > > 
+> > > > > Right, but from the guest's point of view, async PF means "it will probably
+> > > > > take a while for the host to get the page, so I may consider doing something
+> > > > > else in the meantime (ie schedule another process if available)".
+> > > > 
+> > > > Except in this case, the guest never gets a chance to run, i.e. it can't do
+> > > > something else.  From the guest point of view, if KVM doesn't inject what is
+> > > > effectively a spurious async #PF, the VM-Exiting instruction simply took a (really)
+> > > > long time to execute.
+> > > 
+> > > Sorry, I didn't get that.  If userspace learns from the
+> > > kvm_run::memory_fault::flags that the exit is due to an async PF, it should
+> > > call kvm run immediately, inject the not-present PF and allow the guest to
+> > > reschedule.  What do you mean by "the guest never gets a chance to run"?
+> > 
+> > What I'm saying is that, as proposed, the API doesn't precisely tell userspace
+                                                                         ^^^^^^^^^
+                                                                         KVM
+> > an exit happened due to an "async #PF".  KVM has absolutely zero clue as to
+> > whether or not userspace is going to do an async #PF, or if userspace wants to
+> > intercept the fault for some entirely different purpose.
 > 
-> On this version, HEST table got added to ACPI tables testing for aarch64 virt.
+> Userspace is supposed to know whether the PF is async from the dedicated
+> flag added in the memory_fault structure:
+> KVM_MEMORY_EXIT_FLAG_ASYNC_PF_USER.  It will be set when KVM managed to
+> inject page-not-present.  Are you saying it isn't sufficient?
+
+Gah, sorry, typo.  The API doesn't tell *KVM* that userfault exit is due to an
+async #PF.
+
+> > Unless the remote page was already requested, e.g. by a different vCPU, or by a
+> > prefetching algorithim.
+> > 
+> > > Conversely, if the page content is available, it must have already been
+> > > prepopulated into guest memory pagecache, the bit in the bitmap is cleared
+> > > and no exit to userspace occurs.
+> > 
+> > But that doesn't happen instantaneously.  Even if the VMM somehow atomically
+> > receives the page and marks it present, it's still possible for marking the page
+> > present to race with KVM checking the bitmap.
 > 
-> There are also some patch reorder to help reviewers to check the changes.
+> That looks like a generic problem of the VM-exit fault handling.  Eg when
+
+Heh, it's a generic "problem" for faults in general.  E.g. modern x86 CPUs will
+take "spurious" page faults on write accesses if a PTE is writable in memory but
+the CPU has a read-only mapping cached in its TLB.
+
+It's all a matter of cost.  E.g. pre-Nehalem Intel CPUs didn't take such spurious
+read-only faults as they would re-walk the in-memory page tables, but that ended
+up being a net negative because the cost of re-walking for all read-only faults
+outweighed the benefits of avoiding spurious faults in the unlikely scenario the
+fault had already been fixed.
+
+For a spurious async #PF + IRQ, the cost could be signficant, e.g. due to causing
+unwanted context switches in the guest, in addition to the raw overhead of the
+faults, interrupts, and exits.
+
+> one vCPU exits, userspace handles the fault and races setting the bitmap
+> with another vCPU that is about to fault the same page, which may cause a
+> spurious exit.
 > 
-> The code itself is almost identical to v4, with just a few minor nits addressed.
-checkpatch on my machine still complains
+> On the other hand, is it malignant?  The only downside is additional
+> overhead of the async PF protocol, but if the race occurs infrequently, it
+> shouldn't be a problem.
 
-0007-acpi-ghes-Use-HEST-table-offsets-when-preparing-GHES.patch has no obvious style problems and is ready for submission.
-Checking 0008-acpi-ghes-don-t-hard-code-the-number-of-sources-for-.patch...
-WARNING: line over 80 characters
-#170: FILE: hw/acpi/ghes.c:390:
-+        build_ghes_v2_entry(table_data, linker, &notif_source[i], i, num_sources);
+When it comes to uAPI, I want to try and avoid statements along the lines of
+"IF 'x' holds true, then 'y' SHOULDN'T be a problem".  If this didn't impact uAPI,
+I wouldn't care as much, i.e. I'd be much more willing iterate as needed.
 
-total: 0 errors, 1 warnings, 159 lines checked
-
-0008-acpi-ghes-don-t-hard-code-the-number-of-sources-for-.patch has style problems, please review.  If any of these errors
-are false positives report them to the maintainer, see
-CHECKPATCH in MAINTAINERS.
-Checking 0009-acpi-ghes-add-a-notifier-to-notify-when-error-data-i.patch...
-total: 0 errors, 0 warnings, 26 lines checked
-
-0009-acpi-ghes-add-a-notifier-to-notify-when-error-data-i.patch has no obvious style problems and is ready for submission.
-Checking 0010-acpi-generic_event_device-Update-GHES-migration-to-c.patch...
-total: 0 errors, 0 warnings, 41 lines checked
-
-0010-acpi-generic_event_device-Update-GHES-migration-to-c.patch has no obvious style problems and is ready for submission.
-Checking 0011-acpi-generic_event_device-add-logic-to-detect-if-HES.patch...
-total: 0 errors, 0 warnings, 59 lines checked
-
-0011-acpi-generic_event_device-add-logic-to-detect-if-HES.patch has no obvious style problems and is ready for submission.
-Checking 0012-acpi-generic_event_device-add-an-APEI-error-device.patch...
-total: 0 errors, 0 warnings, 72 lines checked
-
-0012-acpi-generic_event_device-add-an-APEI-error-device.patch has no obvious style problems and is ready for submission.
-Checking 0013-tests-acpi-virt-allow-acpi-table-changes-at-DSDT-and.patch...
-total: 0 errors, 0 warnings, 7 lines checked
-
-0013-tests-acpi-virt-allow-acpi-table-changes-at-DSDT-and.patch has no obvious style problems and is ready for submission.
-Checking 0014-arm-virt-Wire-up-a-GED-error-device-for-ACPI-GHES.patch...
-WARNING: line over 80 characters
-#68: FILE: hw/arm/virt.c:1015:
-+    VirtMachineState *s = container_of(n, VirtMachineState, generic_error_notifier);
-
-total: 0 errors, 1 warnings, 44 lines checked
-
-0014-arm-virt-Wire-up-a-GED-error-device-for-ACPI-GHES.patch has style problems, please review.  If any of these errors
-are false positives report them to the maintainer, see
-CHECKPATCH in MAINTAINERS.
-Checking 0015-qapi-acpi-hest-add-an-interface-to-do-generic-CPER-e.patch...
-total: 0 errors, 0 warnings, 178 lines checked
-
-
-
-> ---
-> v6:
-> - some minor nits addressed:
->    - use GPA instead of offset;
->    - merged two patches;
->    - fixed a couple of long line coding style issues;
->    - the HEST/DSDT diff inside a patch was changed to avoid troubles
->      applying it.
-> 
-> v5:
-> - make checkpatch happier;
-> - HEST table is now tested;
-> - some changes at HEST spec documentation to align with code changes;
-> - extra care was taken with regards to git bisectability.
-> 
-> v4:
-> - added an extra comment for AcpiGhesState structure;
-> - patches reordered;
-> - no functional changes, just code shift between the patches in this series.
-> 
-> v3:
-> - addressed more nits;
-> - hest_add_le now points to the beginning of HEST table;
-> - removed HEST from tests/data/acpi;
-> - added an extra patch to not use fw_cfg with virt-10.0 for hw_error_le
-> 
-> v2: 
-> - address some nits;
-> - improved ags cleanup patch and removed ags.present field;
-> - added some missing le*_to_cpu() calls;
-> - update date at copyright for new files to 2024-2025;
-> - qmp command changed to: inject-ghes-v2-error ans since updated to 10.0;
-> - added HEST and DSDT tables after the changes to make check target happy.
->   (two patches: first one whitelisting such tables; second one removing from
->    whitelist and updating/adding such tables to tests/data/acpi)
-> 
-> 
-> 
-> Mauro Carvalho Chehab (19):
->   tests/acpi: virt: add an empty HEST file
->   tests/qtest/bios-tables-test: extend to also check HEST table
->   tests/acpi: virt: update HEST file with its current data
->   acpi/ghes: Cleanup the code which gets ghes ged state
->   acpi/ghes: prepare to change the way HEST offsets are calculated
->   acpi/ghes: add a firmware file with HEST address
->   acpi/ghes: Use HEST table offsets when preparing GHES records
->   acpi/ghes: don't hard-code the number of sources for HEST table
->   acpi/ghes: add a notifier to notify when error data is ready
->   acpi/generic_event_device: Update GHES migration to cover hest addr
->   acpi/generic_event_device: add logic to detect if HEST addr is
->     available
->   acpi/generic_event_device: add an APEI error device
->   tests/acpi: virt: allow acpi table changes at DSDT and HEST tables
->   arm/virt: Wire up a GED error device for ACPI / GHES
->   qapi/acpi-hest: add an interface to do generic CPER error injection
->   acpi/generic_event_device.c: enable use_hest_addr for QEMU 10.x
->   tests/acpi: virt: update HEST and DSDT tables
->   docs: hest: add new "etc/acpi_table_hest_addr" and update workflow
->   scripts/ghes_inject: add a script to generate GHES error inject
-> 
->  MAINTAINERS                                   |  10 +
->  docs/specs/acpi_hest_ghes.rst                 |  28 +-
->  hw/acpi/Kconfig                               |   5 +
->  hw/acpi/aml-build.c                           |  10 +
->  hw/acpi/generic_event_device.c                |  44 ++
->  hw/acpi/ghes-stub.c                           |   7 +-
->  hw/acpi/ghes.c                                | 231 ++++--
->  hw/acpi/ghes_cper.c                           |  38 +
->  hw/acpi/ghes_cper_stub.c                      |  19 +
->  hw/acpi/meson.build                           |   2 +
->  hw/arm/virt-acpi-build.c                      |  35 +-
->  hw/arm/virt.c                                 |  19 +-
->  hw/core/machine.c                             |   2 +
->  include/hw/acpi/acpi_dev_interface.h          |   1 +
->  include/hw/acpi/aml-build.h                   |   2 +
->  include/hw/acpi/generic_event_device.h        |   1 +
->  include/hw/acpi/ghes.h                        |  51 +-
->  include/hw/arm/virt.h                         |   2 +
->  qapi/acpi-hest.json                           |  35 +
->  qapi/meson.build                              |   1 +
->  qapi/qapi-schema.json                         |   1 +
->  scripts/arm_processor_error.py                | 476 ++++++++++++
->  scripts/ghes_inject.py                        |  51 ++
->  scripts/qmp_helper.py                         | 703 ++++++++++++++++++
->  target/arm/kvm.c                              |   7 +-
->  tests/data/acpi/aarch64/virt/DSDT             | Bin 5196 -> 5240 bytes
->  .../data/acpi/aarch64/virt/DSDT.acpihmatvirt  | Bin 5282 -> 5326 bytes
->  tests/data/acpi/aarch64/virt/DSDT.memhp       | Bin 6557 -> 6601 bytes
->  tests/data/acpi/aarch64/virt/DSDT.pxb         | Bin 7679 -> 7723 bytes
->  tests/data/acpi/aarch64/virt/DSDT.topology    | Bin 5398 -> 5442 bytes
->  tests/data/acpi/aarch64/virt/HEST             | Bin 0 -> 224 bytes
->  tests/qtest/bios-tables-test.c                |   2 +-
->  32 files changed, 1692 insertions(+), 91 deletions(-)
->  create mode 100644 hw/acpi/ghes_cper.c
->  create mode 100644 hw/acpi/ghes_cper_stub.c
->  create mode 100644 qapi/acpi-hest.json
->  create mode 100644 scripts/arm_processor_error.py
->  create mode 100755 scripts/ghes_inject.py
->  create mode 100755 scripts/qmp_helper.py
->  create mode 100644 tests/data/acpi/aarch64/virt/HEST
-> 
-
+I'm not saying we should go straight for a complex implementation.  Quite the
+opposite.  But I do want us to consider the possible ramifications of using a
+single bit for all userfaults, so that we can at least try to design something
+that is extensible and won't be a pain to maintain.
 
