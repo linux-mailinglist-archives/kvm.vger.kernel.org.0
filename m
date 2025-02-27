@@ -1,155 +1,303 @@
-Return-Path: <kvm+bounces-39542-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39543-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0C28A47669
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 08:20:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF59AA476A9
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 08:35:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA4D316F4F5
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 07:20:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C26ED3ACDC1
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 07:34:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7C79221551;
-	Thu, 27 Feb 2025 07:20:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69847223308;
+	Thu, 27 Feb 2025 07:34:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Wb5+Zqi6"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UkA+6NBp"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B1213777E;
-	Thu, 27 Feb 2025 07:20:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 830BD21CC78
+	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 07:34:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740640819; cv=none; b=EPgZS2A5ZbTkiP1L5I4ouQ7lBrepONosUuYTCcq3D0zvHof590AevEQ8WGTfOz+qUGuNpjE6eXY11Cg9kKfoCHxytaeiVtcjqs9rI+KHy4t0jYIeTYoHo5tqUnQQkLUCdAxQtoxLqBqIDvD0vpp4iRoLUGNuIQiPmATAdV4Vc28=
+	t=1740641690; cv=none; b=FpBXOV2dcFIrJh3GKlFf0dg46L9HJlwfn6lbiC7a/fNrKI94iBW4tvVmZ1a1vY5uRbI5X5gYWS/lsOUOpKE/9rYVQeCtobGmVLjcXL4ewDbbLuxCWRxWdh5L3R8gGf6jSjYzhmdNajpPsChCp/1sZX9Ac1bSdqSle4gz5wW54tY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740640819; c=relaxed/simple;
-	bh=jX/RUXtYKsOq/GMka6gQOeYgILirvp+hdNk3FPVAZeg=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=WqKPxVvV1JYSL/E3JFrxkjlrGEZH9vpW3fwUPwYcvNazul3+vc2bLG2R388YDu/ONKhOF4H3hCpmCUUubov4toYVKs02nyL4pOP5YunlKhaZWy3vh7OcPSVzwPhCfpuVBHsQWqpHgsh4KPeW30ZlteNOSNnwHcNbzkIGPKw27vU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Wb5+Zqi6; arc=none smtp.client-ip=52.119.213.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1740641690; c=relaxed/simple;
+	bh=cXIuTmWhfOuayb7KCSU9YQYtmVZoqw4DwJ+xmh63kLk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TGfGfU0sfeKjaaHfAqJssA6WM3NfXix0y3mF86GmsY6hPgzKFRGA74jALqDG9yAbsYfkvMpK+lz0VSfv4bnvpHdJBHHcpOeP9/zhDFu6YgOkhZjQDPGgbWimyT+v/LJGMcxypUANXUpAsKa+Cz1VuyuK4TrjKo+Nfsbe3jx3LOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=UkA+6NBp; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5ded46f323fso745567a12.1
+        for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 23:34:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1740640818; x=1772176818;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-id:mime-version:content-transfer-encoding:subject;
-  bh=jX/RUXtYKsOq/GMka6gQOeYgILirvp+hdNk3FPVAZeg=;
-  b=Wb5+Zqi6c0biRPdSacKQ+LmELqIvGvMpnW1lBtbaI8tSmj9M97kLWQG2
-   0RYWdh6gl/MZ34v3GH4zpr3B7ZdLgBaUqypN29maoqAVNyBxMV9nIlvLt
-   GlqJdpTMysQIRxpgylO7D0VFHNOxMuubYZYl5o5VuVuU4Xnf50kXbEDJx
-   M=;
-X-IronPort-AV: E=Sophos;i="6.13,319,1732579200"; 
-   d="scan'208";a="274749904"
-Subject: Re: [RFC PATCH 0/3] kvm,sched: Add gtime halted
-Thread-Topic: [RFC PATCH 0/3] kvm,sched: Add gtime halted
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2025 07:20:14 +0000
-Received: from EX19MTAEUC002.ant.amazon.com [10.0.10.100:27198]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.12.5:2525] with esmtp (Farcaster)
- id daa47828-8222-44de-8671-1a2b78b59a83; Thu, 27 Feb 2025 07:20:12 +0000 (UTC)
-X-Farcaster-Flow-ID: daa47828-8222-44de-8671-1a2b78b59a83
-Received: from EX19D003EUB004.ant.amazon.com (10.252.51.121) by
- EX19MTAEUC002.ant.amazon.com (10.252.51.245) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 27 Feb 2025 07:20:11 +0000
-Received: from EX19D003EUB001.ant.amazon.com (10.252.51.97) by
- EX19D003EUB004.ant.amazon.com (10.252.51.121) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 27 Feb 2025 07:20:11 +0000
-Received: from EX19D003EUB001.ant.amazon.com ([fe80::f153:3fae:905b:eb06]) by
- EX19D003EUB001.ant.amazon.com ([fe80::f153:3fae:905b:eb06%3]) with mapi id
- 15.02.1544.014; Thu, 27 Feb 2025 07:20:11 +0000
-From: "Sieber, Fernand" <sieberf@amazon.com>
-To: "seanjc@google.com" <seanjc@google.com>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"x86@kernel.org" <x86@kernel.org>, "peterz@infradead.org"
-	<peterz@infradead.org>, "mingo@redhat.com" <mingo@redhat.com>,
-	"vincent.guittot@linaro.org" <vincent.guittot@linaro.org>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "nh-open-source@amazon.com"
-	<nh-open-source@amazon.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Thread-Index: AQHbgkNzVJp2ED40h0CgqrtlEaNsE7NY5JiAgAEwCQCAAAnJgIAArRaA
-Date: Thu, 27 Feb 2025 07:20:11 +0000
-Message-ID: <f114eb3a8a21e1cd1a120db32258340504464458.camel@amazon.com>
-References: <20250218202618.567363-1-sieberf@amazon.com>
-	 <Z755r4S_7BLbHlWa@google.com>
-	 <e8cd99b4c4f93a581203449db9caee29b9751373.camel@amazon.com>
-	 <Z7-A76KjcYB8HAP8@google.com>
-In-Reply-To: <Z7-A76KjcYB8HAP8@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <FF34274FA4AB7D44A00A7E2BDEE076EF@amazon.com>
+        d=linaro.org; s=google; t=1740641687; x=1741246487; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=U1dvznxTvyKsNgavWSNufwqT+/wcUbgTbrkSbuXEd74=;
+        b=UkA+6NBpc0GEalc20xvfZjlYXl1IxYUalClK0MEwc1jzKYYDwex2Us1G24u8YbMcbi
+         lLhKWQ4ip4b5ilE05wzhFsegYLFap+9dbAuhQuPaEzbJ3E4Q4zSTSI9pT4Nr5KkTCcTn
+         2g0Evj3uaXY46f371TfZt/emqNpiXwLr7l5RDt1VcARN2AFQgSwIdgwGUtmwmldSsT6u
+         YAJurzsF72i8bEuUeXr5wuZpAxZT27alCU0QbBpbm4WbyM0ak/M/LlqeI89veBr6AWSs
+         /1xQfLl7b9N4JMKUUE003OptUT0YMRCcv1NV7divjjzHF4yJqOLnY5u8d1p7r2bFVr7X
+         A21g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740641687; x=1741246487;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=U1dvznxTvyKsNgavWSNufwqT+/wcUbgTbrkSbuXEd74=;
+        b=jAwH/ZDfCR9P4cLzbkEM9V3uW2eWJOHSZCa7H86mF75hhQkXm3gmMEl7doSQC1lHGP
+         ZZbaTorqkAWOW2Dw6JEqJoX4EjYfaINIvgE4IKUVBEMknyH35Uq7oUDLFgjOmHt4sAys
+         IOPyVNE/7ZpY5njCs6ylgsoXioViohlEGhLFA/ECNnkYi8LRhvKLmZUAlHrNlVNLxXZf
+         7uYZnV9qgwSNcIwfhw+PW1+fal11NbldtweZqHIDmnsURSJkLseQIE6Vg1xRJnlX9fbP
+         vJqRWRiI5bpfFjUiUeDamlpauPikvq8zR1Y4gGt39Bgx7sLaepYKBNqtIKhJMdB4pmIt
+         6bog==
+X-Forwarded-Encrypted: i=1; AJvYcCWBTWfZo38EqvMx+3vgAXsFcVaFvrXqhocNREx0StMUxErCBN3Wl3a9jmc1KUXTdlDEtvA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyesOmnvG6LFO59bB3ZxgNLBea6CRxD6b7rp4D7FHG/WTqZH51s
+	RWzs8Q1X7po6eo9GU+sArNVVw2VEdlVrJWW0LcvEpxMyhbAsLtYd852ZML/omxkPSFkFAZ3scqB
+	SP/9hKAmwQu1JQdVMBQ3hFfqpLZr5VdhC9UnZRg==
+X-Gm-Gg: ASbGncsMXlGRKTCO7fXVvNSYZJHFxcFMMDxbMRkidgZg09O81m8MUU3dffTqf/rMPI1
+	Bfwq4lvC+GpPskxfrWEjjigfVFi9h6j9Sm/I2Xo5VJHxSUI7D8GLzoVblUPvmEXJ2jhfrN40MfC
+	1m4na+dg1iB1l5YwgI8alay4aaoZhla1rCyoPe
+X-Google-Smtp-Source: AGHT+IG40fFQ2lZ5Y5gBYJwjOho6MPsxU/d0jrx/euil0xdNDtB9YEZMLR+7LzonAdQFy0BRswCDj1snE8yhcsE+RL8=
+X-Received: by 2002:a05:6402:35c3:b0:5dc:c9ce:b01b with SMTP id
+ 4fb4d7f45d1cf-5e4a0d71e54mr8252438a12.8.1740641686623; Wed, 26 Feb 2025
+ 23:34:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+References: <20250218202618.567363-1-sieberf@amazon.com> <20250218202618.567363-4-sieberf@amazon.com>
+In-Reply-To: <20250218202618.567363-4-sieberf@amazon.com>
+From: Vincent Guittot <vincent.guittot@linaro.org>
+Date: Thu, 27 Feb 2025 08:34:34 +0100
+X-Gm-Features: AQ5f1JoKDGirAsal6mP4kiQGkcQt6k2-DzG_AvNjeWNJ-UrBioNyUhKA-GkvBl8
+Message-ID: <CAKfTPtDx3vVK1ZgBwicTeP82wL=wGOKdxheuBHCBjzM6mSDPOQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 3/3] sched,x86: Make the scheduler guest unhalted aware
+To: Fernand Sieber <sieberf@amazon.com>
+Cc: Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, nh-open-source@amazon.com
+Content-Type: text/plain; charset="UTF-8"
 
-T24gV2VkLCAyMDI1LTAyLTI2IGF0IDEzOjAwIC0wODAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
-b3RlOg0KPiBPbiBXZWQsIEZlYiAyNiwgMjAyNSwgRmVybmFuZCBTaWViZXIgd3JvdGU6DQo+ID4g
-T24gVHVlLCAyMDI1LTAyLTI1IGF0IDE4OjE3IC0wODAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
-b3RlOg0KPiA+ID4gPiBJbiB0aGlzIFJGQyB3ZSBpbnRyb2R1Y2UgdGhlIGNvbmNlcHQgb2YgZ3Vl
-c3QgaGFsdGVkIHRpbWUgdG8NCj4gPiA+ID4gYWRkcmVzcw0KPiA+ID4gPiB0aGVzZSBjb25jZXJu
-cy4gR3Vlc3QgaGFsdGVkIHRpbWUgKGd0aW1lX2hhbHRlZCkgYWNjb3VudHMgZm9yDQo+ID4gPiA+
-IGN5Y2xlcw0KPiA+ID4gPiBzcGVudCBpbiBndWVzdCBtb2RlIHdoaWxlIHRoZSBjcHUgaXMgaGFs
-dGVkLiBndGltZV9oYWx0ZWQNCj4gPiA+ID4gcmVsaWVzIG9uDQo+ID4gPiA+IG1lYXN1cmluZyB0
-aGUgbXBlcmYgbXNyIHJlZ2lzdGVyICh4ODYpIGFyb3VuZCBWTSBlbnRlci9leGl0cyB0bw0KPiA+
-ID4gPiBjb21wdXRlDQo+ID4gPiA+IHRoZSBudW1iZXIgb2YgdW5oYWx0ZWQgY3ljbGVzOyBoYWx0
-ZWQgY3ljbGVzIGFyZSB0aGVuIGRlcml2ZWQNCj4gPiA+ID4gZnJvbSB0aGUNCj4gPiA+ID4gdHNj
-IGRpZmZlcmVuY2UgbWludXMgdGhlIG1wZXJmIGRpZmZlcmVuY2UuDQo+ID4gPiANCj4gPiA+IElN
-TywgdGhlcmUgYXJlIGJldHRlciB3YXlzIHRvIHNvbHZlIHRoaXMgdGhhbiBoYXZpbmcgS1ZNIHNh
-bXBsZQ0KPiA+ID4gTVBFUkYgb24NCj4gPiA+IGV2ZXJ5IGVudHJ5IGFuZCBleGl0Lg0KPiA+ID4g
-DQo+ID4gPiBUaGUga2VybmVsIGFscmVhZHkgc2FtcGxlcyBBUEVSRi9NUFJFRiBvbiBldmVyeSB0
-aWNrIGFuZCBwcm92aWRlcw0KPiA+ID4gdGhhdA0KPiA+ID4gaW5mb3JtYXRpb24gdmlhIC9wcm9j
-L2NwdWluZm8sIGp1c3QgdXNlIHRoYXQuwqAgSWYgeW91ciB1c2Vyc3BhY2UNCj4gPiA+IGlzIHVu
-YWJsZQ0KPiA+ID4gdG8gdXNlIC9wcm9jL2NwdWluZm8gb3Igc2ltaWxhciwgdGhhdCBuZWVkcyB0
-byBiZSBleHBsYWluZWQuDQo+ID4gDQo+ID4gSWYgSSB1bmRlcnN0YW5kIGNvcnJlY3RseSB3aGF0
-IHlvdSBhcmUgc3VnZ2VzdGluZyBpcyB0byBoYXZlDQo+ID4gdXNlcnNwYWNlDQo+ID4gcmVndWxh
-cmx5IHNhbXBsaW5nIHRoZXNlIHZhbHVlcyB0byBkZXRlY3QgdGhlIG1vc3QgaWRsZSBDUFVzIGFu
-ZA0KPiA+IHRoZW4NCj4gPiB1c2UgQ1BVIGFmZmluaXR5IHRvIHJlcGluIGhvdXNla2VlcGluZyB0
-YXNrcyB0byB0aGVzZS4gV2hpbGUgaXQncw0KPiA+IHBvc3NpYmxlIHRoaXMgZXNzZW50aWFsbHkg
-cmVxdWlyZXMgdG8gaW1wbGVtZW50IGFub3RoZXIgc2NoZWR1bGluZw0KPiA+IGxheWVyIGluIHVz
-ZXJzcGFjZSB0aHJvdWdoIGNvbnN0YW50IHJlLXBpbm5pbmcgb2YgdGFza3MuIFRoaXMgYWxzbw0K
-PiA+IHJlcXVpcmVzIHRvIGNvbnN0YW50bHkgaWRlbnRpZnkgdGhlIGZ1bGwgc2V0IG9mIHRhc2tz
-IHRoYXQgY2FuDQo+ID4gaW5kdWNlDQo+ID4gdW5kZXNpcmFibGUgb3ZlcmhlYWQgc28gdGhhdCB0
-aGV5IGNhbiBiZSBwaW5uZWQgYWNjb3JkaW5nbHkuIEZvcg0KPiA+IHRoZXNlDQo+ID4gcmVhc29u
-cyB3ZSB3b3VsZCByYXRoZXIgd2FudCB0aGUgbG9naWMgdG8gYmUgaW1wbGVtZW50ZWQgZGlyZWN0
-bHkNCj4gPiBpbg0KPiA+IHRoZSBzY2hlZHVsZXIuDQo+ID4gDQo+ID4gPiBBbmQgaWYgeW91J3Jl
-IHJ1bm5pbmcgdkNQVXMgb24gdGlja2xlc3MgQ1BVcywgYW5kIHlvdSdyZSBkb2luZw0KPiA+ID4g
-SExUL01XQUlUDQo+ID4gPiBwYXNzdGhyb3VnaCwgKmFuZCogeW91IHdhbnQgdG8gc2NoZWR1bGUg
-b3RoZXIgdGFza3Mgb24gdGhvc2UNCj4gPiA+IENQVXMsIHRoZW4gSU1PDQo+ID4gPiB5b3UncmUg
-YWJ1c2luZyBhbGwgb2YgdGhvc2UgdGhpbmdzIGFuZCBpdCdzIG5vdCBLVk0ncyBwcm9ibGVtIHRv
-DQo+ID4gPiBzb2x2ZSwNCj4gPiA+IGVzcGVjaWFsbHkgbm93IHRoYXQgc2NoZWRfZXh0IGlzIGEg
-dGhpbmcuDQo+ID4gDQo+ID4gV2UgYXJlIHJ1bm5pbmcgdkNQVXMgd2l0aCB0aWNrcywgdGhlIHJl
-c3Qgb2YgeW91ciBvYnNlcnZhdGlvbnMgYXJlDQo+ID4gY29ycmVjdC4NCj4gDQo+IElmIHRoZXJl
-J3MgYSBob3N0IHRpY2ssIHdoeSBkbyB5b3UgbmVlZCBLVk0ncyBoZWxwIHRvIG1ha2Ugc2NoZWR1
-bGluZw0KPiBkZWNpc2lvbnM/DQo+IEl0IHNvdW5kcyBsaWtlIHdoYXQgeW91IHdhbnQgaXMgYSBz
-Y2hlZHVsZXIgdGhhdCBpcyBwcmltYXJpbHkgZHJpdmVuDQo+IGJ5IE1QRVJGDQo+IChhbmQgQVBF
-UkY/KSwgYW5kIHNjaGVkX3RpY2soKSA9PiBhcmNoX3NjYWxlX2ZyZXFfdGljaygpIGFscmVhZHkN
-Cj4ga25vd3MgYWJvdXQgTVBFUkYuDQoNCkhhdmluZyB0aGUgbWVhc3VyZSBhcm91bmQgVk0gZW50
-ZXIvZXhpdCBtYWtlcyBpdCBlYXN5IHRvIGF0dHJpYnV0ZSB0aGUNCnVuaGFsdGVkIGN5Y2xlcyB0
-byBhIHNwZWNpZmljIHRhc2sgKHZDUFUpLCB3aGljaCBzb2x2ZXMgYm90aCBvdXIgdXNlDQpjYXNl
-cyBvZiBWTSBtZXRyaWNzIGFuZCBzY2hlZHVsaW5nLiBUaGF0IHNhaWQgd2UgbWF5IGJlIGFibGUg
-dG8gYXZvaWQNCml0IGFuZCBhY2hpZXZlIHRoZSBzYW1lIHJlc3VsdHMuDQoNCmkuZQ0KKiB0aGUg
-Vk0gbWV0cmljcyB1c2UgY2FzZSBjYW4gYmUgc29sdmVkIGJ5IHVzaW5nIC9wcm9jL2NwdWluZm8g
-ZnJvbQ0KdXNlcnNwYWNlLg0KKiBmb3IgdGhlIHNjaGVkdWxpbmcgdXNlIGNhc2UsIHRoZSB0aWNr
-IGJhc2VkIHNhbXBsaW5nIG9mIE1QRVJGIG1lYW5zDQp3ZSBjb3VsZCBwb3RlbnRpYWxseSBpbnRy
-b2R1Y2UgYSBjb3JyZWN0aW5nIGZhY3RvciBvbiBQRUxUIGFjY291bnRpbmcNCm9mIHBpbm5lZCB2
-Q1BVIHRhc2tzIGJhc2VkIG9uIGl0cyB2YWx1ZSAoc2ltaWxhciB0byB3aGF0IEkgZG8gaW4gdGhl
-DQpsYXN0IHBhdGNoIG9mIHRoZSBzZXJpZXMpLg0KDQpUaGUgY29tYmluYXRpb24gb2YgdGhlc2Ug
-d291bGQgcmVtb3ZlIHRoZSByZXF1aXJlbWVudCBvZiBhZGRpbmcgYW55DQpsb2dpYyBhcm91bmQg
-Vk0gZW50cmVyL2V4aXQgdG8gc3VwcG9ydCBvdXIgdXNlIGNhc2VzLg0KDQpJJ20gaGFwcHkgdG8g
-cHJvdG90eXBlIHRoYXQgaWYgd2UgdGhpbmsgaXQncyBnb2luZyBpbiB0aGUgcmlnaHQNCmRpcmVj
-dGlvbj8NCg0KCgoKQW1hem9uIERldmVsb3BtZW50IENlbnRyZSAoU291dGggQWZyaWNhKSAoUHJv
-cHJpZXRhcnkpIExpbWl0ZWQKMjkgR29nb3NvYSBTdHJlZXQsIE9ic2VydmF0b3J5LCBDYXBlIFRv
-d24sIFdlc3Rlcm4gQ2FwZSwgNzkyNSwgU291dGggQWZyaWNhClJlZ2lzdHJhdGlvbiBOdW1iZXI6
-IDIwMDQgLyAwMzQ0NjMgLyAwNwo=
+On Tue, 18 Feb 2025 at 21:27, Fernand Sieber <sieberf@amazon.com> wrote:
+>
+> With guest hlt/mwait/pause pass through, the scheduler has no visibility into
+> real vCPU activity as it sees them all 100% active. As such, load balancing
+> cannot make informed decisions on where it is preferrable to collocate
+> tasks when necessary. I.e as far as the load balancer is concerned, a
+> halted vCPU and an idle polling vCPU look exactly the same so it may decide
+> that either should be preempted when in reality it would be preferrable to
+> preempt the idle one.
+>
+> This commits enlightens the scheduler to real guest activity in this
+> situation. Leveraging gtime unhalted, it adds a hook for kvm to communicate
+> to the scheduler the duration that a vCPU spends halted. This is then used in
+> PELT accounting to discount it from real activity. This results in better
+> placement and overall steal time reduction.
 
+NAK, PELT account for time spent by se on the CPU. If your thread/vcpu
+doesn't do anything but burn cycles, find another way to report thatto
+the host
+Furthermore this breaks all the hierarchy dependency
+
+>
+> This initial implementation assumes that non-idle CPUs are ticking as it
+> hooks the unhalted time the PELT decaying load accounting. As such it
+> doesn't work well if PELT is updated infrequenly with large chunks of
+> halted time. This is not a fundamental limitation but more complex
+> accounting is needed to generalize the use case to nohz full.
+> ---
+>  arch/x86/kvm/x86.c    |  8 ++++++--
+>  include/linux/sched.h |  4 ++++
+>  kernel/sched/core.c   |  1 +
+>  kernel/sched/fair.c   | 25 +++++++++++++++++++++++++
+>  kernel/sched/pelt.c   | 42 +++++++++++++++++++++++++++++++++++-------
+>  kernel/sched/sched.h  |  2 ++
+>  6 files changed, 73 insertions(+), 9 deletions(-)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 46975b0a63a5..156cf05b325f 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10712,6 +10712,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>         int r;
+>         unsigned long long cycles, cycles_start = 0;
+>         unsigned long long unhalted_cycles, unhalted_cycles_start = 0;
+> +       unsigned long long halted_cycles_ns = 0;
+>         bool req_int_win =
+>                 dm_request_for_irq_injection(vcpu) &&
+>                 kvm_cpu_accept_dm_intr(vcpu);
+> @@ -11083,8 +11084,11 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>                 cycles = get_cycles() - cycles_start;
+>                 unhalted_cycles = get_unhalted_cycles() -
+>                         unhalted_cycles_start;
+> -               if (likely(cycles > unhalted_cycles))
+> -                       current->gtime_halted += cycles2ns(cycles - unhalted_cycles);
+> +               if (likely(cycles > unhalted_cycles)) {
+> +                       halted_cycles_ns = cycles2ns(cycles - unhalted_cycles);
+> +                       current->gtime_halted += halted_cycles_ns;
+> +                       sched_account_gtime_halted(current, halted_cycles_ns);
+> +               }
+>         }
+>
+>         local_irq_enable();
+> diff --git a/include/linux/sched.h b/include/linux/sched.h
+> index 5f6745357e20..5409fac152c9 100644
+> --- a/include/linux/sched.h
+> +++ b/include/linux/sched.h
+> @@ -367,6 +367,8 @@ struct vtime {
+>         u64                     gtime;
+>  };
+>
+> +extern void sched_account_gtime_halted(struct task_struct *p, u64 gtime_halted);
+> +
+>  /*
+>   * Utilization clamp constraints.
+>   * @UCLAMP_MIN:        Minimum utilization
+> @@ -588,6 +590,8 @@ struct sched_entity {
+>          */
+>         struct sched_avg                avg;
+>  #endif
+> +
+> +       u64                             gtime_halted;
+>  };
+>
+>  struct sched_rt_entity {
+> diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+> index 9aecd914ac69..1f3ced2b2636 100644
+> --- a/kernel/sched/core.c
+> +++ b/kernel/sched/core.c
+> @@ -4487,6 +4487,7 @@ static void __sched_fork(unsigned long clone_flags, struct task_struct *p)
+>         p->se.nr_migrations             = 0;
+>         p->se.vruntime                  = 0;
+>         p->se.vlag                      = 0;
+> +       p->se.gtime_halted              = 0;
+>         INIT_LIST_HEAD(&p->se.group_node);
+>
+>         /* A delayed task cannot be in clone(). */
+> diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
+> index 1c0ef435a7aa..5ff52711d459 100644
+> --- a/kernel/sched/fair.c
+> +++ b/kernel/sched/fair.c
+> @@ -13705,4 +13705,29 @@ __init void init_sched_fair_class(void)
+>  #endif
+>  #endif /* SMP */
+>
+> +
+> +}
+> +
+> +#ifdef CONFIG_NO_HZ_FULL
+> +void sched_account_gtime_halted(struct task_struct *p, u64 gtime_halted)
+> +{
+>  }
+> +#else
+> +/*
+> + * The implementation hooking into PELT requires regular updates of
+> + * gtime_halted. This is guaranteed unless we run on CONFIG_NO_HZ_FULL.
+> + */
+> +void sched_account_gtime_halted(struct task_struct *p, u64 gtime_halted)
+> +{
+> +       struct sched_entity *se = &p->se;
+> +
+> +       if (unlikely(!gtime_halted))
+> +               return;
+> +
+> +       for_each_sched_entity(se) {
+> +               se->gtime_halted += gtime_halted;
+> +               se->cfs_rq->gtime_halted += gtime_halted;
+> +       }
+> +}
+> +#endif
+> +EXPORT_SYMBOL(sched_account_gtime_halted);
+> diff --git a/kernel/sched/pelt.c b/kernel/sched/pelt.c
+> index 7a8534a2deff..9f96b7c46c00 100644
+> --- a/kernel/sched/pelt.c
+> +++ b/kernel/sched/pelt.c
+> @@ -305,10 +305,23 @@ int __update_load_avg_blocked_se(u64 now, struct sched_entity *se)
+>
+>  int __update_load_avg_se(u64 now, struct cfs_rq *cfs_rq, struct sched_entity *se)
+>  {
+> -       if (___update_load_sum(now, &se->avg, !!se->on_rq, se_runnable(se),
+> -                               cfs_rq->curr == se)) {
+> +       int ret = 0;
+> +       u64 delta = now - se->avg.last_update_time;
+> +       u64 gtime_halted = min(delta, se->gtime_halted);
+>
+> -               ___update_load_avg(&se->avg, se_weight(se));
+> +       ret = ___update_load_sum(now - gtime_halted, &se->avg, !!se->on_rq, se_runnable(se),
+> +                       cfs_rq->curr == se);
+> +
+> +       if (gtime_halted) {
+> +               ret |= ___update_load_sum(now, &se->avg, 0, 0, 0);
+> +               se->gtime_halted -= gtime_halted;
+> +
+> +               /* decay residual halted time */
+> +               if (ret && se->gtime_halted)
+> +                       se->gtime_halted = decay_load(se->gtime_halted, delta / 1024);
+> +       }
+> +
+> +       if (ret) {
+>                 cfs_se_util_change(&se->avg);
+>                 trace_pelt_se_tp(se);
+>                 return 1;
+> @@ -319,10 +332,25 @@ int __update_load_avg_se(u64 now, struct cfs_rq *cfs_rq, struct sched_entity *se
+>
+>  int __update_load_avg_cfs_rq(u64 now, struct cfs_rq *cfs_rq)
+>  {
+> -       if (___update_load_sum(now, &cfs_rq->avg,
+> -                               scale_load_down(cfs_rq->load.weight),
+> -                               cfs_rq->h_nr_runnable,
+> -                               cfs_rq->curr != NULL)) {
+> +       int ret = 0;
+> +       u64 delta = now - cfs_rq->avg.last_update_time;
+> +       u64 gtime_halted = min(delta, cfs_rq->gtime_halted);
+> +
+> +       ret =  ___update_load_sum(now - gtime_halted, &cfs_rq->avg,
+> +                       scale_load_down(cfs_rq->load.weight),
+> +                       cfs_rq->h_nr_runnable,
+> +                       cfs_rq->curr != NULL);
+> +
+> +       if (gtime_halted) {
+> +               ret |= ___update_load_sum(now, &cfs_rq->avg, 0, 0, 0);
+> +               cfs_rq->gtime_halted -= gtime_halted;
+> +
+> +               /* decay any residual halted time */
+> +               if (ret && cfs_rq->gtime_halted)
+> +                       cfs_rq->gtime_halted = decay_load(cfs_rq->gtime_halted, delta / 1024);
+> +       }
+> +
+> +       if (ret) {
+>
+>                 ___update_load_avg(&cfs_rq->avg, 1);
+>                 trace_pelt_cfs_tp(cfs_rq);
+> diff --git a/kernel/sched/sched.h b/kernel/sched/sched.h
+> index b93c8c3dc05a..79b1166265bf 100644
+> --- a/kernel/sched/sched.h
+> +++ b/kernel/sched/sched.h
+> @@ -744,6 +744,8 @@ struct cfs_rq {
+>         struct list_head        throttled_csd_list;
+>  #endif /* CONFIG_CFS_BANDWIDTH */
+>  #endif /* CONFIG_FAIR_GROUP_SCHED */
+> +
+> +       u64                     gtime_halted;
+>  };
+>
+>  #ifdef CONFIG_SCHED_CLASS_EXT
+> --
+> 2.43.0
+>
+>
+>
+>
+> Amazon Development Centre (South Africa) (Proprietary) Limited
+> 29 Gogosoa Street, Observatory, Cape Town, Western Cape, 7925, South Africa
+> Registration Number: 2004 / 034463 / 07
+>
 
