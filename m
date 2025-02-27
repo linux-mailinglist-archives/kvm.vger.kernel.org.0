@@ -1,136 +1,196 @@
-Return-Path: <kvm+bounces-39424-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39425-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 859E5A4708C
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:52:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89AC9A47090
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:54:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A53F16E9A8
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 00:52:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70A693A7044
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 00:53:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38F804D8CE;
-	Thu, 27 Feb 2025 00:52:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B3E128373;
+	Thu, 27 Feb 2025 00:53:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wNILA9DJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i7yuKGcB"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B03938FA6
-	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 00:51:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7316270042
+	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 00:53:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740617519; cv=none; b=VPZhVhGiH1EF2xqF8YgIAIkbizYkn0we/ipfl1NRUP6b62TE0VtDLQlMuGwiBDZLaVUjhP5Se1sunOh6e9HI9JnYZdqG0ZQhVDZtkLvu7z1d66p84oqgluLmJcjdqaJKtGtlySbj8QFIcctGWzGEB7MHp5/XiOApHq6oJFPNQY0=
+	t=1740617638; cv=none; b=WHxdjmGIAx3SJA6JoYzKKQ4B3XNu70mnkxL1FgkPnB1sKTD/x/mbK/ZD7UHglPcnuI/GUOHUcvByd94HcVHR5C/TPt3USVxatzPscFdmoGXm4MmQMDYezERCm33nzgzWDDtp8ltVpk6j+DVIuHuuNPa5izgEEWomKs5s7IiD5cQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740617519; c=relaxed/simple;
-	bh=Q7mNOkHjkgMmZIP6NY5cOonhJIgXhPCJV3iNp/QtlhY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kMlMYXfrYs+JsSuyfnvDEMMLOAhc8esotFYTX8gxW1CQSmWx4HNhvkC/XPYNTgKMEd1vBkN+vlIZuGMtJj4Z8Iy5urq++ruvzeACEhnnHwBPTYmHuvNBuRUkwFEmOPHimlGdYAQ3hiODkqgv3j4W29CX3hI4gj+gmsG45e2DiVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wNILA9DJ; arc=none smtp.client-ip=209.85.214.202
+	s=arc-20240116; t=1740617638; c=relaxed/simple;
+	bh=hnNjM79mm1Ukma7nk1LTyfW5jRqHea0/AuBBXbmbBW4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=o5m/hFY5GxvQuybioxT1BfnxCJn0D89GBza9KlZ0lxOJBlxB8XCvREvCQ5Z8GXlYCJE2usG7vHsPBulKTsFnQM3BDmh11D1PiJ03upLKD+I2CZD8EKRYwfGNAO7q/MN7pBokKkzx2TT1B7J85d5gYImUvthoAsRr5tCPAR0N49w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i7yuKGcB; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2233b764fc8so6215545ad.3
-        for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 16:51:57 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-22350e4b7baso4073595ad.3
+        for <kvm@vger.kernel.org>; Wed, 26 Feb 2025 16:53:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740617517; x=1741222317; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EJotyZiERuL6yZQBDvDnm5IddJUBCXFIUhbBusTXxps=;
-        b=wNILA9DJwSfaz+/FgVDFsta5xGuj+gnGpK6sHsfci7ZXNns9WBL6UM+2o6J+Kqu61g
-         WxZZzY8vPV51whMMcnPQhK6dqbafOlE5cbqOsIEBWvJ3xhy4K0wRAcgr8RqsDNIZVTzx
-         2VBGJlqcaDa3q7aQmlKahTx5jvvtSeR2mHP61nbsKnucGHwH78hPFppZf31AlQndSVIR
-         tMF5GruKGgNthtNdrL2EEUzK/2/WxDPoV/f76xi98vKHzr2MQM3uW3C+NQzTweiHhYq8
-         PoJYYnLVBk6CiEtZR/d7InKoSjo8FcFNWr0X62Nc21GIEZg1/SZYuEaY++bqpnF5+Tpb
-         WM3Q==
+        d=google.com; s=20230601; t=1740617636; x=1741222436; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+etY2CwjqBwAK6Hx5ncpi27ffF6S3xqkUYaVvoUqScA=;
+        b=i7yuKGcBZzhhramdsI0llDjar1TQYNrgHXomLJx/I7G8GeX0Wc9y6VA1SgwvwQxaTW
+         FgVgRT+8L8gsDGIYFhbwd7ciZ0J+jzU9FpxtaJm9waEFoPBfiR/C1OjETDaA+f7wEIb8
+         lzfoXA5QmKj8GGFqKX3ijac6hji7T+5bZhas0h7R/sG76JCExVWI5lVz1y0kKgpXH5R0
+         s5EmyxtAgH2ew1TiNf6L//oR+s/ORa6wFL+nzIO01zpaWDqtT7GiIXl0T1rNcgdeyrRL
+         b2AUfdUZDHq4DFA1XbXpOHYya5GhycOf2E9cIYUzjuQEn3cnx/QO3DXVX55KTBb9uiQA
+         L6Gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740617517; x=1741222317;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EJotyZiERuL6yZQBDvDnm5IddJUBCXFIUhbBusTXxps=;
-        b=ojGjnu/x02hjAG+ygAnrnOMY6x41b8WrOoMXnqsFw57Ytaz5oWwMT1LrA0ofaf3jgq
-         nI1S+hPNcgmgEE+ZLi+OYPT8imW6JDBtc+8itURlhwuRwaDMsn5wuxJ3jLr4tgAQJCoT
-         xosG8EEcAkoPN6aqPQHtpCDG9duQzgsnCjGu+w3bHxNTuQAEdSrrBnGQ4UW1sOAXnY94
-         8LhX0PqVJ6cwwi2Ilrbmo0y6ty30v1gXA1n0XHa5Chl0AYv4ymXS5Ku6anowuxqq1bGU
-         OmdC8qo232uZnXQe5vfvtvf/y3voHGzUBltxcXvZJ/Y7BOlsvllgrYCceHyLpVzI/IAh
-         EZkw==
-X-Forwarded-Encrypted: i=1; AJvYcCXwEIXKkVb1Bs28kkHbVym8yNbLGaE8mll+3o2mGYfbfsRq3wHTUb1WMYKq2Z7Q9Vk7tHE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsFFwCguznCAs87ZAsaDdc/aEc5C3isX0cyYvpLzxqPbI45jcR
-	w3eLNSiWjHXkA+aXxqPigwtVT6UKise2gmm88IFFWLH6jWO3iVZVrB2z4tHgH0WdPlQTxr1mEyi
-	4Ug==
-X-Google-Smtp-Source: AGHT+IEL51u+VHZPqDrfRj4ysQhapPxjeZQ1gDCkR3XNIivE5W3G5YIUboDt4EBORJQZsRkmkIxq982vmL4=
-X-Received: from pjbeu5.prod.google.com ([2002:a17:90a:f945:b0:2ef:82c0:cb8d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d502:b0:21a:8300:b9ce
- with SMTP id d9443c01a7336-221a002afb5mr402718905ad.49.1740617517337; Wed, 26
- Feb 2025 16:51:57 -0800 (PST)
-Date: Wed, 26 Feb 2025 16:51:55 -0800
-In-Reply-To: <4c605b4e395a3538d9a2790918b78f4834912d72.camel@redhat.com>
+        d=1e100.net; s=20230601; t=1740617636; x=1741222436;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+etY2CwjqBwAK6Hx5ncpi27ffF6S3xqkUYaVvoUqScA=;
+        b=MPWvANCDdwZ9FbHCSfBvvvHjsO5LfFD3gAydvsYeUirongr5avtqhde0oyv/smPErN
+         x9xMYsSJB9pC1cWirlc3ccIkTLPqshdwocjP2VcGsRfGWqSg2KNv7ddvfrW34ZojznoT
+         d8HVXAYr60TVtUCBJwwolBo6VgwhNUNG4bMd+pXU76zSu5L4Pi4xmK6CE+aPmHYSiFkR
+         OveiJHl+FsUblRco0sq7N5euN13VwI09fh2IaqTonlXyFb93Iwj/JA176EG6JgnsxpqZ
+         8QtMuZihKmEw2jdQA9ev0qNyATfdxcZVt9WxLU1fbKZJwiX3aydVvol5yz6APWe/Uhk+
+         GVxg==
+X-Gm-Message-State: AOJu0Yzqt40vVusdQ2kmRk3Zbw5DBAKtim183S+Xte9jubRD4BZhrOzr
+	2DGyh0z6N6hcRhx/9OZ4sB05BwHCXEqyLxnlf1Nhdv9/ebb11Gqu3RZGwyUcpz9Ba4UxRVqSaBu
+	Cvw==
+X-Google-Smtp-Source: AGHT+IFAGlSFb6vxw6t08FFVj1P9iXRFuf7eY8Yt2XENxkd5K+QLYD1u+86cXFrRf0pvBHh2r9kyK08oChs=
+X-Received: from pjc6.prod.google.com ([2002:a17:90b:2f46:b0:2fa:2891:e310])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:41d0:b0:21f:ba77:c45e
+ with SMTP id d9443c01a7336-22307e791f2mr132253655ad.45.1740617636044; Wed, 26
+ Feb 2025 16:53:56 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Wed, 26 Feb 2025 16:53:53 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250204004038.1680123-1-jthoughton@google.com>
- <025b409c5ca44055a5f90d2c67e76af86617e222.camel@redhat.com>
- <Z7UwI-9zqnhpmg30@google.com> <07788b85473e24627131ffe1a8d1d01856dd9cb5.camel@redhat.com>
- <Z75lcJOEFfBMATAf@google.com> <4c605b4e395a3538d9a2790918b78f4834912d72.camel@redhat.com>
-Message-ID: <Z7-3K-CXnoqHhmgC@google.com>
-Subject: Re: [PATCH v9 00/11] KVM: x86/mmu: Age sptes locklessly
+X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
+Message-ID: <20250227005353.3216123-1-seanjc@google.com>
+Subject: [PATCH] KVM: VMX: Extract checks on entry/exit control pairs to a
+ helper macro
 From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: James Houghton <jthoughton@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Wei Xu <weixugc@google.com>, Yu Zhao <yuzhao@google.com>, 
-	Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Xin Li <xin@zytor.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Feb 26, 2025, Maxim Levitsky wrote:
-> On Tue, 2025-02-25 at 16:50 -0800, Sean Christopherson wrote:
-> > On Tue, Feb 25, 2025, Maxim Levitsky wrote:
-> > What if we make the assertion user controllable?  I.e. let the user opt-out (or
-> > off-by-default and opt-in) via command line?  We did something similar for the
-> > rseq test, because the test would run far fewer iterations than expected if the
-> > vCPU task was migrated to CPU(s) in deep sleep states.
-> > 
-> > 	TEST_ASSERT(skip_sanity_check || i > (NR_TASK_MIGRATIONS / 2),
-> > 		    "Only performed %d KVM_RUNs, task stalled too much?\n\n"
-> > 		    "  Try disabling deep sleep states to reduce CPU wakeup latency,\n"
-> > 		    "  e.g. via cpuidle.off=1 or setting /dev/cpu_dma_latency to '0',\n"
-> > 		    "  or run with -u to disable this sanity check.", i);
-> > 
-> > This is quite similar, because as you say, it's impractical for the test to account
-> > for every possible environmental quirk.
-> 
-> No objections in principle, especially if sanity check is skipped by default, 
-> although this does sort of defeats the purpose of the check. 
-> I guess that the check might still be used for developers.
+Extract the checking of entry/exit pairs to a helper macro so that the
+code can be reused to process the upcoming "secondary" exit controls (the
+primary exit controls field is out of bits).  Use a macro instead of a
+function to support different sized variables (all secondary exit controls
+will be optional and so the MSR doesn't have the fixed-0/fixed-1 split).
+Taking the largest size as input is trivial, but handling the modification
+of KVM's to-be-used controls is much trickier, e.g. would require bitmap
+games to clear bits from a 32-bit bitmap vs. a 64-bit bitmap.
 
-A middle ground would be to enable the check by default if NUMA balancing is off.
-We can always revisit the default setting if it turns out there are other problematic
-"features".
+Opportunistically add sanity checks to ensure the size of the controls
+match (yay, macro!), e.g. to detect bugs where KVM passes in the pairs for
+primary exit controls, but its variable for the secondary exit controls.
 
-> > > > Aha!  I wonder if in the failing case, the vCPU gets migrated to a pCPU on a
-> > > > different node, and that causes NUMA balancing to go crazy and zap pretty much
-> > > > all of guest memory.  If that's what's happening, then a better solution for the
-> > > > NUMA balancing issue would be to affine the vCPU to a single NUMA node (or hard
-> > > > pin it to a single pCPU?).
-> > > 
-> > > Nope. I pinned main thread to  CPU 0 and VM thread to  CPU 1 and the problem
-> > > persists.  On 6.13, the only way to make the test consistently work is to
-> > > disable NUMA balancing.
-> > 
-> > Well that's odd.  While I'm quite curious as to what's happening,
+To help users triage mismatches, print the control bits that are checked,
+not just the actual value.  For the foreseeable future, that provides
+enough information for a user to determine which fields mismatched.  E.g.
+until secondary entry controls comes along, all entry bits and thus all
+error messages are guaranteed to be unique.
 
-Gah, chatting about this offline jogged my memory.  NUMA balancing doesn't zap
-(mark PROT_NONE/PROT_NUMA) PTEs for paging the kernel thinks are being accessed
-remotely, it zaps PTEs to see if they're are being accessed remotely.  So yeah,
-whenever NUMA balancing kicks in, the guest will see a large amount of its memory
-get re-faulted.
+To avoid returning from a macro, which can get quite dangerous, simply
+process all pairs even if error_on_inconsistent_vmcs_config is set.  The
+speed at which KVM rejects module load is not at all interesting.
 
-Which is why it's such a terribly feature to pair with KVM, at least as-is.  NUMA
-balancing is predicated on inducing and resolving the #PF being relatively cheap,
-but that doesn't hold true for secondary MMUs due to the coarse nature of mmu_notifiers.
+Keep the error message a "once" printk, even though it would be nice to
+print out all mismatching pairs.  In practice, the most likely scenario is
+that a single pair will mismatch on all CPUs.  Printing all mismatches
+generates redundant messages in that situation, and can be extremely noisy
+on systems with large numbers of CPUs.  If a CPU has multiple mismatches,
+not printing every bad pair is the least of the user's concerns.
+
+Cc: Xin Li (Intel) <xin@zytor.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 48 +++++++++++++++++++++++++++---------------
+ 1 file changed, 31 insertions(+), 17 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index b71392989609..678c91762dc9 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2582,6 +2582,34 @@ static u64 adjust_vmx_controls64(u64 ctl_opt, u32 msr)
+ 	return  ctl_opt & allowed;
+ }
+ 
++#define vmx_check_entry_exit_pairs(pairs, entry_controls, exit_controls)	\
++({										\
++	int i, r = 0;								\
++										\
++	BUILD_BUG_ON(sizeof(pairs[0].entry_control) != sizeof(entry_controls));	\
++	BUILD_BUG_ON(sizeof(pairs[0].exit_control)  != sizeof(exit_controls));	\
++										\
++	for (i = 0; i < ARRAY_SIZE(pairs); i++) {				\
++		typeof(entry_controls) n_ctrl = pairs[i].entry_control;		\
++		typeof(exit_controls) x_ctrl = pairs[i].exit_control;		\
++										\
++		if (!(entry_controls & n_ctrl) == !(exit_controls & x_ctrl))	\
++			continue;						\
++										\
++		pr_warn_once("Inconsistent VM-Entry/VM-Exit pair, "		\
++			     "entry = %llx (%llx), exit = %llx (%llx)\n",	\
++			     (u64)(entry_controls & n_ctrl), (u64)n_ctrl,	\
++			     (u64)(exit_controls & x_ctrl), (u64)x_ctrl);	\
++										\
++		if (error_on_inconsistent_vmcs_config)				\
++			r = -EIO;						\
++										\
++		entry_controls &= ~n_ctrl;					\
++		exit_controls &= ~x_ctrl;					\
++	}									\
++	r;									\
++})
++
+ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 			     struct vmx_capability *vmx_cap)
+ {
+@@ -2593,7 +2621,6 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 	u32 _vmentry_control = 0;
+ 	u64 basic_msr;
+ 	u64 misc_msr;
+-	int i;
+ 
+ 	/*
+ 	 * LOAD/SAVE_DEBUG_CONTROLS are absent because both are mandatory.
+@@ -2697,22 +2724,9 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 				&_vmentry_control))
+ 		return -EIO;
+ 
+-	for (i = 0; i < ARRAY_SIZE(vmcs_entry_exit_pairs); i++) {
+-		u32 n_ctrl = vmcs_entry_exit_pairs[i].entry_control;
+-		u32 x_ctrl = vmcs_entry_exit_pairs[i].exit_control;
+-
+-		if (!(_vmentry_control & n_ctrl) == !(_vmexit_control & x_ctrl))
+-			continue;
+-
+-		pr_warn_once("Inconsistent VM-Entry/VM-Exit pair, entry = %x, exit = %x\n",
+-			     _vmentry_control & n_ctrl, _vmexit_control & x_ctrl);
+-
+-		if (error_on_inconsistent_vmcs_config)
+-			return -EIO;
+-
+-		_vmentry_control &= ~n_ctrl;
+-		_vmexit_control &= ~x_ctrl;
+-	}
++	if (vmx_check_entry_exit_pairs(vmcs_entry_exit_pairs,
++				       _vmentry_control, _vmexit_control))
++		return -EIO;
+ 
+ 	/*
+ 	 * Some cpus support VM_{ENTRY,EXIT}_IA32_PERF_GLOBAL_CTRL but they
+
+base-commit: fed48e2967f402f561d80075a20c5c9e16866e53
+-- 
+2.48.1.711.g2feabab25a-goog
+
 
