@@ -1,154 +1,282 @@
-Return-Path: <kvm+bounces-39437-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39438-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43E47A470C4
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:15:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9924BA470CC
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 02:19:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30C6716DFFA
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:15:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9ACC03A9BCA
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 01:18:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFE1A38DD3;
-	Thu, 27 Feb 2025 01:14:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DACB38DD3;
+	Thu, 27 Feb 2025 01:18:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="ct9TI772"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WftKV585"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E544DECF;
-	Thu, 27 Feb 2025 01:14:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3F0A4A35;
+	Thu, 27 Feb 2025 01:18:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740618879; cv=none; b=tR2j0e2yJVs/nAhu47zRMkA5g75xjg+g0qWZKPFuKiN7RtP5VJfIMWvAXbU/V05igNZZcc/vAkdLnCJ0H0FBxfUYqdRwfB4ZUBlWjMm0T6H/RnjGKBmrlvyyDhGHzIvYDzd7K65CNzcCuyjget9HC4H0jdupbY49KXOiqdC/dLc=
+	t=1740619131; cv=none; b=LgzuCHbAlTfh6/5yqJq2mmOrD9sBwJnVyEC0JYQ0ml1nd4VGRI/HmsU5pTFi7+1zMSyn9sQg9AmqZ6xNoVIKltn/O/Z29kVlmQ6HJRMHxgroUt5yRbwGhfkdAjwBryATUAeZ02PTv7W2EzebQSHaAlsDowBfiGX24sStaFZgt4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740618879; c=relaxed/simple;
-	bh=Xs/OLWRjVopl+PBKhxfySZxwwvTxhF09wzNSJg4riJU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=inP+Tne5Y8sqvy5EMBi23QrrZLVG5gM0lSv7FbSbRfuSWVq9DyU29+f/hbNUPg2rOiYrYUSrKxietrU1sBkzQ82y/exTLpdX8tLtNjRqk0gVOCbmyM53SopEOAf62yMmXjKsIYcIckPKX/mb/CbIyVko3MM3Su5kxFjXveJHtzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=ct9TI772; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 51R1EM2l1932536
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Wed, 26 Feb 2025 17:14:25 -0800
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 51R1EM2l1932536
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025021701; t=1740618865;
-	bh=t7YiWUUV1Y0WB51uUogsknfyM0MzRH9BPzhjedNHqHM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ct9TI772GPkCMLNGWtqx5yztYlsqCAN59L8juN2tpJ8zhGl676NX2hgL0kWUR4brS
-	 BSksI+F8muDwrP5oox1YOsSTnYr0hnSP4k3w1srqI0n5Y+pwQ7uOSK0x/+bljFRsJl
-	 n6Qa4Y9fvaJ/Tw405Yzxu5VOew3+vcXo8M/whodutGTPJUocBwxvEA97hGv3sZg99b
-	 fQ+Fd1KjGKwwpE/DpQ8uqvjlyG85jXpKQVBm1OC1uEN0ewI1hINNOi7tb6KsXLGGfK
-	 haJZUDnpj2yD/D2SJn4qIRyO87JEHJJmt1u1263lMCpND+53xMWAoaMjQaKTcZEB40
-	 hAaipNCOkRpbg==
-Message-ID: <ab5ded74-91b4-46ae-b360-b372ff790fa6@zytor.com>
-Date: Wed, 26 Feb 2025 17:14:21 -0800
+	s=arc-20240116; t=1740619131; c=relaxed/simple;
+	bh=HhUhlhjRar2n+oEQ4HGfUAieFs+HeIQJMtyvSs6i4zk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HoH7JGKm591erCz82EoJP9mtS8dxTjItq8VbpOuyJyz6hVMbg/F1/1063jvJgVRkiVWM71xtD4ObTTwTsaWi6XH5S/o3dRbFpUZzvme1SJ054LOFn4t1Dk+tWhLii1ctZwt2jCRmKP1S204QfVy5FvvbsO57zdX4IjxC7rHJqnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WftKV585; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740619130; x=1772155130;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=HhUhlhjRar2n+oEQ4HGfUAieFs+HeIQJMtyvSs6i4zk=;
+  b=WftKV585HET9IDTgqbYq7disXC6q+081ZaQSBXWHKsNUlijsypYKliPk
+   UX6j7VM3EkDGGcxJatBzvF6sd7bM1GPHMXpIFRL19NnYSjJgZXyrGmh6T
+   P37hgmFIRgaF8VO1u4XZbioXQ7NiIvvXk4V5NTjsPVdbqRd6Qa8bc/zY3
+   03miQ/F5LNHVM36QEb9ETip0UFPiCznGcK5Ke5Xq5T3jY0/2i35IGgpaL
+   3uxNuY+sNEHw71Ov4ik8YtCLaguohNw59/DOpCFELGLn2gII/pvQOQgKR
+   UYyTau+jbeYtYYX8S4wImZlZEx/b2nC3qOg989JbLVaDVyub0H/XzY5fi
+   w==;
+X-CSE-ConnectionGUID: YCjk3vbhRfuOQIWuDttTfg==
+X-CSE-MsgGUID: cYCpXazZTHeyhZjmPITlSw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11357"; a="63959580"
+X-IronPort-AV: E=Sophos;i="6.13,318,1732608000"; 
+   d="scan'208";a="63959580"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 17:18:49 -0800
+X-CSE-ConnectionGUID: RQg1tI2SQrqbtY4T0P0NKw==
+X-CSE-MsgGUID: tpvsrkJWSISkP+4EZjYRVw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,318,1732608000"; 
+   d="scan'208";a="116674823"
+Received: from litbin-desktop.sh.intel.com ([10.239.156.93])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 17:18:46 -0800
+From: Binbin Wu <binbin.wu@linux.intel.com>
+To: pbonzini@redhat.com,
+	seanjc@google.com,
+	kvm@vger.kernel.org
+Cc: rick.p.edgecombe@intel.com,
+	kai.huang@intel.com,
+	adrian.hunter@intel.com,
+	reinette.chatre@intel.com,
+	xiaoyao.li@intel.com,
+	tony.lindgren@intel.com,
+	isaku.yamahata@intel.com,
+	yan.y.zhao@intel.com,
+	chao.gao@intel.com,
+	linux-kernel@vger.kernel.org,
+	binbin.wu@linux.intel.com
+Subject: [PATCH v2 00/20] KVM: TDX: TDX "the rest" part
+Date: Thu, 27 Feb 2025 09:20:01 +0800
+Message-ID: <20250227012021.1778144-1-binbin.wu@linux.intel.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] x86/msr: Rename the WRMSRNS opcode macro to
- ASM_WRMSRNS (for KVM)
-To: Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250227010111.3222742-1-seanjc@google.com>
- <20250227010111.3222742-2-seanjc@google.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- xsDNBGUPz1cBDACS/9yOJGojBFPxFt0OfTWuMl0uSgpwk37uRrFPTTLw4BaxhlFL0bjs6q+0
- 2OfG34R+a0ZCuj5c9vggUMoOLdDyA7yPVAJU0OX6lqpg6z/kyQg3t4jvajG6aCgwSDx5Kzg5
- Rj3AXl8k2wb0jdqRB4RvaOPFiHNGgXCs5Pkux/qr0laeFIpzMKMootGa4kfURgPhRzUaM1vy
- bsMsL8vpJtGUmitrSqe5dVNBH00whLtPFM7IbzKURPUOkRRiusFAsw0a1ztCgoFczq6VfAVu
- raTye0L/VXwZd+aGi401V2tLsAHxxckRi9p3mc0jExPc60joK+aZPy6amwSCy5kAJ/AboYtY
- VmKIGKx1yx8POy6m+1lZ8C0q9b8eJ8kWPAR78PgT37FQWKYS1uAroG2wLdK7FiIEpPhCD+zH
- wlslo2ETbdKjrLIPNehQCOWrT32k8vFNEMLP5G/mmjfNj5sEf3IOKgMTMVl9AFjsINLHcxEQ
- 6T8nGbX/n3msP6A36FDfdSEAEQEAAc0WWGluIExpIDx4aW5Aenl0b3IuY29tPsLBDQQTAQgA
- NxYhBIUq/WFSDTiOvUIqv2u9DlcdrjdRBQJlD89XBQkFo5qAAhsDBAsJCAcFFQgJCgsFFgID
- AQAACgkQa70OVx2uN1HUpgv/cM2fsFCQodLArMTX5nt9yqAWgA5t1srri6EgS8W3F+3Kitge
- tYTBKu6j5BXuXaX3vyfCm+zajDJN77JHuYnpcKKr13VcZi1Swv6Jx1u0II8DOmoDYLb1Q2ZW
- v83W55fOWJ2g72x/UjVJBQ0sVjAngazU3ckc0TeNQlkcpSVGa/qBIHLfZraWtdrNAQT4A1fa
- sWGuJrChBFhtKbYXbUCu9AoYmmbQnsx2EWoJy3h7OjtfFapJbPZql+no5AJ3Mk9eE5oWyLH+
- QWqtOeJM7kKvn/dBudokFSNhDUw06e7EoVPSJyUIMbYtUO7g2+Atu44G/EPP0yV0J4lRO6EA
- wYRXff7+I1jIWEHpj5EFVYO6SmBg7zF2illHEW31JAPtdDLDHYcZDfS41caEKOQIPsdzQkaQ
- oW2hchcjcMPAfyhhRzUpVHLPxLCetP8vrVhTvnaZUo0xaVYb3+wjP+D5j/3+hwblu2agPsaE
- vgVbZ8Fx3TUxUPCAdr/p73DGg57oHjgezsDNBGUPz1gBDAD4Mg7hMFRQqlzotcNSxatlAQNL
- MadLfUTFz8wUUa21LPLrHBkUwm8RujehJrzcVbPYwPXIO0uyL/F///CogMNx7Iwo6by43KOy
- g89wVFhyy237EY76j1lVfLzcMYmjBoTH95fJC/lVb5Whxil6KjSN/R/y3jfG1dPXfwAuZ/4N
- cMoOslWkfZKJeEut5aZTRepKKF54T5r49H9F7OFLyxrC/uI9UDttWqMxcWyCkHh0v1Di8176
- jjYRNTrGEfYfGxSp+3jYL3PoNceIMkqM9haXjjGl0W1B4BidK1LVYBNov0rTEzyr0a1riUrp
- Qk+6z/LHxCM9lFFXnqH7KWeToTOPQebD2B/Ah5CZlft41i8L6LOF/LCuDBuYlu/fI2nuCc8d
- m4wwtkou1Y/kIwbEsE/6RQwRXUZhzO6llfoN96Fczr/RwvPIK5SVMixqWq4QGFAyK0m/1ap4
- bhIRrdCLVQcgU4glo17vqfEaRcTW5SgX+pGs4KIPPBE5J/ABD6pBnUUAEQEAAcLA/AQYAQgA
- JhYhBIUq/WFSDTiOvUIqv2u9DlcdrjdRBQJlD89ZBQkFo5qAAhsMAAoJEGu9DlcdrjdR4C0L
- /RcjolEjoZW8VsyxWtXazQPnaRvzZ4vhmGOsCPr2BPtMlSwDzTlri8BBG1/3t/DNK4JLuwEj
- OAIE3fkkm+UG4Kjud6aNeraDI52DRVCSx6xff3bjmJsJJMb12mWglN6LjdF6K+PE+OTJUh2F
- dOhslN5C2kgl0dvUuevwMgQF3IljLmi/6APKYJHjkJpu1E6luZec/lRbetHuNFtbh3xgFIJx
- 2RpgVDP4xB3f8r0I+y6ua+p7fgOjDLyoFjubRGed0Be45JJQEn7A3CSb6Xu7NYobnxfkwAGZ
- Q81a2XtvNS7Aj6NWVoOQB5KbM4yosO5+Me1V1SkX2jlnn26JPEvbV3KRFcwV5RnDxm4OQTSk
- PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
- gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
- l75w1xInsg==
-In-Reply-To: <20250227010111.3222742-2-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 2/26/2025 5:01 PM, Sean Christopherson wrote:
-> Rename the WRMSRNS instruction opcode macro so that it doesn't collide
-> with X86_FEATURE_WRMSRNS when using token pasting to generate references
-> to X86_FEATURE_WRMSRNS.  KVM heavily uses token pasting to generate KVM's
-> set of support feature bits, and adding WRMSRNS support in KVM will run
-> will run afoul of the opcode macro.
-> 
->    arch/x86/kvm/cpuid.c:719:37: error: pasting "X86_FEATURE_" and "" "" does not
->                                        give a valid preprocessing token
->    719 |         u32 __leaf = __feature_leaf(X86_FEATURE_##name);                \
->        |                                     ^~~~~~~~~~~~
-> 
-> KVM has worked around one such collision in the past by #undef'ing the
-> problematic macro in order to avoid blocking a KVM rework, but such games
-> are generally undesirable, e.g. requires bleeding macro details into KVM,
-> risks weird behavior if what KVM is #undef'ing changes, etc.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/include/asm/msr.h | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/msr.h b/arch/x86/include/asm/msr.h
-> index 001853541f1e..60b80a36d045 100644
-> --- a/arch/x86/include/asm/msr.h
-> +++ b/arch/x86/include/asm/msr.h
-> @@ -300,7 +300,7 @@ do {							\
->   #endif	/* !CONFIG_PARAVIRT_XXL */
->   
->   /* Instruction opcode for WRMSRNS supported in binutils >= 2.40 */
-> -#define WRMSRNS _ASM_BYTES(0x0f,0x01,0xc6)
-> +#define ASM_WRMSRNS _ASM_BYTES(0x0f,0x01,0xc6)
->   
->   /* Non-serializing WRMSR, when available.  Falls back to a serializing WRMSR. */
->   static __always_inline void wrmsrns(u32 msr, u64 val)
-> @@ -309,7 +309,7 @@ static __always_inline void wrmsrns(u32 msr, u64 val)
->   	 * WRMSR is 2 bytes.  WRMSRNS is 3 bytes.  Pad WRMSR with a redundant
->   	 * DS prefix to avoid a trailing NOP.
->   	 */
-> -	asm volatile("1: " ALTERNATIVE("ds wrmsr", WRMSRNS, X86_FEATURE_WRMSRNS)
-> +	asm volatile("1: " ALTERNATIVE("ds wrmsr", ASM_WRMSRNS, X86_FEATURE_WRMSRNS)
->   		     "2: " _ASM_EXTABLE_TYPE(1b, 2b, EX_TYPE_WRMSR)
->   		     : : "c" (msr), "a" ((u32)val), "d" ((u32)(val >> 32)));
->   }
+Hi,
 
-I hit the same build issue, thanks for fixing it.
+This patch series adds the support for EPT violation/misconfig handling and
+several TDVMCALL leaves, adds a bunch of wrappers to ignore the operations
+not supported by TDX guests, and the document.
 
-Reviewed-by: Xin Li (Intel) <xin@zytor.com>
+This patch series is the last part needed to provide the ability to run a
+functioning TD VM.  We think this is in pretty good shape at this point and
+ready for handoff to Paolo.
+
+
+Base of this series
+===================
+This series is based on kvm-coco-queue up to the end of "TDX interrupts",
+plus one PAT quirk series. Stack is:
+ - '31db5921f12d ("KVM: TDX: Handle EXIT_REASON_OTHER_SMI")' from
+   kvm-coco-queue.
+ - PAT quirk series
+   "KVM: x86: Introduce quirk KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT" [0].
+
+
+Notable changes since v1 [1]
+============================
+Patch "KVM: x86: Add a switch_db_regs flag to handle TDX's auto-switched
+behavior" is moved to "KVM: TDX: TD vcpu enter/exit" [2].
+
+Rebased after adding tdcall_to_vmx_exit_reason() in [3] and the way to
+get exit_qualification, ext_exit_qualification.
+
+For EPT MISCONFIG, bug the VM and return -EIO.  The handling is deferred
+until tdx_handle_exit() because tdx_to_vmx_exit_reason() is called by
+'noinstr' code with interrupt disabled.
+
+Add SEPT local retry and wait for SEPT zap logic to provide a clean
+solution to avoid the blind SEPT retries.
+
+Morph the following guest requested exit reasons (via TDVMCALL) to KVM's
+tracked exit reasons:
+ - Morph PV CPUID to EXIT_REASON_CPUID
+ - Morph PV HLT to EXIT_REASON_HLT
+ - Morph PV RDMSR to EXIT_REASON_RDMSR
+ - Morph PV WRMSR to EXIT_REASON_WRMSR
+
+Check RVI pending (bit 0 of TD_VCPU_STATE_DETAILS_NON_ARCH field) only for
+HALTED case with IRQ enabled in tdx_protected_apic_has_interrupt().
+
+For PV RDMSR/WRMSR handling, marshall values to the appropriate x86
+registers to leverage the existing kvm_emulate_{rdmsr,wrmsr}(), and
+implement complete_emulated_msr() callback to set return value/code to
+vp_enter_args.
+
+Skip setting of return code when the value is TDVMCALL_STATUS_SUCCESS
+because r10 is always 0 for standard TDVMCALL exit.
+
+Get/set tdvmcall inputs/outputs from/to vp_enter_args directly in struct
+vcpu_tdx. After dropping helpers for read/write a0~a3 in [3].
+
+Added back MTRR MSRs access, but drop the special handling for TDX guests,
+just align with what KVM does for normal VMs.
+
+Dropped tdx_cache_reg().
+
+Updated documents.
+
+
+TODO
+====
+Macrofy vt_x86_ops callbacks suggested by Sean. [4]
+
+
+Overview
+========
+EPT violation
+-------------
+EPT violation for TDX will trigger X86 MMU code.
+Note that instruction fetch from shared memory is not allowed for TDX
+guests, if it occurs, treat it as broken hardware, bug the VM and return
+error.
+(*New Updated*)
+SEPT local retry and wait for SEPT zap logic provides a clean solution to
+avoid the blind SEPT retries.
+
+EPT misconfiguration
+--------------------
+EPT misconfiguration shouldn't happen for TDX guests. If it occurs, bug the
+VM and return error.
+
+TDVMCALL support
+----------------
+Supports are added to allow TDX guests to issue CPUID, HLT, RDMSR/WRMSR and
+GetTdVmCallInfo via TDVMCALL.
+
+- CPUID
+  For TDX, most CPUID leaf/sub-leaf combinations are virtualized by the TDX
+  module while some trigger #VE.  On #VE, TDX guest can issue a TDVMCALL
+  with the leaf Instruction.CPUID to request VMM to emulate CPUID
+  operation.
+
+- HLT
+  TDX guest can issue a TDVMCALL with HLT, which passes the interrupt
+  blocked flag. Whether the interrupt is allowed or not is depending on the
+  interrupt blocked flag.  For NMI, KVM can't get the NMI blocked status of
+  TDX guest, it always assumes NMI is allowed.
+
+- MSRs
+  Some MSRs are virtualized by TDX module directly, while some MSRs will
+  trigger #VE when guest accesses them.  On #VE, TDX guests can issue a
+  TDVMCALL with WRMSR or RDMSR to request emulation in VMM.
+
+Operations ignored
+------------------
+TDX protects TDX guest state from VMM, and some features are not supported
+by TDX guest, a bunch of operations are ignored for TDX guests, including:
+accesses to CPU state, VMX preemption timer, accesses to TSC offset and 
+multiplier, setup MCE for LMCE enable/disable, and hypercall patching.
+
+
+Repos
+=====
+Due to "KVM: VMX: Move common fields of struct" in "TDX vcpu enter/exit" v2
+[2], subsequent patches require changes to use new struct vcpu_vt, refer to
+the full KVM branch below.
+
+It requires TDX module 1.5.06.00.0744 [4], or later as mentioned in [2].
+A working edk2 commit is 95d8a1c ("UnitTestFrameworkPkg: Use TianoCore
+mirror of subhook submodule").
+
+The full KVM branch is here:
+https://github.com/intel/tdx/tree/tdx_kvm_dev-2025-02-26
+
+A matching QEMU is here:
+https://github.com/intel-staging/qemu-tdx/tree/tdx-qemu-wip-2025-02-18
+
+
+Testing 
+=======
+It has been tested as part of the development branch for the TDX base
+series. The testing consisted of TDX kvm-unit-tests and booting a Linux
+TD, and TDX enhanced KVM selftests. It also passed the TDX related test
+cases defined in the LKVS test suite as described in: 
+https://github.com/intel/lkvs/blob/main/KVM/docs/lkvs_on_avocado.md
+
+
+[0] https://lore.kernel.org/kvm/20250224070716.31360-1-yan.y.zhao@intel.com
+[1] https://lore.kernel.org/kvm/20241210004946.3718496-1-binbin.wu@linux.intel.com
+[2] https://lore.kernel.org/kvm/20250129095902.16391-1-adrian.hunter@intel.com
+[3] https://lore.kernel.org/kvm/20250222014225.897298-1-binbin.wu@linux.intel.com
+[4] https://lore.kernel.org/kvm/Z6v9yjWLNTU6X90d@google.com
+[5] https://github.com/intel/tdx-module/releases/tag/TDX_1.5.06
+
+Binbin Wu (1):
+  KVM: TDX: Enable guest access to MTRR MSRs
+
+Isaku Yamahata (16):
+  KVM: TDX: Handle EPT violation/misconfig exit
+  KVM: TDX: Handle TDX PV CPUID hypercall
+  KVM: TDX: Handle TDX PV HLT hypercall
+  KVM: x86: Move KVM_MAX_MCE_BANKS to header file
+  KVM: TDX: Implement callbacks for MSR operations
+  KVM: TDX: Handle TDX PV rdmsr/wrmsr hypercall
+  KVM: TDX: Enable guest access to LMCE related MSRs
+  KVM: TDX: Handle TDG.VP.VMCALL<GetTdVmCallInfo> hypercall
+  KVM: TDX: Add methods to ignore accesses to CPU state
+  KVM: TDX: Add method to ignore guest instruction emulation
+  KVM: TDX: Add methods to ignore VMX preemption timer
+  KVM: TDX: Add methods to ignore accesses to TSC
+  KVM: TDX: Ignore setting up mce
+  KVM: TDX: Add a method to ignore hypercall patching
+  KVM: TDX: Make TDX VM type supported
+  Documentation/virt/kvm: Document on Trust Domain Extensions (TDX)
+
+Yan Zhao (3):
+  KVM: TDX: Detect unexpected SEPT violations due to pending SPTEs
+  KVM: TDX: Retry locally in TDX EPT violation handler on RET_PF_RETRY
+  KVM: TDX: Kick off vCPUs when SEAMCALL is busy during TD page removal
+
+ Documentation/virt/kvm/api.rst           |  13 +-
+ Documentation/virt/kvm/x86/index.rst     |   1 +
+ Documentation/virt/kvm/x86/intel-tdx.rst | 255 ++++++++++++
+ arch/x86/include/asm/shared/tdx.h        |   1 +
+ arch/x86/include/asm/vmx.h               |   2 +
+ arch/x86/kvm/vmx/main.c                  | 482 ++++++++++++++++++++---
+ arch/x86/kvm/vmx/posted_intr.c           |   3 +-
+ arch/x86/kvm/vmx/tdx.c                   | 381 +++++++++++++++++-
+ arch/x86/kvm/vmx/tdx.h                   |  16 +
+ arch/x86/kvm/vmx/tdx_arch.h              |  13 +
+ arch/x86/kvm/vmx/x86_ops.h               |   6 +
+ arch/x86/kvm/x86.c                       |   1 -
+ arch/x86/kvm/x86.h                       |   2 +
+ 13 files changed, 1113 insertions(+), 63 deletions(-)
+ create mode 100644 Documentation/virt/kvm/x86/intel-tdx.rst
+
+-- 
+2.46.0
+
 
