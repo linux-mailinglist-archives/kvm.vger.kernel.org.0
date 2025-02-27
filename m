@@ -1,102 +1,171 @@
-Return-Path: <kvm+bounces-39630-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39631-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1A4EA48956
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 20:59:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CA05A489BF
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 21:22:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D38483B4E90
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 19:59:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D40E33B72F7
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2025 20:22:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADCBF26F472;
-	Thu, 27 Feb 2025 19:59:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7860270EB3;
+	Thu, 27 Feb 2025 20:22:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fRjig69N"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="DJiw+M/C"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89CF11E3DD7
-	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 19:59:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 868F526FDBA
+	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 20:22:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740686352; cv=none; b=aWyoh5bZSwj3TQAI4PZ7fuZ5ieu0Ab3WeZEd22UXXuwKwZGv5kM7L6j/yyu16cybLgXwYnRSzdltu6mbXkoAABFJLGnAMTYkW87QTjvet/X9bK7A3ypkFbrgcUnQxbH7Q/friTRtSifM5SDQvgC6UX26m5So+pBVEZFK+K7Ykec=
+	t=1740687749; cv=none; b=Sz03cNQfvnDY5/28wMNaPlN2hwxWR69K3uQHgHdFqckcMNezL2PL5D4b2ePUDnS35ZhH07jbwL9KfgqyImL3Ecno6uGS+m/p8LBCGU4bLifwCO6PR5LJdgLP/3f75Pw2xt6esKykhN6ERmrlg5ZD2/mqHjj5fOv3VkTNX3lysCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740686352; c=relaxed/simple;
-	bh=/VV1+s8xZRpvzfRQLRPfeZdw7ex/gqiFmPYSVUcpIYE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Content-Type; b=SX596zB7GhdKDTMVC2pAv8I8gb+cSZCxsWjEv7fWV8mXCaU3jHuIwb0nqzkZyWfslVH5t+nJjGaqy7aaqUZWaZvDZRxZ8/FskwbiLgYiUiwPYFp8IFm1JamFy+D47oM7CqlQJfNd8OhHMU8D393xE/2g8Abn548p6UuNhNo/8Jc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fRjig69N; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fe916ba298so2890915a91.1
-        for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 11:59:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740686351; x=1741291151; darn=vger.kernel.org;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7USea8XaxoNKvSqn3loqpyLdXnwrQ2b2Ao0MsUJT9us=;
-        b=fRjig69ND18f0sD6tjs0qjtKfoK4zylV1yalolsH4WQ9gJ5yGIgCyKqNB691Yb/Lhf
-         iqLwyqR6aYIDIDyIuC5QNl72Ec2Tbf2S8MVNs+Soq0tkykwj20W1ivQZDPVGhRuGzRyB
-         u7mXzQd9vi7HbznB+3J5yTw8UBKKvMCzV5D4cXQzZfhfMKfK87jbS+kpo8/D2emqe+/z
-         5FRDGaos34RNPaLdmX63tIl1B9wqIqwBxT9WKRPnenpJDUz2+C4Bs6DMktzHENZ7CGAo
-         vW6E3RzzbiLZ546pLjrC9vsX51M/7YgM5/uxVYUmk9IArZU6KkRuDxKvOT8RIHefyKRm
-         bMsQ==
+	s=arc-20240116; t=1740687749; c=relaxed/simple;
+	bh=4JO84e2/jyvgpbFbferhNXNJSfOzWDotZb4WwEXenb8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=q61anSvlDJJX9dg7Hu4HWTzSKn4aulZ/PhYXSxp9EL2pVtaBmdgY/h9kVIB9MddYzBpiN57H6KEc4p7AeiIR9ZtDXR8KD18ca56Dk1S6TuCWLbuYOdy0RwH36aduf4XqksWTbwwnKqaAFBc4DEmHk10vp+p30W5VC1WYdsPmMi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=DJiw+M/C; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com [209.85.208.69])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id EE20A3F171
+	for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 20:22:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1740687738;
+	bh=SiQZ4Rq+0GqJoxx2KQxyIG0Xut74ShpYg+ijgenLnUA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=DJiw+M/CxLKhynFB8DTFH1WZJmvu5NImLHgNrZeCj2oyaWrnhHH88bEdrhXAxIGsn
+	 cAfbUhsKRC+mi+Y+3PXryvAohOwd6ntLyPZlMbKX1wVzFIkmq+uBzyzOz8aQTAcko6
+	 kDMPzTv9FIWZK7R/VEa4Z0c+0rgw1TlT70SDL6BK+X0FxYeCoXJEgbOa42wnLNWMV4
+	 sTOPT/qdaOEVW1jhcP5SM8MLF69AS4V21JZDMBKGP7WTCOxuKMb2jlOATYljWhyS1X
+	 KwHSEolV9KYe5W+Gtk9kGaMIwjHV31xJkHQ5i8qN+IlANWQu7Gj18TygY3ArXcs9K0
+	 ruOmbl0tbu+hA==
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5daa661ec3dso1610651a12.3
+        for <kvm@vger.kernel.org>; Thu, 27 Feb 2025 12:22:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740686351; x=1741291151;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7USea8XaxoNKvSqn3loqpyLdXnwrQ2b2Ao0MsUJT9us=;
-        b=d3QJnrMclDq/2v5QOdouQTlhiiHbJPZP7aC47MIiIZ+yC+bp0ubJkE9OS5fE+8+w0X
-         vmm2W0vIj97WSOxd//oAPOntHCw++BU5a6cF0LBunKvivPo2+Lue/+wDGpPZMsUStOY0
-         p18oYeSlVpYBoreGHcKo/pn3BvnhdBb28sRHQFsPDqoPLGnI0HSlgB42eDpO7mmv0oPw
-         v+TWFy9CxuWPD4QKyhLM3+pA16N1NyS/MTI9xwHM+rh6uRIR4z7+oZSOus0zcV2j2Ufx
-         qEyxN3TeMYCrvwTIukkg0tQr70UCYqaXkb+/Qt9Ht4AzM1aj1P0wOW9ekh7fqxxTZKCX
-         dKjw==
-X-Forwarded-Encrypted: i=1; AJvYcCXChhwvXxZhvBfFwCb60mUxvmfpubL/RAV181XQwiIhXExAGxGswVgdmjlET57mxBx4T+8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTfzgpQs8YZA6h/qysl8y/tU+bj86aRaTuHswHW07dfbU6sd4J
-	9WpMv48VBKpB/lfIax43xeWxPB7Gnj98UCHdzRbqiHBAetSbDEFu2zSYssMbUnxKALPtGG9gkfn
-	TrA==
-X-Google-Smtp-Source: AGHT+IH5sjjj8akdTxMemVpnenPtHKR1xkFYxPK0klWVvtSn92S5gziRqma+L4+AdqY7Tk5eAbbNSDJYlOs=
-X-Received: from pjbov6.prod.google.com ([2002:a17:90b:2586:b0:2fa:a30a:3382])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3ec4:b0:2ee:d433:7c50
- with SMTP id 98e67ed59e1d1-2febabf19c9mr755977a91.23.1740686350876; Thu, 27
- Feb 2025 11:59:10 -0800 (PST)
-Date: Thu, 27 Feb 2025 11:59:09 -0800
-In-Reply-To: <20250227014858.3244505-3-seanjc@google.com>
+        d=1e100.net; s=20230601; t=1740687738; x=1741292538;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SiQZ4Rq+0GqJoxx2KQxyIG0Xut74ShpYg+ijgenLnUA=;
+        b=oB/ZdW3nGsxm7wi7wPDNKv1XwgaPNaWonnAjec929DlgPsOswdTNc/DO8nSIvOedmE
+         v3DvggEA2kaFNp7I+nCWFEUUkKN6u81dSPy5B3nUwLOHs+xaUBYk0xO6hz0trdDQ9QL8
+         lHFaMBGDs3TCgmrYB7jGjCWZZeKj07zObxBUSqswN2hwurJMiSQaGGvZEWGvsUY52fSJ
+         vf2HrNH9VRgB5NveF8/NAqTGJZ1UxyaOTCuUkEHaswzkxi9RoBLMSsI/eEMvl5f7DvJD
+         S1rVyF/awRr37iidKGdcvA3QAPNpqgRkQuQ7CoA6tgx6++NRpo5Ks2iqK83FMNLKSeOU
+         JoNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV+VQCASQiw/EqExDnNn74D1QrXth/8GyVLHn3NK7yiKGAfoR7QOnNdFQEgfG58l62UFqk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwfbDIORs8b+RyF3Fwnqd8KDIBKEsGbpiY14fou6Rr5r282j6b
+	S7Baa+vaNNi0OAitzBpsLuHnMuJch/+hgvl4TkH4ZOAk9lzyVq3X72qP7SNAGOABQG9UnJYuecK
+	5JSlQwThvjAfWIR7qslHcinCtTjDFwhsviNykTyEQKg0LVBLvrWP1lEMMszvpONGJpmrMOfVS+8
+	lWzpLYqWX4K88UI4nGMZyrGIAQi1j4o3MXOfgfER76
+X-Gm-Gg: ASbGnctbA/xOLjfq9gmFtJeF46Dffot2AUv59W2Zi1ckJvFFas/K6TEH9Xbv8L49CC6
+	LUoLLhdIaRUAkqcn82GK+WSkoZ1LQfh5qc2QAqAB39ZFpaK5JopBH498QLl/oHm7IxJelDRg=
+X-Received: by 2002:a05:6402:350f:b0:5e4:9348:72b4 with SMTP id 4fb4d7f45d1cf-5e4d6921bd4mr402491a12.0.1740687738515;
+        Thu, 27 Feb 2025 12:22:18 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHjN7GoLizYN8AYUswkeK50Pl1lF2BJudLqy3J78FpZbhUAfHe4ulxGizo03P2ZzrkYYxtjIXX1SIy4cdHOVZg=
+X-Received: by 2002:a05:6402:350f:b0:5e4:9348:72b4 with SMTP id
+ 4fb4d7f45d1cf-5e4d6921bd4mr402477a12.0.1740687738203; Thu, 27 Feb 2025
+ 12:22:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250227014858.3244505-1-seanjc@google.com> <20250227014858.3244505-3-seanjc@google.com>
-Message-ID: <Z8DEDSsFbQjcisqr@google.com>
-Subject: Re: [PATCH 2/7] x86, lib: Drop the unused return value from wbinvd_on_all_cpus()
-From: Sean Christopherson <seanjc@google.com>
-To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Zheyun Shen <szy0127@sjtu.edu.cn>, Tom Lendacky <thomas.lendacky@amd.com>, 
-	Kevin Loughlin <kevinloughlin@google.com>, Mingwei Zhang <mizhang@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20250218222209.1382449-1-alex.williamson@redhat.com>
+ <20250218222209.1382449-7-alex.williamson@redhat.com> <Z7UOEpgH5pdTBcJP@x1.local>
+ <20250218161407.6ae2b082.alex.williamson@redhat.com> <CAHTA-ua8mTgNkDs0g=_8gMyT1NkgZqCE0J7QjOU=+cmZ2xqd7Q@mail.gmail.com>
+ <20250219080808.0e22215c.alex.williamson@redhat.com> <CAHTA-ubiguHnrQQH7uML30LsVc+wk-b=zTCioVTs3368eWkmeg@mail.gmail.com>
+ <20250226105540.696a4b80.alex.williamson@redhat.com>
+In-Reply-To: <20250226105540.696a4b80.alex.williamson@redhat.com>
+From: Mitchell Augustin <mitchell.augustin@canonical.com>
+Date: Thu, 27 Feb 2025 14:22:07 -0600
+X-Gm-Features: AQ5f1JrZ1oPBmSEga4Ppqksx7nR2-OUM5LtfazwlWAiz0Eh4H51tt0_skrEMiXg
+Message-ID: <CAHTA-ubjxqs7Rh8ERXqFXCRAm7WoMMRQftSPLmrK61jra7+gYg@mail.gmail.com>
+Subject: Re: [PATCH v2 6/6] vfio/type1: Use mapping page mask for pfnmaps
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	clg@redhat.com, jgg@nvidia.com, willy@infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 26, 2025, Sean Christopherson wrote:
-> Drop wbinvd_on_all_cpus()'s return value; both the "real" version and the
-> stub always return '0', and none of the callers check the return.
+Thanks Alex, that's super helpful and makes sense to me now!
 
-Drat.  None of the callers _in my working tree_.  I only checked a sparse working
-tree and missed that the DRM code checks the return value.  Luckily, it's uninteresting
-code (and dead to boot).  I'll add a patch to drop the checks on the return value.
+-Mitchell
 
-drivers/gpu/drm/drm_cache.c:    if (wbinvd_on_all_cpus())
-drivers/gpu/drm/drm_cache.c-            pr_err("Timed out waiting for cache flush\n");
---
-drivers/gpu/drm/drm_cache.c:    if (wbinvd_on_all_cpus())
-drivers/gpu/drm/drm_cache.c-            pr_err("Timed out waiting for cache flush\n");
---
-drivers/gpu/drm/drm_cache.c:    if (wbinvd_on_all_cpus())
-drivers/gpu/drm/drm_cache.c-            pr_err("Timed out waiting for cache flush\n");
+On Wed, Feb 26, 2025 at 11:55=E2=80=AFAM Alex Williamson
+<alex.williamson@redhat.com> wrote:
+>
+> On Wed, 19 Feb 2025 14:32:35 -0600
+> Mitchell Augustin <mitchell.augustin@canonical.com> wrote:
+>
+> > > Thanks for the review and testing!
+> >
+> > Sure thing, thanks for the patch set!
+> >
+> > If you happen to have a few minutes, I'm struggling to understand the
+> > epfn computation and would appreciate some insight.
+>
+> Sorry, this slipped off my todo list for a few days.
+>
+> > My current understanding (very possibly incorrect):
+> > - epfn is intended to be the last page frame number that can be
+> > represented at the mapping level corresponding to addr_mask. (so, if
+> > addr_mask =3D=3D PUD_MASK, epfn would be the highest pfn still in PUD
+> > level).
+>
+> Actually epfn is the first pfn of the next addr_mask level page.  The
+> value in the parens (*pfn | (~addr_mask >> PAGE_SHIFT)) is the last pfn
+> within the same level page.  We could do it either way, it's just a
+> matter of where the +1 gets added.
+>
+> > - ret should be =3D=3D npages if all pfns in the requested vma are with=
+in
+> > the memory hierarchy level denoted by addr_mask. If npages is more
+> > than can be represented at that level, ret =3D=3D the max number of pag=
+e
+> > frames representable at addr_mask level.
+>
+> Yes.
+>
+> > - - (if the second case is true, that means we were not able to obtain
+> > all requested pages due to running out of PFNs at the current mapping
+> > level)
+>
+> vaddr_get_pfns() is called again if we haven't reached npage.
+> Specifically, from vfio_pin_pages_remote() we hit the added continue
+> under the !batch->size branch.  If the pfnmaps are fully PUD aligned,
+> we'll call vaddr_get_pfns() once per PUD_SIZE, vfio_pin_pages_remote()
+> will only return with the full requested npage value, and we'll only
+> call vfio_iommu_map() once.  The latter has always been true, the
+> difference is the number of times we iterate calling vaddr_get_pfns().
+>
+> > If the above is all correct, what is confusing me is where the "(*pfn)
+> > | " comes into this equation. If epfn is meant to be the last pfn
+> > representable at addr_mask level of the hierarchy, wouldn't that be
+> > represented by (~pgmask >> PAGE_SHIFT) alone?
+>
+> (~addr_mask >> PAGE_SHIFT) gives us the last pfn relative to zero.  We
+> want the last pfn relative to *pfn, therefore we OR in *pfn.  The OR
+> handles any offset that *pfn might have within the addr_mask page, so
+> this operation always provides the last pfn of the addr_mask page
+> relative to *pfn.  +1 because we want to calculate the number of pfns
+> until the next page.  Thanks,
+>
+> Alex
+>
+
+
+--=20
+Mitchell Augustin
+Software Engineer - Ubuntu Partner Engineering
 
