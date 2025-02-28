@@ -1,112 +1,105 @@
-Return-Path: <kvm+bounces-39747-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39748-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD9B6A49FE1
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 18:09:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E021A49FE0
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 18:09:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E3613BDC47
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 17:08:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28B00176706
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 17:09:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 637E327FE64;
-	Fri, 28 Feb 2025 17:07:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC65F280A5C;
+	Fri, 28 Feb 2025 17:07:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Nkk3OyNF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gXUAJKWi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03CC2276034
-	for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 17:07:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88CBB280A40
+	for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 17:07:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740762460; cv=none; b=sJZ2V6mzcxJYQFUREBuwNVevJWc3vKB22S9fnGaw0QDek1MZ5X21z2hvx7Ut7lmhSi8YbWpO9R6SgMxE0bbyLtiOGn88f5O8Jv8Z+EdDFEX/iOM7uS2JUXKI5KUR2bZyaoy4Ol8iFOI0XQNpmPjiziXGwr7jqvedtFOEBTQmqG4=
+	t=1740762470; cv=none; b=XAtXasJQLnmKrEiL5+UwD7gZuVO9o54XqMysH3570PhyXobqeUhFSSyolETs9hf8zJeBRRAXLou8N6tTX9PYM/frOBhl+7x1qn/FNFwazAMBAjeLxRQWqkSNRABQuTMtU8aM6HOS4PFFmgYljduwuAyBM5IuhkXBaUBcUbgHKtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740762460; c=relaxed/simple;
-	bh=E6bnhzdYglUEbw/3sjQWwWPsFClmseZJbB5AYtU15jM=;
+	s=arc-20240116; t=1740762470; c=relaxed/simple;
+	bh=0NfHbYhPhFL4xmc58hlP/iPcW1AfrhEYdXl85tc/9AQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VWumrBDA8q+VfRTyVMWCPry6fjfS9FB3A2BoLbxk0Gt7EV3gzvUowd2mhHWCwp3NQOvdSDzJ116CCS/eQSTRBlNg7DzFIYoEZXIcwKn950kakMhd0Hv+DiI4smKvk7VKtuTfqd+TyYPBM3GKRaxDIAZ/rnkB4JjLA132o85HPxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Nkk3OyNF; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=LIlv/ntums791wjd3ibj/1RQk2EOYJV9g8I3vpd6SHK+Lh8pupjcgewkUxzAki7kZvvD83eiGGbKdKM2bd8ADzLZ0F7fvYiVcin03Wx5Cu2nCuGGphJScaS4uAWP7yMJHAeVzbgGbP/U7Voc7v+8ur0HMoc1/cVClFMAcwFKw3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gXUAJKWi; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2236b6fb4a6so35234095ad.2
-        for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 09:07:38 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fec1f46678so2788583a91.1
+        for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 09:07:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740762458; x=1741367258; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PAnLPa0VRn2NfFWgX/vf88o4ksF29qjxwagnBjCzxlk=;
-        b=Nkk3OyNFIQUqzJFL1qlDe6WfYfYSMMYs+C0t5PVmlFtTTYYHGi1ipsDFERkc6wnPo2
-         9uJPeLBqlJSaD1CfLmkr0/ilS8j/1QH2eUWngT9zcZb1eqI7oml7/mpgVriG00zSgx3p
-         7DntxB7ANNZgrVwXQe0jdgc4PqA4Qlro8VTqKQcr93fkBYwGhsmzzdOHRg+Xuty2ie+5
-         qaiStu7HjyHh0abpnItImUn/CCQf0947ABYz1+tSi2YSFwO6ofaKXJKIqHoMqTcJC2wO
-         Iw/ILhpxoGa4dKyMljUyQvvlvLrPnColZdXDdVj5kLL0qQCiWbzqxrgjnL9qJ5LKRDyv
-         lj/g==
+        d=google.com; s=20230601; t=1740762468; x=1741367268; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wn9Wd0e1ZZG+jNEhSiMJWTR2pHzJGatUZGEsCpUKJdE=;
+        b=gXUAJKWiDUUOyknuLFQi/mUOp1yDUksas1mWHZ6527yXBg8Pt3El2lSuyYVVp2QSkd
+         G7jeB1E3vKGFOCpbMFfEq8R5cvs1Re1OozmGCRXO7qKv/o0TnI2YNrF1bWo4/+V7Kkeh
+         TT/2nGiMPW7tSSYAGw3fBR3+EoovOSNkeYxuqrLAKMFFGrinXO9LKIeTNqZ4vh8lKmiU
+         5y8jN4M9l6b96nNmBfl2Ovps9dv/46f/UFiXZufV2s7f2V4Khp4JtzWO3Q82Q8LVEChj
+         +FcjD7Wwucz0wxGbPj/ylgk0CpQk6ZM9OT2MdAoFO0leoRhOmhRcW82tLjHI+HMFEvMI
+         /bzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740762458; x=1741367258;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=PAnLPa0VRn2NfFWgX/vf88o4ksF29qjxwagnBjCzxlk=;
-        b=gU3v8rjLwTJOoJQOdoJFjcVn68Zc8LFCl82O7m6kUUGisnVfa6la7TO+MQa+mMHvrz
-         QmLcf5eMyjGrBniTm9s4EX/BCYXZGmOvPOQYZalCJEEyvmRvYt5Iu4HYk8r93om6E/S/
-         DZMw5yh4O6Pd4xBUJMftxlCHoJJPW6zV530Qufr5n87BX0+POvQ/zJLFMePlRJXmIGXI
-         xMthjZWiv6hk2mAryutWNqb9erVxzU+xjIlU7ei11TlbxUts51Hay4bB4iJOpfE51P5j
-         Joj4OsBhPQBOrpYTBPAqQ6tIEjuspHGyVqLhUDqjZIccWkiaW8xhqxU6EyJ71zEFM0sU
-         YmQA==
-X-Forwarded-Encrypted: i=1; AJvYcCX1TWS86jZT9jpUN8v4lplC2+7XD01ox7KCduof2JIe7ouiGW0nZT9RlgXdRArM9y2FB0g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YznJrwnYaZBArrgOyOEJ4gOi2Wcp+tetbcy3mHU+zgpLEDBxiyh
-	AtMy2kMh2o6QS6Swg0jga5B4GQ/yLX8hmnN117Quu/1bFEqPiM3Om7kDytdeTRbj16b2hJzzFJp
-	ifA==
-X-Google-Smtp-Source: AGHT+IFH9E/WNEfyobY199bM95DrwqzdXJMQ84WirnxX6jf0Cis+A+w0H4zAFNsKPYsxVMwclKIulMvp+8A=
-X-Received: from pfbei32.prod.google.com ([2002:a05:6a00:80e0:b0:730:8d2f:6eb1])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:21cc:b0:728:e906:e446
- with SMTP id d2e1a72fcca58-734ac4694c5mr8152593b3a.24.1740762458320; Fri, 28
- Feb 2025 09:07:38 -0800 (PST)
-Date: Fri, 28 Feb 2025 09:06:32 -0800
-In-Reply-To: <20250128124812.7324-1-manali.shukla@amd.com>
+        d=1e100.net; s=20230601; t=1740762468; x=1741367268;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wn9Wd0e1ZZG+jNEhSiMJWTR2pHzJGatUZGEsCpUKJdE=;
+        b=osg2crdot6v1sxuJmT0LHS/iEEc+Hg1SAh7P1wn7uMcNIW644o3Kh5bKMg+tQeVocV
+         7/Tp6Fv/sx7d9hrbfJLE98cO2Um0bw1e2bq7cU40SVf7ngd1YjcExo94yEXMdtzpCIic
+         q7DcRodtdJfivqG4M1vJkdVSuHYvodd4Bfol0rA2o2ojotNKRwwaYN4y7NRoWQ0mQs16
+         L0GrF7xWF+qRugwkBrzrFgUT7xar8U8ZlNaLutJSNsoeoe3O/GixxQQnr42NDOvRtX5g
+         /tX/DcIYH7RfdPkGIXHi+gChP/wTYMjT3yddX/X9g6ldhEY1K6n09gb/17M36VH+06SB
+         wQfw==
+X-Forwarded-Encrypted: i=1; AJvYcCVXbatgEwpCSPF5ExcjXhP1Egt77JWLWdWi4xK0W/O9pIlugO1Thf1cr87W+5ZTI2fd5cE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQMebcJCmH+RDILWaH9VSwfyFAEevGTK1lQpxgVmsXxAtKDqcP
+	lQ12T25yloLbavIb+YFRj83XlfqvnSwpQLn6/eKmPrY5TqYWFGa5fa1tdsQz8Sy6cqKReL8gmOa
+	OJg==
+X-Google-Smtp-Source: AGHT+IHCzzNosE8PrfJpy25JhjQdhCx8jziKT/hMLk27lARvaQgMu3AliD8Y8mk7rBFMgRqebNAAm68vYfQ=
+X-Received: from pjbeu14.prod.google.com ([2002:a17:90a:f94e:b0:2fc:2b96:2d4b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1d47:b0:2f4:432d:250d
+ with SMTP id 98e67ed59e1d1-2febab75deemr6114083a91.21.1740762467886; Fri, 28
+ Feb 2025 09:07:47 -0800 (PST)
+Date: Fri, 28 Feb 2025 09:06:34 -0800
+In-Reply-To: <20250124150539.69975-1-fgriffo@amazon.co.uk>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250128124812.7324-1-manali.shukla@amd.com>
+References: <20250124150539.69975-1-fgriffo@amazon.co.uk>
 X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <174052976390.2845556.13408799702754971344.b4-ty@google.com>
-Subject: Re: [PATCH v6 0/3] Add support for the Idle HLT intercept feature
+Message-ID: <174049620083.2628640.12510480368568809515.b4-ty@google.com>
+Subject: Re: [PATCH v2] KVM: x86: Update Xen TSC leaves during CPUID emulation
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Manali Shukla <manali.shukla@amd.com>
-Cc: pbonzini@redhat.com, shuah@kernel.org, nikunj@amd.com, 
-	thomas.lendacky@amd.com, vkuznets@redhat.com, bp@alien8.de, 
-	babu.moger@amd.com, neeraj.upadhyay@amd.com
+To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
+	Fred Griffoul <fgriffo@amazon.co.uk>
+Cc: griffoul@gmail.com, vkuznets@redhat.com, 
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, 28 Jan 2025 12:48:09 +0000, Manali Shukla wrote:
-> The upcoming new Idle HLT Intercept feature allows for the HLT
-> instruction execution by a vCPU to be intercepted by the hypervisor
-> only if there are no pending V_INTR and V_NMI events for the vCPU.
-> When the vCPU is expected to service the pending V_INTR and V_NMI
-> events, the Idle HLT intercept won=E2=80=99t trigger. The feature allows =
-the
-> hypervisor to determine if the vCPU is actually idle and reduces
-> wasteful VMEXITs.
->=20
+On Fri, 24 Jan 2025 15:05:39 +0000, Fred Griffoul wrote:
+> The Xen emulation in KVM modifies certain CPUID leaves to expose
+> TSC information to the guest.
+> 
+> Previously, these CPUID leaves were updated whenever guest time changed,
+> but this conflicts with KVM_SET_CPUID/KVM_SET_CPUID2 ioctls which reject
+> changes to CPUID entries on running vCPUs.
+> 
 > [...]
 
-Applied 1-2 to kvm-x86 svm (with the rewritten changelog).
+Applied to kvm-x86 xen, thanks!
 
-[1/3] x86/cpufeatures: Add CPUID feature bit for Idle HLT intercept
-      https://github.com/kvm-x86/linux/commit/70792aed1455
-[2/3] KVM: SVM: Add Idle HLT intercept support
-      https://github.com/kvm-x86/linux/commit/fa662c908073
-[3/3] KVM: selftests: Add self IPI HLT test
-      (no commit info)
+[1/1] KVM: x86: Update Xen TSC leaves during CPUID emulation
+      https://github.com/kvm-x86/linux/commit/a2b00f85d783
 
 --
 https://github.com/kvm-x86/linux/tree/next
