@@ -1,59 +1,61 @@
-Return-Path: <kvm+bounces-39755-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39756-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E58C4A4A11E
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 19:07:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9522FA4A121
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 19:07:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9A5E3B33CE
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 18:07:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF8073B9CF5
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 18:07:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E1D226E140;
-	Fri, 28 Feb 2025 18:07:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 462112702BF;
+	Fri, 28 Feb 2025 18:07:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="4QPPTwMh"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="V9XzMuHj"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2071.outbound.protection.outlook.com [40.107.94.71])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2074.outbound.protection.outlook.com [40.107.244.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E3C61A2554
-	for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 18:07:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F1641A2554
+	for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 18:07:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.74
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740766042; cv=fail; b=OBChYTXt1lrrhUghF0UCVCmA3HG0Z5yzIcp7hwbkg8GT4hwFsUcftZNsCKInHmFN7+Fn42OfdWmb9Dc+2e9kcFt3ue2hP+XuK4J+rfm7lRuaDSlQbhX6Ka3OdzoY6Wcl24YJfVUlX9PP+K8BCxyISYwQWVdCHI6hEXgJoCYAYsE=
+	t=1740766047; cv=fail; b=cK2r3vNR7/Q0GBrDbDSFJhsbf7+uT16K3cLiXpJNsh+lUB2linKRNzSotJKMqxhwg46idkdkJCY2x/K1nX2fr3zjb+HFlNI58WL9OdYUo4oaBAn/WV0/oSf36DMOdAITvQ+iiw4dDOshyTajTw1397IDHBUd6imStbCwpnuf4RA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740766042; c=relaxed/simple;
-	bh=RinmGsi/fGB63uZ0FDTgoVwigj3VeyxznOnFV0rl2Zk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HrS/T1GSQyV9gyvw8MxFmo0DzcdOAHhBMQb6nUtrC2EHtDt+B1ei4skaUeKiRI+FldoslqrT3Qh/1x78u4mvolK/L+zWsTcVS14tVQd9XaAqIAH3vtPQCyetPM6FIc1ZvrgSE/eJdFtO63w/5j6j0+Tc5YO3ZZjsJAGRVenFjwo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=4QPPTwMh; arc=fail smtp.client-ip=40.107.94.71
+	s=arc-20240116; t=1740766047; c=relaxed/simple;
+	bh=R8m38/2DhwmnzhpnuBu+5eBZkklYnlBplJxuXkYbv7A=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hTOBnRfEJDLLCGzmtdopTI3MzPBSrgg2s+vQGFevBLb5EQJG7d7+S5mB7Hsg/twRCQlBeT4zv0z78zurMJ4NalSL6zD7hs6L5avri+++dht3sqKS3FPVfNOM7tLwNlJnZSbYVYY9O/dxGj353Pg9Zo1fq2EO6icE17QQn0QPKv0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=V9XzMuHj; arc=fail smtp.client-ip=40.107.244.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LtIkAun8ppghMSZBYgNtXSCSxOUlKZzvcd5suou5E1hh1T8On/mk+Kf1S6cN3BKwaDHRrTjh5CyF1Hv/9vSJvKko1kZ9KDOjj23HH7f/UqbLW+/vPElE5mw8fAM77operLbnQVMd7lsT+RxnreGWFfYt9zuzm1LM3i2P3/lDFpyylVHBTYufjfG1qWDaQYTpAHXg/h4AkJRYJRezhOfs+yu4B3HOU4SGGC6eeo2Q3xDQ3u1nv2yKyZpieTI60/+RcX26m7t/hhZJi+KU2jwqimoVfC8rfk/6vzzEF4IMevm3lPOfha/8JnMo/DIeS0Ii/rInSzI87rky08qCX3j8Aw==
+ b=ZkLi4u+7k7FLBhehrr7Y/7Lk3+VHCrZ3GIjLFrevVashLBvDhTcQyTWlMkjeBi0J+OGAV/XOQc5QJ6UJ1yZhaLtdsIY4wrynSCZQlKvuIUvw6sZvpxQP+1ZEhdBCDvZkw+VL9q5ueBAsmAthTwyVKA7RFdavk61yZzK9KosNUbJKrws4YBNekTmE2zzUgFjoi8/aGPMnK9VnUKTDkwx6hsUq06zwKopooANVp9JaZpA3BbW7RoghL4tAqu3sdjAPa3q6A277xAFnKOZXORJCBFIa9ueLriS2Yf93oCkcyCZj2zIk5XbO4TlLHX90i1fjCe/JemYtTbvHRBf9tDeQrw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=K2FDTukXAiLBoFjos2fdqXuplt+kJ6XxKQQi10Sb2yc=;
- b=gMZ6zp7RBp8iUZ4iwHUppqVHxUkq/8dKaiyGV0gNlVvhyVBIl22X/KmhW9SahvtmGo8eSxos2yZCGq1TftrWe31pIPWT75ISKel8p+cLaCBCwkWwjbaxHu1v/hH/VlHUL0GMEXCOayGIiFBns49FuvboOk61780gWrYkTWodxkemh0HbUJ7Jxgs0VyRUdYfi+lMZ8+MwEoQ8ydRF8ecl1i09+tEGJxJQbiebkzPoY2E8AxJmeh246kch/9/nVp4Sc/WM0Iv+5hidej2FK8j29ljaMQM1GYcdl+bGjc4JLA2Cph/6MTcV+uN54EHLpRMgnwI9eNWuVk+GbPjACDrqIQ==
+ bh=aWn12FJGh/GHZYdIwhvqHLwqDpV8jfI8J1LlIkT28s0=;
+ b=CHwn94C+AA36KwuMI9dUROj3skPtLoDViyeKuIBcnIfHDpHp3Zf+wYHfrTWWcvjDECre+Vgs3/k5Clw3WyjZduZbsHP3RD1l+QCWbTNoeuKYmNpWs1rpdH1VGSMWoWKorkey9XOvaEPx9LY1Awhqi6sNJRs1Q0Ibd64D/3AOLtXivZV7+KJjCK0N1nH5ldBkj8tzLFw7UEGZkTGD3Vh382Jv7wPErBK6rG8hcs7uhGbIbn5fxypmHZc0Uf5x9PnPdl9QP7Uszk48iA24SOSU5gi3j13ZUv44NJoLmUwFMULrf66De8g6NRahlfFFedcLe4o5apzQpCxNcg04xnWhQg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=K2FDTukXAiLBoFjos2fdqXuplt+kJ6XxKQQi10Sb2yc=;
- b=4QPPTwMhAJIXFc+KyDL9WesiYTcmq4d8mReq4UqbOx+4weRVJ0OpcnE6yUttXpHC6jQrD/lkzq/Bf0ZD33oxbK/zeaxVHN3yk0ExGPDHxYReWlBhffEsXunKmye11paLrn83pyefJev0m12mPI2nsOe/ArGpHebkcDyMc17j4/s=
-Received: from DM6PR13CA0001.namprd13.prod.outlook.com (2603:10b6:5:bc::14) by
- CH3PR12MB8260.namprd12.prod.outlook.com (2603:10b6:610:12a::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8489.24; Fri, 28 Feb 2025 18:07:14 +0000
-Received: from CY4PEPF0000EE3B.namprd03.prod.outlook.com
- (2603:10b6:5:bc:cafe::2d) by DM6PR13CA0001.outlook.office365.com
- (2603:10b6:5:bc::14) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8511.9 via Frontend Transport; Fri,
- 28 Feb 2025 18:07:14 +0000
+ bh=aWn12FJGh/GHZYdIwhvqHLwqDpV8jfI8J1LlIkT28s0=;
+ b=V9XzMuHjw+AYC1uZWx/ubLTqvNHBJQRRM3dLZ4aP5Y2pxw34JZAMhrrLAO3BnqhrzSZacuBmY9r4/i55bsPv0Vo3wWNgWtBkfwn0IAxX/P5UGls7CaSCnwLrSsP5BzU5Lz88+wSftUFKip8o9kmZVA69Wr7JyyaHUZ9POnh7aX0=
+Received: from CYXPR03CA0034.namprd03.prod.outlook.com (2603:10b6:930:d2::9)
+ by DM4PR12MB6471.namprd12.prod.outlook.com (2603:10b6:8:ba::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.19; Fri, 28 Feb
+ 2025 18:07:21 +0000
+Received: from CY4PEPF0000EE3D.namprd03.prod.outlook.com
+ (2603:10b6:930:d2:cafe::6c) by CYXPR03CA0034.outlook.office365.com
+ (2603:10b6:930:d2::9) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8489.18 via Frontend Transport; Fri,
+ 28 Feb 2025 18:07:21 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -61,21 +63,23 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CY4PEPF0000EE3B.mail.protection.outlook.com (10.167.242.14) with Microsoft
+ CY4PEPF0000EE3D.mail.protection.outlook.com (10.167.242.15) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8489.16 via Frontend Transport; Fri, 28 Feb 2025 18:07:13 +0000
+ 15.20.8489.16 via Frontend Transport; Fri, 28 Feb 2025 18:07:21 +0000
 Received: from bmoger-ubuntu.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 28 Feb
- 2025 12:07:12 -0600
+ 2025 12:07:20 -0600
 From: Babu Moger <babu.moger@amd.com>
 To: <pbonzini@redhat.com>
 CC: <zhao1.liu@intel.com>, <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>,
 	<davydov-max@yandex-team.ru>
-Subject: [PATCH v6 0/6] target/i386: Update EPYC CPU models for Cache property, RAS, SVM feature and add EPYC-Turin CPU model
-Date: Fri, 28 Feb 2025 12:07:00 -0600
-Message-ID: <cover.1740766026.git.babu.moger@amd.com>
+Subject: [PATCH v6 1/6] target/i386: Update EPYC CPU model for Cache property, RAS, SVM feature bits
+Date: Fri, 28 Feb 2025 12:07:01 -0600
+Message-ID: <8ecfd8751d58811b18fd918a6d13e859217156d4.1740766026.git.babu.moger@amd.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <cover.1740766026.git.babu.moger@amd.com>
+References: <cover.1740766026.git.babu.moger@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,117 +92,178 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3B:EE_|CH3PR12MB8260:EE_
-X-MS-Office365-Filtering-Correlation-Id: b92545b9-11ad-4e97-d873-08dd5822baa7
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3D:EE_|DM4PR12MB6471:EE_
+X-MS-Office365-Filtering-Correlation-Id: cc1e641c-a97f-4c3f-9689-08dd5822bf2c
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024|13003099007;
+	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?sQDMR00maWUgzdwwvExg36jN/ZwhbinW/iCGYv2OLP/tUGnTPW8npNRAIe+Z?=
- =?us-ascii?Q?tzrCUC6DDC3UHF/83uCK+W9gc4otP01iRiRZ/wsMeA9EcFBNRGp5psqxCWHW?=
- =?us-ascii?Q?l0FAAa+NwKLR6I3n+OAMtD3mie8YKmhimZg7SPW0Mrry4qjcx5wOJJTMRDGP?=
- =?us-ascii?Q?DUtsI+wJ3xWMehXXaodzLMIOrWRYcLmKyNOGrWwOIjW7DPP5PDBYcy5aX3u1?=
- =?us-ascii?Q?29ZK3Ls98fPi7sOh5dYwJ2j2xXmS1aDaBWEFKpplYcQxmvZ1oQIrdD7N/p+C?=
- =?us-ascii?Q?DDPhF6GVC+wPrB+rKsJxlG445NJ1PpEYIGectTufBL/xFooQXbOv1KO0UvyG?=
- =?us-ascii?Q?rB7fZ/yDnbhzUhh376sllVlpgA/cNxrG9PaDWjnOmdbABzv2JwPzU/Pb0fOs?=
- =?us-ascii?Q?qT4JcvnVlyMSJL8e1iaD2DeHpI/v7b21Mu+Qo8BIWaFXxZsXA+F/MPGNYmY/?=
- =?us-ascii?Q?Tp5r7xktWz5WFsOcYDhwn8fdZDtmQvY/usga5AzC9lgyS7oQlstBmdT7rrWV?=
- =?us-ascii?Q?MKb8b0sUnjopVE0PMaUtTurn3hyLpZ+e/MJkT6Yl3pJ0vDcAqljoxpNVc8jd?=
- =?us-ascii?Q?9LsG/Qp41Y3SnH2tvNzX8TcnLGZ5hAUlbUBuadxd0gcrG2xsemj1Cf9XNn74?=
- =?us-ascii?Q?lkwEOhP9uNBv3VOjqGDSlsRMzeLfG1OiZ8T4qIE01QMBMzA9uyPPASeTwp3x?=
- =?us-ascii?Q?V55dPteocC+q4FmNuzmhj66KyAO4CQ/J2WLSq7jnYMsrS5cFgOtuZKw2C/ao?=
- =?us-ascii?Q?2ZmH7h48iMBAtpprzk2xdVdhYptKX6hCaB/Lw0tV6pJJNzUgaGomAlhVfmFn?=
- =?us-ascii?Q?XtaDF1qk7RokYkzP1BMItsKSS6qhwACkRq8oGKeeStMAwK4hUmgTR1tUkKgx?=
- =?us-ascii?Q?SirdxPKvwZKaFKMbOF6rB//pL7vSrdo1rh0ZGve4tFLlW1evj2NNFztQ+F7U?=
- =?us-ascii?Q?bIEDaV0TXiWV86tCJvwy+EWfhqy7pmjWjUDrO41TxGysBcS1dVUM2e5/uwnJ?=
- =?us-ascii?Q?1BSyDSbZGz68cQWcwoN7AUx2hTAxRsjQoyXQbMvFqppLpNg4MMj1lFFTq/NM?=
- =?us-ascii?Q?SyCX7f6CIZ0PHpQw8XriEixDEDw9klOeUfDln6LyCLQhhUsMmXGTvrnYSBHr?=
- =?us-ascii?Q?Kx6/OURBdXa2mk8wOTrJ5zmrgbdpKahEFaffDn3PuxJZLctDN7P8YL6kuQE7?=
- =?us-ascii?Q?0HMQcGqhgH+AQzC2EFpe4UwZOQgbmQSa9B+VAqrCkeiCyYxJ97NNMgdGQghW?=
- =?us-ascii?Q?5qIxO6QjJPxXrP/wcdlUc1HuhUDdwcj17Q55Lv5+Vkw/IAQq9SEftjAwrg6s?=
- =?us-ascii?Q?j6iyr5f4kLu+fWEaEEtxER1PZHF3taWNohBxtsWzkOVT5AMUwYmH41b5gGiw?=
- =?us-ascii?Q?DIoHjUALQYleUEtY6qnFhXbIVl4hJVTyz/DYpyCtSKjfTxbEfl/vUJQyhalC?=
- =?us-ascii?Q?dmfF8vzB5wb5Z0357JYvykws8IMTiRaT?=
+	=?us-ascii?Q?rjbpuf/LTvXdQbaoP/hNPrW4ctJMcv//7aa/f8/rz9Y0bIvUZhP2CsdIvy/+?=
+ =?us-ascii?Q?Fh7zjGg5sf0ggMkUtqILZftSPMXjiVF+5BiHmDpI70jCUH+kRL7rQmPKjAsx?=
+ =?us-ascii?Q?0pYf59rN0gE4arJ3Cq4A3vV2BQVQNBRhUMMiQb+VTmO+/OpmHwckwkfQcTHO?=
+ =?us-ascii?Q?9B8D5GZ1fRl2LauJxFBAcEevkVgxzRL5wjhFTnS1jAzpDyog07u6PwQ/8Y8c?=
+ =?us-ascii?Q?6WoFyOS4KVJkkcr/CnpCo4jSRL+fD2AhiIkHsSEWJarBGW8GXX90Dhn8LwG/?=
+ =?us-ascii?Q?uDPpQ/+UCoObMMy+9c5D5sNKZPpvG6vsYn4464HDvdlkn1gUe2upxSSmXFpU?=
+ =?us-ascii?Q?LfrT+/+0JQi6aG3Y0SpCJsH6AxCQ0QpLsBQP6KPyecJ/9o38ZQ/wceVo7AJD?=
+ =?us-ascii?Q?0nF2VGvfEJpy6czArMJSG42plWamYBPKXoFEnmnQvDYByuQSmKo1buPIYBhA?=
+ =?us-ascii?Q?MKfUM7H5Mvk9/V/UNRlYJpCcIs+d/ZuAcEEN/4P7DCJt1xbeCOf6/qa+OO2A?=
+ =?us-ascii?Q?cIeHKBjtap8Nhf6XfAxkL+eaikM/vAUWE4WboFpDOS33llroO1ZSRkWxb65T?=
+ =?us-ascii?Q?sTgO6rOY2j5ySpCDM6Gp271uSYsy032jryehEtyYZNOgZN20ElgleyLGcb9R?=
+ =?us-ascii?Q?zB5bcNwCaYNjHlt3JRdbChJAaXtNsWjnRUwweewtCmn4HF80ORzz9LqGsw9X?=
+ =?us-ascii?Q?DD0PYiquF6a+HoczUt+5ICByvYF47L5Fjs2pzHnVGnLh4bcIrMiFubgXewyJ?=
+ =?us-ascii?Q?Lh1zdFxrLXlZzvRJNNheyS5HzKCAYh/ZI5CFpcMzTGBEV8bQp/sm2bOBTS7h?=
+ =?us-ascii?Q?Qqz38W+DfcnFPF1HhEQMMjOw+MIQuxZYExeETFBlfJBzmDfmjhY1ZATHKK8/?=
+ =?us-ascii?Q?j0rg1rIHwICcEiqi+VxixD60KurzMLaoNWFLSwMF/72oRsSWmZ7br/qZKRhS?=
+ =?us-ascii?Q?o9Q7p/xG21q0ys9Zj1DPE5NQMJZB9ZpbY/eujnk2SDtBi8FVUDYp0KEgOhuk?=
+ =?us-ascii?Q?fHv6DfNcDlF6cThbvxK/7/XwYoxji9g7LKna6tK09f5T+0GjxdA4rrZq7oIc?=
+ =?us-ascii?Q?UlvW/0oFXQ399kHUuHAPwTWSGkCU5nO2cjD8F5MiTTmO5oHZHELpmrX6Gs7A?=
+ =?us-ascii?Q?U1xeK6+amOsF6vBZsL2WhIyFAPq8R3rMFXGeelznebKS0q9+NSEhDdbOawmz?=
+ =?us-ascii?Q?niqZvl2TjTpUqU/bBnw2orJ2Yo0TsxiNKBvzo52E5NhYvA7U4PoW2yoesz09?=
+ =?us-ascii?Q?z5a+DDvr3LCT5LpJp2xMyYu9HQBL99Rd8bd7vlzpKH+Qe/cZJYq7fW2U7FFs?=
+ =?us-ascii?Q?6R3tDgJLRm0caB0BJa0LyjZcf63a7Qw/4h2TjL/vLt+AhZonRbcdBoD2TDyW?=
+ =?us-ascii?Q?s8Glhbbj5ChufHX11rxKW934S4g5YLoi0eAs6HqCQMGJQx1UcL3FWeHxyFG2?=
+ =?us-ascii?Q?+T0raE5HBu3Bpsxej8UGPcVBw3/Epyhrt5iSQBCq3LDilDIzxf53ivi7zAj3?=
+ =?us-ascii?Q?oMVGlXgoMyDmQV8=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024)(13003099007);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Feb 2025 18:07:13.8610
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Feb 2025 18:07:21.4418
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b92545b9-11ad-4e97-d873-08dd5822baa7
+X-MS-Exchange-CrossTenant-Network-Message-Id: cc1e641c-a97f-4c3f-9689-08dd5822bf2c
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE3B.namprd03.prod.outlook.com
+	CY4PEPF0000EE3D.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8260
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6471
 
+Found that some of the cache properties are not set correctly for EPYC models.
 
-Following changes are implemented in this series.
+l1d_cache.no_invd_sharing should not be true.
+l1i_cache.no_invd_sharing should not be true.
 
-1. Fixed the cache(L2,L3) property details in all the EPYC models.
-2. Add RAS feature bits (SUCCOR, McaOverflowRecov) on all EPYC models
-3. Add missing SVM feature bits required for nested guests on all EPYC models
-4. Add the missing feature bit fs-gs-base-ns(WRMSR to {FS,GS,KERNEL_G}S_BASE is
-   non-serializing). This bit is added in EPYC-Genoa and EPYC-Turin models.
-5. Add RAS, SVM, fs-gs-base-ns and perfmon-v2 on EPYC-Genoa and EPYC-Turin models.
-6. Add support for EPYC-Turin. 
-   (Add all the above feature bits and few additional bits movdiri, movdir64b,
-    avx512-vp2intersect, avx-vnni, sbpb, ibpb-brtype, srso-user-kernel-no).
+L2.self_init should be true.
+L2.inclusive should be true.
 
-Link: https://www.amd.com/content/dam/amd/en/documents/epyc-technical-docs/programmer-references/57238.zip
-Link: https://www.amd.com/content/dam/amd/en/documents/corporate/cr/speculative-return-stack-overflow-whitepaper.pdf
+L3.inclusive should not be true.
+L3.no_invd_sharing should be true.
+
+Fix the cache properties.
+
+Also add the missing RAS and SVM features bits on AMD
+EPYC CPU models. The SVM feature bits are used in nested guests.
+
+succor		: Software uncorrectable error containment and recovery capability.
+overflow-recov	: MCA overflow recovery support.
+lbrv		: LBR virtualization
+tsc-scale	: MSR based TSC rate control
+vmcb-clean	: VMCB clean bits
+flushbyasid	: Flush by ASID
+pause-filter	: Pause intercept filter
+pfthreshold	: PAUSE filter threshold
+v-vmsave-vmload	: Virtualized VMLOAD and VMSAVE
+vgif		: Virtualized GIF
+
+Signed-off-by: Babu Moger <babu.moger@amd.com>
+Reviewed-by: Maksim Davydov <davydov-max@yandex-team.ru>
+Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
 ---
-v6: Initialized the boolean feature bits to true where applicable.
-    Added Reviewed-by tag from Zhao.
+ target/i386/cpu.c | 73 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 73 insertions(+)
 
-v5: Add EPYC-Turin CPU model
-    Dropped ERAPS and RAPSIZE bits from EPYC-Turin models as kernel support for
-    these bits are not done yet. Users can still use the options +eraps,+rapsize
-    to test these featers.
-    Add Reviewed-by tag from Maksim for the patches already reviewed.
-
-v4: Some of the patches in v3 are already merged. Posting the rest of the patches.
-    Dropped EPYC-Turin model for now. Will post them later.
-    Added SVM feature bit as discussed in
-    https://lore.kernel.org/kvm/b4b7abae-669a-4a86-81d3-d1f677a82929@redhat.com/
-    Fixed the cache property details as discussed in
-    https://lore.kernel.org/kvm/20230504205313.225073-8-babu.moger@amd.com/
-    Thanks to Maksim and Paolo for their feedback.
-
-v3: Added SBPB, IBPB_BRTYPE, SRSO_USER_KERNEL_NO, ERAPS and RAPSIZE bits
-    to EPYC-Turin.
-    Added new patch(1) to fix a minor typo.
-
-v2: Fixed couple of typos.
-    Added Reviewed-by tag from Zhao.
-    Rebased on top of 6d00c6f98256 ("Merge tag 'for-upstream' of https://repo.or.cz/qemu/kevin into staging")
-
-Previous revisions:
-v5: https://lore.kernel.org/kvm/cover.1738869208.git.babu.moger@amd.com/
-v4: https://lore.kernel.org/kvm/cover.1731616198.git.babu.moger@amd.com/
-v3: https://lore.kernel.org/kvm/cover.1729807947.git.babu.moger@amd.com/
-v2: https://lore.kernel.org/kvm/cover.1723068946.git.babu.moger@amd.com/
-v1: https://lore.kernel.org/qemu-devel/cover.1718218999.git.babu.moger@amd.com/
-
-Babu Moger (6):
-  target/i386: Update EPYC CPU model for Cache property, RAS, SVM
-    feature bits
-  target/i386: Update EPYC-Rome CPU model for Cache property, RAS, SVM
-    feature bits
-  target/i386: Update EPYC-Milan CPU model for Cache property, RAS, SVM
-    feature bits
-  target/i386: Add feature that indicates WRMSR to BASE reg is
-    non-serializing
-  target/i386: Update EPYC-Genoa for Cache property, perfmon-v2, RAS and
-    SVM feature bits
-  target/i386: Add support for EPYC-Turin model
-
- target/i386/cpu.c | 437 +++++++++++++++++++++++++++++++++++++++++++++-
- target/i386/cpu.h |   2 +
- 2 files changed, 438 insertions(+), 1 deletion(-)
-
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 72ab147e85..7908b90b77 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -2180,6 +2180,60 @@ static CPUCaches epyc_v4_cache_info = {
+     },
+ };
+ 
++static CPUCaches epyc_v5_cache_info = {
++    .l1d_cache = &(CPUCacheInfo) {
++        .type = DATA_CACHE,
++        .level = 1,
++        .size = 32 * KiB,
++        .line_size = 64,
++        .associativity = 8,
++        .partitions = 1,
++        .sets = 64,
++        .lines_per_tag = 1,
++        .self_init = true,
++        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
++    },
++    .l1i_cache = &(CPUCacheInfo) {
++        .type = INSTRUCTION_CACHE,
++        .level = 1,
++        .size = 64 * KiB,
++        .line_size = 64,
++        .associativity = 4,
++        .partitions = 1,
++        .sets = 256,
++        .lines_per_tag = 1,
++        .self_init = true,
++        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
++    },
++    .l2_cache = &(CPUCacheInfo) {
++        .type = UNIFIED_CACHE,
++        .level = 2,
++        .size = 512 * KiB,
++        .line_size = 64,
++        .associativity = 8,
++        .partitions = 1,
++        .sets = 1024,
++        .lines_per_tag = 1,
++        .self_init = true,
++        .inclusive = true,
++        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
++    },
++    .l3_cache = &(CPUCacheInfo) {
++        .type = UNIFIED_CACHE,
++        .level = 3,
++        .size = 8 * MiB,
++        .line_size = 64,
++        .associativity = 16,
++        .partitions = 1,
++        .sets = 8192,
++        .lines_per_tag = 1,
++        .self_init = true,
++        .no_invd_sharing = true,
++        .complex_indexing = false,
++        .share_level = CPU_TOPOLOGY_LEVEL_DIE,
++    },
++};
++
+ static const CPUCaches epyc_rome_cache_info = {
+     .l1d_cache = &(CPUCacheInfo) {
+         .type = DATA_CACHE,
+@@ -5207,6 +5261,25 @@ static const X86CPUDefinition builtin_x86_defs[] = {
+                 },
+                 .cache_info = &epyc_v4_cache_info
+             },
++            {
++                .version = 5,
++                .props = (PropValue[]) {
++                    { "overflow-recov", "on" },
++                    { "succor", "on" },
++                    { "lbrv", "on" },
++                    { "tsc-scale", "on" },
++                    { "vmcb-clean", "on" },
++                    { "flushbyasid", "on" },
++                    { "pause-filter", "on" },
++                    { "pfthreshold", "on" },
++                    { "v-vmsave-vmload", "on" },
++                    { "vgif", "on" },
++                    { "model-id",
++                      "AMD EPYC-v5 Processor" },
++                    { /* end of list */ }
++                },
++                .cache_info = &epyc_v5_cache_info
++            },
+             { /* end of list */ }
+         }
+     },
 -- 
 2.34.1
 
