@@ -1,111 +1,175 @@
-Return-Path: <kvm+bounces-39749-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39750-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17B9FA49FE9
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 18:10:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E4037A4A036
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 18:22:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F5471892A2B
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 17:09:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB43B1898ABB
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 17:23:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25E23189B84;
-	Fri, 28 Feb 2025 17:07:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E83BB17B50F;
+	Fri, 28 Feb 2025 17:22:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LQ1WDW3e"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0vRvbFFR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A40D1281351
-	for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 17:07:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89F301F4C83
+	for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 17:22:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740762474; cv=none; b=LHyho1wBgTyATi1IVHPyaOcPV2JDTEHiX4JBrib3WRqwMaDxnPr4oefSH134E+FGOdUASk7tEb+1likCLXJMkLuTzPAJP3GZj+pWzaIA5QlKhD3VBMgqlulsM9F0CqQ/yh2vKT+UW/s7rMsExHltIH0zLi1RXj29FEpsqL+/aug=
+	t=1740763372; cv=none; b=u90AE/BbVTPoN7xblI+lkTwWi+1DdnQH1L5ScORz+L9oqJXUOE0fzq+EuRYJyycZTl+ltq/KPX47P5hAWiQPeznWj2Yy3zwHXoSH5m2XXnmXOAMJIizdHrulwXZuopXbpzNTSvkHo2ScrTHJvibpAgeD0HjFZxxjp7elIut5wR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740762474; c=relaxed/simple;
-	bh=xVmIBS8Yry96LzqfMn80N8uQNorpC8OE2/uVu9ohjIs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GxlpJjZ3Z8Jf/tZWAyUHECBcdPTTHlPip+br1D9hRUk6iV1fNRXH5E6ooXDpaexTB3nHVxptmmX6wJ6O9nTn1ISEU4WU1DH4c5EMnl9N68RRSZKWmldfp3Gr6IG+YFOWfuB4ogYclLwfOso4PDnKC8X7RMtdOCcZmOKzbHEdU5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LQ1WDW3e; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1740763372; c=relaxed/simple;
+	bh=/EptXUak4oIDKFwY+d4BF8vrIOm7ZPyHAOn/R5h71TM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=C3sbjWXcGM0YNcHET8dySdACKJqcnpGR/54rA0TfueLrrd2jboOh2ajrF0OQiXnrg5jXspzoG6qIvuVN0iKg/eBEbUEAvMJPqDN4z6+TNyrwoIyWW0eKNyNWRYK/l5ciC1RA/oAanZZ0160p2tE/BfoPcP3Me4n1cAc6w1ERJKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0vRvbFFR; arc=none smtp.client-ip=209.85.160.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2feb47c6757so3096902a91.3
-        for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 09:07:52 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-471fa3b19bcso317091cf.0
+        for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 09:22:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740762472; x=1741367272; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=M2oG6zshz8nl2FBqsuMKiFucOLA6s8CVVHZchlrSE30=;
-        b=LQ1WDW3eTV8sgDqKB7tKT+rAtXMcbxCbuey4CGjycUgthkgR+IVq21tee/osV0rXEk
-         zB0pOLnGy8YSEFQ2F73H3cMArPaG3b8N9gEFz9dmGAu5lteWqi3I3XdE8bgc7uUPJvb4
-         /8FfE8Id8CKYu0OXuBDRpafgqgrVbWPBmOf//ZjSg4HK5uDaoqXSVxvqTvK9kLCAXDYK
-         +xSiYeEDygojoevS/5viPvGyY6XbKvtQHofpVudpu+xHKPekiaFE5sQSc35EjiB9gp8g
-         EcvhJRzQn3MIi7xYIQuF4sXy25ITL0aNY4m0y3Fed+vPgUxD9es+bnbEZpI8VbDwuOXS
-         XyzA==
+        d=google.com; s=20230601; t=1740763369; x=1741368169; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=G/a2UWjgQkqdTI5HsTvQ71onwZTMNWEb7HeWzmw5uT4=;
+        b=0vRvbFFRTajaAJ6kqZCh9pda+Oul3iyMpTlIpgvK6P5DMOnN+pRWPKQOBkbyNbJKb3
+         ThKzDD6M4Z0Hc8CVPJLgyCGmzkWQMs634YU1bi1gNJLOaRQCN5NSW73P96wiSUrneec3
+         iFTrxbFX4Xkmjx5N8OPj79xYF6GfsIQRWHHfPocjOb7DlgdnYAhPscY1E6eq9GeiDCVt
+         CpHapHebITOhVs8bcOx+y11FdpRN+q//DFrPFjTSSf52tVb/JnErCYcib+d9K8+sJTKb
+         oBY6WmNhb1PsVKAXw+hfzuGiHsMXW2f/XSXyQuRIWHLNt0pftck82Dm+Rvc572MGh875
+         B80Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740762472; x=1741367272;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=M2oG6zshz8nl2FBqsuMKiFucOLA6s8CVVHZchlrSE30=;
-        b=jtUwkpuCL1ugX7Dd2hDtLkAchBFmEBvbMGX0OFxlFySxxzMLI4eWpzxlbUy7C/mI8f
-         lF2DAlzJhSXvDdYl7gyLX3a59mnmJjQZ5ZeB6DKDjPHPLtuGRkKASR0xRjg2mehyjUB1
-         zjhw4jqGL4FMHZrDjbADZL2gJuJCzOIplmGuJHc2ZMK/nvDbGPrpxNKRtFuRX5+UHNvd
-         +FyNA2/8FvdmGM8TpudY+SkCSfbkyJObmEtR8r0hL9A98RsQwT20+SmvKZCSD9Ub3Yjj
-         SLiPdxsdQRu3p60YPGdM/nWnDgrDPTAGzKRlAnIDf1kS9AG5NldmO37NIht8ZYKg3BJW
-         WOXQ==
-X-Gm-Message-State: AOJu0YwsVN51LzrNXixJX/O013tJmEJA5XiuXEm/N7vohKWRTmd88ui6
-	iGrDvRpW4owBuC8hrj7bCX1bYpQCvqfMXyReqkiyozjswJ4dncW5WPzFoZZFk4ox5qVN/FFTJ2Q
-	DgA==
-X-Google-Smtp-Source: AGHT+IHxClS6Ov3N4mC2MOcBG8aooiB2l2G7Lim0GoLHj9tgAux8JsYTBZ13NlJ8w5b4r1UNpjTKlpoUIVg=
-X-Received: from pjg7.prod.google.com ([2002:a17:90b:3f47:b0:2f8:49ad:406c])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1ccb:b0:2fe:b470:dde4
- with SMTP id 98e67ed59e1d1-2febab3c659mr7943858a91.12.1740762472274; Fri, 28
- Feb 2025 09:07:52 -0800 (PST)
-Date: Fri, 28 Feb 2025 09:06:36 -0800
-In-Reply-To: <20250215011437.1203084-1-seanjc@google.com>
+        d=1e100.net; s=20230601; t=1740763369; x=1741368169;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=G/a2UWjgQkqdTI5HsTvQ71onwZTMNWEb7HeWzmw5uT4=;
+        b=uhvHKZdCmxiYVHoNTBwkO0elToCQrdS5Ca07LQ6nC+xb4OQY1P9Rzm/RolUObMwXBN
+         +bnD0XdwNYE1pHqTpu/6FERLC+PDgKlDzlguCFOCat07Qm+B2J0aVop+ZtY20xX1IsUw
+         Tz4yowRA4rMYPbBsIyZog1oBwlgeECETOhhr+AwNFpHrNduHaAvbmmppd+zW/l+b/U74
+         BwAkqyUlu5BYnSh7bED+xR5lcWb841iFimONY0aEmZ4h9Q17NxG0ag1sevPhVpEHl/kn
+         jn1dz9b5Xm5NGHjEcLyQP0LTKdpkaSJUUSG/zHNB3XVlsiCJ6HzzsGmqDIkncbT6EydD
+         /y1A==
+X-Gm-Message-State: AOJu0YxfkH6GCcIFpTbZjNZJ70qqtQBRimGAmJd1RZiERViXxXig0h2S
+	T0wbOLotBmM96Lq/kU2ZKJJQFHtnhxSk6Lm4EyBGpg/TvJAJKaQk+5HACTzW9a02UDOc/HmjPQX
+	twoHgkX1xPpfm/0gTBiM1Af1lEvJwo9ss+y7UR2Ap0Bi4CQPtoQ==
+X-Gm-Gg: ASbGncvj3GXTbED1jPisHEXZLnIu2kenzSa/m9sGvvTGYXyEF1S8nHrRp6mTQ9PiLQj
+	vuEQlNyeTdqWdFad1OmqRCPMfbR0JUSTIJxPQ+mjtEK/TpQ+Do2RIaeyl6i/HKnZw9Ur+yf9/+z
+	09Fic=
+X-Google-Smtp-Source: AGHT+IGNihhgUrLxmnJiX8xoYuYEMEiLXOH8BXsKbEk/ejEZR6+wx/qspqpTF/usmPvMS/jdjbhGGnmO2UD7DWsi/6M=
+X-Received: by 2002:a05:622a:54f:b0:471:939c:a304 with SMTP id
+ d75a77b69052e-474bc08cbd6mr4750931cf.8.1740763369149; Fri, 28 Feb 2025
+ 09:22:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250215011437.1203084-1-seanjc@google.com>
-X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <174041641314.2341854.17309269285047570958.b4-ty@google.com>
-Subject: Re: [PATCH v2 0/5] KVM: x86/xen: Restrict hypercall MSR index
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Joao Martins <joao.m.martins@oracle.com>, David Woodhouse <dwmw@amazon.co.uk>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+References: <20250218172500.807733-1-tabba@google.com> <20250218172500.807733-5-tabba@google.com>
+ <Z8HjG9WlE3Djouko@x1.local>
+In-Reply-To: <Z8HjG9WlE3Djouko@x1.local>
+From: Fuad Tabba <tabba@google.com>
+Date: Fri, 28 Feb 2025 09:22:12 -0800
+X-Gm-Features: AQ5f1JpBi7_Gh4he9ov3als6nZxEfCC0aiYVThqoBIKa6XINpRRls12Z7Yy9QT4
+Message-ID: <CA+EHjTy60QBnJtMeZsVjOypZxUm5KW0r-Hm6_bEN7On0MLmxjw@mail.gmail.com>
+Subject: Re: [PATCH v4 04/10] KVM: guest_memfd: Add KVM capability to check if
+ guest_memfd is shared
+To: Peter Xu <peterx@redhat.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 14 Feb 2025 17:14:32 -0800, Sean Christopherson wrote:
-> Harden KVM against goofy userspace by restricting the Xen hypercall MSR
-> index to the de facto standard synthetic range, 0x40000000 - 0x4fffffff.
-> This obviously has the potential to break userspace, but I'm fairly confident
-> it'll be fine (knock wood), and doing nothing is not an option as letting
-> userspace redirect any WRMSR is at best completely broken.
-> 
-> Patches 2-5 are tangentially related cleanups.
-> 
-> [...]
+Hi Peter,
 
-Applied to kvm-x86 xen, with the docs change.  Thanks for the reviews!
+On Fri, 28 Feb 2025 at 08:24, Peter Xu <peterx@redhat.com> wrote:
+>
+> On Tue, Feb 18, 2025 at 05:24:54PM +0000, Fuad Tabba wrote:
+> > Add the KVM capability KVM_CAP_GMEM_SHARED_MEM, which indicates
+> > that the VM supports shared memory in guest_memfd, or that the
+> > host can create VMs that support shared memory. Supporting shared
+> > memory implies that memory can be mapped when shared with the
+> > host.
+> >
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  include/uapi/linux/kvm.h | 1 +
+> >  virt/kvm/kvm_main.c      | 4 ++++
+> >  2 files changed, 5 insertions(+)
+> >
+> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > index 45e6d8fca9b9..117937a895da 100644
+> > --- a/include/uapi/linux/kvm.h
+> > +++ b/include/uapi/linux/kvm.h
+> > @@ -929,6 +929,7 @@ struct kvm_enable_cap {
+> >  #define KVM_CAP_PRE_FAULT_MEMORY 236
+> >  #define KVM_CAP_X86_APIC_BUS_CYCLES_NS 237
+> >  #define KVM_CAP_X86_GUEST_MODE 238
+> > +#define KVM_CAP_GMEM_SHARED_MEM 239
+>
+> I think SHARED_MEM is ok.  Said that, to me the use case in this series is
+> more about "in-place" rather than "shared".
+>
+> In comparison, what I'm recently looking at is a "more" shared mode of
+> guest-memfd where it works almost like memfd.  So all pages will be shared
+> there.
+>
+> That helps me e.g. for the N:1 kvm binding issue I mentioned in another
+> email (in one of my relies in previous version), in which case I want to
+> enable gmemfd folios to be mapped more than once in a process.
+>
+> That'll work there as long as it's fully shared, because all things can be
+> registered in the old VA way, then there's no need to have N:1 restriction.
+> IOW, gmemfd will still rely on mmu notifier for tearing downs, and the
+> gmem->bindings will always be empty.
+>
+> So if this one would be called "in-place", then I'll have my use case as
+> "shared".
 
-[1/5] KVM: x86/xen: Restrict hypercall MSR to unofficial synthetic range
-      https://github.com/kvm-x86/linux/commit/5c17848134ab
-[2/5] KVM: x86/xen: Add an #ifdef'd helper to detect writes to Xen MSR
-      https://github.com/kvm-x86/linux/commit/bb0978d95a55
-[3/5] KVM: x86/xen: Consult kvm_xen_enabled when checking for Xen MSR writes
-      https://github.com/kvm-x86/linux/commit/a5d7700af6b0
-[4/5] KVM: x86/xen: Bury xen_hvm_config behind CONFIG_KVM_XEN=y
-      https://github.com/kvm-x86/linux/commit/69e5a7dde965
-[5/5] KVM: x86/xen: Move kvm_xen_hvm_config field into kvm_xen
-      https://github.com/kvm-x86/linux/commit/26e228ec1695
+I understand what you mean. The naming here is to be consistent with
+the rest of the series. I don't really have a strong opinion. It means
+SHARED_IN_PLACE, but then that would be a mouthful. :)
 
---
-https://github.com/kvm-x86/linux/tree/next
+> I don't want to add any burden to your series, I think I can still make
+> that one "shared-full"..  So it's more of a pure comment just in case you
+> also think "in-place" suites more, or any name you think can identify
+> "in-place conversions" use case and "complete sharable" use cases.
+>
+> Please also feel free to copy me for newer posts.  I'd be more than happy
+> to know when gmemfd will have a basic fault() function.
+
+I definitely will. Thanks for your comments.
+
+Cheers,
+/fuad
+
+> Thanks,
+>
+> --
+> Peter Xu
+>
 
