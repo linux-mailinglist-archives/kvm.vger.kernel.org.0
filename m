@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-39682-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39683-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 472E9A494C4
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 10:23:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAF9FA494CC
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 10:24:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 234DD3B4F3D
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 09:22:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEF271706BB
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 09:24:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2376C255E54;
-	Fri, 28 Feb 2025 09:23:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2641C2561D6;
+	Fri, 28 Feb 2025 09:24:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="zr1J+j1R"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="rFT/Xnak"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2053.outbound.protection.outlook.com [40.107.92.53])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2069.outbound.protection.outlook.com [40.107.237.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC1B6276D3B;
-	Fri, 28 Feb 2025 09:22:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C88001F30A2;
+	Fri, 28 Feb 2025 09:24:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.69
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740734579; cv=fail; b=s6HDXv6OHRbrqFvLPlChiiEPi9FglQV6kV6DhFIaJTaEYsZhq3DinngreK58k6G3eYYSKYURWLfoyn6B21G70FjRqswZORLUbGVRcaDc7LHEwXLmJrGTr6Qy3CQ8XkJfOk0XpLw1FRC8a2bT+rQ0gAuHNHtg/tt+FrPimWb2ZmY=
+	t=1740734660; cv=fail; b=mCYdE3da4PT75EYcP7UQuJIHKc7G79/ydvihhqAsVWIurx97bI1kiCPJ9I5YJAe2Smiv6Nwx2BLO5L4Hb4dI0YxFQcNg8DEOX6W++/DFbgiH4hrtBeJ7fP8CpXb3rXy1DErEZF02sNrDreswuvSw0f/6FPZndC/zByjczj2skXc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740734579; c=relaxed/simple;
-	bh=y2yK87GmOElZx7YoojZ0MU/vatdks/OAxnvGNc+M38Q=;
+	s=arc-20240116; t=1740734660; c=relaxed/simple;
+	bh=9/yMUVH5TQ/upWkNMs/2IAvZC0DDU/TRk6LT3FBipB0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e6UVD/sw4P6vcWoDk7icmKFRWjO/lZ3OPLzE+NmuP2vPqjh5p5/0fpxHeIs8zMn/CBefdAl9k2pDOrk2zaF8MM3yjFRC1y9PEq+dmlIoaBqVdFmUwyiaqtdFrNuNPpfjvwyXk9TvqXp9Er+ib55D0nQ0WPGZGkxsVWR2AXt3qrU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=zr1J+j1R; arc=fail smtp.client-ip=40.107.92.53
+	 MIME-Version:Content-Type; b=L9o/CYaQT6UitN72JBrgUuexMcXieC1I/iyEQ2RtJbBrO58Tfhdjk8I8s+PkPmLQKW2Sa2g1mN9F/9XUTtkxWMSkUO+MzoFiTd2ozbLuG4JSDnQ26jqwT+SPzaLgRnYT1pQpl0VpH3LSvMHTeCJO1Pbwn1rHLbs2fxTeK5oX7Ho=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=rFT/Xnak; arc=fail smtp.client-ip=40.107.237.69
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JneHbrRlN9XqtLVIRw+ERGl2KLTyT9UDntO/dhCU96IWbDLDnJBOw80kwPFIGTCUUPIxFvRroapBwGDosp3ifeQY7LAn2bB4jl0PtjOZjJ/SesKCGs0YVBQElCrtB1RnoVqcaClRwsI/M2JdoTInFFcK2lpVPO9o8/jnBzGgnQTcfjc3nUrc7CZmGAYkyu9sXyrQC+vU3Tacjo8dIGbM+yJYKOdrrGzk4WXWr0HldWkNkzoLIK/C7B7AOoWU8CApd8nBu9H52ETBRFE9sUxxYNI0FOmeLZdsCD2Ekp4QMNsIBSmhviz99sTNpT48ux5jJs3SAgS/o3MyOSyz4cybVw==
+ b=d/LrqkAXrfWu4rZnbcaovlUPoa+6IyeP/CWZd1KC78dwUBTQjgwipZSuS01FcWeGiKEn6brBSQXOzH8Fy+vdIFDWtDmzS7z7/kb+XM4zio2Eiw0tJ2Zv2nJSg3n1dK2cQ6fVsjIPAfke8n/acdUSnq41bc3YwZOBDHByPr08qB0q7DPiYFsF0m8P4u26lrt2BNzDThWq9WmHWT1EnLwvCii9reRaKTn7AiLLYHVMRDmeVhQ0O8FXm/pRHyXhyZR/rdaRN4InU3VITe5JMmfnwDwaFVK36taXqe8R7xpdHAhYnZ/NoIyEgRQfhi4T8M3mM7fFM734m8gJMmgFFpPsdQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=c1WMtFLwBm619ady0UKmZ95YE9M2q0JzD4sS7SkelFo=;
- b=PtZ0lHenAVG01aPhSfSh6tlk+qQwhBWozX8LWSK6kbOzP7S/v4X+6Ad1Q5fmDXDkADY+uNSMIZXDz3lyPMj8+DYZc+t7RxG/B3s+dC3CcongYdO0XYYou1ci2SdW2p8Z4Ty+ijbunj8cBHBR6JM4GmZ3cAlePtChsrbfpbTPt2oUcOY0B1ZIq5Hn1Ovw5PW3fbad7vcL5GXSr92gPTgwzSRGzcJNzOWG6mLPFib0pi0+PuH2TYHLx1ej0XMbQ8JEclCgSAM2pCLiAUpyCXJS9fE0iIzRm5MPRrTkO1oi9T/hk0llkOsrYFTcqHldTDHYtrr2Qf7c+/fbje6iAC5HvQ==
+ bh=b2oJzoquwamRfn+A74VI3gTwiJOszNVo0COy4uKlBvg=;
+ b=Bu9O0zlWujNVLfBzpBHknbzaPQ9LAeGrW12ZNvtTAZHcZVON87z0sQYD3Nu5Q3gfle6YUdSSUnaBGjCyPUZchI0Dc9dZ2olGNhoYX5mawo9MyJJkqdaIPuEN+5bgOUkMzwB1OosO3O4kGxk4lfOPqev4atoe8CJAhi8WuAzrWReiEvUwK8x2tb6b+cCyuWMogRn6U9NSr4+JV8j3mrWfQNi7IRvDfXQv15gP0EzpF2SNsfdRBhQi+H1Llg5mQfkOSvgnaY3E/NWjoNnlX20qIS6pMJekHCR5gtWcPIc+ljxjEhPuc0upqkKC4FcABlVhvoC/DRK0xj6iSHTh+akhXA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=c1WMtFLwBm619ady0UKmZ95YE9M2q0JzD4sS7SkelFo=;
- b=zr1J+j1RVFGfcs07r62iXx5edkQpn75Db5X2X6lu2aNxB8QHYWTDps1Qkr8HCv8qkmkTQr585S4FDKFSeFlopCryJanyMpxv5fguTK4iixSyT7ipv05eLD0b31FxJYMeO5CrKfjeysJofQwc4UnJCLggSj5NsT49CfWXCgK0PWo=
-Received: from SJ0P220CA0003.NAMP220.PROD.OUTLOOK.COM (2603:10b6:a03:41b::34)
- by PH8PR12MB7229.namprd12.prod.outlook.com (2603:10b6:510:227::20) with
+ bh=b2oJzoquwamRfn+A74VI3gTwiJOszNVo0COy4uKlBvg=;
+ b=rFT/XnakVBpzhPPUC3oKg11p19VMBN3b5t5CeZhlIXNEuVm+cumyV+kKNVHcfU17w8qy2J4ks3Pc5XDloorO+lawFVjtS2OeSeuYiacWrXQs6fhc+NQ13s3YaveQpjMoIsiuAfS+OTKckr/ag17k0Sm6xMEipeFE4xe0F6T6EcA=
+Received: from SJ0PR05CA0029.namprd05.prod.outlook.com (2603:10b6:a03:33b::34)
+ by DM6PR12MB4042.namprd12.prod.outlook.com (2603:10b6:5:215::11) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.18; Fri, 28 Feb
- 2025 09:22:52 +0000
-Received: from SJ1PEPF00001CE3.namprd05.prod.outlook.com
- (2603:10b6:a03:41b:cafe::be) by SJ0P220CA0003.outlook.office365.com
- (2603:10b6:a03:41b::34) with Microsoft SMTP Server (version=TLS1_3,
+ 2025 09:24:14 +0000
+Received: from SJ1PEPF00001CDF.namprd05.prod.outlook.com
+ (2603:10b6:a03:33b:cafe::eb) by SJ0PR05CA0029.outlook.office365.com
+ (2603:10b6:a03:33b::34) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.8489.20 via Frontend Transport; Fri,
- 28 Feb 2025 09:22:52 +0000
+ 28 Feb 2025 09:24:14 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,13 +63,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ1PEPF00001CE3.mail.protection.outlook.com (10.167.242.11) with Microsoft
+ SJ1PEPF00001CDF.mail.protection.outlook.com (10.167.242.7) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8489.16 via Frontend Transport; Fri, 28 Feb 2025 09:22:52 +0000
+ 15.20.8489.16 via Frontend Transport; Fri, 28 Feb 2025 09:24:14 +0000
 Received: from BLR-L-NUPADHYA.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 28 Feb
- 2025 03:20:16 -0600
+ 2025 03:21:44 -0600
 From: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
 To: <seanjc@google.com>, <pbonzini@redhat.com>, <kvm@vger.kernel.org>
 CC: <linux-kernel@vger.kernel.org>, <bp@alien8.de>, <tglx@linutronix.de>,
@@ -78,9 +78,9 @@ CC: <linux-kernel@vger.kernel.org>, <bp@alien8.de>, <tglx@linutronix.de>,
 	<Suravee.Suthikulpanit@amd.com>, <David.Kaplan@amd.com>, <x86@kernel.org>,
 	<hpa@zytor.com>, <peterz@infradead.org>, <huibo.wang@amd.com>,
 	<naveen.rao@amd.com>, <binbin.wu@linux.intel.com>, <isaku.yamahata@intel.com>
-Subject: [RFC PATCH 16/19] KVM: x86: Secure AVIC: Add IOAPIC EOI support for level interrupts
-Date: Fri, 28 Feb 2025 14:21:12 +0530
-Message-ID: <20250228085115.105648-17-Neeraj.Upadhyay@amd.com>
+Subject: [RFC PATCH 17/19] KVM: x86/ioapic: Disable RTC_GSI EOI tracking for protected APIC
+Date: Fri, 28 Feb 2025 14:21:13 +0530
+Message-ID: <20250228085115.105648-18-Neeraj.Upadhyay@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250228085115.105648-1-Neeraj.Upadhyay@amd.com>
 References: <20250228085115.105648-1-Neeraj.Upadhyay@amd.com>
@@ -96,137 +96,98 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE3:EE_|PH8PR12MB7229:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0d84d417-7d45-400d-f35e-08dd57d97a32
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CDF:EE_|DM6PR12MB4042:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8132b3c9-f8e2-42d7-9fcb-08dd57d9aad2
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014|7416014;
+	BCL:0;ARA:13230040|36860700013|82310400026|7416014|376014|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?flP6HIPp3RaVgGOSa1uDTM+8ZWkk89KE/a2p3UUiSEJLeQSJTrCJ7X009O6V?=
- =?us-ascii?Q?5vOePNW+SOY0gpZiP86i196qhz96lk6RPGa/0JfjpO2sD0nB8XhA7ylubmgM?=
- =?us-ascii?Q?fzTtzdL+tDqvtV4g61qC+ZfzhSAtFEQA+Xb6uxePUo0BTPyBBwkhbSPprLDD?=
- =?us-ascii?Q?wUVrIEVne9U3ZxtQJn3rrymTbjEW+db3aUWv89jNSvfryckOacCky3z/zXXu?=
- =?us-ascii?Q?ICb1idjAHHXrLgrU1obXxqj0y7TgBAYJ5aTW3Uwe/8Y+o3XTMu2RUzzk0ckX?=
- =?us-ascii?Q?83NCRxlz+pYwk1I5rxBQvkWSoN0JGQ6pERCYMS+1ofF1TB+wnx+Ar5G3LpNe?=
- =?us-ascii?Q?xzjVya/+0wsZY6vrbVv7ya2Hir1Xgd9HMW46gZYJmlq2xSttrDy6OlNwFBOD?=
- =?us-ascii?Q?mEabGzShPvalEGHJNfrSo4PmCOF5bsd4pHaNUVZg0+lp3m97bB9N/c0SbKOm?=
- =?us-ascii?Q?VfCwnjxhBMRVEHPmm2FFTRN0WM7bKAn0931tE5UB7JsGN7q7ShwyE72v3fNa?=
- =?us-ascii?Q?zn1sqcQ1ddikO8oSEmdR3SF6mXrNS2oQEjj4ewvPLfNy9TQUoWPlLe3fmSyk?=
- =?us-ascii?Q?cnVExBpahqe6qka7cbKDauyTSuFIngnzZ6Jn5hGOAxAIlWoMUF+R3Emli8CA?=
- =?us-ascii?Q?b+/t5OvWH27xpWIKDvE6yEaxhhaxrkR4LIPK55P6RGp8+MfmSXCmtJZ+VoHn?=
- =?us-ascii?Q?t0I3DvFGAg9v9YkgTV+wbgB+C38kApdlzG6o9TlKhLeazn+lu87PQSMlfnGe?=
- =?us-ascii?Q?cm6m9RdZPU0ACU6ouNjmoWp+kVrqRI5DGEP+++dfwu996U04Yjh0Nb563Zq1?=
- =?us-ascii?Q?aXtPUrLRSkE3waOx2jYDLomov1VYeiYEMuF5R0ZB8jh+s2EN/LeGT9SzcYhd?=
- =?us-ascii?Q?Yp7eiCqMhbWRUbxFwdTP0MsuOZj4E16+1dHzHjK9qfQmQUYc2vcN40OaOJOu?=
- =?us-ascii?Q?tyP6qIaG3bYTuNZblnn60t49h97TFYRv2FoSzdf/Qmj03r/E5o6R57yzgq2n?=
- =?us-ascii?Q?GdF1fIDs3BbfskuTJcwbVYwXS5vIyTqhRW2C66Ieh23QiG6Yi78PqllJkI3I?=
- =?us-ascii?Q?j5lc/4p3XCc7l6TGwArk9sE8/dTgkmTYgmpx0co0EbzMRPRbXCu6buCQtfFx?=
- =?us-ascii?Q?Pok3yoi6FGLXf8Eq1QFExmbk50TuPXIObE2baQagMePkGhj+2b4PB4s61pXe?=
- =?us-ascii?Q?j6ozGgj7V1g19gT9QF5kC8wt8bwusY0NmTNmVNtr7E6cuqP7yfta13+XKhf3?=
- =?us-ascii?Q?aCPspxz4UsYQY2z+hKFcWrpDZAHYTEEfwRPK2kbQ41sNjgm7/2IBlKVz66pg?=
- =?us-ascii?Q?EEj5YzvMjWs/JkSosDFIviaCasrJzsnnf6wgI4hGYGpPxLWWy9OwEFXS43wR?=
- =?us-ascii?Q?BvO39kCLTQoWa8L6qXMTSMztjy9aYyrL3FunZIs1lCBonqi5NtpRnJ/cua/0?=
- =?us-ascii?Q?LV2QRe+3qs4/XIlbI4wUXxi7G/vrtC/giEu/QodY8unSFA8H/+YTF/MMvbvN?=
- =?us-ascii?Q?akRkIWO7fyEkfRE=3D?=
+	=?us-ascii?Q?l7Z/938vIZVqHtMCaF1OCVPegaIz8XYNZmU3bHEHlK2AaabV03oJM5MEtzwO?=
+ =?us-ascii?Q?CjwwAS3zZjxcqXTLTabKQidqJ3rpK3tJTB8qRYGrUv4wovQloiaZN5j+febY?=
+ =?us-ascii?Q?YlRIFOHEMYA4LS7brneXMQaumW0J01GqMLAusoban2b2GhZ8ROnIfl03qNzL?=
+ =?us-ascii?Q?MpMw2TAiHwrCrjxY2kSFA6fR1HfbOu2amWdOKe2y1rZDdv0ifad7EbHMhW4o?=
+ =?us-ascii?Q?jya9tEBNigz0aNW4m58RbvJ06jsFJj+JDDjA9fgpLuX+QzJdFjoP1Xyhie53?=
+ =?us-ascii?Q?uiAAdvkhKKEaOPBPPzwAY0mBku/3RQby4Ak17TgBgwibyG7Tt5dkous1FB8g?=
+ =?us-ascii?Q?XdHs/wCysYNbzILNo/FKq0/eWRUlOfzjDdBages1qehDFKqVXagYeTum4QS9?=
+ =?us-ascii?Q?YJQnfB8sN1vEbuvJTck/Jb3mncKk8SYXXOnfHnzzITOyqJy7l6FUXAK6hWJ8?=
+ =?us-ascii?Q?qncnHU8o8LhvbhnLSpzXFjInX5yp7pEr5Fbboj71fIf0nqytIOyl70wxedEX?=
+ =?us-ascii?Q?E6tBze3Ny95AIlJtVm4/RrnGkLpcP0rowUiv1JiwHTXdUGZxTw0BZUyGGC1l?=
+ =?us-ascii?Q?rn6AavJHPgkHknSJlTzAm24nLShqm8pAfWJrk5ywLsEaw8cf+8orWdhPkUSS?=
+ =?us-ascii?Q?8w+AUJl0vLMUWWwdKQcFIFZxIcQJ/ANXNkr0MPABI14toXanhOCqUFj9NQ/J?=
+ =?us-ascii?Q?XcFnL2GIrowB3X6h+luPbDQWlNZliSPUSRZKF6bQHyYWvyKteV+/QiSbC+CA?=
+ =?us-ascii?Q?WWFrJPDfQIU2gQTrdDR6TGdwNO/tDVRzNEtQCJlf7AgZom5g9vY58kg7zNCl?=
+ =?us-ascii?Q?GKGGXBevL4SI7kenBWgi3k71SSBTqXlfFigNldNVzCEYapCGnks9+zQtN+c/?=
+ =?us-ascii?Q?xXa1WemJK99dwVifU2zyfCYEdiLDSl95Y6gHClGBtVSQ6HA41DN753rj1TRu?=
+ =?us-ascii?Q?kdX+Cpz6nlgBZORcioQpMANnWoHzpYP0T0nzj5rLps4xF0Bra31sBjy2i/5q?=
+ =?us-ascii?Q?g7yxB5Q9r2/hgzAOENsnnXveO1jiLHLDIC1lI4p/cx/WIifbkjEX8KQ01LsH?=
+ =?us-ascii?Q?Vf0XNFR5lzk4CCaL9r46w07gL4WEa3O5d/Q1GLrD7qdjuHbmNT6vHKtQ71FA?=
+ =?us-ascii?Q?8TjTDuSy2oL0xtKGiJw5XG0F9rYiKyIK6gFs9EIjatJcC4g7fZkYpzL3h0WF?=
+ =?us-ascii?Q?RsFnGRiaE7YekraJMymUvFz1CJNS+uGkPMETCpF4QWc9wUUTPLhxs0wbolDe?=
+ =?us-ascii?Q?hS4oXTC5JQlWPBp1hApY8cfoRXMKHGK3345Uw1JJNdZvLOJQV/yVr2e0Z/BS?=
+ =?us-ascii?Q?x8UI23jiHeD3INmKa9ud1Qz9lTU9AohyJjUv06yWg0BKLJSVytnJ28wzo5Zz?=
+ =?us-ascii?Q?QkMy1CiYa9RkFYEPixY7pXWEmuQwdZUouooaNFdjdGoShHAhSaztZL7G11M8?=
+ =?us-ascii?Q?XJscbx8uYRUWL1iaZ9ou5jNwFkVim6Lvn1PfNXEtrCnafTo53pCYiHeA2zJe?=
+ =?us-ascii?Q?DCyFWRW8PtrsUl4=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014)(7416014);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Feb 2025 09:22:52.4438
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Feb 2025 09:24:14.0365
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0d84d417-7d45-400d-f35e-08dd57d97a32
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8132b3c9-f8e2-42d7-9fcb-08dd57d9aad2
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00001CE3.namprd05.prod.outlook.com
+	SJ1PEPF00001CDF.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7229
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4042
 
-Secure AVIC accelerates EOI writes for edge-triggered interrupts.
-For level-triggered interrupts, EOI msr write is forwarded to
-hypervisor. Handle APIC_EOI msr write VMGEXIT and propagate EOI
-writes to IOAPIC. Current implementation reuses unused host APIC_ISR
-regs space to maintain information about active level-triggered
-interrupts. As host APIC_TMR state is updated from IOAPIC redirect
-entry, host APIC_TMR is used to identify level-triggered IOAPIC
-interrupts.
+Disable RTC_GSI pending EOI tracking for guests with protected APIC
+state such as Secure AVIC. RTC_GSI is a edge-triggered vector and
+Secure AVIC accelerates EOI write for edge-triggered interrupts.
+In addition, APIC_ISR state is not visible within KVM and is part
+of guest-owned backing page. So, lazy pending EOI checks also cannot
+be done. So, disable tracking of pending EOI. This means coalesced
+RTC interrupts cannot be detected by userspace for Secure AVIC guests.
 
 Signed-off-by: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
 ---
- arch/x86/kvm/lapic.h   |  5 +++++
- arch/x86/kvm/svm/sev.c | 26 ++++++++++++++++++++++++++
- 2 files changed, 31 insertions(+)
+ arch/x86/kvm/ioapic.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-index a1367689d53c..4e41c7ea4f66 100644
---- a/arch/x86/kvm/lapic.h
-+++ b/arch/x86/kvm/lapic.h
-@@ -159,6 +159,11 @@ static inline void kvm_lapic_clear_vector(int vec, void *bitmap)
- 	clear_bit(VEC_POS(vec), (bitmap) + REG_POS(vec));
- }
+diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
+index 995eb5054360..7d68e8ef6245 100644
+--- a/arch/x86/kvm/ioapic.c
++++ b/arch/x86/kvm/ioapic.c
+@@ -113,6 +113,9 @@ static void __rtc_irq_eoi_tracking_restore_one(struct kvm_vcpu *vcpu)
+ 	struct dest_map *dest_map = &ioapic->rtc_status.dest_map;
+ 	union kvm_ioapic_redirect_entry *e;
  
-+static inline int kvm_lapic_test_vector(int vec, void *bitmap)
-+{
-+	return test_bit(VEC_POS(vec), (bitmap) + REG_POS(vec));
-+}
++	if (vcpu->arch.apic->guest_apic_protected)
++		return;
 +
- static inline void kvm_lapic_set_vector(int vec, void *bitmap)
+ 	e = &ioapic->redirtbl[RTC_GSI];
+ 	if (!kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT,
+ 				 e->fields.dest_id,
+@@ -443,6 +446,7 @@ static int ioapic_service(struct kvm_ioapic *ioapic, int irq, bool line_status)
  {
- 	set_bit(VEC_POS(vec), (bitmap) + REG_POS(vec));
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 77c1ecebf677..a7e916891226 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -4491,9 +4491,27 @@ static void savic_handle_icr_write(struct kvm_vcpu *kvm_vcpu, u64 icr)
- 	}
- }
+ 	union kvm_ioapic_redirect_entry *entry = &ioapic->redirtbl[irq];
+ 	struct kvm_lapic_irq irqe;
++	struct kvm_vcpu *vcpu;
+ 	int ret;
  
-+static int find_highest_isr(struct kvm_lapic *apic)
-+{
-+	int vec_per_reg = 32;
-+	int max_vec = 256;
-+	u32 *reg;
-+	int vec;
-+
-+	for (vec = max_vec - 32; vec >= 0; vec -= vec_per_reg) {
-+		reg = apic->regs + APIC_ISR + REG_POS(vec);
-+		if (*reg)
-+			return __fls(*reg) + vec;
-+	}
-+
-+	return -1;
-+}
-+
- static bool savic_handle_msr_exit(struct kvm_vcpu *vcpu)
- {
-+	struct kvm_lapic *apic;
- 	u32 msr, reg;
-+	int vec;
- 
- 	msr = kvm_rcx_read(vcpu);
- 	reg = (msr - APIC_BASE_MSR) << 4;
-@@ -4512,6 +4530,12 @@ static bool savic_handle_msr_exit(struct kvm_vcpu *vcpu)
- 			return true;
- 		}
- 		break;
-+	case APIC_EOI:
-+		apic = vcpu->arch.apic;
-+		vec = find_highest_isr(apic);
-+		kvm_lapic_clear_vector(vec, apic->regs + APIC_ISR);
-+		kvm_apic_set_eoi_accelerated(vcpu, vec);
-+		return true;
- 	default:
- 		break;
- 	}
-@@ -5294,6 +5318,8 @@ void sev_savic_set_requested_irr(struct vcpu_svm *svm, bool reinjected)
- 			vec = (i << 5) + vec_pos;
- 			kvm_lapic_clear_vector(vec, apic->regs + APIC_IRR);
- 			val = val & ~BIT(vec_pos);
-+			if (kvm_lapic_test_vector(vec, apic->regs + APIC_TMR))
-+				kvm_lapic_set_vector(vec, apic->regs + APIC_ISR);
- 		} while (val);
- 	}
+ 	if (entry->fields.mask ||
+@@ -472,7 +476,9 @@ static int ioapic_service(struct kvm_ioapic *ioapic, int irq, bool line_status)
+ 		BUG_ON(ioapic->rtc_status.pending_eoi != 0);
+ 		ret = kvm_irq_delivery_to_apic(ioapic->kvm, NULL, &irqe,
+ 					       &ioapic->rtc_status.dest_map);
+-		ioapic->rtc_status.pending_eoi = (ret < 0 ? 0 : ret);
++		vcpu = kvm_get_vcpu(ioapic->kvm, 0);
++		if (!vcpu->arch.apic->guest_apic_protected)
++			ioapic->rtc_status.pending_eoi = (ret < 0 ? 0 : ret);
+ 	} else
+ 		ret = kvm_irq_delivery_to_apic(ioapic->kvm, NULL, &irqe, NULL);
  
 -- 
 2.34.1
