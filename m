@@ -1,201 +1,231 @@
-Return-Path: <kvm+bounces-39663-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39664-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCF9EA492F8
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 09:09:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DEC1A493D2
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 09:44:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78D81189544F
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 08:09:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 553A53A922C
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 08:43:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46A631E8339;
-	Fri, 28 Feb 2025 08:08:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BDB2253356;
+	Fri, 28 Feb 2025 08:44:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GwqQpQdB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fEn/lsau"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8267D1E1C3F
-	for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 08:08:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A9E62512E3
+	for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 08:43:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740730092; cv=none; b=PFqtC6RfREssEc2JqqmQEM2QZK4FucxzosMhWb31GoT+rO4DEDnANGRWKh1zP0XJh8zHy/9tx93A42gVHjqAk75mWhv+d1X16Gl0a1uj86783SBVJk9SEN4+Xx/2TMxJ32HyQP0gGiOkGyay329QtfvO7lRQwjE/lQEVr8mSsjQ=
+	t=1740732240; cv=none; b=BgJwbs+ikNMu9qrNPZuNxjHL0u9GZKoaB34zZ9fB2UA8iUMaJLSh3mSvNjvhfygYLxIwRGQbyTj6+Ux0KVAnHTOtpEAHX8LPsmKwFsJzmCWUsxYm+EBkWyerGkPbyfWaHjDXvexTDC6vgwuAWoQDU+D+6yy2AMF0nGjbKvPixcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740730092; c=relaxed/simple;
-	bh=r9GSmtMicPcq5rW2NPP7VRMa9gYB5kx0AW78fr0QhO4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tySBY3E/9wz+Nz1xMbGe2aJH7uT78xBk5M7KBMqM1QSbehxy2akCFX+tX4CXRhsPfVLI/BuPPryfPI2q6wip2xsJqNSR6s6Z14RvTvFdecDjDLjJbpeokyx21h2t4iv8YAtlyjCerey5qfm2NNbkq55uKvl32AXNngmz/H3tTwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GwqQpQdB; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740730089;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LdUTuAdjhkxdXouf9L2YfL8fvPAf9Q3Za2OJ9RnA1QY=;
-	b=GwqQpQdB4AxZuofKRmSjci5r9TUXHyO7hc/7/QxKbPbmxzxKGwaTqBOOGc1rL9m9rvqMFt
-	g1MDmQZbP7+71Hxl4DDYhelb4lUdsfYz79wf+o0RsFnwRf0GbYyIRXTM4Dk2zX/CYXtPDy
-	4e1meH0ZtrGnUKIdZPcHBuO1FTIiG+0=
-Received: from mail-vk1-f198.google.com (mail-vk1-f198.google.com
- [209.85.221.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-657-tY4D4xAGPqacXf6L0XiNDg-1; Fri, 28 Feb 2025 03:08:05 -0500
-X-MC-Unique: tY4D4xAGPqacXf6L0XiNDg-1
-X-Mimecast-MFC-AGG-ID: tY4D4xAGPqacXf6L0XiNDg_1740730085
-Received: by mail-vk1-f198.google.com with SMTP id 71dfb90a1353d-5236260d1bdso307112e0c.1
-        for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 00:08:05 -0800 (PST)
+	s=arc-20240116; t=1740732240; c=relaxed/simple;
+	bh=feDBNntw9yX3Vh3kglgn6q5F5/6MdMcMdpEBHjC7Lfw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=kwcPh4dXS75HvUNbUxG/8Nh6M05XFssAJVNJ6s4ugLc1gTlf5wR5jfyohy37M1zPcxgqRm0jAFGDZNmhYVjNfA8H4og8NAt9Q1oii9Wm+WP8lIClSclO8AgkygIhotFR3uto8u9OVrQCrcquwafUgjJ3YKzPu8EK8ZMz4BFpprU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fEn/lsau; arc=none smtp.client-ip=209.85.128.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-43995bff469so11778725e9.2
+        for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 00:43:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740732237; x=1741337037; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uCQhmEkI20WCXSrDNmwHS83kJOrfCigX2ZIIywReQD0=;
+        b=fEn/lsau+ZAFBqaSNEZ7wDpeYUZG7tfzEnuOffhaOZaRxb/000T2LedOouTSl2SRaT
+         vcSVn899WYdPG/1gjA76ETy2bzlDfnaFHfWD9JFeje4zBvPAlEAdLUQftmyT2erNZpqN
+         qU+hElQrJFvvD/G461l/VN+EmCDb9U/zqFdga+1cGeEwLOjKH/wAC9XT3xz2fDqnnGS8
+         bV5Soq3nACzcVd6Zb3Y2fptLE0q7x9czgltEhKfovziqp4xPFWQUN6qwWXjhXe8D2ouq
+         +JGnRygloQyVfaYtCjCzuZRaKEeI6/fhLm7YHDr+8+xxpTLyfbXAX/EAOiIhXx4cnlKH
+         BO5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740730085; x=1741334885;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LdUTuAdjhkxdXouf9L2YfL8fvPAf9Q3Za2OJ9RnA1QY=;
-        b=D2wDM9+RZwADHR19j3JGaq9YjnfEuHWUqt04BHJc6NDucg4r0B8nJMbDhKtClQ6uuR
-         g6QqKmKX8XJgdfq56ibLgJEUCuj+Qp6fQWFLUKFwFbCmcrMCJLjcvKT1KuJ1qsKCcqnR
-         uiNR0NB0J6csbwAiJSDmxtUfjVjoAD5Mgjn9YCr39i14qdo1Zu+onLRBeb2kyo9TLDvT
-         7L9w3PBY6cr1nnD0BAG6Qr8aIYqfY2tgUaNBnWW1A2xI5uS4R8f5ns7lvRu4asm4xpIs
-         9KRj+ApTCJg3GXtdlXB0EnFw++3osU4jtxHRIT+ZBrPFzUpW3zd2QtAj5MZ8FUBhBQmW
-         Dv6A==
-X-Forwarded-Encrypted: i=1; AJvYcCUM5aGgfOKU+Jb93b2IUNZzPJYBU8P+jAm/tiPStvhjI/hr3YSEt90WonJCNy6RlAyttFI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrRWyYxZBwltAjuJjy4J6QKxGycUFG9yh77224xINjdOJvbK6I
-	QqLdzBwDGdTf98pLSyzTSyAWQu+kNtG7E6mcjBh+OakwuN8IilbwLi28BljKGy/hmIt2tn4yj3V
-	FtvLsdm6T7oYr0z4bd42azP6zA9sfoJLNZ3b2WviVcWjS9UzJ9G079u4TjzXEq8ZA3Ho/u7XJjW
-	TxGkEFd+m2WeK4XlLTPOkVDQAZ
-X-Gm-Gg: ASbGncvmcTq3XvwM6sRwIyYYnBuJpHyzBh+67bhsQH6lrZVyAcu9di/glvHajMexJPv
-	xkFvzwtq+QeCKTuBgl1SErEjh590LBdn9l67+11O4c5SiL1Qp1kKTtYzFd8WpK5AXhdUuHPi0mg
-	==
-X-Received: by 2002:a05:6122:8293:b0:520:4fff:4c85 with SMTP id 71dfb90a1353d-52358fa2777mr1810209e0c.2.1740730085125;
-        Fri, 28 Feb 2025 00:08:05 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHnzJbPx76VPjBpQt7am7d8LKNakTr6F/2ZNTopcxram3/9GKreE3AEQUVie6mNxSMpVmuq6MObJy/GAXT7g5A=
-X-Received: by 2002:a05:6122:8293:b0:520:4fff:4c85 with SMTP id
- 71dfb90a1353d-52358fa2777mr1810203e0c.2.1740730084874; Fri, 28 Feb 2025
- 00:08:04 -0800 (PST)
+        d=1e100.net; s=20230601; t=1740732237; x=1741337037;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uCQhmEkI20WCXSrDNmwHS83kJOrfCigX2ZIIywReQD0=;
+        b=OI4kZwGuiSpvmgJR3FKKiIgwOiTBp+E6539MOdIgu6MDWKMqu2K8plO/bQVkB2dyZj
+         Lt/DIbvHM1axnDrV++XTNT9EOEzMADfsLjJQ3HV+RNwuVk7HgVVNF1JYrVhRmaXguMtX
+         LN6xxjUqEx59BXy3+kf8VcHbNQEitp8yltT5IK7dtFtMSdk2LqLBR1zlJSTTWPzsiGI+
+         QrpW3FXHeWpUKvJdmqE0/lNioJHxY+e6knx1lEu+Ki0UqCkhJBVC8wGfP0Nu9ueNTpZ3
+         wxLcgOjZR7ysO9KxBHPqOzbY/xfpUdh6WK4hAD6gOtnBNq76HsTScI/ta8fotOlRNkG6
+         PKsA==
+X-Forwarded-Encrypted: i=1; AJvYcCUpnqZERzCQ4wSdS+V5VrGf1wGrxTkyriZy01FNk9OpxS9wcGB7iFwpcmRDxMEgXUJHppg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKiDuy3Ue2Ny+sjA5nh6CgMtadpG7tTmKpE0uqBEO1yJcAleCc
+	ZMebAuh70bWgPtq5gyZhqmHweHp9UbHAHSAOHUugrjRmWrvyXNC2O35s/M0FbssX7TsSC5KyvHQ
+	0k2JBI/xSRA==
+X-Google-Smtp-Source: AGHT+IEJq+5yWOZHmvu9HxjEv9KlFOODJE3Hve16zw/QnOkwbeaxyl/H0lwa63WLmmVB/J+lwRxrJvVq5cm/Ag==
+X-Received: from wmsd7.prod.google.com ([2002:a05:600c:3ac7:b0:439:850b:8080])
+ (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:4693:b0:439:a1f2:50a3 with SMTP id 5b1f17b1804b1-43ba66dfd93mr17960705e9.4.1740732236929;
+ Fri, 28 Feb 2025 00:43:56 -0800 (PST)
+Date: Fri, 28 Feb 2025 08:43:55 +0000
+In-Reply-To: <20250227120607.GPZ8BVL2762we1j3uE@fat_crate.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250227230631.303431-1-kbusch@meta.com>
-In-Reply-To: <20250227230631.303431-1-kbusch@meta.com>
-From: Lei Yang <leiyang@redhat.com>
-Date: Fri, 28 Feb 2025 16:07:24 +0800
-X-Gm-Features: AQ5f1JqPk0QRBHoltnkDQ29vhpwSBSIPKORj3Gk6lgM7TDuBtJyK6aRdH4dto9I
-Message-ID: <CAPpAL=zmMXRLDSqe6cPSHoe51=R5GdY0vLJHHuXLarcFqsUHMQ@mail.gmail.com>
-Subject: Re: [PATCHv3 0/2]
-To: Keith Busch <kbusch@meta.com>
-Cc: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, x86@kernel.org, netdev@vger.kernel.org, 
-	Keith Busch <kbusch@kernel.org>
+Mime-Version: 1.0
+References: <20250227120607.GPZ8BVL2762we1j3uE@fat_crate.local>
+X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
+Message-ID: <20250228084355.2061899-1-jackmanb@google.com>
+Subject: Re: [PATCH RFC v2 03/29] mm: asi: Introduce ASI core API
+From: Brendan Jackman <jackmanb@google.com>
+To: bp@alien8.de
+Cc: akpm@linux-foundation.org, dave.hansen@linux.intel.com, 
+	jackmanb@google.com, yosryahmed@google.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, peterz@infradead.org, 
+	seanjc@google.com, tglx@linutronix.de, x86@kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Keith
+> > OK, sounds like I need to rewrite this explanation! It's only been
 
-V3 introduced a new bug, the following error messages from qemu output
-after applying this patch to boot up a guest.
-Error messages:
-error: kvm run failed Invalid argument
-error: kvm run failed Invalid argument
-EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D000806f4
-ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-EIP=3D0000fff0 EFL=3D00000002 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HLT=
-=3D0
-ES =3D0000 00000000 0000ffff 00009300
-CS =3Df000 ffff0000 0000ffff 00009b00
-SS =3D0000 00000000 0000ffff 00009300
-DS =3D0000 00000000 0000ffff 00009300
-FS =3D0000 00000000 0000ffff 00009300
-GS =3D0000 00000000 0000ffff 00009300
-LDT=3D0000 00000000 0000ffff 00008200error: kvm run failed Invalid argument
+> > read before by people who already knew how this thing worked so this
+> > might take a few attempts to make it clear.
+> > 
+> > Maybe the best way to make it clear is to explain this with reference
+> > to KVM. At a super high level, That looks like:
+> > 
+> > ioctl(KVM_RUN) {
+> >     enter_from_user_mode()
+> >     while !need_userspace_handling() {
+> >         asi_enter();  // part 1
+> >         vmenter();  // part 2
+> >         asi_relax(); // part 3
+> >     }
+> >     asi _exit(); // part 4b
+> >     exit_to_user_mode()
+> > }
+> > 
+> > So part 4a is just referring to continuation of the loop.
+> > 
+> > This explanation was written when that was the only user of this API
+> > so it was probably clearer, now we have userspace it seems a bit odd.
+> > 
+> > With my pseudocode above, does it make more sense? If so I'll try to
+> > think of a better way to explain it.
+> 
+> Well, it is still confusing. I would expect to see:
+> 
+> ioctl(KVM_RUN) {
+>     enter_from_user_mode()
+>     while !need_userspace_handling() {
+>         asi_enter();  // part 1
+>         vmenter();  // part 2
+>         asi_exit(); // part 3
+>     }
+>     asi_switch(); // part 4b
+>     exit_to_user_mode()
+> }
+> 
+> Because then it is ballanced: you enter the restricted address space, do stuff
+> and then you exit it without switching address space. But then you need to
+> switch address space so you have to do asi_exit or asi_switch or wnatnot. And
+> that's still unbalanced.
+> 
+> So from *only* looking at the usage, it'd be a lot more balanced if all calls
+> were paired:
+> 
+> ioctl(KVM_RUN) {
+>     enter_from_user_mode()
+>     asi_switch_to();			<-------+
+>     while !need_userspace_handling() {		|
+>         asi_enter();  // part 1		<---+	|
+>         vmenter();  // part 2		    |	|
+>         asi_exit(); // part 3		<---+	|
+>     }						|
+>     asi_switch_back(); // part 4b	<-------+
+>     exit_to_user_mode()
+> }
+> 
+> (look at me doing ascii paintint :-P)
+> 
+> Naming is awful but it should illustrate what I mean:
+> 
+> 	asi_switch_to
+> 	  asi_enter
+> 	  asi_exit
+> 	asi_switch_back
+> 
+> Does that make more sense?
 
-TR =3D0000 00000000 0000ffff 00008b00
-GDT=3D     00000000 0000ffff
-IDT=3D     00000000 0000ffff
-CR0=3D60000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000
-DR3=3D0000000000000000
-DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-EFER=3D0000000000000000
-Code=3Dc5 5a 08 2d 00 00 00 00 00 00 00 00 00 00 00 00 56 54 46 00 <0f>
-20 c0 a8 01 74 05 e9 2c ff ff ff e9 11 ff 90 00 00 00 00 00 00 00 00
-00 00 00 00 00 00
-EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D000806f4
-ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-EIP=3D0000fff0 EFL=3D00000002 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HLT=
-=3D0
-ES =3D0000 00000000 0000ffff 00009300
-CS =3Df000 ffff0000 0000ffff 00009b00
-SS =3D0000 00000000 0000ffff 00009300
-DS =3D0000 00000000 0000ffff 00009300
-FS =3D0000 00000000 0000ffff 00009300
-GS =3D0000 00000000 0000ffff 00009300
-LDT=3D0000 00000000 0000ffff 00008200
-TR =3D0000 00000000 0000ffff 00008b00
-GDT=3D     00000000 0000ffff
-IDT=3D     00000000 0000ffff
-CR0=3D60000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000
-DR3=3D0000000000000000
-DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-EFER=3D0000000000000000
-Code=3Dc5 5a 08 2d 00 00 00 00 00 00 00 00 00 00 00 00 56 54 46 00 <0f>
-20 c0 a8 01 74 05 e9 2c ff ff ff e9 11 ff 90 00 00 00 00 00 00 00 00
-00 00 00 00 00 00
-EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D000806f4
-ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-EIP=3D0000fff0 EFL=3D00000002 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HLT=
-=3D0
-ES =3D0000 00000000 0000ffff 00009300
-CS =3Df000 ffff0000 0000ffff 00009b00
-SS =3D0000 00000000 0000ffff 00009300
-DS =3D0000 00000000 0000ffff 00009300
-FS =3D0000 00000000 0000ffff 00009300
-GS =3D0000 00000000 0000ffff 00009300
-LDT=3D0000 00000000 0000ffff 00008200
-TR =3D0000 00000000 0000ffff 00008b00
-GDT=3D     00000000 0000ffff
-IDT=3D     00000000 0000ffff
-CR0=3D60000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000
-DR3=3D0000000000000000
-DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-EFER=3D0000000000000000
-Code=3Dc5 5a 08 2d 00 00 00 00 00 00 00 00 00 00 00 00 56 54 46 00 <0f>
-20 c0 a8 01 74 05 e9 2c ff ff ff e9 11 ff 90 00 00 00 00 00 00 00 00
-00 00 00 00 00 00
+Yeah I see what you mean. I think the issues are:
 
-Thanks
-Lei
+1. We're mixing up two different aspects in the API:
 
-On Fri, Feb 28, 2025 at 7:06=E2=80=AFAM Keith Busch <kbusch@meta.com> wrote=
-:
->
-> From: Keith Busch <kbusch@kernel.org>
->
-> changes from v2:
->
->   Fixed up the logical error in vhost on the new failure criteria
->
-> Keith Busch (1):
->   vhost: return task creation error instead of NULL
->
-> Sean Christopherson (1):
->   kvm: retry nx_huge_page_recovery_thread creation
->
->  arch/x86/kvm/mmu/mmu.c    | 12 +++++-------
->  drivers/vhost/vhost.c     |  2 +-
->  include/linux/call_once.h | 16 +++++++++++-----
->  kernel/vhost_task.c       |  4 ++--
->  4 files changed, 19 insertions(+), 15 deletions(-)
->
-> --
-> 2.43.5
->
+   a. Starting and finishing "critical sections" (i.e. the region
+      between asi_enter() and asi_relax())
 
+   b. Actually triggering address space transitions.
+
+2. There is a fundamental asymmetry at play here: asi_enter() and
+   asi_exit() can both be NOPs (when we're already in the relevant
+   address space), and asi_enter() being a NOP is really the _whole
+   point of ASI_.
+
+   The ideal world is where asi_exit() is very very rare, so
+   asi_enter() is almost always a NOP.
+
+So we could disentangle part 1 by just rejigging things as you suggest,
+and I think the naming would be like:
+
+asi_enter
+  asi_start_critical
+  asi_end_critical
+asi_exit
+
+But the issue with that is that asi_start_critical() _must_ imply
+asi_enter() (otherwise if we get an NMI between asi_enter() and
+asi_start_critical(), and that causes a #PF, we will start the
+critical section in the wrong address space and ASI won't do its job).
+So, we are somewhat forced to mix up a. and b. from above.
+
+BTW, there is another thing complicating this picture a little: ASI
+"clients" (really just meaning KVM code at this point) are not not
+really supposed to care at all about the actual address space, the fact
+that they currently have to call asi_exit() in part 4b is just a
+temporary thing to simplify the initial implementation. It has a
+performance cost (not enormous, serious KVM platforms try pretty hard
+to avoid returning to user space, but it does still matter) so
+Google's internal version has already got rid of it and that's where I
+expect this thing to evolve too. But for now it just lets us keep
+things simple since e.g. we never have to think about context
+switching in the restricted address space.
+
+With that in mind, what if it looked like this:
+
+ioctl(KVM_RUN) {
+    enter_from_user_mode()
+    while !need_userspace_handling()
+	// This implies asi_enter(), but this code "doesn't care"
+	// about that.
+        asi_start_critical();
+        vmenter();
+        asi_end_critical();
+    }
+    // TODO: This is temporary, it should not be needed.
+    asi_exit();
+    exit_to_user_mode()
+}
+
+Once the asi_exit() call disappears, it will be symmetrical from the
+"client API"'s point of view. And while we still mix up address space
+switching with critical section boundaries, the address space
+switching is "just an implementation detail" and not really visible as
+part of the API.
+
+> Documentation/process/email-clients.rst
+
+I have now setup Mutt. But, for now I am replying with plan vim +
+git-send-email, because I also sent this RFC to a ridiculous CC list
+(I just blindly used the get_maintainers.pl output, I don't know why I
+thought that was a reasonable approach) and it turns out this is the
+easiest way to trim it in a reply! Hopefully I can get the headers
+right...
 
