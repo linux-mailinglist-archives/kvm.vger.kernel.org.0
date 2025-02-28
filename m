@@ -1,323 +1,506 @@
-Return-Path: <kvm+bounces-39761-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39762-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2A23A4A126
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 19:08:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14A01A4A1BA
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 19:35:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D5AB18998BB
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 18:08:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 355C33AC490
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 18:35:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0439525DD1D;
-	Fri, 28 Feb 2025 18:08:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F34CB27CCDE;
+	Fri, 28 Feb 2025 18:32:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="LCgrz6ME"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qwOJd1PK"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2051.outbound.protection.outlook.com [40.107.93.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 841C426E140
-	for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 18:08:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740766084; cv=fail; b=bsKFEKg4iAfOA1JtbhQdd83kqR5vyyCF8TRWOjHyagjWmDQgllQO7K0AM+zsW3lc40nZi1J4yu/hJ11rUEeZrdsywgUo+V/b7ghwilTBKkTawE0dLXEH5nONjqV1IvkUpg9C6a0ibkxqBGmvyI6TR9lRI4So1btSfFq/+UBKHO0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740766084; c=relaxed/simple;
-	bh=oHJ8AJUXCTUow5wQkuXxEen/dL9z8MVRSb96UInSs5A=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tzap4KvROIj7VvmvGpKDl+gA7mm/Wk6Tl1IOeCSsOUO/KILdTxtcCoUNtjQNgCLByQQmH9Z1w0gx+1BfYC1JONGHynMCBniQR6HSupzul6aUcjMBPOm45A5U9Nz9bvH6QYlkrWyKXwPyOWfRvFvrpaOyxz4IuXWH28YuLW6J1vE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=LCgrz6ME; arc=fail smtp.client-ip=40.107.93.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XhB85ZaLUXzEtJJrpL+opuLFeNIi3d7SdkYAujjA/1gPssdHtnA7SiXhNV1Q5Q4Lz+TW4jWVHc4igLKheuVFaU976tEmwCKrVxs7asGBmVbqz+b2WbtxStBBkw25ceIB7n+lpQIIHoHHwUJ5zfPjuzb14V15txon35CoxVud7dYYqcihD0OiwSKultM31hX/qX7PZqy2FF5h1frc34FNMeBiv3pwnBcfc9YYa1IZZjTNQG72W2bDYqoI7PX+4JSA8+LKhecacAQCCLPmBRurbqDdYs0RBtvKN9dQRlYOmh4v3AVDir+hMqbrLll9OwPkITKQkouAkyZ4LmdEwFCMBg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aVeULQ+Eb8fvVEv9FUxZ/7bE5TjiFYthpnLAE5e7kvU=;
- b=tawIzD+qkmXt+hykkhUOYKFTVHnM9pxzGKma5my+YONBVmHIJq5kBjZVOiuaziLSp3HftxIHry7mGvFgHvYM8o69oGG0nxgYeC9Yn9btZjQrbdxqmBiOE44tt7iC6Kwhqujp5yRblXharTKOnBF9I2ELL05f86hyl3ZxPTUxfZcXXcCCMNR+qADR4S6uIbA5MhJdoYpuWrSLtLk2BIF9RtcHf2y2R0mtSTf3meFXfUDR0wKBWufvSwnFvmfe3UMySz/uicIgfgfL5hXGAGpFAp38MTdqya8HKsL7LfhqZyxgUsBJRq6dU1dvbJ8sPgjuLlM+PLN/r3XoLB5tiADxVQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aVeULQ+Eb8fvVEv9FUxZ/7bE5TjiFYthpnLAE5e7kvU=;
- b=LCgrz6ME1G3zmoVy8zvH9Z4ESgxxCg2wQkWciIsoabcYlGuuW4C/Xzqy8ddicuWWIdBUD6/K42RzbGHgokicvKsrCc8c+Y3mbf84iloRE1KT+uKgEY/FyNmG2I4ZRVbxD5xGUNaIe7bLeQEoGS2GrI2y5pg1Do6ylqblZmdil30=
-Received: from SJ0PR13CA0123.namprd13.prod.outlook.com (2603:10b6:a03:2c6::8)
- by CYYPR12MB8872.namprd12.prod.outlook.com (2603:10b6:930:c8::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.20; Fri, 28 Feb
- 2025 18:08:00 +0000
-Received: from CY4PEPF0000EE3A.namprd03.prod.outlook.com
- (2603:10b6:a03:2c6:cafe::a6) by SJ0PR13CA0123.outlook.office365.com
- (2603:10b6:a03:2c6::8) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8511.10 via Frontend Transport; Fri,
- 28 Feb 2025 18:08:00 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CY4PEPF0000EE3A.mail.protection.outlook.com (10.167.242.12) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8489.16 via Frontend Transport; Fri, 28 Feb 2025 18:07:59 +0000
-Received: from bmoger-ubuntu.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 28 Feb
- 2025 12:07:58 -0600
-From: Babu Moger <babu.moger@amd.com>
-To: <pbonzini@redhat.com>
-CC: <zhao1.liu@intel.com>, <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>,
-	<davydov-max@yandex-team.ru>
-Subject: [PATCH v6 6/6] target/i386: Add support for EPYC-Turin model
-Date: Fri, 28 Feb 2025 12:07:06 -0600
-Message-ID: <51b0e6fdd7caafd365f3a0f38a177920c7a167c5.1740766026.git.babu.moger@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1740766026.git.babu.moger@amd.com>
-References: <cover.1740766026.git.babu.moger@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00D7F27CCD0
+	for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 18:32:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740767523; cv=none; b=nLF/m5khMsDMZHilwS5ryQgW+JC5b2oGzl3V0BvkAGrP8qzSSOa9JB4SfjmX8dW0afplX4D+PSpQtIRdNwoyNnUBwwd3eMif1H+FyLqR6BH2xWsX4DiWbO4NHbVrmQpeI0w/VPzY4njoTqsLAX/Pfha7IPIygOyieRnh0J00qAg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740767523; c=relaxed/simple;
+	bh=guZt1Zi+iXkkSqZIGqCWWaUtqAwC15Ww+zgjipfFYog=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=VcvOeuognSaxUB7pC8rdBlCQfg+BuBhIuiRH+d/vMEvjQkWKpg2VQolUubeTQVS9vb162pvynDYHX41P+zR7owVa3LfQCsaJiIeYPO364/RFSB3eDmH3jnMdtl9mg69HczmkF+juDFElrtBZiw29i1qp4q+GdMGkOgAP2kYnVPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qwOJd1PK; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-223725a1e76so12727975ad.0
+        for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 10:32:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740767520; x=1741372320; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6pijisVLPCJj8vW2ZfATw2CQzs5cG5ymgPPQbMYMBHE=;
+        b=qwOJd1PKAiPgSNYHFttS7XbhwtAdlyjX7vmuyw76UEVFOpvAyDzRY6dJbiqhxOz9+C
+         lrLIt5DAKAbbFngQPOMW3jubsd/r9hqewu5kqfhkPqA8l9YM9DIBKQ1bzfmjK9l+KfSH
+         JhQHQAm/deIlz775qoMqZ9JKAtb9JTsXDK/KiCtiny8JmxPsVjHQTHenyHwBvY8HFhYe
+         FUXQsShQPfeWtm5vxK+pTy0wG+xfX7VrPbN2gV8DBoyS9kD+OM9rS7Hn5mTGUmXTMgpj
+         PXvz9tdkI4iMe7UYPI1zRwzM7VroP6xeK2zYzLzY0ZXcd85Nu3FTqaerNrJskdwnbtPP
+         NZ6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740767520; x=1741372320;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6pijisVLPCJj8vW2ZfATw2CQzs5cG5ymgPPQbMYMBHE=;
+        b=GXtIwCzgK6RVgH+ZFMpVO2EcpXsH1uYjZ8Jpb8PRTzvxgucXillQ8XiybIPvlCZ5vy
+         Oc/DFckc5lEH8WWyn4jgX4SIF4cFW6GHERPCXyTPU1nT1Ew0Gh9LeWL3/iWWm1ES3bgY
+         oQlHMxgLJQguh7kANoYBQiDRzrNCN+MviLtQZI2D8IkrWtHlsSQpGAawELAHQHUfQPAa
+         Ek4GOIlP+XL8nxeQC/I2vnHZhHyyQYDPb/5nlNdexyVu1w8kTHagXGo2ey2NyfiqZ2UY
+         cXXHVak26zd5ZWWjvYj1Jq1SjrxackTZjXC6jhF6qC/+r7gO8ZJN+nlod/hckL4y/AAX
+         /RVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU5uXq+4fPRW0w/1LgzJWFE6ARhLKBUwN1lyRoW3G0AwKguyD4cjuBDwCLuc9GufzkHf60=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+SCV8dMvxAN94nKl0JME7t46Ksev37KYn+npR3/mZHBN54vp7
+	nyYzlKL2x4jGgxktNctrQM+b1lxxWs1kSZSEHSPuLHpx2KcofAQHujj90fDscfZmbE6MjJMEsyZ
+	FtA==
+X-Google-Smtp-Source: AGHT+IF4N9NsIkmr/dcMIkDaZ4a+7XdgaaufJF3rLHlXHdN4NAQScNU/ckB1oUbOH4qNPSFvkWjtZERYyYU=
+X-Received: from pjboh15.prod.google.com ([2002:a17:90b:3a4f:b0:2ea:5be5:da6])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:8cb:b0:220:e63c:5b13
+ with SMTP id d9443c01a7336-2236925e4famr73615075ad.46.1740767520231; Fri, 28
+ Feb 2025 10:32:00 -0800 (PST)
+Date: Fri, 28 Feb 2025 10:31:58 -0800
+In-Reply-To: <27a491ee16015824b416e72921b02a02c27433f7.1740512583.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3A:EE_|CYYPR12MB8872:EE_
-X-MS-Office365-Filtering-Correlation-Id: b7855d33-e65d-4f50-4397-08dd5822d603
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?O4a8zIBuWfV2zBesqvZizN+zPFc1uVvNoNV97uZHygLs4VX1rs/62ImGLZwh?=
- =?us-ascii?Q?8gYRwBHuh4aqJPVQQVwOqV9P1MQJiEzPuwQKs/H9tp/IT146O/tiRIlsTiGO?=
- =?us-ascii?Q?bGIqz8mGfAYQr0iZOOOdIP/RQnEjekKCzsyN1yh43L9zOwQ/fLKl07slwFFD?=
- =?us-ascii?Q?ZsIQeJuwAhUcGUbm2hTufGL4MlwlM9jml91Q1ElUeEAQVAb/AwkHvud7kJ98?=
- =?us-ascii?Q?dN6+Mo5LHQcxyI3Douv9498n17QhmyinxS4406o+VMWZB726G88D3MuIAHPc?=
- =?us-ascii?Q?+pWqJArBTecFbrmhTiwYCpMVR8vOYOmspL3OZOpK5CvOESVMj7TJtw8LRNuG?=
- =?us-ascii?Q?AMR69+p49sk979ffZ1RHFajDsPz4BshTziMH11O00sKrnLcclgMCMVz1Mlen?=
- =?us-ascii?Q?BpH3fUHBd6WaFbrw6kf/wlRB0xcIgdJqlA8RSeIaiFKI+U31xKUynM86Vjn6?=
- =?us-ascii?Q?t5SoLlVDT3ML3jCxx3E54ITr15LkOFFLXCvPxX3SIZYHnuajd+oZtvGSzpZS?=
- =?us-ascii?Q?n4UfX726pQVbbAoUOp0NtLelgJ/LMmiF5bbO6imaLR5w5/fseFToExS5wpwJ?=
- =?us-ascii?Q?B1X9wtzVRXppERhI00pjRWXJ8C1vWe9zI/2/DWXWbw8aPUocmSUaZFyo4cO7?=
- =?us-ascii?Q?7Hc+WCTuaHIbAZFxO6WXYdNRULOe2U7ck3pYCFTWPxCZFr2PXMiCCxaMpUno?=
- =?us-ascii?Q?YtRDKl3lUmM/fRpK48LgILmlpetuPOBYPDvTCc/w9plXNWkzo3q0L2QwMLZt?=
- =?us-ascii?Q?RP7n6jtqGYM6ZpNR8LAQaOJN5HafLeOWe4/9wXNFKgm+XKz0sHvNfAKP7EIa?=
- =?us-ascii?Q?CBseFWfA3up4yljQfGRLrFNq3z4KqPpyew7riV9/VyL/dAwWiPSXjydO4NBu?=
- =?us-ascii?Q?wma+n8l+jGv/bNSIUOKuPIoqy+ZqXUs1ODWmZ7thkv/x3je4UkzfYh9zPZNB?=
- =?us-ascii?Q?lX4W/ei3QTxxv/Zv/sNSWLXF9N2noZ1HDvdlaUytdvT67vKaXGuMuJ+vAcUv?=
- =?us-ascii?Q?X/r7a2/n81wc7CM90WVF5RUTarvnUXvuYxa5mzSjXTVzNas938ySJEOiHW+k?=
- =?us-ascii?Q?3gIuiexs8KCkd7wsWWwL9HeheKaFhFiaShn+0HOI+j386/LkIntGC/2olOD5?=
- =?us-ascii?Q?ZwCE1DZNRIgeLwHdnSV15mlgHcEcBtK9+BhRPnrki0XftPOQ0TFgdIYRrV5U?=
- =?us-ascii?Q?6ZJJ1rh8KEox8/T1snF+SkqwEzn0QuCTacupDt4IauXvdEE7p9EN4LOxg2Pd?=
- =?us-ascii?Q?mQNMjNf1L4KNyJnwveIzw302fKc9GM598q6pWx+AFcG1kp9HAmYk+QX3UgpL?=
- =?us-ascii?Q?zmDwjhKLTPFJqem8Q44I+20MC12u7sfblryhj7op2+UIOQXlGEc+SODH5mCT?=
- =?us-ascii?Q?BBCD4n4+WagMkNcdFiENaaRvG7IYoerz03FlF5G2yBNXCfU0q3lecLk8a8Ol?=
- =?us-ascii?Q?xLfxvDwzdNovFLSS41N3DP13oYriliWBob8vy36Yzlp9hyzhyJMgAGJvDDFP?=
- =?us-ascii?Q?PmgOnvgVy1CELRk5ySOuYY6zoTzMtJphzAR+?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Feb 2025 18:07:59.7586
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b7855d33-e65d-4f50-4397-08dd5822d603
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE3A.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8872
+Mime-Version: 1.0
+References: <cover.1740512583.git.ashish.kalra@amd.com> <27a491ee16015824b416e72921b02a02c27433f7.1740512583.git.ashish.kalra@amd.com>
+Message-ID: <Z8IBHuSc3apsxePN@google.com>
+Subject: Re: [PATCH v5 6/7] KVM: SVM: Add support to initialize SEV/SNP
+ functionality in KVM
+From: Sean Christopherson <seanjc@google.com>
+To: Ashish Kalra <Ashish.Kalra@amd.com>
+Cc: pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
+	thomas.lendacky@amd.com, john.allen@amd.com, herbert@gondor.apana.org.au, 
+	michael.roth@amd.com, dionnaglaze@google.com, nikunj@amd.com, ardb@kernel.org, 
+	kevinloughlin@google.com, Neeraj.Upadhyay@amd.com, aik@amd.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-coco@lists.linux.dev
+Content-Type: multipart/mixed; charset="UTF-8"; boundary="ZxKkPI+e2NE34Qwk"
 
-Add the support for AMD EPYC zen 5 processors (EPYC-Turin).
 
-Add the following new feature bits on top of the feature bits from
-the previous generation EPYC models.
+--ZxKkPI+e2NE34Qwk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-movdiri             : Move Doubleword as Direct Store Instruction
-movdir64b           : Move 64 Bytes as Direct Store Instruction
-avx512-vp2intersect : AVX512 Vector Pair Intersection to a Pair
-                      of Mask Register
-avx-vnni            : AVX VNNI Instruction
-sbpb                : Selective Branch Predictor Barrier
-ibpb-brtype         : IBPB includes branch type prediction flushing
-srso-user-kernel-no : Not vulnerable to SRSO at the user-kernel boundary
+On Tue, Feb 25, 2025, Ashish Kalra wrote:
+> From: Ashish Kalra <ashish.kalra@amd.com>
+> 
+> Move platform initialization of SEV/SNP from CCP driver probe time to
+> KVM module load time so that KVM can do SEV/SNP platform initialization
+> explicitly if it actually wants to use SEV/SNP functionality.
+> 
+> Add support for KVM to explicitly call into the CCP driver at load time
+> to initialize SEV/SNP. If required, this behavior can be altered with KVM
+> module parameters to not do SEV/SNP platform initialization at module load
+> time. Additionally, a corresponding SEV/SNP platform shutdown is invoked
+> during KVM module unload time.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> ---
+>  arch/x86/kvm/svm/sev.c | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 74525651770a..0bc6c0486071 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -2933,6 +2933,7 @@ void __init sev_set_cpu_caps(void)
+>  void __init sev_hardware_setup(void)
+>  {
+>  	unsigned int eax, ebx, ecx, edx, sev_asid_count, sev_es_asid_count;
+> +	struct sev_platform_init_args init_args = {0};
+>  	bool sev_snp_supported = false;
+>  	bool sev_es_supported = false;
+>  	bool sev_supported = false;
+> @@ -3059,6 +3060,17 @@ void __init sev_hardware_setup(void)
+>  	sev_supported_vmsa_features = 0;
+>  	if (sev_es_debug_swap_enabled)
+>  		sev_supported_vmsa_features |= SVM_SEV_FEAT_DEBUG_SWAP;
+> +
+> +	if (!sev_enabled)
+> +		return;
+> +
+> +	/*
+> +	 * Always perform SEV initialization at setup time to avoid
+> +	 * complications when performing SEV initialization later
+> +	 * (such as suspending active guests, etc.).
 
-Link: https://www.amd.com/content/dam/amd/en/documents/epyc-technical-docs/programmer-references/57238.zip
-Link: https://www.amd.com/content/dam/amd/en/documents/corporate/cr/speculative-return-stack-overflow-whitepaper.pdf
-Signed-off-by: Babu Moger <babu.moger@amd.com>
-Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
+This is misleading and wildly incomplete.  *SEV* doesn't have complications, *SNP*
+has complications.  And looking through sev_platform_init(), all of this code
+is buggy.
+
+The sev_platform_init() return code is completely disconnected from SNP setup.
+It can return errors even if SNP setup succeeds, and can return success even if
+SNP setup fails.
+
+I also think it makes sense to require SNP to be initialized during KVM setup.
+I don't see anything in __sev_snp_init_locked() that suggests SNP initialization
+can magically succeed at runtime if it failed at boot.  To keep things sane and
+simple, I think KVM should reject module load if SNP is requested, setup fails,
+and kvm-amd.ko is a module.  If kvm-amd.ko is built-in and SNP fails, just disable
+SNP support.  I.e. when possible, let userspace decide what to do, but don't bring
+down all of KVM just because SNP setup failed.
+
+The attached patches are compile-tested (mostly), can you please test them and
+slot them in?
+
+> +	 */
+> +	init_args.probe = true;
+> +	sev_platform_init(&init_args);
+>  }
+>  
+>  void sev_hardware_unsetup(void)
+> @@ -3074,6 +3086,9 @@ void sev_hardware_unsetup(void)
+>  
+>  	misc_cg_set_capacity(MISC_CG_RES_SEV, 0);
+>  	misc_cg_set_capacity(MISC_CG_RES_SEV_ES, 0);
+> +
+> +	/* Do SEV and SNP Shutdown */
+
+Meh, just omit this comment.  
+
+> +	sev_platform_shutdown();
+>  }
+>  
+>  int sev_cpu_init(struct svm_cpu_data *sd)
+> -- 
+> 2.34.1
+> 
+
+--ZxKkPI+e2NE34Qwk
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-crypto-ccp-Enumerate-SNP-support-in-output-of-sev_pl.patch"
+
+From 7274d7156ff9df5018e4f8ac8fbfae7d7ca8d6d6 Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Fri, 28 Feb 2025 10:01:37 -0800
+Subject: [PATCH 1/4] crypto: ccp: Enumerate SNP support in output of
+ sev_platform_init()
+
+Add an output param to sev_platform_init() to communicate whether or not
+SNP was (or already was) successfully initialized.  The return code from
+sev_platform_init() is completely disconnected from SNP initialization,
+e.g. will return errors if SNP setup succeeded, and will return success if
+SNP setup failed.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- target/i386/cpu.c | 138 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 138 insertions(+)
+ drivers/crypto/ccp/sev-dev.c | 1 +
+ include/linux/psp-sev.h      | 2 ++
+ 2 files changed, 3 insertions(+)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index b9109b7e79..081a7f0c0f 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2665,6 +2665,61 @@ static const CPUCaches epyc_genoa_v2_cache_info = {
-         .share_level = CPU_TOPOLOGY_LEVEL_DIE,
-     },
- };
-+
-+static const CPUCaches epyc_turin_cache_info = {
-+    .l1d_cache = &(CPUCacheInfo) {
-+        .type = DATA_CACHE,
-+        .level = 1,
-+        .size = 48 * KiB,
-+        .line_size = 64,
-+        .associativity = 12,
-+        .partitions = 1,
-+        .sets = 64,
-+        .lines_per_tag = 1,
-+        .self_init = true,
-+        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-+    },
-+    .l1i_cache = &(CPUCacheInfo) {
-+        .type = INSTRUCTION_CACHE,
-+        .level = 1,
-+        .size = 32 * KiB,
-+        .line_size = 64,
-+        .associativity = 8,
-+        .partitions = 1,
-+        .sets = 64,
-+        .lines_per_tag = 1,
-+        .self_init = true,
-+        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-+    },
-+    .l2_cache = &(CPUCacheInfo) {
-+        .type = UNIFIED_CACHE,
-+        .level = 2,
-+        .size = 1 * MiB,
-+        .line_size = 64,
-+        .associativity = 16,
-+        .partitions = 1,
-+        .sets = 1024,
-+        .lines_per_tag = 1,
-+        .self_init = true,
-+        .inclusive = true,
-+        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-+    },
-+    .l3_cache = &(CPUCacheInfo) {
-+        .type = UNIFIED_CACHE,
-+        .level = 3,
-+        .size = 32 * MiB,
-+        .line_size = 64,
-+        .associativity = 16,
-+        .partitions = 1,
-+        .sets = 32768,
-+        .lines_per_tag = 1,
-+        .self_init = true,
-+        .no_invd_sharing = true,
-+        .complex_indexing = false,
-+        .share_level = CPU_TOPOLOGY_LEVEL_DIE,
-+    },
-+};
-+
- /* The following VMX features are not supported by KVM and are left out in the
-  * CPU definitions:
-  *
-@@ -5792,6 +5847,89 @@ static const X86CPUDefinition builtin_x86_defs[] = {
-             { /* end of list */ }
-         }
-     },
-+    {
-+        .name = "EPYC-Turin",
-+        .level = 0xd,
-+        .vendor = CPUID_VENDOR_AMD,
-+        .family = 26,
-+        .model = 0,
-+        .stepping = 0,
-+        .features[FEAT_1_ECX] =
-+            CPUID_EXT_RDRAND | CPUID_EXT_F16C | CPUID_EXT_AVX |
-+            CPUID_EXT_XSAVE | CPUID_EXT_AES |  CPUID_EXT_POPCNT |
-+            CPUID_EXT_MOVBE | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
-+            CPUID_EXT_PCID | CPUID_EXT_CX16 | CPUID_EXT_FMA |
-+            CPUID_EXT_SSSE3 | CPUID_EXT_MONITOR | CPUID_EXT_PCLMULQDQ |
-+            CPUID_EXT_SSE3,
-+        .features[FEAT_1_EDX] =
-+            CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX | CPUID_CLFLUSH |
-+            CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA | CPUID_PGE |
-+            CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 | CPUID_MCE |
-+            CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE | CPUID_DE |
-+            CPUID_VME | CPUID_FP87,
-+        .features[FEAT_6_EAX] =
-+            CPUID_6_EAX_ARAT,
-+        .features[FEAT_7_0_EBX] =
-+            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
-+            CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS |
-+            CPUID_7_0_EBX_INVPCID | CPUID_7_0_EBX_AVX512F |
-+            CPUID_7_0_EBX_AVX512DQ | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
-+            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_AVX512IFMA |
-+            CPUID_7_0_EBX_CLFLUSHOPT | CPUID_7_0_EBX_CLWB |
-+            CPUID_7_0_EBX_AVX512CD | CPUID_7_0_EBX_SHA_NI |
-+            CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512VL,
-+        .features[FEAT_7_0_ECX] =
-+            CPUID_7_0_ECX_AVX512_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
-+            CPUID_7_0_ECX_AVX512_VBMI2 | CPUID_7_0_ECX_GFNI |
-+            CPUID_7_0_ECX_VAES | CPUID_7_0_ECX_VPCLMULQDQ |
-+            CPUID_7_0_ECX_AVX512VNNI | CPUID_7_0_ECX_AVX512BITALG |
-+            CPUID_7_0_ECX_AVX512_VPOPCNTDQ | CPUID_7_0_ECX_LA57 |
-+            CPUID_7_0_ECX_RDPID | CPUID_7_0_ECX_MOVDIRI |
-+            CPUID_7_0_ECX_MOVDIR64B,
-+        .features[FEAT_7_0_EDX] =
-+            CPUID_7_0_EDX_FSRM | CPUID_7_0_EDX_AVX512_VP2INTERSECT,
-+        .features[FEAT_7_1_EAX] =
-+            CPUID_7_1_EAX_AVX_VNNI | CPUID_7_1_EAX_AVX512_BF16,
-+        .features[FEAT_8000_0001_ECX] =
-+            CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
-+            CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
-+            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM |
-+            CPUID_EXT3_TOPOEXT | CPUID_EXT3_PERFCORE,
-+        .features[FEAT_8000_0001_EDX] =
-+            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_PDPE1GB |
-+            CPUID_EXT2_FFXSR | CPUID_EXT2_MMXEXT | CPUID_EXT2_NX |
-+            CPUID_EXT2_SYSCALL,
-+        .features[FEAT_8000_0007_EBX] =
-+            CPUID_8000_0007_EBX_OVERFLOW_RECOV | CPUID_8000_0007_EBX_SUCCOR,
-+        .features[FEAT_8000_0008_EBX] =
-+            CPUID_8000_0008_EBX_CLZERO | CPUID_8000_0008_EBX_XSAVEERPTR |
-+            CPUID_8000_0008_EBX_WBNOINVD | CPUID_8000_0008_EBX_IBPB |
-+            CPUID_8000_0008_EBX_IBRS | CPUID_8000_0008_EBX_STIBP |
-+            CPUID_8000_0008_EBX_STIBP_ALWAYS_ON |
-+            CPUID_8000_0008_EBX_AMD_SSBD | CPUID_8000_0008_EBX_AMD_PSFD,
-+        .features[FEAT_8000_0021_EAX] =
-+            CPUID_8000_0021_EAX_NO_NESTED_DATA_BP |
-+            CPUID_8000_0021_EAX_FS_GS_BASE_NS |
-+            CPUID_8000_0021_EAX_LFENCE_ALWAYS_SERIALIZING |
-+            CPUID_8000_0021_EAX_NULL_SEL_CLR_BASE |
-+            CPUID_8000_0021_EAX_AUTO_IBRS | CPUID_8000_0021_EAX_SBPB |
-+            CPUID_8000_0021_EAX_IBPB_BRTYPE |
-+            CPUID_8000_0021_EAX_SRSO_USER_KERNEL_NO,
-+        .features[FEAT_8000_0022_EAX] =
-+            CPUID_8000_0022_EAX_PERFMON_V2,
-+        .features[FEAT_XSAVE] =
-+            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-+            CPUID_XSAVE_XGETBV1 | CPUID_XSAVE_XSAVES,
-+        .features[FEAT_SVM] =
-+            CPUID_SVM_NPT | CPUID_SVM_LBRV | CPUID_SVM_NRIPSAVE |
-+            CPUID_SVM_TSCSCALE | CPUID_SVM_VMCBCLEAN | CPUID_SVM_FLUSHASID |
-+            CPUID_SVM_PAUSEFILTER | CPUID_SVM_PFTHRESHOLD |
-+            CPUID_SVM_V_VMSAVE_VMLOAD | CPUID_SVM_VGIF |
-+            CPUID_SVM_VNMI | CPUID_SVM_SVME_ADDR_CHK,
-+        .xlevel = 0x80000022,
-+        .model_id = "AMD EPYC-Turin Processor",
-+        .cache_info = &epyc_turin_cache_info,
-+    },
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index cde6ebab589d..5164c5f3bd3f 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -1357,6 +1357,7 @@ static int _sev_platform_init_locked(struct sev_platform_init_args *args)
+ 		 */
+ 		dev_err(sev->dev, "SEV-SNP: failed to INIT, continue SEV INIT\n");
+ 	}
++	args->snp_initialized = sev->snp_initialized;
+ 
+ 	/* Defer legacy SEV/SEV-ES support if allowed by caller/module. */
+ 	if (args->probe && !psp_init_on_probe)
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index 0b3a36bdaa90..726535e302be 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -797,10 +797,12 @@ struct sev_data_snp_shutdown_ex {
+  * @probe: True if this is being called as part of CCP module probe, which
+  *  will defer SEV_INIT/SEV_INIT_EX firmware initialization until needed
+  *  unless psp_init_on_probe module param is set
++ * @snp_initialized: Output param that is true if SNP was initialized.
+  */
+ struct sev_platform_init_args {
+ 	int error;
+ 	bool probe;
++	bool snp_initialized;
  };
  
- /*
--- 
-2.34.1
+ /**
 
+base-commit: ac2ba191f3b6b41c9403b142223dfcc3dfe8903b
+-- 
+2.48.1.711.g2feabab25a-goog
+
+
+--ZxKkPI+e2NE34Qwk
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0002-KVM-SVM-Reject-SNP-VM-creation-if-SNP-platform-initi.patch"
+
+From 6cd53151470bb088e6a5f1fded0e4d9b66fe7bbe Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Fri, 28 Feb 2025 10:09:48 -0800
+Subject: [PATCH 2/4] KVM: SVM: Reject SNP VM creation if SNP platform
+ initialization failed
+
+Explicitly check that SNP platform initialization succeeded prior to
+creating SNP VMs.  The return from sev_platform_init() only tracks "legacy"
+SEV and SEV-ES support, i.e. can return '0' even if SNP setup fails.
+
+Fixes: 1dfe571c12cf ("KVM: SEV: Add initial SEV-SNP support")
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/svm/sev.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 3fc87cdc95c8..dd001a293899 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -449,6 +449,10 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+ 
+ 	/* This needs to happen after SEV/SNP firmware initialization. */
+ 	if (vm_type == KVM_X86_SNP_VM) {
++		if (!init_args.snp_initialized) {
++			ret = -EIO;
++			goto e_free;
++		}
+ 		ret = snp_guest_req_init(kvm);
+ 		if (ret)
+ 			goto e_free;
+-- 
+2.48.1.711.g2feabab25a-goog
+
+
+--ZxKkPI+e2NE34Qwk
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0003-KVM-SVM-Ignore-sev_platform_init-return-code-when-cr.patch"
+
+From 8dd4327a3e30ce73753e818377c6b47a16e48467 Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Fri, 28 Feb 2025 10:09:48 -0800
+Subject: [PATCH 3/4] KVM: SVM: Ignore sev_platform_init() return code when
+ creating SNP VM
+
+Ignore errors from sev_platform_init() when creating SNP VMs, as SNP
+initialization can succeed even if SEV/SEV-ES initialization fails.
+
+Fixes: 1dfe571c12cf ("KVM: SEV: Add initial SEV-SNP support")
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/svm/sev.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index dd001a293899..354f6c32c435 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -443,8 +443,15 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+ 		goto e_no_asid;
+ 
+ 	init_args.probe = false;
++	/*
++	 * Initialize SEV/SEV-ES if neccessary, i.e. if the CCP driver was
++	 * configured to defer setup.
++	 * Ignore failure for SNP VMs, as SNP initialization can succeed even
++	 * if SEV/SEV-ES initialization fails (and vice versa).  SNP support is
++	 * communicated via an out param, and is checked below.
++	 */
+ 	ret = sev_platform_init(&init_args);
+-	if (ret)
++	if (ret && vm_type != KVM_X86_SNP_VM)
+ 		goto e_free;
+ 
+ 	/* This needs to happen after SEV/SNP firmware initialization. */
+-- 
+2.48.1.711.g2feabab25a-goog
+
+
+--ZxKkPI+e2NE34Qwk
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0004-KVM-SVM-Add-support-to-initialize-SEV-SNP-functional.patch"
+
+From d67d8504d1e288f646e67d264f418b2acc300236 Mon Sep 17 00:00:00 2001
+From: Ashish Kalra <ashish.kalra@amd.com>
+Date: Tue, 25 Feb 2025 21:01:33 +0000
+Subject: [PATCH 4/4] KVM: SVM: Add support to initialize SEV/SNP functionality
+ in KVM
+
+Move platform initialization of SEV/SNP from CCP driver probe time to
+KVM module load time so that KVM can do SEV/SNP platform initialization
+explicitly if it actually wants to use SEV/SNP functionality.
+
+Add support for KVM to explicitly call into the CCP driver at load time
+to initialize SEV/SNP. If required, this behavior can be altered with KVM
+module parameters to not do SEV/SNP platform initialization at module load
+time. Additionally, a corresponding SEV/SNP platform shutdown is invoked
+during KVM module unload time.
+
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+Co-developed-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/svm/sev.c | 52 +++++++++++++++++++++++++++++++++++++-----
+ arch/x86/kvm/svm/svm.c |  4 +++-
+ arch/x86/kvm/svm/svm.h |  4 ++--
+ 3 files changed, 51 insertions(+), 9 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 354f6c32c435..2b8c1d125164 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -402,7 +402,7 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+ 			    unsigned long vm_type)
+ {
+ 	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+-	struct sev_platform_init_args init_args = {0};
++	struct sev_platform_init_args init_args = { .probe = false };
+ 	bool es_active = vm_type != KVM_X86_SEV_VM;
+ 	u64 valid_vmsa_features = es_active ? sev_supported_vmsa_features : 0;
+ 	int ret;
+@@ -442,10 +442,9 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+ 	if (ret)
+ 		goto e_no_asid;
+ 
+-	init_args.probe = false;
+ 	/*
+-	 * Initialize SEV/SEV-ES if neccessary, i.e. if the CCP driver was
+-	 * configured to defer setup.
++	 * Initialize SEV/SEV-ES if neccessary, i.e. if setup failued during
++	 * module load, or if the CCP driver was configured to defer setup.
+ 	 * Ignore failure for SNP VMs, as SNP initialization can succeed even
+ 	 * if SEV/SEV-ES initialization fails (and vice versa).  SNP support is
+ 	 * communicated via an out param, and is checked below.
+@@ -456,7 +455,11 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+ 
+ 	/* This needs to happen after SEV/SNP firmware initialization. */
+ 	if (vm_type == KVM_X86_SNP_VM) {
+-		if (!init_args.snp_initialized) {
++		/*
++		 * SNP is initialized during KVM setup, and KVM shouldn't
++		 * advertise support for SNP if initialization failed.
++		 */
++		if (WARN_ON_ONCE(!init_args.snp_initialized)) {
+ 			ret = -EIO;
+ 			goto e_free;
+ 		}
+@@ -2941,9 +2944,10 @@ void __init sev_set_cpu_caps(void)
+ 	}
+ }
+ 
+-void __init sev_hardware_setup(void)
++int __init sev_hardware_setup(void)
+ {
+ 	unsigned int eax, ebx, ecx, edx, sev_asid_count, sev_es_asid_count;
++	struct sev_platform_init_args init_args = { .probe = true };
+ 	bool sev_snp_supported = false;
+ 	bool sev_es_supported = false;
+ 	bool sev_supported = false;
+@@ -3044,6 +3048,38 @@ void __init sev_hardware_setup(void)
+ 	sev_snp_supported = sev_snp_enabled && cc_platform_has(CC_ATTR_HOST_SEV_SNP);
+ 
+ out:
++	/*
++	 * Initialize SEV+ in firmware and throughout the plaform.  If SNP is
++	 * supported by hardare, requested by the user, and fails to initialize,
++	 * reject setup if kvm-amd.ko is built as a module, i.e. if userspace
++	 * can retry and thus decide whether or not SNP is a hard requirement.
++	 * If KVM is fully built-in, continue on so that KVM can still run
++	 * non-SNP VMs.
++	 *
++	 * Leave SEV and SEV-ES as-is; they are compatible with runtime setup,
++	 * and KVM will retry initialization if/when the first SEV/SEV-ES VM is
++	 * created.
++	 *
++	 * Note, if psp_init_on_probe is disabled, this will initialize SNP+,
++	 * but not SEV or SEV-ES.  Deferring SEV/SEV-ES initialization allows
++	 * userspace to hotload firmware (SNP enabling is compatible, "legacy"
++	 * SEV/SEV-ES enabling is not).  As above, KVM will do SEV/SEV-ES at VM
++	 * creation if necessary.
++	 */
++	if (sev_supported) {
++		/*
++		 * Ignore the return value, which only communicates SEV/SEV-ES
++		 * status.  SNP status is provided as an output param.
++		 */
++		sev_platform_init(&init_args);
++		if (!init_args.snp_initialized && sev_snp_supported) {
++			if (IS_MODULE(CONFIG_KVM_AMD))
++				return -EIO;
++
++			sev_snp_supported = false;
++		}
++	}
++
+ 	if (boot_cpu_has(X86_FEATURE_SEV))
+ 		pr_info("SEV %s (ASIDs %u - %u)\n",
+ 			sev_supported ? min_sev_asid <= max_sev_asid ? "enabled" :
+@@ -3070,6 +3106,8 @@ void __init sev_hardware_setup(void)
+ 	sev_supported_vmsa_features = 0;
+ 	if (sev_es_debug_swap_enabled)
+ 		sev_supported_vmsa_features |= SVM_SEV_FEAT_DEBUG_SWAP;
++
++	return 0;
+ }
+ 
+ void sev_hardware_unsetup(void)
+@@ -3085,6 +3123,8 @@ void sev_hardware_unsetup(void)
+ 
+ 	misc_cg_set_capacity(MISC_CG_RES_SEV, 0);
+ 	misc_cg_set_capacity(MISC_CG_RES_SEV_ES, 0);
++
++	sev_platform_shutdown();
+ }
+ 
+ int sev_cpu_init(struct svm_cpu_data *sd)
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 58e377d32627..db48fb8d6257 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -5358,7 +5358,9 @@ static __init int svm_hardware_setup(void)
+ 	 * Note, SEV setup consumes npt_enabled and enable_mmio_caching (which
+ 	 * may be modified by svm_adjust_mmio_mask()), as well as nrips.
+ 	 */
+-	sev_hardware_setup();
++	r = sev_hardware_setup();
++	if (r)
++		return r;
+ 
+ 	svm_hv_hardware_setup();
+ 
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index faa5c0dab0ea..fe7bfab96397 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -773,7 +773,7 @@ static inline struct page *snp_safe_alloc_page(void)
+ void sev_free_vcpu(struct kvm_vcpu *vcpu);
+ void sev_vm_destroy(struct kvm *kvm);
+ void __init sev_set_cpu_caps(void);
+-void __init sev_hardware_setup(void);
++int __init sev_hardware_setup(void);
+ void sev_hardware_unsetup(void);
+ int sev_cpu_init(struct svm_cpu_data *sd);
+ int sev_dev_get_attr(u32 group, u64 attr, u64 *val);
+@@ -797,7 +797,7 @@ static inline struct page *snp_safe_alloc_page(void)
+ static inline void sev_free_vcpu(struct kvm_vcpu *vcpu) {}
+ static inline void sev_vm_destroy(struct kvm *kvm) {}
+ static inline void __init sev_set_cpu_caps(void) {}
+-static inline void __init sev_hardware_setup(void) {}
++static inline int __init sev_hardware_setup(void) { return 0; }
+ static inline void sev_hardware_unsetup(void) {}
+ static inline int sev_cpu_init(struct svm_cpu_data *sd) { return 0; }
+ static inline int sev_dev_get_attr(u32 group, u64 attr, u64 *val) { return -ENXIO; }
+-- 
+2.48.1.711.g2feabab25a-goog
+
+
+--ZxKkPI+e2NE34Qwk--
 
