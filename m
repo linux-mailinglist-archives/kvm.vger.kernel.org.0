@@ -1,103 +1,123 @@
-Return-Path: <kvm+bounces-39743-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39744-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED524A49FC6
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 18:06:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F04DEA49FCB
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 18:07:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D437A174CCC
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 17:06:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FFD03A84F9
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 17:07:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 398EC2702B2;
-	Fri, 28 Feb 2025 17:06:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B437F1A8F9E;
+	Fri, 28 Feb 2025 17:06:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Fjm9BZTj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qudce6UO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17D98189B84
-	for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 17:06:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700352755F6
+	for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 17:06:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740762397; cv=none; b=owNBQNip1iV/j0aBW6Yxt50gElfYroSfc84RccNionh4ecNqy583Q+WftGExB86dAaaq8tl5PCWjACV+f4DW2o9+19uWZT4lF0DL7mwlAO1mupwvSoOaGrf2Y20/DYS4RXn0DGsUpo87VRnLKmcZ/cgINW0sv3AN9qvjukYceRE=
+	t=1740762404; cv=none; b=LLxr7M9X6l4icKDc/TsfYwbCeHlU3fmH07VvVmH7QWn80fG0ngn5FtlaBJp0EbLRhVMKvXyRtsgE28rCxlMaj2yUBGU033UM0wGzZwvttBbtOStdsXCY38wdZUyv0Y8rM9mTHKX8TlTainfLAt0+S1LxwTNdZgTo34ul/rofATA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740762397; c=relaxed/simple;
-	bh=ZNlUa3CeezWnmzy7Kq8Of/zcrmreAtTixe78APIx1Wk=;
+	s=arc-20240116; t=1740762404; c=relaxed/simple;
+	bh=t4Q2wvZb48EBuwVjkxXT6NvgiigVHs3fMJqJwRPXbVU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SFMcuzPr1ZPnqet6DvhgGezjsRo/9vgfF7nBuT/K6ZPv8xCMZyk2mLSq/HmtY9JLU9+MMN1lKDelWHJhF7H9HSaEaW6mQQpwoJsqftgPqWyXjUkR6fYtfB1jjUcgVgX7t3y2LwIkxNlwu5crPlukz9sBlULbGw8z5n9H2BVEbI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Fjm9BZTj; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=dw2pGzpYppqK2JgLEr3QFTbWdmCC5WDAZWjiLYnlYlkPpARntnHYWen59lMNW9ih7EbBMeC9zNRcvbhftWd7ltQiFM0AK2nThjEtfiTX9zP7WggJBdphMQGdcjl2VlaGx1Fw0EIilzLSBZ+U3i0NpF3qrjUOUsh/m1VifsJ9uiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qudce6UO; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-22334230880so33560705ad.1
-        for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 09:06:35 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2feb47c6757so3095372a91.3
+        for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 09:06:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740762395; x=1741367195; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1740762403; x=1741367203; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eWP6D9WOs+e2iJqyvW8XyE8+noGjj4tp3X4+/PvTMxU=;
-        b=Fjm9BZTjoKL4MWjNfTKCpPATlu1Y1ri/xaIHV4MwJdVDy3a4/cUcGi+RC6DLFeQLVT
-         tPfCDbvgX01C5eRsrooK1IIUIi3z/Y7jUH6eBTGgQvoCI6mEqvotGd1XCxaRTe6iZ+LN
-         hyopbZ/afXP/uClLyqJbZwflNiKD2mPjTM8ZP6FzWT5ZGT3LzGjeHqo/Zpmye+IpmmvM
-         Jwdcuswg9GjYK/+d7Lwf0bLQdajQanM29W6vqxrJCA8+V+UmaN3WATs8FJ7oj4SB75Vz
-         P3c60XqHOFmT4bVEgQ0vLPeOWRI+dn6PeAZ6c5n66r/wP59HlLN6u9RjSjIUhjQmUJJZ
-         9cgg==
+        bh=FRALP9rAdADR/8v31ap/i2tCtixKe4fYkVAfof+oSZM=;
+        b=qudce6UOOqgG4oqHIVUYSfr4gj2QEXc8i6w1I/KVVHjo+mAWThyr6Vp72hB0C9ZWsk
+         IdbzO53Va9YD9RtVX3p0fxTvgY8xVl/SHI2ocCLupXgTPa9ZPkxQaX+9NMEsYwBVe56l
+         8ORFLzkFfNE1eQX/XleiX17ogBLG0x8LilAVF2TC3B43fmO3TsKvZgzjpY95z75TRbTF
+         2t0nU+afRQNiHOnKGeWqneGHhl/W1oWGXHBklIPETUSDDbzdf8hd2QN0ZVPU6WTfxXVD
+         661dRPZGwe169wo/Tpo4lqf4c+Ajiohu+BHlAoNI84Z/30No+eO+hIIYqDG5UxbuCm+X
+         wauA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740762395; x=1741367195;
+        d=1e100.net; s=20230601; t=1740762403; x=1741367203;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eWP6D9WOs+e2iJqyvW8XyE8+noGjj4tp3X4+/PvTMxU=;
-        b=OZHUL7//90VLDZXE29CrThMzQ5cfVpccNOe0b33C6vAblEmlhTkw9oj/1AB4QecFBa
-         0PNoq6Bw+1SniW5Bl+ArwFVSA6H9QEi3CIsgN0aXMTPFMskGI9THUAdpuzfIYBtbNH/l
-         PfoiEe6W1ioGTrmmahDT0IC6FxXXG1cjIQduh6h/Z8NiI8jfLjq2AA6IgVZtP/tCQNej
-         JZv5DUm9hwr9JSo8k4zPVKzsquO+Entpqq7fUEVKdcKDjWtdFGQWiIPeVNNMjX99rp/Q
-         AAeNJcV7bQTfx9502S4Y4pkihsMgCpoU9VMZqZ/x1DvcBOpFNoQdMsSXbUBenI1n89Pu
-         fnlA==
-X-Gm-Message-State: AOJu0YyIsYwcpBz7c4E+OdPPeCm/MI+xhWPesJM9QH4Z8JnoBa+8dwTQ
-	7Jp5/fbWtoN62HIEGA8NgzYqMd40lWxuDewdOGaAXrWBhpkdF0+uxdzCKHmAB2y+2Mk9AqGr5mF
-	YGQ==
-X-Google-Smtp-Source: AGHT+IEYtxFcEUEnDqSTHAQVrblyfI2oNMubjRZ5e9W9yNRmL4/qhO+F7kELzTtOhO+SWy8SdhbFQmfwcOA=
-X-Received: from plfz10.prod.google.com ([2002:a17:902:d54a:b0:223:551e:911c])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:17cf:b0:215:89a0:416f
- with SMTP id d9443c01a7336-22368fc97c4mr58635635ad.30.1740762395319; Fri, 28
- Feb 2025 09:06:35 -0800 (PST)
-Date: Fri, 28 Feb 2025 09:06:24 -0800
-In-Reply-To: <20250215010609.1199982-1-seanjc@google.com>
+        bh=FRALP9rAdADR/8v31ap/i2tCtixKe4fYkVAfof+oSZM=;
+        b=TbRWU8WtSyzGQbMmM9cjMwkcV0VTtnQaqTaTZVKTWBFBJovFxIgDYTnkBuEJCbOygo
+         CwEGRIqBlVavQiol5TfY/n6cnwsrlHfi8/PjqziQZJ9+oy0mAz/c4m3hwi6fdeLwhrbd
+         XFkFfeqhoAHgEBs0fDV+16FV/+TxFO0/YbzBOso2GSMitIkfoY2ff09l43ey6e9Hwy8S
+         Ug7p351p2pnj/92G2NqtKdBWZcpjgnETR0+b6WE9m0qz8KzNmkIhcwnLedEb1J9K3fyN
+         FMuqXj/vEJ2IdlF73En7ZzbkvopyAu9uGZpQBdjkFJcC2JrdDOohoQOQUN3D3tSJhm0O
+         r8jQ==
+X-Gm-Message-State: AOJu0Yzs3ber/pEoVW8jcN55dbEhqtGx692QhWPjwyJzuKzcUsZMD7GV
+	uX9o9nKsLTfFPhCdEehVGUTcs08tDgMrymprotum+Xp5me4Hp9cSWjiJeexvzeZ6np2aJsHAcyb
+	BDw==
+X-Google-Smtp-Source: AGHT+IEt64nYiSUPrdOxTNPOPHTIAQus7w+NLV7yZ6Zn8ORHi5B6T6IMJdN9W7cs14DqDsIgbrLsbkMDvaI=
+X-Received: from pjbdj8.prod.google.com ([2002:a17:90a:d2c8:b0:2fc:3022:36b4])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4b50:b0:2fe:8f9f:e5f0
+ with SMTP id 98e67ed59e1d1-2febab702femr6127052a91.19.1740762402761; Fri, 28
+ Feb 2025 09:06:42 -0800 (PST)
+Date: Fri, 28 Feb 2025 09:06:26 -0800
+In-Reply-To: <20250201015518.689704-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250215010609.1199982-1-seanjc@google.com>
+References: <20250201015518.689704-1-seanjc@google.com>
 X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <174050797060.2702095.3801136360929410599.b4-ty@google.com>
-Subject: Re: [PATCH 0/2] KVM: x86: Fix and a cleanup for async #PFs
+Message-ID: <174041647496.2342481.7530493639328581793.b4-ty@google.com>
+Subject: Re: [PATCH v2 00/11] KVM: x86: Fix emulation of (some) L2 instructions
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Fri, 14 Feb 2025 17:06:07 -0800, Sean Christopherson wrote:
-> Fix an issue with async #PF and protected guests (which really shouldn't be
-> using PV asyng #PFs), and clean up naming related to SEND_ALWAYS.
+On Fri, 31 Jan 2025 17:55:07 -0800, Sean Christopherson wrote:
+> Fix a variety of bugs related to emulating instructions on behalf of L2,
+> and (finally) add support for synthesizing nested VM-Exit to L1 when L1
+> wants to intercept an instruction (KVM currently injects a #UD into L2).
 > 
-> Sean Christopherson (2):
->   KVM: x86: Don't inject PV async #PF if SEND_ALWAYS=0 and guest state
->     is protected
->   KVM: x86: Rename and invert async #PF's send_user_only flag to
->     send_always
+> There's no real motivation behind this series.  I spotted the PAUSE_EXITING
+> vs. BUS_LOCK_DETECTION goof when sorting out a report/question about HLT
+> emulation in L2 doing weird things, and then stupidly thought "how hard can
+> it be to generate a VM-Exit?".  Turns out, not that hard, but definitely
+> a bit harder than I was anticipating due to the annoying RIP vs. next RIP
+> flaw.
 > 
 > [...]
 
 Applied to kvm-x86 misc, thanks!
 
-[1/2] KVM: x86: Don't inject PV async #PF if SEND_ALWAYS=0 and guest state is protected
-      https://github.com/kvm-x86/linux/commit/b9595d1ddef8
-[2/2] KVM: x86: Rename and invert async #PF's send_user_only flag to send_always
-      https://github.com/kvm-x86/linux/commit/4fa0efb43a78
+[01/11] KVM: nVMX: Check PAUSE_EXITING, not BUS_LOCK_DETECTION, on PAUSE emulation
+        https://github.com/kvm-x86/linux/commit/f002a97ec8c9
+[02/11] KVM: nSVM: Pass next RIP, not current RIP, for nested VM-Exit on emulation
+        https://github.com/kvm-x86/linux/commit/c8e612bfedff
+[03/11] KVM: nVMX: Allow emulating RDPID on behalf of L2
+        https://github.com/kvm-x86/linux/commit/3244616aac8d
+[04/11] KVM: nVMX: Emulate HLT in L2 if it's not intercepted
+        https://github.com/kvm-x86/linux/commit/f43f7a215af0
+[05/11] KVM: nVMX: Consolidate missing X86EMUL_INTERCEPTED logic in L2 emulation
+        https://github.com/kvm-x86/linux/commit/08e3d89eb330
+[06/11] KVM: x86: Plumb the src/dst operand types through to .check_intercept()
+        https://github.com/kvm-x86/linux/commit/407d03fe924c
+[07/11] KVM: x86: Plumb the emulator's starting RIP into nested intercept checks
+        https://github.com/kvm-x86/linux/commit/9aeb9d8a6738
+[08/11] KVM: x86: Add a #define for the architectural max instruction length
+        https://github.com/kvm-x86/linux/commit/d4aea23fd0ff
+[09/11] KVM: nVMX: Allow the caller to provide instruction length on nested VM-Exit
+        https://github.com/kvm-x86/linux/commit/fbd1e0f19546
+[10/11] KVM: nVMX: Synthesize nested VM-Exit for supported emulation intercepts
+        https://github.com/kvm-x86/linux/commit/79a14afc6090
+[11/11] KVM: selftests: Add a nested (forced) emulation intercept test for x86
+        https://github.com/kvm-x86/linux/commit/2428865bf0af
 
 --
 https://github.com/kvm-x86/linux/tree/next
