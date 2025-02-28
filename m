@@ -1,236 +1,214 @@
-Return-Path: <kvm+bounces-39752-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39753-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53ECFA4A080
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 18:34:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2A2CA4A0DA
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 18:51:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC3393B745E
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 17:34:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F1F87A98AA
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 17:50:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2590A1F09BD;
-	Fri, 28 Feb 2025 17:33:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33D682512E4;
+	Fri, 28 Feb 2025 17:51:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UxeMcg7l"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a1sNo9Wi"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B359E1F4CB3
-	for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 17:33:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B5651BD9C9
+	for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 17:51:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740764021; cv=none; b=oXSod/F5E4JaQjvWAO/VCl7ShZz9/Le7HYnwP1SNISOjCxrtDlMZap3cDRKc9u5RdZWsEY6or4iMeBs7UBwFY5ltJQF1iazB8es1z+MouNb/qGQ7/VInErw+dQP6Xl2wm/auPhKEk39PRkdml/vCrumBWJG+FzWOSAf3i2ifnZM=
+	t=1740765065; cv=none; b=oGJtCGuvv/+PppedDL0SZump9BxxeU34eiUptkMK/DNtp4DP8aWZRFglDkI41VdYvXMwIIWYufOwEMWBJTRrUB/VUClXYUE/IZ3R4Hx6kn2tqzSplxNssACk0KF+Lk2T8M9X6TwG6auDeCz1IhcuLk4n011Ufp116MVpcMWTsho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740764021; c=relaxed/simple;
-	bh=J6ySpsRER44hWFy8MRUtHoj22ATqUm6Z8qwYFmNh4nk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Vpf3xyBEF1BPMtO9S/R/D5VVL++ZPaGC3IkXb5Gojjk29slOSxT0AoCikkCNOzRoaDhSIhydbTh2CB0Fky5ZgIMxTo8w0k7XmWBS5B15Pvl2ukP5pD7YYvRvixKJ94thyrO+kpP5hL3108pB42VDJJjfzqff8oFrcoEp7WyWTBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UxeMcg7l; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740764018;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=rhIm+GV5wR4qNBZa95hn2sN5wbAZ6AH9qtkxMEhDsQ4=;
-	b=UxeMcg7lTSM21HR9EeojYkdBeJbitNF//2G1XNX2w1GZYPZxTpf1CY35WYqz4U/1hfwnKD
-	K2qAc93kLFtumhpWOur4mdnclFOXP2seAPRUjs8DLLFRe78ADErBNgaOKbkO9FZnld1D7Z
-	Q4zEjZzXQQX5b+xX2dEd1M/0uLLa9jA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-206-1PSqBWYcPz2rt39n_21uVQ-1; Fri, 28 Feb 2025 12:33:37 -0500
-X-MC-Unique: 1PSqBWYcPz2rt39n_21uVQ-1
-X-Mimecast-MFC-AGG-ID: 1PSqBWYcPz2rt39n_21uVQ_1740764016
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4394c489babso13927735e9.1
-        for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 09:33:36 -0800 (PST)
+	s=arc-20240116; t=1740765065; c=relaxed/simple;
+	bh=Rd7/uBItQJX+8uapYTk/rpUyTGiqOA264qrStMAcZuw=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=GIQMWQpw3XAjPU/GKEMiUvIyHr4Q+VupprxLeEolK41ikASZcZ8CF8ILxyuNyKDjRCOWwBU9cZMz5nfrehoVt8Ke9GRJPMRG1eUpleD/w2aTtPcvifLz1VRvzGl7v9pHCP+KT1aRdnzFfAvfmUiVYKbL8Sz9ONSbS4S/5o/lLPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a1sNo9Wi; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2f816a85facso4973522a91.3
+        for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 09:51:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740765062; x=1741369862; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=6NyvctiqOUa3n9gcjc6FONh/SC/E+DJ6Q+NnNJwCpW4=;
+        b=a1sNo9WiWO+bqlyVxiCRpS3rccz4kWWfd/j+SZI8YqvSgY/8VLU4vAZ86j0IOodZ55
+         BXYyGYjAfj2MOIH6QhofNpJ/0DrM9FRTit09dAwW1L5HoYSPtCjUG/EP9dILn57gurXX
+         mLYAwrucb24vxGX8LnPLXDMO/b4pAXYrmbLBJJQq9PKc/x3ewtwH+34p0cu4zsVltO40
+         K81ChmwAMWjw4K5zobCA25BkWpGzmfIHMQu/+EuRNnbGgA2vbOXEEY5BBM3H8G7WxPkP
+         +lUfH7ck4+uh00H0c1wZTY/RMb4HIOs1lV84hbC/XCtG7lyAicFgZCPrcGxI5HZ4+Zzq
+         KszQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740764016; x=1741368816;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=rhIm+GV5wR4qNBZa95hn2sN5wbAZ6AH9qtkxMEhDsQ4=;
-        b=agAMXIrMK5tb+lkop2qcriYZl/9F0ZSLSu4tnoNXabqfvgnthwHSTiy9mT96UHwXZ2
-         Me/Dkp7E2ZmEuSjF8kyUC2jK8zECn66hEAHXRwOmWo09nA6FgYhun7VvvniAqdEtMx+B
-         8yJHXWUHdEkhseNorfci6au0GlXYC+7Cz5glKEvXnP/IhFdx6tfVOTjz4FLwDHrRBOMO
-         NnoqZDEvhgKGo3zRDJzIsrIPqzxe5mGiam/0D8xBpeTcMgfvMHjxa8JhjZx7PxvK5cQu
-         51s+vWVo1Xag2wlN6nayqRHgojR/QdoKo8qmQdo2Vh5gHxwq4KX4CAJ3+5eh6YGIoNC8
-         FVUQ==
-X-Gm-Message-State: AOJu0YxAc5rF92lI8POvY88NSc/O55x9UWP8EvWVXMR2YHVr0vsajToJ
-	nGNsBSviPSJFHrh0Hw2z/Otdeg3aJTWPEscNXehhzU1Wc9nUoSgs8E4IRqpdcemJmbzYu7Dd8EA
-	/bOkbKexBs7ZvSFJwjBZtCApNFgnBwopJ+vdTi7hSzLGEQDfQmQ==
-X-Gm-Gg: ASbGncvKM/TXyamTZ9TGY2sLAMuBeuSoVg9ioMTuFI9SD3zbdNsjspeF+PrX5HOPXYJ
-	4boVa30UbO3LTu1+IWgeIkm2F/1jPMJ/1iUqmDw9/VtcZgzJ7aySNw2djzuijJgvrmyNhLpB/FK
-	IF1EiVaBRJB97Ye1eO9lxS3IJz32e6jCVGB7yRVdEgJ9K2nXwwQN+f9PSAW7poN1bBcDxKnSXo6
-	8Ov/+0h/VM5D/QQIFVCbNV9P/QBCLqp6d3iH19dBrBbx6vfQE/wPKuBT7+xBVsleEwd9TrKZ0ba
-	PuQh5fJ1GC3vng/qC7dpdq5aO2Hfp5nGit+fLz3DsYTidfUc4wn36IyOQNdnAR+uN10WmE00Kd3
-	cuY17hSeoNmVfvkKRT01TQk8/dzSMJ5q13xka7zLDUYk=
-X-Received: by 2002:a5d:5985:0:b0:390:eb32:3fc1 with SMTP id ffacd0b85a97d-390ec7d1e4bmr3492737f8f.27.1740764015745;
-        Fri, 28 Feb 2025 09:33:35 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE5vylgmIhOdS0yeOrDHHY05g8cd4R0FkZYz1HiLyQGuUqSC+rKchsZ2KlnSZrQPEf/sddkGw==
-X-Received: by 2002:a5d:5985:0:b0:390:eb32:3fc1 with SMTP id ffacd0b85a97d-390ec7d1e4bmr3492708f8f.27.1740764015297;
-        Fri, 28 Feb 2025 09:33:35 -0800 (PST)
-Received: from ?IPV6:2003:d8:2f36:d800:164f:7689:99fe:7f58? (p200300d82f36d800164f768999fe7f58.dip0.t-ipconnect.de. [2003:d8:2f36:d800:164f:7689:99fe:7f58])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-390e4848252sm5848249f8f.69.2025.02.28.09.33.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Feb 2025 09:33:34 -0800 (PST)
-Message-ID: <5c394c80-bb2b-4f9c-9b76-78b0696fa316@redhat.com>
-Date: Fri, 28 Feb 2025 18:33:30 +0100
+        d=1e100.net; s=20230601; t=1740765062; x=1741369862;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6NyvctiqOUa3n9gcjc6FONh/SC/E+DJ6Q+NnNJwCpW4=;
+        b=hg5v3aYvyznsL2l+BcNPboJbK4F7Brz4s9DWx6xpdOKjeSox1BNB1aJSgXLC96iZC3
+         g4vUVGXZRnA40gJbX2yk6axUR14HSJo3rpv77DbczXj5PWx2WxclGrT06z1VZakPpl//
+         mhGwTJpsYG1Jg0chd0nAKDOiSnPi40uT9/T8VXcx2sC2JIIEVy8mFQoMdno61RcGFXlc
+         CstRnIb6SWsQFSVA9Fpqfy4btXZvWDsc7Y0aAMwubTozWQcIyjJllv8jeyhxpTdJyA71
+         xpBw9SKc822L6lxZ6p/sZq3NoXy5/3kk0ImEBa7XxSXgNqheZii7tynEUfcsKwYGUSLu
+         LTJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWEIgsM+O0OReHkKQ7T97R8mOAf4LNm4+wkwR6ES4R8XhIZQb41PcCD9Lo+2uA25lhpMRc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZVWuU3qIYSImwHVVMxzRzNoZPWWhrjYmdD5M9KlYK0NYRC0qC
+	ylJOusKKuVb/akJDvS5rb+GNBWYDvtI+RDgHXiFyfUmZX6tygV4SzxpSCy/6t+N3na/Amd94IEs
+	UcL6xwROPcxZbpMu34gNUCA==
+X-Google-Smtp-Source: AGHT+IFcKOkFii9o7crCwA/34cEMAOGG0lMrGvepv/XtLz3NB8cMI+uVglV3v5h1Vekl5o+ofsDoALDBoCUPhMpdGg==
+X-Received: from pjbrr3.prod.google.com ([2002:a17:90b:2b43:b0:2fc:1eb0:5743])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:4990:b0:2ee:f80c:687c with SMTP id 98e67ed59e1d1-2febac07e18mr6481041a91.31.1740765061874;
+ Fri, 28 Feb 2025 09:51:01 -0800 (PST)
+Date: Fri, 28 Feb 2025 17:51:00 +0000
+In-Reply-To: <503c4ba7-c667-444a-b396-e85c46469f0a@suse.cz> (message from
+ Vlastimil Babka on Fri, 28 Feb 2025 15:17:11 +0100)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 04/10] KVM: guest_memfd: Add KVM capability to check if
- guest_memfd is shared
-To: Fuad Tabba <tabba@google.com>, Peter Xu <peterx@redhat.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
- pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
- anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
- brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
- xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
- jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
- isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
- vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
- michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
- isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
- suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com,
- quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
- quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
- quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
- james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
- maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com,
- roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com,
- rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
- jthoughton@google.com
-References: <20250218172500.807733-1-tabba@google.com>
- <20250218172500.807733-5-tabba@google.com> <Z8HjG9WlE3Djouko@x1.local>
- <CA+EHjTy60QBnJtMeZsVjOypZxUm5KW0r-Hm6_bEN7On0MLmxjw@mail.gmail.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <CA+EHjTy60QBnJtMeZsVjOypZxUm5KW0r-Hm6_bEN7On0MLmxjw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Message-ID: <diqz8qpqlzzv.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [PATCH v6 1/5] mm/filemap: add mempolicy support to the filemap layer
+From: Ackerley Tng <ackerleytng@google.com>
+To: Vlastimil Babka <vbabka@suse.cz>
+Cc: shivankg@amd.com, akpm@linux-foundation.org, willy@infradead.org, 
+	pbonzini@redhat.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
+	chao.gao@intel.com, seanjc@google.com, david@redhat.com, bharata@amd.com, 
+	nikunj@amd.com, michael.day@amd.com, Neeraj.Upadhyay@amd.com, 
+	thomas.lendacky@amd.com, michael.roth@amd.com, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 28.02.25 18:22, Fuad Tabba wrote:
-> Hi Peter,
-> 
-> On Fri, 28 Feb 2025 at 08:24, Peter Xu <peterx@redhat.com> wrote:
->>
->> On Tue, Feb 18, 2025 at 05:24:54PM +0000, Fuad Tabba wrote:
->>> Add the KVM capability KVM_CAP_GMEM_SHARED_MEM, which indicates
->>> that the VM supports shared memory in guest_memfd, or that the
->>> host can create VMs that support shared memory. Supporting shared
->>> memory implies that memory can be mapped when shared with the
->>> host.
->>>
->>> Signed-off-by: Fuad Tabba <tabba@google.com>
->>> ---
->>>   include/uapi/linux/kvm.h | 1 +
->>>   virt/kvm/kvm_main.c      | 4 ++++
->>>   2 files changed, 5 insertions(+)
->>>
->>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->>> index 45e6d8fca9b9..117937a895da 100644
->>> --- a/include/uapi/linux/kvm.h
->>> +++ b/include/uapi/linux/kvm.h
->>> @@ -929,6 +929,7 @@ struct kvm_enable_cap {
->>>   #define KVM_CAP_PRE_FAULT_MEMORY 236
->>>   #define KVM_CAP_X86_APIC_BUS_CYCLES_NS 237
->>>   #define KVM_CAP_X86_GUEST_MODE 238
->>> +#define KVM_CAP_GMEM_SHARED_MEM 239
->>
->> I think SHARED_MEM is ok.  Said that, to me the use case in this series is
->> more about "in-place" rather than "shared".
->>
->> In comparison, what I'm recently looking at is a "more" shared mode of
->> guest-memfd where it works almost like memfd.  So all pages will be shared
->> there.
->>
->> That helps me e.g. for the N:1 kvm binding issue I mentioned in another
->> email (in one of my relies in previous version), in which case I want to
->> enable gmemfd folios to be mapped more than once in a process.
->>
->> That'll work there as long as it's fully shared, because all things can be
->> registered in the old VA way, then there's no need to have N:1 restriction.
->> IOW, gmemfd will still rely on mmu notifier for tearing downs, and the
->> gmem->bindings will always be empty.
->>
->> So if this one would be called "in-place", then I'll have my use case as
->> "shared".
-> 
-> I understand what you mean. The naming here is to be consistent with
-> the rest of the series. I don't really have a strong opinion. It means
-> SHARED_IN_PLACE, but then that would be a mouthful. :)
+Vlastimil Babka <vbabka@suse.cz> writes:
 
-I'll note that Patrick is also driving it in "all shared" mode for his 
-direct-map removal series IIRC.
+> On 2/26/25 09:25, Shivank Garg wrote:
+>> From: Shivansh Dhiman <shivansh.dhiman@amd.com>
+>> 
+>> Add NUMA mempolicy support to the filemap allocation path by introducing
+>> new APIs that take a mempolicy argument:
+>> - filemap_grab_folio_mpol()
+>> - filemap_alloc_folio_mpol()
+>> - __filemap_get_folio_mpol()
+>> 
+>> These APIs allow callers to specify a NUMA policy during page cache
+>> allocations, enabling fine-grained control over memory placement. This is
+>> particularly needed by KVM when using guest-memfd memory backends, where
+>> the guest memory needs to be allocated according to the NUMA policy
+>> specified by VMM.
+>> 
+>> The existing non-mempolicy APIs remain unchanged and continue to use the
+>> default allocation behavior.
+>> 
+>> Signed-off-by: Shivansh Dhiman <shivansh.dhiman@amd.com>
+>> Signed-off-by: Shivank Garg <shivankg@amd.com>
+>
+> <snip>
+>
+>> --- a/mm/filemap.c
+>> +++ b/mm/filemap.c
+>> @@ -1001,11 +1001,17 @@ int filemap_add_folio(struct address_space *mapping, struct folio *folio,
+>>  EXPORT_SYMBOL_GPL(filemap_add_folio);
+>>  
+>>  #ifdef CONFIG_NUMA
+>> -struct folio *filemap_alloc_folio_noprof(gfp_t gfp, unsigned int order)
+>> +struct folio *filemap_alloc_folio_mpol_noprof(gfp_t gfp, unsigned int order,
+>> +		struct mempolicy *mpol)
+>>  {
+>>  	int n;
+>>  	struct folio *folio;
+>>  
+>> +	if (mpol)
+>> +		return folio_alloc_mpol_noprof(gfp, order, mpol,
+>> +					       NO_INTERLEAVE_INDEX,
 
-So we would have
+Could we pass in the interleave index instead of hard-coding it?
 
-a) All private
-b) Mixing of private and shared (incl conversion)
-c) All shared
+>> +					       numa_node_id());
+>> +
+>>  	if (cpuset_do_page_mem_spread()) {
+>>  		unsigned int cpuset_mems_cookie;
+>>  		do {
+>> @@ -1018,6 +1024,12 @@ struct folio *filemap_alloc_folio_noprof(gfp_t gfp, unsigned int order)
+>>  	}
+>>  	return folio_alloc_noprof(gfp, order);
+>>  }
+>> +EXPORT_SYMBOL(filemap_alloc_folio_mpol_noprof);
+>> +
+>> +struct folio *filemap_alloc_folio_noprof(gfp_t gfp, unsigned int order)
+>> +{
+>> +	return filemap_alloc_folio_mpol_noprof(gfp, order, NULL);
+>> +}
+>>  EXPORT_SYMBOL(filemap_alloc_folio_noprof);
+>>  #endif
+>
+> Here it seems to me:
+>
+> - filemap_alloc_folio_noprof() could stay unchanged
+> - filemap_alloc_folio_mpol_noprof() would
+>   - call folio_alloc_mpol_noprof() if (mpol)
+>   - call filemap_alloc_folio_noprof() otherwise
+>
+> The code would be a bit more clearly structured that way?
+>
 
-"IN_PLACE" might be the wrong angle to look at it.
+I feel that the original proposal makes it clearer that for all filemap
+folio allocations, if mpol is defined, anything to do with cpuset's page
+spread is overridden. Just a slight preference though. I do also agree
+that having filemap_alloc_folio_mpol_noprof() call
+filemap_alloc_folio_noprof() would result in fewer changes.
 
--- 
-Cheers,
-
-David / dhildenb
-
+>> @@ -1881,11 +1893,12 @@ void *filemap_get_entry(struct address_space *mapping, pgoff_t index)
+>>  }
+>>  
+>>  /**
+>> - * __filemap_get_folio - Find and get a reference to a folio.
+>> + * __filemap_get_folio_mpol - Find and get a reference to a folio.
+>>   * @mapping: The address_space to search.
+>>   * @index: The page index.
+>>   * @fgp_flags: %FGP flags modify how the folio is returned.
+>>   * @gfp: Memory allocation flags to use if %FGP_CREAT is specified.
+>> + * @mpol: The mempolicy to apply when allocating a new folio.
+>>   *
+>>   * Looks up the page cache entry at @mapping & @index.
+>>   *
+>> @@ -1896,8 +1909,8 @@ void *filemap_get_entry(struct address_space *mapping, pgoff_t index)
+>>   *
+>>   * Return: The found folio or an ERR_PTR() otherwise.
+>>   */
+>> -struct folio *__filemap_get_folio(struct address_space *mapping, pgoff_t index,
+>> -		fgf_t fgp_flags, gfp_t gfp)
+>> +struct folio *__filemap_get_folio_mpol(struct address_space *mapping, pgoff_t index,
+>> +		fgf_t fgp_flags, gfp_t gfp, struct mempolicy *mpol)
+>>  {
+>>  	struct folio *folio;
+>>  
+>> @@ -1967,7 +1980,7 @@ struct folio *__filemap_get_folio(struct address_space *mapping, pgoff_t index,
+>>  			err = -ENOMEM;
+>>  			if (order > min_order)
+>>  				alloc_gfp |= __GFP_NORETRY | __GFP_NOWARN;
+>> -			folio = filemap_alloc_folio(alloc_gfp, order);
+>> +			folio = filemap_alloc_folio_mpol(alloc_gfp, order, mpol);
+>>  			if (!folio)
+>>  				continue;
+>>  
+>> @@ -2003,6 +2016,13 @@ struct folio *__filemap_get_folio(struct address_space *mapping, pgoff_t index,
+>>  		folio_clear_dropbehind(folio);
+>>  	return folio;
+>>  }
+>> +EXPORT_SYMBOL(__filemap_get_folio_mpol);
+>> +
+>> +struct folio *__filemap_get_folio(struct address_space *mapping, pgoff_t index,
+>> +		fgf_t fgp_flags, gfp_t gfp)
+>> +{
+>> +	return __filemap_get_folio_mpol(mapping, index, fgp_flags, gfp, NULL);
+>> +}
+>>  EXPORT_SYMBOL(__filemap_get_folio);
+>>  
+>>  static inline struct folio *find_get_entry(struct xa_state *xas, pgoff_t max,
 
