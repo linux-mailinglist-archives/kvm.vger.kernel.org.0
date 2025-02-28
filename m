@@ -1,95 +1,96 @@
-Return-Path: <kvm+bounces-39774-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39775-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66D3DA4A6A6
-	for <lists+kvm@lfdr.de>; Sat,  1 Mar 2025 00:41:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36887A4A6AA
+	for <lists+kvm@lfdr.de>; Sat,  1 Mar 2025 00:41:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3A84189C93F
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 087273BB11F
 	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 23:41:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9BCC1DF74F;
-	Fri, 28 Feb 2025 23:40:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02CEB1DEFEE;
+	Fri, 28 Feb 2025 23:41:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="okRC2DRb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Qot7tse1"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E93E1DEFF5
-	for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 23:40:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33631DF270
+	for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 23:41:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740786058; cv=none; b=deR+9nESkiKClNAQviM/rZCVjX2LEzoWTpxnXV4+QTLzReUiFnF2Cj4rufEL+W5WMVmQjKyOwImnbr//yKcrk8AYYyVYmD0YbgkPycPdDGEv5fIXKEtuUjmefJHgyw8c5finxx3czHf8ruZ/vgasvlSdFm9N5VC5W4HP1Y5IhYg=
+	t=1740786064; cv=none; b=cNxCfagfIR8OldH8d6GQn9F9/R/euHXrqwSbZpFF5DwmA4zo8NB489wdPluXpxfYOfUR2iuPoXsI9RVp9qD+UdtR7zZ1JGT3jq2QtFZuoqxFYJtyzPAByA9XuOWtKHaTsH+o7JBaAdPV8aJeI5dvAumjMt7MWB8nBvUr08XgFAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740786058; c=relaxed/simple;
-	bh=X4fmUz6M9WHs8xbXMrIP+NMrZCQ+OGR4N2wlvwZQDa8=;
+	s=arc-20240116; t=1740786064; c=relaxed/simple;
+	bh=czHtOKFbuWT4IFwIXGB3dzoMikaoJb8csCThNc+R2Tk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NrJCGMYqRlJXrPHItXFibXrZtv/x43VaD7yBa7xSRhhV3YCljgkY5cUs3T0pP7/Tpu4XPjsF6yCqz4+SAglUlb+J6+yD13maHh26z4jVq/KDtOm8wp9jgbSNYSSLiRueqTDvNzGFZsYkt/iWAaK+AyaGNzGDfkMfo3wbU6TUBL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=okRC2DRb; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=DiRXFFrql7NIahTPFFe1r2sLu68Z7LklvzrqdmdpHV9B+XXqZYJPGXsEpg4iQlYYRAWb+jgIHkAW44lWNJnxgsp9u/miIueRGGD9w5q65xNBew5KQMCnDdNL644xX+/X3q1r42bR544WX78BYKElGxJJlDzXNdDT55+ecjgf9O8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Qot7tse1; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fe86c01f4aso5512543a91.2
-        for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 15:40:57 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fed5debb85so425361a91.2
+        for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 15:41:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740786057; x=1741390857; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1740786062; x=1741390862; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6Y6kdIhbmecG2s6oijg3hrb/HZDz6lI2TUduP2e++VE=;
-        b=okRC2DRbgKcWRYvPF7gqxNA3TCSIH26D1yX+2+QgGX9SQUME4zhs6JjKJALsgEXcdk
-         HIbCfhmuKupkBekiX5raGgNAhKzmEsIuwCC/PCZ2am/b/yQhDNM5nmKa6cV3Pu5COU2S
-         pc3l6LVsFIlLOUh8tC49gkgpkltw0cwveVvbKi7YggMu2x30Y4+gZuJhRypBVkb+lb54
-         MLIyPQUZv8q6UmrslpLQou0n5Qbg5McK0Zb6I2wnpi/VT7w2q/QIHZQF1/OLqOnI6s0R
-         P9sxkyftuD4GMn8FvJ+XidAlfJ7xlAVuDnF73DJvSsR+D/g2sDvJ2xlrNty8uMRrQK+2
-         fpHw==
+        bh=+Rd2zkA90OfrPC56kZ5TgBkpFyoSsKiSMEhRKLUnwKE=;
+        b=Qot7tse1Mzw2ETR/1mp9X6jcUp3fC+TzmauBU+FMS/A0f65iDRuWYD1LCpZ1K9oVDR
+         GrMlgrZlt7755lqwkJHquj/f59KFVmaYV7JDFxWSfk2CUBEUvVPfYMnLldrs/wKCWFZP
+         /1zaWQkSapYbGWlPOXGjPwyNhS3m8RLgLjNaDWKJgVT1LNiLVbJSv4GJfMmLnwMj8mwp
+         DUQyQtouu9TRfoVvXxd1Fsckj6BM1ZkV/Fid5MX0c5tXcqllCFAKy5T2UJYZILKNQIp0
+         XQD8SZMM8I1Ovzqdz0TOhOXo7Ki5kH5JD4CNYOsNCBUtleB9W/AZcHyYEig+onmi191p
+         a85Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740786057; x=1741390857;
+        d=1e100.net; s=20230601; t=1740786062; x=1741390862;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6Y6kdIhbmecG2s6oijg3hrb/HZDz6lI2TUduP2e++VE=;
-        b=boS8DjNnZWdHNsY5NGk+j0Wg0tsjIVOdyN2aQYC7nKtwonhrHnEStwow+WrTZWtqZu
-         RmmSCr5Kss2M+vifAca5HTflRfNKot1m2lExx6fDOvCAtNWqh+xooA6C/TD5/pGe5zoa
-         ++PX/DuL3i/ZseBU4QCl2MK1z9W6+WFJwBlsMsdpFB/ldD+8c4MqikXNoj2bd/RmneDH
-         0k3NxgsKov56x9wfctNMUGV6ZAktSDG7B1tWZ0ViZ7hIK4lZ8ikvslTrCGNRT/vT9sBD
-         IZ4XoGrNAEbRbmjmif7mD6RUbtjv4ml0Vs592jnhiUQI/s1Ecbn8h8jGlOFC9lMV4lRZ
-         ryRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXmjgefRd1w8VS4pt7Bxei/srcGOnVm7iXAbtnT1854x72+qlF0Gevw0r+x6y8tAMO6myw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YytaI9mxxKXGQFIllkf1crMWQ9iRQmS0eaj/LSO1panl8O6GMCw
-	jVnjtlajeRJopNxJtNhnF0gW3b962rn3gCvWwlcZKH7Q+658hZSo5VG1lxm7WkbhQ4Zas1MJV40
-	R3w==
-X-Google-Smtp-Source: AGHT+IGi1fgzqXBy5vxKuvEo/ZHYsPpv8I4K571iURnu3dRsdMXh/qVkN7umYar1m8IF6nKWFJwTiW+l/DA=
-X-Received: from pjbsj5.prod.google.com ([2002:a17:90b:2d85:b0:2f9:c349:2f84])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2883:b0:2ee:d63f:d8f
- with SMTP id 98e67ed59e1d1-2febab5ba5fmr8017786a91.13.1740786057156; Fri, 28
- Feb 2025 15:40:57 -0800 (PST)
-Date: Fri, 28 Feb 2025 15:40:28 -0800
-In-Reply-To: <20250226074131.312565-1-nik.borisov@suse.com>
+        bh=+Rd2zkA90OfrPC56kZ5TgBkpFyoSsKiSMEhRKLUnwKE=;
+        b=pmhuNNDBFG/krW23wKWyrH9+Y4cYWPee0D/kr6IB0iyIidX3OTUQBdIRPjIf8ry5qd
+         u9lSvZ6bMTkPUziYHhb7/tpMhBNdJM+JDTFLdtblfgzurfJ2z6uEBm5pAN4mRL3MEp5C
+         uJusl5bNvCFNVmaBTC80qlVjVzZQ44jT07X1bfbEhoFTtLdbOv2SbOAozU0a5+HUh3SR
+         3IYUheQ5zXkuYa+cTa85XtxBcuQ3b1M00bv0jr8ydh3GfcJBreCcL9JwFKE465nn+6iP
+         Z51B0As3K3/2DMyXy14+anhnqYagj94FnqEmZr4ceSG5z9u2GRThLNrWzEsbfUjEEoZM
+         qkng==
+X-Forwarded-Encrypted: i=1; AJvYcCV0jwtwlsahRoTVHKVV+mlGI3bKAGjfPS0XDuE9CrapF8hey0UMD8VOoUw8XRmwZiYrezM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRdNCHMhwm95qeENm5pc90VAPrnwd3hV/bu6nR9ShTNitAK8k5
+	N/lu745c08REjBzr7tCjqWvhpbH5P8eKQKhiwEtWmCM6Y42ew7I42sa1cB6qLWw1BohYtRJT7Th
+	ixg==
+X-Google-Smtp-Source: AGHT+IG7CvYyko2UbVPuAkNZZPDFMXpjB4wXlD6Ru8cf7no7JS4XUdhwodgR3HqRriolKmpqFez0BPUdclk=
+X-Received: from pjblb1.prod.google.com ([2002:a17:90b:4a41:b0:2fc:1158:9fe5])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4acb:b0:2ee:a583:e616
+ with SMTP id 98e67ed59e1d1-2febab3e417mr8593663a91.9.1740786062022; Fri, 28
+ Feb 2025 15:41:02 -0800 (PST)
+Date: Fri, 28 Feb 2025 15:40:30 -0800
+In-Reply-To: <20250227220819.656780-1-colin.i.king@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250226074131.312565-1-nik.borisov@suse.com>
+References: <20250227220819.656780-1-colin.i.king@gmail.com>
 X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <174076296192.3737724.4386230620749350319.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: x86/tdp_mmu: Remove tdp_mmu_for_each_pte()
+Message-ID: <174076278043.3736049.13548260851648046331.b4-ty@google.com>
+Subject: Re: [PATCH]][next] KVM: selftests: Fix spelling mistake
+ "UFFDIO_CONINUE" -> "UFFDIO_CONTINUE"
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
-	Nikolay Borisov <nik.borisov@suse.com>
-Cc: linux-kernel@vger.kernel.org, pbonzini@redhat.com
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Colin Ian King <colin.i.king@gmail.com>
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Wed, 26 Feb 2025 09:41:31 +0200, Nikolay Borisov wrote:
-> That macro acts as a different name for for_each_tdp_pte, apart from
-> adding cognitive load it doesn't bring any value. Let's remove it.
+On Thu, 27 Feb 2025 22:08:19 +0000, Colin Ian King wrote:
+> There is a spelling mistake in a PER_PAGE_DEBUG debug message. Fix it.
 
-Applied to kvm-x86 mmu, thanks!
+Applied to kvm-x86 selftests, thanks!
 
-[1/1] KVM: x86/tdp_mmu: Remove tdp_mmu_for_each_pte()
-      https://github.com/kvm-x86/linux/commit/0dab791f05ce
+[1/1] KVM: selftests: Fix spelling mistake "UFFDIO_CONINUE" -> "UFFDIO_CONTINUE"
+      https://github.com/kvm-x86/linux/commit/75418e222e30
 
 --
 https://github.com/kvm-x86/linux/tree/next
