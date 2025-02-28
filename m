@@ -1,215 +1,372 @@
-Return-Path: <kvm+bounces-39686-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39705-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B4E1A49516
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 10:33:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D73C9A495F1
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 10:52:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26EAA17256A
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 09:33:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 736551895406
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2025 09:52:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBA782580CD;
-	Fri, 28 Feb 2025 09:32:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Se5RWO3m"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 643D925B690;
+	Fri, 28 Feb 2025 09:52:01 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2066.outbound.protection.outlook.com [40.107.243.66])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96708255E3C;
-	Fri, 28 Feb 2025 09:31:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740735121; cv=fail; b=cOXbXQ0rXOOllndn8vLoA8HMcAUu1JHp3yuNlBw5DhLyMDuJMCNHCh9Zk/JRYqn6RGzCdN4+FZBxw8uPQwuco6gwrEU2r4D2fld63MByKNKzHI03CiS/o37+w8g+f5b9kodKXtFVxwX+Qlnqdw0l9GayRN34jb2shHBs6z0YzTU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740735121; c=relaxed/simple;
-	bh=vnTidWeawQUhv0PcSUUioS7AHKY78nH9thzr6K+/hko=;
-	h=Message-ID:Date:From:Subject:To:Cc:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=UqlVmnciEX+H3Ue5KwS7RqQsY7o5lKFzjFDbQ7RpE29KqE9msdtMx+zAx1yW2dEdhRYapEDMCpEuO+qUyF0in0F+rZm6Y/0+n5HhrRf5ZL6saUzcr/0W6isauk+NmBLYhKJBGMJy8V4gxk+tTxgs8i/tAfmX1XE2rmJ9sbbr0TQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Se5RWO3m; arc=fail smtp.client-ip=40.107.243.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=vnsaQinTccfTme7MRW5MfuEEU5di9nK+aM8S9tY3FFotIq1q1PpjjNszawOGF02Rd3Jqg2HED6sovsHT66m/srCB4JkprQKsg7Na5wl3Qj59URf6IKr7YhFWIMeGAws3yeF7A2nuNhWDncr2o9JxYn+53cfNQcj+DI5tVan1IgcswgDf/bk5Qk7Dl65ot9hEqK0ecUYN2YU0LxEF3zgz6+BI9hax+P2NmUl6GR3B4HQ96FRxXg5jg6aWoOruDP2qHeerq7loM/LvlUg3crDPsm0P9U5Xf4B3WqVWdW/rjMaYl//W/8d9qzVqFvL3/1MbC/PtcL/UKI/0ai3KryQfqw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Oz/DOSdgZlz9uQKdDoIRGWFw0ffZ4QWlpTk7vY2Bffo=;
- b=Y6/Epi7C5V0C6sEX+yG8IBBH9oaNBwbvNrt6p9gr9DiiwrPvVPgUkhHnGWHN34aERK4qVoana86cT6FEDXDcVajQpUexnbZwBEzIYTVCt3/G2BBzijFpydh++9gbv9qv3Arh9wcSlV6NsyPbwML675WThH9t4nFG+YEHCoBhlmOTZtXTa8dLOSO50pdLTJmnMFHIWsSrZZys3KuqQiNtwUXSsVUHavZLjZynFlnk3qIzTSbag9cRNxehO/wk+L9QL9RPFOPW0d1feUL178z9VwfkwGuLTycYdy5LyOqBxixm37RRmA/O7a3EWGpS2P/c33H/Iuzu4ahs6win/UZr8Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Oz/DOSdgZlz9uQKdDoIRGWFw0ffZ4QWlpTk7vY2Bffo=;
- b=Se5RWO3muKGAn7js0EVorgc6RzI5xn77UqU8RvJZv8zUdnPmi7JWqpc2FQfweU+aKwF7UZG+zZHBv0+ENjj6pyh41EMWeUIV7euNAJr+dX479bqt6d3B9s4WhKjrZVW6PlbrbsgLp3q6D4eeSBkxkwtLaQKpAI7phCibST/99xw=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB6588.namprd12.prod.outlook.com (2603:10b6:510:210::10)
- by CY5PR12MB6060.namprd12.prod.outlook.com (2603:10b6:930:2f::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.22; Fri, 28 Feb
- 2025 09:31:57 +0000
-Received: from PH7PR12MB6588.namprd12.prod.outlook.com
- ([fe80::5e9c:4117:b5e0:cf39]) by PH7PR12MB6588.namprd12.prod.outlook.com
- ([fe80::5e9c:4117:b5e0:cf39%6]) with mapi id 15.20.8489.018; Fri, 28 Feb 2025
- 09:31:56 +0000
-Message-ID: <653c3c6e-bdfc-4604-bda0-3b67970a0c62@amd.com>
-Date: Fri, 28 Feb 2025 15:01:49 +0530
-User-Agent: Mozilla Thunderbird
-From: Ravi Bangoria <ravi.bangoria@amd.com>
-Subject: Re: [PATCH v3 0/6] KVM: SVM: Fix DEBUGCTL bugs
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Xiaoyao Li <xiaoyao.li@intel.com>, rangemachine@gmail.com,
- whanos@sergal.fun, Ravi Bangoria <ravi.bangoria@amd.com>
-References: <20250227222411.3490595-1-seanjc@google.com>
-Content-Language: en-US
-In-Reply-To: <20250227222411.3490595-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN2PR01CA0172.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:26::27) To PH7PR12MB6588.namprd12.prod.outlook.com
- (2603:10b6:510:210::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67FF62594AA;
+	Fri, 28 Feb 2025 09:51:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740736320; cv=none; b=ZL9yFxJ+4H2cgP2x/1Mp65s8mFdouHKQZHoja3S+un0sLtEhUggGDMgUVBzBJinW4yCdxI16gEKyU22KknLdmGOSut1aF5JsQd0VCQP6Cqz6XNhUpeUymKhsDx/8jy94pR7A+jak6dpmbjcAfM6NXQFYPhWMHOAGam65+SfZLW8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740736320; c=relaxed/simple;
+	bh=CFZGYr6wSaFg23H+23+tsMplIUKUtKFYCq+41ItKnfY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ujoe63X8TNgIwwfYJmL/UaRQliYxAYC3L94qdqp6uQYBMSeC45cPOJKEJl6x9IU2mVymwlndluhxZQIGDqA8VbZrkZaWg2Bpa67UPzMTXfvaK1ZmdbS4Oy0/CrNQP0fEMl8DTvyHvZCnh8R6BqHbynmmKZyOspohN0zdlcjHZtg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Z43NZ5t4zzVmX2;
+	Fri, 28 Feb 2025 17:50:22 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 737AB1800B3;
+	Fri, 28 Feb 2025 17:51:54 +0800 (CST)
+Received: from localhost.localdomain (10.90.30.45) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 28 Feb 2025 17:51:54 +0800
+From: Yunsheng Lin <linyunsheng@huawei.com>
+To: Yishai Hadas <yishaih@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>, Shameer
+ Kolothum <shameerali.kolothum.thodi@huawei.com>, Kevin Tian
+	<kevin.tian@intel.com>, Alex Williamson <alex.williamson@redhat.com>, Chris
+ Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, David Sterba
+	<dsterba@suse.com>, Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
+	Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>, Sandeep
+ Dhavale <dhavale@google.com>, Carlos Maiolino <cem@kernel.org>, "Darrick J.
+ Wong" <djwong@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
+	<ilias.apalodimas@linaro.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Trond Myklebust
+	<trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, Chuck Lever
+	<chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown
+	<neilb@suse.de>, Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo
+	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>
+CC: Yunsheng Lin <linyunsheng@huawei.com>, Luiz Capitulino
+	<luizcap@redhat.com>, Mel Gorman <mgorman@techsingularity.net>, Dave Chinner
+	<david@fromorbit.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+	<linux-btrfs@vger.kernel.org>, <linux-erofs@lists.ozlabs.org>,
+	<linux-xfs@vger.kernel.org>, <linux-mm@kvack.org>, <netdev@vger.kernel.org>,
+	<linux-nfs@vger.kernel.org>
+Subject: [PATCH v2] mm: alloc_pages_bulk: remove assumption of populating only NULL elements
+Date: Fri, 28 Feb 2025 17:44:20 +0800
+Message-ID: <20250228094424.757465-1-linyunsheng@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB6588:EE_|CY5PR12MB6060:EE_
-X-MS-Office365-Filtering-Correlation-Id: 97eb4c66-38b4-40e9-f1d7-08dd57dabe3d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?QVNDTXZJMElzY2s1L0RjMzMyUmQrK3FIb0FpVzlBZkZpcWR4QTRHTUZ4M0ha?=
- =?utf-8?B?SldydkM1UEptQkIzOVErS0pFa1c2eGd4L0owODc3bmRxemw1empKNUYwRkZz?=
- =?utf-8?B?NlFYQmlCbzRKVFRpTmVLTzF2RFd0WGpLTU0zKzlvYmk4MjNYdnRiOGlvdHc0?=
- =?utf-8?B?RnN4b2FmNWlSS1FiNjUvenNDWVcyeUhhdER5V3RPT2k2Tlk1RFoxUi93SWVW?=
- =?utf-8?B?Tk9RRFlveFRZSVRwN0hTUWJlb2J4S25EWmlwUSt6clNWY3E1N04vcmVHbGg1?=
- =?utf-8?B?UHVBa2F2NE9XTmowWEV5VERKZGR0WHpiUXdhbDJTZ1NRUjdBbDZxQWxENnRj?=
- =?utf-8?B?dWptSm5POVJvYVZla0Jqa0RRdklyL0p5T1cvK1RxeGhrckRtbGcyWllhUVo1?=
- =?utf-8?B?VHpGYmluQk0vTFJLMHoxQWRSMFdsczYxQlVxSkM4SmUzZWNSeVNpeWk4RWM0?=
- =?utf-8?B?SlBwZC8reW52RzdYc1JaZEdPWTJqZmJMN2h2eFZkSkEwZkJaKzYvNHUzTWt3?=
- =?utf-8?B?Rm8zYVovZHBOSFpxSE9nZi9GakdvcTZ4VGpscys5aHVIUkl4bHhYTmlmQ2s1?=
- =?utf-8?B?dWRPOUl3U1RKVEM2WWpkMzRpMXZYbmdVbHJuazhUWGtJWkV0dmtmd21IT1dG?=
- =?utf-8?B?ZXkyeklnekpnUHhuV2NSVE1hakZQQ1d6UTdIQnBLVmFrVXg0NTM2U242bG02?=
- =?utf-8?B?dUQxVE0vS1ZDaXB2S3FIQWpNWjFhcDZsTEkwcjUvODZIYlZ3Q2ZrUVBEbEFu?=
- =?utf-8?B?YWgrYXJmbHN3V1VTRTZMdUZHYk5HbEVyZlFueVk4Rm1QNTFsdlI2aEpvVlA2?=
- =?utf-8?B?ZnVUc1hzZDdwcndGS1o0M3FoS1NBdHJWVU13OGdsNnB3eGl2LzcwRHMvaHU5?=
- =?utf-8?B?Q1E4bGdhUjZQYjd0US9odzBYL0p0N0JQSXNLK2EwZWdkSXZVbHZwWWlCZENK?=
- =?utf-8?B?YzQ5MUJuUkZSUFNJeDlSbGVDS1JVeXU4OHFyUUdSdXk4ZmZQcXBsVThNRDJM?=
- =?utf-8?B?anNtT0FKMEUycHBCU3k4T0ZLbFZ5UXNIbUs3MzFnWmFpYjE0TDBWeHV6R1FN?=
- =?utf-8?B?bFlaYmVQNk1WTXY1NytuRGp3Sk1EeWI3ZHE3THgvRlU1ZDdSd0pPWmM5b2hT?=
- =?utf-8?B?UjE2VTBFR2NGVEIzUmFvSmZQb3VhMXRxVVlwd0pkVWV3N3FoZXNiSHVkM0ZS?=
- =?utf-8?B?c2RneHJkOWVEMzhDWkMwcmQ2SStySk4wSVRxQmtTSy80ZkpRcENvSFZqN2pM?=
- =?utf-8?B?NFVGRnFUMnZ3SVErRWkvYXMvNXdyYXhvcDRxQkZPUitHVS91M053TFBINXhl?=
- =?utf-8?B?TWIzMW9ob2dZWG1WTzFrRUVMdVV5aHZwT1dvclB4K09id29mN0dpU3dPaGJ6?=
- =?utf-8?B?TWNlRlJhb3JwdTB0MXhWbCtvV1VIVi9meXVqT1NHKzhheXBQWFF6SVB4NGls?=
- =?utf-8?B?MG5DT0xxdlBoZURxM0VUMEZLQmNKTWdTcGZvUjZWbmhVY2hTSmJPVEtvTVZy?=
- =?utf-8?B?NnVzQWFiL2h0bjQ4aklhRzNvdEV1NFdQQjhJVThBSGg3Tk10ekROUTArdDNL?=
- =?utf-8?B?b0NZbnpHODMxWVpxdjczeHdWdU4rUEJiRnk1SUJ6RVM1V3czU0NXdUpiMHVM?=
- =?utf-8?B?MmhidmZneGUvQjZZNTRRaS9OTlJtRHFtZnhEWVdrS3hLZlJpVklZVXJMSHNE?=
- =?utf-8?B?QTkvaWRXVHV4UG9GQ1hVOGRSdWJVdFhNeXQ0THNjRm1oYk5wS0t0bVJXK1dR?=
- =?utf-8?B?NXd3dU5maVZWL2ZXeUlqd0lqQ1d6SHcwc0JyVWZ5b1ZBOXR6Smd5dmlyWUl2?=
- =?utf-8?B?bnRJUkZVYUtGSFY1ZDdPdWhTNjNldDVXSmVYWm1hbll2ZXNmZW9IYzVFbzFo?=
- =?utf-8?Q?KqW55wCGRz0yU?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB6588.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?M1h4TFkrWmZYS3hESTcvdkEwblJhdHdnMVZVeStjSTR6WHU2S2s5c2RqV1Mx?=
- =?utf-8?B?Wm9zU2s2L1FZVU5YRC80bVBxT3M0dkZLVTVKVlpzUkhySW1lUlVZUWtKc09j?=
- =?utf-8?B?Q1daYkExUGpYQjJ4OU1HNzAxT2RVeHRiQVg1ODhoU0NYVWo3Ym1YY1lxMXZk?=
- =?utf-8?B?ZkFzYllHMFRXWVdHNkMzcjRxM3JkUnFWL0lTVk5rcTJyOTFpbkxTckI2VDBa?=
- =?utf-8?B?RDlHZDVNdGs1Vm9zVG1oOU1JR0ptQVozN3p6RnczT21Qb2htanVCYnhvUFhB?=
- =?utf-8?B?UlppNnBCbUp6SzcrSVRUc2xyQ053T05WZDI3Q2FiUWtEMVdNaitNc1M3a2RH?=
- =?utf-8?B?eFJtTjBDZkRLSnk2RXlRUSs2WnZCVjRwZUtXOEZzSDgwN0dMaXNFS2JVWWd5?=
- =?utf-8?B?ejZBcHo5Wkt0b085MzhRdHNlOENCdjJITEgva2UvdDhCNDhDQmhlaVBJZ0F4?=
- =?utf-8?B?Z3VzZytJOFJvajkyUFlkbklJVU9SKzJPR1BYNzl1WStaLzZtNU1JVGs5RktM?=
- =?utf-8?B?NGUyWDNGVVJINklUZU5Ram9jUFZFQzJlKzY0TUkwbEdOTlUybnk4MCtkNG4r?=
- =?utf-8?B?Wm9RZnFBMVRlT0ppWWZJTzBSZFVURE1Xa2FFV1M2SXphT3R4dEdLWkZoQjRJ?=
- =?utf-8?B?cHFNNkd6cGdNWEZKaGpxOTNWakxMNnRmcDNab01vM1JMc0dkQWk1SHVuQ21t?=
- =?utf-8?B?WXBjcHN5NVVmNnBaeHZHYXowZTlaYnJtaXlLdllWeUJIWGo5K2hqaUhtVXJU?=
- =?utf-8?B?eGFEdlg1QkZFcmdiWjFXL3J0OHIrM2VvVWc3bkVwTjdSUEFNaS8yeE5RUVFr?=
- =?utf-8?B?Vm9GdXJKV0lJRnAzaWhsWVZTQy91Yk16bVV1TjdxSVd5WU9zYnZ0bDdQRlEx?=
- =?utf-8?B?aVBYUjNDT1FDM3dETXVYcG1TMEIrdE9rYmN4MGhFQ1kzVEFHODZ6dlkyRHRw?=
- =?utf-8?B?eGdqU0dLR2tqdy96VSt3RFdPeGdQRjJ2OUl5anhlUXY4eitjTUVKYjdBYWdR?=
- =?utf-8?B?RDhDN0cxQU5odlQ3aHdNdEtWblVnWHJNbCtCOGRSQkdEUEhya0dQRE1EQ2p2?=
- =?utf-8?B?bmdKSHRGSlRqYUZqMHVvQk1TR24zamFGWGVvR0NKRUpSL1hsMmdCcWNsVG9N?=
- =?utf-8?B?Z3U5eWxOYnNCMmtoa2I4N1J3ZFA5Vm5JUnVqcnh0UDVPU1Q5Y2ZFQVFLZGtQ?=
- =?utf-8?B?S29QODZtVEs2WllRNUtZcXRQZXNrUVNSRU8vdytTZ1J4RmtacnFiTHJrd2la?=
- =?utf-8?B?QnFVbWtwY091S25XSDBrVlc3OVdZQ2FlVkhDMC9CUnh0MTR2V3FCc3hkRHl0?=
- =?utf-8?B?bkJnTXQ2aTY4MEZpQlhndEtHRG11cVRJOVh1b3pFNndtQnNJZXZlTDFzSlMx?=
- =?utf-8?B?OE0zTFh4MUlJWVlVZkRqejlHK2ZqVnYwYnRHUUdiV2RlcE5qR0RqQzZsZ2Zy?=
- =?utf-8?B?V1Zkc2oxQWd6azltVGlJSWd1V2ljaXFQc1VMRlM4bWdibWdLZlZyQ2xiYmJY?=
- =?utf-8?B?UCtXMnpmU3RUbG9vaWtmc0liL2M0L3Z4cXdycEFZT3VEbVdSTHo5ZmxHdEFG?=
- =?utf-8?B?blozYjBTeXVIRno1OFZ3aGo3NmE1U3hyYlMvdjNMWHpGN0JIS2NrUmFrQkZj?=
- =?utf-8?B?VmNaWGowNnAwdldlODVrbXZyL2ZCMXY5a3FoWFh2Tm42VStsTjRFWCtPL3Zy?=
- =?utf-8?B?RGlJb0JzWUZCOCtlR3c4empDNGd3MzJ1allGTnlIeGRvdkpLZERjVUhSSkNE?=
- =?utf-8?B?c1hPbnhxMnl5VWtVUHRRcUJKQUVSYWhEekNjM0UxQ0xBcjNkdUl3Q2dOWFBv?=
- =?utf-8?B?T2dlMEVaNkFkWFlHOHFETGp0QjlCMWxFMllTNmdiN2NiNHgxeDc4cFFvV0NX?=
- =?utf-8?B?RnVabzdkRUl1bFpHSmJpVzNvbEU1eURUYWhTcGJlNm91QzdDYlR3Q3R5R24w?=
- =?utf-8?B?R0pGOEM1M3NPTmRIb2JmdjFEYjI5bXhiaWE2SzhNTUVaTmgyc3VBWWxtOXBW?=
- =?utf-8?B?N3RlSThtTFpkT0FoWXdUcUwxME8wMFNkL1RJRUJmVHdLeUNYbFRXclFHZ21D?=
- =?utf-8?B?dmJKRkNTUTlSY1RsekV6QXRHY3lwRlNOM3YvNG5pcmMzNXNuSkZ2UGdGZjN5?=
- =?utf-8?Q?iBQ2wYgBAOxTIrFKDEErCPVMD?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 97eb4c66-38b4-40e9-f1d7-08dd57dabe3d
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB6588.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Feb 2025 09:31:56.6307
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mrYtQvCPwrWFEu8sj0vLKNXCeIDcSmum8otmYlxwd/1DheGUZ5TXyVnQtgp3UMGAqmcV1x8VbxBELZOf7yWh4w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6060
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-On 28-Feb-25 3:54 AM, Sean Christopherson wrote:
-> Fix a long-lurking bug in SVM where KVM runs the guest with the host's
-> DEBUGCTL if LBR virtualization is disabled.  AMD CPUs rather stupidly
-> context switch DEBUGCTL if and only if LBR virtualization is enabled (not
-> just supported, but fully enabled).
-> 
-> The bug has gone unnoticed because until recently, the only bits that
-> KVM would leave set were things like BTF, which are guest visible but
-> won't cause functional problems unless guest software is being especially
-> particular about #DBs.
-> 
-> The bug was exposed by the addition of BusLockTrap ("Detect" in the kernel),
-> as the resulting #DBs due to split-lock accesses in guest userspace (lol
-> Steam) get reflected into the guest by KVM.
-> 
-> Note, I don't love suppressing DEBUGCTL.BTF, but practically speaking that's
-> likely the behavior that SVM guests have gotten the vast, vast majority of
-> the time, and given that it's the behavior on Intel, it's (hopefully) a safe
-> option for a fix, e.g. versus trying to add proper BTF virtualization on the
-> fly.
-> 
-> v3:
->  - Suppress BTF, as KVM doesn't actually support it. [Ravi]
->  - Actually load the guest's DEBUGCTL (though amusingly, with BTF squashed,
->    it's guaranteed to be '0' in this scenario). [Ravi]
-> 
-> v2:
->  - Load the guest's DEBUGCTL instead of simply zeroing it on VMRUN.
->  - Drop bits 5:3 from guest DEBUGCTL so that KVM doesn't let the guest
->    unintentionally enable BusLockTrap (AMD repurposed bits). [Ravi]
->  - Collect a review. [Xiaoyao]
->  - Make bits 5:3 fully reserved, in a separate not-for-stable patch.
-> 
-> v1: https://lore.kernel.org/all/20250224181315.2376869-1-seanjc@google.com
+As mentioned in [1], it seems odd to check NULL elements in
+the middle of page bulk allocating, and it seems caller can
+do a better job of bulk allocating pages into a whole array
+sequentially without checking NULL elements first before
+doing the page bulk allocation for most of existing users.
 
-For the series,
+Through analyzing of bulk allocation API used in fs, it
+seems that the callers are depending on the assumption of
+populating only NULL elements in fs/btrfs/extent_io.c and
+net/sunrpc/svc_xprt.c while erofs and btrfs don't, see:
+commit 91d6ac1d62c3 ("btrfs: allocate page arrays using bulk page allocator")
+commit d6db47e571dc ("erofs: do not use pagepool in z_erofs_gbuf_growsize()")
+commit c9fa563072e1 ("xfs: use alloc_pages_bulk_array() for buffers")
+commit f6e70aab9dfe ("SUNRPC: refresh rq_pages using a bulk page allocator")
 
-Reviewed-and-tested-by: Ravi Bangoria <ravi.bangoria@amd.com>
+Change SUNRPC and btrfs to not depend on the assumption.
+Other existing callers seems to be passing all NULL elements
+via memset, kzalloc, etc.
 
-Thanks,
-Ravi
+Remove assumption of populating only NULL elements and treat
+page_array as output parameter like kmem_cache_alloc_bulk().
+Remove the above assumption also enable the caller to not
+zero the array before calling the page bulk allocating API,
+which has about 1~2 ns performance improvement for the test
+case of time_bench_page_pool03_slow() for page_pool in a
+x86 vm system, this reduces some performance impact of
+fixing the DMA API misuse problem in [2], performance
+improves from 87.886 ns to 86.429 ns.
+
+1. https://lore.kernel.org/all/bd8c2f5c-464d-44ab-b607-390a87ea4cd5@huawei.com/
+2. https://lore.kernel.org/all/20250212092552.1779679-1-linyunsheng@huawei.com/
+CC: Jesper Dangaard Brouer <hawk@kernel.org>
+CC: Luiz Capitulino <luizcap@redhat.com>
+CC: Mel Gorman <mgorman@techsingularity.net>
+CC: Dave Chinner <david@fromorbit.com>
+CC: Chuck Lever <chuck.lever@oracle.com>
+Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+Acked-by: Jeff Layton <jlayton@kernel.org>
+---
+V2:
+1. Drop RFC tag and rebased on latest linux-next.
+2. Fix a compile error for xfs.
+3. Defragmemt the page_array for SUNRPC and btrfs.
+---
+ drivers/vfio/pci/virtio/migrate.c |  2 --
+ fs/btrfs/extent_io.c              | 23 +++++++++++++++++-----
+ fs/erofs/zutil.c                  | 12 ++++++------
+ fs/xfs/xfs_buf.c                  |  9 +++++----
+ mm/page_alloc.c                   | 32 +++++--------------------------
+ net/core/page_pool.c              |  3 ---
+ net/sunrpc/svc_xprt.c             | 22 +++++++++++++++++----
+ 7 files changed, 52 insertions(+), 51 deletions(-)
+
+diff --git a/drivers/vfio/pci/virtio/migrate.c b/drivers/vfio/pci/virtio/migrate.c
+index ba92bb4e9af9..9f003a237dec 100644
+--- a/drivers/vfio/pci/virtio/migrate.c
++++ b/drivers/vfio/pci/virtio/migrate.c
+@@ -91,8 +91,6 @@ static int virtiovf_add_migration_pages(struct virtiovf_data_buffer *buf,
+ 		if (ret)
+ 			goto err_append;
+ 		buf->allocated_length += filled * PAGE_SIZE;
+-		/* clean input for another bulk allocation */
+-		memset(page_list, 0, filled * sizeof(*page_list));
+ 		to_fill = min_t(unsigned int, to_alloc,
+ 				PAGE_SIZE / sizeof(*page_list));
+ 	} while (to_alloc > 0);
+diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+index f0a1da40d641..ef52cedd9873 100644
+--- a/fs/btrfs/extent_io.c
++++ b/fs/btrfs/extent_io.c
+@@ -623,13 +623,26 @@ int btrfs_alloc_page_array(unsigned int nr_pages, struct page **page_array,
+ 			   bool nofail)
+ {
+ 	const gfp_t gfp = nofail ? (GFP_NOFS | __GFP_NOFAIL) : GFP_NOFS;
+-	unsigned int allocated;
++	unsigned int allocated, ret;
+ 
+-	for (allocated = 0; allocated < nr_pages;) {
+-		unsigned int last = allocated;
++	/* Defragment page_array so pages can be bulk allocated into remaining
++	 * NULL elements sequentially.
++	 */
++	for (allocated = 0, ret = 0; ret < nr_pages; ret++) {
++		if (page_array[ret]) {
++			page_array[allocated] = page_array[ret];
++			if (ret != allocated)
++				page_array[ret] = NULL;
++
++			allocated++;
++		}
++	}
+ 
+-		allocated = alloc_pages_bulk(gfp, nr_pages, page_array);
+-		if (unlikely(allocated == last)) {
++	while (allocated < nr_pages) {
++		ret = alloc_pages_bulk(gfp, nr_pages - allocated,
++				       page_array + allocated);
++		allocated += ret;
++		if (unlikely(!ret)) {
+ 			/* No progress, fail and do cleanup. */
+ 			for (int i = 0; i < allocated; i++) {
+ 				__free_page(page_array[i]);
+diff --git a/fs/erofs/zutil.c b/fs/erofs/zutil.c
+index 55ff2ab5128e..1c50b5e27371 100644
+--- a/fs/erofs/zutil.c
++++ b/fs/erofs/zutil.c
+@@ -85,13 +85,13 @@ int z_erofs_gbuf_growsize(unsigned int nrpages)
+ 
+ 		for (j = 0; j < gbuf->nrpages; ++j)
+ 			tmp_pages[j] = gbuf->pages[j];
+-		do {
+-			last = j;
+-			j = alloc_pages_bulk(GFP_KERNEL, nrpages,
+-					     tmp_pages);
+-			if (last == j)
++
++		for (last = j; last < nrpages; last += j) {
++			j = alloc_pages_bulk(GFP_KERNEL, nrpages - last,
++					     tmp_pages + last);
++			if (!j)
+ 				goto out;
+-		} while (j != nrpages);
++		}
+ 
+ 		ptr = vmap(tmp_pages, nrpages, VM_MAP, PAGE_KERNEL);
+ 		if (!ptr)
+diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
+index 5d560e9073f4..b4e95b2dd0f0 100644
+--- a/fs/xfs/xfs_buf.c
++++ b/fs/xfs/xfs_buf.c
+@@ -319,16 +319,17 @@ xfs_buf_alloc_pages(
+ 	 * least one extra page.
+ 	 */
+ 	for (;;) {
+-		long	last = filled;
++		long	alloc;
+ 
+-		filled = alloc_pages_bulk(gfp_mask, bp->b_page_count,
+-					  bp->b_pages);
++		alloc = alloc_pages_bulk(gfp_mask, bp->b_page_count - filled,
++					 bp->b_pages + filled);
++		filled += alloc;
+ 		if (filled == bp->b_page_count) {
+ 			XFS_STATS_INC(bp->b_mount, xb_page_found);
+ 			break;
+ 		}
+ 
+-		if (filled != last)
++		if (alloc)
+ 			continue;
+ 
+ 		if (flags & XBF_READ_AHEAD) {
+diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+index f07c95eb5ac1..625d14ee4a41 100644
+--- a/mm/page_alloc.c
++++ b/mm/page_alloc.c
+@@ -4599,9 +4599,6 @@ static inline bool prepare_alloc_pages(gfp_t gfp_mask, unsigned int order,
+  * This is a batched version of the page allocator that attempts to
+  * allocate nr_pages quickly. Pages are added to the page_array.
+  *
+- * Note that only NULL elements are populated with pages and nr_pages
+- * is the maximum number of pages that will be stored in the array.
+- *
+  * Returns the number of pages in the array.
+  */
+ unsigned long alloc_pages_bulk_noprof(gfp_t gfp, int preferred_nid,
+@@ -4617,29 +4614,18 @@ unsigned long alloc_pages_bulk_noprof(gfp_t gfp, int preferred_nid,
+ 	struct alloc_context ac;
+ 	gfp_t alloc_gfp;
+ 	unsigned int alloc_flags = ALLOC_WMARK_LOW;
+-	int nr_populated = 0, nr_account = 0;
+-
+-	/*
+-	 * Skip populated array elements to determine if any pages need
+-	 * to be allocated before disabling IRQs.
+-	 */
+-	while (nr_populated < nr_pages && page_array[nr_populated])
+-		nr_populated++;
++	int nr_populated = 0;
+ 
+ 	/* No pages requested? */
+ 	if (unlikely(nr_pages <= 0))
+ 		goto out;
+ 
+-	/* Already populated array? */
+-	if (unlikely(nr_pages - nr_populated == 0))
+-		goto out;
+-
+ 	/* Bulk allocator does not support memcg accounting. */
+ 	if (memcg_kmem_online() && (gfp & __GFP_ACCOUNT))
+ 		goto failed;
+ 
+ 	/* Use the single page allocator for one page. */
+-	if (nr_pages - nr_populated == 1)
++	if (nr_pages == 1)
+ 		goto failed;
+ 
+ #ifdef CONFIG_PAGE_OWNER
+@@ -4711,24 +4697,16 @@ unsigned long alloc_pages_bulk_noprof(gfp_t gfp, int preferred_nid,
+ 	/* Attempt the batch allocation */
+ 	pcp_list = &pcp->lists[order_to_pindex(ac.migratetype, 0)];
+ 	while (nr_populated < nr_pages) {
+-
+-		/* Skip existing pages */
+-		if (page_array[nr_populated]) {
+-			nr_populated++;
+-			continue;
+-		}
+-
+ 		page = __rmqueue_pcplist(zone, 0, ac.migratetype, alloc_flags,
+ 								pcp, pcp_list);
+ 		if (unlikely(!page)) {
+ 			/* Try and allocate at least one page */
+-			if (!nr_account) {
++			if (!nr_populated) {
+ 				pcp_spin_unlock(pcp);
+ 				goto failed_irq;
+ 			}
+ 			break;
+ 		}
+-		nr_account++;
+ 
+ 		prep_new_page(page, 0, gfp, 0);
+ 		set_page_refcounted(page);
+@@ -4738,8 +4716,8 @@ unsigned long alloc_pages_bulk_noprof(gfp_t gfp, int preferred_nid,
+ 	pcp_spin_unlock(pcp);
+ 	pcp_trylock_finish(UP_flags);
+ 
+-	__count_zid_vm_events(PGALLOC, zone_idx(zone), nr_account);
+-	zone_statistics(zonelist_zone(ac.preferred_zoneref), zone, nr_account);
++	__count_zid_vm_events(PGALLOC, zone_idx(zone), nr_populated);
++	zone_statistics(zonelist_zone(ac.preferred_zoneref), zone, nr_populated);
+ 
+ out:
+ 	return nr_populated;
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index acef1fcd8ddc..200b99375cb6 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -544,9 +544,6 @@ static noinline netmem_ref __page_pool_alloc_pages_slow(struct page_pool *pool,
+ 	if (unlikely(pool->alloc.count > 0))
+ 		return pool->alloc.cache[--pool->alloc.count];
+ 
+-	/* Mark empty alloc.cache slots "empty" for alloc_pages_bulk */
+-	memset(&pool->alloc.cache, 0, sizeof(void *) * bulk);
+-
+ 	nr_pages = alloc_pages_bulk_node(gfp, pool->p.nid, bulk,
+ 					 (struct page **)pool->alloc.cache);
+ 	if (unlikely(!nr_pages))
+diff --git a/net/sunrpc/svc_xprt.c b/net/sunrpc/svc_xprt.c
+index ae25405d8bd2..80fbc4ffef6d 100644
+--- a/net/sunrpc/svc_xprt.c
++++ b/net/sunrpc/svc_xprt.c
+@@ -663,9 +663,23 @@ static bool svc_alloc_arg(struct svc_rqst *rqstp)
+ 		pages = RPCSVC_MAXPAGES;
+ 	}
+ 
+-	for (filled = 0; filled < pages; filled = ret) {
+-		ret = alloc_pages_bulk(GFP_KERNEL, pages, rqstp->rq_pages);
+-		if (ret > filled)
++	/* Defragment the rqstp->rq_pages so pages can be bulk allocated into
++	 * remaining NULL elements sequentially.
++	 */
++	for (filled = 0, ret = 0; ret < pages; ret++) {
++		if (rqstp->rq_pages[ret]) {
++			rqstp->rq_pages[filled] = rqstp->rq_pages[ret];
++			if (ret != filled)
++				rqstp->rq_pages[ret] = NULL;
++
++			filled++;
++		}
++	}
++
++	for (; filled < pages; filled += ret) {
++		ret = alloc_pages_bulk(GFP_KERNEL, pages - filled,
++				       rqstp->rq_pages + filled);
++		if (ret)
+ 			/* Made progress, don't sleep yet */
+ 			continue;
+ 
+@@ -674,7 +688,7 @@ static bool svc_alloc_arg(struct svc_rqst *rqstp)
+ 			set_current_state(TASK_RUNNING);
+ 			return false;
+ 		}
+-		trace_svc_alloc_arg_err(pages, ret);
++		trace_svc_alloc_arg_err(pages, filled);
+ 		memalloc_retry_wait(GFP_KERNEL);
+ 	}
+ 	rqstp->rq_page_end = &rqstp->rq_pages[pages];
+-- 
+2.33.0
+
 
