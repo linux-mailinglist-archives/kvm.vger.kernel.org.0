@@ -1,162 +1,241 @@
-Return-Path: <kvm+bounces-39785-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39786-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD98BA4A767
-	for <lists+kvm@lfdr.de>; Sat,  1 Mar 2025 02:29:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB511A4A769
+	for <lists+kvm@lfdr.de>; Sat,  1 Mar 2025 02:30:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96B1018975BA
-	for <lists+kvm@lfdr.de>; Sat,  1 Mar 2025 01:29:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 175477AAF2C
+	for <lists+kvm@lfdr.de>; Sat,  1 Mar 2025 01:29:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E5457082E;
-	Sat,  1 Mar 2025 01:29:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3769514F117;
+	Sat,  1 Mar 2025 01:29:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S0VaiX8p"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S3Ec/eOB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A4CB1B95B
-	for <kvm@vger.kernel.org>; Sat,  1 Mar 2025 01:29:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B28922318
+	for <kvm@vger.kernel.org>; Sat,  1 Mar 2025 01:29:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740792569; cv=none; b=og9cJ3CAX3Qo4CiDlF9B37Rxh04j7WHCP65t56bz7kDGVtwjc5fMybJWpI8YNgwI8englPPxiMIMBvXPGGtuoTd/nYWHaqYXREPPEdOkEheptTPvd+Nc8XIVg/gx7BZWJKbKjbpYSAa7tAmUhT/f8BkqWANWIBEwl+5d4Fznc48=
+	t=1740792582; cv=none; b=o4lW5eEKmLkZCOCb/DQBE5qVG2S8CW/+uQ1NfBXv+W/NtQd5hsHzm3n4BnXarBIG3TW/ZVu7r2aMPBYFbhlJ5CCyCrzm7Swi7Cx+37BLCVqslcWwybQ8/eoHlNqem6DpgBEe7uUGuEsxXCzgxxbLox3qZGjH6BazsA3iUaUAb5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740792569; c=relaxed/simple;
-	bh=x30Ghtnf2mwjQ7C24lb6dNTXdFIuMS5fxSzqclDeaDU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RcQDygfnl9/oMHxq7E42se/SEN2Z8czaJka7F/wBIqlxDO0q9YXRqGnRcK2R95hpQR+Y1Hn0ecwUnBvs/VPxbYszAmFVhVZQgh6UJ1QU6HBJJ+EJKxGfqqFvAIpXEjsIAualnXs2AhOEHGKLKMVfk+hFVyeM9woq3c6sBEDb0JU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=S0VaiX8p; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2237a32c03aso37925ad.1
-        for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 17:29:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740792567; x=1741397367; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Kc38nFBS6hSU0vji9D+YzzpAjSlnqZ5qJGUo2AO471s=;
-        b=S0VaiX8p5oTZx9ICATxbmh2T98PF+gxmFdn5K7Dqs3yN7BRYfSPZcD7BpIrlV3/JWD
-         g59Bpj5SyQ7kp7GDINxMbFp9sBrVu1zUYCkt5Lx0nWDgUEVBJTiCshbzOXvSvvVNLWK2
-         QWOBISMETj1cm6T+hbYmPck540G8K9T5Jl/QirOuVwzeeRV96vQeKFpCZQR0sU2T2oPo
-         HFPA6k+/LCZc92394kHeB0gnw3Iq3E3m+b88/NeZ/KCobUGJoSVnnqYQ1taIddl9IUlC
-         ciSumnvRSAIPV8TufYdNZM1nIHMj98bEI6Y1XCO41aCpMHKTpuSMdr/C9tPGsu7QYMCX
-         xH5w==
+	s=arc-20240116; t=1740792582; c=relaxed/simple;
+	bh=qay1XQpJ02X81EzQxN92CpuG0KEY1sx/6YinRhzxuXU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ikZY9wXxek7H8ZmPvFnz2g4dzpSKn0EK9rmaCiqNX9H+EoSWrzqM6r62vEIUGp3DHIrJtWW58dNT97gkn91cLkSJ6jp23Jfwd24ueNZL6+g891Yn0eUcW5UXFuecgJEG4x5m4mMkv1omMcBCgBa+WeK77tQQAV0Zxt/fowHjMNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S3Ec/eOB; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740792578;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9mLMW84mV8CqjBT9FwroY41UDoAqgbE+idQajKsM2z8=;
+	b=S3Ec/eOB6aiqKnJpQ1hiMKS0/qEtTEBcZQYaIIxwI02NHsbDWQi1GJLiBQUfCThccCh+7t
+	lcMIs0egax38McJK+20t6GRvQKK1b238lMYkqlQJ3jJY+1/ZSBet77YuXvM0W/IWELTbPW
+	XcMmLt8zKtH+60MRGT+tkykRRl8hDjc=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-292-qJzSBjF5O9GP3utxPXTpyQ-1; Fri, 28 Feb 2025 20:29:36 -0500
+X-MC-Unique: qJzSBjF5O9GP3utxPXTpyQ-1
+X-Mimecast-MFC-AGG-ID: qJzSBjF5O9GP3utxPXTpyQ_1740792576
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6e88964702cso62345956d6.0
+        for <kvm@vger.kernel.org>; Fri, 28 Feb 2025 17:29:36 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740792567; x=1741397367;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Kc38nFBS6hSU0vji9D+YzzpAjSlnqZ5qJGUo2AO471s=;
-        b=mlCLV3l9is03xi3uj8b9qIzztPY0uZX8fTavhT3i+Q0FB7zsfKD9F+dQ5FKuoZArBE
-         32jronmZ7WJWglfepFgQ18iRH7RNSppgc6GJBsVLJ3G2wojHuIomlihP+xFhcTxOWtVM
-         Vv0nc8Cy19zylzJkyD4LmTMfuvOIvphyPxWA/kOCLGu3c+oG2khuWckLyTSW6jNJtgak
-         9E1+PkwTf3knQN/WeQehtPYiZcjS9lOnDTLJaq73jurpTTtNjMHA1HJ7AxnnSYaiIg0T
-         ieIsCN3ofZwdPYsFwgZ3MEKJELG/DYMrUTuM8SsxA/x5ezuzuOm+cITGycWVpkKBXdb6
-         xULA==
-X-Forwarded-Encrypted: i=1; AJvYcCXfv6brWJhrvEaeTT6zYQiegSXJu2KVVncBwWT6nfXlxGYPVuQeZu4+ifwTv7LOnvSUkLI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4PP+EP4USI+XcLXWJ8FtbS53mAJ+RILGvs/Z8ox6C+NY/6qC2
-	mV22DtXQ4W98OouWg6+qZCJG9sEJFyVV5nCb4uRxjWWXncbcwjTgF63sDi2cbU84FEf8PfgEHrJ
-	5M/0BFJDP5faBMqUG0ywkavBJAl3w3IeKV5S3
-X-Gm-Gg: ASbGncsnepsEEgObEJ0R2J76e8mgbZq44+EUUKzQpAV1R70sWrXRyeR0sBwXNfkx5/0
-	ZiEun2t/YbbtZgbyFp6QotLZAME7Q+hUm5Bf4s3E3xsOtPk/q/ivOtKb7aimcp4uWuKt7lZ7k8j
-	R5KJQw2ZAi1eOVBAUkCPuAGdW9oQ==
-X-Google-Smtp-Source: AGHT+IGncPbBhrhz7q7nYtSkG3NCU3eJmen24UIv0X8fbRWFxDMMC/F2mnfn4/23C53PdlyFhZfhFGySOLAkJbQVaoI=
-X-Received: by 2002:a17:902:ccca:b0:220:c905:689f with SMTP id
- d9443c01a7336-22385a2665emr571665ad.25.1740792566772; Fri, 28 Feb 2025
- 17:29:26 -0800 (PST)
+        d=1e100.net; s=20230601; t=1740792576; x=1741397376;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9mLMW84mV8CqjBT9FwroY41UDoAqgbE+idQajKsM2z8=;
+        b=uBixcQrIldZGKS4210a2+wMYeusAX427d86RW6jmyRXDdZvKmQo64azhAZi9nuv6W8
+         AkYC3SSSDT2NaEy/1+niFB/P/9YvC6kimDnlGP/f9UlxrhdjGuH736r+RRci3hD8rxTY
+         5vJkyGWS4HLKG4IFSpDhRswSj6dv2oj625YqLVXy/MXvF1+CiFn14/qdqzwOfMTdtbAb
+         /4+wjbs5G12v8GbscA25PzpnxFaPBWn4RrGUb97mo8yemcYg5n2mNtDTb0uPPAQ7Ztnj
+         9t6D99hkoMzYCRb1ZAQQFItUBm7i165Nh+a+VxHduUXDe4UovUMSYEVotRWHxA50S1fC
+         VFQw==
+X-Gm-Message-State: AOJu0YyXakkyh0Zu5OM7PbgCiICeV6fPRV3xSEx1YLC/6b4hE0hsKkvQ
+	zesfr90YrYX60aUuYi97A9w6OB2WOxZBwSdbLsTJT/7UlJ7ZcJKTUn2hzaeokIvWf0qqjUSmmuJ
+	uN970tK66NV49es8xFfyU/H95MmffB0WWTm5TLEkMo63qoi7vmw==
+X-Gm-Gg: ASbGncsCzvL9xmU/8hddCAbuxsuupmBmwKzl0evSZt2UorSvyRjJadPlbuikp8+/7/D
+	USWxcS7hQ1Xudesc0LS4qt7pHTrLmlzDfmRtTazpRK4us+MTWZrjRyxc8Cm6+Y2fOdonrbyfcLA
+	yNA3yS6yKXDjB4YCDc3FtIJ+z4rZOv7cZlNEd3mUUO5AdS2MpSI/GkCWRobgNg4DokqMHVfPoCG
+	3p1AMVFobrkrryGwKwRrWKTOwIB18a3vkJOfJ/5MidOZ36CKhSlMRudJGjWWaMhz4GUZcO7YGcc
+	Kz2liSyu4zwjvnA=
+X-Received: by 2002:a05:6214:21e7:b0:6e2:383f:4acd with SMTP id 6a1803df08f44-6e8a0ce0f95mr81017016d6.7.1740792576205;
+        Fri, 28 Feb 2025 17:29:36 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH3wC3zFb8P3zHquADvRKZ43FHIiwHHLk0ySJj7QI+8j+3vYjQkzHZ2ev0DCr/P5m1Mp1KcKA==
+X-Received: by 2002:a05:6214:21e7:b0:6e2:383f:4acd with SMTP id 6a1803df08f44-6e8a0ce0f95mr81016826d6.7.1740792575883;
+        Fri, 28 Feb 2025 17:29:35 -0800 (PST)
+Received: from starship ([2607:fea8:fc01:8d8d:6adb:55ff:feaa:b156])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e8976608f2sm28282256d6.53.2025.02.28.17.29.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Feb 2025 17:29:35 -0800 (PST)
+Message-ID: <2bb5b47e1b6c1251ae7fffe6d4d9836a401a1be0.camel@redhat.com>
+Subject: Re: [RFC PATCH 02/13] KVM: nSVM: Rework svm_flush_tlb_asid() to
+ operate on a given VMCB
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>, Sean Christopherson
+ <seanjc@google.com>,  Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov
+ <vkuznets@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Fri, 28 Feb 2025 20:29:34 -0500
+In-Reply-To: <20250205182402.2147495-3-yosry.ahmed@linux.dev>
+References: <20250205182402.2147495-1-yosry.ahmed@linux.dev>
+	 <20250205182402.2147495-3-yosry.ahmed@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250227041209.2031104-1-almasrymina@google.com>
- <20250227041209.2031104-2-almasrymina@google.com> <20250228163846.0a59fb40@kernel.org>
-In-Reply-To: <20250228163846.0a59fb40@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 28 Feb 2025 17:29:13 -0800
-X-Gm-Features: AQ5f1JqnucwSW-6yoUTgklaGGj9zlmp1rtei3-w0QbA66_zGizdQVdrhRtrAPr0
-Message-ID: <CAHS8izNQnTW7sad_oABtxhy3cHxGR0FWJucrHTSVX7ZAA6jT3Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 1/8] net: add get_netmem/put_netmem support
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
-	Donald Hunter <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Jeroen de Borst <jeroendb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-On Fri, Feb 28, 2025 at 4:38=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Thu, 27 Feb 2025 04:12:02 +0000 Mina Almasry wrote:
-> >  static inline void __skb_frag_ref(skb_frag_t *frag)
-> >  {
-> > -     get_page(skb_frag_page(frag));
-> > +     get_netmem(skb_frag_netmem(frag));
-> >  }
->
-> Silently handling types of memory the caller may not be expecting
-> always worries me.
+On Wed, 2025-02-05 at 18:23 +0000, Yosry Ahmed wrote:
+> svm_flush_tlb_asid() currently operates on the current VMCB. In
+> preparation for properly tracking TLB flushes for L1 and L2 ASIDs,
+> refactor it to work on a given VMCB. All existing callers pass the
+> current VMCB.
+> 
+> Create a svm_flush_tlb_guest() wrapper to use as the flush_tlb_guest()
+> callback.
+> 
+> kvm_hv_vcpu_purge_flush_tlb() is only called when the current VMCB is
+> passed to maintain current behavior.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> ---
+>  arch/x86/kvm/svm/svm.c | 25 ++++++++++++++++++-------
+>  1 file changed, 18 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 08340ae57777b..2108b48ba4959 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -3954,7 +3954,7 @@ static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
+>  	svm->vmcb->save.rflags |= (X86_EFLAGS_TF | X86_EFLAGS_RF);
+>  }
+>  
+> -static void svm_flush_tlb_asid(struct kvm_vcpu *vcpu)
+> +static void svm_flush_tlb_asid(struct kvm_vcpu *vcpu, struct kvm_vmcb_info *vmcb)
+>  {
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+>  
+> @@ -3963,7 +3963,8 @@ static void svm_flush_tlb_asid(struct kvm_vcpu *vcpu)
+>  	 * A TLB flush for the current ASID flushes both "host" and "guest" TLB
+>  	 * entries, and thus is a superset of Hyper-V's fine grained flushing.
+>  	 */
+> -	kvm_hv_vcpu_purge_flush_tlb(vcpu);
+> +	if (vmcb == svm->current_vmcb)
+> +		kvm_hv_vcpu_purge_flush_tlb(vcpu);
 
-Sorry, I'm not following. What caller is not expecting netmem? Here
-we're making sure __skb_frag_ref() handles netmem correctly, i.e. we
-were not expecting netmem here before, and after this patch we'll
-handle it correctly.
+This is hyperv PV feature that should be looked upon very carefully.
 
-> Why do we need this?
->
+To recap, 
+each vCPU has 2 queues of pending TLB flush requests that target only small range of
+memory pages. 
 
-The MSG_ZEROCOPY TX path takes a page reference on the passed memory
-in zerocopy_fill_skb_from_iter() that kfree_skb() later drops when the
-skb is sent. We need an equivalent for netmem, which only supports pp
-refs today. This is my attempt at implementing a page_ref equivalent
-to net_iov and generic netmem.
+One is for L1 and one for L2, because now KVM supports a mode where L2
+can ask L0 to do a tlb flush on its behalf, and KVM will figure out to which L1 vCPUs
+to send this flush request.
 
-I think __skb_frag_[un]ref is used elsewhere in the TX path too,
-tcp_mtu_probe for example calls skb_frag_ref eventually.
+Requests arrive from other vCPUs.
 
-> In general, I'm surprised by the lack of bug reports for devmem.
+Here we purge the TLB request queue because we flushed a super-set of the requests,
+which used to contain both L1 and L2 TLB, but soon that won't be true.
 
-I guess we did a good job making sure we don't regress the page paths.
+So I think it might make sense to also add vmcb to kvm_hv_vcpu_purge_flush_tlb, and then
+depending if it is vmcb01 or vmcb02, purge the correct queue.
+I don't know if this is theoretical or actual bug but it is better to be safe IMHO.
 
-The lack of support in any driver that qemu will run is an issue. I
-wonder if also the fact that devmem needs some setup is also an issue.
-We need headersplit enabled, udmabuf created, netlink API bound, and
-then a connection referring to created and we don't support loopback.
-I think maybe it all may make it difficult for syzbot to repro. I've
-had it on my todo list to investigate this more.
 
-> Can you think of any way we could expose this more to syzbot?
-> First thing that comes to mind is a simple hack in netdevsim,
-> to make it insert a netmem handle (allocated locally, not a real
-> memory provider), every N packets (controllable via debugfs).
-> Would that work?
+>  
+>  	/*
+>  	 * Flush only the current ASID even if the TLB flush was invoked via
+> @@ -3973,14 +3974,15 @@ static void svm_flush_tlb_asid(struct kvm_vcpu *vcpu)
+>  	 * VM-Exit (via kvm_mmu_reset_context()).
+>  	 */
+>  	if (static_cpu_has(X86_FEATURE_FLUSHBYASID))
+> -		svm->vmcb->control.tlb_ctl = TLB_CONTROL_FLUSH_ASID;
+> +		vmcb->ptr->control.tlb_ctl = TLB_CONTROL_FLUSH_ASID;
+>  	else
+> -		svm->current_vmcb->asid_generation--;
+> +		vmcb->asid_generation--;
+>  }
+>  
+>  static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
+>  {
+>  	hpa_t root_tdp = vcpu->arch.mmu->root.hpa;
+> +	struct vcpu_svm *svm = to_svm(vcpu);
+>  
+>  	/*
+>  	 * When running on Hyper-V with EnlightenedNptTlb enabled, explicitly
+> @@ -3991,11 +3993,13 @@ static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
+>  	if (svm_hv_is_enlightened_tlb_enabled(vcpu) && VALID_PAGE(root_tdp))
+>  		hyperv_flush_guest_mapping(root_tdp);
+>  
+> -	svm_flush_tlb_asid(vcpu);
+> +	svm_flush_tlb_asid(vcpu, svm->current_vmcb);
+>  }
+>  
+>  static void svm_flush_tlb_all(struct kvm_vcpu *vcpu)
+>  {
+> +	struct vcpu_svm *svm = to_svm(vcpu);
+> +
+>  	/*
+>  	 * When running on Hyper-V with EnlightenedNptTlb enabled, remote TLB
+>  	 * flushes should be routed to hv_flush_remote_tlbs() without requesting
+> @@ -4006,7 +4010,7 @@ static void svm_flush_tlb_all(struct kvm_vcpu *vcpu)
+>  	if (WARN_ON_ONCE(svm_hv_is_enlightened_tlb_enabled(vcpu)))
+>  		hv_flush_remote_tlbs(vcpu->kvm);
+>  
+> -	svm_flush_tlb_asid(vcpu);
+> +	svm_flush_tlb_asid(vcpu, svm->current_vmcb);
+>  }
+>  
+>  static void svm_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t gva)
+> @@ -4016,6 +4020,13 @@ static void svm_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t gva)
+>  	invlpga(gva, svm->vmcb->control.asid);
+>  }
+>  
+> +static void svm_flush_tlb_guest(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vcpu_svm *svm = to_svm(vcpu);
+> +
+> +	svm_flush_tlb_asid(vcpu, svm->current_vmcb);
+> +}
+> +
 
-Yes, great idea. I don't see why it wouldn't work.
+Small nitpick: I think that this change is still unrelated and thus
+probably should go to a separate patch.
 
-We don't expect mixing of net_iovs and pages in the same skb, but
-netdevsim could create one net_iov skb every N skbs.
 
-I guess I'm not totally sure something is discoverable to syzbot. Is a
-netdevsim hack toggleable via a debugfs sufficient for syzbot? I'll
-investigate and ask.
+Best regards,
+	Maxim Levitsky
 
---
-Thanks,
-Mina
+>  static inline void sync_cr8_to_lapic(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+> @@ -5055,7 +5066,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+>  	.flush_tlb_all = svm_flush_tlb_all,
+>  	.flush_tlb_current = svm_flush_tlb_current,
+>  	.flush_tlb_gva = svm_flush_tlb_gva,
+> -	.flush_tlb_guest = svm_flush_tlb_asid,
+> +	.flush_tlb_guest = svm_flush_tlb_guest,
+>  
+>  	.vcpu_pre_run = svm_vcpu_pre_run,
+>  	.vcpu_run = svm_vcpu_run,
+
+
 
