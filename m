@@ -1,110 +1,195 @@
-Return-Path: <kvm+bounces-39819-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39827-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22908A4B416
-	for <lists+kvm@lfdr.de>; Sun,  2 Mar 2025 19:32:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CFEBA4B52A
+	for <lists+kvm@lfdr.de>; Sun,  2 Mar 2025 23:05:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0415D188EA72
-	for <lists+kvm@lfdr.de>; Sun,  2 Mar 2025 18:33:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 179477A6EA4
+	for <lists+kvm@lfdr.de>; Sun,  2 Mar 2025 22:03:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A7921EB1A1;
-	Sun,  2 Mar 2025 18:32:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42AD61EFF83;
+	Sun,  2 Mar 2025 22:04:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QeSfQLQf"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="DqTN/GIb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B1551ADC98
-	for <kvm@vger.kernel.org>; Sun,  2 Mar 2025 18:32:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D33D21EF08A
+	for <kvm@vger.kernel.org>; Sun,  2 Mar 2025 22:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740940372; cv=none; b=TE0hLFlOtY16mR+RBt2ObAX0bpW2lwFnc7vVxpep0R/jQQGnZ+9tqnemE2bbYISrSY60QVpb9hPWZzzdQwCLINOBM8HdeLmUIvO9bbcOeIt5CbnkZBPhiU81b5VMsumgltQ635RGZ0ufUHBsY019hglqrOXnx7sPm2jC45cYsB0=
+	t=1740953067; cv=none; b=e3HYRnb4v14lSs6RRwq98EXdJFms7vuYv/j+qgAG3ZKx4iIUbOEFgeVm1D4CwCF2GDRv0i3sopJ6Nw+kjaY18yyfTMLK5OV7CjypFncJAyyIVnCOZoFrkHq+rEzK/iRPCCiKPFtFjCH6uT2A8h09iYcKn9T4ilfH+X9pGX/B1dY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740940372; c=relaxed/simple;
-	bh=L0zY7H39BPgrQsaUTKK99onsMr5XmylhBQKwZxrgLyA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=T9MkazkIG/XnCsy7WoxXwhdoshTKUmEIpsv8ZA4p1LQ2KI2I2/KTzjIqGMVtr8YH4cqgOtUrS9xAIFeJaakSqsZ6ARr0g+IpAOsTdhJs7MuCvVCcSjgN4c1EBrVCpepYVlUDlDHYgMiMz/ca14tj7XxRa9B0IR5obBK+D5wNGpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QeSfQLQf; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740940369; x=1772476369;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=L0zY7H39BPgrQsaUTKK99onsMr5XmylhBQKwZxrgLyA=;
-  b=QeSfQLQfvpqYAlTV5mlsvHSCUXVX6HnyMkFH1kkSZlW1nXzjzMRHAfPC
-   RrLR+ktGf3gp/iDjcXW4PSfsCeDu401rL7WykRiM6zpf5gqG+qoRK+DIg
-   rMkGeJjia1CNYewnpVeSjdfw1k9JSP6WGHmdinM0rTwqwWLR6cxjX5uVz
-   eSH3Yf6A3EMMMcGR84sUDu4OuGipQfXbBW1NxYPRe+LujilL63FWeR99L
-   7fV6ap74OqX+spxOPPdBBRRcGfVkhd9iFU2gh3wHc713y6cSGC7SYn3SJ
-   fVCBJAjgYznedYF+kdTrA5Yil84SB/yEkznVGfKN1LcwWJcqUeI2PBMoE
-   A==;
-X-CSE-ConnectionGUID: Hk3wDI4IQEKWTktizHc8OQ==
-X-CSE-MsgGUID: QQoZOOlQSdiMiv8/mgUpQA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11361"; a="45467575"
-X-IronPort-AV: E=Sophos;i="6.13,328,1732608000"; 
-   d="scan'208";a="45467575"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2025 10:32:49 -0800
-X-CSE-ConnectionGUID: dVgVgaj2SkCImpXuPyougA==
-X-CSE-MsgGUID: 2dYm69rGRy6e+CqgFZpTqw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="123048396"
-Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
-  by orviesa005.jf.intel.com with ESMTP; 02 Mar 2025 10:32:46 -0800
-Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1too7I-000HWn-1I;
-	Sun, 02 Mar 2025 18:32:44 +0000
-Date: Mon, 3 Mar 2025 02:32:33 +0800
-From: kernel test robot <lkp@intel.com>
-To: Isaku Yamahata <isaku.yamahata@intel.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	kvm@vger.kernel.org, Farrah Chen <farrah.chen@intel.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>
-Subject: [kvm:kvm-coco-queue 32/127] ERROR: modpost: "tdx_vcpu_create"
- [arch/x86/kvm/kvm-intel.ko] undefined!
-Message-ID: <202503030235.MiYJbBOG-lkp@intel.com>
+	s=arc-20240116; t=1740953067; c=relaxed/simple;
+	bh=u/EcC/yDZ53bNEFkgXaMyEwLBwqAZF8gW2bGGHxhSFo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kqejMj01GvR+dLNhdetl1TB6H1rajp6gbLn8u+AN3QAPRNDiOCZGG+zQxJ228gCdIynusajB/yIuhHUNX/yHFrRI2XmI8VylZSLxp1UnxVRKDFf3uglYh1w9R0v3MihAgBvm3DQws16BvaPJWc6GD7v5wrpwI7gJ/O44aS/6ZX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=DqTN/GIb; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 522BNMDX029888;
+	Sun, 2 Mar 2025 22:03:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2023-11-20; bh=ZcijMWLxpIRqndUt7j1TxLaHbZYJ+
+	ZQUDOxv2I7j0E4=; b=DqTN/GIbcqPZLm8iRXxm+QgJDspvQwInDntwur/yC7EA+
+	e6EXjqYDsQ6jH3AAWoSv2WF3mfuBiBK22wfp+EhVFly+MeafjcNGRGEN2aKJh9eg
+	ILsBtpKhJVwX7c+qoKFO9JsHyXq9Zu5syvNFTLrpnssutfUGiqxFO+bactdIeYWv
+	mES2gWwdZ+waLLZFbCHI3bhGgILmztNHZ6mCRHUX/yfuU8ZWNhGBwwcL2WjQvXUx
+	AqU2Sf0VOTm6qByqvi3TjzQHbQgYZ6fmuKKvkj4ukxL068q+JEeOYa6+olbawtrP
+	4Gg7Ikuu33jRNucCq/Su/zYKEVuRRkI9SBvOnTo3w==
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 453ub71kgq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 02 Mar 2025 22:03:27 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 522GhEHV015706;
+	Sun, 2 Mar 2025 22:03:26 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 453rp803b3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 02 Mar 2025 22:03:26 +0000
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 522M3QoP040088;
+	Sun, 2 Mar 2025 22:03:26 GMT
+Received: from localhost.localdomain (ca-dev80.us.oracle.com [10.211.9.80])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 453rp80353-1;
+	Sun, 02 Mar 2025 22:03:26 +0000
+From: Dongli Zhang <dongli.zhang@oracle.com>
+To: qemu-devel@nongnu.org, kvm@vger.kernel.org
+Cc: pbonzini@redhat.com, zhao1.liu@intel.com, mtosatti@redhat.com,
+        sandipan.das@amd.com, babu.moger@amd.com, likexu@tencent.com,
+        like.xu.linux@gmail.com, zhenyuw@linux.intel.com, groug@kaod.org,
+        khorenko@virtuozzo.com, alexander.ivanov@virtuozzo.com,
+        den@virtuozzo.com, davydov-max@yandex-team.ru, xiaoyao.li@intel.com,
+        dapeng1.mi@linux.intel.com, joe.jin@oracle.com
+Subject: [PATCH v2 00/10] target/i386/kvm/pmu: PMU Enhancement, Bugfix and Cleanup 
+Date: Sun,  2 Mar 2025 14:00:08 -0800
+Message-ID: <20250302220112.17653-1-dongli.zhang@oracle.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-02_06,2025-02-28_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 suspectscore=0 phishscore=0
+ adultscore=0 mlxlogscore=999 malwarescore=0 spamscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2502100000
+ definitions=main-2503020180
+X-Proofpoint-GUID: Px3x5PcXlVOtH_SyJSbj8YF-L0NOPzIN
+X-Proofpoint-ORIG-GUID: Px3x5PcXlVOtH_SyJSbj8YF-L0NOPzIN
 
-tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git kvm-coco-queue
-head:   9fe4541afcfad987d39790f0a40527af190bf0dd
-commit: b6c5df065013b1ccb29a23f59f7ad4e8a366a6fd [32/127] KVM: TDX: create/free TDX vcpu structure
-config: x86_64-randconfig-077-20250302 (https://download.01.org/0day-ci/archive/20250303/202503030235.MiYJbBOG-lkp@intel.com/config)
-compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250303/202503030235.MiYJbBOG-lkp@intel.com/reproduce)
+Would you mind suggesting how we can move forward with this patchset as:
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202503030235.MiYJbBOG-lkp@intel.com/
+(1) One patch for kvm_arch_pre_create_vcpu() is picked from Xiaoyao's
+patchset.
+(2) Dapeng is working on mediated passthrough vPMU QEMU patches. This
+patchset doesn't support mediated passthrough vPMU.
 
-All errors (new ones prefixed by >>, old ones prefixed by <<):
+This patchset addresses four bugs related to AMD PMU virtualization.
 
-ERROR: modpost: "tdx_vm_init" [arch/x86/kvm/kvm-intel.ko] undefined!
-ERROR: modpost: "tdx_vm_destroy" [arch/x86/kvm/kvm-intel.ko] undefined!
-ERROR: modpost: "tdx_mmu_release_hkid" [arch/x86/kvm/kvm-intel.ko] undefined!
->> ERROR: modpost: "tdx_vcpu_create" [arch/x86/kvm/kvm-intel.ko] undefined!
->> ERROR: modpost: "tdx_vcpu_free" [arch/x86/kvm/kvm-intel.ko] undefined!
-ERROR: modpost: "tdx_vm_ioctl" [arch/x86/kvm/kvm-intel.ko] undefined!
-ERROR: modpost: "enable_tdx" [arch/x86/kvm/kvm-intel.ko] undefined!
-ERROR: modpost: "tdx_cleanup" [arch/x86/kvm/kvm-intel.ko] undefined!
-ERROR: modpost: "tdx_bringup" [arch/x86/kvm/kvm-intel.ko] undefined!
+1. The PerfMonV2 is still available if PERCORE if disabled via
+"-cpu host,-perfctr-core".
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2. The VM 'cpuid' command still returns PERFCORE although "-pmu" is
+configured.
+
+3. The third issue is that using "-cpu host,-pmu" does not disable AMD PMU
+virtualization. When using "-cpu EPYC" or "-cpu host,-pmu", AMD PMU
+virtualization remains enabled. On the VM's Linux side, you might still
+see:
+
+[    0.510611] Performance Events: Fam17h+ core perfctr, AMD PMU driver.
+
+instead of:
+
+[    0.596381] Performance Events: PMU not available due to virtualization, using software events only.
+[    0.600972] NMI watchdog: Perf NMI watchdog permanently disabled
+
+To address this, KVM_CAP_PMU_CAPABILITY is used to set KVM_PMU_CAP_DISABLE
+when "-pmu" is configured.
+
+4. The fourth issue is that unreclaimed performance events (after a QEMU
+system_reset) in KVM may cause random, unwanted, or unknown NMIs to be
+injected into the VM.
+
+The AMD PMU registers are not reset during QEMU system_reset.
+
+(1) If the VM is reset (e.g., via QEMU system_reset or VM kdump/kexec) while
+running "perf top", the PMU registers are not disabled properly.
+
+(2) Despite x86_cpu_reset() resetting many registers to zero, kvm_put_msrs()
+does not handle AMD PMU registers, causing some PMU events to remain
+enabled in KVM.
+
+(3) The KVM kvm_pmc_speculative_in_use() function consistently returns true,
+preventing the reclamation of these events. Consequently, the
+kvm_pmc->perf_event remains active.
+
+(4) After a reboot, the VM kernel may report the following error:
+
+[    0.092011] Performance Events: Fam17h+ core perfctr, Broken BIOS detected, complain to your hardware vendor.
+[    0.092023] [Firmware Bug]: the BIOS has corrupted hw-PMU resources (MSR c0010200 is 530076)
+
+(5) In the worst case, the active kvm_pmc->perf_event may inject unknown
+NMIs randomly into the VM kernel:
+
+[...] Uhhuh. NMI received for unknown reason 30 on CPU 0.
+
+To resolve these issues, we propose resetting AMD PMU registers during the
+VM reset process
+
+
+Changed since v1:
+  - Use feature_dependencies for CPUID_EXT3_PERFCORE and
+    CPUID_8000_0022_EAX_PERFMON_V2.
+  - Remove CPUID_EXT3_PERFCORE when !cpu->enable_pmu.
+  - Pick kvm_arch_pre_create_vcpu() patch from Xiaoyao Li.
+  - Use "-pmu" but not a global "pmu-cap-disabled" for KVM_PMU_CAP_DISABLE.
+  - Also use sysfs kvm.enable_pmu=N to determine if PMU is supported.
+  - Some changes to PMU register limit calculation.
+
+
+Xiaoyao Li (1):
+  kvm: Introduce kvm_arch_pre_create_vcpu()
+
+Dongli Zhang (9):
+  target/i386: disable PerfMonV2 when PERFCORE unavailable
+  target/i386: disable PERFCORE when "-pmu" is configured
+  target/i386/kvm: set KVM_PMU_CAP_DISABLE if "-pmu" is configured
+  target/i386/kvm: extract unrelated code out of kvm_x86_build_cpuid()
+  target/i386/kvm: rename architectural PMU variables
+  target/i386/kvm: query kvm.enable_pmu parameter
+  target/i386/kvm: reset AMD PMU registers during VM reset
+  target/i386/kvm: support perfmon-v2 for reset
+  target/i386/kvm: don't stop Intel PMU counters
+
+ accel/kvm/kvm-all.c        |   5 +
+ include/system/kvm.h       |   1 +
+ target/arm/kvm.c           |   5 +
+ target/i386/cpu.c          |   8 +
+ target/i386/cpu.h          |  12 ++
+ target/i386/kvm/kvm.c      | 348 ++++++++++++++++++++++++++++++++++------
+ target/loongarch/kvm/kvm.c |   5 +
+ target/mips/kvm.c          |   5 +
+ target/ppc/kvm.c           |   5 +
+ target/riscv/kvm/kvm-cpu.c |   5 +
+ target/s390x/kvm/kvm.c     |   5 +
+ 11 files changed, 357 insertions(+), 47 deletions(-)
+
+base-commit: b69801dd6b1eb4d107f7c2f643adf0a4e3ec9124
+
+Thank you very much!
+
+Dongli Zhang
+
 
