@@ -1,40 +1,40 @@
-Return-Path: <kvm+bounces-39888-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39889-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45A13A4C42B
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 16:05:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94E40A4C42D
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 16:06:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8A913A5505
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 15:05:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09DB03A84AC
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 15:05:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 958C3213E94;
-	Mon,  3 Mar 2025 15:05:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7436A213248;
+	Mon,  3 Mar 2025 15:05:36 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E9B5156F5E;
-	Mon,  3 Mar 2025 15:05:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76DAA156F5E;
+	Mon,  3 Mar 2025 15:05:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741014332; cv=none; b=BBFYHbITm32fw0Tra4MK1sPlPlj5pHOJ6XI9zquhZaUqK3dtR4SACZEMhYd0qwoD4hN3AC1hQCBjjegfO9KKx1WR3S/M/3QOaVGZsTlyOINr/BJ3ehNfA/jSiZXFwGA4Nzlt7z2degc/gem7Qih0ccJ+wu5VP67/6iNPi/8HcLE=
+	t=1741014336; cv=none; b=jPpMJgwnTHbMnmg/xyLaq/HtfPqy6Fu2CpEh7R7A1tWJN41FsC9S7F6K7/l5UndB7KDRQr4jvbQLZrw2KE2na6yhvLC9ZjynzFSb3Fy4R3GvB3ZVwIAybDWAfMjXhQYxZMReMvNYb3vnT9mk1SPMArm8Z0lxK5VJB+mW/b4MUg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741014332; c=relaxed/simple;
-	bh=FAfxwdkJdI2ka4k/gWKw/rIYeoMTctGSdN1ZWB+qzBE=;
+	s=arc-20240116; t=1741014336; c=relaxed/simple;
+	bh=1sFtJ7G8T2gULGkEX+wJ+5Cx5/yoOS5AhTqUPY1T+Bo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tEZ+YJ6MNNc7AqxhfFJjND/FcQZMyixH89NV0/iuC2dS1bRWm2l0IUX2tivdalpR6B6o1zaPY8t25A0gLfyEYA17/h+o+HHziZ9s/LegbxOQ13BHmL4LS0S62r7KfNotu+ZBB7Iuvhq27XN1al7crtUQ7jMsVBua4FzjtvAPa/o=
+	 In-Reply-To:Content-Type; b=q+xtorC5cS2MDgfIbcLASFqyN2u3J4vISn/4wjtHQH2BdPOebZmV2m2cYF/ZGd3DnGW5Jft9r0dnDJ32rVUhUa7i9GWEoKLnmy5ioCzqh4wbAt3OL9fiZtLq4Lob3zLdTN9ScZfc4pcPxztfpYHASSw1W8dmtcFWIcOSgPKrD1M=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6B0B6113E;
-	Mon,  3 Mar 2025 07:05:43 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BE735106F;
+	Mon,  3 Mar 2025 07:05:47 -0800 (PST)
 Received: from [10.1.39.33] (e122027.cambridge.arm.com [10.1.39.33])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CD6FE3F5A1;
-	Mon,  3 Mar 2025 07:05:25 -0800 (PST)
-Message-ID: <762524e0-d54f-4026-8a1d-732a7cfc6a1a@arm.com>
-Date: Mon, 3 Mar 2025 15:05:24 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AE1793F5A1;
+	Mon,  3 Mar 2025 07:05:29 -0800 (PST)
+Message-ID: <59f84354-e890-48c8-ba06-87dda471f364@arm.com>
+Date: Mon, 3 Mar 2025 15:05:25 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -42,11 +42,9 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 01/45] KVM: Prepare for handling only shared mappings
- in mmu_notifier events
+Subject: Re: [PATCH v7 05/45] arm64: RME: Add wrappers for RMI calls
 To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Sean Christopherson <seanjc@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
  Oliver Upton <oliver.upton@linux.dev>,
  Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
@@ -59,85 +57,125 @@ Cc: Sean Christopherson <seanjc@google.com>,
  Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
  <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
 References: <20250213161426.102987-1-steven.price@arm.com>
- <20250213161426.102987-2-steven.price@arm.com>
- <8bf9ba6c-a8b2-42aa-9802-8e968bec1cd5@redhat.com>
+ <20250213161426.102987-6-steven.price@arm.com>
+ <8f08b96b-8219-4d51-8f46-bc367bbf2031@redhat.com>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <8bf9ba6c-a8b2-42aa-9802-8e968bec1cd5@redhat.com>
+In-Reply-To: <8f08b96b-8219-4d51-8f46-bc367bbf2031@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 02/03/2025 23:36, Gavin Shan wrote:
+On 03/03/2025 03:42, Gavin Shan wrote:
 > On 2/14/25 2:13 AM, Steven Price wrote:
->> From: Sean Christopherson <seanjc@google.com>
+>> The wrappers make the call sites easier to read and deal with the
+>> boiler plate of handling the error codes from the RMM.
 >>
->> Add flags to "struct kvm_gfn_range" to let notifier events target only
->> shared and only private mappings, and write up the existing mmu_notifier
->> events to be shared-only (private memory is never associated with a
->> userspace virtual address, i.e. can't be reached via mmu_notifiers).
->>
->> Add two flags so that KVM can handle the three possibilities (shared,
->> private, and shared+private) without needing something like a tri-state
->> enum.
->>
->> Link: https://lore.kernel.org/all/ZJX0hk+KpQP0KUyB@google.com
->> Signed-off-by: Sean Christopherson <seanjc@google.com>
 >> Signed-off-by: Steven Price <steven.price@arm.com>
 >> ---
->>   include/linux/kvm_host.h | 2 ++
->>   virt/kvm/kvm_main.c      | 7 +++++++
->>   2 files changed, 9 insertions(+)
+>> Changes from v5:
+>>   * Further improve comments
+>> Changes from v4:
+>>   * Improve comments
+>> Changes from v2:
+>>   * Make output arguments optional.
+>>   * Mask RIPAS value rmi_rtt_read_entry()
+>>   * Drop unused rmi_rtt_get_phys()
+>> ---
+>>   arch/arm64/include/asm/rmi_cmds.h | 508 ++++++++++++++++++++++++++++++
+>>   1 file changed, 508 insertions(+)
+>>   create mode 100644 arch/arm64/include/asm/rmi_cmds.h
 >>
->> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
->> index 3cb9a32a6330..0de1e485452c 100644
->> --- a/include/linux/kvm_host.h
->> +++ b/include/linux/kvm_host.h
->> @@ -266,6 +266,8 @@ struct kvm_gfn_range {
->>       gfn_t end;
->>       union kvm_mmu_notifier_arg arg;
->>       enum kvm_gfn_range_filter attr_filter;
->> +    bool only_private;
->> +    bool only_shared;
->>       bool may_block;
->>   };
 > 
-> The added members (only_private and only_shared) looks duplicated to the
-> member of attr_filter, which can be set to KVM_FILTER_SHARED,
-> KVM_FILTER_PRIVATE,
-> or both of them. More details can be found from the following commit where
-> attr_filter was by dca6c88532322 ("KVM: Add member to struct kvm_gfn_range
-> to indicate private/shared").
+> With the following nitpicks addressed:
 > 
-> I'm guessing Sean's suggestion was given before dca6c88532322 showed up.
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
 
-Thanks for pointing this out - you are absolutely right. I need to
-switch the code in the following patches over to use attr_filter
-instead. I hadn't realised when rebasing that attr_filter is the
-replacement.
+Thanks, there were a couple of other pages and params_ptr references
+that I've updated to granules and just 'params' too now. With hindsight
+conflating pages and granules in the earlier versions of this series was
+a big mistake ;)
 
-Thanks,
 Steve
 
->>   bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range);
->> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->> index faf10671eed2..4f0136094fac 100644
->> --- a/virt/kvm/kvm_main.c
->> +++ b/virt/kvm/kvm_main.c
->> @@ -593,6 +593,13 @@ static __always_inline kvm_mn_ret_t
->> __kvm_handle_hva_range(struct kvm *kvm,
->>                * the second or later invocation of the handler).
->>                */
->>               gfn_range.arg = range->arg;
+>> diff --git a/arch/arm64/include/asm/rmi_cmds.h b/arch/arm64/include/
+>> asm/rmi_cmds.h
+>> new file mode 100644
+>> index 000000000000..043b7ff278ee
+>> --- /dev/null
+>> +++ b/arch/arm64/include/asm/rmi_cmds.h
+>> @@ -0,0 +1,508 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 */
+>> +/*
+>> + * Copyright (C) 2023 ARM Ltd.
+>> + */
 >> +
->> +            /*
->> +             * HVA-based notifications aren't relevant to private
->> +             * mappings as they don't have a userspace mapping.
->> +             */
->> +            gfn_range.only_private = false;
->> +            gfn_range.only_shared = true;
->>               gfn_range.may_block = range->may_block;
->>               /*
->>                * HVA-based notifications aren't relevant to private
+>> +#ifndef __ASM_RMI_CMDS_H
+>> +#define __ASM_RMI_CMDS_H
+>> +
+> 
+> [...]
+> 
+>> +
+>> +/**
+>> + * rmi_rec_aux_count() - Get number of auxiliary granules required
+>> + * @rd: PA of the RD
+>> + * @aux_count: Number of pages written to this pointer
+>                   ^^^^^^^^^^^^^^^
+>                   Number of granules
+>> + *
+>> + * A REC may require extra auxiliary pages to be delegated for the
+>> RMM to
+>                                         ^^^^^
+>                                         granules
+> 
+>> + * store metadata (not visible to the normal world) in. This function
+>> provides
+>> + * the number of pages that are required.
+>                     ^^^^^
+>                     granules
+>> + *
+>> + * Return: RMI return code
+>> + */
+>> +static inline int rmi_rec_aux_count(unsigned long rd, unsigned long
+>> *aux_count)
+>> +{
+>> +    struct arm_smccc_res res;
+>> +
+>> +    arm_smccc_1_1_invoke(SMC_RMI_REC_AUX_COUNT, rd, &res);
+>> +
+>> +    if (aux_count)
+>> +        *aux_count = res.a1;
+>> +    return res.a0;
+>> +}
+>> +
+>> +/**
+>> + * rmi_rec_create() - Create a REC
+>> + * @rd: PA of the RD
+>> + * @rec: PA of the target REC
+>> + * @params_ptr: PA of REC parameters
+>> + *
+>> + * Create a REC using the parameters specified in the struct
+>> rec_params pointed
+>> + * to by @params_ptr.
+>> + *
+>> + * Return: RMI return code
+>> + */
+>> +static inline int rmi_rec_create(unsigned long rd, unsigned long rec,
+>> +                 unsigned long params_ptr)
+>> +{
+>> +    struct arm_smccc_res res;
+>> +
+>> +    arm_smccc_1_1_invoke(SMC_RMI_REC_CREATE, rd, rec, params_ptr, &res);
+>> +
+>> +    return res.a0;
+>> +}
+>> +
+> 
+> 'params_ptr' may be renamed to 'params'.
+> 
+> 
+> [...]
+>> +#endif /* __ASM_RMI_CMDS_H */
 > 
 > Thanks,
 > Gavin
