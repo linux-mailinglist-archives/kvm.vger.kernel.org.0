@@ -1,155 +1,272 @@
-Return-Path: <kvm+bounces-39912-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39914-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1061A4CA8E
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 18:59:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 33CDFA4CABF
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 19:07:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDF613AB4AD
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 17:52:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2CB33AF658
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 17:55:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0CFF217F32;
-	Mon,  3 Mar 2025 17:52:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F221C21CC74;
+	Mon,  3 Mar 2025 17:55:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LfRPn5Eg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GVRm/GPu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69CAF14A62B
-	for <kvm@vger.kernel.org>; Mon,  3 Mar 2025 17:52:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78A9121883F
+	for <kvm@vger.kernel.org>; Mon,  3 Mar 2025 17:55:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741024327; cv=none; b=ruCrX2lndVLVsoEzp1S2lJZG+7tWBfQaT2QjXRxg3EvZvwJvE+yDrR6E4HTBC7MciW0ECDUt3xau5CKHzHDAbytlXx2bLxSUYnuMlaqMQMQdSdW4zR8FvXXIcjB/F/L6/gH/CAmf6ZWe8R3eKpfmUBmuYKzZgi8ChI3j0zciV9A=
+	t=1741024546; cv=none; b=iXPBftKsBzEj268XU6QD/rnot0CjvuGnWCyEtEE+itZejY0L7nypaD6XFB29zHD1NBmAvEAQVn+8p6AW3tm7DEosaTipfxw4+i28tONw2A2XAVaxwNns3I6jzfUI3SdoT/1JkM/KasyCfgncoOuFmYKfnoVBLQnJjAe4GYR/+bE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741024327; c=relaxed/simple;
-	bh=QgP6NlBbs6rnKRSAqZSsqdiq8RcsyUmD/3Z4AUZwGfU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AyauF/K0hHrZtu/gYeyW41BRRA/DIE2dnicn/zk6nvxUbL780GPTkRebJ2QD0qG/8eVI4wX+TrYH9r8Li5jOOA+QgTd6LI6T9c2TMXnTCnbb7pMF+UySRwBzLiu+28RbOoytYjtf1mfd/fiQoCjBID8R3r1JMtGJ2eE7YzmBda8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LfRPn5Eg; arc=none smtp.client-ip=209.85.208.47
+	s=arc-20240116; t=1741024546; c=relaxed/simple;
+	bh=RYeCiH4hrglpzCL4UionL7B70QIq6qUx4/oWmBloBco=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=s8R+y2ZvcR3NjLnKaRl5iy38BRNrcPm5tuqh/2qRwbbR/pN20O+8QDHVvZitSEXTw5ZnVMdcUElhq2UrzoR0b0i9K34FKT1Jhy6ZXFN4o1Kya41Z64w8QjwtW8WDg7GWxbo6K3Cp2GRUHqnzFtQ1L51zo4A3DRBQi8u5SkugAeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GVRm/GPu; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5e05ac70b61so173a12.1
-        for <kvm@vger.kernel.org>; Mon, 03 Mar 2025 09:52:05 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-22328fb6cbfso83937095ad.2
+        for <kvm@vger.kernel.org>; Mon, 03 Mar 2025 09:55:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741024324; x=1741629124; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RaobNh8YJ+j6HIOIVsKGbmDCn24ZoUL5ZjszjFtTcS8=;
-        b=LfRPn5EgR3wV0UwXYgBIycUNpBriUrfIdsNTfd19Blv5waSFgbxQsXLDp+nagyB6hK
-         6u9H6uwX5FH82P9/KuzpJBlrnQTMoM/CrNizy3BGeM/mmrlpjxcOpRwGNn7bw3LwTpU4
-         zcrlJi5xWDuueANLU4W1ZADLFyVDOGm1theH+qQAhuJswXcO6WDgj1/kKQKQ9y3qKiVd
-         QDM+7J3L0gVNZj0exbDAeY5/zBOXrUiblQ/J0+m3w3Jj5nX8XiPaCgCke1F1HQdWvQ1+
-         9xBhvv1lyf0+jMBXubMJ1y94oewBocUBccGhK5g1wyFhySbnsBPDT8dW+F7A5MkcGRKR
-         DryA==
+        d=google.com; s=20230601; t=1741024544; x=1741629344; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=t29eipV8nLIfT3AxIgJFAPTVE7nBNDXlcKJOKbdgiFo=;
+        b=GVRm/GPu6oSeBjCxdOOKjdcfTC3oeOriYY13rcKw7VQRFIvzYqvyTFhyu+6ZRU1tnj
+         QnGuemkgX8/SPupq4Krkt+S/7a86rm6SW/jnsUaaLZBZWeO1vtK+1gxgu7a9B5PrRyvd
+         7EXYqKsphEucqUsv8Xa0Nh9MbTNyQZjck4YNOU3fjObe0MelUTSdPlb5itmEGCR0iMWC
+         XUzoWdfS6B+uoX/lyC2K0YU7RAZrGJtstc0fOlLXhqj36QHuL2FmkkflII2Myct9aEVX
+         NdV0ju2ZOoWwKkCQDCeZqy7n51Piy7cEqBP4ph1byVZac1gpY5cP9aB5ofabCL3+sq9Z
+         uD1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741024324; x=1741629124;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RaobNh8YJ+j6HIOIVsKGbmDCn24ZoUL5ZjszjFtTcS8=;
-        b=DAVMkdPelB723pyrRWSmPFcgc3pqBh2jWAI/VXzxboSu2pdm5Gs8qUyFVY3nh+lkUE
-         S1vyEY8L49nMndQBAeOF/7aPz38932xPq6KBUKOpXFVpCfNiVPmv/lx9PkU5WLwqWGgq
-         gS3kDjl6OONYpH/1FXxFaWH77ccAPKtp51n7YRmFA2akk0/5vrUmnc0e/e1MtQdnRXSZ
-         osD8ng1vA/n2gs3KbI5qyL01Xdqb/FC4Xbea0b/ZWFY178hpv3YBX+dlPe6OdAxDL8o+
-         XlznOYslJq6lMTu/dxxKp9M0I8VYT/xDx8XVKRT8kkZO6qx5mu/Zwozj2a0Z/5X2tc8i
-         hw9w==
-X-Forwarded-Encrypted: i=1; AJvYcCWRWqKnfHdvLvlap1WDtMmjX5aUdFv1M6Y3FGhHWetBfPmzlHDoGnpP7kABKk3XtXggIHc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzIvhAmm4YwtWfVM7mdS4ZhZGCGmKzmnUDjl7mpv2f0ehogXcqz
-	M08ZXUdY92s79cB8z3UfiECvZ0pPZJiwnXq2lXD3WIBXbsfoYn2TYTixw7gyTCS2ofyqJkqG0I4
-	E2tgIZpyumFD6Seb/Zwpf9iyF6r9/+mLeeoUj
-X-Gm-Gg: ASbGncsWRQe3O+om7HaHdrwB1iM3lGzIAh/c0WcDLYFGAlVO+8DZQ2ItwEn6iYboAql
-	WBzYXpcTkmXQM+lXQfg+Zuh1+DLWgsqpwlbay55RzA7xeWDTDb6/+YHhXSiNnetHnIaIoZfXA7h
-	1qYLX/wPXKyLgOokJv4VyFbqPvrA==
-X-Google-Smtp-Source: AGHT+IHPcwKiQzmn4yJOryRL5uTQknzFAuD+P5AADy3IJVvd+Dc/ZHFNhuisMirp59eZXjRx9+fwabi/H/38Lmlxb4g=
-X-Received: by 2002:aa7:df06:0:b0:5dc:ccb4:cb11 with SMTP id
- 4fb4d7f45d1cf-5e50f8af131mr187775a12.4.1741024323531; Mon, 03 Mar 2025
- 09:52:03 -0800 (PST)
+        d=1e100.net; s=20230601; t=1741024544; x=1741629344;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=t29eipV8nLIfT3AxIgJFAPTVE7nBNDXlcKJOKbdgiFo=;
+        b=T+p2LfvG/8DGAQaYoH9Gvul/JUZ3T60rjHAIeKOREfz1GKL+1pzuPHN/a6H9Syls6G
+         hpdKsF/KWK8FlRlzpF16Ti+8OK5GxOkea4n13MbBrUZEhnCtpRn/q/AX5g4S09sGlP42
+         2yyo2e/8nJcgLrhzJ9mop7BX0WDKhreYy4U6c53CtChe1e5gsqRIKxgM8+MVxhQU86qk
+         wEfbJyoWaGwtboI2MhUDe0WDCqmy9FRawgYk5uha5Cv3FaBzMhT+8/W0BJAdhuck0kV/
+         PN+J9bWpGyuAhbG3Y+smRhBY49xtQwLumfMCVNXLKWJq51HEl7yao1eNhzwj3P5ie4jk
+         bf1A==
+X-Forwarded-Encrypted: i=1; AJvYcCWEpFzPMHfYp+3uM8SN40DhGtxwRIz1nTbQ9FJ4K+Zng4GxAyS/HxCAHlJp1FhLOSVQjDA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFuJ26VYvIrC6vwnShHQPkx+ud5GwDv3RS1ab3q74mvHSzRyOM
+	AxecqscPqf5MjmXDGhnhCI1KSDZ/HI2jsO918oDHDRsfxIR6G5ueWRyF/jjwKmG4qMCP6cNrpjj
+	7SA==
+X-Google-Smtp-Source: AGHT+IHmiRcJ/TXtxOjZJ9TLtmElrBxOaPNxmsCaonemIQYwQWgcMwsBzh5CFU7u1TN6rwqurQh1oo4KA6M=
+X-Received: from pfbmc22.prod.google.com ([2002:a05:6a00:7696:b0:730:92d9:52e3])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:22d0:b0:21f:89e5:2704
+ with SMTP id d9443c01a7336-2236924f93cmr219888425ad.34.1741024543838; Mon, 03
+ Mar 2025 09:55:43 -0800 (PST)
+Date: Mon, 3 Mar 2025 09:55:42 -0800
+In-Reply-To: <20250303052227.523411-1-zijie.wei@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250205182402.2147495-1-yosry.ahmed@linux.dev>
- <20250205182402.2147495-2-yosry.ahmed@linux.dev> <Z8JOvMx6iLexT3pK@google.com>
-In-Reply-To: <Z8JOvMx6iLexT3pK@google.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Mon, 3 Mar 2025 09:51:51 -0800
-X-Gm-Features: AQ5f1Jq-mwSjDevO7kvzGk_6Els8FMXYyGYRIuLa4ds4q8oc7antxsMG0ld7T2w
-Message-ID: <CALMp9eSGRLMj-a_ZrzzeLx_jgAea13-to=ZPHu3F+trQq28YjA@mail.gmail.com>
-Subject: Re: [RFC PATCH 01/13] KVM: nSVM: Track the ASID per-VMCB
-To: Sean Christopherson <seanjc@google.com>
-Cc: Yosry Ahmed <yosry.ahmed@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+References: <20241121065039.183716-1-zijie.wei@linux.alibaba.com> <20250303052227.523411-1-zijie.wei@linux.alibaba.com>
+Message-ID: <Z8XtHvJ4KZTYa-yr@google.com>
+Subject: Re: [PATCH v4] KVM: x86: ioapic: Optimize EOI handling to reduce
+ unnecessary VM exits
+From: Sean Christopherson <seanjc@google.com>
+To: weizijie <zijie.wei@linux.alibaba.com>
+Cc: kai.huang@intel.com, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H . Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	xuyun <xuyun_xy.xy@linux.alibaba.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 28, 2025 at 4:03=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> +Jim, for his input on VPIDs.
->
-> On Wed, Feb 05, 2025, Yosry Ahmed wrote:
-> > The ASID is currently tracked per-vCPU, because the same ASID is used b=
-y
-> > L1 and L2. That ASID is flushed on every transition between L1 and L2.
-> >
-> > Track the ASID separately for each VMCB (similar to the
-> > asid_generation), giving L2 a separate ASID. This is in preparation for
-> > doing fine-grained TLB flushes on nested transitions instead of
-> > unconditional full flushes.
->
-> After having some time to think about this, rather than track ASIDs per V=
-MCB, I
-> think we should converge on a single approach for nVMX (VPID) and nSVM (A=
-SID).
->
-> Per **VM**, one VPID/ASID for L1, and one VPID/ASID for L2.
+Several minor comments.  No need to post v5, I'll do so today as a small se=
+ries
+with preparatory patches to refactor and deduplicate the userspace vs. in-k=
+ernel
+logic.
 
-When using EPT on VMX, there is probably no advantage to using one
-VPID per VM. The physical ASID is determined by <EPTRTA, VPID, PCID>.
-Two different VMs are not going to share an EPTRTA, so they already
-have different ASIDs, even if they have the same VPID.
+On Mon, Mar 03, 2025, weizijie wrote:
+> Configuring IOAPIC routed interrupts triggers KVM to rescan all vCPU's
+> ioapic_handled_vectors which is used to control which vectors need to
+> trigger EOI-induced VMEXITs. If any interrupt is already in service on
+> some vCPU using some vector when the IOAPIC is being rescanned, the
+> vector is set to vCPU's ioapic_handled_vectors. If the vector is then
+> reused by other interrupts, each of them will cause a VMEXIT even it is
+> unnecessary. W/o further IOAPIC rescan, the vector remains set, and this
+> issue persists, impacting guest's interrupt performance.
+>=20
+> Both
+>=20
+>   commit db2bdcbbbd32 ("KVM: x86: fix edge EOI and IOAPIC reconfig race")
+>=20
+> and
+>=20
+>   commit 0fc5a36dd6b3 ("KVM: x86: ioapic: Fix level-triggered EOI and
+> IOAPIC reconfigure race")
+>=20
+> mentioned this issue, but it was considered as "rare" thus was not
+> addressed. However in real environment this issue can actually happen
+> in a well-behaved guest.
+>=20
+> Simple Fix Proposal:
+> A straightforward solution is to record highest in-service IRQ that
+> is pending at the time of the last scan. Then, upon the next guest
+> exit, do a full KVM_REQ_SCAN_IOAPIC. This ensures that a re-scan of
+> the ioapic occurs only when the recorded vector is EOI'd, and
+> subsequently, the extra bits in the eoi_exit_bitmap are cleared,
+> avoiding unnecessary VM exits.
 
-> For SVM, the dynamic ASID crud is a holdover from KVM's support for CPUs =
-that
-> don't support FLUSHBYASID, i.e. needed to purge the entire TLB in order t=
-o flush
-> guest mappings.  FLUSHBYASID was added in 2010, and AFAIK has been suppor=
-ted by
-> all AMD CPUs since.
+Write changelogs as "commands", i.e. state what changes are actually being =
+made,
+as opposed to passively describing a proposed/possible change.
 
-> KVM already mostly keeps the same ASID, except for when a vCPU is migrate=
-d, in
-> which case KVM assigns a new ASID.  I suspect that following VMX's lead a=
-nd
-> simply doing a TLB flush in this situation would be an improvement for mo=
-dern
-> CPUs, as it would flush the entries that need to be flushed, and not poll=
-ute the
-> TLBs with stale, unused entries.
->
-> Using a static per-VM ASID would also allow using broadcast invalidations=
-[*],
-> would simplify the SVM code base, and I think/hope would allow us to move=
- much
-> of the TLB flushing logic, e.g. for task migration, to common code.
->
-> For VPIDs, maybe it's because it's Friday afternoon, but for the life of =
-me I
-> can't think of any reason why KVM needs to assign VPIDs per vCPU.  Especi=
-ally
-> since KVM is ridiculously conservative and flushes _all_ EPT/VPID context=
-s when
-> running a different vCPU on a pCPU (which I suspect we can trim down?).
->
-> Am I forgetting something?
+> Co-developed-by: xuyun <xuyun_xy.xy@linux.alibaba.com>
+> Signed-off-by: xuyun <xuyun_xy.xy@linux.alibaba.com>
+> Signed-off-by: weizijie <zijie.wei@linux.alibaba.com>
+> Reviewed-by: Kai Huang <kai.huang@intel.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  1 +
+>  arch/x86/kvm/ioapic.c           | 10 ++++++++--
+>  arch/x86/kvm/irq_comm.c         |  9 +++++++--
+>  arch/x86/kvm/lapic.c            | 13 +++++++++++++
+>  4 files changed, 29 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_h=
+ost.h
+> index 0b7af5902ff7..8c50e7b4a96f 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1062,6 +1062,7 @@ struct kvm_vcpu_arch {
+>  #if IS_ENABLED(CONFIG_HYPERV)
+>  	hpa_t hv_root_tdp;
+>  #endif
+> +	u8 last_pending_vector;
 
-TDX? IIRC, TDX requires a unique VPID for each vCPU in a VM.
+To be consistent with how KVM handles IRQs, this should probably be an "int=
+" with
+-1 as the "no pending EOI" value.
 
-> [*] https://lore.kernel.org/all/Z8HdBg3wj8M7a4ts@google.com
+I also think we should go with a verbose name to try and precisely capture =
+what
+this field tracks, e.g. highest_stale_pending_ioapic_eoi.  It's abusrdly lo=
+ng,
+but with massaging and refactoring the line lengths are a non-issue, and I =
+want
+to avoid confusion with pending_ioapic_eoi and highest_isr_cache (and other=
+s).
+
+>  };
+> =20
+>  struct kvm_lpage_info {
+> diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
+> index 995eb5054360..40252a800897 100644
+> --- a/arch/x86/kvm/ioapic.c
+> +++ b/arch/x86/kvm/ioapic.c
+> @@ -297,10 +297,16 @@ void kvm_ioapic_scan_entry(struct kvm_vcpu *vcpu, u=
+long *ioapic_handled_vectors)
+>  			u16 dm =3D kvm_lapic_irq_dest_mode(!!e->fields.dest_mode);
+> =20
+>  			if (kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT,
+> -						e->fields.dest_id, dm) ||
+> -			    kvm_apic_pending_eoi(vcpu, e->fields.vector))
+> +						e->fields.dest_id, dm))
+>  				__set_bit(e->fields.vector,
+>  					  ioapic_handled_vectors);
+> +			else if (kvm_apic_pending_eoi(vcpu, e->fields.vector)) {
+> +				__set_bit(e->fields.vector,
+> +					  ioapic_handled_vectors);
+> +				vcpu->arch.last_pending_vector =3D e->fields.vector >
+> +					vcpu->arch.last_pending_vector ? e->fields.vector :
+> +					vcpu->arch.last_pending_vector;
+
+Eh, no need to use a ternary operator, last_pending_vector only needs to be=
+ written
+if it's changing.
+
+>  		}
+>  	}
+>  	spin_unlock(&ioapic->lock);
+> diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
+> index 8136695f7b96..1d23c52576e1 100644
+> --- a/arch/x86/kvm/irq_comm.c
+> +++ b/arch/x86/kvm/irq_comm.c
+> @@ -426,9 +426,14 @@ void kvm_scan_ioapic_routes(struct kvm_vcpu *vcpu,
+> =20
+>  			if (irq.trig_mode &&
+>  			    (kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT,
+> -						 irq.dest_id, irq.dest_mode) ||
+> -			     kvm_apic_pending_eoi(vcpu, irq.vector)))
+> +						 irq.dest_id, irq.dest_mode)))
+>  				__set_bit(irq.vector, ioapic_handled_vectors);
+> +			else if (kvm_apic_pending_eoi(vcpu, irq.vector)) {
+> +				__set_bit(irq.vector, ioapic_handled_vectors);
+> +				vcpu->arch.last_pending_vector =3D irq.vector >
+> +					vcpu->arch.last_pending_vector ? irq.vector :
+> +					vcpu->arch.last_pending_vector;
+
+This is wrong.  Well, maybe not "wrong" per se, but unnecessary.  The trig_=
+mode
+check guards both the "new" and "old" routing cases, i.e. KVM's behavior is=
+ to
+intercept EOIs for in-flight IRQs if and only if the IRQ is level-triggered=
+.
+
+This code really needs to be de-duplicated between the userspace and in-ker=
+nel
+I/O APICs.  It probably should have been de-duplicated by fceb3a36c29a ("KV=
+M: x86:
+ioapic: Fix level-triggered EOI and userspace I/OAPIC reconfigure race"), b=
+ut it's
+a much more pressing issue now.
+
+> +			}
+>  		}
+>  	}
+>  	srcu_read_unlock(&kvm->irq_srcu, idx);
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index a009c94c26c2..7c540a0eb340 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -1466,6 +1466,19 @@ static void kvm_ioapic_send_eoi(struct kvm_lapic *=
+apic, int vector)
+>  	if (!kvm_ioapic_handles_vector(apic, vector))
+>  		return;
+> =20
+> +	/*
+> +	 * When there are instances where ioapic_handled_vectors is
+> +	 * set due to pending interrupts, clean up the record and do
+> +	 * a full KVM_REQ_SCAN_IOAPIC.
+> +	 * This ensures the vector is cleared in the vCPU's ioapic_handled_vect=
+ors,
+> +	 * if the vector is reused=C2=A0by non-IOAPIC interrupts, avoiding unne=
+cessary
+> +	 * EOI-induced VMEXITs for that vector.
+> +	 */
+> +	if (apic->vcpu->arch.last_pending_vector =3D=3D vector) {
+> +		apic->vcpu->arch.last_pending_vector =3D 0;
+
+I think it makes sense to reset the field when KVM_REQ_SCAN_IOAPIC, mainly =
+so
+that it's more obviously correct, i.e. so that it's easier to see that the =
+field
+is reset immediately prior to scanning, along with the bitmap itself.
+
+> +		kvm_make_request(KVM_REQ_SCAN_IOAPIC, apic->vcpu);
+> +	}
+> +
+>  	/* Request a KVM exit to inform the userspace IOAPIC. */
+>  	if (irqchip_split(apic->vcpu->kvm)) {
+>  		apic->vcpu->arch.pending_ioapic_eoi =3D vector;
+> --=20
+> 2.43.5
+>=20
 
