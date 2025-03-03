@@ -1,123 +1,136 @@
-Return-Path: <kvm+bounces-39865-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39867-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB75BA4BA75
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 10:11:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 007FBA4BACF
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 10:30:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 374A616AAEE
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 09:11:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 025621890E84
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 09:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AFE41F03F1;
-	Mon,  3 Mar 2025 09:11:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C5B31F0E5C;
+	Mon,  3 Mar 2025 09:29:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vnqx3bc1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23A771F03E1;
-	Mon,  3 Mar 2025 09:11:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC09D1F0E50
+	for <kvm@vger.kernel.org>; Mon,  3 Mar 2025 09:29:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740993085; cv=none; b=mfvKJpQkMKg6e+6c4C/yORgBGBzbS1mpDPCFFFN+gyJc6JuhwEebOut42xgJGCx3Zh9VTG4whQAL8awHChEkfXxqKBGnODTQBs64sPAjftcqYR+zlv+Oob6i35QLZZvB6TkOt+owDXJsK0E5g9uUTBCRxeusNsbGRM9uZZ2EpJ4=
+	t=1740994183; cv=none; b=CjEC8W3+dcg9L1ktBzGjX22/dHlyuMdj0mExg/c+jhYN1XaCv12TudHOwsRSDgAc3j8eL/bSFE3nurp4K1ZR4gyr4tkEjVcUF2yaj6Nl8VkPytKNDCZdfrirIrqbUq7MSEYuacpxUUNgI5M78fP2v36GxDqkLXj+wuwYD97k7fY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740993085; c=relaxed/simple;
-	bh=3P7asazvVhA6Z+2Oqdc1BRq4108S/dF7oNeQJkxp/Z8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VylxTvPkKLRfaPY73wUDW2kCLHPQ3VvHCZ1tFCilMI6bARpXw/oojR61tOfj9uh4XNWPKKLw2Axl5u06fHuFChRoiGAQila46VDkRQsft6m0yyC/AopCQUi1i8ild3oLylftbh75R9hM7pk1zGIu02aIpti3f+VBxpQ9KC2/Ts0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.2.5.213])
-	by gateway (Coremail) with SMTP id _____8CxeXE2csVn7AiJAA--.37601S3;
-	Mon, 03 Mar 2025 17:11:18 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.2.5.213])
-	by front1 (Coremail) with SMTP id qMiowMAxDcUycsVni4AzAA--.57137S2;
-	Mon, 03 Mar 2025 17:11:15 +0800 (CST)
-From: Bibo Mao <maobibo@loongson.cn>
-To: Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Huacai Chen <chenhuacai@kernel.org>
-Cc: WANG Xuerui <kernel@xen0n.name>,
-	kvm@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Xianglai Li <lixianglai@loongson.cn>
-Subject: [PATCH] LoongArch: KVM: Reload guest CSR registers after S4
-Date: Mon,  3 Mar 2025 17:11:14 +0800
-Message-Id: <20250303091114.1511496-1-maobibo@loongson.cn>
-X-Mailer: git-send-email 2.39.3
+	s=arc-20240116; t=1740994183; c=relaxed/simple;
+	bh=hO/1w0WIreFcCNOGOIiuvQHBGfGmx0RKyWkuiZ5OENQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y1T4zUKAnUI+M/90d1BCmRJ9hnL+UFZ+OIqhIPfipJUqA8Rrs6A8hqY/ktFDxkzHzE4x6mkNUcM2ZGnCQqt6bDu8LLgyw2mFaJ39Dq2ev0G1P4m4kCP9NouVRissaBFuBVnSSv5xVUP4W67/uFTos+GR3//gnRJ8iga0SJnYtxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vnqx3bc1; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740994179;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dm+Ad9vtaxKH6b/jFWjk7lOEkc1nxwN4lmuVSAb6Ah0=;
+	b=Vnqx3bc1aNPedPa4JUTrjtarmagh3gGaZ2wZ/LJr2h+eN1Vcri003ozZo1KTVNfkVxxvf2
+	Rx/YeYjmXYYg6SnhFu+5UPZrV67sRi9DfsSi/zA7/OTwKOKMYKbqtiilr19F2DRfwOxjm6
+	P6o0Kwyk60Uc/820ANtGYehq3lIg6/c=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-227-rnzXVbNIPdqejnvZhekS3A-1; Mon, 03 Mar 2025 04:29:16 -0500
+X-MC-Unique: rnzXVbNIPdqejnvZhekS3A-1
+X-Mimecast-MFC-AGG-ID: rnzXVbNIPdqejnvZhekS3A_1740994155
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-22379af38e0so35617515ad.2
+        for <kvm@vger.kernel.org>; Mon, 03 Mar 2025 01:29:16 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740994155; x=1741598955;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dm+Ad9vtaxKH6b/jFWjk7lOEkc1nxwN4lmuVSAb6Ah0=;
+        b=kiUd74LxJhlic9H+EcXL7vo5BnXdiiQmUJZZAtfMpANW08LXYhc0j88uJRMSMvN7rL
+         vCnAMR0WCHzpmAIIi1ozVthjNX0G64jLpQF2/jCqFM1HUJPqBCwixCHCAubDLKHPby8N
+         eDAazTvqJGYcxDm/hw8oMfRLPqGyKLVK23+K6bZGut2tPmoFk69gg58ygxnfO2UGcRst
+         RAZv+O++RDutK5nXHw8o2Ne0mOXjpXGkQL7oSg/ns+I4maxJ3sGY1nT6oY8bslPE/bhl
+         B6oWUhoF23XmMxzUUt3oBTlt6UM7NjZ0Qzi4aHhqJh71lfxqcp+bfNb+HhEpcx2DmgxT
+         +DEg==
+X-Forwarded-Encrypted: i=1; AJvYcCWfH5AfrksMqikQs0xsRhDhXYlRFuCEopcaG29i5l1boFmtGk+xQ8Q/PLaRC2i3qcc6xVk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxV23Yq4OQEE5b+xBfAbmrqVmb/Xz0ScAz6njxMBbftzLp1aEUZ
+	P36iVWS9xzyHzzkZghsYDREHGpZ4Tb9mGv7Yfrx2s3N8y/9zoClXzanwYg4dBHLgqpyMGxxghCU
+	6fRbHannlY+jgOCJArnMqpJ+9z/2GZc5BVgVdcvVuXR63SHS1B7sXp2lqEZzKAVKG18oCpTIhUP
+	UTRWKnMb+v/pua16wMsBPOpsSp
+X-Gm-Gg: ASbGnctK4pV2MGZFSYjQ8Bh/AJCU/s3035NpQiKhn0BV5/0s9HK3YQZA2Db/ntQunpn
+	xjRRhZ0D2HswRsWO9PWlpVNK9MfhOz1RNEfwB9LdW4eU4JNo3gmiBCcO4XawggWQAB/MxDPQ=
+X-Received: by 2002:a17:902:f547:b0:220:f7bb:842 with SMTP id d9443c01a7336-22369255811mr196196115ad.42.1740994154031;
+        Mon, 03 Mar 2025 01:29:14 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEeh8T/Isef6u47m5QPpp9NHgJMkJl3dnUE8Ylea44Ny6EY1sjUVU9fZMYGnxlnkM9rFe7Jpp6zS4k5VEsVFKw=
+X-Received: by 2002:a17:902:f547:b0:220:f7bb:842 with SMTP id
+ d9443c01a7336-22369255811mr196195835ad.42.1740994153774; Mon, 03 Mar 2025
+ 01:29:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMAxDcUycsVni4AzAA--.57137S2
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
-	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
-	nUUI43ZEXa7xR_UUUUUUUUU==
+References: <20250303085237.19990-1-sgarzare@redhat.com>
+In-Reply-To: <20250303085237.19990-1-sgarzare@redhat.com>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Mon, 3 Mar 2025 10:28:37 +0100
+X-Gm-Features: AQ5f1JpYz8RUYj9eXvkfBI5yoVaRYAPygFZFSo69WGk-H92b36v2eBIN9Cg-xmM
+Message-ID: <CAJaqyWfNieVxJu0pGCcjRc++wRnRpyHqfkuYpAqnKCLUjbW6Xw@mail.gmail.com>
+Subject: Re: [PATCH] vhost: fix VHOST_*_OWNER documentation
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On host HW guest CSR registers are lost after suspend and resume
-operation. Since last_vcpu of boot CPU still records latest vCPU pointer
-so that guest CSR register skips to reload when boot CPU resumes and
-vCPU is scheduled.
+On Mon, Mar 3, 2025 at 9:52=E2=80=AFAM Stefano Garzarella <sgarzare@redhat.=
+com> wrote:
+>
+> VHOST_OWNER_SET and VHOST_OWNER_RESET are used in the documentation
+> instead of VHOST_SET_OWNER and VHOST_RESET_OWNER respectively.
+>
+> To avoid confusion, let's use the right names in the documentation.
+> No change to the API, only the documentation is involved.
+>
 
-Here last_vcpu is cleared so that guest CSR register will reload from
-scheduled vCPU context after suspend and resume.
+Reviewed-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
 
-Also there is another small fix for Loongson AVEC support, bit 14 is added
-in CSR ESTAT register. Macro CSR_ESTAT_IS is replaced with hardcoded value
-0x1fff and AVEC interrupt status bit 14 is supported with macro
-CSR_ESTAT_IS.
-
-Signed-off-by: Bibo Mao <maobibo@loongson.cn>
----
- arch/loongarch/kvm/main.c | 8 ++++++++
- arch/loongarch/kvm/vcpu.c | 2 +-
- 2 files changed, 9 insertions(+), 1 deletion(-)
-
-diff --git a/arch/loongarch/kvm/main.c b/arch/loongarch/kvm/main.c
-index f6d3242b9234..b177773f38f6 100644
---- a/arch/loongarch/kvm/main.c
-+++ b/arch/loongarch/kvm/main.c
-@@ -284,6 +284,7 @@ long kvm_arch_dev_ioctl(struct file *filp,
- int kvm_arch_enable_virtualization_cpu(void)
- {
- 	unsigned long env, gcfg = 0;
-+	struct kvm_context *context;
- 
- 	env = read_csr_gcfg();
- 
-@@ -317,6 +318,13 @@ int kvm_arch_enable_virtualization_cpu(void)
- 	kvm_debug("GCFG:%lx GSTAT:%lx GINTC:%lx GTLBC:%lx",
- 		  read_csr_gcfg(), read_csr_gstat(), read_csr_gintc(), read_csr_gtlbc());
- 
-+	/*
-+	 * HW Guest CSR registers are lost after CPU suspend and resume
-+	 * Clear last_vcpu so that Guest CSR register forced to reload
-+	 * from vCPU SW state
-+	 */
-+	context = this_cpu_ptr(vmcs);
-+	context->last_vcpu = NULL;
- 	return 0;
- }
- 
-diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-index 20f941af3e9e..9e1a9b4aa4c6 100644
---- a/arch/loongarch/kvm/vcpu.c
-+++ b/arch/loongarch/kvm/vcpu.c
-@@ -311,7 +311,7 @@ static int kvm_handle_exit(struct kvm_run *run, struct kvm_vcpu *vcpu)
- {
- 	int ret = RESUME_GUEST;
- 	unsigned long estat = vcpu->arch.host_estat;
--	u32 intr = estat & 0x1fff; /* Ignore NMI */
-+	u32 intr = estat & CSR_ESTAT_IS;
- 	u32 ecode = (estat & CSR_ESTAT_EXC) >> CSR_ESTAT_EXC_SHIFT;
- 
- 	vcpu->mode = OUTSIDE_GUEST_MODE;
-
-base-commit: 1e15510b71c99c6e49134d756df91069f7d18141
--- 
-2.39.3
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  include/uapi/linux/vhost.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+> index b95dd84eef2d..d4b3e2ae1314 100644
+> --- a/include/uapi/linux/vhost.h
+> +++ b/include/uapi/linux/vhost.h
+> @@ -28,10 +28,10 @@
+>
+>  /* Set current process as the (exclusive) owner of this file descriptor.=
+  This
+>   * must be called before any other vhost command.  Further calls to
+> - * VHOST_OWNER_SET fail until VHOST_OWNER_RESET is called. */
+> + * VHOST_SET_OWNER fail until VHOST_RESET_OWNER is called. */
+>  #define VHOST_SET_OWNER _IO(VHOST_VIRTIO, 0x01)
+>  /* Give up ownership, and reset the device to default values.
+> - * Allows subsequent call to VHOST_OWNER_SET to succeed. */
+> + * Allows subsequent call to VHOST_SET_OWNER to succeed. */
+>  #define VHOST_RESET_OWNER _IO(VHOST_VIRTIO, 0x02)
+>
+>  /* Set up/modify memory layout */
+> --
+> 2.48.1
+>
 
 
