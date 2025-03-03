@@ -1,79 +1,86 @@
-Return-Path: <kvm+bounces-39859-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39860-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D055DA4B7DC
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 07:20:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D432A4B7E8
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 07:26:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F07CC16A773
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 06:20:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D43AB3AB7DB
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 06:25:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A0371E7C05;
-	Mon,  3 Mar 2025 06:20:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EDD31E5B6B;
+	Mon,  3 Mar 2025 06:26:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="n4GHLkjH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XjwU5P4B"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DAC21E0B91
-	for <kvm@vger.kernel.org>; Mon,  3 Mar 2025 06:20:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFA401E47BA
+	for <kvm@vger.kernel.org>; Mon,  3 Mar 2025 06:26:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740982842; cv=none; b=XpupQF2RkCuZf1UQ21FGgBUHdkAiCMWXwoFuENj7e7GMimufBAt5sFP3/9qfMs6CDufyBGoeuTChcndEOy83fU2x/0WSwX5yngCebtfBi+adUejhmChrhi1dv0S0oVaVv59igfAzawcZoMMnONZcxfrcsx5yKmbdS3rgg6yywjQ=
+	t=1740983162; cv=none; b=UNjsUn6AwiNoYZzhmdy6IfOv/O9Eb5BJCy/bSBhaYa0BIPsQLQLQ/SRSAmkDd/IRREMhqIk85yUUgguAhHrOczowJmjdcistD0RFHwJ9K41bpn9so5nz1PMMLFwHTp2zuxEcafE0a7P6RrZ8KW/SOKJankyid0ol1664DSbamOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740982842; c=relaxed/simple;
-	bh=xnkf9dHEY/bxJnJp3UuspjIPE+0ejwYLRa1u2I2pWLw=;
+	s=arc-20240116; t=1740983162; c=relaxed/simple;
+	bh=7M+DRz2hm03rBgj2x3UrNt6vpeHXng5+xitohQvfcAY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F26KNtzuGRKublzNkVW4Z6oj9bbo3MW3VQBd1NscwFGLbKGBKObJAJGJmJkvY/eUg0buP1yU5NVatOVLKYn7KpVw/iRzCoOV21sD/yUYR01xkM8ciIyH46wA/CtDJ25fj4SdSfaYBg9XoTU/k0KPaiF/IsYiRw6Qu5stnV6LQDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=n4GHLkjH; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-22185cddbffso83992725ad.1
-        for <kvm@vger.kernel.org>; Sun, 02 Mar 2025 22:20:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1740982840; x=1741587640; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Dyr2GA3li0orAMv11T62PbEJr2SsMfqcDoVbAywiFjQ=;
-        b=n4GHLkjHDB19+s2CbedRjrcjp3Cnndf7K9chgfbcrOk5G748SCu80SjY9wpDEI5sI7
-         Zg20PPbKFJqNI7ezc/NtdeoxeM4XqKewFfQwHlRdFCkHSV2tVP9a/huDBA4TMQvDMc2p
-         imbs5qZ+s+bsTiq70qf5Z78pZlLzd9+zY8L3f9GMHlqf6wholg71sPtsfwOLNdyO+po7
-         OABDt0UAozddrEPAe2fEgg4LdCFiAITPd5QpgaqQKINIPXpfOvLEeRlHWR8K6ko9vYgW
-         8LxitVKYYPB6fN66UamaS5nPf+qCqyGm7YeCvYFeCvH8zl3aaQ32p+NvJRqnhj2CWvwb
-         ngYA==
+	 In-Reply-To:Content-Type; b=NqI5b6VVVRURlsIXnjhDVIpCRuMC2BG2Kk9w+/ZwQlgxUzzmvnPEdl/rZHAM2cBMKfLdQxFB+/XcHhTDsoNSjV18llj8EbkZhPO1fxIb7uIIosoblVHjX7KCvtmlxj3FwQz2LmqzKxnUnGixbtAzyRB+nLil1I1D+Afqf0f9I5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XjwU5P4B; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740983159;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=N+ANXerGfs05Qx5JuBBnd1YtOYkq281duKe5pNwiLBs=;
+	b=XjwU5P4BipKFB3PnMww7FkDxuhqtkJ4RXL1JGHDmcWkz79M00BeiAJ2E+HGPhuTUMpVa5G
+	N0VhTQcZJCYkyflHU2iiPL8gEyKtRpFhItRtYWqyzFWyYKimVj5zNvfDVs9K4sJ9fhg7n2
+	puDDYCeYZ7O6wpkdPMjrzZAgMhZ/7Vo=
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-122-MV7uPczROkS0WUP5s5Q3Bg-1; Mon, 03 Mar 2025 01:25:58 -0500
+X-MC-Unique: MV7uPczROkS0WUP5s5Q3Bg-1
+X-Mimecast-MFC-AGG-ID: MV7uPczROkS0WUP5s5Q3Bg_1740983157
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-22107b29ac3so65953445ad.1
+        for <kvm@vger.kernel.org>; Sun, 02 Mar 2025 22:25:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740982840; x=1741587640;
+        d=1e100.net; s=20230601; t=1740983157; x=1741587957;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dyr2GA3li0orAMv11T62PbEJr2SsMfqcDoVbAywiFjQ=;
-        b=GSaoYEeMbgIFGPnbf3MCiXyxmWns/RmOFSHRLsCC/vvP+78onEkZ1jgTpQo/iVk9DA
-         Fu7gn+Fv1nyX3QhZBvq23/AldsEdRXm6Ws/8Ry5sz38gaW34o6H+vkkRkjqtlcsd7MEC
-         RgneiMk2Yp9ebsp5DZXFYPbBVW4kaX41c4Eo/LfyrLIIkxq6xmOGY7pyy5VHXWNbztzO
-         OM1qH4gvQrp1ZhGAMaw1IcEfjYSyxRQJNtfntzT4688j2liQNTM9hFadzmiSiBTDNOow
-         Dhu6XgoOOEsFtQgB54b3bOekQG4MjbV/YroX0a7Cw3JUSD5UR8MKp4B6eQVg+gBPK4B3
-         QE/g==
-X-Forwarded-Encrypted: i=1; AJvYcCWcmzYkJpg4WuT4tb6EGd/ljtuoDcHJXScLVkh3YnLo72AjEExLqcgTGTrpNKpfTd40eMg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yws8KmeA813BIOl7uJJyLBRC66oyw+ojDDdsV/ozz8IuF1aFYlB
-	Xk3Bv8nGzMfEF2jH/Tuk1GQGQcSLSd9nhSgclKVM46vVd1F5Mj7MtA7e5hGIbfo=
-X-Gm-Gg: ASbGncv2vDTn/KWge9iiQFruCt9BliGQil7lJ4Dl4EVp/XvszjrPuhakDSjoyRb0QGS
-	4WUTTBGYfyS6vQMfr+6DD/Af+IuOjOPExWPMA7t8tBk/KXSADwwJ0J2plDiMqZvvJclMF7w73pz
-	tDBGoyRjVLIZ04DBUkHU5rUvY0ZRnQb3gCPNUO6rY+V0WvGtGEx+WxvUbjtoWKl2nMqJ7zxhgJY
-	SQqTDYr3Nv+WL0b9e4E2n4cTSUvlSVc+3WTZEIvAmz/SvH8S/suK3QLEMsZwCQzWATZxUkVGxiH
-	FqK6SR7Vy3fXuUWYsGlwlu0sFL+0h8VO3xqbZOKfZbnGGr7duSWUnHbzvA==
-X-Google-Smtp-Source: AGHT+IEieq/BD1K+cE8LpIHguGq+X9OAmHwKGwyKh2uFq+hVqj0tth75vrcZnQUypyq8Bcdl5DillA==
-X-Received: by 2002:aa7:8207:0:b0:734:26c6:26d3 with SMTP id d2e1a72fcca58-7349d1ec1a1mr23805966b3a.5.1740982838260;
-        Sun, 02 Mar 2025 22:20:38 -0800 (PST)
-Received: from [157.82.207.107] ([157.82.207.107])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-736614c13dcsm414807b3a.42.2025.03.02.22.20.34
+        bh=N+ANXerGfs05Qx5JuBBnd1YtOYkq281duKe5pNwiLBs=;
+        b=L+AXcI6OkV8JYj1L8tLFV3vSBzrRxCvYyt6+Fz3Ii3QqugbyoZRz2ihvgCVcla+4+b
+         2HxBlb6/5dWSQeZt1NW9hxnWb9McD7c+D3GUVhJV3vH0p0ZWwhaWG5LCx55wRFXGcD7B
+         93X5WeD5VuxN1gXpD3kmpUK6ugVGbFvU/gqA8QijAn3DEu3VDlfY+XZBrpWaUTABeeAP
+         Zu+Ud0urV6cNgfqH3L71a47TQfTvdChgOBozQoVsosRthoPe16EHDOtcrHY0oWrdKRtZ
+         +5hidf94rkEkJmSDR9jxWNtNLRyhkI7UYdVYy/DdwU9U4dq3EFxIwsoWBkSTFC9/9yo1
+         owow==
+X-Forwarded-Encrypted: i=1; AJvYcCXj2Jv48FJY47hSTOnISGOTALoNtduEFMBHzol0Su2JAupDjFUDP5oXoLslL1NQQwzm8Lc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4eD27hdvKak4jn5eVPQuxdcZHaNWXquXYt34LfOTp+5NPm02z
+	iTfOP4Iw2zQu+WCFET+5WuVbmI3st1VHfTjuaiEIXUxNeK6ynduIfAv2TrC9YRDDCdjz6yDww7h
+	MwJFvv3tsNp9Xd6ISudH5g9IEeW5SX40tIt/4PJiuZMUyNUNXSw==
+X-Gm-Gg: ASbGncsVEg8FT3BlFN0ynsEUP78VocTIoDabzchDct9TGW5tebvCprdWAWjXtx/WZeJ
+	iW/Nc2Yj2L6xLuyDS3lWcAjvPoGRruY3t8y0OgoSSDmPSJUTO/b1bURnA/+IvjM4/gwvmPpVaTS
+	sxR9aJK1WWDIgvLxXjAoAcICs24lWF7+gpR3x/FVoqX6pstlUQdW6U/9oGwrYrZYwHRwJbX+xyW
+	uaFqVuaIsp5U8o8x+ZKvHO1hY/fgbySBRssGT1ERBTTBsLI8UY77XgqSWHe5O2KoYZwNdZwMki+
+	cvPPnAHNS58DTMfRig==
+X-Received: by 2002:a17:902:e5cf:b0:220:ff82:1c60 with SMTP id d9443c01a7336-2234a4891c5mr239752415ad.14.1740983157575;
+        Sun, 02 Mar 2025 22:25:57 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFpXtcArHUqT2hI5ax8evJjGCyGJEtPHCAmH1OVzs9dnw0tbzauezRsGnlG5Grz1mEDveiZtg==
+X-Received: by 2002:a17:902:e5cf:b0:220:ff82:1c60 with SMTP id d9443c01a7336-2234a4891c5mr239752075ad.14.1740983157279;
+        Sun, 02 Mar 2025 22:25:57 -0800 (PST)
+Received: from [192.168.68.55] ([180.233.125.164])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-223504c59e1sm70112765ad.158.2025.03.02.22.25.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 02 Mar 2025 22:20:37 -0800 (PST)
-Message-ID: <0ec77558-bdfb-4471-a44b-0a37a9422f72@daynix.com>
-Date: Mon, 3 Mar 2025 15:20:33 +0900
+        Sun, 02 Mar 2025 22:25:56 -0800 (PST)
+Message-ID: <e432ee67-6afb-40c8-9542-48770834ee40@redhat.com>
+Date: Mon, 3 Mar 2025 16:25:48 +1000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,71 +88,61 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 5/6] selftest: tun: Add tests for virtio-net
- hashing
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>,
- Andrew Melnychenko <andrew@daynix.com>,
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
- Lei Yang <leiyang@redhat.com>
-References: <20250228-rss-v7-0-844205cbbdd6@daynix.com>
- <20250228-rss-v7-5-844205cbbdd6@daynix.com>
- <20250228062947.7864a59c@kernel.org>
+Subject: Re: [PATCH v7 11/45] arm64: RME: RTT tear down
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+References: <20250213161426.102987-1-steven.price@arm.com>
+ <20250213161426.102987-12-steven.price@arm.com>
 Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <20250228062947.7864a59c@kernel.org>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20250213161426.102987-12-steven.price@arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 2025/02/28 23:29, Jakub Kicinski wrote:
-> On Fri, 28 Feb 2025 16:58:51 +0900 Akihiko Odaki wrote:
->> The added tests confirm tun can perform RSS and hash reporting, and
->> reject invalid configurations for them.
+On 2/14/25 2:13 AM, Steven Price wrote:
+> The RMM owns the stage 2 page tables for a realm, and KVM must request
+> that the RMM creates/destroys entries as necessary. The physical pages
+> to store the page tables are delegated to the realm as required, and can
+> be undelegated when no longer used.
 > 
-> The tests may benefit from using FIXTURE_VARIANT(), up to you.
-
-I took a look at it after seeing your suggestion, but it is 
-unfortunately not straightfoward to use FIXTURE_VARIANT() for them
-so I'll leave it as is. The problem is that a packet for each test has a 
-different type and requires different functions to construct.
-
-Tests added in "[PATCH net-next v7 4/6] selftest: tun: Test vnet ioctls 
-without device" are easier to adopt FIXTURE_VARIANT(), but one 
-exceptional test case, which is for TUNGETVNETHASHCAP, does not fit well 
-so I also keep the current form.
-
-Thank you for your suggestion anyway.
-
+> Creating new RTTs is the easy part, tearing down is a little more
+> tricky. The result of realm_rtt_destroy() can be used to effectively
+> walk the tree and destroy the entries (undelegating pages that were
+> given to the realm).
 > 
-> The IPv4 tests fail reliably on a VM with a debug kernel
-> (kernel/configs/debug.config included in the config):
-> 
-> # 5.90 [+0.00] ok 14 tun_vnet_hash.unclassified
-> # 5.90 [+0.00] #  RUN           tun_vnet_hash.ipv4 ...
-> # 6.18 [+0.28] # tun.c:669:ipv4:Expected 0 (0) != tun_vnet_hash_check(self->source_fd, self->dest_fds, &packet, sizeof(packet), 0, VIRTIO_NET_HASH_REPORT_IPv4, 0x6e45d952) (0)
-> # 15.09 [+8.92] # ipv4: Test failed
-> # 15.10 [+0.00] #          FAIL  tun_vnet_hash.ipv4
-> # 15.10 [+0.00] not ok 15 tun_vnet_hash.ipv4
-> # 15.10 [+0.00] #  RUN           tun_vnet_hash.tcpv4 ...
-> # 15.36 [+0.26] # tun.c:689:tcpv4:Expected 0 (0) != tun_vnet_hash_check(self->source_fd, self->dest_fds, &packet, sizeof(packet), VIRTIO_NET_HDR_F_DATA_VALID, VIRTIO_NET_HASH_REPORT_TCPv4, 0xfb63539a) (0)
-> # 24.76 [+9.40] # tcpv4: Test failed
-> # 24.76 [+0.00] #          FAIL  tun_vnet_hash.tcpv4
-> # 24.76 [+0.00] not ok 16 tun_vnet_hash.tcpv4
-> # 24.77 [+0.00] #  RUN           tun_vnet_hash.udpv4 ...
-> # 25.05 [+0.28] # tun.c:710:udpv4:Expected 0 (0) != tun_vnet_hash_check(self->source_fd, self->dest_fds, &packet, sizeof(packet), VIRTIO_NET_HDR_F_DATA_VALID, VIRTIO_NET_HASH_REPORT_UDPv4, 0xfb63539a) (0)
-> # 32.11 [+7.06] # udpv4: Test failed
-> # 32.11 [+0.00] #          FAIL  tun_vnet_hash.udpv4
-> # 32.11 [+0.00] not ok 17 tun_vnet_hash.udpv4
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+> Changes since v6:
+>   * Move rme_rtt_level_mapsize() and supporting defines from kvm_rme.h
+>     into rme.c as they are only used in that file.
+> Changes since v5:
+>   * Rename some RME_xxx defines to do with page sizes as RMM_xxx - they are
+>     a property of the RMM specification not the RME architecture.
+> Changes since v2:
+>   * Moved {alloc,free}_delegated_page() and ensure_spare_page() to a
+>     later patch when they are actually used.
+>   * Some simplifications now rmi_xxx() functions allow NULL as an output
+>     parameter.
+>   * Improved comments and code layout.
+> ---
+>   arch/arm64/include/asm/kvm_rme.h |   7 ++
+>   arch/arm64/kvm/mmu.c             |   6 +-
+>   arch/arm64/kvm/rme.c             | 128 +++++++++++++++++++++++++++++++
+>   3 files changed, 138 insertions(+), 3 deletions(-)
 
-I cannot reproduce the failure. What commit did you apply this patch 
-series on? What architecture did the kernel run on?
+Reviewed-by: Gavin Shan <gshan@redhat.com>
+
 
