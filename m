@@ -1,131 +1,128 @@
-Return-Path: <kvm+bounces-40069-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40055-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCBD6A4EB79
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 19:26:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5634DA4E7C6
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 18:10:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B6B8188C445
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 18:21:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FAB4425C11
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 16:59:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED2EC27EC85;
-	Tue,  4 Mar 2025 18:09:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3CED2C2CAA;
+	Tue,  4 Mar 2025 16:37:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="NWsY9fXc"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Tlz/rsNV"
 X-Original-To: kvm@vger.kernel.org
 Received: from beeline1.cc.itu.edu.tr (beeline1.cc.itu.edu.tr [160.75.25.115])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C0720458B
-	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 18:09:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD83E2857CB
+	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 16:36:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=160.75.25.115
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741111776; cv=pass; b=uDSnSyhHkF3t+psi08Uhu0g1L1rYnweb03cP4cK852w5BxCpQigJIi06UKnc1aK3BvUo7m//rS149bY7ofrXslqTVIZN9btMsw+RDc0x2ulnd4Mf5x+u3EquDsmU6asSuGnqUgT3WWzri56k/G9PcFhY72zj32sZ559ZO/3/X+4=
+	t=1741106221; cv=pass; b=nEy75j5QbsILZrXmjNhQLat4VHGvrQWIvIkNWz8HBGdDJclXjK58Pw95vjHwdCcH1IF0hJAf2OiuJ7/9xdvWHnWbU7ROgD6HaT7TRvTZPxatBms9P7oW+kFfxHwr3Pnr5QOP200zl6nst6IzPtVWXgyPphyJuTF8acbRETUSYIE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741111776; c=relaxed/simple;
-	bh=gLzufxXzt0l7nygEjLB/9ni9EbV3R+EdI/i1bDBrI2E=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Kmphlz4NJD5y439F5fwt6XRzvpWrBHDUlgL8yZLB6oHMHPtZiSjFzxxbV04AnnaMETJOdZJmL+g6A98cK6sfcAZsJ/KQ8wOqgFsjXe+5RN3CxAriFLsSPSCjG3HgemWxtIQkw5wiKvya1eC7FhV579ihGpjF2oppOvdAxCAAMXM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=NWsY9fXc; arc=none smtp.client-ip=72.21.196.25; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; arc=pass smtp.client-ip=160.75.25.115
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+	s=arc-20240116; t=1741106221; c=relaxed/simple;
+	bh=FCkDWt+wTwZDcGN6QqEl9yLvHrIbg1v2Mer2UItZCz4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R9rxfDYrqG/O1yku1MoQ7KBPe75Q6JH/tHExlYSCkapp0ya4/oaMq+ewcXbmP9ETk5T9h6pFzsyAUc0D0qpa6jojPnreYbvTlqgC3AWkZSIbfQCfZJmjEdoE1CjitiEDQjACaaaFBdkT35+kFYn3VJIZNbWmm2t/inqaG4ER1SU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Tlz/rsNV; arc=none smtp.client-ip=65.109.113.108; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; arc=pass smtp.client-ip=160.75.25.115
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=cc.itu.edu.tr
-Received: from lesvatest1.cc.itu.edu.tr (unknown [10.146.128.1])
+Received: from lesvatest1.cc.itu.edu.tr (lesvatest1.cc.itu.edu.tr [10.146.128.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
 	(No client certificate requested)
-	by beeline1.cc.itu.edu.tr (Postfix) with ESMTPS id 11CBE408B645
-	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 21:09:33 +0300 (+03)
+	by beeline1.cc.itu.edu.tr (Postfix) with ESMTPS id 57ACB40D974C
+	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 19:36:58 +0300 (+03)
 X-Envelope-From: <root@cc.itu.edu.tr>
 Received: from lesva1.cc.itu.edu.tr (unknown [160.75.70.79])
-	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6fSx0mmTzG051
-	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 18:18:09 +0300 (+03)
+	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6h8s6QHMzG3CQ
+	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 19:34:21 +0300 (+03)
 Received: by le1 (Postfix, from userid 0)
-	id 4719342726; Tue,  4 Mar 2025 18:18:08 +0300 (+03)
+	id 3DD794272E; Tue,  4 Mar 2025 19:34:15 +0300 (+03)
 Authentication-Results: lesva1.cc.itu.edu.tr;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=NWsY9fXc
-X-Envelope-From: <linux-kernel+bounces-541823-bozkiru=itu.edu.tr@vger.kernel.org>
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Tlz/rsNV
+X-Envelope-From: <linux-kernel+bounces-541865-bozkiru=itu.edu.tr@vger.kernel.org>
 Authentication-Results: lesva2.cc.itu.edu.tr;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=NWsY9fXc
-Received: from fgw2.itu.edu.tr (fgw2.itu.edu.tr [160.75.25.104])
-	by le2 (Postfix) with ESMTP id 6493741A8F
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:34:50 +0300 (+03)
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by fgw2.itu.edu.tr (Postfix) with SMTP id 11D942DCDE
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:34:49 +0300 (+03)
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Tlz/rsNV
+Received: from fgw1.itu.edu.tr (fgw1.itu.edu.tr [160.75.25.103])
+	by le2 (Postfix) with ESMTP id DDE3F41ADC
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:59:59 +0300 (+03)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by fgw1.itu.edu.tr (Postfix) with SMTP id 73E5F305F789
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:59:59 +0300 (+03)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E36A01681E0
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 13:33:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F8413A67E1
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 13:59:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 399A2215044;
-	Mon,  3 Mar 2025 13:31:46 +0000 (UTC)
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D81A2135CE;
+	Mon,  3 Mar 2025 13:59:44 +0000 (UTC)
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 107C82116F3;
-	Mon,  3 Mar 2025 13:31:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15414212F9A;
+	Mon,  3 Mar 2025 13:59:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741008702; cv=none; b=Ege9Tn35AK1sZNEfZM95Po5zYR8reb24Zq7e8+MKl3V4k+0UcbWLJp9dNR3fFft16HCP7mTw2pvHPDIkdYREhI161Qm80BnzRieCorauYwhaMPHDu7FWPqJnr0WSEpTTYOy+IQ3x6FM3FoRrZI7Or3584L8/HeYmEE3VEXPjEXU=
+	t=1741010381; cv=none; b=tY8fWaVh4C5Uix08fDTQX9zRPM57WJ5Ew4mFEZdS9U0RB8Dqcpj37IFJRA6KJBJxri7dS6unocJbyvQiEe3QX6O+WJW7mx+9smqa5CzNkEY+qmv+qbLKSLIhu/wjHzBOEu+KLqNZnJKspAfeJZiBEdQ6vKJngnwKkR0r4mIS0XA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741008702; c=relaxed/simple;
-	bh=gLzufxXzt0l7nygEjLB/9ni9EbV3R+EdI/i1bDBrI2E=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JDBaC3KJRV3DK6Fem8IijRz2GKUj5liPUjTLgVXpLYUbzvxutcOVn7TIvW3dFGmHXdaYCjg6VNQCeZuVQ5VEm8/uEyam5mReVidSSxpM2JcIek1IBvR4acAMrjmnX0UlbHsFK6mIZq3qPzNp1ETTw3qWA3iOklPHV+pCdZJWorU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=NWsY9fXc; arc=none smtp.client-ip=72.21.196.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1741008702; x=1772544702;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Q0UMU0w4P1V9x66iYOqq2hXEUmMMf6XfFEDXRgYhyWI=;
-  b=NWsY9fXc8VV3NtzairQ/1WCfJY9h+CasXUQ14nnp6bU0QVm2kOkK5uop
-   gsNlWGgJ9herXLcNhZxEfEE+UkkOviUqchIkXQ0Tu9ZC7SM2nDGxJU4rv
-   XyOgYzmKu8fMRNmqWkQWpdekP/GGQwWnwh5B++uDBDzjwiP99SpyYwLTe
-   I=;
-X-IronPort-AV: E=Sophos;i="6.13,329,1732579200"; 
-   d="scan'208";a="471520831"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 13:31:23 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:52084]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.52.238:2525] with esmtp (Farcaster)
- id 138b0d45-31f1-425a-a923-c15034519930; Mon, 3 Mar 2025 13:31:22 +0000 (UTC)
-X-Farcaster-Flow-ID: 138b0d45-31f1-425a-a923-c15034519930
-Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 3 Mar 2025 13:31:22 +0000
-Received: from EX19MTAUWA001.ant.amazon.com (10.250.64.204) by
- EX19D020UWC004.ant.amazon.com (10.13.138.149) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 3 Mar 2025 13:31:21 +0000
-Received: from email-imr-corp-prod-pdx-1box-2b-ecca39fb.us-west-2.amazon.com
- (10.25.36.214) by mail-relay.amazon.com (10.250.64.204) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1544.14 via Frontend Transport; Mon, 3 Mar 2025 13:31:21 +0000
-Received: from dev-dsk-kalyazin-1a-a12e27e2.eu-west-1.amazon.com (dev-dsk-kalyazin-1a-a12e27e2.eu-west-1.amazon.com [172.19.103.116])
-	by email-imr-corp-prod-pdx-1box-2b-ecca39fb.us-west-2.amazon.com (Postfix) with ESMTPS id EF588803CC;
-	Mon,  3 Mar 2025 13:31:18 +0000 (UTC)
-From: Nikita Kalyazin <kalyazin@amazon.com>
-To: <akpm@linux-foundation.org>, <pbonzini@redhat.com>, <shuah@kernel.org>
-CC: <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
-	<lorenzo.stoakes@oracle.com>, <david@redhat.com>, <ryan.roberts@arm.com>,
-	<quic_eberman@quicinc.com>, <jthoughton@google.com>, <peterx@redhat.com>,
-	<graf@amazon.de>, <jgowans@amazon.com>, <roypat@amazon.co.uk>,
-	<derekmn@amazon.com>, <nsaenz@amazon.es>, <xmarcalx@amazon.com>,
-	<kalyazin@amazon.com>
-Subject: [RFC PATCH 5/5] KVM: selftests: add uffd missing test for guest_memfd
-Date: Mon, 3 Mar 2025 13:30:11 +0000
-Message-ID: <20250303133011.44095-6-kalyazin@amazon.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250303133011.44095-1-kalyazin@amazon.com>
-References: <20250303133011.44095-1-kalyazin@amazon.com>
+	s=arc-20240116; t=1741010381; c=relaxed/simple;
+	bh=FCkDWt+wTwZDcGN6QqEl9yLvHrIbg1v2Mer2UItZCz4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QV6oyKPh3NBt0HKctwrPp5Ffhx6mVyVRWc0Lkhgjb8lLC5j+CwVqmNljo7UpV92TLNDn1wypkFNEN7ldiU+Xj47C4G5LvNXcWZDmbvdTQfujXM+JxdrSWr7ZmqIKEKIFJfw6hmS9OFMl9nQsT4oPWTe6qPkhdH4X/hj0V7VcguQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Tlz/rsNV; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id E334F40E0214;
+	Mon,  3 Mar 2025 13:59:36 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id z8186o3I-Gwu; Mon,  3 Mar 2025 13:59:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1741010372; bh=6saylgDZEGaqn8IRfv0exuo1BIZF6zZsttHwQyJfS38=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Tlz/rsNVrKyIr14dnSWB4zmg0dJM7SK1/pWrPNA+x6S6VZyRhCpVhpA3LKjc54sSF
+	 roVNBUrvjx90Iu/L/IzSk6OFSqBAoMxxOwDvYIA34Uv7IYYphjUiokA7wySM2vTN/b
+	 E+AoBaFl2poYpiXqCHxLqVBgKTzDgsYgVCbcHdbvt508vfth8luuBePJv72q4ozWpp
+	 K31dtZffWfGZibBUjj3Y+pzX9jfHpwucMgha2lxVb0U8p08C7Z8SW+J45KTIR8PPdJ
+	 e7RgrHcmWwHthszwd+Wxb51mgAJkUapU2ZlPy3b3NP3HkKh/aH5pZSSydUWjH7DlZh
+	 MbRFB29lTe85L9/ENVBqJbtQbWSg7DaaqguGXJVJIQLGTAHXyoLeNX9kWejRndqDM8
+	 09XYxoNyDrS1WLHiMjnoP3P7IJPnGhQ0+oljim1sg3yF0+VQ+osfj8XZS0nniEbLk/
+	 vIOKbf+ePrxwqsovZk8iFO8Q+IzZNXOjMLh53wbYSOl+9cch7J7v5D0aiNUFtrg2/+
+	 pS0jv2k+xmSg4iDaa1iOrUpqzgv0mo8ueB7sRSEVsvCYgzaujUtV2Sz3YC9OWGXXKb
+	 h2j9TYmEVA93yWuZAUX+Ogj8GYawnQylvFBtEqAKoAg/Fc2QI0Efy45Wr99YbZk2JZ
+	 p17gSiiljxrmLiJ/xnemlWeE=
+Received: from zn.tnic (pd95303ce.dip0.t-ipconnect.de [217.83.3.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 9653640E01AD;
+	Mon,  3 Mar 2025 13:59:20 +0000 (UTC)
+Date: Mon, 3 Mar 2025 14:59:14 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Patrick Bellasi <derkling@google.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Patrick Bellasi <derkling@matbug.net>,
+	Brendan Jackman <jackmanb@google.com>,
+	David Kaplan <David.Kaplan@amd.com>
+Subject: Re: [PATCH final?] x86/bugs: KVM: Add support for SRSO_MSR_FIX
+Message-ID: <20250303135914.GGZ8W1skZjxqhYiJa8@fat_crate.local>
+References: <20250226184540.2250357-1-derkling@google.com>
+ <Z79wrLx3kJCxweuy@google.com>
 Precedence: bulk
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -133,144 +130,37 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Z79wrLx3kJCxweuy@google.com>
 X-ITU-Libra-ESVA-Information: Please contact Istanbul Teknik Universitesi for more information
-X-ITU-Libra-ESVA-ID: 4Z6fSx0mmTzG051
+X-ITU-Libra-ESVA-ID: 4Z6h8s6QHMzG3CQ
 X-ITU-Libra-ESVA: No virus found
 X-ITU-Libra-ESVA-From: root@cc.itu.edu.tr
-X-ITU-Libra-ESVA-Watermark: 1741716451.35067@klgtCy/3kzJhDWhNySo7LQ
+X-ITU-Libra-ESVA-Watermark: 1741710936.59294@zyYb55kA8cTY2MsMuYwMUQ
 X-ITU-MailScanner-SpamCheck: not spam
 
-The test demonstrates how a page missing event can be resolved via write
-syscall followed by UFFDIO_CONTINUE ioctl.
+On Wed, Feb 26, 2025 at 07:51:08PM +0000, Yosry Ahmed wrote:
+> To add more details about this, we are using ASI as our main mitigation
+> for SRSO. However, it's likely that bp-spec-reduce is cheaper, so we
+> basically want to always use bp-spec-reduce if available, if not, we
+> don't want the ibpb-on-vmexit or safe-ret as they are a lot more
+> expensive than ASI.
+> 
+> So we want the cmdline option to basically say only use bp-spec-reduce
+> if it's available, but don't fallback if it isn't.
 
-Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>
----
- .../testing/selftests/kvm/guest_memfd_test.c  | 88 +++++++++++++++++++
- 1 file changed, 88 insertions(+)
+Yap, that should also be a part of the commit message.
 
-diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-index b07221aa54c9..aea0e8627981 100644
---- a/tools/testing/selftests/kvm/guest_memfd_test.c
-+++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-@@ -10,12 +10,16 @@
- #include <errno.h>
- #include <stdio.h>
- #include <fcntl.h>
-+#include <pthread.h>
- 
- #include <linux/bitmap.h>
- #include <linux/falloc.h>
-+#include <linux/userfaultfd.h>
- #include <sys/mman.h>
- #include <sys/types.h>
- #include <sys/stat.h>
-+#include <sys/syscall.h>
-+#include <sys/ioctl.h>
- 
- #include "kvm_util.h"
- #include "test_util.h"
-@@ -278,6 +282,88 @@ static void test_create_guest_memfd_multiple(struct kvm_vm *vm)
- 	close(fd1);
- }
- 
-+struct fault_args {
-+	char *addr;
-+	volatile char value;
-+};
-+
-+static void *fault_thread_fn(void *arg)
-+{
-+	struct fault_args *args = arg;
-+
-+	/* Trigger page fault */
-+	args->value = *args->addr;
-+	return NULL;
-+}
-+
-+static void test_uffd_missing(int fd, size_t page_size, size_t total_size)
-+{
-+	struct uffdio_register uffd_reg;
-+	struct uffdio_continue uffd_cont;
-+	struct uffd_msg msg;
-+	struct fault_args args;
-+	pthread_t fault_thread;
-+	void *mem, *buf = NULL;
-+	int uffd, ret;
-+	off_t offset = page_size;
-+	void *fault_addr;
-+
-+	ret = posix_memalign(&buf, page_size, total_size);
-+	TEST_ASSERT_EQ(ret, 0);
-+
-+	uffd = syscall(__NR_userfaultfd, O_CLOEXEC);
-+	TEST_ASSERT(uffd != -1, "userfaultfd creation should succeed");
-+
-+	struct uffdio_api uffdio_api = {
-+		.api = UFFD_API,
-+		.features = UFFD_FEATURE_MISSING_SHMEM,
-+	};
-+	ret = ioctl(uffd, UFFDIO_API, &uffdio_api);
-+	TEST_ASSERT(ret != -1, "ioctl(UFFDIO_API) should succeed");
-+
-+	mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-+	TEST_ASSERT(mem != MAP_FAILED, "mmap should succeed");
-+
-+	uffd_reg.range.start = (unsigned long)mem;
-+	uffd_reg.range.len = total_size;
-+	uffd_reg.mode = UFFDIO_REGISTER_MODE_MISSING;
-+	ret = ioctl(uffd, UFFDIO_REGISTER, &uffd_reg);
-+	TEST_ASSERT(ret != -1, "ioctl(UFFDIO_REGISTER) should succeed");
-+
-+	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
-+			offset, page_size);
-+	TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) should succeed");
-+
-+	fault_addr = mem + offset;
-+	args.addr = fault_addr;
-+
-+	ret = pthread_create(&fault_thread, NULL, fault_thread_fn, &args);
-+	TEST_ASSERT(ret == 0, "pthread_create should succeed");
-+
-+	ret = read(uffd, &msg, sizeof(msg));
-+	TEST_ASSERT(ret != -1, "read from userfaultfd should succeed");
-+	TEST_ASSERT(msg.event == UFFD_EVENT_PAGEFAULT, "event type should be pagefault");
-+	TEST_ASSERT((void *)(msg.arg.pagefault.address & ~(page_size - 1)) == fault_addr,
-+		    "pagefault should occur at expected address");
-+
-+	ret = pwrite(fd, buf + offset, page_size, offset);
-+	TEST_ASSERT(ret == page_size, "write should succeed");
-+
-+	uffd_cont.range.start = (unsigned long)fault_addr;
-+	uffd_cont.range.len = page_size;
-+	uffd_cont.mode = 0;
-+	ret = ioctl(uffd, UFFDIO_CONTINUE, &uffd_cont);
-+	TEST_ASSERT(ret != -1, "ioctl(UFFDIO_CONTINUE) should succeed");
-+
-+	ret = pthread_join(fault_thread, NULL);
-+	TEST_ASSERT(ret == 0, "pthread_join should succeed");
-+
-+	ret = munmap(mem, total_size);
-+	TEST_ASSERT(!ret, "munmap should succeed");
-+	free(buf);
-+	close(uffd);
-+}
-+
- unsigned long get_shared_type(void)
- {
- #ifdef __x86_64__
-@@ -316,6 +402,8 @@ void test_vm_type(unsigned long type, bool is_shared)
- 	test_file_size(fd, page_size, total_size);
- 	test_fallocate(fd, page_size, total_size);
- 	test_invalid_punch_hole(fd, page_size, total_size);
-+	if (is_shared)
-+		test_uffd_missing(fd, page_size, total_size);
- 
- 	close(fd);
- 	kvm_vm_release(vm);
+> On the other hand we are enlighting ASI to skip mitigating SRSO if
+> X86_FEATURE_SRSO_BP_SPEC_REDUCE is enabled
+
+Yap, makes sense.
+
 -- 
-2.47.1
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
 
 
