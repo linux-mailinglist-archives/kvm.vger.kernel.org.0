@@ -1,87 +1,87 @@
-Return-Path: <kvm+bounces-39894-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39895-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD937A4C6B6
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 17:20:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D270CA4C6F0
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 17:25:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0099C3A9C92
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 16:20:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF5D918864FF
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 16:23:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 235D323BF88;
-	Mon,  3 Mar 2025 16:11:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BCF123314E;
+	Mon,  3 Mar 2025 16:15:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NuOPfHDN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="biH1rgV8"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97F9322ACD6
-	for <kvm@vger.kernel.org>; Mon,  3 Mar 2025 16:11:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03FE7217F29
+	for <kvm@vger.kernel.org>; Mon,  3 Mar 2025 16:15:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741018305; cv=none; b=urxma1ursWZ3THPFqvWka6g1050F4xZIuMXZrvAl+HYjtiYnX/580TK7Oj6zm/9i915SbcVD4AEYSYMijfQBYM96EYiCfyMcuuQ0djQOPgy8QeVxCRn/Olc/32FPE5EQeIh1XeHWyypULXd604Q1pBbok0MLB8LErIkEcyQO3ug=
+	t=1741018514; cv=none; b=CKGnXPZ0YBI4W45JhXGl3OcIsIz8YXmItqMMQEE28eb9L3FWPcywV/34ZxztTXYbQ7tqggdvBCKYJe0BVDtLXeqPpu8kqoJaUdU4cR8so7mECFeBlZzQG9RBBudp5+WwoB5uYywL8wvUU3Jx/aAk3VlEEpEYDtutVkV7I8F1Vy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741018305; c=relaxed/simple;
-	bh=e9ZKaBFXZ4rx4mLbacml2+h2XK5R5AhP1uLRLKbse0U=;
+	s=arc-20240116; t=1741018514; c=relaxed/simple;
+	bh=UHQ8vhqpcHN8q/bjgM47x/48IdLOuS9bmUiOoTqRB0g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=S7qnlmDpoCuBIV2PqnnyPO8iXbNle7PjKQpR4W/RWHdysmyAcaTEIuCdwumIo3/6N9nLt3Pteg116uZuQzx+G52p0VvpdLLTqDXLr6kwEFXuo2i10Qy31Jyu/WR/xd8+vIaAR/TbUTPxiBmMbee4EYl9fG/M5s3UMxoXOv0t3+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NuOPfHDN; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=j1spDG5u7PC7WcHfxwLbZQevHj26NE1TELkRu9TeTSoxZW996R11PljPxUBGFrhsTPBmBuYKR/aLwQXhKPyk2Fp3391Kdh7/NWoIYweGIudMjKn0g/or1EeTlLdYxML7wKbBgqJoRNie1M87le8CSV8Vj0rX1/o3yFzSOn9Oamo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=biH1rgV8; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741018302;
+	s=mimecast20190719; t=1741018512;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=UK++ok7eznBr4HbeaXcZUWnmH5R9dI4DMZDcxpgCjlA=;
-	b=NuOPfHDN9skUZGMk6MU9nToRaXClOYyMhdJHlg60fClCL05cR69smo4L+cO8y/l93eBOAA
-	nBNf4KDOqXk5mRUNiAodX5eycrzypiA0+3ZW4+fHWMcdWpgloagv3YiWO80XWSRpHEMBQ7
-	zRigeqJOdHltO7Yv4aUBc+v0HKrrerU=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=WO88smOWWthJK1QxqR+UAV6MapZrHQRhHnvW1gpMXWw=;
+	b=biH1rgV8BJsPSyQXm/2HcMi7ILpZa4SCYxPUqkoA8vAw438/v3VfQpbsA3rZ9C711x312s
+	+iDhcbgxR6ucxMaVJ30LMXzmriUEpx55r6q7vfu9LeOWB7j4+b6XBuvie0YAv5+PxBIt76
+	YgK5/Hn5id3jAyufKfozsugZ78n+oco=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-502-TL6qYnIcNm-nMEV6nTgc6A-1; Mon, 03 Mar 2025 11:11:35 -0500
-X-MC-Unique: TL6qYnIcNm-nMEV6nTgc6A-1
-X-Mimecast-MFC-AGG-ID: TL6qYnIcNm-nMEV6nTgc6A_1741018294
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43941ad86d4so20703025e9.2
-        for <kvm@vger.kernel.org>; Mon, 03 Mar 2025 08:11:35 -0800 (PST)
+ us-mta-550-AvaUYCa2NI2d_svE83R67A-1; Mon, 03 Mar 2025 11:15:01 -0500
+X-MC-Unique: AvaUYCa2NI2d_svE83R67A-1
+X-Mimecast-MFC-AGG-ID: AvaUYCa2NI2d_svE83R67A_1741018500
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43995bff469so32182935e9.2
+        for <kvm@vger.kernel.org>; Mon, 03 Mar 2025 08:15:00 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741018294; x=1741623094;
+        d=1e100.net; s=20230601; t=1741018498; x=1741623298;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=UK++ok7eznBr4HbeaXcZUWnmH5R9dI4DMZDcxpgCjlA=;
-        b=IPp94L2/3BCJY9BkhjoyiwevNqAIVE5q2CJJTaMPokm6EDq9ylCvJl8rnBmshrnPaf
-         xdezuR9Hmn3ZjTs6MatbLVX33dbyry5QStQYkUnFmtH3PYkNSU4hx1RQFHRUVh1nApdq
-         uoqIjhLMA5Ers8xz3wRDwnfYxjRmaSqbVVy36kbMvI1ZBVwn443+HO09brvhovtkKzmk
-         QB13tkRfv92w25IvV54N8aORAwpC3NzEfKxhLWUSNSf3KLEO8n7Q4XTB1e+hafjZFnNr
-         P4kKw9GpQqaRlWZIlyXyfqi8mIBIwqcyeqUoS/zEAefbqv2TcOYqFdy1EdfXU2OVvDpm
-         Njqw==
-X-Forwarded-Encrypted: i=1; AJvYcCWT70btjP+WGSHauPaD8G68Ai4+7MBt1unvQz1oMLcTpuApivqJlOFVjIs9y/FveMDkJa8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw82B8rSpoT5HUUZK2PQztZp/WDLUI0rpdTEZfSuxxmXquLCqZk
-	kupu26xzYoR0yv1alRyMPkYSvNSm1ns73KQ6j/3EJ2f0C1QSFJlbDmPGb3r/KT3ly23+QkxKsqh
-	V/junMXG+wf64vtHPTeLKrO1L7eLT5F4HeqRYfw2yb6ndBkMOew==
-X-Gm-Gg: ASbGncvtKheilphpnL9KwombvCm8vq7zbbXvCGjuXCiEInktzepM5160uRJiV9Ip83h
-	mR/WUwVn1QUPbekY8a2MkE5In76ZNGNr6ThOp6HYfBg9r2G4lbXfDp2GOpk9p1rvoHaCbD1uLb6
-	dwBsk3dQUNV+FL+ratXt72Pznf56E54hLig/2tIMdfos05URtjjxesJLA81KzSekEWCLCpOlFI9
-	ALNmg4J2qB7e27ZPHgIixe0qkgkD/OtKv1TQnEBuFa9UOQZofjzM66HXH7uzR6lgxPHAD9bBZwC
-	WW/bjbxDwRGhFKQ87OM=
-X-Received: by 2002:a05:600c:a01:b0:439:8a44:1e65 with SMTP id 5b1f17b1804b1-43ba66e67b6mr121549935e9.7.1741018294490;
-        Mon, 03 Mar 2025 08:11:34 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGVkwTV0pN68fkjhH/8vWMXh4kcuPS1c7rU0g3KWqUiBrZrQdy2QSnDEzxsZm74VBAI5x5WsQ==
-X-Received: by 2002:a05:600c:a01:b0:439:8a44:1e65 with SMTP id 5b1f17b1804b1-43ba66e67b6mr121549725e9.7.1741018294065;
-        Mon, 03 Mar 2025 08:11:34 -0800 (PST)
+        bh=WO88smOWWthJK1QxqR+UAV6MapZrHQRhHnvW1gpMXWw=;
+        b=qlP3vdloUqBcCE2zUJ6NoCM+pLUAdclK0Ig8T63EhM8cSpgnt7oWga1kduyWugvc8z
+         FaLeZ+1ejZBO1xXDbI+P+Kj2Pnm6cuQ+m2KdY8L1iAo5d8e0sF3bfbMqr6HFCNNTnQFt
+         k4aFpFpqMbbt/0k7mUk9NWFJfaE1D1Y4TxbOcD+vg3QRaduXgEgawmup8Bh4ihLyan65
+         1IyWKWFIvOUlAOoBR/RhDtz/t3/ePDl0/nkbufrWyVdLM36mXtDBFW6MzrPZ4R+qenBJ
+         mPOMzG4T+Ldb60VTLepzneL13v0zdNtOOnt6LMBaGX1mUOsisCv9g7eRNZ4vs3A2IxHx
+         a7DA==
+X-Forwarded-Encrypted: i=1; AJvYcCWIVV0chYNZ4NjhYDGFrcW9cJBFy+nPL76PDIkDeLCLpZ5cXXJpvOJmLjsYb2ix2+HbEbI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbD2x13NK5E+THtO52gTRgCRYQjOLU4vOE1kwjDEsGqgfskMVU
+	FxbTDzSq2DonoU/dnBv/P0B8syKCuDv7EV9V92Lun/+bMbLwPHXjyz7x0BJG9ph9afsQzQo5ctZ
+	QMbN/0gXs8dtG6uepwzFTsqSLz3MA2c8VqNLUV0bxk2ILI30wViMJc9aGwC4i
+X-Gm-Gg: ASbGncv2eES7ip4OPjhLacT89c53K+K4igCzJSc8/N8mOgXnjip4RVHfxsTkfrr0m2R
+	gSkOMBXHDUjQlETvEHaQ6TGMXsn6HuQJQ1hgTXBLQkcE9FmMyxS9adYwmjgWaGxvQsPB31kUVfH
+	X8yw6sQAbdpMTgUfdIhdh47rpEb9nCs6H4Ag5Nbmnio+e9CFj4rRH3Y3pN6u+aQaLySKoX5uDRz
+	31b59HNcqO5af3C2E6H5gCn7nAUVr6iGYQ36/smUB38gT/HNMFCDK+IxCo7/Cwg3n4AjicX4CW0
+	yJcqiKlBqCtud9J95Lw=
+X-Received: by 2002:a05:6000:2c6:b0:390:fbdd:994d with SMTP id ffacd0b85a97d-390fbdd9a80mr6260761f8f.27.1741018498639;
+        Mon, 03 Mar 2025 08:14:58 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEQO/4LZPvr+KBbaM6MmSATu11kI0bnGEOwBJkKY+mu0Xb1tr6Q858LFXwRFMGNTPMbamnurA==
+X-Received: by 2002:a05:6000:2c6:b0:390:fbdd:994d with SMTP id ffacd0b85a97d-390fbdd9a80mr6260747f8f.27.1741018498286;
+        Mon, 03 Mar 2025 08:14:58 -0800 (PST)
 Received: from [192.168.10.27] ([151.95.119.44])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-43bc11e1c8esm43677065e9.32.2025.03.03.08.11.32
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-390e47b7d12sm15207850f8f.58.2025.03.03.08.14.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Mar 2025 08:11:32 -0800 (PST)
-Message-ID: <4a2d487b-aabd-4854-a8df-214423b8c390@redhat.com>
-Date: Mon, 3 Mar 2025 17:11:31 +0100
+        Mon, 03 Mar 2025 08:14:56 -0800 (PST)
+Message-ID: <530fd31f-923b-4337-a9fb-76715eadc338@redhat.com>
+Date: Mon, 3 Mar 2025 17:14:55 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,13 +89,13 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/4] KVM: x86: Introduce supported_quirks to block
- disabling quirks
+Subject: Re: [PATCH 4/4] KVM: TDX: Always honor guest PAT on TDX enabled
+ platforms
 To: Yan Zhao <yan.y.zhao@intel.com>
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, seanjc@google.com
 References: <20250301073428.2435768-1-pbonzini@redhat.com>
- <20250301073428.2435768-3-pbonzini@redhat.com>
- <Z8UEmKhnP9w1qII9@yzhao56-desk.sh.intel.com>
+ <20250301073428.2435768-5-pbonzini@redhat.com>
+ <Z8UGIryFjJ+msO6i@yzhao56-desk.sh.intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -133,123 +133,54 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <Z8UEmKhnP9w1qII9@yzhao56-desk.sh.intel.com>
+In-Reply-To: <Z8UGIryFjJ+msO6i@yzhao56-desk.sh.intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 3/3/25 02:23, Yan Zhao wrote:
-> On Sat, Mar 01, 2025 at 02:34:26AM -0500, Paolo Bonzini wrote:
->> From: Yan Zhao <yan.y.zhao@intel.com>
->>
->> Introduce supported_quirks in kvm_caps to store platform-specific force-enabled
->> quirks.  Any quirk removed from kvm_caps.supported_quirks will never be
->> included in kvm->arch.disabled_quirks, and will cause the ioctl to fail if
->> passed to KVM_ENABLE_CAP(KVM_CAP_DISABLE_QUIRKS2).
->>
->> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
->> Message-ID: <20250224070832.31394-1-yan.y.zhao@intel.com>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>   arch/x86/kvm/x86.c | 7 ++++---
->>   arch/x86/kvm/x86.h | 2 ++
->>   2 files changed, 6 insertions(+), 3 deletions(-)
->>
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index fd0a44e59314..a97e58916b6a 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -4782,7 +4782,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->>   		r = enable_pmu ? KVM_CAP_PMU_VALID_MASK : 0;
->>   		break;
->>   	case KVM_CAP_DISABLE_QUIRKS2:
->> -		r = KVM_X86_VALID_QUIRKS;
->> +		r = kvm_caps.supported_quirks;
->
-> As the concern raised in [1], it's confusing for
-> KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT to be present on AMD's platforms while not
-> present on Intel's non-self-snoop platforms.
+On 3/3/25 02:30, Yan Zhao wrote:
+>>   	kvm->arch.has_protected_state = true;
+>>   	kvm->arch.has_private_mem = true;
+>> +	kvm->arch.disabled_quirks |= KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT;
+> Though the quirk is disabled by default in KVM in tdx_vm_init() for TDs, the
+> kvm->arch.disabled_quirks can be overwritten by a userspace specified value in
+> kvm_vm_ioctl_enable_cap().
+> "kvm->arch.disabled_quirks = cap->args[0] & kvm_caps.supported_quirks;"
+> 
+> So, when an old userspace tries to disable other quirks on this new KVM, it may
+> accidentally turn KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT into enabled for TDs, which
+> would cause SEPT being zapped when (de)attaching non-coherent devices.
 
-To make it less confusing, let's rename it to 
-KVM_X86_QUIRK_IGNORE_GUEST_PAT.  So if userspace wants to say "I don't 
-want KVM to ignore guest's PAT!", it can do so easily:
+Yeah, sorry about that - Xiaoyao also pointed it out and I should have 
+noticed it---or marked the patches as RFC which they were.
 
-- it can check unconditionally that the quirk is included in 
-KVM_CAP_DISABLE_QUIRKS2, and it will pass on both Intel with self-snoop 
-with AMD;
+> Could we force KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT to be disabled for TDs?
+> 
+> e.g.
+> 
+> tdx_vm_init
+>     kvm->arch.always_disabled_quirks |= KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT;
+> 
+> static inline bool kvm_check_has_quirk(struct kvm *kvm, u64 quirk)
+> {
+>          WARN_ON_ONCE(kvm->arch.always_disabled_quirk & kvm_caps.force_enabled_quirks);
+> 
+>          u64 disabled_quirks = kvm->arch.always_disabled_quirk | kvm->arch.disabled_quirks;
+>          return !(disabled_quirks & quirk) |
+>                 (kvm_caps.force_enabled_quirks & quirk);
+> }
 
-- it can pass it unconditionally to KVM_X86_QUIRK_IGNORE_GUEST_PAT, 
-knowing that PAT will be honored.
+We can change KVM_ENABLE_CAP(KVM_X86_DISABLE_QUIRKS), as well as 
+QUIRKS2, to use "|=" instead of "=".
 
-But KVM_CHECK_EXTENSION(KVM_CAP_DISABLE_QUIRKS2) will *not* include the 
-quirk on Intel without self-snoop, which lets userspace detect the 
-condition and raise an error.  This is better than introducing a new 
-case in the API "the bit is returned by KVM_CHECK_EXTENSION, but 
-rejected by KVM_ENABLE_CAP".  Such a new case would inevitably lead to 
-KVM_CAP_DISABLE_QUIRKS3. :)
+While this is technically a change in the API, the current 
+implementation is just awful and I hope that no one is relying on it! 
+This way, the "always_disabled_quirks" are not needed.
 
-> Or what about introduce kvm_caps.force_enabled_quirk?
->
-> if (!static_cpu_has(X86_FEATURE_SELFSNOOP))
->          kvm_caps.force_enabled_quirks |= KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT;
+If the "|=" idea doesn't work out I agree that 
+kvm->arch.always_disabled_quirk is needed.
 
-That would also make it harder for userspace to understand what's going on.
-
-> [1] https://lore.kernel.org/all/Z8UBpC76CyxCIRiU@yzhao56-desk.sh.intel.com/
->>   		break;
->>   	case KVM_CAP_X86_NOTIFY_VMEXIT:
->>   		r = kvm_caps.has_notify_vmexit;
->> @@ -6521,11 +6521,11 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->>   	switch (cap->cap) {
->>   	case KVM_CAP_DISABLE_QUIRKS2:
->>   		r = -EINVAL;
->> -		if (cap->args[0] & ~KVM_X86_VALID_QUIRKS)
->> +		if (cap->args[0] & ~kvm_caps.supported_quirks)
->>   			break;
->>   		fallthrough;
->>   	case KVM_CAP_DISABLE_QUIRKS:
->> -		kvm->arch.disabled_quirks = cap->args[0];
->> +		kvm->arch.disabled_quirks = cap->args[0] & kvm_caps.supported_quirks;
->
-> Will this break the uapi of KVM_CAP_DISABLE_QUIRKS?
-> My understanding is that only KVM_CAP_DISABLE_QUIRKS2 filters out invalid
-> quirks.
-
-The difference between KVM_CAP_DISABLE_QUIRKS and 
-KVM_CAP_DISABLE_QUIRKS2 is only that invalid values do not cause an 
-error; but userspace cannot know what is in kvm->arch.disabled_quirks, 
-so KVM can change the value that is stored there.
+Sending v3 shortly...
 
 Paolo
-
-
->>   		r = 0;
->>   		break;
->>   	case KVM_CAP_SPLIT_IRQCHIP: {
->> @@ -9775,6 +9775,7 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
->>   		kvm_host.xcr0 = xgetbv(XCR_XFEATURE_ENABLED_MASK);
->>   		kvm_caps.supported_xcr0 = kvm_host.xcr0 & KVM_SUPPORTED_XCR0;
->>   	}
->> +	kvm_caps.supported_quirks = KVM_X86_VALID_QUIRKS;
->>   	kvm_caps.inapplicable_quirks = 0;
->>   
->>   	rdmsrl_safe(MSR_EFER, &kvm_host.efer);
->> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
->> index 9af199c8e5c8..f2672b14388c 100644
->> --- a/arch/x86/kvm/x86.h
->> +++ b/arch/x86/kvm/x86.h
->> @@ -34,6 +34,8 @@ struct kvm_caps {
->>   	u64 supported_xcr0;
->>   	u64 supported_xss;
->>   	u64 supported_perf_cap;
->> +
->> +	u64 supported_quirks;
->>   	u64 inapplicable_quirks;
->>   };
->>   
->> -- 
->> 2.43.5
->>
->>
-> 
 
 
