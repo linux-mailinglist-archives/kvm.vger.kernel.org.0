@@ -1,83 +1,81 @@
-Return-Path: <kvm+bounces-39874-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39875-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F612A4C155
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 14:10:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FA26A4C1E8
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 14:30:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67A6616D3A6
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 13:10:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35117189478E
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 13:30:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16021212B18;
-	Mon,  3 Mar 2025 13:09:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 351CE1F0E4F;
+	Mon,  3 Mar 2025 13:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="DZizKf0I"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ITTKtL4D"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BD09211297;
-	Mon,  3 Mar 2025 13:09:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A8B53365;
+	Mon,  3 Mar 2025 13:30:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741007375; cv=none; b=gkdp1CL1CjpFXt9foKVHb/z+cTaTwuErfPsVUiMhgb3goU+AAJx+zm+IrZj2HVE3xHuWnYeKsBFLWI2wlyj+KCz1nSDWYgMjLxAdSQ2pm6VCvWY8jC5bx9zx67sy7c8ahR2iVLa/9/xj0SF9/RHwj3v/MNk1XYwSDum7gVXoGwI=
+	t=1741008626; cv=none; b=INAlfBJFFfapxVocY3KodjtLHgjepk5o1oyOjZApsQX4Dwd/1xv3GZN1jlPWG9Grd53zoQKbPhB19/r7+Xa/6jlSVivLvIDbP21Y7c4vvYDT3p3tEqpjYC0RiS8W3/iiaKu/Kg+AOHsxl+jUQ1tTr9gCfYHCwbSSpPz22/kiESU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741007375; c=relaxed/simple;
-	bh=Q1BGVztK8kR5/ZW+9TFXncK+fkh6xuxcZierK7FxuQk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EiLnEerfY3exM4UVjv/pO+IEuNV+QWZdi5E5sVm07Y41git2Buu1DDLphzXo2eib6uCix524xN6YVZzj5BepzC35VnSF6p2d4xJU6gzg3eBsYS8YWbB++6SHOhdYtSiFQmr5EPCbpd1DH0ralKIEz44/SqFQo7bPvaUjPnxXTco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=DZizKf0I; arc=none smtp.client-ip=52.119.213.150
+	s=arc-20240116; t=1741008626; c=relaxed/simple;
+	bh=MyaeKqfVcMrkKZ9YXltjW2dOr6aOi7EKVIuukUVWLRg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JtsfifJpDh51QTkYxcHff2I6vVrnZ8hEuLXMCjes86IhYFZbUOFF62VM9Tcr3Mx0P3sd8hmrwen/jjwL6g47QOr5xt9thjahf8DBO//e80WHzl35zVrzOsWWskp0gjPoEhJwVohy9YpFbFddy1dtB6JYxXZlgWTsnDe0fe1/jE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ITTKtL4D; arc=none smtp.client-ip=207.171.184.29
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1741007374; x=1772543374;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=XKenNyKlzRx3KFaAkl7fAqp0QyjUeRzS8JHs+ogdzvo=;
-  b=DZizKf0IR8cY2FWnmqzBNyo4Oz8uVIntq+ZuXoO6qcJJ9WRXU8KHIAwO
-   lPXMM6U9lV0jPxyPP0xQpINO03QrMWWJbGW+irYo4LG7cb+cj7Zs8cYyl
-   MzdKiwOrCEPQDK0MBkcddzEZvTwx5ZIgBSm8M7pjIBgC8RAIIoe7VR+Dw
-   U=;
+  t=1741008624; x=1772544624;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=2L3Lyb/8WcMt5Xzo+0pszQ2qfPvOzityflFvXPF/tvA=;
+  b=ITTKtL4DflFJzaMt/1iqJ6tvidMkgcLJb5gCKMhVftiv/eUt1Zy2Ay+s
+   N4q4qv5FU/c4Gc9IpGoyP6hs3bSD3scCWYiQ/q8DPVhIcW3lBk+bfvirg
+   8bU95t7Ejp4D9TsVtyMLnLsXRhDXwcOcrWLjCyGSbUzSNJrYJMk/WTgff
+   4=;
 X-IronPort-AV: E=Sophos;i="6.13,329,1732579200"; 
-   d="scan'208";a="701674208"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 13:09:11 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:55265]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.35.48:2525] with esmtp (Farcaster)
- id f7436fc3-0ba0-4ad2-aabb-25e5142b6a4d; Mon, 3 Mar 2025 13:09:09 +0000 (UTC)
-X-Farcaster-Flow-ID: f7436fc3-0ba0-4ad2-aabb-25e5142b6a4d
-Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
+   d="scan'208";a="498891611"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 13:30:18 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:4349]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.53.36:2525] with esmtp (Farcaster)
+ id 30b52795-a314-42f7-b716-d33823c57578; Mon, 3 Mar 2025 13:30:18 +0000 (UTC)
+X-Farcaster-Flow-ID: 30b52795-a314-42f7-b716-d33823c57578
+Received: from EX19D020UWA001.ant.amazon.com (10.13.138.249) by
  EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 3 Mar 2025 13:09:05 +0000
-Received: from EX19MTAUWC001.ant.amazon.com (10.250.64.145) by
- EX19D020UWC004.ant.amazon.com (10.13.138.149) with Microsoft SMTP Server
+ Mon, 3 Mar 2025 13:30:15 +0000
+Received: from EX19MTAUWC002.ant.amazon.com (10.250.64.143) by
+ EX19D020UWA001.ant.amazon.com (10.13.138.249) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 3 Mar 2025 13:09:05 +0000
-Received: from email-imr-corp-prod-iad-1box-1a-6851662a.us-east-1.amazon.com
- (10.25.36.210) by mail-relay.amazon.com (10.250.64.145) with Microsoft SMTP
+ Mon, 3 Mar 2025 13:30:15 +0000
+Received: from email-imr-corp-prod-pdx-all-2c-8a67eb17.us-west-2.amazon.com
+ (10.25.36.210) by mail-relay.amazon.com (10.250.64.149) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1544.14 via Frontend Transport; Mon, 3 Mar 2025 13:09:05 +0000
+ 15.2.1544.14 via Frontend Transport; Mon, 3 Mar 2025 13:30:15 +0000
 Received: from dev-dsk-kalyazin-1a-a12e27e2.eu-west-1.amazon.com (dev-dsk-kalyazin-1a-a12e27e2.eu-west-1.amazon.com [172.19.103.116])
-	by email-imr-corp-prod-iad-1box-1a-6851662a.us-east-1.amazon.com (Postfix) with ESMTPS id 2E5D640513;
-	Mon,  3 Mar 2025 13:09:03 +0000 (UTC)
+	by email-imr-corp-prod-pdx-all-2c-8a67eb17.us-west-2.amazon.com (Postfix) with ESMTPS id 014DD40434;
+	Mon,  3 Mar 2025 13:30:12 +0000 (UTC)
 From: Nikita Kalyazin <kalyazin@amazon.com>
-To: <pbonzini@redhat.com>, <shuah@kernel.org>
+To: <akpm@linux-foundation.org>, <pbonzini@redhat.com>, <shuah@kernel.org>
 CC: <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <michael.day@amd.com>, <david@redhat.com>,
-	<quic_eberman@quicinc.com>, <jthoughton@google.com>, <brijesh.singh@amd.com>,
-	<michael.roth@amd.com>, <graf@amazon.de>, <jgowans@amazon.com>,
-	<roypat@amazon.co.uk>, <derekmn@amazon.com>, <nsaenz@amazon.es>,
-	<xmarcalx@amazon.com>, <kalyazin@amazon.com>
-Subject: [v3 PATCH 2/2] KVM: selftests: update guest_memfd write tests
-Date: Mon, 3 Mar 2025 13:08:38 +0000
-Message-ID: <20250303130838.28812-3-kalyazin@amazon.com>
+	<linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
+	<lorenzo.stoakes@oracle.com>, <david@redhat.com>, <ryan.roberts@arm.com>,
+	<quic_eberman@quicinc.com>, <jthoughton@google.com>, <peterx@redhat.com>,
+	<graf@amazon.de>, <jgowans@amazon.com>, <roypat@amazon.co.uk>,
+	<derekmn@amazon.com>, <nsaenz@amazon.es>, <xmarcalx@amazon.com>,
+	<kalyazin@amazon.com>
+Subject: [RFC PATCH 0/5] KVM: guest_memfd: support for uffd missing
+Date: Mon, 3 Mar 2025 13:30:06 +0000
+Message-ID: <20250303133011.44095-1-kalyazin@amazon.com>
 X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250303130838.28812-1-kalyazin@amazon.com>
-References: <20250303130838.28812-1-kalyazin@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -87,124 +85,68 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Type: text/plain
 
-This is to reflect that the write syscall is now implemented for
-guest_memfd.
+This series is built on top of the v3 write syscall support [1].
 
-Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>
----
- .../testing/selftests/kvm/guest_memfd_test.c  | 85 +++++++++++++++++--
- 1 file changed, 79 insertions(+), 6 deletions(-)
+With James's KVM userfault [2], it is possible to handle stage-2 faults
+in guest_memfd in userspace.  However, KVM itself also triggers faults
+in guest_memfd in some cases, for example: PV interfaces like kvmclock,
+PV EOI and page table walking code when fetching the MMIO instruction on
+x86.  It was agreed in the guest_memfd upstream call on 23 Jan 2025 [3]
+that KVM would be accessing those pages via userspace page tables.  In
+order for such faults to be handled in userspace, guest_memfd needs to
+support userfaultfd.
 
-diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-index 38c501e49e0e..b07221aa54c9 100644
---- a/tools/testing/selftests/kvm/guest_memfd_test.c
-+++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-@@ -20,18 +20,90 @@
- #include "kvm_util.h"
- #include "test_util.h"
- 
--static void test_file_read_write(int fd)
-+static void test_file_read(int fd)
- {
- 	char buf[64];
- 
- 	TEST_ASSERT(read(fd, buf, sizeof(buf)) < 0,
- 		    "read on a guest_mem fd should fail");
--	TEST_ASSERT(write(fd, buf, sizeof(buf)) < 0,
--		    "write on a guest_mem fd should fail");
- 	TEST_ASSERT(pread(fd, buf, sizeof(buf), 0) < 0,
- 		    "pread on a guest_mem fd should fail");
--	TEST_ASSERT(pwrite(fd, buf, sizeof(buf), 0) < 0,
--		    "pwrite on a guest_mem fd should fail");
-+}
-+
-+static void test_file_write(int fd, size_t total_size)
-+{
-+	size_t page_size = getpagesize();
-+	void *buf = NULL;
-+	int ret;
-+
-+	ret = posix_memalign(&buf, page_size, total_size);
-+	TEST_ASSERT_EQ(ret, 0);
-+
-+	/* Check arguments correctness checks work as expected */
-+
-+	ret = pwrite(fd, buf, page_size - 1, 0);
-+	TEST_ASSERT(ret == -1, "write unaligned count on a guest_mem fd should fail");
-+	TEST_ASSERT_EQ(errno, EINVAL);
-+
-+	ret = pwrite(fd, buf, page_size, 1);
-+	TEST_ASSERT(ret == -1, "write unaligned offset on a guest_mem fd should fail");
-+	TEST_ASSERT_EQ(errno, EINVAL);
-+
-+	ret = pwrite(fd, buf, page_size, total_size);
-+	TEST_ASSERT(ret == -1, "writing past the file size on a guest_mem fd should fail");
-+	TEST_ASSERT_EQ(errno, EINVAL);
-+
-+	ret = pwrite(fd, NULL, page_size, 0);
-+	TEST_ASSERT(ret == -1, "supplying a NULL buffer when writing a guest_mem fd should fail");
-+	TEST_ASSERT_EQ(errno, EINVAL);
-+
-+	/* Check double population is not allowed */
-+
-+	ret = pwrite(fd, buf, page_size, 0);
-+	TEST_ASSERT(ret == page_size, "page-aligned write on a guest_mem fd should succeed");
-+
-+	ret = pwrite(fd, buf, page_size, 0);
-+	TEST_ASSERT(ret == -1, "write on already populated guest_mem fd should fail");
-+	TEST_ASSERT_EQ(errno, ENOSPC);
-+
-+	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE, 0, page_size);
-+	TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) should succeed");
-+
-+	/* Check population is allowed again after punching a hole */
-+
-+	ret = pwrite(fd, buf, page_size, 0);
-+	TEST_ASSERT(ret == page_size, "page-aligned write on a punched guest_mem fd should succeed");
-+
-+	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE, 0, page_size);
-+	TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) should succeed");
-+
-+	/* Check population of already allocated memory is allowed */
-+
-+	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE, 0, page_size);
-+	TEST_ASSERT(!ret, "fallocate with aligned offset and size should succeed");
-+
-+	ret = pwrite(fd, buf, page_size, 0);
-+	TEST_ASSERT(ret == page_size, "write on a preallocated guest_mem fd should succeed");
-+
-+	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE, 0, page_size);
-+	TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) should succeed");
-+
-+	/* Check population works until an already populated page is encountered */
-+
-+	ret = pwrite(fd, buf, total_size, 0);
-+	TEST_ASSERT(ret == total_size, "page-aligned write on a guest_mem fd should succeed");
-+
-+	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE, 0, page_size);
-+	TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) should succeed");
-+
-+	ret = pwrite(fd, buf, total_size, 0);
-+	TEST_ASSERT(ret == page_size, "write on a guest_mem fd should not overwrite data");
-+
-+	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE, 0, total_size);
-+	TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) should succeed");
-+
-+
-+	free(buf);
- }
- 
- static void test_mmap_allowed(int fd, size_t total_size)
-@@ -233,7 +305,8 @@ void test_vm_type(unsigned long type, bool is_shared)
- 
- 	fd = vm_create_guest_memfd(vm, total_size, 0);
- 
--	test_file_read_write(fd);
-+	test_file_read(fd);
-+	test_file_write(fd, total_size);
- 
- 	if (is_shared)
- 		test_mmap_allowed(fd, total_size);
+This series proposes a limited support for userfaultfd in guest_memfd:
+ - userfaultfd support is conditional to `CONFIG_KVM_GMEM_SHARED_MEM`
+   (as is fault support in general)
+ - Only `page missing` event is currently supported
+ - Userspace is supposed to respond to the event with the `write`
+   syscall followed by `UFFDIO_CONTINUE` ioctl to unblock the faulting
+   process.   Note that we can't use `UFFDIO_COPY` here because
+   userfaulfd code does not know how to prepare guest_memfd pages, eg
+   remove them from direct map [4].
+
+Not included in this series:
+ - Proper interface for userfaultfd to recognise guest_memfd mappings
+ - Proper handling of truncation cases after locking the page
+
+Request for comments:
+ - Is it a sensible workflow for guest_memfd to resolve a userfault
+   `page missing` event with `write` syscall + `UFFDIO_CONTINUE`?  One
+   of the alternatives is teaching `UFFDIO_COPY` how to deal with
+   guest_memfd pages.
+ - What is a way forward to make userfaultfd code aware of guest_memfd?
+   I saw that Patrick hit a somewhat similar problem in [5] when trying
+   to use direct map manipulation functions in KVM and was pointed by
+   David at Elliot's guestmem library [6] that might include a shim for that.
+   Would the library be the right place to expose required interfaces like
+   `vma_is_gmem`?
+
+Nikita
+
+[1] https://lore.kernel.org/kvm/20250303130838.28812-1-kalyazin@amazon.com/T/
+[2] https://lore.kernel.org/kvm/20250109204929.1106563-1-jthoughton@google.com/T/
+[3] https://docs.google.com/document/d/1M6766BzdY1Lhk7LiR5IqVR8B8mG3cr-cxTxOrAosPOk/edit?tab=t.0#heading=h.w1126rgli5e3
+[4] https://lore.kernel.org/kvm/20250221160728.1584559-1-roypat@amazon.co.uk/T/
+[4] https://lore.kernel.org/kvm/20250221160728.1584559-1-roypat@amazon.co.uk/T/#ma130b29c130dbdc894aa08d8d56c16ec383f36dd
+[5] https://lore.kernel.org/kvm/20241122-guestmem-library-v5-2-450e92951a15@quicinc.com/T/
+
+Nikita Kalyazin (5):
+  KVM: guest_memfd: add kvm_gmem_vma_is_gmem
+  KVM: guest_memfd: add support for uffd missing
+  mm: userfaultfd: allow to register userfaultfd for guest_memfd
+  mm: userfaultfd: support continue for guest_memfd
+  KVM: selftests: add uffd missing test for guest_memfd
+
+ include/linux/userfaultfd_k.h                 |  9 ++
+ mm/userfaultfd.c                              | 23 ++++-
+ .../testing/selftests/kvm/guest_memfd_test.c  | 88 +++++++++++++++++++
+ virt/kvm/guest_memfd.c                        | 17 +++-
+ virt/kvm/kvm_mm.h                             |  1 +
+ 5 files changed, 136 insertions(+), 2 deletions(-)
+
+
+base-commit: 592e7531753dc4b711f96cd1daf808fd493d3223
 -- 
 2.47.1
 
