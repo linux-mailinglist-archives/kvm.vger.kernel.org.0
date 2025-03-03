@@ -1,101 +1,128 @@
-Return-Path: <kvm+bounces-39936-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39937-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E6DEA4CE55
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 23:34:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0873A4CEC9
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 23:54:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05FAF3AAE49
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 22:33:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 911BF7A80DE
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 22:53:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE690236450;
-	Mon,  3 Mar 2025 22:33:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 319B223ED66;
+	Mon,  3 Mar 2025 22:53:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nzCGyc0A"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="eC5Ah8SC"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12D2E1F130C;
-	Mon,  3 Mar 2025 22:33:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEEFA238D28
+	for <kvm@vger.kernel.org>; Mon,  3 Mar 2025 22:53:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741041235; cv=none; b=FkSOutIlqKgJSM/3+HCu1F3QaFvG6XC3LOYBi/NxApbPOOrGnl9XuwUVMSy0VTBh46s7cqS5dTj6GnsxQOZctAuUH3uOmoKJ/v5LqdXEa9pcFR7n6tGv1ZtCiijm+f9wu/Q1sXkfRqsHelgGFKJ8HWr9o3wPqCvBCaYhkXd1H4o=
+	t=1741042394; cv=none; b=KqjwwXIz6sOzi4LHDblz9DGEpuD69UxznLVK4DXhhhBYwsPy3p8yAiZ1osPaBqva2KLR5ClnVE9lXOltWOm9lmeejmWQYenTNkY0wuBpkCTVYB0Jb64Ohkaz5gelLwWu3QA5d8Cuv63YxSdx6Q/qYDURHOPn2QXgT/X98tJr8p8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741041235; c=relaxed/simple;
-	bh=mXqIacAC3RLc1tYiomnB+ph7/jwRad1h/08sQbaQrKg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AP5aAmSQe3wnswQYvLf19s6//bekqg8CE/Kq1damqXCd06cVLytIsktzq3HqzSyhADk64w2fcp0hzmgmjRvCj8pywhTK9DQzbGIrS9mbAIQon6EoeK0c56UrA0od1RFo1OYoB1MFHJw/F4/mPAzbW+xS8oQVIfanNHJiKA8mQaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nzCGyc0A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E73E9C4CED6;
-	Mon,  3 Mar 2025 22:33:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741041234;
-	bh=mXqIacAC3RLc1tYiomnB+ph7/jwRad1h/08sQbaQrKg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nzCGyc0ACZ4YdrUHbJuOX/zRI9wJJHe9tJrLmln3cGv7f5a4ExHBkfa6nyB0NA4/T
-	 05CadXsIjbbLOjIDu7qJIfi+7SlFPB7Dvyf0gTAYG7NMTPzooHI6WQKaQJeOAtSWVQ
-	 7xckCLhk5n7rPFK/iz1cQ640OhIOfPjdnP85lVp986kRIK6Osx36Oi/l+P2skCcrvQ
-	 iUqTWLdMcwbuBy4H7/YsekYHSoIV4TBphHWU2yHOKUHlI5c952/hZwAWE0KFEfBloj
-	 iiDAljQ5a/aM4CFvHvANKyLa+vibaunMplD1jcsef+oMYzGkf0nGd8w3Vemt8xIdmf
-	 tzzvYxHgeg5Zw==
-Date: Mon, 3 Mar 2025 14:33:53 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Jason Wang <jasowang@redhat.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko
- <andrew@daynix.com>, Stephen Hemminger <stephen@networkplumber.org>,
- gur.stavi@huawei.com, Lei Yang <leiyang@redhat.com>
-Subject: Re: [PATCH net-next v7 5/6] selftest: tun: Add tests for virtio-net
- hashing
-Message-ID: <20250303143353.42219664@kernel.org>
-In-Reply-To: <0ec77558-bdfb-4471-a44b-0a37a9422f72@daynix.com>
-References: <20250228-rss-v7-0-844205cbbdd6@daynix.com>
-	<20250228-rss-v7-5-844205cbbdd6@daynix.com>
-	<20250228062947.7864a59c@kernel.org>
-	<0ec77558-bdfb-4471-a44b-0a37a9422f72@daynix.com>
+	s=arc-20240116; t=1741042394; c=relaxed/simple;
+	bh=/5XukNlXJKyGVREeQdU7wG2r6Y2lbVhDem2XgJQlNlw=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=c05njnHkj2qEmMWtwfx6LfkcONE0llAzpTM5X7jKmJuI2Dl7Umys8aIHJ09kj8+BcEBEVCikux6jxees/P6zMR+6XYO+V7Z7Q1Rte7iqZUlplkL2yqEJ2tjM/vWx+rKUvHvQGVoy6JkfdZTzK861OVWb3571IBADU+SjEpmphCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=eC5Ah8SC; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-22374f56453so82802885ad.0
+        for <kvm@vger.kernel.org>; Mon, 03 Mar 2025 14:53:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1741042392; x=1741647192; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rHRREGcSp2krqTtJr5eO01PBlpy/oFOdFDc6Qvhwm80=;
+        b=eC5Ah8SC6TMYOUVmlaMcM1AwBDdWEVI5AmzthZHRqMyA8yy8WYZ5ktV6BBKAEeRCR6
+         rwbNySYdv3leiCupxi9m9pMANdzLBLvC1a40wJzax/uSuWqf3Z5Xc2jKimK1QSKVLKC4
+         fALS2U97NGJHd01JfqMxqQQ7LZX1q0SFNZMunQyerZp67EOQj2BetMoCYgaVrfGwWOCK
+         RqUNunYS4RLoilcVkVvtbnKPU2vCB7yP5MrLkhaWTZSBlc5eUj6Y4XYA4hKJr3S1wJla
+         FzAKSJglFqXgwoTe/0uGqBoc0zQK3wLvl6wP3LXIxcrgGtiTf0CPvVTt2eHcTxjWlS0R
+         4dDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741042392; x=1741647192;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rHRREGcSp2krqTtJr5eO01PBlpy/oFOdFDc6Qvhwm80=;
+        b=ZcWEsVhdcNCMKxm5++gRGK1SjiyafQkk/03PjslJ4w6XRTMJiVqSWz86VUNquvrRgu
+         3gUC805EzyAMdZ9Ik/C2NF5mEF0rFIPi3hupSZ3AwGWl738mSdn3JSXUfCf0+gRU1PLe
+         Hg1rXKptKeiW+V7dqoNuoxRBR3Qt0cnbWr2pOvQuGgUNdDngaDwqLi8NWCN4tfs/tUZz
+         eSowv4YjYia6PdvbwUk86TIegkKQT3x+zeqHqmsRlrAU6sy7bNcjOiCaaOEl6oiY6TXS
+         /JyYnJkJ7+K1VSBardPk2OqDWYPQe+8PDWEeHwqUS8TE5xdqmsUPcQiI4P88zj0nF3Ut
+         nkBw==
+X-Gm-Message-State: AOJu0YzLeuAx0kONGvZREa2wKbldm1noj9Uqzy6wIRF8PZO47TOxpvX8
+	7rt5EE7+xKwx7I3LGnvUabFm/nR7GEzv/T3G7D4E4SQjtjPu/aRSH7sMiG1NxDA=
+X-Gm-Gg: ASbGncvO0vYSeOKvZui3eu/pqDC0qu1hjmAm/2tOPgsMR28Wp7oOc5CU7aKWcJXRN/B
+	yCvLjqh9+Z++skt1GERe7XUn1zJELTOlh4QOhRplFf4GSM3lelqNYAJw4E0YOLBme9tSLnN5qrx
+	VAwykuDPMxVXCodpl9y7wJqRUKgLaYIGWX0Mf628FkC8AyYXBqGJdbNLS+71orG0cuCHmbmGuFn
+	Q0GC/ZwUxCzzykh8nuf+c0lwqRYgZzTL5SNwsumuclCqt0qOh16mZ4LoP6hXy1Qwr6z2SF3DusJ
+	Y/2KB78hfW4M5UwZEwBiC7EC+B9lQHNgrAb6HXydgmWClo0OXbTdtHGyhQ==
+X-Google-Smtp-Source: AGHT+IFTnPiC8gGn23TPq+Loy5LwqUVXrpZ/genl7BFYk1BAOqQRQeXw3l+mF/ky73QXi/CT689qMQ==
+X-Received: by 2002:a05:6a00:a91:b0:731:e974:f9c2 with SMTP id d2e1a72fcca58-734abed5bbfmr23190306b3a.0.1741042391979;
+        Mon, 03 Mar 2025 14:53:11 -0800 (PST)
+Received: from atishp.ba.rivosinc.com ([64.71.180.162])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-734a003eb4fsm9440601b3a.129.2025.03.03.14.53.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Mar 2025 14:53:11 -0800 (PST)
+From: Atish Patra <atishp@rivosinc.com>
+Subject: [PATCH v2 0/4] RISC-V KVM PMU fix and selftest improvement
+Date: Mon, 03 Mar 2025 14:53:05 -0800
+Message-Id: <20250303-kvm_pmu_improve-v2-0-41d177e45929@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIANEyxmcC/2WNywrCMBBFf6XM2kg6JrW48j+kFJuHHSRNSDQoJ
+ f9uLLhyeQ7cc1dIJpJJcGpWiCZTIr9UwF0Dar4uN8NIVwbkKDmiZPfsxuCeI7kQfTbMWqv5oZ9
+ QcAF1FaKx9NqKl6HyTOnh43s7yO3X/lrdXyu3jLOjUFz2Cifb6XOk7BMtaq+8g6GU8gGwP2/cs
+ QAAAA==
+X-Change-ID: 20250225-kvm_pmu_improve-fffd038b2404
+To: Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+ Paul Walmsley <paul.walmsley@sifive.com>, 
+ Palmer Dabbelt <palmer@dabbelt.com>, Andrew Jones <ajones@ventanamicro.com>, 
+ Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+ linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, Atish Patra <atishp@rivosinc.com>
+X-Mailer: b4 0.15-dev-42535
 
-On Mon, 3 Mar 2025 15:20:33 +0900 Akihiko Odaki wrote:
-> > # 5.90 [+0.00] ok 14 tun_vnet_hash.unclassified
-> > # 5.90 [+0.00] #  RUN           tun_vnet_hash.ipv4 ...
-> > # 6.18 [+0.28] # tun.c:669:ipv4:Expected 0 (0) != tun_vnet_hash_check(self->source_fd, self->dest_fds, &packet, sizeof(packet), 0, VIRTIO_NET_HASH_REPORT_IPv4, 0x6e45d952) (0)
-> > # 15.09 [+8.92] # ipv4: Test failed
-> > # 15.10 [+0.00] #          FAIL  tun_vnet_hash.ipv4
-> > # 15.10 [+0.00] not ok 15 tun_vnet_hash.ipv4
-> > # 15.10 [+0.00] #  RUN           tun_vnet_hash.tcpv4 ...
-> > # 15.36 [+0.26] # tun.c:689:tcpv4:Expected 0 (0) != tun_vnet_hash_check(self->source_fd, self->dest_fds, &packet, sizeof(packet), VIRTIO_NET_HDR_F_DATA_VALID, VIRTIO_NET_HASH_REPORT_TCPv4, 0xfb63539a) (0)
-> > # 24.76 [+9.40] # tcpv4: Test failed
-> > # 24.76 [+0.00] #          FAIL  tun_vnet_hash.tcpv4
-> > # 24.76 [+0.00] not ok 16 tun_vnet_hash.tcpv4
-> > # 24.77 [+0.00] #  RUN           tun_vnet_hash.udpv4 ...
-> > # 25.05 [+0.28] # tun.c:710:udpv4:Expected 0 (0) != tun_vnet_hash_check(self->source_fd, self->dest_fds, &packet, sizeof(packet), VIRTIO_NET_HDR_F_DATA_VALID, VIRTIO_NET_HASH_REPORT_UDPv4, 0xfb63539a) (0)
-> > # 32.11 [+7.06] # udpv4: Test failed
-> > # 32.11 [+0.00] #          FAIL  tun_vnet_hash.udpv4
-> > # 32.11 [+0.00] not ok 17 tun_vnet_hash.udpv4  
-> 
-> I cannot reproduce the failure. What commit did you apply this patch 
-> series on? What architecture did the kernel run on?
+This series adds a fix for KVM PMU code and improves the pmu selftest
+by allowing generating precise number of interrupts. It also provided
+another additional option to the overflow test that allows user to
+generate custom number of LCOFI interrupts.
 
-x86 inside vng, see this for exact details:
-https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style
+Signed-off-by: Atish Patra <atishp@rivosinc.com>
+---
+Changes in v2:
+- Initialized the local overflow irq variable to 0 indicate that it's not a
+  allowed value. 
+- Moved the introduction of argument option `n` to the last patch. 
+- Link to v1: https://lore.kernel.org/r/20250226-kvm_pmu_improve-v1-0-74c058c2bf6d@rivosinc.com
 
-The tests are run on top of net-next + net (the two networking trees
-merged together).
+---
+Atish Patra (4):
+      RISC-V: KVM: Disable the kernel perf counter during configure
+      KVM: riscv: selftests: Do not start the counter in the overflow handler
+      KVM: riscv: selftests: Change command line option
+      KVM: riscv: selftests: Allow number of interrupts to be configurable
+
+ arch/riscv/kvm/vcpu_pmu.c                        |  1 +
+ tools/testing/selftests/kvm/riscv/sbi_pmu_test.c | 81 ++++++++++++++++--------
+ 2 files changed, 57 insertions(+), 25 deletions(-)
+---
+base-commit: 0ad2507d5d93f39619fc42372c347d6006b64319
+change-id: 20250225-kvm_pmu_improve-fffd038b2404
+--
+Regards,
+Atish patra
+
 
