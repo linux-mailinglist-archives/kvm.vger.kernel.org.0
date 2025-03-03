@@ -1,118 +1,116 @@
-Return-Path: <kvm+bounces-40057-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40069-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A979A4E8AE
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 18:28:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCBD6A4EB79
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 19:26:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4E4B3AEC80
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 17:07:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B6B8188C445
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 18:21:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3233029AAFF;
-	Tue,  4 Mar 2025 16:46:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED2EC27EC85;
+	Tue,  4 Mar 2025 18:09:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="VzsappMV"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="NWsY9fXc"
 X-Original-To: kvm@vger.kernel.org
-Received: from beeline3.cc.itu.edu.tr (beeline3.cc.itu.edu.tr [160.75.25.117])
+Received: from beeline1.cc.itu.edu.tr (beeline1.cc.itu.edu.tr [160.75.25.115])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E92F329AAE1
-	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 16:46:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=160.75.25.117
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C0720458B
+	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 18:09:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=160.75.25.115
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741106778; cv=pass; b=tOyvszFs8Ui7mfPGmRCe7+fZX/wlAXLOo/+g2Pa8vE2SDK4iWUkLy5dWTqnM1gMU1nU1ce/FYyLbR19SCDDMg4D3/8fvbhX29LjjJslK0AvoR2HqrKoWvyw+G/Bv2IcqSQtOKXQhDT8UOVhA/VQknA/ZgoU2sqV33zgn+QkI3T0=
+	t=1741111776; cv=pass; b=uDSnSyhHkF3t+psi08Uhu0g1L1rYnweb03cP4cK852w5BxCpQigJIi06UKnc1aK3BvUo7m//rS149bY7ofrXslqTVIZN9btMsw+RDc0x2ulnd4Mf5x+u3EquDsmU6asSuGnqUgT3WWzri56k/G9PcFhY72zj32sZ559ZO/3/X+4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741106778; c=relaxed/simple;
-	bh=1EbjAiaSwLMHWFntE6x8Us7e5Tuslulew517JKZampo=;
+	s=arc-20240116; t=1741111776; c=relaxed/simple;
+	bh=gLzufxXzt0l7nygEjLB/9ni9EbV3R+EdI/i1bDBrI2E=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=a4OmSd41QWDfXPgNyi5j53XMlQ+mg8RU24muNbx3ak1aTl1PM9QwSJGvihkjOH9Uaye9PV5oQl1m8/Jt1O8OQl2IXbdvUIp6O+9tIlLxV3S4YfmriV3yliT7wZt/Hn6vWdkTlDdu+5V8FwnNa3xeR8Z33Tr0YCgxvNtrB2QOxU8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=VzsappMV; arc=none smtp.client-ip=207.171.188.206; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; arc=pass smtp.client-ip=160.75.25.117
+	 MIME-Version:Content-Type; b=Kmphlz4NJD5y439F5fwt6XRzvpWrBHDUlgL8yZLB6oHMHPtZiSjFzxxbV04AnnaMETJOdZJmL+g6A98cK6sfcAZsJ/KQ8wOqgFsjXe+5RN3CxAriFLsSPSCjG3HgemWxtIQkw5wiKvya1eC7FhV579ihGpjF2oppOvdAxCAAMXM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=NWsY9fXc; arc=none smtp.client-ip=72.21.196.25; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; arc=pass smtp.client-ip=160.75.25.115
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=cc.itu.edu.tr
-Received: from lesvatest1.cc.itu.edu.tr (lesvatest1.cc.itu.edu.tr [10.146.128.1])
+Received: from lesvatest1.cc.itu.edu.tr (unknown [10.146.128.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
 	(No client certificate requested)
-	by beeline3.cc.itu.edu.tr (Postfix) with ESMTPS id 356C140CEC97
-	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 19:46:15 +0300 (+03)
+	by beeline1.cc.itu.edu.tr (Postfix) with ESMTPS id 11CBE408B645
+	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 21:09:33 +0300 (+03)
 X-Envelope-From: <root@cc.itu.edu.tr>
-Authentication-Results: lesvatest1.cc.itu.edu.tr;
-	dkim=pass (1024-bit key, unprotected) header.d=amazon.com header.i=@amazon.com header.a=rsa-sha256 header.s=amazon201209 header.b=VzsappMV
 Received: from lesva1.cc.itu.edu.tr (unknown [160.75.70.79])
-	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6hN55JdNzG455
-	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 19:44:05 +0300 (+03)
+	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6fSx0mmTzG051
+	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 18:18:09 +0300 (+03)
 Received: by le1 (Postfix, from userid 0)
-	id E8ADD42740; Tue,  4 Mar 2025 19:44:00 +0300 (+03)
+	id 4719342726; Tue,  4 Mar 2025 18:18:08 +0300 (+03)
 Authentication-Results: lesva1.cc.itu.edu.tr;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=VzsappMV
-X-Envelope-From: <linux-kernel+bounces-541819-bozkiru=itu.edu.tr@vger.kernel.org>
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=NWsY9fXc
+X-Envelope-From: <linux-kernel+bounces-541823-bozkiru=itu.edu.tr@vger.kernel.org>
 Authentication-Results: lesva2.cc.itu.edu.tr;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=VzsappMV
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=NWsY9fXc
 Received: from fgw2.itu.edu.tr (fgw2.itu.edu.tr [160.75.25.104])
-	by le2 (Postfix) with ESMTP id ED39841E28
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:33:05 +0300 (+03)
+	by le2 (Postfix) with ESMTP id 6493741A8F
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:34:50 +0300 (+03)
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by fgw2.itu.edu.tr (Postfix) with SMTP id 988EA2DCE0
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:33:05 +0300 (+03)
+	by fgw2.itu.edu.tr (Postfix) with SMTP id 11D942DCDE
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:34:49 +0300 (+03)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 774AC172D5B
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 13:32:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E36A01681E0
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 13:33:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3012B213221;
-	Mon,  3 Mar 2025 13:31:02 +0000 (UTC)
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 399A2215044;
+	Mon,  3 Mar 2025 13:31:46 +0000 (UTC)
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E0E42144D1;
-	Mon,  3 Mar 2025 13:30:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 107C82116F3;
+	Mon,  3 Mar 2025 13:31:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741008659; cv=none; b=GJAaFqzhmviQ2/0dPoEmiEvqXUIdNDGnch+Y2tuAppz7SqHfeDFtb9tfLq03rpC2siYWzR2BcafV2D2o2neRxEyKIneIVZD4yRDAYqll52naNKllaGlIl5z5Vt2H4CoZJz+/qvRZaqbPImaUmNWe/SDJUqtPO6nK0MeBAT5DVZ4=
+	t=1741008702; cv=none; b=Ege9Tn35AK1sZNEfZM95Po5zYR8reb24Zq7e8+MKl3V4k+0UcbWLJp9dNR3fFft16HCP7mTw2pvHPDIkdYREhI161Qm80BnzRieCorauYwhaMPHDu7FWPqJnr0WSEpTTYOy+IQ3x6FM3FoRrZI7Or3584L8/HeYmEE3VEXPjEXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741008659; c=relaxed/simple;
-	bh=1EbjAiaSwLMHWFntE6x8Us7e5Tuslulew517JKZampo=;
+	s=arc-20240116; t=1741008702; c=relaxed/simple;
+	bh=gLzufxXzt0l7nygEjLB/9ni9EbV3R+EdI/i1bDBrI2E=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FcY0Pm+0bx9hMJp0wLibbf+F59aVv6cETerJygaT7egXke9Ky7UUIPhm2FTLzQ8+cjeXxomJBXROjXRkwTH6O1Wq+RDlS87rWfE54VC+/kFKRoB32Dt/tdFqQ/O5v3jUI9K2H+xd/iUA62XEWi/7p1+ef4rMSM3N9LLHkWYPJAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=VzsappMV; arc=none smtp.client-ip=207.171.188.206
+	 MIME-Version:Content-Type; b=JDBaC3KJRV3DK6Fem8IijRz2GKUj5liPUjTLgVXpLYUbzvxutcOVn7TIvW3dFGmHXdaYCjg6VNQCeZuVQ5VEm8/uEyam5mReVidSSxpM2JcIek1IBvR4acAMrjmnX0UlbHsFK6mIZq3qPzNp1ETTw3qWA3iOklPHV+pCdZJWorU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=NWsY9fXc; arc=none smtp.client-ip=72.21.196.25
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1741008658; x=1772544658;
+  t=1741008702; x=1772544702;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=V1vY8tCYPxCY4hbQpuMez7lxmv4c2waMAS4LksLgaxQ=;
-  b=VzsappMVe+uMF9FL8QZwBs7coX7WCMQFxCGGwVcuZ4iLrTy8fWR6RTgN
-   NUuwTvJuMjAhm57ShmOnJXzLnrkejOMlhzB9o6Xsq5EbpuN5p2Zls3RcV
-   hvSB2yalX/wWV6e/f9WN+u1D+3QySesr1n+zD/k3AdOnWus4dgtFaVkq/
-   4=;
+  bh=Q0UMU0w4P1V9x66iYOqq2hXEUmMMf6XfFEDXRgYhyWI=;
+  b=NWsY9fXc8VV3NtzairQ/1WCfJY9h+CasXUQ14nnp6bU0QVm2kOkK5uop
+   gsNlWGgJ9herXLcNhZxEfEE+UkkOviUqchIkXQ0Tu9ZC7SM2nDGxJU4rv
+   XyOgYzmKu8fMRNmqWkQWpdekP/GGQwWnwh5B++uDBDzjwiP99SpyYwLTe
+   I=;
 X-IronPort-AV: E=Sophos;i="6.13,329,1732579200"; 
-   d="scan'208";a="803691401"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 13:30:56 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:32907]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.58.163:2525] with esmtp (Farcaster)
- id 415691d2-e1c3-4608-9ed6-87a92ed11fa8; Mon, 3 Mar 2025 13:30:55 +0000 (UTC)
-X-Farcaster-Flow-ID: 415691d2-e1c3-4608-9ed6-87a92ed11fa8
-Received: from EX19D020UWC002.ant.amazon.com (10.13.138.147) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+   d="scan'208";a="471520831"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 13:31:23 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:52084]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.52.238:2525] with esmtp (Farcaster)
+ id 138b0d45-31f1-425a-a923-c15034519930; Mon, 3 Mar 2025 13:31:22 +0000 (UTC)
+X-Farcaster-Flow-ID: 138b0d45-31f1-425a-a923-c15034519930
+Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 3 Mar 2025 13:30:54 +0000
-Received: from EX19MTAUWC002.ant.amazon.com (10.250.64.143) by
- EX19D020UWC002.ant.amazon.com (10.13.138.147) with Microsoft SMTP Server
+ Mon, 3 Mar 2025 13:31:22 +0000
+Received: from EX19MTAUWA001.ant.amazon.com (10.250.64.204) by
+ EX19D020UWC004.ant.amazon.com (10.13.138.149) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 3 Mar 2025 13:30:54 +0000
-Received: from email-imr-corp-prod-iad-all-1b-8410187a.us-east-1.amazon.com
- (10.25.36.210) by mail-relay.amazon.com (10.250.64.149) with Microsoft SMTP
+ Mon, 3 Mar 2025 13:31:21 +0000
+Received: from email-imr-corp-prod-pdx-1box-2b-ecca39fb.us-west-2.amazon.com
+ (10.25.36.214) by mail-relay.amazon.com (10.250.64.204) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1544.14 via Frontend Transport; Mon, 3 Mar 2025 13:30:54 +0000
+ 15.2.1544.14 via Frontend Transport; Mon, 3 Mar 2025 13:31:21 +0000
 Received: from dev-dsk-kalyazin-1a-a12e27e2.eu-west-1.amazon.com (dev-dsk-kalyazin-1a-a12e27e2.eu-west-1.amazon.com [172.19.103.116])
-	by email-imr-corp-prod-iad-all-1b-8410187a.us-east-1.amazon.com (Postfix) with ESMTPS id 77107406A9;
-	Mon,  3 Mar 2025 13:30:52 +0000 (UTC)
+	by email-imr-corp-prod-pdx-1box-2b-ecca39fb.us-west-2.amazon.com (Postfix) with ESMTPS id EF588803CC;
+	Mon,  3 Mar 2025 13:31:18 +0000 (UTC)
 From: Nikita Kalyazin <kalyazin@amazon.com>
 To: <akpm@linux-foundation.org>, <pbonzini@redhat.com>, <shuah@kernel.org>
 CC: <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
@@ -122,9 +120,9 @@ CC: <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
 	<graf@amazon.de>, <jgowans@amazon.com>, <roypat@amazon.co.uk>,
 	<derekmn@amazon.com>, <nsaenz@amazon.es>, <xmarcalx@amazon.com>,
 	<kalyazin@amazon.com>
-Subject: [RFC PATCH 3/5] mm: userfaultfd: allow to register userfaultfd for guest_memfd
-Date: Mon, 3 Mar 2025 13:30:09 +0000
-Message-ID: <20250303133011.44095-4-kalyazin@amazon.com>
+Subject: [RFC PATCH 5/5] KVM: selftests: add uffd missing test for guest_memfd
+Date: Mon, 3 Mar 2025 13:30:11 +0000
+Message-ID: <20250303133011.44095-6-kalyazin@amazon.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250303133011.44095-1-kalyazin@amazon.com>
 References: <20250303133011.44095-1-kalyazin@amazon.com>
@@ -138,44 +136,139 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Type: text/plain
 X-ITU-Libra-ESVA-Information: Please contact Istanbul Teknik Universitesi for more information
-X-ITU-Libra-ESVA-ID: 4Z6hN55JdNzG455
+X-ITU-Libra-ESVA-ID: 4Z6fSx0mmTzG051
 X-ITU-Libra-ESVA: No virus found
 X-ITU-Libra-ESVA-From: root@cc.itu.edu.tr
-X-ITU-Libra-ESVA-Watermark: 1741711460.9795@cfoWrTvZ3Ko0Lgxs7xWjOA
+X-ITU-Libra-ESVA-Watermark: 1741716451.35067@klgtCy/3kzJhDWhNySo7LQ
 X-ITU-MailScanner-SpamCheck: not spam
+
+The test demonstrates how a page missing event can be resolved via write
+syscall followed by UFFDIO_CONTINUE ioctl.
 
 Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>
 ---
- include/linux/userfaultfd_k.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ .../testing/selftests/kvm/guest_memfd_test.c  | 88 +++++++++++++++++++
+ 1 file changed, 88 insertions(+)
 
-diff --git a/include/linux/userfaultfd_k.h b/include/linux/userfaultfd_k.h
-index 75342022d144..440d38903359 100644
---- a/include/linux/userfaultfd_k.h
-+++ b/include/linux/userfaultfd_k.h
-@@ -20,6 +20,10 @@
- #include <asm-generic/pgtable_uffd.h>
- #include <linux/hugetlb_inline.h>
+diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
+index b07221aa54c9..aea0e8627981 100644
+--- a/tools/testing/selftests/kvm/guest_memfd_test.c
++++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+@@ -10,12 +10,16 @@
+ #include <errno.h>
+ #include <stdio.h>
+ #include <fcntl.h>
++#include <pthread.h>
  
-+#ifdef CONFIG_KVM_PRIVATE_MEM
-+bool kvm_gmem_vma_is_gmem(struct vm_area_struct *vma);
-+#endif
+ #include <linux/bitmap.h>
+ #include <linux/falloc.h>
++#include <linux/userfaultfd.h>
+ #include <sys/mman.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
++#include <sys/syscall.h>
++#include <sys/ioctl.h>
+ 
+ #include "kvm_util.h"
+ #include "test_util.h"
+@@ -278,6 +282,88 @@ static void test_create_guest_memfd_multiple(struct kvm_vm *vm)
+ 	close(fd1);
+ }
+ 
++struct fault_args {
++	char *addr;
++	volatile char value;
++};
 +
- /* The set of all possible UFFD-related VM flags. */
- #define __VM_UFFD_FLAGS (VM_UFFD_MISSING | VM_UFFD_WP | VM_UFFD_MINOR)
- 
-@@ -242,6 +246,11 @@ static inline bool vma_can_userfault(struct vm_area_struct *vma,
- 		return false;
- #endif
- 
-+#ifdef CONFIG_KVM_PRIVATE_MEM
-+	if (kvm_gmem_vma_is_gmem(vma))
-+		return true;
-+#endif
++static void *fault_thread_fn(void *arg)
++{
++	struct fault_args *args = arg;
 +
- 	/* By default, allow any of anon|shmem|hugetlb */
- 	return vma_is_anonymous(vma) || is_vm_hugetlb_page(vma) ||
- 	    vma_is_shmem(vma);
++	/* Trigger page fault */
++	args->value = *args->addr;
++	return NULL;
++}
++
++static void test_uffd_missing(int fd, size_t page_size, size_t total_size)
++{
++	struct uffdio_register uffd_reg;
++	struct uffdio_continue uffd_cont;
++	struct uffd_msg msg;
++	struct fault_args args;
++	pthread_t fault_thread;
++	void *mem, *buf = NULL;
++	int uffd, ret;
++	off_t offset = page_size;
++	void *fault_addr;
++
++	ret = posix_memalign(&buf, page_size, total_size);
++	TEST_ASSERT_EQ(ret, 0);
++
++	uffd = syscall(__NR_userfaultfd, O_CLOEXEC);
++	TEST_ASSERT(uffd != -1, "userfaultfd creation should succeed");
++
++	struct uffdio_api uffdio_api = {
++		.api = UFFD_API,
++		.features = UFFD_FEATURE_MISSING_SHMEM,
++	};
++	ret = ioctl(uffd, UFFDIO_API, &uffdio_api);
++	TEST_ASSERT(ret != -1, "ioctl(UFFDIO_API) should succeed");
++
++	mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
++	TEST_ASSERT(mem != MAP_FAILED, "mmap should succeed");
++
++	uffd_reg.range.start = (unsigned long)mem;
++	uffd_reg.range.len = total_size;
++	uffd_reg.mode = UFFDIO_REGISTER_MODE_MISSING;
++	ret = ioctl(uffd, UFFDIO_REGISTER, &uffd_reg);
++	TEST_ASSERT(ret != -1, "ioctl(UFFDIO_REGISTER) should succeed");
++
++	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
++			offset, page_size);
++	TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) should succeed");
++
++	fault_addr = mem + offset;
++	args.addr = fault_addr;
++
++	ret = pthread_create(&fault_thread, NULL, fault_thread_fn, &args);
++	TEST_ASSERT(ret == 0, "pthread_create should succeed");
++
++	ret = read(uffd, &msg, sizeof(msg));
++	TEST_ASSERT(ret != -1, "read from userfaultfd should succeed");
++	TEST_ASSERT(msg.event == UFFD_EVENT_PAGEFAULT, "event type should be pagefault");
++	TEST_ASSERT((void *)(msg.arg.pagefault.address & ~(page_size - 1)) == fault_addr,
++		    "pagefault should occur at expected address");
++
++	ret = pwrite(fd, buf + offset, page_size, offset);
++	TEST_ASSERT(ret == page_size, "write should succeed");
++
++	uffd_cont.range.start = (unsigned long)fault_addr;
++	uffd_cont.range.len = page_size;
++	uffd_cont.mode = 0;
++	ret = ioctl(uffd, UFFDIO_CONTINUE, &uffd_cont);
++	TEST_ASSERT(ret != -1, "ioctl(UFFDIO_CONTINUE) should succeed");
++
++	ret = pthread_join(fault_thread, NULL);
++	TEST_ASSERT(ret == 0, "pthread_join should succeed");
++
++	ret = munmap(mem, total_size);
++	TEST_ASSERT(!ret, "munmap should succeed");
++	free(buf);
++	close(uffd);
++}
++
+ unsigned long get_shared_type(void)
+ {
+ #ifdef __x86_64__
+@@ -316,6 +402,8 @@ void test_vm_type(unsigned long type, bool is_shared)
+ 	test_file_size(fd, page_size, total_size);
+ 	test_fallocate(fd, page_size, total_size);
+ 	test_invalid_punch_hole(fd, page_size, total_size);
++	if (is_shared)
++		test_uffd_missing(fd, page_size, total_size);
+ 
+ 	close(fd);
+ 	kvm_vm_release(vm);
 -- 
 2.47.1
 
