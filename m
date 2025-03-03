@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-39903-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39904-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CD7DA4C97E
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 18:30:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 082D7A4C967
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 18:28:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1695717E18F
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 17:22:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F2F21896C1F
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 17:22:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E9D222E3F9;
-	Mon,  3 Mar 2025 17:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9419124E005;
+	Mon,  3 Mar 2025 17:10:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bbFNaiSa"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RdYlOTPR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCB1E22E410
-	for <kvm@vger.kernel.org>; Mon,  3 Mar 2025 17:10:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A8424CEF4
+	for <kvm@vger.kernel.org>; Mon,  3 Mar 2025 17:10:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741021823; cv=none; b=G3+2yUiTDVrclwhLSDY+BuqMzK6mmOoMzT6CJqQL9tdJIJTwpr7vZcQLR+jA8S3eUAnAm9BVHrT5eN64WOCfNOS0bgGOADUtg0Ck7os1XZBeFZIobVEYWZDehuj/pkKCdYDATn/ZnQwmQHhQwcw5WnQwDHcUZQTJiPA3pE0CvlQ=
+	t=1741021825; cv=none; b=P3aD5SmqEKjx3jhwxzTg0EZoIlrU8OvcBN4AdU1VuRRmJjHLmop+cUy60xt6WNPyHYwC8dHirwqFOQxl1JXVHcNIFostU6fBAiQ9yQDIB1B/zgjs+dz5wps3ruj/OqTe4lQwPsBZFgi3dMJglust4NNQIqH5nR3dbcZrzt8pqKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741021823; c=relaxed/simple;
-	bh=28EFBKCZw3l6FNCPthRE40BpPOj+wO1/hWE45k0kfu8=;
+	s=arc-20240116; t=1741021825; c=relaxed/simple;
+	bh=5q3op/vr/0aA73x90j/SW+hw8Vc/Uz7wBgQMLMPuxSk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=O3hy+/H7XOBepUOF6DjZozbuiBaFU7DXeHZOfLulwBsxN4pces1f4e4OrVDjxHpaul3QGzS6jLs6aVRLBSekswhVS7f6J7kji9uce2jFPHhj6GmM2FauaeGFTFaEANBrlAda38OgPo9AGMrnDvzl5LbEUPMGS9rEcOzFgTEDPBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bbFNaiSa; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=QQJDjfIJ+s0qJsPOLjxkHrPB5gOoQkIuBKOvNDj/F07igpekqSTsyy8yJXCdEeAl4iWnBu1VIWq9QMF6DhHIrq6d/F6I6QnYCMc8y3pfGwW5FJ/W+o/tRKuZXrkV4BdAAZlovSVzytKPXIDbIUY2uLoSfZ1J27OWqhNlxAbmkoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RdYlOTPR; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4399a5afc95so18161475e9.3
-        for <kvm@vger.kernel.org>; Mon, 03 Mar 2025 09:10:21 -0800 (PST)
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-390f11e6fdbso1380485f8f.0
+        for <kvm@vger.kernel.org>; Mon, 03 Mar 2025 09:10:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741021820; x=1741626620; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1741021822; x=1741626622; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SRXCGSvCKi8KFNLeYd6jvsHWuv061HBQkZp/LgnTXzc=;
-        b=bbFNaiSa8ywRmzNGwqIWi/7Arl3e/avvW9QTmCIl+OD0rvzqAGDrKmJ9a65esS574R
-         7UZ64Ew3Ks1B9wqomF4x/mJxm55k8ZK03cGa1HWoSCu6hc07v6y3vq6RzJFSb91WBDeD
-         dDRShz1dptcMECBEglHCH0kyMK5lIkxzS8D84QteMm0p5wD4qb4SjI5dv9L133mLACeK
-         57Lz+7TEsbul1CLex0Z4ilbD6HhKtWZsPIQlqNxZ91fKl3WYTxpSRr23peCNiHm93jlt
-         B/VzyPkfGPw1joUHYpdzsvxJjRqjNRNXOYNgdhdtrbpA4nbvKNFGu3VPKVmsZSzR2IzO
-         5ONw==
+        bh=iEl5LoBVGArZ0Hko7f7NcM1d/VPAiCytVB+FzStXmAM=;
+        b=RdYlOTPRfrgeZME3BJZFJJWwJlHtD8li/HPNM/WYlSrnEWzDx7UIMKNvyK6UQK9zeY
+         2DmOYj7W1FYJXG+woijRyyHpPEfknWpU2Y2mZ/b3dtVuQY/CdRVh66+IitjJlwifVvc2
+         ZSOjphiu0YvK/XatPiyl7jqEg8zjMDX3N7MrUX3J9B2y/ine7CwsUfzczd8QmE52hf5B
+         K4880r1V6VeGo9AMQTwWGjKpCFJMRv/YZKT5HxF0PuyKW47Iu/7wM4rC+VPFwpXg+yV9
+         YoRFs4jU/t0xJrT0FXJXEMCIrmhD5CoRs5Rjg8tGXo5tC0dLaGtKV+ptv7eDH6a0hteL
+         OCxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741021820; x=1741626620;
+        d=1e100.net; s=20230601; t=1741021822; x=1741626622;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SRXCGSvCKi8KFNLeYd6jvsHWuv061HBQkZp/LgnTXzc=;
-        b=GnMpa0I9JbdW3zS5p/m0vmTdZThkBSjmkxGXXffCXlRCK6Mu23Zq0Qn53FtgjL+JX8
-         tTTBv0jmCiSIEXSoKnp4vYP39grE5EtSVnqvZ9e/TRaxSEJZg2G+sLBvO9ri4HUvLRdj
-         K85+GsPiPYqC/11oY9/0I2OMLjCJ3Jt5lMBNSNC/vqCkLA5Zsjlxl2Mw5pn3udayma0h
-         H1SbNJg615MZsSr25QfLzAEF/7K7nDqjn0GZQ4ZMr4InVHzyAyHotdCAFxdct1re2G6I
-         xti8pxiW5fOfk3juT0BmPaEsKxM5XpEYGCTlK06a86iGxfUJugFuJk0vsxnKMyc10Tot
-         c5Kg==
-X-Gm-Message-State: AOJu0Yzyp+lTwQm7fwDEfDEKaEBbobuP2NABUoR9k+g1rXYMipUGZimi
-	y1S//3jg6oLJRn4MfiJ0Zq71eDDSmsYGAzT1AtxHlV+rCLCIx1Hq2iHQAYmejQMTMvmelTLU5LN
-	A/eCZjozgjxumDvPEswcKG/HOq8p7FU39XwjSGGIGeUuoKJbnysgSCDm7C3I6/4WKQs/7V5mVTP
-	nPd2E+k9itY07aMA/KVvHjQJg=
-X-Google-Smtp-Source: AGHT+IHiT+g0b2FcJU3pHgUKOxKohFEOEB1W2gcQabUIaCdSRC5gA7558TblaDocxHQhpruqsN96dOjIwQ==
-X-Received: from wmbet10.prod.google.com ([2002:a05:600c:818a:b0:43b:c9e4:2160])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:190a:b0:434:a4b3:5ebe
- with SMTP id 5b1f17b1804b1-43ba675830emr94037315e9.24.1741021819910; Mon, 03
- Mar 2025 09:10:19 -0800 (PST)
-Date: Mon,  3 Mar 2025 17:10:06 +0000
+        bh=iEl5LoBVGArZ0Hko7f7NcM1d/VPAiCytVB+FzStXmAM=;
+        b=J0IqecPaBxdLySCDRsZzsrZ14lhzMbA6YXSqVz6rR77Zki7x3vlkqXorgQoeV7Go9G
+         WZ1/WVpyuT2j4AplEBL5PXj1mzhChn08OvJKusSH+Z3ui9+JZirkzwFAqU27SYFmkK4V
+         p2road5qcb74efzt2/GDZ7NnS+JecGdIMCSAL8ye23YAmJ12d/Lqim8o6Xjy5SAAXJcN
+         bsSBnwqV817Mfg5+e6IzX0JnLKIWTIJ0rwwangse/+krDzK5SSawFvdo4EzO9UNbNqd4
+         GLOyfpOdibjd39P7ygzDx9NFirN84kkwv9WB7v1/NLKANFR2wHEGU4mJwgQWgpWOOjZF
+         RLAA==
+X-Gm-Message-State: AOJu0YyYSaHsv4wqIMFq8q6TKGXcjWaew2YanC3WI6HIOSbVLmIAi6Jw
+	jZSNG1VVoWegXI5hD6k//EjKl7uQzStKxv+B4zRt8TYp97uQugYbj1nBQMdxrXjsiBTFGu5kpSz
+	MYLGEjKzf3aE3gMifTcGfaB5hRa+adGCt5R4zun4BIuZn0O0De6Z8ywiyVM2dK9/kRs4eG4sQtn
+	K5OZIpWJlT2B/UOVGLMTi5QQ0=
+X-Google-Smtp-Source: AGHT+IHgoYpjT7qfoJb2A88YneKFoylvHGn17OMTHx97hw2eQNXCP3h043pd8jbo3m8XgXFe11agjUZICw==
+X-Received: from wmgg5.prod.google.com ([2002:a05:600d:5:b0:43b:c99a:4af8])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:1ac9:b0:391:13ef:1b1b
+ with SMTP id ffacd0b85a97d-39113ef1e57mr1340632f8f.30.1741021821960; Mon, 03
+ Mar 2025 09:10:21 -0800 (PST)
+Date: Mon,  3 Mar 2025 17:10:07 +0000
 In-Reply-To: <20250303171013.3548775-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,9 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250303171013.3548775-1-tabba@google.com>
 X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <20250303171013.3548775-3-tabba@google.com>
-Subject: [PATCH v5 2/9] KVM: guest_memfd: Handle final folio_put() of
- guest_memfd pages
+Message-ID: <20250303171013.3548775-4-tabba@google.com>
+Subject: [PATCH v5 3/9] KVM: guest_memfd: Allow host to map guest_memfd() pages
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
@@ -100,136 +99,195 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
 	jthoughton@google.com, peterx@redhat.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Before transitioning a guest_memfd folio to unshared, thereby
-disallowing access by the host and allowing the hypervisor to
-transition its view of the guest page as private, we need to be
-sure that the host doesn't have any references to the folio.
+Add support for mmap() and fault() for guest_memfd backed memory
+in the host for VMs that support in-place conversion between
+shared and private. To that end, this patch adds the ability to
+check whether the VM type supports in-place conversion, and only
+allows mapping its memory if that's the case.
 
-This patch introduces a new type for guest_memfd folios, which
-isn't activated in this series but is here as a placeholder and
-to facilitate the code in the subsequent patch series. This will
-be used in the future to register a callback that informs the
-guest_memfd subsystem when the last reference is dropped,
-therefore knowing that the host doesn't have any remaining
-references.
+Also add the KVM capability KVM_CAP_GMEM_SHARED_MEM, which
+indicates that the VM supports shared memory in guest_memfd, or
+that the host can create VMs that support shared memory.
+Supporting shared memory implies that memory can be mapped when
+shared with the host.
 
-This patch also introduces the configuration option,
-KVM_GMEM_SHARED_MEM, which toggles support for mapping
-guest_memfd shared memory at the host.
+This is controlled by the KVM_GMEM_SHARED_MEM configuration
+option.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
-Acked-by: Vlastimil Babka <vbabka@suse.cz>
-Acked-by: David Hildenbrand <david@redhat.com>
 ---
- include/linux/kvm_host.h   |  7 +++++++
- include/linux/page-flags.h | 16 ++++++++++++++++
- mm/debug.c                 |  1 +
- mm/swap.c                  |  9 +++++++++
- virt/kvm/Kconfig           |  5 +++++
- 5 files changed, 38 insertions(+)
+ include/linux/kvm_host.h |  11 ++++
+ include/uapi/linux/kvm.h |   1 +
+ virt/kvm/guest_memfd.c   | 105 +++++++++++++++++++++++++++++++++++++++
+ virt/kvm/kvm_main.c      |   4 ++
+ 4 files changed, 121 insertions(+)
 
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index f34f4cfaa513..7788e3625f6d 100644
+index 7788e3625f6d..2d025b8ee20e 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -2571,4 +2571,11 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
- 				    struct kvm_pre_fault_memory *range);
- #endif
- 
-+#ifdef CONFIG_KVM_GMEM_SHARED_MEM
-+static inline void kvm_gmem_handle_folio_put(struct folio *folio)
-+{
-+	WARN_ONCE(1, "A placeholder that shouldn't trigger. Work in progress.");
-+}
-+#endif
-+
- #endif
-diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
-index 6dc2494bd002..daeee9a38e4c 100644
---- a/include/linux/page-flags.h
-+++ b/include/linux/page-flags.h
-@@ -933,6 +933,7 @@ enum pagetype {
- 	PGTY_slab	= 0xf5,
- 	PGTY_zsmalloc	= 0xf6,
- 	PGTY_unaccepted	= 0xf7,
-+	PGTY_guestmem	= 0xf8,
- 
- 	PGTY_mapcount_underflow = 0xff
- };
-@@ -1082,6 +1083,21 @@ FOLIO_TYPE_OPS(hugetlb, hugetlb)
- FOLIO_TEST_FLAG_FALSE(hugetlb)
+@@ -728,6 +728,17 @@ static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
+ }
  #endif
  
 +/*
-+ * guestmem folios are used to back VM memory as managed by guest_memfd. Once
-+ * the last reference is put, instead of freeing these folios back to the page
-+ * allocator, they are returned to guest_memfd.
-+ *
-+ * For now, guestmem will only be set on these folios as long as they  cannot be
-+ * mapped to user space ("private state"), with the plan of always setting that
-+ * type once typed folios can be mapped to user space cleanly.
++ * Arch code must define kvm_arch_gmem_supports_shared_mem if support for
++ * private memory is enabled and it supports in-place shared/private conversion.
 + */
++#if !defined(kvm_arch_gmem_supports_shared_mem) && !IS_ENABLED(CONFIG_KVM_PRIVATE_MEM)
++static inline bool kvm_arch_gmem_supports_shared_mem(struct kvm *kvm)
++{
++	return false;
++}
++#endif
++
+ #ifndef kvm_arch_has_readonly_mem
+ static inline bool kvm_arch_has_readonly_mem(struct kvm *kvm)
+ {
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 45e6d8fca9b9..117937a895da 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -929,6 +929,7 @@ struct kvm_enable_cap {
+ #define KVM_CAP_PRE_FAULT_MEMORY 236
+ #define KVM_CAP_X86_APIC_BUS_CYCLES_NS 237
+ #define KVM_CAP_X86_GUEST_MODE 238
++#define KVM_CAP_GMEM_SHARED_MEM 239
+ 
+ struct kvm_irq_routing_irqchip {
+ 	__u32 irqchip;
+diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+index b2aa6bf24d3a..4291956b51ae 100644
+--- a/virt/kvm/guest_memfd.c
++++ b/virt/kvm/guest_memfd.c
+@@ -312,7 +312,112 @@ static pgoff_t kvm_gmem_get_index(struct kvm_memory_slot *slot, gfn_t gfn)
+ 	return gfn - slot->base_gfn + slot->gmem.pgoff;
+ }
+ 
 +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
-+FOLIO_TYPE_OPS(guestmem, guestmem)
++static bool kvm_gmem_offset_is_shared(struct file *file, pgoff_t index)
++{
++	struct kvm_gmem *gmem = file->private_data;
++
++	/* For now, VMs that support shared memory share all their memory. */
++	return kvm_arch_gmem_supports_shared_mem(gmem->kvm);
++}
++
++static vm_fault_t kvm_gmem_fault(struct vm_fault *vmf)
++{
++	struct inode *inode = file_inode(vmf->vma->vm_file);
++	struct folio *folio;
++	vm_fault_t ret = VM_FAULT_LOCKED;
++
++	filemap_invalidate_lock_shared(inode->i_mapping);
++
++	folio = kvm_gmem_get_folio(inode, vmf->pgoff);
++	if (IS_ERR(folio)) {
++		switch (PTR_ERR(folio)) {
++		case -EAGAIN:
++			ret = VM_FAULT_RETRY;
++			break;
++		case -ENOMEM:
++			ret = VM_FAULT_OOM;
++			break;
++		default:
++			ret = VM_FAULT_SIGBUS;
++			break;
++		}
++		goto out_filemap;
++	}
++
++	if (folio_test_hwpoison(folio)) {
++		ret = VM_FAULT_HWPOISON;
++		goto out_folio;
++	}
++
++	/* Must be called with folio lock held, i.e., after kvm_gmem_get_folio() */
++	if (!kvm_gmem_offset_is_shared(vmf->vma->vm_file, vmf->pgoff)) {
++		ret = VM_FAULT_SIGBUS;
++		goto out_folio;
++	}
++
++	/*
++	 * Only private folios are marked as "guestmem" so far, and we never
++	 * expect private folios at this point.
++	 */
++	if (WARN_ON_ONCE(folio_test_guestmem(folio)))  {
++		ret = VM_FAULT_SIGBUS;
++		goto out_folio;
++	}
++
++	/* No support for huge pages. */
++	if (WARN_ON_ONCE(folio_test_large(folio))) {
++		ret = VM_FAULT_SIGBUS;
++		goto out_folio;
++	}
++
++	if (!folio_test_uptodate(folio)) {
++		clear_highpage(folio_page(folio, 0));
++		kvm_gmem_mark_prepared(folio);
++	}
++
++	vmf->page = folio_file_page(folio, vmf->pgoff);
++
++out_folio:
++	if (ret != VM_FAULT_LOCKED) {
++		folio_unlock(folio);
++		folio_put(folio);
++	}
++
++out_filemap:
++	filemap_invalidate_unlock_shared(inode->i_mapping);
++
++	return ret;
++}
++
++static const struct vm_operations_struct kvm_gmem_vm_ops = {
++	.fault = kvm_gmem_fault,
++};
++
++static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
++{
++	struct kvm_gmem *gmem = file->private_data;
++
++	if (!kvm_arch_gmem_supports_shared_mem(gmem->kvm))
++		return -ENODEV;
++
++	if ((vma->vm_flags & (VM_SHARED | VM_MAYSHARE)) !=
++	    (VM_SHARED | VM_MAYSHARE)) {
++		return -EINVAL;
++	}
++
++	file_accessed(file);
++	vm_flags_set(vma, VM_DONTDUMP);
++	vma->vm_ops = &kvm_gmem_vm_ops;
++
++	return 0;
++}
 +#else
-+FOLIO_TEST_FLAG_FALSE(guestmem)
-+#endif
++#define kvm_gmem_mmap NULL
++#endif /* CONFIG_KVM_GMEM_SHARED_MEM */
 +
- PAGE_TYPE_OPS(Zsmalloc, zsmalloc, zsmalloc)
- 
- /*
-diff --git a/mm/debug.c b/mm/debug.c
-index 8d2acf432385..08bc42c6cba8 100644
---- a/mm/debug.c
-+++ b/mm/debug.c
-@@ -56,6 +56,7 @@ static const char *page_type_names[] = {
- 	DEF_PAGETYPE_NAME(table),
- 	DEF_PAGETYPE_NAME(buddy),
- 	DEF_PAGETYPE_NAME(unaccepted),
-+	DEF_PAGETYPE_NAME(guestmem),
- };
- 
- static const char *page_type_name(unsigned int page_type)
-diff --git a/mm/swap.c b/mm/swap.c
-index 47bc1bb919cc..241880a46358 100644
---- a/mm/swap.c
-+++ b/mm/swap.c
-@@ -38,6 +38,10 @@
- #include <linux/local_lock.h>
- #include <linux/buffer_head.h>
- 
-+#ifdef CONFIG_KVM_GMEM_SHARED_MEM
-+#include <linux/kvm_host.h>
-+#endif
-+
- #include "internal.h"
- 
- #define CREATE_TRACE_POINTS
-@@ -101,6 +105,11 @@ static void free_typed_folio(struct folio *folio)
- 	case PGTY_hugetlb:
- 		free_huge_folio(folio);
- 		return;
+ static struct file_operations kvm_gmem_fops = {
++	.mmap		= kvm_gmem_mmap,
+ 	.open		= generic_file_open,
+ 	.release	= kvm_gmem_release,
+ 	.fallocate	= kvm_gmem_fallocate,
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index ba0327e2d0d3..38f0f402ea46 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4830,6 +4830,10 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+ #ifdef CONFIG_KVM_PRIVATE_MEM
+ 	case KVM_CAP_GUEST_MEMFD:
+ 		return !kvm || kvm_arch_has_private_mem(kvm);
 +#endif
 +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
-+	case PGTY_guestmem:
-+		kvm_gmem_handle_folio_put(folio);
-+		return;
++	case KVM_CAP_GMEM_SHARED_MEM:
++		return !kvm || kvm_arch_gmem_supports_shared_mem(kvm);
  #endif
  	default:
- 		WARN_ON_ONCE(1);
-diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-index 54e959e7d68f..37f7734cb10f 100644
---- a/virt/kvm/Kconfig
-+++ b/virt/kvm/Kconfig
-@@ -124,3 +124,8 @@ config HAVE_KVM_ARCH_GMEM_PREPARE
- config HAVE_KVM_ARCH_GMEM_INVALIDATE
-        bool
-        depends on KVM_PRIVATE_MEM
-+
-+config KVM_GMEM_SHARED_MEM
-+       select KVM_PRIVATE_MEM
-+       depends on !KVM_GENERIC_MEMORY_ATTRIBUTES
-+       bool
+ 		break;
 -- 
 2.48.1.711.g2feabab25a-goog
 
