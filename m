@@ -1,112 +1,155 @@
-Return-Path: <kvm+bounces-39913-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39912-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABD00A4CA81
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 18:57:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1061A4CA8E
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 18:59:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37C33174AEF
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 17:52:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDF613AB4AD
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 17:52:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E519B14A62B;
-	Mon,  3 Mar 2025 17:52:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0CFF217F32;
+	Mon,  3 Mar 2025 17:52:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BvRp+RpF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LfRPn5Eg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4241F4C83
-	for <kvm@vger.kernel.org>; Mon,  3 Mar 2025 17:52:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69CAF14A62B
+	for <kvm@vger.kernel.org>; Mon,  3 Mar 2025 17:52:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741024354; cv=none; b=reCvM9zjtIfx8/FU3jx805nm7WbpbKlrf+eO2s7UyISpfK1jzn8Kd/hhGtIHgcqhwUpVehtay8Q49QJvbncHa3ZTeGtD0Zk+SyUPVSoY7/4XXD9id5ZCwtgV842IQBPTpOrC91HvCvTCyB09Z+C2gNOCV6jRY0UMVHhXnNCTpqY=
+	t=1741024327; cv=none; b=ruCrX2lndVLVsoEzp1S2lJZG+7tWBfQaT2QjXRxg3EvZvwJvE+yDrR6E4HTBC7MciW0ECDUt3xau5CKHzHDAbytlXx2bLxSUYnuMlaqMQMQdSdW4zR8FvXXIcjB/F/L6/gH/CAmf6ZWe8R3eKpfmUBmuYKzZgi8ChI3j0zciV9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741024354; c=relaxed/simple;
-	bh=9F2LtWXXlSX30cTWgq26RNKeGiOlNMUkTPieGkfimyU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=S7wTE6UQ/N0DxKpD5HPToIhfr19zWYbshsyKUjbDRQnUqc7Kh2r6b+46XJGgHHNcACGF08/YTzmOq1hoIOZZfxaZr/ahDKX/uFu1hhTbdyxDiyBAwW3BJ/KZU9jKMsbruI/s6kIFQp6DRBtsJtSQASX2N6Ki+co3GsWhHJKbpLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BvRp+RpF; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741024353; x=1772560353;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=9F2LtWXXlSX30cTWgq26RNKeGiOlNMUkTPieGkfimyU=;
-  b=BvRp+RpFK2OgaltEr57ZpAt44hWd3oua1hhGM4Emuz7kHqx9eAaur7Hm
-   I/Vb0GCZtzCpbWro624XzQ80t04qUkKAUq1XvSoBZ7C4rFLByJNcgnaiZ
-   42FbKTKRE3BeLWPUIfF8CXDiF4YcXIo0+F1zQCoCo86h/5ZkKYvg572jK
-   IiUHEUqlQnSejLygijSkpT0tkOYMxwprJsqKEG9dHGGILZstL6riUfmEf
-   rMWw1V3wQ1x8bOVSACwtazXL42UhTe9iaRX30zJAAU+MW4R4FwD0WeT5B
-   MAFl3W679/usVBCI8gbtQWQd1Lfb8K3kYA3zn46sCyNESIBKA4tPaY73d
-   A==;
-X-CSE-ConnectionGUID: /GeComAVTnigVhFBIuy4hA==
-X-CSE-MsgGUID: 0pTUop47Ssa8rao7evTEXQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11362"; a="41157025"
-X-IronPort-AV: E=Sophos;i="6.13,330,1732608000"; 
-   d="scan'208";a="41157025"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 09:52:32 -0800
-X-CSE-ConnectionGUID: hxRG7/4ISYCjYaArTqD1hQ==
-X-CSE-MsgGUID: dHtl9BCLTcGgrSKPYQh+cA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,330,1732608000"; 
-   d="scan'208";a="122736352"
-Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
-  by fmviesa005.fm.intel.com with ESMTP; 03 Mar 2025 09:52:30 -0800
-Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tp9xr-000Imj-2h;
-	Mon, 03 Mar 2025 17:52:27 +0000
-Date: Tue, 4 Mar 2025 01:51:48 +0800
-From: kernel test robot <lkp@intel.com>
-To: Isaku Yamahata <isaku.yamahata@intel.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	kvm@vger.kernel.org, Farrah Chen <farrah.chen@intel.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Binbin Wu <binbin.wu@linux.intel.com>
-Subject: [kvm:kvm-coco-queue 113/127] ERROR: modpost: "tdx_interrupt_allowed"
- [arch/x86/kvm/kvm-intel.ko] undefined!
-Message-ID: <202503040123.42BYAY9p-lkp@intel.com>
+	s=arc-20240116; t=1741024327; c=relaxed/simple;
+	bh=QgP6NlBbs6rnKRSAqZSsqdiq8RcsyUmD/3Z4AUZwGfU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AyauF/K0hHrZtu/gYeyW41BRRA/DIE2dnicn/zk6nvxUbL780GPTkRebJ2QD0qG/8eVI4wX+TrYH9r8Li5jOOA+QgTd6LI6T9c2TMXnTCnbb7pMF+UySRwBzLiu+28RbOoytYjtf1mfd/fiQoCjBID8R3r1JMtGJ2eE7YzmBda8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LfRPn5Eg; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5e05ac70b61so173a12.1
+        for <kvm@vger.kernel.org>; Mon, 03 Mar 2025 09:52:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741024324; x=1741629124; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RaobNh8YJ+j6HIOIVsKGbmDCn24ZoUL5ZjszjFtTcS8=;
+        b=LfRPn5EgR3wV0UwXYgBIycUNpBriUrfIdsNTfd19Blv5waSFgbxQsXLDp+nagyB6hK
+         6u9H6uwX5FH82P9/KuzpJBlrnQTMoM/CrNizy3BGeM/mmrlpjxcOpRwGNn7bw3LwTpU4
+         zcrlJi5xWDuueANLU4W1ZADLFyVDOGm1theH+qQAhuJswXcO6WDgj1/kKQKQ9y3qKiVd
+         QDM+7J3L0gVNZj0exbDAeY5/zBOXrUiblQ/J0+m3w3Jj5nX8XiPaCgCke1F1HQdWvQ1+
+         9xBhvv1lyf0+jMBXubMJ1y94oewBocUBccGhK5g1wyFhySbnsBPDT8dW+F7A5MkcGRKR
+         DryA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741024324; x=1741629124;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RaobNh8YJ+j6HIOIVsKGbmDCn24ZoUL5ZjszjFtTcS8=;
+        b=DAVMkdPelB723pyrRWSmPFcgc3pqBh2jWAI/VXzxboSu2pdm5Gs8qUyFVY3nh+lkUE
+         S1vyEY8L49nMndQBAeOF/7aPz38932xPq6KBUKOpXFVpCfNiVPmv/lx9PkU5WLwqWGgq
+         gS3kDjl6OONYpH/1FXxFaWH77ccAPKtp51n7YRmFA2akk0/5vrUmnc0e/e1MtQdnRXSZ
+         osD8ng1vA/n2gs3KbI5qyL01Xdqb/FC4Xbea0b/ZWFY178hpv3YBX+dlPe6OdAxDL8o+
+         XlznOYslJq6lMTu/dxxKp9M0I8VYT/xDx8XVKRT8kkZO6qx5mu/Zwozj2a0Z/5X2tc8i
+         hw9w==
+X-Forwarded-Encrypted: i=1; AJvYcCWRWqKnfHdvLvlap1WDtMmjX5aUdFv1M6Y3FGhHWetBfPmzlHDoGnpP7kABKk3XtXggIHc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIvhAmm4YwtWfVM7mdS4ZhZGCGmKzmnUDjl7mpv2f0ehogXcqz
+	M08ZXUdY92s79cB8z3UfiECvZ0pPZJiwnXq2lXD3WIBXbsfoYn2TYTixw7gyTCS2ofyqJkqG0I4
+	E2tgIZpyumFD6Seb/Zwpf9iyF6r9/+mLeeoUj
+X-Gm-Gg: ASbGncsWRQe3O+om7HaHdrwB1iM3lGzIAh/c0WcDLYFGAlVO+8DZQ2ItwEn6iYboAql
+	WBzYXpcTkmXQM+lXQfg+Zuh1+DLWgsqpwlbay55RzA7xeWDTDb6/+YHhXSiNnetHnIaIoZfXA7h
+	1qYLX/wPXKyLgOokJv4VyFbqPvrA==
+X-Google-Smtp-Source: AGHT+IHPcwKiQzmn4yJOryRL5uTQknzFAuD+P5AADy3IJVvd+Dc/ZHFNhuisMirp59eZXjRx9+fwabi/H/38Lmlxb4g=
+X-Received: by 2002:aa7:df06:0:b0:5dc:ccb4:cb11 with SMTP id
+ 4fb4d7f45d1cf-5e50f8af131mr187775a12.4.1741024323531; Mon, 03 Mar 2025
+ 09:52:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20250205182402.2147495-1-yosry.ahmed@linux.dev>
+ <20250205182402.2147495-2-yosry.ahmed@linux.dev> <Z8JOvMx6iLexT3pK@google.com>
+In-Reply-To: <Z8JOvMx6iLexT3pK@google.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Mon, 3 Mar 2025 09:51:51 -0800
+X-Gm-Features: AQ5f1Jq-mwSjDevO7kvzGk_6Els8FMXYyGYRIuLa4ds4q8oc7antxsMG0ld7T2w
+Message-ID: <CALMp9eSGRLMj-a_ZrzzeLx_jgAea13-to=ZPHu3F+trQq28YjA@mail.gmail.com>
+Subject: Re: [RFC PATCH 01/13] KVM: nSVM: Track the ASID per-VMCB
+To: Sean Christopherson <seanjc@google.com>
+Cc: Yosry Ahmed <yosry.ahmed@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git kvm-coco-queue
-head:   9fe4541afcfad987d39790f0a40527af190bf0dd
-commit: 322c70bc596a64cdc219c028c7d765ee82c811f9 [113/127] KVM: TDX: Handle TDX PV HLT hypercall
-config: x86_64-randconfig-077-20250302 (https://download.01.org/0day-ci/archive/20250304/202503040123.42BYAY9p-lkp@intel.com/config)
-compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250304/202503040123.42BYAY9p-lkp@intel.com/reproduce)
+On Fri, Feb 28, 2025 at 4:03=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> +Jim, for his input on VPIDs.
+>
+> On Wed, Feb 05, 2025, Yosry Ahmed wrote:
+> > The ASID is currently tracked per-vCPU, because the same ASID is used b=
+y
+> > L1 and L2. That ASID is flushed on every transition between L1 and L2.
+> >
+> > Track the ASID separately for each VMCB (similar to the
+> > asid_generation), giving L2 a separate ASID. This is in preparation for
+> > doing fine-grained TLB flushes on nested transitions instead of
+> > unconditional full flushes.
+>
+> After having some time to think about this, rather than track ASIDs per V=
+MCB, I
+> think we should converge on a single approach for nVMX (VPID) and nSVM (A=
+SID).
+>
+> Per **VM**, one VPID/ASID for L1, and one VPID/ASID for L2.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202503040123.42BYAY9p-lkp@intel.com/
+When using EPT on VMX, there is probably no advantage to using one
+VPID per VM. The physical ASID is determined by <EPTRTA, VPID, PCID>.
+Two different VMs are not going to share an EPTRTA, so they already
+have different ASIDs, even if they have the same VPID.
 
-All errors (new ones prefixed by >>, old ones prefixed by <<):
+> For SVM, the dynamic ASID crud is a holdover from KVM's support for CPUs =
+that
+> don't support FLUSHBYASID, i.e. needed to purge the entire TLB in order t=
+o flush
+> guest mappings.  FLUSHBYASID was added in 2010, and AFAIK has been suppor=
+ted by
+> all AMD CPUs since.
 
->> ERROR: modpost: "tdx_interrupt_allowed" [arch/x86/kvm/kvm-intel.ko] undefined!
-ERROR: modpost: "enable_tdx" [arch/x86/kvm/kvm-intel.ko] undefined!
-ERROR: modpost: "tdx_disable_virtualization_cpu" [arch/x86/kvm/kvm-intel.ko] undefined!
-ERROR: modpost: "tdx_vm_init" [arch/x86/kvm/kvm-intel.ko] undefined!
-ERROR: modpost: "tdx_vm_destroy" [arch/x86/kvm/kvm-intel.ko] undefined!
-ERROR: modpost: "tdx_mmu_release_hkid" [arch/x86/kvm/kvm-intel.ko] undefined!
-ERROR: modpost: "tdx_vcpu_create" [arch/x86/kvm/kvm-intel.ko] undefined!
-ERROR: modpost: "tdx_vcpu_free" [arch/x86/kvm/kvm-intel.ko] undefined!
-ERROR: modpost: "tdx_vcpu_reset" [arch/x86/kvm/kvm-intel.ko] undefined!
-ERROR: modpost: "tdx_prepare_switch_to_guest" [arch/x86/kvm/kvm-intel.ko] undefined!
-WARNING: modpost: suppressed 21 unresolved symbol warnings because there were too many)
+> KVM already mostly keeps the same ASID, except for when a vCPU is migrate=
+d, in
+> which case KVM assigns a new ASID.  I suspect that following VMX's lead a=
+nd
+> simply doing a TLB flush in this situation would be an improvement for mo=
+dern
+> CPUs, as it would flush the entries that need to be flushed, and not poll=
+ute the
+> TLBs with stale, unused entries.
+>
+> Using a static per-VM ASID would also allow using broadcast invalidations=
+[*],
+> would simplify the SVM code base, and I think/hope would allow us to move=
+ much
+> of the TLB flushing logic, e.g. for task migration, to common code.
+>
+> For VPIDs, maybe it's because it's Friday afternoon, but for the life of =
+me I
+> can't think of any reason why KVM needs to assign VPIDs per vCPU.  Especi=
+ally
+> since KVM is ridiculously conservative and flushes _all_ EPT/VPID context=
+s when
+> running a different vCPU on a pCPU (which I suspect we can trim down?).
+>
+> Am I forgetting something?
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+TDX? IIRC, TDX requires a unique VPID for each vCPU in a VM.
+
+> [*] https://lore.kernel.org/all/Z8HdBg3wj8M7a4ts@google.com
 
