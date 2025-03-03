@@ -1,113 +1,111 @@
-Return-Path: <kvm+bounces-39839-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39840-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25081A4B5CA
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 02:26:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F76DA4B5CC
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 02:31:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD5D83ACA3E
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 01:26:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FECC3AFC9C
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 01:31:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0942D13BC3F;
-	Mon,  3 Mar 2025 01:26:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A817C13BC3F;
+	Mon,  3 Mar 2025 01:31:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T+TI8sMm"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WbJ8MDUB"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303AA800;
-	Mon,  3 Mar 2025 01:26:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B41E22B9BB;
+	Mon,  3 Mar 2025 01:31:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740965207; cv=fail; b=krOBWx642Tw3T2KA5UXWesCKCilj3iW2OVDXma80mrjASMA5ix2Qoo87/raI7+5Mj/z/XxT/nu28tbdMbJFYN4IAMG5uTNyCAJKyGUe1sxpeiZp4lQVKGzlU41EzKqqnJG7s/grdUPT1AbrmYimpEBla+mQ2h8piuNJWk3FJwSA=
+	t=1740965503; cv=fail; b=BTB6Btp5KGoE/gHSfAYU4r/HnYL/5I3lEAVH7hIiZNbO8PTm2Jbfj4zKTAJ4zaRUVk0QkUOmD1ZpIDiwuq2teKlgjLo7QaYAz2Ux1viWDG6uUjglT/GG38mTnltEVKDzyzUoPN0qsj6HXltmxUt9nQvfrkcObNxHt39AkgtUhIE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740965207; c=relaxed/simple;
-	bh=xYCaFl8gCxRrlLIPPuT3RVVZ++qFMtFJU4L/kpVxPe0=;
+	s=arc-20240116; t=1740965503; c=relaxed/simple;
+	bh=ABZQOmAdF9MzJygZSjHi8R6vLjgTez+xQuOBJIwmI5Y=;
 	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=bl/nnr7QTMk5SkDltfh77f1XUOj80QhbAH/QfhXUFR3Xx87UnZSPM418zgCbHkmlCR6kGLTPb8iKPJ/FY2+NfGHNvR0kXIS5VnVHw6mduL8Y3zF0aMAd3JSzb7JSmGhkE71Wu9LHtD8+SUr3zvTroQ0Pn4hACWzNkkiuOoPOvTs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T+TI8sMm; arc=fail smtp.client-ip=192.198.163.8
+	 Content-Disposition:In-Reply-To:MIME-Version; b=U2xwpWf0ctnx4iAxOa4fC4p5Ut5Q7QjQIyNrdmBU6ktjgIspPwg9HxjZGzEvw5EM8wx9OFT6120yyssVYOcUDL9gzuUJo8CMk60h+qlHWZ12ngqVPFTMP6/qL2ilx3s1pbbRz1ozLcElccBbPqje1eRsXtwjnnAdjNU6zbDMHAI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WbJ8MDUB; arc=fail smtp.client-ip=192.198.163.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740965205; x=1772501205;
+  t=1740965502; x=1772501502;
   h=date:from:to:cc:subject:message-id:reply-to:references:
    in-reply-to:mime-version;
-  bh=xYCaFl8gCxRrlLIPPuT3RVVZ++qFMtFJU4L/kpVxPe0=;
-  b=T+TI8sMmRB8rBw5dTH3Vy+hpW2bY6lr4XGmBMYbujUMPJ8azK9pQ9tCg
-   vibE+cUP4yxct6C5HG3AYJSrFCptraeGuvvN67RbbDrnjevEgkbU0cTid
-   wtuDGJx+ZLFJfc/BmEkGi16o4lhwwCh17kfgR4BRI8z5aDPOW0BvnP9Y+
-   EapdJpmMVcZVoXZDwNlrjWy5HS2372nHjkbRzoqc7hGu77CYdLD+Iujc4
-   5e781WZperLwx4DIFUk3kp1ulyxW6J4F8JWKbmCDSNXQcbxpHHateygC+
-   xBFxr5ON03CNT+JKrnjZoeKJXWKIiX9syWSIHZNH71FKv+L0CnaYiJ0IG
-   Q==;
-X-CSE-ConnectionGUID: MSkl7/4NSbikwW6+FiXC/w==
-X-CSE-MsgGUID: mLfWJ6FOSKOzQRsz7Tb87w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11361"; a="59371874"
+  bh=ABZQOmAdF9MzJygZSjHi8R6vLjgTez+xQuOBJIwmI5Y=;
+  b=WbJ8MDUBT3SZJlRWCAfgZ2u18SYEgYco0nDr5hrbN3wyzrufykLapSIG
+   D9kJ8Zb0VFb+ALjNKMDPTIk6DRqsZ5iNzbCNfXe3xh+Oz6qbjprf+5eAv
+   RLgufEB7j39+pz2S1kDqU1CzfgNiSSSBW9Dqdt/HxOrDdnIQutz/t9prE
+   2wHfrT+Y31vqhZDcLey8lks5/y5OX2Fh8kI99CJ27a+dy5PiK76yJu7ZO
+   w2+gMeSI+hOXwdX1WBcTEDTUUyGvuX0kg5tKDyFhbomCkwpB1n2JnXdsn
+   rl7NSNC15Gj0dD2CJjO8gp/IuXvlvYKFKAJHT0A8Lt3Gh9P4Rrd2NAcEF
+   A==;
+X-CSE-ConnectionGUID: ngXV6AO6RIOmwbe9QX41tA==
+X-CSE-MsgGUID: M8qVaxaHTYuNIA9GtRi87A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11361"; a="59372575"
 X-IronPort-AV: E=Sophos;i="6.13,328,1732608000"; 
-   d="scan'208";a="59371874"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2025 17:26:44 -0800
-X-CSE-ConnectionGUID: FkZL8nu9TIuDi6G7QycnIA==
-X-CSE-MsgGUID: qxbU+IjpTjmYJRIyV32mjg==
+   d="scan'208";a="59372575"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2025 17:31:41 -0800
+X-CSE-ConnectionGUID: I43UGhlaSry5WIRG5SmiyA==
+X-CSE-MsgGUID: cVc7wAiPTy+NcN/Y6WTZdA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,328,1732608000"; 
-   d="scan'208";a="118559389"
+   d="scan'208";a="122817945"
 Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2025 17:26:43 -0800
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2025 17:31:40 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
  ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Sun, 2 Mar 2025 17:26:42 -0800
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1544.14; Sun, 2 Mar 2025 17:31:39 -0800
 Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Sun, 2 Mar 2025 17:31:39 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.174)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Sun, 2 Mar 2025 17:26:42 -0800
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.44) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Sun, 2 Mar 2025 17:26:40 -0800
+ 15.1.2507.44; Sun, 2 Mar 2025 17:31:38 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=p4Hlzz6oi9JIT0aSLHwfWNuG9dDERgezVUuxQ45hzjnbpbcA2xRUxEBA0UyGzo6petNa4uv+bmFENaJdmsoGFAJ4gSxpMhMgF5SD06Oy+v8wOSjxe4SRr9Dzza63IuqicyhvxEJZ5KJw4m0zSFlnh4Tle579WBth9dR/hgfVM17g1+VPXvx07k1xYjNEdyKFqSKAAFYDYSm7r33vommzb3S/jLuomaEBbrncHk22Bh0V70CAI7pWUgZSd5DNilSi8BQdJRAD/EijqIcI9eeH2tf95ZMZfhgFRHHUHz7m2DpaXbSMH/o3OvDWriqBFKeU17YRbasof34sSutyVx9mBQ==
+ b=eFFSOSKP3w4U3Inen41aueCf/QnVLKqHFNb1jmARS63Tjoiuzow1hkU4e/JpS2Hd0X4aKxoI/xdUQ0X8MBEfPHH0ATSVxcSB4wlH51o8liTSg6r9RyTLQkbnfy3gPwFONjh3LdwYxZ+9zlEQsrdZA76MPwqrsAagW19vGiftw6PV1aW3uarTWbDl1SnFsClxVMC6w/mGlvvhc01yV/pod+EBvjY/Jxd2QChvmRQgHxj7rR8TkdBtGfpSLjy1gLWQ3BdIM/8Y2pB6Xiva7lLAg5eGLxz6/6brBYI3SHXxJ9lWX7J9RyRTxLGvaNXZGqzUc9WhvBp/CddUkwducBdVfA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zELFZXRLfLVJyw0sDDmIl/9DptRuc9nlFvEH+nNghuk=;
- b=KSNISQWRzwcE0HT1Ler0mNSIpDkhB03cpFiCkxK7a4AK1LMe8pJLUX0Xxm9fA6wmNw/8aBYOKkREAn6EUQWegHLr0gXuFIWCv4LUjNx5YUkJZJi6jkOggqwwLcOpOBLedg2uZESXMYKDly94kEeLocJKwJ1z9N42giJGZvK2QZZFLolIAhKraeb58OMS1RS4e6AeEGa607GzS1grUqKgKH+dnSgZ/ekNJfAlGhXNcHwIv3s1JMrcmpb92szYCainnStxCdiDPFP+9iT/jCViHy/wC0yVAA2g29RAuiQKYJNfF/xgwf73R4lW9R9X8aQe/t9ZnLcyMLg1/f7dBg11gw==
+ bh=sF9glYrjhd+VtuYf5V2QeadJf+mn92WbmRuIsqb8SiA=;
+ b=JJJq45y2a2XYdj7DLu/Gtg0RE0NE7V/DqyOAmTTByKR9/r5orlfI9axxcruhZPhJcUUeUpEcKYehCCBgZspJwNcJ4k2fXDzVSHMva/Q1UgB0W56uSKhdiWa54fYpAcalJUujMCvNqWXhnqamRRj5pQMSEvJT1vxeGau160l5he6zRA9nKrMH/4qZEX9jD8HDTt61uZQFrLpFJteY/ErZTpZetu+gFklMDcpKjLCSgMxNWMunPPLShj2uVaWLjmK03AZVVD8Aj0wARL19kTA64/GJrJi59OAuOR2f3TB9cd66Vo8VwprZhm/L2LWcRvU+sg3cK5DHA/9AtsjAhh90yw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
 Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- IA0PR11MB7188.namprd11.prod.outlook.com (2603:10b6:208:440::12) with
+ PH8PR11MB6879.namprd11.prod.outlook.com (2603:10b6:510:229::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.26; Mon, 3 Mar
- 2025 01:26:39 +0000
+ 2025 01:31:29 +0000
 Received: from DS7PR11MB5966.namprd11.prod.outlook.com
  ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
  ([fe80::e971:d8f4:66c4:12ca%4]) with mapi id 15.20.8489.025; Mon, 3 Mar 2025
- 01:26:39 +0000
-Date: Mon, 3 Mar 2025 09:25:19 +0800
+ 01:31:29 +0000
+Date: Mon, 3 Mar 2025 09:30:10 +0800
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
-CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<seanjc@google.com>, Kevin Tian <kevin.tian@intel.com>
-Subject: Re: [PATCH 3/4] KVM: x86: Introduce Intel specific quirk
- KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT
-Message-ID: <Z8UE/zlXoDO3Civj@yzhao56-desk.sh.intel.com>
+CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, <seanjc@google.com>
+Subject: Re: [PATCH 4/4] KVM: TDX: Always honor guest PAT on TDX enabled
+ platforms
+Message-ID: <Z8UGIryFjJ+msO6i@yzhao56-desk.sh.intel.com>
 Reply-To: Yan Zhao <yan.y.zhao@intel.com>
 References: <20250301073428.2435768-1-pbonzini@redhat.com>
- <20250301073428.2435768-4-pbonzini@redhat.com>
+ <20250301073428.2435768-5-pbonzini@redhat.com>
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20250301073428.2435768-4-pbonzini@redhat.com>
-X-ClientProxiedBy: SG2PR02CA0002.apcprd02.prod.outlook.com
- (2603:1096:3:17::14) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+In-Reply-To: <20250301073428.2435768-5-pbonzini@redhat.com>
+X-ClientProxiedBy: SG2PR06CA0202.apcprd06.prod.outlook.com (2603:1096:4:1::34)
+ To DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -115,301 +113,155 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|IA0PR11MB7188:EE_
-X-MS-Office365-Filtering-Correlation-Id: ee4aec02-3f4b-47cf-75a1-08dd59f27225
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|PH8PR11MB6879:EE_
+X-MS-Office365-Filtering-Correlation-Id: 32b405db-6e25-43f3-26a3-08dd59f31f80
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7053199007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?L1eombptv0R7Q7TKPCgdbcSDvDlniHCCigOY8xBFMhy4V+hfpiyg3d0KMp6N?=
- =?us-ascii?Q?XJK7+6f5KJW8ybfeQRRLfwg98DYHzor/w6vhcLijOThiK6dHU/xBrZ/bqAAF?=
- =?us-ascii?Q?9XhAotmg+2P00nVEUd+ybmCYO/7Qqpo8d4v1TcDgx26X2MM7e8LW41c6Gl6n?=
- =?us-ascii?Q?RqLk/Hxfla5tyOZr+1eTIO7BewGB33RqCPeXF/M4YIfeIVBVijG/Vp+XzyE5?=
- =?us-ascii?Q?ME1HQY3jrAsRPZF7wkbE4Akb4lsJAli1zrfNSrwVZNB7a2WyhpYNzMOJhcQ+?=
- =?us-ascii?Q?CE31tW68PBHrMZwivfPNI+7OCYBtbhSohC1ieaKMINcwfyOLZZnafKXHAKeG?=
- =?us-ascii?Q?7gwg4sVueyYbAV6OUCY0iCsIiQTWZFM2vvPymOKU2dflmB6a0DFhdcpR1T7e?=
- =?us-ascii?Q?ShlWzOwd7eblskTWL9JW+3rpRq3DsK+ORjgBcoSuVbfGp+f6AHW0HJk/ScfE?=
- =?us-ascii?Q?apMuPzmFXmywxiSd+RjP22MY2hcLeHi1H6MyV76x0YEV0eAO/+T3bHwxaaIQ?=
- =?us-ascii?Q?PhWzaDPk7DE9pDwsPXP1i9vX2cZ2TEB1xHTMo2zBETIEcqx8/lxpapig58PE?=
- =?us-ascii?Q?9b4fNCgRpdGmRCyhEg4wXIKwkj65hYDgSjjdANfXeq5rvtkxRriHuZ5Rry3x?=
- =?us-ascii?Q?mCQ2rc2utJEdkJZt4iNYKRRGUqD3SoVmGZh05OhW1z80VvT1rjj6H6ZQXIam?=
- =?us-ascii?Q?ajxIUWEAoC+2vqELem9Ei+EpIsfS0Sq0AzHopUToUXCjqM6P0Snplpbf2i16?=
- =?us-ascii?Q?nAbXth3ZfYkapreWXcJOpltRNN3mAVE+Bax3cM7QMLMpaobzR8DHg5TUyH5V?=
- =?us-ascii?Q?y7Y8OLgA72VQWF2tVbkLyWl3uuns3WKRY1kh/Ois4R4PlwId5pQmG0Q/C/NF?=
- =?us-ascii?Q?xk5X90apWdKYmdkj3sGdML5LROLqEgcHMSkcrRpPMahJsJzE/0TcKQHShS9C?=
- =?us-ascii?Q?NgHGPBHcu2lC4+N8X5Zv3Jp/vUo9tTou0GUjaGPcHxL/NGLDLQOnv7pwcBEw?=
- =?us-ascii?Q?vXhSBzkGiqbwMpIMQfyCqwjgpE/GzxLUx/BVni9P46PZbGQcFlAaVyf6HVm4?=
- =?us-ascii?Q?1dX9vlPFmfCzRZbLEoJk20BZRUFnaYxAbEcR4euBIqCnGvkhESV+cTrJMhHX?=
- =?us-ascii?Q?u9qjlVsjELnsHhLuZ4qvF3+CJPPyMp7QhABITQQjnNEjh4MIRnAVeTlnxVFp?=
- =?us-ascii?Q?Fc5hccXz/NwP3zfPqYNljSsDSgsMc2P+7sRs4qqxsqktaQ4ZMcNQ3UutZrvN?=
- =?us-ascii?Q?6ABwwlTrLQQxZadROMe/J6PES07/KRBe+ajudU+3a1lGl4XApyvegBdckQ2m?=
- =?us-ascii?Q?N7Q+NP9movDSljSRrxJtaM3/L/C0lF869qe7pnUKbO3a7usBEprnoQos2UMU?=
- =?us-ascii?Q?J0oYkrnrOFvrlK8t9QXw6R2tCmxl7eSe8zN9fIR2zXt6G86+dQ=3D=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7053199007);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?sbU2Tzoftboqxrb/xW9njLJL5O2Z01d9iz1nRSeQdSIiNPjDgT/h+gW8N/dI?=
+ =?us-ascii?Q?jANEBstPEIOgjdLtJXUj7oJ9+VQG6yN4v8c1mIuverLDhlO+vLPpGxFTmL2e?=
+ =?us-ascii?Q?v1RifNKV5r0SQq/e5UDGeB1S7kKse4C7kfIcbnw/AGRpl2ZWsQSJbMmEBrUj?=
+ =?us-ascii?Q?ODcaQjcIT2uAkTV60P08BpcsbTEiyXzI3DEwXXlZWwns0SlGUr0LfpGDhQYV?=
+ =?us-ascii?Q?TmxKJJULM45c/qpsFznqgz78AWPASlSmhvDCtgFdtkx2Xnxj39dfUnY3wmnT?=
+ =?us-ascii?Q?f3QNWcX1hL1QaZZwwufmnZkoU0uj8wT/SnJ1fUSoHvHxOwUFJgkUcHVThiAJ?=
+ =?us-ascii?Q?HmhVLgGIlfmOtcXlBSL22q/sJT4Cn8ELIMOd0txtDj8GBnCLZKExDeQCQ15n?=
+ =?us-ascii?Q?gkUVp6nCUeER6hQOwoqhBbtUxRF77xc/26i3a47vAfoXjKswChA08l3caAKj?=
+ =?us-ascii?Q?XA+tz8d+8FWsMG/2FAzJEzDDbSvvbSyRKloAYkV7ATWSO6s7EDQLc93j18wl?=
+ =?us-ascii?Q?FEQZytIimcLP9USvSaFxaQNClvgPlacjH2okzoqGdvJCo1FBS0F8D26KlC8j?=
+ =?us-ascii?Q?LPIdjlv46cmTYuh5CJh55J7sxRtREEHPWuZg75AnfVla6jcGTO3XG6zEEqFu?=
+ =?us-ascii?Q?h/PyqGp+lw1FHUMTYh4Ce6GOC7dnCiMnteFTpfSberYMwjq/Jli5YzsGBBlU?=
+ =?us-ascii?Q?DPIyhHyiKPQ6qEz2LYXlhqpf8oxueq4/ADVeIdXSPoP3H/MeIqJ0pW8MsLGA?=
+ =?us-ascii?Q?wX7lLMgpUlQ6aH5UorMDuEA92YdqxAAcH/nvtUuA2J/3BogJFcgCwehopyL6?=
+ =?us-ascii?Q?N4Z7WY+YnpcFNgQsAbydH783BTE6VIqHoYHt2alDKJiRHyo6h/7O/cm09HBJ?=
+ =?us-ascii?Q?hY/id9RVMgi/7tcIirJeNnzJJWri8PiDn6nrihu1L2FhLGFR/PKrQrs9qFeC?=
+ =?us-ascii?Q?zMjrlJzm22r4wVYD8X0lmpiViB2V9T4f5oLndBQ3DQWITtWKVWqjASnWrmRg?=
+ =?us-ascii?Q?C1QZ2xodQoy01nD3JgWccEw73cPRqvVPYS0Dqi39GqJXPvPOXUV1NkYQZKaU?=
+ =?us-ascii?Q?B9FMBBR8pXyAkwj+MrxyOT1RuIAXyhNJim9CLJGd7+AkprqseXittzUgVIkU?=
+ =?us-ascii?Q?5aLspdROzZPLMLews8c1hubloyjRiUAeowgHL9rZfNCygRKdhYI55PTLUrz0?=
+ =?us-ascii?Q?RSx360RRwVhsGfB6b8nxQRiaM4akTBqWnjB4gwQTY8FJlfROzIZbZl1a2Th/?=
+ =?us-ascii?Q?dd770bBXRKdk/WRyRLzZbSFDL26wOjr4w8TUIOZnr1kpsZTdfOLUjXMbdOY4?=
+ =?us-ascii?Q?6zqrQYD7t+uYmkV//MntjRWgn9FpaLqHpnSI66m6Rb3PaiFn2XF6ZUwS0NC7?=
+ =?us-ascii?Q?ai9Wpv97L7DNVk95oBWOcU4qnRh8?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ZQtgEAbQHNy4cKTw6fyHuv5x8afF2XnWsrtkYSw1ssGVDZcafFF1AyJ0deLb?=
- =?us-ascii?Q?6XJqDZ5AzkcSMb96BQeOfQxiZVBNJA73cvoBVUDrATdA2yazQOK7kKgMIxP1?=
- =?us-ascii?Q?6eSdqN+yzBRR7nd/pYgNtSWBvOynhzbDYzi8K600w1XrmLjn42TXJx8ShadL?=
- =?us-ascii?Q?MP0hRVpKO6jGqgjSKnFCESX0eUeHRoph7Gnznwq3pQr+K0Ccis+trNKYCjlK?=
- =?us-ascii?Q?fajDmwHF3Vmg3Dzc0z2JluTbHZIVK8RGyIrD8+x9QgBhTpa2FCw+ny8Tmp6O?=
- =?us-ascii?Q?+VZs/I+umV02tvtK2QzybN+MXTkCiQyxEhNPJq9/V1JEMmUjiEHCMlumw9M/?=
- =?us-ascii?Q?snUSYY806n2a0LywaQIUZgKCEtboNISy2BKtYxHYDgdIX4CunHbaGz7I59pU?=
- =?us-ascii?Q?C/JWIYsPfEs28/EiEqO5HCohUKsWCD53Hyr3tYLgHb7sowdYZaPG8LS7PmG1?=
- =?us-ascii?Q?fXe3ZgtF0kKIMXIUohS92BISHmwIhFgq11G+u6s54NYHpsxvMTy6fF1r9nGh?=
- =?us-ascii?Q?sCHV+h2l0oCEoEJ2vds0+sk2lI4qJf0CR5zkv97t70lpW0Ctifg0hrhfVcN0?=
- =?us-ascii?Q?DN+ykZ1jlCySuXpIzYCBXIMdHjQOXMCDSyxgo0hdEhQjfhNy23n+mKr8cRS1?=
- =?us-ascii?Q?OKxHQvKn8cFl8Kwyzj9eDl/tpwdp6knnM0Syk6tJfwdHMBDn+yj9QlW9P6WW?=
- =?us-ascii?Q?Ft9kz92wmxCBzJIE1Wk6pspxTQw34NuLnvo6nLpTLCBueTd4TsoVL6GELLCM?=
- =?us-ascii?Q?h4ZO4F2p+MJePyShFiD/k/XOUt4MzOY9NREKvcX5YBlIGjW6BFUfAAo4b4LB?=
- =?us-ascii?Q?U9TPiiAXIUIbQKjWfszXRIX+f0zH+u+2XrSAM/iRYWCArzGvl8yKnLvCsFya?=
- =?us-ascii?Q?i1G0T+mP4dMTkdAmHdaNeEMHhWdzAR/TAXH4g0z+TX+XkrX0lCL6XloKkVXj?=
- =?us-ascii?Q?JrDYoIttRdohnH3dVxfclGlGVpLNRMC2OUByhslSlsSiYsFLnvK072XzWnl/?=
- =?us-ascii?Q?gvFkZHefbNnts1oXnXXG9kBMHno3kEtsCxUStP/Uli0MNnQ9nfaJ+0iVGNpM?=
- =?us-ascii?Q?NiYZ6dJJLd1Sl6Ly10Gj/qDoKUY4hU8EGf0h2XadDU6S0Mm2f8e8Ey6ZGN97?=
- =?us-ascii?Q?vrEFyLRkE336YjnBYX54nkGTx3kYeh3o0xUp/Jw9JzsgE/VaYOy6TKa5XhPO?=
- =?us-ascii?Q?blUrWJnv/q8kwXWNuo6wfFWJeb9emRH2SCIkY91LJAdqjCnsB3LO3+MlgYgu?=
- =?us-ascii?Q?/5gZHFXv6E8Vuu81JfV5vkcCT/CZ2o13s/5FCBKiJ+FnclKoztlavJj4YNUe?=
- =?us-ascii?Q?J9pKLtD59uqJ3w7LwBvDgD2Wm3p7euc/kcze10Yh4nV3l/TIvOqPPQ29VEq+?=
- =?us-ascii?Q?kppvGW4fgBArMQyCV9Xkt+nNrpO1dDcQZZW1Epm44CRiiwf0by8k7LjAkKgU?=
- =?us-ascii?Q?vptqh+U6sPPWeXHXmrG+XIYfTKPeYJwN6/iTv4vfkID3/Nemkr+mr937a1BL?=
- =?us-ascii?Q?Hgs/whZH9azzB7A/spH6B4+vGsxQHezA8Q9Oq61rtmT/d6/vXbW1UQIm/ihv?=
- =?us-ascii?Q?f34/lYPu3BqFl4n3drRFb4u64qHuJkWtJVblcFax?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: ee4aec02-3f4b-47cf-75a1-08dd59f27225
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?4Og3tCgi0g23IZ/GciWvCWrtVycWfaiL5GTtH7nfSPxnNH1UnybZZRiwTviN?=
+ =?us-ascii?Q?c3MFaVtrarUb81eH0kQOgZJW6ebqCGbhDGb+/jJD7GSx+3U2gag50VjHo9vx?=
+ =?us-ascii?Q?xtkAe13wNvD9qBzUVMVBmsr2FQAlDL9qT+gAcrpcBx5MeqTlt4uJv67R8/gc?=
+ =?us-ascii?Q?b8nC+m/iaK2rVeUuXQThdInXijdo3QNvHk+qh4//1EJpe8R9J3AUOwiXruo2?=
+ =?us-ascii?Q?QAk1WXJBXFCXdgjD57nphBhGmzzHDHw9uZcse7988HsgzASoNsfbuDirvIt/?=
+ =?us-ascii?Q?czIUwKtuuR9M/dXjMfSNnHssXziJybl/zbW7EZEMKHV7jqDnJX/j1UXftxd4?=
+ =?us-ascii?Q?JGqn/S1nh9EYPPa+4hzqVL9ovEiLolpbTGRHPb7hmWXgAPS/jMVR+0xH5X/5?=
+ =?us-ascii?Q?izoPqFu4oNjwUVumwJE7OEyFlWmV3WDS8hLsbkPZ4SrMsZKlLbISuyrpkjPK?=
+ =?us-ascii?Q?iP7JN8XhkvjGPHvrPbGBZfn7UI2JKOqwpFJHKigsCRfYl28APCgwhRI2Xz0b?=
+ =?us-ascii?Q?cSQz+Kb9pIj1e2qy43gxhU0NGsaPrbiPiTbeE7w/GMFvyZ3JEBDFJ3Nkp+il?=
+ =?us-ascii?Q?qzzX+x28LzWqf14yy7NI35JjQJaS05aIXXanWHHYU3CFkn4RDOMgFtb5drMS?=
+ =?us-ascii?Q?oqpphcL6ZQX+mW4v+cieWH7nB4U+9buBgZpS78/sQreVZgEByPQw4dl6eOog?=
+ =?us-ascii?Q?0T58gVuLlgrfb3eqVXjXLDauaUeTb8uIBZqlidSQC8u15Ie/XLnwKEDQ3BJB?=
+ =?us-ascii?Q?5qrkUiqGgDa8MSeKa41giJpFPzNGDjequ5VBR1gb/jF06fZK0R3QVnlcbGQ/?=
+ =?us-ascii?Q?XU6jAt2VYg3nYYA0zZ7wFnEqO4r9vw+l/yhScWgjynhbZuDPIDZazBi1A5VI?=
+ =?us-ascii?Q?QAxV+b8lS76pCh2JqF9bKV/XFJT97HxNPzmKdTmJiXea9fEyFDyf3UexpnyZ?=
+ =?us-ascii?Q?IIJSvl4jj4lqr12gmqNFP9Ax/bP3MaJx8Ctmmdd0v+ikKjHq/0nTTHPRzSjP?=
+ =?us-ascii?Q?TELTifSsIGMQeEnlgGs/BzawNQi9b2IaTk/HltcqCvYQYXM4MKc2k04F7jhY?=
+ =?us-ascii?Q?8X4tF2jLnTFfd9ruzjh/kFKL4ccLqsaXnxtoli5ztoxxSGltOf2xMbn7XkTU?=
+ =?us-ascii?Q?Kg61SwrJwiidm9/FKneTPHvbaI1nROvM5Vq1rurceoh7gsNdShHGEAlNJ6rQ?=
+ =?us-ascii?Q?edzNnP8cFHAbmVHSOkwuKEuGWalc4T9NlvnRoQC+D+HDZXU8x+XKwEii/hif?=
+ =?us-ascii?Q?KU0yxjl3qQr341e7DfheCE59/Oq9OziRAUnrHhSrZ3WsIRdDW8Llpg5tdG4i?=
+ =?us-ascii?Q?6D1KMujV8QaY/OZV/Q+5fhjlC9gV+nSz3nB4lziCUk2vkR9li63P7bktIFfG?=
+ =?us-ascii?Q?EvQgx+9sd/tszc2P154DwSRTI+qVvw5vEq9K+fwmd1eqWq5/OyIGMhohL7XP?=
+ =?us-ascii?Q?NavzF9s6xEawmh+I1e0d0PP+REWA2iWOBmKzbRW861tCDJ5CYd+NNjZxjih5?=
+ =?us-ascii?Q?5w0a2cms3zeKsk6skRy42DiavtXjb+BQkJ8QEdHurfVlWl57FHfU2aQ0r2Bk?=
+ =?us-ascii?Q?Xdzqznh6G06D6dDgE9dS0XB1nOmo6UdL7fFG/L4T?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 32b405db-6e25-43f3-26a3-08dd59f31f80
 X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2025 01:26:38.9843
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2025 01:31:29.7828
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ftXBxSuvSZjsGcp9xmiImyds9JuePTESDB1I5o4NO2fGiF8xnp8jKreZ1a1RgusLdKGiFpK5V2q0ahF6pMrhsw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7188
+X-MS-Exchange-CrossTenant-UserPrincipalName: g5ndYqPsI+LqIN1NQ0KpyxHEJ3SHiZXkP+l/+rWUYRf+93l9OZwnac/79lZE/onz4HAekmVXw1EGB636WA36HQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6879
 X-OriginatorOrg: intel.com
 
-On Sat, Mar 01, 2025 at 02:34:27AM -0500, Paolo Bonzini wrote:
+On Sat, Mar 01, 2025 at 02:34:28AM -0500, Paolo Bonzini wrote:
 > From: Yan Zhao <yan.y.zhao@intel.com>
 > 
-> Introduce an Intel specific quirk KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT to have
-> KVM ignore guest PAT when this quirk is enabled.
+> Always honor guest PAT in KVM-managed EPTs on TDX enabled platforms by
+> making self-snoop feature a hard dependency for TDX and making quirk
+> KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT not a valid quirk once TDX is enabled.
 > 
-> KVM is able to safely honor guest PAT on Intel platforms when CPU feature
-> self-snoop is supported. However, KVM honoring guest PAT was reverted after
-> commit 9d70f3fec144 ("Revert "KVM: VMX: Always honor guest PAT on CPUs that
-> support self-snoop""), due to UC access on certain Intel platforms being
-> very slow [1]. Honoring guest PAT on those platforms may break some old
-> guests that accidentally specify PAT as UC. Those old guests may never
-> expect the slowness since KVM always forces WB previously. See [2].
+> The quirk KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT only affects memory type of
+> KVM-managed EPTs. For the TDX-module-managed private EPT, memory type is
+> always forced to WB now.
 > 
-> So, introduce an Intel specific quirk KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT.
-> KVM enables the quirk on all Intel platforms by default to avoid breaking
-> old unmodifiable guests. Newer userspace can disable this quirk to turn on
-> honoring guest PAT.
+> Honoring guest PAT in KVM-managed EPTs ensures KVM does not invoke
+> kvm_zap_gfn_range() when attaching/detaching non-coherent DMA devices;
+> this would cause mirrored EPTs for TDs to be zapped, as well as incorrect
+> zapping of the private EPT that is managed by the TDX module.
 > 
-> The quirk is only valid on Intel's platforms and is absent on AMD's
-> platforms as KVM always honors guest PAT when running on AMD.
+> As a new platform, TDX always comes with self-snoop feature supported and has
+> no worry to break old not-well-written yet unmodifiable guests. So, simply
+> force-disable the KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT quirk for TDX VMs.
 > 
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 > Suggested-by: Sean Christopherson <seanjc@google.com>
-> Cc: Kevin Tian <kevin.tian@intel.com>
 > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> Link: https://lore.kernel.org/all/Ztl9NWCOupNfVaCA@yzhao56-desk.sh.intel.com # [1]
-> Link: https://lore.kernel.org/all/87jzfutmfc.fsf@redhat.com # [2]
-> Message-ID: <20250224070946.31482-1-yan.y.zhao@intel.com>
+> Message-ID: <20250224071039.31511-1-yan.y.zhao@intel.com>
+> [Use disabled_quirks instead of supported_quirks. - Paolo]
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  Documentation/virt/kvm/api.rst  | 22 +++++++++++++++++++
->  arch/x86/include/uapi/asm/kvm.h |  1 +
->  arch/x86/kvm/mmu.h              |  2 +-
->  arch/x86/kvm/mmu/mmu.c          | 11 ++++++----
->  arch/x86/kvm/svm/svm.c          |  1 +
->  arch/x86/kvm/vmx/vmx.c          | 39 +++++++++++++++++++++++++++------
->  arch/x86/kvm/x86.c              |  2 +-
->  7 files changed, 65 insertions(+), 13 deletions(-)
+>  arch/x86/kvm/vmx/tdx.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 > 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 2d75edc9db4f..1f13e47a65fa 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -8157,6 +8157,28 @@ KVM_X86_QUIRK_STUFF_FEATURE_MSRS    By default, at vCPU creation, KVM sets the
->                                      and 0x489), as KVM does now allow them to
->                                      be set by userspace (KVM sets them based on
->                                      guest CPUID, for safety purposes).
-> +
-> +KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT  By default, on Intel platforms, KVM ignores
-> +                                    guest PAT and forces the effective memory
-> +                                    type to WB in EPT.  The quirk is not available
-> +                                    on Intel platforms which are incapable of
-> +                                    safely honoring guest PAT (i.e., without CPU
-> +                                    self-snoop, KVM always ignores guest PAT and
-> +                                    forces effective memory type to WB).  It is
-> +                                    also ignored on AMD platforms or, on Intel,
-> +                                    when a VM has non-coherent DMA devices
-> +                                    assigned; KVM always honors guest PAT in
-> +                                    such case. The quirk is needed to avoid
-> +                                    slowdowns on certain Intel Xeon platforms
-> +                                    (e.g. ICX, SPR) where self-snoop feature is
-> +                                    supported but UC is slow enough to cause
-> +                                    issues with some older guests that use
-> +                                    UC instead of WC to map the video RAM.
-> +                                    Userspace can disable the quirk to honor
-> +                                    guest PAT if it knows that there is no such
-> +                                    guest software, for example if it does not
-> +                                    expose a bochs graphics device (which is
-> +                                    known to have had a buggy driver).
->  =================================== ============================================
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index b6f6f6e2f02e..4450fd99cb4c 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -624,6 +624,7 @@ int tdx_vm_init(struct kvm *kvm)
 >  
->  7.32 KVM_CAP_MAX_VCPU_ID
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> index 89cc7a18ef45..db55a70e173c 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -441,6 +441,7 @@ struct kvm_sync_regs {
->  #define KVM_X86_QUIRK_MWAIT_NEVER_UD_FAULTS	(1 << 6)
->  #define KVM_X86_QUIRK_SLOT_ZAP_ALL		(1 << 7)
->  #define KVM_X86_QUIRK_STUFF_FEATURE_MSRS	(1 << 8)
-> +#define KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT	(1 << 9)
->  
->  #define KVM_STATE_NESTED_FORMAT_VMX	0
->  #define KVM_STATE_NESTED_FORMAT_SVM	1
-> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> index 47e64a3c4ce3..f999c15d8d3e 100644
-> --- a/arch/x86/kvm/mmu.h
-> +++ b/arch/x86/kvm/mmu.h
-> @@ -232,7 +232,7 @@ static inline u8 permission_fault(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
->  	return -(u32)fault & errcode;
->  }
->  
-> -bool kvm_mmu_may_ignore_guest_pat(void);
-> +bool kvm_mmu_may_ignore_guest_pat(struct kvm *kvm);
->  
->  int kvm_mmu_post_init_vm(struct kvm *kvm);
->  void kvm_mmu_pre_destroy_vm(struct kvm *kvm);
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index e6eb3a262f8d..bcf395d7ec53 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -4663,17 +4663,20 @@ static int kvm_tdp_mmu_page_fault(struct kvm_vcpu *vcpu,
->  }
->  #endif
->  
-> -bool kvm_mmu_may_ignore_guest_pat(void)
-> +bool kvm_mmu_may_ignore_guest_pat(struct kvm *kvm)
->  {
->  	/*
->  	 * When EPT is enabled (shadow_memtype_mask is non-zero), and the VM
->  	 * has non-coherent DMA (DMA doesn't snoop CPU caches), KVM's ABI is to
->  	 * honor the memtype from the guest's PAT so that guest accesses to
->  	 * memory that is DMA'd aren't cached against the guest's wishes.  As a
-> -	 * result, KVM _may_ ignore guest PAT, whereas without non-coherent DMA,
-> -	 * KVM _always_ ignores guest PAT (when EPT is enabled).
-> +	 * result, KVM _may_ ignore guest PAT, whereas without non-coherent DMA.
-> +	 * KVM _always_ ignores guest PAT, when EPT is enabled and when quirk
-> +	 * KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT is enabled or the CPU lacks the
-> +	 * ability to safely honor guest PAT.
->  	 */
-> -	return shadow_memtype_mask;
-> +	return shadow_memtype_mask &&
-> +	       kvm_check_has_quirk(kvm, KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT);
->  }
->
->  int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index ebaa5a41db07..2254dbebddac 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -5426,6 +5426,7 @@ static __init int svm_hardware_setup(void)
->  	 */
->  	allow_smaller_maxphyaddr = !npt_enabled;
->  
-> +	kvm_caps.inapplicable_quirks |= KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT;
-Similar to KVM_X86_QUIRK_CD_NW_CLEARED for Intel,
-KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT has actually no effect on AMD's platforms,
-even if kvm_check_has_quirk() returns true.
+>  	kvm->arch.has_protected_state = true;
+>  	kvm->arch.has_private_mem = true;
+> +	kvm->arch.disabled_quirks |= KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT;
+Though the quirk is disabled by default in KVM in tdx_vm_init() for TDs, the
+kvm->arch.disabled_quirks can be overwritten by a userspace specified value in
+kvm_vm_ioctl_enable_cap().
+"kvm->arch.disabled_quirks = cap->args[0] & kvm_caps.supported_quirks;"
 
-I'm wondering if it's really necessary for us to introuce
-kvm_caps.inapplicable_quirks.
+So, when an old userspace tries to disable other quirks on this new KVM, it may
+accidentally turn KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT into enabled for TDs, which
+would cause SEPT being zapped when (de)attaching non-coherent devices.
 
->  	return 0;
+Could we force KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT to be disabled for TDs?
+
+e.g.
+
+tdx_vm_init
+   kvm->arch.always_disabled_quirks |= KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT;
+
+static inline bool kvm_check_has_quirk(struct kvm *kvm, u64 quirk)
+{
+        WARN_ON_ONCE(kvm->arch.always_disabled_quirk & kvm_caps.force_enabled_quirks);
+
+        u64 disabled_quirks = kvm->arch.always_disabled_quirk | kvm->arch.disabled_quirks;
+        return !(disabled_quirks & quirk) |
+               (kvm_caps.force_enabled_quirks & quirk);
+}
+
 >  
->  err:
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 75df4caea2f7..5365efb22e96 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7599,6 +7599,33 @@ int vmx_vm_init(struct kvm *kvm)
->  	return 0;
->  }
->  
-> +/*
-> + * Ignore guest PAT when the CPU doesn't support self-snoop to safely honor
-> + * guest PAT, or quirk KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT is turned on.  Always
-> + * honor guest PAT when there's non-coherent DMA device attached.
-> + *
-> + * Honoring guest PAT means letting the guest control memory types.
-> + * - On Intel CPUs that lack self-snoop feature, honoring guest PAT may result
-> + *   in unexpected behavior. So always ignore guest PAT on those CPUs.
-> + *
-> + * - KVM's ABI is to trust the guest for attached non-coherent DMA devices to
-> + *   function correctly (non-coherent DMA devices need the guest to flush CPU
-> + *   caches properly). So honoring guest PAT to avoid breaking existing ABI.
-> + *
-> + * - On certain Intel CPUs (e.g. SPR, ICX), though self-snoop feature is
-> + *   supported, UC is slow enough to cause issues with some older guests (e.g.
-> + *   an old version of bochs driver uses ioremap() instead of ioremap_wc() to
-> + *   map the video RAM, causing wayland desktop to fail to get started
-> + *   correctly). To avoid breaking those old guests that rely on KVM to force
-> + *   memory type to WB, only honoring guest PAT when quirk
-> + *   KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT is disabled.
-> + */
-> +static inline bool vmx_ignore_guest_pat(struct kvm *kvm)
-> +{
-> +	return !kvm_arch_has_noncoherent_dma(kvm) &&
-> +	       kvm_check_has_quirk(kvm, KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT);
-> +}
-> +
->  u8 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
->  {
 >  	/*
-> @@ -7608,13 +7635,8 @@ u8 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
->  	if (is_mmio)
->  		return MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT;
+>  	 * Because guest TD is protected, VMM can't parse the instruction in TD.
+> @@ -3470,6 +3471,11 @@ int __init tdx_bringup(void)
+>  		goto success_disable_tdx;
+>  	}
 >  
-> -	/*
-> -	 * Force WB and ignore guest PAT if the VM does NOT have a non-coherent
-> -	 * device attached.  Letting the guest control memory types on Intel
-> -	 * CPUs may result in unexpected behavior, and so KVM's ABI is to trust
-> -	 * the guest to behave only as a last resort.
-> -	 */
-> -	if (!kvm_arch_has_noncoherent_dma(vcpu->kvm))
-> +	/* Force WB if ignoring guest PAT */
-> +	if (vmx_ignore_guest_pat(vcpu->kvm))
->  		return (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
->  
->  	return (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT);
-> @@ -8506,6 +8528,9 @@ __init int vmx_hardware_setup(void)
->  
->  	kvm_set_posted_intr_wakeup_handler(pi_wakeup_handler);
->  
-> +	/* Must use WB if the CPU does not have self-snoop.  */
-> +	if (!static_cpu_has(X86_FEATURE_SELFSNOOP))
-> +		kvm_caps.supported_quirks &= ~KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT;
->  	kvm_caps.inapplicable_quirks = KVM_X86_QUIRK_CD_NW_CLEARED;
->  	return r;
->  }
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index a97e58916b6a..b221f273ec77 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -13544,7 +13544,7 @@ static void kvm_noncoherent_dma_assignment_start_or_stop(struct kvm *kvm)
->  	 * (or last) non-coherent device is (un)registered to so that new SPTEs
->  	 * with the correct "ignore guest PAT" setting are created.
->  	 */
-> -	if (kvm_mmu_may_ignore_guest_pat())
-> +	if (kvm_mmu_may_ignore_guest_pat(kvm))
->  		kvm_zap_gfn_range(kvm, gpa_to_gfn(0), gpa_to_gfn(~0ULL));
->  }
->  
+> +	if (!cpu_feature_enabled(X86_FEATURE_SELFSNOOP)) {
+> +		pr_err("Self-snoop is required for TDX\n");
+> +		goto success_disable_tdx;
+> +	}
+> +
+>  	if (!cpu_feature_enabled(X86_FEATURE_TDX_HOST_PLATFORM)) {
+>  		pr_err("tdx: no TDX private KeyIDs available\n");
+>  		goto success_disable_tdx;
 > -- 
 > 2.43.5
-> 
 > 
 
