@@ -1,144 +1,119 @@
-Return-Path: <kvm+bounces-39871-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39872-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F586A4BFDB
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 13:08:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91675A4C14C
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 14:08:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E02C16BE99
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 12:08:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B88BF16B4A3
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 13:08:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0DE920E313;
-	Mon,  3 Mar 2025 12:07:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17F20211491;
+	Mon,  3 Mar 2025 13:08:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gmqbQPQH"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="VDXy9l2Z"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92A9B20E333
-	for <kvm@vger.kernel.org>; Mon,  3 Mar 2025 12:07:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D41210F59;
+	Mon,  3 Mar 2025 13:08:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741003661; cv=none; b=POBYyCUIe+cWwMct58Hps9lrajME7wW28LJSjaUK7GqxfXL8jdZ2JZxnTZ4qDl8Zo6AAPOgUF/1bTvPdLjjYw/H3yxpXlhLgi5oMcGLQD2jiZQwUR+aGwpQifTwexyEq00kXDVrjPvCpwtgwwwJsPpCayFljJeF82V0vjxloLjQ=
+	t=1741007329; cv=none; b=tcCFC1K7KPOPGFLXDwrsxjSxn2PyO+l/floC12kmwGjn4ncLmDuBY+O7K/3KfbmAxEyYPfQHghc1+3S0/kmxAJKCyVitp+6zi5lnPgwR3dsyOdw+5X1jqrApiJgSRUEcVxU6+eiS8TH8bxg4CZ2L45XNXnENPgd5hZdgRoAN7PI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741003661; c=relaxed/simple;
-	bh=uju7sIH5BGh5W5JTJZHooDHmsXtbGtIZ2zwKahZ89tE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=brFPxdaMjXyji2lxYk4QZlX3HadHoBjPja7cnFDFlD+x3ca6yz0SZW8xX94RJk3jx5e6Q1kDcHUodK1CMNsVytZXf2slVOygLzhqrvOthRN6SDPQFQfBQwTTneAv8okBaDV6IjgJde2Wgx4yrdRWRVqogxIUiUmETrW9zCNFeeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gmqbQPQH; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741003658;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fw9/y9pO0Tgw7qMRxrC2z9OKO7bwRqJ7EcWxU9xvHxE=;
-	b=gmqbQPQHo791kKnZNlAwQ2WG8QhP9DjrBjXU3zcVXamO33ueoXgjyOvC6wwe/j1ig12UV5
-	hK26v7YCtKq/V6x0bopmKMEqUSqBq414eUcp8xxdg3SGwhcBfSm5tKyAWRQGLDKuvS0Ku4
-	NvjVyPAG84vPrY7MPtyNHEHPIA0Wkk8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-246-dzSe4f8UOw2hTU_rq6tQlg-1; Mon, 03 Mar 2025 07:07:32 -0500
-X-MC-Unique: dzSe4f8UOw2hTU_rq6tQlg-1
-X-Mimecast-MFC-AGG-ID: dzSe4f8UOw2hTU_rq6tQlg_1741003651
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-390de58dc4eso4030995f8f.0
-        for <kvm@vger.kernel.org>; Mon, 03 Mar 2025 04:07:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741003651; x=1741608451;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fw9/y9pO0Tgw7qMRxrC2z9OKO7bwRqJ7EcWxU9xvHxE=;
-        b=dh+1z9SJKGfa1tnte3HjnSKxL3fFDznbRSwebOoLZCO9s6d/EtAHvhsjoeSuRTVX70
-         RvUEsM/RYATfVpFOpvU5nhIsdddGrGueB6bQ1LOUt9vjMi2CjfWvPwnN5dJfwy3ozHbo
-         Ak+sJNME6piZO+Yizj25x+pReMznHoMwA66BgaHFeuny+/sOMKzL2/aapC98I1hGMebs
-         1ay8B+nueGu0S7wVgEjIMDIKsYUb0b8NUe3N5NAN6YHr8mV0XnS4rNFd0odk1rHD/Cd1
-         lm+hecuru7UGxezyqPWiMHtW5lY5vNmyIuz49GTc5D6CpIAzmNQtzYrjHh3WspObWTyH
-         i8KQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXboGAa7dKexOBeMiHGngkrWrjicy0S566FZ9LvD0wiAoPeZ3/hotYqcpxyyRb4YvTHid8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrUR+Yrtvgaemtfi/oBZOzVnqEHcadjmFOjklcwY1NstxVXCcO
-	0BgtYCB5rdMaUn/UQDFWs2K9DiIy6x1BzO8gYexkdIqoO+QZVFEwiLmYqTDO4bt32GtVP8D24eY
-	TJaHbf+WFi8YYbz0+NwlAT1tB3JYhhTsefzIINwnS7h1r2tV1DSeL/U+UWc+8sHQ6yxt1F4JjCO
-	vmIIEsJ4SNL+6K779+/oPlI9Xa
-X-Gm-Gg: ASbGncs7ECpI7UGHHXAfARo3UI14NkDwb9PsblIFVpghjMyVHP1UuZn+fobwj1TZ34U
-	F8meBh+V4EMsIX+EY/i+FbGXgyHC62iGl2HZSLUKnJxx1DSOrL5Ggs9l3SWblEc7sVd7mw0FP
-X-Received: by 2002:a05:6000:1543:b0:390:ef45:1a37 with SMTP id ffacd0b85a97d-390ef451caemr10434832f8f.55.1741003650997;
-        Mon, 03 Mar 2025 04:07:30 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFQibAQBZKGLMDrS/FjVYTrJktgwlJ/8V2jDfRODdesJgHBiBswiP6BF/IeHZ/V6AALHag0O/R4QLX3SW+KpHI=
-X-Received: by 2002:a05:6000:1543:b0:390:ef45:1a37 with SMTP id
- ffacd0b85a97d-390ef451caemr10434799f8f.55.1741003650538; Mon, 03 Mar 2025
- 04:07:30 -0800 (PST)
+	s=arc-20240116; t=1741007329; c=relaxed/simple;
+	bh=uylAwl9z4lLSLbtftXMVsVSfo+l6pIl66/zaUNQcLB0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=skrXokXU853by9KIxiQ1XE+7kJzWJPULPDhjtrS85esV5tjD07Ns4Vl6P8WVskMsDN5l4gTm2nFidAPHqdBPkXN6kNIRmQfBED6v+W0roNcO+q6GsjzNHCrfix0GAPBawgdZvEgLENdmcWJoF4W7F5qPp9I1aQ98xd1gGxzVHJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=VDXy9l2Z; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1741007328; x=1772543328;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ijLS6/7VoNS5QgB9vq9v8BcogTKboYMwaB+vjiqquWQ=;
+  b=VDXy9l2Zu9p7ohCfcZOJ9vRCae8CYq5vvLUv2tRSBLYo/HiW4psz9Qkt
+   Mj4PXQyj+5BMd4fycVb6Sh9agQrNpbk+ny4LNPm3Jppv5/7jNmT0X9ij9
+   weYDqRtNq3BFdhg+qqx02E5nEY2tKj1uBRet1M/l5/HYx06yPQXyUyluO
+   g=;
+X-IronPort-AV: E=Sophos;i="6.13,329,1732579200"; 
+   d="scan'208";a="382575094"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 13:08:46 +0000
+Received: from EX19MTAEUB002.ant.amazon.com [10.0.43.254:35314]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.24.106:2525] with esmtp (Farcaster)
+ id c10353bf-5d23-44b0-9a7e-a591baedecbb; Mon, 3 Mar 2025 13:08:44 +0000 (UTC)
+X-Farcaster-Flow-ID: c10353bf-5d23-44b0-9a7e-a591baedecbb
+Received: from EX19D015EUB003.ant.amazon.com (10.252.51.113) by
+ EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 3 Mar 2025 13:08:40 +0000
+Received: from EX19MTAUEA002.ant.amazon.com (10.252.134.9) by
+ EX19D015EUB003.ant.amazon.com (10.252.51.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 3 Mar 2025 13:08:40 +0000
+Received: from email-imr-corp-prod-iad-all-1b-3ae3de11.us-east-1.amazon.com
+ (10.43.8.2) by mail-relay.amazon.com (10.252.134.34) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
+ 15.2.1544.14 via Frontend Transport; Mon, 3 Mar 2025 13:08:40 +0000
+Received: from dev-dsk-kalyazin-1a-a12e27e2.eu-west-1.amazon.com (dev-dsk-kalyazin-1a-a12e27e2.eu-west-1.amazon.com [172.19.103.116])
+	by email-imr-corp-prod-iad-all-1b-3ae3de11.us-east-1.amazon.com (Postfix) with ESMTPS id E2BB7A065C;
+	Mon,  3 Mar 2025 13:08:38 +0000 (UTC)
+From: Nikita Kalyazin <kalyazin@amazon.com>
+To: <pbonzini@redhat.com>, <shuah@kernel.org>
+CC: <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <michael.day@amd.com>, <david@redhat.com>,
+	<quic_eberman@quicinc.com>, <jthoughton@google.com>, <brijesh.singh@amd.com>,
+	<michael.roth@amd.com>, <graf@amazon.de>, <jgowans@amazon.com>,
+	<roypat@amazon.co.uk>, <derekmn@amazon.com>, <nsaenz@amazon.es>,
+	<xmarcalx@amazon.com>, <kalyazin@amazon.com>
+Subject: [v3 PATCH 0/2] KVM: guest_memfd: use write for population
+Date: Mon, 3 Mar 2025 13:08:36 +0000
+Message-ID: <20250303130838.28812-1-kalyazin@amazon.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <202503021436.STomlZOE-lkp@intel.com>
-In-Reply-To: <202503021436.STomlZOE-lkp@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 3 Mar 2025 13:07:18 +0100
-X-Gm-Features: AQ5f1JoWiKKm2LeQHKrPeE63Zh1-iaGQM-Bm15TiuDzT9_6uJl3yL4GkD6PHv6U
-Message-ID: <CABgObfYnELV3FjMgZRASi4p6Hmp67yBLJngyLWbbp23czhHFFA@mail.gmail.com>
-Subject: Re: [kvm:kvm-coco-queue 20/127] ERROR: modpost: "enable_tdx"
- [arch/x86/kvm/kvm-intel.ko] undefined!
-To: kernel test robot <lkp@intel.com>
-Cc: Isaku Yamahata <isaku.yamahata@intel.com>, llvm@lists.linux.dev, 
-	oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org, 
-	Farrah Chen <farrah.chen@intel.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On Sun, Mar 2, 2025 at 7:25=E2=80=AFAM kernel test robot <lkp@intel.com> wr=
-ote:
->
-> tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git kvm-coco-queue
-> head:   9fe4541afcfad987d39790f0a40527af190bf0dd
-> commit: a58e01fec9ad144302cd8dfc0b6524315cdb2883 [20/127] KVM: TDX: Add p=
-laceholders for TDX VM/vCPU structures
-> config: x86_64-randconfig-077-20250302 (https://download.01.org/0day-ci/a=
-rchive/20250302/202503021436.STomlZOE-lkp@intel.com/config)
-> compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd70=
-8029e0b2869e80abe31ddb175f7c35361f90)
-> reproduce (this is a W=3D1 build): (https://download.01.org/0day-ci/archi=
-ve/20250302/202503021436.STomlZOE-lkp@intel.com/reproduce)
->
-> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
-ion of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202503021436.STomlZOE-lkp=
-@intel.com/
->
-> All errors (new ones prefixed by >>, old ones prefixed by <<):
->
-> >> ERROR: modpost: "enable_tdx" [arch/x86/kvm/kvm-intel.ko] undefined!
-> ERROR: modpost: "tdx_cleanup" [arch/x86/kvm/kvm-intel.ko] undefined!
-> ERROR: modpost: "tdx_bringup" [arch/x86/kvm/kvm-intel.ko] undefined!
+This series is rebased on top of Fuad's v4 for shared mapping of
+guest_memfd [1].
 
-All these failures are solved the same way, just
+Change since v2 [2]:
+ - David/Mike D: Only compile support for the write syscall if
+   CONFIG_KVM_GMEM_SHARED_MEM introduced in [1] is enabled.
 
-diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-index fc013c8816f1..e8a3657d716e 100644
---- a/arch/x86/kvm/vmx/tdx.h
-+++ b/arch/x86/kvm/vmx/tdx.h
-@@ -2,7 +2,7 @@
- #ifndef __KVM_X86_VMX_TDX_H
- #define __KVM_X86_VMX_TDX_H
+In non-CoCo use cases where the host can access guest memory,
+guest_memfd can be allocated and populated via the write syscall.  Even
+though the same can also be achieved via userspace mapping and memcpy
+from userspace, write provides a more performant option because it 1)
+avoids double initialisation as the kernel does not need to zero pages
+and 2) does not require setting up page tables.
 
--#ifdef CONFIG_INTEL_TDX_HOST
-+#ifdef CONFIG_KVM_INTEL_TDX
- int tdx_bringup(void);
- void tdx_cleanup(void);
+Nikita
 
-Will apply to kvm-coco-queue.
+[1] https://lore.kernel.org/kvm/20250218172500.807733-4-tabba@google.com/T/
+[2] https://lore.kernel.org/kvm/20241129123929.64790-1-kalyazin@amazon.com/T/
 
-Paolo
+Nikita Kalyazin (2):
+  KVM: guest_memfd: add generic population via write
+  KVM: selftests: update guest_memfd write tests
+
+ .../testing/selftests/kvm/guest_memfd_test.c  | 85 +++++++++++++++--
+ virt/kvm/guest_memfd.c                        | 94 ++++++++++++++++++-
+ 2 files changed, 170 insertions(+), 9 deletions(-)
+
+
+base-commit: 005f6404708d430abab7fab9b422d0daf6e0c2fe
+-- 
+2.47.1
 
 
