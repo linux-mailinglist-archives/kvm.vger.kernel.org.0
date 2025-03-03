@@ -1,184 +1,149 @@
-Return-Path: <kvm+bounces-39889-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39890-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94E40A4C42D
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 16:06:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13120A4C436
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 16:07:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09DB03A84AC
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 15:05:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D2AD3A93FB
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 15:06:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7436A213248;
-	Mon,  3 Mar 2025 15:05:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D11E621421D;
+	Mon,  3 Mar 2025 15:06:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mWZCP8MB"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76DAA156F5E;
-	Mon,  3 Mar 2025 15:05:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C0AE214213
+	for <kvm@vger.kernel.org>; Mon,  3 Mar 2025 15:06:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741014336; cv=none; b=jPpMJgwnTHbMnmg/xyLaq/HtfPqy6Fu2CpEh7R7A1tWJN41FsC9S7F6K7/l5UndB7KDRQr4jvbQLZrw2KE2na6yhvLC9ZjynzFSb3Fy4R3GvB3ZVwIAybDWAfMjXhQYxZMReMvNYb3vnT9mk1SPMArm8Z0lxK5VJB+mW/b4MUg0=
+	t=1741014375; cv=none; b=RS2gogHP6009hd16otVKpaCpIxTk97XNW1lvwkALfLtpCJa1lsxq+817Hi4CgU7YuGbypJFBVwSwgfjUTdbIe6RP8M5kUlnLc+uGmVYzetaKpPqRkFrigi7SaIjMWbosqYn7+uHld1AO43W6sF5vokVe1glsdQ+XXu9BW7s80gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741014336; c=relaxed/simple;
-	bh=1sFtJ7G8T2gULGkEX+wJ+5Cx5/yoOS5AhTqUPY1T+Bo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q+xtorC5cS2MDgfIbcLASFqyN2u3J4vISn/4wjtHQH2BdPOebZmV2m2cYF/ZGd3DnGW5Jft9r0dnDJ32rVUhUa7i9GWEoKLnmy5ioCzqh4wbAt3OL9fiZtLq4Lob3zLdTN9ScZfc4pcPxztfpYHASSw1W8dmtcFWIcOSgPKrD1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BE735106F;
-	Mon,  3 Mar 2025 07:05:47 -0800 (PST)
-Received: from [10.1.39.33] (e122027.cambridge.arm.com [10.1.39.33])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AE1793F5A1;
-	Mon,  3 Mar 2025 07:05:29 -0800 (PST)
-Message-ID: <59f84354-e890-48c8-ba06-87dda471f364@arm.com>
-Date: Mon, 3 Mar 2025 15:05:25 +0000
+	s=arc-20240116; t=1741014375; c=relaxed/simple;
+	bh=P9F1ofeYrCy0v/tXEp86XKR4kq6FqY1je5tQrslWrMw=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=EJ5iu0YXJNoZG1J3BET8mgu+T3yONC54UeSXq5f8todc+FXz0jj2ByZFs6VwrywM9AJUJhleKsqSBTgu/1GimZVjyEI3bMNgdMfetxxU/aaMWaHMtW/lAUkfiVjVNjjfFO93PxxfvSXb7sYOiq3hZKo/FmLlp+SktSQYNZS0bts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--derkling.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mWZCP8MB; arc=none smtp.client-ip=209.85.128.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--derkling.bounces.google.com
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4394c489babso25501065e9.1
+        for <kvm@vger.kernel.org>; Mon, 03 Mar 2025 07:06:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741014371; x=1741619171; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=RDvNDSBHwWtbzP2LN4FrATbN6y8fQnYjZO4RYaZIKfs=;
+        b=mWZCP8MBfdoFBfGai6cClbCLNUNo0smjyWA5IriDHlBKye375ROh7xFRukdMODFiLq
+         dbZ1oI8eo6jd0N08P/NIbYxEwKU3tu/pAQ4RsLe7+PvkQQh4u9tsMaTSFxGssaQUxSWh
+         0x34vxTcedXrBah5+wbxb9rq8cLRkcTNXU4ptjeAUsejN3ofYmxYoX5PrrTS5B5Ax31m
+         iBwiEn8CMEtpGmkggLqw9H4fk4qDgjHbVuq+VmM7wMLO/7/ev7+aDO2QrXBxGjPqXHqw
+         lDmFYDdwJdzodn5xWRVInztzlPlIWNQIwZ9IG8HYlnQiPD7i47ie6Rwffy5WN0FFuwJd
+         hI6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741014371; x=1741619171;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RDvNDSBHwWtbzP2LN4FrATbN6y8fQnYjZO4RYaZIKfs=;
+        b=WFGalqJ+C/P26mn3XX+nmiktUyYTRw0bDgTradO8qyYD9TgerYg93OqLUMk5mWYlOh
+         i4rQIAU9t6Lmq6WlXmaEskMwuZPqtGpTidK24xR4G+ZaKDPMAsUggQtHfZ81uKFvLCYD
+         w3gCP6jCJWZxxwbN4C7Ey5bkDRz7vvCNM67etAE7nAW9aaql017nEB7as6+xWogq1X+1
+         5Ruhy+Tyu3mjTGOfBKmc51FcdCT8TERMAcI/ygwZGYam7l8ENK1LZV7cm5bl1P8TIOjZ
+         CVbZUJyKoYu67QBvBiBmoe2v8kuIs8fqg6/FqWL5DmeZSqKwG3dKif6HtbTeQvb4GR8a
+         T7Xg==
+X-Forwarded-Encrypted: i=1; AJvYcCWba2kOfvguEmR81hefSaEkw2ARgHwZqpvNfwXFjdmlNqHhGwprFABsVzU/YpIUBtXeYY4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx19aLwwtJuqap6z1XW47PxlUtumT4K33ZP1uYXx7Aq5vFt8BzD
+	8DkcbkwpGn6VzKB89S/0HCioRKWVr3KGeWNHFFapsCz5QuL7ZraJDk7SypUePj8pEmDh8dNoEmA
+	6I7r+BiZdEw==
+X-Google-Smtp-Source: AGHT+IHoEuw10xjAFK3YffNpBzL0FGxTUI0tpeWG2zIYS0277Gf09Ura44LMHf5llA6zU5CoNjFRM4Oo2iaZhw==
+X-Received: from wmbjh6.prod.google.com ([2002:a05:600c:a086:b0:439:9558:cfae])
+ (user=derkling job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:a48:b0:439:99ab:6178 with SMTP id 5b1f17b1804b1-43ba66da248mr109415265e9.6.1741014369703;
+ Mon, 03 Mar 2025 07:06:09 -0800 (PST)
+Date: Mon,  3 Mar 2025 15:05:56 +0000
+In-Reply-To: 20250303141046.GHZ8W4ZrPEdWA7Hb-b@fat_crate.local
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 05/45] arm64: RME: Add wrappers for RMI calls
-To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20250213161426.102987-1-steven.price@arm.com>
- <20250213161426.102987-6-steven.price@arm.com>
- <8f08b96b-8219-4d51-8f46-bc367bbf2031@redhat.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <8f08b96b-8219-4d51-8f46-bc367bbf2031@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
+Message-ID: <20250303150557.171528-1-derkling@google.com>
+Subject: Re: [PATCH final?] x86/bugs: KVM: Add support for SRSO_MSR_FIX
+From: Patrick Bellasi <derkling@google.com>
+To: Borislav Petkov <bp@alien8.de>
+Cc: Patrick Bellasi <derkling@google.com>, Sean Christopherson <seanjc@google.com>, 
+	Yosry Ahmed <yosry.ahmed@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Josh Poimboeuf <jpoimboe@redhat.com>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Patrick Bellasi <derkling@matbug.net>, Brendan Jackman <jackmanb@google.com>, 
+	David Kaplan <David.Kaplan@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 03/03/2025 03:42, Gavin Shan wrote:
-> On 2/14/25 2:13 AM, Steven Price wrote:
->> The wrappers make the call sites easier to read and deal with the
->> boiler plate of handling the error codes from the RMM.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes from v5:
->>   * Further improve comments
->> Changes from v4:
->>   * Improve comments
->> Changes from v2:
->>   * Make output arguments optional.
->>   * Mask RIPAS value rmi_rtt_read_entry()
->>   * Drop unused rmi_rtt_get_phys()
->> ---
->>   arch/arm64/include/asm/rmi_cmds.h | 508 ++++++++++++++++++++++++++++++
->>   1 file changed, 508 insertions(+)
->>   create mode 100644 arch/arm64/include/asm/rmi_cmds.h
->>
-> 
-> With the following nitpicks addressed:
-> 
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> On Wed, Feb 26, 2025 at 06:45:40PM +0000, Patrick Bellasi wrote:
+> > +
+> > +	case SRSO_CMD_BP_SPEC_REDUCE:
+> > +		if (boot_cpu_has(X86_FEATURE_SRSO_BP_SPEC_REDUCE)) {
+> > +bp_spec_reduce:
+> > +			pr_notice("Reducing speculation to address VM/HV SRSO attack vector.\n");
+>
+> Probably not needed anymore as that will be in srso_strings which is issued
+> later.
 
-Thanks, there were a couple of other pages and params_ptr references
-that I've updated to granules and just 'params' too now. With hindsight
-conflating pages and granules in the earlier versions of this series was
-a big mistake ;)
+Good point, the above can certainly be dropped.
 
-Steve
+> > +			srso_mitigation = SRSO_MITIGATION_BP_SPEC_REDUCE;
+> > +			break;
+> > +		} else {
+> > +			srso_mitigation = SRSO_MITIGATION_BP_SPEC_REDUCE_NA;
+> > +			pr_warn("BP_SPEC_REDUCE not supported!\n");
+> > +		}
+> 
+> This is the part I'm worried about: user hears somewhere "bp-spec-reduce" is
+> faster, sets it but doesn't know whether the hw even supports it. Machine
+> boots, warns which is a single line and waaay buried in dmesg and continues
+> unmitigated.
 
->> diff --git a/arch/arm64/include/asm/rmi_cmds.h b/arch/arm64/include/
->> asm/rmi_cmds.h
->> new file mode 100644
->> index 000000000000..043b7ff278ee
->> --- /dev/null
->> +++ b/arch/arm64/include/asm/rmi_cmds.h
->> @@ -0,0 +1,508 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +/*
->> + * Copyright (C) 2023 ARM Ltd.
->> + */
->> +
->> +#ifndef __ASM_RMI_CMDS_H
->> +#define __ASM_RMI_CMDS_H
->> +
-> 
-> [...]
-> 
->> +
->> +/**
->> + * rmi_rec_aux_count() - Get number of auxiliary granules required
->> + * @rd: PA of the RD
->> + * @aux_count: Number of pages written to this pointer
->                   ^^^^^^^^^^^^^^^
->                   Number of granules
->> + *
->> + * A REC may require extra auxiliary pages to be delegated for the
->> RMM to
->                                         ^^^^^
->                                         granules
-> 
->> + * store metadata (not visible to the normal world) in. This function
->> provides
->> + * the number of pages that are required.
->                     ^^^^^
->                     granules
->> + *
->> + * Return: RMI return code
->> + */
->> +static inline int rmi_rec_aux_count(unsigned long rd, unsigned long
->> *aux_count)
->> +{
->> +    struct arm_smccc_res res;
->> +
->> +    arm_smccc_1_1_invoke(SMC_RMI_REC_AUX_COUNT, rd, &res);
->> +
->> +    if (aux_count)
->> +        *aux_count = res.a1;
->> +    return res.a0;
->> +}
->> +
->> +/**
->> + * rmi_rec_create() - Create a REC
->> + * @rd: PA of the RD
->> + * @rec: PA of the target REC
->> + * @params_ptr: PA of REC parameters
->> + *
->> + * Create a REC using the parameters specified in the struct
->> rec_params pointed
->> + * to by @params_ptr.
->> + *
->> + * Return: RMI return code
->> + */
->> +static inline int rmi_rec_create(unsigned long rd, unsigned long rec,
->> +                 unsigned long params_ptr)
->> +{
->> +    struct arm_smccc_res res;
->> +
->> +    arm_smccc_1_1_invoke(SMC_RMI_REC_CREATE, rd, rec, params_ptr, &res);
->> +
->> +    return res.a0;
->> +}
->> +
-> 
-> 'params_ptr' may be renamed to 'params'.
-> 
-> 
-> [...]
->> +#endif /* __ASM_RMI_CMDS_H */
-> 
-> Thanks,
-> Gavin
-> 
+That's why we are also going to detect this cases and set
+SRSO_MITIGATION_BP_SPEC_REDUCE_NA, so that we get a:
 
+  "Vulnerable: Reduced Speculation, not available"
+
+from vulnerabilities/spec_rstack_overflow, which should be the only place users
+look for to assess the effective mitigation posture, ins't it?
+
+> So *maybe* we can make this a lot more subtle and say:
+> 
+> srso=__dont_fall_back_to_ibpb_on_vmexit_if_bp_spec_reduce__
+> 
+> (joking about the name but that should be the gist of what it means)
+
+I can think about it, but this seems something different than the common
+practice, i.e. specify at cmdline what you want and be prepares on possibly
+not to get it.
+
+> and then act accordingly when that is specified along with a big fat:
+> 
+> WARN_ON(..."You should not use this as a mitigation option if you don't know
+> what you're doing")
+> 
+> along with a big fat splat in dmesg.
+> 
+> Hmmm...?
+
+After all the above already happens, e.g. if we ask for ibpb-vmexit but the
+machine has not the ucode. In this case we still have to check the
+vulnerabilities report to know that we are:
+
+  "Vulnerable: No microcode"
+
+--
+#include <best/regards.h>
+
+Patrick Bellasi (derkling@)
 
