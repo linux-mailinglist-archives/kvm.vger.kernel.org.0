@@ -1,197 +1,177 @@
-Return-Path: <kvm+bounces-39918-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39919-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E421A4CB6B
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 19:55:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16F5EA4CBAC
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 20:12:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A08B1897825
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 18:55:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 504D33A6E24
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 19:12:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEAE52356AE;
-	Mon,  3 Mar 2025 18:53:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59BB7230BFB;
+	Mon,  3 Mar 2025 19:12:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1sDF35VW"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BCFVJpif"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7525B22DFAF
-	for <kvm@vger.kernel.org>; Mon,  3 Mar 2025 18:53:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D467D33F6;
+	Mon,  3 Mar 2025 19:12:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741028018; cv=none; b=WbC2/YdmWdsw+mfyW6Oxf8ec0Nk2J+ACMPpVHl7UJSrP6jJ8r9Re5e0W1oLambAe4Xn/F3+PGniIDhl6n2hZXbFRbH7s+5ylqSWeYwGQts4HIsJC2oFCyWlG06CDjkvteAYJ5J7EyJPGRwlOUBTC7uRaQukQbQ3tHQglDD+bvrs=
+	t=1741029125; cv=none; b=LNjqQ3yRczVQSPL5Tt6Y69jfeCJZijeR9VILJErPkeSmgJKg+aOixR5H7X7wjq/oELTNLbCfoxib9wNrvYqVYKRQggq+VDGxJ7tr78pOalIxGWG3o15Xo4viEDBGJ/qEIhHoXKHVjtodZyhIc0EYojTifw+HF11OTwSeBLiXQb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741028018; c=relaxed/simple;
-	bh=eyW4uvAiKZw6iNEDEnhVcsa7Mr/hVjNJlE3N7IMkQe0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Vi1y91xZf6/YpPtezBoseyKuxzqp/4MNrgQJ2GxO2bKmMMDcKka/6ZmOu4lMq0tXojIhDzzTxeM3W/A1ibN+WfMm1kz3ptI+rl+exSuVu1xv+nM4CyuOI0xAAc7v4mSXQnapifAxL6n+SKlfPM50NREA3sCqthO+qT4F8A7SYTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1sDF35VW; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-22356964533so67309285ad.3
-        for <kvm@vger.kernel.org>; Mon, 03 Mar 2025 10:53:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741028015; x=1741632815; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6r9/NFesFUoIvHadBrGFJSc8h4PL3K25ceD37Tn3zwo=;
-        b=1sDF35VWjjOhCMn2db6tJGNhJLGAQj+teW4yazDnHpTs27dntJvakz9FqtqvV/P/jH
-         ArzCl6osFI7YbiIn0nAtjNwj60a44yvQY2ep9XnCUvMf6uyitQubo3SrkURljaE/o0z3
-         UFgItotiQUXkzUgpfF0tQu7hAwwP4silF6+xCZV+Rv2PC+MeRiz4zvYIorV5vmpe+ckg
-         2cYT63RfM0aM7M9cScI9Rj+j9+aej5j1n+aTkdlxOal0AZhVDzFi5ipymk24enej07NG
-         j6VFW2pHykeF4tDAfdpVGTMXtkWFL0S5/w9soqkhDi+AHbei21m13wPGpaLlPQGla5mv
-         0YCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741028015; x=1741632815;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=6r9/NFesFUoIvHadBrGFJSc8h4PL3K25ceD37Tn3zwo=;
-        b=i2fjbuicdwSqvpCWNzPHdNRlgLB1PIlJ2zrRmMGbbl11l5iL6GoXB35Biinuy7IdSq
-         gGZDMdy4wQOdFyvt/2Gcf1bUUTMD0nHvOpXC9rDuTyaQKVuTRE5BGVH+5xdsUVCnBwPv
-         2CliIFOkYbkJ42N/GOCIXvWlMUGQIwUa533DI+6Lc+uQR+yXTKgVTc0JE5bkfkAJnAJu
-         Tp+f3v+sWW+5+g4lydUvkO1AIg2CavMKvvJPdLwmBd3nldxo0DRHgKAILOcKkHZi+sAF
-         PATFeSjG3V1RgYDNI2ucPEz5BtgI5irJbXm/0bpT0cK3EW7H6BkMquSZNp7ekrxPa7UL
-         BKoA==
-X-Forwarded-Encrypted: i=1; AJvYcCWKGUdTrgGOlvFbYV8L4d4WssVumOq4mwxwJ+eNtro+F6HsEeQ/s/lSEhmFHrYkMD9qyQ0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxj6booWdibb/JJxOAzgsmqSR5oix085failnjb+c0SwUHUj3EJ
-	QohFeCFTo3cRoYPD0UOdwT61g6ZZ3eYThYxJP+dA8ODQoaoRcwmg7p1tO7DS4AJvo1g7HmfMvf1
-	XlA==
-X-Google-Smtp-Source: AGHT+IGWjx3WHsPRnBz65sq3hR/Pz6bpJVGezrEQ1CdrZWFRxr60xiXoBSKFm6ZFcrNN6JHU7+cWkAXveL8=
-X-Received: from pfbhm10.prod.google.com ([2002:a05:6a00:670a:b0:736:38eb:5869])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:b95:b0:736:53ef:a04e
- with SMTP id d2e1a72fcca58-73653efa732mr6458527b3a.22.1741028015671; Mon, 03
- Mar 2025 10:53:35 -0800 (PST)
-Date: Mon, 3 Mar 2025 10:53:34 -0800
-In-Reply-To: <CALMp9eSGRLMj-a_ZrzzeLx_jgAea13-to=ZPHu3F+trQq28YjA@mail.gmail.com>
+	s=arc-20240116; t=1741029125; c=relaxed/simple;
+	bh=HRBDb/01Aoz/Xbn/HWrMNCNs4hJQ+oaS+r2C1Bxu8ag=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gzACzu4bttGroADCgUlrS+B/F1xBxNvkqzR9jZ6muhTTnXmfFs95Aiy/J7l1xPjqlnZZRXWJlEvZreGEnPH1KnJZNmjhGNwAOWD/FAx2mE2Q6ZR46vrA1ue/cS5GQPZrh/qU4ATGA8kL901JSYZ5GwDfr2Z8T8HOoz0sLwE6DiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=BCFVJpif; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 523F53EF002272;
+	Mon, 3 Mar 2025 19:12:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=KkerPnmZLypqnbkqHWCG8ODSVofP4Dm6qZuF15VXw
+	wM=; b=BCFVJpif0WlvB3nW+oj9FIMUJYaC9bRP1TSJsrlGw8VqnZ1P2FAQEeEgs
+	+Nu+NRXs4pheNsTyQ9fVIr37FRtJvpHejtncuS5XDNY91XHSAZ2tcy7m9Bp9AupJ
+	X8DTd/RQGklxA3KaG1NPaE/PKjiybsmEkXHU1CbouP8uW+W+wU9RcQaimvJHTETJ
+	nLVMo5L9jtuwv6e+Bre7C+Goi8aXiLadJjSECbsLDTkPTa2Kq2I+btYUlDY60BKS
+	awWWaw6xFFsIZJ3qk3gV4aD9RvgmDii5Rupp1bbtUdBDpAr/S4wn8Qd2fiFkHEuX
+	OXb46BSJt9EYRqaCVZsQ/bOiLw06w==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 454xr4x6eh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 03 Mar 2025 19:12:01 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 523G8lsD020845;
+	Mon, 3 Mar 2025 19:12:00 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 454djn9k6g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 03 Mar 2025 19:12:00 +0000
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 523JBxi931326774
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 3 Mar 2025 19:11:59 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 95B3758052;
+	Mon,  3 Mar 2025 19:11:59 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C9B195805D;
+	Mon,  3 Mar 2025 19:11:58 +0000 (GMT)
+Received: from MacBookPro.ibm.com (unknown [9.61.240.87])
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  3 Mar 2025 19:11:58 +0000 (GMT)
+From: Rorie Reyes <rreyes@linux.ibm.com>
+To: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc: hca@linux.ibm.com, borntraeger@de.ibm.com, agordeev@linux.ibm.com,
+        gor@linux.ibm.com, pasic@linux.ibm.com, jjherne@linux.ibm.com,
+        alex.williamson@redhat.com, akrowiak@linux.ibm.com,
+        rreyes@linux.ibm.com
+Subject: [RFC PATCH v1] fixup! s390/vfio-ap: Notify userspace that guest's AP config changed when mdev removed
+Date: Mon,  3 Mar 2025 14:11:58 -0500
+Message-ID: <20250303191158.49317-1-rreyes@linux.ibm.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250205182402.2147495-1-yosry.ahmed@linux.dev>
- <20250205182402.2147495-2-yosry.ahmed@linux.dev> <Z8JOvMx6iLexT3pK@google.com>
- <CALMp9eSGRLMj-a_ZrzzeLx_jgAea13-to=ZPHu3F+trQq28YjA@mail.gmail.com>
-Message-ID: <Z8X6rtIwlTtu5rHx@google.com>
-Subject: Re: [RFC PATCH 01/13] KVM: nSVM: Track the ASID per-VMCB
-From: Sean Christopherson <seanjc@google.com>
-To: Jim Mattson <jmattson@google.com>
-Cc: Yosry Ahmed <yosry.ahmed@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: mtees-123PRKTcihCHVDAVpovJQdXesc
+X-Proofpoint-ORIG-GUID: mtees-123PRKTcihCHVDAVpovJQdXesc
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-03_09,2025-03-03_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ priorityscore=1501 lowpriorityscore=0 clxscore=1015 bulkscore=0
+ adultscore=0 suspectscore=0 phishscore=0 spamscore=0 impostorscore=0
+ malwarescore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502100000 definitions=main-2503030144
 
-On Mon, Mar 03, 2025, Jim Mattson wrote:
-> On Fri, Feb 28, 2025 at 4:03=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> >
-> > +Jim, for his input on VPIDs.
-> >
-> > On Wed, Feb 05, 2025, Yosry Ahmed wrote:
-> > > The ASID is currently tracked per-vCPU, because the same ASID is used=
- by
-> > > L1 and L2. That ASID is flushed on every transition between L1 and L2=
-.
-> > >
-> > > Track the ASID separately for each VMCB (similar to the
-> > > asid_generation), giving L2 a separate ASID. This is in preparation f=
-or
-> > > doing fine-grained TLB flushes on nested transitions instead of
-> > > unconditional full flushes.
-> >
-> > After having some time to think about this, rather than track ASIDs per=
- VMCB, I
-> > think we should converge on a single approach for nVMX (VPID) and nSVM =
-(ASID).
-> >
-> > Per **VM**, one VPID/ASID for L1, and one VPID/ASID for L2.
->=20
-> When using EPT on VMX, there is probably no advantage to using one
-> VPID per VM. The physical ASID is determined by <EPTRTA, VPID, PCID>.
-> Two different VMs are not going to share an EPTRTA, so they already
-> have different ASIDs, even if they have the same VPID.
+This patch is based on the s390/features branch
 
-For posterity, which the SDM says this:
+The guest's AP configuration is cleared when the mdev is removed, so
+userspace must be notified that the AP configuration has changed. To this
+end, this patch:
 
-  Linear mappings may be created. They are derived from the paging structur=
-es
-  referenced (directly or indirectly) by the current value of CR3 and are a=
-ssociated
-  with the current VPID and the current PCID.
+* Removes call to 'signal_guest_ap_cfg_changed()' function from the
+  'vfio_ap_mdev_unset_kvm()' function because it has no affect given it is
+  called after the mdev fd is closed.
 
-it explicitly disallows creating or using linear mappings when EPT is enabl=
-ed:
+* Adds call to 'signal_guest_ap_cfg_changed()' function to the
+  'vfio_ap_mdev_request()' function to notify userspace that the guest's
+  AP configuration has changed before signaling the request to remove the
+  mdev.
 
-  No linear mappings are created while EPT is in use.
+Minor change - Fixed an indentation issue in function
+'signal_guest_ap_cfg_changed()'
 
-  no linear mappings are used while EPT is in use.
+Fixes: 2ba4410dd477 ("s390/vfio-ap: Signal eventfd when guest AP configuration is changed")
+Signed-off-by: Rorie Reyes <rreyes@linux.ibm.com>
+---
+ drivers/s390/crypto/vfio_ap_ops.c | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
 
-I think it's still worth assigning a unique VPID though, e.g. it would prov=
-ide
-some amount of defense in depth.  I.e. two different VMs *shouldn't* share =
-an
-EPTRTA :-)
+diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+index 571f5dcb49c5..c1afac5ac555 100644
+--- a/drivers/s390/crypto/vfio_ap_ops.c
++++ b/drivers/s390/crypto/vfio_ap_ops.c
+@@ -652,8 +652,8 @@ static void vfio_ap_matrix_init(struct ap_config_info *info,
+ 
+ static void signal_guest_ap_cfg_changed(struct ap_matrix_mdev *matrix_mdev)
+ {
+-		if (matrix_mdev->cfg_chg_trigger)
+-			eventfd_signal(matrix_mdev->cfg_chg_trigger);
++	if (matrix_mdev->cfg_chg_trigger)
++		eventfd_signal(matrix_mdev->cfg_chg_trigger);
+ }
+ 
+ static void vfio_ap_mdev_update_guest_apcb(struct ap_matrix_mdev *matrix_mdev)
+@@ -1870,7 +1870,6 @@ static void vfio_ap_mdev_unset_kvm(struct ap_matrix_mdev *matrix_mdev)
+ 		get_update_locks_for_kvm(kvm);
+ 
+ 		kvm_arch_crypto_clear_masks(kvm);
+-		signal_guest_ap_cfg_changed(matrix_mdev);
+ 		vfio_ap_mdev_reset_queues(matrix_mdev);
+ 		kvm_put_kvm(kvm);
+ 		matrix_mdev->kvm = NULL;
+@@ -2057,6 +2056,14 @@ static void vfio_ap_mdev_request(struct vfio_device *vdev, unsigned int count)
+ 
+ 	matrix_mdev = container_of(vdev, struct ap_matrix_mdev, vdev);
+ 
++	if (matrix_mdev->kvm) {
++		get_update_locks_for_kvm(matrix_mdev->kvm);
++		kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
++		signal_guest_ap_cfg_changed(matrix_mdev);
++	} else {
++		mutex_lock(&matrix_dev->mdevs_lock);
++	}
++
+ 	if (matrix_mdev->req_trigger) {
+ 		if (!(count % 10))
+ 			dev_notice_ratelimited(dev,
+@@ -2068,6 +2075,12 @@ static void vfio_ap_mdev_request(struct vfio_device *vdev, unsigned int count)
+ 		dev_notice(dev,
+ 			   "No device request registered, blocked until released by user\n");
+ 	}
++
++	if (matrix_mdev->kvm)
++		release_update_locks_for_kvm(matrix_mdev->kvm);
++	else
++		mutex_unlock(&matrix_dev->mdevs_lock);
++
+ }
+ 
+ static int vfio_ap_mdev_get_device_info(unsigned long arg)
+-- 
+2.48.1
 
-> > For SVM, the dynamic ASID crud is a holdover from KVM's support for CPU=
-s that
-> > don't support FLUSHBYASID, i.e. needed to purge the entire TLB in order=
- to flush
-> > guest mappings.  FLUSHBYASID was added in 2010, and AFAIK has been supp=
-orted by
-> > all AMD CPUs since.
->=20
-> > KVM already mostly keeps the same ASID, except for when a vCPU is migra=
-ted, in
-> > which case KVM assigns a new ASID.  I suspect that following VMX's lead=
- and
-> > simply doing a TLB flush in this situation would be an improvement for =
-modern
-> > CPUs, as it would flush the entries that need to be flushed, and not po=
-llute the
-> > TLBs with stale, unused entries.
-> >
-> > Using a static per-VM ASID would also allow using broadcast invalidatio=
-ns[*],
-> > would simplify the SVM code base, and I think/hope would allow us to mo=
-ve much
-> > of the TLB flushing logic, e.g. for task migration, to common code.
-> >
-> > For VPIDs, maybe it's because it's Friday afternoon, but for the life o=
-f me I
-> > can't think of any reason why KVM needs to assign VPIDs per vCPU.  Espe=
-cially
-> > since KVM is ridiculously conservative and flushes _all_ EPT/VPID conte=
-xts when
-> > running a different vCPU on a pCPU (which I suspect we can trim down?).
-> >
-> > Am I forgetting something?
->=20
-> TDX? IIRC, TDX requires a unique VPID for each vCPU in a VM.
-
-Ha!  Nope, the TDX module actually does what I'm suggesting, and uses a per=
--VM
-VPID.  So if I'm forgetting some TLB edge case, TDX is already hosed.
-
-FWIW, the hypervisor, i.e. KVM, has no control over the VPID used by the TD=
-X
-module.  Intel incorporated SEAM mode into the ASID tag to prevent TLB coll=
-isions
-between the hypervisor and the TDX module, and that also conveniently provi=
-des
-separation between VPIDs for non-TDX VMs and TDX VMs (and now I'm curious i=
-f TDX
-enabling does the "right" thing and skips VPID allocation).
-
-FWIW, TDX's scheme would match what I'm proposing almost exactly.  TDX "com=
-poses"
-the VPID using the HKID (guaranteed unique per VM) and then a "VM identifie=
-r",
-which at a glance differentiates L1 from L2.
-
-> > [*] https://lore.kernel.org/all/Z8HdBg3wj8M7a4ts@google.com
 
