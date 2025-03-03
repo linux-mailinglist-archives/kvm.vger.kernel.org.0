@@ -1,132 +1,262 @@
-Return-Path: <kvm+bounces-39863-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39864-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DC6FA4B9FF
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 09:56:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9A9AA4BA29
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 10:00:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D0DB1893726
-	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 08:56:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B70A7A240A
+	for <lists+kvm@lfdr.de>; Mon,  3 Mar 2025 08:58:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C29571F4168;
-	Mon,  3 Mar 2025 08:53:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F34801EFFA9;
+	Mon,  3 Mar 2025 08:58:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KYjlLeYW"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="B8CnYRgD";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="8rEpUTS9";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="B8CnYRgD";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="8rEpUTS9"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DAD61F3FF3
-	for <kvm@vger.kernel.org>; Mon,  3 Mar 2025 08:52:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26EDF1F03E0
+	for <kvm@vger.kernel.org>; Mon,  3 Mar 2025 08:58:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740991981; cv=none; b=OYYbUZ6q6UtV51lUuA2zKAGI7C3+laMEuNnPAUrrq7fsbxjBlNBZzIDEtNYxVNY60wqhuilt86VIjDtuAqqRVAzv4BNENvNGM0bRX6PtM/ihz11OtrhfjsDvLfZ6AJzahN9mXQJdaQjasD5alHHr0GTmZF2XoUXMKCHfPdiw5UM=
+	t=1740992336; cv=none; b=g/ofdmEdhp6MSTt4M0JtfQSjO0PGlnkt/5vb5mN+bTq563rTEUo7QBG4VpaMzAa1kcgh309osAbdqiRqHlD1zbMCjXUkecJsOLVlreI82YCQXaW4Ob77d3Kn9MCQhXFXDXOwz0ddfBWJa4PT+UdFmgFDTOxXO5EK7R/r99NITJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740991981; c=relaxed/simple;
-	bh=7BJ75VnqDYEbE9e13G+MCHppvDrRT82moH7VLX3ZmAQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=il9mobRNhrvMHZXSEHmBSe5JF5U58Q60D9ghabyKlC1GsG11nlHudrVIPZqt4jEynKYcWLZbvTDEK2pfnvqX1tCUnzcTkpmPYR6cQlzrrx760K88UJAWL7UVLGzNnLr1f/0HXvMHn/9/j4Rhs31wsTUHWPOagBN3HFqGQs6flRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KYjlLeYW; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740991978;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=x5f0Ge/u6HApn0cHLmrjeezLoP0KdtHv+tljpLM2u/w=;
-	b=KYjlLeYWqKLkKWb6GhI0K+TR6gDip80zFMZgsVxyeEpw1BFCn7V3Pmd/+3j9WsBNxzMS6/
-	rFRfNCfRfJ96IdNeyq+oMWdLbxglSiToc+f8rR8r7z79lxel70bDxAu/OQqniU6kZ/L3/W
-	w3coEpfDeOac8FSQK7JUPF0LdRLl+Is=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-400-IsZul_cCOuK_8Kn6VbhoCQ-1; Mon, 03 Mar 2025 03:52:47 -0500
-X-MC-Unique: IsZul_cCOuK_8Kn6VbhoCQ-1
-X-Mimecast-MFC-AGG-ID: IsZul_cCOuK_8Kn6VbhoCQ_1740991966
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5e4a0d66c69so5196897a12.0
-        for <kvm@vger.kernel.org>; Mon, 03 Mar 2025 00:52:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740991966; x=1741596766;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=x5f0Ge/u6HApn0cHLmrjeezLoP0KdtHv+tljpLM2u/w=;
-        b=wlZaSJIRpXTLYgXaMai0rEEjnVkXCvyezSJ/hsu3wUUaNuEXBNQiCVV3hwXq8XL4dq
-         GC1RBcllrajQCRaYPnPub85v5pBoc6jAq2h0ppLlaap1zXSJR8sf+2+JdVGtwEm2ikyI
-         wFqrVUzevhJM6UGIXyQGnpncFq5TPilUzLTPUDWO9outG0RVx+ddN4Pl2hKuguBLg5ga
-         u6cLJHX4Au0Q6Q+jxLEQQHEiUuO1RAdNk+Tw7xEzWfy/G8VlXhssC6cDUZQB5ksJ0/Ed
-         rjQH4kjMXVrIdhkWx1vBW3AzsngSg0snnmIw/DW6VbelkXAyPNJu0+8ozm8+tXe0lBjv
-         vQMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX8w9hBMg5eWOzb1kyM/efkaLNtzjmwUdx8m6flERGxgTH4uDcBheUbxLSjSsH0bGwqtlU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywdl+ByH0W6jY7Vcgy8IJaXFRjXF0Cz03XzjXUXzd4uWW2evtOf
-	CLyarJ5T2KJj3ARjZFrl05WD3mtHA6BMf/vndl1LYAtEUa+DMdVZ/n6RO32OLDQDkrSsPpm3vy6
-	7Eyj9ivDDjsRCFneujxCP+KHeazLQkgf/XaYQWn28Wy/dmnY4Hw==
-X-Gm-Gg: ASbGncvNrNpbgSpl+ntokxuFM5nW9pfZaFG7df7AtxiWcBDDGSnkGzxhyZJigl8oqf9
-	d2Y0QuLCU0y48xc6ugprNYOfpM4hornaUspjGYk9pAyb5MlUyaNrhCebDHiHFYCzVqq2JWQN2GJ
-	ILiev4BbXEDnkyJfu7zRyjQPxAkEZ497gwthUg0mzCNGtePq7NGvN2tIUHbt76kwEaKenvMIgLZ
-	WD1G6PwbNAEce1MzNITWa7Oti+ov2oyOoSWSq4wMcmTv2C7yER5Lr10v8XuRG+e8MA3R123++5S
-	9C71fgqzucEzNY+MYB1+AR2OSrKE2foifeYMPCWbwN3EarGaniXzu7I6eiEDOgOxH8JPZicF
-X-Received: by 2002:a05:6402:270d:b0:5de:5263:ae79 with SMTP id 4fb4d7f45d1cf-5e4d6adec08mr13660770a12.12.1740991965903;
-        Mon, 03 Mar 2025 00:52:45 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHo44UCmf/nhSiQ3s6omsM4aVzpmAfPARCDmTuHp0dZeSeSv2Z6WHtZA+hKBPUeIaCokWugDw==
-X-Received: by 2002:a05:6402:270d:b0:5de:5263:ae79 with SMTP id 4fb4d7f45d1cf-5e4d6adec08mr13660741a12.12.1740991965384;
-        Mon, 03 Mar 2025 00:52:45 -0800 (PST)
-Received: from localhost.localdomain (host-79-46-200-29.retail.telecomitalia.it. [79.46.200.29])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e4c3fb5927sm6466076a12.53.2025.03.03.00.52.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Mar 2025 00:52:43 -0800 (PST)
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: virtualization@lists.linux.dev
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	kvm@vger.kernel.org,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>
-Subject: [PATCH] vhost: fix VHOST_*_OWNER documentation
-Date: Mon,  3 Mar 2025 09:52:37 +0100
-Message-ID: <20250303085237.19990-1-sgarzare@redhat.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1740992336; c=relaxed/simple;
+	bh=zAf1+BM44wP25cv6hyE2HCECIGSZwz/rO3r4AqVG9Z8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B+EeI3QyMgwMeykXGtFIGU4HCIFq5jTwnWdxgbW+zjk1kbBX0ouwcnzX4LCyKwOnkl/q1L2K0jegqfxYoYIJfQaeLoIC1nZNjvMRZoojx0X9BiXq0oKLEL8ufJkuETpA7oCQN7kkPqkCpbpxGlhsnyiY3o4nnVFiXXdrNIWA5cY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=B8CnYRgD; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=8rEpUTS9; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=B8CnYRgD; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=8rEpUTS9; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 40A462117A;
+	Mon,  3 Mar 2025 08:58:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1740992332; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=aSON7+XnjGfp+c6nCY9Q1Nyp8iCGTByScIrdxR+QXcU=;
+	b=B8CnYRgDFesPnktfWJW3OZH+DNLlQUg2CuQ00iXZpbMajpG2B6/garfUkEbOFCfiflnKmQ
+	A3+srEERN74fzyDoxhcoWqgestuE1o9MPwGpaUA+CQtjoZilWaHrPLVQtl3WrfoZfNM9yS
+	nlDlPu7MeKKtkb9AmeiuqNB69h8Uj7E=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1740992332;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=aSON7+XnjGfp+c6nCY9Q1Nyp8iCGTByScIrdxR+QXcU=;
+	b=8rEpUTS9caaL2Wrykctdl/I1wdPdVYVyRksK83SPToX2ti1iYIu9q/ccAw793D7E9potHg
+	vbRbExkz2osvc3CQ==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=B8CnYRgD;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=8rEpUTS9
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1740992332; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=aSON7+XnjGfp+c6nCY9Q1Nyp8iCGTByScIrdxR+QXcU=;
+	b=B8CnYRgDFesPnktfWJW3OZH+DNLlQUg2CuQ00iXZpbMajpG2B6/garfUkEbOFCfiflnKmQ
+	A3+srEERN74fzyDoxhcoWqgestuE1o9MPwGpaUA+CQtjoZilWaHrPLVQtl3WrfoZfNM9yS
+	nlDlPu7MeKKtkb9AmeiuqNB69h8Uj7E=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1740992332;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=aSON7+XnjGfp+c6nCY9Q1Nyp8iCGTByScIrdxR+QXcU=;
+	b=8rEpUTS9caaL2Wrykctdl/I1wdPdVYVyRksK83SPToX2ti1iYIu9q/ccAw793D7E9potHg
+	vbRbExkz2osvc3CQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0B97913939;
+	Mon,  3 Mar 2025 08:58:52 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id nQCHAkxvxWdXeAAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Mon, 03 Mar 2025 08:58:52 +0000
+Message-ID: <b494af0e-3441-48d4-abc8-df3d5c006935@suse.cz>
+Date: Mon, 3 Mar 2025 09:58:51 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 4/5] KVM: guest_memfd: Enforce NUMA mempolicy using
+ shared policy
+To: Ackerley Tng <ackerleytng@google.com>, Shivank Garg <shivankg@amd.com>
+Cc: akpm@linux-foundation.org, willy@infradead.org, pbonzini@redhat.com,
+ linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-coco@lists.linux.dev, chao.gao@intel.com, seanjc@google.com,
+ david@redhat.com, bharata@amd.com, nikunj@amd.com, michael.day@amd.com,
+ Neeraj.Upadhyay@amd.com, thomas.lendacky@amd.com, michael.roth@amd.com,
+ tabba@google.com
+References: <diqzbjumm167.fsf@ackerleytng-ctop.c.googlers.com>
+Content-Language: en-US
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ EP+ylKVEKb0Q2A==
+In-Reply-To: <diqzbjumm167.fsf@ackerleytng-ctop.c.googlers.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 40A462117A
+X-Spam-Score: -4.51
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	ARC_NA(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.cz:mid,suse.cz:dkim]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-VHOST_OWNER_SET and VHOST_OWNER_RESET are used in the documentation
-instead of VHOST_SET_OWNER and VHOST_RESET_OWNER respectively.
+On 2/28/25 18:25, Ackerley Tng wrote:
+> Shivank Garg <shivankg@amd.com> writes:
+> 
+>> Previously, guest-memfd allocations followed local NUMA node id in absence
+>> of process mempolicy, resulting in arbitrary memory allocation.
+>> Moreover, mbind() couldn't be used since memory wasn't mapped to userspace
+>> in the VMM.
+>>
+>> Enable NUMA policy support by implementing vm_ops for guest-memfd mmap
+>> operation. This allows the VMM to map the memory and use mbind() to set
+>> the desired NUMA policy. The policy is then retrieved via
+>> mpol_shared_policy_lookup() and passed to filemap_grab_folio_mpol() to
+>> ensure that allocations follow the specified memory policy.
+>>
+>> This enables the VMM to control guest memory NUMA placement by calling
+>> mbind() on the mapped memory regions, providing fine-grained control over
+>> guest memory allocation across NUMA nodes.
+>>
+>> The policy change only affect future allocations and does not migrate
+>> existing memory. This matches mbind(2)'s default behavior which affects
+>> only new allocations unless overridden with MPOL_MF_MOVE/MPOL_MF_MOVE_ALL
+>> flags, which are not supported for guest_memfd as it is unmovable.
+>>
+>> Suggested-by: David Hildenbrand <david@redhat.com>
+>> Signed-off-by: Shivank Garg <shivankg@amd.com>
+>> ---
+>>  virt/kvm/guest_memfd.c | 76 +++++++++++++++++++++++++++++++++++++++++-
+>>  1 file changed, 75 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+>> index f18176976ae3..b3a8819117a0 100644
+>> --- a/virt/kvm/guest_memfd.c
+>> +++ b/virt/kvm/guest_memfd.c
+>> @@ -2,6 +2,7 @@
+>>  #include <linux/backing-dev.h>
+>>  #include <linux/falloc.h>
+>>  #include <linux/kvm_host.h>
+>> +#include <linux/mempolicy.h>
+>>  #include <linux/pagemap.h>
+>>  #include <linux/anon_inodes.h>
+>>
+>> @@ -11,8 +12,12 @@ struct kvm_gmem {
+>>  	struct kvm *kvm;
+>>  	struct xarray bindings;
+>>  	struct list_head entry;
+>> +	struct shared_policy policy;
+>>  };
+>>
+> 
+> struct shared_policy should be stored on the inode rather than the file,
+> since the memory policy is a property of the memory (struct inode),
+> rather than a property of how the memory is used for a given VM (struct
+> file).
 
-To avoid confusion, let's use the right names in the documentation.
-No change to the API, only the documentation is involved.
+That makes sense. AFAICS shmem also uses inodes to store policy.
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- include/uapi/linux/vhost.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> When the shared_policy is stored on the inode, intra-host migration [1]
+> will work correctly, since the while the inode will be transferred from
+> one VM (struct kvm) to another, the file (a VM's view/bindings of the
+> memory) will be recreated for the new VM.
+> 
+> I'm thinking of having a patch like this [2] to introduce inodes.
 
-diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-index b95dd84eef2d..d4b3e2ae1314 100644
---- a/include/uapi/linux/vhost.h
-+++ b/include/uapi/linux/vhost.h
-@@ -28,10 +28,10 @@
- 
- /* Set current process as the (exclusive) owner of this file descriptor.  This
-  * must be called before any other vhost command.  Further calls to
-- * VHOST_OWNER_SET fail until VHOST_OWNER_RESET is called. */
-+ * VHOST_SET_OWNER fail until VHOST_RESET_OWNER is called. */
- #define VHOST_SET_OWNER _IO(VHOST_VIRTIO, 0x01)
- /* Give up ownership, and reset the device to default values.
-- * Allows subsequent call to VHOST_OWNER_SET to succeed. */
-+ * Allows subsequent call to VHOST_SET_OWNER to succeed. */
- #define VHOST_RESET_OWNER _IO(VHOST_VIRTIO, 0x02)
- 
- /* Set up/modify memory layout */
--- 
-2.48.1
+shmem has it easier by already having inodes
+
+> With this, we shouldn't need to pass file pointers instead of inode
+> pointers.
+
+Any downsides, besides more work needed? Or is it feasible to do it using
+files now and convert to inodes later?
+
+Feels like something that must have been discussed already, but I don't
+recall specifics.
 
 
