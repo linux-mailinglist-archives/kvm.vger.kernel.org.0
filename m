@@ -1,224 +1,233 @@
-Return-Path: <kvm+bounces-40037-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40038-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF498A4E149
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 15:41:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EBD0A4E182
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 15:45:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6CE75188384A
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 14:36:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A73841894F24
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 14:39:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B01327780E;
-	Tue,  4 Mar 2025 14:33:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B6CB263F44;
+	Tue,  4 Mar 2025 14:36:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="BDaEO87K"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IDxHgb5F"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2078.outbound.protection.outlook.com [40.107.236.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B2472777F4;
-	Tue,  4 Mar 2025 14:33:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.78
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741098827; cv=fail; b=on96T7IC3uWKOx1qww8PwQjiyXwwBIUEWIyP+WBUie2Zgf1MekBjxqTI9AEZN9mQ+HhVTs+3v6had1fdrtJbfdpA3rNV9kSuBBYFO0KiOeN7CZGdlXiGRKgEKnq2fTEY0FNdi2Nv6tNgzV5tTgDhDErbJWvqLnS79+yP0hIwe5E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741098827; c=relaxed/simple;
-	bh=DtdeTnm/DnPRxghYIw11pAPTSjjzWxrGO+cO3POlt+Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=TTqKTcym41jZPb0Qwm3qTgbgL4XGkKVhCql51P8wUdChkwNA3jlj0bcC8yxQbN6crRtS4tv1eIpALrvTYMhRlLTKgreXqazx83ZREn4DTolHOfuCuS+N/oLan0EakM8IVrdVm1/uGCmDg0SJ3froLlWZngn6nbmFgTZt26tw9EI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=BDaEO87K; arc=fail smtp.client-ip=40.107.236.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Mi5BUBRXKXmzkxHp2CgLxkqO4vLimycDHEpKmJmi+KOf2gqjnI+sg0Q2z4TIJPvbTqIbSUNzWZ+lLiWUFd0j052UCyMxDJi+D4LGyOWoBTCLWRQ8I6ubUlMJ1G7j1dl7A6wQ3gxwgcFdQ0Cs7A2iPKoBy9GzstaLmPi0hb12hs4SAiZD2Xg1FsmNfhfyRkIh8I+WEbkWLMCW/YhagB1f3vVAaBh1F07F32uVJLSLrNqcB/FQGgN1HyDLkWeqk9GQFHahgBSi7QBwYmmCqAkT1QLjFGZYVw1qQppSOHp0PFoSpZxhyv/rWAhly13ikavlu4MLCQ0qGLfYyUkRcGCZCw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ToUpnVs6G6hCg56zsofiLUAcEsDA/5fBb5JYeBOdHWU=;
- b=X6p6bmA2kT2cOlLrKRMNCV7RUq5pnt4KyhacAeOz79oi7gUDTIdD4TTvxtCA/t4rt5rYtNOgOKBp6sP4nDtXCpwAJtRCsn7Ry6btxRcCK4TQOnmiPWF2UNdnh/3TiBvZF6M1iGS3ahf9SzPJNYcJaF6fryG3ZPMJPbBqrl+Aw2zh0FxdHY9le1Bp5VYWoFaoYvieUxYfJLqiXZx5Je7goAAQU7HUyySKAa6vLy8lil1uvWdV2APKezFZ6biDWFzGrD6P+taeQd8sHfK+44OsG3PeiuPs1INVdaZIWFal7yoODc/C1dIowwQiKmBNJ9WvnVW1AUcrRWTSiHkAlXxTHA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ToUpnVs6G6hCg56zsofiLUAcEsDA/5fBb5JYeBOdHWU=;
- b=BDaEO87K5S//0+erqIfRk6KQJAWmr9xLwxupmHuAIoYZvZArQ5+0/todZkJIfU8Pjfmjtd3JOpYZznRu/+9ZjB3zDkpLGWOZ6k2oi5etz8czrpVH1H0HjpiIIo4eL755nVh+d4vKU+Kt1sBM8FZ5ekF9fmty2M5C61jpiV27iGpVF/w3PCfCS8MMiPlCuY4e5j22nDJeJM4/XVReaSmLI1rYIrXGCyI00rlnQ7Dfjfqk9wM/NOd7Ta4VfO7Hq2eBHsbWM87FhK+6iq/nvhyo/JNuSWedlm2gTOmIMb0r5TjZ/Ak11zDHjZxIEBh8b19ijk/RmqO1Q7EKb5daKkAuaQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by DS0PR12MB7582.namprd12.prod.outlook.com (2603:10b6:8:13c::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.17; Tue, 4 Mar
- 2025 14:33:40 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.8489.025; Tue, 4 Mar 2025
- 14:33:40 +0000
-Date: Tue, 4 Mar 2025 10:33:39 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>
-Cc: "Kasireddy, Vivek" <vivek.kasireddy@intel.com>,
-	Wei Lin Guay <wguay@meta.com>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	Dag Moxnes <dagmoxnes@meta.com>,
-	"kbusch@kernel.org" <kbusch@kernel.org>,
-	Nicolaas Viljoen <nviljoen@meta.com>,
-	Oded Gabbay <ogabbay@kernel.org>,
-	Simona Vetter <simona.vetter@ffwll.ch>,
-	Leon Romanovsky <leon@kernel.org>, Maor Gottlieb <maorg@nvidia.com>
-Subject: Re: [PATCH 0/4] cover-letter: Allow MMIO regions to be exported
- through dmabuf
-Message-ID: <20250304143339.GM133783@nvidia.com>
-References: <20241216095920.237117-1-wguay@fb.com>
- <IA0PR11MB7185FDD56CFDD0A2B8D21468F83B2@IA0PR11MB7185.namprd11.prod.outlook.com>
- <924671F4-E8B5-4007-BE5D-29ED58B95F46@meta.com>
- <IA0PR11MB71858B2E59D3A9F58CEE83DCF8052@IA0PR11MB7185.namprd11.prod.outlook.com>
- <61DF4F0E-D947-436B-9160-A40079DB9085@meta.com>
- <IA0PR11MB7185E7DBB9E959A2F40D4170F8C22@IA0PR11MB7185.namprd11.prod.outlook.com>
- <20250226133822.GA28425@nvidia.com>
- <0d471fca-b64c-4392-88ee-d26dbfe3cf2d@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0d471fca-b64c-4392-88ee-d26dbfe3cf2d@amd.com>
-X-ClientProxiedBy: BN9P220CA0027.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:408:13e::32) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D415D20FA8B
+	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 14:36:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741099018; cv=none; b=q2FpOI31XE5McyghLinZZ23TeKCwG1sOYFowt43CpiYHlf8LDCdhBfp/zXTteJivwDHKSFT6wa3TjIwUSRFIyxiRKR3EWSWOtHC1bwFQ0Itmr9wSAIiOzJnkObFcYLOF72UvFlQ79rT3AeabVZ5l7kQXwZUYf5GZYXj2cr3rYo4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741099018; c=relaxed/simple;
+	bh=QxDMqoc0xID44HaESYXc7yWWzMeYF/JbxGeoRjff/Jw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qvL5PVVu2rRw+JT4ZUKlPQLlIFC3tfNAbWzpYGUGX6Wi5PYtQov656VBpQcYk19XsHXLPvg0aPIeW83vC/h3C6b771H1UYHugMFWfoT2nbxDvLEFk53KRncyusZqtXJr4glBpcFcz1u5nTDt7zF8lOioFTAKBmXWa3SWsx5wVIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IDxHgb5F; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-474fdb3212aso253071cf.0
+        for <kvm@vger.kernel.org>; Tue, 04 Mar 2025 06:36:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741099016; x=1741703816; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=+ygttRTKf7i4hHwUkxbYRbNGqV7dr+gxLZlkMmtHeME=;
+        b=IDxHgb5Fq814Fk5mrKK7ssmZg3pBd3vW6wJOGN1Uc7DlGTRAWkCGDLXkxHG2Q/+i2r
+         O9DHYa4oOfKrEAjTnqH7oE/H7q0E8c/KvaOFt+17CQ6sRgCH+yGGPvUpsosDVVaxvXJ0
+         seBwQW9P2gBwruypnLH4WWznFhfULPoFNxORAjnRXbwp+6shFVtnkj71WVDB1GQ98ro9
+         Enx5xpZviIKxzmre+yCEe5gIRE1zAlvwYLK/NRllCxcYVFxdRTZTRbwGJ74ijSwzb+ow
+         pmq2wNrLgeHcBUJsjYCI+Yk8vn1YoiDxjSEgU9Xj6FODjYIwiPTdSx5z6kCOMvMnnJGT
+         ajnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741099016; x=1741703816;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+ygttRTKf7i4hHwUkxbYRbNGqV7dr+gxLZlkMmtHeME=;
+        b=ibfg4AzSmcnKlp8hoQ/DMh9LxPhOutJAuZgL7+rspelDVy8X9OvMCYfP2QyWag0j1b
+         OZJtCYIT7sk/ugSQeMFCZ3WxEWmH+XPTzgD9bvHtdCYGr3n7Q3TQfxnq7yc5/OzClzen
+         werq5GmBDqxZuBFBsd560zCfMuzeCoVA6DrkEfYY3Su7s0637UlqraiZcHoWbE/4RDRr
+         WTzXTc3oD624iYPfhafiGDD9aQekJeK9WQGJ0DMmqxFMYvxBpiAujJYmMFRVcTzWgNFW
+         kW33DsKF847KGBrP8UFLb0kjHNg7RWtu0ofMK1J/o1xxKdC5OuZmiLhhusYocBxUAhbm
+         sveQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWQHRx3t06qn0Tiw+44KKDn+i3krVbUMmhHGW8u7V2zdxKYF6AbQ9xRYbUugReauMHyGp4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQvLYbtyghO3kXQ26ohKbnAbVIc7J5pWEv5yXnh3sOkyjIEQG/
+	Plqv5/t/kzoyGAFm/vg+pFJJE7vYcmhb9ZOBLT8PwNyVwLFWqoMRO5iIkhZLUwIjIPxMVjC06SW
+	w20y234tThUwItv/UKDw9xw5pVU/BDo8iBRe9
+X-Gm-Gg: ASbGnctIzSoAtAM75ZOP7Ynz0rnDufORe8M6r1b8cvdCOg4okITPXhCcX8yICv+LLyn
+	4jwytebotUxdk/prJZFYJZnMsArX29uor1WjN/v7XG0DsjKrEYxsimDy68InqfID+9h5e+5wkLM
+	Uem/0+F3MkZUfeFiPMmkjM+WVpYGr//D36CH9gwNCKYcpBOKfuyI83+cg=
+X-Google-Smtp-Source: AGHT+IFeNCEP0siRwcGFMhDyxTwUgN/q4ESl7wZnSThP1BZE2VnPVYxln59ocl0tbMWx93FWKB2s5IMnvCUEO374htw=
+X-Received: by 2002:ac8:7e86:0:b0:471:939c:a304 with SMTP id
+ d75a77b69052e-474fc4f486bmr4445741cf.8.1741099015479; Tue, 04 Mar 2025
+ 06:36:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|DS0PR12MB7582:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5d5ff77d-0199-48ab-4ec5-08dd5b298ea9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?K2dYUENaMVhQKzRqcmRhRE93Q1VpYkxQVjBYVUowenFwRjlEMnozNVkyUWVL?=
- =?utf-8?B?UXRkQTZMUXVWYjlzR0xwdnB5Vjg5cy8vNkVQSWYzV3lHeEtVU0RNeElHZlRW?=
- =?utf-8?B?SjVRenlqanBMMFdDQWVoTHRhZTV2VGNSNm1mV2JKOFVlUUs5TkM2aTFVUlQz?=
- =?utf-8?B?Um9iR2MxU3dhQm90QU8xUC9OZ2ZNdDFvSHZRcmVhdFFxMGFWbndTQUFLUmQx?=
- =?utf-8?B?c0RsQ2pOQ3dWWEI0dkhyY0xmdEJoVHRBQ1NIaC9QQjM3UmhzSzB1UlZNSEJW?=
- =?utf-8?B?SHJ2eG5HcWxwRmRvQUxoWWJKTWR4VmxKcU1ZTmVBN0FhN2tGd2Q0M2x1enFl?=
- =?utf-8?B?MnRKQzRPVzJtODRNNWh2bFhVeU0yUy9QVng0Rm9hYitkbXNNZW9jd1NrTjd6?=
- =?utf-8?B?M1BqRG04RzREMVhhUlpQdU9uNWo4bUZ6cGgyTEFxWEhuZ2pCVmlDVkVYZWor?=
- =?utf-8?B?SkZyUlZFZnF0eWN1TGd4dGpGZWFrK1hHeXc2K2RQZDNTZ0ZwKzk3bW13VHAx?=
- =?utf-8?B?N2FjdmpBcC90VWVKWUpPVmV5NnZJYjNvcU9FbmhUSTdwN29Dem1ZNE8zNU1G?=
- =?utf-8?B?c3Y1bysxUnJ4T21CaGtsY2dKWElzeWhIU1NVUXNYVHVVRm0xYUpVM0poNlpJ?=
- =?utf-8?B?WWUwbWdiUndxUE9EYzhjejNuR3BiTkNWeTNlUWEyL0lBWTdXNFFFZ2Z1WjF6?=
- =?utf-8?B?anBKMUxhamtjRDdmbTFQS0U2YWtVdGFKQURtYTdSQnJLNkFiWVJjelBLV2NO?=
- =?utf-8?B?b0VWVzE2b1V1U1RhcEM2c3RxYTFaK3hiSmQweUdRZmlJWGF6eC9OaTNWNHBZ?=
- =?utf-8?B?WnBCYVNGaG13dDd6My9mbTl6d2lMdFIwb1g3UyswNzZLSDArM0o2d28waGZy?=
- =?utf-8?B?VW8zVEpmWmxoSzRuNmxYdmQ4ZElLNTdLUno5cWt2UzFqNWR5QnFIZzdUbDJU?=
- =?utf-8?B?NHhTbGl6RWIzYTArcVJLV3pNRE5LOGZrYU1yT1FNVHNSSnlXamFNenB4QU1F?=
- =?utf-8?B?YjZXNFJCYWc4aUVxVld3OTJBMXZMVUZDd3llTWpUU09CSzZTT3ZmUzVUMU9K?=
- =?utf-8?B?ZDZtaTVCeE0xVnZBcmNlU1lMSHlvRHg3bzZ6bTBFeHhGNnNvQzBBR0JINkVV?=
- =?utf-8?B?NUtIVDVmOHlpYnJ0N2pESWZlWkRNdzV6ZE9mbTRxM05jcHpNaU5JN3I2TzBM?=
- =?utf-8?B?SVk5eTNTNm9aRHpXcXEzY1dwOWJWRDZWcGgrQ3hGb1pNSWk3NHFhUzl3eXV6?=
- =?utf-8?B?NHd3bjdpYXh1YmtIbDYzUE96aU9lYnhZZHdPRndKUkVsZUl2VU9ZUHhyVW1r?=
- =?utf-8?B?ODI1YzJLTXpvSENWTHJPdkJYUzI0bkV2cFJSN0txWnpUUEhTeWtNMzJIWkhH?=
- =?utf-8?B?WHJFTWt3SUx1bG9SVys4R09BMFc3MXlPeHhVUFpRNWlJVUdKclhTT1pzMDlR?=
- =?utf-8?B?ZDVOOU1LOGN4MWREQ0JNOEJUdWg2ZElpRVgxK1d2VUJvakJjMktRU3FvSmdY?=
- =?utf-8?B?Wjg3clZaWnY5ZGRUSC9manFtZjlyUldxdUswb1dwY0xMQTBSUW5kTEpHT3Yv?=
- =?utf-8?B?SjA0N2RvMGo3WkYva0lyb01hM3RqUldkUWJ6YVV4UTBwUlpiWTIveGk0Yml2?=
- =?utf-8?B?bXhvZUs0OEt5R1ltMU9iWFBvZVNnS2l3SW5BUDF2YUt0am9VR0tjSW0rR05y?=
- =?utf-8?B?QUFKa2JDR3Zydnp1N015aXBZNi90N0l0U0ROWWdXSHFzTFJtZUlVSi9ZdHQ3?=
- =?utf-8?B?TDROa0hlUWVxT3dDemNvUXZEdzBYWGp2L1VJbzFrMUx5TXhQS1huaWMxcTcr?=
- =?utf-8?B?dmU0b3plbEZWNW01TCtWWThaWFJtUW12N0hsSlc1cWc1ZWpzVFJML2ppbk14?=
- =?utf-8?Q?RfA0gFcHVoURr?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?QW11U0dKczAvZW1IZFRGTXNqU2NYZXlyKzBTbWRlQjZpaE1JQXVoQVZvdTdV?=
- =?utf-8?B?T3RiNXlRNlR1RVlZdnhQL3RQcUMrd042TEoyL2JzWkFaU0JmWkdnTXRhU2x2?=
- =?utf-8?B?WVJjVURzR0UvL3BCMHJnUFovYmlmNlZBOTRONWlHeHp5bzBQUVBhMFdHTnhG?=
- =?utf-8?B?cTNaWUtPMURYaDB6b216VEdSTlgvdGxjOEdybTdaeStQRGxUQ0NzcEVISDV2?=
- =?utf-8?B?VFk5RXltRlBwYndvWXdBYURuWVc3UHByNVVBeWNsb1VndERyajFRM051Szhk?=
- =?utf-8?B?NHh1bE52Y3h3ZW5qQW5pbnc2ejdReVVzd2JyN292VGIrOW1PUzYrMDY5Q29h?=
- =?utf-8?B?ZlpiYlNibzA5SHU0Qk50ZDNyMkFGZkVmYlRkQmsxZnhGWkpZT0d4dUF1SE0z?=
- =?utf-8?B?T0tqbndaMmNlRTUweHZOK2VqSy9odWhtNFBoaE15aThvVTJLNEtuQUpQYUVs?=
- =?utf-8?B?K1A5V1RkQjdVQnorUTNvTTgrUTNIcWJYeXN1OGoyMzRrQmNvUVRHZXZyMUlR?=
- =?utf-8?B?bnUyT2QzQmEvaDZYRzFDUFdwbVg2bGV1Q2FJZndsZ2NhR0wycnJaWGEzdklx?=
- =?utf-8?B?MTZyOWFxZkdMc3ZDRUZqOXAydWdlSWlaNGdsaUVqd05kM091M1ZiUkpiM2Nx?=
- =?utf-8?B?SWxrZlFHZkFwWCt0N3E1azloelZ1QTM2a1dKUFlZTkJ2ajd3UUxnaEpQLzhY?=
- =?utf-8?B?WmNUdkZlRGVrTzB2U2RML3h2YzFGUzBuT0F4THVZV0JicXZTL0JCWXZsOG9I?=
- =?utf-8?B?aHI3MVozeWk1ekVnV1hvNjZHTTNPMVRkSzk2NUFrR2VRWUFZTmpZWThyMGd5?=
- =?utf-8?B?TlpDR040azNuMWtIUGgwY0Q0MVpCcDVvd0FBSDFRSFlmK0xLbURDalZIZnhQ?=
- =?utf-8?B?Qm95REhwOStMR2k2YUlkOTJjZlMzMDRkcW5EdW1kSGlhWGtiakVEKzJOTVpJ?=
- =?utf-8?B?WHN6QkxUZTZjT20wK3FQYytDUmN0dzNOZk9mczQ4UUdDSmsvNTFLYXpDY2h5?=
- =?utf-8?B?T1pmcms5MHByaVJjbm5zZGNqR1l3VHA2OTJoQ0JheURnQ1BhS21qQ2Y1VndF?=
- =?utf-8?B?am5vYURYOWYxK0IzTHNwdWpFN2VjY0orRng2WUJiUEpvRFVPb3J0QlhGTmxW?=
- =?utf-8?B?R0IrR2dRWU00NG1taC96dlJGTE4vYzdlWlFMeGJma1V2RGQyb0ZEbC9RY0hK?=
- =?utf-8?B?am1uVDM3dnBmL1J4aDJtWUlSQml1aXlpUnByZXdKWDI2bE5WVHdKUmIzS3Rm?=
- =?utf-8?B?ZlhQTDVTMnNmblFxVkh1VlBncjVyYlpuM2Z1MEdma0pBZEwrSVpFV2dwVlM4?=
- =?utf-8?B?MDgvbEJ6dWtCMHo5QmJaYXNDTHFBNGhsWXdaUjlPY21NUThNRGszR1hnK2M1?=
- =?utf-8?B?USt2NkEwUHVIVjBBVy9qVWhIUVo0aWJzamZ1R3NaTThtZkRyQ0h1L1BNbHRj?=
- =?utf-8?B?OEdWRVJRRE9xdTlwZXI4c1FLU0NzSURzaCtDbkZ0eDNuRHkzVmx6dURaYzZJ?=
- =?utf-8?B?L2J1ekt2NStkdmRsYWFGa25jZnpHOU9mbE40RDVyMDI3c04rSjRqcTkwVFdH?=
- =?utf-8?B?cFRwbm9aQWNJOUJaZWVDck9FN1BLdnV1WkJWcmNudTYveGJUSUdWMXdQN0NQ?=
- =?utf-8?B?SGJESEZiWDF5RUlhb2ZCL2hPdjBrOVU5czBwamcvWXljcGRnUEFiTG9QYWo4?=
- =?utf-8?B?NTBlWGxISDN3TFRDTlhzbktXSWFiNzhibkxjWDZlcHl4TGk0OGpBVWhZYkM1?=
- =?utf-8?B?aVV2RWIxQlVMcHRzWXBONmFWNEJ4NUJXUXpWd2RlZ2FzYWtkcFZBZzlFRGJl?=
- =?utf-8?B?cmUzRm9uZjJSUzdYY0U4aElZa0pXQzBnenlZdTFUYzc3aVBtUTUyME0xTHAx?=
- =?utf-8?B?V2p1ODdmRWRPNFErMXI3VFRJaUhxUldGVXBDQWI2ZkV0cS9sbnV5QzhGYkpK?=
- =?utf-8?B?T0t3eFBieDhxRWMwa2JQRmRKcXhDL2lqWWpaU1BEN0FBTjh0OGh0NXdJWW9u?=
- =?utf-8?B?bmttY3hoQ2d3M202cXBWei9qRFZ4SVVvRjNCbXlhQmtzaER6RjRYU3hhVHN5?=
- =?utf-8?B?RE0vWDJiVzM4V0tuVlg2bGMvaTdTeUR0WmZYdkkwbXgySXA5bEJxUlVEZkxJ?=
- =?utf-8?Q?klf/Aaz+4VOOMUk/BB6/7sZWb?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5d5ff77d-0199-48ab-4ec5-08dd5b298ea9
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2025 14:33:40.3134
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nGln8DJl/ssUB1or68p5GyfHv2cUPeCls3Km3anz2EvyVA6DsCoiZpftwn9A0d19
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7582
+References: <20250210184150.2145093-1-maz@kernel.org> <20250210184150.2145093-4-maz@kernel.org>
+In-Reply-To: <20250210184150.2145093-4-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 4 Mar 2025 14:36:19 +0000
+X-Gm-Features: AQ5f1Jo68p3yb9_4_jDKr_EIPn09Ol_E9D3YE9a_TVB0qWSEdbu-YNoM1obqL94
+Message-ID: <CA+EHjTwkX+sy1wuS8LvGM+=m_S-h-=xUUXOyMapnoLiHt0XpOw@mail.gmail.com>
+Subject: Re: [PATCH 03/18] KVM: arm64: Handle trapping of FEAT_LS64* instructions
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Mark Rutland <mark.rutland@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Mar 04, 2025 at 03:29:42PM +0100, Christian König wrote:
-> Am 26.02.25 um 14:38 schrieb Jason Gunthorpe:
-> > On Wed, Feb 26, 2025 at 07:55:07AM +0000, Kasireddy, Vivek wrote:
-> >
-> >>> Is there any update or ETA for the v3? Are there any ways we can help?
-> >> I believe Leon's series is very close to getting merged. Once it
-> >> lands, this series can be revived.
-> > The recent drama has made what happens next unclear.
-> >
-> > I would like it if interested parties could contribute reviews to
-> > Leon's v7 series to help it along.
-> 
-> I think demonstrating how any new interface would work with the
-> existing importers/exporters would help.
+Hi Marc,
 
-I can see that, but also it is a huge amount of work to make trial
-changes to all sorts of subsystems :\
+On Mon, 10 Feb 2025 at 18:42, Marc Zyngier <maz@kernel.org> wrote:
+>
+> We generally don't expect FEAT_LS64* instructions to trap, unless
+> they are trapped by a guest hypervisor.
+>
+> Otherwise, this is just the guest playing tricks on us by using
+> an instruction that isn't advertised, which we handle with a well
+> deserved UNDEF.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/handle_exit.c | 64 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 64 insertions(+)
+>
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 512d152233ff2..4f8354bf7dc5f 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -294,6 +294,69 @@ static int handle_svc(struct kvm_vcpu *vcpu)
+>         return 1;
+>  }
+>
+> +static int handle_ls64b(struct kvm_vcpu *vcpu)
+> +{
+> +       struct kvm *kvm = vcpu->kvm;
+> +       u64 esr = kvm_vcpu_get_esr(vcpu);
+> +       u64 iss = ESR_ELx_ISS(esr);
+> +       bool allowed;
+> +
+> +       switch (iss) {
+> +       case ESR_ELx_ISS_ST64BV:
+> +               allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V);
+> +               break;
+> +       case ESR_ELx_ISS_ST64BV0:
+> +               allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA);
+> +               break;
+> +       case ESR_ELx_ISS_LDST64B:
+> +               allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64);
+> +               break;
+> +       default:
+> +               /* Clearly, we're missing something. */
+> +               goto unknown_trap;
+> +       }
+> +
+> +       if (!allowed)
+> +               goto undef;
+> +
+> +       if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
+> +               u64 hcrx = __vcpu_sys_reg(vcpu, HCRX_EL2);
+> +               bool fwd;
+> +
+> +               switch (iss) {
+> +               case ESR_ELx_ISS_ST64BV:
+> +                       fwd = !(hcrx & HCRX_EL2_EnASR);
+> +                       break;
+> +               case ESR_ELx_ISS_ST64BV0:
+> +                       fwd = !(hcrx & HCRX_EL2_EnAS0);
+> +                       break;
+> +               case ESR_ELx_ISS_LDST64B:
+> +                       fwd = !(hcrx & HCRX_EL2_EnALS);
+> +                       break;
+> +               default:
+> +                       /* We don't expect to be here */
+> +                       fwd = false;
+> +               }
+> +
+> +               if (fwd) {
+> +                       kvm_inject_nested_sync(vcpu, esr);
+> +                       return 1;
+> +               }
+> +       }
+> +
+> +unknown_trap:
+> +       /*
+> +        * If we land here, something must be very wrong, because we
+> +        * have no idea why we trapped at all. Warn and undef as a
+> +        * fallback.
+> +        */
+> +       WARN_ON(1);
 
-> > We may want to start considering pushing ahead with this patch series
-> > and using the usual hack of abusing the scatterlist in the mean time.
-> 
-> That works for me as well.
-> 
-> I think when we should get away from scatterlist then that should be
-> a separate set of patches or maybe call it a separate project to get
-> done for all DMA-buf parties.
-> 
-> E.g. propose something like an iterator based interface and
-> demonstrate that V4L and a DRM driver can live with that and that
-> this approach works like expected.
+nit: should this be WARN_ONCE() instead?
 
-Yeah, maybe so. We are some ways from that yet..
+> +
+> +undef:
+> +       kvm_inject_undefined(vcpu);
+> +       return 1;
+> +}
 
-Jason
+I'm wondering if this can be simplified by having one switch()
+statement that toggles both allowed and fwd (or maybe even only fwd),
+and then inject depending on that, e.g.,
+
++static int handle_ls64b(struct kvm_vcpu *vcpu)
++{
++    struct kvm *kvm = vcpu->kvm;
++    bool is_nv = vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu);
++    u64 hcrx = __vcpu_sys_reg(vcpu, HCRX_EL2);
++    u64 esr = kvm_vcpu_get_esr(vcpu);
++    u64 iss = ESR_ELx_ISS(esr);
++    bool fwd = false;
++
++    switch (iss) {
++    case ESR_ELx_ISS_ST64BV:
++         fwd = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V) &&
++                   !(hcrx & HCRX_EL2_EnASR)
++         break;
+...
++    default:
++        WARN_ONCE(1);
++ }
++
++    if (is_nv && fwd) {
++        kvm_inject_nested_sync(vcpu, esr);
++    else
++        kvm_inject_undefined(vcpu);
++
++    return 1;
++}
+
+I think this has the same effect as the code above.
+
+Cheers,
+/fuad
+
+
+
+> +
+>  static exit_handle_fn arm_exit_handlers[] = {
+>         [0 ... ESR_ELx_EC_MAX]  = kvm_handle_unknown_ec,
+>         [ESR_ELx_EC_WFx]        = kvm_handle_wfx,
+> @@ -303,6 +366,7 @@ static exit_handle_fn arm_exit_handlers[] = {
+>         [ESR_ELx_EC_CP14_LS]    = kvm_handle_cp14_load_store,
+>         [ESR_ELx_EC_CP10_ID]    = kvm_handle_cp10_id,
+>         [ESR_ELx_EC_CP14_64]    = kvm_handle_cp14_64,
+> +       [ESR_ELx_EC_LS64B]      = handle_ls64b,
+>         [ESR_ELx_EC_HVC32]      = handle_hvc,
+>         [ESR_ELx_EC_SMC32]      = handle_smc,
+>         [ESR_ELx_EC_HVC64]      = handle_hvc,
+> --
+> 2.39.2
+>
 
