@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-39951-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39952-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16712A4D108
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 02:35:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD5B3A4D10F
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 02:36:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FA63177444
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 01:35:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91A923AF5AE
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 01:35:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17C951DF962;
-	Tue,  4 Mar 2025 01:33:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F382C1F03D2;
+	Tue,  4 Mar 2025 01:33:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="epF1dJPS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lMQ36Qrt"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C261AAE17
-	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 01:33:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A765C7603F
+	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 01:33:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741052024; cv=none; b=EdTyOfvVh5cqRx3RvZ9sVl274xgDBtvk+gq8BwDbH7nQQiqngt48BVrQ85DOgsCdnDb28CHWDmjHDoItZ3Z2Xuo5RuZdlmnGxiIBaU/zzLoCvUQLdqitG8/ST1JCSrm39trjlkOvC92umzBV2f4UrdhcoaNG20JisI0ngrqyyNU=
+	t=1741052026; cv=none; b=TfewIzU7vuyArRHqnP8jXbA3NlcWr2ckZAfgeFaCyltj2D3a8Gyzst5FanJnM9RLb6R/2YAKOXPpm5fA+19hiJpvbIpGVlY+L+vkBsZ012Lk2jmhk8DIfBXeg2GfNSNOY3+tbRbcROQiDZ4gOe+zxAICtix3k4o+t9r57BuYIQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741052024; c=relaxed/simple;
-	bh=bWa7MI7Je53+hcO260m6tDnoOA7tYXPBsMlcHDj5OIo=;
+	s=arc-20240116; t=1741052026; c=relaxed/simple;
+	bh=3bM8LluU4Z3E3P/OumEsl2hMh8xJPdKkueEVx9wyqcI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tq4rIPA+DcbptUCid5guMMmoIfOH2VKnYjV3RW1VExoX1yd6RMEOp1NiYgBW7/54PUYmMAgFspJi0qKsdIVU6Sdf3R7Cresx7y8T2vox09HESOMRr4ZPKRe0dNjQL0BTKceldTd7LAA8VqWdKvbzg2hoWo3PF822e1HsA3CGROQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=epF1dJPS; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=ZFCsWh1MfUaX3WbAqCezOI631OoZ1xiX15YKnFOhhgZz7h7oARdM03RWmBcM2DZSzNisHdNYw2qVxD/BEOv38ZCzzKS2XW76dLapf9ev2l2WRcmasOP8vH4toHS7j+UWFxxkjpMdTPjoI6dqMGG7ynmLhG61LSGv4Bfg3iW1Vjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lMQ36Qrt; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fe870bc003so10197313a91.1
-        for <kvm@vger.kernel.org>; Mon, 03 Mar 2025 17:33:42 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fe86c01f4aso9927983a91.2
+        for <kvm@vger.kernel.org>; Mon, 03 Mar 2025 17:33:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741052022; x=1741656822; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1741052024; x=1741656824; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=X9wy79sbNpkEBREyMkIDmJ5bL01i0GTTP9jdKigT/f8=;
-        b=epF1dJPSJoIjx/5l9rks5Ltj6C0W3uT4vbDwj3VYDbaVcWrMTOKLshVh6dX4Zgku+0
-         +ely5Tt3LYMysBckLf1irSrm8/tGv38riOLZTbDp+1McTRBna2xoo61Tc52NQjLFkjuw
-         OvQVmuc+S4Y9jwpeUW51GG/Zkc/8/LM/NssyL0+nIZBrBMV5U/BKzSTCN9P0mAAy+YC4
-         gMdVgNn0u0RAoyU3nsgjvngVWQz+0qRS0OUnvxMpr1/x+9NmpXI+iqAX2h5m4AWjfrzb
-         QPKgYAy0nVddeTg8vy/8Wla0mgW4/GA4X0hIJBZ9BWQhBW5jcmAXrlK/6x5Vk5hk17Kf
-         KkTQ==
+        bh=pVWF/+OYw6uzU0HOKtc8UI2eMuXCIdB02LubQ/Jgc4A=;
+        b=lMQ36QrtN4pKrlUn10OuZQj7JChGZKd9gh+VFl4B/f4eTO+t2CnuLoHn5xiA3mhUBG
+         63gSQrzHdzD+whGPP1Ln+0DqGYmR+PVKbLCXo+fO/aICdWsY3itULKm6q7EXNauoD2fS
+         aSKPLqtqvKCyOngYtpvVQ6QeUxWd0mrh1DT46Q0xVnAnQeLIf3Y+auv59b9MIQCSc+KP
+         AyLiA9zMRKXpyqpHdaTM18QsP7shDchu41OdHSMApGUbE+TPZ4WHGuy0g/8xS8j0GPUo
+         9IGrKTQ597gvf+huO5YyrHEJ9FHZfzqx8T38+HVHPpFFMt7LylVUrwPoZjQWZQXx40Zz
+         w0KA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741052022; x=1741656822;
+        d=1e100.net; s=20230601; t=1741052024; x=1741656824;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=X9wy79sbNpkEBREyMkIDmJ5bL01i0GTTP9jdKigT/f8=;
-        b=Ir9hc/rrv17i3FPYM2ltFOAFFgIhvKE/Qu6k4pmKc9aPJTEeDzcoqe3jqcsrQ939Cw
-         guXlpxTbQogbJDVTWt5rxXDOdMBgnGBBEoVjbFgs9lpKRXV8Df+o/cLL2kzhg8IR2Jqh
-         8CMpE0VRkYpUQUJMct0pLgXc2AESUHANh5YNuUL3fxK6ztKxhabDWsPEGk+yjRdjSKyI
-         oGQu0rsLnfJX04/uRtc5sSrOJvihKm32UxxCImxmmtnHGIDKG3qvK2DS38DY4I9X3vBK
-         JFuPu/J+qKjTGDtcDWyxmERDADgiMgjLiECijrVQg3+iPscNnz4oOYf9qpIQ71vGMNFy
-         SIcg==
-X-Gm-Message-State: AOJu0YwaKtTw3FUf6LpgLdfvbs3SlilwW5PVnJlwmmMxcERKSpZb2g5L
-	PdjC1SYjElKADmqDmjz4NjY6QtTN4JhRe+0Nz+Ex0PVxo9uTAuQY/iiU/1RdR8ptWQxdkbCJ6Ag
-	sHQ==
-X-Google-Smtp-Source: AGHT+IGVk1UjX3zn4sKZXBI9Q4g1z0uT75lXD5hnr1yXiiySOX13OZkHBINhW/GTF9uaoBbYjX8IGddC1WU=
-X-Received: from pjbsj5.prod.google.com ([2002:a17:90b:2d85:b0:2f9:c349:2f84])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d2c3:b0:2f9:d0cd:3403
- with SMTP id 98e67ed59e1d1-2ff33bdb4a2mr2138807a91.16.1741052022093; Mon, 03
- Mar 2025 17:33:42 -0800 (PST)
+        bh=pVWF/+OYw6uzU0HOKtc8UI2eMuXCIdB02LubQ/Jgc4A=;
+        b=crg1rxak/h/ElycIYP3jPImMdlLsx5tyJ3RF5nVHcu33cMW3wzsC7TkDNADDUaymWe
+         SYif8+zAFrgcyWFly32QTNkXAsnmNVxYi80VYxRPE810+sXUDUmnz3n0ImDTrDmabAfx
+         dtZcsyitQBEVQbmtX9BYT/TOh2Rj59H56/1D175QlnzCnDdw7YajbH7dW2Un2IRA8m82
+         KOdJCBFsth6lto0T4TpYMaH/dxgjXTNga+NdmyUrwDrcdmtn90YYi75fSSj84VYLGxO2
+         4havJtKvesO8diDUinZt/kNK+3/xxCCZNnX1yCjo58Hf3hUCIiNPaxyre374R1zpGLIt
+         IXoQ==
+X-Gm-Message-State: AOJu0YwdMpalg//isldlZvch/ilAkoBs8yK6ECb1qm7JEoZj4cOz29oj
+	t0tEeHPIY2bvbrLJbT/2/kVdmBjRciiN119fwJaPnwG2skDro5ElgBk1F8HT2+52T277F0Y3EJS
+	Y1g==
+X-Google-Smtp-Source: AGHT+IEiqQkt5+UNuOvzeaEsfiMYJNiN4m8YxDgw4H7w/e5EeOuHeJe3r5VOcS0UXwoNZ+TKzKVyw7qbpOc=
+X-Received: from pgbeq11.prod.google.com ([2002:a05:6a02:268b:b0:ad5:512a:7755])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:2d12:b0:1e1:a75a:c452
+ with SMTP id adf61e73a8af0-1f2f4d1ffc9mr23538694637.19.1741052023760; Mon, 03
+ Mar 2025 17:33:43 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Mon,  3 Mar 2025 17:33:34 -0800
+Date: Mon,  3 Mar 2025 17:33:35 -0800
 In-Reply-To: <20250304013335.4155703-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250304013335.4155703-1-seanjc@google.com>
 X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <20250304013335.4155703-3-seanjc@google.com>
-Subject: [PATCH v5 2/3] KVM: x86: Add a helper to deduplicate I/O APIC EOI
- interception logic
+Message-ID: <20250304013335.4155703-4-seanjc@google.com>
+Subject: [PATCH v5 3/3] KVM: x86: Rescan I/O APIC routes after EOI
+ interception for old routing
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -85,87 +85,111 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	weizijie <zijie.wei@linux.alibaba.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Extract the vCPU specific EOI interception logic for I/O APIC emulation
-into a common helper for userspace and in-kernel emulation in anticipation
-of optimizing the "pending EOI" case.
+From: weizijie <zijie.wei@linux.alibaba.com>
 
-No functional change intended.
+Rescan I/O APIC routes for a vCPU after handling an intercepted I/O APIC
+EOI for an IRQ that is not targeting said vCPU, i.e. after handling what's
+effectively a stale EOI VM-Exit.  If a level-triggered IRQ is in-flight
+when IRQ routing changes, e.g. because the guest change routing from its
+IRQ handler, then KVM intercepts EOIs on both the new and old target vCPUs,
+so that the in-flight IRQ can be de-asserted when it's EOI'd.
 
+However, only the EOI for the in-flight IRQ needs to intercepted, as IRQs
+on the same vector with the new routing are coincidental, i.e. occur only
+if the guest is reusing the vector for multiple interrupt sources.  If the
+I/O APIC routes aren't rescanned, KVM will unnecessarily intercept EOIs
+for the vector and negative impact the vCPU's interrupt performance.
+
+Note, both commit db2bdcbbbd32 ("KVM: x86: fix edge EOI and IOAPIC reconfig
+race") and commit 0fc5a36dd6b3 ("KVM: x86: ioapic: Fix level-triggered EOI
+and IOAPIC reconfigure race") mentioned this issue, but it was considered
+a "rare" occurrence thus was not addressed.  However in real environments,
+this issue can happen even in a well-behaved guest.
+
+Cc: Kai Huang <kai.huang@intel.com>
+Co-developed-by: xuyun <xuyun_xy.xy@linux.alibaba.com>
+Signed-off-by: xuyun <xuyun_xy.xy@linux.alibaba.com>
+Signed-off-by: weizijie <zijie.wei@linux.alibaba.com>
+[sean: massage changelog and comments, use int/-1, reset at scan]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/ioapic.c   |  7 ++-----
- arch/x86/kvm/ioapic.h   |  2 ++
- arch/x86/kvm/irq_comm.c | 21 +++++++++++++++++----
- 3 files changed, 21 insertions(+), 9 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/irq_comm.c         | 16 ++++++++++++++--
+ arch/x86/kvm/lapic.c            |  8 ++++++++
+ arch/x86/kvm/x86.c              |  1 +
+ 4 files changed, 24 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
-index 995eb5054360..45dae2d5d2f1 100644
---- a/arch/x86/kvm/ioapic.c
-+++ b/arch/x86/kvm/ioapic.c
-@@ -296,11 +296,8 @@ void kvm_ioapic_scan_entry(struct kvm_vcpu *vcpu, ulong *ioapic_handled_vectors)
- 		    index == RTC_GSI) {
- 			u16 dm = kvm_lapic_irq_dest_mode(!!e->fields.dest_mode);
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 44007a351e88..b378414c3104 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1025,6 +1025,7 @@ struct kvm_vcpu_arch {
  
--			if (kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT,
--						e->fields.dest_id, dm) ||
--			    kvm_apic_pending_eoi(vcpu, e->fields.vector))
--				__set_bit(e->fields.vector,
--					  ioapic_handled_vectors);
-+			kvm_scan_ioapic_irq(vcpu, e->fields.dest_id, dm,
-+					    e->fields.vector, ioapic_handled_vectors);
- 		}
- 	}
- 	spin_unlock(&ioapic->lock);
-diff --git a/arch/x86/kvm/ioapic.h b/arch/x86/kvm/ioapic.h
-index 539333ac4b38..aa8cb4ac0479 100644
---- a/arch/x86/kvm/ioapic.h
-+++ b/arch/x86/kvm/ioapic.h
-@@ -120,4 +120,6 @@ void kvm_ioapic_scan_entry(struct kvm_vcpu *vcpu,
- 			   ulong *ioapic_handled_vectors);
- void kvm_scan_ioapic_routes(struct kvm_vcpu *vcpu,
- 			    ulong *ioapic_handled_vectors);
-+void kvm_scan_ioapic_irq(struct kvm_vcpu *vcpu, u32 dest_id, u16 dest_mode,
-+			 u8 vector, unsigned long *ioapic_handled_vectors);
- #endif
+ 	int pending_ioapic_eoi;
+ 	int pending_external_vector;
++	int highest_stale_pending_ioapic_eoi;
+ 
+ 	/* be preempted when it's in kernel-mode(cpl=0) */
+ 	bool preempted_in_kernel;
 diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
-index 866f84392797..14590d9c4a37 100644
+index 14590d9c4a37..d6d792b5d1bd 100644
 --- a/arch/x86/kvm/irq_comm.c
 +++ b/arch/x86/kvm/irq_comm.c
-@@ -402,6 +402,21 @@ void kvm_arch_post_irq_routing_update(struct kvm *kvm)
- 	kvm_make_scan_ioapic_request(kvm);
+@@ -412,9 +412,21 @@ void kvm_scan_ioapic_irq(struct kvm_vcpu *vcpu, u32 dest_id, u16 dest_mode,
+ 	 * level-triggered IRQ.  The EOI needs to be intercepted and forwarded
+ 	 * to I/O APIC emulation so that the IRQ can be de-asserted.
+ 	 */
+-	if (kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT, dest_id, dest_mode) ||
+-	    kvm_apic_pending_eoi(vcpu, vector))
++	if (kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT, dest_id, dest_mode)) {
+ 		__set_bit(vector, ioapic_handled_vectors);
++	} else if (kvm_apic_pending_eoi(vcpu, vector)) {
++		__set_bit(vector, ioapic_handled_vectors);
++
++		/*
++		 * Track the highest pending EOI for which the vCPU is NOT the
++		 * target in the new routing.  Only the EOI for the IRQ that is
++		 * in-flight (for the old routing) needs to be intercepted, any
++		 * future IRQs that arrive on this vCPU will be coincidental to
++		 * the level-triggered routing and don't need to be intercepted.
++		 */
++		if ((int)vector > vcpu->arch.highest_stale_pending_ioapic_eoi)
++			vcpu->arch.highest_stale_pending_ioapic_eoi = vector;
++	}
  }
  
-+void kvm_scan_ioapic_irq(struct kvm_vcpu *vcpu, u32 dest_id, u16 dest_mode,
-+			 u8 vector, unsigned long *ioapic_handled_vectors)
-+{
-+	/*
-+	 * Intercept EOI if the vCPU is the target of the new IRQ routing, or
-+	 * the vCPU has a pending IRQ from the old routing, i.e. if the vCPU
-+	 * may receive a level-triggered IRQ in the future, or already received
-+	 * level-triggered IRQ.  The EOI needs to be intercepted and forwarded
-+	 * to I/O APIC emulation so that the IRQ can be de-asserted.
-+	 */
-+	if (kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT, dest_id, dest_mode) ||
-+	    kvm_apic_pending_eoi(vcpu, vector))
-+		__set_bit(vector, ioapic_handled_vectors);
-+}
-+
  void kvm_scan_ioapic_routes(struct kvm_vcpu *vcpu,
- 			    ulong *ioapic_handled_vectors)
- {
-@@ -427,10 +442,8 @@ void kvm_scan_ioapic_routes(struct kvm_vcpu *vcpu,
- 			if (!irq.trig_mode)
- 				continue;
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 9dbc0f5d9865..6af84a0f84f3 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -1459,6 +1459,14 @@ static void kvm_ioapic_send_eoi(struct kvm_lapic *apic, int vector)
+ 	if (!kvm_ioapic_handles_vector(apic, vector))
+ 		return;
  
--			if (kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT,
--						irq.dest_id, irq.dest_mode) ||
--			     kvm_apic_pending_eoi(vcpu, irq.vector))
--				__set_bit(irq.vector, ioapic_handled_vectors);
-+			kvm_scan_ioapic_irq(vcpu, irq.dest_id, irq.dest_mode,
-+					    irq.vector, ioapic_handled_vectors);
- 		}
- 	}
- 	srcu_read_unlock(&kvm->irq_srcu, idx);
++	/*
++	 * If the intercepted EOI is for an IRQ that was pending from previous
++	 * routing, then re-scan the I/O APIC routes as EOIs for the IRQ likely
++	 * no longer need to be intercepted.
++	 */
++	if (apic->vcpu->arch.highest_stale_pending_ioapic_eoi == vector)
++		kvm_make_request(KVM_REQ_SCAN_IOAPIC, apic->vcpu);
++
+ 	/* Request a KVM exit to inform the userspace IOAPIC. */
+ 	if (irqchip_split(apic->vcpu->kvm)) {
+ 		apic->vcpu->arch.pending_ioapic_eoi = vector;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 7d4b9e2f1a38..a40b09dfb36a 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10650,6 +10650,7 @@ static void vcpu_scan_ioapic(struct kvm_vcpu *vcpu)
+ 		return;
+ 
+ 	bitmap_zero(vcpu->arch.ioapic_handled_vectors, 256);
++	vcpu->arch.highest_stale_pending_ioapic_eoi = -1;
+ 
+ 	kvm_x86_call(sync_pir_to_irr)(vcpu);
+ 
 -- 
 2.48.1.711.g2feabab25a-goog
 
