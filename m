@@ -1,158 +1,205 @@
-Return-Path: <kvm+bounces-40095-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40096-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80617A4F1AB
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 00:41:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B70C1A4F1BC
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 00:46:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB9DF3A63F7
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 23:40:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D711816DDC9
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 23:46:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D54AC27700D;
-	Tue,  4 Mar 2025 23:40:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED1E8277021;
+	Tue,  4 Mar 2025 23:46:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RVpfvPqS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D3lO9AcS"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F206D1EBA1C;
-	Tue,  4 Mar 2025 23:40:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E0CB1F3FC6
+	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 23:45:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741131653; cv=none; b=elphyMH5zji2BdBYohZuMpRkmB5vDCpOGldSsGeJvco9iab+vneVlNQns63FTKhSGg8cJOFQaU3cMzSjtPN1fT+/u/nvdBD8TWfhTowtyqOBEg64TiHqoSkA1v8ERqC/34cCgJCmLy9k5jBei6B5tlNP6KpHsXyZbvhNK+Ympo4=
+	t=1741131961; cv=none; b=RbUh5tL6BV4XdgmPG/lWZ5cR3xe6Yc7YpxG9RPTPkZY5Ik24G26W9cpDzE9NU9BCqvSHK9sAyrPDRVStRdp/OSSSmeTnVq5+Fp3AnoWQaIoK9Rm1VJ5i0GWW4tBmA1btDIasjqxqJ12P3VcYrI9U4cDVwzg3cZQII6ONKa7OlAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741131653; c=relaxed/simple;
-	bh=cxLfUqLkhwKVUt3Tqn/g8gs/5ZZ0Yq3hQzO2yTAaSmw=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=hf/X5L2F+ErU4USMnMwriD9PT6XgU2JoNSdrt2OnH0PQVoNcfn8eLzOzJEpp75kSMMX2ZHk6LQeM0l909jMzonE/EY8zP4zIda6Jd79uwzub7rvWVe3fuSs/RPDkmYqnseJCzijQOFPTr1HWzLekZh+7a+nzbzL5HrTAhy2DSBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RVpfvPqS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3305BC4CEE5;
-	Tue,  4 Mar 2025 23:40:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741131652;
-	bh=cxLfUqLkhwKVUt3Tqn/g8gs/5ZZ0Yq3hQzO2yTAaSmw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=RVpfvPqSBf5hnaE72AMOGKHXeBeG1G1Rh+1hVECFXa3TWZ7Js8+191d5iSw1gK8j5
-	 9gXaR8MvjXlambzJY1lQM7oPb58SiJJiOGZ3KuaHKItCci20C23GhPhIwsNFpM6k/n
-	 yJAoCBeq9r73+UDgtYXu3LDGHgUNhgmnFrY2Z1P6Yz4+1guX8S925V4ntxpwFzTZnd
-	 eZAVecZaTqE78uW+TYURDRfkObpI9uoQ5nxrghvsPCGgdVCzvmR40mldxflGKhyRRu
-	 Tx4LP6pHNxCisO5pKYl3U7mkCgVIP4dO9wnnfLQCOcgsrMzam7m1W64axTlX14WMNi
-	 NxDT+zxwvSA4w==
-Date: Tue, 4 Mar 2025 17:40:50 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Nishanth Aravamudan <naravamudan@nvidia.com>
-Cc: Bjorn Helgaas <bhelgaas@google.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Raphael Norwitz <raphael.norwitz@nutanix.com>,
-	Amey Narkhede <ameynarkhede03@gmail.com>, linux-pci@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v3] PCI: account for sysfs-disabled reset in
- pci_{slot,bus}_resettable()
-Message-ID: <20250304234050.GA265524@bhelgaas>
+	s=arc-20240116; t=1741131961; c=relaxed/simple;
+	bh=Lef0MQKtiaqOzXYjRH2Nm9Cp4sRXRppVWKK2dDGvm/k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=R/32+3YAsb6nxbeuU1DcLD21f/eUvHni/ZwNGI101KTITgNAhQEPhpeQqX5K0SYKU11ul/LM2s1T9xDN4qKMJkBX+FF1XPkl4W5a3XlFengJwLmj5noUsLbOCq7/iGY5VPkYBuYlgBIQVo33U5dDUUsOKHDw7u7ji9o6jzkidJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D3lO9AcS; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741131958;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OP9ovaiE8W931ELBVF5NuIIs9fylqFyNkVXudwtC3tg=;
+	b=D3lO9AcShb87PGEn5D2HW5BRoGt6qeLURM8PqffIy9Yw92JFA6FFKLgSf30Kua0x1yCdqm
+	ZlXzCCKsMbNiygrDvAfcZv03KxEWSSEMzcYhR1SAHUMA1idB8xIYzVEfKieuj5EYEfDJO7
+	O5qpIsgjOdHRoSlDWs+b77mqR/r0xuQ=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-658-yAZKeG6tNTiRnHLaGeJYfw-1; Tue, 04 Mar 2025 18:45:52 -0500
+X-MC-Unique: yAZKeG6tNTiRnHLaGeJYfw-1
+X-Mimecast-MFC-AGG-ID: yAZKeG6tNTiRnHLaGeJYfw_1741131951
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2feda472a6eso6648833a91.0
+        for <kvm@vger.kernel.org>; Tue, 04 Mar 2025 15:45:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741131950; x=1741736750;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OP9ovaiE8W931ELBVF5NuIIs9fylqFyNkVXudwtC3tg=;
+        b=NJNipIKjC9lNI1OBBUheAYJMUvOyDbgv27P41J0o44DkEZP+g3CHQKWL26DUT+pdkr
+         MoP7F7gxbFlwzn8mm4ZUXGpn6HPKYa2T2oXghOwutPRAg6qktVeOFAHSUcwznKSBZlQK
+         u++cyCd6Tphi/25VIleUg4OIerhmvg3EIw1GvaPtM+ESK7LlWa7ViLuRQ+zE9sP5jG+o
+         ZXFzbFkfql4kCHG7kYP5Xlyx+JC2X19OFW5FOo9aoxBORWcgCJveHEkkZa8cgMUPcNPL
+         /qMYrmojTG3dyEOfzwXe328oVG7wyWJHuSomnmCr/eXhTQsHML6ZB1kqYuqLUVJKBMNg
+         lHcA==
+X-Forwarded-Encrypted: i=1; AJvYcCUUicElQ5ZmFRJR0m1Zdwq/Oby4lbix51LLDZxxyvRq1gi34ZTi7NPM34zQIThU6gv0Fd8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3r3jGNKREfGmMRwU/h3q3y4hy4eGS66ycR8E8zFtYdRfbVHZX
+	P+olfQOAo4280sEabG5aQEhPjU8GkHc8ZjeQhzFGuHYK98LSdZ/rh14j/7ZloyDlI/2ehhmnAwW
+	tz7Q+7+i3sdGoWHl1zhGOioQk44czJjCHDUojcp6XLZe7nNZqKIBT81cFaQ==
+X-Gm-Gg: ASbGnctxnhKKD9nbPDX+80bPFLMns2VKs1936iXpFOTSW+0gomE+gjN9e3zrMB7OpHk
+	+ejqepi1p6YbTYetP/lSUgLB9BHwXzYIhvfCLy8ukPBS5vNlj3JXVI4qj19RJ8VhP+/Skj5UUaD
+	OPdlYieY0nkufS/C9kkIBmQ7BsLhb4Yze748P+ffDn6JU09IAWFUNwYW/owdq+2cdprgdEQ+GGm
+	0KMxFbh2IZbi1k6VvYl5iVwYH1NngCN5/AFaJes1n0eEh0o6LxRFwJXmK+g/kqR70gW3QvQG8sf
+	gapS8VLhitt8Av4=
+X-Received: by 2002:a05:6a20:7345:b0:1ee:d6a7:e341 with SMTP id adf61e73a8af0-1f34952e7f5mr2027007637.30.1741131950427;
+        Tue, 04 Mar 2025 15:45:50 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG6SHWUDr/wxtrgl8ODJO2LORkYE1xgQa8DpVJblqhw13356llhbnfpOxuEBTenhhAi0XuOnQ==
+X-Received: by 2002:a05:6a20:7345:b0:1ee:d6a7:e341 with SMTP id adf61e73a8af0-1f34952e7f5mr2026963637.30.1741131950083;
+        Tue, 04 Mar 2025 15:45:50 -0800 (PST)
+Received: from [192.168.68.55] ([180.233.125.1])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-aee7de37fedsm9080597a12.42.2025.03.04.15.45.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Mar 2025 15:45:49 -0800 (PST)
+Message-ID: <c8af8a7f-5ee4-460b-aec4-959f688db628@redhat.com>
+Date: Wed, 5 Mar 2025 09:45:41 +1000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250207205600.1846178-1-naravamudan@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 35/45] arm64: RME: Propagate number of breakpoints and
+ watchpoints to userspace
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+References: <20250213161426.102987-1-steven.price@arm.com>
+ <20250213161426.102987-36-steven.price@arm.com>
+Content-Language: en-US
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20250213161426.102987-36-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Feb 07, 2025 at 02:56:00PM -0600, Nishanth Aravamudan wrote:
-> Commit d88f521da3ef ("PCI: Allow userspace to query and set
-> device reset mechanism") added support for userspace to disable reset of
-> specific PCI devices (by echo'ing "" into reset_method) and
-> pci_{slot,bus}_resettable() methods do not check pci_reset_supported()
-> to see if userspace has disabled reset.
+On 2/14/25 2:14 AM, Steven Price wrote:
+> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 > 
-> __pci_reset_bus()
-> 	-> pci_bus_reset(..., PCI_RESET_PROBE)
-> 		-> pci_bus_resettable()
+> The RMM describes the maximum number of BPs/WPs available to the guest
+> in the Feature Register 0. Propagate those numbers into ID_AA64DFR0_EL1,
+> which is visible to userspace. A VMM needs this information in order to
+> set up realm parameters.
 > 
-> __pci_reset_slot()
-> 	-> pci_slot_reset(..., PCI_RESET_PROBE)
-> 		-> pci_slot_resettable()
-> 
-> pci_reset_bus()
-> 	-> pci_probe_reset_slot()
-> 		-> pci_slot_reset(..., PCI_RESET_PROBE)
-> 			-> pci_bus_resettable()
-> 	if true:
-> 		__pci_reset_slot()
-> 	else:
-> 		__pci_reset_bus()
-> 
-> I was able to reproduce this issue with a vfio device passed to a qemu
-> guest, where I had disabled PCI reset via sysfs. Both
-> vfio_pci_ioctl_get_pci_hot_reset_info() and
-> vfio_pci_ioctl_pci_hot_reset() check if either the vdev's slot or bus is
-> not resettable by calling pci_probe_reset_slot(). Before my change, this
-> ends up ignoring the sysfs file contents and vfio-pci happily ends up
-> issuing a reset to that device.
-> 
-> Add an explicit check of pci_reset_supported() in both
-> pci_slot_resettable() and pci_bus_resettable() to ensure both the reset
-> status and reset execution are both bypassed if an administrator
-> disables it for a device.
-> 
-> Fixes: d88f521da3ef ("PCI: Allow userspace to query and set device reset mechanism")
-> Signed-off-by: Nishanth Aravamudan <naravamudan@nvidia.com>
-> Cc: Bjorn Helgaas <bhelgaas@google.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Raphael Norwitz <raphael.norwitz@nutanix.com>
-> Cc: Amey Narkhede <ameynarkhede03@gmail.com>
-> Cc: linux-pci@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: Jason Gunthorpe <jgg@nvidia.com>
-> Cc: Yishai Hadas <yishaih@nvidia.com>
-> Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Cc: kvm@vger.kernel.org
-
-Applied to pci/reset for v6.15, thanks!
-
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
+>   arch/arm64/include/asm/kvm_rme.h |  2 ++
+>   arch/arm64/kvm/rme.c             | 22 ++++++++++++++++++++++
+>   arch/arm64/kvm/sys_regs.c        |  2 +-
+>   3 files changed, 25 insertions(+), 1 deletion(-)
 > 
-> Changes since v2:
->  - update commit message to include more details
-> 
-> Changes since v1:
->  - fix capitalization and ()s
->  - clarify same checks are done in reset path
-> 
->  drivers/pci/pci.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
-> index 869d204a70a3..738d29375ad3 100644
-> --- a/drivers/pci/pci.c
-> +++ b/drivers/pci/pci.c
-> @@ -5405,6 +5405,8 @@ static bool pci_bus_resettable(struct pci_bus *bus)
->  		return false;
->  
->  	list_for_each_entry(dev, &bus->devices, bus_list) {
-> +		if (!pci_reset_supported(dev))
-> +			return false;
->  		if (dev->dev_flags & PCI_DEV_FLAGS_NO_BUS_RESET ||
->  		    (dev->subordinate && !pci_bus_resettable(dev->subordinate)))
->  			return false;
-> @@ -5481,6 +5483,8 @@ static bool pci_slot_resettable(struct pci_slot *slot)
->  	list_for_each_entry(dev, &slot->bus->devices, bus_list) {
->  		if (!dev->slot || dev->slot != slot)
->  			continue;
-> +		if (!pci_reset_supported(dev))
-> +			return false;
->  		if (dev->dev_flags & PCI_DEV_FLAGS_NO_BUS_RESET ||
->  		    (dev->subordinate && !pci_bus_resettable(dev->subordinate)))
->  			return false;
-> -- 
-> 2.34.1
-> 
+
+With the following one nitpick addressed:
+
+Reviewed-by: Gavin Shan <gshan@redhat.com>
+
+> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
+> index d684b30493f5..67ee38541a82 100644
+> --- a/arch/arm64/include/asm/kvm_rme.h
+> +++ b/arch/arm64/include/asm/kvm_rme.h
+> @@ -85,6 +85,8 @@ void kvm_init_rme(void);
+>   u32 kvm_realm_ipa_limit(void);
+>   u32 kvm_realm_vgic_nr_lr(void);
+>   
+> +u64 kvm_realm_reset_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val);
+> +
+>   bool kvm_rme_supports_sve(void);
+>   
+>   int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
+> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+> index f83f34358832..8c426f575728 100644
+> --- a/arch/arm64/kvm/rme.c
+> +++ b/arch/arm64/kvm/rme.c
+> @@ -87,6 +87,28 @@ u32 kvm_realm_vgic_nr_lr(void)
+>   	return u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_GICV3_NUM_LRS);
+>   }
+>   
+> +u64 kvm_realm_reset_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val)
+> +{
+> +	u32 bps = u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_NUM_BPS);
+> +	u32 wps = u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_NUM_WPS);
+> +	u32 ctx_cmps;
+> +
+> +	if (!kvm_is_realm(vcpu->kvm))
+> +		return val;
+> +
+> +	/* Ensure CTX_CMPs is still valid */
+> +	ctx_cmps = FIELD_GET(ID_AA64DFR0_EL1_CTX_CMPs, val);
+> +	ctx_cmps = min(bps, ctx_cmps);
+> +
+> +	val &= ~(ID_AA64DFR0_EL1_BRPs_MASK | ID_AA64DFR0_EL1_WRPs_MASK |
+> +		 ID_AA64DFR0_EL1_CTX_CMPs);
+> +	val |= FIELD_PREP(ID_AA64DFR0_EL1_BRPs_MASK, bps) |
+> +	       FIELD_PREP(ID_AA64DFR0_EL1_WRPs_MASK, wps) |
+> +	       FIELD_PREP(ID_AA64DFR0_EL1_CTX_CMPs, ctx_cmps);
+> +
+> +	return val;
+> +}
+> +
+
+The chunk of code can be squeezed to sys_reg.c::sanitise_id_aa64dfr0_el1() since
+sys_reg.c has been plumbed for realm, no reason to keep a separate helper in rme.c
+because it's only called by sys_reg.c::sanitise_id_aa64dfr0_el1()
+
+>   static int get_start_level(struct realm *realm)
+>   {
+>   	return 4 - ((realm->ia_bits - 8) / (RMM_PAGE_SHIFT - 3));
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index ed881725eb64..5618eff33155 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1820,7 +1820,7 @@ static u64 sanitise_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val)
+>   	/* Hide BRBE from guests */
+>   	val &= ~ID_AA64DFR0_EL1_BRBE_MASK;
+>   
+> -	return val;
+> +	return kvm_realm_reset_id_aa64dfr0_el1(vcpu, val);
+>   }
+>   
+>   static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+
+Thanks,
+Gavin
+
 
