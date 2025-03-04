@@ -1,128 +1,227 @@
-Return-Path: <kvm+bounces-40043-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40045-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7F4EA4E285
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 16:12:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F032DA4E521
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 17:11:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39B7119C3487
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 15:04:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E66D881664
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 15:38:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A517427FE78;
-	Tue,  4 Mar 2025 14:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C0A327C85F;
+	Tue,  4 Mar 2025 15:25:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ochd6w06"
 X-Original-To: kvm@vger.kernel.org
-Received: from vps-ovh.mhejs.net (vps-ovh.mhejs.net [145.239.82.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A6C623A9AE;
-	Tue,  4 Mar 2025 14:59:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.239.82.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A066A27C851;
+	Tue,  4 Mar 2025 15:25:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741100352; cv=none; b=KXmr+NSAEjfKjmH5P7BtLA34irzhgRrh/SeNnVWIckd8U+kqbKj9Sd9b0aiBQwNfF0VdJCBHGua99XyCe9mUp1f5duQ1QJqXdxKiyTejjG106SOCGXDYJ75+ozpf04mTUGyh4ZBtJiUfbFbJgYzm89BCTCrVmhN5ZY099se9Zgo=
+	t=1741101931; cv=none; b=SjNOszI184lDHu61iZ7AzzQrNhGtnXNE5ygNaUwEX1SP93CubTkjYYyJyV2fJxxi65+lx5V/br8PRs2Zb/dMdkFB5kpiBqa74V1O9zknKd6Zb6TCPkE+Vl1/n6ncBhOyU4K+HgFUtgVlpfwzXfo2oWRvDXVr0H2GgVywRGY2/XI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741100352; c=relaxed/simple;
-	bh=UClmafexKg6NNUTLIrpb/B8GK548EN1DK2RtSIjCdMI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K6/VWHMsrV1+C4ae/Etuk5rNW6Zy4MOkmpc5J7gsiMVt8BUXyV2nIxYFWsisn07zUj39usEPIyz/2C+8pfr7mv5xJOAeg6WlfBsYAwoGVFzvKD3iBajqgO+xVWv4GVDs2qPIu8chTUn68gLsSL6abYy88Kf0o2uttxoJco1WNcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name; spf=pass smtp.mailfrom=vps-ovh.mhejs.net; arc=none smtp.client-ip=145.239.82.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vps-ovh.mhejs.net
-Received: from MUA
-	by vps-ovh.mhejs.net with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
-	(Exim 4.98)
-	(envelope-from <mhej@vps-ovh.mhejs.net>)
-	id 1tpSfV-00000000KXK-3XMb;
-	Tue, 04 Mar 2025 14:50:45 +0100
-Message-ID: <2fd13fdb-1d62-4d76-a8a0-c63fb0575fb7@maciej.szmigiero.name>
-Date: Tue, 4 Mar 2025 14:50:40 +0100
+	s=arc-20240116; t=1741101931; c=relaxed/simple;
+	bh=Q3MX4rkE4OTeTa/jKAc1daOdke8WhwOrg3oQElBMyBI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hM+Y1Rm5D38/aUsQH0NyYDsQymuTmurzxWrLd48UCZw6p8eHaJqwLsHV8J7ajjhu3kfy8Ln+L/w7Cft32iVzMiZ/Ez0EQhlh1XPb7jEn96RBqRILJ0r9ygj9sL5KvGO1cZoFArSvZekvxzODH/HFxxdSkigLw8lArA/qmYLeFmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ochd6w06; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26B05C4CEE5;
+	Tue,  4 Mar 2025 15:25:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741101931;
+	bh=Q3MX4rkE4OTeTa/jKAc1daOdke8WhwOrg3oQElBMyBI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ochd6w06w2ZkuDI3gJgfDWEZAlMwLfvaOSP+Wp4+GDsolwX4NxSeF+OYTX7Gy4uwo
+	 7bMS/G7TgXyclh+c/cRhO8xVOnQv7i4+2m5hrMM7o7pyjUYP7/JLLtmLpqAtWCN048
+	 JTt6qLBduehqTXwMjboEXQvpb/YBcCi0mNTghujFDvc8VYk2KU9gdhm41nt98Ou2xL
+	 DeTY39HMi641ZAPySmps05l0RGTg72Cu4t/FX3oObi4bzhGwwAN3U78sBxToOg57vv
+	 BrR4UA4xwlR0uBFWQ/vW0/atfHnH/UU2y1/jETtQeysgfREG3I/nnIuimAQ34ieYM3
+	 NsuBwvN1sNRQA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tpU9A-00AIEh-SR;
+	Tue, 04 Mar 2025 15:25:28 +0000
+Date: Tue, 04 Mar 2025 15:25:28 +0000
+Message-ID: <86frjsq0lz.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH 03/18] KVM: arm64: Handle trapping of FEAT_LS64* instructions
+In-Reply-To: <CA+EHjTwkX+sy1wuS8LvGM+=m_S-h-=xUUXOyMapnoLiHt0XpOw@mail.gmail.com>
+References: <20250210184150.2145093-1-maz@kernel.org>
+	<20250210184150.2145093-4-maz@kernel.org>
+	<CA+EHjTwkX+sy1wuS8LvGM+=m_S-h-=xUUXOyMapnoLiHt0XpOw@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: QEMU's Hyper-V HV_X64_MSR_EOM is broken with split IRQCHIP
-To: Vitaly Kuznetsov <vkuznets@redhat.com>,
- Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>
-References: <Z8ZBzEJ7--VWKdWd@google.com> <87ikoposs6.fsf@redhat.com>
-Content-Language: en-US, pl-PL
-From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Autocrypt: addr=mail@maciej.szmigiero.name; keydata=
- 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
-Disposition-Notification-To: "Maciej S. Szmigiero"
- <mail@maciej.szmigiero.name>
-In-Reply-To: <87ikoposs6.fsf@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Sender: mhej@vps-ovh.mhejs.net
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 4.03.2025 13:59, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
+Hi Fuad,
+
+On Tue, 04 Mar 2025 14:36:19 +0000,
+Fuad Tabba <tabba@google.com> wrote:
 > 
->> FYI, QEMU's Hyper-V emulation of HV_X64_MSR_EOM has been broken since QEMU commit
->> c82d9d43ed ("KVM: Kick resamplefd for split kernel irqchip"), as nothing in KVM
->> will forward the EOM notification to userspace.  I have no idea if anything in
->> QEMU besides hyperv_testdev.c cares.
+> Hi Marc,
 > 
-> The only VMBus device in QEMU besides the testdev seems to be Hyper-V
-> ballooning driver, Cc: Maciej to check whether it's a real problem for
-> it or not.
+> On Mon, 10 Feb 2025 at 18:42, Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > We generally don't expect FEAT_LS64* instructions to trap, unless
+> > they are trapped by a guest hypervisor.
+> >
+> > Otherwise, this is just the guest playing tricks on us by using
+> > an instruction that isn't advertised, which we handle with a well
+> > deserved UNDEF.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/handle_exit.c | 64 ++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 64 insertions(+)
+> >
+> > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> > index 512d152233ff2..4f8354bf7dc5f 100644
+> > --- a/arch/arm64/kvm/handle_exit.c
+> > +++ b/arch/arm64/kvm/handle_exit.c
+> > @@ -294,6 +294,69 @@ static int handle_svc(struct kvm_vcpu *vcpu)
+> >         return 1;
+> >  }
+> >
+> > +static int handle_ls64b(struct kvm_vcpu *vcpu)
+> > +{
+> > +       struct kvm *kvm = vcpu->kvm;
+> > +       u64 esr = kvm_vcpu_get_esr(vcpu);
+> > +       u64 iss = ESR_ELx_ISS(esr);
+> > +       bool allowed;
+> > +
+> > +       switch (iss) {
+> > +       case ESR_ELx_ISS_ST64BV:
+> > +               allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V);
+> > +               break;
+> > +       case ESR_ELx_ISS_ST64BV0:
+> > +               allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA);
+> > +               break;
+> > +       case ESR_ELx_ISS_LDST64B:
+> > +               allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64);
+> > +               break;
+> > +       default:
+> > +               /* Clearly, we're missing something. */
+> > +               goto unknown_trap;
+> > +       }
+> > +
+> > +       if (!allowed)
+> > +               goto undef;
+> > +
+> > +       if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
+> > +               u64 hcrx = __vcpu_sys_reg(vcpu, HCRX_EL2);
+> > +               bool fwd;
+> > +
+> > +               switch (iss) {
+> > +               case ESR_ELx_ISS_ST64BV:
+> > +                       fwd = !(hcrx & HCRX_EL2_EnASR);
+> > +                       break;
+> > +               case ESR_ELx_ISS_ST64BV0:
+> > +                       fwd = !(hcrx & HCRX_EL2_EnAS0);
+> > +                       break;
+> > +               case ESR_ELx_ISS_LDST64B:
+> > +                       fwd = !(hcrx & HCRX_EL2_EnALS);
+> > +                       break;
+> > +               default:
+> > +                       /* We don't expect to be here */
+> > +                       fwd = false;
+> > +               }
+> > +
+> > +               if (fwd) {
+> > +                       kvm_inject_nested_sync(vcpu, esr);
+> > +                       return 1;
+> > +               }
+> > +       }
+> > +
+> > +unknown_trap:
+> > +       /*
+> > +        * If we land here, something must be very wrong, because we
+> > +        * have no idea why we trapped at all. Warn and undef as a
+> > +        * fallback.
+> > +        */
+> > +       WARN_ON(1);
+> 
+> nit: should this be WARN_ONCE() instead?
+> 
+> > +
+> > +undef:
+> > +       kvm_inject_undefined(vcpu);
+> > +       return 1;
+> > +}
+> 
+> I'm wondering if this can be simplified by having one switch()
+> statement that toggles both allowed and fwd (or maybe even only fwd),
+> and then inject depending on that, e.g.,
+> 
+> +static int handle_ls64b(struct kvm_vcpu *vcpu)
+> +{
+> +    struct kvm *kvm = vcpu->kvm;
+> +    bool is_nv = vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu);
+> +    u64 hcrx = __vcpu_sys_reg(vcpu, HCRX_EL2);
+> +    u64 esr = kvm_vcpu_get_esr(vcpu);
+> +    u64 iss = ESR_ELx_ISS(esr);
+> +    bool fwd = false;
+> +
+> +    switch (iss) {
+> +    case ESR_ELx_ISS_ST64BV:
+> +         fwd = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V) &&
+> +                   !(hcrx & HCRX_EL2_EnASR)
+> +         break;
+> ...
+> +    default:
+> +        WARN_ONCE(1);
+> + }
+> +
+> +    if (is_nv && fwd) {
+> +        kvm_inject_nested_sync(vcpu, esr);
+> +    else
+> +        kvm_inject_undefined(vcpu);
+> +
+> +    return 1;
+> +}
+> 
+> I think this has the same effect as the code above.
 
-I just did a quick check on a hv-balloon Windows 2019 setup that I had on hand
-and it seems to work with "kernel-irqchip=split" the same correct way as without
-this option (which AFAIK is kernel-irqchip=on for q35 machine type).
+Yeah, I think something like that could work. I initially was trying
+to handle all 4 states (allowed, fwd), but obviously some states do
+not exist (you don't forward something that isn't allowed).
 
-So at least this Windows version and its VMBus client driver seem to not be
-affected by this issue.
+My only concern here is that we don't have clear rules on the init of
+EL2 guest registers such as HCRX_EL2 when !NV, but that's something
+that can be easily done (or even worked around locally).
 
-Will try to look at this deeper in coming time as I am fairly busy right now
-with QEMU live migration stuff before the code freeze soon.
+Maybe we should introduce the dreaded notion of "effective value" for
+EL2 registers when NV is not enabled...
 
 Thanks,
-Maciej
 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
