@@ -1,363 +1,222 @@
-Return-Path: <kvm+bounces-40021-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40022-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AD05A4DD7D
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 13:07:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4478A4DD88
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 13:09:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B98A16EF57
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 12:07:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D856A18960B4
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 12:10:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57B6F20102F;
-	Tue,  4 Mar 2025 12:07:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAB3B20298D;
+	Tue,  4 Mar 2025 12:09:42 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E711FF601;
-	Tue,  4 Mar 2025 12:07:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB561FF601;
+	Tue,  4 Mar 2025 12:09:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741090062; cv=none; b=fs2AyEdJbS9k6Bhf5jRSUnmTMvR3bIv+dEuNPTHc2y+OWti+kWiK9kj1HM3V3wGanHif3s1wS9araqzvmC6aaJaUVZ4IguRxY/IL29ZAwK3cjgGjVo4ttZbA/95666htfrSMnEYryk7NUade+uhCnC2yUs9l/d/dqYcW0MtLwkU=
+	t=1741090182; cv=none; b=RSoKzq8IZ6xkbm4EjSDHCHWPUikvMJed6hIlfg7F5wWMVrgdvlw//asHOkjdWkongHt6+Um56kBF0gZt/R2H8Fu03TU3/t1Wsb7tHtDHM/PDCldUDOy1O91t2uZREouPfsr4KTelxmsxZQ8JNrukQqLE8QLSVc0W9IerCXYpmbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741090062; c=relaxed/simple;
-	bh=bp2iPskVZOK1JVVi3KlAz8zsthiV1Tqzf0yTRvNgGYc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=d6rTXaM3SdVCP4gH/ooVXPC1mvV0eF8/b14D02i74MdXgOdRvXM3NZC3E7mUMEfyEFdCWWlC1oGhiJz4MiO7qXQgvrx+lC+ZOyd1HKsAUHTyUtAoUMjjjz7FbzheaQI1rT+K8dm7Vu4Jb+l5cEGYHg3bOq53YL/ZRYgzlBDZ8h4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+	s=arc-20240116; t=1741090182; c=relaxed/simple;
+	bh=4S8tqaK0XJCLIv/7Rv3hJVe8rj1mH8s+KkdKMp6uzeo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=DaXZqM0wD0MrA8Ot0rtwhQJD1l3t48U+XdoRWzCJZd2X9Xux6zoGaUno/KUm39M88Xu/y2sNlX4ZXXSKUlMCUSKXd6C4qLPVELtoZ5XYRJjeUDkDf9qmRSBzCjgNW0EI9btFvx1GPYZL8vOjBrFtOeDDynft8NV7oVub34d4d8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Z6ZF04Ny7z17LYj;
-	Tue,  4 Mar 2025 20:07:32 +0800 (CST)
-Received: from kwepemg500006.china.huawei.com (unknown [7.202.181.43])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2F0BE1A0188;
-	Tue,  4 Mar 2025 20:06:59 +0800 (CST)
-Received: from huawei.com (10.50.165.33) by kwepemg500006.china.huawei.com
- (7.202.181.43) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 4 Mar
- 2025 20:06:58 +0800
-From: Longfang Liu <liulongfang@huawei.com>
-To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <jonathan.cameron@huawei.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linuxarm@openeuler.org>, <liulongfang@huawei.com>
-Subject: [PATCH v2 3/3] migration: adapt to new migration configuration
-Date: Tue, 4 Mar 2025 20:05:28 +0800
-Message-ID: <20250304120528.63605-4-liulongfang@huawei.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20250304120528.63605-1-liulongfang@huawei.com>
-References: <20250304120528.63605-1-liulongfang@huawei.com>
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Z6ZBX3494z2DkHc;
+	Tue,  4 Mar 2025 20:05:24 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id D7E721A016C;
+	Tue,  4 Mar 2025 20:09:35 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 4 Mar 2025 20:09:35 +0800
+Message-ID: <91fcdfca-3e7b-417c-ab26-7d5e37853431@huawei.com>
+Date: Tue, 4 Mar 2025 20:09:35 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemg500006.china.huawei.com (7.202.181.43)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] mm: alloc_pages_bulk: remove assumption of populating
+ only NULL elements
+To: Dave Chinner <david@fromorbit.com>
+CC: Yishai Hadas <yishaih@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>, Shameer
+ Kolothum <shameerali.kolothum.thodi@huawei.com>, Kevin Tian
+	<kevin.tian@intel.com>, Alex Williamson <alex.williamson@redhat.com>, Chris
+ Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, David Sterba
+	<dsterba@suse.com>, Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
+	Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>, Sandeep
+ Dhavale <dhavale@google.com>, Carlos Maiolino <cem@kernel.org>, "Darrick J.
+ Wong" <djwong@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
+	<ilias.apalodimas@linaro.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Trond Myklebust
+	<trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, Chuck Lever
+	<chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown
+	<neilb@suse.de>, Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo
+	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Luiz Capitulino
+	<luizcap@redhat.com>, Mel Gorman <mgorman@techsingularity.net>,
+	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, <linux-btrfs@vger.kernel.org>,
+	<linux-erofs@lists.ozlabs.org>, <linux-xfs@vger.kernel.org>,
+	<linux-mm@kvack.org>, <netdev@vger.kernel.org>, <linux-nfs@vger.kernel.org>
+References: <20250228094424.757465-1-linyunsheng@huawei.com>
+ <Z8a3WSOrlY4n5_37@dread.disaster.area>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <Z8a3WSOrlY4n5_37@dread.disaster.area>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-On the new hardware platform, the migration region is moved from
-VF to PF. the driver also needs to be modified accordingly to adapt
-to the new hardware device.
+On 2025/3/4 16:18, Dave Chinner wrote:
 
-Use PF's io base directly on the new hardware platform. and no mmap
-operation is required.
-If it is on an old platform, the driver needs to be compatible with
-the old solution.
+...
 
-Signed-off-by: Longfang Liu <liulongfang@huawei.com>
----
- .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 183 ++++++++++++------
- .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |   7 +
- 2 files changed, 130 insertions(+), 60 deletions(-)
+> 
+>>
+>> 1. https://lore.kernel.org/all/bd8c2f5c-464d-44ab-b607-390a87ea4cd5@huawei.com/
+>> 2. https://lore.kernel.org/all/20250212092552.1779679-1-linyunsheng@huawei.com/
+>> CC: Jesper Dangaard Brouer <hawk@kernel.org>
+>> CC: Luiz Capitulino <luizcap@redhat.com>
+>> CC: Mel Gorman <mgorman@techsingularity.net>
+>> CC: Dave Chinner <david@fromorbit.com>
+>> CC: Chuck Lever <chuck.lever@oracle.com>
+>> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+>> Acked-by: Jeff Layton <jlayton@kernel.org>
+>> ---
+>> V2:
+>> 1. Drop RFC tag and rebased on latest linux-next.
+>> 2. Fix a compile error for xfs.
+> 
+> And you still haven't tested the code changes to XFS, because
+> this patch is also broken.
 
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-index 599905dbb707..d67f8672c5f8 100644
---- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-@@ -125,6 +125,72 @@ static int qm_get_cqc(struct hisi_qm *qm, u64 *addr)
- 	return 0;
- }
- 
-+static int qm_get_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
-+			   struct acc_vf_data *vf_data)
-+{
-+	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
-+	struct device *dev = &qm->pdev->dev;
-+	u32 eqc_addr, aeqc_addr;
-+	int ret;
-+
-+	if (qm->ver == QM_HW_V3) {
-+		eqc_addr = QM_EQC_DW0;
-+		aeqc_addr = QM_AEQC_DW0;
-+	} else {
-+		eqc_addr = QM_EQC_PF_DW0;
-+		aeqc_addr = QM_AEQC_PF_DW0;
-+	}
-+
-+	/* QM_EQC_DW has 7 regs */
-+	ret = qm_read_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
-+	if (ret) {
-+		dev_err(dev, "failed to read QM_EQC_DW\n");
-+		return ret;
-+	}
-+
-+	/* QM_AEQC_DW has 7 regs */
-+	ret = qm_read_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
-+	if (ret) {
-+		dev_err(dev, "failed to read QM_AEQC_DW\n");
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static int qm_set_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
-+			   struct acc_vf_data *vf_data)
-+{
-+	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
-+	struct device *dev = &qm->pdev->dev;
-+	u32 eqc_addr, aeqc_addr;
-+	int ret;
-+
-+	if (qm->ver == QM_HW_V3) {
-+		eqc_addr = QM_EQC_DW0;
-+		aeqc_addr = QM_AEQC_DW0;
-+	} else {
-+		eqc_addr = QM_EQC_PF_DW0;
-+		aeqc_addr = QM_AEQC_PF_DW0;
-+	}
-+
-+	/* QM_EQC_DW has 7 regs */
-+	ret = qm_write_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
-+	if (ret) {
-+		dev_err(dev, "failed to write QM_EQC_DW\n");
-+		return ret;
-+	}
-+
-+	/* QM_AEQC_DW has 7 regs */
-+	ret = qm_write_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
-+	if (ret) {
-+		dev_err(dev, "failed to write QM_AEQC_DW\n");
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
- static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
- {
- 	struct device *dev = &qm->pdev->dev;
-@@ -167,20 +233,6 @@ static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
- 		return ret;
- 	}
- 
--	/* QM_EQC_DW has 7 regs */
--	ret = qm_read_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
--	if (ret) {
--		dev_err(dev, "failed to read QM_EQC_DW\n");
--		return ret;
--	}
--
--	/* QM_AEQC_DW has 7 regs */
--	ret = qm_read_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
--	if (ret) {
--		dev_err(dev, "failed to read QM_AEQC_DW\n");
--		return ret;
--	}
--
- 	return 0;
- }
- 
-@@ -238,20 +290,6 @@ static int qm_set_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
- 		return ret;
- 	}
- 
--	/* QM_EQC_DW has 7 regs */
--	ret = qm_write_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
--	if (ret) {
--		dev_err(dev, "failed to write QM_EQC_DW\n");
--		return ret;
--	}
--
--	/* QM_AEQC_DW has 7 regs */
--	ret = qm_write_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
--	if (ret) {
--		dev_err(dev, "failed to write QM_AEQC_DW\n");
--		return ret;
--	}
--
- 	return 0;
- }
- 
-@@ -399,13 +437,6 @@ static int vf_qm_check_match(struct hisi_acc_vf_core_device *hisi_acc_vdev,
- 		return -EINVAL;
- 	}
- 
--	ret = qm_write_regs(vf_qm, QM_VF_STATE, &vf_data->vf_qm_state, 1);
--	if (ret) {
--		dev_err(dev, "failed to write QM_VF_STATE\n");
--		return ret;
--	}
--
--	hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
- 	hisi_acc_vdev->match_done = true;
- 	return 0;
- }
-@@ -456,6 +487,13 @@ static int vf_qm_load_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
- 	if (migf->total_length < sizeof(struct acc_vf_data))
- 		return -EINVAL;
- 
-+	ret = qm_write_regs(qm, QM_VF_STATE, &vf_data->vf_qm_state, 1);
-+	if (ret) {
-+		dev_err(dev, "failed to write QM_VF_STATE\n");
-+		return -EINVAL;
-+	}
-+	hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
-+
- 	qm->eqe_dma = vf_data->eqe_dma;
- 	qm->aeqe_dma = vf_data->aeqe_dma;
- 	qm->sqc_dma = vf_data->sqc_dma;
-@@ -470,6 +508,10 @@ static int vf_qm_load_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
- 		return ret;
- 	}
- 
-+	ret = qm_set_xqc_regs(hisi_acc_vdev, vf_data);
-+	if (ret)
-+		return ret;
-+
- 	ret = hisi_qm_mb(qm, QM_MB_CMD_SQC_BT, qm->sqc_dma, 0, 0);
- 	if (ret) {
- 		dev_err(dev, "set sqc failed\n");
-@@ -544,6 +586,10 @@ static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
- 		return ret;
- 	}
- 
-+	ret = qm_get_xqc_regs(hisi_acc_vdev, vf_data);
-+	if (ret)
-+		return -EINVAL;
-+
- 	ret = vf_qm_read_data(vf_qm, vf_data);
- 	if (ret)
- 		return -EINVAL;
-@@ -688,8 +734,12 @@ static int hisi_acc_vf_load_state(struct hisi_acc_vf_core_device *hisi_acc_vdev)
- {
- 	struct device *dev = &hisi_acc_vdev->vf_dev->dev;
- 	struct hisi_acc_vf_migration_file *migf = hisi_acc_vdev->resuming_migf;
-+	struct acc_vf_data *vf_data = &migf->vf_data;
- 	int ret;
- 
-+	if (vf_data->vf_qm_state != QM_READY)
-+		return 0;
-+
- 	/* Recover data to VF */
- 	ret = vf_qm_load_data(hisi_acc_vdev, migf);
- 	if (ret) {
-@@ -1131,34 +1181,46 @@ static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
- {
- 	struct vfio_pci_core_device *vdev = &hisi_acc_vdev->core_device;
- 	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
-+	struct hisi_qm *pf_qm = hisi_acc_vdev->pf_qm;
- 	struct pci_dev *vf_dev = vdev->pdev;
- 
--	/*
--	 * ACC VF dev BAR2 region consists of both functional register space
--	 * and migration control register space. For migration to work, we
--	 * need access to both. Hence, we map the entire BAR2 region here.
--	 * But unnecessarily exposing the migration BAR region to the Guest
--	 * has the potential to prevent/corrupt the Guest migration. Hence,
--	 * we restrict access to the migration control space from
--	 * Guest(Please see mmap/ioctl/read/write override functions).
--	 *
--	 * Please note that it is OK to expose the entire VF BAR if migration
--	 * is not supported or required as this cannot affect the ACC PF
--	 * configurations.
--	 *
--	 * Also the HiSilicon ACC VF devices supported by this driver on
--	 * HiSilicon hardware platforms are integrated end point devices
--	 * and the platform lacks the capability to perform any PCIe P2P
--	 * between these devices.
--	 */
-+	if (pf_qm->ver == QM_HW_V3) {
-+		/*
-+		 * ACC VF dev BAR2 region consists of both functional register space
-+		 * and migration control register space. For migration to work, we
-+		 * need access to both. Hence, we map the entire BAR2 region here.
-+		 * But unnecessarily exposing the migration BAR region to the Guest
-+		 * has the potential to prevent/corrupt the Guest migration. Hence,
-+		 * we restrict access to the migration control space from
-+		 * Guest(Please see mmap/ioctl/read/write override functions).
-+		 *
-+		 * Please note that it is OK to expose the entire VF BAR if migration
-+		 * is not supported or required as this cannot affect the ACC PF
-+		 * configurations.
-+		 *
-+		 * Also the HiSilicon ACC VF devices supported by this driver on
-+		 * HiSilicon hardware platforms are integrated end point devices
-+		 * and the platform lacks the capability to perform any PCIe P2P
-+		 * between these devices.
-+		 */
- 
--	vf_qm->io_base =
--		ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
--			pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
--	if (!vf_qm->io_base)
--		return -EIO;
-+		vf_qm->io_base =
-+			ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
-+				pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
-+		if (!vf_qm->io_base)
-+			return -EIO;
- 
--	vf_qm->fun_type = QM_HW_VF;
-+		vf_qm->fun_type = QM_HW_VF;
-+		vf_qm->ver = pf_qm->ver;
-+	} else {
-+		/*
-+		 * In the new HW platform, the migration function register space is in BAR2 of PF,
-+		 * and each VF occupies 8KB address space.
-+		 */
-+		vf_qm->io_base = pf_qm->io_base + QM_MIG_REGION_OFFSET +
-+				hisi_acc_vdev->vf_id * QM_MIG_REGION_SIZE;
-+		vf_qm->fun_type = QM_HW_PF;
-+	}
- 	vf_qm->pdev = vf_dev;
- 	mutex_init(&vf_qm->mailbox_lock);
- 
-@@ -1488,7 +1550,8 @@ static void hisi_acc_vfio_pci_close_device(struct vfio_device *core_vdev)
- 
- 	mutex_lock(&hisi_acc_vdev->open_mutex);
- 	hisi_acc_vdev->dev_opened = false;
--	iounmap(vf_qm->io_base);
-+	if (vf_qm->ver == QM_HW_V3)
-+		iounmap(vf_qm->io_base);
- 	mutex_unlock(&hisi_acc_vdev->open_mutex);
- 	vfio_pci_core_close_device(core_vdev);
- }
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-index 245d7537b2bc..b01eb54525d3 100644
---- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-@@ -50,6 +50,13 @@
- #define QM_EQC_DW0		0X8000
- #define QM_AEQC_DW0		0X8020
- 
-+#define QM_MIG_REGION_OFFSET	0x180000
-+#define QM_MIG_REGION_SIZE	0x2000
-+
-+#define QM_SUB_VERSION_ID		0x100210
-+#define QM_EQC_PF_DW0		0x1c00
-+#define QM_AEQC_PF_DW0		0x1c20
-+
- struct acc_vf_data {
- #define QM_MATCH_SIZE offsetofend(struct acc_vf_data, qm_rsv_state)
- 	/* QM match information */
--- 
-2.24.0
+I tested XFS using the below cmd and testcase, testing seems
+to be working fine, or am I missing something obvious here
+as I am not realy familiar with fs subsystem yet:
 
+Step to setup the xfs:
+dd if=/dev/zero of=xfs_image bs=1M count=1024
+losetup -f xfs_image
+losetup -a
+./mkfs.xfs /dev/loop0
+mkdir xfs_test
+mount /dev/loop0 xfs_test/
+
+Test shell file:
+#!/bin/bash
+
+# Configuration parameters
+DIR="/home/xfs_test"              # Directory to perform file operations
+FILE_COUNT=100              # Maximum number of files to create in each loop
+MAX_FILE_SIZE=1024          # Maximum file size in KB
+MIN_FILE_SIZE=10            # Minimum file size in KB
+OPERATIONS=10               # Number of create/delete operations per loop
+TOTAL_RUNS=10000               # Total number of loops to run
+
+# Check if the directory exists
+if [ ! -d "$DIR" ]; then
+    echo "Directory $DIR does not exist. Please create the directory first!"
+    exit 1
+fi
+
+echo "Starting file system test on: $DIR"
+
+for ((run=1; run<=TOTAL_RUNS; run++)); do
+    echo "Run $run of $TOTAL_RUNS"
+
+    # Randomly create files
+    for ((i=1; i<=OPERATIONS; i++)); do
+        # Generate a random file size between MIN_FILE_SIZE and MAX_FILE_SIZE (in KB)
+        FILE_SIZE=$((RANDOM % (MAX_FILE_SIZE - MIN_FILE_SIZE + 1) + MIN_FILE_SIZE))
+        # Generate a unique file name using timestamp and random number
+        FILE_NAME="$DIR/file_$(date +%s)_$RANDOM"
+        # Create a file with random content
+        dd if=/dev/urandom of="$FILE_NAME" bs=1K count=$FILE_SIZE &>/dev/null
+        echo "Created file: $FILE_NAME, Size: $FILE_SIZE KB"
+    done
+
+    # Randomly delete files
+    for ((i=1; i<=OPERATIONS; i++)); do
+        # List all files in the directory
+        FILE_LIST=($(ls $DIR))
+        # Check if there are any files to delete
+        if [ ${#FILE_LIST[@]} -gt 0 ]; then
+            # Randomly select a file to delete
+            RANDOM_FILE=${FILE_LIST[$RANDOM % ${#FILE_LIST[@]}]}
+            rm -f "$DIR/$RANDOM_FILE"
+            echo "Deleted file: $DIR/$RANDOM_FILE"
+        fi
+    done
+
+    echo "Completed run $run"
+done
+
+echo "Test completed!"
+
+
+> 
+>> diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
+>> index 5d560e9073f4..b4e95b2dd0f0 100644
+>> --- a/fs/xfs/xfs_buf.c
+>> +++ b/fs/xfs/xfs_buf.c
+>> @@ -319,16 +319,17 @@ xfs_buf_alloc_pages(
+>>  	 * least one extra page.
+>>  	 */
+>>  	for (;;) {
+>> -		long	last = filled;
+>> +		long	alloc;
+>>  
+>> -		filled = alloc_pages_bulk(gfp_mask, bp->b_page_count,
+>> -					  bp->b_pages);
+>> +		alloc = alloc_pages_bulk(gfp_mask, bp->b_page_count - filled,
+>> +					 bp->b_pages + filled);
+>> +		filled += alloc;
+>>  		if (filled == bp->b_page_count) {
+>>  			XFS_STATS_INC(bp->b_mount, xb_page_found);
+>>  			break;
+>>  		}
+>>  
+>> -		if (filled != last)
+>> +		if (alloc)
+>>  			continue;
+> 
+> alloc_pages_bulk() now returns the number of pages allocated in the
+> array. So if we ask for 4 pages, then get 2, filled is now 2. Then
+> we loop, ask for another 2 pages, get those two pages and it returns
+> 4. Now filled is 6, and we continue.
+
+It will be returning 2 instead of 4 for the second loop if I understand
+it correctly as 'bp->b_pages + filled' and 'bp->b_page_count - filled'
+is passing to alloc_pages_bulk() API now.
+
+> 
+> Now we ask alloc_pages_bulk() for -2 pages, which returns 4 pages...
+> 
+> Worse behaviour: second time around, no page allocation succeeds
+> so it returns 2 pages. Filled is now 4, which is the number of pages
+> we need, so we break out of the loop with only 2 pages allocated.
+> There's about to be kernel crashes occur.....
+> 
+> Once is a mistake, twice is compeltely unacceptable.  When XFS stops
+> using alloc_pages_bulk (probably 6.15) I won't care anymore. But
+> until then, please stop trying to change this code.
+> 
+> NACK.
+> 
+> -Dave.
 
