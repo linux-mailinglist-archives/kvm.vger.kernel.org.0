@@ -1,186 +1,177 @@
-Return-Path: <kvm+bounces-40084-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40085-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 554A9A4EF64
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 22:31:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 329A7A4EFD3
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 23:01:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48251172C6A
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 21:31:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D3173AC30D
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 22:01:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9C06278103;
-	Tue,  4 Mar 2025 21:31:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7235427933A;
+	Tue,  4 Mar 2025 21:58:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PKHSVMcl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g3WsuEdo"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70D0B2673BA
-	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 21:31:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CD62278164
+	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 21:58:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741123898; cv=none; b=mvZ7NkbAC1ywJBeCVKwfg/d1HquHiLVn0wfF48Q77ViNKNLMirRTsPQ8MQ74b7chwMI1yv+t9JkkyGODyTUtw3WGNs4IwadgglRApzQPgH7X5IhYNM1/Qp825K2xt8iMb7H13Avf+Yroci1KBPSfJEhpcyNMRmAweO5NV7smpbA=
+	t=1741125528; cv=none; b=QfOzm10gdWVpWB9SmuuB4x7a0yA81665YgOCYLE8UxvLc1CYyDjWUXTlXSiehngwyDuzcXrKncSNw/kr3S5RlusQV9RnQt6VJ9Iu/Vp5ZUCy1i2IqSbJZ+Ej6QCagKIo+nU6fDvhhqUX86YQhR9CQBD1csoY01vR5IkuR0RP/6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741123898; c=relaxed/simple;
-	bh=iZIzip/a82vX2LkJv4zSZm4C3SJDxHZJwHDvU2KQ3Lw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=obT9boisS8dNqy39HuvYJfo5mqtdiuUfha25md0FG6k1fcOyvmrV8CilNyneoFZI5qe2KrS1y7z6bo8jvy14u0xFCYkjpSZXXgiRxPX3M1dyzSnrW24Ld8kIvW+E1QS+HJUotFb+zebrH5Lc/W2xQkals29TIYXPjeZtje69c8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PKHSVMcl; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741123895;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/u+lFueGmAvUTM+DtaLsQO1A1g/BaRj/gNOIsb+910g=;
-	b=PKHSVMclxtCDIQ+ZkfTp4Q3WZXs3lReg5RD0iiLH0Wf0BegavvJbwUd0NzQsuACnny2tOe
-	noWX3jQ2acxzsdereNtHsJPGlV2ei2ASeoepzaw32JevZLJNwfC5rG3IeepOF8Iwbcd11B
-	qxjniK52Y4Z4DOCxCmnjfgC3SgXdTIw=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-10-3_UlCdBXO-OkX_oIR4xNtg-1; Tue, 04 Mar 2025 16:31:34 -0500
-X-MC-Unique: 3_UlCdBXO-OkX_oIR4xNtg-1
-X-Mimecast-MFC-AGG-ID: 3_UlCdBXO-OkX_oIR4xNtg_1741123893
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-4721d9703ecso133760901cf.3
-        for <kvm@vger.kernel.org>; Tue, 04 Mar 2025 13:31:34 -0800 (PST)
+	s=arc-20240116; t=1741125528; c=relaxed/simple;
+	bh=oSozo7BznZq14l5z/ZoFH+lJ1JJjswQ4w2zFnLW19RQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=GAD1jL7Jwu6NqmLDCj046SuBbmdpdfMCju2jzBKkc65o0oOi4s5oZ9XM3jdUeV4SWzG+tSaaAhmsTONxOEkyqPdT8Zvvv8WHypBQ11pnMyNMj/fI2W0s5VAbuC7zMmTzliGg0BUV+ag7ERMbwgk3f89QR3D5gsEXTvsXcpBpKqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g3WsuEdo; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fe86c01f4aso11808616a91.2
+        for <kvm@vger.kernel.org>; Tue, 04 Mar 2025 13:58:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741125526; x=1741730326; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rU2M9OXwTVnYbkbyQeQ/NuCDqqxkxOkVZk19DIvCT9w=;
+        b=g3WsuEdozEidoSVszolMaen8FvQEIjHsWRG69thS7oOYHL6Z1Bv80d918x9L/dl6tK
+         b5TU+5OwqOnnu2hn9kuWl1pDg1uSN2KtbMSZnR9ClVM8BZbIiYf7ottjgm2Ig9yLX5nP
+         XxxizzBkk0Ywvn8hBEhDBgCgNZG6T+mYFDJu+O/VOWbBeAqSD6goc36TT+8Z6gISzTjz
+         9l03TloDOkr0FU0QhosipemWhEDlohpE81zyK9LFfISSaZ8xvbIVDzQWq0jhRE3TJ29Q
+         YcWarntqDXltkQwFw1plHRPwRXInysOuxbCQKK+ytD4DttgrNWFCox5IBU9J/0GTRQZM
+         SA+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741123893; x=1741728693;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/u+lFueGmAvUTM+DtaLsQO1A1g/BaRj/gNOIsb+910g=;
-        b=eJwLLz4iEFEc4tqdxu+Q1sDbJXPA4pTUFXgv1VeXLWU8zWuz4RgOhmXCxLUgY6N3HT
-         3zB4QPjxu93GKbWQc+wVvwkr8K8Z7VaJZ/IBhthqUbCVkrRdcf7mUrdRGCvyJ+BBLWVH
-         12wZ9SxkANIfXSLZlYr0jcGh5ZxCUZoZ5259czkZceoEJKxLN8DFwwBFfbb3bdr3Yme0
-         MjbZFtWXbm+QEn4C56X0XHPDGVjia26d2xksaVUBPS1gV3zrRdIg+0SSzZyGONMXYDQv
-         JY+yt29QZoSO3MuC2ivBRaTixerZEulUvTtIWNIZFKPSD/FEFgmk+zSufkqqsoRM3pg4
-         W5nQ==
-X-Gm-Message-State: AOJu0YyPRTtjnqbztF5lcLbCpEaIwl2jtcs+U347vG4WtyN+hIC0X2eK
-	dP8k31ae8ags6TZdw7idYi77Rr6lIgSeMOszh78jRAvgoLteBd0GnUh/iYHAJhy6gq3RaMeIIQg
-	Vs38Tz7ZtW1hBWgCw0sIaLCrPmaNhsE5vfdtkNikt5j8JVCYqsQ==
-X-Gm-Gg: ASbGncsS1CLvKWUVxYwfUhdHgtb8NWLDN7ESzUCOttYbplTOPqnmPng3LiYcg6oynnL
-	1rvmDNSDQX65DH5ziHspQS2KxFpVPXa3OefbrMIqTNNXETtkCREgUZeJi9i8sLDTZSdRmhoFwv/
-	KjXUwGz3wjMHxRPo1b359XA5i4ewlnw/NxsddHakOomIz1EosB8jXp5fhVdaISY8mTiVzu1u28I
-	kv06gFCWu0sV6o4RPE71mtqC4akgxwoZtY90KnOSuDiLHQ65WT3i2wXpXRTS6+vLdI0bL8Y+ekp
-	oH8Ip3E/Gr5FAvQ=
-X-Received: by 2002:a05:622a:60f:b0:471:be0e:e853 with SMTP id d75a77b69052e-4750b43c3d2mr11681861cf.20.1741123893530;
-        Tue, 04 Mar 2025 13:31:33 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFq3Qm8HjXWzqA8J3MceftXH5+TdpP0G/l/xsbfQtBrI9xoJPnzFc7gCJPy7NR5vHnpnooV3A==
-X-Received: by 2002:a05:622a:60f:b0:471:be0e:e853 with SMTP id d75a77b69052e-4750b43c3d2mr11681531cf.20.1741123893214;
-        Tue, 04 Mar 2025 13:31:33 -0800 (PST)
-Received: from starship ([2607:fea8:fc01:8d8d:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-474e0f1e0c1sm36608431cf.47.2025.03.04.13.31.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Mar 2025 13:31:32 -0800 (PST)
-Message-ID: <23cfae5adcdee2c69014d18b2b19be157ef2c20d.camel@redhat.com>
-Subject: Re: QEMU's Hyper-V HV_X64_MSR_EOM is broken with split IRQCHIP
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>, Sean Christopherson
-	 <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Paolo Bonzini
-	 <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>, "Maciej S. Szmigiero"
-	 <maciej.szmigiero@oracle.com>
-Date: Tue, 04 Mar 2025 16:31:31 -0500
-In-Reply-To: <87cyewq2ea.fsf@redhat.com>
-References: <Z8ZBzEJ7--VWKdWd@google.com> <87ikoposs6.fsf@redhat.com>
-	 <Z8cNBTgz3YBDga3c@google.com> <87cyewq2ea.fsf@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        d=1e100.net; s=20230601; t=1741125526; x=1741730326;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rU2M9OXwTVnYbkbyQeQ/NuCDqqxkxOkVZk19DIvCT9w=;
+        b=nPlW1HktD+/2+vl1XrBEJdTWs/4odxZhnVvp0hcfgZxJlSKsdjGSzsPAHCLY1mCcuU
+         4F2Z6dBa6fJ5AXnI7KYdG/cA7NL15up5IWXsK6dJFWepk2cuddSX6sGZ+vxrv9wAF5l2
+         u3yoKGo9FXXJJ9jL+STs6p7F4edyTD9HUh7ngRSGU9U19kKCcHxYN/uCpQXGBbIsTlmi
+         QuDPfj5is2RDQsZkKJBAH093XOy7P61/gFSMvVAcudcoVKcb0BUwTYGa7rOvTOVfiUX1
+         PI5/87UrHu31qdC19NnnJdvfTGve6LRNwmNbdhmBPSKYzMAYOZp3o0msreWWXgjNOVDJ
+         MvMA==
+X-Forwarded-Encrypted: i=1; AJvYcCWfN/5zRY+Nmk1eUZbNeNmMJMG76wYCsR+ZYhLHqTYuxVynAPvA8eNV8BMWpw6jptJ8YNk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRlQmcmElHJmSF49D2H0AjmUsQY0R1ej3Q0X/HHqzteRownvpa
+	P0dkMGZZoNbR8KQ7A38QECVu/yg/jeXeqFBIt7SXBzUNflGfzilq+JtijNJEang24nuP9b5pxkc
+	uzw==
+X-Google-Smtp-Source: AGHT+IFwhJrFtcLOUPHJp0NCI/99GBs81nXEXvmHLfhsmwGYjVBAdZr5LyhZb46FaL0Cxv1fDqlkY4W/+pM=
+X-Received: from pjbrr3.prod.google.com ([2002:a17:90b:2b43:b0:2fc:1eb0:5743])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2643:b0:2ee:d7d3:3019
+ with SMTP id 98e67ed59e1d1-2ff49728419mr1782201a91.12.1741125526427; Tue, 04
+ Mar 2025 13:58:46 -0800 (PST)
+Date: Tue, 4 Mar 2025 13:58:44 -0800
+In-Reply-To: <217bc786-4c81-4a7a-9c66-71f971c2e8fd@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <cover.1740512583.git.ashish.kalra@amd.com> <27a491ee16015824b416e72921b02a02c27433f7.1740512583.git.ashish.kalra@amd.com>
+ <Z8IBHuSc3apsxePN@google.com> <cf34c479-c741-4173-8a94-b2e69e89810b@amd.com>
+ <Z8I5cwDFFQZ-_wqI@google.com> <8dc83535-a594-4447-a112-22b25aea26f9@amd.com>
+ <Z8YV64JanLqzo-DS@google.com> <217bc786-4c81-4a7a-9c66-71f971c2e8fd@amd.com>
+Message-ID: <Z8d3lDKfN1ffZbt5@google.com>
+Subject: Re: [PATCH v5 6/7] KVM: SVM: Add support to initialize SEV/SNP
+ functionality in KVM
+From: Sean Christopherson <seanjc@google.com>
+To: Ashish Kalra <ashish.kalra@amd.com>
+Cc: pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
+	thomas.lendacky@amd.com, john.allen@amd.com, herbert@gondor.apana.org.au, 
+	michael.roth@amd.com, dionnaglaze@google.com, nikunj@amd.com, ardb@kernel.org, 
+	kevinloughlin@google.com, Neeraj.Upadhyay@amd.com, aik@amd.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-coco@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, 2025-03-04 at 15:46 +0100, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> 
-> > On Tue, Mar 04, 2025, Vitaly Kuznetsov wrote:
-> > > Sean Christopherson <seanjc@google.com> writes:
-> > > 
-> > > > FYI, QEMU's Hyper-V emulation of HV_X64_MSR_EOM has been broken since QEMU commit
-> > > > c82d9d43ed ("KVM: Kick resamplefd for split kernel irqchip"), as nothing in KVM
-> > > > will forward the EOM notification to userspace.  I have no idea if anything in
-> > > > QEMU besides hyperv_testdev.c cares.
-> > > 
-> > > The only VMBus device in QEMU besides the testdev seems to be Hyper-V
-> > > ballooning driver, Cc: Maciej to check whether it's a real problem for
-> > > it or not.
-> > > 
-> > > > The bug is reproducible by running the hyperv_connections KVM-Unit-Test with a
-> > > > split IRQCHIP.
-> > > 
-> > > Thanks, I can reproduce the problem too.
-> > > 
-> > > > Hacking QEMU and KVM (see KVM commit 654f1f13ea56 ("kvm: Check irqchip mode before
-> > > > assign irqfd") as below gets the test to pass.  Assuming that's not a palatable
-> > > > solution, the other options I can think of would be for QEMU to intercept
-> > > > HV_X64_MSR_EOM when using a split IRQCHIP, or to modify KVM to do KVM_EXIT_HYPERV_SYNIC
-> > > > on writes to HV_X64_MSR_EOM with a split IRQCHIP.
-> > > 
-> > > AFAIR, Hyper-V message interface is a fairly generic communication
-> > > mechanism which in theory can be used without interrupts at all: the
-> > > corresponding SINT can be masked and the guest can be polling for
-> > > messages, proccessing them and then writing to HV_X64_MSR_EOM to trigger
-> > > delivery on the next queued message. To support this scenario on the
-> > > backend, we need to receive HV_X64_MSR_EOM writes regardless of whether
-> > > irqchip is split or not. (In theory, we can get away without this by
-> > > just checking if pending messages can be delivered upon each vCPU entry
-> > > but this can take an undefined amount of time in some scenarios so I
-> > > guess we're better off with notifications).
+On Mon, Mar 03, 2025, Ashish Kalra wrote:
+> On 3/3/2025 2:49 PM, Sean Christopherson wrote:
+> > On Mon, Mar 03, 2025, Ashish Kalra wrote:
+> >> On 2/28/2025 4:32 PM, Sean Christopherson wrote:
+> >>> On Fri, Feb 28, 2025, Ashish Kalra wrote:
+> >>>> And the other consideration is that runtime setup of especially SEV-ES VMs will not
+> >>>> work if/when first SEV-ES VM is launched, if SEV INIT has not been issued at 
+> >>>> KVM setup time.
+> >>>>
+> >>>> This is because qemu has a check for SEV INIT to have been done (via SEV platform
+> >>>> status command) prior to launching SEV-ES VMs via KVM_SEV_INIT2 ioctl. 
+> >>>>
+> >>>> So effectively, __sev_guest_init() does not get invoked in case of launching 
+> >>>> SEV_ES VMs, if sev_platform_init() has not been done to issue SEV INIT in 
+> >>>> sev_hardware_setup().
+> >>>>
+> >>>> In other words the deferred initialization only works for SEV VMs and not SEV-ES VMs.
+> >>>
+> >>> In that case, I vote to kill off deferred initialization entirely, and commit to
+> >>> enabling all of SEV+ when KVM loads (which we should have done from day one).
+> >>> Assuming we can do that in a way that's compatible with the /dev/sev ioctls.
+> >>
+> >> Yes, that's what seems to be the right approach to enabling all SEV+ when KVM loads. 
+> >>
+> >> For SEV firmware hotloading we will do implicit SEV Shutdown prior to DLFW_EX
+> >> and SEV (re)INIT after that to ensure that SEV is in UNINIT state before
+> >> DLFW_EX.
+> >>
+> >> We still probably want to keep the deferred initialization for SEV in 
+> >> __sev_guest_init() by calling sev_platform_init() to support the SEV INIT_EX
+> >> case.
 > > 
-> > Before c82d9d43ed ("KVM: Kick resamplefd for split kernel irqchip"), and without
-> > a split IRCHIP, QEMU gets notified via eventfd.  On writes to HV_X64_MSR_EOM, KVM
-> > invokes irq_acked(), i.e. irqfd_resampler_ack(), for all SINT routes.  The eventfd
-> > signal gets back to sint_ack_handler(), which invokes msg_retry() to re-post the
-> > message.
-> > 
-> > I.e. trapping HV_X64_MSR_EOM on would be a slow path relative to what's there for
-> > in-kernel IRQCHIP.
+> > Refresh me, how does INIT_EX fit into all of this?  I.e. why does it need special
+> > casing?
 > 
-> My understanding is that the only type of message which requires fast
-> processing is STIMER messages but we don't do stimers in userspace. I
-> guess it is possible to have a competing 'noisy neighbough' in userspace
-> draining message slots but then we are slow anyway.
+> For SEV INIT_EX, we need the filesystem to be up and running as the user-supplied
+> SEV related persistent data is read from a regular file and provided to the
+> INIT_EX command.
 > 
+> Now, with the modified SEV/SNP init flow, when SEV/SNP initialization is 
+> performed during KVM module load, then as i believe the filesystem will be
+> mounted before KVM module loads, so SEV INIT_EX can be supported without
+> any issues.
+> 
+> Therefore, we don't need deferred initialization support for SEV INIT_EX
+> in case of KVM being loaded as a module.
+> 
+> But if KVM module is built-in, then filesystem will not be mounted when 
+> SEV/SNP initialization is done during KVM initialization and in that case
+> SEV INIT_EX cannot be supported. 
+> 
+> Therefore to support SEV INIT_EX when KVM module is built-in, the following
+> will need to be done:
+> 
+> - Boot kernel with psp_init_on_probe=false command line.
+> - This ensures that during KVM initialization, only SNP INIT is done.
+> - Later at runtime, when filesystem has already been mounted, 
+> SEV VM launch will trigger deferred SEV (INIT_EX) initialization
+> (via the __sev_guest_init() -> sev_platform_init() code path).
+> 
+> NOTE: psp_init_on_probe module parameter and deferred SEV initialization
+> during SEV VM launch (__sev_guest_init()->sev_platform_init()) was added
+> specifically to support SEV INIT_EX case.
 
-Hi,
+Ugh.  That's quite the unworkable mess.  sev_hardware_setup() can't determine
+if SEV/SEV-ES is fully supported without initializing the platform, but userspace
+needs KVM to do initialization so that SEV platform status reads out correctly.
 
-AFAIK, HV_X64_MSR_EOM is only one of the ways for the guest to signal that it processed the SYNIC message.
+Aha!
 
-Guest can also signal that it finished processing a SYNIC message using HV_X64_MSR_EOI or even by writing to EOI
-local apic register, and I actually think that the later is what is used by at least recent Windows.
+Isn't that a Google problem?  And one that resolves itself if initialization is
+done on kvm-amd.ko load?
 
+A system/kernel _could_ be configured to use a path during initcalls, with the
+approproate initramfs magic.  So there's no hard requirement that makes init_ex_path
+incompatible with CRYPTO_DEV_CCP_DD=y or CONFIG_KVM_AMD=y.  Google's environment
+simply doesn't jump through those hoops.
 
-Now KVM does intercept EOI and it even "happens" to work with both APICv and AVIC:
+But Google _does_ build kvm-amd.ko as a module.
 
-APICv has EOI 'exiting bitmap' and SYNC interrupts are set there (see vcpu_load_eoi_exitmap).
-
-AVIC intercepts EOI write iff the interrupt was level-triggered and SYNIC interrupts happen
-to be indeed level-triggered:
-
-static int synic_set_irq(struct kvm_vcpu_hv_synic *synic, u32 sint)
-...
-	irq.shorthand = APIC_DEST_SELF;
-	irq.dest_mode = APIC_DEST_PHYSICAL;
-	irq.delivery_mode = APIC_DM_FIXED;
-	irq.vector =
-vector;
-	irq.level = 1;
-...
-
-
-Best regards,
-	Maxim Levitsky
-
-
-
+So rather than carry a bunch of hard-to-follow code (and potentially impossible
+constraints), always do initialization at kvm-amd.ko load, and require the platform
+owner to ensure init_ex_path can be resolved when sev_hardware_setup() runs, i.e.
+when kvm-amd.ko is loaded or its initcall runs.
 
