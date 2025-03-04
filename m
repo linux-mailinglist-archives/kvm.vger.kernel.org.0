@@ -1,222 +1,206 @@
-Return-Path: <kvm+bounces-40001-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40002-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EA64A4D7BC
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 10:18:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E35DA4D7E6
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 10:22:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FB0F3ABD22
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 09:17:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8783518848BC
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 09:22:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36BBC1FCCF7;
-	Tue,  4 Mar 2025 09:17:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F8FB1FCCF5;
+	Tue,  4 Mar 2025 09:21:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="fuxu++ZY"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="X0lw7Z0V"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B11841F4CA6
-	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 09:17:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A142B1F666B;
+	Tue,  4 Mar 2025 09:21:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741079873; cv=none; b=l9XTuFc92HO2vKSTDJicKUmg/j/IESXl+I8IC8CWmfU/kD4x6p4qYqwbCUI7FTGdsVZadS7l75z0dvGbgHLg0HyP3DFra3YUVQO1I4nEpaDTRRz6i6IF55cI2jPqiTYwGEJMZf5x5t2keHyO5bvzoQs4L3R9aAOpfIvQ08cpBuQ=
+	t=1741080117; cv=none; b=Qu0u80m1VW7GvOM1HgLSeaPHrFy/RevYD8g0ivVy5kw1DIntWwXUDTFG4i7QDI/n6hGRBhf/WhXARrQ932xQ7qnZPExlFoA/O4x+w8ajVrp8bjeEvGvipdKATtFkzgUkc+0NIXLF36aB4tMfHg0kHEJsl5YC9IzyOboM6K+o7Wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741079873; c=relaxed/simple;
-	bh=EYwd2Jf8ZA0KU9xC36aNCIR5lDQhcFK0j7Q6bTeAt5o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aGkIqEw9ctL6xmAEn59Yp0h+PebzhmTLr5DvHXOmhQ9GMVxPVZJ8Pe63/oEPN7hv4W//smq/RGaBU6+FeIIZYrkmkpatlvQTCXdPani5omrsi8Hr6NJg7Bzli0NUD3Vv+iP2yLHqV/BA4CimqDuecp8uK87II4x1zEAPdsJMMcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=fuxu++ZY; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5e53b3fa7daso3553496a12.2
-        for <kvm@vger.kernel.org>; Tue, 04 Mar 2025 01:17:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1741079869; x=1741684669; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=U7nVbwpLU0+lp6Hc0ee6jvbH0Pu/dJ0Otg1V1qw972I=;
-        b=fuxu++ZYVsqoY3xjWsoTqcXMgLBOCtHww6PZHUOFjz5ZCu+QqJYXzitd9nUrbOXdjP
-         vlId1tD1GAFFDUCt4mtRLBehfFm2IgtoWyfO8hYTXTsnU1JseV1C8hw5Zamf3QEi8Pl6
-         +DMmdH4u8snN/q8RavL3eaoQBoqjPBE2cz4VWdIrhOaXchpJgr6lSoBlL7nkBCv5wouJ
-         unrymmFLGE0qhL/SferbZsj0JrR51NjppLcZExBfAWFN9AzRFpF4I31CILKK8ufUUOIs
-         fnDizfeEvpw7uJNhqMuJSL8Lucj8/ma28e/HsVdlu4Gq2Z/5XQ2dljW3BkNmPVPbf9pa
-         EZXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741079869; x=1741684669;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U7nVbwpLU0+lp6Hc0ee6jvbH0Pu/dJ0Otg1V1qw972I=;
-        b=bNa3EBH/RijNzGyHwLknuBxEZbfisJl0QnT83NezVETPklGhDfCQqOcKIOgDmzDS3b
-         LsbBg5OSJwzgfSP9xm4NykNa66FUDLdmEjXqDgH2SmGbS3qqDfL9iaVGeKZ+f8DklTDL
-         Ehjr/1ygOsGLPArVbMhqnkX0r6JpPOiMq0ka3vlf8ZbSBIupyiAxb/b7bEoGKmg4ny+h
-         NRc9+/6pEqF8N8qt4d/IK++cPkk+D4Aqu9F+kgXQ6YIyClcdFka8DQGIHckEd8qbmyFP
-         Q851czXjna/V2BvD2/X6agzrMk0YzGJXeF1yuCNwhSrWiUywJPrdf3pg9NgsjhWSeuNQ
-         Ff5g==
-X-Forwarded-Encrypted: i=1; AJvYcCWvDnJMsPlyH8S7urdtdlDyuylmvXqdkc5bTw8wRDcLclmdvw9ZWMsyp8WK0S0qNZUFhY0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0cUM9h7u5ONIOosrIe5QeXeipFyPez79VBDRzjBsc7gHUJCsJ
-	wp8qwquhsY94Pss5KCCXrco0iKgUXBMjTAPSbv1/cVmBwrBlL6CCKe3Vhfv5bfg=
-X-Gm-Gg: ASbGncsHddLGOgLsD7zO9BbzJ0ECdfArca+SiwwrHu2++/UQELv6QJ0mZdAupGiJamS
-	W08qJu3+GLZi2lxwu9p4E9kjXXRFiny+WG6GuKO3LF+grio1H6ApByeQSSQflbkbOVhfUJsOswr
-	mVgxNMR5D6RVfvsI+ImdNAffeljBfsLO4AodRwpn7h1n8YkuolMVvcaMMhVy4oU/g343Aar6uOO
-	HlaIKl32xBW1xEFux87/hnfL6ImS2xxPe5fgdr6NX8RFX7atiRVk8vn7wUcE1lu2nLB4q4IGtDX
-	JIGmR/MD+T90QePSTOowi3Njp4Q6mzfs3hARG6on/4DiYTzaArJb+USG2U1FISG3Z5ROZnW+
-X-Google-Smtp-Source: AGHT+IFEBbxQyaP0/2DWYOKB8ElC0B8gdpp7QbNW8c37nqwtwNfKPMEljUeKpMeGoOykV8PZYEcmVQ==
-X-Received: by 2002:a05:6402:2789:b0:5e0:52df:d569 with SMTP id 4fb4d7f45d1cf-5e4d6b852d0mr16127811a12.28.1741079868692;
-        Tue, 04 Mar 2025 01:17:48 -0800 (PST)
-Received: from ?IPV6:2403:580d:fda1::299? (2403-580d-fda1--299.ip6.aussiebb.net. [2403:580d:fda1::299])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-223501f9dd8sm90968655ad.57.2025.03.04.01.17.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Mar 2025 01:17:48 -0800 (PST)
-Message-ID: <6f4017dc-2b3d-4b1a-b819-423acb42d999@suse.com>
-Date: Tue, 4 Mar 2025 19:47:34 +1030
+	s=arc-20240116; t=1741080117; c=relaxed/simple;
+	bh=/1wKwYgH19DpR7ZDJ3t00Y7uW5W0ujgdjwaOYeJddnU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=S0bhdlgQuJOURkTy2/XQeXOspSztCRVoVSVUu5p/bEhvEuxYPXSbOFbJ54kf37e4nrU+7X0iXcXe8kvWhU9Np4kkmE2I6cZjBqpPZtCu7in7jfHh7GO4UqOEcu+FgMocHqa2c0fWzaVtaiJ8ngEZR0KQiIGB+GCC8rq6QAqsnY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=X0lw7Z0V; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 523Ka1Oq022695;
+	Tue, 4 Mar 2025 09:21:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=1Yq58o
+	psB7IHhCTkH6W3tTgFClxwqWnFAP5FP/WEa0c=; b=X0lw7Z0VjVTksB3zFoSAto
+	4S+VlWluS/uLTlHPf9xVpjfF5e7R3WMnbovHYXFMGave8kUPJ8hM2i45w7pEbpQT
+	xft9NRj0pwrX4h8AHSKqLQEDwiEq5IlGz2/LSLlBEJoaBspX3mf3kPnomiX0QPnI
+	5bQTSBcttLHzGEYFIDi7QUeRlANfIAMHvjHiXhuJKP0flxpEHC6FkGshSN5aw/zi
+	yO1S3ZzwQPfPp8xsliDjXLXrn73upIf7m2lrB9P6tdxwEIw2/Sqr9cwy46JbWKKy
+	RRr3JMfKxLuW5oUMWPa9jcoJKPL5Epuvh2pBmtBJw1PJ1fB005PgSSUCUZc+MqCA
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 455dunwqfh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Mar 2025 09:21:41 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5245mPVu025026;
+	Tue, 4 Mar 2025 09:21:40 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 454f91v6t0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Mar 2025 09:21:40 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5249LbXD54460758
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 4 Mar 2025 09:21:37 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E7B3D20040;
+	Tue,  4 Mar 2025 09:21:36 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 360C020049;
+	Tue,  4 Mar 2025 09:21:36 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.179.5.148])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Tue,  4 Mar 2025 09:21:36 +0000 (GMT)
+Date: Tue, 4 Mar 2025 10:21:34 +0100
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        borntraeger@de.ibm.com, nrb@linux.ibm.com, seiden@linux.ibm.com,
+        nsg@linux.ibm.com, schlameuss@linux.ibm.com, hca@linux.ibm.com
+Subject: Re: [PATCH v3 1/1] KVM: s390: pv: fix race when making a page
+ secure
+Message-ID: <20250304102134.1bd9fb03@p-imbrenda>
+In-Reply-To: <370231a1-af36-46ca-a87c-ce1929473c1d@redhat.com>
+References: <20250227130954.440821-1-imbrenda@linux.ibm.com>
+	<20250227130954.440821-2-imbrenda@linux.ibm.com>
+	<370231a1-af36-46ca-a87c-ce1929473c1d@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] mm: alloc_pages_bulk: remove assumption of populating
- only NULL elements
-To: Yunsheng Lin <linyunsheng@huawei.com>, Yishai Hadas <yishaih@nvidia.com>,
- Jason Gunthorpe <jgg@ziepe.ca>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- Kevin Tian <kevin.tian@intel.com>,
- Alex Williamson <alex.williamson@redhat.com>, Chris Mason <clm@fb.com>,
- Josef Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>,
- Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
- Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>,
- Sandeep Dhavale <dhavale@google.com>, Carlos Maiolino <cem@kernel.org>,
- "Darrick J. Wong" <djwong@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Trond Myklebust <trondmy@kernel.org>,
- Anna Schumaker <anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>,
- Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>,
- Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>,
- Tom Talpey <tom@talpey.com>
-Cc: Luiz Capitulino <luizcap@redhat.com>,
- Mel Gorman <mgorman@techsingularity.net>, Dave Chinner
- <david@fromorbit.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org,
- linux-erofs@lists.ozlabs.org, linux-xfs@vger.kernel.org, linux-mm@kvack.org,
- netdev@vger.kernel.org, linux-nfs@vger.kernel.org
-References: <20250228094424.757465-1-linyunsheng@huawei.com>
-Content-Language: en-US
-From: Qu Wenruo <wqu@suse.com>
-Autocrypt: addr=wqu@suse.com; keydata=
- xsBNBFnVga8BCACyhFP3ExcTIuB73jDIBA/vSoYcTyysFQzPvez64TUSCv1SgXEByR7fju3o
- 8RfaWuHCnkkea5luuTZMqfgTXrun2dqNVYDNOV6RIVrc4YuG20yhC1epnV55fJCThqij0MRL
- 1NxPKXIlEdHvN0Kov3CtWA+R1iNN0RCeVun7rmOrrjBK573aWC5sgP7YsBOLK79H3tmUtz6b
- 9Imuj0ZyEsa76Xg9PX9Hn2myKj1hfWGS+5og9Va4hrwQC8ipjXik6NKR5GDV+hOZkktU81G5
- gkQtGB9jOAYRs86QG/b7PtIlbd3+pppT0gaS+wvwMs8cuNG+Pu6KO1oC4jgdseFLu7NpABEB
- AAHNGFF1IFdlbnJ1byA8d3F1QHN1c2UuY29tPsLAlAQTAQgAPgIbAwULCQgHAgYVCAkKCwIE
- FgIDAQIeAQIXgBYhBC3fcuWlpVuonapC4cI9kfOhJf6oBQJnEXVgBQkQ/lqxAAoJEMI9kfOh
- Jf6o+jIH/2KhFmyOw4XWAYbnnijuYqb/obGae8HhcJO2KIGcxbsinK+KQFTSZnkFxnbsQ+VY
- fvtWBHGt8WfHcNmfjdejmy9si2jyy8smQV2jiB60a8iqQXGmsrkuR+AM2V360oEbMF3gVvim
- 2VSX2IiW9KERuhifjseNV1HLk0SHw5NnXiWh1THTqtvFFY+CwnLN2GqiMaSLF6gATW05/sEd
- V17MdI1z4+WSk7D57FlLjp50F3ow2WJtXwG8yG8d6S40dytZpH9iFuk12Sbg7lrtQxPPOIEU
- rpmZLfCNJJoZj603613w/M8EiZw6MohzikTWcFc55RLYJPBWQ+9puZtx1DopW2jOwE0EWdWB
- rwEIAKpT62HgSzL9zwGe+WIUCMB+nOEjXAfvoUPUwk+YCEDcOdfkkM5FyBoJs8TCEuPXGXBO
- Cl5P5B8OYYnkHkGWutAVlUTV8KESOIm/KJIA7jJA+Ss9VhMjtePfgWexw+P8itFRSRrrwyUf
- E+0WcAevblUi45LjWWZgpg3A80tHP0iToOZ5MbdYk7YFBE29cDSleskfV80ZKxFv6koQocq0
- vXzTfHvXNDELAuH7Ms/WJcdUzmPyBf3Oq6mKBBH8J6XZc9LjjNZwNbyvsHSrV5bgmu/THX2n
- g/3be+iqf6OggCiy3I1NSMJ5KtR0q2H2Nx2Vqb1fYPOID8McMV9Ll6rh8S8AEQEAAcLAfAQY
- AQgAJgIbDBYhBC3fcuWlpVuonapC4cI9kfOhJf6oBQJnEXWBBQkQ/lrSAAoJEMI9kfOhJf6o
- cakH+QHwDszsoYvmrNq36MFGgvAHRjdlrHRBa4A1V1kzd4kOUokongcrOOgHY9yfglcvZqlJ
- qfa4l+1oxs1BvCi29psteQTtw+memmcGruKi+YHD7793zNCMtAtYidDmQ2pWaLfqSaryjlzR
- /3tBWMyvIeWZKURnZbBzWRREB7iWxEbZ014B3gICqZPDRwwitHpH8Om3eZr7ygZck6bBa4MU
- o1XgbZcspyCGqu1xF/bMAY2iCDcq6ULKQceuKkbeQ8qxvt9hVxJC2W3lHq8dlK1pkHPDg9wO
- JoAXek8MF37R8gpLoGWl41FIUb3hFiu3zhDDvslYM4BmzI18QgQTQnotJH8=
-In-Reply-To: <20250228094424.757465-1-linyunsheng@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: XalftXI9k2WUBCiF3t9fhOPR3smvupSv
+X-Proofpoint-GUID: XalftXI9k2WUBCiF3t9fhOPR3smvupSv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-04_04,2025-03-03_04,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ adultscore=0 priorityscore=1501 malwarescore=0 bulkscore=0 spamscore=0
+ suspectscore=0 mlxlogscore=915 phishscore=0 clxscore=1015 mlxscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502100000 definitions=main-2503040075
 
+On Fri, 28 Feb 2025 22:15:04 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-
-在 2025/2/28 20:14, Yunsheng Lin 写道:
-> As mentioned in [1], it seems odd to check NULL elements in
-> the middle of page bulk allocating, and it seems caller can
-> do a better job of bulk allocating pages into a whole array
-> sequentially without checking NULL elements first before
-> doing the page bulk allocation for most of existing users.
+> On 27.02.25 14:09, Claudio Imbrenda wrote:
+> > Holding the pte lock for the page that is being converted to secure is
+> > needed to avoid races. A previous commit removed the locking, which
+> > caused issues. Fix by locking the pte again.
+> > 
+> > Fixes: 5cbe24350b7d ("KVM: s390: move pv gmap functions into kvm")
+> > Reported-by: David Hildenbrand <david@redhat.com>
+> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>  
 > 
-> Through analyzing of bulk allocation API used in fs, it
-> seems that the callers are depending on the assumption of
-> populating only NULL elements in fs/btrfs/extent_io.c and
-> net/sunrpc/svc_xprt.c while erofs and btrfs don't, see:
-> commit 91d6ac1d62c3 ("btrfs: allocate page arrays using bulk page allocator")
+> Tested with shmem / memory-backend-memfd that ends up using large folios 
+> / THPs.
+> 
+> Tested-by: David Hildenbrand <david@redhat.com>
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> 
+> Two comments below.
 
-If you want to change the btrfs part, please run full fstests with 
-SCRATCH_DEV_POOL populated at least.
+I will need to send a v4, unfortunately there are other issues with this
+patch (as you have probably noticed by now as well)
 
-[...]
-> diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-> index f0a1da40d641..ef52cedd9873 100644
-> --- a/fs/btrfs/extent_io.c
-> +++ b/fs/btrfs/extent_io.c
-> @@ -623,13 +623,26 @@ int btrfs_alloc_page_array(unsigned int nr_pages, struct page **page_array,
->   			   bool nofail)
->   {
->   	const gfp_t gfp = nofail ? (GFP_NOFS | __GFP_NOFAIL) : GFP_NOFS;
-> -	unsigned int allocated;
-> +	unsigned int allocated, ret;
->   
-> -	for (allocated = 0; allocated < nr_pages;) {
-> -		unsigned int last = allocated;
-> +	/* Defragment page_array so pages can be bulk allocated into remaining
-> +	 * NULL elements sequentially.
-> +	 */
-> +	for (allocated = 0, ret = 0; ret < nr_pages; ret++) {
-> +		if (page_array[ret]) {
+> 
+> [...]
+> 
+> > +
+> > +int make_hva_secure(struct mm_struct *mm, unsigned long hva, struct uv_cb_header *uvcb)
+> > +{
+> > +	struct folio *folio;
+> > +	spinlock_t *ptelock;
+> > +	pte_t *ptep;
+> > +	int rc;
+> > +
+> > +	ptep = get_locked_valid_pte(mm, hva, &ptelock);
+> > +	if (!ptep)
+> > +		return -ENXIO;
+> > +
+> > +	folio = page_folio(pte_page(*ptep));
+> > +	folio_get(folio);  
+> 
+> Grabbing a folio reference is only required if you want to keep using 
+> the folio after the pte_unmap_unlock. While the PTL is locked it cannot 
+> vanish.
+> 
+> So consider grabbing a reference only before dropping the PTL and you 
+> inted to call kvm_s390_wiggle_split_folio(). Then, you would effectively 
+> not require these two atomics on the expected hot path.
+> 
+> (I recall that the old code did that)
 
-You just prove how bad the design is.
+This code will go away hopefully in the next merge window anyway
+(unless I get sick *again*)
 
-All the callers have their page array members to initialized to NULL, or 
-do not care and just want alloc_pages_bulk() to overwrite the 
-uninitialized values.
+> 
+> > +	/*
+> > +	 * Secure pages cannot be huge and userspace should not combine both.
+> > +	 * In case userspace does it anyway this will result in an -EFAULT for
+> > +	 * the unpack. The guest is thus never reaching secure mode.
+> > +	 * If userspace plays dirty tricks and decides to map huge pages at a
+> > +	 * later point in time, it will receive a segmentation fault or
+> > +	 * KVM_RUN will return -EFAULT.
+> > +	 */
+> > +	if (folio_test_hugetlb(folio))
+> > +		rc =  -EFAULT;
+> > +	else if (folio_test_large(folio))
+> > +		rc = -E2BIG;
+> > +	else if (!pte_write(*ptep))
+> > +		rc = -ENXIO;
+> > +	else
+> > +		rc = make_folio_secure(mm, folio, uvcb);
+> > +	pte_unmap_unlock(ptep, ptelock);
+> > +
+> > +	if (rc == -E2BIG || rc == -EBUSY)
+> > +		rc = kvm_s390_wiggle_split_folio(mm, folio, rc == -E2BIG);
+> > +	folio_put(folio);
+> > +
+> > +	return rc;
+> > +}
+> > +EXPORT_SYMBOL_GPL(make_hva_secure);
+> >   
+> >   /*
+> >    * To be called with the folio locked or with an extra reference! This will
+> > diff --git a/arch/s390/kvm/gmap.c b/arch/s390/kvm/gmap.c
+> > index 02adf151d4de..c08950b4301c 100644  
+> 
+> 
+> There is one remaining reference to __gmap_make_secure, which you remove:
+> 
+> $ git grep __gmap_make_secure
+> arch/s390/kvm/gmap.c: * Return: 0 on success, < 0 in case of error (see 
+> __gmap_make_secure()).
 
-The best example here is btrfs_encoded_read_regular().
-Now your code will just crash encoded read.
+will fix
 
-Read the context before doing stupid things.
-
-I find it unacceptable that you just change the code, without any 
-testing, nor even just check all the involved callers.
-
-> +			page_array[allocated] = page_array[ret];
-> +			if (ret != allocated)
-> +				page_array[ret] = NULL;
-> +
-> +			allocated++;
-> +		}
-> +	}
->   
-> -		allocated = alloc_pages_bulk(gfp, nr_pages, page_array);
-> -		if (unlikely(allocated == last)) {
-> +	while (allocated < nr_pages) {
-> +		ret = alloc_pages_bulk(gfp, nr_pages - allocated,
-> +				       page_array + allocated);
-
-I see the new interface way worse than the existing one.
-
-All btrfs usage only wants a simple retry-until-all-fulfilled behavior.
-
-NACK for btrfs part, and I find you very unresponsible not even bother 
-running any testsuit and just submit such a mess.
-
-Just stop this, no one will ever take you serious anymore.
-
-Thanks,
-Qu
+> 
+> 
+> 
 
 
