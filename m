@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-40086-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40087-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 248B6A4F006
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 23:20:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C075A4F060
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 23:27:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AE9D47A76A0
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 22:19:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31F233AD09C
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 22:26:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE04925D523;
-	Tue,  4 Mar 2025 22:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5633927CB1D;
+	Tue,  4 Mar 2025 22:25:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Hn00f3gf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XD39lfme"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0A071F03D7;
-	Tue,  4 Mar 2025 22:20:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 451E427BF9A;
+	Tue,  4 Mar 2025 22:25:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741126821; cv=none; b=l9yNZ0ldH+c7p2Gwj1/YK1xwdnUVnFi4q8Hp58wb5hO66Lp3CQf+pN8e8j/lSXTjwTriVdp8cSUzEUTofmgD/PFK6KCsQRloyEffdmI/i8XjiuSeAfETLWTSBcSLlMJZU2iMAyXB9CCZzSMtDmD0YtqOa2fYToD1O8sNGzY+ViQ=
+	t=1741127149; cv=none; b=iuVCQwoBm6dtdwF3jVXc/6uUznoT7LwmPHYTIxscBESLVZD3KvGySdbX6rqLgQ5/yk+QpycpBeJdtOnr4PjO2c2TkJV3WejmWUsObdaC0CU1b7K67u1gz7meQDW6R/OlxCEzyy8JjPwc7/4PgKVZaOjMqK832QQMvFBWLgiJne8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741126821; c=relaxed/simple;
-	bh=oXS5Xdt897A6IZs5CiSravPHGQiBNv0XA3lzqNjWF4w=;
+	s=arc-20240116; t=1741127149; c=relaxed/simple;
+	bh=+YKdvSyLZ6TkDIbiWBV44TEa2+iLI1ebm9Ag1JOpgeM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lk1s5UYQPbGvp4k6Kmi+yBeEFUWFpQehn5bZW+KiWg3Nx4b/IPJlDfrh8dXx2wo+GW2Bf+6o3xki4X1N7btuIMAFDAiXyFZX2o3naIsnj3hLDGlxr5FczZfS7aiazhKoCbMVUS7jJSS0jODoIKYOpg3YyT2CBTuA/d0Ju2U+Ge8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Hn00f3gf; arc=none smtp.client-ip=198.175.65.19
+	 In-Reply-To:Content-Type; b=COETCaMKrp+VK4r33OhPgzW2KR1hxhWB3VV2HVlGyIcr+k7fsIXffyJolaNLlTI/E/0BQEv9fTKUNYrTd0Xg17WteTAdeW7LQVfqF2VwO9wgZa7BoubL0R1fEPVfNoWY4apANqWrXxdmFochQ58KOtWABXNo3cBuFD5CyRvOeeo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XD39lfme; arc=none smtp.client-ip=198.175.65.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741126819; x=1772662819;
+  t=1741127148; x=1772663148;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=oXS5Xdt897A6IZs5CiSravPHGQiBNv0XA3lzqNjWF4w=;
-  b=Hn00f3gf/l9GayRD7n8uY2kdhXPnQ9F+REihK5Zf4M3iBKFLtRU1+UjK
-   ujxFE2hLcPdB9WH2kNaaskNAyD9Bw3+Z6zTiZMYFAPQTnkPBI3eDLXXKj
-   3ejKYx1Nf4/XmFSC7Afpk0AxHhrd37IiREcdtZ+YoVjnwnd+3bGvtCPp6
-   A2diJAAurtcA9dDykstNzlUWaBGxnAKuP3SY7tTiDEpLzsHu8MVbN7I2Z
-   E/eIJbpCN8d5VhRMX/9ci2+p+sYjAqBbDkVvMe+JYXl+6lzCMT9+GwIEQ
-   pDzdvQt2GYdJPa1nP2U4DQgSUDjl5JJoUZ+f9NfFzQAft+emZRURxuIgR
-   A==;
-X-CSE-ConnectionGUID: pcQvjX07QdCiBAUO3Lr8tQ==
-X-CSE-MsgGUID: 6w9lw0qvTw2N9QZm3Yg4fA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="41925300"
+  bh=+YKdvSyLZ6TkDIbiWBV44TEa2+iLI1ebm9Ag1JOpgeM=;
+  b=XD39lfmeRwvVh/XXDU9B3bHN959bwJMp38bhaeafgR+/wFRuZHGscBSk
+   gVdD2y2gEhvE+6VqvLcJ3CvbGnogIbsywydxYom0inEXCZ9KOd0Eay0oe
+   U/0y+W95nE08X7Fcwu4AMz79LBhjuEIfOU+QUDQ705Ux5ClPXNysHMsNZ
+   tdVDZcGXEOC8ryJPpM+DJKw5DC9fGnpteNsjgfLgxjZkHVGWiU9tU1BJm
+   yJHHXMSaurbli4gE1fqMTDqvyte70/pdZnpGwnRTHF5luoS7zDiqesjZU
+   diEWby3oUk+79PQzvxZgpiv2amQy4pBMwMIdP/fW9JDsuZEL0jCpkH5uO
+   g==;
+X-CSE-ConnectionGUID: hzCNPEahSC+Dt89cMCSaBg==
+X-CSE-MsgGUID: 5yGgDIaLRaCgVMtRdjLY2w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="41783881"
 X-IronPort-AV: E=Sophos;i="6.14,221,1736841600"; 
-   d="scan'208";a="41925300"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 14:20:13 -0800
-X-CSE-ConnectionGUID: xIvnxSaFTUaMWZmr8c6x1A==
-X-CSE-MsgGUID: ju34oCFzSXuyzKWy4UWzRA==
+   d="scan'208";a="41783881"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 14:25:44 -0800
+X-CSE-ConnectionGUID: hACrHhpFRO+cw53qia9MjA==
+X-CSE-MsgGUID: /5dNQ9SmTQeECwjFXVNo6Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.14,221,1736841600"; 
-   d="scan'208";a="123511974"
+   d="scan'208";a="123106042"
 Received: from kinlongk-mobl1.amr.corp.intel.com (HELO [10.125.109.165]) ([10.125.109.165])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 14:20:13 -0800
-Message-ID: <ce5e2f44-144b-47bd-9f7e-02f61abed76a@intel.com>
-Date: Tue, 4 Mar 2025 14:20:31 -0800
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 14:25:43 -0800
+Message-ID: <866757ec-3a05-4360-b35d-5ab8e66ab6c5@intel.com>
+Date: Tue, 4 Mar 2025 14:26:01 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,15 +67,15 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/6] x86/fpu/xstate: Always preserve non-user
- xfeatures/flags in __state_perm
+Subject: Re: [PATCH v2 2/6] x86/fpu/xstate: Add CET supervisor mode state
+ support
 To: Chao Gao <chao.gao@intel.com>, tglx@linutronix.de, x86@kernel.org,
  seanjc@google.com, pbonzini@redhat.com, linux-kernel@vger.kernel.org,
  kvm@vger.kernel.org
 Cc: peterz@infradead.org, rick.p.edgecombe@intel.com, mlevitsk@redhat.com,
  weijiang.yang@intel.com, john.allen@amd.com
 References: <20241126101710.62492-1-chao.gao@intel.com>
- <20241126101710.62492-2-chao.gao@intel.com>
+ <20241126101710.62492-3-chao.gao@intel.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -121,21 +121,18 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <20241126101710.62492-2-chao.gao@intel.com>
+In-Reply-To: <20241126101710.62492-3-chao.gao@intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 11/26/24 02:17, Chao Gao wrote:
-> When granting userspace or a KVM guest access to an xfeature, preserve the
-> entity's existing supervisor and software-defined permissions as tracked
-> by __state_perm, i.e. use __state_perm to track *all* permissions even
-> though all supported supervisor xfeatures are granted to all FPUs and
-> FPU_GUEST_PERM_LOCKED disallows changing permissions.
+...
+> The alternative is to enable it in KVM domain, but KVM maintainers NAKed
+> the solution. The external discussion can be found at [*], it ended up
+> with adding the support in kernel instead of KVM domain.
+So, there's a lot of changelog here, but scant details.
 
-Should we document what __state_perm contains either in
-fpu_state_perm or xstate_get_group_perm()?
-
-Either way:
-
-Acked-by: Dave Hansen <dave.hansen@intel.com>
+This patch enables XFEATURE_CET_KERNEL everywhere it's available, right?
+So, this patch at least wastes the XSAVE buffer space and doesn't
+actually get anything. Right?
 
