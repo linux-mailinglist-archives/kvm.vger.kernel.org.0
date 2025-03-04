@@ -1,126 +1,128 @@
-Return-Path: <kvm+bounces-40031-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40032-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04373A4E06C
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 15:16:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38906A4E0FD
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 15:33:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F71F1888107
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 14:15:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2D363A432C
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 14:25:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4656204F7F;
-	Tue,  4 Mar 2025 14:14:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A26B7208970;
+	Tue,  4 Mar 2025 14:24:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Ns4tJAbo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WDMJUclK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DADD2045B2
-	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 14:14:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB8D2080F4
+	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 14:24:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741097691; cv=none; b=BnyGj4p0Xq3Qf1HEkWcNQWwrDUn5t2Cr96CJwHKdFGOFfL5jroO5U8cT9aDC6gsDmpSP4RK7NAfwrAuA6u5RucwZElADnAL+k9RTIwqaybVVOcuUl8IdOBcxoD0VJTZlaIRH36zy8G/VdtlEOk8b1ankl7I3C0tIH2pu6KoIdkI=
+	t=1741098248; cv=none; b=eCNfsEbhHROO89mNUPFfmBbUM+ky1z82abGQYxnls1rfjl5DeJRZk6Xccy0cxw2EVWudXdXHmKJZnr6thB1bln+unEZpZQLTXc56bmR3jCyfR8RlSg7jTrFmgyj+S90Z5k3R4aCitAEsTN0ThO/WneQ0DrLcPR9ajajtdKrjoeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741097691; c=relaxed/simple;
-	bh=OiLrp8ci87DZb70VaYtR9ZQenfr3MThO06nklmGO+rQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ji9Mwmf+cvXCiXzNIpyXlV8PrTM1xZhypT5wWrF7s/cp+qWh63utDhSUfgY9h2WNYT9df30hOFbOXL+FLtlz3tBiX14qyx5Jz8PxXrW5haWDdY6AK4B2LN72jwtkVoG6SI7YVSdF2VF7F/ICZZw8gK4jQE+o6hddy4nwhRq2qe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Ns4tJAbo; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7c3cb761402so203563385a.0
-        for <kvm@vger.kernel.org>; Tue, 04 Mar 2025 06:14:49 -0800 (PST)
+	s=arc-20240116; t=1741098248; c=relaxed/simple;
+	bh=9Bl9KwN0gqToxnWw3xRARnhDd5Ny5Hr/yDwL7Fo49yo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=hsci1y0zNZAeaQQ/r9JeY3pSXo+KSBNncRfTzJxios+EiiHF7//efJdiaIXRwS9Yruocn0LxfeUctmOryw4353i47i/nGEr3GDmvgMCq0yLlLqfFsGcjWeTiLKVaOcN7rsjNS7XVC6/mEaex0MsIepxEbFIB8E8HN6iAhrH94f0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WDMJUclK; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fec1f46678so13017121a91.1
+        for <kvm@vger.kernel.org>; Tue, 04 Mar 2025 06:24:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1741097688; x=1741702488; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=P5l2R6iUh6JQQNif8SJbj7EwSVWvxpPGSGu0suY4qtA=;
-        b=Ns4tJAbon78WLM0BWe1cYtHrWzeIY7dg/m6qUDjw3lTlH6tdfhXRPxHWvowmmFh6hD
-         S4gblloIkr+mOzlueGePRIn/NbKUONTw3MlKNLFB0osHr05zQN7nSux+COgcweTE7KXw
-         lQ0CjB4Q3KlFTkP4kRoOYv8Iin3XNFw0eXZ4pOTLjC49vX3dzaT9jtKh3HsrWW+pB0NZ
-         /2r6PRnQUvbDQaPZHnarOll9PHAzQhjX/yhidh3MXsW1a3Yqe5Qlz2J7Y4qz6vby9Xbh
-         /bAnj+9HqL8+jNs97eiMZRJLpthQXNwQrrDdnBbf0P/oOZJRUSq/ocUzhCqNLQnGL9eL
-         T/Qg==
+        d=google.com; s=20230601; t=1741098247; x=1741703047; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=U0bJtWO/zgI2jPul9efwN4/8kC8XZP1YPShn0ZzQqIY=;
+        b=WDMJUclKq45kt3hPwuLAd1qIRAaWNrKMPirGfZb9Y//YZeBBO+GaAn6QZIYZJ4vV1/
+         GcnHl/pvY7p4m51Po0u36wTkApihcVF3dADWrDVQMRDi9Ajff+UGOvfvO7XL6OOIzNN7
+         BUzSHxWDJGW5xTiKKz3GMA9tiYYL+fTx2bEJC1E/96UMEwnpZSY/wsfxysX+PYnGyVlk
+         M+Vc9QmetS1Cwm/RLvwUsDoUW2XXDmqZcq4qKTTa5/DONO328PeMBJoaHxtmUCpQwCpo
+         UIxlUcakLx5pgcQZlfApPFqMifJq/sBeBNbqED29MloHNH3roo44xk3cWu1C6x79uIpa
+         1LZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741097688; x=1741702488;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=P5l2R6iUh6JQQNif8SJbj7EwSVWvxpPGSGu0suY4qtA=;
-        b=WAeCVywyMfaveSpyRosHlJLsv1YOzUtZ9q6Xub5p/0zOUe/JFCijPe/AbHRx+8blaV
-         PjhMA/XLDydjNk2qQWP0mfWSxrUVB+KjHHWs+/mqflrXre9/PXKnHpOGGqtQDMaxZysQ
-         eAL0dbeAsWaZOR/1SZUcLNQ6DbzkK4pY0E6+OgNCzhBX+m0vs/ZhhfYMWP+4gslRM3gD
-         Da5J1luXIruIziwCoxM+SlkjBzdUwPLQYv6elsuxPJI7p7ZN7C4diyJXBnl54qSXmwS8
-         ukyHiMkfGmcXtESiRjlkfXLQKo/hQFTlaka9TheEm3/rJdBg6co+LXZ6x5RQ5wQZeEgq
-         Qn1w==
-X-Forwarded-Encrypted: i=1; AJvYcCXT+1y+fSXe03AwPWiFeQra1LkCijXGNq+lS+fLXVypxaR5Rnj8pudTyyUiLbiJMUFWFco=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxcvmzf03AYHCei6AgJQAF3WzqOS3ymkkwCW3qDEdc04kiByPNi
-	HeL5hv89fXlH3kJqRLuAUdSggPTpUbCzFTASVFeOOMRefzFr/Vh/5o223v5GCsY=
-X-Gm-Gg: ASbGncsq2tqfBoK5RnLqvhgC18fNnO26UYVd/aaiitXN1W+fb6Gz1VIJWH5eB5/3NcN
-	pNtgg3kPcACOLfgsPZ5ONzJxu4bS+HWK2LhB6coy5zBDekbCmK1I28RdZBVrv+CmwF/Tk52ssGQ
-	FLXQB3kiFVGjidgfITrIl1StBSWSlUvamlHHmhfIpliOJ+nYGxQYDnLCXF5hT+dmXn5k0EhGet2
-	FMu1VNwCd6as/3iaY90P2BjC2BqE0h1A4Fyuqi2CXRX0DGsysEss1VNZrk1MzTDjDKTk2CUU6yy
-	teY21+PST1RMnf3hTIITfCHBzzVJY5vQdl+LLhvMEt/eMpFkd8m6rdnXtsAAR9MViUo5yEYRLYV
-	kyIuFZ7laIyetPJZ4DA==
-X-Google-Smtp-Source: AGHT+IHAijVgZIvuG3Mmw5/e25haZvsnd9blawxKL03iQ7Rih/OP9LzbPftPTxU6t1xcj3zZe1e/Rw==
-X-Received: by 2002:a05:620a:1a9e:b0:7c0:c5b8:e3bb with SMTP id af79cd13be357-7c39c4af6e5mr2166272385a.19.1741097688249;
-        Tue, 04 Mar 2025 06:14:48 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c3d657a95fsm16381885a.17.2025.03.04.06.14.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Mar 2025 06:14:47 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1tpT2l-0000000172s-0kT4;
-	Tue, 04 Mar 2025 10:14:47 -0400
-Date: Tue, 4 Mar 2025 10:14:47 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Wathsala Vithanage <wathsala.vithanage@arm.com>
-Cc: linux-kernel@vger.kernel.org, nd@arm.com,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Philipp Stanner <pstanner@redhat.com>,
-	Yunxiang Li <Yunxiang.Li@amd.com>,
-	"Dr. David Alan Gilbert" <linux@treblig.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	"open list:VFIO DRIVER" <kvm@vger.kernel.org>
-Subject: Re: [RFC PATCH] vfio/pci: add PCIe TPH to device feature ioctl
-Message-ID: <20250304141447.GY5011@ziepe.ca>
-References: <20250221224638.1836909-1-wathsala.vithanage@arm.com>
+        d=1e100.net; s=20230601; t=1741098247; x=1741703047;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=U0bJtWO/zgI2jPul9efwN4/8kC8XZP1YPShn0ZzQqIY=;
+        b=P3sEuhELlV+mbcG0pTnwT9Ra0o1eaWILRkspe6JLH64owASY3ZHqy/bUA73qBQom3G
+         ZdW3/b74Fm//rHlzmPCLOC067gkY/zZ3LS0Mxx539o0n4Y9PkiFIsogr0dRdJAvyCXND
+         j/4ob1kvTS0tZ/e00R2B0WfDceiz3a0ODJHVTsAnZ7kbO5HEMAWSi6DMyK3oxxAG7ydh
+         0JWu7j5nMzlQRYc8qnmvZOa2q80v/qWvkRIaZzVkzlJuEIg8JMhiI1IcVOCPAx3RsFUU
+         HCJR8dUMXG8m58UjScIYAHT11e+XpCblgzHhNOTubme01HEI7eyV+TiWjKIIC5vH0OAM
+         5q6g==
+X-Gm-Message-State: AOJu0Ywm5yvtbw1lj00ClsWa3v+frpxsPc7cVyYxqw/PNoEferN3ss4V
+	o2M/5cpcVwYVole9Qq6Fyzoz5QNag0AnpUG5yZsauMyfkVJUmr/Ss3p9NtMOndvdasWZLTW6XHF
+	3nw==
+X-Google-Smtp-Source: AGHT+IGL3TvS3xJpuQuBmUEPAOK05SjuoCnEI7eL2mdXhB6ZVp9f2QmZKZ+Ad458Pw2V2VPF2vgblI0mNPs=
+X-Received: from pjbsj5.prod.google.com ([2002:a17:90b:2d85:b0:2f9:c349:2f84])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:e7c6:b0:2ee:53b3:3f1c
+ with SMTP id 98e67ed59e1d1-2febab2ed89mr25640807a91.5.1741098246542; Tue, 04
+ Mar 2025 06:24:06 -0800 (PST)
+Date: Tue, 4 Mar 2025 06:24:05 -0800
+In-Reply-To: <87ikoposs6.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250221224638.1836909-1-wathsala.vithanage@arm.com>
+Mime-Version: 1.0
+References: <Z8ZBzEJ7--VWKdWd@google.com> <87ikoposs6.fsf@redhat.com>
+Message-ID: <Z8cNBTgz3YBDga3c@google.com>
+Subject: Re: QEMU's Hyper-V HV_X64_MSR_EOM is broken with split IRQCHIP
+From: Sean Christopherson <seanjc@google.com>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>, 
+	"Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Feb 21, 2025 at 10:46:33PM +0000, Wathsala Vithanage wrote:
-> Linux v6.13 introduced the PCIe TLP Processing Hints (TPH) feature for
-> direct cache injection. As described in the relevant patch set [1],
-> direct cache injection in supported hardware allows optimal platform
-> resource utilization for specific requests on the PCIe bus. This feature
-> is currently available only for kernel device drivers. However,
-> user space applications, especially those whose performance is sensitive
-> to the latency of inbound writes as seen by a CPU core, may benefit from
-> using this information (E.g., DPDK cache stashing RFC [2] or an HPC
-> application running in a VM).
+On Tue, Mar 04, 2025, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
 > 
-> This patch enables configuring of TPH from the user space via
-> VFIO_DEVICE_FEATURE IOCLT. It provides an interface to user space
-> drivers and VMMs to enable/disable the TPH feature on PCIe devices and
-> set steering tags in MSI-X or steering-tag table entries using
-> VFIO_DEVICE_FEATURE_SET flag or read steering tags from the kernel using
-> VFIO_DEVICE_FEATURE_GET to operate in device-specific mode.
+> > FYI, QEMU's Hyper-V emulation of HV_X64_MSR_EOM has been broken since QEMU commit
+> > c82d9d43ed ("KVM: Kick resamplefd for split kernel irqchip"), as nothing in KVM
+> > will forward the EOM notification to userspace.  I have no idea if anything in
+> > QEMU besides hyperv_testdev.c cares.
+> 
+> The only VMBus device in QEMU besides the testdev seems to be Hyper-V
+> ballooning driver, Cc: Maciej to check whether it's a real problem for
+> it or not.
+> 
+> >
+> > The bug is reproducible by running the hyperv_connections KVM-Unit-Test with a
+> > split IRQCHIP.
+> 
+> Thanks, I can reproduce the problem too.
+> 
+> >
+> > Hacking QEMU and KVM (see KVM commit 654f1f13ea56 ("kvm: Check irqchip mode before
+> > assign irqfd") as below gets the test to pass.  Assuming that's not a palatable
+> > solution, the other options I can think of would be for QEMU to intercept
+> > HV_X64_MSR_EOM when using a split IRQCHIP, or to modify KVM to do KVM_EXIT_HYPERV_SYNIC
+> > on writes to HV_X64_MSR_EOM with a split IRQCHIP.
+> 
+> AFAIR, Hyper-V message interface is a fairly generic communication
+> mechanism which in theory can be used without interrupts at all: the
+> corresponding SINT can be masked and the guest can be polling for
+> messages, proccessing them and then writing to HV_X64_MSR_EOM to trigger
+> delivery on the next queued message. To support this scenario on the
+> backend, we need to receive HV_X64_MSR_EOM writes regardless of whether
+> irqchip is split or not. (In theory, we can get away without this by
+> just checking if pending messages can be delivered upon each vCPU entry
+> but this can take an undefined amount of time in some scenarios so I
+> guess we're better off with notifications).
 
-What level of protection do we expect to have here? Is it OK for
-userspace to make up any old tag value or is there some security
-concern with that?
+Before c82d9d43ed ("KVM: Kick resamplefd for split kernel irqchip"), and without
+a split IRCHIP, QEMU gets notified via eventfd.  On writes to HV_X64_MSR_EOM, KVM
+invokes irq_acked(), i.e. irqfd_resampler_ack(), for all SINT routes.  The eventfd
+signal gets back to sint_ack_handler(), which invokes msg_retry() to re-post the
+message.
 
-Jason
+I.e. trapping HV_X64_MSR_EOM on would be a slow path relative to what's there for
+in-kernel IRQCHIP.
 
