@@ -1,187 +1,286 @@
-Return-Path: <kvm+bounces-40066-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40060-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5D63A4EB6D
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 19:25:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19661A4E88E
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 18:26:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA12D3A6554
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 18:08:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A52E424B82
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 17:19:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55AF281517;
-	Tue,  4 Mar 2025 17:49:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AFD227E1BA;
+	Tue,  4 Mar 2025 16:56:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="RWV4zZ1f"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eUSnRGGM"
 X-Original-To: kvm@vger.kernel.org
-Received: from beeline2.cc.itu.edu.tr (beeline2.cc.itu.edu.tr [160.75.25.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9F2927BF9A
-	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 17:49:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=160.75.25.116
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741110577; cv=pass; b=UoKwo2eUIoz7u1+2gQEh8yqlSuAvO0dYCfxbqf7rolFZPi4i2EyYBz3LaAzOStHHdLF5zn1OmQBJggv08hWXjO7a5LE8JbtHUoZK4VozrNh++YgDK3IobRyckSF5coUQWNOIiPD6DBlPUcy3eXmgJJShF6gkQANy89NLFi3vF9g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741110577; c=relaxed/simple;
-	bh=7Cs8+xD0eyRv5jjLhLfMj+HmulqJJeMsFqQidfj0T9o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=roIIihfKqDuY25DmtAhgRq+VkD7auLWwQtoDTh9llFa2duxsxEU+SzCX3cwFsW4DITzoCZ38VtqdYri/vBqqtDzYGZL9Gmpbo3fV3hmAjkclWU8Lk++Ukr4BJHctwDZZdUObvBQkXdGzqqyGF7S1MEkbS6JKhoMFMqnUXaOrxto=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=RWV4zZ1f; arc=none smtp.client-ip=65.109.113.108; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; arc=pass smtp.client-ip=160.75.25.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=cc.itu.edu.tr
-Received: from lesvatest1.cc.itu.edu.tr (lesvatest1.cc.itu.edu.tr [10.146.128.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
-	(No client certificate requested)
-	by beeline2.cc.itu.edu.tr (Postfix) with ESMTPS id E68EA40891AB
-	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 20:49:32 +0300 (+03)
-X-Envelope-From: <root@cc.itu.edu.tr>
-Authentication-Results: lesvatest1.cc.itu.edu.tr;
-	dkim=pass (4096-bit key, unprotected) header.d=alien8.de header.i=@alien8.de header.a=rsa-sha256 header.s=alien8 header.b=RWV4zZ1f
-Received: from lesva1.cc.itu.edu.tr (unknown [160.75.70.79])
-	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6gbR6LfmzG1tP
-	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 19:08:51 +0300 (+03)
-Received: by le1 (Postfix, from userid 0)
-	id 3DEE042722; Tue,  4 Mar 2025 19:08:49 +0300 (+03)
-Authentication-Results: lesva1.cc.itu.edu.tr;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=RWV4zZ1f
-X-Envelope-From: <linux-kernel+bounces-541887-bozkiru=itu.edu.tr@vger.kernel.org>
-Authentication-Results: lesva2.cc.itu.edu.tr;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=RWV4zZ1f
-Received: from fgw1.itu.edu.tr (fgw1.itu.edu.tr [160.75.25.103])
-	by le2 (Postfix) with ESMTP id B61B341F7C
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 17:11:33 +0300 (+03)
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by fgw1.itu.edu.tr (Postfix) with SMTP id 4C1DF3063EFF
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 17:11:33 +0300 (+03)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DA3D3A5BF5
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 14:11:18 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1496C213E6D;
-	Mon,  3 Mar 2025 14:11:16 +0000 (UTC)
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53A220E03C;
-	Mon,  3 Mar 2025 14:11:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E008427C17A
+	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 16:56:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741011073; cv=none; b=KxG/7/pGcVBEylmxQGV5q8i4vrMUSQoIjxW3dldi3W3OSAykoo5yQWe+bSTl0togcrP5IuHD3n6g/QWmRpA3hgHB9EnKjisRkgwZ6/54d41eXYe95VGRndORVooBROLYzMwol63UJpoGj3tyBq1rtfGGUotlBelZ96MrrnubmrE=
+	t=1741107390; cv=none; b=ABdWzUcWFnoKwCe7by+y9atYMWx3yesBMEzGt/9vZciGExnC1fu7g8MCO7SbsoqS76gXLSZqvzSH6/9WEmjDful6lLUwoXDz/1MV0xTSNeJE40bFmsjfgBHVQFdCiMEHSQ3HnnWhbGmMPw8sbZrG2lYeGg27qi44JhO3sBWe3Ao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741011073; c=relaxed/simple;
-	bh=7Cs8+xD0eyRv5jjLhLfMj+HmulqJJeMsFqQidfj0T9o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tmvKrmywOWlxW0DLYsxHDvq4MvmmsR3DQpV2J6U8M44Ye4qZhDJd2F+dEKvzRTsH9Xl+Ao9o4o8nFvTTPDRyDrfwcVkhBxDtcEH+xWyj+h2Aszxpd+ijbUMYQwkWT4hREu56eGOWJz+mYCOAth+svK+ODXQkn0PK2ieGIIgw2C0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=RWV4zZ1f; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 7373440E0216;
-	Mon,  3 Mar 2025 14:11:08 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id GDnUHKTQ8ZrC; Mon,  3 Mar 2025 14:11:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1741011064; bh=4Z1HILAtOOSuw4f8u0TuP4N4mKWHdFYqQRdroELwqAA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RWV4zZ1fQc16+fz4gY0XAhbqJbDgyYexDEzCsnztJHL0C7CklpquuRcKK3WyemQCj
-	 +PTVkUFWXIBLbG6EPlcWiD4jvDUHpgBtqBVzOZd7G55cwo912sNUAW3M7lT5k6Zafk
-	 yS0H2MkwJekqJD2hEFTFh8gWgGuABGtxvohaJGdfy59NeDmUOKoRfbZHvGtcz8FK2n
-	 RJ022mX6FbsuDg7Fem5oaj3vsRx4VSEptDLXcs/dOco7CH+NMtT1ruCUWiXSOkmSS5
-	 6kPWn3pXXku5onTI9lCUrGlLzbwLWNCwbRGBj3kwfQWa9mPHPtNI15NuMroF0yaafM
-	 eFnutA245v5BqPxuCPrNzKMaKzA66+Y6lvWnO1k046J1j1sECSAwzuPa/EduHXtJzB
-	 rMAp4sF+LligfjSGYYrK0YHMoXlZ+sNPVtsemoAGvLkarpEXYq0UE1UHQHUdxbu8aG
-	 aSwNVi1B1umgqQY1ABCGhID9fwy6Ub5qMDLYlxhu5DPZF/EQW0izmU+xeJc48B/P83
-	 LcDiCf1N0X2NKd8Mz1IrfBTNdAvOYTzbcisd/q7fLs8K94z6WULLtFBx5ht9lqrrn+
-	 YSKRcTpxJSq3g0bbHenlgB+DtBynbj5yzeQWbJtcdmSJnwfomqmGzFOtaaJGAQidg9
-	 tuKEIMCceB0P7PgyJyuobaec=
-Received: from zn.tnic (pd95303ce.dip0.t-ipconnect.de [217.83.3.206])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 0E3C740E01D1;
-	Mon,  3 Mar 2025 14:10:51 +0000 (UTC)
-Date: Mon, 3 Mar 2025 15:10:46 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Patrick Bellasi <derkling@google.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Yosry Ahmed <yosry.ahmed@linux.dev>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Josh Poimboeuf <jpoimboe@redhat.com>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Patrick Bellasi <derkling@matbug.net>,
-	Brendan Jackman <jackmanb@google.com>,
-	David Kaplan <David.Kaplan@amd.com>
-Subject: Re: [PATCH final?] x86/bugs: KVM: Add support for SRSO_MSR_FIX
-Message-ID: <20250303141046.GHZ8W4ZrPEdWA7Hb-b@fat_crate.local>
-References: <20250226184540.2250357-1-derkling@google.com>
-Precedence: bulk
+	s=arc-20240116; t=1741107390; c=relaxed/simple;
+	bh=i8jamBfI+P0eeepl+Uhp4JL8/Pr1Lgs5TPF4k0VKrP0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JuXBJIpMbwOcs/eZyKcEmk6HgXrN2jpnLmPU1kLcva2WYX5k6el8LTb7ItFNdT+bFONuQfIotjCcL3TBvqDgSiAS+OpmuLoX5hdW4d74xCkwWVws/XM20nETq5MlsZFgaBzeTowpZocmDIjlEb/zIzn3TX93/OX9dkPcOiyxmQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eUSnRGGM; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4750a85a0ddso4891cf.1
+        for <kvm@vger.kernel.org>; Tue, 04 Mar 2025 08:56:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741107388; x=1741712188; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=9DtRkP6CYCN2VX6LAP0NMel2JbBrN6HKmyX2jA5Yc7E=;
+        b=eUSnRGGMpspuowJrPZqYRwOjNFU2sn2PpkSC8uApJIIe5py4rVtuLZRvD6LnFPhZoX
+         DRNz89R+eMcEHJ0kIJ2sgxE2nXZmzJl72/J62srrAx1UcOu1WWy8eswqciznT2qKBjCU
+         MvkL8XUU021ajMk1q/Oo/Uh0WAD4sG9awgzH4Ong+DrrAc+8BbKMQlHl2QRS6S3NhwHM
+         yjKeZAUrGVim0qIbMi6V8G7wikRnSB0HZLJOzlzL/YZCU/Hn5dJNGgrc/Dsmnv1EcYpk
+         F438ZjeaFWDrAmGzFwDcfCuLDSzFvaZ7sfN9q+S9bBq/ddikL+ens0w+W3SDENdjq+i2
+         uhVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741107388; x=1741712188;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9DtRkP6CYCN2VX6LAP0NMel2JbBrN6HKmyX2jA5Yc7E=;
+        b=JYyLrRWax0HDRSXfqroc/r4b8AOgIjU3CqQdqGSx2luB/2N5X0Wuidasrzm9gkYqgN
+         P6bx5VmKbCgYAoSjLTjM3AJ/46YYzRXM/0yaY9tbedRSTorJ3BeHXNPxHOcehOR5pDkr
+         4k8n7xTqzAY2rkI+wZh35NrR3gO9PhrPfUzsJMm0c8e/cHZWE79B/8EPiPUhl2yh4QPT
+         /eXX6QVlHbDccI+eR6eOr8RF8/0wKTasBVrnBX1vzT820n4xKmBjlUgwbYtFOn2Sn9w/
+         m1sjUkbRO9WiPDA6ljWyeDpW4dFqeiALiA/P1t97eb0NbBb6p12x88HKf1JSXFGMukth
+         hrUw==
+X-Forwarded-Encrypted: i=1; AJvYcCU/amsDdvTHJiUTJNCtcWq4Ya0IAEYGl/gQSEq5HWKFiH5rixJYU93LKTrC0t6EA6fYHLk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNkoXjTSTVjjbru+ODqzO+JI8B+CTgYSdb7e6PYyXsOR0qBsTr
+	/IoHjo3qOqIS9f5U2IDyFQrR7H+pOLRNt4SODWTEElPrdcBmVpmh/0e7Pou8mhCRUQh46Qc2ekc
+	WMIOVjsA3pbeKSPVJBMzy3ULHEkAQN/wzMAeE
+X-Gm-Gg: ASbGncus2jGAzgwFRXUuv8zs2uwsFuA+NnTVMht0GL6jy6cC1dqwbaX/D/jWJlJ4qTz
+	9X17FHFZhT03A0NhqYIrcNRALqNnqJLCHOsnEiHucrNZhwANLpl1wCH6vg2/x3hUlvMW2j11E8D
+	bizkAI7dh9Y6PF1wcStBiUueFORnci8AMvFyl8wgvbjomErRaRmjosBQ==
+X-Google-Smtp-Source: AGHT+IF23vzPgXJFq7laGxxdPorzVUnziNDjwTEtrDs+9M/YfHZweGHZAZN5eGiioteQmHR0kHXdQj+z0gs3Xcfs9rk=
+X-Received: by 2002:a05:622a:48e:b0:474:cbac:a983 with SMTP id
+ d75a77b69052e-4750a4d1015mr307611cf.6.1741107387427; Tue, 04 Mar 2025
+ 08:56:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250226184540.2250357-1-derkling@google.com>
-X-ITU-Libra-ESVA-Information: Please contact Istanbul Teknik Universitesi for more information
-X-ITU-Libra-ESVA-ID: 4Z6gbR6LfmzG1tP
-X-ITU-Libra-ESVA: No virus found
-X-ITU-Libra-ESVA-From: root@cc.itu.edu.tr
-X-ITU-Libra-ESVA-Watermark: 1741715236.0081@N6Y0X8+jwCeibHPUEVu4lg
-X-ITU-MailScanner-SpamCheck: not spam
+References: <20250210184150.2145093-1-maz@kernel.org> <20250210184150.2145093-8-maz@kernel.org>
+In-Reply-To: <20250210184150.2145093-8-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 4 Mar 2025 16:55:50 +0000
+X-Gm-Features: AQ5f1JpeNlKdk-l5r71vf2tqDSYKeajf6KLHiNZ0LiUdyjmTYrSWEAH6GprWQ2A
+Message-ID: <CA+EHjTwm4CosWDGcaH_tnLU7zMNCq8twDyEcKd7-V0Lu7b-LcA@mail.gmail.com>
+Subject: Re: [PATCH 07/18] KVM: arm64: Compute FGT masks from KVM's own FGT tables
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Mark Rutland <mark.rutland@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Feb 26, 2025 at 06:45:40PM +0000, Patrick Bellasi wrote:
+Hi Marc,
+
+On Mon, 10 Feb 2025 at 18:42, Marc Zyngier <maz@kernel.org> wrote:
+>
+> In the process of decoupling KVM's view of the FGT bits from the
+> wider architectural state, use KVM's own FGT tables to build
+> a synthitic view of what is actually known.
+
+synthitic -> synthetic
+
+
+> This allows for some checking along the way.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_arm.h  |   4 ++
+>  arch/arm64/include/asm/kvm_host.h |  14 ++++
+>  arch/arm64/kvm/emulate-nested.c   | 102 ++++++++++++++++++++++++++++++
+>  3 files changed, 120 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 8d94a6c0ed5c4..e424085f2aaca 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -359,6 +359,10 @@
+>  #define __HAFGRTR_EL2_MASK     (GENMASK(49, 17) | GENMASK(4, 0))
+>  #define __HAFGRTR_EL2_nMASK    ~(__HAFGRTR_EL2_RES0 | __HAFGRTR_EL2_MASK)
+>
+> +/* Because the sysreg file mixes R and W... */
+> +#define HFGRTR_EL2_RES0                HFGxTR_EL2_RES0 (0)
+> +#define HFGWTR_EL2_RES0                (HFGRTR_EL2_RES0 | __HFGRTR_ONLY_MASK)
+
+__HFGRTR_ONLY_MASK is a hand-crafted bitmask. The only bit remaining
+in HFGxTR_EL2 that is RES0 is bit 51. If that were to be used as an
+HFGRTR-only bit without __HFGRTR_ONLY_MASK getting updated, then
+aggregate_fgt() below would set its bit in hfgwtr_masks. Could this be
+a problem if this happens and the polarity of this bit ends up being
+negative, thereby setting the corresponding nmask bit?
+
+Cheers,
+/fuad
+
 > +
-> +	case SRSO_CMD_BP_SPEC_REDUCE:
-> +		if (boot_cpu_has(X86_FEATURE_SRSO_BP_SPEC_REDUCE)) {
-> +bp_spec_reduce:
-> +			pr_notice("Reducing speculation to address VM/HV SRSO attack vector.\n");
-
-Probably not needed anymore as that will be in srso_strings which is issued
-later.
-
-> +			srso_mitigation = SRSO_MITIGATION_BP_SPEC_REDUCE;
-> +			break;
-> +		} else {
-> +			srso_mitigation = SRSO_MITIGATION_BP_SPEC_REDUCE_NA;
-> +			pr_warn("BP_SPEC_REDUCE not supported!\n");
-> +		}
-
-This is the part I'm worried about: user hears somewhere "bp-spec-reduce" is
-faster, sets it but doesn't know whether the hw even supports it. Machine
-boots, warns which is a single line and waaay buried in dmesg and continues
-unmitigated.
-
-So *maybe* we can make this a lot more subtle and say:
-
-srso=__dont_fall_back_to_ibpb_on_vmexit_if_bp_spec_reduce__
-
-(joking about the name but that should be the gist of what it means)
-
-and then act accordingly when that is specified along with a big fat:
-
-WARN_ON(..."You should not use this as a mitigation option if you don't know
-what you're doing")
-
-along with a big fat splat in dmesg.
-
-Hmmm...?
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
-
+>  /* Similar definitions for HCRX_EL2 */
+>  #define __HCRX_EL2_RES0         HCRX_EL2_RES0
+>  #define __HCRX_EL2_MASK                (BIT(6))
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 7cfa024de4e34..4e67d4064f409 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -569,6 +569,20 @@ struct kvm_sysreg_masks {
+>         } mask[NR_SYS_REGS - __SANITISED_REG_START__];
+>  };
+>
+> +struct fgt_masks {
+> +       const char      *str;
+> +       u64             mask;
+> +       u64             nmask;
+> +       u64             res0;
+> +};
+> +
+> +extern struct fgt_masks hfgrtr_masks;
+> +extern struct fgt_masks hfgwtr_masks;
+> +extern struct fgt_masks hfgitr_masks;
+> +extern struct fgt_masks hdfgrtr_masks;
+> +extern struct fgt_masks hdfgwtr_masks;
+> +extern struct fgt_masks hafgrtr_masks;
+> +
+>  struct kvm_cpu_context {
+>         struct user_pt_regs regs;       /* sp = sp_el0 */
+>
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index 607d37bab70b4..bbfe89c37a86e 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -2033,6 +2033,101 @@ static u32 encoding_next(u32 encoding)
+>         return sys_reg(op0 + 1, 0, 0, 0, 0);
+>  }
+>
+> +#define FGT_MASKS(__n, __m)                                            \
+> +       struct fgt_masks __n = { .str = #__m, .res0 = __m, }
+> +
+> +FGT_MASKS(hfgrtr_masks, HFGRTR_EL2_RES0);
+> +FGT_MASKS(hfgwtr_masks, HFGWTR_EL2_RES0);
+> +FGT_MASKS(hfgitr_masks, HFGITR_EL2_RES0);
+> +FGT_MASKS(hdfgrtr_masks, HDFGRTR_EL2_RES0);
+> +FGT_MASKS(hdfgwtr_masks, HDFGWTR_EL2_RES0);
+> +FGT_MASKS(hafgrtr_masks, HAFGRTR_EL2_RES0);
+> +
+> +static __init bool aggregate_fgt(union trap_config tc)
+> +{
+> +       struct fgt_masks *rmasks, *wmasks;
+> +
+> +       switch (tc.fgt) {
+> +       case HFGxTR_GROUP:
+> +               rmasks = &hfgrtr_masks;
+> +               wmasks = &hfgwtr_masks;
+> +               break;
+> +       case HDFGRTR_GROUP:
+> +               rmasks = &hdfgrtr_masks;
+> +               wmasks = &hdfgwtr_masks;
+> +               break;
+> +       case HAFGRTR_GROUP:
+> +               rmasks = &hafgrtr_masks;
+> +               wmasks = NULL;
+> +               break;
+> +       case HFGITR_GROUP:
+> +               rmasks = &hfgitr_masks;
+> +               wmasks = NULL;
+> +               break;
+> +       }
+> +
+> +       /*
+> +        * A bit can be reserved in either the R or W register, but
+> +        * not both.
+> +        */
+> +       if ((BIT(tc.bit) & rmasks->res0) &&
+> +           (!wmasks || (BIT(tc.bit) & wmasks->res0)))
+> +               return false;
+> +
+> +       if (tc.pol)
+> +               rmasks->mask |= BIT(tc.bit) & ~rmasks->res0;
+> +       else
+> +               rmasks->nmask |= BIT(tc.bit) & ~rmasks->res0;
+> +
+> +       if (wmasks) {
+> +               if (tc.pol)
+> +                       wmasks->mask |= BIT(tc.bit) & ~wmasks->res0;
+> +               else
+> +                       wmasks->nmask |= BIT(tc.bit) & ~wmasks->res0;
+> +       }
+> +
+> +       return true;
+> +}
+> +
+> +static __init int check_fgt_masks(struct fgt_masks *masks)
+> +{
+> +       unsigned long duplicate = masks->mask & masks->nmask;
+> +       u64 res0 = masks->res0;
+> +       int ret = 0;
+> +
+> +       if (duplicate) {
+> +               int i;
+> +
+> +               for_each_set_bit(i, &duplicate, 64) {
+> +                       kvm_err("%s[%d] bit has both polarities\n",
+> +                               masks->str, i);
+> +               }
+> +
+> +               ret = -EINVAL;
+> +       }
+> +
+> +       masks->res0 = ~(masks->mask | masks->nmask);
+> +       if (masks->res0 != res0)
+> +               kvm_info("Implicit %s = %016llx, expecting %016llx\n",
+> +                        masks->str, masks->res0, res0);
+> +
+> +       return ret;
+> +}
+> +
+> +static __init int check_all_fgt_masks(int ret)
+> +{
+> +       int err = 0;
+> +
+> +       err |= check_fgt_masks(&hfgrtr_masks);
+> +       err |= check_fgt_masks(&hfgwtr_masks);
+> +       err |= check_fgt_masks(&hfgitr_masks);
+> +       err |= check_fgt_masks(&hdfgrtr_masks);
+> +       err |= check_fgt_masks(&hdfgwtr_masks);
+> +       err |= check_fgt_masks(&hafgrtr_masks);
+> +
+> +       return ret ?: err;
+> +}
+> +
+>  int __init populate_nv_trap_config(void)
+>  {
+>         int ret = 0;
+> @@ -2097,8 +2192,15 @@ int __init populate_nv_trap_config(void)
+>                         ret = xa_err(prev);
+>                         print_nv_trap_error(fgt, "Failed FGT insertion", ret);
+>                 }
+> +
+> +               if (!aggregate_fgt(tc)) {
+> +                       ret = -EINVAL;
+> +                       print_nv_trap_error(fgt, "FGT bit is reserved", ret);
+> +               }
+>         }
+>
+> +       ret = check_all_fgt_masks(ret);
+> +
+>         kvm_info("nv: %ld fine grained trap handlers\n",
+>                  ARRAY_SIZE(encoding_to_fgt));
+>
+> --
+> 2.39.2
+>
 
