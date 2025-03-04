@@ -1,138 +1,209 @@
-Return-Path: <kvm+bounces-40046-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40048-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60A78A4E439
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 16:51:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85C37A4E4ED
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 17:06:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FA7C16E6BC
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 15:45:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F61F7A8020
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 16:04:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 929F62356A3;
-	Tue,  4 Mar 2025 15:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F71D24C099;
+	Tue,  4 Mar 2025 15:47:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DiF3v5Vk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eYIhp1+R"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A4F204C1D
-	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 15:30:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96F424C084;
+	Tue,  4 Mar 2025 15:47:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741102223; cv=none; b=VIKYqr1kSdYjbvdlVgq3mtl4nazFYjmz77PUgcluGBZblOn0dIbbj4xrGKSh2v20+93DrG3srd0u6o4q+GCuUqUaiZ59mTqPI6Fb3n4MWbEHvTXI/AoGF+6cGd3Kp7/GZw5/ghfpy6+FMqaK/qpo5bEYjOcyCYumlU3Df/bGsM0=
+	t=1741103234; cv=none; b=ZuWdu902W5Lx+VQ91k7SfE1c0kU1iLV5GekFdmGy+6Zp8mhruus5PPlSyhPvk55BNY53WbJV7aVskwi5Mqerw2qCQzctdy283PstjU+RMCZ7lM1qotwIOcQ5zNojodm/AQM7GUL3n8+YIvIxIsd+wJvfRBk8flriybfBlJEKSPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741102223; c=relaxed/simple;
-	bh=pCfGtvk96jzYY0aDPo6UzD5wZN4EHA8IEklxkYVKezQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Vk+uAitTXXR2UZ9MJReeCe7j9O7IZyIJWnne29SMi1Rgs9XPzBk4wvGxdZNw6uzyZwrBo9o6QmIaAVYb5JJBbXEUx07bFfkLh4kbfl9cio3o6qf4PXxec3SigmoYk9Dx1m2ft6b+7hoRALQYCmNUk74rvhjn9sjJSg6DgU0AO+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DiF3v5Vk; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2feda472a7bso5683068a91.3
-        for <kvm@vger.kernel.org>; Tue, 04 Mar 2025 07:30:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741102221; x=1741707021; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cvg9RGNtgXTSILk0IdpR94FQL1jxJC1gyLgPdqw8XU0=;
-        b=DiF3v5VkUGnzU9LKyJFBLtvo7EuoyDw4OnRAFiK+y8GgN2HpMhbK8zc+rPW6V+4IK8
-         TYW4fTuVYM41oIxmQaZBZq0o0HbHJLedCSSU2GgvWAH5pz6pLojHA/aIl9g8er5M03Yr
-         BjAISmyhDBrGcce83oggSEo1XMgS/4C8xlA6tW0JCgl0dW3TBJn8ksyPyrh9ZEdqA9xU
-         Nbtp3xtpEx6yvGs/9oPSIOx6pib+NM4PGyvglFbFc7K3+inEa8mXx/cYzMAxwgVlJmhH
-         dM+EarfIA5cX5aGGpBxXzZsLq0QwUCrrq7TQPuLflyLlIzjlgIo6Z9iyzUeXJoqyIYni
-         dVlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741102221; x=1741707021;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cvg9RGNtgXTSILk0IdpR94FQL1jxJC1gyLgPdqw8XU0=;
-        b=WNBrtJe4ckPWoMvBO8A25VWBA8W6sa4qXI5QCYAZuBuAkuyC/qK+q+/S2w+YWE55/R
-         LDJQSwIuKAxbgV1zBG//GmPSnhcJakmzUjFECb8Ei7hR/mcFV++C25RMtF5IpBVHJ8tG
-         AOzTW2D0NdVcumAzyUHdRs+3g8GfLRCap6vO1ngVqSuVKe3BCxswNlVuK3iLcsV/HSag
-         AsVJyGDXY1FSCOtzvcUMruKZGrO/IDs7yYp7ZwK6iHZtBkm63slZD8VXCupqVjAJVh7G
-         ZmP0K410Hfchry/MZjKwdbP32c4MAClRkJJtt6WWrQN+4I0txVYHhi4uwlkSh3HI9l5Z
-         hkoA==
-X-Forwarded-Encrypted: i=1; AJvYcCXqot0MVrrmXtyvS9OD5Aj7pktETOBhn/RiyzDPAuODEikxhYbeGn2ugCGKqugDNBb+1PM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCZLAIRw3Yqcp04mS2FNl361afcOK/o7gXzeutlvhhAUpFjFRd
-	UNldFPHWE9OJxt+7A9tPyTK7D4H9nWorz+S/5XoyCPHWUjfcZ/kab1jdpmRR+dmQkmt8nMErcQv
-	PsA==
-X-Google-Smtp-Source: AGHT+IEM4E5/Zptus46DoKrgzz5+XTeSJ4hJIAQWQAIYRnIL9pjg60K5aKaF81Eu644JbhsDlC5832QLpoQ=
-X-Received: from pjur6.prod.google.com ([2002:a17:90a:d406:b0:2fc:2959:b397])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2c90:b0:2ee:db8a:2a01
- with SMTP id 98e67ed59e1d1-2febac10a9fmr26741760a91.30.1741102221273; Tue, 04
- Mar 2025 07:30:21 -0800 (PST)
-Date: Tue, 4 Mar 2025 07:30:19 -0800
-In-Reply-To: <diqz8qplabre.fsf@ackerleytng-ctop.c.googlers.com>
+	s=arc-20240116; t=1741103234; c=relaxed/simple;
+	bh=CzgKvgWWn9VItc2I3f+jV1mLlblrc3SXMV7PgF63HnU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sbNNTIgRy2he1B2FO4STByYSyOFnEb701PXonj43Y38KxiMBvtyMOpCi4KrL+aFvxBX0YNKy8J/ZjJ6MORs/xktazYYqjggJ+MpumbrP3L4jNCykVh9H1/FnQ/qnoYc4cYMlfH5oT6kdZojQvY2SSbg+pQFkJx6diTosTcy9BIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eYIhp1+R; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C875C4CEE5;
+	Tue,  4 Mar 2025 15:47:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741103234;
+	bh=CzgKvgWWn9VItc2I3f+jV1mLlblrc3SXMV7PgF63HnU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=eYIhp1+R5Fy8beCFpYaMRbWBGZHuOJdZwA5KaEoymQlBSNBd9iHALGfkIADKGKV2c
+	 WxnvuhV3XMZ2RaqbeYWdSRYDQC2I8ex6+huJDHDCoSHD2KSjqC4qS+G4PwsIGBqaN1
+	 IKpD3KgkkEWTuxuhsZKgQS5Y7RoSBy/PkW6hEEhuP3p3HgAQqLv2evoUm2Wt9M4HrI
+	 rLNE5E6WJuk0o/0bFdGoMyXme/+tMSCvBPoP8SmafMpfi05YumCh6/cYUHSL4xb2FA
+	 jj3jpmAN9jjk4UcyFneZ5n0ArrM4LG/0dGpdwnhf2CC7S0jmdcGolBYMDK0oCNhjOp
+	 WXRB44edK67ag==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tpUUB-00AIzw-QM;
+	Tue, 04 Mar 2025 15:47:12 +0000
+Date: Tue, 04 Mar 2025 15:47:11 +0000
+Message-ID: <86eczcpzls.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH 03/18] KVM: arm64: Handle trapping of FEAT_LS64* instructions
+In-Reply-To: <CA+EHjTwkX+sy1wuS8LvGM+=m_S-h-=xUUXOyMapnoLiHt0XpOw@mail.gmail.com>
+References: <20250210184150.2145093-1-maz@kernel.org>
+	<20250210184150.2145093-4-maz@kernel.org>
+	<CA+EHjTwkX+sy1wuS8LvGM+=m_S-h-=xUUXOyMapnoLiHt0XpOw@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <b494af0e-3441-48d4-abc8-df3d5c006935@suse.cz> <diqz8qplabre.fsf@ackerleytng-ctop.c.googlers.com>
-Message-ID: <Z8cci0nNtwja8gyR@google.com>
-Subject: Re: [PATCH v6 4/5] KVM: guest_memfd: Enforce NUMA mempolicy using
- shared policy
-From: Sean Christopherson <seanjc@google.com>
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: Vlastimil Babka <vbabka@suse.cz>, shivankg@amd.com, akpm@linux-foundation.org, 
-	willy@infradead.org, pbonzini@redhat.com, linux-fsdevel@vger.kernel.org, 
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-coco@lists.linux.dev, chao.gao@intel.com, david@redhat.com, 
-	bharata@amd.com, nikunj@amd.com, michael.day@amd.com, Neeraj.Upadhyay@amd.com, 
-	thomas.lendacky@amd.com, michael.roth@amd.com, tabba@google.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Mar 04, 2025, Ackerley Tng wrote:
-> Vlastimil Babka <vbabka@suse.cz> writes:
-> >> struct shared_policy should be stored on the inode rather than the file,
-> >> since the memory policy is a property of the memory (struct inode),
-> >> rather than a property of how the memory is used for a given VM (struct
-> >> file).
-> >
-> > That makes sense. AFAICS shmem also uses inodes to store policy.
-> >
-> >> When the shared_policy is stored on the inode, intra-host migration [1]
-> >> will work correctly, since the while the inode will be transferred from
-> >> one VM (struct kvm) to another, the file (a VM's view/bindings of the
-> >> memory) will be recreated for the new VM.
-> >> 
-> >> I'm thinking of having a patch like this [2] to introduce inodes.
-> >
-> > shmem has it easier by already having inodes
-> >
-> >> With this, we shouldn't need to pass file pointers instead of inode
-> >> pointers.
-> >
-> > Any downsides, besides more work needed? Or is it feasible to do it using
-> > files now and convert to inodes later?
-> >
-> > Feels like something that must have been discussed already, but I don't
-> > recall specifics.
+On Tue, 04 Mar 2025 14:36:19 +0000,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> Here's where Sean described file vs inode: "The inode is effectively the
-> raw underlying physical storage, while the file is the VM's view of that
-> storage." [1].
+> Hi Marc,
 > 
-> I guess you're right that for now there is little distinction between
-> file and inode and using file should be feasible, but I feel that this
-> dilutes the original intent.
+> On Mon, 10 Feb 2025 at 18:42, Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > We generally don't expect FEAT_LS64* instructions to trap, unless
+> > they are trapped by a guest hypervisor.
+> >
+> > Otherwise, this is just the guest playing tricks on us by using
+> > an instruction that isn't advertised, which we handle with a well
+> > deserved UNDEF.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/handle_exit.c | 64 ++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 64 insertions(+)
+> >
+> > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> > index 512d152233ff2..4f8354bf7dc5f 100644
+> > --- a/arch/arm64/kvm/handle_exit.c
+> > +++ b/arch/arm64/kvm/handle_exit.c
+> > @@ -294,6 +294,69 @@ static int handle_svc(struct kvm_vcpu *vcpu)
+> >         return 1;
+> >  }
+> >
+> > +static int handle_ls64b(struct kvm_vcpu *vcpu)
+> > +{
+> > +       struct kvm *kvm = vcpu->kvm;
+> > +       u64 esr = kvm_vcpu_get_esr(vcpu);
+> > +       u64 iss = ESR_ELx_ISS(esr);
+> > +       bool allowed;
+> > +
+> > +       switch (iss) {
+> > +       case ESR_ELx_ISS_ST64BV:
+> > +               allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V);
+> > +               break;
+> > +       case ESR_ELx_ISS_ST64BV0:
+> > +               allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA);
+> > +               break;
+> > +       case ESR_ELx_ISS_LDST64B:
+> > +               allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64);
+> > +               break;
+> > +       default:
+> > +               /* Clearly, we're missing something. */
+> > +               goto unknown_trap;
+> > +       }
+> > +
+> > +       if (!allowed)
+> > +               goto undef;
+> > +
+> > +       if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
+> > +               u64 hcrx = __vcpu_sys_reg(vcpu, HCRX_EL2);
+> > +               bool fwd;
+> > +
+> > +               switch (iss) {
+> > +               case ESR_ELx_ISS_ST64BV:
+> > +                       fwd = !(hcrx & HCRX_EL2_EnASR);
+> > +                       break;
+> > +               case ESR_ELx_ISS_ST64BV0:
+> > +                       fwd = !(hcrx & HCRX_EL2_EnAS0);
+> > +                       break;
+> > +               case ESR_ELx_ISS_LDST64B:
+> > +                       fwd = !(hcrx & HCRX_EL2_EnALS);
+> > +                       break;
+> > +               default:
+> > +                       /* We don't expect to be here */
+> > +                       fwd = false;
+> > +               }
+> > +
+> > +               if (fwd) {
+> > +                       kvm_inject_nested_sync(vcpu, esr);
+> > +                       return 1;
+> > +               }
+> > +       }
+> > +
+> > +unknown_trap:
+> > +       /*
+> > +        * If we land here, something must be very wrong, because we
+> > +        * have no idea why we trapped at all. Warn and undef as a
+> > +        * fallback.
+> > +        */
+> > +       WARN_ON(1);
+> 
+> nit: should this be WARN_ONCE() instead?
+> 
+> > +
+> > +undef:
+> > +       kvm_inject_undefined(vcpu);
+> > +       return 1;
+> > +}
+> 
+> I'm wondering if this can be simplified by having one switch()
+> statement that toggles both allowed and fwd (or maybe even only fwd),
+> and then inject depending on that, e.g.,
+> 
+> +static int handle_ls64b(struct kvm_vcpu *vcpu)
+> +{
+> +    struct kvm *kvm = vcpu->kvm;
+> +    bool is_nv = vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu);
+> +    u64 hcrx = __vcpu_sys_reg(vcpu, HCRX_EL2);
+> +    u64 esr = kvm_vcpu_get_esr(vcpu);
+> +    u64 iss = ESR_ELx_ISS(esr);
+> +    bool fwd = false;
+> +
+> +    switch (iss) {
+> +    case ESR_ELx_ISS_ST64BV:
+> +         fwd = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V) &&
+> +                   !(hcrx & HCRX_EL2_EnASR)
 
-Hmm, and using the file would be actively problematic at some point.  One could
-argue that NUMA policy is property of the VM accessing the memory, i.e. that two
-VMs mapping the same guest_memfd could want different policies.  But in practice,
-that would allow for conflicting requirements, e.g. different policies in each
-VM for the same chunk of memory, and would likely lead to surprising behavior due
-to having to manually do mbind() for every VM/file view.
+Ah, I know what I dislike about this approach: If your L1 guest runs
+at EL2, HCRX_EL2 doesn't apply (it is only for an L2 guest). Yet we
+evaluate it.
 
-> Something like [2] doesn't seem like too big of a change and could perhaps be
-> included earlier rather than later, since it will also contribute to support
-> for restricted mapping [3].
-> 
-> [1] https://lore.kernel.org/all/ZLGiEfJZTyl7M8mS@google.com/
-> [2] https://lore.kernel.org/all/d1940d466fc69472c8b6dda95df2e0522b2d8744.1726009989.git.ackerleytng@google.com/
-> [3] https://lore.kernel.org/all/20250117163001.2326672-1-tabba@google.com/T/
+I think this still works because you shouldn't have HCRX_EL2.EnASR
+clear on the host if LS64V is advertised to the guest, but it feels a
+bit fragile.
+
+I'll have another think at refactoring that code.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
