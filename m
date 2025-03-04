@@ -1,49 +1,50 @@
-Return-Path: <kvm+bounces-40062-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40063-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB534A4E8CE
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 18:30:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB95FA4E8DD
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 18:31:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08F117A8AE5
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 17:27:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A29C27A988F
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 17:28:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CBA329345E;
-	Tue,  4 Mar 2025 17:02:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 428B928153B;
+	Tue,  4 Mar 2025 17:05:10 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14D17293450
-	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 17:02:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7559281508
+	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 17:05:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741107740; cv=none; b=g/TLhettifoTl8pni6FImBSrYjnH4LPtSQtbqB+zpSs+NifrqJp6zaF+3QbaHxbfPqeGVxAVSkLzW1yRRM6534dxMRKnevYSgvpWSUYZ8m8z38aWqXxhhzNV4/UHGDFRDMig1Fc2p7jiQdmdF6kBIS6qKA39UuHi5xaKdEkgMyU=
+	t=1741107909; cv=none; b=B41YwBw7mQBwz/P7AJ5M7AlGO4NAi1VCzKeHcKcDdeLklBJB+hMVOzRb25kzTLtZmmjIFp50rFyOPUb8fdZeArRVPdWK++K7XOxw3Zs+c5Akag3PYPOLthM4kgZg6hAu7ZOV3OaJ49DdCyBcngAfXsE+YOx7hoGyQ+UJ/JENKgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741107740; c=relaxed/simple;
-	bh=EFjtBnt19Ojd3dLx40oDXftpn2X9SiAs1wVQcHBfI6w=;
+	s=arc-20240116; t=1741107909; c=relaxed/simple;
+	bh=TFI3NvbW8gK/maKSuBAQuVMO7L/dB77VNEUZWU+5FVI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PLKQvp/5JEmCFHeB9JRF71leCg90RyshLgaTz/zaFVz57o/VlgFl0czny7s4QfTR+lD4mU/lCgApuxr57Zvd0qaNsFvmPB9dZjwAFvKzLrTfHtqWZaOJ9o9524XQaRUpErL3ZSmtAkijVJYCoJ4lLX4qEJBlG3VLnmM9ZkLlnG0=
+	 Content-Type:Content-Disposition:In-Reply-To; b=ipCSjxwU3iPzjqiP+0ZJVoihLB692gBQeRzIjR4NgWlm420jkZ634Qlwo7IgkKaBDYCrYvxd4AIdc0YKao+OBwN+BDN7KxM0fHw7Bpef0HednS/1wBiRzXYmTqHocor0oPp+g7s7XIiBTjc9CERh/U4dUEG4t4eqZJDg7x5R8F8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1D6252F;
-	Tue,  4 Mar 2025 09:02:31 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EBD0D2F;
+	Tue,  4 Mar 2025 09:05:20 -0800 (PST)
 Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4F54A3F5A1;
-	Tue,  4 Mar 2025 09:02:16 -0800 (PST)
-Date: Tue, 4 Mar 2025 17:02:13 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1E0EF3F5A1;
+	Tue,  4 Mar 2025 09:05:05 -0800 (PST)
+Date: Tue, 4 Mar 2025 17:05:03 +0000
 From: Joey Gouly <joey.gouly@arm.com>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
 Cc: kvm@vger.kernel.org, drjones@redhat.com, kvmarm@lists.linux.dev,
 	Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [kvm-unit-tests PATCH v1 1/7] arm64: drop to EL1 if booted at EL2
-Message-ID: <20250304170213.GB1553498@e124191.cambridge.arm.com>
+Subject: Re: [kvm-unit-tests PATCH v1 2/7] arm64: timer: use hypervisor
+ timers when at EL2
+Message-ID: <20250304170503.GC1553498@e124191.cambridge.arm.com>
 References: <20250220141354.2565567-1-joey.gouly@arm.com>
- <20250220141354.2565567-2-joey.gouly@arm.com>
- <Z8CYeyKrFoglWWSp@raptor>
+ <20250220141354.2565567-3-joey.gouly@arm.com>
+ <Z8CYwU7cfxEMnEUL@raptor>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -52,97 +53,163 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z8CYeyKrFoglWWSp@raptor>
+In-Reply-To: <Z8CYwU7cfxEMnEUL@raptor>
 
-Hi,
-
-On Thu, Feb 27, 2025 at 04:53:15PM +0000, Alexandru Elisei wrote:
+On Thu, Feb 27, 2025 at 04:55:26PM +0000, Alexandru Elisei wrote:
 > Hi Joey,
 > 
-> On Thu, Feb 20, 2025 at 02:13:48PM +0000, Joey Gouly wrote:
-> > EL2 is not currently supported, drop to EL1 to conitnue booting.
+> On Thu, Feb 20, 2025 at 02:13:49PM +0000, Joey Gouly wrote:
+> > At EL2, with VHE:
+> >   - CNTP_CVAL_EL0 is forwarded to CNTHP_CVAL_EL0
+> >   - CNTV_CVAL_EL0 is forwarded to CNTHP_CVAL_EL0
+> 
+> CNTH*V*_CVAL_EL0, right?
+
+Fixed.
+
+> 
+> It also happens for the other two registers for the physical and virtual
+> timers (CNT{P,V}_{TVAL,CTL}_EL0). Just nitpicking here.
+
+I'll write it like that, thanks!
+
+> 
+> > 
+> > Save the hypervisor physical and virtual timer IRQ numbers from the DT/ACPI.
 > > 
 > > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 > > ---
-> >  arm/cstart64.S | 27 +++++++++++++++++++++++++--
-> >  1 file changed, 25 insertions(+), 2 deletions(-)
+> >  arm/timer.c         | 10 ++++++++--
+> >  lib/acpi.h          |  2 ++
+> >  lib/arm/asm/timer.h | 11 +++++++++++
+> >  lib/arm/timer.c     | 19 +++++++++++++++++--
+> >  4 files changed, 38 insertions(+), 4 deletions(-)
 > > 
-> > diff --git a/arm/cstart64.S b/arm/cstart64.S
-> > index b480a552..3a305ad0 100644
-> > --- a/arm/cstart64.S
-> > +++ b/arm/cstart64.S
-> > @@ -57,14 +57,25 @@ start:
-> >  	add     x6, x6, :lo12:reloc_end
-> >  1:
-> >  	cmp	x5, x6
-> > -	b.hs	1f
-> > +	b.hs	reloc_done
-> >  	ldr	x7, [x5]			// r_offset
-> >  	ldr	x8, [x5, #16]			// r_addend
-> >  	add	x8, x8, x4			// val = base + r_addend
-> >  	str	x8, [x4, x7]			// base[r_offset] = val
-> >  	add	x5, x5, #24
-> >  	b	1b
-> > -
-> > +reloc_done:
-> > +	mrs	x4, CurrentEL
-> > +	cmp	x4, CurrentEL_EL2
-> > +	b.ne	1f
-> > +drop_to_el1:
-> > +	mov	x4, 4
-> > +	msr	spsr_el2, x4
-> > +	adrp	x4, 1f
-> > +	add	x4, x4, :lo12:1f
-> > +	msr	elr_el2, x4
+> > diff --git a/arm/timer.c b/arm/timer.c
+> > index 2cb80518..c6287ca7 100644
+> > --- a/arm/timer.c
+> > +++ b/arm/timer.c
+> > @@ -347,8 +347,14 @@ static void test_ptimer(void)
+> >  static void test_init(void)
+> >  {
+> >  	assert(TIMER_PTIMER_IRQ != -1 && TIMER_VTIMER_IRQ != -1);
+It's still there ^^
+> > -	ptimer_info.irq = TIMER_PTIMER_IRQ;
+> > -	vtimer_info.irq = TIMER_VTIMER_IRQ;
+> > +	if (current_level() == CurrentEL_EL1) {
+> > +		ptimer_info.irq = TIMER_PTIMER_IRQ;
+> > +		vtimer_info.irq = TIMER_VTIMER_IRQ;
 > 
-> I'm going to assume this works because KVM is nice enough to initialise the
-> EL2 registers that affect execution at EL1 to some sane defaults. Is that
-> something that can be relied on going forward?
+> You dropped the assert for TIMER_{P,V}TIMER_IRQ.
 
-I was just trying to keep the changes minimal.
+The assertion is still there!
 
 > 
-> What about UEFI?
-
-Haven't tested it yet.
-
+> Otherwise, looks good to me:
 > 
-> I was expecting some kind of initialization of the registers that affect
-> EL1.
+> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
-I'll look into it.
-
-Thanks,
-Joey
+Thanks!
 
 > 
 > Thanks,
 > Alex
 > 
-> > +	isb
-> > +	eret
-> >  1:
-> >  	/* zero BSS */
-> >  	adrp	x4, bss
-> > @@ -186,6 +197,18 @@ get_mmu_off:
+> > +	} else {
+> > +		assert(TIMER_HPTIMER_IRQ != -1 && TIMER_HVTIMER_IRQ != -1);
+> > +		ptimer_info.irq = TIMER_HPTIMER_IRQ;
+> > +		vtimer_info.irq = TIMER_HVTIMER_IRQ;
+> > +	}
 > >  
-> >  .globl secondary_entry
-> >  secondary_entry:
-> > +	mrs	x0, CurrentEL
-> > +	cmp	x0, CurrentEL_EL2
-> > +	b.ne	1f
-> > +drop_to_el1_secondary:
-> > +	mov	x0, 4
-> > +	msr	spsr_el2, x0
-> > +	adrp	x0, 1f
-> > +	add	x0, x0, :lo12:1f
-> > +	msr	elr_el2, x0
-> > +	isb
-> > +	eret
-> > +1:
-> >  	/* enable FP/ASIMD and SVE */
-> >  	mov	x0, #(3 << 20)
-> >  	orr	x0, x0, #(3 << 16)
+> >  	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_UNKNOWN, ptimer_unsupported_handler);
+> >  	ptimer_info.read_ctl();
+> > diff --git a/lib/acpi.h b/lib/acpi.h
+> > index c330c877..66e3062d 100644
+> > --- a/lib/acpi.h
+> > +++ b/lib/acpi.h
+> > @@ -290,6 +290,8 @@ struct acpi_table_gtdt {
+> >  	u64 counter_read_block_address;
+> >  	u32 platform_timer_count;
+> >  	u32 platform_timer_offset;
+> > +	u32 virtual_el2_timer_interrupt;
+> > +	u32 virtual_el2_timer_flags;
+> >  };
+> >  
+> >  /* Reset to default packing */
+> > diff --git a/lib/arm/asm/timer.h b/lib/arm/asm/timer.h
+> > index aaf839fc..7dda0f4f 100644
+> > --- a/lib/arm/asm/timer.h
+> > +++ b/lib/arm/asm/timer.h
+> > @@ -21,12 +21,23 @@ struct timer_state {
+> >  		u32 irq;
+> >  		u32 irq_flags;
+> >  	} vtimer;
+> > +	struct {
+> > +		u32 irq;
+> > +		u32 irq_flags;
+> > +	} hptimer;
+> > +	struct {
+> > +		u32 irq;
+> > +		u32 irq_flags;
+> > +	} hvtimer;
+> >  };
+> >  extern struct timer_state __timer_state;
+> >  
+> >  #define TIMER_PTIMER_IRQ (__timer_state.ptimer.irq)
+> >  #define TIMER_VTIMER_IRQ (__timer_state.vtimer.irq)
+> >  
+> > +#define TIMER_HPTIMER_IRQ (__timer_state.hptimer.irq)
+> > +#define TIMER_HVTIMER_IRQ (__timer_state.hvtimer.irq)
+> > +
+> >  void timer_save_state(void);
+> >  
+> >  #endif /* !__ASSEMBLY__ */
+> > diff --git a/lib/arm/timer.c b/lib/arm/timer.c
+> > index ae702e41..57f504e2 100644
+> > --- a/lib/arm/timer.c
+> > +++ b/lib/arm/timer.c
+> > @@ -38,10 +38,11 @@ static void timer_save_state_fdt(void)
+> >  	 *      secure timer irq
+> >  	 *      non-secure timer irq            (ptimer)
+> >  	 *      virtual timer irq               (vtimer)
+> > -	 *      hypervisor timer irq
+> > +	 *      hypervisor timer irq            (hptimer)
+> > +	 *      hypervisor virtual timer irq    (hvtimer)
+> >  	 */
+> >  	prop = fdt_get_property(fdt, node, "interrupts", &len);
+> > -	assert(prop && len == (4 * 3 * sizeof(u32)));
+> > +	assert(prop && len >= (4 * 3 * sizeof(u32)));
+> >  
+> >  	data = (u32 *) prop->data;
+> >  	assert(fdt32_to_cpu(data[3]) == 1 /* PPI */ );
+> > @@ -50,6 +51,14 @@ static void timer_save_state_fdt(void)
+> >  	assert(fdt32_to_cpu(data[6]) == 1 /* PPI */ );
+> >  	__timer_state.vtimer.irq = PPI(fdt32_to_cpu(data[7]));
+> >  	__timer_state.vtimer.irq_flags = fdt32_to_cpu(data[8]);
+> > +	if (len == (5 * 3 * sizeof(u32))) {
+> > +		assert(fdt32_to_cpu(data[9]) == 1 /* PPI */ );
+> > +		__timer_state.hptimer.irq = PPI(fdt32_to_cpu(data[10]));
+> > +		__timer_state.hptimer.irq_flags = fdt32_to_cpu(data[11]);
+> > +		assert(fdt32_to_cpu(data[12]) == 1 /* PPI */ );
+> > +		__timer_state.hvtimer.irq = PPI(fdt32_to_cpu(data[13]));
+> > +		__timer_state.hvtimer.irq_flags = fdt32_to_cpu(data[14]);
+> > +	}
+> >  }
+> >  
+> >  #ifdef CONFIG_EFI
+> > @@ -72,6 +81,12 @@ static void timer_save_state_acpi(void)
+> >  
+> >  	__timer_state.vtimer.irq = gtdt->virtual_timer_interrupt;
+> >  	__timer_state.vtimer.irq_flags = gtdt->virtual_timer_flags;
+> > +
+> > +	__timer_state.hptimer.irq = gtdt->non_secure_el2_interrupt;
+> > +	__timer_state.hptimer.irq_flags = gtdt->non_secure_el2_flags;
+> > +
+> > +	__timer_state.hvtimer.irq = gtdt->virtual_el2_timer_interrupt;
+> > +	__timer_state.hvtimer.irq_flags = gtdt->virtual_el2_timer_flags;
+> >  }
+> >  
+> >  #else
 > > -- 
 > > 2.25.1
 > > 
