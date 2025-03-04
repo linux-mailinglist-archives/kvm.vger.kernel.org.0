@@ -1,283 +1,128 @@
-Return-Path: <kvm+bounces-40044-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40043-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45DF2A4E2D9
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 16:20:53 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F010A189E318
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 15:13:55 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B89E8281372;
-	Tue,  4 Mar 2025 15:06:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="I2IDkUtl"
-X-Original-To: kvm@vger.kernel.org
-Received: from beeline1.cc.itu.edu.tr (beeline1.cc.itu.edu.tr [160.75.25.115])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379DE281369
-	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 15:06:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=160.75.25.115
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741100787; cv=pass; b=EfXbqKnddQHhxCH944tFrrSXDEOAUwIrqHmwJQqFNCrs7eAuWNudgsK23GCQnAxTRTMltCQ1SA4DAZpsTay0QO5Sx+Zrz2YM3wgbeAoFnII2g70qEY3zuE+2zt7tl+uZdZFk+iDMC/4D5FoykIo7hXTNhAECCrFnRIn6i68WXwQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741100787; c=relaxed/simple;
-	bh=O+1kyzMjMuVSclP/dGDX7WvTQ3qb9jZg68fPpc8T+yE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CDPg0iII8RVoHMM8vPe/GjU9lyu4TDjuV6jkl8FJjhfiihWPxg1eEo+AOgNn31F/xqss4hLOLswIgDykAJ6tyGs6IbYpj3hvZ0L4A8KeivA1fGaOgQsNEZzlANCfNCzcMzVyhGeJHJ4A0gxBWuE9zR59iiY9gMlFzkQS0+QcxiU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=I2IDkUtl; arc=none smtp.client-ip=99.78.197.218; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; arc=pass smtp.client-ip=160.75.25.115
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=cc.itu.edu.tr
-Received: from lesvatest1.cc.itu.edu.tr (lesvatest1.cc.itu.edu.tr [10.146.128.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
-	(No client certificate requested)
-	by beeline1.cc.itu.edu.tr (Postfix) with ESMTPS id 6FA2140D051B
-	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 18:06:24 +0300 (+03)
-X-Envelope-From: <root@cc.itu.edu.tr>
-Authentication-Results: lesvatest1.cc.itu.edu.tr;
-	dkim=pass (1024-bit key, unprotected) header.d=amazon.com header.i=@amazon.com header.a=rsa-sha256 header.s=amazon201209 header.b=I2IDkUtl
-Received: from lesva1.cc.itu.edu.tr (unknown [160.75.70.79])
-	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6fB22v13zFyTC
-	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 18:05:14 +0300 (+03)
-Received: by le1 (Postfix, from userid 0)
-	id 84F934273D; Tue,  4 Mar 2025 18:04:57 +0300 (+03)
-Authentication-Results: lesva1.cc.itu.edu.tr;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=I2IDkUtl
-X-Envelope-From: <linux-kernel+bounces-541764-bozkiru=itu.edu.tr@vger.kernel.org>
-Authentication-Results: lesva2.cc.itu.edu.tr;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=I2IDkUtl
-Received: from fgw1.itu.edu.tr (fgw1.itu.edu.tr [160.75.25.103])
-	by le2 (Postfix) with ESMTP id 4F59141C9E
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:10:00 +0300 (+03)
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by fgw1.itu.edu.tr (Postfix) with SMTP id 26EEC3063EFE
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:10:00 +0300 (+03)
+	by mail.lfdr.de (Postfix) with ESMTPS id B7F4EA4E285
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 16:12:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02C1B18937C1
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 13:09:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39B7119C3487
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 15:04:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9A7D2116F7;
-	Mon,  3 Mar 2025 13:09:00 +0000 (UTC)
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A517427FE78;
+	Tue,  4 Mar 2025 14:59:12 +0000 (UTC)
+X-Original-To: kvm@vger.kernel.org
+Received: from vps-ovh.mhejs.net (vps-ovh.mhejs.net [145.239.82.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 181CA21129F;
-	Mon,  3 Mar 2025 13:08:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A6C623A9AE;
+	Tue,  4 Mar 2025 14:59:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.239.82.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741007337; cv=none; b=pECj3u8HVlYM/1jGdnbmLyk/Kzo7Lq8ndBAc9X+hJMMsyOX5Jd5dEi6l787IURpjufX3gmorCzHpemNuZw58Fbog61SDH2Le5GYgObjK0rs6km5uB3EBfztpeasPraHP2cxo8M6KYxDzqVmv97KcKvH4lkL6/WGSD5sP/GhF+7Y=
+	t=1741100352; cv=none; b=KXmr+NSAEjfKjmH5P7BtLA34irzhgRrh/SeNnVWIckd8U+kqbKj9Sd9b0aiBQwNfF0VdJCBHGua99XyCe9mUp1f5duQ1QJqXdxKiyTejjG106SOCGXDYJ75+ozpf04mTUGyh4ZBtJiUfbFbJgYzm89BCTCrVmhN5ZY099se9Zgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741007337; c=relaxed/simple;
-	bh=O+1kyzMjMuVSclP/dGDX7WvTQ3qb9jZg68fPpc8T+yE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qGYKEEMFbZ9bXK5xECkZE0nf2Qe3QLrO++zzfxBFtX8Ric7qoSsFvRutGRLHrNxvri31lIuVC7iPq130xJE7djxXGd+N09nWEt5b/6q35SkGImk796xFdLzWg9nmHF6TYAtxhaEesfwm2SZh2qE774WgOqPGTcY0EI7KJoNLnIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=I2IDkUtl; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1741007337; x=1772543337;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=fo0RfFhjOlaWjyHUEezlWZqA9yMhjyUNGY8gIayRQKY=;
-  b=I2IDkUtliTSdICOOZOja+o2KRv/R5z5Ky+EeWO9Y9O4GRF/gbY69iM7k
-   TWLuitm4OcSoflrJ5CngkN27xEKPjLSQqnLfuOe72oFsE1Ma2nBy1J+S1
-   xEEMGj053E6Gw+dKiCB8KR92kcTU6drBRrM7O2/yzOONZNphwzDI1u6JE
-   s=;
-X-IronPort-AV: E=Sophos;i="6.13,329,1732579200"; 
-   d="scan'208";a="382575134"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 13:08:55 +0000
-Received: from EX19MTAEUA001.ant.amazon.com [10.0.10.100:44365]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.12.5:2525] with esmtp (Farcaster)
- id a3ca6071-d059-430d-be89-565f65c948ae; Mon, 3 Mar 2025 13:08:53 +0000 (UTC)
-X-Farcaster-Flow-ID: a3ca6071-d059-430d-be89-565f65c948ae
-Received: from EX19D015EUA002.ant.amazon.com (10.252.50.219) by
- EX19MTAEUA001.ant.amazon.com (10.252.50.192) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 3 Mar 2025 13:08:53 +0000
-Received: from EX19MTAUEB002.ant.amazon.com (10.252.135.47) by
- EX19D015EUA002.ant.amazon.com (10.252.50.219) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 3 Mar 2025 13:08:52 +0000
-Received: from email-imr-corp-prod-iad-all-1b-3ae3de11.us-east-1.amazon.com
- (10.43.8.2) by mail-relay.amazon.com (10.252.135.97) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1544.14 via Frontend Transport; Mon, 3 Mar 2025 13:08:52 +0000
-Received: from dev-dsk-kalyazin-1a-a12e27e2.eu-west-1.amazon.com (dev-dsk-kalyazin-1a-a12e27e2.eu-west-1.amazon.com [172.19.103.116])
-	by email-imr-corp-prod-iad-all-1b-3ae3de11.us-east-1.amazon.com (Postfix) with ESMTPS id 0E275A0686;
-	Mon,  3 Mar 2025 13:08:50 +0000 (UTC)
-From: Nikita Kalyazin <kalyazin@amazon.com>
-To: <pbonzini@redhat.com>, <shuah@kernel.org>
-CC: <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <michael.day@amd.com>, <david@redhat.com>,
-	<quic_eberman@quicinc.com>, <jthoughton@google.com>, <brijesh.singh@amd.com>,
-	<michael.roth@amd.com>, <graf@amazon.de>, <jgowans@amazon.com>,
-	<roypat@amazon.co.uk>, <derekmn@amazon.com>, <nsaenz@amazon.es>,
-	<xmarcalx@amazon.com>, <kalyazin@amazon.com>
-Subject: [v3 PATCH 1/2] KVM: guest_memfd: add generic population via write
-Date: Mon, 3 Mar 2025 13:08:37 +0000
-Message-ID: <20250303130838.28812-2-kalyazin@amazon.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250303130838.28812-1-kalyazin@amazon.com>
-References: <20250303130838.28812-1-kalyazin@amazon.com>
-Precedence: bulk
+	s=arc-20240116; t=1741100352; c=relaxed/simple;
+	bh=UClmafexKg6NNUTLIrpb/B8GK548EN1DK2RtSIjCdMI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=K6/VWHMsrV1+C4ae/Etuk5rNW6Zy4MOkmpc5J7gsiMVt8BUXyV2nIxYFWsisn07zUj39usEPIyz/2C+8pfr7mv5xJOAeg6WlfBsYAwoGVFzvKD3iBajqgO+xVWv4GVDs2qPIu8chTUn68gLsSL6abYy88Kf0o2uttxoJco1WNcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name; spf=pass smtp.mailfrom=vps-ovh.mhejs.net; arc=none smtp.client-ip=145.239.82.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vps-ovh.mhejs.net
+Received: from MUA
+	by vps-ovh.mhejs.net with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
+	(Exim 4.98)
+	(envelope-from <mhej@vps-ovh.mhejs.net>)
+	id 1tpSfV-00000000KXK-3XMb;
+	Tue, 04 Mar 2025 14:50:45 +0100
+Message-ID: <2fd13fdb-1d62-4d76-a8a0-c63fb0575fb7@maciej.szmigiero.name>
+Date: Tue, 4 Mar 2025 14:50:40 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: QEMU's Hyper-V HV_X64_MSR_EOM is broken with split IRQCHIP
+To: Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>
+References: <Z8ZBzEJ7--VWKdWd@google.com> <87ikoposs6.fsf@redhat.com>
+Content-Language: en-US, pl-PL
+From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Autocrypt: addr=mail@maciej.szmigiero.name; keydata=
+ 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
+Disposition-Notification-To: "Maciej S. Szmigiero"
+ <mail@maciej.szmigiero.name>
+In-Reply-To: <87ikoposs6.fsf@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain
-X-ITU-Libra-ESVA-Information: Please contact Istanbul Teknik Universitesi for more information
-X-ITU-Libra-ESVA-ID: 4Z6fB22v13zFyTC
-X-ITU-Libra-ESVA: No virus found
-X-ITU-Libra-ESVA-From: root@cc.itu.edu.tr
-X-ITU-Libra-ESVA-Watermark: 1741705527.77103@REq2++EsRkQvdaL15mxx+w
-X-ITU-MailScanner-SpamCheck: not spam
+Sender: mhej@vps-ovh.mhejs.net
 
-write syscall populates guest_memfd with user-supplied data in a generic
-way, ie no vendor-specific preparation is performed.  This is supposed
-to be used in non-CoCo setups where guest memory is not
-hardware-encrypted.
+On 4.03.2025 13:59, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> 
+>> FYI, QEMU's Hyper-V emulation of HV_X64_MSR_EOM has been broken since QEMU commit
+>> c82d9d43ed ("KVM: Kick resamplefd for split kernel irqchip"), as nothing in KVM
+>> will forward the EOM notification to userspace.  I have no idea if anything in
+>> QEMU besides hyperv_testdev.c cares.
+> 
+> The only VMBus device in QEMU besides the testdev seems to be Hyper-V
+> ballooning driver, Cc: Maciej to check whether it's a real problem for
+> it or not.
 
-The following behaviour is implemented:
- - only page-aligned count and offset are allowed
- - if the memory is already allocated, the call will successfully
-   populate it
- - if the memory is not allocated, the call will both allocate and
-   populate
- - if the memory is already populated, the call will not repopulate it
+I just did a quick check on a hv-balloon Windows 2019 setup that I had on hand
+and it seems to work with "kernel-irqchip=split" the same correct way as without
+this option (which AFAIK is kernel-irqchip=on for q35 machine type).
 
-Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>
----
- virt/kvm/guest_memfd.c | 94 ++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 91 insertions(+), 3 deletions(-)
+So at least this Windows version and its VMBus client driver seem to not be
+affected by this issue.
 
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 30b47ff0e6d2..f93fe5835173 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -417,12 +417,97 @@ static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
- 
- 	return 0;
- }
--#else
--#define kvm_gmem_mmap NULL
-+
-+static ssize_t kvm_kmem_gmem_write(struct file *file, const char __user *buf,
-+				   size_t count, loff_t *offset)
-+{
-+	pgoff_t start, end, index;
-+	ssize_t ret = 0;
-+
-+	if (!PAGE_ALIGNED(*offset) || !PAGE_ALIGNED(count))
-+		return -EINVAL;
-+
-+	if (*offset + count > i_size_read(file_inode(file)))
-+		return -EINVAL;
-+
-+	if (!buf)
-+		return -EINVAL;
-+
-+	start = *offset >> PAGE_SHIFT;
-+	end = (*offset + count) >> PAGE_SHIFT;
-+
-+	filemap_invalidate_lock_shared(file->f_mapping);
-+
-+	for (index = start; index < end; ) {
-+		struct folio *folio;
-+		void *vaddr;
-+		pgoff_t buf_offset = (index - start) << PAGE_SHIFT;
-+
-+		if (signal_pending(current)) {
-+			ret = -EINTR;
-+			goto out;
-+		}
-+
-+		folio = kvm_gmem_get_folio(file_inode(file), index);
-+		if (IS_ERR(folio)) {
-+			ret = -EFAULT;
-+			goto out;
-+		}
-+
-+		if (folio_test_hwpoison(folio)) {
-+			folio_unlock(folio);
-+			folio_put(folio);
-+			ret = -EFAULT;
-+			goto out;
-+		}
-+
-+		/* No support for huge pages. */
-+		if (WARN_ON_ONCE(folio_test_large(folio))) {
-+			folio_unlock(folio);
-+			folio_put(folio);
-+			ret = -EFAULT;
-+			goto out;
-+		}
-+
-+		if (folio_test_uptodate(folio)) {
-+			folio_unlock(folio);
-+			folio_put(folio);
-+			ret = -ENOSPC;
-+			goto out;
-+		}
-+
-+		folio_unlock(folio);
-+
-+		vaddr = kmap_local_folio(folio, 0);
-+		ret = copy_from_user(vaddr, buf + buf_offset, PAGE_SIZE);
-+		kunmap_local(vaddr);
-+		if (ret) {
-+			ret = -EINVAL;
-+			folio_put(folio);
-+			goto out;
-+		}
-+
-+		kvm_gmem_mark_prepared(folio);
-+		folio_put(folio);
-+
-+		index = folio_next_index(folio);
-+		*offset += PAGE_SIZE;
-+	}
-+
-+out:
-+	filemap_invalidate_unlock_shared(file->f_mapping);
-+
-+	return ret && start == (*offset >> PAGE_SHIFT) ?
-+		ret : *offset - (start << PAGE_SHIFT);
-+}
- #endif /* CONFIG_KVM_GMEM_SHARED_MEM */
- 
- static struct file_operations kvm_gmem_fops = {
--	.mmap		= kvm_gmem_mmap,
-+#ifdef CONFIG_KVM_GMEM_SHARED_MEM
-+	.mmap           = kvm_gmem_mmap,
-+	.llseek         = default_llseek,
-+	.write          = kvm_kmem_gmem_write,
-+#endif /* CONFIG_KVM_GMEM_SHARED_MEM */
- 	.open		= generic_file_open,
- 	.release	= kvm_gmem_release,
- 	.fallocate	= kvm_gmem_fallocate,
-@@ -538,6 +623,9 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
- 	}
- 
- 	file->f_flags |= O_LARGEFILE;
-+#ifdef CONFIG_KVM_GMEM_SHARED_MEM
-+	file->f_mode |= FMODE_LSEEK | FMODE_PWRITE;
-+#endif /* CONFIG_KVM_GMEM_SHARED_MEM */
- 
- 	inode = file->f_inode;
- 	WARN_ON(file->f_mapping != inode->i_mapping);
--- 
-2.47.1
+Will try to look at this deeper in coming time as I am fairly busy right now
+with QEMU live migration stuff before the code freeze soon.
 
+Thanks,
+Maciej
 
 
