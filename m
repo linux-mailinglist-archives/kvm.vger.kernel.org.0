@@ -1,190 +1,105 @@
-Return-Path: <kvm+bounces-40076-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40077-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BED61A4EE1B
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 21:11:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0D1EA4EE73
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 21:33:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD105174D0D
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 20:11:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1BF4818905BE
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 20:33:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E628025FA09;
-	Tue,  4 Mar 2025 20:11:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2324425290A;
+	Tue,  4 Mar 2025 20:33:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="M3L3796v"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JujmKx8S"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D8162475C3;
-	Tue,  4 Mar 2025 20:11:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 056711F7561
+	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 20:33:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741119080; cv=none; b=YCUAGaXRAw5RslCdA2kCgD8PzMxQzMvbN3a98tmvFVUWRZupI4HQTPLnDpN1zelMULq6HePnvU7zt1mTr6xlc/qe7pEekfX6p+FC8IpcFqcx7It6ML36vDBKIXSrJz+p1ZAHt+NxLrL2spdpoXWPhvalfjAGqq3XsISHRh0Sl8U=
+	t=1741120423; cv=none; b=fSr1dSf9Q9Dn1C6UK3U3bzqm7mX3I7EcITCcRoBXoOIer94n884Y3b68Eb/sFDOLj9rYFO1WIz97E/KnoCM9oil5t6XZsvV+hRPLGjvpO1s6RfSA+CSdEF11+QAmHoR6UrEl8/jc0OXb50lqOUGgE3bp0vcmh4FIrClQJJoar+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741119080; c=relaxed/simple;
-	bh=cfMzhB7XC+JezusyQjnaqFcQyOtbEDdC23yjtB+Tv4A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Hc3IPJVi2gkEtpka4LMp4a8QfQFn+gBgsnDEf+Ivrxs60paSEZv1BHdyjUwoMR7oZFu/BvM2l/yF/zteROCx4vdldYD+r9TFMzmOmqUvy/RmIPOOuluDP9PolN+bEHt85wYXS61vfSy1bwAGMeGAbmZS/0O9yDsr8JV3jli6xIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=M3L3796v; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 524CS7nq006582;
-	Tue, 4 Mar 2025 20:11:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=LfZdko
-	V5EnRMLdP1eqVZF5PRicg+LrrVV4/C29hMnRc=; b=M3L3796vPh1i5TcTJzVUIq
-	3DMMmMzomLt+nqk6+syHPl6K3Dda8yUg6pbOVKDaA1yJ83gOJ6pMduQyjNPmQEqM
-	+jHJJZpX0QGI6XnGGrnsF4kq+2AsxVE4D+JrP8Ven3RlfRdzZ33F579E+YoBOiPt
-	TL+XB8sXi8ix0nQbEW9gAn4EYl2PZ2Z05/EFcGuuUzg/MdOsl7XY2luSMdzT2IQK
-	a23pPelKBcxNRVRE9yOBVyWV6Y/V8bSXeooU1kZNSQw9SkG1OdXO4dra+nwtp3TF
-	/eGuuC4XTT2OtEOu+OTmm3wEretDvgg7TxuOTZ8lFTW+7Pg8EZt5Kw9Za6g9it4g
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4561j327dg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Mar 2025 20:11:15 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 524Gf6Dj020788;
-	Tue, 4 Mar 2025 20:11:14 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 454esjxwsa-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Mar 2025 20:11:14 +0000
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 524KBEJq20906594
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 4 Mar 2025 20:11:14 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0F6EC5805A;
-	Tue,  4 Mar 2025 20:11:14 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2A5F258052;
-	Tue,  4 Mar 2025 20:11:13 +0000 (GMT)
-Received: from [9.61.107.75] (unknown [9.61.107.75])
-	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  4 Mar 2025 20:11:13 +0000 (GMT)
-Message-ID: <a3e051e0-b2c3-4e2e-961e-ee36956a5666@linux.ibm.com>
-Date: Tue, 4 Mar 2025 15:11:12 -0500
+	s=arc-20240116; t=1741120423; c=relaxed/simple;
+	bh=hNebqbCE2yqbI2osTfkgAzvemKMHxfuWslQEhGVpKdg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Ly6xbvZijc/5aj1yl+YpxjAvhTbL1S+oAbAOzkuiAv4RePqEBexh4tE3HJgOyOpcqG3Ygqft4P1r5e8kUbtMTeCpOBdo+lmf+J9jVFrd9v9LoWN/ZwS+WitfC09Orvt/7HBaenAP/68hxerIul0Ch+M2MVMK0pqDf2ZGFPGiD3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JujmKx8S; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fe8de1297eso306150a91.0
+        for <kvm@vger.kernel.org>; Tue, 04 Mar 2025 12:33:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741120421; x=1741725221; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aR/mtojvVD4MOofnNj5lekhpmEopZbM3vAwRwI8M1kw=;
+        b=JujmKx8SpeVdTirk6al4iTm7cobh+a5VnI5gLg00kagbT0Nsyn+sksmS8R21bUC+Om
+         2duD/7gbrj7c+2waHe+XRgQdDD3VHFbZ++db0Scx30tDO57oIpv+iGqr9ootyZVgOCFA
+         KwhsVLRWWdoVWnnG+ICTqn3SLeB4TVKQYIfGKpn1JAEcmz7AIXa/0cvmW8/erUFV24P5
+         TCTT8Kp0vOA+payK4dqK4PPO/vZc1YQpSMCiq9Ul87hlKwLU48VEBYg1zpHwlKhSv0A5
+         G8OT8a2RTaxm8/cp7c4leBAe1bpl6Yw0j8Y/WniudA8YJtlPyBbx+WNhY8TBFMd/U7Gd
+         UKrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741120421; x=1741725221;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aR/mtojvVD4MOofnNj5lekhpmEopZbM3vAwRwI8M1kw=;
+        b=h/oDBBRdsnEFmjBCg9A4HEl1bmoM/snyq0+49y4UFON+lgURSw1f/nZeQQYIGBf7fG
+         z/k2HjTRJDPfVYd0RBqwLAe3GB+0J/QpDp3fJQ4+UEyl91XEz6EBg9nHmkXboKW5NG7I
+         HKBQO5LHOAm0aV5jaQb4huVSjQTLgPfF0Itmjd49QUUUKAmQvYNDcj7BoF81HELnqrjj
+         BT7ZydaNi6D31de+H7JFBSYA2YkJHOMt5UZznIr0AnRqew6EO5KkmnTJrJ/dSuyxWI40
+         KLjCeQ1BoMv57fzL8y+/FIWbzhrU9U04kf8FGkyiY3Un7gTgx0Nj86MNLMt2LxzXCIl9
+         14Pg==
+X-Gm-Message-State: AOJu0YxjCF+lXAzVRbLDhA7lnIuGqhNRjEG3avM/oAY4gMFq9NlUf1mF
+	cBuWOuVoRgiTB2qVIZMchdzb7DodOXWnsHwNq1gZOcO2DsayoWKvPvuNr//3IFO7JszuAMB4Zn3
+	p8w==
+X-Google-Smtp-Source: AGHT+IHp1rLM9l3GN6LHS8mT2Yp0gsJ9spM1otODrubQReDL89eKryR2+OL5FrHR9AW18Vuyc/xceNObn7A=
+X-Received: from pjre20.prod.google.com ([2002:a17:90a:b394:b0:2ff:4a39:c208])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d64e:b0:2ee:9661:eafb
+ with SMTP id 98e67ed59e1d1-2ff49ad68fdmr863352a91.12.1741120421226; Tue, 04
+ Mar 2025 12:33:41 -0800 (PST)
+Date: Tue, 4 Mar 2025 12:33:39 -0800
+In-Reply-To: <c13882ced3c713058c9a1ccf425f396319832b5d.1740479886.git.naveen@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2] s390/vfio-ap: Notify userspace that guest's AP
- config changed when mdev removed
-To: Rorie Reyes <rreyes@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc: hca@linux.ibm.com, borntraeger@de.ibm.com, agordeev@linux.ibm.com,
-        gor@linux.ibm.com, pasic@linux.ibm.com, jjherne@linux.ibm.com,
-        alex.williamson@redhat.com
-References: <20250304200812.54556-1-rreyes@linux.ibm.com>
-Content-Language: en-US
-From: Anthony Krowiak <akrowiak@linux.ibm.com>
-In-Reply-To: <20250304200812.54556-1-rreyes@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: tiG2HG6yWu_vmo5TBiraBFzxZVFt7ulp
-X-Proofpoint-ORIG-GUID: tiG2HG6yWu_vmo5TBiraBFzxZVFt7ulp
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-04_08,2025-03-04_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- impostorscore=0 spamscore=0 mlxlogscore=999 phishscore=0 clxscore=1015
- priorityscore=1501 adultscore=0 mlxscore=0 bulkscore=0 malwarescore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502100000 definitions=main-2503040160
+Mime-Version: 1.0
+References: <cover.1740479886.git.naveen@kernel.org> <c13882ced3c713058c9a1ccf425f396319832b5d.1740479886.git.naveen@kernel.org>
+Message-ID: <Z8djo1eN4q0mqhT8@google.com>
+Subject: Re: [RFC kvm-unit-tests PATCH 4/4] x86/apic: Add test for xapic-split
+From: Sean Christopherson <seanjc@google.com>
+To: "Naveen N Rao (AMD)" <naveen@kernel.org>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Vasant Hegde <vasant.hegde@amd.com>, 
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
+On Tue, Feb 25, 2025, Naveen N Rao (AMD) wrote:
+> The current apic-split test actually uses x2apic. Rename the same, and
+> add a separate test for xapic in split irqchip mode.
 
+I would actually prefer we go in the opposite direction and rip out the testcases
+that explicitly specify kernel_irqchip=split, not add more.  And instead either
+defer to the user via ACCEL=, or make it a top-level switch.
 
+While it would be nice for unittests.cfg to cover more scenarios by "default",
+the flip side of doing so is that makes it annoying for an end user to do more,
+and gives the false impression that the configurations in unittests.cfg are the
+only ones that are worth testing.
 
-On 3/4/25 3:08 PM, Rorie Reyes wrote:
-> The guest's AP configuration is cleared when the mdev is removed, so
-> userspace must be notified that the AP configuration has changed. To this
-> end, this patch:
->
-> * Removes call to 'signal_guest_ap_cfg_changed()' function from the
->    'vfio_ap_mdev_unset_kvm()' function because it has no affect given it is
->    called after the mdev fd is closed.
->
-> * Adds call to 'signal_guest_ap_cfg_changed()' function to the
->    'vfio_ap_mdev_request()' function to notify userspace that the guest's
->    AP configuration has changed before signaling the request to remove the
->    mdev.
->
-> Minor change - Fixed an indentation issue in function
-> 'signal_guest_ap_cfg_changed()'
->
-> Fixes: 07d89045bffe ("s390/vfio-ap: Signal eventfd when guest AP configuration is changed")
-> Signed-off-by: Rorie Reyes <rreyes@linux.ibm.com>
-> ---
-> This patch is based on the s390/features branch
->
-> V1 -> V2:
-> - replaced get_update_locks_for_kvm() with get_update_locks_for_mdev
-> - removed else statements that were unnecessary
-> - Addressed review comments for commit messages/details
-> ---
->   drivers/s390/crypto/vfio_ap_ops.c | 15 ++++++++++++---
->   1 file changed, 12 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> index 571f5dcb49c5..ae2bc5c1d445 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -652,8 +652,8 @@ static void vfio_ap_matrix_init(struct ap_config_info *info,
->   
->   static void signal_guest_ap_cfg_changed(struct ap_matrix_mdev *matrix_mdev)
->   {
-> -		if (matrix_mdev->cfg_chg_trigger)
-> -			eventfd_signal(matrix_mdev->cfg_chg_trigger);
-> +	if (matrix_mdev->cfg_chg_trigger)
-> +		eventfd_signal(matrix_mdev->cfg_chg_trigger);
->   }
->   
->   static void vfio_ap_mdev_update_guest_apcb(struct ap_matrix_mdev *matrix_mdev)
-> @@ -1870,7 +1870,6 @@ static void vfio_ap_mdev_unset_kvm(struct ap_matrix_mdev *matrix_mdev)
->   		get_update_locks_for_kvm(kvm);
->   
->   		kvm_arch_crypto_clear_masks(kvm);
-> -		signal_guest_ap_cfg_changed(matrix_mdev);
->   		vfio_ap_mdev_reset_queues(matrix_mdev);
->   		kvm_put_kvm(kvm);
->   		matrix_mdev->kvm = NULL;
-> @@ -2057,6 +2056,13 @@ static void vfio_ap_mdev_request(struct vfio_device *vdev, unsigned int count)
->   
->   	matrix_mdev = container_of(vdev, struct ap_matrix_mdev, vdev);
->   
-> +	get_update_locks_for_mdev(matrix_mdev);
-> +
-> +	if (matrix_mdev->kvm) {
-> +		kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
-> +		signal_guest_ap_cfg_changed(matrix_mdev);
-> +	}
-> +
->   	if (matrix_mdev->req_trigger) {
->   		if (!(count % 10))
->   			dev_notice_ratelimited(dev,
-> @@ -2068,6 +2074,9 @@ static void vfio_ap_mdev_request(struct vfio_device *vdev, unsigned int count)
->   		dev_notice(dev,
->   			   "No device request registered, blocked until released by user\n");
->   	}
-> +
-> +	release_update_locks_for_mdev(matrix_mdev);
-> +
+E.g. svm_npt fails with kernel_irqchip=split on x2AVIC hardware due to test bugs
+(patches incoming), hyperv_connections fails due to what is effectively a
+QEMU bug that also got hoisted into KVM[1], and vmx_apic_passthrough_tpr_threshold_test
+also fails with kernel_irqchip=split due to a KVM bug that happened to be masked
+by another KVM bug with the in-kernel PIT emulation.
 
-Get rid of empty line; other than that, LGTM
-Reviewed-by: Anthony Krowiak <akrowiak@linux.ibm.com>
-
->   }
->   
->   static int vfio_ap_mdev_get_device_info(unsigned long arg)
-
+[1] https://lore.kernel.org/all/Z8ZBzEJ7--VWKdWd@google.com
+[2] https://lore.kernel.org/all/202502271500.28201544-lkp@intel.com
 
