@@ -1,107 +1,94 @@
-Return-Path: <kvm+bounces-39993-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39997-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43145A4D6E4
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 09:45:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96B73A4D764
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 10:07:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE9F83A83A2
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 08:45:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CCD61703F2
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 09:06:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE12F1F5853;
-	Tue,  4 Mar 2025 08:45:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 447AA2036E8;
+	Tue,  4 Mar 2025 09:00:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EKknB6l0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B3Ny1zWL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618461EEA54;
-	Tue,  4 Mar 2025 08:45:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D13331FE472
+	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 09:00:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741077939; cv=none; b=pHcWdunxuFNagTFYsBp7fFw6OWVfjwdebfrryMWiK3I0WxqUKtiiIAJXqNNxhkB97P5Ig3ymkbdAXOJ44etiZTBQ5CpZJWkPDP4VY/Ednu+H8E8e3gvA8hiuvbTsOqDF982M5Zze2XMtWq/rAlFct3unzqi0bQiSZWVbz6YrZKQ=
+	t=1741078855; cv=none; b=ahW08zfAvEmSTlT9fpNE3tUHycJv8TL+MmPAdt5GRRZvCXKh5WYQRDOYrQ39b92NNkm9GcMHw4TYJetYc4vmPSjBBSYR3R6YnoRrhg0u4wKeOd9WgfLmsGTUwfouprSqawzbrDrG3tWpSMbtOBXdDB/grM2Mwb6RpBkBqNyor4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741077939; c=relaxed/simple;
-	bh=/ZT66LxzZws3uPtWH3EfG34DGIlMuHvvJHT8oAY0/8Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NekdGLwZQP40jLfngOtCqDfYkbIMmOsDPDZTFPPTOFgwiVeeZ46RFHIuJ0CoExxrWSKpJUoKkycPxQGB0pwjljwZ+BGqvIo/1qfvndQRLVHwSu3G5/h84IQd/r3kqYLbujDuNlmDg8+GcDGcn3T9l8QsSwXqC2Dh6byMYuu2Sno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EKknB6l0; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1741078855; c=relaxed/simple;
+	bh=OoPp9XyS2jWaQakABftfnWg6+XHFQIyhZmXs4vC83yg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=p9L2YdjxQGSULI+pYi9I5hQVFs+BRdFrUnkIuGhw3lELnGpL/8n8WjWyxlXAuAh6FZqVEPFfO5vJI7C7033V5fyLGUChriNeS49WbcC65YIHIhokYacnDNeQWX/V6q5Mkv6fHUDHdAnudjtkEYr6K0ng9F4WUVh+89eb9dricMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=B3Ny1zWL; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741077938; x=1772613938;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=/ZT66LxzZws3uPtWH3EfG34DGIlMuHvvJHT8oAY0/8Q=;
-  b=EKknB6l0xWBaqnO3pQo6/GX/oSwRMshaUGptEhQvfM3S/GmE/zM2FJaD
-   AViRGcAWkGqBg2jsDOnE8MYrZnqGmQyQZ2AZkBSypWnHmEfM8WMhJuCOW
-   Z0iskTlOkt1NGW7kLbQhL7EhnEwCWIvVxBPY9uor1ga7NQ7zUALUMifXK
-   45gN4zyAVjqaWqs/9W25Xa7x1dAsECVcXPOmIBOHLzq0XFLryVGmOxAU5
-   XshZ3AFQXA/BKs42Ad3kPDJHRCUL8Bh+hSZ33jnhGHQgAG7Nvxoq62hhl
-   4X06jMyD8FSs2mqhLVPs2MPWnKG9yY0gp45HPdl23QbfpUvqhSBouVNH6
+  t=1741078853; x=1772614853;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=OoPp9XyS2jWaQakABftfnWg6+XHFQIyhZmXs4vC83yg=;
+  b=B3Ny1zWLIGoglHv+SdNfen9/03yYWvKGgu/V11BuyLRniSwqBUg10hHx
+   WKHOJKdHG+UT0wzAoL1bVbb/e2IaXXpD6gZWG5B7bKezT3tjUI4GuluCn
+   a0LcDkpVeRRgkkLJmhDfcA4Y9CMcjSNGfBEOcYbSCni10dYxdSwzyzVIk
+   qMNaM+wmn8uOiMviXOW9JG+2GU8D1oTOugHDOF3Q7ky/7GPfcHbea19aN
+   H7k/swF0RsGENpKzip8S/VSBRg2yqjWRrLmjQc4NiPx3VtoYwJ5FQKl0I
+   GCpw7p8AzaVNqvkTNgTHABR6RSrbNPgXCHXzOdjIUXROa+sp9L9VbVIMU
    g==;
-X-CSE-ConnectionGUID: E4/cYfPHT9i3LvPnITskkg==
-X-CSE-MsgGUID: tFtYd8jRQmaxfMGZ+GPCqQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11362"; a="41162157"
+X-CSE-ConnectionGUID: WDjgcvJRScu6WkR6/ayvqA==
+X-CSE-MsgGUID: kmNaKF1sTrmcBabYd3RS/Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11362"; a="52631322"
 X-IronPort-AV: E=Sophos;i="6.13,331,1732608000"; 
-   d="scan'208";a="41162157"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 00:45:37 -0800
-X-CSE-ConnectionGUID: PxBCRQzWQ6e41xrrFlcfdQ==
-X-CSE-MsgGUID: DHG1xNFbTdu4nF5+xP9QmQ==
+   d="scan'208";a="52631322"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 01:00:52 -0800
+X-CSE-ConnectionGUID: LvFIOIQOTVq1fD42FYCJ6Q==
+X-CSE-MsgGUID: x/FUcEJMTDe7hHBRxaRqOA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,331,1732608000"; 
-   d="scan'208";a="118042217"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by orviesa009.jf.intel.com with ESMTP; 04 Mar 2025 00:45:34 -0800
-Received: by black.fi.intel.com (Postfix, from userid 1000)
-	id 957D118F; Tue, 04 Mar 2025 10:45:32 +0200 (EET)
-Date: Tue, 4 Mar 2025 10:45:32 +0200
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
-	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, vannapurve@google.com, 
-	ackerleytng@google.com, mail@maciej.szmigiero.name, david@redhat.com, 
-	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
-	isaku.yamahata@gmail.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, 
-	quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com, 
-	yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, 
-	qperret@google.com, keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, 
-	hch@infradead.org, jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, 
-	fvdl@google.com, hughd@google.com, jthoughton@google.com, peterx@redhat.com
-Subject: Re: [PATCH v5 1/9] mm: Consolidate freeing of typed folios on final
- folio_put()
-Message-ID: <re7ecgfu4x4arh47tjojse33qvc2dt2qrjznemphdwphe2rmzh@2vbm6zto3plc>
-References: <20250303171013.3548775-1-tabba@google.com>
- <20250303171013.3548775-2-tabba@google.com>
+   d="scan'208";a="118999215"
+Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
+  by fmviesa009.fm.intel.com with ESMTP; 04 Mar 2025 01:00:51 -0800
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+To: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org,
+	Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: [PATCH 0/2] KVM: x86: Cleanup and fix for reporting CPUID leaf 0x80000022
+Date: Tue,  4 Mar 2025 03:23:12 -0500
+Message-Id: <20250304082314.472202-1-xiaoyao.li@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250303171013.3548775-2-tabba@google.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 03, 2025 at 05:10:05PM +0000, Fuad Tabba wrote:
-> +static inline int page_get_type(const struct page *page)
-> +{
-> +	return page->page_type >> 24;
+Patch 1 is a cleanup and Patch 2 is a fix. Please see the individual
+patch for detail.
 
-This magic number in page_type code asks for a #define.
+Xiaoyao Li (2):
+  KVM: x86: Remove the unreachable case for 0x80000022 leaf in
+    __do_cpuid_func()
+  KVM: x86: Explicitly set eax and ebx to 0 when X86_FEATURE_PERFMON_V2
+    cannot be exposed to guest
 
+ arch/x86/kvm/cpuid.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
+
+
+base-commit: 7d2154117a02832ab3643fe2da4cdc9d2090dcb2
 -- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+2.34.1
+
 
