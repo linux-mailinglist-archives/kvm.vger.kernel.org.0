@@ -1,222 +1,104 @@
-Return-Path: <kvm+bounces-40022-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40023-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4478A4DD88
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 13:09:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72F56A4DDE0
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 13:27:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D856A18960B4
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 12:10:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 798AF3B2EA8
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 12:27:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAB3B20298D;
-	Tue,  4 Mar 2025 12:09:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61625202C2D;
+	Tue,  4 Mar 2025 12:27:06 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB561FF601;
-	Tue,  4 Mar 2025 12:09:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A2EA78F4C;
+	Tue,  4 Mar 2025 12:27:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741090182; cv=none; b=RSoKzq8IZ6xkbm4EjSDHCHWPUikvMJed6hIlfg7F5wWMVrgdvlw//asHOkjdWkongHt6+Um56kBF0gZt/R2H8Fu03TU3/t1Wsb7tHtDHM/PDCldUDOy1O91t2uZREouPfsr4KTelxmsxZQ8JNrukQqLE8QLSVc0W9IerCXYpmbc=
+	t=1741091225; cv=none; b=nDvBiPOrbGLSIWz6K/2mjshuhCrOUd9C7UsgVzj7HcaPFjL2GU8k0rkjTfxWZ3Dd28AH7sw6L66DM7M213VHlWY0jT4SvTDRGu/gNNf6vdUt6+6vHGy/UipuvEYZRkFK92HwgRlv659XDTB/+E3SViJAJ3k2zJk22PxmvAU5HIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741090182; c=relaxed/simple;
-	bh=4S8tqaK0XJCLIv/7Rv3hJVe8rj1mH8s+KkdKMp6uzeo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=DaXZqM0wD0MrA8Ot0rtwhQJD1l3t48U+XdoRWzCJZd2X9Xux6zoGaUno/KUm39M88Xu/y2sNlX4ZXXSKUlMCUSKXd6C4qLPVELtoZ5XYRJjeUDkDf9qmRSBzCjgNW0EI9btFvx1GPYZL8vOjBrFtOeDDynft8NV7oVub34d4d8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+	s=arc-20240116; t=1741091225; c=relaxed/simple;
+	bh=VZwo7yIopqaSoCkScnbhAKG3Hk9pFePeDrDhz1+e4Xg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=u1huOQNuAMEqTbB36c7F2uwb0cpDNeUqArXVTjU9Od8pg5S1rTAubYwUMO4+D/90485UClsEhd2e1IXIYqXVVyWs3rndTJl7l+yZmYqU298hOeBkqQdSkP48Bf5wIxxFXq6nRm4KPKEfhcQOi+vHcMQcnrAAViJehn72zmsayOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Z6ZBX3494z2DkHc;
-	Tue,  4 Mar 2025 20:05:24 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id D7E721A016C;
-	Tue,  4 Mar 2025 20:09:35 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Z6Zc45k1Yz6M4c3;
+	Tue,  4 Mar 2025 20:24:04 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 612E7140415;
+	Tue,  4 Mar 2025 20:27:00 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (7.182.85.71) by
+ frapeml500008.china.huawei.com (7.182.85.71) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 4 Mar 2025 20:09:35 +0800
-Message-ID: <91fcdfca-3e7b-417c-ab26-7d5e37853431@huawei.com>
-Date: Tue, 4 Mar 2025 20:09:35 +0800
+ 15.1.2507.39; Tue, 4 Mar 2025 13:27:00 +0100
+Received: from frapeml500008.china.huawei.com ([7.182.85.71]) by
+ frapeml500008.china.huawei.com ([7.182.85.71]) with mapi id 15.01.2507.039;
+ Tue, 4 Mar 2025 13:27:00 +0100
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: liulongfang <liulongfang@huawei.com>, "alex.williamson@redhat.com"
+	<alex.williamson@redhat.com>, "jgg@nvidia.com" <jgg@nvidia.com>, "Jonathan
+ Cameron" <jonathan.cameron@huawei.com>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linuxarm@openeuler.org" <linuxarm@openeuler.org>
+Subject: RE: [PATCH v2 0/3] update live migration configuration region
+Thread-Topic: [PATCH v2 0/3] update live migration configuration region
+Thread-Index: AQHbjP24f+s3bC9JCk6yB9EQqmW997Ni5NVQ
+Date: Tue, 4 Mar 2025 12:26:59 +0000
+Message-ID: <0b5399e306f841b794120e6ca91c1edd@huawei.com>
+References: <20250304120528.63605-1-liulongfang@huawei.com>
+In-Reply-To: <20250304120528.63605-1-liulongfang@huawei.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] mm: alloc_pages_bulk: remove assumption of populating
- only NULL elements
-To: Dave Chinner <david@fromorbit.com>
-CC: Yishai Hadas <yishaih@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>, Shameer
- Kolothum <shameerali.kolothum.thodi@huawei.com>, Kevin Tian
-	<kevin.tian@intel.com>, Alex Williamson <alex.williamson@redhat.com>, Chris
- Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, David Sterba
-	<dsterba@suse.com>, Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
-	Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>, Sandeep
- Dhavale <dhavale@google.com>, Carlos Maiolino <cem@kernel.org>, "Darrick J.
- Wong" <djwong@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Jesper
- Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
-	<ilias.apalodimas@linaro.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Trond Myklebust
-	<trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, Chuck Lever
-	<chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown
-	<neilb@suse.de>, Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo
-	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Luiz Capitulino
-	<luizcap@redhat.com>, Mel Gorman <mgorman@techsingularity.net>,
-	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, <linux-btrfs@vger.kernel.org>,
-	<linux-erofs@lists.ozlabs.org>, <linux-xfs@vger.kernel.org>,
-	<linux-mm@kvack.org>, <netdev@vger.kernel.org>, <linux-nfs@vger.kernel.org>
-References: <20250228094424.757465-1-linyunsheng@huawei.com>
- <Z8a3WSOrlY4n5_37@dread.disaster.area>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <Z8a3WSOrlY4n5_37@dread.disaster.area>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemf200006.china.huawei.com (7.185.36.61)
-
-On 2025/3/4 16:18, Dave Chinner wrote:
-
-...
-
-> 
->>
->> 1. https://lore.kernel.org/all/bd8c2f5c-464d-44ab-b607-390a87ea4cd5@huawei.com/
->> 2. https://lore.kernel.org/all/20250212092552.1779679-1-linyunsheng@huawei.com/
->> CC: Jesper Dangaard Brouer <hawk@kernel.org>
->> CC: Luiz Capitulino <luizcap@redhat.com>
->> CC: Mel Gorman <mgorman@techsingularity.net>
->> CC: Dave Chinner <david@fromorbit.com>
->> CC: Chuck Lever <chuck.lever@oracle.com>
->> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
->> Acked-by: Jeff Layton <jlayton@kernel.org>
->> ---
->> V2:
->> 1. Drop RFC tag and rebased on latest linux-next.
->> 2. Fix a compile error for xfs.
-> 
-> And you still haven't tested the code changes to XFS, because
-> this patch is also broken.
-
-I tested XFS using the below cmd and testcase, testing seems
-to be working fine, or am I missing something obvious here
-as I am not realy familiar with fs subsystem yet:
-
-Step to setup the xfs:
-dd if=/dev/zero of=xfs_image bs=1M count=1024
-losetup -f xfs_image
-losetup -a
-./mkfs.xfs /dev/loop0
-mkdir xfs_test
-mount /dev/loop0 xfs_test/
-
-Test shell file:
-#!/bin/bash
-
-# Configuration parameters
-DIR="/home/xfs_test"              # Directory to perform file operations
-FILE_COUNT=100              # Maximum number of files to create in each loop
-MAX_FILE_SIZE=1024          # Maximum file size in KB
-MIN_FILE_SIZE=10            # Minimum file size in KB
-OPERATIONS=10               # Number of create/delete operations per loop
-TOTAL_RUNS=10000               # Total number of loops to run
-
-# Check if the directory exists
-if [ ! -d "$DIR" ]; then
-    echo "Directory $DIR does not exist. Please create the directory first!"
-    exit 1
-fi
-
-echo "Starting file system test on: $DIR"
-
-for ((run=1; run<=TOTAL_RUNS; run++)); do
-    echo "Run $run of $TOTAL_RUNS"
-
-    # Randomly create files
-    for ((i=1; i<=OPERATIONS; i++)); do
-        # Generate a random file size between MIN_FILE_SIZE and MAX_FILE_SIZE (in KB)
-        FILE_SIZE=$((RANDOM % (MAX_FILE_SIZE - MIN_FILE_SIZE + 1) + MIN_FILE_SIZE))
-        # Generate a unique file name using timestamp and random number
-        FILE_NAME="$DIR/file_$(date +%s)_$RANDOM"
-        # Create a file with random content
-        dd if=/dev/urandom of="$FILE_NAME" bs=1K count=$FILE_SIZE &>/dev/null
-        echo "Created file: $FILE_NAME, Size: $FILE_SIZE KB"
-    done
-
-    # Randomly delete files
-    for ((i=1; i<=OPERATIONS; i++)); do
-        # List all files in the directory
-        FILE_LIST=($(ls $DIR))
-        # Check if there are any files to delete
-        if [ ${#FILE_LIST[@]} -gt 0 ]; then
-            # Randomly select a file to delete
-            RANDOM_FILE=${FILE_LIST[$RANDOM % ${#FILE_LIST[@]}]}
-            rm -f "$DIR/$RANDOM_FILE"
-            echo "Deleted file: $DIR/$RANDOM_FILE"
-        fi
-    done
-
-    echo "Completed run $run"
-done
-
-echo "Test completed!"
 
 
-> 
->> diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
->> index 5d560e9073f4..b4e95b2dd0f0 100644
->> --- a/fs/xfs/xfs_buf.c
->> +++ b/fs/xfs/xfs_buf.c
->> @@ -319,16 +319,17 @@ xfs_buf_alloc_pages(
->>  	 * least one extra page.
->>  	 */
->>  	for (;;) {
->> -		long	last = filled;
->> +		long	alloc;
->>  
->> -		filled = alloc_pages_bulk(gfp_mask, bp->b_page_count,
->> -					  bp->b_pages);
->> +		alloc = alloc_pages_bulk(gfp_mask, bp->b_page_count - filled,
->> +					 bp->b_pages + filled);
->> +		filled += alloc;
->>  		if (filled == bp->b_page_count) {
->>  			XFS_STATS_INC(bp->b_mount, xb_page_found);
->>  			break;
->>  		}
->>  
->> -		if (filled != last)
->> +		if (alloc)
->>  			continue;
-> 
-> alloc_pages_bulk() now returns the number of pages allocated in the
-> array. So if we ask for 4 pages, then get 2, filled is now 2. Then
-> we loop, ask for another 2 pages, get those two pages and it returns
-> 4. Now filled is 6, and we continue.
 
-It will be returning 2 instead of 4 for the second loop if I understand
-it correctly as 'bp->b_pages + filled' and 'bp->b_page_count - filled'
-is passing to alloc_pages_bulk() API now.
+> -----Original Message-----
+> From: liulongfang <liulongfang@huawei.com>
+> Sent: Tuesday, March 4, 2025 12:05 PM
+> To: alex.williamson@redhat.com; jgg@nvidia.com; Shameerali Kolothum
+> Thodi <shameerali.kolothum.thodi@huawei.com>; Jonathan Cameron
+> <jonathan.cameron@huawei.com>
+> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> linuxarm@openeuler.org; liulongfang <liulongfang@huawei.com>
+> Subject: [PATCH v2 0/3] update live migration configuration region
+>=20
+> On the new hardware platform, the configuration register space
+> of the live migration function is set on the PF, while on the
+> old platform, this part is placed on the VF.
+>=20
+> Change v1 -> v2
+> 	Delete the vf_qm_state read operation in Pre_Copy
 
-> 
-> Now we ask alloc_pages_bulk() for -2 pages, which returns 4 pages...
-> 
-> Worse behaviour: second time around, no page allocation succeeds
-> so it returns 2 pages. Filled is now 4, which is the number of pages
-> we need, so we break out of the loop with only 2 pages allocated.
-> There's about to be kernel crashes occur.....
-> 
-> Once is a mistake, twice is compeltely unacceptable.  When XFS stops
-> using alloc_pages_bulk (probably 6.15) I won't care anymore. But
-> until then, please stop trying to change this code.
-> 
-> NACK.
-> 
-> -Dave.
+If I understand correctly, previously this was discussed in your bug fix se=
+ries here,
+https://lore.kernel.org/all/fa8cd8c1cdbe4849b445ffd8f4894515@huawei.com/
+
+And why we are having it here in this new hardware support series now?
+
+Could we please move all the existing bug fixes in one series and support f=
+or
+new platform in another series, please.
+
+Thanks,
+Shameer
+
 
