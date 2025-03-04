@@ -1,288 +1,369 @@
-Return-Path: <kvm+bounces-40090-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40091-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F01E8A4F0C0
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 23:50:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32239A4F0CF
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 23:56:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 675207A5D9A
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 22:49:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C152C7AA64E
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 22:55:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17A4226A0ED;
-	Tue,  4 Mar 2025 22:50:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2658927C869;
+	Tue,  4 Mar 2025 22:54:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AYlmf9NZ"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="aZoG2YGC";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="kYqbYxlm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C71C204F61;
-	Tue,  4 Mar 2025 22:50:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741128634; cv=none; b=LAgiLp7j8qmaR7/ytbFjLXvZYu8SYQdCxzJgfIik3smUpR2AwSs+C5K63WOFl5Zx+p9ccRfGUiwAmmjaGrNh5vE2iPLBTfLz6CYPJuODgPv3iL2rMZY+fYGv0iRVV64cJaOzKhWRUAo4t5MGFNw4CXPg8Jp+91eXkwKQ4WVP8aA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741128634; c=relaxed/simple;
-	bh=JpXLnfHFb7X6UP0T5PPovzxp39AnpKclEfcPTpKIoM0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fo/rNKAyLQVqiintX6uXQp+hjyYzHGawrkYn4tY4X/AyZ/sjug2eZ+0KSmX2VdXTsN8Sj8VdZq/uGHlHTxXGOjhYHvAygmy0CXSNvxVk0EaPYggQyAOLGDGMbPpJ3vWXt4qua73LQNuBw3NYly6BGN1gCQDVvzm41o2egUKhQ1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AYlmf9NZ; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741128632; x=1772664632;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=JpXLnfHFb7X6UP0T5PPovzxp39AnpKclEfcPTpKIoM0=;
-  b=AYlmf9NZvtYzAq2mS4AZiXQvk3JLl51uRHEKQ3m4mj+dktqY+qpF+6N2
-   SkTyGkE0UUBIC63A4cMoGZREjjkA2OPGcNkQRf/OW+RmttF8r1Xsv5SDL
-   TsGd3sQ987zXjxe1NXtDUM71fAOR9v7SqYLqxKv5E1xunJYpKOPchq+fV
-   G0+mEwb2QdHgLkvlJr6/36shlZoDf6ORSNmW857arNQRx+s9bOf1V2VT0
-   vh/no3Iu+A/c+gWlkKr3JMzKeSeFHuI7RAZ8pQ+nC+xtYv+V4mZzm5nD/
-   0dt86LeV1bLuZYIRJh27S9iDK8OW7y2xz2DaDX2nV1+aFjiDFRyeBCWWF
-   g==;
-X-CSE-ConnectionGUID: gn+q8SB5Rgm7rzQ5JnD+cg==
-X-CSE-MsgGUID: 5RcmavH9QtGiwFL9AHKuKw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="42202307"
-X-IronPort-AV: E=Sophos;i="6.14,221,1736841600"; 
-   d="scan'208";a="42202307"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 14:50:31 -0800
-X-CSE-ConnectionGUID: gbqYRql8TV+FDo28CzqB6A==
-X-CSE-MsgGUID: VOax7jffTVO2U8+anUc4sg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="118413778"
-Received: from kinlongk-mobl1.amr.corp.intel.com (HELO [10.125.109.165]) ([10.125.109.165])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 14:50:30 -0800
-Message-ID: <ea73a36a-8ac5-462b-a97e-c398f6307f2f@intel.com>
-Date: Tue, 4 Mar 2025 14:50:48 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FCCD251791
+	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 22:54:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741128890; cv=fail; b=DRqTFXCYQyLLvP1oqUEXbRcII+H+sMR75PijBIeo1ivrt/1wtowEEip5rKSQqvuMqRWJPoNIR8CN2V6uZOBI3hYuoF7/6Z1hLx3xeO6id6EbdUTgznuoRErEJDFApSWu45oPXGvLNE/gcoyKoodTPEoe4FP2Kuy4x7nTxLuDiE8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741128890; c=relaxed/simple;
+	bh=kH7YGgNXLopgSeyn2jtFf/xjQ86K03TGL6Wv/V395yY=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=c1Tm8UMKgj++QkcA9/SPgX5VKR44UwLlLWJMyzSFGGUBKk+ijxrdfTXIYRDDJyqHHFBnj0Ic+8TbZSaloaCwispe5OiITanQGTCaH7Po34Led6kUoebG7byCcvMXmPxLgyQOQM3vyjddvnrOf05/REPWoFhQhnVbNR4jKm2dhdQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=aZoG2YGC; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=kYqbYxlm; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 524KfeQ2008742;
+	Tue, 4 Mar 2025 22:54:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2023-11-20; bh=hRy8a0vwWGTthTpI/GLFjLX4b23gY8GHFyotBKjyVo0=; b=
+	aZoG2YGCm+KqsX47+u9f64VfO6eE8zCrVjO85QOTD+iyivsO48OmA3RFozjJKUU8
+	zgCuNeQ0HKzXlExXY4mOlb+GyFWHrx7xCEEtEmjH862/HLcuKeme/h2XbwzQpRUf
+	1in9PkHPjIGpzONEXAmkwbFu8/VSkYfmo1drx+eX1cmVsN2NWriv7lb68wxPTFKT
+	tSuV7++s4h8bO60hxIxxyPiHUySOYTlztUkRbxsOslrB1cA8vJNrI9BpsuBBpU0m
+	d9mTEbyVQX9pxFmqEWPpt5jbdCA00fbqDIXA4bdnkiXFLtoepKX0MZHCd6eG/L6a
+	Yd6DaNKbbLZhdwKHekXhKw==
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 453u8wp8qp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 04 Mar 2025 22:54:00 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 524L07pg010933;
+	Tue, 4 Mar 2025 22:53:59 GMT
+Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2045.outbound.protection.outlook.com [104.47.55.45])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 453rpb5gqd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 04 Mar 2025 22:53:59 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Eue3bhIjcb8MaW4T3sPeJZMS3lr//QFGd7WKRNRjDVgaolVSexmdTENQ0O0Jg/dVVmBFyzbxIfzGLI0D0ldgln2HbRAb3iwbJhcy/N7EIOjFv0orjc6hManShE10epq3pDJe64u4HLhGMMixNcLUDSh6gqZpnYYHwR4VD/uCFZ3S/bZAyvwaEQahezFHyIxOHZQ9sMQPLHYfOkEYiejwMUV25IG6cTPMQGxaZWS+ky/Ji2JqIx6MuafDu/0mHaBRok6rX9max6Z+lkAba+YrLeJckawoPQDfYyOBxi4s6ChspMWFJgFYv61C/3rXPtmNqDaB1WdBkxlEanspvPXnIw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hRy8a0vwWGTthTpI/GLFjLX4b23gY8GHFyotBKjyVo0=;
+ b=bjkGaWKS0wRwrBLPaTvvPJo7beN4WS8G4Y7fH0NfCqC4sbivJVCj0CV5/axw2z8OLSyBkbePfCqsmLhg85EtwfHtkGxKZjEH3mgFJb4gG4cX3kF284dw8LN2RJlIe88D5yVz3fAL5zqOcY8LLbuDdc45v7XI/bhPsOWZ1xQpgLBS+koh4FWnc4d4KNWyugkDVvWRx9Byfoi+wDGsmeppTyK74KtgI1sK208/0qXSG7DtAF8kDK2Th9mkk8efEdbBdeFcUKQ2PhFo5ixaR/NkmwD3dVIlPKLjhLr39KWLNx0O+pHI46k411P+1v2M4ccOKAjUbO9EfkVOC6CPSSqeFQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hRy8a0vwWGTthTpI/GLFjLX4b23gY8GHFyotBKjyVo0=;
+ b=kYqbYxlmJUxQoElxG8BSxh4zCMlX1z+HRKh7+sGBMiB3ZfPLnW5FDU1mIVVT1t/XdLLtfCUKcZB63jwP80RELhYLrSpx/+eJLRiXXUnk/sm8cjouQB59MhxDv5QiQ/uPExgzkNwvd68uS8QKIAMBLyMxy9hOnjpWmI+yzrW3DEk=
+Received: from BN6PR1001MB2068.namprd10.prod.outlook.com
+ (2603:10b6:405:2b::35) by CH4PR10MB8074.namprd10.prod.outlook.com
+ (2603:10b6:610:23d::20) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.17; Tue, 4 Mar
+ 2025 22:53:57 +0000
+Received: from BN6PR1001MB2068.namprd10.prod.outlook.com
+ ([fe80::c9b4:7351:3a7d:942f]) by BN6PR1001MB2068.namprd10.prod.outlook.com
+ ([fe80::c9b4:7351:3a7d:942f%4]) with mapi id 15.20.8511.017; Tue, 4 Mar 2025
+ 22:53:57 +0000
+Message-ID: <d6644767-3ed9-41be-847f-950d3666e0c6@oracle.com>
+Date: Tue, 4 Mar 2025 14:53:54 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 01/10] target/i386: disable PerfMonV2 when PERFCORE
+ unavailable
+To: Xiaoyao Li <xiaoyao.li@intel.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org
+Cc: pbonzini@redhat.com, zhao1.liu@intel.com, mtosatti@redhat.com,
+        sandipan.das@amd.com, babu.moger@amd.com, likexu@tencent.com,
+        like.xu.linux@gmail.com, zhenyuw@linux.intel.com, groug@kaod.org,
+        khorenko@virtuozzo.com, alexander.ivanov@virtuozzo.com,
+        den@virtuozzo.com, davydov-max@yandex-team.ru,
+        dapeng1.mi@linux.intel.com, joe.jin@oracle.com
+References: <20250302220112.17653-1-dongli.zhang@oracle.com>
+ <20250302220112.17653-2-dongli.zhang@oracle.com>
+ <46cd2769-aad6-4b99-aea9-426968a9d7cb@intel.com>
+Content-Language: en-US
+From: dongli.zhang@oracle.com
+In-Reply-To: <46cd2769-aad6-4b99-aea9-426968a9d7cb@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: BLAPR03CA0065.namprd03.prod.outlook.com
+ (2603:10b6:208:329::10) To BN6PR1001MB2068.namprd10.prod.outlook.com
+ (2603:10b6:405:2b::35)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 4/6] x86/fpu/xstate: Introduce fpu_guest_cfg for guest
- FPU configuration
-To: Chao Gao <chao.gao@intel.com>, tglx@linutronix.de, x86@kernel.org,
- seanjc@google.com, pbonzini@redhat.com, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
-Cc: peterz@infradead.org, rick.p.edgecombe@intel.com, mlevitsk@redhat.com,
- weijiang.yang@intel.com, john.allen@amd.com
-References: <20241126101710.62492-1-chao.gao@intel.com>
- <20241126101710.62492-5-chao.gao@intel.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <20241126101710.62492-5-chao.gao@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN6PR1001MB2068:EE_|CH4PR10MB8074:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4742b536-1191-4d5f-f58e-08dd5b6f722b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?QURTY09EQjNWT05IK1BqUDB0NFp5N3U0dmRwb2hPanRFVXJmN0szaFRIQytm?=
+ =?utf-8?B?T3R4ZmVTQVZKODRPUDhjUFluL29najFnanlVUWRqbjN4Mjg2NmhrWkFzRDZG?=
+ =?utf-8?B?OHhPZzlRRE9USDc5Q2NNR3plZVdEYit1K1lMUzlpV0RzTGtpdG1paWZtTVZm?=
+ =?utf-8?B?RkovVk1MYS8yNUxyckxST25Xa0RWaklmVXR3L0JHNU45cnFPbWtNZ1VMZml6?=
+ =?utf-8?B?aWYvZ05lUngwVkowMXg2TnJMcFpVdk1vOUVxdjArSnRtbzQzcXlmWmExOHN2?=
+ =?utf-8?B?QnpLRGtEYlg0V0VOT1BUWHdqOGFFd2R5WTFpWlFaUXEyQ2JubkJRN2xVUU5N?=
+ =?utf-8?B?Rks1c0JmNFp3eWdOQW9XSGhkMGd0REpHTHY2eGpvaEppSGo4eVlkMEowSW9r?=
+ =?utf-8?B?bXNVbUx5Y0pZRVhwOHpJTWg5Zk4vek1JcGRYVThaS2pMTmI3ODYvTy9QTmVD?=
+ =?utf-8?B?ZVpUS0ZoOTk4WTBiMmIzOEI2bUJ2c2UxYW1mRStVNU1zcEJBcGo2THZIc1p6?=
+ =?utf-8?B?bDg0OFhQaXVTQzhnRkJ0WFhOMy93VlZxaG9qbW5UVlJDNDdRUWdTQzA0WU15?=
+ =?utf-8?B?MXJuR2IwSDVQUjNYbFU1TGFOUHZWb3dubFFMM0JrZTBMRHM0by83dlBFVjJC?=
+ =?utf-8?B?NlZwU25pM21hcTQwd0VzRmJuNFRPY3JZaUtRL0VwSzBOTThMQWJyaUR0Rm1L?=
+ =?utf-8?B?VTV4aVo4QzRZSGVDS2w2U0syeUJDaG44QWlTb3RjVHVRdm1mMUg2TnVJUVll?=
+ =?utf-8?B?NkZFT1k4RmJsUEgrVk1Idk1GRXpiWU50a3dsSkZCdTQ0Q2M0dzJCNEp0V0JK?=
+ =?utf-8?B?OUxaWDh5NzhFVnRZaDBNVThSakpEQXdXUUhGR2pwUXkwTlI5ZDZlbS9oRk9G?=
+ =?utf-8?B?L1hEV3Z5Q1ozWTBaTGZNTmRpNXRnZmw1UjJ2Mk0xRHNwZmFQZkJCaC9XMnJ3?=
+ =?utf-8?B?RzQ1RXNhbE9GdFk2N0VtekxKeDVBd3JBTkdrbm5ZYlh4djdXazBRVHRIOTFT?=
+ =?utf-8?B?MzhTQ0NYUEVjSGRERDdNWkJROHRTa3IySlRjT3ZEeDEzTjlGVm9qUVU2ZVV3?=
+ =?utf-8?B?L0tNbXE4MDJnNmE3MUlIenUrTjFTM1poeW51SXh3UGIyM3pJQ2o1NlBoNk14?=
+ =?utf-8?B?OFF5VFBFN3ArZVdyK1hhK2pYS0tyUGVzNVhPdlpmY1BRNTErNld2aFhyandp?=
+ =?utf-8?B?RER4dTJ4dWFrbEN0R25qT1diZGx4SU5DeWc1N3BGWFF0b1RDTU91SlFQbHVa?=
+ =?utf-8?B?NDE5Z0hQY1ZLWXo3dTV5YTBxeGg4c0Vyb3NOQ0FiS2RkS0hHUnY1RTUxZ0Mr?=
+ =?utf-8?B?NllrK1pVaTE1WmhldDBNWXFYVmtoMGV1TDBPMzZkMDlpOSt6c2NuYnlXYTFE?=
+ =?utf-8?B?czd6R0RjTEgvdXYwZFpQN1o3SGRTUVVSV3YrL20yT29nUGI2MkNwVk5qZWFG?=
+ =?utf-8?B?N3RUQ2V2cVBleEltSm55cExRTGpoVS9nL0hUUTY4eS92ZW4weHhaV2pYZTdk?=
+ =?utf-8?B?cVAxemh0YzRwVDdhcVAyR1RNYm1hOHpuRlBaWlo0WEpXcVk4dHZRY2JZcmRC?=
+ =?utf-8?B?Qkt1Z3JyV1RjbThBQ3g3L3k2ZmxJVFBsTWlmRXVHZmttVXU1U3ZsVHpmYTRJ?=
+ =?utf-8?B?WmQyOHU0UWhKVy9YNDRyMzlkdWFleVZBVnZHODlDdWZUdFVBWlZqWitJOGZR?=
+ =?utf-8?B?ZkMxcEoyV29VUU45S3hlaHl6WTU5cW04M0FldUpZWEUrSDhDYmtYc1ZoMDA3?=
+ =?utf-8?B?R3dxejBDUzExL29FbmNtMFh0YXVVMmFqTUZEUGVDVTY2TE0yMkFHUklzOGNr?=
+ =?utf-8?B?Ujd4ZGZTSjdTZ0NiZXhVVmQwZjlYZ3lJUStPRFNxR01hSVhtbTdJajBiNStv?=
+ =?utf-8?Q?JSDoDVLpUiLvi?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN6PR1001MB2068.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?aVhlbVJVUzBjVkM2eEpTem9XeUV3ZzZTZ0o0MXRqWXByUFF1SjNMNzMyUEFH?=
+ =?utf-8?B?MHBpTXFweThHYkVLTjBNVHVLQnBiQ254OUpYNmxEZlBaN2xvMTV0dTRzWU82?=
+ =?utf-8?B?dWRaRzgvdjdrZllxR0ExNG5HZDE1QzFkNEU3a01MNCtoWjdYTFM1UlRMaFBt?=
+ =?utf-8?B?L1h2bWgwSmovanVpbCtPN1pDOGR0QW5yQTNhcDMzZUpIM1RyVGJERmQzcSs0?=
+ =?utf-8?B?aVZaQXd3eGVQRkIxTjJTYnlHbnp3cGxvTXJvb21KcDMxTnpqdzJPUEcyYlh0?=
+ =?utf-8?B?SVozY0xQKzFpNkR6V2phYnEyaXM1d0dKL01BL3JUUExYeEY3TWFzQ2VWenFu?=
+ =?utf-8?B?Y2NFOTN6c3dEZHQ5eWtPMFM0MGgwQWV3YzRUbDBIbjI5emNxb3F1My9VNmQv?=
+ =?utf-8?B?cFNlYTZ3MlhlQ3UvdEdQTjA3c0U5NDBpT0prZSt1aDNDMzJwNGFMNWpFN0w1?=
+ =?utf-8?B?NjFYZkM1ZnF1YjN6SGV5OFhzR090bWh6UERMb0VKVU5PZ3ZCYXF2NWtvcTd6?=
+ =?utf-8?B?WGRJUE9nRmw2SENZcGo1Rk5zZGJzcVVxSk5wQ3NpRFJTaEM0cGZvVnFtOUp1?=
+ =?utf-8?B?aEQzMWdwVFFJNTB0MnF6cWZSd09UYlFPMDlwUkdJaldVZ2J1cUw0SlBDdXd2?=
+ =?utf-8?B?MEFuZzZxaFRtWmFKY1hrZGszdUxqK1dOVUl3cGhJSUY2R2pZOTBuRjI1ZnNx?=
+ =?utf-8?B?VkExemhLREVVMFA0NXVHQzNhK2JUMWhRSHlVU1pZYzcyRVdSR3VYZURwVU03?=
+ =?utf-8?B?RDdnY0hqeXJ0MGE5aE0xWCthbGk4c3E2MkQ4Y2RDVnF1ekc0QWFNMURNT0lR?=
+ =?utf-8?B?Y2c0ZXd5Slc1WGhTVlNOU284Yzk2WERwSmgyd1ozcGR2dDJnMzhKbEtXd2dv?=
+ =?utf-8?B?QmI1NXBLelF6OUx4WTlOOHczbXFMOHEzem9mYTdGOVNWaFBTc29Yc1JFdVlu?=
+ =?utf-8?B?anNqbjc1bzZjRkJtQ0V2RnBsVTlEWU5LcjdIRWZFSE5sQnNaRHJVT3dYYXR1?=
+ =?utf-8?B?VGtBTGlkNEp2bWo3dXVlQW9veXpKR3BEK28vaFBxeFJUZW4reWFDNjQ5RkRF?=
+ =?utf-8?B?TVZEbnh6dWpldURkb0c4RTZRTHh4SnQ4cmJUNmVvNU1CaDZNNlNpWDJIZCt3?=
+ =?utf-8?B?eUZkK0Y4NjgvVnhuTkJJY05zVzVEQ1BEaUxWSjdRcUNiR3RCSzBpUGJXY2hK?=
+ =?utf-8?B?My9leFFHWUlIckZiZkMzWFdDRk9la2hrelNzTFJsWXppay8rWkJVTWZrem1M?=
+ =?utf-8?B?RVNER0ZxMkNxSStjVGFEYmJBOGlFNHY0WnBCZXVhT0EyTE9LWDJ4TkRPaUVU?=
+ =?utf-8?B?VmdyekUzVUhTbmd0RDVYdHE1WFYwdU5objlkWUsyNWNoRmFRYTY3ZmYzWWZn?=
+ =?utf-8?B?Rmk4TWlDZkZlYzZhSWtWc3hXclZ4U1MwaGIwcHR2Z3ZiM2NobFQzVDljcFVR?=
+ =?utf-8?B?UUlkZzZmK2FvZ2xnL1BxZUJucEE0bUJPT0U2cTd1S24rZjF1ZDVmck9xM2Zy?=
+ =?utf-8?B?cXA4ZWJIc3RqcmRvVjhYdGRQbHNhMG1vOVpyQ2JWczNKRHpZalFpTVV0dHFt?=
+ =?utf-8?B?SG5xTTZyM0V6dmVzSDA5Tm11ZGdFUFZna3VYRGZOQnVSbkZhY2J4TnNQc2Zk?=
+ =?utf-8?B?N1Y0SUFoaHMyNWtRZzJuN2Z2UldKS3JSOEJ6TVd0eVVPVElESTFrU0h6c0Vi?=
+ =?utf-8?B?ejRxcDVoY1g5Q2ZaSTBCODcxcWpqYkNTTkNVVS81VlN1YmZ4VnY3aENIaHBP?=
+ =?utf-8?B?d2NoQlloOHdzTnMzams4NHhFbmdaaDY3ZU54Vk5TbGx5OVJ0blVCUE5TY1BZ?=
+ =?utf-8?B?dHliUUdhd3U2QnFDR3B5WjRNQVBmVjJxQmVmT3R5aExMSVhoZ2I0SnZmOTZV?=
+ =?utf-8?B?bEk2NTlsUUFSTnlINU1FR2NMdHMzUVZDVGRZQkdjMkx4SmZyK1Vzd1ZvdDE4?=
+ =?utf-8?B?RE4rTEJuZUhlK1VCOHdaSWtXY0kvMDNCVnlubE9Zb0R2WUUwSTRDemRRczFj?=
+ =?utf-8?B?Ykw2cE4wL2YwU0JzWnhFM2FDVVA5TldpWm1kRGptbWdGQUFIRmYzMFVadFZP?=
+ =?utf-8?B?VHRHYlF1dzVnRGxLcXJ2ZzdMYlhiUVA2Wmk5bWc5U0g0TjJqWExraGZlbzUr?=
+ =?utf-8?B?ZFZuRS9rTFJFcVRaa3VIUnMyNnpqQXlmL0N4UHJEdmRRYmVGb1BLWCt3NndF?=
+ =?utf-8?B?RXc9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	qOa+CB+WEibugjPsKgwdFEo6bL0v5uQeRo7khX6C/wvaEdBIF1FwA0VQn1xnjIJk5ZHIxdZurKBeosgT6Rtqsp3x1OANJvNlmlAF4F81lHYB/h9CPMgjVlua7eIo0/CdhVCpPQ5l1/MOWnbHi9kJafBC16xTSVfajsRg4aAuuF0ANf5XA3zaH9HFfLhELgMtmb2GcJeq7O35wL/74txKODrpnmwI8oGTGOEtl4qWPcxSXXtJjIo3tflAXb7cp8etCJlTBYweF4wkFrFVcM60t+g1RMXUOk1NPR2uPv/CclNOV7+MOHogB7PveFrKtNwNH7bhvhGTFToGplVnrj/hNOgFwautoZXR4BWc1kw7g0OXgkbI34FCDMploM5LVhrpcIBu2vEk0TXcBwhO9ajkMU3aYl4LVEB7ZqAgbM8IjyYJ1Ag4QdCGoSZU9XxVT99EqcDIETZW51h6vNiUsFRjITOWAs7Gj4bXnB/wavH6zYUrPvUrXlVNxSwgrvAdW2S1v4DWT1YnwovTkIUocjO9L9EJGEBkC/Eu/vaP5JYdv+UvjWov8/3G/QdL6Juafew3ixdOxHCUBgZK4ovG/hfINR2LMglywuBG1HnycHiVK80=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4742b536-1191-4d5f-f58e-08dd5b6f722b
+X-MS-Exchange-CrossTenant-AuthSource: BN6PR1001MB2068.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2025 22:53:57.3027
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sWIF+SSzqOgIB9tS17yVvMv63QSu0kISeSmwbQJc4bhJ90MsNFMrm2r86xqFrahj/HqjeXayVdjuI+4/2Eaa7g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH4PR10MB8074
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-04_09,2025-03-04_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0 mlxscore=0
+ spamscore=0 bulkscore=0 suspectscore=0 malwarescore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2502100000
+ definitions=main-2503040183
+X-Proofpoint-ORIG-GUID: 4WnU5W-5nBBLbotxxEtRQQKz66dKPXw4
+X-Proofpoint-GUID: 4WnU5W-5nBBLbotxxEtRQQKz66dKPXw4
 
-On 11/26/24 02:17, Chao Gao wrote:
-> From: Yang Weijiang <weijiang.yang@intel.com>
-> 
-> Define new fpu_guest_cfg to hold all guest FPU settings so that it can
-> differ from generic kernel FPU settings, e.g., enabling CET supervisor
-> xstate by default for guest fpstate while it's remained disabled in
-> kernel FPU config.
-> 
-> The kernel dynamic xfeatures are specifically used by guest fpstate now,
-> add the mask for guest fpstate so that guest_perm.__state_perm ==
-> (fpu_kernel_cfg.default_xfeature | XFEATURE_MASK_KERNEL_DYNAMIC). And
-> if guest fpstate is re-allocated to hold user dynamic xfeatures, the
-> resulting permissions are consumed before calculate new guest fpstate.
+Hi Xiaoyao,
 
-This kinda restates what the code does, but I don't think it matches the
-code.
+On 3/4/25 6:40 AM, Xiaoyao Li wrote:
+> On 3/3/2025 6:00 AM, Dongli Zhang wrote:
+>> When the PERFCORE is disabled with "-cpu host,-perfctr-core", it is
+>> reflected in in guest dmesg.
+>>
+>> [    0.285136] Performance Events: AMD PMU driver.
+> 
+> I'm a little confused. wWhen no perfctr-core, AMD PMU driver can still be
+> probed? (forgive me if I ask a silly question)
 
-> With new guest FPU config added, there're 3 categories of FPU configs in
-> kernel, the usages and key fields are recapped as below.
+Intel use "cpuid -1 -l 0xa" to determine the support of PMU.
 
-This changelog is pretty rough. It's got a lot of words but not much
-substance.
+However, AMD doesn't use CPUID to determine PMU support (except AMD PMU
+PerfMonV2).
 
+I have derived everything from Linux kernel function amd_pmu_init().
 
-> kernel FPU config:
->   @fpu_kernel_cfg.max_features
->   - all known and CPU supported user and supervisor features except
->     independent kernel features
-> 
->   @fpu_kernel_cfg.default_features
->   - all known and CPU supported user and supervisor features except
->     dynamic kernel features, independent kernel features and dynamic
->     userspace features.
-> 
->   @fpu_kernel_cfg.max_size
->   - size of compacted buffer with 'fpu_kernel_cfg.max_features'
-> 
->   @fpu_kernel_cfg.default_size
->   - size of compacted buffer with 'fpu_kernel_cfg.default_features'
-> 
-> user FPU config:
->   @fpu_user_cfg.max_features
->   - all known and CPU supported user features
-> 
->   @fpu_user_cfg.default_features
->   - all known and CPU supported user features except dynamic userspace
->     features.
-> 
->   @fpu_user_cfg.max_size
->   - size of non-compacted buffer with 'fpu_user_cfg.max_features'
-> 
->   @fpu_user_cfg.default_size
->   - size of non-compacted buffer with 'fpu_user_cfg.default_features'
-> 
-> guest FPU config:
->   @fpu_guest_cfg.max_features
->   - all known and CPU supported user and supervisor features except
->     independent kernel features.
-> 
->   @fpu_guest_cfg.default_features
->   - all known and CPU supported user and supervisor features except
->     independent kernel features and dynamic userspace features.
-> 
->   @fpu_guest_cfg.max_size
->   - size of compacted buffer with 'fpu_guest_cfg.max_features'
-> 
->   @fpu_guest_cfg.default_size
->   - size of compacted buffer with 'fpu_guest_cfg.default_features'
+As line 1521, the PMU isn't supported by old AMD CPUs.
 
-This looks like kerneldoc, not changelog. Are you sure you want it _here_?
+1516 __init int amd_pmu_init(void)
+1517 {
+1518         int ret;
+1519
+1520         /* Performance-monitoring supported from K7 and later: */
+1521         if (boot_cpu_data.x86 < 6)
+1522                 return -ENODEV;
+1523
+1524         x86_pmu = amd_pmu;
+1525
+1526         ret = amd_core_pmu_init();
 
 
-> diff --git a/arch/x86/include/asm/fpu/types.h b/arch/x86/include/asm/fpu/types.h
-> index b49e65120d34..da6583a1c0a2 100644
-> --- a/arch/x86/include/asm/fpu/types.h
-> +++ b/arch/x86/include/asm/fpu/types.h
-> @@ -611,6 +611,6 @@ struct fpu_state_config {
->  };
->  
->  /* FPU state configuration information */
-> -extern struct fpu_state_config fpu_kernel_cfg, fpu_user_cfg;
-> +extern struct fpu_state_config fpu_kernel_cfg, fpu_user_cfg, fpu_guest_cfg;
->  
->  #endif /* _ASM_X86_FPU_TYPES_H */
-> diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-> index 1209c7aebb21..9e2e5c46cf28 100644
-> --- a/arch/x86/kernel/fpu/core.c
-> +++ b/arch/x86/kernel/fpu/core.c
-> @@ -33,9 +33,10 @@ DEFINE_STATIC_KEY_FALSE(__fpu_state_size_dynamic);
->  DEFINE_PER_CPU(u64, xfd_state);
->  #endif
->  
-> -/* The FPU state configuration data for kernel and user space */
-> +/* The FPU state configuration data for kernel, user space and guest. */
->  struct fpu_state_config	fpu_kernel_cfg __ro_after_init;
->  struct fpu_state_config fpu_user_cfg __ro_after_init;
-> +struct fpu_state_config fpu_guest_cfg __ro_after_init;
->  
->  /*
->   * Represents the initial FPU state. It's mostly (but not completely) zeroes,
-> @@ -536,8 +537,15 @@ void fpstate_reset(struct fpu *fpu)
->  	fpu->perm.__state_perm		= fpu_kernel_cfg.default_features;
->  	fpu->perm.__state_size		= fpu_kernel_cfg.default_size;
->  	fpu->perm.__user_state_size	= fpu_user_cfg.default_size;
-> -	/* Same defaults for guests */
-> -	fpu->guest_perm = fpu->perm;
-> +
-> +	/* Guest permission settings */
-> +	fpu->guest_perm.__state_perm	= fpu_guest_cfg.default_features;
-> +	fpu->guest_perm.__state_size	= fpu_guest_cfg.default_size;
-> +	/*
-> +	 * Set guest's __user_state_size to fpu_user_cfg.default_size so that
-> +	 * existing uAPIs can still work.
-> +	 */
-> +	fpu->guest_perm.__user_state_size = fpu_user_cfg.default_size;
->  }
->  
->  static inline void fpu_inherit_perms(struct fpu *dst_fpu)
-> diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
-> index c38e477e3e45..17c3255dfa41 100644
-> --- a/arch/x86/kernel/fpu/xstate.c
-> +++ b/arch/x86/kernel/fpu/xstate.c
-> @@ -686,6 +686,7 @@ static int __init init_xstate_size(void)
->  {
->  	/* Recompute the context size for enabled features: */
->  	unsigned int user_size, kernel_size, kernel_default_size;
-> +	unsigned int guest_default_size;
->  	bool compacted = cpu_feature_enabled(X86_FEATURE_XCOMPACTED);
->  
->  	/* Uncompacted user space size */
-> @@ -707,13 +708,18 @@ static int __init init_xstate_size(void)
->  	kernel_default_size =
->  		xstate_calculate_size(fpu_kernel_cfg.default_features, compacted);
->  
-> +	guest_default_size =
-> +		xstate_calculate_size(fpu_guest_cfg.default_features, compacted);
-> +
->  	if (!paranoid_xstate_size_valid(kernel_size))
->  		return -EINVAL;
->  
->  	fpu_kernel_cfg.max_size = kernel_size;
->  	fpu_user_cfg.max_size = user_size;
-> +	fpu_guest_cfg.max_size = kernel_size;
->  
->  	fpu_kernel_cfg.default_size = kernel_default_size;
-> +	fpu_guest_cfg.default_size = guest_default_size;
->  	fpu_user_cfg.default_size =
->  		xstate_calculate_size(fpu_user_cfg.default_features, false);
->  
-> @@ -829,6 +835,10 @@ void __init fpu__init_system_xstate(unsigned int legacy_size)
->  	fpu_user_cfg.default_features = fpu_user_cfg.max_features;
->  	fpu_user_cfg.default_features &= ~XFEATURE_MASK_USER_DYNAMIC;
->  
-> +	fpu_guest_cfg.max_features = fpu_kernel_cfg.max_features;
-> +	fpu_guest_cfg.default_features = fpu_guest_cfg.max_features;
-> +	fpu_guest_cfg.default_features &= ~XFEATURE_MASK_USER_DYNAMIC;
+1. Therefore, at least 4 PMCs are available (without 'perfctr-core').
 
-I thought this was saying above that it was _setting_ dynamic features.
+2. With 'perfctr-core', there are 6 PMCs. (line 1410)
 
-Why _not_ set them by default?
+1404 static int __init amd_core_pmu_init(void)
+1405 {
+1406         union cpuid_0x80000022_ebx ebx;
+1407         u64 even_ctr_mask = 0ULL;
+1408         int i;
+1409
+1410         if (!boot_cpu_has(X86_FEATURE_PERFCTR_CORE))
+1411                 return 0;
+1412
+1413         /* Avoid calculating the value each time in the NMI handler */
+1414         perf_nmi_window = msecs_to_jiffies(100);
+1415
+1416         /*
+1417          * If core performance counter extensions exists, we must use
+1418          * MSR_F15H_PERF_CTL/MSR_F15H_PERF_CTR msrs. See also
+1419          * amd_pmu_addr_offset().
+1420          */
+1421         x86_pmu.eventsel        = MSR_F15H_PERF_CTL;
+1422         x86_pmu.perfctr         = MSR_F15H_PERF_CTR;
+1423         x86_pmu.cntr_mask64     = GENMASK_ULL(AMD64_NUM_COUNTERS_CORE
+- 1, 0);
+
+
+3. With PerfMonV2, extra global registers are available, as well as PMCs.
+(line 1426)
+
+1425         /* Check for Performance Monitoring v2 support */
+1426         if (boot_cpu_has(X86_FEATURE_PERFMON_V2)) {
+1427                 ebx.full = cpuid_ebx(EXT_PERFMON_DEBUG_FEATURES);
+1428
+1429                 /* Update PMU version for later usage */
+1430                 x86_pmu.version = 2;
+1431
+1432                 /* Find the number of available Core PMCs */
+1433                 x86_pmu.cntr_mask64 =
+GENMASK_ULL(ebx.split.num_core_pmc - 1, 0);
+1434
+1435                 amd_pmu_global_cntr_mask = x86_pmu.cntr_mask64;
+1436
+1437                 /* Update PMC handling functions */
+1438                 x86_pmu.enable_all = amd_pmu_v2_enable_all;
+1439                 x86_pmu.disable_all = amd_pmu_v2_disable_all;
+1440                 x86_pmu.enable = amd_pmu_v2_enable_event;
+1441                 x86_pmu.handle_irq = amd_pmu_v2_handle_irq;
+1442                 static_call_update(amd_pmu_test_overflow,
+amd_pmu_test_overflow_status);
+1443         }
+
+
+That's why legacy 4-PMC PMU is probed after we disable perfctr-core.
+
+- (boot_cpu_data.x86 < 6): No PMU.
+- Without perfctr-core: 4 PMCs
+- With perfctr-core: 6 PMCs
+- PerfMonV2: PMCs (currently 6) + global PMU registers
+
+
+May this resolve your concern in another thread that "This looks like a KVM
+bug."? This isn't a KVM bug. It is because AMD's lack of the configuration
+to disable PMU.
+
+Thank you very much!
+
+Dongli Zhang
+
+> 
+>> However, the guest CPUID indicates the PerfMonV2 is still available.
+>>
+>> CPU:
+>>     Extended Performance Monitoring and Debugging (0x80000022):
+>>        AMD performance monitoring V2         = true
+>>        AMD LBR V2                            = false
+>>        AMD LBR stack & PMC freezing          = false
+>>        number of core perf ctrs              = 0x6 (6)
+>>        number of LBR stack entries           = 0x0 (0)
+>>        number of avail Northbridge perf ctrs = 0x0 (0)
+>>        number of available UMC PMCs          = 0x0 (0)
+>>        active UMCs bitmask                   = 0x0
+>>
+>> Disable PerfMonV2 in CPUID when PERFCORE is disabled.
+>>
+>> Suggested-by: Zhao Liu <zhao1.liu@intel.com>
+> 
+> Though I have above confusion of the description, the change itself looks
+> good to me. So
+> 
+> Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> 
+>> Fixes: 209b0ac12074 ("target/i386: Add PerfMonV2 feature bit")
+>> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+>> ---
+>> Changed since v1:
+>>    - Use feature_dependencies (suggested by Zhao Liu).
+>>
+>>   target/i386/cpu.c | 4 ++++
+>>   1 file changed, 4 insertions(+)
+>>
+>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>> index 72ab147e85..b6d6167910 100644
+>> --- a/target/i386/cpu.c
+>> +++ b/target/i386/cpu.c
+>> @@ -1805,6 +1805,10 @@ static FeatureDep feature_dependencies[] = {
+>>           .from = { FEAT_7_1_EDX,             CPUID_7_1_EDX_AVX10 },
+>>           .to = { FEAT_24_0_EBX,              ~0ull },
+>>       },
+>> +    {
+>> +        .from = { FEAT_8000_0001_ECX,       CPUID_EXT3_PERFCORE },
+>> +        .to = { FEAT_8000_0022_EAX,        
+>> CPUID_8000_0022_EAX_PERFMON_V2 },
+>> +    },
+>>   };
+>>     typedef struct X86RegisterInfo32 {
+> 
+
 
