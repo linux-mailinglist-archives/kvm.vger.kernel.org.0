@@ -1,336 +1,281 @@
-Return-Path: <kvm+bounces-39960-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39961-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EE6FA4D28D
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 05:24:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C60CA4D299
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 05:35:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 240AF188932A
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 04:24:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0691D3AC001
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 04:35:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 484401EB5E9;
-	Tue,  4 Mar 2025 04:23:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 485F51F03D1;
+	Tue,  4 Mar 2025 04:35:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DA+46ioD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="etjibc7l"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A13137160;
-	Tue,  4 Mar 2025 04:23:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741062225; cv=fail; b=EEGOx/Pl7uuvexco6l71Jpw2WxAQa/lvANZn0n4WryAu/5TX1J/1p3HjwoNq2Dvb/PnW3blp1Up79p3nv6uC8MwaZRcdKwARcEZ77jcIF+uj59AaA7mEGAKSZfNz5NpJdKUEjcAg3zuGnY/axqwdwn3IqXKa0LfI125Kx1iX/Hs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741062225; c=relaxed/simple;
-	bh=//TOIqrj3yg2mvCOodkVOCkj4CE3cRbXyPTvAYUR36o=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=bXPsgHojaCvtPp3NzXoWhTUK2IOYtIxRUk0tY1ixyQZjrtO05rbxR9mztsz1ZTE0zyBnnO9FWQM7jdimrIETbVL9hwkGD6B0I6iqwkMa4qoVS9Y9I01wLqN1tkq58zTcM/KFIaG+cgR7rwUfhU4vvE4EL/T+X4rU1VFvR/Vrdtw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DA+46ioD; arc=fail smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741062223; x=1772598223;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=//TOIqrj3yg2mvCOodkVOCkj4CE3cRbXyPTvAYUR36o=;
-  b=DA+46ioDaDABzpqJmBFB2da4scwWi3MFfln2hRfh7diaV5aadlk94l3f
-   x1RiZcEUFCHsodkCXSsFe6S97HXgsQMoyJOjf0eiUXTpyY0pcJD0ZMtjp
-   3A9nhQH/Dw/farurU61zHWaj6LPEJZ1jbTmdIL1hc/mhtXNsOrbLNHL1C
-   knZshfwr3UDaHtwlYX5DvUtWXWqHlFg/qaST5aWDRQ8ux3oZnC+xXKDH9
-   GAvGDNFFFsG1DuaGFb8HFFcHmE9Dlkjpsw9PhvHmQPneD0OA/NGKch2U2
-   LXp6gSEikXBNh+/zOnxTvSSrgWpCSMpOjZ4EiGIGSTJheTVEZ4DuYnZYo
-   A==;
-X-CSE-ConnectionGUID: B89qAhF/TrOlps4e5jxEyg==
-X-CSE-MsgGUID: f0JfjowHRgO74x7hL6/+Tw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11362"; a="45736730"
-X-IronPort-AV: E=Sophos;i="6.13,331,1732608000"; 
-   d="scan'208";a="45736730"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 20:23:43 -0800
-X-CSE-ConnectionGUID: wbSpolUsSW+L9mLD+1OxwA==
-X-CSE-MsgGUID: cZG1f6huQuW2U30DgLMJdQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,331,1732608000"; 
-   d="scan'208";a="118940220"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 20:23:42 -0800
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Mon, 3 Mar 2025 20:23:41 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Mon, 3 Mar 2025 20:23:41 -0800
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.44) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Mon, 3 Mar 2025 20:23:40 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Me5695C7j6ykfZEEttiCfOp4F13vGg/EyH7exztvOGDfzykG7Gn+2Xl1lf9M9FzybZp53AvYg+xpJrjsTOHoo7ohKjp37VvRkYyffX8y7G/ZTsjuZqoywXBvhSIDboj9hFzPv2oklnJDdPJeGW5cTFAwX8LnKYY8ImXRkiCUkt/sEzS7XNYMprc4T7cS+f/fu9ZViwYhWq6w+kceZ4VknrWDVQArc0vqH9yOZX3NEBWp4iH0hXMRgK/+FKyzdWqc7luW+ji0IINWcTYIas4D0BsCFwmOEoBvlXnimvwBGwSO1DGJq2rY53Z3Avce/a9Mmy3Gfk3jj8NLuJEK3VgmCQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Vw17quOZdHqg31VIWrvN9diQX19qHfSJta7gPVfmNnw=;
- b=c28y1kO0FcyuD70XRC/fRCGgJf9kDEIkSKf9fqJqr1F1ZiXI90ik1LgyHgiMT+d30AqrVFLDh3+GrbcFIm+CeBxc66zUOR2jyq2DeVfkNlvTcQFgjrlO2nMaXMj5sPMuldh/yKejWp7hCFODfDlk18QsfKYhWj43AIxmb3aH2vzbhd4SbrAAHrA0FiC+nGLEJSCLwQ5CU91o/l5m96t22tz5vJJoFNpyQU16ayjqFHH7VxUbyMU37z//YOFvm40Nfg5NwHnLtXE8KQd6tbkgAyEmlg1u0m+sJsYEY7VJIj5OR3AxoRXXktbmDj/9Z+ToqIntMVQW41OCurI5LRvIJw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- PH7PR11MB7570.namprd11.prod.outlook.com (2603:10b6:510:27a::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8489.29; Tue, 4 Mar 2025 04:23:11 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca%4]) with mapi id 15.20.8489.025; Tue, 4 Mar 2025
- 04:23:10 +0000
-Date: Tue, 4 Mar 2025 12:21:49 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, <seanjc@google.com>
-Subject: Re: [PATCH 2/4] KVM: x86: Introduce supported_quirks to block
- disabling quirks
-Message-ID: <Z8Z/3dxtpbjpCJPI@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20250301073428.2435768-1-pbonzini@redhat.com>
- <20250301073428.2435768-3-pbonzini@redhat.com>
- <Z8UEmKhnP9w1qII9@yzhao56-desk.sh.intel.com>
- <4a2d487b-aabd-4854-a8df-214423b8c390@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <4a2d487b-aabd-4854-a8df-214423b8c390@redhat.com>
-X-ClientProxiedBy: SG2PR01CA0187.apcprd01.prod.exchangelabs.com
- (2603:1096:4:189::12) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9267A14F9FB
+	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 04:35:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741062923; cv=none; b=AE/XjvIqGNE5dmBZ7VOTh3CAXllNvRu/85jAVeqadtHehMw403SGqlh+L8C60nWAkGlR37h5eLIq/mpOytsexD0GgT8tLy+V6DTDuzxCnunNgyDpJjcrjvv8KEAWdrhA6wWVaK0SXP9EEka3J6vyr9d5/AEQanW4ABCy6jnvqhw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741062923; c=relaxed/simple;
+	bh=eDv7izcYqzv4YAygR57Owiww1VX6TewRxTapsAxTfog=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=r3VVEuh3D4/fYsKAHGlEnK0qXET0AUNB0+0+SHi33gyqhuAQPf9aBS93U/pJe2AdoMx62M4kdPrRcXuwsLnF6yNYw30phC/r2zxjjbnUnJDZLccb9qCgVymC3ySAa44kO6QNJLeJDX12Jnmr87MXVSlGUad1+wE1ZsKYmrd/reI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=etjibc7l; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741062920;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=koAfnbIioMA+14AQ61if+zlW74/NZhlzHrW6k45ApV8=;
+	b=etjibc7loZucRBeE7BgTWiW+B55gkte9R1l0LW9EXA5dzo73pKkFooS0mCX8u2rkZDhjc/
+	ExzmM7n3tLMCDSSmYUC7wYo/YU9F8bkIYHFVcnLgo0uGunRyrwblnNEPE/0HMj9Pwy1/zY
+	lUYKCWFkwMt5s/erRDGUqiBGTi7AYvU=
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-79-qRMK5Bm-PAS4caSCHlOuSQ-1; Mon, 03 Mar 2025 23:35:19 -0500
+X-MC-Unique: qRMK5Bm-PAS4caSCHlOuSQ-1
+X-Mimecast-MFC-AGG-ID: qRMK5Bm-PAS4caSCHlOuSQ_1741062918
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-22366901375so85640615ad.0
+        for <kvm@vger.kernel.org>; Mon, 03 Mar 2025 20:35:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741062918; x=1741667718;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=koAfnbIioMA+14AQ61if+zlW74/NZhlzHrW6k45ApV8=;
+        b=asOh2W2M6Ts+viTbyGMbLgTucugJ11nxM8ti0XuEhmV8RiT2Zy0/OY8wJbpnljjh1w
+         rRpUtuZFQ2xwRm0pt6TTIL6v596HOBmUPGul3sNNjn7iPnDJkFwZDeeee5XlsPSyaWCA
+         nDnGuY2TdOeyR3uPfd5TTZk/g+cpY3ml4jXsOUBRkMKWIPifYSGDH7Q/g7Cw+0QCDwVf
+         6qh+hgTCQh8I/j9QGMwWTqRPi74tZjymELpwgSqkfvVrrDnZnaCLxDKLG+CD0BaV2d48
+         LJn/56zndsHtROmTX+9W9iKmpm4M3FY9hC0dT+PZVNRW3FBZP6Ln4ErVSUY+SExX3AZ4
+         dArw==
+X-Forwarded-Encrypted: i=1; AJvYcCVUScdgVO/J/kq+1FXATcTjkNEAmxOlgsWzZuf38lCdjOsjPFqiIns/05fiJqEgF9tdYzM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YysUW2SdaU1GnHqjYZ6Z0qOMEtFF8G+Y2eOK4SbPJrgtPh1248r
+	AF4e6RhiBOk4H/fMsR/o86LsstHaYgXmDEQdCQITly5kgKQniJZPnSU2BJsrE3qycx+IbgFqhW3
+	XgI7Ml7AfgGeF7Mp/56nPdTZVY2P5HHxXhEqfnnh0bvU1W48unA==
+X-Gm-Gg: ASbGncuBp2GOblDAtm2jn15Y07Z4TLYEdAYr0WZKAVlehUvIaAd4KbRsQcWiX7vDnen
+	4KMKHrnm8ggqVHp1NXGm4iJmK6NDTZfW/SytRdtud8klhnk/6CcFTjAb2nzVOB9Y3NG3mzgYwyg
+	UnzR1sXU9OJwsWX8YvZOl3gQhJQdbdFR+BTRnOSg1pLnnuZ0R/nmZMWcW5YdE4eJwNHS+VPaDED
+	orc/AFsOUVCKTTdg5hy97dGqPWLpxnGfJmKqc8x1MqXn0VXeetF5OmDI3tzsaY+By1NaFO+OiwS
+	CbJTKwMnAo4E9jFJjw==
+X-Received: by 2002:a05:6a00:1913:b0:736:3ea8:4813 with SMTP id d2e1a72fcca58-7366e54bffdmr3139292b3a.2.1741062917997;
+        Mon, 03 Mar 2025 20:35:17 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFQXRcbRKs/P20up2fdaG8YXNHl5+RMV13H5szfYcd+4TW2P2h1zQR3oil9dzOG5dukT3+nLg==
+X-Received: by 2002:a05:6a00:1913:b0:736:3ea8:4813 with SMTP id d2e1a72fcca58-7366e54bffdmr3139257b3a.2.1741062917556;
+        Mon, 03 Mar 2025 20:35:17 -0800 (PST)
+Received: from [192.168.68.55] ([180.233.125.164])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-aee7dcb4611sm9141977a12.0.2025.03.03.20.35.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Mar 2025 20:35:16 -0800 (PST)
+Message-ID: <b89caaaf-3d26-4ca4-b395-08bf3f90dd1f@redhat.com>
+Date: Tue, 4 Mar 2025 14:35:08 +1000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|PH7PR11MB7570:EE_
-X-MS-Office365-Filtering-Correlation-Id: ba574766-d1b7-42b9-9e4e-08dd5ad445a8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?ZqjtPVZ5e370FIBz7omEflPV8Rswm7inCXmqCRW0lNGxHkU9SgsY+CC9jmJr?=
- =?us-ascii?Q?0CQZGKs8dXQljNBdWFXS8zzm7hP7+R2haHmE7OVmuftg5Unhvloc8moVTKBy?=
- =?us-ascii?Q?hRtyLr8WJndYSHGIa4U0LPkn4Y0I0NUArZ0y/K+3c+8au8aiNQBIrEhQkW71?=
- =?us-ascii?Q?pXQTTstKJYqfB+DVer+XnmUc7vMzfEFPXbiBX7c8FDxIm6ZbJjKYnptowwzo?=
- =?us-ascii?Q?f0x/KWTkPY6Z27ofzaMaW+4+Q4mZ/9rV4Qqh++nnJgchrVSnNsRlF4M0Hsvm?=
- =?us-ascii?Q?6wxTXbT9aBgwMiwUfiUQ8f8ilinrg3q0l4Gc6sgCzmJB1tgTt+cQUPd1YNjt?=
- =?us-ascii?Q?eKE9Q0wnM5c3X91VMx0f48UbYb5GgU7GmeZU1Cp3bAJ34EPhUnQJUtnXYnPD?=
- =?us-ascii?Q?6C3nWzssRCKg3jskVEkR1odMckrTxVkwv/3n8iM2Yrskr/q6TwJrYTEbmmxm?=
- =?us-ascii?Q?HPAZDpPyuhb7eIr8d9JL3av3UQEsAk23oylv1SuvBzWO+GomWpzVkfNAbZ+j?=
- =?us-ascii?Q?/aXlMECoZkpjL94IJgMawl5liN/FM2IXottZmqmtwnt+kZrh7DUzbI55fcQy?=
- =?us-ascii?Q?MUCe253wNo4/6xnUV7bmAAK5ybOqrN6wQd9T25059TNApkzgsvjkP9VEnDrZ?=
- =?us-ascii?Q?TDnFZkFd4yNc7xUy07azobvTL7xTabVuMSQjyUl7GcbeaCFtt/0dseNG70aJ?=
- =?us-ascii?Q?0gV9rCrsAtCZegk/Gr+l7D0BQuFD73FSpSj5YaOMcMoAU4AQHs/MVtIm68TQ?=
- =?us-ascii?Q?VHbT1k3zAG6cH2inyaHcxAzu4o7mYSF5j2VpNDjDYSg0B4ciVNDysFO4pzCw?=
- =?us-ascii?Q?/Nc11w6TrAOYrahLqDKC8zH68FeWwKLaqkSzor6CDZy9vvoAl9oMr8faQ0aT?=
- =?us-ascii?Q?IElqqeW+R5njL4YqdG01UHFDHHzlbOvyiQ0sI1yqOqJh6oLFIjlOwmajQYSc?=
- =?us-ascii?Q?08Pwob7YPfgDODpZVD6iGmY+EasFZ0WecZjiObSSJCEs2ln5G4Mvb7vMJDi7?=
- =?us-ascii?Q?AuAkrKasrvKeuZSzj0R0Tj2jPYpXW3WDX2fjQ1km+qAfnCLVb+iYpy1UaHEk?=
- =?us-ascii?Q?aQzpmuHLI1k2OUvQJGNd0Wc35qh72DcoWKTl+tsIvsaifTUY/jt1zzTojziy?=
- =?us-ascii?Q?sOsZJxqA7nIhe+yWfUB8S7TForoGgr+QvuzgH1tsSf3bfppYwtPqx83BjuUz?=
- =?us-ascii?Q?/7wDWVbqYr++TrAPJ4PXcyTdmeesZPNhj8Wdb3BkUgXYMiKrhsEXM2bF6sA5?=
- =?us-ascii?Q?MD5qLiUpfPDVGZ/xG2VV6ZiL8XIkAMbAFKGXl24A6SfWv9seRof7j0PIbh4d?=
- =?us-ascii?Q?Q8xlxXy039j+Di7qy3ZOLDsBfNvyewZLLvoRWAI1dysRszr2wlu39QPv7ryd?=
- =?us-ascii?Q?GX47yybKt9sWBsLAtDiyHkxmmtIu?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?XCGYp+O9pV24fmHw672TeE1r+l/vHkidXLJEyF0K0WorKe4BLnEplwFjVdcE?=
- =?us-ascii?Q?ZSQqT5n84l9XPokewA5qNKx4ZzP0y1ccsMIlr11bzB5Ax4vWYaAw7ENETrog?=
- =?us-ascii?Q?lCSYmGYhsfxP+/i7CJqTkBX8OICqNekqiNrKUrasNk+FRH3+VULtwx2HWmGW?=
- =?us-ascii?Q?q8MwJoOEUo8gL6ycRLHb4PVt3ILwlvvWr0ZRe4TYaPKsQCAJ6gIV23WesBm3?=
- =?us-ascii?Q?rcF9rJPUpnrIU+LlKUSvOaKa7izociZkE4hWWHVlvI+qMq7Cmd67gOg5MOzZ?=
- =?us-ascii?Q?Yxul2LtCWokaanwpHwr3aUVOOFJjh1OCo0r2wu3kAUjKE0kntjeF4HgtY1lA?=
- =?us-ascii?Q?QMtNEJLdY+plBiLbUQu94M09SazZMT7xRHsvTbtiDbQeDF19sIcI6m0vDP74?=
- =?us-ascii?Q?r4dKGENJCO5CYYKueqRcdLk23Lbcgcxv1OZI1klFHJArJn4TtjqlRzpv4e7K?=
- =?us-ascii?Q?ea4JFgtDQsbowfHbUA7SAblwXxs4/Ux3Ohq4um5BCUsoR+uzC9SsV5hye7gN?=
- =?us-ascii?Q?CGM7nqapdHJnPzfWBUBDalpjU0498rVIOztWDmzj8FHOEMoO2JMA29J4Fx7i?=
- =?us-ascii?Q?cfiHB9cqvzsb+Wdf6RPCHtbrNgLOSfieAAkqTp4jmezb3Lfk4OencRu+FGWZ?=
- =?us-ascii?Q?tpU1qPQsEC1nQh1SzyCGEDXqG0XOd075sjDbuqa7UZjuio4R4gbIuDjhAPr4?=
- =?us-ascii?Q?AfR0mE/KUhEcJwe9nesEPXHOA/iL3gfGFg0+Ok9g1eOHeE02AyGBy56hn2Vu?=
- =?us-ascii?Q?qTTWzGZB/Gawx5b6L9sFcCIZ6ABsvmgAJMOQsMiL8ffdR4b/nmNy4e/zabkw?=
- =?us-ascii?Q?uq71KW1CVlQvD449tbs8Dsu/4k1wlghFXr59852g5LcfcLFVU9cknUOykkjL?=
- =?us-ascii?Q?hpMDi3cNqcGxOVfOt21gM8p5rHr2bPMFi/jGdF4MyiX4k5UrlJJVrNnxbHd0?=
- =?us-ascii?Q?CzmMXNWiUWEJpcJ3NVwqyIIhIYCQIKHcE3foyXUTSr5NeG9zhMCkgGo0TJVj?=
- =?us-ascii?Q?0A5LmJHvjQfcVFPALt337Xn2IMEOL94aV11ZyNUhNIKHsq7BLAXbdhS0k/+9?=
- =?us-ascii?Q?vMgzF++PkkIvCJ+ZdHIAhn0bbWvVovb8C1VhX8Ghx4L0tBxWRG12MkMCAe9S?=
- =?us-ascii?Q?X30CREM9al4mfImpA/YuLXear5G//2+/Fz6tp/gHdLRJiNL871OdzH3tZ15q?=
- =?us-ascii?Q?jCspvbRMhWc+MSqE5eggVZFEcuXxORATRCr+LlVX4fMej6ae1UV/UyFkQPZF?=
- =?us-ascii?Q?us5Zr271ZFPOzmhqHR1oHhCa9diVgaKvlWiEp9P+Ea17I5SKOgBGP50P01rR?=
- =?us-ascii?Q?GPl/w1iY4xeKoRZZSv2rI3o7n5e1z+FH97oAlyxq5SylASoer/NkAXy+CvAV?=
- =?us-ascii?Q?jG/M5CP+EcI/H/MPe/kicT+EoibyRIF45XWWfyJqhG7eHawm/TUotdx9emI9?=
- =?us-ascii?Q?Mpe4DiNXUuGsxcMtqHPFRDrEcoru7B6OI42bzz2UYdY36tPVtxszPFRXXp/Z?=
- =?us-ascii?Q?Xm9x2/w9+HSYwufrT7Tnk9kak0hWqWUW2l5nkX9NVyNCGC0RrK+cjCjeJ6VM?=
- =?us-ascii?Q?A9Jc67X8VqxIxcx+dnlarS+HCePH/2FrnoI5y4SZ?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: ba574766-d1b7-42b9-9e4e-08dd5ad445a8
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2025 04:23:10.6102
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GWWe6dLdjVygbJkbzeEhPUB3S8yvKabFSrU580b/HpuXgzZhuPIvw3NFPpi9LafCZMCKzNkERBPZI13cFdzi6A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7570
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 18/45] arm64: RME: Handle RMI_EXIT_RIPAS_CHANGE
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+References: <20250213161426.102987-1-steven.price@arm.com>
+ <20250213161426.102987-19-steven.price@arm.com>
+Content-Language: en-US
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20250213161426.102987-19-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 03, 2025 at 05:11:31PM +0100, Paolo Bonzini wrote:
-> On 3/3/25 02:23, Yan Zhao wrote:
-> > On Sat, Mar 01, 2025 at 02:34:26AM -0500, Paolo Bonzini wrote:
-> > > From: Yan Zhao <yan.y.zhao@intel.com>
-> > > 
-> > > Introduce supported_quirks in kvm_caps to store platform-specific force-enabled
-> > > quirks.  Any quirk removed from kvm_caps.supported_quirks will never be
-> > > included in kvm->arch.disabled_quirks, and will cause the ioctl to fail if
-> > > passed to KVM_ENABLE_CAP(KVM_CAP_DISABLE_QUIRKS2).
-> > > 
-> > > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > > Message-ID: <20250224070832.31394-1-yan.y.zhao@intel.com>
-> > > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > > ---
-> > >   arch/x86/kvm/x86.c | 7 ++++---
-> > >   arch/x86/kvm/x86.h | 2 ++
-> > >   2 files changed, 6 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > index fd0a44e59314..a97e58916b6a 100644
-> > > --- a/arch/x86/kvm/x86.c
-> > > +++ b/arch/x86/kvm/x86.c
-> > > @@ -4782,7 +4782,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> > >   		r = enable_pmu ? KVM_CAP_PMU_VALID_MASK : 0;
-> > >   		break;
-> > >   	case KVM_CAP_DISABLE_QUIRKS2:
-> > > -		r = KVM_X86_VALID_QUIRKS;
-> > > +		r = kvm_caps.supported_quirks;
-> > 
-> > As the concern raised in [1], it's confusing for
-> > KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT to be present on AMD's platforms while not
-> > present on Intel's non-self-snoop platforms.
+On 2/14/25 2:13 AM, Steven Price wrote:
+> The guest can request that a region of it's protected address space is
+> switched between RIPAS_RAM and RIPAS_EMPTY (and back) using
+> RSI_IPA_STATE_SET. This causes a guest exit with the
+> RMI_EXIT_RIPAS_CHANGE code. We treat this as a request to convert a
+> protected region to unprotected (or back), exiting to the VMM to make
+> the necessary changes to the guest_memfd and memslot mappings. On the
+> next entry the RIPAS changes are committed by making RMI_RTT_SET_RIPAS
+> calls.
 > 
-> To make it less confusing, let's rename it to
-> KVM_X86_QUIRK_IGNORE_GUEST_PAT.  So if userspace wants to say "I don't want
-Hmm, it looks that quirk IGNORE_GUEST_PAT is effectively always enabled on Intel
-platforms without enabling EPT.
-
-And kvm_mmu_may_ignore_guest_pat() does not care quirk IGNORE_GUEST_PAT on AMD
-or on Intel when enable_ept is 0.
-
-bool kvm_mmu_may_ignore_guest_pat(struct kvm *kvm)                               
-{                                                                                
-        return shadow_memtype_mask &&                                            
-               kvm_check_has_quirk(kvm, KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT);     
-}                                                                                
-
-After renaming the quirk, should we also hide quirk IGNORE_GUEST_PAT from being
-exposed in KVM_CAP_DISABLE_QUIRKS2 when enable_ept is 0?
-However, doing so will complicate kvm_noncoherent_dma_assignment_start_or_stop().
-
-
-> KVM to ignore guest's PAT!", it can do so easily:
+> The VMM may wish to reject the RIPAS change requested by the guest. For
+> now it can only do with by no longer scheduling the VCPU as we don't
+> currently have a usecase for returning that rejection to the guest, but
+> by postponing the RMI_RTT_SET_RIPAS changes to entry we leave the door
+> open for adding a new ioctl in the future for this purpose.
 > 
-> - it can check unconditionally that the quirk is included in
-> KVM_CAP_DISABLE_QUIRKS2, and it will pass on both Intel with self-snoop with
-> AMD;
-So, when userspace finds the quirk IGNORE_GUEST_PAT is exposed in
-KVM_CAP_DISABLE_QUIRKS2, it cannot treat this as an implication that KVM is
-currently ignoring guest PAT, but it only means that this is a new KVM with
-quirk IGNORE_GUEST_PAT taken into account.
-
-> - it can pass it unconditionally to KVM_X86_QUIRK_IGNORE_GUEST_PAT, knowing
-> that PAT will be honored.
-For AMD, since userspace does not explicitly disable quirk IGNORE_GUEST_PAT, you
-introduced kvm_caps.inapplicable_quirks to allow IGNORE_GUEST_PAT to be listed
-in KVM_CAP_DISABLED_QUIRKS.
-
-From KVM_CAP_DISABLED_QUIRKS, the userspace knows that honing guest PAT is
-performed on AMD.
-
-Is this understanding correct? 
-
-> But KVM_CHECK_EXTENSION(KVM_CAP_DISABLE_QUIRKS2) will *not* include the
-> quirk on Intel without self-snoop, which lets userspace detect the condition
-> and raise an error.  This is better than introducing a new case in the API
-> "the bit is returned by KVM_CHECK_EXTENSION, but rejected by
-> KVM_ENABLE_CAP".  Such a new case would inevitably lead to
-> KVM_CAP_DISABLE_QUIRKS3. :)
-Agreed. Thanks for the explanation:)
-
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> New patch for v7: The code was previously split awkwardly between two
+> other patches.
+> ---
+>   arch/arm64/kvm/rme.c | 87 ++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 87 insertions(+)
 > 
-> > Or what about introduce kvm_caps.force_enabled_quirk?
-> > 
-> > if (!static_cpu_has(X86_FEATURE_SELFSNOOP))
-> >          kvm_caps.force_enabled_quirks |= KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT;
-> 
-> That would also make it harder for userspace to understand what's going on.
-Right.
 
-> > [1] https://lore.kernel.org/all/Z8UBpC76CyxCIRiU@yzhao56-desk.sh.intel.com/
-> > >   		break;
-> > >   	case KVM_CAP_X86_NOTIFY_VMEXIT:
-> > >   		r = kvm_caps.has_notify_vmexit;
-> > > @@ -6521,11 +6521,11 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
-> > >   	switch (cap->cap) {
-> > >   	case KVM_CAP_DISABLE_QUIRKS2:
-> > >   		r = -EINVAL;
-> > > -		if (cap->args[0] & ~KVM_X86_VALID_QUIRKS)
-> > > +		if (cap->args[0] & ~kvm_caps.supported_quirks)
-> > >   			break;
-> > >   		fallthrough;
-> > >   	case KVM_CAP_DISABLE_QUIRKS:
-> > > -		kvm->arch.disabled_quirks = cap->args[0];
-> > > +		kvm->arch.disabled_quirks = cap->args[0] & kvm_caps.supported_quirks;
-> > 
-> > Will this break the uapi of KVM_CAP_DISABLE_QUIRKS?
-> > My understanding is that only KVM_CAP_DISABLE_QUIRKS2 filters out invalid
-> > quirks.
-> 
-> The difference between KVM_CAP_DISABLE_QUIRKS and KVM_CAP_DISABLE_QUIRKS2 is
-> only that invalid values do not cause an error; but userspace cannot know
-> what is in kvm->arch.disabled_quirks, so KVM can change the value that is
-> stored there.
-Ah, it makes sense.
+With the following comments addressed:
 
-Thanks
-Yan
+Reviewed-by: Gavin Shan <gshan@redhat.com>
 
-> 
-> > >   		r = 0;
-> > >   		break;
-> > >   	case KVM_CAP_SPLIT_IRQCHIP: {
-> > > @@ -9775,6 +9775,7 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
-> > >   		kvm_host.xcr0 = xgetbv(XCR_XFEATURE_ENABLED_MASK);
-> > >   		kvm_caps.supported_xcr0 = kvm_host.xcr0 & KVM_SUPPORTED_XCR0;
-> > >   	}
-> > > +	kvm_caps.supported_quirks = KVM_X86_VALID_QUIRKS;
-> > >   	kvm_caps.inapplicable_quirks = 0;
-> > >   	rdmsrl_safe(MSR_EFER, &kvm_host.efer);
-> > > diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> > > index 9af199c8e5c8..f2672b14388c 100644
-> > > --- a/arch/x86/kvm/x86.h
-> > > +++ b/arch/x86/kvm/x86.h
-> > > @@ -34,6 +34,8 @@ struct kvm_caps {
-> > >   	u64 supported_xcr0;
-> > >   	u64 supported_xss;
-> > >   	u64 supported_perf_cap;
-> > > +
-> > > +	u64 supported_quirks;
-> > >   	u64 inapplicable_quirks;
-> > >   };
-> > > -- 
-> > > 2.43.5
-> > > 
-> > > 
-> > 
-> 
+> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+> index 507eb4b71bb7..f965869e9ef7 100644
+> --- a/arch/arm64/kvm/rme.c
+> +++ b/arch/arm64/kvm/rme.c
+> @@ -624,6 +624,64 @@ void kvm_realm_unmap_range(struct kvm *kvm, unsigned long start, u64 size,
+>   		realm_unmap_private_range(kvm, start, end);
+>   }
+>   
+> +static int realm_set_ipa_state(struct kvm_vcpu *vcpu,
+> +			       unsigned long start,
+> +			       unsigned long end,
+> +			       unsigned long ripas,
+> +			       unsigned long *top_ipa)
+> +{
+> +	struct kvm *kvm = vcpu->kvm;
+> +	struct realm *realm = &kvm->arch.realm;
+> +	struct realm_rec *rec = &vcpu->arch.rec;
+> +	phys_addr_t rd_phys = virt_to_phys(realm->rd);
+> +	phys_addr_t rec_phys = virt_to_phys(rec->rec_page);
+> +	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
+> +	unsigned long ipa = start;
+> +	int ret = 0;
+> +
+> +	while (ipa < end) {
+> +		unsigned long next;
+> +
+> +		ret = rmi_rtt_set_ripas(rd_phys, rec_phys, ipa, end, &next);
+> +
+
+This doesn't look correct to me. Looking at RMM::smc_rtt_set_ripas(), it's possible
+the SMC call is returned without updating 'next' to a valid address. In this case,
+the garbage content resident in 'next' can be used to updated to 'ipa' in next
+iternation. So we need to initialize it in advance, like below.
+
+	unsigned long ipa = start;
+	unsigned long next = start;
+
+	while (ipa < end) {
+		ret = rmi_rtt_set_ripas(rd_phys, rec_phys, ipa, end, &next);
+
+> +		if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
+> +			int walk_level = RMI_RETURN_INDEX(ret);
+> +			int level = find_map_level(realm, ipa, end);
+> +
+> +			/*
+> +			 * If the RMM walk ended early then more tables are
+> +			 * needed to reach the required depth to set the RIPAS.
+> +			 */
+> +			if (walk_level < level) {
+> +				ret = realm_create_rtt_levels(realm, ipa,
+> +							      walk_level,
+> +							      level,
+> +							      memcache);
+> +				/* Retry with RTTs created */
+> +				if (!ret)
+> +					continue;
+> +			} else {
+> +				ret = -EINVAL;
+> +			}
+> +
+> +			break;
+> +		} else if (RMI_RETURN_STATUS(ret) != RMI_SUCCESS) {
+> +			WARN(1, "Unexpected error in %s: %#x\n", __func__,
+> +			     ret);
+> +			ret = -EINVAL;
+
+			ret = -ENXIO;
+
+> +			break;
+> +		}
+> +		ipa = next;
+> +	}
+> +
+> +	*top_ipa = ipa;
+> +
+> +	if (ripas == RMI_EMPTY && ipa != start)
+> +		realm_unmap_private_range(kvm, start, ipa);
+> +
+> +	return ret;
+> +}
+> +
+>   static int realm_init_ipa_state(struct realm *realm,
+>   				unsigned long ipa,
+>   				unsigned long end)
+> @@ -863,6 +921,32 @@ void kvm_destroy_realm(struct kvm *kvm)
+>   	kvm_free_stage2_pgd(&kvm->arch.mmu);
+>   }
+>   
+> +static void kvm_complete_ripas_change(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm *kvm = vcpu->kvm;
+> +	struct realm_rec *rec = &vcpu->arch.rec;
+> +	unsigned long base = rec->run->exit.ripas_base;
+> +	unsigned long top = rec->run->exit.ripas_top;
+> +	unsigned long ripas = rec->run->exit.ripas_value;
+> +	unsigned long top_ipa;
+> +	int ret;
+> +
+
+Some checks are needed here to ensure the addresses (@base and @top) falls inside
+the protected (private) space for two facts: (1) Those parameters originates from
+the guest, which can be misbehaving. (2) RMM::smc_rtt_set_ripas() isn't limited to
+the private space, meaning it also can change RIPAS for the ranges in the shared
+space.
+
+> +	do {
+> +		kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_page_cache,
+> +					   kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu));
+> +		write_lock(&kvm->mmu_lock);
+> +		ret = realm_set_ipa_state(vcpu, base, top, ripas, &top_ipa);
+> +		write_unlock(&kvm->mmu_lock);
+> +
+> +		if (WARN_RATELIMIT(ret && ret != -ENOMEM,
+> +				   "Unable to satisfy RIPAS_CHANGE for %#lx - %#lx, ripas: %#lx\n",
+> +				   base, top, ripas))
+> +			break;
+> +
+> +		base = top_ipa;
+> +	} while (top_ipa < top);
+> +}
+> +
+>   int kvm_rec_enter(struct kvm_vcpu *vcpu)
+>   {
+>   	struct realm_rec *rec = &vcpu->arch.rec;
+> @@ -873,6 +957,9 @@ int kvm_rec_enter(struct kvm_vcpu *vcpu)
+>   		for (int i = 0; i < REC_RUN_GPRS; i++)
+>   			rec->run->enter.gprs[i] = vcpu_get_reg(vcpu, i);
+>   		break;
+> +	case RMI_EXIT_RIPAS_CHANGE:
+> +		kvm_complete_ripas_change(vcpu);
+> +		break;
+>   	}
+>   
+>   	if (kvm_realm_state(vcpu->kvm) != REALM_STATE_ACTIVE)
+
+Thanks,
+Gavin
+
 
