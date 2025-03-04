@@ -1,174 +1,187 @@
-Return-Path: <kvm+bounces-40082-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40083-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14508A4EF36
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 22:12:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95161A4EF3A
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 22:14:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 212AF172659
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 21:12:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 42CA77A3271
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 21:13:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 827821FDA9D;
-	Tue,  4 Mar 2025 21:12:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0968326B09A;
+	Tue,  4 Mar 2025 21:13:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n7PXUWgh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EbPB9hUu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EABE277017
-	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 21:12:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D28D71F76A8
+	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 21:13:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741122750; cv=none; b=Ajq28ma9VHMtn9bvFF74y9YfxqCeuTlBk01cUOnkpHWImnFSPWwfGFEnP0+GYpvqm+DL1ZzUdcUyZT/ikk3FE+dq2lGzqSdEo8DHkC05yaulisoCPNZO5MtLzPsCuM9RCfTKNwOzjf2cTmeahnFglY1CwuFuCG0la9/0k7ewpyw=
+	t=1741122833; cv=none; b=fP8qNi4Z7lF8PElVkoPED+ykHWm+AFPrnff9yBhqTCOr4uSaFO8eUYKvrIGq3mASB+/wbDLzjwZsh938IcIfqpY7JFAR1Z/yd6mZ1iy1imqZ6YEhcQgL37SQhl7Zp9V9uK1fJJsYLJZ8EP56vHgvU3F4XeFZcDPx29NWC9qvWYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741122750; c=relaxed/simple;
-	bh=R2/H38BJgKv4PeSV/QR+Ybv+Cpfei3KqlHt6w0BRbxo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=oTUTUEPwh0lM6n5OfgN4hqMBYBKbJOJqjCxlKjP398JX2+esTKA5Mf0MbTjRskvz2sR4j36WZUm5corezLwpXieN6HxgHzXodcEli9vb9Tosmm05km/CFxwduEIj2xBnjNn8G7Ldf6NECloeItwdMoCDH7vtrkiWMOmGjTVgicE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n7PXUWgh; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1741122833; c=relaxed/simple;
+	bh=TCAAE6gsjgeclNBdvjOox4Bwi0mPdD4n0SDCQ0gB+qc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ge6PNMt/x+Z6fV1Dt/WXaQeZFlXAj51R6rLpQyxvDFIA7hbMZT4gu+CYL/Uv+pyy4yhitE4QdkUiggW935qlcpg/iYTgwvQqVjYT4dGNC6cF85Fg6NfO5fsXvbdHgH/mkDvHukpBls26LJDxs6TGRS4iN2eRV6gMgJe4vFFBqTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EbPB9hUu; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fec7e82f6fso7882159a91.1
-        for <kvm@vger.kernel.org>; Tue, 04 Mar 2025 13:12:29 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2234bf13b47so116206375ad.0
+        for <kvm@vger.kernel.org>; Tue, 04 Mar 2025 13:13:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741122748; x=1741727548; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=SU4dAalPyEF4QXKzc+XfhsgG1WoBqJ/cuqhTLYx8iwA=;
-        b=n7PXUWghmXOmw5mjumZcT+ged524k5vwaMMjGb0IrnBaCg+wRk+LnVYr/2j4nBama6
-         GK1vLFNg6+i6XhUBnpE6ET03bv4d/e2R7iK/DuqsTjNrDaks0WUVQ3EhS1nzXqV4c/K1
-         waRZ+S09nTUcnRON6o3NDXSg6rCG5Dkr4m6DC5PtbOSMLYOUF/Si2iJXsHE0c4EQK5OS
-         Zjlg7rqlK82BzgIHoWccX5ZLKWbiB7e5jHa1CEZDfNcmSJ9CWcJbdF+K051SlqYK2MPh
-         bxeXfABgC577T/GUnXleFKgw4WF8RtYr1ZRcmCC15l3yaCPnoQNSDqN9VofFNyIvpdXb
-         6V/Q==
+        d=google.com; s=20230601; t=1741122831; x=1741727631; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AS2FCaw0bw5shMN56ZiPoQPh04ebZNABk2sKJln1VXU=;
+        b=EbPB9hUug9yRPprSwohhhT2hO/1eQndmKio8XsLURM0ZzAFFxW7NEWXuZUafuP7/En
+         nfOy5/9i8EwG34HBtr6324mlKLaj1FHVF9D2bJHccXkG3GtXNxbWa2OEF/lkUoHv48xK
+         rRw2dIG/FvYqb1FOQuz1vk1XTjYKOJM2HPhuzNf1b4++65ElR3xmpxgqHpLt+/FnjHwp
+         GWR4AVUDVD3/GepCgSvaEvK0/WaEQPli26WwSiqYveMwN6C/gVbkLm/Ko1kbCoF0E2b6
+         aFQQSsbNx4q3zvC4rJAhq6lb9K1ISqkYL4myDZuZhwYy6DPJoAu0OE/WZPDdBR+xrZDG
+         OQqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741122748; x=1741727548;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SU4dAalPyEF4QXKzc+XfhsgG1WoBqJ/cuqhTLYx8iwA=;
-        b=FfijEKWMlM8+YtR5eVcE4Cb2yfwrescS9U66u3HaTGYRmoS7TaPs81IyV6/KPHcjhQ
-         SNHJ3csW/aKGOOdDh4FtUM5fycUYLYkYnZJbgn5rhqPY1YQ2HkCCu45Y5xfeyf+4oWdF
-         a2bmTgEn4bE0sPlXS8wRtRpISkXS0HaAVraO/YD2JpdMFVrf8IKFipyQlxTURHjO1UWH
-         mqDVWEHKrEPj4gnvHkt836R6Xxd3zqpS1ykjvIIkEiVRRVILaX7UTdbvZA671OHfAXb9
-         M7DZl0E/X1ivVrZyJBp0WM/pP9ahq7DuLpxwAUgDEnoxADeS+99BaI6XgNZDrNpCwURF
-         R55w==
-X-Gm-Message-State: AOJu0YxtXZFoAlPMaSWolHDNBRXiNRAhiUMZtl7/PLLT0FhPqXYq5qYm
-	Z916BkaqOAncPIUGgFNzFcXBRmFyN6W7mcrTJtXs6w34dleSKqMpJrwn45UXjNNi8XUiyQx/qj3
-	zXQ==
-X-Google-Smtp-Source: AGHT+IHTZCEyKxoHM+rzsxNY4/ZeAhBWUjUoDRE9eK9aIf2B1JTbMH2+8leV7W+6gCGhCdpJb1sDS+0kWAc=
-X-Received: from pjboe13.prod.google.com ([2002:a17:90b:394d:b0:2f4:4222:ebba])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d648:b0:2fe:85f0:e115
- with SMTP id 98e67ed59e1d1-2ff4979d0ebmr1121733a91.26.1741122748603; Tue, 04
- Mar 2025 13:12:28 -0800 (PST)
+        d=1e100.net; s=20230601; t=1741122831; x=1741727631;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AS2FCaw0bw5shMN56ZiPoQPh04ebZNABk2sKJln1VXU=;
+        b=VEqJJRhMGr7uiIuRsB4F+Thh/oZgZcaWfKD3kzM11Q6+6YTwDN+3uNPk5xGdVl7qO8
+         1ITcsYnBaXf0v2FfVgVoSaRIhJWLlNi9qJg1vlre9aOB/00tGRAOCKNDNf4wuGdeqmml
+         s76lecjDuSJ6IlWFNENrcEjRdKF6OhEUBh617jKRvSMIUzO5cO7ZJhVPf7+iLO9/uM9r
+         o6ClvfQ/WO+mX0T8JeH/5s8lN4m3C8qPcFh9J1+bRDeqfL2z+xArKA/YhPGMM4K2NT+X
+         WtHnz7oS3lTqhQXVS/IaRbyawqvgDJzgepZPyMqsmM9F4LzdfiNv5Ga6SqwP1s6iLeOb
+         Ss8A==
+X-Gm-Message-State: AOJu0YxY5Qic/hZAB4ldncW6TJupwRZHxLp1R75SJzlGsfEcklLc3XtP
+	n19vt1ENij4P4sWMGjuLbtdAuuxZMFPKm2qxQGit6pd3DHI/bMym3bruM+R2A0PsXZzAr+RGnJx
+	kAA==
+X-Google-Smtp-Source: AGHT+IHeNHjc8m3CUtFP4FnljCokGYSDGhlX1rnsnOaX0epdL6xXOTbCk6HlVSXsp2TFbeQ3ofPZJ0Kem7s=
+X-Received: from pfbhu52.prod.google.com ([2002:a05:6a00:69b4:b0:736:3cd5:ba37])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:170c:b0:736:3184:7fe8
+ with SMTP id d2e1a72fcca58-73682b54a53mr598154b3a.2.1741122831110; Tue, 04
+ Mar 2025 13:13:51 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  4 Mar 2025 13:12:23 -0800
-In-Reply-To: <20250304211223.124321-1-seanjc@google.com>
+Date: Tue,  4 Mar 2025 13:13:48 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250304211223.124321-1-seanjc@google.com>
 X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <20250304211223.124321-3-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH 2/2] x86: nSVM: Ensure APIC MMIO tests run with
- APIC in xAPIC mode
+Message-ID: <20250304211348.126107-1-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH] x86: ioapic: Expand routing reconfiguration =>
+ EOI interception testcase
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Implement prepare/restore logic for the nSVM/nNPT APIC MMIO passthrough
-tests to ensure the CPU is actually running with xAPIC enabled.  As is,
-the test is effectively validating KVM's KVM_X86_QUIRK_LAPIC_MMIO_HOLE,
-or if x2AVIC is support, CPU behavior.
-
-The latter (x2AVIC enabled) is especially problematic, as AMD CPUs appear
-to return '0' for xAPIC reads when x2AVIC is enabled.  And because KVM
-disables/inhibits AVIC and x2AVIC when running L2, the divergence in
-behavior (KVM provies 0xffs, CPU provides 0s) results in test failures.
-
-Opportunistically make the hardcoded APIC base pointer (eww) an unsigned
-long literal.
-
-Note, svm_test.finished() is invoked *before* svm_test.succeeded(), i.e.
-restoring x2APIC (if it was enabled) must be done in the "check" code.
+Expand the testcase that verifies KVM intercepts EOI for in-flight level-
+triggered interrupts across routing changes to test multiple interrupts,
+e.g. to ensure KVM isn't processing only the highest priority interrupt,
+and to test both in-service (ISR) and pending interrupts (IRR).
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/svm_npt.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ x86/ioapic.c | 52 ++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 46 insertions(+), 6 deletions(-)
 
-diff --git a/x86/svm_npt.c b/x86/svm_npt.c
-index b791f1ac..bd5e8f35 100644
---- a/x86/svm_npt.c
-+++ b/x86/svm_npt.c
-@@ -1,3 +1,4 @@
-+#include "apic.h"
- #include "svm.h"
- #include "vm.h"
- #include "alloc_page.h"
-@@ -134,8 +135,27 @@ static bool npt_rw_pfwalk_check(struct svm_test *test)
- 	    && (vmcb->control.exit_info_2 == read_cr3());
+diff --git a/x86/ioapic.c b/x86/ioapic.c
+index 7d3e37cc..e46eae2f 100644
+--- a/x86/ioapic.c
++++ b/x86/ioapic.c
+@@ -373,28 +373,58 @@ static void test_ioapic_level_retrigger_mask(void)
+ 	set_mask(0x0e, false);
  }
  
-+static bool was_x2apic;
-+
-+static void npt_apic_prepare(void)
-+{
-+	was_x2apic = is_x2apic_enabled();
-+
-+	if (was_x2apic)
-+		reset_apic();
-+}
-+
-+static void npt_apic_restore(void)
-+{
-+	if (was_x2apic)
-+		enable_x2apic();
-+
-+	was_x2apic = false;
-+}
-+
- static void npt_l1mmio_prepare(struct svm_test *test)
+-static volatile int g_isr_84;
++static volatile int g_isr_64, g_isr_84;
+ 
+-static void ioapic_isr_84(isr_regs_t *regs)
++static void ioapic_reconfigure_dest(int line)
  {
-+	npt_apic_prepare();
+-	int line = 0xe;
+ 	ioapic_redir_entry_t e;
+ 
+-	++g_isr_84;
+ 	set_irq_line(line, 0);
+ 
+ 	e = ioapic_read_redir(line);
++	report(e.remote_irr == 1, "Reconfigure Remote IRR set");
++
+ 	e.dest_id = 1;
+ 
+ 	// Update only upper part of the register because we only change the
+ 	// destination, which resides in the upper part
+ 	ioapic_write_reg(0x10 + line * 2 + 1, ((u32 *)&e)[1]);
++}
+ 
++static void ioapic_isr_64(isr_regs_t *regs)
++{
++	/*
++	 * Raise the IRQ line for the higher priority interrupt, *before*
++	 * reconfiguring the I/O APIC routing.  KVM should intercept EOI for
++	 * both the in-service vector (line 0xd, vector 0x64) and the requested
++	 * vector (line 0xe, vector 0x84).
++	 */
++	set_irq_line(0x0e, 1);
++
++	ioapic_reconfigure_dest(0xe);
++	ioapic_reconfigure_dest(0xd);
++	eoi();
++
++	++g_isr_64;
++}
++
++static void ioapic_isr_84(isr_regs_t *regs)
++{
++	report(g_isr_64, "Higher priority IRQ should be blocked until IRET restores RFLAGS.IF");
++
++	++g_isr_84;
+ 	eoi();
  }
  
- u32 nested_apic_version1;
-@@ -154,6 +174,9 @@ static bool npt_l1mmio_check(struct svm_test *test)
- 	volatile u32 *data = (volatile void *)(0xfee00030);
- 	u32 lvr = *data;
+ static void test_ioapic_self_reconfigure(void)
+ {
++	ioapic_redir_entry_t d = {
++		.vector = 0x64,
++		.delivery_mode = 0,
++		.dest_mode = 0,
++		.dest_id = 0,
++		.trig_mode = TRIGGER_LEVEL,
++	};
+ 	ioapic_redir_entry_t e = {
+ 		.vector = 0x84,
+ 		.delivery_mode = 0,
+@@ -403,11 +433,21 @@ static void test_ioapic_self_reconfigure(void)
+ 		.trig_mode = TRIGGER_LEVEL,
+ 	};
  
-+	/* Restore APIC state *after* reading LVR. */
-+	npt_apic_restore();
++	handle_irq(0x64, ioapic_isr_64);
++	ioapic_write_redir(0xd, d);
 +
- 	return nested_apic_version1 == lvr && nested_apic_version2 == lvr;
+ 	handle_irq(0x84, ioapic_isr_84);
+ 	ioapic_write_redir(0xe, e);
+-	set_irq_line(0x0e, 1);
++
++	set_irq_line(0x0d, 1);
++
+ 	e = ioapic_read_redir(0xe);
+-	report(g_isr_84 == 1 && e.remote_irr == 0, "Reconfigure self");
++	report(g_isr_84 == 1 && e.remote_irr == 0, "Reconfigure self highest priority");
++
++	d = ioapic_read_redir(0xd);
++	report(g_isr_64 == 1 && d.remote_irr == 0, "Reconfigure self lower priority");
++
++	poll_remote_irr(0xd);
+ 	poll_remote_irr(0xe);
  }
  
-@@ -162,6 +185,8 @@ static void npt_rw_l1mmio_prepare(struct svm_test *test)
- 
- 	u64 *pte;
- 
-+	npt_apic_prepare();
-+
- 	pte = npt_get_pte(0xfee00080);
- 
- 	*pte &= ~(1ULL << 1);
-@@ -180,6 +205,8 @@ static bool npt_rw_l1mmio_check(struct svm_test *test)
- 
- 	*pte |= (1ULL << 1);
- 
-+	npt_apic_restore();
-+
- 	return (vmcb->control.exit_code == SVM_EXIT_NPF)
- 	    && (vmcb->control.exit_info_1 == 0x100000007ULL);
- }
+
+base-commit: 68fee697b589b7eb7b82e8dd60155c5ccf054275
 -- 
 2.48.1.711.g2feabab25a-goog
 
