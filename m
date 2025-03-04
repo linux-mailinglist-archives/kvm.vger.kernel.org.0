@@ -1,115 +1,178 @@
-Return-Path: <kvm+bounces-40074-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40075-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 372A4A4EDEB
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 20:54:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CE3E4A4EE13
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 21:08:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 884AC1735FC
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 19:54:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8FB616F7DD
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 20:08:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22F2525F979;
-	Tue,  4 Mar 2025 19:54:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5B9B25F98D;
+	Tue,  4 Mar 2025 20:08:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="y3vm450d"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="a8fh9Etm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F15041FFC5F
-	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 19:53:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A06B1FA243;
+	Tue,  4 Mar 2025 20:08:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741118041; cv=none; b=K3mKHovbhxmZjgiCQhNAmj4kF1aXir2aFTpsPITgtQt7GsEqnfH7DCtiJPKTnLFDFHeYKKsQ45GDVwR0VJO2qxJpohXX9LHJobltirQggWi9VieTZdEes+Tz9pHxK9D+gbObAClgwyTMRfnIbnfIR1/WEq+JMrqg2Ervdx2LlIs=
+	t=1741118902; cv=none; b=ClHjlCuTlT4kqyqxiMVkROf8N9092MmJe0ACgz1XMfVH7DpvyDhFHjjSqqbdJKjIOWGdswmHJFHyYqPUlCRmNCXnVBhdD/XNU7Kket49rdyGNbI9RwRAl2KAQ0saDDQKuDdcxOKAzLizV9LqrwXFBcUxusKAXGqdrPVfLS+Zipg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741118041; c=relaxed/simple;
-	bh=h0QmsF5WjU8uUwJMDtkw5V/S9XuBsfrGQ8xVySEL8cg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gGGwkX1X8Y26KilKdRr2IePERzSY2HZuOgVKowFig0YtopF5mibN7yDyTA1slFiqpW7bLiZBIarDxUoEMp35T84iBqINpXfBYYqwLM1KCTrtuCyJzIL7VL9ZXu7BgS0bFaVs6orOltnFfBYQ1QPYRSAwQ1IkLkZtrnphOb7MbuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=y3vm450d; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2f816a85facso11472565a91.3
-        for <kvm@vger.kernel.org>; Tue, 04 Mar 2025 11:53:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741118039; x=1741722839; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FcX8s6TGQjn/ciNyOtVkHsyvdW8iKLLpE8U6tntEZos=;
-        b=y3vm450dWDHQJv0jDxz0YiC2xJ8SSdhIHBNjbGQlIn4Zf/G5k330KdRIARzT3kA+LO
-         DxwFErOXEltPNFjAttYipAKkA7d5kfEKFtU5fPxB8krnyUizvUv5wJF27toki3zJkz+b
-         NZifndeodY1TAQQqDTAYoZiq0quv2zgzmwbNvk8uxWT2IeGulK2l8NeQPvxOSeM85yX/
-         QFxMApcuvuY18/z5bRSTlJS50oDvjaZfdOYuxlv5GleEIFqfd72hyew/MX7P219yOkCO
-         tkiur2Mu0o9ILzUDqRco67769pvTcUnpOmT47gnyRacKyXOMZOusgpUcn6VAzuqVgcNp
-         Fgsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741118039; x=1741722839;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FcX8s6TGQjn/ciNyOtVkHsyvdW8iKLLpE8U6tntEZos=;
-        b=IY5qcLmsUU1EixZSQoxtOgOnAxWqJ+1C4f0xkp/glr7YUtxk3R08YfFBPMIATVnsBB
-         mFUScBbHCUYp8Y/wyTtKICiI4tGT+2wkGrkCVCFKtAAUVyNHVi/rnbzq0QrFm6PSOj+V
-         yCbRuJLJSH6ZWIuVn2qaaBe/n6tBCJwWiEQYYsTp4QSj8fMWkvc/kGo3KLwqy9MMNpUp
-         BBXcjY8abg/lptpdIKzmxgH/4PgHXTF9rZ+/zLv2w54y2DARMfxjnX3fpaDedSDhU1HX
-         NuAN3N0+Xob3ALVRYqEQeE5TWGRMUXu3nVABqJgbfXre2G0vqe8fS0Q62gXeJ/povKHf
-         JWwA==
-X-Forwarded-Encrypted: i=1; AJvYcCXN9/1YKxtzamNSqkNASqghxZY7Nmmb3YocbFx3VIYm11VmvzLlw4dP+C6GSKnEZzY1B9s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWBzWkF+X7NeQJw8/QajeCtTpuoizzh820rGSAPZdV8yIjWs3h
-	h2eQxQ1DO9U6o8uoKkY4CP/TaM+CfyZZGUT5rtL/s+A1VejA70H/94eI8c9I/4bPDsrkIokHIsu
-	IFQ==
-X-Google-Smtp-Source: AGHT+IHOGmjXt5qX0JwYqHXuRcMAyZDKrDodX6geowjqs/tfeTheYOjqw3n3RYRUFrP2O9PpebVhmR1sgYI=
-X-Received: from pjbsi3.prod.google.com ([2002:a17:90b:5283:b0:2fc:2e92:6cf])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3f06:b0:2f5:88bb:118
- with SMTP id 98e67ed59e1d1-2ff497eb7a6mr724027a91.22.1741118039359; Tue, 04
- Mar 2025 11:53:59 -0800 (PST)
-Date: Tue, 4 Mar 2025 11:53:57 -0800
-In-Reply-To: <42035a43-660c-4d38-9369-db824e271671@zytor.com>
+	s=arc-20240116; t=1741118902; c=relaxed/simple;
+	bh=N3wtJjVZHu5J62i7FEtx2ll9WoSXpNgDqVUXy1JDSZo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rqyOL4NGZabEYr/PQfLgTKRjAh2ZBJQNO7zRkd5Q9EYpWlXMNeqBxRUg3heyLmfkZQm/CKFAGit6cSH/FZFDF/ZOMitgaqMdDS/6XlBy1KnGxJYDKoaNEe4M1tnfik+x7EqPF7XKvdyLS9/LsWTX0rD+5c2vPqoPw5Ur8Puh2kY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=a8fh9Etm; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 524EBHXB021531;
+	Tue, 4 Mar 2025 20:08:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=3LoAL7M/RzbbQbnOUQ+MAjfHxxiz6tifN6gEL4s8h
+	aQ=; b=a8fh9EtmqY3PLnyxd5CJss6XvOtH/vXhAHaXaWVsvKl5TSFDR/J/9DmZB
+	bVJMgbYP3yeh8VpnLCqSH19HicXPWcvUt4iZt3dWfGxydSbB4sHEXfMLBk20ABNc
+	EouM7kWWQjo+STx00VUBIKNeQf0weNVxoOkAtslaZXNRx9wEr1SUaoLIc8arlcCe
+	xm879WKRFcpn5gADtanDWfrZ+hntCYOV+qwBGnrGLJ2vrWoHAjqVxfk3dfNxAbiR
+	cqInEEE2iM0d+He7dNb7svHKZIA+w5akbIb2VVjG+L7BO77ocAZywwwY9hXFwS+6
+	4B4+0eeRC/NgmiKj1VFg4Ka5rB/sQ==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 455sw7mk26-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Mar 2025 20:08:17 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 524J72s0013784;
+	Tue, 4 Mar 2025 20:08:14 GMT
+Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 454e2kq4uq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Mar 2025 20:08:14 +0000
+Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
+	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 524K8De130737010
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 4 Mar 2025 20:08:13 GMT
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 23BA558056;
+	Tue,  4 Mar 2025 20:08:13 +0000 (GMT)
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 764805805A;
+	Tue,  4 Mar 2025 20:08:12 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.12.79.204])
+	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  4 Mar 2025 20:08:12 +0000 (GMT)
+From: Rorie Reyes <rreyes@linux.ibm.com>
+To: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc: hca@linux.ibm.com, borntraeger@de.ibm.com, agordeev@linux.ibm.com,
+        gor@linux.ibm.com, pasic@linux.ibm.com, jjherne@linux.ibm.com,
+        alex.williamson@redhat.com, akrowiak@linux.ibm.com,
+        rreyes@linux.ibm.com
+Subject: [RFC PATCH v2] s390/vfio-ap: Notify userspace that guest's AP config changed when mdev removed
+Date: Tue,  4 Mar 2025 15:08:12 -0500
+Message-ID: <20250304200812.54556-1-rreyes@linux.ibm.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241126101710.62492-1-chao.gao@intel.com> <Z0WitW5iFdu6L5IV@intel.com>
- <Z4HI2EsPwezokhB0@google.com> <42035a43-660c-4d38-9369-db824e271671@zytor.com>
-Message-ID: <Z8daVRCZjNTxLATy@google.com>
-Subject: Re: [PATCH v2 0/6] Introduce CET supervisor state support
-From: Sean Christopherson <seanjc@google.com>
-To: Xin Li <xin@zytor.com>
-Cc: Chao Gao <chao.gao@intel.com>, Borislav Petkov <bp@alien8.de>, tglx@linutronix.de, 
-	dave.hansen@intel.com, x86@kernel.org, pbonzini@redhat.com, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, peterz@infradead.org, 
-	rick.p.edgecombe@intel.com, mlevitsk@redhat.com, weijiang.yang@intel.com, 
-	john.allen@amd.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Gf7uwwKhzr_LAleLkkU9y9wB1MGMrlKr
+X-Proofpoint-GUID: Gf7uwwKhzr_LAleLkkU9y9wB1MGMrlKr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-04_08,2025-03-04_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ phishscore=0 mlxlogscore=999 mlxscore=0 adultscore=0 bulkscore=0
+ malwarescore=0 lowpriorityscore=0 suspectscore=0 clxscore=1015 spamscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502100000 definitions=main-2503040160
 
-On Tue, Mar 04, 2025, Xin Li wrote:
-> On 1/10/2025 5:26 PM, Sean Christopherson wrote:
-> > On Tue, Nov 26, 2024, Chao Gao wrote:
-> > > On Tue, Nov 26, 2024 at 06:17:04PM +0800, Chao Gao wrote:
-> > > > This v2 is essentially a resend of the v1 series. I took over this work
-> > > >from Weijiang, so I added my Signed-off-by and incremented the version
-> > > > number. This repost is to seek more feedback on this work, which is a
-> > > > dependency for CET KVM support. In turn, CET KVM support is a dependency
-> > > > for both FRED KVM support and CET AMD support.
-> > > 
-> > > This series is primarily for the CET KVM series. Merging it through the tip
-> > > tree means this code will not have an actual user until the CET KVM series
-> > > is merged. A good proposal from Rick is that x86 maintainers can ack this
-> > > series, and then it can be picked up by the KVM maintainers along with the
-> > > CET KVM series. Dave, Paolo and Sean, are you okay with this approach?
-> > 
-> > Boris indicated off-list that he would prefer to take this through tip and give
-> > KVM an immutable branch.  I'm a-ok with either approach.
-> > 
-> 
-> Hi Sean and Boris,
-> 
-> At this point because KVM is the only user of this feature, would it
-> make more sense to take this patch set through KVM x86 tree?
+The guest's AP configuration is cleared when the mdev is removed, so
+userspace must be notified that the AP configuration has changed. To this
+end, this patch:
 
-Which tree it goes through is largely irrelevant, it needs explicit acceptance
-from the tip tree folks no matter what.
+* Removes call to 'signal_guest_ap_cfg_changed()' function from the
+  'vfio_ap_mdev_unset_kvm()' function because it has no affect given it is
+  called after the mdev fd is closed.
+
+* Adds call to 'signal_guest_ap_cfg_changed()' function to the
+  'vfio_ap_mdev_request()' function to notify userspace that the guest's
+  AP configuration has changed before signaling the request to remove the
+  mdev.
+
+Minor change - Fixed an indentation issue in function
+'signal_guest_ap_cfg_changed()'
+
+Fixes: 07d89045bffe ("s390/vfio-ap: Signal eventfd when guest AP configuration is changed")
+Signed-off-by: Rorie Reyes <rreyes@linux.ibm.com>
+---
+This patch is based on the s390/features branch
+
+V1 -> V2:
+- replaced get_update_locks_for_kvm() with get_update_locks_for_mdev
+- removed else statements that were unnecessary
+- Addressed review comments for commit messages/details
+---
+ drivers/s390/crypto/vfio_ap_ops.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+index 571f5dcb49c5..ae2bc5c1d445 100644
+--- a/drivers/s390/crypto/vfio_ap_ops.c
++++ b/drivers/s390/crypto/vfio_ap_ops.c
+@@ -652,8 +652,8 @@ static void vfio_ap_matrix_init(struct ap_config_info *info,
+ 
+ static void signal_guest_ap_cfg_changed(struct ap_matrix_mdev *matrix_mdev)
+ {
+-		if (matrix_mdev->cfg_chg_trigger)
+-			eventfd_signal(matrix_mdev->cfg_chg_trigger);
++	if (matrix_mdev->cfg_chg_trigger)
++		eventfd_signal(matrix_mdev->cfg_chg_trigger);
+ }
+ 
+ static void vfio_ap_mdev_update_guest_apcb(struct ap_matrix_mdev *matrix_mdev)
+@@ -1870,7 +1870,6 @@ static void vfio_ap_mdev_unset_kvm(struct ap_matrix_mdev *matrix_mdev)
+ 		get_update_locks_for_kvm(kvm);
+ 
+ 		kvm_arch_crypto_clear_masks(kvm);
+-		signal_guest_ap_cfg_changed(matrix_mdev);
+ 		vfio_ap_mdev_reset_queues(matrix_mdev);
+ 		kvm_put_kvm(kvm);
+ 		matrix_mdev->kvm = NULL;
+@@ -2057,6 +2056,13 @@ static void vfio_ap_mdev_request(struct vfio_device *vdev, unsigned int count)
+ 
+ 	matrix_mdev = container_of(vdev, struct ap_matrix_mdev, vdev);
+ 
++	get_update_locks_for_mdev(matrix_mdev);
++
++	if (matrix_mdev->kvm) {
++		kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
++		signal_guest_ap_cfg_changed(matrix_mdev);
++	}
++
+ 	if (matrix_mdev->req_trigger) {
+ 		if (!(count % 10))
+ 			dev_notice_ratelimited(dev,
+@@ -2068,6 +2074,9 @@ static void vfio_ap_mdev_request(struct vfio_device *vdev, unsigned int count)
+ 		dev_notice(dev,
+ 			   "No device request registered, blocked until released by user\n");
+ 	}
++
++	release_update_locks_for_mdev(matrix_mdev);
++
+ }
+ 
+ static int vfio_ap_mdev_get_device_info(unsigned long arg)
+-- 
+2.48.1
+
 
