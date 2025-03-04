@@ -1,128 +1,161 @@
-Return-Path: <kvm+bounces-40032-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40033-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38906A4E0FD
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 15:33:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36DC8A4E102
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 15:34:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2D363A432C
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 14:25:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6A141889D27
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 14:29:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A26B7208970;
-	Tue,  4 Mar 2025 14:24:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2AB620A5F5;
+	Tue,  4 Mar 2025 14:27:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WDMJUclK"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RjblS/yI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB8D2080F4
-	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 14:24:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6559920551D;
+	Tue,  4 Mar 2025 14:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741098248; cv=none; b=eCNfsEbhHROO89mNUPFfmBbUM+ky1z82abGQYxnls1rfjl5DeJRZk6Xccy0cxw2EVWudXdXHmKJZnr6thB1bln+unEZpZQLTXc56bmR3jCyfR8RlSg7jTrFmgyj+S90Z5k3R4aCitAEsTN0ThO/WneQ0DrLcPR9ajajtdKrjoeg=
+	t=1741098461; cv=none; b=RU/fZlvpxPfRwxnAGJvXGFRVpzYsVgzQFX+N4rjNdnqBVXru7Zb2+WxVe0ETrM5p/iksnUMYpSzWK6zTH7oaLDFXnwUdJZY7SVuXJlw+APUqxyLuFmDQv1FFrcLaf5hRWONKI9XI6hB+5rLfXext0O4bpw72SRPbjSHeLJqRSy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741098248; c=relaxed/simple;
-	bh=9Bl9KwN0gqToxnWw3xRARnhDd5Ny5Hr/yDwL7Fo49yo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hsci1y0zNZAeaQQ/r9JeY3pSXo+KSBNncRfTzJxios+EiiHF7//efJdiaIXRwS9Yruocn0LxfeUctmOryw4353i47i/nGEr3GDmvgMCq0yLlLqfFsGcjWeTiLKVaOcN7rsjNS7XVC6/mEaex0MsIepxEbFIB8E8HN6iAhrH94f0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WDMJUclK; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fec1f46678so13017121a91.1
-        for <kvm@vger.kernel.org>; Tue, 04 Mar 2025 06:24:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741098247; x=1741703047; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=U0bJtWO/zgI2jPul9efwN4/8kC8XZP1YPShn0ZzQqIY=;
-        b=WDMJUclKq45kt3hPwuLAd1qIRAaWNrKMPirGfZb9Y//YZeBBO+GaAn6QZIYZJ4vV1/
-         GcnHl/pvY7p4m51Po0u36wTkApihcVF3dADWrDVQMRDi9Ajff+UGOvfvO7XL6OOIzNN7
-         BUzSHxWDJGW5xTiKKz3GMA9tiYYL+fTx2bEJC1E/96UMEwnpZSY/wsfxysX+PYnGyVlk
-         M+Vc9QmetS1Cwm/RLvwUsDoUW2XXDmqZcq4qKTTa5/DONO328PeMBJoaHxtmUCpQwCpo
-         UIxlUcakLx5pgcQZlfApPFqMifJq/sBeBNbqED29MloHNH3roo44xk3cWu1C6x79uIpa
-         1LZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741098247; x=1741703047;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=U0bJtWO/zgI2jPul9efwN4/8kC8XZP1YPShn0ZzQqIY=;
-        b=P3sEuhELlV+mbcG0pTnwT9Ra0o1eaWILRkspe6JLH64owASY3ZHqy/bUA73qBQom3G
-         ZdW3/b74Fm//rHlzmPCLOC067gkY/zZ3LS0Mxx539o0n4Y9PkiFIsogr0dRdJAvyCXND
-         j/4ob1kvTS0tZ/e00R2B0WfDceiz3a0ODJHVTsAnZ7kbO5HEMAWSi6DMyK3oxxAG7ydh
-         0JWu7j5nMzlQRYc8qnmvZOa2q80v/qWvkRIaZzVkzlJuEIg8JMhiI1IcVOCPAx3RsFUU
-         HCJR8dUMXG8m58UjScIYAHT11e+XpCblgzHhNOTubme01HEI7eyV+TiWjKIIC5vH0OAM
-         5q6g==
-X-Gm-Message-State: AOJu0Ywm5yvtbw1lj00ClsWa3v+frpxsPc7cVyYxqw/PNoEferN3ss4V
-	o2M/5cpcVwYVole9Qq6Fyzoz5QNag0AnpUG5yZsauMyfkVJUmr/Ss3p9NtMOndvdasWZLTW6XHF
-	3nw==
-X-Google-Smtp-Source: AGHT+IGL3TvS3xJpuQuBmUEPAOK05SjuoCnEI7eL2mdXhB6ZVp9f2QmZKZ+Ad458Pw2V2VPF2vgblI0mNPs=
-X-Received: from pjbsj5.prod.google.com ([2002:a17:90b:2d85:b0:2f9:c349:2f84])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:e7c6:b0:2ee:53b3:3f1c
- with SMTP id 98e67ed59e1d1-2febab2ed89mr25640807a91.5.1741098246542; Tue, 04
- Mar 2025 06:24:06 -0800 (PST)
-Date: Tue, 4 Mar 2025 06:24:05 -0800
-In-Reply-To: <87ikoposs6.fsf@redhat.com>
+	s=arc-20240116; t=1741098461; c=relaxed/simple;
+	bh=jL5unq9yErEo8MFJrjl8ofEg7uYG5FNHf00uFXTXyHc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ze6Z64pTZ/kSocC7c2aDDfg4XuydraPbpOCKxNkWav/AwUk16+/cObygQk4/xqBvVg1HNGsjwpqb6JZ0tRznmjbPuQAlKkytJq44FRD2iYnhg8v7ImIx707RMR9h01/LrVctRCEGT9AFvkNVKc8TMZaHekgkozRuZERRGgawmwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=RjblS/yI; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 524805xg026836;
+	Tue, 4 Mar 2025 14:27:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=HOWPQU
+	NX7QomlPJQKK7TEaNAXDXHwcCY1bXmJ0RpVcg=; b=RjblS/yIsGZsrKlYx2X6uZ
+	wuo566+ilsX2qS1l84R9Ylptesikhuz6rieBZZoK/+wTBpYp+QRc8yA8ZMS3743s
+	ACEx6ASrGHTICgdMy9aDH+dtPvYfZVQP5MKNN/k0bprcOsAc4qRtHZXINKFu/TVh
+	vfDVSTymzhnX5rQYS1jCTduNJON0AmZegVDSGSO1GDWmwsE4sSEFLwyqwz+fmAX6
+	URycRK+STrocHnGk5w3UQZSbuj52pKzplCNd8eRdRsEDILjnuCZwaT/iCnFc7GAH
+	dWT7uTrPyoK4PiSyoRRMmtL7fqE8axkIM4zN0pmz5eS67MXttIictxB+boSM/kNw
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 455kkpcbqq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Mar 2025 14:27:35 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 524AkF7L032216;
+	Tue, 4 Mar 2025 14:27:08 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 454cjsx0ga-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Mar 2025 14:27:08 +0000
+Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 524ER6RF16843458
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 4 Mar 2025 14:27:06 GMT
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 73C9E58052;
+	Tue,  4 Mar 2025 14:27:06 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 79BBD58056;
+	Tue,  4 Mar 2025 14:27:05 +0000 (GMT)
+Received: from [9.61.107.75] (unknown [9.61.107.75])
+	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  4 Mar 2025 14:27:05 +0000 (GMT)
+Message-ID: <d5308330-23f3-4f55-836c-0c6e884587b0@linux.ibm.com>
+Date: Tue, 4 Mar 2025 09:27:05 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <Z8ZBzEJ7--VWKdWd@google.com> <87ikoposs6.fsf@redhat.com>
-Message-ID: <Z8cNBTgz3YBDga3c@google.com>
-Subject: Re: QEMU's Hyper-V HV_X64_MSR_EOM is broken with split IRQCHIP
-From: Sean Christopherson <seanjc@google.com>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>, 
-	"Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1] fixup! s390/vfio-ap: Notify userspace that guest's
+ AP config changed when mdev removed
+To: Rorie Reyes <rreyes@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc: hca@linux.ibm.com, borntraeger@de.ibm.com, agordeev@linux.ibm.com,
+        gor@linux.ibm.com, pasic@linux.ibm.com, jjherne@linux.ibm.com,
+        alex.williamson@redhat.com
+References: <20250303191158.49317-1-rreyes@linux.ibm.com>
+ <4bf76371-43ea-4c1a-8a7f-500b0b0195b6@linux.ibm.com>
+ <d8b34b34-1776-4bd9-bbde-8fe508166dfd@linux.ibm.com>
+Content-Language: en-US
+From: Anthony Krowiak <akrowiak@linux.ibm.com>
+In-Reply-To: <d8b34b34-1776-4bd9-bbde-8fe508166dfd@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: cWjAk7cCCobmfzFEcUtTtrQT-2HAvflo
+X-Proofpoint-ORIG-GUID: cWjAk7cCCobmfzFEcUtTtrQT-2HAvflo
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-04_06,2025-03-03_04,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1015
+ malwarescore=0 adultscore=0 impostorscore=0 bulkscore=0 mlxlogscore=999
+ phishscore=0 spamscore=0 priorityscore=1501 mlxscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2502100000
+ definitions=main-2503040118
 
-On Tue, Mar 04, 2025, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> 
-> > FYI, QEMU's Hyper-V emulation of HV_X64_MSR_EOM has been broken since QEMU commit
-> > c82d9d43ed ("KVM: Kick resamplefd for split kernel irqchip"), as nothing in KVM
-> > will forward the EOM notification to userspace.  I have no idea if anything in
-> > QEMU besides hyperv_testdev.c cares.
-> 
-> The only VMBus device in QEMU besides the testdev seems to be Hyper-V
-> ballooning driver, Cc: Maciej to check whether it's a real problem for
-> it or not.
-> 
-> >
-> > The bug is reproducible by running the hyperv_connections KVM-Unit-Test with a
-> > split IRQCHIP.
-> 
-> Thanks, I can reproduce the problem too.
-> 
-> >
-> > Hacking QEMU and KVM (see KVM commit 654f1f13ea56 ("kvm: Check irqchip mode before
-> > assign irqfd") as below gets the test to pass.  Assuming that's not a palatable
-> > solution, the other options I can think of would be for QEMU to intercept
-> > HV_X64_MSR_EOM when using a split IRQCHIP, or to modify KVM to do KVM_EXIT_HYPERV_SYNIC
-> > on writes to HV_X64_MSR_EOM with a split IRQCHIP.
-> 
-> AFAIR, Hyper-V message interface is a fairly generic communication
-> mechanism which in theory can be used without interrupts at all: the
-> corresponding SINT can be masked and the guest can be polling for
-> messages, proccessing them and then writing to HV_X64_MSR_EOM to trigger
-> delivery on the next queued message. To support this scenario on the
-> backend, we need to receive HV_X64_MSR_EOM writes regardless of whether
-> irqchip is split or not. (In theory, we can get away without this by
-> just checking if pending messages can be delivered upon each vCPU entry
-> but this can take an undefined amount of time in some scenarios so I
-> guess we're better off with notifications).
 
-Before c82d9d43ed ("KVM: Kick resamplefd for split kernel irqchip"), and without
-a split IRCHIP, QEMU gets notified via eventfd.  On writes to HV_X64_MSR_EOM, KVM
-invokes irq_acked(), i.e. irqfd_resampler_ack(), for all SINT routes.  The eventfd
-signal gets back to sint_ack_handler(), which invokes msg_retry() to re-post the
-message.
 
-I.e. trapping HV_X64_MSR_EOM on would be a slow path relative to what's there for
-in-kernel IRQCHIP.
+
+On 3/4/25 9:18 AM, Rorie Reyes wrote:
+>
+>
+> On 3/4/25 8:36 AM, Anthony Krowiak wrote:
+>>>     static void vfio_ap_mdev_update_guest_apcb(struct ap_matrix_mdev 
+>>> *matrix_mdev)
+>>> @@ -1870,7 +1870,6 @@ static void vfio_ap_mdev_unset_kvm(struct 
+>>> ap_matrix_mdev *matrix_mdev)
+>>>           get_update_locks_for_kvm(kvm);
+>>>             kvm_arch_crypto_clear_masks(kvm);
+>>> -        signal_guest_ap_cfg_changed(matrix_mdev);
+>>>           vfio_ap_mdev_reset_queues(matrix_mdev);
+>>>           kvm_put_kvm(kvm);
+>>>           matrix_mdev->kvm = NULL;
+>>> @@ -2057,6 +2056,14 @@ static void vfio_ap_mdev_request(struct 
+>>> vfio_device *vdev, unsigned int count)
+>>>         matrix_mdev = container_of(vdev, struct ap_matrix_mdev, vdev);
+>>>   +    if (matrix_mdev->kvm) {
+>>> +        get_update_locks_for_kvm(matrix_mdev->kvm);
+>>
+>> I know we talked about this prior to submission of this patch, but 
+>> looking at this again I think
+>> you should use the get_update_locks_for_mdev() function for two reasons:
+>>
+>> 1. It is safer because it will take the matrix_dev->guests_lock which 
+>> will prevent the matrix_mdev->kvm
+>>     field from changing before you check it
+>>
+> So I'll replace *get_update_locks_for_kvm(matrix_mdev->kvm)* with 
+> *get_update_locks_for_mdev(&matrix_dev->guests_lock)*
+
+See code below:get_update_locks_for_mdev(matrix_mdev)
+That function will take the guests_lock
+
+>> 2. I will eliminate the need for the else
+>>
+>> get_update_locks_for_mdev(matrix_mdev)
+>> if (matrix_mdev->kvm) {
+>>     clear the masks
+>>     signal guest config changed
+>> }
+>> ...
+>> release_update_locks_for_mdev(matrix_mdev); Sorry about not seeing 
+>> this before you posted this patch.
+>>> + kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
+>>> +        signal_guest_ap_cfg_changed(matrix_mdev);
+>>> +    } else {
+>>> +        mutex_lock(&matrix_dev->mdevs_lock);
+>>> +    }
+> So remove the else statement that contains the mutex function
+
 
