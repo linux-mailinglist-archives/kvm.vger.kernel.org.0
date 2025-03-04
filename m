@@ -1,433 +1,336 @@
-Return-Path: <kvm+bounces-39959-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39960-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14941A4D281
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 05:19:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EE6FA4D28D
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 05:24:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8BDC3AE111
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 04:18:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 240AF188932A
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 04:24:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10F661F417C;
-	Tue,  4 Mar 2025 04:18:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 484401EB5E9;
+	Tue,  4 Mar 2025 04:23:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="LdBnSerG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DA+46ioD"
 X-Original-To: kvm@vger.kernel.org
-Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazolkn19010008.outbound.protection.outlook.com [52.103.11.8])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 185471F1506;
-	Tue,  4 Mar 2025 04:18:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.11.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A13137160;
+	Tue,  4 Mar 2025 04:23:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741061888; cv=fail; b=WXWubeKZhhgvasZdNpbWKfOhi0/C4V8cUnkNDb61QL2BHI/RDg4DJVqp6BnNlq5kTVF6zcQJqZ8w9c5Deert3A0NQsST/slXy4cf/RMsbodW00gjO+pezkNlon6JiMHomZzcyQJ5jgVZRskiGEzXauHn30E3Nu+vwUlsKWPFnOY=
+	t=1741062225; cv=fail; b=EEGOx/Pl7uuvexco6l71Jpw2WxAQa/lvANZn0n4WryAu/5TX1J/1p3HjwoNq2Dvb/PnW3blp1Up79p3nv6uC8MwaZRcdKwARcEZ77jcIF+uj59AaA7mEGAKSZfNz5NpJdKUEjcAg3zuGnY/axqwdwn3IqXKa0LfI125Kx1iX/Hs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741061888; c=relaxed/simple;
-	bh=IkkmSezgeILSPBcM54KK1wnSLQHc3oI+QFbJZiVoQF0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=CU/UFI3WsgfIS6HewRRMDqEhNX78L2LXxUGsHG5mDz0h3qRGkO+JpcS679y0z+Lro+Y8Sx704RjpME5y72K8xQ9hdojgWFb8mROjtacPoTO4qz3U8Gryxy3jWf2L+bmfc+PPxjT2GH1Fhronr1zl8qP6MfGISSMGpK9cQK08NJ0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=LdBnSerG; arc=fail smtp.client-ip=52.103.11.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+	s=arc-20240116; t=1741062225; c=relaxed/simple;
+	bh=//TOIqrj3yg2mvCOodkVOCkj4CE3cRbXyPTvAYUR36o=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=bXPsgHojaCvtPp3NzXoWhTUK2IOYtIxRUk0tY1ixyQZjrtO05rbxR9mztsz1ZTE0zyBnnO9FWQM7jdimrIETbVL9hwkGD6B0I6iqwkMa4qoVS9Y9I01wLqN1tkq58zTcM/KFIaG+cgR7rwUfhU4vvE4EL/T+X4rU1VFvR/Vrdtw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DA+46ioD; arc=fail smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741062223; x=1772598223;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=//TOIqrj3yg2mvCOodkVOCkj4CE3cRbXyPTvAYUR36o=;
+  b=DA+46ioDaDABzpqJmBFB2da4scwWi3MFfln2hRfh7diaV5aadlk94l3f
+   x1RiZcEUFCHsodkCXSsFe6S97HXgsQMoyJOjf0eiUXTpyY0pcJD0ZMtjp
+   3A9nhQH/Dw/farurU61zHWaj6LPEJZ1jbTmdIL1hc/mhtXNsOrbLNHL1C
+   knZshfwr3UDaHtwlYX5DvUtWXWqHlFg/qaST5aWDRQ8ux3oZnC+xXKDH9
+   GAvGDNFFFsG1DuaGFb8HFFcHmE9Dlkjpsw9PhvHmQPneD0OA/NGKch2U2
+   LXp6gSEikXBNh+/zOnxTvSSrgWpCSMpOjZ4EiGIGSTJheTVEZ4DuYnZYo
+   A==;
+X-CSE-ConnectionGUID: B89qAhF/TrOlps4e5jxEyg==
+X-CSE-MsgGUID: f0JfjowHRgO74x7hL6/+Tw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11362"; a="45736730"
+X-IronPort-AV: E=Sophos;i="6.13,331,1732608000"; 
+   d="scan'208";a="45736730"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 20:23:43 -0800
+X-CSE-ConnectionGUID: wbSpolUsSW+L9mLD+1OxwA==
+X-CSE-MsgGUID: cZG1f6huQuW2U30DgLMJdQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,331,1732608000"; 
+   d="scan'208";a="118940220"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 20:23:42 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Mon, 3 Mar 2025 20:23:41 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Mon, 3 Mar 2025 20:23:41 -0800
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.44) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Mon, 3 Mar 2025 20:23:40 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=orVnHf5358RlPzpciPc248b9H0WkSTeB3BEkOneHB0/pxy3AuNfEPIuA523jIMn2dUARW2UbQFAtzuQN135sGhxYgVMa2mRYAGBa217xxCPIFFbJ6R+SacH0tVAmPgOKka1I7+hcypIza/VznLjB+ojcLoCUSopdv++JrmEz+JK8ZZ16g8ZcZL8oddVBXpM+Hp/+noH67NOfBaqE/dUhha7k0DJYakp9XKTqyT5O3M6sARYwLM7t/Tk0CwFUPo/VdKVv8MNS5IUXF/xGExAM1FmsWcmzFSlzxLZ9yLkj3FRLLjUY6Xh0fm+BHYh3lfY9znb0ERniHR1K6sxkKr4uVw==
+ b=Me5695C7j6ykfZEEttiCfOp4F13vGg/EyH7exztvOGDfzykG7Gn+2Xl1lf9M9FzybZp53AvYg+xpJrjsTOHoo7ohKjp37VvRkYyffX8y7G/ZTsjuZqoywXBvhSIDboj9hFzPv2oklnJDdPJeGW5cTFAwX8LnKYY8ImXRkiCUkt/sEzS7XNYMprc4T7cS+f/fu9ZViwYhWq6w+kceZ4VknrWDVQArc0vqH9yOZX3NEBWp4iH0hXMRgK/+FKyzdWqc7luW+ji0IINWcTYIas4D0BsCFwmOEoBvlXnimvwBGwSO1DGJq2rY53Z3Avce/a9Mmy3Gfk3jj8NLuJEK3VgmCQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PzEySjbbc6HrK6FD5TMJLnk9DO7HVtEDsRMFDyTDn50=;
- b=u15diXRI/9xytJKOxhb82TsfGXofaVPRBTTU46dXkb+im5pw+A7Foikt+j8jmp3Z8ehhxSKCLhSX+w0CT1aE2kQWkmcuVK77uuSc5ZtF/NtVo7BYPppI03DYthuEVNuteP3CNni7YqNZYW4xHbhzPSFIXD0UgZuAd5xenPm+xWTjY+VkJ0IuE384VgvKXfr8V+G41YVob7FoSch30y8umsvPvvggjDI/bOsR3GyYgSEUTjvntK932tBcel2ycKHErinkQw7Z6f4es5bAnHzkrDt/Rot0MmpxwIKphOSrqY29vppkyErmwBtKokfziqahKU8c+rwiRVgAaLDeTZAvUQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PzEySjbbc6HrK6FD5TMJLnk9DO7HVtEDsRMFDyTDn50=;
- b=LdBnSerGOEIofsQi5ZalLjBKi0g1NV9utelD1zrZU17IkQ5YPIc8A3eGmtl6/XLP6SUAqOdUEwB69LKR+MSfw11TeHEeKiOamq+D/oW2TtozaZCP+ZZjh6FKJSM5TCXj3UdzVCjVmFluoxZA9+hBziektD1ZqHqviC5FH82l2zwOYoSmqSNDIrCGndOHfLIN+DMkL4m0aiBRw+oKqGqJkc93TjSXxXOcNKy9iop7GvIFEokeJXs+Qx1cfKLVFiP/ntVJ8WZ5GQKDaZ8ee6mO8q/bd+3zrIGbjmkDx94SacyQnL+Z/8fEKj4wTb9QHjCTUVASb3+kUPRrhhNFZ0Qjng==
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com (2603:10b6:805:33::23)
- by PH8PR02MB10184.namprd02.prod.outlook.com (2603:10b6:510:224::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.26; Tue, 4 Mar
- 2025 04:18:02 +0000
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::cedd:1e64:8f61:b9df]) by SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::cedd:1e64:8f61:b9df%3]) with mapi id 15.20.8489.025; Tue, 4 Mar 2025
- 04:18:02 +0000
-From: Michael Kelley <mhklinux@outlook.com>
-To: Sean Christopherson <seanjc@google.com>, Thomas Gleixner
-	<tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
-	<bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, "x86@kernel.org"
-	<x86@kernel.org>, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Juergen Gross <jgross@suse.com>, "K. Y.
- Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei
- Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, Ajay Kaher
-	<ajay.kaher@broadcom.com>, Jan Kiszka <jan.kiszka@siemens.com>, Andy
- Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Daniel
- Lezcano <daniel.lezcano@linaro.org>, John Stultz <jstultz@google.com>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "virtualization@lists.linux.dev"
-	<virtualization@lists.linux.dev>, "linux-hyperv@vger.kernel.org"
-	<linux-hyperv@vger.kernel.org>, "xen-devel@lists.xenproject.org"
-	<xen-devel@lists.xenproject.org>, Tom Lendacky <thomas.lendacky@amd.com>,
-	Nikunj A Dadhania <nikunj@amd.com>
-Subject: RE: [PATCH v2 31/38] x86/tsc: Pass KNOWN_FREQ and RELIABLE as params
- to registration
-Thread-Topic: [PATCH v2 31/38] x86/tsc: Pass KNOWN_FREQ and RELIABLE as params
- to registration
-Thread-Index: AQHbiL/SUCd7zgLAtUGlvGS/sV/Q7LNiY70g
-Date: Tue, 4 Mar 2025 04:18:02 +0000
-Message-ID:
- <SN6PR02MB4157CBC183775A8C17AC590BD4C82@SN6PR02MB4157.namprd02.prod.outlook.com>
-References: <20250227021855.3257188-1-seanjc@google.com>
- <20250227021855.3257188-32-seanjc@google.com>
-In-Reply-To: <20250227021855.3257188-32-seanjc@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN6PR02MB4157:EE_|PH8PR02MB10184:EE_
-x-ms-office365-filtering-correlation-id: 3e7219cf-5274-41d6-6e0c-08dd5ad38e06
-x-microsoft-antispam:
- BCL:0;ARA:14566002|19110799003|8060799006|15080799006|461199028|8062599003|41001999003|12091999003|19061999003|102099032|3412199025|440099028;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?IOdnMuGdXWduI0tAKQdceZLZVWr+sgMp6SFApUZhwYYIBNLL3D+COyOcRyL+?=
- =?us-ascii?Q?obmgaXsF4INm4wdD/k0o+JEnuLOYWMzN3i2sDvrjGH+IAEY9+e0/CoQNMtgW?=
- =?us-ascii?Q?hGkomfxS05uCMShiIA7lTUjgIeMvToEGVcdoNTfd0bXxs0tqmx0ytUiz3GW2?=
- =?us-ascii?Q?AWZgjg/y5NopYkWd8cIph+5AlI4oSNPRFG3WANj/yE4pSw+R8EMhYWitaf6D?=
- =?us-ascii?Q?/mncv87szT4BE1dvh4zqaeO2SQriZrlYJ+f9/WVU9+HVn1aaQ9LBQvvhA7E8?=
- =?us-ascii?Q?8FZqK05CrExpwo4F+kbKIfKySnX/UY0URbC9iJjpvcnkbFPbIqyur5mGopKn?=
- =?us-ascii?Q?937+bXn9posbQh6e/7vUWB+igToCXLWBgDejYoRgrTc0SnpCLkgyRRlEkxZ7?=
- =?us-ascii?Q?JU5CUYZ2SE+rFmXdsEUvT2n9/TT2UNEnu+5amKeaeb6VFqTyt4PLrWld4mlw?=
- =?us-ascii?Q?66JMAxzf2U2lFD7UZIKpdGMIVFOF3CCRPxd9Gmq42gdbwRijailo8F5wXfzH?=
- =?us-ascii?Q?5u2jU/Wx0Mt+x/S/Z+zhD7wVI4FVuHCERhL7SXYNBmJ1wp3XaGOncaXNbyDV?=
- =?us-ascii?Q?uD69HcRfku6DzAerY2kvKFUCTv4/9bF+Hd8+nmMs1BQeKRBMSR4CpjEzDP0i?=
- =?us-ascii?Q?Ks4kqRzrDvGK4uK2dmikncHWKLRayqzvRtfKBrJ2c42P61I/K1DK5DU1yFIL?=
- =?us-ascii?Q?XJGHtiOnXuxvm5CyXrXRvkAj1Ek2Jh5/G7ftjD8b2GiLK7IRUHjYjvXn2jbd?=
- =?us-ascii?Q?Pd41kZqZBix5gLry9tUrpZBeFlPNMnOIlKWGR8t/J3seL20epooVHnphJnK+?=
- =?us-ascii?Q?ANJEo75xljvmv41yM4AVUkMtjCNJqpzo3BEgybp4mawmQCWgZ79AgwSdhAQC?=
- =?us-ascii?Q?c5SEJM45vYBdrz2HQ/oHZUmqpsA4eVPjUBOKVBr9jAHRf9hGHzqvjKm32mwk?=
- =?us-ascii?Q?tiXSHsRNSczkUZy0T7ClIxi/VgGEe74CSqWzBRVLdjsaCabZMQqhI35OyJ5z?=
- =?us-ascii?Q?qJ4Lwgzy5H/EIJOXzlgzjen0yeX7fY84kHdNuF1HSQLp/529p/q8KbBp9gld?=
- =?us-ascii?Q?EynBE9FiU96zxRw37/NLCr+nYhfGReUcnOKFKGrrhPzTfYUN96jHaoViQXg3?=
- =?us-ascii?Q?CLUQBAr+0crLOyEUvD/5c3Lt40jfaqYOrQ=3D=3D?=
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?zPrKRhgt1MKbwuiKcsdppWeBkUR/b76XxVLIeALE6pSVq58uE4HbRBsTjAWP?=
- =?us-ascii?Q?3+hsu86ZFOAZmtK5wIbXh7mJmVtm4srt0Y1vmuMd5NXEMEauBrER2YJFebf2?=
- =?us-ascii?Q?PxPox0wzHJCtmr3fQribryXkmrW32w93Daq61YQ1On04U+xp7GmoUrz1Yy4d?=
- =?us-ascii?Q?2MZsVvGXmkSo6C1uxs/V/C51BrnOYaIWNpcUZUFH4j9Xk4ljypVN5UEYp9GN?=
- =?us-ascii?Q?KLxVVzRm+JwVCSburM/1ZTAjmrsHyss17ZZYrVX+vycfEElB4z6RtD8UwFQU?=
- =?us-ascii?Q?11nh7vo/LnMiNmziv29U1Nchz6dyLkkuqxkOrZMmYllqkFQTWfqUKuzNr9Gv?=
- =?us-ascii?Q?0hmMurKAoo04re9hyiQ9Yy8e2UxntXH9DM0ihIKRgGPhZRnQO3zDECGlSKla?=
- =?us-ascii?Q?oiPgUXsV5f5UoM3syZKyTEojldwvmGArwtmyqCiOD4Am1dWtTe7Qm2MyGVl3?=
- =?us-ascii?Q?qQtBJ3k6/wVdVlpNlLTY3OvXaeXD2q8NFwC59UcbDcGB+9jokjqjyyzvKB5b?=
- =?us-ascii?Q?47dgdrHQxquIONA1p/4hUJ+A1xXAyzbAXq38GB+irQ4QljKBhDuyryC2281J?=
- =?us-ascii?Q?EdLGHiSjKnoorokjWNHXhfgqA2kbS5B5mKQCCsi+nCo+2wJpo88bvxHvi+zH?=
- =?us-ascii?Q?GyPG2nWxqBBQ2/Mb3TZBh+lVrcetJy/DDCB8piHVzyalhPCC+Y0E7iRICJsR?=
- =?us-ascii?Q?oNM1WAmfMx4u/sh/Hl/s3ql88tOfw9kn1Z2ttx9fhpW7HYCD+Jw356YmWP9F?=
- =?us-ascii?Q?bhVzcUpOphE+C09XOcABoEqLoL8yDdh4Y0gHo1y/6zpJGJHZtlUDxO+g9cSY?=
- =?us-ascii?Q?12aChDvOHVWEBShzqMaRClcaviiQ1NHXVW1Fp5Q1ux1hgg6rCQHtgsmZAUjQ?=
- =?us-ascii?Q?rQPui8KamL9EB/WPX1LQRT+KEKINp3yPrpNPsQR2c7hofip23BfUcsDgPNaY?=
- =?us-ascii?Q?u+bpKhK5bsYtMhG5IhvXOeQj0mfySwiF0Faz0F6Mmb8dvlUaFAiSM76gqGS/?=
- =?us-ascii?Q?A/IufiOLyM01Sr2/R/TUnfWW0fgNzn5/LLYEDDX0PWgbHl9F4FmRHnK6GX0W?=
- =?us-ascii?Q?CHflUSYO5Wz8qi/4+T95eiG9MPjenE0awDkn7GlN8saqWqaeMJMRjb6dlCKi?=
- =?us-ascii?Q?CnalEIKl06jEE9xvzn30ozgkQ9Zee1GJTkCblTfO7Ng9pTVkSuVx64iU0huk?=
- =?us-ascii?Q?JJx0olGMiUZrHMnu+i39cQPzyHhSr1Vrp/547dL50GeDDQ6lKmm4KJLAjGk?=
- =?us-ascii?Q?=3D?=
+ bh=Vw17quOZdHqg31VIWrvN9diQX19qHfSJta7gPVfmNnw=;
+ b=c28y1kO0FcyuD70XRC/fRCGgJf9kDEIkSKf9fqJqr1F1ZiXI90ik1LgyHgiMT+d30AqrVFLDh3+GrbcFIm+CeBxc66zUOR2jyq2DeVfkNlvTcQFgjrlO2nMaXMj5sPMuldh/yKejWp7hCFODfDlk18QsfKYhWj43AIxmb3aH2vzbhd4SbrAAHrA0FiC+nGLEJSCLwQ5CU91o/l5m96t22tz5vJJoFNpyQU16ayjqFHH7VxUbyMU37z//YOFvm40Nfg5NwHnLtXE8KQd6tbkgAyEmlg1u0m+sJsYEY7VJIj5OR3AxoRXXktbmDj/9Z+ToqIntMVQW41OCurI5LRvIJw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ PH7PR11MB7570.namprd11.prod.outlook.com (2603:10b6:510:27a::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8489.29; Tue, 4 Mar 2025 04:23:11 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca%4]) with mapi id 15.20.8489.025; Tue, 4 Mar 2025
+ 04:23:10 +0000
+Date: Tue, 4 Mar 2025 12:21:49 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, <seanjc@google.com>
+Subject: Re: [PATCH 2/4] KVM: x86: Introduce supported_quirks to block
+ disabling quirks
+Message-ID: <Z8Z/3dxtpbjpCJPI@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20250301073428.2435768-1-pbonzini@redhat.com>
+ <20250301073428.2435768-3-pbonzini@redhat.com>
+ <Z8UEmKhnP9w1qII9@yzhao56-desk.sh.intel.com>
+ <4a2d487b-aabd-4854-a8df-214423b8c390@redhat.com>
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+In-Reply-To: <4a2d487b-aabd-4854-a8df-214423b8c390@redhat.com>
+X-ClientProxiedBy: SG2PR01CA0187.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:189::12) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|PH7PR11MB7570:EE_
+X-MS-Office365-Filtering-Correlation-Id: ba574766-d1b7-42b9-9e4e-08dd5ad445a8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?ZqjtPVZ5e370FIBz7omEflPV8Rswm7inCXmqCRW0lNGxHkU9SgsY+CC9jmJr?=
+ =?us-ascii?Q?0CQZGKs8dXQljNBdWFXS8zzm7hP7+R2haHmE7OVmuftg5Unhvloc8moVTKBy?=
+ =?us-ascii?Q?hRtyLr8WJndYSHGIa4U0LPkn4Y0I0NUArZ0y/K+3c+8au8aiNQBIrEhQkW71?=
+ =?us-ascii?Q?pXQTTstKJYqfB+DVer+XnmUc7vMzfEFPXbiBX7c8FDxIm6ZbJjKYnptowwzo?=
+ =?us-ascii?Q?f0x/KWTkPY6Z27ofzaMaW+4+Q4mZ/9rV4Qqh++nnJgchrVSnNsRlF4M0Hsvm?=
+ =?us-ascii?Q?6wxTXbT9aBgwMiwUfiUQ8f8ilinrg3q0l4Gc6sgCzmJB1tgTt+cQUPd1YNjt?=
+ =?us-ascii?Q?eKE9Q0wnM5c3X91VMx0f48UbYb5GgU7GmeZU1Cp3bAJ34EPhUnQJUtnXYnPD?=
+ =?us-ascii?Q?6C3nWzssRCKg3jskVEkR1odMckrTxVkwv/3n8iM2Yrskr/q6TwJrYTEbmmxm?=
+ =?us-ascii?Q?HPAZDpPyuhb7eIr8d9JL3av3UQEsAk23oylv1SuvBzWO+GomWpzVkfNAbZ+j?=
+ =?us-ascii?Q?/aXlMECoZkpjL94IJgMawl5liN/FM2IXottZmqmtwnt+kZrh7DUzbI55fcQy?=
+ =?us-ascii?Q?MUCe253wNo4/6xnUV7bmAAK5ybOqrN6wQd9T25059TNApkzgsvjkP9VEnDrZ?=
+ =?us-ascii?Q?TDnFZkFd4yNc7xUy07azobvTL7xTabVuMSQjyUl7GcbeaCFtt/0dseNG70aJ?=
+ =?us-ascii?Q?0gV9rCrsAtCZegk/Gr+l7D0BQuFD73FSpSj5YaOMcMoAU4AQHs/MVtIm68TQ?=
+ =?us-ascii?Q?VHbT1k3zAG6cH2inyaHcxAzu4o7mYSF5j2VpNDjDYSg0B4ciVNDysFO4pzCw?=
+ =?us-ascii?Q?/Nc11w6TrAOYrahLqDKC8zH68FeWwKLaqkSzor6CDZy9vvoAl9oMr8faQ0aT?=
+ =?us-ascii?Q?IElqqeW+R5njL4YqdG01UHFDHHzlbOvyiQ0sI1yqOqJh6oLFIjlOwmajQYSc?=
+ =?us-ascii?Q?08Pwob7YPfgDODpZVD6iGmY+EasFZ0WecZjiObSSJCEs2ln5G4Mvb7vMJDi7?=
+ =?us-ascii?Q?AuAkrKasrvKeuZSzj0R0Tj2jPYpXW3WDX2fjQ1km+qAfnCLVb+iYpy1UaHEk?=
+ =?us-ascii?Q?aQzpmuHLI1k2OUvQJGNd0Wc35qh72DcoWKTl+tsIvsaifTUY/jt1zzTojziy?=
+ =?us-ascii?Q?sOsZJxqA7nIhe+yWfUB8S7TForoGgr+QvuzgH1tsSf3bfppYwtPqx83BjuUz?=
+ =?us-ascii?Q?/7wDWVbqYr++TrAPJ4PXcyTdmeesZPNhj8Wdb3BkUgXYMiKrhsEXM2bF6sA5?=
+ =?us-ascii?Q?MD5qLiUpfPDVGZ/xG2VV6ZiL8XIkAMbAFKGXl24A6SfWv9seRof7j0PIbh4d?=
+ =?us-ascii?Q?Q8xlxXy039j+Di7qy3ZOLDsBfNvyewZLLvoRWAI1dysRszr2wlu39QPv7ryd?=
+ =?us-ascii?Q?GX47yybKt9sWBsLAtDiyHkxmmtIu?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?XCGYp+O9pV24fmHw672TeE1r+l/vHkidXLJEyF0K0WorKe4BLnEplwFjVdcE?=
+ =?us-ascii?Q?ZSQqT5n84l9XPokewA5qNKx4ZzP0y1ccsMIlr11bzB5Ax4vWYaAw7ENETrog?=
+ =?us-ascii?Q?lCSYmGYhsfxP+/i7CJqTkBX8OICqNekqiNrKUrasNk+FRH3+VULtwx2HWmGW?=
+ =?us-ascii?Q?q8MwJoOEUo8gL6ycRLHb4PVt3ILwlvvWr0ZRe4TYaPKsQCAJ6gIV23WesBm3?=
+ =?us-ascii?Q?rcF9rJPUpnrIU+LlKUSvOaKa7izociZkE4hWWHVlvI+qMq7Cmd67gOg5MOzZ?=
+ =?us-ascii?Q?Yxul2LtCWokaanwpHwr3aUVOOFJjh1OCo0r2wu3kAUjKE0kntjeF4HgtY1lA?=
+ =?us-ascii?Q?QMtNEJLdY+plBiLbUQu94M09SazZMT7xRHsvTbtiDbQeDF19sIcI6m0vDP74?=
+ =?us-ascii?Q?r4dKGENJCO5CYYKueqRcdLk23Lbcgcxv1OZI1klFHJArJn4TtjqlRzpv4e7K?=
+ =?us-ascii?Q?ea4JFgtDQsbowfHbUA7SAblwXxs4/Ux3Ohq4um5BCUsoR+uzC9SsV5hye7gN?=
+ =?us-ascii?Q?CGM7nqapdHJnPzfWBUBDalpjU0498rVIOztWDmzj8FHOEMoO2JMA29J4Fx7i?=
+ =?us-ascii?Q?cfiHB9cqvzsb+Wdf6RPCHtbrNgLOSfieAAkqTp4jmezb3Lfk4OencRu+FGWZ?=
+ =?us-ascii?Q?tpU1qPQsEC1nQh1SzyCGEDXqG0XOd075sjDbuqa7UZjuio4R4gbIuDjhAPr4?=
+ =?us-ascii?Q?AfR0mE/KUhEcJwe9nesEPXHOA/iL3gfGFg0+Ok9g1eOHeE02AyGBy56hn2Vu?=
+ =?us-ascii?Q?qTTWzGZB/Gawx5b6L9sFcCIZ6ABsvmgAJMOQsMiL8ffdR4b/nmNy4e/zabkw?=
+ =?us-ascii?Q?uq71KW1CVlQvD449tbs8Dsu/4k1wlghFXr59852g5LcfcLFVU9cknUOykkjL?=
+ =?us-ascii?Q?hpMDi3cNqcGxOVfOt21gM8p5rHr2bPMFi/jGdF4MyiX4k5UrlJJVrNnxbHd0?=
+ =?us-ascii?Q?CzmMXNWiUWEJpcJ3NVwqyIIhIYCQIKHcE3foyXUTSr5NeG9zhMCkgGo0TJVj?=
+ =?us-ascii?Q?0A5LmJHvjQfcVFPALt337Xn2IMEOL94aV11ZyNUhNIKHsq7BLAXbdhS0k/+9?=
+ =?us-ascii?Q?vMgzF++PkkIvCJ+ZdHIAhn0bbWvVovb8C1VhX8Ghx4L0tBxWRG12MkMCAe9S?=
+ =?us-ascii?Q?X30CREM9al4mfImpA/YuLXear5G//2+/Fz6tp/gHdLRJiNL871OdzH3tZ15q?=
+ =?us-ascii?Q?jCspvbRMhWc+MSqE5eggVZFEcuXxORATRCr+LlVX4fMej6ae1UV/UyFkQPZF?=
+ =?us-ascii?Q?us5Zr271ZFPOzmhqHR1oHhCa9diVgaKvlWiEp9P+Ea17I5SKOgBGP50P01rR?=
+ =?us-ascii?Q?GPl/w1iY4xeKoRZZSv2rI3o7n5e1z+FH97oAlyxq5SylASoer/NkAXy+CvAV?=
+ =?us-ascii?Q?jG/M5CP+EcI/H/MPe/kicT+EoibyRIF45XWWfyJqhG7eHawm/TUotdx9emI9?=
+ =?us-ascii?Q?Mpe4DiNXUuGsxcMtqHPFRDrEcoru7B6OI42bzz2UYdY36tPVtxszPFRXXp/Z?=
+ =?us-ascii?Q?Xm9x2/w9+HSYwufrT7Tnk9kak0hWqWUW2l5nkX9NVyNCGC0RrK+cjCjeJ6VM?=
+ =?us-ascii?Q?A9Jc67X8VqxIxcx+dnlarS+HCePH/2FrnoI5y4SZ?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: ba574766-d1b7-42b9-9e4e-08dd5ad445a8
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR02MB4157.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3e7219cf-5274-41d6-6e0c-08dd5ad38e06
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Mar 2025 04:18:02.3789
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2025 04:23:10.6102
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR02MB10184
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: GWWe6dLdjVygbJkbzeEhPUB3S8yvKabFSrU580b/HpuXgzZhuPIvw3NFPpi9LafCZMCKzNkERBPZI13cFdzi6A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7570
+X-OriginatorOrg: intel.com
 
-From: Sean Christopherson <seanjc@google.com> Sent: Wednesday, February 26,=
- 2025 6:19 PM
->=20
-> Add a "tsc_properties" set of flags and use it to annotate whether the
-> TSC operates at a known and/or reliable frequency when registering a
-> paravirtual TSC calibration routine.  Currently, each PV flow manually
-> sets the associated feature flags, but often in haphazard fashion that
-> makes it difficult for unfamiliar readers to see the properties of the
-> TSC when running under a particular hypervisor.
->=20
-> The other, bigger issue with manually setting the feature flags is that
-> it decouples the flags from the calibration routine.  E.g. in theory, PV
-> code could mark the TSC as having a known frequency, but then have its
-> PV calibration discarded in favor of a method that doesn't use that known
-> frequency.  Passing the TSC properties along with the calibration routine
-> will allow adding sanity checks to guard against replacing a "better"
-> calibration routine with a "worse" routine.
->=20
-> As a bonus, the flags also give developers working on new PV code a heads
-> up that they should at least mark the TSC as having a known frequency.
->=20
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/coco/sev/core.c       |  6 ++----
->  arch/x86/coco/tdx/tdx.c        |  7 ++-----
->  arch/x86/include/asm/tsc.h     |  8 +++++++-
->  arch/x86/kernel/cpu/acrn.c     |  4 ++--
->  arch/x86/kernel/cpu/mshyperv.c | 10 +++++++---
->  arch/x86/kernel/cpu/vmware.c   |  7 ++++---
->  arch/x86/kernel/jailhouse.c    |  4 ++--
->  arch/x86/kernel/kvmclock.c     |  4 ++--
->  arch/x86/kernel/tsc.c          |  8 +++++++-
->  arch/x86/xen/time.c            |  4 ++--
->  10 files changed, 37 insertions(+), 25 deletions(-)
->=20
-> diff --git a/arch/x86/coco/sev/core.c b/arch/x86/coco/sev/core.c
-> index dab386f782ce..29dd50552715 100644
-> --- a/arch/x86/coco/sev/core.c
-> +++ b/arch/x86/coco/sev/core.c
-> @@ -3284,12 +3284,10 @@ void __init snp_secure_tsc_init(void)
->  {
->  	unsigned long long tsc_freq_mhz;
->=20
-> -	setup_force_cpu_cap(X86_FEATURE_TSC_KNOWN_FREQ);
-> -	setup_force_cpu_cap(X86_FEATURE_TSC_RELIABLE);
-> -
->  	rdmsrl(MSR_AMD64_GUEST_TSC_FREQ, tsc_freq_mhz);
->  	snp_tsc_freq_khz =3D (unsigned long)(tsc_freq_mhz * 1000);
->=20
->  	tsc_register_calibration_routines(securetsc_get_tsc_khz,
-> -					  securetsc_get_tsc_khz);
-> +					  securetsc_get_tsc_khz,
-> +					  TSC_FREQ_KNOWN_AND_RELIABLE);
->  }
-> diff --git a/arch/x86/coco/tdx/tdx.c b/arch/x86/coco/tdx/tdx.c
-> index 42cdaa98dc5e..ca31560d0dd3 100644
-> --- a/arch/x86/coco/tdx/tdx.c
-> +++ b/arch/x86/coco/tdx/tdx.c
-> @@ -1135,14 +1135,11 @@ static unsigned long tdx_get_tsc_khz(void)
->=20
->  void __init tdx_tsc_init(void)
->  {
-> -	/* TSC is the only reliable clock in TDX guest */
-> -	setup_force_cpu_cap(X86_FEATURE_TSC_RELIABLE);
-> -	setup_force_cpu_cap(X86_FEATURE_TSC_KNOWN_FREQ);
-> -
->  	/*
->  	 * Override the PV calibration routines (if set) with more trustworthy
->  	 * CPUID-based calibration.  The TDX module emulates CPUID, whereas any
->  	 * PV information is provided by the hypervisor.
->  	 */
-> -	tsc_register_calibration_routines(tdx_get_tsc_khz, NULL);
-> +	tsc_register_calibration_routines(tdx_get_tsc_khz, NULL,
-> +					  TSC_FREQ_KNOWN_AND_RELIABLE);
->  }
-> diff --git a/arch/x86/include/asm/tsc.h b/arch/x86/include/asm/tsc.h
-> index 9318c74e8d13..360f47610258 100644
-> --- a/arch/x86/include/asm/tsc.h
-> +++ b/arch/x86/include/asm/tsc.h
-> @@ -41,8 +41,14 @@ extern int cpuid_get_cpu_freq(unsigned int *cpu_khz);
->  extern void tsc_early_init(void);
->  extern void tsc_init(void);
->  #if defined(CONFIG_HYPERVISOR_GUEST) || defined(CONFIG_AMD_MEM_ENCRYPT)
-> +enum tsc_properties {
-> +	TSC_FREQUENCY_KNOWN	=3D BIT(0),
-> +	TSC_RELIABLE		=3D BIT(1),
-> +	TSC_FREQ_KNOWN_AND_RELIABLE =3D TSC_FREQUENCY_KNOWN | TSC_RELIABLE,
-> +};
->  extern void tsc_register_calibration_routines(unsigned long (*calibrate_=
-tsc)(void),
-> -					      unsigned long (*calibrate_cpu)(void));
-> +					      unsigned long (*calibrate_cpu)(void),
-> +					      enum tsc_properties properties);
->  #endif
->  extern void mark_tsc_unstable(char *reason);
->  extern int unsynchronized_tsc(void);
-> diff --git a/arch/x86/kernel/cpu/acrn.c b/arch/x86/kernel/cpu/acrn.c
-> index 2da3de4d470e..4f2f4f7ec334 100644
-> --- a/arch/x86/kernel/cpu/acrn.c
-> +++ b/arch/x86/kernel/cpu/acrn.c
-> @@ -29,9 +29,9 @@ static void __init acrn_init_platform(void)
->  	/* Install system interrupt handler for ACRN hypervisor callback */
->  	sysvec_install(HYPERVISOR_CALLBACK_VECTOR, sysvec_acrn_hv_callback);
->=20
-> -	setup_force_cpu_cap(X86_FEATURE_TSC_KNOWN_FREQ);
->  	tsc_register_calibration_routines(acrn_get_tsc_khz,
-> -					  acrn_get_tsc_khz);
-> +					  acrn_get_tsc_khz,
-> +					  TSC_FREQUENCY_KNOWN);
->  }
->=20
->  static bool acrn_x2apic_available(void)
-> diff --git a/arch/x86/kernel/cpu/mshyperv.c b/arch/x86/kernel/cpu/mshyper=
-v.c
-> index 174f6a71c899..445ac3adfebc 100644
-> --- a/arch/x86/kernel/cpu/mshyperv.c
-> +++ b/arch/x86/kernel/cpu/mshyperv.c
-> @@ -421,8 +421,13 @@ static void __init ms_hyperv_init_platform(void)
->=20
->  	if (ms_hyperv.features & HV_ACCESS_FREQUENCY_MSRS &&
->  	    ms_hyperv.misc_features & HV_FEATURE_FREQUENCY_MSRS_AVAILABLE) {
-> -		tsc_register_calibration_routines(hv_get_tsc_khz, hv_get_tsc_khz);
-> -		setup_force_cpu_cap(X86_FEATURE_TSC_KNOWN_FREQ);
-> +		enum tsc_properties tsc_properties =3D TSC_FREQUENCY_KNOWN;
-> +
-> +		if (ms_hyperv.features & HV_ACCESS_TSC_INVARIANT)
-> +			tsc_properties =3D TSC_FREQ_KNOWN_AND_RELIABLE;
-> +
-> +		tsc_register_calibration_routines(hv_get_tsc_khz, hv_get_tsc_khz,
-> +						  tsc_properties);
->  	}
+On Mon, Mar 03, 2025 at 05:11:31PM +0100, Paolo Bonzini wrote:
+> On 3/3/25 02:23, Yan Zhao wrote:
+> > On Sat, Mar 01, 2025 at 02:34:26AM -0500, Paolo Bonzini wrote:
+> > > From: Yan Zhao <yan.y.zhao@intel.com>
+> > > 
+> > > Introduce supported_quirks in kvm_caps to store platform-specific force-enabled
+> > > quirks.  Any quirk removed from kvm_caps.supported_quirks will never be
+> > > included in kvm->arch.disabled_quirks, and will cause the ioctl to fail if
+> > > passed to KVM_ENABLE_CAP(KVM_CAP_DISABLE_QUIRKS2).
+> > > 
+> > > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> > > Message-ID: <20250224070832.31394-1-yan.y.zhao@intel.com>
+> > > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > > ---
+> > >   arch/x86/kvm/x86.c | 7 ++++---
+> > >   arch/x86/kvm/x86.h | 2 ++
+> > >   2 files changed, 6 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > > index fd0a44e59314..a97e58916b6a 100644
+> > > --- a/arch/x86/kvm/x86.c
+> > > +++ b/arch/x86/kvm/x86.c
+> > > @@ -4782,7 +4782,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+> > >   		r = enable_pmu ? KVM_CAP_PMU_VALID_MASK : 0;
+> > >   		break;
+> > >   	case KVM_CAP_DISABLE_QUIRKS2:
+> > > -		r = KVM_X86_VALID_QUIRKS;
+> > > +		r = kvm_caps.supported_quirks;
+> > 
+> > As the concern raised in [1], it's confusing for
+> > KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT to be present on AMD's platforms while not
+> > present on Intel's non-self-snoop platforms.
+> 
+> To make it less confusing, let's rename it to
+> KVM_X86_QUIRK_IGNORE_GUEST_PAT.  So if userspace wants to say "I don't want
+Hmm, it looks that quirk IGNORE_GUEST_PAT is effectively always enabled on Intel
+platforms without enabling EPT.
 
-For the Hyper-V guest code,
+And kvm_mmu_may_ignore_guest_pat() does not care quirk IGNORE_GUEST_PAT on AMD
+or on Intel when enable_ept is 0.
 
-Reviewed-by: Michael Kelley <mhklinux@outlook.com>
-Tested-by: Michael Kelley <mhklinux@outlook.com>
+bool kvm_mmu_may_ignore_guest_pat(struct kvm *kvm)                               
+{                                                                                
+        return shadow_memtype_mask &&                                            
+               kvm_check_has_quirk(kvm, KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT);     
+}                                                                                
 
->=20
->  	if (ms_hyperv.priv_high & HV_ISOLATION) {
-> @@ -525,7 +530,6 @@ static void __init ms_hyperv_init_platform(void)
->  		 * is called.
->  		 */
->  		wrmsrl(HV_X64_MSR_TSC_INVARIANT_CONTROL,
-> HV_EXPOSE_INVARIANT_TSC);
-> -		setup_force_cpu_cap(X86_FEATURE_TSC_RELIABLE);
->  	}
->=20
->  	/*
-> diff --git a/arch/x86/kernel/cpu/vmware.c b/arch/x86/kernel/cpu/vmware.c
-> index 399cf3286a60..a3a71309214c 100644
-> --- a/arch/x86/kernel/cpu/vmware.c
-> +++ b/arch/x86/kernel/cpu/vmware.c
-> @@ -385,10 +385,10 @@ static void __init vmware_paravirt_ops_setup(void)
->   */
->  static void __init vmware_set_capabilities(void)
->  {
-> +	/* TSC is non-stop and reliable even if the frequency isn't known. */
->  	setup_force_cpu_cap(X86_FEATURE_CONSTANT_TSC);
->  	setup_force_cpu_cap(X86_FEATURE_TSC_RELIABLE);
-> -	if (vmware_tsc_khz)
-> -		setup_force_cpu_cap(X86_FEATURE_TSC_KNOWN_FREQ);
-> +
->  	if (vmware_hypercall_mode =3D=3D CPUID_VMWARE_FEATURES_ECX_VMCALL)
->  		setup_force_cpu_cap(X86_FEATURE_VMCALL);
->  	else if (vmware_hypercall_mode =3D=3D CPUID_VMWARE_FEATURES_ECX_VMMCALL=
-)
-> @@ -417,7 +417,8 @@ static void __init vmware_platform_setup(void)
->=20
->  		vmware_tsc_khz =3D tsc_khz;
->  		tsc_register_calibration_routines(vmware_get_tsc_khz,
-> -						  vmware_get_tsc_khz);
-> +						  vmware_get_tsc_khz,
-> +						  TSC_FREQ_KNOWN_AND_RELIABLE);
->=20
->  #ifdef CONFIG_X86_LOCAL_APIC
->  		/* Skip lapic calibration since we know the bus frequency. */
-> diff --git a/arch/x86/kernel/jailhouse.c b/arch/x86/kernel/jailhouse.c
-> index b0a053692161..d73a4d0fb118 100644
-> --- a/arch/x86/kernel/jailhouse.c
-> +++ b/arch/x86/kernel/jailhouse.c
-> @@ -218,7 +218,8 @@ static void __init jailhouse_init_platform(void)
->=20
->  	machine_ops.emergency_restart		=3D jailhouse_no_restart;
->=20
-> -	tsc_register_calibration_routines(jailhouse_get_tsc, jailhouse_get_tsc)=
-;
-> +	tsc_register_calibration_routines(jailhouse_get_tsc, jailhouse_get_tsc,
-> +					  TSC_FREQUENCY_KNOWN);
->=20
->  	while (pa_data) {
->  		mapping =3D early_memremap(pa_data, sizeof(header));
-> @@ -256,7 +257,6 @@ static void __init jailhouse_init_platform(void)
->  	pr_debug("Jailhouse: PM-Timer IO Port: %#x\n", pmtmr_ioport);
->=20
->  	precalibrated_tsc_khz =3D setup_data.v1.tsc_khz;
-> -	setup_force_cpu_cap(X86_FEATURE_TSC_KNOWN_FREQ);
->=20
->  	pci_probe =3D 0;
->=20
-> diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
-> index 1dbe12ecb26e..ce676e735ced 100644
-> --- a/arch/x86/kernel/kvmclock.c
-> +++ b/arch/x86/kernel/kvmclock.c
-> @@ -199,7 +199,6 @@ void kvmclock_cpu_action(enum kvm_guest_cpu_action ac=
-tion)
->   */
->  static unsigned long kvm_get_tsc_khz(void)
->  {
-> -	setup_force_cpu_cap(X86_FEATURE_TSC_KNOWN_FREQ);
->  	return pvclock_tsc_khz(this_cpu_pvti());
->  }
->=20
-> @@ -403,7 +402,8 @@ void __init kvmclock_init(void)
->=20
->  	kvm_sched_clock_init(stable);
->=20
-> -	tsc_register_calibration_routines(kvm_get_tsc_khz, kvm_get_tsc_khz);
-> +	tsc_register_calibration_routines(kvm_get_tsc_khz, kvm_get_tsc_khz,
-> +					  TSC_FREQUENCY_KNOWN);
->=20
->  	x86_platform.get_wallclock =3D kvm_get_wallclock;
->  	x86_platform.set_wallclock =3D kvm_set_wallclock;
-> diff --git a/arch/x86/kernel/tsc.c b/arch/x86/kernel/tsc.c
-> index 5501d76243c8..be58df4fef66 100644
-> --- a/arch/x86/kernel/tsc.c
-> +++ b/arch/x86/kernel/tsc.c
-> @@ -1301,11 +1301,17 @@ static void __init check_system_tsc_reliable(void=
-)
->   */
->  #if defined(CONFIG_HYPERVISOR_GUEST) || defined(CONFIG_AMD_MEM_ENCRYPT)
->  void tsc_register_calibration_routines(unsigned long (*calibrate_tsc)(vo=
-id),
-> -				       unsigned long (*calibrate_cpu)(void))
-> +				       unsigned long (*calibrate_cpu)(void),
-> +				       enum tsc_properties properties)
->  {
->  	if (WARN_ON_ONCE(!calibrate_tsc))
->  		return;
->=20
-> +	if (properties & TSC_FREQUENCY_KNOWN)
-> +		setup_force_cpu_cap(X86_FEATURE_TSC_KNOWN_FREQ);
-> +	if (properties & TSC_RELIABLE)
-> +		setup_force_cpu_cap(X86_FEATURE_TSC_RELIABLE);
-> +
->  	x86_platform.calibrate_tsc =3D calibrate_tsc;
->  	if (calibrate_cpu)
->  		x86_platform.calibrate_cpu =3D calibrate_cpu;
-> diff --git a/arch/x86/xen/time.c b/arch/x86/xen/time.c
-> index 13e5888c4501..4de06ea55397 100644
-> --- a/arch/x86/xen/time.c
-> +++ b/arch/x86/xen/time.c
-> @@ -40,7 +40,6 @@ static unsigned long xen_tsc_khz(void)
->  	struct pvclock_vcpu_time_info *info =3D
->  		&HYPERVISOR_shared_info->vcpu_info[0].time;
->=20
-> -	setup_force_cpu_cap(X86_FEATURE_TSC_KNOWN_FREQ);
->  	return pvclock_tsc_khz(info);
->  }
->=20
-> @@ -571,7 +570,8 @@ static void __init xen_init_time_common(void)
->  	 */
->  	paravirt_set_sched_clock(xen_sched_clock, NULL, NULL);
->=20
-> -	tsc_register_calibration_routines(xen_tsc_khz, NULL);
-> +	tsc_register_calibration_routines(xen_tsc_khz, NULL,
-> +					  TSC_FREQUENCY_KNOWN);
->  	x86_platform.get_wallclock =3D xen_get_wallclock;
->  }
->=20
-> --
-> 2.48.1.711.g2feabab25a-goog
->=20
+After renaming the quirk, should we also hide quirk IGNORE_GUEST_PAT from being
+exposed in KVM_CAP_DISABLE_QUIRKS2 when enable_ept is 0?
+However, doing so will complicate kvm_noncoherent_dma_assignment_start_or_stop().
 
+
+> KVM to ignore guest's PAT!", it can do so easily:
+> 
+> - it can check unconditionally that the quirk is included in
+> KVM_CAP_DISABLE_QUIRKS2, and it will pass on both Intel with self-snoop with
+> AMD;
+So, when userspace finds the quirk IGNORE_GUEST_PAT is exposed in
+KVM_CAP_DISABLE_QUIRKS2, it cannot treat this as an implication that KVM is
+currently ignoring guest PAT, but it only means that this is a new KVM with
+quirk IGNORE_GUEST_PAT taken into account.
+
+> - it can pass it unconditionally to KVM_X86_QUIRK_IGNORE_GUEST_PAT, knowing
+> that PAT will be honored.
+For AMD, since userspace does not explicitly disable quirk IGNORE_GUEST_PAT, you
+introduced kvm_caps.inapplicable_quirks to allow IGNORE_GUEST_PAT to be listed
+in KVM_CAP_DISABLED_QUIRKS.
+
+From KVM_CAP_DISABLED_QUIRKS, the userspace knows that honing guest PAT is
+performed on AMD.
+
+Is this understanding correct? 
+
+> But KVM_CHECK_EXTENSION(KVM_CAP_DISABLE_QUIRKS2) will *not* include the
+> quirk on Intel without self-snoop, which lets userspace detect the condition
+> and raise an error.  This is better than introducing a new case in the API
+> "the bit is returned by KVM_CHECK_EXTENSION, but rejected by
+> KVM_ENABLE_CAP".  Such a new case would inevitably lead to
+> KVM_CAP_DISABLE_QUIRKS3. :)
+Agreed. Thanks for the explanation:)
+
+> 
+> > Or what about introduce kvm_caps.force_enabled_quirk?
+> > 
+> > if (!static_cpu_has(X86_FEATURE_SELFSNOOP))
+> >          kvm_caps.force_enabled_quirks |= KVM_X86_QUIRK_EPT_IGNORE_GUEST_PAT;
+> 
+> That would also make it harder for userspace to understand what's going on.
+Right.
+
+> > [1] https://lore.kernel.org/all/Z8UBpC76CyxCIRiU@yzhao56-desk.sh.intel.com/
+> > >   		break;
+> > >   	case KVM_CAP_X86_NOTIFY_VMEXIT:
+> > >   		r = kvm_caps.has_notify_vmexit;
+> > > @@ -6521,11 +6521,11 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+> > >   	switch (cap->cap) {
+> > >   	case KVM_CAP_DISABLE_QUIRKS2:
+> > >   		r = -EINVAL;
+> > > -		if (cap->args[0] & ~KVM_X86_VALID_QUIRKS)
+> > > +		if (cap->args[0] & ~kvm_caps.supported_quirks)
+> > >   			break;
+> > >   		fallthrough;
+> > >   	case KVM_CAP_DISABLE_QUIRKS:
+> > > -		kvm->arch.disabled_quirks = cap->args[0];
+> > > +		kvm->arch.disabled_quirks = cap->args[0] & kvm_caps.supported_quirks;
+> > 
+> > Will this break the uapi of KVM_CAP_DISABLE_QUIRKS?
+> > My understanding is that only KVM_CAP_DISABLE_QUIRKS2 filters out invalid
+> > quirks.
+> 
+> The difference between KVM_CAP_DISABLE_QUIRKS and KVM_CAP_DISABLE_QUIRKS2 is
+> only that invalid values do not cause an error; but userspace cannot know
+> what is in kvm->arch.disabled_quirks, so KVM can change the value that is
+> stored there.
+Ah, it makes sense.
+
+Thanks
+Yan
+
+> 
+> > >   		r = 0;
+> > >   		break;
+> > >   	case KVM_CAP_SPLIT_IRQCHIP: {
+> > > @@ -9775,6 +9775,7 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+> > >   		kvm_host.xcr0 = xgetbv(XCR_XFEATURE_ENABLED_MASK);
+> > >   		kvm_caps.supported_xcr0 = kvm_host.xcr0 & KVM_SUPPORTED_XCR0;
+> > >   	}
+> > > +	kvm_caps.supported_quirks = KVM_X86_VALID_QUIRKS;
+> > >   	kvm_caps.inapplicable_quirks = 0;
+> > >   	rdmsrl_safe(MSR_EFER, &kvm_host.efer);
+> > > diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> > > index 9af199c8e5c8..f2672b14388c 100644
+> > > --- a/arch/x86/kvm/x86.h
+> > > +++ b/arch/x86/kvm/x86.h
+> > > @@ -34,6 +34,8 @@ struct kvm_caps {
+> > >   	u64 supported_xcr0;
+> > >   	u64 supported_xss;
+> > >   	u64 supported_perf_cap;
+> > > +
+> > > +	u64 supported_quirks;
+> > >   	u64 inapplicable_quirks;
+> > >   };
+> > > -- 
+> > > 2.43.5
+> > > 
+> > > 
+> > 
+> 
 
