@@ -1,112 +1,120 @@
-Return-Path: <kvm+bounces-39948-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-39949-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DE8CA4D0C5
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 02:26:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8155EA4D100
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 02:34:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCB661740DA
-	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 01:26:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F413118921B5
+	for <lists+kvm@lfdr.de>; Tue,  4 Mar 2025 01:34:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D7DD14386D;
-	Tue,  4 Mar 2025 01:26:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F249B155CBD;
+	Tue,  4 Mar 2025 01:33:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eL+8r5Xy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pQln1YOB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C02C6A33B
-	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 01:26:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A179114F121
+	for <kvm@vger.kernel.org>; Tue,  4 Mar 2025 01:33:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741051571; cv=none; b=oSh958elxWImol39EgTRT9kRJhn/O7cXdCZbTETIBK6kfVHdgYWbfZf9EhzcB+6R5/QBhrq0L4PqS8MP41Z/vQYDY69wcWs6F000cZwVGl6hwUD031iAd1AdzsETVR0lUkKklbAZy7KkE1HFbSgRmcvRcuzY55kZBQsWXlEYcIU=
+	t=1741052021; cv=none; b=Jltj8ktl8DVrdFzmUNVKxqFChQIgHV8BshqD/Bkq4Kczb4cJ+KMIN7cqlYUpPLyhRwbiGnkz1BzwJ2w5A0W//TSRIfS3PdSMcwVlp+/QuJ0riJUHf7RfJ74mb03ln4cZDmbMxdpKcHwmtdT3+wd1qxg3VrBzuuRtM8v7seIOvH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741051571; c=relaxed/simple;
-	bh=YiZaoiok5I5oPdwlFn37HPnRMfwWP7zPxdm2K7b6Fag=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=DJvRjbkJC/FVqQRwDLMaBopQq3bgXLZ88SdbhIFBJfSqbOL9z631lD5mKcTY33RqpyLe2Fb7MFjREHswbjKsCCQzjeL5X3mtSEDD8GAoi3NFUEljZtflCpQUSHlvRYHzeC+OnWRnUTP7ySeJ/YIr/zJvV/tFlos8m0wuI2vVEPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eL+8r5Xy; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741051570; x=1772587570;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=YiZaoiok5I5oPdwlFn37HPnRMfwWP7zPxdm2K7b6Fag=;
-  b=eL+8r5Xyqa6/orDyaIlFnC6QMjq1Xzv5CbfOCQHsuH+EbBSudPRXLeRo
-   EIT/GvRKITtGjj5QwTdCMxhjwJUPoLtZeda5nnQ0V+v9gunofqazprxus
-   H7pNrOtJbeVjoce9jrSjc3+PTgPCtUZzoCV7A8EOLrhPgF38KcNk1g4UR
-   Xkyqw2m14AYDzOG4Wu5HWCF7udH50OyZ0fd+93AQlx5zAt4NK5RTurf6O
-   xpQZuXsQFWRDgf53bG5PCyqHbY8hWDQVDI+lmsOrIQI4Q6f83bhWXhlKP
-   +gKN0gqaOkzx3YVoOQgMgVH1T3ZwfWsdnUFA4B2SY8wi8SIVgIR+L/ZdT
-   g==;
-X-CSE-ConnectionGUID: p4DGpBovT4eGQqmMsbEn7Q==
-X-CSE-MsgGUID: 5pTSBWvfTd6byXW2+zUBIg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11362"; a="53345454"
-X-IronPort-AV: E=Sophos;i="6.13,331,1732608000"; 
-   d="scan'208";a="53345454"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 17:26:09 -0800
-X-CSE-ConnectionGUID: VlVOrw4iS3inpz+wPeb0/A==
-X-CSE-MsgGUID: vJy85qGARLOfTxMvzsEMwQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,331,1732608000"; 
-   d="scan'208";a="117953050"
-Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
-  by orviesa009.jf.intel.com with ESMTP; 03 Mar 2025 17:26:07 -0800
-Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tpH2r-000J7O-0B;
-	Tue, 04 Mar 2025 01:26:05 +0000
-Date: Tue, 4 Mar 2025 09:25:22 +0800
-From: kernel test robot <lkp@intel.com>
-To: Isaku Yamahata <isaku.yamahata@intel.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	kvm@vger.kernel.org, Farrah Chen <farrah.chen@intel.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Binbin Wu <binbin.wu@linux.intel.com>
-Subject: [kvm:kvm-coco-queue 115/127] ERROR: modpost: "tdx_has_emulated_msr"
- [arch/x86/kvm/kvm-intel.ko] undefined!
-Message-ID: <202503040911.EFn6ARad-lkp@intel.com>
+	s=arc-20240116; t=1741052021; c=relaxed/simple;
+	bh=SIl8ho5t9EI4LTWKJyqZ5Q0RNUveM8TTZXpUMKr3JMs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=JYZ8vXB4QXdu/ZrU5J0ocmV+IGLDPWdYUbEpdlqPbl0JtUgWFmcNraawd7mYFyIiCvXSKpoU+CCbiHjafIX8F0E4CBQJ7H2SPeGpX2tJ2S1accan7QXzd58MtP9aznx2RhWyPgdW2fhUmbRSovg5yni6OOAWdbwKmI67x6yZW+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pQln1YOB; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fecd603bb8so5661655a91.3
+        for <kvm@vger.kernel.org>; Mon, 03 Mar 2025 17:33:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741052019; x=1741656819; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ucq5/Kd4TvXDiuBl3Q8d5rnG9vbnh5K6yq9XVdM4wcE=;
+        b=pQln1YOB5jlDl6iZ5o4p8C+V5ZWTaOltr091R7bFravLgWskdfGJdhuonW4fZ5OdLT
+         8HKuvKzt2QhtKZv63TgN+tGgVKqUruBwxZpc/RvJmiBnrWXz2DIBG7o0aJpSyLj4Hd3i
+         wupn5OaivhbcbzHz7i0jDoqMvsVuxZfVkWkZKAj20mtaYF29L7ri+XCtyAbLRvqOFGzv
+         04U+3BzHhjqiJ6HcASjrY5/W4ioBQpAwZHwgG+nXLy4zWF8C/FzOZXkrQtRz0T24H0gf
+         FLiV7dpsB2GtXBXMwlnlEbXIie632Sp9fYJ7taKKUf78YOtRJPA2DmYypME75YjwxwqQ
+         3Enw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741052019; x=1741656819;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ucq5/Kd4TvXDiuBl3Q8d5rnG9vbnh5K6yq9XVdM4wcE=;
+        b=iyiOEgZEAWHe+Zpb22i2jok6DqgKTyYdyEM6j5OJ5TfH1GptFatIkElPtBW6Za2kYy
+         KY1VrlUjRMgVr8wUCr1Yac9a+AnqCgOsVmTPtenWSvPFSCBUCD7xHcD2WuagVMAARyRm
+         A93YMiO2ZDtuCfMEJMg5mNbv23fU6N6B2dF8UV0Sr3gF2yBqdUi+VNntjBpHfwgGZjGA
+         SOXgjHf6MkbCuJvwmxZu8lVNy8mfgyDdlJmIS5EjFxY44zHALgqz2uFOAz7uPbSBSyzW
+         d3E5EA7Nn/eP91Cvq55LMyWPrj5QIHLOI3C4X7O0UI6/aAC1uju4cxhVfpRXWs+iq33p
+         /0gw==
+X-Gm-Message-State: AOJu0YxWElAYiV+hDpSwbyt8BBcse2WbFa6eoDOmkYdrHMi7d9Uxyl6K
+	HUzr6PoY8jwkmmcuUH2r2HQ73HPADrx/JVpePR4MLY/LaHtc7Y4orQFR3WtAO8sDu8Eyw/t30Lh
+	pWQ==
+X-Google-Smtp-Source: AGHT+IEpHqEHsE2O9LE/UQmqGjjKfdFVaaCLQ3xRW5HZAI9zSYi8OXdvnTjdYVeBp8F7ytBDsguC8d+OIyY=
+X-Received: from pjbsu16.prod.google.com ([2002:a17:90b:5350:b0:2fa:24c5:36e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:390b:b0:2ee:8e75:4aeb
+ with SMTP id 98e67ed59e1d1-2febab7864bmr28054444a91.17.1741052018927; Mon, 03
+ Mar 2025 17:33:38 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Mon,  3 Mar 2025 17:33:32 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
+Message-ID: <20250304013335.4155703-1-seanjc@google.com>
+Subject: [PATCH v5 0/3] KVM: x86: Optimize "stale" EOI bitmap exiting
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Kai Huang <kai.huang@intel.com>, xuyun <xuyun_xy.xy@linux.alibaba.com>, 
+	weizijie <zijie.wei@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
 
-tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git kvm-coco-queue
-head:   9fe4541afcfad987d39790f0a40527af190bf0dd
-commit: 45906ac7d5845667e6d37f2f4b86034ca1c5fbd2 [115/127] KVM: TDX: Implement callbacks for MSR operations
-config: x86_64-randconfig-077-20250302 (https://download.01.org/0day-ci/archive/20250304/202503040911.EFn6ARad-lkp@intel.com/config)
-compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250304/202503040911.EFn6ARad-lkp@intel.com/reproduce)
+Slightly modified version of the patch (now mini-series) to optimize EOI
+bitmap exiting for "stale" routes, i.e. for the case where a vCPU has an
+in-flight IRQ when the routing changes, and needs one final EOI exit to
+deassert the IRQ.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202503040911.EFn6ARad-lkp@intel.com/
+Kai, I dropped your Reviewed-by as the change was non-trivial.
 
-All errors (new ones prefixed by >>, old ones prefixed by <<):
+v5:
+ - Intercept EOI if and only if the IRQ is level-triggered.
+ - Add helper to consolidate logic.
+ - Tweak field name.
+ - "Reset" field to -1, immediately before scanning routes.
 
-ERROR: modpost: "tdx_interrupt_allowed" [arch/x86/kvm/kvm-intel.ko] undefined!
-ERROR: modpost: "enable_tdx" [arch/x86/kvm/kvm-intel.ko] undefined!
-ERROR: modpost: "tdx_disable_virtualization_cpu" [arch/x86/kvm/kvm-intel.ko] undefined!
->> ERROR: modpost: "tdx_has_emulated_msr" [arch/x86/kvm/kvm-intel.ko] undefined!
-ERROR: modpost: "tdx_vm_init" [arch/x86/kvm/kvm-intel.ko] undefined!
-ERROR: modpost: "tdx_vm_destroy" [arch/x86/kvm/kvm-intel.ko] undefined!
-ERROR: modpost: "tdx_mmu_release_hkid" [arch/x86/kvm/kvm-intel.ko] undefined!
-ERROR: modpost: "tdx_vcpu_create" [arch/x86/kvm/kvm-intel.ko] undefined!
-ERROR: modpost: "tdx_vcpu_free" [arch/x86/kvm/kvm-intel.ko] undefined!
-ERROR: modpost: "tdx_vcpu_reset" [arch/x86/kvm/kvm-intel.ko] undefined!
-WARNING: modpost: suppressed 24 unresolved symbol warnings because there were too many)
+v4: https://lore.kernel.org/all/20250303052227.523411-1-zijie.wei@linux.alibaba.com
 
+Sean Christopherson (2):
+  KVM: x86: Isolate edge vs. level check in userspace I/O APIC route
+    scanning
+  KVM: x86: Add a helper to deduplicate I/O APIC EOI interception logic
+
+weizijie (1):
+  KVM: x86: Rescan I/O APIC routes after EOI interception for old
+    routing
+
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/ioapic.c           |  7 ++-----
+ arch/x86/kvm/ioapic.h           |  2 ++
+ arch/x86/kvm/irq_comm.c         | 37 ++++++++++++++++++++++++++++-----
+ arch/x86/kvm/lapic.c            |  8 +++++++
+ arch/x86/kvm/x86.c              |  1 +
+ 6 files changed, 46 insertions(+), 10 deletions(-)
+
+
+base-commit: ead22377189e55ba0e9b637a8f48578cf84f5b9c
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.48.1.711.g2feabab25a-goog
+
 
