@@ -1,188 +1,137 @@
-Return-Path: <kvm+bounces-40170-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40171-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42BF0A504D8
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 17:30:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3051FA50620
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 18:14:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D93361898867
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 16:28:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E7A116F74D
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 17:14:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E77C197A8B;
-	Wed,  5 Mar 2025 16:25:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AACDB1C84AC;
+	Wed,  5 Mar 2025 17:14:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ust7rjDG"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4648318A6B5;
-	Wed,  5 Mar 2025 16:25:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CCE61A3160;
+	Wed,  5 Mar 2025 17:14:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741191926; cv=none; b=lsC5+5Cs9BSqAVf6/DRYw2hIvIdy44Wl6p3ZXuh++HaGFaeTPBG4JOjYp6pn28DoasHCIbJww0OdSrAloMBPmFjMdJm3aCWLEuYaNmA3Fph2cnMyGQ/gVo+RCg5K3ki8BGHDuHywN2FWqWt5/NO4nQQXxL8etTtEn9USCW+3PS8=
+	t=1741194844; cv=none; b=UAJLf1x/J9zOZObWECeim0nhfK7oIDmVU30JSkkkefIAsx9hqzvmdJzYej0np4e9+KDznUi2ds7U1k0mE8wIKkMm0oNfLSKuFZtvkQPwaIflkT6sTStjKeGs5nS1XTYIippBMJDlLSAz2EBjWj2n7I369sAyXtGk67lKww2udtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741191926; c=relaxed/simple;
-	bh=K+K6DmUC+Wxvngt/uU7W1IItHbJf0lWSGmSE11WgMBc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HKprgePh14EbWjMV2x8CGcz09i90dqUSI+qE2NtBKiQG0oSUDpX2bmOf6uecehUrVaaiupQfbJB9vPkOqJFIXaw6mNxZCiYkhiItsGP1LPcNwXMa6vHzdEX5rMP+AOrQyqqqYZ1fSUwKNVrdkPS/yKC7nVVzax85OtS3TmeBSM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D5D60FEC;
-	Wed,  5 Mar 2025 08:25:36 -0800 (PST)
-Received: from [10.57.67.16] (unknown [10.57.67.16])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1FB763F5A1;
-	Wed,  5 Mar 2025 08:25:18 -0800 (PST)
-Message-ID: <ea9bb982-cf31-4079-8fea-dc39e91a975b@arm.com>
-Date: Wed, 5 Mar 2025 16:25:17 +0000
+	s=arc-20240116; t=1741194844; c=relaxed/simple;
+	bh=JG3bEgryVkD89ivJEHDvKdoz5pX+G5di1bV0ReHD08c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PQ9HkdP/X5q0LuDwdSvwS+l8JJPB1N3WDE0gopQdgDo5Kl7mcfpphb3hPAfLStSnBSNXlxqvF5BNE4TELZQrFBtdH7pQ7cq9KbOlPY+Izp9jsrMwpKzhslG4keaARnOvfpuEW8w1ElW4YFMHpNewQAfadvMhRsNcHTm01s3mz2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ust7rjDG; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-22334203781so21833985ad.0;
+        Wed, 05 Mar 2025 09:14:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741194843; x=1741799643; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=PDY4vgETAYK/Bcf1CBHzUdesUL3jSm/FcT00+a6QmGo=;
+        b=Ust7rjDGoqZx3HCrfajj2gtB9xYBYxbHAFmYrxM0smoVZKk77Q6M0kqoqg95PjJqSG
+         dndICRxP3GlP8LtzHOXhnuth0cIlIi3vSzbZSy6/0/x1VVGfYA0CCQ1p+/YB7yU8/xwN
+         /U4lC5o3wO6zzKONdm5GZZSTZLGo9yVEUK4+uPKrscPqzxhQ5TkQsERYBlQZteh38q6Z
+         9xxMHO+Vc3Z00xYcP/iOUSTKm5CHoBYo6T6CVRVxN8GSf7N+v/+rns76vwQ/Tf3TC6mk
+         h/J5J+jLYxN9NHdJ8+e88nlYAxqim64nnzoRyWjckWS7ujnp7C3ne4B1Ky7ZcT6mmYa/
+         5TEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741194843; x=1741799643;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PDY4vgETAYK/Bcf1CBHzUdesUL3jSm/FcT00+a6QmGo=;
+        b=kF2yiS1dZmOD94UqNdARa+aNuSBxF5w1cDVViRDVnUHzBVTYMztLVIW5+vRkdrd21f
+         tQxhurc/umE2fpZ4DCcslwVxc4jJxHJR/Ra9oZPS1b5Pm5pj8UyT8NbE7RA/ZSZ2vnDM
+         7itjug/1dr1sdryNAkINBEdw7zfNkjy/L93OTmOK+whbaSYVMMay4/XAeLF1ovo11s0i
+         w5TdMZky/9AOrRfMOhdEFVexMlJEE0UqA0JB/hAJlsTxC6ka0jHQfPXV6aGaxg1u6Nhu
+         ej7+DMwIEnXhcTA5NlGlAD/i3rrSS5W3uND1Lv0k5rv8wIORcvQ1L3Vn44mbMEVc9g+V
+         RWRw==
+X-Forwarded-Encrypted: i=1; AJvYcCUyOOeTZEq9dy8OgFWAtVyltOoTqvgdVj+iNsg4otviKyZgsTTcOCb/KPwuqJ3D4WOH67k=@vger.kernel.org, AJvYcCV+WJdQwg5Jth1Okqp1+Z8LvIvdHroTvLDbyv5+wk4CuYW4DrcC8ZMF+1J8yzXPDXPiy4lFmtIM@vger.kernel.org, AJvYcCVa4mYbey2MNt7WSznsBJDo7A1x9a8AMo3PY6oIBG/cMEdr2ttory/tS5qsVv0Ks4LvExvxkonENo6rQETr@vger.kernel.org, AJvYcCVgnUtXFdBLnghdvW+uEkXdSTCOz0A2qpRiEKOY/I8MzQ3cj+pedWfdeMeLTiqwSGiUtAg9A68XwUP892ng@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSySokwwCx39XppRH3cw4KLy6czK6R66ErcAn0q5VJTkFuIy+l
+	3C4xPuz8fjXvJqnmDCkDufqcFdLo9Jw4DJs+R9ZQEshAuOIv1/Mj
+X-Gm-Gg: ASbGnct3X3iWjfSH1N1nC5iaXj9r8keT9DYKueD8SlilRI6ELxCs/z7v1WbeBCvc012
+	DHbf4MHiXvHVa5LDbxuJb88limDyDYnD/wPWsAlXj2vYE4oTpNDgNymeDfOG7didrY7EvkeCtef
+	CRv7i5efCzO5z3pwsMFmk8ZezaNvNwIkudPKrGXTXuw033ojbKyCp/8455QUYOjG7TOrc27cZsR
+	0HAfifSe3T/Nu4FjTSYUIPO/+bp5q9rJgqiAAV/10ksUwd/lu7SD1WwD32F1GuldPZJi2TD84dL
+	6Raoz1FVqgSlwl8y3gmjSYixiYtpIKiWTOQ+6vzu5WHHFKd0qsDpN8Vt5ZA0sy3Zog==
+X-Google-Smtp-Source: AGHT+IEdZkMPD62CNO9btal/a+oXLs3ROwPZYX/AQSk8n+IbCHpG0Z2D91NOXzOmsZW9ggc8Myd3iw==
+X-Received: by 2002:a05:6a00:26f8:b0:732:6276:b46c with SMTP id d2e1a72fcca58-73693cfa00emr165967b3a.0.1741194842711;
+        Wed, 05 Mar 2025 09:14:02 -0800 (PST)
+Received: from devvm6277.cco0.facebook.com ([2a03:2880:2ff:1::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7364ba1371asm7133443b3a.5.2025.03.05.09.14.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Mar 2025 09:14:02 -0800 (PST)
+Date: Wed, 5 Mar 2025 09:14:00 -0800
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Jorgen Hansen <jhansen@vmware.com>,
+	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	virtualization@lists.linux-foundation.org,
+	linux-hyperv@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+	Dexuan Cui <decui@microsoft.com>, Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [PATCH net-next 0/3] vsock: support network namespace
+Message-ID: <Z8iGWLsQGdTv47je@devvm6277.cco0.facebook.com>
+References: <20200116172428.311437-1-sgarzare@redhat.com>
+ <Z8eVanBR7r90FK7m@devvm6277.cco0.facebook.com>
+ <cmkkkyzyo34pspkewbuthotojte4fcjrzqivjxxgi4agpw7bck@ddofpz3g77z7>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 09/45] kvm: arm64: Expose debug HW register numbers for
- Realm
-To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20250213161426.102987-1-steven.price@arm.com>
- <20250213161426.102987-10-steven.price@arm.com>
- <cec600f2-2ddc-4c71-9bab-0a0403132b43@redhat.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <cec600f2-2ddc-4c71-9bab-0a0403132b43@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cmkkkyzyo34pspkewbuthotojte4fcjrzqivjxxgi4agpw7bck@ddofpz3g77z7>
 
-Hi Gavin,
-
-On 03/03/2025 04:48, Gavin Shan wrote:
-> On 2/14/25 2:13 AM, Steven Price wrote:
->> From: Suzuki K Poulose <suzuki.poulose@arm.com>
->>
->> Expose VM specific Debug HW register numbers.
-
-Looking at this now, this patch description is garbage. Probably the
-patch has changed over time - so I suspect it's my fault not Suzuki's.
-We're not exposing anything new here. This is purely about telling the
-VMM that a realm cannot (currently) be debugged. Something like the
-below would be more accurate:
-
-"""
-kvm: arm64: Don't expose debug capabilities for realm guests
-
-RMM v1.0 provides no mechanism for the host to perform debug operations
-on the guest. So don't expose KVM_CAP_SET_GUEST_DEBUG and report 0
-breakpoints and 0 watch points.
-"""
-
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>   arch/arm64/kvm/arm.c | 24 +++++++++++++++++++++---
->>   1 file changed, 21 insertions(+), 3 deletions(-)
->>
+On Wed, Mar 05, 2025 at 10:42:58AM +0100, Stefano Garzarella wrote:
+> On Tue, Mar 04, 2025 at 04:06:02PM -0800, Bobby Eshleman wrote:
+> > On Thu, Jan 16, 2020 at 06:24:25PM +0100, Stefano Garzarella wrote:
+> > 
+> > One question: what is the behavior we expect from guest namespaces?  In
+> > v2, you mentioned prototyping a /dev/vsock ioctl() to define the
+> > namespace for the virtio-vsock device. This would mean only one
+> > namespace could use vsock in the guest? Do we want to make sure that our
+> > design makes it possible to support multiple namespaces in the future if
+> > the use case arrives?
 > 
-> Documentation/virt/kvm/api.rst needs to be updated accordingly.
-
-I don't think (with the above clarification) there's anything to update
-in the API documentation. There's nothing new being added, just
-capabilities being hidden where the functionality isn't available.
-
-And eventually we hope to add support for this (in a later RMM spec) - I
-don't yet know exactly what form this will take, but I hope to keep the
-interfaces as close as possible to what we already have so that existing
-tooling can be used.
-
-Thanks,
-Steve
-
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index b8fa82be251c..df6eb5e9ca96 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -78,6 +78,22 @@ bool is_kvm_arm_initialised(void)
->>       return kvm_arm_initialised;
->>   }
->>   +static u32 kvm_arm_get_num_brps(struct kvm *kvm)
->> +{
->> +    if (!kvm_is_realm(kvm))
->> +        return get_num_brps();
->> +    /* Realm guest is not debuggable. */
->> +    return 0;
->> +}
->> +
->> +static u32 kvm_arm_get_num_wrps(struct kvm *kvm)
->> +{
->> +    if (!kvm_is_realm(kvm))
->> +        return get_num_wrps();
->> +    /* Realm guest is not debuggable. */
->> +    return 0;
->> +}
->> +
+> Yes, I guess it makes sense that multiple namespaces can communicate with
+> the host and then use the virtio-vsock device!
 > 
-> The above two comments "Realm guest is not debuggable." can be dropped
-> since
-> the code is self-explanatory, and those two functions are unnecessary to be
-> kept in that way, for example:
-> 
->     case KVM_CAP_GUEST_DEBUG_HW_BPS:
->         return kvm_is_realm(kvm) ? 0 : get_num_brps();
->     case KVM_CAP_GUEST_DEBUG_HW_WRPS:
->         return kvm_is_realm(kvm) ? 0 : get_num_wrps();
-> 
-> 
->>   int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
->>   {
->>       return kvm_vcpu_exiting_guest_mode(vcpu) == IN_GUEST_MODE;
->> @@ -323,7 +339,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm,
->> long ext)
->>       case KVM_CAP_ARM_IRQ_LINE_LAYOUT_2:
->>       case KVM_CAP_ARM_NISV_TO_USER:
->>       case KVM_CAP_ARM_INJECT_EXT_DABT:
->> -    case KVM_CAP_SET_GUEST_DEBUG:
->>       case KVM_CAP_VCPU_ATTRIBUTES:
->>       case KVM_CAP_PTP_KVM:
->>       case KVM_CAP_ARM_SYSTEM_SUSPEND:
->> @@ -331,6 +346,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm,
->> long ext)
->>       case KVM_CAP_COUNTER_OFFSET:
->>           r = 1;
->>           break;
->> +    case KVM_CAP_SET_GUEST_DEBUG:
->> +        r = !kvm_is_realm(kvm);
->> +        break;
->>       case KVM_CAP_SET_GUEST_DEBUG2:
->>           return KVM_GUESTDBG_VALID_MASK;
->>       case KVM_CAP_ARM_SET_DEVICE_ADDR:
->> @@ -376,10 +394,10 @@ int kvm_vm_ioctl_check_extension(struct kvm
->> *kvm, long ext)
->>           r = cpus_have_final_cap(ARM64_HAS_32BIT_EL1);
->>           break;
->>       case KVM_CAP_GUEST_DEBUG_HW_BPS:
->> -        r = get_num_brps();
->> +        r = kvm_arm_get_num_brps(kvm);
->>           break;
->>       case KVM_CAP_GUEST_DEBUG_HW_WPS:
->> -        r = get_num_wrps();
->> +        r = kvm_arm_get_num_wrps(kvm);
->>           break;
->>       case KVM_CAP_ARM_PMU_V3:
->>           r = kvm_arm_support_pmu_v3();
-> 
-> Thanks,
-> Gavin
+> IIRC, the main use case here was also nested VMs. So a netns could be used
+> to isolate a nested VM in L1 and it may not need to talk to L0, so the
+> software in the L1 netns can use vsock, but only to talk to L2.
 > 
 
+Oh I see. The ioctl(IOCTL_VM_SOCKETS_ASSIGN_G2H_NETNS) makes sense here
+and seems like the simplest approach. Maybe we don't want multiple
+namespaces for virtio-vsocka then? The problem I see is that then users
+might expect non-colliding port spaces, which means there needs to be
+some kind of port-mapping, which would then require vsock users to pass
+around their port mappings out-of-band...
+
+It sounds like none of our known use cases requires non-colliding ports?
+
+> > 
+> > More questions/comments in other parts of this thread.
+> 
+> Sure, I'm happy to help with this effort with discussions/reviews!
+> 
+
+Awesome, thank you!
+
+Best,
+Bobby
 
