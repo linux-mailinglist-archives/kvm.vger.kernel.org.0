@@ -1,146 +1,188 @@
-Return-Path: <kvm+bounces-40169-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40170-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0127A5042F
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 17:10:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42BF0A504D8
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 17:30:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9604C3A2D2B
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 16:09:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D93361898867
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 16:28:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B3B32512EF;
-	Wed,  5 Mar 2025 16:09:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OqxuMXdw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E77C197A8B;
+	Wed,  5 Mar 2025 16:25:26 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 275A8250BE1;
-	Wed,  5 Mar 2025 16:09:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4648318A6B5;
+	Wed,  5 Mar 2025 16:25:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741190976; cv=none; b=MbOAB+Y8UyGbpe23xRZPsq8SvH18fVcSAqFB4r5Eofu4BxPYTxwnXzpB6tP/vWNUmPuBj5PDoyHjU6EBz6McZRpP/t6wRNcFXtfp8fZrFYUJmH54GTVpR8Udkp35HXpLtt1+OfewqE6XjNEvwcpnlVrLQE5bWzFwhPbnK0/RubY=
+	t=1741191926; cv=none; b=lsC5+5Cs9BSqAVf6/DRYw2hIvIdy44Wl6p3ZXuh++HaGFaeTPBG4JOjYp6pn28DoasHCIbJww0OdSrAloMBPmFjMdJm3aCWLEuYaNmA3Fph2cnMyGQ/gVo+RCg5K3ki8BGHDuHywN2FWqWt5/NO4nQQXxL8etTtEn9USCW+3PS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741190976; c=relaxed/simple;
-	bh=GKmV83MRa5t4NkQJ3esvrmWFVjgUKTVYEu/IX/vnRuE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H7Xea7VQ85j4FQf8Omid1dhnQVOak95lwWUmgWp0IP3T2FNDpTQjQo9kxJEeOm2Rg8DIBxe8IqECk9QtTSa0Aj3DpBh3KbIVCmc25jNDGlhyzW8wpLY+odaCRVX/QwuJ+6FRUSQeKqUL1BOfgIEuujQ1BqiahrRbsDcEstlgTM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OqxuMXdw; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2234e4b079cso130383205ad.1;
-        Wed, 05 Mar 2025 08:09:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741190974; x=1741795774; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=W3ZvhVCBXJoVmMj/QDYwjnvrQ0tg00IV0Ab5gY5yAEQ=;
-        b=OqxuMXdws3OWw0P7ds8BSRPa+IXzPOrlywOJ5fnHh9XFfwyey7iYNq0pmQi40j3YOg
-         cMHvRwyw9vnKf5nWBnYiv3X58jPnjRlA/hUaJacuD/fDCIke42ZBT8R2oTyk9EwQdVHR
-         C7zGSy9vlHhK9JzWRQETywUlUndgiR8hzmp9Bncrk3uqiB9NhJm0WgRaWEa2lpo4lRG1
-         GRczrWTtBxdy7g7IzAjzLir9heAj6f/mPESiY69znZhG8b40H9tMd95tuSSD2dRZsy4I
-         oRRejS+BdMe1/h0BdHaKV9N7CCslUMMafhNmHf9WaMbAXUw7IeXMXF4Zdh/fZql1JPKa
-         5AWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741190974; x=1741795774;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W3ZvhVCBXJoVmMj/QDYwjnvrQ0tg00IV0Ab5gY5yAEQ=;
-        b=V4DQBnbMA7lbsnMjGkMeGN9FDFwfiY9+y66qgGZTgNKUWURt3UYrMkrnz+1OYiso1F
-         GRFxYTPYd11G4vKduB/rR675dgCaXcasHeH9KVzpro8CiLrEKFErzMotbbQKQmzTszQj
-         1gtLuKtlHFnWlV/KCJ3hhHmEAdJpSNwYUqayxv4hq5B0/QzOq6I6PJUlaRZuoxyrf/jh
-         e74CUISWav9pl3ugu48MqObrXcZbbBNDFST8vQmj/blx2ovx9A3tI02xHbC3WHDBxyhb
-         wLZXSk4GO/1oykdewwFNd8J/zU8kcw/jv0xgqsX9MAfIi0hZOI5kwC17nIhvNMU8pxmO
-         XLSw==
-X-Forwarded-Encrypted: i=1; AJvYcCUFCFGEt2zPXi5VeeQcxZ3UYVwi3KWlM6l2ukecqb/EPTnTli7++seLoy/XS+ITnr99GeA9aj2Q+wqgZgLD@vger.kernel.org, AJvYcCVOcdgU4dArYOur+EnPeCUY6MTvj0Vjo5f+5YT+hbLUrq3Ty11ZiFHEnY5dmO2yJ3KXPBO6fVeJiAkkPpLh@vger.kernel.org, AJvYcCWIey76QEiPHrQR2lziWToNMPtkR1xzvW3yGGFgmLXMdVRcoeQ1JaZbIlMrHQ30CV0I+tw=@vger.kernel.org, AJvYcCXTZTepMbqRvuTAqBGUIr9cMLIlZ9cyMNixdHCz1UNrqrhrwr7flsTSdImA1JfRtnip5mLJmXfS@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFLGYplRrJG7d08HxQ2f7tKBBGYrphIN1iFBI9UB1qm0KMTrtG
-	5Prh8E2L6awGZj3WdjK2aYOF7A8hpCWCEwE5XmVU/AWgo0I+3R6v
-X-Gm-Gg: ASbGncvqOViXB9qNXA48o2z9y5eXjg6WLoEFGFrLhpxTePPuXR+tydL+IUDV7f6MnPt
-	9BBINGAoIMqf7+uBm9ICjUn4YmEjrOiwvvEO0eMhzg6SNy1j6ml26QsW/3bStisLG807E8D3J6A
-	gO75hXsgNMT8IGCcpNq1tJkIulPvSs5Z1OLGRkQb3cKwL2nB0iiy8D79o9MAE/bzPykee78N/Nx
-	ThvQCjpBU0Fm2igNfPYFgOmtpCcS6uXAhKILVhQQxacyA8qDUBpyFoaGuqcr9frDWiAVqHborjq
-	mnBYaTOCV6pfoJuDoY/1WslaI+oNZQkfTURDNm1X5GWgluvoddFJHM/zbVIuHz/kqA==
-X-Google-Smtp-Source: AGHT+IECEBns91C5EwHlCoDWNpwg07LFYchP/SxyUo4u1fqpcLi7anWcXaFI4dnLEJw/KAKqFZuNdw==
-X-Received: by 2002:a05:6a00:3ccd:b0:736:5f75:4a44 with SMTP id d2e1a72fcca58-73682cc409dmr5359182b3a.22.1741190972845;
-        Wed, 05 Mar 2025 08:09:32 -0800 (PST)
-Received: from devvm6277.cco0.facebook.com ([2a03:2880:2ff:2::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7358603f4a2sm10921810b3a.173.2025.03.05.08.09.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Mar 2025 08:09:32 -0800 (PST)
-Date: Wed, 5 Mar 2025 08:09:30 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Jason Wang <jasowang@redhat.com>, davem@davemloft.net,
-	Stefan Hajnoczi <stefanha@redhat.com>, linux-kernel@vger.kernel.org,
-	Jorgen Hansen <jhansen@vmware.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux-foundation.org,
-	linux-hyperv@vger.kernel.org, Dexuan Cui <decui@microsoft.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 0/3] vsock: support network namespace
-Message-ID: <Z8h3OsmQxL3e48ZJ@devvm6277.cco0.facebook.com>
-References: <20200116172428.311437-1-sgarzare@redhat.com>
- <20200427142518.uwssa6dtasrp3bfc@steredhat>
- <224cdc10-1532-7ddc-f113-676d43d8f322@redhat.com>
- <20200428160052.o3ihui4262xogyg4@steredhat>
- <Z8edJjqAqAaV3Vkt@devvm6277.cco0.facebook.com>
- <20250305022248-mutt-send-email-mst@kernel.org>
- <v5c32aounjit7gxtwl4yxo2q2q6yikpb5yv3huxrxgfprxs2gk@b6r3jljvm6mt>
+	s=arc-20240116; t=1741191926; c=relaxed/simple;
+	bh=K+K6DmUC+Wxvngt/uU7W1IItHbJf0lWSGmSE11WgMBc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HKprgePh14EbWjMV2x8CGcz09i90dqUSI+qE2NtBKiQG0oSUDpX2bmOf6uecehUrVaaiupQfbJB9vPkOqJFIXaw6mNxZCiYkhiItsGP1LPcNwXMa6vHzdEX5rMP+AOrQyqqqYZ1fSUwKNVrdkPS/yKC7nVVzax85OtS3TmeBSM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D5D60FEC;
+	Wed,  5 Mar 2025 08:25:36 -0800 (PST)
+Received: from [10.57.67.16] (unknown [10.57.67.16])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1FB763F5A1;
+	Wed,  5 Mar 2025 08:25:18 -0800 (PST)
+Message-ID: <ea9bb982-cf31-4079-8fea-dc39e91a975b@arm.com>
+Date: Wed, 5 Mar 2025 16:25:17 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <v5c32aounjit7gxtwl4yxo2q2q6yikpb5yv3huxrxgfprxs2gk@b6r3jljvm6mt>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 09/45] kvm: arm64: Expose debug HW register numbers for
+ Realm
+To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+References: <20250213161426.102987-1-steven.price@arm.com>
+ <20250213161426.102987-10-steven.price@arm.com>
+ <cec600f2-2ddc-4c71-9bab-0a0403132b43@redhat.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <cec600f2-2ddc-4c71-9bab-0a0403132b43@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Mar 05, 2025 at 10:30:17AM +0100, Stefano Garzarella wrote:
-> On Wed, Mar 05, 2025 at 02:27:12AM -0500, Michael S. Tsirkin wrote:
-> > On Tue, Mar 04, 2025 at 04:39:02PM -0800, Bobby Eshleman wrote:
-> > > I think it might be a lot of complexity to bring into the picture from
-> > > netdev, and I'm not sure there is a big win since the vsock device could
-> > > also have a vsock->net itself? I think the complexity will come from the
-> > > address translation, which I don't think netdev buys us because there
-> > > would still be all of the work work to support vsock in netfilter?
-> > 
-> > Ugh.
-> > 
-> > Guys, let's remember what vsock is.
-> > 
-> > It's a replacement for the serial device with an interface
-> > that's easier for userspace to consume, as you get
-> > the demultiplexing by the port number.
-> > 
-> > The whole point of vsock is that people do not want
-> > any firewalling, filtering, or management on it.
-> > 
-> > It needs to work with no configuration even if networking is
-> > misconfigured or blocked.
+Hi Gavin,
+
+On 03/03/2025 04:48, Gavin Shan wrote:
+> On 2/14/25 2:13 AM, Steven Price wrote:
+>> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>
+>> Expose VM specific Debug HW register numbers.
+
+Looking at this now, this patch description is garbage. Probably the
+patch has changed over time - so I suspect it's my fault not Suzuki's.
+We're not exposing anything new here. This is purely about telling the
+VMM that a realm cannot (currently) be debugged. Something like the
+below would be more accurate:
+
+"""
+kvm: arm64: Don't expose debug capabilities for realm guests
+
+RMM v1.0 provides no mechanism for the host to perform debug operations
+on the guest. So don't expose KVM_CAP_SET_GUEST_DEBUG and report 0
+breakpoints and 0 watch points.
+"""
+
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>>   arch/arm64/kvm/arm.c | 24 +++++++++++++++++++++---
+>>   1 file changed, 21 insertions(+), 3 deletions(-)
+>>
 > 
-> I agree with Michael here.
+> Documentation/virt/kvm/api.rst needs to be updated accordingly.
+
+I don't think (with the above clarification) there's anything to update
+in the API documentation. There's nothing new being added, just
+capabilities being hidden where the functionality isn't available.
+
+And eventually we hope to add support for this (in a later RMM spec) - I
+don't yet know exactly what form this will take, but I hope to keep the
+interfaces as close as possible to what we already have so that existing
+tooling can be used.
+
+Thanks,
+Steve
+
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index b8fa82be251c..df6eb5e9ca96 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -78,6 +78,22 @@ bool is_kvm_arm_initialised(void)
+>>       return kvm_arm_initialised;
+>>   }
+>>   +static u32 kvm_arm_get_num_brps(struct kvm *kvm)
+>> +{
+>> +    if (!kvm_is_realm(kvm))
+>> +        return get_num_brps();
+>> +    /* Realm guest is not debuggable. */
+>> +    return 0;
+>> +}
+>> +
+>> +static u32 kvm_arm_get_num_wrps(struct kvm *kvm)
+>> +{
+>> +    if (!kvm_is_realm(kvm))
+>> +        return get_num_wrps();
+>> +    /* Realm guest is not debuggable. */
+>> +    return 0;
+>> +}
+>> +
 > 
-> It's been 5 years and my memory is bad, but using netdev seemed like a mess,
-> especially because in vsock we don't have anything related to
-> IP/Ethernet/ARP, etc.
+> The above two comments "Realm guest is not debuggable." can be dropped
+> since
+> the code is self-explanatory, and those two functions are unnecessary to be
+> kept in that way, for example:
 > 
-> I see vsock more as AF_UNIX than netdev.
+>     case KVM_CAP_GUEST_DEBUG_HW_BPS:
+>         return kvm_is_realm(kvm) ? 0 : get_num_brps();
+>     case KVM_CAP_GUEST_DEBUG_HW_WRPS:
+>         return kvm_is_realm(kvm) ? 0 : get_num_wrps();
+> 
+> 
+>>   int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
+>>   {
+>>       return kvm_vcpu_exiting_guest_mode(vcpu) == IN_GUEST_MODE;
+>> @@ -323,7 +339,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm,
+>> long ext)
+>>       case KVM_CAP_ARM_IRQ_LINE_LAYOUT_2:
+>>       case KVM_CAP_ARM_NISV_TO_USER:
+>>       case KVM_CAP_ARM_INJECT_EXT_DABT:
+>> -    case KVM_CAP_SET_GUEST_DEBUG:
+>>       case KVM_CAP_VCPU_ATTRIBUTES:
+>>       case KVM_CAP_PTP_KVM:
+>>       case KVM_CAP_ARM_SYSTEM_SUSPEND:
+>> @@ -331,6 +346,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm,
+>> long ext)
+>>       case KVM_CAP_COUNTER_OFFSET:
+>>           r = 1;
+>>           break;
+>> +    case KVM_CAP_SET_GUEST_DEBUG:
+>> +        r = !kvm_is_realm(kvm);
+>> +        break;
+>>       case KVM_CAP_SET_GUEST_DEBUG2:
+>>           return KVM_GUESTDBG_VALID_MASK;
+>>       case KVM_CAP_ARM_SET_DEVICE_ADDR:
+>> @@ -376,10 +394,10 @@ int kvm_vm_ioctl_check_extension(struct kvm
+>> *kvm, long ext)
+>>           r = cpus_have_final_cap(ARM64_HAS_32BIT_EL1);
+>>           break;
+>>       case KVM_CAP_GUEST_DEBUG_HW_BPS:
+>> -        r = get_num_brps();
+>> +        r = kvm_arm_get_num_brps(kvm);
+>>           break;
+>>       case KVM_CAP_GUEST_DEBUG_HW_WPS:
+>> -        r = get_num_wrps();
+>> +        r = kvm_arm_get_num_wrps(kvm);
+>>           break;
+>>       case KVM_CAP_ARM_PMU_V3:
+>>           r = kvm_arm_support_pmu_v3();
+> 
+> Thanks,
+> Gavin
 > 
 
-+1, I also agree with this.
-
-For reference I added netdev to vsock before [1] to use qdisc and at
-least from the qdisc perspect the juice wasn't worth the squeeze (tldr:
-only pfifo_fast worked because vsock can't recover when other qdiscs silently
-drop packets).
-
-[1] https://lore.kernel.org/all/5a93c5aad99d79f028d349cb7e3c128c65d5d7e2.1660362668.git.bobby.eshleman@bytedance.com/
-
-Best,
-Bobby
 
