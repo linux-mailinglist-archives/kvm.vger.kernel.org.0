@@ -1,252 +1,282 @@
-Return-Path: <kvm+bounces-40112-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40113-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FD71A4F3F8
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 02:40:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B12DA4F431
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 02:58:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EAC4C1890926
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 01:40:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3A1418896B9
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 01:58:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D6991531C4;
-	Wed,  5 Mar 2025 01:39:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6998B155751;
+	Wed,  5 Mar 2025 01:58:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KEmY2HhO"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Pf6znWzu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2053.outbound.protection.outlook.com [40.107.237.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF9E313AA2D
-	for <kvm@vger.kernel.org>; Wed,  5 Mar 2025 01:39:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741138793; cv=none; b=TqtFj7zJuvTzW2Lfm7w2+aoY12rB1+9No2aO1F7O3DrYTZ8WIjgdC2BbGDcmXX/uiobttrhpDV0O2UkkoKtS/Qj4y1RKiRDc3E+K+EVuxRWHQrbxlDJOTMDusqfx2cxvfR8YTGSXPxDHdkpxAaqA0ZurDzKkOMMlp6lHew+c3JE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741138793; c=relaxed/simple;
-	bh=dqWsSzrccmVHnLHCLmkQRVxxeSfQIVPPMj9Ba8t5jOk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gM7a3a4rP0opYAYefpOoihoqnEONA5395gFW3M66G4DtusCcf6xJCaDFgnacp8fBWk0qgnM7lxLQ0LMo3OsHvwTO1XCJIyiymMQe8c68yp2tlk56DsQLvJBghu08ixZxDbcXwPPA5FaXQrrp3nE98MGewBOb60j/2ArrSaOkGro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KEmY2HhO; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-223a0da61easo78105ad.0
-        for <kvm@vger.kernel.org>; Tue, 04 Mar 2025 17:39:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741138791; x=1741743591; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9fA2KYQHik2cIQjoxJaa3twCTPuvqgtb1JUSNyfAxYc=;
-        b=KEmY2HhOS8mF2KDj8S398zL/v1r7A/0pFXXbr7COg5sO4riLlxI+m9l5LS63Xw5H0z
-         DFtXfHaP8JmFmct3QWE4c+tNRkETsrVr3cSXac1HnQz8L1vhBD5r2C1g6CdahfZv/RnG
-         fhuH3+R35Ks7+4UXylW1Fhn6EHMFOQtsksGyM57fwxCd3nwTobKe3uXRWUGaza7HaWNs
-         LBjL2DV26rHB0+ouRAVVz+OZGdnNh4icMh0dqTL8daa2+0a7J+eJzjUvZ2hx4MeNAIU2
-         f0QXmHMg8PpJC5IzwjgfQl5yBkwcTnKYkGg6y43zvO0zGHNByYsznxQdNvmXY9gjdc3J
-         QtEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741138791; x=1741743591;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9fA2KYQHik2cIQjoxJaa3twCTPuvqgtb1JUSNyfAxYc=;
-        b=HTNuLgJDzx3RKZMaB9e6zYC4SB7v3sPnNtG0kvjwQ+FjnlBKALhnUBhRbByPO+z5v1
-         m4bnnnOAmRzySTBm9pgx8LkaeGMu0efSCM4LN5zSrlOZXFBfo5Smgeupe1yf4S6k1Ju0
-         vQUeJvVVjhqGGWUdRf3n1lM7mf6LyXMwXYxpXMtnN0LX70ia3UtDd6IpmdhMXCmTATqS
-         0s5QjCThllp5wjD5k/H3/hD6Q7W1k7vRs2EYScNmCFrHf0I5YYIDZ+2ibBPIibvPKoWQ
-         KUAe5xVO4SY46OWvJ08HA1pud9o9vRTgmODCflBGNm4H5dsrAVWtfhuXaM7VUzi3Aadp
-         FTHw==
-X-Forwarded-Encrypted: i=1; AJvYcCWfRaiXK++8Q8a0PO5Pjl22RC64VQ651e2HfQT2WKJWIe/PulSU2Ms3oS7uOqnXW+YcKN8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvQZDoYqKxuLin8OXjR4h1d9lWgZkFjC/RnAq3i0Lia0CF/4oD
-	3wctz68D32RyqGs/hYkSw5S6wmUPBtD6aeJXllvCs+wGDhg7VaORH2sukZxag48uQF0iMsqGDfe
-	UxMwUsmbUUZVD/jwCMM7xd+ae8RB7jp1PNn3b
-X-Gm-Gg: ASbGncvYwpN/rAAMwMh9lHzk0lGC8x6m07on/ZcJODSim2nZlOghHf+5G/kl5jQV5C2
-	VvqBrRLMvT9m+LskUJpmRNeaRvSTpFkHFZQemdikzBue0G7vebx80XULTql2n7ok1oa9weH9cBP
-	eeVrmGkwD7gnDEK4QSg+ToDfdrxHNfVctxNFT0Te3DhSZfaJO+IN4PPwZz
-X-Google-Smtp-Source: AGHT+IH5gXmkQSdJDrmvDbhcX1gVqatKumUNqefxFocuBrCcwtKWp6uWzxr+bTikNvWZpTgRK27RGaHlzULM/jBATGw=
-X-Received: by 2002:a17:903:494:b0:216:2839:145 with SMTP id
- d9443c01a7336-223f44abcf5mr798995ad.1.1741138790491; Tue, 04 Mar 2025
- 17:39:50 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C64146A6F;
+	Wed,  5 Mar 2025 01:58:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741139916; cv=fail; b=VR9E85Fn+NNqpn8oOBgpPgQVVJsAnM4UXxFQDvwI/mj18hbaQK9TlsWUPO9pOz7KSZqysXNFnSgC0Vj2P9dRaY53Apkh1Q5w3185gbD/QOb5oE9avU6Re3G4AAcTqmaRlD1e2aTwIe1h26zoEgLX7VUCGjgOK/IPybf0aqO7RCs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741139916; c=relaxed/simple;
+	bh=s/n9+oD1z+HLxMbvIpELH717JeVWUBcIk/Veg1x3PHk=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=PFF5inw6pBNR9gAkTX8HhBuKShv5m2AYKUemHmmuQTmEfBNi6CsG6TlYwz21cHWPgoVPan2XUjSVDvwk3B0+J+qQoCNDPXeIWoow238HNe2fayWrFDalOws/LNIKJeb8VcXNZGzKgxxsLizwDQybhdN9R1FZQGYmrKXT7FLy198=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Pf6znWzu; arc=fail smtp.client-ip=40.107.237.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=OCzmOXrx8lDiBc6v4zPVtOu0QQied+ttxNmzHVQC/YBx4RN3x7TQfDuo4fA4uwUdmQxfeLrxrhDhNFVEp8/s+KeHAqGGp7TNBXJ7i0ISIK2yhCL+g5bBeLRN3x+B5Q9sgyQxGsWBWjob0YaBag0EAWIvfiDMJQpPgep+ME425b/Ot6YLgQofBRIwH3OD3hbwaKxVbXJvZAGLbBBZh+YJNfWIMA5YfqUW7owGGWhCF4uHQ9Da80KiPJnI87Lfb2aYMxHb7FCNBeTpOyKaTHxREjBnDBdWLskPqxEi84M1mb8stIGgshsQ4mVVpfqeFp0j4MLlquaabirr2RLCE9nOUw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2CEQmh9ssTJ/wSyYzeAqXx0sdN6lNRmxLbEIFIrSkdk=;
+ b=yn7aBx6E1bzCctIbNZqWpVYgVXilmpr9mCCXFgSscrjJM7orS/T2S40D02/thzf4Djbf4l9i2Zg4/AunXCrS5TlArHSQLGnJKZNhd7TmuPeMNKeonH1bbCOz3E+tJgWdzeZl/5z5ignJP5wnLhuA6Mpfsm1rV389G1cotIJKjoal9uyLSjGF2GiZyspa0FzxNQ5fuoWIEaK3bdKsLZzdkdvkKA4YRkDSsE1UYoD0TVdpc2SKudR/JCh+Wqwe8WHXGzTOgJquw/dUMd+d+q1OX2qzRV+aY5BP4NV5yTArZ0Vnb5L41iF3Ge8xb6/wJ7EUc8mAP77yy4R1qBDvUxOIfw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2CEQmh9ssTJ/wSyYzeAqXx0sdN6lNRmxLbEIFIrSkdk=;
+ b=Pf6znWzuUwRy4NwkXrf+dyCIqnrhKHctaynBh1FFLWaopmEdyO44of2irIKzk3j0S7ypzXUO84CQ10jMZFEZ0pIr9iGRtp41wMAZNW67mX79sMX/1b15xGsl6Zuw5vfkiuNRPInivbXoe+8hhOHrYvv84UGjHzn5aujEYEDJzrA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB9066.namprd12.prod.outlook.com (2603:10b6:510:1f6::5)
+ by CY8PR12MB8363.namprd12.prod.outlook.com (2603:10b6:930:7a::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.29; Wed, 5 Mar
+ 2025 01:58:31 +0000
+Received: from PH7PR12MB9066.namprd12.prod.outlook.com
+ ([fe80::954d:ca3a:4eac:213f]) by PH7PR12MB9066.namprd12.prod.outlook.com
+ ([fe80::954d:ca3a:4eac:213f%2]) with mapi id 15.20.8511.017; Wed, 5 Mar 2025
+ 01:58:31 +0000
+Message-ID: <a0feef4a-1e12-445c-8a17-0f2ecc4d7c85@amd.com>
+Date: Tue, 4 Mar 2025 19:58:28 -0600
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 6/7] KVM: SVM: Add support to initialize SEV/SNP
+ functionality in KVM
+To: Sean Christopherson <seanjc@google.com>
+Cc: pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ thomas.lendacky@amd.com, john.allen@amd.com, herbert@gondor.apana.org.au,
+ michael.roth@amd.com, dionnaglaze@google.com, nikunj@amd.com,
+ ardb@kernel.org, kevinloughlin@google.com, Neeraj.Upadhyay@amd.com,
+ aik@amd.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-coco@lists.linux.dev
+References: <cover.1740512583.git.ashish.kalra@amd.com>
+ <27a491ee16015824b416e72921b02a02c27433f7.1740512583.git.ashish.kalra@amd.com>
+ <Z8IBHuSc3apsxePN@google.com> <cf34c479-c741-4173-8a94-b2e69e89810b@amd.com>
+ <Z8I5cwDFFQZ-_wqI@google.com> <8dc83535-a594-4447-a112-22b25aea26f9@amd.com>
+ <Z8YV64JanLqzo-DS@google.com> <217bc786-4c81-4a7a-9c66-71f971c2e8fd@amd.com>
+ <Z8d3lDKfN1ffZbt5@google.com>
+Content-Language: en-US
+From: "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <Z8d3lDKfN1ffZbt5@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA1P222CA0138.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:806:3c2::27) To PH7PR12MB9066.namprd12.prod.outlook.com
+ (2603:10b6:510:1f6::5)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250227041209.2031104-1-almasrymina@google.com>
- <20250227041209.2031104-2-almasrymina@google.com> <20250228163846.0a59fb40@kernel.org>
- <CAHS8izNQnTW7sad_oABtxhy3cHxGR0FWJucrHTSVX7ZAA6jT3Q@mail.gmail.com> <20250303162051.09ad684e@kernel.org>
-In-Reply-To: <20250303162051.09ad684e@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 4 Mar 2025 17:39:37 -0800
-X-Gm-Features: AQ5f1JokmBfu9vApWvP6OeSWBJnA3SLQMcYEIWf9RLvx2TEKaGIWTz1vBTgX4iM
-Message-ID: <CAHS8izNWt2-1bC2f0jv4Qpk_A9VpEXNvVRoXUtL43_16d-Ui-A@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 1/8] net: add get_netmem/put_netmem support
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
-	Donald Hunter <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Jeroen de Borst <jeroendb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB9066:EE_|CY8PR12MB8363:EE_
+X-MS-Office365-Filtering-Correlation-Id: b1401fab-2011-4dca-695e-08dd5b893aa5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?cDNGVzBQYXFVa1dWUU1nT2crQzdPVGp6aVRqVkRhdDV2UTFCSXJmWlQwdFdO?=
+ =?utf-8?B?OC8yOE5wb0o1YlFxbVM4RVpDalpNMzVBNm5ZcDlpMFhlbWw5K0d3cytta3pm?=
+ =?utf-8?B?dktvTHArOER6cW95SVh4djFMNUxEMHRNdllJV05HZTJlWHc3Nk5mWWVaVm1r?=
+ =?utf-8?B?bFJxa1diakhPVGFvNzZQOEQ0L1pWenVVTnU0ZnM2cFlVWk9nUzhGUGdObU95?=
+ =?utf-8?B?eDBvSUo5V2ZPRnVabDVuMlZYZEI5U0Rib0tYQUFDL0xNcC9Ld3crWmYrR1Fi?=
+ =?utf-8?B?dWhvcUhpZHpzbURlKzlycW5TaW9xUzQrS1pjZFNpREp1ZmduZzhmM0RtTS9U?=
+ =?utf-8?B?OGxCeVl5RnlIUkpWdm5uYTRPV1B4WEYyamMvTEVOOEhFRHdTOWt0S1Y1ZlpT?=
+ =?utf-8?B?V0IwUTBZUitnTVhQN0kwREZzbHI3NElQRlEzYmMzZFQyNzNlcm5MdXpXRzNv?=
+ =?utf-8?B?NTlSMmZQUzZMWU9iQnlJdy9sbEg1VldqMVQwTm42NVBEQVRlTXd6bFJvSlk1?=
+ =?utf-8?B?Vy9XTENpbzZLcDJ3U0p6Vi82OU96STZSUzlxOURoQXo0T29GVkpIVWxWTkc0?=
+ =?utf-8?B?a1pNOGJDK2cxeXZJK0RyS1pDMEdCTERzMlJ6OTc3S3ROY1NjUHNCay9tajFT?=
+ =?utf-8?B?N3NtSEVhQXpXMUk0b282a240cTZjWkY0TG04d0t6Nmp4RFl2QnNKWU11akdC?=
+ =?utf-8?B?YzBsUnZRbXAxbmxpWGNZelVTb3Njell3ckxKKzV1WUhEQm5BUlNjR2VsZys3?=
+ =?utf-8?B?akRvcVArRTBCMVFSK1F4VytZV0h4UDFJa3RGNWpSZ2k4azR1anJ2Kyt2eUpE?=
+ =?utf-8?B?enVZREQ1YjFjZHZJZnZlbUZmczdldndzT2thdzNNVDFBcnNZbEdGdCtLbk5S?=
+ =?utf-8?B?WlJ6ckEzNHgzaDltdGR5WFNXbW9ncEEzK2kvR2VMWnJ5TlJYK3RtMVFsZW5k?=
+ =?utf-8?B?d2RralFkNVdpL3FOcDVtZTRlQXZmTi9IcXJjOVZqU3dlZS9DeHBqUzlUaXVk?=
+ =?utf-8?B?dk1TeTBvR0VGdFN6RTBlQWhka2RBRjljS0wxM2xKWTR0QkpQd0VsQjVrYTc3?=
+ =?utf-8?B?MGQ0dlRxRHVZUklVQW1EOUdKemlJZW9mZGgxMlRSWVNYT3JEUzU0VlRhcHFF?=
+ =?utf-8?B?aTlPOWhWeFI0dnBJSHhJZXdHNjBpMnYvUHFSellXM3o1NHJPZGxMb29ZQ2Nm?=
+ =?utf-8?B?Q2xqVzV4cHJtc3cxRjIzZVcycjNRcXIyempDQ3IrejNIb0hqMFg3djJ1S2pJ?=
+ =?utf-8?B?SW5seXRYOG9aOEtrVG9icmJlUFBaUG1mencvakVzdVo4Zkh4ck5QKzNFVmxj?=
+ =?utf-8?B?T2h1TlRqR2hCaXdmWXJmUERtbk02OC9Ob3hTay9LaGVTOXIvSGJ5cE56V0NR?=
+ =?utf-8?B?NWZYSklxVG8wQ1NBQndmWkRDbXBCY0dacllKZm5nbkwvYW0wU29DWmRXQlFs?=
+ =?utf-8?B?RlgwNzFxN25ubWFnNll3bXFyc3F4bSt2aDlycXVyKytJMVJ5b3NwMnM4Q2JD?=
+ =?utf-8?B?eVZFMnhxNS9PRDcyTVY5c1c1UDFrRHlVN3JuOFcyMFZrSFhkWVViTExHWjhV?=
+ =?utf-8?B?VVdkVllPNmFTRUpERWZBank1cmhva0g3MCt2eTdDYVRDQXdHbUNIS1I4c1F2?=
+ =?utf-8?B?cEdLZDVvMy8yOEdRWTV4ZU5oV2pqT1l2UVNoaGNTcmNaVlE4K1R5dndoYVhn?=
+ =?utf-8?B?SHpqeXJOdGNLY09uYzNHc0h0SThBeGV0eVRlQkdJZlVibDQrQ1puMGgySnJR?=
+ =?utf-8?B?bE1zSVphajkyL0doTWlnN0VhMk1EdTIvRkZvQ3VueUFQNExMNEgwcmRxMGNs?=
+ =?utf-8?B?azA0dHdhaDRpbThLYnpWK25wQzFhU0VaU242SXZJdFRDSzFlTDdWWllUNHAw?=
+ =?utf-8?Q?CPPELKDRsr2Md?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB9066.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MUl5NEtiOVd6enhCelhINm9wQjdnT1JzVWZFdVJ0WUtBNXRTT1VqNFNwOFhV?=
+ =?utf-8?B?Um13VllSaWkzRC9sNHdqaTdwdVdPRXorellVWkJIMXhHd0FlYlpwcG5vMDRy?=
+ =?utf-8?B?cHlJeVdSa1hRanJBeU5nc29ZYmVBeTBIV3paWDJiaVNhOE91SWVzV3QwVnRG?=
+ =?utf-8?B?QkliVFUxVmRHV3VtT1JvZitGbGxueXJjRHNPMDJXZjVEcU9OYzdkNG5iNUxV?=
+ =?utf-8?B?QVRZUG9IdVVHMUtZMzdzK2RDTGtnL0l5dGFpRHFZeHhvMGtaN0VleDd3WnRy?=
+ =?utf-8?B?NlRHNnBBNTVmQjQ5ZnZmMFl5YnlMLzZITjRJYmpOekswVDBmdTZQRTkrZVhq?=
+ =?utf-8?B?U1h0R2YwSFo1VmsxM0tDcHJMck9lV0FYSlBGeWE0L1lXeXZUM1l1Q3lGVnFh?=
+ =?utf-8?B?NWJZak9vaU9jWENqb0RCcDhDREt0L21jT3RXQTAwS3JjNFc4ZEJ5K1h4VzFP?=
+ =?utf-8?B?SWE2WnBuSk1Ic2U4UHVORGpyWE1BWHNkcVM5ZjVZQmVXUTNCRFRScjM2S0FP?=
+ =?utf-8?B?VGJuWmIrdnFKTEUrd05qQVVaMmI4VDZYL0ZDbGh5V2tJcHdvRlNFOFc1M25N?=
+ =?utf-8?B?N2kwNXJkSmNVenNXSnY4N0t3M1I5NnlpOHoyWWxYeGdnWEFRM1Bwb242ZmRu?=
+ =?utf-8?B?a2w5L3VVa1IweS9paXNXcitEbUlVRHBsV3BmdnNNc3FqZTBKZXVUVitFSlV6?=
+ =?utf-8?B?eDBtMFlHNFM4dFZibnBjbzZ1M2JCbWZ0TS9talhSQ29sQkpXdVcyUTYyR1V1?=
+ =?utf-8?B?WFFLQ3F6YUg1K1I1bi9SS0RIN1pveDExMWtCTjlmdFJiMXd4eHZMV2d3VEhE?=
+ =?utf-8?B?QTljUjF5WGVqdVdTSWZrWGtuc0llc2JyU2lXVVdHUjFDV3RPZEtsNjA5MmFU?=
+ =?utf-8?B?SGJjTkNMbWtqZS9jckE1UVg0OUNBK2ZtL2pQM3UyaUhKUlFMa1RaQ3NiUFA3?=
+ =?utf-8?B?Z1dYUDZnM20rZkltM2RqWlhhTzNTTng2dnhyZ1FOQ0tzUGVocE1YTGd0UVZ4?=
+ =?utf-8?B?OG9vUjk5eDFieFR1M1JCdSt1M3BlVEpJcGhmbWdLMU40cG9PcEF1OU5KVjgv?=
+ =?utf-8?B?aDF4c2xVSmpXKzQ1TnNkMlFhbzB1V0QvaFBacVhZTGszYUZTQ0haVnJHSXV2?=
+ =?utf-8?B?bmVQeEloaDc2S3UxUlZQTDJKODFMbkowdm9ReDF2NG0wSnd0WUpadU5TVnlQ?=
+ =?utf-8?B?akczU0hTMWJJR0ZYekxIdXFLM0lmd2J6bzRUaS9PZDVrV3J4R0cxQTJOcUt6?=
+ =?utf-8?B?cC9SVDR3dUpsSmZ0TS9HcnZmNFJzNFNPck1TaHNiUXBtS3dHelZyNVgwb2oy?=
+ =?utf-8?B?NkJpbGRaK29qOUlaRnNoOWVmRWJmaDhWdCtSYjhObzBLTkZoTGhRZndJeWtU?=
+ =?utf-8?B?c0pnZm5NRHpMRWZPd1RkdlhNMkQ5dUNPRWZyaEhISGtkdG44NEVZOFNZUGtM?=
+ =?utf-8?B?YmUyQ3J2VjZOMThaTFBpdTEyWG1KNU40Z1pzaGJqRlpvdE84SGE3YnljZDMx?=
+ =?utf-8?B?dXovM3ZqMFNreXRsRWZxcVpFRE10NHFoc0VOak9PdGorcWwzbFhQbE5OMSs4?=
+ =?utf-8?B?QURNSG05QzBnR1JqWjlBZ0FQQytkVVpBREpocjB2VDlGYmFwY3ZLUnhkNVNa?=
+ =?utf-8?B?bmhrb3Z2dkpTT2NqUzJ1YXRjVjY5QkZVMHNwRkIwc3pacEZaYWRJRzVOamhP?=
+ =?utf-8?B?MzNjLzlYdzFROGNERmhKbi9HejZtdjNhV0dhdFBGWUZBTnhISSsySnRuUmlS?=
+ =?utf-8?B?YUNuVVRiK2NDS25RQmw0cW4xTlZkNzl6a3Q5b2NIcnc3NzR3cVR1aXdiYkh3?=
+ =?utf-8?B?dElXaXk5VnpjZ1NkZW90S090R3d2NzNQaE5CalF1cTV0NVFYWXRsT2srMStw?=
+ =?utf-8?B?T3JUcmQ4K1lFaVpvSlgwT1pCMG8wY3BMNDBMd0xZbDRtUmg4RUpheFFCTDcr?=
+ =?utf-8?B?TlR1ZEptUStkQW0zTlN3dXdGUk9CT3pod2xsSFBVb3NpcXB0cVlkNVNYd010?=
+ =?utf-8?B?bFdpY0tYeTlsR21EQjNLYzBBRGdBYzZOQkZPa2ZlcHNlVE5WTEJYSXhVckRl?=
+ =?utf-8?B?R05jeW1kS1lTRVY3RHhaeFh5MGY3eVVTWnB2ZXVkRzRJbG9OMzJsYmtyeTlV?=
+ =?utf-8?Q?1E79TtetohdLLbHPxc8ybqTvC?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b1401fab-2011-4dca-695e-08dd5b893aa5
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB9066.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2025 01:58:31.1151
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uiuwh3MyEvGDNTx7PYOvVAdaOL+gtYHZ8cp0BkW9WrH0wdGPTpnpvfVVqG6Dcr9WMgUM2NAZGBU0KBFD5Q7HIA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8363
 
-On Mon, Mar 3, 2025 at 4:20=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Fri, 28 Feb 2025 17:29:13 -0800 Mina Almasry wrote:
-> > On Fri, Feb 28, 2025 at 4:38=E2=80=AFPM Jakub Kicinski <kuba@kernel.org=
-> wrote:
-> > > On Thu, 27 Feb 2025 04:12:02 +0000 Mina Almasry wrote:
-> > > >  static inline void __skb_frag_ref(skb_frag_t *frag)
-> > > >  {
-> > > > -     get_page(skb_frag_page(frag));
-> > > > +     get_netmem(skb_frag_netmem(frag));
-> > > >  }
-> > >
-> > > Silently handling types of memory the caller may not be expecting
-> > > always worries me.
-> >
-> > Sorry, I'm not following. What caller is not expecting netmem?
-> > Here we're making sure __skb_frag_ref() handles netmem correctly,
-> > i.e. we were not expecting netmem here before, and after this patch
-> > we'll handle it correctly.
-> >
-> > > Why do we need this?
-> > >
-> >
-> > The MSG_ZEROCOPY TX path takes a page reference on the passed memory
-> > in zerocopy_fill_skb_from_iter() that kfree_skb() later drops when the
-> > skb is sent. We need an equivalent for netmem, which only supports pp
-> > refs today. This is my attempt at implementing a page_ref equivalent
-> > to net_iov and generic netmem.
-> >
-> > I think __skb_frag_[un]ref is used elsewhere in the TX path too,
-> > tcp_mtu_probe for example calls skb_frag_ref eventually.
->
-> Any such caller must be inspected to make sure it generates
-> / anticipates skbs with appropriate pp_recycle and readable settings.
-> It's possible that adding a set of _netmem APIs would be too much
-> churn, but if it's not - it'd make it clear which parts of the kernel
-> we have inspected.
->
 
-I see, you're concerned about interactions between skb->pp_recycle and
-skb->unreadable. My strategy to handle this is to take what works for
-pages, and extend it as carefully as possible to unreadable
-net_iovs/skbs. Abstractly speaking, I think skb_frag_ref/unref should
-be able to obtain/drop a ref on a frag regardless of what the
-underlying memory type is.
+On 3/4/2025 3:58 PM, Sean Christopherson wrote:
+> On Mon, Mar 03, 2025, Ashish Kalra wrote:
+>> On 3/3/2025 2:49 PM, Sean Christopherson wrote:
+>>> On Mon, Mar 03, 2025, Ashish Kalra wrote:
+>>>> On 2/28/2025 4:32 PM, Sean Christopherson wrote:
+>>>>> On Fri, Feb 28, 2025, Ashish Kalra wrote:
+>>>>>> And the other consideration is that runtime setup of especially SEV-ES VMs will not
+>>>>>> work if/when first SEV-ES VM is launched, if SEV INIT has not been issued at 
+>>>>>> KVM setup time.
+>>>>>>
+>>>>>> This is because qemu has a check for SEV INIT to have been done (via SEV platform
+>>>>>> status command) prior to launching SEV-ES VMs via KVM_SEV_INIT2 ioctl. 
+>>>>>>
+>>>>>> So effectively, __sev_guest_init() does not get invoked in case of launching 
+>>>>>> SEV_ES VMs, if sev_platform_init() has not been done to issue SEV INIT in 
+>>>>>> sev_hardware_setup().
+>>>>>>
+>>>>>> In other words the deferred initialization only works for SEV VMs and not SEV-ES VMs.
+>>>>>
+>>>>> In that case, I vote to kill off deferred initialization entirely, and commit to
+>>>>> enabling all of SEV+ when KVM loads (which we should have done from day one).
+>>>>> Assuming we can do that in a way that's compatible with the /dev/sev ioctls.
+>>>>
+>>>> Yes, that's what seems to be the right approach to enabling all SEV+ when KVM loads. 
+>>>>
+>>>> For SEV firmware hotloading we will do implicit SEV Shutdown prior to DLFW_EX
+>>>> and SEV (re)INIT after that to ensure that SEV is in UNINIT state before
+>>>> DLFW_EX.
+>>>>
+>>>> We still probably want to keep the deferred initialization for SEV in 
+>>>> __sev_guest_init() by calling sev_platform_init() to support the SEV INIT_EX
+>>>> case.
+>>>
+>>> Refresh me, how does INIT_EX fit into all of this?  I.e. why does it need special
+>>> casing?
+>>
+>> For SEV INIT_EX, we need the filesystem to be up and running as the user-supplied
+>> SEV related persistent data is read from a regular file and provided to the
+>> INIT_EX command.
+>>
+>> Now, with the modified SEV/SNP init flow, when SEV/SNP initialization is 
+>> performed during KVM module load, then as i believe the filesystem will be
+>> mounted before KVM module loads, so SEV INIT_EX can be supported without
+>> any issues.
+>>
+>> Therefore, we don't need deferred initialization support for SEV INIT_EX
+>> in case of KVM being loaded as a module.
+>>
+>> But if KVM module is built-in, then filesystem will not be mounted when 
+>> SEV/SNP initialization is done during KVM initialization and in that case
+>> SEV INIT_EX cannot be supported. 
+>>
+>> Therefore to support SEV INIT_EX when KVM module is built-in, the following
+>> will need to be done:
+>>
+>> - Boot kernel with psp_init_on_probe=false command line.
+>> - This ensures that during KVM initialization, only SNP INIT is done.
+>> - Later at runtime, when filesystem has already been mounted, 
+>> SEV VM launch will trigger deferred SEV (INIT_EX) initialization
+>> (via the __sev_guest_init() -> sev_platform_init() code path).
+>>
+>> NOTE: psp_init_on_probe module parameter and deferred SEV initialization
+>> during SEV VM launch (__sev_guest_init()->sev_platform_init()) was added
+>> specifically to support SEV INIT_EX case.
+> 
+> Ugh.  That's quite the unworkable mess.  sev_hardware_setup() can't determine
+> if SEV/SEV-ES is fully supported without initializing the platform, but userspace
+> needs KVM to do initialization so that SEV platform status reads out correctly.
+> 
+> Aha!
+> 
+> Isn't that a Google problem?  And one that resolves itself if initialization is
+> done on kvm-amd.ko load?
 
-Currently __skb_frag_ref() obtains a page ref regardless of
-skb->pp_recycle setting, and skb_page_unref() drops a page_ref if
-!skb->pp_recycle and a pp ref if skb->pp_recycle. I extend the logic
-so that it applies as-is to net_iovs and unreadable skbs.
+Yes, SEV INIT_EX is mainly used/required by Google.
 
-After this patch, __skb_frag_ref() obtains a 'page ref equivalent' on
-the net_iov regardless of the pp_recycle setting. My conjecture is
-that since that works for pages, it should also work for net_iovs.
+> 
+> A system/kernel _could_ be configured to use a path during initcalls, with the
+> approproate initramfs magic.  So there's no hard requirement that makes init_ex_path
+> incompatible with CRYPTO_DEV_CCP_DD=y or CONFIG_KVM_AMD=y.  Google's environment
+> simply doesn't jump through those hoops.
+> 
+> But Google _does_ build kvm-amd.ko as a module.
+> 
+> So rather than carry a bunch of hard-to-follow code (and potentially impossible
+> constraints), always do initialization at kvm-amd.ko load, and require the platform
+> owner to ensure init_ex_path can be resolved when sev_hardware_setup() runs, i.e.
+> when kvm-amd.ko is loaded or its initcall runs.
 
-Also after this patch, skb_page_unref will drop a pp ref on the
-net_iov if skb->pp_recycle is set, and drop a 'page ref equivalent' on
-the net_iov if !skb->pp_recycle. The conjecture again is that since
-that works for pages, it should extend to net_iovs.
+So you are proposing that we drop all deferred initialization support for SEV, i.e,
+we drop the psp_init_on_probe module parameter for CCP driver, remove the probe
+field from sev_platform_init_args and correspondingly drop any support to skip/defer
+SEV INIT in _sev_platform_init_locked() and then also drop all existing support in
+KVM for SEV deferred initialization, i.e, remove the call to sev_platform_init()
+from __sev_guest_init().
 
-With regards to the callers, my thinking is that since we preserved
-the semantics of __skb_frag_ref and skb_page_unref (and so
-skb_frag_ref/skb_frag_unref by extension), then all existing callers
-of skb_frag_[un]ref should work as is. Here is some code analysis of
-individual callers:
-
-1. skb_release_data
-      __skb_frag_unref
-        skb_page_unref
-
-This code path expects to drop a pp_ref if skb->pp_recycle, and drop a
-page ref if !skb->pp_recycle. We make sure to do this regardless if
-the skb is actually filled with net_iovs or pages, and the conjecture
-is that since the logic to acquire/drop a pp=3Dpage ref works for pages,
-it should work for the net_iovs as well.
-
-2. __skb_zcopy_downgrade_managed
-      skb_frag_ref
-
-Same thing here, since this code expects to get a page ref on the
-frag, we obtain the net_iov equivalent of a page_ref and that should
-work as well for net_iovs as pages. I could look at more callers, but
-the general thinking is the same. Am I off the rails here?
-
-Of course, we could leave skb_frag_[un]ref as-is and create an
-skb_frag_[un]ref_netmem which support net_iovs, but my ambition here
-was to make skb_frag_[un]ref itself support netmem rather than fork
-the frag refcounting - if it seems like a good idea?
-
-> > > In general, I'm surprised by the lack of bug reports for devmem.
-> >
-> > I guess we did a good job making sure we don't regress the page paths.
->
-> :)
->
-> > The lack of support in any driver that qemu will run is an issue. I
-> > wonder if also the fact that devmem needs some setup is also an issue.
-> > We need headersplit enabled, udmabuf created, netlink API bound, and
-> > then a connection referring to created and we don't support loopback.
-> > I think maybe it all may make it difficult for syzbot to repro. I've
-> > had it on my todo list to investigate this more.
-> >
-> > > Can you think of any way we could expose this more to syzbot?
-> > > First thing that comes to mind is a simple hack in netdevsim,
-> > > to make it insert a netmem handle (allocated locally, not a real
-> > > memory provider), every N packets (controllable via debugfs).
-> > > Would that work?
-> >
-> > Yes, great idea. I don't see why it wouldn't work.
-> >
-> > We don't expect mixing of net_iovs and pages in the same skb, but
-> > netdevsim could create one net_iov skb every N skbs.
-> >
-> > I guess I'm not totally sure something is discoverable to syzbot. Is a
-> > netdevsim hack toggleable via a debugfs sufficient for syzbot? I'll
-> > investigate and ask.
->
-> Yeah, my unreliable memory is that syzbot has a mixed record discovering
-> problems with debugfs. If you could ask Dmitry for advice that'd be
-> ideal.
-
-Yes, I took a look here and discussed with Willem. Long story short is
-that syzbot support is possible but with a handful of changes. We'll
-look into that.
-
-Long story long, for syzbot support I don't think netdevsim itself
-will be useful. Its our understanding so far that syzbot doesn't do
-anything special with netdevsim. We'll need to add queue
-API/page_pool/unreadable netmem support to one of the drivers qemu
-(syzbot) uses, and that should get syzbot fuzzing the control plane.
-
-To get syzbot to fuzz the data plane, I think we need to set up a
-special syzbot instance which configures udmabuf/rss/flow
-steering/netlink binding and start injecting packets through the data
-path. Syzbot would not discover a working config on its own. I'm told
-it's rare to set up specialized syzbot instances but we could sell
-that this coverage is important enough.
-
-Hacking netdevsim like you suggested would be useful as well, but
-outside of syzbot, AFAICT so far. We can run existing netdevsim data
-path tests with netdevsim in 'unreadable netmem mode' and see if it
-can reproduce issues. Although I'm not sure how to integrate that with
-continuous testing yet.
-
---
 Thanks,
-Mina
+Ashish
 
