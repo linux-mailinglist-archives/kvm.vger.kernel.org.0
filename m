@@ -1,246 +1,252 @@
-Return-Path: <kvm+bounces-40111-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40112-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5B96A4F3F1
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 02:38:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FD71A4F3F8
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 02:40:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0E513A79FF
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 01:38:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EAC4C1890926
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 01:40:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B260B148314;
-	Wed,  5 Mar 2025 01:38:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D6991531C4;
+	Wed,  5 Mar 2025 01:39:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EMw6sI/f"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KEmY2HhO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20ABA3B7A8
-	for <kvm@vger.kernel.org>; Wed,  5 Mar 2025 01:38:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF9E313AA2D
+	for <kvm@vger.kernel.org>; Wed,  5 Mar 2025 01:39:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741138709; cv=none; b=BtGKfA+BsMDtZfUq+OLglyvQul8hQtBGOQR3+/jA5La4fQFnG3zfplsV8peeTCbAZBHNctbxWzH/9cJ3Tv43QBbdtMSooVx9e0jtBYjdpSCguswp7pyw24nKdzk7DkAOn3aEtRKORPiGLUTs3lxyFoURGFCPDht7nbxJyw2LdJQ=
+	t=1741138793; cv=none; b=TqtFj7zJuvTzW2Lfm7w2+aoY12rB1+9No2aO1F7O3DrYTZ8WIjgdC2BbGDcmXX/uiobttrhpDV0O2UkkoKtS/Qj4y1RKiRDc3E+K+EVuxRWHQrbxlDJOTMDusqfx2cxvfR8YTGSXPxDHdkpxAaqA0ZurDzKkOMMlp6lHew+c3JE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741138709; c=relaxed/simple;
-	bh=K4absVKzsv8lTq4U5SKjFXUqDZfm7QdEVd3JKOxSQqQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eHGTWWtQrakiALSTdvG2HpIKvQMFYi+VwUtIz7lB6Z0/E1bJUhHv6YMMN6LIVtKiWjU2WXbtSIhrNqZkyxoYXkh/00ZFqb0/6yt4+krAsK2b5cTI9ardrESX+iFVGlCOus0NOUiT7xOzpVbAwfEMUPrgvh5jLjX7aPWwjgdqT3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EMw6sI/f; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741138708; x=1772674708;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=K4absVKzsv8lTq4U5SKjFXUqDZfm7QdEVd3JKOxSQqQ=;
-  b=EMw6sI/fOgT1ZRBAGAmZcCheJsqzxnBm9sOsuCVeTJwZxaaij870Qkh5
-   c1Fyb/TBaUi+/jITEH2CJj4FbageZSYEor+dyPbx4ItrtW4yJkAIF/3qL
-   paRBbml1TVzqnBLtq35s7//5RYn1lM206hxDv6hoUWQ1Yic3ip2bZcrme
-   lKNDXVuU3dMBJZcTA1uyaDdmFzXCzOKaptgTtOkXpqNfBiH6mq5Hy5jZP
-   LPP4kcW/OCixhPOAd/CzuJ118wk4YXNPcOj9DlARDpp3diqmQ4k91bJf0
-   lCWXy2WcW/XQjynRFp2w2umKU1EXn+7JbsoNNCwC9Z+fO4gi/8cL2u/hT
-   A==;
-X-CSE-ConnectionGUID: iA109u/STySV8f2mrNu72Q==
-X-CSE-MsgGUID: EqiRH5dOQfe66pM7zsx7pw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="41976198"
-X-IronPort-AV: E=Sophos;i="6.14,221,1736841600"; 
-   d="scan'208";a="41976198"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 17:38:27 -0800
-X-CSE-ConnectionGUID: 7VCINtbaT/mZ4zjbg4es1Q==
-X-CSE-MsgGUID: 2uAVGxFmTKO5RLyBpkwRtw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="119439029"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 17:38:23 -0800
-Message-ID: <1412c575-0a04-4d36-8b7f-e722da4d291f@intel.com>
-Date: Wed, 5 Mar 2025 09:38:19 +0800
+	s=arc-20240116; t=1741138793; c=relaxed/simple;
+	bh=dqWsSzrccmVHnLHCLmkQRVxxeSfQIVPPMj9Ba8t5jOk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gM7a3a4rP0opYAYefpOoihoqnEONA5395gFW3M66G4DtusCcf6xJCaDFgnacp8fBWk0qgnM7lxLQ0LMo3OsHvwTO1XCJIyiymMQe8c68yp2tlk56DsQLvJBghu08ixZxDbcXwPPA5FaXQrrp3nE98MGewBOb60j/2ArrSaOkGro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KEmY2HhO; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-223a0da61easo78105ad.0
+        for <kvm@vger.kernel.org>; Tue, 04 Mar 2025 17:39:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741138791; x=1741743591; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9fA2KYQHik2cIQjoxJaa3twCTPuvqgtb1JUSNyfAxYc=;
+        b=KEmY2HhOS8mF2KDj8S398zL/v1r7A/0pFXXbr7COg5sO4riLlxI+m9l5LS63Xw5H0z
+         DFtXfHaP8JmFmct3QWE4c+tNRkETsrVr3cSXac1HnQz8L1vhBD5r2C1g6CdahfZv/RnG
+         fhuH3+R35Ks7+4UXylW1Fhn6EHMFOQtsksGyM57fwxCd3nwTobKe3uXRWUGaza7HaWNs
+         LBjL2DV26rHB0+ouRAVVz+OZGdnNh4icMh0dqTL8daa2+0a7J+eJzjUvZ2hx4MeNAIU2
+         f0QXmHMg8PpJC5IzwjgfQl5yBkwcTnKYkGg6y43zvO0zGHNByYsznxQdNvmXY9gjdc3J
+         QtEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741138791; x=1741743591;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9fA2KYQHik2cIQjoxJaa3twCTPuvqgtb1JUSNyfAxYc=;
+        b=HTNuLgJDzx3RKZMaB9e6zYC4SB7v3sPnNtG0kvjwQ+FjnlBKALhnUBhRbByPO+z5v1
+         m4bnnnOAmRzySTBm9pgx8LkaeGMu0efSCM4LN5zSrlOZXFBfo5Smgeupe1yf4S6k1Ju0
+         vQUeJvVVjhqGGWUdRf3n1lM7mf6LyXMwXYxpXMtnN0LX70ia3UtDd6IpmdhMXCmTATqS
+         0s5QjCThllp5wjD5k/H3/hD6Q7W1k7vRs2EYScNmCFrHf0I5YYIDZ+2ibBPIibvPKoWQ
+         KUAe5xVO4SY46OWvJ08HA1pud9o9vRTgmODCflBGNm4H5dsrAVWtfhuXaM7VUzi3Aadp
+         FTHw==
+X-Forwarded-Encrypted: i=1; AJvYcCWfRaiXK++8Q8a0PO5Pjl22RC64VQ651e2HfQT2WKJWIe/PulSU2Ms3oS7uOqnXW+YcKN8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvQZDoYqKxuLin8OXjR4h1d9lWgZkFjC/RnAq3i0Lia0CF/4oD
+	3wctz68D32RyqGs/hYkSw5S6wmUPBtD6aeJXllvCs+wGDhg7VaORH2sukZxag48uQF0iMsqGDfe
+	UxMwUsmbUUZVD/jwCMM7xd+ae8RB7jp1PNn3b
+X-Gm-Gg: ASbGncvYwpN/rAAMwMh9lHzk0lGC8x6m07on/ZcJODSim2nZlOghHf+5G/kl5jQV5C2
+	VvqBrRLMvT9m+LskUJpmRNeaRvSTpFkHFZQemdikzBue0G7vebx80XULTql2n7ok1oa9weH9cBP
+	eeVrmGkwD7gnDEK4QSg+ToDfdrxHNfVctxNFT0Te3DhSZfaJO+IN4PPwZz
+X-Google-Smtp-Source: AGHT+IH5gXmkQSdJDrmvDbhcX1gVqatKumUNqefxFocuBrCcwtKWp6uWzxr+bTikNvWZpTgRK27RGaHlzULM/jBATGw=
+X-Received: by 2002:a17:903:494:b0:216:2839:145 with SMTP id
+ d9443c01a7336-223f44abcf5mr798995ad.1.1741138790491; Tue, 04 Mar 2025
+ 17:39:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 01/10] target/i386: disable PerfMonV2 when PERFCORE
- unavailable
-To: dongli.zhang@oracle.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
-Cc: pbonzini@redhat.com, zhao1.liu@intel.com, mtosatti@redhat.com,
- sandipan.das@amd.com, babu.moger@amd.com, likexu@tencent.com,
- like.xu.linux@gmail.com, zhenyuw@linux.intel.com, groug@kaod.org,
- khorenko@virtuozzo.com, alexander.ivanov@virtuozzo.com, den@virtuozzo.com,
- davydov-max@yandex-team.ru, dapeng1.mi@linux.intel.com, joe.jin@oracle.com
-References: <20250302220112.17653-1-dongli.zhang@oracle.com>
- <20250302220112.17653-2-dongli.zhang@oracle.com>
- <46cd2769-aad6-4b99-aea9-426968a9d7cb@intel.com>
- <d6644767-3ed9-41be-847f-950d3666e0c6@oracle.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <d6644767-3ed9-41be-847f-950d3666e0c6@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20250227041209.2031104-1-almasrymina@google.com>
+ <20250227041209.2031104-2-almasrymina@google.com> <20250228163846.0a59fb40@kernel.org>
+ <CAHS8izNQnTW7sad_oABtxhy3cHxGR0FWJucrHTSVX7ZAA6jT3Q@mail.gmail.com> <20250303162051.09ad684e@kernel.org>
+In-Reply-To: <20250303162051.09ad684e@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 4 Mar 2025 17:39:37 -0800
+X-Gm-Features: AQ5f1JokmBfu9vApWvP6OeSWBJnA3SLQMcYEIWf9RLvx2TEKaGIWTz1vBTgX4iM
+Message-ID: <CAHS8izNWt2-1bC2f0jv4Qpk_A9VpEXNvVRoXUtL43_16d-Ui-A@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 1/8] net: add get_netmem/put_netmem support
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
+	Donald Hunter <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Jeroen de Borst <jeroendb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 3/5/2025 6:53 AM, dongli.zhang@oracle.com wrote:
-> Hi Xiaoyao,
-> 
-> On 3/4/25 6:40 AM, Xiaoyao Li wrote:
->> On 3/3/2025 6:00 AM, Dongli Zhang wrote:
->>> When the PERFCORE is disabled with "-cpu host,-perfctr-core", it is
->>> reflected in in guest dmesg.
->>>
->>> [    0.285136] Performance Events: AMD PMU driver.
->>
->> I'm a little confused. wWhen no perfctr-core, AMD PMU driver can still be
->> probed? (forgive me if I ask a silly question)
-> 
-> Intel use "cpuid -1 -l 0xa" to determine the support of PMU.
-> 
-> However, AMD doesn't use CPUID to determine PMU support (except AMD PMU
-> PerfMonV2).
-> 
-> I have derived everything from Linux kernel function amd_pmu_init().
-> 
-> As line 1521, the PMU isn't supported by old AMD CPUs.
-> 
-> 1516 __init int amd_pmu_init(void)
-> 1517 {
-> 1518         int ret;
-> 1519
-> 1520         /* Performance-monitoring supported from K7 and later: */
-> 1521         if (boot_cpu_data.x86 < 6)
-> 1522                 return -ENODEV;
-> 1523
-> 1524         x86_pmu = amd_pmu;
-> 1525
-> 1526         ret = amd_core_pmu_init();
-> 
-> 
-> 1. Therefore, at least 4 PMCs are available (without 'perfctr-core').
-> 
-> 2. With 'perfctr-core', there are 6 PMCs. (line 1410)
-> 
-> 1404 static int __init amd_core_pmu_init(void)
-> 1405 {
-> 1406         union cpuid_0x80000022_ebx ebx;
-> 1407         u64 even_ctr_mask = 0ULL;
-> 1408         int i;
-> 1409
-> 1410         if (!boot_cpu_has(X86_FEATURE_PERFCTR_CORE))
-> 1411                 return 0;
-> 1412
-> 1413         /* Avoid calculating the value each time in the NMI handler */
-> 1414         perf_nmi_window = msecs_to_jiffies(100);
-> 1415
-> 1416         /*
-> 1417          * If core performance counter extensions exists, we must use
-> 1418          * MSR_F15H_PERF_CTL/MSR_F15H_PERF_CTR msrs. See also
-> 1419          * amd_pmu_addr_offset().
-> 1420          */
-> 1421         x86_pmu.eventsel        = MSR_F15H_PERF_CTL;
-> 1422         x86_pmu.perfctr         = MSR_F15H_PERF_CTR;
-> 1423         x86_pmu.cntr_mask64     = GENMASK_ULL(AMD64_NUM_COUNTERS_CORE
-> - 1, 0);
-> 
-> 
-> 3. With PerfMonV2, extra global registers are available, as well as PMCs.
-> (line 1426)
-> 
-> 1425         /* Check for Performance Monitoring v2 support */
-> 1426         if (boot_cpu_has(X86_FEATURE_PERFMON_V2)) {
-> 1427                 ebx.full = cpuid_ebx(EXT_PERFMON_DEBUG_FEATURES);
-> 1428
-> 1429                 /* Update PMU version for later usage */
-> 1430                 x86_pmu.version = 2;
-> 1431
-> 1432                 /* Find the number of available Core PMCs */
-> 1433                 x86_pmu.cntr_mask64 =
-> GENMASK_ULL(ebx.split.num_core_pmc - 1, 0);
-> 1434
-> 1435                 amd_pmu_global_cntr_mask = x86_pmu.cntr_mask64;
-> 1436
-> 1437                 /* Update PMC handling functions */
-> 1438                 x86_pmu.enable_all = amd_pmu_v2_enable_all;
-> 1439                 x86_pmu.disable_all = amd_pmu_v2_disable_all;
-> 1440                 x86_pmu.enable = amd_pmu_v2_enable_event;
-> 1441                 x86_pmu.handle_irq = amd_pmu_v2_handle_irq;
-> 1442                 static_call_update(amd_pmu_test_overflow,
-> amd_pmu_test_overflow_status);
-> 1443         }
-> 
-> 
-> That's why legacy 4-PMC PMU is probed after we disable perfctr-core.
-> 
-> - (boot_cpu_data.x86 < 6): No PMU.
-> - Without perfctr-core: 4 PMCs
-> - With perfctr-core: 6 PMCs
-> - PerfMonV2: PMCs (currently 6) + global PMU registers
-> 
-> 
-> May this resolve your concern in another thread that "This looks like a KVM
-> bug."? This isn't a KVM bug. It is because AMD's lack of the configuration
-> to disable PMU.
+On Mon, Mar 3, 2025 at 4:20=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Fri, 28 Feb 2025 17:29:13 -0800 Mina Almasry wrote:
+> > On Fri, Feb 28, 2025 at 4:38=E2=80=AFPM Jakub Kicinski <kuba@kernel.org=
+> wrote:
+> > > On Thu, 27 Feb 2025 04:12:02 +0000 Mina Almasry wrote:
+> > > >  static inline void __skb_frag_ref(skb_frag_t *frag)
+> > > >  {
+> > > > -     get_page(skb_frag_page(frag));
+> > > > +     get_netmem(skb_frag_netmem(frag));
+> > > >  }
+> > >
+> > > Silently handling types of memory the caller may not be expecting
+> > > always worries me.
+> >
+> > Sorry, I'm not following. What caller is not expecting netmem?
+> > Here we're making sure __skb_frag_ref() handles netmem correctly,
+> > i.e. we were not expecting netmem here before, and after this patch
+> > we'll handle it correctly.
+> >
+> > > Why do we need this?
+> > >
+> >
+> > The MSG_ZEROCOPY TX path takes a page reference on the passed memory
+> > in zerocopy_fill_skb_from_iter() that kfree_skb() later drops when the
+> > skb is sent. We need an equivalent for netmem, which only supports pp
+> > refs today. This is my attempt at implementing a page_ref equivalent
+> > to net_iov and generic netmem.
+> >
+> > I think __skb_frag_[un]ref is used elsewhere in the TX path too,
+> > tcp_mtu_probe for example calls skb_frag_ref eventually.
+>
+> Any such caller must be inspected to make sure it generates
+> / anticipates skbs with appropriate pp_recycle and readable settings.
+> It's possible that adding a set of _netmem APIs would be too much
+> churn, but if it's not - it'd make it clear which parts of the kernel
+> we have inspected.
+>
 
-It helps a lot! Yes, it doesn't a KVM bug.
+I see, you're concerned about interactions between skb->pp_recycle and
+skb->unreadable. My strategy to handle this is to take what works for
+pages, and extend it as carefully as possible to unreadable
+net_iovs/skbs. Abstractly speaking, I think skb_frag_ref/unref should
+be able to obtain/drop a ref on a frag regardless of what the
+underlying memory type is.
 
-Thanks for your elaborated explanation!
+Currently __skb_frag_ref() obtains a page ref regardless of
+skb->pp_recycle setting, and skb_page_unref() drops a page_ref if
+!skb->pp_recycle and a pp ref if skb->pp_recycle. I extend the logic
+so that it applies as-is to net_iovs and unreadable skbs.
 
-> Thank you very much!
-> 
-> Dongli Zhang
-> 
->>
->>> However, the guest CPUID indicates the PerfMonV2 is still available.
->>>
->>> CPU:
->>>      Extended Performance Monitoring and Debugging (0x80000022):
->>>         AMD performance monitoring V2         = true
->>>         AMD LBR V2                            = false
->>>         AMD LBR stack & PMC freezing          = false
->>>         number of core perf ctrs              = 0x6 (6)
->>>         number of LBR stack entries           = 0x0 (0)
->>>         number of avail Northbridge perf ctrs = 0x0 (0)
->>>         number of available UMC PMCs          = 0x0 (0)
->>>         active UMCs bitmask                   = 0x0
->>>
->>> Disable PerfMonV2 in CPUID when PERFCORE is disabled.
->>>
->>> Suggested-by: Zhao Liu <zhao1.liu@intel.com>
->>
->> Though I have above confusion of the description, the change itself looks
->> good to me. So
->>
->> Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
->>
->>> Fixes: 209b0ac12074 ("target/i386: Add PerfMonV2 feature bit")
->>> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
->>> ---
->>> Changed since v1:
->>>     - Use feature_dependencies (suggested by Zhao Liu).
->>>
->>>    target/i386/cpu.c | 4 ++++
->>>    1 file changed, 4 insertions(+)
->>>
->>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->>> index 72ab147e85..b6d6167910 100644
->>> --- a/target/i386/cpu.c
->>> +++ b/target/i386/cpu.c
->>> @@ -1805,6 +1805,10 @@ static FeatureDep feature_dependencies[] = {
->>>            .from = { FEAT_7_1_EDX,             CPUID_7_1_EDX_AVX10 },
->>>            .to = { FEAT_24_0_EBX,              ~0ull },
->>>        },
->>> +    {
->>> +        .from = { FEAT_8000_0001_ECX,       CPUID_EXT3_PERFCORE },
->>> +        .to = { FEAT_8000_0022_EAX,
->>> CPUID_8000_0022_EAX_PERFMON_V2 },
->>> +    },
->>>    };
->>>      typedef struct X86RegisterInfo32 {
->>
-> 
+After this patch, __skb_frag_ref() obtains a 'page ref equivalent' on
+the net_iov regardless of the pp_recycle setting. My conjecture is
+that since that works for pages, it should also work for net_iovs.
 
+Also after this patch, skb_page_unref will drop a pp ref on the
+net_iov if skb->pp_recycle is set, and drop a 'page ref equivalent' on
+the net_iov if !skb->pp_recycle. The conjecture again is that since
+that works for pages, it should extend to net_iovs.
+
+With regards to the callers, my thinking is that since we preserved
+the semantics of __skb_frag_ref and skb_page_unref (and so
+skb_frag_ref/skb_frag_unref by extension), then all existing callers
+of skb_frag_[un]ref should work as is. Here is some code analysis of
+individual callers:
+
+1. skb_release_data
+      __skb_frag_unref
+        skb_page_unref
+
+This code path expects to drop a pp_ref if skb->pp_recycle, and drop a
+page ref if !skb->pp_recycle. We make sure to do this regardless if
+the skb is actually filled with net_iovs or pages, and the conjecture
+is that since the logic to acquire/drop a pp=3Dpage ref works for pages,
+it should work for the net_iovs as well.
+
+2. __skb_zcopy_downgrade_managed
+      skb_frag_ref
+
+Same thing here, since this code expects to get a page ref on the
+frag, we obtain the net_iov equivalent of a page_ref and that should
+work as well for net_iovs as pages. I could look at more callers, but
+the general thinking is the same. Am I off the rails here?
+
+Of course, we could leave skb_frag_[un]ref as-is and create an
+skb_frag_[un]ref_netmem which support net_iovs, but my ambition here
+was to make skb_frag_[un]ref itself support netmem rather than fork
+the frag refcounting - if it seems like a good idea?
+
+> > > In general, I'm surprised by the lack of bug reports for devmem.
+> >
+> > I guess we did a good job making sure we don't regress the page paths.
+>
+> :)
+>
+> > The lack of support in any driver that qemu will run is an issue. I
+> > wonder if also the fact that devmem needs some setup is also an issue.
+> > We need headersplit enabled, udmabuf created, netlink API bound, and
+> > then a connection referring to created and we don't support loopback.
+> > I think maybe it all may make it difficult for syzbot to repro. I've
+> > had it on my todo list to investigate this more.
+> >
+> > > Can you think of any way we could expose this more to syzbot?
+> > > First thing that comes to mind is a simple hack in netdevsim,
+> > > to make it insert a netmem handle (allocated locally, not a real
+> > > memory provider), every N packets (controllable via debugfs).
+> > > Would that work?
+> >
+> > Yes, great idea. I don't see why it wouldn't work.
+> >
+> > We don't expect mixing of net_iovs and pages in the same skb, but
+> > netdevsim could create one net_iov skb every N skbs.
+> >
+> > I guess I'm not totally sure something is discoverable to syzbot. Is a
+> > netdevsim hack toggleable via a debugfs sufficient for syzbot? I'll
+> > investigate and ask.
+>
+> Yeah, my unreliable memory is that syzbot has a mixed record discovering
+> problems with debugfs. If you could ask Dmitry for advice that'd be
+> ideal.
+
+Yes, I took a look here and discussed with Willem. Long story short is
+that syzbot support is possible but with a handful of changes. We'll
+look into that.
+
+Long story long, for syzbot support I don't think netdevsim itself
+will be useful. Its our understanding so far that syzbot doesn't do
+anything special with netdevsim. We'll need to add queue
+API/page_pool/unreadable netmem support to one of the drivers qemu
+(syzbot) uses, and that should get syzbot fuzzing the control plane.
+
+To get syzbot to fuzz the data plane, I think we need to set up a
+special syzbot instance which configures udmabuf/rss/flow
+steering/netlink binding and start injecting packets through the data
+path. Syzbot would not discover a working config on its own. I'm told
+it's rare to set up specialized syzbot instances but we could sell
+that this coverage is important enough.
+
+Hacking netdevsim like you suggested would be useful as well, but
+outside of syzbot, AFAICT so far. We can run existing netdevsim data
+path tests with netdevsim in 'unreadable netmem mode' and see if it
+can reproduce issues. Although I'm not sure how to integrate that with
+continuous testing yet.
+
+--
+Thanks,
+Mina
 
