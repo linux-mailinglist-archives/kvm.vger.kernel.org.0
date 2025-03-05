@@ -1,177 +1,255 @@
-Return-Path: <kvm+bounces-40128-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40129-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5E54A4F6AA
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 06:47:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6077A4F6CE
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 07:03:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 378DF16EFB7
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 05:47:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8ADED3AADAD
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 06:02:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 311131DB363;
-	Wed,  5 Mar 2025 05:47:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D35F11DC988;
+	Wed,  5 Mar 2025 06:02:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MP4e13DS"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="LTiN0JFZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2065.outbound.protection.outlook.com [40.107.220.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 802D719408C
-	for <kvm@vger.kernel.org>; Wed,  5 Mar 2025 05:47:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741153632; cv=none; b=Yl+o5Fo70E5mQhvQ9TA4DWqnt96OhXoC4SGWdTHQKFzhhqjrQ9jbwM9Tzxv2k6jBAkskzoosyFaVbXDes+74bKkpnOkUnrJO3cgcpTvxdPBXylsKvPTySoFimgKeLa9dQQjKy3MjE2r/LH+vxHg24Lj8MZ5ll7LZhOkZ8hIJknE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741153632; c=relaxed/simple;
-	bh=Yr2zEleQP5OB9VQnCOvN96Nz1sM+C0j+qfjDSd3R7qM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QaCLKRAkmCpCd9Gqki+FGOXo7XIJJ9WU27R8Mzs7j8H+AmX6CpOQB6nFO3iDl+tawurcwu3tqefu1LyAFcylUivIxC1iN3wdxGYr+MZL8Oo/J9RwMS8QDC8ADGOgyLC85R1CJoBqxADEOmx/VKBtbvPzTKOLZfzzfmbr4diWx50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MP4e13DS; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741153629;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TckiHzoidmvghQ6zu3pJdp/CUVWbSHOgWhuCociTv5w=;
-	b=MP4e13DSP8GrWaJJOc1aGnMtzaCTvmRk3WFx1PSgx0UGjAn7Ro07JHfr0YhNBk/KMLTIiK
-	x84/JOLp0f/SqOmwW+Wq+r+r1IkRGPwG/XzjA+jWjYxerSwMcm2L6/mf2u2SqBJ+JNkdSA
-	+NETmOhvMQTN+k9/J2wzm/yGUiRTx04=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-139-ccwnJRW_PmauYf9c7LhadQ-1; Wed, 05 Mar 2025 00:47:07 -0500
-X-MC-Unique: ccwnJRW_PmauYf9c7LhadQ-1
-X-Mimecast-MFC-AGG-ID: ccwnJRW_PmauYf9c7LhadQ_1741153627
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2fec1f46678so15264952a91.1
-        for <kvm@vger.kernel.org>; Tue, 04 Mar 2025 21:47:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741153627; x=1741758427;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TckiHzoidmvghQ6zu3pJdp/CUVWbSHOgWhuCociTv5w=;
-        b=MQEVyPZdTneyVDIzq2B/MSKXBcx/pWucSXKrceJfsrg2f+bAFn4uWMAsQXx/YbtnpT
-         XSFakX3LxkSUs0WyU9URcRgKurbzdsg47aAdW86NiRhy1cw9NZYnk/uwVKC9lb4Obuz3
-         /R+g4LTzVo4EBVx87SHfPyXzgS6SjPBh/SG4Il6GOY4nqQreNNYETLZaZuSVdeoOfmcr
-         HiGB4G9F4JfEuOGxIsCEClHe8ik2DFsvmfOBqHBci+EJRN197wOIlGjE6ycLj1Rucvb8
-         Nn6kqx+gfldb4yibBmWYXpFNt9TUj6YF6hm8+4NkcoyI2Rbk2IBAQvBkXZycAHl/aLtd
-         JfkA==
-X-Forwarded-Encrypted: i=1; AJvYcCX5jYJjb83+3G4OjevETAKhwE4ANGBWjrzmQGYYfGPt/Fka7KVWGyK7tGrKmO1EyYMH8us=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwK6LESr+h7/8v57mxXxt5yaRGyxtYqnW4BjfyI7PcpwgDa5b9f
-	8rIRzuYUft2NzoLJhOyrKuDjpmvZESwqaONhlKchiaDZgUJjYwKJQrQybXWsYYvRoqMQoVdnuSV
-	2cWZSlfWZpHl50FgVASWUhS/4ieSlT9AtPnXtDnQUQO8xP4pCPVfGkDtvBINKsq10JlL4SKp9Dc
-	D9uG0mmjrfUolBFzrcZjJCIzuj
-X-Gm-Gg: ASbGncvC3/baNyqBnrIg9GSofvzEk6Z3OASEdJbE0sNt9dB/slpYOf1eFzQc7TsPBp/
-	fQklMzx6pH0eCgVboAajS4TZ4n3qqzC1YHr4KsIqstfxhoyol9X9V5ZQ2byiHi+9+vPqet/bu5A
-	==
-X-Received: by 2002:a17:90b:1d52:b0:2ee:dcf6:1c8f with SMTP id 98e67ed59e1d1-2ff497cb040mr4004276a91.16.1741153626847;
-        Tue, 04 Mar 2025 21:47:06 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE7tLwkzpVQv2Fhj6KJP/g5jr88+NKViP8f9P/MLEqloHXqeIoNFWMkg7gOLyvweXjBE7QjXpxFd7/tryglpqM=
-X-Received: by 2002:a17:90b:1d52:b0:2ee:dcf6:1c8f with SMTP id
- 98e67ed59e1d1-2ff497cb040mr4004247a91.16.1741153626527; Tue, 04 Mar 2025
- 21:47:06 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EAF37083D;
+	Wed,  5 Mar 2025 06:02:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.65
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741154576; cv=fail; b=bkvSD/fYYwGoUr07jJ/UjcvSygTJ0Jmftk86+igxEfBA5kGc5ilfFG/K8vMaWvN7MWtlQgbDHlqIaWROjb6YSSYEI8EigTv5w4SXBEqoKQ/KklAzw7hYadcJF/wNhfTEHnJNhEbm4N5cee1Z7Ga2tS45MffpAUWW/mY90QvfUUQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741154576; c=relaxed/simple;
+	bh=HdTruijo+1rFwNZ4V0p3gYDevZJFVgD/rZIOB3U2lXg=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=K/1BRDV8ypiLA6CyOAas41B+tNeqMRmLSLV9gYn4VecSR1sWj1BbKB3wP03IVGnKLh1OG1MWkhNDJNx70HiFuy69b0sLgckRn/DQ3aPWncHnSCGWC0yA/Ilo1nQff+yBpfWz+8/LnvHtxCp6JPWpoXOaUCXERqm3S/xdU72TUdc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=LTiN0JFZ; arc=fail smtp.client-ip=40.107.220.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=AjhdG0u/Z15+jT/xouOMPQ4i7gqWxbbdOn3SG5J+FqrFooSAJpd1AjXMrDsD/bBUpW40aE7CjsEwOXHRCMQTTsNjXq12+BwdfLAZt1UaUvQOtnH5NfPn9GFXhipEa40yLJddhAOltyfBhpwJaIbsgluyx/fjXR6vUVdB60gnlj9q5NG2aW8KTQmqUZw0VYTBOWHcZUfBwVQvxRou3PolrLp6CeemDnMVYxREDE50Nf+6qjQrSC420yRNp8bocwUCoeQyOJ2FEOaJ9AFBKQSWe9tvmbNGUw940dBfUCHnX6GZFG5sBXv2/pqB4j237Rjah/J1NEMdhMfJrP3XgXjSjQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VmpCS2wXnuE28S1kHmm/Qwp0LdSpoI9uBh3K2vmhOYI=;
+ b=Qq2X/ru1IPUARlAbf6/J9wFRp83H49GAefi8B4jEfJBFCBcaY3Q5LroQVzfMkEt6aM/Gykez0+JJXuycZOQm0MsNpzUmdQMdB+wNXjNBaAJ5otrMtBfH9KCnSVuN3cwnk5I79RSN0ECSucgYrshIh0RN8nnaCyKuoBQULIeV3Hir5YBO5Z9u0sr7akMLWEO+QahSVbn/oxYX1MgL9pyViAsgA6q4rYMlz4QxnFdzeuLpqkDOUPhu7KupPFztYjaNNKr8KJzNhhIHm/vtgxZxmd9hHS8JVLLhBJULIFP8ygDAgf+IeXC+il4TWAyFD9croKAQMwpvkUsT5BusJeNmCw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VmpCS2wXnuE28S1kHmm/Qwp0LdSpoI9uBh3K2vmhOYI=;
+ b=LTiN0JFZ4DAldtKr7tenrhd8NgH8/qctfjxb/2VGutkvCaLk4Uy7/i/mAdjKcH7+vx05KHMI/mZekrXPuDXJlTlH+lJJy1sjf6jbX/AIfjSddzrVD+SgdJklzUaEqdeopbh/F4tqD5fmaCMyqP6iXg9hrtDrXXFJL4NOlql5gkg=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CH2PR12MB4262.namprd12.prod.outlook.com (2603:10b6:610:af::8)
+ by MN6PR12MB8591.namprd12.prod.outlook.com (2603:10b6:208:471::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.25; Wed, 5 Mar
+ 2025 06:02:51 +0000
+Received: from CH2PR12MB4262.namprd12.prod.outlook.com
+ ([fe80::3bdb:bf3d:8bde:7870]) by CH2PR12MB4262.namprd12.prod.outlook.com
+ ([fe80::3bdb:bf3d:8bde:7870%5]) with mapi id 15.20.8489.025; Wed, 5 Mar 2025
+ 06:02:51 +0000
+Message-ID: <b22ccda0-15b8-4cac-96f1-de6c9fad48b0@amd.com>
+Date: Wed, 5 Mar 2025 11:32:41 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 4/5] KVM: guest_memfd: Enforce NUMA mempolicy using
+ shared policy
+To: Sean Christopherson <seanjc@google.com>,
+ David Hildenbrand <david@redhat.com>, Ackerley Tng <ackerleytng@google.com>,
+ Vlastimil Babka <vbabka@suse.cz>
+Cc: akpm@linux-foundation.org, willy@infradead.org, pbonzini@redhat.com,
+ linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-coco@lists.linux.dev, chao.gao@intel.com, bharata@amd.com,
+ nikunj@amd.com, michael.day@amd.com, Neeraj.Upadhyay@amd.com,
+ thomas.lendacky@amd.com, michael.roth@amd.com, tabba@google.com
+References: <b494af0e-3441-48d4-abc8-df3d5c006935@suse.cz>
+ <diqz8qplabre.fsf@ackerleytng-ctop.c.googlers.com>
+ <Z8cci0nNtwja8gyR@google.com>
+ <9d04c204-cb9a-4109-977b-3d39b992c521@redhat.com>
+ <Z8cxaGGoQ2163-R6@google.com>
+Content-Language: en-US
+From: Shivank Garg <shivankg@amd.com>
+In-Reply-To: <Z8cxaGGoQ2163-R6@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN3PR01CA0036.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:97::15) To CH2PR12MB4262.namprd12.prod.outlook.com
+ (2603:10b6:610:af::8)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20200116172428.311437-1-sgarzare@redhat.com> <20200427142518.uwssa6dtasrp3bfc@steredhat>
- <224cdc10-1532-7ddc-f113-676d43d8f322@redhat.com> <20200428160052.o3ihui4262xogyg4@steredhat>
- <Z8edJjqAqAaV3Vkt@devvm6277.cco0.facebook.com>
-In-Reply-To: <Z8edJjqAqAaV3Vkt@devvm6277.cco0.facebook.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 5 Mar 2025 13:46:54 +0800
-X-Gm-Features: AQ5f1JrNByKY7PtEfXG0ORfP7FScyD2MAlIYCt0mdU5F_0VbeZRH2Dv5bfH1am0
-Message-ID: <CACGkMEtTgmFVDU+ftDKEvy31JkV9zLLUv25LrEPKQyzgKiQGSQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/3] vsock: support network namespace
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, davem@davemloft.net, 
-	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org, 
-	Jorgen Hansen <jhansen@vmware.com>, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, linux-hyperv@vger.kernel.org, 
-	Dexuan Cui <decui@microsoft.com>, netdev@vger.kernel.org, 
-	Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PR12MB4262:EE_|MN6PR12MB8591:EE_
+X-MS-Office365-Filtering-Correlation-Id: 840f51cb-42f1-46b0-18ce-08dd5bab5cd6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?eERPR3ZpSGV6UGV5RG4ySndkZUtGakM0UmJ2d2pXOUZSTEJnUFdIUkxsQjBi?=
+ =?utf-8?B?RVkyRHBpSzVvRzExUCtZUVliUklaWVFsT2U0SGJKU3gxeWpVR3lOTFgzODJ3?=
+ =?utf-8?B?dlJmbXA0a3RwWFUwQmpQQ0lqQS90QW0xeEozVDFKU2V4QVRQUFNpSXA4N0tP?=
+ =?utf-8?B?MUw0Qi8rVDNrcVFGYlA2ZFpsQTNxQ1VXZkNUL1k0Zzh6L3VzT0JzbExvL2hh?=
+ =?utf-8?B?bHRaOGVQQXNFeXhDbjlXOGxscWJkUDVNeE8xNVhXdGNVZHRZV2tkeDBZWWN2?=
+ =?utf-8?B?ZkdGa3NGUGJWb3FVZS9lT2pWTWZHUWpzT1lKVDBVR3BacHNtY0g2bFF2TENI?=
+ =?utf-8?B?aWcwdXNUS0pIaFBGZUJWWXN0WmpWUmEwZXpRdDFZU3kra0h2M2JYOUxtMDZu?=
+ =?utf-8?B?VGl5OWg4YVFsc1dMZFBRZVNuMXpLSW9mM3FNcWlLQitMQnBRVGxDVlNrWWZ5?=
+ =?utf-8?B?Z094K2wxeXczL0JKSEFtU1NuUmpzWHJHSklidEIrdEIycTU3VlBEcXZVbEJU?=
+ =?utf-8?B?YVlEZFlzSFViS3VmZzV0ektVSG1OWFUwcEQxd2IzRXI3TEhPV0ZxN1lXVm5B?=
+ =?utf-8?B?U2NBMDJQcFRiYW80SEwrRkxnQ1poL0V5enpsTklOeEVHMWpHSGVlZkhHT2VV?=
+ =?utf-8?B?VWJCS1JHUFovNkNNS1hIdG5iWW9wcUY5b0gwYWRaWGcrWUFKUDRYVGY4V2FK?=
+ =?utf-8?B?WEMxaHl4SE1QK2M4U3d4WTQ5bVdBZWJyOXVUVUFreUhxeGZTUTlQVGt6UkZQ?=
+ =?utf-8?B?bDJONFl2Rk5RT3BCaU05ZGs5czc3cSs3ZU1iclZKc3M0R2ZOQzNIL0lCeXVJ?=
+ =?utf-8?B?NVNxTjRBOGlwUUI3WlhOM3dBM2RSL1hLcCt3Ym4yTUJDR2poVEZKYXBBR2k5?=
+ =?utf-8?B?NWhnalg4TXQ0RHlYQUdsMnVaczFFK3BIYS9QZGFWU1Z0cFlCczRIRUdvdEda?=
+ =?utf-8?B?d3oxQnVQZHE5WkhDbzU0cG8ya1dhQldEK3czUit3a0pOSlpvRWUrTndab001?=
+ =?utf-8?B?MFM0cHdEcTE2R2VyODNFeG1kbjdReUdxU09BcjBESFhMS0E3Yy9UdWJBeklJ?=
+ =?utf-8?B?NndJa1hvQzNPZm51bDF3c20yc1NtdnUweVJVQW5RK3ZhMy9reEVlSjJCdHFS?=
+ =?utf-8?B?dW9xK2dKVmhXdkhjUlc5SHhGSUJIV2hpZE11QTZHNll1N095cWc1UEd5ZUZB?=
+ =?utf-8?B?S250TmFrN1h4WWErK0JIWEFwVHp5Z1VkbDZYcERIUW1FS3o4bTh4WVQ1MElL?=
+ =?utf-8?B?SlZ6MXVKZ09ZcVhhSElWaUl5cmJUK2NlTE8yZ0dtVHhiYzRweE52YytUVkto?=
+ =?utf-8?B?Q3M1WmxueGxISFZhWFduK01WK29NK1ZBVXYwK1BHTjNkKzMyTnpLdGNjTGcz?=
+ =?utf-8?B?MExXMHovT3kwT3YwRUZiTzZDUjUyTnlWS3hlKzZTNHQxOXFJUkhaL2RpTjlZ?=
+ =?utf-8?B?OEJ3S1VYWks4Tk9BNW0rUEtEcTQ5aVd3T2ZNNTFPMEUySVREODBHbmVaZzIw?=
+ =?utf-8?B?UFI4cjk1SHF5aEI5RTBXbDRDRWdQKzA2NlgzRzRzeGpqODI2WktGUk8veVFh?=
+ =?utf-8?B?N2JZdE43Skt5R2ZEYWF3RnF5aDUyNlo5RjF4NEFlQ3VzTkdieVFoZmswMHor?=
+ =?utf-8?B?MnRuTElnRStXZGp3WHA1T3pCU29QdGVsaDNxcG94YUxsaWNxdlVoZThQMDF6?=
+ =?utf-8?B?a3FYQ3VNZ2tZeWFrb1Z1K1ZadXNBV2Z5M2ZMenRFcytFK2UyeFZnNkFrQWFY?=
+ =?utf-8?B?OWU3Uk1YcmN4K2Z0Nmk5bXRGdEhCYWVLUlpMWGtiQWpucU1XV1dMaGc5QmM0?=
+ =?utf-8?B?VmpQZzB6ODZ2K1kxMWxmUGJFbzgyeEZLU2d3UmlOemhDN3RKMFZTS1VISGZx?=
+ =?utf-8?Q?tlXQxDNqaBzhq?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB4262.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?OTg3dTFvMGRQNWozVFgrM0ZsSURvYXR5ZkdRa3EzUUc2V1g5WlFNNjVoWGhz?=
+ =?utf-8?B?Q3RDZkZEdmVDNUFrWmlnL3RyRWV3VEpKdGhDcDNlYXJUdjJRZWRwS3JEbERV?=
+ =?utf-8?B?TXNraTV6MXQ2RmxKNHM3a1cyMnJXakV4b2d0OWszN05yQVdFTTR5S2Z4cyt4?=
+ =?utf-8?B?VEZyVFNoVkYwWXJQeUtCeHZ1Y1FZcUhGS3AzVEhnajgzbjJaNVhGWWxvOFBa?=
+ =?utf-8?B?NFFPdE0zUldmb1M0NGxmNlZhSmlnT1o0Njg5QXZMZjlmQUp6QUxuSjRlR2Iw?=
+ =?utf-8?B?OXdNSGNMV1U5SlRnakRyYlB2U3JhaEgvSjJabktBQWFVV3NpaFhzbEZJUFY3?=
+ =?utf-8?B?VThRRHZiWkU2aWQzTkVpUGQrbTZpc3ozYnlHMFVtTGxFK2taNTN5cTR4U1Rt?=
+ =?utf-8?B?cGFkcnNnOHpRWnFvdnQ3SjNuSnhHWjVwRllodHB4RFdMdTFHTThBYWZOcDJU?=
+ =?utf-8?B?MmE4WHJqY0RtcmllNFNqVS9PSU1GUkZLcjZrTTV5cHoxK3ZtZTFFUi82ZUhl?=
+ =?utf-8?B?LzZMenZlWHozZTJJOCt6Nk5YZitEK2duRnB6Vzh0QklvRmMwSmVMYWJVVVI3?=
+ =?utf-8?B?VUtocWpYYmtvdGVMaUtMYTZlbjFaMkh1RDdxci9YazR5QXlIV3VscWZDSUxE?=
+ =?utf-8?B?c25ZNEVySHVKZ21lTDdSandKOU5NVmQvTzBTM2dnRFVyYjZWbEZNZUJRYVh1?=
+ =?utf-8?B?TzFjWlJvRUlUWE9FaGduQVBoSVViTlEyS0luY2NmNWdzRDB0R0FRV3JtRFhM?=
+ =?utf-8?B?eTE2WkZFVDhPUStaL3c3ZTZDL05Kc2FsZzJRYXl2d3ZkaW4wQjBOaDRoeTJD?=
+ =?utf-8?B?SU1KYzZvYUhzUFUxN2t1YktMK3NCT0R0c2NEVkNxYWI1QWFqRjdyWGJ0QXFs?=
+ =?utf-8?B?TkRNRTN5d29pRlFKckM0cmozMmZJQ1JIeCs5MHNlTDhsU3IzQmh4M3RybHh5?=
+ =?utf-8?B?R3liVGxuWWtVbmVZTTNBTmNnTkw0VkowWkkvYnpNWlBqMG9yVUtTUUNEdHRZ?=
+ =?utf-8?B?R2JrR3QxcXJSSlQ1U1RzVTZoZktrZmI5cnlkc0hONldIbEpDR3NBNzN5SjY0?=
+ =?utf-8?B?YnNJcmFyOUFTUnVvcEFmME5JTmk4dlNDNG9ySXFGMzFHd1lBekZTL2NDR0pl?=
+ =?utf-8?B?dXh6VGdUSDNVYjkreUkvZkg2Zm8xckpRYTczcDdtQ3N5a1UvdUc0d05BZVhr?=
+ =?utf-8?B?QUJFcUpNY2NETzhFcU1iaU1VZ1czdEZ5ZXZnTkRpc2ZNb1RoclBlUWNtZzh5?=
+ =?utf-8?B?Q2orNUpOQlo3eXRhSmdEZE1jc1QxTkJuK0RZcERHeEFyb3Z5UGY0ME8wWFE0?=
+ =?utf-8?B?S1N2OWttdG84dkRVWmFTV1VxUStzMEIzaGp1Ti95dUlaeStaZmdyTEVNd1Jp?=
+ =?utf-8?B?bnNuSWhoK0tCU2F5eHFOVFZIRFBwOGc1MWxyaG5OWDB6Z05Xa003d3ZCM1Rj?=
+ =?utf-8?B?SHl5RG9kejRSTzJaVGZJNnBtNk5mTUVXbFIrdUt2YmtzUlhzSDZneXI0YURx?=
+ =?utf-8?B?cFhCcmZ4TjNrOEowVk5TbmJRS3hGK3ZIdGR5am1XK3d2NDByNk9HTU9tcEJl?=
+ =?utf-8?B?NDRFMG1SLzFNSlgyanNCZjRJMXFhUHlEUHlVcTI3QXJUUVBtaUpTdVE1bExu?=
+ =?utf-8?B?dHhqVVQybnhtdjlGV1NKellYd3ZLWDVXZXpQVTlFb0xaTjNCUmV4Z2I3ZzZ6?=
+ =?utf-8?B?VGEwSlJ6WU1jbDlPRzYyT2xCK3p1Sit3TnZVU2J3Q1Exc1FBN2lISHlLTndt?=
+ =?utf-8?B?ME1Fa3loUHhxZnNPdlZCcTFsU0x0cElONlR0TSt4V1hTdFR2UVpCUlZoUUdh?=
+ =?utf-8?B?Y2IzT2M3RHlZRVFtUWxwajltUjJpSFJsdnQwYUlxcWR6dXdldGJCZDVSR1NG?=
+ =?utf-8?B?bHlzaUplMXQ3U3Z0Y1YwZm8yalAxY1dKcnUzZVBxVVl3eHUrclhEeDlQS0pE?=
+ =?utf-8?B?c1QrNUtjR0tINWQ0c0JjRkF0bndGNXV4cE80UHVqak9Xa3FaRGtjVlpRRE5n?=
+ =?utf-8?B?aGMvYnQzSEk2MWFFN3kwQjh2a0JrenljaEIzcUhFc2RGOENKK2VSRlJqQThG?=
+ =?utf-8?B?WkxpZkJqWEtVdWQ0VGgyVng2RGthOE1vQlJVNDMzZHA1c21FR2wrVmJXWnZK?=
+ =?utf-8?Q?sK1rwxQ0SCdCheQF7DJKl7DUC?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 840f51cb-42f1-46b0-18ce-08dd5bab5cd6
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4262.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2025 06:02:51.5804
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jbx/caJEskBTOOelNMejZ1VC6iDJerEgSdcp8GQkAeT2DP7FJuHxuEHtLZzIliHnDEmQWar7SvhNZKEtAzKtew==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR12MB8591
 
-On Wed, Mar 5, 2025 at 8:39=E2=80=AFAM Bobby Eshleman <bobbyeshleman@gmail.=
-com> wrote:
->
-> On Tue, Apr 28, 2020 at 06:00:52PM +0200, Stefano Garzarella wrote:
-> > On Tue, Apr 28, 2020 at 04:13:22PM +0800, Jason Wang wrote:
-> > >
-> > >
-> > > As we've discussed, it should be a netdev probably in either guest or=
- host
-> > > side. And it would be much simpler if we want do implement namespace =
-then.
-> > > No new API is needed.
-> > >
-> >
-> > Thanks Jason!
-> >
-> > It would be cool, but I don't have much experience on netdev.
-> > Do you see any particular obstacles?
-> >
-> > I'll take a look to understand how to do it, surely in the guest would
-> > be very useful to have the vsock device as a netdev and maybe also in t=
-he host.
-> >
->
-> WRT netdev, do we foresee big gains beyond just leveraging the netdev's
-> namespace?
 
-It's a leverage of the network subsystem (netdevice, steering, uAPI,
-tracing, probably a lot of others), not only its namespace. It can
-avoid duplicating existing mechanisms in a vsock specific way. If we
-manage to do that, namespace support will be a "byproduct".
 
->
-> IIUC, the idea is that we could follow the tcp/ip model and introduce
-> vsock-supported netdevs. This would allow us to have a netdev associated
-> with the virtio-vsock device and create virtual netdev pairs (i.e.,
-> veth) that can bridge namespaces. Then, allocate CIDs or configure port
-> mappings for those namespaces?
+On 3/4/2025 10:29 PM, Sean Christopherson wrote:
+> On Tue, Mar 04, 2025, David Hildenbrand wrote:
+>> On 04.03.25 16:30, Sean Christopherson wrote:
+>>> On Tue, Mar 04, 2025, Ackerley Tng wrote:
+>>>> Vlastimil Babka <vbabka@suse.cz> writes:
+>>>>>> struct shared_policy should be stored on the inode rather than the file,
+>>>>>> since the memory policy is a property of the memory (struct inode),
+>>>>>> rather than a property of how the memory is used for a given VM (struct
+>>>>>> file).
+>>>>>
+>>>>> That makes sense. AFAICS shmem also uses inodes to store policy.
+>>>>>
+>>>>>> When the shared_policy is stored on the inode, intra-host migration [1]
+>>>>>> will work correctly, since the while the inode will be transferred from
+>>>>>> one VM (struct kvm) to another, the file (a VM's view/bindings of the
+>>>>>> memory) will be recreated for the new VM.
+>>>>>>
+>>>>>> I'm thinking of having a patch like this [2] to introduce inodes.
+>>>>>
+>>>>> shmem has it easier by already having inodes
+>>>>>
+>>>>>> With this, we shouldn't need to pass file pointers instead of inode
+>>>>>> pointers.
+>>>>>
+>>>>> Any downsides, besides more work needed? Or is it feasible to do it using
+>>>>> files now and convert to inodes later?
+>>>>>
+>>>>> Feels like something that must have been discussed already, but I don't
+>>>>> recall specifics.
+>>>>
+>>>> Here's where Sean described file vs inode: "The inode is effectively the
+>>>> raw underlying physical storage, while the file is the VM's view of that
+>>>> storage." [1].
+>>>>
+>>>> I guess you're right that for now there is little distinction between
+>>>> file and inode and using file should be feasible, but I feel that this
+>>>> dilutes the original intent.
+>>>
+>>> Hmm, and using the file would be actively problematic at some point.  One could
+>>> argue that NUMA policy is property of the VM accessing the memory, i.e. that two
+>>> VMs mapping the same guest_memfd could want different policies.  But in practice,
+>>> that would allow for conflicting requirements, e.g. different policies in each
+>>> VM for the same chunk of memory, and would likely lead to surprising behavior due
+>>> to having to manually do mbind() for every VM/file view.
+>>
+>> I think that's the same behavior with shmem? I mean, if you have two people
+>> asking for different things for the same MAP_SHARE file range, surprises are
+>> unavoidable.
+> 
+> Yeah, I was specifically thinking of the case where a secondary mapping doesn't
+> do mbind() at all, e.g. could end up effectively polluting guest_memfd with "bad"
+> allocations.
 
-Probably.
+Thank you for the feedback.
+I agree that storing the policy in the inode is the correct approach, as it aligns
+with shmem's behavior. I now understand that keeping the policy in file-private data
+could lead to surprising behavior, especially with multiple VMs mapping the same
+guest_memfd.
 
->
-> I think it might be a lot of complexity to bring into the picture from
-> netdev, and I'm not sure there is a big win since the vsock device could
-> also have a vsock->net itself?
+The inode-based approach also makes sense from a long-term perspective, especially
+with upcoming restricted mapping support. I'll pick the Ackerley's patch[1] to add
+support for gmem inodes. With this patch, it does not seem overly complex to
+implement to policy storage in inodes.
 
-Yes, it can. I think we need to evaluate both approaches (that's why I
-raise the approach of reusing netdevice). We can hear from others.
+I'll test this approach and submit a revised patch shortly.
 
-> I think the complexity will come from the
-> address translation, which I don't think netdev buys us because there
-> would still be all of the work work to support vsock in netfilter?
+[1] https://lore.kernel.org/all/d1940d466fc69472c8b6dda95df2e0522b2d8744.1726009989.git.ackerleytng@google.com/
 
-Netfilter should not work as vsock will behave as a separate protocol
-other than TCP/IP (e.g ETH_P_VSOCK)  if we try to implement netdevice.
-
->
-> Some other thoughts I had: netdev's flow control features would all have
-> to be ignored or disabled somehow (I think dev_direct_xmit()?), because
-> queueing introduces packet loss and the vsock protocol is unable to
-> survive packet loss.
-
-Or just allow it and then configuring a qdisc that may drop packets
-could be treated as a misconfiguration.
-
-> Netfilter's ability to drop packets would have to
-> be disabled too.
->
-> Best,
-> Bobby
->
-
-Thanks
-
+Thanks,
+Shivank
 
