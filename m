@@ -1,176 +1,161 @@
-Return-Path: <kvm+bounces-40166-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40167-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6845A50347
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 16:16:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FE21A503E9
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 16:55:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2052188591F
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 15:16:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4B2B3AEDC7
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 15:54:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00CD324E4B4;
-	Wed,  5 Mar 2025 15:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CE8E250C0B;
+	Wed,  5 Mar 2025 15:54:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e7UdisB8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DIvVpIET"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70C94339A8
-	for <kvm@vger.kernel.org>; Wed,  5 Mar 2025 15:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E6611F5826;
+	Wed,  5 Mar 2025 15:54:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741187755; cv=none; b=bc4JNMu4yEbc74GHFYo58Pkug8RiTrmdZLST4MwHQnXC1BW7zLYrgrc1IE8cANENOJI/we568WYLoNXFvv7BjHDmt2eHeQGtPX7Sj8bI2J6sGOM/joe/vNQ+8g4avgQbGOBBZAkfySNVs0yYdY4LPfIDQnv4uQtsKL6iA7Imb78=
+	t=1741190080; cv=none; b=T6CyYGT1ZQy9e5j+fV5PgdyEAeq8iSzoEN+/Lmhsbtf/s0B8CKZXrrNYhRGKZam7fjCHNHesYEnda0JKb+mqJ/8dNsYHQ8v4ob8113cN3PkNOTltl47cz2JHLEiurnQymfir7ULYwPiOha/pQdJpn5JK06DFchdBFwW1NyjcSjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741187755; c=relaxed/simple;
-	bh=4tqmMQtOiOKnGZ3ZxD4NeG7n/StDSWUcCXtqs+VM+1A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G2PhJhijq4yg6usDHEluoEQ6apKAeVwF2izdDKhfT0caZiZtigdpf1PaG3tj3prYqTTN/n7Yn2o9puqjEzBMpT1GGSaJS0IDkQFPEI7mqTQAy0nSwE+Dvg6S14j/GYsoiSzgGlOTZyixAgtxZkpSt3t7AB3kBd/xMkheqJDul4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e7UdisB8; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741187752;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=CiSQrfsCnakgAOeukHOOBIClm9MewAMTBuwPPuO+KAg=;
-	b=e7UdisB85vT+4KJAcBjWxBwTPfWH69kgSaEZVWx2xe1OoUSyUl9ZZsom1xOmAXDekb8JNy
-	FNKAjMkEKtx8cjlK7Atvj5VW8iohIFquRgUVcqVs/DG2dehoucVMgeIoCNgLbwRcihm4fZ
-	vaRXjpxaJnuTXf3KyTfGC7jH22wdRUk=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-350-1wQMR7MHPwOZGVvX8W5V9Q-1; Wed, 05 Mar 2025 10:15:50 -0500
-X-MC-Unique: 1wQMR7MHPwOZGVvX8W5V9Q-1
-X-Mimecast-MFC-AGG-ID: 1wQMR7MHPwOZGVvX8W5V9Q_1741187750
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3912539665cso293572f8f.1
-        for <kvm@vger.kernel.org>; Wed, 05 Mar 2025 07:15:50 -0800 (PST)
+	s=arc-20240116; t=1741190080; c=relaxed/simple;
+	bh=ruhS78A+AtEtKl22culYdzmPSc1jjG/Tbxd9IG/FgJQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eBu0zl3K5X8VHpHjMJDTxyn9Adt6AfmXtWMNf5ZO0NKVLQrVl+LqsA2rupqK/pz+NbqNYra5SW2XG4fPRS0ynujU9X+OU0oYujB4yn59CUCHJSpjsavtlv+wZcvAdFmQhsx6ADUoXT7BEqnpn6FkJDHkzgfhsBogAoNIJsMfHXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DIvVpIET; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-22403cbb47fso9644125ad.0;
+        Wed, 05 Mar 2025 07:54:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741190078; x=1741794878; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+vIc0DMsQO6eS51lnk/KHT+RqFvDL3u0FZpOodk49SU=;
+        b=DIvVpIETOg0tDGBa86hGjoc4lYTlUjjBO67yZRuDF4rbhF75s3xLeLqzzve63eQEP9
+         0bXEKwErCy8ggFEa1Ud0LvA6t9S5SvFtSqUEGTrjILrojIKqmDCe0BSbpZBXfKGZrZkv
+         UKDcQIKZzCtqOw0PqQ77op9nEcV8CS7N2JcnBktArjsqd7HqdZzvbz/r9Isb0t+fxgPD
+         o1EGYo9OX1wQ7cXfpw2AU0rg29G9j2wyJP2XMUJBiTmmk77BbVyKfDMLTy3Jv/cGd9N4
+         4btnh27xTW8cB7lFthvX89D7VdrldxXyT9eKhBs17vq/qwWFdSX9Gfi3a3KoGegIHgwJ
+         IjGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741187749; x=1741792549;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CiSQrfsCnakgAOeukHOOBIClm9MewAMTBuwPPuO+KAg=;
-        b=jAs2mrdGa/zFiUut4Wmv6BDWDAWBCnzxVem6PmlRbrW73cGBUYAc6eXTNWRUC1iyYB
-         eT+hCCwzV8JWxGJnzv+8mVTkh3PQa3u7G4ds9D1Gqb6UsVAuEuumhSqO4ZZq6HKwVUYG
-         IVceDcZT9q/AHgKCig74B6Se2XoNGoOQX3hOmGGBtIv2vRe1EfUdYcRfRPAGgx6rHyBV
-         idyiPORqCyOs0wk+nBTCN4fhHjP+k6KSj0a9dVSlXvzFPa5iF8i4FRJFpJBbgSnUfxMz
-         Ljl2WlVwa6JVaLveqUczuFLRX+g50zJYwofgwC3aUqTEzVdK4xtDG9mQ55/UPdPEAuj0
-         Oe7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWMPPLucmFzvADvHvpjjZNkUTxakd0IB6IK0hAsYhbmFPjM3B/N4TLrqxeT/nuK0cXOqkg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvUSTCugvCAnJeF9Go/DlTIhGNqHkyAhJqpUiLz+XMFgwnyhIF
-	iA/er7iUAgZhhjK66pvR+l4S9yLAkTzpuKJElUjFECDyLNEe59vlhvfT5Lm25dLSZ0y8HQ7Jos6
-	d55S2/5DAr8uq/a6EHTFo75AEIilnt/H64HnXbvEiFfXnmCDRiQ==
-X-Gm-Gg: ASbGncsmwCuJflhKdn7/76O6OaLKODxmL6YAbEHPcG1c3trz/HcnY9Cy21+V1BAqeZ7
-	w0HsA/QaLIv1FbwX/sXiQyEn9Eqm4192S6a8h1FmvdJxzfAYigeC7e5rLrO2VtxMgQBduOJvDH9
-	j6H8TgtbG5MYZxEVS8qajqPa3kIQED9BWH1Jac0T7lpRShjFXtQVzA0pP8cwKCMcI6jHV04ZzWL
-	/Sgd/l3FJAMm8S1CpqmMpc9JrDh1xxBWLTjV4TBhrwNdXPwXACUhMWm0xyB4+WgauWks5UNKX4W
-	hNhn3tlX6lg5Y0BYW/VR0HYWSFg7AwusDBYrzF/sdcZu3J0=
-X-Received: by 2002:a5d:5f4a:0:b0:38f:4ffd:c757 with SMTP id ffacd0b85a97d-3911e9cbb97mr2856994f8f.2.1741187748162;
-        Wed, 05 Mar 2025 07:15:48 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEcUMEJxhXYSy5ju/XG3xJ3qA0Ba0Gk4MVgFGQ8BCtjKwcDbD7Tg2dj5TJvGKlZef/SJhhDmA==
-X-Received: by 2002:a5d:5f4a:0:b0:38f:4ffd:c757 with SMTP id ffacd0b85a97d-3911e9cbb97mr2856868f8f.2.1741187746359;
-        Wed, 05 Mar 2025 07:15:46 -0800 (PST)
-Received: from [192.168.0.7] (ip-109-42-51-231.web.vodafone.de. [109.42.51.231])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-390e479609asm21023593f8f.2.2025.03.05.07.15.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Mar 2025 07:15:45 -0800 (PST)
-Message-ID: <6cd29f92-82ee-4f56-b0d4-3b55b669b373@redhat.com>
-Date: Wed, 5 Mar 2025 16:15:44 +0100
+        d=1e100.net; s=20230601; t=1741190078; x=1741794878;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+vIc0DMsQO6eS51lnk/KHT+RqFvDL3u0FZpOodk49SU=;
+        b=lzwC8fG0xZdAHAhsbkbeVNjpUE9e92J65zsKZbTK1xVPbr36B2eD9q6CTi3/gnRojq
+         KYs+8cmybb6vHGG2d0KvW9Dh6dHOXYNwk7GDHIzV2g37kgfNnAMCAKClYSz5DhkOYW7E
+         5FlyOmgt5soCZZ6d9Aax4x+Oe1eRc5NyFnhAqw8+svT7wNqWaU+cFHJB4mZP0h8PpZSu
+         6+6TcZcZYI+3/3+5fCR+ihh3E31iH96Rlcy0neUHbRsm839vE8p40Ai5+O37PGIPsGDJ
+         lqLZc9egO1tkXClKtgfUtKy2V7OYM2BHC4w6PXW655ILZ0dXVui+ySaDovPWd6yf/VcE
+         F4Jg==
+X-Forwarded-Encrypted: i=1; AJvYcCUIS1tqKVaawdcgagSY6/7XERpKZsUtRkLwKGWFQOiG8VXLMyvF+Jxo7ENsxGEp1M6Gde+GsDfBwaQNFo1w@vger.kernel.org, AJvYcCUoM7K2Q1LhPuOO4w9AtXYaANHRvV8E5v35NHg8JN/0M/d2qGJXyuV5w65lOxUXoYu+uUSlfj09@vger.kernel.org, AJvYcCVTRM1EjDLiSTDluD6Slty8J62pq5Y4Dm8x5xRdGf6lgiebMje/22gYet7Ez8ygLv+44ms=@vger.kernel.org, AJvYcCX3AU/X+XwzbOyP6ba3xF6lLsGn/Tkfe5oJqh3P+b1VYi4XTTcE0PRqDm1GrWhq24l+o7p67WsGkMiFJVQM@vger.kernel.org
+X-Gm-Message-State: AOJu0YxjZ693eUleTyYRr1EujH/XVOQvkDHVquQsxOkfFrtlxAC5LFZU
+	qD1R2XPzHCRUCguIi3+zgoYUPXmVUUdi8/bVd6+VP0+5etB5roka
+X-Gm-Gg: ASbGncsOhHuGrxQCyhlJgKzI06fDhL62UMFCwjxciJZspR9bn0Nxf1FP283dxB8MkwU
+	I75fkotIqemeFYWZNfjgC9Xwh2bzD48nYTNQw5Z7p8b47nfbk/fWR/BN0fXrB3BJLpJw5K+hg+3
+	ySa9HGH55Oe6+44gex62cl35RWLbBvk9yF/nkn4ZemURBBAp4D49wYa7s8vU8n7OjbNJsXz2LuS
+	qfF6LRE8IS/kQuWoOiM/pnM+ELrfD3JDRgeNaNRp7EM1pEBj8y5wK1wk+6HemxwBT+WRyKKI80+
+	vYcrrHtlh31EM9ATU4/IWpFbHvwU9ig/HRtkHfacCcP7CSauT+vB7XrVi5TIHiNTHQ==
+X-Google-Smtp-Source: AGHT+IGxwYNgRJxj/Y20mv0OZbh6G4d3argbKiFxAPkI+V5vuufD3HZdLhPGHXdzRe1CMg/k0x2Reg==
+X-Received: by 2002:a05:6a21:78a8:b0:1ee:e58d:aa67 with SMTP id adf61e73a8af0-1f34945f651mr7240995637.8.1741190077952;
+        Wed, 05 Mar 2025 07:54:37 -0800 (PST)
+Received: from devvm6277.cco0.facebook.com ([2a03:2880:2ff:3::])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af15490ae3csm9391147a12.78.2025.03.05.07.54.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Mar 2025 07:54:37 -0800 (PST)
+Date: Wed, 5 Mar 2025 07:54:35 -0800
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Jorgen Hansen <jhansen@vmware.com>,
+	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	virtualization@lists.linux-foundation.org,
+	linux-hyperv@vger.kernel.org, Dexuan Cui <decui@microsoft.com>
+Subject: Re: [PATCH net-next 1/3] vsock: add network namespace support
+Message-ID: <Z8hzu3+VQKKjlkRN@devvm6277.cco0.facebook.com>
+References: <20200116172428.311437-1-sgarzare@redhat.com>
+ <20200116172428.311437-2-sgarzare@redhat.com>
+ <20250305022900-mutt-send-email-mst@kernel.org>
+ <CAGxU2F5C1kTN+z2XLwATvs9pGq0HAvXhKp6NUULos7O3uarjCA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v1] editorconfig: Add max line length
- setting for commit message and branch description
-To: Marc Hartmayer <mhartmay@linux.ibm.com>, kvm@vger.kernel.org
-Cc: Janosch Frank <frankja@linux.ibm.com>, Nico Boehr <nrb@linux.ibm.com>,
- =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Andrew Jones <andrew.jones@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>
-References: <20250131115307.70334-1-mhartmay@linux.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <20250131115307.70334-1-mhartmay@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAGxU2F5C1kTN+z2XLwATvs9pGq0HAvXhKp6NUULos7O3uarjCA@mail.gmail.com>
 
-On 31/01/2025 12.53, Marc Hartmayer wrote:
-> Add max line length setting for commit messages and branch descriptions to
-> the Editorconfig configuration. Use herefor the same value as used by
-> checkpatch [1]. See [2] for details about the file 'COMMIT_EDITMSG'.
+On Wed, Mar 05, 2025 at 10:23:08AM +0100, Stefano Garzarella wrote:
+> On Wed, 5 Mar 2025 at 08:32, Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+
+[...]
+
+> >
+> >
+> > I'm not sure I understand the usecase. Can you explain a bit more,
+> > please?
 > 
-> [1] https://github.com/torvalds/linux/blob/69e858e0b8b2ea07759e995aa383e8780d9d140c/scripts/checkpatch.pl#L3270
-> [2] https://git-scm.com/docs/git-commit/2.46.1#Documentation/git-commit.txt-codeGITDIRCOMMITEDITMSGcode
+> It's been five years, but I'm trying!
+> We are tracking this RFE here [1].
 > 
-> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-> ---
->   .editorconfig | 3 +++
->   1 file changed, 3 insertions(+)
+> I also add Jakub in the thread with who I discussed last year a possible 
+> restart of this effort, he could add more use cases.
 > 
-> diff --git a/.editorconfig b/.editorconfig
-> index 46d4ac64f897..03bb16cb9442 100644
-> --- a/.editorconfig
-> +++ b/.editorconfig
-> @@ -13,3 +13,6 @@ insert_final_newline = true
->   charset = utf-8
->   indent_style = tab
->   indent_size = 8
-> +
-> +[{COMMIT_EDITMSG,EDIT_DESCRIPTION}]
-> +max_line_length = 75
+> The problem with vsock, host-side, currently is that if you launch a VM 
+> with a virtio-vsock device (using vhost) inside a container (e.g., 
+> Kata), so inside a network namespace, it is reachable from any other 
+> container, whereas they would like some isolation. Also the CID is 
+> shared among all, while they would like to reuse the same CID in 
+> different namespaces.
+> 
+> This has been partially solved with vhost-user-vsock, but it is 
+> inconvenient to use sometimes because of the hybrid-vsock problem 
+> (host-side vsock is remapped to AF_UNIX).
+> 
+> Something from the cover letter of the series [2]:
+> 
+>   As we partially discussed in the multi-transport proposal, it could
+>   be nice to support network namespace in vsock to reach the following
+>   goals:
+>   - isolate host applications from guest applications using the same ports
+>     with CID_ANY
+>   - assign the same CID of VMs running in different network namespaces
+>   - partition VMs between VMMs or at finer granularity
+> 
+> Thanks,
+> Stefano
+> 
 
-Thanks, applied now!
+Do you know of any use cases for guest-side vsock netns?
 
-  Thomas
+Our use case is also host-side. vsock is used to communicate with a
+host-side shim/proxy/debug console. Each vmm and these components share
+a namespace and are isolated from other vmm + components. The VM
+connects back to the host via vsock after startup and communicates its
+port of choice out-of-band (fw_cfg).  The main problem is in security:
+untrusted VM programs can potentially connect with and exploit the
+host-side vsock services meant for other VMs. If vsock respected
+namespaces, then these host-side services would be unreachable by other
+VMs and protected.  Namespaces would also allow the vsock port to be
+static across VMs, and avoid the need for the out-of-band mechanism for
+communicating the port.
 
+Jakub can jump in to add anything, but I think this is the same use case
+/ user he was probably referring to.
+
+Best,
+Bobby
 
