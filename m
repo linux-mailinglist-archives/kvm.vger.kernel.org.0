@@ -1,87 +1,82 @@
-Return-Path: <kvm+bounces-40129-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40130-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6077A4F6CE
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 07:03:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3783A4F6DC
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 07:11:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8ADED3AADAD
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 06:02:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A3643ABBF6
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 06:11:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D35F11DC988;
-	Wed,  5 Mar 2025 06:02:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B501C1DC198;
+	Wed,  5 Mar 2025 06:11:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="LTiN0JFZ"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="HPEsFP5g"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2065.outbound.protection.outlook.com [40.107.220.65])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2046.outbound.protection.outlook.com [40.107.236.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EAF37083D;
-	Wed,  5 Mar 2025 06:02:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3E0170A13;
+	Wed,  5 Mar 2025 06:10:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.46
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741154576; cv=fail; b=bkvSD/fYYwGoUr07jJ/UjcvSygTJ0Jmftk86+igxEfBA5kGc5ilfFG/K8vMaWvN7MWtlQgbDHlqIaWROjb6YSSYEI8EigTv5w4SXBEqoKQ/KklAzw7hYadcJF/wNhfTEHnJNhEbm4N5cee1Z7Ga2tS45MffpAUWW/mY90QvfUUQ=
+	t=1741155059; cv=fail; b=HEbuf09WrztPjZt7P8x6lzKQAO40Piv4R+iB1SWvqyzhVGkvXHsSgbJtV7pG7SOA/03/XDPdJfIpzpMr+CXp/xBiw72KXZknFbdbcZI9qqOP+1+aL13XPq5XY6YAb1K2fbEMJNzcStn4D34zLoiCySZhSvq+fdrPk5cr8qQin/w=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741154576; c=relaxed/simple;
-	bh=HdTruijo+1rFwNZ4V0p3gYDevZJFVgD/rZIOB3U2lXg=;
+	s=arc-20240116; t=1741155059; c=relaxed/simple;
+	bh=F2vM6bdoZxhWmSkKCRkUDEkPDGRX8ZlINtwVazdGDqc=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=K/1BRDV8ypiLA6CyOAas41B+tNeqMRmLSLV9gYn4VecSR1sWj1BbKB3wP03IVGnKLh1OG1MWkhNDJNx70HiFuy69b0sLgckRn/DQ3aPWncHnSCGWC0yA/Ilo1nQff+yBpfWz+8/LnvHtxCp6JPWpoXOaUCXERqm3S/xdU72TUdc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=LTiN0JFZ; arc=fail smtp.client-ip=40.107.220.65
+	 Content-Type:MIME-Version; b=FTj4t0rjXK56h91V+fepvoVaapToURbLM+YIRBiqY+PvBk3/2B/4hx5rHTbCem9ZRANYfrdOuYQd6+VqjuvyXb0nsZeFRzOcK2DyTJlrjWLap1nN95qO5sHRpVW2kPFXNDbKM7bSUHVSfJz1DrRyqgptFFpt/owBMnQ9ni2+fTM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=HPEsFP5g; arc=fail smtp.client-ip=40.107.236.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=AjhdG0u/Z15+jT/xouOMPQ4i7gqWxbbdOn3SG5J+FqrFooSAJpd1AjXMrDsD/bBUpW40aE7CjsEwOXHRCMQTTsNjXq12+BwdfLAZt1UaUvQOtnH5NfPn9GFXhipEa40yLJddhAOltyfBhpwJaIbsgluyx/fjXR6vUVdB60gnlj9q5NG2aW8KTQmqUZw0VYTBOWHcZUfBwVQvxRou3PolrLp6CeemDnMVYxREDE50Nf+6qjQrSC420yRNp8bocwUCoeQyOJ2FEOaJ9AFBKQSWe9tvmbNGUw940dBfUCHnX6GZFG5sBXv2/pqB4j237Rjah/J1NEMdhMfJrP3XgXjSjQ==
+ b=dphgHOrHS/oGfUPsOuoSO659LCqq8WEoGSl0H+62c9CluKG0SQqbpOzpWRqNwiCSoRcto9hY0IsMceTsU51Y4YCKVWqQcDhmmHCIoGGvCrq3hH3cGPiydNM2AWJS65jqYrXhHoqtzNZbMwKh6lrkQUTLdkt8OB0i+/Klr3dUQHTjRyMOQ2QY0U3i8B/Egvx8UoLaa8/SasfbxPa6PD1/yMleTmtg50tOeHlTmpADzym+VZqXDCBhDwbangcBpK441EgzDcM6i/ApiBoNziyjJCh0Ngm/g138AkgTgXVh7dGr8f04r4/AXp+wyHMuzbbPN/UEDIrO7O73/J4/9xqKpQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VmpCS2wXnuE28S1kHmm/Qwp0LdSpoI9uBh3K2vmhOYI=;
- b=Qq2X/ru1IPUARlAbf6/J9wFRp83H49GAefi8B4jEfJBFCBcaY3Q5LroQVzfMkEt6aM/Gykez0+JJXuycZOQm0MsNpzUmdQMdB+wNXjNBaAJ5otrMtBfH9KCnSVuN3cwnk5I79RSN0ECSucgYrshIh0RN8nnaCyKuoBQULIeV3Hir5YBO5Z9u0sr7akMLWEO+QahSVbn/oxYX1MgL9pyViAsgA6q4rYMlz4QxnFdzeuLpqkDOUPhu7KupPFztYjaNNKr8KJzNhhIHm/vtgxZxmd9hHS8JVLLhBJULIFP8ygDAgf+IeXC+il4TWAyFD9croKAQMwpvkUsT5BusJeNmCw==
+ bh=qyTXpHcVfgoEcrTj/hOybcrS08QQ5PuT2e3ccUDhUsw=;
+ b=MfMbGENFhL8JJpmo48/d7/jbBmKnm5o9kGdjzVJUSl3LzdUw2DXaWPu8ZTXvCevwYXQ1RGj1ldZtkLS5aMgURcqkjpPeC9Ya86DtPph8zWzwzyc5fYttB7Rueb7fhW1WXm83a7Gklo56BG4TJExSHL4xSh/92hTQxQWS29tLeI9MMAF9JoaAJp300maiym/5TFJNyu2vy4/iXjBcQ+kkNgbgXKHxgL1kpUc94NI07dyFb3DpX01d+TPpafDSdSrj92U4tu1ILeQ0HibfQlugSz8YkVfCnUBL1W2wLOXySZcV5s5bQrbFcx3oD7BDTrHYpfLaeYa1hPMV50KOBOSzKg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VmpCS2wXnuE28S1kHmm/Qwp0LdSpoI9uBh3K2vmhOYI=;
- b=LTiN0JFZ4DAldtKr7tenrhd8NgH8/qctfjxb/2VGutkvCaLk4Uy7/i/mAdjKcH7+vx05KHMI/mZekrXPuDXJlTlH+lJJy1sjf6jbX/AIfjSddzrVD+SgdJklzUaEqdeopbh/F4tqD5fmaCMyqP6iXg9hrtDrXXFJL4NOlql5gkg=
+ bh=qyTXpHcVfgoEcrTj/hOybcrS08QQ5PuT2e3ccUDhUsw=;
+ b=HPEsFP5gk/q14Ecz/pAKLDnf5PsMXXqx/98EqKQWwPoe90GuhTtVVIHX/M+NqrQL6awVEb2eebKfdHFCmqRPr7pmIrVXmQokQX76UcNWTc6X3qVj+Du5JxaX+R3hSwkl/z+bmSkM5sgjO/8O6wRp+wZwxtzQWpLWPednx8vYIFQ=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from CH2PR12MB4262.namprd12.prod.outlook.com (2603:10b6:610:af::8)
- by MN6PR12MB8591.namprd12.prod.outlook.com (2603:10b6:208:471::15) with
+ by DS0PR12MB6582.namprd12.prod.outlook.com (2603:10b6:8:d2::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.25; Wed, 5 Mar
- 2025 06:02:51 +0000
+ 2025 06:10:55 +0000
 Received: from CH2PR12MB4262.namprd12.prod.outlook.com
  ([fe80::3bdb:bf3d:8bde:7870]) by CH2PR12MB4262.namprd12.prod.outlook.com
  ([fe80::3bdb:bf3d:8bde:7870%5]) with mapi id 15.20.8489.025; Wed, 5 Mar 2025
- 06:02:51 +0000
-Message-ID: <b22ccda0-15b8-4cac-96f1-de6c9fad48b0@amd.com>
-Date: Wed, 5 Mar 2025 11:32:41 +0530
+ 06:10:55 +0000
+Message-ID: <476ddccb-3736-46c9-bbd6-b803138d5a3a@amd.com>
+Date: Wed, 5 Mar 2025 11:40:45 +0530
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 4/5] KVM: guest_memfd: Enforce NUMA mempolicy using
- shared policy
-To: Sean Christopherson <seanjc@google.com>,
- David Hildenbrand <david@redhat.com>, Ackerley Tng <ackerleytng@google.com>,
- Vlastimil Babka <vbabka@suse.cz>
+Subject: Re: [PATCH v6 1/5] mm/filemap: add mempolicy support to the filemap
+ layer
+To: Ackerley Tng <ackerleytng@google.com>, Vlastimil Babka <vbabka@suse.cz>
 Cc: akpm@linux-foundation.org, willy@infradead.org, pbonzini@redhat.com,
  linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
  linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-coco@lists.linux.dev, chao.gao@intel.com, bharata@amd.com,
- nikunj@amd.com, michael.day@amd.com, Neeraj.Upadhyay@amd.com,
- thomas.lendacky@amd.com, michael.roth@amd.com, tabba@google.com
-References: <b494af0e-3441-48d4-abc8-df3d5c006935@suse.cz>
- <diqz8qplabre.fsf@ackerleytng-ctop.c.googlers.com>
- <Z8cci0nNtwja8gyR@google.com>
- <9d04c204-cb9a-4109-977b-3d39b992c521@redhat.com>
- <Z8cxaGGoQ2163-R6@google.com>
+ linux-coco@lists.linux.dev, chao.gao@intel.com, seanjc@google.com,
+ david@redhat.com, bharata@amd.com, nikunj@amd.com, michael.day@amd.com,
+ Neeraj.Upadhyay@amd.com, thomas.lendacky@amd.com, michael.roth@amd.com,
+ tabba@google.com
+References: <diqz8qpqlzzv.fsf@ackerleytng-ctop.c.googlers.com>
 Content-Language: en-US
 From: Shivank Garg <shivankg@amd.com>
-In-Reply-To: <Z8cxaGGoQ2163-R6@google.com>
+In-Reply-To: <diqz8qpqlzzv.fsf@ackerleytng-ctop.c.googlers.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN3PR01CA0036.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:97::15) To CH2PR12MB4262.namprd12.prod.outlook.com
+X-ClientProxiedBy: BMXP287CA0009.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:b00:2c::15) To CH2PR12MB4262.namprd12.prod.outlook.com
  (2603:10b6:610:af::8)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -90,166 +85,235 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PR12MB4262:EE_|MN6PR12MB8591:EE_
-X-MS-Office365-Filtering-Correlation-Id: 840f51cb-42f1-46b0-18ce-08dd5bab5cd6
+X-MS-TrafficTypeDiagnostic: CH2PR12MB4262:EE_|DS0PR12MB6582:EE_
+X-MS-Office365-Filtering-Correlation-Id: cd9a4931-c234-4551-67a7-08dd5bac7d13
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?eERPR3ZpSGV6UGV5RG4ySndkZUtGakM0UmJ2d2pXOUZSTEJnUFdIUkxsQjBi?=
- =?utf-8?B?RVkyRHBpSzVvRzExUCtZUVliUklaWVFsT2U0SGJKU3gxeWpVR3lOTFgzODJ3?=
- =?utf-8?B?dlJmbXA0a3RwWFUwQmpQQ0lqQS90QW0xeEozVDFKU2V4QVRQUFNpSXA4N0tP?=
- =?utf-8?B?MUw0Qi8rVDNrcVFGYlA2ZFpsQTNxQ1VXZkNUL1k0Zzh6L3VzT0JzbExvL2hh?=
- =?utf-8?B?bHRaOGVQQXNFeXhDbjlXOGxscWJkUDVNeE8xNVhXdGNVZHRZV2tkeDBZWWN2?=
- =?utf-8?B?ZkdGa3NGUGJWb3FVZS9lT2pWTWZHUWpzT1lKVDBVR3BacHNtY0g2bFF2TENI?=
- =?utf-8?B?aWcwdXNUS0pIaFBGZUJWWXN0WmpWUmEwZXpRdDFZU3kra0h2M2JYOUxtMDZu?=
- =?utf-8?B?VGl5OWg4YVFsc1dMZFBRZVNuMXpLSW9mM3FNcWlLQitMQnBRVGxDVlNrWWZ5?=
- =?utf-8?B?Z094K2wxeXczL0JKSEFtU1NuUmpzWHJHSklidEIrdEIycTU3VlBEcXZVbEJU?=
- =?utf-8?B?YVlEZFlzSFViS3VmZzV0ektVSG1OWFUwcEQxd2IzRXI3TEhPV0ZxN1lXVm5B?=
- =?utf-8?B?U2NBMDJQcFRiYW80SEwrRkxnQ1poL0V5enpsTklOeEVHMWpHSGVlZkhHT2VV?=
- =?utf-8?B?VWJCS1JHUFovNkNNS1hIdG5iWW9wcUY5b0gwYWRaWGcrWUFKUDRYVGY4V2FK?=
- =?utf-8?B?WEMxaHl4SE1QK2M4U3d4WTQ5bVdBZWJyOXVUVUFreUhxeGZTUTlQVGt6UkZQ?=
- =?utf-8?B?bDJONFl2Rk5RT3BCaU05ZGs5czc3cSs3ZU1iclZKc3M0R2ZOQzNIL0lCeXVJ?=
- =?utf-8?B?NVNxTjRBOGlwUUI3WlhOM3dBM2RSL1hLcCt3Ym4yTUJDR2poVEZKYXBBR2k5?=
- =?utf-8?B?NWhnalg4TXQ0RHlYQUdsMnVaczFFK3BIYS9QZGFWU1Z0cFlCczRIRUdvdEda?=
- =?utf-8?B?d3oxQnVQZHE5WkhDbzU0cG8ya1dhQldEK3czUit3a0pOSlpvRWUrTndab001?=
- =?utf-8?B?MFM0cHdEcTE2R2VyODNFeG1kbjdReUdxU09BcjBESFhMS0E3Yy9UdWJBeklJ?=
- =?utf-8?B?NndJa1hvQzNPZm51bDF3c20yc1NtdnUweVJVQW5RK3ZhMy9reEVlSjJCdHFS?=
- =?utf-8?B?dW9xK2dKVmhXdkhjUlc5SHhGSUJIV2hpZE11QTZHNll1N095cWc1UEd5ZUZB?=
- =?utf-8?B?S250TmFrN1h4WWErK0JIWEFwVHp5Z1VkbDZYcERIUW1FS3o4bTh4WVQ1MElL?=
- =?utf-8?B?SlZ6MXVKZ09ZcVhhSElWaUl5cmJUK2NlTE8yZ0dtVHhiYzRweE52YytUVkto?=
- =?utf-8?B?Q3M1WmxueGxISFZhWFduK01WK29NK1ZBVXYwK1BHTjNkKzMyTnpLdGNjTGcz?=
- =?utf-8?B?MExXMHovT3kwT3YwRUZiTzZDUjUyTnlWS3hlKzZTNHQxOXFJUkhaL2RpTjlZ?=
- =?utf-8?B?OEJ3S1VYWks4Tk9BNW0rUEtEcTQ5aVd3T2ZNNTFPMEUySVREODBHbmVaZzIw?=
- =?utf-8?B?UFI4cjk1SHF5aEI5RTBXbDRDRWdQKzA2NlgzRzRzeGpqODI2WktGUk8veVFh?=
- =?utf-8?B?N2JZdE43Skt5R2ZEYWF3RnF5aDUyNlo5RjF4NEFlQ3VzTkdieVFoZmswMHor?=
- =?utf-8?B?MnRuTElnRStXZGp3WHA1T3pCU29QdGVsaDNxcG94YUxsaWNxdlVoZThQMDF6?=
- =?utf-8?B?a3FYQ3VNZ2tZeWFrb1Z1K1ZadXNBV2Z5M2ZMenRFcytFK2UyeFZnNkFrQWFY?=
- =?utf-8?B?OWU3Uk1YcmN4K2Z0Nmk5bXRGdEhCYWVLUlpMWGtiQWpucU1XV1dMaGc5QmM0?=
- =?utf-8?B?VmpQZzB6ODZ2K1kxMWxmUGJFbzgyeEZLU2d3UmlOemhDN3RKMFZTS1VISGZx?=
- =?utf-8?Q?tlXQxDNqaBzhq?=
+	=?utf-8?B?bFNGQVR3UWRuR2lrbFIwcHdTR2o5TDU5RkdmSHNTMnRUclVHOEtUMkdHSjFD?=
+ =?utf-8?B?VU1McHpYaHgwbHcrTVhzcHlPT0RiVUZFanBGVGw5amEwcTY1em9vdkVaSlVG?=
+ =?utf-8?B?cWEzU0ozTEs3WjZ6L0xZQVpIdXROQm51TDNKZGtCcGREWE96MW5wb0ZmQ2pU?=
+ =?utf-8?B?YVpyZExDbzJKTXVWOWFYUzlxOXNKbGVBcS9tdnJCUzlXZnU4eGZVa0JkNmdW?=
+ =?utf-8?B?a0tqNWNoLzRaL3lEQ2FLNkxTU0lDM0lQUHF0VG16cms5ZXFhaks3eG9MMVhT?=
+ =?utf-8?B?dENmRVVwckk0a1BJYzlSdHg2aGVHUklRY0Fnb3NmamEzWjRJOWNTTU11b2g4?=
+ =?utf-8?B?UjZidTZqdW0zWmVRRC9TRlpLNmxLbjd4WENRK1FoOWMvMEo5aDJCTTk0Nms2?=
+ =?utf-8?B?dUl2cmxoSmJkWk42ZENNZytzMnorYnlQK2pYeHF1NTRDMFYzbmZNTVZuNkxE?=
+ =?utf-8?B?TUlYdS8rTVZyMllKL2FNNGIwTmpXRFRPQlZpU0pDT0Rwa0VySWJJSXJ4ZGZz?=
+ =?utf-8?B?RzFyd2diOHB5REU1d1k4SzFxbXV5OWo4RFBkV2hQY0VLaGovVmpBRVc5dzly?=
+ =?utf-8?B?d29LajhCVG9jeW9PbFU1MG05NW1oZUpVL2RSTjVxUTRQL2VSb3l4b3RoRlJk?=
+ =?utf-8?B?U25ZK3VhUVVjVjlNTkhjMHNhUlBqTWRuZGtXb09FZmlrV3Z3WGV3SUZDL25B?=
+ =?utf-8?B?SytuWk42OEQrVnVvTlpBOFkydUN6Mnh4ckZRWk45dGpQL0xhWi9DWEo1V09O?=
+ =?utf-8?B?K3hyRDBXN3FYZXVrVkh3a0dMb0ptWWhrSDI5OGtzVmkxbDArbzNJNXlRUUdR?=
+ =?utf-8?B?VXhiQk81SUErSVBOZnlOWFp6aXducUE2YitIdm85TmtpeU5kTlpqMDZaNUZD?=
+ =?utf-8?B?aXhXcDBUMUxwQ0VJMWszZ0FUd3NkOFBFN2RlekxaUmlZYWg3OWRGa1k1Z1ZC?=
+ =?utf-8?B?bFRjOG90U2xLRjlhZG1hdkpZZFR6Y2lpek1aS1JsVUYwdkw1L0hJOVAzcEVM?=
+ =?utf-8?B?ZlNIaUdMNUFuSCtZUUhIb2cyVFZiQzF6ZTkwa1BKYVllcjJhaGlmcTRNTGww?=
+ =?utf-8?B?ZHhRY1JOMXlsY3dIS2JVdkJuVkhHOTB2c0ZmVGtFRk0zcEVqcGhCOCs2WG5V?=
+ =?utf-8?B?K09BSzFtMTlYVVdWekY3TjRad1kvOXBEWkhwT05aNVN5R3V1NzlGOXBTUTlZ?=
+ =?utf-8?B?SU82blpmMW1LWG9ocjhwL1FnNEpyRmdFMEQycmhCMXpPZzczc0M4RWtkMzNP?=
+ =?utf-8?B?bU1hRXJGZ2hiam1waDlhODdWRkZTZllSbVZac2JDTmNkemJHTEtDdXFFc0xK?=
+ =?utf-8?B?c1hjclZVNXdSNnRGbmhQTWwrWEFDUnVNdGJ3eHdwUElJMmdNZ2QwUGhnbjRC?=
+ =?utf-8?B?L1NpUVdBOUhFTFNJUGg4UU9SV0xCUS9uNVRCaFg1eEkxSitLWXlyNm05MEVo?=
+ =?utf-8?B?cHd5NkYrcVdXcDBaSVZwcy95NmE2RG9SK3owZ2xwTXhId2hsOG9SNnJkcXZJ?=
+ =?utf-8?B?OFAvcHdvVjkvNVhGR2lkKzVDMVAxOEpDRnF3eWY2cDVJUkJsR3RZbGh2ajFl?=
+ =?utf-8?B?ME0wdElqUkR3OE1mYStxTmxGcVRGdlo5QktwWGxSbktRL1JFaXh2TmppcW1I?=
+ =?utf-8?B?ekU0Q0wySHBjc0VTZ3lmMTROY3NpNnBqVWRtSVJtZlIzRXkyLzJNenlqTFlX?=
+ =?utf-8?B?bnFyMDF1RXpvbWIzVTZkRWF3WG1SWVIvNGhIaTlHWC91RHIxUzBsMFZyUjBh?=
+ =?utf-8?B?MXhnVTMwSE1kc2JrTmJXVlFJUVdwSURQSTk1QW1wSTZlSVgvazkxendWK092?=
+ =?utf-8?B?NzIwWWtpd2ZGQTVQa0xSUU5VcnFqQ05wMzRUSUpOSDIwMDR1ZmYwVk1YNFdk?=
+ =?utf-8?Q?RVB2LXiCg/w/L?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB4262.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB4262.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?OTg3dTFvMGRQNWozVFgrM0ZsSURvYXR5ZkdRa3EzUUc2V1g5WlFNNjVoWGhz?=
- =?utf-8?B?Q3RDZkZEdmVDNUFrWmlnL3RyRWV3VEpKdGhDcDNlYXJUdjJRZWRwS3JEbERV?=
- =?utf-8?B?TXNraTV6MXQ2RmxKNHM3a1cyMnJXakV4b2d0OWszN05yQVdFTTR5S2Z4cyt4?=
- =?utf-8?B?VEZyVFNoVkYwWXJQeUtCeHZ1Y1FZcUhGS3AzVEhnajgzbjJaNVhGWWxvOFBa?=
- =?utf-8?B?NFFPdE0zUldmb1M0NGxmNlZhSmlnT1o0Njg5QXZMZjlmQUp6QUxuSjRlR2Iw?=
- =?utf-8?B?OXdNSGNMV1U5SlRnakRyYlB2U3JhaEgvSjJabktBQWFVV3NpaFhzbEZJUFY3?=
- =?utf-8?B?VThRRHZiWkU2aWQzTkVpUGQrbTZpc3ozYnlHMFVtTGxFK2taNTN5cTR4U1Rt?=
- =?utf-8?B?cGFkcnNnOHpRWnFvdnQ3SjNuSnhHWjVwRllodHB4RFdMdTFHTThBYWZOcDJU?=
- =?utf-8?B?MmE4WHJqY0RtcmllNFNqVS9PSU1GUkZLcjZrTTV5cHoxK3ZtZTFFUi82ZUhl?=
- =?utf-8?B?LzZMenZlWHozZTJJOCt6Nk5YZitEK2duRnB6Vzh0QklvRmMwSmVMYWJVVVI3?=
- =?utf-8?B?VUtocWpYYmtvdGVMaUtMYTZlbjFaMkh1RDdxci9YazR5QXlIV3VscWZDSUxE?=
- =?utf-8?B?c25ZNEVySHVKZ21lTDdSandKOU5NVmQvTzBTM2dnRFVyYjZWbEZNZUJRYVh1?=
- =?utf-8?B?TzFjWlJvRUlUWE9FaGduQVBoSVViTlEyS0luY2NmNWdzRDB0R0FRV3JtRFhM?=
- =?utf-8?B?eTE2WkZFVDhPUStaL3c3ZTZDL05Kc2FsZzJRYXl2d3ZkaW4wQjBOaDRoeTJD?=
- =?utf-8?B?SU1KYzZvYUhzUFUxN2t1YktMK3NCT0R0c2NEVkNxYWI1QWFqRjdyWGJ0QXFs?=
- =?utf-8?B?TkRNRTN5d29pRlFKckM0cmozMmZJQ1JIeCs5MHNlTDhsU3IzQmh4M3RybHh5?=
- =?utf-8?B?R3liVGxuWWtVbmVZTTNBTmNnTkw0VkowWkkvYnpNWlBqMG9yVUtTUUNEdHRZ?=
- =?utf-8?B?R2JrR3QxcXJSSlQ1U1RzVTZoZktrZmI5cnlkc0hONldIbEpDR3NBNzN5SjY0?=
- =?utf-8?B?YnNJcmFyOUFTUnVvcEFmME5JTmk4dlNDNG9ySXFGMzFHd1lBekZTL2NDR0pl?=
- =?utf-8?B?dXh6VGdUSDNVYjkreUkvZkg2Zm8xckpRYTczcDdtQ3N5a1UvdUc0d05BZVhr?=
- =?utf-8?B?QUJFcUpNY2NETzhFcU1iaU1VZ1czdEZ5ZXZnTkRpc2ZNb1RoclBlUWNtZzh5?=
- =?utf-8?B?Q2orNUpOQlo3eXRhSmdEZE1jc1QxTkJuK0RZcERHeEFyb3Z5UGY0ME8wWFE0?=
- =?utf-8?B?S1N2OWttdG84dkRVWmFTV1VxUStzMEIzaGp1Ti95dUlaeStaZmdyTEVNd1Jp?=
- =?utf-8?B?bnNuSWhoK0tCU2F5eHFOVFZIRFBwOGc1MWxyaG5OWDB6Z05Xa003d3ZCM1Rj?=
- =?utf-8?B?SHl5RG9kejRSTzJaVGZJNnBtNk5mTUVXbFIrdUt2YmtzUlhzSDZneXI0YURx?=
- =?utf-8?B?cFhCcmZ4TjNrOEowVk5TbmJRS3hGK3ZIdGR5am1XK3d2NDByNk9HTU9tcEJl?=
- =?utf-8?B?NDRFMG1SLzFNSlgyanNCZjRJMXFhUHlEUHlVcTI3QXJUUVBtaUpTdVE1bExu?=
- =?utf-8?B?dHhqVVQybnhtdjlGV1NKellYd3ZLWDVXZXpQVTlFb0xaTjNCUmV4Z2I3ZzZ6?=
- =?utf-8?B?VGEwSlJ6WU1jbDlPRzYyT2xCK3p1Sit3TnZVU2J3Q1Exc1FBN2lISHlLTndt?=
- =?utf-8?B?ME1Fa3loUHhxZnNPdlZCcTFsU0x0cElONlR0TSt4V1hTdFR2UVpCUlZoUUdh?=
- =?utf-8?B?Y2IzT2M3RHlZRVFtUWxwajltUjJpSFJsdnQwYUlxcWR6dXdldGJCZDVSR1NG?=
- =?utf-8?B?bHlzaUplMXQ3U3Z0Y1YwZm8yalAxY1dKcnUzZVBxVVl3eHUrclhEeDlQS0pE?=
- =?utf-8?B?c1QrNUtjR0tINWQ0c0JjRkF0bndGNXV4cE80UHVqak9Xa3FaRGtjVlpRRE5n?=
- =?utf-8?B?aGMvYnQzSEk2MWFFN3kwQjh2a0JrenljaEIzcUhFc2RGOENKK2VSRlJqQThG?=
- =?utf-8?B?WkxpZkJqWEtVdWQ0VGgyVng2RGthOE1vQlJVNDMzZHA1c21FR2wrVmJXWnZK?=
- =?utf-8?Q?sK1rwxQ0SCdCheQF7DJKl7DUC?=
+	=?utf-8?B?ZVhtb01RUnpabVZxeERIZGxMUU1xV0Y2VlhacysySEltYS9BeXdtUmc1VXpi?=
+ =?utf-8?B?ampBcW5sdlgvbnpjYi9jVVRpdlR0TytFeFc0eG9mR0V5ZmlXOXNmY05CZTlm?=
+ =?utf-8?B?L0pEMTVxU0djcDlZT0FMRXNPakdDQi9wRnJTZHVpWmZHektIeE1RSVdNNFlW?=
+ =?utf-8?B?eXFEbXNGNkc0dkMybFc2UG8vMDlleGpQZThNeHArQkdKM2N5OHNPMGR3cnp2?=
+ =?utf-8?B?dGl5Q2c5R0Q0cUMvZW9xTUFmSmk3MWZSR3ZRM3lnU0paQmc3ekdGTWdDK2pa?=
+ =?utf-8?B?eUlMWWlUM25BSGl6VXRXTXp3T1dCU1ZRVWgybThnU3ZOOGFvUjZhVCsxZVdJ?=
+ =?utf-8?B?bUVRMnowMnNGOEo3K1dSQk1SRVdXMG11dGtSMllUOE1FOGdIdEU3ZVVmTzFR?=
+ =?utf-8?B?M0p2RHI5OXVVakVtRVVDek84V0tRTjFZVkRFRmJEVE5QTEU0TTBmS0pBOVp2?=
+ =?utf-8?B?UXBJY2RXUXlKOXkxd1R4NUR4cW9xT0huSkVSRDAyYUE1WVh4dllwaWcxMVlW?=
+ =?utf-8?B?a3FmSTNQelY2MGgyYWxYR2lHV3NvN2pYblA5bURzMGhCcXU1ZFBaLzI0a3hi?=
+ =?utf-8?B?V0FhRUxEdFJpeCtEZUNST1FqQ0Q5eDBpTy82VmJyY1lGMnc1aU5yUHBhWnBL?=
+ =?utf-8?B?aEU3MzJya2ZVcFhyL3ZNK3UzZm5ySzN4L3RxOEFOYWtNQ09vU0NTTzNKd2JO?=
+ =?utf-8?B?QUZPZVdZaWRid1E0RkhCODZSQytJU0JuNGxObytuSEFsY1VMdDZyY0xMTlgv?=
+ =?utf-8?B?VXZzOUJieWw2bkhMQXpWRmRTTmxOU1R1dzY3VDlqLzNlRnNxc3NMWXdPU0t5?=
+ =?utf-8?B?UnBRaDFCMlowcEJjYlM1WTFtMTBKNFE1Wk9udHFzenlUUTczRHNESFhJWDVE?=
+ =?utf-8?B?VVVIamtyYzVUcVdJQnU0Z0pFS2ExcFhvZUd6ekZXZW81RFBaMHJrOWp3Q3VT?=
+ =?utf-8?B?aGlYSUkzZURLTDFubVZBanZFN2hoRnNSK25BOHhmV1ZBN3NWdE1ZNG0rcWV4?=
+ =?utf-8?B?MVBvU3UyYmlSbEkvL2NKMVVYeUtJcTk4KzJxdlNXWlF4M2JMc3dsLzRuV3ll?=
+ =?utf-8?B?VHFkeDhOb1VROWR0SHB3WXAyUDFValU4RCthYXJ4YmhNSXRQdE1EWlp2SWFW?=
+ =?utf-8?B?NUZNRGYxaWF1TXU5YWIzbUx2N3kyeVJtMVhCNUFBaEVOV1B1QnNQbWpITStF?=
+ =?utf-8?B?Zi9CektCOGlEYUpNNEJNMXZXc0N2bkYxQjlKQW9XdnhHSmd3OFphN0pwczlw?=
+ =?utf-8?B?RFMwdXkxd0xtejh5S3pMcnNhZHM4OUR4M3U1S0dZbUJIMnRxMXNBcXB6VW1o?=
+ =?utf-8?B?Ykh4K3RBSmFmSFFWNHhxK2pMWFhqK29RSksyeDFONTg4SlE5SmRqSEE4OHpV?=
+ =?utf-8?B?NFhJeUd4VVlsbVNua2d0QkFQYmhCVGVzbDI0ZnBnOGRNQkZLUUt0akpUQzlU?=
+ =?utf-8?B?OHgydy9FYzB6aHBHNGUyNjd3SW5HWFplUCtnOXpOdjNYbjc0NUJLQ3pvRThD?=
+ =?utf-8?B?d0pJb21HcTE3cU1wUjZOZHJKUCszblF1Zkg1bkVIZ1dsQXJmbWxrZWkzeHF2?=
+ =?utf-8?B?VUxYY3IxaU9RZnh1aG1GdjBlU2ZzR1FSYi9pYzJ1YURLdWRkblhUTVZUN21q?=
+ =?utf-8?B?NFhZYXF1L2F0Mlk1b2Mvbm94TVhKVFpHRnkybzNrdHVkR2lOaWVEalltVXdY?=
+ =?utf-8?B?Qlo5VmNpakdvVXRiY1BpeUhuL0l4dUxqL01sL2ErOEkxeFJCcTJoSUw3RnNM?=
+ =?utf-8?B?N0JIYU1NV1lQYmt0U1ZhcDhYbkpnTkF2YWcwa3JDMkYrNmpZVThtdzc3RVlF?=
+ =?utf-8?B?R2NwenM0QmozR2J0TXpJektTR2pKSDIxREduOVA3L2RFOVJ3Zk9HWXBHVVZV?=
+ =?utf-8?B?UE1ybEYzZ2xOZE5MV2dSYkdnYVZWL28rcDZPYU4yUVdMQUxad2p4QTZUU2hp?=
+ =?utf-8?B?V0Z5RVBNd3pGT09jN2p3bmZDeG1HWGZpZjdWeEJsMnA2YkNQeUh1RVc5NWJq?=
+ =?utf-8?B?NGJHcytTZnBRMnVpaTFoTEMvUGZRZ1VOR0dUbHAwaDdYQUgraUVTdHNLR2Nh?=
+ =?utf-8?B?TVdtS0VOSTdmSEVCd3lLVXF6YnI4UWQ0bENBTzlGc3Foa2JmWDZGU1pZNzR4?=
+ =?utf-8?Q?ybG0dQ2+O71KBSdNThs+CBD2K?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 840f51cb-42f1-46b0-18ce-08dd5bab5cd6
+X-MS-Exchange-CrossTenant-Network-Message-Id: cd9a4931-c234-4551-67a7-08dd5bac7d13
 X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4262.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2025 06:02:51.5804
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2025 06:10:55.1158
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jbx/caJEskBTOOelNMejZ1VC6iDJerEgSdcp8GQkAeT2DP7FJuHxuEHtLZzIliHnDEmQWar7SvhNZKEtAzKtew==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR12MB8591
+X-MS-Exchange-CrossTenant-UserPrincipalName: r2H/F0h1s5WX3Wm0hVt6RLRctraeuKFngo5QAXzbExLLId2/MZdRnD8N3k5mYbUuOlX0kCR2cc3OX0bT5pdHEw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6582
 
 
 
-On 3/4/2025 10:29 PM, Sean Christopherson wrote:
-> On Tue, Mar 04, 2025, David Hildenbrand wrote:
->> On 04.03.25 16:30, Sean Christopherson wrote:
->>> On Tue, Mar 04, 2025, Ackerley Tng wrote:
->>>> Vlastimil Babka <vbabka@suse.cz> writes:
->>>>>> struct shared_policy should be stored on the inode rather than the file,
->>>>>> since the memory policy is a property of the memory (struct inode),
->>>>>> rather than a property of how the memory is used for a given VM (struct
->>>>>> file).
->>>>>
->>>>> That makes sense. AFAICS shmem also uses inodes to store policy.
->>>>>
->>>>>> When the shared_policy is stored on the inode, intra-host migration [1]
->>>>>> will work correctly, since the while the inode will be transferred from
->>>>>> one VM (struct kvm) to another, the file (a VM's view/bindings of the
->>>>>> memory) will be recreated for the new VM.
->>>>>>
->>>>>> I'm thinking of having a patch like this [2] to introduce inodes.
->>>>>
->>>>> shmem has it easier by already having inodes
->>>>>
->>>>>> With this, we shouldn't need to pass file pointers instead of inode
->>>>>> pointers.
->>>>>
->>>>> Any downsides, besides more work needed? Or is it feasible to do it using
->>>>> files now and convert to inodes later?
->>>>>
->>>>> Feels like something that must have been discussed already, but I don't
->>>>> recall specifics.
->>>>
->>>> Here's where Sean described file vs inode: "The inode is effectively the
->>>> raw underlying physical storage, while the file is the VM's view of that
->>>> storage." [1].
->>>>
->>>> I guess you're right that for now there is little distinction between
->>>> file and inode and using file should be feasible, but I feel that this
->>>> dilutes the original intent.
->>>
->>> Hmm, and using the file would be actively problematic at some point.  One could
->>> argue that NUMA policy is property of the VM accessing the memory, i.e. that two
->>> VMs mapping the same guest_memfd could want different policies.  But in practice,
->>> that would allow for conflicting requirements, e.g. different policies in each
->>> VM for the same chunk of memory, and would likely lead to surprising behavior due
->>> to having to manually do mbind() for every VM/file view.
->>
->> I think that's the same behavior with shmem? I mean, if you have two people
->> asking for different things for the same MAP_SHARE file range, surprises are
->> unavoidable.
+On 2/28/2025 11:21 PM, Ackerley Tng wrote:
+> Vlastimil Babka <vbabka@suse.cz> writes:
 > 
-> Yeah, I was specifically thinking of the case where a secondary mapping doesn't
-> do mbind() at all, e.g. could end up effectively polluting guest_memfd with "bad"
-> allocations.
+>> On 2/26/25 09:25, Shivank Garg wrote:
+>>> From: Shivansh Dhiman <shivansh.dhiman@amd.com>
+>>>
+>>> Add NUMA mempolicy support to the filemap allocation path by introducing
+>>> new APIs that take a mempolicy argument:
+>>> - filemap_grab_folio_mpol()
+>>> - filemap_alloc_folio_mpol()
+>>> - __filemap_get_folio_mpol()
+>>>
+>>> These APIs allow callers to specify a NUMA policy during page cache
+>>> allocations, enabling fine-grained control over memory placement. This is
+>>> particularly needed by KVM when using guest-memfd memory backends, where
+>>> the guest memory needs to be allocated according to the NUMA policy
+>>> specified by VMM.
+>>>
+>>> The existing non-mempolicy APIs remain unchanged and continue to use the
+>>> default allocation behavior.
+>>>
+>>> Signed-off-by: Shivansh Dhiman <shivansh.dhiman@amd.com>
+>>> Signed-off-by: Shivank Garg <shivankg@amd.com>
+>>
+>> <snip>
+>>
+>>> --- a/mm/filemap.c
+>>> +++ b/mm/filemap.c
+>>> @@ -1001,11 +1001,17 @@ int filemap_add_folio(struct address_space *mapping, struct folio *folio,
+>>>  EXPORT_SYMBOL_GPL(filemap_add_folio);
+>>>  
+>>>  #ifdef CONFIG_NUMA
+>>> -struct folio *filemap_alloc_folio_noprof(gfp_t gfp, unsigned int order)
+>>> +struct folio *filemap_alloc_folio_mpol_noprof(gfp_t gfp, unsigned int order,
+>>> +		struct mempolicy *mpol)
+>>>  {
+>>>  	int n;
+>>>  	struct folio *folio;
+>>>  
+>>> +	if (mpol)
+>>> +		return folio_alloc_mpol_noprof(gfp, order, mpol,
+>>> +					       NO_INTERLEAVE_INDEX,
+> 
+> Could we pass in the interleave index instead of hard-coding it?
 
-Thank you for the feedback.
-I agree that storing the policy in the inode is the correct approach, as it aligns
-with shmem's behavior. I now understand that keeping the policy in file-private data
-could lead to surprising behavior, especially with multiple VMs mapping the same
-guest_memfd.
+Good point.
+I'll modify this to allow passing the interleave index. 
 
-The inode-based approach also makes sense from a long-term perspective, especially
-with upcoming restricted mapping support. I'll pick the Ackerley's patch[1] to add
-support for gmem inodes. With this patch, it does not seem overly complex to
-implement to policy storage in inodes.
+> 
+>>> +					       numa_node_id());
+>>> +
+>>>  	if (cpuset_do_page_mem_spread()) {
+>>>  		unsigned int cpuset_mems_cookie;
+>>>  		do {
+>>> @@ -1018,6 +1024,12 @@ struct folio *filemap_alloc_folio_noprof(gfp_t gfp, unsigned int order)
+>>>  	}
+>>>  	return folio_alloc_noprof(gfp, order);
+>>>  }
+>>> +EXPORT_SYMBOL(filemap_alloc_folio_mpol_noprof);
+>>> +
+>>> +struct folio *filemap_alloc_folio_noprof(gfp_t gfp, unsigned int order)
+>>> +{
+>>> +	return filemap_alloc_folio_mpol_noprof(gfp, order, NULL);
+>>> +}
+>>>  EXPORT_SYMBOL(filemap_alloc_folio_noprof);
+>>>  #endif
+>>
+>> Here it seems to me:
+>>
+>> - filemap_alloc_folio_noprof() could stay unchanged
+>> - filemap_alloc_folio_mpol_noprof() would
+>>   - call folio_alloc_mpol_noprof() if (mpol)
+>>   - call filemap_alloc_folio_noprof() otherwise
+>>
+>> The code would be a bit more clearly structured that way?
+>>
+> 
+> I feel that the original proposal makes it clearer that for all filemap
+> folio allocations, if mpol is defined, anything to do with cpuset's page
+> spread is overridden. Just a slight preference though. I do also agree
+> that having filemap_alloc_folio_mpol_noprof() call
+> filemap_alloc_folio_noprof() would result in fewer changes.
+> 
 
-I'll test this approach and submit a revised patch shortly.
-
-[1] https://lore.kernel.org/all/d1940d466fc69472c8b6dda95df2e0522b2d8744.1726009989.git.ackerleytng@google.com/
+Your proposed structure makes sense.
+I'll update the patch to add these suggestions in the next version.
 
 Thanks,
 Shivank
+
+>>> @@ -1881,11 +1893,12 @@ void *filemap_get_entry(struct address_space *mapping, pgoff_t index)
+>>>  }
+>>>  
+>>>  /**
+>>> - * __filemap_get_folio - Find and get a reference to a folio.
+>>> + * __filemap_get_folio_mpol - Find and get a reference to a folio.
+>>>   * @mapping: The address_space to search.
+>>>   * @index: The page index.
+>>>   * @fgp_flags: %FGP flags modify how the folio is returned.
+>>>   * @gfp: Memory allocation flags to use if %FGP_CREAT is specified.
+>>> + * @mpol: The mempolicy to apply when allocating a new folio.
+>>>   *
+>>>   * Looks up the page cache entry at @mapping & @index.
+>>>   *
+>>> @@ -1896,8 +1909,8 @@ void *filemap_get_entry(struct address_space *mapping, pgoff_t index)
+>>>   *
+>>>   * Return: The found folio or an ERR_PTR() otherwise.
+>>>   */
+>>> -struct folio *__filemap_get_folio(struct address_space *mapping, pgoff_t index,
+>>> -		fgf_t fgp_flags, gfp_t gfp)
+>>> +struct folio *__filemap_get_folio_mpol(struct address_space *mapping, pgoff_t index,
+>>> +		fgf_t fgp_flags, gfp_t gfp, struct mempolicy *mpol)
+>>>  {
+>>>  	struct folio *folio;
+>>>  
+>>> @@ -1967,7 +1980,7 @@ struct folio *__filemap_get_folio(struct address_space *mapping, pgoff_t index,
+>>>  			err = -ENOMEM;
+>>>  			if (order > min_order)
+>>>  				alloc_gfp |= __GFP_NORETRY | __GFP_NOWARN;
+>>> -			folio = filemap_alloc_folio(alloc_gfp, order);
+>>> +			folio = filemap_alloc_folio_mpol(alloc_gfp, order, mpol);
+>>>  			if (!folio)
+>>>  				continue;
+>>>  
+>>> @@ -2003,6 +2016,13 @@ struct folio *__filemap_get_folio(struct address_space *mapping, pgoff_t index,
+>>>  		folio_clear_dropbehind(folio);
+>>>  	return folio;
+>>>  }
+>>> +EXPORT_SYMBOL(__filemap_get_folio_mpol);
+>>> +
+>>> +struct folio *__filemap_get_folio(struct address_space *mapping, pgoff_t index,
+>>> +		fgf_t fgp_flags, gfp_t gfp)
+>>> +{
+>>> +	return __filemap_get_folio_mpol(mapping, index, fgp_flags, gfp, NULL);
+>>> +}
+>>>  EXPORT_SYMBOL(__filemap_get_folio);
+>>>  
+>>>  static inline struct folio *find_get_entry(struct xa_state *xas, pgoff_t max,
+
 
