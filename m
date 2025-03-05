@@ -1,214 +1,138 @@
-Return-Path: <kvm+bounces-40156-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40158-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92F45A50041
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 14:20:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 59144A5018D
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 15:15:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62506174716
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 13:14:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81912170C59
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 14:15:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B792624CEEB;
-	Wed,  5 Mar 2025 13:12:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B7AF24BC03;
+	Wed,  5 Mar 2025 14:14:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bQnGzWp1"
+	dkim=pass (2048-bit key) header.d=xenosoft.de header.i=@xenosoft.de header.b="fUhr+fZd";
+	dkim=permerror (0-bit key) header.d=xenosoft.de header.i=@xenosoft.de header.b="VEbEw3V/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A5C24C668
-	for <kvm@vger.kernel.org>; Wed,  5 Mar 2025 13:12:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741180362; cv=none; b=dTrM0S6KzyP/GJo/wkeWCgknqE+c0/OI3K12Tra7fWzupJh0g8gaADxWpqGpGHk2Ud69CCkpgrcAPKRmGpKqeSa6dMALfr5JRDhB8z5v0xHCfZBtKA+haq92skOhk2k4F8pmPEcyaKuMrWcvpJf8CsynFl/YdVYgsIEef7uZZG0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741180362; c=relaxed/simple;
-	bh=niOkZ3yknjy6O15SgZEu1bTRkBCDN86QkzY45J5nUU4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iFY7OrqG2+VClbYH8TFCtFPv1MwQ4Z/wUofH7ww/pyv2Inx/g8Z3HsAznz5Rf0EjROEPTGN45hxlCg/cnfzVK4o7gYN9ryOccz8peQNnAvWehrwagLrlNH0quJQPrDvLMoIkjg4CWUah7Ds2EOA2/u9vUFpf22VYd4nUIXJ1w2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bQnGzWp1; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-474e1b8c935so265501cf.0
-        for <kvm@vger.kernel.org>; Wed, 05 Mar 2025 05:12:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741180358; x=1741785158; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=iOdrgfnKDo0adnIeWCzGbGdt+czcdG3OGWY151PLQj4=;
-        b=bQnGzWp1S5Lnz9b7S+X9iWyT1enphmYxyeyJwj5VVMYJnObuLGzhvMkG9uBL3XQ78b
-         Zo3JrmBI4ko2x+OO+iOQpQBqfBgjcS472wlJfVY900sBa3almRwnfbIdcWBcdXKwsieo
-         7k0oWhWF732whbIyH4GNsIMNo9o7b80aqltg+jU0O65LkiOSm3+oSVpH3YoRptaQnRij
-         NWBaZfEqos2npnT6v52bnbTpKCy19r6KPYKzleLdok7ZrEkR9SnnqDT5T6ABVfKQ+2Iz
-         NKN7Fajx9PPEYnKJdu5XQV9dDUNkJGUpIwD5ACAowRHjrTqUH64V59DpzL+Y1S7JzlY8
-         4rYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741180358; x=1741785158;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iOdrgfnKDo0adnIeWCzGbGdt+czcdG3OGWY151PLQj4=;
-        b=AFlL8M487sNrVUVYEZIvbcQQEl5rABKI45AqWML91h/bj/0q1vJrX7oBUfeXo8GM3p
-         ftA/7C3mEq9i+i4glI0u8O4Lo5mYeld+VMyB0ptzqihmcxaSUYFC77ViGsDNijapd0OB
-         PriNPiJwg8Gwhdhg4vft8wdTrD/6kUzsD9njN96brRIBvlTnauw0mK1ZL65E9D8k1+f4
-         YAOoJ5AXvJf/c7LIjatS55QkS/oszYO8N6qD5kM20N+OAJ2uujJNFTHLA/U08f+9cBqk
-         Kfo7c4fsEjBcVb+D2X+eYo7DI1Fy0op0skMaGiAqmOqEQBOEpqklNMf81Q4MN1dlJvzi
-         BWRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUsfNz4Gz+r/eMY3P8AhoAQsv7+L2SyX/c9cVhaRGv3ppO5MT/NP775QztaXkW3lReIZi4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0Y5PjPV4XEvpEABzuXL0o5//R9skyYySyWVt1B2IBFN+EWjjb
-	badyrc6r7j/2NBN6nf8tYyX9duP+vyhi8jBObt8slzyyK0fS2SBgOvfpfzruZ2Fo+8VbI11K4Cx
-	lWL3OhMzVZiQi01xqsobaMrhk3cfGLblmB7JL
-X-Gm-Gg: ASbGncuZTKOV4CYT/5mhflNnh0FDqpfZaZCIkYqTRmGe2LKDMC/vFjWJlJ2hwUlOJHQ
-	HfFlfqDWnGP28mdSz5tlhrBhLOHMFg69DOTUB9ZyQCry4a2/gtWNzlSWvRtcHLt3gFPeID2D7Pi
-	5lbn49Z1i5we5hmdbPVXbuFLleIpp6hQq+R3XNSJ3y6gf4MSH+B4cZbmOC
-X-Google-Smtp-Source: AGHT+IFIn6b7M1PNu9NZZ9KBzOuRO4deZPOixhL9M73rMvQkDHUtfUtYPha+8DdwHlmaLHcT+urAybKKpNAnQK1YFdU=
-X-Received: by 2002:a05:622a:110b:b0:471:f560:27dc with SMTP id
- d75a77b69052e-4750cae2127mr2406081cf.27.1741180357471; Wed, 05 Mar 2025
- 05:12:37 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 866E0155751;
+	Wed,  5 Mar 2025 14:14:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741184096; cv=pass; b=h5hWlc4JTOhekmmxoPeH0g9kaooQ+dbeqfEmZH8zAP7bbpenQXHEkK/K/FgM1yOKCm3MVgJ2KxTeEAwAU8gn2Reuq2A3wKA71/XEQgqkCT69kMggMah7gozSYv4XQya10/59RMjP91o+b3/2nn+dNUB98FnvkK0hEHfSa8Au3FM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741184096; c=relaxed/simple;
+	bh=aWOrg0kFCs07mvG7SMft2khd/jNHqHiEbXdDYsIZw5U=;
+	h=Content-Type:From:Mime-Version:Subject:Date:Message-Id:References:
+	 Cc:In-Reply-To:To; b=AvLJWXlcqeKXUmpOea3Qtu/toBTB65Jnwn3o11TF8jV2+SAjIdgA67lqAGRw+a8378vp8HU8iouHtrJ7ViDhy80Jgsbatk/SCwK7J6dzYQfEBkXQ8iT1KuiFzS3vxIeVwovd04a49izYqQjwPZASI8ndms0lFYBBPpRxq5Q4ss8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xenosoft.de; spf=none smtp.mailfrom=xenosoft.de; dkim=pass (2048-bit key) header.d=xenosoft.de header.i=@xenosoft.de header.b=fUhr+fZd; dkim=permerror (0-bit key) header.d=xenosoft.de header.i=@xenosoft.de header.b=VEbEw3V/; arc=pass smtp.client-ip=85.215.255.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xenosoft.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=xenosoft.de
+ARC-Seal: i=1; a=rsa-sha256; t=1741184065; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=CWDaimXSwk1sUD60tEP0N53EtqW1F95Qgk/sD3IZShhOFHvPeXIYxB3HtC1O/ITF+B
+    V5vGlTsRd8Nb60t++0cAhO7qLZhlbmllEoCYZcAzwwuYIsEojFoW9rzaFbzPdhxSPmBb
+    jhJT2kQ+MT3HyP/bUME3ARa/FI5FYtmj3fyq9+S8dnmD8Mkb1/sm7nr8i0Cm6pcMryVQ
+    rIHeNo/9MggU1Dduuvo6m4/P66bePfKRC+KEYO1BPq6IIUeCjJ3ea72np6nPhRpa+gGa
+    kMwbXI+UhsEINWsgAMJMipg7yTMEyNJnZYuLBi4W14KqrjvAReGSCCq27gpQXWemYnd0
+    p9uw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1741184065;
+    s=strato-dkim-0002; d=strato.com;
+    h=To:In-Reply-To:Cc:References:Message-Id:Date:Subject:From:Cc:Date:
+    From:Subject:Sender;
+    bh=XG+agOvW8ppEzopPxKXPNXl9FwqxrC3qL6otfZY6Dvg=;
+    b=KGgVBEjIz52vYzYAPtj1IaG+RFhJaIx6Xr8IZEgvMZ6ZyP8Ub+rsGSUusZYo+GrvOe
+    PIF4ynLeSI9C5yV8nuD6i/fEf8TRWoNGV7f84X0gv3IpZFZJCfDw+WgLla/YXGc2mfUN
+    YdynFpiRDuQi0MERFBCLdnRGq84MmaibU/Vehxa9QyVevVTFwO1vEINFkXy8w6O4324X
+    kNv5ato72i+9vb2iIH1+IRbxPi4kpBdPLRjtvzQZcnyZQIiQdRTYO9B9ccE1qwZzLNWO
+    TT8/0oQe4CYVJ+Xz08Li9Aom4utxR4fHn6153q2KSPtL4vXahQHpKsMuwugtIyyQOsHH
+    6jWA==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1741184065;
+    s=strato-dkim-0002; d=xenosoft.de;
+    h=To:In-Reply-To:Cc:References:Message-Id:Date:Subject:From:Cc:Date:
+    From:Subject:Sender;
+    bh=XG+agOvW8ppEzopPxKXPNXl9FwqxrC3qL6otfZY6Dvg=;
+    b=fUhr+fZdAUFqeeHI5Oj6gCyIZ7DKOIF0Si4KnTCNnzDVy/1E8xwUVCXQp1G26IkPBd
+    cfmQGQtt8FycM9BYf5ascZy1JarpwGoYg70a3AC7yH0LvcC3ERGRm6Mw3NgBUoZQA0O3
+    1pgDlE3ykIgrNB3huyq0B6wQ+MyvEES+eqen6b9lyL0ReoaQPs1ht8EpKBDL8aR3SJQh
+    z/S5WgovSOd5FVK5IZtR6gHgT5r9o3tk9v0tnEk1wUDOmlhzLXb/OOwHBbhRqD3Zg9P9
+    OSbPtfHXtmDdQoEJmslHtSHsujSBL18ekSj/Ci+KcRIf3gdqmFjr16MEAYf0MiB3/K97
+    x+mg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1741184065;
+    s=strato-dkim-0003; d=xenosoft.de;
+    h=To:In-Reply-To:Cc:References:Message-Id:Date:Subject:From:Cc:Date:
+    From:Subject:Sender;
+    bh=XG+agOvW8ppEzopPxKXPNXl9FwqxrC3qL6otfZY6Dvg=;
+    b=VEbEw3V/vVNB/Bx0MOVubiCRR4pqIA9VSi92Emrv6RNVDNnP12qsPKxZLFuko8ZQGL
+    KgfkUAqhQ14RVHRvioCA==
+X-RZG-AUTH: ":L2QefEenb+UdBJSdRCXu93KJ1bmSGnhMdmOod1DhGN0rBVhd9dFr6KxrfO5Oh7V7VZrgs3iXAXqZnhDuuhhnGfQQmpdNZeQ5Fv1TtRo="
+Received: from smtpclient.apple
+    by smtp.strato.de (RZmta 51.3.0 AUTH)
+    with ESMTPSA id e2a9e4125EEO3YE
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Wed, 5 Mar 2025 15:14:24 +0100 (CET)
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+From: Christian Zigotzky <chzigotzky@xenosoft.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250110-asi-rfc-v2-v2-0-8419288bc805@google.com>
- <20250110-asi-rfc-v2-v2-2-8419288bc805@google.com> <Z8K2B3WJoICVbDj3@kernel.org>
-In-Reply-To: <Z8K2B3WJoICVbDj3@kernel.org>
-From: Brendan Jackman <jackmanb@google.com>
-Date: Wed, 5 Mar 2025 14:12:25 +0100
-X-Gm-Features: AQ5f1JrEWoe__i5J-gwzMxiuWZ9pJYk4XLPMWAQuPYUSu5vOhjZQNejm22RSyYE
-Message-ID: <CA+i-1C06Sunj0BmFON=MbWBK6ZDt_=K4P3BHChRBYyxXqEkQ2g@mail.gmail.com>
-Subject: Re: [PATCH RFC v2 02/29] x86: Create CONFIG_MITIGATION_ADDRESS_SPACE_ISOLATION
-To: Mike Rapoport <rppt@kernel.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Richard Henderson <richard.henderson@linaro.org>, Matt Turner <mattst88@gmail.com>, 
-	Vineet Gupta <vgupta@kernel.org>, Russell King <linux@armlinux.org.uk>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Guo Ren <guoren@kernel.org>, 
-	Brian Cain <bcain@quicinc.com>, Huacai Chen <chenhuacai@kernel.org>, 
-	WANG Xuerui <kernel@xen0n.name>, Geert Uytterhoeven <geert@linux-m68k.org>, 
-	Michal Simek <monstr@monstr.eu>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	Dinh Nguyen <dinguyen@kernel.org>, Jonas Bonn <jonas@southpole.se>, 
-	Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>, Stafford Horne <shorne@gmail.com>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
-	Christophe Leroy <christophe.leroy@csgroup.eu>, Naveen N Rao <naveen@kernel.org>, 
-	Madhavan Srinivasan <maddy@linux.ibm.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, Yoshinori Sato <ysato@users.sourceforge.jp>, 
-	Rich Felker <dalias@libc.org>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, 
-	"David S. Miller" <davem@davemloft.net>, Andreas Larsson <andreas@gaisler.com>, 
-	Richard Weinberger <richard@nod.at>, Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
-	Johannes Berg <johannes@sipsolutions.net>, Chris Zankel <chris@zankel.net>, 
-	Max Filippov <jcmvbkbc@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Andrew Morton <akpm@linux-foundation.org>, Juri Lelli <juri.lelli@redhat.com>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Dietmar Eggemann <dietmar.eggemann@arm.com>, 
-	Steven Rostedt <rostedt@goodmis.org>, Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, 
-	Valentin Schneider <vschneid@redhat.com>, Uladzislau Rezki <urezki@gmail.com>, 
-	Christoph Hellwig <hch@infradead.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>, 
-	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Ard Biesheuvel <ardb@kernel.org>, Josh Poimboeuf <jpoimboe@kernel.org>, 
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-snps-arc@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
-	linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org, 
-	loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org, 
-	linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org, 
-	linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
-	linux-sh@vger.kernel.org, sparclinux@vger.kernel.org, 
-	linux-um@lists.infradead.org, linux-arch@vger.kernel.org, linux-mm@kvack.org, 
-	linux-trace-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-efi@vger.kernel.org, 
-	Junaid Shahid <junaids@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0 (1.0)
+Subject: [Kernel 6.12.17] [PowerPC e5500] KVM HV compilation error
+Date: Wed, 5 Mar 2025 15:14:13 +0100
+Message-Id: <DDEA8D1B-0A0F-4CF3-9A73-7762FFEFD166@xenosoft.de>
+References: <20250112095527.434998-4-pbonzini@redhat.com>
+Cc: Trevor Dickinson <rtd2@xtra.co.nz>,
+ mad skateman <madskateman@gmail.com>, hypexed@yahoo.com.au,
+ Darren Stevens <darren@stevens-zone.net>
+In-Reply-To: <20250112095527.434998-4-pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, seanjc@google.com, linuxppc-dev@lists.ozlabs.org,
+ regressions@lists.linux.dev, Greg KH <greg@kroah.com>
+X-Mailer: iPhone Mail (22D72)
 
-On Sat, Mar 01, 2025 at 09:23:51AM +0200, Mike Rapoport wrote:
-> Hi Brendan,
->
-> On Fri, Jan 10, 2025 at 06:40:28PM +0000, Brendan Jackman wrote:
-> > Currently a nop config. Keeping as a separate commit for easy review of
-> > the boring bits. Later commits will use and enable this new config.
-> >
-> > This config is only added for non-UML x86_64 as other architectures do
-> > not yet have pending implementations. It also has somewhat artificial
-> > dependencies on !PARAVIRT and !KASAN which are explained in the Kconfig
-> > file.
-> >
-> > Co-developed-by: Junaid Shahid <junaids@google.com>
-> > Signed-off-by: Junaid Shahid <junaids@google.com>
-> > Signed-off-by: Brendan Jackman <jackmanb@google.com>
-> > ---
-> >  arch/alpha/include/asm/Kbuild      |  1 +
-> >  arch/arc/include/asm/Kbuild        |  1 +
-> >  arch/arm/include/asm/Kbuild        |  1 +
-> >  arch/arm64/include/asm/Kbuild      |  1 +
-> >  arch/csky/include/asm/Kbuild       |  1 +
-> >  arch/hexagon/include/asm/Kbuild    |  1 +
-> >  arch/loongarch/include/asm/Kbuild  |  3 +++
-> >  arch/m68k/include/asm/Kbuild       |  1 +
-> >  arch/microblaze/include/asm/Kbuild |  1 +
-> >  arch/mips/include/asm/Kbuild       |  1 +
-> >  arch/nios2/include/asm/Kbuild      |  1 +
-> >  arch/openrisc/include/asm/Kbuild   |  1 +
-> >  arch/parisc/include/asm/Kbuild     |  1 +
-> >  arch/powerpc/include/asm/Kbuild    |  1 +
-> >  arch/riscv/include/asm/Kbuild      |  1 +
-> >  arch/s390/include/asm/Kbuild       |  1 +
-> >  arch/sh/include/asm/Kbuild         |  1 +
-> >  arch/sparc/include/asm/Kbuild      |  1 +
-> >  arch/um/include/asm/Kbuild         |  2 +-
-> >  arch/x86/Kconfig                   | 14 ++++++++++++++
-> >  arch/xtensa/include/asm/Kbuild     |  1 +
-> >  include/asm-generic/asi.h          |  5 +++++
-> >  22 files changed, 41 insertions(+), 1 deletion(-)
->
-> I don't think this all is needed. You can put asi.h with stubs used outside
-> of arch/x86 in include/linux and save you the hassle of updating every
-> architecture.
+Hi All,
 
-...
+The stable long-term kernel 6.12.17 cannot compile with KVM HV support for e=
+5500 PowerPC machines anymore.
 
-> If you expect other architectures might implement ASI the config would better
-> fit into init/Kconfig or mm/Kconfig and in arch/x86/Kconfig will define
-> ARCH_HAS_MITIGATION_ADDRESS_SPACE_ISOLATION.
+Bug report: https://github.com/chzigotzky/kernels/issues/6
 
-...
+Kernel config: https://github.com/chzigotzky/kernels/blob/6_12/configs/x5000=
+_defconfig
 
-> > +++ b/include/asm-generic/asi.h
-> > @@ -0,0 +1,5 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +#ifndef __ASM_GENERIC_ASI_H
-> > +#define __ASM_GENERIC_ASI_H
-> > +
-> > +#endif
->
-> IMHO it should be include/linux/asi.h, with something like
->
-> #infdef __LINUX_ASI_H
-> #define __LINUX_ASI_H
->
-> #ifdef CONFIG_MITIGATION_ADDRESS_SPACE_ISOLATION
->
-> #include <asm/asi.h>
->
-> #else /* CONFIG_MITIGATION_ADDRESS_SPACE_ISOLATION */
->
-> /* stubs for functions used outside arch/ */
->
-> #endif /* CONFIG_MITIGATION_ADDRESS_SPACE_ISOLATION */
->
-> #endif /* __LINUX_ASI_H */
+Error messages:
 
-Thanks Mike! That does indeed look way tidier. I'll try to adopt it.
+arch/powerpc/kvm/e500_mmu_host.c: In function 'kvmppc_e500_shadow_map':
+arch/powerpc/kvm/e500_mmu_host.c:447:9: error: implicit declaration of funct=
+ion '__kvm_faultin_pfn' [-Werror=3Dimplicit-function-declaration]
+   pfn =3D __kvm_faultin_pfn(slot, gfn, FOLL_WRITE, NULL, &page);
+         ^~~~~~~~~~~~~~~~~
+  CC      kernel/notifier.o
+arch/powerpc/kvm/e500_mmu_host.c:500:2: error: implicit declaration of funct=
+ion 'kvm_release_faultin_page'; did you mean 'kvm_read_guest_page'? [-Werror=
+=3Dimplicit-function-declaration]
+  kvm_release_faultin_page(kvm, page, !!ret, writable);
+
+After that, I compiled it without KVM HV support.
+
+Kernel config: https://github.com/chzigotzky/kernels/blob/6_12/configs/e5500=
+_defconfig
+
+Please check the error messages.
+
+Thanks,
+Christian=
+
 
