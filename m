@@ -1,212 +1,201 @@
-Return-Path: <kvm+bounces-40135-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40136-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B825A4F760
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 07:45:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6B7DA4F794
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 08:04:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 652373AAF68
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 06:45:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 984E8188CBD2
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 07:04:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F6971DC9BE;
-	Wed,  5 Mar 2025 06:45:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CDA11EA7F8;
+	Wed,  5 Mar 2025 07:03:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Wf9PaZn1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DKsr/oAB"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A25E1156F44
-	for <kvm@vger.kernel.org>; Wed,  5 Mar 2025 06:45:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 154D51C5F13
+	for <kvm@vger.kernel.org>; Wed,  5 Mar 2025 07:03:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741157125; cv=none; b=n/yr5HZILBlwoGoB6bB1o5cmtOdPtsagAW1V6KP2reFjBZkGo5ijAL7Zwri/cGW2pP3OPNcO5LOTafPMwzNKtQomrR2mqZMS0HYV/OndqZ4zIqdx4a/vGWPYnbKaaKv/nuZL8dD8011d64qfm0zgyeDauJDd3l9n+oaEXpTq9WI=
+	t=1741158230; cv=none; b=TohVKWjU4uVUv3CwC6Iqa7kdofOHlVu9T8jdVufDYBBfcePPKm7UYBpSBUEe6JL8WH6yHgNyOkSJkFxeSOl10I9/ZSQyqx6vmKhOr62P+S7LShqSngL5mJYqblkZB3JxSnS3Un6Dun8XbjJBfmGzCTArJ2szUdUSfAEFrXN7/ms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741157125; c=relaxed/simple;
-	bh=1O99U5nRWIuBAzW+EccIHzGDSDZySRUCBYSsmWHrZoQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uUJGOY4Yoa74KOxckUIKWydNQiFI2lMIcxmCmnrWV5q9t2p02YmCnZZOh1stT78tN1ej7/5oiM0VNHtWkmZ4LeHUJhu8yEWK8Ib3Kw97wfy5qvnzAFmpAMNAxsQB7we8h9drp04jTmfPMP7PCdnt9tZG+4RaSOiLZedhhyOvttA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Wf9PaZn1; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 5 Mar 2025 06:45:14 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1741157121;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qS9UAv2i+fAHlT+2Q9Dnnlq3IrBK4nCeCJYvJbiG8Ow=;
-	b=Wf9PaZn1OnZLxpIZbUPs+klnOtfRlJdhcNPTNu2uBWRJh9wGZEBrwJITmSbbKrosX2DcGq
-	JWMal9Y6il+7Lu9N/zpchFMkmy1LqrPjjGbPwjE/0uaAncXOFgyA2cWFP1G4pMK7fTND9A
-	jAh1zIO9J9k6mBYDFQbr7DLZAhFkROE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 13/13] KVM: nSVM: Stop bombing the TLB on nested
- transitions
-Message-ID: <Z8fy-saRNCC031jw@google.com>
-References: <20250205182402.2147495-1-yosry.ahmed@linux.dev>
- <20250205182402.2147495-14-yosry.ahmed@linux.dev>
- <da0b13813b11e5b13f01dced9a629ac07fad27cd.camel@redhat.com>
- <Z8YrdcWd1PD76adM@google.com>
- <36d8ffbda9e69c5245ded717e7491f6fcd5ca72e.camel@redhat.com>
+	s=arc-20240116; t=1741158230; c=relaxed/simple;
+	bh=8jzrqTqhnifkrDyJTtW4igiWDfZ+eSKjlbRZVYBx39w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kg/Y0y94akWIEZ/9M9vFNt5Bbb7YnyVMPwb5BHaF7UIlx/6dGnqJFcSfUinTD/jaB43BPKWV7D3K9JJCzH37eC+epdhlG4bjYJPKSiKG/K1H1GsUwPOtYydlK7ghiNRcblqcay4mdDMtWg8rHu+7tIDv4R6wEe5PpB8A4uM0ouQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DKsr/oAB; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741158229; x=1772694229;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=8jzrqTqhnifkrDyJTtW4igiWDfZ+eSKjlbRZVYBx39w=;
+  b=DKsr/oABCKh1zI/IQQmfGiEfIKwiPVviZWCqWxyCav/kKGdpEEj6GoLq
+   Ximz1mNph7Ez+lQi0MDSdoT0sH1DnUqx+KF4AOz3vFtxpUt8D+mRbysor
+   lmyCHeJBHoOBJYQNv4vClOODdMVr8rJoJ5YdL40WGPqemtLWet1hZxQMq
+   pwGLeirBM4sl4EnSySD49nUHj1Sbufe9o6PO044dkay3WlRYPP7aa7eya
+   LYzYMKnOzSHT4vYosqNrsjjPt5VsVdIgTLUzXwnDP4OeYuN8nkrMqtEGv
+   N15/b258Ev0hVF1WN+HpdrLzBwWciUYEBkzVIvC6CvpE8veXfMiW5WMO8
+   A==;
+X-CSE-ConnectionGUID: UV5zbQq7S1mJQnBthAb2/w==
+X-CSE-MsgGUID: J3s8KwWgRUSCGnp2R46Frw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="41965851"
+X-IronPort-AV: E=Sophos;i="6.14,222,1736841600"; 
+   d="scan'208";a="41965851"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 23:03:48 -0800
+X-CSE-ConnectionGUID: 9xVNrOErS1+czG8AUsdpxw==
+X-CSE-MsgGUID: gJ77evYTTHyiJK2c6J45sw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="155794923"
+Received: from unknown (HELO [10.238.2.135]) ([10.238.2.135])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 23:03:44 -0800
+Message-ID: <7a6ec4ef-500f-491a-aba9-bf013b1058da@linux.intel.com>
+Date: Wed, 5 Mar 2025 15:03:41 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <36d8ffbda9e69c5245ded717e7491f6fcd5ca72e.camel@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 05/10] target/i386/kvm: extract unrelated code out of
+ kvm_x86_build_cpuid()
+To: Dongli Zhang <dongli.zhang@oracle.com>, qemu-devel@nongnu.org,
+ kvm@vger.kernel.org
+Cc: pbonzini@redhat.com, zhao1.liu@intel.com, mtosatti@redhat.com,
+ sandipan.das@amd.com, babu.moger@amd.com, likexu@tencent.com,
+ like.xu.linux@gmail.com, zhenyuw@linux.intel.com, groug@kaod.org,
+ khorenko@virtuozzo.com, alexander.ivanov@virtuozzo.com, den@virtuozzo.com,
+ davydov-max@yandex-team.ru, xiaoyao.li@intel.com, joe.jin@oracle.com
+References: <20250302220112.17653-1-dongli.zhang@oracle.com>
+ <20250302220112.17653-6-dongli.zhang@oracle.com>
+Content-Language: en-US
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <20250302220112.17653-6-dongli.zhang@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 04, 2025 at 10:14:40PM -0500, Maxim Levitsky wrote:
-> On Mon, 2025-03-03 at 22:21 +0000, Yosry Ahmed wrote:
-> > On Fri, Feb 28, 2025 at 09:21:54PM -0500, Maxim Levitsky wrote:
-> > > On Wed, 2025-02-05 at 18:24 +0000, Yosry Ahmed wrote:
-> > > > Now that nested TLB flushes are properly tracked with a well-maintained
-> > > > separate ASID for L2 and proper handling of L1's TLB flush requests,
-> > > > drop the unconditional flushes and syncs on nested transitions.
-> > > > 
-> > > > On a Milan machine, an L1 and L2 guests were booted, both with a single
-> > > > vCPU, and pinned to a single physical CPU to maximize TLB collisions. In
-> > > > this setup, the cpuid_rate microbenchmark [1] showed the following
-> > > > changes with this patch:
-> > > > 
-> > > > +--------+--------+-------------------+----------------------+
-> > > > > L0     | L1     | cpuid_rate (base) | cpuid_rate (patched) |
-> > > > +========+========+===================+======================+
-> > > > > NPT    | NPT    | 256621            | 301113 (+17.3%)      |
-> > > > > NPT    | Shadow | 180017            | 203347 (+12.96%)     |
-> > > > > Shadow | Shadow | 177006            | 189150 (+6.86%)      |
-> > > > +--------+--------+-------------------+----------------------+
-> > > > 
-> > > > [1]https://lore.kernel.org/kvm/20231109180646.2963718-1-khorenko@virtuozzo.com/
-> > > > 
-> > > > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
-> > > > ---
-> > > >  arch/x86/kvm/svm/nested.c | 7 -------
-> > > >  1 file changed, 7 deletions(-)
-> > > > 
-> > > > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> > > > index 8e40ff21f7353..45a187d4c23d1 100644
-> > > > --- a/arch/x86/kvm/svm/nested.c
-> > > > +++ b/arch/x86/kvm/svm/nested.c
-> > > > @@ -512,9 +512,6 @@ static void nested_svm_entry_tlb_flush(struct kvm_vcpu *vcpu)
-> > > >  		svm->nested.last_asid = svm->nested.ctl.asid;
-> > > >  		kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
-> > > >  	}
-> > > > -	/* TODO: optimize unconditional TLB flush/MMU sync */
-> > > > -	kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
-> > > > -	kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
-> > > >  }
-> > > >  
-> > > >  static void nested_svm_exit_tlb_flush(struct kvm_vcpu *vcpu)
-> > > > @@ -530,10 +527,6 @@ static void nested_svm_exit_tlb_flush(struct kvm_vcpu *vcpu)
-> > > >  	 */
-> > > >  	if (svm->nested.ctl.tlb_ctl == TLB_CONTROL_FLUSH_ALL_ASID)
-> > > >  		kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
-> > > > -
-> > > > -	/* TODO: optimize unconditional TLB flush/MMU sync */
-> > > > -	kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
-> > > > -	kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
-> > > >  }
-> > > >  
-> > > >  /*
-> > > 
-> > > Assuming that all previous patches are correct this one should work as well.
-> > > 
-> > > However only a very heavy stress testing, including hyperv, windows guests
-> > > of various types, etc can give me confidence that there is no some ugly bug lurking
-> > > somewhere.
-> > 
-> > I tried booting an L2 and running some workloads like netperf in there.
-> > I also tried booting an L3.
-> > 
-> > I am planning to try and run some testing with a windows L2 guest. I am
-> > assuming this exercises the hyper-V emulation in L1, which could be
-> > interesting.
-> > 
-> > I am not sure if I will be able to test more scenarios though,
-> > especially Windows as an L1 (and something else as an L2).
-> > 
-> > Let me know if you have something specific in mind.
-> 
-> 
-> KVM can run itself 'under' HyperV (although in this case when it runs a guest
-> the guest will be L3 overall, so not really something supported but still something that might
-> reveal bugs).
-> In this case KVM/L1 can take advantage of L0's TLB flush interface.
 
-I don't think I will be able to test on Hyper-V.
+On 3/3/2025 6:00 AM, Dongli Zhang wrote:
+> The initialization of 'has_architectural_pmu_version',
+> 'num_architectural_pmu_gp_counters', and
+> 'num_architectural_pmu_fixed_counters' is unrelated to the process of
+> building the CPUID.
+>
+> Extract them out of kvm_x86_build_cpuid().
+>
+> No functional change.
+>
+> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+> ---
+> Changed since v1:
+>   - Still extract the code, but call them for all CPUs.
+>
+>  target/i386/kvm/kvm.c | 66 +++++++++++++++++++++++++------------------
+>  1 file changed, 39 insertions(+), 27 deletions(-)
+>
+> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+> index 5c8a852dbd..8f293ffd61 100644
+> --- a/target/i386/kvm/kvm.c
+> +++ b/target/i386/kvm/kvm.c
+> @@ -1959,33 +1959,6 @@ static uint32_t kvm_x86_build_cpuid(CPUX86State *env,
+>          }
+>      }
+>  
+> -    if (limit >= 0x0a) {
+> -        uint32_t eax, edx;
+> -
+> -        cpu_x86_cpuid(env, 0x0a, 0, &eax, &unused, &unused, &edx);
+> -
+> -        has_architectural_pmu_version = eax & 0xff;
+> -        if (has_architectural_pmu_version > 0) {
+> -            num_architectural_pmu_gp_counters = (eax & 0xff00) >> 8;
+> -
+> -            /* Shouldn't be more than 32, since that's the number of bits
+> -             * available in EBX to tell us _which_ counters are available.
+> -             * Play it safe.
+> -             */
+> -            if (num_architectural_pmu_gp_counters > MAX_GP_COUNTERS) {
+> -                num_architectural_pmu_gp_counters = MAX_GP_COUNTERS;
+> -            }
+> -
+> -            if (has_architectural_pmu_version > 1) {
+> -                num_architectural_pmu_fixed_counters = edx & 0x1f;
+> -
+> -                if (num_architectural_pmu_fixed_counters > MAX_FIXED_COUNTERS) {
+> -                    num_architectural_pmu_fixed_counters = MAX_FIXED_COUNTERS;
+> -                }
+> -            }
+> -        }
+> -    }
+> -
+>      cpu_x86_cpuid(env, 0x80000000, 0, &limit, &unused, &unused, &unused);
+>  
+>      for (i = 0x80000000; i <= limit; i++) {
+> @@ -2085,6 +2058,43 @@ int kvm_arch_pre_create_vcpu(CPUState *cpu, Error **errp)
+>      return 0;
+>  }
+>  
+> +static void kvm_init_pmu_info(CPUX86State *env)
+> +{
+> +    uint32_t eax, edx;
+> +    uint32_t unused;
+> +    uint32_t limit;
+> +
+> +    cpu_x86_cpuid(env, 0, 0, &limit, &unused, &unused, &unused);
+> +
+> +    if (limit < 0x0a) {
+> +        return;
+> +    }
+> +
+> +    cpu_x86_cpuid(env, 0x0a, 0, &eax, &unused, &unused, &edx);
+> +
+> +    has_architectural_pmu_version = eax & 0xff;
+> +    if (has_architectural_pmu_version > 0) {
+> +        num_architectural_pmu_gp_counters = (eax & 0xff00) >> 8;
+> +
+> +        /*
+> +         * Shouldn't be more than 32, since that's the number of bits
+> +         * available in EBX to tell us _which_ counters are available.
+> +         * Play it safe.
+> +         */
+> +        if (num_architectural_pmu_gp_counters > MAX_GP_COUNTERS) {
+> +            num_architectural_pmu_gp_counters = MAX_GP_COUNTERS;
+> +        }
+> +
+> +        if (has_architectural_pmu_version > 1) {
+> +            num_architectural_pmu_fixed_counters = edx & 0x1f;
+> +
+> +            if (num_architectural_pmu_fixed_counters > MAX_FIXED_COUNTERS) {
+> +                num_architectural_pmu_fixed_counters = MAX_FIXED_COUNTERS;
+> +            }
+> +        }
+> +    }
+> +}
+> +
+>  int kvm_arch_init_vcpu(CPUState *cs)
+>  {
+>      struct {
+> @@ -2267,6 +2277,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>      cpuid_i = kvm_x86_build_cpuid(env, cpuid_data.entries, cpuid_i);
+>      cpuid_data.cpuid.nent = cpuid_i;
+>  
+> +    kvm_init_pmu_info(env);
+> +
+>      if (((env->cpuid_version >> 8)&0xF) >= 6
+>          && (env->features[FEAT_1_EDX] & (CPUID_MCE | CPUID_MCA)) ==
+>             (CPUID_MCE | CPUID_MCA)) {
 
-> 
-> Stress testing L3s also can be nice, although in this case from L0 POV, it doesn't see L3 at all.
-> Instead it sees that L1 runs two different L2s back to back, so the current code will
-> likely flush everything all the time.
+Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 
-I did run an L3 in an attempt to shake out any bugs.
 
-> 
-> 
-> The direct TLB flush that hyperv does, especially from L2 to L0 should also be tested,
-> it's a relatively new feature, so we need to check that L2 actually uses it.
-
-Is this when KVM is emulating Hyper-V for nested guests, or when KVM is
-running on top of Hyper-V? If the latter, as I said earlier I am not
-sure if I will be able to test that.
-
-> 
-> KVM also has its own way of TLB flushing paravirtualization, which can in theory interfere with this.
-> 
-> 
-> It's also nice to run a hyperv enabled Windows as KVM guest, and run a guest in it (can be Windows or Linux or anything else)
-> Such guest will run two L2 VMs, Windows itself and the VM you run inside.
-
-Yeah that's something I intend on doing. Sean mentioned that recent
-Windows versions run the OS in L1 on top of the hypervisor in L0, so I
-think if I run a Windows VM I automatically get both L1 and L2. So just
-running a Windows VM should exercise the TLB flushes. I will also try to
-run WSL to have multiple L2 VMs. I believe that's what you are talking
-about here.
-
-> 
-> 
-> You can also try other L1s, like VirtualBox, VMware, running in Windows or Linux L1,
-> and themselves can run a windows or Linux L2. 
-> 
-> You can also test other OSes like BSD* and such as L1, they might have a different TLB access pattern and
-> might reveal something, who knows. These can also run L2s using their own hypervisors.
-> 
-> Running a very old (say Windows XP, or some very old Linux) as L2 might also reveal something.
-
-Honestly, I don't think I have the time or resources to test other
-operating systems or L1s tbh. Currently my plan is to try and exercise
-more scenarios in a Linux L2 guest, and run a Windows guest as I
-mentioned earlier.
-
-> 
-> (But don't try to run win95/98 - this OS is known to not flush TLB properly (it doesn't use INVLPG when it should),
-> so it doesn't work well on AMD at all because of this).
-
-Good to know :)
-
-> 
-> Finally, it might be worth it to develop a TLB stress test if one doesn't exist yet.
-
-I also thought about this, but I think it would be very tricky to cover
-all the cases, and we'd need the test to create an L1 that is
-sophisticated enough to exercise different TLB flushing scenarios. I
-think running an actual OS as L1 is probably exercising the TLB code
-more that any test.
-
-That being said, Sean did mention the 'access' tests in KUT, and I plan
-to check how relevant they are and if they can easily extended to add
-some coverage for this.
 
