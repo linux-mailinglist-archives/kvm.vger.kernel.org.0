@@ -1,248 +1,113 @@
-Return-Path: <kvm+bounces-40099-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40100-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30D1AA4F23A
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 01:16:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04640A4F24B
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 01:18:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CE4916EB3D
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 00:16:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E124C3AAFA5
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 00:18:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8C4312B94;
-	Wed,  5 Mar 2025 00:16:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A510D61FFE;
+	Wed,  5 Mar 2025 00:17:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UlNPGhw8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qiy9Zl6y"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E3D553AC
-	for <kvm@vger.kernel.org>; Wed,  5 Mar 2025 00:16:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B391C288DA;
+	Wed,  5 Mar 2025 00:17:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741133770; cv=none; b=q9bSIFR5pxWhNt/JoSZ1AC0PcN1wRWQSxsMYRKMfA7A6sLu0B4KheXiRp5fBTgsYz9xRNeHXjvTRMTrCwu09aQgM9010vDbqz8OQt5qOIraC0xm9CYgbf5f3PBvqj4mZwd60huFeqoenXoGb71Znlt1rrULeA55IlGqCOmWVlPc=
+	t=1741133871; cv=none; b=nWpEkgWyHGDzEN3mavyv3mQQciUjkimd3WWqYKmVoeS5CJxV4A0gareEgaVapwPauvmrD3mk0WG06bxNgmX7U8BasspzCJ7RrkUkOwwdhHhm4ketbFJl4VGkRDIokXd8IAjvJiK+/lCAsvN2lR8tfrmGnrgXQHutWEjKR0ASchM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741133770; c=relaxed/simple;
-	bh=1eNeeZMatMhbyDkf4IzA6vyYEqGA9LjWEzci90EKIKM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=E8zkfHfu4rrZJv0sCLXeQIYFE6WRD4RE2xExIMIpGVJ362xOdHKq/MyYh1Qf2FCIALdwadSFdoRy6Qon0KXb+ExNgLxDrGhdSyO4O5Of7rPA+6hIvaXaW6QC8ZhxntZ+FZPc4fHhIoTscZBeSgVWoUvy+uAn5b+7/1W9kSXAVJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UlNPGhw8; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741133767;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K+nZIdJ+GUg9TiIWa5Z45oEZwDdDHGq5zn5aUSYMnu4=;
-	b=UlNPGhw8bhP1SJ0nhRgKvhfTel21NylxxJdoQmaLC1JwqG3h/Nb9QgPVym4T/NWNv6fzLE
-	qcfsbjRG8Fkly/bs+cFSKI7y3hiLhzrWWDRZnJJ+4WIOKtxIY13IhDVGsiHxOO62Z/LV6F
-	mogLy8pyWrBucpNfhn1Jp//aki3ukD0=
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
- [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-180-wIaNwpxFO8qYzDzV294BTQ-1; Tue, 04 Mar 2025 19:16:06 -0500
-X-MC-Unique: wIaNwpxFO8qYzDzV294BTQ-1
-X-Mimecast-MFC-AGG-ID: wIaNwpxFO8qYzDzV294BTQ_1741133765
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-223725aa321so22670205ad.2
-        for <kvm@vger.kernel.org>; Tue, 04 Mar 2025 16:16:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741133765; x=1741738565;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=K+nZIdJ+GUg9TiIWa5Z45oEZwDdDHGq5zn5aUSYMnu4=;
-        b=BvppWuXMv+bLktJxQrR2bz1ZYEIh3rzpx6jjhrBD6kex09fwyBrcGfJxEucsuBCf4Z
-         eIMda7L490o0c+OimJ78pY3LE+Ctc24VSf13B0hCoJeGYPwjVxYsw3yRBM/dC/eG+uGI
-         gn7KGXoIjRpsPa/gR5e8BN1NGAstiqwhGR2LfDMzA52u4Iky/P6/xy4UZojzzYyBS5iC
-         EQFNaqwctzx5ztbsa8igcHrrXQk5VxK40d3JqoQq5wkvdeShM+pAIPqP9Rzuot/DNf49
-         5GSppQmnXf7U2+MjAfen5cZ5vSfWtgYE7ACpcyUn4UeACilOdQUFW8tcbBKdPIL+6lvZ
-         +vUg==
-X-Forwarded-Encrypted: i=1; AJvYcCX2rN6p0Q+pxVGgNV22vcLdaUrx364pFFIUxmB3kovNWtUXOYcv4gbYYo6U9XxifcU4VGs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyv3chOGmVAsTKTCpTivlz4nOKsUIFGHd6VroMATEYWdt3y2pYj
-	kP1Fk9gsPNDU0k5Pz0vv7QSwIJtckpe8kOaesxZpV05lvWSy3p0worT+QTBc3W/5ZXICpKqVeM4
-	SGcdkkdoyrypssyCMgIQF7j/9wRA2MsM8JV9H2QPXIO3I3vnzVg==
-X-Gm-Gg: ASbGncue0ZCuYU9Q6WwfJmDCrUN74xEncgl+tWM6qH+mv/U6ZnEk7kIB+M5RBAq/83/
-	K5FQFfyVJmFD/+RD8K/CwjAvutxEwz9h0uI/4e6V7GXcjs8XBEqA1UIRJ7v1AWyWHEREL/AELhY
-	u5lz3AEXb1T0uLyX039heQ9Zm7lBLKyc6VdYG4OZHH/5qvn2X+J9IXF/0knjzt7eams9iVqocZA
-	4KGMu/HELWDXdDTrrSVqA+0+EozqguA49IyLyaBxensGTcnb1unr4lcSj5rCPuPMXhI6Y3houc2
-	Jw6gSOV1LnP1cvM=
-X-Received: by 2002:a05:6a00:b42:b0:736:4e02:c543 with SMTP id d2e1a72fcca58-73682b73e82mr1248275b3a.9.1741133764827;
-        Tue, 04 Mar 2025 16:16:04 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFtbldcyedC0VzElSl5L414yZHuxZ/AzfRFOHxkoXbZKPjFlAxwXPjGCGBZbMPisg2mcwac1Q==
-X-Received: by 2002:a05:6a00:b42:b0:736:4e02:c543 with SMTP id d2e1a72fcca58-73682b73e82mr1248225b3a.9.1741133764350;
-        Tue, 04 Mar 2025 16:16:04 -0800 (PST)
-Received: from [192.168.68.55] ([180.233.125.1])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7363a0f88bfsm7109144b3a.24.2025.03.04.16.15.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Mar 2025 16:16:03 -0800 (PST)
-Message-ID: <1e1aa766-c358-4a4f-918e-f0044fe499fe@redhat.com>
-Date: Wed, 5 Mar 2025 10:15:54 +1000
+	s=arc-20240116; t=1741133871; c=relaxed/simple;
+	bh=0yno/DE+/JPPbpjlTDp+6AS6Y5WufQLFUtooXTkZzOg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hcMEaSGBb0En8C0lPS38caGpxDPLEg7yZOSOgV6vMyADODspEw6gKYWNVXy2ICL8HZ1562v8svTXGifliNah8SE+MJrK0m/2mQFJwDX5+RYMgas9FCIVYxzFPFxxeKpnmoY3xqLHd8s7fx75so4Dkmc+aC2Hr0kBoe2hXJBVZrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qiy9Zl6y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E4BDC4CEE5;
+	Wed,  5 Mar 2025 00:17:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741133871;
+	bh=0yno/DE+/JPPbpjlTDp+6AS6Y5WufQLFUtooXTkZzOg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Qiy9Zl6yv/aKjE9r7FltyhR99JNSR3mZEy7tHtEeAZwJx9e8I+OyYUOIVNR/AvgN4
+	 8y/TJexVAPwro/TnXD3bQGzwmuDowlMMQPnXQozziTqqfk4ft5fYlNG2Ew0+QbtsnO
+	 eIyPdgpKMmQ/18DHZ7SRDJQb5iNtOpCEkY2L7uSer+P0ci0NrVCxLl100RUgrg3zvo
+	 nx1DwfGtnJq5RIvZj/2QasoTO5Pwq+9XrYxDI9iJO7LOaPsIW5g2kdovUQlNW0r6l7
+	 j9E0YzHkyykZLrOevBWIxL8cVwlHZEmcr6184buXgx5OLsUD/wTj9miuN8+PRGiuqt
+	 lYFzVKL3eR5nQ==
+Date: Tue, 4 Mar 2025 16:17:48 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, Donald
+ Hunter <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Jeroen de Borst <jeroendb@google.com>, Harshitha
+ Ramamurthy <hramamurthy@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>,
+ Neal Cardwell <ncardwell@google.com>, "Michael S. Tsirkin"
+ <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Eugenio =?UTF-8?B?UMOpcmV6?=
+ <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Stefano
+ Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, Jamal Hadi Salim
+ <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, Pedro Tammela
+ <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
+Subject: Re: [PATCH net-next v6 7/8] net: check for driver support in netmem
+ TX
+Message-ID: <20250304161748.42b71228@kernel.org>
+In-Reply-To: <CAHS8izOJfSCM+qZ=npPOK3kwuA1pyGHrPo73brRq2VXg8G450g@mail.gmail.com>
+References: <20250227041209.2031104-1-almasrymina@google.com>
+	<20250227041209.2031104-8-almasrymina@google.com>
+	<20250228164301.07af6753@kernel.org>
+	<CAHS8izO-N4maVtjhgH7CFv5D-QEtjQaYKSrHUrth=aJje4NZgg@mail.gmail.com>
+	<20250303162901.7fa57cd0@kernel.org>
+	<CAHS8izOJfSCM+qZ=npPOK3kwuA1pyGHrPo73brRq2VXg8G450g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 05/45] arm64: RME: Add wrappers for RMI calls
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20250213161426.102987-1-steven.price@arm.com>
- <20250213161426.102987-6-steven.price@arm.com>
- <8f08b96b-8219-4d51-8f46-bc367bbf2031@redhat.com>
- <59f84354-e890-48c8-ba06-87dda471f364@arm.com>
-Content-Language: en-US
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <59f84354-e890-48c8-ba06-87dda471f364@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 3/4/25 1:05 AM, Steven Price wrote:
-> On 03/03/2025 03:42, Gavin Shan wrote:
->> On 2/14/25 2:13 AM, Steven Price wrote:
->>> The wrappers make the call sites easier to read and deal with the
->>> boiler plate of handling the error codes from the RMM.
->>>
->>> Signed-off-by: Steven Price <steven.price@arm.com>
->>> ---
->>> Changes from v5:
->>>    * Further improve comments
->>> Changes from v4:
->>>    * Improve comments
->>> Changes from v2:
->>>    * Make output arguments optional.
->>>    * Mask RIPAS value rmi_rtt_read_entry()
->>>    * Drop unused rmi_rtt_get_phys()
->>> ---
->>>    arch/arm64/include/asm/rmi_cmds.h | 508 ++++++++++++++++++++++++++++++
->>>    1 file changed, 508 insertions(+)
->>>    create mode 100644 arch/arm64/include/asm/rmi_cmds.h
->>>
->>
->> With the following nitpicks addressed:
->>
->> Reviewed-by: Gavin Shan <gshan@redhat.com>
+On Mon, 3 Mar 2025 19:53:44 -0800 Mina Almasry wrote:
+> > Upper devices and BPF access is covered I think, by the skbuff checks.
+> > But I think we missed adding a check in validate_xmit_skb() to protect
+> > the xmit paths of HW|virt drivers. You can try to add a TC rule which
+> > forwards all traffic from your devmem flow back out to the device and
+> > see if it crashes on net-next ?  
 > 
-> Thanks, there were a couple of other pages and params_ptr references
-> that I've updated to granules and just 'params' too now. With hindsight
-> conflating pages and granules in the earlier versions of this series was
-> a big mistake ;)
+> No crash, but by adding debug logs I'm detecting that we're passing
+> unreadable netmem dma-addresses to the dma_unmap_*() APIs, which is
+> known to be unsafe. I just can't reproduce an issue because my
+> platform has the IOMMU disabled.
 > 
-
-Yeah, that was because the assumption was the page size and granule size are
-equal(4KB), but they're still different things. With the intention to support
-ARM CCA on host with non-aligned page sizes (16KB/64KB), we have to differentiate
-granule/page.
-
-Ideally, the granule is only visible to RMI calls and their helpers. An new memory
-allocator seems inevitable so that the allocated pages can be distributed on requests
-by various RMI helpers in granule. It means the allocator is the line to separate page
-and granule :)
-
-Thanks,
-Gavin
-
-> Steve
+> I guess I do need to send the hunk from validate_xmit_skb() as a fix
+> to net and CC stable.
 > 
->>> diff --git a/arch/arm64/include/asm/rmi_cmds.h b/arch/arm64/include/
->>> asm/rmi_cmds.h
->>> new file mode 100644
->>> index 000000000000..043b7ff278ee
->>> --- /dev/null
->>> +++ b/arch/arm64/include/asm/rmi_cmds.h
->>> @@ -0,0 +1,508 @@
->>> +/* SPDX-License-Identifier: GPL-2.0 */
->>> +/*
->>> + * Copyright (C) 2023 ARM Ltd.
->>> + */
->>> +
->>> +#ifndef __ASM_RMI_CMDS_H
->>> +#define __ASM_RMI_CMDS_H
->>> +
->>
->> [...]
->>
->>> +
->>> +/**
->>> + * rmi_rec_aux_count() - Get number of auxiliary granules required
->>> + * @rd: PA of the RD
->>> + * @aux_count: Number of pages written to this pointer
->>                    ^^^^^^^^^^^^^^^
->>                    Number of granules
->>> + *
->>> + * A REC may require extra auxiliary pages to be delegated for the
->>> RMM to
->>                                          ^^^^^
->>                                          granules
->>
->>> + * store metadata (not visible to the normal world) in. This function
->>> provides
->>> + * the number of pages that are required.
->>                      ^^^^^
->>                      granules
->>> + *
->>> + * Return: RMI return code
->>> + */
->>> +static inline int rmi_rec_aux_count(unsigned long rd, unsigned long
->>> *aux_count)
->>> +{
->>> +    struct arm_smccc_res res;
->>> +
->>> +    arm_smccc_1_1_invoke(SMC_RMI_REC_AUX_COUNT, rd, &res);
->>> +
->>> +    if (aux_count)
->>> +        *aux_count = res.a1;
->>> +    return res.a0;
->>> +}
->>> +
->>> +/**
->>> + * rmi_rec_create() - Create a REC
->>> + * @rd: PA of the RD
->>> + * @rec: PA of the target REC
->>> + * @params_ptr: PA of REC parameters
->>> + *
->>> + * Create a REC using the parameters specified in the struct
->>> rec_params pointed
->>> + * to by @params_ptr.
->>> + *
->>> + * Return: RMI return code
->>> + */
->>> +static inline int rmi_rec_create(unsigned long rd, unsigned long rec,
->>> +                 unsigned long params_ptr)
->>> +{
->>> +    struct arm_smccc_res res;
->>> +
->>> +    arm_smccc_1_1_invoke(SMC_RMI_REC_CREATE, rd, rec, params_ptr, &res);
->>> +
->>> +    return res.a0;
->>> +}
->>> +
->>
->> 'params_ptr' may be renamed to 'params'.
->>
->>
->> [...]
->>> +#endif /* __ASM_RMI_CMDS_H */
->>
->> Thanks,
->> Gavin
->>
-> 
+> Another thing I'm worried about is ip_forward() inserting an
+> unreadable skb into the tx path somewhere higher up the stack which
+> calls more code that isn't expecting unreadable skbs? Specifically
+> worried about skb_frag_ref/unref. Does this sound like a concern as
+> well? Or is it a similar code path to tc?
 
+I'd say similar to tc. We can protect drivers with a check in
+validate_xmit_skb(). The second API surface we need to filter on
+is skb / skb_frag helpers. The third is socket API / opt-in for
+in-kernel socket readers.
+
+Driver and socket should be "easy" to cover with an explicit
+opt in. You already covered skb APIs but it's less centralized
+and there may be some abuses we are not aware of. Which is why
+patch 1 worries me a little.
 
