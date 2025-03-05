@@ -1,118 +1,144 @@
-Return-Path: <kvm+bounces-40126-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40127-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9324CA4F5F3
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 05:09:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7D12A4F603
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 05:17:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E672F3A9C20
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 04:09:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4AF223A9F16
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 04:17:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BBFF1A23BF;
-	Wed,  5 Mar 2025 04:09:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBDE51C6FF2;
+	Wed,  5 Mar 2025 04:17:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hc65uFJ4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PaArDxeJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DBAE1A5B8B
-	for <kvm@vger.kernel.org>; Wed,  5 Mar 2025 04:09:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98CB41AAA1D
+	for <kvm@vger.kernel.org>; Wed,  5 Mar 2025 04:17:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741147753; cv=none; b=g6Q9I2W5iafjNKgog0vcsfNqgLrn1KJ0F/gh4gbo0d6A62G3SU47MW0jln6BtzD1vE4ohGcJmmp1X49B6/ExRecD3E5TWpxRbvslCeRtzGwmQc5KsqWH2Pe4dye1IFmrOM/upEQWvBiUl4caytYtf6k9K0CnZv6QAgGi9rTtgR4=
+	t=1741148240; cv=none; b=DdG3U3VZA9SRIbH6amZX1qmvJ8A7ozpxGLakqcicIG37qapomZWhGNtDQzlEFbMPo+AtVsgJcSr5FVXJ6F7v4mL1rwqrdYddbuP3XCfU2tpUmP7Hq2/fTobzBQoR5FKAdMrK3NKzM57Sy/WdUPHE/wuk6ps7jzJGlLTFSAa/+XI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741147753; c=relaxed/simple;
-	bh=sl3kF2jIRgykOyy13qNEYv7/mlV05yVeWOFjVH+qAtU=;
+	s=arc-20240116; t=1741148240; c=relaxed/simple;
+	bh=HwBqRobMEjc1RHDutE1Wec8IsX+1zzZJtF0f3kRjfZ8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HXf6PUIQJm/OoGLYjW/QhgMDXsCr2WZ+6XKdU/cIUO4UdzB3hoFT4YGZIAGsLV36kNhgHXbQkjz2dV9usmYFEVo3iux+P6NdcmTwgYLTOYhouS7BOPpYIEsWU0lwYx2b/wU2Qukq5hH2zPJk8pvtffjEajxu+SIdqPVUnHg8SwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Hc65uFJ4; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741147751;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sl3kF2jIRgykOyy13qNEYv7/mlV05yVeWOFjVH+qAtU=;
-	b=Hc65uFJ4lzCEOKpChJX0j9NJSRQi0YzkgbxtkSM4vG4jTEkqqPRAck6wuYyixFhz3CsOP0
-	XjkamHIbVFuf7+j/YNtSIFiksRdzHeQItEjRORWY/IMjl6miJQgnGuvddYySVZZTzApEUF
-	Rk49GBK+HUz9R568MAjKazF340sVQkA=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-662-Yw6VbydgMIqJbxxtiA5sSA-1; Tue, 04 Mar 2025 23:08:54 -0500
-X-MC-Unique: Yw6VbydgMIqJbxxtiA5sSA-1
-X-Mimecast-MFC-AGG-ID: Yw6VbydgMIqJbxxtiA5sSA_1741147715
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2feda472a4aso6861974a91.1
-        for <kvm@vger.kernel.org>; Tue, 04 Mar 2025 20:08:35 -0800 (PST)
+	 To:Cc:Content-Type; b=Dj8zIQ2lWC9BGP1ZnRZ48vVrpYoIl0/9NIKic0n3LalIIwYNSu6m9sHL4LnHJMba+AxaWVrZ4EKkAcvOoo/YWsh2/zs2my5jXNiiA1MrhgL6MgNODdOMSEWwpZRq25LGYJAQYpY7kd9kXlQ2R5f4zvQJiTHcwlcAqnRVQjVvEcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PaArDxeJ; arc=none smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-47509b2bb7dso9444961cf.2
+        for <kvm@vger.kernel.org>; Tue, 04 Mar 2025 20:17:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741148236; x=1741753036; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XcHAlTO4gyMhCqU3G5F6EtU5yvv2W4gq8broR/6eQhA=;
+        b=PaArDxeJGiGw8KgQgWhIGz6Vw8JFggpR69SIRf6a0wKU+au3ITv4AAPWPLb2/zpT90
+         2Tkg+9xmgIeNZZFcXsvd/HK4324DQtZgrgpFu++7TmFaVUx1ZbndP25InQJhTAn3cl0y
+         brBZOw83YLaDadsD25X9FO2k19int4Z0Kan2/p8D9xRmh2eqAs4zDOUS1hZgAslEkyzm
+         jJ6h2N9aWF0kIQ22RoWuKzurtKfEwVLodNHghDM9VXPAP/aPzcZOtnnMhAkH0PCazwsT
+         74K8jwh9RqmuLIgCHhCO66krZE6B1F2T+fUxBd4gK+xS78fx52/Pk8ovZeIbrqzgCUTM
+         hpaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741147714; x=1741752514;
+        d=1e100.net; s=20230601; t=1741148236; x=1741753036;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sl3kF2jIRgykOyy13qNEYv7/mlV05yVeWOFjVH+qAtU=;
-        b=nBWbDIyr7VbqZdhEA8Ist1wqlGx0augtvEv00SdghRx0hWVjcqCMSjersbprcOkMTr
-         DALv4+4psi//tgV2eEofsCSJ509y64Wj5bS5UmD5TnAZNC7wM4xxK1ugKe8jwu4jMiL2
-         6E9wrGiZTJ0Z6m6eXSTpdtXlUyKp4cGRoP/2VBGFuQKoq48F54wEO8G3hnLFb0UJKMMh
-         IKCvufPiYa4rG/S2QxLaR39WUMDahbFmMALDP0T2o2tv/ZGYK2w0Sz3//h6DtL5dzOXt
-         4byXlNfNA9SYDDqsgAdy3ZJYEfwPRlJL62hDFkjvcaRjkyIvxmLNI2vcc+errHVgeqhJ
-         2tpw==
-X-Forwarded-Encrypted: i=1; AJvYcCXSkUHJr+kVWPRkpxp+cXRrLyiTiVDzkZAEOEVI0pHXP9tr9kHkFAaTRXSswF6V0EjjY78=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxcTFdDDZO2HIJGtCpZFuDLBVCG3Omzp2KMQevyb+QKe44Uytd9
-	nETQf6LK7cpp2dGLmE+jkCC6jteYuLo1uaIbQaY4JNEl+cftotJqmIEIJo5XCb3DhIKqtTtFJm+
-	CP0m9f+8imgrRfQ1ld6y1uV+TYaxvpY5e4j6ykdP7MNmqgJe5OHXBAUaEkSE6QSTZlya+/xWWNJ
-	npZgLCXdknfpkaqO4raHQo5MGPX92MguhZzj4=
-X-Gm-Gg: ASbGncvQ+X1A3EwNSrHpTgsDdySTSmYRmAn3PA892cIS0/ZGyUKL7lTk3vDW4yaKZ5U
-	j2l7IKdfidQkWEdRjAKolcG84cbO9IK8uY3BPA0BVzFwaGp5X5qNoZNFb5JrrxO4FL0HkwPrfZw
-	==
-X-Received: by 2002:a17:90b:38c7:b0:2ea:3f34:f194 with SMTP id 98e67ed59e1d1-2ff497a94d1mr3253877a91.10.1741147714159;
-        Tue, 04 Mar 2025 20:08:34 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFRhAjiy6oJgdTVYVOYk9K5LcroQa6MmEtafp7KA+t5KO8Pe7O1jHU38xtYt3z4pO+pz1vuRaGm1QENB3uSDNs=
-X-Received: by 2002:a17:90b:38c7:b0:2ea:3f34:f194 with SMTP id
- 98e67ed59e1d1-2ff497a94d1mr3253847a91.10.1741147713755; Tue, 04 Mar 2025
- 20:08:33 -0800 (PST)
+        bh=XcHAlTO4gyMhCqU3G5F6EtU5yvv2W4gq8broR/6eQhA=;
+        b=veMuRopYWmyNy+9uBN9oX+Kg7m5+MvAlM18auOJxDhs41kCUBB55Bij3dHIDQ9bWe2
+         i08bQkekCx/MLqv1GCuTmOsKaLAB3RZHvay/MAka83lqvoh2NnAc4+I5JplrkM2Uxy8p
+         DyLcAoDfFx94JKTQSOV8EBT6tPLcs9t6IRy0VqVUB7poCNMPWgxzUo35nEci0HCxjIDc
+         qmd0YIVgb/f9S99p0THLSCZSM4uRqaXVtDjLj0dNPl24trxnpg4THfXVef4Djlss4aFR
+         nFg+NQAOZE/fk+gHn9LtIsTMPh5JaS+Khc4D+E7d2kbu29GwJgygswQUnJXSqDphE0CW
+         qxig==
+X-Forwarded-Encrypted: i=1; AJvYcCWuXKLgBfA0/Oz7H3XpWgXlWRRuL03NCbcx2X3jZKgZ55hIJVPz8vSqiroB2lFhhy0hf/s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1E4RmJBpxVlVBD/tHzw1pU15ne9PiJ9v1qEWAZchwr/DhvGLD
+	RIFOy/migSSJD5wpZAEWHlMKbN4QjAZ7+lTKm+r2QWrhuTWH138Oy2GvJ/a383I2+y9WYYNYG8/
+	CmPq3D6AEZUvHFidGZrtbM4k92eCuJqRPJFuP
+X-Gm-Gg: ASbGncuUbWXuNaiP+JpuLiFQ7mKJiji048AezD0eAycoaT6ac8AFOtnhsV8B0ZnJFL0
+	jved2ffn0MzZ8yzzTNvzr7BCS/LZJi6BudPeY1V85qIdIZDr1AC2tTMKggoDM+CbzsFRPPO5f95
+	xTG8BKahwk0Kgr7cc2cz7tj4TDuDPAQIqMRbgcY98+aKPsDpVn+IhqZJUj
+X-Google-Smtp-Source: AGHT+IFJNFqHI05Gy+INURBdfismHLlToIOAN2sGK8FQGemkQqgtUPkgQBuqxpFP5bBRssTUaN9X8dG7bt2dplInltQ=
+X-Received: by 2002:ac8:5d8d:0:b0:473:8a27:5b70 with SMTP id
+ d75a77b69052e-4750b442ffbmr24970761cf.19.1741148236174; Tue, 04 Mar 2025
+ 20:17:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250303085237.19990-1-sgarzare@redhat.com> <CAJaqyWfNieVxJu0pGCcjRc++wRnRpyHqfkuYpAqnKCLUjbW6Xw@mail.gmail.com>
-In-Reply-To: <CAJaqyWfNieVxJu0pGCcjRc++wRnRpyHqfkuYpAqnKCLUjbW6Xw@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 5 Mar 2025 12:08:22 +0800
-X-Gm-Features: AQ5f1Jr9X3ymlwY6PrZDcvmZUstskG7PfMhNEYJbHpQgXjCqpakU8L3BFGy8d0g
-Message-ID: <CACGkMEtycEX=8FrKntZ7DUDaXf61y6ZE4=49SmQu5Nkh_tf39g@mail.gmail.com>
-Subject: Re: [PATCH] vhost: fix VHOST_*_OWNER documentation
-To: Eugenio Perez Martin <eperezma@redhat.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, virtualization@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	"Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org
+References: <20250221053927.486476-1-suleiman@google.com> <20250221053927.486476-3-suleiman@google.com>
+ <Z8NCGFcH9H14VOV-@char.us.oracle.com>
+In-Reply-To: <Z8NCGFcH9H14VOV-@char.us.oracle.com>
+From: Suleiman Souhlal <suleiman@google.com>
+Date: Wed, 5 Mar 2025 13:17:04 +0900
+X-Gm-Features: AQ5f1JoH4jwPGSW282LkcEOTlJZEQawNQoZu1dnFNF46VUE5HwqLizIhVtKljd8
+Message-ID: <CABCjUKCU_3q_VfzergdmRK4Tc2BxUcmCotf+E8MpWX6o+g0CTA@mail.gmail.com>
+Subject: Re: [PATCH v4 2/2] KVM: x86: Include host suspended time in steal time
+To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Chao Gao <chao.gao@intel.com>, 
+	David Woodhouse <dwmw2@infradead.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, ssouhlal@freebsd.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 3, 2025 at 5:29=E2=80=AFPM Eugenio Perez Martin <eperezma@redha=
-t.com> wrote:
+On Sun, Mar 2, 2025 at 2:22=E2=80=AFAM Konrad Rzeszutek Wilk
+<konrad.wilk@oracle.com> wrote:
 >
-> On Mon, Mar 3, 2025 at 9:52=E2=80=AFAM Stefano Garzarella <sgarzare@redha=
-t.com> wrote:
+> On Fri, Feb 21, 2025 at 02:39:27PM +0900, Suleiman Souhlal wrote:
+> > When the host resumes from a suspend, the guest thinks any task
+> > that was running during the suspend ran for a long time, even though
+> > the effective run time was much shorter, which can end up having
+> > negative effects with scheduling.
 > >
-> > VHOST_OWNER_SET and VHOST_OWNER_RESET are used in the documentation
-> > instead of VHOST_SET_OWNER and VHOST_RESET_OWNER respectively.
-> >
-> > To avoid confusion, let's use the right names in the documentation.
-> > No change to the API, only the documentation is involved.
-> >
+> > To mitigate this issue, the time that the host was suspended is include=
+d
+> > in steal time, which lets the guest can subtract the duration from the
 >
-> Reviewed-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> s/can//
+> > tasks' runtime.
+> >
+> > In order to implement this behavior, once the suspend notifier fires,
+> > vCPUs trying to run block until the resume notifier finishes. This is
 >
+> s/run/run will/
+> > because the freezing of userspace tasks happens between these two point=
+s,
+> Full stop at the end of that                                             =
+ ^
+> > which means that vCPUs could otherwise run and get their suspend steal
+> > time misaccounted, particularly if a vCPU would run after resume before
+> > the resume notifier.
+>
+> s/notifier/notifier fires/
+>
+> > Incidentally, doing this also addresses a potential race with the
+> > suspend notifier setting PVCLOCK_GUEST_STOPPED, which could then get
+> > cleared before the suspend actually happened.
+> >
+> > One potential caveat is that in the case of a suspend happening during
+> > a VM migration, the suspend time might not be accounted.
+>
+> s/accounted/accounted for./
+> > A workaround would be for the VMM to ensure that the guest is entered
+> > with KVM_RUN after resuming from suspend.
+>
+> So ..does that mean there is a QEMU patch as well?
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+No, I am not planning on making a QEMU patch.
+A QEMU patch would only be needed if you cared about the caveat mentioned t=
+here.
 
-Thanks
-
+Thanks,
+-- Suleiman
 
