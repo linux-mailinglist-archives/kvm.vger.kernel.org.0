@@ -1,224 +1,132 @@
-Return-Path: <kvm+bounces-40137-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40138-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2F1DA4F7AA
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 08:07:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9684FA4F7DE
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 08:27:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C47881890FE7
-	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 07:07:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C50B73A6E41
+	for <lists+kvm@lfdr.de>; Wed,  5 Mar 2025 07:27:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 363301EA7D9;
-	Wed,  5 Mar 2025 07:07:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF70B1EE03D;
+	Wed,  5 Mar 2025 07:27:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EOGyVK+N"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fwgEF8j1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7C419CC2E
-	for <kvm@vger.kernel.org>; Wed,  5 Mar 2025 07:07:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BF971C84CC
+	for <kvm@vger.kernel.org>; Wed,  5 Mar 2025 07:27:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741158445; cv=none; b=YQXtqOPLTs+mDe/QVE6xKImjR+6XE8gVZs2APq/r7G/TdPG8MpF6+v34t0MJIKWYup2fCmTqRpp8YLiOVPTJ/YSSKX+leRw58Sfi3dCgYJdYP420O6EpVcNJK+F69fAaLjdZvQQy/RGL7OWDdqDVg9KH9g0fYnWIgc9H/2RGjrI=
+	t=1741159641; cv=none; b=SzilZklnkvqtzu51DTpxnTzDzWEC+MoeG3DesPkkXQSsZCLD9MbVax76DHaYG6BWZOgjZa0ZHiOrYAiigO1HXBBaGp7KPnDI7jbTPSpPkA/NScj/rl7oEQM8mC8gEZGALtnkAxpjeXjM9dmDsV62TpGpBNixaCt/Z+jkK+dAsDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741158445; c=relaxed/simple;
-	bh=tGcC8AKHL36G6KKjYkJ2djPBvA8fScGzKykiUMbohgA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KuXq8dXEtUvFNo16R05SPK/JwfcANBeaX6GtLk3+jbTvrAApdTge1SXaPtPkJeFJ6TI3lqFu+VtnTegwHFasf0S3AwKYrztwlJnTcY53gu5hXXHCQRxrBFNo4LhCO2Ayx6qg3Raowc+GNlYtRnY9TDJS7uF3f3JUVNObE7zSVAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EOGyVK+N; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741158443; x=1772694443;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=tGcC8AKHL36G6KKjYkJ2djPBvA8fScGzKykiUMbohgA=;
-  b=EOGyVK+NbFq6tRHabI5FSMBNeGAShpIQy1d5NkpUp9PAU5W+DtZIfCOg
-   SCg+RHOkGkPZY5SEXdmRTHfFPclYwFVAS3SjsgAD1QfFXoFnDc0Ky2gRa
-   R4ZadR2IZWCyeeBJUG3LFmbe/rxFL4CuhYhoyntPbfqs2i+nfxd/9fEXU
-   5c0tLZa8btovOFU/IOKUlIquk/b/sYfCHHR/uMWaXtNW/ebreQljIAKsA
-   rdPmE26O7TxxVtki3SjrOpekEjE7fjZfl0gOSotMawsP4YsBw9DVFA2o5
-   snge4SpnrToxlQeuf615OWR+RxSjhQh1hsBQ55wi1adVIO6N/s0vYmKQl
-   g==;
-X-CSE-ConnectionGUID: W9f5k1MNR4KVV0sdAS9edA==
-X-CSE-MsgGUID: b4lMCR7DRhe/EzXvb1VfZQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="67475196"
-X-IronPort-AV: E=Sophos;i="6.14,222,1736841600"; 
-   d="scan'208";a="67475196"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 23:07:22 -0800
-X-CSE-ConnectionGUID: CngObJnVT/GAgcDIZQc0yw==
-X-CSE-MsgGUID: pn+k+QgaRuKQNoXuwC+4UA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,222,1736841600"; 
-   d="scan'208";a="123623659"
-Received: from unknown (HELO [10.238.2.135]) ([10.238.2.135])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 23:07:18 -0800
-Message-ID: <d2e9fc7f-76f0-41da-98bc-96886fe9f660@linux.intel.com>
-Date: Wed, 5 Mar 2025 15:07:15 +0800
+	s=arc-20240116; t=1741159641; c=relaxed/simple;
+	bh=ggBjNt/KlzNhbq7zUAZEYyviD7fOL0zcgpYxjiglnLg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u6P3TG/KUzaGVkgdNRyQnqNeO+q9XJQyedOzcwq5nYEXResfZ9mxyRxL3Rgcn4V2Kg8QFD0bGj5n9QE2eWFyG543cKPJajViMI3zFvCWFlbAMXvbjWCCj1/d3/laGxeMYjKMIuCn9++AWh+OUIBZx/dqZNp3k0MG8CejdwM5iyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fwgEF8j1; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741159639;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3Gqpuh7OkhW6l3/SGFe53202mdgSid6lnY8KI4KHLQM=;
+	b=fwgEF8j1cVxduCjmAe9q2TpeL2gaDA58zXgdVRPPU+bxNpzcCwKYBxR3piX7bjk+/ZQEMh
+	WET77SmowRsojY6e9tdhW70ZR8bZil+pbCXwfo2X9LqYjLyaiLgXulF3qkLuK3bhTjDOv4
+	eiBMi14IZ5X8DWHzpiuWPoSm3vcRBwI=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-212-Mqbq35SrN4K3dKAqLRgAEw-1; Wed, 05 Mar 2025 02:27:17 -0500
+X-MC-Unique: Mqbq35SrN4K3dKAqLRgAEw-1
+X-Mimecast-MFC-AGG-ID: Mqbq35SrN4K3dKAqLRgAEw_1741159636
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43bcc04d2ebso11958595e9.1
+        for <kvm@vger.kernel.org>; Tue, 04 Mar 2025 23:27:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741159636; x=1741764436;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3Gqpuh7OkhW6l3/SGFe53202mdgSid6lnY8KI4KHLQM=;
+        b=UyoMGUZ8CLyx1M6N6kCYNvLO8pprTrZvmYa5EmWuxpjo9g7WNJSbRTQ3g2EMGBtomO
+         ZnaEj9aiKKVXue0wlWBDS4YMSQJ43M9pfd+hjBDZC+mnSoI4pNOKD/d+wOe+VQwlIXRX
+         NYs+0FvTDuslmZrnZaVs6XhBbEjy/YAL4NuW+EnrdkwO7OK++O0+Koz1AaulupZ3atdA
+         oSjPtGZ/QScIbKEMQ46dmX0P9lQL2JPEFyDtkMeFLvSdVLlFaGOLzdgkEAts/Ik0G7YE
+         /vRXrXNy0af4Tdj0M/YFIWoi+jJvI81A5IrPxUNw7ifAxceNuLu26tv57UobTZRsYUJe
+         w9Sw==
+X-Forwarded-Encrypted: i=1; AJvYcCVeInckmfE9zNYQcCw19/ky2Nlp9kvQrw/o1fvQZzW1SaGPk7HGjpSpYITN7iRZ+HUf2js=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7wV6EA3s/ULA+bmjCi6r2GZmzzm/0ZhClSOXb2HAakgENYZVE
+	PNt8zSQ/WCjQ3gAfli7UeH7VYhyUQ5NLrR2yXC00jMwEHrFdqax/Ohz9Jb+xO78CfJ9TXDehGqO
+	Y/7QnfZbL94mNvA+U7q+J7+0TvXxJVMCKNMN1t6/Mys5Rm7rgiw==
+X-Gm-Gg: ASbGncvSRs63cImCwGmH34GNY/6pPQ+K0vLad2NlMNAYJcFWknfpguw4pnM/rqM571a
+	BqYl71zpijrRmFKa8m0SvmPRB8Xl6NGEAeDDFP8sQn+HiMMi57Vr0RHZiY/gNqlQp0j4kuzMKTE
+	Goi5vScAoTRF/NvEKNthQ7qpPc5kEFB0PFYCtHTvDrOIAiqtvn3Ad3+UDbY6ORpTRqqqBrtVHbL
+	LgW/mjCTNINB7I0K29A+FY1YHIj7LqSp2AvrJWvckhZHlm4RtqQMTt32mQDg/n1Lp7h8T9haBEc
+	8d7XFid/Vw==
+X-Received: by 2002:a5d:588c:0:b0:391:1222:b459 with SMTP id ffacd0b85a97d-3911f7bd7b9mr1100778f8f.49.1741159636301;
+        Tue, 04 Mar 2025 23:27:16 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFFSwg2gbLwAPlPAn2L1vg/ffvpbpIN3dglqIqZN8294KCbPeBfUkyQP4He1JGn832GdDHxeA==
+X-Received: by 2002:a5d:588c:0:b0:391:1222:b459 with SMTP id ffacd0b85a97d-3911f7bd7b9mr1100756f8f.49.1741159635943;
+        Tue, 04 Mar 2025 23:27:15 -0800 (PST)
+Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-390e47a7b88sm19898221f8f.40.2025.03.04.23.27.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Mar 2025 23:27:15 -0800 (PST)
+Date: Wed, 5 Mar 2025 02:27:12 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>,
+	Jason Wang <jasowang@redhat.com>, davem@davemloft.net,
+	Stefan Hajnoczi <stefanha@redhat.com>, linux-kernel@vger.kernel.org,
+	Jorgen Hansen <jhansen@vmware.com>, kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	linux-hyperv@vger.kernel.org, Dexuan Cui <decui@microsoft.com>,
+	netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [PATCH net-next 0/3] vsock: support network namespace
+Message-ID: <20250305022248-mutt-send-email-mst@kernel.org>
+References: <20200116172428.311437-1-sgarzare@redhat.com>
+ <20200427142518.uwssa6dtasrp3bfc@steredhat>
+ <224cdc10-1532-7ddc-f113-676d43d8f322@redhat.com>
+ <20200428160052.o3ihui4262xogyg4@steredhat>
+ <Z8edJjqAqAaV3Vkt@devvm6277.cco0.facebook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 06/10] target/i386/kvm: rename architectural PMU
- variables
-To: Dongli Zhang <dongli.zhang@oracle.com>, qemu-devel@nongnu.org,
- kvm@vger.kernel.org
-Cc: pbonzini@redhat.com, zhao1.liu@intel.com, mtosatti@redhat.com,
- sandipan.das@amd.com, babu.moger@amd.com, likexu@tencent.com,
- like.xu.linux@gmail.com, zhenyuw@linux.intel.com, groug@kaod.org,
- khorenko@virtuozzo.com, alexander.ivanov@virtuozzo.com, den@virtuozzo.com,
- davydov-max@yandex-team.ru, xiaoyao.li@intel.com, joe.jin@oracle.com
-References: <20250302220112.17653-1-dongli.zhang@oracle.com>
- <20250302220112.17653-7-dongli.zhang@oracle.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20250302220112.17653-7-dongli.zhang@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z8edJjqAqAaV3Vkt@devvm6277.cco0.facebook.com>
 
+On Tue, Mar 04, 2025 at 04:39:02PM -0800, Bobby Eshleman wrote:
+> I think it might be a lot of complexity to bring into the picture from
+> netdev, and I'm not sure there is a big win since the vsock device could
+> also have a vsock->net itself? I think the complexity will come from the
+> address translation, which I don't think netdev buys us because there
+> would still be all of the work work to support vsock in netfilter?
 
-On 3/3/2025 6:00 AM, Dongli Zhang wrote:
-> AMD does not have what is commonly referred to as an architectural PMU.
-> Therefore, we need to rename the following variables to be applicable for
-> both Intel and AMD:
->
-> - has_architectural_pmu_version
-> - num_architectural_pmu_gp_counters
-> - num_architectural_pmu_fixed_counters
->
-> For Intel processors, the meaning of has_pmu_version remains unchanged.
->
-> For AMD processors:
->
-> has_pmu_version == 1 corresponds to versions before AMD PerfMonV2.
-> has_pmu_version == 2 corresponds to AMD PerfMonV2.
->
-> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
-> ---
->  target/i386/kvm/kvm.c | 49 ++++++++++++++++++++++++-------------------
->  1 file changed, 28 insertions(+), 21 deletions(-)
->
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index 8f293ffd61..e895d22f94 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -164,9 +164,16 @@ static bool has_msr_perf_capabs;
->  static bool has_msr_pkrs;
->  static bool has_msr_hwcr;
->  
-> -static uint32_t has_architectural_pmu_version;
-> -static uint32_t num_architectural_pmu_gp_counters;
-> -static uint32_t num_architectural_pmu_fixed_counters;
-> +/*
-> + * For Intel processors, the meaning is the architectural PMU version
-> + * number.
-> + *
-> + * For AMD processors: 1 corresponds to the prior versions, and 2
-> + * corresponds to AMD PerfMonV2.
-> + */
-> +static uint32_t has_pmu_version;
-> +static uint32_t num_pmu_gp_counters;
-> +static uint32_t num_pmu_fixed_counters;
->  
->  static int has_xsave2;
->  static int has_xcrs;
-> @@ -2072,24 +2079,24 @@ static void kvm_init_pmu_info(CPUX86State *env)
->  
->      cpu_x86_cpuid(env, 0x0a, 0, &eax, &unused, &unused, &edx);
->  
-> -    has_architectural_pmu_version = eax & 0xff;
-> -    if (has_architectural_pmu_version > 0) {
-> -        num_architectural_pmu_gp_counters = (eax & 0xff00) >> 8;
-> +    has_pmu_version = eax & 0xff;
-> +    if (has_pmu_version > 0) {
-> +        num_pmu_gp_counters = (eax & 0xff00) >> 8;
->  
->          /*
->           * Shouldn't be more than 32, since that's the number of bits
->           * available in EBX to tell us _which_ counters are available.
->           * Play it safe.
->           */
-> -        if (num_architectural_pmu_gp_counters > MAX_GP_COUNTERS) {
-> -            num_architectural_pmu_gp_counters = MAX_GP_COUNTERS;
-> +        if (num_pmu_gp_counters > MAX_GP_COUNTERS) {
-> +            num_pmu_gp_counters = MAX_GP_COUNTERS;
->          }
->  
-> -        if (has_architectural_pmu_version > 1) {
-> -            num_architectural_pmu_fixed_counters = edx & 0x1f;
-> +        if (has_pmu_version > 1) {
-> +            num_pmu_fixed_counters = edx & 0x1f;
->  
-> -            if (num_architectural_pmu_fixed_counters > MAX_FIXED_COUNTERS) {
-> -                num_architectural_pmu_fixed_counters = MAX_FIXED_COUNTERS;
-> +            if (num_pmu_fixed_counters > MAX_FIXED_COUNTERS) {
-> +                num_pmu_fixed_counters = MAX_FIXED_COUNTERS;
->              }
->          }
->      }
-> @@ -4041,25 +4048,25 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
->              kvm_msr_entry_add(cpu, MSR_KVM_POLL_CONTROL, env->poll_control_msr);
->          }
->  
-> -        if (has_architectural_pmu_version > 0) {
-> -            if (has_architectural_pmu_version > 1) {
-> +        if (has_pmu_version > 0) {
-> +            if (has_pmu_version > 1) {
->                  /* Stop the counter.  */
->                  kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
->                  kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
->              }
->  
->              /* Set the counter values.  */
-> -            for (i = 0; i < num_architectural_pmu_fixed_counters; i++) {
-> +            for (i = 0; i < num_pmu_fixed_counters; i++) {
->                  kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR0 + i,
->                                    env->msr_fixed_counters[i]);
->              }
-> -            for (i = 0; i < num_architectural_pmu_gp_counters; i++) {
-> +            for (i = 0; i < num_pmu_gp_counters; i++) {
->                  kvm_msr_entry_add(cpu, MSR_P6_PERFCTR0 + i,
->                                    env->msr_gp_counters[i]);
->                  kvm_msr_entry_add(cpu, MSR_P6_EVNTSEL0 + i,
->                                    env->msr_gp_evtsel[i]);
->              }
-> -            if (has_architectural_pmu_version > 1) {
-> +            if (has_pmu_version > 1) {
->                  kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_STATUS,
->                                    env->msr_global_status);
->                  kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
-> @@ -4519,17 +4526,17 @@ static int kvm_get_msrs(X86CPU *cpu)
->      if (env->features[FEAT_KVM] & CPUID_KVM_POLL_CONTROL) {
->          kvm_msr_entry_add(cpu, MSR_KVM_POLL_CONTROL, 1);
->      }
-> -    if (has_architectural_pmu_version > 0) {
-> -        if (has_architectural_pmu_version > 1) {
-> +    if (has_pmu_version > 0) {
-> +        if (has_pmu_version > 1) {
->              kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
->              kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
->              kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_STATUS, 0);
->              kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL, 0);
->          }
-> -        for (i = 0; i < num_architectural_pmu_fixed_counters; i++) {
-> +        for (i = 0; i < num_pmu_fixed_counters; i++) {
->              kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR0 + i, 0);
->          }
-> -        for (i = 0; i < num_architectural_pmu_gp_counters; i++) {
-> +        for (i = 0; i < num_pmu_gp_counters; i++) {
->              kvm_msr_entry_add(cpu, MSR_P6_PERFCTR0 + i, 0);
->              kvm_msr_entry_add(cpu, MSR_P6_EVNTSEL0 + i, 0);
->          }
+Ugh.
 
-Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Guys, let's remember what vsock is.
 
+It's a replacement for the serial device with an interface
+that's easier for userspace to consume, as you get
+the demultiplexing by the port number.
+
+The whole point of vsock is that people do not want
+any firewalling, filtering, or management on it.
+
+It needs to work with no configuration even if networking is
+misconfigured or blocked.
+
+-- 
+MST
 
 
