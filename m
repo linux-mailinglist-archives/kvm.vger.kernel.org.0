@@ -1,188 +1,470 @@
-Return-Path: <kvm+bounces-40235-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40236-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54207A54735
-	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 11:02:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A1D4A54756
+	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 11:07:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E415E7A8C36
-	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 10:00:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 383617AA893
+	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 10:04:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39C071FF1B1;
-	Thu,  6 Mar 2025 10:00:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67D951FCFE6;
+	Thu,  6 Mar 2025 10:04:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UG5NGoqJ"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="qGTdoaH9"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99F471F4289
-	for <kvm@vger.kernel.org>; Thu,  6 Mar 2025 10:00:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B50631F5837
+	for <kvm@vger.kernel.org>; Thu,  6 Mar 2025 10:04:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741255240; cv=none; b=CTU7DxbMA6Y4EVm7QxtXXftvC6AnkhmPQ5OFmqcEJuo7eJtVH3f/RqQwmWa7HVg/arFCVuoFb87xuuRlxkYxNnDfhUCOG54MVTEZnegdgkyw4c1ghJLRVUmFv5yDj0zcZZMKWskDqAwEsYd6t8KLnozvrqPRHFHgadcx80F0PIM=
+	t=1741255494; cv=none; b=mKCBZcugGSazb6gtChK3MMXYepyzOeMdAemt260PKvVHTxWxd5IZhr/tK17R2gSppv2u+euxxVMVPsUL5/YH8rhiybgtxkV6AGieGmrunIoDIKdO9vB+cJZy/ARqje1T9gMeqSfcaRkdJOcFvYmwRZpMNThVPtnAzmIhc3ndzxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741255240; c=relaxed/simple;
-	bh=5Lhtwd5cH2PKhD/dFJio5Nb5ixUzvTEXAnioAWegKMc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=P205cbc9fPeV0HXxr5ZCqdtWgyv72oF0K1IRa5WbLfQh3NAZGNvD58Lz5HVfWQ8DHCMgcL7+Yd/1FaKTTqwMBLf/9/V8ruw3fr7sZRsRabHxu6ENh/3tYzZRLK92plIQWk+QQ5Ku8sMWjS4AX9v+3346Slp/6iLV7vb5m651k0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UG5NGoqJ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741255237;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Wkn24CpGo6+FUEVuRlexbhMNX+ALW6So6mD2WHyvwXE=;
-	b=UG5NGoqJF0UQ13IZimXnF8l4/I5XIvqd2oFLlD+5XZE27Z25U9j8ddNMaEGUYnm6k4iYNV
-	D3WA8Bk0bsFkQ5e6VRL+jmeaPACgc1q1FkFKUpVPyjcT+IMJlxJs+HFzuusCAjTcLsMJ1+
-	KBRSW+a8QCQmTmJIwudwT1wDa+yx27E=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-618-wZU8ueioMLGgOKvPeGYw7w-1; Thu, 06 Mar 2025 05:00:33 -0500
-X-MC-Unique: wZU8ueioMLGgOKvPeGYw7w-1
-X-Mimecast-MFC-AGG-ID: wZU8ueioMLGgOKvPeGYw7w_1741255232
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3912539665cso702673f8f.1
-        for <kvm@vger.kernel.org>; Thu, 06 Mar 2025 02:00:33 -0800 (PST)
+	s=arc-20240116; t=1741255494; c=relaxed/simple;
+	bh=OJ1F1NNuv0qdblhg0g7KpAL8Lo0GxQCjM+N402Kt5SM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=X89unsD19qYfGGZB8RGt4xU78ECQBZBG4ITb0FqKipXq1fHyxfNd2cr6rm1v1qNoDPwrIUi73ZPOrNaNk57mVEzlaLRIybPYV1utXJ1NaQZTpV3Nkd1BrvaUtd+ZtTnXuNFj4bl/puT9Ay1dXbb7vJc6N5ZUtfB7dFm8RJLVDDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=qGTdoaH9; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-388cae9eb9fso223996f8f.3
+        for <kvm@vger.kernel.org>; Thu, 06 Mar 2025 02:04:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1741255490; x=1741860290; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Jg/9qKNjUh6WHo1qn9JaxEqIXukmDLBRfUYray1VLno=;
+        b=qGTdoaH9yYqHy2y0SWTN50+wJy+zZM/k+9n2lfg79zV7f7LN0HdYtr5lb67LCGplMd
+         UNtG2xn6KCg7jh/Fk/EkWJAZlhHD3XA4NeAmR0yWdmbrfsMSqlcNBmpVUczhBrelMPPQ
+         J645l327njADznZSgjVkKJNpJdEHEHLG4cCrW1dke8xFuBK3KO8e2uCy8oPL+8bySjEc
+         VPaKSK0yMuALmN/EcVo4HRhH3QI64Qmyv1BhEhI4zAr8+TDrvxeK7JTAtdnjTP/2/IrH
+         wEvYNgvoxCBEcl6NHTkQDv7gdt9VCEIaqjm0DY3YGeU2prt3v+w7+zCJPnTJ8I3VlLBe
+         Q9Tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741255232; x=1741860032;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wkn24CpGo6+FUEVuRlexbhMNX+ALW6So6mD2WHyvwXE=;
-        b=IMDTj47NJv1hzw0/yqEeWQ/TagSQ1NAp9Cskzos4zSdrt4BtdNS4eJE2CqgzBgdlyi
-         2Sdkm18a5GCa+0fUu/c34bTESL2fMQ6lYz3rlGeW9TBJhdVHpZwPfbsS+TBissK27X42
-         LBiIgZNKvqXIk9ogZrRyEs1zXZ0C5zVoc8xtyKW0X7uAfse3t7Nh9SIIDmacyNeEdyJ4
-         tWCy/OUSeP7UvJuIMlNa1MBJJuFbAW1TWkFzVtfRdfLlgwNd2ElLSg/UooF6O0NJ0LqG
-         rBbeiRFfB3Qjp72+c7EpZH7JhyoGpNxnylEwKr+2UMk7CzpbBC5rv6mEfGU6XlRyTpbf
-         vpdA==
-X-Gm-Message-State: AOJu0YweoxlXpBAuLqTLb0tlG0D6qqZNiAJnzaPvZO0/LdRNUsiydRUm
-	TWBxk2rJONAwavKS8HLJLvPw7iIlhezR931Y87QCyG+AG8Dj2TKNqhUFxgS+LYDBDKmeDLPEk0e
-	tsruCkJtxU3CNXkfeaIHq1gYznM2wiwLanRrVcLji7Z3FDaBFkw==
-X-Gm-Gg: ASbGnctfyz+aa2eXh+z/blARyfNFO2EDgM0/v6FvqWH7y1GChh+CBkVmjdB5BsP7WhA
-	Rxr40zsHGdODf/39h9Sehi5Yi3MXLCL6h6X+/okDLPqsjWCdF/Fa1KPeN8+YmASXCNag6r7B0zl
-	HkW1aunNhzCJmsO26u/7ixk8wKpGJvCeEuuXL2sLNfYSXrW/Qg1Q1ZYKxCkeCuKUM9opdqTLFZY
-	heP7rGn6RbL79zikuNkf6rQDkgV08OB4riOC5rxpTiCGH2eYQpo1fkt7ebc6TzpVYgC1Z28yZku
-	xKo5t12CyTk=
-X-Received: by 2002:a05:600c:1c9c:b0:43b:ca8c:fca3 with SMTP id 5b1f17b1804b1-43bdb3b8fc5mr21081175e9.11.1741255232030;
-        Thu, 06 Mar 2025 02:00:32 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGbZl9Jwi9K2ockg9+UNE+kX6iPaGsi8yOptcqo6NIW8PqlcWYlqkjfEnAsg9dPJ6hUpVn3bw==
-X-Received: by 2002:a05:600c:1c9c:b0:43b:ca8c:fca3 with SMTP id 5b1f17b1804b1-43bdb3b8fc5mr21080845e9.11.1741255231504;
-        Thu, 06 Mar 2025 02:00:31 -0800 (PST)
-Received: from fedora (g3.ign.cz. [91.219.240.17])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43bd435cd8csm45017965e9.40.2025.03.06.02.00.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Mar 2025 02:00:30 -0800 (PST)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>, Sean Christopherson
- <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Paolo Bonzini
- <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>, "Maciej S. Szmigiero"
- <maciej.szmigiero@oracle.com>
-Subject: Re: QEMU's Hyper-V HV_X64_MSR_EOM is broken with split IRQCHIP
-In-Reply-To: <87a59zq0x2.fsf@redhat.com>
-References: <Z8ZBzEJ7--VWKdWd@google.com> <87ikoposs6.fsf@redhat.com>
- <Z8cNBTgz3YBDga3c@google.com> <87cyewq2ea.fsf@redhat.com>
- <23cfae5adcdee2c69014d18b2b19be157ef2c20d.camel@redhat.com>
- <87a59zq0x2.fsf@redhat.com>
-Date: Thu, 06 Mar 2025 11:00:29 +0100
-Message-ID: <87senqo4w2.fsf@redhat.com>
+        d=1e100.net; s=20230601; t=1741255490; x=1741860290;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Jg/9qKNjUh6WHo1qn9JaxEqIXukmDLBRfUYray1VLno=;
+        b=ukFHRt3NX7uP4z+FNDHQxA1L4kQiXsAViqYZ9XE21kz+nl/YVu2XHVvrML/JRmC0Ex
+         mLr8TAOoztiAzCHwUnv6EXhNv5iEcTzo5pDNwqnEVBrkNPrBppClH4XWwnA/d9EXG8yl
+         mISni560wLEaNA/xb4YbxuquuwkuX/vaSeFm28F/wyWcsBrm5v69jd0+NsdAaaiLMqK4
+         myfWwBmjnynTlsUjxt6ybemcRa01CQnrrsk7CSAqwgAiSWWb0smAl5XERy+A9OUAwZnp
+         B684qV4yWqguIvKlZhf1ff8yZLoKoBLP6DiXM5zjF81Q2Hd4a8YRuWhEAK3wARfsgvdo
+         8XTA==
+X-Gm-Message-State: AOJu0YyYshbstmJ03tsA51+mX/pm8ksfGojPgib8ylVGhn1VPWCx3ZiA
+	AfMAcYZYtWRr5lhftEqcnCJIT+tGLI1i1Vko5BM598XGMxZI9PorH71GMtTHjpU=
+X-Gm-Gg: ASbGncuE4LX9rMAY3oSttmaXBDoUKYzTz9gxUJOcSLkEi9C+n8W4nz2rQXFY41I4ExN
+	gTEIUNauOo3Xua1smMaEPiwzMFe9XTNVwNBvuhupIJUiQfoVY0+OEsrhbI4Rafv9vZZiFrOUnM+
+	xSZgc4vY/dTS9RpGAIjNEaOoQQCZS0vm2OGfIfpGf+cgx8NBkYZTJDyMV0Ai/2Y6fYt3zBxyYF8
+	juKpbAKC84m8ExT+JO/MpKX6JbiZEnMJmsI11LMtlABJ2/VRyV+rf/zdP2Z4V0HLU0iKd2is5zv
+	wOXFcrslvuCeIgHml9emVpS7QpAstd2J8VcNMbEBjYoaCdggRavhEHF89Lea2GGiBddJ3aIf6++
+	x/oZSYWHzplhTqw==
+X-Google-Smtp-Source: AGHT+IFX0IXxho0unDC4q8aK6YSd5PkSQ/Xue8YFaXRzGcMhz5iFhT85EXUQtiogersbAPprxcqsgw==
+X-Received: by 2002:a5d:5f4a:0:b0:391:2fc9:8198 with SMTP id ffacd0b85a97d-3912fc986a5mr235428f8f.16.1741255489611;
+        Thu, 06 Mar 2025 02:04:49 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:e17:9700:16d2:7456:6634:9626? ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43bdd8c3d61sm14735945e9.15.2025.03.06.02.04.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Mar 2025 02:04:48 -0800 (PST)
+Message-ID: <ebc85af2-31b0-4b7c-bce6-f90f1969a784@rivosinc.com>
+Date: Thu, 6 Mar 2025 11:04:48 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v7 5/6] lib: riscv: Add SBI SSE support
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ Andrew Jones <ajones@ventanamicro.com>, Anup Patel
+ <apatel@ventanamicro.com>, Atish Patra <atishp@rivosinc.com>
+References: <20250214114423.1071621-1-cleger@rivosinc.com>
+ <20250214114423.1071621-6-cleger@rivosinc.com>
+ <20250227-a28f41972a73e8269d26b461@orel>
+Content-Language: en-US
+From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+In-Reply-To: <20250227-a28f41972a73e8269d26b461@orel>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Vitaly Kuznetsov <vkuznets@redhat.com> writes:
 
-> Maxim Levitsky <mlevitsk@redhat.com> writes:
->
->> On Tue, 2025-03-04 at 15:46 +0100, Vitaly Kuznetsov wrote:
->>> Sean Christopherson <seanjc@google.com> writes:
->>> 
->>> > On Tue, Mar 04, 2025, Vitaly Kuznetsov wrote:
->>> > > Sean Christopherson <seanjc@google.com> writes:
->>> > > 
->>> > > > FYI, QEMU's Hyper-V emulation of HV_X64_MSR_EOM has been broken since QEMU commit
->>> > > > c82d9d43ed ("KVM: Kick resamplefd for split kernel irqchip"), as nothing in KVM
->>> > > > will forward the EOM notification to userspace.  I have no idea if anything in
->>> > > > QEMU besides hyperv_testdev.c cares.
->>> > > 
->>> > > The only VMBus device in QEMU besides the testdev seems to be Hyper-V
->>> > > ballooning driver, Cc: Maciej to check whether it's a real problem for
->>> > > it or not.
->>> > > 
->>> > > > The bug is reproducible by running the hyperv_connections KVM-Unit-Test with a
->>> > > > split IRQCHIP.
->>> > > 
->>> > > Thanks, I can reproduce the problem too.
->>> > > 
->>> > > > Hacking QEMU and KVM (see KVM commit 654f1f13ea56 ("kvm: Check irqchip mode before
->>> > > > assign irqfd") as below gets the test to pass.  Assuming that's not a palatable
->>> > > > solution, the other options I can think of would be for QEMU to intercept
->>> > > > HV_X64_MSR_EOM when using a split IRQCHIP, or to modify KVM to do KVM_EXIT_HYPERV_SYNIC
->>> > > > on writes to HV_X64_MSR_EOM with a split IRQCHIP.
->>> > > 
->>> > > AFAIR, Hyper-V message interface is a fairly generic communication
->>> > > mechanism which in theory can be used without interrupts at all: the
->>> > > corresponding SINT can be masked and the guest can be polling for
->>> > > messages, proccessing them and then writing to HV_X64_MSR_EOM to trigger
->>> > > delivery on the next queued message. To support this scenario on the
->>> > > backend, we need to receive HV_X64_MSR_EOM writes regardless of whether
->>> > > irqchip is split or not. (In theory, we can get away without this by
->>> > > just checking if pending messages can be delivered upon each vCPU entry
->>> > > but this can take an undefined amount of time in some scenarios so I
->>> > > guess we're better off with notifications).
->>> > 
->>> > Before c82d9d43ed ("KVM: Kick resamplefd for split kernel irqchip"), and without
->>> > a split IRCHIP, QEMU gets notified via eventfd.  On writes to HV_X64_MSR_EOM, KVM
->>> > invokes irq_acked(), i.e. irqfd_resampler_ack(), for all SINT routes.  The eventfd
->>> > signal gets back to sint_ack_handler(), which invokes msg_retry() to re-post the
->>> > message.
->>> > 
->>> > I.e. trapping HV_X64_MSR_EOM on would be a slow path relative to what's there for
->>> > in-kernel IRQCHIP.
->>> 
->>> My understanding is that the only type of message which requires fast
->>> processing is STIMER messages but we don't do stimers in userspace. I
->>> guess it is possible to have a competing 'noisy neighbough' in userspace
->>> draining message slots but then we are slow anyway.
->>> 
->>
->> Hi,
->>
->> AFAIK, HV_X64_MSR_EOM is only one of the ways for the guest to signal that it processed the SYNIC message.
->>
->> Guest can also signal that it finished processing a SYNIC message using HV_X64_MSR_EOI or even by writing to EOI
->> local apic register, and I actually think that the later is what is used by at least recent Windows.
->>
->
-> Hyper-V SynIC has two distinct concepts: "messages" and "events". While
-> events are just flags (like interrupts), messages actually carry
-> information and the recipient is responsible for clearing message slot
-> (there are only 16 of them per vCPU AFAIR). Strictly speaking,
-> HV_X64_MSR_EOM is optional and hypervisor may deliver a new message to
-> an empty slot at any time. It may use EOI as a trigger but note that
-> not every message delivery results in an interrupt as e.g. SINT can be
-> configured in 'polling' mode -- and that's when HV_X64_MSR_EOM comes
-> handy.
->
 
-Thinking more about this, I believe we should not be using eventfd for
-delivering writes to HV_X64_MSR_EOM to VMM at all. Namely, writes to
-HV_X64_MSR_EOM should not invoke irq_acked(): it should be valid for a
-guest to poll for messages by writing to HV_X64_MSR_EOM within the
-interrupt handler, drain the queue and then write to the EOI
-register. In this case, the VMM may want to distinguish between EOI and
-EOM. We can do a separate eventfd, of course, but I think it's an
-overkill and 'slow' processing will do just fine.
+On 27/02/2025 17:03, Andrew Jones wrote:
+> On Fri, Feb 14, 2025 at 12:44:18PM +0100, Clément Léger wrote:
+>> Add support for registering and handling SSE events. This will be used
+>> by sbi test as well as upcoming double trap tests.
+>>
+>> Signed-off-by: Clément Léger <cleger@rivosinc.com>
+>> ---
+>>  riscv/Makefile          |   2 +
+>>  lib/riscv/asm/csr.h     |   1 +
+>>  lib/riscv/asm/sbi-sse.h |  48 +++++++++++++++++++
+>>  lib/riscv/sbi-sse-asm.S | 103 ++++++++++++++++++++++++++++++++++++++++
+>>  lib/riscv/asm-offsets.c |   9 ++++
+>>  lib/riscv/sbi-sse.c     |  84 ++++++++++++++++++++++++++++++++
+>>  6 files changed, 247 insertions(+)
+>>  create mode 100644 lib/riscv/asm/sbi-sse.h
+>>  create mode 100644 lib/riscv/sbi-sse-asm.S
+>>  create mode 100644 lib/riscv/sbi-sse.c
+>>
+>> diff --git a/riscv/Makefile b/riscv/Makefile
+>> index 02d2ac39..ed590ede 100644
+>> --- a/riscv/Makefile
+>> +++ b/riscv/Makefile
+>> @@ -43,6 +43,8 @@ cflatobjs += lib/riscv/setup.o
+>>  cflatobjs += lib/riscv/smp.o
+>>  cflatobjs += lib/riscv/stack.o
+>>  cflatobjs += lib/riscv/timer.o
+>> +cflatobjs += lib/riscv/sbi-sse-asm.o
+>> +cflatobjs += lib/riscv/sbi-sse.o
+>>  ifeq ($(ARCH),riscv32)
+>>  cflatobjs += lib/ldiv32.o
+>>  endif
+>> diff --git a/lib/riscv/asm/csr.h b/lib/riscv/asm/csr.h
+>> index 16f5ddd7..389d9850 100644
+>> --- a/lib/riscv/asm/csr.h
+>> +++ b/lib/riscv/asm/csr.h
+>> @@ -17,6 +17,7 @@
+>>  #define CSR_TIME		0xc01
+>>  
+>>  #define SR_SIE			_AC(0x00000002, UL)
+>> +#define SR_SPP			_AC(0x00000100, UL)
+>>  
+>>  /* Exception cause high bit - is an interrupt if set */
+>>  #define CAUSE_IRQ_FLAG		(_AC(1, UL) << (__riscv_xlen - 1))
+>> diff --git a/lib/riscv/asm/sbi-sse.h b/lib/riscv/asm/sbi-sse.h
+>> new file mode 100644
+>> index 00000000..ba18ce27
+>> --- /dev/null
+>> +++ b/lib/riscv/asm/sbi-sse.h
+>> @@ -0,0 +1,48 @@
+>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>> +/*
+>> + * SBI SSE library interface
+>> + *
+>> + * Copyright (C) 2025, Rivos Inc., Clément Léger <cleger@rivosinc.com>
+>> + */
+>> +#ifndef _RISCV_SSE_H_
+>> +#define _RISCV_SSE_H_
+>> +
+>> +#include <asm/sbi.h>
+>> +
+>> +typedef void (*sbi_sse_handler_fn)(void *data, struct pt_regs *regs, unsigned int hartid);
+>> +
+>> +struct sbi_sse_handler_arg {
+>> +	unsigned long reg_tmp;
+>> +	sbi_sse_handler_fn handler;
+>> +	void *handler_data;
+>> +	void *stack;
+>> +};
+>> +
+>> +extern void sbi_sse_entry(void);
+>> +
+>> +static inline bool sbi_sse_event_is_global(uint32_t event_id)
+>> +{
+>> +	return !!(event_id & SBI_SSE_EVENT_GLOBAL_BIT);
+>> +}
+>> +
+>> +struct sbiret sbi_sse_read_attrs_raw(unsigned long event_id, unsigned long base_attr_id,
+>> +				     unsigned long attr_count, unsigned long phys_lo,
+>> +				     unsigned long phys_hi);
+>> +struct sbiret sbi_sse_read_attrs(unsigned long event_id, unsigned long base_attr_id,
+>> +				 unsigned long attr_count, unsigned long *values);
+>> +struct sbiret sbi_sse_write_attrs_raw(unsigned long event_id, unsigned long base_attr_id,
+>> +				      unsigned long attr_count, unsigned long phys_lo,
+>> +				      unsigned long phys_hi);
+>> +struct sbiret sbi_sse_write_attrs(unsigned long event_id, unsigned long base_attr_id,
+>> +				  unsigned long attr_count, unsigned long *values);
+>> +struct sbiret sbi_sse_register_raw(unsigned long event_id, unsigned long entry_pc,
+>> +				   unsigned long entry_arg);
+>> +struct sbiret sbi_sse_register(unsigned long event_id, struct sbi_sse_handler_arg *arg);
+>> +struct sbiret sbi_sse_unregister(unsigned long event_id);
+>> +struct sbiret sbi_sse_enable(unsigned long event_id);
+>> +struct sbiret sbi_sse_hart_mask(void);
+>> +struct sbiret sbi_sse_hart_unmask(void);
+>> +struct sbiret sbi_sse_inject(unsigned long event_id, unsigned long hart_id);
+>> +struct sbiret sbi_sse_disable(unsigned long event_id);
+> 
+> nit: I'd put disable up by enable to keep pairs together.
+> 
+>> +
+>> +#endif /* !_RISCV_SSE_H_ */
+>> diff --git a/lib/riscv/sbi-sse-asm.S b/lib/riscv/sbi-sse-asm.S
+>> new file mode 100644
+>> index 00000000..5f60b839
+>> --- /dev/null
+>> +++ b/lib/riscv/sbi-sse-asm.S
+>> @@ -0,0 +1,103 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 */
+>> +/*
+>> + * RISC-V SSE events entry point.
+>> + *
+>> + * Copyright (C) 2025, Rivos Inc., Clément Léger <cleger@rivosinc.com>
+>> + */
+>> +#define __ASSEMBLY__
+>> +#include <asm/asm.h>
+>> +#include <asm/csr.h>
+>> +#include <asm/asm-offsets.h>
+> 
+> nit: asm-offsets above csr if we want to practice alphabetical ordering.
+> 
+>> +#include <generated/sbi-asm-offsets.h>
+>> +
+>> +.section .text
+>> +.global sbi_sse_entry
+>> +sbi_sse_entry:
+>> +	/* Save stack temporarily */
+>> +	REG_S sp, SBI_SSE_REG_TMP(a7)
+>> +	/* Set entry stack */
+>> +	REG_L sp, SBI_SSE_HANDLER_STACK(a7)
+>> +
+>> +	addi sp, sp, -(PT_SIZE)
+>> +	REG_S ra, PT_RA(sp)
+>> +	REG_S s0, PT_S0(sp)
+>> +	REG_S s1, PT_S1(sp)
+>> +	REG_S s2, PT_S2(sp)
+>> +	REG_S s3, PT_S3(sp)
+>> +	REG_S s4, PT_S4(sp)
+>> +	REG_S s5, PT_S5(sp)
+>> +	REG_S s6, PT_S6(sp)
+>> +	REG_S s7, PT_S7(sp)
+>> +	REG_S s8, PT_S8(sp)
+>> +	REG_S s9, PT_S9(sp)
+>> +	REG_S s10, PT_S10(sp)
+>> +	REG_S s11, PT_S11(sp)
+>> +	REG_S tp, PT_TP(sp)
+>> +	REG_S t0, PT_T0(sp)
+>> +	REG_S t1, PT_T1(sp)
+>> +	REG_S t2, PT_T2(sp)
+>> +	REG_S t3, PT_T3(sp)
+>> +	REG_S t4, PT_T4(sp)
+>> +	REG_S t5, PT_T5(sp)
+>> +	REG_S t6, PT_T6(sp)
+>> +	REG_S gp, PT_GP(sp)
+>> +	REG_S a0, PT_A0(sp)
+>> +	REG_S a1, PT_A1(sp)
+>> +	REG_S a2, PT_A2(sp)
+>> +	REG_S a3, PT_A3(sp)
+>> +	REG_S a4, PT_A4(sp)
+>> +	REG_S a5, PT_A5(sp)
+>> +	csrr a1, CSR_SEPC
+>> +	REG_S a1, PT_EPC(sp)
+>> +	csrr a2, CSR_SSTATUS
+>> +	REG_S a2, PT_STATUS(sp)
+>> +
+>> +	REG_L a0, SBI_SSE_REG_TMP(a7)
+>> +	REG_S a0, PT_SP(sp)
+>> +
+>> +	REG_L t0, SBI_SSE_HANDLER(a7)
+>> +	REG_L a0, SBI_SSE_HANDLER_DATA(a7)
+>> +	mv a1, sp
+>> +	mv a2, a6
+>> +	jalr t0
+>> +
+>> +	REG_L a1, PT_EPC(sp)
+>> +	REG_L a2, PT_STATUS(sp)
+>> +	csrw CSR_SEPC, a1
+>> +	csrw CSR_SSTATUS, a2
+>> +
+>> +	REG_L ra, PT_RA(sp)
+>> +	REG_L s0, PT_S0(sp)
+>> +	REG_L s1, PT_S1(sp)
+>> +	REG_L s2, PT_S2(sp)
+>> +	REG_L s3, PT_S3(sp)
+>> +	REG_L s4, PT_S4(sp)
+>> +	REG_L s5, PT_S5(sp)
+>> +	REG_L s6, PT_S6(sp)
+>> +	REG_L s7, PT_S7(sp)
+>> +	REG_L s8, PT_S8(sp)
+>> +	REG_L s9, PT_S9(sp)
+>> +	REG_L s10, PT_S10(sp)
+>> +	REG_L s11, PT_S11(sp)
+>> +	REG_L tp, PT_TP(sp)
+>> +	REG_L t0, PT_T0(sp)
+>> +	REG_L t1, PT_T1(sp)
+>> +	REG_L t2, PT_T2(sp)
+>> +	REG_L t3, PT_T3(sp)
+>> +	REG_L t4, PT_T4(sp)
+>> +	REG_L t5, PT_T5(sp)
+>> +	REG_L t6, PT_T6(sp)
+>> +	REG_L gp, PT_GP(sp)
+>> +	REG_L a0, PT_A0(sp)
+>> +	REG_L a1, PT_A1(sp)
+>> +	REG_L a2, PT_A2(sp)
+>> +	REG_L a3, PT_A3(sp)
+>> +	REG_L a4, PT_A4(sp)
+>> +	REG_L a5, PT_A5(sp)
+>> +
+>> +	REG_L sp, PT_SP(sp)
+>> +
+>> +	li a7, ASM_SBI_EXT_SSE
+>> +	li a6, ASM_SBI_EXT_SSE_COMPLETE
+>> +	ecall
+> 
+> nit: Format asm with a tab after the operator like save/restore_context do.
+> 
+>> +
+>> diff --git a/lib/riscv/asm-offsets.c b/lib/riscv/asm-offsets.c
+>> index 6c511c14..77e5d26d 100644
+>> --- a/lib/riscv/asm-offsets.c
+>> +++ b/lib/riscv/asm-offsets.c
+>> @@ -4,6 +4,7 @@
+>>  #include <asm/processor.h>
+>>  #include <asm/ptrace.h>
+>>  #include <asm/smp.h>
+>> +#include <asm/sbi-sse.h>
+> 
+> nit: alphabetize
+> 
+>>  
+>>  int main(void)
+>>  {
+>> @@ -63,5 +64,13 @@ int main(void)
+>>  	OFFSET(THREAD_INFO_HARTID, thread_info, hartid);
+>>  	DEFINE(THREAD_INFO_SIZE, sizeof(struct thread_info));
+>>  
+>> +	DEFINE(ASM_SBI_EXT_SSE, SBI_EXT_SSE);
+>> +	DEFINE(ASM_SBI_EXT_SSE_COMPLETE, SBI_EXT_SSE_COMPLETE);
+>> +
+>> +	OFFSET(SBI_SSE_REG_TMP, sbi_sse_handler_arg, reg_tmp);
+>> +	OFFSET(SBI_SSE_HANDLER, sbi_sse_handler_arg, handler);
+>> +	OFFSET(SBI_SSE_HANDLER_DATA, sbi_sse_handler_arg, handler_data);
+>> +	OFFSET(SBI_SSE_HANDLER_STACK, sbi_sse_handler_arg, stack);
+>> +
+>>  	return 0;
+>>  }
+>> diff --git a/lib/riscv/sbi-sse.c b/lib/riscv/sbi-sse.c
+>> new file mode 100644
+>> index 00000000..bc4dd10e
+>> --- /dev/null
+>> +++ b/lib/riscv/sbi-sse.c
+> 
+> I think we could just put these wrappers in lib/riscv/sbi.c, but OK.
 
--- 
-Vitaly
+Hey Andrew,
+
+I'll move everything in sbi.c ;)
+
+> 
+>> @@ -0,0 +1,84 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +/*
+>> + * SBI SSE library
+>> + *
+>> + * Copyright (C) 2025, Rivos Inc., Clément Léger <cleger@rivosinc.com>
+>> + */
+>> +#include <asm/sbi.h>
+>> +#include <asm/sbi-sse.h>
+>> +#include <asm/io.h>
+> 
+> nit: alphabetize
+> 
+>> +
+>> +struct sbiret sbi_sse_read_attrs_raw(unsigned long event_id, unsigned long base_attr_id,
+>> +				     unsigned long attr_count, unsigned long phys_lo,
+>> +				     unsigned long phys_hi)
+>> +{
+>> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_READ_ATTRS, event_id, base_attr_id, attr_count,
+>> +			 phys_lo, phys_hi, 0);
+>> +}
+>> +
+>> +struct sbiret sbi_sse_read_attrs(unsigned long event_id, unsigned long base_attr_id,
+>> +				 unsigned long attr_count, unsigned long *values)
+>> +{
+>> +	phys_addr_t p = virt_to_phys(values);
+>> +
+>> +	return sbi_sse_read_attrs_raw(event_id, base_attr_id, attr_count, lower_32_bits(p),
+>> +				      upper_32_bits(p));
+>> +}
+>> +
+>> +struct sbiret sbi_sse_write_attrs_raw(unsigned long event_id, unsigned long base_attr_id,
+>> +				      unsigned long attr_count, unsigned long phys_lo,
+>> +				      unsigned long phys_hi)
+>> +{
+>> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_WRITE_ATTRS, event_id, base_attr_id, attr_count,
+>> +			 phys_lo, phys_hi, 0);
+>> +}
+>> +
+>> +struct sbiret sbi_sse_write_attrs(unsigned long event_id, unsigned long base_attr_id,
+>> +				  unsigned long attr_count, unsigned long *values)
+>> +{
+>> +	phys_addr_t p = virt_to_phys(values);
+>> +
+>> +	return sbi_sse_write_attrs_raw(event_id, base_attr_id, attr_count, lower_32_bits(p),
+>> +				       upper_32_bits(p));
+>> +}
+>> +
+>> +struct sbiret sbi_sse_register_raw(unsigned long event_id, unsigned long entry_pc,
+>> +				   unsigned long entry_arg)
+>> +{
+>> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_REGISTER, event_id, entry_pc, entry_arg, 0, 0, 0);
+>> +}
+>> +
+>> +struct sbiret sbi_sse_register(unsigned long event_id, struct sbi_sse_handler_arg *arg)
+>> +{
+> 
+>  phys_addr_t entry = virt_to_phys(sbi_sse_entry);
+>  phys_addr_t arg = virt_to_phys(arg);
+> 
+>  assert(__riscv_xlen > 32 || upper_32_bits(entry) == 0);
+>  assert(__riscv_xlen > 32 || upper_32_bits(arg) == 0);
+
+Ahem, while looking at it, there is actually no reason to pass phys
+address there :|. That should be virtual pointer, I'll remove that.
+
+Thanks,
+
+Clément
+
+> 
+>  return sbi_sse_register_raw(event_id, entry, arg);
+> 
+>> +	return sbi_sse_register_raw(event_id, virt_to_phys(sbi_sse_entry), virt_to_phys(arg));
+>> +}
+>> +
+>> +struct sbiret sbi_sse_unregister(unsigned long event_id)
+>> +{
+>> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_UNREGISTER, event_id, 0, 0, 0, 0, 0);
+>> +}
+>> +
+>> +struct sbiret sbi_sse_enable(unsigned long event_id)
+>> +{
+>> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_ENABLE, event_id, 0, 0, 0, 0, 0);
+>> +}
+>> +
+>> +struct sbiret sbi_sse_disable(unsigned long event_id)
+>> +{
+>> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_DISABLE, event_id, 0, 0, 0, 0, 0);
+>> +}
+>> +
+>> +struct sbiret sbi_sse_hart_mask(void)
+>> +{
+>> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_HART_MASK, 0, 0, 0, 0, 0, 0);
+>> +}
+>> +
+>> +struct sbiret sbi_sse_hart_unmask(void)
+>> +{
+>> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_HART_UNMASK, 0, 0, 0, 0, 0, 0);
+>> +}
+>> +
+>> +struct sbiret sbi_sse_inject(unsigned long event_id, unsigned long hart_id)
+>> +{
+>> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_INJECT, event_id, hart_id, 0, 0, 0, 0);
+>> +}
+>> -- 
+>> 2.47.2
+>>
+> 
+> Besides the nits and the sanity checking for rv32,
+> 
+> Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 
 
