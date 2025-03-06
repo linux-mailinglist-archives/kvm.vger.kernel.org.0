@@ -1,112 +1,206 @@
-Return-Path: <kvm+bounces-40204-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40205-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C9D5A53F6C
-	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 01:57:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95752A54001
+	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 02:37:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF49118934C6
-	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 00:57:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C083716B6E9
+	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 01:37:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F05933981;
-	Thu,  6 Mar 2025 00:57:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A14C18BC20;
+	Thu,  6 Mar 2025 01:37:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YILbfmTZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VmRjlZWK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 575BEB661
-	for <kvm@vger.kernel.org>; Thu,  6 Mar 2025 00:57:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E81C1865E3
+	for <kvm@vger.kernel.org>; Thu,  6 Mar 2025 01:37:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741222665; cv=none; b=PYHpEIOZqvTGSNA9mK79W6xCb7P90xN6JIimT3Q72a2XzukZZwGBOdltBs4l+kJdVzzKh4UBz6J+cGaDPSbRp+f/nx+wjBbXW7Iy9Emxu247b43pJj5mQo/2MruAhv5iassirGf4J7gRlMn0V18n9hF5DEzjEcIvdKEmVKe4Szs=
+	t=1741225060; cv=none; b=W+8Sa93sF3jR32qZKmTZo1OA05Ug5KbvJnM3IiXGxjogYHcnt+6j5DcGxK6tMI2NVSBc80MakdqLZNJ84b/D1ywqmUZiH8VCYqGuRC4iwCJqG6DsIhpaXVIitN+JB3W03LfoutN5wL8DENYawvIqrmEhtS98xhSH4FCqz2LeIn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741222665; c=relaxed/simple;
-	bh=BRzTPsuUtFVxjdzRFQihcgGwgS/fBY4FoJRdAjKtQrM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=eMJbPHzCRMsmeBicNuN4u+4Vpb/PMI1jj6dENpKVD4qBhBe//zaFtQivAGWcuiYElBIwwB6Ks6f95gvFKDtceaKpWfj5gSCmffX9P5nMLPdoov7AixqNocwH6i3j68fOK9qpaj6CbFT2a0L12AQ0ZNYf4FdU9+e6LPhIDFpz+QE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YILbfmTZ; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2f81a0d0a18so279426a91.3
-        for <kvm@vger.kernel.org>; Wed, 05 Mar 2025 16:57:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741222662; x=1741827462; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oFMXLR5DEt2+VAGefXNYR8zqNGy8KsIqW8Sdzn2Q4Jw=;
-        b=YILbfmTZenpCLg1rIf63ngx80kqrHYjgHEbBh2o6hP9avOx56YcpQv2ExyLU5Jv2Gl
-         4ffEVnXU3iYGAdOxcMCsBNTtey808q4HZ63MjGLQsqpMQV4SGzkG8y7jGlNeXgGc2NEj
-         Oiti58ha2MOIGbhUAM9XuxlIEzR+6GPuqwVcu8OimJIbdJ5DUBrcUjWbDVP/QgNQrvGp
-         8lFuRhtzdeJ0vwLRq9ndZ5cKLLege10dNS8SXx6TfQ4HmDx18pxwNb6GkEClf6z8uwqo
-         Xo11qDxHqWqN03jgXbrjTKorqeUylfvsmYizgDMR6kV2Qjx9/Awn9BzRh5/1ZWdtFQZR
-         zWiw==
+	s=arc-20240116; t=1741225060; c=relaxed/simple;
+	bh=jt8oE1DDukSHhfGAEncsuyQqx3ir3OOa0dHNqoKOelY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eXuUrigoTDyeS5Wp5jEHmHU6HcJOZtbs5SB6aYBWUMqBXqP5IJ/U88HW3Ek9Ye27AqvJrFIHzwf8Xpij6RH2Ghl1kFPgIxYgD6X4tg9fzKaWIPgDpqjSIqqNW2tKEgtBAWnS6V/cnJIE6PQhOc0oY0g3FDyTlfuIPpvcpsmb/l0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VmRjlZWK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741225057;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MwJDzSbLHHnbA7u1yktm23jopFFzMjn7g9N2Exf0cfw=;
+	b=VmRjlZWK2YZtElGV344lcd+z+gwzitqf91ScAoE0YwcnPMc/JFrUItM+ElWRWlZeO3C/LH
+	Rw8OFPrhe+1Rffs0VFnUgmCijFPxRSnZ3Zt9fW5kctubeNEe/qVjF01Nu9urO8FBLN7saW
+	84DLxwlWTYuwMQDvodHdAV2GMufkZm0=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-263-H_vfbc38MDGbUOvymUp4Pg-1; Wed, 05 Mar 2025 20:37:36 -0500
+X-MC-Unique: H_vfbc38MDGbUOvymUp4Pg-1
+X-Mimecast-MFC-AGG-ID: H_vfbc38MDGbUOvymUp4Pg_1741225055
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-ab76f438dddso19485466b.2
+        for <kvm@vger.kernel.org>; Wed, 05 Mar 2025 17:37:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741222662; x=1741827462;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oFMXLR5DEt2+VAGefXNYR8zqNGy8KsIqW8Sdzn2Q4Jw=;
-        b=wKEsI2AHoHEWZ6A8t3ADF66w186zl20b94P3/bJgvpTHaNgyKYqqT+xUFAo1xan98x
-         bosO/SU9Ka+JkYoLNv4wo3gClEVwvxmKIjLAXcjPcBQB2+4AOAs+7C0GAOwHFBY4upuN
-         IRqSeQg+u49TxQ5oDzGQ0YIf889DGuR+GZuUuJxc5Pv8xAk9trjyBp1+7o735rUqsD7k
-         9kZewDD3kO+3PdS51/mZF5CRCt0u+RMggDu2Uqw4soZRRrQyadt1k6MH6DmqlRSQ6Y+E
-         UfwQmqJBbU0akdHtZhNp2PJCST3VwoczPSPyfPzEyv9/q7tDG1t+Od3iuSX5GyFXPQTn
-         9aJw==
-X-Gm-Message-State: AOJu0Yzald3cs75ZSfg/0Z2VnftsmtqKlpIluTHqM+pqUbYhQ10baAb+
-	mUoh1QQlutqOXQb/uUB6e0QKtDfy+CCymnZfe24fb148YY8klYv9t395SSNQ3DpANxUtghzDzXc
-	yLQ==
-X-Google-Smtp-Source: AGHT+IFPT939blb6w0S+5BBekpr9w9VO3AEymWncjXsP3CZkDiyR2r8ZM6izTc/wi53NLuX33sPmez2yPdo=
-X-Received: from pjbok16.prod.google.com ([2002:a17:90b:1d50:b0:2fa:1481:81f5])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4f4e:b0:2ee:ab29:1a57
- with SMTP id 98e67ed59e1d1-2ff49790511mr8702853a91.2.1741222662573; Wed, 05
- Mar 2025 16:57:42 -0800 (PST)
-Date: Wed,  5 Mar 2025 16:57:28 -0800
-In-Reply-To: <20250304082314.472202-1-xiaoyao.li@intel.com>
+        d=1e100.net; s=20230601; t=1741225054; x=1741829854;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MwJDzSbLHHnbA7u1yktm23jopFFzMjn7g9N2Exf0cfw=;
+        b=CVfWZmSfwdfOtPiSD2XqE0/Khc44gVAHOeoc20xxxdXoYTo/9PZBJXJEMUUCkCSNFm
+         FLN6XMO5hIlgHbySDDf/lK30ZIKUl5wR9mrH7aMlFXCuM5WXPdoesszg+6olrWz57n92
+         zz+QQ7/4gmpT29wI92Z0aTY+0BJnAJIZahcpfchmR5zzj0N+ix/K9zgL9vm394R2+8VB
+         YZn3E64oNjH996wE0gQALkNQrP8dLaxN+TFHJpO/szq9sQaoKC7atf1gioRm7n+wViNW
+         3IFRnw+O+PB0XeEmCLbSUyS+863eGsu40WfhJM7Z8bVeNGN9AjHetjtx1P307mxZ/5F+
+         K4pg==
+X-Forwarded-Encrypted: i=1; AJvYcCU0yxsh8gf3oCVLIas3TfraCKrG4uZIPsQiQrYU44xQh6LEEMake4ZPf++Pv+/q85M1iC8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLbD/eQO4HenmmVR+L55vhE8MZUkmug6ExFdppGM5re7rJ9sdq
+	Mufe5DO7eRlYQ/Xz5aIZrxbBc9WIXB6dyfW/ncnvVlIHzuOdiyObe0YiNVYulo/KEUgxKtNT0J7
+	kGOlqu1Dygva3Qk5FL0NSIK8/ZbjaYSvxDtDwteIqPNE596bwziZOe6q3U7monk3oRlTAsqV54N
+	GcwMCzUwFjYFp/+3TjKRix0dyA
+X-Gm-Gg: ASbGnctG5VqmZlneIR9hk8XsQTYIuTo59SN1uo5iQQkt8OtTGD89zOZyictZtxW5JUg
+	9eOr1hnHFrFJLaKiImBzdEMl8OwxDU9qbNLrr0AeMLltdJzx+TE2vJvVnC6XtDNggakQgcYHMEg
+	==
+X-Received: by 2002:a17:907:3f97:b0:abf:6225:c91d with SMTP id a640c23a62f3a-ac20db5625bmr437490366b.34.1741225054598;
+        Wed, 05 Mar 2025 17:37:34 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE9H1qhwvkDgDybNE5sW4VnwbCiQQmLm0SVfn0Ji7BN3QvZ4moN9FmVfiIH9jslgkkvztcXACeXl8wpC1dBMno=
+X-Received: by 2002:a17:907:3f97:b0:abf:6225:c91d with SMTP id
+ a640c23a62f3a-ac20db5625bmr437488266b.34.1741225054236; Wed, 05 Mar 2025
+ 17:37:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250304082314.472202-1-xiaoyao.li@intel.com>
-X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <174110882170.40250.8746962643426198696.b4-ty@google.com>
-Subject: Re: [PATCH 0/2] KVM: x86: Cleanup and fix for reporting CPUID leaf 0x80000022
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+References: <20200116172428.311437-1-sgarzare@redhat.com> <20200427142518.uwssa6dtasrp3bfc@steredhat>
+ <224cdc10-1532-7ddc-f113-676d43d8f322@redhat.com> <20200428160052.o3ihui4262xogyg4@steredhat>
+ <Z8edJjqAqAaV3Vkt@devvm6277.cco0.facebook.com> <20250305022248-mutt-send-email-mst@kernel.org>
+ <v5c32aounjit7gxtwl4yxo2q2q6yikpb5yv3huxrxgfprxs2gk@b6r3jljvm6mt> <CACGkMEvms=i5z9gVRpnrXXpBnt3KGwM4bfRc46EztzDi4pqOsw@mail.gmail.com>
+In-Reply-To: <CACGkMEvms=i5z9gVRpnrXXpBnt3KGwM4bfRc46EztzDi4pqOsw@mail.gmail.com>
+From: Lei Yang <leiyang@redhat.com>
+Date: Thu, 6 Mar 2025 09:36:57 +0800
+X-Gm-Features: AQ5f1JoJEUufAEkLHWWULXhaNHkiqHvkFGZFpeTeSZ026lfQ3NJ0WwfBHHNypzs
+Message-ID: <CAPpAL=xsDM4ffe9kpAnvL3AfQrKg9tpbDdbTGgSwecHFf5wSLA@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/3] vsock: support network namespace
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, 
+	Stefan Hajnoczi <stefanha@redhat.com>, linux-kernel@vger.kernel.org, 
+	Jorgen Hansen <jhansen@vmware.com>, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, 
+	Bobby Eshleman <bobbyeshleman@gmail.com>, linux-hyperv@vger.kernel.org, 
+	Dexuan Cui <decui@microsoft.com>, netdev@vger.kernel.org, 
+	Jason Wang <jasowang@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 04 Mar 2025 03:23:12 -0500, Xiaoyao Li wrote:
-> Patch 1 is a cleanup and Patch 2 is a fix. Please see the individual
-> patch for detail.
-> 
-> Xiaoyao Li (2):
->   KVM: x86: Remove the unreachable case for 0x80000022 leaf in
->     __do_cpuid_func()
->   KVM: x86: Explicitly set eax and ebx to 0 when X86_FEATURE_PERFMON_V2
->     cannot be exposed to guest
-> 
-> [...]
+QE tested this series patch with virtio-net regression tests,
+everything works fine.
 
-Applied patch 2 to kvm-x86 fixes and tagged it for stable, and applied patch 1
-to misc.  Not zeroing eax/ebx is relatively benign, as it only affects the
-!enable_pmu case, but it's most definitely a bug and the fix is about as safe
-as a fix can be.
+Tested-by: Lei Yang <leiyang@redhat.com>
 
-I also added quite a bit of extra information to both changelogs.
+On Thu, Mar 6, 2025 at 8:17=E2=80=AFAM Jason Wang <jasowang@redhat.com> wro=
+te:
+>
+> On Wed, Mar 5, 2025 at 5:30=E2=80=AFPM Stefano Garzarella <sgarzare@redha=
+t.com> wrote:
+> >
+> > On Wed, Mar 05, 2025 at 02:27:12AM -0500, Michael S. Tsirkin wrote:
+> > >On Tue, Mar 04, 2025 at 04:39:02PM -0800, Bobby Eshleman wrote:
+> > >> I think it might be a lot of complexity to bring into the picture fr=
+om
+> > >> netdev, and I'm not sure there is a big win since the vsock device c=
+ould
+> > >> also have a vsock->net itself? I think the complexity will come from=
+ the
+> > >> address translation, which I don't think netdev buys us because ther=
+e
+> > >> would still be all of the work work to support vsock in netfilter?
+> > >
+> > >Ugh.
+> > >
+> > >Guys, let's remember what vsock is.
+> > >
+> > >It's a replacement for the serial device with an interface
+> > >that's easier for userspace to consume, as you get
+> > >the demultiplexing by the port number.
+>
+> Interesting, but at least VSOCKETS said:
+>
+> """
+> config VSOCKETS
+>         tristate "Virtual Socket protocol"
+>         help
+>          Virtual Socket Protocol is a socket protocol similar to TCP/IP
+>           allowing communication between Virtual Machines and hypervisor
+>           or host.
+>
+>           You should also select one or more hypervisor-specific transpor=
+ts
+>           below.
+>
+>           To compile this driver as a module, choose M here: the module
+>           will be called vsock. If unsure, say N.
+> """
+>
+> This sounds exactly like networking stuff and spec also said something si=
+milar
+>
+> """
+> The virtio socket device is a zero-configuration socket communications
+> device. It facilitates data transfer between the guest and device
+> without using the Ethernet or IP protocols.
+> """
+>
+> > >
+> > >The whole point of vsock is that people do not want
+> > >any firewalling, filtering, or management on it.
+>
+> We won't get this, these are for ethernet and TCP/IP mostly.
+>
+> > >
+> > >It needs to work with no configuration even if networking is
+> > >misconfigured or blocked.
+>
+> I don't see any blockers that prevent us from zero configuration, or I
+> miss something?
+>
+> >
+> > I agree with Michael here.
+> >
+> > It's been 5 years and my memory is bad, but using netdev seemed like a
+> > mess, especially because in vsock we don't have anything related to
+> > IP/Ethernet/ARP, etc.
+>
+> We don't need to bother with that, kernel support protocols other than TC=
+P/IP.
+>
+> >
+> > I see vsock more as AF_UNIX than netdev.
+>
+> But you have a device in guest that differs from the AF_UNIX.
+>
+> >
+> > I put in CC Jakub who was covering network namespace, maybe he has some
+> > advice for us regarding this. Context [1].
+> >
+> > Thanks,
+> > Stefano
+> >
+> > [1] https://lore.kernel.org/netdev/Z8edJjqAqAaV3Vkt@devvm6277.cco0.face=
+book.com/
+> >
+>
+> Thanks
+>
+>
 
-Thanks!
-
-[1/2] KVM: x86: Remove the unreachable case for 0x80000022 leaf in __do_cpuid_func()
-      https://github.com/kvm-x86/linux/commit/e6c8728a8e2d
-[2/2] KVM: x86: Explicitly zero EAX and EBX when PERFMON_V2 isn't supported by KVM
-      https://github.com/kvm-x86/linux/commit/f9dc8fb3afc9
-
---
-https://github.com/kvm-x86/linux/tree/next
 
