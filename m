@@ -1,192 +1,164 @@
-Return-Path: <kvm+bounces-40199-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40200-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F418CA53EFF
-	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 01:17:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 65A72A53F1F
+	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 01:29:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2AE5116B02E
-	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 00:17:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90909170301
+	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 00:29:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A353E5672;
-	Thu,  6 Mar 2025 00:17:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D08BCFC12;
+	Thu,  6 Mar 2025 00:29:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fbjCaw7C"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="rnePR2hw"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E0C0184E
-	for <kvm@vger.kernel.org>; Thu,  6 Mar 2025 00:17:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C88FF9E8;
+	Thu,  6 Mar 2025 00:29:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741220229; cv=none; b=CypENA0SxgvNdhcwRolehpM+omGlLl9dGXovfHM3gHWxjWhYYzKHTcwkFFnSaesozO51KHt2m2X9JC9bi2WrB5xMIh92kB6KSUGwwCFTkxKKvPmaZuwDw/FVSmIx08G9lxAcYyMLJz9xF+JSrzAJo2p9wBPiNZAVc7JLD4lNSOA=
+	t=1741220986; cv=none; b=c+iSgCo7VwfD0UnJC6W1p2dFO7SKZYMfP936W9zCxmNJivGdhBs4uITob/LDqcdYbpJGesrkF2XOQ/T/RsP+sBjIadOHFViawDabs0vPcCXxLtrBlRVG8fGGvu7VZEYYdccb5yW8x1MH1vmIEQt39E7sl91eOSrmi/LRNH6wPGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741220229; c=relaxed/simple;
-	bh=+Wwm78y9BnVLdWm8RFuREOENXYM1SpKDISYy3wFQGr8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m8EhHk9uq4+C8p/kFWOBi+3AhPZsyIDiDuzqrYpTShRJK/gXm80orx1yLA6SsS8Vkv+ieHVvhuFDVIYnP2BTRBVh6aqVJ0P/OSzYoTpyxzWdxIHVJtl7HTm/y4maLeCJRuQpcyBFOc1MQYRzxcXm0LWDmOGvfPn/1YF5f9alfgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fbjCaw7C; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741220227;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YYivC87WhRU5jPCfxZzkS7AXzckjBFGkdKstv7mfD7c=;
-	b=fbjCaw7Cbiya0VugU4yRUuuCN86Vn4oa9ivgkrnDWkfyC1IRYgTyP50U5Vg0HZxUdW9CK6
-	5z1cmwrXrk3Oy8Z01/zWsjsbw1xQJ/htBWb5xZUiNDqQVxHFKrFgLzn3IFh2hAt6BMrc0R
-	yJsbVqyI8GVxVqDpoi5taZ4nPViC/LI=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-680-IDAD1RGaMmKGmmPyCUMWRw-1; Wed, 05 Mar 2025 19:17:04 -0500
-X-MC-Unique: IDAD1RGaMmKGmmPyCUMWRw-1
-X-Mimecast-MFC-AGG-ID: IDAD1RGaMmKGmmPyCUMWRw_1741220223
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2ff58318acaso409718a91.0
-        for <kvm@vger.kernel.org>; Wed, 05 Mar 2025 16:17:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741220223; x=1741825023;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YYivC87WhRU5jPCfxZzkS7AXzckjBFGkdKstv7mfD7c=;
-        b=ZTIXM1uFYbV+LK/4tGDNYdjJm1RhyJfYtrUPCYf5Zvse3196nvovLDRNclAURYrsDw
-         oi6ZknlFnn+BuXdnR1S2AXV/7CRC/JBBpxACDAoYU1ATXjiSzMW6xvCu0+d2rVMS/lkq
-         z8TKS9406Ni6eq5ALhnCP8CBJmFBEHcy75YvwcGRJWMA9FX7KgGqbtW8MgEGBGjVQB+a
-         uLtoXjbq2dGr/ffTQxBKD8a3AhkqZd6vCwqYw1DdmQ6HxbgWQm3Kyz2Jv8XWiwpCmflo
-         h+4qI8OCa4samCqHLsVAlh+U6YPIAEWRZlR7PKQL2EhMhoXzeCOAYYfi0f8RYvRU/CoT
-         SIkw==
-X-Forwarded-Encrypted: i=1; AJvYcCWxPylG6+kfDXvONpQdWmq5na+D/G9uBzIaf5Q/Fw7tvl4nQDWBdKJHbmzNt1TFQa0FNcs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwuJ17V8ebfVXzPeeuTJKyiaVwqDp5dY8nFrvOAq0OyAFtkkIBj
-	7Y8yNnQA1a7sSqFn9nMEbBYZ2oTIinhQZ2A+iK1Ri/LY3Wbgu0D5MdJRxrz0pFXYz3u7te27m7D
-	7fMXHg/W4eI74H8N7kG1/AEGvaEkiW77PdUxRZSJXP7fnO0DCerZRyGzSUtXXOJB07Jfjmbgd8u
-	gG9VGjVFkddSFv6tPvea5xZdx9
-X-Gm-Gg: ASbGncvwBr3mjie/JAoaOTSCOfZj1SBIZk/TK4dg+lTQvCirT+BNx7iiXJl/KqJ+30N
-	buqq11cgTKwstiJX4XkSv6vJ/sIiPq/3xabWEZFnmdeSwpV88Bu8S3/lCVmvlwk7+jszSVLtTI3
-	g=
-X-Received: by 2002:a17:90b:3c87:b0:2ef:2f49:7d7f with SMTP id 98e67ed59e1d1-2ff497cce78mr9640209a91.18.1741220222888;
-        Wed, 05 Mar 2025 16:17:02 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFm03yuBJCzHipb+u+/vxkatspEkUc/vBoHzZ9SJCyh2hxYSRGDOjw00zbfIsnmQnxOyJi4dQOkxCDXWDyfOC0=
-X-Received: by 2002:a17:90b:3c87:b0:2ef:2f49:7d7f with SMTP id
- 98e67ed59e1d1-2ff497cce78mr9640168a91.18.1741220222504; Wed, 05 Mar 2025
- 16:17:02 -0800 (PST)
+	s=arc-20240116; t=1741220986; c=relaxed/simple;
+	bh=K0hpXmBIeWACuRqHPWQt5Zf2GMFn3E5zMQxaMAaoKZw=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=tjsktFNE3UIUaAN2AQj6p3jOjc6bjqDvGbyaAAmuqN+F+BcXQD+GqzvSGkq2k+89B/ayxm7/ich0Z0Bu7Lx/Fz/adD/BMlcjBJUbc8BBL2JjeDjMp6w+w4HkbTXycceCmaDfuG+iYLxWPUjlGjjfkrl7x5g1DMEcRq6C6bgZ3EY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=rnePR2hw; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.202] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 5260TRbF3519988
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Wed, 5 Mar 2025 16:29:28 -0800
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 5260TRbF3519988
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025021701; t=1741220968;
+	bh=nyfZtjxpwWEfPD2aWtSJVU9prs0awbhhMdouVBIRD14=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=rnePR2hwJuXY5FmWXVv6sKakKb16gqY6la25fcNXD75cRQVpa2ZRcjCrKVOuukjCB
+	 hRqstDX2y33m5xXuD7NVQPXDQYLTAplDaBg1xcMyt+j959umpzmuK30mLTDge0cGXp
+	 bnvazkO/OsgotjsN+4A03SGz9l8AUI6QO/4BJ9vha8pm3FY247UsUaf91Izo6cffrQ
+	 olDvEOmJ3YNx2I/0aCLbw3SAefG82cytvU9inPCFtN7bbjw/fVGuZWrUfEKeWiHKih
+	 mJwYNN1fefggEc2XOBAauB3RKE/hvo3PoSnUZaFsHLKmVg/yGvEbQYRrnL4xbRkR89
+	 uKCAqqVibBGfw==
+Message-ID: <ab26bb7f-4466-4136-a6d7-2c239bf204b2@zytor.com>
+Date: Wed, 5 Mar 2025 16:29:26 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20200116172428.311437-1-sgarzare@redhat.com> <20200427142518.uwssa6dtasrp3bfc@steredhat>
- <224cdc10-1532-7ddc-f113-676d43d8f322@redhat.com> <20200428160052.o3ihui4262xogyg4@steredhat>
- <Z8edJjqAqAaV3Vkt@devvm6277.cco0.facebook.com> <20250305022248-mutt-send-email-mst@kernel.org>
- <v5c32aounjit7gxtwl4yxo2q2q6yikpb5yv3huxrxgfprxs2gk@b6r3jljvm6mt>
-In-Reply-To: <v5c32aounjit7gxtwl4yxo2q2q6yikpb5yv3huxrxgfprxs2gk@b6r3jljvm6mt>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 6 Mar 2025 08:16:51 +0800
-X-Gm-Features: AQ5f1Jql0yqolE1p-RM3zEM6LJujZ0qsyX-vhJHsLFPVzV7f1_y-mNi6DKL8tMs
-Message-ID: <CACGkMEvms=i5z9gVRpnrXXpBnt3KGwM4bfRc46EztzDi4pqOsw@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/3] vsock: support network namespace
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Bobby Eshleman <bobbyeshleman@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, 
-	Stefan Hajnoczi <stefanha@redhat.com>, linux-kernel@vger.kernel.org, 
-	Jorgen Hansen <jhansen@vmware.com>, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, linux-hyperv@vger.kernel.org, 
-	Dexuan Cui <decui@microsoft.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] x86/msr: Rename the WRMSRNS opcode macro to
+ ASM_WRMSRNS (for KVM)
+From: Xin Li <xin@zytor.com>
+To: Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250227010111.3222742-1-seanjc@google.com>
+ <20250227010111.3222742-2-seanjc@google.com>
+ <ab5ded74-91b4-46ae-b360-b372ff790fa6@zytor.com>
+Content-Language: en-US
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <ab5ded74-91b4-46ae-b360-b372ff790fa6@zytor.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Mar 5, 2025 at 5:30=E2=80=AFPM Stefano Garzarella <sgarzare@redhat.=
-com> wrote:
->
-> On Wed, Mar 05, 2025 at 02:27:12AM -0500, Michael S. Tsirkin wrote:
-> >On Tue, Mar 04, 2025 at 04:39:02PM -0800, Bobby Eshleman wrote:
-> >> I think it might be a lot of complexity to bring into the picture from
-> >> netdev, and I'm not sure there is a big win since the vsock device cou=
-ld
-> >> also have a vsock->net itself? I think the complexity will come from t=
-he
-> >> address translation, which I don't think netdev buys us because there
-> >> would still be all of the work work to support vsock in netfilter?
-> >
-> >Ugh.
-> >
-> >Guys, let's remember what vsock is.
-> >
-> >It's a replacement for the serial device with an interface
-> >that's easier for userspace to consume, as you get
-> >the demultiplexing by the port number.
+On 2/26/2025 5:14 PM, Xin Li wrote:
+> On 2/26/2025 5:01 PM, Sean Christopherson wrote:
+>> Rename the WRMSRNS instruction opcode macro so that it doesn't collide
+>> with X86_FEATURE_WRMSRNS when using token pasting to generate references
+>> to X86_FEATURE_WRMSRNS.  KVM heavily uses token pasting to generate KVM's
+>> set of support feature bits, and adding WRMSRNS support in KVM will run
+>> will run afoul of the opcode macro.
+>>
+>>    arch/x86/kvm/cpuid.c:719:37: error: pasting "X86_FEATURE_" and "" 
+>> "" does not
+>>                                        give a valid preprocessing token
+>>    719 |         u32 __leaf = 
+>> __feature_leaf(X86_FEATURE_##name);                \
+>>        |                                     ^~~~~~~~~~~~
+>>
+>> KVM has worked around one such collision in the past by #undef'ing the
+>> problematic macro in order to avoid blocking a KVM rework, but such games
+>> are generally undesirable, e.g. requires bleeding macro details into KVM,
+>> risks weird behavior if what KVM is #undef'ing changes, etc.
+>>
+>> Signed-off-by: Sean Christopherson <seanjc@google.com>
+>> ---
+>>   arch/x86/include/asm/msr.h | 4 ++--
+>>   1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arch/x86/include/asm/msr.h b/arch/x86/include/asm/msr.h
+>> index 001853541f1e..60b80a36d045 100644
+>> --- a/arch/x86/include/asm/msr.h
+>> +++ b/arch/x86/include/asm/msr.h
+>> @@ -300,7 +300,7 @@ do {                            \
+>>   #endif    /* !CONFIG_PARAVIRT_XXL */
+>>   /* Instruction opcode for WRMSRNS supported in binutils >= 2.40 */
+>> -#define WRMSRNS _ASM_BYTES(0x0f,0x01,0xc6)
+>> +#define ASM_WRMSRNS _ASM_BYTES(0x0f,0x01,0xc6)
+>>   /* Non-serializing WRMSR, when available.  Falls back to a 
+>> serializing WRMSR. */
+>>   static __always_inline void wrmsrns(u32 msr, u64 val)
+>> @@ -309,7 +309,7 @@ static __always_inline void wrmsrns(u32 msr, u64 val)
+>>        * WRMSR is 2 bytes.  WRMSRNS is 3 bytes.  Pad WRMSR with a 
+>> redundant
+>>        * DS prefix to avoid a trailing NOP.
+>>        */
+>> -    asm volatile("1: " ALTERNATIVE("ds wrmsr", WRMSRNS, 
+>> X86_FEATURE_WRMSRNS)
+>> +    asm volatile("1: " ALTERNATIVE("ds wrmsr", ASM_WRMSRNS, 
+>> X86_FEATURE_WRMSRNS)
+>>                "2: " _ASM_EXTABLE_TYPE(1b, 2b, EX_TYPE_WRMSR)
+>>                : : "c" (msr), "a" ((u32)val), "d" ((u32)(val >> 32)));
+>>   }
+> 
+> I hit the same build issue, thanks for fixing it.
+> 
+> Reviewed-by: Xin Li (Intel) <xin@zytor.com>
+> 
 
-Interesting, but at least VSOCKETS said:
-
-"""
-config VSOCKETS
-        tristate "Virtual Socket protocol"
-        help
-         Virtual Socket Protocol is a socket protocol similar to TCP/IP
-          allowing communication between Virtual Machines and hypervisor
-          or host.
-
-          You should also select one or more hypervisor-specific transports
-          below.
-
-          To compile this driver as a module, choose M here: the module
-          will be called vsock. If unsure, say N.
-"""
-
-This sounds exactly like networking stuff and spec also said something simi=
-lar
-
-"""
-The virtio socket device is a zero-configuration socket communications
-device. It facilitates data transfer between the guest and device
-without using the Ethernet or IP protocols.
-"""
-
-> >
-> >The whole point of vsock is that people do not want
-> >any firewalling, filtering, or management on it.
-
-We won't get this, these are for ethernet and TCP/IP mostly.
-
-> >
-> >It needs to work with no configuration even if networking is
-> >misconfigured or blocked.
-
-I don't see any blockers that prevent us from zero configuration, or I
-miss something?
-
->
-> I agree with Michael here.
->
-> It's been 5 years and my memory is bad, but using netdev seemed like a
-> mess, especially because in vsock we don't have anything related to
-> IP/Ethernet/ARP, etc.
-
-We don't need to bother with that, kernel support protocols other than TCP/=
-IP.
-
->
-> I see vsock more as AF_UNIX than netdev.
-
-But you have a device in guest that differs from the AF_UNIX.
-
->
-> I put in CC Jakub who was covering network namespace, maybe he has some
-> advice for us regarding this. Context [1].
->
-> Thanks,
-> Stefano
->
-> [1] https://lore.kernel.org/netdev/Z8edJjqAqAaV3Vkt@devvm6277.cco0.facebo=
-ok.com/
->
-
-Thanks
+Do we need an ack from x86 maintainers?
 
 
