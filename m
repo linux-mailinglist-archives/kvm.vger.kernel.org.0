@@ -1,55 +1,59 @@
-Return-Path: <kvm+bounces-40245-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40246-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFE16A54E75
-	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 16:01:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F6B8A54EB3
+	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 16:15:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F6D916CE45
-	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 15:01:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1E671897DB4
+	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 15:15:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08B44188713;
-	Thu,  6 Mar 2025 15:01:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D587C20E016;
+	Thu,  6 Mar 2025 15:15:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JFO5gqFH"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="awgjPrqG"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B24B146A63
-	for <kvm@vger.kernel.org>; Thu,  6 Mar 2025 15:00:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 626851422A8
+	for <kvm@vger.kernel.org>; Thu,  6 Mar 2025 15:15:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741273263; cv=none; b=fbhhBzg5KnF0RztdUdjH0zs67KQDbkqRmJCayB+eTf/MhTSJlcMTTbL/fdom6Yg2/yfHHpJM8WzhxMzrGh9KJrTZ7p6Krtu2J8qOO9GzoDmZXKkqlk11Ydlfuyk58pRcbCztG4ltW1oLd6EZZ4NeXFpYQiWJhVRM5PG2F5ytCXA=
+	t=1741274113; cv=none; b=Zu97oua6imQ7ImEVTAoLwKJ0C2vD+30lTDxwOq9OW9P0dWKCpgrZZSQNo8dkYnA0AnQZWAYjg2a6P8H+iBysDrH0/v+l9nRP8oHdDxmVLNwLMmqywGNH81wf2sTtKX2Ah4gwHe6QoDcrsS5bN+1YqbeKskZ03eEpIr8bXyEabUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741273263; c=relaxed/simple;
-	bh=oZADMNrFoa4M4+Mlpki/zDF0vLGa5k7RADpclaPMpZk=;
+	s=arc-20240116; t=1741274113; c=relaxed/simple;
+	bh=YLnyndirqOvTPaPblji8B/aRLU9k3jAx/h3tWxpJvko=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R77CI4FEPynIURVmbDFCBsixvgoatIdtUkwU0PYNDCPfMu29j4J00PjLD1Vu9e5Rc+HGttUZKyPEZjEBnPS/ht6sTemrMbbHmMXpjnMs9il8SVsb4vjWRPiQo3sWdHiPlayWbd8Y8u9zszNJhhXtMIVYNCLrxEAmkYhbleuuWN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JFO5gqFH; arc=none smtp.client-ip=95.215.58.173
+	 Content-Type:Content-Disposition:In-Reply-To; b=TLtIDoUcgT28Oa6ab4hqzZOunk/LKzjogVmtlKKScklgI1OIUsgEtVR0tNE1V7TXTehOR/UhFGBC5hbmtBdaoj/kParmvaIwBCU6eObJj40Z6VHkF3GLA56LKK4na0cHCSY8fXTMRtkTHOz0EPqIgkVvB+EtI2hX78KkUj+5ENM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=awgjPrqG; arc=none smtp.client-ip=91.218.175.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Thu, 6 Mar 2025 16:00:39 +0100
+Date: Thu, 6 Mar 2025 16:15:06 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1741273257;
+	t=1741274108;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Hn7c/6RNePAc/TyMQA2ogLwul4UMrfndhIbIlRb9pCg=;
-	b=JFO5gqFHGTXBa01sVBxBNEFv+1jFfKJddl7i/zpAQqO9KhGyJrpzrkD1vQx9A/PfsOU9Lh
-	jlHxreja1PsXMI+35oMFvw1D6lVi9PYPA4xgGomTLRWkeERRWvphkoaY2tF6/POs82grns
-	zxLRpAEJDpxeTsbrBhMQycPQe1/MDoE=
+	bh=lVH0GxmWmcu/UgBN4gM6j99Mf09UV1MGgTDFHSQe7xs=;
+	b=awgjPrqGX7DrTrDLvctmgTXfKtUMvPuFfeK/N5E6bNTd+ACdSlmnDf0ZqdV5yXyGiiMh36
+	il9O9NP3lcdrQlffuKAnVnoWdPX8k7jgKkj8kd6/wTGQhL47Y8BGpq6V/jSjIx5NJoeCjL
+	sAHkemNZe0+6p2zt+YTHY37ioxJCJo0=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Andrew Jones <andrew.jones@linux.dev>
-To: Akshay Behl <akshaybehl231@gmail.com>
-Cc: kvm@vger.kernel.org, cleger@rivosinc.com, 
+To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	Andrew Jones <ajones@ventanamicro.com>, Anup Patel <apatel@ventanamicro.com>, 
 	Atish Patra <atishp@rivosinc.com>
-Subject: Re: [kvm-unit-tests PATCH] riscv: Add fwft landing_pad tests
-Message-ID: <20250306-f537bf6f4eb921242929127e@orel>
-References: <20250306113942.10880-1-akshaybehl231@gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v7 6/6] riscv: sbi: Add SSE extension tests
+Message-ID: <20250306-5f8b0b45873648fa93beccc7@orel>
+References: <20250214114423.1071621-1-cleger@rivosinc.com>
+ <20250214114423.1071621-7-cleger@rivosinc.com>
+ <20250227-93a15f012d9bda941ef44e38@orel>
+ <d37dc38b-ba6d-48cd-8d23-9e2ce9c6581e@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -59,236 +63,96 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250306113942.10880-1-akshaybehl231@gmail.com>
+In-Reply-To: <d37dc38b-ba6d-48cd-8d23-9e2ce9c6581e@rivosinc.com>
 X-Migadu-Flow: FLOW_OUT
 
+On Thu, Mar 06, 2025 at 03:32:39PM +0100, Clément Léger wrote:
+> 
+> 
+> On 28/02/2025 18:51, Andrew Jones wrote:
+...
+> >> +	attr = SBI_SSE_ATTR_INTERRUPTED_FLAGS;
+> >> +	ret = sbi_sse_read_attrs(event_id, attr, 1, &prev_value);
+> >> +	sbiret_report_error(&ret, SBI_SUCCESS, "Save interrupted flags no error");
+> >> +
+> >> +	for (i = 0; i < ARRAY_SIZE(interrupted_flags); i++) {
+> >> +		flags = interrupted_flags[i];
+> >> +		ret = sbi_sse_write_attrs(event_id, attr, 1, &flags);
+> >> +		sbiret_report_error(&ret, SBI_SUCCESS,
+> >> +				    "Set interrupted flags bit 0x%lx value no error", flags);
+> >> +		ret = sbi_sse_read_attrs(event_id, attr, 1, &value);
+> >> +		sbiret_report_error(&ret, SBI_SUCCESS, "Get interrupted flags after set no error");
+> >> +		report(value == flags, "interrupted flags modified value ok: 0x%lx", value);
+> > 
+> > Do we also need to test with more than one flag set at a time?
+> 
+> That is already done a few lines above (see /* Restore full saved state */).
 
-Hi Akshay,
-
-You may want to CC potential reviewers like myself and Clément to ensure
-your patches don't get overlooked.
-
-On Thu, Mar 06, 2025 at 05:09:42PM +0530, Akshay Behl wrote:
-> Added invalid value, invalid flags, locking and other checks for fwft landing_pad feature.
-
-Please keep commit message lines around 70 chars long.
-
-While the patch is true to the commit message, I think we should add
-the full landing pad test at the same time, i.e. after successfully
-enabling the feature we should check that it works, and without the
-feature enabled we should check that it doesn't work, like
-fwft_check_pte_ad_hw_updating() does for ADUE. I think the kvm-unit-tests
-framework should have everything needed for that already, but, if not,
-we can add what's necessary.
+OK
 
 > 
-> Signed-off-by: Akshay Behl <akshaybehl231@gmail.com>
-> ---
->  riscv/sbi-fwft.c | 82 ++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 82 insertions(+)
+> > 
+> >> +	}
+> >> +
+> >> +	/* Write invalid bit in flag register */
+> >> +	flags = SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SDT << 1;
+> >> +	ret = sbi_sse_write_attrs(event_id, attr, 1, &flags);
+> >> +	sbiret_report_error(&ret, SBI_ERR_INVALID_PARAM, "Set invalid flags bit 0x%lx value error",
+> >> +			    flags);
+> >> +#if __riscv_xlen > 32
+> >> +	flags = BIT(32);
+> >> +	ret = sbi_sse_write_attrs(event_id, attr, 1, &flags);
+> >> +	sbiret_report_error(&ret, SBI_ERR_INVALID_PARAM, "Set invalid flags bit 0x%lx value error",
+> > 
+> > This should have a different report string than the test above.
 > 
-> diff --git a/riscv/sbi-fwft.c b/riscv/sbi-fwft.c
-> index ac2e3486..5d88d683 100644
-> --- a/riscv/sbi-fwft.c
-> +++ b/riscv/sbi-fwft.c
-> @@ -329,6 +329,87 @@ adue_done:
->  	report_prefix_pop();
->  }
->  
-> +static struct sbiret fwft_landing_pad_set(unsigned long value, unsigned long flags)
-> +{
-> +	return fwft_set(SBI_FWFT_LANDING_PAD, value, flags);
-> +}
-> +
-> +static struct sbiret fwft_landing_pad_get(void)
-> +{
-> +	return fwft_get(SBI_FWFT_LANDING_PAD);
-> +}
+> The bit value format does differentiate the printf though.
 
-After making the changes pointed out below there will only be a couple
-places where we can use these wrappers, so we could probably drop them.
+OK
 
-> +
-> +static void fwft_check_landing_pad(void)
-> +{
-> +	struct sbiret ret;
-
-Add a blank line here.
-
-> +	report_prefix_push("landing_pad");
-> +
-> +	ret = fwft_landing_pad_get();
-> +	if (ret.error == SBI_ERR_NOT_SUPPORTED) {
-> +		report_skip("SBI_FWFT_LANDING_PAD is not supported");
-
-You can drop the "SBI_FWFT_LANDING_PAD is " since the "landing_pad" prefix
-will be included in the skip message already.
-
-> +		return;
-> +	} else if (!sbiret_report_error(&ret, SBI_SUCCESS, "get landing pad feature"))
-> +		return;
-
-The above if-else is the same as fwft_check_pte_ad_hw_updating() so we
-could factor it out.
-
-> +
-> +	report(ret.value == 0, "initial landing pad feature value is 0");
-> +
-
-Let's write "resets to 0" for the above report instead of "initial..."
-
-If value isn't zero then it'd be useful to output what it is.
-sbiret_report() will do that. Since we'll want to check the reset value of
-all FWFT features then we could write a function like
-
- /* Must be called before any fwft_set() call is made for @feature */
- static void fwft_check_reset(uint32_t feature, unsigned long reset)
- {
-	struct sbiret ret = fwft_get(feature);
-
-	sbiret_report(&ret, SBI_SUCCESS, reset, "resets to %lu", reset);
- }
-
-to be used by all features.
-
-> +	/* Invalid value test */
-> +	ret = fwft_landing_pad_set(2, 0);
-> +	sbiret_report_error(&ret, SBI_ERR_INVALID_PARAM,
-> +			    "set landing pad feature invalid value 2");
-
-Drop "landing pad feature" from the report line, we have that info in the
-prefix already. Same comment for all report lines below.
-
-> +	ret = fwft_landing_pad_set(0xFFFFFFFF, 0);
-> +	sbiret_report_error(&ret, SBI_ERR_INVALID_PARAM,
-> +				"set landing pad feature invalid value 0xFFFFFFFF");
-> +
-> +	/* Set to 1 and check with get */
-> +	ret = fwft_landing_pad_set(1, 0);
-> +	sbiret_report_error(&ret, SBI_SUCCESS,
-> +			    "set landing pad feature to 1");
-> +	ret = fwft_landing_pad_get();
-> +	sbiret_report(&ret, SBI_SUCCESS, 1,
-> +		      "get landing pad feature expected value 1");
-
-On harts which don't support Zicfilp this won't succeed. We could get
-SBI_ERR_NOT_SUPPORTED or SBI_ERR_DENIED and then we'll want to bail
-out early. Whether or not we report SKIP or FAIL depends on what
-we expect, though. I'd say we should report SKIP by default and
-allow the user to state when they do expect success. We give the
-user control over tests with environment variables. So we can
-create "SBI_HAVE_FWFT_LANDING_PAD", which, when enabled, means anything
-other than SBI_SUCCESS when attempting to set landing pad to 1 is
-an error. We should do the same for the other features like
-PTE_AD_HW_UPDATING, so that's another opportunity for some code
-factoring.
-
-> +
-> +	/* Set to 0 and check with get */
-> +	ret = fwft_landing_pad_set(0, 0);
-> +	sbiret_report_error(&ret, SBI_SUCCESS,
-> +			    "set landing pad feature to 0");
-> +	ret = fwft_landing_pad_get();
-> +	sbiret_report(&ret, SBI_SUCCESS, 0,
-> +		      "get landing pad feature expected value 0");
-
-We have fwft_set_and_check_raw() which could be used for the above tests.
-
-> +
-> +#if __riscv_xlen > 32
-> +	/* Test using invalid flag bits */
-
-The comment is wrong since the next test tests an invalid 'value'.
-
-Also, BIT(32) isn't invalid because it sets a bit above 31, but simply
-because the spec doesn't define that value. I think it's a good idea to
-test, though, in case an SBI implementation isn't paying attention to
-high bits.
-
-> +	ret = fwft_landing_pad_set(BIT(32), 0);
-> +	sbiret_report_error(&ret, SBI_ERR_INVALID_PARAM,
-> +			    "Set misaligned deleg with invalid value > 32bits");
-
-Copy+paste error "misaligned deleg", but again we have a prefix so we
-shouldn't be repeating the feature in each report.
-
-> +	ret = fwft_landing_pad_set(1, BIT(32));
-> +	sbiret_report_error(&ret, SBI_ERR_INVALID_PARAM,
-> +			    "set landing pad feature with invalid flag > 32 bits");
-> +#endif
-
-We can do yet more refactoring by creating an fwft_inval_input() test
-since all features will test flags the same way and likely even value
-(0/1 only). Since value might not be 0/1, then we could factor the
-flags checking out to allow it to be called separately. So,
-
- static void fwft_inval_flags(uint32_t feature, unsigned long value)
- {
-   /* invalid flags tests */
- }
- static void fwft_inval_input(uint32_t feature)
- {
-    /* invalid value tests where 0/1 are valid */
-    fwft_inval_flags(feature, 0);
- }
-
-> +
-> +	/* Locking test */
-> +	ret = fwft_landing_pad_set(1, SBI_FWFT_SET_FLAG_LOCK);
-> +	sbiret_report_error(&ret, SBI_SUCCESS,
-> +			    "set landing pad feature to 1 and lock");
-> +
-> +	/* Attempt without the lock flag */
-> +	ret = fwft_landing_pad_set(0, 0);
-> +	sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED,
-> +			    "attempt to set locked landing pad feature to 0 without lock flag");
-> +
-> +	/* Attempt with the lock flag still should fail */
-> +	ret = fwft_landing_pad_set(0, SBI_FWFT_SET_FLAG_LOCK);
-> +	sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED,
-> +			    "attempt to set locked landing pad feature to 0 with lock flag");
-
-We should also test attempting to set the locked feature with the same
-value. It should still return SBI_ERR_DENIED_LOCKED, i.e. the SBI
-implementation shouldn't check that the value is the same and return
-SBI_SUCCESS since nothing would change. It should be checked with and
-without the lock flag set.
-
-As Clement pointed out while reviewing fwft_check_pte_ad_hw_updating(),
-we could probably factor out the lock tests into a generic function
-that all features can use. Let's do that.
-
-> +
-> +	/* Verify that the value remains locked at 1 */
-> +	ret = fwft_landing_pad_get();
-> +	sbiret_report(&ret, SBI_SUCCESS, 1,
-> +		      "get locked landing pad feature expected value 1");
-> +
-> +	report_prefix_pop();
-> +}
-> +
->  void check_fwft(void)
->  {
->  	report_prefix_push("fwft");
-> @@ -344,6 +425,7 @@ void check_fwft(void)
->  	fwft_check_base();
->  	fwft_check_misaligned_exc_deleg();
->  	fwft_check_pte_ad_hw_updating();
-> +	fwft_check_landing_pad();
->  
->  	report_prefix_pop();
->  }
-> -- 
-> 2.34.1
+...
+> >> +	ret = sbi_sse_unregister(event_id);
+> >> +	if (!sbiret_report_error(&ret, SBI_SUCCESS, "SSE unregister no error"))
+> >> +		goto done;
+> >> +
+> >> +	sse_check_state(event_id, SBI_SSE_STATE_UNUSED);
+> >> +
+> >> +done:
+> > 
+> > Is it ok to leave this function with an event registered/enabled? If not,
+> > then some of the goto's above should goto other labels which disable and
+> > unregister.
+> 
+> No it's not but it's massive pain to keep everything coherent when it
+> fails ;)
 >
 
-So, I think we need some refactoring of the current tests which should
-come in separate patches at the start of a series and then we need 
-separate patches adding support to the framework to test landing pads
-work if we don't have all the support we need already, and then we
-need a complete FWFT landing pad test which not only checks the SBI
-interface works, but that the feature is actually getting enabled
-and disabled.
+asserts/aborts are fine if we can't recover easily, but then we should
+move the SSE tests out of the main SBI test into its own test so we
+don't short-circuit all other tests that may follow it.
+
+...
+> >> +		/* Be sure global events are targeting the current hart */
+> >> +		sse_global_event_set_current_hart(event_id);
+> >> +
+> >> +		sbi_sse_register(event_id, event_arg);
+> >> +		value = arg->prio;
+> >> +		sbi_sse_write_attrs(event_id, SBI_SSE_ATTR_PRIORITY, 1, &value);
+> >> +		sbi_sse_enable(event_id);
+> > 
+> > No return code checks for these SSE calls? If we're 99% sure they should
+> > succeed, then I'd still check them with asserts.
+> 
+> I was a bit lazy here. Since the goal is *not* to check the event state
+> themselve but rather the ordering, I didn't bother checking them. As
+> said before, habndling error and event state properly in case of error
+> seemed like a churn to me *just* for testing. I'll try something better
+> as well though.
+> 
+
+We always want at least asserts() in order to catch the train when it
+first goes off the rails, rather than after it smashed through a village
+or two.
 
 Thanks,
 drew
