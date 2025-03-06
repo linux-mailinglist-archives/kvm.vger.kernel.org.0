@@ -1,130 +1,174 @@
-Return-Path: <kvm+bounces-40261-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40262-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E8C7A5522B
-	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 18:03:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F288BA55249
+	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 18:06:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1217A3A1DAC
-	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 17:02:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C205518833F1
+	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 17:03:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DD3726BD9F;
-	Thu,  6 Mar 2025 17:00:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7924925A35F;
+	Thu,  6 Mar 2025 17:03:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="iNTknRuK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FZIKrwjo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A52325BADC;
-	Thu,  6 Mar 2025 17:00:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DCD113635B
+	for <kvm@vger.kernel.org>; Thu,  6 Mar 2025 17:03:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741280436; cv=none; b=tcwfypwva6KiWO7I3rujXOMhwT/bcuUugCrus1rsctUKRTtrE7udm7DskXiZ7ei20GhKM803mjBs2cBlqvo04BK5/dz1lD9u2F1DTpPn9GYX1MM4PbBObQppz/g+EyWo0GGG3YfmRg2Aakeq44J3KRPdC7eMDeX2VPOcMyJXxfY=
+	t=1741280597; cv=none; b=g6l57ZrNqMtirxqVJcQySCzwscGP8bonRvBooE+sHuIzSoUid3m4uuAoDGORr3/fDyv+lTgdAKm5DHAuWY4xF53EcldAW7G3QSPy05AUDAvop8gqoZ5zdvKOX7JDTDcKdhi7J5Mqk/4z6/pbsmaTr9Uv2e3xEKZ/cD1HmXNxTqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741280436; c=relaxed/simple;
-	bh=CA3oS7yvpfmULftQdCN1MhnvUH4iqwV7t8JiQGZfNqg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S1dE/rQyx4cc3RBdtjczGehVO0aX5TvzlTCklmzGWOTPj5Fgr9Rsx7KfWcBjfJVemAVki+jFzfDSR+1YZOqXB1O7RxYU/oba61nXEu7WuNHCXxBKfRqUQZgE22Q3E5EiHy8yQSi4L17gZLknkz7h02O+XCPn1Rv2x2JNWc7daMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=iNTknRuK; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 24B8440E0216;
-	Thu,  6 Mar 2025 17:00:30 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id nxFP5hBSf08p; Thu,  6 Mar 2025 17:00:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1741280419; bh=yRS5zdx12qlghPTisegH/MGSTWiNp0ZxQFtA1dzgSCA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iNTknRuK8K0YaWLMKsbSE7wAsBn+qoAs+cnac+2DvCsqlfCH/sERig2gFVI1M1kjX
-	 VjELmvuYsSFT11HDtmwZoEnhliioJJ/OfeH1mqNo2lcg6/6DZhypTeHvRiLX6FLlFl
-	 S60Q1ssaFWb1BBd8EQ6GG1lJObJCygUFYlDUdW4uhTT+69wxNGpcEb9G8g+DaWX49b
-	 5LZH6lpb83J0wjbfeRU/KshRXJ7gxGjI33g5O4VFYJk5EMkGdFAkQrNEbJwlZ9Ro/H
-	 tpyeqR+7F6XOR1d3JZ8vWlJy6h61gPmjidntFdDQoGL8+O/NTTh7DcaW1xYczGf55t
-	 zfXC/16gAmErg2eewKpj7WmDneFcSkWoygk8lrW62aHAQUk8s7YyQVZXGb/MrbM4CH
-	 iHrvUjPaEJy33pAWsfOpPot0tdlZjbh7tvrR/OkRaQZV7qZnqZIEoIfgp0DvNDEjQD
-	 MGegSFaOjE5SgwIWY1tg7WaRPyOtwHKdfg170zLElbeiuWScJeLFHv+YDCWqRh9JEn
-	 E995j59TN8+AZRo9KvMpjv1jkZKveh9BDpFcGVvbxksXCyH32po7/4LkQ3y2tY+hbQ
-	 ySTjZgs4n5QJMgF5fGlbacB9+KY6IWVh2dQwRIyq5N04YM84nwS0eRnK3wIEeJ1MA8
-	 5KZ40LTgQLk49vGlN0AfzjmI=
-Received: from zn.tnic (pd95303ce.dip0.t-ipconnect.de [217.83.3.206])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 32F4A40E0214;
-	Thu,  6 Mar 2025 17:00:05 +0000 (UTC)
-Date: Thu, 6 Mar 2025 17:59:58 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Kim Phillips <kim.phillips@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Michael Roth <michael.roth@amd.com>,
-	Ashish Kalra <ashish.kalra@amd.com>,
-	"Nikunj A . Dadhania" <nikunj@amd.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH v4 1/2] x86/cpufeatures: Add "Allowed SEV Features"
- Feature
-Message-ID: <20250306165958.GGZ8nUjqVyJnw-JV0B@fat_crate.local>
-References: <20250306003806.1048517-1-kim.phillips@amd.com>
- <20250306003806.1048517-2-kim.phillips@amd.com>
+	s=arc-20240116; t=1741280597; c=relaxed/simple;
+	bh=1Pb1LWdB/fkOI6KagikZenEdrDGuxjTvfvQ7hM2eBTY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fwPWhjmO7EpObey15/h+z36DuaXOirNcM5rm6pT8U+t/gPxOhFRBbq/YLBW+EWWPdv6LL/Z0O+oUMXmG9wF9GCFPtt4AmaaAgo9EH8J5gIEscGpgEF2xqDsKH/Q0qA/snXVmlKd2sd2E3cG/FrYLLFI3naq/tvNPrIhgKYbVxF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FZIKrwjo; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-474e1b8c935so360811cf.0
+        for <kvm@vger.kernel.org>; Thu, 06 Mar 2025 09:03:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741280594; x=1741885394; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=4EMbFFYJ1L3mBwyzCsveQHnx4Pg8IDkCRue104JrOR8=;
+        b=FZIKrwjousfzhRVJ/NrOu10J9CY6wgy/9I/Owh1NlI3wly/SFSnMrLGN5n/39Nep9T
+         npFTGOMGg12uGqKLpel6QXSGhCZCrpZu/PW7szKD3/LIxYHb+/TMQIOdVrzHZf+iBJQZ
+         //DJGILeiPEThB+enYaGOTWyUXOmmuk7Fb63Y0OLlbsKrGnG8qSRN8ll5oj4IliiNwOD
+         9yi8HgaitD8gppDMqYClDACMzDawYcIa4QW9TCuTKjwYM2t0ijFG6KvCXg7x8QX4hwq/
+         7y05Y+hlfwvoh49XzzNVZ++AyLC+UOnxZZAeYHmuEIbcdYQ0EgB3w3M4EgHV+yH5ckeE
+         qWaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741280594; x=1741885394;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4EMbFFYJ1L3mBwyzCsveQHnx4Pg8IDkCRue104JrOR8=;
+        b=niDD0b2z4P/m/k3KwKfxKDoMdjDjLsE1p0YmNU0Um27Y1885Y18mu2budTt4trTFyg
+         uUMrvckZX0YJ+18SaaQNWtEVSgkUHbezck6t5j5fTI/RCJvac46OcejH3XX6XW6iNgtl
+         tviS5zfZyu7zgKpewprqdxPxpQVdDPKfEn172UOvpjxyY/SWvNkDOrc8nDE0Ru7OIQkk
+         UVpu+AgXb0romOzCi4KdzolNlk5sqvaoHazXTiEM52z0T3/PY2KpjM7i2a1DjZVVmOEW
+         sD+NZXNLOcW1Fca1rljidDI+FoBbKiW9jZz+19oW6o5vq7BEneSKwfF/el+MX9oi5SZk
+         jmQg==
+X-Gm-Message-State: AOJu0Ywkymj9dODkfkyNHyLEox+ToO+bQFSvLaLRSfu+Scgwnaifieer
+	icWaxigEPReU9vXsJEwx75jDIeLYs4XaDjWameeNpWX4mAYI6ada1crJFZDVv+WBoJ+6Q39LEr/
+	uGqbTiYGJ7z1rfa7TUJ/R0OJri8F5QGQu0xIf
+X-Gm-Gg: ASbGnctDo/Rii/q1O0OuGhITKat96YTpiK+Av3slb+J7xY72z8m12SKpZUQlbo/0EB6
+	Uxzn4a0CR7osBO3+mwBGWfYTCHmWPaTXGDbP/PahlgZRuj5AgwZDzlbpVJfBOTnGzgWHzsqO3Oy
+	2BJq48aJOZkZadriMPa0hlNmJK
+X-Google-Smtp-Source: AGHT+IFscbfbEjQWzgP/Q0C4syso7M3jLLXL+09eTxjQNjzcEV/iwWGPrS218eIlgnbeDmmG2MI/wuau2W2s73zwJUo=
+X-Received: by 2002:a05:622a:54f:b0:474:fb73:6988 with SMTP id
+ d75a77b69052e-4751b0f4665mr4590771cf.24.1741280593410; Thu, 06 Mar 2025
+ 09:03:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250306003806.1048517-2-kim.phillips@amd.com>
+References: <20250303171013.3548775-5-tabba@google.com> <diqzldtita25.fsf@ackerleytng-ctop.c.googlers.com>
+In-Reply-To: <diqzldtita25.fsf@ackerleytng-ctop.c.googlers.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 6 Mar 2025 17:02:34 +0000
+X-Gm-Features: AQ5f1JqLAreIPGMno5EAURP2cZNEzAHzAi-nToyKh39XwFjVasgUAzUIjnmcvsY
+Message-ID: <CA+EHjTycf+OgM1M+XuCqG=ypAGt+woEVHYj9t86o6Knf+Kk-EQ@mail.gmail.com>
+Subject: Re: [PATCH v5 4/9] KVM: guest_memfd: Handle in-place shared memory as
+ guest_memfd backed memory
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, mail@maciej.szmigiero.name, david@redhat.com, 
+	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
+	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
+	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
+	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
+	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
+	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
+	hughd@google.com, jthoughton@google.com, peterx@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Mar 05, 2025 at 06:38:04PM -0600, Kim Phillips wrote:
-> From: Kishon Vijay Abraham I <kvijayab@amd.com>
-> 
-> Add CPU feature detection for "Allowed SEV Features" to allow the
-> Hypervisor to enforce that SEV-ES and SEV-SNP guest VMs cannot
-> enable features (via SEV_FEATURES) that the Hypervisor does not
-> support or wish to be enabled.
-> 
-> Signed-off-by: Kishon Vijay Abraham I <kvijayab@amd.com>
-> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
-> Signed-off-by: Kim Phillips <kim.phillips@amd.com>
-> ---
->  arch/x86/include/asm/cpufeatures.h | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> index 8f8aaf94dc00..6a12c8c48bd2 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -454,6 +454,7 @@
->  #define X86_FEATURE_DEBUG_SWAP		(19*32+14) /* "debug_swap" SEV-ES full debug state swap support */
->  #define X86_FEATURE_RMPREAD		(19*32+21) /* RMPREAD instruction */
->  #define X86_FEATURE_SEGMENTED_RMP	(19*32+23) /* Segmented RMP support */
-> +#define X86_FEATURE_ALLOWED_SEV_FEATURES (19*32+27) /* Allowed SEV Features */
->  #define X86_FEATURE_SVSM		(19*32+28) /* "svsm" SVSM present */
->  #define X86_FEATURE_HV_INUSE_WR_ALLOWED	(19*32+30) /* Allow Write to in-use hypervisor-owned pages */
->  
-> -- 
+Hi Ackerley,
 
-I guess this goes thru Sean:
+On Thu, 6 Mar 2025 at 16:09, Ackerley Tng <ackerleytng@google.com> wrote:
+>
+> Fuad Tabba <tabba@google.com> writes:
+>
+> > For VMs that allow sharing guest_memfd backed memory in-place,
+> > handle that memory the same as "private" guest_memfd memory. This
+> > means that faulting that memory in the host or in the guest will
+> > go through the guest_memfd subsystem.
+> >
+> > Note that the word "private" in the name of the function
+> > kvm_mem_is_private() doesn't necessarily indicate that the memory
+> > isn't shared, but is due to the history and evolution of
+> > guest_memfd and the various names it has received. In effect,
+> > this function is used to multiplex between the path of a normal
+> > page fault and the path of a guest_memfd backed page fault.
+> >
+>
+> I think this explanation is a good summary, but this change seems to
+> make KVM take pages via guest_memfd functions for more than just
+> guest-private pages.
+>
+> This change picks the guest_memfd fault path as long as the memslot has
+> an associated guest_memfd (kvm_slot_can_be_private()) and gmem was
+> configured to kvm_arch_gmem_supports_shared_mem().
+>
+> For shared accesses, shouldn't KVM use the memslot's userspace_addr?
+> It's still possibly the same mmap-ed guest_memfd inode, but via
+> userspace_addr. And for special accesses from within KVM (e.g. clock),
+> maybe some other changes are required inside KVM, or those could also
+> use userspace_addr.
 
-Acked-by: Borislav Petkov (AMD) <bp@alien8.de>
+The reason is that, although it does have a userspace_addr, it might
+not actually be mapped. We don't require that shared memory be mapped.
 
--- 
-Regards/Gruss,
-    Boris.
+Cheers,
+/fuad
 
-https://people.kernel.org/tglx/notes-about-netiquette
+
+> You mentioned that pKVM doesn't use
+> KVM_GENERIC_MEMORY_ATTRIBUTES/mem_attr_array, so perhaps the change
+> required here is that kvm_mem_is_private() should be updated to
+> kvm_slot_can_be_private() && whatever pKVM uses to determine if a gfn is
+> private?
+>
+> So perhaps kvm_arch_gmem_supports_shared_mem() should be something like
+> kvm_arch_gmem_use_guest_memfd(), where x86 would override that to use
+> mem_attr_array if CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES is selected?
+>
+> >
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  include/linux/kvm_host.h | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 2d025b8ee20e..296f1d284d55 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -2521,7 +2521,8 @@ static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+> >  #else
+> >  static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+> >  {
+> > -     return false;
+> > +     return kvm_arch_gmem_supports_shared_mem(kvm) &&
+> > +            kvm_slot_can_be_private(gfn_to_memslot(kvm, gfn));
+> >  }
+> >  #endif /* CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES */
 
