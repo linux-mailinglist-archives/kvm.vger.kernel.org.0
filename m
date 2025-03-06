@@ -1,209 +1,180 @@
-Return-Path: <kvm+bounces-40247-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40248-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8A46A54EBF
-	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 16:18:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA008A54F79
+	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 16:48:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F223E7A65D3
-	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 15:17:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F27413B0D1D
+	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 15:48:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F7851FCD05;
-	Thu,  6 Mar 2025 15:18:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDF3720E715;
+	Thu,  6 Mar 2025 15:48:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="ThV/m0mh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xTyzc5Up"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E02B8624B
-	for <kvm@vger.kernel.org>; Thu,  6 Mar 2025 15:18:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E75717995E
+	for <kvm@vger.kernel.org>; Thu,  6 Mar 2025 15:48:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741274315; cv=none; b=X3ctMFZJjD+W7McRjKSAEkN3UE7lGqddFzozevJg9fIbq/O9d3ZHsSRqgnDWpZIkdhB/1gK0wnF14fghJqIU42bJcizZ9sol/qe+wk21EJKzCTxrw8G/KbiDUEReuoAIzTqOYfiprd3m2uDr5lMcaMpah1KA1KEoCzSMyCr8toE=
+	t=1741276099; cv=none; b=uBNXysCBE5yBXrQIhlYYH7Na/uhS73KblGM/EMOxKwF+mcHjYLmFcpdC3g0WQcqEtH0bUf5NtftZN4vjAtjjBm3C+cvUOMNPc8PPwSyU7NsgrKdNGMbwyZRdCTeBVe1XqTqvbG2f1smxU4DYLnF7PWuDqsdqLscZyBpDQU4Keyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741274315; c=relaxed/simple;
-	bh=wAOiTA+tP/5T263ZZxCvXZJv5v3ESCZNrC/EHFNcUm8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VfyAZcfbPisWyswWAjGdRGndtk61duyHQSZLuYT+sMabmAzuLWuLYr1iaXlP56yKrB2p0euZEWqCf3XY9sFiWEGcn1IG1PaImJ7CznjHpkdV6yj0Cgxq+UyzcZ/1jYdQw2/lzJ696YANibeuvpYlXlDe4RJIVsy/zyA5irEPO+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=ThV/m0mh; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-39129fc51f8so734919f8f.0
-        for <kvm@vger.kernel.org>; Thu, 06 Mar 2025 07:18:31 -0800 (PST)
+	s=arc-20240116; t=1741276099; c=relaxed/simple;
+	bh=sVoNZXopYL7XJzNhGxf33zifIINRMsLYqPItqDsaZWw=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=A6M4qM75nTO4B0kZYrMFnW9KLxA7UkJBPq5koTS4nuA5fYEooLfrfs0/2/gEu4+s3tON2l/xj4atQY+Ekd0hxCPw9MJc6uYndG26fukw7oe23HK0ZI9inr0GVK32R6Zrv27bNoDKLE/C1gARf3AYL/Kpu4BugPKj0aDaD3ByPL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xTyzc5Up; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ff7aecba07so76603a91.2
+        for <kvm@vger.kernel.org>; Thu, 06 Mar 2025 07:48:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1741274310; x=1741879110; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IIXC/E5OlKrDuk9g0mFflx2OTFt9jKupk5/WwhMtXpU=;
-        b=ThV/m0mhLSRJACcRGmHyTCPya52PyE7xjUEC3H+w6VT7B7tZFz/Q0xlsC0vP1rtub/
-         p+TgUgi/2zuHDxDVPXFk6d+kw2bVhAPATyiPCOBeFcbbCA5dgnSSa2raxeMw82o5s/7k
-         DVqDyPyeFjAnrYOhS5xK37ey5KZqXRqXmIMig++ClyXVm5vKIgpWDN2bUees+taura5j
-         RZy/OexgxngbdHwkJb978enoQdkl0vlNJY/MSJpVrVBYjNtowwUD3x931gDFyGzZJfwS
-         BIannOr+vv6rHU4ru55eULSimakHVhOLKkGBhwdW0DkgndNhoiCWS0PPdpqZ7V7hc4Jj
-         hZ7A==
+        d=google.com; s=20230601; t=1741276097; x=1741880897; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=WN5n6yCvcOa+zM2USNjiOsagVXAB7Ffxj7AYdaUTQwM=;
+        b=xTyzc5UpGVNhFtnyK7H5YbSq+jqYuvkR3ynLI4dWF+YZBpqdHwyOZy5tDy6yU44/fE
+         BYp3eNn01C5kJFcutUvtJ2zs424XGHN56tG8QeIPg1+XvkdBP6kIVWpHaEH5Ta2qmJBr
+         fL0noPFCqkql9bJBp3GXQzvS5XmTU24isbKDMYiXjdpMsZhge10ViIPZrCS7T/P82Ywx
+         dDs3ui3zzqq0dDs/xQCA1ZIGI/v8ibKSG4ZPTrPXOmpw4uANo5mwsohCpknseQK7ZXle
+         usLon1f0qqEwsMnVTkSawoiOE71S0KvVNT5sWqJEEKefbr4PNdZOdXljH472EcQYtQkE
+         NEDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741274310; x=1741879110;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1741276097; x=1741880897;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IIXC/E5OlKrDuk9g0mFflx2OTFt9jKupk5/WwhMtXpU=;
-        b=ie9Wzca9+5jM6zls19e641AtID1+qZda9zdv8wdQNLk25YmB3nuNuh7Ss/sVUVWaZy
-         wZC+Ins8lJO7WQJqBt2BPhLdIliC7bRfBLrRswhddIi3IUcOra8IQjCa65czZ4Lj/afG
-         fHckpdQW1xb8DzCVQwkNwRY6GyWCXnpMmntvPPagQlBakYwdr1z+usoi/ZsxuKYwRJ0t
-         E9T27rk/m1iuHKY5tQqyqpIunRZFE1leYYXcJN9T+7Zj390rZyqSbdL8U8NeqJ7n7N4J
-         yx5yZtibLNTYOjBnimx8MpDIVUCEWgDhzzO4zX6xhaiEVzgL/yabgmWlT/UQezlPRD3x
-         TNDg==
-X-Gm-Message-State: AOJu0YwoEJs1DhAl8dtCvHkpxzuuLbephnr02qnlnipyOQYMBkkwAQ17
-	0ADWnqNNfxmU/RCuJtgS4zvCmVsD5VRJtJJ6wQ/cVD/8C07C9bvzvmPVCJg+LM4=
-X-Gm-Gg: ASbGncvczf+nOLccXpI6tEm99OVaYlVwvkBhmuXOuGLcHcXoDgd51k42yyo03GnCzOm
-	WSCHJxy1eZJFVxMGclNJAVp6VzPaABFaq4EbA387YWZS0iMht/lqP0yNLBvARntSo7MTDqP2kgo
-	tSSTA1GXdToYccGgWGK1VsucZ1GrmlWiPA1IhZY0z5+W8JFhvzbmIUc5Tzy6p69eFX860uOWAvh
-	6TMdpXuEFtJ7JRfOf+NAGm4Qbc+b0LW7VF4EulTwGsguP4C0f67pvpeiq+gKiyPFmoijO5JzoD5
-	WkGpFdBH/i/8LAW35S9XD89+ZHrdr07qPOSm/Q4qe+La6KmRlfZwZ3aPuz+YPZKZGX43TTiNQk1
-	eG49PE6rfGv1nzQ==
-X-Google-Smtp-Source: AGHT+IFCi0fjVLMkviMnUgPgVJ0nwO5mlZi4c0s50RoU2djU+cKhatevNgFUGeCsxJR3YwcKPVFt0A==
-X-Received: by 2002:a5d:47ce:0:b0:390:e311:a8c7 with SMTP id ffacd0b85a97d-3911f72769cmr5208010f8f.5.1741274310512;
-        Thu, 06 Mar 2025 07:18:30 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:e17:9700:16d2:7456:6634:9626? ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912c0193bfsm2348419f8f.55.2025.03.06.07.18.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Mar 2025 07:18:30 -0800 (PST)
-Message-ID: <95a72c57-40ff-417a-a8a2-065554eda5ec@rivosinc.com>
-Date: Thu, 6 Mar 2025 16:18:29 +0100
+        bh=WN5n6yCvcOa+zM2USNjiOsagVXAB7Ffxj7AYdaUTQwM=;
+        b=vCB3CkXeFRziQ8vL73T9+OvLZNYh1QGlnduDJDVF2SS42/HhMHt0zbOu7tPyRHViY6
+         uB44Xb/u+kxKVradaBkDUyi/Vu1RSRcds9KM3HJFvf2BF1H/p4g3yKGzAz40uJSbmHR9
+         saKwyaQL+t26PA5t/sf/H/p5nHjFH0O1DT73MVD9QijqrsaSop2xkffRc16i9ezu2VJo
+         ZzD7MRIU7yE5xv6uT/Bb1mNbmSoGc4xBfbgeGH3ZBCwmjG86DzvP0YcFhUMNGYnCpPzo
+         mInTwC5+tRrvjhIvWQVRBh5IjYsqWv6NAqw5Dq4VsdH692ZfIVaE5RAWByZhWWh+BzjR
+         3dPw==
+X-Forwarded-Encrypted: i=1; AJvYcCWd+9nTL44QI3c7bc/wfrueb4vY3ED8cjWSo19fc18tIiYXt9IzdV28M+cpRyLvGO1HdMw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQAhO0Cr4114N0qQsWjLiKnBJDZqJBdZWdBSWpuAbRxMYdLRgP
+	FGnPse22gOZZHMJ1VFronrJNGEFmpNZ0YssXy6gUapYjLTa6NpDd9ypOA6zDglxq/29FmdE/SOH
+	wKa0fm931p6tGb5wKubX1gw==
+X-Google-Smtp-Source: AGHT+IGIpKIz67HLCauppdWF07A7kBE16hQeQDJtBmIWPGn65BdGHarhO9hkIPwx1gqSyqaBuxIwDSrAUaXKDp4m4A==
+X-Received: from pjbqa14.prod.google.com ([2002:a17:90b:4fce:b0:2fa:1fac:2695])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:4a87:b0:2ff:682b:b759 with SMTP id 98e67ed59e1d1-2ff682bb96amr4351705a91.7.1741276096694;
+ Thu, 06 Mar 2025 07:48:16 -0800 (PST)
+Date: Thu, 06 Mar 2025 15:48:15 +0000
+In-Reply-To: <5c394c80-bb2b-4f9c-9b76-78b0696fa316@redhat.com> (message from
+ David Hildenbrand on Fri, 28 Feb 2025 18:33:30 +0100)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v7 6/6] riscv: sbi: Add SSE extension tests
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- Andrew Jones <ajones@ventanamicro.com>, Anup Patel
- <apatel@ventanamicro.com>, Atish Patra <atishp@rivosinc.com>
-References: <20250214114423.1071621-1-cleger@rivosinc.com>
- <20250214114423.1071621-7-cleger@rivosinc.com>
- <20250227-93a15f012d9bda941ef44e38@orel>
- <d37dc38b-ba6d-48cd-8d23-9e2ce9c6581e@rivosinc.com>
- <20250306-5f8b0b45873648fa93beccc7@orel>
-Content-Language: en-US
-From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-In-Reply-To: <20250306-5f8b0b45873648fa93beccc7@orel>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Message-ID: <diqzo6yetb28.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [PATCH v4 04/10] KVM: guest_memfd: Add KVM capability to check if
+ guest_memfd is shared
+From: Ackerley Tng <ackerleytng@google.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: tabba@google.com, peterx@redhat.com, kvm@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org, 
+	willy@infradead.org, akpm@linux-foundation.org, xiaoyao.li@intel.com, 
+	yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org, 
+	amoorthy@google.com, dmatlack@google.com, isaku.yamahata@intel.com, 
+	mic@digikod.net, vbabka@suse.cz, vannapurve@google.com, 
+	mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com
+Content-Type: text/plain; charset="UTF-8"
 
+David Hildenbrand <david@redhat.com> writes:
 
-
-On 06/03/2025 16:15, Andrew Jones wrote:
-> On Thu, Mar 06, 2025 at 03:32:39PM +0100, Clément Léger wrote:
->>
->>
->> On 28/02/2025 18:51, Andrew Jones wrote:
-> ...
->>>> +	attr = SBI_SSE_ATTR_INTERRUPTED_FLAGS;
->>>> +	ret = sbi_sse_read_attrs(event_id, attr, 1, &prev_value);
->>>> +	sbiret_report_error(&ret, SBI_SUCCESS, "Save interrupted flags no error");
->>>> +
->>>> +	for (i = 0; i < ARRAY_SIZE(interrupted_flags); i++) {
->>>> +		flags = interrupted_flags[i];
->>>> +		ret = sbi_sse_write_attrs(event_id, attr, 1, &flags);
->>>> +		sbiret_report_error(&ret, SBI_SUCCESS,
->>>> +				    "Set interrupted flags bit 0x%lx value no error", flags);
->>>> +		ret = sbi_sse_read_attrs(event_id, attr, 1, &value);
->>>> +		sbiret_report_error(&ret, SBI_SUCCESS, "Get interrupted flags after set no error");
->>>> +		report(value == flags, "interrupted flags modified value ok: 0x%lx", value);
+> On 28.02.25 18:22, Fuad Tabba wrote:
+>> Hi Peter,
+>> 
+>> On Fri, 28 Feb 2025 at 08:24, Peter Xu <peterx@redhat.com> wrote:
 >>>
->>> Do we also need to test with more than one flag set at a time?
->>
->> That is already done a few lines above (see /* Restore full saved state */).
-> 
-> OK
-> 
->>
+>>> On Tue, Feb 18, 2025 at 05:24:54PM +0000, Fuad Tabba wrote:
+>>>> Add the KVM capability KVM_CAP_GMEM_SHARED_MEM, which indicates
+>>>> that the VM supports shared memory in guest_memfd, or that the
+>>>> host can create VMs that support shared memory. Supporting shared
+>>>> memory implies that memory can be mapped when shared with the
+>>>> host.
+>>>>
+>>>> Signed-off-by: Fuad Tabba <tabba@google.com>
+>>>> ---
+>>>>   include/uapi/linux/kvm.h | 1 +
+>>>>   virt/kvm/kvm_main.c      | 4 ++++
+>>>>   2 files changed, 5 insertions(+)
+>>>>
+>>>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>>>> index 45e6d8fca9b9..117937a895da 100644
+>>>> --- a/include/uapi/linux/kvm.h
+>>>> +++ b/include/uapi/linux/kvm.h
+>>>> @@ -929,6 +929,7 @@ struct kvm_enable_cap {
+>>>>   #define KVM_CAP_PRE_FAULT_MEMORY 236
+>>>>   #define KVM_CAP_X86_APIC_BUS_CYCLES_NS 237
+>>>>   #define KVM_CAP_X86_GUEST_MODE 238
+>>>> +#define KVM_CAP_GMEM_SHARED_MEM 239
 >>>
->>>> +	}
->>>> +
->>>> +	/* Write invalid bit in flag register */
->>>> +	flags = SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SDT << 1;
->>>> +	ret = sbi_sse_write_attrs(event_id, attr, 1, &flags);
->>>> +	sbiret_report_error(&ret, SBI_ERR_INVALID_PARAM, "Set invalid flags bit 0x%lx value error",
->>>> +			    flags);
->>>> +#if __riscv_xlen > 32
->>>> +	flags = BIT(32);
->>>> +	ret = sbi_sse_write_attrs(event_id, attr, 1, &flags);
->>>> +	sbiret_report_error(&ret, SBI_ERR_INVALID_PARAM, "Set invalid flags bit 0x%lx value error",
+>>> I think SHARED_MEM is ok.  Said that, to me the use case in this series is
+>>> more about "in-place" rather than "shared".
 >>>
->>> This should have a different report string than the test above.
->>
->> The bit value format does differentiate the printf though.
-> 
-> OK
-> 
-> ...
->>>> +	ret = sbi_sse_unregister(event_id);
->>>> +	if (!sbiret_report_error(&ret, SBI_SUCCESS, "SSE unregister no error"))
->>>> +		goto done;
->>>> +
->>>> +	sse_check_state(event_id, SBI_SSE_STATE_UNUSED);
->>>> +
->>>> +done:
+>>> In comparison, what I'm recently looking at is a "more" shared mode of
+>>> guest-memfd where it works almost like memfd.  So all pages will be shared
+>>> there.
 >>>
->>> Is it ok to leave this function with an event registered/enabled? If not,
->>> then some of the goto's above should goto other labels which disable and
->>> unregister.
->>
->> No it's not but it's massive pain to keep everything coherent when it
->> fails ;)
->>
-> 
-> asserts/aborts are fine if we can't recover easily, but then we should
-> move the SSE tests out of the main SBI test into its own test so we
-> don't short-circuit all other tests that may follow it.
-
-Oh yes I did not though of that. I could as well short circuit the sse
-event test themselves. Currently test function returns void but that
-could be handled more gracefully so that we don't break all other tests
-as well.
-
-> 
-> ...
->>>> +		/* Be sure global events are targeting the current hart */
->>>> +		sse_global_event_set_current_hart(event_id);
->>>> +
->>>> +		sbi_sse_register(event_id, event_arg);
->>>> +		value = arg->prio;
->>>> +		sbi_sse_write_attrs(event_id, SBI_SSE_ATTR_PRIORITY, 1, &value);
->>>> +		sbi_sse_enable(event_id);
+>>> That helps me e.g. for the N:1 kvm binding issue I mentioned in another
+>>> email (in one of my relies in previous version), in which case I want to
+>>> enable gmemfd folios to be mapped more than once in a process.
 >>>
->>> No return code checks for these SSE calls? If we're 99% sure they should
->>> succeed, then I'd still check them with asserts.
->>
->> I was a bit lazy here. Since the goal is *not* to check the event state
->> themselve but rather the ordering, I didn't bother checking them. As
->> said before, habndling error and event state properly in case of error
->> seemed like a churn to me *just* for testing. I'll try something better
->> as well though.
->>
-> 
-> We always want at least asserts() in order to catch the train when it
-> first goes off the rails, rather than after it smashed through a village
-> or two.
+>>> That'll work there as long as it's fully shared, because all things can be
+>>> registered in the old VA way, then there's no need to have N:1 restriction.
+>>> IOW, gmemfd will still rely on mmu notifier for tearing downs, and the
+>>> gmem->bindings will always be empty.
+>>>
+>>> So if this one would be called "in-place", then I'll have my use case as
+>>> "shared".
+>> 
+>> I understand what you mean. The naming here is to be consistent with
+>> the rest of the series. I don't really have a strong opinion. It means
+>> SHARED_IN_PLACE, but then that would be a mouthful. :)
+>
+> I'll note that Patrick is also driving it in "all shared" mode for his 
+> direct-map removal series IIRC.
+>
+> So we would have
+>
+> a) All private
+> b) Mixing of private and shared (incl conversion)
+> c) All shared
+>
+> "IN_PLACE" might be the wrong angle to look at it.
 
-Yeah sure ;) I'll try to do what I said before: short circuit the
-remaining SSE test for the event itself rather than aborting or
-splitting the tests.
+How about something like "supports_mmap" or "mmap_capable"?
 
-Thanks,
+So like
 
-Clément
++ KVM_CAP_GMEM_MMAP
++ CONFIG_KVM_GMEM_MMAP_CAPABLE
++ kvm_arch_gmem_mmap_capable()
 
-> 
-> Thanks,
-> drew
+I'm just trying to avoid the use of shared, which could already mean 
+
++ shared between processes
++ shared between guest and host
 
 
