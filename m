@@ -1,79 +1,88 @@
-Return-Path: <kvm+bounces-40236-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40237-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A1D4A54756
-	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 11:07:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5549EA547A3
+	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 11:23:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 383617AA893
-	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 10:04:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B40587A5BCF
+	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 10:22:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67D951FCFE6;
-	Thu,  6 Mar 2025 10:04:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94B97200100;
+	Thu,  6 Mar 2025 10:23:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="qGTdoaH9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QM3rgURe"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B50631F5837
-	for <kvm@vger.kernel.org>; Thu,  6 Mar 2025 10:04:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1735218A6B5
+	for <kvm@vger.kernel.org>; Thu,  6 Mar 2025 10:23:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741255494; cv=none; b=mKCBZcugGSazb6gtChK3MMXYepyzOeMdAemt260PKvVHTxWxd5IZhr/tK17R2gSppv2u+euxxVMVPsUL5/YH8rhiybgtxkV6AGieGmrunIoDIKdO9vB+cJZy/ARqje1T9gMeqSfcaRkdJOcFvYmwRZpMNThVPtnAzmIhc3ndzxA=
+	t=1741256623; cv=none; b=WZ4NBi2f9wHlzXnyA1mEjzqSE9JPvhZtL85Z74w7lRgcgtM4kRnxRMx0n80NII9GrO4dsD1GWXxjoYZcbsoMzNOXq9lXLtWz/heoFTyyYPP1ugfm0cVrDBdkXiBLfqYlE3xRUJGO0UB+mNSoeihJS/zZd5h2EC+0Ng35fWdztOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741255494; c=relaxed/simple;
-	bh=OJ1F1NNuv0qdblhg0g7KpAL8Lo0GxQCjM+N402Kt5SM=;
+	s=arc-20240116; t=1741256623; c=relaxed/simple;
+	bh=j+Rx427sErw5e7XRoSkAgNBdWS17qNHBwXls0pAiPC0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X89unsD19qYfGGZB8RGt4xU78ECQBZBG4ITb0FqKipXq1fHyxfNd2cr6rm1v1qNoDPwrIUi73ZPOrNaNk57mVEzlaLRIybPYV1utXJ1NaQZTpV3Nkd1BrvaUtd+ZtTnXuNFj4bl/puT9Ay1dXbb7vJc6N5ZUtfB7dFm8RJLVDDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=qGTdoaH9; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-388cae9eb9fso223996f8f.3
-        for <kvm@vger.kernel.org>; Thu, 06 Mar 2025 02:04:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1741255490; x=1741860290; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Jg/9qKNjUh6WHo1qn9JaxEqIXukmDLBRfUYray1VLno=;
-        b=qGTdoaH9yYqHy2y0SWTN50+wJy+zZM/k+9n2lfg79zV7f7LN0HdYtr5lb67LCGplMd
-         UNtG2xn6KCg7jh/Fk/EkWJAZlhHD3XA4NeAmR0yWdmbrfsMSqlcNBmpVUczhBrelMPPQ
-         J645l327njADznZSgjVkKJNpJdEHEHLG4cCrW1dke8xFuBK3KO8e2uCy8oPL+8bySjEc
-         VPaKSK0yMuALmN/EcVo4HRhH3QI64Qmyv1BhEhI4zAr8+TDrvxeK7JTAtdnjTP/2/IrH
-         wEvYNgvoxCBEcl6NHTkQDv7gdt9VCEIaqjm0DY3YGeU2prt3v+w7+zCJPnTJ8I3VlLBe
-         Q9Tg==
+	 In-Reply-To:Content-Type; b=FyXa+BSWSFupt0XNIDYQaQIW+3K5oSdAA3KVj0N69ZHFn/+8oWKuDFqKRPOuBOVBtQxPRL8n/o4PY5pqZyat8yPSqcfllDSHHoBFcoaKKzCTYjn+7xVnW7AXRQi/C14MgDp6WjIPxhST4PhImhOxc3ig8RiFbctViJJOiYEVoJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QM3rgURe; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741256620;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=ePG7U3aar3vY5ktuUAGH2EdVtVOLwbBJOXDd+7DUuto=;
+	b=QM3rgURejY/8Xcp3Oq0+ZzlMc1yR5EcevXC1B5PZ9dGPA5w/Dp9kxKmb0mGWD3LVLhJijC
+	4X8JNVq89L0jVJ9Sif1ZhsmWieyNp9ruDR4kKMYdHju5Ki/Igg1bsfKfIoAGZIXZf+dJlN
+	o51icC/k4XoqUol1S9nTbEx04BgYBWY=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-633-m_vI-_78OSiBzA_a-5ps7A-1; Thu, 06 Mar 2025 05:23:34 -0500
+X-MC-Unique: m_vI-_78OSiBzA_a-5ps7A-1
+X-Mimecast-MFC-AGG-ID: m_vI-_78OSiBzA_a-5ps7A_1741256613
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3912b048ed2so267093f8f.0
+        for <kvm@vger.kernel.org>; Thu, 06 Mar 2025 02:23:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741255490; x=1741860290;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jg/9qKNjUh6WHo1qn9JaxEqIXukmDLBRfUYray1VLno=;
-        b=ukFHRt3NX7uP4z+FNDHQxA1L4kQiXsAViqYZ9XE21kz+nl/YVu2XHVvrML/JRmC0Ex
-         mLr8TAOoztiAzCHwUnv6EXhNv5iEcTzo5pDNwqnEVBrkNPrBppClH4XWwnA/d9EXG8yl
-         mISni560wLEaNA/xb4YbxuquuwkuX/vaSeFm28F/wyWcsBrm5v69jd0+NsdAaaiLMqK4
-         myfWwBmjnynTlsUjxt6ybemcRa01CQnrrsk7CSAqwgAiSWWb0smAl5XERy+A9OUAwZnp
-         B684qV4yWqguIvKlZhf1ff8yZLoKoBLP6DiXM5zjF81Q2Hd4a8YRuWhEAK3wARfsgvdo
-         8XTA==
-X-Gm-Message-State: AOJu0YyYshbstmJ03tsA51+mX/pm8ksfGojPgib8ylVGhn1VPWCx3ZiA
-	AfMAcYZYtWRr5lhftEqcnCJIT+tGLI1i1Vko5BM598XGMxZI9PorH71GMtTHjpU=
-X-Gm-Gg: ASbGncuE4LX9rMAY3oSttmaXBDoUKYzTz9gxUJOcSLkEi9C+n8W4nz2rQXFY41I4ExN
-	gTEIUNauOo3Xua1smMaEPiwzMFe9XTNVwNBvuhupIJUiQfoVY0+OEsrhbI4Rafv9vZZiFrOUnM+
-	xSZgc4vY/dTS9RpGAIjNEaOoQQCZS0vm2OGfIfpGf+cgx8NBkYZTJDyMV0Ai/2Y6fYt3zBxyYF8
-	juKpbAKC84m8ExT+JO/MpKX6JbiZEnMJmsI11LMtlABJ2/VRyV+rf/zdP2Z4V0HLU0iKd2is5zv
-	wOXFcrslvuCeIgHml9emVpS7QpAstd2J8VcNMbEBjYoaCdggRavhEHF89Lea2GGiBddJ3aIf6++
-	x/oZSYWHzplhTqw==
-X-Google-Smtp-Source: AGHT+IFX0IXxho0unDC4q8aK6YSd5PkSQ/Xue8YFaXRzGcMhz5iFhT85EXUQtiogersbAPprxcqsgw==
-X-Received: by 2002:a5d:5f4a:0:b0:391:2fc9:8198 with SMTP id ffacd0b85a97d-3912fc986a5mr235428f8f.16.1741255489611;
-        Thu, 06 Mar 2025 02:04:49 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:e17:9700:16d2:7456:6634:9626? ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43bdd8c3d61sm14735945e9.15.2025.03.06.02.04.48
+        d=1e100.net; s=20230601; t=1741256613; x=1741861413;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ePG7U3aar3vY5ktuUAGH2EdVtVOLwbBJOXDd+7DUuto=;
+        b=AD23Rp/ugRb5cpWJ4ZbkMPSQlhN7mXJtL5iDepQDoE1uqRW8zAmterc3mLCoLSX14Q
+         k1N67+sumjqhwcb3OxmWuvSrkz6gyUpWPHtk6GiSIYkYLTOmi8c9P587DtRjm/dZRtcv
+         vy33m0b6t64ogAfLpubk0paBCq6Hv30Zu/yCfle/x9R5/AIbCSJtcLZn5ChSI7sMqiij
+         2EE4/U1dyql8ZfsB2AkDDZ/uVlvaBoaCseC/mooDIbkJ36E8tELleKqUdu/9ES89SDuS
+         tKudIxF3PxZtvnEheeQXlNVOt9UgvSIueBUWo2R+DF4izsOdXxVQGbxa3uz7oJJglW58
+         ZGJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVgqp5bXgX8Is54K9kvILkYCK4GoNtfvdAYNJICj+cUk4AFzZlvP5ZBUjmYpSNGP/MrnNg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyy0Dsbz4XhgbqgMNXkK+509ZmAiIePqq6Y0FJuRqTSez9YAwu3
+	iNvATJl/U182OhprGqOZyHKxzY3JsrtWGKBAmjqDZvrrjsjBiWhgyBnRRySuaqGpUu9CMk/sqZ+
+	PpyN9ah4Ff7bwvGbTpYiNztwMNbq45igaaSXO/N/gecvGIIKoGQ==
+X-Gm-Gg: ASbGncu7A8WLSjckYMq6ez2+wbYCuw7A7x2DPsxjoENR75m05YYL8mayjYTqpX/BXwh
+	8Vwi42s9m+9lbI3WV+xPWxiGzMgdc0scGzju9BzaKNX53mFZ9roQQhkugxWtKHI8HgvUkj5y85x
+	w9n9gy87eF4jfEQ4IexHW7m7ZaoksO6Ch1zfw8BG03QsLBgfziJC1amqamKCBawWic2W2gJryDK
+	mucJBcsQkN82SnhuRNDYWa2gfS7UIskDLEICzraMyg+o1MWSriNI1Xud0botgHBjn4k6qqyHOd5
+	7q57WMCAJxZOT3b8WwEo3Vr2zXYuSg60P/27EytTvirswUpRV+u/n4EzdRtFd4nv0bn3nU/sRIB
+	GJknzps27c9uY7SzpeymurJLldXztRu1+zBQdUU3EoOg=
+X-Received: by 2002:a5d:6da7:0:b0:38f:2766:759f with SMTP id ffacd0b85a97d-3911f7a8406mr5682437f8f.41.1741256613175;
+        Thu, 06 Mar 2025 02:23:33 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEocobemWznRTQwuqIfwXuQoFw5IRLgHoYcd/Sn4/ZqtXJzxOan6u8q9zJOyXNihXoLVxnD9Q==
+X-Received: by 2002:a5d:6da7:0:b0:38f:2766:759f with SMTP id ffacd0b85a97d-3911f7a8406mr5682424f8f.41.1741256612835;
+        Thu, 06 Mar 2025 02:23:32 -0800 (PST)
+Received: from ?IPV6:2003:cb:c74d:4400:2f98:9b35:6822:ce54? (p200300cbc74d44002f989b356822ce54.dip0.t-ipconnect.de. [2003:cb:c74d:4400:2f98:9b35:6822:ce54])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912c102b62sm1546653f8f.84.2025.03.06.02.23.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Mar 2025 02:04:48 -0800 (PST)
-Message-ID: <ebc85af2-31b0-4b7c-bce6-f90f1969a784@rivosinc.com>
-Date: Thu, 6 Mar 2025 11:04:48 +0100
+        Thu, 06 Mar 2025 02:23:32 -0800 (PST)
+Message-ID: <c60e60a2-07ed-4692-8952-c125c34122f8@redhat.com>
+Date: Thu, 6 Mar 2025 11:23:29 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,390 +90,98 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v7 5/6] lib: riscv: Add SBI SSE support
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- Andrew Jones <ajones@ventanamicro.com>, Anup Patel
- <apatel@ventanamicro.com>, Atish Patra <atishp@rivosinc.com>
-References: <20250214114423.1071621-1-cleger@rivosinc.com>
- <20250214114423.1071621-6-cleger@rivosinc.com>
- <20250227-a28f41972a73e8269d26b461@orel>
+Subject: Re: [PATCH v4 1/1] KVM: s390: pv: fix race when making a page secure
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+ frankja@linux.ibm.com, borntraeger@de.ibm.com, nrb@linux.ibm.com,
+ seiden@linux.ibm.com, nsg@linux.ibm.com, schlameuss@linux.ibm.com,
+ hca@linux.ibm.com
+References: <20250304182304.178746-1-imbrenda@linux.ibm.com>
+ <20250304182304.178746-2-imbrenda@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
-From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-In-Reply-To: <20250227-a28f41972a73e8269d26b461@orel>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20250304182304.178746-2-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+>   /**
+> - * make_folio_secure() - make a folio secure
+> + * __make_folio_secure() - make a folio secure
+>    * @folio: the folio to make secure
+>    * @uvcb: the uvcb that describes the UVC to be used
+>    *
+> @@ -243,14 +276,13 @@ static int expected_folio_refs(struct folio *folio)
+>    *         -EINVAL if the UVC failed for other reasons.
+>    *
+>    * Context: The caller must hold exactly one extra reference on the folio
+> - *          (it's the same logic as split_folio())
+> + *          (it's the same logic as split_folio()), and the folio must be
+> + *          locked.
+>    */
+> -int make_folio_secure(struct folio *folio, struct uv_cb_header *uvcb)
+> +static int __make_folio_secure(struct folio *folio, struct uv_cb_header *uvcb)
+
+One more nit: -EBUSY can no longer be returned from his function, so you 
+might just remove it from the doc above.
 
 
+While chasing a very weird folio split bug that seems to result in late 
+validation issues (:/), I was wondering if __gmap_destroy_page could 
+similarly be problematic.
 
-On 27/02/2025 17:03, Andrew Jones wrote:
-> On Fri, Feb 14, 2025 at 12:44:18PM +0100, Clément Léger wrote:
->> Add support for registering and handling SSE events. This will be used
->> by sbi test as well as upcoming double trap tests.
->>
->> Signed-off-by: Clément Léger <cleger@rivosinc.com>
->> ---
->>  riscv/Makefile          |   2 +
->>  lib/riscv/asm/csr.h     |   1 +
->>  lib/riscv/asm/sbi-sse.h |  48 +++++++++++++++++++
->>  lib/riscv/sbi-sse-asm.S | 103 ++++++++++++++++++++++++++++++++++++++++
->>  lib/riscv/asm-offsets.c |   9 ++++
->>  lib/riscv/sbi-sse.c     |  84 ++++++++++++++++++++++++++++++++
->>  6 files changed, 247 insertions(+)
->>  create mode 100644 lib/riscv/asm/sbi-sse.h
->>  create mode 100644 lib/riscv/sbi-sse-asm.S
->>  create mode 100644 lib/riscv/sbi-sse.c
->>
->> diff --git a/riscv/Makefile b/riscv/Makefile
->> index 02d2ac39..ed590ede 100644
->> --- a/riscv/Makefile
->> +++ b/riscv/Makefile
->> @@ -43,6 +43,8 @@ cflatobjs += lib/riscv/setup.o
->>  cflatobjs += lib/riscv/smp.o
->>  cflatobjs += lib/riscv/stack.o
->>  cflatobjs += lib/riscv/timer.o
->> +cflatobjs += lib/riscv/sbi-sse-asm.o
->> +cflatobjs += lib/riscv/sbi-sse.o
->>  ifeq ($(ARCH),riscv32)
->>  cflatobjs += lib/ldiv32.o
->>  endif
->> diff --git a/lib/riscv/asm/csr.h b/lib/riscv/asm/csr.h
->> index 16f5ddd7..389d9850 100644
->> --- a/lib/riscv/asm/csr.h
->> +++ b/lib/riscv/asm/csr.h
->> @@ -17,6 +17,7 @@
->>  #define CSR_TIME		0xc01
->>  
->>  #define SR_SIE			_AC(0x00000002, UL)
->> +#define SR_SPP			_AC(0x00000100, UL)
->>  
->>  /* Exception cause high bit - is an interrupt if set */
->>  #define CAUSE_IRQ_FLAG		(_AC(1, UL) << (__riscv_xlen - 1))
->> diff --git a/lib/riscv/asm/sbi-sse.h b/lib/riscv/asm/sbi-sse.h
->> new file mode 100644
->> index 00000000..ba18ce27
->> --- /dev/null
->> +++ b/lib/riscv/asm/sbi-sse.h
->> @@ -0,0 +1,48 @@
->> +/* SPDX-License-Identifier: GPL-2.0-only */
->> +/*
->> + * SBI SSE library interface
->> + *
->> + * Copyright (C) 2025, Rivos Inc., Clément Léger <cleger@rivosinc.com>
->> + */
->> +#ifndef _RISCV_SSE_H_
->> +#define _RISCV_SSE_H_
->> +
->> +#include <asm/sbi.h>
->> +
->> +typedef void (*sbi_sse_handler_fn)(void *data, struct pt_regs *regs, unsigned int hartid);
->> +
->> +struct sbi_sse_handler_arg {
->> +	unsigned long reg_tmp;
->> +	sbi_sse_handler_fn handler;
->> +	void *handler_data;
->> +	void *stack;
->> +};
->> +
->> +extern void sbi_sse_entry(void);
->> +
->> +static inline bool sbi_sse_event_is_global(uint32_t event_id)
->> +{
->> +	return !!(event_id & SBI_SSE_EVENT_GLOBAL_BIT);
->> +}
->> +
->> +struct sbiret sbi_sse_read_attrs_raw(unsigned long event_id, unsigned long base_attr_id,
->> +				     unsigned long attr_count, unsigned long phys_lo,
->> +				     unsigned long phys_hi);
->> +struct sbiret sbi_sse_read_attrs(unsigned long event_id, unsigned long base_attr_id,
->> +				 unsigned long attr_count, unsigned long *values);
->> +struct sbiret sbi_sse_write_attrs_raw(unsigned long event_id, unsigned long base_attr_id,
->> +				      unsigned long attr_count, unsigned long phys_lo,
->> +				      unsigned long phys_hi);
->> +struct sbiret sbi_sse_write_attrs(unsigned long event_id, unsigned long base_attr_id,
->> +				  unsigned long attr_count, unsigned long *values);
->> +struct sbiret sbi_sse_register_raw(unsigned long event_id, unsigned long entry_pc,
->> +				   unsigned long entry_arg);
->> +struct sbiret sbi_sse_register(unsigned long event_id, struct sbi_sse_handler_arg *arg);
->> +struct sbiret sbi_sse_unregister(unsigned long event_id);
->> +struct sbiret sbi_sse_enable(unsigned long event_id);
->> +struct sbiret sbi_sse_hart_mask(void);
->> +struct sbiret sbi_sse_hart_unmask(void);
->> +struct sbiret sbi_sse_inject(unsigned long event_id, unsigned long hart_id);
->> +struct sbiret sbi_sse_disable(unsigned long event_id);
-> 
-> nit: I'd put disable up by enable to keep pairs together.
-> 
->> +
->> +#endif /* !_RISCV_SSE_H_ */
->> diff --git a/lib/riscv/sbi-sse-asm.S b/lib/riscv/sbi-sse-asm.S
->> new file mode 100644
->> index 00000000..5f60b839
->> --- /dev/null
->> +++ b/lib/riscv/sbi-sse-asm.S
->> @@ -0,0 +1,103 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +/*
->> + * RISC-V SSE events entry point.
->> + *
->> + * Copyright (C) 2025, Rivos Inc., Clément Léger <cleger@rivosinc.com>
->> + */
->> +#define __ASSEMBLY__
->> +#include <asm/asm.h>
->> +#include <asm/csr.h>
->> +#include <asm/asm-offsets.h>
-> 
-> nit: asm-offsets above csr if we want to practice alphabetical ordering.
-> 
->> +#include <generated/sbi-asm-offsets.h>
->> +
->> +.section .text
->> +.global sbi_sse_entry
->> +sbi_sse_entry:
->> +	/* Save stack temporarily */
->> +	REG_S sp, SBI_SSE_REG_TMP(a7)
->> +	/* Set entry stack */
->> +	REG_L sp, SBI_SSE_HANDLER_STACK(a7)
->> +
->> +	addi sp, sp, -(PT_SIZE)
->> +	REG_S ra, PT_RA(sp)
->> +	REG_S s0, PT_S0(sp)
->> +	REG_S s1, PT_S1(sp)
->> +	REG_S s2, PT_S2(sp)
->> +	REG_S s3, PT_S3(sp)
->> +	REG_S s4, PT_S4(sp)
->> +	REG_S s5, PT_S5(sp)
->> +	REG_S s6, PT_S6(sp)
->> +	REG_S s7, PT_S7(sp)
->> +	REG_S s8, PT_S8(sp)
->> +	REG_S s9, PT_S9(sp)
->> +	REG_S s10, PT_S10(sp)
->> +	REG_S s11, PT_S11(sp)
->> +	REG_S tp, PT_TP(sp)
->> +	REG_S t0, PT_T0(sp)
->> +	REG_S t1, PT_T1(sp)
->> +	REG_S t2, PT_T2(sp)
->> +	REG_S t3, PT_T3(sp)
->> +	REG_S t4, PT_T4(sp)
->> +	REG_S t5, PT_T5(sp)
->> +	REG_S t6, PT_T6(sp)
->> +	REG_S gp, PT_GP(sp)
->> +	REG_S a0, PT_A0(sp)
->> +	REG_S a1, PT_A1(sp)
->> +	REG_S a2, PT_A2(sp)
->> +	REG_S a3, PT_A3(sp)
->> +	REG_S a4, PT_A4(sp)
->> +	REG_S a5, PT_A5(sp)
->> +	csrr a1, CSR_SEPC
->> +	REG_S a1, PT_EPC(sp)
->> +	csrr a2, CSR_SSTATUS
->> +	REG_S a2, PT_STATUS(sp)
->> +
->> +	REG_L a0, SBI_SSE_REG_TMP(a7)
->> +	REG_S a0, PT_SP(sp)
->> +
->> +	REG_L t0, SBI_SSE_HANDLER(a7)
->> +	REG_L a0, SBI_SSE_HANDLER_DATA(a7)
->> +	mv a1, sp
->> +	mv a2, a6
->> +	jalr t0
->> +
->> +	REG_L a1, PT_EPC(sp)
->> +	REG_L a2, PT_STATUS(sp)
->> +	csrw CSR_SEPC, a1
->> +	csrw CSR_SSTATUS, a2
->> +
->> +	REG_L ra, PT_RA(sp)
->> +	REG_L s0, PT_S0(sp)
->> +	REG_L s1, PT_S1(sp)
->> +	REG_L s2, PT_S2(sp)
->> +	REG_L s3, PT_S3(sp)
->> +	REG_L s4, PT_S4(sp)
->> +	REG_L s5, PT_S5(sp)
->> +	REG_L s6, PT_S6(sp)
->> +	REG_L s7, PT_S7(sp)
->> +	REG_L s8, PT_S8(sp)
->> +	REG_L s9, PT_S9(sp)
->> +	REG_L s10, PT_S10(sp)
->> +	REG_L s11, PT_S11(sp)
->> +	REG_L tp, PT_TP(sp)
->> +	REG_L t0, PT_T0(sp)
->> +	REG_L t1, PT_T1(sp)
->> +	REG_L t2, PT_T2(sp)
->> +	REG_L t3, PT_T3(sp)
->> +	REG_L t4, PT_T4(sp)
->> +	REG_L t5, PT_T5(sp)
->> +	REG_L t6, PT_T6(sp)
->> +	REG_L gp, PT_GP(sp)
->> +	REG_L a0, PT_A0(sp)
->> +	REG_L a1, PT_A1(sp)
->> +	REG_L a2, PT_A2(sp)
->> +	REG_L a3, PT_A3(sp)
->> +	REG_L a4, PT_A4(sp)
->> +	REG_L a5, PT_A5(sp)
->> +
->> +	REG_L sp, PT_SP(sp)
->> +
->> +	li a7, ASM_SBI_EXT_SSE
->> +	li a6, ASM_SBI_EXT_SSE_COMPLETE
->> +	ecall
-> 
-> nit: Format asm with a tab after the operator like save/restore_context do.
-> 
->> +
->> diff --git a/lib/riscv/asm-offsets.c b/lib/riscv/asm-offsets.c
->> index 6c511c14..77e5d26d 100644
->> --- a/lib/riscv/asm-offsets.c
->> +++ b/lib/riscv/asm-offsets.c
->> @@ -4,6 +4,7 @@
->>  #include <asm/processor.h>
->>  #include <asm/ptrace.h>
->>  #include <asm/smp.h>
->> +#include <asm/sbi-sse.h>
-> 
-> nit: alphabetize
-> 
->>  
->>  int main(void)
->>  {
->> @@ -63,5 +64,13 @@ int main(void)
->>  	OFFSET(THREAD_INFO_HARTID, thread_info, hartid);
->>  	DEFINE(THREAD_INFO_SIZE, sizeof(struct thread_info));
->>  
->> +	DEFINE(ASM_SBI_EXT_SSE, SBI_EXT_SSE);
->> +	DEFINE(ASM_SBI_EXT_SSE_COMPLETE, SBI_EXT_SSE_COMPLETE);
->> +
->> +	OFFSET(SBI_SSE_REG_TMP, sbi_sse_handler_arg, reg_tmp);
->> +	OFFSET(SBI_SSE_HANDLER, sbi_sse_handler_arg, handler);
->> +	OFFSET(SBI_SSE_HANDLER_DATA, sbi_sse_handler_arg, handler_data);
->> +	OFFSET(SBI_SSE_HANDLER_STACK, sbi_sse_handler_arg, stack);
->> +
->>  	return 0;
->>  }
->> diff --git a/lib/riscv/sbi-sse.c b/lib/riscv/sbi-sse.c
->> new file mode 100644
->> index 00000000..bc4dd10e
->> --- /dev/null
->> +++ b/lib/riscv/sbi-sse.c
-> 
-> I think we could just put these wrappers in lib/riscv/sbi.c, but OK.
+We're now no longer holding the PTL while performing the operation.
 
-Hey Andrew,
+(not that that would explain the issue I am chasing, because 
+gmap_destroy_page() is never called in my setup)
 
-I'll move everything in sbi.c ;)
+-- 
+Cheers,
 
-> 
->> @@ -0,0 +1,84 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +/*
->> + * SBI SSE library
->> + *
->> + * Copyright (C) 2025, Rivos Inc., Clément Léger <cleger@rivosinc.com>
->> + */
->> +#include <asm/sbi.h>
->> +#include <asm/sbi-sse.h>
->> +#include <asm/io.h>
-> 
-> nit: alphabetize
-> 
->> +
->> +struct sbiret sbi_sse_read_attrs_raw(unsigned long event_id, unsigned long base_attr_id,
->> +				     unsigned long attr_count, unsigned long phys_lo,
->> +				     unsigned long phys_hi)
->> +{
->> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_READ_ATTRS, event_id, base_attr_id, attr_count,
->> +			 phys_lo, phys_hi, 0);
->> +}
->> +
->> +struct sbiret sbi_sse_read_attrs(unsigned long event_id, unsigned long base_attr_id,
->> +				 unsigned long attr_count, unsigned long *values)
->> +{
->> +	phys_addr_t p = virt_to_phys(values);
->> +
->> +	return sbi_sse_read_attrs_raw(event_id, base_attr_id, attr_count, lower_32_bits(p),
->> +				      upper_32_bits(p));
->> +}
->> +
->> +struct sbiret sbi_sse_write_attrs_raw(unsigned long event_id, unsigned long base_attr_id,
->> +				      unsigned long attr_count, unsigned long phys_lo,
->> +				      unsigned long phys_hi)
->> +{
->> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_WRITE_ATTRS, event_id, base_attr_id, attr_count,
->> +			 phys_lo, phys_hi, 0);
->> +}
->> +
->> +struct sbiret sbi_sse_write_attrs(unsigned long event_id, unsigned long base_attr_id,
->> +				  unsigned long attr_count, unsigned long *values)
->> +{
->> +	phys_addr_t p = virt_to_phys(values);
->> +
->> +	return sbi_sse_write_attrs_raw(event_id, base_attr_id, attr_count, lower_32_bits(p),
->> +				       upper_32_bits(p));
->> +}
->> +
->> +struct sbiret sbi_sse_register_raw(unsigned long event_id, unsigned long entry_pc,
->> +				   unsigned long entry_arg)
->> +{
->> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_REGISTER, event_id, entry_pc, entry_arg, 0, 0, 0);
->> +}
->> +
->> +struct sbiret sbi_sse_register(unsigned long event_id, struct sbi_sse_handler_arg *arg)
->> +{
-> 
->  phys_addr_t entry = virt_to_phys(sbi_sse_entry);
->  phys_addr_t arg = virt_to_phys(arg);
-> 
->  assert(__riscv_xlen > 32 || upper_32_bits(entry) == 0);
->  assert(__riscv_xlen > 32 || upper_32_bits(arg) == 0);
-
-Ahem, while looking at it, there is actually no reason to pass phys
-address there :|. That should be virtual pointer, I'll remove that.
-
-Thanks,
-
-Clément
-
-> 
->  return sbi_sse_register_raw(event_id, entry, arg);
-> 
->> +	return sbi_sse_register_raw(event_id, virt_to_phys(sbi_sse_entry), virt_to_phys(arg));
->> +}
->> +
->> +struct sbiret sbi_sse_unregister(unsigned long event_id)
->> +{
->> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_UNREGISTER, event_id, 0, 0, 0, 0, 0);
->> +}
->> +
->> +struct sbiret sbi_sse_enable(unsigned long event_id)
->> +{
->> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_ENABLE, event_id, 0, 0, 0, 0, 0);
->> +}
->> +
->> +struct sbiret sbi_sse_disable(unsigned long event_id)
->> +{
->> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_DISABLE, event_id, 0, 0, 0, 0, 0);
->> +}
->> +
->> +struct sbiret sbi_sse_hart_mask(void)
->> +{
->> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_HART_MASK, 0, 0, 0, 0, 0, 0);
->> +}
->> +
->> +struct sbiret sbi_sse_hart_unmask(void)
->> +{
->> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_HART_UNMASK, 0, 0, 0, 0, 0, 0);
->> +}
->> +
->> +struct sbiret sbi_sse_inject(unsigned long event_id, unsigned long hart_id)
->> +{
->> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_INJECT, event_id, hart_id, 0, 0, 0, 0);
->> +}
->> -- 
->> 2.47.2
->>
-> 
-> Besides the nits and the sanity checking for rv32,
-> 
-> Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+David / dhildenb
 
 
