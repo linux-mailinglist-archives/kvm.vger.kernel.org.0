@@ -1,86 +1,86 @@
-Return-Path: <kvm+bounces-40267-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40268-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 388D3A55422
-	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 19:08:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20073A554C0
+	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 19:20:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7B1B174488
-	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 18:06:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 28E267AB046
+	for <lists+kvm@lfdr.de>; Thu,  6 Mar 2025 18:19:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0FBE2780FF;
-	Thu,  6 Mar 2025 18:04:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21EC526F447;
+	Thu,  6 Mar 2025 18:19:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K3QYqisI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BBEYTbtE"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF742271295
-	for <kvm@vger.kernel.org>; Thu,  6 Mar 2025 18:04:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88F9E26D5DE
+	for <kvm@vger.kernel.org>; Thu,  6 Mar 2025 18:19:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741284278; cv=none; b=mtpFjHwZFBA3M+ESYT2CSj37Zitpb2wuLQ3aOuM2R+rrECH06gsx5EhwfGPcKB7MmOIZCKxgpaOdHkM5i2duzb6IQ+L4ifUMuF3J7W36R/BpD+u41LOEQ0wRQ+nKdX6Ey9JHIudPd8PcEcIs2T6qfU994cB1CQTJ/imLdS89iJM=
+	t=1741285159; cv=none; b=V+SkwRaEJQ845GoHJYIF/hVhJnr04QEeCEdCe/tBWtBPjU4w4fConK8PA5+6RxsrfcR655mUjVmtn9xc6niHXCZUqJqXN45Lf92xwIsw+EEOlTE7uvONUZFg+gdkkGlp8Oiw2G6IATY5HkgzuAQDi33lROWtoN8HpAi/CupQiPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741284278; c=relaxed/simple;
-	bh=jsZ89rPW8SVxwb/94fTRHgQYP6dcsmlemLCLpxtFjT0=;
+	s=arc-20240116; t=1741285159; c=relaxed/simple;
+	bh=FXq9VutgHbih6VL+4daHo/jo/HskVzVXgPD8GPDnC5w=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KdqLJ1YTRB8wM8GG9zkAB4SPy7u+usD4hRgfDJfK41kWxu5z06g4KBaqHSuRnIYjQHtru5EQQKuzta78L7Ot265A1+1wXVMqs/gH+IqWc4JPfHv/b/yIMhCHvCGH3X2HXnkuTi+L5s2rmHersTiUhBTMEIIxGm9bgtSyBFbLP70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K3QYqisI; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=hRFK3Fr1ZrOSoGSoIcbdITLZjfNnc0Wk0E5aJA5ByzZWVaJcZhC8H4f8a3P3nnwAdtnCN80rNcmSKND+mJb7L5efEn9iA0U1ilF5TA0GKgwFbphXE3ZFf85GLyw5iQ/KxWE1DjmdJqORrL9hpNVxZLDazeUSXCKkvPQFglv52Kk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BBEYTbtE; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741284274;
+	s=mimecast20190719; t=1741285154;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=pLBvLweWonzCO2qK3YJRAhjHec0mbtZh2afYe9FoHpU=;
-	b=K3QYqisICBdWU4d9jGkMUhrwYlOrMZ7k+QX43rzaPsbp/JUq1DWpT5nD9xeze8rAxK0wxj
-	G9ycRa91Tl2sOPtP8SzQk238xKyiocyrs+eUuPY5wmE8nOCfB0FmNq4QBGfJ9eitWbhSOY
-	nN60caYPRjyokTAfK2RwgquB44cKu8M=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=6jRuAqwxJQpBm7YfQoMi6ev65+OsKERmq486j5awJXM=;
+	b=BBEYTbtEDjvcCVvV2cH7gt+p/pAMS9ChsbBdv+6Gbf5yYwCQrH2fU0w2bZXoiBGFyulOQp
+	3mvjDFjwzlgyT3JUYH0tOnlHPgUSKjuD/6c20AbVoHdaHe5kz8M71WLdR8KT8IpASgGV55
+	U4Xn62MvoyvLHhWJrHu8NBVPvT+9i/A=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-688-wQ8RK7-dOe2OqU9mpteLHw-1; Thu, 06 Mar 2025 13:04:28 -0500
-X-MC-Unique: wQ8RK7-dOe2OqU9mpteLHw-1
-X-Mimecast-MFC-AGG-ID: wQ8RK7-dOe2OqU9mpteLHw_1741284267
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-ac21873859dso93191066b.2
-        for <kvm@vger.kernel.org>; Thu, 06 Mar 2025 10:04:27 -0800 (PST)
+ us-mta-313-Hxzln55zOdueJSRr3ZS-6w-1; Thu, 06 Mar 2025 13:19:12 -0500
+X-MC-Unique: Hxzln55zOdueJSRr3ZS-6w-1
+X-Mimecast-MFC-AGG-ID: Hxzln55zOdueJSRr3ZS-6w_1741285151
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-abf681786dfso98200966b.3
+        for <kvm@vger.kernel.org>; Thu, 06 Mar 2025 10:19:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741284267; x=1741889067;
+        d=1e100.net; s=20230601; t=1741285150; x=1741889950;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=pLBvLweWonzCO2qK3YJRAhjHec0mbtZh2afYe9FoHpU=;
-        b=W1k1Yhkb6IZwQQZLnoZYcBXUYZ5phkcBOPEhj3HscOBXbbNRg7+uOScQCWJz7RN7Xv
-         nrJCk5Rdd5QPx53YAxhJJaY4hAd2Zq6KTejzLuG9DcgHCZm1YnS8xmFPoZ/CYf6aQ7dX
-         hEcu5CZQPa73dBFJ+D479azWMsNySzaVVL4a01mLN4D2ybViVSczM9YLwea/Jp4bZMJJ
-         /vMqlmP6/dV57kxuyGl1hdp3Fahi08N9SKmZBOzaGACnImJww/j5HcVrtkfXjhKnKJma
-         nAIKxiDylkYm9ORBXTOqJPy4o145ZHJaC8z9tyyDIk4lgUxZL5bMt/woOQNFDHeSjVzx
-         6/MQ==
-X-Gm-Message-State: AOJu0YwmbKVlVvVsAVleMNMLAEd2Mml4fSpVfr1yRoEkOse9bY13BqlF
-	OBK6B/x14P1NLhub//ISL8O9/PXnhjZKo7NkGBsBwsAnRR2uQ09Elbr+VfXG442KSff2JcWS5Pd
-	aHWIlUhyvsj2fY0uAMFaCnARWScXme29j9g7t7cE3wVjibYY8+g==
-X-Gm-Gg: ASbGncs2FYJsr604UrVGxa4THCZUefR57LnaynigD4wAO6iKETRPk/OmlZFQlUZASvx
-	veqHgUg+mbz581laKd0XVDFNcXaHLh4CzPTM38VJJuIqI2lVtSjp1/lPH/AMi8oVkilSr9k9DA7
-	0AIFo2B3KQZmHvs8Osa2uvLvxe6AnIkAP6+6R//P/uI9jPcP7/ke4Z6c0nR42qgzbqNX1JYEKKd
-	fU1oIenJJHgP2F4h+Rnknzsk07NUx/zojLpB4Xbqqd+9U15q2ixeQ8Vocw06FSQrq3pOIihx+P9
-	jCJV3GmwQO96khAyMQ==
-X-Received: by 2002:a17:907:788:b0:ac1:f19a:c0b8 with SMTP id a640c23a62f3a-ac252641940mr731566b.24.1741284266829;
-        Thu, 06 Mar 2025 10:04:26 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE8NUefjgvE9EqIYm5RxhrQBZhigrHZsPqhDIvh2JtR2gwQ9o40dK+HVt5GaTkHWYeT0BJHqQ==
-X-Received: by 2002:a17:907:788:b0:ac1:f19a:c0b8 with SMTP id a640c23a62f3a-ac252641940mr722566b.24.1741284266228;
-        Thu, 06 Mar 2025 10:04:26 -0800 (PST)
+        bh=6jRuAqwxJQpBm7YfQoMi6ev65+OsKERmq486j5awJXM=;
+        b=AHjk8WzNPD9QOmIykyP42sZKFK7OHmRkTtWugrBt3MzyXGgttgn5UeNqrwChHHPPp0
+         yvaR0jqn2jRciJC+xneSkwb/gTgtB1fV4NS4JQoVS9WOuiF1D7oASUNB6BqsdRdtA3Pw
+         210sq1Fmy4dMZehqRpdewCpvGBI8ziUcvWxqgOD1+YpiJuUNC7MrlGsEmXEmlmRvZDme
+         pnbgGn1UXtTPrRX7Kods+t5oVuXA73mjnbeXGrqjMtBkNWW5m7ACphwzynN8ZkZt8w4V
+         NK+ECxrG/s0ZE/4CtPcqd6IEHIfe8Rz+R6xkmevMD/19X1z1/LRy/vdBWYJEdozRRAq2
+         OKYQ==
+X-Gm-Message-State: AOJu0YyWizatvUA3UhFsi34b2887ykheBhcneKHWbezVmgX4NvZGRpHA
+	As4hPVoMqAtxriqcY9XCVEyvAT/I/OjG4VNTjBhmUENMF1go9txTIFhL3blVqGCI4Ty66e+XspF
+	8W/nwg43cY29msNp4WnR8s3omyXJ0pi2omDAPcGBhjeq9eJGVVPjxKj6el82u
+X-Gm-Gg: ASbGncsFET8ruj6GTi6HOeQX6zGiuJ0me3Ih5khMTO7+LWwqMyE6oPp93EIFU2JlKiU
+	mH3rSuXXROaxZOuYQe2Kpjmy0XA/v/CbAc4TNXwamo06hNz9NZN0wmXtnAhXVuTNGXY3EXfY2KU
+	uLSiRPTNoEJ7WLLtLoKO/Yetzep7blku4HGrOTZBLBpT3+N1vkxGhHpNwhjHnJscXRAEX4oD/UN
+	TF/1eLMgQVrVBjVp24sG3fKEb2GJVDvBWmwhr9yvu/2hcCnlDupKCZ07iBiIPlr+whChfAegZRf
+	MSMMrM4mT2xhuvENgQ==
+X-Received: by 2002:a17:907:3e82:b0:abf:74e1:cfc0 with SMTP id a640c23a62f3a-ac2525e03f3mr8858866b.7.1741285150497;
+        Thu, 06 Mar 2025 10:19:10 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFN+o9is5w1JfJMbrFgww09160gc/alBQQgiqGe4a9qzYyNyB/NZp0L7mrMG7+bQLWMumjkIg==
+X-Received: by 2002:a17:907:3e82:b0:abf:74e1:cfc0 with SMTP id a640c23a62f3a-ac2525e03f3mr8854866b.7.1741285150062;
+        Thu, 06 Mar 2025 10:19:10 -0800 (PST)
 Received: from [192.168.1.84] ([93.56.163.127])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-ac23988bd53sm131534566b.143.2025.03.06.10.04.24
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-ac239488be1sm134167066b.74.2025.03.06.10.19.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Mar 2025 10:04:25 -0800 (PST)
-Message-ID: <0745c6ee-9d8b-4936-ab1f-cfecceb86735@redhat.com>
-Date: Thu, 6 Mar 2025 19:04:23 +0100
+        Thu, 06 Mar 2025 10:19:09 -0800 (PST)
+Message-ID: <d3f83243-5526-4196-956c-de349bebd81f@redhat.com>
+Date: Thu, 6 Mar 2025 19:19:07 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,18 +88,20 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2 02/12] KVM: x86: Allow the use of
- kvm_load_host_xsave_state() with guest_state_protected
-To: Xiaoyao Li <xiaoyao.li@intel.com>, Adrian Hunter
- <adrian.hunter@intel.com>, seanjc@google.com
+Subject: Re: [PATCH V2 05/12] KVM: TDX: Implement TDX vcpu enter/exit path
+To: Adrian Hunter <adrian.hunter@intel.com>, Xiaoyao Li
+ <xiaoyao.li@intel.com>, seanjc@google.com
 Cc: kvm@vger.kernel.org, rick.p.edgecombe@intel.com, kai.huang@intel.com,
  reinette.chatre@intel.com, tony.lindgren@linux.intel.com,
  binbin.wu@linux.intel.com, dmatlack@google.com, isaku.yamahata@intel.com,
  nik.borisov@suse.com, linux-kernel@vger.kernel.org, yan.y.zhao@intel.com,
  chao.gao@intel.com, weijiang.yang@intel.com
 References: <20250129095902.16391-1-adrian.hunter@intel.com>
- <20250129095902.16391-3-adrian.hunter@intel.com>
- <01e85b96-db63-4de2-9f49-322919e054ec@intel.com>
+ <20250129095902.16391-6-adrian.hunter@intel.com>
+ <06c73413-d751-45bf-bde9-cdb4f56f95b0@intel.com>
+ <632ea548-0e64-4a62-8126-120e42f4cd64@intel.com>
+ <d9924ccd-7322-48aa-93be-82620f72791c@intel.com>
+ <3e64b29e-34eb-4f9e-b7d1-a7803665ca55@intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -137,150 +139,94 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <01e85b96-db63-4de2-9f49-322919e054ec@intel.com>
+In-Reply-To: <3e64b29e-34eb-4f9e-b7d1-a7803665ca55@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 2/20/25 11:50, Xiaoyao Li wrote:
-> On 1/29/2025 5:58 PM, Adrian Hunter wrote:
->> From: Sean Christopherson <seanjc@google.com>
+On 2/27/25 19:37, Adrian Hunter wrote:
+> On 25/02/25 08:15, Xiaoyao Li wrote:
+>> On 2/24/2025 8:27 PM, Adrian Hunter wrote:
+>>> On 20/02/25 15:16, Xiaoyao Li wrote:
+>>>> On 1/29/2025 5:58 PM, Adrian Hunter wrote:
+>>>>> +#define TDX_REGS_UNSUPPORTED_SET    (BIT(VCPU_EXREG_RFLAGS) |    \
+>>>>> +                     BIT(VCPU_EXREG_SEGMENTS))
+>>>>> +
+>>>>> +fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediate_exit)
+>>>>> +{
+>>>>> +    /*
+>>>>> +     * force_immediate_exit requires vCPU entering for events injection with
+>>>>> +     * an immediately exit followed. But The TDX module doesn't guarantee
+>>>>> +     * entry, it's already possible for KVM to_think_ it completely entry
+>>>>> +     * to the guest without actually having done so.
+>>>>> +     * Since KVM never needs to force an immediate exit for TDX, and can't
+>>>>> +     * do direct injection, just warn on force_immediate_exit.
+>>>>> +     */
+>>>>> +    WARN_ON_ONCE(force_immediate_exit);
+>>>>> +
+>>>>> +    trace_kvm_entry(vcpu, force_immediate_exit);
+>>>>> +
+>>>>> +    tdx_vcpu_enter_exit(vcpu);
+>>>>> +
+>>>>> +    vcpu->arch.regs_avail &= ~TDX_REGS_UNSUPPORTED_SET;
+>>>>
+>>>> I don't understand this. Why only clear RFLAGS and SEGMENTS?
+>>>>
+>>>> When creating the vcpu, vcpu->arch.regs_avail = ~0 in kvm_arch_vcpu_create().
+>>>>
+>>>> now it only clears RFLAGS and SEGMENTS for TDX vcpu, which leaves other bits set. But I don't see any code that syncs the guest value of into vcpu->arch.regs[reg].
+>>>
+>>> TDX guest registers are generally not known but
+>>> values are placed into vcpu->arch.regs when needed
+>>> to work with common code.
+>>>
+>>> We used to use ~VMX_REGS_LAZY_LOAD_SET and tdx_cache_reg()
+>>> which has since been removed.
+>>>
+>>> tdx_cache_reg() did not support RFLAGS, SEGMENTS,
+>>> EXIT_INFO_1/EXIT_INFO_2 but EXIT_INFO_1/EXIT_INFO_2 became
+>>> needed, so that just left RFLAGS, SEGMENTS.
 >>
->> Allow the use of kvm_load_host_xsave_state() with
->> vcpu->arch.guest_state_protected == true. This will allow TDX to reuse
->> kvm_load_host_xsave_state() instead of creating its own version.
+>> Quote what Sean said [1]
 >>
->> For consistency, amend kvm_load_guest_xsave_state() also.
+>>    “I'm also not convinced letting KVM read garbage for RIP, RSP, CR3, or
+>>    PDPTRs is at all reasonable.  CR3 and PDPTRs should be unreachable,
+>>    and I gotta imagine the same holds true for RSP.  Allow reads/writes
+>>    to RIP is fine, in that it probably simplifies the overall code.”
 >>
->> Ensure that guest state that kvm_load_host_xsave_state() depends upon,
->> such as MSR_IA32_XSS, cannot be changed by user space, if
->> guest_state_protected.
+>> We need to justify why to let KVM read "garbage" of VCPU_REGS_RIP,
+>> VCPU_EXREG_PDPTR, VCPU_EXREG_CR0, VCPU_EXREG_CR3, VCPU_EXREG_CR4,
+>> VCPU_EXREG_EXIT_INFO_1, and VCPU_EXREG_EXIT_INFO_2 are neeed.
 >>
->> [Adrian: wrote commit message]
->>
->> Link: https://lore.kernel.org/r/Z2GiQS_RmYeHU09L@google.com
->> Signed-off-by: Sean Christopherson <seanjc@google.com>
->> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
->> ---
->> TD vcpu enter/exit v2:
->>   - New patch
->> ---
->>   arch/x86/kvm/svm/svm.c |  7 +++++--
->>   arch/x86/kvm/x86.c     | 18 +++++++++++-------
->>   2 files changed, 16 insertions(+), 9 deletions(-)
->>
->> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
->> index 7640a84e554a..b4bcfe15ad5e 100644
->> --- a/arch/x86/kvm/svm/svm.c
->> +++ b/arch/x86/kvm/svm/svm.c
->> @@ -4253,7 +4253,9 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct 
->> kvm_vcpu *vcpu,
->>           svm_set_dr6(svm, DR6_ACTIVE_LOW);
->>       clgi();
->> -    kvm_load_guest_xsave_state(vcpu);
->> +
->> +    if (!vcpu->arch.guest_state_protected)
->> +        kvm_load_guest_xsave_state(vcpu);
->>       kvm_wait_lapic_expire(vcpu);
->> @@ -4282,7 +4284,8 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct 
->> kvm_vcpu *vcpu,
->>       if (unlikely(svm->vmcb->control.exit_code == SVM_EXIT_NMI))
->>           kvm_before_interrupt(vcpu, KVM_HANDLING_NMI);
->> -    kvm_load_host_xsave_state(vcpu);
->> +    if (!vcpu->arch.guest_state_protected)
->> +        kvm_load_host_xsave_state(vcpu);
->>       stgi();
->>       /* Any pending NMI will happen here */
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index bbb6b7f40b3a..5cf9f023fd4b 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -1169,11 +1169,9 @@ EXPORT_SYMBOL_GPL(kvm_lmsw);
->>   void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu)
->>   {
->> -    if (vcpu->arch.guest_state_protected)
->> -        return;
->> +    WARN_ON_ONCE(vcpu->arch.guest_state_protected);
->>       if (kvm_is_cr4_bit_set(vcpu, X86_CR4_OSXSAVE)) {
->> -
->>           if (vcpu->arch.xcr0 != kvm_host.xcr0)
->>               xsetbv(XCR_XFEATURE_ENABLED_MASK, vcpu->arch.xcr0);
->> @@ -1192,13 +1190,11 @@ EXPORT_SYMBOL_GPL(kvm_load_guest_xsave_state);
->>   void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu)
->>   {
->> -    if (vcpu->arch.guest_state_protected)
->> -        return;
->> -
->>       if (cpu_feature_enabled(X86_FEATURE_PKU) &&
->>           ((vcpu->arch.xcr0 & XFEATURE_MASK_PKRU) ||
->>            kvm_is_cr4_bit_set(vcpu, X86_CR4_PKE))) {
->> -        vcpu->arch.pkru = rdpkru();
->> +        if (!vcpu->arch.guest_state_protected)
->> +            vcpu->arch.pkru = rdpkru();
+>> The changelog justify nothing for it.
 > 
-> this needs justification.
-> 
->>           if (vcpu->arch.pkru != vcpu->arch.host_pkru)
->>               wrpkru(vcpu->arch.host_pkru);
->>       }
-> 
-> 
->> @@ -3916,6 +3912,10 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, 
->> struct msr_data *msr_info)
->>           if (!msr_info->host_initiated &&
->>               !guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))
->>               return 1;
->> +
->> +        if (vcpu->arch.guest_state_protected)
->> +            return 1;
->> +
-> 
-> this and below change need to be a separate patch. So that we can 
-> discuss independently.
-> 
-> I see no reason to make MSR_IA32_XSS special than other MSRs. When 
-> guest_state_protected, most of the MSRs that aren't emulated by KVM are 
-> inaccessible by KVM.
+> Could add VCPU_REGS_RIP, VCPU_REGS_RSP, VCPU_EXREG_CR3, VCPU_EXREG_PDPTR.
+> But not VCPU_EXREG_CR0 nor VCPU_EXREG_CR4 since we started using them.
 
-I agree with Xiaoyao that this change is sensible but should be proposed 
-separately for both SNP and TDX.
+Hi Adrian,
 
-Allowing the use of kvm_load_host_xsave_state() is really ugly, 
-especially since the corresponding code is so simple:
+how is CR0 used? And CR4 is only used other than for loading the XSAVE 
+state, I think?
 
-         if (cpu_feature_enabled(X86_FEATURE_PKU) && vcpu->arch.pkru != 0)
-                         wrpkru(vcpu->arch.host_pkru);
-
-	if (kvm_host.xcr0 != kvm_tdx->xfam & kvm_caps.supported_xcr0)
-		xsetbv(XCR_XFEATURE_ENABLED_MASK, kvm_host.xcr0);
-
-	/*
-	 * All TDX hosts support XSS; but even if they didn't, both
-	 * arms of the comparison would be 0 and the wrmsrl would be
-	 * skipped.
-	 */
-	if (kvm_host.xss != kvm_tdx->xfam & kvm_caps.supported_xss)
-		wrmsrl(MSR_IA32_XSS, kvm_host.xss);
-
-This is really all that should be in patch 7.  I'll test it and decide 
-what to do.
+I will change this to a list of specific available registers instead of 
+using "&= ~", and it would be even better if CR0/CR4 are not on the list.
 
 Paolo
 
->>           /*
->>            * KVM supports exposing PT to the guest, but does not support
->>            * IA32_XSS[bit 8]. Guests have to use RDMSR/WRMSR rather than
->> @@ -4375,6 +4375,10 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, 
->> struct msr_data *msr_info)
->>           if (!msr_info->host_initiated &&
->>               !guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))
->>               return 1;
->> +
->> +        if (vcpu->arch.guest_state_protected)
->> +            return 1;
->> +
->>           msr_info->data = vcpu->arch.ia32_xss;
->>           break;
->>       case MSR_K7_CLK_CTL:
+>> btw, how EXIT_INFO_1/EXIT_INFO_2 became needed? It seems I cannot find any TDX code use them.
+> 
+> vmx_get_exit_qual() / vmx_get_intr_info() are now used by TDX.
+> 
+>>
+>> [1] https://lore.kernel.org/all/Z2GiQS_RmYeHU09L@google.com/
+>>
+>>>>
+>>>>> +    trace_kvm_exit(vcpu, KVM_ISA_VMX);
+>>>>> +
+>>>>> +    return EXIT_FASTPATH_NONE;
+>>>>> +}
+>>>>
+>>>
+>>
 > 
 > 
 
