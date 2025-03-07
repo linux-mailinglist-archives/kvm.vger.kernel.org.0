@@ -1,70 +1,80 @@
-Return-Path: <kvm+bounces-40349-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40350-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F13BDA56D69
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 17:18:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 538E3A56E05
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 17:41:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DEE217A9587
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 16:17:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 985063ABD8B
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 16:38:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAC9E23A995;
-	Fri,  7 Mar 2025 16:18:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A29B23CF08;
+	Fri,  7 Mar 2025 16:38:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lJeSkNOa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KUi3BXLI"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C760238173;
-	Fri,  7 Mar 2025 16:18:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6366323BD12;
+	Fri,  7 Mar 2025 16:38:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741364310; cv=none; b=mL6kTsRUtrhJ14n/s+UKhJT/sBua9OrLux9yWx2Vr02uw2PkYjORHrzCl0+nFCNeXiwbawF0ZxWNDeBM/nbi53rQjvlvBmf2iKzz5hc7XS8h/i+yO/dPB2Zhf6v2BdyrE5fj9zhEsiEmsFfu0GJo7kDckDpusnHiXg+SCKltLQk=
+	t=1741365535; cv=none; b=TyL/hbS0q8jTpIMsvK0MqwfgoCb0qeByIuslZ5EbTeeC+KVbVMhoYmdpS2+ggPrS/PVNcN0GBaskeBTDdAKsyzVuKFJWrhAKocCi6+aZAkX5lYd0gI5FTL2VjzaM34W3C0UdtiiovYW1t0/iw5H9LPUPy1+E22+XPywlWe5lldQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741364310; c=relaxed/simple;
-	bh=dou9LxTbjCg/TK9bz3v6nlT4kc6yvpg0t7FYG2dWH3o=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lzt/d0pbqhRLGn8bcr1SNuUFBjJPfsnu8mAyLIzG2H6d8U6in/BK/1P3EnkPwLLNdtl12Gj4/tFDro660hLFb+hOKQG1LXE6csA8ih76Qrr9NqC390MQmroqzjGIAPFwlKucocd5iA4p+e75b6ZupuzGOB2++PwtLUOyCMIFTNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lJeSkNOa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 624BBC4CED1;
-	Fri,  7 Mar 2025 16:18:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741364309;
-	bh=dou9LxTbjCg/TK9bz3v6nlT4kc6yvpg0t7FYG2dWH3o=;
-	h=From:To:Cc:Subject:Date:From;
-	b=lJeSkNOaWizpe65670I85HU9y6eg0HmOUp4LJ+c5Y05gNDJQFLl++Ag1xmLpkkdIo
-	 xefmR/NR+AJyD58NKDuyPZxLOj8QSjmrwavVFdSIXQMpIVT/sKylb3tO2zh5p6g6uI
-	 SGuIHVc+gQQVC7skzekT+0WroizhwoPhZrDFh3F2XU1dyCcdoIMAue2FPWCY5isglZ
-	 JASfYBN8YpD71Ny9frSiw5P7qToxQQ6ZkV96iWFwZxjm1k08O8YESkUT8d+2CiJ29F
-	 4kEhpHAuELMF3O/FI5zPsjubMBxFAIh0yzgawNFAtjaBvzrcVq1Yo/e6nSUkaFkuIk
-	 MOnzUIn91yKUQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tqaP4-00BT9x-Uf;
-	Fri, 07 Mar 2025 16:18:27 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Ahmed Genidi <ahmed.genidi@arm.com>,
-	Ben Horgan <ben.horgan@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Leo Yan <leo.yan@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Will Deacon <will@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [GIT PULL] KVM/arm64 fixes for 6.14, take #4
-Date: Fri,  7 Mar 2025 16:18:24 +0000
-Message-Id: <20250307161824.2373079-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1741365535; c=relaxed/simple;
+	bh=1VVRkZJh2auY7okOk/XeHGyOC8ItgKpelHUDvZ4TgRM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QzydIXwUd7iacfoFzcW6jV8SyKKiguEGMVJaI5AdpKdCmQWcIuN8OJzknovsCloJS0wq7J4hBxWZsm3oFtt9Yx5FsyVWjIUKZhWNo4pvQdrjW/D7mJXJ/iDz4ZHACreQ4IqJG3aFexz3Uq8hM/5PqGbcNuCAZflAznF601aXWtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KUi3BXLI; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741365533; x=1772901533;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=1VVRkZJh2auY7okOk/XeHGyOC8ItgKpelHUDvZ4TgRM=;
+  b=KUi3BXLI76cIgpCJyo5T9a2nfxuqN46oggh4qfw2Sfxoe38A2S2pJ1h8
+   1sX2QgJhGXZ++EzK1YTT+Un4ID0oRrWIOe1w1goqxxXlkPA5PgEx2LCmk
+   xdx+xFalWcl8Tdw/9rcAjUdx4u3usWMsUyQwZMwT4qT3g99JhGH6y75u6
+   dA7QuWYIIq2CLFwUhQAEdvZZyxjLhWUpMd75jwR2o2mrIv79N7W3nwdL+
+   Dojhn+GiUayEySupVngXv1srecvQypxSdBuoNZDJm3XtidIPEVozQ4EoW
+   +nSvPKPSQRtPrwbPdi7+Mw3dC2E0Hq+ecLelZiRmc7+d8qSYBjovTYz9t
+   w==;
+X-CSE-ConnectionGUID: cwxABDVaTBeFvLr+dG2I4w==
+X-CSE-MsgGUID: JFGcHi8hSR6h2suQ55RmNA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="46344342"
+X-IronPort-AV: E=Sophos;i="6.14,229,1736841600"; 
+   d="scan'208";a="46344342"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2025 08:38:53 -0800
+X-CSE-ConnectionGUID: flIP6gWkTsibwbluGtV6hw==
+X-CSE-MsgGUID: Ese1Mqt/RpuMPpxzQIj1ng==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,229,1736841600"; 
+   d="scan'208";a="124397938"
+Received: from spr.sh.intel.com ([10.239.53.19])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2025 08:38:49 -0800
+From: Chao Gao <chao.gao@intel.com>
+To: chao.gao@intel.com,
+	tglx@linutronix.de,
+	dave.hansen@intel.com,
+	x86@kernel.org,
+	seanjc@google.com,
+	pbonzini@redhat.com,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Cc: peterz@infradead.org,
+	rick.p.edgecombe@intel.com,
+	weijiang.yang@intel.com,
+	john.allen@amd.com,
+	bp@alien8.de
+Subject: [PATCH v3 00/10] Introduce CET supervisor state support
+Date: Sat,  8 Mar 2025 00:41:13 +0800
+Message-ID: <20250307164123.1613414-1-chao.gao@intel.com>
+X-Mailer: git-send-email 2.46.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -72,51 +82,110 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, ahmed.genidi@arm.com, ben.horgan@arm.com, catalin.marinas@arm.com, leo.yan@arm.com, mark.rutland@arm.com, oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Paolo,
+==Changelog==
+v2->v3:
+ - reorder patches to add fpu_guest_cfg first and then introduce dynamic kernel
+   feature concept (Dave)
+ - Revise changelog for all patches except the first and the last one (Dave)
+ - Split up patches that do multiple things into separate patches.
+ - collect tags for patch 1
 
-Here's what I hope to be the last set of 6.14 fixes for
-KVM/arm64. This time, two patches addressing the two side of the same
-bug, where pKVM's PSCI relay wasn't correctly setting up the CPUs when
-in the hVHE mode. Thanks to Ahmed and Mark for fixing it.
+v1->v2:
+ - rebase onto the latest kvm-x86/next
+ - Add performance data to the cover-letter
+ - v1: https://lore.kernel.org/kvm/73802bff-833c-4233-9a5b-88af0d062c82@intel.com/
 
-Please pull,
+==Background==
 
-	M.
+This series spins off from CET KVM virtualization enabling series [1].
+The purpose is to get these preparation work resolved ahead of KVM part
+landing. There was a discussion about introducing CET supervisor state
+support [2] [3].
 
-The following changes since commit fa808ed4e199ed17d878eb75b110bda30dd52434:
+CET supervisor state, i.e., IA32_PL{0,1,2}_SSP, are xsave-managed MSRs,
+it can be enabled via IA32_XSS[bit 12]. KVM relies on host side CET
+supervisor state support to fully enable guest CET MSR contents storage.
+The benefits are: 1) No need to manually save/restore the 3 MSRs when
+vCPU fpu context is sched in/out. 2) Omit manually swapping the three
+MSRs at VM-Exit/VM-Entry for guest/host. 3) Make guest CET user/supervisor
+states managed in a consistent manner within host kernel FPU framework.
 
-  KVM: arm64: Ensure a VMID is allocated before programming VTTBR_EL2 (2025-02-20 16:29:28 +0000)
+==Solution==
 
-are available in the Git repository at:
+This series tries to:
+1) Fix existing issue regarding enabling guest supervisor states support.
+2) Add CET supervisor state support in core kernel.
+3) Introduce new FPU config for guest fpstate setup.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.14-4
+With the preparation work landed, for guest fpstate, we have xstate_bv[12]
+== xcomp_bv[12] == 1 and CET supervisor state is saved/reloaded when
+xsaves/xrstors executes on guest fpstate.
+For non-guest/normal fpstate, we have xstate_bv[12] == xcomp_bv[12] == 0,
+then HW can optimize xsaves/xrstors operations.
 
-for you to fetch changes up to 3855a7b91d42ebf3513b7ccffc44807274978b3d:
+==Performance==
 
-  KVM: arm64: Initialize SCTLR_EL1 in __kvm_hyp_init_cpu() (2025-03-02 08:36:52 +0000)
+We measured context-switching performance with the benchmark [4] in following
+three cases.
 
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.14, take #4
+case 1: the baseline. i.e., this series isn't applied
+case 2: baseline + this series. CET-S space is allocated for guest fpu only.
+case 3: baseline + allocate CET-S space for all tasks. Hardware init
+        optimization avoids writing out CET-S space on each XSAVES.
 
-- Fix a couple of bugs affecting pKVM's PSCI relay implementation
-  when running in the hVHE mode, resulting in the host being entered
-  with the MMU in an unknown state, and EL2 being in the wrong mode.
+the data are as follows
 
-----------------------------------------------------------------
-Ahmed Genidi (1):
-      KVM: arm64: Initialize SCTLR_EL1 in __kvm_hyp_init_cpu()
+case |IA32_XSS[12] | Space | RFBM[12] | Drop%	
+-----+-------------+-------+----------+------
+  1  |	   0	   | None  |	0     |  0.0%
+  2  |	   1	   | None  |	0     |  0.2%
+  3  |	   1	   | 24B?  |	1     |  0.2%
 
-Mark Rutland (1):
-      KVM: arm64: Initialize HCR_EL2.E2H early
+Case 2 and 3 have no difference in performnace. But case 2 is preferred because
+it can save 24B of CET-S space for all non-vCPU threads with just a one-line
+change:
 
- arch/arm64/include/asm/el2_setup.h   | 31 ++++++++++++++++++++++++++-----
- arch/arm64/kernel/head.S             | 22 +++-------------------
- arch/arm64/kvm/hyp/nvhe/hyp-init.S   | 10 +++++++---
- arch/arm64/kvm/hyp/nvhe/psci-relay.c |  3 +++
- 4 files changed, 39 insertions(+), 27 deletions(-)
++	fpu_kernel_cfg.default_features &= ~XFEATURE_MASK_KERNEL_DYNAMIC;
+
+fpu_guest_cfg has its own merits. Regardless of the approach we take, using
+different FPU configuration settings for the guest and the kernel improves
+readability, decouples them from each other, and arguably enhances
+extensibility.
+
+[1]: https://lore.kernel.org/all/20240219074733.122080-1-weijiang.yang@intel.com/
+[2]: https://lore.kernel.org/all/ZM1jV3UPL0AMpVDI@google.com/
+[3]: https://lore.kernel.org/all/2597a87b-1248-b8ce-ce60-94074bc67ea4@intel.com/
+[4]: https://github.com/antonblanchard/will-it-scale/blob/master/tests/context_switch1.c
+
+
+
+Chao Gao (2):
+  x86/fpu/xstate: Drop @perm from guest pseudo FPU container
+  x86/fpu/xstate: Correct xfeatures cache in guest pseudo fpu container
+
+Sean Christopherson (1):
+  x86/fpu/xstate: Always preserve non-user xfeatures/flags in
+    __state_perm
+
+Yang Weijiang (7):
+  x86/fpu/xstate: Correct guest fpstate size calculation
+  x86/fpu/xstate: Introduce guest FPU configuration
+  x86/fpu/xstate: Initialize guest perm with fpu_guest_cfg
+  x86/fpu/xstate: Initialize guest fpstate with fpu_guest_config
+  x86/fpu/xstate: Add CET supervisor xfeature support
+  x86/fpu/xstate: Introduce XFEATURE_MASK_KERNEL_DYNAMIC xfeature set
+  x86/fpu/xstate: Warn if CET supervisor state is detected in normal
+    fpstate
+
+ arch/x86/include/asm/fpu/types.h  | 31 +++++++++++++++------------
+ arch/x86/include/asm/fpu/xstate.h | 11 ++++++----
+ arch/x86/kernel/fpu/core.c        | 34 +++++++++++++++++-------------
+ arch/x86/kernel/fpu/xstate.c      | 35 ++++++++++++++++++++++++-------
+ arch/x86/kernel/fpu/xstate.h      |  2 ++
+ 5 files changed, 74 insertions(+), 39 deletions(-)
+
+-- 
+2.46.1
+
 
