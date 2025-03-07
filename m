@@ -1,231 +1,303 @@
-Return-Path: <kvm+bounces-40331-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40332-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D86E5A56634
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 12:04:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A79E9A56638
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 12:05:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 784E83B2E8B
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 11:03:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 419BB188CDE0
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 11:04:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9A94215F53;
-	Fri,  7 Mar 2025 11:02:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="BV8lPg2W"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1A852135BE;
+	Fri,  7 Mar 2025 11:04:02 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps-ovh.mhejs.net (vps-ovh.mhejs.net [145.239.82.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BF0821576C
-	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 11:02:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2FD1925AC
+	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 11:03:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.239.82.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741345331; cv=none; b=RVdSUn3fWDdQjsRt2APG5Dp+hToYwIUfV/wscwVDm1pQrRl4Kx2nitjl5Zx8LArrbgVg1R4isCcTm1ZVfN8Kv1T3zQEIrxpy5TJEUBTWOwubKUyIAKb6OYRVM15hgnaOt7Ct7OLebqo4yZgb7W5DBTEcITagS2ylV2DZYsK6xdE=
+	t=1741345442; cv=none; b=d5LbgW5Y39335Io63DehFZDSHyN/kIrUSgCS9S/51Py7OMQP9AGRuyBqxbylP3MibnjrIHzOqWYFWmgPzvfVJsp3MMsHrxrPlWpY8XRovc8H63wGREUZ4O3uD7zp1hua7Wk+qNBfWen5SdP2tTgxRIplpD4P7lwKQr4hg5PJWS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741345331; c=relaxed/simple;
-	bh=bUqgi3dszTeuIO6Jayt7FNCSfLxGF0Q3vs9yEXuCbLI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To; b=qwtOaMginhf/11EOw4vr63P6Taoe1wwFLPEhXjShJ9v70mMmzRdxV0d1mGbzo3rLhBnENb5oDIDkiK20xOaEZym6ecPi+DxcPteJwuYD3TBIjkQA7hX30GHDdpPryxrfWTgSdQRt3nYDp7AN1YgFaIcFlNNUtHFGaG31RKxH17k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=BV8lPg2W; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2239c066347so30255195ad.2
-        for <kvm@vger.kernel.org>; Fri, 07 Mar 2025 03:02:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1741345328; x=1741950128; darn=vger.kernel.org;
-        h=to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Y12vdXD8IUD5lnVxvCmdhC+FVPs9nLD3u7Whh+JFE1I=;
-        b=BV8lPg2W+w8JYUuHvukENfQu1yEcqAfhTffhdX84e9KY40mWidZAHKVgite9chElwl
-         565JSX43tcP+myeQSpriEqik41rF+49s27l9Bs9I63gnt7xAr75bkYd2ofHi01ApKBnR
-         tYo5xZjmPnyCU0X/r3W0Mtn1vQ26v875DGlGOVgq5k/OB4pDwIDGqR6pe2qKg0pfeb7r
-         guT/kuRyEa1z76tXhAK9rdHJSiy+fIczLF+0HkKnkh3PUgA5ZAmKrjYoRGm++P5Box3w
-         4QJ80cMva+6bc1BrKw3ELlcY5UmOKKA4H4hJFtyAEZxISJX6UarGhJw6f69rvQ6vVeVK
-         meMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741345328; x=1741950128;
-        h=to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Y12vdXD8IUD5lnVxvCmdhC+FVPs9nLD3u7Whh+JFE1I=;
-        b=Pe6xh/2DiYui/5I5qFh+28gBiq1U7x1VQehqucJGTe4SHDlBO8hFfo8pkw2G4jBtJb
-         aL9HUkCCXLXhBDt84z5Rn+xLLUTmcO6DQH3pbhoAy9xsc1jrWbqV6UQgT/mJFoR5Mscz
-         TJ2UhPJB/QcNacCYM7oOB99nnf6PXS43ntH80StIbwdd6+1aF+LvKDBjEJBAZbRyS570
-         he4OsfUhIaH/tdfd/kSIOcXwrAuAPWwcnkl0B/yOKkhBdGAAmGXiXWe/gjjRSWjHFpYS
-         Db5qdr3i/yELUa1N9c+01bqCYHtacYsd1KluTIXDPuZAGwV/j/mIRDh1s4Sex/yjAy6Z
-         35WA==
-X-Forwarded-Encrypted: i=1; AJvYcCWw2sYkZ/Y+XauIb/5qf3IbdN+NLprttLjnRNBSCf6DLFFCyP3SRnvloPyaezIiY0Lj/BA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6pNlObPHMA9sAIaYQweP1dot5vcQjC34wsntJRETy+hzxOHnM
-	SnWu7HLEqfveS4OtiljBygk+PCUSvLLwMXx4IwhiR3EQlyqSzdCsFsDbTyxZaKU=
-X-Gm-Gg: ASbGncsjmBZ+pfBQdqkPNOeVEYPEipQFix/0XrIUyqcBrFENR5r3JFez0ZUyunpuDw8
-	HqqET0/0tOQ3PgYMYo28iPtFptE+1uuhZ5kjR375d9MLaysZNS7rc+GACqpzwxAjbddWwOF924D
-	kzSWHOKsmJ0CuZyV1oyzT2Yk4NJxYtXbZ90NhtHqCraeviJ62+u1BJfyPY9uEik7KwE9PPbnmj/
-	TeWqnq/OIwdQNJMmdf6VhxncKR4KG3ENxIdrOMiaaOxEDr2Cat3LHzO+BchMn6JncXTYyrXN0af
-	6N4geHwqaB1Oevmto+Kg4yohzYglqZdbtYHYDKBDak/UWmzU
-X-Google-Smtp-Source: AGHT+IF6zWuYi6fdLJEcdg62jGV3EWL/4omMjcZtlNvZShjxdxWSb6A2HX3eGBs7ZpbGb0lfsNdgeA==
-X-Received: by 2002:a17:903:283:b0:21f:6a36:7bf3 with SMTP id d9443c01a7336-224288974admr56342095ad.12.1741345328248;
-        Fri, 07 Mar 2025 03:02:08 -0800 (PST)
-Received: from localhost ([157.82.205.237])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-224109ddfd2sm27280985ad.39.2025.03.07.03.02.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Mar 2025 03:02:07 -0800 (PST)
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-Date: Fri, 07 Mar 2025 20:01:22 +0900
-Subject: [PATCH net-next v9 6/6] vhost/net: Support
- VIRTIO_NET_F_HASH_REPORT
+	s=arc-20240116; t=1741345442; c=relaxed/simple;
+	bh=ym7AQyWsSXIYF70MZecVyVeOKF4z0+8GiYFk8nOGB4M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=c8NdlqrbgZk9h1rxJj+Yx8XT+DUnWeTugG+cRanp9e+hnhf1ud/fNP5dgOLCcf+Ddh4Jyn8ruXu2MgR72dg7n8IVhTpd5kKBd7hyaTaXg5w9KdbazlaznYfPFyYgvkVF/5i6ezJAHqndWWiirr4L+OwJxLFaRovwGDUwOjw51ug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name; spf=pass smtp.mailfrom=vps-ovh.mhejs.net; arc=none smtp.client-ip=145.239.82.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vps-ovh.mhejs.net
+Received: from MUA
+	by vps-ovh.mhejs.net with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
+	(Exim 4.98)
+	(envelope-from <mhej@vps-ovh.mhejs.net>)
+	id 1tqVUh-00000000RND-2ZNg;
+	Fri, 07 Mar 2025 12:03:55 +0100
+Message-ID: <93aa0f81-06c6-4b6b-9d8b-fcae0c17f488@maciej.szmigiero.name>
+Date: Fri, 7 Mar 2025 12:03:49 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250307-rss-v9-6-df76624025eb@daynix.com>
-References: <20250307-rss-v9-0-df76624025eb@daynix.com>
-In-Reply-To: <20250307-rss-v9-0-df76624025eb@daynix.com>
-To: Jonathan Corbet <corbet@lwn.net>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>, 
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, kvm@vger.kernel.org, 
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
- Yuri Benditovich <yuri.benditovich@daynix.com>, 
- Andrew Melnychenko <andrew@daynix.com>, 
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, 
- Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>, 
- Akihiko Odaki <akihiko.odaki@daynix.com>
-X-Mailer: b4 0.14.2
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/7] hw/hyperv/vmbus: common compilation unit
+To: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Cc: kvm@vger.kernel.org, philmd@linaro.org, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, manos.pitsidianakis@linaro.org,
+ richard.henderson@linaro.org, Marcelo Tosatti <mtosatti@redhat.com>,
+ alex.bennee@linaro.org
+References: <20250306064118.3879213-1-pierrick.bouvier@linaro.org>
+ <20250306064118.3879213-4-pierrick.bouvier@linaro.org>
+ <adadeb12-9eb7-4338-828e-62e77034b1dd@maciej.szmigiero.name>
+ <9ee1b0aa-27e3-47f9-8276-1158bfa5ad06@linaro.org>
+Content-Language: en-US, pl-PL
+From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Autocrypt: addr=mail@maciej.szmigiero.name; keydata=
+ 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
+Disposition-Notification-To: "Maciej S. Szmigiero"
+ <mail@maciej.szmigiero.name>
+In-Reply-To: <9ee1b0aa-27e3-47f9-8276-1158bfa5ad06@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Sender: mhej@vps-ovh.mhejs.net
 
-VIRTIO_NET_F_HASH_REPORT allows to report hash values calculated on the
-host. When VHOST_NET_F_VIRTIO_NET_HDR is employed, it will report no
-hash values (i.e., the hash_report member is always set to
-VIRTIO_NET_HASH_REPORT_NONE). Otherwise, the values reported by the
-underlying socket will be reported.
+Hi Pierrick,
 
-VIRTIO_NET_F_HASH_REPORT requires VIRTIO_F_VERSION_1.
+On 6.03.2025 23:59, Pierrick Bouvier wrote:
+> Hi Maciej,
+> 
+> we are currently working toward building a single QEMU binary able to emulate all architectures, and one prerequisite is to remove duplication of compilation units (some are duplicated per target now, because of compile time defines).
+> 
+> So the work here is to replace those compile time defines with runtime functions instead, so the same code can be used for various architectures.
 
-Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-Tested-by: Lei Yang <leiyang@redhat.com>
----
- drivers/vhost/net.c | 49 +++++++++++++++++++++++++++++--------------------
- 1 file changed, 29 insertions(+), 20 deletions(-)
+But this is x86-only where AFAIK page size is always 4k
+so is TARGET_PAGE_SIZE going away eventually or is the
+QEMU policy to get rid of it at the first opportunity?
+  
+> Is it more clear for you?
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index b9b9e9d40951856d881d77ac74331d914473cd56..16b241b44f89820a42c302f3586ea6bb5e0d4289 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -73,6 +73,7 @@ enum {
- 	VHOST_NET_FEATURES = VHOST_FEATURES |
- 			 (1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
- 			 (1ULL << VIRTIO_NET_F_MRG_RXBUF) |
-+			 (1ULL << VIRTIO_NET_F_HASH_REPORT) |
- 			 (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
- 			 (1ULL << VIRTIO_F_RING_RESET)
- };
-@@ -1097,9 +1098,11 @@ static void handle_rx(struct vhost_net *net)
- 		.msg_controllen = 0,
- 		.msg_flags = MSG_DONTWAIT,
- 	};
--	struct virtio_net_hdr hdr = {
--		.flags = 0,
--		.gso_type = VIRTIO_NET_HDR_GSO_NONE
-+	struct virtio_net_hdr_v1_hash hdr = {
-+		.hdr = {
-+			.flags = 0,
-+			.gso_type = VIRTIO_NET_HDR_GSO_NONE
-+		}
- 	};
- 	size_t total_len = 0;
- 	int err, mergeable;
-@@ -1110,7 +1113,6 @@ static void handle_rx(struct vhost_net *net)
- 	bool set_num_buffers;
- 	struct socket *sock;
- 	struct iov_iter fixup;
--	__virtio16 num_buffers;
- 	int recv_pkts = 0;
- 
- 	mutex_lock_nested(&vq->mutex, VHOST_NET_VQ_RX);
-@@ -1191,30 +1193,30 @@ static void handle_rx(struct vhost_net *net)
- 			vhost_discard_vq_desc(vq, headcount);
- 			continue;
- 		}
-+		hdr.hdr.num_buffers = cpu_to_vhost16(vq, headcount);
- 		/* Supply virtio_net_hdr if VHOST_NET_F_VIRTIO_NET_HDR */
- 		if (unlikely(vhost_hlen)) {
--			if (copy_to_iter(&hdr, sizeof(hdr),
--					 &fixup) != sizeof(hdr)) {
-+			if (copy_to_iter(&hdr, vhost_hlen,
-+					 &fixup) != vhost_hlen) {
- 				vq_err(vq, "Unable to write vnet_hdr "
- 				       "at addr %p\n", vq->iov->iov_base);
- 				goto out;
- 			}
--		} else {
-+		} else if (likely(set_num_buffers)) {
- 			/* Header came from socket; we'll need to patch
- 			 * ->num_buffers over if VIRTIO_NET_F_MRG_RXBUF
- 			 */
--			iov_iter_advance(&fixup, sizeof(hdr));
-+			iov_iter_advance(&fixup, offsetof(struct virtio_net_hdr_v1, num_buffers));
-+
-+			if (copy_to_iter(&hdr.hdr.num_buffers, sizeof(hdr.hdr.num_buffers),
-+					 &fixup) != sizeof(hdr.hdr.num_buffers)) {
-+				vq_err(vq, "Failed num_buffers write");
-+				vhost_discard_vq_desc(vq, headcount);
-+				goto out;
-+			}
- 		}
- 		/* TODO: Should check and handle checksum. */
- 
--		num_buffers = cpu_to_vhost16(vq, headcount);
--		if (likely(set_num_buffers) &&
--		    copy_to_iter(&num_buffers, sizeof num_buffers,
--				 &fixup) != sizeof num_buffers) {
--			vq_err(vq, "Failed num_buffers write");
--			vhost_discard_vq_desc(vq, headcount);
--			goto out;
--		}
- 		nvq->done_idx += headcount;
- 		if (nvq->done_idx > VHOST_NET_BATCH)
- 			vhost_net_signal_used(nvq);
-@@ -1607,10 +1609,13 @@ static int vhost_net_set_features(struct vhost_net *n, u64 features)
- 	size_t vhost_hlen, sock_hlen, hdr_len;
- 	int i;
- 
--	hdr_len = (features & ((1ULL << VIRTIO_NET_F_MRG_RXBUF) |
--			       (1ULL << VIRTIO_F_VERSION_1))) ?
--			sizeof(struct virtio_net_hdr_mrg_rxbuf) :
--			sizeof(struct virtio_net_hdr);
-+	if (features & (1ULL << VIRTIO_NET_F_HASH_REPORT))
-+		hdr_len = sizeof(struct virtio_net_hdr_v1_hash);
-+	else if (features & ((1ULL << VIRTIO_NET_F_MRG_RXBUF) |
-+			     (1ULL << VIRTIO_F_VERSION_1)))
-+		hdr_len = sizeof(struct virtio_net_hdr_mrg_rxbuf);
-+	else
-+		hdr_len = sizeof(struct virtio_net_hdr);
- 	if (features & (1 << VHOST_NET_F_VIRTIO_NET_HDR)) {
- 		/* vhost provides vnet_hdr */
- 		vhost_hlen = hdr_len;
-@@ -1691,6 +1696,10 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
- 			return -EFAULT;
- 		if (features & ~VHOST_NET_FEATURES)
- 			return -EOPNOTSUPP;
-+		if ((features & ((1ULL << VIRTIO_F_VERSION_1) |
-+				 (1ULL << VIRTIO_NET_F_HASH_REPORT))) ==
-+		    (1ULL << VIRTIO_NET_F_HASH_REPORT))
-+			return -EINVAL;
- 		return vhost_net_set_features(n, features);
- 	case VHOST_GET_BACKEND_FEATURES:
- 		features = VHOST_NET_BACKEND_FEATURES;
+Thanks,
+Maciej
 
--- 
-2.48.1
+> On 3/6/25 12:29, Maciej S. Szmigiero wrote:
+>> On 6.03.2025 07:41, Pierrick Bouvier wrote:
+>>> Replace TARGET_PAGE.* by runtime calls.
+>>
+>> Seems like this patch subject/title is not aligned
+>> well with its content, or a least incomplete.
+>>
+>> Also, could you provide more detailed information
+>> why TARGET_PAGE_SIZE is getting replaced by
+>> qemu_target_page_size() please?
+>>
+>> I don't see such information in the cover letter either.
+>>
+>> Thanks,
+>> Maciej
+>>> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+>>> ---
+>>>    hw/hyperv/vmbus.c     | 50 +++++++++++++++++++++----------------------
+>>>    hw/hyperv/meson.build |  2 +-
+>>>    2 files changed, 26 insertions(+), 26 deletions(-)
+>>>
+>>> diff --git a/hw/hyperv/vmbus.c b/hw/hyperv/vmbus.c
+>>> index 12a7dc43128..109ac319caf 100644
+>>> --- a/hw/hyperv/vmbus.c
+>>> +++ b/hw/hyperv/vmbus.c
+>>> @@ -18,7 +18,7 @@
+>>>    #include "hw/hyperv/vmbus.h"
+>>>    #include "hw/hyperv/vmbus-bridge.h"
+>>>    #include "hw/sysbus.h"
+>>> -#include "cpu.h"
+>>> +#include "exec/target_page.h"
+>>>    #include "trace.h"
+>>>    enum {
+>>> @@ -309,7 +309,7 @@ void vmbus_put_gpadl(VMBusGpadl *gpadl)
+>>>    uint32_t vmbus_gpadl_len(VMBusGpadl *gpadl)
+>>>    {
+>>> -    return gpadl->num_gfns * TARGET_PAGE_SIZE;
+>>> +    return gpadl->num_gfns * qemu_target_page_size();
+>>>    }
+>>>    static void gpadl_iter_init(GpadlIter *iter, VMBusGpadl *gpadl,
+>>> @@ -323,14 +323,14 @@ static void gpadl_iter_init(GpadlIter *iter, VMBusGpadl *gpadl,
+>>>    static inline void gpadl_iter_cache_unmap(GpadlIter *iter)
+>>>    {
+>>> -    uint32_t map_start_in_page = (uintptr_t)iter->map & ~TARGET_PAGE_MASK;
+>>> -    uint32_t io_end_in_page = ((iter->last_off - 1) & ~TARGET_PAGE_MASK) + 1;
+>>> +    uint32_t map_start_in_page = (uintptr_t)iter->map & ~qemu_target_page_mask();
+>>> +    uint32_t io_end_in_page = ((iter->last_off - 1) & ~qemu_target_page_mask()) + 1;
+>>>        /* mapping is only done to do non-zero amount of i/o */
+>>>        assert(iter->last_off > 0);
+>>>        assert(map_start_in_page < io_end_in_page);
+>>> -    dma_memory_unmap(iter->as, iter->map, TARGET_PAGE_SIZE - map_start_in_page,
+>>> +    dma_memory_unmap(iter->as, iter->map, qemu_target_page_size() - map_start_in_page,
+>>>                         iter->dir, io_end_in_page - map_start_in_page);
+>>>    }
+>>> @@ -348,17 +348,17 @@ static ssize_t gpadl_iter_io(GpadlIter *iter, void *buf, uint32_t len)
+>>>        assert(iter->active);
+>>>        while (len) {
+>>> -        uint32_t off_in_page = iter->off & ~TARGET_PAGE_MASK;
+>>> -        uint32_t pgleft = TARGET_PAGE_SIZE - off_in_page;
+>>> +        uint32_t off_in_page = iter->off & ~qemu_target_page_mask();
+>>> +        uint32_t pgleft = qemu_target_page_size() - off_in_page;
+>>>            uint32_t cplen = MIN(pgleft, len);
+>>>            void *p;
+>>>            /* try to reuse the cached mapping */
+>>>            if (iter->map) {
+>>>                uint32_t map_start_in_page =
+>>> -                (uintptr_t)iter->map & ~TARGET_PAGE_MASK;
+>>> -            uint32_t off_base = iter->off & ~TARGET_PAGE_MASK;
+>>> -            uint32_t mapped_base = (iter->last_off - 1) & ~TARGET_PAGE_MASK;
+>>> +                (uintptr_t)iter->map & ~qemu_target_page_mask();
+>>> +            uint32_t off_base = iter->off & ~qemu_target_page_mask();
+>>> +            uint32_t mapped_base = (iter->last_off - 1) & ~qemu_target_page_mask();
+>>>                if (off_base != mapped_base || off_in_page < map_start_in_page) {
+>>>                    gpadl_iter_cache_unmap(iter);
+>>>                    iter->map = NULL;
+>>> @@ -368,10 +368,10 @@ static ssize_t gpadl_iter_io(GpadlIter *iter, void *buf, uint32_t len)
+>>>            if (!iter->map) {
+>>>                dma_addr_t maddr;
+>>>                dma_addr_t mlen = pgleft;
+>>> -            uint32_t idx = iter->off >> TARGET_PAGE_BITS;
+>>> +            uint32_t idx = iter->off >> qemu_target_page_bits();
+>>>                assert(idx < iter->gpadl->num_gfns);
+>>> -            maddr = (iter->gpadl->gfns[idx] << TARGET_PAGE_BITS) | off_in_page;
+>>> +            maddr = (iter->gpadl->gfns[idx] << qemu_target_page_bits()) | off_in_page;
+>>>                iter->map = dma_memory_map(iter->as, maddr, &mlen, iter->dir,
+>>>                                           MEMTXATTRS_UNSPECIFIED);
+>>> @@ -382,7 +382,7 @@ static ssize_t gpadl_iter_io(GpadlIter *iter, void *buf, uint32_t len)
+>>>                }
+>>>            }
+>>> -        p = (void *)(uintptr_t)(((uintptr_t)iter->map & TARGET_PAGE_MASK) |
+>>> +        p = (void *)(uintptr_t)(((uintptr_t)iter->map & qemu_target_page_mask()) |
+>>>                    off_in_page);
+>>>            if (iter->dir == DMA_DIRECTION_FROM_DEVICE) {
+>>>                memcpy(p, buf, cplen);
+>>> @@ -591,9 +591,9 @@ static void ringbuf_init_common(VMBusRingBufCommon *ringbuf, VMBusGpadl *gpadl,
+>>>                                    uint32_t begin, uint32_t end)
+>>>    {
+>>>        ringbuf->as = as;
+>>> -    ringbuf->rb_addr = gpadl->gfns[begin] << TARGET_PAGE_BITS;
+>>> -    ringbuf->base = (begin + 1) << TARGET_PAGE_BITS;
+>>> -    ringbuf->len = (end - begin - 1) << TARGET_PAGE_BITS;
+>>> +    ringbuf->rb_addr = gpadl->gfns[begin] << qemu_target_page_bits();
+>>> +    ringbuf->base = (begin + 1) << qemu_target_page_bits();
+>>> +    ringbuf->len = (end - begin - 1) << qemu_target_page_bits();
+>>>        gpadl_iter_init(&ringbuf->iter, gpadl, as, dir);
+>>>    }
+>>> @@ -734,7 +734,7 @@ static int vmbus_channel_notify_guest(VMBusChannel *chan)
+>>>        unsigned long *int_map, mask;
+>>>        unsigned idx;
+>>>        hwaddr addr = chan->vmbus->int_page_gpa;
+>>> -    hwaddr len = TARGET_PAGE_SIZE / 2, dirty = 0;
+>>> +    hwaddr len = qemu_target_page_size() / 2, dirty = 0;
+>>>        trace_vmbus_channel_notify_guest(chan->id);
+>>> @@ -743,7 +743,7 @@ static int vmbus_channel_notify_guest(VMBusChannel *chan)
+>>>        }
+>>>        int_map = cpu_physical_memory_map(addr, &len, 1);
+>>> -    if (len != TARGET_PAGE_SIZE / 2) {
+>>> +    if (len != qemu_target_page_size() / 2) {
+>>>            res = -ENXIO;
+>>>            goto unmap;
+>>>        }
+>>> @@ -1038,14 +1038,14 @@ static int sgl_from_gpa_ranges(QEMUSGList *sgl, VMBusDevice *dev,
+>>>            }
+>>>            len -= sizeof(range);
+>>> -        if (range.byte_offset & TARGET_PAGE_MASK) {
+>>> +        if (range.byte_offset & qemu_target_page_mask()) {
+>>>                goto eio;
+>>>            }
+>>>            for (; range.byte_count; range.byte_offset = 0) {
+>>>                uint64_t paddr;
+>>>                uint32_t plen = MIN(range.byte_count,
+>>> -                                TARGET_PAGE_SIZE - range.byte_offset);
+>>> +                                qemu_target_page_size() - range.byte_offset);
+>>>                if (len < sizeof(uint64_t)) {
+>>>                    goto eio;
+>>> @@ -1055,7 +1055,7 @@ static int sgl_from_gpa_ranges(QEMUSGList *sgl, VMBusDevice *dev,
+>>>                    goto err;
+>>>                }
+>>>                len -= sizeof(uint64_t);
+>>> -            paddr <<= TARGET_PAGE_BITS;
+>>> +            paddr <<= qemu_target_page_bits();
+>>>                paddr |= range.byte_offset;
+>>>                range.byte_count -= plen;
+>>> @@ -1804,7 +1804,7 @@ static void handle_gpadl_header(VMBus *vmbus, vmbus_message_gpadl_header *msg,
+>>>         * anything else and simplify things greatly.
+>>>         */
+>>>        if (msg->rangecount != 1 || msg->range[0].byte_offset ||
+>>> -        (msg->range[0].byte_count != (num_gfns << TARGET_PAGE_BITS))) {
+>>> +        (msg->range[0].byte_count != (num_gfns << qemu_target_page_bits()))) {
+>>>            return;
+>>>        }
+>>> @@ -2240,10 +2240,10 @@ static void vmbus_signal_event(EventNotifier *e)
+>>>            return;
+>>>        }
+>>> -    addr = vmbus->int_page_gpa + TARGET_PAGE_SIZE / 2;
+>>> -    len = TARGET_PAGE_SIZE / 2;
+>>> +    addr = vmbus->int_page_gpa + qemu_target_page_size() / 2;
+>>> +    len = qemu_target_page_size() / 2;
+>>>        int_map = cpu_physical_memory_map(addr, &len, 1);
+>>> -    if (len != TARGET_PAGE_SIZE / 2) {
+>>> +    if (len != qemu_target_page_size() / 2) {
+>>>            goto unmap;
+>>>        }
+>>> diff --git a/hw/hyperv/meson.build b/hw/hyperv/meson.build
+>>> index f4aa0a5ada9..c855fdcf04c 100644
+>>> --- a/hw/hyperv/meson.build
+>>> +++ b/hw/hyperv/meson.build
+>>> @@ -1,6 +1,6 @@
+>>>    specific_ss.add(when: 'CONFIG_HYPERV', if_true: files('hyperv.c'))
+>>>    specific_ss.add(when: 'CONFIG_HYPERV_TESTDEV', if_true: files('hyperv_testdev.c'))
+>>> -specific_ss.add(when: 'CONFIG_VMBUS', if_true: files('vmbus.c'))
+>>> +system_ss.add(when: 'CONFIG_VMBUS', if_true: files('vmbus.c'))
+>>>    specific_ss.add(when: 'CONFIG_SYNDBG', if_true: files('syndbg.c'))
+>>>    specific_ss.add(when: 'CONFIG_HV_BALLOON', if_true: files('hv-balloon.c', 'hv-balloon-page_range_tree.c', 'hv-balloon-our_range_memslots.c'))
+>>>    system_ss.add(when: 'CONFIG_HV_BALLOON', if_false: files('hv-balloon-stub.c'))
+>>
+> 
 
 
