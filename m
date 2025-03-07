@@ -1,122 +1,176 @@
-Return-Path: <kvm+bounces-40322-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40324-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 037A8A5637A
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 10:19:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C3CF3A56423
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 10:41:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B969A188B7EE
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 09:19:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE72B188E72A
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 09:42:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EAF620897A;
-	Fri,  7 Mar 2025 09:18:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="v/um14Qj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BCCB20C033;
+	Fri,  7 Mar 2025 09:41:32 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65B062054F1
-	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 09:18:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D5641A8F97;
+	Fri,  7 Mar 2025 09:41:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741339125; cv=none; b=n0iV6+jEh+OXYBQGL58qGy3wSoLPJED6sYUdxvR1Jkei3fqhq7qwlGXC+YcvGMB7/EmZipzrFqN9i1sUAWBGN5YWuNNQPkVhCUYp+49FduQCWmAU7qhUnaNOw9ePzj45dDa8TfCP/T6O+cE0pEOFhqRbYwGkz4NGY63OfGKNVH8=
+	t=1741340492; cv=none; b=RFG9b4k9da65RdauouB8ggfGXSpYMBkXElxRz/hEssRaKo/JziAxOSuhWXb6IylxfhYN1u49VLuWw9XYaoOwBR6Xh/Ai2L0yuobU5jcsfv4qzwOz1EOcmkcib6mD6MHhnl95lPbb+53D3zP7CFzWUzwhpqUmmunsXiC1Ks2LcvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741339125; c=relaxed/simple;
-	bh=bOIKtdlaOQMqgV6ghEveRdhfkbyzwmHzV3cRNq2qtcc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lnC/mUfDU0qFrDbf+F2mfF2U3Qmtc5xV+51qWjTCLMtTclfWT2xdVvNI9T7TanipBjMgUeKbxUHR5X9Aed++n+eRu9NaE1DhRbPcsg48gFUmrVDxkR/XxAnBFb4yGo0u6p4jisRLnVddVO/ATHJV9NSI7KfvQxNqDX/5jOvfubs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=v/um14Qj; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1741339111;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=y2FBvybRQ7hGNDuactnNvnWlcdQr0dcjdCw8K+WSDT8=;
-	b=v/um14QjntUhD9/+RjAPoAqg5hVIFWfCDpaGuI3rZaVkVpnzjZ4cpDc2xZ3mkeysr6W9z2
-	xbw+4yumPwu7bH4NmlPTKPqXmnDnAh2JsHoY5L/yMVAZYEQMBt0P+TSM4mxRcP6MI3jdoT
-	lkxLHe4Zyn/2jMILuyMorKlQiFsHWWQ=
-From: Andrew Jones <andrew.jones@linux.dev>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	kvm-riscv@lists.infradead.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-s390@vger.kernel.org
-Cc: pbonzini@redhat.com,
-	thuth@redhat.com,
-	alexandru.elisei@arm.com,
-	eric.auger@redhat.com,
-	lvivier@redhat.com,
-	frankja@linux.ibm.com,
-	imbrenda@linux.ibm.com,
-	nrb@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v2] Makefile: Use CFLAGS in cc-option
-Date: Fri,  7 Mar 2025 10:18:29 +0100
-Message-ID: <20250307091828.57933-2-andrew.jones@linux.dev>
+	s=arc-20240116; t=1741340492; c=relaxed/simple;
+	bh=sHnV9GEozz+Opv61zRjqJ4zv0AEgNaF9oXU1zOBaCs4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=ndrwAd1fq7Tsl7riwMoA7E/TYOw/91KKBiHw8TrW5ntAe3r89CEiJrCIsb2RaPziauW74h0qYI1CJ1ZwluBRT7mHQ/B3XozrtKFfms8QfQ9/P+ZkjxsjWd5RjR3UMDbrVSDB2uEAReCvP3Wk0J9vcoiKQmHtrXChmT4NvNW29k0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Z8LQ532WYz1R6Dn;
+	Fri,  7 Mar 2025 17:21:33 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 59CC61402CE;
+	Fri,  7 Mar 2025 17:23:12 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 7 Mar 2025 17:23:11 +0800
+Message-ID: <180818a1-b906-4a0b-89d3-34cb71cc26c9@huawei.com>
+Date: Fri, 7 Mar 2025 17:23:11 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] mm: alloc_pages_bulk: remove assumption of populating
+ only NULL elements
+To: NeilBrown <neilb@suse.de>
+CC: Qu Wenruo <wqu@suse.com>, Yishai Hadas <yishaih@nvidia.com>, Jason
+ Gunthorpe <jgg@ziepe.ca>, Shameer Kolothum
+	<shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>, Chris Mason <clm@fb.com>, Josef
+ Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>, Gao Xiang
+	<xiang@kernel.org>, Chao Yu <chao@kernel.org>, Yue Hu <zbestahu@gmail.com>,
+	Jeffle Xu <jefflexu@linux.alibaba.com>, Sandeep Dhavale <dhavale@google.com>,
+	Carlos Maiolino <cem@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>, Jesper Dangaard Brouer
+	<hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker
+	<anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, Jeff Layton
+	<jlayton@kernel.org>, Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo
+	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Luiz Capitulino
+	<luizcap@redhat.com>, Mel Gorman <mgorman@techsingularity.net>, Dave Chinner
+	<david@fromorbit.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+	<linux-btrfs@vger.kernel.org>, <linux-erofs@lists.ozlabs.org>,
+	<linux-xfs@vger.kernel.org>, <linux-mm@kvack.org>, <netdev@vger.kernel.org>,
+	<linux-nfs@vger.kernel.org>
+References: <> <f834a7cd-ca0a-4495-a787-134810aa0e4d@huawei.com>
+ <174129565467.33508.7106343513316364028@noble.neil.brown.name>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <174129565467.33508.7106343513316364028@noble.neil.brown.name>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-When cross compiling with clang we need to specify the target in
-CFLAGS and cc-option will fail to recognize target-specific options
-without it. Add CFLAGS to the CC invocation in cc-option.
+On 2025/3/7 5:14, NeilBrown wrote:
+> On Thu, 06 Mar 2025, Yunsheng Lin wrote:
+>> On 2025/3/6 7:41, NeilBrown wrote:
+>>> On Wed, 05 Mar 2025, Yunsheng Lin wrote:
+>>>>
+>>>> For the existing btrfs and sunrpc case, I am agreed that there
+>>>> might be valid use cases too, we just need to discuss how to
+>>>> meet the requirements of different use cases using simpler, more
+>>>> unified and effective APIs.
+>>>
+>>> We don't need "more unified".
+>>
+>> What I meant about 'more unified' is how to avoid duplicated code as
+>> much as possible for two different interfaces with similar‌ functionality.
+>>
+>> The best way I tried to avoid duplicated code as much as possible is
+>> to defragment the page_array before calling the alloc_pages_bulk()
+>> for the use case of btrfs and sunrpc so that alloc_pages_bulk() can
+>> be removed of the assumption populating only NULL elements, so that
+>> the API is simpler and more efficient.
+>>
+>>>
+>>> If there are genuinely two different use cases with clearly different
+>>> needs - even if only slightly different - then it is acceptable to have
+>>> two different interfaces.  Be sure to choose names which emphasise the
+>>> differences.
+>>
+>> The best name I can come up with for the use case of btrfs and sunrpc
+>> is something like alloc_pages_bulk_refill(), any better suggestion about
+>> the naming?
+> 
+> I think alloc_pages_bulk_refill() is a good name.
+> 
+> So:
+> - alloc_pages_bulk() would be given an uninitialised array of page
+>   pointers and a required count and would return the number of pages
+>   that were allocated
+> - alloc_pages_bulk_refill() would be given an initialised array of page
+>   pointers some of which might be NULL.  It would attempt to allocate
+>   pages for the non-NULL pointers and return the total number of
 
-The introduction of the realmode_bits variable is necessary to
-avoid make failing to build x86 due to CFLAGS referencing itself.
+You meant 'NULL pointers' instead of 'non-NULL pointers' above?
 
-Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
----
-v2:
- - Fixed x86 builds with the realmode_bits variable
+>   allocated pages in the array - just like the current
+>   alloc_pages_bulk().
 
- Makefile            | 2 +-
- x86/Makefile.common | 3 ++-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+I guess 'the total number of allocated pages in the array ' include
+the pages which are already in the array before calling the above
+API?
 
-diff --git a/Makefile b/Makefile
-index 78352fced9d4..9dc5d2234e2a 100644
---- a/Makefile
-+++ b/Makefile
-@@ -21,7 +21,7 @@ DESTDIR := $(PREFIX)/share/kvm-unit-tests/
- 
- # cc-option
- # Usage: OP_CFLAGS+=$(call cc-option, -falign-functions=0, -malign-functions=0)
--cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
-+cc-option = $(shell if $(CC) $(CFLAGS) -Werror $(1) -S -o /dev/null -xc /dev/null \
-               > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
- 
- libcflat := lib/libcflat.a
-diff --git a/x86/Makefile.common b/x86/Makefile.common
-index 0b7f35c8de85..e97464912e28 100644
---- a/x86/Makefile.common
-+++ b/x86/Makefile.common
-@@ -98,6 +98,7 @@ tests-common = $(TEST_DIR)/vmexit.$(exe) $(TEST_DIR)/tsc.$(exe) \
- ifneq ($(CONFIG_EFI),y)
- tests-common += $(TEST_DIR)/realmode.$(exe) \
- 		$(TEST_DIR)/la57.$(exe)
-+realmode_bits := $(if $(call cc-option,-m16,""),16,32)
- endif
- 
- test_cases: $(tests-common) $(tests)
-@@ -108,7 +109,7 @@ $(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o
- 	$(LD) -m elf_i386 -nostdlib -o $@ \
- 	      -T $(SRCDIR)/$(TEST_DIR)/realmode.lds $^
- 
--$(TEST_DIR)/realmode.o: bits = $(if $(call cc-option,-m16,""),16,32)
-+$(TEST_DIR)/realmode.o: bits = $(realmode_bits)
- 
- $(TEST_DIR)/access_test.$(bin): $(TEST_DIR)/access.o
- 
--- 
-2.48.1
+I guess it is worth mentioning that the current alloc_pages_bulk()
+may return different value with the same size of arrays, but with
+different layout of the same number of NULL pointers.
+For the same size of arrays with different layout for the NULL pointer
+below('*' indicate NULL pointer), and suppose buddy allocator is only
+able to allocate two pages:
+1. P**P*P: will return 4.
+2. P*PP**: will return 5.
 
+If the new API do the page defragmentation, then it will always return
+the same value for different layout of the same number of NULL pointers.
+I guess the new one is the more perfered behavior as it provides a more
+defined semantic.
+
+> 
+> sunrpc could usefully use both of these interfaces.
+> 
+> alloc_pages_bulk() could be implemented by initialising the array and
+> then calling alloc_pages_bulk_refill().  Or alloc_pages_bulk_refill()
+> could be implemented by compacting the pages and then calling
+> alloc_pages_bulk().
+> If we could duplicate the code and have two similar but different
+> functions.
+> 
+> The documentation for _refill() should make it clear that the pages
+> might get re-ordered.
+
+Does 'the pages might get re-ordered' mean defragmenting the page_array?
+If yes, it makes sense to make it clear.
+
+> 
+> Having looked at some of the callers I agree that the current interface
+> is not ideal for many of them, and that providing a simpler interface
+> would help.
+
++1
+
+> 
+> Thanks,
+> NeilBrown
 
