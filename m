@@ -1,145 +1,131 @@
-Return-Path: <kvm+bounces-40387-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40388-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 586D7A5711C
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 20:09:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C923A5711E
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 20:10:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 656611895D14
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 19:09:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85FF33B8CB6
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 19:10:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40B2A24EF95;
-	Fri,  7 Mar 2025 19:09:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66C6124E4B7;
+	Fri,  7 Mar 2025 19:10:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z8qpAKNg"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ocoog27G"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E20E121C198;
-	Fri,  7 Mar 2025 19:09:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D65E21C198
+	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 19:10:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741374561; cv=none; b=a9Jum8lcrizs2hNaFSCMEf6M4+PN5QiRy0SNneUTwCVY0SesqRliFvmX3NOUFZDPf5PUTWCLMyvU/H2vfH5iZf501TvNkd9axj1yOU21DRte/QRzrHej91E2QmoA3L3YeopJKRkMkav5/PsRKqzvQFAgLG+1VgzJd9KIytMgV48=
+	t=1741374612; cv=none; b=tUm0c1YTHEGSDXMCB2SH1TfCfVcO+rSoLdGkhLa6iRXsKJLZP4coaRgkzPQuBCcRJiFmPlHfaZZeZO2RUsIBBMTaPxboWYqs6x9QM3474xpjG3tqdlTN7W978272M6gn8xKoaLyssnNkoXS4t7GqYejkMJOdWkKZ3BFQPLUyqMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741374561; c=relaxed/simple;
-	bh=7b1yf7yKNPbaNxLB08eC3eXk3nNFfhGnwkF5GV3f3qs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rN5YJ/XYSDUM1PGU+m7MHH90ZgQysY/stWHetGrALJd313G3K8uBtVKGbTbKpYcrZbB7a6upY88kbbUqOE0AEK41a8OQ++SS89dAlzKski8T3UnqFe96ipdEEmLN031hPNjjD9QN2+aGTjIBYTAuepVapOapiUx/N21bXRW8R/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z8qpAKNg; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741374560; x=1772910560;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=7b1yf7yKNPbaNxLB08eC3eXk3nNFfhGnwkF5GV3f3qs=;
-  b=Z8qpAKNgHV21JvM89ci3GPsXuGKeJcfv8ahf4tvDEyCt5d0i0nA9a/o4
-   zaL9GcBoptMpY+jLKAYhp4r7WXHd9ZgNx3KWQnKLBW/JGUP+kjplKQKmV
-   769RkpYFbWZbL1lSkYwKHvsPwUjHg7Ww/tVq1SukgoTM4FhRXCFIrW+9f
-   5WVxayzoWx2I67cGTZItBvIMP8HpEuZC8KYYNVGY9wo8chXQKHVmSwA3l
-   uCiWBRO/qlH18zssj3F/RlI1cmFjMZqzzzAlduazkOj81auIqGY62vI5R
-   e6zYnq6aF4fmHNu7X4TbcQqhFJpG6nIxzG8Pi9QK2sUK7tI6sWO9fQOU+
-   g==;
-X-CSE-ConnectionGUID: D5hRxFgoSQy6WG1uEXw1+g==
-X-CSE-MsgGUID: lYFH3SYvQ7SLxxZ/fv4ObQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="42314229"
-X-IronPort-AV: E=Sophos;i="6.14,230,1736841600"; 
-   d="scan'208";a="42314229"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2025 11:09:19 -0800
-X-CSE-ConnectionGUID: hCn3oAx7SByF4Z4ZVqm/Gg==
-X-CSE-MsgGUID: ZB2sL+QMTKStStCuX7FDnQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="156619226"
-Received: from dnelso2-mobl.amr.corp.intel.com (HELO [10.125.110.132]) ([10.125.110.132])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2025 11:09:18 -0800
-Message-ID: <b9389b35-c1ef-4a53-9eb2-051df0aaf33d@intel.com>
-Date: Fri, 7 Mar 2025 11:09:42 -0800
+	s=arc-20240116; t=1741374612; c=relaxed/simple;
+	bh=ONnsblcmxaZYUjElGGhA+pC+7SIqeEFJ+Lg1pNGu//s=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=bPgvWBBDPmDZIixO68ELNSkWEV9ux4ImME+xqo8AjlbvpARjhdP9TxbuF4KJAxmYGLRAOI+QNb2Y8D1WLuNDCYL+c96JVuJSXL4JK6ccu37dGj+62q+c6FPkUN7LIviLy+upd2NlWylwWfhOd9w3FUAu8lA4PTQhk17xJqjInxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Ocoog27G; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-22337bc9ac3so47628875ad.1
+        for <kvm@vger.kernel.org>; Fri, 07 Mar 2025 11:10:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1741374610; x=1741979410; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8fmW+9iS3PmT2XAAZO5m9vMY0XGD6LHO6SASf0iJxOY=;
+        b=Ocoog27G97nVxVe/FlfhLAfgm+n6iR+zl2Tk8v5U758D2D6AXCSIZsaD6lgvNAJhYR
+         k5nyyS4IxVaemyzEdZWKzzUCQXu6ejKMOgJLEeTvqXZRoBAbpSATfKlNq0Ef7colESHi
+         LvXfl3lLENM2eocYsMEBVGgQdvU30Uhf6KVESEPhafNBVQiQRIvrQm6KtbLmuGWf9Q8E
+         XXl2xCqZPrJEFsXlM8L2qQ8aLT6FXqE8aRLJrbd57FFhtn0Aoz1Wx/zZD1o1uauBn3mm
+         Vm5wUGKReOqdXf14VktzS2Qv+V+JEQXgDK55ZfV/HK4RaDt9DExH3OTVvmgwIbccCQ1x
+         k6+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741374610; x=1741979410;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8fmW+9iS3PmT2XAAZO5m9vMY0XGD6LHO6SASf0iJxOY=;
+        b=A7u6Y6NA5pAxQtvH/jcJeGa4tsQ3vbeAKSeWgMJCGugk+/kpq7MBhbtd+0esWVsZi1
+         4lrqVK54ykZdU6PXK7DpdzEpW0YjkdlZdTwdYiu+co+CI07JNZrPLzAjcF6DF/JvXafi
+         C0rpl081N/EtP61RdzD3AAimuvxzvqYXwaCUh32uSZKJxS2wRWGJxygNa6bcwrgMJJO8
+         W6yjbnemtTy3sCSv5x8igvFSsTK5eMaTAv57rYnKyMzzm2/0dUgUoOzSteTS5mRheFCN
+         sRmciaVkvNq4C1oQfBvNIYRgdoRiySkzPP/EIURF7pqDmcHMPoKn4LVZdYqdbAavGRxY
+         Se2g==
+X-Forwarded-Encrypted: i=1; AJvYcCVHutMg0CpnJKlkMg5PwdUNyhmXk4scd3s+qrnVqHdl5oaw8H0OeunZxn7NySAUnJHWv5Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvMtmCHL1LInks1XaFd/YbIW+Ch6GHJlkC8L2zYfVH7m3T9+0T
+	L0heHUVPyGFD2ggQSdjYYNLpNoZ0FKqb2wiHy9rgn6ZcguKd/mr4r8u2n+ry8cw=
+X-Gm-Gg: ASbGncu9aOifeQwPnnTfuS48V1nO78J21fcK68dF5u2YjKDXvT7G4mzxLVzIwwtQEUc
+	6O8XR5P2YKfxFajep77G5ulMT68C7sx/Sr6SF8XnmgX4OdBrRNayDBkZhqFUTBQtBE4RYB0WQBa
+	1pF4R78iENM0PK1sJxFCPexacbuVeZuf0Y6Qt9Vdh8odbTFScSkrQ9GV+GpkxDtJZ6kM4/OeqDe
+	HAKGJIN1cUPvUhhRxB+wgO03ZiuJqqK7KL5KJA2wuSiQXQnA45GC7p3ck7M0luoPV5zbbAHDfaM
+	UISc4GxHI6FnzSR4WH2efgJHGKj5UoevKrkVYFTY7RTF
+X-Google-Smtp-Source: AGHT+IECxrDCFtIdTWnSb1B3IJubkBg7Oin2BPr4sIgfjEKC9LVYl+fNe3gSQDbgmFBFaHBFR75q4Q==
+X-Received: by 2002:a17:902:da81:b0:224:c46:d167 with SMTP id d9443c01a7336-22428887604mr58984615ad.16.1741374610024;
+        Fri, 07 Mar 2025 11:10:10 -0800 (PST)
+Received: from pc.. ([38.39.164.180])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-736b2da32c6sm1449895b3a.149.2025.03.07.11.10.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Mar 2025 11:10:09 -0800 (PST)
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: philmd@linaro.org,
+	"Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+	pierrick.bouvier@linaro.org,
+	alex.bennee@linaro.org,
+	kvm@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	richard.henderson@linaro.org,
+	manos.pitsidianakis@linaro.org
+Subject: [PATCH v2 0/7] hw/hyperv: remove duplication compilation units
+Date: Fri,  7 Mar 2025 11:09:56 -0800
+Message-Id: <20250307191003.248950-1-pierrick.bouvier@linaro.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 00/10] Introduce CET supervisor state support
-To: Chao Gao <chao.gao@intel.com>, tglx@linutronix.de, x86@kernel.org,
- seanjc@google.com, pbonzini@redhat.com, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
-Cc: peterz@infradead.org, rick.p.edgecombe@intel.com,
- weijiang.yang@intel.com, john.allen@amd.com, bp@alien8.de
-References: <20250307164123.1613414-1-chao.gao@intel.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
- oAiUXvGAOxPDsB/P6UEOISPpLl5IuYsSwAeZGkdQ5g6m1xq7AlDJQZddhr/1DC/nMVa/2BoY
- 2UnKuZuSBu7lgOE193+7Uks3416N2hTkyKUSNkduyoZ9F5twiBhxPJwPtn/wnch6n5RsoXsb
- ygOEDxLEsSk/7eyFycjE+btUtAWZtx+HseyaGfqkZK0Z9bT1lsaHecmB203xShwCPT49Blxz
- VOab8668QpaEOdLGhtvrVYVK7x4skyT3nGWcgDCl5/Vp3TWA4K+IofwvXzX2ON/Mj7aQwf5W
- iC+3nWC7q0uxKwwsddJ0Nu+dpA/UORQWa1NiAftEoSpk5+nUUi0WE+5DRm0H+TXKBWMGNCFn
- c6+EKg5zQaa8KqymHcOrSXNPmzJuXvDQ8uj2J8XuzCZfK4uy1+YdIr0yyEMI7mdh4KX50LO1
- pmowEqDh7dLShTOif/7UtQYrzYq9cPnjU2ZW4qd5Qz2joSGTG9eCXLz5PRe5SqHxv6ljk8mb
- ApNuY7bOXO/A7T2j5RwXIlcmssqIjBcxsRRoIbpCwWWGjkYjzYCjgsNFL6rt4OL11OUF37wL
- QcTl7fbCGv53KfKPdYD5hcbguLKi/aCccJK18ZwNjFhqr4MliQARAQABzUVEYXZpZCBDaHJp
- c3RvcGhlciBIYW5zZW4gKEludGVsIFdvcmsgQWRkcmVzcykgPGRhdmUuaGFuc2VuQGludGVs
- LmNvbT7CwXgEEwECACIFAlQ+9J0CGwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEGg1
- lTBwyZKwLZUP/0dnbhDc229u2u6WtK1s1cSd9WsflGXGagkR6liJ4um3XCfYWDHvIdkHYC1t
- MNcVHFBwmQkawxsYvgO8kXT3SaFZe4ISfB4K4CL2qp4JO+nJdlFUbZI7cz/Td9z8nHjMcWYF
- IQuTsWOLs/LBMTs+ANumibtw6UkiGVD3dfHJAOPNApjVr+M0P/lVmTeP8w0uVcd2syiaU5jB
- aht9CYATn+ytFGWZnBEEQFnqcibIaOrmoBLu2b3fKJEd8Jp7NHDSIdrvrMjYynmc6sZKUqH2
- I1qOevaa8jUg7wlLJAWGfIqnu85kkqrVOkbNbk4TPub7VOqA6qG5GCNEIv6ZY7HLYd/vAkVY
- E8Plzq/NwLAuOWxvGrOl7OPuwVeR4hBDfcrNb990MFPpjGgACzAZyjdmYoMu8j3/MAEW4P0z
- F5+EYJAOZ+z212y1pchNNauehORXgjrNKsZwxwKpPY9qb84E3O9KYpwfATsqOoQ6tTgr+1BR
- CCwP712H+E9U5HJ0iibN/CDZFVPL1bRerHziuwuQuvE0qWg0+0SChFe9oq0KAwEkVs6ZDMB2
- P16MieEEQ6StQRlvy2YBv80L1TMl3T90Bo1UUn6ARXEpcbFE0/aORH/jEXcRteb+vuik5UGY
- 5TsyLYdPur3TXm7XDBdmmyQVJjnJKYK9AQxj95KlXLVO38lczsFNBFRjzmoBEACyAxbvUEhd
- GDGNg0JhDdezyTdN8C9BFsdxyTLnSH31NRiyp1QtuxvcqGZjb2trDVuCbIzRrgMZLVgo3upr
- MIOx1CXEgmn23Zhh0EpdVHM8IKx9Z7V0r+rrpRWFE8/wQZngKYVi49PGoZj50ZEifEJ5qn/H
- Nsp2+Y+bTUjDdgWMATg9DiFMyv8fvoqgNsNyrrZTnSgoLzdxr89FGHZCoSoAK8gfgFHuO54B
- lI8QOfPDG9WDPJ66HCodjTlBEr/Cwq6GruxS5i2Y33YVqxvFvDa1tUtl+iJ2SWKS9kCai2DR
- 3BwVONJEYSDQaven/EHMlY1q8Vln3lGPsS11vSUK3QcNJjmrgYxH5KsVsf6PNRj9mp8Z1kIG
- qjRx08+nnyStWC0gZH6NrYyS9rpqH3j+hA2WcI7De51L4Rv9pFwzp161mvtc6eC/GxaiUGuH
- BNAVP0PY0fqvIC68p3rLIAW3f97uv4ce2RSQ7LbsPsimOeCo/5vgS6YQsj83E+AipPr09Caj
- 0hloj+hFoqiticNpmsxdWKoOsV0PftcQvBCCYuhKbZV9s5hjt9qn8CE86A5g5KqDf83Fxqm/
- vXKgHNFHE5zgXGZnrmaf6resQzbvJHO0Fb0CcIohzrpPaL3YepcLDoCCgElGMGQjdCcSQ+Ci
- FCRl0Bvyj1YZUql+ZkptgGjikQARAQABwsFfBBgBAgAJBQJUY85qAhsMAAoJEGg1lTBwyZKw
- l4IQAIKHs/9po4spZDFyfDjunimEhVHqlUt7ggR1Hsl/tkvTSze8pI1P6dGp2XW6AnH1iayn
- yRcoyT0ZJ+Zmm4xAH1zqKjWplzqdb/dO28qk0bPso8+1oPO8oDhLm1+tY+cOvufXkBTm+whm
- +AyNTjaCRt6aSMnA/QHVGSJ8grrTJCoACVNhnXg/R0g90g8iV8Q+IBZyDkG0tBThaDdw1B2l
- asInUTeb9EiVfL/Zjdg5VWiF9LL7iS+9hTeVdR09vThQ/DhVbCNxVk+DtyBHsjOKifrVsYep
- WpRGBIAu3bK8eXtyvrw1igWTNs2wazJ71+0z2jMzbclKAyRHKU9JdN6Hkkgr2nPb561yjcB8
- sIq1pFXKyO+nKy6SZYxOvHxCcjk2fkw6UmPU6/j/nQlj2lfOAgNVKuDLothIxzi8pndB8Jju
- KktE5HJqUUMXePkAYIxEQ0mMc8Po7tuXdejgPMwgP7x65xtfEqI0RuzbUioFltsp1jUaRwQZ
- MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
- hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
- vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <20250307164123.1613414-1-chao.gao@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On 3/7/25 08:41, Chao Gao wrote:
-> case |IA32_XSS[12] | Space | RFBM[12] | Drop%	
-> -----+-------------+-------+----------+------
->   1  |	   0	   | None  |	0     |  0.0%
->   2  |	   1	   | None  |	0     |  0.2%
->   3  |	   1	   | 24B?  |	1     |  0.2%
+Work towards having a single binary, by removing duplicated object files.
 
-So, 0.2% is still, what, dozens of cycles? Are you sure that it really
-takes the CPU dozens of cycles to skip over the feature during XSAVE?
+hw/hyperv/hyperv.c was excluded at this time, because it depends on target
+dependent symbols:
+- from system/kvm.h
+    - kvm_check_extension
+    - kvm_vm_ioctl
+- from exec/cpu-all.h | memory_ldst_phys.h.inc
+    - ldq_phys
 
-If it really turns out to be this measurable, we should probably follow
-up with the folks that implement XSAVE and see what's going on under the
-covers.
+v2
+- remove osdep from header
+- use hardcoded buffer size for syndbg, assuming page size is always 4Kb.
 
-On a separate note, I was bugging Thomas a bit on IRC. His memory was
-that the AMX-era FPU rework only expected KVM to support user features.
-You might want to dig through the history a bit and see if _that_ was
-ever properly addressed because that would change the problem you're
-trying to solve.
+Pierrick Bouvier (7):
+  hw/hyperv/hv-balloon-stub: common compilation unit
+  hw/hyperv/hyperv.h: header cleanup
+  hw/hyperv/vmbus: common compilation unit
+  hw/hyperv/hyperv-proto: move SYNDBG definition from target/i386
+  hw/hyperv/syndbg: common compilation unit
+  hw/hyperv/balloon: common balloon compilation units
+  hw/hyperv/hyperv_testdev: common compilation unit
+
+ include/hw/hyperv/hyperv-proto.h | 12 ++++++++
+ include/hw/hyperv/hyperv.h       |  3 +-
+ target/i386/kvm/hyperv-proto.h   | 12 --------
+ hw/hyperv/syndbg.c               | 10 +++++--
+ hw/hyperv/vmbus.c                | 50 ++++++++++++++++----------------
+ hw/hyperv/meson.build            |  9 +++---
+ 6 files changed, 51 insertions(+), 45 deletions(-)
+
+-- 
+2.39.5
+
 
