@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-40318-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40321-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B6FBA56305
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 09:55:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92663A56318
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 09:59:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F55C17588E
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 08:55:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC21A16F7B0
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 08:59:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D261E1DE4;
-	Fri,  7 Mar 2025 08:55:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42C221E1DF0;
+	Fri,  7 Mar 2025 08:59:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DqXblCeE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gLMQoBDT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242891A5B9E
-	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 08:55:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1918199E94
+	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 08:59:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741337735; cv=none; b=q7qiQ8CrWOCMi6JFHrIdG54BsSy/s4oDDKL4NF07ImkerJ7oSzHkKOE3hOavQ3ADhKh27rWpmrCvOG9M/FJuJRzckMdVwVY2hUHpjO5SaEHOM8W8OzHewWp7iytjdLq7sAtMvHb8jTUbpBbDewnCasQ2h65TkeC/Wb7aUEXrksM=
+	t=1741337949; cv=none; b=PHiltqxGD2WRaT2oZU7Wt/f0B1256Db4dLkx479VAd3uT0LL7LID6VgfwRdxP6QRdLzmJ/pWeU2S3Afe6O2m9QJ5uLHuE+9MjTPcIw5qPDnCHbbU4PgGnPo9pystoEOe1XlEkxFZiorJrzFsiTk0Oz6cl/xdNCSGF/6H9dd848Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741337735; c=relaxed/simple;
-	bh=RpN/LeNWfGyP6YXcs9FmCYAJxwp+Z5cSq5y5kR3MKmw=;
+	s=arc-20240116; t=1741337949; c=relaxed/simple;
+	bh=lcLY1x1iW003ARIIYfypc8gSXCdCsMc0qubiz9RJXy8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iYijwXljLC6yINQbZm8K9BPr3mgpJy05UCUWz9BzzJEesSfNAc2clEsl8AuW1FFrdRGcZtoxIhIZd6wXfTpYnwCQFNmXk5CLnfdE6WA56mYiW7rUPkQ2DxRt6LZKLXuRwmKtf+0EPjI83g03hqEFIJSrCb/ZDWFxZOjGugEOKZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DqXblCeE; arc=none smtp.client-ip=192.198.163.16
+	 Content-Type:Content-Disposition:In-Reply-To; b=uY+8D4vkoc5mQZSQ3dBU6YqmRmeCvd7clXtFc3lAJVDHl/WttW1Xq4gEIxaBqUuzC0QPEHo1kXJBz0QxxBRpM3is+81ZgGWSWDHP70vYIvpxK2Kwl2JZaH+9ONG7QjSLXNWsRzJYvDM9qYnn9qUvQXY0O7rsRxr2xIK0xfvtvGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gLMQoBDT; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741337733; x=1772873733;
+  t=1741337948; x=1772873948;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=RpN/LeNWfGyP6YXcs9FmCYAJxwp+Z5cSq5y5kR3MKmw=;
-  b=DqXblCeE0sFGUHm18O0NYvJLkd+3Ehgn6P0tke3xGWfoV88q3YUeZwhi
-   a04IDmWoVO29MFwb1ewBc7D5hNgOTCAKt2xfls01vCJvUltZ7g3LERGQz
-   gslRZwYFmP4+h6Pra3KmEVMWtH8VRW2mlVzpzjrEfE0/+Nu0a3k1Her7I
-   Qe2vpDhqF4u/TMrtuDbCnEld5KCW2cgimdSKaYPwT9Cpzo6UBU1H8fH5u
-   Mr1gR7oZ9tOYYJ74MvThQD+2gKYiKNcWnfP/XeXf4oaru+nXbiCMZUg9l
-   aVAYZBlVIL23etCo48iJvx4URdufRrKDhhE0bhbh0Ipfa82XAdTv+PT+5
+  bh=lcLY1x1iW003ARIIYfypc8gSXCdCsMc0qubiz9RJXy8=;
+  b=gLMQoBDTMBPeScAN4Yl1ZmEpJVQkC17mVlsvakl8Dwh0/NM6hFvSUSBN
+   MvmotTJr/1+Try0c2mq2EKGv+GvzmJLwkeC+uqA6bjpDN2/8olrwB3l1w
+   2Ko3jKxB8/NrQO7yzfyFJYqXHo9ltVkUvxVonQxezF87LBwKaCGb4oMdW
+   6arH7HWWyFxzDYi8rzfr+cDhnozuK8ZhK6voUC19GfKYcPmw6bjSGGeFI
+   heD4gNQpv+2zLdOWryIrJpZQ6DXhaiWapTMJAOrBWjqUmqKVkCY/12AVp
+   +/8EQXzwYLliHMi2epSVjjNKQucpbvvYC/tnHF4F7ZHlBYbCXsaZQ2zAA
    Q==;
-X-CSE-ConnectionGUID: 0AQ/7n+2SxqtmaoiY0Go5Q==
-X-CSE-MsgGUID: Qs0lCtoURUCRZiOgjVeHMA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="29961617"
+X-CSE-ConnectionGUID: 18UfZxnxTUqt3VTjlxRELg==
+X-CSE-MsgGUID: O2GpVk/pQwKrHiv7EvN1Zw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="42521572"
 X-IronPort-AV: E=Sophos;i="6.14,228,1736841600"; 
-   d="scan'208";a="29961617"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2025 00:55:31 -0800
-X-CSE-ConnectionGUID: bm/QiMATQDK5kl9bpcb14Q==
-X-CSE-MsgGUID: c+VQWqPuQSmOZZgXgIJGBw==
+   d="scan'208";a="42521572"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2025 00:59:07 -0800
+X-CSE-ConnectionGUID: lflAClxPRXafbSNVjWQY3Q==
+X-CSE-MsgGUID: nQXLNZKkRem5CEU/Z4hs7w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="119789356"
+   d="scan'208";a="123459836"
 Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
-  by orviesa007.jf.intel.com with ESMTP; 07 Mar 2025 00:55:24 -0800
-Date: Fri, 7 Mar 2025 17:15:32 +0800
+  by fmviesa003.fm.intel.com with ESMTP; 07 Mar 2025 00:59:03 -0800
+Date: Fri, 7 Mar 2025 17:19:11 +0800
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Dongli Zhang <dongli.zhang@oracle.com>
 Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com,
@@ -68,11 +68,11 @@ Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com,
 	alexander.ivanov@virtuozzo.com, den@virtuozzo.com,
 	davydov-max@yandex-team.ru, xiaoyao.li@intel.com,
 	dapeng1.mi@linux.intel.com, joe.jin@oracle.com
-Subject: Re: [PATCH v2 05/10] target/i386/kvm: extract unrelated code out of
- kvm_x86_build_cpuid()
-Message-ID: <Z8q5NHQeIgXxTmPO@intel.com>
+Subject: Re: [PATCH v2 06/10] target/i386/kvm: rename architectural PMU
+ variables
+Message-ID: <Z8q6D8fqFmegi4uW@intel.com>
 References: <20250302220112.17653-1-dongli.zhang@oracle.com>
- <20250302220112.17653-6-dongli.zhang@oracle.com>
+ <20250302220112.17653-7-dongli.zhang@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,96 +81,21 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250302220112.17653-6-dongli.zhang@oracle.com>
+In-Reply-To: <20250302220112.17653-7-dongli.zhang@oracle.com>
 
-> +static void kvm_init_pmu_info(CPUX86State *env)
-> +{
-> +    uint32_t eax, edx;
-> +    uint32_t unused;
-> +    uint32_t limit;
-> +
-> +    cpu_x86_cpuid(env, 0, 0, &limit, &unused, &unused, &unused);
+> +/*
+> + * For Intel processors, the meaning is the architectural PMU version
+> + * number.
+> + *
+> + * For AMD processors: 1 corresponds to the prior versions, and 2
+> + * corresponds to AMD PerfMonV2.
+> + */
+> +static uint32_t has_pmu_version;
 
-At this stage, CPUID has already been filled and we should not use
-cpu_x86_cpuid() to get the "raw" CPUID info.
+The "has_" prefix sounds like a boolean type. So what about "pmu_version"?
 
-Instead, after kvm_x86_build_cpuid(), the cpuid_find_entry() helper
-should be preferred.
+Others look good to me,
 
-With cpuid_find_entry(), we don't even need to check the limit again.
-
-> +
-> +    if (limit < 0x0a) {
-> +        return;
-> +    }
-
-...
-
->  int kvm_arch_init_vcpu(CPUState *cs)
->  {
->      struct {
-> @@ -2267,6 +2277,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
->      cpuid_i = kvm_x86_build_cpuid(env, cpuid_data.entries, cpuid_i);
->      cpuid_data.cpuid.nent = cpuid_i;
->  
-> +    kvm_init_pmu_info(env);
-> +
-
-Referring what has_msr_feature_control did, what about the following
-change?
-
- int kvm_arch_init_vcpu(CPUState *cs)
- {
-     struct {
-@@ -2277,8 +2240,6 @@ int kvm_arch_init_vcpu(CPUState *cs)
-     cpuid_i = kvm_x86_build_cpuid(env, cpuid_data.entries, cpuid_i);
-     cpuid_data.cpuid.nent = cpuid_i;
-
--    kvm_init_pmu_info(env);
--
-     if (((env->cpuid_version >> 8)&0xF) >= 6
-         && (env->features[FEAT_1_EDX] & (CPUID_MCE | CPUID_MCA)) ==
-            (CPUID_MCE | CPUID_MCA)) {
-@@ -2329,6 +2290,31 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         has_msr_feature_control = true;
-     }
-
-+    c = cpuid_find_entry(&cpuid_data.cpuid, 0xa, 0);
-+    if (c) {
-+        has_architectural_pmu_version = c->eax & 0xff;
-+        if (has_architectural_pmu_version > 0) {
-+            num_architectural_pmu_gp_counters = (c->eax & 0xff00) >> 8;
-+
-+            /*
-+             * Shouldn't be more than 32, since that's the number of bits
-+             * available in EBX to tell us _which_ counters are available.
-+             * Play it safe.
-+             */
-+            if (num_architectural_pmu_gp_counters > MAX_GP_COUNTERS) {
-+                num_architectural_pmu_gp_counters = MAX_GP_COUNTERS;
-+            }
-+
-+            if (has_architectural_pmu_version > 1) {
-+                num_architectural_pmu_fixed_counters = c->edx & 0x1f;
-+
-+                if (num_architectural_pmu_fixed_counters > MAX_FIXED_COUNTERS) {
-+                    num_architectural_pmu_fixed_counters = MAX_FIXED_COUNTERS;
-+                }
-+            }
-+        }
-+    }
-+
-     if (env->mcg_cap & MCG_LMCE_P) {
-         has_msr_mcg_ext_ctl = has_msr_feature_control = true;
-     }
----
-
-The above codes check 0xa after 0x1 and 0x7, and uses the local variable
-`c`, so that it doesn't need to wrap another new function.
-
-Regards,
-Zhao
-
-
+Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
 
 
