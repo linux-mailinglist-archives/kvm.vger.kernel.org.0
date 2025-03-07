@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-40385-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40387-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4E22A570B8
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 19:41:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 586D7A5711C
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 20:09:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8CE83B789D
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 18:41:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 656611895D14
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 19:09:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CCA4241CA2;
-	Fri,  7 Mar 2025 18:41:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40B2A24EF95;
+	Fri,  7 Mar 2025 19:09:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Mfh2kqgA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z8qpAKNg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E92219E98;
-	Fri,  7 Mar 2025 18:41:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E20E121C198;
+	Fri,  7 Mar 2025 19:09:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741372888; cv=none; b=EYdd4Q0J65zkCibgRIAAkDIHs6ijDSLVehTNYjHl7VMr++V+wg67syUEXblrp8grX8pU1fZnNS46y0AygrJTBsiuiw9ZLvVUj7Lm5ObAs/KLGrHVuwMnfgxPVx5J9AbTKdS3ozQibFm8P7PSxY3rGlhLNVPCDNFIG4BBj0T9DfQ=
+	t=1741374561; cv=none; b=a9Jum8lcrizs2hNaFSCMEf6M4+PN5QiRy0SNneUTwCVY0SesqRliFvmX3NOUFZDPf5PUTWCLMyvU/H2vfH5iZf501TvNkd9axj1yOU21DRte/QRzrHej91E2QmoA3L3YeopJKRkMkav5/PsRKqzvQFAgLG+1VgzJd9KIytMgV48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741372888; c=relaxed/simple;
-	bh=gty8PqZgqe7OpYUmvh89+QW9b9WDHvBIJHRemJ0a4RY=;
+	s=arc-20240116; t=1741374561; c=relaxed/simple;
+	bh=7b1yf7yKNPbaNxLB08eC3eXk3nNFfhGnwkF5GV3f3qs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rVOXU3FGVE8cL+ySxsdgy4DT2StbUZoDROjFjcePNffR9aFCrkHDrEUvKZnrkqAMSIwNiVlWqK2ZTnudGf2aaQLM4Jrl3XkFsV8N/CSQF5pIFFc46WUj+vSqZnDcOfyxsbEV7c8/5lPWJTTLUunpQV586aFrQCHaYi03779wiuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Mfh2kqgA; arc=none smtp.client-ip=192.198.163.12
+	 In-Reply-To:Content-Type; b=rN5YJ/XYSDUM1PGU+m7MHH90ZgQysY/stWHetGrALJd313G3K8uBtVKGbTbKpYcrZbB7a6upY88kbbUqOE0AEK41a8OQ++SS89dAlzKski8T3UnqFe96ipdEEmLN031hPNjjD9QN2+aGTjIBYTAuepVapOapiUx/N21bXRW8R/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z8qpAKNg; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741372887; x=1772908887;
+  t=1741374560; x=1772910560;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=gty8PqZgqe7OpYUmvh89+QW9b9WDHvBIJHRemJ0a4RY=;
-  b=Mfh2kqgABj4RKlTuROa26UpjaAKA2gU0cw9Hm02uFLD08q463ZEeyraS
-   kWJgLiKRirYeWipJGMK+zj1T78A89Ch1ZCIxg0Z/J71B47gfWTL+vDo3N
-   dICvgFJk9zC63/gOOMAf6mRZwxa9cWJf6NRlZcfVbZ2MVjfvVR7BSdMVR
-   yaEyCt6YvmJb3IPrFHNLvY8dw/y+MvvxznVJPidFIS0TC1kEHkzd+ij7O
-   eHhLbNnnB6DBvrdLBvWxH5obrc0I43eEaF7vQTiTQALWJ2KExZ0xI5UJw
-   RKrCaJVEipODswKegHQ8NankfLKXtbNLoaqP1X0JFH9KmXH6yScduFdhT
+  bh=7b1yf7yKNPbaNxLB08eC3eXk3nNFfhGnwkF5GV3f3qs=;
+  b=Z8qpAKNgHV21JvM89ci3GPsXuGKeJcfv8ahf4tvDEyCt5d0i0nA9a/o4
+   zaL9GcBoptMpY+jLKAYhp4r7WXHd9ZgNx3KWQnKLBW/JGUP+kjplKQKmV
+   769RkpYFbWZbL1lSkYwKHvsPwUjHg7Ww/tVq1SukgoTM4FhRXCFIrW+9f
+   5WVxayzoWx2I67cGTZItBvIMP8HpEuZC8KYYNVGY9wo8chXQKHVmSwA3l
+   uCiWBRO/qlH18zssj3F/RlI1cmFjMZqzzzAlduazkOj81auIqGY62vI5R
+   e6zYnq6aF4fmHNu7X4TbcQqhFJpG6nIxzG8Pi9QK2sUK7tI6sWO9fQOU+
    g==;
-X-CSE-ConnectionGUID: fyrqlwKYQ4euidvpoJn7Mg==
-X-CSE-MsgGUID: o3FUuQiITpuHEWUU7vwknQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="46357002"
-X-IronPort-AV: E=Sophos;i="6.14,229,1736841600"; 
-   d="scan'208";a="46357002"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2025 10:41:26 -0800
-X-CSE-ConnectionGUID: zrwdQHN7Tf+i1POGddtPVw==
-X-CSE-MsgGUID: R/OL9BOmQ4+4JjC8pabv6A==
+X-CSE-ConnectionGUID: D5hRxFgoSQy6WG1uEXw1+g==
+X-CSE-MsgGUID: lYFH3SYvQ7SLxxZ/fv4ObQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="42314229"
+X-IronPort-AV: E=Sophos;i="6.14,230,1736841600"; 
+   d="scan'208";a="42314229"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2025 11:09:19 -0800
+X-CSE-ConnectionGUID: hCn3oAx7SByF4Z4ZVqm/Gg==
+X-CSE-MsgGUID: ZB2sL+QMTKStStCuX7FDnQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="119337812"
+   d="scan'208";a="156619226"
 Received: from dnelso2-mobl.amr.corp.intel.com (HELO [10.125.110.132]) ([10.125.110.132])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2025 10:41:26 -0800
-Message-ID: <98dda94f-b805-4e0e-871a-085eb2f6ff20@intel.com>
-Date: Fri, 7 Mar 2025 10:41:49 -0800
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2025 11:09:18 -0800
+Message-ID: <b9389b35-c1ef-4a53-9eb2-051df0aaf33d@intel.com>
+Date: Fri, 7 Mar 2025 11:09:42 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,16 +67,13 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 07/10] x86/fpu/xstate: Initialize guest fpstate with
- fpu_guest_config
+Subject: Re: [PATCH v3 00/10] Introduce CET supervisor state support
 To: Chao Gao <chao.gao@intel.com>, tglx@linutronix.de, x86@kernel.org,
  seanjc@google.com, pbonzini@redhat.com, linux-kernel@vger.kernel.org,
  kvm@vger.kernel.org
 Cc: peterz@infradead.org, rick.p.edgecombe@intel.com,
- weijiang.yang@intel.com, john.allen@amd.com, bp@alien8.de,
- Maxim Levitsky <mlevitsk@redhat.com>
+ weijiang.yang@intel.com, john.allen@amd.com, bp@alien8.de
 References: <20250307164123.1613414-1-chao.gao@intel.com>
- <20250307164123.1613414-8-chao.gao@intel.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -122,56 +119,27 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <20250307164123.1613414-8-chao.gao@intel.com>
+In-Reply-To: <20250307164123.1613414-1-chao.gao@intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 3/7/25 08:41, Chao Gao wrote:
-> From: Yang Weijiang <weijiang.yang@intel.com>
-> 
-> Use fpu_guest_cfg to initialize the guest fpstate and the guest FPU pseduo
-> container.
-> 
-> The user_* fields remain unchanged for compatibility with KVM uAPIs.
-> 
-> Inline the logic of __fpstate_reset() to directly utilize fpu_guest_cfg.
+> case |IA32_XSS[12] | Space | RFBM[12] | Drop%	
+> -----+-------------+-------+----------+------
+>   1  |	   0	   | None  |	0     |  0.0%
+>   2  |	   1	   | None  |	0     |  0.2%
+>   3  |	   1	   | 24B?  |	1     |  0.2%
 
-Why? Seriously, why? Why would you just inline it? Could you please
-revisit the moment when you decided to do this? Please go back to that
-moment and try to unlearn whatever propensity you have for taking this path.
+So, 0.2% is still, what, dozens of cycles? Are you sure that it really
+takes the CPU dozens of cycles to skip over the feature during XSAVE?
 
-There are two choices: make the existing function work for guests, or
-add a new guest-only reset function.
+If it really turns out to be this measurable, we should probably follow
+up with the folks that implement XSAVE and see what's going on under the
+covers.
 
-Just an an example:
-
-static void __fpstate_reset(struct fpstate *fpstate,
-			    struct fpu_state_config *kernel_cfg,
-			    u64 xfd)
-{
-        /* Initialize sizes and feature masks */
-        fpstate->size           = kernel_cfg->default_size;
-        fpstate->xfeatures      = kernel_cfg->default_features;
-
-	/* Some comment about why user states don't vary */
-        fpstate->user_size      = fpu_user_cfg.default_size;
-        fpstate->user_xfeatures = fpu_user_cfg.default_features;
-
-        fpstate->xfd            = xfd;
-}
-
-Then you have two call sites:
-
-	__fpstate_reset(fpstate, &fpu_guest_cfg, 0);
-and
-	__fpstate_reset(fpu->fpstate, &fpu_kernel_cfg,
-		        init_fpstate.xfd);
-
-What does this tell you?
-
-It clearly lays out that to reset an fpstate, you need a specific kernel
-config. That kernel config is (can be) different for guests.
-
-Refactoring the code as you go along is not optional. It's a requirement.
-
+On a separate note, I was bugging Thomas a bit on IRC. His memory was
+that the AMX-era FPU rework only expected KVM to support user features.
+You might want to dig through the history a bit and see if _that_ was
+ever properly addressed because that would change the problem you're
+trying to solve.
 
