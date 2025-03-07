@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-40308-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40310-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E080A561B0
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 08:22:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBCC1A561D7
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 08:32:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8DFDB7A8DDB
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 07:21:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 261231893F4B
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 07:32:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57CDF1A2632;
-	Fri,  7 Mar 2025 07:21:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99A431A5BAA;
+	Fri,  7 Mar 2025 07:32:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ia3ghLI+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TXqwYR8o"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F6A431A89
-	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 07:21:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1418819D8A4
+	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 07:32:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741332112; cv=none; b=UchjszInKbxzBwmGOXy7qzNkLc/kXO+okzfhxRX02xTEWMTtuzlJxv8t7FzfbwuXtJK5+0gY4ZdlfqEa4kyJLK/2z71Bp65LG5fDlvjL20r4gLvbb9BYKjVcTJhW2613z7tc/AGiYEyHilrgfpnbGJDrNvkGabNMn3EhHOJ6EJU=
+	t=1741332733; cv=none; b=F8GHjSMEBTxqRPz9SRsx8uZhtSQrEh1ln78rl+t5QSOX3leMDg6DB9miIt1iDVtk67m5vUEDemLeFoczPh1PmdQyYU6koumHsvGVxM6buDIHdgsJKD7UHTjgay6pZ9UP1HVKPTjRY2NZUQdK4bnspOstghA5Wq21nUwmfIs0t3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741332112; c=relaxed/simple;
-	bh=z5G5631nTIRqDdY+F3KY6G3vbEul2mSHrm5r6NEZZy4=;
+	s=arc-20240116; t=1741332733; c=relaxed/simple;
+	bh=0n9mnucRi4sYNV486/6Gw1e7LpF2GnO1kkWy7c3sKFk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c/+q74DTFGGLqY6m4i/GYaAb1nOpsrj+E64XeVpKDKuUjtHdXg8Nr2cFELK2TlIOcoMJkhnMXk6OYBhFmIGXOydUAxwwdAF3OMaKwY8Z1D2KF0ncHpEMBNirrXA8p+1lACFMXIPkTIiHtLeieBdpN3ZkVwzFKq/dIPSSwrP6wQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ia3ghLI+; arc=none smtp.client-ip=198.175.65.15
+	 Content-Type:Content-Disposition:In-Reply-To; b=GBRJD5W6WmrSxi/ZmClJLPxLqyYb/J9RTTElmGe5uhAeD0e6rzGzGYRdkVrjvCIqox+UGbxiOGJdCOrsclzlmqBAjFtIySLUwApsViy4PA3Jwgf/tecINWg9j8MWasmzC5pQOXLCt6ePEDBQ9zOtLpu8YlvoyUHdRzjciSxsKvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TXqwYR8o; arc=none smtp.client-ip=192.198.163.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741332110; x=1772868110;
+  t=1741332732; x=1772868732;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=z5G5631nTIRqDdY+F3KY6G3vbEul2mSHrm5r6NEZZy4=;
-  b=ia3ghLI+IHCeiNoIeLHMND/JFmKHjnbvx4nkibU+NW0b1/bzMtiGcw6E
-   vrTWQKFSoGETd/gz6RwXuCPFWCUb0vjx1A0FRCypWqL1k/1x/90NbW8J9
-   cs23TKvcqEj9HUOMu9yKU2u8udAlboRCncjEof0ycj32Lh7rReNc0CJQ9
-   qnP2XSMQFUHMC+9u2qpQ21B1Vvqt6CcN4At6LyE7hTJi2Dsuuhu2sh+/r
-   CBg7ZFZDaIaJ5PKFiGWwacuy7umpDzeffCiPw6Vw29dlmph9R+WKthxAx
-   4IVA1yR/1meSsI8lTXjiViHchmPapCik9TG3QS8cSG8hVeMcAizU//pFr
-   A==;
-X-CSE-ConnectionGUID: 3iM5z+rtSN6S7v/y4u8hCQ==
-X-CSE-MsgGUID: yCdBtX5GQ+msSiJnSH3HEQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="46027353"
+  bh=0n9mnucRi4sYNV486/6Gw1e7LpF2GnO1kkWy7c3sKFk=;
+  b=TXqwYR8oAB0QIDLwXMeqbcPSCWg9PWkkps/iNCFTWy7ZRghc+H4f0sUg
+   UYPdEv+mPeGj8ljVaNZhGJtXAQT+YrF0a6AYVHY9p/WtbISaSYsJLZrKo
+   cO3rL04jS+CjIcoctHbrxECf0wmBcAX8/pnSZuaBBQ4P38TCozVaNuuuv
+   CV0PqgsvgM3/F4kH/1YhgAYiVh5j/+vpvgMZmDYyvQ8FGzzK64EBskgeR
+   ECsFETVZHDh3GxbpNbSiOg+moNFzPtqkvh1WkEeUVpVPejsgce/Wiem4b
+   RSC/PTYvLiFvprULO5vYls10SlL4JcMaN0T4o+jr3Q/uR6qfpbkCloH4G
+   g==;
+X-CSE-ConnectionGUID: Bb6EFEkwRJSExE+H6wh7Pw==
+X-CSE-MsgGUID: SeJ104yMRMCZ5Cf5ZwXAbQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="59931185"
 X-IronPort-AV: E=Sophos;i="6.14,228,1736841600"; 
-   d="scan'208";a="46027353"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2025 23:21:49 -0800
-X-CSE-ConnectionGUID: 3vpmoA5NTg6eXzieuSHKhA==
-X-CSE-MsgGUID: nI9mrnhdTuOqLaOEpmJRUw==
+   d="scan'208";a="59931185"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2025 23:32:09 -0800
+X-CSE-ConnectionGUID: Z1+BL8nvTUqYhVfuIt1Egg==
+X-CSE-MsgGUID: eTZR0ffEQceqcW7KL2AxEg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.14,228,1736841600"; 
-   d="scan'208";a="124172995"
+   d="scan'208";a="142483946"
 Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
-  by orviesa003.jf.intel.com with ESMTP; 06 Mar 2025 23:21:44 -0800
-Date: Fri, 7 Mar 2025 15:41:53 +0800
+  by fmviesa002.fm.intel.com with ESMTP; 06 Mar 2025 23:32:05 -0800
+Date: Fri, 7 Mar 2025 15:52:14 +0800
 From: Zhao Liu <zhao1.liu@intel.com>
 To: dongli.zhang@oracle.com
 Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com,
@@ -68,13 +68,13 @@ Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com,
 	alexander.ivanov@virtuozzo.com, den@virtuozzo.com,
 	davydov-max@yandex-team.ru, xiaoyao.li@intel.com,
 	dapeng1.mi@linux.intel.com, joe.jin@oracle.com
-Subject: Re: [PATCH v2 02/10] target/i386: disable PERFCORE when "-pmu" is
- configured
-Message-ID: <Z8qjQVem/vqcSjhw@intel.com>
+Subject: Re: [PATCH v2 03/10] [DO NOT MERGE] kvm: Introduce
+ kvm_arch_pre_create_vcpu()
+Message-ID: <Z8qlrjciHEbdnqaA@intel.com>
 References: <20250302220112.17653-1-dongli.zhang@oracle.com>
- <20250302220112.17653-3-dongli.zhang@oracle.com>
- <Z8nSPf4bUPICgf3g@intel.com>
- <483c5783-6fb3-4793-9727-2cd4263dd92b@oracle.com>
+ <20250302220112.17653-4-dongli.zhang@oracle.com>
+ <Z8hjy/8OBTXEA1kp@intel.com>
+ <acef41fc-9eb1-4df7-b7b6-61995a76fcc4@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,16 +83,26 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <483c5783-6fb3-4793-9727-2cd4263dd92b@oracle.com>
+In-Reply-To: <acef41fc-9eb1-4df7-b7b6-61995a76fcc4@oracle.com>
 
-> 1. Remove "kvm_enabled() && IS_AMD_CPU(env)" since the bit is reserved by
-> Intel.
-> 
-> 2. Add your Reviewed-by.
+> I didn't know if I would need to wait until this patch is merged into
+> mainline QEMU. That's why I didn't add my signed-off.
 
-Yes, this is exactly what I mean!
+No problem if Xiaoyao is okay with it (copyright of patches need to
+honor the original author & signed-off). IMO, if your series is accepted
+first, it also helps to reduce the size of the TDX series, and it helps
+the subsequent PMU development (like mediated PMU). Conversely, it's
+also not a big deal; you can simply rebase and remove this patch at that
+time.
 
-Regards,
+Even I'm thinking that my KVM PMU filter should perhaps base on your work.
+
+> I will add in v3 and remove "DO NOT MERGE" if the patch isn't in QEMU when
+> I am sending out v3.
+
+Okay.
+
+Thanks,
 Zhao
 
 
