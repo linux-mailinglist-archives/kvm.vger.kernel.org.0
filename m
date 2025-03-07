@@ -1,143 +1,147 @@
-Return-Path: <kvm+bounces-40433-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40434-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCCB1A57362
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 22:12:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32030A57372
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 22:21:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A4CD1778E6
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 21:12:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4A37189911B
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 21:21:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62B032571A1;
-	Fri,  7 Mar 2025 21:12:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12DA5257AFF;
+	Fri,  7 Mar 2025 21:21:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JnIW4UkA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DivcZmOY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B42BD187346
-	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 21:12:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CFED20FA9C
+	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 21:21:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741381935; cv=none; b=GCEvoyrMznIYT5rVWMcSv9BLdvwHbkZZhsXJmej7TreeSr4oHFp9TXsEhYBDKrEL9+i5L02gJx/9y7XJraj2zZFnf+X+dppa2DJGjJp4+CAaCpEoQ0BUDaFaVxr8xSTPUF0H6pHE4r333sDmhPN9U67mzT3rvs6bH/uQHZMN48I=
+	t=1741382464; cv=none; b=AiAR4eRTLw7xz1EVxRtWUPdWJ2VTSFA1HlkNUvZ78Z8iv3yvQFXY367lk39qwlbseaCFfdGzOUM+o1e9XXyF7mtRgS4TKUk6MdlCzhgMI1e8xjA/XD+gQncr9Yqz95AVf//aVElyWwqfcpZU3abEjB2KMCi0UQWDqP+smxHIdf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741381935; c=relaxed/simple;
-	bh=sQWNAB2iw5kTLaHZ8V3vpevUpfJJGo/WthIZ7bg0uuw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZrKO/EyDocV28zSolCm/gVVTFaZT1RlofNPx99nEeZYvaWOneOFpYG+jrxPYDBEDKeP5eAIniffRmz9h17OajLCowToOTlhzfbA5SJiGIVToMH56itcAHXXWttjM61Cq7HbDS5ui1JnFbkXqODCthfMCWIvRJRNM3jZv1dhJv3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=JnIW4UkA; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-43bcc04d4fcso14251645e9.2
-        for <kvm@vger.kernel.org>; Fri, 07 Mar 2025 13:12:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1741381932; x=1741986732; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=l64+I2Ef5txlgYNJJZ7ulgkakQ+zvNIWx2E9yaYadXc=;
-        b=JnIW4UkA4GENtrI2nWTO7VqTmQoil+T9EbEDPHScuH5yaqfJkoBpnBOoO9Ba4hKUhm
-         dQnwOF/OM4ddKz2DG7iJrHTvlPAnGZub3ngDS6OUJ/MT7R+d9LChQpWnvZZem42xztNN
-         7/iMx03TUIQswPUZxQISrXpmR6medGkTRWkUwYdfpgQNe4b/TLU/DCHJB+BW2PMjHIne
-         Wk22hhw8icLDdpmjbQcWV54fZIf01DGopt3Jw+XJZvipsOrZQXe3x8AwsN1AM8IlrxE9
-         o7xXXUhxTuCPwFv/aJWtcBNUin93xcsMGgW9ysVDnwPsySJt/tg3Ur2a+KuUVNIezwDC
-         YHUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741381932; x=1741986732;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=l64+I2Ef5txlgYNJJZ7ulgkakQ+zvNIWx2E9yaYadXc=;
-        b=qwaW0EQnCGT+OAGiXLUnhIgIzudLG6uhhQrap6rwz89E+XJJyKMqL8mHWG8eQ5dSdC
-         Ae2kFsdM4saBo6pbLFs6JUsJun5MMcJHoxKBkj2DfYTOjs0GtTGfsdGORWPOAOBDCXkT
-         8myQTJiedH4hAeIFUZ5V1jzKj2wWju1FloaVklrXRJk6ieWq4oG/N5bUaSzaxCoqG70L
-         YM6wMqzywIpoGZJxvBjEGNDvunLNPTAxeWeMAN+9Ba+OdAyJqnRVF3naEH/OzcvUAaYt
-         30OsU26dsIWx0XQ7UPz9pwAsa9kVSp9HX074W3gZbZm1EJPwUAw/rRZ4JrHGJnvfR9JU
-         TK3w==
-X-Forwarded-Encrypted: i=1; AJvYcCU/yc3VJq40u9pVFOD9ccylNZgrESKKUqJVacNdDQzhOUFAW1hIRQS5WpUk+RagHnyDFSg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyC/fVrev7UtRYSYoxAfDk9E0UiD/+oYjv3L6qiQpxReZY9wSzu
-	3eQuYvZZxBu5Hrf1k445aGR2jXAryVv3/sbYfTqArTfGDMI5a5PJ9SPbHeT+xLQ=
-X-Gm-Gg: ASbGncsnSu2X8Sfi6Tk37gPcZMUJgInE02uC09Qe2V+PBfBR6wjuiBx+vzz5dEOQ+5n
-	EJ6EN7QK0ZOmPUPktUlZOU3cow0wAVKOMaeS/RV0cJDfkSmgaaT7C+Vv1jTaPC6aMKcvVEjr0Yc
-	59RBMd0cuHrGGhhiH5AtW4Zonq7QqfEHGPcwm+aKIpEalKVlPOe7t8wVkUkXuAoxq+AwLXSlbSG
-	RIsYzPRsxc9EcvmlArVB09GFWgbdRdNcslaShPV9W6IuWllxFp+CoSDHDhMllBEGebwd3i3rVbV
-	jgNaxiBaKIoh1k+pv6Wm1o1cFZKCcvoVJekMt3aw5ED0LwTTUfmbZyLQAjkhGl9vGz9um6KQSOc
-	Vf6R+cUYsNdw9
-X-Google-Smtp-Source: AGHT+IGMHinE/FosS8DiGLzc8NSoY80Ag05j+jkWNdrl93TrEoYsCnm/CTh9yxyf5sjzV/B5gSbRjA==
-X-Received: by 2002:a05:600c:1ca5:b0:439:9b3f:2de1 with SMTP id 5b1f17b1804b1-43c601e129fmr35212005e9.15.1741381931945;
-        Fri, 07 Mar 2025 13:12:11 -0800 (PST)
-Received: from [192.168.69.199] (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43bd435c6f4sm91146665e9.34.2025.03.07.13.12.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Mar 2025 13:12:11 -0800 (PST)
-Message-ID: <083ec6f1-dac6-4ef1-8c4a-5d8c399154c3@linaro.org>
-Date: Fri, 7 Mar 2025 22:12:09 +0100
+	s=arc-20240116; t=1741382464; c=relaxed/simple;
+	bh=qrcIMU9U9DsBF5V3/PQV1D3t6SaK+EsSQxKpxWX4Vpc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=p+2xJ8Ha9lcAHeccS61Pv1c3DWThKtCTQOJE4Yyy3qZwLa+Ko9QTvfuOj2ZYtkaoqLRPtfGN2k/jOdMdNyVLWFfM6lv57lIT9jzjTqivbrZN2bEfIqS7b6GmSPZvFbVtHszGKAcDgpCurg2UeDB+cR/qWVIC6s3kzi+vqYwrLJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DivcZmOY; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741382461;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=TVPc86QDGWiEvS+VR4wqbSlUQGU+L2IWUkT/81scyXw=;
+	b=DivcZmOYLE8ARJONiIztLH0+dcWZHx1sRJCPzPEdcSoWMb0VlD3SrCKdpOnwzsg2CLWYAT
+	bnHpKIG94ere7FlIYYyglRgbZggbkDn5qv6hCHI3YPV3EmYRkfWlSY966jm8iK5T7MU3WL
+	VWaYDVTe+/DBwZ8jeGizOPUxkqP7F3w=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-282-ZeGQP00UO-ukQBiQPD0alw-1; Fri,
+ 07 Mar 2025 16:20:56 -0500
+X-MC-Unique: ZeGQP00UO-ukQBiQPD0alw-1
+X-Mimecast-MFC-AGG-ID: ZeGQP00UO-ukQBiQPD0alw_1741382455
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8D62418004A9;
+	Fri,  7 Mar 2025 21:20:55 +0000 (UTC)
+Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 850471956095;
+	Fri,  7 Mar 2025 21:20:54 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Cc: xiaoyao.li@intel.com,
+	adrian.hunter@intel.com,
+	seanjc@google.com,
+	rick.p.edgecombe@intel.com
+Subject: [PATCH v3 00/10] KVM: TDX: TD vcpu enter/exit
+Date: Fri,  7 Mar 2025 16:20:42 -0500
+Message-ID: <20250307212053.2948340-1-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 06/14] system: Declare qemu_[min/max]rampagesize() in
- 'system/hostmem.h'
-To: qemu-devel@nongnu.org
-Cc: Alex Williamson <alex.williamson@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, qemu-ppc@nongnu.org,
- Thomas Huth <thuth@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Tony Krowiak <akrowiak@linux.ibm.com>, Ilya Leoshkevich <iii@linux.ibm.com>,
- kvm@vger.kernel.org, Yi Liu <yi.l.liu@intel.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Zhenzhong Duan <zhenzhong.duan@intel.com>,
- Matthew Rosato <mjrosato@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>,
- Peter Xu <peterx@redhat.com>, Pierrick Bouvier
- <pierrick.bouvier@linaro.org>,
- Daniel Henrique Barboza <danielhb413@gmail.com>,
- Eric Auger <eric.auger@redhat.com>, qemu-s390x@nongnu.org,
- Jason Herne <jjherne@linux.ibm.com>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?=
- <clg@redhat.com>, David Hildenbrand <david@redhat.com>,
- =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Harsh Prateek Bora <harshpb@linux.ibm.com>,
- Nicholas Piggin <npiggin@gmail.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>
-References: <20250307180337.14811-1-philmd@linaro.org>
- <20250307180337.14811-7-philmd@linaro.org>
-Content-Language: en-US
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <20250307180337.14811-7-philmd@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On 7/3/25 19:03, Philippe Mathieu-Daudé wrote:
-> Both qemu_minrampagesize() and qemu_maxrampagesize() are
-> related to host memory backends. Move their prototype
-> declaration to "system/hostmem.h".
+The changes from v2 here mostly come from Xiaoyao's review, with which
+I mostly agreed:
 
-   qemu_minrampagesize()
-      -> find_min_backend_pagesize()
-          -> object_dynamic_cast(obj, TYPE_MEMORY_BACKEND)
+- moving the preparation for user return notifiers to prepare_switch_to_host,
 
+- squashing "x86/virt/tdx: Make tdh_vp_enter() noinstr" into patch 1
 
-   qemu_maxrampagesize()
-      -> find_max_backend_pagesize()
-         -> object_dynamic_cast(obj, TYPE_MEMORY_BACKEND)
+- dropping "KVM: TDX: Set arch.has_protected_state
+  to true" which is now part of one of the earlier series.
 
-Having:
+- replacing TDX_REGS_UNSUPPORTED_SET with the strict list of registers
+  that (at least potentially) are made available in unencrypted form
 
-include/system/hostmem.h:23:#define TYPE_MEMORY_BACKEND "memory-backend"
+The major change however is rewriting "KVM: TDX: restore host xsave
+state when exit from the guest TD" to not use kvm_load_host_xsave_state().
+There's a disagreement between me and Sean on that topic, but posting
+the patches is the best way to clear that up.  Also for this reason I'm
+including an extra patch at the end providing the hunks that were (or
+should be) only needed in order to appease kvm_load_host_xsave_state();
+I have tested without it and unlike the rest it is not included in kvm-coco-queue.
 
+Paolo
 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-> ---
->   include/exec/ram_addr.h    | 3 ---
->   include/system/hostmem.h   | 3 +++
->   hw/ppc/spapr_caps.c        | 1 +
->   hw/s390x/s390-virtio-ccw.c | 1 +
->   hw/vfio/spapr.c            | 1 +
->   5 files changed, 6 insertions(+), 3 deletions(-)
+Adrian Hunter (2):
+  KVM: TDX: Disable support for TSX and WAITPKG
+  KVM: TDX: Save and restore IA32_DEBUGCTL
+
+Binbin Wu (1):
+  KVM: VMX: Move common fields of struct vcpu_{vmx,tdx} to a struct
+
+Chao Gao (1):
+  KVM: x86: Allow to update cached values in kvm_user_return_msrs w/o
+    wrmsr
+
+Isaku Yamahata (5):
+  KVM: TDX: Implement TDX vcpu enter/exit path
+  KVM: TDX: vcpu_run: save/restore host state(host kernel gs)
+  KVM: TDX: restore host xsave state when exit from the guest TD
+  KVM: TDX: restore user ret MSRs
+  KVM: x86: Add a switch_db_regs flag to handle TDX's auto-switched
+    behavior
+
+Kai Huang (1):
+  x86/virt/tdx: Add SEAMCALL wrapper to enter/exit TDX guest
+
+Paolo Bonzini (1):
+  [NOT FOR UPSTREAM] KVM: TDX: put somewhat sensible values in vCPU for
+    encrypted registers
+
+ arch/x86/include/asm/kvm_host.h  |  12 +-
+ arch/x86/include/asm/tdx.h       |   1 +
+ arch/x86/kvm/vmx/common.h        |  68 ++++++++++
+ arch/x86/kvm/vmx/main.c          |  48 ++++++-
+ arch/x86/kvm/vmx/nested.c        |  10 +-
+ arch/x86/kvm/vmx/posted_intr.c   |  18 +--
+ arch/x86/kvm/vmx/tdx.c           | 264 ++++++++++++++++++++++++++++++++++++++-
+ arch/x86/kvm/vmx/tdx.h           |  20 ++-
+ arch/x86/kvm/vmx/vmx.c           |  99 +++++++--------
+ arch/x86/kvm/vmx/vmx.h           | 104 ++++++---------
+ arch/x86/kvm/vmx/x86_ops.h       |  11 ++
+ arch/x86/kvm/x86.c               |  28 ++++-
+ arch/x86/virt/vmx/tdx/seamcall.S |   3 +
+ arch/x86/virt/vmx/tdx/tdx.c      |   8 ++
+ arch/x86/virt/vmx/tdx/tdx.h      |   1 +
+ 15 files changed, 541 insertions(+), 154 deletions(-)
+
+-- 
+2.43.5
 
 
