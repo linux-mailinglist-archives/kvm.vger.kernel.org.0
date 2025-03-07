@@ -1,87 +1,85 @@
-Return-Path: <kvm+bounces-40319-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40320-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D276DA5630A
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 09:56:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A165AA56315
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 09:57:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C257A3A973E
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 08:56:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52EAD3B2D83
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 08:57:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FDDA1E1DED;
-	Fri,  7 Mar 2025 08:56:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 092621E1DFD;
+	Fri,  7 Mar 2025 08:57:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GILUOuB1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rCsJxzWN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231F21AC891
-	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 08:56:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9630B1DF990
+	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 08:57:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741337780; cv=none; b=CBIJiltkqmQ3yFbudrV9FA1QeQwGhD4s4t+YnFHk/XhSM9kXIjQvb+65DvQEaXu179YyPCYIAznjZvjA8rsBpxie06NWwm7OMOmlM3crCwthRbJPakuCr1iRc7R1IYxyAqpugUvTzow1H7YzDKW5zN7OpmI6gAIOA/uyiTLyUfU=
+	t=1741337861; cv=none; b=LRH375VXq1VpaeNQbTIQHrRjpBbJgEPjbNWymNjap+9Pi4Q5n+/39vCrGGWIOJV1kwqrD+SgGWT/VvROrLwMv51eK6O9LFlWZxtSlGgr+gXmloTpUnJxVTsMI6tsq/67k03OnE+HoorXBez9UFcooxRjVJgSUp1CFZZnvUas8To=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741337780; c=relaxed/simple;
-	bh=e1cmm4lk2rGmkDSn74gLD2WK+nX77RKJ17yafcd0/fo=;
+	s=arc-20240116; t=1741337861; c=relaxed/simple;
+	bh=vGG9NEnOun53/QXEi+g4WfOf7xFQ/aekd5NU3bx/M10=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LXGygrkrdBuF5EEg0906E37/1fpIHs+28ZxF+GgPnY/Oyj+n9OYNG8x1j1vMzBgyI1MNF1X76bMLanTyfzCBFWBbsJ8ekcQ5d98r8FvWYWUrAIlskt0SlaV3w5OH9SqGHsv50ST4ryVHg3vWjoVQPk6AEpnlV8H4DQoFYS4+cwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GILUOuB1; arc=none smtp.client-ip=209.85.160.179
+	 To:Cc:Content-Type; b=NYxYkOxedSNfbMgjuWbvToW2HixY+zwA6tTY/b+4FCqzuhI7TG2b+qWxAHA4N8jms1dTlUq38T0EysZ73wY0geeKYWGfHWaSt/AXFZSiJM2Ld/dXZzyQ7PGKz1gmrbx0ZMzpCjMdWtaH1/KXBIii3v428GaCWDL/Lk2yshnUQAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rCsJxzWN; arc=none smtp.client-ip=209.85.160.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-474fdb3212aso246191cf.0
-        for <kvm@vger.kernel.org>; Fri, 07 Mar 2025 00:56:18 -0800 (PST)
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-474fdb3212aso246921cf.0
+        for <kvm@vger.kernel.org>; Fri, 07 Mar 2025 00:57:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741337778; x=1741942578; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6GQHEoLTAFzBsO3pOwwB5OGgq8AJN92/UyqNILH3AQQ=;
-        b=GILUOuB19hLahU1rTBddaWGMeB5VvD8dyt83a+xxxmoGJYhBwFmMmti9/8ysRaUyPA
-         MEeT2Ta3lYoXh3W+F4NJLNeg+2wwTevk1mfmSsXIM/nZyfPG8RgUgV/I4TBkpQ75ualL
-         ZyyJwgXiViVvddFCzIc6HJzjHOYoifnA4NS+sAUwZVxaEokIyeqTv1VIRtgdEBqoMML5
-         2uVs4ckR1YAnWLJTri9GoVjHoHJz2La84m+jMQCX3tF6GxAHZQi1ZuGvOE/dzmyhg8p2
-         UvA93ZAxRCwRZR0/8Is2vntu17eozmU3xxSgz35y51Ds42ss4SBcI+gk0nVdK4h3zg8W
-         m4lA==
+        d=google.com; s=20230601; t=1741337858; x=1741942658; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=3/bwAjReW7ie98bg7DwXms4xhFjHn4AdXPUuqjhFQI0=;
+        b=rCsJxzWNb4eaOn5v41nu5hdDMVp5eKu4H9yCc5CWksi0yFXRvBgLSDqLBCUcTmTCi3
+         aqgFdiTLGXL6YOuv4AVhwwms8dTD0mlMB1yNOy9ZXYIIWiZj1ZvjGlJJOOndCM1gKGMh
+         HSIGjwTcmjLGmTjfeF8OK4z7nNweI844fMjxPcMwZsJeem7sXs0XzE4QJWeF59qIsktJ
+         aOamuPY5OGLK9xdj458+St44jpVJ1a+tgPAHSX0gRMjIt1bzU62ED7LunLFYD/vrmyo3
+         FQBvHrG38qVH4A8F+y1nNbVLCTO8RfEZdwsjt6nHpxuY1DginkK6kldQrCBhQ7efOFw+
+         J7gQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741337778; x=1741942578;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6GQHEoLTAFzBsO3pOwwB5OGgq8AJN92/UyqNILH3AQQ=;
-        b=WdrCmYYzjKopZZJRpNW4KBTyxtZMaUYVgtU8oa4vd91veWTaI9kA4cSymHbrof3gki
-         uHFDJXxP/HetfaAt23O17s8z93KNdtmGfewWxJ6e3kzXYSpc06AHg+VzzM82QmkZW3hR
-         bs4c8XroJMCSr/bWcDvnbF7i0y3HwsNw66RZybru/MziCRUAiLR15gmuG2hQTZ4shFaB
-         t+GxnBhuzTAwr0F+1na8QW3xm4GSke1OU4Px6iac5c6mOOdJcwBpQwnDJbXV8XsDFEho
-         VXB2p2MReB9Au5rpwDcUs0k5h9L8LMIoLhCxVCdUaR7ufPOa9SqVZ2WG4qTEAu8mOW87
-         S8AA==
-X-Gm-Message-State: AOJu0YzYydJqHbjLCvuy/T/c2LAzLCisWTAhtzHnQ7lrGLgY2TvFOWE9
-	M2ahnlFo6h0bF2Fh60YaH0HO2hXRn+/HI9V3/UREmo3nuFvW1oEv8PJhLS1mdjdDPhvjOnSV9TQ
-	USoToktdu55yrf1ArNioBrGpGig2H8/xGuJ82
-X-Gm-Gg: ASbGncvkVa2DpQiWD3njWpzDukbdKUPMXos3FaHjCcs5nh8/8wxRvPAFe6MOci7Ko7R
-	7/S6hLQyDAYTyi0scUBVCKyM2uA5ewJzlvqjzRupNS9LtkPVPeZrP7qCAUTGcx+JNoB0YeHHk1S
-	+rGR703/lE0mwROFMdx/0tgQmE
-X-Google-Smtp-Source: AGHT+IHw1oZaKmPCBs1ISB2portW8h1kNWaRUIgS0f9qwa4t2kBctwVH/B3jDuvDQd+jXMJiIAtCMYUSHhWqq2waroU=
-X-Received: by 2002:a05:622a:1388:b0:472:8e8:fe07 with SMTP id
- d75a77b69052e-47652083b39mr1890261cf.3.1741337777664; Fri, 07 Mar 2025
- 00:56:17 -0800 (PST)
+        d=1e100.net; s=20230601; t=1741337858; x=1741942658;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3/bwAjReW7ie98bg7DwXms4xhFjHn4AdXPUuqjhFQI0=;
+        b=j0Z2ieQPBjphuznhiuwxkpqwZw6WSnX1IHC6puorCp2q4R6Pt7dLDARdWC/YfRaiBp
+         BgCEpksqeIwjRH7jr4RbOBsGjx1jJefSWws8OLiSsr/wKzLNgpcCaOgrRohA0tZoMv3O
+         SDUkQkCyr1693cXWWjrXClEKDe/bDll6rSK+lJskkSSdrZR+2NDIQQmESxzDijpxkgxN
+         gWudfBwqxOSNvxiVXNDSGtNwaAbBPJwjVLwejJRAp/RHzLrMNscq54wXB5fNgY41Tw6I
+         Ta+cJkYLjERBo0dIwv+cgTuMBBNoTVqIUmY5urVqmyFY9FvOLiUJWSKB2wvYiADxPZ9i
+         cwLw==
+X-Gm-Message-State: AOJu0YwGQRyFRdquoGEdKL7w/C+vFcYeZNuwhJgzBtUGHXfuTqmhuorS
+	7IXzvoDkk7M9emZMeA1MgjBjwf9Ovek40OYOe8G2+By8hc+YrwaVDrwmTmDPWNX6/whRbGnBTYW
+	GNtP0fcqaIyKJVEX7yckwljg/H1q+LMNg6pFMF0bvabQgEb1vd+z+t7A=
+X-Gm-Gg: ASbGncsh3zk1I0bPxr3yFMrLpEgphKHdiU8EIF1a2Iw1u26TvRi84+TV9n94mXwxl7/
+	9Vkj5/al/xMvrgTn+m4hSDOY9wGLtqk2gu0d1NR/pxdUUGflBrQkS/RnJp5g2g9kA8I24MZEr81
+	Zj24bETt/uatQWKW7gUFWOizSm
+X-Google-Smtp-Source: AGHT+IEJfnwrntQWEbO59kgrl0DHAqzKu3TmruS5tWQMX2gWkrRQKc/y6j5gschySkCsMnfblI87FsWqsfAoI+IMKRo=
+X-Received: by 2002:ac8:58d5:0:b0:474:fe2d:d201 with SMTP id
+ d75a77b69052e-476521fd83bmr2036211cf.9.1741337858125; Fri, 07 Mar 2025
+ 00:57:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250303171013.3548775-1-tabba@google.com> <20250303171013.3548775-4-tabba@google.com>
- <CADrL8HUAkzUdZEunCXgdECD+cNZi_O+HBdQZdN=EGiX_OuQJOg@mail.gmail.com>
-In-Reply-To: <CADrL8HUAkzUdZEunCXgdECD+cNZi_O+HBdQZdN=EGiX_OuQJOg@mail.gmail.com>
+References: <20250303171013.3548775-4-tabba@google.com> <diqzfrjpu6a8.fsf@ackerleytng-ctop.c.googlers.com>
+In-Reply-To: <diqzfrjpu6a8.fsf@ackerleytng-ctop.c.googlers.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Fri, 7 Mar 2025 08:55:40 +0000
-X-Gm-Features: AQ5f1JoSEOn1B-_DQf2o7NWVh2Tb849yIB-2Usp-jM7lK4TSgCDQQhyJIBItfd0
-Message-ID: <CA+EHjTy9cyYd4U6ghqGjg6f3fBxzvJvNSzP5nCCc0ZK7F7jazQ@mail.gmail.com>
+Date: Fri, 7 Mar 2025 08:57:00 +0000
+X-Gm-Features: AQ5f1JpvWVX4p-I-6NV1AGFD4gCusH1RF5PO6B8I5VhGtEmyhDA3YIF8HF36ulc
+Message-ID: <CA+EHjTwOMH97apzhVjxW_+pN6iXMRbkA7QQtdZfuUKUJm27-BA@mail.gmail.com>
 Subject: Re: [PATCH v5 3/9] KVM: guest_memfd: Allow host to map guest_memfd() pages
-To: James Houghton <jthoughton@google.com>
+To: Ackerley Tng <ackerleytng@google.com>
 Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
 	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
 	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
@@ -90,74 +88,82 @@ Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
 	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
 	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
 	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	peterx@redhat.com
+	vannapurve@google.com, mail@maciej.szmigiero.name, david@redhat.com, 
+	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
+	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
+	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
+	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
+	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
+	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
+	hughd@google.com, jthoughton@google.com, peterx@redhat.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Hi Ackerley,
 
-On Fri, 7 Mar 2025 at 01:53, James Houghton <jthoughton@google.com> wrote:
+On Thu, 6 Mar 2025 at 22:46, Ackerley Tng <ackerleytng@google.com> wrote:
 >
-> On Mon, Mar 3, 2025 at 9:10=E2=80=AFAM Fuad Tabba <tabba@google.com> wrot=
-e:
-> > +static vm_fault_t kvm_gmem_fault(struct vm_fault *vmf)
-> > +{
-> > +       struct inode *inode =3D file_inode(vmf->vma->vm_file);
-> > +       struct folio *folio;
-> > +       vm_fault_t ret =3D VM_FAULT_LOCKED;
-> > +
-> > +       filemap_invalidate_lock_shared(inode->i_mapping);
-> > +
-> > +       folio =3D kvm_gmem_get_folio(inode, vmf->pgoff);
-> > +       if (IS_ERR(folio)) {
-> > +               switch (PTR_ERR(folio)) {
-> > +               case -EAGAIN:
-> > +                       ret =3D VM_FAULT_RETRY;
-> > +                       break;
-> > +               case -ENOMEM:
-> > +                       ret =3D VM_FAULT_OOM;
-> > +                       break;
-> > +               default:
-> > +                       ret =3D VM_FAULT_SIGBUS;
-> > +                       break;
+> Fuad Tabba <tabba@google.com> writes:
 >
-> Tiny nit-pick: This smells almost like an open-coded vmf_error(). For
-> the non-EAGAIN case, can we just call vmf_error()?
+> > Add support for mmap() and fault() for guest_memfd backed memory
+> > in the host for VMs that support in-place conversion between
+> > shared and private. To that end, this patch adds the ability to
+> > check whether the VM type supports in-place conversion, and only
+> > allows mapping its memory if that's the case.
+> >
+> > Also add the KVM capability KVM_CAP_GMEM_SHARED_MEM, which
+> > indicates that the VM supports shared memory in guest_memfd, or
+> > that the host can create VMs that support shared memory.
+> > Supporting shared memory implies that memory can be mapped when
+> > shared with the host.
+> >
+> > This is controlled by the KVM_GMEM_SHARED_MEM configuration
+> > option.
+> >
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  include/linux/kvm_host.h |  11 ++++
+> >  include/uapi/linux/kvm.h |   1 +
+> >  virt/kvm/guest_memfd.c   | 105 +++++++++++++++++++++++++++++++++++++++
+> >  virt/kvm/kvm_main.c      |   4 ++
+> >  4 files changed, 121 insertions(+)
+> >
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 7788e3625f6d..2d025b8ee20e 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -728,6 +728,17 @@ static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
+> >  }
+> >  #endif
+> >
+> > +/*
+> > + * Arch code must define kvm_arch_gmem_supports_shared_mem if support for
+> > + * private memory is enabled and it supports in-place shared/private conversion.
+> > + */
+> > +#if !defined(kvm_arch_gmem_supports_shared_mem) && !IS_ENABLED(CONFIG_KVM_PRIVATE_MEM)
+>
+> Is this a copypasta error? I'm wondering if this should be
+> !IS_ENABLED(CONFIG_KVM_GMEM_SHARED_MEM).
 
-I wasn't aware of that. I will fix this on the respin, thanks for
-pointing it out.
+Yes. Kirill had pointed that out as well. I will fix it.
 
-That said, any idea why vmf_error() doesn't convert -EAGAIN to VM_FAULT_RET=
-RY?
+> Also, would you consider defining a __weak function to be overridden by
+> different architectures, or would weak symbols not be inline-able?
+
+I have no strong opinion, but I think that it should follow the same
+pattern as kvm_arch_has_private_mem().
 
 Cheers,
 /fuad
 
-> > +               }
-> > +               goto out_filemap;
-> > +       }
+> > +static inline bool kvm_arch_gmem_supports_shared_mem(struct kvm *kvm)
+> > +{
+> > +     return false;
+> > +}
+> > +#endif
 > > +
-> > +       if (folio_test_hwpoison(folio)) {
-> > +               ret =3D VM_FAULT_HWPOISON;
-> > +               goto out_folio;
-> > +       }
-> > +
-> > +       /* Must be called with folio lock held, i.e., after kvm_gmem_ge=
-t_folio() */
-> > +       if (!kvm_gmem_offset_is_shared(vmf->vma->vm_file, vmf->pgoff)) =
-{
-> > +               ret =3D VM_FAULT_SIGBUS;
-> > +               goto out_folio;
-> > +       }
+> >
+> > <snip>
 
