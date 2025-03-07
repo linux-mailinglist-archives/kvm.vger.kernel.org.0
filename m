@@ -1,86 +1,91 @@
-Return-Path: <kvm+bounces-40342-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40343-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84AD2A56D4F
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 17:16:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E762A56D50
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 17:16:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 601877A51CC
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 16:15:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77F181894F62
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 16:16:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B37B23A998;
-	Fri,  7 Mar 2025 16:15:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB95423A9BE;
+	Fri,  7 Mar 2025 16:15:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="dbCjVbPN"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="2cGsIzb4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C76F239072
-	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 16:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 283A823957F
+	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 16:15:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741364156; cv=none; b=a/Mu9EOTiAdv0rwF2zBUuiNY7W9pS+OJEnRM/KpvUYMkXfE+4bILGJ0ylNlMlNSbEqiw6wbzDxqTD/6eGDUr0ixoJDu9gNw3jTIF5RlLu8ePWox6dbHgGpaJ4rIcu8yRiHomlRg23bII1dWqho2wVpoTmm/P8OJq05+CeUOpl+0=
+	t=1741364157; cv=none; b=ZROMGr18aS70PBKp4XKEM8pNdBD7IhPp9gq7P4O+uVd5ZMh/d6dfehBw0X0zHrgkkoldguuHLNvaSpFqYT/3mvTgILkkXYjwP7Wg9Oxz0RJ0XWLvTGYPrrOdiBweay5+0/LkukBVDM/yRPA3GMxlqo/MPtPi38U+JADVDPPU1Kg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741364156; c=relaxed/simple;
-	bh=TVZyG+uvvJqH79JhGYh67F5wQeGPPJPyTH5+w3/Wz90=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rpKf2LqJZWjdg/EqR/erEUfYs+ijdZLZJdhlqJa1qXMKFqdzKAJ0I7F6HQx/yLf4j6dxLU8gDbCzNLq0HqBbDkmhO7RkRO7VJawNblZKk8QDfdxX7UT43yMoEi0oTpBtWr/mCWTyk5W4lClpdTLrTnh4ujUe2FMfRGgkwDnyzoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=dbCjVbPN; arc=none smtp.client-ip=209.85.128.52
+	s=arc-20240116; t=1741364157; c=relaxed/simple;
+	bh=pUbBH6lKqjkYHOrWph+jCd+XfegjoIltPb4IwKUmCfs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZRtbdAqGAlFEvbw83d1dR3c7dGGHKde+NEE+VxuYLqRsQ3KlLnZw9q9WIrzAhH4Z8NA4cPFrpDyyDeXw/Oy1EhF1BgIaRVcH+kScNj+M2vytr3lFHvcivjOZb+z+xEw97QtyAKbMefZ5ynhSvFu7oponRrStGZ5cYJDUMOlw4AE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=2cGsIzb4; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43bbb440520so23850065e9.2
-        for <kvm@vger.kernel.org>; Fri, 07 Mar 2025 08:15:53 -0800 (PST)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43bd732fd27so17581105e9.0
+        for <kvm@vger.kernel.org>; Fri, 07 Mar 2025 08:15:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1741364151; x=1741968951; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ma6UNYm4yNX/ZvXcUmutWIxQKtLrtbmF18vjvUMyo+0=;
-        b=dbCjVbPNnjV+Cz7RGr3VP2vOTahYkvCQvjx6jOjEbEbFF+J/6fFHtVafsx0UGmNGn7
-         Lypw7QWwBUXYh37c4KkICcPfjrhSNVxBWpjw03lH+LxX8tyfCaOUrcP9v3REsQ5KM8+c
-         L5/+CDvjQ3AacST4h2NtYw0/5oG8rfbbJSkL4kAcdRpQTnMlciYGvsd6LmQlbqLoTOEm
-         1BiIEAE+Fm6q51ZlYlhRyojX8WOT4u5DadoAXUHOWr/AIdsOpl9cCndNUyblwZxp0BIG
-         NMe8t0iBGezS1nWVd3p43aFwRH/iuzeS734sgY4q0oEhowS+Nb19xrB5TSxLewAFgL8n
-         riQg==
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1741364152; x=1741968952; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/6i1/sQFS23e0aHQ0gG/Xo3pgpweMckYvmkT9KdoCho=;
+        b=2cGsIzb4tvEHb4VhpHacTU5WgIwAzCCslCeulAcNeeO71YwYYYwCfhLCR89ADkwN2d
+         9fPIMwKQsXabeeKWKUAQVrNPjcwmHF7dCTg3iTR2l7qT5d3DRGbpOS5lv1JWb+yhU0sq
+         VHmJX2UCC2X4QaLz/0ufaSYM35EqfvI4DqdKca5kCK4OEXzVkyDsogX+i0mlShq9Tzvi
+         4CH86IN81SR8gRKT8A/Np2lOFSqf6X0EnepvBHxgDizUYIcw1ajTqHqWadohwL4cbT0Z
+         UEdY1RQZLGwKvaWlbqwSNKBawL72DZtGpH8C2pTHaRDt03zlzdJqvoyhnY2BJqLe1b4Q
+         tWug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741364151; x=1741968951;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ma6UNYm4yNX/ZvXcUmutWIxQKtLrtbmF18vjvUMyo+0=;
-        b=Af/qB0PBowIXdj8ef/FJwbF9ZDe0XmKmt3WVdzi+orPll+PSUcADUl7w2DKC0b2DFx
-         HIXyN2C0QuaMximcUFMg4cM87FIH14p9wLVVbb+gUpOIfJnd6OSIMy014ozTiirpAJEp
-         yAfObJkHlcF6t6Ft3sHdQ/msbeDYx+5iH0DR1GNvkRRFFu6oX6JS8LVsjEfmayHWkiK8
-         /ZooGIev4ugfVf+enlU+4wmT3woW30Izw4S0SvAaW2Jh2u/LrzAxiZIxU2TyWtqR5xkJ
-         0fYqkrs3bRabmEZtWZIKMkmlw4t7DQ1X93nc7h7Feu2VHoT24CwWIq53jIkC7dvSx5Lm
-         dN/Q==
-X-Gm-Message-State: AOJu0Yz/75WSgCO3vxLByYVt8gEWBa0XFv6eQE5knKMTRBamz7jTm0tE
-	KsGji9iL9VjI+G3531RQX0AunttvpNINxI22Tr2qt4G2Ns1XM7j74jX8YX6RwJ6CR72clWvntSk
-	C
-X-Gm-Gg: ASbGncutVXgAUBnZiWYPM9sX6Kszb3//Kqu+aOqCTCpbR2dDka7zSlZmKjiKTc7vX9I
-	qXE1HygULXdh/m5gRv5Dw9nQ3sVul+26sNLD26g1VNE98rejwrEjWrrdLsT3p3VusChWUPZosyD
-	U43q+LQ9HjYOOHm9QTcr0QaU5EtLsv5l7uOoBB/6qWPu2KuYdc2HIO72F+Qic0IblCvdz6ov3G7
-	NdLAxna/2kQeqI+gbVAS+FjGdcuEHniei4OgQvrBJIlImJOuKOhZglnEsXbZI7GXCwmCI3tbTkW
-	24mGy8P7nIfm771NpZSItc6nH0E2XgaHTnEc/qZgwbL2Sw==
-X-Google-Smtp-Source: AGHT+IF7XbE04CqOvEX8W4K9LRBGFZNizyeeIKygHO9HjdO9iwyVbPTpDERhNgQ3kKf0mPYmzxYulg==
-X-Received: by 2002:a05:600c:3544:b0:43b:ce36:756e with SMTP id 5b1f17b1804b1-43c601ccce3mr37788095e9.12.1741364151285;
-        Fri, 07 Mar 2025 08:15:51 -0800 (PST)
+        d=1e100.net; s=20230601; t=1741364152; x=1741968952;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/6i1/sQFS23e0aHQ0gG/Xo3pgpweMckYvmkT9KdoCho=;
+        b=gkaJxvHhjO0Bmp/KXvmayghZe/FnLK4CRDEMAntz8qO8Rft/yztNQlROZ6p2HA5VAG
+         o1rWEGBrLPtD6gDfOS70G3Qz1VJQe9347QhH7jcJJVOEb5PUb6VyqwTrdWUMHivrEVaU
+         3XX2SPRibT5hq0Oxt1uNN8eqpAFEkhe9e5ICueydnTynN63eEp29rBH1MThR2HF1gm85
+         TFPK+i8KS44UfKoWsa8W0OcueJ6LcEotX4sGUgrCwHlpUEIhwpfoj7zyWf7bsgpj1B7C
+         vd40nGjFH+ccSJTNaDv2luART+QGBBZoq4keDRpaUJvRLXf2CA42rebG+1AWFzprADye
+         xDvg==
+X-Gm-Message-State: AOJu0YyIzsgw0d15cnTltW38/Tz0QFuZlFoHdko3eIi3GwyyVauN7CJE
+	flBhsQm/9xVsiBxugQL33G1DqyAGVYoX+iMzGeGrmEqyQyIO3pBEC/WxKoAMUOm5jWYsJC6tAsW
+	7
+X-Gm-Gg: ASbGncvKI5LNLEgLCiMEwxw/acMffL4FRH5Wc0CrsIkE7BDStFzUxfH1q49soFAzD4I
+	m6tk6LTC3CCDZbemBD6Z3nby4fMlX4n1X++JTVN6ZGokY15IEb5gDEjW4u1Mdr3/J88n5To4lNh
+	76ZFkw5qO0+uRpsgwRK5XjBzrjGb/0QZ2OeZRAeonDgi1hqbR6KGlWg4tCMfinBMUOYryHYrraI
+	STDNbwEjgtdSw7DUGkb7zLdtPhuGcA9rIJmC+yAMuIPFuvywWpuDjw9GVuR/W0F8mbS43QurHDO
+	vhxeZEvRNYpWG0eqr/BQdxdOO102C/jZYfJDqwkLPF794Q==
+X-Google-Smtp-Source: AGHT+IFgUcPXSiBD5RSvWaNWhqMpYlA6SxLhZgQGPKx5eyPuJ3M5Yl0LRdylWzB/3/C6DxCmNYVAYQ==
+X-Received: by 2002:a05:600c:450d:b0:439:7c0b:13f6 with SMTP id 5b1f17b1804b1-43c6872e1ffmr32499415e9.31.1741364152302;
+        Fri, 07 Mar 2025 08:15:52 -0800 (PST)
 Received: from carbon-x1.. ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43bdd8daadbsm55496245e9.21.2025.03.07.08.15.50
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43bdd8daadbsm55496245e9.21.2025.03.07.08.15.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Mar 2025 08:15:50 -0800 (PST)
+        Fri, 07 Mar 2025 08:15:51 -0800 (PST)
 From: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org
 Cc: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>,
 	Andrew Jones <ajones@ventanamicro.com>,
 	Anup Patel <apatel@ventanamicro.com>,
-	Atish Patra <atishp@rivosinc.com>
-Subject: [kvm-unit-tests PATCH v8 0/6] riscv: add SBI SSE extension tests
-Date: Fri,  7 Mar 2025 17:15:42 +0100
-Message-ID: <20250307161549.1873770-1-cleger@rivosinc.com>
+	Atish Patra <atishp@rivosinc.com>,
+	Andrew Jones <andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH v8 1/6] kbuild: Allow multiple asm-offsets file to be generated
+Date: Fri,  7 Mar 2025 17:15:43 +0100
+Message-ID: <20250307161549.1873770-2-cleger@rivosinc.com>
 X-Mailer: git-send-email 2.47.2
+In-Reply-To: <20250307161549.1873770-1-cleger@rivosinc.com>
+References: <20250307161549.1873770-1-cleger@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,95 +95,60 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This series adds tests for SBI SSE extension as well as needed
-infrastructure for SSE support. It also adds test specific asm-offsets
-generation to use custom OFFSET and DEFINE from the test directory.
+In order to allow multiple asm-offsets files to generated the include
+guard need to be different between these file. Add a asm_offset_name
+makefile macro to obtain an uppercase name matching the original asm
+offsets file.
 
+Signed-off-by: Clément Léger <cleger@rivosinc.com>
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 ---
+ scripts/asm-offsets.mak | 22 +++++++++++++++-------
+ 1 file changed, 15 insertions(+), 7 deletions(-)
 
-V8:
- - Short circuit current event tests if failure happens
- - Remove SSE from all report strings
- - Indent .prio field
- - Add cpu_relax()/smp_rmb() where needed
- - Add timeout for global event ENABLED state check
- - Added BIT(32) aliases tests for attribute/event_id.
-
-V7:
- - Test ids/attributes/attributes count > 32 bits
- - Rename all SSE function to sbi_sse_*
- - Use event_id instead of event/evt
- - Factorize read/write test
- - Use virt_to_phys() for attributes read/write.
- - Extensively use sbiret_report_error()
- - Change check function return values to bool.
- - Added assert for stack size to be below or equal to PAGE_SIZE
- - Use en env variable for the maximum hart ID
- - Check that individual read from attributes matches the multiple
-   attributes read.
- - Added multiple attributes write at once
- - Used READ_ONCE/WRITE_ONCE
- - Inject all local event at once rather than looping fopr each core.
- - Split test_arg for local_dispatch test so that all CPUs can run at
-   once.
- - Move SSE entry and generic code to lib/riscv for other tests
- - Fix unmask/mask state checking
-
-V6:
- - Add missing $(generated-file) dependencies for "-deps" objects
- - Split SSE entry from sbi-asm.S to sse-asm.S and all SSE core functions
-   since it will be useful for other tests as well (dbltrp).
-
-V5:
- - Update event ranges based on latest spec
- - Rename asm-offset-test.c to sbi-asm-offset.c
-
-V4:
- - Fix typo sbi_ext_ss_fid -> sbi_ext_sse_fid
- - Add proper asm-offset generation for tests
- - Move SSE specific file from lib/riscv to riscv/
-
-V3:
- - Add -deps variable for test specific dependencies
- - Fix formatting errors/typo in sbi.h
- - Add missing double trap event
- - Alphabetize sbi-sse.c includes
- - Fix a6 content after unmasking event
- - Add SSE HART_MASK/UNMASK test
- - Use mv instead of move
- - move sbi_check_sse() definition in sbi.c
- - Remove sbi_sse test from unitests.cfg
-
-V2:
- - Rebased on origin/master and integrate it into sbi.c tests
-
-Clément Léger (6):
-  kbuild: Allow multiple asm-offsets file to be generated
-  riscv: Set .aux.o files as .PRECIOUS
-  riscv: Use asm-offsets to generate SBI_EXT_HSM values
-  riscv: lib: Add SBI SSE extension definitions
-  lib: riscv: Add SBI SSE support
-  riscv: sbi: Add SSE extension tests
-
- scripts/asm-offsets.mak |   22 +-
- riscv/Makefile          |    5 +-
- lib/riscv/asm/csr.h     |    1 +
- lib/riscv/asm/sbi.h     |  144 ++++-
- lib/riscv/sbi-sse-asm.S |  103 ++++
- lib/riscv/asm-offsets.c |    9 +
- lib/riscv/sbi.c         |   76 +++
- riscv/sbi-tests.h       |    1 +
- riscv/sbi-asm.S         |    6 +-
- riscv/sbi-asm-offsets.c |   11 +
- riscv/sbi-sse.c         | 1215 +++++++++++++++++++++++++++++++++++++++
- riscv/sbi.c             |    2 +
- riscv/.gitignore        |    1 +
- 13 files changed, 1584 insertions(+), 12 deletions(-)
- create mode 100644 lib/riscv/sbi-sse-asm.S
- create mode 100644 riscv/sbi-asm-offsets.c
- create mode 100644 riscv/sbi-sse.c
- create mode 100644 riscv/.gitignore
-
+diff --git a/scripts/asm-offsets.mak b/scripts/asm-offsets.mak
+index 7b64162d..a5fdbf5d 100644
+--- a/scripts/asm-offsets.mak
++++ b/scripts/asm-offsets.mak
+@@ -15,10 +15,14 @@ define sed-y
+ 	s:->::; p;}'
+ endef
+ 
++define asm_offset_name
++	$(shell echo $(notdir $(1)) | tr [:lower:]- [:upper:]_)
++endef
++
+ define make_asm_offsets
+ 	(set -e; \
+-	 echo "#ifndef __ASM_OFFSETS_H__"; \
+-	 echo "#define __ASM_OFFSETS_H__"; \
++	 echo "#ifndef __$(strip $(asm_offset_name))_H__"; \
++	 echo "#define __$(strip $(asm_offset_name))_H__"; \
+ 	 echo "/*"; \
+ 	 echo " * Generated file. DO NOT MODIFY."; \
+ 	 echo " *"; \
+@@ -29,12 +33,16 @@ define make_asm_offsets
+ 	 echo "#endif" ) > $@
+ endef
+ 
+-$(asm-offsets:.h=.s): $(asm-offsets:.h=.c)
+-	$(CC) $(CFLAGS) -fverbose-asm -S -o $@ $<
++define gen_asm_offsets_rules
++$(1).s: $(1).c
++	$(CC) $(CFLAGS) -fverbose-asm -S -o $$@ $$<
++
++$(1).h: $(1).s
++	$$(call make_asm_offsets,$(1))
++	cp -f $$@ lib/generated/
++endef
+ 
+-$(asm-offsets): $(asm-offsets:.h=.s)
+-	$(call make_asm_offsets)
+-	cp -f $(asm-offsets) lib/generated/
++$(foreach o,$(asm-offsets),$(eval $(call gen_asm_offsets_rules, $(o:.h=))))
+ 
+ OBJDIRS += lib/generated
+ 
 -- 
 2.47.2
 
