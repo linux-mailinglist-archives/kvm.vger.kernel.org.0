@@ -1,101 +1,122 @@
-Return-Path: <kvm+bounces-40321-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40322-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92663A56318
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 09:59:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 037A8A5637A
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 10:19:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC21A16F7B0
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 08:59:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B969A188B7EE
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 09:19:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42C221E1DF0;
-	Fri,  7 Mar 2025 08:59:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EAF620897A;
+	Fri,  7 Mar 2025 09:18:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gLMQoBDT"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="v/um14Qj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1918199E94
-	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 08:59:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65B062054F1
+	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 09:18:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741337949; cv=none; b=PHiltqxGD2WRaT2oZU7Wt/f0B1256Db4dLkx479VAd3uT0LL7LID6VgfwRdxP6QRdLzmJ/pWeU2S3Afe6O2m9QJ5uLHuE+9MjTPcIw5qPDnCHbbU4PgGnPo9pystoEOe1XlEkxFZiorJrzFsiTk0Oz6cl/xdNCSGF/6H9dd848Q=
+	t=1741339125; cv=none; b=n0iV6+jEh+OXYBQGL58qGy3wSoLPJED6sYUdxvR1Jkei3fqhq7qwlGXC+YcvGMB7/EmZipzrFqN9i1sUAWBGN5YWuNNQPkVhCUYp+49FduQCWmAU7qhUnaNOw9ePzj45dDa8TfCP/T6O+cE0pEOFhqRbYwGkz4NGY63OfGKNVH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741337949; c=relaxed/simple;
-	bh=lcLY1x1iW003ARIIYfypc8gSXCdCsMc0qubiz9RJXy8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uY+8D4vkoc5mQZSQ3dBU6YqmRmeCvd7clXtFc3lAJVDHl/WttW1Xq4gEIxaBqUuzC0QPEHo1kXJBz0QxxBRpM3is+81ZgGWSWDHP70vYIvpxK2Kwl2JZaH+9ONG7QjSLXNWsRzJYvDM9qYnn9qUvQXY0O7rsRxr2xIK0xfvtvGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gLMQoBDT; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741337948; x=1772873948;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=lcLY1x1iW003ARIIYfypc8gSXCdCsMc0qubiz9RJXy8=;
-  b=gLMQoBDTMBPeScAN4Yl1ZmEpJVQkC17mVlsvakl8Dwh0/NM6hFvSUSBN
-   MvmotTJr/1+Try0c2mq2EKGv+GvzmJLwkeC+uqA6bjpDN2/8olrwB3l1w
-   2Ko3jKxB8/NrQO7yzfyFJYqXHo9ltVkUvxVonQxezF87LBwKaCGb4oMdW
-   6arH7HWWyFxzDYi8rzfr+cDhnozuK8ZhK6voUC19GfKYcPmw6bjSGGeFI
-   heD4gNQpv+2zLdOWryIrJpZQ6DXhaiWapTMJAOrBWjqUmqKVkCY/12AVp
-   +/8EQXzwYLliHMi2epSVjjNKQucpbvvYC/tnHF4F7ZHlBYbCXsaZQ2zAA
-   Q==;
-X-CSE-ConnectionGUID: 18UfZxnxTUqt3VTjlxRELg==
-X-CSE-MsgGUID: O2GpVk/pQwKrHiv7EvN1Zw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="42521572"
-X-IronPort-AV: E=Sophos;i="6.14,228,1736841600"; 
-   d="scan'208";a="42521572"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2025 00:59:07 -0800
-X-CSE-ConnectionGUID: lflAClxPRXafbSNVjWQY3Q==
-X-CSE-MsgGUID: nQXLNZKkRem5CEU/Z4hs7w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="123459836"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
-  by fmviesa003.fm.intel.com with ESMTP; 07 Mar 2025 00:59:03 -0800
-Date: Fri, 7 Mar 2025 17:19:11 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Dongli Zhang <dongli.zhang@oracle.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com,
-	mtosatti@redhat.com, sandipan.das@amd.com, babu.moger@amd.com,
-	likexu@tencent.com, like.xu.linux@gmail.com,
-	zhenyuw@linux.intel.com, groug@kaod.org, khorenko@virtuozzo.com,
-	alexander.ivanov@virtuozzo.com, den@virtuozzo.com,
-	davydov-max@yandex-team.ru, xiaoyao.li@intel.com,
-	dapeng1.mi@linux.intel.com, joe.jin@oracle.com
-Subject: Re: [PATCH v2 06/10] target/i386/kvm: rename architectural PMU
- variables
-Message-ID: <Z8q6D8fqFmegi4uW@intel.com>
-References: <20250302220112.17653-1-dongli.zhang@oracle.com>
- <20250302220112.17653-7-dongli.zhang@oracle.com>
+	s=arc-20240116; t=1741339125; c=relaxed/simple;
+	bh=bOIKtdlaOQMqgV6ghEveRdhfkbyzwmHzV3cRNq2qtcc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lnC/mUfDU0qFrDbf+F2mfF2U3Qmtc5xV+51qWjTCLMtTclfWT2xdVvNI9T7TanipBjMgUeKbxUHR5X9Aed++n+eRu9NaE1DhRbPcsg48gFUmrVDxkR/XxAnBFb4yGo0u6p4jisRLnVddVO/ATHJV9NSI7KfvQxNqDX/5jOvfubs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=v/um14Qj; arc=none smtp.client-ip=95.215.58.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1741339111;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=y2FBvybRQ7hGNDuactnNvnWlcdQr0dcjdCw8K+WSDT8=;
+	b=v/um14QjntUhD9/+RjAPoAqg5hVIFWfCDpaGuI3rZaVkVpnzjZ4cpDc2xZ3mkeysr6W9z2
+	xbw+4yumPwu7bH4NmlPTKPqXmnDnAh2JsHoY5L/yMVAZYEQMBt0P+TSM4mxRcP6MI3jdoT
+	lkxLHe4Zyn/2jMILuyMorKlQiFsHWWQ=
+From: Andrew Jones <andrew.jones@linux.dev>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvm-riscv@lists.infradead.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-s390@vger.kernel.org
+Cc: pbonzini@redhat.com,
+	thuth@redhat.com,
+	alexandru.elisei@arm.com,
+	eric.auger@redhat.com,
+	lvivier@redhat.com,
+	frankja@linux.ibm.com,
+	imbrenda@linux.ibm.com,
+	nrb@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v2] Makefile: Use CFLAGS in cc-option
+Date: Fri,  7 Mar 2025 10:18:29 +0100
+Message-ID: <20250307091828.57933-2-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250302220112.17653-7-dongli.zhang@oracle.com>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-> +/*
-> + * For Intel processors, the meaning is the architectural PMU version
-> + * number.
-> + *
-> + * For AMD processors: 1 corresponds to the prior versions, and 2
-> + * corresponds to AMD PerfMonV2.
-> + */
-> +static uint32_t has_pmu_version;
+When cross compiling with clang we need to specify the target in
+CFLAGS and cc-option will fail to recognize target-specific options
+without it. Add CFLAGS to the CC invocation in cc-option.
 
-The "has_" prefix sounds like a boolean type. So what about "pmu_version"?
+The introduction of the realmode_bits variable is necessary to
+avoid make failing to build x86 due to CFLAGS referencing itself.
 
-Others look good to me,
+Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+---
+v2:
+ - Fixed x86 builds with the realmode_bits variable
 
-Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
+ Makefile            | 2 +-
+ x86/Makefile.common | 3 ++-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 78352fced9d4..9dc5d2234e2a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -21,7 +21,7 @@ DESTDIR := $(PREFIX)/share/kvm-unit-tests/
+ 
+ # cc-option
+ # Usage: OP_CFLAGS+=$(call cc-option, -falign-functions=0, -malign-functions=0)
+-cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
++cc-option = $(shell if $(CC) $(CFLAGS) -Werror $(1) -S -o /dev/null -xc /dev/null \
+               > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
+ 
+ libcflat := lib/libcflat.a
+diff --git a/x86/Makefile.common b/x86/Makefile.common
+index 0b7f35c8de85..e97464912e28 100644
+--- a/x86/Makefile.common
++++ b/x86/Makefile.common
+@@ -98,6 +98,7 @@ tests-common = $(TEST_DIR)/vmexit.$(exe) $(TEST_DIR)/tsc.$(exe) \
+ ifneq ($(CONFIG_EFI),y)
+ tests-common += $(TEST_DIR)/realmode.$(exe) \
+ 		$(TEST_DIR)/la57.$(exe)
++realmode_bits := $(if $(call cc-option,-m16,""),16,32)
+ endif
+ 
+ test_cases: $(tests-common) $(tests)
+@@ -108,7 +109,7 @@ $(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o
+ 	$(LD) -m elf_i386 -nostdlib -o $@ \
+ 	      -T $(SRCDIR)/$(TEST_DIR)/realmode.lds $^
+ 
+-$(TEST_DIR)/realmode.o: bits = $(if $(call cc-option,-m16,""),16,32)
++$(TEST_DIR)/realmode.o: bits = $(realmode_bits)
+ 
+ $(TEST_DIR)/access_test.$(bin): $(TEST_DIR)/access.o
+ 
+-- 
+2.48.1
 
 
