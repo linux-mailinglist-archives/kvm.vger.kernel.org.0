@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-40382-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40383-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92800A57013
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 19:06:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B10D9A57037
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 19:14:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7568B1673F5
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 18:06:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72FE03B0298
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 18:13:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C02623FC54;
-	Fri,  7 Mar 2025 18:06:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5C8224167A;
+	Fri,  7 Mar 2025 18:13:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ccv3WhIH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IPz7zco+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B60421607A4;
-	Fri,  7 Mar 2025 18:06:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44662192B8A;
+	Fri,  7 Mar 2025 18:13:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741370796; cv=none; b=T5YGEzaH1urCCdObMWY5Hz49YKr7gC9/yOt1rYxHnf+GK4uh0fLNVPkhN4ha7g1uYF7Jnu9fGJlfUl6tbHuUb4N8VgFo+I8mNG/f3YxPxC40MVKrPRPp4ZNVflnE5Ov3hl7iIoY69fgF6OHG9dQQbUoNy80IL5nzUKLyTOtdfzk=
+	t=1741371238; cv=none; b=W+VI2OpPj/QB4ui9uMflGhD5aIWGgtxNzrwDg1IPM3Ix97wghxb+t5qwBNaUHWfCjijBOJYELbct1TwlABA5abXWdxRsCgvB2dqu6Ra/LxuvOgex5fU6QlqRel4OcgxFYkrmfXnLBHwANfEWb92JQXVqPUq7Ub06R2og/bqMRI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741370796; c=relaxed/simple;
-	bh=/LNeyTo1Lsx5XsFAdGiPxDkCOZ6LU1NL1TFIHWBBD8o=;
+	s=arc-20240116; t=1741371238; c=relaxed/simple;
+	bh=P0hb/K5fXlDUQ4dNT6prqrHpf5iaAZicNfpMsVvE7+U=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mkJd/fBJg8zX28xdMUcBB5ep3jbb/nCpm2v6ZsoAICVXYkFnw0Oq+/M1KZuPp94sxhvG3zaqrHZflNuvdyjZr3yqZxL3gjGolWxhvQv0E5wuruBSV7WI1MxXNP15fmlP0qa9HQP3UnUCDJF+LazXZvxiUW3xNuGNjtGrhW1VQv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ccv3WhIH; arc=none smtp.client-ip=198.175.65.18
+	 In-Reply-To:Content-Type; b=osPdWKCbVAGfAG4mg5txEryL1LU1tNp8BM39gz75Lx7kxnKaU8DYdYVj5fUYst4WQ8EiE/G0zsY+cO5WHPcC6n6u4lyoJuFHWdtRcarysXtfU5Mr1SPmQydLmEfd/uB0D70PZ2w49rWs/wxQS7MTXuhpXDDBP2ccjjjscXUbFnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IPz7zco+; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741370795; x=1772906795;
+  t=1741371237; x=1772907237;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=/LNeyTo1Lsx5XsFAdGiPxDkCOZ6LU1NL1TFIHWBBD8o=;
-  b=Ccv3WhIHu+bq05nJp9slTZ8nHzExcILyVx80kUpAAsFqL/PiEdT4pX7k
-   N8oQ59ZNAcUizJIpOeLBLn6iUcwqJFPZh6mcX5WyVNqh/bE35b/xTlz9N
-   +XZkcHeCUoAwGYThEQR/GM8GeA7GGYvwzU8k62N+KadjTv4ONkWZOeYmy
-   VKOnOZD/faQNUfXALHyC6bE+RpW0S+8N8fmjCb4JwNS6MlT/hebLXEEbi
-   x3aSYY8uF6YJj/nc232Xy4Pq077AK2Z/EWWS4z8rUs/8ruc4vDpB6l4VU
-   RpETGIuOV8GrVJGgEGLrFlK4KmHpDX36akbskZDtBuYt06VAvqlcPCGVW
-   A==;
-X-CSE-ConnectionGUID: st9SMvM6RQ61ciZYCrsEEg==
-X-CSE-MsgGUID: pBiC9xYWQWaJG9zqYaG4gg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="42629927"
+  bh=P0hb/K5fXlDUQ4dNT6prqrHpf5iaAZicNfpMsVvE7+U=;
+  b=IPz7zco+mh/8toN7b845PyhYZoVKmP2wu0+3y+3H1ymd0ozt/+aPcAuI
+   I57IaRskYIee+0TmminaogsrgrEnD+aP+dGyME1C3u3N0EgOjH71aLHnB
+   Fj+m2ORU1QUsplKtb6/fppftI2athFKNYQPs1yOImIzIQ3DmVnGISr4U4
+   xm9T9eJZHWgFvazk8sH4JHOrtF8eoRUbPl4L1/Uwso5RtuOu/6OUMD9Nn
+   eciyn76yX2ra6hpWiZgEbUz6D2ePoQHXuS77hq8pNqE3wQ3owBj/1oHmp
+   P9ojh0x78gha4OU3cT1Nt4frp6Z5LdSD3LK2K5tYStfTd5A+qKdPG7bRt
+   w==;
+X-CSE-ConnectionGUID: qTvHnxhuTVKBc2SAbXtHwQ==
+X-CSE-MsgGUID: miIkTCHdR7eI4+Ukr0gxHw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="53825148"
 X-IronPort-AV: E=Sophos;i="6.14,229,1736841600"; 
-   d="scan'208";a="42629927"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2025 10:06:34 -0800
-X-CSE-ConnectionGUID: uhEHW7HqSmSgYdgBm3bTOQ==
-X-CSE-MsgGUID: Nzo/yW6HQHG22mJ9x4SJbw==
+   d="scan'208";a="53825148"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2025 10:13:56 -0800
+X-CSE-ConnectionGUID: yojZbz0ETNS35RUFFM8sXw==
+X-CSE-MsgGUID: 0jAGisTORj2FQ6ii9YKalA==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="150339325"
+X-IronPort-AV: E=Sophos;i="6.14,229,1736841600"; 
+   d="scan'208";a="142627098"
 Received: from dnelso2-mobl.amr.corp.intel.com (HELO [10.125.110.132]) ([10.125.110.132])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2025 10:06:33 -0800
-Message-ID: <cde2e31a-af2b-4236-a5b7-e1119c62b4a5@intel.com>
-Date: Fri, 7 Mar 2025 10:06:56 -0800
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2025 10:13:55 -0800
+Message-ID: <63044dfe-7f44-4a3d-9a27-82c036232241@intel.com>
+Date: Fri, 7 Mar 2025 10:14:19 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,16 +67,15 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 05/10] x86/fpu/xstate: Introduce guest FPU
- configuration
+Subject: Re: [PATCH v3 06/10] x86/fpu/xstate: Initialize guest perm with
+ fpu_guest_cfg
 To: Chao Gao <chao.gao@intel.com>, tglx@linutronix.de, x86@kernel.org,
  seanjc@google.com, pbonzini@redhat.com, linux-kernel@vger.kernel.org,
  kvm@vger.kernel.org
 Cc: peterz@infradead.org, rick.p.edgecombe@intel.com,
- weijiang.yang@intel.com, john.allen@amd.com, bp@alien8.de,
- Maxim Levitsky <mlevitsk@redhat.com>
+ weijiang.yang@intel.com, john.allen@amd.com, bp@alien8.de
 References: <20250307164123.1613414-1-chao.gao@intel.com>
- <20250307164123.1613414-6-chao.gao@intel.com>
+ <20250307164123.1613414-7-chao.gao@intel.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -122,25 +121,54 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <20250307164123.1613414-6-chao.gao@intel.com>
+In-Reply-To: <20250307164123.1613414-7-chao.gao@intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 3/7/25 08:41, Chao Gao wrote:
-> +	fpu_guest_cfg.max_features = fpu_kernel_cfg.max_features;
-> +	fpu_guest_cfg.default_features = fpu_guest_cfg.max_features;
-> +	fpu_guest_cfg.default_features &= ~XFEATURE_MASK_USER_DYNAMIC;
+> From: Yang Weijiang <weijiang.yang@intel.com>
+> 
+> Use the new fpu_guest_cfg to initialize guest permissions.
 
-Is just copying and pasting the 'fpu_kernel_cfg' initialization really
-the best way to explain what's going on?
+Background, please.
 
-Let's say you just did:
+What are the guest permissions currently set to? Why does it need to change?
 
-	fpu_guest_cfg = fpu_kernel_cfg;
+> Note fpu_guest_cfg and fpu_kernel_cfg remain the same for now. So there
+> is no functional change.
+> 
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> [Gao Chao: Extrace this from the previous patch ]
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
+> ---
+>  arch/x86/kernel/fpu/core.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
+> index b0c1ef40d105..d7ae684adbad 100644
+> --- a/arch/x86/kernel/fpu/core.c
+> +++ b/arch/x86/kernel/fpu/core.c
+> @@ -534,8 +534,15 @@ void fpstate_reset(struct fpu *fpu)
+>  	fpu->perm.__state_perm		= fpu_kernel_cfg.default_features;
+>  	fpu->perm.__state_size		= fpu_kernel_cfg.default_size;
+>  	fpu->perm.__user_state_size	= fpu_user_cfg.default_size;
+> -	/* Same defaults for guests */
+> -	fpu->guest_perm = fpu->perm;
+> +
+> +	/* Guest permission settings */
+> +	fpu->guest_perm.__state_perm	= fpu_guest_cfg.default_features;
+> +	fpu->guest_perm.__state_size	= fpu_guest_cfg.default_size;
+> +	/*
+> +	 * Set guest's __user_state_size to fpu_user_cfg.default_size so that
+> +	 * existing uAPIs can still work.
+> +	 */
 
-?
+I suspect that readers here will understand that this line:
 
-That would explicitly tell the reader that they're equal.
+> +	fpu->guest_perm.__user_state_size = fpu_user_cfg.default_size;
+>  }
 
-
+means "Set guest's __user_state_size to fpu_user_cfg.default_size". The
+comment basically just literally restates what the code does. That part
+of the comment doesn't add value.
 
