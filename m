@@ -1,143 +1,196 @@
-Return-Path: <kvm+bounces-40340-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40341-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 126C8A56BE1
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 16:23:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F9BCA56C62
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 16:44:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9084B7A5190
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 15:18:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DD063AEA4A
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 15:44:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F32E21D3F1;
-	Fri,  7 Mar 2025 15:17:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="mYAdAwxv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7381821E088;
+	Fri,  7 Mar 2025 15:44:01 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5059221B90F
-	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 15:17:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C895521D5BE;
+	Fri,  7 Mar 2025 15:43:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741360670; cv=none; b=NucFX8rDgMpucsaZM6X7YX/hTfYVVx0CqCIKqd3wsGz4oRSlImqPWjpQ+EwLxHyEJVprouwUQvIxSR/3tg0wxEvNDUPdlWNrmmA6HEttz12SSc9L1rF1wzfhLjeNn43mRql57i/i+RDKj0PUAF94LYNWexXwAq1K9BpbN1Eq2wo=
+	t=1741362241; cv=none; b=gEpjLSXgja3pGbRd62As0a+54Fin+9NDydsbH6Ntc4rjzarL8WBHvpb9P1f6lfgGuPSRy6p9rUjPjoETzphmSKPFCVZYg7sO6Zf7RFa3mYxCHkzyv5TONSeucbZA55RVhEVyAsm/bjs9mPGkxYEd+3jJFP2ejke2kLrARhy6YBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741360670; c=relaxed/simple;
-	bh=rX0uMtq0RVZw5cLocHPJ4iQ1QgIw8r0WsZ5PnIUFg/k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oT4/yZrihuJc2++bjOzdKvM1cUgYt0LLNaMtd9e1fGn7XzK+fWSauYRZsiWIX6FdgztY23v5AQKxS/Kbu6KGi/Utg0hxlp02oGkZhxpYz4JXQoBHa8z3ew0kmeH6uQsjVPIFzzkoMswoQD22H8ntmq6m70r6g7efhn24eNMk3PY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=mYAdAwxv; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7c3d0e90c4eso309227785a.1
-        for <kvm@vger.kernel.org>; Fri, 07 Mar 2025 07:17:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1741360667; x=1741965467; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kCAKy1MLCn9h59tEwZqypamw7ZoTBGTa4RgpePYYALo=;
-        b=mYAdAwxvOF/FNKH8ghHWZmZmVqxewrCco3QLKzVoay/uP2SagsmrLgck+MK8C0BE9M
-         p5Iv5tc49YScJNaj2Rnv6egDmCWLi+kHBxIkpweWKabbqDPoKWhkMgldw/0J38gj0jz2
-         vufiHwYAYMsmehRUDGr3bVI4NVAFoJjrMF8dluSvVHBRKg6OAeDG4tsWs3SwHWrmeRlS
-         oDfDvpIUpL18c4PqDn8Yro63tRRKk6tB3iE7Ej05DoCLsVj++pVTQ0uY94K20MPW5zUv
-         IgmJhXjzv5XvU83qktfr42Pl7vbpw5veI6GpaXuB15HnnHqLdUOclLw9uMDN9vK9PVQs
-         WK8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741360667; x=1741965467;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kCAKy1MLCn9h59tEwZqypamw7ZoTBGTa4RgpePYYALo=;
-        b=prhvmwm5drYnQYHwk7I3i1wqY6gluvlKBJmKYIupbft6vr8H+HGYcvZCEXwG51hMYm
-         B1389ojngDgrHZV1Pas3PiJZVoBq8GGZTgexT62ctPmlv4sMiylvnKcfOmEYQveMKs7C
-         ww03v/obYdQndjTRG3Xxw5rw0tLS4SHMKenvs8OV5/SG+H5hBS8YsQpYc1SsP6Auezxz
-         5dvgBxFIqCGvAnQQL780hg2YLyLwX7Wo86uJiXt0Rs643/QfRlK9VobzcyX9L8wWsECp
-         FjINGjjVszNe1XIbG7mYQAcTyA287yiTddOF95/rOjN9d2DYZB4DYtUC++bsnS5rxeyt
-         8Emg==
-X-Forwarded-Encrypted: i=1; AJvYcCVyOStFivgwcPUboZfGdbO07Y9HnJF514A76XkkxUdUED4n8gG4wrMWpMu8EcfukdUL9cE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyg8O7he+TJ5Zfiz+S2JK+sK1t/8lOpGdtHMm6Ew5bMzie36Xje
-	/J3g+Gsm8d5IbFqMCrN7RKSysVtzDj+wl6CJYcGmSLcuYlW09ODF0kiCBYpvxVs=
-X-Gm-Gg: ASbGncvML0SB259hHHMzx4fwJlJ1oWHzhDZk9lP80qi15hnvsPYRTgLfFasPf5/ldJV
-	435zoMkEC93/J3FQf2eAT0TfHDSE2FxQL+CacBke2SL7LUsdD1K8Oy17E1Uow67rk8WIjS9chBg
-	pIc8Ic9d+EDG/eo2bSRYi59UjIQSn9YKj4qIK+rjtZMWF4367Bjin0HNoAkllEh4vwbnOJjaL2e
-	KMLdBwFdrTAn+hDervhiOMkK7Ftoan3JZW1Gbdvgd9doZIlkj2W22dvQEpdCvvGHwKdhcVUdMP/
-	cL+9Sk2Wt0QldOrEnYdahJv+fg+Lb3Sg4U6i+a5k8Dua7JUk0gnABprHYtkK222w+x/Wm++WFjU
-	vcRIZ2GAV2iXWZFJbNA==
-X-Google-Smtp-Source: AGHT+IGPtlWnpTlq97dHBsYv9Qj2zzhftXBWiYKJa7fQGbPL61VR64KLpfRR/UmiZXjz25h9+jNuNw==
-X-Received: by 2002:a05:620a:27ce:b0:7c3:cbad:5735 with SMTP id af79cd13be357-7c499d46c20mr545047685a.28.1741360667128;
-        Fri, 07 Mar 2025 07:17:47 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c3e5511328sm252963085a.105.2025.03.07.07.17.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Mar 2025 07:17:46 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1tqZSL-00000001ljV-3gSE;
-	Fri, 07 Mar 2025 11:17:45 -0400
-Date: Fri, 7 Mar 2025 11:17:45 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Alexey Kardashevskiy <aik@amd.com>
-Cc: Xu Yilun <yilun.xu@linux.intel.com>, x86@kernel.org,
-	kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
-	Michael Roth <michael.roth@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>,
-	Joao Martins <joao.m.martins@oracle.com>,
-	Nicolin Chen <nicolinc@nvidia.com>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Steve Sistare <steven.sistare@oracle.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
-	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
-	Zhi Wang <zhiw@nvidia.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-Subject: Re: [RFC PATCH v2 14/22] iommufd: Add TIO calls
-Message-ID: <20250307151745.GH354403@ziepe.ca>
-References: <Z72GmixR6NkzXAl7@yilunxu-OptiPlex-7050>
- <2fe6b3c6-3eed-424d-87f0-34c4e7e1c906@amd.com>
- <Z77xrqLtJfB84dJF@yilunxu-OptiPlex-7050>
- <20250226131202.GH5011@ziepe.ca>
- <Z7/jFhlsBrbrloia@yilunxu-OptiPlex-7050>
- <20250301003711.GR5011@ziepe.ca>
- <Z8U+/0IYyn7XX3ao@yilunxu-OptiPlex-7050>
- <20250305192842.GE354403@ziepe.ca>
- <Z8lE+5OpqZc746mT@yilunxu-OptiPlex-7050>
- <c5c31890-14fc-4fab-8cd4-d4dcfdecdd2d@amd.com>
+	s=arc-20240116; t=1741362241; c=relaxed/simple;
+	bh=WYGYqIE7tjs3Ndvg97TJgF3DQFNARamHvv9Sv/QBZgk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NnG8wv9UAyN/ExzYZq7SXvgSWRTSKIiSa2OfaualMJiUUjoDXV1GkS8yn+8/l7hZeYR3Kow5EdoG5oLJIh9/MMnEEIv9ue61cPyEb+IivhfXOA8Ilz8FuXLbM5uGcnsey8koGMl0orX+6IiWwFBUXGU0CIeiRmBY9Yvtjbq6iGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8239C1477;
+	Fri,  7 Mar 2025 07:44:10 -0800 (PST)
+Received: from [10.1.35.22] (e122027.cambridge.arm.com [10.1.35.22])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D558B3F66E;
+	Fri,  7 Mar 2025 07:43:53 -0800 (PST)
+Message-ID: <4566d2d1-1f59-49e3-ad75-45c27ac4dfda@arm.com>
+Date: Fri, 7 Mar 2025 15:43:51 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c5c31890-14fc-4fab-8cd4-d4dcfdecdd2d@amd.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 12/45] arm64: RME: Allocate/free RECs to match vCPUs
+To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+References: <20250213161426.102987-1-steven.price@arm.com>
+ <20250213161426.102987-13-steven.price@arm.com>
+ <7639eca7-8fd8-491c-90bd-1be084fbd710@redhat.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <7639eca7-8fd8-491c-90bd-1be084fbd710@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Mar 07, 2025 at 01:19:11PM +1100, Alexey Kardashevskiy wrote:
-> > > Part of my problem here is I don't see anyone who seems to have read
-> > > all three specs and is trying to mush them together. Everyone is
-> > > focused on their own spec. I know there are subtle differences :\
+Hi Gavin,
+
+On 03/03/2025 07:08, Gavin Shan wrote:
+> On 2/14/25 2:13 AM, Steven Price wrote:
+>> The RMM maintains a data structure known as the Realm Execution Context
+>> (or REC). It is similar to struct kvm_vcpu and tracks the state of the
+>> virtual CPUs. KVM must delegate memory and request the structures are
+>> created when vCPUs are created, and suitably tear down on destruction.
+>>
+>> RECs must also be supplied with addition pages - auxiliary (or AUX)
+>> granules - for storing the larger registers state (e.g. for SVE). The
+>> number of AUX granules for a REC depends on the parameters with which
+>> the Realm was created - the RMM makes this information available via the
+>> RMI_REC_AUX_COUNT call performed after creating the Realm Descriptor
+>> (RD).
+>>
+>> Note that only some of register state for the REC can be set by KVM, the
+>> rest is defined by the RMM (zeroed). The register state then cannot be
+>> changed by KVM after the REC is created (except when the guest
+>> explicitly requests this e.g. by performing a PSCI call). The RMM also
+>> requires that the VMM creates RECs in ascending order of the MPIDR.
+>>
+>> See Realm Management Monitor specification (DEN0137) for more
+>> information:
+>> https://developer.arm.com/documentation/den0137/
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> Changes since v6:
+>>   * Avoid reporting the KVM_ARM_VCPU_REC feature if the guest isn't a
+>>     realm guest.
+>>   * Support host page size being larger than RMM's granule size when
+>>     allocating/freeing aux granules.
+>> Changes since v5:
+>>   * Separate the concept of vcpu_is_rec() and
+>>     kvm_arm_vcpu_rec_finalized() by using the KVM_ARM_VCPU_REC feature as
+>>     the indication that the VCPU is a REC.
+>> Changes since v2:
+>>   * Free rec->run earlier in kvm_destroy_realm() and adapt to previous
+>> patches.
+>> ---
+>>   arch/arm64/include/asm/kvm_emulate.h |   7 ++
+>>   arch/arm64/include/asm/kvm_host.h    |   3 +
+>>   arch/arm64/include/asm/kvm_rme.h     |  18 +++
+>>   arch/arm64/kvm/arm.c                 |  13 +-
+>>   arch/arm64/kvm/reset.c               |  11 ++
+>>   arch/arm64/kvm/rme.c                 | 179 +++++++++++++++++++++++++++
+>>   6 files changed, 229 insertions(+), 2 deletions(-)
+>>
 > 
-> One is SEV TIO (earlier version published), another one TDX Connect (which I
-> do not have and asked above) and what is the third one here? Or is it 4 as
-> ARM and RiscV both doing this now? Thanks,
+> With the following one comment addressed:
+> 
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> 
+> [...]
+> 
+>>     /*
+>> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/
+>> asm/kvm_rme.h
+>> index 698bb48a8ae1..5db377943db4 100644
+>> --- a/arch/arm64/include/asm/kvm_rme.h
+>> +++ b/arch/arm64/include/asm/kvm_rme.h
+>> @@ -6,6 +6,7 @@
+>>   #ifndef __ASM_KVM_RME_H
+>>   #define __ASM_KVM_RME_H
+>>   +#include <asm/rmi_smc.h>
+>>   #include <uapi/linux/kvm.h>
+>>     /**
+>> @@ -65,6 +66,21 @@ struct realm {
+>>       unsigned int ia_bits;
+>>   };
+>>   +/**
+>> + * struct realm_rec - Additional per VCPU data for a Realm
+>> + *
+>> + * @mpidr: MPIDR (Multiprocessor Affinity Register) value to identify
+>> this VCPU
+>> + * @rec_page: Kernel VA of the RMM's private page for this REC
+>> + * @aux_pages: Additional pages private to the RMM for this REC
+>> + * @run: Kernel VA of the RmiRecRun structure shared with the RMM
+>> + */
+>> +struct realm_rec {
+>> +    unsigned long mpidr;
+>> +    void *rec_page;
+>> +    struct page *aux_pages[REC_PARAMS_AUX_GRANULES];
+>> +    struct rec_run *run;
+>> +};
+>> +
+> 
+> REC_PARAMS_AUX_GRANULES represents the maximal number of the auxiliary
+> granules.
+> Since the base page size is always larger than or equal to granule size
+> (4KB).
+> The capacity of array @aux_pages[] needs to be REC_PARAMS_AUX_GRANULES.
+> Ideally,
+> the array's size can be computed dynamically and it's allocated in
+> kvm_create_rec().
 
-ARM will come with a spec someday, I don't know about RISCV. Maybe it
-is 4..
+This is indeed another example of where pages and granules have got
+mixed. The RMM specification provides a maximum number of granules (and
+there's a similar array in struct rec_params). Here the use of
+REC_PARAMS_AUX_GRANULES is just to keep the structure more simple (no
+dynamic allocation) with the cost of ~128bytes. Obviously if
+PAGE_SIZE>4k then this array could be smaller.
 
-Jason
+> Alternatively, to keep the code simple, a comment is needed here to
+> explain why
+> the array's size has been set to REC_PARAMS_AUX_GRANULES.
+
+Definitely a valid point - this could do with a comment explaining the
+situation.
+
+> An relevant question: Do we plan to support differentiated sizes between
+> page
+> and granule? I had the assumption this feature will be supported in the
+> future
+> after the base model (equal page and granule size) gets merged first.
+
+Yes I do plan to support it. This series actually has the basic support
+in it already, with an experimental patch at the end enabling that
+support. It "works" but I haven't tested it well and I think some of the
+error handling isn't quite right yet.
+
+But there's also a bunch more work to be done (like here) to avoid
+over-allocating memory when PAGE_SIZE>4k. E.g. RTTs need an
+sub-allocator so that we don't waste an entire (larger) page on each RTT.
+
+Steve
+
 
