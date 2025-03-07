@@ -1,78 +1,42 @@
-Return-Path: <kvm+bounces-40363-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40364-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCFE8A56F01
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 18:28:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDFA4A56F1C
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 18:34:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D30C0188BB7E
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 17:28:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4E2A3A88CF
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 17:34:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 563CB23FC54;
-	Fri,  7 Mar 2025 17:28:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qRvmhaa/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3924923FC68;
+	Fri,  7 Mar 2025 17:34:17 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps-ovh.mhejs.net (vps-ovh.mhejs.net [145.239.82.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 103C32940D
-	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 17:28:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC3421A44C
+	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 17:34:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.239.82.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741368523; cv=none; b=EqtM3yJfjG6Xvm7eviQDXpza1SvHpBZsf9sJyAmuTXieeHNnq9qYrXyb4otmHqsrAnoBsH1b8oOzAI/eW/f7hQqpTEs1choA9bd89esE6azS9jbpz/wXlmJZ+Z/+aqe/xRJXIcvDnQ3nueiLwiW1tkm4d8o/7wIDHetA4iyTcNI=
+	t=1741368856; cv=none; b=fPazaL4BUj/7xdZXALnt0xET6ris+FNs/Iz+XCxS0QZlykuYhAPbZ6SEmtI1Wiy6yZfAuKJ3GiCWF+rT44jYSGjMg4vpYiMKJi/pEHJ7cy5cPpvfO0Iqc0abpBuedMXohslLzaHWVHQydxZ+BOs0rt+UqF8w1rOLg3MZdNBZ1UQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741368523; c=relaxed/simple;
-	bh=fuCjjgBkNEewYDYmiM8ozxvRqJg4DrU5jlpsU73PMjU=;
+	s=arc-20240116; t=1741368856; c=relaxed/simple;
+	bh=3t2T3k4MN1V1dxi/A58kgz8iO8L2Pcvx3DvlLxsW+24=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uSrSjKdr2mk622mydKnkCwApubaAMU/GPrlQY08fcajjXIXV8HKNRrkS1U7u6Eip0KEf8oZ/a5lMvzKgsnqFN/pkav8hhFQ23nldQ1IM/0Qbd9tbdEoevXG5QfCK1mQzseJNOhBzN3P15zba5fNS9uFqz2oCgAvr16JaDYLCr4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qRvmhaa/; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-223378e2b0dso33268475ad.0
-        for <kvm@vger.kernel.org>; Fri, 07 Mar 2025 09:28:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1741368521; x=1741973321; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fuCjjgBkNEewYDYmiM8ozxvRqJg4DrU5jlpsU73PMjU=;
-        b=qRvmhaa/gnMfEH30ipzg2el22N/xmFNku8jXS9L94QB0dPNGiLxYuli07oPcUoNMvg
-         fkTaAIq7WTL8sQcMVD/y1rf3DkJet1lQBPwjjSbyy/eUf1XmDx+0bjm88BBzZNLnKSfU
-         Zj/mBKvLx5JasSi4cnfiMtIyezQUygm6DvQn1nMWtvfyMqfPlErSz1QmDOoz4sOYr5z2
-         LZ428bbV4kVpIFPmgmscLqzxPSkcD3WujFJDTu/zUqHJFhwHlu4W9+4BNhgL+w70Mv0A
-         b8mR/MJ5E7cIEq3pimGWsVl6+ItjLhdTI0wRTyEHRJ+keHSpcf5QkZvnrb1S12AngmE1
-         0NZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741368521; x=1741973321;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fuCjjgBkNEewYDYmiM8ozxvRqJg4DrU5jlpsU73PMjU=;
-        b=L55DpAPi6UUAuD/29RP27Bbkl0Ok5zgJnzetZf0eCgZzRU1rIxz8+fcNYcCshMFEl+
-         AuLM8h62GDVj8dDZp0erFQ+wZsUAMIKx3JcktYZhA5W14qsO/Mx/qIAJDgetXkrjezMG
-         lkj6KseuZBs55N2sIJsLgfK0ZrPFVw5x7f8n4L0cfBpsRHciEu5Aj8/pe1HQiZ2I0bUp
-         nfsTO9celYT4eakeBbtclCWwt8ekC+zZuGJLc3/oIo2zOVP4CyklMRjp9DQrfT/Mic7z
-         Nwgd+t0bZ4E42n7g3YQf9iPCnT4jn0UnGxD0kcTS91wQbt6DLyEnxWEa3KCej7ZZGpNb
-         /rRg==
-X-Gm-Message-State: AOJu0YwqI4hoil0X3PZMshK68qDF8VzR3YOznriMIUzLlm2jrzA4JA8q
-	Dduc+YjEDpbOeKsQjOa3SqNg8hLD51vc0wG/SBt4/Ul2U82nCTwmuy+Ea2I6nSs=
-X-Gm-Gg: ASbGnctiJQwdDjGh8KgzVQunmoukssQeNZqizoFG0uB0vYbaeDop6sc4WOgQNMeQ+tl
-	njz/EY8bTWFAvKtmepF2CDUoeRYC5bHB6xnb4nkCzYq2820SDSNQKi7ZN1mCHzN4pYSNkXl9OJU
-	vKIIxLapoIniBBo0LHrvXffG7bnhLA4hDYk9DKisun0DzvYidVi1Tbffa6Mj3XvB2/QV5oIa1yq
-	rtmzQPpqMEvRvxVqTBUnejGjHbmjxTik/TsNuKgz+D7eByMCY6/8m/UPd7C//5NfBGJyWcukvKp
-	zkc2kj6VQqzGbO8PdxnUUxySHCDhKCLx/caecY/hu9l8Ynl1b/4i/2G+Pg==
-X-Google-Smtp-Source: AGHT+IHkmMPBeC7Jjz6QaagGABV93I+Jsq2T/Kqau419WQZhtTKYIasZKgrWrz43zBNXteOS9gtokg==
-X-Received: by 2002:a05:6a20:43a0:b0:1f1:253:2e6d with SMTP id adf61e73a8af0-1f544c377efmr7566014637.29.1741368521281;
-        Fri, 07 Mar 2025 09:28:41 -0800 (PST)
-Received: from [192.168.1.67] ([38.39.164.180])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af2812887b3sm2819173a12.71.2025.03.07.09.28.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Mar 2025 09:28:40 -0800 (PST)
-Message-ID: <ab1a90fb-e068-4ddc-865e-07bdeb2789e3@linaro.org>
-Date: Fri, 7 Mar 2025 09:28:40 -0800
+	 In-Reply-To:Content-Type; b=O0tvHoHJJnaFeiSxjm4VZYMyUmopWD8o8GJEo0rltDYXQWHCkyX4CAeCHlYNwo7V9cXiFy4UROaKYmhYqbZVZqrh2Q6oM2CLKUnhEmuz+Zc0FXZR4tlMWYWYnCCI7ZGzO+j8onh5mnkLklc+/bQh51tBXyiaPmdarB6LDAzLSzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name; spf=pass smtp.mailfrom=vps-ovh.mhejs.net; arc=none smtp.client-ip=145.239.82.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vps-ovh.mhejs.net
+Received: from MUA
+	by vps-ovh.mhejs.net with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
+	(Exim 4.98)
+	(envelope-from <mhej@vps-ovh.mhejs.net>)
+	id 1tqbaJ-00000000RvH-3weB;
+	Fri, 07 Mar 2025 18:34:07 +0100
+Message-ID: <2a0ec1b4-4beb-4b95-a48d-32a8d5274269@maciej.szmigiero.name>
+Date: Fri, 7 Mar 2025 18:34:02 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,13 +45,12 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 5/7] hw/hyperv/syndbg: common compilation unit
-Content-Language: en-US
-To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+To: =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Pierrick Bouvier <pierrick.bouvier@linaro.org>, kvm@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- manos.pitsidianakis@linaro.org, Marcelo Tosatti <mtosatti@redhat.com>,
- alex.bennee@linaro.org
+ manos.pitsidianakis@linaro.org, Marcelo Tosatti <mtosatti@redhat.com>
 References: <20250306064118.3879213-1-pierrick.bouvier@linaro.org>
  <20250306064118.3879213-6-pierrick.bouvier@linaro.org>
  <353b36fd-2265-43c3-8072-3055e5bd7057@linaro.org>
@@ -95,62 +58,146 @@ References: <20250306064118.3879213-1-pierrick.bouvier@linaro.org>
  <d62743f5-ca79-47c0-a72b-c36308574bdd@linaro.org>
  <6556fdd8-83ea-4cc6-9a3b-3822fdc8cb5d@linaro.org>
  <95a6f718-8fab-434c-9b02-6812f7afbcc3@maciej.szmigiero.name>
-From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-In-Reply-To: <95a6f718-8fab-434c-9b02-6812f7afbcc3@maciej.szmigiero.name>
+ <87o6yc3nea.fsf@draig.linaro.org>
+Content-Language: en-US, pl-PL
+From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Autocrypt: addr=mail@maciej.szmigiero.name; keydata=
+ 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
+Disposition-Notification-To: "Maciej S. Szmigiero"
+ <mail@maciej.szmigiero.name>
+In-Reply-To: <87o6yc3nea.fsf@draig.linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
+Sender: mhej@vps-ovh.mhejs.net
 
-T24gMy83LzI1IDAzOjA3LCBNYWNpZWogUy4gU3ptaWdpZXJvIHdyb3RlOg0KPiBPbiA2LjAz
-LjIwMjUgMjM6NTYsIFBpZXJyaWNrIEJvdXZpZXIgd3JvdGU6DQo+PiBPbiAzLzYvMjUgMDk6
-NTgsIFBoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpIHdyb3RlOg0KPj4+IE9uIDYvMy8yNSAxNzoy
-MywgUGllcnJpY2sgQm91dmllciB3cm90ZToNCj4+Pj4gT24gMy82LzI1IDA4OjE5LCBSaWNo
-YXJkIEhlbmRlcnNvbiB3cm90ZToNCj4+Pj4+IE9uIDMvNS8yNSAyMjo0MSwgUGllcnJpY2sg
-Qm91dmllciB3cm90ZToNCj4+Pj4+PiBSZXBsYWNlIFRBUkdFVF9QQUdFLiogYnkgcnVudGlt
-ZSBjYWxscw0KPj4+Pj4+DQo+Pj4+Pj4gU2lnbmVkLW9mZi1ieTogUGllcnJpY2sgQm91dmll
-ciA8cGllcnJpY2suYm91dmllckBsaW5hcm8ub3JnPg0KPj4+Pj4+IC0tLQ0KPj4+Pj4+ICDC
-oMKgwqAgaHcvaHlwZXJ2L3N5bmRiZy5jwqDCoMKgIHwgNyArKysrLS0tDQo+Pj4+Pj4gIMKg
-wqDCoCBody9oeXBlcnYvbWVzb24uYnVpbGQgfCAyICstDQo+Pj4+Pj4gIMKgwqDCoCAyIGZp
-bGVzIGNoYW5nZWQsIDUgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkNCj4+Pj4+Pg0K
-Pj4+Pj4+IGRpZmYgLS1naXQgYS9ody9oeXBlcnYvc3luZGJnLmMgYi9ody9oeXBlcnYvc3lu
-ZGJnLmMNCj4+Pj4+PiBpbmRleCBkM2UzOTE3MDc3Mi4uZjkzODIyMDJlZDMgMTAwNjQ0DQo+
-Pj4+Pj4gLS0tIGEvaHcvaHlwZXJ2L3N5bmRiZy5jDQo+Pj4+Pj4gKysrIGIvaHcvaHlwZXJ2
-L3N5bmRiZy5jDQo+Pj4+Pj4gQEAgLTE0LDcgKzE0LDcgQEANCj4+Pj4+PiAgwqDCoMKgICNp
-bmNsdWRlICJtaWdyYXRpb24vdm1zdGF0ZS5oIg0KPj4+Pj4+ICDCoMKgwqAgI2luY2x1ZGUg
-Imh3L3FkZXYtcHJvcGVydGllcy5oIg0KPj4+Pj4+ICDCoMKgwqAgI2luY2x1ZGUgImh3L2xv
-YWRlci5oIg0KPj4+Pj4+IC0jaW5jbHVkZSAiY3B1LmgiDQo+Pj4+Pj4gKyNpbmNsdWRlICJl
-eGVjL3RhcmdldF9wYWdlLmgiDQo+Pj4+Pj4gIMKgwqDCoCAjaW5jbHVkZSAiaHcvaHlwZXJ2
-L2h5cGVydi5oIg0KPj4+Pj4+ICDCoMKgwqAgI2luY2x1ZGUgImh3L2h5cGVydi92bWJ1cy1i
-cmlkZ2UuaCINCj4+Pj4+PiAgwqDCoMKgICNpbmNsdWRlICJody9oeXBlcnYvaHlwZXJ2LXBy
-b3RvLmgiDQo+Pj4+Pj4gQEAgLTE4OCw3ICsxODgsOCBAQCBzdGF0aWMgdWludDE2X3QgaGFu
-ZGxlX3JlY3ZfbXNnKEh2U3luRGJnICpzeW5kYmcsDQo+Pj4+Pj4gdWludDY0X3Qgb3V0Z3Bh
-LA0KPj4+Pj4+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHVpbnQ2NF90IHRpbWVvdXQsIHVpbnQzMl90
-DQo+Pj4+Pj4gKnJldHJpZXZlZF9jb3VudCkNCj4+Pj4+PiAgwqDCoMKgIHsNCj4+Pj4+PiAg
-wqDCoMKgwqDCoMKgwqAgdWludDE2X3QgcmV0Ow0KPj4+Pj4+IC3CoMKgwqAgdWludDhfdCBk
-YXRhX2J1ZltUQVJHRVRfUEFHRV9TSVpFIC0gVURQX1BLVF9IRUFERVJfU0laRV07DQo+Pj4+
-Pj4gK8KgwqDCoCBjb25zdCBzaXplX3QgYnVmX3NpemUgPSBxZW11X3RhcmdldF9wYWdlX3Np
-emUoKSAtDQo+Pj4+Pj4gVURQX1BLVF9IRUFERVJfU0laRTsNCj4+Pj4+PiArwqDCoMKgIHVp
-bnQ4X3QgKmRhdGFfYnVmID0gZ19hbGxvY2EoYnVmX3NpemUpOw0KPj4+Pj4+ICDCoMKgwqDC
-oMKgwqDCoCBod2FkZHIgb3V0X2xlbjsNCj4+Pj4+PiAgwqDCoMKgwqDCoMKgwqAgdm9pZCAq
-b3V0X2RhdGE7DQo+Pj4+Pj4gIMKgwqDCoMKgwqDCoMKgIHNzaXplX3QgcmVjdl9ieXRlX2Nv
-dW50Ow0KPj4+Pj4NCj4+Pj4+IFdlJ3ZlIHB1cmdlZCB0aGUgY29kZSBiYXNlIG9mIFZMQXMs
-IGFuZCB0aG9zZSBhcmUgcHJlZmVyYWJsZSB0byBhbGxvY2EuDQo+Pj4+PiBKdXN0IHVzZSBn
-X21hbGxvYyBhbmQgZ19hdXRvZnJlZS4NCj4+Pj4+DQo+Pj4+DQo+Pj4+IEkgaGVzaXRhdGVk
-LCBkdWUgdG8gcG90ZW50aWFsIHBlcmZvcm1hbmNlIGNvbnNpZGVyYXRpb25zIGZvciBwZW9w
-bGUNCj4+Pj4gcmV2aWV3aW5nIHRoZSBwYXRjaC4gSSdsbCBzd2l0Y2ggdG8gaGVhcCBiYXNl
-ZCBzdG9yYWdlLg0KPj4+DQo+Pj4gT1RPSCBoeXBlcnYgaXMgeDg2LW9ubHksIHNvIHdlIGNv
-dWxkIGRvOg0KPj4+DQo+Pj4gI2RlZmluZSBCVUZTWiAoNCAqIEtpQikNCj4+Pg0KPj4+IGhh
-bmRsZV9yZWN2X21zZygpDQo+Pj4gew0KPj4+ICDCoMKgwqAgdWludDhfdCBkYXRhX2J1ZltC
-VUZTWiAtIFVEUF9QS1RfSEVBREVSX1NJWkVdOw0KPj4+ICDCoMKgwqAgLi4uDQo+Pj4NCj4+
-PiBodl9zeW5kYmdfY2xhc3NfaW5pdCgpDQo+Pj4gew0KPj4+ICDCoMKgwqAgYXNzZXJ0KEJV
-RlNaID4gcWVtdV90YXJnZXRfcGFnZV9zaXplKCkpOw0KPj4+ICDCoMKgwqAgLi4uDQo+Pj4N
-Cj4+PiBhbmQgY2FsbCBpdCBhIGRheS4NCj4+DQo+PiBDb3VsZCBiZSBwb3NzaWJsZSBmb3Ig
-bm93IHllcy4NCj4+DQo+PiBBbnkgb3BpbmlvbiBmcm9tIGNvbmNlcm5lZCBtYWludGFpbmVy
-cz8NCj4gDQo+IEkgdGhpbmsgZXNzZW50aWFsbHkgaGFyZGNvZGluZyA0ayBwYWdlcyBpbiBo
-eXBlcnYgaXMgb2theQ0KPiAod2l0aCBhbiBhcHByb3ByaWF0ZSBjaGVja2luZy9lbmZvcmNl
-bWVudCBhc3NlcnRzKCkgb2YgY291cnNlKSwNCj4gc2luY2UgZXZlbiBpZiB0aGlzIGdldHMg
-cG9ydGVkIHRvIEFSTTY0IGF0IHNvbWUgcG9pbnQNCj4gaXQgaXMgZ29pbmcgdG8gbmVlZCAq
-YSBsb3QqIG9mIGNoYW5nZXMgYW55d2F5Lg0KPiANCg0KT2ssIEkgd2lsbCBoYXJkY29kZSB0
-aGlzIGZvbGxvd2luZyBQaGlsaXBwZSBzdWdnZXN0aW9uIHRoZW4uDQoNCj4gVGhhbmtzLA0K
-PiBNYWNpZWoNCj4gDQoNCg==
+On 7.03.2025 15:50, Alex Bennée wrote:
+> "Maciej S. Szmigiero" <mail@maciej.szmigiero.name> writes:
+> 
+>> On 6.03.2025 23:56, Pierrick Bouvier wrote:
+>>> On 3/6/25 09:58, Philippe Mathieu-Daudé wrote:
+>>>> On 6/3/25 17:23, Pierrick Bouvier wrote:
+>>>>> On 3/6/25 08:19, Richard Henderson wrote:
+>>>>>> On 3/5/25 22:41, Pierrick Bouvier wrote:
+>>>>>>> Replace TARGET_PAGE.* by runtime calls
+>>>>>>>
+>>>>>>> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+>>>>>>> ---
+>>>>>>>      hw/hyperv/syndbg.c    | 7 ++++---
+>>>>>>>      hw/hyperv/meson.build | 2 +-
+>>>>>>>      2 files changed, 5 insertions(+), 4 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/hw/hyperv/syndbg.c b/hw/hyperv/syndbg.c
+>>>>>>> index d3e39170772..f9382202ed3 100644
+>>>>>>> --- a/hw/hyperv/syndbg.c
+>>>>>>> +++ b/hw/hyperv/syndbg.c
+>>>>>>> @@ -14,7 +14,7 @@
+>>>>>>>      #include "migration/vmstate.h"
+>>>>>>>      #include "hw/qdev-properties.h"
+>>>>>>>      #include "hw/loader.h"
+>>>>>>> -#include "cpu.h"
+>>>>>>> +#include "exec/target_page.h"
+>>>>>>>      #include "hw/hyperv/hyperv.h"
+>>>>>>>      #include "hw/hyperv/vmbus-bridge.h"
+>>>>>>>      #include "hw/hyperv/hyperv-proto.h"
+>>>>>>> @@ -188,7 +188,8 @@ static uint16_t handle_recv_msg(HvSynDbg *syndbg,
+>>>>>>> uint64_t outgpa,
+>>>>>>>                                      uint64_t timeout, uint32_t
+>>>>>>> *retrieved_count)
+>>>>>>>      {
+>>>>>>>          uint16_t ret;
+>>>>>>> -    uint8_t data_buf[TARGET_PAGE_SIZE - UDP_PKT_HEADER_SIZE];
+>>>>>>> +    const size_t buf_size = qemu_target_page_size() -
+>>>>>>> UDP_PKT_HEADER_SIZE;
+>>>>>>> +    uint8_t *data_buf = g_alloca(buf_size);
+>>>>>>>          hwaddr out_len;
+>>>>>>>          void *out_data;
+>>>>>>>          ssize_t recv_byte_count;
+>>>>>>
+>>>>>> We've purged the code base of VLAs, and those are preferable to alloca.
+>>>>>> Just use g_malloc and g_autofree.
+>>>>>>
+>>>>>
+>>>>> I hesitated, due to potential performance considerations for people
+>>>>> reviewing the patch. I'll switch to heap based storage.
+>>>>
+>>>> OTOH hyperv is x86-only, so we could do:
+>>>>
+>>>> #define BUFSZ (4 * KiB)
+>>>>
+>>>> handle_recv_msg()
+>>>> {
+>>>>      uint8_t data_buf[BUFSZ - UDP_PKT_HEADER_SIZE];
+>>>>      ...
+>>>>
+>>>> hv_syndbg_class_init()
+>>>> {
+>>>>      assert(BUFSZ > qemu_target_page_size());
+>>>>      ...
+>>>>
+>>>> and call it a day.
+>>> Could be possible for now yes.
+>>> Any opinion from concerned maintainers?
+>>
+>> I think essentially hardcoding 4k pages in hyperv is okay
+>> (with an appropriate checking/enforcement asserts() of course),
+>> since even if this gets ported to ARM64 at some point
+>> it is going to need *a lot* of changes anyway.
+> 
+> There was a talk at last years KVM Forum about porting WHPX for Windows
+> on Arm:
+> 
+>    https://kvm-forum.qemu.org/2024/Qemu_support_for_Windows_on_Arm_GgKlLjf.pdf
+> 
+> but am I right in thinking all the hyperv code in QEMU is about
+> providing guest facing enlightenments for Windows guests under KVM? I
+> guess no one is working on that at the moment.
+
+Yes, I think that talk was about running QEMU on actual Hyper-V hypervisor,
+while the code in hw/hyperv is about QEMU emulating Hyper-V interfaces to
+QEMU's VMs.
+
+CONFIG_HYPERV in hw/hyperv/Kconfig is even marked as "depends on KVM".
+
+Thanks,
+Maciej
+
 
