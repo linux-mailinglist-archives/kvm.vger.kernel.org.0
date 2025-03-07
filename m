@@ -1,204 +1,188 @@
-Return-Path: <kvm+bounces-40338-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40339-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04D3BA56AD7
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 15:51:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E8144A56B0E
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 16:02:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D64E816E7F9
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 14:51:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AAD8177B17
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 15:02:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CF57218EB5;
-	Fri,  7 Mar 2025 14:51:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 954EE21C187;
+	Fri,  7 Mar 2025 15:02:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="G6fqniQN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FsUHngrx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 545A716EB4C
-	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 14:50:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D3C82E3361
+	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 15:02:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741359059; cv=none; b=Jznc67MjwNtH4V8MEXhPlGElcLJ/X5cIC9D5BOnM3+KKKS5eeevQ0yG5FFiFNXMie9xX4P9ZsTdqyWvJojIqbNaeW4EwyNbLDz8qhvk+43DFnHLO1GY8Ww9uwr8DFd250eu0OkuPjGhDMTeJA5YBB2MiwPy1V1CbSxc+mYkGWRo=
+	t=1741359763; cv=none; b=jO7lTr+kUjxExm4iuleEwGRbk+oZCXsqqID4Iujd+0vFQUfNhR2fOm1Wp4BgW++DLhJEx2eNeBe0qD+Z5tZcD+c76jjHUoBvldbXNGOU3NqAKp8P6KEIH3JogAsY8hK2VQBeumU4qgl8xTaFR7kSc8tC3Tiejio5U8m6+mnpRXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741359059; c=relaxed/simple;
-	bh=eAedVYtfVf3yxgzI40aE73Utpr7yVE8JA/C++NA9E18=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Td8rmncd+4MK13bwf4pbWs8IrltkaGXGKV7tD7GbyxwAP24KzVANEQtIdCGY7bdfn1dpZenfA60i3/85epTWODzlcRBrBUdWCo57IvoBeoIGSRc1U+baB8AIE6gC5qJeSe7sfNpk3G3U1wK5Ym1HJjnJuge6/Gvs2jPOkmRHMy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=G6fqniQN; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5e539ea490dso2476901a12.0
-        for <kvm@vger.kernel.org>; Fri, 07 Mar 2025 06:50:57 -0800 (PST)
+	s=arc-20240116; t=1741359763; c=relaxed/simple;
+	bh=/CqtL46hs9Sn9XtjnQtnzpwEcuZGxBycCOlQy6JckL8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=qqDigG6bjtHnaTRGmzvlL5GCiGfSXFI0vvfHUFqJk4RlZDSC/Kz6Ys79SLn77qx00KW2DrjOjpLawPeSzTRZPmHCUpRetW+JcbqunHJyC8OOc3mHBFGnJNeYTJQeiFHS0t0fRJ5lWk5d1t4zWXEwDm7pVmbZzdbMdJVrovuYdBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FsUHngrx; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff4b130bb2so3446775a91.0
+        for <kvm@vger.kernel.org>; Fri, 07 Mar 2025 07:02:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1741359056; x=1741963856; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:user-agent
-         :references:in-reply-to:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dNZtIZJytF/Zt61U4OrGGE9iALPc/9QtNmwJUb2ZA74=;
-        b=G6fqniQNdOXnHM7miLhqlrGOwQJo9ZUoYxkX0C/sNfnrs3OJxuGEOr1Z/mqfsywHiA
-         2qUO3ktmvH6p38n2ca/wzuijdNDk9HquCkuMdXgsVPkf24X4+z/pK5gwZ/UvQhqNKOxH
-         EW+dtiJthDJ1uj5HLDWzmZxcgU4Qtav5cIlaCPfvBTz+yF+VvTQzUCJ23tXFfGQHSF5K
-         iBRvQH2pH3ud/N4OdCq9AGJAbgGAftMUxRXOC2ek9cZnyBB5L5XwNk2vsLKOYWV82D7y
-         9hzttu/R8ctSbYClijt4W1uLbUA+rxZXhZVsmxfqSiyrB7Y33nBhoIw1FZqDtVA2Fo9f
-         aRoA==
+        d=google.com; s=20230601; t=1741359761; x=1741964561; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8p9/fq/nM+pr2NlVgvqJ7GCWcpETpYSDd5iEoMo788I=;
+        b=FsUHngrxXCywmDSJa9hL/9zsqQo5AjsoYN9LuBW053qYTzLkTK8CW+8H6r1pvVR7S5
+         jQhFyzpkDw/xaxXrCqXuMwp/jOCq4G9lrshZ8Kaths7MMPTIBt/o9wDspWW11/Ryucxk
+         BiREI5x/QN6TWI+289OCY/ETO6TYJxHR5o+ZfkSB8ubEqWL0wa4L3dI9iKdnHZmgic0v
+         kJ3Tl2faU3Dz4G0c/8P5+i5oNzHqo2qPC25Kl0I2oBZbuDK2jcR1JM0ENjOwBs/BIkP3
+         Ya/lVzXWiwpq6eNUdYHyip6oxX6ER35x6YiFse6OMs971c436Vnrl84CLpN14L9wbmZ6
+         OPRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741359056; x=1741963856;
-        h=content-transfer-encoding:mime-version:message-id:date:user-agent
-         :references:in-reply-to:subject:cc:to:from:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=dNZtIZJytF/Zt61U4OrGGE9iALPc/9QtNmwJUb2ZA74=;
-        b=aSnNX22ZVl98zHMoBwcqp9c55Td/lwhSYK0fPHlPd1XtXutwHRLVfxkv825KvrvLTG
-         f+SNi8kPil6V29ajxKjiFZqf0kj+xsp9b8mSIUmiNt3+tfXOiDi2cizXGOKNRjFsZwFC
-         eUCja1LF6M0erAzYlligV/faMSJVFqpBo/7r81GFBQ2ZPE+L3tOHyHjjeviBMkOiwaty
-         m7410UIFcn+E7wXlLwzYyCEIyediEdm9iOjePfl3EdSMFCBdN98klSNdcKK+QenB95wO
-         gBwzYg+n17ldlfbMwtwPjqEQL17yB1FwtbnnkX5kNmLjCPkDYUQevi3pQwdPRUI3wUwn
-         NuUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVpQsJwffz5UHfNPmeD2/dOsk59/ptdHUFPw/Ndl6THBd2wt1E9pruDTZtEQspjKPVtWCI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOXkq1zDG7F8S/sUANaFS9h++h9EFIIDLrmVVD0H9PXKLXhnTR
-	01YeDKtiCkwwg9HEd/pHuzkDhEVIYK+XsE1hWiTTXVnEFk+ugFTfcoy2NMUqA7I=
-X-Gm-Gg: ASbGncuubpz76Uyxr10kv8QFaatysGz4IH0PvRt6CzG9ad0yjPYSif9EYMIg78eB1Fo
-	AlRaO+ngzib1xxM59A4FBc5OaqwuuhqvBgUmS72xqbl8/2l+vUKrsKjHdDCGFqQEWN1An3MJgAR
-	NlKoa3OPk+QE1nVCzJ2syrr0d4vtU5qiWKwdDMyx0gy2QHNgL838XbbTXVdRCdruFUdBjXZJVle
-	N6VB6aUqrZqISuk0lXXa7i4QYBdvGFY2St2tou4emEo7Wn7zJW2HOwIFcxXVLVSM9DwTVxTO0YR
-	2ab6I/YLPY30n6alJUeIzX1QSAC92rDfL/QXcKhTv9fQ8+w=
-X-Google-Smtp-Source: AGHT+IGlT1ukA1jbMwwSvTcNJeSfQ9ZpWZAeZEzYscuw2hkZ6zyCLpFa1cLRIlIwBB9gpCeXrZuDzg==
-X-Received: by 2002:a05:6402:34c7:b0:5e5:ba77:6f24 with SMTP id 4fb4d7f45d1cf-5e5e22d4c66mr8934967a12.16.1741359054974;
-        Fri, 07 Mar 2025 06:50:54 -0800 (PST)
-Received: from draig.lan ([185.126.160.109])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e5c745c552sm2726825a12.17.2025.03.07.06.50.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Mar 2025 06:50:54 -0800 (PST)
-Received: from draig (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 27D825F90C;
-	Fri,  7 Mar 2025 14:50:53 +0000 (GMT)
-From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc: Pierrick Bouvier <pierrick.bouvier@linaro.org>,  kvm@vger.kernel.org,
-  Paolo Bonzini <pbonzini@redhat.com>,  Philippe =?utf-8?Q?Mathieu-Daud?=
- =?utf-8?Q?=C3=A9?=
- <philmd@linaro.org>,  Richard Henderson <richard.henderson@linaro.org>,
-  qemu-devel@nongnu.org,  manos.pitsidianakis@linaro.org,  Marcelo Tosatti
- <mtosatti@redhat.com>
-Subject: Re: [PATCH 5/7] hw/hyperv/syndbg: common compilation unit
-In-Reply-To: <95a6f718-8fab-434c-9b02-6812f7afbcc3@maciej.szmigiero.name>
-	(Maciej S. Szmigiero's message of "Fri, 7 Mar 2025 12:07:25 +0100")
-References: <20250306064118.3879213-1-pierrick.bouvier@linaro.org>
-	<20250306064118.3879213-6-pierrick.bouvier@linaro.org>
-	<353b36fd-2265-43c3-8072-3055e5bd7057@linaro.org>
-	<35c2c7a5-5b12-4c21-a40a-375caae60d0c@linaro.org>
-	<d62743f5-ca79-47c0-a72b-c36308574bdd@linaro.org>
-	<6556fdd8-83ea-4cc6-9a3b-3822fdc8cb5d@linaro.org>
-	<95a6f718-8fab-434c-9b02-6812f7afbcc3@maciej.szmigiero.name>
-User-Agent: mu4e 1.12.9; emacs 30.1
-Date: Fri, 07 Mar 2025 14:50:53 +0000
-Message-ID: <87o6yc3nea.fsf@draig.linaro.org>
+        d=1e100.net; s=20230601; t=1741359761; x=1741964561;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8p9/fq/nM+pr2NlVgvqJ7GCWcpETpYSDd5iEoMo788I=;
+        b=I/l/nhTYgr4ap0/cbeiHsQ97BC3dFCK8DzkDaBF7cWuwshconVQKl/1Sc4pInpk+xJ
+         h486MRFiOJT4wGOych4PXiN3Q+9qy8enBojh2iI6nrNWGmSCRpC/WeUwfuo8voTQx0uW
+         tR/P+bimn5A88Da1jIUkgMIhzn1Zr2zayKMAlCWj65FkGInNzpHreJqMRft26RCcPCVB
+         btF3ohO2bTtxcR0z8+MklLuCbsAK5OEj6cIlZg9i0W1oLLisqAwa3Nclj8YhyqSz0bKW
+         4rMun+TQYgbdV4CYxKmcB2y68zyxrFqsdCFUgQ3jQ7GbcLytdL5MYcVZ/Vcj/PTQExf/
+         w1TA==
+X-Gm-Message-State: AOJu0YwJuqIuVjPeCvGNZfF7ypD+evjQaAdb4KqjkBgSVIUSdnaxrf5f
+	bMlGHFGTzpaxPOx/pv5oGBaOu/fP6wVE29DBA5QYrc1woSs7YqkwZmRNQA3rTyeEA4T17ziPisZ
+	A6g==
+X-Google-Smtp-Source: AGHT+IGVQ4cg/Vi/nSKbSvruTswaX4BW6St/JWA/Tpijs0lJZx0Aae/mTyaI4ditO9P+2u0QbEdPJNvO1OU=
+X-Received: from pjbqn14.prod.google.com ([2002:a17:90b:3d4e:b0:2ea:9d23:79a0])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d605:b0:2ee:db8a:2a01
+ with SMTP id 98e67ed59e1d1-2ff7cf128cdmr5320710a91.30.1741359761542; Fri, 07
+ Mar 2025 07:02:41 -0800 (PST)
+Date: Fri, 7 Mar 2025 07:02:36 -0800
+In-Reply-To: <44961459-2759-4164-b604-f6bd43da8ce9@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <44961459-2759-4164-b604-f6bd43da8ce9@stanley.mountain>
+Message-ID: <Z8sKjFrSJVLsLbQw@google.com>
+Subject: Re: [bug report] KVM: VMX: Use GPA legality helpers to replace open
+ coded equivalents
+From: Sean Christopherson <seanjc@google.com>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-"Maciej S. Szmigiero" <mail@maciej.szmigiero.name> writes:
+On Fri, Mar 07, 2025, Dan Carpenter wrote:
+> Hello Sean Christopherson,
+> 
+> Commit 636e8b733491 ("KVM: VMX: Use GPA legality helpers to replace
+> open coded equivalents") from Feb 3, 2021 (linux-next), leads to the
+> following Smatch static checker warning:
+> 
+> 	arch/x86/kvm/vmx/nested.c:834 nested_vmx_check_msr_switch()
+> 	warn: potential user controlled sizeof overflow 'addr + count * 16' '0-u64max + 16-68719476720'
+> 
+> arch/x86/kvm/vmx/nested.c
+>     827 static int nested_vmx_check_msr_switch(struct kvm_vcpu *vcpu,
+>     828                                        u32 count, u64 addr)
+>     829 {
+>     830         if (count == 0)
+>     831                 return 0;
+>     832 
+>     833         if (!kvm_vcpu_is_legal_aligned_gpa(vcpu, addr, 16) ||
+> --> 834             !kvm_vcpu_is_legal_gpa(vcpu, (addr + count * sizeof(struct vmx_msr_entry) - 1)))
+>                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> Do we support kvm on 32bit systems?
 
-> On 6.03.2025 23:56, Pierrick Bouvier wrote:
->> On 3/6/25 09:58, Philippe Mathieu-Daud=C3=A9 wrote:
->>> On 6/3/25 17:23, Pierrick Bouvier wrote:
->>>> On 3/6/25 08:19, Richard Henderson wrote:
->>>>> On 3/5/25 22:41, Pierrick Bouvier wrote:
->>>>>> Replace TARGET_PAGE.* by runtime calls
->>>>>>
->>>>>> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
->>>>>> ---
->>>>>> =C2=A0=C2=A0=C2=A0 hw/hyperv/syndbg.c=C2=A0=C2=A0=C2=A0 | 7 ++++---
->>>>>> =C2=A0=C2=A0=C2=A0 hw/hyperv/meson.build | 2 +-
->>>>>> =C2=A0=C2=A0=C2=A0 2 files changed, 5 insertions(+), 4 deletions(-)
->>>>>>
->>>>>> diff --git a/hw/hyperv/syndbg.c b/hw/hyperv/syndbg.c
->>>>>> index d3e39170772..f9382202ed3 100644
->>>>>> --- a/hw/hyperv/syndbg.c
->>>>>> +++ b/hw/hyperv/syndbg.c
->>>>>> @@ -14,7 +14,7 @@
->>>>>> =C2=A0=C2=A0=C2=A0 #include "migration/vmstate.h"
->>>>>> =C2=A0=C2=A0=C2=A0 #include "hw/qdev-properties.h"
->>>>>> =C2=A0=C2=A0=C2=A0 #include "hw/loader.h"
->>>>>> -#include "cpu.h"
->>>>>> +#include "exec/target_page.h"
->>>>>> =C2=A0=C2=A0=C2=A0 #include "hw/hyperv/hyperv.h"
->>>>>> =C2=A0=C2=A0=C2=A0 #include "hw/hyperv/vmbus-bridge.h"
->>>>>> =C2=A0=C2=A0=C2=A0 #include "hw/hyperv/hyperv-proto.h"
->>>>>> @@ -188,7 +188,8 @@ static uint16_t handle_recv_msg(HvSynDbg *syndbg,
->>>>>> uint64_t outgpa,
->>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint6=
-4_t timeout, uint32_t
->>>>>> *retrieved_count)
->>>>>> =C2=A0=C2=A0=C2=A0 {
->>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint16_t ret;
->>>>>> -=C2=A0=C2=A0=C2=A0 uint8_t data_buf[TARGET_PAGE_SIZE - UDP_PKT_HEAD=
-ER_SIZE];
->>>>>> +=C2=A0=C2=A0=C2=A0 const size_t buf_size =3D qemu_target_page_size(=
-) -
->>>>>> UDP_PKT_HEADER_SIZE;
->>>>>> +=C2=A0=C2=A0=C2=A0 uint8_t *data_buf =3D g_alloca(buf_size);
->>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 hwaddr out_len;
->>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 void *out_data;
->>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ssize_t recv_byte_count;
->>>>>
->>>>> We've purged the code base of VLAs, and those are preferable to alloc=
-a.
->>>>> Just use g_malloc and g_autofree.
->>>>>
->>>>
->>>> I hesitated, due to potential performance considerations for people
->>>> reviewing the patch. I'll switch to heap based storage.
->>>
->>> OTOH hyperv is x86-only, so we could do:
->>>
->>> #define BUFSZ (4 * KiB)
->>>
->>> handle_recv_msg()
->>> {
->>> =C2=A0=C2=A0=C2=A0 uint8_t data_buf[BUFSZ - UDP_PKT_HEADER_SIZE];
->>> =C2=A0=C2=A0=C2=A0 ...
->>>
->>> hv_syndbg_class_init()
->>> {
->>> =C2=A0=C2=A0=C2=A0 assert(BUFSZ > qemu_target_page_size());
->>> =C2=A0=C2=A0=C2=A0 ...
->>>
->>> and call it a day.
->> Could be possible for now yes.
->> Any opinion from concerned maintainers?
->
-> I think essentially hardcoding 4k pages in hyperv is okay
-> (with an appropriate checking/enforcement asserts() of course),
-> since even if this gets ported to ARM64 at some point
-> it is going to need *a lot* of changes anyway.
+"Support" might be a bit of a strong word, but yes, KVM is supposed to work on
+32-bit systems.  Even if we ignore 32-bit, not explicitly checking the count is
+silly.  There's an explicit limit on @count, and it's architecturally capped at
+4096.  I suspect the only reason KVM doesn't check it here is because exceeding
+the limit isn't listed in the SDM as consitency check.
 
-There was a talk at last years KVM Forum about porting WHPX for Windows
-on Arm:
+But the SDM does say that exceeding the limit results in undefined behavior,
+"(including a machine check during the VMX transition)".  I.e. KVM can quite
+literally do whatever it wants.  And KVM does check the limit later on.
 
-  https://kvm-forum.qemu.org/2024/Qemu_support_for_Windows_on_Arm_GgKlLjf.p=
-df
+I can't think of any ordering weirdness that would result in an early check, so
+assuming testing comes through clean, I'll post this:
 
-but am I right in thinking all the hyperv code in QEMU is about
-providing guest facing enlightenments for Windows guests under KVM? I
-guess no one is working on that at the moment.
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index d06e50d9c0e7..64ea387a14a1 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -824,12 +824,30 @@ static int nested_vmx_check_apicv_controls(struct kvm_vcpu *vcpu,
+        return 0;
+ }
+ 
++static u32 nested_vmx_max_atomic_switch_msrs(struct kvm_vcpu *vcpu)
++{
++       struct vcpu_vmx *vmx = to_vmx(vcpu);
++       u64 vmx_misc = vmx_control_msr(vmx->nested.msrs.misc_low,
++                                      vmx->nested.msrs.misc_high);
++
++       return (vmx_misc_max_msr(vmx_misc) + 1) * VMX_MISC_MSR_LIST_MULTIPLIER;
++}
++
+ static int nested_vmx_check_msr_switch(struct kvm_vcpu *vcpu,
+                                       u32 count, u64 addr)
+ {
+        if (count == 0)
+                return 0;
+ 
++       /*
++        * Exceeding the limit results in architecturally _undefined_ behavior,
++        * i.e. KVM is allowed to do literally anything in response to a bad
++        * limit.  Immediately generate a consistency check so that code that
++        * consumes the count doesn't need to worry about extreme edge cases.
++        */
++       if (count > nested_vmx_max_atomic_switch_msrs(vcpu))
++               return -EINVAL;
++
+        if (!kvm_vcpu_is_legal_aligned_gpa(vcpu, addr, 16) ||
+            !kvm_vcpu_is_legal_gpa(vcpu, (addr + count * sizeof(struct vmx_msr_entry) - 1)))
+                return -EINVAL;
+@@ -940,15 +958,6 @@ static int nested_vmx_store_msr_check(struct kvm_vcpu *vcpu,
+        return 0;
+ }
+ 
+-static u32 nested_vmx_max_atomic_switch_msrs(struct kvm_vcpu *vcpu)
+-{
+-       struct vcpu_vmx *vmx = to_vmx(vcpu);
+-       u64 vmx_misc = vmx_control_msr(vmx->nested.msrs.misc_low,
+-                                      vmx->nested.msrs.misc_high);
+-
+-       return (vmx_misc_max_msr(vmx_misc) + 1) * VMX_MISC_MSR_LIST_MULTIPLIER;
+-}
+-
+ /*
+  * Load guest's/host's msr at nested entry/exit.
+  * return 0 for success, entry index for failure.
+@@ -965,7 +974,7 @@ static u32 nested_vmx_load_msr(struct kvm_vcpu *vcpu, u64 gpa, u32 count)
+        u32 max_msr_list_size = nested_vmx_max_atomic_switch_msrs(vcpu);
+ 
+        for (i = 0; i < count; i++) {
+-               if (unlikely(i >= max_msr_list_size))
++               if (WARN_ON_ONCE(i >= max_msr_list_size))
+                        goto fail;
+ 
+                if (kvm_vcpu_read_guest(vcpu, gpa + i * sizeof(e),
+@@ -1053,7 +1062,7 @@ static int nested_vmx_store_msr(struct kvm_vcpu *vcpu, u64 gpa, u32 count)
+        u32 max_msr_list_size = nested_vmx_max_atomic_switch_msrs(vcpu);
+ 
+        for (i = 0; i < count; i++) {
+-               if (unlikely(i >= max_msr_list_size))
++               if (WARN_ON_ONCE(i >= max_msr_list_size))
+                        return -EINVAL;
+ 
+                if (!read_and_check_msr_entry(vcpu, gpa, i, &e))
 
-
->
-> Thanks,
-> Maciej
-
---=20
-Alex Benn=C3=A9e
-Virtualisation Tech Lead @ Linaro
 
