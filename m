@@ -1,79 +1,80 @@
-Return-Path: <kvm+bounces-40417-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40418-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 218AEA571D9
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 20:32:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99E39A571DD
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 20:33:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0664C3B3B36
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 19:32:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 833DD3AED99
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 19:33:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66221250BFB;
-	Fri,  7 Mar 2025 19:32:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B9722459D6;
+	Fri,  7 Mar 2025 19:33:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WxH4HCjy"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Bg2i7hKN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 120FD1AA1D5
-	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 19:32:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB4D1A314D
+	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 19:33:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741375960; cv=none; b=C/aW00mZz+iGRcgUGkz13/mMCiHI9JevxT1DbTa4uNcLSYycIHp0koIcsylDfPTu3yeT1gLo+esHiMcqAr8DrOZEeiP5ozYhQg/i5Ey3Gu/1tp8Jg1rFrBxhH/myhEr/jq4XoAOyn3xr76qmdc7WN6ynvu9sHMlgw7VtfIS3hEk=
+	t=1741375996; cv=none; b=oQCYs6aNqgWitedFMjdve0pPv29Iq1vLU1Fda74DF0zBnV40vD9yE3+NR1Nbw9uCBTehj6Su3r998GidHbRN9VZ5xISxNS92eErzphyAWwFhTokfJf2K78bGaBORMpycm/x8e5y2tMheAEa4r4HSBfNZnKzd7DbYUk3sq24DePU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741375960; c=relaxed/simple;
-	bh=HtK6fZimQujKype0r19lWlFwCfanGbqGbMwfFlc25jE=;
+	s=arc-20240116; t=1741375996; c=relaxed/simple;
+	bh=NJess9IdYE/PYzwoQkwOQt5KK8lcepL4fvn19cHTE2I=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cchG0SFzcmTWq0jlqKq/HlDhvN5QS7BQ3Tup8WL7pG8mCVDv/cQxCVTr/bG9ki15jLFm0tWJV/feV6bH3vCF+HuCTdi7aW+qG5OKquZyA/nPVC65aByvOE1qs7iXwN0hln8vfaZvamA0HTBDIvLZw2ICHAkl3GhN2fF8sh81ePs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=WxH4HCjy; arc=none smtp.client-ip=209.85.216.44
+	 In-Reply-To:Content-Type; b=Xd7GE+W1wxcinzrxIQ7CD78gn8xmM43d07lJAerFCSG5PR7JrJd/TYg+g3/A9l3G3v8DaWv8XUhBFhNLuJUUoNG+aZqyDMwXDCyvnMNZrx6NexizAJiNIUmwy0EV/ns4y7i+6jW82LZBQd0jc+gcrGCVGPz62lWSdgTQmAHk7Wk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Bg2i7hKN; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2fa8ac56891so3597840a91.2
-        for <kvm@vger.kernel.org>; Fri, 07 Mar 2025 11:32:38 -0800 (PST)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-224019ad9edso56105065ad.1
+        for <kvm@vger.kernel.org>; Fri, 07 Mar 2025 11:33:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1741375958; x=1741980758; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=linaro.org; s=google; t=1741375994; x=1741980794; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=MeKWtiInp5V+cmwwK3Y1NC5YRaGg6vaRs97hD7A0NQA=;
-        b=WxH4HCjygpDbu5jjxNaL/4XPfbDh5exv+qV2LVj4Yapejx9gqwEAPnTqrbjPvtdzmb
-         0N99ujDM9Uu17l/R7nhMS8jCAJ9l80G5PxHMPh0mHTSJXDCPFuZBvo6AP5A7cq0huTEW
-         cMcFSHjaEOkdij5iBK8/5DLVnXRCRep9YGZV4Qj2Lpkul0nbe6+j+iT8IBGodecF5N+A
-         3PqH0Y2SuiLhPOcRG56Fb8CZvbtlQEvWgjiSPKOX3iFX+TQ65iNCgpHP4qVNo2UCWYy+
-         ZoCS9Zi7VRcfGI5Oc2ISQGTLXZn583SMV+l9PhT3+u1yYdZQ+xsEohmcNtgMNMqTD5Bb
-         AJxg==
+        bh=u3kjokVzIaezggl6X9BH2jkPw8k9xqIqx0wCQNs0kXA=;
+        b=Bg2i7hKNGoY0I1cjbI89eFKC4rFTk14hjuzdm99+Aa+xQAstlejmG8tDs/zB13tjMk
+         e7A+/D/3G7bmM9KhOHY9GCOT8ylHOeGEE00O2SFc+/oxUFKgX+qUeboFEleSSepUvA+x
+         ItiJ2CA+Y4JU8iCW7Bm9jrLurac3BJVJsgXJ/+bphIRMntEy4zVXztUPT119v0TRXPsS
+         mca13dix22+YBqyw44Id1IwPhvPPGm6qsbXqAwtUZ9J5zx+ODXKiQomirpCqGJLz0neV
+         RUkokdp8oc2wrAWtMriAC3wT3r/irCzQic8r/aizzSfQpP8vLPsSCDs1KkazEEgH07DM
+         cdWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741375958; x=1741980758;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1741375994; x=1741980794;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MeKWtiInp5V+cmwwK3Y1NC5YRaGg6vaRs97hD7A0NQA=;
-        b=hbOAZVUNKdHrBQh4le3JP4oMBRSYsaP+EeGZr21tKxApZPi2JTtr0HZjyqbq9CX5hv
-         FxzRmUh4Of9HiCb8Mvu7hK2zKk8CmoUhATASeVFLs5OimU/azQrvXR1eRhKGHf7gInJa
-         /8etIy0g4jpV9fJa59NXwKRnslsK+WKH1Gi8VnTlKpfRRT0NrAhoAg29eGbuIwA1acGF
-         gt20BVwi2f9gGaY18U4KIOIqBYY3fSaRyyGYiPA01TDXUo92jbJp2orzQpZ0xof4REvf
-         PdlI6Rbl0M7hdprwa4u9ar2+C5sbETlc7dBjT/ChPASH38/xhGBgbsNQzKRPbFu5uEOb
-         SvTA==
-X-Forwarded-Encrypted: i=1; AJvYcCVIS3cGjDcj74v0VQ30fljdCANEO8KVot5u19biL8Tt8+Z13HpVdYt0nYEmvhRcsDAjyQs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHUYCYPIf3QNVwX2Co1tuf4X2XlySa6YO8BL5Le/yISWXPnQy7
-	JSQkpsq0mb2lJVbQ12srxlbPqndqHamDQnx8y8wbs+IiR5BORKoHBBoKU5JyNL4=
-X-Gm-Gg: ASbGnctumPlc8BdQzytVjmQR3sLWEA44wuAxNuWBOXGKu/yUtHvo14cL4BM1gnILluk
-	o0MqLb7xfn4DybrPHSor4z52UcInI4wTqIL41XKn4QdbXT13lut+v8IcYCDFtmSzbSEGjj33w4e
-	lIlERNrbA9n7JGf7HqRKbDigSMFMBjq8QJV+M/wOIZwe243hzTY8gtTILKsnlqF+IogHJZJHrrr
-	Bi8r9ulBAplHb5GDTa8pnRWkKEm/QpGpsOYLIqN/eV2dqtUMb5UwuBCFj13ENub/UlinaEkCQ9V
-	oXi3wPe/FpOIYrdWT0w8YQZ8GwD2ackNY2w8xP5bK1anFj8qBOOf+4t+fg==
-X-Google-Smtp-Source: AGHT+IFyYXzUnplKfHzTRwjXR6Pptw2Ed9CumeXy1pPAFDk/GxVx6wFsvOZ3tk3Y0JCtpo/anM2miw==
-X-Received: by 2002:a17:90b:4c44:b0:2ee:f80c:6889 with SMTP id 98e67ed59e1d1-2ff7cf22f41mr8270598a91.33.1741375958305;
-        Fri, 07 Mar 2025 11:32:38 -0800 (PST)
-Received: from [192.168.1.67] ([38.39.164.180])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-224109ddffesm34103155ad.40.2025.03.07.11.32.37
+        bh=u3kjokVzIaezggl6X9BH2jkPw8k9xqIqx0wCQNs0kXA=;
+        b=Po6eNBjM6akeJEQs7eAoDSZaGU6HIQy0VgLvP5+Ksw0nGesegdZCzeUGCR2BI391EC
+         47cmkscZLXT21w1WvqiIVqwx0zFpjJpLXRNdzcJWDQ1hGiHEkIiu3kiySBtMUDlG/RWH
+         jtGSEpl6cmcYnVpjiNYszuzZSrGLTi0FllOWda9RoEzmoS601QVkkbOv4X/ShDBBV5ec
+         2mDwwwYTgFBCsOkCIc5HhilnxA754k3Pw21Jv6UOPOAGVntGsZBKvICJKMjGf9xYfHr4
+         7AAJgZfMaCROOVYFLrLjImchPMvnsCdrXZiK+OJjL2RsPsc1kj7QYRn6mu5txidChZVp
+         zeog==
+X-Forwarded-Encrypted: i=1; AJvYcCWLfN3LEYtHBgBNttdHg4UBsO/E4KpC4jTeHwK+zOUoX/N28Q3ZorrOOUerVrrYlTvFDmM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3JFKaBGdeIh8HL91a5TKa9/PwmYgChD2jSdmiqB4ZSqXILhyQ
+	utxBRNBaMvHr4R1SPdsKPm0+vO3GShVML1tSNBVdxkCk7EtFZY9LrlaEtl2HOhY=
+X-Gm-Gg: ASbGncv9gNWXaEIraxJzVW11g1yEwImQWKwIUfAViNV3huPPshQHf9HjGTPhEmyjOa/
+	SNGPEmnasuKW6yY8cV7+EN7NSCxq22QUxWUq/k3Ojpo5H13h3v0cEFnxRRiq6B9cQ2XxQuum08u
+	j6QLj3O+HZ4YGy/ICi3zheR25wprLJ8oE+5P90qh7QkIf+HO0ALDBU5StqsnFW6orl5z5D2VXt+
+	hBDndYqT0cMY/yliL5Q9EZtH589XXF9oQEWWA1u8oFzK7YB/gSeR45Rats+W67AmttNdPslwVk1
+	kZ5OafCoLlU/a7ZJJWnPWxY5eWBBNN0ZZub1fo4vbwq0mUAUSkpLeW89GAx0wx2/QVFnoC6/8Et
+	1hy6nB7/5
+X-Google-Smtp-Source: AGHT+IEQOLI770TWa27yduqe67P21zhBtRAIhboQgxBkp3Oh+eooU56f4qRJxrvGavqUpSRVsMkxOQ==
+X-Received: by 2002:a17:903:40cb:b0:223:6744:bfb9 with SMTP id d9443c01a7336-22428ab7691mr82163675ad.41.1741375994492;
+        Fri, 07 Mar 2025 11:33:14 -0800 (PST)
+Received: from [192.168.0.4] (174-21-74-48.tukw.qwest.net. [174.21.74.48])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22410a7f8c2sm33992215ad.116.2025.03.07.11.33.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Mar 2025 11:32:37 -0800 (PST)
-Message-ID: <8739f1cd-e2d0-4720-9f72-c7ca60c85d8a@linaro.org>
-Date: Fri, 7 Mar 2025 11:32:37 -0800
+        Fri, 07 Mar 2025 11:33:14 -0800 (PST)
+Message-ID: <b294d3cb-e8a8-4811-ae23-f82f6cbb784c@linaro.org>
+Date: Fri, 7 Mar 2025 11:33:12 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,90 +82,27 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 5/7] hw/hyperv/syndbg: common compilation unit
-Content-Language: en-US
-To: qemu-devel@nongnu.org
+Subject: Re: [PATCH v2 6/7] hw/hyperv/balloon: common balloon compilation
+ units
+To: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
 Cc: philmd@linaro.org, "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
  alex.bennee@linaro.org, kvm@vger.kernel.org,
  Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- richard.henderson@linaro.org, manos.pitsidianakis@linaro.org
+ manos.pitsidianakis@linaro.org
 References: <20250307191003.248950-1-pierrick.bouvier@linaro.org>
- <20250307191003.248950-6-pierrick.bouvier@linaro.org>
-From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-In-Reply-To: <20250307191003.248950-6-pierrick.bouvier@linaro.org>
+ <20250307191003.248950-7-pierrick.bouvier@linaro.org>
+Content-Language: en-US
+From: Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <20250307191003.248950-7-pierrick.bouvier@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 3/7/25 11:10, Pierrick Bouvier wrote:
-> Replace TARGET_PAGE.* by runtime calls
-> 
-> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+> Signed-off-by: Pierrick Bouvier<pierrick.bouvier@linaro.org>
 > ---
->   hw/hyperv/syndbg.c    | 10 +++++++---
->   hw/hyperv/meson.build |  2 +-
->   2 files changed, 8 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/hyperv/syndbg.c b/hw/hyperv/syndbg.c
-> index d3e39170772..ee91266c070 100644
-> --- a/hw/hyperv/syndbg.c
-> +++ b/hw/hyperv/syndbg.c
-> @@ -14,7 +14,7 @@
->   #include "migration/vmstate.h"
->   #include "hw/qdev-properties.h"
->   #include "hw/loader.h"
-> -#include "cpu.h"
-> +#include "exec/target_page.h"
->   #include "hw/hyperv/hyperv.h"
->   #include "hw/hyperv/vmbus-bridge.h"
->   #include "hw/hyperv/hyperv-proto.h"
-> @@ -183,12 +183,14 @@ static bool create_udp_pkt(HvSynDbg *syndbg, void *pkt, uint32_t pkt_len,
->       return true;
->   }
->   
-> +#define MSG_BUFSZ 4096
-> +
->   static uint16_t handle_recv_msg(HvSynDbg *syndbg, uint64_t outgpa,
->                                   uint32_t count, bool is_raw, uint32_t options,
->                                   uint64_t timeout, uint32_t *retrieved_count)
->   {
->       uint16_t ret;
-> -    uint8_t data_buf[TARGET_PAGE_SIZE - UDP_PKT_HEADER_SIZE];
-> +    uint8_t data_buf[MSG_BUFSZ];
->       hwaddr out_len;
->       void *out_data;
->       ssize_t recv_byte_count;
-> @@ -201,7 +203,7 @@ static uint16_t handle_recv_msg(HvSynDbg *syndbg, uint64_t outgpa,
->           recv_byte_count = 0;
->       } else {
->           recv_byte_count = recv(syndbg->socket, data_buf,
-> -                               MIN(sizeof(data_buf), count), MSG_WAITALL);
-> +                               MIN(MSG_BUFSZ, count), MSG_WAITALL);
->           if (recv_byte_count == -1) {
->               return HV_STATUS_INVALID_PARAMETER;
->           }
-> @@ -374,6 +376,8 @@ static const Property hv_syndbg_properties[] = {
->   
->   static void hv_syndbg_class_init(ObjectClass *klass, void *data)
->   {
-> +    g_assert(MSG_BUFSZ > qemu_target_page_size());
-> +
+>   hw/hyperv/meson.build | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Should be >= here.
-
->       DeviceClass *dc = DEVICE_CLASS(klass);
->   
->       device_class_set_props(dc, hv_syndbg_properties);
-> diff --git a/hw/hyperv/meson.build b/hw/hyperv/meson.build
-> index c855fdcf04c..a9f2045a9af 100644
-> --- a/hw/hyperv/meson.build
-> +++ b/hw/hyperv/meson.build
-> @@ -1,6 +1,6 @@
->   specific_ss.add(when: 'CONFIG_HYPERV', if_true: files('hyperv.c'))
->   specific_ss.add(when: 'CONFIG_HYPERV_TESTDEV', if_true: files('hyperv_testdev.c'))
->   system_ss.add(when: 'CONFIG_VMBUS', if_true: files('vmbus.c'))
-> -specific_ss.add(when: 'CONFIG_SYNDBG', if_true: files('syndbg.c'))
-> +system_ss.add(when: 'CONFIG_SYNDBG', if_true: files('syndbg.c'))
->   specific_ss.add(when: 'CONFIG_HV_BALLOON', if_true: files('hv-balloon.c', 'hv-balloon-page_range_tree.c', 'hv-balloon-our_range_memslots.c'))
->   system_ss.add(when: 'CONFIG_HV_BALLOON', if_false: files('hv-balloon-stub.c'))
-
+r~
 
