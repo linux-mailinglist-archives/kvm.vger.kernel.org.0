@@ -1,75 +1,77 @@
-Return-Path: <kvm+bounces-40420-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40421-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22A55A57211
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 20:38:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDDF4A57214
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 20:38:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5397A17729C
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 19:38:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 11AB87A9594
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 19:37:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C34A52561CC;
-	Fri,  7 Mar 2025 19:37:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A861B2500CE;
+	Fri,  7 Mar 2025 19:37:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B0Fl96Tm"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="twkrckQI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65290255241
-	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 19:37:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AF9D255E34
+	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 19:37:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741376244; cv=none; b=Se51seWXlwxNlYs/rBT1aB76ggNq7App/dHQAAf3w8HhcnMH+pkbIcqfNUL4Q6JUHU0+TUe/1YAMYdIE1xW/N+0bjfN9H+1N32MnrxpfuJYKu7cs+WIyRxQUdjVX8wFBuq8TGyJ7a55fn2QwSUZs7vAtOlnYriD/e3wa5XZMtt8=
+	t=1741376245; cv=none; b=oCqLSj/tR6OwLZDDpTuBlWF+Dbj36rkZru/6R4wzCouMH37Gy5pTTjpNnOX/fO1chEv+BEmI8T0BfJyehYKoPzJgaooj9ZVEgRwuO76j7l+hGS3voJhzNG24kuJ+uWzOkye+24D/NEVs6W5BT/ViH06lVq/VLFVRz8pXUQpFMy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741376244; c=relaxed/simple;
-	bh=oIH8yj3UVV8IhXniF0UD9Iri92boehPiW+vAOQGJ/C4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=bwwDVe6JkOLz0qMa7k7Xi0t5nyhlediIUKvy1yGAdTtLL2fgmElWKiM58A79piokgPY3e79x6SUSYrw8436Smravqp/zgG4Euyr2IxQ6smuye3SW46ygDztOLGRqbkjymnzYzWLbgMZJ4/gXxavpejM05pLdN4q4KMxGCwcWyMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=B0Fl96Tm; arc=none smtp.client-ip=209.85.216.47
+	s=arc-20240116; t=1741376245; c=relaxed/simple;
+	bh=gBV4um8wlOhOwRmzVNVgWoclDLVNGnUH5xpVA2pmGY4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=KhMrLNv5t2dNLA28FHQ/vBdqxsv+i4EPYedl5dKFW/b/gKzfMlSegntDuv3fzsYOTSm9QYw0HvBhqIpUrKnoXInAAsizDwjubhz5LUnV2Ff6sSWEceuk4yJBrAzOKSZk+g0q6HpMYMzxW+8F+mH6D+s4VKzFD65OXqUFs3d5SYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=twkrckQI; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2ff797f8f1bso2603375a91.3
-        for <kvm@vger.kernel.org>; Fri, 07 Mar 2025 11:37:23 -0800 (PST)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2232aead377so46751895ad.0
+        for <kvm@vger.kernel.org>; Fri, 07 Mar 2025 11:37:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1741376242; x=1741981042; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9HouUG8niuHw8Sf2QTc63hh0W5B3dkdBWi71GrcJcio=;
-        b=B0Fl96Tmalev3fBAu467gC40WZWBL9JQ4eigzvZcvz05PWebD6CzBPiPgKMJXnIb9S
-         MEiKu7ZMdXLCOLe8aQNBEriLo2yEiNyI6bcKgblxooX1t1GGLaa/QYlwC2ncqu2nSTeN
-         FKMUzLzMf1V4UuYOFX2OqjV3WYpXRfyDdQ6TzX6ItzqS8eY/Tzm6xD5icNpd1LGHt4HN
-         RCOVkh/c+j4/zPeszF5DhMUWp9lFW3d4821KFjbfFCkvXeb8R5b7cCycSQaxSuZyEvS8
-         /6RohFNtG6orG4LCEMX7iVJkUNe/KtaUiiiuUuID1xdMk+s1XkmSwDZuaWWB1oXpV1D7
-         QYOA==
+        d=linaro.org; s=google; t=1741376243; x=1741981043; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rr2e69lL8FG0Id6CFQe12hDqKFL6G/BQmRPiJllL+3c=;
+        b=twkrckQIQhETUvKZHyEuwAl4jk8zoYekYHTsq5/NDl8Skd64b4RbBh19CCsFeN7eEw
+         tjzmZhmKabWtUj3dLBPUryIqV9TIuXszIuwR5OTFfJ/uFlzvzHJ4LVGaSGsEv40EGF+Q
+         IXYQubnpQBdA3Gigby43thvCjPnc/PeMKyeDNpMmoGU1HBzQhMn3tbX3L82AOOabzdEg
+         yyTPuEOuYymtEL9L3b+jbTD53tDrtkZL3fumiIs13p3bP6dkdmwNTJ64NmFzQyrm6b8i
+         C9qm6GjvDX7CKSW5qOjVJ70/9Tb+oajE+JiIKHK3gxPLB29OPmlATq4aRNgLPAxYGYlZ
+         Ly8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741376242; x=1741981042;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9HouUG8niuHw8Sf2QTc63hh0W5B3dkdBWi71GrcJcio=;
-        b=o850aOHTYvfbOpmoDM/jNfFrkA420jUhIsl4HPgqNfokc32CY8vptuvPn/NKOydN46
-         HZiTXT5v+o/Z6kFlOLlKthcsmLWcATojFnsnj46y0GxufNCeda6DsSq2fPI0Sn3a0zCm
-         bvjFuvpcbmU5p4+WUvijyCea0rks72DrT6WlbtKoDkBdgQj+7R6TeCkp3t0spskF1V0i
-         YBjpup1STSXpFZQAyhAeU9At+6yCwE50GI5YX3UKA96/T3NaJwrpx7B9pOisJcQlUuoy
-         wnqdnKy3GlQxM7g6vrRtVwRtehzxeYYblaDqYDTAj9N1H6BIwlmxYYRwuHzfKP7YtG09
-         isCg==
-X-Forwarded-Encrypted: i=1; AJvYcCWHXDm/8yO9AkyWwKsINFvPaHoaMZ56NZrdyAlOmTPmV3zp6J7Z0O+FWH0plST5vpChPRs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy55FwOGVfxCD8J1zcQNMujiJllcmphabQ8jq48eogSf2Ja462c
-	ohB6gzZ/xML7JtOUS3nK0a6dFyNuMw3z5PDAwaq/LVOYlrN9P8gxsi0zGQsuMAg=
-X-Gm-Gg: ASbGncsN1B2jlg49hpBNkw+OuIRdSHLw9VEQsY/XZp7kjXd5MqSJoSl/6mi25GijYnJ
-	qO2o5lv9tFaqb4v13JV9ofJQfXqgyzjboJENvMXrLk5UJRQ8gVQ9rk08dqc8DO3faQC/Y4mm4NG
-	n4rXbb1efK7dC7kwD1CnSKVvbRK4siu9PzQn4V0aQGlsKkSTSMHOXT2yYsWtwep5dXdGau+Ms9v
-	QIqlTYuRe6pY+y+/ZyZrRJfHIrXt712Cp4laqSTNZkuYFH27NHhMg51UvfRtunvOVok2FjsLpVK
-	A/7N8ukDsAmoIOU2Zacd2+/I2jLuKoGneP4c9Cg0mhNo
-X-Google-Smtp-Source: AGHT+IFJS++w8dzKDaOiSNIqEF9LrcEsboBc4OQa3FNMlu4p0lXjJGWbKjKjpc9ao6Lot8C40MJZdA==
-X-Received: by 2002:a17:90b:350d:b0:2fe:85f0:e115 with SMTP id 98e67ed59e1d1-2ff7cefbc61mr6158126a91.26.1741376242639;
-        Fri, 07 Mar 2025 11:37:22 -0800 (PST)
+        d=1e100.net; s=20230601; t=1741376243; x=1741981043;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rr2e69lL8FG0Id6CFQe12hDqKFL6G/BQmRPiJllL+3c=;
+        b=C3FVfVfvZCsgaFzfs1mm439qZ95qUy7ujyo2hRkM+1tCNKWe6FUmCdAGvyRIUP6452
+         B0zXwjZ2IUr9AEXWTttv7cgOM4ZMEwqxgDZe0DaCnyTLt0PtaX4TD35ymUX/PbtTcL8G
+         e4csiCpkz+Wq8ZhHM7JEH9+FJC4J9epJm6JhE2jhp61oHsQqSxJM3ZU+yyFuqHR9gKyt
+         n49FoJmoKxhD56X7HhWMwh3SytTXCat6gfaNSLze1XUwNX480xUSlgjsIqvfauGVrkE1
+         cywEFWJu44qQGb/yUVzOhvf8uSc9RJvXRvqz1OTRyrtsvM5JqXYlU0oRWNRxHANCaRev
+         Bj5w==
+X-Forwarded-Encrypted: i=1; AJvYcCVkKZSyeY3sk0ix9Q4enLW5J0PefMxftpY8uk7Xu+PYd5BYw778sawXGwkplWmLtS5mJq4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywitb143YBFKcYBTehbb6QOESAIOPvAck/xJ9omQIqLtPMvo9ZY
+	lVssB6SqxLercPzT2WM7WIpcg43D1rasvsrwMJEED/eY1k3O/5B/q9vo7hnst3M=
+X-Gm-Gg: ASbGncv0CaG0IPiP3ln/y6Cqhczo6xNiFczSn7Rp+vTjKFfFTWtaT90Va3uYGo5sKEA
+	iLprDvYRw3wmk9vubNHAdwc02jTqHxZz0Oo7zWRRbGWML2JZoSX4f7wMopgJ7xXdTC3pCNzhBT+
+	6xkARFoAhaYOhwfvR8QilnygdonT5F5sReP+D9ABDhNkf4hWSlWn/4qX2B417lczX0xMlq7JTc0
+	ZyJqR4NkG/H5nMAYVltLYVnDMbM0rSmibaARfIVTLqL+Yp7hR4Ws/+7I97DJKT2b7RMPCmLwRbJ
+	R3G9aFKVaBhx4JJ50GTGdg6OBzSYMe8o3kpFbuN+lJgp
+X-Google-Smtp-Source: AGHT+IF+B4FmJwW4AAH0ztyyNrVMPlGFTFmizaeHxb8u74ANm2FF7U52/1RJ8EMRstrrGA/FGRW6YA==
+X-Received: by 2002:a17:90b:1c0c:b0:2fe:a545:4c85 with SMTP id 98e67ed59e1d1-2ff7cefccd3mr7096469a91.27.1741376243525;
+        Fri, 07 Mar 2025 11:37:23 -0800 (PST)
 Received: from pc.. ([38.39.164.180])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ff693739ecsm3821757a91.26.2025.03.07.11.37.20
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ff693739ecsm3821757a91.26.2025.03.07.11.37.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Mar 2025 11:37:22 -0800 (PST)
+        Fri, 07 Mar 2025 11:37:23 -0800 (PST)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: alex.bennee@linaro.org,
@@ -81,53 +83,37 @@ Cc: alex.bennee@linaro.org,
 	manos.pitsidianakis@linaro.org,
 	pierrick.bouvier@linaro.org,
 	Marcelo Tosatti <mtosatti@redhat.com>
-Subject: [PATCH v3 0/7] hw/hyperv: remove duplication compilation units
-Date: Fri,  7 Mar 2025 11:37:05 -0800
-Message-Id: <20250307193712.261415-1-pierrick.bouvier@linaro.org>
+Subject: [PATCH v3 1/7] hw/hyperv/hv-balloon-stub: common compilation unit
+Date: Fri,  7 Mar 2025 11:37:06 -0800
+Message-Id: <20250307193712.261415-2-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250307193712.261415-1-pierrick.bouvier@linaro.org>
+References: <20250307193712.261415-1-pierrick.bouvier@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-Work towards having a single binary, by removing duplicated object files.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+---
+ hw/hyperv/meson.build | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-hw/hyperv/hyperv.c was excluded at this time, because it depends on target
-dependent symbols:
-- from system/kvm.h
-    - kvm_check_extension
-    - kvm_vm_ioctl
-- from exec/cpu-all.h | memory_ldst_phys.h.inc
-    - ldq_phys
-
-v2
-- remove osdep from header
-- use hardcoded buffer size for syndbg, assuming page size is always 4Kb.
-
-v3
-- fix assert for page size.
-
-Pierrick Bouvier (7):
-  hw/hyperv/hv-balloon-stub: common compilation unit
-  hw/hyperv/hyperv.h: header cleanup
-  hw/hyperv/vmbus: common compilation unit
-  hw/hyperv/hyperv-proto: move SYNDBG definition from target/i386
-  hw/hyperv/syndbg: common compilation unit
-  hw/hyperv/balloon: common balloon compilation units
-  hw/hyperv/hyperv_testdev: common compilation unit
-
- include/hw/hyperv/hyperv-proto.h | 12 ++++++++
- include/hw/hyperv/hyperv.h       |  3 +-
- target/i386/kvm/hyperv-proto.h   | 12 --------
- hw/hyperv/syndbg.c               | 10 +++++--
- hw/hyperv/vmbus.c                | 50 ++++++++++++++++----------------
- hw/hyperv/meson.build            |  9 +++---
- 6 files changed, 51 insertions(+), 45 deletions(-)
-
+diff --git a/hw/hyperv/meson.build b/hw/hyperv/meson.build
+index d3d2668c71a..f4aa0a5ada9 100644
+--- a/hw/hyperv/meson.build
++++ b/hw/hyperv/meson.build
+@@ -2,4 +2,5 @@ specific_ss.add(when: 'CONFIG_HYPERV', if_true: files('hyperv.c'))
+ specific_ss.add(when: 'CONFIG_HYPERV_TESTDEV', if_true: files('hyperv_testdev.c'))
+ specific_ss.add(when: 'CONFIG_VMBUS', if_true: files('vmbus.c'))
+ specific_ss.add(when: 'CONFIG_SYNDBG', if_true: files('syndbg.c'))
+-specific_ss.add(when: 'CONFIG_HV_BALLOON', if_true: files('hv-balloon.c', 'hv-balloon-page_range_tree.c', 'hv-balloon-our_range_memslots.c'), if_false: files('hv-balloon-stub.c'))
++specific_ss.add(when: 'CONFIG_HV_BALLOON', if_true: files('hv-balloon.c', 'hv-balloon-page_range_tree.c', 'hv-balloon-our_range_memslots.c'))
++system_ss.add(when: 'CONFIG_HV_BALLOON', if_false: files('hv-balloon-stub.c'))
 -- 
 2.39.5
 
