@@ -1,120 +1,114 @@
-Return-Path: <kvm+bounces-40459-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40460-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29421A57435
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 22:57:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38B96A574A8
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 23:07:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAA16189A272
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 21:57:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 464227A6F35
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 22:06:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43798258CEB;
-	Fri,  7 Mar 2025 21:56:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48ACC257437;
+	Fri,  7 Mar 2025 22:06:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Jdk28EUQ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A9+UCkeR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AFC22586CA
-	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 21:56:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7056F7E9
+	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 22:06:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741384602; cv=none; b=f9yOvatWUKUY+97pdpzSLA0MGnRXnY/wVK1YkwKSXmORKWKs/n58z/sMac8rWr27ysDdi64+GVi380VCR5/golzN22Z15giWhbOXvVkEvw6q5cxWnLsY6phA86csPD3Yq5fddSCr/8KoPOn4U8OCfMfe3FPcwnTJBYK8mKRvoIM=
+	t=1741385176; cv=none; b=PQlAelU8ioTpDTWEgLbUnAE27faKwb776P1nqm8vYoqGkusnOmBz0jZOTph84zCFzoTqCQ5BPSgi3y9+sPbcX+Dro6XozOU0pxmb+y/zHWZwROD5vyaaA3fjpF6S8YdspDYH/vdLb8Kd22uGlhNm1/rwFf5q8yrJL8D9WvZhXro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741384602; c=relaxed/simple;
-	bh=yY9+XTJM0pOnsUYB702ihOubwlN9+6GRoxh8d7LHLcw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=P/2t1Z3x0oTiu4W/39Gmmo8zSDWpv2H5gOtuAbS1eKmdjUgFyUDjyEcHr8J8Nvv+m4tKj5UmLnIRja+uQYFQi8Mfe9DtDyR/fpsCuId7LXTSA9UkxTEdNggsJaFAFqlZba2tykELMM/eACyYtNtY8BskwaJ1L3TLGZsqe8164Vw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Jdk28EUQ; arc=none smtp.client-ip=209.85.214.177
+	s=arc-20240116; t=1741385176; c=relaxed/simple;
+	bh=jnj/oH7synqEu1wZ89p6C9MtdW5abL6/9wJ0sHQP9+Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JSx1h7BpVSdz+zF4OZIV+VcyaT6p1kne8FwAlF3FbcBH8R+otWRTcTLuJ2clyE3PpzfdmMW/oLRN0BaUsl+l8PopNWCfRBBcXfpHaNUlFL2r0lwo8aiXDeOWZfMdWKthxtS9U0rA1fnwd4eVZWKtgpzEUW8KGBl/UDhkw+K97wQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=A9+UCkeR; arc=none smtp.client-ip=209.85.221.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-22398e09e39so44399755ad.3
-        for <kvm@vger.kernel.org>; Fri, 07 Mar 2025 13:56:40 -0800 (PST)
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-390ec449556so2820881f8f.1
+        for <kvm@vger.kernel.org>; Fri, 07 Mar 2025 14:06:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1741384600; x=1741989400; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9F27FfUGwswIcGWG8chjG9ToIwjCIEVz8dw0HLVPgHE=;
-        b=Jdk28EUQR4j2Hgl6i0Rngj05z7SJVr9+diBJ7bfe/F5fy/5KQlh/XwvDEuRMZO/mhE
-         6FDweP96u9WXheyr2sunurCZh4xrECg3pFQJg5gm7Gb9Wn7wTmQqSe7lUxg6pRJA93RC
-         AEOx0CdZdaXv0nlJKNM9mnPGwbPZLZ5E5DcTjxcDPHGBLtYd7b14KmhD9Kmtya+CqO0M
-         ILy0d0t9/QEiqW1PXr5ejPSOEm8jA8hjMC1za4MIDMIQF9KCRsSePoz0GF9QGpL8BUh5
-         spaRvh7BXKKHpsRufJM9czyYIKGvgwD0jnt+SdjYQOYUH5mFUxW/60LxDNLwVUW8wEGW
-         rDDw==
+        d=linaro.org; s=google; t=1741385173; x=1741989973; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=J+E+5MNTzmNhs6MH91U6sTaUkbdxX1RykL7+d9oBnXU=;
+        b=A9+UCkeRPkOyPh39SwNtfe/5KG35VWyjWzPQ4ss+S8+4nw2+CmfkFLZ9PcXlSpnR+/
+         2ag5LooAjFkS07KW9lJkTCC3NXkN/EQ6buQNabLz7ltaFEDPLgduAIbY1KOUO9tDSmwQ
+         GjzZ7gl4GZJoecsY/f+xdTKI3O+pwv9BnCZZu5UBmr5g6q4F8UX8htF+B0QZfWOZ39DI
+         KhIwnR963wT4d7ZjECaI6KLrN5YEGU5btAi+Ztp9q1M+Yeh6SkRc/Oikql0w76qHKBYu
+         xs776TpmiX7zJxkPMIwPfc8FmC9MekIg97EMbG3byCpUaghSHwByVlMw4AWFo21fiMlO
+         CX5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741384600; x=1741989400;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9F27FfUGwswIcGWG8chjG9ToIwjCIEVz8dw0HLVPgHE=;
-        b=GoE6cithDu2HysRx1o+NzBOLDmSKqu2dzhCqTRPtjaaStNhHlZfoSnHMmjAuwtqUPD
-         LSiMjyuOqnpsZm9+BbdSqSyGd/HiS5oOm51y7idGgXdmMkognfEfqHmlY1Wu1U2ss5DW
-         MTi54eIgphFlKAi65h6gw5LiDqmR5iKYUa8YqkhIe+GXM3EM8W0hLtZDuPeQ1aJirbWC
-         XC4CdbOV27Fy5tVGbA0A83F8Ga8rwO8HwqE67ommYZ2j5QBkuA6N9vmKds+ga+xzc4Qw
-         uSocnEIPn95EnNrLb+51yyb4Uj0AKXoI0cws7bEuaz5ztQKyKWaRVBoO1PK4bUK+fzSz
-         iRLA==
-X-Forwarded-Encrypted: i=1; AJvYcCV2tLmmqVk4zns60O+xMRe8oXQ5boGco1suIo4yermlIho+PkFPBlZ6zyKJ7AZi+eIh+4I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6wif8QU/Hql5SyJioTlzfBe1KrjT3p6kSiV6G765Xji7/Ar7H
-	KPEACLAgcZaiHKjsCaDkmq16sh35SbLKgF6/Qnqg2/5W7dLST5UH1F6VX2G7IjA=
-X-Gm-Gg: ASbGnctxFUDL3OqrfAle8LVUrwMWW+Hxqv69kGALuDHxzZdHQqNwPUmMCM6711JGP/0
-	gn1rEhnnLtCmKqn+u8ojHztY1XqaRkC5HL3luSSZN38sYhIR5axsZcrZQkXKjqA4ShwYLzRbm2J
-	hi6LDsqctQAz8YupZcroj82MD2T0qA4P5OXMtxv1CeoKsm8/ZWhj3hF3FsBMFFKG9b8fGfYgEMf
-	T45fU2ST/uOdHp5aQ3PeFZqLcOjUamWQHDa6cijusi5GtyuxH1PbA8ZP9Tv08M+P7BGL5nChGO6
-	p756fBYI1b+XWsICEFmI68woJ/u2gWpo2dzwBGecv8ZL
-X-Google-Smtp-Source: AGHT+IEpBLPbNDwbFWHbtDFWg/F3o2uXMTLWPQlQ0zMSbaU7eLTdBBkOHLlJs+mEDdjKeNRx4XKwJw==
-X-Received: by 2002:a05:6a00:3a0d:b0:736:362a:6fc8 with SMTP id d2e1a72fcca58-736aaae41d7mr6920551b3a.15.1741384600200;
-        Fri, 07 Mar 2025 13:56:40 -0800 (PST)
-Received: from pc.. ([38.39.164.180])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-736ac9247dcsm2000927b3a.125.2025.03.07.13.56.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Mar 2025 13:56:39 -0800 (PST)
-From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-To: qemu-devel@nongnu.org
-Cc: philmd@linaro.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	pierrick.bouvier@linaro.org,
-	kvm@vger.kernel.org,
-	alex.bennee@linaro.org,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	"Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-	richard.henderson@linaro.org,
-	manos.pitsidianakis@linaro.org
-Subject: [PATCH v4 7/7] hw/hyperv/hyperv_testdev: common compilation unit
-Date: Fri,  7 Mar 2025 13:56:23 -0800
-Message-Id: <20250307215623.524987-8-pierrick.bouvier@linaro.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250307215623.524987-1-pierrick.bouvier@linaro.org>
-References: <20250307215623.524987-1-pierrick.bouvier@linaro.org>
+        d=1e100.net; s=20230601; t=1741385173; x=1741989973;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=J+E+5MNTzmNhs6MH91U6sTaUkbdxX1RykL7+d9oBnXU=;
+        b=hHiW0Nc5OlsJIqnF96QhmeINNVBlj/Wr0I8h/UEvjKVVu6FbLWJ6HljXKXRUJuMWNS
+         SslZocy7RpTuCdVj5sOkrZl4jwqnea7avuREY4eB4NaeqHukHBcgqt30IbHZFOETr+oH
+         kR87F67Qs9K5fjgmF49TX3w/piu3lEI+TFF75IFtmCUNJ8gsqGcNU2Clp3VhD846Lc69
+         KJMqzjltTHTdyg0gghKzQbFHtvVlVGFHbFRlUv5KvQrDrL93B+YVW6gym+/0Z+JE2+xZ
+         +8L5go0J8naiToJg7KQA4ujH0vA6GhPJI5/GL/2ncUHtahXeW+Ul9/DXyszWyheKLrSB
+         DLtA==
+X-Forwarded-Encrypted: i=1; AJvYcCXBDnG1KKiAefshmZiPaE8XaRAG5qXwxsts5ew1MiOLDCGMGatIU5rBjxcsv2pYc9Z/ol0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyouKSYKztrxxSMARKD/7KQNik7Si6jFx8YtsE6ziCNHtRSGsWc
+	UAiFC+x/SU83wUk1hhaN3yf6Ee9C5rRj2rot4OhsvFGwD2CmGX+roQ3CTQGfdrs=
+X-Gm-Gg: ASbGncurifim9MBXF4wQxK+SBf6k6cR72hSHd/flCmjm0p9rlJdVAdP9JRhgjEQhss1
+	YoiFAR37Th/KzzPeg95WcF3YTfmEfwx/SFTmAsEp/0LVs+MpHK5Di6x44OeLplL2hZCaX+VY/3F
+	ifh2O7TfeoMH5Enu7oezXRjwjj+5ywf02ir0K85SDa9GrNtv5w54Y/nfoQR0FQBjvOwEbv7c/Yy
+	kRxofCMPw+G3U9KFuebY5B7ZPdSbmIJWOlYLw7rQbMU9gkHl0HsDcvpikojwd0vcHV4je3AWhqa
+	Q69UaqaCL/10g8ripqhdNmWOsJZQ0pPmjYJjT3TVqjL0rwjv74SYO92iRmGpfYlkqJv8YiIRzIE
+	Qi5DubnyBEko/
+X-Google-Smtp-Source: AGHT+IFDossi/1p4SEuqIz1YxM/T8A6eeUCGfHQgGZUcm+3bvisxJU4T73PWVu7xZcVUj0qkKVGP3w==
+X-Received: by 2002:a05:6000:2c5:b0:391:2f2f:828 with SMTP id ffacd0b85a97d-39132d664a7mr3463240f8f.29.1741385172711;
+        Fri, 07 Mar 2025 14:06:12 -0800 (PST)
+Received: from [192.168.69.199] (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912c01d81csm6691181f8f.58.2025.03.07.14.06.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Mar 2025 14:06:11 -0800 (PST)
+Message-ID: <fb8f0700-2676-4e7a-8857-ca10f5060b37@linaro.org>
+Date: Fri, 7 Mar 2025 23:06:10 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 0/7] hw/hyperv: remove duplication compilation units
+To: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ alex.bennee@linaro.org, Marcelo Tosatti <mtosatti@redhat.com>,
+ "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+ richard.henderson@linaro.org, manos.pitsidianakis@linaro.org
+References: <20250307215623.524987-1-pierrick.bouvier@linaro.org>
+Content-Language: en-US
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <20250307215623.524987-1-pierrick.bouvier@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
----
- hw/hyperv/meson.build | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 7/3/25 22:56, Pierrick Bouvier wrote:
+> Work towards having a single binary, by removing duplicated object files.
+> 
+> hw/hyperv/hyperv.c was excluded at this time, because it depends on target
+> dependent symbols:
+> - from system/kvm.h
+>      - kvm_check_extension
+>      - kvm_vm_ioctl
 
-diff --git a/hw/hyperv/meson.build b/hw/hyperv/meson.build
-index 5acd709bdd5..ef5a596c8ab 100644
---- a/hw/hyperv/meson.build
-+++ b/hw/hyperv/meson.build
-@@ -1,5 +1,5 @@
- specific_ss.add(when: 'CONFIG_HYPERV', if_true: files('hyperv.c'))
--specific_ss.add(when: 'CONFIG_HYPERV_TESTDEV', if_true: files('hyperv_testdev.c'))
-+system_ss.add(when: 'CONFIG_HYPERV_TESTDEV', if_true: files('hyperv_testdev.c'))
- system_ss.add(when: 'CONFIG_VMBUS', if_true: files('vmbus.c'))
- system_ss.add(when: 'CONFIG_SYNDBG', if_true: files('syndbg.c'))
- system_ss.add(when: 'CONFIG_HV_BALLOON', if_true: files('hv-balloon.c', 'hv-balloon-page_range_tree.c', 'hv-balloon-our_range_memslots.c'))
--- 
-2.39.5
+Bug, these should be declared outside of COMPILING_PER_TARGET.
+
+> - from exec/cpu-all.h | memory_ldst_phys.h.inc
+>      - ldq_phys
+
+Yeah, not an easy one.
 
 
