@@ -1,169 +1,176 @@
-Return-Path: <kvm+bounces-40320-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40318-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A165AA56315
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 09:57:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B6FBA56305
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 09:55:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52EAD3B2D83
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 08:57:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F55C17588E
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 08:55:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 092621E1DFD;
-	Fri,  7 Mar 2025 08:57:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D261E1DE4;
+	Fri,  7 Mar 2025 08:55:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rCsJxzWN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DqXblCeE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9630B1DF990
-	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 08:57:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242891A5B9E
+	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 08:55:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741337861; cv=none; b=LRH375VXq1VpaeNQbTIQHrRjpBbJgEPjbNWymNjap+9Pi4Q5n+/39vCrGGWIOJV1kwqrD+SgGWT/VvROrLwMv51eK6O9LFlWZxtSlGgr+gXmloTpUnJxVTsMI6tsq/67k03OnE+HoorXBez9UFcooxRjVJgSUp1CFZZnvUas8To=
+	t=1741337735; cv=none; b=q7qiQ8CrWOCMi6JFHrIdG54BsSy/s4oDDKL4NF07ImkerJ7oSzHkKOE3hOavQ3ADhKh27rWpmrCvOG9M/FJuJRzckMdVwVY2hUHpjO5SaEHOM8W8OzHewWp7iytjdLq7sAtMvHb8jTUbpBbDewnCasQ2h65TkeC/Wb7aUEXrksM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741337861; c=relaxed/simple;
-	bh=vGG9NEnOun53/QXEi+g4WfOf7xFQ/aekd5NU3bx/M10=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NYxYkOxedSNfbMgjuWbvToW2HixY+zwA6tTY/b+4FCqzuhI7TG2b+qWxAHA4N8jms1dTlUq38T0EysZ73wY0geeKYWGfHWaSt/AXFZSiJM2Ld/dXZzyQ7PGKz1gmrbx0ZMzpCjMdWtaH1/KXBIii3v428GaCWDL/Lk2yshnUQAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rCsJxzWN; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-474fdb3212aso246921cf.0
-        for <kvm@vger.kernel.org>; Fri, 07 Mar 2025 00:57:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741337858; x=1741942658; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=3/bwAjReW7ie98bg7DwXms4xhFjHn4AdXPUuqjhFQI0=;
-        b=rCsJxzWNb4eaOn5v41nu5hdDMVp5eKu4H9yCc5CWksi0yFXRvBgLSDqLBCUcTmTCi3
-         aqgFdiTLGXL6YOuv4AVhwwms8dTD0mlMB1yNOy9ZXYIIWiZj1ZvjGlJJOOndCM1gKGMh
-         HSIGjwTcmjLGmTjfeF8OK4z7nNweI844fMjxPcMwZsJeem7sXs0XzE4QJWeF59qIsktJ
-         aOamuPY5OGLK9xdj458+St44jpVJ1a+tgPAHSX0gRMjIt1bzU62ED7LunLFYD/vrmyo3
-         FQBvHrG38qVH4A8F+y1nNbVLCTO8RfEZdwsjt6nHpxuY1DginkK6kldQrCBhQ7efOFw+
-         J7gQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741337858; x=1741942658;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3/bwAjReW7ie98bg7DwXms4xhFjHn4AdXPUuqjhFQI0=;
-        b=j0Z2ieQPBjphuznhiuwxkpqwZw6WSnX1IHC6puorCp2q4R6Pt7dLDARdWC/YfRaiBp
-         BgCEpksqeIwjRH7jr4RbOBsGjx1jJefSWws8OLiSsr/wKzLNgpcCaOgrRohA0tZoMv3O
-         SDUkQkCyr1693cXWWjrXClEKDe/bDll6rSK+lJskkSSdrZR+2NDIQQmESxzDijpxkgxN
-         gWudfBwqxOSNvxiVXNDSGtNwaAbBPJwjVLwejJRAp/RHzLrMNscq54wXB5fNgY41Tw6I
-         Ta+cJkYLjERBo0dIwv+cgTuMBBNoTVqIUmY5urVqmyFY9FvOLiUJWSKB2wvYiADxPZ9i
-         cwLw==
-X-Gm-Message-State: AOJu0YwGQRyFRdquoGEdKL7w/C+vFcYeZNuwhJgzBtUGHXfuTqmhuorS
-	7IXzvoDkk7M9emZMeA1MgjBjwf9Ovek40OYOe8G2+By8hc+YrwaVDrwmTmDPWNX6/whRbGnBTYW
-	GNtP0fcqaIyKJVEX7yckwljg/H1q+LMNg6pFMF0bvabQgEb1vd+z+t7A=
-X-Gm-Gg: ASbGncsh3zk1I0bPxr3yFMrLpEgphKHdiU8EIF1a2Iw1u26TvRi84+TV9n94mXwxl7/
-	9Vkj5/al/xMvrgTn+m4hSDOY9wGLtqk2gu0d1NR/pxdUUGflBrQkS/RnJp5g2g9kA8I24MZEr81
-	Zj24bETt/uatQWKW7gUFWOizSm
-X-Google-Smtp-Source: AGHT+IEJfnwrntQWEbO59kgrl0DHAqzKu3TmruS5tWQMX2gWkrRQKc/y6j5gschySkCsMnfblI87FsWqsfAoI+IMKRo=
-X-Received: by 2002:ac8:58d5:0:b0:474:fe2d:d201 with SMTP id
- d75a77b69052e-476521fd83bmr2036211cf.9.1741337858125; Fri, 07 Mar 2025
- 00:57:38 -0800 (PST)
+	s=arc-20240116; t=1741337735; c=relaxed/simple;
+	bh=RpN/LeNWfGyP6YXcs9FmCYAJxwp+Z5cSq5y5kR3MKmw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iYijwXljLC6yINQbZm8K9BPr3mgpJy05UCUWz9BzzJEesSfNAc2clEsl8AuW1FFrdRGcZtoxIhIZd6wXfTpYnwCQFNmXk5CLnfdE6WA56mYiW7rUPkQ2DxRt6LZKLXuRwmKtf+0EPjI83g03hqEFIJSrCb/ZDWFxZOjGugEOKZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DqXblCeE; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741337733; x=1772873733;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=RpN/LeNWfGyP6YXcs9FmCYAJxwp+Z5cSq5y5kR3MKmw=;
+  b=DqXblCeE0sFGUHm18O0NYvJLkd+3Ehgn6P0tke3xGWfoV88q3YUeZwhi
+   a04IDmWoVO29MFwb1ewBc7D5hNgOTCAKt2xfls01vCJvUltZ7g3LERGQz
+   gslRZwYFmP4+h6Pra3KmEVMWtH8VRW2mlVzpzjrEfE0/+Nu0a3k1Her7I
+   Qe2vpDhqF4u/TMrtuDbCnEld5KCW2cgimdSKaYPwT9Cpzo6UBU1H8fH5u
+   Mr1gR7oZ9tOYYJ74MvThQD+2gKYiKNcWnfP/XeXf4oaru+nXbiCMZUg9l
+   aVAYZBlVIL23etCo48iJvx4URdufRrKDhhE0bhbh0Ipfa82XAdTv+PT+5
+   Q==;
+X-CSE-ConnectionGUID: 0AQ/7n+2SxqtmaoiY0Go5Q==
+X-CSE-MsgGUID: Qs0lCtoURUCRZiOgjVeHMA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="29961617"
+X-IronPort-AV: E=Sophos;i="6.14,228,1736841600"; 
+   d="scan'208";a="29961617"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2025 00:55:31 -0800
+X-CSE-ConnectionGUID: bm/QiMATQDK5kl9bpcb14Q==
+X-CSE-MsgGUID: c+VQWqPuQSmOZZgXgIJGBw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="119789356"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
+  by orviesa007.jf.intel.com with ESMTP; 07 Mar 2025 00:55:24 -0800
+Date: Fri, 7 Mar 2025 17:15:32 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Dongli Zhang <dongli.zhang@oracle.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com,
+	mtosatti@redhat.com, sandipan.das@amd.com, babu.moger@amd.com,
+	likexu@tencent.com, like.xu.linux@gmail.com,
+	zhenyuw@linux.intel.com, groug@kaod.org, khorenko@virtuozzo.com,
+	alexander.ivanov@virtuozzo.com, den@virtuozzo.com,
+	davydov-max@yandex-team.ru, xiaoyao.li@intel.com,
+	dapeng1.mi@linux.intel.com, joe.jin@oracle.com
+Subject: Re: [PATCH v2 05/10] target/i386/kvm: extract unrelated code out of
+ kvm_x86_build_cpuid()
+Message-ID: <Z8q5NHQeIgXxTmPO@intel.com>
+References: <20250302220112.17653-1-dongli.zhang@oracle.com>
+ <20250302220112.17653-6-dongli.zhang@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250303171013.3548775-4-tabba@google.com> <diqzfrjpu6a8.fsf@ackerleytng-ctop.c.googlers.com>
-In-Reply-To: <diqzfrjpu6a8.fsf@ackerleytng-ctop.c.googlers.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Fri, 7 Mar 2025 08:57:00 +0000
-X-Gm-Features: AQ5f1JpvWVX4p-I-6NV1AGFD4gCusH1RF5PO6B8I5VhGtEmyhDA3YIF8HF36ulc
-Message-ID: <CA+EHjTwOMH97apzhVjxW_+pN6iXMRbkA7QQtdZfuUKUJm27-BA@mail.gmail.com>
-Subject: Re: [PATCH v5 3/9] KVM: guest_memfd: Allow host to map guest_memfd() pages
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, mail@maciej.szmigiero.name, david@redhat.com, 
-	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
-	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
-	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
-	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
-	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
-	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
-	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
-	hughd@google.com, jthoughton@google.com, peterx@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250302220112.17653-6-dongli.zhang@oracle.com>
 
-Hi Ackerley,
+> +static void kvm_init_pmu_info(CPUX86State *env)
+> +{
+> +    uint32_t eax, edx;
+> +    uint32_t unused;
+> +    uint32_t limit;
+> +
+> +    cpu_x86_cpuid(env, 0, 0, &limit, &unused, &unused, &unused);
 
-On Thu, 6 Mar 2025 at 22:46, Ackerley Tng <ackerleytng@google.com> wrote:
->
-> Fuad Tabba <tabba@google.com> writes:
->
-> > Add support for mmap() and fault() for guest_memfd backed memory
-> > in the host for VMs that support in-place conversion between
-> > shared and private. To that end, this patch adds the ability to
-> > check whether the VM type supports in-place conversion, and only
-> > allows mapping its memory if that's the case.
-> >
-> > Also add the KVM capability KVM_CAP_GMEM_SHARED_MEM, which
-> > indicates that the VM supports shared memory in guest_memfd, or
-> > that the host can create VMs that support shared memory.
-> > Supporting shared memory implies that memory can be mapped when
-> > shared with the host.
-> >
-> > This is controlled by the KVM_GMEM_SHARED_MEM configuration
-> > option.
-> >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  include/linux/kvm_host.h |  11 ++++
-> >  include/uapi/linux/kvm.h |   1 +
-> >  virt/kvm/guest_memfd.c   | 105 +++++++++++++++++++++++++++++++++++++++
-> >  virt/kvm/kvm_main.c      |   4 ++
-> >  4 files changed, 121 insertions(+)
-> >
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index 7788e3625f6d..2d025b8ee20e 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -728,6 +728,17 @@ static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
-> >  }
-> >  #endif
-> >
-> > +/*
-> > + * Arch code must define kvm_arch_gmem_supports_shared_mem if support for
-> > + * private memory is enabled and it supports in-place shared/private conversion.
-> > + */
-> > +#if !defined(kvm_arch_gmem_supports_shared_mem) && !IS_ENABLED(CONFIG_KVM_PRIVATE_MEM)
->
-> Is this a copypasta error? I'm wondering if this should be
-> !IS_ENABLED(CONFIG_KVM_GMEM_SHARED_MEM).
+At this stage, CPUID has already been filled and we should not use
+cpu_x86_cpuid() to get the "raw" CPUID info.
 
-Yes. Kirill had pointed that out as well. I will fix it.
+Instead, after kvm_x86_build_cpuid(), the cpuid_find_entry() helper
+should be preferred.
 
-> Also, would you consider defining a __weak function to be overridden by
-> different architectures, or would weak symbols not be inline-able?
+With cpuid_find_entry(), we don't even need to check the limit again.
 
-I have no strong opinion, but I think that it should follow the same
-pattern as kvm_arch_has_private_mem().
+> +
+> +    if (limit < 0x0a) {
+> +        return;
+> +    }
 
-Cheers,
-/fuad
+...
 
-> > +static inline bool kvm_arch_gmem_supports_shared_mem(struct kvm *kvm)
-> > +{
-> > +     return false;
-> > +}
-> > +#endif
-> > +
-> >
-> > <snip>
+>  int kvm_arch_init_vcpu(CPUState *cs)
+>  {
+>      struct {
+> @@ -2267,6 +2277,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>      cpuid_i = kvm_x86_build_cpuid(env, cpuid_data.entries, cpuid_i);
+>      cpuid_data.cpuid.nent = cpuid_i;
+>  
+> +    kvm_init_pmu_info(env);
+> +
+
+Referring what has_msr_feature_control did, what about the following
+change?
+
+ int kvm_arch_init_vcpu(CPUState *cs)
+ {
+     struct {
+@@ -2277,8 +2240,6 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     cpuid_i = kvm_x86_build_cpuid(env, cpuid_data.entries, cpuid_i);
+     cpuid_data.cpuid.nent = cpuid_i;
+
+-    kvm_init_pmu_info(env);
+-
+     if (((env->cpuid_version >> 8)&0xF) >= 6
+         && (env->features[FEAT_1_EDX] & (CPUID_MCE | CPUID_MCA)) ==
+            (CPUID_MCE | CPUID_MCA)) {
+@@ -2329,6 +2290,31 @@ int kvm_arch_init_vcpu(CPUState *cs)
+         has_msr_feature_control = true;
+     }
+
++    c = cpuid_find_entry(&cpuid_data.cpuid, 0xa, 0);
++    if (c) {
++        has_architectural_pmu_version = c->eax & 0xff;
++        if (has_architectural_pmu_version > 0) {
++            num_architectural_pmu_gp_counters = (c->eax & 0xff00) >> 8;
++
++            /*
++             * Shouldn't be more than 32, since that's the number of bits
++             * available in EBX to tell us _which_ counters are available.
++             * Play it safe.
++             */
++            if (num_architectural_pmu_gp_counters > MAX_GP_COUNTERS) {
++                num_architectural_pmu_gp_counters = MAX_GP_COUNTERS;
++            }
++
++            if (has_architectural_pmu_version > 1) {
++                num_architectural_pmu_fixed_counters = c->edx & 0x1f;
++
++                if (num_architectural_pmu_fixed_counters > MAX_FIXED_COUNTERS) {
++                    num_architectural_pmu_fixed_counters = MAX_FIXED_COUNTERS;
++                }
++            }
++        }
++    }
++
+     if (env->mcg_cap & MCG_LMCE_P) {
+         has_msr_mcg_ext_ctl = has_msr_feature_control = true;
+     }
+---
+
+The above codes check 0xa after 0x1 and 0x7, and uses the local variable
+`c`, so that it doesn't need to wrap another new function.
+
+Regards,
+Zhao
+
+
+
 
