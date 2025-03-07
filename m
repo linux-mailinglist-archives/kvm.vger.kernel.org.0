@@ -1,188 +1,143 @@
-Return-Path: <kvm+bounces-40339-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40340-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8144A56B0E
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 16:02:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 126C8A56BE1
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 16:23:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AAD8177B17
-	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 15:02:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9084B7A5190
+	for <lists+kvm@lfdr.de>; Fri,  7 Mar 2025 15:18:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 954EE21C187;
-	Fri,  7 Mar 2025 15:02:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F32E21D3F1;
+	Fri,  7 Mar 2025 15:17:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FsUHngrx"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="mYAdAwxv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D3C82E3361
-	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 15:02:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5059221B90F
+	for <kvm@vger.kernel.org>; Fri,  7 Mar 2025 15:17:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741359763; cv=none; b=jO7lTr+kUjxExm4iuleEwGRbk+oZCXsqqID4Iujd+0vFQUfNhR2fOm1Wp4BgW++DLhJEx2eNeBe0qD+Z5tZcD+c76jjHUoBvldbXNGOU3NqAKp8P6KEIH3JogAsY8hK2VQBeumU4qgl8xTaFR7kSc8tC3Tiejio5U8m6+mnpRXI=
+	t=1741360670; cv=none; b=NucFX8rDgMpucsaZM6X7YX/hTfYVVx0CqCIKqd3wsGz4oRSlImqPWjpQ+EwLxHyEJVprouwUQvIxSR/3tg0wxEvNDUPdlWNrmmA6HEttz12SSc9L1rF1wzfhLjeNn43mRql57i/i+RDKj0PUAF94LYNWexXwAq1K9BpbN1Eq2wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741359763; c=relaxed/simple;
-	bh=/CqtL46hs9Sn9XtjnQtnzpwEcuZGxBycCOlQy6JckL8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qqDigG6bjtHnaTRGmzvlL5GCiGfSXFI0vvfHUFqJk4RlZDSC/Kz6Ys79SLn77qx00KW2DrjOjpLawPeSzTRZPmHCUpRetW+JcbqunHJyC8OOc3mHBFGnJNeYTJQeiFHS0t0fRJ5lWk5d1t4zWXEwDm7pVmbZzdbMdJVrovuYdBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FsUHngrx; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff4b130bb2so3446775a91.0
-        for <kvm@vger.kernel.org>; Fri, 07 Mar 2025 07:02:42 -0800 (PST)
+	s=arc-20240116; t=1741360670; c=relaxed/simple;
+	bh=rX0uMtq0RVZw5cLocHPJ4iQ1QgIw8r0WsZ5PnIUFg/k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oT4/yZrihuJc2++bjOzdKvM1cUgYt0LLNaMtd9e1fGn7XzK+fWSauYRZsiWIX6FdgztY23v5AQKxS/Kbu6KGi/Utg0hxlp02oGkZhxpYz4JXQoBHa8z3ew0kmeH6uQsjVPIFzzkoMswoQD22H8ntmq6m70r6g7efhn24eNMk3PY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=mYAdAwxv; arc=none smtp.client-ip=209.85.222.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7c3d0e90c4eso309227785a.1
+        for <kvm@vger.kernel.org>; Fri, 07 Mar 2025 07:17:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741359761; x=1741964561; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8p9/fq/nM+pr2NlVgvqJ7GCWcpETpYSDd5iEoMo788I=;
-        b=FsUHngrxXCywmDSJa9hL/9zsqQo5AjsoYN9LuBW053qYTzLkTK8CW+8H6r1pvVR7S5
-         jQhFyzpkDw/xaxXrCqXuMwp/jOCq4G9lrshZ8Kaths7MMPTIBt/o9wDspWW11/Ryucxk
-         BiREI5x/QN6TWI+289OCY/ETO6TYJxHR5o+ZfkSB8ubEqWL0wa4L3dI9iKdnHZmgic0v
-         kJ3Tl2faU3Dz4G0c/8P5+i5oNzHqo2qPC25Kl0I2oBZbuDK2jcR1JM0ENjOwBs/BIkP3
-         Ya/lVzXWiwpq6eNUdYHyip6oxX6ER35x6YiFse6OMs971c436Vnrl84CLpN14L9wbmZ6
-         OPRw==
+        d=ziepe.ca; s=google; t=1741360667; x=1741965467; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kCAKy1MLCn9h59tEwZqypamw7ZoTBGTa4RgpePYYALo=;
+        b=mYAdAwxvOF/FNKH8ghHWZmZmVqxewrCco3QLKzVoay/uP2SagsmrLgck+MK8C0BE9M
+         p5Iv5tc49YScJNaj2Rnv6egDmCWLi+kHBxIkpweWKabbqDPoKWhkMgldw/0J38gj0jz2
+         vufiHwYAYMsmehRUDGr3bVI4NVAFoJjrMF8dluSvVHBRKg6OAeDG4tsWs3SwHWrmeRlS
+         oDfDvpIUpL18c4PqDn8Yro63tRRKk6tB3iE7Ej05DoCLsVj++pVTQ0uY94K20MPW5zUv
+         IgmJhXjzv5XvU83qktfr42Pl7vbpw5veI6GpaXuB15HnnHqLdUOclLw9uMDN9vK9PVQs
+         WK8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741359761; x=1741964561;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8p9/fq/nM+pr2NlVgvqJ7GCWcpETpYSDd5iEoMo788I=;
-        b=I/l/nhTYgr4ap0/cbeiHsQ97BC3dFCK8DzkDaBF7cWuwshconVQKl/1Sc4pInpk+xJ
-         h486MRFiOJT4wGOych4PXiN3Q+9qy8enBojh2iI6nrNWGmSCRpC/WeUwfuo8voTQx0uW
-         tR/P+bimn5A88Da1jIUkgMIhzn1Zr2zayKMAlCWj65FkGInNzpHreJqMRft26RCcPCVB
-         btF3ohO2bTtxcR0z8+MklLuCbsAK5OEj6cIlZg9i0W1oLLisqAwa3Nclj8YhyqSz0bKW
-         4rMun+TQYgbdV4CYxKmcB2y68zyxrFqsdCFUgQ3jQ7GbcLytdL5MYcVZ/Vcj/PTQExf/
-         w1TA==
-X-Gm-Message-State: AOJu0YwJuqIuVjPeCvGNZfF7ypD+evjQaAdb4KqjkBgSVIUSdnaxrf5f
-	bMlGHFGTzpaxPOx/pv5oGBaOu/fP6wVE29DBA5QYrc1woSs7YqkwZmRNQA3rTyeEA4T17ziPisZ
-	A6g==
-X-Google-Smtp-Source: AGHT+IGVQ4cg/Vi/nSKbSvruTswaX4BW6St/JWA/Tpijs0lJZx0Aae/mTyaI4ditO9P+2u0QbEdPJNvO1OU=
-X-Received: from pjbqn14.prod.google.com ([2002:a17:90b:3d4e:b0:2ea:9d23:79a0])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d605:b0:2ee:db8a:2a01
- with SMTP id 98e67ed59e1d1-2ff7cf128cdmr5320710a91.30.1741359761542; Fri, 07
- Mar 2025 07:02:41 -0800 (PST)
-Date: Fri, 7 Mar 2025 07:02:36 -0800
-In-Reply-To: <44961459-2759-4164-b604-f6bd43da8ce9@stanley.mountain>
+        d=1e100.net; s=20230601; t=1741360667; x=1741965467;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kCAKy1MLCn9h59tEwZqypamw7ZoTBGTa4RgpePYYALo=;
+        b=prhvmwm5drYnQYHwk7I3i1wqY6gluvlKBJmKYIupbft6vr8H+HGYcvZCEXwG51hMYm
+         B1389ojngDgrHZV1Pas3PiJZVoBq8GGZTgexT62ctPmlv4sMiylvnKcfOmEYQveMKs7C
+         ww03v/obYdQndjTRG3Xxw5rw0tLS4SHMKenvs8OV5/SG+H5hBS8YsQpYc1SsP6Auezxz
+         5dvgBxFIqCGvAnQQL780hg2YLyLwX7Wo86uJiXt0Rs643/QfRlK9VobzcyX9L8wWsECp
+         FjINGjjVszNe1XIbG7mYQAcTyA287yiTddOF95/rOjN9d2DYZB4DYtUC++bsnS5rxeyt
+         8Emg==
+X-Forwarded-Encrypted: i=1; AJvYcCVyOStFivgwcPUboZfGdbO07Y9HnJF514A76XkkxUdUED4n8gG4wrMWpMu8EcfukdUL9cE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyg8O7he+TJ5Zfiz+S2JK+sK1t/8lOpGdtHMm6Ew5bMzie36Xje
+	/J3g+Gsm8d5IbFqMCrN7RKSysVtzDj+wl6CJYcGmSLcuYlW09ODF0kiCBYpvxVs=
+X-Gm-Gg: ASbGncvML0SB259hHHMzx4fwJlJ1oWHzhDZk9lP80qi15hnvsPYRTgLfFasPf5/ldJV
+	435zoMkEC93/J3FQf2eAT0TfHDSE2FxQL+CacBke2SL7LUsdD1K8Oy17E1Uow67rk8WIjS9chBg
+	pIc8Ic9d+EDG/eo2bSRYi59UjIQSn9YKj4qIK+rjtZMWF4367Bjin0HNoAkllEh4vwbnOJjaL2e
+	KMLdBwFdrTAn+hDervhiOMkK7Ftoan3JZW1Gbdvgd9doZIlkj2W22dvQEpdCvvGHwKdhcVUdMP/
+	cL+9Sk2Wt0QldOrEnYdahJv+fg+Lb3Sg4U6i+a5k8Dua7JUk0gnABprHYtkK222w+x/Wm++WFjU
+	vcRIZ2GAV2iXWZFJbNA==
+X-Google-Smtp-Source: AGHT+IGPtlWnpTlq97dHBsYv9Qj2zzhftXBWiYKJa7fQGbPL61VR64KLpfRR/UmiZXjz25h9+jNuNw==
+X-Received: by 2002:a05:620a:27ce:b0:7c3:cbad:5735 with SMTP id af79cd13be357-7c499d46c20mr545047685a.28.1741360667128;
+        Fri, 07 Mar 2025 07:17:47 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c3e5511328sm252963085a.105.2025.03.07.07.17.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Mar 2025 07:17:46 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1tqZSL-00000001ljV-3gSE;
+	Fri, 07 Mar 2025 11:17:45 -0400
+Date: Fri, 7 Mar 2025 11:17:45 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Alexey Kardashevskiy <aik@amd.com>
+Cc: Xu Yilun <yilun.xu@linux.intel.com>, x86@kernel.org,
+	kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>,
+	Joao Martins <joao.m.martins@oracle.com>,
+	Nicolin Chen <nicolinc@nvidia.com>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Steve Sistare <steven.sistare@oracle.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
+	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
+	Zhi Wang <zhiw@nvidia.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: Re: [RFC PATCH v2 14/22] iommufd: Add TIO calls
+Message-ID: <20250307151745.GH354403@ziepe.ca>
+References: <Z72GmixR6NkzXAl7@yilunxu-OptiPlex-7050>
+ <2fe6b3c6-3eed-424d-87f0-34c4e7e1c906@amd.com>
+ <Z77xrqLtJfB84dJF@yilunxu-OptiPlex-7050>
+ <20250226131202.GH5011@ziepe.ca>
+ <Z7/jFhlsBrbrloia@yilunxu-OptiPlex-7050>
+ <20250301003711.GR5011@ziepe.ca>
+ <Z8U+/0IYyn7XX3ao@yilunxu-OptiPlex-7050>
+ <20250305192842.GE354403@ziepe.ca>
+ <Z8lE+5OpqZc746mT@yilunxu-OptiPlex-7050>
+ <c5c31890-14fc-4fab-8cd4-d4dcfdecdd2d@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <44961459-2759-4164-b604-f6bd43da8ce9@stanley.mountain>
-Message-ID: <Z8sKjFrSJVLsLbQw@google.com>
-Subject: Re: [bug report] KVM: VMX: Use GPA legality helpers to replace open
- coded equivalents
-From: Sean Christopherson <seanjc@google.com>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c5c31890-14fc-4fab-8cd4-d4dcfdecdd2d@amd.com>
 
-On Fri, Mar 07, 2025, Dan Carpenter wrote:
-> Hello Sean Christopherson,
+On Fri, Mar 07, 2025 at 01:19:11PM +1100, Alexey Kardashevskiy wrote:
+> > > Part of my problem here is I don't see anyone who seems to have read
+> > > all three specs and is trying to mush them together. Everyone is
+> > > focused on their own spec. I know there are subtle differences :\
 > 
-> Commit 636e8b733491 ("KVM: VMX: Use GPA legality helpers to replace
-> open coded equivalents") from Feb 3, 2021 (linux-next), leads to the
-> following Smatch static checker warning:
-> 
-> 	arch/x86/kvm/vmx/nested.c:834 nested_vmx_check_msr_switch()
-> 	warn: potential user controlled sizeof overflow 'addr + count * 16' '0-u64max + 16-68719476720'
-> 
-> arch/x86/kvm/vmx/nested.c
->     827 static int nested_vmx_check_msr_switch(struct kvm_vcpu *vcpu,
->     828                                        u32 count, u64 addr)
->     829 {
->     830         if (count == 0)
->     831                 return 0;
->     832 
->     833         if (!kvm_vcpu_is_legal_aligned_gpa(vcpu, addr, 16) ||
-> --> 834             !kvm_vcpu_is_legal_gpa(vcpu, (addr + count * sizeof(struct vmx_msr_entry) - 1)))
->                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> Do we support kvm on 32bit systems?
+> One is SEV TIO (earlier version published), another one TDX Connect (which I
+> do not have and asked above) and what is the third one here? Or is it 4 as
+> ARM and RiscV both doing this now? Thanks,
 
-"Support" might be a bit of a strong word, but yes, KVM is supposed to work on
-32-bit systems.  Even if we ignore 32-bit, not explicitly checking the count is
-silly.  There's an explicit limit on @count, and it's architecturally capped at
-4096.  I suspect the only reason KVM doesn't check it here is because exceeding
-the limit isn't listed in the SDM as consitency check.
+ARM will come with a spec someday, I don't know about RISCV. Maybe it
+is 4..
 
-But the SDM does say that exceeding the limit results in undefined behavior,
-"(including a machine check during the VMX transition)".  I.e. KVM can quite
-literally do whatever it wants.  And KVM does check the limit later on.
-
-I can't think of any ordering weirdness that would result in an early check, so
-assuming testing comes through clean, I'll post this:
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index d06e50d9c0e7..64ea387a14a1 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -824,12 +824,30 @@ static int nested_vmx_check_apicv_controls(struct kvm_vcpu *vcpu,
-        return 0;
- }
- 
-+static u32 nested_vmx_max_atomic_switch_msrs(struct kvm_vcpu *vcpu)
-+{
-+       struct vcpu_vmx *vmx = to_vmx(vcpu);
-+       u64 vmx_misc = vmx_control_msr(vmx->nested.msrs.misc_low,
-+                                      vmx->nested.msrs.misc_high);
-+
-+       return (vmx_misc_max_msr(vmx_misc) + 1) * VMX_MISC_MSR_LIST_MULTIPLIER;
-+}
-+
- static int nested_vmx_check_msr_switch(struct kvm_vcpu *vcpu,
-                                       u32 count, u64 addr)
- {
-        if (count == 0)
-                return 0;
- 
-+       /*
-+        * Exceeding the limit results in architecturally _undefined_ behavior,
-+        * i.e. KVM is allowed to do literally anything in response to a bad
-+        * limit.  Immediately generate a consistency check so that code that
-+        * consumes the count doesn't need to worry about extreme edge cases.
-+        */
-+       if (count > nested_vmx_max_atomic_switch_msrs(vcpu))
-+               return -EINVAL;
-+
-        if (!kvm_vcpu_is_legal_aligned_gpa(vcpu, addr, 16) ||
-            !kvm_vcpu_is_legal_gpa(vcpu, (addr + count * sizeof(struct vmx_msr_entry) - 1)))
-                return -EINVAL;
-@@ -940,15 +958,6 @@ static int nested_vmx_store_msr_check(struct kvm_vcpu *vcpu,
-        return 0;
- }
- 
--static u32 nested_vmx_max_atomic_switch_msrs(struct kvm_vcpu *vcpu)
--{
--       struct vcpu_vmx *vmx = to_vmx(vcpu);
--       u64 vmx_misc = vmx_control_msr(vmx->nested.msrs.misc_low,
--                                      vmx->nested.msrs.misc_high);
--
--       return (vmx_misc_max_msr(vmx_misc) + 1) * VMX_MISC_MSR_LIST_MULTIPLIER;
--}
--
- /*
-  * Load guest's/host's msr at nested entry/exit.
-  * return 0 for success, entry index for failure.
-@@ -965,7 +974,7 @@ static u32 nested_vmx_load_msr(struct kvm_vcpu *vcpu, u64 gpa, u32 count)
-        u32 max_msr_list_size = nested_vmx_max_atomic_switch_msrs(vcpu);
- 
-        for (i = 0; i < count; i++) {
--               if (unlikely(i >= max_msr_list_size))
-+               if (WARN_ON_ONCE(i >= max_msr_list_size))
-                        goto fail;
- 
-                if (kvm_vcpu_read_guest(vcpu, gpa + i * sizeof(e),
-@@ -1053,7 +1062,7 @@ static int nested_vmx_store_msr(struct kvm_vcpu *vcpu, u64 gpa, u32 count)
-        u32 max_msr_list_size = nested_vmx_max_atomic_switch_msrs(vcpu);
- 
-        for (i = 0; i < count; i++) {
--               if (unlikely(i >= max_msr_list_size))
-+               if (WARN_ON_ONCE(i >= max_msr_list_size))
-                        return -EINVAL;
- 
-                if (!read_and_check_msr_entry(vcpu, gpa, i, &e))
-
+Jason
 
