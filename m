@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-40514-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40515-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35408A57FB6
-	for <lists+kvm@lfdr.de>; Sun,  9 Mar 2025 00:10:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B0D1A57FB7
+	for <lists+kvm@lfdr.de>; Sun,  9 Mar 2025 00:10:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E877188DF82
-	for <lists+kvm@lfdr.de>; Sat,  8 Mar 2025 23:11:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8C4316B0E3
+	for <lists+kvm@lfdr.de>; Sat,  8 Mar 2025 23:10:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 503CB20C468;
-	Sat,  8 Mar 2025 23:10:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55AC3212B3C;
+	Sat,  8 Mar 2025 23:10:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fpxWITAR"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pcWZxKfQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B92E01F9F5C
-	for <kvm@vger.kernel.org>; Sat,  8 Mar 2025 23:10:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE66520F083
+	for <kvm@vger.kernel.org>; Sat,  8 Mar 2025 23:10:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741475446; cv=none; b=cOrEYkzOB60b4u58/u+65UvQIrqpxJu7DeDpBnw6gdeREMiu3uI6TK9M2fn+BWbrZJG5r4NpEQjydWrKscpDVLv2Bz6BKS8xs+7N0uV148FHkkhXlWku2e96w0ngUIa9FdON4vtgvbt8wM1sqwQzSeelpdqFxMMKuUqiN+qa4eo=
+	t=1741475451; cv=none; b=gp/H5S76p2SvfP4U5ieOYmRYMYaslAo0v7VE5VOtB9ZV68G6qgohy/izak17NHhg+pyAZVOqngpNWcdxkt/bVoy1PnQ+SAQFFrDeAgs0L1xvZN6J68jEDeNtxbRJ/I9qDTrFXu4Osqa1wZkB8MKmGni/I09iMmdsPX8byOF3X8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741475446; c=relaxed/simple;
-	bh=aqPEb4yOPrVtNlr0AJyyI8wIcJ0q7eTX0wEHsEYITYE=;
+	s=arc-20240116; t=1741475451; c=relaxed/simple;
+	bh=Thj+uJzLgQ7BqnoA+PwoNvSZQYPTABL7cPmxH1Gg5NU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NGFYffr77f6sMg/8pV115JgDftAOSE/7K17x6tGm5f24T78C1m+vyvDMJJzQ5UDjJoQCFSdjblMQ0AGP4oiVnSXASbGK0zso6WzQL4UCmyBWS/634nrTbANCET6Hdc8cN6WlLzK37MnnFm88k7mZzJCiw9tEBim4rVsB6kqqc2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=fpxWITAR; arc=none smtp.client-ip=209.85.128.44
+	 MIME-Version:Content-Type; b=RiggTxq8m/eIttTWF0+2S0tLYZ9X4FVH42AZKQlU/aah4reOxGd2S2e4Nc4ddaaWbhVb7ketvR6FW9wyqOnIqxd7D0J87CHAelFgcfQ3zzBC9QiC1l+jw+Ev7zWYGhtPKdLABsrz1SzCktF6Psmwh7F66joZ7oGlJk0rmQTeHDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=pcWZxKfQ; arc=none smtp.client-ip=209.85.221.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43cf0d787eeso1297945e9.3
-        for <kvm@vger.kernel.org>; Sat, 08 Mar 2025 15:10:43 -0800 (PST)
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3913fdd0120so217392f8f.0
+        for <kvm@vger.kernel.org>; Sat, 08 Mar 2025 15:10:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1741475442; x=1742080242; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1741475448; x=1742080248; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=e994k6DJ1GVQfS1v420FHs4KoJEVg7ohUIOs13xGxIQ=;
-        b=fpxWITARpU/PV1If7xs2Q3qT2woVj6gqDAdJYu6gqA68szLzbhGCEtBW4D7g0dRZMK
-         Vyrl7W2pror3t7oGJMonmNWdepCxsG9QdDYgl9Aoz5W0m8Mk/kg1NyYinS7Z3wGlKXBr
-         d3Se3C6HQp+PF9IWf6aZby06WbwDs13x1rznWluqhe2XLDysSU6NSRgIEXvxj/69sy6g
-         ajjniNjt3tzZ2i9wKj2+l4bME6WX7UXhgst0JwqWyaaP1CTaRVjS+0gCK2p+VPjjfJUE
-         QJr/edPbVvaeI/az5f7XJ7ORVPcZPLC2UTDXWF5G7sgTR/HMNjmbY5Zcj6KleiGIbbZp
-         fKsQ==
+        bh=rb5Gq5gjoqNir/3li58uEI51RqNLZd7aJ8wRwb3WrW0=;
+        b=pcWZxKfQ1rYSFopE9uNUEEak91WmVdiXEogtOIhLLhacIjG4PCyM+DkYviGJtJ2eKY
+         OVgERrPS+Dyp6n1bczJ88aACxsfufm4wbbasF+JehyiA5WPOHFWioyO03bfW/8YpcobT
+         p3Pk/St12eSCJsOjJteTxq/HEPFUyDkR1kCfvy6Q11wQLQ/ZBjMiG4u9pmjuhIZNGDo5
+         k23mYyIYx00ncJxw7FB5W8dxZYu85ZSafzToTcME6yMhebdzxIWWvgqGYCZGJvq6FX0E
+         tJzmABU4HTHK/dT2oN4Uzq4HLkcVDH5k7tHrrp4qxaZdxvre8sSDbZmrYghFko363v2O
+         EHSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741475442; x=1742080242;
+        d=1e100.net; s=20230601; t=1741475448; x=1742080248;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=e994k6DJ1GVQfS1v420FHs4KoJEVg7ohUIOs13xGxIQ=;
-        b=wBAOIz70Ssmuo6GlKqzI2hvbRW8gWZNk4FL9VPR3Xa3QfHgWv6w9EZK6fSPuD93wRf
-         Syo4rwIfoT9Jj0HTaz1NdQMWhthc1JlzmsDAjPOFF7yXafH5Bo6tbfuCVHdgpVbPreR4
-         mC+uoFrye/LizUOTgpKr0S+Hytmilq1TOMFfiW6oiv/uES2gTNijrw9ZYkeCTQUAAvZ8
-         RCrc/viRy/LHBKSy3Um+p/PzP9FO5ZXxbuCNHbiWZhwg+IJ6euBRaE3ccwkCi2VuW/FO
-         2R3NqtsxNibI5ezXxF0bfEPsJ1rBRL33JrGUbYjNTs8YBPh6La3vHgkv3Bh945iC0ccF
-         XoJg==
-X-Forwarded-Encrypted: i=1; AJvYcCVqKOuKjFoqZDBnLMMke3ecuvjruZ0806jTmk9OPcI3cUJtd3j+oqECL8mExgqG/TlV7xo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzX4K/qQ/2giVKcLXtBtHHgD/7XfYpTVtz1sv2t33wRgiRIeSGm
-	52JVDnTa05rk89GkkrDWui2INY8rrYxfyiPDlqp50JXWiWk3C1KOTZ/UnTEeYps=
-X-Gm-Gg: ASbGnctzeeuFjc6Wm2zOBQycYpwuZdxIKiW9KKGd2+NL+bP9Aaw4utavVkFC4RgZbdJ
-	X7xFM340XTi999Lz4pgOeQw7oSJwn96ST2jem7Hn7o+nOFGlRGvPlmk65j+mDEYngNnWbqQWqeX
-	xXj87vaW+7fbqnuLnY5rjwg4v970OEwsOFAOFfcgCkeYICMGlGdHnFUKyXWAFMnxZvsW5HmfHU/
-	Vs1pzRsl7kRzw56AfbjLHgNKMHAePz5E05jDmLL3R6binCAxSc+ke91w4d1hDD8c5Ze2TBcS19W
-	iyCH1leow4BY+moDo5pjc431CpMDEe9Db7TUG3vYbOlKpQuJPgtBRsAdd3VozIVvQxt8ZfL4NAn
-	ON9tfcOXAfEegJXQf1bI=
-X-Google-Smtp-Source: AGHT+IGanFAG++lqDWp4faa7iGXFNwWsx6KoPF+8GUYwA8SvvtEs71rNKQ7140I7e3KcmDtaGGxtiw==
-X-Received: by 2002:a5d:64c3:0:b0:391:2932:e67b with SMTP id ffacd0b85a97d-39132dacfdbmr7249820f8f.35.1741475442093;
-        Sat, 08 Mar 2025 15:10:42 -0800 (PST)
+        bh=rb5Gq5gjoqNir/3li58uEI51RqNLZd7aJ8wRwb3WrW0=;
+        b=fbMVfjne6vxlknXRDWlfqycu9dq+R7U968r14TznHEPeN4D8JZKTUWTyObTAjIdu67
+         W+8XZXmicSbwr76DhWGVd0x+t4t3UHdXdhJsJsaw3to+RHKkimQHreI1xunrdgOYLrwW
+         qiVkwkRldtHiGqXA7GjJGDiOKTos1hEYxSIjnVfcrrK+KENhl61YMNUPGs5h+hPI8/o/
+         OQoKkbiueCgOtU3cO6nFTfO1NFQoyEQUJ/cg5wsRPa7rW3DhXLLFzDpPZfzaQSHnpLo6
+         GEfz9aqnlxg0xpxHgyVv1hANUUpewt6913AHH/z2ti3dhXBXGIl809AUZn3KsKvfSmlM
+         cGVA==
+X-Forwarded-Encrypted: i=1; AJvYcCVTsIxzEixNyqIv0oxZjAOmKFrzo4Mo/uGaLZeFlAfmBzm4v+rE9gbqXPhOx8BXH3+EryI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyETuQBSi6lffeuX8B8F1nWqfaUBdmQWX8Q7nPVee69wCuTpOPI
+	eoyEkOj3/owzWbg0D84tD/iV7c3xhWP35JUZiN15SS121gVcoC7GO+/lvK4c/OY=
+X-Gm-Gg: ASbGnctnucVS2/uB2IKOuhu6qwQDeLyEXQ3E/1QUIGn025iwKHAiRZPE1JNx9MCJIKa
+	jYN7/kghVGrUKzkLuzvQ3xYalQgpy1DwIU3GqYfafEwHzdGuSylw18lcOcMotvlpdE/WU3J9GhD
+	CUYqsAjVDbSmFqaU6F8BN8nGCIZ1/9o6ebuUW1nLlg4t4KsC8HV3TAL2JHYtW6lS3FJcltfU2+R
+	QLZEF0uwhnjZh58EPfP620KYNer0f3mBvcxclIpXgwQYojOpSXsjFTF0hKIc925yt0LEogv0wi7
+	EYTl+EmBOodXAPxa9PBoe+pzDlgUBrA/jJPFQ1Mr/omCiiHAAIqyK+w05WhETVzIqOFt4S4VCfm
+	4SSVxesVr57q7XdEU19g=
+X-Google-Smtp-Source: AGHT+IFpyPZ8OHsunTdPUAhz3+hHZqpRzqB+uc+3KU0WeLI4qJr+CM3YEWcq/yPMOmAPEzlWQ4DAbw==
+X-Received: by 2002:a5d:588f:0:b0:390:f394:6274 with SMTP id ffacd0b85a97d-39132da9214mr5345868f8f.52.1741475448065;
+        Sat, 08 Mar 2025 15:10:48 -0800 (PST)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43cec28e1c4sm12949955e9.1.2025.03.08.15.10.40
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912bfb79fbsm10297840f8f.13.2025.03.08.15.10.45
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sat, 08 Mar 2025 15:10:41 -0800 (PST)
+        Sat, 08 Mar 2025 15:10:46 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Yi Liu <yi.l.liu@intel.com>,
@@ -105,9 +105,9 @@ Cc: Yi Liu <yi.l.liu@intel.com>,
 	=?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
 	Richard Henderson <richard.henderson@linaro.org>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH v2 14/21] system/iommufd: Introduce iommufd_builtin() helper
-Date: Sun,  9 Mar 2025 00:09:10 +0100
-Message-ID: <20250308230917.18907-15-philmd@linaro.org>
+Subject: [PATCH v2 15/21] hw/vfio/pci: Check CONFIG_IOMMUFD at runtime using iommufd_builtin()
+Date: Sun,  9 Mar 2025 00:09:11 +0100
+Message-ID: <20250308230917.18907-16-philmd@linaro.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250308230917.18907-1-philmd@linaro.org>
 References: <20250308230917.18907-1-philmd@linaro.org>
@@ -120,43 +120,100 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-iommufd_builtin() can be used to check at runtime whether
-the IOMMUFD feature is built in a qemu-system binary.
+Convert the compile time check on the CONFIG_IOMMUFD definition
+by a runtime one by calling iommufd_builtin().
 
+Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- docs/devel/vfio-iommufd.rst | 2 +-
- include/system/iommufd.h    | 6 ++++++
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ hw/vfio/pci.c | 38 ++++++++++++++++++--------------------
+ 1 file changed, 18 insertions(+), 20 deletions(-)
 
-diff --git a/docs/devel/vfio-iommufd.rst b/docs/devel/vfio-iommufd.rst
-index 3d1c11f175e..08882094eee 100644
---- a/docs/devel/vfio-iommufd.rst
-+++ b/docs/devel/vfio-iommufd.rst
-@@ -88,7 +88,7 @@ Step 2: configure QEMU
- ----------------------
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 9872884ff8a..e83252766d1 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -19,7 +19,6 @@
+  */
  
- Interactions with the ``/dev/iommu`` are abstracted by a new iommufd
--object (compiled in with the ``CONFIG_IOMMUFD`` option).
-+object (which availability can be checked at runtime using ``iommufd_builtin()``).
+ #include "qemu/osdep.h"
+-#include CONFIG_DEVICES /* CONFIG_IOMMUFD */
+ #include <linux/vfio.h>
+ #include <sys/ioctl.h>
  
- Any QEMU device (e.g. VFIO device) wishing to use ``/dev/iommu`` must
- be linked with an iommufd object. It gets a new optional property
-diff --git a/include/system/iommufd.h b/include/system/iommufd.h
-index cbab75bfbf6..3fedf8cfb63 100644
---- a/include/system/iommufd.h
-+++ b/include/system/iommufd.h
-@@ -63,4 +63,10 @@ bool iommufd_backend_get_dirty_bitmap(IOMMUFDBackend *be, uint32_t hwpt_id,
-                                       Error **errp);
+@@ -2973,11 +2972,10 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+         if (!(~vdev->host.domain || ~vdev->host.bus ||
+               ~vdev->host.slot || ~vdev->host.function)) {
+             error_setg(errp, "No provided host device");
+-            error_append_hint(errp, "Use -device vfio-pci,host=DDDD:BB:DD.F "
+-#ifdef CONFIG_IOMMUFD
+-                              "or -device vfio-pci,fd=DEVICE_FD "
+-#endif
+-                              "or -device vfio-pci,sysfsdev=PATH_TO_DEVICE\n");
++            error_append_hint(errp, "Use -device vfio-pci,host=DDDD:BB:DD.F %s"
++                              "or -device vfio-pci,sysfsdev=PATH_TO_DEVICE\n",
++                              iommufd_builtin()
++                              ? "or -device vfio-pci,fd=DEVICE_FD " : "");
+             return;
+         }
+         vbasedev->sysfsdev =
+@@ -3412,19 +3410,18 @@ static const Property vfio_pci_dev_properties[] = {
+                                    qdev_prop_nv_gpudirect_clique, uint8_t),
+     DEFINE_PROP_OFF_AUTO_PCIBAR("x-msix-relocation", VFIOPCIDevice, msix_relo,
+                                 OFF_AUTO_PCIBAR_OFF),
+-#ifdef CONFIG_IOMMUFD
+-    DEFINE_PROP_LINK("iommufd", VFIOPCIDevice, vbasedev.iommufd,
+-                     TYPE_IOMMUFD_BACKEND, IOMMUFDBackend *),
+-#endif
+     DEFINE_PROP_BOOL("skip-vsc-check", VFIOPCIDevice, skip_vsc_check, true),
+ };
  
- #define TYPE_HOST_IOMMU_DEVICE_IOMMUFD TYPE_HOST_IOMMU_DEVICE "-iommufd"
+-#ifdef CONFIG_IOMMUFD
++static const Property vfio_pci_dev_iommufd_properties[] = {
++    DEFINE_PROP_LINK("iommufd", VFIOPCIDevice, vbasedev.iommufd,
++                     TYPE_IOMMUFD_BACKEND, IOMMUFDBackend *),
++};
 +
-+static inline bool iommufd_builtin(void)
-+{
-+    return type_is_registered(TYPE_IOMMUFD_BACKEND);
-+}
-+
- #endif
+ static void vfio_pci_set_fd(Object *obj, const char *str, Error **errp)
+ {
+     vfio_device_set_fd(&VFIO_PCI(obj)->vbasedev, str, errp);
+ }
+-#endif
+ 
+ static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
+ {
+@@ -3433,9 +3430,10 @@ static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
+ 
+     device_class_set_legacy_reset(dc, vfio_pci_reset);
+     device_class_set_props(dc, vfio_pci_dev_properties);
+-#ifdef CONFIG_IOMMUFD
+-    object_class_property_add_str(klass, "fd", NULL, vfio_pci_set_fd);
+-#endif
++    if (iommufd_builtin()) {
++        device_class_set_props(dc, vfio_pci_dev_iommufd_properties);
++        object_class_property_add_str(klass, "fd", NULL, vfio_pci_set_fd);
++    }
+     dc->desc = "VFIO-based PCI device assignment";
+     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+     pdc->realize = vfio_realize;
+@@ -3540,11 +3538,11 @@ static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
+                                           "vf-token",
+                                           "Specify UUID VF token. Required for VF when PF is owned "
+                                           "by another VFIO driver");
+-#ifdef CONFIG_IOMMUFD
+-    object_class_property_set_description(klass, /* 9.0 */
+-                                          "iommufd",
+-                                          "Set host IOMMUFD backend device");
+-#endif
++    if (iommufd_builtin()) {
++        object_class_property_set_description(klass, /* 9.0 */
++                                              "iommufd",
++                                              "Set host IOMMUFD backend device");
++    }
+     object_class_property_set_description(klass, /* 9.1 */
+                                           "x-device-dirty-page-tracking",
+                                           "Disable device dirty page tracking and use "
 -- 
 2.47.1
 
