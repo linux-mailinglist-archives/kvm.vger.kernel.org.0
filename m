@@ -1,87 +1,87 @@
-Return-Path: <kvm+bounces-40483-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40484-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C00CDA57C7B
-	for <lists+kvm@lfdr.de>; Sat,  8 Mar 2025 18:46:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9A6DA57C7E
+	for <lists+kvm@lfdr.de>; Sat,  8 Mar 2025 18:47:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AA69188FC57
-	for <lists+kvm@lfdr.de>; Sat,  8 Mar 2025 17:46:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A86A188FC8D
+	for <lists+kvm@lfdr.de>; Sat,  8 Mar 2025 17:47:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AEF61DE4E7;
-	Sat,  8 Mar 2025 17:46:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9FF31E51FB;
+	Sat,  8 Mar 2025 17:46:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YLQZGxo6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EoPIqfE2"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C89382
-	for <kvm@vger.kernel.org>; Sat,  8 Mar 2025 17:46:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BEA2382
+	for <kvm@vger.kernel.org>; Sat,  8 Mar 2025 17:46:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741455999; cv=none; b=ZyAUHWUYj0zVu5xm+11BwcYMrzT0YAK3XBHK1rKivZpMiT1mmV2lH0cuqnjamwIN3/tfLSZMa66HaRhHFTUlH5Y2Ckfqe8BRe24KIXfiWI9+gB6rRMhjPIzJCapWRFg4iO0tjXaNvxb6CVIEqE69trGPBOW5jaxJms8RTIJ8Xo8=
+	t=1741456018; cv=none; b=kG/I1XfKzximUY4pu+Kg9biIV6IWp9N1JaiU6Lp1YYpeus03Dl+RxlEYScWu9fdScFnduyEh2FavQg4EkDylv9GRhksM0pZ7euQ7T6mT55f5T1lLb68Ni7NRVj+B9EQkziiMzKxdCO5gD3GkS79JG1uBTH3CVWO05UaSz9Qw+5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741455999; c=relaxed/simple;
-	bh=PYEnb38HiakEYtg74oyO3vxM2z63FaH5GHZYTi7pIeU=;
+	s=arc-20240116; t=1741456018; c=relaxed/simple;
+	bh=orNi7udgNnSq6OteuSKH0sPpaJ4rju+hdgJiRNMfMwk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uLGlBk24xIMvncxpInF0LDSmkJJFRzN2LVc2R+/Z5TxBvO+LFSsAtni5/FV24+Eu+pCIEnBmCIU2XxjRAvkCJeb2ZEk8sK4x+NpCTAS1Bohzq5Rosdyacj/pqXJezYY1ZLACeiLBmGQYVOuP6YE3/NxBjZ/gWHtlxSb9hQsKT9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YLQZGxo6; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=MISUzQi08TdlJqKT5DGgl7HenHo0xy47/rMc+BgzRJxZWCyZDxtj1XKuMGs/yjsq6L8G6SUJLgFZhgRGT8kUzNE/fyouj6pmZgOYZBLed3d7G9QHSFBq2Lkj0DeQ5HVW3npcCC/6kReeaCy7yEk2m+b4X+sW5X8JMPsAub85Evw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EoPIqfE2; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741455996;
+	s=mimecast20190719; t=1741456016;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=JFiuNU+eFFJHRrhW3V5tuq9L5rOEUcb+ufPXNixlpbQ=;
-	b=YLQZGxo60vW+5Sd3uONEsFGMmDtVqHgfKww8jIOVXneDsFXX7rvdZgevSU0cb1L6p7XXwr
-	7KrjVwp2/FEdYbdvVwNJam24RNHRqBoGl1rbZPNYbpZCUsjqTLDfL9TrjZ4o5JlSg9SR59
-	XLeUe93twVgcRzwPfYiLP8gkbYCy6c0=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=kplSIE8sz96ksijypwP97suDzWNUGToBxqP/OBlFt5U=;
+	b=EoPIqfE23z6a8joBh9mNgjZanLunaopvWSNdfuIiaby2OwisfvRqFWIZBSnDQUWXblu9bU
+	3uv8irGTU2tS65snQ6XFPFdp2ABJJ5rPDh12HN6gzSaMkfpR82kq89jDQrnP/yvu5PA/Om
+	cehkRo2tXDE4J8q/ATHJv1ZS/2hUtaE=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-99-85Fm460rP4m6kC5yOrsGTw-1; Sat, 08 Mar 2025 12:46:35 -0500
-X-MC-Unique: 85Fm460rP4m6kC5yOrsGTw-1
-X-Mimecast-MFC-AGG-ID: 85Fm460rP4m6kC5yOrsGTw_1741455994
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43bbbb00891so11790575e9.1
-        for <kvm@vger.kernel.org>; Sat, 08 Mar 2025 09:46:35 -0800 (PST)
+ us-mta-408-pv1T1vuLNieWxwAWsoTM9A-1; Sat, 08 Mar 2025 12:46:54 -0500
+X-MC-Unique: pv1T1vuLNieWxwAWsoTM9A-1
+X-Mimecast-MFC-AGG-ID: pv1T1vuLNieWxwAWsoTM9A_1741456013
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3913f97d115so141991f8f.0
+        for <kvm@vger.kernel.org>; Sat, 08 Mar 2025 09:46:54 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741455994; x=1742060794;
+        d=1e100.net; s=20230601; t=1741456013; x=1742060813;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JFiuNU+eFFJHRrhW3V5tuq9L5rOEUcb+ufPXNixlpbQ=;
-        b=P34ynS3kQ4gV+nuMnlw2qSsFGigLltCPNyuSPmc0q9T1/mQMDUB8hRWZaNXZZX/gj0
-         fkrqz0hdu+o+J8MHVTRwYO+iKFXHRh9EQOMlIGbs4U+u27IXtRr4qT4wTh9mEz2yrmJl
-         334HTVNC/TQsnFOuFgdYV7AyAZ//49fzOfGPu5h4R+wxdmhWeC7aQxty7DAv/4GOR6am
-         NhoP4Lwm7FL/ZpwPiHrJOGao/IBBD6Nk4sSYUBjDsPtSSGvEzMc5Ww1RQSm787WeVk3a
-         KJSwQgq2Prn7q08Xb/x2GtWn7su9UTE9v6FWhyRuRbTGVVuIj24y4S+XdtN7e5hKtcRn
-         qMjA==
-X-Forwarded-Encrypted: i=1; AJvYcCXWt1Ljdas9zhEQuzA9A2X90DxQ4mryaCXFWPmvtvSXp+OoSey6Pd1ypL1GLrtxOtPkysU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZO8nkJv821AlBKqjNcJDQzjOzRC2Zte4zPssM67jNVo3rIB4s
-	TwpZLu52OXN6E9B+DbnwcenVc7B9fB8HND7Gr0p1f1KygW9l8Oy/hKKxUdT2cc8laNUAed+lh8F
-	zr/uCN2Gk4RCnbEyA2l7TKv4ZHWJVehVOMaDApxhIBlevMFDYCg==
-X-Gm-Gg: ASbGncuZVXQuQV0znEu0vNUWfhv/7yx60f9taq/DAMab3iO0LdCjenpvxl20oaZC4QZ
-	QjQElxw2wmJ85h9dJ5W53fCmhIp9jm8q4SdeJZPkhqmWMHpzZzO6LfiXxEEcsqrkEPaINH9ZrdJ
-	YUa7CV3f3XwaazhWZgSAfM5U0/qUvOklUtPb1w8ZXf9tzj+dMSo7m/WOT123aGAhpdoMdk6MfTx
-	39eawco2xib6WBVf6qhdf/U4khmeo4Jz7adKv5zWgJuwYB6fqDVrThnU4lMvQuwk4oODHhAJhsi
-	b60MH03xORLD0uEf74WOC/5xLxU+qA3WIsobKAI3ZppV/hoBjrWycg==
-X-Received: by 2002:a05:600c:4f8b:b0:43b:d12a:40e1 with SMTP id 5b1f17b1804b1-43c5a611738mr51923835e9.18.1741455994260;
-        Sat, 08 Mar 2025 09:46:34 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFXDdIfMBPv93iu+e/Gkd6YEnybDD7pp3B6hlmvFzVaN+tQm4DgzwwuQp9HBP2ikgS2EWK0JQ==
-X-Received: by 2002:a05:600c:4f8b:b0:43b:d12a:40e1 with SMTP id 5b1f17b1804b1-43c5a611738mr51923515e9.18.1741455993852;
-        Sat, 08 Mar 2025 09:46:33 -0800 (PST)
+        bh=kplSIE8sz96ksijypwP97suDzWNUGToBxqP/OBlFt5U=;
+        b=fIJ+G7QAet8kMXaQxwJwoJBfhXinxUpft534rYYxpRWHGpXB6pvROgucV+Sp2APtoj
+         tZKrynOjoZoqGVIFmnF0/SFaZFap19xz2xdp8RwyBeKp9HnNzxt/ewOJzw4kcjLICtw2
+         Yc1pPGAjhJNnH2NzW6ifB3hHcls7C99zs2GsjGvRYV20tzpL/xf+mAMz6VEwg5MtYL7D
+         ErEgIbCVSCNNcQxsqHvFVGm+yRgnO34SsukDYnoddpGeYMbWnkAQp5fmIqRqdrvCJatM
+         A1Ckv8yHcJDJLcCk7IFETj6GnfHbMir0i9dVH5P61esQwctXgosdQyA+KBALXQqvJFTG
+         oZsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVTN6wBIpQ5aHzBu0MNHwR+6djJ29C+Zc5Ccuhe+YB6G9WhfGCmEe7mC/Twd6zK6tnADh8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkdAIhQzWsYk9AOQEkPgQcR5CR4TZ8x1hxzQIUkKA/Bmip+okC
+	Jtu6BwHqaWp6+Oe2jTKCIuu1rd3zf9iobYnJOMyD9iP64PbMNdxwZIDbzP0XiW00C4PxgXeH9xH
+	uA5JO9dDjOzDN/L+/fG171EN8RNPJ6k2ruG7zEM7hGwYI7nDzqg==
+X-Gm-Gg: ASbGnctU7ALe2WwNDcR4cXsdyug1ZCargBaqRExrUoq2Z9ZS2San6mQdt3xgnw0rNOv
+	WyPJVNxKzUs4spw+pljALaT152g6ivJk107lsR6RABQv/EVbK9wbh8kAcZZzGmgP7NJa0WGyS2L
+	pxLdsA2+KTbu5WbOvYlyZegNOA8YU/kFuz/tmumrnSSvJ+aImE9ujMxkrhQP2YOUTpzHRKcTQBi
+	9IMAb1RtGiEdn1gWq8dv9Ej8S2lX8mLUw7X7JSF6Fw+rwkSMitllyxhaSxVbPw90czsrhhxGlw7
+	JrUpvBpiCuSv/kQgSgJfdhwS34ZzO2a83PGl0CuKwgqmhVQfiEzGvQ==
+X-Received: by 2002:a05:6000:1f84:b0:390:ec6e:43ea with SMTP id ffacd0b85a97d-3913af060e0mr2540741f8f.15.1741456013521;
+        Sat, 08 Mar 2025 09:46:53 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHACTi5CC9SIWwc1JtKrQyMJgYyvTWI5vSTqG9Fd4mfmKIqRA/AQ7YM1vpgtBxVRDpfYzX5cw==
+X-Received: by 2002:a05:6000:1f84:b0:390:ec6e:43ea with SMTP id ffacd0b85a97d-3913af060e0mr2540721f8f.15.1741456013168;
+        Sat, 08 Mar 2025 09:46:53 -0800 (PST)
 Received: from ?IPV6:2a01:e0a:280:24f0:9db0:474c:ff43:9f5c? ([2a01:e0a:280:24f0:9db0:474c:ff43:9f5c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912c0e2f10sm9437703f8f.65.2025.03.08.09.46.31
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43cec8e1596sm15897565e9.31.2025.03.08.09.46.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 08 Mar 2025 09:46:32 -0800 (PST)
-Message-ID: <870c603c-ead4-4100-a671-0e9c28ab3712@redhat.com>
-Date: Sat, 8 Mar 2025 18:46:31 +0100
+        Sat, 08 Mar 2025 09:46:52 -0800 (PST)
+Message-ID: <ead04114-e666-4cd4-bb9b-2676e7becce2@redhat.com>
+Date: Sat, 8 Mar 2025 18:46:51 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,7 +89,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 07/14] hw/vfio: Compile display.c once
+Subject: Re: [PATCH 09/14] hw/vfio/pci: Convert CONFIG_KVM check to runtime
+ one
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  qemu-devel@nongnu.org
 Cc: Alex Williamson <alex.williamson@redhat.com>,
@@ -111,7 +112,7 @@ Cc: Alex Williamson <alex.williamson@redhat.com>,
  Nicholas Piggin <npiggin@gmail.com>, Halil Pasic <pasic@linux.ibm.com>,
  Christian Borntraeger <borntraeger@linux.ibm.com>
 References: <20250307180337.14811-1-philmd@linaro.org>
- <20250307180337.14811-8-philmd@linaro.org>
+ <20250307180337.14811-10-philmd@linaro.org>
 Content-Language: en-US, fr
 From: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>
 Autocrypt: addr=clg@redhat.com; keydata=
@@ -157,13 +158,13 @@ Autocrypt: addr=clg@redhat.com; keydata=
  HQoPn9qrDJgsgcbBVc1gkUT6hnxShKPp4PlsZVMNjvPAnr5TEBgHkk54HQRhhwcYv1T2QumQ
  izDiU6iOrUzBThaMhZO3i927SG2DwWDVzZltKrCMD1aMPvb3NU8FOYRhNmIFR3fcalYr+9gD
  uVKe8BVz4atMOoktmt0GWTOC8P4=
-In-Reply-To: <20250307180337.14811-8-philmd@linaro.org>
+In-Reply-To: <20250307180337.14811-10-philmd@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 3/7/25 19:03, Philippe Mathieu-Daudé wrote:
-> display.c doesn't rely on target specific definitions,
-> move it to system_ss[] to build it once.
+> Use the runtime kvm_enabled() helper to check whether
+> KVM is available or not.
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 
@@ -176,27 +177,71 @@ C.
 
 
 > ---
->   hw/vfio/meson.build | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
+>   hw/vfio/pci.c | 19 +++++++++----------
+>   1 file changed, 9 insertions(+), 10 deletions(-)
 > 
-> diff --git a/hw/vfio/meson.build b/hw/vfio/meson.build
-> index fea6dbe88cd..96e342aa8cb 100644
-> --- a/hw/vfio/meson.build
-> +++ b/hw/vfio/meson.build
-> @@ -5,7 +5,6 @@ vfio_ss.add(files(
->   ))
->   vfio_ss.add(when: 'CONFIG_PSERIES', if_true: files('spapr.c'))
->   vfio_ss.add(when: 'CONFIG_VFIO_PCI', if_true: files(
-> -  'display.c',
->     'pci-quirks.c',
->     'pci.c',
->   ))
-> @@ -28,3 +27,6 @@ system_ss.add(when: 'CONFIG_VFIO', if_true: files(
->   system_ss.add(when: ['CONFIG_VFIO', 'CONFIG_IOMMUFD'], if_true: files(
->     'iommufd.c',
->   ))
-> +system_ss.add(when: 'CONFIG_VFIO_PCI', if_true: files(
-> +  'display.c',
-> +))
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index fdbc15885d4..9872884ff8a 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -118,8 +118,13 @@ static void vfio_intx_eoi(VFIODevice *vbasedev)
+>   
+>   static bool vfio_intx_enable_kvm(VFIOPCIDevice *vdev, Error **errp)
+>   {
+> -#ifdef CONFIG_KVM
+> -    int irq_fd = event_notifier_get_fd(&vdev->intx.interrupt);
+> +    int irq_fd;
+> +
+> +    if (!kvm_enabled()) {
+> +        return true;
+> +    }
+> +
+> +    irq_fd = event_notifier_get_fd(&vdev->intx.interrupt);
+>   
+>       if (vdev->no_kvm_intx || !kvm_irqfds_enabled() ||
+>           vdev->intx.route.mode != PCI_INTX_ENABLED ||
+> @@ -171,16 +176,13 @@ fail_irqfd:
+>   fail:
+>       qemu_set_fd_handler(irq_fd, vfio_intx_interrupt, NULL, vdev);
+>       vfio_unmask_single_irqindex(&vdev->vbasedev, VFIO_PCI_INTX_IRQ_INDEX);
+> +
+>       return false;
+> -#else
+> -    return true;
+> -#endif
+>   }
+>   
+>   static void vfio_intx_disable_kvm(VFIOPCIDevice *vdev)
+>   {
+> -#ifdef CONFIG_KVM
+> -    if (!vdev->intx.kvm_accel) {
+> +    if (!kvm_enabled() || !vdev->intx.kvm_accel) {
+>           return;
+>       }
+>   
+> @@ -211,7 +213,6 @@ static void vfio_intx_disable_kvm(VFIOPCIDevice *vdev)
+>       vfio_unmask_single_irqindex(&vdev->vbasedev, VFIO_PCI_INTX_IRQ_INDEX);
+>   
+>       trace_vfio_intx_disable_kvm(vdev->vbasedev.name);
+> -#endif
+>   }
+>   
+>   static void vfio_intx_update(VFIOPCIDevice *vdev, PCIINTxRoute *route)
+> @@ -278,7 +279,6 @@ static bool vfio_intx_enable(VFIOPCIDevice *vdev, Error **errp)
+>       vdev->intx.pin = pin - 1; /* Pin A (1) -> irq[0] */
+>       pci_config_set_interrupt_pin(vdev->pdev.config, pin);
+>   
+> -#ifdef CONFIG_KVM
+>       /*
+>        * Only conditional to avoid generating error messages on platforms
+>        * where we won't actually use the result anyway.
+> @@ -287,7 +287,6 @@ static bool vfio_intx_enable(VFIOPCIDevice *vdev, Error **errp)
+>           vdev->intx.route = pci_device_route_intx_to_irq(&vdev->pdev,
+>                                                           vdev->intx.pin);
+>       }
+> -#endif
+>   
+>       ret = event_notifier_init(&vdev->intx.interrupt, 0);
+>       if (ret) {
 
 
