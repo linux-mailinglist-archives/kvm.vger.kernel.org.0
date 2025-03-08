@@ -1,87 +1,87 @@
-Return-Path: <kvm+bounces-40479-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40480-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DEAEA57C6E
-	for <lists+kvm@lfdr.de>; Sat,  8 Mar 2025 18:39:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD7F6A57C71
+	for <lists+kvm@lfdr.de>; Sat,  8 Mar 2025 18:39:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5725F16D23C
-	for <lists+kvm@lfdr.de>; Sat,  8 Mar 2025 17:39:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6C773B1A09
+	for <lists+kvm@lfdr.de>; Sat,  8 Mar 2025 17:39:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 503F61E5B8C;
-	Sat,  8 Mar 2025 17:39:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 978161E5210;
+	Sat,  8 Mar 2025 17:39:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LzPw9Vml"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UU98VcOQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57D7A2A8C1
-	for <kvm@vger.kernel.org>; Sat,  8 Mar 2025 17:39:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1A091E832D
+	for <kvm@vger.kernel.org>; Sat,  8 Mar 2025 17:39:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741455571; cv=none; b=mp4OqeNIAGDolVtXIz1R7cHL/KYTYB8zns0JiPeMuPnSaL4cjNMlIjmzDX9H1cZXcOYsqPTk2pNwjLE1hSGb9lKfzWjClKEodNN4/2VH88Xg6+tv7CStoTTGsz+UF8yEvhcNdfXfqYgnNyR5S5K58r8Tr7AEirCdY+vqXHaYmoE=
+	t=1741455589; cv=none; b=d/M4qQBBknlZG0EpRm6C8drCgxqthMgAHzM6KelKqhEV1jIkSZpoMTehfSIRjHdtMv/G8Q5uPJagqfbAChKUy5A52wBoYML/odlUJM7eKoy7OU3GexwTbpeP+dupf/NzDvVEcBZz5e44z6RvwjU9Ykg/CqRDd0OcbVLOgmnAo9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741455571; c=relaxed/simple;
-	bh=Vyzes6yPodgWtepYJ0kysN1gu/bASh45vII0uVUqWg4=;
+	s=arc-20240116; t=1741455589; c=relaxed/simple;
+	bh=J+SaCPFMc3bFF8JvDnCO33Se7yHilP5YS0DT2q9J+R0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sd5CfIfXAwBBa9Kni+RbTUypuy20r2ziVFgjvnIdi4cTHUC1I6yjooX5KWYKnxQ1V6qRiWRjys+gRuMH6Hf3ljgApXpwvVsiiDE4dLqcuEs2Zp/Lvopoo4XtyU5kY3rOyUoWWWmQoHUXeEW+3UinYkMOCmjgLaCA5l6/UwWwbgA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LzPw9Vml; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=IPAYZ8BVVUPVXv/8/3i08SnVjaCN8yxPTtaxrhoZuxxVxv7yPZVAY910zY3NCLPFcUkIBVx56FqsqKryOP0mJdq8yHY294xRuRWvBxnK9Ju+HNqA9cLEg2x91AjMxbBrHYzJC68z2ZlM/lLypHpa9Xdb5AzQ+r/5uG7ZIwRLKXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UU98VcOQ; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741455568;
+	s=mimecast20190719; t=1741455586;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=qamZfm5imeWTmF4koOCO+jppYPG1NjS3ToLxXEEU9RU=;
-	b=LzPw9Vmlii7eg133US9LSgnxSK4ARffaXhw8lRigUHRaw7kTAARCa6m2SvC+rzFPDflvNC
-	yfj1XbfXKaCOZFjD0s499g++61EN8nhFv0FgSoM1Cr0xZ+byGdaW6bFXcQ4fgpVz8bVknN
-	8fDK9/p2VZy3wjwTmg+3eMfa/jbetQs=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=bGcfUxnZD2BDHLv4HPQl4B+PTJ6sdhEDZmj/JnVgQCA=;
+	b=UU98VcOQg4KW7iYU2PP8A7jhn68SGDGei7ng7YU7u2MOKiVYxBGqirV5rybg11hYR4ghcB
+	jbtmgESy+HBgN0Oe5ba96kg78kYVD66rhutsHrTD8D6AaYXzCD5EWgF09EdBXe6tE6XeLR
+	v+cvzijm/ZT0H+xjp6jLKw0h9R5vDQQ=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-215-wWc91Q1gP0uh4iuQ3Himcw-1; Sat, 08 Mar 2025 12:39:25 -0500
-X-MC-Unique: wWc91Q1gP0uh4iuQ3Himcw-1
-X-Mimecast-MFC-AGG-ID: wWc91Q1gP0uh4iuQ3Himcw_1741455564
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-39130f02631so940999f8f.2
-        for <kvm@vger.kernel.org>; Sat, 08 Mar 2025 09:39:25 -0800 (PST)
+ us-mta-624-Ok1mW20CPuS32D6U7CrKEw-1; Sat, 08 Mar 2025 12:39:43 -0500
+X-MC-Unique: Ok1mW20CPuS32D6U7CrKEw-1
+X-Mimecast-MFC-AGG-ID: Ok1mW20CPuS32D6U7CrKEw_1741455582
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-39123912ff0so1239416f8f.2
+        for <kvm@vger.kernel.org>; Sat, 08 Mar 2025 09:39:43 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741455564; x=1742060364;
+        d=1e100.net; s=20230601; t=1741455582; x=1742060382;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qamZfm5imeWTmF4koOCO+jppYPG1NjS3ToLxXEEU9RU=;
-        b=MEo/knrcZ0ZLz5MIyIYT9sS309izoKXVh3znVf/evuEXeNWQAxBgIclEqy5M8noQQa
-         3hxiAdTmp+EhIzP/wh86lYyLefix6c3i5pj5+hEEPoTUvf8+dzlo/AZvPa1Y9yhfs/oN
-         TFWCRz20nVr6eVEZOcwptTOMZOMJr00WsqqcO7V0D6Fur4ZBMrGlXjSPGTAK1gB34cYi
-         VqcsvkRFvVGfg0a2mB3y8rM0Pj8LhBXzBYuxvtI8oUP7cKPexEb9RJ8h5VltR2sjccF0
-         ZevA25WxTyJR/iw9JlLjyL5web/p7gHu06Fx8rrwxTza3O4MhOLpIbJi/HBFjTFwo3J0
-         WI2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVNSu8hk50Fq/rF5yupiwvCpIHkmSwPkzpnWOF4dFUcKaL5PlfLX8TZvaZnLML3eC8mNws=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxY6ETfbvdXWqTtimtPdEHh6lFf5RhyGvpiH5qSSOks3brPDmVW
-	HN4FjFY6vnNDD9K4Vfc3bj0dOq7u/U8kboNo2Yt3i+gi/4yOwqLQ5jvByAyJKz5cYixBtmbv2ly
-	MYZR50jRrfuSgJJU8dc0Ys7bTNbWlipZao3YYKopiRi880v2hUw==
-X-Gm-Gg: ASbGncvNgGUM6Pcr7WLk7suEtZ7dt9akESLqKEmYol5uKg/H3F0g7HwvmxOCmvCcB09
-	iGxT6QG+oOCvCZ7iv2UkbMwcgNfRwu4XdfWiMWasv+6a68+kEZZZt96+lqDXO+ojaRssfgMtsB9
-	GqsCnEDCClxajhy/4RGdcTzjji5uCvXyJKQ3ZHFRuAdlOUUt8Je5kAOk+x830BhEnl03vNPqk5y
-	SbV1h68sZBpM1QvbDjFEgRbaJGJRasgwMEIq272DHjvtoOCsKommPenGketFUJ1SGzGaYMBRsRj
-	KITgv9Ffpx4FUnP2oHhcavn/f5Knv9hCEFdJMlzMAzVZ40hJ53ZGCA==
-X-Received: by 2002:a05:6000:2ac:b0:390:fdba:ac7 with SMTP id ffacd0b85a97d-39132de18d6mr4678680f8f.51.1741455564363;
-        Sat, 08 Mar 2025 09:39:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEuqOYO3CExg8l7ldlVJ+3eQiEPeO4WHsxPTQMi7nK/ov7zzIVSdYDkHv+lUMQxcS7ZwXMgWQ==
-X-Received: by 2002:a05:6000:2ac:b0:390:fdba:ac7 with SMTP id ffacd0b85a97d-39132de18d6mr4678654f8f.51.1741455563988;
-        Sat, 08 Mar 2025 09:39:23 -0800 (PST)
+        bh=bGcfUxnZD2BDHLv4HPQl4B+PTJ6sdhEDZmj/JnVgQCA=;
+        b=Ty7Te1Sb9TTG4Xb8WfGXhoX4wOPWuzyL1UMlL3oXhQqTaHrWNRyw+Q8Oa8eF/Dd4rU
+         tRG/KA6i8c6URlagJX0/pZrIm0OBY908fAWQsOG/xv7w468VzYHKJ08QoCi0w4HXJ4XY
+         kpDW7sWTwO+4t8GQ2lvclkRUloHh95uipvbM7OrvCTqkYkEmhFDpfX4lOf23VQPWiyXa
+         uczt/f5TU4rvsm0rr4RWifCrQ+H9wxXuxK73HL7H712srR1DsVY8LM0g5pS0uCZWPCQ5
+         xQeboSKplgH27aMhHYiI5kS+/tvW3v2er2ZJ0Lgvdgzf/p71Iq0ZY1Cerv4ft+0d+Z4O
+         qAYw==
+X-Forwarded-Encrypted: i=1; AJvYcCX6PeatSMdSkFLtMKQdlhPezRBW8OYztGxmokMcV13dR7vO1c0kKRESookJT14e5xroHTU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJyPm8hCW1vbHepU7/fOHXTkQMQkYNeRNo8MjdmqetWd8nIUqv
+	OeJzxXSzE5C5e+RK7oB9NrFW/N7HMEuy3S7p2dfG1bPavsu9UL32sRvsTaVKgpzECSm0siGT4qF
+	Ac9Td9CxOj3SPupjA641AMq963ZMjlIRG7TEOLBGPx4ZMIKVF7w==
+X-Gm-Gg: ASbGncvlRrThW9jChlYcggUXKefbyljI7q3TlEad+EYzG0W641weq3ZFy4KQMcRnsS/
+	qBfNy2DdPuPgnljS0Z5QZSrgZZUksWc/6kS1xF91OwHtgZIAfqSMrX4YoiHdpNA0sdzxYxJ1Zbw
+	gQ15mTsco9FRHGyIw9RNUuDWPyo5sHHBZJNtxTQ6vmR4R/D6CxpIcfbd1IBC+mGoMZauiP98f+A
+	yYUK1NQsI+Bt+e+35GnNqPL5hILWyhWSkrr9vPlMfcRscqkea3mUeJQHUNe2pCTBG4/iNS6XBxS
+	dEK5XsOQqGpYIoEUtxBXPmf8HGU9yaPRj1rZ79ZZKCPLvauLdJdM/A==
+X-Received: by 2002:a05:6000:1a87:b0:391:2391:2f79 with SMTP id ffacd0b85a97d-39132d98a8emr5549130f8f.43.1741455582241;
+        Sat, 08 Mar 2025 09:39:42 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGQMbpEoddj0se9YngZ5X8Iyjc8r63xl9sjZbhchD57b60ocj0gTwZgLixwwMk5jxxBRj8O/A==
+X-Received: by 2002:a05:6000:1a87:b0:391:2391:2f79 with SMTP id ffacd0b85a97d-39132d98a8emr5549097f8f.43.1741455581891;
+        Sat, 08 Mar 2025 09:39:41 -0800 (PST)
 Received: from ?IPV6:2a01:e0a:280:24f0:9db0:474c:ff43:9f5c? ([2a01:e0a:280:24f0:9db0:474c:ff43:9f5c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912bfba679sm9273720f8f.8.2025.03.08.09.39.22
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912c103aa5sm9499939f8f.94.2025.03.08.09.39.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 08 Mar 2025 09:39:22 -0800 (PST)
-Message-ID: <822daee8-72b4-4012-a3b4-75543e43f847@redhat.com>
-Date: Sat, 8 Mar 2025 18:39:21 +0100
+        Sat, 08 Mar 2025 09:39:41 -0800 (PST)
+Message-ID: <a24abb3b-d10d-4891-8d1c-e9fafe6eae6a@redhat.com>
+Date: Sat, 8 Mar 2025 18:39:40 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,7 +89,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 02/14] hw/vfio/spapr: Do not include <linux/kvm.h>
+Subject: Re: [PATCH 03/14] hw/vfio: Compile some common objects once
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  qemu-devel@nongnu.org
 Cc: Alex Williamson <alex.williamson@redhat.com>,
@@ -111,7 +111,7 @@ Cc: Alex Williamson <alex.williamson@redhat.com>,
  Nicholas Piggin <npiggin@gmail.com>, Halil Pasic <pasic@linux.ibm.com>,
  Christian Borntraeger <borntraeger@linux.ibm.com>
 References: <20250307180337.14811-1-philmd@linaro.org>
- <20250307180337.14811-3-philmd@linaro.org>
+ <20250307180337.14811-4-philmd@linaro.org>
 Content-Language: en-US, fr
 From: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>
 Autocrypt: addr=clg@redhat.com; keydata=
@@ -157,14 +157,22 @@ Autocrypt: addr=clg@redhat.com; keydata=
  HQoPn9qrDJgsgcbBVc1gkUT6hnxShKPp4PlsZVMNjvPAnr5TEBgHkk54HQRhhwcYv1T2QumQ
  izDiU6iOrUzBThaMhZO3i927SG2DwWDVzZltKrCMD1aMPvb3NU8FOYRhNmIFR3fcalYr+9gD
  uVKe8BVz4atMOoktmt0GWTOC8P4=
-In-Reply-To: <20250307180337.14811-3-philmd@linaro.org>
+In-Reply-To: <20250307180337.14811-4-philmd@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 3/7/25 19:03, Philippe Mathieu-Daudé wrote:
-> <linux/kvm.h> is already include by "system/kvm.h" in the next line.
+> Some files don't rely on any target-specific knowledge
+> and can be compiled once:
+> 
+>   - helpers.c
+>   - container-base.c
+>   - migration.c (removing unnecessary "exec/ram_addr.h")
+>   - migration-multifd.c
+>   - cpr.c
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+
 
 Reviewed-by: Cédric Le Goater <clg@redhat.com>
 
@@ -174,22 +182,50 @@ C.
 
 
 > ---
->   hw/vfio/spapr.c | 3 ---
->   1 file changed, 3 deletions(-)
+>   hw/vfio/migration.c |  1 -
+>   hw/vfio/meson.build | 13 ++++++++-----
+>   2 files changed, 8 insertions(+), 6 deletions(-)
 > 
-> diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
-> index ad4c499eafe..9b5ad05bb1c 100644
-> --- a/hw/vfio/spapr.c
-> +++ b/hw/vfio/spapr.c
-> @@ -11,9 +11,6 @@
->   #include "qemu/osdep.h"
->   #include <sys/ioctl.h>
->   #include <linux/vfio.h>
-> -#ifdef CONFIG_KVM
-> -#include <linux/kvm.h>
-> -#endif
->   #include "system/kvm.h"
->   #include "exec/address-spaces.h"
+> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+> index 416643ddd69..fbff46cfc35 100644
+> --- a/hw/vfio/migration.c
+> +++ b/hw/vfio/migration.c
+> @@ -27,7 +27,6 @@
+>   #include "qapi/error.h"
+>   #include "qapi/qapi-events-vfio.h"
+>   #include "exec/ramlist.h"
+> -#include "exec/ram_addr.h"
+>   #include "pci.h"
+>   #include "trace.h"
+>   #include "hw/hw.h"
+> diff --git a/hw/vfio/meson.build b/hw/vfio/meson.build
+> index 260d65febd6..8e376cfcbf8 100644
+> --- a/hw/vfio/meson.build
+> +++ b/hw/vfio/meson.build
+> @@ -1,12 +1,7 @@
+>   vfio_ss = ss.source_set()
+>   vfio_ss.add(files(
+> -  'helpers.c',
+>     'common.c',
+> -  'container-base.c',
+>     'container.c',
+> -  'migration.c',
+> -  'migration-multifd.c',
+> -  'cpr.c',
+>   ))
+>   vfio_ss.add(when: 'CONFIG_PSERIES', if_true: files('spapr.c'))
+>   vfio_ss.add(when: 'CONFIG_IOMMUFD', if_true: files(
+> @@ -25,3 +20,11 @@ vfio_ss.add(when: 'CONFIG_VFIO_AP', if_true: files('ap.c'))
+>   vfio_ss.add(when: 'CONFIG_VFIO_IGD', if_true: files('igd.c'))
 >   
+>   specific_ss.add_all(when: 'CONFIG_VFIO', if_true: vfio_ss)
+> +
+> +system_ss.add(when: 'CONFIG_VFIO', if_true: files(
+> +  'helpers.c',
+> +  'container-base.c',
+> +  'migration.c',
+> +  'migration-multifd.c',
+> +  'cpr.c',
+> +))
 
 
