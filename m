@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-40509-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40510-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BED52A57FB0
-	for <lists+kvm@lfdr.de>; Sun,  9 Mar 2025 00:10:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40455A57FB1
+	for <lists+kvm@lfdr.de>; Sun,  9 Mar 2025 00:10:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22B25188DD96
-	for <lists+kvm@lfdr.de>; Sat,  8 Mar 2025 23:10:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24A803ABD40
+	for <lists+kvm@lfdr.de>; Sat,  8 Mar 2025 23:10:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5072D204C0E;
-	Sat,  8 Mar 2025 23:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 666A81F9F5C;
+	Sat,  8 Mar 2025 23:10:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mifcYFkb"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JKO2YAF4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B702C1B425C
-	for <kvm@vger.kernel.org>; Sat,  8 Mar 2025 23:10:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF1AE1B425C
+	for <kvm@vger.kernel.org>; Sat,  8 Mar 2025 23:10:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741475418; cv=none; b=YI9NcQtRTNn2Dl/023Q9/TOf/agEZ5UYED+xrr6kaVd4/L1pse3iug7SY/Ru2plbUJLPQmrzUwLgzGVJYdFCeLJ7X4oYZUBWONcFAMt/mguo8p3sWP58O/h67XN7uEMY4wyFm18c7IBYzmpgMbi0L8DDZShLHYLkoDj9XJsoDN4=
+	t=1741475423; cv=none; b=J4DdXvveuXEdE6tF6LOtWecmdE9R7B8wbMDrFsVb7PyeouzDRXpTrBK71h1tyZ5cH//QY0S8cg6NJlZp7dVWpDSMz74ZqEqH8nEv6pnAr5W/enrUwb2/z87ilPciz39u4moaQhAE6gYX70wn7zMtL8F65nFFyY1lI6D6HyjskwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741475418; c=relaxed/simple;
-	bh=fufiwJtrmYk9kZrf6Nj6EkRNSLGh1JbTuh9JKdzh+0w=;
+	s=arc-20240116; t=1741475423; c=relaxed/simple;
+	bh=pSU027guXWV44OJWUo+ZHPch6oXSIyJRktU1hf+rwPE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HB4g+10OAH7SsTm6xV7HJ/W4cjPz/7InsKSgv5+GXVRInX3EZ/+Pm2n+cdiuoKw+dh5HgA8YQCOjybzLkmOCWqwKSijKKVGvw4KwcQ1r3c66KAXQcXi9PqYKdZXXPPaFkIp768ZMpyikcywfBa5JMtk/XJHWETCjn7SxipWMDK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=mifcYFkb; arc=none smtp.client-ip=209.85.128.43
+	 MIME-Version:Content-Type; b=XsGGy9Ze4odfPJ6/6s9fXXTETYI0Qkmp3ITUIOJ0DET+4RXB5NAL/SGSyRdmv4a4iRubA6bgNtMYiKjHJ0gvVPn4C1ebVcUOtEsnqAvhkgKwcITRsJsq0XV+PITlKHiUeDMd7KAccplQvSjIVyfbX3qoaZ2XewXYKf7AEJ+Kqgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=JKO2YAF4; arc=none smtp.client-ip=209.85.221.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43bd03ed604so26020785e9.2
-        for <kvm@vger.kernel.org>; Sat, 08 Mar 2025 15:10:15 -0800 (PST)
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3912c09bea5so2328142f8f.1
+        for <kvm@vger.kernel.org>; Sat, 08 Mar 2025 15:10:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1741475414; x=1742080214; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1741475420; x=1742080220; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UEvdVMyvXjdezRQS+46yXb37w36/326vMxQlDhu7A50=;
-        b=mifcYFkb2grITwgII/fzuA7CSXjQD14LJX1bwc2hgTLSJAzmiIcOuZlPlkB60mdJH/
-         ljnWs1x+BnhNX2S4ZPBM23JswFMolWaVv8KG9wbEj+V8kqlaGCfvqZSBEkRgssKblrjt
-         RQ9JGeGlfOhMJy68aOuO/Xu2jM6mZmktH3tAVyqlY83xQk2OinCgLRTX7FBUO/eHn5RJ
-         7YSTSA1zHLV15GscJHFWxKD2hPxor0g9E1f/zyr3eVOMeNVMsEm/aZk4g7sW3lfRyxDY
-         liB6xOmDs0tWe4QMM4xzEYtgXuE3m2uuLf2++qtuImRK+Z7EqL/PtZnJBG3MDZyWm93f
-         1a5g==
+        bh=GJXNBj0mVkk7ow8GecZF5txwITRLIlUvrzgwdEPrsZI=;
+        b=JKO2YAF4toC2CcOACIFBcsDrU+VQJQ72JaFYRujjY77OXv1yKg3MiEVGAnwpdbTrqN
+         qyq9RT3qi49+27epD2bqSwEMfYygDB3aIFLXHhvlFOiQw3KICoLB6HOe8dVkRRMdCU2f
+         FtDXMAdFahJutAQeciFZWAFQdKuVbhwX7DbWr/Urm2OwsJa83Wu2J3GXo5O486zDX7hN
+         Jl6ieakQOFmHz6ekoKbybhJzOhICY3LI7PiCBB71Ed44GVYpZjzlnnfn6dDOAUZiClq0
+         w7eyOMgNpLaGjTah8sRrd6ulmi6MZjeD87Ukx3PVZw/TQI2hzVKWNJEf7tmcNQGc4car
+         lXrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741475414; x=1742080214;
+        d=1e100.net; s=20230601; t=1741475420; x=1742080220;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UEvdVMyvXjdezRQS+46yXb37w36/326vMxQlDhu7A50=;
-        b=YtebOn17gA2I+euSGpftCyJ64dxgmAHc7Y8H8/9292a0swphWU9rtFMxeUPFpH2L6g
-         k4eQWHkAFpe+siJrrgW/NDC/v9FkJLRP2wrvwFy/STscnWY5ovlMD3TWjaEWyDV6Pbg2
-         IP7ioFE1BVVpKbOSVIue3qpMempJ7IUNCnfE3unt79yaE1tcqrar2D6gjDVEfjBO0KAm
-         GDQ1IsCvBNpNAeC2d0q0Xc0F3HyMV7CkeLk+9LMlfANhfUbswQJoB/I6Xl/l2YmCMOAX
-         dWv7Cr5Cr1TOx8+AGkYOl8NGIA2Gj5wllxEX9oHsl//X9b6fZ2D+w8E8d0xQdtNaXJqD
-         cGTw==
-X-Forwarded-Encrypted: i=1; AJvYcCXMmtFUOgDPgcyXBmV23pFw6xhQH0iW6RQOC3teGlod8kjKEErt5OfKWtyuEKGf3pa1dRE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNtqk1BcmhtlES9D/OZlnFvTjHf5RgZV2HfyC5ZYxMBMYtCvFj
-	5nOvOMYL5Co6WjqpOhQe0tWlCKdO6dfYYpxuR0jioOZuV9r+iCZHZKy6A/DwDPI=
-X-Gm-Gg: ASbGncsQu1TZTucUNcz/SLLCJJTKqumbo5vJpLIU3R7tk85iyta59HMQuxe5PTJ+7oO
-	ZW1dcZSrEOCD2HjgU20nT/oVsSk97+x7UzjwQwVhB5Lim1s1orIUqkH4u85bMbOd0twTyDZZroG
-	B/R22z1+N/pojbZx+uqZakNOtN/LQUp3hrrKq8GjVPVJFMjFJM8Ac8m+aHgHtHoyglwaarAv3wT
-	jD+9ye4HlMq6vSYOpdMwBsrgcVRFW/taZKhO8vbaQxRynosghh+ZVp7928tuPRr3BV8IQjC46C0
-	vMEzWK35uvHX2B2VwwOXpohIF9M2/la94zmPt0OG0BsTn6Hbi/3WPZS32SjRjibHDVppterF34r
-	6ZMHTq6ZpgCFZuCbXTPc=
-X-Google-Smtp-Source: AGHT+IHU+xQMgt3dsdiNnJgEOhNSs6YqxwcUDocahOsxR/CmDr32kZwcNq5kvICgYKsd1qnYF/NWOQ==
-X-Received: by 2002:a05:600c:35d1:b0:439:967b:46fc with SMTP id 5b1f17b1804b1-43c601d9167mr53509045e9.8.1741475414122;
-        Sat, 08 Mar 2025 15:10:14 -0800 (PST)
+        bh=GJXNBj0mVkk7ow8GecZF5txwITRLIlUvrzgwdEPrsZI=;
+        b=Du0oe4Xm8+2YHPcIAYiA2isHyHztS5QV33oGAbvSM7o/baGNY1ZeZ+cNo1mUMZb1uH
+         eaWzLq5temgq31ZJH91G9gOFwkfOK6JufrnNUot6bvcK1mQmjEvdte3ZMnn1QZn5GAdH
+         GHOHOaDxrT7zP4UnFLr7vGdxUSqpyHJ6qpMYqC/VR7HzaJBzK1pO2CZojDCATWAvFJB0
+         9SSLkYJVh6E41G/t1rb2UsEy2dFuhRUxc60H0wj7FcADmMZmWCoD3NeeaV7LQUZ00u64
+         PVk/mOA9fKvDXAwnj3x8kpN/ERTUEqkdZMJ6O7sujas0nIrM5ZSKHXIPIf9zi8Mnn24P
+         sIqA==
+X-Forwarded-Encrypted: i=1; AJvYcCWggkx9XRUs+vLOjfaziTTLfg28RYCg7EeoPYSK5cCQVThX6PsAUGDrGnOleUf7oBsmKQg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLnx2TMDEcFqP/ENWxIpfEu8pBdRPiQoIXXKqUF/QOvQ0UMYkI
+	4tjHgbcQeMhFZjF+0cFL0r7UWELM370cjmpGawkG2D/7i1yCw0ExPKnp9UFCuWA=
+X-Gm-Gg: ASbGncuoebW6elEJEZLqqtLlLosQB8HbcNreJTFvxdwDBa6udlmUYAMbCEFjf61xjSg
+	SVgziMNlCGTjXmV5nsp1LKvNKq4HLnYgTP6KawbfifCTslwgDn85RfDfK2+nkBuqE9B8qTjPMVs
+	7NFqCP7gS0or6NSIkgg/FxzakgPU/Y3OkaAgr6qtI+rtZt7bDg6ZbrH8EaXQDu1o5rI6thY+4sV
+	DgDo5vYiv0DcxIfXtjng8bMlyrF4k8T2R5R1FwjwncvFWBRi/A7AxUIaWXaDZgQIVXlMxnSuyPR
+	Oqk3bUk0U7eYutZmoA/rH0BL6U0bueRkvxSPC/7xPhPNKr+M5F6Fwwh5szl6dSjapWoH0KYOfku
+	Xz34+vhk/s2LDww5iPYuIXJnUVG2zaQ==
+X-Google-Smtp-Source: AGHT+IHQgGDKYnpS8cvxChOVuSZsAjnTKah2viEVS9oNKXufBZ9Ckl/6tU+y5xvoKE6/Q1ES0ORdxg==
+X-Received: by 2002:a05:6000:1545:b0:391:2ba9:4c51 with SMTP id ffacd0b85a97d-39132d98bb8mr5365371f8f.44.1741475420168;
+        Sat, 08 Mar 2025 15:10:20 -0800 (PST)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ceef2fb8dsm14915575e9.18.2025.03.08.15.10.12
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912c0e4065sm10260184f8f.62.2025.03.08.15.10.17
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sat, 08 Mar 2025 15:10:13 -0800 (PST)
+        Sat, 08 Mar 2025 15:10:19 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Yi Liu <yi.l.liu@intel.com>,
@@ -105,9 +105,9 @@ Cc: Yi Liu <yi.l.liu@intel.com>,
 	=?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
 	Richard Henderson <richard.henderson@linaro.org>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH v2 09/21] hw/vfio/pci: Convert CONFIG_KVM check to runtime one
-Date: Sun,  9 Mar 2025 00:09:05 +0100
-Message-ID: <20250308230917.18907-10-philmd@linaro.org>
+Subject: [PATCH v2 10/21] qom: Introduce type_is_registered()
+Date: Sun,  9 Mar 2025 00:09:06 +0100
+Message-ID: <20250308230917.18907-11-philmd@linaro.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250308230917.18907-1-philmd@linaro.org>
 References: <20250308230917.18907-1-philmd@linaro.org>
@@ -120,80 +120,50 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Use the runtime kvm_enabled() helper to check whether
-KVM is available or not.
+In order to be able to check whether a QOM type has been
+registered, introduce the type_is_registered() helper.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Cédric Le Goater <clg@redhat.com>
 ---
- hw/vfio/pci.c | 19 +++++++++----------
- 1 file changed, 9 insertions(+), 10 deletions(-)
+ include/qom/object.h | 8 ++++++++
+ qom/object.c         | 5 +++++
+ 2 files changed, 13 insertions(+)
 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index fdbc15885d4..9872884ff8a 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -118,8 +118,13 @@ static void vfio_intx_eoi(VFIODevice *vbasedev)
+diff --git a/include/qom/object.h b/include/qom/object.h
+index 9192265db76..5b5333017e0 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -898,6 +898,14 @@ Type type_register_static(const TypeInfo *info);
+  */
+ void type_register_static_array(const TypeInfo *infos, int nr_infos);
  
- static bool vfio_intx_enable_kvm(VFIOPCIDevice *vdev, Error **errp)
- {
--#ifdef CONFIG_KVM
--    int irq_fd = event_notifier_get_fd(&vdev->intx.interrupt);
-+    int irq_fd;
++/**
++ * type_is_registered:
++ * @typename: The @typename to check.
++ *
++ * Returns: %true if @typename has been registered, %false otherwise.
++ */
++bool type_is_registered(const char *typename);
 +
-+    if (!kvm_enabled()) {
-+        return true;
-+    }
-+
-+    irq_fd = event_notifier_get_fd(&vdev->intx.interrupt);
- 
-     if (vdev->no_kvm_intx || !kvm_irqfds_enabled() ||
-         vdev->intx.route.mode != PCI_INTX_ENABLED ||
-@@ -171,16 +176,13 @@ fail_irqfd:
- fail:
-     qemu_set_fd_handler(irq_fd, vfio_intx_interrupt, NULL, vdev);
-     vfio_unmask_single_irqindex(&vdev->vbasedev, VFIO_PCI_INTX_IRQ_INDEX);
-+
-     return false;
--#else
--    return true;
--#endif
+ /**
+  * DEFINE_TYPES:
+  * @type_array: The array containing #TypeInfo structures to register
+diff --git a/qom/object.c b/qom/object.c
+index 01618d06bd8..be442980049 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -100,6 +100,11 @@ static TypeImpl *type_table_lookup(const char *name)
+     return g_hash_table_lookup(type_table_get(), name);
  }
  
- static void vfio_intx_disable_kvm(VFIOPCIDevice *vdev)
++bool type_is_registered(const char *typename)
++{
++    return !!type_table_lookup(typename);
++}
++
+ static TypeImpl *type_new(const TypeInfo *info)
  {
--#ifdef CONFIG_KVM
--    if (!vdev->intx.kvm_accel) {
-+    if (!kvm_enabled() || !vdev->intx.kvm_accel) {
-         return;
-     }
- 
-@@ -211,7 +213,6 @@ static void vfio_intx_disable_kvm(VFIOPCIDevice *vdev)
-     vfio_unmask_single_irqindex(&vdev->vbasedev, VFIO_PCI_INTX_IRQ_INDEX);
- 
-     trace_vfio_intx_disable_kvm(vdev->vbasedev.name);
--#endif
- }
- 
- static void vfio_intx_update(VFIOPCIDevice *vdev, PCIINTxRoute *route)
-@@ -278,7 +279,6 @@ static bool vfio_intx_enable(VFIOPCIDevice *vdev, Error **errp)
-     vdev->intx.pin = pin - 1; /* Pin A (1) -> irq[0] */
-     pci_config_set_interrupt_pin(vdev->pdev.config, pin);
- 
--#ifdef CONFIG_KVM
-     /*
-      * Only conditional to avoid generating error messages on platforms
-      * where we won't actually use the result anyway.
-@@ -287,7 +287,6 @@ static bool vfio_intx_enable(VFIOPCIDevice *vdev, Error **errp)
-         vdev->intx.route = pci_device_route_intx_to_irq(&vdev->pdev,
-                                                         vdev->intx.pin);
-     }
--#endif
- 
-     ret = event_notifier_init(&vdev->intx.interrupt, 0);
-     if (ret) {
+     TypeImpl *ti = g_malloc0(sizeof(*ti));
 -- 
 2.47.1
 
