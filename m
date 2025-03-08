@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-40510-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40511-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40455A57FB1
-	for <lists+kvm@lfdr.de>; Sun,  9 Mar 2025 00:10:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A842A57FB2
+	for <lists+kvm@lfdr.de>; Sun,  9 Mar 2025 00:10:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24A803ABD40
-	for <lists+kvm@lfdr.de>; Sat,  8 Mar 2025 23:10:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 163AD3AB914
+	for <lists+kvm@lfdr.de>; Sat,  8 Mar 2025 23:10:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 666A81F9F5C;
-	Sat,  8 Mar 2025 23:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A32A520D50D;
+	Sat,  8 Mar 2025 23:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JKO2YAF4"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l4WB1w6R"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF1AE1B425C
-	for <kvm@vger.kernel.org>; Sat,  8 Mar 2025 23:10:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6BE1B425C
+	for <kvm@vger.kernel.org>; Sat,  8 Mar 2025 23:10:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741475423; cv=none; b=J4DdXvveuXEdE6tF6LOtWecmdE9R7B8wbMDrFsVb7PyeouzDRXpTrBK71h1tyZ5cH//QY0S8cg6NJlZp7dVWpDSMz74ZqEqH8nEv6pnAr5W/enrUwb2/z87ilPciz39u4moaQhAE6gYX70wn7zMtL8F65nFFyY1lI6D6HyjskwU=
+	t=1741475428; cv=none; b=nh0pt6qpZ7bCSPg0fAabk1Oww4lIge+2etXCrswj1hotkDOQyV0s0VwadYdKjSoZciczrSMpP+pcxkrAh2U0be00dLs0pYwsu25twjIaftAhOIKdYHUExDS9F7NJZlfBB9dInIdYyyWiZwB68nK3Ce+62DMWGIqF8/Y18vTpxSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741475423; c=relaxed/simple;
-	bh=pSU027guXWV44OJWUo+ZHPch6oXSIyJRktU1hf+rwPE=;
+	s=arc-20240116; t=1741475428; c=relaxed/simple;
+	bh=elWpsIOnV0p3LFy4LnL/vFxjO0MGaJh5o5Tte1c4oC8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XsGGy9Ze4odfPJ6/6s9fXXTETYI0Qkmp3ITUIOJ0DET+4RXB5NAL/SGSyRdmv4a4iRubA6bgNtMYiKjHJ0gvVPn4C1ebVcUOtEsnqAvhkgKwcITRsJsq0XV+PITlKHiUeDMd7KAccplQvSjIVyfbX3qoaZ2XewXYKf7AEJ+Kqgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=JKO2YAF4; arc=none smtp.client-ip=209.85.221.54
+	 MIME-Version:Content-Type; b=VGu75z8lXAp1+gh3/YB361kMINuIrJViOuTCSghMiykasVNMgeD+NU7XeYTTqRIAKo3imjt2Rv1ys2a9dl35Gw7dwnzZu/YMMjCwFqYR4weJ5xmiYgfpH+73L4sZ3zhvRAtaXIzs77Yfd+4liI7wQLNBRTJ8gG7ARkiVA1ou4ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=l4WB1w6R; arc=none smtp.client-ip=209.85.128.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3912c09bea5so2328142f8f.1
-        for <kvm@vger.kernel.org>; Sat, 08 Mar 2025 15:10:21 -0800 (PST)
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43bcc04d4fcso17916375e9.2
+        for <kvm@vger.kernel.org>; Sat, 08 Mar 2025 15:10:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1741475420; x=1742080220; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1741475425; x=1742080225; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GJXNBj0mVkk7ow8GecZF5txwITRLIlUvrzgwdEPrsZI=;
-        b=JKO2YAF4toC2CcOACIFBcsDrU+VQJQ72JaFYRujjY77OXv1yKg3MiEVGAnwpdbTrqN
-         qyq9RT3qi49+27epD2bqSwEMfYygDB3aIFLXHhvlFOiQw3KICoLB6HOe8dVkRRMdCU2f
-         FtDXMAdFahJutAQeciFZWAFQdKuVbhwX7DbWr/Urm2OwsJa83Wu2J3GXo5O486zDX7hN
-         Jl6ieakQOFmHz6ekoKbybhJzOhICY3LI7PiCBB71Ed44GVYpZjzlnnfn6dDOAUZiClq0
-         w7eyOMgNpLaGjTah8sRrd6ulmi6MZjeD87Ukx3PVZw/TQI2hzVKWNJEf7tmcNQGc4car
-         lXrA==
+        bh=OAApOfCWWikXdcBm+45ltUmeOBmLQGFruMZPHaiGOZ8=;
+        b=l4WB1w6RxIj1XfV8FitOLA8BtSlVL3OR4eW43OBstDDECzWe2v7fmrNghHANYpB4l/
+         Nj+kZltdalxMwhKu8yk2tN8xy67Iv0Z+ABO3CZffJ2xjZkSVdll0nYllmYd1ts6bVTu7
+         gdV9pZBXVh51kvDVMkzAcUrZ+Q2d2+huDC3tbIw1Bv9ldF+BMeydFFCDLzWYvxu/Z1iH
+         4aDIv90zAXeqAqMF1X6ChgRikKZi+xIsSbKmSjlraPDl0MyzYRjhj/dq5teDe5uLhOl9
+         BGf9yx4tfPsXkKMw+0FuiFsM1TRJ6hqtKbF0it7T4IFmc3ttgk44QgblqViCiADlq0D6
+         s4MA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741475420; x=1742080220;
+        d=1e100.net; s=20230601; t=1741475425; x=1742080225;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GJXNBj0mVkk7ow8GecZF5txwITRLIlUvrzgwdEPrsZI=;
-        b=Du0oe4Xm8+2YHPcIAYiA2isHyHztS5QV33oGAbvSM7o/baGNY1ZeZ+cNo1mUMZb1uH
-         eaWzLq5temgq31ZJH91G9gOFwkfOK6JufrnNUot6bvcK1mQmjEvdte3ZMnn1QZn5GAdH
-         GHOHOaDxrT7zP4UnFLr7vGdxUSqpyHJ6qpMYqC/VR7HzaJBzK1pO2CZojDCATWAvFJB0
-         9SSLkYJVh6E41G/t1rb2UsEy2dFuhRUxc60H0wj7FcADmMZmWCoD3NeeaV7LQUZ00u64
-         PVk/mOA9fKvDXAwnj3x8kpN/ERTUEqkdZMJ6O7sujas0nIrM5ZSKHXIPIf9zi8Mnn24P
-         sIqA==
-X-Forwarded-Encrypted: i=1; AJvYcCWggkx9XRUs+vLOjfaziTTLfg28RYCg7EeoPYSK5cCQVThX6PsAUGDrGnOleUf7oBsmKQg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLnx2TMDEcFqP/ENWxIpfEu8pBdRPiQoIXXKqUF/QOvQ0UMYkI
-	4tjHgbcQeMhFZjF+0cFL0r7UWELM370cjmpGawkG2D/7i1yCw0ExPKnp9UFCuWA=
-X-Gm-Gg: ASbGncuoebW6elEJEZLqqtLlLosQB8HbcNreJTFvxdwDBa6udlmUYAMbCEFjf61xjSg
-	SVgziMNlCGTjXmV5nsp1LKvNKq4HLnYgTP6KawbfifCTslwgDn85RfDfK2+nkBuqE9B8qTjPMVs
-	7NFqCP7gS0or6NSIkgg/FxzakgPU/Y3OkaAgr6qtI+rtZt7bDg6ZbrH8EaXQDu1o5rI6thY+4sV
-	DgDo5vYiv0DcxIfXtjng8bMlyrF4k8T2R5R1FwjwncvFWBRi/A7AxUIaWXaDZgQIVXlMxnSuyPR
-	Oqk3bUk0U7eYutZmoA/rH0BL6U0bueRkvxSPC/7xPhPNKr+M5F6Fwwh5szl6dSjapWoH0KYOfku
-	Xz34+vhk/s2LDww5iPYuIXJnUVG2zaQ==
-X-Google-Smtp-Source: AGHT+IHQgGDKYnpS8cvxChOVuSZsAjnTKah2viEVS9oNKXufBZ9Ckl/6tU+y5xvoKE6/Q1ES0ORdxg==
-X-Received: by 2002:a05:6000:1545:b0:391:2ba9:4c51 with SMTP id ffacd0b85a97d-39132d98bb8mr5365371f8f.44.1741475420168;
-        Sat, 08 Mar 2025 15:10:20 -0800 (PST)
+        bh=OAApOfCWWikXdcBm+45ltUmeOBmLQGFruMZPHaiGOZ8=;
+        b=mI1ONnVxU19OLbgPxB2S7Uxwv8JM0YLepG3731LVinVfVdr6xWpEB8GHgHngzspLvI
+         aGWJze0qrSWd+6BHp6r0xaZJuSpqEZnL/WhS/zsVOxpfmtHKR5z5E3HePc637rK89Uat
+         YZDu1EmdW9OXw0aBmJQuOBTSjDVZeTdyBdzXL7jmgsAwrFU+6q6o5ohfRj2raaCTz4Cp
+         aV8wznq8rpdbfVTsn4I5bgUxSihIRnvFLJmUYT0MqnCRVovEWyppYPi8FIENhZlqa5tZ
+         l1GM8/4fHU6HO/AnNJfx1fZwCFIdZGgV3gztv9PsGZ2qGTBqDkreoKRqo2BGz4CZVRfj
+         Mkyw==
+X-Forwarded-Encrypted: i=1; AJvYcCX6nmDNmsg3BDeD09eQavqTLCjvbl1R15mXdf5pG9OL2DjtT0u66ijwDKdCAeq49kp1OOA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2SEzop4WJwkYs5Eno/732ht6qQSDAn87tceEShZOp4R5TXSlU
+	aCvmJo586mY/j+GzfpDhmU3C8OMECGaOwtQvm4c7J2YCEjGjvbQ7AnNzhl6PJp0=
+X-Gm-Gg: ASbGncuk6qvWKpyF/CoknIiRpLpfOOPXFK4MhuOLlHNAGQpy/90OxjUTW+LKPwmZqNS
+	0fLpiSsEX7lYzZphyY+uWBmGE10MQhYwc7J8mZPHlmaggUzk6ab05YQhA49fSRVNKKeExJxCwUg
+	plACNLqTAl5aCW1sx6+KrIzQHhxPSakiz6XQ3JNGdIL35uNFiUzhqdMkeDc9QrGoi77lU5jFwth
+	wlNZKkPTfCBKaXIgYtwmYkn+FfpTjkQ2PQD1ZXbm3HKWwhtQFZseCfKOMeThpuwGa98czGoHT4q
+	q9SYWJx4ZMp4gBOY3LEMsxZttGD4LRHsG1VdyAZPnd8xf7CWSDgUkjayLvXfY4c3nNz3EaOYVbF
+	DUhVY46jxlDYk+SZ76zc=
+X-Google-Smtp-Source: AGHT+IEsdUpzC3vvzIbC6qsVM93qE5A0/3sv2x9KGYFFRAItc0/EzKZy6rlmtqCICch1ekTW0tHDTg==
+X-Received: by 2002:a05:600c:3b1a:b0:43b:c541:51d3 with SMTP id 5b1f17b1804b1-43c601cfe2cmr50795605e9.6.1741475425507;
+        Sat, 08 Mar 2025 15:10:25 -0800 (PST)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912c0e4065sm10260184f8f.62.2025.03.08.15.10.17
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ceaac390bsm30320235e9.35.2025.03.08.15.10.24
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sat, 08 Mar 2025 15:10:19 -0800 (PST)
+        Sat, 08 Mar 2025 15:10:25 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Yi Liu <yi.l.liu@intel.com>,
@@ -105,9 +105,9 @@ Cc: Yi Liu <yi.l.liu@intel.com>,
 	=?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
 	Richard Henderson <richard.henderson@linaro.org>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH v2 10/21] qom: Introduce type_is_registered()
-Date: Sun,  9 Mar 2025 00:09:06 +0100
-Message-ID: <20250308230917.18907-11-philmd@linaro.org>
+Subject: [PATCH v2 11/21] hw/vfio/igd: Define TYPE_VFIO_PCI_IGD_LPC_BRIDGE
+Date: Sun,  9 Mar 2025 00:09:07 +0100
+Message-ID: <20250308230917.18907-12-philmd@linaro.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250308230917.18907-1-philmd@linaro.org>
 References: <20250308230917.18907-1-philmd@linaro.org>
@@ -120,50 +120,49 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-In order to be able to check whether a QOM type has been
-registered, introduce the type_is_registered() helper.
+Define TYPE_VFIO_PCI_IGD_LPC_BRIDGE once to help
+following where the QOM type is used in the code.
+We'll use it once more in the next commit.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- include/qom/object.h | 8 ++++++++
- qom/object.c         | 5 +++++
- 2 files changed, 13 insertions(+)
+ hw/vfio/pci-quirks.h | 2 ++
+ hw/vfio/igd.c        | 4 ++--
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index 9192265db76..5b5333017e0 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -898,6 +898,14 @@ Type type_register_static(const TypeInfo *info);
-  */
- void type_register_static_array(const TypeInfo *infos, int nr_infos);
+diff --git a/hw/vfio/pci-quirks.h b/hw/vfio/pci-quirks.h
+index d1532e379b1..fdaa81f00aa 100644
+--- a/hw/vfio/pci-quirks.h
++++ b/hw/vfio/pci-quirks.h
+@@ -69,4 +69,6 @@ typedef struct VFIOConfigMirrorQuirk {
  
-+/**
-+ * type_is_registered:
-+ * @typename: The @typename to check.
-+ *
-+ * Returns: %true if @typename has been registered, %false otherwise.
-+ */
-+bool type_is_registered(const char *typename);
+ extern const MemoryRegionOps vfio_generic_mirror_quirk;
+ 
++#define TYPE_VFIO_PCI_IGD_LPC_BRIDGE "vfio-pci-igd-lpc-bridge"
 +
- /**
-  * DEFINE_TYPES:
-  * @type_array: The array containing #TypeInfo structures to register
-diff --git a/qom/object.c b/qom/object.c
-index 01618d06bd8..be442980049 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -100,6 +100,11 @@ static TypeImpl *type_table_lookup(const char *name)
-     return g_hash_table_lookup(type_table_get(), name);
+ #endif /* HW_VFIO_VFIO_PCI_QUIRKS_H */
+diff --git a/hw/vfio/igd.c b/hw/vfio/igd.c
+index b1a237edd66..1fd3c4ef1d0 100644
+--- a/hw/vfio/igd.c
++++ b/hw/vfio/igd.c
+@@ -262,7 +262,7 @@ static void vfio_pci_igd_lpc_bridge_class_init(ObjectClass *klass, void *data)
  }
  
-+bool type_is_registered(const char *typename)
-+{
-+    return !!type_table_lookup(typename);
-+}
-+
- static TypeImpl *type_new(const TypeInfo *info)
- {
-     TypeImpl *ti = g_malloc0(sizeof(*ti));
+ static const TypeInfo vfio_pci_igd_lpc_bridge_info = {
+-    .name = "vfio-pci-igd-lpc-bridge",
++    .name = TYPE_VFIO_PCI_IGD_LPC_BRIDGE,
+     .parent = TYPE_PCI_DEVICE,
+     .class_init = vfio_pci_igd_lpc_bridge_class_init,
+     .interfaces = (InterfaceInfo[]) {
+@@ -524,7 +524,7 @@ void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+     lpc_bridge = pci_find_device(pci_device_root_bus(&vdev->pdev),
+                                  0, PCI_DEVFN(0x1f, 0));
+     if (lpc_bridge && !object_dynamic_cast(OBJECT(lpc_bridge),
+-                                           "vfio-pci-igd-lpc-bridge")) {
++                                           TYPE_VFIO_PCI_IGD_LPC_BRIDGE)) {
+         error_report("IGD device %s cannot support legacy mode due to existing "
+                      "devices at address 1f.0", vdev->vbasedev.name);
+         return;
 -- 
 2.47.1
 
