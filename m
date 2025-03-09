@@ -1,177 +1,191 @@
-Return-Path: <kvm+bounces-40522-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40523-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69DDDA58038
-	for <lists+kvm@lfdr.de>; Sun,  9 Mar 2025 02:10:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7FCEA5816F
+	for <lists+kvm@lfdr.de>; Sun,  9 Mar 2025 09:07:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F0CB16D857
-	for <lists+kvm@lfdr.de>; Sun,  9 Mar 2025 01:10:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B21063AAC5A
+	for <lists+kvm@lfdr.de>; Sun,  9 Mar 2025 08:07:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A16AD1A28D;
-	Sun,  9 Mar 2025 01:10:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 700D718CC1D;
+	Sun,  9 Mar 2025 08:07:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZkeaAeZP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T8SiOuTQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5477C4A0F
-	for <kvm@vger.kernel.org>; Sun,  9 Mar 2025 01:10:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C70202DF68
+	for <kvm@vger.kernel.org>; Sun,  9 Mar 2025 08:07:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741482604; cv=none; b=EE+NxLxkMo/Ir0JxpCdx9I3pE2rfvyoerZvMRr1Y9oUi6nutY7lVrgxW5HO/QE0VImaLbuU/KbGFWqPJnotffBtZtYEFvH2O6sSq1ukUGlecs5lwYbqJnevvgoYVY/S06ZHd/Nz6Jk8Lh0PwTTPBFnsmiX8WPsItaPGO0gLEXBA=
+	t=1741507652; cv=none; b=uoK2vCj+RWW8TEU4ibueN2s6YUW23OtmBAcNBqVTzsMNAYrJ27lIk8BYEozogukV0umqlsEMHdBeXKIVBQE/tBvIaGP0FBG0kIKe/wrUO5k6RFyU8GKNch0NLaA8JRcKgfv/aGjeJvsfkmWrN/bJ2kL0js06NtfF7tDirxgoyCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741482604; c=relaxed/simple;
-	bh=EMETro1CBymXxo+PkEzv8CVP78iq4oJXIfSe7eI5Prs=;
+	s=arc-20240116; t=1741507652; c=relaxed/simple;
+	bh=99NEVqvBP5TRbaKk01Oc0W/ttk9cc30UFtifsXasBuM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CYhYdsFOT/TBcXUVocSH0DyNdWI99Hj6WKkNIf1bhb0IErY1zciy4atnEKgWz8XG6XKCnK+pUzC8pArTdXAQh72PEZkw40NiqnHcLoAF7JJSRY7+OXIt0w2YL+8ytvlD/DiGK4hGrzYNzgjhj3vERHqtKFd/PaClLdSBkjvWIhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZkeaAeZP; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2242aca53efso104285ad.1
-        for <kvm@vger.kernel.org>; Sat, 08 Mar 2025 17:10:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741482603; x=1742087403; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r4FPh8cAnZtQW5ZPsNxGskEY/OiXTs4MuYAjZb1WM+U=;
-        b=ZkeaAeZPQ7WHdS2CK/13f0SEVvcCYLu7iFqUHpgPI9PUXmfMGxlkjOcbxwXzH2lFCR
-         ovavEJ2ReX0jD9uYyfg/h38rnF0bL7psOnlHjBaK+Ifvws3KFBbq1MBhToPtu0xMtCOj
-         CrWFlxncNE9PduzEtAg/Po7be/sguR0izvT5IlYtKBRA33AjsH2KBMWs19HaUKqf885Y
-         WYSV5a6/ixvWL06uvYbyJprsommeTLNrtIxe5j5H/NLQqGVG7r0U9Ldu1IbIzBT4LqRe
-         mRuyhdW4m180pcxrMO5wyUY+KA7rnffBmCaYBRx2/gWu2yhiXK5lfipt9RJT1k8t2OLv
-         DW4Q==
+	 To:Cc:Content-Type; b=MZaKdZY0cI+7/iceAKzrZSx5c4XJBia1XxoFX5OF/t9r6iRzWANWouiBmDg4nnp1UdbvCSnQhhbNobsF6E+7uDFJ4hGWODONX6kYEX4xrXcrg1sle95mrclucAoMnkSDBi+DcAqG9AQuYKW3vl3eY27eMROopaS75FYExX5KY1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T8SiOuTQ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741507649;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bMxc923CRiMks37b+Jjb8HyITgLj/wOpsi581iiQzTY=;
+	b=T8SiOuTQQ0T6Rb19uqgfHMwOjjxc0udWW/JB8b5Mxlnyzlo4dZUDH46pTkQxF3CtwxgH03
+	wOXH8ZwbAY8V/RQYqKvGM8uAxgO2+n2JWNlM4Us5a3+bbtmHOO25aOupaLOrdRB7IDE2cj
+	5xHqzo9Qush9bjNdyWqIt18Fsl5ZPx0=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-286-LDMkTRLvM_G-5HZA4Cd8ng-1; Sun, 09 Mar 2025 04:07:28 -0400
+X-MC-Unique: LDMkTRLvM_G-5HZA4Cd8ng-1
+X-Mimecast-MFC-AGG-ID: LDMkTRLvM_G-5HZA4Cd8ng_1741507647
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3913f546dfbso488578f8f.1
+        for <kvm@vger.kernel.org>; Sun, 09 Mar 2025 00:07:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741482603; x=1742087403;
+        d=1e100.net; s=20230601; t=1741507645; x=1742112445;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=r4FPh8cAnZtQW5ZPsNxGskEY/OiXTs4MuYAjZb1WM+U=;
-        b=pCu+VE57bC3e5qCc7X8h0IPll1V1eToYfE1VZcMKc3zjfB8znzE6RhVt1b45+Loc4y
-         m4VfmaRkFcpd3xQj4u3iqQHChXTFug/zmucMv1dESJmu3WvWh8VahMdFRu+Zb7e24MLe
-         YUhGUMAWIK0QaXLYB6NQE9Je9Tf8zG+xgsvsUiiTH1A499mV+Tzn7rjJHb+mWoxEKyvm
-         PAtWsDtWM0VtSCXLR+m3/m1inn1gqM64apJ2+jVm/zumdtZljGdtd6lbGL3e8JmGuJIl
-         Vz4ChfAdfTZQFO3xKcmWgIzXoDPPILKeKXCnKe+0EOY91YCtOuGLz0hX5mbJlOLrtKZ+
-         hKEw==
-X-Forwarded-Encrypted: i=1; AJvYcCUMzGPHcN4xLaV8GmSyGAsKD2NlKnUzv/fr+wqpsh+EdXVNoSuiQgWBC0CGACa7urkjqcs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4ANiyqFEm6xI5SaoRIgHh/nHPueY5CjE4X8aDS90+gBS0f3hU
-	XeukeVDT7tmVfpLcFzVIzm5BQAcj//9YH7ExMWjCRI2+0h9hn3BOIbuL9iTnNn+NspELlrgL5cc
-	w9MUoUzZTS3WBT0Z2u623cvYhgxsJWR+DR8Wp
-X-Gm-Gg: ASbGnctgFMqHYRm9cjVQlXaIkkRchJOWsW+pfdDSCp4buFMpY+CwG+SGTqBSz7cHQE0
-	f6JyHo7OmT3vLmo9pjuTXpxleiuu2XeYgS79uekP3B3V1WN/tntTjpQEM4VvDeMXBJeaKanRgCm
-	BQAcHHyz2LzQWQ3/93M6s6SSlM0ZZUvh/E1RUPQ2SH+UCtoYXK/D0KZocoiw==
-X-Google-Smtp-Source: AGHT+IFSArhJYsv3zVVqv8OWZu8TOBKIMea4fF5APrE5l+oYIst19Piwk29+HWLQWw6zl3b0tZUthbrcWcdq34ooI38=
-X-Received: by 2002:a17:903:32c7:b0:21f:56e5:daee with SMTP id
- d9443c01a7336-22540e5a9aemr1979785ad.6.1741482602144; Sat, 08 Mar 2025
- 17:10:02 -0800 (PST)
+        bh=bMxc923CRiMks37b+Jjb8HyITgLj/wOpsi581iiQzTY=;
+        b=VBnUTfhwMs00mh24wmL6cwaCXvF8onL+H2Axw0Zm9NpYQk4gPVK9akvG1hHcs31vPf
+         GOtP1eKFPPyeL1AZFmZ3w2SSvFp58aWcAADkQpob2ytWSyaEI4B38rNXFqSSskz2pHIa
+         h2maaZqSjsI12wWONVZch1mYDvmxrpXtiIQ55IySzmLKUAqQR+Cmdf/U/tljl5/CJmv9
+         efJ5YPWX1lZt+/6i/YHvoJXvdw0GZTYPIjrX0MdjjJixHo7xQWAiOQXpHrEaI0gsaNnV
+         2/3DQ14o8ROuuv+NjWydqmz4uWCLR7kt5Y9P49bdtyLmb9YT58RmH9meHFgZ7zeAh+6y
+         /6Qw==
+X-Gm-Message-State: AOJu0YwWaCXYe0/CG2mJQV8uR/m1m8fPtujgliGke5mC9RV6u8XTAbSU
+	gF2aqEFKZ7P9piaLcQ7KsuYHX1as7Cy2UpMRcPgbG+NKkVGLH8La2bXsRXx/teDiDcLLWykbSVQ
+	bzjc+wMhmrG/9EZ3s00TKE70Dv6cJ4+JFbx97lYk2sNlaWbV70/lLb/txDJM3kouzXiSvUTXisJ
+	mVw27X62EPf4GJ6MP4L7awMQV8+3D4J1QV44I=
+X-Gm-Gg: ASbGncs5U+ca7dcJrtrfjRnErbn2NmISGnMcg/M55IyNNA2qslHMu7GVBbCQpLCGcPX
+	h1HYRE/Cna0+5CA7bMoNyJqNdKReHFBTVkF5QBujz2+G1OshEo5Md4T9vWDyeQtKGMbco3J6Gyg
+	==
+X-Received: by 2002:a05:6000:4102:b0:391:487f:27e7 with SMTP id ffacd0b85a97d-391487f2b5amr87714f8f.55.1741507645471;
+        Sun, 09 Mar 2025 00:07:25 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGhD/61rkcaEIdwMrtxevM0JBg/y05qGnnJvvH/bQYC44QrzoG0yv2gURYtI+KKv8IIxwg7AZ5hOgrh770quwo=
+X-Received: by 2002:a05:6000:4102:b0:391:487f:27e7 with SMTP id
+ ffacd0b85a97d-391487f2b5amr87696f8f.55.1741507645022; Sun, 09 Mar 2025
+ 00:07:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250226082549.6034-1-shivankg@amd.com>
-In-Reply-To: <20250226082549.6034-1-shivankg@amd.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Sat, 8 Mar 2025 17:09:46 -0800
-X-Gm-Features: AQ5f1JpKR8YeZcYjkYLi6Yj3T7-X4RTGFozEjKkiiy8Q2qes9s3EoImSl39wsJs
-Message-ID: <CAGtprH8akKUF=8+RkX_QMjp35C0bU1zxGi4v1Zm5AWCw=8V8AQ@mail.gmail.com>
-Subject: Re: [PATCH v6 0/5] Add NUMA mempolicy support for KVM guest-memfd
-To: Shivank Garg <shivankg@amd.com>
-Cc: akpm@linux-foundation.org, willy@infradead.org, pbonzini@redhat.com, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
-	chao.gao@intel.com, seanjc@google.com, ackerleytng@google.com, 
-	david@redhat.com, vbabka@suse.cz, bharata@amd.com, nikunj@amd.com, 
-	michael.day@amd.com, Neeraj.Upadhyay@amd.com, thomas.lendacky@amd.com, 
-	michael.roth@amd.com, tabba@google.com
+References: <20250308010347.1014779-1-seanjc@google.com>
+In-Reply-To: <20250308010347.1014779-1-seanjc@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Sun, 9 Mar 2025 09:06:54 +0100
+X-Gm-Features: AQ5f1JoolazH4jL0h1xGLNNnbKtztmE1g0HsqhOFa3fHrQo1Y-uGVjTz1XGfUfY
+Message-ID: <CABgObfYO8tEYYTDfmf+F-GA3aOCrRn6_Os6uhry9EJ4F3QHkUw@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM: x86: Fixes for 6.14-rcN
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 26, 2025 at 12:28=E2=80=AFAM Shivank Garg <shivankg@amd.com> wr=
-ote:
+On Sat, Mar 8, 2025 at 2:03=E2=80=AFAM Sean Christopherson <seanjc@google.c=
+om> wrote:
 >
-> In this patch-series:
-> Based on the discussion in the bi-weekly guest_memfd upstream call on
-> 2025-02-20[4], I have dropped the RFC tag, documented the memory allocati=
-on
-> behavior after policy changes and added selftests.
+> Please pull a handful of fixes for 6.14.  The DEBUGCTL changes are the mo=
+st
+> urgent, as they fix a bug that was introduced in 6.13 that results in Ste=
+am
+> (and other applications) getting killed due to unexpected #DBs.
 >
+> The following changes since commit c2fee09fc167c74a64adb08656cb993ea47519=
+7e:
 >
-> KVM's guest-memfd memory backend currently lacks support for NUMA policy
-> enforcement, causing guest memory allocations to be distributed arbitrari=
-ly
-> across host NUMA nodes regardless of the policy specified by the VMM. Thi=
-s
-> occurs because conventional userspace NUMA control mechanisms like mbind(=
-)
-> are ineffective with guest-memfd, as the memory isn't directly mapped to
-> userspace when allocations occur.
+>   KVM: x86: Load DR6 with guest value only before entering .vcpu_run() lo=
+op (2025-02-12 08:59:38 -0800)
 >
-> This patch-series adds NUMA binding capabilities to guest_memfd backend
-> KVM guests. It has evolved through several approaches based on community
-> feedback:
+> are available in the Git repository at:
 >
-> - v1,v2: Extended the KVM_CREATE_GUEST_MEMFD IOCTL to pass mempolicy.
-> - v3: Introduced fbind() syscall for VMM memory-placement configuration.
-> - v4-v6: Current approach using shared_policy support and vm_ops (based o=
-n
->       suggestions from David[1] and guest_memfd biweekly upstream call[2]=
-).
+>   https://github.com/kvm-x86/linux.git tags/kvm-x86-fixes-6.14-rcN.2
 >
-> For SEV-SNP guests, which use the guest-memfd memory backend, NUMA-aware
-> memory placement is essential for optimal performance, particularly for
-> memory-intensive workloads.
+> for you to fetch changes up to f9dc8fb3afc968042bdaf4b6e445a9272071c9f3:
 >
-> This series implements proper NUMA policy support for guest-memfd by:
->
-> 1. Adding mempolicy-aware allocation APIs to the filemap layer.
+>   KVM: x86: Explicitly zero EAX and EBX when PERFMON_V2 isn't supported b=
+y KVM (2025-03-04 09:19:18 -0800)
 
-I have been thinking more about this after the last guest_memfd
-upstream call on March 6th.
+Pulled, thanks.
 
-To allow 1G page support with guest_memfd [1] without encountering
-significant memory overheads, its important to support in-place memory
-conversion with private hugepages getting split/merged upon
-conversion. Private pages can be seamlessly split/merged only if the
-refcounts of complete subpages are frozen, most effective way to
-achieve and enforce this is to just not have struct pages for private
-memory. All the guest_memfd private range users (including IOMMU [2]
-in future) can request pfns for offsets and get notified about
-invalidation when pfns go away.
+Paolo
 
-Not having struct pages for private memory also provide additional benefits=
-:
-* Significantly lesser memory overhead for handling splitting/merge operati=
-ons
-    - With struct pages around, every split of 1G page needs struct
-page allocation for 512 * 512 4K pages in worst case.
-* Enable roadmap for PFN range allocators in the backend and usecases
-like KHO [3] that target use of memory without struct page.
+> ----------------------------------------------------------------
+> KVM x86 fixes for 6.14-rcN #2
+>
+>  - Set RFLAGS.IF in C code on SVM to get VMRUN out of the STI shadow.
+>
+>  - Ensure DEBUGCTL is context switched on AMD to avoid running the guest =
+with
+>    the host's value, which can lead to unexpected bus lock #DBs.
+>
+>  - Suppress DEBUGCTL.BTF on AMD (to match Intel), as KVM doesn't properly
+>    emulate BTF.  KVM's lack of context switching has meant BTF has always=
+ been
+>    broken to some extent.
+>
+>  - Always save DR masks for SNP vCPUs if DebugSwap is *supported*, as the=
+ guest
+>    can enable DebugSwap without KVM's knowledge.
+>
+>  - Fix a bug in mmu_stress_tests where a vCPU could finish the "writes to=
+ RO
+>    memory" phase without actually generating a write-protection fault.
+>
+>  - Fix a printf() goof in the SEV smoke test that causes build failures w=
+ith
+>    -Werror.
+>
+>  - Explicitly zero EAX and EBX in CPUID.0x8000_0022 output when PERFMON_V=
+2
+>    isn't supported by KVM.
+>
+> ----------------------------------------------------------------
+> Sean Christopherson (11):
+>       KVM: SVM: Set RFLAGS.IF=3D1 in C code, to get VMRUN out of the STI =
+shadow
+>       KVM: selftests: Assert that STI blocking isn't set after event inje=
+ction
+>       KVM: SVM: Drop DEBUGCTL[5:2] from guest's effective value
+>       KVM: SVM: Suppress DEBUGCTL.BTF on AMD
+>       KVM: x86: Snapshot the host's DEBUGCTL in common x86
+>       KVM: SVM: Manually context switch DEBUGCTL if LBR virtualization is=
+ disabled
+>       KVM: x86: Snapshot the host's DEBUGCTL after disabling IRQs
+>       KVM: SVM: Save host DR masks on CPUs with DebugSwap
+>       KVM: SVM: Don't rely on DebugSwap to restore host DR0..DR3
+>       KVM: selftests: Ensure all vCPUs hit -EFAULT during initial RO stag=
+e
+>       KVM: selftests: Fix printf() format goof in SEV smoke test
+>
+> Xiaoyao Li (1):
+>       KVM: x86: Explicitly zero EAX and EBX when PERFMON_V2 isn't support=
+ed by KVM
+>
+>  arch/x86/include/asm/kvm_host.h                    |  1 +
+>  arch/x86/kvm/cpuid.c                               |  2 +-
+>  arch/x86/kvm/svm/sev.c                             | 24 +++++++----
+>  arch/x86/kvm/svm/svm.c                             | 49 ++++++++++++++++=
+++++++
+>  arch/x86/kvm/svm/svm.h                             |  2 +-
+>  arch/x86/kvm/svm/vmenter.S                         | 10 +----
+>  arch/x86/kvm/vmx/vmx.c                             |  8 +---
+>  arch/x86/kvm/vmx/vmx.h                             |  2 -
+>  arch/x86/kvm/x86.c                                 |  2 +
+>  tools/testing/selftests/kvm/mmu_stress_test.c      | 21 ++++++----
+>  .../selftests/kvm/x86/nested_exceptions_test.c     |  2 +
+>  tools/testing/selftests/kvm/x86/sev_smoke_test.c   |  3 +-
+>  12 files changed, 91 insertions(+), 35 deletions(-)
+>
 
-IIRC, filemap was initially used as a matter of convenience for
-initial guest memfd implementation.
-
-As pointed by David in the call, to get rid of struct page for private
-memory ranges, filemap/pagecache needs to be replaced by a lightweight
-mechanism that tracks offsets -> pfns mapping for private memory
-ranges while still keeping filemap/pagecache for shared memory ranges
-(it's still needed to allow GUP usecases). I am starting to think that
-the filemap replacement for private memory ranges should be done
-sooner rather than later, otherwise it will become more and more
-difficult with features landing in guest_memfd relying on presence of
-filemap.
-
-This discussion matters more for hugepages and PFN range allocations.
-I would like to ensure that we have consensus on this direction.
-
-[1] https://lpc.events/event/18/contributions/1764/
-[2] https://lore.kernel.org/kvm/CAGtprH8C4MQwVTFPBMbFWyW4BrK8-mDqjJn-UUFbFh=
-w4w23f3A@mail.gmail.com/
-[3] https://lore.kernel.org/linux-mm/20240805093245.889357-1-jgowans@amazon=
-.com/
 
