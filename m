@@ -1,168 +1,211 @@
-Return-Path: <kvm+bounces-40524-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40526-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F84DA58178
-	for <lists+kvm@lfdr.de>; Sun,  9 Mar 2025 09:11:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 822CDA58437
+	for <lists+kvm@lfdr.de>; Sun,  9 Mar 2025 14:24:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDC683AC66F
-	for <lists+kvm@lfdr.de>; Sun,  9 Mar 2025 08:11:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0ABBF3AD26D
+	for <lists+kvm@lfdr.de>; Sun,  9 Mar 2025 13:24:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C96A818C008;
-	Sun,  9 Mar 2025 08:11:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59A9A1DCB0E;
+	Sun,  9 Mar 2025 13:23:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V4ifpFYy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dVz46CN7"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DC3328DD0
-	for <kvm@vger.kernel.org>; Sun,  9 Mar 2025 08:11:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07722136349;
+	Sun,  9 Mar 2025 13:23:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741507887; cv=none; b=HqqgUB4iyQvCdasX0nS7qK7P+JdWMQfiMaO2wnehuSOpJ/oTjG2X6eRoruu2GwBAJPMdGH8Hxa2pQ+LUy3zXHdNMVr6qHppeygmgdtJuyOstBh9WUzQRxDWk/T0Axwh9OCWrMEJexSvLDhDUbEBQL1YJhCBpJDNsAjIes2PW6Ho=
+	t=1741526634; cv=none; b=iLadkb/cLZECY93/3+UenK2YmLHxOuUJ/BnLF2fm7gUlGU5J9/neotwoOVv5UcYlH+6LGqbERyC0+/4NR67EerEpRE55/A4gB+F/qWE5jSLo0/aTSBc+KtX8Aky+IKV+X6wdQXf8CIFhGJQJ5MCG0RDBZJMubLGO9IV+DDSfdeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741507887; c=relaxed/simple;
-	bh=ywIIx7CiwkSiZ7dUfWCVTJcaWhwCEYd2mnYkP29YtLU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=W1mPTJ/bLVbc0l8PTq4lx/aEfuD8FEdqHAPyTIgkOV8Ign+2ixFcCJEwDz08PuwtXkZ8n2vm3TTfowTsgM0HI1dTO+oM2WIVviMpEyI9xpzb+pH+1+s5lo5ur/ilH8dtibdH26ePd5ZDqWK6PT7PRZLbasAEdVispxuly7sTS7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V4ifpFYy; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741507884;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=7sH7FGfqnhoLEuqI61iUbKKZNJk8uSxjiDzSzhKVUkA=;
-	b=V4ifpFYyiWi26bWYaXFsAs+BS6m838goeZTIiNwB4nfW0KuPUyflMjD3X+22VYkvzwRHiC
-	2TwPRU4uWmesWfSwekepWFI+pO4bdOr+obiYVO0NPvRqh9R6+S8ZnqjUT5bsvmDAUFvw9J
-	1B7VSCUY9FOed+znzEde2cT3TOf6MxY=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-222-MWeIDluvMKy8ay3kww2keg-1; Sun,
- 09 Mar 2025 04:11:21 -0400
-X-MC-Unique: MWeIDluvMKy8ay3kww2keg-1
-X-Mimecast-MFC-AGG-ID: MWeIDluvMKy8ay3kww2keg_1741507880
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0D9731956080;
-	Sun,  9 Mar 2025 08:11:20 +0000 (UTC)
-Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 46D0E1800370;
-	Sun,  9 Mar 2025 08:11:19 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM fixes for Linux-6.14-rc6
-Date: Sun,  9 Mar 2025 04:11:18 -0400
-Message-ID: <20250309081118.2953196-1-pbonzini@redhat.com>
+	s=arc-20240116; t=1741526634; c=relaxed/simple;
+	bh=amviRZAng65qhSPsIn/ez8PlX5/EY5IcXVvOyQBoCh4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rZNGvFCWFmn8to73uMN3GfOjykI1pgpoWD0gAsAaqyv/MgeSi4QgEcTuUKpAkkijCaXTEppVADyJGL8MOIjazSryjWGTiGcWW9ptIaMat+vVneLFz3barGNIWcCItoRDQD0W6+HJwBhL76Br1DCzq61GaOtkYKWAxheslRee0uI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dVz46CN7; arc=none smtp.client-ip=209.85.214.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-2241053582dso43908715ad.1;
+        Sun, 09 Mar 2025 06:23:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741526632; x=1742131432; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=78f5GfsZLdHs7HcZYqhufn9bqBeaLB9GfsmUNDdGsAU=;
+        b=dVz46CN7GFk2MohHsYZ1XpOKSfkjB8WZZklFuVu4dwGXHnMq+/+DPo0NDU9RYZ1nmO
+         StWMyWieLWr2EFekLtMfS7OY07T37Wf4p7Yr/k0gtVA8sbmhApmoKVHWdCk05IBBCkO9
+         GXgiiPhpbxyuJuhUXrasukPdW+3Y8tNLNp3da5OPzFGDoJ43XvgzFubu6JKCDTDLvRPV
+         QT10UjAgCd7URCYnsbTb3I35yAVBvjKQqkwzXkVhhiIIcstF/ga2Hgi3NaHEvnut06iQ
+         Zmg7nhaVsPi9r+VH8VlYVXe0xD+YBI/VS3RAkEhQzVLOiKvD8FqlqILpKbYoTiF0Bdli
+         Yo/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741526632; x=1742131432;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=78f5GfsZLdHs7HcZYqhufn9bqBeaLB9GfsmUNDdGsAU=;
+        b=SLujwD/K5KKk51kaKy78olPD9T8e6LllR8SVwYHfc7zfkoqqwLY0MMPft+4ML8hoNn
+         N1BixI+htVtWc5MqbHGlU5FpozmEh+ep2lK0Wx9D6bkvqF0PIVr5EcRl3YflN6HGYtsh
+         1K3Qz+VSxGwKAS345FSVx/+oz+S46K79gpZY6pmBmhwa/G88fp+02i3OqjKHDn3IVTF2
+         cqSr/iOL0ftXc2Aljn0PinAZWucYSdE4pqKWyZ3TnIrMYvTUW1lcqAvoa+34XGAfrtM5
+         VnZdpnwWlXYDrCANhRYPqQRP1uBUsmxFqCL04ZoxFKTWNamOahfCsajhJmMUHVYUns5g
+         CqjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUw8D/2Etaz6O2DIR3WsW5NuKisN1gOcibV2ejKQmVlbM9lWIbO/yNJ9cQMg/MhGtSRD5j8tywT5UpuZFBA@vger.kernel.org, AJvYcCVBZqjFSShKlA9/tRVoCr1HUIT494t2yd5+6g+7ijnbS/3+plWEZDTrlyA6+l0dhOkkpWCkkKy9@vger.kernel.org, AJvYcCVhEoJRBBhprANid+iS7cJntWMmp+eoEX/oA6homJnG8Ej991mKOVS3SEpVJIeP+0S2pdwDcVLHaWNw@vger.kernel.org, AJvYcCWMRG5l8xdXa7bI53NfScdvdVpFHIjFpGST8U/+U9EGJkW1Cz2KP818KoGYmYS9GQhLgY5LdrJWPVeD7i0=@vger.kernel.org, AJvYcCWl8RCmwfTr+gTFwKNxebdtWgGSII1tCp7IXOFdvBZbRGuw5O0x8PWcklhsr0G9xlD6XP7e0A4auu8Z@vger.kernel.org, AJvYcCXwYhBLoHtWchUPd4dhM4v9zMhoDiPgsloe19pqimPMmFntvkcxWUy5xNxsDq0lEQvKKWU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpO6iAPX6wtQylr6LWtgptxI6xDaAfiQvZU2fpt5oXXNu7DfaI
+	0DSCcb79f0tkyUT1+pA+vZW6QcTUz6j9v41mb3DsdzlrqPmU9Rsv
+X-Gm-Gg: ASbGncvS7V1lS8M83grceIJfnJtzNab7Sk1jqr0fL4Tkm3UKu3qtpkL5gIqaq7FlRaH
+	qbsDgKCnE5lwgPbpfRmFJOsqkgFyXfEB8+ts5+mfvaEkQgYEoA/FaTsTR4Hl6a6jf0LRl/YbfH4
+	h2c2Bc+xtCfeUZJKDENxDq+AiweaYUhs8rXSvF8NyJDQ+2d4p2/VzRZ7ymgFUJaw9b389nQhjar
+	4SWQUgcurn14SMuBYFfzuXBF5REMVu3u7pYbQx4DKSYZ478pCHThsl890USCFLlxZztBdSfC/Xx
+	hrlU76nK2xkRgcXg5mOL36k9pYkpgXs1XknhNE3FTU4UubSg+p/Mlyj77rTAKYRrfBObJvvZMcp
+	1AW38DvjAEA+5gbsEvUrBOwO+SCG8tg7DuctILaZZ
+X-Google-Smtp-Source: AGHT+IFtC936bSg/3HregqNsD+RiIvE+I7Cf0Sja++qaGUNlZeLkZuXJlqOzuqqV2Wpl3dx1MeKXQQ==
+X-Received: by 2002:a17:902:eb81:b0:220:c86d:d7eb with SMTP id d9443c01a7336-22428ab863cmr167985465ad.36.1741526632153;
+        Sun, 09 Mar 2025 06:23:52 -0700 (PDT)
+Received: from ?IPV6:2409:8a55:301b:e120:c508:514a:4065:877? ([2409:8a55:301b:e120:c508:514a:4065:877])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-736d4f20913sm597161b3a.13.2025.03.09.06.23.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 09 Mar 2025 06:23:51 -0700 (PDT)
+Message-ID: <7abb0e8c-f565-48f0-a393-8dabbabc3fe2@gmail.com>
+Date: Sun, 9 Mar 2025 21:23:35 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] mm: alloc_pages_bulk: remove assumption of populating
+ only NULL elements
+To: NeilBrown <neilb@suse.de>, Yunsheng Lin <linyunsheng@huawei.com>
+Cc: Qu Wenruo <wqu@suse.com>, Yishai Hadas <yishaih@nvidia.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>,
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ Kevin Tian <kevin.tian@intel.com>,
+ Alex Williamson <alex.williamson@redhat.com>, Chris Mason <clm@fb.com>,
+ Josef Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>,
+ Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
+ Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>,
+ Sandeep Dhavale <dhavale@google.com>, Carlos Maiolino <cem@kernel.org>,
+ "Darrick J. Wong" <djwong@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Trond Myklebust <trondmy@kernel.org>,
+ Anna Schumaker <anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>,
+ Jeff Layton <jlayton@kernel.org>, Olga Kornievskaia <okorniev@redhat.com>,
+ Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
+ Luiz Capitulino <luizcap@redhat.com>,
+ Mel Gorman <mgorman@techsingularity.net>, Dave Chinner
+ <david@fromorbit.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ linux-erofs@lists.ozlabs.org, linux-xfs@vger.kernel.org, linux-mm@kvack.org,
+ netdev@vger.kernel.org, linux-nfs@vger.kernel.org
+References: <> <180818a1-b906-4a0b-89d3-34cb71cc26c9@huawei.com>
+ <174138137096.33508.11446632870562394754@noble.neil.brown.name>
+Content-Language: en-US
+From: Yunsheng Lin <yunshenglin0825@gmail.com>
+In-Reply-To: <174138137096.33508.11446632870562394754@noble.neil.brown.name>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Linus,
+On 3/8/2025 5:02 AM, NeilBrown wrote:
 
-The following changes since commit 916b7f42b3b3b539a71c204a9b49fdc4ca92cd82:
+...
 
-  kvm: retry nx_huge_page_recovery_thread creation (2025-03-01 02:54:18 -0500)
+>>
+>>>    allocated pages in the array - just like the current
+>>>    alloc_pages_bulk().
+>>
+>> I guess 'the total number of allocated pages in the array ' include
+>> the pages which are already in the array before calling the above
+>> API?
+> 
+> Yes - just what the current function does.
+> Though I don't know that we really need that detail.
+> I think there are three interesting return values:
+> 
+> - hard failure - don't bother trying again soon:   maybe -ENOMEM
+> - success - all pages are allocated:  maybe 0 (or 1?)
+> - partial success - at least one page allocated, ok to try again
+>    immediately - maybe -EAGAIN (or 0).
 
-are available in the Git repository at:
+Yes, the above makes sense. And I guess returning '-ENOMEM' & '0' &
+'-EAGAIN' seems like a more explicit value.
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+> 
+>>
 
-for you to fetch changes up to ea9bd29a9c0d757b3384ae3e633e6bbaddf00725:
+...
 
-  Merge tag 'kvm-x86-fixes-6.14-rcN.2' of https://github.com/kvm-x86/linux into HEAD (2025-03-09 03:44:06 -0400)
+>>
+> 
+> If I were do work on this (and I'm not, so you don't have to follow my
+> ideas) I would separate the bulk_alloc into several inline functions and
+> combine them into the different interfaces that you want.  This will
+> result in duplicated object code without duplicated source code.  The
+> object code should be optimal.
 
-This remains quite an active rc period, but these are "just" bugs and
-issues introduced during this merge window.  So, no big deal overall.
+Thanks for the detailed suggestion, it seems feasible.
+If the 'add to a linked list' dispose was not removed in the [1],
+I guess it is worth trying.
+But I am not sure if it is still worth it at the cost of the above
+mentioned 'duplicated object code' considering the array defragmenting
+seem to be able to unify the dispose of 'add to end of array' and
+'add to next hole in array'.
 
-Paolo
+I guess I can try with the easier one using array defragmenting first,
+and try below if there is more complicated use case.
 
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.14, take #4
+1. 
+https://lore.kernel.org/all/f1c75db91d08cafd211eca6a3b199b629d4ffe16.1734991165.git.luizcap@redhat.com/
 
-* Fix a couple of bugs affecting pKVM's PSCI relay implementation
-  when running in the hVHE mode, resulting in the host being entered
-  with the MMU in an unknown state, and EL2 being in the wrong mode.
-
-x86:
-
-* Set RFLAGS.IF in C code on SVM to get VMRUN out of the STI shadow.
-
-* Ensure DEBUGCTL is context switched on AMD to avoid running the guest with
-  the host's value, which can lead to unexpected bus lock #DBs.
-
-* Suppress DEBUGCTL.BTF on AMD (to match Intel), as KVM doesn't properly
-  emulate BTF.  KVM's lack of context switching has meant BTF has always been
-  broken to some extent.
-
-* Always save DR masks for SNP vCPUs if DebugSwap is *supported*, as the guest
-  can enable DebugSwap without KVM's knowledge.
-
-* Fix a bug in mmu_stress_tests where a vCPU could finish the "writes to RO
-  memory" phase without actually generating a write-protection fault.
-
-* Fix a printf() goof in the SEV smoke test that causes build failures with
-  -Werror.
-
-* Explicitly zero EAX and EBX in CPUID.0x8000_0022 output when PERFMON_V2
-  isn't supported by KVM.
-
-----------------------------------------------------------------
-Ahmed Genidi (1):
-      KVM: arm64: Initialize SCTLR_EL1 in __kvm_hyp_init_cpu()
-
-Mark Rutland (1):
-      KVM: arm64: Initialize HCR_EL2.E2H early
-
-Paolo Bonzini (2):
-      Merge tag 'kvmarm-fixes-6.14-4' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
-      Merge tag 'kvm-x86-fixes-6.14-rcN.2' of https://github.com/kvm-x86/linux into HEAD
-
-Sean Christopherson (11):
-      KVM: SVM: Set RFLAGS.IF=1 in C code, to get VMRUN out of the STI shadow
-      KVM: selftests: Assert that STI blocking isn't set after event injection
-      KVM: SVM: Drop DEBUGCTL[5:2] from guest's effective value
-      KVM: SVM: Suppress DEBUGCTL.BTF on AMD
-      KVM: x86: Snapshot the host's DEBUGCTL in common x86
-      KVM: SVM: Manually context switch DEBUGCTL if LBR virtualization is disabled
-      KVM: x86: Snapshot the host's DEBUGCTL after disabling IRQs
-      KVM: SVM: Save host DR masks on CPUs with DebugSwap
-      KVM: SVM: Don't rely on DebugSwap to restore host DR0..DR3
-      KVM: selftests: Ensure all vCPUs hit -EFAULT during initial RO stage
-      KVM: selftests: Fix printf() format goof in SEV smoke test
-
-Xiaoyao Li (1):
-      KVM: x86: Explicitly zero EAX and EBX when PERFMON_V2 isn't supported by KVM
-
- arch/arm64/include/asm/el2_setup.h                 | 31 +++++++++++---
- arch/arm64/kernel/head.S                           | 22 ++--------
- arch/arm64/kvm/hyp/nvhe/hyp-init.S                 | 10 +++--
- arch/arm64/kvm/hyp/nvhe/psci-relay.c               |  3 ++
- arch/x86/include/asm/kvm_host.h                    |  1 +
- arch/x86/kvm/cpuid.c                               |  2 +-
- arch/x86/kvm/svm/sev.c                             | 24 +++++++----
- arch/x86/kvm/svm/svm.c                             | 49 ++++++++++++++++++++++
- arch/x86/kvm/svm/svm.h                             |  2 +-
- arch/x86/kvm/svm/vmenter.S                         | 10 +----
- arch/x86/kvm/vmx/vmx.c                             |  8 +---
- arch/x86/kvm/vmx/vmx.h                             |  2 -
- arch/x86/kvm/x86.c                                 |  2 +
- tools/testing/selftests/kvm/mmu_stress_test.c      | 21 ++++++----
- .../selftests/kvm/x86/nested_exceptions_test.c     |  2 +
- tools/testing/selftests/kvm/x86/sev_smoke_test.c   |  3 +-
- 16 files changed, 130 insertions(+), 62 deletions(-)
+> 
+> The parts of the function are:
+>   - validity checks - fallback to single page allocation
+>   - select zone - fallback to single page allocation
+>   - allocate multiple pages in the zone and dispose of them
+>   - allocate a single page
+> 
+> The "dispose of them" is one of
+>    - add to a linked list
+>    - add to end of array
+>    - add to next hole in array
+> 
+> These three could be inline functions that the "allocate multiple pages"
+> and "allocate single page" functions call.  We can pass these as
+> function arguments and the compile will inline them.
+> I imagine these little function would take one page and return
+> a bool indicating if any more are wanted.
+> 
+> The three functions: alloc_bulk_array alloc_bulk_list
+> alloc_bulk_refill_array would each look like:
+> 
+>    validity checks: do we need to allocate anything?
+> 
+>    if want more than one page &&
+>       am allowed to do mulipage (e.g. not __GFP_ACCOUNT) &&
+>       zone = choose_zone() {
+>          alloc_multi_from_zone(zone, dispose_function)
+>    }
+>    if nothing allocated
+>       alloc_single_page(dispose_function)
+> 
+> Each would have a different dispose_function and the initial checks
+> would be quite different, as would the return value.
+> 
+> Thanks for working on this.
+> 
+> NeilBrown
+> 
 
 
