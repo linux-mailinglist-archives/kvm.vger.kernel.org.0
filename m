@@ -1,148 +1,192 @@
-Return-Path: <kvm+bounces-40527-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40528-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0B1BA5848D
-	for <lists+kvm@lfdr.de>; Sun,  9 Mar 2025 14:41:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A499A5875C
+	for <lists+kvm@lfdr.de>; Sun,  9 Mar 2025 19:52:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD580188D3B2
-	for <lists+kvm@lfdr.de>; Sun,  9 Mar 2025 13:41:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2E6F188D285
+	for <lists+kvm@lfdr.de>; Sun,  9 Mar 2025 18:52:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D89611DDA09;
-	Sun,  9 Mar 2025 13:41:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14C891FF618;
+	Sun,  9 Mar 2025 18:52:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dZy+j99A"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NCg6vyX4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF6041CC8B0;
-	Sun,  9 Mar 2025 13:41:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A905916ABC6
+	for <kvm@vger.kernel.org>; Sun,  9 Mar 2025 18:52:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741527670; cv=none; b=CseRxX/+UU46QL+ZWParpah/6OGC5r4exa1Incuka7ri6NP+BNKYk89B69773AR6/dn8nZOvWZl9hrbN3xSSXkZRVYfZyKzsPMXmLkeRhxRtfFOniJYGC/knylrjnFHbcdhUDlQB1eil4vU63SlAcJEtJmArH0oGGed6y3Bw0ZQ=
+	t=1741546341; cv=none; b=FTKPCqIVcRkrO3V4cL9kPS2KMny8dvj1XT9Ooxe6ePTsbQFj4WgMUnXJk+OpxTzagbPQTYZA6Icwx8x2mugp/fVHnMY43WlWueU5cqp1tmY3wbPO0ltg7mLczP/uUONevHYPCa5HGS0j9rlRvs7GDftXT+KXU+rr/PoCREwdloU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741527670; c=relaxed/simple;
-	bh=fLQGO5wiRlZUKjdUjb206YTBiUBA4D9ukOUBp9rUGdo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pVZdJh3pH/MJCkmowACkVdNLpbYBHA+fKCFcWVxGl041bWcPoFfDnWYZKAw2gQJfCEpeAqXHT8Ypl/rlxaH8GVEyqRLNdHA3nlbdNbTFW2bIat+CmH30Psg4NLFO3eB0nRFP9UHC5GGOEEhRwzneTnrMYylUUdUXpqWsklq6pJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dZy+j99A; arc=none smtp.client-ip=209.85.214.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-2239c066347so56554275ad.2;
-        Sun, 09 Mar 2025 06:41:08 -0700 (PDT)
+	s=arc-20240116; t=1741546341; c=relaxed/simple;
+	bh=zXJZIdGJR4OS9afIEosSDb+g7DJuyc8R4tm7TR6XlYU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fu7rPzvriaryM+20/lvC9Q2W7mA1kC7fbLIkNk6Eua2Wed8HSbOQml+2EH7KWiC5TwxjXKtdGxjFmUW/puqSTzy0rSzNdDK1YYZ/eh1T+t00hqkF4YtYfXMGKlYqY0ng/EVfT36J1icrhjkRfiZHtWmNC3K+p9ZXRnp1xuHjaf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NCg6vyX4; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2242aca53efso145365ad.1
+        for <kvm@vger.kernel.org>; Sun, 09 Mar 2025 11:52:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741527668; x=1742132468; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LbqFVYGZKiXAHZ9rqZe+rnsj7EpBf3DH/8Ue+vs/s7U=;
-        b=dZy+j99A6lc+e7y/Qzm6Q/1YoWVfMsfZGoIK0xCSx8Lwc5xeDjobk9XNJd/XQiJQcl
-         fKTkMAID7+x41913IaPmy7gthptTfzpQCY6E9bgYEl7g9VUtH7rszLt3z9xOq14xzg7P
-         cz5V0nBjPCzBMASmcwDMaNVNolWbqo/D/cjl5Zy5P7V/HASGSFU2BFnE4apStu40BYDv
-         9an5/hEmzDW1YKnddc/OdDjymcY2wWBHIVm5h/vmFl4T1LcNr583+O/w7ggHosgXtrVK
-         hW+fKFL/J6a80Vq746AxAp3tMPTKTvMdHQIp5ptlKp9v0TRdDq9eTICjhMDm7VyhTupm
-         ui4g==
+        d=google.com; s=20230601; t=1741546339; x=1742151139; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f0F9uAQ7tctvQCnO0ZWm2wGaaH5f4voNwAJg6oGX9SI=;
+        b=NCg6vyX4WZXQu6zrAm1Nis9GmixG/GZ7SVWr512m9nfSu/RMgQ+J2G6wwBc0J0V4dc
+         I7kURwAzsFCFDNr7V4HCqNIRCwhjwRJPGjFDWxnqMGc10kpuRejJivB02NC/36EBC9oH
+         uemrg86+eZw4WvV6I+vjC0p7Tps5KxPAOSN6RcDRS1HJvY7Yyu57K4nw8BE+17hF29l9
+         skWZnPR4woVP3z4gSJLYXpQYEOeWTt87qSu7i1Jdu8/HkgfbpT2Tg7LyQ8oCKghkPCrM
+         QP3R7CVNTwNWeSpOMAh/ztweNUF7WJhDPf5HdT5rovyeFS45FKx7vUlla9kTRsLZqM7f
+         0grg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741527668; x=1742132468;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LbqFVYGZKiXAHZ9rqZe+rnsj7EpBf3DH/8Ue+vs/s7U=;
-        b=WFRCj04H7h5vMg7NHlu7BYMTq1l5XByuzvyWvVADkqIZNcZkmb11QI3pEVDAN0o8Ou
-         gVvssHzJqtSnT7ZKuATB+xo3DgGXSZTS6PNgi4XRlI+lkNWG4MwrfuNJJR0YcbgUo194
-         328PbtsAb8jME0rK4gwhWqtmFWC4nd0/XPH1v/fnXcFMnfds9zY/R77VMQUV4jE5EaaL
-         NoAK26PBqJUBCP6pOTDo3L3EumhzYvn62tSlHs7rfVeq9LO6MybQ+CZENdMadNwoPP8z
-         9qsm1MJHz0UXqE7NxBtBDmy2qZ+w8SOv1YRk05VLIEQRlO/u24CKLzGPeOQ76+T80i7m
-         VnkA==
-X-Forwarded-Encrypted: i=1; AJvYcCU4pxKYCowU7A0H88lZIu1N7tPwQcBBEIJIe/Z39TiPE2qGuxOOBph/QM9XOusUOYoVa0bhBfMAPMz/eos=@vger.kernel.org, AJvYcCX0WUPa+TwSxc5Miy2+Z595KX+nprvF+KjotaUHSpvFwlI0tMUqy1gqJDbx+4SXY7e6VsD2Kk014x5PP87K@vger.kernel.org, AJvYcCXDaD8JcHay07zKcbU1GHcyE95AUMCxDMx/Lin50xLMNPDJ9HlaL3EZKm+r7mPJBx9iIl0=@vger.kernel.org, AJvYcCXKttusgU40iG9k4AOvniQ1Ji9na6JPjvMqOiDp/5NoOJdkdqIVbSSUshxJa0xA/9PIkci5cgkf@vger.kernel.org, AJvYcCXPgiTER58b3naZxw7Nv0LzRavi41sCfH8KMcQpmDL1LsIFuKp4HzL8nuiK/Ko8YBjuruH8TZSOTA6E@vger.kernel.org, AJvYcCXpYURkqSH2a27S1k6L4gK6XM7GREtpsp9IqzjLLdyjy3eNLHgKouqmn7X1qbKZccuBtMcrsk3MC6bE@vger.kernel.org
-X-Gm-Message-State: AOJu0YwT5GiCO+CGOMi4fz838i7o3QhNpxlxhJ2CLYVsEEi2oYiXhuKi
-	08LCEUGi5oz7hqtIVi4qJzSb71/rVgYbBYVibPOaeG8TATTwuWPK
-X-Gm-Gg: ASbGnctlwAfgPZ6UvKrp6DxeT8cTrjY+6xcODqrIBWSHh3i5aFgropbQ9tEUjxT+aWp
-	4Ijy96OUipYiuJ3zq4Qv018FlTVdQE38mE9r3+1c4DkI0sNdpdPWQ4OhbNX23Tl9dxYudAo3yRw
-	6qMHFebk0EyT5zcNDv32nIx+swtfCYVApWvBx13OLddNujtpX0saIZksmwgAZaxllj74OYvXfce
-	hrjz59n6TQnXI3X0NRyX5YiEQIY+WN3VO7/eNM5nSr5hULcsBz3q/bHvNEVgYBY/wgaFylsv/dU
-	q+bxUN4phtCu7JSBcRB74e3q48qW/1HKPZ8LFWykh4bwocUEHmfpn+eMSymRyVqjlfacXp5DEsi
-	NF7YIgRQ1t3tPAgXjump9bh4t3M2KQQ==
-X-Google-Smtp-Source: AGHT+IFypNCMIn41ibdTDNx4lnj5ojm64dR+2U0xpw0STk3CxsR4PZycEa3AfGJqpDAqBoyMWdx6gQ==
-X-Received: by 2002:a05:6a00:2e17:b0:736:5c8e:bab8 with SMTP id d2e1a72fcca58-736aa9c1effmr17581861b3a.3.1741527667817;
-        Sun, 09 Mar 2025 06:41:07 -0700 (PDT)
-Received: from ?IPV6:2409:8a55:301b:e120:c508:514a:4065:877? ([2409:8a55:301b:e120:c508:514a:4065:877])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-736d4d14f66sm619646b3a.82.2025.03.09.06.40.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 09 Mar 2025 06:41:07 -0700 (PDT)
-Message-ID: <cce03970-d66f-4344-b496-50ecf59483a6@gmail.com>
-Date: Sun, 9 Mar 2025 21:40:52 +0800
+        d=1e100.net; s=20230601; t=1741546339; x=1742151139;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f0F9uAQ7tctvQCnO0ZWm2wGaaH5f4voNwAJg6oGX9SI=;
+        b=tja/2yy66ROSHUm3uFnGeRlG1QTbePPvuoaBHt7X2qnJX77z84FXW357Id3Rplb0fK
+         zzmXrZqQEPyDxXLGOcXyifOx9GlPL8KXaylB4VhHJc/6whZwR6Rd0licMK5ckioZjYDL
+         PuIPccO7GWxEbIdeAL+LRa2TB0eC1U+1POc6QipfEOvFSzR4zbJdU2xI3yWIdsRvCkLb
+         VTkWDZDAUMST5CLWx+8RYyVSq3KpVlgwanI5x0SD+U1tnqKJmKpnX2AeqMNYLHrBIexL
+         dodVcDMCdv4Pm0g7fP/O1s5YVyQiHpolQVkccrkQU7LJmNgLacahpB8iF+ACLRlDRlFk
+         h/cQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWTL3NB+zYTePHfjigwQaQ9QDqY1Jp2zcv9a3Jp4lpdPwDor2veXLtbyOtUPwFaLS4yuoY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzeDTIResAO5Jt5MPNbv/ibcu65bfUre0+QXc15/YMT+/0bdqDR
+	IeBdupVWYb+VdHCvrhU0+KU5oSXst3VLdfacQQqPhspltlSuWU1jERfQGigbpTQmzh91Z+73KIT
+	Z0/75s6nqT9uatuDn6J+5INyXoDh8Z6m93wKt
+X-Gm-Gg: ASbGncuLV+n7o8wgN3gtjiEkaedbCbgMCvB/kUpNRZeWPnhfqovAw+Ns1zA/bg2CTMh
+	1pPTnD1UQ23m5/nfsb09943/F+DLpMlCp9gSDRe3kRgj4+j3QjQstHFQZXDLtuYria15c1zmXv7
+	EQElI2/RtE9SEq3Smy+rdOmC6cWLc+2mMwEz3eAMI+sfP2GFDGSVX7PWzKw2g=
+X-Google-Smtp-Source: AGHT+IFG9SSJTufI0eFYbf0wQm2WofP3DAL5foaE083K56zTD/V1FvHHIehtuzbAThLlpAJshuGX+RU/r/N5IlTVF58=
+X-Received: by 2002:a17:903:32c7:b0:21f:56e5:daee with SMTP id
+ d9443c01a7336-22540e5a9aemr2472185ad.6.1741546338366; Sun, 09 Mar 2025
+ 11:52:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] mm: alloc_pages_bulk: remove assumption of populating
- only NULL elements
-To: Dave Chinner <david@fromorbit.com>, Yunsheng Lin <linyunsheng@huawei.com>
-Cc: Yishai Hadas <yishaih@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- Kevin Tian <kevin.tian@intel.com>,
- Alex Williamson <alex.williamson@redhat.com>, Chris Mason <clm@fb.com>,
- Josef Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>,
- Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
- Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>,
- Sandeep Dhavale <dhavale@google.com>, Carlos Maiolino <cem@kernel.org>,
- "Darrick J. Wong" <djwong@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Trond Myklebust <trondmy@kernel.org>,
- Anna Schumaker <anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>,
- Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>,
- Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>,
- Tom Talpey <tom@talpey.com>, Luiz Capitulino <luizcap@redhat.com>,
- Mel Gorman <mgorman@techsingularity.net>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
- linux-btrfs@vger.kernel.org, linux-erofs@lists.ozlabs.org,
- linux-xfs@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org,
- linux-nfs@vger.kernel.org
-References: <20250228094424.757465-1-linyunsheng@huawei.com>
- <Z8a3WSOrlY4n5_37@dread.disaster.area>
- <91fcdfca-3e7b-417c-ab26-7d5e37853431@huawei.com>
- <Z8vnKRJlP78DHEk6@dread.disaster.area>
-Content-Language: en-US
-From: Yunsheng Lin <yunshenglin0825@gmail.com>
-In-Reply-To: <Z8vnKRJlP78DHEk6@dread.disaster.area>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250226082549.6034-1-shivankg@amd.com> <CAGtprH8akKUF=8+RkX_QMjp35C0bU1zxGi4v1Zm5AWCw=8V8AQ@mail.gmail.com>
+In-Reply-To: <CAGtprH8akKUF=8+RkX_QMjp35C0bU1zxGi4v1Zm5AWCw=8V8AQ@mail.gmail.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Sun, 9 Mar 2025 11:52:05 -0700
+X-Gm-Features: AQ5f1JrURSpnxKRR4ttTpVJoZfdt94X5FqXT7N9vOmgEqpVIhGKcMYbUZvLcn9Y
+Message-ID: <CAGtprH8Rzgg55knK467NEZ3gnhNFhYA8fL3zda188wgcmj1YYA@mail.gmail.com>
+Subject: Re: [PATCH v6 0/5] Add NUMA mempolicy support for KVM guest-memfd
+To: Shivank Garg <shivankg@amd.com>
+Cc: akpm@linux-foundation.org, willy@infradead.org, pbonzini@redhat.com, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
+	chao.gao@intel.com, seanjc@google.com, ackerleytng@google.com, 
+	david@redhat.com, vbabka@suse.cz, bharata@amd.com, nikunj@amd.com, 
+	michael.day@amd.com, Neeraj.Upadhyay@amd.com, thomas.lendacky@amd.com, 
+	michael.roth@amd.com, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 3/8/2025 2:43 PM, Dave Chinner wrote:
+On Sat, Mar 8, 2025 at 5:09=E2=80=AFPM Vishal Annapurve <vannapurve@google.=
+com> wrote:
+>
+> On Wed, Feb 26, 2025 at 12:28=E2=80=AFAM Shivank Garg <shivankg@amd.com> =
+wrote:
+> >
+> > In this patch-series:
+> > Based on the discussion in the bi-weekly guest_memfd upstream call on
+> > 2025-02-20[4], I have dropped the RFC tag, documented the memory alloca=
+tion
+> > behavior after policy changes and added selftests.
+> >
+> >
+> > KVM's guest-memfd memory backend currently lacks support for NUMA polic=
+y
+> > enforcement, causing guest memory allocations to be distributed arbitra=
+rily
+> > across host NUMA nodes regardless of the policy specified by the VMM. T=
+his
+> > occurs because conventional userspace NUMA control mechanisms like mbin=
+d()
+> > are ineffective with guest-memfd, as the memory isn't directly mapped t=
+o
+> > userspace when allocations occur.
+> >
+> > This patch-series adds NUMA binding capabilities to guest_memfd backend
+> > KVM guests. It has evolved through several approaches based on communit=
+y
+> > feedback:
+> >
+> > - v1,v2: Extended the KVM_CREATE_GUEST_MEMFD IOCTL to pass mempolicy.
+> > - v3: Introduced fbind() syscall for VMM memory-placement configuration=
+.
+> > - v4-v6: Current approach using shared_policy support and vm_ops (based=
+ on
+> >       suggestions from David[1] and guest_memfd biweekly upstream call[=
+2]).
+> >
+> > For SEV-SNP guests, which use the guest-memfd memory backend, NUMA-awar=
+e
+> > memory placement is essential for optimal performance, particularly for
+> > memory-intensive workloads.
+> >
+> > This series implements proper NUMA policy support for guest-memfd by:
+> >
+> > 1. Adding mempolicy-aware allocation APIs to the filemap layer.
+>
+> I have been thinking more about this after the last guest_memfd
+> upstream call on March 6th.
+>
+> To allow 1G page support with guest_memfd [1] without encountering
+> significant memory overheads, its important to support in-place memory
+> conversion with private hugepages getting split/merged upon
+> conversion. Private pages can be seamlessly split/merged only if the
+> refcounts of complete subpages are frozen, most effective way to
+> achieve and enforce this is to just not have struct pages for private
+> memory. All the guest_memfd private range users (including IOMMU [2]
+> in future) can request pfns for offsets and get notified about
+> invalidation when pfns go away.
+>
+> Not having struct pages for private memory also provide additional benefi=
+ts:
+> * Significantly lesser memory overhead for handling splitting/merge opera=
+tions
+>     - With struct pages around, every split of 1G page needs struct
+> page allocation for 512 * 512 4K pages in worst case.
+> * Enable roadmap for PFN range allocators in the backend and usecases
+> like KHO [3] that target use of memory without struct page.
+>
+> IIRC, filemap was initially used as a matter of convenience for
+> initial guest memfd implementation.
+>
+> As pointed by David in the call, to get rid of struct page for private
+> memory ranges, filemap/pagecache needs to be replaced by a lightweight
+> mechanism that tracks offsets -> pfns mapping for private memory
+> ranges while still keeping filemap/pagecache for shared memory ranges
+> (it's still needed to allow GUP usecases). I am starting to think that
 
-...
+Going one step further, If we support folio->mapping and possibly any
+other needed bits while still tracking folios corresponding to shared
+memory ranges along with private memory pfns in a separate
+"gmem_cache" to keep core-mm interaction compatible, can that allow
+pursuing the direction of not needing filemap at all?
 
->> I tested XFS using the below cmd and testcase, testing seems
->> to be working fine, or am I missing something obvious here
->> as I am not realy familiar with fs subsystem yet:
-> 
-> That's hardly what I'd call a test. It barely touches the filesystem
-> at all, and it is not exercising memory allocation failure paths at
-> all.
-> 
-> Go look up fstests and use that to test the filesystem changes you
-> are making. You can use that to test btrfs and NFS, too.
-
-Thanks for the suggestion.
-I used the below xfstests to do the testing in a VM, the smoke testing
-seems fine for now, will do a full testing too:
-https://github.com/tytso/xfstests-bld
-
-Also, it seems the fstests doesn't support erofs yet?
-
-> 
-> -Dave.
-> 
-
+> the filemap replacement for private memory ranges should be done
+> sooner rather than later, otherwise it will become more and more
+> difficult with features landing in guest_memfd relying on presence of
+> filemap.
+>
+> This discussion matters more for hugepages and PFN range allocations.
+> I would like to ensure that we have consensus on this direction.
+>
+> [1] https://lpc.events/event/18/contributions/1764/
+> [2] https://lore.kernel.org/kvm/CAGtprH8C4MQwVTFPBMbFWyW4BrK8-mDqjJn-UUFb=
+Fhw4w23f3A@mail.gmail.com/
+> [3] https://lore.kernel.org/linux-mm/20240805093245.889357-1-jgowans@amaz=
+on.com/
 
