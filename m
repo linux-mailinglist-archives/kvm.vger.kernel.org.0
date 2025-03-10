@@ -1,203 +1,316 @@
-Return-Path: <kvm+bounces-40654-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40655-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D0F8A59742
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 15:15:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 064ACA5977D
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 15:23:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0ABC18843EB
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 14:15:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C0033A4DD5
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 14:23:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7866A22B8C7;
-	Mon, 10 Mar 2025 14:15:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2434222C327;
+	Mon, 10 Mar 2025 14:23:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EXHWdYEE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q1sAEwFk"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D18DBA3D
-	for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 14:15:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84C4022AE5D
+	for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 14:23:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741616115; cv=none; b=dhW1Y8r4a/PszbD4UwHOoQE/RjmDUHmVT6nt1UdcmoXjvbEBsYjBI3t6eVfHrUKlHQEsrtOIG4+3Ag4Z9Sy8GXXubk+HXdWvTvE0LgoxMMzwxwa+PkMnqVpa0cXndukeX1FHD6cy0om0x011iqfUuXHor/PeH6sw56g0i5m3r58=
+	t=1741616626; cv=none; b=pdGAkZ8VsqJI394wNF3kns8KmlEu1SG8RhCQ1kxUVwVw38kEQMOnjga6sBRrGUpJRA44R+rjMK0Xjec4rnxA/ScWFveKAPbEYY+kNZlxy9gHcjwLeKMwO2zAJVh8aZ3jGmak4lpSYb+JWyw5HSS5eTZxyVIzzKHe797g8Heebrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741616115; c=relaxed/simple;
-	bh=jEa1MxsrpS1cHMT2RYO8VBbSWB07INDb5JSIrlBAMRw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QdzdDQpK2ZwlljIyTcwiV1VYEbis7Hh81Lqyh4RlM+7F61eFbvUr6cuPUWOryHU5gPheFri737ZvDbZrjP+1YHJOO5W820xj2kFLM1MTwVqZLpcTWdoPLb5ALVg/9sPYiSp0/+lyTPqOGQXVbydYE2kjpjDCWEb5ttmhtXj+41M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EXHWdYEE; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741616112;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eMdCg2efbd0Qh20QNdOF7eXxFbnyvCBURzGryJnLYK4=;
-	b=EXHWdYEE9lph3MRunvnF4RunQeOpdaKVsAdXONUZsBZR6gwjZnATJ/jQmTzKqzN2o5qv3D
-	JqiMFYTY0J8fZQfnvRtsDMW5FwJYGuzcC5WLAxcVJjyED/lLxB/PLVLzDz+uoMxcR5+zDT
-	pia61au+5OC15ByhHthQNL4EPdAFF/Q=
-Received: from mail-yb1-f200.google.com (mail-yb1-f200.google.com
- [209.85.219.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-192-DbMtLMwCPZuD1HM7CTfqxQ-1; Mon, 10 Mar 2025 10:15:11 -0400
-X-MC-Unique: DbMtLMwCPZuD1HM7CTfqxQ-1
-X-Mimecast-MFC-AGG-ID: DbMtLMwCPZuD1HM7CTfqxQ_1741616111
-Received: by mail-yb1-f200.google.com with SMTP id 3f1490d57ef6-e5740c858beso5077252276.2
-        for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 07:15:11 -0700 (PDT)
+	s=arc-20240116; t=1741616626; c=relaxed/simple;
+	bh=68XPxVNyLnouCntVeMoHYnPvAP1WquVZf5t+Dt+l008=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=NW//qm9gjEXvKB+VeFWZwniPO2FWoyBEZI8UcrJWNQ8obVrDkuL0/0t4nPZko82Hw380nm7scYwYa9V9oKqJNcb8mqOoHlZeF7tQJV/k+Oo4kDGuyBqGbY5POCqZ6x2d96yuZ78j2yJ6QxYp+UJmM9v1KYLcbdAI6fa8hbqx4FI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q1sAEwFk; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-300fefb8e25so57493a91.3
+        for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 07:23:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741616623; x=1742221423; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=siqaS2JbSnx2njtDDydrKwV/MnNuVKvfYYNYvSOekGg=;
+        b=q1sAEwFkhfIcOkvNPSGKdjBlTNCQPzWhm69qKzIQLzMSpAjOLohUyszvJXCyvgRSRw
+         kKKTXn+nnnSkTBz9pLIyQjobjjrqBQlJXxepMY/mmTaJMwROHsWo8ff0G0l8TAO69mML
+         juTrcEfK5W8JVRDTpQ3+793n/FZ8VVTfOm9zD/HYGgsVd8nHFJ6W9IKN461JuwwwEkNS
+         hsr5S/I+Ig+ILlTlWWDmIpqNIj+sySm0bgZWAx75nny78FPmRBOJp3Qy+jO/uiaY1KUc
+         DcFfTRuxSTponheS0liO0RWX6tK2iASg/ExOpCf6I6Qe8uEh8VxSsb2nGgBEu9sje9c2
+         /PUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741616111; x=1742220911;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eMdCg2efbd0Qh20QNdOF7eXxFbnyvCBURzGryJnLYK4=;
-        b=r1t2srDOJe2PN5dHsjeNy+JyBegq2yLnRinFSCD9rsc/JnAC7L7rSbo5yU8FNMX5BW
-         sqoEZdTZxNjdaXpyvBeGl5y5BLZYLOJjBfbGOHjzpLQu5iu1XOG2tdiKXcDq75A4RU9Y
-         B4ekfDo/0xf9aUmtI7fVngIUbsqIp+KLGjGRr3JmFsU8VQWvuIeYYuIZw6gMB2fWLvkJ
-         ntDcfvuDQNWy2GocITdntZEfWAjN6JKJBhZCnDB73y6kacVaVHJyvCYakjgK6OhnyqSE
-         f/c4mjJzoJyz/hdyR41hYmMdU975NIkJS5qmlTHjAASoD4Y/OhxYPEMg7G/QjmOugvh0
-         Stug==
-X-Forwarded-Encrypted: i=1; AJvYcCVAARjQe23UhJ8kuqaNliLBD7f7mUnyhBWEvr3FPsqW2DAG5SS7wn1MY0AW46orYvEAOB4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjFkPKhE7FPvEyT73P/5YBFJoSbefn6y2wLAFs1fUpdtf8TLsv
-	OKVvAehSFeiT5AjckoUrNFpxL6L5lk1PCA0VR+yV6Cpq5RZQNhTu1nfJ4j4e+yU/nfRfjtuHyZi
-	f0B1H/gdLdHZOSA3zMM/9a0mtGp0ChkOxCP9dX9l4Mpuo4TV2Zr//OyO1XZsVjoKwX6rwbTQD0j
-	LlEDEuTTLXO4Vhy+e42t2RrW8f
-X-Gm-Gg: ASbGncuOmtdjQG/T60jtktq7XXCFkz/fuV5xgH7zBn+PJp6bWP8h2WwZYS7G+0vTrSe
-	k63I4a7Zvox/04Bess/mQALMZblPvsXR5WSW7u+ZcbvhAEoK+CmVz/jFcIMIbLGmmUED3g9A=
-X-Received: by 2002:a05:6902:2805:b0:e60:9d12:c1e5 with SMTP id 3f1490d57ef6-e635c1d8d02mr14992227276.36.1741616111104;
-        Mon, 10 Mar 2025 07:15:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGUqWrvAukg1iFDpO6ExBXHje3cw437GoWuPupbevVNTptRCcjP/uO3Bp+OM9ocpYHlDfKvsiQX6/BEdrkJbTU=
-X-Received: by 2002:a05:6902:2805:b0:e60:9d12:c1e5 with SMTP id
- 3f1490d57ef6-e635c1d8d02mr14992171276.36.1741616110694; Mon, 10 Mar 2025
- 07:15:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1741616623; x=1742221423;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=siqaS2JbSnx2njtDDydrKwV/MnNuVKvfYYNYvSOekGg=;
+        b=hTvJ1Q97f0e7hrXYVh+iiVPkoyQ6Su6QZ1ttWnviVnG62xG8TkPO344TOtY+bRA3Lm
+         y7fQIBahTkZRiQDh1ERnTuqmwkMTmttqQZ89gU9gnrFETU10tkF9Cl/OCPmEH1YI7N/P
+         dOyrfWUlKkmu/ZzzzASbebWPYxxYnht5DnF8InlxjZRXCxvo/tS2+ECQ2QWttYm5+tWe
+         j0FP2uM++O/UgPa8L892PZRZ3idGkfggOgzY+CWLDF4dP+vZOyVkNnLUrfRcJFwkMRln
+         eu2nRCN+lKqvf+xSpg9Hlrk32GIC9t0nDpE3qJ92YLohdzt6zVa+Q5Alql+Rpul4JAyh
+         RWdg==
+X-Gm-Message-State: AOJu0YyDfleo2JewzWNf8z0w4Br9e/G8nwOEGvxiOTvKnK1DTTmmzDy3
+	yInpUwJ1iwirM64ER9UNFw6OP7VJYsUJ8CssJIdlEEcgImBj80FbhkcZJSgNyaLlGw8+2n46LEx
+	8nPRFSF4x4D4BsmZK18jAXg==
+X-Google-Smtp-Source: AGHT+IEeQE/5jmeJ5/KuStm+Ss3KKZYK5UVXqTShZa7bpYd0X3YKbTqnCPeb/Q75cIive1di1Iuaubvf+4uM9toG5w==
+X-Received: from pjbpd6.prod.google.com ([2002:a17:90b:1dc6:b0:2fa:15aa:4d1e])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:4d8c:b0:2ff:4bac:6fbf with SMTP id 98e67ed59e1d1-2ff7ce4f2bdmr22213321a91.7.1741616622722;
+ Mon, 10 Mar 2025 07:23:42 -0700 (PDT)
+Date: Mon, 10 Mar 2025 14:23:41 +0000
+In-Reply-To: <CA+EHjTxhumDswVVosDtvMojk-MJbJT=V8Cxhhnw2GGUDL74Mmw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20200116172428.311437-1-sgarzare@redhat.com> <20200427142518.uwssa6dtasrp3bfc@steredhat>
- <224cdc10-1532-7ddc-f113-676d43d8f322@redhat.com> <20200428160052.o3ihui4262xogyg4@steredhat>
- <Z8edJjqAqAaV3Vkt@devvm6277.cco0.facebook.com> <20250305022248-mutt-send-email-mst@kernel.org>
- <v5c32aounjit7gxtwl4yxo2q2q6yikpb5yv3huxrxgfprxs2gk@b6r3jljvm6mt> <CACGkMEvms=i5z9gVRpnrXXpBnt3KGwM4bfRc46EztzDi4pqOsw@mail.gmail.com>
-In-Reply-To: <CACGkMEvms=i5z9gVRpnrXXpBnt3KGwM4bfRc46EztzDi4pqOsw@mail.gmail.com>
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Mon, 10 Mar 2025 15:14:59 +0100
-X-Gm-Features: AQ5f1JosWWXY88zUmFjBrkclv9qmpGDLsUUZ5bj0pBV0c8sMAT4CMg2t-YayKWI
-Message-ID: <CAGxU2F7SWG0m0KwODbKsbQipz6WzrRSuE1cUe6mYxZskqkbneQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/3] vsock: support network namespace
-To: Jason Wang <jasowang@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Bobby Eshleman <bobbyeshleman@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, 
-	Stefan Hajnoczi <stefanha@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, linux-hyperv@vger.kernel.org, 
-	Dexuan Cui <decui@microsoft.com>, netdev@vger.kernel.org
+Mime-Version: 1.0
+References: <20250303171013.3548775-3-tabba@google.com> <diqzbjucu60l.fsf@ackerleytng-ctop.c.googlers.com>
+ <CA+EHjTxhumDswVVosDtvMojk-MJbJT=V8Cxhhnw2GGUDL74Mmw@mail.gmail.com>
+Message-ID: <diqz4j01t15e.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [PATCH v5 2/9] KVM: guest_memfd: Handle final folio_put() of
+ guest_memfd pages
+From: Ackerley Tng <ackerleytng@google.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, mail@maciej.szmigiero.name, david@redhat.com, 
+	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
+	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
+	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
+	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
+	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
+	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
+	hughd@google.com, jthoughton@google.com, peterx@redhat.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, 6 Mar 2025 at 01:17, Jason Wang <jasowang@redhat.com> wrote:
->
-> On Wed, Mar 5, 2025 at 5:30=E2=80=AFPM Stefano Garzarella <sgarzare@redha=
-t.com> wrote:
-> >
-> > On Wed, Mar 05, 2025 at 02:27:12AM -0500, Michael S. Tsirkin wrote:
-> > >On Tue, Mar 04, 2025 at 04:39:02PM -0800, Bobby Eshleman wrote:
-> > >> I think it might be a lot of complexity to bring into the picture fr=
-om
-> > >> netdev, and I'm not sure there is a big win since the vsock device c=
-ould
-> > >> also have a vsock->net itself? I think the complexity will come from=
- the
-> > >> address translation, which I don't think netdev buys us because ther=
-e
-> > >> would still be all of the work work to support vsock in netfilter?
-> > >
-> > >Ugh.
-> > >
-> > >Guys, let's remember what vsock is.
-> > >
-> > >It's a replacement for the serial device with an interface
-> > >that's easier for userspace to consume, as you get
-> > >the demultiplexing by the port number.
->
-> Interesting, but at least VSOCKETS said:
->
-> """
-> config VSOCKETS
->         tristate "Virtual Socket protocol"
->         help
->          Virtual Socket Protocol is a socket protocol similar to TCP/IP
->           allowing communication between Virtual Machines and hypervisor
->           or host.
->
->           You should also select one or more hypervisor-specific transpor=
-ts
->           below.
->
->           To compile this driver as a module, choose M here: the module
->           will be called vsock. If unsure, say N.
-> """
->
-> This sounds exactly like networking stuff and spec also said something si=
-milar
->
-> """
-> The virtio socket device is a zero-configuration socket communications
-> device. It facilitates data transfer between the guest and device
-> without using the Ethernet or IP protocols.
-> """
->
-> > >
-> > >The whole point of vsock is that people do not want
-> > >any firewalling, filtering, or management on it.
->
-> We won't get this, these are for ethernet and TCP/IP mostly.
->
-> > >
-> > >It needs to work with no configuration even if networking is
-> > >misconfigured or blocked.
->
-> I don't see any blockers that prevent us from zero configuration, or I
-> miss something?
->
-> >
-> > I agree with Michael here.
-> >
-> > It's been 5 years and my memory is bad, but using netdev seemed like a
-> > mess, especially because in vsock we don't have anything related to
-> > IP/Ethernet/ARP, etc.
->
-> We don't need to bother with that, kernel support protocols other than TC=
-P/IP.
+Fuad Tabba <tabba@google.com> writes:
 
-Do we have an example of any other non-Ethernet device that uses
-netdev? Just to see what we should do.
-
-I'm not completely against the idea, but from what I remember when I
-looked at it five years ago, it wasn't that easy and straightforward
-to use.
-
+> Hi Ackerley,
 >
-> >
-> > I see vsock more as AF_UNIX than netdev.
+> On Fri, 7 Mar 2025 at 17:04, Ackerley Tng <ackerleytng@google.com> wrote:
+>>
+>> Fuad Tabba <tabba@google.com> writes:
+>>
+>> > Before transitioning a guest_memfd folio to unshared, thereby
+>> > disallowing access by the host and allowing the hypervisor to
+>> > transition its view of the guest page as private, we need to be
+>> > sure that the host doesn't have any references to the folio.
+>> >
+>> > This patch introduces a new type for guest_memfd folios, which
+>> > isn't activated in this series but is here as a placeholder and
+>> > to facilitate the code in the subsequent patch series. This will
+>> > be used in the future to register a callback that informs the
+>> > guest_memfd subsystem when the last reference is dropped,
+>> > therefore knowing that the host doesn't have any remaining
+>> > references.
+>> >
+>> > This patch also introduces the configuration option,
+>> > KVM_GMEM_SHARED_MEM, which toggles support for mapping
+>> > guest_memfd shared memory at the host.
+>> >
+>> > Signed-off-by: Fuad Tabba <tabba@google.com>
+>> > Acked-by: Vlastimil Babka <vbabka@suse.cz>
+>> > Acked-by: David Hildenbrand <david@redhat.com>
+>> > ---
+>> >  include/linux/kvm_host.h   |  7 +++++++
+>> >  include/linux/page-flags.h | 16 ++++++++++++++++
+>> >  mm/debug.c                 |  1 +
+>> >  mm/swap.c                  |  9 +++++++++
+>> >  virt/kvm/Kconfig           |  5 +++++
+>> >  5 files changed, 38 insertions(+)
+>> >
+>> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+>> > index f34f4cfaa513..7788e3625f6d 100644
+>> > --- a/include/linux/kvm_host.h
+>> > +++ b/include/linux/kvm_host.h
+>> > @@ -2571,4 +2571,11 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+>> >                                   struct kvm_pre_fault_memory *range);
+>> >  #endif
+>> >
+>> > +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+>> > +static inline void kvm_gmem_handle_folio_put(struct folio *folio)
+>> > +{
+>> > +     WARN_ONCE(1, "A placeholder that shouldn't trigger. Work in progress.");
+>> > +}
+>> > +#endif
+>> > +
+>> >  #endif
+>>
+>> Following up with the discussion at the guest_memfd biweekly call on the
+>> guestmem library, I think this folio_put() handler for guest_memfd could
+>> be the first function that's refactored out into (placeholder name)
+>> mm/guestmem.c.
+>>
+>> This folio_put() handler has to stay in memory even after KVM (as a
+>> module) is unloaded from memory, and so it is a good candidate for the
+>> first function in the guestmem library.
+>>
+>> Along those lines, CONFIG_KVM_GMEM_SHARED_MEM in this patch can be
+>> renamed CONFIG_GUESTMEM, and CONFIG_GUESTMEM will guard the existence of
+>> PGTY_guestmem.
+>>
+>> CONFIG_KVM_GMEM_SHARED_MEM can be introduced in the next patch of this
+>> series, which could, in Kconfig, select CONFIG_GUESTMEM.
+>>
+>> > diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+>> > index 6dc2494bd002..daeee9a38e4c 100644
+>> > --- a/include/linux/page-flags.h
+>> > +++ b/include/linux/page-flags.h
+>> > @@ -933,6 +933,7 @@ enum pagetype {
+>> >       PGTY_slab       = 0xf5,
+>> >       PGTY_zsmalloc   = 0xf6,
+>> >       PGTY_unaccepted = 0xf7,
+>> > +     PGTY_guestmem   = 0xf8,
+>> >
+>> >       PGTY_mapcount_underflow = 0xff
+>> >  };
+>> > @@ -1082,6 +1083,21 @@ FOLIO_TYPE_OPS(hugetlb, hugetlb)
+>> >  FOLIO_TEST_FLAG_FALSE(hugetlb)
+>> >  #endif
+>> >
+>> > +/*
+>> > + * guestmem folios are used to back VM memory as managed by guest_memfd. Once
+>> > + * the last reference is put, instead of freeing these folios back to the page
+>> > + * allocator, they are returned to guest_memfd.
+>> > + *
+>> > + * For now, guestmem will only be set on these folios as long as they  cannot be
+>> > + * mapped to user space ("private state"), with the plan of always setting that
+>> > + * type once typed folios can be mapped to user space cleanly.
+>> > + */
+>> > +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+>> > +FOLIO_TYPE_OPS(guestmem, guestmem)
+>> > +#else
+>> > +FOLIO_TEST_FLAG_FALSE(guestmem)
+>> > +#endif
+>> > +
+>> >  PAGE_TYPE_OPS(Zsmalloc, zsmalloc, zsmalloc)
+>> >
+>> >  /*
+>> > diff --git a/mm/debug.c b/mm/debug.c
+>> > index 8d2acf432385..08bc42c6cba8 100644
+>> > --- a/mm/debug.c
+>> > +++ b/mm/debug.c
+>> > @@ -56,6 +56,7 @@ static const char *page_type_names[] = {
+>> >       DEF_PAGETYPE_NAME(table),
+>> >       DEF_PAGETYPE_NAME(buddy),
+>> >       DEF_PAGETYPE_NAME(unaccepted),
+>> > +     DEF_PAGETYPE_NAME(guestmem),
+>> >  };
+>> >
+>> >  static const char *page_type_name(unsigned int page_type)
+>> > diff --git a/mm/swap.c b/mm/swap.c
+>> > index 47bc1bb919cc..241880a46358 100644
+>> > --- a/mm/swap.c
+>> > +++ b/mm/swap.c
+>> > @@ -38,6 +38,10 @@
+>> >  #include <linux/local_lock.h>
+>> >  #include <linux/buffer_head.h>
+>> >
+>> > +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+>> > +#include <linux/kvm_host.h>
+>> > +#endif
+>> > +
+>> >  #include "internal.h"
+>> >
+>> >  #define CREATE_TRACE_POINTS
+>> > @@ -101,6 +105,11 @@ static void free_typed_folio(struct folio *folio)
+>> >       case PGTY_hugetlb:
+>> >               free_huge_folio(folio);
+>> >               return;
+>> > +#endif
+>> > +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+>> > +     case PGTY_guestmem:
+>> > +             kvm_gmem_handle_folio_put(folio);
+>> > +             return;
+>> >  #endif
+>> >       default:
+>> >               WARN_ON_ONCE(1);
+>> > diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+>> > index 54e959e7d68f..37f7734cb10f 100644
+>> > --- a/virt/kvm/Kconfig
+>> > +++ b/virt/kvm/Kconfig
+>> > @@ -124,3 +124,8 @@ config HAVE_KVM_ARCH_GMEM_PREPARE
+>> >  config HAVE_KVM_ARCH_GMEM_INVALIDATE
+>> >         bool
+>> >         depends on KVM_PRIVATE_MEM
+>> > +
+>> > +config KVM_GMEM_SHARED_MEM
+>> > +       select KVM_PRIVATE_MEM
+>> > +       depends on !KVM_GENERIC_MEMORY_ATTRIBUTES
+>>
+>> Enforcing that KVM_GENERIC_MEMORY_ATTRIBUTES is not selected should not
+>> be a strict requirement. Fuad explained in an offline chat that this is
+>> just temporary.
+>>
+>> If we have CONFIG_GUESTMEM, then this question is moot, I think
+>> CONFIG_GUESTMEM would just be independent of everything else; other
+>> configs would depend on CONFIG_GUESTMEM.
 >
-> But you have a device in guest that differs from the AF_UNIX.
+> There are two things here. First of all, the unfortunate naming
+> situation where PRIVATE could mean GUESTMEM, or private could mean not
+> shared. I plan to tackle this aspect (i.e., the naming) in a separate
+> patch series, since that will surely generate a lot of debate :)
+>
 
-Yes, but the device is simply for carrying messages.
-Another thing that makes me think of AF_UNIX is the hybrid-vsock
-developed by Firecracker [1] that we also reused in vhost-user-vsock
-[2], where the mapping between AF_VSOCK and AF_UNIX is really
-implemented.
+Oops. By "depend on CONFIG_GUESTMEM" I meant "depend on the introduction
+of the guestmem shim". I think this is a good time to introduce the shim
+because the folio_put() callback needs to be in mm and not just in KVM,
+which is a loadable module and hence can be removed from memory.
 
-Thanks,
-Stefano
+If we do introduce the shim, the config flag CONFIG_KVM_GMEM_SHARED_MEM
+will be replaced by CONFIG_GUESTMEM (or other name), and then the
+question on depending on !KVM_GENERIC_MEMORY_ATTRIBUTES will be moot
+since I think an mm config flag wouldn't place a constraint on a module
+config flag?
 
-[1] https://github.com/firecracker-microvm/firecracker/blob/main/docs/vsock=
-.md#firecracker-virtio-vsock-design
-[2] https://github.com/rust-vmm/vhost-device/tree/main/vhost-device-vsock
+When I wrote this, I thought that config flags are easily renamed since
+they're an interface and are user-facing, but I realized config flag
+renaming seems to be easily renamed based on this search [1].
 
+If we're going with renaming in a separate patch series, some mechanism
+should be introduced here to handle the case where
+
+1. Kernel (and KVM module) is compiled with KVM_GMEM_SHARED_MEM set
+2. KVM is unloaded
+3. folio_put() tries to call kvm_gmem_handle_folio_put()
+
+> The other part is that, with shared memory in-place, the memory
+> attributes are an orthogonal matter. The attributes are the userpace's
+> view of what it expects the state of the memory to be, and are used to
+> multiplex whether the memory being accessed is guest_memfd or the
+> regular (i.e., most likely anonymous) memory used normally by KVM.
+>
+> This behavior however would be architecture, or even vm-type specific.
+>
+
+I agree it is orthogonal but I'm calling this out because "depends on
+!KVM_GENERIC_MEMORY_ATTRIBUTES" means if I set
+CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES, I can't use PGTY_guestmem since
+CONFIG_KVM_GMEM_SHARED_MEM would get unset.
+
+I was trying to test this with a KVM_X86_SW_PROTECTED_VM, setting up for
+using the ioctl to convert memory and hit this issue.
+
+> Cheers,
+> /fuad
+>
+>> > +       bool
+
+[1] https://lore.kernel.org/all/?q=s%3Arename+dfn%3AKconfig+merged
 
