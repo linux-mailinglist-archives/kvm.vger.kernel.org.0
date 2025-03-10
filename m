@@ -1,106 +1,191 @@
-Return-Path: <kvm+bounces-40692-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40693-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90B21A59F46
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 18:38:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3F83A5A1BC
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 19:12:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D598916C5D9
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 17:38:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D47B8173C85
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 18:12:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8419D2343D4;
-	Mon, 10 Mar 2025 17:38:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBDBD235362;
+	Mon, 10 Mar 2025 18:12:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b="uajN0eka"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Ntwx2Uyu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx.swemel.ru (mx.swemel.ru [95.143.211.150])
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 783C722ACDC;
-	Mon, 10 Mar 2025 17:37:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.211.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1284B233725;
+	Mon, 10 Mar 2025 18:12:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741628282; cv=none; b=c4XNzNkeIKHl92TEbkaFZ6oQhHoRZ/Cgztni/JNXp7h+j0jaGyEqApjRjUNmBg2cVvGzgyO/xMsKeB8Daia398uaiyxn8WwPJ+Ejk9U2QcacBaIFWn87lfLC9lCoMcJjOMhNwSvtvmeIljB7W6E4V77ko3dLNP1AlN+JZ8WW1jI=
+	t=1741630352; cv=none; b=YB1cMGFlSYw7FK7JcbRoM9zRqnGt0WgmhctiYVbe+1IgaQ18vMRIDZHw8RmmQKNaHCd64riQpw1H904hhhHq9km+j2YQCy1Deoa4J9pmixh1l6K9PTpeU7/LNBfL9fI3qcdEXwshxajlpwb8RqbE6wDfLbFAx4ycrRfw7OSLYTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741628282; c=relaxed/simple;
-	bh=ap3sPasrD3MtqJJ59dpJLS9W6lSJm9jqsQdhmWCCPrE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tnZ6qDlgOE13DVDurzkf9ScjHbXbMx7z4lQPeiHNmOIbTTE80rocrZcYD8/JNRL9Ij1uQIwT5DtYSmEQDvDlunEZ7qezp/7voucysf7wchzSyOmjzgc4Q1EtHY95o5rvxOFhkqmiMrmx5dvsXF+vjo6XdaFC/NjrYNuWJejl1HM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru; spf=pass smtp.mailfrom=swemel.ru; dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b=uajN0eka; arc=none smtp.client-ip=95.143.211.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=swemel.ru
-From: Andrey Kalachev <kalachev@swemel.ru>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=swemel.ru; s=mail;
-	t=1741628270;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9lmtUAfPPLINDeikVCo6wgZcDq+CKBrrfwKQrdC9wco=;
-	b=uajN0ekaVNJgGbX6wPMIW8yBvV99/KzRPvEvGZqnvKAKDtTNV7RtahGfzOV2j8pni4l7o/
-	hIOXGp9Ki6BZr8uVLlMJvOUIVSB8dccijGng/jger4E+l8cIODcmP3fx2CiQ1oH6Bl2fJl
-	4zNl3qdkbQSeSd7FF/9wgOhzq5iW5NA=
-To: stable@vger.kernel.org
-Cc: rananta@google.com,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	kalachev@swemel.ru,
-	lvc-project@linuxtesting.org
-Subject: [PATCH 6.1.y] KVM: selftests: Fix build error due to assert in dirty_log_test
-Date: Mon, 10 Mar 2025 20:37:49 +0300
-Message-Id: <20250310173749.11260-2-kalachev@swemel.ru>
-In-Reply-To: <20250310173749.11260-1-kalachev@swemel.ru>
-References: <20250310173749.11260-1-kalachev@swemel.ru>
+	s=arc-20240116; t=1741630352; c=relaxed/simple;
+	bh=HG/W4n5uZlKY6cxWkKtd3p2/Kd4jfK+Mk8Uxv4orh/M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Ql5BMjqAJbOHwuNZyjWJsRnZB/LehRN5Vi7LEICAixKRm5tU9uhc/j/uW7MA1oV1stMZVCQL6IqehiArTnNzwNXm8PA/q38qQwOn4d8IbWgq4zy+TWzXPGgraRsy2XInmIfrElP+xscKST/ZjDQ7cdQPUaAn4mIOgrprowDIuIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Ntwx2Uyu; arc=none smtp.client-ip=52.119.213.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1741630351; x=1773166351;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=AJNzET63DVGR7tJQ8b5ZW+nPqzzSSt+0wH0JG0KxXMQ=;
+  b=Ntwx2Uyu3x33GAf7fzYGVLxmIbFhej99vgmteWkYBNzqLRgg9breUu7v
+   RS/98kS+foQ5MCCOrVk7xuB2NdOOKWkMQQSIMdPnvKGbG/Mia7UcNYqjl
+   mY+uwxwnlKnj2dg/KWDW5uCx38+L0nfQXMQ6PD8IQxO34/qWXbOmLehxM
+   E=;
+X-IronPort-AV: E=Sophos;i="6.14,236,1736812800"; 
+   d="scan'208";a="278114488"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 18:12:26 +0000
+Received: from EX19MTAEUA001.ant.amazon.com [10.0.17.79:59359]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.34.60:2525] with esmtp (Farcaster)
+ id c3925b25-0958-4048-85a6-faf49dbd70a0; Mon, 10 Mar 2025 18:12:24 +0000 (UTC)
+X-Farcaster-Flow-ID: c3925b25-0958-4048-85a6-faf49dbd70a0
+Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
+ EX19MTAEUA001.ant.amazon.com (10.252.50.223) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 10 Mar 2025 18:12:24 +0000
+Received: from [192.168.30.50] (10.106.82.18) by EX19D022EUC002.ant.amazon.com
+ (10.252.51.137) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14; Mon, 10 Mar 2025
+ 18:12:23 +0000
+Message-ID: <fdae95e3-962b-4eaf-9ae7-c6bd1062c518@amazon.com>
+Date: Mon, 10 Mar 2025 18:12:22 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [RFC PATCH 0/5] KVM: guest_memfd: support for uffd missing
+To: Peter Xu <peterx@redhat.com>, James Houghton <jthoughton@google.com>
+CC: <akpm@linux-foundation.org>, <pbonzini@redhat.com>, <shuah@kernel.org>,
+	<kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
+	<lorenzo.stoakes@oracle.com>, <david@redhat.com>, <ryan.roberts@arm.com>,
+	<quic_eberman@quicinc.com>, <graf@amazon.de>, <jgowans@amazon.com>,
+	<roypat@amazon.co.uk>, <derekmn@amazon.com>, <nsaenz@amazon.es>,
+	<xmarcalx@amazon.com>
+References: <20250303133011.44095-1-kalyazin@amazon.com>
+ <Z8YfOVYvbwlZST0J@x1.local>
+ <CADrL8HXOQ=RuhjTEmMBJrWYkcBaGrqtXmhzPDAo1BE3EWaBk4g@mail.gmail.com>
+ <Z8i0HXen8gzVdgnh@x1.local>
+Content-Language: en-US
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
+ CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
+ i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
+In-Reply-To: <Z8i0HXen8gzVdgnh@x1.local>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D004EUC004.ant.amazon.com (10.252.51.191) To
+ EX19D022EUC002.ant.amazon.com (10.252.51.137)
 
-From: Raghavendra Rao Ananta <rananta@google.com>
 
-The commit e5ed6c922537 ("KVM: selftests: Fix a semaphore imbalance in
-the dirty ring logging test") backported the fix from v6.8 to stable
-v6.1. However, since the patch uses 'TEST_ASSERT_EQ()', which doesn't
-exist on v6.1, the following build error is seen:
 
-dirty_log_test.c:775:2: error: call to undeclared function
-'TEST_ASSERT_EQ'; ISO C99 and later do not support implicit function
-declarations [-Wimplicit-function-declaration]
-        TEST_ASSERT_EQ(sem_val, 0);
-        ^
-1 error generated.
+On 05/03/2025 20:29, Peter Xu wrote:
+> On Wed, Mar 05, 2025 at 11:35:27AM -0800, James Houghton wrote:
+>> I think it might be useful to implement an fs-generic MINOR mode. The
+>> fault handler is already easy enough to do generically (though it
+>> would become more difficult to determine if the "MINOR" fault is
+>> actually a MISSING fault, but at least for my userspace, the
+>> distinction isn't important. :)) So the question becomes: what should
+>> UFFDIO_CONTINUE look like?
+>>
+>> And I think it would be nice if UFFDIO_CONTINUE just called
+>> vm_ops->fault() to get the page we want to map and then mapped it,
+>> instead of having shmem-specific and hugetlb-specific versions (though
+>> maybe we need to keep the hugetlb specialization...). That would avoid
+>> putting kvm/gmem/etc. symbols in mm/userfaultfd code.
+>>
+>> I've actually wanted to do this for a while but haven't had a good
+>> reason to pursue it. I wonder if it can be done in a
+>> backwards-compatible fashion...
+> 
+> Yes I also thought about that. :)
 
-Replace the macro with its equivalent, 'ASSERT_EQ()' to fix the issue.
+Hi Peter, hi James.  Thanks for pointing at the race condition!
 
-Fixes: e5ed6c922537 ("KVM: selftests: Fix a semaphore imbalance in the dirty ring logging test")
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
----
- tools/testing/selftests/kvm/dirty_log_test.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+I did some experimentation and it indeed looks possible to call 
+vm_ops->fault() from userfault_continue() to make it generic and 
+decouple from KVM, at least for non-hugetlb cases.  One thing is we'd 
+need to prevent a recursive handle_userfault() invocation, which I 
+believe can be solved by adding a new VMF flag to ignore the userfault 
+path when the fault handler is called from userfault_continue().  I'm 
+open to a more elegant solution though.
 
-diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-index ec40a33c29fd..711b9e4d86aa 100644
---- a/tools/testing/selftests/kvm/dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_test.c
-@@ -772,9 +772,9 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	 * verification of all iterations.
- 	 */
- 	sem_getvalue(&sem_vcpu_stop, &sem_val);
--	TEST_ASSERT_EQ(sem_val, 0);
-+	ASSERT_EQ(sem_val, 0);
- 	sem_getvalue(&sem_vcpu_cont, &sem_val);
--	TEST_ASSERT_EQ(sem_val, 0);
-+	ASSERT_EQ(sem_val, 0);
- 
- 	pthread_create(&vcpu_thread, NULL, vcpu_worker, vcpu);
- 
--- 
-2.30.2
+Regarding usage of the MINOR notification, in what case do you recommend 
+sending it?  If following the logic implemented in shmem and hugetlb, ie 
+if the page is _present_ in the pagecache, I can't see how it is going 
+to work with the write syscall, as we'd like to know when the page is 
+_missing_ in order to respond with the population via the write.  If 
+going against shmem/hugetlb logic, and sending the MINOR event when the 
+page is missing from the pagecache, how would it solve the race 
+condition problem?
+
+Also, where would the check for the folio_test_uptodate() mentioned by 
+James fit into here?  Would it only be used for fortifying the MINOR 
+(present) against the race?
+
+> When Axel added minor fault, it's not a major concern as it's the only fs
+> that will consume the feature anyway in the do_fault() path - hugetlbfs has
+> its own path to take care of.. even until now.
+> 
+> And there's some valid points too if someone would argue to put it there
+> especially on folio lock - do that in shmem.c can avoid taking folio lock
+> when generating minor fault message.  It might make some difference when
+> the faults are heavy and when folio lock is frequently taken elsewhere too.
+
+Peter, could you expand on this?  Are you referring to the following 
+(shmem_get_folio_gfp)?
+
+	if (folio) {
+		folio_lock(folio);
+
+		/* Has the folio been truncated or swapped out? */
+		if (unlikely(folio->mapping != inode->i_mapping)) {
+			folio_unlock(folio);
+			folio_put(folio);
+			goto repeat;
+		}
+		if (sgp == SGP_WRITE)
+			folio_mark_accessed(folio);
+		if (folio_test_uptodate(folio))
+			goto out;
+		/* fallocated folio */
+		if (sgp != SGP_READ)
+			goto clear;
+		folio_unlock(folio);
+		folio_put(folio);
+	}
+
+Could you explain in what case the lock can be avoided?  AFAIC, the 
+function is called by both the shmem fault handler and userfault_continue().
+
+> It might boil down to how many more FSes would support minor fault, and
+> whether we would care about such difference at last to shmem users. If gmem
+> is the only one after existing ones, IIUC there's still option we implement
+> it in gmem code.  After all, I expect the change should be very under
+> control (<20 LOCs?)..
+> 
+> --
+> Peter Xu
+> 
 
 
