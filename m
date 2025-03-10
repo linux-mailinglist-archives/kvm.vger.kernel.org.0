@@ -1,175 +1,193 @@
-Return-Path: <kvm+bounces-40618-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40620-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB3F3A59418
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 13:20:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81EC4A59436
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 13:25:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F6573A7E69
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 12:20:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2622168A88
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 12:25:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E11802253E6;
-	Mon, 10 Mar 2025 12:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A635227B9A;
+	Mon, 10 Mar 2025 12:25:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FD/veueW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZVvLaxpp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6904112B71;
-	Mon, 10 Mar 2025 12:20:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76A8422423E;
+	Mon, 10 Mar 2025 12:25:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741609224; cv=none; b=YZBhW3fZHR4ibaR5s4XNY1DfYqCXRGHBB9BThDpqawFM4O2ImXnPzaz8xHBbywoswBm9le9EjNuAHr9Zq4awdIjFswMFupEnvKoLgUUD6RjOHZ3DzrIOqxjdIxdHcCg97o9Yz8UPOsbVIkw0YHUHcYnplIahbrO2ov8pnDVlzyE=
+	t=1741609512; cv=none; b=RzX3sqzgBfQAM/jl8kk9Ui/GURkV8Q1KeGPZFf59LiXQdh8I5s5Dhszwswr1tYUMJwQHYhFOS32HRpCyHxpClS9yFWNUoEFgMExWTi2s8yOj6Q4yB4bOtVCQYPec7SbpLGKhFv6vRN5Vw24Ylm+v0x7Sr+se29IJGz0iE8OaXHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741609224; c=relaxed/simple;
-	bh=Nv4+9IXR1foiLgcCPciQGd7XoxCZn1Ea3xtco5f/uks=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ChYI2aXlFIiBqCg5oJW09hqWgp183PPS8OkPeDAT/z14OcUhpMgx1wT1VIptrvx8zINrzAcLLfAkGZwT2dmYH/94WUuLtfm65CEmqmixLB+xwmSTFh9rSNxfPX+74a6jxPSSNjTilYSepBJ3sU2kDRhuR4hV/+s23AXRPW3x9N4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=FD/veueW; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 529NeauW028787;
-	Mon, 10 Mar 2025 12:20:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=YC+kTP
-	ilZKXCkJhmFSGkSldD+jVSe32pprVzsJOlftA=; b=FD/veueWARkL3EBH2ncDi0
-	AJRM/8KYwXA/qh6DjntviaRTJG7SJwKlWGCJFoXx2URJg8Kw/FQpjDWUv+/T4EOP
-	yWqAIZa2XaLx9Wse65gm3/gf0/WduRQqZ3QFEpphKdXWRqBbPiWp2BJeeXCEe1B8
-	p6kKKwip2I3kLKbKw8+xZwPvLFeqeNDnsjbwQtSFIo1aMUg7W8RtT9/0TrdNZK63
-	ArHGQGOgygJeIuEKY9dhISL+AZRoEYLyFje4YYK1Eh7TSO+pyO0ceHpiDU0LioBK
-	yjUNT77zDP73XaWy4vV70ss5wxNSgtziAB6o1Hc1/UKqBvrYEJYXzc5vp4ai627g
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 459jd4u51e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 10 Mar 2025 12:20:19 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52AAUSen022223;
-	Mon, 10 Mar 2025 12:20:19 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 45917n6gp5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 10 Mar 2025 12:20:19 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52ACKFMJ42467624
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 10 Mar 2025 12:20:15 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 32A2520043;
-	Mon, 10 Mar 2025 12:20:15 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id ECB8420040;
-	Mon, 10 Mar 2025 12:20:14 +0000 (GMT)
-Received: from [9.171.55.85] (unknown [9.171.55.85])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 10 Mar 2025 12:20:14 +0000 (GMT)
-Message-ID: <aa9bd929-e2b9-4772-9802-171c30036dff@linux.ibm.com>
-Date: Mon, 10 Mar 2025 13:20:14 +0100
+	s=arc-20240116; t=1741609512; c=relaxed/simple;
+	bh=pBDyZMeTYijWWERE2PGpvZldblWOM4srKyJV30gv0OY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fsr4zss7u4rIVVh49xkikEy8p4ikowu3BDDx4fZ+22N+nYTLmdPqaUuYBphWDL5kx9MyeTy7UImZYPvMlMX8PuiElIfZPbyQNooh4VCdhUB68rV9u9wjMm9bVuCKqVbqjq4M1S3tVYf1JX4NwM99+UcwgxQg90xJr1nHFxV/3BA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZVvLaxpp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2FAFC4CEE5;
+	Mon, 10 Mar 2025 12:25:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741609511;
+	bh=pBDyZMeTYijWWERE2PGpvZldblWOM4srKyJV30gv0OY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ZVvLaxppvCxa/8rfaWcmv/5ayzUsAGWHXuLIqzHvH5mubuheQVaYCOMxPF1e2FfBR
+	 k0X0HRNESynHlt5C6ngTLXeQTeDfkM6A22HhLrx85VWEbast3nhUlSUYGLp6jYSgQT
+	 5bnHTEJ7ACs+0OA+DFn8C+FXknZXFiiK6qoLCdvcbkPLhpZPIR76c2KYmTH4p0t3jM
+	 xnleBOrVGAZcuh+ioSDK8mRfcK7e5moLf48TkTQQpNCuhJZygDVO+MyRCNIdZcRpuo
+	 ngDL2iPNAuLwozFiJ4W8M52qnJ7oZrjC12kupJLOspz3JYuMXlAfcxFk86qLFLjj61
+	 dUkDLe0RL3hcg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1trcBw-00CAea-Bu;
+	Mon, 10 Mar 2025 12:25:08 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Fuad Tabba <tabba@google.com>
+Subject: [PATCH v2 00/23] KVM: arm64: Revamp Fine Grained Trap handling
+Date: Mon, 10 Mar 2025 12:24:42 +0000
+Message-Id: <20250310122505.2857610-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v1] s390x: pv: fix arguments for
- out-of-tree-builds
-To: Nico Boehr <nrb@linux.ibm.com>, imbrenda@linux.ibm.com, thuth@redhat.com
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20250227131031.3811206-1-nrb@linux.ibm.com>
-Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20250227131031.3811206-1-nrb@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Nfqg6UZABeHws056IZ2Lj5dzFnN35OO8
-X-Proofpoint-GUID: Nfqg6UZABeHws056IZ2Lj5dzFnN35OO8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-10_05,2025-03-07_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- phishscore=0 mlxlogscore=999 impostorscore=0 priorityscore=1501 mlxscore=0
- suspectscore=0 malwarescore=0 clxscore=1015 bulkscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2502100000
- definitions=main-2503100095
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 2/27/25 2:10 PM, Nico Boehr wrote:
-> When building out-of-tree, the parmfile was not passed to genprotimg,
-> causing the selftest-setup_PV test to fail.
-> 
-> Fix the Makefile rule s.t. parmfile is correctly passed.
-> 
-> Suggested-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> ---
->   s390x/Makefile | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index 47dda6d26a6f..97ed0b473af5 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -213,7 +213,7 @@ else
->   	GENPROTIMG_PCF := 0x000000e0
->   endif
->   
-> -$(patsubst %.parmfile,%.pv.bin,$(wildcard s390x/*.parmfile)): %.pv.bin: %.parmfile
-> +$(TEST_DIR)/selftest.pv.bin: $(SRCDIR)/s390x/selftest.parmfile
->   %.pv.bin: %.bin $(HOST_KEY_DOCUMENT) $(comm-key)
->   	$(eval parmfile_args = $(if $(filter %.parmfile,$^),--parmfile $(filter %.parmfile,$^),))
->   	$(GENPROTIMG) $(GENPROTIMG_DEFAULT_ARGS) --host-key-document $(HOST_KEY_DOCUMENT) $(GENPROTIMG_COMM_OPTION) $(comm-key) --x-pcf $(GENPROTIMG_PCF) $(parmfile_args) --image $(filter %.bin,$^) -o $@
+Mark recently mentioned that the way we handled FGTs, and particularly
+their RES0 behaviour was not entirely future-proof.
 
+The main issue is that RES0 bits are extracted from the sysreg file,
+which is independently updated, and that the KVM-specific enablement
+is not necessarily done at the same time. This means that a bit that
+KVM considered RES0 at some point all of a sudden acquires a meaning,
+and that this can trigger unexpected behaviours.
 
-We had this hardcoded, then changed to this rule and now move back to 
-hardcoding, no?
+One way of fixing that would be to mandate that everything gets
+updated synchronously. While this is something I'd really want to see,
+it is unlikely to happen within my lifetime.
 
-It's fine but it's still strange...
+So the next best option is to reintroduce KVM's own view of RES0
+masks, so that it can continue to ignore a given feature in a safe
+manner. But instead of going back to what we have a while back in the
+form of hand-crafted masks that are likely to be wrong, this series
+makes use of the rather exhaustive description of traps that we know
+about, and then some more:
+
+- compile the encoding_to_fgt[] array into individual positive,
+  negative, and res0 masks
+
+- use these masks in place of anything that is hardcoded
+
+- fix a few bugs along the way (thanks Mark!)
+
+- perform some validation and let users know that KVM may be missing
+  some FGT bit definitions
+
+But it would be foolish to stop here. We also use FGTs to implement
+the so called "Fine Grained UNDEF" (FGU) bits, and make sure that
+system registers that are not exposed to a guest do UNDEF. This means
+evaluating the guest configuration and setting up these FGU bits when
+said configuration isn't supported.
+
+This series therefore goes one step further and, for the HFG*TR_EL2,
+HDFG*TR_EL2, and HAFGRTR_EL2 registers, define which bit is controlled
+by which feature. This is done mechanically, with very minimal human
+intervention, by extracting the relevant data from the ARM-released
+JSON files.
+
+Oh, and one more thing: we now do the same for HCRX_EL2 and HCR_EL2.
+Isn't that great?
+
+With that data, we greatly simplify the dependency between FGUs and
+features, as no code needs to be written. We also use the same data to
+set the RES0 bits for any register that requires sanitisation (the
+VNCR-backed registers, for example).
+
+Overall, and while this is a lot of new LoCs, it is IMO a reduction in
+complexity and maintenance burden.
+
+This series is atop of 6.14-rc4, and contains bits and pieces of
+FEAT_LS64 support thanks to the newly added HFGITR_EL2.PSBCSYNC bit
+sharing an EC with LS64.
+
+* From v1 [1]:
+
+  - Renamed the LS64 EC to OTHER (Mark)
+
+  - Simplified the handling of the OTHER EC by folding the relevant
+    checks (Fuad)
+
+  - Added HCRX_EL2 and HCR_EL2 conversion to the config scheme, the
+    latter requiring some extra infrastructure
+
+  - Rebased on v6.14-rc4
+
+[1] https://lore.kernel.org/r/20250210184150.2145093-1-maz@kernel.org
+
+Marc Zyngier (22):
+  arm64: sysreg: Add ID_AA64ISAR1_EL1.LS64 encoding for FEAT_LS64WB
+  arm64: sysreg: Update ID_AA64MMFR4_EL1 description
+  arm64: sysreg: Add layout for HCR_EL2
+  arm64: Add syndrome information for trapped LD64B/ST64B{,V,V0}
+  KVM: arm64: Handle trapping of FEAT_LS64* instructions
+  KVM: arm64: Restrict ACCDATA_EL1 undef to FEAT_ST64_ACCDATA being
+    disabled
+  KVM: arm64: Don't treat HCRX_EL2 as a FGT register
+  KVM: arm64: Plug FEAT_GCS handling
+  KVM: arm64: Compute FGT masks from KVM's own FGT tables
+  KVM: arm64: Add description of FGT bits leading to EC!=0x18
+  KVM: arm64: Use computed masks as sanitisers for FGT registers
+  KVM: arm64: Propagate FGT masks to the nVHE hypervisor
+  KVM: arm64: Use computed FGT masks to setup FGT registers
+  KVM: arm64: Remove most hand-crafted masks for FGT registers
+  KVM: arm64: Use KVM-specific HCRX_EL2 RES0 mask
+  KVM: arm64: Handle PSB CSYNC traps
+  KVM: arm64: Switch to table-driven FGU configuration
+  KVM: arm64: Validate FGT register descriptions against RES0 masks
+  KVM: arm64: Use FGT feature maps to drive RES0 bits
+  KVM: arm64: Allow kvm_has_feat() to take variable arguments
+  KVM: arm64: Use HCRX_EL2 feature map to drive fixed-value bits
+  KVM: arm64: Use HCR_EL2 feature map to drive fixed-value bits
+
+Mark Rutland (1):
+  KVM: arm64: Unconditionally configure fine-grain traps
+
+ arch/arm64/include/asm/esr.h            |   9 +-
+ arch/arm64/include/asm/kvm_arm.h        | 189 +++--
+ arch/arm64/include/asm/kvm_host.h       |  33 +-
+ arch/arm64/kvm/Makefile                 |   2 +-
+ arch/arm64/kvm/arm.c                    |   8 +
+ arch/arm64/kvm/config.c                 | 891 ++++++++++++++++++++++++
+ arch/arm64/kvm/emulate-nested.c         | 140 +++-
+ arch/arm64/kvm/handle_exit.c            |  72 ++
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 110 +--
+ arch/arm64/kvm/hyp/nvhe/switch.c        |   7 +
+ arch/arm64/kvm/nested.c                 | 204 +-----
+ arch/arm64/kvm/sys_regs.c               |  65 +-
+ arch/arm64/tools/sysreg                 |  90 ++-
+ 13 files changed, 1394 insertions(+), 426 deletions(-)
+ create mode 100644 arch/arm64/kvm/config.c
+
+-- 
+2.39.2
+
 
