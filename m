@@ -1,358 +1,283 @@
-Return-Path: <kvm+bounces-40615-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40616-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A959DA590A1
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 11:02:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0941A591F6
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 11:55:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C08B0188EE47
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 10:02:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2C0E16D316
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 10:54:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28523225A23;
-	Mon, 10 Mar 2025 10:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 406BE227563;
+	Mon, 10 Mar 2025 10:51:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LDwPMxQS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HSGQICjU"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 377E7224240
-	for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 10:01:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 924FD226D1E
+	for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 10:51:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741600894; cv=none; b=RIpsoqqxi6Ey+XmTYtOIq7R+Bemw9mdZeMOVFrYwTvEolpJ61Lg1v6bl3Sgh1YMJ7hchKrUpm/zmhqlC+/Yo6uGqiMlwYueltixTC1+LaC64kCT2u/0Tc9D6wGxE02aoTOgmmV08x8ZUQ11TIgucA5WX1uhoei14SK64kbOaMAU=
+	t=1741603877; cv=none; b=B2fMwnYSIXmcEWXADzTV1jZagFbD1PX6xum/wEbgnY5QxWUqi+yXu7xFCmaIEqkJgTQsmeDBvhWJvcQX0cycfA08zI96WPcPPkzKlhqKnQ7KR4dT/eFl9NT1JRA+UKWEq9z1TzLSbri+bAhxrVTHqcLzvEU9d5EE0HzXis9H4CM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741600894; c=relaxed/simple;
-	bh=kCptOO7WTS4D4pVelx8hJMiU7UV1dMk6cw8JtDE8HWE=;
+	s=arc-20240116; t=1741603877; c=relaxed/simple;
+	bh=5s3rawUIjr3yWblxOqJ18a21f4XARGwxCKHF/ItDOwk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZwTxikONruDb9ugh05jZH6VdVqFlb1JQWnYdOQHUTjjVNrn6qd6bax3cy1qbB33nCRSRejLda82Bog22cA4LUIrAMJ3VjF33b7+ZVuJBBteY+0R/zhX7n6TS5fIKz45PwG4+fASln4y+sbBFrG059oV+s4EKPRVtTCUyIkZmoVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LDwPMxQS; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741600891;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xr9w71kjsM5Luuk2otd03enGGnFQEqtLlHU+jI22Q3c=;
-	b=LDwPMxQS0zhE7kHPIjaIHW0FtbYNgb/fT5sXZLYCuvKZ2An1Qn1iAxlDf7LURSz0pNmYyl
-	9Q1wp1ozKrH5nroi2Aya4A59Yf3dGgFvDrpq4CFcxaHHGnEOW8npJHSgBITBgpFnQp1tJ/
-	rh3hep9vHwHSXD+hOwjBrhDutImsdqY=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-170-b00VQoudN8CGFhdo4pEWWg-1; Mon, 10 Mar 2025 06:01:29 -0400
-X-MC-Unique: b00VQoudN8CGFhdo4pEWWg-1
-X-Mimecast-MFC-AGG-ID: b00VQoudN8CGFhdo4pEWWg_1741600889
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5e67df8c373so1265541a12.0
-        for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 03:01:29 -0700 (PDT)
+	 To:Cc:Content-Type; b=aHGFOFO9DqMNpGAUkYJI6scHqLmOsCjReU1D3Fb05e9SJfEpldyEn8MpChQ4k99Yl3c3Sjau5uT87D2DHF+ODF9A7vfvQt3Eb3oeID3peF0pizJVi2gEaXgRh59EFjpKsfifMhYiIibLJ/WgjDFKVBQy2ec486Ix9V0JdZ9a3rs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HSGQICjU; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-47681dba807so185411cf.1
+        for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 03:51:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741603874; x=1742208674; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=GsgHhJNmkDq1O/YozvCptEjFHuaUcIYXqJY3xYqe+UM=;
+        b=HSGQICjUVDQbm+8s9ps/aMKdw1s9i5H0291WxJz87RXBwaskSVQfJV1ngcXjKwMYwy
+         tKJ6C9G+ibsMRvG7eNYSt644TRK4v7a31QXQpRwpxzwXARfv+pZrmGb2iIW3OdavQj+N
+         txgJqlAZDYW3OOwwp79/k+mBHhheLfFLjcnWGaV1VL1zj2MFu08vQ4gFWI7vpLs5VbgR
+         ADpoJMiLCa1/y5eHP2Yanc9h3pA+IawdMqIqlh1ICIhilaChyKqBZqytdSyTvlUQ7pLI
+         B2D6ImBeFCGZp8Y57rwmGTgMVMSzldJ06rEo2dAx+KCyAL8FHFZBlyWOoRR02rurWN3O
+         8AoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741600888; x=1742205688;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xr9w71kjsM5Luuk2otd03enGGnFQEqtLlHU+jI22Q3c=;
-        b=t5iZ/dStyKpQ73R/bGCrJirz5wH+1u6rFmmTmoTRuV/SqLRlL5CC7p2RwAXBLVwcal
-         8thjD721RrugZppLKb/BW2tL3Ckec+0YY5py3VvcNulETIYflxa2US7yvlnzta7JuhdW
-         uQgtsjYStVHjMpDZhRhBQtqqANsKXC0UVQRX6ZxMGCRBGXNGubppqrStu7uYHaUmgEqR
-         yb9tBLdwEYx3wKuKAEyYQWJMmRCGvdMciM9QTdWR9b3TZs23ghRoU8/V9XFXycYM9Zsy
-         odOifNgjS2KpETzr/EU2QPj9LBg/7xMK1XuthnEwnQdahCHl6juCaQSPZQDVLw24lJKa
-         b/Og==
-X-Forwarded-Encrypted: i=1; AJvYcCXILwOvszmIc5QEDOinDcJ4ZL7iRQsrR4SHHHc4pjLYWyVBmSz8LklTF7Ka8a6BkUosjo4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyR/rj6C+txKv826nSf6MKhwfROspZzCUmqI5EDlYN4i4LThad9
-	qU6xYKaxwVNl40RV2hVHxm980WjaeX2JK9pdJcBX5UzK9y0dsqEDT9y8gvo22PN4jzLiQ3SchD0
-	QkGEEWGY41oGcqDOHqbnrmE1i6vLeJwCIYz7A5SUFcOfUxa01V8sjyPxUOm1i2sPAty008HrMu4
-	ci3/AuyKDcgnndmZ7BzmBqNvOW
-X-Gm-Gg: ASbGncvK10tqxWnAysPOaPshaW2ueilJUQhGdu/UrwKX7GFhDl2AANfdEznOs92AQGg
-	8MJ2ATivq7xrZZvnQbFJH7UiDKROSggZiM7twtQTyEEestzCsWCzvL4M04RPzYgUK7y9nowAHfA
-	==
-X-Received: by 2002:a17:907:a181:b0:ac2:7a3b:31ef with SMTP id a640c23a62f3a-ac27a3b4268mr710421666b.41.1741600888475;
-        Mon, 10 Mar 2025 03:01:28 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHuFnN7zPHPASajv3LwDLTFnpfckkATF6JYZEpa9/avX3UmTJtekiKHKEC/uww5oRaTbOZUYx11vHikxYga8mM=
-X-Received: by 2002:a17:907:a181:b0:ac2:7a3b:31ef with SMTP id
- a640c23a62f3a-ac27a3b4268mr710417566b.41.1741600887976; Mon, 10 Mar 2025
- 03:01:27 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1741603874; x=1742208674;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GsgHhJNmkDq1O/YozvCptEjFHuaUcIYXqJY3xYqe+UM=;
+        b=OXbltLF0CixH5k46haS9HAYx2OZMZ8Wo9+KzW9Wj/FrtN4SBn6wNck0ial9eB7Ali0
+         Zx/TXUO3ma2H9gV/dc11/DiZi8ZM/foz9HIGd+Az63PO73dFyxw55TCYntZAnmhBjnA6
+         NYUloweGLLJJOvupLandMvI63xWDbBz4bs6J57IdK/3y2u8eeHClGh+9UTT9r39hbrE0
+         2NotfICT726RraEpOlXiFqR7E6RYYP0LGyD3nleI1RjuIOrep9PS1KSPHYPCkik204D2
+         2bleNdldWsInFFe9ka1oBjLyXbYQPyuRKGrXPECApihIa2M5GVtg2wthMfwGrJO4puNr
+         MP/Q==
+X-Gm-Message-State: AOJu0Yw6YccWigkqhs2oOYUccjJ6ONX+xhIW//DIU2sk7TWteC48lwQG
+	CuTNotIFfsqVzbtHg6h730hu0wQTu3tbbp34PsZNm1ys0VqE1rknKTXu4bSjpRHSTpQ9jx6vt7c
+	apr/q+zCxrzWvdvfFLeDClo+2OmVv/V++k63i
+X-Gm-Gg: ASbGncvGf6YeMYhfkpZnmoKtueba7etPXTCM4WBDfHxBT/3FnGogn7upTyV1LsEtHxm
+	JZLenVZal0ZckhPhL5BR+kH3itS31bxGMLpwqjWosOZlUG1HGp615Xm5CBqhjfvGRZEjtzSJHoM
+	ZYag0BHDmXutjegqUrgyX14D67T7kUUn96DzM=
+X-Google-Smtp-Source: AGHT+IFjx4d1g1257vPbEG4Ss+rawxH74R9/yXbl+GoTTbybUHaqCakPJfsdpLytVxhx4SVCnvjiKG47fh4ne3E9FtY=
+X-Received: by 2002:a05:622a:2a0b:b0:471:eab0:ef21 with SMTP id
+ d75a77b69052e-47668a7e96fmr5778091cf.13.1741603874136; Mon, 10 Mar 2025
+ 03:51:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250308214045.1160445-1-almasrymina@google.com>
-In-Reply-To: <20250308214045.1160445-1-almasrymina@google.com>
-From: Lei Yang <leiyang@redhat.com>
-Date: Mon, 10 Mar 2025 18:00:51 +0800
-X-Gm-Features: AQ5f1Jrkwm3AKULNqsZpquHRLDhQkbFM4PkLqf-j-uACY2HaSQ5keeelX2KkkPY
-Message-ID: <CAPpAL=yPwCXONQfO4cZYt_j1CEt1=Yq6jDzqnc6udCTStM8exQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 0/9] Device memory TCP TX
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
-	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Jeroen de Borst <jeroendb@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
+References: <20250303171013.3548775-3-tabba@google.com> <diqzbjucu60l.fsf@ackerleytng-ctop.c.googlers.com>
+In-Reply-To: <diqzbjucu60l.fsf@ackerleytng-ctop.c.googlers.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 10 Mar 2025 10:50:37 +0000
+X-Gm-Features: AQ5f1Jrapxy-udzYyByq6fwLBA7bWnEYimb6j8q79RDN3N0_PrJEhUvOrrSfYks
+Message-ID: <CA+EHjTxhumDswVVosDtvMojk-MJbJT=V8Cxhhnw2GGUDL74Mmw@mail.gmail.com>
+Subject: Re: [PATCH v5 2/9] KVM: guest_memfd: Handle final folio_put() of
+ guest_memfd pages
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, mail@maciej.szmigiero.name, david@redhat.com, 
+	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
+	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
+	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
+	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
+	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
+	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
+	hughd@google.com, jthoughton@google.com, peterx@redhat.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-QE tested this series with virtio-net regression tests, everything works fi=
-ne.
+Hi Ackerley,
 
-Tested-by: Lei Yang <leiyang@redhat.com>
+On Fri, 7 Mar 2025 at 17:04, Ackerley Tng <ackerleytng@google.com> wrote:
+>
+> Fuad Tabba <tabba@google.com> writes:
+>
+> > Before transitioning a guest_memfd folio to unshared, thereby
+> > disallowing access by the host and allowing the hypervisor to
+> > transition its view of the guest page as private, we need to be
+> > sure that the host doesn't have any references to the folio.
+> >
+> > This patch introduces a new type for guest_memfd folios, which
+> > isn't activated in this series but is here as a placeholder and
+> > to facilitate the code in the subsequent patch series. This will
+> > be used in the future to register a callback that informs the
+> > guest_memfd subsystem when the last reference is dropped,
+> > therefore knowing that the host doesn't have any remaining
+> > references.
+> >
+> > This patch also introduces the configuration option,
+> > KVM_GMEM_SHARED_MEM, which toggles support for mapping
+> > guest_memfd shared memory at the host.
+> >
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > Acked-by: Vlastimil Babka <vbabka@suse.cz>
+> > Acked-by: David Hildenbrand <david@redhat.com>
+> > ---
+> >  include/linux/kvm_host.h   |  7 +++++++
+> >  include/linux/page-flags.h | 16 ++++++++++++++++
+> >  mm/debug.c                 |  1 +
+> >  mm/swap.c                  |  9 +++++++++
+> >  virt/kvm/Kconfig           |  5 +++++
+> >  5 files changed, 38 insertions(+)
+> >
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index f34f4cfaa513..7788e3625f6d 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -2571,4 +2571,11 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+> >                                   struct kvm_pre_fault_memory *range);
+> >  #endif
+> >
+> > +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> > +static inline void kvm_gmem_handle_folio_put(struct folio *folio)
+> > +{
+> > +     WARN_ONCE(1, "A placeholder that shouldn't trigger. Work in progress.");
+> > +}
+> > +#endif
+> > +
+> >  #endif
+>
+> Following up with the discussion at the guest_memfd biweekly call on the
+> guestmem library, I think this folio_put() handler for guest_memfd could
+> be the first function that's refactored out into (placeholder name)
+> mm/guestmem.c.
+>
+> This folio_put() handler has to stay in memory even after KVM (as a
+> module) is unloaded from memory, and so it is a good candidate for the
+> first function in the guestmem library.
+>
+> Along those lines, CONFIG_KVM_GMEM_SHARED_MEM in this patch can be
+> renamed CONFIG_GUESTMEM, and CONFIG_GUESTMEM will guard the existence of
+> PGTY_guestmem.
+>
+> CONFIG_KVM_GMEM_SHARED_MEM can be introduced in the next patch of this
+> series, which could, in Kconfig, select CONFIG_GUESTMEM.
+>
+> > diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+> > index 6dc2494bd002..daeee9a38e4c 100644
+> > --- a/include/linux/page-flags.h
+> > +++ b/include/linux/page-flags.h
+> > @@ -933,6 +933,7 @@ enum pagetype {
+> >       PGTY_slab       = 0xf5,
+> >       PGTY_zsmalloc   = 0xf6,
+> >       PGTY_unaccepted = 0xf7,
+> > +     PGTY_guestmem   = 0xf8,
+> >
+> >       PGTY_mapcount_underflow = 0xff
+> >  };
+> > @@ -1082,6 +1083,21 @@ FOLIO_TYPE_OPS(hugetlb, hugetlb)
+> >  FOLIO_TEST_FLAG_FALSE(hugetlb)
+> >  #endif
+> >
+> > +/*
+> > + * guestmem folios are used to back VM memory as managed by guest_memfd. Once
+> > + * the last reference is put, instead of freeing these folios back to the page
+> > + * allocator, they are returned to guest_memfd.
+> > + *
+> > + * For now, guestmem will only be set on these folios as long as they  cannot be
+> > + * mapped to user space ("private state"), with the plan of always setting that
+> > + * type once typed folios can be mapped to user space cleanly.
+> > + */
+> > +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> > +FOLIO_TYPE_OPS(guestmem, guestmem)
+> > +#else
+> > +FOLIO_TEST_FLAG_FALSE(guestmem)
+> > +#endif
+> > +
+> >  PAGE_TYPE_OPS(Zsmalloc, zsmalloc, zsmalloc)
+> >
+> >  /*
+> > diff --git a/mm/debug.c b/mm/debug.c
+> > index 8d2acf432385..08bc42c6cba8 100644
+> > --- a/mm/debug.c
+> > +++ b/mm/debug.c
+> > @@ -56,6 +56,7 @@ static const char *page_type_names[] = {
+> >       DEF_PAGETYPE_NAME(table),
+> >       DEF_PAGETYPE_NAME(buddy),
+> >       DEF_PAGETYPE_NAME(unaccepted),
+> > +     DEF_PAGETYPE_NAME(guestmem),
+> >  };
+> >
+> >  static const char *page_type_name(unsigned int page_type)
+> > diff --git a/mm/swap.c b/mm/swap.c
+> > index 47bc1bb919cc..241880a46358 100644
+> > --- a/mm/swap.c
+> > +++ b/mm/swap.c
+> > @@ -38,6 +38,10 @@
+> >  #include <linux/local_lock.h>
+> >  #include <linux/buffer_head.h>
+> >
+> > +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> > +#include <linux/kvm_host.h>
+> > +#endif
+> > +
+> >  #include "internal.h"
+> >
+> >  #define CREATE_TRACE_POINTS
+> > @@ -101,6 +105,11 @@ static void free_typed_folio(struct folio *folio)
+> >       case PGTY_hugetlb:
+> >               free_huge_folio(folio);
+> >               return;
+> > +#endif
+> > +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> > +     case PGTY_guestmem:
+> > +             kvm_gmem_handle_folio_put(folio);
+> > +             return;
+> >  #endif
+> >       default:
+> >               WARN_ON_ONCE(1);
+> > diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> > index 54e959e7d68f..37f7734cb10f 100644
+> > --- a/virt/kvm/Kconfig
+> > +++ b/virt/kvm/Kconfig
+> > @@ -124,3 +124,8 @@ config HAVE_KVM_ARCH_GMEM_PREPARE
+> >  config HAVE_KVM_ARCH_GMEM_INVALIDATE
+> >         bool
+> >         depends on KVM_PRIVATE_MEM
+> > +
+> > +config KVM_GMEM_SHARED_MEM
+> > +       select KVM_PRIVATE_MEM
+> > +       depends on !KVM_GENERIC_MEMORY_ATTRIBUTES
+>
+> Enforcing that KVM_GENERIC_MEMORY_ATTRIBUTES is not selected should not
+> be a strict requirement. Fuad explained in an offline chat that this is
+> just temporary.
+>
+> If we have CONFIG_GUESTMEM, then this question is moot, I think
+> CONFIG_GUESTMEM would just be independent of everything else; other
+> configs would depend on CONFIG_GUESTMEM.
 
-On Sun, Mar 9, 2025 at 5:41=E2=80=AFAM Mina Almasry <almasrymina@google.com=
-> wrote:
->
-> v7: https://lore.kernel.org/netdev/20250227041209.2031104-1-almasrymina@g=
-oogle.com/
-> =3D=3D=3D
->
-> Changelog:
-> - Check the dmabuf net_iov binding belongs to the device the TX is going
->   out on. (Jakub)
-> - Provide detailed inspection of callsites of
->   __skb_frag_ref/skb_page_unref in patch 2's changelog (Jakub)
->
-> v6: https://lore.kernel.org/netdev/20250222191517.743530-1-almasrymina@go=
-ogle.com/
-> =3D=3D=3D
->
-> v6 has no major changes. Addressed a few issues from Paolo and David,
-> and collected Acks from Stan. Thank you everyone for the review!
->
-> Changes:
-> - retain behavior to process MSG_FASTOPEN even if the provided cmsg is
->   invalid (Paolo).
-> - Rework the freeing of tx_vec slightly (it now has its own err label).
->   (Paolo).
-> - Squash the commit that makes dmabuf unbinding scheduled work into the
->   same one which implements the TX path so we don't run into future
->   errors on bisecting (Paolo).
-> - Fix/add comments to explain how dmabuf binding refcounting works
->   (David).
->
-> v5: https://lore.kernel.org/netdev/20250220020914.895431-1-almasrymina@go=
-ogle.com/
-> =3D=3D=3D
->
-> v5 has no major changes; it clears up the relatively minor issues
-> pointed out to in v4, and rebases the series on top of net-next to
-> resolve the conflict with a patch that raced to the tree. It also
-> collects the review tags from v4.
->
-> Changes:
-> - Rebase to net-next
-> - Fix issues in selftest (Stan).
-> - Address comments in the devmem and netmem driver docs (Stan and Bagas)
-> - Fix zerocopy_fill_skb_from_devmem return error code (Stan).
->
-> v4: https://lore.kernel.org/netdev/20250203223916.1064540-1-almasrymina@g=
-oogle.com/
-> =3D=3D=3D
->
-> v4 mainly addresses the critical driver support issue surfaced in v3 by
-> Paolo and Stan. Drivers aiming to support netmem_tx should make sure not
-> to pass the netmem dma-addrs to the dma-mapping APIs, as these dma-addrs
-> may come from dma-bufs.
->
-> Additionally other feedback from v3 is addressed.
->
-> Major changes:
-> - Add helpers to handle netmem dma-addrs. Add GVE support for
->   netmem_tx.
-> - Fix binding->tx_vec not being freed on error paths during the
->   tx binding.
-> - Add a minimal devmem_tx test to devmem.py.
-> - Clean up everything obsolete from the cover letter (Paolo).
->
-> v3: https://patchwork.kernel.org/project/netdevbpf/list/?series=3D929401&=
-state=3D*
-> =3D=3D=3D
->
-> Address minor comments from RFCv2 and fix a few build warnings and
-> ynl-regen issues. No major changes.
->
-> RFC v2: https://patchwork.kernel.org/project/netdevbpf/list/?series=3D920=
-056&state=3D*
-> =3D=3D=3D=3D=3D=3D=3D
->
-> RFC v2 addresses much of the feedback from RFC v1. I plan on sending
-> something close to this as net-next  reopens, sending it slightly early
-> to get feedback if any.
->
-> Major changes:
-> --------------
->
-> - much improved UAPI as suggested by Stan. We now interpret the iov_base
->   of the passed in iov from userspace as the offset into the dmabuf to
->   send from. This removes the need to set iov.iov_base =3D NULL which may
->   be confusing to users, and enables us to send multiple iovs in the
->   same sendmsg() call. ncdevmem and the docs show a sample use of that.
->
-> - Removed the duplicate dmabuf iov_iter in binding->iov_iter. I think
->   this is good improvment as it was confusing to keep track of
->   2 iterators for the same sendmsg, and mistracking both iterators
->   caused a couple of bugs reported in the last iteration that are now
->   resolved with this streamlining.
->
-> - Improved test coverage in ncdevmem. Now multiple sendmsg() are tested,
->   and sending multiple iovs in the same sendmsg() is tested.
->
-> - Fixed issue where dmabuf unmapping was happening in invalid context
->   (Stan).
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
-> The TX path had been dropped from the Device Memory TCP patch series
-> post RFCv1 [1], to make that series slightly easier to review. This
-> series rebases the implementation of the TX path on top of the
-> net_iov/netmem framework agreed upon and merged. The motivation for
-> the feature is thoroughly described in the docs & cover letter of the
-> original proposal, so I don't repeat the lengthy descriptions here, but
-> they are available in [1].
->
-> Full outline on usage of the TX path is detailed in the documentation
-> included with this series.
->
-> Test example is available via the kselftest included in the series as wel=
-l.
->
-> The series is relatively small, as the TX path for this feature largely
-> piggybacks on the existing MSG_ZEROCOPY implementation.
->
-> Patch Overview:
-> ---------------
->
-> 1. Documentation & tests to give high level overview of the feature
->    being added.
->
-> 1. Add netmem refcounting needed for the TX path.
->
-> 2. Devmem TX netlink API.
->
-> 3. Devmem TX net stack implementation.
->
-> 4. Make dma-buf unbinding scheduled work to handle TX cases where it gets
->    freed from contexts where we can't sleep.
->
-> 5. Add devmem TX documentation.
->
-> 6. Add scaffolding enabling driver support for netmem_tx. Add helpers, dr=
-iver
-> feature flag, and docs to enable drivers to declare netmem_tx support.
->
-> 7. Guard netmem_tx against being enabled against drivers that don't
->    support it.
->
-> 8. Add devmem_tx selftests. Add TX path to ncdevmem and add a test to
->    devmem.py.
->
-> Testing:
-> --------
->
-> Testing is very similar to devmem TCP RX path. The ncdevmem test used
-> for the RX path is now augemented with client functionality to test TX
-> path.
->
-> * Test Setup:
->
-> Kernel: net-next with this RFC and memory provider API cherry-picked
-> locally.
->
-> Hardware: Google Cloud A3 VMs.
->
-> NIC: GVE with header split & RSS & flow steering support.
->
-> Performance results are not included with this version, unfortunately.
-> I'm having issues running the dma-buf exporter driver against the
-> upstream kernel on my test setup. The issues are specific to that
-> dma-buf exporter and do not affect this patch series. I plan to follow
-> up this series with perf fixes if the tests point to issues once they're
-> up and running.
->
-> Special thanks to Stan who took a stab at rebasing the TX implementation
-> on top of the netmem/net_iov framework merged. Parts of his proposal [2]
-> that are reused as-is are forked off into their own patches to give full
-> credit.
->
-> [1] https://lore.kernel.org/netdev/20240909054318.1809580-1-almasrymina@g=
-oogle.com/
-> [2] https://lore.kernel.org/netdev/20240913150913.1280238-2-sdf@fomichev.=
-me/T/#m066dd407fbed108828e2c40ae50e3f4376ef57fd
->
-> Cc: sdf@fomichev.me
-> Cc: asml.silence@gmail.com
-> Cc: dw@davidwei.uk
-> Cc: Jamal Hadi Salim <jhs@mojatatu.com>
-> Cc: Victor Nogueira <victor@mojatatu.com>
-> Cc: Pedro Tammela <pctammela@mojatatu.com>
-> Cc: Samiullah Khawaja <skhawaja@google.com>
->
->
-> Mina Almasry (8):
->   netmem: add niov->type attribute to distinguish different net_iov
->     types
->   net: add get_netmem/put_netmem support
->   net: devmem: Implement TX path
->   net: add devmem TCP TX documentation
->   net: enable driver support for netmem TX
->   gve: add netmem TX support to GVE DQO-RDA mode
->   net: check for driver support in netmem TX
->   selftests: ncdevmem: Implement devmem TCP TX
->
-> Stanislav Fomichev (1):
->   net: devmem: TCP tx netlink api
->
->  Documentation/netlink/specs/netdev.yaml       |  12 +
->  Documentation/networking/devmem.rst           | 150 ++++++++-
->  .../networking/net_cachelines/net_device.rst  |   1 +
->  Documentation/networking/netdev-features.rst  |   5 +
->  Documentation/networking/netmem.rst           |  23 +-
->  drivers/net/ethernet/google/gve/gve_main.c    |   4 +
->  drivers/net/ethernet/google/gve/gve_tx_dqo.c  |   8 +-
->  include/linux/netdevice.h                     |   2 +
->  include/linux/skbuff.h                        |  17 +-
->  include/linux/skbuff_ref.h                    |   4 +-
->  include/net/netmem.h                          |  38 ++-
->  include/net/sock.h                            |   1 +
->  include/uapi/linux/netdev.h                   |   1 +
->  net/core/datagram.c                           |  48 ++-
->  net/core/dev.c                                |  33 ++
->  net/core/devmem.c                             | 118 ++++++-
->  net/core/devmem.h                             |  83 ++++-
->  net/core/netdev-genl-gen.c                    |  13 +
->  net/core/netdev-genl-gen.h                    |   1 +
->  net/core/netdev-genl.c                        |  73 ++++-
->  net/core/skbuff.c                             |  48 ++-
->  net/core/sock.c                               |   6 +
->  net/ipv4/ip_output.c                          |   3 +-
->  net/ipv4/tcp.c                                |  50 ++-
->  net/ipv6/ip6_output.c                         |   3 +-
->  net/vmw_vsock/virtio_transport_common.c       |   5 +-
->  tools/include/uapi/linux/netdev.h             |   1 +
->  .../selftests/drivers/net/hw/devmem.py        |  26 +-
->  .../selftests/drivers/net/hw/ncdevmem.c       | 300 +++++++++++++++++-
->  29 files changed, 1002 insertions(+), 75 deletions(-)
->
->
-> base-commit: 8ef890df4031121a94407c84659125cbccd3fdbe
-> --
-> 2.49.0.rc0.332.g42c0ae87b1-goog
->
->
+There are two things here. First of all, the unfortunate naming
+situation where PRIVATE could mean GUESTMEM, or private could mean not
+shared. I plan to tackle this aspect (i.e., the naming) in a separate
+patch series, since that will surely generate a lot of debate :)
 
+The other part is that, with shared memory in-place, the memory
+attributes are an orthogonal matter. The attributes are the userpace's
+view of what it expects the state of the memory to be, and are used to
+multiplex whether the memory being accessed is guest_memfd or the
+regular (i.e., most likely anonymous) memory used normally by KVM.
+
+This behavior however would be architecture, or even vm-type specific.
+
+Cheers,
+/fuad
+
+> > +       bool
 
