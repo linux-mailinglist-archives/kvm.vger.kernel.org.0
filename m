@@ -1,94 +1,93 @@
-Return-Path: <kvm+bounces-40542-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40543-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3D81A58B05
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 05:01:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D16E2A58B0B
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 05:04:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 685773A933F
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 04:01:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0A8F3AB572
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 04:03:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09D251C1F13;
-	Mon, 10 Mar 2025 04:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 172841C07D9;
+	Mon, 10 Mar 2025 04:03:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TqFPCmp6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DfTTKFVa"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1D79199FBA
-	for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 04:01:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A19537F8
+	for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 04:03:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741579278; cv=none; b=uHD6tPjs+DW9nsNf8Qv0r2tqRT8grXeOzSJ5pGH53p9xAc9a6u04DAFft3iBnt5pWIsMDP3Wyuieid/b9yAAlCmeVvRYdqWFbBAMrkgK1yrAoxrsIePqT/bNQAY1lpN9Ov/Kvx0It8c6US6KJ1cM/z9DOlxVRl4BCijjXw7Cors=
+	t=1741579433; cv=none; b=NZGX7n3l/4deUo+IcahKXuD0NxfDLBvXN1sZ3KLywMEdZnUppF5HCS0h3t9eMhupw6jDj7qw44w56wKZJDILuH38e00CqWEEcgBTNU747Xr+psBBXxzcSvp5ObUW6BNrfyTa/muxpu9PYe8dpEvSJiFtoIRM84L8yaN4M3mBji8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741579278; c=relaxed/simple;
-	bh=y2jgmxgCkCS0866p0uhw4Z/wKL7ZAlvCJDAr0KB4Wp8=;
+	s=arc-20240116; t=1741579433; c=relaxed/simple;
+	bh=aHOy1ecN9jlAaMS2M7dcU9gCxoht3SCiGLgSPyDZ63k=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nNw5y96uKBeqzTBg5f7SSK6waCqqMINWSfJtt/BDdabQVcHsSjD9YCyATrxvMMTG9JN7dWtIZZ9RvP5V2ySyIu49BSLoMrQaH5nov1GKxCRYFTL2xuYf09xzfhmIlVPEblO2j99/jCMLhHsiwWSmGPS1yG8HT/ofiALIcAAHSLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TqFPCmp6; arc=none smtp.client-ip=170.10.129.124
+	 To:Cc:Content-Type; b=oxlHdmWGOrWW30FQFpixljgCfx4it8yYqX3/53wdWWthCqEZdeRaLcXrHCHKA3JDFcxlLgngQHBaJ187nAkLUKPj8Cp8TqwnXLKV45xtoolN2c8lh8pFZ0IAn7KHz/8YyYULQKnq73jx00i/Csw6KNITcse7QehGl2SpIkWVvjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DfTTKFVa; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741579274;
+	s=mimecast20190719; t=1741579430;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=baDSD60KKAXA2YV4cwTHazyMng6zqZ9j6/BH6ENwQIo=;
-	b=TqFPCmp6FldnTqNHM9ffUXFPQbuMHMY+8uF5yS4iUpfs1qGhIFxWR2DWxPevrGMRgjWfuy
-	fW9doVJlPPFzhPvMq/3s14KwPYPw4x//GlcMa6sIPw8rQvlT0B8r2I5IdMQZ5i+i5yN4uO
-	gDt5RGpKIqfwCQId4tnYJfed5FyuRrc=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=KgUpYDCvfAICXWh2Ym5jayuE/HfSSdl1/NY4QdmfsrM=;
+	b=DfTTKFVaMfNTYVEolhXdbmgRd0nuBNKM2JGmJ1imuxeflvIeF1VeEjL2heSYuZWo5Ym4k+
+	ifOknskryfB6hA34Q4fo2tsy2yWfIOb34GcG72bwUwaCzg1dnhs1NV56C87OtA2dKX96DT
+	KoAGp1ddatvrElDmTrM+M7sz3+TNIig=
+Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com
+ [209.85.222.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-85-jU-WkZcKOCGmi51sEEqXbg-1; Mon, 10 Mar 2025 00:01:13 -0400
-X-MC-Unique: jU-WkZcKOCGmi51sEEqXbg-1
-X-Mimecast-MFC-AGG-ID: jU-WkZcKOCGmi51sEEqXbg_1741579272
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2ff5296726fso11475653a91.0
-        for <kvm@vger.kernel.org>; Sun, 09 Mar 2025 21:01:13 -0700 (PDT)
+ us-mta-462-kCrqVgJVO8-Myl2CkbEDEg-1; Mon, 10 Mar 2025 00:03:48 -0400
+X-MC-Unique: kCrqVgJVO8-Myl2CkbEDEg-1
+X-Mimecast-MFC-AGG-ID: kCrqVgJVO8-Myl2CkbEDEg_1741579428
+Received: by mail-ua1-f70.google.com with SMTP id a1e0cc1a2514c-86d3515b03eso4978715241.1
+        for <kvm@vger.kernel.org>; Sun, 09 Mar 2025 21:03:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741579271; x=1742184071;
+        d=1e100.net; s=20230601; t=1741579428; x=1742184228;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=baDSD60KKAXA2YV4cwTHazyMng6zqZ9j6/BH6ENwQIo=;
-        b=MOEpIqFz0Hy17ItGAmsQUoHalr6jPzYu3YJgLUBRmi/S0NOqtsF4FIoV/rDGfDWUpw
-         iAR9wTS60OQ0P9tj/cv8RkJpT4E0hY8s4+JgIZ0MHDVHNdSl/nYf34n0xxOwlskDJo9q
-         +fsl3jWq+n0Ccfxa4XRCWvFmTAortgR32vGlvF9Ve9+QjwSRvhDmFGg6/J+nHCvajzeG
-         1A837SMB451ERVILL2tllTrpioq7fFMODKILhW/D/EKQOc1gbPA3PpyowrKVINd0q62+
-         b4PhZTzpc3RfXWeyazX8CidCCnUJJOY1YMXnsiru0V2O9q/1/8ze3VlCml7fgVWk/Z/q
-         I5iw==
-X-Forwarded-Encrypted: i=1; AJvYcCUxsQElEVicXs2YEWdwDyq44bVByVsIas3q1k4Ibe5svwxfiE2GyEjDc16HdayRg1qSKow=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvrdGPlXou5qF0YrzsduaIUsZv5LqXBScOoDoezFJJ54kXGsWH
-	z5twhYcZ0Tk/bpueBubNJwI9mECU9tLEvzjulVYXl58/IRAgRS63RdSj0V6Cvm4QQ1PDqIFHsju
-	7HGGtaOdDsOErkOESuQ8PYwMeXATcvCxIWtTsT139YW1VokdCjULfgRFO6A0PcaBpbX5vbz8kqX
-	m4YonObxqGwz3aOLVUEgq2NJuAiWdNsAePuoNVMVBx
-X-Gm-Gg: ASbGnctzcCKAqq8XZ7ANkQcf2segaEpdtoIaZmVEPpStBXNAmd64eOFfuBY66wWLt6F
-	0vJx3dkV1BpplT9LCHYF+lV1zUUK/+e+YKQvSmquDhPuJEfF+f2IynNlzmQR3and5MEy8MxQSJg
+        bh=KgUpYDCvfAICXWh2Ym5jayuE/HfSSdl1/NY4QdmfsrM=;
+        b=T1UkS432VrjTiD84kpd62y0NMBD6h6ID096+gn22S8NP4jnnS5qWXEkZ0F4fOyta8+
+         MYcqmS0/f4NdaQBOz3iPPxyLSBKnQE5dEmF/am4VAJ2Lnh532HnxWqDCrHE+uH+3n2G4
+         6Dn+9Cd9h61gYKE/9LR1QfoITVVYhwU2pH4mHinVOFwCxKAXUsvPO/CPsubOx9dkmxxm
+         RH59hWtte7oW5KFV+mr2paFxnkH3+Ybd0s2rarK8i99apPzeOoWsKBjl46X37z/Q+Udc
+         YVP3cqz72QwHM+GpdWCrlxJ8aM0bKrm0xGC0c6NK6ipdqbtLZj5jcGAuMP7zlyXoKKWR
+         wjSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVX0HXbNJUecg2mrhWlGdC8cqrzFJDn3wLjbXpRqyW1JvpKSlhnGm9CVkfOxzcD39H6f2Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMU+G7UtbhNftqW1HXR1s63lxXB7NcQQdQOZZ3/mEqQZNgepfZ
+	kxylmS3J+R6UNEp169XC1AhWdxhnv7QzPOj6r1OS3R+7QZXCmqC9dIcj6u6vizO9ffzQtLz/YX1
+	uORKFT1bAq1Rh13uI43p+TWa19iXTtJxMLoANTKm3RM7+k21DADBA3MG0MWjzisexEWdGLqMTmY
+	Jyige+c1/iiuLabIlLZu9bscGn
+X-Gm-Gg: ASbGncvRbTmhkBRxHn0BOJnAqmshnSlNhVeDXntsF4SVh8UrY0XD+11sM9O8811pnRy
+	H4wBOfcE1vvMO4gGh1Kp9JKfshI+NAQRvZT2BZVoWUGEqG0u+fgLlqpVaJtuxGA1+MZi7DvgVGw
 	==
-X-Received: by 2002:a17:90b:1b0b:b0:2fc:c262:ef4b with SMTP id 98e67ed59e1d1-2ff7cea9a99mr22401425a91.18.1741579271540;
-        Sun, 09 Mar 2025 21:01:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF9DOsUxA9Z0UU+zFKp4XwB12kvLD6PT8eYjbCh1DLy1GK1oX1uE/LbhxDyNJ0rRDiXuxTT1vCPASJg6+fMr/4=
-X-Received: by 2002:a17:90b:1b0b:b0:2fc:c262:ef4b with SMTP id
- 98e67ed59e1d1-2ff7cea9a99mr22401364a91.18.1741579271097; Sun, 09 Mar 2025
- 21:01:11 -0700 (PDT)
+X-Received: by 2002:a05:6102:1625:b0:4bb:c24b:b658 with SMTP id ada2fe7eead31-4c30a6ce291mr6889403137.18.1741579428324;
+        Sun, 09 Mar 2025 21:03:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEWEExs57zlYjvHiKjt0sJdXJFbwo2Zs0LPOPlolmp1grxhBOdO/jBTdI674OxaLt6FioYXJto0Ve0T2qHTIms=
+X-Received: by 2002:a05:6102:1625:b0:4bb:c24b:b658 with SMTP id
+ ada2fe7eead31-4c30a6ce291mr6889393137.18.1741579427853; Sun, 09 Mar 2025
+ 21:03:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250307-rss-v9-0-df76624025eb@daynix.com> <20250307-rss-v9-3-df76624025eb@daynix.com>
- <CACGkMEsNHba=PY5UQoH1zdGQRiHC8FugMG1nkXqOj1TBdOQrww@mail.gmail.com>
-In-Reply-To: <CACGkMEsNHba=PY5UQoH1zdGQRiHC8FugMG1nkXqOj1TBdOQrww@mail.gmail.com>
+References: <20250307-rss-v9-0-df76624025eb@daynix.com> <20250307-rss-v9-5-df76624025eb@daynix.com>
+In-Reply-To: <20250307-rss-v9-5-df76624025eb@daynix.com>
 From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 10 Mar 2025 12:01:00 +0800
-X-Gm-Features: AQ5f1JpaV-Y2lOTdTlLng-Bakedv0t_hz074LEAN3YdWqqKw7pRKMp2RrCa8b3E
-Message-ID: <CACGkMEtCEwSB7XvCg7_8ebkcM8o2s8JB2Err2f153L-_i2KtxA@mail.gmail.com>
-Subject: Re: [PATCH net-next v9 3/6] tun: Introduce virtio-net hash feature
+Date: Mon, 10 Mar 2025 12:03:35 +0800
+X-Gm-Features: AQ5f1JpUIYkO2z7JqKfhDMFz04EDw9VRlQFOeI99RHje5MrLTIGs-yAN3N8PypE
+Message-ID: <CACGkMEuTwd4+DP1Cb+ZgJtxTiJj4N_NMPHiKusd8a4Tn3+B_3A@mail.gmail.com>
+Subject: Re: [PATCH net-next v9 5/6] selftest: tun: Add tests for virtio-net hashing
 To: Akihiko Odaki <akihiko.odaki@daynix.com>
 Cc: Jonathan Corbet <corbet@lwn.net>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
 	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -103,72 +102,116 @@ Cc: Jonathan Corbet <corbet@lwn.net>, Willem de Bruijn <willemdebruijn.kernel@gm
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 10, 2025 at 11:55=E2=80=AFAM Jason Wang <jasowang@redhat.com> w=
-rote:
+On Fri, Mar 7, 2025 at 7:02=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix.=
+com> wrote:
 >
-> On Fri, Mar 7, 2025 at 7:01=E2=80=AFPM Akihiko Odaki <akihiko.odaki@dayni=
-x.com> wrote:
-> >
-> > Hash reporting
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >
-> > Allow the guest to reuse the hash value to make receive steering
-> > consistent between the host and guest, and to save hash computation.
-> >
-> > RSS
-> > =3D=3D=3D
-> >
-> > RSS is a receive steering algorithm that can be negotiated to use with
-> > virtio_net. Conventionally the hash calculation was done by the VMM.
-> > However, computing the hash after the queue was chosen defeats the
-> > purpose of RSS.
-> >
-> > Another approach is to use eBPF steering program. This approach has
-> > another downside: it cannot report the calculated hash due to the
-> > restrictive nature of eBPF steering program.
-> >
-> > Introduce the code to perform RSS to the kernel in order to overcome
-> > thse challenges. An alternative solution is to extend the eBPF steering
-> > program so that it will be able to report to the userspace, but I didn'=
-t
-> > opt for it because extending the current mechanism of eBPF steering
-> > program as is because it relies on legacy context rewriting, and
-> > introducing kfunc-based eBPF will result in non-UAPI dependency while
-> > the other relevant virtualization APIs such as KVM and vhost_net are
-> > UAPIs.
-> >
-> > Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> > Tested-by: Lei Yang <leiyang@redhat.com>
-> > ---
-> >  Documentation/networking/tuntap.rst |   7 ++
-> >  drivers/net/Kconfig                 |   1 +
-> >  drivers/net/tap.c                   |  68 ++++++++++++++-
-> >  drivers/net/tun.c                   |  98 +++++++++++++++++-----
-> >  drivers/net/tun_vnet.h              | 159 ++++++++++++++++++++++++++++=
-++++++--
-> >  include/linux/if_tap.h              |   2 +
-> >  include/linux/skbuff.h              |   3 +
-> >  include/uapi/linux/if_tun.h         |  75 +++++++++++++++++
-> >  net/core/skbuff.c                   |   4 +
-> >  9 files changed, 386 insertions(+), 31 deletions(-)
+> The added tests confirm tun can perform RSS and hash reporting, and
+> reject invalid configurations for them.
 
-[...]
+Let's be more verbose here. E.g what's the network topology used here.
 
-> > + *
-> > + * The %TUN_VNET_HASH_REPORT flag set with this ioctl will be effectiv=
-e only
-> > + * after calling the %TUNSETVNETHDRSZ ioctl with a number greater than=
- or equal
-> > + * to the size of &struct virtio_net_hdr_v1_hash.
 >
-> So you had a dependency check already for vnet hdr len. I'd still
-> suggest to split this into rss and hash as they are separated
-> features. Then we can use separate data structure for them instead of
-> a container struct.
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> Tested-by: Lei Yang <leiyang@redhat.com>
+> ---
+>  tools/testing/selftests/net/Makefile |   2 +-
+>  tools/testing/selftests/net/tun.c    | 584 +++++++++++++++++++++++++++++=
++++++-
+>  2 files changed, 576 insertions(+), 10 deletions(-)
 >
+> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftes=
+ts/net/Makefile
+> index 73ee88d6b043004be23b444de667a1d99a6045de..9772f691a9a011d99212df324=
+63cdb930cf0a1a0 100644
+> --- a/tools/testing/selftests/net/Makefile
+> +++ b/tools/testing/selftests/net/Makefile
+> @@ -123,6 +123,6 @@ $(OUTPUT)/reuseport_bpf_numa: LDLIBS +=3D -lnuma
+>  $(OUTPUT)/tcp_mmap: LDLIBS +=3D -lpthread -lcrypto
+>  $(OUTPUT)/tcp_inq: LDLIBS +=3D -lpthread
+>  $(OUTPUT)/bind_bhash: LDLIBS +=3D -lpthread
+> -$(OUTPUT)/io_uring_zerocopy_tx: CFLAGS +=3D -I../../../include/
+> +$(OUTPUT)/io_uring_zerocopy_tx $(OUTPUT)/tun: CFLAGS +=3D -I../../../inc=
+lude/
+>
+>  include bpf.mk
+> diff --git a/tools/testing/selftests/net/tun.c b/tools/testing/selftests/=
+net/tun.c
+> index 463dd98f2b80b1bdcb398cee43c834e7dc5cf784..acadeea7194eaea9416a605b4=
+7f99f7a5f1f80cd 100644
+> --- a/tools/testing/selftests/net/tun.c
+> +++ b/tools/testing/selftests/net/tun.c
+> @@ -2,21 +2,38 @@
+>
+>  #define _GNU_SOURCE
+>
+> +#include <endian.h>
+>  #include <errno.h>
+>  #include <fcntl.h>
+> +#include <sched.h>
 
-Besides this, I think we still need to add new bits to TUNGETIFF to
-let userspace know about the new ability.
+Is this needed?
+
+> +#include <stddef.h>
+>  #include <stdio.h>
+>  #include <stdlib.h>
+>  #include <string.h>
+>  #include <unistd.h>
+> -#include <linux/if.h>
+> +#include <net/if.h>
+> +#include <netinet/ip.h>
+> +#include <sys/ioctl.h>
+> +#include <sys/socket.h>
+> +#include <linux/compiler.h>
+> +#include <linux/icmp.h>
+> +#include <linux/if_arp.h>
+>  #include <linux/if_tun.h>
+> +#include <linux/ipv6.h>
+>  #include <linux/netlink.h>
+>  #include <linux/rtnetlink.h>
+> -#include <sys/ioctl.h>
+> -#include <sys/socket.h>
+> +#include <linux/sockios.h>
+> +#include <linux/tcp.h>
+> +#include <linux/udp.h>
+> +#include <linux/virtio_net.h>
+>
+>  #include "../kselftest_harness.h"
+>
+> +#define TUN_HWADDR_SOURCE { 0x02, 0x00, 0x00, 0x00, 0x00, 0x00 }
+> +#define TUN_HWADDR_DEST { 0x02, 0x00, 0x00, 0x00, 0x00, 0x01 }
+> +#define TUN_IPADDR_SOURCE htonl((172 << 24) | (17 << 16) | 0)
+> +#define TUN_IPADDR_DEST htonl((172 << 24) | (17 << 16) | 1)
+> +
+>  static int tun_attach(int fd, char *dev)
+>  {
+>         struct ifreq ifr;
+> @@ -39,7 +56,7 @@ static int tun_detach(int fd, char *dev)
+>         return ioctl(fd, TUNSETQUEUE, (void *) &ifr);
+>  }
+>
+> -static int tun_alloc(char *dev)
+> +static int tun_alloc(char *dev, short flags)
+>  {
+>         struct ifreq ifr;
+>         int fd, err;
+> @@ -52,7 +69,8 @@ static int tun_alloc(char *dev)
+>
+>         memset(&ifr, 0, sizeof(ifr));
+>         strcpy(ifr.ifr_name, dev);
+> -       ifr.ifr_flags =3D IFF_TAP | IFF_NAPI | IFF_MULTI_QUEUE;
+> +       ifr.ifr_flags =3D flags | IFF_TAP | IFF_NAPI | IFF_NO_PI |
+> +                       IFF_MULTI_QUEUE;
+>
+>         err =3D ioctl(fd, TUNSETIFF, (void *) &ifr);
+>         if (err < 0) {
+> @@ -64,6 +82,40 @@ static int tun_alloc(char *dev)
+>         return fd;
+>  }
+>
+> +static bool tun_add_to_bridge(int local_fd, const char *name)
+> +{
+
+I wonder if a packet socket is more convenient here.
 
 Thanks
 
