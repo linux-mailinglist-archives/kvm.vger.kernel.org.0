@@ -1,136 +1,175 @@
-Return-Path: <kvm+bounces-40617-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40618-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5DB8A592EB
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 12:42:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB3F3A59418
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 13:20:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4B7E16664D
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 11:42:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F6573A7E69
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 12:20:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81C3122170F;
-	Mon, 10 Mar 2025 11:42:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E11802253E6;
+	Mon, 10 Mar 2025 12:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bram9Ioq"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FD/veueW"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CE2521E088;
-	Mon, 10 Mar 2025 11:42:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6904112B71;
+	Mon, 10 Mar 2025 12:20:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741606971; cv=none; b=Lz2Hqd4cthYZZ/lPWhQJqAIYCQrowCarpaodcqt36Nev9H2SFZzjw69AlEC6PrRb2EewBPhluwteHXd5okPyHHm17Z1uWrR1IYolAEiy4ctmVTw64PIegIu3vxl0JoDpdmlCKXD6IlGGEcWDMEDuOHgQun87xstbhqTFg8chN/Y=
+	t=1741609224; cv=none; b=YZBhW3fZHR4ibaR5s4XNY1DfYqCXRGHBB9BThDpqawFM4O2ImXnPzaz8xHBbywoswBm9le9EjNuAHr9Zq4awdIjFswMFupEnvKoLgUUD6RjOHZ3DzrIOqxjdIxdHcCg97o9Yz8UPOsbVIkw0YHUHcYnplIahbrO2ov8pnDVlzyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741606971; c=relaxed/simple;
-	bh=xypKLBSRK+f/hP1WP1Z/qtoHUvhbr3rrnxD0zz/vPi0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JoAaZ3suz5WBLdrIfVKIiQwek3uGL3MK4NxD3fmaZVS5qP3KeGX/fcnUP6laN1nvlKt2hhD5QiR+RqCiRBAQP69YUpdimpTRd+4b54zvKQIj9mZt8nlF3Q6oGQBeyPEx9WmVFvSMJGazjjaZ04xGkxVgtsCK8zx0qmbxVk7gjA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bram9Ioq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1608FC4CEE5;
-	Mon, 10 Mar 2025 11:42:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741606971;
-	bh=xypKLBSRK+f/hP1WP1Z/qtoHUvhbr3rrnxD0zz/vPi0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Bram9Ioq++dX2SLjUUUyVswCF6Rk9Ou8XjSu6yp70TNv3b11WBAuN2o2/BdZ08KNL
-	 Lo50Ux7k1hEwZJZ4/4Gtl77Ea9oNstZyxqBHPQY1b8ueiFOymzd8Wc7OBDWvJUwKa+
-	 NPJygOZNQQDdqzsCYHdihQzS1IunX9yeaG8LAUB2H6cS2LEUydWJuDcfot8rw3/fGf
-	 6fGjMl/DvlBewrnUSkNvD06BOcZfdNiB3xCxaHMlLbu2AWNVR/KjcH0JHhzOok4BFo
-	 bQlDEhqeBU6mnUnQnWVp0VZdhtoxNvpC50SbWrP/D/pLl8oeC5iEHA+Pk7E+YcA624
-	 Y8aYSqp/wi6DQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1trbWy-00C9i8-I3;
-	Mon, 10 Mar 2025 11:42:48 +0000
-Date: Mon, 10 Mar 2025 11:42:48 +0000
-Message-ID: <8634flp0w7.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH 07/18] KVM: arm64: Compute FGT masks from KVM's own FGT tables
-In-Reply-To: <CA+EHjTwm4CosWDGcaH_tnLU7zMNCq8twDyEcKd7-V0Lu7b-LcA@mail.gmail.com>
-References: <20250210184150.2145093-1-maz@kernel.org>
-	<20250210184150.2145093-8-maz@kernel.org>
-	<CA+EHjTwm4CosWDGcaH_tnLU7zMNCq8twDyEcKd7-V0Lu7b-LcA@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1741609224; c=relaxed/simple;
+	bh=Nv4+9IXR1foiLgcCPciQGd7XoxCZn1Ea3xtco5f/uks=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ChYI2aXlFIiBqCg5oJW09hqWgp183PPS8OkPeDAT/z14OcUhpMgx1wT1VIptrvx8zINrzAcLLfAkGZwT2dmYH/94WUuLtfm65CEmqmixLB+xwmSTFh9rSNxfPX+74a6jxPSSNjTilYSepBJ3sU2kDRhuR4hV/+s23AXRPW3x9N4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=FD/veueW; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 529NeauW028787;
+	Mon, 10 Mar 2025 12:20:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=YC+kTP
+	ilZKXCkJhmFSGkSldD+jVSe32pprVzsJOlftA=; b=FD/veueWARkL3EBH2ncDi0
+	AJRM/8KYwXA/qh6DjntviaRTJG7SJwKlWGCJFoXx2URJg8Kw/FQpjDWUv+/T4EOP
+	yWqAIZa2XaLx9Wse65gm3/gf0/WduRQqZ3QFEpphKdXWRqBbPiWp2BJeeXCEe1B8
+	p6kKKwip2I3kLKbKw8+xZwPvLFeqeNDnsjbwQtSFIo1aMUg7W8RtT9/0TrdNZK63
+	ArHGQGOgygJeIuEKY9dhISL+AZRoEYLyFje4YYK1Eh7TSO+pyO0ceHpiDU0LioBK
+	yjUNT77zDP73XaWy4vV70ss5wxNSgtziAB6o1Hc1/UKqBvrYEJYXzc5vp4ai627g
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 459jd4u51e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 10 Mar 2025 12:20:19 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52AAUSen022223;
+	Mon, 10 Mar 2025 12:20:19 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 45917n6gp5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 10 Mar 2025 12:20:19 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52ACKFMJ42467624
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 10 Mar 2025 12:20:15 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 32A2520043;
+	Mon, 10 Mar 2025 12:20:15 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id ECB8420040;
+	Mon, 10 Mar 2025 12:20:14 +0000 (GMT)
+Received: from [9.171.55.85] (unknown [9.171.55.85])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 10 Mar 2025 12:20:14 +0000 (GMT)
+Message-ID: <aa9bd929-e2b9-4772-9802-171c30036dff@linux.ibm.com>
+Date: Mon, 10 Mar 2025 13:20:14 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v1] s390x: pv: fix arguments for
+ out-of-tree-builds
+To: Nico Boehr <nrb@linux.ibm.com>, imbrenda@linux.ibm.com, thuth@redhat.com
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20250227131031.3811206-1-nrb@linux.ibm.com>
+Content-Language: en-US
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20250227131031.3811206-1-nrb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Nfqg6UZABeHws056IZ2Lj5dzFnN35OO8
+X-Proofpoint-GUID: Nfqg6UZABeHws056IZ2Lj5dzFnN35OO8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-10_05,2025-03-07_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
+ phishscore=0 mlxlogscore=999 impostorscore=0 priorityscore=1501 mlxscore=0
+ suspectscore=0 malwarescore=0 clxscore=1015 bulkscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2502100000
+ definitions=main-2503100095
 
-On Tue, 04 Mar 2025 16:55:50 +0000,
-Fuad Tabba <tabba@google.com> wrote:
+On 2/27/25 2:10 PM, Nico Boehr wrote:
+> When building out-of-tree, the parmfile was not passed to genprotimg,
+> causing the selftest-setup_PV test to fail.
 > 
-> Hi Marc,
+> Fix the Makefile rule s.t. parmfile is correctly passed.
 > 
-> On Mon, 10 Feb 2025 at 18:42, Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > In the process of decoupling KVM's view of the FGT bits from the
-> > wider architectural state, use KVM's own FGT tables to build
-> > a synthitic view of what is actually known.
+> Suggested-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> ---
+>   s390x/Makefile | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> synthitic -> synthetic
-> 
-> 
-> > This allows for some checking along the way.
-> >
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_arm.h  |   4 ++
-> >  arch/arm64/include/asm/kvm_host.h |  14 ++++
-> >  arch/arm64/kvm/emulate-nested.c   | 102 ++++++++++++++++++++++++++++++
-> >  3 files changed, 120 insertions(+)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> > index 8d94a6c0ed5c4..e424085f2aaca 100644
-> > --- a/arch/arm64/include/asm/kvm_arm.h
-> > +++ b/arch/arm64/include/asm/kvm_arm.h
-> > @@ -359,6 +359,10 @@
-> >  #define __HAFGRTR_EL2_MASK     (GENMASK(49, 17) | GENMASK(4, 0))
-> >  #define __HAFGRTR_EL2_nMASK    ~(__HAFGRTR_EL2_RES0 | __HAFGRTR_EL2_MASK)
-> >
-> > +/* Because the sysreg file mixes R and W... */
-> > +#define HFGRTR_EL2_RES0                HFGxTR_EL2_RES0 (0)
-> > +#define HFGWTR_EL2_RES0                (HFGRTR_EL2_RES0 | __HFGRTR_ONLY_MASK)
-> 
-> __HFGRTR_ONLY_MASK is a hand-crafted bitmask. The only bit remaining
-> in HFGxTR_EL2 that is RES0 is bit 51. If that were to be used as an
-> HFGRTR-only bit without __HFGRTR_ONLY_MASK getting updated, then
-> aggregate_fgt() below would set its bit in hfgwtr_masks. Could this be
-> a problem if this happens and the polarity of this bit ends up being
-> negative, thereby setting the corresponding nmask bit?
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index 47dda6d26a6f..97ed0b473af5 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -213,7 +213,7 @@ else
+>   	GENPROTIMG_PCF := 0x000000e0
+>   endif
+>   
+> -$(patsubst %.parmfile,%.pv.bin,$(wildcard s390x/*.parmfile)): %.pv.bin: %.parmfile
+> +$(TEST_DIR)/selftest.pv.bin: $(SRCDIR)/s390x/selftest.parmfile
+>   %.pv.bin: %.bin $(HOST_KEY_DOCUMENT) $(comm-key)
+>   	$(eval parmfile_args = $(if $(filter %.parmfile,$^),--parmfile $(filter %.parmfile,$^),))
+>   	$(GENPROTIMG) $(GENPROTIMG_DEFAULT_ARGS) --host-key-document $(HOST_KEY_DOCUMENT) $(GENPROTIMG_COMM_OPTION) $(comm-key) --x-pcf $(GENPROTIMG_PCF) $(parmfile_args) --image $(filter %.bin,$^) -o $@
 
-This could become a problem indeed. But the only fix for that is to
-kill the HFGxTR stupidity and describe all the bits as needed so that
-we stop assuming things.
 
-I'm half tempted to do that next.
+We had this hardcoded, then changed to this rule and now move back to 
+hardcoding, no?
 
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+It's fine but it's still strange...
 
