@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-40650-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40651-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2CCEA59675
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 14:38:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C97BA5967B
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 14:38:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2ACE165ADA
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 13:38:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCBE716811F
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 13:38:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A5F622A4C3;
-	Mon, 10 Mar 2025 13:38:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 694E222A4E4;
+	Mon, 10 Mar 2025 13:38:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wnc2u0ld"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UA5sl2D9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBAD622A4C9
-	for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 13:37:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2286227BB9
+	for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 13:38:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741613881; cv=none; b=uQnDF1Tj9xVm0vRvWTU/CO8LdMYACui2Ta1zc87C+IXtS6V47HjXniM3uoicAeCGMMyQvwjuu7LQnJemSTeZ6b2q+TkzW905xjKfSpJTqlLrjWbjti9+c2TLGhigqUOPK/VMcTWpT41cjDOAUq0KmWDHLbCZgwfFW4AZeFLy5o0=
+	t=1741613921; cv=none; b=D5K1/ZS2oMzjsWmtuUfVRKwdkNAsVzYMVR6gUuFOZhayOBCllgHceAL7YOCflZ40PaizWZDBwevUt5z/lSfTVJUFgV21/153eIxcVaFMJLefzMdAl2BC7YkMSXhQRaUkueeZYVUWR+VKmjsyx5LJy1RRG5QOb1A+6gWCVRifIok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741613881; c=relaxed/simple;
-	bh=O5iGlbsXT8XGT9+c1Jgg8tmT+6CCjQRkMC4YKnQjPN4=;
+	s=arc-20240116; t=1741613921; c=relaxed/simple;
+	bh=gNoV67GnzVOt2F/z+eHLRA0jaS/FFQ+qBQgjo1qKkcI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lABW12xEJPf8jY19KxHbLWpCZG+pwdQb62j8G2VdtH1FMqKy+3E0R4COINJ7sUB8yBe89hg3uvi+Fb8613B+O6yvEkpWTYFp0rqD4kZzBQ2djrGWyvYBthokPVvhO2cc2H8XtXfCDBd3ihQuC8e5c4sV0jfI8Fg0ex2y6gR30TI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=wnc2u0ld; arc=none smtp.client-ip=209.85.221.41
+	 In-Reply-To:Content-Type; b=D7MyzU0eBhTGvYIxqefGAbfuz+tSF7SG/OWxndJvzSp/i/XlWEEjmHNnUxlsxVYaTK8qf24k+EV88GSv14CW/YtZzaxOn19Z4EoRi+5tV+5rTCZvof+MKSJmYwlHsn8aMh0OEDhMV2ZLtGiVRekFbNg3uspBpLJKjRHc3qiiykk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=UA5sl2D9; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-39130ee05b0so2582540f8f.3
-        for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 06:37:59 -0700 (PDT)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43bc63876f1so36173015e9.3
+        for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 06:38:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1741613878; x=1742218678; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1741613918; x=1742218718; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=8KySdQxX1nHvjTTeGWqK8o0qyyUi+8pyjyiDw/OuToM=;
-        b=wnc2u0ldACc2xTZbd0MbfCTJ3MDUtIskuhS4fMoigFJcc4/4T7bfnYz3IjUYFnU1Ux
-         XSiw6PxngAN12ETZ61RS7P0qXkapBPCpS0cnjwGzlubsOMSess5xlRGTZUFbWSrL/Bdp
-         x6u6G9FiuKVRcWrK3KBUtFx1untVPA3LdqhZsK4YlrIlWtdd4Gt57Qyd3G8iuIKWUOuv
-         CNfd11A7lxNwakFyDSHkhj8FOGU4mYxhG7oo02XFwl6TJnYXb7fNO2KFO+33QqRDnjl5
-         DZKoM4L6G17C4RpMEwBwnBecfptJOjj719uYbUbH55APS38ZogA3OmST4R1IDz8qtKsM
-         hc4Q==
+        bh=fI8Ir2Zu1z7LkL/zkdFv81XeyawLXZhGTuauzkxQWC0=;
+        b=UA5sl2D9D9uUWRItQlIYVaAJqsxxN5Dc1z6bhovSFRqBFdA/ky00gVg6dSTbYf2k+g
+         lcP/5vSRyELlrQRrbs+Yu9MTf/fqz+ta1ZW+E8l7nmg5KvH7ATxNwD8XI70B8twPEVB9
+         M4Zj+ArHN4q/wslC2O1njLXInudP/L+Cc50cgXbilSdw90jWAiBL4vgmEvf2RTO1jkjY
+         kaeBizCHpJCWzxJMocrlawVlQZiC16oiP1lE2MjnyVNrnEtrrpywDMZJLsKzS5UvTs+q
+         9JwXlewrro9bjItgN9nbzsIYJBNAyEVMriTnGGAeqv3amv/CedSeNvUyL+NO8m+ArtWc
+         Ohnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741613878; x=1742218678;
+        d=1e100.net; s=20230601; t=1741613918; x=1742218718;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8KySdQxX1nHvjTTeGWqK8o0qyyUi+8pyjyiDw/OuToM=;
-        b=e1KAz8JoRicK3Ob8XwPuRt+6B1W/rXyU3E5Ph9O0XUpAgxtTJ9dsrRRvzY1m//Z0e7
-         yEDiUI6amGJ3rc9+bjJkrg00hlX3tNAU5WI3v6A707Kj1Ci5MRBclKsimzPEhkJGF0tY
-         H5tLyOf8loJPOChnilFWPcdj9ihLNyIXLFkMdflHJIu/zjMfB7KbOYYJwnSlohLZ6CVq
-         ShwtsmKgbhp1SErLPvKoedYCu6zefp1arFJdOB9zzuhsf3fInTjAon8LxtNJu+JfreVB
-         gF6HqUWLiO2KI8KuJLLJsWzGKWA8Qt8Qp5JbrNECm95vlJwtcqdxQ26OjIicToUl9J7H
-         IROQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWD9F6eMrY4Brf2I6uWVg9vOGmC8BSXQNkZQ7bFDIxjc5H+Z5bvBskjtEioOWZ2plZyAmU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5/NiH9cdAk6bjkVjfYFptjXp9lWnP5meOkY7ULH81GKR876gS
-	LWZt6QyqTSjzU68VdZC2K8SDZ/Jwx+CJRVkgBHEJB9tB1Fxc2rc9QoOncUC/DpY=
-X-Gm-Gg: ASbGnctN5ws6KnUjFLUPtuaR/CgauMSbNH08IXhqnAIVfoWEEzPU0B5bPRiqRTIEPIh
-	lZLYpUudJj8ZxsY+01EpVNLm2gltgptbWLuGDI6Q3tqjP1xjIDnvPF+zqLZ+diXa5mDVygw6UY5
-	+Wc+fr9ojIeq80KqUBG6ILOy1UiocRE/PkLTaYzZaiVc1ZdDC3pXZyB6T68ClC71XU3U9ULAVLr
-	b1FZEixuyBhMMHAIZJCguAIitzE1gA59RTzTVj6/drZiflCiI7dEz31mFcEX/NlE/M5Cuq72Y3q
-	XtuobE/D+cB5tDZeTZGHI35Lt6fRRO/jdFVRT95atiXIaZy//Dfc6CbaSYGRmUz+jC/tW2ECIQv
-	FzD548xoBHYW/
-X-Google-Smtp-Source: AGHT+IEi3Zkt+nyRM6pBylfBbjpQZ+nrPau9+qv5tN7Kk8GGNSrRDFA2w3bF2VCAkL483hx7lOZtSA==
-X-Received: by 2002:a5d:64ec:0:b0:391:3406:b4e2 with SMTP id ffacd0b85a97d-3913406b7e9mr8435477f8f.49.1741613878158;
-        Mon, 10 Mar 2025 06:37:58 -0700 (PDT)
+        bh=fI8Ir2Zu1z7LkL/zkdFv81XeyawLXZhGTuauzkxQWC0=;
+        b=Lg4gLVDLea+O5PIXInUHCjVg9UrjUGbPgmN0bCVqCt9zbuQNyug4XndERc/5+k/E/2
+         U19HIa35veEUi8ms9aQF1nVR5EzDtxb7KG2e/jy0uPmO2FMv41oQ+FS9vofMXCwxH3gM
+         OnEjCmjxltJXpRx4wukcor6OxghQxloijrMgDxDTmOmOwU8jT0LWw/QopKnaDfZ6G+I+
+         H8vzsMukMGdySTUGNUifGMeauME4tcXjYUc77rKlzAsPqAC5131x9OZKJDonNB39dTHk
+         vh/1lzFFMbGb5D6iozAssXu0XlVsfKE0+qBUtShu2ACzef/w6D7epBim8LxUa1Kg47N/
+         nsJg==
+X-Forwarded-Encrypted: i=1; AJvYcCWTwFVXFsMxpuD4kWazAn/h8DpDUZpVFHcRZqxfQ3aUpCacTNe4/J7tXb+tlrpHdHyJFpQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9rt7z4ZKPgiBUrw8B9z1urylPkC2PJNcJEeW7VGqfzcyngd5k
+	lPGSHvE/s7eirbZTDHqc+FjJ2NA4Y2V7ge72p/7lNRwB/lfRK4jIm5nTmirPxyI=
+X-Gm-Gg: ASbGncs4Nia9+m8mU2FcZGyxZbkbuMNvIX1dSLewc+32YVTh3Ig5995E2xsOD4Tj34M
+	yobxOCN8bjGgM+oq1M0M1RBLsFQ3CCqXICJpmpZi8GVJ//XZCaThuQYi2ScasFGqri8dv4HecJk
+	ztkXYQybds5tLAOuFAsimMPEeEXwF04DAuoWRNG/59NOvwWz/y6xWlVoOkcS9ux4laQJaokIIHg
+	6AXd2qJEPS0BKCJCaRgyqU0L1zlbC4YU/U0qWfdXJTNqSD54crQihLSZ1R5Eu7/YrgYpno65r84
+	n3xvQSLiZnG8cEyxdQhptJYLNjYf9zttRQPpu4ckHo2ev8RwDGRXLSQCks2bn51OtIibaMTcmJZ
+	aQBo9ZUsdSrEskm1XHaOJUks=
+X-Google-Smtp-Source: AGHT+IFI1n3NuoI/n8U8/SXHlifSn7tQ/FUgR7JfVMlIX6tnbG1hMXfpyjk+3Tr3iEzmpdh1YIRDsg==
+X-Received: by 2002:a05:6000:402a:b0:391:2dea:c9a5 with SMTP id ffacd0b85a97d-39132d6b61cmr8799479f8f.20.1741613917931;
+        Mon, 10 Mar 2025 06:38:37 -0700 (PDT)
 Received: from [192.168.69.199] (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912c0e3099sm15376268f8f.69.2025.03.10.06.37.56
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912c01cb82sm15420203f8f.51.2025.03.10.06.38.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Mar 2025 06:37:57 -0700 (PDT)
-Message-ID: <d883d194-3a68-4982-a408-d9ab889fd2c7@linaro.org>
-Date: Mon, 10 Mar 2025 14:37:54 +0100
+        Mon, 10 Mar 2025 06:38:37 -0700 (PDT)
+Message-ID: <f76f27e7-730e-4bd9-8a91-7b329aa1249f@linaro.org>
+Date: Mon, 10 Mar 2025 14:38:35 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,11 +82,9 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 15/21] hw/vfio/pci: Check CONFIG_IOMMUFD at runtime
- using iommufd_builtin()
-To: "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "Liu, Yi L" <yi.l.liu@intel.com>,
+Subject: Re: [PATCH v2 00/21] hw/vfio: Build various objects once
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>, qemu-devel@nongnu.org
+Cc: Yi Liu <yi.l.liu@intel.com>,
  Pierrick Bouvier <pierrick.bouvier@linaro.org>,
  Alex Williamson <alex.williamson@redhat.com>,
  Christian Borntraeger <borntraeger@linux.ibm.com>,
@@ -95,67 +93,95 @@ Cc: "Liu, Yi L" <yi.l.liu@intel.com>,
  Halil Pasic <pasic@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
  David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
  Matthew Rosato <mjrosato@linux.ibm.com>, Tomita Moeko
- <tomitamoeko@gmail.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ <tomitamoeko@gmail.com>, qemu-ppc@nongnu.org,
  Daniel Henrique Barboza <danielhb413@gmail.com>,
  Eric Farman <farman@linux.ibm.com>, Eduardo Habkost <eduardo@habkost.net>,
- Peter Xu <peterx@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
+ Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
+ Zhenzhong Duan <zhenzhong.duan@intel.com>, qemu-s390x@nongnu.org,
  Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Harsh Prateek Bora <harshpb@linux.ibm.com>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?=
- <clg@redhat.com>, Ilya Leoshkevich <iii@linux.ibm.com>,
- Jason Herne <jjherne@linux.ibm.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?=
- <berrange@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
+ Harsh Prateek Bora <harshpb@linux.ibm.com>,
+ Ilya Leoshkevich <iii@linux.ibm.com>, Jason Herne <jjherne@linux.ibm.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>
 References: <20250308230917.18907-1-philmd@linaro.org>
- <20250308230917.18907-16-philmd@linaro.org>
- <SJ0PR11MB67449BEA0E3B4A04E603633C92D62@SJ0PR11MB6744.namprd11.prod.outlook.com>
+ <ef7dcee1-90fe-44be-aa14-6c016d98369f@redhat.com>
 Content-Language: en-US
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <SJ0PR11MB67449BEA0E3B4A04E603633C92D62@SJ0PR11MB6744.namprd11.prod.outlook.com>
+In-Reply-To: <ef7dcee1-90fe-44be-aa14-6c016d98369f@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 10/3/25 05:11, Duan, Zhenzhong wrote:
-> Hi Philippe,
+On 10/3/25 09:03, Cédric Le Goater wrote:
+> On 3/9/25 00:08, Philippe Mathieu-Daudé wrote:
+>> By doing the following changes:
+>> - Clean some headers up
+>> - Replace compile-time CONFIG_KVM check by kvm_enabled()
+>> - Replace compile-time CONFIG_IOMMUFD check by iommufd_builtin()
+>> we can build less vfio objects.
+>>
+>> Since v1:
+>> - Added R-b tags
+>> - Introduce type_is_registered()
+>> - Split builtin check VS meson changes (rth)
+>> - Consider IGD
+>>
+>> Philippe Mathieu-Daudé (21):
+>>    hw/vfio/common: Include missing 'system/tcg.h' header
+>>    hw/vfio/spapr: Do not include <linux/kvm.h>
+>>    hw/vfio: Compile some common objects once
+>>    hw/vfio: Compile more objects once
+>>    hw/vfio: Compile iommufd.c once
+>>    system: Declare qemu_[min/max]rampagesize() in 'system/hostmem.h'
+>>    hw/vfio: Compile display.c once
+>>    system/kvm: Expose kvm_irqchip_[add,remove]_change_notifier()
+>>    hw/vfio/pci: Convert CONFIG_KVM check to runtime one
+>>    qom: Introduce type_is_registered()
+>>    hw/vfio/igd: Define TYPE_VFIO_PCI_IGD_LPC_BRIDGE
+>>    hw/vfio/igd: Check CONFIG_VFIO_IGD at runtime using vfio_igd_builtin()
+>>    hw/vfio/igd: Compile once
+>>    system/iommufd: Introduce iommufd_builtin() helper
+>>    hw/vfio/pci: Check CONFIG_IOMMUFD at runtime using iommufd_builtin()
+>>    hw/vfio/pci: Compile once
+>>    hw/vfio/ap: Check CONFIG_IOMMUFD at runtime using iommufd_builtin()
+>>    hw/vfio/ccw: Check CONFIG_IOMMUFD at runtime using iommufd_builtin()
+>>    hw/vfio/s390x: Compile AP and CCW once
+>>    hw/vfio/platform: Check CONFIG_IOMMUFD at runtime using
+>>      iommufd_builtin
+>>    hw/vfio/platform: Compile once
+>>
+>>   docs/devel/vfio-iommufd.rst  |  2 +-
+>>   hw/vfio/pci-quirks.h         |  8 +++++
+>>   include/exec/ram_addr.h      |  3 --
+>>   include/qom/object.h         |  8 +++++
+>>   include/system/hostmem.h     |  3 ++
+>>   include/system/iommufd.h     |  6 ++++
+>>   include/system/kvm.h         |  8 ++---
+>>   target/s390x/kvm/kvm_s390x.h |  2 +-
+>>   hw/ppc/spapr_caps.c          |  1 +
+>>   hw/s390x/s390-virtio-ccw.c   |  1 +
+>>   hw/vfio/ap.c                 | 27 ++++++++---------
+>>   hw/vfio/ccw.c                | 27 ++++++++---------
+>>   hw/vfio/common.c             |  1 +
+>>   hw/vfio/igd-stubs.c          | 20 +++++++++++++
+>>   hw/vfio/igd.c                |  4 +--
+>>   hw/vfio/iommufd.c            |  1 -
+>>   hw/vfio/migration.c          |  1 -
+>>   hw/vfio/pci-quirks.c         |  9 +++---
+>>   hw/vfio/pci.c                | 57 +++++++++++++++++-------------------
+>>   hw/vfio/platform.c           | 25 ++++++++--------
+>>   hw/vfio/spapr.c              |  4 +--
+>>   qom/object.c                 |  5 ++++
+>>   hw/vfio/meson.build          | 35 +++++++++++++---------
+>>   23 files changed, 152 insertions(+), 106 deletions(-)
+>>   create mode 100644 hw/vfio/igd-stubs.c
+>>
 > 
->> -----Original Message-----
->> From: Philippe Mathieu-Daudé <philmd@linaro.org>
->> Subject: [PATCH v2 15/21] hw/vfio/pci: Check CONFIG_IOMMUFD at runtime
->> using iommufd_builtin()
->>
->> Convert the compile time check on the CONFIG_IOMMUFD definition
->> by a runtime one by calling iommufd_builtin().
->>
->> Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
->> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
->> ---
->> hw/vfio/pci.c | 38 ++++++++++++++++++--------------------
->> 1 file changed, 18 insertions(+), 20 deletions(-)
-
-
->> static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
->> {
->> @@ -3433,9 +3430,10 @@ static void vfio_pci_dev_class_init(ObjectClass *klass,
->> void *data)
->>
->>      device_class_set_legacy_reset(dc, vfio_pci_reset);
->>      device_class_set_props(dc, vfio_pci_dev_properties);
->> -#ifdef CONFIG_IOMMUFD
->> -    object_class_property_add_str(klass, "fd", NULL, vfio_pci_set_fd);
->> -#endif
->> +    if (iommufd_builtin()) {
->> +        device_class_set_props(dc, vfio_pci_dev_iommufd_properties);
+> Patches 1-9 still look ok and could be merged through the vfio tree
+> if maintainers ack patch 6 and 8.
 > 
-> device_class_set_props() is called twice. Won't it break qdev_print_props() and qdev_prop_walk()?
+> The rest, depending on type_is_registered(), would be nice to have,
+> but since there are conflicts and soft freeze is scheduled for
+> tomorrow, we would probably have to wait QEMU 10.1.
 
-device_class_set_props() is misnamed, as it doesn't SET an array of
-properties, but ADD them (or 'register') to the class.
-
-See device_class_set_props_n() in hw/core/qdev-properties.c.
-
-I'll see to rename the QDev methods for clarity.
-
-Regards,
-
-Phil.
+No particular rush for the 10.0 release.
 
