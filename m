@@ -1,87 +1,87 @@
-Return-Path: <kvm+bounces-40587-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40588-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A9BCA58D0A
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 08:38:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E1EDA58D0B
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 08:38:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C11B37A2B92
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 07:37:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 814D3188D0AD
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 07:38:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA465221543;
-	Mon, 10 Mar 2025 07:38:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E125221543;
+	Mon, 10 Mar 2025 07:38:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bO2g/kjp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y2h2aAPo"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2451F1CAA70
-	for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 07:38:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18F4E1CAA70
+	for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 07:38:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741592307; cv=none; b=bDrH+/0HeMuOprU7tG46ASwTGrCflWzjbMdL0hfV8KgzVxPwaRIy/buCIj7ncYcg83sYZFrm3bMSqvrHTPgTN7sifkgsczHYpukr7sN9XBpruoZWOQClsvUMkTm5K7Tb/i3PHQhZdXVB9wL5FiabtlQXTk7NdNmD9rdrH5u3/0o=
+	t=1741592315; cv=none; b=q/uQ+/+M+k78hNcQaoEMrKKHDZBG2YiXOtYgMJJNUDEBrI5PVcPTG+EKqrGW2KheIAp+NznfvZRAyRJ4vw3uyrpRk1diUHWSrDw6hUpNC/shJPz3wQaXQW0UJmDYz+OMj2cZ0zda+FcbSXpU6NR8gP5AEHOXCvFMXqSAdgA9dCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741592307; c=relaxed/simple;
-	bh=1OXJRubtXFMW2KYDuJU4NAsfR5xoiHagHY62jO57foE=;
+	s=arc-20240116; t=1741592315; c=relaxed/simple;
+	bh=bFQhGbgFVuB6JSoOrXMIMFIAlmoiAyT2wqLAjD9ZV6Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MIMFJmOzMjXMe2sbTcy7cI8PTYkV5lZrown91VMNHWjaJIC2tZuOlvth69kxZCdD18Emtw1bCknj/Zn2KMzqBf2GTF3gthv2nD5cV585t6OyRCf1wFJPQhOVP8T9Njt+MQhmiCMV0PXP2yXUJoCXsayCDV74gYbcFWr8gPpLMKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bO2g/kjp; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=YZuEwFaCd7qAN2hJssvuqdR2MfZ2EejnK4rKr0ciYQYNTmwT6A00UB6nyLVRJD/6dwyXtaFuwmpPPPWFeQ4v0m12VtjjEHW+3T0lQd3/hwYIj8EooO76+DuuHjjwP3+0SGMAAaQdrhw7Zk5K1yXFoi3a6hE24R40oer2WRY+Oa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y2h2aAPo; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741592304;
+	s=mimecast20190719; t=1741592313;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=fcGMiPuXUpwi+/5XTTpJX6j45pWqFypmx1+7cGeA7kA=;
-	b=bO2g/kjpLafnCg9lv85XnUBKBDyrBGat+pZjeHjQhlDid49QHIzcOuvUI0JHe3ctSuciKF
-	vM+d4dyeNk3liZoQfhKamdYkNn2D4NwNgK5JilDo5+VzlxS9ITScTcMpVyNMY1MYO8pUGh
-	iKwT2YqvIl1YQikXlISqPq4ZJmD/j6A=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=GVlHPqi6khAgp4NROThPCeWZ+Jjizn4nCkjDIbu+9os=;
+	b=Y2h2aAPoCGy8VcIMBY7z6ENCfQuBmtRVU7lV65/8wwsjXgNmIX3EZtBcEW43IidAJkTdE7
+	3u2VUG7TbowUuRN/wpNJWbZ1kbPb7s9NSGGjd9rZ3ypk3jWxgHJJjWMrY/4k8BxErC7fvW
+	IeZpwE1D3Dq5YXirV85W2O2tyYMzESE=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-517-iOWos8JDON6Gibq0pOG6iA-1; Mon, 10 Mar 2025 03:38:20 -0400
-X-MC-Unique: iOWos8JDON6Gibq0pOG6iA-1
-X-Mimecast-MFC-AGG-ID: iOWos8JDON6Gibq0pOG6iA_1741592299
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-39137e17c50so790289f8f.3
-        for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 00:38:19 -0700 (PDT)
+ us-mta-128-4U-JlZ6cNfGWCqwwqAmjWA-1; Mon, 10 Mar 2025 03:38:31 -0400
+X-MC-Unique: 4U-JlZ6cNfGWCqwwqAmjWA-1
+X-Mimecast-MFC-AGG-ID: 4U-JlZ6cNfGWCqwwqAmjWA_1741592310
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43cf172ff63so4093045e9.3
+        for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 00:38:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741592299; x=1742197099;
+        d=1e100.net; s=20230601; t=1741592310; x=1742197110;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fcGMiPuXUpwi+/5XTTpJX6j45pWqFypmx1+7cGeA7kA=;
-        b=Ngrfi/Byb0f1njx3R9R5SeXO85mykk+YCZDx2e0FhVieQKGmOUCSAltB04Z0dcv9Zw
-         ryEHhu20gjlfk9yfXzXaNkExK+qsVP1xRXVIePFVZoOsVs9bjtvQU8Nj7odA547PtuCt
-         9wattrdkwkOjtQ2upgFWUbVRNKBwRIsudEsLnUK+pUT13/Fzc1XvxvBMtmmr72TZ3YXi
-         Kth7MWoGyTcfcGf2wuFwpBBeWhfLf+gleVOTovKn0jeoQ3dsDEkpQycdS1C7QXnMtt+7
-         tdxz4vaq3ZBbQR4TPvmP0sntyvpsJf4ppD+pR9QeXDwa3MEVM9AM3Ivw2dhgg2kGdH/t
-         IRCA==
-X-Forwarded-Encrypted: i=1; AJvYcCVu+ZSFRHrBTkBUr+7woPyRQ65DMT4/x10pVb9bE/zjFLIb8yujIdU5USfIs/WvO0CVyAo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0IfFC5IyXmrQGfhRpcBgKcfD1LLea3yyGbNG0q5YR0r0KzA+e
-	usTkja+Tx6ZsxyeSy7Hxr36d8W1LgjOtZq/XyNy+pYPGKvcn/J+b0SXM7eEpCnk36emjUbltTD/
-	YBNviRWaNiSytEGmfgBI/opg/43x7jnfJv/MVRRb4gXEE+V1ySg==
-X-Gm-Gg: ASbGnctA/bxCOzHiHb6AQMcv74AhtLY248hXEWQ0yr2D3SxWC/J5/lxByrBEUGPySQj
-	TlWNgJ2SJUXKWOov16bBwJxkHvexoXAt3Fi9yTwWAniyD6+3GAC+ys856zI36clYNazmQUkkqx3
-	HbTtPiffOvsr0iuwNzI7QX39iauOS2hKIgrFIUk6v3s39+BpsW3DzxfUm3sDWEmhUtgk7DAwUAS
-	1QR13ll5Xg1husXDys2MJckEj/yX/NoULsMWmj1q2TbSQD0kVanbp8e5RTNh5LSCyAYuk8WOND8
-	Osd9MouT3M9pyibBb+DPphYPCTU7qEzLD2rmyW6u6BFM3DB7o6+pzg==
-X-Received: by 2002:a5d:64aa:0:b0:390:e853:85bd with SMTP id ffacd0b85a97d-39132db1108mr8321568f8f.48.1741592298833;
-        Mon, 10 Mar 2025 00:38:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE0MGS9KJUmdCejnHIUD/RZQ1jDAmK+3msRX4LEXUMNgnJkjKsldrWGKI/drvwRgRDBSDmiVQ==
-X-Received: by 2002:a5d:64aa:0:b0:390:e853:85bd with SMTP id ffacd0b85a97d-39132db1108mr8321532f8f.48.1741592298503;
-        Mon, 10 Mar 2025 00:38:18 -0700 (PDT)
+        bh=GVlHPqi6khAgp4NROThPCeWZ+Jjizn4nCkjDIbu+9os=;
+        b=VKpC1kXHDKGuFQEo+8W2JghDjufPDxl68/Dzs+/HfbaYEF9tsgIGqb7UTiEY6TGC5c
+         74JeOytbbsIiaW7Aw18hlXdwPLIPKrwCz8DSP7tVM8Q2AyRUqYK4AhKmPxpZ25+MEGOq
+         LPZRZBSLxKRIjZygQIeaxweUcKGUreSwygSqbfhWpHnn9051wnj0FANf5aRmb9F5+7p4
+         ENYC79n7YxhYF9bJLkKmybO55dRczfE6cMw73rValMIOJqadLLzC8yr9pQtVv1y1TuEA
+         +r3nTMooy4uAHtgEGa/ESyRQsVIMb0m+kYJ7IwGduk1mp5GWd1TrFlc3CagFKl2wh8E/
+         UgsA==
+X-Forwarded-Encrypted: i=1; AJvYcCX2+lKkwpxMx2tR7BEFM9vMjbAVvmUU6YS16MOHgwUhwWoVjUnbYR5apfFHV9wZ6qz5YN4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1e0e0QtEyrrzQbeJePblBzd10sYa76b/CZV40giuVukRyn6Rb
+	ks2VNgxAb2Ng6hOcI5VRcWzgKBWsBIGDdPb2jovI6TB2W0xXH2B0uLxQkySbCY+If7RvzZ3xG7r
+	ksf73GqpWbCxqrj/co0tqczBtQuYCznKS1EjpUiP3ZV2bQCN7cg==
+X-Gm-Gg: ASbGncuzPdFyWRPbW+beacQajt0Njm5syVGwQvtb8q8fWHrhJ0RoyH2X8xHWFRFpGYC
+	trOL6lmqf5trPH1XqPn9aNntuJOc3lJFGraLLzJ2igTbJvaYvqF0YnUwSJQk7uj/IgAQZ6p8Z/M
+	dSHV9o2yj6PPY3yMfapwQYNE6r9RadlKtNSP9L731SBq9usFupy/y6+yzoMdQy7vyAUn5RlIUeH
+	o/WGk5HA5O7ZVz5z9zLmwW07ckaz8PHlcZpOShInldTARxcG5uhxxBANxuBqDGg05b1ze4HB/Ib
+	SMUcSPzJbXEq0HGE/Xw5uWiMgOoOOcq9sy2zmefsUvpAaC7iyobqLg==
+X-Received: by 2002:a05:6000:18af:b0:391:3b1b:f3b7 with SMTP id ffacd0b85a97d-3913b1bf54amr3942337f8f.28.1741592310075;
+        Mon, 10 Mar 2025 00:38:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHiahtuiON9qB1ZPT4rXfJHltu8gWbLn4mRq/nAUaKEk5h5U+ZW+r1nn9PUl4zpjFgM9R7lmA==
+X-Received: by 2002:a05:6000:18af:b0:391:3b1b:f3b7 with SMTP id ffacd0b85a97d-3913b1bf54amr3942313f8f.28.1741592309669;
+        Mon, 10 Mar 2025 00:38:29 -0700 (PDT)
 Received: from ?IPV6:2a01:e0a:280:24f0:9db0:474c:ff43:9f5c? ([2a01:e0a:280:24f0:9db0:474c:ff43:9f5c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43bd435c88esm164018355e9.36.2025.03.10.00.38.17
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43cf86b1d80sm25719405e9.9.2025.03.10.00.38.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Mar 2025 00:38:17 -0700 (PDT)
-Message-ID: <6c9b7ba4-e894-44b5-8a35-eee310c50c94@redhat.com>
-Date: Mon, 10 Mar 2025 08:38:16 +0100
+        Mon, 10 Mar 2025 00:38:29 -0700 (PDT)
+Message-ID: <1446fd11-c5fe-44b6-afad-3483bea22325@redhat.com>
+Date: Mon, 10 Mar 2025 08:38:27 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,7 +89,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 10/21] qom: Introduce type_is_registered()
+Subject: Re: [PATCH v2 11/21] hw/vfio/igd: Define TYPE_VFIO_PCI_IGD_LPC_BRIDGE
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  qemu-devel@nongnu.org
 Cc: Yi Liu <yi.l.liu@intel.com>,
@@ -112,7 +112,7 @@ Cc: Yi Liu <yi.l.liu@intel.com>,
  =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
  Richard Henderson <richard.henderson@linaro.org>
 References: <20250308230917.18907-1-philmd@linaro.org>
- <20250308230917.18907-11-philmd@linaro.org>
+ <20250308230917.18907-12-philmd@linaro.org>
 Content-Language: en-US, fr
 From: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>
 Autocrypt: addr=clg@redhat.com; keydata=
@@ -158,17 +158,16 @@ Autocrypt: addr=clg@redhat.com; keydata=
  HQoPn9qrDJgsgcbBVc1gkUT6hnxShKPp4PlsZVMNjvPAnr5TEBgHkk54HQRhhwcYv1T2QumQ
  izDiU6iOrUzBThaMhZO3i927SG2DwWDVzZltKrCMD1aMPvb3NU8FOYRhNmIFR3fcalYr+9gD
  uVKe8BVz4atMOoktmt0GWTOC8P4=
-In-Reply-To: <20250308230917.18907-11-philmd@linaro.org>
+In-Reply-To: <20250308230917.18907-12-philmd@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 3/9/25 00:09, Philippe Mathieu-Daudé wrote:
-> In order to be able to check whether a QOM type has been
-> registered, introduce the type_is_registered() helper.
+> Define TYPE_VFIO_PCI_IGD_LPC_BRIDGE once to help
+> following where the QOM type is used in the code.
+> We'll use it once more in the next commit.
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-
-FWIW,
 
 
 Reviewed-by: Cédric Le Goater <clg@redhat.com>
@@ -179,44 +178,42 @@ C.
 
 
 > ---
->   include/qom/object.h | 8 ++++++++
->   qom/object.c         | 5 +++++
->   2 files changed, 13 insertions(+)
+>   hw/vfio/pci-quirks.h | 2 ++
+>   hw/vfio/igd.c        | 4 ++--
+>   2 files changed, 4 insertions(+), 2 deletions(-)
 > 
-> diff --git a/include/qom/object.h b/include/qom/object.h
-> index 9192265db76..5b5333017e0 100644
-> --- a/include/qom/object.h
-> +++ b/include/qom/object.h
-> @@ -898,6 +898,14 @@ Type type_register_static(const TypeInfo *info);
->    */
->   void type_register_static_array(const TypeInfo *infos, int nr_infos);
+> diff --git a/hw/vfio/pci-quirks.h b/hw/vfio/pci-quirks.h
+> index d1532e379b1..fdaa81f00aa 100644
+> --- a/hw/vfio/pci-quirks.h
+> +++ b/hw/vfio/pci-quirks.h
+> @@ -69,4 +69,6 @@ typedef struct VFIOConfigMirrorQuirk {
 >   
-> +/**
-> + * type_is_registered:
-> + * @typename: The @typename to check.
-> + *
-> + * Returns: %true if @typename has been registered, %false otherwise.
-> + */
-> +bool type_is_registered(const char *typename);
+>   extern const MemoryRegionOps vfio_generic_mirror_quirk;
+>   
+> +#define TYPE_VFIO_PCI_IGD_LPC_BRIDGE "vfio-pci-igd-lpc-bridge"
 > +
->   /**
->    * DEFINE_TYPES:
->    * @type_array: The array containing #TypeInfo structures to register
-> diff --git a/qom/object.c b/qom/object.c
-> index 01618d06bd8..be442980049 100644
-> --- a/qom/object.c
-> +++ b/qom/object.c
-> @@ -100,6 +100,11 @@ static TypeImpl *type_table_lookup(const char *name)
->       return g_hash_table_lookup(type_table_get(), name);
+>   #endif /* HW_VFIO_VFIO_PCI_QUIRKS_H */
+> diff --git a/hw/vfio/igd.c b/hw/vfio/igd.c
+> index b1a237edd66..1fd3c4ef1d0 100644
+> --- a/hw/vfio/igd.c
+> +++ b/hw/vfio/igd.c
+> @@ -262,7 +262,7 @@ static void vfio_pci_igd_lpc_bridge_class_init(ObjectClass *klass, void *data)
 >   }
 >   
-> +bool type_is_registered(const char *typename)
-> +{
-> +    return !!type_table_lookup(typename);
-> +}
-> +
->   static TypeImpl *type_new(const TypeInfo *info)
->   {
->       TypeImpl *ti = g_malloc0(sizeof(*ti));
+>   static const TypeInfo vfio_pci_igd_lpc_bridge_info = {
+> -    .name = "vfio-pci-igd-lpc-bridge",
+> +    .name = TYPE_VFIO_PCI_IGD_LPC_BRIDGE,
+>       .parent = TYPE_PCI_DEVICE,
+>       .class_init = vfio_pci_igd_lpc_bridge_class_init,
+>       .interfaces = (InterfaceInfo[]) {
+> @@ -524,7 +524,7 @@ void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+>       lpc_bridge = pci_find_device(pci_device_root_bus(&vdev->pdev),
+>                                    0, PCI_DEVFN(0x1f, 0));
+>       if (lpc_bridge && !object_dynamic_cast(OBJECT(lpc_bridge),
+> -                                           "vfio-pci-igd-lpc-bridge")) {
+> +                                           TYPE_VFIO_PCI_IGD_LPC_BRIDGE)) {
+>           error_report("IGD device %s cannot support legacy mode due to existing "
+>                        "devices at address 1f.0", vdev->vbasedev.name);
+>           return;
 
 
