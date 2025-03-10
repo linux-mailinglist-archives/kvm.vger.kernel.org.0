@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-40548-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40549-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA219A58B54
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 05:59:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D2ECAA58B55
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 05:59:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3670167B62
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 04:59:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E9A6162BE4
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 04:59:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 531B51C5D7B;
-	Mon, 10 Mar 2025 04:58:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CF301C5F34;
+	Mon, 10 Mar 2025 04:58:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mQFG2H5v"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iB/F1b9r"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E99DB1C1F02
-	for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 04:58:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2381D1C54A2
+	for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 04:58:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741582734; cv=none; b=GPrRJK6NoKZ+0eY3VZL2tZjYKazlaYxHZysPNG3HiEBOsILIHxfyLnD8niusW1BJg8VIeQuWx4oAOc2s33jf3fC/94m6Q+APuM8smUPjFET6uUIOueNVTJf0BbWxSswr/PcQG80pqEVQUcXzo0rMP12Tu1hscWfwm27YB3Q4CQA=
+	t=1741582735; cv=none; b=L96e8XiKuBnDN6LO21BPNqdYip4tp98I9lBWm8Ly/Z8BsiRW9X6JVEWvzVTomX1C9H5uUskUAcuow/6Vp2ks+wM7/6ihtM2QBLSS09aSSsTyh3T0k10SpCOHYhIgxOt4qfjIVa9T/Qx7eksgoKHpsJiJx9YcjuUjzmrIew5x0vk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741582734; c=relaxed/simple;
-	bh=o6CNIlf+fgBJTyg+UOitU2imqEFZyMkcskpxXQcwyD0=;
+	s=arc-20240116; t=1741582735; c=relaxed/simple;
+	bh=EHJ4NV86nZgqju0S3FLNfal/v+biiU/OyUthg9HEuSo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CT6cDCbATiHhqyCYFl7YA22moOxAEGf9ZyruWC7BhgeJTDSfZhpvdQ5h61s+BqseP3H0iIVr/F5LKO2bJEcS/gsi2vVfyEYTcGf6pmCX9kkLwpO4O761aMWWdyQQSLQrpeFJa7LnxitNNu11bOK5MLpnpSNhpBh+/EIZy/+y3Ks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=mQFG2H5v; arc=none smtp.client-ip=209.85.214.178
+	 MIME-Version; b=amexvAGmgVoC8s/sYHkhUZoBo0V+LTtReBI1pECVcBJO3BtHNeHzKO6+4R9I6QEErCGzPgA4LSA3fShIg871ZeQojERlSuM7EW3997ZjKAT6nQEudlx6wgqDJCliIpM+aDFsrDlzdZgNMTWFueXyDfJthkBVFCAsaPavc+Cke7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=iB/F1b9r; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-22337bc9ac3so70486445ad.1
-        for <kvm@vger.kernel.org>; Sun, 09 Mar 2025 21:58:52 -0700 (PDT)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-219f8263ae0so68330455ad.0
+        for <kvm@vger.kernel.org>; Sun, 09 Mar 2025 21:58:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1741582732; x=1742187532; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1741582733; x=1742187533; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2OIqebmv6TCVHIjcnbRR2ASx6yOnmt3f1dkycngreo0=;
-        b=mQFG2H5vDXikEoiX20qrclrU6jfHDzjtxDQU/xod95BZGvbEqW1jXnCly2ZNoU1Omt
-         cGcFs5bPQ6nUqv6G0TxS6wkzDtp3I/zbJVjaBGa5HUu+309gd69R8eODaz+6XxC0h+c+
-         BPbFsVbCaBMLxazvB0Ur4wnyCC4ek4QqaSidsU79kRvgcz3J+/+OgRhBG1P54EEtaEah
-         xjHScelHtkgB/D/1nFdbvWq73WmzcXOVmCjcRKoJF0oP8RpnbHfbhwURem3rzVjXFMI2
-         fvax6odTxjT51rpNEyOS60GeoPl3py4Pw5yrFDay6Rr2s1uaI7f8vNU3WvI0/1O2CViA
-         aY1w==
+        bh=OGwlDw5fL6/8/4sqaw9ZjtskhrLsqkJfziSvtmiyf9E=;
+        b=iB/F1b9rHXZraDpIsztclSKMfo9uPZ537k4+zDO01LV/HTrfPuqnC8nwY/axJMwSo+
+         5BFyGfXVwSlaTBQZr/Imly6YdHE5ZgPp1D0XXqrAmn65tn1UuwmWiOW8g0vLMcPke4Kw
+         cUE1gnz8LYPzPaxZUiqoihealmU0l3qdEDe7g9hRCefXaBHmOHHYwP4iI6CvgSKW3lRG
+         54WDXplFI9kpO3myMNNN2REVuotELkVMM0BmonRAUDbL20NFHqFYUVvV3Z+N/Nfx3SoH
+         atdKewqrD+dNJnl3SCEdatMHgRg7Isvrq2KdQVMAp45GWvdd/j6llMb4pWoMiKDY/7b2
+         1jSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741582732; x=1742187532;
+        d=1e100.net; s=20230601; t=1741582733; x=1742187533;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2OIqebmv6TCVHIjcnbRR2ASx6yOnmt3f1dkycngreo0=;
-        b=PIzSjmoZrSPSYocpfEPfZO5kSWw7cfROA3q4bUvEh82NLg/SlmQRn7D0NvklLPwws2
-         a8cDV68BhlcZe+9hTgc2XuX5mrrTb4Zbs0IWc0RTXuYTbeHR7H+TUHSmc6hgZZ2iKwVh
-         eM4xNQMDjPcsKoOKK/pifzN9wwEtdPBDN1NED+k1PqVqGnlcOJVSDxr5cv1y/aNnQpPc
-         E4h2Vyl7Ne6jbc+YEGcHnJCsPZbKTivenpQ2h+9IC4lMGxCE9CB5fpScWdrJDuOVvECt
-         802RnRL4e3WsUELquuGAAPTlcPnvIhoMOk4FDuBj+rqosXtwXuraYZEYjh7/pjCfAQYL
-         F5hg==
-X-Forwarded-Encrypted: i=1; AJvYcCX1GaBYADaCv2lWWtORr014vVVq6d9hfNslZ4gzmv5V2hmx4NyTG/e0VPrPTj7Jpix8XE8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNUxH0WF8Nw9A7anZS6qbaMzJ5iZAaEWCAuzyO14RZsuGcyXyR
-	VP9y2LEICVNImWLbFqJpiWH58izqIOWXMN0ZXZmnwVa+HHdqx7BlqtN0l1idhtk=
-X-Gm-Gg: ASbGncsV91UNyeds+jIrG0FunXF237IVF9DxYWlJOxFMYauTe3Qmj8nv6KZuXkOxdQy
-	zu3CRhaO0NGhmaRJLtN7lvH3TVE1JmoHZjBvtUqeK8UmOX++RrzWdu50qpH8bKbbPj8o3fKKhhC
-	fCxxkKkrLy4pDYMWtARLV3ZxuPUZ0fVWOw3/x1gUBUn33mVLYnnPEMheG9R/+4VBx2FvjL29f+w
-	pbLJqZMx679xEc1Y2FqY5JTowO+AFXQp4Rw/IaT1C8JmdhVDC4tkxYZRqG7NYn8g7OVEkM2QZjF
-	N/ub6ND0JDEr95h9ddCJdZhaQmtHCo3BItGEnjobQG55
-X-Google-Smtp-Source: AGHT+IFiauNE3phtYbHOElNurEea3KFBOmPJM6YIEsLLcuetadtqaCJcJRoQf8PU7u5dj3ax/cwksA==
-X-Received: by 2002:a05:6a00:17a7:b0:736:47a5:e268 with SMTP id d2e1a72fcca58-736aa9bc787mr17756988b3a.1.1741582732211;
-        Sun, 09 Mar 2025 21:58:52 -0700 (PDT)
+        bh=OGwlDw5fL6/8/4sqaw9ZjtskhrLsqkJfziSvtmiyf9E=;
+        b=eIl0XaFbm+U1J50eozZB8UbXhlYDe93WVOjAeOxDyYYIJ/JgmKnN6SihexxWpv6IEJ
+         ssCVFcp4RIfOWxgg0DYFHJoN9SQhlkA4p02denxP6QnOI+qL+l4hm61L3JpMFPhMq7AN
+         51lyanbCDgqC+qD8wd5d3tim4UEpLYgzZJm/fAslujGC7LxmF5GNA2PtQwV3IbW0KP/Q
+         Mu+HORdIHDYCbhz3hhxjFhLn5nPi0Mi27lHmccS6LRV3lPjThH3ZOiPvgDqEPQLPoQG8
+         SY14n1yv3JLhEI3HAOMcMg9ahLHazDBgzddop3XbOqQZJ18hrGoZGfxzXCeg94Tmz2JU
+         eX1A==
+X-Forwarded-Encrypted: i=1; AJvYcCVq7ZVlYBAsYYY3xfD6t6rSWM3fRrG+YN2wEkiqd+p4/mD/8h46Mf/BOT5TnPr6bf19Y8I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzyu+p0WRUpXpFVKMMULCiwXtKLATpgu2o5J46Ck79p/VsoIx1r
+	XLgBKPGo9StVatzJpJMI8PunNdFUm/gI+hmfv0CICaa9NGT1Ayre4Tyu13BIbSc=
+X-Gm-Gg: ASbGncvHC4Ly4VqHbprxJeRJzUyqLjGFFN+gCRbcaZmBxOm4vJLUwPPTOeQ+LKrp9yB
+	4asu6RsL8JIdpIrrnSZh4LBNQNQSet87G5Efs56xmn6F5u/oJpRgs+iRI9fMnUCty9eM2c5sUuu
+	nX5FK5LQUELyKX/bwMxwFkOnG1G36r7WI+DgLHLws35FPTccFoEfouoeMSxblfZ3hlkmPQcfnyV
+	dpcSD8nFr+lfeF9OtvXLSV9VM46uaPqLm8xcXZsV3nxiEAIY/RIZdazh8Pc73pa8Ikzex1bUDLY
+	UxMCJ1TxtbVhwcN/W5JGX9iF3bz0MzrtUc+hgRhcGrgR
+X-Google-Smtp-Source: AGHT+IF9OJp4stFJ9k/lsvOwoQRvqqkA/ZzdxglsajfWtO3On0dbMxz5MT0xvVfYC1mLC7gyZMGdug==
+X-Received: by 2002:a05:6a00:13a9:b0:736:3be3:3d77 with SMTP id d2e1a72fcca58-736aaac69ddmr15637676b3a.16.1741582733352;
+        Sun, 09 Mar 2025 21:58:53 -0700 (PDT)
 Received: from pc.. ([38.39.164.180])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-736d2ae318csm1708308b3a.53.2025.03.09.21.58.51
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-736d2ae318csm1708308b3a.53.2025.03.09.21.58.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Mar 2025 21:58:51 -0700 (PDT)
+        Sun, 09 Mar 2025 21:58:52 -0700 (PDT)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org,
@@ -98,9 +98,9 @@ Cc: qemu-ppc@nongnu.org,
 	xen-devel@lists.xenproject.org,
 	Stefano Stabellini <sstabellini@kernel.org>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH 02/16] exec/memory_ldst_phys: extract memory_ldst_phys declarations from cpu-all.h
-Date: Sun,  9 Mar 2025 21:58:28 -0700
-Message-Id: <20250310045842.2650784-3-pierrick.bouvier@linaro.org>
+Subject: [PATCH 03/16] include: move target_words_bigendian() from tswap to bswap
+Date: Sun,  9 Mar 2025 21:58:29 -0700
+Message-Id: <20250310045842.2650784-4-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250310045842.2650784-1-pierrick.bouvier@linaro.org>
 References: <20250310045842.2650784-1-pierrick.bouvier@linaro.org>
@@ -112,123 +112,69 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-They are now accessible through exec/memory.h instead, and we make sure
-all variants are available for common or target dependent code.
-
-To allow this, we need to implement address_space_st{*}_cached, simply
-forwarding the calls to _cached_slow variants.
+This is needed for next commits (especially when implementing st/ld
+primitives which will use this function).
+As well, remove reference to TARGET_BIG_ENDIAN, as we are about to
+remove this dependency.
 
 Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 ---
- include/exec/cpu-all.h              | 15 ------------
- include/exec/memory.h               | 36 +++++++++++++++++++++++++++++
- include/exec/memory_ldst_phys.h.inc |  5 +---
- 3 files changed, 37 insertions(+), 19 deletions(-)
+ include/exec/tswap.h | 11 -----------
+ include/qemu/bswap.h | 12 ++++++++++++
+ 2 files changed, 12 insertions(+), 11 deletions(-)
 
-diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-index 17ea82518a0..1c2e18f492b 100644
---- a/include/exec/cpu-all.h
-+++ b/include/exec/cpu-all.h
-@@ -75,21 +75,6 @@ static inline void stl_phys_notdirty(AddressSpace *as, hwaddr addr, uint32_t val
-                                MEMTXATTRS_UNSPECIFIED, NULL);
- }
+diff --git a/include/exec/tswap.h b/include/exec/tswap.h
+index ecd4faef015..cc662cd8b54 100644
+--- a/include/exec/tswap.h
++++ b/include/exec/tswap.h
+@@ -10,17 +10,6 @@
  
--#define SUFFIX
--#define ARG1         as
--#define ARG1_DECL    AddressSpace *as
--#define TARGET_ENDIANNESS
--#include "exec/memory_ldst_phys.h.inc"
+ #include "qemu/bswap.h"
+ 
+-/**
+- * target_words_bigendian:
+- * Returns true if the (default) endianness of the target is big endian,
+- * false otherwise. Note that in target-specific code, you can use
+- * TARGET_BIG_ENDIAN directly instead. On the other hand, common
+- * code should normally never need to know about the endianness of the
+- * target, so please do *not* use this function unless you know very well
+- * what you are doing!
+- */
+-bool target_words_bigendian(void);
 -
--/* Inline fast path for direct RAM access.  */
--#define ENDIANNESS
--#include "exec/memory_ldst_cached.h.inc"
--
--#define SUFFIX       _cached
--#define ARG1         cache
--#define ARG1_DECL    MemoryRegionCache *cache
--#define TARGET_ENDIANNESS
--#include "exec/memory_ldst_phys.h.inc"
- #endif
+ /*
+  * If we're in target-specific code, we can hard-code the swapping
+  * condition, otherwise we have to do (slower) run-time checks.
+diff --git a/include/qemu/bswap.h b/include/qemu/bswap.h
+index b915835bead..ebf6f9e5f5c 100644
+--- a/include/qemu/bswap.h
++++ b/include/qemu/bswap.h
+@@ -1,6 +1,8 @@
+ #ifndef BSWAP_H
+ #define BSWAP_H
  
- /* page related stuff */
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 78c4e0aec8d..7c20f36a312 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -2798,6 +2798,42 @@ static inline void address_space_stb_cached(MemoryRegionCache *cache,
-     }
- }
++#include <stdbool.h>
++
+ #undef  bswap16
+ #define bswap16(_x) __builtin_bswap16(_x)
+ #undef  bswap32
+@@ -8,6 +10,16 @@
+ #undef  bswap64
+ #define bswap64(_x) __builtin_bswap64(_x)
  
-+static inline uint16_t address_space_lduw_cached(MemoryRegionCache *cache,
-+    hwaddr addr, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    return address_space_lduw_cached_slow(cache, addr, attrs, result);
-+}
++/**
++ * target_words_bigendian:
++ * Returns true if the (default) endianness of the target is big endian,
++ * false otherwise.
++ * Common code should normally never need to know about the endianness of the
++ * target, so please do *not* use this function unless you know very well
++ * what you are doing!
++ */
++bool target_words_bigendian(void);
 +
-+static inline void address_space_stw_cached(MemoryRegionCache *cache,
-+    hwaddr addr, uint16_t val, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    address_space_stw_cached_slow(cache, addr, val, attrs, result);
-+}
-+
-+static inline uint32_t address_space_ldl_cached(MemoryRegionCache *cache,
-+    hwaddr addr, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    return address_space_ldl_cached_slow(cache, addr, attrs, result);
-+}
-+
-+static inline void address_space_stl_cached(MemoryRegionCache *cache,
-+    hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    address_space_stl_cached_slow(cache, addr, val, attrs, result);
-+}
-+
-+static inline uint64_t address_space_ldq_cached(MemoryRegionCache *cache,
-+    hwaddr addr, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    return address_space_ldq_cached_slow(cache, addr, attrs, result);
-+}
-+
-+static inline void address_space_stq_cached(MemoryRegionCache *cache,
-+    hwaddr addr, uint64_t val, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    address_space_stq_cached_slow(cache, addr, val, attrs, result);
-+}
-+
- #define ENDIANNESS   _le
- #include "exec/memory_ldst_cached.h.inc"
- 
-diff --git a/include/exec/memory_ldst_phys.h.inc b/include/exec/memory_ldst_phys.h.inc
-index ecd678610d1..db67de75251 100644
---- a/include/exec/memory_ldst_phys.h.inc
-+++ b/include/exec/memory_ldst_phys.h.inc
-@@ -19,7 +19,6 @@
-  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-  */
- 
--#ifdef TARGET_ENDIANNESS
- static inline uint16_t glue(lduw_phys, SUFFIX)(ARG1_DECL, hwaddr addr)
+ static inline uint32_t bswap24(uint32_t x)
  {
-     return glue(address_space_lduw, SUFFIX)(ARG1, addr,
-@@ -55,7 +54,7 @@ static inline void glue(stq_phys, SUFFIX)(ARG1_DECL, hwaddr addr, uint64_t val)
-     glue(address_space_stq, SUFFIX)(ARG1, addr, val,
-                                     MEMTXATTRS_UNSPECIFIED, NULL);
- }
--#else
-+
- static inline uint8_t glue(ldub_phys, SUFFIX)(ARG1_DECL, hwaddr addr)
- {
-     return glue(address_space_ldub, SUFFIX)(ARG1, addr,
-@@ -139,9 +138,7 @@ static inline void glue(stq_be_phys, SUFFIX)(ARG1_DECL, hwaddr addr, uint64_t va
-     glue(address_space_stq_be, SUFFIX)(ARG1, addr, val,
-                                        MEMTXATTRS_UNSPECIFIED, NULL);
- }
--#endif
- 
- #undef ARG1_DECL
- #undef ARG1
- #undef SUFFIX
--#undef TARGET_ENDIANNESS
+     return (((x & 0x000000ffU) << 16) |
 -- 
 2.39.5
 
