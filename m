@@ -1,180 +1,237 @@
-Return-Path: <kvm+bounces-40597-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40599-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B0AEA58DD6
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 09:17:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75181A58DEA
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 09:20:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 050923AC704
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 08:16:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A54B016A8C4
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 08:20:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57AAA2236F6;
-	Mon, 10 Mar 2025 08:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4564522257E;
+	Mon, 10 Mar 2025 08:20:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="NBn0+jdL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ABjhcdoW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE26813E41A
-	for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 08:16:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A96135965
+	for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 08:20:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741594609; cv=none; b=O82OIZGq9+LQ868n/O7HUMuf99Im8W778kg7BSxQgZK+pRlo3jnUM5kwXGBMaOijoVeWousk6aFW0f2QjIghgc3Eoa3CE7E0epnrwD1ryc2z44NAIkDJxR91F2I7mWwNdh4SBG4C34yLzeo9EDZmZoTb2HiOjPaQe/HkV3UQdhY=
+	t=1741594819; cv=none; b=VnGFi+JjdnlTdVvb9bNca9XlS71pIrvgNKaA+3QEp+0JipDEHaaIyzElxsYGMTgzRfbnGpVHXVLgxQx8E8pp7uh1WQjlgTMwjRslS7puTZOG1AqjlsAzobLDBLD0E76ipqBxCyKoIwfwo5KpznlazUVzh2ITgdsgFINTeqWpQXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741594609; c=relaxed/simple;
-	bh=bYJgB5J1rWOwdnYTlKo6V+nCLjOSgt8m+waOje7Vwoo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MxCyc+ekWLHbi0DTMBmeOhJtGhmRoK1DdEsLraMxs/Vl/wBYvvvudmwusdq/erWscFZuoeZuGmt1qwxNyJVwwOk43u+Tgumv7duJKsgC/4OhiuiOvV0dXNglmaH/y4ZGDr2Mn+q6QULd2RnGJ57MSr86WsyQy6/tFWyHaRQcUzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=NBn0+jdL; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2232aead377so3616315ad.0
-        for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 01:16:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1741594606; x=1742199406; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZmMfWN/YjTztlUTbhbD2bh8ol9HLPI3qHdmgf2q4Pyk=;
-        b=NBn0+jdL7TtqMlPl4/KtYMrMunRagWlS6tO3+ay0X4H+WhhkJwuU7ueUX5D1NIZkas
-         f4mKJHieBq5ypC7rZFa17DbwcsoAZmVGWhBL/rOXx9A23dx2C7BlUkJAh52Hs3XqSLTn
-         P/NdUhRLn1WqIq649kD06QH/sKTYmp6f5xsgAYLb0hbTseeN8/lwpnQz/sTvn6ovc4K/
-         v3HT23f/dOxrK0E5TojvrnqXTL7CF2iQBKuWSD+ipN5FjjJGO/VVyV/Razy7Q9Q4ZORc
-         EZj3GrVfAZOt9kAAjcCD9SBJOObn+r+LQ8H92CSYYwOeefZeTaIAEvC/61vA2CfDGZDM
-         EkLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741594606; x=1742199406;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZmMfWN/YjTztlUTbhbD2bh8ol9HLPI3qHdmgf2q4Pyk=;
-        b=nKEV0pufZKn8F0B8OtgykIWAHn5giMzF6fyQ8676qQIt6kZcx8jVlRBOuyvh8X2qxp
-         3v6E5gSPPxpUq+SzpOWrenuNdDiYi+hYCmoG6/ks+lR8u28Y+4U94LYe43d6uVqhzJLW
-         8A7CXbkTmUOMFBO5pinsLwuz5Hn2KUmSMiuSPcyBs+o7qsoWW6+OQPOxbXy+Yfe2ErXO
-         rD5Kp6oYgOX0wQIrxczJXuDG3pW7IwwLJc/XDFMu3hJdr1bYMAI+ySYC+ZMObfC3DuUU
-         rjoyxrtQ7yHh4rlI3zaGVS9SQGyD4aZlJNUBWZ3M2Utd0UgVz9Yazu8vcffQhhJDh0am
-         vJ9g==
-X-Forwarded-Encrypted: i=1; AJvYcCXafP9JjPvGrEWYz9I+yRjjtxSvSSdwK22iEaSUSeRYkPiJnXwcpnJcHt088dzB5ZD6X8E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfpHveYWr1nhP3ntF+pbNcI7wYB8Bjusyd4vTIDtgqwK7cLetw
-	4ZifURozoartCkKZ59LunXKd5BLBb5nLuuiBzCMEXjGomoXjqUYaz71LTGuijV0=
-X-Gm-Gg: ASbGncv2R1Vi5saVtPlCCZocCkneF0z5uSE56Q/IJ+FRjWMNbAyHV8yF0pIYq9pXGII
-	pDWf9cCryOYsek50rjZ6y+1SAU0XG1sVNjfGlOE58+2XWpETLFnuyQPOYDFJBiUWYeeJinF8CLV
-	nfNgMG9WexP2zcVAnh4OYaVMa0sIEbAnMdMI7Ta9eirlhYUm+q69Lsn9HwA0xdqEcxYeyHnrlX0
-	fC8QNPDp76iWP8VC8eaj6FDynZrT/VwZnjv54o/LIURM/njxCNw1hqSpK8cq77tb0I3kFiB9/8j
-	ivawUvVUEJrYXWAxKGOkulFILPj/svsTDpvwk9P4ORhA6jlg31CX/ZJQMQ==
-X-Google-Smtp-Source: AGHT+IF0rPYRbicP0/CqimCD18L/ZR4wVPSR4hAOvttkF0NCrjknQOFhZJD3NGgEaMlKRFPN5jMntA==
-X-Received: by 2002:a05:6a00:4f90:b0:736:3d6c:aa64 with SMTP id d2e1a72fcca58-736aab13b03mr19832278b3a.21.1741594606209;
-        Mon, 10 Mar 2025 01:16:46 -0700 (PDT)
-Received: from [157.82.205.237] ([157.82.205.237])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-736e085c030sm819390b3a.14.2025.03.10.01.16.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Mar 2025 01:16:45 -0700 (PDT)
-Message-ID: <5cfedd24-de7c-484b-afa7-ddb4828fb9e8@daynix.com>
-Date: Mon, 10 Mar 2025 17:16:41 +0900
+	s=arc-20240116; t=1741594819; c=relaxed/simple;
+	bh=LXWNHMvLvXD0VwhJ6IcIyTnGaD9zgRK8HpIgyy3vA6E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IYEG0w5knMwBh2W6ZxL0coaqB2ZeM38ZPMo6iq9OTLR+WFAYXPTBR9HmkONeLSBr9pb0AFBtDC8285d8vkJIAqcJpn2TcI99XfjuuoElKSqP3I5nXmwu1Pfr5oOmf84i5Gdewvj34A6dUFkmjYd4Tm4BARm9XKKG4g5CLeNWfR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ABjhcdoW; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741594817; x=1773130817;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=LXWNHMvLvXD0VwhJ6IcIyTnGaD9zgRK8HpIgyy3vA6E=;
+  b=ABjhcdoWEpCTsZaw8XZRA3qr5G81ozn/3uF2LxHW92sqxXi/VJ9aKT0O
+   kfFylQyCASFIibuRwRi1VkmGjUv2vPH+YoOZEbaNHVugY5r8cEFd//Vva
+   3IZoQpRCUdqsz7m5XI7vCS9tdLSJcvY+id5uqDzeUWBnY13Y7ikZxiv8u
+   qlJ5ooxlQqkWs217DsPy+3GoFXdzfpx3trhph4py7BlU3to9b4KvY6SdC
+   6P4jpAtZKclpu+1F6D7qEDfUW6zYxVuFOBdG9GwtKpx1/A8WrsJnzoPTY
+   c6kJXmrA1zqoux+c7pjTQHAn1/ZoHjEeqnGyoXWmPHVsbBVtevuH/0QNf
+   A==;
+X-CSE-ConnectionGUID: MUrml70DQT+dbjnT33bptg==
+X-CSE-MsgGUID: 36UKrJlkR7aaWt3dvie/Yg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11368"; a="42688441"
+X-IronPort-AV: E=Sophos;i="6.14,235,1736841600"; 
+   d="scan'208";a="42688441"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 01:20:16 -0700
+X-CSE-ConnectionGUID: 8jJCGZSLQg+TyO4E3PI0/w==
+X-CSE-MsgGUID: rn7e5Ph6R2+rfXMhZWE4GA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,235,1736841600"; 
+   d="scan'208";a="150862776"
+Received: from emr-bkc.sh.intel.com ([10.112.230.82])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 01:20:13 -0700
+From: Chenyi Qiang <chenyi.qiang@intel.com>
+To: David Hildenbrand <david@redhat.com>,
+	Alexey Kardashevskiy <aik@amd.com>,
+	Peter Xu <peterx@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Michael Roth <michael.roth@amd.com>
+Cc: Chenyi Qiang <chenyi.qiang@intel.com>,
+	qemu-devel@nongnu.org,
+	kvm@vger.kernel.org,
+	Williams Dan J <dan.j.williams@intel.com>,
+	Peng Chao P <chao.p.peng@intel.com>,
+	Gao Chao <chao.gao@intel.com>,
+	Xu Yilun <yilun.xu@intel.com>,
+	Li Xiaoyao <xiaoyao.li@intel.com>
+Subject: [PATCH v3 0/7] Enable shared device assignment
+Date: Mon, 10 Mar 2025 16:18:28 +0800
+Message-ID: <20250310081837.13123-1-chenyi.qiang@intel.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 3/6] tun: Introduce virtio-net hash feature
-To: Jason Wang <jasowang@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>,
- Andrew Melnychenko <andrew@daynix.com>,
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
- Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>
-References: <20250307-rss-v9-0-df76624025eb@daynix.com>
- <20250307-rss-v9-3-df76624025eb@daynix.com>
- <CACGkMEsNHba=PY5UQoH1zdGQRiHC8FugMG1nkXqOj1TBdOQrww@mail.gmail.com>
- <CACGkMEtCEwSB7XvCg7_8ebkcM8o2s8JB2Err2f153L-_i2KtxA@mail.gmail.com>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <CACGkMEtCEwSB7XvCg7_8ebkcM8o2s8JB2Err2f153L-_i2KtxA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 2025/03/10 13:01, Jason Wang wrote:
-> On Mon, Mar 10, 2025 at 11:55 AM Jason Wang <jasowang@redhat.com> wrote:
->>
->> On Fri, Mar 7, 2025 at 7:01 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>
->>> Hash reporting
->>> ==============
->>>
->>> Allow the guest to reuse the hash value to make receive steering
->>> consistent between the host and guest, and to save hash computation.
->>>
->>> RSS
->>> ===
->>>
->>> RSS is a receive steering algorithm that can be negotiated to use with
->>> virtio_net. Conventionally the hash calculation was done by the VMM.
->>> However, computing the hash after the queue was chosen defeats the
->>> purpose of RSS.
->>>
->>> Another approach is to use eBPF steering program. This approach has
->>> another downside: it cannot report the calculated hash due to the
->>> restrictive nature of eBPF steering program.
->>>
->>> Introduce the code to perform RSS to the kernel in order to overcome
->>> thse challenges. An alternative solution is to extend the eBPF steering
->>> program so that it will be able to report to the userspace, but I didn't
->>> opt for it because extending the current mechanism of eBPF steering
->>> program as is because it relies on legacy context rewriting, and
->>> introducing kfunc-based eBPF will result in non-UAPI dependency while
->>> the other relevant virtualization APIs such as KVM and vhost_net are
->>> UAPIs.
->>>
->>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
->>> Tested-by: Lei Yang <leiyang@redhat.com>
->>> ---
->>>   Documentation/networking/tuntap.rst |   7 ++
->>>   drivers/net/Kconfig                 |   1 +
->>>   drivers/net/tap.c                   |  68 ++++++++++++++-
->>>   drivers/net/tun.c                   |  98 +++++++++++++++++-----
->>>   drivers/net/tun_vnet.h              | 159 ++++++++++++++++++++++++++++++++++--
->>>   include/linux/if_tap.h              |   2 +
->>>   include/linux/skbuff.h              |   3 +
->>>   include/uapi/linux/if_tun.h         |  75 +++++++++++++++++
->>>   net/core/skbuff.c                   |   4 +
->>>   9 files changed, 386 insertions(+), 31 deletions(-)
-> 
-> [...]
-> 
->>> + *
->>> + * The %TUN_VNET_HASH_REPORT flag set with this ioctl will be effective only
->>> + * after calling the %TUNSETVNETHDRSZ ioctl with a number greater than or equal
->>> + * to the size of &struct virtio_net_hdr_v1_hash.
->>
->> So you had a dependency check already for vnet hdr len. I'd still
->> suggest to split this into rss and hash as they are separated
->> features. Then we can use separate data structure for them instead of
->> a container struct.
->>
-> 
-> Besides this, I think we still need to add new bits to TUNGETIFF to
-> let userspace know about the new ability.
+This is the v3 series of the shared device assignment support.
 
-The userspace can peform TUNGETVNETHASHCAP and see if it results in EINVAL.
+The overview of this series:
+- Patch 1-3: preparation patches. The function exposure and some
+  defintion change to return values.
+- Patch 4-5: Introduce a new object to implement RamDiscardManager
+  interface and a callback to notify the shared/private state change.
+- Patch 6: Store the new object including guest_memfd information in
+  RAMBlock. Register the RamDiscardManager instance to the target
+  RAMBlock's MemoryRegion so that the object can notify the page
+  conversion events to other systems.
+- Patch 7: Unlock the coordinate discard so that the shared device
+  assignment (VFIO) can work with guest_memfd.
 
-Regards,
-Akihiko Odaki
+Compared with v2 series, the main changes are:
 
-> 
-> Thanks
-> 
+- Introduce the new patch 04 to unify the definiton of ReplayRamPopulate()
+  and ReplayRamDiscard().
+- In state_change() callback, fallback to a "1 block at a time" handling in case of
+  mixed state. In addition, change the bitmap before calling the
+  listener so that the listener can do the change according to the
+  latest status.
+- In kvm_convert_memory(), use ReplayPopulated() and ReplayDiscard()
+  interface to trigger set_attribute() and add the undo operation if
+  state_change() failed.
+- v2: https://lore.kernel.org/qemu-devel/20250217081833.21568-1-chenyi.qiang@intel.com/
+
+More small changes or details can be found in the individual patches.
+
+---
+Original cover letter:
+
+Background
+==========
+Confidential VMs have two classes of memory: shared and private memory.
+Shared memory is accessible from the host/VMM while private memory is
+not. Confidential VMs can decide which memory is shared/private and
+convert memory between shared/private at runtime.
+
+"guest_memfd" is a new kind of fd whose primary goal is to serve guest
+private memory. In current implementation, shared memory is allocated
+with normal methods (e.g. mmap or fallocate) while private memory is
+allocated from guest_memfd. When a VM performs memory conversions, QEMU
+frees pages via madvise or via PUNCH_HOLE on memfd or guest_memfd from
+one side, and allocates new pages from the other side. This will cause a
+stale IOMMU mapping issue mentioned in [1] when we try to enable shared
+device assignment in confidential VMs.
+
+Solution
+========
+The key to enable shared device assignment is to update the IOMMU mappings
+on page conversion. RamDiscardManager, an existing interface currently
+utilized by virtio-mem, offers a means to modify IOMMU mappings in
+accordance with VM page assignment. Page conversion is similar to
+hot-removing a page in one mode and adding it back in the other.
+
+This series implements a RamDiscardManager for confidential VMs and
+utilizes its infrastructure to notify VFIO of page conversions.
+
+Relationship with in-place page conversion
+==========================================
+To support 1G page support for guest_memfd [2], the current direction is to
+allow mmap() of guest_memfd to userspace so that both private and shared
+memory can use the same physical pages as the backend. This in-place page
+conversion design eliminates the need to discard pages during shared/private
+conversions. However, device assignment will still be blocked because the
+in-place page conversion will reject the conversion when the page is pinned
+by VFIO.
+
+To address this, the key difference lies in the sequence of VFIO map/unmap
+operations and the page conversion. It can be adjusted to achieve
+unmap-before-conversion-to-private and map-after-conversion-to-shared,
+ensuring compatibility with guest_memfd.
+
+Limitation
+==========
+One limitation is that VFIO expects the DMA mapping for a specific IOVA
+to be mapped and unmapped with the same granularity. The guest may
+perform partial conversions, such as converting a small region within a
+larger region. To prevent such invalid cases, all operations are
+performed with 4K granularity. This could be optimized after the
+cut_mapping operation [3] is introduced in future. We can alway perform a
+split-before-unmap if partial conversions happen. If the split succeeds,
+the unmap will succeed and be atomic. If the split fails, the unmap
+process fails.
+
+Testing
+=======
+This patch series is tested based on TDX patches available at:
+KVM: https://github.com/intel/tdx/tree/kvm-coco-queue-snapshot/kvm-coco-queue-snapshot-20250308
+QEMU: https://github.com/intel-staging/qemu-tdx/tree/tdx-upstream-snapshot-2025-03-10
+
+To facilitate shared device assignment with the NIC, employ the legacy
+type1 VFIO with the QEMU command:
+
+qemu-system-x86_64 [...]
+    -device vfio-pci,host=XX:XX.X
+
+The parameter of dma_entry_limit needs to be adjusted. For example, a
+16GB guest needs to adjust the parameter like
+vfio_iommu_type1.dma_entry_limit=4194304.
+
+If use the iommufd-backed VFIO with the qemu command:
+
+qemu-system-x86_64 [...]
+    -object iommufd,id=iommufd0 \
+    -device vfio-pci,host=XX:XX.X,iommufd=iommufd0
+
+No additional adjustment required.
+
+Following the bootup of the TD guest, the guest's IP address becomes
+visible, and iperf is able to successfully send and receive data.
+
+Related link
+============
+[1] https://lore.kernel.org/qemu-devel/20240423150951.41600-54-pbonzini@redhat.com/
+[2] https://lore.kernel.org/lkml/cover.1726009989.git.ackerleytng@google.com/
+[3] https://lore.kernel.org/linux-iommu/7-v1-01fa10580981+1d-iommu_pt_jgg@nvidia.com/
+
+Chenyi Qiang (7):
+  memory: Export a helper to get intersection of a MemoryRegionSection
+    with a given range
+  memory: Change memory_region_set_ram_discard_manager() to return the
+    result
+  memory: Unify the definiton of ReplayRamPopulate() and
+    ReplayRamDiscard()
+  memory-attribute-manager: Introduce MemoryAttributeManager to manage
+    RAMBLock with guest_memfd
+  memory-attribute-manager: Introduce a callback to notify the
+    shared/private state change
+  memory: Attach MemoryAttributeManager to guest_memfd-backed RAMBlocks
+  RAMBlock: Make guest_memfd require coordinate discard
+
+ accel/kvm/kvm-all.c                       |  50 ++-
+ hw/virtio/virtio-mem.c                    |  81 ++--
+ include/exec/memory.h                     |  64 ++-
+ include/exec/ramblock.h                   |   2 +
+ include/system/memory-attribute-manager.h |  60 +++
+ migration/ram.c                           |   5 +-
+ system/memory-attribute-manager.c         | 471 ++++++++++++++++++++++
+ system/memory.c                           |  22 +-
+ system/meson.build                        |   1 +
+ system/physmem.c                          |  17 +-
+ 10 files changed, 690 insertions(+), 83 deletions(-)
+ create mode 100644 include/system/memory-attribute-manager.h
+ create mode 100644 system/memory-attribute-manager.c
+
+-- 
+2.43.5
 
 
