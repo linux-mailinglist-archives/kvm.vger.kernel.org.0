@@ -1,142 +1,117 @@
-Return-Path: <kvm+bounces-40646-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40647-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88CE9A594A8
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 13:38:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BE2DA59545
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 13:55:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8FD23AA4C4
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 12:38:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BF2087A6A7A
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 12:54:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF76322579E;
-	Mon, 10 Mar 2025 12:38:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ZduK12QS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEE3C2288C6;
+	Mon, 10 Mar 2025 12:54:53 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from zero.eik.bme.hu (zero.eik.bme.hu [152.66.115.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D81721ABBF;
-	Mon, 10 Mar 2025 12:38:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F112D227E99
+	for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 12:54:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=152.66.115.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741610298; cv=none; b=R8CiB6qPF6nNFRahGQbdEOa5IePdE5GUEGooqb/DyymiG/M59YBb2lBKHB7g4BeORSsQgxu4ZurV9iDV78UL9Npt1LubAJ8MxKF1i1ENgrl9XdfT7GES296YCyANh7OLSOR2uXlfv3e16/sVF4giSW29z51MfIiOp5NFSNo9XgM=
+	t=1741611293; cv=none; b=gE47ArVDnDrvLUT+cE0KKA53VzyFBMPZtAL20ePXnUJW8n6jDSWeXjtM1/9eoD81KjeeBM+rUegMY1vcjRBO/4UL5kwmLc7asbe5XLrri3TcpTIoSLPqKdgzCzqPOLzJmI8lSHpKTgGIWa+QGIiAB9Y/p3h3Oxdp8vI3KZ30YDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741610298; c=relaxed/simple;
-	bh=JXR4+10SNV0hKThI0ToqylAIm5f+vi3OmJs1mvD5UQA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=XeVQ/2EDcD08rlG+BpCbyZhvWr1SQbQmJysWJjjAr5wv+fObQqfmJd5xsNyG1ielo9nKh1GqVN4V6wU5+rlz4/XV7EU9myM2S4oDzO/IQqwCxdIe4NDoG7pVIfwwfqULMSCotW3+QLm1dMLXljIiRwE81Mkp0XQvxFgotHlDQfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ZduK12QS; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52A9Aagb005563;
-	Mon, 10 Mar 2025 12:38:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=Wih/Xz
-	fRmD19ygp1y6a3M1Sqr8MDTw2pPgGQRDO0Rus=; b=ZduK12QSu1IMwJQ6WAdK2G
-	H2aVMJL2oI3IIaODIYX+EkXIZPnk6cW1DJ2VJImVIwvhby/8s+lKvf2mmbOHxPJz
-	Vubh3+WNmPMMB+c2hxHBB50clPoQy01kKE/fz8uKF2EN42j9vTNoEFMF3nJbBPnI
-	VK5Tb4X8o/zAjGeuAwdsNHgwBGT5Z76jAlb0upq3mSaG8UXyCgl+vLSoOIsb9dLt
-	GSFM/ci/EUi3XKSk2VKQo9FsDJzg7fd6CbzwQGA16/TM5kg5kXKn2MYi4ri8gI1h
-	+Sl1yAgrkcGz7/rfKwbFxwsN1AmRpiBitbUn/9lqqYU9tu1nvTYoJDcQAQrsbt1Q
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 459jd4u852-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 10 Mar 2025 12:38:14 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52A9drWU006982;
-	Mon, 10 Mar 2025 12:38:13 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 45907sxt3g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 10 Mar 2025 12:38:13 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52ACcAdb36045168
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 10 Mar 2025 12:38:10 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1A8C220043;
-	Mon, 10 Mar 2025 12:38:10 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 822AA20040;
-	Mon, 10 Mar 2025 12:38:09 +0000 (GMT)
-Received: from li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com (unknown [9.171.78.164])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon, 10 Mar 2025 12:38:09 +0000 (GMT)
-From: "Marc Hartmayer" <mhartmay@linux.ibm.com>
-To: Janosch Frank <frankja@linux.ibm.com>, Nico Boehr <nrb@linux.ibm.com>,
-        imbrenda@linux.ibm.com, thuth@redhat.com
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v1] s390x: pv: fix arguments for
- out-of-tree-builds
-In-Reply-To: <aa9bd929-e2b9-4772-9802-171c30036dff@linux.ibm.com>
-References: <20250227131031.3811206-1-nrb@linux.ibm.com>
- <aa9bd929-e2b9-4772-9802-171c30036dff@linux.ibm.com>
-Date: Mon, 10 Mar 2025 13:38:07 +0100
-Message-ID: <87zfht12og.fsf@linux.ibm.com>
+	s=arc-20240116; t=1741611293; c=relaxed/simple;
+	bh=W3/9O1Y0xJrnCEvAJcPmVWqBzYcdq2h/xZElW405+C0=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=S2OQYpuDycjF8+vKCY5h553JGv9ALxXGULyO61NaN2zdV7EXRDT+rYxY6mvLOQL5f8E0GR2/nlgYA2vSX7NSw1vyyNCh3huNb/q80Fk3s+Yg/1bXvtvMtjPKOj8W8GFjcAefzIgBaA54hFkaPcq1q+wf4IYFeM1/noh8rNuSpFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=eik.bme.hu; spf=pass smtp.mailfrom=eik.bme.hu; arc=none smtp.client-ip=152.66.115.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=eik.bme.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eik.bme.hu
+Received: from zero.eik.bme.hu (localhost [127.0.0.1])
+	by zero.eik.bme.hu (Postfix) with ESMTP id 4A2234E6030;
+	Mon, 10 Mar 2025 13:54:42 +0100 (CET)
+X-Virus-Scanned: amavisd-new at eik.bme.hu
+Received: from zero.eik.bme.hu ([127.0.0.1])
+ by zero.eik.bme.hu (zero.eik.bme.hu [127.0.0.1]) (amavisd-new, port 10028)
+ with ESMTP id eEgzcnJ1JlRt; Mon, 10 Mar 2025 13:54:40 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+	id 5C90B4E602E; Mon, 10 Mar 2025 13:54:40 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by zero.eik.bme.hu (Postfix) with ESMTP id 58FC474577C;
+	Mon, 10 Mar 2025 13:54:40 +0100 (CET)
+Date: Mon, 10 Mar 2025 13:54:40 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Eric Auger <eric.auger@redhat.com>
+cc: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@linaro.org>, 
+    qemu-devel@nongnu.org, Yi Liu <yi.l.liu@intel.com>, 
+    Pierrick Bouvier <pierrick.bouvier@linaro.org>, 
+    Alex Williamson <alex.williamson@redhat.com>, 
+    Christian Borntraeger <borntraeger@linux.ibm.com>, 
+    =?ISO-8859-15?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, 
+    Tony Krowiak <akrowiak@linux.ibm.com>, Nicholas Piggin <npiggin@gmail.com>, 
+    Halil Pasic <pasic@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, 
+    David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>, 
+    Matthew Rosato <mjrosato@linux.ibm.com>, 
+    Tomita Moeko <tomitamoeko@gmail.com>, qemu-ppc@nongnu.org, 
+    Daniel Henrique Barboza <danielhb413@gmail.com>, 
+    Eric Farman <farman@linux.ibm.com>, Eduardo Habkost <eduardo@habkost.net>, 
+    Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org, 
+    Zhenzhong Duan <zhenzhong.duan@intel.com>, qemu-s390x@nongnu.org, 
+    Paolo Bonzini <pbonzini@redhat.com>, 
+    Harsh Prateek Bora <harshpb@linux.ibm.com>, 
+    =?ISO-8859-15?Q?C=E9dric_Le_Goater?= <clg@redhat.com>, 
+    Ilya Leoshkevich <iii@linux.ibm.com>, Jason Herne <jjherne@linux.ibm.com>, 
+    =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>, 
+    Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v2 09/21] hw/vfio/pci: Convert CONFIG_KVM check to runtime
+ one
+In-Reply-To: <28c102c1-d157-4d22-a351-9fcc8f4260fd@redhat.com>
+Message-ID: <2d44848e-01c1-25c5-dfcb-99f5112fcbd7@eik.bme.hu>
+References: <20250308230917.18907-1-philmd@linaro.org> <20250308230917.18907-10-philmd@linaro.org> <28c102c1-d157-4d22-a351-9fcc8f4260fd@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 5LF8WJoLj8DaJ5lDdbAmLriJKPKX5EgS
-X-Proofpoint-GUID: 5LF8WJoLj8DaJ5lDdbAmLriJKPKX5EgS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-10_05,2025-03-07_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- phishscore=0 mlxlogscore=999 impostorscore=0 priorityscore=1501 mlxscore=0
- suspectscore=0 malwarescore=0 clxscore=1015 bulkscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2502100000
- definitions=main-2503100099
+Content-Type: multipart/mixed; boundary="3866299591-1686296412-1741611280=:72286"
 
-On Mon, Mar 10, 2025 at 01:20 PM +0100, Janosch Frank <frankja@linux.ibm.co=
-m> wrote:
-> On 2/27/25 2:10 PM, Nico Boehr wrote:
->> When building out-of-tree, the parmfile was not passed to genprotimg,
->> causing the selftest-setup_PV test to fail.
->>=20
->> Fix the Makefile rule s.t. parmfile is correctly passed.
->>=20
->> Suggested-by: Marc Hartmayer <mhartmay@linux.ibm.com>
->> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
->> ---
->>   s390x/Makefile | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>=20
->> diff --git a/s390x/Makefile b/s390x/Makefile
->> index 47dda6d26a6f..97ed0b473af5 100644
->> --- a/s390x/Makefile
->> +++ b/s390x/Makefile
->> @@ -213,7 +213,7 @@ else
->>   	GENPROTIMG_PCF :=3D 0x000000e0
->>   endif
->>=20=20=20
->> -$(patsubst %.parmfile,%.pv.bin,$(wildcard s390x/*.parmfile)): %.pv.bin:=
- %.parmfile
->> +$(TEST_DIR)/selftest.pv.bin: $(SRCDIR)/s390x/selftest.parmfile
->>   %.pv.bin: %.bin $(HOST_KEY_DOCUMENT) $(comm-key)
->>   	$(eval parmfile_args =3D $(if $(filter %.parmfile,$^),--parmfile $(fi=
-lter %.parmfile,$^),))
->>   	$(GENPROTIMG) $(GENPROTIMG_DEFAULT_ARGS) --host-key-document $(HOST_K=
-EY_DOCUMENT) $(GENPROTIMG_COMM_OPTION) $(comm-key) --x-pcf $(GENPROTIMG_PCF=
-) $(parmfile_args) --image $(filter %.bin,$^) -o $@
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+
+--3866299591-1686296412-1741611280=:72286
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8BIT
+
+On Mon, 10 Mar 2025, Eric Auger wrote:
+> Hi Philippe,
 >
+> On 3/9/25 12:09 AM, Philippe Mathieu-Daudé wrote:
+>> Use the runtime kvm_enabled() helper to check whether
+>> KVM is available or not.
 >
-> We had this hardcoded, then changed to this rule and now move back to=20
-> hardcoding, no?
+> Miss the "why" of this patch.
+>
+> By the way I fail to remember/see where kvm_allowed is set.
 
-We probably have never tried to build KUT out-of-tree.
+It's in include/system/kvm.h
 
-[=E2=80=A6snip=E2=80=A6]
+> I am also confused because we still have some code, like in
+> vfio/common.c which does both checks:
+> #ifdef CONFIG_KVM
+>         if (kvm_enabled()) {
+>             max_memslots = kvm_get_max_memslots();
+>         }
+> #endif
 
+I think this is because if KVM is not available the if cannot be true so 
+it can be left out altogether. This may make sense on platforms like 
+Windows and macOS where QEMU is compiled without KVM so basically 
+everywhere except Linux.
+
+Regards,
+BALATON Zoltan
+--3866299591-1686296412-1741611280=:72286--
 
