@@ -1,201 +1,266 @@
-Return-Path: <kvm+bounces-40689-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40690-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 861E8A59BC7
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 17:56:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF64CA59EB7
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 18:33:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0BF171887F37
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 16:56:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71C511645A7
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 17:33:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D309230988;
-	Mon, 10 Mar 2025 16:56:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D0C230BD4;
+	Mon, 10 Mar 2025 17:33:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n2LBMi1S"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HwGWmr5i"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B1B6158538
-	for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 16:56:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741625801; cv=none; b=pkGRhWYcB8Hb+M3wwzckMuoWEECK0he8ZJY/NVHiQDNMYUkM9Hpcp6yN+4jpunsxTjcBhlPJqqI9GhzsDcGx0uJUazFqkC1anGEWkCUJV2pEi2xcQBZ5u53GaD/kC6w5JuXJ+mSuOLWhAl6t0WyH1BISvtiSgfAUVAMhbp+Q1kQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741625801; c=relaxed/simple;
-	bh=Q27YEq2U49jHqG/hGwjwp0kXWnrMKlmqxGCr74nLvhE=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=gcVgaLs7sDKOvUkDwJxHYLeg8nqUy00RVAbmiXBvOUsTvr98t8/VJuv0QMluA4wt1ZCFKOXGh6+7OWffGEstJWVF/Nwlc+C0CumfnyAlLnZc0VRHQutc2YQ5OYrK4s79m1MWfBL8dMx/4kkxrdqI/cf/m04Ay5PA20ldbKYlX+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=n2LBMi1S; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2ff784dc055so5769350a91.1
-        for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 09:56:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1741625799; x=1742230599; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZkjkedmykN6Dnae+6hPjYb5eiAU0Rz5li5jIqpcMQ1w=;
-        b=n2LBMi1SggxLv2XHoou6mWwuuE2nT/KJtarQb3R7MkMY15EFFoNyrxwB9hUbVu7M+L
-         1prSuE/N9o2Z7aRxcCXvJFAuxy23px/c7t5FRuA1s50k7ml+c9riCRe9GSYxiR0oqVyY
-         tVzIN0vydyrhyPxkV7q8yPwFTP+xM2E7/bHklk/C6RaYxi42KgHaUorfWQ4xz6csosqI
-         +M+XpUsyrD4qnJvMUydPKX9B8RubUPuctFHJUTpV26bxM2N9QElfvpAzU9J428hlWweG
-         VwLdBp/vji6N3bpoK8hhhZHg5/jjZES/K9ejCXF+mpek9fdrEE3t0zA1FJKfSc0WVCT2
-         De7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741625799; x=1742230599;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZkjkedmykN6Dnae+6hPjYb5eiAU0Rz5li5jIqpcMQ1w=;
-        b=eKyKj+UGHyjPUR80Woifgq42xRr2IrRu0P97TieIpgTu+SvCuEodA89PfMbbSGxtDy
-         2EPfz/tOYltCTRlLtTLLQxn/gNrpQGwWNBIo0t9F6+KEsk7cABG5QxBiSRLmF/1AfT6Z
-         lPfyxwq2yxPjyDCD3pPwB21G+01B6SZ1sX/aGm+ECWxH8gFf6b1nZvMRyIvsJP7kNVSp
-         Mk7W6DOshK3N3OBW+whUP/QtAQYSc/5IfGp037KCxmz5pbatjvbxfmSIEEDAn/JwYXkM
-         mjt6ZDpuJzfIOqqtkWX+mrlwAx/SDNh8kGoBHAdui8sH/fLAlJG1SsZO+U7qg31gE5UB
-         mu9A==
-X-Forwarded-Encrypted: i=1; AJvYcCUUVP4fs78DP16Nn+SPtJ2rWxaXuGaUGdh4+hjovpE38lDLuMVFP/YYYcSQCrGQIWRoPuk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJIUbmHcPZpCuWz+cZcEV9QwBGZCG1nwBR5Jr6xfWZBgijUKAl
-	1PoAGaZ+zernI3kWLA7mJwSde8TMCJ1ksZphSGdtvtWksG6w5tNr1+7IGTCn+yU=
-X-Gm-Gg: ASbGncsl/MhEO+JKMbg9OHsvfjcB+nsoxpPyOwjEBMwfagrHimppaGxLPozMAwp0hNb
-	1y1hgiWZNOkoFzoCMpaSKSkHQFhilE9U5ghZxh7aTB0JvPk33bodiIoWV+e3h0tz2mxJWBO8bjt
-	UKRjGNM7TqAT9UK4rz3GxbEBr6TgDehe/FFA+86SsKPyPRDb0L7QFazC8qMYNNn5P4JQaa58ia9
-	9DQZsoV9HviH67CKu5/fob77qxJ1G9s07vKZjHiieFYruIVwBSlqPx+VCs4ymwA2s2XCXQlgJ5U
-	aarVQF2rQp3lP/Mo7e6dP7llQ2Hzn5DtZ+ICWJqO8DUou+pCzLbGG4Cbmw==
-X-Google-Smtp-Source: AGHT+IHIbgCn3Exn+AALN657KIom6PGObNAGMKxJbf0VIqQkDogxhfDXJch+Uz3paJ/iK/pOhThzrA==
-X-Received: by 2002:a17:90b:4a51:b0:2fa:e9b:33b8 with SMTP id 98e67ed59e1d1-300ff10caacmr851943a91.18.1741625798731;
-        Mon, 10 Mar 2025 09:56:38 -0700 (PDT)
-Received: from [192.168.1.67] ([38.39.164.180])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22410aa883asm80360745ad.239.2025.03.10.09.56.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Mar 2025 09:56:38 -0700 (PDT)
-Message-ID: <a57faa36-2e66-4438-accc-0cbfdeebf100@linaro.org>
-Date: Mon, 10 Mar 2025 09:56:36 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F36D922E407;
+	Mon, 10 Mar 2025 17:33:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741628009; cv=fail; b=bgVTZeXrsPZ613a7D2hHJIXZljrEpu5ycaMGxVdktHlErbs97oBlEjHnQkmthii2CvU0or8BxTV9V1ZiFb3Sq69P0hkx4FxmLUBxW+JZVvCFfoS/JahMBCD62IUtwUeKmbHzqF+isLOe3MsaRE6AmIBmUU7BORnxPUUd4WifM7w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741628009; c=relaxed/simple;
+	bh=TgRcgO2mXGsBRaWD6PLAHXeguyyPv0S/7qCWlD4ssOU=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=oHlbzq0jEsGpYUe2+/ylJGL2HWfQ974yHoWfXZAKDrNisTXhlqixE1kgK/hRYSlLW7eYiE7FDlhstxTit1vWlpoLjTSfT1KjrQFGtzAvsL0kaEJGKosr2Z7FlX+uK9fYRITCRCJxAWFTubgjNQax5bq2h28ZEEKA1El2fT82SXI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HwGWmr5i; arc=fail smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741628008; x=1773164008;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=TgRcgO2mXGsBRaWD6PLAHXeguyyPv0S/7qCWlD4ssOU=;
+  b=HwGWmr5icmSE+b7FHDBSSI6n4CY93HBzVARW5p3u6HYIRHoxpj8UI80v
+   VY5U0dn8NvTw25wLBP3CHQBpgX6wzcz0HjPXZ7r0rTIHEzeGX6sfAX2EO
+   WhHm4O9+9IwO6WhFjV7gVcmIbXvQ6mnSt1xZVVV9P8EiqMjG+7IDt1MV/
+   hThPtoth3ADh6eAug2fu44Yx7rQUdezCQ+4hmFBMWQacxGb+JvUFZRXfY
+   hM2DNLAdBMD1jl+8M9kr50ug4lAxLcKPjhatxReov+bPOBXgc8Yxll4tY
+   1c7EgfW9mYyMwq3aUJu7HFQsrzzXpztg2F2oPeZU61S67ce599eCfmRkF
+   w==;
+X-CSE-ConnectionGUID: vY3NU78tTE66MWf6kC5jig==
+X-CSE-MsgGUID: CzzMhWtcSqy5kJd0FmWkEA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11369"; a="41803701"
+X-IronPort-AV: E=Sophos;i="6.14,236,1736841600"; 
+   d="scan'208";a="41803701"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 10:33:27 -0700
+X-CSE-ConnectionGUID: 3yi9tdo8RrKM+bKyHh6Hcw==
+X-CSE-MsgGUID: xEYFsWCJTFOc4UyFkjJY8w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,236,1736841600"; 
+   d="scan'208";a="119890014"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Mar 2025 10:33:28 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Mon, 10 Mar 2025 10:33:26 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Mon, 10 Mar 2025 10:33:26 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.170)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Mon, 10 Mar 2025 10:33:26 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jatQtl+ZXJATJCG7sflG6zI2jg74VSe6Fof+bLp8upZ3BxQ5swJVAz0zVwC2FfeuSMXUn0DLEpi+XXDzHASQiX4Zn+I/cS11w/PMj02IE0lWhZ3ZEX4PoOCTlE7ZzQUWrNff2enqHEVOkpAE7jipTRoVX+ZO5iOHoVxWybCNh3lLj8GXi654A5CjnmWKEc53QdJ9dR1j29gp4Iq6K0tHYV9SIdxmxXaenuPrGQU+aiJDb3gWEOpntV+MSIIS8i9VsLhGEJfoT1cBplObePdFmNZUJPDjhS+kOVToKZWBfyN94noxz4mGrPayM0MyCyM/XKaJYaYXuuFEUu4Ilw2pbw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ktjz3SnAR8bJd7sDCn7cTblPX7O3mODLORaFves++BM=;
+ b=f1fAi4EJaW7/vrqRV7DNrwmlMrhDvo1t7KzLAHs6hnDMsSXSUptEZKMeVoIUTvhuaZRWSR5uExsh1H7pj3FQJf0xvXAHkGrN2/Ql2dmx3dgpjJOlRjRbKAy217J9VnRcgPsM4beYG5IC5yMuPe6f/NGNDPi3oup+2QHh1i8lrcRbPldX0Pws32sjhnHMywp3W3eF7GWoTaabN0Oi0JNDvPCI8VNbRsI2qNG4RnXnD1RjaWIMKGBLib+kgW58bIo8ynbxpgZHjdA4WfGUppDuQ5+BFe7OlF0tTSpLg+nhhssP42OLnZ/4biqe2tpIwQzbgmgDvRL+d+FHunC5Xa/IhA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from IA1PR11MB7917.namprd11.prod.outlook.com (2603:10b6:208:3fe::19)
+ by PH7PR11MB8012.namprd11.prod.outlook.com (2603:10b6:510:24b::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.26; Mon, 10 Mar
+ 2025 17:33:24 +0000
+Received: from IA1PR11MB7917.namprd11.prod.outlook.com
+ ([fe80::c689:71de:da2e:2d3]) by IA1PR11MB7917.namprd11.prod.outlook.com
+ ([fe80::c689:71de:da2e:2d3%4]) with mapi id 15.20.8511.025; Mon, 10 Mar 2025
+ 17:33:24 +0000
+Message-ID: <b624a831-0c91-4e89-8183-a9a1ea569e6c@intel.com>
+Date: Mon, 10 Mar 2025 10:33:20 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 04/10] x86/fpu/xstate: Correct guest fpstate size
+ calculation
+To: Chao Gao <chao.gao@intel.com>
+CC: <tglx@linutronix.de>, <dave.hansen@intel.com>, <x86@kernel.org>,
+	<seanjc@google.com>, <pbonzini@redhat.com>, <linux-kernel@vger.kernel.org>,
+	<kvm@vger.kernel.org>, <peterz@infradead.org>, <rick.p.edgecombe@intel.com>,
+	<weijiang.yang@intel.com>, <john.allen@amd.com>, <bp@alien8.de>
+References: <20250307164123.1613414-1-chao.gao@intel.com>
+ <20250307164123.1613414-5-chao.gao@intel.com>
+ <b34c842a-142f-4ef7-97d4-2144f50f74cf@intel.com> <Z8uwIVACkXBlMWPt@intel.com>
+ <481b6a20-2ccb-4eae-801b-ff95c7ccd09c@intel.com> <Z85BdZC/tlMRxhwr@intel.com>
+ <24b5d917-9dd0-4d5b-bca8-d9683756baff@intel.com> <Z86PgkOXRfNFkoBX@intel.com>
+Content-Language: en-US
+From: "Chang S. Bae" <chang.seok.bae@intel.com>
+In-Reply-To: <Z86PgkOXRfNFkoBX@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SJ0PR13CA0056.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c2::31) To IA1PR11MB7917.namprd11.prod.outlook.com
+ (2603:10b6:208:3fe::19)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/16] make system memory API available for common code
-Content-Language: en-US
-From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- Alistair Francis <alistair.francis@wdc.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Harsh Prateek Bora <harshpb@linux.ibm.com>, alex.bennee@linaro.org,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Daniel Henrique Barboza <danielhb413@gmail.com>, kvm@vger.kernel.org,
- Peter Xu <peterx@redhat.com>, Nicholas Piggin <npiggin@gmail.com>,
- Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
- David Hildenbrand <david@redhat.com>, Weiwei Li <liwei1518@gmail.com>,
- Paul Durrant <paul@xen.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- Anthony PERARD <anthony@xenproject.org>,
- Yoshinori Sato <ysato@users.sourceforge.jp>, manos.pitsidianakis@linaro.org,
- qemu-riscv@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>
-References: <20250310045842.2650784-1-pierrick.bouvier@linaro.org>
- <f231b3be-b308-56cf-53ff-1a6a7fb4da5c@eik.bme.hu>
- <c5b9eea9-c412-461d-b79b-0fa2f72128ee@linaro.org>
-In-Reply-To: <c5b9eea9-c412-461d-b79b-0fa2f72128ee@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR11MB7917:EE_|PH7PR11MB8012:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8d26fd95-48e0-40d4-7b04-08dd5ff9a89f
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?OTFPZE1tb1ZoSnZ0Q0pGbmtOTGZKbXpVWHhxVUlXNnhPNUI4THhlcVVpSkc0?=
+ =?utf-8?B?Z21tREZpVUROUzk5NlZIV2NueXNqY2V2SzJkTEJjUHRYSTBTc09STUlpMFdI?=
+ =?utf-8?B?cHRKcFo3NHd3ZkFMRHVCVHdHbmZFS09SdjRBTVplU2JYWUl1SFYwU1ExM0FJ?=
+ =?utf-8?B?ZmVVWE4wNHR2WnhSSkRoUDZUbnhtVTF0OTczS1l6WTZONnZmbEs3TWJrQmE4?=
+ =?utf-8?B?QkJLQVRDTkQ0cHdsZXB3VHArYWxnZ2pUWWd4OHFDSWpxaStaZFFaVVRpUk1H?=
+ =?utf-8?B?QWFzZU10YXpDOVcyR1gzNjNYVjNLdlZCbW5nK3NlOVRMYTcwTWxmS3Q4cFpr?=
+ =?utf-8?B?MzZVd29mMTJIcHF0VmhiejFyOHVyZzQwdWhYS21ORjdyU0xKcGRRNWxjL2Zm?=
+ =?utf-8?B?REsxWkFydEZVT3V5cWoxbnQzRjJ4UndUcThzSi9ZSVF3cmFENWRvenBBeHg2?=
+ =?utf-8?B?YlpaMjJNUmtITDRUNzVnbkQ0ZzJoQXhlWjFHSUVEaFovVXJjYnB5ZTYzK2FT?=
+ =?utf-8?B?WUdXbDVQcEVsdmlpNUw2YnRPYUFkcG0vb1VxTnFibGZXelBUaW5RV3RWMFU0?=
+ =?utf-8?B?VDJ3N3FGbHlmK05pTkg5TVI3SzBaRkZabXI2NVhIK0N0UlExWkRUbFZ5M1dO?=
+ =?utf-8?B?TWlWbE4wbmhramxMUlhpb2tXbWVZaW5UOUxBZ3V1S0w5cXVUTTNhUG1VTmJW?=
+ =?utf-8?B?N2ltaGExbEtlbG9Od0NRakZIUzU2aHA3dEkybXJlUnluNTNSWXkvdGxZTHBm?=
+ =?utf-8?B?bTZ0Y3hYaWVtVStqam1VdjlFWllsY0x4bG5ZbU5QN2Y1ckZtbzZ5Z3BZWWx4?=
+ =?utf-8?B?MXZBZmRwOC9HdVhwcnZOMzBVYm5CSFRkZzVpQnEyQVpYS3orcE1jQW13c3FL?=
+ =?utf-8?B?NlJHZEszOHpJWnh0MTR1WU1mU1BBd1JUVmlBRkNnWFhydW9nVG1aaVFSL2sz?=
+ =?utf-8?B?RSt4alVPWjZTQVFyWXczSlR5WlNUd1Zzbk8vVmEyUGZBVjhHajZmK1cyS2Nx?=
+ =?utf-8?B?VHEwZzZrdVhySVpEekp4TmswK0FmQ2Q3Y0k1OXQ0YUNkNGtmRmlnSmYyUkhS?=
+ =?utf-8?B?WHFUeHkzNWNzL09VRDZhWjBjMzAxVmFwZ213ZzdVMi8vTUEvc3JxdlJyMVZr?=
+ =?utf-8?B?VWlNRzdmV1NIOGw3djdLTVgvMUZCUEJZUG9BL0pLT05qVUxVTkxteitqemUy?=
+ =?utf-8?B?UWlxWHl4RWhVYzNJdlRxL2J0WmtBcGladzFVUjNLa21FLzRib29nWTVsRFZo?=
+ =?utf-8?B?ejRmZythY2FRQnpEdVhHS1VaRGdlRFhuN0tHazdaY1VGSlRvU2luQjNuOTdo?=
+ =?utf-8?B?VDl5MXZOeEI1RGxZWWhVWGJ1N0hpVW1wbDEvZWhTN1BRTXZ0UVlGeDMwTTFl?=
+ =?utf-8?B?VkhxRGtqWjVRMVgvVWlLdVNSQUR4L0NHRDhmclRubklQNzJuTjJBdFJuU0Iw?=
+ =?utf-8?B?bmhBNEg3V1VJZU00KzhRODFxNkRCQ2dqTGQ0T0JhdjFYdWpqbEx2NEZhUkVj?=
+ =?utf-8?B?OFZYdGxlYVhPNy9FdmZxZ1Eyb1NldnlPd21CdTJidDVjWjlLZnBzZFZseXVq?=
+ =?utf-8?B?TjNENEh3NVNOYkZMZGlYZi9CUjJqcXpEVStYS1ViT3FaL2NYdzNyRlAxUjBy?=
+ =?utf-8?B?VnlqNVRpajZWT1RBUVh2OHcvTG01ZUFQNnV4WVc4citFSEhHUWo2aEMwV1g0?=
+ =?utf-8?B?SVZnYUZlVWVDTVVYNG5EU2psREtpVGI0MDRLV0o3MzVJREdPSVpDYS9CT2JF?=
+ =?utf-8?B?UDFUUVBsQldmU2VMS3pyZnBOaWJ6Y2NzQXhtNmJ4Ukc4L2p1eDZQV1pkVWRr?=
+ =?utf-8?B?dnJSbnR0ZUZyazM2VVYxeXdzNzh1NlFMM1Awd0hLVS9tQTJrWHU1TklpWU9N?=
+ =?utf-8?Q?XBr7sK5EqTPHg?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB7917.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RERNR1IvVkhOVEZMTmpqcGxpanVvejJCQzRwQkVzRGRLOC9RYldOWHNXSTNu?=
+ =?utf-8?B?M21HQ1ZPSVo5VkJBMk83TkRsSVRHRlJNbmRmd1dhZnNPZVp4Mm11eFI4ZW9Z?=
+ =?utf-8?B?dmpvamNidWtkT1gxemhEYXZZLzdUQXRsV0sxUE5oenVMNGRJRm44eXhFMncy?=
+ =?utf-8?B?SUcxNkVhaXR4NVgxQ05XRlJnOTZNU3JueUt0Q1hmbDBjY1NqeUdQeU15UGRp?=
+ =?utf-8?B?RHIvTWhCMUNSQi9uT0t2WE0yRks3RVZVWk5raVViRS8zV2U2clNidzl1a3pz?=
+ =?utf-8?B?ajMxSUgyQjlGVTdTYSt5ZXZFY2FJWnhtcERhbHNCQ0pBaEpBOC9HVktYK0t5?=
+ =?utf-8?B?a1RQQ3lsN1d1MmZTalY2UDdCeS96a202YzRkSEV1TFJvOEpMQ2hMS0hsa0tY?=
+ =?utf-8?B?VVFnUmQ5eDlPQ0ZsNER4TVNYbHZ6RURXVW1TelY5K2NoTGNrcTd2MWxTR1Vu?=
+ =?utf-8?B?R3NRM2JpNHA0V25HVzZ1cm5OV1I0b0hFSmVZT01MRFBzUzBFNE95c244ZnNu?=
+ =?utf-8?B?eko2NnZ5MStDRlBvT1U5L0JldDEwamV0dXNZV3VRMFFhQk5WbDhKZmdkTFBF?=
+ =?utf-8?B?YlFCTnQ1REFPbVlraklNR2hmUk9GY1NabFNvMTNwRkFMeVFqVnpQeDdjeDVB?=
+ =?utf-8?B?TzhPZDNwWitmdmVVR1pkbkcvN2xqV0N4dE5GKzc1UFd5TFdYVXFWTHhMejdJ?=
+ =?utf-8?B?OTNYWVRDY0FpUjkxRldkM2JWQ2p5cWRCbVJMRVhFU2RLWHlHTlBXK2NVL3JQ?=
+ =?utf-8?B?KzBGNGFmWjZuendIQ05vTk4wQUlwNnEzaHo3Y3VpbFFoTGUwY3Z6U0lBVEcy?=
+ =?utf-8?B?RHdVazRKNmpCUEFPaHVVVml4L1F3MmZIZkRJUlB6bTBwVHJSeWpOU1N6cG41?=
+ =?utf-8?B?RC9ORnlFQ0dvbnptRWtpcHY5YUJJZkRuYXJ1U3d1cXhjamNnVC9tNWZUa2x5?=
+ =?utf-8?B?N2JEZ2pSM011STBCdDJhRXFDSWFSSC81Z3JjMytKb2dyOE84STYvb1dUZ2xY?=
+ =?utf-8?B?T00zNUxtWFZaOHc5bm9NUVdnbWtObVduWlFUK21FS1FqTnA0clY0MFlCWDQx?=
+ =?utf-8?B?amlIbks2NWYvSGRBTWhUQTZNaEttMHM1cDZlbGhTbUQxQmRmc0VoZ3ZNSEwr?=
+ =?utf-8?B?N01pb2lWamFBR1NLVjBQTS90V1ZrQ2ppajl3YStnYThTc2xFcEs3aWp3aHNV?=
+ =?utf-8?B?cy9wdWdZVS9uNW5Bc0hsenBRY2V3b1pNYmJOeU1PeEo0WStWN2tzMFZIZXFX?=
+ =?utf-8?B?VTNUWDZRVVVNMU1qWlg4a1NmZlFnTTFnNjFJckVkUDV5dU52RkUyZFdTNHRr?=
+ =?utf-8?B?bHdYbEdYT0hzaW1oNU1TNE1vNktRVXV6dThBaEd3MTVqRzBGWVl5NkxNWUI1?=
+ =?utf-8?B?czlmRkFuNFNlTXB4Y3NoMW5ZK2Yrdk9LTzU1THRZejYxNElublJrS3BZTUNQ?=
+ =?utf-8?B?TGtvVFpJNVM0WkFtN2ZkRzY5dVl5b2Z0V3J3eElSenFnTnoxRUcwWjZMakJ2?=
+ =?utf-8?B?eFdlMnpna2VOVWJSMlpzYWpUckRPSy9vS3BPRG1LNWNuWVA3QTF6ZEJOWXQv?=
+ =?utf-8?B?ZkhJTHIyYW9tbDFwa0QzczRxYkFZUUxlb1RPbW82T1hEcTdpdmUxZmhNejIr?=
+ =?utf-8?B?eEZRSVRybVNZMldiVjhWVWllMTVjS21mcXV4QnJsSVdBWW9DT2tlbGhiQVNW?=
+ =?utf-8?B?MjFlandsNG81ZFpJVEcraXJsMEhMRHhDMVpQNHM5QzhSaGxwR3R3K1F6S3JW?=
+ =?utf-8?B?TmFJWlZ3aDJjbDk3NGtuWFNpRlgvekZpK1JPVVM0WG84M2lNTlA2TmdCQll2?=
+ =?utf-8?B?MXFnRE5LQ3preGRXRm41eityeThsZEVJOHUvcVUrL3UvdFBMckIwczBSMEFs?=
+ =?utf-8?B?azZUZHVIUkkyQ0UvZytidmtnNHJFdk9KNjVsS2MwRU5KbDRHMVIwUDZlT2lL?=
+ =?utf-8?B?TUZZRXE0a0FNOEdaelkrd0dZS0c5a3dRYUdVMXF6elYreC8xM3hMWGhMTTdU?=
+ =?utf-8?B?QnFBRDBaR1RKaWNSMFhXc0hvNjlON28zUC9xUjJOdFYzY1NHT3U4anN5MEhK?=
+ =?utf-8?B?NDMvRU8vTlFGOXVTQjZ6ZnJxTlNxRVg2WGRoQUo3UUR2SzNSMDhaTG51K2xJ?=
+ =?utf-8?B?KzE5b0ZBaFFyMVRQdEYzZGxFRytuOUpjV3RSV0wvNTJVRUlERWVub044TTRX?=
+ =?utf-8?B?elE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8d26fd95-48e0-40d4-7b04-08dd5ff9a89f
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB7917.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Mar 2025 17:33:24.0912
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: bhA1fUzRmMYckNCS9fEQRBBSuZjxAftRSZVKmvcAe0v7tnizM5j40jZllkHnaKBO8A6jOW+OJIOS9zCzGdAxMIsdh9FhFXoCy+fFkwMFxA0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB8012
+X-OriginatorOrg: intel.com
 
-On 3/10/25 09:28, Pierrick Bouvier wrote:
-> Hi Zoltan,
+On 3/10/2025 12:06 AM, Chao Gao wrote:
 > 
-> On 3/10/25 06:23, BALATON Zoltan wrote:
->> On Sun, 9 Mar 2025, Pierrick Bouvier wrote:
->>> The main goal of this series is to be able to call any memory ld/st function
->>> from code that is *not* target dependent.
->>
->> Why is that needed?
->>
-> 
-> this series belongs to the "single binary" topic, where we are trying to
-> build a single QEMU binary with all architectures embedded.
-> 
-> To achieve that, we need to have every single compilation unit compiled
-> only once, to be able to link a binary without any symbol conflict.
-> 
-> A consequence of that is target specific code (in terms of code relying
-> of target specific macros) needs to be converted to common code,
-> checking at runtime properties of the target we run. We are tackling
-> various places in QEMU codebase at the same time, which can be confusing
-> for the community members.
-> 
-> This series take care of system memory related functions and associated
-> compilation units in system/.
-> 
->>> As a positive side effect, we can
->>> turn related system compilation units into common code.
->>
->> Are there any negative side effects? In particular have you done any
->> performance benchmarking to see if this causes a measurable slow down?
->> Such as with the STREAM benchmark:
->> https://stackoverflow.com/questions/56086993/what-does-stream-memory-bandwidth-benchmark-really-measure
->>
->> Maybe it would be good to have some performance tests similiar to
->> functional tests that could be run like the CI tests to detect such
->> performance changes. People report that QEMU is getting slower and slower
->> with each release. Maybe it could be a GSoC project to make such tests but
->> maybe we're too late for that.
->>
-> 
-> I agree with you, and it's something we have mentioned during our
-> "internal" conversations. Testing performance with existing functional
-> tests would already be a first good step. However, given the poor
-> reliability we have on our CI runners, I think it's a bit doomed.
-> 
-> Ideally, every QEMU release cycle should have a performance measurement
-> window to detect potential sources of regressions.
-> 
-> To answer to your specific question, I am trying first to get a review
-> on the approach taken. We can always optimize in next series version, in
-> case we identify it's a big deal to introduce a branch for every memory
-> related function call.
-> 
-> In all cases, transforming code relying on compile time
-> optimization/dead code elimination through defines to runtime checks
-> will *always* have an impact, even though it should be minimal in most
-> of cases. But the maintenance and compilation time benefits, as well as
-> the perspectives it opens (single binary, heterogeneous emulation, use
-> QEMU as a library) are worth it IMHO.
-> 
->> Regards,
->> BALATON Zoltan
-> 
-> Regards,
-> Pierrick
-> 
+> Should patch 2 be posted separately?
 
-As a side note, we recently did some work around performance analysis 
-(for aarch64), as you can see here [1]. In the end, QEMU performance 
-depends (roughly in this order) on:
-1. quality of code generated by TCG
-2. helper code to implement instructions
-3. mmu emulation
+gfpu->perm has been somewhat overlooked, as __xstate_request_perm() does 
+not update this field. However, I see that as a separate issue. The 
+options are either to fix it so that it remains in sync with 
+fpu->guest_perm consistently or to remove it entirely, as you proposed, 
+if it has no actual use.
 
-Other state of the art translators that exist are faster (fex, box64) 
-mainly by enhancing 1, and relying on various tricks to avoid 
-translating some libraries calls. But those translators are host/target 
-specific, and the ratio of instructions generated (vs target ones read) 
-is much lower than QEMU. In the experimentation listed in the blog, I 
-observed that for qemu-system-aarch64, we have an average expansion 
-factor of around 18 (1 guest insn translates to 18 host ones).
+There hasn’t been any relevant change that would justify a quick 
+follow-up like the other case. So, I'd assume it as part of this series.
 
-For users seeing performance decreases, beyond the QEMU code changes, 
-adding new target instructions may add new helpers, which may be called 
-by the stack people use, and they can sometimes observe a slower behaviour.
+But yes, I think gfpu->perm is also going to be 
+fpu_kernel_cfg.default_features at the moment.
 
-There are probably some other low hanging fruits for other target 
-architectures.
+> Regarding the changelog, I am uncertain what's quite different in the context.
+> It seems both you and I are talking about the inconsistency between
+> gfpu->xfeatures and fpstate->xfeatures. Did I miss something obvious?
 
-[1] https://www.linaro.org/blog/qemu-a-tale-of-performance-analysis/
+I saw a distinction between inconsistencies within a function and 
+inconsistencies across functions.
+
+Stepping back a bit, the approach for defining the VCPU xfeature set was 
+originally intended to include only user features, but it now appears 
+somewhat inconsistent:
+
+(a) In fpu_alloc_guest_fpstate(), fpu_user_cfg is used.
+(b) However, __fpstate_reset() references fpu_kernel_cfg to set storage
+     attributes.
+(c) Additionally, fpu->guest_perm takes fpu_kernel_cfg, which affects
+     fpstate_realloc().
+
+To maintain a consistent VCPU xfeature set, (b) and (c) should be corrected.
+
+Alternatively, the VCPU xfeature set could be reconsidered to align with 
+how other tasks handle it. This might offer better maintainability 
+across functions. In that case, another option would be simply updating 
+fpu_alloc_guest_fpstate().
+
+The recent tip-tree change seems somewhat incomplete — perhaps in 
+hindsight. If following up on this, the changelog should specifically 
+address inconsistencies within a function. I saw this as a way to 
+solidify an upcoming change, where addressing it sooner rather than 
+later would be beneficial.
+
+In patch 3, you've pointed out the inconsistency between (a) and (b), 
+which is a valid point. However, the fix is only partial and does not 
+fully address the issue either. Moreover, the patch does not reference 
+the recent tip-tree change as it didn't have any context at that time.
+
+Thanks,
+Chang
 
