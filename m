@@ -1,191 +1,196 @@
-Return-Path: <kvm+bounces-40693-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40694-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3F83A5A1BC
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 19:12:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E339A5A39F
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 20:08:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D47B8173C85
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 18:12:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1158A3A63FF
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 19:08:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBDBD235362;
-	Mon, 10 Mar 2025 18:12:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF3A22356CC;
+	Mon, 10 Mar 2025 19:08:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Ntwx2Uyu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gwE1disK"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1284B233725;
-	Mon, 10 Mar 2025 18:12:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DBFB1D5161
+	for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 19:08:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741630352; cv=none; b=YB1cMGFlSYw7FK7JcbRoM9zRqnGt0WgmhctiYVbe+1IgaQ18vMRIDZHw8RmmQKNaHCd64riQpw1H904hhhHq9km+j2YQCy1Deoa4J9pmixh1l6K9PTpeU7/LNBfL9fI3qcdEXwshxajlpwb8RqbE6wDfLbFAx4ycrRfw7OSLYTo=
+	t=1741633710; cv=none; b=fr6orRuSbVGgW2UArWDuuCYrPrcE11c4vG+rrwzcBTnRYW/bT8K+7GRIYFlRrQpcx2S1SKv1GlUxtwILIF2c1ZiY7LCZY9ZHw9+XeI+i0cpjYgPXM+m1knom0kV3s3YOgPCGUqzjOA2JLGQFPQwlE3I8K4XTzMPTmpmReZPYoTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741630352; c=relaxed/simple;
-	bh=HG/W4n5uZlKY6cxWkKtd3p2/Kd4jfK+Mk8Uxv4orh/M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Ql5BMjqAJbOHwuNZyjWJsRnZB/LehRN5Vi7LEICAixKRm5tU9uhc/j/uW7MA1oV1stMZVCQL6IqehiArTnNzwNXm8PA/q38qQwOn4d8IbWgq4zy+TWzXPGgraRsy2XInmIfrElP+xscKST/ZjDQ7cdQPUaAn4mIOgrprowDIuIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Ntwx2Uyu; arc=none smtp.client-ip=52.119.213.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1741630351; x=1773166351;
-  h=message-id:date:mime-version:reply-to:subject:to:cc:
-   references:from:in-reply-to:content-transfer-encoding;
-  bh=AJNzET63DVGR7tJQ8b5ZW+nPqzzSSt+0wH0JG0KxXMQ=;
-  b=Ntwx2Uyu3x33GAf7fzYGVLxmIbFhej99vgmteWkYBNzqLRgg9breUu7v
-   RS/98kS+foQ5MCCOrVk7xuB2NdOOKWkMQQSIMdPnvKGbG/Mia7UcNYqjl
-   mY+uwxwnlKnj2dg/KWDW5uCx38+L0nfQXMQ6PD8IQxO34/qWXbOmLehxM
-   E=;
-X-IronPort-AV: E=Sophos;i="6.14,236,1736812800"; 
-   d="scan'208";a="278114488"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 18:12:26 +0000
-Received: from EX19MTAEUA001.ant.amazon.com [10.0.17.79:59359]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.34.60:2525] with esmtp (Farcaster)
- id c3925b25-0958-4048-85a6-faf49dbd70a0; Mon, 10 Mar 2025 18:12:24 +0000 (UTC)
-X-Farcaster-Flow-ID: c3925b25-0958-4048-85a6-faf49dbd70a0
-Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
- EX19MTAEUA001.ant.amazon.com (10.252.50.223) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 10 Mar 2025 18:12:24 +0000
-Received: from [192.168.30.50] (10.106.82.18) by EX19D022EUC002.ant.amazon.com
- (10.252.51.137) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14; Mon, 10 Mar 2025
- 18:12:23 +0000
-Message-ID: <fdae95e3-962b-4eaf-9ae7-c6bd1062c518@amazon.com>
-Date: Mon, 10 Mar 2025 18:12:22 +0000
+	s=arc-20240116; t=1741633710; c=relaxed/simple;
+	bh=I8WBVtWANunK2BsVVMkENeci/wdZK9By9QfvSXLeLpA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eRu7y6BBAumfa3nob7wZmpKUvwvu7Cxf3fyXShXoLC/K2N0GxzW3FjkmylAj8itwc83fda3b2TbWZ+LO/cfh2EYCCba7KDu/4T5BZIIKMGTVFFIxSERiZev1w2RmGGRw0eG9zpXO4v6vL6CffKK8aYTgHXT/HCiIqGaeuTCgQBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gwE1disK; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741633707;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=t1SRT4mHBnbiV0+OMBjrUqLMo+A+BMJyikzuIFhqDfo=;
+	b=gwE1disKhG99HDqpmKagpoTcHnCR+7kz5qJ8UTwm1mAeCW47eCn3PTsnRphcPQ2guGfNB1
+	0FW17ogPJ8DCYikpsZtyA/rGZVzNrbIA6xKHFljRJ3EIwMlX0NR0EA3TNQu3zlJW901r7Y
+	/mPD/kbYqWCmOYTN87QFGYi5beAjOro=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-374-DaHXBlXIOtW79Xw8c0vx1Q-1; Mon, 10 Mar 2025 15:08:25 -0400
+X-MC-Unique: DaHXBlXIOtW79Xw8c0vx1Q-1
+X-Mimecast-MFC-AGG-ID: DaHXBlXIOtW79Xw8c0vx1Q_1741633703
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-391492acb59so934500f8f.3
+        for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 12:08:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741633703; x=1742238503;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=t1SRT4mHBnbiV0+OMBjrUqLMo+A+BMJyikzuIFhqDfo=;
+        b=W0lzjbypt9Eadj/jtBko1ae4FjRsKdTPAB7Qpy1DgDMhKNj4mM/ie93Kr+PdHcR/x1
+         iLUda6tu4s3mOQpKSfs/JCylwWKun/4nW0tnyu9E3HONvFP8e53ACOzNB+X5m0/R+9uL
+         yoU9dRSV6XsmvWAbwkd9pQl6sUDDpWJ53ob+HZCwpwkTuIiu1T3rkROiT0eF93CidC1g
+         SpoLxIn/8KNWVCZsr8tMpo6pAMXrDMnbNin0HPeMPHiRCIkUBJ87CR+RUQ1XPhhX6srJ
+         zy11MqSDXYyldKlZnvBUI5N6kH9CoHvY483HhpItsHz+uIcPoQUn5ty2fZo6PKRYidN/
+         o3Qw==
+X-Forwarded-Encrypted: i=1; AJvYcCX0d0AcWmfD/XF27Cf7+ytflTectg9qrdZbgldWSaowBdZiM7nUsNb2hKdAo1kYumWDZ8o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEUK8zaXu93bCuJ3mG0rA4jLmNt9yEJOFsjHV42CWhwPc88TkM
+	tGUH7T9f+Qwd/r38nNfSJKleCLjwp8ABhagEeqoxYmTHkW2fknQatlQ6A24bbZpwUOZ1kZgSWYB
+	RMRcDHiepGtiqe7xQJpN1xqjqkkIXg9ABJW+Tg+lOhGCd7r0W9nm2wTBuuPuA5iFvL/KjJt0lrN
+	3nyHtkAjZ7kDcwYT0QxqDe8lBn
+X-Gm-Gg: ASbGncsLGIqUGHm/fNgMmw6jasEzn071BDp/40jUj6PyH0GtjOf1GkuYPHhkmYvNhBo
+	canAoUVNcrOA7wGKYvwfFyQo47dbf1cpBFRELE+6rVZW4X6nrBTk1rVs8oIvysHzzTTbRABxmWC
+	I=
+X-Received: by 2002:a5d:47c1:0:b0:391:2bcc:11f2 with SMTP id ffacd0b85a97d-39132d2ac45mr9154854f8f.1.1741633703348;
+        Mon, 10 Mar 2025 12:08:23 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFGyvXXU3WZlwFBgx+HboQAJJyBSLVeAW/lF14HEQyNVdqRinVNp3MIdGujE/P/5BdCn4TEgPFhh2qIHaZhffo=
+X-Received: by 2002:a5d:47c1:0:b0:391:2bcc:11f2 with SMTP id
+ ffacd0b85a97d-39132d2ac45mr9154815f8f.1.1741633702980; Mon, 10 Mar 2025
+ 12:08:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: <kalyazin@amazon.com>
-Subject: Re: [RFC PATCH 0/5] KVM: guest_memfd: support for uffd missing
-To: Peter Xu <peterx@redhat.com>, James Houghton <jthoughton@google.com>
-CC: <akpm@linux-foundation.org>, <pbonzini@redhat.com>, <shuah@kernel.org>,
-	<kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
-	<lorenzo.stoakes@oracle.com>, <david@redhat.com>, <ryan.roberts@arm.com>,
-	<quic_eberman@quicinc.com>, <graf@amazon.de>, <jgowans@amazon.com>,
-	<roypat@amazon.co.uk>, <derekmn@amazon.com>, <nsaenz@amazon.es>,
-	<xmarcalx@amazon.com>
-References: <20250303133011.44095-1-kalyazin@amazon.com>
- <Z8YfOVYvbwlZST0J@x1.local>
- <CADrL8HXOQ=RuhjTEmMBJrWYkcBaGrqtXmhzPDAo1BE3EWaBk4g@mail.gmail.com>
- <Z8i0HXen8gzVdgnh@x1.local>
-Content-Language: en-US
-From: Nikita Kalyazin <kalyazin@amazon.com>
-Autocrypt: addr=kalyazin@amazon.com; keydata=
- xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
- JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
- BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
- IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
- CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
- ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
- ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
- i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
-In-Reply-To: <Z8i0HXen8gzVdgnh@x1.local>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EX19D004EUC004.ant.amazon.com (10.252.51.191) To
- EX19D022EUC002.ant.amazon.com (10.252.51.137)
+References: <20250129095902.16391-1-adrian.hunter@intel.com>
+ <20250129095902.16391-3-adrian.hunter@intel.com> <01e85b96-db63-4de2-9f49-322919e054ec@intel.com>
+ <0745c6ee-9d8b-4936-ab1f-cfecceb86735@redhat.com> <Z8oImITJahUiZbwj@google.com>
+ <CABgObfahNJWCMPMV101ta-d0Cxu=RjjfMkKbOWTdRmk_VtACuw@mail.gmail.com> <Z8t16I-UXNQhcd3N@google.com>
+In-Reply-To: <Z8t16I-UXNQhcd3N@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 10 Mar 2025 20:08:11 +0100
+X-Gm-Features: AQ5f1JqP7yzQO9ZWBQJYZ0hX78ZHcc3kjat0AbaztEiJ2xswLh-ni0t0t0XKYj0
+Message-ID: <CABgObfbr4+y57wOiHwZZjv80rE3Bs3MujYY8HvQgDTDoctzpoQ@mail.gmail.com>
+Subject: Re: [PATCH V2 02/12] KVM: x86: Allow the use of kvm_load_host_xsave_state()
+ with guest_state_protected
+To: Sean Christopherson <seanjc@google.com>
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>, Adrian Hunter <adrian.hunter@intel.com>, 
+	kvm <kvm@vger.kernel.org>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Kai Huang <kai.huang@intel.com>, reinette.chatre@intel.com, 
+	Tony Lindgren <tony.lindgren@linux.intel.com>, Binbin Wu <binbin.wu@linux.intel.com>, 
+	David Matlack <dmatlack@google.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Nikolay Borisov <nik.borisov@suse.com>, linux-kernel@vger.kernel.org, 
+	Yan Zhao <yan.y.zhao@intel.com>, Chao Gao <chao.gao@intel.com>, 
+	Weijiang Yang <weijiang.yang@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Sat, Mar 8, 2025 at 12:04=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Thu, Mar 06, 2025, Paolo Bonzini wrote:
+> I still absolutely detest carrying dedicated code
+> for SEV and TDX state management.  It's bad enough that figuring out WTF =
+actually
+> happens basically requires encyclopedic knowledge of massive specs.
+>
+> I tried to figure out a way to share code, but everything I can come up w=
+ith that
+> doesn't fake vCPU state makes the non-TDX code a mess.  :-(
 
+The only thing worse is requiring encyclopedic knowledge of both the
+specs and KVM. :)  And yeah, we do require some knowledge of parts of
+KVM
+that *shouldn't* matter for protected-state guests, but it shouldn't
+be worse than needed.
 
-On 05/03/2025 20:29, Peter Xu wrote:
-> On Wed, Mar 05, 2025 at 11:35:27AM -0800, James Houghton wrote:
->> I think it might be useful to implement an fs-generic MINOR mode. The
->> fault handler is already easy enough to do generically (though it
->> would become more difficult to determine if the "MINOR" fault is
->> actually a MISSING fault, but at least for my userspace, the
->> distinction isn't important. :)) So the question becomes: what should
->> UFFDIO_CONTINUE look like?
->>
->> And I think it would be nice if UFFDIO_CONTINUE just called
->> vm_ops->fault() to get the page we want to map and then mapped it,
->> instead of having shmem-specific and hugetlb-specific versions (though
->> maybe we need to keep the hugetlb specialization...). That would avoid
->> putting kvm/gmem/etc. symbols in mm/userfaultfd code.
->>
->> I've actually wanted to do this for a while but haven't had a good
->> reason to pursue it. I wonder if it can be done in a
->> backwards-compatible fashion...
-> 
-> Yes I also thought about that. :)
+There's different microcode/firmware for VMX/SVM/SEV-ES+/TDX, the
+chance of sharing code is lower and lower as more stuff is added
+there---as is the case
+for SEV-ES/SNP and TDX. Which is why state management code for TDX is
+anyway doing its own thing most of the time---there's no point in
+sharing a little bit which is not even the hardest.
 
-Hi Peter, hi James.  Thanks for pointing at the race condition!
+> > just so that the common code does the right thing for pkru/xcr0/xss,
+>
+> FWIW, it's not just to that KVM does the right thing for those values, it=
+'s a
+> defense in depth mechanism so that *when*, not if, KVM screws up, the odd=
+s of the
+> bug being fatal to KVM and/or the guest are reduced.
 
-I did some experimentation and it indeed looks possible to call 
-vm_ops->fault() from userfault_continue() to make it generic and 
-decouple from KVM, at least for non-hugetlb cases.  One thing is we'd 
-need to prevent a recursive handle_userfault() invocation, which I 
-believe can be solved by adding a new VMF flag to ignore the userfault 
-path when the fault handler is called from userfault_continue().  I'm 
-open to a more elegant solution though.
+I would say the other way round is true too.  Not relying too much on
+fake values in vcpu->arch can be more robust.
 
-Regarding usage of the MINOR notification, in what case do you recommend 
-sending it?  If following the logic implemented in shmem and hugetlb, ie 
-if the page is _present_ in the pagecache, I can't see how it is going 
-to work with the write syscall, as we'd like to know when the page is 
-_missing_ in order to respond with the population via the write.  If 
-going against shmem/hugetlb logic, and sending the MINOR event when the 
-page is missing from the pagecache, how would it solve the race 
-condition problem?
+> Without actual sanity check and safeguards in the low level helpers, we a=
+bsolutely
+> are playing a game of whack-a-mole.
+>
+> E.g. see commit 9b42d1e8e4fe ("KVM: x86: Play nice with protected guests =
+in
+> complete_hypercall_exit()").
+>
+> At a glance, kvm_hv_hypercall() is still broken, because is_protmode() wi=
+ll return
+> false incorrectly.
 
-Also, where would the check for the folio_test_uptodate() mentioned by 
-James fit into here?  Would it only be used for fortifying the MINOR 
-(present) against the race?
+So the fixes are needed anyway and we're playing the game anyway. :(
 
-> When Axel added minor fault, it's not a major concern as it's the only fs
-> that will consume the feature anyway in the do_fault() path - hugetlbfs has
-> its own path to take care of.. even until now.
-> 
-> And there's some valid points too if someone would argue to put it there
-> especially on folio lock - do that in shmem.c can avoid taking folio lock
-> when generating minor fault message.  It might make some difference when
-> the faults are heavy and when folio lock is frequently taken elsewhere too.
+> > And while the change for XSS (and possibly other MSRs) is actually corr=
+ect,
+> > it should be justified for both SEV-ES/SNP and TDX rather than sneaked =
+into
+> > the TDX patches.
+> >
+> > While there could be other flows that consume guest state, they're
+> > just as bound to do the wrong thing if vcpu->arch is only guaranteed
+> > to be somehow plausible (think anything that for whatever reason uses
+> > cpu_role).
+>
+> But the MMU code is *already* broken.  kvm_init_mmu() =3D> vcpu_to_role_r=
+egs().  It
+> "works" because the fubar role is never truly consumed.  I'm sure there a=
+re more
+> examples.
 
-Peter, could you expand on this?  Are you referring to the following 
-(shmem_get_folio_gfp)?
+Yes, and there should be at least a WARN_ON_ONCE when it is accessed,
+even if we don't completely cull the initialization of cpu_role...
+Loading the XSAVE state isn't any different.
 
-	if (folio) {
-		folio_lock(folio);
+I'm okay with placing some values in cr0/cr4 or even xcr0/xss, but do
+not wish to use them more than the absolute minimum necessary. And I
+would rather not set more than the bare minimum needed in CR4... why
+set CR4.PKE for example, if KVM anyway has no business using the guest
+PKRU.
 
-		/* Has the folio been truncated or swapped out? */
-		if (unlikely(folio->mapping != inode->i_mapping)) {
-			folio_unlock(folio);
-			folio_put(folio);
-			goto repeat;
-		}
-		if (sgp == SGP_WRITE)
-			folio_mark_accessed(folio);
-		if (folio_test_uptodate(folio))
-			goto out;
-		/* fallocated folio */
-		if (sgp != SGP_READ)
-			goto clear;
-		folio_unlock(folio);
-		folio_put(folio);
-	}
+Paolo
 
-Could you explain in what case the lock can be avoided?  AFAIC, the 
-function is called by both the shmem fault handler and userfault_continue().
-
-> It might boil down to how many more FSes would support minor fault, and
-> whether we would care about such difference at last to shmem users. If gmem
-> is the only one after existing ones, IIUC there's still option we implement
-> it in gmem code.  After all, I expect the change should be very under
-> control (<20 LOCs?)..
-> 
-> --
-> Peter Xu
-> 
+> > There's no way the existing flows for !guest_state_protected should run=
+ _at
+> > all_ when the register state is not there. If they do, it's a bug and f=
+ixing
+> > them is the right thing to do (it may feel like whack-a-mole but isn't)
+>
+> Eh, it's still whack-a-mole, there just happen to be a finite number of m=
+oles :-)
 
 
