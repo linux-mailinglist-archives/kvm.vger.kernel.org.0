@@ -1,126 +1,87 @@
-Return-Path: <kvm+bounces-40684-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40685-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75291A59A8E
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 17:00:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 81FE2A59ACD
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 17:17:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AE823AAFF7
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 15:59:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D8D63A9FF8
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 16:17:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D72F122F386;
-	Mon, 10 Mar 2025 15:59:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEF2A22FE06;
+	Mon, 10 Mar 2025 16:17:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="YOUgLza4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AY+q+Fix"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F403222E3EA;
-	Mon, 10 Mar 2025 15:59:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9820422F155
+	for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 16:17:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741622378; cv=none; b=fSxW7sqq2Qt5DaZu80Bv/aHtD5NOa0Aq6Go3nxlTu8hA85mTRF/chdPQ2Go+BIYrmOGT12bqyHzPN6r4hCgt+jC4qm5IfGvKUOPbuFVVF5GwARAHoUf+vjffQ1k/zvm5yFRV5yxAjsGxixc+zIDbLLVFsUIi8FofaOSk69kOYdw=
+	t=1741623431; cv=none; b=N8x2HaxTDDiLqepXad1rgubaJR8RxzrXtETVqSlknr6gcubD0tHALT+5nP2caFFD/1I5R6860BVqWaYKfAiwyPZbb2sxHFyp07/lySVEjQK8ckiamMqdVvVcgtOH190E8LaE7sQsOaugfCGdxnFuhBdnGjBLMwT1y3otw9yR788=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741622378; c=relaxed/simple;
-	bh=EBdiWtBZsjV9l+VD6FfbfKEnQna0Mj2l44kwBSBVKVw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UrlNSBfozMTrnhXTdgL2ISBLiZCBOmunzcjyU4WCvCDFcMO1dYeJbBu5mvnaVmVIqCmvuQKPh/ZEHPoZxOBrifjGH1JZm3eMmtjHjezV+fRGyzxTLPwA83kiKJuVIykXTRcmlOGkGTyHvcLDpC3t4hC4gKkj3XMvirIi3FW2Apg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=YOUgLza4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A90DC4CEE5;
-	Mon, 10 Mar 2025 15:59:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1741622377;
-	bh=EBdiWtBZsjV9l+VD6FfbfKEnQna0Mj2l44kwBSBVKVw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YOUgLza46P+/1QH9sbANY82RHUhPdqOJu4QkvdUBxKxUlNlmfMRRQCzEeAYrgvzAm
-	 I9BYaiDUn0P4flP+/zRB9yWcUmo2wYk2M+XbkcHJzfcHIx5Nfef82dLJ3Km1iGpppm
-	 qpSvQAlP78Vpl7w4GTjhKHQoqq+A8/8Qx2dIvDaA=
-Date: Mon, 10 Mar 2025 16:59:30 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Christian Zigotzky <chzigotzky@xenosoft.de>,
-	Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	regressions@lists.linux.dev, Trevor Dickinson <rtd2@xtra.co.nz>,
-	mad skateman <madskateman@gmail.com>, hypexed@yahoo.com.au,
-	Darren Stevens <darren@stevens-zone.net>
-Subject: Re: [Kernel 6.12.17] [PowerPC e5500] KVM HV compilation error
-Message-ID: <2025031024-dreamt-engulf-087b@gregkh>
-References: <20250112095527.434998-4-pbonzini@redhat.com>
- <DDEA8D1B-0A0F-4CF3-9A73-7762FFEFD166@xenosoft.de>
- <2025030516-scoured-ethanol-6540@gregkh>
- <Z8hlXzQZwVEH11fB@google.com>
+	s=arc-20240116; t=1741623431; c=relaxed/simple;
+	bh=E5gkLF4efJbEakqe2LCyGh3dRXBQKFkQyAgDGFFrD/E=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=X5cSEOgGSOXN+Vua54ZAkvfSK/55WVSa2tYuyEYETmLjEtYQ3XIRe5pHr1Sws1kj2+AQde5veLSeu5wdmaXxPtcdWJEU2zNxpR+1rlpsGbz8boxp3TPM/A/rlYS0bzX3KnbxCSP7sLL3+kBPOPp1a2rtoZLUef8F0BlbJamCcZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AY+q+Fix; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff798e8c93so6547870a91.2
+        for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 09:17:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741623430; x=1742228230; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=E5gkLF4efJbEakqe2LCyGh3dRXBQKFkQyAgDGFFrD/E=;
+        b=AY+q+Fixb/TovXaeoNGX4yu2G3DhjbwDs2qV2dHdvU0GZ6/81XD9YQQfkwbTzdV+Hq
+         uDe+zEKR5jjRxka1ut4ObLgqPo8gFKj1eKJQPIJNKU7TBhhnYjGXt3zM0zpe1tfP7aWZ
+         ppNTtLynMqw0DiIoEZJ1gsUjQVPFvKLTPKt4B4qWkI4H8oxAwTSu9XdFUz7MeQ+EqSNP
+         EcOqGiuFaWZ09PatCYsPRvQ1s7iUE1EnZ2aQ8gePwMeN5fGtz86foUQ/2twMJcU3kNLi
+         aQFRzTOKIeaFmpUEgRwQkORItGCGYZFlmQpwm1F69SaPBHgrjBw5nrGKjxqe9dR4pRNE
+         ejwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741623430; x=1742228230;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=E5gkLF4efJbEakqe2LCyGh3dRXBQKFkQyAgDGFFrD/E=;
+        b=JtUckoH8GLKcvk7+7xkMEjIHPlgQOpdl736kPZCRNIdkJCJFSHxnTuIAWH5Dxrhasz
+         /2ENs0opSHTC2jSw/cHTaiPLBXiv3EvEOzt0Oe1i79m7QuBREKWxtfRASPDkqEOE3tQK
+         67uDTN7N52u8FlvY0Wh9BZ3xKgmVoOtHZoBeRTEqd8Sf97PJqbYKZ2Y9b840Rvo7xMYw
+         /LK1KPxycIGZe5HJ6pQq1lzmiI8kJQhoUvJslBiiJmAFr0gtN4+ZuYwd6WwKSc4OdVLL
+         fo8NoJv15Qo2dlaQAtqko0j91dhN4ksqDHU10sspsz2USQ4SySV0ic+a5bmi6ct8mzPe
+         dmyw==
+X-Gm-Message-State: AOJu0YxNOORuqmmZ+sqkZ17WAceyQB2jIMPL2bLmtVoqtPwcy4YoaDT5
+	Rv5i53cslqy/pmSV6XKArQOHXznq1vwjXsXzQNW7/65UBL25N5TY1l+rgatw+VwhkhVs7vQESwx
+	8Rg==
+X-Google-Smtp-Source: AGHT+IEvtopbnUmeWsy/nIhJXSJwmRVRXafyvQtfaSeezEXN0bryU3yMD0urwCDwgpBZydAdDQCaU98xn/I=
+X-Received: from pfbde10.prod.google.com ([2002:a05:6a00:468a:b0:736:48e7:45b2])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:3994:b0:1f3:32c1:cc5d
+ with SMTP id adf61e73a8af0-1f58cb3fe00mr534312637.21.1741623429907; Mon, 10
+ Mar 2025 09:17:09 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Mon, 10 Mar 2025 09:16:55 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z8hlXzQZwVEH11fB@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.rc0.332.g42c0ae87b1-goog
+Message-ID: <20250310161655.1072731-1-seanjc@google.com>
+Subject: [ANNOUNCE] PUCK Agenda - 2025.03.12 - CANCELED
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Mar 05, 2025 at 06:53:19AM -0800, Sean Christopherson wrote:
-> On Wed, Mar 05, 2025, Greg KH wrote:
-> > On Wed, Mar 05, 2025 at 03:14:13PM +0100, Christian Zigotzky wrote:
-> > > Hi All,
-> > > 
-> > > The stable long-term kernel 6.12.17 cannot compile with KVM HV support for e5500 PowerPC machines anymore.
-> > > 
-> > > Bug report: https://github.com/chzigotzky/kernels/issues/6
-> > > 
-> > > Kernel config: https://github.com/chzigotzky/kernels/blob/6_12/configs/x5000_defconfig
-> > > 
-> > > Error messages:
-> > > 
-> > > arch/powerpc/kvm/e500_mmu_host.c: In function 'kvmppc_e500_shadow_map':
-> > > arch/powerpc/kvm/e500_mmu_host.c:447:9: error: implicit declaration of function '__kvm_faultin_pfn' [-Werror=implicit-function-declaration]
-> > >    pfn = __kvm_faultin_pfn(slot, gfn, FOLL_WRITE, NULL, &page);
-> > >          ^~~~~~~~~~~~~~~~~
-> > >   CC      kernel/notifier.o
-> > > arch/powerpc/kvm/e500_mmu_host.c:500:2: error: implicit declaration of function 'kvm_release_faultin_page'; did you mean 'kvm_read_guest_page'? [-Werror=implicit-function-declaration]
-> > >   kvm_release_faultin_page(kvm, page, !!ret, writable);
-> > > 
-> > > After that, I compiled it without KVM HV support.
-> > > 
-> > > Kernel config: https://github.com/chzigotzky/kernels/blob/6_12/configs/e5500_defconfig
-> > > 
-> > > Please check the error messages.
-> > 
-> > Odd, what commit caused this problem?  Any hint as to what commit is
-> > missing to fix it?
-> 
-> 833f69be62ac.  It most definitely should be reverted.  The "dependency" for commit
-> 87ecfdbc699c ("KVM: e500: always restore irqs") is a superficial code conflict.
-> 
-> Oof.  The same buggy patch was queue/proposed for all stable trees from 5.4 onward,
-> but it look like it only landed in 6.1, 6.6, and 6.12.  I'll send reverts.
-> 
-> commit 833f69be62ac366b5c23b4a6434389e470dd5c7f
-> Author:     Sean Christopherson <seanjc@google.com>
-> AuthorDate: Thu Oct 10 11:23:56 2024 -0700
-> Commit:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> CommitDate: Mon Feb 17 10:04:56 2025 +0100
-> 
->     KVM: PPC: e500: Use __kvm_faultin_pfn() to handle page faults
->     
->     [ Upstream commit 419cfb983ca93e75e905794521afefcfa07988bb ]
->     
->     Convert PPC e500 to use __kvm_faultin_pfn()+kvm_release_faultin_page(),
->     and continue the inexorable march towards the demise of
->     kvm_pfn_to_refcounted_page().
->     
->     Signed-off-by: Sean Christopherson <seanjc@google.com>
->     Tested-by: Dmitry Osipenko <dmitry.osipenko@collabora.com>
->     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->     Message-ID: <20241010182427.1434605-55-seanjc@google.com>
->     Stable-dep-of: 87ecfdbc699c ("KVM: e500: always restore irqs")
->     Signed-off-by: Sasha Levin <sashal@kernel.org>
+In protest of Daylight Savings Time, a.k.a. the worst idea ever, PUCK is
+canceled this week.
 
-All now reverted, sorry about that.
-
-greg k-h
+Paolo and other folks in Europe, would you prefer to cancel PUCK for the rest
+of March (until Europe joins the US in DST), or deal with the off-by-one error?
 
