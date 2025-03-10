@@ -1,206 +1,146 @@
-Return-Path: <kvm+bounces-40677-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40678-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87B72A599AA
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 16:18:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 986D6A599B6
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 16:20:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 226DD16F8EC
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 15:18:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCB9F3AB499
+	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 15:18:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C4A5233D69;
-	Mon, 10 Mar 2025 15:15:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36DE822D7A8;
+	Mon, 10 Mar 2025 15:17:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="F3f9iuDZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZyaYNf4w"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F222523372F
-	for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 15:15:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E11E22B584
+	for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 15:17:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741619714; cv=none; b=LpDAJ2QVSPsScjvzKBzpA40gKFZKUM8mnY2emGO9y1CNvo+66jUDwYi8lYZsTjiq/fViMSwZPkLvpmVXGmrNI9qYMfJatcKYcrNdi1C1a5C5smuqpGRFypetdYhWQZCqmzEMO+ORGreKpYDEu05D4Vdw5RcvCaHdhrOHit5o9ew=
+	t=1741619832; cv=none; b=B32uSSNlq0sNQ9/DkbLYTO2aFvJC7VpwQVBsqlDV8gKpyuRKqdB+g6NFoFuhuKYN07VqCc5SDBl/7/qs98pM3qzecsIhQ+wfUPYRmr7e3Pg16ytVUiY7R9hqIr/GCgDcnpveBPzF7z9WJfu9okWo47SWAsolY/dNMZ1SwWdfpcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741619714; c=relaxed/simple;
-	bh=3H55FORtmwscKRH5SzHI+X59iFLs94AL05N994sGaPc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=t0aobcB4CV9Umaxj0wS7lCYhOgJqDJH8ysgvGwmWZ9LdY0uHi+xOmpICrLWMBqgcEia5uKmY/wyLf2UcKz3Pp+5SpZrGhAVG+bbpTIxWTx/8wIHX31gzQc0NlqFx15IT823szfYIRHqe8Zx5k6ZYXfm+61llwmet1vLookh3ZkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=F3f9iuDZ; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-22403cbb47fso82410195ad.0
-        for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 08:15:12 -0700 (PDT)
+	s=arc-20240116; t=1741619832; c=relaxed/simple;
+	bh=fYz1a4PjX7SP8UGBh/6PKCi0p5uGjpFD7+PkVtYlRE4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pbOLmh85yaKq/tiNoE/A1VxsojtengLBhEYmerJZmmVxzIpcW40Qxuu2+SiyvvtO3ygbjROCgMCGmaMWj5W9pvwjJonKlJ45buuqkmx/vyKNVWvBqE7JGyJOCighHlrhF4P2Fhv8WwS5fcI7edrqXJ+YZ2BezhZGXf+C2J72efs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZyaYNf4w; arc=none smtp.client-ip=209.85.214.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-2239c066347so75014135ad.2
+        for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 08:17:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1741619712; x=1742224512; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OfJ3/5A+8eTTKYRN2eD83evjq8eHQRgBJnaNQ4fOKIc=;
-        b=F3f9iuDZ1gOqc3bM+g71TDUDFrV5Wy9sxXs9cJY0K2EbYAMPyrkJC+UiSz8LIDVbFv
-         J0/B1JUSX7Z2WkFNIf6ZKynschBkvbKEGje0HL2xDZ3MQvqiU5+h2zyg0w7RqLZxqBfp
-         ja+pS5WGrVwDHiCrYtGtPYfHtkDbX0Dv2CUl8QBv15kaVhWCH1e3zj2mFBfTD+uEMYhy
-         dR8961lSy7MeQiKgauCfV+z/0sBVx+wwv4ZBOOcXmqTw8eopHTryxz862AUA3sH2m6iU
-         QXBTSLXOkHkQKKTXvUkGeICoE0bqxqLe32VTrW3opBh4e5DN7+NkFup8vKoep06R2adb
-         9i+A==
+        d=gmail.com; s=20230601; t=1741619829; x=1742224629; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9hRR9eFzKTibA6SanHS7Z7NacsATBx5TBcKCL5oIsCc=;
+        b=ZyaYNf4wZivXeOAiR1u//d5fWMgZDlSZhY9GK0w5oznr5H/HnyBAkczWra4nGfWSwa
+         Qxz4gnwG/ZIaWy+FL3ZENAidauS27UiOS4kVw8FOimuiszTPHAMHUAGNo8bEUOPdildq
+         yAOsxviBg9LTCUF2wFee9TqP+eXR7CcLHH/9j2WjAIg+TTMBZRKILi9T9bcponsMDehN
+         W4QP901GkphXvnkAAlWY1MFR/a5o91K3YoENIBUxzZrGP33pjcdK4TxvhPJLnCEH4Vc9
+         k9pfj/UbumQtbBrXuX+dOPG9MemP+EmDRsdP8upXTxypEbJDady70C2zYZhswktGq+S0
+         5Fgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741619712; x=1742224512;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OfJ3/5A+8eTTKYRN2eD83evjq8eHQRgBJnaNQ4fOKIc=;
-        b=ndGHhgVX/G0UDCu7jCGvBZ6dsalaG2dY0Fe5opBXhzRBT4ZGKs1ioqBwnfZidvmhg/
-         sXfv1TmQbioo+OFvk6Y3QOiwIOsL9g5goZ9jm9VGJgc6htEZvMFtv1E2tPAJRYvxdV2x
-         RXRTJ/eCRnH4gSlT1s+coDJcN28ofZ132LFY9zcltxmFvDGcfNR890CFM0K8H8whSVXj
-         46EPljCL6TycIqfUlsJ66rrDVlfpPwKMgAlwh+yJF+xLab9PPmEaWU7eJQGHOkxJxdtW
-         AT0IBgyhiTMUM+WOpY37eBbfilFoammBrhhJ7soIGPaqgCjFIygCNlBpi59mgKV1ruD4
-         y5Lw==
-X-Forwarded-Encrypted: i=1; AJvYcCUZrBKOp2Q4G7pID1fn7Vl94ZGbeRhBSdOLbENClc41QstqAcZMQ61bJa4pTa4GMtBa0qE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpnzJi9w0r2ibnWt7igii9BEvLOOZz9oH2S0KgCobuY5d/X9Nr
-	az3bR3b9BjNo0/Oom09AHudYfOOLyNxlho8Qeqe11BSal8mixj75U2AKOVIIY7s=
-X-Gm-Gg: ASbGncvRtk8B9Ua8ULl0tNpdceqyP5giP1X6klzdVJ9lCe0HwY7frWQFn+7NOefXRsa
-	gQAjKwcvLmN5Qswb25VykQMGgMwDNDvHeW5MJ7dAOzIICUWleGWp2kbo+dVw/rm0TPuWuknPndp
-	2wRL25NxQ1PIXjIEnRYRe+OXszJsGmt0vE5iYx711dMZ9fTZu4c13uPTaj5/Xcqnbv5qzrTUzZQ
-	6q+hwDxJRZSN/tmTGotHMMbyyi5kIvgQsh8YVnnPsDeCGctBbeu0CDbbtz5tKEIRdmO6wZXyW7U
-	mIlJEmC7Je/jHQmL9Rqr0GqtIV9gZqhdcng2+Hfmuxfuaw==
-X-Google-Smtp-Source: AGHT+IFwcAES82fPdZN2juakD/f3DtxEXqN8fLDByuuUWFv0PrmjGf+tQ1Z8z/EN2hDCjCyy0IsnJg==
-X-Received: by 2002:a17:903:2b0f:b0:21f:8453:7484 with SMTP id d9443c01a7336-22428a9d15dmr204592905ad.30.1741619710747;
-        Mon, 10 Mar 2025 08:15:10 -0700 (PDT)
-Received: from carbon-x1.. ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-224109e99dfsm79230515ad.91.2025.03.10.08.15.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Mar 2025 08:15:10 -0700 (PDT)
-From: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>
-To: Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	linux-kselftest@vger.kernel.org
-Cc: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>,
-	Samuel Holland <samuel.holland@sifive.com>,
-	Deepak Gupta <debug@rivosinc.com>
-Subject: [PATCH v3 17/17] RISC-V: KVM: add support for SBI_FWFT_MISALIGNED_DELEG
-Date: Mon, 10 Mar 2025 16:12:24 +0100
-Message-ID: <20250310151229.2365992-18-cleger@rivosinc.com>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250310151229.2365992-1-cleger@rivosinc.com>
-References: <20250310151229.2365992-1-cleger@rivosinc.com>
+        d=1e100.net; s=20230601; t=1741619829; x=1742224629;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9hRR9eFzKTibA6SanHS7Z7NacsATBx5TBcKCL5oIsCc=;
+        b=WwUmM6Z6wB5Ai/WvwSoBH60swYi0QZP8h9rzwk0PJx/zcHRboNxqT3Uw0qxAmAgEF9
+         lLDWKKHJuzW/eD4eKJ3NOTE4jcwmDXB9Eb0GEZ1qUTnomWx1Ff50kEC0wZYVMAEu8Qq4
+         Hq+hMHxYVLIx4pqN+7ncRm28IAE5mCPlCjkRjRSbJCulgz8RYFzdq3+xwsEy8i39jwLY
+         k/ot1fhgjCAOa6TeZlAiXL63Yc7SDEs3nFav2NVwOe4rV9lFLugDkJVDCkIkhI98qyV5
+         mly6XqfOVz94VqIo33+c5XbOX84YZQfLpSNOrRdczNwkDZRf/Lvlsnkrh7VvJYY/ojhY
+         KTHg==
+X-Forwarded-Encrypted: i=1; AJvYcCWWrNktIi45UF5nTmKkSiDc8oe5v7kv4x5K6hJyyRjDVoHZ9o2Z+dv+QQAYSG3hyJnYaiU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVo6EQDf1V7J0bd/imzW62P54GH349xiUY9HNCD4VO5chy8ETN
+	R4O0GhhVYyUnulEVNJKc3pFkNQs5ZOBd84Z2hX99PCtbATCOYJw=
+X-Gm-Gg: ASbGncs1iE773rEqg/p57fnvG364X5jcSmZa8/uR2Yp6HRQ1XpFtpney14pU55jEw7n
+	AfmBYPVmio4A7krjRiLytvT6J5mPPAUqIBkVz9m3ZMmn9b10ES9NLaO7cFLmnu3InaSdV0szGWV
+	sXYzhIEzmMLlliXDYedun9SbpG6Jb05AKswBa+t6zbsEyAN0TJSfOes4k1IurSkZu8Lttz5V1Do
+	L8d0LsjptCpCmGmD4hU2UPYsdSlw7oHh6D4+521Vp5JRf3vzVVYsIuo1skmUsVb4wkIlMD61VXQ
+	fJTdbTDQ9BjzvxoJnFXcHaHVLd2SOe/RmBz1sPGWdATBK2eR
+X-Google-Smtp-Source: AGHT+IGoPEqYRu6kEb6iHvvB5lodkJM7ycEzmRHAEsrCpUaTNhIDOTfpdN//UjZ7KzKlSQrUCMm6Wg==
+X-Received: by 2002:a17:902:e80a:b0:223:f408:c3f8 with SMTP id d9443c01a7336-22428897491mr261740075ad.14.1741619829297;
+        Mon, 10 Mar 2025 08:17:09 -0700 (PDT)
+Received: from [192.168.0.113] ([58.38.42.149])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22410ac0794sm79129765ad.259.2025.03.10.08.17.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Mar 2025 08:17:08 -0700 (PDT)
+Message-ID: <324d8b90-198b-40df-bd91-02cda9443e94@gmail.com>
+Date: Mon, 10 Mar 2025 23:16:59 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 12/21] hw/vfio/igd: Check CONFIG_VFIO_IGD at runtime
+ using vfio_igd_builtin()
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>, qemu-devel@nongnu.org
+Cc: Yi Liu <yi.l.liu@intel.com>,
+ Pierrick Bouvier <pierrick.bouvier@linaro.org>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Tony Krowiak <akrowiak@linux.ibm.com>, Nicholas Piggin <npiggin@gmail.com>,
+ Halil Pasic <pasic@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+ David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Matthew Rosato <mjrosato@linux.ibm.com>, qemu-ppc@nongnu.org,
+ Daniel Henrique Barboza <danielhb413@gmail.com>,
+ Eric Farman <farman@linux.ibm.com>, Eduardo Habkost <eduardo@habkost.net>,
+ Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
+ Zhenzhong Duan <zhenzhong.duan@intel.com>, qemu-s390x@nongnu.org,
+ Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Harsh Prateek Bora <harshpb@linux.ibm.com>,
+ Ilya Leoshkevich <iii@linux.ibm.com>, Jason Herne <jjherne@linux.ibm.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>
+References: <20250308230917.18907-1-philmd@linaro.org>
+ <20250308230917.18907-13-philmd@linaro.org>
+ <415339c1-8f83-4059-949e-63ef0c28b4b9@redhat.com>
+ <7fc9e684-d677-4ae6-addb-9983f74166b3@linaro.org>
+Content-Language: en-US
+From: Tomita Moeko <tomitamoeko@gmail.com>
+In-Reply-To: <7fc9e684-d677-4ae6-addb-9983f74166b3@linaro.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-SBI_FWFT_MISALIGNED_DELEG needs hedeleg to be modified to delegate
-misaligned load/store exceptions. Save and restore it during CPU
-load/put.
+On 3/10/25 21:43, Philippe Mathieu-Daudé wrote:
+> On 10/3/25 08:37, Cédric Le Goater wrote:
+>> On 3/9/25 00:09, Philippe Mathieu-Daudé wrote:
+>>> Convert the compile time check on the CONFIG_VFIO_IGD definition
+>>> by a runtime one by calling vfio_igd_builtin(), which check
+>>> whether VFIO_IGD is built in a qemu-system binary.
+>>>
+>>> Add stubs to avoid when VFIO_IGD is not built in:
+>>
+>> I thought we were trying to avoid stubs in QEMU build. Did that change ?
+> 
+> Hmm so you want remove the VFIO_IGD Kconfig symbol and have it always
+> builtin with VFIO. It might make sense for quirks, since vfio_realize()
+> already checks for the VFIO_FEATURE_ENABLE_IGD_OPREGION feature.
+> 
+> I'll see if there aren't other implications I missed.
+> 
+> Thanks,
+> 
+> Phil.
 
-Signed-off-by: Clément Léger <cleger@rivosinc.com>
-Reviewed-by: Deepak Gupta <debug@rivosinc.com>
----
- arch/riscv/kvm/vcpu.c          |  3 +++
- arch/riscv/kvm/vcpu_sbi_fwft.c | 39 ++++++++++++++++++++++++++++++++++
- 2 files changed, 42 insertions(+)
+I personally suggest keeping the VFIO_IGD Kconfig symbol to prevent
+building IGD-specific code into non x86 target. The change Cedric
+mentioned in another reply [1] moves VFIO_FEATURE_ENABLE_IGD_OPREGION
+from vfio_realize() to igd.c.
 
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index 542747e2c7f5..d98e379945c3 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -646,6 +646,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- {
- 	void *nsh;
- 	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
-+	struct kvm_vcpu_config *cfg = &vcpu->arch.cfg;
- 
- 	vcpu->cpu = -1;
- 
-@@ -671,6 +672,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- 		csr->vstval = nacl_csr_read(nsh, CSR_VSTVAL);
- 		csr->hvip = nacl_csr_read(nsh, CSR_HVIP);
- 		csr->vsatp = nacl_csr_read(nsh, CSR_VSATP);
-+		cfg->hedeleg = nacl_csr_read(nsh, CSR_HEDELEG);
- 	} else {
- 		csr->vsstatus = csr_read(CSR_VSSTATUS);
- 		csr->vsie = csr_read(CSR_VSIE);
-@@ -681,6 +683,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- 		csr->vstval = csr_read(CSR_VSTVAL);
- 		csr->hvip = csr_read(CSR_HVIP);
- 		csr->vsatp = csr_read(CSR_VSATP);
-+		cfg->hedeleg = csr_read(CSR_HEDELEG);
- 	}
- }
- 
-diff --git a/arch/riscv/kvm/vcpu_sbi_fwft.c b/arch/riscv/kvm/vcpu_sbi_fwft.c
-index cce1e41d5490..756fda1cf2e7 100644
---- a/arch/riscv/kvm/vcpu_sbi_fwft.c
-+++ b/arch/riscv/kvm/vcpu_sbi_fwft.c
-@@ -14,6 +14,8 @@
- #include <asm/kvm_vcpu_sbi.h>
- #include <asm/kvm_vcpu_sbi_fwft.h>
- 
-+#define MIS_DELEG (BIT_ULL(EXC_LOAD_MISALIGNED) | BIT_ULL(EXC_STORE_MISALIGNED))
-+
- struct kvm_sbi_fwft_feature {
- 	/**
- 	 * @id: Feature ID
-@@ -64,7 +66,44 @@ static bool kvm_fwft_is_defined_feature(enum sbi_fwft_feature_t feature)
- 	return false;
- }
- 
-+static bool kvm_sbi_fwft_misaligned_delegation_supported(struct kvm_vcpu *vcpu)
-+{
-+	if (!misaligned_traps_can_delegate())
-+		return false;
-+
-+	return true;
-+}
-+
-+static int kvm_sbi_fwft_set_misaligned_delegation(struct kvm_vcpu *vcpu,
-+					struct kvm_sbi_fwft_config *conf,
-+					unsigned long value)
-+{
-+	if (value == 1)
-+		csr_set(CSR_HEDELEG, MIS_DELEG);
-+	else if (value == 0)
-+		csr_clear(CSR_HEDELEG, MIS_DELEG);
-+	else
-+		return SBI_ERR_INVALID_PARAM;
-+
-+	return SBI_SUCCESS;
-+}
-+
-+static int kvm_sbi_fwft_get_misaligned_delegation(struct kvm_vcpu *vcpu,
-+					struct kvm_sbi_fwft_config *conf,
-+					unsigned long *value)
-+{
-+	*value = (csr_read(CSR_HEDELEG) & MIS_DELEG) != 0;
-+
-+	return SBI_SUCCESS;
-+}
-+
- static const struct kvm_sbi_fwft_feature features[] = {
-+	{
-+		.id = SBI_FWFT_MISALIGNED_EXC_DELEG,
-+		.supported = kvm_sbi_fwft_misaligned_delegation_supported,
-+		.set = kvm_sbi_fwft_set_misaligned_delegation,
-+		.get = kvm_sbi_fwft_get_misaligned_delegation,
-+	},
- };
- 
- static struct kvm_sbi_fwft_config *
--- 
-2.47.2
+[1] https://lore.kernel.org/qemu-devel/20250306180131.32970-1-tomitamoeko@gmail.com/
 
+Thanks,
+Moeko
 
