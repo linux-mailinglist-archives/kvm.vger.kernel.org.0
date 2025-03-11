@@ -1,161 +1,146 @@
-Return-Path: <kvm+bounces-40752-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40753-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6568BA5BB37
-	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 09:54:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24AB5A5BB95
+	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 10:03:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A79E3A9E65
-	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 08:54:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB82A1883682
+	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 09:03:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B03A022839A;
-	Tue, 11 Mar 2025 08:54:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 449D02206A7;
+	Tue, 11 Mar 2025 09:03:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NiO14CtH"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LRTIRk/K"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB0F1DED63
-	for <kvm@vger.kernel.org>; Tue, 11 Mar 2025 08:54:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A038E1E8325;
+	Tue, 11 Mar 2025 09:03:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741683291; cv=none; b=SKx3jBI6XUu7aIoAwhzYqxkh6w9cfByd2krTXc7JwmKJ71AOpEMQPd36+NXGt7oJDkoSyZO1cilNqMz7Zz/vYf8v9mwRFOtv4CGbjzNKVq2Oocqy+EK4DVStfTNVi7vAhVNrzVPVqO84wbF4YHjso/Wg03A4sBENv5iWBZShv2Q=
+	t=1741683801; cv=none; b=dq7VRVNU+M+e3wLx9iPc63AuF/IPFzBeSBRovam/DO+IC1P32Y8lrGb8bewybI6nVNkG+/Ro/BqbE7S6/ZFj4CkAzm0zOVN1KxjIRUCudsMSvmuVHbno1u23jsMKkIl1yca1IfkR/1U0YblVt7htgl64gvoAYONaRI83nmNFXWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741683291; c=relaxed/simple;
-	bh=BusmRBHFPp1Z2gslwi237WLZz+j2bUmB2IS8UYAJF9I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=krbraQd0QGWrW/ZSig/lrDJOE9Kfv1g9OaPE2uFLSARiJE/13Ikf0MwCrP8TNUkYUgHTdMzH3ikXtb1im0YxTnp+A9VGEbc2cRpo6eW7DUM04J3mds5JI0/nFId6yZKI98md6q3PTwlOl7/7tMsGuJmB0nFssIlUCXoLWQXrjuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=NiO14CtH; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-43cfe574976so9048095e9.1
-        for <kvm@vger.kernel.org>; Tue, 11 Mar 2025 01:54:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1741683288; x=1742288088; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+NbdoBDIcR1jHweEXbc4Ma4qdVpd3aU6BwDB7n+N8OM=;
-        b=NiO14CtH0Cxey+pk0tdCtO5IxpUpjD9Hw4PlIgdhsAkoWqnZukQ151sjTtsg/je8eS
-         eErzdsXqEffsT1rwYBs+mKLjcSykzrfvgOAGhyQpQarKaOK39NgunGaRp238anSszTR9
-         H+tHthhmDLLAKsqWjZNx37yxTemjhmXzTdblPN01f+2pxznVP0HOemhCjrAkDOEQbiYo
-         rekt8xwP/yS1POxbf+LEj48LhY02XNgUzMlpkpI5RtMt4/1fHiDw9HH04nbIpkixqk+i
-         QcpIBHFzMY6Twa9Y5cGTZK5hH3zj6t7NkDiPEcN2I+hHlAnmfeZ8+xQQzcCYudOf5387
-         KhPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741683288; x=1742288088;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+NbdoBDIcR1jHweEXbc4Ma4qdVpd3aU6BwDB7n+N8OM=;
-        b=s0IJ5IdDm/HcRpzWrLu+QVT87M0/80DQIKZsyFEWwG6N87q/RMQwHPx4TDLZoi9W7Q
-         d99FmFSw/wtnQgUOd9Uf5V6wUe8Iojcvmf+v36defh0KU0Z27ewCSlqdaQpnVDpI500r
-         BFUhEl/zuF9b+FpqosvOYDiaEjMlR9vUa0MUYlZKCmH7D3JZz3eOLIg8OMavok+i8nNo
-         lTJPSKFNkitxN3kiDKsihTmJRLGzcR+VLt4AnAlN86XP5lS2yZoBZPjFhWkSBPNLnJZd
-         tTIpXOklbSa6+TgTAxTkzZb/wx6pnS6oeyTEAps0DZm0aOcPVI60SmJ4+x1EDGZFseDp
-         sPUg==
-X-Forwarded-Encrypted: i=1; AJvYcCVqehBu9DsxL3GeFltgaBWR/v31KERv2XC+i/4O2ZVpoos6iAJIE9WrRpQRC1GDH7Z4/nQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbawHI494iIn/ZWWU7BpJD890MYy7jIReZG1HYZ3Lta+oRoo/j
-	vWyGXgjOCl3izwpyzSf5nc6yDdiPHVMy34VGLvWKWJLL0SL6vlETw01Lmm7lqlM=
-X-Gm-Gg: ASbGncubSYY2/TJXJ6JNB2R3Ym3dHjC8DxqFvCAsbpkWmpa9QfT1QgEiXxBPGCT6+Ut
-	CqMZBTXETIbE+W3hyFtjl9ZueZq2bdlzyYjkHHNyIMuVog7FSbTO45h+IUnQsiKAzb0BGfQ/4Xd
-	i4xXPV3nkDP6smEDCzXfneQvP35PuAAxMmwU2aOQjEUUDvl3VNSKKjFHYSEoBjcpkh21ZjjTnPp
-	xUlXgFe1oIR9C4xOVK2cHf2WlqHcJdZbCbpNzd0GjBJ2NmaDcBl7SXvvaautEBvpPb5tcOiMUl7
-	AZXZE2ZjTKrQ5GVSpiyXDfHFQY5obyTjha0lvb8igHoOZ4N67a9CI0lg2uJP6tUlmzGHE6VP+6B
-	x68V76EaTTN9H
-X-Google-Smtp-Source: AGHT+IGkHbj2ZNr/Mfwfq8mUReR/77d7syd2mBxKtkFlkIbijAo/Dl9pEGPS+M5qN+oRcpz9vIFPoQ==
-X-Received: by 2002:a05:600c:1c05:b0:43b:b756:f0a9 with SMTP id 5b1f17b1804b1-43d01bdbea9mr42698915e9.11.1741683286740;
-        Tue, 11 Mar 2025 01:54:46 -0700 (PDT)
-Received: from [192.168.69.199] (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912bfdfe61sm17731252f8f.38.2025.03.11.01.54.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Mar 2025 01:54:46 -0700 (PDT)
-Message-ID: <37026d8c-e892-47cc-b2b1-21d36fe856c2@linaro.org>
-Date: Tue, 11 Mar 2025 09:54:44 +0100
+	s=arc-20240116; t=1741683801; c=relaxed/simple;
+	bh=pjEg5cmLEj5ooQVvL49nmBZYAhf5d8xz543Q8kEuuPc=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
+	 References:In-Reply-To; b=knPmDs17EfOjXyJ0V78HPT6L3DpkOO9ri53TgzkyvgLV/7NByX7H6FCt4YvZ5/A4N/6Jq85biXXT790jyDDkaL9ZUrUKlIkRreN/71eKITd+Y1uzwkUjRisPc6+fbmsKgUiqH5/FF9a5U6eJWv78a5WA1yAsTX5BNUCeGhAZrGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=LRTIRk/K; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52B7axre004999;
+	Tue, 11 Mar 2025 09:03:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=pvB777
+	kIThSkt/KxU+Ma6cpWoL4Ow0d5CmXaNiO+TN8=; b=LRTIRk/KlMH5nhye4u5uEa
+	wogGKB8GL0Et7qqdMvBZfb8oA2wKcLLOE2pNbgqb/JvYYAwnsR8cJ+LTAc+6t1rj
+	XAlP68qKuxTjzkvHYiO98wGKsge/TrF3mlUZSg7QwieDWt2u0VD35hC89oiU0us0
+	07D01603l6ntewauga/eezav9zvLKndTW+mGTAv+tFFCZBRqYAV8Bi1rqM4RyjI3
+	neBnsvkkXRqlGaA6Ybdfpk2vJs0OJIyG1b38nWgSsRR7aAMJt7eX5BC++tH+ObTk
+	luRAHFmpKAboWr28EDp4Bs/M1H5IDhaqMr41O1+SPwyP9Wb1bcT7KLhLMGsnmtzA
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45a78qtt4w-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 11 Mar 2025 09:03:14 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52B8gOkj007011;
+	Tue, 11 Mar 2025 09:03:14 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 45907t3gvc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 11 Mar 2025 09:03:14 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52B93BS656820078
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 11 Mar 2025 09:03:11 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F09BF20040;
+	Tue, 11 Mar 2025 09:03:10 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9D77020043;
+	Tue, 11 Mar 2025 09:03:10 +0000 (GMT)
+Received: from t14-nrb (unknown [9.179.15.153])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 11 Mar 2025 09:03:10 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 09/21] hw/vfio/pci: Convert CONFIG_KVM check to runtime
- one
-To: BALATON Zoltan <balaton@eik.bme.hu>, Eric Auger <eric.auger@redhat.com>
-Cc: qemu-devel@nongnu.org, Yi Liu <yi.l.liu@intel.com>,
- Pierrick Bouvier <pierrick.bouvier@linaro.org>,
- Alex Williamson <alex.williamson@redhat.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Tony Krowiak <akrowiak@linux.ibm.com>, Nicholas Piggin <npiggin@gmail.com>,
- Halil Pasic <pasic@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
- David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Matthew Rosato <mjrosato@linux.ibm.com>, Tomita Moeko
- <tomitamoeko@gmail.com>, qemu-ppc@nongnu.org,
- Daniel Henrique Barboza <danielhb413@gmail.com>,
- Eric Farman <farman@linux.ibm.com>, Eduardo Habkost <eduardo@habkost.net>,
- Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
- Zhenzhong Duan <zhenzhong.duan@intel.com>, qemu-s390x@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- Harsh Prateek Bora <harshpb@linux.ibm.com>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?=
- <clg@redhat.com>, Ilya Leoshkevich <iii@linux.ibm.com>,
- Jason Herne <jjherne@linux.ibm.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?=
- <berrange@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
-References: <20250308230917.18907-1-philmd@linaro.org>
- <20250308230917.18907-10-philmd@linaro.org>
- <28c102c1-d157-4d22-a351-9fcc8f4260fd@redhat.com>
- <2d44848e-01c1-25c5-dfcb-99f5112fcbd7@eik.bme.hu>
-Content-Language: en-US
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <2d44848e-01c1-25c5-dfcb-99f5112fcbd7@eik.bme.hu>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 11 Mar 2025 10:03:10 +0100
+Message-Id: <D8DBDJDQ6EAC.36V0PWNW1R4MH@linux.ibm.com>
+To: "Janosch Frank" <frankja@linux.ibm.com>, <imbrenda@linux.ibm.com>,
+        <thuth@redhat.com>
+Cc: <kvm@vger.kernel.org>, <linux-s390@vger.kernel.org>
+Subject: Re: [kvm-unit-tests PATCH v1] s390x: pv: fix arguments for
+ out-of-tree-builds
+From: "Nico Boehr" <nrb@linux.ibm.com>
+X-Mailer: aerc 0.20.1
+References: <20250227131031.3811206-1-nrb@linux.ibm.com>
+ <aa9bd929-e2b9-4772-9802-171c30036dff@linux.ibm.com>
+In-Reply-To: <aa9bd929-e2b9-4772-9802-171c30036dff@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ag5WFr6-MB5KlmPOGBDwb5qfmhSvrA0F
+X-Proofpoint-ORIG-GUID: ag5WFr6-MB5KlmPOGBDwb5qfmhSvrA0F
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-11_01,2025-03-11_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ spamscore=0 adultscore=0 mlxlogscore=999 phishscore=0 priorityscore=1501
+ lowpriorityscore=0 malwarescore=0 bulkscore=0 suspectscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2502100000
+ definitions=main-2503110060
 
-On 10/3/25 13:54, BALATON Zoltan wrote:
-> On Mon, 10 Mar 2025, Eric Auger wrote:
->> Hi Philippe,
->>
->> On 3/9/25 12:09 AM, Philippe Mathieu-Daudé wrote:
->>> Use the runtime kvm_enabled() helper to check whether
->>> KVM is available or not.
->>
->> Miss the "why" of this patch.
->>
->> By the way I fail to remember/see where kvm_allowed is set.
+On Mon Mar 10, 2025 at 1:20 PM CET, Janosch Frank wrote:
+> On 2/27/25 2:10 PM, Nico Boehr wrote:
+>> When building out-of-tree, the parmfile was not passed to genprotimg,
+>> causing the selftest-setup_PV test to fail.
+>>=20
+>> Fix the Makefile rule s.t. parmfile is correctly passed.
+>>=20
+>> Suggested-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+>> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+>> ---
+>>   s390x/Makefile | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>=20
+>> diff --git a/s390x/Makefile b/s390x/Makefile
+>> index 47dda6d26a6f..97ed0b473af5 100644
+>> --- a/s390x/Makefile
+>> +++ b/s390x/Makefile
+>> @@ -213,7 +213,7 @@ else
+>>   	GENPROTIMG_PCF :=3D 0x000000e0
+>>   endif
+>>  =20
+>> -$(patsubst %.parmfile,%.pv.bin,$(wildcard s390x/*.parmfile)): %.pv.bin:=
+ %.parmfile
+>> +$(TEST_DIR)/selftest.pv.bin: $(SRCDIR)/s390x/selftest.parmfile
+>>   %.pv.bin: %.bin $(HOST_KEY_DOCUMENT) $(comm-key)
+>>   	$(eval parmfile_args =3D $(if $(filter %.parmfile,$^),--parmfile $(fi=
+lter %.parmfile,$^),))
+>>   	$(GENPROTIMG) $(GENPROTIMG_DEFAULT_ARGS) --host-key-document $(HOST_K=
+EY_DOCUMENT) $(GENPROTIMG_COMM_OPTION) $(comm-key) --x-pcf $(GENPROTIMG_PCF=
+) $(parmfile_args) --image $(filter %.bin,$^) -o $@
+>
+>
+> We had this hardcoded, then changed to this rule and now move back to=20
+> hardcoding, no?
 
-In accel/accel-system.c:
+I mean the preferred way would be to not hardcode it _and_ have out of tree
+builds working, but I (with my limited makefile knowledge) couldn't get thi=
+s to
+work properly. I will of course take patches... :-)
 
-     int accel_init_machine(AccelState *accel, MachineState *ms)
-     {
-         AccelClass *acc = ACCEL_GET_CLASS(accel);
-         int ret;
-         ms->accelerator = accel;
-         *(acc->allowed) = true;
-         ret = acc->init_machine(ms);
-         if (ret < 0) {
-             ms->accelerator = NULL;
-             *(acc->allowed) = false;
-             object_unref(OBJECT(accel));
-         } else {
-             object_set_accelerator_compat_props(acc->compat_props);
-         }
-         return ret;
-     }
-
-> 
-> It's in include/system/kvm.h
-> 
->> I am also confused because we still have some code, like in
->> vfio/common.c which does both checks:
->> #ifdef CONFIG_KVM
->>         if (kvm_enabled()) {
->>             max_memslots = kvm_get_max_memslots();
->>         }
->> #endif
-
-We should prefer kvm_enabled() over CONFIG_KVM, but for kvm_enabled()
-we need the prototypes declared, which sometimes aren't.
+Since I had a unpleasant surprise with the upstream CI and out-of-tree-buil=
+ds
+recently, I thought it's acceptable to remove flexibility that nobody uses.
 
