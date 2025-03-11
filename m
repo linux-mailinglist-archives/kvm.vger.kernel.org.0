@@ -1,235 +1,246 @@
-Return-Path: <kvm+bounces-40742-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40743-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E961A5B92E
-	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 07:24:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64901A5B962
+	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 07:49:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 971891702AB
-	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 06:24:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95453170F3F
+	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 06:49:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 519A21F78F3;
-	Tue, 11 Mar 2025 06:24:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8C301EE01F;
+	Tue, 11 Mar 2025 06:49:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="FPoHkQ99"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="mJlPb8CM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2065.outbound.protection.outlook.com [40.107.243.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2DB153363
-	for <kvm@vger.kernel.org>; Tue, 11 Mar 2025 06:24:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741674254; cv=none; b=E4egevxFESHBWthOICNRWJdZP4n68RN4ItSaMfGTqsQtm2cc/7AUZYXDuEjUXrSKebuACpQ+YiFvI4GLK0OEJSAHo9GRpyjIYu5ya6sDZ4WyP3UoEUPsIMuD9eskBXx9mLXJqgTyseBeYX8hqVvSOYqJQdNBgC6xGCPrNEUbtI0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741674254; c=relaxed/simple;
-	bh=DsqDEHlBUwS8fyV8/WMCNPW7k1Q8GQhlh9GKPXRNGBY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K34RKOQiBOwNNJDksxadrQaDBXsy+erYQyMsrlePsi0cWr/SQd5U9ASLWa37lzjfUjvOH5ldyR6Ig/Be4FfNgVfL3KpYg7o/1h/N7UlmRz0bbuGLOWX02bGYpHFhmHNNAwxefvthrC065tCAXRdvieZVFWeRTmV6XXnCjrd1jb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=FPoHkQ99; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-223fd89d036so98879475ad.1
-        for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 23:24:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1741674252; x=1742279052; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hcOWo3MpfkZwJWARJhxBJx9ftvSTMuCRJKTKMNfQ2T0=;
-        b=FPoHkQ9991pPxzcc1wNC8ql57JSLUfNSGlxHUt/djJvzy6tttksaE1tmYgZn/MSq6x
-         lheb9UNZRvv0CS3g7cAZbIkWUi0QW94/r3W7YPyowTp8j1CVIsojnZzWdIfE5IHMgxox
-         xpMbh0USTe0mijm9J/kWE+nUQDGnb3RAGZvbVQ3206vnggOSGs/Qmhauaf3cIILDwelF
-         EnQfIxlrnuULyyF9yAympiFuc98OYBkyvNvLiHskPcr8sTxahCxq1eYLSb/8H9ie7Pg+
-         SCLC4/3BzU04zYQZYRSDg4clysyhLsn6BYahOjjzCdzEjTXvADo3uLgEBD8fikXhi4m1
-         vvHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741674252; x=1742279052;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hcOWo3MpfkZwJWARJhxBJx9ftvSTMuCRJKTKMNfQ2T0=;
-        b=TZzfmrNAAlJDyNXlz5uDUfBFvhNIzRu6UFgxLGGM6TVGOdWo74fVFJFxxXYsZfoEdm
-         GEMo/+B6+RGPd3vhBnMmpyVqXIxZ4Udr0lehf2ap5uIJ40HaiOPp7QGabxNYAUBUTAmR
-         2fHCfoaO+wqJ1CTeQb91n5UpzPRpk1SfvP/uI2rlmI4Zv4uZ86GuL13MFb49U5nz9Zto
-         3ozY0Aks680Ujaasr62tci9mTkX7xjlFmwDpJAkAlMYdj62LL0Viy6tF9yH9O5Br5HfP
-         4zt623+DAWnCSIwJHcp39LwhtZdJ2PIRgTias/hytyYzNEJjzeNoOePKpIhrs6fQSBGd
-         pHDA==
-X-Forwarded-Encrypted: i=1; AJvYcCX+07zXSf5RdXNt7l/uwJIJ8g9ZrWThWXRGbK/ZhwbUhbZG3R+Lg4uOEdqfgpRwDzs7Pp0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4ycoQemLrqsoLUpDh521Dp9w5uFbVSd3n5VOmfBL47oLj1NIz
-	tdeJgAyqMhY2eGoqFvYqGHydS0rNj95mnVMAtdSZGFT71hHC8xGg1PfUQUiZRAs=
-X-Gm-Gg: ASbGncsrun24URCtTXpzZZS0BUBRTT4p/zA7qz1of54Ps3SQbc9bHj90bskhrx5hA8X
-	7SIeUzj64pq2+VlBUUwrD8Q22H7PNhAyddCdmvZJtNiJhK39/1aQCTmIG85ohIzAiyD9xnu04ug
-	QtbDAo9q0R5hJA9PZPsHzafcUN5OADKXBVAshNJQuCcMSQnhPl8FzZJdBN4lW+JaNHEImO80sEI
-	tqweCR4YYpBdQNkJ4RE39Luok4W2I12scPFNP3HUpj/IWH422mu+7P/2gdpCnPsnZ+wBk7V3sJt
-	rNbf0r50A7T/7efuYN/dJandz6yKNLPvK3OwpqgcHgcUcjpAhQFYG3yW2g==
-X-Google-Smtp-Source: AGHT+IGn18ZSOeDi0OtiFl4e+mdyHaJbBZUtxUxoxSL45HZJeEfhcKnA+r8VKFVTyGuyQbzX9uCMeA==
-X-Received: by 2002:a05:6a00:1a92:b0:730:d5ca:aee with SMTP id d2e1a72fcca58-736aaae81e6mr21317990b3a.23.1741674252333;
-        Mon, 10 Mar 2025 23:24:12 -0700 (PDT)
-Received: from [157.82.205.237] ([157.82.205.237])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-736a336010dsm9010979b3a.59.2025.03.10.23.24.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Mar 2025 23:24:12 -0700 (PDT)
-Message-ID: <1dd2417a-3246-44b0-b4ba-feadfd6f794e@daynix.com>
-Date: Tue, 11 Mar 2025 15:24:06 +0900
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81607156861
+	for <kvm@vger.kernel.org>; Tue, 11 Mar 2025 06:49:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.65
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741675754; cv=fail; b=UnCrkyNRRHyp60p2o0Yq16Bx54yVLkWcYC1OtEXpYTbTehTgwwPprsCg4qLmQSvezFFOMroqgnGmBx7BJhc8rg9z6skawJIXV6R/UvW0qmM3TzbrEnFnF2TFn6P2Zdec17iOVAaI/HE42wHy9b/PRserzK7DqYdQEYnesLBzsVI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741675754; c=relaxed/simple;
+	bh=abpv58BlNjJYATetij/t8E5ylagCEB0LZYc4LpAfJnI=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=bdvT2xy8kNx8Uae8FDuuz8VuCrBsENsi9eVIqHEW1tM77gd9jxGrsHJWZX3AeIMDF3o92ci9Oy5U9dUAHhCdYRMzBRCzaqX1h9WlczKORJrmkmyjitPb06dEZh07B54utEDlBpTUdw/cYTWG3Uf0LFZnvzFvTxPNNAM5I6EJCmo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=mJlPb8CM; arc=fail smtp.client-ip=40.107.243.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=wke4k27HFsv5D6cTY2BzVuBQSSuuTskPLQXJB2vk4nbAV3IXR4x6JjCEoZsO6u9YH7TSWNjg/Rw+wYlXarI+YNV9uMdF29BpOtz/xX6uHGyy8FQNvkGLxCSuQR9coIyLw0fGppxBu8CjqM/Pzfs8ez8/v6LsYVeCi9KPk08EYOQQgq/Iuzh2PI4gIkcODiSZntX9udIgM3lLuhYrvxAhcUu8WgV+XGu9OO1h4e15PZtE0qegOIAh4haKaxTz9HE4wnq0woWqgr2quBYK8c3dm+OxtP4Ly83Hdj0JoBbeagtcdwXdzeLdD2M13xWGBRvic9whxEJ0Zzf+V1rfYETJvw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=X6zf4GgXS12BCbAUcBZI/hXp2rECNckA6U6EUrta6/I=;
+ b=Rwc0uQXrWpWbFHSKUev9cSzjhLEW4doyKWRF0aKmr5WSGlBxoWAs1oMcMQh7aDESd0YMGtpMnbqmj/ml/lH+eEpkJ4L0XLSa9g16fD96uBI4RBbzsMAthtt0Gcd8IfzBY7zSV4JSyDwNCDxGdwSFE+DSTGQLMli15UXHSEIPo5MTr+bw1id0EOX9ny0S/sVExrFRUcTFY2R53Z66+5ApBUtWQbzKYH15+QBxpHjpqpeIyNEp96u0Gwl4jvj/7MeBndtc8+qWQTSL+ak2tzWtilyRXnPXT72Teuk/QivzyKJ3vOTQ30VCOXK7rVgZlAAVneJ6+k9ekUQQBs3C7dxZ3Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=X6zf4GgXS12BCbAUcBZI/hXp2rECNckA6U6EUrta6/I=;
+ b=mJlPb8CM/jVED0kaHZk4mY2w7Sojdx8ZxCwEV9dI0aSdqmn2T3g/ZEFuoZNnbioqnthDUZNXnnwrZwMAevrcSg1k9AbllJfm8RBd/i/05BsmxH1b42YWn+fgi4etI8dZ2CzEBDhrOiJsZaY6mpm1SfrM4c1iB6NwodIZPlkPjgk=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from MN0PR12MB6317.namprd12.prod.outlook.com (2603:10b6:208:3c2::12)
+ by DM4PR12MB6543.namprd12.prod.outlook.com (2603:10b6:8:8c::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8511.27; Tue, 11 Mar 2025 06:49:10 +0000
+Received: from MN0PR12MB6317.namprd12.prod.outlook.com
+ ([fe80::6946:6aa5:d057:ff4]) by MN0PR12MB6317.namprd12.prod.outlook.com
+ ([fe80::6946:6aa5:d057:ff4%5]) with mapi id 15.20.8511.025; Tue, 11 Mar 2025
+ 06:49:10 +0000
+Message-ID: <1186d28c-5788-4b4c-bf22-d86f21b7ceb9@amd.com>
+Date: Tue, 11 Mar 2025 12:19:03 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 4/5] KVM: SVM: Prevent writes to TSC MSR when Secure
+ TSC is enabled
+To: Tom Lendacky <thomas.lendacky@amd.com>, seanjc@google.com,
+ pbonzini@redhat.com, kvm@vger.kernel.org
+Cc: santosh.shukla@amd.com, bp@alien8.de, isaku.yamahata@intel.com
+References: <20250310063938.13790-1-nikunj@amd.com>
+ <20250310064522.14100-1-nikunj@amd.com>
+ <20250310064522.14100-3-nikunj@amd.com>
+ <92a926b7-7958-f44a-fc05-7fa2c171e710@amd.com>
+Content-Language: en-US
+From: "Nikunj A. Dadhania" <nikunj@amd.com>
+In-Reply-To: <92a926b7-7958-f44a-fc05-7fa2c171e710@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN2PR01CA0239.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:eb::18) To MN0PR12MB6317.namprd12.prod.outlook.com
+ (2603:10b6:208:3c2::12)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 6/6] vhost/net: Support
- VIRTIO_NET_F_HASH_REPORT
-To: Jason Wang <jasowang@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>,
- Andrew Melnychenko <andrew@daynix.com>,
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
- Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>
-References: <20250307-rss-v9-0-df76624025eb@daynix.com>
- <20250307-rss-v9-6-df76624025eb@daynix.com>
- <CACGkMEuccQ6ah-aZ3tcW1VRuetEoPA_NaLxLT+9fb0uAab8Agg@mail.gmail.com>
- <2e550452-a716-4c3f-9d5a-3882d2c9912a@daynix.com>
- <CACGkMEu9tynRgTh__3p_vSqOekSirbVgS90rd5dUiJru9oV1eg@mail.gmail.com>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <CACGkMEu9tynRgTh__3p_vSqOekSirbVgS90rd5dUiJru9oV1eg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN0PR12MB6317:EE_|DM4PR12MB6543:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9e43a1c0-31ae-4b5f-6e7f-08dd6068d392
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Mk1RRUJFd3ZxQm1IRnlhTGdGczFHMFFTN1I2cVR4VVRqYWw1Q2RFUm1HVHNz?=
+ =?utf-8?B?OENyd1JxZjRCRGlVUG5KdmhSTlJwVVlRd08vWk4yRkM4bnVYb2tZRFRzMFhZ?=
+ =?utf-8?B?OHVTYTdTLzlwc01yRCtSd3ZPT3ZuR05wcFI2TnVGZHVwMUZZVTJnbGg1azNT?=
+ =?utf-8?B?RUFxaG95clErWm0rUjkvNWEyWi9LQU91aTdsTTFnSzNZYWZ6Ump3RHdmZkpw?=
+ =?utf-8?B?dXJiTWdQV2dLUnlRZENwUnFUZE1yMmVzei9tTThnYmhoZXJmRzZpTEphbE96?=
+ =?utf-8?B?RWV4TTBxcmtHVXZ5UnA3SXBzRTBhVEU0ZnowU090b0RLVU9hTFREYVNKbENM?=
+ =?utf-8?B?YXI5QTlqZ0pyQTBhZnE1ZGNiNlNYcVlFcDUzZUdhbEF1YVlza0tNUXVnVWhW?=
+ =?utf-8?B?UGFTN1lURHMyRDJGN0dyNG1ZUmpFNXZsY042dnNIUkxzeXNWZFdDUTRKRDgr?=
+ =?utf-8?B?UkZoMVc5S1pGUUlKNEpxNXlpMjJ1WU9pUXFrZlhNMXREWTRFVVUxYjZFUDhD?=
+ =?utf-8?B?ZFpMTFU2enNrK2N3YUJNK0NUaXNlSDZnU3lSaHU4WTZVNW1vWmtLYm9lNmsy?=
+ =?utf-8?B?eXlzK29TblJNbHlObzRiWDVGRVpWdVJOL2NkV1FJQ0h2S0lLbi9NSk9NZlJ2?=
+ =?utf-8?B?WDk4dzBlUjFEQk9FZ2dJOW9jaFFEOFZ4L3p2VzhpVnFXMTFrZ3dJWGV0VkZq?=
+ =?utf-8?B?eHlZM0YrT0c1Vk51cWovNUpoZ2lTSDJ5YXh3N1NkbC9GaVcwVmhlcElrYkRQ?=
+ =?utf-8?B?MEZRN2QzZG9KZHVqWTc0NlhEQXM1R0RxVGVXQWZPcW5HN0Z5SnIvdTdxa3dI?=
+ =?utf-8?B?UG9UdWZFcXNvWE8zRDBRSTlpdDhpRTJxRlViYi9zVU1IR3hkSHYxRm9SWGRl?=
+ =?utf-8?B?Nzk2NWV6UVFLM002c2FicFI0dTdZUXpSeG43alFwckZKeFZnK3V0bVJaZ2RZ?=
+ =?utf-8?B?YUUwZmVITUQrSk8rK3V2UWhUUGFwL09OY29hRDlDRFFBeFVnNkYrdUtkOUlv?=
+ =?utf-8?B?dHExRWx2bEcydTRUam11NWtOWnlpeTRNcG1leUh6K1hteFNvVmx6Y0dHdHNv?=
+ =?utf-8?B?cFFCZmhMbW5DaXJYQTFwZ3hnNDU0Y1kxS21OalUvcmw3Q21SZS9PSlBIbG5T?=
+ =?utf-8?B?alJkYnFzdjBKMnM5UTZySWpnYTNYclBzNlFDNmVMS0pQbVg4TEVWajlCaitG?=
+ =?utf-8?B?YXIxK2UrTFJQOGxmVGdabGpHOWI4N1RSUy95SHhkU2VjMmNiVXRWZGxsMWpo?=
+ =?utf-8?B?dGtyQ3lUWXBHekRPSDRQTDFZaHlqWTljWXEzMFRrdTlhUTZ1Qjk1bzJIZmZ2?=
+ =?utf-8?B?SVJ1bTBlWHlkelNQcXZ6VVNCUTFTcjR0ZEtHTnAzSDZ2NUJCOFhrSGFMcmVi?=
+ =?utf-8?B?SU54RUticUVjcVZOMGpOaXJ5bkNySVZFWmU5cmlUTFVHV0hBN0NGYlRKeFBD?=
+ =?utf-8?B?U3FkODFxWjFBVUlzQWVSQ0pxZXN0N0FGeGNTOWg2MDJrQjd4ZFlHd3REU1dI?=
+ =?utf-8?B?aXNUYmdta3RmeEFhNjQraVdvK2FSb0NJODlyM2lDcWV2cXN4M25BSXFyZnho?=
+ =?utf-8?B?b3dZT0lWSkYwczBOazB1b3dDY2NEd1lZY2xzWU9IUVhROVB5SzBtQlRXQ2ZE?=
+ =?utf-8?B?ZjNRMmh1UjJzUXprekcxY0ZmQTB0ZzJJanlvdTVsU2xYRHJOa1NhcGh3bENx?=
+ =?utf-8?B?Q1dKOGdPeWg1QXY0bGtxK0gxbUxEc0hzem56cDhwdmVtNXhBZlh5Q1lQT1FX?=
+ =?utf-8?B?RHpaYW9ITDdHMlFIYW41T0dmTk1lYXFPS1dCUmp1V2xvWTExanpiYVEvNXVH?=
+ =?utf-8?B?aVV4em0zRHd1bmQvYkJ2SU8rVG1yeHhnd1FSYldSU1ZUVDdnWk1lWElWTUtx?=
+ =?utf-8?Q?o32yj7HrdLw4c?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB6317.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VVcyYUU1WEdFUXljYjM4Y21PODFCcVpFbVprVTcxek5Eb2lpaHM4UlNJT3Iy?=
+ =?utf-8?B?Wjd1MnFlcnF0cE5ZR0lRbEdLUlN3QmlZQndpSnZkY3l2NmVmYW9jTmN1Wjhv?=
+ =?utf-8?B?NkNjZ0kyWGJIZVZqSFpoSTd2ZHRkWjU1UTlKdXJRaFVZNnlvOXlTdVpTeEZO?=
+ =?utf-8?B?dHVBTzV2MDY3ei8xWDB5a1dvVmJxRlJQUm9GeU5nV3dIYVNmakJnZ1YxcG1C?=
+ =?utf-8?B?SWErU05iTWsrNm9NZ1VSbDdibWU4NTdiTVQzZlp3N21KdktFbmNtN1dTS01t?=
+ =?utf-8?B?d2VteGZKdytHbldZR0pzMWtDMmVuenNQYzVoNGlYUVB4YWVVRVJzeWsxN1Jy?=
+ =?utf-8?B?SERBV1F6eE8zMjFodldyQlE5Y1BNU3M2YTVneXpuMXlKbVRKUmpnYkxnTEk2?=
+ =?utf-8?B?cEphei9kMGNVSHJDV3NVRjFjL2tCcTlXL0dIZHFEamRoYU03SVZSNEowTW9h?=
+ =?utf-8?B?REloUmtGRnZZR3hPdkUvVXlMM0k3NDdNMk9EYTduYzFaMWNsNlV2Rk9tUDlU?=
+ =?utf-8?B?K0JUZnVBVjl6SS9oYUdUOXBySm9JTit2WmFrTnJyQlhMYWdOUHRGWW1Qb0ta?=
+ =?utf-8?B?RklzaUNxWW1lQnNMZ0JsSmJudGx5VnVmTG1hYVRYWWhjQmM0QVd0K1krTFNa?=
+ =?utf-8?B?VTlIZEppTHhEd2dtVENEQUh4QitIbFVOVExyN1BJcmhrRDV5TnUyWk1JYnVU?=
+ =?utf-8?B?RmRsaitEMFpuNjY3cXJTVDllYmp5dXFZQ0paWGI0OVV0VVhwQ2pMVTkydTFE?=
+ =?utf-8?B?YWo1RHRCckV3UHBkdTZaOFpTaDgvZFFiZWtick43Y2ZVN2lMdkkxd3RvMjFx?=
+ =?utf-8?B?dHgzV1FCLyt0NzRYREU5RlQyYllDenEvTFpkYzZhL0xkaGxpNitCQXVZamZB?=
+ =?utf-8?B?NzdCUDRYRkJha3lSVlI3dWl3anNORWF4V1VsZ2N3dWhZakt6a0lJSjRNZ3JF?=
+ =?utf-8?B?VzlqM3NiZmZOSmdnMVFaUTJBM3hDUytaUjdmZDRlcjVLOWZHMGd2VEFVdzQ3?=
+ =?utf-8?B?VFZwL3FnT2JrdS80cjVxQmFhSXF5emExZStJM1lqbGl3aXZNZklPT1FHSUF5?=
+ =?utf-8?B?S2s5QnlDTjZrSnoraUZlTEJHYXgyb0JYSlFweUtWZHM0WXNodWxRT05rSDd0?=
+ =?utf-8?B?QUhySU50a1pZOW8zdnJQb0Zmc2NVZkY2NHJLR04rRjUyZjFhWjVVRU5oTytL?=
+ =?utf-8?B?SzVhVDlXeER5N1dsS2srQnRlOHRwZXBxYWx0ckhYV1J6MDhreFFUQ0xsREFN?=
+ =?utf-8?B?Y0F6YWE3cmw3R1AzNm1Pa1hEM281ZVVsMHVMeWtSUXZVYkhMd3V6bHNoRDBK?=
+ =?utf-8?B?d243aUhMUTRXZVN4MEloaUZRNy92MUVOTEdJdTlaNU02K3pLUXhlL2lzVDl3?=
+ =?utf-8?B?aVlzZDRVR0FxT0JaNmxkQ0NseVorWnhqWU55dnVPR3hlODIxejAyOTlhM2k4?=
+ =?utf-8?B?SUVKOHRmdjVGQm9JTG5UZWU2Vkw2eG9ubDQySmRIbGFRVkRZcU9uK0VjbEI5?=
+ =?utf-8?B?QlUvYlhNaC93TkxpaXlZYkVwMVZRSFBaQjUvTWxCak9PQ05GQnNnWDJUNkFZ?=
+ =?utf-8?B?amVKZ2cwckZyNlFBcUdKYjB3TTVMaGV0bHVrbXVoTlZ5anZXVXo4NEkyaWgw?=
+ =?utf-8?B?OFRrendRSUpyUEU5K0djVEtvdW5wL05zbFRkcE5Bd1pKUzZPaksyZUhzSHdV?=
+ =?utf-8?B?cDgwMW5ackFVQ0FwUUJVbStXK1ZqWWVtbElRd09wcDd2ZVZ6aXJXblJ2bHpt?=
+ =?utf-8?B?UjV1L1JGQ25MRnFyb0cveWlXVmVaeUFuQ1ZzOEdTeXhrQnozT0ZSNndmTHV1?=
+ =?utf-8?B?NVRSL2VtemY5WHJxQ1VuZG5NcytKU1JubnQzZjhBTHZyWlAyNnc1cTYyMXZE?=
+ =?utf-8?B?VFFvTnpQQW0wcE5TRU9SNElHZ3dwR1hsUEF5aGI2WlZzMEx2aXhCYm1PM3d2?=
+ =?utf-8?B?cU1NWjJtYUF2cUdmRWlzRmd5aHhiTGVtUURWZFg0Ni9IeFRFU3prempkTTRh?=
+ =?utf-8?B?NGsvTkJtRlBWKzVkV3gvQktsTkJJWWVKb2hLaEZDem5GY3A0OFVpQ0E3V29V?=
+ =?utf-8?B?MVlKSXBOeEhKUUY3SklVQTlHbkJBZFhQZzkyOUFNS2lWeXNxVGt3eE1Bdldz?=
+ =?utf-8?Q?9KEPJkaVc9Lk6z0tJgDn7Dxx3?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9e43a1c0-31ae-4b5f-6e7f-08dd6068d392
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR12MB6317.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2025 06:49:10.2310
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: I+AlY1v4vUUFivvFn7jA9RBMnfto5fcs4aJ47Z8ei99MY/egsgxLcpgFwT5NtQ7LVjPzxb6Y5CaEXAT4pYIz+A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6543
 
-On 2025/03/11 9:42, Jason Wang wrote:
-> On Mon, Mar 10, 2025 at 3:04 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>
->> On 2025/03/10 13:43, Jason Wang wrote:
->>> On Fri, Mar 7, 2025 at 7:02 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>>
->>>> VIRTIO_NET_F_HASH_REPORT allows to report hash values calculated on the
->>>> host. When VHOST_NET_F_VIRTIO_NET_HDR is employed, it will report no
->>>> hash values (i.e., the hash_report member is always set to
->>>> VIRTIO_NET_HASH_REPORT_NONE). Otherwise, the values reported by the
->>>> underlying socket will be reported.
->>>>
->>>> VIRTIO_NET_F_HASH_REPORT requires VIRTIO_F_VERSION_1.
->>>>
->>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
->>>> Tested-by: Lei Yang <leiyang@redhat.com>
->>>> ---
->>>>    drivers/vhost/net.c | 49 +++++++++++++++++++++++++++++--------------------
->>>>    1 file changed, 29 insertions(+), 20 deletions(-)
->>>>
->>>> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
->>>> index b9b9e9d40951856d881d77ac74331d914473cd56..16b241b44f89820a42c302f3586ea6bb5e0d4289 100644
->>>> --- a/drivers/vhost/net.c
->>>> +++ b/drivers/vhost/net.c
->>>> @@ -73,6 +73,7 @@ enum {
->>>>           VHOST_NET_FEATURES = VHOST_FEATURES |
->>>>                            (1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
->>>>                            (1ULL << VIRTIO_NET_F_MRG_RXBUF) |
->>>> +                        (1ULL << VIRTIO_NET_F_HASH_REPORT) |
->>>>                            (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
->>>>                            (1ULL << VIRTIO_F_RING_RESET)
->>>>    };
->>>> @@ -1097,9 +1098,11 @@ static void handle_rx(struct vhost_net *net)
->>>>                   .msg_controllen = 0,
->>>>                   .msg_flags = MSG_DONTWAIT,
->>>>           };
->>>> -       struct virtio_net_hdr hdr = {
->>>> -               .flags = 0,
->>>> -               .gso_type = VIRTIO_NET_HDR_GSO_NONE
->>>> +       struct virtio_net_hdr_v1_hash hdr = {
->>>> +               .hdr = {
->>>> +                       .flags = 0,
->>>> +                       .gso_type = VIRTIO_NET_HDR_GSO_NONE
->>>> +               }
->>>>           };
->>>>           size_t total_len = 0;
->>>>           int err, mergeable;
->>>> @@ -1110,7 +1113,6 @@ static void handle_rx(struct vhost_net *net)
->>>>           bool set_num_buffers;
->>>>           struct socket *sock;
->>>>           struct iov_iter fixup;
->>>> -       __virtio16 num_buffers;
->>>>           int recv_pkts = 0;
->>>>
->>>>           mutex_lock_nested(&vq->mutex, VHOST_NET_VQ_RX);
->>>> @@ -1191,30 +1193,30 @@ static void handle_rx(struct vhost_net *net)
->>>>                           vhost_discard_vq_desc(vq, headcount);
->>>>                           continue;
->>>>                   }
->>>> +               hdr.hdr.num_buffers = cpu_to_vhost16(vq, headcount);
->>>>                   /* Supply virtio_net_hdr if VHOST_NET_F_VIRTIO_NET_HDR */
->>>>                   if (unlikely(vhost_hlen)) {
->>>> -                       if (copy_to_iter(&hdr, sizeof(hdr),
->>>> -                                        &fixup) != sizeof(hdr)) {
->>>> +                       if (copy_to_iter(&hdr, vhost_hlen,
->>>> +                                        &fixup) != vhost_hlen) {
->>>>                                   vq_err(vq, "Unable to write vnet_hdr "
->>>>                                          "at addr %p\n", vq->iov->iov_base);
->>>>                                   goto out;
->>>
->>> Is this an "issue" specific to RSS/HASH? If it's not, we need a separate patch.
->>>
->>> Honestly, I'm not sure if it's too late to fix this.
->>
->> There is nothing wrong with the current implementation.
-> 
-> Note that I meant the vhost_hlen part, and the current code is tricky.
-> 
-> The comment said:
-> 
-> """
-> /* Supply virtio_net_hdr if VHOST_NET_F_VIRTIO_NET_HDR */
-> """
-> 
-> So it tries to only offer virtio_net_hdr even if vhost_hlen is the set
-> to mrg_rxbuf len.
-> 
-> And this patch changes this behaviour.
 
-mrg_rxbuf only adds the num_buffers field, which is always set for 
-mrg_rxbuf.
 
-The num_buffers was not set for VIRTIO_F_VERSION_1 in the past, but this 
-was also fixed with commit a3b9c053d82a ("vhost/net: Set num_buffers for 
-virtio 1.0")
-
-So there is no behavioral change for existing features with this patch.
-
-Regards,
-Akihiko Odaki
-
+On 3/10/2025 8:53 PM, Tom Lendacky wrote:
+> On 3/10/25 01:45, Nikunj A Dadhania wrote:
+>> Disallow writes to MSR_IA32_TSC for Secure TSC enabled SNP guests. Even if
+>> KVM attempts to emulate such writes, TSC calculation will ignore the
 > 
-> Thanks
+> s/TSC calculation/the TSC calculation performed by hardware/
 > 
->> The current
->> implementation fills the header with zero except num_buffers, which it
->> fills some real value. This functionality is working fine with
->> VIRTIO_NET_F_MRG_RXBUF and VIRTIO_F_VERSION_1, which change the header size.
->>
->> Now I'm adding VIRTIO_NET_F_HASH_REPORT and it adds the hash_report
->> field, which also needs to be initialized with zero, so I'm making sure
->> vhost_net will also initialize it.
->>
->> Regards,
->> Akihiko Odaki
->>
->>>
->>> Others look fine.
->>>
->>> Thanks
->>>
->>
+>> TSC_SCALE and TSC_OFFSET present in the VMCB. Instead, it will use
 > 
+> s/present/values present/
+> s/VMCB. Instead, it will use/VMCB and instead use the/
+>> GUEST_TSC_SCALE and GUEST_TSC_OFFSET stored in the VMSA.
+> 
+> s/stored/values stored/
+> 
+
+Ack
+
+>>
+>> Additionally, incorporate a check for protected guest state to allow the
+>> VMM to initialize the TSC MSR.
+> 
+> I don't see this in the patch.
+
+This change is removed as we are differentiating between host/guest writes
+and host writes are ignored. I will remove this.
+ 
+>>
+>> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+> 
+> With cleanup to the commit message and a formatting nit below:
+> 
+> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+> 
+>> ---
+>>  arch/x86/kvm/svm/svm.c | 19 +++++++++++++++++++
+>>  1 file changed, 19 insertions(+)
+>>
+>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+>> index e65721db1f81..1652848b0240 100644
+>> --- a/arch/x86/kvm/svm/svm.c
+>> +++ b/arch/x86/kvm/svm/svm.c
+>> @@ -3161,6 +3161,25 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+>>  
+>>  		svm->tsc_aux = data;
+>>  		break;
+>> +	case MSR_IA32_TSC:
+>> +		/*
+>> +		 * For Secure TSC enabled VM, do not emulate TSC write as the
+>> +		 * TSC calculation ignores the TSC_OFFSET and TSC_SCALE control
+>> +		 * fields.
+>> +		 *
+>> +		 * Guest writes: Record the error and return a #GP.
+>> +		 * Host writes are ignored.
+>> +		 */
+>> +		if (snp_secure_tsc_enabled(vcpu->kvm)) {
+>> +			if (!msr->host_initiated) {
+>> +				vcpu_unimpl(vcpu, "unimplemented IA32_TSC for Secure TSC\n");
+>> +				return 1;
+>> +			} else
+>> +				return 0;
+> 
+> You need "{" and "}" around this.
+
+Ack
+
+Regards
+Nikunj
 
 
