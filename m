@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-40757-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40758-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA2A2A5BC95
-	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 10:47:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F5BBA5BCDB
+	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 10:54:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 634E5188CA15
-	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 09:47:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38A293B3D7D
+	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 09:53:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 225A322424D;
-	Tue, 11 Mar 2025 09:47:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A444235377;
+	Tue, 11 Mar 2025 09:53:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YqpnwX9B"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uxiyeziF"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45743BA34;
-	Tue, 11 Mar 2025 09:47:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A5D22F14C;
+	Tue, 11 Mar 2025 09:53:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741686435; cv=none; b=EqURWO12Y7Z+p8SQPySuBsfLIOo1m0qS9wqVme0Z0HlqwsOvJsR2u1JbXXFiVKmzE6N8LynVWl6w5wJO68NpB4kLVDE/oJ1JCCK35wIrLpmHY0rWdQQ5JY0W2gu2pNaNrSMv44czxlxVs8xVc666eaHUheFReXyWD6KWRo3dak0=
+	t=1741686785; cv=none; b=dVwY7cVP2WHkiTyjc3GUATuo38ODYBUupZcwfiLqDc9DGL126dhqgSQzKtg0GKALs3NvZq4TPxmVJEO7jdU6WXx6GjXd+gReKRfrCnD4Cmd/Ee4ON0XAwaFlCyWBvhX6Q40BKr1pjGaA/1V7tqoG2uTCHd5827UbQPVLekFRYtI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741686435; c=relaxed/simple;
-	bh=m8GtSASoTKItJBBxR++EYkWDcnQaVyq2qcdQfxdQw0Q=;
+	s=arc-20240116; t=1741686785; c=relaxed/simple;
+	bh=puyoyj48u72UZ6m1NRBLfHoQqzns49w+qNQn7nb7V7A=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gZhAM7M/dz+Q2EbJqRF/ZQ/dL4XcnHU5uN8s/Nt6U443fT084HwJ7zgLYx5e4ZQAzjCPlftF5D+3Byps1/ZAPyUTNeIhfKtReLWr6iJE6ORqtvbmDVroG/otNQfcb/5vNy+Ai/BJA3SMXCtsRZtpsgPvCswXidSQGBfPpCyBzwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YqpnwX9B; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3D57C4CEE9;
-	Tue, 11 Mar 2025 09:47:14 +0000 (UTC)
+	 MIME-Version:Content-Type; b=uvDo2UAC+tsWDC8zrtBGh/Hgc6LGJLBC9gM/ykCL8KocuWRodzLzhKbIY7T+aDYYzh819NjC4NJkAcdJ0yrvbGZj8GiqcUWdoj95vt8CmESWnWmLj38Rj91oifbMbNfRgrCRK6p973OEeLlnpxNJi5CsjeW0ZtyaFuKfyVMkoLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uxiyeziF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10EF8C4CEE9;
+	Tue, 11 Mar 2025 09:53:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741686434;
-	bh=m8GtSASoTKItJBBxR++EYkWDcnQaVyq2qcdQfxdQw0Q=;
+	s=k20201202; t=1741686785;
+	bh=puyoyj48u72UZ6m1NRBLfHoQqzns49w+qNQn7nb7V7A=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YqpnwX9B2JRyJ6ffnkz3XHwibH3H3cz+fKM7rFClRH42y0w7kEVeC6u6lz8wUqISl
-	 vTC1Q9lEiea8HUF3BMsUXFRnMB6g//gY9uy6QvxySDgdN239b7u2sA/EnQ3ICQLCW5
-	 S+vyETyiQh89sUgQ1LcKHa0g0J5vnY7YthLDoTTTRnyvKt0ZF4SNX3C9b+TxDj8UMA
-	 HWFye28XUeXvz8s/V6KAQm+wzS+ZbzcdDZaPMcpSHNU98jePa1d55AvLIzMrDyo69a
-	 j31njN3HxtBFCUtx2LUliEwEp0MokEQo7zSkZAyXeJQTPaMhfuoxoUfIT8AGWg5JCh
-	 f272CICu68NHQ==
+	b=uxiyeziFlgVTAxJ6UMoTvU3+3gRs1QGJSXs6u5p0kDCEPxJY07V6a7UHcZmc3HLWR
+	 o0LvSkRs8Oc7SFB9DMX4djmb2CfxJhylWnn3Ysng8cHHwxdq6Hj4EDPcvWBBZiLL46
+	 5/JL5ou2ooqHiVxWy+h3LcnAlnDwVwCgmspobVSOfY3szjvn3YzIJ2bfcNZD+S05NF
+	 aNEYAds7LJjFrnfrLdEvO9eJyjJ02sNieybvoub7Van/yBEid4KKy6Q1FW8Q1DUTpq
+	 1av0JFnFShWfrj2Qm6QOrs77RpRomopLdoTiEsa+9gMte7GSleULOyYdW+rhCNLJpP
+	 cwNusTVGHtFKA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1trwCe-00CTdL-GR;
-	Tue, 11 Mar 2025 09:47:12 +0000
-Date: Tue, 11 Mar 2025 09:47:12 +0000
-Message-ID: <86wmcvoq5b.wl-maz@kernel.org>
+	id 1trwIJ-00CTlY-4o;
+	Tue, 11 Mar 2025 09:53:03 +0000
+Date: Tue, 11 Mar 2025 09:53:02 +0000
+Message-ID: <86v7sfopvl.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Zhenyu Ye <yezhenyu2@huawei.com>
 Cc: <yuzenghui@huawei.com>,
@@ -63,10 +63,10 @@ Cc: <yuzenghui@huawei.com>,
 	<linux-arm-kernel@lists.infradead.org>,
 	<kvm@vger.kernel.org>,
 	<kvmarm@lists.linux.dev>
-Subject: Re: [PATCH v1 2/5] arm64/kvm: support set the DBM attr during memory abort
-In-Reply-To: <20250311040321.1460-3-yezhenyu2@huawei.com>
+Subject: Re: [PATCH v1 5/5] arm64/config: add config to control whether enable HDBSS feature
+In-Reply-To: <20250311040321.1460-6-yezhenyu2@huawei.com>
 References: <20250311040321.1460-1-yezhenyu2@huawei.com>
-	<20250311040321.1460-3-yezhenyu2@huawei.com>
+	<20250311040321.1460-6-yezhenyu2@huawei.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -76,89 +76,59 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: yezhenyu2@huawei.com, yuzenghui@huawei.com, will@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com, joey.gouly@arm.com, linux-kernel@vger.kernel.org, xiexiangyou@huawei.com, zhengchuan@huawei.com, wangzhou1@hisilicon.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Please follow the current convention for the subject of your patch (if
-you do a git log --oneline on arch/arm64/kvm, all commit should have
-the same style).
-
-On Tue, 11 Mar 2025 04:03:18 +0000,
+On Tue, 11 Mar 2025 04:03:21 +0000,
 Zhenyu Ye <yezhenyu2@huawei.com> wrote:
-> 
+>=20
 > From: eillon <yezhenyu2@huawei.com>
-> 
-> Since the ARMv8, the page entry has supported the DBM attribute.
-> Support set the attr during user_mem_abort().
-
-Not quite. ARMv8.1 added DBM, and that is still, to this day, an
-optional functionality, including in ARMv9.5.
-
-> 
+>=20
+> The HDBSS feature introduces new assembly registers
+> (HDBSSBR_EL2 and HDBSSPROD_EL2), which depends on the armv9.5-a
+> compilation support. So add ARM64_HDBSS config to control whether
+> enable the HDBSS feature.
+>=20
 > Signed-off-by: eillon <yezhenyu2@huawei.com>
 > ---
->  arch/arm64/include/asm/kvm_pgtable.h | 3 +++
->  arch/arm64/kvm/hyp/pgtable.c         | 6 ++++++
->  2 files changed, 9 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 6b9d274052c7..35648d7f08f5 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -86,6 +86,8 @@ typedef u64 kvm_pte_t;
->  
->  #define KVM_PTE_LEAF_ATTR_HI_S2_XN	BIT(54)
->  
-> +#define KVM_PTE_LEAF_ATTR_HI_S2_DBM	BIT(51)
+>  arch/arm64/Kconfig                  | 19 +++++++++++++++++++
+>  arch/arm64/Makefile                 |  4 +++-
+>  arch/arm64/include/asm/cpufeature.h |  3 +++
+>  3 files changed, 25 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> index 940343beb3d4..3458261eb14b 100644
+> --- a/arch/arm64/Kconfig
+> +++ b/arch/arm64/Kconfig
+> @@ -2237,6 +2237,25 @@ config ARM64_GCS
+> =20
+>  endmenu # "v9.4 architectural features"
+> =20
+> +menu "ARMv9.5 architectural features"
 > +
->  #define KVM_PTE_LEAF_ATTR_HI_S1_GP	BIT(50)
->  
->  #define KVM_PTE_LEAF_ATTR_S2_PERMS	(KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | \
-> @@ -252,6 +254,7 @@ enum kvm_pgtable_prot {
->  
->  	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
->  	KVM_PGTABLE_PROT_NORMAL_NC		= BIT(4),
-> +	KVM_PGTABLE_PROT_DBM			= BIT(5),
->  
->  	KVM_PGTABLE_PROT_SW0			= BIT(55),
->  	KVM_PGTABLE_PROT_SW1			= BIT(56),
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index df5cc74a7dd0..3ea6bdbc02a0 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -700,6 +700,9 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
->  	if (prot & KVM_PGTABLE_PROT_W)
->  		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
->  
-> +	if (prot & KVM_PGTABLE_PROT_DBM)
-> +		attr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
+> +config ARM64_HDBSS
+> +	bool "Enable support for Hardware Dirty state tracking Structure (HDBSS=
+)"
+> +	default y
+> +	depends on AS_HAS_ARMV9_5
+> +	help
+> +	  Hardware Dirty state tracking Structure(HDBSS) enhances tracking
+> +	  translation table descriptors=E2=80=99 dirty state to reduce the cost=
+ of
+> +	  surveying for dirtied granules.
 > +
->  	if (!kvm_lpa2_is_enabled())
->  		attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S2_SH, sh);
->  
-> @@ -1309,6 +1312,9 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
->  	if (prot & KVM_PGTABLE_PROT_W)
->  		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
->  
-> +	if (prot & KVM_PGTABLE_PROT_DBM)
-> +		set |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
-> +
+> +	  The feature introduces new assembly registers (HDBSSBR_EL2 and
+> +	  HDBSSPROD_EL2), which depends on AS_HAS_ARMV9_5.
 
-Why isn't that exclusive of PROT_W?
-
->  	if (prot & KVM_PGTABLE_PROT_X)
->  		clr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
->  
-
-What is driving this KVM_PGTABLE_PROT_DBM bit?
-
-Thanks,
+Why? You seem to be using the generated accessors everywhere, and I
+can't see a need for this compiler dependency.
 
 	M.
 
--- 
+--=20
 Without deviation from the norm, progress is not possible.
 
