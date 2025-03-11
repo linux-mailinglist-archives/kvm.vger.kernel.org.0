@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-40756-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40757-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 938EDA5BC77
-	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 10:41:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA2A2A5BC95
+	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 10:47:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5F6817273F
-	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 09:41:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 634E5188CA15
+	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 09:47:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 147B322DFA5;
-	Tue, 11 Mar 2025 09:41:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 225A322424D;
+	Tue, 11 Mar 2025 09:47:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HV3NHKVl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YqpnwX9B"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B9ED22B5A8;
-	Tue, 11 Mar 2025 09:41:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45743BA34;
+	Tue, 11 Mar 2025 09:47:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741686086; cv=none; b=tClBVMkY/Ge48wGyfUZPS5w4xOzD7e6bI2XP92Z4Swl4rTj48mWtzQnRxxi41GCc41u+q6k/gaR4ftxrlegTBw2C9ngRvRMKEO0nY5sTH7tPiB1EbP2rcQJScOUAicrZhuJJSGUqucpFHArR0nm4gTC5RxA5KG1Pics/+1UcDWU=
+	t=1741686435; cv=none; b=EqURWO12Y7Z+p8SQPySuBsfLIOo1m0qS9wqVme0Z0HlqwsOvJsR2u1JbXXFiVKmzE6N8LynVWl6w5wJO68NpB4kLVDE/oJ1JCCK35wIrLpmHY0rWdQQ5JY0W2gu2pNaNrSMv44czxlxVs8xVc666eaHUheFReXyWD6KWRo3dak0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741686086; c=relaxed/simple;
-	bh=GOKOd/OMoe0MpaKpHbszJNcD+QQKjKFDq+dV3uSywxM=;
+	s=arc-20240116; t=1741686435; c=relaxed/simple;
+	bh=m8GtSASoTKItJBBxR++EYkWDcnQaVyq2qcdQfxdQw0Q=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mu9HR+Pm7wxUz/UPLG7GbQL5LfC6OiFX2CwQatrBA/J81wiylsaHSBLc/0L985LlnlIZ8+dD1MLB4yeqDPW9VqQidRGThnoWCYkS0/YWW/0Q01jAQjirXmKtvoZetJcG8eKbXcDUQVfHSqKL2It0x5MnXLdypa1RQbqbM0hIYzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HV3NHKVl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CFCFC4CEE9;
-	Tue, 11 Mar 2025 09:41:25 +0000 (UTC)
+	 MIME-Version:Content-Type; b=gZhAM7M/dz+Q2EbJqRF/ZQ/dL4XcnHU5uN8s/Nt6U443fT084HwJ7zgLYx5e4ZQAzjCPlftF5D+3Byps1/ZAPyUTNeIhfKtReLWr6iJE6ORqtvbmDVroG/otNQfcb/5vNy+Ai/BJA3SMXCtsRZtpsgPvCswXidSQGBfPpCyBzwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YqpnwX9B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3D57C4CEE9;
+	Tue, 11 Mar 2025 09:47:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741686085;
-	bh=GOKOd/OMoe0MpaKpHbszJNcD+QQKjKFDq+dV3uSywxM=;
+	s=k20201202; t=1741686434;
+	bh=m8GtSASoTKItJBBxR++EYkWDcnQaVyq2qcdQfxdQw0Q=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HV3NHKVl8OcXBKi5oS+QCVHzEAVL27ic9HxurXAtRijfpI+k63r8BBYpBg1GV2uOy
-	 gxriENPt5T4eeO1FCMSeHnsGFr+tFfTwJcokOxEUI+ckNMtXvYb+maSw0GfNSc9dut
-	 QUmfzxiftOJmsYq8alp2ecldSXcpF2e0yi2pTX3ptgndujlS9J01iwfk7AZiCTM1rJ
-	 TDo3Ur20dBGIkl3o/HQvbgT56MYDHJXh1UB8yf134+Py0eGgwFWieDEw/RMuwWe5Ev
-	 sPJQ9QZNjYkgNofaGEaDf67FwLsWDZXzpJirE92Q6zzyYJnpS3DbgXT7eHdQPvG9qq
-	 e6ExeOpB+8KFg==
+	b=YqpnwX9B2JRyJ6ffnkz3XHwibH3H3cz+fKM7rFClRH42y0w7kEVeC6u6lz8wUqISl
+	 vTC1Q9lEiea8HUF3BMsUXFRnMB6g//gY9uy6QvxySDgdN239b7u2sA/EnQ3ICQLCW5
+	 S+vyETyiQh89sUgQ1LcKHa0g0J5vnY7YthLDoTTTRnyvKt0ZF4SNX3C9b+TxDj8UMA
+	 HWFye28XUeXvz8s/V6KAQm+wzS+ZbzcdDZaPMcpSHNU98jePa1d55AvLIzMrDyo69a
+	 j31njN3HxtBFCUtx2LUliEwEp0MokEQo7zSkZAyXeJQTPaMhfuoxoUfIT8AGWg5JCh
+	 f272CICu68NHQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1trw71-00CTXk-0C;
-	Tue, 11 Mar 2025 09:41:23 +0000
-Date: Tue, 11 Mar 2025 09:41:22 +0000
-Message-ID: <86y0xboqf1.wl-maz@kernel.org>
+	id 1trwCe-00CTdL-GR;
+	Tue, 11 Mar 2025 09:47:12 +0000
+Date: Tue, 11 Mar 2025 09:47:12 +0000
+Message-ID: <86wmcvoq5b.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Zhenyu Ye <yezhenyu2@huawei.com>
 Cc: <yuzenghui@huawei.com>,
@@ -63,10 +63,10 @@ Cc: <yuzenghui@huawei.com>,
 	<linux-arm-kernel@lists.infradead.org>,
 	<kvm@vger.kernel.org>,
 	<kvmarm@lists.linux.dev>
-Subject: Re: [PATCH v1 1/5] arm64/sysreg: add HDBSS related register information
-In-Reply-To: <20250311040321.1460-2-yezhenyu2@huawei.com>
+Subject: Re: [PATCH v1 2/5] arm64/kvm: support set the DBM attr during memory abort
+In-Reply-To: <20250311040321.1460-3-yezhenyu2@huawei.com>
 References: <20250311040321.1460-1-yezhenyu2@huawei.com>
-	<20250311040321.1460-2-yezhenyu2@huawei.com>
+	<20250311040321.1460-3-yezhenyu2@huawei.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -82,125 +82,78 @@ X-SA-Exim-Rcpt-To: yezhenyu2@huawei.com, yuzenghui@huawei.com, will@kernel.org, 
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 11 Mar 2025 04:03:17 +0000,
+Please follow the current convention for the subject of your patch (if
+you do a git log --oneline on arch/arm64/kvm, all commit should have
+the same style).
+
+On Tue, 11 Mar 2025 04:03:18 +0000,
 Zhenyu Ye <yezhenyu2@huawei.com> wrote:
 > 
 > From: eillon <yezhenyu2@huawei.com>
 > 
-> The ARM architecture added the HDBSS feature and descriptions of
-> related registers (HDBSSBR/HDBSSPROD) in the DDI0601(ID121123) version,
-> add them to Linux.
+> Since the ARMv8, the page entry has supported the DBM attribute.
+> Support set the attr during user_mem_abort().
+
+Not quite. ARMv8.1 added DBM, and that is still, to this day, an
+optional functionality, including in ARMv9.5.
+
 > 
 > Signed-off-by: eillon <yezhenyu2@huawei.com>
 > ---
->  arch/arm64/include/asm/esr.h          |  2 ++
->  arch/arm64/include/asm/kvm_arm.h      |  1 +
->  arch/arm64/include/asm/sysreg.h       |  4 ++++
->  arch/arm64/tools/sysreg               | 28 +++++++++++++++++++++++++++
->  tools/arch/arm64/include/asm/sysreg.h |  4 ++++
->  5 files changed, 39 insertions(+)
+>  arch/arm64/include/asm/kvm_pgtable.h | 3 +++
+>  arch/arm64/kvm/hyp/pgtable.c         | 6 ++++++
+>  2 files changed, 9 insertions(+)
 > 
-> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-> index d1b1a33f9a8b..a33befe0999a 100644
-> --- a/arch/arm64/include/asm/esr.h
-> +++ b/arch/arm64/include/asm/esr.h
-> @@ -147,6 +147,8 @@
->  #define ESR_ELx_CM 		(UL(1) << ESR_ELx_CM_SHIFT)
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 6b9d274052c7..35648d7f08f5 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -86,6 +86,8 @@ typedef u64 kvm_pte_t;
 >  
->  /* ISS2 field definitions for Data Aborts */
-> +#define ESR_ELx_HDBSSF_SHIFT	(11)
-> +#define ESR_ELx_HDBSSF		(UL(1) << ESR_ELx_HDBSSF_SHIFT)
->  #define ESR_ELx_TnD_SHIFT	(10)
->  #define ESR_ELx_TnD 		(UL(1) << ESR_ELx_TnD_SHIFT)
->  #define ESR_ELx_TagAccess_SHIFT	(9)
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index c2417a424b98..80793ef57f8b 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -122,6 +122,7 @@
->  			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK)
+>  #define KVM_PTE_LEAF_ATTR_HI_S2_XN	BIT(54)
 >  
->  /* VTCR_EL2 Registers bits */
-> +#define VTCR_EL2_HDBSS		(1UL << 45)
->  #define VTCR_EL2_DS		TCR_EL2_DS
->  #define VTCR_EL2_RES1		(1U << 31)
->  #define VTCR_EL2_HD		(1 << 22)
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 05ea5223d2d5..b727772c06fb 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -522,6 +522,10 @@
->  #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
->  
->  #define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
+> +#define KVM_PTE_LEAF_ATTR_HI_S2_DBM	BIT(51)
 > +
-> +#define SYS_HDBSSBR_EL2			sys_reg(3, 4, 2, 3, 2)
-> +#define SYS_HDBSSPROD_EL2		sys_reg(3, 4, 2, 3, 3)
+>  #define KVM_PTE_LEAF_ATTR_HI_S1_GP	BIT(50)
+>  
+>  #define KVM_PTE_LEAF_ATTR_S2_PERMS	(KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | \
+> @@ -252,6 +254,7 @@ enum kvm_pgtable_prot {
+>  
+>  	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
+>  	KVM_PGTABLE_PROT_NORMAL_NC		= BIT(4),
+> +	KVM_PGTABLE_PROT_DBM			= BIT(5),
+>  
+>  	KVM_PGTABLE_PROT_SW0			= BIT(55),
+>  	KVM_PGTABLE_PROT_SW1			= BIT(56),
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index df5cc74a7dd0..3ea6bdbc02a0 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -700,6 +700,9 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
+>  	if (prot & KVM_PGTABLE_PROT_W)
+>  		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+>  
+> +	if (prot & KVM_PGTABLE_PROT_DBM)
+> +		attr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
+> +
+>  	if (!kvm_lpa2_is_enabled())
+>  		attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S2_SH, sh);
+>  
+> @@ -1309,6 +1312,9 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+>  	if (prot & KVM_PGTABLE_PROT_W)
+>  		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+>  
+> +	if (prot & KVM_PGTABLE_PROT_DBM)
+> +		set |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
 > +
 
-Why do you add this here? You have added these two new register to the
-sysreg file, which should be enough.
+Why isn't that exclusive of PROT_W?
 
->  #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
->  #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
->  #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index 762ee084b37c..c2aea1e7fd22 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -2876,6 +2876,34 @@ Sysreg	GCSPR_EL2	3	4	2	5	1
->  Fields	GCSPR_ELx
->  EndSysreg
+>  	if (prot & KVM_PGTABLE_PROT_X)
+>  		clr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
 >  
-> +Sysreg	HDBSSBR_EL2	3	4	2	3	2
-> +Res0	63:56
-> +Field	55:12	BADDR
-> +Res0	11:4
-> +Enum	3:0	SZ
-> +	0b0001	8KB
-> +	0b0010	16KB
-> +	0b0011	32KB
-> +	0b0100	64KB
-> +	0b0101	128KB
-> +	0b0110	256KB
-> +	0b0111	512KB
-> +	0b1000	1MB
-> +	0b1001	2MB
-> +EndEnum
-> +EndSysreg
-> +
-> +Sysreg	HDBSSPROD_EL2	3	4	2	3	3
-> +Res0	63:32
-> +Enum	31:26	FSC
-> +	0b000000	OK
-> +	0b010000	ExternalAbort
-> +	0b101000	GPF
-> +EndEnum
-> +Res0	25:19
-> +Field	18:0	INDEX
-> +EndSysreg
-> +
->  Sysreg	DACR32_EL2	3	4	3	0	0
->  Res0	63:32
->  Field	31:30	D15
-> diff --git a/tools/arch/arm64/include/asm/sysreg.h b/tools/arch/arm64/include/asm/sysreg.h
-> index 150416682e2c..95fc6a4ee655 100644
-> --- a/tools/arch/arm64/include/asm/sysreg.h
-> +++ b/tools/arch/arm64/include/asm/sysreg.h
-> @@ -518,6 +518,10 @@
->  #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
->  
->  #define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
-> +
-> +#define SYS_HDBSSBR_EL2			sys_reg(3, 4, 2, 3, 2)
-> +#define SYS_HDBSSPROD_EL2		sys_reg(3, 4, 2, 3, 3)
-> +
 
-Same thing here.
-
->  #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
->  #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
->  #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
+What is driving this KVM_PGTABLE_PROT_DBM bit?
 
 Thanks,
 
