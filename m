@@ -1,141 +1,234 @@
-Return-Path: <kvm+bounces-40705-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40706-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E284A5A5B2
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 22:09:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1877A5B157
+	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 01:08:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A539C1884C6B
-	for <lists+kvm@lfdr.de>; Mon, 10 Mar 2025 21:09:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E5B13AE19E
+	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 00:08:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E82E91D7994;
-	Mon, 10 Mar 2025 21:09:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6D7E2F5E;
+	Tue, 11 Mar 2025 00:08:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HOlds9A5"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ogDADxfo"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 592851DE2DF
-	for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 21:08:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A7C01367
+	for <kvm@vger.kernel.org>; Tue, 11 Mar 2025 00:08:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741640940; cv=none; b=f3rP2So2QixPJRo4MHT2s3Ti8l8mJapTADo3Wy4CVSufJHn8sIuo5x/M7z8bkyXyngYzBAWFuDEoR3XlQYlT5SNMWp09r7NVOg9ndLFufekzoPMc7MBUP+i6D71i9APQexf8ySmX4xU6STmC3i9UAoumWhZvboCVIs4XK7hfcg0=
+	t=1741651722; cv=none; b=uN/JPcnjdQ5s5zqlqC/fUyB3O6PBPZ15ys0t082rc5I/xMPLa5uHvp/oFEHcGgh2A/Q/bQOBlFyRGK/TjP4Ekr1GvJxJ87W3uwrGdAmwwpMz9lKkWWrH89ZxJmMDdAMky7VkN7FIOz1Am5VWmdMOjpe4iTFMv12qsWxb4zFPC7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741640940; c=relaxed/simple;
-	bh=L2wq15UItCiN04BIyCvZmtzf97dq/7ag+fNk4WjCasg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=d7FiAM9WaMeOPHffB/yJLNedoWK7kmo411IP1c2qtXZC/oAV7hSFv/BphT5benE2qqerCpu6AVhzr9/BH70BPf/Z2TyI/AtVttAGxGl2zyHurIOUPBmiV7YYnd9wIaAekgbsTNADrDJreHrts2L/MiNnBFLHiBWMhJa1cRm04RY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HOlds9A5; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741640937;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SvMGLxhh+ZiXjvBM74tRFWSSYebdSD0/MkQ6jTYRHSk=;
-	b=HOlds9A5bASAcMBNZCJqbGRv42xG6Kqg8b4kre40+Sswdnax/eZO1nLSzgi0rmcTdLeDr6
-	PzNFJGdfbT3ouwGV5+tD29lx9EL1G9gfolDp1LDfbQu6F4MYgye7vLTyuQp8QxbZaCXNAo
-	ONIz7g8TwKS7s/do7Y+5T+6F8K/U0XQ=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-470-vVjNr17qMySHniBsd-8Luw-1; Mon, 10 Mar 2025 17:08:56 -0400
-X-MC-Unique: vVjNr17qMySHniBsd-8Luw-1
-X-Mimecast-MFC-AGG-ID: vVjNr17qMySHniBsd-8Luw_1741640935
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3d43405d1baso3290255ab.0
-        for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 14:08:56 -0700 (PDT)
+	s=arc-20240116; t=1741651722; c=relaxed/simple;
+	bh=Cvh1RtQnMU6grwKtrt7k8hVDS0kw9T+tOkujjathD0Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pJk3SKUfXzUdXvJJQyWkqyw1BlKDNxbVSMql70yZdn2sbb4lxJ4RuikEwoM421MYGtIWI8EP0W0s+0Z7AC75l3cKoFCYdIyic89kY/PS1+bv4MRm4qFmJJoHnRNCSMMABCJTFltWfkoNaH48hiZf19MOt9Ar1tX8e1h51RUT2Kw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ogDADxfo; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2f9d3d0f55dso7381395a91.1
+        for <kvm@vger.kernel.org>; Mon, 10 Mar 2025 17:08:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1741651719; x=1742256519; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PTvxJUlPBJjWMPlx3bz6qPMSvpnDhRXJlpzPDdfISJA=;
+        b=ogDADxfoVu54PKpYq1ObC6cmVzhuZioDrvC25EuNGvA9aBVUjp3aTk64RQT2D/gGrw
+         7YwP5cuo9orYA7dq7zk13bbJTKbMhGDmIqL0SR+oLTd6CqLZ1sbRf+Xba7drlAQPW2hy
+         imDyiiuTU15S3G44GFALTfFf/SqZ/qMhpFKyXy6N27oaaMrI27wuPxYhyZG7ALiXMUXT
+         2ceLYxXddr4m9KBWg+HjXKjyvDAyfKVHBqmCaGJ+AgIoDSEoW3kvo/guEE+K5K7clb22
+         teXhj6Am1Y5q5Dxe42Mk98GtjGUu5MYkZ07zDptY157whZlWE3EdoJs9m+WISdavie8h
+         sSHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741640935; x=1742245735;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SvMGLxhh+ZiXjvBM74tRFWSSYebdSD0/MkQ6jTYRHSk=;
-        b=f1602t+jp5GtktXEK15QY98mcinYRjWPxdgeOvjZBr8eH5q0tUkA4JpjLW30ijWebb
-         CvMGyoP0YfSfbIOfK4PNlbRT57dX8qMG5cm8xEHUoTib/cGGYaf0ka49osO7owmZoIvr
-         7tGFy3o5ngcoTngmRxW1x/VpiwFgl6VZ61wEn2AWzT+eNbqnFjMFmk4ssTfxq9ZK5dHS
-         oV/C+VRu9JfAOGeac0i6vvir7QEQvIt1bBio9rfyiMydqeXeHHD0XRPWxMX14F2ssxBP
-         jm/uwPEPWNzumZ159m/rPdBv9ZYAKkacm200D4Ms7F6tLmncODz0wQ6tzuHr4O+TioBk
-         2nCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVECa+wBf25Xw/i4/GYauyXkLYaiA1erkSjr/pcSWH60RcY2MEGmIOyAaslLbNAkBlJMvY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDR1J3dyFaayM7nIADQnC7fZ11DvSxG6iYFDUtqHhHY2L0wtiY
-	9j06NwOxOAl8eu7X5Bm3B5k92dbU69oWFh+G9nwm+/qLe29/5CsSYnVuWK+1SXApFZ8XGDCZpEb
-	VWCt7BN3kst+quTadWS13M7KxtFBqqVt1ZOswNCZtTagwEiow/Q==
-X-Gm-Gg: ASbGncv3UroUHb7nB4uYvl9NOKHlfwZvkUCLPBTmapjMGh7bdSbe11bBEbckgZ0vgsE
-	zrN7Rf2ckCDXFaXOd4V4sA51JIUas1uy2jDFnQeLMacsdh3cx+8TAKkjUQdhGNjGqjGpx87sqJf
-	ozCd4Sxz5iqIQ7OvGPYKxzf5WC1CLX55es6EtNLe2/2fKGsCYc88gFYqxDegWxqdjq+9gHAryAn
-	CSY7JyqqMc6zr5baHftR/IwGZm3A5rNg53A/x5xfy2C7a/sP6XLFU7m4dUw/ZmkbYjPTCWr9tdA
-	BHf6r4Rgu0En/hJNVak=
-X-Received: by 2002:a05:6e02:1a24:b0:3d4:3d13:e5fc with SMTP id e9e14a558f8ab-3d46899f135mr3923675ab.5.1741640935361;
-        Mon, 10 Mar 2025 14:08:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEmNDJ2pRGpp9uY0mu1cCccVjJS8JHYTtTcVWJbMxUlnrc80/38LgZSUF0a1GBpMv/1LQn6Cw==
-X-Received: by 2002:a05:6e02:1a24:b0:3d4:3d13:e5fc with SMTP id e9e14a558f8ab-3d46899f135mr3923535ab.5.1741640935057;
-        Mon, 10 Mar 2025 14:08:55 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f21552b5d5sm2031142173.77.2025.03.10.14.08.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Mar 2025 14:08:53 -0700 (PDT)
-Date: Mon, 10 Mar 2025 15:08:50 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Yishai Hadas <yishaih@nvidia.com>
-Cc: <jgg@nvidia.com>, <mst@redhat.com>, <jasowang@redhat.com>,
- <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
- <parav@nvidia.com>, <israelr@nvidia.com>, <kevin.tian@intel.com>,
- <joao.m.martins@oracle.com>, <maorg@nvidia.com>
-Subject: Re: [PATCH V1 vfio] vfio/virtio: Enable support for virtio-block
- live migration
-Message-ID: <20250310150850.5d61a387.alex.williamson@redhat.com>
-In-Reply-To: <20250302162723.82578-1-yishaih@nvidia.com>
-References: <20250302162723.82578-1-yishaih@nvidia.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+        d=1e100.net; s=20230601; t=1741651719; x=1742256519;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PTvxJUlPBJjWMPlx3bz6qPMSvpnDhRXJlpzPDdfISJA=;
+        b=Jnu7i9xEjr+oHkdqqr8f0VxxWdR+7KoLJEvzI8ezYo6xjklcq/2ozHABxognpf63PO
+         AzcbUVLUgeLbf82imCj00L2CJuhNe4Q3hJbK5bb/AjtHUEo5apaRXADaopQSGYB/ZKA0
+         N/Yyms4VbdkqALbk/Iyk+o2ZMWXkdC073rGCgD6pSfOxAqVi3WizNNX/vNpMq94+kJPT
+         Q7moNEmLw2fjvfv5vJHwZ5uqIqNq8//mijOHe3pkBSBDuT9mn5PFRaigki5nEA3a9yW2
+         KymWgBxb9yK1ry3/oQa2/pwzsERdge8I+jcR//DiW0aEVcVMiWJFYV0+j0AxfNpJRoe+
+         gEQw==
+X-Forwarded-Encrypted: i=1; AJvYcCWnqYRWuNnJGYc4BClTshPgpRzFmpDdOnNJb8ZGD0f0GKaEmRbjyb6L5eCmHlPFnObk01Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWS4uDYnur/A68HD9BFmaosXwe4uH2B39kcqIEHTUBOO8LXTXn
+	NrXGADBROv+P6a2iXweBI66U7DMNt5/CsZ7hCSqwntEEPn2ppKdx/Rh8Fbw6SSc=
+X-Gm-Gg: ASbGncslVlgJ8t0On0koExjUNxsH8zBXMpLUmf2jH6E/7vbBFEQ5Lwh6dg34oPxPEy7
+	LXfRuOGBtORQfHFDE4qYh60mCwXhdJgw/6dFuljXKR8WeQf+oVRQlL314jlOLfYxIRFDURhE2Ww
+	AZYX5v6dGdGbVJweZJCGiao9ZfOpfz22DZbswkN6lZLe7eS93bg8rn8Ci37b/BJIum4BGFR9+Nb
+	8RlMFFAUcNb89RwP29AhJD5cbWwaMSmY42hlO6h4MwAjONhHPQ7nSPifVTuPctP0Uch7/CRSBDS
+	6U2H9v1pi0MNsqO5y4RO/ORTe511jRtsDODpLpZdsLi7GX9KveYhDxoNhw==
+X-Google-Smtp-Source: AGHT+IGi4aJraVBfVl/EoRE61kEiyTdmOlXjmvYO10+d4f3aT2ylBHqrXw1ypyhAFiauPBgYo5Y/4w==
+X-Received: by 2002:a17:90b:3c49:b0:2ee:e317:69ab with SMTP id 98e67ed59e1d1-2ff7cd62f6dmr28557548a91.0.1741651719455;
+        Mon, 10 Mar 2025 17:08:39 -0700 (PDT)
+Received: from [192.168.1.67] ([38.39.164.180])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30103449c84sm109325a91.1.2025.03.10.17.08.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Mar 2025 17:08:39 -0700 (PDT)
+Message-ID: <106877af-deff-4919-adad-698b4c09b85e@linaro.org>
+Date: Mon, 10 Mar 2025 17:08:38 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 02/16] exec/memory_ldst_phys: extract memory_ldst_phys
+ declarations from cpu-all.h
+Content-Language: en-US
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Alistair Francis <alistair.francis@wdc.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Harsh Prateek Bora <harshpb@linux.ibm.com>, alex.bennee@linaro.org,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Daniel Henrique Barboza <danielhb413@gmail.com>, kvm@vger.kernel.org,
+ Peter Xu <peterx@redhat.com>, Nicholas Piggin <npiggin@gmail.com>,
+ Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+ David Hildenbrand <david@redhat.com>, Weiwei Li <liwei1518@gmail.com>,
+ Paul Durrant <paul@xen.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Anthony PERARD <anthony@xenproject.org>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, manos.pitsidianakis@linaro.org,
+ qemu-riscv@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>
+References: <20250310045842.2650784-1-pierrick.bouvier@linaro.org>
+ <20250310045842.2650784-3-pierrick.bouvier@linaro.org>
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+In-Reply-To: <20250310045842.2650784-3-pierrick.bouvier@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Sun, 2 Mar 2025 18:27:23 +0200
-Yishai Hadas <yishaih@nvidia.com> wrote:
+On 3/9/25 21:58, Pierrick Bouvier wrote:
+> They are now accessible through exec/memory.h instead, and we make sure
+> all variants are available for common or target dependent code.
+> 
+> To allow this, we need to implement address_space_st{*}_cached, simply
+> forwarding the calls to _cached_slow variants.
+> 
 
-> With a functional and tested backend for virtio-block live migration,
-> add the virtio-block device ID to the pci_device_id table.
-> 
-> Currently, the driver supports legacy IO functionality only for
-> virtio-net, and it is accounted for in specific parts of the code.
-> 
-> To enforce this limitation, an explicit check for virtio-net, has been
-> added in virtiovf_support_legacy_io(). Once a backend implements legacy
-> IO functionality for virtio-block, the necessary support will be added
-> to the driver, and this additional check should be removed.
-> 
-> The module description was updated accordingly.
-> 
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+It's not needed, following inclusion will do it.
+
+#define ENDIANNESS
++#include "exec/memory_ldst_cached.h.inc"
+
+> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 > ---
-> Changes from V0:
-> https://lore.kernel.org/kvm/20250227155444.57354e74.alex.williamson@redhat.com/T/
+>   include/exec/cpu-all.h              | 15 ------------
+>   include/exec/memory.h               | 36 +++++++++++++++++++++++++++++
+>   include/exec/memory_ldst_phys.h.inc |  5 +---
+>   3 files changed, 37 insertions(+), 19 deletions(-)
 > 
-> - Replace "NET,BLOCK" with "NET and BLOCK" for readability, as was
->   suggested by Alex.
-> - Make the tristate summary more generic as was suggeted by Kevin and
->   Alex.
-> - Add Kevin Tian Reviewed-by clause.
-> 
->  drivers/vfio/pci/virtio/Kconfig     | 6 +++---
->  drivers/vfio/pci/virtio/legacy_io.c | 4 +++-
->  drivers/vfio/pci/virtio/main.c      | 5 +++--
->  3 files changed, 9 insertions(+), 6 deletions(-)
-
-Applied to vfio next branch for v6.15.  Thanks,
-
-Alex
+> diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+> index 17ea82518a0..1c2e18f492b 100644
+> --- a/include/exec/cpu-all.h
+> +++ b/include/exec/cpu-all.h
+> @@ -75,21 +75,6 @@ static inline void stl_phys_notdirty(AddressSpace *as, hwaddr addr, uint32_t val
+>                                  MEMTXATTRS_UNSPECIFIED, NULL);
+>   }
+>   
+> -#define SUFFIX
+> -#define ARG1         as
+> -#define ARG1_DECL    AddressSpace *as
+> -#define TARGET_ENDIANNESS
+> -#include "exec/memory_ldst_phys.h.inc"
+> -
+> -/* Inline fast path for direct RAM access.  */
+> -#define ENDIANNESS
+> -#include "exec/memory_ldst_cached.h.inc"
+> -
+> -#define SUFFIX       _cached
+> -#define ARG1         cache
+> -#define ARG1_DECL    MemoryRegionCache *cache
+> -#define TARGET_ENDIANNESS
+> -#include "exec/memory_ldst_phys.h.inc"
+>   #endif
+>   
+>   /* page related stuff */
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index 78c4e0aec8d..7c20f36a312 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -2798,6 +2798,42 @@ static inline void address_space_stb_cached(MemoryRegionCache *cache,
+>       }
+>   }
+>   
+> +static inline uint16_t address_space_lduw_cached(MemoryRegionCache *cache,
+> +    hwaddr addr, MemTxAttrs attrs, MemTxResult *result)
+> +{
+> +    return address_space_lduw_cached_slow(cache, addr, attrs, result);
+> +}
+> +
+> +static inline void address_space_stw_cached(MemoryRegionCache *cache,
+> +    hwaddr addr, uint16_t val, MemTxAttrs attrs, MemTxResult *result)
+> +{
+> +    address_space_stw_cached_slow(cache, addr, val, attrs, result);
+> +}
+> +
+> +static inline uint32_t address_space_ldl_cached(MemoryRegionCache *cache,
+> +    hwaddr addr, MemTxAttrs attrs, MemTxResult *result)
+> +{
+> +    return address_space_ldl_cached_slow(cache, addr, attrs, result);
+> +}
+> +
+> +static inline void address_space_stl_cached(MemoryRegionCache *cache,
+> +    hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result)
+> +{
+> +    address_space_stl_cached_slow(cache, addr, val, attrs, result);
+> +}
+> +
+> +static inline uint64_t address_space_ldq_cached(MemoryRegionCache *cache,
+> +    hwaddr addr, MemTxAttrs attrs, MemTxResult *result)
+> +{
+> +    return address_space_ldq_cached_slow(cache, addr, attrs, result);
+> +}
+> +
+> +static inline void address_space_stq_cached(MemoryRegionCache *cache,
+> +    hwaddr addr, uint64_t val, MemTxAttrs attrs, MemTxResult *result)
+> +{
+> +    address_space_stq_cached_slow(cache, addr, val, attrs, result);
+> +}
+> +
+>   #define ENDIANNESS   _le
+>   #include "exec/memory_ldst_cached.h.inc"
+>   
+> diff --git a/include/exec/memory_ldst_phys.h.inc b/include/exec/memory_ldst_phys.h.inc
+> index ecd678610d1..db67de75251 100644
+> --- a/include/exec/memory_ldst_phys.h.inc
+> +++ b/include/exec/memory_ldst_phys.h.inc
+> @@ -19,7 +19,6 @@
+>    * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+>    */
+>   
+> -#ifdef TARGET_ENDIANNESS
+>   static inline uint16_t glue(lduw_phys, SUFFIX)(ARG1_DECL, hwaddr addr)
+>   {
+>       return glue(address_space_lduw, SUFFIX)(ARG1, addr,
+> @@ -55,7 +54,7 @@ static inline void glue(stq_phys, SUFFIX)(ARG1_DECL, hwaddr addr, uint64_t val)
+>       glue(address_space_stq, SUFFIX)(ARG1, addr, val,
+>                                       MEMTXATTRS_UNSPECIFIED, NULL);
+>   }
+> -#else
+> +
+>   static inline uint8_t glue(ldub_phys, SUFFIX)(ARG1_DECL, hwaddr addr)
+>   {
+>       return glue(address_space_ldub, SUFFIX)(ARG1, addr,
+> @@ -139,9 +138,7 @@ static inline void glue(stq_be_phys, SUFFIX)(ARG1_DECL, hwaddr addr, uint64_t va
+>       glue(address_space_stq_be, SUFFIX)(ARG1, addr, val,
+>                                          MEMTXATTRS_UNSPECIFIED, NULL);
+>   }
+> -#endif
+>   
+>   #undef ARG1_DECL
+>   #undef ARG1
+>   #undef SUFFIX
+> -#undef TARGET_ENDIANNESS
 
 
