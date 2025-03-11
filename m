@@ -1,337 +1,211 @@
-Return-Path: <kvm+bounces-40755-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40756-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32999A5BC56
-	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 10:32:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 938EDA5BC77
+	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 10:41:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6507A174D76
-	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 09:32:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5F6817273F
+	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 09:41:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3127225A31;
-	Tue, 11 Mar 2025 09:32:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 147B322DFA5;
+	Tue, 11 Mar 2025 09:41:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tSK4mao4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HV3NHKVl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 842821E2312;
-	Tue, 11 Mar 2025 09:32:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B9ED22B5A8;
+	Tue, 11 Mar 2025 09:41:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741685548; cv=none; b=ppH3MlX/9AfCkCCSbCC+ZKUGt520K4Im6i5Rfi/B91gu7M7uyCIUQTyLI/TzBgk5BtqmTlumquo6IjRlaVFk0RYgVldVsLehAiWChfNrubMe+9rYFiMw6o9PWRUqceyZTm1EeCvfE2BU7ZfUaKFF/lYy6wyUXvjpsFGaxp+TiIM=
+	t=1741686086; cv=none; b=tClBVMkY/Ge48wGyfUZPS5w4xOzD7e6bI2XP92Z4Swl4rTj48mWtzQnRxxi41GCc41u+q6k/gaR4ftxrlegTBw2C9ngRvRMKEO0nY5sTH7tPiB1EbP2rcQJScOUAicrZhuJJSGUqucpFHArR0nm4gTC5RxA5KG1Pics/+1UcDWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741685548; c=relaxed/simple;
-	bh=86NBFuRadsVUmel+UiOUBCdQv1HrG0o3+CvP/y7JgRk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=V6xb/vnMbzxmwU8W2+/yMfzk+5yzAXfXeWzFEXqKp/fQjUVQTsYSygi0DC7YIHPgji5OuXABP6PDXgvf8xCchdL0CpenloQWYLZo5Wdfow4bRx/aANJKFEJ3Ri6n5i0aiSuoxrBQcP2Il7RfdSWg9h2t3VsY9qvx1ID7+Mrkdp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=tSK4mao4; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52B7oCeA015900;
-	Tue, 11 Mar 2025 09:32:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=86NBFu
-	RadsVUmel+UiOUBCdQv1HrG0o3+CvP/y7JgRk=; b=tSK4mao4KUwoOmAjNnVRSd
-	metRAR4FyJ8ev6EFsKuva3J59LXbycP4ibjfxxpCODbCNN0bmJzun5tQkAXMmC8A
-	JnEGR9QfDu9oa3PEct3prjLz0324Lu3hGzv/6pewsgYqg2rNih6+06whS7NA1zmV
-	k9yn6ZNv5F+R5ULJh5s6XH8q+T7QstjSOoVX+FcN7/ECA44iYU7mu8Egf138U2oZ
-	XlxAkYGEypf14AdOR9mby9tpgCv/4aawj3P5eUhO2TrN+OlCzBdd7Saqn1KS1gAd
-	AtpVWqqgc7UIZghKaGj1rpVZWUU/e2Y1nQrz+4SNwe4kIS/9fCy6Ow+U0GRR75UQ
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45a1gp544n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Mar 2025 09:32:16 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 52B8rPk4008649;
-	Tue, 11 Mar 2025 09:32:16 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45a1gp544f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Mar 2025 09:32:16 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52B6Sdi8022265;
-	Tue, 11 Mar 2025 09:32:15 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 45917nbddd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Mar 2025 09:32:15 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52B9WBTr39584246
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 11 Mar 2025 09:32:11 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8BD1D20043;
-	Tue, 11 Mar 2025 09:32:11 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6DE6520040;
-	Tue, 11 Mar 2025 09:32:07 +0000 (GMT)
-Received: from vaibhav?linux.ibm.com (unknown [9.39.19.180])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Tue, 11 Mar 2025 09:32:07 +0000 (GMT)
-Received: by vaibhav@linux.ibm.com (sSMTP sendmail emulation); Tue, 11 Mar 2025 15:02:06 +0530
-From: Vaibhav Jain <vaibhav@linux.ibm.com>
-To: Athira Rajeev <atrajeev@linux.ibm.com>
-Cc: linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, Madhavan Srinivasan <maddy@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin
- <npiggin@gmail.com>,
-        Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
-        sbhat@linux.ibm.com, gautam@linux.ibm.com, kconsul@linux.ibm.com,
-        amachhiw@linux.ibm.com, Athira Rajeev <atrajeev@linux.vnet.ibm.com>
-Subject: Re: [PATCH v4 6/6] powerpc/kvm-hv-pmu: Add perf-events for Hostwide
- counters
-In-Reply-To: <96795462-3AFA-4C90-9E63-ACB9AE3E66EE@linux.ibm.com>
-References: <20250224131522.77104-1-vaibhav@linux.ibm.com>
- <20250224131522.77104-7-vaibhav@linux.ibm.com>
- <96795462-3AFA-4C90-9E63-ACB9AE3E66EE@linux.ibm.com>
-Date: Tue, 11 Mar 2025 15:02:06 +0530
-Message-ID: <87ikofud49.fsf@vajain21.in.ibm.com>
+	s=arc-20240116; t=1741686086; c=relaxed/simple;
+	bh=GOKOd/OMoe0MpaKpHbszJNcD+QQKjKFDq+dV3uSywxM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mu9HR+Pm7wxUz/UPLG7GbQL5LfC6OiFX2CwQatrBA/J81wiylsaHSBLc/0L985LlnlIZ8+dD1MLB4yeqDPW9VqQidRGThnoWCYkS0/YWW/0Q01jAQjirXmKtvoZetJcG8eKbXcDUQVfHSqKL2It0x5MnXLdypa1RQbqbM0hIYzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HV3NHKVl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CFCFC4CEE9;
+	Tue, 11 Mar 2025 09:41:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741686085;
+	bh=GOKOd/OMoe0MpaKpHbszJNcD+QQKjKFDq+dV3uSywxM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HV3NHKVl8OcXBKi5oS+QCVHzEAVL27ic9HxurXAtRijfpI+k63r8BBYpBg1GV2uOy
+	 gxriENPt5T4eeO1FCMSeHnsGFr+tFfTwJcokOxEUI+ckNMtXvYb+maSw0GfNSc9dut
+	 QUmfzxiftOJmsYq8alp2ecldSXcpF2e0yi2pTX3ptgndujlS9J01iwfk7AZiCTM1rJ
+	 TDo3Ur20dBGIkl3o/HQvbgT56MYDHJXh1UB8yf134+Py0eGgwFWieDEw/RMuwWe5Ev
+	 sPJQ9QZNjYkgNofaGEaDf67FwLsWDZXzpJirE92Q6zzyYJnpS3DbgXT7eHdQPvG9qq
+	 e6ExeOpB+8KFg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1trw71-00CTXk-0C;
+	Tue, 11 Mar 2025 09:41:23 +0000
+Date: Tue, 11 Mar 2025 09:41:22 +0000
+Message-ID: <86y0xboqf1.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Zhenyu Ye <yezhenyu2@huawei.com>
+Cc: <yuzenghui@huawei.com>,
+	<will@kernel.org>,
+	<oliver.upton@linux.dev>,
+	<catalin.marinas@arm.com>,
+	<joey.gouly@arm.com>,
+	<linux-kernel@vger.kernel.org>,
+	<xiexiangyou@huawei.com>,
+	<zhengchuan@huawei.com>,
+	<wangzhou1@hisilicon.com>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<kvm@vger.kernel.org>,
+	<kvmarm@lists.linux.dev>
+Subject: Re: [PATCH v1 1/5] arm64/sysreg: add HDBSS related register information
+In-Reply-To: <20250311040321.1460-2-yezhenyu2@huawei.com>
+References: <20250311040321.1460-1-yezhenyu2@huawei.com>
+	<20250311040321.1460-2-yezhenyu2@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: SZrUU42cdm-4ApI_3zxQkdoYvz_n9hD6
-X-Proofpoint-ORIG-GUID: M5TteZ_w2XWaQS51ysCBLLkWMb8Nzryi
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-11_01,2025-03-11_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 clxscore=1015
- mlxlogscore=999 suspectscore=0 spamscore=0 impostorscore=0 bulkscore=0
- phishscore=0 malwarescore=0 priorityscore=1501 adultscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502100000 definitions=main-2503110064
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: yezhenyu2@huawei.com, yuzenghui@huawei.com, will@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com, joey.gouly@arm.com, linux-kernel@vger.kernel.org, xiexiangyou@huawei.com, zhengchuan@huawei.com, wangzhou1@hisilicon.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Athira Rajeev <atrajeev@linux.ibm.com> writes:
+On Tue, 11 Mar 2025 04:03:17 +0000,
+Zhenyu Ye <yezhenyu2@huawei.com> wrote:
+> 
+> From: eillon <yezhenyu2@huawei.com>
+> 
+> The ARM architecture added the HDBSS feature and descriptions of
+> related registers (HDBSSBR/HDBSSPROD) in the DDI0601(ID121123) version,
+> add them to Linux.
+> 
+> Signed-off-by: eillon <yezhenyu2@huawei.com>
+> ---
+>  arch/arm64/include/asm/esr.h          |  2 ++
+>  arch/arm64/include/asm/kvm_arm.h      |  1 +
+>  arch/arm64/include/asm/sysreg.h       |  4 ++++
+>  arch/arm64/tools/sysreg               | 28 +++++++++++++++++++++++++++
+>  tools/arch/arm64/include/asm/sysreg.h |  4 ++++
+>  5 files changed, 39 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+> index d1b1a33f9a8b..a33befe0999a 100644
+> --- a/arch/arm64/include/asm/esr.h
+> +++ b/arch/arm64/include/asm/esr.h
+> @@ -147,6 +147,8 @@
+>  #define ESR_ELx_CM 		(UL(1) << ESR_ELx_CM_SHIFT)
+>  
+>  /* ISS2 field definitions for Data Aborts */
+> +#define ESR_ELx_HDBSSF_SHIFT	(11)
+> +#define ESR_ELx_HDBSSF		(UL(1) << ESR_ELx_HDBSSF_SHIFT)
+>  #define ESR_ELx_TnD_SHIFT	(10)
+>  #define ESR_ELx_TnD 		(UL(1) << ESR_ELx_TnD_SHIFT)
+>  #define ESR_ELx_TagAccess_SHIFT	(9)
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index c2417a424b98..80793ef57f8b 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -122,6 +122,7 @@
+>  			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK)
+>  
+>  /* VTCR_EL2 Registers bits */
+> +#define VTCR_EL2_HDBSS		(1UL << 45)
+>  #define VTCR_EL2_DS		TCR_EL2_DS
+>  #define VTCR_EL2_RES1		(1U << 31)
+>  #define VTCR_EL2_HD		(1 << 22)
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 05ea5223d2d5..b727772c06fb 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -522,6 +522,10 @@
+>  #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
+>  
+>  #define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
+> +
+> +#define SYS_HDBSSBR_EL2			sys_reg(3, 4, 2, 3, 2)
+> +#define SYS_HDBSSPROD_EL2		sys_reg(3, 4, 2, 3, 3)
+> +
 
->> On 24 Feb 2025, at 6:45=E2=80=AFPM, Vaibhav Jain <vaibhav@linux.ibm.com>=
- wrote:
->>=20
->> Update 'kvm-hv-pmu.c' to add five new perf-events mapped to the five
->> Hostwide counters. Since these newly introduced perf events are at system
->> wide scope and can be read from any L1-Lpar CPU, 'kvmppc_pmu' scope and
->> capabilities are updated appropriately.
->>=20
->> Also introduce two new helpers. First is kvmppc_update_l0_stats() that u=
-ses
->> the infrastructure introduced in previous patches to issues the
->> H_GUEST_GET_STATE hcall L0-PowerVM to fetch guest-state-buffer holding t=
-he
->> latest values of these counters which is then parsed and 'l0_stats'
->> variable updated.
->>=20
->> Second helper is kvmppc_pmu_event_update() which is called from
->> 'kvmppv_pmu' callbacks and uses kvmppc_update_l0_stats() to update
->> 'l0_stats' and the update the 'struct perf_event's event-counter.
->>=20
->> Some minor updates to kvmppc_pmu_{add, del, read}() to remove some debug
->> scaffolding code.
->>=20
->> Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
->> ---
->> Changelog
->>=20
->> v3->v4:
->> * Minor tweaks to patch description and code as its now being built as a
->> separate kernel module.
->>=20
->> v2->v3:
->> None
->>=20
->> v1->v2:
->> None
->> ---
->> arch/powerpc/perf/kvm-hv-pmu.c | 92 +++++++++++++++++++++++++++++++++-
->> 1 file changed, 91 insertions(+), 1 deletion(-)
->>=20
->> diff --git a/arch/powerpc/perf/kvm-hv-pmu.c b/arch/powerpc/perf/kvm-hv-p=
-mu.c
->> index ed371454f7b5..274459bb32d6 100644
->> --- a/arch/powerpc/perf/kvm-hv-pmu.c
->> +++ b/arch/powerpc/perf/kvm-hv-pmu.c
->> @@ -30,6 +30,11 @@
->> #include "asm/guest-state-buffer.h"
->>=20
->> enum kvmppc_pmu_eventid {
->> + KVMPPC_EVENT_HOST_HEAP,
->> + KVMPPC_EVENT_HOST_HEAP_MAX,
->> + KVMPPC_EVENT_HOST_PGTABLE,
->> + KVMPPC_EVENT_HOST_PGTABLE_MAX,
->> + KVMPPC_EVENT_HOST_PGTABLE_RECLAIM,
->> KVMPPC_EVENT_MAX,
->> };
->>=20
->> @@ -61,8 +66,14 @@ static DEFINE_SPINLOCK(lock_l0_stats);
->> /* GSB related structs needed to talk to L0 */
->> static struct kvmppc_gs_msg *gsm_l0_stats;
->> static struct kvmppc_gs_buff *gsb_l0_stats;
->> +static struct kvmppc_gs_parser gsp_l0_stats;
->>=20
->> static struct attribute *kvmppc_pmu_events_attr[] =3D {
->> + KVMPPC_PMU_EVENT_ATTR(host_heap, KVMPPC_EVENT_HOST_HEAP),
->> + KVMPPC_PMU_EVENT_ATTR(host_heap_max, KVMPPC_EVENT_HOST_HEAP_MAX),
->> + KVMPPC_PMU_EVENT_ATTR(host_pagetable, KVMPPC_EVENT_HOST_PGTABLE),
->> + KVMPPC_PMU_EVENT_ATTR(host_pagetable_max, KVMPPC_EVENT_HOST_PGTABLE_MA=
-X),
->> + KVMPPC_PMU_EVENT_ATTR(host_pagetable_reclaim, KVMPPC_EVENT_HOST_PGTABL=
-E_RECLAIM),
->> NULL,
->> };
->>=20
->> @@ -71,7 +82,7 @@ static const struct attribute_group kvmppc_pmu_events_=
-group =3D {
->> .attrs =3D kvmppc_pmu_events_attr,
->> };
->>=20
->> -PMU_FORMAT_ATTR(event, "config:0");
->> +PMU_FORMAT_ATTR(event, "config:0-5");
->> static struct attribute *kvmppc_pmu_format_attr[] =3D {
->> &format_attr_event.attr,
->> NULL,
->> @@ -88,6 +99,79 @@ static const struct attribute_group *kvmppc_pmu_attr_=
-groups[] =3D {
->> NULL,
->> };
->>=20
->> +/*
->> + * Issue the hcall to get the L0-host stats.
->> + * Should be called with l0-stat lock held
->> + */
->> +static int kvmppc_update_l0_stats(void)
->> +{
->> + int rc;
->> +
->> + /* With HOST_WIDE flags guestid and vcpuid will be ignored */
->> + rc =3D kvmppc_gsb_recv(gsb_l0_stats, KVMPPC_GS_FLAGS_HOST_WIDE);
->> + if (rc)
->> + goto out;
->> +
->> + /* Parse the guest state buffer is successful */
->> + rc =3D kvmppc_gse_parse(&gsp_l0_stats, gsb_l0_stats);
->> + if (rc)
->> + goto out;
->> +
->> + /* Update the l0 returned stats*/
->> + memset(&l0_stats, 0, sizeof(l0_stats));
->> + rc =3D kvmppc_gsm_refresh_info(gsm_l0_stats, gsb_l0_stats);
->> +
->> +out:
->> + return rc;
->> +}
->> +
->> +/* Update the value of the given perf_event */
->> +static int kvmppc_pmu_event_update(struct perf_event *event)
->> +{
->> + int rc;
->> + u64 curr_val, prev_val;
->> + unsigned long flags;
->> + unsigned int config =3D event->attr.config;
->> +
->> + /* Ensure no one else is modifying the l0_stats */
->> + spin_lock_irqsave(&lock_l0_stats, flags);
->> +
->> + rc =3D kvmppc_update_l0_stats();
->> + if (!rc) {
->> + switch (config) {
->> + case KVMPPC_EVENT_HOST_HEAP:
->> + curr_val =3D l0_stats.guest_heap;
->> + break;
->> + case KVMPPC_EVENT_HOST_HEAP_MAX:
->> + curr_val =3D l0_stats.guest_heap_max;
->> + break;
->> + case KVMPPC_EVENT_HOST_PGTABLE:
->> + curr_val =3D l0_stats.guest_pgtable_size;
->> + break;
->> + case KVMPPC_EVENT_HOST_PGTABLE_MAX:
->> + curr_val =3D l0_stats.guest_pgtable_size_max;
->> + break;
->> + case KVMPPC_EVENT_HOST_PGTABLE_RECLAIM:
->> + curr_val =3D l0_stats.guest_pgtable_reclaim;
->> + break;
->> + default:
->> + rc =3D -ENOENT;
->> + break;
->> + }
->> + }
->> +
->> + spin_unlock_irqrestore(&lock_l0_stats, flags);
->> +
->> + /* If no error than update the perf event */
->> + if (!rc) {
->> + prev_val =3D local64_xchg(&event->hw.prev_count, curr_val);
->> + if (curr_val > prev_val)
->> + local64_add(curr_val - prev_val, &event->count);
->> + }
->> +
->> + return rc;
->> +}
->> +
->> static int kvmppc_pmu_event_init(struct perf_event *event)
->> {
->> unsigned int config =3D event->attr.config;
->> @@ -110,15 +194,19 @@ static int kvmppc_pmu_event_init(struct perf_event=
- *event)
->>=20
->> static void kvmppc_pmu_del(struct perf_event *event, int flags)
->> {
->> + /* Do nothing */
->> }
->
-> If we don=E2=80=99t read the counter stats in =E2=80=9Cdel=E2=80=9D call =
-back, we will loose the final count getting updated, right ?
-> Del callback needs to call kvmppc_pmu_read. Can you check the difference =
-in count stats by calling kvmppc_pmu_read here ?
->
+Why do you add this here? You have added these two new register to the
+sysreg file, which should be enough.
 
-Yes, agreed. Will address this in next version of the patch series
+>  #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
+>  #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
+>  #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
+> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> index 762ee084b37c..c2aea1e7fd22 100644
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
+> @@ -2876,6 +2876,34 @@ Sysreg	GCSPR_EL2	3	4	2	5	1
+>  Fields	GCSPR_ELx
+>  EndSysreg
+>  
+> +Sysreg	HDBSSBR_EL2	3	4	2	3	2
+> +Res0	63:56
+> +Field	55:12	BADDR
+> +Res0	11:4
+> +Enum	3:0	SZ
+> +	0b0001	8KB
+> +	0b0010	16KB
+> +	0b0011	32KB
+> +	0b0100	64KB
+> +	0b0101	128KB
+> +	0b0110	256KB
+> +	0b0111	512KB
+> +	0b1000	1MB
+> +	0b1001	2MB
+> +EndEnum
+> +EndSysreg
+> +
+> +Sysreg	HDBSSPROD_EL2	3	4	2	3	3
+> +Res0	63:32
+> +Enum	31:26	FSC
+> +	0b000000	OK
+> +	0b010000	ExternalAbort
+> +	0b101000	GPF
+> +EndEnum
+> +Res0	25:19
+> +Field	18:0	INDEX
+> +EndSysreg
+> +
+>  Sysreg	DACR32_EL2	3	4	3	0	0
+>  Res0	63:32
+>  Field	31:30	D15
+> diff --git a/tools/arch/arm64/include/asm/sysreg.h b/tools/arch/arm64/include/asm/sysreg.h
+> index 150416682e2c..95fc6a4ee655 100644
+> --- a/tools/arch/arm64/include/asm/sysreg.h
+> +++ b/tools/arch/arm64/include/asm/sysreg.h
+> @@ -518,6 +518,10 @@
+>  #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
+>  
+>  #define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
+> +
+> +#define SYS_HDBSSBR_EL2			sys_reg(3, 4, 2, 3, 2)
+> +#define SYS_HDBSSPROD_EL2		sys_reg(3, 4, 2, 3, 3)
+> +
 
-> Thanks
-> Athira
->
->>=20
->> static int kvmppc_pmu_add(struct perf_event *event, int flags)
->> {
->> + if (flags & PERF_EF_START)
->> + return kvmppc_pmu_event_update(event);
->> return 0;
->> }
->>=20
->> static void kvmppc_pmu_read(struct perf_event *event)
->> {
->> + kvmppc_pmu_event_update(event);
->> }
->>=20
->> /* Return the size of the needed guest state buffer */
->> @@ -302,6 +390,8 @@ static struct pmu kvmppc_pmu =3D {
->> .read =3D kvmppc_pmu_read,
->> .attr_groups =3D kvmppc_pmu_attr_groups,
->> .type =3D -1,
->> + .scope =3D PERF_PMU_SCOPE_SYS_WIDE,
->> + .capabilities =3D PERF_PMU_CAP_NO_EXCLUDE | PERF_PMU_CAP_NO_INTERRUPT,
->> };
->>=20
->> static int __init kvmppc_register_pmu(void)
->> --=20
->> 2.48.1
->>=20
->>=20
->>=20
->
->
+Same thing here.
 
---=20
-Cheers
-~ Vaibhav
+>  #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
+>  #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
+>  #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
