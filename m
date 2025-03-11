@@ -1,234 +1,275 @@
-Return-Path: <kvm+bounces-40783-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40784-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9362FA5CA24
-	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 17:02:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FB62A5CB68
+	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 17:57:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9061B3A9587
-	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 16:02:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 753023B8E25
+	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 16:56:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E4B525FA17;
-	Tue, 11 Mar 2025 16:02:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7CCC26137A;
+	Tue, 11 Mar 2025 16:57:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="1J+yBYLA"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="lbjV6Vna"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2046.outbound.protection.outlook.com [40.107.94.46])
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F3AE3594E
-	for <kvm@vger.kernel.org>; Tue, 11 Mar 2025 16:02:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741708938; cv=fail; b=mQILi3QYnZdC410qiISR6Z6kf+zlXSnCas7Zn0F4e+e8J4re15pl9BzdLO4y0l38mWMgw7EdG2EQI6fMU6oLEE+P/BpTvMeT4Sv0YLR0Kckqc/gs5ETUkrEgOw6Ycwe3qUJZAxJw3bn1WRUfOhLy4tO89KjztlozP/voTepMYFU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741708938; c=relaxed/simple;
-	bh=iSndnrRuvSztp9/zLO4ApIO6jQ6wfNBaqHIcwuRFSPY=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=XmQmL0SKyX+e8xBWQtUfPZw+o2tj7l8tYYVtNfsqLVxRJE4/ccoTY+sqRRH97Jxf0Ql4Undsv7uog2akSQ7BuYZiMJCqVfoRoqkLQJb88pjc8rn3GrAbvWJaXKKWwZ4TN1zvFD++GoMYoie7IVpF1xZOJ5+Q3pyG5fSPWwp6svg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=1J+yBYLA; arc=fail smtp.client-ip=40.107.94.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ndkhV1z5s58He7Zg3TBHW9Z06NzHTInJXOfwVw5weFw+wl1xbjOV0JvkicLI13tU3ltSvwzxI2l008u4iPCLAGf9geVDkUKhXMiRo4twO1I+PInBd2cGyiImNjhV4O9Be/RBEbU7DFG5bj+7fFJx7pOfNT4k4qzpRTQo6/6vk/TPFMM5cJmpJlUZp5IkNzKruTDI3XY4YAL8I/AMeT/St9385GnmRGjMFB8PX9kXkyKAzx2US/4cNp7qHU9slwY6KezAt28/D+NvpXVFeEQb9wufyI+jNq7REXk6ZiDEGi8giQejDNxthvctnDzxHEhv8jNVNdfNdEWS5158vtmuMA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gEuX2VPI9CBlgNxHKjuQSoA2pk8h54g1cDbuVnYM5h4=;
- b=uMKKC+O5k6eutqGUQj6/sBencd1diLoODc7EOA3R0IAFaSVVLuDFoI8fp+8Kw9LGiSiD+EOIRFZuXd0YownYMBX2zQ2nj089imiY2fHaF8NMtJ8wiGubyUS5L4wWajJDwA8VrPIHz3DbjFs95gNOED35Ff7SFlZwXL5/5rsdvVEFCdqmbrMnWc7P9HW+TTKHDBPNni0FGuLMT2n+v0CwbiuVRO73FIPRiU1CnS6x/OdeoaA2WXbiSTuxqNKHTqvHG4wQIOkPDuzkmdkPJXmEGus/EMfMCoAhYHOfqE2UajP3s12aLKYfoy/+C4OFU/icIJ63nV8vyawn0WX4/Pk6Ig==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gEuX2VPI9CBlgNxHKjuQSoA2pk8h54g1cDbuVnYM5h4=;
- b=1J+yBYLA/pX2OS0o2H8LBEWHy+LuZqMC6xo4Tpw/ru17oYPHZhLyCvNkXgzmRd303FfxyJgbRhRyYXA+BXl25QUbwOnaaQCKzqAGeB6DvfJtHlVrkF5+6kVKebJJN29TmxqGjS2EXloZQW3r9Ji94oD+a/TEMhgSBuwFbh4r4ZU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from CY5PR12MB6321.namprd12.prod.outlook.com (2603:10b6:930:22::20)
- by DS0PR12MB8072.namprd12.prod.outlook.com (2603:10b6:8:dd::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.27; Tue, 11 Mar
- 2025 16:02:12 +0000
-Received: from CY5PR12MB6321.namprd12.prod.outlook.com
- ([fe80::62e5:ecc4:ecdc:f9a0]) by CY5PR12MB6321.namprd12.prod.outlook.com
- ([fe80::62e5:ecc4:ecdc:f9a0%4]) with mapi id 15.20.8511.026; Tue, 11 Mar 2025
- 16:02:12 +0000
-Message-ID: <dd48e6ea-3f85-474b-8c08-7faad7c07e51@amd.com>
-Date: Tue, 11 Mar 2025 21:32:05 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 5/5] KVM: SVM: Enable Secure TSC for SNP guests
-To: Sean Christopherson <seanjc@google.com>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>, pbonzini@redhat.com,
- kvm@vger.kernel.org, santosh.shukla@amd.com, bp@alien8.de,
- isaku.yamahata@intel.com
-References: <20250310063938.13790-1-nikunj@amd.com>
- <20250310064522.14100-1-nikunj@amd.com>
- <20250310064522.14100-4-nikunj@amd.com>
- <5ac9fdb6-cbc5-2669-28fa-f178556449ca@amd.com>
- <cc076754-f465-426b-b404-1892d26e8f23@amd.com>
- <d92856e0-cc43-4c51-88c7-65f4c70424bf@amd.com>
- <0d121f41-a31d-1c0b-22cb-9533dd983b8a@amd.com> <Z9BOEtM6bm-ng68c@google.com>
- <73c6c8ea-93a0-4e2b-b5fe-74ea972b1a2c@amd.com> <Z9Bcceu2755QY7cS@google.com>
-Content-Language: en-US
-From: "Nikunj A. Dadhania" <nikunj@amd.com>
-In-Reply-To: <Z9Bcceu2755QY7cS@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2PR02CA0014.apcprd02.prod.outlook.com
- (2603:1096:3:17::26) To CY5PR12MB6321.namprd12.prod.outlook.com
- (2603:10b6:930:22::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C953184F;
+	Tue, 11 Mar 2025 16:56:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741712220; cv=none; b=IkloNwa0A3QujEplnpPJk+PZH54gMMm4b+Qpq5lKmOer4hO88nANbFuQIyVSspSbkb+btRL0ZZrzmIiQeM0RWY2725oVii7FuqPvMZGfjtuYhtjE0gU0AB/zALFmk8T13bX2Q8nY4DL3/hDznYThvabti2FUuPzEqIRqur0XEpQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741712220; c=relaxed/simple;
+	bh=nDMt8eiwz7+zam9WwPXd2KG0XnvM1fHkqQ7RgCtM+vA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=ZNST/oMdN0+akNSbFu7MfKLU8PoTxJqokakPIPwJ0TBUaRRfv7hMjyz1RK5bFu2FfFDLYoEElbhrQNwL0QJwBF/OiRrHq8vJvftCk6bNDanhlNeGIu/ooBZW+Xaujfm6U0gMvWdiED6R/fqiT7KoQM5CleJ7zIofLhdCpIH/LVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=lbjV6Vna; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1741712219; x=1773248219;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=tlV9Mo9aek/qm0du1iKz9kkFBfH6SyE9Qgk2PjqxtjE=;
+  b=lbjV6VnaIXFhjHX8QYJsT9wL0C7i3XdJzLBucFTccLiaqePr6YNfELW+
+   vKhWBa0V5M2L39XbwgJc9gqU+3P8MGbY1gTJxdQsnIIYA26ri5r9cRAnS
+   IbnDJqKAAVcZ/0ZPhUwMob0ebmjzq3sUBsbb+MRzvFwyGfkLFtMYR5SrV
+   E=;
+X-IronPort-AV: E=Sophos;i="6.14,239,1736812800"; 
+   d="scan'208";a="385729533"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2025 16:56:50 +0000
+Received: from EX19MTAEUA002.ant.amazon.com [10.0.17.79:6023]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.26.251:2525] with esmtp (Farcaster)
+ id f548cd40-c792-49af-ad1d-1f5d23f80cf5; Tue, 11 Mar 2025 16:56:49 +0000 (UTC)
+X-Farcaster-Flow-ID: f548cd40-c792-49af-ad1d-1f5d23f80cf5
+Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
+ EX19MTAEUA002.ant.amazon.com (10.252.50.126) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 11 Mar 2025 16:56:49 +0000
+Received: from [10.95.111.253] (10.95.111.253) by
+ EX19D022EUC002.ant.amazon.com (10.252.51.137) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 11 Mar 2025 16:56:48 +0000
+Message-ID: <9e7536cc-211d-40ca-b458-66d3d8b94b4d@amazon.com>
+Date: Tue, 11 Mar 2025 16:56:47 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR12MB6321:EE_|DS0PR12MB8072:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3d602e9d-548a-4d0b-5efe-08dd60b61595
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?bWlMM0tvWlhzV0QvZ1Z5NW43WkFGWVRoekFEdktXeEZCZll2dTFZdTQrS2VT?=
- =?utf-8?B?eEhYcFhHVSs5bXlWVXE4dEE3ZjJVUk01WU82NEE5Ump1T3hXTVU2S0NRRzZR?=
- =?utf-8?B?K3YxRDlNNC8wUzZMSncvTVJsNVRwM2JaSFYxM0V1Vjl6WEpjWVNLcVZOcnZZ?=
- =?utf-8?B?cnI5MVBoRlc2YU1HbHpZNnpFU0dQSkg1eVFXckpDNU9xWG9XTHlkWCtQVUx0?=
- =?utf-8?B?TmdIUTBRMFYwcDRlWUVvZ3ZLNEpzN2pzZEljdVZ4RVMvQTV2dWFieVVnaitU?=
- =?utf-8?B?Rmt4QnZQaEw1K2h2R2F1Z3daaUhrYmxMVm9tTUYwQ0pWREtjcjlhWUg3a0VS?=
- =?utf-8?B?aHB4V0gxMys4bkJqa3FxUGs2T3FmR3ZhWWY4NU4wdFBlK1l6MTI1V21kMUc4?=
- =?utf-8?B?THRnZnJWbnJ4ZllGaldLUDc4YXNkdjlBTkNxbUUzaGxUOXJ0NE5RQ3BYa1dw?=
- =?utf-8?B?RjEzM3ZLanV6L21rUmRocFRRM1JzYnFHOEF0RHNDbjJGNVdjZVdEU0V5S3M0?=
- =?utf-8?B?SkRJUlVwOTdTNGQxUkV5WldaRFl5c2VQVUQzMHpEUXkxZnFXbEk4Yk5jZ2hz?=
- =?utf-8?B?OElybGM4dHBObGFvUlZTZHdmd2FYemZ6YytvRXJqYnArclcvOFhuWERFQWRV?=
- =?utf-8?B?MWgxRHFHNFdZWWF4dmJ6WUtkWE11Y01xWjB4aTJHdmxlRVcrakdSVThaUllK?=
- =?utf-8?B?d3F2SU5HeXFISkV0eTIwWTRMK2F2ai9BcXRJeitQdGhLTkQxOUNpbGtUdERY?=
- =?utf-8?B?YTY2blhXaUZvbTNjTmxpc0NmN0FWVW9kdnlxOEdTdDR1d2tSTjF4VE1GRU96?=
- =?utf-8?B?elVMOVhVVDR0VVdWaXZtZ2xabXV0MkE4Y3NGUjFFYlNFZ2JvUjVGQU5DUkJG?=
- =?utf-8?B?V2djRnpaTXZwZWRkN0UwNFZWVlZvbzZIV0dFRUpkcGRzSThqdm9EK3g4QzJq?=
- =?utf-8?B?TmgvdzZ0MnFMUXc1VjA3b1VnZ2hPalkwWW5sSitNTFRVUHFCdEx2TVI3WFhK?=
- =?utf-8?B?b0s5ajZsT1NYQ1dGTGw2MWVBQmtjdDBlLzUyMEtpUFhVZHlEWXFXc3dNWlJm?=
- =?utf-8?B?Y2R2Q0ZwSjZLdDVsOUJGK0N0ZzVlb0xkV2NrZ2dWUGE2Sm9RMUREd3QvVHdk?=
- =?utf-8?B?TnBnVER3eGswZzlpYmVIekp6NzlLMjA5WFhOb3kzY1J3WVRTTlV4eGZUWUdx?=
- =?utf-8?B?Y3d0am91UWxtZFdNUmxyVU5aZkYxUHBsS3BwdXpnZ0ZTVld5aStVSXk0VGcx?=
- =?utf-8?B?Uld4bFpWT1JreW1sM1kvUXJSMlZCVkR0cEphOXRVUWZBem11MU5ZdGx5ZUZs?=
- =?utf-8?B?RFM5RzJKWjlpNlJkNjZvcUZ0OUZsMjNZSWQ4MU1pMlNzTHowZUE0SnFaMGV3?=
- =?utf-8?B?Vk5tcHNVVGZPbm1ENWtLZi9iNi95bHpJRnVnU3A5MlpKcHF5ZmMrTkpIN3hj?=
- =?utf-8?B?MGcwcTd0SGd4cEpRa3hQOEJpMksvanRwQ25mNDhZU2RxQWE4OUgyc3RsLzcx?=
- =?utf-8?B?bXJiZDk3eUhIUWtsaitET2FNZkxiTlVuRHhOalhyazU3UEdlZkhCcUhKdjJQ?=
- =?utf-8?B?Yzlza05iT3JMTHNGbS9xdmdySzYrN2E0dFU3M0R2WTFpVEFEU3Q4Z25XakxX?=
- =?utf-8?B?L0Z5aFRFOUVhclNkdHY1K05sd1QxZnBZd0JndlNCNUlmU1BiODJlK3RJL1VR?=
- =?utf-8?B?dGtvdDVxWXdZbGZqNEZFRDZHclFFK1R1bFNwQXFoc29hTFlXZHJMVnVuV2VO?=
- =?utf-8?B?VWpFWS9URzVtMXQzWDRBS2laejZ1SHlaamZOQWxYRWZvMG5yYi9YSW5Yd2xv?=
- =?utf-8?B?WkxRdWQwZ1RWa1ZvVE8yTkhOR1A1MEcrZ294SWQ2WkdSc2lhaXhxSkhvYml0?=
- =?utf-8?Q?VJHfCXWjtkgRZ?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6321.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Q0V5VE1PeTFDanNKUzNocGZ3MmkrdzFFQnJLOE1paDgwSkt6aXgzWGYzZXE5?=
- =?utf-8?B?UUk5ZitGeUQ1dTlnc05xR2phV1N5WTdYVGxGVmYreCtpdG1CVXNmbkNnKzdY?=
- =?utf-8?B?SVdOUFJaN2svSmpHMzVNRHJjUUR1MUJYemd5d1lJZkJJNFNDdnNJS0JzbjFU?=
- =?utf-8?B?YVdRMWtZUGg1OG8yMFlFMGR6YitKTmdyd0h1MFFyZmszK3EyRnkwa0JSZUpJ?=
- =?utf-8?B?aUphTzUxdm8rekRSZE9CZ3RMMXo1L1pFb0hialJiT1VFdGlHUjRNTmJtaUJw?=
- =?utf-8?B?bWVxcENyMUdQMHB0MkVOa1p6T3gzRVFRdjJVbHpzUHBSejdQWWNiUXlzVDZL?=
- =?utf-8?B?REFQc1I0YmQzZzErNTQvZWw2ZFF5R0JvWVJJYjludnBQZGdaYVBIL2p3WHNm?=
- =?utf-8?B?TDRycjdLOS9ZNTdUa2pjd3o2eWI0aUJFc3EyTE9yV25OTUpwb0xpY2FOUGFP?=
- =?utf-8?B?M044OWQ3NUpLTWNmVExkL3NWUHorQUlRU09jbENLRGU0aDdOYXB4N2dsMkU3?=
- =?utf-8?B?TmwxVzNNSC9yWnIyb3RtMWxxQ1RDR2JHTjFIV04zUDZCMUF3NStOdzJNc2w1?=
- =?utf-8?B?RVlidlZ6OU9rQUJnelNJOGpiaE0yYmk0b0VsdEJwRk9ZTVpqRGJhTzduSk1q?=
- =?utf-8?B?bTNVOVNSWEx4MmVJWkZBRE8rUk00ckQ0RDA0UmhYZ1FMZkc0UDZsR1VTMHFZ?=
- =?utf-8?B?aGEvWFdZTjdRRXBWUTFLRHFOWmE3c2JaaXBOOWppeENzTjRFZGtIekY2Lzdu?=
- =?utf-8?B?Szg4dk1YWHJYTzlBWDZLOTNJV1dObUxnVzkwZ0FuNVZQQ2o5ZjFBTjNJdUpD?=
- =?utf-8?B?cG0zUXM2dkhqSmN1elY1OXJOMGJGbG5DWkQrQ0JKRFNJVjlwanJGV3VJd2xy?=
- =?utf-8?B?K3dnRm05QlRzRnNJa0lVTUYvcWxvMWNNR1AwTFpyVzhoK3oxNTFvdVhUNmMy?=
- =?utf-8?B?RWlRNFRFSEVMdDY1eVlwemNvaWZ3U2t6VWU4NVJjcFdoT2dBY09xWUJjWlRN?=
- =?utf-8?B?U0dMNmluMStkOVdzWXhCQjRTTTFoTDNpMU9BNDVGcjkvT0hxMmxUREdmdzk5?=
- =?utf-8?B?eTFXdkQ5MmpzMTZwVlUyQm1Say9uRFA3RmtxZ2NMc1Blc1hWS20rNXdUSTds?=
- =?utf-8?B?b0k4QjhuU0R4SVl4UzZpaXFGci9SVkVwQUpWcTJESEwwVENucjFvdDg4ODJN?=
- =?utf-8?B?a0Juc1E2cGcvS0R1RFg5cVRDTnprTURYRnNqejVaOXZhVU5CWTY2eEtUd2FF?=
- =?utf-8?B?bkF6Ymd5d0NoZWZHVnpBRUo5eUtIcFVQNTRLcUwrUklKNE5qTkpyUHBLV1hG?=
- =?utf-8?B?WG10bkIrTzJWRFJHc2ZmSldBdDF4Z0hoN0hhK1FEVXJ6Tlg5VG1pWFBxVVU5?=
- =?utf-8?B?NUxNZjVBeVJQTkM3d3h4aHB0NkRlQ3VsYzZzdHh0NlZiT2NRdERHaGlJa1RE?=
- =?utf-8?B?dkt4T1p6eS8zK1NPNVpSZU1ldkp2WGg5R0wvWWRSQ1dpUGl5anhmOUNaOTBv?=
- =?utf-8?B?N0kwNTZ5NDFUUjFFMjJFcWIwMjFjaXdGbVB0UVFKWVpodGEvZVpGdFVrSkZN?=
- =?utf-8?B?bXVVK0x6eXhQSmlXWFd5bzNsdUtDcG9rdlJ4U0tUOG5kUWhLUkVMV0FiNkVO?=
- =?utf-8?B?dy9SK20zR3lxalZyek10anlTY29PSUtKQnlnbGFFVWVuZ252VWZ6blhEWmNi?=
- =?utf-8?B?WDZyaFk2aEZrSVZkaml1VHpZSE5SaEdVS1l3UEJqV1NMLzZ4MWo0aDFEVDZY?=
- =?utf-8?B?cTM3bjNtN1lWWGhnYlAwUTVhU1FEQit1NlBjd05mUi9tTDgxR0VYV1VCVGZP?=
- =?utf-8?B?N0lYVWVuWkw4Y21obDZiSDBEbUh0Y3ZuZW04ejlHWmgzdms3NzNVZlQrTVJx?=
- =?utf-8?B?VEd1VVQzZkJ1M20zZmFsTnQwb3JqS0ZHenJ2dVZRK1RtcnFydWZBR2J4VnNt?=
- =?utf-8?B?MURhOXM2bzF4MmJab2ZxZGIxenZrbHdLREg4cndoYlNNc2p3N1pnYXhjclU4?=
- =?utf-8?B?TnQzTGQ1UkR2UzFOeFdvN3ZGMlN6a1VJVDdCM1ZRaFFCV3VQeTlvb0dod3dk?=
- =?utf-8?B?M2dtWHF1UjByYTI3cEUzWU1pMW1xUDY5ek42ZXl3UjY3b1VDRHBORXVEODhj?=
- =?utf-8?Q?HU/f7evouulSkpenswYC5bvvC?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3d602e9d-548a-4d0b-5efe-08dd60b61595
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6321.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2025 16:02:12.1881
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uvjKDBmDAwuJg0pwaoju1ENlDC95WevXHR4+c6QcB4Ymwhae3S0mNf9hRHQbimufI/uVRfQeY5TFh5FT1aggGg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8072
+User-Agent: Mozilla Thunderbird
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [RFC PATCH 0/5] KVM: guest_memfd: support for uffd missing
+To: Peter Xu <peterx@redhat.com>
+CC: James Houghton <jthoughton@google.com>, <akpm@linux-foundation.org>,
+	<pbonzini@redhat.com>, <shuah@kernel.org>, <kvm@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-mm@kvack.org>, <lorenzo.stoakes@oracle.com>, <david@redhat.com>,
+	<ryan.roberts@arm.com>, <quic_eberman@quicinc.com>, <graf@amazon.de>,
+	<jgowans@amazon.com>, <roypat@amazon.co.uk>, <derekmn@amazon.com>,
+	<nsaenz@amazon.es>, <xmarcalx@amazon.com>
+References: <20250303133011.44095-1-kalyazin@amazon.com>
+ <Z8YfOVYvbwlZST0J@x1.local>
+ <CADrL8HXOQ=RuhjTEmMBJrWYkcBaGrqtXmhzPDAo1BE3EWaBk4g@mail.gmail.com>
+ <Z8i0HXen8gzVdgnh@x1.local> <fdae95e3-962b-4eaf-9ae7-c6bd1062c518@amazon.com>
+ <Z89EFbT_DKqyJUxr@x1.local>
+Content-Language: en-US
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
+ CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
+ i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
+In-Reply-To: <Z89EFbT_DKqyJUxr@x1.local>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D010EUA004.ant.amazon.com (10.252.50.94) To
+ EX19D022EUC002.ant.amazon.com (10.252.51.137)
 
 
 
-On 3/11/2025 9:23 PM, Sean Christopherson wrote:
-> On Tue, Mar 11, 2025, Nikunj A. Dadhania wrote:
+On 10/03/2025 19:57, Peter Xu wrote:
+> On Mon, Mar 10, 2025 at 06:12:22PM +0000, Nikita Kalyazin wrote:
 >>
 >>
->> On 3/11/2025 8:22 PM, Sean Christopherson wrote:
->>> On Tue, Mar 11, 2025, Tom Lendacky wrote:
->>>> On 3/11/25 06:05, Nikunj A. Dadhania wrote:
->>>>> On 3/11/2025 2:41 PM, Nikunj A. Dadhania wrote:
->>>>>> On 3/10/2025 9:09 PM, Tom Lendacky wrote:
->>>>>>> On 3/10/25 01:45, Nikunj A Dadhania wrote:
->>>>>>
->>>>>>>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
->>>>>>>> index 50263b473f95..b61d6bd75b37 100644
->>>>>>>> --- a/arch/x86/kvm/svm/sev.c
->>>>>>>> +++ b/arch/x86/kvm/svm/sev.c
->>>>>>>> @@ -2205,6 +2205,20 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
->>>>>>>>  
->>>>>>>>  	start.gctx_paddr = __psp_pa(sev->snp_context);
->>>>>>>>  	start.policy = params.policy;
->>>>>>>> +
->>>>>>>> +	if (snp_secure_tsc_enabled(kvm)) {
->>>>>>>> +		u32 user_tsc_khz = params.desired_tsc_khz;
->>>>>>>> +
->>>>>>>> +		/* Use tsc_khz if the VMM has not provided the TSC frequency */
->>>>>>>> +		if (!user_tsc_khz)
->>>>>>>> +			user_tsc_khz = tsc_khz;
->>>>>>>> +
->>>>>>>> +		start.desired_tsc_khz = user_tsc_khz;
+>> On 05/03/2025 20:29, Peter Xu wrote:
+>>> On Wed, Mar 05, 2025 at 11:35:27AM -0800, James Houghton wrote:
+>>>> I think it might be useful to implement an fs-generic MINOR mode. The
+>>>> fault handler is already easy enough to do generically (though it
+>>>> would become more difficult to determine if the "MINOR" fault is
+>>>> actually a MISSING fault, but at least for my userspace, the
+>>>> distinction isn't important. :)) So the question becomes: what should
+>>>> UFFDIO_CONTINUE look like?
+>>>>
+>>>> And I think it would be nice if UFFDIO_CONTINUE just called
+>>>> vm_ops->fault() to get the page we want to map and then mapped it,
+>>>> instead of having shmem-specific and hugetlb-specific versions (though
+>>>> maybe we need to keep the hugetlb specialization...). That would avoid
+>>>> putting kvm/gmem/etc. symbols in mm/userfaultfd code.
+>>>>
+>>>> I've actually wanted to do this for a while but haven't had a good
+>>>> reason to pursue it. I wonder if it can be done in a
+>>>> backwards-compatible fashion...
 >>>
->>> The code just below this clobbers kvm->arch.default_tsc_khz, which could already
->>> have been set by userspace.  Why?  Either require params.desired_tsc_khz to match
->>> kvm->arch.default_tsc_khz, or have KVM's ABI be that KVM stuffs desired_tsc_khz
->>> based on kvm->arch.default_tsc_khz.  I don't see any reason to add yet another
->>> way to control TSC.
+>>> Yes I also thought about that. :)
 >>
->> Setting of the desired TSC frequency needs to be done during SNP_LAUNCH_START,
->> while parsing of the tsc-frequency happens as part of the cpu common class, 
->> and kvm->arch.default_tsc_khz is set pretty late.
+>> Hi Peter, hi James.  Thanks for pointing at the race condition!
+>>
+>> I did some experimentation and it indeed looks possible to call
+>> vm_ops->fault() from userfault_continue() to make it generic and decouple
+>> from KVM, at least for non-hugetlb cases.  One thing is we'd need to prevent
+>> a recursive handle_userfault() invocation, which I believe can be solved by
+>> adding a new VMF flag to ignore the userfault path when the fault handler is
+>> called from userfault_continue().  I'm open to a more elegant solution
+>> though.
 > 
-> That's a QEMU problem, not a KVM problem, no?
+> It sounds working to me.  Adding fault flag can also be seen as part of
+> extension of vm_operations_struct ops.  So we could consider reusing
+> fault() API indeed.
 
-Yes.
+Great!
 
-I had missed that KVM_CAP_SET_TSC_KHZ can be a VM ioctl as well when
-KVM_CAP_VM_TSC_CONTROL is set. Let me use this interface to set the TSC frequency 
-and then during SNP_LAUNCH_START use kvm->arch.default_tsc_khz when using SecureTSC.
+>>
+>> Regarding usage of the MINOR notification, in what case do you recommend
+>> sending it?  If following the logic implemented in shmem and hugetlb, ie if
+>> the page is _present_ in the pagecache, I can't see how it is going to work
+> 
+> It could be confusing when reading that chunk of code, because it looks
+> like it notifies minor fault when cache hit. But the critical part here is
+> that we rely on the pgtable missing causing the fault() to trigger first.
+> So it's more like "cache hit && pgtable missing" for minor fault.
 
-Does that sound ok?
+Right, but the cache hit still looks like a precondition for the minor 
+fault event?
 
-Regards,
-Nikunj
+>> with the write syscall, as we'd like to know when the page is _missing_ in
+>> order to respond with the population via the write.  If going against
+>> shmem/hugetlb logic, and sending the MINOR event when the page is missing
+>> from the pagecache, how would it solve the race condition problem?
+> 
+> Should be easier we stick with mmap() rather than write().  E.g. for shmem
+> case of current code base:
+> 
+>          if (folio && vma && userfaultfd_minor(vma)) {
+>                  if (!xa_is_value(folio))
+>                          folio_put(folio);
+>                  *fault_type = handle_userfault(vmf, VM_UFFD_MINOR);
+>                  return 0;
+>          }
+> 
+> vma is only availble if vmf!=NULL, aka in fault context.  With that, in
+> write() to shmem inodes, nothing will generate a message, because minor
+> fault so far is only about pgtable missing.  It needs to be mmap()ed first,
+> and has nothing yet to do with write() syscalls.
+
+Yes, that's true that write() itself isn't going to generate a message. 
+My idea was to _respond_ to a message generated by the fault handler 
+(vmf != NULL) with a write().  I didn't mean to generate it from write().
+
+What I wanted to achieve was send a message on fault + cache miss and 
+respond to the message with a write() to fill the cache followed by a 
+UFFDIO_CONTINUE to set up pagetables.  I understand that a MINOR trap 
+(MINOR + UFFDIO_CONTINUE) is preferable, but how does it fit into this 
+model?  What/how will guarantee a cache hit that would trigger the MINOR 
+message?
+
+To clarify, I would like to be able to populate pages _on-demand_, not 
+only proactively (like in the original UFFDIO_CONTINUE cover letter 
+[1]).  Do you think the MINOR trap could still be applicable or would it 
+necessarily require the MISSING trap?
+
+[1] 
+https://lore.kernel.org/linux-fsdevel/20210301222728.176417-1-axelrasmussen@google.com/T/
+
+>>
+>> Also, where would the check for the folio_test_uptodate() mentioned by James
+>> fit into here?  Would it only be used for fortifying the MINOR (present)
+>> against the race?
+>>
+>>> When Axel added minor fault, it's not a major concern as it's the only fs
+>>> that will consume the feature anyway in the do_fault() path - hugetlbfs has
+>>> its own path to take care of.. even until now.
+>>>
+>>> And there's some valid points too if someone would argue to put it there
+>>> especially on folio lock - do that in shmem.c can avoid taking folio lock
+>>> when generating minor fault message.  It might make some difference when
+>>> the faults are heavy and when folio lock is frequently taken elsewhere too.
+>>
+>> Peter, could you expand on this?  Are you referring to the following
+>> (shmem_get_folio_gfp)?
+>>
+>>        if (folio) {
+>>                folio_lock(folio);
+>>
+>>                /* Has the folio been truncated or swapped out? */
+>>                if (unlikely(folio->mapping != inode->i_mapping)) {
+>>                        folio_unlock(folio);
+>>                        folio_put(folio);
+>>                        goto repeat;
+>>                }
+>>                if (sgp == SGP_WRITE)
+>>                        folio_mark_accessed(folio);
+>>                if (folio_test_uptodate(folio))
+>>                        goto out;
+>>                /* fallocated folio */
+>>                if (sgp != SGP_READ)
+>>                        goto clear;
+>>                folio_unlock(folio);
+>>                folio_put(folio);
+>>        }
+>>
+>> Could you explain in what case the lock can be avoided?  AFAIC, the function
+>> is called by both the shmem fault handler and userfault_continue().
+> 
+> I think you meant the UFFDIO_CONTINUE side of things.  I agree with you, we
+> always need the folio lock.
+> 
+> What I was saying is the trapping side, where the minor fault message can
+> be generated without the folio lock now in case of shmem.  It's about
+> whether we could generalize the trapping side, so handle_mm_fault() can
+> generate the minor fault message instead of by shmem.c.
+> 
+> If the only concern is "referring to a module symbol from core mm", then
+> indeed the trapping side should be less of a concern anyway, because the
+> trapping side (when in the module codes) should always be able to reference
+> mm functions.
+> 
+> Actually.. if we have a fault() flag introduced above, maybe we can
+> generalize the trap side altogether without the folio lock overhead.  When
+> the flag set, if we can always return the folio unlocked (as long as
+> refcount held), then in UFFDIO_CONTINUE ioctl we can lock it.
+
+Where does this locking happen exactly during trapping?  I was thinking 
+it was only done when the page was allocated.  The trapping part (quoted 
+by you above) only looks up the page in the cache and calls 
+handle_userfault().  Am I missing something?
+
+>>
+>>> It might boil down to how many more FSes would support minor fault, and
+>>> whether we would care about such difference at last to shmem users. If gmem
+>>> is the only one after existing ones, IIUC there's still option we implement
+>>> it in gmem code.  After all, I expect the change should be very under
+>>> control (<20 LOCs?)..
+>>>
+>>> --
+>>> Peter Xu
+>>>
+>>
+> 
+> --
+> Peter Xu
+> 
 
 
