@@ -1,221 +1,337 @@
-Return-Path: <kvm+bounces-40754-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40755-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0D7DA5BBCC
-	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 10:13:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32999A5BC56
+	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 10:32:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 349863A979A
-	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 09:13:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6507A174D76
+	for <lists+kvm@lfdr.de>; Tue, 11 Mar 2025 09:32:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ACD4238169;
-	Tue, 11 Mar 2025 09:11:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3127225A31;
+	Tue, 11 Mar 2025 09:32:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="QRSsn3zv"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tSK4mao4"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2076.outbound.protection.outlook.com [40.107.92.76])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5437236457
-	for <kvm@vger.kernel.org>; Tue, 11 Mar 2025 09:11:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.76
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741684286; cv=fail; b=nGEKTQuAtQuMF9/NJJjBKtsNqZitHQ5vyQReVMamgelwAMV+Ix1PVPMZwSKBekd0IFLs48+jTvOG2B1pEr/jWS1eZjy4pLzJMFc0X3sSB6iLjs3VqDyjCft5JyQl0zR45P7Eg7UrJrDFE33S2ArF178AX2hED0hQH4nE+nRC9QU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741684286; c=relaxed/simple;
-	bh=xJPL+3TddTjgv4MxM4A35eE0GdCTI3fQZb89hFjOIlE=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=skdqTrfOxqiKy80dvs3pxJsytestDWXoBwErnwzZPUJnB063JEwEhxSyxzSVjZC7E9UOEN7cnPVxd5GYPR8dYKdnoNDnkAT6AWtwBNrLLC6yBNixCV5ozeeFaxvZoyYL/uYDqx/RgVnThCdRA7h6423UIP5UkfMsae0AESBoC8E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=QRSsn3zv; arc=fail smtp.client-ip=40.107.92.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ITW4WdDGrTcJZm8hKPS80MJ96TlRrx5bXkYV9O6TPRUUgF3fLj33jBL8tC6LIc8Qlga0T9q8PSIlIPOziFtUfKctF8h2zc8nJpq/yuTKP7vV4ndhy7c/dBWSnIpeywmH43/uvIj9mslVVTAwFqAuk+9wJpkdUjyR/1Md8+YgR+CiVgU41qxBKhZxfDvl6++1J1oagUQpLTwGPfnjub0sTAOrrDXei1nBVF6kXPBU0/RPuj40j557Z0jNm+AtpCaGJMNZvQf/3fL+tMII5DBMFChaNcUg+luWR0nxAKZMX6bkK9ImX7Nq/8VnPHQaq/wp6N2T2SoOlJ9LRAydEO/oUw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KaVykDkeEI8Q8vkAqO8WvDdrDJEKMiPRSW/Mir9JlBc=;
- b=nNRKsVdJk6PBfWU1Kp1Trq0PEg0huDvRCbiyaKc99Od5oE/3Mm4AvkSZ8QClI3vztojMVARe6XxMwG8DcMcZnmEH8Fxbngo+L3A9I11yz2xBm+d8EKX9zb6nTFsMJ07Vl9oOKSsfhsVXkLKwnzniOr9BwtsM7F5Hptf9ZEgtykZy0SMpoE98q2JjtYOJJhsi9PFmsxnv/fo5o2jTamLMjSVnxg8MG0doghoJJvN29z0k4lzL9Uyf/bLTfrxyWjxgf4+3ho5NBA2WriqOBRioABu0u59gyxUgBELT63NPOYxjO8/DcWj/iGQUCiZd4aRdZJVhWtB4JQhRlh1qPdvZTQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KaVykDkeEI8Q8vkAqO8WvDdrDJEKMiPRSW/Mir9JlBc=;
- b=QRSsn3zvLO+cxOt6v3lr7uPbszQKQ7ZjVUSoPEYLiJRNdzUWzHvrt7zVZkKvonuI40eEWzpMl3z03mpAoaiVbWqkKX+tfY6KHFRO7UIoi0f94DWh2qs/M1NRtUphYuSyElhdpz3VF3eBUeQRbkRERLEyMQHrbzBFIwrZlljfuIY=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from MN0PR12MB6317.namprd12.prod.outlook.com (2603:10b6:208:3c2::12)
- by SN7PR12MB7154.namprd12.prod.outlook.com (2603:10b6:806:2a5::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.27; Tue, 11 Mar
- 2025 09:11:21 +0000
-Received: from MN0PR12MB6317.namprd12.prod.outlook.com
- ([fe80::6946:6aa5:d057:ff4]) by MN0PR12MB6317.namprd12.prod.outlook.com
- ([fe80::6946:6aa5:d057:ff4%5]) with mapi id 15.20.8511.025; Tue, 11 Mar 2025
- 09:11:21 +0000
-Message-ID: <cc076754-f465-426b-b404-1892d26e8f23@amd.com>
-Date: Tue, 11 Mar 2025 14:41:13 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 5/5] KVM: SVM: Enable Secure TSC for SNP guests
-To: Tom Lendacky <thomas.lendacky@amd.com>, seanjc@google.com,
- pbonzini@redhat.com, kvm@vger.kernel.org
-Cc: santosh.shukla@amd.com, bp@alien8.de, isaku.yamahata@intel.com
-References: <20250310063938.13790-1-nikunj@amd.com>
- <20250310064522.14100-1-nikunj@amd.com>
- <20250310064522.14100-4-nikunj@amd.com>
- <5ac9fdb6-cbc5-2669-28fa-f178556449ca@amd.com>
-Content-Language: en-US
-From: "Nikunj A. Dadhania" <nikunj@amd.com>
-In-Reply-To: <5ac9fdb6-cbc5-2669-28fa-f178556449ca@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2PR02CA0090.apcprd02.prod.outlook.com
- (2603:1096:4:90::30) To MN0PR12MB6317.namprd12.prod.outlook.com
- (2603:10b6:208:3c2::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 842821E2312;
+	Tue, 11 Mar 2025 09:32:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741685548; cv=none; b=ppH3MlX/9AfCkCCSbCC+ZKUGt520K4Im6i5Rfi/B91gu7M7uyCIUQTyLI/TzBgk5BtqmTlumquo6IjRlaVFk0RYgVldVsLehAiWChfNrubMe+9rYFiMw6o9PWRUqceyZTm1EeCvfE2BU7ZfUaKFF/lYy6wyUXvjpsFGaxp+TiIM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741685548; c=relaxed/simple;
+	bh=86NBFuRadsVUmel+UiOUBCdQv1HrG0o3+CvP/y7JgRk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=V6xb/vnMbzxmwU8W2+/yMfzk+5yzAXfXeWzFEXqKp/fQjUVQTsYSygi0DC7YIHPgji5OuXABP6PDXgvf8xCchdL0CpenloQWYLZo5Wdfow4bRx/aANJKFEJ3Ri6n5i0aiSuoxrBQcP2Il7RfdSWg9h2t3VsY9qvx1ID7+Mrkdp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=tSK4mao4; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52B7oCeA015900;
+	Tue, 11 Mar 2025 09:32:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=86NBFu
+	RadsVUmel+UiOUBCdQv1HrG0o3+CvP/y7JgRk=; b=tSK4mao4KUwoOmAjNnVRSd
+	metRAR4FyJ8ev6EFsKuva3J59LXbycP4ibjfxxpCODbCNN0bmJzun5tQkAXMmC8A
+	JnEGR9QfDu9oa3PEct3prjLz0324Lu3hGzv/6pewsgYqg2rNih6+06whS7NA1zmV
+	k9yn6ZNv5F+R5ULJh5s6XH8q+T7QstjSOoVX+FcN7/ECA44iYU7mu8Egf138U2oZ
+	XlxAkYGEypf14AdOR9mby9tpgCv/4aawj3P5eUhO2TrN+OlCzBdd7Saqn1KS1gAd
+	AtpVWqqgc7UIZghKaGj1rpVZWUU/e2Y1nQrz+4SNwe4kIS/9fCy6Ow+U0GRR75UQ
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45a1gp544n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 11 Mar 2025 09:32:16 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 52B8rPk4008649;
+	Tue, 11 Mar 2025 09:32:16 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45a1gp544f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 11 Mar 2025 09:32:16 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52B6Sdi8022265;
+	Tue, 11 Mar 2025 09:32:15 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 45917nbddd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 11 Mar 2025 09:32:15 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52B9WBTr39584246
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 11 Mar 2025 09:32:11 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8BD1D20043;
+	Tue, 11 Mar 2025 09:32:11 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6DE6520040;
+	Tue, 11 Mar 2025 09:32:07 +0000 (GMT)
+Received: from vaibhav?linux.ibm.com (unknown [9.39.19.180])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Tue, 11 Mar 2025 09:32:07 +0000 (GMT)
+Received: by vaibhav@linux.ibm.com (sSMTP sendmail emulation); Tue, 11 Mar 2025 15:02:06 +0530
+From: Vaibhav Jain <vaibhav@linux.ibm.com>
+To: Athira Rajeev <atrajeev@linux.ibm.com>
+Cc: linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin
+ <npiggin@gmail.com>,
+        Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
+        sbhat@linux.ibm.com, gautam@linux.ibm.com, kconsul@linux.ibm.com,
+        amachhiw@linux.ibm.com, Athira Rajeev <atrajeev@linux.vnet.ibm.com>
+Subject: Re: [PATCH v4 6/6] powerpc/kvm-hv-pmu: Add perf-events for Hostwide
+ counters
+In-Reply-To: <96795462-3AFA-4C90-9E63-ACB9AE3E66EE@linux.ibm.com>
+References: <20250224131522.77104-1-vaibhav@linux.ibm.com>
+ <20250224131522.77104-7-vaibhav@linux.ibm.com>
+ <96795462-3AFA-4C90-9E63-ACB9AE3E66EE@linux.ibm.com>
+Date: Tue, 11 Mar 2025 15:02:06 +0530
+Message-ID: <87ikofud49.fsf@vajain21.in.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN0PR12MB6317:EE_|SN7PR12MB7154:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9c20ba08-20ef-4235-05b6-08dd607cb057
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?ZUdLQWQ0eE41NUZXSXVtYm05aVNDTzVtT0x5Wnh0VnY0MFBIbzFPbXpMRXZk?=
- =?utf-8?B?RWluRTR1U1JvRjhtc2RyTjZMcitiR0FLb0JNeUExWFVIcHRIQnEzbDExZFVW?=
- =?utf-8?B?UUVtdG1yZ0tDMWZlNkgreHd4UEJFM1M3Zk9WSU1zKzFJNTdxa1hPbzdJOTV6?=
- =?utf-8?B?MCtqQzdob1M1U2tHZk5PSERVRUw3NVRHaGdDQXd1azFza2lWd3puSG1hTm1C?=
- =?utf-8?B?YncxSTF3RHk2alJnbzRsdXNrbEFMNWw0b1FkQjEvY0Uvd3U3MGNMTEtjMEVk?=
- =?utf-8?B?MEl5cG93Rk5YOXhvYW5jZmJZeTRxR0ZVcjFvQy9maGdsa3FSZHRiOUUxdThL?=
- =?utf-8?B?aWZFeVhtajNQYnE3Q1QyRzhqT3hLMXdsdHh4NjczWVd4bmdobk0vaEwyclBL?=
- =?utf-8?B?bkFBd0hKQXlFVFVQak5FcWZWUGJEZnd6RmNrN3U4U2FqeDM0RW1mWTlhMFlG?=
- =?utf-8?B?NHViWnNGd0ZMUE9FQ2cxVCtiVHZZcHNTcUhHRXF6Zm1WRXJoYTNrK05FTnVK?=
- =?utf-8?B?M3FqNW1FUmJlWXlPSTFBd1VuN3BzbzZCOXJja3k4dXc4eDZWZVpjK0pJWDAw?=
- =?utf-8?B?cVVWS3lSK1dOZWlZWkVLR0tJS3VVSVBnTFZsbzJNakFoOU8zM3hUTXF0Q3dM?=
- =?utf-8?B?aEIzbGV6b3FtUUNGcFJRcjVuVHdqUFVDQTJNVzgxMTRpWU1iZDFFbyt6cWJm?=
- =?utf-8?B?K0U0dXJicWJQQ09CWXFiM05ZUDhIdjYvQzJRWFdKdW16TkJLbkxGNjFkbnAw?=
- =?utf-8?B?djZoc3kwMUlHTVlkYUpLa0x6aGYrMkhkRVk5N3NUYkthYzB0VmtVRzQ1ZC80?=
- =?utf-8?B?Y0hpdHZjNWRkOXhReHd3OWRxU05Obi9HTExwTUxsYVplT3pVRURkdTA2QXFD?=
- =?utf-8?B?QjFTMURGa2ppME04UWNPQlN2d04waHNUMFgxQ2tqT0YyWGpxZE83RnlDWlpu?=
- =?utf-8?B?a2NpM1RBVHBUMy9EOC9yTzVGZTZ2Vzd2clp1cjZzNW9OZ0c0ZzNDdExZYncw?=
- =?utf-8?B?dnk1d3M3VlRiYTNtakNvVjdETUlFclhaV2V0cFhzWE91TjdYR3lJTkkzNDBi?=
- =?utf-8?B?aVlKZjNpRk1zZVhJaUFjRnVVbFNlZG1iSExBOENNSnRVZWd3bnJOMzhuMFlP?=
- =?utf-8?B?Wm0xSHFicGJzekF1bkU5M0g4ZXFlR1FUVzhZSmZRTU90QXlxOVkxUE8wUzly?=
- =?utf-8?B?MEZoWERMNVViN2hjVWRuTkw4N0Y1TGdBS0RKN080ODhDOEU0cjhEYVVzc2lt?=
- =?utf-8?B?UmtMTUFUY1RVNWFING9lUlhpTGRZdkVDMURqN2Q4cmdjU0lWSzgrMFppQ3p5?=
- =?utf-8?B?TkhmZE9wamZ5UUxvY2laRitlMytad2pVUTZGN2M5eWduK3Fya3A4VlRjRFdY?=
- =?utf-8?B?MEEreFJSMTFXNUlJVXZmektpaHlEVTdSRVdId2MwQ3MzTFlDamZ5VkwvdDl5?=
- =?utf-8?B?dXJ1WUJNc1gvQlFzNVhrN05qbWZKempzYkdwaWxYNnpyU0RrZzN5LzhjSUp0?=
- =?utf-8?B?MEQzUTlTcVdhbFlzaFM2bWhzWXNoaFN5WWVpc1U1WXRNb3hvZ0gwcWo1cHBi?=
- =?utf-8?B?bThIVmF6MVgyZUFQN042Y3RuYnhWTWJNVkd3UVZKZ0JBMnRFWmEvV1hOQTFw?=
- =?utf-8?B?d1JFVTMyZkd5ckEzdjlaQkVoRU5tdnpGVWZoWXR0bGcyQnpEQVNxMytCWHdD?=
- =?utf-8?B?aU56S2VxUE82UjI2UUc1MUxONUk3TVlkZnB2TnhnMVZuVnE1SHZYZk1BbGRE?=
- =?utf-8?B?SE95SjZwaUd3NGl5c0FMRjFnNWFucWdzY3hkUHA3TDZlRlo4QkNnM3BzVm56?=
- =?utf-8?B?K2xNTkVqR0IxeTV3MnhkRXZHNmMrWEVtT0xzdUVLS3REeWJtS1RRUGk2REFB?=
- =?utf-8?Q?5WPbn8Kk2l22s?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB6317.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?L1owT3hKcDRCYnRieC9vSCs0bXJja1IwL1IyVTV2Z2RSNFdlSnZaK2lMY1dJ?=
- =?utf-8?B?MDF0MmkyRFlKWjR5MlpDNm5oYzdjeUpUYXVBM1BMcHp0N2tVRi9LNSt4Zm82?=
- =?utf-8?B?UWpyM3BocVVOeHRIa0NYckE5aTE4TUQ0bjVENUh4N2s2ZFdJd2tGdmxManpR?=
- =?utf-8?B?TzdGSm5qc0FFSjh0OUROTFRMS214VElXVXBrSSs5ZTAxZS9VWHZuY1Y4NTVt?=
- =?utf-8?B?QkQ4Zm5oMWtsUGR6ZWhMZ056cllSVC9wcmpEUzJnMDRTNlduME5qcVJnNTJw?=
- =?utf-8?B?YmZ4YTR5ZE9LaFNzeXZYSjJHd1h0WnhhYnBGVnZiekFOc1BTdWlzWWhSR09i?=
- =?utf-8?B?VzBHYm5hMFdEYlBBN1ZIb2NBNW1DSlVrVFdsZjNxcFdTZEgxWlRWbnJlVjdi?=
- =?utf-8?B?bHY1RXlpdDNqWm1nSS9CK2tiYjlBKzdVeDhieTZwUmUzTmo2RXB6VCs0S3Rh?=
- =?utf-8?B?WkFaSU5ZQTZiT1BsR2c5eWUvVFVxdGxPdjZTdzh1cWNpUzlseHV0eDRXQWRY?=
- =?utf-8?B?cE9MMVNqT1RvMW9xcUFCN0poNTV3NjJiQWxuSUtZQjNqSEZ4cFV2bFprdmxJ?=
- =?utf-8?B?Tk9sNnVNK2hnV2FtazNaQk9CWVA5dTFtQ3JNNkwzWjRScktYaHlERE1Fa1Va?=
- =?utf-8?B?dUFpWkVoYVJTNWJiUTAxK3U3SmRSbGdRUXpaY3BNdlMvL2V1VVVaeGU5VHcx?=
- =?utf-8?B?VFdsMFpGelFQbExlMGQ2WjZ5QnJrN0JqbGY1LzZFazFscHZEaFNrL1N1d3Jq?=
- =?utf-8?B?ekhGUXhRSzdMN0dQUFpaWDRyU3hIYVFoMEx6Y2ZCRnovVS9jbHlySThtNG1r?=
- =?utf-8?B?Nlc4TUFPd21wN2xZa0pXc2loZGZCSUtYWW5obVUzVFdZVUhrTXR5VkNnYnRR?=
- =?utf-8?B?UmJobjNSejRUNGZ3ejNKYTVIUC9VOFpFa0VkazRPNmdSMmx4WWFzR2hheU40?=
- =?utf-8?B?N1QxelNsRktpNTU0MjlUVC8vSUQvdWwwSzM2cWkyK2Znd1FpRWpEQ2RqUmhG?=
- =?utf-8?B?MjR0dnMyOFduRStEaGF3NGxJcmhFVzN0QUVJOG5hT29wYnZJa2FsTzBVZHdo?=
- =?utf-8?B?MHpycGQrN1ErRmZTY25uaUJhVElLUHF3MUJZc2w2bHpNMWJXV3B3UTcrNHJ6?=
- =?utf-8?B?WHZwV0t3bVVVbStYc2pCZ0Uxby9jZjZvQUsxTmM1QXd2eFJpUVdUS1c5aXZT?=
- =?utf-8?B?Vk1leW1RMVpsWGx0TnV2Vkl2UGtqRXZ5bmpUNzJaWFYweG44RDNPOFliVWNU?=
- =?utf-8?B?a29UbnlWZDBMQnJCc3RMT0xGdFNUYmEyNXl0THBUNVZLYkhyL2t1MkhhZXNk?=
- =?utf-8?B?NnZrRmIxWWViQTlmUnFQc0dHVlhFSWkwc2o5bE9vMllmVmhVUTR1amVNc2dV?=
- =?utf-8?B?NjdZZmhnWXVwVnVRdkZqTmFjSEdldDdyUzU1YjNodllRdStGN3NsNGllbTFD?=
- =?utf-8?B?Uk91ekxGMzRWbzVRV2k0dnpaamJGYzBSZThMcndnLzNzb1M3TWVBVHZ2cTVi?=
- =?utf-8?B?dVNEYjVDQkFCWFRxUzJxV3lGR0VzMGRTbk1GWFlYaUVFMENHWjFYd1l5Y211?=
- =?utf-8?B?OEx0N0lHamV6amszOEJoeHQreTBDK3l2eVE4Mk5hYUlrdEFraDkxTktNN3Zu?=
- =?utf-8?B?ZTFnbHlNcEdzNC9POW40aU5MVkdUN0h3NDZLYVZSZ2phNCtreS8zUnZoYTVX?=
- =?utf-8?B?RlR5d1B2LytmWHJveWF0TU04YnpVMHFSUFRpbFF3eEgyMnhZVEplbVZIeVUr?=
- =?utf-8?B?cDhCZ2pLVVkxZzNZMGhQWVdpT0FnM2VTaGJsemJWUXdzdS9oRGsreDJHMEw4?=
- =?utf-8?B?WVJNdDVZN3BHcy9KRVlPUVFSS1Bna0R3RVJGK2YydUNucWE1VFFscDRVNFJY?=
- =?utf-8?B?cFNrYU5xTDdVYnZvYlFzSko3eGo0SnVZS01pWU0xU1ZMVTk2Y05pTjYxd3ZP?=
- =?utf-8?B?bFh1U0ZNZEdpNzQ1UXJ2bGw1dHlRd2NucmRRWHY2K2FCMFNaZlhnU3YvSkxH?=
- =?utf-8?B?QTlGTFppYVVrZkMxUnZ5ekZvNkdNdWhVSGg3azZVdjIwSGV5M2ZSOFlTQytL?=
- =?utf-8?B?cEFwRnp2Q0FwSVdibCtqeE1HVU85a0dUZ2RVaURzRlV5Tm9NZW5RRlVEYjVY?=
- =?utf-8?Q?y2sv3qIMvXKm6PLEHKXoDIrxW?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9c20ba08-20ef-4235-05b6-08dd607cb057
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR12MB6317.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2025 09:11:21.1767
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: oGaXISZ7nGqnMw1eHW+T7OFVte0nqw3K1KAVcAz/X22zhBozmIJII7z87LgIvawVMykvsWb2wtym7FyoytLbFw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7154
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: SZrUU42cdm-4ApI_3zxQkdoYvz_n9hD6
+X-Proofpoint-ORIG-GUID: M5TteZ_w2XWaQS51ysCBLLkWMb8Nzryi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-11_01,2025-03-11_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 clxscore=1015
+ mlxlogscore=999 suspectscore=0 spamscore=0 impostorscore=0 bulkscore=0
+ phishscore=0 malwarescore=0 priorityscore=1501 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502100000 definitions=main-2503110064
 
+Athira Rajeev <atrajeev@linux.ibm.com> writes:
 
-
-On 3/10/2025 9:09 PM, Tom Lendacky wrote:
-> On 3/10/25 01:45, Nikunj A Dadhania wrote:
-
->> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
->> index 50263b473f95..b61d6bd75b37 100644
->> --- a/arch/x86/kvm/svm/sev.c
->> +++ b/arch/x86/kvm/svm/sev.c
->> @@ -2205,6 +2205,20 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
->>  
->>  	start.gctx_paddr = __psp_pa(sev->snp_context);
->>  	start.policy = params.policy;
+>> On 24 Feb 2025, at 6:45=E2=80=AFPM, Vaibhav Jain <vaibhav@linux.ibm.com>=
+ wrote:
+>>=20
+>> Update 'kvm-hv-pmu.c' to add five new perf-events mapped to the five
+>> Hostwide counters. Since these newly introduced perf events are at system
+>> wide scope and can be read from any L1-Lpar CPU, 'kvmppc_pmu' scope and
+>> capabilities are updated appropriately.
+>>=20
+>> Also introduce two new helpers. First is kvmppc_update_l0_stats() that u=
+ses
+>> the infrastructure introduced in previous patches to issues the
+>> H_GUEST_GET_STATE hcall L0-PowerVM to fetch guest-state-buffer holding t=
+he
+>> latest values of these counters which is then parsed and 'l0_stats'
+>> variable updated.
+>>=20
+>> Second helper is kvmppc_pmu_event_update() which is called from
+>> 'kvmppv_pmu' callbacks and uses kvmppc_update_l0_stats() to update
+>> 'l0_stats' and the update the 'struct perf_event's event-counter.
+>>=20
+>> Some minor updates to kvmppc_pmu_{add, del, read}() to remove some debug
+>> scaffolding code.
+>>=20
+>> Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
+>> ---
+>> Changelog
+>>=20
+>> v3->v4:
+>> * Minor tweaks to patch description and code as its now being built as a
+>> separate kernel module.
+>>=20
+>> v2->v3:
+>> None
+>>=20
+>> v1->v2:
+>> None
+>> ---
+>> arch/powerpc/perf/kvm-hv-pmu.c | 92 +++++++++++++++++++++++++++++++++-
+>> 1 file changed, 91 insertions(+), 1 deletion(-)
+>>=20
+>> diff --git a/arch/powerpc/perf/kvm-hv-pmu.c b/arch/powerpc/perf/kvm-hv-p=
+mu.c
+>> index ed371454f7b5..274459bb32d6 100644
+>> --- a/arch/powerpc/perf/kvm-hv-pmu.c
+>> +++ b/arch/powerpc/perf/kvm-hv-pmu.c
+>> @@ -30,6 +30,11 @@
+>> #include "asm/guest-state-buffer.h"
+>>=20
+>> enum kvmppc_pmu_eventid {
+>> + KVMPPC_EVENT_HOST_HEAP,
+>> + KVMPPC_EVENT_HOST_HEAP_MAX,
+>> + KVMPPC_EVENT_HOST_PGTABLE,
+>> + KVMPPC_EVENT_HOST_PGTABLE_MAX,
+>> + KVMPPC_EVENT_HOST_PGTABLE_RECLAIM,
+>> KVMPPC_EVENT_MAX,
+>> };
+>>=20
+>> @@ -61,8 +66,14 @@ static DEFINE_SPINLOCK(lock_l0_stats);
+>> /* GSB related structs needed to talk to L0 */
+>> static struct kvmppc_gs_msg *gsm_l0_stats;
+>> static struct kvmppc_gs_buff *gsb_l0_stats;
+>> +static struct kvmppc_gs_parser gsp_l0_stats;
+>>=20
+>> static struct attribute *kvmppc_pmu_events_attr[] =3D {
+>> + KVMPPC_PMU_EVENT_ATTR(host_heap, KVMPPC_EVENT_HOST_HEAP),
+>> + KVMPPC_PMU_EVENT_ATTR(host_heap_max, KVMPPC_EVENT_HOST_HEAP_MAX),
+>> + KVMPPC_PMU_EVENT_ATTR(host_pagetable, KVMPPC_EVENT_HOST_PGTABLE),
+>> + KVMPPC_PMU_EVENT_ATTR(host_pagetable_max, KVMPPC_EVENT_HOST_PGTABLE_MA=
+X),
+>> + KVMPPC_PMU_EVENT_ATTR(host_pagetable_reclaim, KVMPPC_EVENT_HOST_PGTABL=
+E_RECLAIM),
+>> NULL,
+>> };
+>>=20
+>> @@ -71,7 +82,7 @@ static const struct attribute_group kvmppc_pmu_events_=
+group =3D {
+>> .attrs =3D kvmppc_pmu_events_attr,
+>> };
+>>=20
+>> -PMU_FORMAT_ATTR(event, "config:0");
+>> +PMU_FORMAT_ATTR(event, "config:0-5");
+>> static struct attribute *kvmppc_pmu_format_attr[] =3D {
+>> &format_attr_event.attr,
+>> NULL,
+>> @@ -88,6 +99,79 @@ static const struct attribute_group *kvmppc_pmu_attr_=
+groups[] =3D {
+>> NULL,
+>> };
+>>=20
+>> +/*
+>> + * Issue the hcall to get the L0-host stats.
+>> + * Should be called with l0-stat lock held
+>> + */
+>> +static int kvmppc_update_l0_stats(void)
+>> +{
+>> + int rc;
 >> +
->> +	if (snp_secure_tsc_enabled(kvm)) {
->> +		u32 user_tsc_khz = params.desired_tsc_khz;
+>> + /* With HOST_WIDE flags guestid and vcpuid will be ignored */
+>> + rc =3D kvmppc_gsb_recv(gsb_l0_stats, KVMPPC_GS_FLAGS_HOST_WIDE);
+>> + if (rc)
+>> + goto out;
 >> +
->> +		/* Use tsc_khz if the VMM has not provided the TSC frequency */
->> +		if (!user_tsc_khz)
->> +			user_tsc_khz = tsc_khz;
+>> + /* Parse the guest state buffer is successful */
+>> + rc =3D kvmppc_gse_parse(&gsp_l0_stats, gsb_l0_stats);
+>> + if (rc)
+>> + goto out;
 >> +
->> +		start.desired_tsc_khz = user_tsc_khz;
-> 
-> Do we need to perform any sanity checking against this value?
+>> + /* Update the l0 returned stats*/
+>> + memset(&l0_stats, 0, sizeof(l0_stats));
+>> + rc =3D kvmppc_gsm_refresh_info(gsm_l0_stats, gsb_l0_stats);
+>> +
+>> +out:
+>> + return rc;
+>> +}
+>> +
+>> +/* Update the value of the given perf_event */
+>> +static int kvmppc_pmu_event_update(struct perf_event *event)
+>> +{
+>> + int rc;
+>> + u64 curr_val, prev_val;
+>> + unsigned long flags;
+>> + unsigned int config =3D event->attr.config;
+>> +
+>> + /* Ensure no one else is modifying the l0_stats */
+>> + spin_lock_irqsave(&lock_l0_stats, flags);
+>> +
+>> + rc =3D kvmppc_update_l0_stats();
+>> + if (!rc) {
+>> + switch (config) {
+>> + case KVMPPC_EVENT_HOST_HEAP:
+>> + curr_val =3D l0_stats.guest_heap;
+>> + break;
+>> + case KVMPPC_EVENT_HOST_HEAP_MAX:
+>> + curr_val =3D l0_stats.guest_heap_max;
+>> + break;
+>> + case KVMPPC_EVENT_HOST_PGTABLE:
+>> + curr_val =3D l0_stats.guest_pgtable_size;
+>> + break;
+>> + case KVMPPC_EVENT_HOST_PGTABLE_MAX:
+>> + curr_val =3D l0_stats.guest_pgtable_size_max;
+>> + break;
+>> + case KVMPPC_EVENT_HOST_PGTABLE_RECLAIM:
+>> + curr_val =3D l0_stats.guest_pgtable_reclaim;
+>> + break;
+>> + default:
+>> + rc =3D -ENOENT;
+>> + break;
+>> + }
+>> + }
+>> +
+>> + spin_unlock_irqrestore(&lock_l0_stats, flags);
+>> +
+>> + /* If no error than update the perf event */
+>> + if (!rc) {
+>> + prev_val =3D local64_xchg(&event->hw.prev_count, curr_val);
+>> + if (curr_val > prev_val)
+>> + local64_add(curr_val - prev_val, &event->count);
+>> + }
+>> +
+>> + return rc;
+>> +}
+>> +
+>> static int kvmppc_pmu_event_init(struct perf_event *event)
+>> {
+>> unsigned int config =3D event->attr.config;
+>> @@ -110,15 +194,19 @@ static int kvmppc_pmu_event_init(struct perf_event=
+ *event)
+>>=20
+>> static void kvmppc_pmu_del(struct perf_event *event, int flags)
+>> {
+>> + /* Do nothing */
+>> }
+>
+> If we don=E2=80=99t read the counter stats in =E2=80=9Cdel=E2=80=9D call =
+back, we will loose the final count getting updated, right ?
+> Del callback needs to call kvmppc_pmu_read. Can you check the difference =
+in count stats by calling kvmppc_pmu_read here ?
+>
 
-On the higher side, sev-snp-guest.stsc-freq is u32, a Secure TSC guest boots fine with
-TSC frequency set to the highest value (stsc-freq=0xFFFFFFFF).
+Yes, agreed. Will address this in next version of the patch series
 
-On the lower side as MSR_AMD64_GUEST_TSC_FREQ is in MHz, TSC clock should at least be 1Mhz. 
-Any values below would either triggers a splat or crashes the guest kernel
+> Thanks
+> Athira
+>
+>>=20
+>> static int kvmppc_pmu_add(struct perf_event *event, int flags)
+>> {
+>> + if (flags & PERF_EF_START)
+>> + return kvmppc_pmu_event_update(event);
+>> return 0;
+>> }
+>>=20
+>> static void kvmppc_pmu_read(struct perf_event *event)
+>> {
+>> + kvmppc_pmu_event_update(event);
+>> }
+>>=20
+>> /* Return the size of the needed guest state buffer */
+>> @@ -302,6 +390,8 @@ static struct pmu kvmppc_pmu =3D {
+>> .read =3D kvmppc_pmu_read,
+>> .attr_groups =3D kvmppc_pmu_attr_groups,
+>> .type =3D -1,
+>> + .scope =3D PERF_PMU_SCOPE_SYS_WIDE,
+>> + .capabilities =3D PERF_PMU_CAP_NO_EXCLUDE | PERF_PMU_CAP_NO_INTERRUPT,
+>> };
+>>=20
+>> static int __init kvmppc_register_pmu(void)
+>> --=20
+>> 2.48.1
+>>=20
+>>=20
+>>=20
+>
+>
 
-For stsc-freq=1000 (1Khz), guest crash with the below:
-
-  kvm-clock: using sched offset of 4782335885 cycles
-  CPU: 0 UID: 0 PID: 0 Comm: swapper Not tainted 6.14.0-rc5-00537-gcecc16fa7fac #254
-  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS unknown 02/02/2022
-  RIP: 0010:pvclock_tsc_khz+0x13/0x40
-
-For stsc-freq=500000 (500KHz), boots but with the below warning: basically tsc_khz is 
-zero as we are reading zero from MSR_AMD64_GUEST_TSC_FREQ.
-
-  WARNING: CPU: 0 PID: 0 at arch/x86/kernel/tsc.c:1463 determine_cpu_tsc_frequencies+0x11b/0x120
-
-Regards
-Nikunj
-
+--=20
+Cheers
+~ Vaibhav
 
