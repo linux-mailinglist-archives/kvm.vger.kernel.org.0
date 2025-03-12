@@ -1,170 +1,134 @@
-Return-Path: <kvm+bounces-40860-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40861-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1483A5E773
-	for <lists+kvm@lfdr.de>; Wed, 12 Mar 2025 23:29:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DEDBA5E7B2
+	for <lists+kvm@lfdr.de>; Wed, 12 Mar 2025 23:53:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9ACF93BC51C
-	for <lists+kvm@lfdr.de>; Wed, 12 Mar 2025 22:29:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FB5C1899BE7
+	for <lists+kvm@lfdr.de>; Wed, 12 Mar 2025 22:53:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B4AD1F0E31;
-	Wed, 12 Mar 2025 22:29:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63DF21F12EA;
+	Wed, 12 Mar 2025 22:53:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LFj1bo98"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="WMuzWzyh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B9419E96D;
-	Wed, 12 Mar 2025 22:29:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA35B1F03E4
+	for <kvm@vger.kernel.org>; Wed, 12 Mar 2025 22:53:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741818552; cv=none; b=OinrIyMTU3IuZ1jlZSO1ntPkKC1daybOczKiOWzbNVtLup/6XWugxrH9N27JAUT6lj09jHamoG3Vdv9TzTyMJHjXVz82vnezGg7Hb+m+oAhPlokNE+yfNiIHPatceWJ86LqrcNn5HghU33MpHdRRGgUmL4TkVTQrG4kWq5OqZGE=
+	t=1741819984; cv=none; b=MPJd3d5dJZ8w7t2tAs/uzcQIDa51A50YRwD+bPy0S2de9dD+uOBanmrgPCNbKiw4suV7fmubGZYKPsnhqJ4tuFCdNHcZcUc7ynKITUEGK9XYAtRmPRCiniHs9icQs7qNqu4HjPmz9KN7C1C6JbpRl4syD3114w1RZXcAg2XjRd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741818552; c=relaxed/simple;
-	bh=6PSD8Ihb5wqTIoMhe00VHOCE57HyMwiB7MEagGbuhZI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DfSDN2V+AhDwl8spPzkdX142x96Qw2e6u2r6clM3eqWc2rjsJo5BS3IZa0ieF7VjybzQxLpCY9NhVE6rUOAbW8BOCwxM2SEYxkdHMMx4XcCwIIk5Zf2IIhX12ZvFwow8G7j0YSgCvtgafubXneHzl/pnaVM+950LYloch/hu4OQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LFj1bo98; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-223fb0f619dso6501435ad.1;
-        Wed, 12 Mar 2025 15:29:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741818550; x=1742423350; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=7Zt5RBTdS4tu9y1ZkvHvMS6PvikbgYBd+xanSqGhaSs=;
-        b=LFj1bo98U5ofV7suHOs88OkZxgEoPC6S5uk1QIxc9pzu1VGMnTEQJIa9pqFlbbheo+
-         Em1bmkLPeUvqKMCAuj3lktGsy41LS8xJ62OlGnX+XcQopyeRtKsVgzBRKsAlXF2Cqw4T
-         uSiE9jCCNd5zqYE2e/u9bAPP+FlglAIBdufsyDnI8a15K15cS3wBWkQ9+Ktcg3FW/qVq
-         NKQ0zVmJDCD0Xs2wjn5kLXxQSvyZCpHDhdStUqrD4XWmXJugMemHmG99qaNq5oRpC4xD
-         k1z0MpMY/ZvavWFw1wXSNS/G3JyD1wdkX+uJpQi1zKDtFAez5jLOtkyOnmXn9SrgmcPJ
-         u9ew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741818550; x=1742423350;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7Zt5RBTdS4tu9y1ZkvHvMS6PvikbgYBd+xanSqGhaSs=;
-        b=M6REmIARnFB01wHvlC5WqT8nCkLI73to98bpjCn5SS/5gY013NBJ5+ntOyn9SfXBqQ
-         XmvWKYjEO9wmaWsQYPBwYUxJqHmxc6gosR7yvWyoPoJggp4NUzBupbzBj8cFvT+PUrsa
-         yVGZmPAOpmn598HgCZS5IBfm2lhV2HsxizjfgJVOnSJaRzhbZct5INLULu8WgfJdLJBO
-         R8rLEi3LoQ4gEnI79baN67sbKvaW0w5Z07hzM7mnH7x/eRCv8nDEJ+csr5UX0I1WBiRP
-         HdRBn4oFhfH0blQh4vFoafZ66l1JbAMsL5xeZnj98xTHnGHA+UJ4WCShcuyc3qQVrViH
-         myiw==
-X-Forwarded-Encrypted: i=1; AJvYcCUOb1ZyfhGJlQh46KJLimc2nFKmCdAKk9+f0dDjXl6dDjqy90pHuhpdLgrNBdvPpbVDOhPn7S4o@vger.kernel.org, AJvYcCV/i046aWP7ZL+eWK4FiK5omCi6DTmbCttUEjtBgw2sAmW+44HTi3cTk74tdsLHsyIwc4YrIzT6Ci0fGTLN@vger.kernel.org, AJvYcCVLqwZhSMWNJ2eB2TaIbB8jjc5Bkil1bsi0rlTMiFwzBfTlMTzyl16aGq8zWla2G3vmUvU=@vger.kernel.org, AJvYcCWGt0N4WZRhVu0x2llfkvwrIVPaZ6xnFd3xIX+SQ5fqrunYWg/ahR49F7Rlo0kSWE6RHbLRNaUTvMq1Mlu6@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSAsqp8oGwmY22dRfT/BjW1g2g0yPYRTAFNyQpsw5N12wi80VI
-	DtcH1Xq44l0j2N5KLyo5zgucfo1voP6kfauSg/wrZtrGh+TORd2e
-X-Gm-Gg: ASbGncvscoeLH16Ju9H0DAln/lesHkz32J1wR7UI3upxFTyCIVuay83Z0VUhoI/d1cP
-	DJ9qOz3yMwPG2N7VJyrTNIOkK99+Ba4YiAOwJBya9k2NeHEUN+8pky2RdpbgGuVuaWJlDVJg02N
-	TwMjnFzMUXyBYY95+OHI0eFiUC5PQHCOjVwdUv2rUjlXt7dSfOAxnLpd045dOxLrfVMtnOoWwv7
-	55g4uUbtFTM3ZsDkj5Z1cvqWwCkAUYvm6SfKuDFeB2FTegp+TfGHdqRmkeeG8pwFphcsJBKEXN8
-	/WI4sjE5Ef+3QQlZGR5W+j3939uUqcZ1ftDU8Nmjp9zNOaXX5P4N8HCvz3PuASYLav2EZOdfLK8
-	g
-X-Google-Smtp-Source: AGHT+IG5eB7LsgG76qzryME3xovo7CXpCBzbsMGvNvGwS4V4Ch2lCvncSSjVtCrUYYynhYS0YR2b6g==
-X-Received: by 2002:a05:6a20:160c:b0:1f5:7007:9eb1 with SMTP id adf61e73a8af0-1f58cbc4a43mr14791625637.34.1741818550325;
-        Wed, 12 Mar 2025 15:29:10 -0700 (PDT)
-Received: from devvm6277.cco0.facebook.com ([2a03:2880:2ff:5::])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af56ea7c87csm46437a12.57.2025.03.12.15.29.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Mar 2025 15:29:09 -0700 (PDT)
-Date: Wed, 12 Mar 2025 15:29:07 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, davem@davemloft.net,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org,
-	Jorgen Hansen <jhansen@vmware.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux-foundation.org,
-	linux-hyperv@vger.kernel.org, Dexuan Cui <decui@microsoft.com>,
-	netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
-Subject: Re: [PATCH net-next 0/3] vsock: support network namespace
-Message-ID: <Z9IKs15jhjaaj5px@devvm6277.cco0.facebook.com>
-References: <20200116172428.311437-1-sgarzare@redhat.com>
- <20200427142518.uwssa6dtasrp3bfc@steredhat>
- <224cdc10-1532-7ddc-f113-676d43d8f322@redhat.com>
- <20200428160052.o3ihui4262xogyg4@steredhat>
- <Z8edJjqAqAaV3Vkt@devvm6277.cco0.facebook.com>
- <CACGkMEtTgmFVDU+ftDKEvy31JkV9zLLUv25LrEPKQyzgKiQGSQ@mail.gmail.com>
- <Z89ILjEUU12CuVwk@devvm6277.cco0.facebook.com>
- <CACGkMEskp720d+UKm_aPUtGZC5NzH+mp_YKoY2NQV6_YBbRz9g@mail.gmail.com>
+	s=arc-20240116; t=1741819984; c=relaxed/simple;
+	bh=hoZhiLRaT03dibrPq0Yn3WJWMlO59LD/uOjv0wF9noE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KmAs8DJ7UqCQvMlwbnRekyINm6blIEAZbeIBS6TJINggENE7zVHYDJKstoOlnC1DhHzRtlToGSH++/1UMpMrv+SOuGGlcvwG9GwThYPnn/1bmZHTqObwsEuR++mAzOurAvoupYf1ewbwRR0lAqsUvDjJtoy7QJoFOZ40Xgm1f78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=WMuzWzyh; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52CMBZDg016338
+	for <kvm@vger.kernel.org>; Wed, 12 Mar 2025 15:53:01 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2021-q4; bh=Kl7hkD5KMfAcTnkDQa
+	3RazR6pgojSxqrZR2wzVHhiQ0=; b=WMuzWzyhKUaaVcIycvDdMYT9v+5dCOlgUQ
+	cBVNSnVBD2Ivh1VYUOTNxpTpW3/gaG70wDY2tyTKJD0KSjIVslm9OZoj3tqe6YmR
+	MOUMqLKdfXPcKl642ijwkxGJ+LEoS4A7B0ba9XylRB5sa3k/sRc0yXzZZyD1K340
+	+g4wDYWHFgJQeqlmtvLQwrbt5T3YfXapF6bitzpKP54PmSLzb7TYEFaqvtvqic+a
+	oqSfoTy5z7ExqYjdSFe41PmNprPpZWzVYYgWW2B/EuQbpBBjKJlsWShOUBvosRUL
+	sXnlVN6SruaejSmQPjFa21+fnCSzwhzQSy0FEdY787uqfH/VPhQg==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 45bccqkxud-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <kvm@vger.kernel.org>; Wed, 12 Mar 2025 15:53:01 -0700 (PDT)
+Received: from twshared40462.17.frc2.facebook.com (2620:10d:c0a8:1b::2d) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1544.14; Wed, 12 Mar 2025 22:53:00 +0000
+Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
+	id 561091905B414; Wed, 12 Mar 2025 15:52:57 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <alex.williamson@redhat.com>, <kvm@vger.kernel.org>
+CC: Keith Busch <kbusch@kernel.org>
+Subject: [PATCH] vfio/type1: conditional rescheduling while pinning
+Date: Wed, 12 Mar 2025 15:52:55 -0700
+Message-ID: <20250312225255.617869-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEskp720d+UKm_aPUtGZC5NzH+mp_YKoY2NQV6_YBbRz9g@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: qBZDEUkIjl_YJwOHb-5d7Pi6ScjHdM1N
+X-Proofpoint-ORIG-GUID: qBZDEUkIjl_YJwOHb-5d7Pi6ScjHdM1N
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-12_06,2025-03-11_02,2024-11-22_01
 
-On Tue, Mar 11, 2025 at 08:59:44AM +0800, Jason Wang wrote:
-> On Tue, Mar 11, 2025 at 4:14 AM Bobby Eshleman <bobbyeshleman@gmail.com> wrote:
-> >
-> > On Wed, Mar 05, 2025 at 01:46:54PM +0800, Jason Wang wrote:
-> > > On Wed, Mar 5, 2025 at 8:39 AM Bobby Eshleman <bobbyeshleman@gmail.com> wrote:
-> > > >
-> > > > On Tue, Apr 28, 2020 at 06:00:52PM +0200, Stefano Garzarella wrote:
-> > > > > On Tue, Apr 28, 2020 at 04:13:22PM +0800, Jason Wang wrote:
-> > > >
-> > > > WRT netdev, do we foresee big gains beyond just leveraging the netdev's
-> > > > namespace?
-> > >
-> > > It's a leverage of the network subsystem (netdevice, steering, uAPI,
-> > > tracing, probably a lot of others), not only its namespace. It can
-> > > avoid duplicating existing mechanisms in a vsock specific way. If we
-> > > manage to do that, namespace support will be a "byproduct".
-> > >
-> > [...]
-> > >
-> > > Yes, it can. I think we need to evaluate both approaches (that's why I
-> > > raise the approach of reusing netdevice). We can hear from others.
-> > >
-> >
-> > I agree it is worth evaluating. If netdev is being considered, then it
-> > is probably also worth considering your suggestion from a few years back
-> > to add these capabilities by building vsock on top of virtio-net [1].
-> >
-> > [1] https://lore.kernel.org/all/2747ac1f-390e-99f9-b24e-f179af79a9da@redhat.com/
-> 
-> Yes. I think having a dedicated netdev might be simpler than reusing
-> the virito-net.
-> 
-> >
-> > Considering that the current vsock protocol will only ever be able to
-> > enjoy a restricted feature set of these other net subsystems due to its
-> > lack of tolerance for packet loss (e.g., no multiqueue steering, no
-> > packet scheduling), I wonder if it would be best to a) wait until a user
-> > requires these capabilities, and b) at that point extend vsock to tolerate
-> > packet loss (add a seqnum)?
-> 
-> Maybe, a question back to this proposal. What's the plan for the
-> userspace? For example, do we expect to extend iproute2 and other and
-> how (e.g having a new vsock dedicated tool)?
-> 
+From: Keith Busch <kbusch@kernel.org>
 
-If we were going to add a seqnum and start bringing in other systems, we
-would probably want to add support into iproute2. For example, when I
-played with qdisc, using ip seemed like the best from the user side.
-The iproute2 changes weren't bad at all[1]. We'd probably need the
-device to carry a new feature bit too.
+A large DMA mapping request can loop through dma address pinning for
+many pages. The repeated vmf_insert_pfn can be costly, so let the task
+reschedule as need to prevent CPU stalls.
 
-That said, all of this still creates the problem of adding new
-system-level ways to disrupt AF_VSOCK users. I think we could offer this
-in a way that is orthogonal to prior vsock, possibly AF_VSOCK2, a
-sockopt, or ioctl to opt-in to using net features... so that we aren't
-violating commitment to existing users that vsock should work regardless
-of network configuration? letting the user that holds the fd of the
-socket make the choice might be the best way to safeguard the contract?
+ rcu: INFO: rcu_sched self-detected stall on CPU
+ rcu: 	36-....: (20999 ticks this GP) idle=3Db01c/1/0x4000000000000000 so=
+ftirq=3D35839/35839 fqs=3D3538
+ rcu: 	         hardirqs   softirqs   csw/system
+ rcu: 	 number:        0        107            0
+ rcu: 	cputime:       50          0        10446   =3D=3D> 10556(ms)
+ rcu: 	(t=3D21075 jiffies g=3D377761 q=3D204059 ncpus=3D384)
+...
+  <TASK>
+  ? asm_sysvec_apic_timer_interrupt+0x16/0x20
+  ? walk_system_ram_range+0x63/0x120
+  ? walk_system_ram_range+0x46/0x120
+  ? pgprot_writethrough+0x20/0x20
+  lookup_memtype+0x67/0xf0
+  track_pfn_insert+0x20/0x40
+  vmf_insert_pfn_prot+0x88/0x140
+  vfio_pci_mmap_huge_fault+0xf9/0x1b0 [vfio_pci_core]
+  __do_fault+0x28/0x1b0
+  handle_mm_fault+0xef1/0x2560
+  fixup_user_fault+0xf5/0x270
+  vaddr_get_pfns+0x169/0x2f0 [vfio_iommu_type1]
+  vfio_pin_pages_remote+0x162/0x8e0 [vfio_iommu_type1]
+  vfio_iommu_type1_ioctl+0x1121/0x1810 [vfio_iommu_type1]
+  ? futex_wake+0x1c1/0x260
+  x64_sys_call+0x234/0x17a0
+  do_syscall_64+0x63/0x130
+  ? exc_page_fault+0x63/0x130
+  entry_SYSCALL_64_after_hwframe+0x4b/0x53
 
-[1]:	https://github.com/beshleman/iproute2/commit/55fd8a6c133335cda4ede6f8928eb3cea54534b8
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ drivers/vfio/vfio_iommu_type1.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Best,
-Bobby
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_ty=
+pe1.c
+index 50ebc9593c9d7..9ad5fcc2de7c7 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -679,6 +679,7 @@ static long vfio_pin_pages_remote(struct vfio_dma *dm=
+a, unsigned long vaddr,
+=20
+ 		if (unlikely(disable_hugepages))
+ 			break;
++		cond_resched();
+ 	}
+=20
+ out:
+--=20
+2.47.1
+
 
