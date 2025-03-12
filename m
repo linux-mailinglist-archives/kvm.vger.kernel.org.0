@@ -1,260 +1,259 @@
-Return-Path: <kvm+bounces-40810-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40811-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89E42A5D3EA
-	for <lists+kvm@lfdr.de>; Wed, 12 Mar 2025 02:14:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27CBBA5D417
+	for <lists+kvm@lfdr.de>; Wed, 12 Mar 2025 02:37:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5A101724C7
-	for <lists+kvm@lfdr.de>; Wed, 12 Mar 2025 01:14:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C42EC1897F02
+	for <lists+kvm@lfdr.de>; Wed, 12 Mar 2025 01:37:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 706133595E;
-	Wed, 12 Mar 2025 01:14:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A15213C82E;
+	Wed, 12 Mar 2025 01:37:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dmDlqUoQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V3oGwvo2"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29DC8634D
-	for <kvm@vger.kernel.org>; Wed, 12 Mar 2025 01:14:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741742044; cv=none; b=BYF0bZZ1mOyVG5v3JZ7sh16ur0mQfXhAymjrj8fEfOtZuk71wiImy4p3igntA3WzS0qSGddW0N9qsdr6sGsFXHmWrN7R6e32m3JJYF1m3zQ1iposoyqy2mf5o34FCwzHZ7U5NuYK/cZJJOn6tR+FHQwgn+pjlxiREZnVLyxg/Xg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741742044; c=relaxed/simple;
-	bh=cw+bu3HxlbNj06nDNyIU+XJthNYzbbahBS9eBPqp78Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oiaOlVqTAqznyuRbZHVkMTcU7WKjhp81mWo0g8gMMhX+Kx/OoCTX2Mddgx0UV+mmRek+Pv6V4ei2Ls+Urt1i/hdSkVuOPB1a3UjAkef93xlu9dVhDmFLxERWfBndDeeFMXaa3HIcT2MOSc8hvpjQsattjSpysQdo63fnZSumMm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dmDlqUoQ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741742041;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GTQ6FqeSGJWa4gXakFBln2Ru3c0CV8pFrUsBtR+Ub9U=;
-	b=dmDlqUoQCbnCFZ7Hi4JHHqDnN1Eb7lrkfTEJEVUnDVU+8hIpqHhhlMOhGJHhcYn96EC3ie
-	3BKBFvqy5SNJ6XCylrsFE/8NVWHuXscEXh03IUuySSwNS+L8o4aV+xbZnipfE20Evz69r/
-	frh0IRNfIb836TLHlJIB/3KLIMu9Gd4=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-498-34Xi6h_tNNSo5Tb8LP3Huw-1; Tue,
- 11 Mar 2025 21:13:56 -0400
-X-MC-Unique: 34Xi6h_tNNSo5Tb8LP3Huw-1
-X-Mimecast-MFC-AGG-ID: 34Xi6h_tNNSo5Tb8LP3Huw_1741742034
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0DA7019560B4;
-	Wed, 12 Mar 2025 01:13:54 +0000 (UTC)
-Received: from tpad.localdomain (unknown [10.96.133.2])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C1A881955BCB;
-	Wed, 12 Mar 2025 01:13:52 +0000 (UTC)
-Received: by tpad.localdomain (Postfix, from userid 1000)
-	id 67841400DCFE8; Tue, 11 Mar 2025 22:13:30 -0300 (-03)
-Date: Tue, 11 Mar 2025 22:13:30 -0300
-From: Marcelo Tosatti <mtosatti@redhat.com>
-To: Isaku Yamahata <isaku.yamahata@intel.com>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com,
-	Sean Christopherson <seanjc@google.com>, chao.gao@intel.com,
-	rick.p.edgecombe@intel.com, yan.y.zhao@intel.com,
-	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-	Nikunj A Dadhania <nikunj@amd.com>
-Subject: Re: [PATCH 0/2] KVM: kvm-coco-queue: Support protected TSC
-Message-ID: <Z9DfurM5LwR5fwX4@tpad>
-References: <cover.1728719037.git.isaku.yamahata@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44D653595E;
+	Wed, 12 Mar 2025 01:37:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741743449; cv=fail; b=BsKtMRSKCnpJgi1hzrndu2YdMcedjAU0vmpVwLFy1CE+NSkoYc3O9L6vf4lnwnjyzlJ+UvXFSESzdzZHwo6jSRkhsaKRzkpOOhMeyj2Lp255FQMD9ucipH4aRpIhR5nuVOnQ1KPreRteBIaZR/ZpGygyDV12VR+OXpJzFuffa/M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741743449; c=relaxed/simple;
+	bh=lK4xktmhmtsLcBmwsWCeVzG6OHgFPKoSSQkcbFdxrcU=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=mPtmm+2KiIAJyuXhv4ATSqWqO4mOqvWrWTImfNXYCSrSRM9dWUMKM8q8MhG0tWq7R5NOw4lGRlueqw3NExZmc9eUh09DhfET62sjCJtv1J5DqqbTLhk6xe60y4XWmlH9lTusqeHRfCLyLdesP5qE2qpif6xkQcJ2gGjqOk+RS2Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V3oGwvo2; arc=fail smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741743447; x=1773279447;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=lK4xktmhmtsLcBmwsWCeVzG6OHgFPKoSSQkcbFdxrcU=;
+  b=V3oGwvo2MHL89tfB/ncmxVMOQTFCho4dc9HH6QNOGxCrJASjMlM87/rb
+   q4qnr3YM4VTUBLoWbfdlUySzRKfwjBYjf6Bvr/gEFixy0bJScllSqwJv3
+   BF2ESVa9Tqv/fC7vskxtuJIRsx6jU9YNx1MkBPrTfrzGGVZNdt/TYJgRZ
+   HPrSWXSRx6Wc48j1nsUD1JKQb0I6M+4YE8FIN7zJJxtvn5kSP8VY+o2G7
+   wfE3YzuhglJmfdZUexsn724fM2CVS84bvVx2u+hzXr8J3JCKOyXnsGH9J
+   cwJ3eM4UG9/GPQj7xYTYAUFo9SfzqF7x9XewbXMbXKkVpV0RxmzvCZ433
+   g==;
+X-CSE-ConnectionGUID: +PgNWczhRemjOtWoFyhwUA==
+X-CSE-MsgGUID: cpxuUwtiTaatxsdC5qVyxQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11370"; a="53448237"
+X-IronPort-AV: E=Sophos;i="6.14,240,1736841600"; 
+   d="scan'208";a="53448237"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2025 18:37:26 -0700
+X-CSE-ConnectionGUID: xdiefz1USOiaGnhD7Cgomw==
+X-CSE-MsgGUID: z90UtD4KRYqZQl9mdttPYw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,240,1736841600"; 
+   d="scan'208";a="120193427"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Mar 2025 18:37:26 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Tue, 11 Mar 2025 18:37:25 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Tue, 11 Mar 2025 18:37:25 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.174)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Tue, 11 Mar 2025 18:37:25 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JC+Ld3koqNdb6HXxIN6fJjismL6kLF/qHhqM9shxmAeq/VkwcbQeND0HQz7R4wHGKqhUDBcvrxUv+KmFNKQ50VdHA97CbEbBWgSGxgTsv2Vj6xO/nKjUQbF46xQyph9GTds7Udb5+RljWdUn1rJuP+N+PuC2a/msvT6aqQKnTfJ5UWmgUpyfByW7Ejj/WOHNxnCkO9UzO/roDz12VERoS8W/4wYUNMxiRljhH6fr4764XE9FlV4wckNaMkVAurMwsSoeavV40nquB98Ou7fyWWossF8SIbU+C3WRvUAKROEyqOEJzsxZrjyiyd3q94EJME2azO28nKqzsd9Dg/hODQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Su8yCl/m9HJ4ipeRf8wS/T3VyEUWJ0hgUDBZiqYVC8U=;
+ b=COFBWTAkGQlKULOOFJZkHgPg7b+pLeCP9meBRCdlWMYRd+s0AvI/QdqO5Pu3RgpaEAn8M9e271tTvELXFlsEind5HACdS5t6BwY1H46p7Dd9pZ++vm/9jzLi5UEm3udCVDH2cTrjraiwF01qjtmiHeUnwi8HSmsBt6kCZ9ExtfKumU89wlunFIEYPSF2PmCYaDHvQUq/IzXo0IVInAlswMErByo5yGyAQY21HMGmxx5BIr4iMUJFUC1OrlYDFqWPySRGjXq42+R/gNoeu5zJq0Y55hQvJLJHZRlWh/lxwMp6F3doAau/3gGRuh5t5LuEcKba64TsY+Sql9I7rPGrVg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
+ by LV3PR11MB8766.namprd11.prod.outlook.com (2603:10b6:408:212::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.27; Wed, 12 Mar
+ 2025 01:37:17 +0000
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8]) by PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8%4]) with mapi id 15.20.8511.026; Wed, 12 Mar 2025
+ 01:37:17 +0000
+Date: Tue, 11 Mar 2025 18:37:13 -0700
+From: Dan Williams <dan.j.williams@intel.com>
+To: Jason Gunthorpe <jgg@nvidia.com>, Alexey Kardashevskiy <aik@amd.com>
+CC: Baolu Lu <baolu.lu@linux.intel.com>, Xu Yilun <yilun.xu@linux.intel.com>,
+	<kvm@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+	<linux-media@vger.kernel.org>, <linaro-mm-sig@lists.linaro.org>,
+	<sumit.semwal@linaro.org>, <christian.koenig@amd.com>, <pbonzini@redhat.com>,
+	<seanjc@google.com>, <alex.williamson@redhat.com>,
+	<vivek.kasireddy@intel.com>, <dan.j.williams@intel.com>,
+	<yilun.xu@intel.com>, <linux-coco@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, <lukas@wunner.de>, <yan.y.zhao@intel.com>,
+	<daniel.vetter@ffwll.ch>, <leon@kernel.org>, <zhenzhong.duan@intel.com>,
+	<tao1.su@intel.com>
+Subject: Re: [RFC PATCH 08/12] vfio/pci: Create host unaccessible dma-buf for
+ private device
+Message-ID: <67d0e549d4d27_201f029458@dwillia2-xfh.jf.intel.com.notmuch>
+References: <Z4Hp9jvJbhW0cqWY@yilunxu-OptiPlex-7050>
+ <20250113164935.GP5556@nvidia.com>
+ <ZnDGqww5SLbVD6ET@yilunxu-OptiPlex-7050>
+ <20250114133553.GB5556@nvidia.com>
+ <17cd9b77-4620-4883-9a6a-8d1cab822c88@amd.com>
+ <20250115130102.GM5556@nvidia.com>
+ <f1ac048f-64b1-4343-ab86-ad98c24a44f5@linux.intel.com>
+ <20250117132523.GA5556@nvidia.com>
+ <835c7751-d8ba-4af0-812f-2b3a9a91d0bc@amd.com>
+ <20250120132843.GI5556@nvidia.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250120132843.GI5556@nvidia.com>
+X-ClientProxiedBy: MW2PR2101CA0025.namprd21.prod.outlook.com
+ (2603:10b6:302:1::38) To PH8PR11MB8107.namprd11.prod.outlook.com
+ (2603:10b6:510:256::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1728719037.git.isaku.yamahata@intel.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|LV3PR11MB8766:EE_
+X-MS-Office365-Filtering-Correlation-Id: 37b5634f-18cf-489a-67b2-08dd61066c5c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?Kzkxq8zPsyIXGe0BThEHRfArRJy3R4j37lCV1QxvGzVF+zI/UfjN3zPTJwyA?=
+ =?us-ascii?Q?8HHxo/z/mDb3V79KO63pHAUtK3MVspTnfDW2mY4DYwSosN4pFwE07bfibsEE?=
+ =?us-ascii?Q?5p/VIbLJp+IN6LjY00hRAOuS9pp0KfI69XtWCJJXxc7Llu/sSmUDzZd0mU8g?=
+ =?us-ascii?Q?D7dSTRewPfBgyS9w0KkidOhWo8qYuoKj6wlzg1vD48O/f/USagGeUcO+I3ii?=
+ =?us-ascii?Q?OQ6zvNM0KNJwWOZjd51aHmk7u/J3c9rSLYx5wZJNmQmlbDOm4QjhHc9tbua2?=
+ =?us-ascii?Q?Aux6DJ+vqoKmqcsPCu0efKoML/HArDzOrfcNAD4MnvKtENtJOmTxB8O1BJ0p?=
+ =?us-ascii?Q?BxrUsZbLPo86p3SKTyRiy3aaIb8V0tY8+e2n6hhOXjnTMVpEv+xOUyuuIRqD?=
+ =?us-ascii?Q?SCuWKEFeHl50eeh6S0i4uXKOFW+Lf76mzFTtLEwnanjr+c0wsUDtYwKfoeVF?=
+ =?us-ascii?Q?fAXHPff7KTnPi9lwsI89ZR2LDCfUmt/3cRvKjE0XGrMmKAE/ejvPLvaTzvZ2?=
+ =?us-ascii?Q?9u7AqMXRD+0P1Kai90OZUzIrANwPWUO8pH8VGp6OCGTRXr+RWo78msJkJYh+?=
+ =?us-ascii?Q?Oux+k8jBnUQjdPdes9zzjqRYycpd7Tgwqu4EG5AxUGrUZVTaF61VV1BSYw6B?=
+ =?us-ascii?Q?Rc5Ii/LP7+s8reNbtP4TNkMM3vbO96gDwmnRkMcI/h9OO3UsDJOtWJP75IH5?=
+ =?us-ascii?Q?lVB8dklwS5zXlk1WzuihNuievaW6ZO8EQ0Alyfn7Piziv6KWYKa2IGmXA3Qh?=
+ =?us-ascii?Q?EjwLMYcwsjXkXnF1Pp9ZvSp2kNO9q2FHlbNMVmo3pR905rJJGY0i4/VyTOqq?=
+ =?us-ascii?Q?jsbf1z+qZG0Tg0dnt8BdwgIhkv45aJ1vOX4pg0+iW1TjJoPbH73KdqG9tWz+?=
+ =?us-ascii?Q?shr1i08lstb5b+jG3WCbhOSmVs/oa2RrJS5yYgRB31BIwH/NXtNgysoRjOpP?=
+ =?us-ascii?Q?Q+UTSabBzbcmUqBy7uAurSe8YJ6flB6DIewSD6pHtr1PO3g83llQr6ad+aXx?=
+ =?us-ascii?Q?0fJrvcxuCWRDq4auHDgZAcdURGy6jdmWMrhcEpr83iwJYipXe6gxgATj6dIh?=
+ =?us-ascii?Q?AddYg45T8EEJ+Vn0vS03U0sV8++PE/bMtxDE3ukVUhK0JMR1r6Six09L7/03?=
+ =?us-ascii?Q?gjQCQ42ZgkvSGRyxEC99NXcLiOTI8yT466tiRs2kPvPuFqQmn4q0PxbRc7UO?=
+ =?us-ascii?Q?5bhKBK+p5dIpKNjf4oeZfnfZcqH4fZF6Vjmj4kgtQV8th5xj9+ZXZPJLMNGt?=
+ =?us-ascii?Q?II359vQBf9BAVQBXXIFvdUqaTJgYzMO+rydkLRispOflMlUkGxiB2It6jKa2?=
+ =?us-ascii?Q?Rv6oJs3Nnvya4tGnM3tZTXtojgO0D+wJFXDBa3MmhmdO+4QXvINQhpktY1mH?=
+ =?us-ascii?Q?aqRivjasiieU3uyav4PePS0HZHSj?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Ttrl8dLU7exUQCLVc4KQwjKgtPQkM2R9IiqSAJxuXFtjUg6asrMb43p+3mBV?=
+ =?us-ascii?Q?2AKVeqT6KhjlSCQD2x6/FUtmM1bDiriMC+u1YOI1u0T/ODeub07WR6t+CogI?=
+ =?us-ascii?Q?vFMIKlvzrjzMMeuZWSKDyf9mRNLuyCfcQ+kNuuaHCaz1+HGb2/r5aV7fzuE2?=
+ =?us-ascii?Q?5OwYUo8dBLPxblVVXS/MXdz64YlBP5viqUefI0ehosxBZXHmgrlYd1yqlk0B?=
+ =?us-ascii?Q?/WtVZDqPz/4mW4KWPEBo5rjPzAdCe1VlIBt+f1ZSfzer+7ohp2XPMV89S7Go?=
+ =?us-ascii?Q?lE092PAmdW5NZ9su0f7m7ThXFHAyZFDez1FhCLCKW0sZ0xHGb9CCk8nbW4S+?=
+ =?us-ascii?Q?7BYwGWt7Jr+aI5MWOspWziB8g52tPg2DzSaD4HSubgvyXk9giIdWLMDDfCms?=
+ =?us-ascii?Q?P/zF3LwsRQDj12MUA6S9YM2A/QKBH2PKX6CJD+PibS+MGMCFXFaN9xGVZ1Rh?=
+ =?us-ascii?Q?MXhCcMIa+vRsN4+hzKhO8mWnDQoGsbSiyZJ0UPIHjatc5X5jM8xeElte0a1i?=
+ =?us-ascii?Q?21PwvDns/7BjHnkyqKD96hgzmDHil+mHn5U5h7bNPCpBNvb0WdMZZbY/M17w?=
+ =?us-ascii?Q?bGX793hcJLA0yWTLwH9fwvtwYyveQOYhGxoKRLsgdAiDNDqpnNF6Y02yxMpk?=
+ =?us-ascii?Q?Vz71p4rCysLPBVSK9t909DyyrzYkSwbny0HE4j/aEqUcHmaPbus5zZ1wDl0m?=
+ =?us-ascii?Q?zZiezpveJ8oT1uwMBSHvWslvEb/1XkK31M2S0dLbfshswTiVoPLI3Go17fRJ?=
+ =?us-ascii?Q?gEfXUAJEFZnAWkn5w4Dfdv8sfITp9ZohcfPWXJJOu9imT0/+f/iPVVpJtVPJ?=
+ =?us-ascii?Q?WXAQLYniOa//w8DDVdEjoPx7ea7OvY6Up6ESD8bSF7r5Woiub58ljSzcrxZA?=
+ =?us-ascii?Q?8WZl9hKLDNWhsprRt4DyEsVPXqNgnburSAZPS0798Cy+7UbEL5w/kF5lu6SP?=
+ =?us-ascii?Q?Te19HkkIKdEhGGdH61wF6wT08gVc6ze9Trrg2CHeG7Dta1LhKkR4Z6D1fmw4?=
+ =?us-ascii?Q?1/w5BwW4FvLQS1r4Lbbs3Dpi8zcgIthkpbYZCO3tfL5xy+Tp1c045mrYD9MU?=
+ =?us-ascii?Q?ZnZafgmdgOgNEt7oSKdqwftJ54jMjB8JF+gkZdgqRClIu0CfNxu/jbgnMVN2?=
+ =?us-ascii?Q?VlAlYeJE7E/AZHqjLbW7DTvea419OsnEqxF2FnopDRNYhN29aXSFCS7+wQsI?=
+ =?us-ascii?Q?/1T7UkFNRRmmrWCVtRtmpYxqoQqQ/L/QtkiZd2dv/ymXQw/EqN6Pcnfg59tB?=
+ =?us-ascii?Q?XmVZA9KyhehQ+9DXPI1zHKuIFFb63SWRUZhSzz3Z6MV9yuifRe5Tg48t8JIV?=
+ =?us-ascii?Q?DXRigpE1bYJ6LmylIAh4wGuCx9gJs5HPXrWRi13yJ1hLVP/ebal1OT4+OZH4?=
+ =?us-ascii?Q?XVe916I7smxIG/xVRiOvgOVpiZp1RNJF2hsakCz49FdXJ/96smV37HIC/N7R?=
+ =?us-ascii?Q?gpBbGn1MUayuC1tklPA7hEpEgdC4nj7EfTEmEkUEXZZnj0lbGbip9ocapUK0?=
+ =?us-ascii?Q?sNbnJ2IkhaZbCeyBZKhF6xxIZIvQ3C+ZGUYExlZncVHqat0xJgLuXeQlzS/P?=
+ =?us-ascii?Q?dUhYYjw8NciON0X8H4SzLfRUlmmaazYbp3XSM3N+iZCl44RHxmN0XkLPXTrw?=
+ =?us-ascii?Q?wg=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 37b5634f-18cf-489a-67b2-08dd61066c5c
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Mar 2025 01:37:17.3926
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: F4zyWPgxAbFeVdbfvJBOeiPHtC20mGPC6h/cUgUUQ2LmVVQPoU3S/0/gh8AbqmCI8jeQOC/uc7+CczncDSjDee3GjFgjhjHOUFipeSc348E=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8766
+X-OriginatorOrg: intel.com
 
-On Sat, Oct 12, 2024 at 12:55:54AM -0700, Isaku Yamahata wrote:
-> This patch series is for the kvm-coco-queue branch.  The change for TDX KVM is
-> included at the last.  The test is done by create TDX vCPU and run, get TSC
-> offset via vCPU device attributes and compare it with the TDX TSC OFFSET
-> metadata.  Because the test requires the TDX KVM and TDX KVM kselftests, don't
-> include it in this patch series.
+[ My ears have been burning for a couple months regarding this thread
+  and I have finally had the chance to circle back and read through all
+  the discussion on PATCH 01/12 and this PATCH 08/12, pardon the latency
+  while I addressed some CXL backlog ]
 
-OK, previous results were incorrect. In fact, this patches (which apply
-cleanly to current kvm-coco-queue) reduce cyclictest latency from:
+Jason Gunthorpe wrote:
+> On Mon, Jan 20, 2025 at 08:45:51PM +1100, Alexey Kardashevskiy wrote:
+> 
+> > > For CC I'm expecting the KVM fd to be the handle for the cVM, so any
+> > > RPCs that want to call into the secure world need the KVM FD to get
+> > > the cVM's identifier. Ie a "bind to cVM" RPC will need the PCI
+> > > information and the cVM's handle.
+> > 
+> > And keep KVM fd open until unbind? Or just for the short time to call the
+> > PSP?
+> 
+> iommufd will keep the KVM fd alive so long as the vIOMMU object
+> exists. Other uses for kvm require it to work like this.
+> 
+> > > But it also seems to me that VFIO should be able to support putting
+> > > the device into the RUN state without involving KVM or cVMs.
+> > 
+> > AMD's TDI bind handler in the PSP wants a guest handle ("GCTX") and a guest
+> > device BDFn, and VFIO has no desire to dive into this KVM business beyond
+> > IOMMUFD.
+> 
+> As in my other email, VFIO is not restricted to running VMs, useful
+> things should be available to apps like DPDK.
+> 
+> There is a use case for using TDISP and getting devices up into an
+> ecrypted/attested state on pure bare metal without any KVM, VFIO
+> should work in that use case too.
 
-Max Latencies: 00167 00160
-Max Latencies: 00132 00151
-Max Latencies: 00138 00142
-Max Latencies: 02512 02582
-Max Latencies: 00139 00140
-Max Latencies: 00128 00131
-Max Latencies: 00131 00132
-Max Latencies: 00131 00134
-Max Latencies: 00136 00147
-Max Latencies: 00153 00135
-Max Latencies: 00138 00138
+Are you sure you are not confusing the use case for native PCI CMA plus
+PCIe IDE *without* PCIe TDISP? In other words validate device
+measurements over a secure session and set up link encryption, but not
+enable DMA to private memory. Without a cVM there is no private memory
+for the device to talk to in the TDISP run state, but you can certainly
+encrypt the PCIe link.
 
-to:
+However that pretty much only gets you an extension of a secure session
+to a PCIe link state. It does not enable end-to-end MMIO and DMA
+integrity+confidentiality.
 
-Max Latencies: 00134 00131                                                                                  
-Max Latencies: 00130 00129                                                                                  
-Max Latencies: 00126 00141                                                                                 
-Max Latencies: 00137 00138                                                                                  
-Max Latencies: 00123 00115                                                                                  
-Max Latencies: 00119 00127                                                                                  
-Max Latencies: 00131 00104                                                                                  
-Max Latencies: 00137 00127                                                                                  
-Max Latencies: 00135 00126                                                                                  
-Max Latencies: 00128 00142                                                                                  
-Max Latencies: 00135 00138         
+Note that to my knowledge all but the Intel TEE I/O implementation
+disallow routing T=0 traffic over IDE. The host bridge only accepts T=1
+traffic over IDE to private memory which is not this "without any KVM"
+use case.
 
-> 
-> 
-> Background
-> ----------
-> X86 confidential computing technology defines protected guest TSC so that the
-> VMM can't change the TSC offset/multiplier once vCPU is initialized and the
-> guest can trust TSC.  The SEV-SNP defines Secure TSC as optional.  TDX mandates
-> it.  The TDX module determines the TSC offset/multiplier.  The VMM has to
-> retrieve them.
-> 
-> On the other hand, the x86 KVM common logic tries to guess or adjust the TSC
-> offset/multiplier for better guest TSC and TSC interrupt latency at KVM vCPU
-> creation (kvm_arch_vcpu_postcreate()), vCPU migration over pCPU
-> (kvm_arch_vcpu_load()), vCPU TSC device attributes (kvm_arch_tsc_set_attr()) and
-> guest/host writing to TSC or TSC adjust MSR (kvm_set_msr_common()).
-> 
-> 
-> Problem
-> -------
-> The current x86 KVM implementation conflicts with protected TSC because the
-> VMM can't change the TSC offset/multiplier.  Disable or ignore the KVM
-> logic to change/adjust the TSC offset/multiplier somehow.
-> 
-> Because KVM emulates the TSC timer or the TSC deadline timer with the TSC
-> offset/multiplier, the TSC timer interrupts are injected to the guest at the
-> wrong time if the KVM TSC offset is different from what the TDX module
-> determined.
-> 
-> Originally the issue was found by cyclic test of rt-test [1] as the latency in
-> TDX case is worse than VMX value + TDX SEAMCALL overhead.  It turned out that
-> the KVM TSC offset is different from what the TDX module determines.
-> 
-> 
-> Solution
-> --------
-> The solution is to keep the KVM TSC offset/multiplier the same as the value of
-> the TDX module somehow.  Possible solutions are as follows.
-> - Skip the logic
->   Ignore (or don't call related functions) the request to change the TSC
->   offset/multiplier.
->   Pros
->   - Logically clean.  This is similar to the guest_protected case.
->   Cons
->   - Needs to identify the call sites.
-> 
-> - Revert the change at the hooks after TSC adjustment
->   x86 KVM defines the vendor hooks when the TSC offset/multiplier are
->   changed.  The callback can revert the change.
->   Pros
->   - We don't need to care about the logic to change the TSC offset/multiplier.
->   Cons:
->   - Hacky to revert the KVM x86 common code logic.
-> 
-> Choose the first one.  With this patch series, SEV-SNP secure TSC can be
-> supported.
-> 
-> 
-> Patches:
-> 1: Preparation for the next patch
-> 2: Skip the logic to adjust the TSC offset/multiplier in the common x86 KVM logic
-> 
-> [1] https://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git
-> 
-> Changes for TDX KVM
-> 
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 8785309ccb46..969da729d89f 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -694,8 +712,6 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
->  	vcpu->arch.cr0_guest_owned_bits = -1ul;
->  	vcpu->arch.cr4_guest_owned_bits = -1ul;
->  
-> -	vcpu->arch.tsc_offset = kvm_tdx->tsc_offset;
-> -	vcpu->arch.l1_tsc_offset = vcpu->arch.tsc_offset;
->  	/*
->  	 * TODO: support off-TD debug.  If TD DEBUG is enabled, guest state
->  	 * can be accessed. guest_state_protected = false. and kvm ioctl to
-> @@ -706,6 +722,13 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
->  	 */
->  	vcpu->arch.guest_state_protected = true;
->  
-> +	/* VMM can't change TSC offset/multiplier as TDX module manages them. */
-> +	vcpu->arch.guest_tsc_protected = true;
-> +	vcpu->arch.tsc_offset = kvm_tdx->tsc_offset;
-> +	vcpu->arch.l1_tsc_offset = vcpu->arch.tsc_offset;
-> +	vcpu->arch.tsc_scaling_ratio = kvm_tdx->tsc_multiplier;
-> +	vcpu->arch.l1_tsc_scaling_ratio = kvm_tdx->tsc_multiplier;
-> +
->  	if ((kvm_tdx->xfam & XFEATURE_MASK_XTILE) == XFEATURE_MASK_XTILE)
->  		vcpu->arch.xfd_no_write_intercept = true;
->  
-> @@ -2674,6 +2697,7 @@ static int tdx_td_init(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
->  		goto out;
->  
->  	kvm_tdx->tsc_offset = td_tdcs_exec_read64(kvm_tdx, TD_TDCS_EXEC_TSC_OFFSET);
-> +	kvm_tdx->tsc_multiplier = td_tdcs_exec_read64(kvm_tdx, TD_TDCS_EXEC_TSC_MULTIPLIER);
->  	kvm_tdx->attributes = td_params->attributes;
->  	kvm_tdx->xfam = td_params->xfam;
->  
-> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-> index 614b1c3b8483..c0e4fa61cab1 100644
-> --- a/arch/x86/kvm/vmx/tdx.h
-> +++ b/arch/x86/kvm/vmx/tdx.h
-> @@ -42,6 +42,7 @@ struct kvm_tdx {
->  	bool tsx_supported;
->  
->  	u64 tsc_offset;
-> +	u64 tsc_multiplier;
->  
->  	enum kvm_tdx_state state;
->  
-> diff --git a/arch/x86/kvm/vmx/tdx_arch.h b/arch/x86/kvm/vmx/tdx_arch.h
-> index 861c0f649b69..be4cf65c90a8 100644
-> --- a/arch/x86/kvm/vmx/tdx_arch.h
-> +++ b/arch/x86/kvm/vmx/tdx_arch.h
-> @@ -69,6 +69,7 @@
->  
->  enum tdx_tdcs_execution_control {
->  	TD_TDCS_EXEC_TSC_OFFSET = 10,
-> +	TD_TDCS_EXEC_TSC_MULTIPLIER = 11,
->  };
->  
->  enum tdx_vcpu_guest_other_state {
-> 
-> ---
-> Isaku Yamahata (2):
->   KVM: x86: Push down setting vcpu.arch.user_set_tsc
->   KVM: x86: Don't allow tsc_offset, tsc_scaling_ratio to change
-> 
->  arch/x86/include/asm/kvm_host.h |  1 +
->  arch/x86/kvm/x86.c              | 21 ++++++++++++++-------
->  2 files changed, 15 insertions(+), 7 deletions(-)
-> 
-> 
-> base-commit: 909f9d422f59f863d7b6e4e2c6e57abb97a27d4d
-> -- 
-> 2.45.2
-> 
-> 
+The uapi proposed in the PCI/TSM series [1] is all about the setup of PCI
+CMA + PCIe IDE without KVM as a precuror to all the VFIO + KVM + IOMMUFD
+work needed to get the TDI able to publish private MMIO and DMA to
+private memory.
 
+[1]: http://lore.kernel.org/174107245357.1288555.10863541957822891561.stgit@dwillia2-xfh.jf.intel.com
 
