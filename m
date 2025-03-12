@@ -1,505 +1,283 @@
-Return-Path: <kvm+bounces-40858-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40859-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FAF0A5E629
-	for <lists+kvm@lfdr.de>; Wed, 12 Mar 2025 22:06:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B88BA5E731
+	for <lists+kvm@lfdr.de>; Wed, 12 Mar 2025 23:18:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67E7417D4EE
-	for <lists+kvm@lfdr.de>; Wed, 12 Mar 2025 21:04:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A749817BBCB
+	for <lists+kvm@lfdr.de>; Wed, 12 Mar 2025 22:18:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 569871F3D5D;
-	Wed, 12 Mar 2025 20:59:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBACF1EFFAF;
+	Wed, 12 Mar 2025 22:17:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gj4ZK6zG"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="JtTCYbqk";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="YvcQiaWT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99AF01F30DE;
-	Wed, 12 Mar 2025 20:59:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741813187; cv=none; b=chhVH9BvFQKa9mIwZpwLRrcyuWDiY+BdQwq2GOQTsZ4e8iaJol2gfwuU5avBn7EtzMPlalwhlDhXFW7m/EqmMk0G06R8vkvtOhqqJazOqqKixrOl1FuO6FpGgeqIZ+yE7ommPIj5UA6poiXQud1oOMvCNtLcx+vm7HLoh5UEpc0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741813187; c=relaxed/simple;
-	bh=Do16I5bAYzmzhFhoe8gnWsx5863bMKTjbneEuRXGaqU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Y/3KvWGIw0IbIbwzlibJ8wqi/SOCmMWM3ojiOi+WsVpxtVkdS4z3w14016Hw0Bj8K3vgGo5arJCjaRhm4FMgtqPcVORcB/BW+apbE17nkEfzaZ+IG5iq/ozb6Fru3Y1J1OQggiCJooLEkJ1CyAL6f1byuRYRNFaBRlAXPAvIwB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gj4ZK6zG; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2ff6a98c638so750338a91.0;
-        Wed, 12 Mar 2025 13:59:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AF8D19E96D
+	for <kvm@vger.kernel.org>; Wed, 12 Mar 2025 22:17:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741817879; cv=fail; b=CpCCO3WnXQBAt899zTGNKhNNLbEQtfyj4fcCcaeoB2FnmsNpH56FpQLkh1kNpR1WhevWYOqrSHzEPpAnxDhX8uGtw/l33hK0FKlt4P0nrw8JVR+4j0Z7e70ixuRB6xydeL1B4Xhvl4N6UMPxlZL7xV3ojvBXJHY+IXhrOdwzM34=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741817879; c=relaxed/simple;
+	bh=E0DOPWMo+++4W+gWp+Volqiut1+BmAykJNLHdSSZ+hQ=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ivYZUx3yQxIjhmNR+s1BlRhavFjdwqUxpRgps6p3UdeicNMKTEn+EV9ESb/3c89S+JKAurxPZoIMKwZ6ltrsw3h2wq4YuLdoffBqDoK7ypycHOItxKF9pkaAjABUJ/OwLm9JzziJy9f7I0B739W7swCnDHIvt26Y+6BtG0DqE/M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=JtTCYbqk; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=YvcQiaWT; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52CItrtv015513;
+	Wed, 12 Mar 2025 22:17:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2023-11-20; bh=JW7eDsPO9SzTWCRVtOSSqfOqSO2MiEd0Tv29hfYcKII=; b=
+	JtTCYbqkJDhxkYT5RUlKWUgu6ljQOvrzkatS9q3NGhsqo74aBARFGbdDMrhX7ine
+	whfso48368uVq5AXw6MOLTcnVx9ZR1+GxAgWXN6YkBCuKqDXKU9rnRRpITn7ZeGe
+	ceIvELYhKaYJe+pDZRu9SUWQ+eVp/vycBp4xFLZpRp7cdw+7iYqOL/UQjh2xFQ3k
+	JCMKb8L3euq4rN+Nx/+uFjK1214P1Q9bb8D/8qvzagHxDvU7yVZpeiubMpdnivYL
+	xskKcUaq/YsDoaEWuzCxcvm+HUCDg3of7VS+GhHZgOmtuqxo+bUmUNRv1V89sbf5
+	fVqt40YgIyxAOt6QmgJPbA==
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 45au4djxw2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 12 Mar 2025 22:17:24 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 52CL6FAj002224;
+	Wed, 12 Mar 2025 22:17:23 GMT
+Received: from nam02-dm3-obe.outbound.protection.outlook.com (mail-dm3nam02lp2045.outbound.protection.outlook.com [104.47.56.45])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 45atn7wjev-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 12 Mar 2025 22:17:22 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=vOOfUxHi6etN73Vm2P74r5Gxd2h+/YIWa11tbrBV1HJLEHhveu4PnW7/xdHBkjm4vl340nxYBPWqjeC2jrlDhAg/77ILh8zRJwTJ7RtR4Q262ruE8FCCnznL3GHEMevRXCKHaMlfWL80AFVC1uNnqRJ0x55eDVS3Ov1DGla/Bbci82/wPNYdsbJDJ5SjIfZG/Mr1rP4EiMsA6mfjJ1wFf0qUwd21ZkEpiEocAAJjO7cOebqYJB+pbKH+Jcw3ceFT3DPPCsFM4TwR5L1eT1j1NiicLbJCShzleSmEHqjjuqPwiKD2XS+QUdcA/mt755ZMGPQLAIbQKRGPvf139qx1lg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JW7eDsPO9SzTWCRVtOSSqfOqSO2MiEd0Tv29hfYcKII=;
+ b=bxAmvBbd1bLcrBidlqPPT7ZS94/X8prdPLFhSwc5G4C6H+QxXtdf4TmzBFalv057ao2kq/gj7sNfdYyaeNS9Jbtl2AJ1yGHwVJuU4Z52TcDHbG5GYugoOzAqfDYjrvoHz6bZaNMLNa2dF1KDwLB3SsMspvUIJ57wrv2DaNXcpvd9au8Zf82qFgzD//YMZvD2vFXEmBI2jzb6XswbsAt1kjIeViokEjdNj4DnvuCyGfONpFFKNWdP7732YHCLISO1yvu6h0bLUjm2fXsb+UDsUzps3icOB39m3h74kj1rfbqFw6sZJEaBY9jFHa0LkWIBPYX7MBeGw2MFmnf+/iNxnA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741813185; x=1742417985; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lCaQyn2/uqo7QNM9DADy6R5q4JezG8pI2E1+WaA9IUU=;
-        b=gj4ZK6zGSugeybrgfdRtomS6ZkfW4Dhn57be8vBpK7RN3WgEGu/Bqc8FMnhY4DGzT2
-         EunArjSFiae9lpz+soy/wITxgqokF3xQgNp0I+D5M1cuTDRh1RMTkhanMuYOs7+9YbgB
-         KkZBRelc8gg8CYU7DspNWHLTPpZp1FsiGmv9Mxtmhusk8mgvhKj9N+jgwWT2IQ46K1FC
-         GZ96i1F2Ux6nV7RvDGYjbWfCtMt/TPNP2Pi55ujV5NqG/mz7ZX8IPI5GktWT+UMUyIpA
-         5ntmyXCZwmotCPW+J5KjJejcd05H2xKGfXxqRibiMf8G4Dg0GSLcJMCncyoFkE0WHtNx
-         SrzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741813185; x=1742417985;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lCaQyn2/uqo7QNM9DADy6R5q4JezG8pI2E1+WaA9IUU=;
-        b=uNVG/kyXe4DnXhxUO18/WFRR3TrxZHqUSLnqi9Z5TB8hWmc134noB+1PbnZiufRKJV
-         rk7iUXV0B1NwP3C+YPOKV9u8h9sB98O6vLi2kkHgE8duLfRErwv8FXEaanrb6o+w993H
-         2mXByKddzTcqrBvQOMq0SsK0PHyHCLN0XZZixdkacUxadpSb7e/9TnJ0w6Q6/ZUSUuoX
-         muE1WcCL/fYYGXhOo5IMgzobfvyQx0S/ny6uZUzv7Uev50UROPNtiW1tqkYTq+ewnBaN
-         MuQ0VVajHTrvaTttKDL1zipOG1GhB6meZ9kWRa/vTwdY2xYCRiSZFa0xMxBuZzvhkrRS
-         kDTw==
-X-Forwarded-Encrypted: i=1; AJvYcCUU/q3jHFYXpRqLyWDDJ0bKry6kua0x87H7HEpecVUabmdp5QnFFRSmcYVF2NtaLXxJfbiHaeqFFyLOfBSQ@vger.kernel.org, AJvYcCUqTjfcpYRY69de56XE3ZT2XBCVMeiR9uphjlgEV+8bNDvTdbITnRsSaYXxPokIL0ZDQn4=@vger.kernel.org, AJvYcCUuMuAzcLub50ZGBkzWLfdzYCl4QR9mAOVjZe9FiJmKw2tFjSZc9Uj2uXpGdu/j6NCF2xrWJhpD@vger.kernel.org, AJvYcCWWFEil2GaybYYfhoP8rplHqnz13HIlybO3Apn3ZMHbTzNbSHhjRWjKZUAzGsWPz4Qg+ydqlyIXNnji4m58@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDQ0nkf7dTG7MypetShG/exyKAW/sQOAtYqdU944Ld6vsKTVGo
-	HEyiWZhMTIM01IkPYJUXQSzZhuUxomowO137kAZpGEoTyoUkomVZ
-X-Gm-Gg: ASbGncvsEYA84QzvDfD0BJ0OZLsZ+gCiCedxjn3zft53vlT/bAuR7Xbpq7ShWg3DdMk
-	2Idfgqrf0+fdGv1QDJrsE9Mg5mZWo2gGW94B2wRsx4V4CXeD1AsitlxyK46EvrYv6k/CcP3yVOS
-	y29DEH2p419fI2undEsseFXIlTdCrWeGFEDmXrUBdJ8CFqIFhqVTn5PGTvAADerwUT8XhUHmgYL
-	NPXoD//4TLwvWS/cIrnjLcKFTZmlzzapdLP5b2rmaDtUY9LCUZ8wE6RYrv1gNoKgG9u3D9i1I86
-	WRfW/1h9OdIyXmZnIohq9ix0xdJ2cE2GN1w5xAwM3/I=
-X-Google-Smtp-Source: AGHT+IG8o4T4fQgM/ljNeiMXid+znFHo/f0a3WcQ7wf4lTgAMYEbvfs/XE+5hQSFsAZ5+QRpMt+LWA==
-X-Received: by 2002:a17:90b:1d0a:b0:2ea:83a0:47a5 with SMTP id 98e67ed59e1d1-2ff7ce457acmr33164596a91.4.1741813184517;
-        Wed, 12 Mar 2025 13:59:44 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:70::])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-301190b98ebsm2342609a91.36.2025.03.12.13.59.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Mar 2025 13:59:43 -0700 (PDT)
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-Date: Wed, 12 Mar 2025 13:59:37 -0700
-Subject: [PATCH v2 3/3] vhost/vsock: use netns of process that opens the
- vhost-vsock-netns device
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JW7eDsPO9SzTWCRVtOSSqfOqSO2MiEd0Tv29hfYcKII=;
+ b=YvcQiaWT7xHz8xESl32hQDlVa9xdIUgG4S3BuondAVNAD41PPjkS0cpCsmaXmPweMhy6NSasedCdPLop938SXgeA32v/r0dK5Dxh3lirCV+cKk5JMkiLy7OTiaP2700gS5umrLTlDmXX10Az6J/VFsiDTP8ESG7QdwuSkQOCz7U=
+Received: from BN6PR1001MB2068.namprd10.prod.outlook.com
+ (2603:10b6:405:2b::35) by SJ0PR10MB4496.namprd10.prod.outlook.com
+ (2603:10b6:a03:2d5::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.27; Wed, 12 Mar
+ 2025 22:17:20 +0000
+Received: from BN6PR1001MB2068.namprd10.prod.outlook.com
+ ([fe80::c9b4:7351:3a7d:942f]) by BN6PR1001MB2068.namprd10.prod.outlook.com
+ ([fe80::c9b4:7351:3a7d:942f%4]) with mapi id 15.20.8511.026; Wed, 12 Mar 2025
+ 22:17:20 +0000
+Message-ID: <7b69618d-bec5-48da-a652-44569b0c750f@oracle.com>
+Date: Wed, 12 Mar 2025 15:17:17 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 08/10] target/i386/kvm: reset AMD PMU registers during
+ VM reset
+To: Zhao Liu <zhao1.liu@intel.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com,
+        mtosatti@redhat.com, sandipan.das@amd.com, babu.moger@amd.com,
+        likexu@tencent.com, like.xu.linux@gmail.com, zhenyuw@linux.intel.com,
+        groug@kaod.org, khorenko@virtuozzo.com, alexander.ivanov@virtuozzo.com,
+        den@virtuozzo.com, davydov-max@yandex-team.ru, xiaoyao.li@intel.com,
+        dapeng1.mi@linux.intel.com, joe.jin@oracle.com, ewanhai-oc@zhaoxin.com
+References: <20250302220112.17653-1-dongli.zhang@oracle.com>
+ <20250302220112.17653-9-dongli.zhang@oracle.com> <Z86Y9BxV6p25A2Wo@intel.com>
+ <a52ad0b9-4760-4347-ad73-1690eb28a464@oracle.com>
+ <Z9A/0RE2Zc7BKDvD@intel.com>
+ <976f58aa-5e14-4dda-ae07-f78276b54ff8@oracle.com>
+ <Z9FGDfzqimDo8SV5@intel.com>
+Content-Language: en-US
+From: Dongli Zhang <dongli.zhang@oracle.com>
+In-Reply-To: <Z9FGDfzqimDo8SV5@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BN0PR04CA0210.namprd04.prod.outlook.com
+ (2603:10b6:408:e9::35) To BN6PR1001MB2068.namprd10.prod.outlook.com
+ (2603:10b6:405:2b::35)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250312-vsock-netns-v2-3-84bffa1aa97a@gmail.com>
-References: <20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com>
-In-Reply-To: <20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>, 
- Jakub Kicinski <kuba@kernel.org>, "K. Y. Srinivasan" <kys@microsoft.com>, 
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
- Dexuan Cui <decui@microsoft.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
- Bryan Tan <bryan-bt.tan@broadcom.com>, 
- Vishnu Dasa <vishnu.dasa@broadcom.com>, 
- Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
-Cc: "David S. Miller" <davem@davemloft.net>, virtualization@lists.linux.dev, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-hyperv@vger.kernel.org, kvm@vger.kernel.org, 
- Bobby Eshleman <bobbyeshleman@gmail.com>
-X-Mailer: b4 0.14.2
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN6PR1001MB2068:EE_|SJ0PR10MB4496:EE_
+X-MS-Office365-Filtering-Correlation-Id: 034f3fc4-e18b-49f6-4d04-08dd61b3a801
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?clAyNm02a1pRM0lIUkx2T2pDb1V1SURTaHBlY3FHWTZtek1TRXJUcXoxUUU4?=
+ =?utf-8?B?VThneWhYL3ZoamdnTll6bzdUZlJvZnB5cFJLVldUdWJlUzJyRzdjeDJ5ZE1O?=
+ =?utf-8?B?M1BzdjZXZEVLY3VTeE9oejViMGUyc25qbnF2OFdZOXh6L2IvUEpqSEVZRE5y?=
+ =?utf-8?B?V1Z0TWhuTHpwR0FYMURtaFE5QVl6M3EzY0VjZDdRZm5KazR2QjVwc0h4ekov?=
+ =?utf-8?B?UmFCV091S1FCMTFFM1FxS0gvVkQ5MUVOS2NETUFSWThWTlRNK01oSGhjT1lP?=
+ =?utf-8?B?czBhQmVDN3B1ODJvQzVlME8vVUhEMUhVdGxMVzFhTk5DR2llaGd2S1RqbU4v?=
+ =?utf-8?B?WUw2YVpxZTVtT0o2K1pKdHdYb012eHVTT1R4TisrcnBNdjdrOXd2RWduMldB?=
+ =?utf-8?B?c2ZDU2NQVHp1ckptMVVqMmxBWjY0eEh1UFNEMDVobU1uZEhVNmVIYzZRWUxZ?=
+ =?utf-8?B?ZnYwRlpNNm04UzFxWUpBWm5wUnNzVkJYcVkzYmQ5R3ZyS2MyUmxQbUw5Zm5T?=
+ =?utf-8?B?S3dvQjZlWUJsdE1OWWhadCtud0lwWnRJdWRsaWlnYnZsMEFNRmtIc1JwQVUr?=
+ =?utf-8?B?RlV0RG5YWkpoUTVLMzhkOGxuNkZlaWMxamR1ZjdNT29GZ2YxbTRaOTB4b21L?=
+ =?utf-8?B?NjJ0bk5vdXZPOC9ScXphWTRFQ2lqQnk3Tlk2KzU4V2cwbkFVRzZqdzlDYWdz?=
+ =?utf-8?B?UEVkQXdLOTJNNE4wWkpFWGVLSnk0R1Zwd2ZOSmJmTjhBaEVBRXkraWIwVUFy?=
+ =?utf-8?B?ZGgyNE1TUlZudnVjbmNGK3VYMWlLR1RySHJDTElHY21zUkV0YzVaS0VrTjFJ?=
+ =?utf-8?B?RExTdCtuOGNqVlk2anFUMWw5ckR2NUY4UmwrVGI3ZVdQZDRwOENqS1F5MlJx?=
+ =?utf-8?B?NEY0UUYrSlh5T3JXSGN1Z3ppbjVFaTM0RGxmTVRZOENkb0NYQzMwcjZYM2Qy?=
+ =?utf-8?B?NzBqUVlSbDBTSE9Ca0JsUzVudHg0Lzd6UGd5ak9HbTVpMXhYdjg2TU5IbkEx?=
+ =?utf-8?B?QmVMWVV6Q21kT1ZmMnc3dE84ZDc2Y1R0cmJ1bzZmWHNjWXIzTlA0QlhMQXZz?=
+ =?utf-8?B?TjZ0VUs2SDV4L1AxL0s0QjBmNE9TeHV2dTBIVEJtRmtEeHBHcERxNlhtMlNs?=
+ =?utf-8?B?b3ZDa1pqeTBBTERXMS82dmI4Y2MrTWo4RUp5STFtT2lEaXh6aGQ2ZjNObits?=
+ =?utf-8?B?WmpzbmNDdXJYZEx5OSt3ZE9TYzViM0xIZDRxVlh0dXQ4eFNaRG05V0Z5eGVT?=
+ =?utf-8?B?cUhWMm11VC9FeUdVTjBuWnN1QXFDMjF2cGNMVCtmZ0dZMVVLZ084NWw5SFFB?=
+ =?utf-8?B?d0hOVVhxZlJYczBOTlArdG1Vakd4WFk3UUFla25DYmlGNWpSa2tTR1RqTGRh?=
+ =?utf-8?B?UlN6ZURuNFR2RmRnaUJhMWVUV0pnNGE4QXdaWURXR1k0WUVPSmVQZk5DOG5n?=
+ =?utf-8?B?a2I4RS9qcDJ2b0gyS0VXYkZSOW95dUMrYXJUY1p3VkVyOTZUYnZLWXBCdmFl?=
+ =?utf-8?B?QlN6Ti9CcER3ckFNNFRmVFRLd0FJZkpIVWp4dGw2Ky9Ka2JsRmRnWVhyb2lh?=
+ =?utf-8?B?cHpMZmVWTHNHRU8rSzhyWStWdnQ3ZmdWYVhBMnhXMWs3cm1KVitIMDVSZUlQ?=
+ =?utf-8?B?eDVvaVVTVUdPbVdIS1labm52bkRHczB0SG9RZWJOcyt1SHdFNHhyRTA0OWVF?=
+ =?utf-8?B?bFRsM2h3Y0FaM1ZWNGxubGpmQ2ZmUnBBbGNsOFlrMFhFSzkwVXBkN3EvbThV?=
+ =?utf-8?B?L3l5OERSZ1JMcVY0cDIwdVh6clJLeEttcUN2U005d2VxejErZ2d0N3UzUzlv?=
+ =?utf-8?B?d01EZzhQTktmdlVRUThRRHNiK1FaYXh0S1c0Q3ZMOGJnUTl5b2JVajNMUW9N?=
+ =?utf-8?Q?RxE+rEg6RsYU8?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN6PR1001MB2068.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?OEQ3eFpSOS9zQU0xS2lIb2RYaDFkTURaL3hEa1dMRjhwcmg4MmREeXkzVXR3?=
+ =?utf-8?B?NUdQMGE2Rld4QlBmczRnYUxsakZndTViVVNFcm14THgxcGZSWkZLdXAxQVZN?=
+ =?utf-8?B?VnQ5N1lhdFNyaFZTZ1NzSzZ0LzJRWmV0YUZ2QmhPaDZLeVlESDhOdDduU2lI?=
+ =?utf-8?B?SExkcnI0TjQ2aUNUUkhrM0FhVGdrOUwyL0xoRVNQTGt6Z2Z0eGw1OHAxb0N6?=
+ =?utf-8?B?a1dXSmQyZUlEOFlCQlZXbUlFSmNsYVhVUlRsRnRKRXNvd3AxZEhOUVBaWitp?=
+ =?utf-8?B?NC9BVG52bnhjcTNsMVZBc25JUXhKY2xLbkxRSXJkU0JlRXVtdEgxRlVTOTNR?=
+ =?utf-8?B?cjNtV1lTYm9aMVd1VCt6L29LR1BlaTduUGNJd3U1YXJaQ3dIYS9uTlY3SUQ4?=
+ =?utf-8?B?Z3ZnbnUwdXpiZ0JKaXVVRlUrYnBlejR0Y25QTERSa1gxa0ZWYkFYM2VYZHVy?=
+ =?utf-8?B?TWRIOUhpVHB4b0FKUkVXb3lhMTA1T1YzRUVxczNKR2J4VVZMblhSZXJvUkJM?=
+ =?utf-8?B?eFk1c01ueVN4VG1lWUp5eUl0S0JBOG5hdEVYZzZkMXY5bTRxRng5aXprRGxO?=
+ =?utf-8?B?Z0xIYUlYYW8zL2lxWDFzTlRVZVpYNCtDM3ltQytZcG02ZVRsU1hkSE1SenFQ?=
+ =?utf-8?B?Ly9iN1RxNEV5TUxNa0N0cjhkYkNZcHRqWFlMN2dNUGhNWnMxYlNNaXVFWFk4?=
+ =?utf-8?B?MG0vT2dOMFFzRmVINERWZ3hVODJwZWtWdjBmZTkwNEUzZk5NMUhpb0k1a0E4?=
+ =?utf-8?B?dDVQOVlqNzBzRFBXMHNpQ3RPTkdaV3Iyd2xyODdFWDlsSDF0Z1RNeExlRzZa?=
+ =?utf-8?B?K01FbTdKc3cwb0ZSRmF6c1pPQW82eCs0ZFNZbXY4YVE1QU11Sk9rU2xMVmVV?=
+ =?utf-8?B?cEdYb3NuYWYyVUlYMmNDK25nbFR6cTNwOElxOHRYc3ArU0hMS2FlaWhaREM3?=
+ =?utf-8?B?ZVEyTUJVaCt2TXBDNXdWdElQK2tlbXFhNEttRnd5Tm8xTEpyQTI5UnlRVnE2?=
+ =?utf-8?B?NHhHcG5IV0oxMFdML29PWlZ3Z001dmtlMW1WU3NxTlAzZnl2NXdmZDlqQzRN?=
+ =?utf-8?B?WUx5V1owVi9vK043TmJrRE1zQmxTejdDem1KWU5Fa3lvczNzbFBCQVIvQldt?=
+ =?utf-8?B?VE1HRlFiRDZyMmxTcTlMNEVTRlVybktscTN2WDJId1hQdlArbmNLSGZmamJG?=
+ =?utf-8?B?V2RwRkdvQlFlN3UzSmdsQXcwVVNKVXRTYS9JaklyWThGbEdKZ2lYWmZiUGQ5?=
+ =?utf-8?B?ZjByOWVFOWJHRm8rZVF3RDJlbEFURUdvdnVlU0xFSnkzMG5JM2xRZ1pQSzhx?=
+ =?utf-8?B?ZnlSczAvQ0JkTkQ2YXBnSWJ3ZjZ3N21nRFgvNzI3aytCRVZhSk5kWjUzOUhN?=
+ =?utf-8?B?YTJ2ME8rVEJEMHI4QUdtTndWSnBjT0ErbUlVSmdoZE9tdTBhcm9MSm4zbi9Z?=
+ =?utf-8?B?djNRbXFrNVZwL3dHeEtmS0w5aEp3SzNSeGhiMGkrRE5uWngyRGtGaHFTR1Vv?=
+ =?utf-8?B?SVdHdWZMcmc1Vmk0bkE3SWhxYTI4bXdVN1d6NGZuQnAzUVJOV05iWFFEc2tY?=
+ =?utf-8?B?UjZja1FzSzZoM0xCVXlyTUYyRWxzMlNudHV4UFBtTThNamViT0k4R0VhN2w2?=
+ =?utf-8?B?MUwvYmswczNyRXFuUWxCKzZFMVcxNklCcHF5MkNzNkF1ajB0U1BMTXAvRVJE?=
+ =?utf-8?B?dlZXdWJvNmlJZ2hLbGhyMW9EVVZhUVlnMFNscDhaTE9oSVlmRWtvVy9BWm9z?=
+ =?utf-8?B?eGFZMmI1QXJTc2JsOFBwYUZLSmw0cjdzQjV4RXhPSEdINnNyeUJmd3ZFc215?=
+ =?utf-8?B?ZUJneFB4L3o1QkFqZk5qOVlFMTA2eG02OVJSUjJiaGw4MW9Bc0x1Z0dYbEFq?=
+ =?utf-8?B?Y2hPd2FVWkphRGR1VGVldHFhbWJ4OEFQMGVXWVlkd1N0VElUVk9nckc0dU5G?=
+ =?utf-8?B?MFE1TS9CV2ZYb0NGVnR0cStnYld3U0pVcWx3WXVLQWZQT1hFY2FZWUVnb3V3?=
+ =?utf-8?B?L09VT3h0Mlk0cm0zNGhEZDBCLzN4N2FOYlJkbkpyY0JrN0ZGbmU3MUpsbDYw?=
+ =?utf-8?B?WVp2a0pZV2hlSW1VdnA0REpndXpoeXdWaW5uNDAyYjhsQkxTVXVCRmtXcVo3?=
+ =?utf-8?B?dTkrenRNTW5Gbk5hOHU0Wnh4UktZUDlLYnpVS1RGZnBzT1hSQzZFVzQ4R1RY?=
+ =?utf-8?B?MXc9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	fZ2jHZ9EMYYtWBc7z+uXg+BeCBWJV7z/JC8h41oIP+1JVlbIe6/RRyeSzlNaqm5bHr7SynFPZFbJoQkgKmf2au7FFjbLK5rgpX2DwqTBv/al7sYnDqqEuMM9f1qofWRj4r1dnb7eOO8S1voI9AN0Xzh1N28UWiwV+VpMgzzwi3fRlkNGEo4pwyDkUPzphshma8EJs6oKeG+pJU2Si6tLW9XIpMnsZv9lu8ZWkDsSngK8FEvQxHbCiZSdMx8P9Lsev2zCIe8BDG7q78WUu9kJhoqRWcoakbi1kE+XGI49lol+rW5+Jk3ztVbd+eL+ZGwm6MSdK34UadDFvJW6HDAo5tutNJ1E7vl7rAXMvqgNpcqugDYBZeBFqaNCbcyMzYNnoBAh5t6qb+0ct54okEOwHHWX6b0wg3OcQdHrtloF1B3+17hP67UO8Dl8lEUM1T5EW697Q6mTL4AVWooqFxHKlrFEB4lbapEs2UXFrvqsR1HiBvGOjgahJJNydqiVEmoDI3C5E1doD+woqBOxAMLqaL5zGtlX5tuRQ7E2/vXNtC0smHdI8jtSRpUQlvWJCe+lQ0z8kdRoFdTz9fNdpgFcWZILWROnos+u77l2VRZyIcE=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 034f3fc4-e18b-49f6-4d04-08dd61b3a801
+X-MS-Exchange-CrossTenant-AuthSource: BN6PR1001MB2068.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Mar 2025 22:17:20.2952
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MIBK4veqQo0+3FkCkmZCv3IrXHoyItTiqhlRu+33awfy7OVogcNxkOeAwBKCWQTvz+ee3W7k4cmgAjJzyPmIGw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR10MB4496
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-12_06,2025-03-11_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 phishscore=0
+ suspectscore=0 adultscore=0 spamscore=0 mlxscore=0 bulkscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2502280000 definitions=main-2503120158
+X-Proofpoint-GUID: qJnVglXQ1bXojfBQX59Y8S8Z1GAmfLhM
+X-Proofpoint-ORIG-GUID: qJnVglXQ1bXojfBQX59Y8S8Z1GAmfLhM
 
-From: Stefano Garzarella <sgarzare@redhat.com>
+Hi Zhao,
 
-This patch assigns the network namespace of the process that opened
-vhost-vsock-netns device (e.g. VMM) to the packets coming from the
-guest, allowing only host sockets in the same network namespace to
-communicate with the guest.
+On 3/12/25 1:30 AM, Zhao Liu wrote:
+>>>>>> +    /*
+>>>>>> +     * If KVM_CAP_PMU_CAPABILITY is not supported, there is no way to
+>>>>>> +     * disable the AMD pmu virtualization.
+>>>>>> +     *
+>>>>>> +     * If KVM_CAP_PMU_CAPABILITY is supported !cpu->enable_pmu
+>>>>>> +     * indicates the KVM has already disabled the PMU virtualization.
+>>>>>> +     */
+>>>>>> +    if (has_pmu_cap && !cpu->enable_pmu) {
+>>>>>> +        return;
+>>>>>> +    }
+>>>>>
+>>>>> Could we only check "cpu->enable_pmu" at the beginning of this function?
+>>>>> then if pmu is already disabled, we don't need to initialize the pmu info.
+>>>>
+>>>> I don't think so. There is a case:
+>>>>
+>>>> - cpu->enable_pmu = false. (That is, "-cpu host,-pmu").
+>>>> - But for KVM prior v5.18 that KVM_CAP_PMU_CAPABILITY doesn't exist.
+>>>>
+>>>> There is no way to disable vPMU. To determine based on only
+>>>> "!cpu->enable_pmu" doesn't work.
+>>>
+>>> Ah, I didn't get your point here. When QEMU user has already disabled
+>>> PMU, why we still need to continue initialize PMU info and save/load PMU
+>>> MSRs? In this case, user won't expect vPMU could work.
+>>
+>> Yes, "In this case, user won't expect vPMU could work.".
+>>
+>> But in reality vPMU is still active, although that doesn't match user's
+>> expectation.
+>>
+>> User doesn't expect PMU to work. However, "perf stat" still works in VM
+>> (when KVM_CAP_PMU_CAPABILITY isn't available).
+>>
+>> Would you suggest we only follow user's expectation?
+> 
+> Yes, for this case, many PMU related CPUIDs have already been disabled
+> because of "!enable_pmu", so IMO it's not necessary to handle other PMU
+> MSRs.
+> 
+>> That is, once user
+>> configure "-pmu", we are going to always assume vPMU is disabled, even it
+>> is still available (on KVM without KVM_CAP_PMU_CAPABILITY and prior v5.18)?
+> 
+> Strictly speaking, only the earlier AMD PMUs are still AVAILABLE at this
+> point, as the other platforms, have CPUIDs to indicate PMU enablement.
+> So for the latter (which I understand is most of the cases nowadays),
+> there's no reason to assume that the PMUs are still working when the CPUIDs
+> are corrupted...
+> 
+> There is no perfect solution for pre-v5.18 kernel... But while not breaking
+> compatibility, again IMO, we need the logic to be self-consistent, i.e.
+> any time the user does not enable vPMU (enable_pmu = false), it should be
+> assumed that vPMU does not work.
+> 
 
-This patch also allows having different VMs, running in different
-network namespace, with the same CID/port.
+Sure. That makes coding easier, with less assumptions.
 
-This patch brings namespace support only to vhost-vsock, but not
-to virtio-vsock, hyperv, or vmci.
+Thank you very much!
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Bobby Eshleman <bobbyeshleman@gmail.com>
----
-v1 -> v2
- * removed 'netns' module param
- * renamed vsock_default_net() to vsock_global_net() to reflect new
-   semantics
- * reserved NULL net to indicate "global" vsock namespace
-
-RFC -> v1
-* added 'netns' module param
-* added 'vsock_net_eq()' to check the "net" assigned to a socket
-  only when 'netns' support is enabled
----
- drivers/vhost/vsock.c            | 97 +++++++++++++++++++++++++++++++++-------
- include/linux/miscdevice.h       |  1 +
- include/net/af_vsock.h           |  3 +-
- net/vmw_vsock/af_vsock.c         | 30 ++++++++++++-
- net/vmw_vsock/virtio_transport.c |  4 +-
- net/vmw_vsock/vsock_loopback.c   |  4 +-
- 6 files changed, 117 insertions(+), 22 deletions(-)
-
-diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-index 02e2a3551205a4398a74a167a82802d950c962f6..8702beb8238aa290b6d901e53c36481637840017 100644
---- a/drivers/vhost/vsock.c
-+++ b/drivers/vhost/vsock.c
-@@ -46,6 +46,7 @@ static DEFINE_READ_MOSTLY_HASHTABLE(vhost_vsock_hash, 8);
- struct vhost_vsock {
- 	struct vhost_dev dev;
- 	struct vhost_virtqueue vqs[2];
-+	struct net *net;
- 
- 	/* Link to global vhost_vsock_hash, writes use vhost_vsock_mutex */
- 	struct hlist_node hash;
-@@ -67,8 +68,9 @@ static u32 vhost_transport_get_local_cid(void)
- /* Callers that dereference the return value must hold vhost_vsock_mutex or the
-  * RCU read lock.
-  */
--static struct vhost_vsock *vhost_vsock_get(u32 guest_cid)
-+static struct vhost_vsock *vhost_vsock_get(u32 guest_cid, struct net *net, bool global_fallback)
- {
-+	struct vhost_vsock *fallback = NULL;
- 	struct vhost_vsock *vsock;
- 
- 	hash_for_each_possible_rcu(vhost_vsock_hash, vsock, hash, guest_cid) {
-@@ -78,11 +80,18 @@ static struct vhost_vsock *vhost_vsock_get(u32 guest_cid)
- 		if (other_cid == 0)
- 			continue;
- 
--		if (other_cid == guest_cid)
--			return vsock;
-+		if (other_cid == guest_cid) {
-+			if (net_eq(net, vsock->net))
-+				return vsock;
- 
-+			if (net_eq(vsock->net, vsock_global_net()))
-+				fallback = vsock;
-+		}
- 	}
- 
-+	if (global_fallback)
-+		return fallback;
-+
- 	return NULL;
- }
- 
-@@ -272,13 +281,14 @@ static int
- vhost_transport_send_pkt(struct sk_buff *skb)
- {
- 	struct virtio_vsock_hdr *hdr = virtio_vsock_hdr(skb);
-+	struct net *net = VIRTIO_VSOCK_SKB_CB(skb)->net;
- 	struct vhost_vsock *vsock;
- 	int len = skb->len;
- 
- 	rcu_read_lock();
- 
- 	/* Find the vhost_vsock according to guest context id  */
--	vsock = vhost_vsock_get(le64_to_cpu(hdr->dst_cid));
-+	vsock = vhost_vsock_get(le64_to_cpu(hdr->dst_cid), net, true);
- 	if (!vsock) {
- 		rcu_read_unlock();
- 		kfree_skb(skb);
-@@ -305,7 +315,8 @@ vhost_transport_cancel_pkt(struct vsock_sock *vsk)
- 	rcu_read_lock();
- 
- 	/* Find the vhost_vsock according to guest context id  */
--	vsock = vhost_vsock_get(vsk->remote_addr.svm_cid);
-+	vsock = vhost_vsock_get(vsk->remote_addr.svm_cid,
-+				sock_net(sk_vsock(vsk)), true);
- 	if (!vsock)
- 		goto out;
- 
-@@ -403,7 +414,7 @@ static bool vhost_transport_msgzerocopy_allow(void)
- 	return true;
- }
- 
--static bool vhost_transport_seqpacket_allow(u32 remote_cid);
-+static bool vhost_transport_seqpacket_allow(struct vsock_sock *vsk, u32 remote_cid);
- 
- static struct virtio_transport vhost_transport = {
- 	.transport = {
-@@ -459,13 +470,14 @@ static struct virtio_transport vhost_transport = {
- 	.send_pkt = vhost_transport_send_pkt,
- };
- 
--static bool vhost_transport_seqpacket_allow(u32 remote_cid)
-+static bool vhost_transport_seqpacket_allow(struct vsock_sock *vsk, u32 remote_cid)
- {
-+	struct net *net = sock_net(sk_vsock(vsk));
- 	struct vhost_vsock *vsock;
- 	bool seqpacket_allow = false;
- 
- 	rcu_read_lock();
--	vsock = vhost_vsock_get(remote_cid);
-+	vsock = vhost_vsock_get(remote_cid, net, true);
- 
- 	if (vsock)
- 		seqpacket_allow = vsock->seqpacket_allow;
-@@ -525,7 +537,7 @@ static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
- 			continue;
- 		}
- 
--		VIRTIO_VSOCK_SKB_CB(skb)->net = vsock_global_net();
-+		VIRTIO_VSOCK_SKB_CB(skb)->net = vsock->net;
- 		total_len += sizeof(*hdr) + skb->len;
- 
- 		/* Deliver to monitoring devices all received packets */
-@@ -650,7 +662,7 @@ static void vhost_vsock_free(struct vhost_vsock *vsock)
- 	kvfree(vsock);
- }
- 
--static int vhost_vsock_dev_open(struct inode *inode, struct file *file)
-+static int __vhost_vsock_dev_open(struct inode *inode, struct file *file, struct net *net)
- {
- 	struct vhost_virtqueue **vqs;
- 	struct vhost_vsock *vsock;
-@@ -669,6 +681,8 @@ static int vhost_vsock_dev_open(struct inode *inode, struct file *file)
- 		goto out;
- 	}
- 
-+	vsock->net = net;
-+
- 	vsock->guest_cid = 0; /* no CID assigned yet */
- 	vsock->seqpacket_allow = false;
- 
-@@ -693,6 +707,22 @@ static int vhost_vsock_dev_open(struct inode *inode, struct file *file)
- 	return ret;
- }
- 
-+static int vhost_vsock_dev_open(struct inode *inode, struct file *file)
-+{
-+	return __vhost_vsock_dev_open(inode, file, vsock_global_net());
-+}
-+
-+static int vhost_vsock_netns_dev_open(struct inode *inode, struct file *file)
-+{
-+	struct net *net;
-+
-+	net = get_net_ns_by_pid(current->pid);
-+	if (IS_ERR(net))
-+		return PTR_ERR(net);
-+
-+	return __vhost_vsock_dev_open(inode, file, net);
-+}
-+
- static void vhost_vsock_flush(struct vhost_vsock *vsock)
- {
- 	vhost_dev_flush(&vsock->dev);
-@@ -708,7 +738,7 @@ static void vhost_vsock_reset_orphans(struct sock *sk)
- 	 */
- 
- 	/* If the peer is still valid, no need to reset connection */
--	if (vhost_vsock_get(vsk->remote_addr.svm_cid))
-+	if (vhost_vsock_get(vsk->remote_addr.svm_cid, sock_net(sk), true))
- 		return;
- 
- 	/* If the close timeout is pending, let it expire.  This avoids races
-@@ -753,6 +783,8 @@ static int vhost_vsock_dev_release(struct inode *inode, struct file *file)
- 	virtio_vsock_skb_queue_purge(&vsock->send_pkt_queue);
- 
- 	vhost_dev_cleanup(&vsock->dev);
-+	if (vsock->net)
-+		put_net(vsock->net);
- 	kfree(vsock->dev.vqs);
- 	vhost_vsock_free(vsock);
- 	return 0;
-@@ -777,9 +809,15 @@ static int vhost_vsock_set_cid(struct vhost_vsock *vsock, u64 guest_cid)
- 	if (vsock_find_cid(guest_cid))
- 		return -EADDRINUSE;
- 
-+	/* If this namespace has already connected to this CID, then report
-+	 * that this address is already in use.
-+	 */
-+	if (vsock->net && vsock_net_has_connected(vsock->net, guest_cid))
-+		return -EADDRINUSE;
-+
- 	/* Refuse if CID is already in use */
- 	mutex_lock(&vhost_vsock_mutex);
--	other = vhost_vsock_get(guest_cid);
-+	other = vhost_vsock_get(guest_cid, vsock->net, false);
- 	if (other && other != vsock) {
- 		mutex_unlock(&vhost_vsock_mutex);
- 		return -EADDRINUSE;
-@@ -931,6 +969,24 @@ static struct miscdevice vhost_vsock_misc = {
- 	.fops = &vhost_vsock_fops,
- };
- 
-+static const struct file_operations vhost_vsock_netns_fops = {
-+	.owner          = THIS_MODULE,
-+	.open           = vhost_vsock_netns_dev_open,
-+	.release        = vhost_vsock_dev_release,
-+	.llseek		= noop_llseek,
-+	.unlocked_ioctl = vhost_vsock_dev_ioctl,
-+	.compat_ioctl   = compat_ptr_ioctl,
-+	.read_iter      = vhost_vsock_chr_read_iter,
-+	.write_iter     = vhost_vsock_chr_write_iter,
-+	.poll           = vhost_vsock_chr_poll,
-+};
-+
-+static struct miscdevice vhost_vsock_netns_misc = {
-+	.minor = VHOST_VSOCK_NETNS_MINOR,
-+	.name = "vhost-vsock-netns",
-+	.fops = &vhost_vsock_netns_fops,
-+};
-+
- static int __init vhost_vsock_init(void)
- {
- 	int ret;
-@@ -941,17 +997,26 @@ static int __init vhost_vsock_init(void)
- 		return ret;
- 
- 	ret = misc_register(&vhost_vsock_misc);
--	if (ret) {
--		vsock_core_unregister(&vhost_transport.transport);
--		return ret;
--	}
-+	if (ret)
-+		goto out_vt;
-+
-+	ret = misc_register(&vhost_vsock_netns_misc);
-+	if (ret)
-+		goto out_vvm;
- 
- 	return 0;
-+
-+out_vvm:
-+	misc_deregister(&vhost_vsock_misc);
-+out_vt:
-+	vsock_core_unregister(&vhost_transport.transport);
-+	return ret;
- };
- 
- static void __exit vhost_vsock_exit(void)
- {
- 	misc_deregister(&vhost_vsock_misc);
-+	misc_deregister(&vhost_vsock_netns_misc);
- 	vsock_core_unregister(&vhost_transport.transport);
- };
- 
-diff --git a/include/linux/miscdevice.h b/include/linux/miscdevice.h
-index 69e110c2b86a9b16c1637778a25e1eebb3fd0111..a7e11b70a5398a225c4d63d50ac460e6388e022c 100644
---- a/include/linux/miscdevice.h
-+++ b/include/linux/miscdevice.h
-@@ -71,6 +71,7 @@
- #define USERIO_MINOR		240
- #define VHOST_VSOCK_MINOR	241
- #define RFKILL_MINOR		242
-+#define VHOST_VSOCK_NETNS_MINOR	243
- #define MISC_DYNAMIC_MINOR	255
- 
- struct device;
-diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
-index 41afbc18648c953da27a93571d408de968aa7668..1e37737689a741d91e64b8c0ed0a931fc7376194 100644
---- a/include/net/af_vsock.h
-+++ b/include/net/af_vsock.h
-@@ -143,7 +143,7 @@ struct vsock_transport {
- 				     int flags);
- 	int (*seqpacket_enqueue)(struct vsock_sock *vsk, struct msghdr *msg,
- 				 size_t len);
--	bool (*seqpacket_allow)(u32 remote_cid);
-+	bool (*seqpacket_allow)(struct vsock_sock *vsk, u32 remote_cid);
- 	u32 (*seqpacket_has_data)(struct vsock_sock *vsk);
- 
- 	/* Notification. */
-@@ -258,4 +258,5 @@ static inline bool vsock_msgzerocopy_allow(const struct vsock_transport *t)
- }
- 
- struct net *vsock_global_net(void);
-+bool vsock_net_has_connected(struct net *net, u64 guest_cid);
- #endif /* __AF_VSOCK_H__ */
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index d206489bf0a81cf989387c7c8063be91a7c21a7d..58fa415555d6aae5043b5ca2bfc4783af566cf28 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -391,6 +391,34 @@ void vsock_for_each_connected_socket(struct vsock_transport *transport,
- }
- EXPORT_SYMBOL_GPL(vsock_for_each_connected_socket);
- 
-+bool vsock_net_has_connected(struct net *net, u64 guest_cid)
-+{
-+	bool ret = false;
-+	int i;
-+
-+	spin_lock_bh(&vsock_table_lock);
-+
-+	for (i = 0; i < ARRAY_SIZE(vsock_connected_table); i++) {
-+		struct vsock_sock *vsk;
-+
-+		list_for_each_entry(vsk, &vsock_connected_table[i],
-+				    connected_table) {
-+			if (sock_net(sk_vsock(vsk)) != net)
-+				continue;
-+
-+			if (vsk->remote_addr.svm_cid == guest_cid) {
-+				ret = true;
-+				goto out;
-+			}
-+		}
-+	}
-+
-+out:
-+	spin_unlock_bh(&vsock_table_lock);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(vsock_net_has_connected);
-+
- void vsock_add_pending(struct sock *listener, struct sock *pending)
- {
- 	struct vsock_sock *vlistener;
-@@ -537,7 +565,7 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
- 
- 	if (sk->sk_type == SOCK_SEQPACKET) {
- 		if (!new_transport->seqpacket_allow ||
--		    !new_transport->seqpacket_allow(remote_cid)) {
-+		    !new_transport->seqpacket_allow(vsk, remote_cid)) {
- 			module_put(new_transport->module);
- 			return -ESOCKTNOSUPPORT;
- 		}
-diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-index 163ddfc0808529ad6dda7992f9ec48837dd7337c..60bf3f1f39c51d44768fd2f04df3abee9f966252 100644
---- a/net/vmw_vsock/virtio_transport.c
-+++ b/net/vmw_vsock/virtio_transport.c
-@@ -536,7 +536,7 @@ static bool virtio_transport_msgzerocopy_allow(void)
- 	return true;
- }
- 
--static bool virtio_transport_seqpacket_allow(u32 remote_cid);
-+static bool virtio_transport_seqpacket_allow(struct vsock_sock *vsk, u32 remote_cid);
- 
- static struct virtio_transport virtio_transport = {
- 	.transport = {
-@@ -593,7 +593,7 @@ static struct virtio_transport virtio_transport = {
- 	.can_msgzerocopy = virtio_transport_can_msgzerocopy,
- };
- 
--static bool virtio_transport_seqpacket_allow(u32 remote_cid)
-+static bool virtio_transport_seqpacket_allow(struct vsock_sock *vsk, u32 remote_cid)
- {
- 	struct virtio_vsock *vsock;
- 	bool seqpacket_allow;
-diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
-index 6e78927a598e07cf77386a420b9d05d3f491dc7c..1b2fab73e0d0a6c63ed60d29fc837da58f6fb121 100644
---- a/net/vmw_vsock/vsock_loopback.c
-+++ b/net/vmw_vsock/vsock_loopback.c
-@@ -46,7 +46,7 @@ static int vsock_loopback_cancel_pkt(struct vsock_sock *vsk)
- 	return 0;
- }
- 
--static bool vsock_loopback_seqpacket_allow(u32 remote_cid);
-+static bool vsock_loopback_seqpacket_allow(struct vsock_sock *vsk, u32 remote_cid);
- static bool vsock_loopback_msgzerocopy_allow(void)
- {
- 	return true;
-@@ -106,7 +106,7 @@ static struct virtio_transport loopback_transport = {
- 	.send_pkt = vsock_loopback_send_pkt,
- };
- 
--static bool vsock_loopback_seqpacket_allow(u32 remote_cid)
-+static bool vsock_loopback_seqpacket_allow(struct vsock_sock *vsk, u32 remote_cid)
- {
- 	return true;
- }
-
--- 
-2.47.1
-
+Dongli Zhang
 
