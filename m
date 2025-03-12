@@ -1,316 +1,429 @@
-Return-Path: <kvm+bounces-40832-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40833-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B84BA5E0CE
-	for <lists+kvm@lfdr.de>; Wed, 12 Mar 2025 16:45:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AEB0A5E1C8
+	for <lists+kvm@lfdr.de>; Wed, 12 Mar 2025 17:29:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F22591889072
-	for <lists+kvm@lfdr.de>; Wed, 12 Mar 2025 15:45:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10A4E189F310
+	for <lists+kvm@lfdr.de>; Wed, 12 Mar 2025 16:29:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26D83253322;
-	Wed, 12 Mar 2025 15:45:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 408F223ED56;
+	Wed, 12 Mar 2025 16:29:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hXWkyMkq"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="pVFgoTVC"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 542F823BD0C
-	for <kvm@vger.kernel.org>; Wed, 12 Mar 2025 15:45:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D4F1DFF7
+	for <kvm@vger.kernel.org>; Wed, 12 Mar 2025 16:29:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741794346; cv=none; b=L+IQQ3hYMihbcoCJz7InzhnmkXhopPteOnycAn4yZzl6e+WQWEmxp1IEMc2BdoRAVzuaFJqMjK6vpE3iPc2lbAVGJc5npFYW9oiHOAMKT3WPaNtaIkX7BHviKHzJqN9+JIp79PVoR93RD+rxih/sCbmvY99cZD3PHOFs/UhSu24=
+	t=1741796957; cv=none; b=hMMh4g0JJMuFCY7uEEHmg5dneVWLt2PhYYsA8EWMp8RO0l0IQkQi0BLTpbwkaNKEVdJe/OLxUwq7PkCGKJbxczH5bAboeggT4YG0GKnmvFSa1SGddOU+ctrMgOiccyDzdNQItjJQw5PAIMyGk2Q+RFIdon9r1eFeLSnEL1CHdQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741794346; c=relaxed/simple;
-	bh=D/wZ1TUBH9NL6fkDzSIbr43ucRHs/N+gCZnO6yydIP4=;
+	s=arc-20240116; t=1741796957; c=relaxed/simple;
+	bh=mWGhI49i6UgGfjNzGzJkbGoCU3DcP3jqtupC6ccNRAw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZeCK73XQnRur2M8kb4aRjWmUN+x5fgEa/Aw6QJn9x5G98B1PtDk7JU8e42lxad53+z+MbPv9ER06lGCwe0SeAFQWwvsa9rC8uvbGekivEhJ7JRAAyeHfoHgoHmiEF2VASOn6Au43n+NliC19E9aod2m70rA5BwGLwCZC5X1YoQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hXWkyMkq; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741794343;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ut4pbapSzhs8uCjUUCSZVy14MK3K3nRSMdDH7UTR4MM=;
-	b=hXWkyMkq1IgxdVm3S7pDcoQceimXRKyxBlwZHCUWjsjZthykOQmttKg/EvTaB3rsxezTUS
-	Zx4J0pF/ND5iCY28Gf9TDC/mio2x9dDB6yPy/Xk6RubtxRIRUoJqcM25NvJY5pDBTb7GKF
-	Vyxa7aRVUBsH9kL6ML3WMVPGJOexwO0=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-605-R9TEX-7iOS20hcU1Zz6bNA-1; Wed, 12 Mar 2025 11:45:42 -0400
-X-MC-Unique: R9TEX-7iOS20hcU1Zz6bNA-1
-X-Mimecast-MFC-AGG-ID: R9TEX-7iOS20hcU1Zz6bNA_1741794341
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7c53b4b0d69so1296228485a.2
-        for <kvm@vger.kernel.org>; Wed, 12 Mar 2025 08:45:42 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=aQsOPa+5dBs+UdA6piczsMDc1I2Ocf7y6mpUziO4LYHv1sMk+mtW81yqaUGDCTd6JWQNIAK7RwSz0yE1J7nOuk7ZJJBhq9LKFuNI8XKsKAXUyanPjSwVMIM9Nh2fJN79mvTF60tudFf8yU8D9eA2khhLaX2JNldOdA4g7FOfjrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=pVFgoTVC; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4394036c0efso42357495e9.2
+        for <kvm@vger.kernel.org>; Wed, 12 Mar 2025 09:29:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1741796952; x=1742401752; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=fOnSpbCHIVScbDy74xUesrpWh1zALxdGl2tg20/LxlI=;
+        b=pVFgoTVCCg/OncDFEL6yAntENqSsdSOyArApxSNH8smBSzpFOog0CEsaq3kHzkG9hP
+         HLW5ATRy0tReYSgI+vxqNg0qx385Fzh9zTy3ADYj/c0oPm1ESaVXWpX3HNzqnZTjqwnE
+         3IvnRu711hNMr3pPxbeOpECxJ+FsLxIQR9YEElqob9wWt+K9674RuZVK9JyJmf78gU51
+         PpY0LXWqFTrf+9sgnofjm5arEADhVF0bxq5zxjgeqUrt5EhjyYtyrltuKsEnpYtPGyWC
+         gP0Tmh+0XN1e7LGkcNY+8iBdH+xXOjeBu96sEC/8YMSx236s72zZp8k65/NuBptYNJZ4
+         mV+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741794341; x=1742399141;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ut4pbapSzhs8uCjUUCSZVy14MK3K3nRSMdDH7UTR4MM=;
-        b=O9p/5Ku7XqXQZFCRpAZyXzd/9/FqKyUxGeNMEPrKr3WTatb/NSxCIqoR8IiyCHp41v
-         n+XPSfHwPbpd8RNGn6fMnj8aKjW/Q1EQr5fzByexGLMGGATl7YvHJqwuTalA97978x4O
-         kn62/3VEoa/I9kgr6LicTDK+yOQJVB2yz3rKHBPbAOf+D4yvy07XzYIlKntR3nTDxL3k
-         gYMfWryQNJ/BZMgJ8ZMIQEQUaM3etqoma8e9HuFHUkt5+oArmOE4ast1FnPj9qAJlmUX
-         YvvNGM93COrNxjgoKDvyc8FMES+qx1Rb0tjHW6HhlSpDqZx1WTgqjvqClObSV8k68qQj
-         iSug==
-X-Forwarded-Encrypted: i=1; AJvYcCWF7VHJz6toFFsDaoTHx69y0luyHmwk68YcaMeI9j7TjXu/xVjmHie/v6+57uyZrWM78G0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7f/81nuuJd1zSLVYIgOxh9xRPS6IZVE83qabpTQgLi8og6by7
-	6TAd4z8tMu+AjRD1kejA2/4YbLDsPifb8YBd2MCXl69s2BNhzQzfOOwZrKMLQXUHwFabqkeAW5A
-	At5EEBaENGu8stGbHiFh25V/Fq0T/R8vmuo/wNi+0kjasgLSugw==
-X-Gm-Gg: ASbGnctfLXnK3naXf8IF818gQb7CMhDFF2zcJvp8XC9gwrVLP8g2Y1kgmEjIgA5uyCD
-	YFsjRs2ZPDBAG6AvjzxZ3p5+RaWg9EzP6QDHs5tL3+naooYT4vx6Ph3f+bpOerF6Qp+xdg4eYJv
-	nc0Gw0Ry8aYz9sfSizwP3cmI/HEX9zz1OGWZSHwiPktFhJ8zg3gbcVQLoeWnaTJsnEGi6lJj23b
-	WJz5I0tV9S/Q/PKY5yRcCW5ozidoI+ByM/fEtYZ9uxX9OcSV+o0DOGWnKqmDYK6ovQBoFp2jvpw
-	Qvo/rrs=
-X-Received: by 2002:a05:620a:26a3:b0:7c5:5692:ee91 with SMTP id af79cd13be357-7c55692f028mr1679141585a.23.1741794341495;
-        Wed, 12 Mar 2025 08:45:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFeUONLhGbcchFtsON6vku9vRaOBMh9M5T52ggQTNZ6v7izQr/2SjLlIdPk6U0xKsrrhbgKhA==
-X-Received: by 2002:a05:620a:26a3:b0:7c5:5692:ee91 with SMTP id af79cd13be357-7c55692f028mr1679137385a.23.1741794341075;
-        Wed, 12 Mar 2025 08:45:41 -0700 (PDT)
-Received: from x1.local ([85.131.185.92])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c545fd5772sm634042685a.35.2025.03.12.08.45.39
+        d=1e100.net; s=20230601; t=1741796952; x=1742401752;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fOnSpbCHIVScbDy74xUesrpWh1zALxdGl2tg20/LxlI=;
+        b=vusA+d+c2jScDdgq3dOCzk8hvZpVGv2jDIx2TWT2w1IgfRceES0YEZ0UaoQxGFTGs1
+         LYJa/T0H4nvnPBEyNgZdzx5ZJCzoUWQ3BL2yYYU0/1lJb7+U/PrOdf0R+uGkjQ6Sh4Cg
+         WsQvvlPagXlGlZ1D1lmrcZnzS/4HiI6fvtXQ6eX5OyZQHVUdjehewV1WvRfJe1mwMd6t
+         TD+Ho5rdvrLTk5bzqcCMnl9pitfst8uGY18CoKo+hfH9Kc1Eo+mgKGUYIveYhSEXBdpJ
+         Ya96RGhhoksX+LEBP+gUZ8THSD4HDT+n0u4sLzghqIfn8Mvj3/G5KvBb23WshCQAdAqi
+         mdHQ==
+X-Gm-Message-State: AOJu0Yz+zPMghHfIuRKyWDI+jez93UCZBf+YrUWVSW8voF5W/A+FGX8f
+	n7QXuS6hR9z6vJmru/mN+1gzgXmmG8rPQ5RMiFOTriQIWs/kIn1qiq2u5XM6jA0=
+X-Gm-Gg: ASbGncsrftIj878ASKj3amby0UBhkJbZDIFCtWJ8EcwF7yDGLpIZ0iuwXnwhOj/D+vd
+	s3HRzC0z/VXz1IAZS7iV8MYb81jT+UhmkYNV7CHR+DF1vMkwOpZUPekHiIgcOCHDmy02cYApus/
+	oLYMaO1lo7UKEcKhtJm+2SHFwx/DciFIaLgi+MtiBJwgxS4tXPhmLQN66LtkQj7G0y6VI05HmU1
+	ceRxk8G998whyB019ZpktZa2vjfLpMiv2ilY1KkJj2YcXPUfVytQ5fVlGoRrtWuXfUBCQbY+89L
+	rZXRw0MFWWQhfGUzLKP44K20BHdONjYO
+X-Google-Smtp-Source: AGHT+IHc8EpNIG4cxuPPSWYSwyRFGGdAIA0LCRbEBlPg4hgpbqDCLbDFmReBz0mcS83oLAFqOhYDNQ==
+X-Received: by 2002:a5d:648f:0:b0:391:3150:96ff with SMTP id ffacd0b85a97d-39132d57d7emr17431954f8f.32.1741796952214;
+        Wed, 12 Mar 2025 09:29:12 -0700 (PDT)
+Received: from localhost ([2a02:8308:a00c:e200::59a5])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d0a72eeecsm26070745e9.3.2025.03.12.09.29.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Mar 2025 08:45:40 -0700 (PDT)
-Date: Wed, 12 Mar 2025 11:45:36 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Nikita Kalyazin <kalyazin@amazon.com>
-Cc: James Houghton <jthoughton@google.com>, akpm@linux-foundation.org,
-	pbonzini@redhat.com, shuah@kernel.org, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, lorenzo.stoakes@oracle.com, david@redhat.com,
-	ryan.roberts@arm.com, quic_eberman@quicinc.com, graf@amazon.de,
-	jgowans@amazon.com, roypat@amazon.co.uk, derekmn@amazon.com,
-	nsaenz@amazon.es, xmarcalx@amazon.com
-Subject: Re: [RFC PATCH 0/5] KVM: guest_memfd: support for uffd missing
-Message-ID: <Z9GsIDVYWoV8d8-C@x1.local>
-References: <20250303133011.44095-1-kalyazin@amazon.com>
- <Z8YfOVYvbwlZST0J@x1.local>
- <CADrL8HXOQ=RuhjTEmMBJrWYkcBaGrqtXmhzPDAo1BE3EWaBk4g@mail.gmail.com>
- <Z8i0HXen8gzVdgnh@x1.local>
- <fdae95e3-962b-4eaf-9ae7-c6bd1062c518@amazon.com>
- <Z89EFbT_DKqyJUxr@x1.local>
- <9e7536cc-211d-40ca-b458-66d3d8b94b4d@amazon.com>
+        Wed, 12 Mar 2025 09:29:11 -0700 (PDT)
+Date: Wed, 12 Mar 2025 17:29:10 +0100
+From: Andrew Jones <ajones@ventanamicro.com>
+To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	Anup Patel <apatel@ventanamicro.com>, Atish Patra <atishp@rivosinc.com>, 
+	Andrew Jones <andrew.jones@linux.dev>
+Subject: Re: [kvm-unit-tests PATCH v8 5/6] lib: riscv: Add SBI SSE support
+Message-ID: <20250312-cf0b7348207165c9dceddd56@orel>
+References: <20250307161549.1873770-1-cleger@rivosinc.com>
+ <20250307161549.1873770-6-cleger@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <9e7536cc-211d-40ca-b458-66d3d8b94b4d@amazon.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250307161549.1873770-6-cleger@rivosinc.com>
 
-On Tue, Mar 11, 2025 at 04:56:47PM +0000, Nikita Kalyazin wrote:
+On Fri, Mar 07, 2025 at 05:15:47PM +0100, Clément Léger wrote:
+> Add support for registering and handling SSE events. This will be used
+> by sbi test as well as upcoming double trap tests.
 > 
+> Signed-off-by: Clément Léger <cleger@rivosinc.com>
+> Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+> ---
+>  riscv/Makefile          |   1 +
+>  lib/riscv/asm/csr.h     |   1 +
+>  lib/riscv/asm/sbi.h     |  38 ++++++++++++++-
+>  lib/riscv/sbi-sse-asm.S | 103 ++++++++++++++++++++++++++++++++++++++++
+>  lib/riscv/asm-offsets.c |   9 ++++
+>  lib/riscv/sbi.c         |  76 +++++++++++++++++++++++++++++
+>  6 files changed, 227 insertions(+), 1 deletion(-)
+>  create mode 100644 lib/riscv/sbi-sse-asm.S
 > 
-> On 10/03/2025 19:57, Peter Xu wrote:
-> > On Mon, Mar 10, 2025 at 06:12:22PM +0000, Nikita Kalyazin wrote:
-> > > 
-> > > 
-> > > On 05/03/2025 20:29, Peter Xu wrote:
-> > > > On Wed, Mar 05, 2025 at 11:35:27AM -0800, James Houghton wrote:
-> > > > > I think it might be useful to implement an fs-generic MINOR mode. The
-> > > > > fault handler is already easy enough to do generically (though it
-> > > > > would become more difficult to determine if the "MINOR" fault is
-> > > > > actually a MISSING fault, but at least for my userspace, the
-> > > > > distinction isn't important. :)) So the question becomes: what should
-> > > > > UFFDIO_CONTINUE look like?
-> > > > > 
-> > > > > And I think it would be nice if UFFDIO_CONTINUE just called
-> > > > > vm_ops->fault() to get the page we want to map and then mapped it,
-> > > > > instead of having shmem-specific and hugetlb-specific versions (though
-> > > > > maybe we need to keep the hugetlb specialization...). That would avoid
-> > > > > putting kvm/gmem/etc. symbols in mm/userfaultfd code.
-> > > > > 
-> > > > > I've actually wanted to do this for a while but haven't had a good
-> > > > > reason to pursue it. I wonder if it can be done in a
-> > > > > backwards-compatible fashion...
-> > > > 
-> > > > Yes I also thought about that. :)
-> > > 
-> > > Hi Peter, hi James.  Thanks for pointing at the race condition!
-> > > 
-> > > I did some experimentation and it indeed looks possible to call
-> > > vm_ops->fault() from userfault_continue() to make it generic and decouple
-> > > from KVM, at least for non-hugetlb cases.  One thing is we'd need to prevent
-> > > a recursive handle_userfault() invocation, which I believe can be solved by
-> > > adding a new VMF flag to ignore the userfault path when the fault handler is
-> > > called from userfault_continue().  I'm open to a more elegant solution
-> > > though.
-> > 
-> > It sounds working to me.  Adding fault flag can also be seen as part of
-> > extension of vm_operations_struct ops.  So we could consider reusing
-> > fault() API indeed.
-> 
-> Great!
-> 
-> > > 
-> > > Regarding usage of the MINOR notification, in what case do you recommend
-> > > sending it?  If following the logic implemented in shmem and hugetlb, ie if
-> > > the page is _present_ in the pagecache, I can't see how it is going to work
-> > 
-> > It could be confusing when reading that chunk of code, because it looks
-> > like it notifies minor fault when cache hit. But the critical part here is
-> > that we rely on the pgtable missing causing the fault() to trigger first.
-> > So it's more like "cache hit && pgtable missing" for minor fault.
-> 
-> Right, but the cache hit still looks like a precondition for the minor fault
-> event?
+> diff --git a/riscv/Makefile b/riscv/Makefile
+> index 02d2ac39..16fc125b 100644
+> --- a/riscv/Makefile
+> +++ b/riscv/Makefile
+> @@ -43,6 +43,7 @@ cflatobjs += lib/riscv/setup.o
+>  cflatobjs += lib/riscv/smp.o
+>  cflatobjs += lib/riscv/stack.o
+>  cflatobjs += lib/riscv/timer.o
+> +cflatobjs += lib/riscv/sbi-sse-asm.o
+>  ifeq ($(ARCH),riscv32)
+>  cflatobjs += lib/ldiv32.o
+>  endif
+> diff --git a/lib/riscv/asm/csr.h b/lib/riscv/asm/csr.h
+> index c7fc87a9..3e4b5fca 100644
+> --- a/lib/riscv/asm/csr.h
+> +++ b/lib/riscv/asm/csr.h
+> @@ -17,6 +17,7 @@
+>  #define CSR_TIME		0xc01
+>  
+>  #define SR_SIE			_AC(0x00000002, UL)
+> +#define SR_SPP			_AC(0x00000100, UL)
+>  
+>  /* Exception cause high bit - is an interrupt if set */
+>  #define CAUSE_IRQ_FLAG		(_AC(1, UL) << (__riscv_xlen - 1))
+> diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
+> index 780c9edd..acef8a5e 100644
+> --- a/lib/riscv/asm/sbi.h
+> +++ b/lib/riscv/asm/sbi.h
+> @@ -230,5 +230,41 @@ struct sbiret sbi_send_ipi_broadcast(void);
+>  struct sbiret sbi_set_timer(unsigned long stime_value);
+>  long sbi_probe(int ext);
+>  
+> -#endif /* !__ASSEMBLER__ */
+> +typedef void (*sbi_sse_handler_fn)(void *data, struct pt_regs *regs, unsigned int hartid);
+> +
+> +struct sbi_sse_handler_arg {
+> +	unsigned long reg_tmp;
+> +	sbi_sse_handler_fn handler;
+> +	void *handler_data;
+> +	void *stack;
+> +};
+> +
+> +extern void sbi_sse_entry(void);
+> +
+> +static inline bool sbi_sse_event_is_global(uint32_t event_id)
+> +{
+> +	return !!(event_id & SBI_SSE_EVENT_GLOBAL_BIT);
+> +}
+> +
+> +struct sbiret sbi_sse_read_attrs_raw(unsigned long event_id, unsigned long base_attr_id,
+> +				     unsigned long attr_count, unsigned long phys_lo,
+> +				     unsigned long phys_hi);
+> +struct sbiret sbi_sse_read_attrs(unsigned long event_id, unsigned long base_attr_id,
+> +				 unsigned long attr_count, unsigned long *values);
+> +struct sbiret sbi_sse_write_attrs_raw(unsigned long event_id, unsigned long base_attr_id,
+> +				      unsigned long attr_count, unsigned long phys_lo,
+> +				      unsigned long phys_hi);
+> +struct sbiret sbi_sse_write_attrs(unsigned long event_id, unsigned long base_attr_id,
+> +				  unsigned long attr_count, unsigned long *values);
+> +struct sbiret sbi_sse_register_raw(unsigned long event_id, unsigned long entry_pc,
+> +				   unsigned long entry_arg);
+> +struct sbiret sbi_sse_register(unsigned long event_id, struct sbi_sse_handler_arg *arg);
+> +struct sbiret sbi_sse_unregister(unsigned long event_id);
+> +struct sbiret sbi_sse_enable(unsigned long event_id);
+> +struct sbiret sbi_sse_disable(unsigned long event_id);
+> +struct sbiret sbi_sse_hart_mask(void);
+> +struct sbiret sbi_sse_hart_unmask(void);
+> +struct sbiret sbi_sse_inject(unsigned long event_id, unsigned long hart_id);
+> +
+> +#endif /* !__ASSEMBLY__ */
 
-Yes.
+When rebasing on latest master this should have been left as
+__ASSEMBLER__
 
-> 
-> > > with the write syscall, as we'd like to know when the page is _missing_ in
-> > > order to respond with the population via the write.  If going against
-> > > shmem/hugetlb logic, and sending the MINOR event when the page is missing
-> > > from the pagecache, how would it solve the race condition problem?
-> > 
-> > Should be easier we stick with mmap() rather than write().  E.g. for shmem
-> > case of current code base:
-> > 
-> >          if (folio && vma && userfaultfd_minor(vma)) {
-> >                  if (!xa_is_value(folio))
-> >                          folio_put(folio);
-> >                  *fault_type = handle_userfault(vmf, VM_UFFD_MINOR);
-> >                  return 0;
-> >          }
-> > 
-> > vma is only availble if vmf!=NULL, aka in fault context.  With that, in
-> > write() to shmem inodes, nothing will generate a message, because minor
-> > fault so far is only about pgtable missing.  It needs to be mmap()ed first,
-> > and has nothing yet to do with write() syscalls.
-> 
-> Yes, that's true that write() itself isn't going to generate a message. My
-> idea was to _respond_ to a message generated by the fault handler (vmf !=
-> NULL) with a write().  I didn't mean to generate it from write().
-> 
-> What I wanted to achieve was send a message on fault + cache miss and
-> respond to the message with a write() to fill the cache followed by a
-> UFFDIO_CONTINUE to set up pagetables.  I understand that a MINOR trap (MINOR
-> + UFFDIO_CONTINUE) is preferable, but how does it fit into this model?
-> What/how will guarantee a cache hit that would trigger the MINOR message?
-> 
-> To clarify, I would like to be able to populate pages _on-demand_, not only
-> proactively (like in the original UFFDIO_CONTINUE cover letter [1]).  Do you
-> think the MINOR trap could still be applicable or would it necessarily
-> require the MISSING trap?
+>  #endif /* _ASMRISCV_SBI_H_ */
+> diff --git a/lib/riscv/sbi-sse-asm.S b/lib/riscv/sbi-sse-asm.S
+> new file mode 100644
+> index 00000000..e4efd1ff
+> --- /dev/null
+> +++ b/lib/riscv/sbi-sse-asm.S
+> @@ -0,0 +1,103 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * RISC-V SSE events entry point.
+> + *
+> + * Copyright (C) 2025, Rivos Inc., Clément Léger <cleger@rivosinc.com>
+> + */
+> +#define __ASSEMBLY__
 
-I think MINOR can also achieve similar things.  MINOR traps the pgtable
-missing event (let's imagine page cache is already populated, or at least
-when MISSING mode not registered, it'll auto-populate on 1st access).  So
-as long as the content can only be accessed from the pgtable (either via
-mmap() or GUP on top of it), then afaiu it could work similarly like
-MISSING faults, because anything trying to access it will be trapped.
+__ASSEMBLER__
 
-Said that, we can also choose to implement MISSING first.  In that case
-write() is definitely not enough, because MISSING is at least so far based
-on top of whether the page cache present, and write() won't be atomic on
-update a page.  We need to implement UFFDIO_COPY for gmemfd MISSING.
+> +#include <asm/asm.h>
+> +#include <asm/asm-offsets.h>
+> +#include <asm/csr.h>
+> +#include <generated/sbi-asm-offsets.h>
+> +
+> +.section .text
+> +.global sbi_sse_entry
+> +sbi_sse_entry:
+> +	/* Save stack temporarily */
+> +	REG_S	sp, SBI_SSE_REG_TMP(a7)
+> +	/* Set entry stack */
+> +	REG_L	sp, SBI_SSE_HANDLER_STACK(a7)
+> +
+> +	addi	sp, sp, -(PT_SIZE)
+> +	REG_S	ra, PT_RA(sp)
+> +	REG_S	s0, PT_S0(sp)
+> +	REG_S	s1, PT_S1(sp)
+> +	REG_S	s2, PT_S2(sp)
+> +	REG_S	s3, PT_S3(sp)
+> +	REG_S	s4, PT_S4(sp)
+> +	REG_S	s5, PT_S5(sp)
+> +	REG_S	s6, PT_S6(sp)
+> +	REG_S	s7, PT_S7(sp)
+> +	REG_S	s8, PT_S8(sp)
+> +	REG_S	s9, PT_S9(sp)
+> +	REG_S	s10, PT_S10(sp)
+> +	REG_S	s11, PT_S11(sp)
+> +	REG_S	tp, PT_TP(sp)
+> +	REG_S	t0, PT_T0(sp)
+> +	REG_S	t1, PT_T1(sp)
+> +	REG_S	t2, PT_T2(sp)
+> +	REG_S	t3, PT_T3(sp)
+> +	REG_S	t4, PT_T4(sp)
+> +	REG_S	t5, PT_T5(sp)
+> +	REG_S	t6, PT_T6(sp)
+> +	REG_S	gp, PT_GP(sp)
+> +	REG_S	a0, PT_A0(sp)
+> +	REG_S	a1, PT_A1(sp)
+> +	REG_S	a2, PT_A2(sp)
+> +	REG_S	a3, PT_A3(sp)
+> +	REG_S	a4, PT_A4(sp)
+> +	REG_S	a5, PT_A5(sp)
+> +	csrr	a1, CSR_SEPC
+> +	REG_S	a1, PT_EPC(sp)
+> +	csrr	a2, CSR_SSTATUS
+> +	REG_S	a2, PT_STATUS(sp)
+> +
+> +	REG_L	a0, SBI_SSE_REG_TMP(a7)
+> +	REG_S	a0, PT_SP(sp)
+> +
+> +	REG_L	t0, SBI_SSE_HANDLER(a7)
+> +	REG_L	a0, SBI_SSE_HANDLER_DATA(a7)
+> +	mv	a1, sp
+> +	mv	a2, a6
+> +	jalr	t0
+> +
+> +	REG_L	a1, PT_EPC(sp)
+> +	REG_L	a2, PT_STATUS(sp)
+> +	csrw	CSR_SEPC, a1
+> +	csrw	CSR_SSTATUS, a2
+> +
+> +	REG_L	ra, PT_RA(sp)
+> +	REG_L	s0, PT_S0(sp)
+> +	REG_L	s1, PT_S1(sp)
+> +	REG_L	s2, PT_S2(sp)
+> +	REG_L	s3, PT_S3(sp)
+> +	REG_L	s4, PT_S4(sp)
+> +	REG_L	s5, PT_S5(sp)
+> +	REG_L	s6, PT_S6(sp)
+> +	REG_L	s7, PT_S7(sp)
+> +	REG_L	s8, PT_S8(sp)
+> +	REG_L	s9, PT_S9(sp)
+> +	REG_L	s10, PT_S10(sp)
+> +	REG_L	s11, PT_S11(sp)
+> +	REG_L	tp, PT_TP(sp)
+> +	REG_L	t0, PT_T0(sp)
+> +	REG_L	t1, PT_T1(sp)
+> +	REG_L	t2, PT_T2(sp)
+> +	REG_L	t3, PT_T3(sp)
+> +	REG_L	t4, PT_T4(sp)
+> +	REG_L	t5, PT_T5(sp)
+> +	REG_L	t6, PT_T6(sp)
+> +	REG_L	gp, PT_GP(sp)
+> +	REG_L	a0, PT_A0(sp)
+> +	REG_L	a1, PT_A1(sp)
+> +	REG_L	a2, PT_A2(sp)
+> +	REG_L	a3, PT_A3(sp)
+> +	REG_L	a4, PT_A4(sp)
+> +	REG_L	a5, PT_A5(sp)
+> +
+> +	REG_L	sp, PT_SP(sp)
+> +
+> +	li	a7, ASM_SBI_EXT_SSE
+> +	li	a6, ASM_SBI_EXT_SSE_COMPLETE
+> +	ecall
+> +
+> diff --git a/lib/riscv/asm-offsets.c b/lib/riscv/asm-offsets.c
+> index 6c511c14..a96c6e97 100644
+> --- a/lib/riscv/asm-offsets.c
+> +++ b/lib/riscv/asm-offsets.c
+> @@ -3,6 +3,7 @@
+>  #include <elf.h>
+>  #include <asm/processor.h>
+>  #include <asm/ptrace.h>
+> +#include <asm/sbi.h>
+>  #include <asm/smp.h>
+>  
+>  int main(void)
+> @@ -63,5 +64,13 @@ int main(void)
+>  	OFFSET(THREAD_INFO_HARTID, thread_info, hartid);
+>  	DEFINE(THREAD_INFO_SIZE, sizeof(struct thread_info));
+>  
+> +	DEFINE(ASM_SBI_EXT_SSE, SBI_EXT_SSE);
+> +	DEFINE(ASM_SBI_EXT_SSE_COMPLETE, SBI_EXT_SSE_COMPLETE);
+> +
+> +	OFFSET(SBI_SSE_REG_TMP, sbi_sse_handler_arg, reg_tmp);
+> +	OFFSET(SBI_SSE_HANDLER, sbi_sse_handler_arg, handler);
+> +	OFFSET(SBI_SSE_HANDLER_DATA, sbi_sse_handler_arg, handler_data);
+> +	OFFSET(SBI_SSE_HANDLER_STACK, sbi_sse_handler_arg, stack);
+> +
+>  	return 0;
+>  }
+> diff --git a/lib/riscv/sbi.c b/lib/riscv/sbi.c
+> index 02dd338c..1752c916 100644
+> --- a/lib/riscv/sbi.c
+> +++ b/lib/riscv/sbi.c
+> @@ -2,6 +2,7 @@
+>  #include <libcflat.h>
+>  #include <cpumask.h>
+>  #include <limits.h>
+> +#include <asm/io.h>
+>  #include <asm/sbi.h>
+>  #include <asm/setup.h>
+>  
+> @@ -31,6 +32,81 @@ struct sbiret sbi_ecall(int ext, int fid, unsigned long arg0,
+>  	return ret;
+>  }
+>  
+> +struct sbiret sbi_sse_read_attrs_raw(unsigned long event_id, unsigned long base_attr_id,
+> +				     unsigned long attr_count, unsigned long phys_lo,
+> +				      unsigned long phys_hi)
+                   extra space here ^
 
-Either way looks ok to me.
+> +{
+> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_READ_ATTRS, event_id, base_attr_id, attr_count,
+> +			 phys_lo, phys_hi, 0);
+> +}
+> +
+> +struct sbiret sbi_sse_read_attrs(unsigned long event_id, unsigned long base_attr_id,
+> +				 unsigned long attr_count, unsigned long *values)
+> +{
+> +	phys_addr_t p = virt_to_phys(values);
+> +
+> +	return sbi_sse_read_attrs_raw(event_id, base_attr_id, attr_count, lower_32_bits(p),
+> +				      upper_32_bits(p));
+> +}
+> +
+> +struct sbiret sbi_sse_write_attrs_raw(unsigned long event_id, unsigned long base_attr_id,
+> +				      unsigned long attr_count, unsigned long phys_lo,
+> +				      unsigned long phys_hi)
+> +{
+> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_WRITE_ATTRS, event_id, base_attr_id, attr_count,
+> +			 phys_lo, phys_hi, 0);
+> +}
+> +
+> +struct sbiret sbi_sse_write_attrs(unsigned long event_id, unsigned long base_attr_id,
+> +				  unsigned long attr_count, unsigned long *values)
+> +{
+> +	phys_addr_t p = virt_to_phys(values);
+> +
+> +	return sbi_sse_write_attrs_raw(event_id, base_attr_id, attr_count, lower_32_bits(p),
+> +				       upper_32_bits(p));
+> +}
+> +
+> +struct sbiret sbi_sse_register_raw(unsigned long event_id, unsigned long entry_pc,
+> +				   unsigned long entry_arg)
+> +{
+> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_REGISTER, event_id, entry_pc, entry_arg, 0, 0, 0);
+> +}
+> +
+> +struct sbiret sbi_sse_register(unsigned long event_id, struct sbi_sse_handler_arg *arg)
+> +{
+> +	return sbi_sse_register_raw(event_id, (unsigned long) sbi_sse_entry, (unsigned long) arg);
 
-> 
-> [1] https://lore.kernel.org/linux-fsdevel/20210301222728.176417-1-axelrasmussen@google.com/T/
-> 
-> > > 
-> > > Also, where would the check for the folio_test_uptodate() mentioned by James
-> > > fit into here?  Would it only be used for fortifying the MINOR (present)
-> > > against the race?
-> > > 
-> > > > When Axel added minor fault, it's not a major concern as it's the only fs
-> > > > that will consume the feature anyway in the do_fault() path - hugetlbfs has
-> > > > its own path to take care of.. even until now.
-> > > > 
-> > > > And there's some valid points too if someone would argue to put it there
-> > > > especially on folio lock - do that in shmem.c can avoid taking folio lock
-> > > > when generating minor fault message.  It might make some difference when
-> > > > the faults are heavy and when folio lock is frequently taken elsewhere too.
-> > > 
-> > > Peter, could you expand on this?  Are you referring to the following
-> > > (shmem_get_folio_gfp)?
-> > > 
-> > >        if (folio) {
-> > >                folio_lock(folio);
-> > > 
-> > >                /* Has the folio been truncated or swapped out? */
-> > >                if (unlikely(folio->mapping != inode->i_mapping)) {
-> > >                        folio_unlock(folio);
-> > >                        folio_put(folio);
-> > >                        goto repeat;
-> > >                }
-> > >                if (sgp == SGP_WRITE)
-> > >                        folio_mark_accessed(folio);
-> > >                if (folio_test_uptodate(folio))
-> > >                        goto out;
-> > >                /* fallocated folio */
-> > >                if (sgp != SGP_READ)
-> > >                        goto clear;
-> > >                folio_unlock(folio);
-> > >                folio_put(folio);
-> > >        }
+nit: no spaces after casts
 
-[1]
-
-> > > 
-> > > Could you explain in what case the lock can be avoided?  AFAIC, the function
-> > > is called by both the shmem fault handler and userfault_continue().
-> > 
-> > I think you meant the UFFDIO_CONTINUE side of things.  I agree with you, we
-> > always need the folio lock.
-> > 
-> > What I was saying is the trapping side, where the minor fault message can
-> > be generated without the folio lock now in case of shmem.  It's about
-> > whether we could generalize the trapping side, so handle_mm_fault() can
-> > generate the minor fault message instead of by shmem.c.
-> > 
-> > If the only concern is "referring to a module symbol from core mm", then
-> > indeed the trapping side should be less of a concern anyway, because the
-> > trapping side (when in the module codes) should always be able to reference
-> > mm functions.
-> > 
-> > Actually.. if we have a fault() flag introduced above, maybe we can
-> > generalize the trap side altogether without the folio lock overhead.  When
-> > the flag set, if we can always return the folio unlocked (as long as
-> > refcount held), then in UFFDIO_CONTINUE ioctl we can lock it.
-> 
-> Where does this locking happen exactly during trapping?  I was thinking it
-> was only done when the page was allocated.  The trapping part (quoted by you
-> above) only looks up the page in the cache and calls handle_userfault().  Am
-> I missing something?
-
-That's only what I worry if we want to reuse fault() to generalize the trap
-code in core mm, because fault() by default takes the folio lock at least
-for shmem.  I agree the folio doesn't need locking when trapping the fault
-and sending the message.
+> +}
+> +
+> +struct sbiret sbi_sse_unregister(unsigned long event_id)
+> +{
+> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_UNREGISTER, event_id, 0, 0, 0, 0, 0);
+> +}
+> +
+> +struct sbiret sbi_sse_enable(unsigned long event_id)
+> +{
+> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_ENABLE, event_id, 0, 0, 0, 0, 0);
+> +}
+> +
+> +struct sbiret sbi_sse_disable(unsigned long event_id)
+> +{
+> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_DISABLE, event_id, 0, 0, 0, 0, 0);
+> +}
+> +
+> +struct sbiret sbi_sse_hart_mask(void)
+> +{
+> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_HART_MASK, 0, 0, 0, 0, 0, 0);
+> +}
+> +
+> +struct sbiret sbi_sse_hart_unmask(void)
+> +{
+> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_HART_UNMASK, 0, 0, 0, 0, 0, 0);
+> +}
+> +
+> +struct sbiret sbi_sse_inject(unsigned long event_id, unsigned long hart_id)
+> +{
+> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_INJECT, event_id, hart_id, 0, 0, 0, 0);
+> +}
+> +
+>  void sbi_shutdown(void)
+>  {
+>  	sbi_ecall(SBI_EXT_SRST, 0, 0, 0, 0, 0, 0, 0);
+> -- 
+> 2.47.2
+>
 
 Thanks,
-
-> 
-> > > 
-> > > > It might boil down to how many more FSes would support minor fault, and
-> > > > whether we would care about such difference at last to shmem users. If gmem
-> > > > is the only one after existing ones, IIUC there's still option we implement
-> > > > it in gmem code.  After all, I expect the change should be very under
-> > > > control (<20 LOCs?)..
-> > > > 
-> > > > --
-> > > > Peter Xu
-> > > > 
-> > > 
-> > 
-> > --
-> > Peter Xu
-> > 
-> 
-
--- 
-Peter Xu
-
+drew
 
