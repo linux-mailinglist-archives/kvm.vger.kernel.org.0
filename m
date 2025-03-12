@@ -1,246 +1,344 @@
-Return-Path: <kvm+bounces-40848-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40849-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4B56A5E34E
-	for <lists+kvm@lfdr.de>; Wed, 12 Mar 2025 18:59:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE52AA5E3C5
+	for <lists+kvm@lfdr.de>; Wed, 12 Mar 2025 19:39:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63CE53A9107
-	for <lists+kvm@lfdr.de>; Wed, 12 Mar 2025 17:59:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F375E17578A
+	for <lists+kvm@lfdr.de>; Wed, 12 Mar 2025 18:39:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5129625A2AB;
-	Wed, 12 Mar 2025 17:58:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CEEA257430;
+	Wed, 12 Mar 2025 18:39:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VMenEBkN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WHEtGdiK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D85A5258CE9
-	for <kvm@vger.kernel.org>; Wed, 12 Mar 2025 17:58:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAD1256C6A
+	for <kvm@vger.kernel.org>; Wed, 12 Mar 2025 18:39:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741802329; cv=none; b=U1kP7J+Hkj6yxkDE7/e/CiEmxxjyCy+Mg/JuTxLhX2i+WgiY/vMp63P0cTGPn9KhPutdR2xnRwAQ2+lWHybA09lDMkMgPpmFzPTtbJHs+zWSfM9+Vz5zTIOK8wrOSec0dww1RgZd/iQxBu83reZGENLT2XimyYl3uzfc6eZli2Q=
+	t=1741804768; cv=none; b=RRVz37rc0ousEpOCyxlyCDIGB1qovw2Sel+El/tG82pBR9yC6KXbkv+f9wFkVJRlXlo3yEoaV7ATmRY81ArCj87e4OUV9rhFKxLsCBjJsS0L6GXhg0ES7KM11ZDoRcd8jntPXNrgCn2Q4g+Qcc5WZGE0wjAgVrrQvmb3LfDWo3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741802329; c=relaxed/simple;
-	bh=dBp330nwbC7q4iPH2IoIUZ3Q0GJxinDrCajbj2wj9s0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OvLN/XNrtzPWzVlJla6JLaI90eXgq/41/ERWjsE5SaILR6dGNZaROMfE5lBv5PSibWcuxhie1lmbuCxaW2IAp30YFkpYdp/ZZWqYSUXs/4RbEV2e77BYyffrsCVRw8faiwnuG0vFSng/IQzFAbG59VOi2lSz7XFfGBfYhsboIZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VMenEBkN; arc=none smtp.client-ip=209.85.128.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-43bc97e6360so311655e9.3
-        for <kvm@vger.kernel.org>; Wed, 12 Mar 2025 10:58:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741802326; x=1742407126; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IlIj3TjUhtkedIPYTVHeRQbthVzaFoCCtbaBiaH1aMs=;
-        b=VMenEBkNgjG7/kRyc1xc2e8vAftptPXLVORUiTRFurTxFfUYQZmorBRSvN25uudUQy
-         g585dTGZOz/Lo2aDflADS5rS8YAJwyAMzptUjN7nw9foymv438eP1y+dgkEGt7tvGEmm
-         fsQgP/2l/0AFPQqu7PkvI5fbOy/X9r0g1X25i4akgDJjq9Q1ij8vKtvjxh06razNV8TI
-         Pi49jUkd7f4K8XDYsjrZ8dOX49YoQMflOZcFPfeJndWdDsO9UzDySd7SGFx7ZNeq47JZ
-         B4aVHH5vMOcJypUAEa6vD6UOiasGrn64Gh4Q0ZS797E84ulmvBYiSjCeX/pkubxJRUvM
-         7chA==
+	s=arc-20240116; t=1741804768; c=relaxed/simple;
+	bh=wVF5UCJq8TwNkOCogaMkn5fk/pOwfq9wFtAG/vz6GOw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kd1JAiFn5kdk3BTToN3cjOqjgZYHTF3FjRAlECS+1yGwPISCbJ3NzwoyXCjH6JDa0G4i2+Nwg88FZbLkbiJd3r8j7lxb3oD0iFJ9a1gR7SmNy5TrlhXlOLjapCF3Dts03++nOjD4HrNsw7BzYpXwzreNTo8dEvHUOC8QILIxOkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WHEtGdiK; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741804765;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=FpAQlvDURVXWfuuOfiLPpYSES6FxJzxrvh27SN0EPb0=;
+	b=WHEtGdiK4XcW+bsstegrHfOTghhdb+uRFrTctUgC08yzYhXJTLT16Ud9S+FxBgvJes9YJB
+	FBGdH3N/aoS52pZVYypddvw9CMOvXNtBC1OidNB+FegbsoqImoXb4fHuEho9hcc07v5SG6
+	hjSOuh18J0eMKq/QSAqkltmv3pcs7u8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-216-nUZe4oHnP6-stiuLsWwwvg-1; Wed, 12 Mar 2025 14:39:24 -0400
+X-MC-Unique: nUZe4oHnP6-stiuLsWwwvg-1
+X-Mimecast-MFC-AGG-ID: nUZe4oHnP6-stiuLsWwwvg_1741804763
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43cf446681cso540175e9.1
+        for <kvm@vger.kernel.org>; Wed, 12 Mar 2025 11:39:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741802326; x=1742407126;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IlIj3TjUhtkedIPYTVHeRQbthVzaFoCCtbaBiaH1aMs=;
-        b=phQBsD6CtKvpW/AOyTJV8xtNp4NQIx/WGt3sxxWVxgfrykzzU5NnSxl0m+vMUwEc1p
-         L0wskDfH8wdruJqOODPbLlQgpGmZenZFI5KvYShqQURe9y3ut6u/pRxmb4SpJndr/xDR
-         MhHe5sGMkgruaLV0lxpsISFaBzWg6E3afwPPbm21tLF0uccgJVENTqr+I+d47piiVjBV
-         jLfZr/O4jvmHB+K7EltL7zjra8WrePeksUHBPbggY0JhojW1JqiyjweWH/U9ED/pHJG6
-         rFH9riuIBadj/h85x2s8NegpgCw/aVau1WzdepnzL4MNhdj7S+eAFnhgAj4GssbepjmM
-         eADQ==
-X-Gm-Message-State: AOJu0YxEXVcetUCgMnVgm77UIY4jHgcVi7zVyFoVYI0Ix8k53RyKVG+z
-	nkEPnIzS1JXZ9DZAfnPbT4vnAO87vjc9p75gUo4JGyVfJ/B3nReOUZKxJL+AOqWajxHQ18oed7k
-	PUtqRdvhMMsRnUWHb2B64VqOUDUcycIqC/7xUwT0ZC8CxPPVVc7SIn9el6+mRaDyAIn07sU8OR8
-	ORDD8WkL16AMHpbmZc8nlvHuc=
-X-Google-Smtp-Source: AGHT+IEjvTr2HYGSAjPDkNMw4G4npR8OoTHD1VZTAuD0hSm6xCoVT94NRgIvuCOHObtSUaBMEiPsUwonRg==
-X-Received: from wmqa16.prod.google.com ([2002:a05:600c:3490:b0:43c:fa2a:77d])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:1d09:b0:43c:efed:732b
- with SMTP id 5b1f17b1804b1-43cefed78bcmr140968325e9.5.1741802326090; Wed, 12
- Mar 2025 10:58:46 -0700 (PDT)
-Date: Wed, 12 Mar 2025 17:58:23 +0000
-In-Reply-To: <20250312175824.1809636-1-tabba@google.com>
+        d=1e100.net; s=20230601; t=1741804763; x=1742409563;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FpAQlvDURVXWfuuOfiLPpYSES6FxJzxrvh27SN0EPb0=;
+        b=J/Ms8qKpzvMwD5mbwEWwoPSAyCKfnc7jTvTinTARAJHxORT9YQImBq5uoknuiWFiOk
+         KDHWokfKcepunxbYApW1hueSytFI3RknfcGNeVc62tt6RzEDnBdB/N9Ddg4sO8g8k6vL
+         1Ls4gEsrGt6ZQs9dtA7koGXfZvyhpzuuaV6vV6ROWp1xqo/v+uMESS+ZkTL2z4OB44Yg
+         pdzsNe8WuZ3WccNFnOsxfg1DSJK6Fx52ainzXVTv4qoalzVKFl4qcnJFretxfg+i8V9u
+         mBi8d0mD6EkdGK1PbCxI7SnPhlpvEZNiAydI17LO6gfyeEsnwBdk72NSsf3420kVp9F6
+         /S6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWCI+7m2ODzl3aO07VOeLGjh4AKPqY/wrnss3LD/keo6OEmNpqDDTeVAGVyHhbmz1O8fm0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvYwhgpv6m0juCxeuo3HUuzmBfzudF37cAeCMYYi8hoeftMs1U
+	aEWI91ceYiEYgiuwHH3KUs9l5ojOqIhBdVlkoDAwt5FmKcKSxfBQaEQZabS2RnalITpjjmfZ+2E
+	q56QFi893gvQ0NrL700je7yNeOlAYcgDqGp9HEy7wEC5oIFwteQ==
+X-Gm-Gg: ASbGncvNHXn6q9mnzAg48nkR6n3qQcnLxA8/GvRpjBBfufKENwGyVtIa42rd1Jc0J2+
+	jSkD64EpVBvTg7QZkb7a16X1v7xa5i58eGHXvEjosoCsyTbjfq9wRLegJYdxjUB+buR5WnEM7o2
+	618iIPDuE1vd3lLVrx2q9gIndgFB0Hru/ml/vcHHbagkw+nIi1qpU+Z3w8LWbrSWmcF5WwLCKZQ
+	YVOBcuZWvZ78Wsh6+5atqi5DQ6NKfaO6LOjLvwBZIDeX5W11pdOMnNHSnFS4/mENBjY6hZL/jM2
+	xU/8f8xw4ZLKwxXwz3WLuw==
+X-Received: by 2002:a05:600c:154d:b0:43d:160:cd97 with SMTP id 5b1f17b1804b1-43d0160cfb3mr81433545e9.25.1741804762795;
+        Wed, 12 Mar 2025 11:39:22 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH8Up0exKa8uUyXSVqc46o/ZF8opDLggJlhh9jMidWnfu/BbBjzmo/eHcQWr0AS31ifbuD0MA==
+X-Received: by 2002:a05:600c:154d:b0:43d:160:cd97 with SMTP id 5b1f17b1804b1-43d0160cfb3mr81433405e9.25.1741804762391;
+        Wed, 12 Mar 2025 11:39:22 -0700 (PDT)
+Received: from [192.168.10.81] ([176.206.122.167])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-43d0a8d0ab1sm28753375e9.34.2025.03.12.11.39.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Mar 2025 11:39:21 -0700 (PDT)
+Message-ID: <052c37b5-8deb-413e-b8cf-966e00f608ef@redhat.com>
+Date: Wed, 12 Mar 2025 19:39:20 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250312175824.1809636-1-tabba@google.com>
-X-Mailer: git-send-email 2.49.0.rc0.332.g42c0ae87b1-goog
-Message-ID: <20250312175824.1809636-11-tabba@google.com>
-Subject: [PATCH v6 10/10] KVM: guest_memfd: selftests: guest_memfd mmap() test
- when mapping is allowed
-From: Fuad Tabba <tabba@google.com>
-To: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
-Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 03/16] KVM: VMX: Move posted interrupt delivery code to
+ common header
+To: Binbin Wu <binbin.wu@linux.intel.com>, seanjc@google.com,
+ kvm@vger.kernel.org
+Cc: rick.p.edgecombe@intel.com, kai.huang@intel.com, adrian.hunter@intel.com,
+ reinette.chatre@intel.com, xiaoyao.li@intel.com, tony.lindgren@intel.com,
+ isaku.yamahata@intel.com, yan.y.zhao@intel.com, chao.gao@intel.com,
+ linux-kernel@vger.kernel.org
+References: <20250222014757.897978-1-binbin.wu@linux.intel.com>
+ <20250222014757.897978-4-binbin.wu@linux.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <20250222014757.897978-4-binbin.wu@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Expand the guest_memfd selftests to include testing mapping guest
-memory for VM types that support it.
+On 2/22/25 02:47, Binbin Wu wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> 
+> Move posted interrupt delivery code to common header so that TDX can
+> leverage it.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> [binbin: split into new patch]
+> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
+> Reviewed-by: Chao Gao <chao.gao@intel.com>
+> ---
+> TDX interrupts v3:
+>   - fixup comment and add Chao's Reviewed-by
+>     https://lore.kernel.org/kvm/20250211025828.3072076-2-binbin.wu@linux.intel.com/T/#m990cab2280c2f5fdaffc22575c3e3e3012a691df
+> 
+> TDX interrupts v2:
+> - Rebased due to moving pi_desc to vcpu_vt.
+> 
+> TDX interrupts v1:
+> - This is split out from patch "KVM: TDX: Implement interrupt injection"
+> ---
+>   arch/x86/kvm/vmx/common.h | 68 +++++++++++++++++++++++++++++++++++++++
+>   arch/x86/kvm/vmx/vmx.c    | 59 +--------------------------------
+>   2 files changed, 69 insertions(+), 58 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/common.h b/arch/x86/kvm/vmx/common.h
+> index 9d4982694f06..8b12d8214b6c 100644
+> --- a/arch/x86/kvm/vmx/common.h
+> +++ b/arch/x86/kvm/vmx/common.h
+> @@ -4,6 +4,7 @@
+>   
+>   #include <linux/kvm_host.h>
+>   
+> +#include "posted_intr.h"
 
-Also, build the guest_memfd selftest for aarch64.
+This include is already needed in "KVM: VMX: Move common fields of 
+struct vcpu_{vmx,tdx} to a struct" due to
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- tools/testing/selftests/kvm/Makefile.kvm      |  1 +
- .../testing/selftests/kvm/guest_memfd_test.c  | 75 +++++++++++++++++--
- 2 files changed, 70 insertions(+), 6 deletions(-)
++struct vcpu_vt {
++	/* Posted interrupt descriptor */
++	struct pi_desc pi_desc;
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 4277b983cace..c9a3f30e28dd 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -160,6 +160,7 @@ TEST_GEN_PROGS_arm64 += coalesced_io_test
- TEST_GEN_PROGS_arm64 += demand_paging_test
- TEST_GEN_PROGS_arm64 += dirty_log_test
- TEST_GEN_PROGS_arm64 += dirty_log_perf_test
-+TEST_GEN_PROGS_arm64 += guest_memfd_test
- TEST_GEN_PROGS_arm64 += guest_print_test
- TEST_GEN_PROGS_arm64 += get-reg-list
- TEST_GEN_PROGS_arm64 += kvm_create_max_vcpus
-diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-index ce687f8d248f..38c501e49e0e 100644
---- a/tools/testing/selftests/kvm/guest_memfd_test.c
-+++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-@@ -34,12 +34,48 @@ static void test_file_read_write(int fd)
- 		    "pwrite on a guest_mem fd should fail");
- }
- 
--static void test_mmap(int fd, size_t page_size)
-+static void test_mmap_allowed(int fd, size_t total_size)
- {
-+	size_t page_size = getpagesize();
-+	const char val = 0xaa;
-+	char *mem;
-+	int ret;
-+	int i;
-+
-+	mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-+	TEST_ASSERT(mem != MAP_FAILED, "mmaping() guest memory should pass.");
-+
-+	memset(mem, val, total_size);
-+	for (i = 0; i < total_size; i++)
-+		TEST_ASSERT_EQ(mem[i], val);
-+
-+	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE, 0,
-+			page_size);
-+	TEST_ASSERT(!ret, "fallocate the first page should succeed");
-+
-+	for (i = 0; i < page_size; i++)
-+		TEST_ASSERT_EQ(mem[i], 0x00);
-+	for (; i < total_size; i++)
-+		TEST_ASSERT_EQ(mem[i], val);
-+
-+	memset(mem, val, total_size);
-+	for (i = 0; i < total_size; i++)
-+		TEST_ASSERT_EQ(mem[i], val);
-+
-+	ret = munmap(mem, total_size);
-+	TEST_ASSERT(!ret, "munmap should succeed");
-+}
-+
-+static void test_mmap_denied(int fd, size_t total_size)
-+{
-+	size_t page_size = getpagesize();
- 	char *mem;
- 
- 	mem = mmap(NULL, page_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
- 	TEST_ASSERT_EQ(mem, MAP_FAILED);
-+
-+	mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-+	TEST_ASSERT_EQ(mem, MAP_FAILED);
- }
- 
- static void test_file_size(int fd, size_t page_size, size_t total_size)
-@@ -170,19 +206,27 @@ static void test_create_guest_memfd_multiple(struct kvm_vm *vm)
- 	close(fd1);
- }
- 
--int main(int argc, char *argv[])
-+unsigned long get_shared_type(void)
- {
--	size_t page_size;
-+#ifdef __x86_64__
-+	return KVM_X86_SW_PROTECTED_VM;
-+#endif
-+	return 0;
-+}
-+
-+void test_vm_type(unsigned long type, bool is_shared)
-+{
-+	struct kvm_vm *vm;
- 	size_t total_size;
-+	size_t page_size;
- 	int fd;
--	struct kvm_vm *vm;
- 
- 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_GUEST_MEMFD));
- 
- 	page_size = getpagesize();
- 	total_size = page_size * 4;
- 
--	vm = vm_create_barebones();
-+	vm = vm_create_barebones_type(type);
- 
- 	test_create_guest_memfd_invalid(vm);
- 	test_create_guest_memfd_multiple(vm);
-@@ -190,10 +234,29 @@ int main(int argc, char *argv[])
- 	fd = vm_create_guest_memfd(vm, total_size, 0);
- 
- 	test_file_read_write(fd);
--	test_mmap(fd, page_size);
-+
-+	if (is_shared)
-+		test_mmap_allowed(fd, total_size);
-+	else
-+		test_mmap_denied(fd, total_size);
-+
- 	test_file_size(fd, page_size, total_size);
- 	test_fallocate(fd, page_size, total_size);
- 	test_invalid_punch_hole(fd, page_size, total_size);
- 
- 	close(fd);
-+	kvm_vm_release(vm);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+#ifndef __aarch64__
-+	/* For now, arm64 only supports shared guest memory. */
-+	test_vm_type(VM_TYPE_DEFAULT, false);
-+#endif
-+
-+	if (kvm_has_cap(KVM_CAP_GMEM_SHARED_MEM))
-+		test_vm_type(get_shared_type(), true);
-+
-+	return 0;
- }
--- 
-2.49.0.rc0.332.g42c0ae87b1-goog
+I'll fix it up in kvm-coco-queue.
+
+Paolo
+
+>   #include "mmu.h"
+>   
+>   union vmx_exit_reason {
+> @@ -108,4 +109,71 @@ static inline int __vmx_handle_ept_violation(struct kvm_vcpu *vcpu, gpa_t gpa,
+>   	return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
+>   }
+>   
+> +static inline void kvm_vcpu_trigger_posted_interrupt(struct kvm_vcpu *vcpu,
+> +						     int pi_vec)
+> +{
+> +#ifdef CONFIG_SMP
+> +	if (vcpu->mode == IN_GUEST_MODE) {
+> +		/*
+> +		 * The vector of the virtual has already been set in the PIR.
+> +		 * Send a notification event to deliver the virtual interrupt
+> +		 * unless the vCPU is the currently running vCPU, i.e. the
+> +		 * event is being sent from a fastpath VM-Exit handler, in
+> +		 * which case the PIR will be synced to the vIRR before
+> +		 * re-entering the guest.
+> +		 *
+> +		 * When the target is not the running vCPU, the following
+> +		 * possibilities emerge:
+> +		 *
+> +		 * Case 1: vCPU stays in non-root mode. Sending a notification
+> +		 * event posts the interrupt to the vCPU.
+> +		 *
+> +		 * Case 2: vCPU exits to root mode and is still runnable. The
+> +		 * PIR will be synced to the vIRR before re-entering the guest.
+> +		 * Sending a notification event is ok as the host IRQ handler
+> +		 * will ignore the spurious event.
+> +		 *
+> +		 * Case 3: vCPU exits to root mode and is blocked. vcpu_block()
+> +		 * has already synced PIR to vIRR and never blocks the vCPU if
+> +		 * the vIRR is not empty. Therefore, a blocked vCPU here does
+> +		 * not wait for any requested interrupts in PIR, and sending a
+> +		 * notification event also results in a benign, spurious event.
+> +		 */
+> +
+> +		if (vcpu != kvm_get_running_vcpu())
+> +			__apic_send_IPI_mask(get_cpu_mask(vcpu->cpu), pi_vec);
+> +		return;
+> +	}
+> +#endif
+> +	/*
+> +	 * The vCPU isn't in the guest; wake the vCPU in case it is blocking,
+> +	 * otherwise do nothing as KVM will grab the highest priority pending
+> +	 * IRQ via ->sync_pir_to_irr() in vcpu_enter_guest().
+> +	 */
+> +	kvm_vcpu_wake_up(vcpu);
+> +}
+> +
+> +/*
+> + * Post an interrupt to a vCPU's PIR and trigger the vCPU to process the
+> + * interrupt if necessary.
+> + */
+> +static inline void __vmx_deliver_posted_interrupt(struct kvm_vcpu *vcpu,
+> +						  struct pi_desc *pi_desc, int vector)
+> +{
+> +	if (pi_test_and_set_pir(vector, pi_desc))
+> +		return;
+> +
+> +	/* If a previous notification has sent the IPI, nothing to do.  */
+> +	if (pi_test_and_set_on(pi_desc))
+> +		return;
+> +
+> +	/*
+> +	 * The implied barrier in pi_test_and_set_on() pairs with the smp_mb_*()
+> +	 * after setting vcpu->mode in vcpu_enter_guest(), thus the vCPU is
+> +	 * guaranteed to see PID.ON=1 and sync the PIR to IRR if triggering a
+> +	 * posted interrupt "fails" because vcpu->mode != IN_GUEST_MODE.
+> +	 */
+> +	kvm_vcpu_trigger_posted_interrupt(vcpu, POSTED_INTR_VECTOR);
+> +}
+> +
+>   #endif /* __KVM_X86_VMX_COMMON_H */
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 008e558a6f41..2d4185df1581 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -4186,50 +4186,6 @@ void vmx_msr_filter_changed(struct kvm_vcpu *vcpu)
+>   		pt_update_intercept_for_msr(vcpu);
+>   }
+>   
+> -static inline void kvm_vcpu_trigger_posted_interrupt(struct kvm_vcpu *vcpu,
+> -						     int pi_vec)
+> -{
+> -#ifdef CONFIG_SMP
+> -	if (vcpu->mode == IN_GUEST_MODE) {
+> -		/*
+> -		 * The vector of the virtual has already been set in the PIR.
+> -		 * Send a notification event to deliver the virtual interrupt
+> -		 * unless the vCPU is the currently running vCPU, i.e. the
+> -		 * event is being sent from a fastpath VM-Exit handler, in
+> -		 * which case the PIR will be synced to the vIRR before
+> -		 * re-entering the guest.
+> -		 *
+> -		 * When the target is not the running vCPU, the following
+> -		 * possibilities emerge:
+> -		 *
+> -		 * Case 1: vCPU stays in non-root mode. Sending a notification
+> -		 * event posts the interrupt to the vCPU.
+> -		 *
+> -		 * Case 2: vCPU exits to root mode and is still runnable. The
+> -		 * PIR will be synced to the vIRR before re-entering the guest.
+> -		 * Sending a notification event is ok as the host IRQ handler
+> -		 * will ignore the spurious event.
+> -		 *
+> -		 * Case 3: vCPU exits to root mode and is blocked. vcpu_block()
+> -		 * has already synced PIR to vIRR and never blocks the vCPU if
+> -		 * the vIRR is not empty. Therefore, a blocked vCPU here does
+> -		 * not wait for any requested interrupts in PIR, and sending a
+> -		 * notification event also results in a benign, spurious event.
+> -		 */
+> -
+> -		if (vcpu != kvm_get_running_vcpu())
+> -			__apic_send_IPI_mask(get_cpu_mask(vcpu->cpu), pi_vec);
+> -		return;
+> -	}
+> -#endif
+> -	/*
+> -	 * The vCPU isn't in the guest; wake the vCPU in case it is blocking,
+> -	 * otherwise do nothing as KVM will grab the highest priority pending
+> -	 * IRQ via ->sync_pir_to_irr() in vcpu_enter_guest().
+> -	 */
+> -	kvm_vcpu_wake_up(vcpu);
+> -}
+> -
+>   static int vmx_deliver_nested_posted_interrupt(struct kvm_vcpu *vcpu,
+>   						int vector)
+>   {
+> @@ -4289,20 +4245,7 @@ static int vmx_deliver_posted_interrupt(struct kvm_vcpu *vcpu, int vector)
+>   	if (!vcpu->arch.apic->apicv_active)
+>   		return -1;
+>   
+> -	if (pi_test_and_set_pir(vector, &vt->pi_desc))
+> -		return 0;
+> -
+> -	/* If a previous notification has sent the IPI, nothing to do.  */
+> -	if (pi_test_and_set_on(&vt->pi_desc))
+> -		return 0;
+> -
+> -	/*
+> -	 * The implied barrier in pi_test_and_set_on() pairs with the smp_mb_*()
+> -	 * after setting vcpu->mode in vcpu_enter_guest(), thus the vCPU is
+> -	 * guaranteed to see PID.ON=1 and sync the PIR to IRR if triggering a
+> -	 * posted interrupt "fails" because vcpu->mode != IN_GUEST_MODE.
+> -	 */
+> -	kvm_vcpu_trigger_posted_interrupt(vcpu, POSTED_INTR_VECTOR);
+> +	__vmx_deliver_posted_interrupt(vcpu, &vt->pi_desc, vector);
+>   	return 0;
+>   }
+>   
 
 
