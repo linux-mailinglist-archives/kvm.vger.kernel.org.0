@@ -1,103 +1,74 @@
-Return-Path: <kvm+bounces-40809-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40810-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81720A5D3E8
-	for <lists+kvm@lfdr.de>; Wed, 12 Mar 2025 02:14:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89E42A5D3EA
+	for <lists+kvm@lfdr.de>; Wed, 12 Mar 2025 02:14:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35A40189D4E3
-	for <lists+kvm@lfdr.de>; Wed, 12 Mar 2025 01:14:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5A101724C7
+	for <lists+kvm@lfdr.de>; Wed, 12 Mar 2025 01:14:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFB3713D8A4;
-	Wed, 12 Mar 2025 01:13:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 706133595E;
+	Wed, 12 Mar 2025 01:14:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dQ5xbV8u"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dmDlqUoQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80ACE5CB8;
-	Wed, 12 Mar 2025 01:13:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29DC8634D
+	for <kvm@vger.kernel.org>; Wed, 12 Mar 2025 01:14:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741742029; cv=none; b=q6LncpD+fZ2iDOG2wSeRTAXj9R9IDqSOwUrCkQ4jAZPzhRv4esh3hBP+lcO4Wxp9+/M5X7CnxXjQDJpAW3FvFFWCFwUDDRfGdsJqhEL6//hu7Uj1fXs09QTgbBlciSugeRmp0ArwpJgKC5brYQ73ubh6cBEsVpNOZUDoSzHRPxo=
+	t=1741742044; cv=none; b=BYF0bZZ1mOyVG5v3JZ7sh16ur0mQfXhAymjrj8fEfOtZuk71wiImy4p3igntA3WzS0qSGddW0N9qsdr6sGsFXHmWrN7R6e32m3JJYF1m3zQ1iposoyqy2mf5o34FCwzHZ7U5NuYK/cZJJOn6tR+FHQwgn+pjlxiREZnVLyxg/Xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741742029; c=relaxed/simple;
-	bh=+RZZ7dldifWWO9KJpQQJzaN1oqzmUvwKYrniOyXt/Dc=;
+	s=arc-20240116; t=1741742044; c=relaxed/simple;
+	bh=cw+bu3HxlbNj06nDNyIU+XJthNYzbbahBS9eBPqp78Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A18X1o3AyxnEKZyZnFay1BSgyBgsk2xxAN6LOKs23nZx3W4xhPoa1dnObn6D10gs9koBEkAXzY06eUtINWJOHXWVQpnKB8YRqtLXoN+dvKw0dFw0+M5izUTUbrx/NjlTJz85YAqmAEjm2zHWmfjxjptUXfNBNqx6Y3VQ2tUi6YE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dQ5xbV8u; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741742028; x=1773278028;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=+RZZ7dldifWWO9KJpQQJzaN1oqzmUvwKYrniOyXt/Dc=;
-  b=dQ5xbV8ul0YjycD+MymH6UJ5uHbNo+3HUvSxDhhgyPEDzPLFsP9Ll7H1
-   6HRqJG53EJTiGtfn2ascqjlWdK1aC5tQtC++eVK5KXIZmkQdJk1Or5M7V
-   jHp+hA4inmQQQayIPiZVE/3cqq5GR5YqSdLTOQwrbGI7uJfvWXVROGM5c
-   JSQ0BYiGa+Uad2hfULiTdrPyvPCPVA05p4uZWxptuOywQTn0b8t5E6Hs4
-   iXnHD2SO92ls4bg4jFl6K3PnKJHO/A0M3SRLf7uimH+3DYQLnzoQwmWjT
-   uHnE67gC/87fuYLaVAVaLksn+YGOBZ76NJlIDNVWsxMOJQZwxjhRrK9x8
-   g==;
-X-CSE-ConnectionGUID: w5cLbFRNSz+AyX7A5DoucA==
-X-CSE-MsgGUID: 4w839Y+0T3mgUlwmnRQRwg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11370"; a="42936200"
-X-IronPort-AV: E=Sophos;i="6.14,240,1736841600"; 
-   d="scan'208";a="42936200"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2025 18:13:47 -0700
-X-CSE-ConnectionGUID: u38PE43hRciZlNtVu9D/dQ==
-X-CSE-MsgGUID: eMPyhx1JRFGVHJBvNOHpgQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,240,1736841600"; 
-   d="scan'208";a="151443309"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmviesa001.fm.intel.com with ESMTP; 11 Mar 2025 18:13:39 -0700
-Date: Wed, 12 Mar 2025 09:11:09 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Alexey Kardashevskiy <aik@amd.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, x86@kernel.org, kvm@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-arch@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
-	Michael Roth <michael.roth@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>,
-	Joao Martins <joao.m.martins@oracle.com>,
-	Nicolin Chen <nicolinc@nvidia.com>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Steve Sistare <steven.sistare@oracle.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
-	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
-	Zhi Wang <zhiw@nvidia.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-Subject: Re: [RFC PATCH v2 14/22] iommufd: Add TIO calls
-Message-ID: <Z9DfLQtmq7GGXlBb@yilunxu-OptiPlex-7050>
-References: <Z72GmixR6NkzXAl7@yilunxu-OptiPlex-7050>
- <2fe6b3c6-3eed-424d-87f0-34c4e7e1c906@amd.com>
- <Z77xrqLtJfB84dJF@yilunxu-OptiPlex-7050>
- <20250226131202.GH5011@ziepe.ca>
- <Z7/jFhlsBrbrloia@yilunxu-OptiPlex-7050>
- <20250301003711.GR5011@ziepe.ca>
- <Z8U+/0IYyn7XX3ao@yilunxu-OptiPlex-7050>
- <20250305192842.GE354403@ziepe.ca>
- <Z8lE+5OpqZc746mT@yilunxu-OptiPlex-7050>
- <c5c31890-14fc-4fab-8cd4-d4dcfdecdd2d@amd.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=oiaOlVqTAqznyuRbZHVkMTcU7WKjhp81mWo0g8gMMhX+Kx/OoCTX2Mddgx0UV+mmRek+Pv6V4ei2Ls+Urt1i/hdSkVuOPB1a3UjAkef93xlu9dVhDmFLxERWfBndDeeFMXaa3HIcT2MOSc8hvpjQsattjSpysQdo63fnZSumMm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dmDlqUoQ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741742041;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GTQ6FqeSGJWa4gXakFBln2Ru3c0CV8pFrUsBtR+Ub9U=;
+	b=dmDlqUoQCbnCFZ7Hi4JHHqDnN1Eb7lrkfTEJEVUnDVU+8hIpqHhhlMOhGJHhcYn96EC3ie
+	3BKBFvqy5SNJ6XCylrsFE/8NVWHuXscEXh03IUuySSwNS+L8o4aV+xbZnipfE20Evz69r/
+	frh0IRNfIb836TLHlJIB/3KLIMu9Gd4=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-498-34Xi6h_tNNSo5Tb8LP3Huw-1; Tue,
+ 11 Mar 2025 21:13:56 -0400
+X-MC-Unique: 34Xi6h_tNNSo5Tb8LP3Huw-1
+X-Mimecast-MFC-AGG-ID: 34Xi6h_tNNSo5Tb8LP3Huw_1741742034
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0DA7019560B4;
+	Wed, 12 Mar 2025 01:13:54 +0000 (UTC)
+Received: from tpad.localdomain (unknown [10.96.133.2])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C1A881955BCB;
+	Wed, 12 Mar 2025 01:13:52 +0000 (UTC)
+Received: by tpad.localdomain (Postfix, from userid 1000)
+	id 67841400DCFE8; Tue, 11 Mar 2025 22:13:30 -0300 (-03)
+Date: Tue, 11 Mar 2025 22:13:30 -0300
+From: Marcelo Tosatti <mtosatti@redhat.com>
+To: Isaku Yamahata <isaku.yamahata@intel.com>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com,
+	Sean Christopherson <seanjc@google.com>, chao.gao@intel.com,
+	rick.p.edgecombe@intel.com, yan.y.zhao@intel.com,
+	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+	Nikunj A Dadhania <nikunj@amd.com>
+Subject: Re: [PATCH 0/2] KVM: kvm-coco-queue: Support protected TSC
+Message-ID: <Z9DfurM5LwR5fwX4@tpad>
+References: <cover.1728719037.git.isaku.yamahata@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -106,50 +77,184 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c5c31890-14fc-4fab-8cd4-d4dcfdecdd2d@amd.com>
+In-Reply-To: <cover.1728719037.git.isaku.yamahata@intel.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Fri, Mar 07, 2025 at 01:19:11PM +1100, Alexey Kardashevskiy wrote:
-> 
-> 
-> On 6/3/25 17:47, Xu Yilun wrote:
-> > On Wed, Mar 05, 2025 at 03:28:42PM -0400, Jason Gunthorpe wrote:
-> > > On Mon, Mar 03, 2025 at 01:32:47PM +0800, Xu Yilun wrote:
-> > > > All these settings cannot really take function until guest verifies them
-> > > > and does TDISP start. Guest verification does not (should not) need host
-> > > > awareness.
-> > > > 
-> > > > Our solution is, separate the secure DMA setting and secure device setting
-> > > > in different components, iommufd & vfio.
-> > > > 
-> > > > Guest require bind:
-> > > >    - ioctl(iommufd, IOMMU_VIOMMU_ALLOC, {.type = IOMMU_VIOMMU_TYPE_KVM_VALID,
-> > > > 					.kvm_fd = kvm_fd,
-> > > > 					.out_viommu_id = &viommu_id});
-> > > >    - ioctl(iommufd, IOMMU_HWPT_ALLOC, {.flag = IOMMU_HWPT_ALLOC_TRUSTED,
-> > > > 				      .pt_id = viommu_id,
-> > > > 				      .out_hwpt_id = &hwpt_id});
-> > > >    - ioctl(vfio_fd, VFIO_DEVICE_ATTACH_IOMMUFD_PT, {.pt_id = hwpt_id})
-> > > >      - do secure DMA setting in Intel iommu driver.
-> > > > 
-> > > >    - ioctl(vfio_fd, VFIO_DEVICE_TSM_BIND, ...)
-> > > >      - do bind in Intel TSM driver.
-> > > 
-> > > Except what do command do you issue to the secure world for TSM_BIND
-> > > and what are it's argument? Again you can't include the vBDF or vIOMMU
-> > > ID here.
-> > 
-> > Bind for TDX doesn't require vBDF or vIOMMU ID. The seamcall is like:
-> > 
-> > u64 tdh_devif_create(u64 stream_id,     // IDE stream ID, PF0 stuff
-> >                       u64 devif_id,      // TDI ID, it is the host BDF
-> >                       u64 tdr_pa,        // TDX VM core metadate page, TDX Connect uses it as CoCo-VM ID
-> >                       u64 devifcs_pa)    // metadate page provide to firmware
-> 
-> 
-> (offtopic) is there a public spec with this command defined?
+On Sat, Oct 12, 2024 at 12:55:54AM -0700, Isaku Yamahata wrote:
+> This patch series is for the kvm-coco-queue branch.  The change for TDX KVM is
+> included at the last.  The test is done by create TDX vCPU and run, get TSC
+> offset via vCPU device attributes and compare it with the TDX TSC OFFSET
+> metadata.  Because the test requires the TDX KVM and TDX KVM kselftests, don't
+> include it in this patch series.
 
-Sorry, there is no public TDX Connect SPEC yet.
+OK, previous results were incorrect. In fact, this patches (which apply
+cleanly to current kvm-coco-queue) reduce cyclictest latency from:
 
-Thanks,
-Yilun
+Max Latencies: 00167 00160
+Max Latencies: 00132 00151
+Max Latencies: 00138 00142
+Max Latencies: 02512 02582
+Max Latencies: 00139 00140
+Max Latencies: 00128 00131
+Max Latencies: 00131 00132
+Max Latencies: 00131 00134
+Max Latencies: 00136 00147
+Max Latencies: 00153 00135
+Max Latencies: 00138 00138
+
+to:
+
+Max Latencies: 00134 00131                                                                                  
+Max Latencies: 00130 00129                                                                                  
+Max Latencies: 00126 00141                                                                                 
+Max Latencies: 00137 00138                                                                                  
+Max Latencies: 00123 00115                                                                                  
+Max Latencies: 00119 00127                                                                                  
+Max Latencies: 00131 00104                                                                                  
+Max Latencies: 00137 00127                                                                                  
+Max Latencies: 00135 00126                                                                                  
+Max Latencies: 00128 00142                                                                                  
+Max Latencies: 00135 00138         
+
+> 
+> 
+> Background
+> ----------
+> X86 confidential computing technology defines protected guest TSC so that the
+> VMM can't change the TSC offset/multiplier once vCPU is initialized and the
+> guest can trust TSC.  The SEV-SNP defines Secure TSC as optional.  TDX mandates
+> it.  The TDX module determines the TSC offset/multiplier.  The VMM has to
+> retrieve them.
+> 
+> On the other hand, the x86 KVM common logic tries to guess or adjust the TSC
+> offset/multiplier for better guest TSC and TSC interrupt latency at KVM vCPU
+> creation (kvm_arch_vcpu_postcreate()), vCPU migration over pCPU
+> (kvm_arch_vcpu_load()), vCPU TSC device attributes (kvm_arch_tsc_set_attr()) and
+> guest/host writing to TSC or TSC adjust MSR (kvm_set_msr_common()).
+> 
+> 
+> Problem
+> -------
+> The current x86 KVM implementation conflicts with protected TSC because the
+> VMM can't change the TSC offset/multiplier.  Disable or ignore the KVM
+> logic to change/adjust the TSC offset/multiplier somehow.
+> 
+> Because KVM emulates the TSC timer or the TSC deadline timer with the TSC
+> offset/multiplier, the TSC timer interrupts are injected to the guest at the
+> wrong time if the KVM TSC offset is different from what the TDX module
+> determined.
+> 
+> Originally the issue was found by cyclic test of rt-test [1] as the latency in
+> TDX case is worse than VMX value + TDX SEAMCALL overhead.  It turned out that
+> the KVM TSC offset is different from what the TDX module determines.
+> 
+> 
+> Solution
+> --------
+> The solution is to keep the KVM TSC offset/multiplier the same as the value of
+> the TDX module somehow.  Possible solutions are as follows.
+> - Skip the logic
+>   Ignore (or don't call related functions) the request to change the TSC
+>   offset/multiplier.
+>   Pros
+>   - Logically clean.  This is similar to the guest_protected case.
+>   Cons
+>   - Needs to identify the call sites.
+> 
+> - Revert the change at the hooks after TSC adjustment
+>   x86 KVM defines the vendor hooks when the TSC offset/multiplier are
+>   changed.  The callback can revert the change.
+>   Pros
+>   - We don't need to care about the logic to change the TSC offset/multiplier.
+>   Cons:
+>   - Hacky to revert the KVM x86 common code logic.
+> 
+> Choose the first one.  With this patch series, SEV-SNP secure TSC can be
+> supported.
+> 
+> 
+> Patches:
+> 1: Preparation for the next patch
+> 2: Skip the logic to adjust the TSC offset/multiplier in the common x86 KVM logic
+> 
+> [1] https://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git
+> 
+> Changes for TDX KVM
+> 
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index 8785309ccb46..969da729d89f 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -694,8 +712,6 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
+>  	vcpu->arch.cr0_guest_owned_bits = -1ul;
+>  	vcpu->arch.cr4_guest_owned_bits = -1ul;
+>  
+> -	vcpu->arch.tsc_offset = kvm_tdx->tsc_offset;
+> -	vcpu->arch.l1_tsc_offset = vcpu->arch.tsc_offset;
+>  	/*
+>  	 * TODO: support off-TD debug.  If TD DEBUG is enabled, guest state
+>  	 * can be accessed. guest_state_protected = false. and kvm ioctl to
+> @@ -706,6 +722,13 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
+>  	 */
+>  	vcpu->arch.guest_state_protected = true;
+>  
+> +	/* VMM can't change TSC offset/multiplier as TDX module manages them. */
+> +	vcpu->arch.guest_tsc_protected = true;
+> +	vcpu->arch.tsc_offset = kvm_tdx->tsc_offset;
+> +	vcpu->arch.l1_tsc_offset = vcpu->arch.tsc_offset;
+> +	vcpu->arch.tsc_scaling_ratio = kvm_tdx->tsc_multiplier;
+> +	vcpu->arch.l1_tsc_scaling_ratio = kvm_tdx->tsc_multiplier;
+> +
+>  	if ((kvm_tdx->xfam & XFEATURE_MASK_XTILE) == XFEATURE_MASK_XTILE)
+>  		vcpu->arch.xfd_no_write_intercept = true;
+>  
+> @@ -2674,6 +2697,7 @@ static int tdx_td_init(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
+>  		goto out;
+>  
+>  	kvm_tdx->tsc_offset = td_tdcs_exec_read64(kvm_tdx, TD_TDCS_EXEC_TSC_OFFSET);
+> +	kvm_tdx->tsc_multiplier = td_tdcs_exec_read64(kvm_tdx, TD_TDCS_EXEC_TSC_MULTIPLIER);
+>  	kvm_tdx->attributes = td_params->attributes;
+>  	kvm_tdx->xfam = td_params->xfam;
+>  
+> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+> index 614b1c3b8483..c0e4fa61cab1 100644
+> --- a/arch/x86/kvm/vmx/tdx.h
+> +++ b/arch/x86/kvm/vmx/tdx.h
+> @@ -42,6 +42,7 @@ struct kvm_tdx {
+>  	bool tsx_supported;
+>  
+>  	u64 tsc_offset;
+> +	u64 tsc_multiplier;
+>  
+>  	enum kvm_tdx_state state;
+>  
+> diff --git a/arch/x86/kvm/vmx/tdx_arch.h b/arch/x86/kvm/vmx/tdx_arch.h
+> index 861c0f649b69..be4cf65c90a8 100644
+> --- a/arch/x86/kvm/vmx/tdx_arch.h
+> +++ b/arch/x86/kvm/vmx/tdx_arch.h
+> @@ -69,6 +69,7 @@
+>  
+>  enum tdx_tdcs_execution_control {
+>  	TD_TDCS_EXEC_TSC_OFFSET = 10,
+> +	TD_TDCS_EXEC_TSC_MULTIPLIER = 11,
+>  };
+>  
+>  enum tdx_vcpu_guest_other_state {
+> 
+> ---
+> Isaku Yamahata (2):
+>   KVM: x86: Push down setting vcpu.arch.user_set_tsc
+>   KVM: x86: Don't allow tsc_offset, tsc_scaling_ratio to change
+> 
+>  arch/x86/include/asm/kvm_host.h |  1 +
+>  arch/x86/kvm/x86.c              | 21 ++++++++++++++-------
+>  2 files changed, 15 insertions(+), 7 deletions(-)
+> 
+> 
+> base-commit: 909f9d422f59f863d7b6e4e2c6e57abb97a27d4d
+> -- 
+> 2.45.2
+> 
+> 
+
 
