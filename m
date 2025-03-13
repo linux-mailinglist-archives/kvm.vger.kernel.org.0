@@ -1,47 +1,46 @@
-Return-Path: <kvm+bounces-40885-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40886-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3948A5EBD7
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 07:42:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E40B4A5EBE2
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 07:47:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23E951758EA
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 06:42:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCF33189AD3B
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 06:48:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7A621FBC8B;
-	Thu, 13 Mar 2025 06:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A745A1F91C7;
+	Thu, 13 Mar 2025 06:47:50 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 226D21FAC38
-	for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 06:42:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0635136658
+	for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 06:47:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741848162; cv=none; b=ZjAKH4+GC9y70YG0IdPRUitHSOoxjlhvAQnLL8htcpnI13j+trp4mWEHe0ymPgmRUQRSGkU7xu/g9rTUvlPwTp9yE1LYQW7PPRbvDYA9TpMKl/F0ZB+tyL5V5YU4RvaERqLvrb96eEjcnZ/4CzdpdxoP+gWTd7E515jMeGOklRE=
+	t=1741848470; cv=none; b=iAxkQxFe4AoWF8J0NQtu9VyMBdD6k93j2HaXOULWW9kQVv0AQItt4OD8gUl0u/MAwRElnm3ypD+Ti46NkHUTAlR4nroUtJ7avqw3UnytzUHRbOFBfkJo6RjUpxD0chiQh4f7jIy4yHvQpoOOV1FpYZLJ042Q5c+gydmhM9L0x5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741848162; c=relaxed/simple;
-	bh=72GOgf5EZMb/WeOuXYWdvyFh+GK9+QQtkNoZR0xyE68=;
+	s=arc-20240116; t=1741848470; c=relaxed/simple;
+	bh=JqOnqPvBauN17fWAqwG6ze79GdzPNv37S4EAxVv0ghY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H/FQ2qXFsKSOuw+FDgMv5oS+cZHRQ68nmyp+W2LuNtjGphiXbbSTT+j1V2Xl4bBCaLGg9dA0lxPjMez53H67FM13Pvl9pTpsfLEDU5r3+EtgrB7AYt4kb3tska/T8g9shgIgzgGX76+OSgVdjmIs4obM5GIIdHm62XesPveWqEU=
+	 Content-Type:Content-Disposition:In-Reply-To; b=IuDHMq4W2Yrhw2fp2NmxLfHxRtdbLhnbCNb9jGM6HIN5dpSI83tGa21qCSufiRo6jXXyFPnM7Mx27oj60viHLfG1640T/bJphkZOzFe3bjaE9b/p7TdqS32IDjp5r137KeOp7/UZ/4Iezsn8xNgwfnX+rQsO/FkDJpCEyGiXGCU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 349BF68C4E; Thu, 13 Mar 2025 07:42:36 +0100 (CET)
-Date: Thu, 13 Mar 2025 07:42:36 +0100
+	id 789CD68C4E; Thu, 13 Mar 2025 07:47:43 +0100 (CET)
+Date: Thu, 13 Mar 2025 07:47:43 +0100
 From: Christoph Hellwig <hch@lst.de>
 To: Mike Christie <michael.christie@oracle.com>
 Cc: chaitanyak@nvidia.com, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
 	joao.m.martins@oracle.com, linux-nvme@lists.infradead.org,
 	kvm@vger.kernel.org, kwankhede@nvidia.com,
 	alex.williamson@redhat.com, mlevitsk@redhat.com
-Subject: Re: [PATCH RFC 10/11] nvmet: Add addr fam and trtype for mdev pci
- driver
-Message-ID: <20250313064236.GE9967@lst.de>
-References: <20250313052222.178524-1-michael.christie@oracle.com> <20250313052222.178524-11-michael.christie@oracle.com>
+Subject: Re: [PATCH RFC 00/11] nvmet: Add NVMe target mdev/vfio driver
+Message-ID: <20250313064743.GA10198@lst.de>
+References: <20250313052222.178524-1-michael.christie@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -50,43 +49,62 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250313052222.178524-11-michael.christie@oracle.com>
+In-Reply-To: <20250313052222.178524-1-michael.christie@oracle.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Thu, Mar 13, 2025 at 12:18:11AM -0500, Mike Christie wrote:
-> This allocates 253 for mdev pci since it might not fit into any
-> existing value (not sure how to co-exist with pci-epf).
+On Thu, Mar 13, 2025 at 12:18:01AM -0500, Mike Christie wrote:
 > 
-> One of the reasons this patchset is a RFC is because I was not sure
-> if allocating a new number for this was the best. Another approach
-> is that I could break up pci-epf into a:
+> If we agree on a new virtual NVMe driver being ok, why mdev vs vhost?
+> =====================================================================
+> The problem with a vhost nvme is:
 > 
-> 1. PCI component - Common PCI and NVMe PCI code.
-> 2. Interface/bus component - Callouts so pci-epf can use the
-> pci_epf_driver/pci_epf_ops and mdev-pci can use mdev and vfio
-> callouts.
-> 3. Memory management component - Callouts for using DMA for pci-epf
-> vs vfio related memory for mdev-pci.
-> 
-> On one hand, by creating a core nvmet pci driver then have subdrivers
-> we could share NVMF_ADDR_FAMILY_PCI and NVMF_TRTYPE_PCI. However,
-> it will get messy. There is some PCI code we could share for 1
-> but 2 and 3 will make sharing difficult becuse of how different the
-> drivers work (mdev-vfio vs pci-epf layers).
+> 2.1. If we do a fully vhost nvmet solution, it will require new guest
+> drivers that present NVMe interfaces to userspace then perform the
+> vhost spec on the backend like how vhost-scsi does.
+>
+> I don't want to implement a windows or even a linux nvme vhost
+> driver. I don't think anyone wants the extra headache.
 
-I think we'll need to discuss this more based on concrete code proposals
-once we go along, but here's my handwavy 2cents for now:
+As in a nvme-virtio spec?  Note that I suspect you could use the
+vhost infrastructure for something that isn't virtio, but it would
+be a fair amount of work.
 
-  - in addition to the pure software endpoint and mdev I also expect
-    hardardware offloaded PCIe endpoints to show up really soon, so
-    we'll have more than just the two
-  - having common code for different PCIe tagets where applicable is
-    thus a good idea, but I'd expect it to be a set of library
-    functions or conditionals in the core code, not a new layer
-    with indirect calls
-  - I had quite a lot of discussions with Damien about the trtype and
-    related bits.  I suspect by the time we get to having multiple
-    PCIe endpoints we just need to split the configfs interface naming
-    from the on-wire fabrics trtrype enum to not need trtype assignments.
+> 2.2. We can do a hybrid approach where in the guest it looks like we
+> are a normal old local NVMe drive and use the guest's native NVMe driver.
+> However in QEMU we would have a vhost nvme module that instead of using
+> vhost virtqueues handles virtual PCI memory accesses as well as a vhost
+> nvme kernel or user driver to process IO.
+> 
+> So not as much extra code as option 1 since we don't have to worry about
+> the guest but still extra QEMU code.
+
+And it does sound rather inefficient to me.
+
+> Why not a new blk driver or why not vdpa blk?
+> =============================================
+> Applications want standardized interfaces for things like persistent
+> reservations. They have to support them with SCSI and NVMe already
+> and don't want to have to support a new virtio block interface.
+> 
+> Also the nvmet-mdev-pci driver in this patchset can perform was well
+> as SPDK vhost blk so that doesn't have the perf advantage like it
+> used to.
+
+Maybe I'm too old school, but I find vdpa a complete pain in the neck
+to deal with in any way..
+
+> 1. Should the driver integrate with pci-epf (the drivers work very
+> differently but could share some code)?
+
+If we can easily share code we should in a library.  But we should
+not force sharing code where it just make things more complicated.
+
+> 2. Should it try to fit into the existing configfs interface or implement
+> it's own like how pci-epf did? I did an attempt for this but it feels
+> wrong.
+
+pci-epf needs to integrate with the pci endpoint configfs interface
+exposed by that subsystem.  So the way it works wasn't really a choice
+but a requirement to interact with the underlying abstraction.
 
 
