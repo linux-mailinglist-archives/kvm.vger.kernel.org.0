@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-40953-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40955-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DBC0A5FC05
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 17:39:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 401AAA5FC07
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 17:39:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E0723B2C28
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 16:39:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B90F16D666
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 16:39:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FED026A098;
-	Thu, 13 Mar 2025 16:39:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 723F826A0BF;
+	Thu, 13 Mar 2025 16:39:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nAmadn+a"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iUNwF2ke"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C16269D17
-	for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 16:39:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E7ED26A095
+	for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 16:39:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741883959; cv=none; b=Z/2eZIkeLYE19VYc6vpkrPQM7C66eZBSDWNAVfqOHf35XGnOc3yPM4xHadf6bEokIQ0EAvU0/lu55zNhMcDcaXnSOf4e7F8nQQqbVXBKPskd/zcRPK6tuE4Rx52/FfVpusrJlxxINoF96mYAQHT7olKZ5wg6x6L0Rv80BjRe/ss=
+	t=1741883961; cv=none; b=AQ7rDLlYSmEj809aAMSeZmUE1Es7mb7X8cs/AEzXl0obIseSFNUxw0SSRJTqTvlsiSS54ECrwm22Xsp4iCHwoHOQvbqjE4b4lumTLhNPPMMrSrjToy6YUoIytNW+hsUKK4GVW+fuGaSFhQQEgVpwXDhbe87CeQRJH+c1Z5Bon1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741883959; c=relaxed/simple;
-	bh=o5ngxEogoPE4wzfGJK+6GJ+kqB2vK52Q1QHqnpgsaHQ=;
+	s=arc-20240116; t=1741883961; c=relaxed/simple;
+	bh=7ZCuTPyFqkaspTwPhH/SEirOAPA6rDicmFwNtDxEP7g=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rcj1iL8+nQuso1KR6XZvgvixaD1N/oTq3pZL6xoCP386tYY/iQUCVH85jJF7ZyIllZZ2l9pXpHtc78OOwX78uy/c1XsF0qSOeiLSCpSDeT6Pfp0yZ328xkjVcyKPw5kKvPPBQAJLxJ6kxoToCK1XetSv6tjpfsrhoAMxk36GtYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=nAmadn+a; arc=none smtp.client-ip=209.85.216.54
+	 MIME-Version; b=XR1dm/QFye7RcVuny1koGF6bU4NJSGE8QU+NbMEC1w0NbMYM0QIreIoDnbWM2Qal9G/FB33nR1/oYzMD6RtHEKdeb6DEZMKJjKvylUfHU7u6P+tKoiy0CSuE9Ppts9Io4yien7dNDmaKQ2ckQ6lola7SAl8xgX8HeEWedw0GRzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=iUNwF2ke; arc=none smtp.client-ip=209.85.216.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2fee05829edso2501469a91.3
-        for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 09:39:17 -0700 (PDT)
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2ff6ae7667dso2578454a91.0
+        for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 09:39:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1741883957; x=1742488757; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1741883958; x=1742488758; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wT5ohu0Ui7xrH+jgYqMJMpKemGPcZNvy7jzdyuAyzEs=;
-        b=nAmadn+ah1BeUmVKHRFLruTDQoYrU3gBBC7V1w2LWP8wcBv20LLoi1khnTyr62f7Ga
-         4h4YOwuR/wq64qrQJbWtmOeFkhAPP4I80QePj26Y/t0qr7wDyZhfBtsQEPQzMvgOB5Op
-         X7nItLOqoShoKNvp9MQ0zZSWsVSEqcGKid8dWSVeHugUwIEEBmp9sgfFA/+MgvaRnmAx
-         87guR4JbXeeGErmxGXPG8xv81kJpSS1J4IzkqvreHR94MiRcby4BFKsjyGWiRPWADG79
-         T9nJIBDFR4AAxJ1qktsWFj6YBwlkghEsk15/g1DHK83ZwJMZ1lD5OYE+qTAeVvN96YNu
-         GMCQ==
+        bh=mZcjdDtX1Z7JVvsuWgguTldfqVr7ZBWkV3i9i17ooa8=;
+        b=iUNwF2keHls6VK1fRn2dZyYKkGiKeSJQvO45MzMdjV2wEVapGOmZ4qcb7Pb0PIEQgV
+         RHHpAW2hJHIkGfrlM3XsvL/uAMCDEEmV/gEG6g7ZsoyXxqJKWjt/U+B+XxfoG2vmJNQa
+         V7/5JbZFHZ0ZrFCqTxhoC2yZvWgUc2TwIZUjHd5Ey7iR3GPRBKCI4YWdrF6E4hLsbUaH
+         J+KO1UaDaJj/b2efzDAQ3rSKjVDk3deqQwD9TUrNv8QlOqSMndSuPMZ2uR12XuvG4dHk
+         3LCexNX1FMSajaWJ8eI8wL8dZOINk/WyPiAfjlHY+o9/bnxMJvDcgkTIJyU84fhb+hWp
+         usFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741883957; x=1742488757;
+        d=1e100.net; s=20230601; t=1741883958; x=1742488758;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wT5ohu0Ui7xrH+jgYqMJMpKemGPcZNvy7jzdyuAyzEs=;
-        b=VPiBaArcca1yFEUHfq/JMapysFbMpQjby6ZJ4ejjfFU4i4lFT4v8Pq32A7Jp4fTsWB
-         9sJ1OM1oINQzYqO1vaOD0EhKdBNtCoYX+WIVfNTYr7k5kGmc1VOU3xvLvKH+zlz7CGcy
-         OY8KKTasUINqGwfKsg/7WXnJfmMNcl/uUgMxnpb9HaO+w6dxEEmAgUtCnRR73PchIzoI
-         qcFNRwsrBBL9InaLYsPw3HaJciOi59QjTNc5m5w4FPaW1AA820972kGLsoCngKGJnEDb
-         AdBnmnL/uW0DfsUrDjQCfw16hDwGn8k2hrlq8pF6PrpIiIX+6o0K+oXf9/cmqyuC3/0s
-         Vo+w==
-X-Forwarded-Encrypted: i=1; AJvYcCXwO4ZcBwc/lhcxQqADo8BO81GWCnArXgF9v/K6RtLZDZLtMcE5iyl6fq7vgytlJbR1o3k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzlxzsk39Zo4R+poYYTtty59om99f4EKGcKZPyx35Pn3fDqSgnO
-	tvXWDNBTUOAE7PdqPqubd4kxyo6cAAdAGTYaBY7ohPJ7OzWpokY2bTW4SYwk3sM=
-X-Gm-Gg: ASbGnctyjINLEcapyPRABMPDTshHeTdAAAnnTftCn61DhkCd+VIgp9SNLfu7iMtSk4O
-	yWL1hxXk4KnC/X7N1IjmSjhSianp9qKC/vTc67GDGJN2WRD1ODJn+6F+NWdEFcDQ/DGKNxB5OHB
-	rO7Peht+fq+BBAlrvh3SlEsAW5ytZsLedW1AYUYm3EKV63qAmDp8a/vCWvv9uK03Wa/joe77kXO
-	j3ohkjsy0qiQ8Nwl3TbxU8o/YzJzAmEA2ZHu94q7IN5J0T05UBILfa3cjGlOje2tTlOt1kpIZVt
-	Vbq09Z+92GaWCAveC9HAuk5yqDWXyzsga9pZpQObp3jO
-X-Google-Smtp-Source: AGHT+IGT0TQa6IzxQKmV0c+iT9Ap/Go2mov47rFQ/lft0hbXJmOXflaiO0g7vmiNGPWVgJAiRn5xgQ==
-X-Received: by 2002:a17:90b:2710:b0:2ff:6fc3:79c3 with SMTP id 98e67ed59e1d1-3014e8435admr275040a91.9.1741883957269;
-        Thu, 13 Mar 2025 09:39:17 -0700 (PDT)
+        bh=mZcjdDtX1Z7JVvsuWgguTldfqVr7ZBWkV3i9i17ooa8=;
+        b=EWo+VExrWPS7VwVvPdDeIxiGFyr7HXTo1WZ+wpEBjKIbFiag4HGgKGVNT8dpVU3dUT
+         I8OBGie5gM75gzSLJgxJBzWJ9tDgrE9PijF9bxWwU9z1EgJBQGBFU96vI891dwVCAprx
+         00Hv7P1uqn7tmwVl5F6UYDFU0CaModvy44rkGQJDTprvqiwtyxRZsbyZaWPGfQvEjcIw
+         lnxm8WDizKmVqcqnQqGkEfLKqB323eN7cnd6+KGb8nV21YR+cEnueo912k2YLrUJoWvV
+         wrgcrxb238/qnkNkEeSAHEgYZ/hrkNVfGFNUad0ClI3OsNS0yuBU7MN5nc7xzOetqK5G
+         F9UQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUQSYYqKn55Ww/V6tgmR66z4xEeN/6scaB45DiK80x1FtdpgW3HfWJmbGN7l6kqMzUs+2A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+izlsadojVerw9ajKeEGFTNLtnzVYSlhdS5TpDkOFdcaR1CQW
+	0290AwEvfrofQhYYqFPkFtTr4jBupyrfIVxVBCSaGn4WHkcZeNwV8zFKRbqXTLk=
+X-Gm-Gg: ASbGncsbKBFR04oXrjEct+ZUUIUNcE4Jy8yCee0B5qduXwlKDdTbIQ/1or/Llru7sLx
+	kauNOhCPnuKv7BTu9LZDZTrpeWXPXEDMFDpSaIDwOsvubFLb3U6NWSpJ0L+19yRTSdBNFdXoqcz
+	JjzK5R+76U9shstsmEpLxIABSpPZfLB95ZXamtYsuyyIrG+cWr1IJ7HjfRPF25c7YiyjdwQYQxe
+	CYtWiq38+zouSItSnwb7yoz8fOjM4IF3rYj1RtAx6isYuA6vDJ/Eq4NlKzXpxErix1I9o8Co5yV
+	fHHYXyrP8cEffgT78zQsBl0UMXRGpEaviElBw0Mi22Jl
+X-Google-Smtp-Source: AGHT+IG4zIqLxuyjovKp9g3TAXrCpctV1RL6f3536TGUBfN83HoHfbIXNZa1EoQ+qlG58AlBh7g+Ww==
+X-Received: by 2002:a17:90b:5403:b0:2ee:fa0c:cebc with SMTP id 98e67ed59e1d1-3014e861c18mr244498a91.20.1741883958391;
+        Thu, 13 Mar 2025 09:39:18 -0700 (PDT)
 Received: from pc.. ([38.39.164.180])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30119265938sm4020084a91.39.2025.03.13.09.39.16
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30119265938sm4020084a91.39.2025.03.13.09.39.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Mar 2025 09:39:16 -0700 (PDT)
+        Thu, 13 Mar 2025 09:39:18 -0700 (PDT)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Paul Durrant <paul@xen.org>,
@@ -98,9 +98,9 @@ Cc: Paul Durrant <paul@xen.org>,
 	Daniel Henrique Barboza <danielhb413@gmail.com>,
 	Nicholas Piggin <npiggin@gmail.com>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v4 05/17] exec/memory.h: make devend_memop "target defines" agnostic
-Date: Thu, 13 Mar 2025 09:38:51 -0700
-Message-Id: <20250313163903.1738581-6-pierrick.bouvier@linaro.org>
+Subject: [PATCH v4 06/17] codebase: prepare to remove cpu.h from exec/exec-all.h
+Date: Thu, 13 Mar 2025 09:38:52 -0700
+Message-Id: <20250313163903.1738581-7-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250313163903.1738581-1-pierrick.bouvier@linaro.org>
 References: <20250313163903.1738581-1-pierrick.bouvier@linaro.org>
@@ -112,48 +112,105 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Will allow to make system/memory.c common later.
-
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 ---
- include/exec/memory.h | 16 ++++------------
- 1 file changed, 4 insertions(+), 12 deletions(-)
+ include/tcg/tcg-op.h           | 1 +
+ target/ppc/helper_regs.h       | 2 ++
+ hw/ppc/spapr_nested.c          | 1 +
+ hw/sh4/sh7750.c                | 1 +
+ page-vary-target.c             | 2 +-
+ target/ppc/tcg-excp_helper.c   | 1 +
+ target/riscv/bitmanip_helper.c | 2 +-
+ 7 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index da21e9150b5..069021ac3ff 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -3138,25 +3138,17 @@ address_space_write_cached(MemoryRegionCache *cache, hwaddr addr,
- MemTxResult address_space_set(AddressSpace *as, hwaddr addr,
-                               uint8_t c, hwaddr len, MemTxAttrs attrs);
+diff --git a/include/tcg/tcg-op.h b/include/tcg/tcg-op.h
+index a02850583bd..bc46b5570c4 100644
+--- a/include/tcg/tcg-op.h
++++ b/include/tcg/tcg-op.h
+@@ -9,6 +9,7 @@
+ #define TCG_TCG_OP_H
  
--#ifdef COMPILING_PER_TARGET
- /* enum device_endian to MemOp.  */
- static inline MemOp devend_memop(enum device_endian end)
+ #include "tcg/tcg-op-common.h"
++#include "exec/target_long.h"
+ 
+ #ifndef TARGET_LONG_BITS
+ #error must include QEMU headers
+diff --git a/target/ppc/helper_regs.h b/target/ppc/helper_regs.h
+index 8196c1346dc..b928c2c452d 100644
+--- a/target/ppc/helper_regs.h
++++ b/target/ppc/helper_regs.h
+@@ -20,6 +20,8 @@
+ #ifndef HELPER_REGS_H
+ #define HELPER_REGS_H
+ 
++#include "target/ppc/cpu.h"
++
+ void hreg_swap_gpr_tgpr(CPUPPCState *env);
+ void hreg_compute_hflags(CPUPPCState *env);
+ void hreg_update_pmu_hflags(CPUPPCState *env);
+diff --git a/hw/ppc/spapr_nested.c b/hw/ppc/spapr_nested.c
+index 201f6292033..a79e398c132 100644
+--- a/hw/ppc/spapr_nested.c
++++ b/hw/ppc/spapr_nested.c
+@@ -2,6 +2,7 @@
+ #include "qemu/cutils.h"
+ #include "exec/exec-all.h"
+ #include "exec/cputlb.h"
++#include "exec/target_long.h"
+ #include "helper_regs.h"
+ #include "hw/ppc/ppc.h"
+ #include "hw/ppc/spapr.h"
+diff --git a/hw/sh4/sh7750.c b/hw/sh4/sh7750.c
+index 6faf0e3ca8b..41306fb6008 100644
+--- a/hw/sh4/sh7750.c
++++ b/hw/sh4/sh7750.c
+@@ -29,6 +29,7 @@
+ #include "hw/irq.h"
+ #include "hw/sh4/sh.h"
+ #include "system/system.h"
++#include "target/sh4/cpu.h"
+ #include "hw/qdev-properties.h"
+ #include "hw/qdev-properties-system.h"
+ #include "sh7750_regs.h"
+diff --git a/page-vary-target.c b/page-vary-target.c
+index 3f81144cda8..84ddeb7c26a 100644
+--- a/page-vary-target.c
++++ b/page-vary-target.c
+@@ -21,7 +21,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "exec/page-vary.h"
+-#include "exec/exec-all.h"
++#include "exec/target_page.h"
+ 
+ bool set_preferred_target_page_bits(int bits)
  {
-     QEMU_BUILD_BUG_ON(DEVICE_HOST_ENDIAN != DEVICE_LITTLE_ENDIAN &&
-                       DEVICE_HOST_ENDIAN != DEVICE_BIG_ENDIAN);
+diff --git a/target/ppc/tcg-excp_helper.c b/target/ppc/tcg-excp_helper.c
+index 5a189dc3d70..c422648cfdd 100644
+--- a/target/ppc/tcg-excp_helper.c
++++ b/target/ppc/tcg-excp_helper.c
+@@ -19,6 +19,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu/main-loop.h"
+ #include "qemu/log.h"
++#include "target/ppc/cpu.h"
+ #include "exec/cpu_ldst.h"
+ #include "exec/exec-all.h"
+ #include "exec/helper-proto.h"
+diff --git a/target/riscv/bitmanip_helper.c b/target/riscv/bitmanip_helper.c
+index b99c4a39a1f..e9c8d7f7780 100644
+--- a/target/riscv/bitmanip_helper.c
++++ b/target/riscv/bitmanip_helper.c
+@@ -20,7 +20,7 @@
  
--#if HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN
--    /* Swap if non-host endianness or native (target) endianness */
--    return (end == DEVICE_HOST_ENDIAN) ? 0 : MO_BSWAP;
--#else
--    const int non_host_endianness =
--        DEVICE_LITTLE_ENDIAN ^ DEVICE_BIG_ENDIAN ^ DEVICE_HOST_ENDIAN;
--
--    /* In this case, native (target) endianness needs no swap.  */
--    return (end == non_host_endianness) ? MO_BSWAP : 0;
--#endif
-+    bool big_endian = (end == DEVICE_NATIVE_ENDIAN
-+                       ? target_words_bigendian()
-+                       : end == DEVICE_BIG_ENDIAN);
-+    return big_endian ? MO_BE : MO_LE;
- }
--#endif /* COMPILING_PER_TARGET */
+ #include "qemu/osdep.h"
+ #include "qemu/host-utils.h"
+-#include "exec/exec-all.h"
++#include "exec/target_long.h"
+ #include "exec/helper-proto.h"
+ #include "tcg/tcg.h"
  
- /*
-  * Inhibit technologies that require discarding of pages in RAM blocks, e.g.,
 -- 
 2.39.5
 
