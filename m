@@ -1,182 +1,197 @@
-Return-Path: <kvm+bounces-40932-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40933-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC4F6A5F5D7
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 14:22:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A42EA5F63B
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 14:46:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CFB519C0917
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 13:19:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC9B7164007
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 13:46:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C581B267AF0;
-	Thu, 13 Mar 2025 13:19:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 699F5267B04;
+	Thu, 13 Mar 2025 13:46:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="Fya+B5uv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MZNKDB+U"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C876B2676E3
-	for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 13:19:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3FB2E3366
+	for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 13:46:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741871979; cv=none; b=nUuWKq724qeAq9qmTv/KXQX8TUfcKsIAO3h+9T/kPWS1iNqmlU8TohvMZncnnFpNm3wi93KsEj7WSJq/1fA8wK8ybuSWlJk4uU1x1FwsJ1ZOsZ5QLE9oBJI8R3GU452p+kIL8BPsF9g5GKdtf7aXkCDWUmRj+iXAXH/GE9IeDxk=
+	t=1741873565; cv=none; b=r8mTk6UR6KW9MuCf5t/wK912PchPb5y8xsy1FMR2u0ZlMUpuMvKyYTsd8whIwoJ3satrehRuLGo22m2dTGFnQdRdDL1RSPSmRaSZzTLI87hgWad1KBAC94CcEByLjMHyMAYoxuuJhUXgsmuZ9I8bV3w1rf/P8+P2ApVB/sXHt3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741871979; c=relaxed/simple;
-	bh=Gdz8UJhWShBn1LGKb52FUKgFJdhhJNGhVtNjQr+Ljhw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RxeveIXLnusyefUaQFy89rgvsAf01w8L/gangPROw7YQao+Mme35ytuBHyCMQioI41DCve7xhO7llPRlonhHBi1jcYdxOtaT8737xBcftXKAxFh/8f5u+we8ZLgmx/w/5y+aNyPcUw1yDdJ4TBJiyjrl6J/74hzJpFTzcsHlDDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=Fya+B5uv; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-ac2bb7ca40bso181058366b.3
-        for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 06:19:35 -0700 (PDT)
+	s=arc-20240116; t=1741873565; c=relaxed/simple;
+	bh=JhH/G33xlgUDc5fGZAmQj6oFOu/IAnb5cVYbjKxgCFY=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=dq4PJZIcl6xWr8BCsiTLlUzqyZLvZSLhYrWXQN4k9pJJ0OmUdtrWD0iSfmRT3E95tfULNLQdgZCzqF3/+7cVMPwWkCRZsCl0nLqXLHUTh3XgXYfxjWPDKqnRNBiKf2Db2s7IsZJqYcK6QHPzZkuSQ6xxf1YLFs30dvjLz1rlixk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MZNKDB+U; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ff68033070so1624032a91.2
+        for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 06:46:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1741871974; x=1742476774; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+        d=google.com; s=20230601; t=1741873563; x=1742478363; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=SLwI9+XgDvx6y1QmCRm2s349AXzMPGhMLML8/FN0xLk=;
-        b=Fya+B5uvMaBWg05/ZRaooO28oARMieTKejYuRJHRQIjyrXOuvQoFXtsyZGxHLoiqGL
-         3dxTmbWsHoc/LO3ACZs+ovLFovc85/cZDAFlz4Dr+Np2mRFz+D/XMy6Yy9Fdx2qs84ny
-         rp5uIw5CRIrGOkqHeFwdv8DUsSLZ0RAdaeJqNgnjynazmIg3FDYRa0vOpHiRwZFKJH5/
-         G3CEBRjEzjPipxd+Xx25UTJa6oXICPZLQ+CcujMNWwKjyhV7QnxyM0+/J8XoKLvkDpQp
-         C9w2NQYJDA9rpmIe5YofDyga9OrNItLRekWl+/h9p0E9oAN+c48I94bUQRMPo8p4ISfU
-         YbBw==
+        bh=+q0qvY/TGgLG06XL8YIgS/nLJoWR0rj9CjBle27wqTo=;
+        b=MZNKDB+Ue6s6ATP0tXYYsO9HF/sVImyTzVPb4tHArDQCue/t7bhkavBxqVQDc6g9Zb
+         l9jwDeqstDWScsmfuG2nPOLU1ffVLTw6XWdZdyvUk/EUO9NjebVaJNNd83zofDEJFN71
+         m7rOYc406Nw5jKOeqaim7p73IUae3rrqAKxqgXYqzeBsHltMQ//1mO+5d1XKCDEPI6/a
+         rB3yM5IgzY+/JKezYwMdbsTRIXPlKb0kxxUL3+oFGoaqVmLDA7RlhKVvZ12fhqcP8ROY
+         DXgEJL5DMT+plhTYjyYuKjim6Pdx/DJpwo6sJMFsLgWXNGdjiV/wiaESnNgNmoAOuAba
+         3R2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741871974; x=1742476774;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1741873563; x=1742478363;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SLwI9+XgDvx6y1QmCRm2s349AXzMPGhMLML8/FN0xLk=;
-        b=F6itkWM08cmAKK/dqF93wNys7DMrgo+0QnPjS0RNxY6nQzmcniNmgPckysQbFSvXch
-         27sHxeiTyYDJ6V7covvBt9tGIV21hTasn8JeiLOHz4XUlbNk2qXKhULmO2qpxtALCQom
-         gAn6FYrsP0FS13sAeFPH/1MHqiYKtAAYt19QcEU6nejRNGVSwDzSYqYHl2rhipBXXMP1
-         m1GTEJgML7BcBZEU9swETSZQ6zZxOeFSsbwwXztXSp6fpMxZ0ortB654JcKyHz4fPjn8
-         K6JD9TEWJeNuUx1pJoMSnUo8sJpvp/nFgkodXiRxsh+LIc9GXQ+nG8fZBm18UTn9VFLC
-         qFyw==
-X-Forwarded-Encrypted: i=1; AJvYcCWxKT1g3J5C+mbH9AZeODBPFe3w5TBmEJnGk2gujwgRQejIw+nnUAXFlFIhXFeGMaa8gaY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+3pvRQQ3j/dvAiGjN/FTe3zwoTcam358JkPziUITECca0HaB4
-	2Nu9pzLuDSGnSRRs9tF7RerE5y5aqkE/wBFRWGjxizPrzT+0RU5Ri9aFIYn5Klw=
-X-Gm-Gg: ASbGncvAcCczua1yeJ3Y1+W6n5Pv5909jDq8NuwpRZKFUehorVNEdAbdRmGqS+w4ybw
-	YqKEiIEHoCdRu7D3yFE7Z6zkQeAeJEm0pGxGUYx/M93QTtWmVRAEw9wy9+QUSw7vnlz6p+9evmQ
-	rvjU0C7cm5A77aZH+YDMfYKPQf5lUpTSsav6LglNcK8dzxgh8fIBI+v53tuSrSgfrQRB5y+04t7
-	HrVFeYrb4S2d4TTeau34Y5TL2O9S7yB0KaOBpibGhDtXEb3BQr+vGHADnsSFYNv4pavg67rB65f
-	uRwuo3Oqp6rbWWvFBZLWTROozS+yPHI6
-X-Google-Smtp-Source: AGHT+IF3RjvN3caMGccSNmH1eaKCAyeC0UKLdIujqC0Ubvi5/eGttJVhWRGqhwIRTen+UtV+e2lwpQ==
-X-Received: by 2002:a17:907:7da8:b0:ac1:dd6f:f26c with SMTP id a640c23a62f3a-ac2b9ede2f5mr1499361666b.46.1741871973986;
-        Thu, 13 Mar 2025 06:19:33 -0700 (PDT)
-Received: from localhost ([2a02:8308:a00c:e200::59a5])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3147ead1dsm81138266b.58.2025.03.13.06.19.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Mar 2025 06:19:33 -0700 (PDT)
-Date: Thu, 13 Mar 2025 14:19:32 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-Cc: Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
-	Samuel Holland <samuel.holland@sifive.com>
-Subject: Re: [PATCH v3 08/17] riscv: misaligned: add a function to check
- misalign trap delegability
-Message-ID: <20250313-4bea400c5770a5a5d3d70b38@orel>
-References: <20250310151229.2365992-1-cleger@rivosinc.com>
- <20250310151229.2365992-9-cleger@rivosinc.com>
+        bh=+q0qvY/TGgLG06XL8YIgS/nLJoWR0rj9CjBle27wqTo=;
+        b=BgN6mdObLwKQmzjmcsSYDNmiiScFgexJBUCLmcNByoNnCpCS7W253wqXTFViwzU9J8
+         GwkF3GpIlGXaa45oBQOnfQ7DdkB8DsaiHHP6vCf87NV1OUonMlLh6ZQheR7xkb4naAoi
+         Nc3C+f0A+xkWXIlAIO3yoPit7qAacM9MNQZdUy6X5COKFUTUa7cGbrT6xf+iesD/d51V
+         5vHPpg4idpbIngTsSOnSecR2P2k8Y4yXhAtZeNwqdPoqCTgeaOZhyQAPqaKwgKsxzVFe
+         6PPvL+lTmEF+sDzobzx8ldlvDkgsXOm585kHVlxhnjPlzwIzSl88XOW5Tc3pKcK7LyJE
+         8zhA==
+X-Gm-Message-State: AOJu0Yx68CFCoxvzUVMB0VJw/+E08dmvOt/DGu/SfgPjVsBnvAs1bRX/
+	6Ugy/fduenJxQWM8ihdsIMKfHu1xpD6tjexeA/GmUgQNAO8dl/IG9pUeM2xSiEIr3orj5Bg+DgB
+	WAv5ckdAn77DF597UamFIiA==
+X-Google-Smtp-Source: AGHT+IGLRXewZE6/3Z+HmLDNn9LacFatmvoh5VTCuVAJ4SkFg24rzX49qnEitSWoWj2PYntmyy2EBQ/LunKs8BcMVw==
+X-Received: from pjbse12.prod.google.com ([2002:a17:90b:518c:b0:2fc:2ee0:d38a])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90a:d610:b0:2fe:b470:dde4 with SMTP id 98e67ed59e1d1-300ff0ca033mr18619186a91.12.1741873563344;
+ Thu, 13 Mar 2025 06:46:03 -0700 (PDT)
+Date: Thu, 13 Mar 2025 13:46:01 +0000
+In-Reply-To: <20250312175824.1809636-4-tabba@google.com> (message from Fuad
+ Tabba on Wed, 12 Mar 2025 17:58:16 +0000)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250310151229.2365992-9-cleger@rivosinc.com>
+Mime-Version: 1.0
+Message-ID: <diqz1pv1t55y.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [PATCH v6 03/10] KVM: guest_memfd: Handle kvm_gmem_handle_folio_put()
+ for KVM as a module
+From: Ackerley Tng <ackerleytng@google.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, mail@maciej.szmigiero.name, david@redhat.com, 
+	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
+	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
+	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
+	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
+	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
+	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
+	hughd@google.com, jthoughton@google.com, peterx@redhat.com, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Mar 10, 2025 at 04:12:15PM +0100, Clément Léger wrote:
-> Checking for the delegability of the misaligned access trap is needed
-> for the KVM FWFT extension implementation. Add a function to get the
-> delegability of the misaligned trap exception.
-> 
-> Signed-off-by: Clément Léger <cleger@rivosinc.com>
+Fuad Tabba <tabba@google.com> writes:
+
+> In some architectures, KVM could be defined as a module. If there is a
+> pending folio_put() while KVM is unloaded, the system could crash. By
+> having a helper check for that and call the function only if it's
+> available, we are able to handle that case more gracefully.
+>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+>
 > ---
->  arch/riscv/include/asm/cpufeature.h  |  5 +++++
->  arch/riscv/kernel/traps_misaligned.c | 17 +++++++++++++++--
->  2 files changed, 20 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/riscv/include/asm/cpufeature.h b/arch/riscv/include/asm/cpufeature.h
-> index ad7d26788e6a..8b97cba99fc3 100644
-> --- a/arch/riscv/include/asm/cpufeature.h
-> +++ b/arch/riscv/include/asm/cpufeature.h
-> @@ -69,12 +69,17 @@ int cpu_online_unaligned_access_init(unsigned int cpu);
->  #if defined(CONFIG_RISCV_SCALAR_MISALIGNED)
->  void unaligned_emulation_finish(void);
->  bool unaligned_ctl_available(void);
-> +bool misaligned_traps_can_delegate(void);
->  DECLARE_PER_CPU(long, misaligned_access_speed);
->  #else
->  static inline bool unaligned_ctl_available(void)
->  {
->  	return false;
+>
+> This patch could be squashed with the previous one of the maintainers
+> think it would be better.
+> ---
+>  include/linux/kvm_host.h |  5 +----
+>  mm/swap.c                | 20 +++++++++++++++++++-
+>  virt/kvm/guest_memfd.c   |  8 ++++++++
+>  3 files changed, 28 insertions(+), 5 deletions(-)
+>
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 7788e3625f6d..3ad0719bfc4f 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -2572,10 +2572,7 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+>  #endif
+>  
+>  #ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> -static inline void kvm_gmem_handle_folio_put(struct folio *folio)
+> -{
+> -	WARN_ONCE(1, "A placeholder that shouldn't trigger. Work in progress.");
+> -}
+> +void kvm_gmem_handle_folio_put(struct folio *folio);
+>  #endif
+>  
+>  #endif
+> diff --git a/mm/swap.c b/mm/swap.c
+> index 241880a46358..27dfd75536c8 100644
+> --- a/mm/swap.c
+> +++ b/mm/swap.c
+> @@ -98,6 +98,24 @@ static void page_cache_release(struct folio *folio)
+>  		unlock_page_lruvec_irqrestore(lruvec, flags);
 >  }
-> +static inline bool misaligned_traps_can_delegate(void)
+>  
+> +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> +static void gmem_folio_put(struct folio *folio)
 > +{
-> +	return false;
+> +#if IS_MODULE(CONFIG_KVM)
+> +	void (*fn)(struct folio *folio);
+> +
+> +	fn = symbol_get(kvm_gmem_handle_folio_put);
+> +	if (WARN_ON_ONCE(!fn))
+> +		return;
+> +
+> +	fn(folio);
+> +	symbol_put(kvm_gmem_handle_folio_put);
+> +#else
+> +	kvm_gmem_handle_folio_put(folio);
+> +#endif
 > +}
->  #endif
->  
->  bool check_vector_unaligned_access_emulated_all_cpus(void);
-> diff --git a/arch/riscv/kernel/traps_misaligned.c b/arch/riscv/kernel/traps_misaligned.c
-> index db31966a834e..a67a6e709a06 100644
-> --- a/arch/riscv/kernel/traps_misaligned.c
-> +++ b/arch/riscv/kernel/traps_misaligned.c
-> @@ -716,10 +716,10 @@ static int cpu_online_check_unaligned_access_emulated(unsigned int cpu)
->  }
->  #endif
->  
-> -#ifdef CONFIG_RISCV_SBI
-> -
->  static bool misaligned_traps_delegated;
->  
-> +#ifdef CONFIG_RISCV_SBI
+> +#endif
+
+I was thinking of having a static function pointer within mm/swap.c that
+will be filled in and mm/swap.c 
+
 > +
->  static int cpu_online_sbi_unaligned_setup(unsigned int cpu)
+>  static void free_typed_folio(struct folio *folio)
 >  {
->  	if (sbi_fwft_set(SBI_FWFT_MISALIGNED_EXC_DELEG, 1, 0) &&
-> @@ -761,6 +761,7 @@ static int cpu_online_sbi_unaligned_setup(unsigned int cpu __always_unused)
->  {
->  	return 0;
->  }
-> +
+>  	switch (folio_get_type(folio)) {
+> @@ -108,7 +126,7 @@ static void free_typed_folio(struct folio *folio)
 >  #endif
+>  #ifdef CONFIG_KVM_GMEM_SHARED_MEM
+>  	case PGTY_guestmem:
+> -		kvm_gmem_handle_folio_put(folio);
+> +		gmem_folio_put(folio);
+>  		return;
+>  #endif
+>  	default:
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index b2aa6bf24d3a..5fc414becae5 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -13,6 +13,14 @@ struct kvm_gmem {
+>  	struct list_head entry;
+>  };
 >  
->  int cpu_online_unaligned_access_init(unsigned int cpu)
-> @@ -773,3 +774,15 @@ int cpu_online_unaligned_access_init(unsigned int cpu)
->  
->  	return cpu_online_check_unaligned_access_emulated(cpu);
->  }
-> +
-> +bool misaligned_traps_can_delegate(void)
+> +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> +void kvm_gmem_handle_folio_put(struct folio *folio)
 > +{
-> +	/*
-> +	 * Either we successfully requested misaligned traps delegation for all
-> +	 * CPUS or the SBI does not implemented FWFT extension but delegated the
-> +	 * exception by default.
-> +	 */
-> +	return misaligned_traps_delegated ||
-> +	       all_cpus_unaligned_scalar_access_emulated();
+> +	WARN_ONCE(1, "A placeholder that shouldn't trigger. Work in progress.");
 > +}
-> +EXPORT_SYMBOL_GPL(misaligned_traps_can_delegate);
-> \ No newline at end of file
-
-Check your editor settings.
-
-> -- 
-> 2.47.2
-
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> +EXPORT_SYMBOL_GPL(kvm_gmem_handle_folio_put);
+> +#endif /* CONFIG_KVM_GMEM_SHARED_MEM */
+> +
+>  /**
+>   * folio_file_pfn - like folio_file_page, but return a pfn.
+>   * @folio: The folio which contains this index.
 
