@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-40933-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40934-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A42EA5F63B
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 14:46:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2B02A5F64B
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 14:50:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC9B7164007
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 13:46:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F3A53B8AD9
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 13:49:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 699F5267B04;
-	Thu, 13 Mar 2025 13:46:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBDFE267B67;
+	Thu, 13 Mar 2025 13:49:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MZNKDB+U"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lpCd+Y1t"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3FB2E3366
-	for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 13:46:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B06EF267B15
+	for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 13:49:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741873565; cv=none; b=r8mTk6UR6KW9MuCf5t/wK912PchPb5y8xsy1FMR2u0ZlMUpuMvKyYTsd8whIwoJ3satrehRuLGo22m2dTGFnQdRdDL1RSPSmRaSZzTLI87hgWad1KBAC94CcEByLjMHyMAYoxuuJhUXgsmuZ9I8bV3w1rf/P8+P2ApVB/sXHt3A=
+	t=1741873795; cv=none; b=rOzrclAKB3SGBldh05ROYunoifE1ydnoklg2ZOCXU2I/nev8LyRp3U0l1Rz3k/wzb/E8OnKDA2wteRePP2wNDMLpKyp92zLUl8rEHwjm7zrGM7dHdpQmHd0+w8/sagJKW/zAaW5dG8TrscelNIzi4gxdDvszVOLE/qw6jtERvqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741873565; c=relaxed/simple;
-	bh=JhH/G33xlgUDc5fGZAmQj6oFOu/IAnb5cVYbjKxgCFY=;
+	s=arc-20240116; t=1741873795; c=relaxed/simple;
+	bh=gMCfqiVCtSUA4PcPW4KCsEWkN4hHQAPeVYOcAUqrgXE=;
 	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=dq4PJZIcl6xWr8BCsiTLlUzqyZLvZSLhYrWXQN4k9pJJ0OmUdtrWD0iSfmRT3E95tfULNLQdgZCzqF3/+7cVMPwWkCRZsCl0nLqXLHUTh3XgXYfxjWPDKqnRNBiKf2Db2s7IsZJqYcK6QHPzZkuSQ6xxf1YLFs30dvjLz1rlixk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MZNKDB+U; arc=none smtp.client-ip=209.85.216.73
+	 Content-Type; b=a88vREz2y0wnoKg/oXu6qAP7PD8qzb1tSN2nyECE3BH0TLaN6X4kCjXyhPoz+WpTLPeRJWxEWyHLIS28KBJ8eEDuewC5EVludXDKu2wRroQLYZFschFB7zIOTqjxMbO/7STDTxgXCgj1d7qpogRX/zyZI3Q7RvCrxvwHWeR7YUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lpCd+Y1t; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ff68033070so1624032a91.2
-        for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 06:46:03 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff5296726fso3076030a91.0
+        for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 06:49:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741873563; x=1742478363; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1741873793; x=1742478593; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=+q0qvY/TGgLG06XL8YIgS/nLJoWR0rj9CjBle27wqTo=;
-        b=MZNKDB+Ue6s6ATP0tXYYsO9HF/sVImyTzVPb4tHArDQCue/t7bhkavBxqVQDc6g9Zb
-         l9jwDeqstDWScsmfuG2nPOLU1ffVLTw6XWdZdyvUk/EUO9NjebVaJNNd83zofDEJFN71
-         m7rOYc406Nw5jKOeqaim7p73IUae3rrqAKxqgXYqzeBsHltMQ//1mO+5d1XKCDEPI6/a
-         rB3yM5IgzY+/JKezYwMdbsTRIXPlKb0kxxUL3+oFGoaqVmLDA7RlhKVvZ12fhqcP8ROY
-         DXgEJL5DMT+plhTYjyYuKjim6Pdx/DJpwo6sJMFsLgWXNGdjiV/wiaESnNgNmoAOuAba
-         3R2A==
+        bh=OyNJjs/gNu8oshRQuCS4jUqblJqtSPB3m+r3xFEElV4=;
+        b=lpCd+Y1tPVKZgn3BexlncXMOOxdkvKadrki57GYxjE/mXEuWww0m150kL3u4Mr1t1p
+         +/ycqppcEPSqvgzKCGU7NYA1WMV+QtAPIGju+dN4406NJbq9Sb835PPelIJyhc3co3F/
+         NtHLp2AWPOfToXW7nJXSGmeMgKKaFzLfbVeIUIVLQC3r50RLpM2aXhVcHjbD84/tud4G
+         p8Wzpp0fnRBQI3jhU/gK1fdcFK+mLRL+JAp1LwA779OSul2zaV1fcOjetEd/UOscdHrx
+         8sNA2lGe39V/BhJj8hZ4oM8NAw4wqMQKMEvqymb6uRjds6KnU61Fn9xOUhxbOEbwW6iR
+         z6BA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741873563; x=1742478363;
+        d=1e100.net; s=20230601; t=1741873793; x=1742478593;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+q0qvY/TGgLG06XL8YIgS/nLJoWR0rj9CjBle27wqTo=;
-        b=BgN6mdObLwKQmzjmcsSYDNmiiScFgexJBUCLmcNByoNnCpCS7W253wqXTFViwzU9J8
-         GwkF3GpIlGXaa45oBQOnfQ7DdkB8DsaiHHP6vCf87NV1OUonMlLh6ZQheR7xkb4naAoi
-         Nc3C+f0A+xkWXIlAIO3yoPit7qAacM9MNQZdUy6X5COKFUTUa7cGbrT6xf+iesD/d51V
-         5vHPpg4idpbIngTsSOnSecR2P2k8Y4yXhAtZeNwqdPoqCTgeaOZhyQAPqaKwgKsxzVFe
-         6PPvL+lTmEF+sDzobzx8ldlvDkgsXOm585kHVlxhnjPlzwIzSl88XOW5Tc3pKcK7LyJE
-         8zhA==
-X-Gm-Message-State: AOJu0Yx68CFCoxvzUVMB0VJw/+E08dmvOt/DGu/SfgPjVsBnvAs1bRX/
-	6Ugy/fduenJxQWM8ihdsIMKfHu1xpD6tjexeA/GmUgQNAO8dl/IG9pUeM2xSiEIr3orj5Bg+DgB
-	WAv5ckdAn77DF597UamFIiA==
-X-Google-Smtp-Source: AGHT+IGLRXewZE6/3Z+HmLDNn9LacFatmvoh5VTCuVAJ4SkFg24rzX49qnEitSWoWj2PYntmyy2EBQ/LunKs8BcMVw==
-X-Received: from pjbse12.prod.google.com ([2002:a17:90b:518c:b0:2fc:2ee0:d38a])
+        bh=OyNJjs/gNu8oshRQuCS4jUqblJqtSPB3m+r3xFEElV4=;
+        b=eXaM8PMs9iSr7n+j8My+qScnpShm6OKsBiwobJ1MpSvOm9Hy07Qhl6AttXY3y1Ct0c
+         sRtadbrgU6VWd5XG/DPvZxIcyItuBmPSeMdOXDqKQBAMfwRTyHA/VhVJ3X9De0yubu8T
+         +JzGaWN2tnE2NigNk93BuTES8EhBRfOAu18zA3TuYPvmteWCB5jroijucLHSIM+AWnLI
+         eIeWTeRQHGFCfHr68j0Qviw/xIqD4XEco+cDdBUfZgEGh93KW4pjscgTOgiapxsbVz8o
+         AvaEqryBk71+04F9njjrjZb5Ok1OgKEsQjNt/ZO1hcl6/J8Z20THDCtWFrR05b5XUJb/
+         6KSQ==
+X-Gm-Message-State: AOJu0YzP3BZjBs8vMrqjITk1O2h0I7E88q024HU5NDhOmf2Xztjl2sKu
+	kaFOaJrYaMyoEKEMALd3WiQ+RsN4v7cKAiQuMK+a5uVJ+2VJqgN53Kug34n7YcM+yQcp6N0Ya2p
+	il6M9iK9lsXxCAGdZSYf5Gg==
+X-Google-Smtp-Source: AGHT+IGfsAmdTxTQYHYplZzycHsKG/hPYjcXb+RZOYsTu+CeVMuSfI1qOJSKxQHDz2gmbEGo5OI61WdiyIF8ghhPdQ==
+X-Received: from pjbpx16.prod.google.com ([2002:a17:90b:2710:b0:2ef:9b30:69d3])
  (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90a:d610:b0:2fe:b470:dde4 with SMTP id 98e67ed59e1d1-300ff0ca033mr18619186a91.12.1741873563344;
- Thu, 13 Mar 2025 06:46:03 -0700 (PDT)
-Date: Thu, 13 Mar 2025 13:46:01 +0000
+ 2002:a17:90b:1b0b:b0:2fc:c262:ef4b with SMTP id 98e67ed59e1d1-2ff7cea9a99mr42242805a91.18.1741873792782;
+ Thu, 13 Mar 2025 06:49:52 -0700 (PDT)
+Date: Thu, 13 Mar 2025 13:49:51 +0000
 In-Reply-To: <20250312175824.1809636-4-tabba@google.com> (message from Fuad
  Tabba on Wed, 12 Mar 2025 17:58:16 +0000)
 Precedence: bulk
@@ -72,7 +72,7 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Message-ID: <diqz1pv1t55y.fsf@ackerleytng-ctop.c.googlers.com>
+Message-ID: <diqzy0x9rqf4.fsf@ackerleytng-ctop.c.googlers.com>
 Subject: Re: [PATCH v6 03/10] KVM: guest_memfd: Handle kvm_gmem_handle_folio_put()
  for KVM as a module
 From: Ackerley Tng <ackerleytng@google.com>
@@ -159,8 +159,17 @@ Fuad Tabba <tabba@google.com> writes:
 > +}
 > +#endif
 
-I was thinking of having a static function pointer within mm/swap.c that
-will be filled in and mm/swap.c 
+Sorry about the premature sending earlier!
+
+I was thinking about having a static function pointer in mm/swap.c that
+will be filled in when KVM is loaded and cleared when KVM is unloaded.
+
+One benefit I see is that it'll avoid the lookup that symbol_get() does
+on every folio_put(), but some other pinning on KVM would have to be
+done to prevent KVM from being unloaded in the middle of
+kvm_gmem_handle_folio_put() call.
+
+Do you/anyone else see pros/cons either way?
 
 > +
 >  static void free_typed_folio(struct folio *folio)
