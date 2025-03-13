@@ -1,176 +1,190 @@
-Return-Path: <kvm+bounces-40916-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40917-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96BBAA5F1AE
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 11:59:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29680A5F1CB
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 12:04:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9188F165E37
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 10:59:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE7D9178485
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 11:04:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C48CE264FBD;
-	Thu, 13 Mar 2025 10:59:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B978926618B;
+	Thu, 13 Mar 2025 11:03:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iVLZfptD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Bu+a/iHj"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F0B1EEA28
-	for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 10:59:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C0DC1EF084;
+	Thu, 13 Mar 2025 11:03:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741863544; cv=none; b=NNcKq5zWKD8EnC6os4JtDkuImyvxJ7rYnHqIyz7mdBEqY1rkX6k7tHc5IEwnTqUO1f28p0lwyoLGl8L9GB2hUNFII/2EVbLUTHpv2ypOxJQUw3xSqT7iFS0FLQlLDBqapdydR9XXTSR+MiV2cVnaePjDbhRXkD+xotVXvU4JCjA=
+	t=1741863830; cv=none; b=F62oxT/5hpH8PA18hjOW5To0ozflX2yH+PPynBmoPS6GTGS1hdT26e6KHuxY/Biy0/zIW2IpIYU72Ot/vsIm38uKeK7MhLMFHzG68cX5OuRDBLTEok7RYphgNd0V5wfQ2dK/0gSOmjIdQmZaYKxe1usrWDBt5nQ6Y45l+qzFEXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741863544; c=relaxed/simple;
-	bh=37LJNif6aGyyhlJh5h8ixFPgluvePWafJrCynYtE1IE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DU+jtQuPRhTCZ17YDXaRrkh1c2UiEp5ML2XFXeiGiH+KUzb8KtGLzygPHcq6WvaVgtaSLjNm0Yt0zT1sfeBxXd4Ijej71Y3jEj8unYCp++AGyYopDKyysARQQrYNjyVntahoXtVcAsQHKuufYDnl6Fj7D5B/NT1hNH3ofq8yV3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iVLZfptD; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741863541;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=I8+KGKdJ4EK24n18Z2V3Wf8YYaN68pwFttwmHD5FeXs=;
-	b=iVLZfptD+pn64iyDSyI9HvKJqVIM7VARZHxcm78tK7bXK16d5pvAEVqfSAZ+i/8WL45NFP
-	aPWFUwTjTeAcgfyqPAK6tfAFSlncRiHt6fnRxCRDA0tfz23QQmF7w305BVYFt5RPOx90Nj
-	Aay6tMPBv48kV7h3ux+IRm/SmWV6868=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-138-njpsjua0PyGKHjgj1WaXaw-1; Thu, 13 Mar 2025 06:58:59 -0400
-X-MC-Unique: njpsjua0PyGKHjgj1WaXaw-1
-X-Mimecast-MFC-AGG-ID: njpsjua0PyGKHjgj1WaXaw_1741863539
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43cf5196c25so4102995e9.0
-        for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 03:58:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741863539; x=1742468339;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=I8+KGKdJ4EK24n18Z2V3Wf8YYaN68pwFttwmHD5FeXs=;
-        b=Atsnr9b5YxcJjXO7329PEzrgcz8v+7BwEq12XpW9HvFxbRzrfkimy83hfgSwJLeQSy
-         lXnP521e4r2XNL3J3eSen8QA+clHBM3ePoAm9Ea8SOfPiZGcVdMA2adKxVBkv+FTOeP3
-         e/mriPbPTsCGnsxPVYrykq1kanDZWDfpJAnGe2mRsClTqTKeZtoF7JyaipGfW7kiJ3UP
-         R4EjSxHZ/mr55aNX2j8qCTVYYHGpBYuBHUa8gw0TLDM83ttDV1KtuobYFxqjWZr9igl4
-         t0JUrXXJzV5dTiO5xkR1tPZWtP6eq3MX+u0klZdHKjH03tfQxDB5PXx0UiadvupUoGlD
-         RGLw==
-X-Forwarded-Encrypted: i=1; AJvYcCVpN8a+NDCFLBBFiBGs9YoCGtoUSl2eVhBJAPwGj0qfxlYmw0wAaLAxueoTw5YNQskNIuQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8RRl7gLXyCQMvqF072IcSE/vnFaeC7LyuSIlRWFu/LZABbEq1
-	G9uB7SYdru34JzGEuenXAiMmYkCVkRNq8LsZqo7IArIwzLjo12BMHe/7zGbxPSQv1M2hmwz1DlE
-	6kN9AGtqaDPfQnKZZicwUb4GQ9byYofYHHK6PrC4XgZW00sMSrQ==
-X-Gm-Gg: ASbGncuT60ljMDHS9oD6wku4GhTikzwsxhZammRrhN/pM7An5DAZbiZ/FFFSqNTMFh+
-	ZZKDaJozBMbNx9JS5irK2d2gbIRcVcFcaGmmP3J4/0lg6ROgBa1VQj3mlJbELfKDn7+8Y0g5JkR
-	GWnUU6/yT+5QeaZD1VYiz8jvafca4ELEt5P9XhLAPLhe2O9OIpznyxMWL57JOIDKRwRSf4sK0HC
-	i0TZP44pH5V20oBbkDWb7Mv0h5OJeBOj6g5NTJXKlKqF1W9ETVAJZiye/5yfnqiV5uk5KjEPhgG
-	DNTtSTz9q6Qd3SKiHjBqBb8ZdcWbZ0W/i+CzU3X7
-X-Received: by 2002:a05:6000:1aca:b0:390:f738:246b with SMTP id ffacd0b85a97d-39132d1cc3fmr19536584f8f.15.1741863538694;
-        Thu, 13 Mar 2025 03:58:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFl5a/zzB4j/bQzrh0zOYukq0rCxpL/1iN9vmTUtNgl3blwOPgCRfDtKqTKHkVbblM4clhX9A==
-X-Received: by 2002:a05:6000:1aca:b0:390:f738:246b with SMTP id ffacd0b85a97d-39132d1cc3fmr19536568f8f.15.1741863538262;
-        Thu, 13 Mar 2025 03:58:58 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-6-87.dyn.eolo.it. [146.241.6.87])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d0a7582absm49566905e9.17.2025.03.13.03.58.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Mar 2025 03:58:57 -0700 (PDT)
-Message-ID: <b62ea2ac-aff3-4a00-bc3a-960c28bc5522@redhat.com>
-Date: Thu, 13 Mar 2025 11:58:54 +0100
+	s=arc-20240116; t=1741863830; c=relaxed/simple;
+	bh=PRm49VmHjxWTEv5l+Jj3Z5fYyVs179E0dso2MnFLV8g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uh6VOSLAjwZrRjwr7hJBv/QHuNJ4n0atLGgFH4nEEtPsWA3AM8tPOasrTIfkVD+WNcyPcz6Td1X9KdAdfcYFFrRfGp/un+i3Rafjo3Id2z9jf6TWl5TRrmJiDRDG5NVdf/L3IVzqnbNR7ilzC1g0XjLLsS6ohLopQhEx/P7+NLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Bu+a/iHj; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741863830; x=1773399830;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=PRm49VmHjxWTEv5l+Jj3Z5fYyVs179E0dso2MnFLV8g=;
+  b=Bu+a/iHjaxv6aq/ERCMb7HUyNC8LskCA5J1Qwx43aK9CBSwz+oKPzWBI
+   lV/Tu2j5lCSfYyPW8ducbEdHtVc5mtx+tQjlj42kX3l1QYZ7+RxvL7UDu
+   N5B81yfgf5nqy54lm47fcRBptgQz4mqqUbvMoY8+8f/pnO5T/NyALzEy1
+   GpuN7i620LbVZh768CV6OAtAdFG+uo087Iy+L98K/er3Yinsgp3n2Roh3
+   szmDFo2kzr65qA4uLft/At6eewqeL6S1wUtQ1W/sm21Qav8idDst9WHxu
+   aw8cLY0WGBMz8sBNPSSO1Q1AUQM6h04SwuzpWwbE8z+FACvZdwQxp2HHo
+   Q==;
+X-CSE-ConnectionGUID: 7Tsr1VKUQu6MehpV1MvHiA==
+X-CSE-MsgGUID: +ceLFAgxR8Cjjl22rBNHug==
+X-IronPort-AV: E=McAfee;i="6700,10204,11371"; a="42880217"
+X-IronPort-AV: E=Sophos;i="6.14,244,1736841600"; 
+   d="scan'208";a="42880217"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 04:03:49 -0700
+X-CSE-ConnectionGUID: Qsefzw/4RSOyJmWwfTvfZQ==
+X-CSE-MsgGUID: c60qU6WUQcmlcM/iLDH6CQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,244,1736841600"; 
+   d="scan'208";a="120881485"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by orviesa010.jf.intel.com with ESMTP; 13 Mar 2025 04:03:41 -0700
+Date: Thu, 13 Mar 2025 19:01:06 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Alexey Kardashevskiy <aik@amd.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Robin Murphy <robin.murphy@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>,
+	Joao Martins <joao.m.martins@oracle.com>,
+	Nicolin Chen <nicolinc@nvidia.com>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Steve Sistare <steven.sistare@oracle.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
+	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
+	Zhi Wang <zhiw@nvidia.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: Re: [RFC PATCH v2 14/22] iommufd: Add TIO calls
+Message-ID: <Z9K68m8iq3cDXShL@yilunxu-OptiPlex-7050>
+References: <20250218111017.491719-1-aik@amd.com>
+ <20250218111017.491719-15-aik@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 8/9] net: check for driver support in netmem
- TX
-To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- kvm@vger.kernel.org, virtualization@lists.linux.dev,
- linux-kselftest@vger.kernel.org
-Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Jeroen de Borst <jeroendb@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn
- <willemb@google.com>, David Ahern <dsahern@kernel.org>,
- Neal Cardwell <ncardwell@google.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin"
- <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Shuah Khan <shuah@kernel.org>, sdf@fomichev.me,
- asml.silence@gmail.com, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>,
- Victor Nogueira <victor@mojatatu.com>, Pedro Tammela
- <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
-References: <20250308214045.1160445-1-almasrymina@google.com>
- <20250308214045.1160445-9-almasrymina@google.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250308214045.1160445-9-almasrymina@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250218111017.491719-15-aik@amd.com>
 
-On 3/8/25 10:40 PM, Mina Almasry wrote:
-> We should not enable netmem TX for drivers that don't declare support.
-> 
-> Check for driver netmem TX support during devmem TX binding and fail if
-> the driver does not have the functionality.
-> 
-> Check for driver support in validate_xmit_skb as well.
-> 
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
-> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-> 
-> ---
-> 
-> v5: https://lore.kernel.org/netdev/20250227041209.2031104-8-almasrymina@google.com/
-> - Check that the dmabuf mappings belongs to the specific device the TX
->   is being sent from (Jakub)
-> 
-> v4:
-> - New patch
-> 
-> ---
->  net/core/dev.c         | 33 +++++++++++++++++++++++++++++++++
->  net/core/devmem.h      |  6 ++++++
->  net/core/netdev-genl.c |  7 +++++++
->  3 files changed, 46 insertions(+)
-> 
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 1cb134ff7327..5553947123a0 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -3868,10 +3868,43 @@ int skb_csum_hwoffload_help(struct sk_buff *skb,
->  }
->  EXPORT_SYMBOL(skb_csum_hwoffload_help);
->  
-> +static struct sk_buff *validate_xmit_unreadable_skb(struct sk_buff *skb,
-> +						    struct net_device *dev)
+> +int iommufd_vdevice_tsm_bind_ioctl(struct iommufd_ucmd *ucmd)
 > +{
-> +	struct skb_shared_info *shinfo;
-> +	struct net_iov *niov;
+> +	struct iommu_vdevice_tsm_bind *cmd = ucmd->cmd;
+> +	struct iommufd_viommu *viommu;
+> +	struct iommufd_vdevice *vdev;
+> +	struct iommufd_device *idev;
+> +	struct tsm_tdi *tdi;
+> +	int rc = 0;
 > +
-> +	if (likely(skb_frags_readable(skb)))
-> +		goto out;
+> +	viommu = iommufd_get_viommu(ucmd, cmd->viommu_id);
+
+Why need user to input viommu_id? And why get viommu here?
+The viommu is always available after vdevice is allocated, is it?
+
+int iommufd_vdevice_alloc_ioctl(struct iommufd_ucmd *ucmd)
+{
+	...
+
+	vdev->viommu = viommu;
+	refcount_inc(&viommu->obj.users);
+	...
+}
+
+> +	if (IS_ERR(viommu))
+> +		return PTR_ERR(viommu);
 > +
-> +	if (likely(!dev->netmem_tx))
+> +	idev = iommufd_get_device(ucmd, cmd->dev_id);
+> +	if (IS_ERR(idev)) {
+> +		rc = PTR_ERR(idev);
+> +		goto out_put_viommu;
+> +	}
+> +
+> +	vdev = container_of(iommufd_get_object(ucmd->ictx, cmd->vdevice_id,
+> +					       IOMMUFD_OBJ_VDEVICE),
+> +			    struct iommufd_vdevice, obj);
+> +	if (IS_ERR(idev)) {
+                   ^
+vdev?
 
-Minor nit: I think the above is actually unlikely. The skb is
-unreadable: is supposed to be transmitted on a device supporting
-netmem_tx, otherwise we are in exceptional/error path.
+> +		rc = PTR_ERR(idev);
+> +		goto out_put_dev;
+> +	}
+> +
+> +	tdi = tsm_tdi_get(idev->dev);
 
-No need to repost just for this.
+And do we still need dev_id for the struct device *? vdevice also has
+this info.
+
+int iommufd_vdevice_alloc_ioctl(struct iommufd_ucmd *ucmd)
+{
+        ...
+	vdev->dev = idev->dev;
+	get_device(idev->dev);
+        ...
+}
+
+
+> +	if (!tdi) {
+> +		rc = -ENODEV;
+> +		goto out_put_vdev;
+> +	}
+> +
+> +	rc = tsm_tdi_bind(tdi, vdev->id, cmd->kvmfd);
+> +	if (rc)
+> +		goto out_put_tdi;
+> +
+> +	vdev->tsm_bound = true;
+> +
+> +	rc = iommufd_ucmd_respond(ucmd, sizeof(*cmd));
+> +out_put_tdi:
+> +	tsm_tdi_put(tdi);
+> +out_put_vdev:
+> +	iommufd_put_object(ucmd->ictx, &vdev->obj);
+> +out_put_dev:
+> +	iommufd_put_object(ucmd->ictx, &idev->obj);
+> +out_put_viommu:
+> +	iommufd_put_object(ucmd->ictx, &viommu->obj);
+> +	return rc;
+> +}
+
+Another concern is do we need an unbind ioctl? We don't bind on vdevice
+create so it seems not symmetrical we only unbind on vdevice destroy.
 
 Thanks,
+Yilun
 
-Paolo
 
 
