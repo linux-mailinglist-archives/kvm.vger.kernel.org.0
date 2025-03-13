@@ -1,75 +1,77 @@
-Return-Path: <kvm+bounces-40949-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40950-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08D6AA5FBF5
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 17:39:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15CE8A5FBFF
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 17:39:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 008773A3302
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 16:39:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62B271890A33
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 16:39:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6720268C5A;
-	Thu, 13 Mar 2025 16:39:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED8C8269B1C;
+	Thu, 13 Mar 2025 16:39:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="y8QoiTWm"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="os0AdLfp"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C5113BAF1
-	for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 16:39:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 683CB1FBEA8
+	for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 16:39:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741883953; cv=none; b=mDzw44yYKezr5vY8+/x/GErdlFNH32NQ5l4zpVsgV0pvSR6L/wKQ0QWf88tzQjhNJx83Gz/u1m5v9CVRPCQqWJiE32HaWXloNDBZZnK1k4+ZaNrebEZILr/ELrM1QnVdzq8HucQ1NEmT8+A4nLmTDnqUTxEohxgftAQkzsF9Bss=
+	t=1741883956; cv=none; b=nj8odf5QNxgN1CirI1l7/+HVXu0eMIW9KBOVRCOiiik+VFnHw8ATnAlnUqrvW6VKbNxhc0t22jJ9OKBhrbFCatsmsnvt8Y0IZf5c6pt5gJLK6GurcgAOdq9zgY6aa6zHPWkLlRuLEA+L2S/a22qWY+RGsAxpXX76H+scappgVWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741883953; c=relaxed/simple;
-	bh=gMv2pM17WT7RBN3gUJsIR05Imxg7gLISWbHDSmjmW+c=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=BumZxnOY6gVH+Zy5Erp3qc2If7ZcP3H8KlEhe8GJHxJpzkz23Fd3bMRMYC4wXF8t4P7IANpz7+XBUxGmCgGb1F+m7BR3aLoTVvRiNOwSpDIzd1wunrj+cT8FZZxwRlwmcTcyqsTHWoh0fJZm/h1QdkiQBX4bZ5iblUBcWbxEvJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=y8QoiTWm; arc=none smtp.client-ip=209.85.216.54
+	s=arc-20240116; t=1741883956; c=relaxed/simple;
+	bh=D7kAKGSn4zAKkiSs1hQlq6vEceALs33too5mFmMr30Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Oy9NIZjXPa4whvzMLpX/0qpRAi63ftY42MkdXf9wq64yXkKgdnERpPaOuXoiLzgmwSe5mQPfuInZxjO+iUeY99CTLAWaJS1nticWmA49IC8CTa1YWgVklq/Ojdkur6pqkU1kiyRRuepak1rPLpZk84nob3jGYsVWHtceRyD5yhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=os0AdLfp; arc=none smtp.client-ip=209.85.216.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-301302a328bso2506822a91.2
-        for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 09:39:12 -0700 (PDT)
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2ff65d88103so2115514a91.2
+        for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 09:39:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1741883951; x=1742488751; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ffKtZZCij4vskrAA+3NvWrKzzZscOxv69bTHCnUkApM=;
-        b=y8QoiTWm7z0YAd9HS+M7iwp6QrO+lQzG187S2KXGo+x2u7E4NHFNBUzf/BKvbeuy0w
-         7fs23QrMzuRMHB2le7kkbADSVr7xndOWBsHdonP9hFqljIlVWXtfHmedDZ0ilx3EmYGz
-         ttZH65/ha6klPPKvPGYugbtpGyM9lr8Mw7QSvCTWzwosTAFSjqLq7Ma7POKEwxNVjjMy
-         I09TJ1DtMuMxzM+6tTxselUme7mPStj1q4og9MRO6oqm0v6EArdOfn4nYlXPaE3DiikN
-         aNDAnRy+HgbtgAvZ9rIli0lRmvwIbQ+xJ7482hCQa6YfqRqGSSAOF6vHkCrOR2RsIx1H
-         kOJA==
+        d=linaro.org; s=google; t=1741883952; x=1742488752; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=949DeBQijWmgHqYCdDdupcSTn3rDdND8nLqwkILEwEI=;
+        b=os0AdLfpbmE1IPXGe2iz9R0NgEj4pTBFdZmHErvcvlX81Z0RN33b+piz/BsbE6/auT
+         eqsCNnj3MBT9J+21AO4xLjeqO+wAaP9md9KZe891zmI8qw8AHr32kQihcNA8DKGFvDb3
+         k3OKULE/aXJPsQ8tWMEwBlwprUj6PLu0UIB0Oi0g+hRiYAYhO3Ugxx5FEMkSbIDCanHy
+         bF39skCvNcusNwpNYy/iwQ8n9yiB0zSbXnzVZMwNmPzgOkaF6/7n9Km5oPiL5tJptz8v
+         76lffw8j7QWxzhOM7vqRtqER5smOmzUeICY5id5WJEKYhu3HEMsXMgii9oshlZcBMa1r
+         UlCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741883951; x=1742488751;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ffKtZZCij4vskrAA+3NvWrKzzZscOxv69bTHCnUkApM=;
-        b=S4nt2G9mb2PhIEKUN38MY96EuRqIhryKiIJDQmHue+p20CYmfkYDbACMUG7zQDiNYU
-         cSKHuJLWHgil78bG3Mqc1hFwwbNmuYpc6cvig/0d+gi4D2qAvRI8CsSAwF3ub2LCrFTB
-         YzlkhtTblgfff/Nsi+46s0AFvZmnSEVa1Kl40/I8Oyd1YIYo1Ro//w8m56gQf/GCNNds
-         GCUEz7/L/fBSN7v83J3bYaAjbjXJyzEozZXpgoJlxarK+3oqqL4ZerNVpAZO7sdNMbSC
-         5wC5+gu/KWLcQJwPrNBaOflPa4Oj9o6tvuh4YR/e/IOuuwm2vnCuYr6pRQfjdU3LtLXG
-         +j5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX0rsRU3Ufk9JUcTvHeI8bQIQtmjgkhxc0+3nn2TVSj4oee4Bn4gaV5auwZadAOlF7ZgTI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjoiqN4Ght3O8PH7xqFfbq+gwSrT0TErhVGhac8kiJyVVf2LhZ
-	iD78suVdYgQ52JYoeSRmgn4pDMgIcVflr4u14MjdUajyI5ikavpHxr3c6C16ls8=
-X-Gm-Gg: ASbGnctgQBfoheQdVVd4s7R7hG5irHGJnRB2eHY6Nv+gu/q4bMFyK+TmQEsOY5ObWkx
-	N8pphcHPrnXBBCCJSuPa8tqqRaTUV5SqRKQXtxjVqrIsRY9a1VsVxp+EWgPOIrhPSYZY5xJNPAc
-	D3T/5Tz+hyZNdIbhkejxz+7yUIX4hL4HcVMzVawqndmmgJ/OrWl6FzbFVAsxmjWLWcwQIvgIai/
-	w0nbKcuxJVHGyjwlpn3GVCNxbhUWUbUCrLZugZMNMiPTgVQhiBsnCSkOCtC7NlJusDrUh1ZDe+l
-	xzHwmLP7RwL2CZ3gXxCOsHOI6rfrUJYYHy4btLLLcXLeOGl0vM3CkEI=
-X-Google-Smtp-Source: AGHT+IHILZBC4XG/VXTDGPE0LXvE+Aqy8ch+S3jq5UEPqUMQPlTTQn84Hgx+UBUoAEZm2kMt8qUx5g==
-X-Received: by 2002:a17:90a:e7c1:b0:2fa:137f:5c61 with SMTP id 98e67ed59e1d1-3014e843678mr320923a91.12.1741883951572;
-        Thu, 13 Mar 2025 09:39:11 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1741883952; x=1742488752;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=949DeBQijWmgHqYCdDdupcSTn3rDdND8nLqwkILEwEI=;
+        b=Yc1e9uTqtw+B4diZKqAwguvnap/J0A7JE9Vm+3oeMdeGxER+AfOS4X1F4DRuIdw32i
+         nVDKepsTMv2vew//+NfG/tiXvfLUC83B5wyT6obPMdKldhmgpMS3NqSCzpwCfLSq7et7
+         eQtnLxkhNSFqSOs079MU30LYsaEiHKncPf/9gKM898AQh5jYCL8aRZoy5fbU7oh870L3
+         kbtwJsL+I0GG5GuWfOoCm7zGe/UjQROqSomNhSG2bSFO4ClywFdC30sMUB3cGIev8vYs
+         uZ1+r1wp5gznxDDVRGpL1lPugHuherc9PFieCgLM6XQQhJs+IxzeKwPckvi+EfYkkJT8
+         MgdA==
+X-Forwarded-Encrypted: i=1; AJvYcCVdZ5FMekObl2z/yDhhW5Vl/lOyzjVG5EzBFO1okxJRZHuzzEqU+Z6wQJ/Ck/FvyeNdZBM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXv3/BYC7eKC08u29zVqBA2nwgvmA5ZO0oOGlpPI0w9zzFXiuo
+	gAk3t1JaDBe6L+EMSuvT5FuFKdlAtW/J9zlpR7difZUPGHhiIC29lSVSYyv2ZnM=
+X-Gm-Gg: ASbGncuK855Quvi6ucwkNUxe4zKWjdOq/IHpZTEBkRrSn1gABQJWR2JX7XRI/ZPNYlG
+	vHrx03GrP6o1XVN7x6TFhIX30bz0ZUx7qn+MXaSgFmktd5Ab58w2wJgCuNHnGBVA90bFo33D71p
+	lWFan+9CpmcNYgmGkit1qHpizYZoksxzqfTIo4NEsWiBgoM5JiReBz7HHvB2NfY+yciE4t6meuB
+	lf+2xkH8Rsn1EQ7IhFQR6zTHT/J9/h9w7zX1IePm3IZXxbeXRxERQHKEfnqpKMxXKn1Dxp7fo3l
+	HdOD2O7yFkba0r9GuuPezTf7XVaiwSMklNtatGI+DXvg
+X-Google-Smtp-Source: AGHT+IGev37PyaCRPVTSAXm6sa8QmcuQfkCR4AEqF/Tkfr+Zh7Bhff2KfoPULWlCloRr8rbLF7MLgw==
+X-Received: by 2002:a17:90b:3850:b0:2ff:7b15:813b with SMTP id 98e67ed59e1d1-3014e855f52mr302864a91.17.1741883952691;
+        Thu, 13 Mar 2025 09:39:12 -0700 (PDT)
 Received: from pc.. ([38.39.164.180])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30119265938sm4020084a91.39.2025.03.13.09.39.10
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30119265938sm4020084a91.39.2025.03.13.09.39.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Mar 2025 09:39:11 -0700 (PDT)
+        Thu, 13 Mar 2025 09:39:12 -0700 (PDT)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Paul Durrant <paul@xen.org>,
@@ -96,11 +98,12 @@ Cc: Paul Durrant <paul@xen.org>,
 	Daniel Henrique Barboza <danielhb413@gmail.com>,
 	Nicholas Piggin <npiggin@gmail.com>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v4 00/17] make system memory API available for common code
-Date: Thu, 13 Mar 2025 09:38:46 -0700
-Message-Id: <20250313163903.1738581-1-pierrick.bouvier@linaro.org>
+Subject: [PATCH v4 01/17] exec/tswap: target code can use TARGET_BIG_ENDIAN instead of target_words_bigendian()
+Date: Thu, 13 Mar 2025 09:38:47 -0700
+Message-Id: <20250313163903.1738581-2-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.39.5
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20250313163903.1738581-1-pierrick.bouvier@linaro.org>
+References: <20250313163903.1738581-1-pierrick.bouvier@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -109,90 +112,49 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The main goal of this series is to be able to call any memory ld/st function
-from code that is *not* target dependent. As a positive side effect, we can
-turn related system compilation units into common code.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+---
+ include/exec/tswap.h | 11 ++++++-----
+ cpu-target.c         |  1 +
+ 2 files changed, 7 insertions(+), 5 deletions(-)
 
-The first 5 patches remove dependency of memory API to cpu headers and remove
-dependency to target specific code. This could be a series on its own, but it's
-great to be able to turn system memory compilation units into common code to
-make sure it can't regress, and prove it achieves the desired result.
-
-The next patches remove more dependencies on cpu headers (exec-all,
-memory-internal, ram_addr).
-Then, we add access to a needed function from kvm, some xen stubs, and we
-finally can turn our compilation units into common code.
-
-Every commit was tested to build correctly for all targets (on windows, linux,
-macos), and the series was fully tested by running all tests we have (linux,
-x86_64 host).
-
-v2:
-- reorder first commits (tswap change first, so memory cached functions can use it)
-- move st/ld*_p functions to tswap instead of bswap
-- add define for target_words_bigendian when COMPILING_PER_TARGET, equals to
-  TARGET_BIG_ENDIAN (avoid overhead in target code)
-- rewrite devend_memop
-- remove useless exec-all.h in concerned patch
-- extract devend_big_endian function to reuse in system/memory.c
-- rewrite changes to system/memory.c
-
-v3:
-- move devend functions to memory_internal.h
-- completed description for commits removing cpu.h dependency
-
-v4:
-- rebase on top of master
-  * missing include in 'codebase: prepare to remove cpu.h from exec/exec-all.h'
-  * meson build conflict
-
-Pierrick Bouvier (17):
-  exec/tswap: target code can use TARGET_BIG_ENDIAN instead of
-    target_words_bigendian()
-  exec/tswap: implement {ld,st}.*_p as functions instead of macros
-  exec/memory_ldst: extract memory_ldst declarations from cpu-all.h
-  exec/memory_ldst_phys: extract memory_ldst_phys declarations from
-    cpu-all.h
-  exec/memory.h: make devend_memop "target defines" agnostic
-  codebase: prepare to remove cpu.h from exec/exec-all.h
-  exec/exec-all: remove dependency on cpu.h
-  exec/memory-internal: remove dependency on cpu.h
-  exec/ram_addr: remove dependency on cpu.h
-  system/kvm: make kvm_flush_coalesced_mmio_buffer() accessible for
-    common code
-  exec/ram_addr: call xen_hvm_modified_memory only if xen is enabled
-  hw/xen: add stubs for various functions
-  system/physmem: compilation unit is now common to all targets
-  include/exec/memory: extract devend_big_endian from devend_memop
-  include/exec/memory: move devend functions to memory-internal.h
-  system/memory: make compilation unit common
-  system/ioport: make compilation unit common
-
- include/exec/cpu-all.h              | 66 -----------------------
- include/exec/exec-all.h             |  1 -
- include/exec/memory-internal.h      | 21 +++++++-
- include/exec/memory.h               | 30 ++++-------
- include/exec/ram_addr.h             | 11 ++--
- include/exec/tswap.h                | 81 +++++++++++++++++++++++++++--
- include/system/kvm.h                |  6 +--
- include/tcg/tcg-op.h                |  1 +
- target/ppc/helper_regs.h            |  2 +
- include/exec/memory_ldst.h.inc      |  4 --
- include/exec/memory_ldst_phys.h.inc |  5 +-
- cpu-target.c                        |  1 +
- hw/ppc/spapr_nested.c               |  1 +
- hw/sh4/sh7750.c                     |  1 +
- hw/xen/xen_stubs.c                  | 56 ++++++++++++++++++++
- page-vary-target.c                  |  2 +-
- system/ioport.c                     |  1 -
- system/memory.c                     | 17 ++----
- target/ppc/tcg-excp_helper.c        |  1 +
- target/riscv/bitmanip_helper.c      |  2 +-
- hw/xen/meson.build                  |  3 ++
- system/meson.build                  |  6 +--
- 22 files changed, 193 insertions(+), 126 deletions(-)
- create mode 100644 hw/xen/xen_stubs.c
-
+diff --git a/include/exec/tswap.h b/include/exec/tswap.h
+index ecd4faef015..2683da0adb7 100644
+--- a/include/exec/tswap.h
++++ b/include/exec/tswap.h
+@@ -13,13 +13,14 @@
+ /**
+  * target_words_bigendian:
+  * Returns true if the (default) endianness of the target is big endian,
+- * false otherwise. Note that in target-specific code, you can use
+- * TARGET_BIG_ENDIAN directly instead. On the other hand, common
+- * code should normally never need to know about the endianness of the
+- * target, so please do *not* use this function unless you know very well
+- * what you are doing!
++ * false otherwise. Common code should normally never need to know about the
++ * endianness of the target, so please do *not* use this function unless you
++ * know very well what you are doing!
+  */
+ bool target_words_bigendian(void);
++#ifdef COMPILING_PER_TARGET
++#define target_words_bigendian()  TARGET_BIG_ENDIAN
++#endif
+ 
+ /*
+  * If we're in target-specific code, we can hard-code the swapping
+diff --git a/cpu-target.c b/cpu-target.c
+index cae77374b38..519b0f89005 100644
+--- a/cpu-target.c
++++ b/cpu-target.c
+@@ -155,6 +155,7 @@ void cpu_abort(CPUState *cpu, const char *fmt, ...)
+     abort();
+ }
+ 
++#undef target_words_bigendian
+ bool target_words_bigendian(void)
+ {
+     return TARGET_BIG_ENDIAN;
 -- 
 2.39.5
 
