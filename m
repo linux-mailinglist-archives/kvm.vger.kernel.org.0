@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-40929-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40930-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B193FA5F505
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 13:57:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EBF9A5F56E
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 14:08:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 101183B8345
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 12:57:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F64B4203E2
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 13:07:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 807222676F8;
-	Thu, 13 Mar 2025 12:57:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9F15267B0A;
+	Thu, 13 Mar 2025 13:06:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="APOaxmmg"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="J1Lgso/9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5ECA2676CE
-	for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 12:57:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F30332673A1
+	for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 13:06:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741870657; cv=none; b=iOtkA+QtXHJ2p6a/e3ZeLPhIgD0R0/BHoCMahNrIRl0xCv5Zi5EHIKXmK/i0XDuEE7dqGkQnI9J7UOJQ65qMH7DcSXWUqlCS39XarY3IgE/t8v2r6BWqxh98DOFbxQurm1rlHh0/z6ec85VmlxBjmflfIDyJF2I1ru9zdTyysaY=
+	t=1741871176; cv=none; b=RiC+0Xgjw7L6+UezhASgItJrmX/fLL8nHXx9kyWHzXpAAG3KWYEkF0gwmhHVIQUDfG0hBNnZ3UXX6/+g0ItLE2Jw2ddihkywYNN9ert0ovT3n77gbi8UQcrwXfSBWSk5JKj4srZuu/bL7o78oXvIHaOmJg6tNoEq5rH08cNF3tU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741870657; c=relaxed/simple;
-	bh=3SJF7mpLxysqOLGs7s+q7f1LccNakiGDFqv7+deqaJ8=;
+	s=arc-20240116; t=1741871176; c=relaxed/simple;
+	bh=fIDudF5HjifkvRrbLC104K9OM6Yle4HKyCDfYCYSVCg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s6pfZMWBRhyh3fbGTLHbb5lUZI/x4JPRDGnrRUbYsRfNc5yi/IYuUMmi52exrF/Wl2xXaihay9nPgHAIrzOWarFxP1H+lCSc0sT8QzM+ymDIrFbqYIseapwRThI50MuTgDpY/mZ77AXa00YqFHCGEm3rb22bkbhLreQjL+nNikc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=APOaxmmg; arc=none smtp.client-ip=209.85.221.48
+	 Content-Type:Content-Disposition:In-Reply-To; b=KYvpIu9eSyps+kjVlnsID6wnx18Kq4giOqRE9TPhbMjs4LdMt84YYw5olC5zLINN4D3AqCbpeWUI+eVxGeOWlJR3mER5cB95GiHKBFaGWSko9aNRNjd/Jxsk6U+45IEkGO+LhDCn5a0BITnNRI/1txc9xFuIbpKK0DnMxfmF8Ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=J1Lgso/9; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-390f5f48eafso514800f8f.0
-        for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 05:57:35 -0700 (PDT)
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4393dc02b78so5614735e9.3
+        for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 06:06:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1741870654; x=1742475454; darn=vger.kernel.org;
+        d=ventanamicro.com; s=google; t=1741871171; x=1742475971; darn=vger.kernel.org;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=oU2CWGwDlIJhGLUqCxoni4cHhWUsK2iDFsgYYpF/oTQ=;
-        b=APOaxmmggK32pxXRV68Rk7ps3GTf785tyvV1NoRdGow8T4TVJgHByJSrANXI4wyqHJ
-         HHefvHlSgNUGh5DMal/5KsbjTtJ+XgyfwSk/CKlC50hkaC5pX2Yubu8+c5noE26g7JL+
-         YsB7X7S1oDbUEalvVXLbg79kOdbDBCD82zricwFglb3VbUpLTSE/AZ+v2ki8Md/Z5trv
-         taCeWZc8/TnH9fqWGL2Nkq26Hrnuog/oVL2lOFiRzNhd0bXILM/PMp+vZ6BFQGqefBgq
-         pPng4xVPyagpcbUdhWCmOn1d39cPa2l8KGOOWadD2KTiMq2q4ewFFULdG4CMfGSrScxk
-         6W6g==
+        bh=JykEzm+QtlDREfjY9aCf97M8p4eU9HkNtWKu9+Cs/cE=;
+        b=J1Lgso/9SeTyTtYo1LBuVXTKidpIUIN8k2LJVz4dd7kNqEKHmLkuEsjRQodm/b04MT
+         k0fy78APUjZiKJAjryvIRG5T7JrdIsQNZyDHofV8G46A+sJiZWI/R5OJFTqyt1hK4Us3
+         C5Xfbrjn5Oa7GpsYqoZ7H5CjJOI0YLvuB4fkUW2fwFfdX0aAA9GIKWGM4j77qK6Cq0Bt
+         8V/lSvq0uJcV8HxQdJVU6yS/BLt/4RO9x4Ff/vpBv4IiKv3aFuUEtjoOo+eLEozk9ZV5
+         wSgttPDCYGBF11hmH7/7BT1QIzKOBDfiAdbbpsRbPztA6VxLa2WbRj7nKqFbLXR9MaQ2
+         fB1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741870654; x=1742475454;
+        d=1e100.net; s=20230601; t=1741871171; x=1742475971;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oU2CWGwDlIJhGLUqCxoni4cHhWUsK2iDFsgYYpF/oTQ=;
-        b=L+JxZGuKmhAZ3fd347oTXhGvu+SAvP/+OEY/QXaIqrz0ZH/MV7GFCb6HwnsP2dhBY2
-         8+LcokeAMJJyQESJ/r/GPUUrhVUgn+e5mhsskNYglovfsa1YrbBbiUuGmAb9kSeQ1d+B
-         X6oavJKT4Be9mKQ9EDyQBd2a1iBa2X3Af7ncGff9cT1AF3JTo6Qj/IAvGbntLXzYHfa5
-         HINUN5sxxGoRA22DHm0MFA2euEREpqqlcNQXq9u86pshJYe5nf3OrzWUPrB7ZXB8TcBl
-         JpqM3wR4H1V6yDffimsSyETli0B7aUhOL+9vjhOJiSZGSNYP3UER3mzRA7rfqbwhJr5Q
-         JY+A==
-X-Forwarded-Encrypted: i=1; AJvYcCWFpupEG0ytsCwmBvAEMxYHAZUD87GeucLBRpqDxxBuI0h1GuS7KkkynKcshGKKEuJqWfQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjZbeSWlSCxaW3/vfMJRNz0QxMVQQaig34+g5UeA4jL/wBpdCT
-	s6sgBjElE2iYWeB3ktkeRn1zDAMDiBprxdVV2tPsAjy4g+c6O0wQyqmYp97vsbQ=
-X-Gm-Gg: ASbGncsdcUPvZNSh8csvF4WMoSIZNXw0A/NfqYRed3Cyzod3hNcYJnpzw1TMCizT5F4
-	HxaAySUHqtAYuOCntYqDnQYiZ47QTJe2FMBcEbzvWsZg2wlqorHIQSNx/MpRamr7gV87K4hkSS3
-	zeSbvquFZVzFs+RgoS3kwsM/lgOqGuMg3hbsaN0Z7agTlthalQuN5+ERphSfJl67+57MptHPKg7
-	h3yQ7dVUI2gsx5qcoKXEfRfsJ1sjx7er94ZR/YlGxCNOaw3ixQcC+iLyQs+4MXrYWQ0aBRGuABb
-	d/GLBc8leOyLrUT/7NVyiuz19GK2m0ra
-X-Google-Smtp-Source: AGHT+IGM1DblGtxykFocIp33D2K47p5ADdU4DE4GFvOo3U3iDj70FwK79o4wmAKz0GgKu55I89czxg==
-X-Received: by 2002:a5d:64ac:0:b0:390:e889:d1cf with SMTP id ffacd0b85a97d-39132dc561cmr20667619f8f.37.1741870654174;
-        Thu, 13 Mar 2025 05:57:34 -0700 (PDT)
+        bh=JykEzm+QtlDREfjY9aCf97M8p4eU9HkNtWKu9+Cs/cE=;
+        b=YayCF0sEpQhm/2i4IaNyFopxcHxitERMme+Z6UdQV7L/bodwkl0lNZrcnneqUizBot
+         awuDxLGNmkiMUXtWlf2t6H1apkKZEp6B8Hqiz7gvZkeJnAwjcPuc2OSDk5yMs3Gd4sT9
+         kpskLrQleVhA1GXxU1sHw8i/DHdFaaBkwk3gNXJ/k6KVnmK4PGcQGUHFnQ+jzeYFd8Gz
+         c+W/sjgHLxVHjqqfSFv0dS9zz5YTE1H8n6NFlfoNtpcvlBImiiCJdKHSKDWFylwp2wl4
+         jpvY6OpOVy3Ba5YFYsA8k2Qwg/0IjWpR56fip1gnhwdRsGV1jW3l+//0nEwbbXgkhX1l
+         ezKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW7gMdBQkN6IEBS3GtecjJP68XCZo/ghKUCSSkgN7dVI/oliVOINURL/Wd52B0fEMAd7QU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSgcD9uspFkgTl0DGto1Fuh1DGuU5BLXfDFJunSBOdSIx7SJYc
+	Bzig+G0Izha8Ka8u/oDDXuk5mH9RKj0pVZ2Vczk/vxR32nD6QKMWmXNMHHZ2uDk=
+X-Gm-Gg: ASbGncttQu7iiTGkFb2mTznPUTvSz74fow+hRJPICOjZUc7CnHzU8WjZ66db+7xO2yX
+	ILrfoOqHryCHCxQ06etFEW1qrkWpPbmRKM+ktXlwofKyiodgvQWe+OHrE9lf5AAI9QcibLZvOf0
+	CteDfr+o8E40DxYI8SBDVaZMHWfgmSRPk5UOM7sdle/MmiJbJVERW/FoOKLvKTMu2uGNsHhbeCZ
+	qnUe5CxLqyuD2tSZQmy5LIzFBftTA4vYI/ztBaCFy1Q9/ntAAVNNPC6SeCAbccRUuRDc3jiVAa7
+	NGgyajOKsGmTVTK3qZKpMYpDtZKDMKux
+X-Google-Smtp-Source: AGHT+IHbHWsyXLkkKJFKW9xqRqjCmH9M6Hc04X13GIMAwv1uQuG0cXmClbOatlbE9Co87YMRA/AdwA==
+X-Received: by 2002:a05:600c:3b13:b0:43c:e9f7:d6a3 with SMTP id 5b1f17b1804b1-43d01be652fmr113577215e9.13.1741871171136;
+        Thu, 13 Mar 2025 06:06:11 -0700 (PDT)
 Received: from localhost ([2a02:8308:a00c:e200::59a5])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395c82c2690sm2044096f8f.25.2025.03.13.05.57.33
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395c7df413esm2048987f8f.20.2025.03.13.06.06.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Mar 2025 05:57:33 -0700 (PDT)
-Date: Thu, 13 Mar 2025 13:57:32 +0100
+        Thu, 13 Mar 2025 06:06:10 -0700 (PDT)
+Date: Thu, 13 Mar 2025 14:06:09 +0100
 From: Andrew Jones <ajones@ventanamicro.com>
 To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
 Cc: Paul Walmsley <paul.walmsley@sifive.com>, 
@@ -81,11 +81,11 @@ Cc: Paul Walmsley <paul.walmsley@sifive.com>,
 	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
 	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
 	Samuel Holland <samuel.holland@sifive.com>
-Subject: Re: [PATCH v3 05/17] riscv: misaligned: use on_each_cpu() for scalar
- misaligned access probing
-Message-ID: <20250313-311b94f9bafe73bcd41158a1@orel>
+Subject: Re: [PATCH v3 06/17] riscv: misaligned: use correct CONFIG_ ifdef
+ for misaligned_access_speed
+Message-ID: <20250313-a437330d8e1c638a9aa61e0a@orel>
 References: <20250310151229.2365992-1-cleger@rivosinc.com>
- <20250310151229.2365992-6-cleger@rivosinc.com>
+ <20250310151229.2365992-7-cleger@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -95,61 +95,51 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250310151229.2365992-6-cleger@rivosinc.com>
+In-Reply-To: <20250310151229.2365992-7-cleger@rivosinc.com>
 
-On Mon, Mar 10, 2025 at 04:12:12PM +0100, Clément Léger wrote:
-> schedule_on_each_cpu() was used without any good reason while documented
-> as very slow. This call was in the boot path, so better use
-> on_each_cpu() for scalar misaligned checking. Vector misaligned check
-> still needs to use schedule_on_each_cpu() since it requires irqs to be
-> enabled but that's less of a problem since this code is ran in a kthread.
-> Add a comment to explicit that.
+On Mon, Mar 10, 2025 at 04:12:13PM +0100, Clément Léger wrote:
+> misaligned_access_speed is defined under CONFIG_RISCV_SCALAR_MISALIGNED
+> but was used under CONFIG_RISCV_PROBE_UNALIGNED_ACCESS. Fix that by
+> using the correct config option.
 > 
 > Signed-off-by: Clément Léger <cleger@rivosinc.com>
 > ---
->  arch/riscv/kernel/traps_misaligned.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
+>  arch/riscv/kernel/traps_misaligned.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
 > diff --git a/arch/riscv/kernel/traps_misaligned.c b/arch/riscv/kernel/traps_misaligned.c
-> index 90ac74191357..ffac424faa88 100644
+> index ffac424faa88..7fe25adf2539 100644
 > --- a/arch/riscv/kernel/traps_misaligned.c
 > +++ b/arch/riscv/kernel/traps_misaligned.c
-> @@ -616,6 +616,11 @@ bool check_vector_unaligned_access_emulated_all_cpus(void)
->  		return false;
->  	}
+> @@ -362,7 +362,7 @@ static int handle_scalar_misaligned_load(struct pt_regs *regs)
 >  
-> +	/*
-> +	 * While being documented as very slow, schedule_on_each_cpu() is used
-> +	 * since kernel_vector_begin() that is called inside the vector code
-> +	 * expects irqs to be enabled or it will panic().
+>  	perf_sw_event(PERF_COUNT_SW_ALIGNMENT_FAULTS, 1, regs, addr);
+>  
+> -#ifdef CONFIG_RISCV_PROBE_UNALIGNED_ACCESS
+> +#ifdef CONFIG_RISCV_SCALAR_MISALIGNED
+>  	*this_cpu_ptr(&misaligned_access_speed) = RISCV_HWPROBE_MISALIGNED_SCALAR_EMULATED;
+>  #endif
 
-which expects
+Sure, but CONFIG_RISCV_PROBE_UNALIGNED_ACCESS selects
+CONFIG_RISCV_SCALAR_MISALIGNED, so this isn't fixing anything. Changing it
+does make sense though since this line in handle_scalar_misaligned_load()
+"belongs" to check_unaligned_access_emulated() which is also under
+CONFIG_RISCV_SCALAR_MISALIGNED. Anyway, all this unaligned configs need a
+major cleanup.
 
-> +	 */
->  	schedule_on_each_cpu(check_vector_unaligned_access_emulated);
->  
->  	for_each_online_cpu(cpu)
-> @@ -636,7 +641,7 @@ bool check_vector_unaligned_access_emulated_all_cpus(void)
->  
->  static bool unaligned_ctl __read_mostly;
->  
-> -static void check_unaligned_access_emulated(struct work_struct *work __always_unused)
-> +static void check_unaligned_access_emulated(void *arg __always_unused)
->  {
->  	int cpu = smp_processor_id();
->  	long *mas_ptr = per_cpu_ptr(&misaligned_access_speed, cpu);
-> @@ -677,7 +682,7 @@ bool check_unaligned_access_emulated_all_cpus(void)
->  	 * accesses emulated since tasks requesting such control can run on any
->  	 * CPU.
->  	 */
-> -	schedule_on_each_cpu(check_unaligned_access_emulated);
-> +	on_each_cpu(check_unaligned_access_emulated, NULL, 1);
->  
->  	for_each_online_cpu(cpu)
->  		if (per_cpu(misaligned_access_speed, cpu)
-> -- 
-> 2.47.2
->
 
 Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+
+Thanks,
+drew
+
+>  
+> -- 
+> 2.47.2
+> 
+> 
+> -- 
+> kvm-riscv mailing list
+> kvm-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/kvm-riscv
 
