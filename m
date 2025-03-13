@@ -1,156 +1,203 @@
-Return-Path: <kvm+bounces-40966-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40967-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0F32A5FC15
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 17:40:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EFFEA5FC53
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 17:43:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 149943B4C7D
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 16:40:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F16F718980FE
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 16:43:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF33326AAAC;
-	Thu, 13 Mar 2025 16:39:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2E04269AF5;
+	Thu, 13 Mar 2025 16:42:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FoMxmgg0"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q5/I3J6W"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C3626AA84
-	for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 16:39:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 808C32676FD
+	for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 16:42:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741883973; cv=none; b=H3Aa4wozQBHe6eQ8Am4GVgsiPWi1SoI0Ysw9x7Dp4gTlflpEa89dGLMdJ3EMXCy4zuPWfoHfH/UEy8ROV00rMgn62xcXh16+c0J6HTmBjU0HezM1hXbRFE5yqfshRc5Ixpfom8e61gqdjxfVWYJba8rPsDwXO+Fq/7yq0sx9Zu8=
+	t=1741884164; cv=none; b=BBI+MpMzfftERGDSgXxWvAKyx1JeOWZPAOmsQOilsLcdmGI90TC48wWedNtDp0gZSzAQjmCuBGGBYa1yulHfnHIqmVDPLWifp+faNpwSd0ubw+FdzfqNnnXxe5uBNJLBVxdARf+bcx9+DrngmjiTpKa5pQzxCA/iU/BsWzWgKts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741883973; c=relaxed/simple;
-	bh=8cc5k/dBJ8A5yXdLs7/Et5ghEBM8BXgwEWxHnVDm94A=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nlIb8//Vb+9WALXfeGDgxe/FOJ8LFqQm/e/4tW+PxbfOK8ghFMcmTyi8Mu4pqJE27t/XJmQr2cITnGmwR9+E5MspW1YOEtmytcNvlWaOUVhpZc2cSOkynvy6bsNn/gvcbs48xwkNIeqpYEqNiGRIh+j1RzfuOFEb4do3pmqSHJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=FoMxmgg0; arc=none smtp.client-ip=209.85.214.175
+	s=arc-20240116; t=1741884164; c=relaxed/simple;
+	bh=gCyx909i/VmdGR3y+oGr5MxeGns+Q7mtyAvdPenaCS8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KmTxaNmQb71A+CCanwKEyStiYHqcFCZw/tf88Ukrcmk+Vbk0dvCMY+BO7k1KydE8ApQRknHBjuSrzGYduhVNAmKn582RCnHznQRe9rq/bSgKwb7w5m7agd+UtBFwH6DeilhGPZX/z/1/pIvX9yjMbZAFA463tGcV6v0V0qK6UyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=q5/I3J6W; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-223fd89d036so26176715ad.1
-        for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 09:39:31 -0700 (PDT)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-223fd89d036so26248445ad.1
+        for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 09:42:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1741883971; x=1742488771; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pdsNHldr91xnqdGHk1DTLXuYnmkD/cCe/HKmA2EoKL4=;
-        b=FoMxmgg0Y61b0vfXL6BoCPEi7Pm0K8qEhuiJVod8DztrLMUVt7GfqE+F0Rq0gvvmwo
-         ZyQXaPICzHCzqIA+rJdrT1ZSaY7qOMYksrAnE2hpVV8kbQtULbbfmKzYaxAtBmy1TLkh
-         uMyAY3PeSwtJO+fXSeYnUVQxebGoSD4aBkP0O8HSD05mHMQex2iPc6M45DWIEWzZ6WXK
-         nLovmM/JiODOw2wXbM7MqPUcIDE6zYOrBWsQPyIY91vzjJJL5BTGk3wh9Hbm92jWyECc
-         +8GGTYP4SRgI8smZwQQ9nvT4Xg2QgWgpPHo2cQBrvCL/OW9F7G2VYItMe5GETdnz/tmU
-         YDRw==
+        d=linaro.org; s=google; t=1741884162; x=1742488962; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mEeJf1jLjksxcxRMyFkwRUHHzj+nso1co+jY2XBogVQ=;
+        b=q5/I3J6WB+kDeBqX7lB4/kjqC90z+pR5O9iILhntJBPLxAFvJumvOMVrP91Uy2afo/
+         UT6HLog55EQ6SdhlAdOVvVysI6odXL+9ADV74FE7Ct78CmYKf5tadXfcL3693Rg1pHOU
+         Tcm99hkPLrKlRBFT6Oa3GOfZLZf8itgYZaco60hNzsfMgxLYHnWIcmqE/c+W4+LszYUW
+         lkjm/tx4JJQWXpEgFxLTTL1EHUfCFrGPzjz93c5nxxPldRPWfQMMCKQ5K6Oc2Mu4LaGl
+         bi/F5HZaMx0lf1eDZtLkRJ2f7CivtJOxF6IIQbY48K8vyxoj7cNeCSEy7yDEj7xrtVa3
+         Qu5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741883971; x=1742488771;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pdsNHldr91xnqdGHk1DTLXuYnmkD/cCe/HKmA2EoKL4=;
-        b=ppjwQBQqraXdbTNKW/5FAp3b1yJUH1rpHJZ4NlCatWYOyitzoXTPM2jGpDD+GkU86r
-         VAGd3NnEKd/o8m7ebiFKy7qh1yXEXkf+aOTmqH8eCR7tAlVyoJhg7i8WpiOOIwhksiqY
-         r7NyPMuIjsEHjQr9MnA3kjk7n1+pyMLETsWqhtUkcbzP5/XeBiesSIEdPxwM2caQX0xh
-         B3srgqaeG/ilNxaHT1QVosTqoUpKgOjib/4nMJ+7a4F1nJKWjzPGzAz/BEUI2DUTUpiW
-         rxfIY3aMxBispWPMW+SExLuz6lV6AAJU6Kb9ZCZ+VjTVOCt/o/cgkxEJzT8KMHUGtBTW
-         Anlg==
-X-Forwarded-Encrypted: i=1; AJvYcCW+aWabrt0Pb9em1YR0gXhiW7cVthPt8sYFXq5hWypgi3yfC1TulJx0TddLpm8xsIqOBoc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNK1TBbZ3IPo0AH7Sx4KcKSmYP5nhFrh/h56mPxJ5urs2S44vy
-	u5Y6i9+QqO00YbnrDNHm7YS7d0RZ352UsiXUhB1mF7Wli8iKetgvy4j6VwxAzIU=
-X-Gm-Gg: ASbGncvhUu/X0Q7yOS8U3s5fyP1l72TWtS4MVBMwGS0DefyaEnKE+ATvRCT+Y0+S0Mb
-	aUqsdwvbE2ykSFWv1yNFF5o/zqS2hq0B/M1XJd1Es/kyJyCQpFVz1O19uYYP/iTK98u+TWwk/hb
-	uOXGkw+VKcguz7AgOpNQsVm5rR8NWOKgg+5NFcUlCaw52i695HR8zthqcKKV1DY5Kye3q/VvNCU
-	oSpa6LeL9uRobdFz6JNKoYL7LFWLFcwYf3jW896bveUAm7jlrCkPjarfP7obmbacf0jlPFLhMWv
-	828wywkIZBaX284f22yC5HQwQwlGT41ScEhg02N0+ES6
-X-Google-Smtp-Source: AGHT+IGwkoEmUkadWWuwDPp5K+cQQMib7Zg2jJHfpZBwTIoZ4S09vzdl8DeRv7aJJJyLYJnLE9fiwQ==
-X-Received: by 2002:a17:90a:d604:b0:2f9:cf97:56ac with SMTP id 98e67ed59e1d1-3014e735345mr385635a91.0.1741883970945;
-        Thu, 13 Mar 2025 09:39:30 -0700 (PDT)
-Received: from pc.. ([38.39.164.180])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30119265938sm4020084a91.39.2025.03.13.09.39.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Mar 2025 09:39:30 -0700 (PDT)
-From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-To: qemu-devel@nongnu.org
-Cc: Paul Durrant <paul@xen.org>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Harsh Prateek Bora <harshpb@linux.ibm.com>,
-	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
-	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-	xen-devel@lists.xenproject.org,
-	Peter Xu <peterx@redhat.com>,
-	alex.bennee@linaro.org,
-	manos.pitsidianakis@linaro.org,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	qemu-ppc@nongnu.org,
-	Richard Henderson <richard.henderson@linaro.org>,
-	kvm@vger.kernel.org,
-	David Hildenbrand <david@redhat.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Weiwei Li <liwei1518@gmail.com>,
-	qemu-riscv@nongnu.org,
-	Alistair Francis <alistair.francis@wdc.com>,
-	Anthony PERARD <anthony@xenproject.org>,
-	Yoshinori Sato <ysato@users.sourceforge.jp>,
-	Daniel Henrique Barboza <danielhb413@gmail.com>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v4 17/17] system/ioport: make compilation unit common
-Date: Thu, 13 Mar 2025 09:39:03 -0700
-Message-Id: <20250313163903.1738581-18-pierrick.bouvier@linaro.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250313163903.1738581-1-pierrick.bouvier@linaro.org>
-References: <20250313163903.1738581-1-pierrick.bouvier@linaro.org>
+        d=1e100.net; s=20230601; t=1741884162; x=1742488962;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mEeJf1jLjksxcxRMyFkwRUHHzj+nso1co+jY2XBogVQ=;
+        b=j/MLA8Whu7NyGe46AUEd9TMIiyFDb0nFDnspzBa83JES6cablNTYLP7eE7ORGsGmJi
+         GoKz0/sRd6uNHCgX91UDTuy1bD6I5beACZbvs9eKO4qUSW3TlDMGxEYRyYpSqxKFp6nV
+         +8LTH0Lz+eJU8aghakCm2FLRq1uCNCnzGlyFeKba16hLqJUcpeHwUy9ZSIPDsTZ5k3UY
+         OHoxxc2GJMOhK6qh9ygoPVHebnW/Y/K5cq/mDGfFeHmTzLkBUHSDO7kHmc1ZX2/3xvU7
+         nPAUrVhvhz6J4Z/iA3GwCBAwpKFazBzkges0LhsDIS3pKOMD2y8XljZptqbWoozTgjVS
+         ynDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX43AfPGSm3zI+ydugGizPuOPBCN8Ra4kRq0HezPOfns68e9rYF2E/6iRRGHuwlnwA8N1g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxv9cyWv7aGpfABObi9mnyWyEOxq2K/G1dE308l9KGkgoT6Kqxw
+	HL3BUohSrvWqRkIH2QRo4KFcTkioSrtZSb1v02leiQHlaokFmDQAigiNImKYx90=
+X-Gm-Gg: ASbGncv1cpNTBRLlomfDD0/8C2mUjt2fr+ZGGpxBGUDYDgu8cBk6vZsuJK1tOBeRyze
+	ZBtYZLyrJVHc1qw/sHx5o6Ch1b8QrrFgoMnrDMg3URU0jX0HXenM3PvsIjXyP6H87ieo4YS+rFE
+	J5VnYv64duzVUim0bHZtVJU2Y8ViKXvNw/AabpIREUXDkHbBzMG04xjgw3JNtFAoNmjKdnB6pnv
+	/ovZNr4qQ2sUqhIB91ziB+OH33lboquajsTS08V/U3ZflLfJHg5hlrzOfSsbikVm5B1pkos/ztn
+	qvkBEb8jnUELWVFzw+z35ZuUoXsmpmWE/qN1E5mgvw45sgK2dCkBJR3FSQ==
+X-Google-Smtp-Source: AGHT+IEscFPBgwURkivERQ63uZlHCc12XioxFkzuW02QWXVxwQASklk7TdMNVKzsKRLZFS0yvJdJJg==
+X-Received: by 2002:a05:6a00:1891:b0:736:a682:deb8 with SMTP id d2e1a72fcca58-7371f0d35cfmr310216b3a.8.1741884161761;
+        Thu, 13 Mar 2025 09:42:41 -0700 (PDT)
+Received: from [192.168.1.67] ([38.39.164.180])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7371169c3desm1537504b3a.155.2025.03.13.09.42.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Mar 2025 09:42:41 -0700 (PDT)
+Message-ID: <9cef5cb6-feea-4be7-ab08-e0b3a8caff9c@linaro.org>
+Date: Thu, 13 Mar 2025 09:42:40 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 00/17] make system memory API available for common code
+Content-Language: en-US
+To: qemu-devel@nongnu.org
+Cc: Paul Durrant <paul@xen.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
+ <philmd@linaro.org>, Harsh Prateek Bora <harshpb@linux.ibm.com>,
+ Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ xen-devel@lists.xenproject.org, Peter Xu <peterx@redhat.com>,
+ alex.bennee@linaro.org, manos.pitsidianakis@linaro.org,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org,
+ Richard Henderson <richard.henderson@linaro.org>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Weiwei Li <liwei1518@gmail.com>, qemu-riscv@nongnu.org,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Anthony PERARD <anthony@xenproject.org>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>,
+ Daniel Henrique Barboza <danielhb413@gmail.com>,
+ Nicholas Piggin <npiggin@gmail.com>
+References: <20250313163903.1738581-1-pierrick.bouvier@linaro.org>
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+In-Reply-To: <20250313163903.1738581-1-pierrick.bouvier@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
----
- system/ioport.c    | 1 -
- system/meson.build | 2 +-
- 2 files changed, 1 insertion(+), 2 deletions(-)
+Hi,
 
-diff --git a/system/ioport.c b/system/ioport.c
-index 55c2a752396..89daae9d602 100644
---- a/system/ioport.c
-+++ b/system/ioport.c
-@@ -26,7 +26,6 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "cpu.h"
- #include "exec/ioport.h"
- #include "exec/memory.h"
- #include "exec/address-spaces.h"
-diff --git a/system/meson.build b/system/meson.build
-index 4f44b78df31..063301c3ad0 100644
---- a/system/meson.build
-+++ b/system/meson.build
-@@ -1,6 +1,5 @@
- specific_ss.add(when: 'CONFIG_SYSTEM_ONLY', if_true: [files(
-   'arch_init.c',
--  'ioport.c',
-   'globals-target.c',
- )])
- 
-@@ -13,6 +12,7 @@ system_ss.add(files(
-   'dirtylimit.c',
-   'dma-helpers.c',
-   'globals.c',
-+  'ioport.c',
-   'memory_mapping.c',
-   'memory.c',
-   'physmem.c',
--- 
-2.39.5
+patch 12 (adding xen stubs, so would need someone from hw/xen) and 15 
+are missing reviews.
+
+Thanks,
+Pierrick
+
+On 3/13/25 09:38, Pierrick Bouvier wrote:
+> The main goal of this series is to be able to call any memory ld/st function
+> from code that is *not* target dependent. As a positive side effect, we can
+> turn related system compilation units into common code.
+> 
+> The first 5 patches remove dependency of memory API to cpu headers and remove
+> dependency to target specific code. This could be a series on its own, but it's
+> great to be able to turn system memory compilation units into common code to
+> make sure it can't regress, and prove it achieves the desired result.
+> 
+> The next patches remove more dependencies on cpu headers (exec-all,
+> memory-internal, ram_addr).
+> Then, we add access to a needed function from kvm, some xen stubs, and we
+> finally can turn our compilation units into common code.
+> 
+> Every commit was tested to build correctly for all targets (on windows, linux,
+> macos), and the series was fully tested by running all tests we have (linux,
+> x86_64 host).
+> 
+> v2:
+> - reorder first commits (tswap change first, so memory cached functions can use it)
+> - move st/ld*_p functions to tswap instead of bswap
+> - add define for target_words_bigendian when COMPILING_PER_TARGET, equals to
+>    TARGET_BIG_ENDIAN (avoid overhead in target code)
+> - rewrite devend_memop
+> - remove useless exec-all.h in concerned patch
+> - extract devend_big_endian function to reuse in system/memory.c
+> - rewrite changes to system/memory.c
+> 
+> v3:
+> - move devend functions to memory_internal.h
+> - completed description for commits removing cpu.h dependency
+> 
+> v4:
+> - rebase on top of master
+>    * missing include in 'codebase: prepare to remove cpu.h from exec/exec-all.h'
+>    * meson build conflict
+> 
+> Pierrick Bouvier (17):
+>    exec/tswap: target code can use TARGET_BIG_ENDIAN instead of
+>      target_words_bigendian()
+>    exec/tswap: implement {ld,st}.*_p as functions instead of macros
+>    exec/memory_ldst: extract memory_ldst declarations from cpu-all.h
+>    exec/memory_ldst_phys: extract memory_ldst_phys declarations from
+>      cpu-all.h
+>    exec/memory.h: make devend_memop "target defines" agnostic
+>    codebase: prepare to remove cpu.h from exec/exec-all.h
+>    exec/exec-all: remove dependency on cpu.h
+>    exec/memory-internal: remove dependency on cpu.h
+>    exec/ram_addr: remove dependency on cpu.h
+>    system/kvm: make kvm_flush_coalesced_mmio_buffer() accessible for
+>      common code
+>    exec/ram_addr: call xen_hvm_modified_memory only if xen is enabled
+>    hw/xen: add stubs for various functions
+>    system/physmem: compilation unit is now common to all targets
+>    include/exec/memory: extract devend_big_endian from devend_memop
+>    include/exec/memory: move devend functions to memory-internal.h
+>    system/memory: make compilation unit common
+>    system/ioport: make compilation unit common
+> 
+>   include/exec/cpu-all.h              | 66 -----------------------
+>   include/exec/exec-all.h             |  1 -
+>   include/exec/memory-internal.h      | 21 +++++++-
+>   include/exec/memory.h               | 30 ++++-------
+>   include/exec/ram_addr.h             | 11 ++--
+>   include/exec/tswap.h                | 81 +++++++++++++++++++++++++++--
+>   include/system/kvm.h                |  6 +--
+>   include/tcg/tcg-op.h                |  1 +
+>   target/ppc/helper_regs.h            |  2 +
+>   include/exec/memory_ldst.h.inc      |  4 --
+>   include/exec/memory_ldst_phys.h.inc |  5 +-
+>   cpu-target.c                        |  1 +
+>   hw/ppc/spapr_nested.c               |  1 +
+>   hw/sh4/sh7750.c                     |  1 +
+>   hw/xen/xen_stubs.c                  | 56 ++++++++++++++++++++
+>   page-vary-target.c                  |  2 +-
+>   system/ioport.c                     |  1 -
+>   system/memory.c                     | 17 ++----
+>   target/ppc/tcg-excp_helper.c        |  1 +
+>   target/riscv/bitmanip_helper.c      |  2 +-
+>   hw/xen/meson.build                  |  3 ++
+>   system/meson.build                  |  6 +--
+>   22 files changed, 193 insertions(+), 126 deletions(-)
+>   create mode 100644 hw/xen/xen_stubs.c
+> 
 
 
