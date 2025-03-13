@@ -1,189 +1,221 @@
-Return-Path: <kvm+bounces-41013-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41014-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2E31A603C7
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 22:57:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B9AAA6040C
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 23:14:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E706F420D8F
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 21:57:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B269A3BFAFC
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 22:13:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0C311FBEB7;
-	Thu, 13 Mar 2025 21:56:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAC961F76BD;
+	Thu, 13 Mar 2025 22:13:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lICVW+tK"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="QwYtpq5z"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C23901FA854
-	for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 21:56:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F6C1F0997;
+	Thu, 13 Mar 2025 22:13:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741902971; cv=none; b=ns9gtuHo7iQQQVs7S3FMXqP3rboxMIZWSnwmzD6JSRV9tHtZkEVxeH8qOx8P88G5Cla3TkGkGcppdOwTckluPxUOQChWqyhoWyB2/njtltC0J3zwn3A3kozQipTohY8aOMhDrqXWYGpBoAtYVFXX6EIxtfiPsp+a4f/xyTgfh7s=
+	t=1741904030; cv=none; b=WBydxstfAj0MT00pqLjAmky1T/1lkS7xYofGRFNBZ4REWHE01qNK+G8xrDlMMpURZSJnBW68T7XwOeHihYwp3L2dCEJijc7X3WjfLzjAYCtlQb8Jmj+WQkfff0ebMlM4CZyjNdt3oKhY2SHMCa4H6Q37+dutib2uQyJsCmLNNuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741902971; c=relaxed/simple;
-	bh=0t+zX0HpA8zT88d4wD6BeZXcNvONGsx3iB3nDx8sBHU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MiC3cfG3/dYFuSnpElTUb79veVARkgTlSxWrWsHsyESBH5VHds2PEtyUHUk3fA23vYDJhHKJwobc5Q83ssqjevVSnAioiLvj/q864m/F9BBOknDkVqAZAzHxgyk82bt0a5QbFOoZofcnXp9kXf2PVQeWi4rFPJkEbVPoerc+02A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lICVW+tK; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1741902966;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=02QFPfOHKNlwJVYXcIvUHxvnbWRxOfELTFB2ejfTyvY=;
-	b=lICVW+tKNQLbo3DdJ0O57TAfgeNd/mBKvfCyhNmUiNES939D0kwmknmM43I4U+lf/tMKmN
-	00FzrxMSQeYM1O4syIWifBj1t4Bi3Db0C9Qzfm5TcUacoXiKRuWK/Rt3i5eUX3lU+38070
-	1Awydq35vC+xqGC/YiX/Ur5aM4wtzpg=
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Maxim Levitsky <mlevitsk@redhat.com>,
-	x86@kernel.org,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yosry Ahmed <yosry.ahmed@linux.dev>
-Subject: [PATCH 7/7] KVM: SVM: Share more code between pre_sev_run() and pre_svm_run()
-Date: Thu, 13 Mar 2025 21:55:40 +0000
-Message-ID: <20250313215540.4171762-8-yosry.ahmed@linux.dev>
-In-Reply-To: <20250313215540.4171762-1-yosry.ahmed@linux.dev>
-References: <20250313215540.4171762-1-yosry.ahmed@linux.dev>
+	s=arc-20240116; t=1741904030; c=relaxed/simple;
+	bh=6et2f+IAaWWEtqOwRSdd4hH+fOa2/crNtycQ3NR4sHs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=hcewjQaIFcaAjmAMiP50JD2tgoXRsW3PLMz1BgtkRvPbMlBgGviGB7q6eqLaAGmh89wU4dgb+S7oMKhSdgM9+eiHaXL4F4kuMBZ4g29EDQKYFL+Tavg/PdrTiR1FlG0WmfFikz7k6JH2YwQZxQ03P0mHM/ZHaMcGYMCLYJPGcmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=QwYtpq5z; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1741904028; x=1773440028;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=ykTJUUOvH2VvwmsTF8Y9p+LL6eaaY5GGxwQKE1SyE+c=;
+  b=QwYtpq5zgJDfsss5OYFlFcZxPzO2XShKe1onQqBnnIDCWY5szpO4d07Z
+   r5H30etVQrHLZ9SJ3Y4ALMq4/x6sDxGghIf2/5NQd0nZmhZUIPrj3axKG
+   NboMEKntEWK/sXHNhoaOp9B3IIl+ApmZk2LU840UxooqLV4zZSPqKVRWc
+   k=;
+X-IronPort-AV: E=Sophos;i="6.14,245,1736812800"; 
+   d="scan'208";a="178481195"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 22:13:46 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [10.0.17.79:22832]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.42.72:2525] with esmtp (Farcaster)
+ id c936554d-6948-4d14-b818-fcc3de9bf611; Thu, 13 Mar 2025 22:13:45 +0000 (UTC)
+X-Farcaster-Flow-ID: c936554d-6948-4d14-b818-fcc3de9bf611
+Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
+ EX19MTAEUC001.ant.amazon.com (10.252.51.155) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 13 Mar 2025 22:13:42 +0000
+Received: from [192.168.31.185] (10.106.83.24) by
+ EX19D022EUC002.ant.amazon.com (10.252.51.137) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 13 Mar 2025 22:13:41 +0000
+Message-ID: <507e6ad7-2e28-4199-948a-4001e0d6f421@amazon.com>
+Date: Thu, 13 Mar 2025 22:13:23 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [RFC PATCH 0/5] KVM: guest_memfd: support for uffd missing
+To: Peter Xu <peterx@redhat.com>
+CC: James Houghton <jthoughton@google.com>, <akpm@linux-foundation.org>,
+	<pbonzini@redhat.com>, <shuah@kernel.org>, <kvm@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-mm@kvack.org>, <lorenzo.stoakes@oracle.com>, <david@redhat.com>,
+	<ryan.roberts@arm.com>, <quic_eberman@quicinc.com>, <graf@amazon.de>,
+	<jgowans@amazon.com>, <roypat@amazon.co.uk>, <derekmn@amazon.com>,
+	<nsaenz@amazon.es>, <xmarcalx@amazon.com>
+References: <Z8YfOVYvbwlZST0J@x1.local>
+ <CADrL8HXOQ=RuhjTEmMBJrWYkcBaGrqtXmhzPDAo1BE3EWaBk4g@mail.gmail.com>
+ <Z8i0HXen8gzVdgnh@x1.local> <fdae95e3-962b-4eaf-9ae7-c6bd1062c518@amazon.com>
+ <Z89EFbT_DKqyJUxr@x1.local> <9e7536cc-211d-40ca-b458-66d3d8b94b4d@amazon.com>
+ <Z9GsIDVYWoV8d8-C@x1.local> <7c304c72-1f9c-4a5a-910b-02d0f1514b01@amazon.com>
+ <Z9HhTjEWtM58Zfxf@x1.local> <69dc324f-99fb-44ec-8501-086fe7af9d0d@amazon.com>
+ <Z9MuC5NCFUpCZ9l8@x1.local>
+Content-Language: en-US
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
+ CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
+ i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
+In-Reply-To: <Z9MuC5NCFUpCZ9l8@x1.local>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D012EUC002.ant.amazon.com (10.252.51.162) To
+ EX19D022EUC002.ant.amazon.com (10.252.51.137)
 
-pre_svm_run() and pre_sev_run() now do some redundant work, and the
-control flow is not super clear. Specifically:
-- Both functions check if the ASID in the VMCB is the expected one.
-- Both functions check if the vCPU moved to a different physical CPU.
-- Both functions issue an ASID TLB flush if needed.
 
-Pass the ASID and whether or not SEV requires a TLB flush from
-pre_sev_run() to pre_svm_run(), and use the logic there instead.
-pre_sev_run() now only performs SEV-specific checks.
 
-Note that pre_sev_run() used svm->vcpu.arch.last_vmentry_cpu to check if
-the vCPU moved to a different physical CPU, while pre_svm_run uses
-svm->current_vmcb->cpu. The former tracks the CPU per vCPU, while the
-latter tracks it per VMCB. For SEV, they both should be equivalent since
-there is a single VMCB per-vCPU (nested is not supported).
+On 13/03/2025 19:12, Peter Xu wrote:
+> On Thu, Mar 13, 2025 at 03:25:16PM +0000, Nikita Kalyazin wrote:
+>>
+>>
+>> On 12/03/2025 19:32, Peter Xu wrote:
+>>> On Wed, Mar 12, 2025 at 05:07:25PM +0000, Nikita Kalyazin wrote:
+>>>> However if MISSING is not registered, the kernel will auto-populate with a
+>>>> clear page, ie there is no way to inject custom content from userspace.  To
+>>>> explain my use case a bit more, the population thread will be trying to copy
+>>>> all guest memory proactively, but there will inevitably be cases where a
+>>>> page is accessed through pgtables _before_ it gets populated.  It is not
+>>>> desirable for such access to result in a clear page provided by the kernel.
+>>>
+>>> IMHO populating with a zero page in the page cache is fine. It needs to
+>>> make sure all accesses will go via the pgtable, as discussed below in my
+>>> previous email [1], then nobody will be able to see the zero page, not
+>>> until someone updates the content then follow up with a CONTINUE to install
+>>> the pgtable entry.
+>>>
+>>> If there is any way that the page can be accessed without the pgtable
+>>> installation, minor faults won't work indeed.
+>>
+>> I think I see what you mean now.  I agree, it isn't the end of the world if
+>> the kernel clears the page and then userspace overwrites it.
+>>
+>> The way I see it is:
+>>
+>> @@ -400,20 +401,26 @@ static vm_fault_t kvm_gmem_fault(struct vm_fault *vmf)
+>>          if (WARN_ON_ONCE(folio_test_large(folio))) {
+>>                  ret = VM_FAULT_SIGBUS;
+>>                  goto out_folio;
+>>          }
+>>
+>>          if (!folio_test_uptodate(folio)) {
+>>                  clear_highpage(folio_page(folio, 0));
+>>                  kvm_gmem_mark_prepared(folio);
+>>          }
+>>
+>> +       if (userfaultfd_minor(vmf->vma)) {
+>> +               folio_unlock(folio);
+>> +               filemap_invalidate_unlock_shared(inode->i_mapping);
+>> +               return handle_userfault(vmf, VM_UFFD_MISSING);
+>> +       }
+> 
+> I suppose you meant s/MISSING/MINOR/.
 
-Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
----
- arch/x86/kvm/svm/sev.c | 27 ++++++++++-----------------
- arch/x86/kvm/svm/svm.c | 10 ++++++----
- arch/x86/kvm/svm/svm.h |  2 +-
- 3 files changed, 17 insertions(+), 22 deletions(-)
+Yes, that's what I meant, thank you.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 1ee04d6b9356b..607139757f8ff 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -3451,11 +3451,11 @@ void sev_es_unmap_ghcb(struct vcpu_svm *svm)
- 	svm->sev_es.ghcb = NULL;
- }
- 
--int pre_sev_run(struct vcpu_svm *svm, int cpu)
-+int pre_sev_run(struct vcpu_svm *svm, unsigned int *asid, bool *need_flush)
- {
-+	int cpu = svm->vcpu.cpu;
- 	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, cpu);
- 	struct kvm *kvm = svm->vcpu.kvm;
--	unsigned int asid = sev_get_asid(kvm);
- 
- 	/*
- 	 * Reject KVM_RUN if userspace attempts to run the vCPU with an invalid
-@@ -3465,24 +3465,17 @@ int pre_sev_run(struct vcpu_svm *svm, int cpu)
- 	if (sev_es_guest(kvm) && !VALID_PAGE(svm->vmcb->control.vmsa_pa))
- 		return -EINVAL;
- 
--	if (WARN_ON_ONCE(svm->vmcb->control.asid != asid)) {
--		svm->vmcb->control.asid = asid;
--		vmcb_mark_dirty(svm->vmcb, VMCB_ASID);
--	}
--
- 	/*
--	 * Flush guest TLB:
--	 *
--	 * 1) when different VMCB for the same ASID is to be run on the same host CPU.
--	 * 2) or this VMCB was executed on different host CPU in previous VMRUNs.
-+	 * Flush the guest TLB when a difference VMCB for the same ASID is to be
-+	 * run on the same host CPU. The caller will also flush the TLB if the
-+	 * VMCB was executed on a different host CPU in previous VMRUNs.
- 	 */
--	if (sd->sev_vmcbs[asid] == svm->vmcb &&
--	    svm->vcpu.arch.last_vmentry_cpu == cpu)
--		return 0;
-+	*asid = sev_get_asid(kvm);
-+	if (sd->sev_vmcbs[*asid] != svm->vmcb) {
-+		sd->sev_vmcbs[*asid] = svm->vmcb;
-+		*need_flush = true;
-+	}
- 
--	sd->sev_vmcbs[asid] = svm->vmcb;
--	svm_vmcb_set_flush_asid(svm->vmcb);
--	vmcb_mark_dirty(svm->vmcb, VMCB_ASID);
- 	return 0;
- }
- 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index c5e2733fb856d..6b338d84e7b93 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3615,21 +3615,23 @@ static int pre_svm_run(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_svm *kvm_svm = to_kvm_svm(vcpu->kvm);
- 	struct vcpu_svm *svm = to_svm(vcpu);
-+	unsigned int asid = kvm_svm->asid;
-+	bool sev_need_flush = false;
-+
-+	if (sev_guest(vcpu->kvm) && pre_sev_run(svm, &asid, &sev_need_flush))
-+		return -1;
- 
- 	/*
- 	 * If the previous VMRUN of the VMCB occurred on a different physical
- 	 * CPU, then mark the VMCB dirty and flush the ASID.  Hardware's
- 	 * VMCB clean bits are per logical CPU, as are KVM's ASID assignments.
- 	 */
--	if (unlikely(svm->current_vmcb->cpu != vcpu->cpu)) {
-+	if (unlikely(sev_need_flush || svm->current_vmcb->cpu != vcpu->cpu)) {
- 		svm_vmcb_set_flush_asid(svm->vmcb);
- 		vmcb_mark_all_dirty(svm->vmcb);
- 		svm->current_vmcb->cpu = vcpu->cpu;
-         }
- 
--	if (sev_guest(vcpu->kvm))
--		return pre_sev_run(svm, vcpu->cpu);
--
- 	/* Flush the ASID on every VMRUN if kvm_svm->asid allocation failed */
- 	if (unlikely(!kvm_svm->asid))
- 		svm_vmcb_set_flush_asid(svm->vmcb);
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 4c6664ba4048d..f25e99c79d07d 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -754,7 +754,7 @@ void avic_refresh_virtual_apic_mode(struct kvm_vcpu *vcpu);
- 
- /* sev.c */
- 
--int pre_sev_run(struct vcpu_svm *svm, int cpu);
-+int pre_sev_run(struct vcpu_svm *svm, unsigned int *asid, bool *need_flush);
- void sev_init_vmcb(struct vcpu_svm *svm);
- void sev_vcpu_after_set_cpuid(struct vcpu_svm *svm);
- int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in);
--- 
-2.49.0.rc1.451.g8f38331e32-goog
+>> +
+>>          vmf->page = folio_file_page(folio, vmf->pgoff);
+>>
+>>   out_folio:
+>>          if (ret != VM_FAULT_LOCKED) {
+>>                  folio_unlock(folio);
+>>                  folio_put(folio);
+>>          }
+>>
+>> On the first fault (cache miss), the kernel will allocate/add/clear the page
+>> (as there is no MISSING trap now), and once the page is in the cache, a
+>> MINOR event will be sent for userspace to copy its content. Please let me
+>> know if this is an acceptable semantics.
+>>
+>> Since userspace is getting notified after KVM calls
+>> kvm_gmem_mark_prepared(), which removes the page from the direct map [1],
+>> userspace can't use write() to populate the content because write() relies
+>> on direct map [2].  However userspace can do a plain memcpy that would use
+>> user pagetables instead.  This forces userspace to respond to stage-2 and
+>> VMA faults in guest_memfd differently, via write() and memcpy respectively.
+>> It doesn't seem like a significant problem though.
+> 
+> It looks ok in general, but could you remind me why you need to stick with
+> write() syscall?
+> 
+> IOW, if gmemfd will always need mmap() and it's fully accessible from
+> userspace in your use case, wouldn't mmap()+memcpy() always work already,
+> and always better than write()?
+
+Yes, that's right, mmap() + memcpy() is functionally sufficient. 
+write() is an optimisation.  Most of the pages in guest_memfd are only 
+ever accessed by the vCPU (not userspace) via TDP (stage-2 pagetables) 
+so they don't need userspace pagetables set up.  By using write() we can 
+avoid VMA faults, installing corresponding PTEs and double page 
+initialisation we discussed earlier.  The optimised path only contains 
+pagecache population via write().  Even TDP faults can be avoided if 
+using KVM prefaulting API [1].
+
+[1] https://docs.kernel.org/virt/kvm/api.html#kvm-pre-fault-memory
+
+> 
+> Thanks,
+> 
+>>
+>> I believe, with this approach the original race condition is gone because
+>> UFFD messages are only sent on cache hit and it is up to userspace to
+>> serialise writes.  Please correct me if I'm wrong here.
+>>
+>> [1] https://lore.kernel.org/kvm/20250221160728.1584559-1-roypat@amazon.co.uk/T/#mdf41fe2dc33332e9c500febd47e14ae91ad99724
+>> [2] https://lore.kernel.org/kvm/20241129123929.64790-1-kalyazin@amazon.com/T/#mf5d794aa31d753cbc73e193628f31e418051983d
+>>
+>>>>
+>>>>> as long as the content can only be accessed from the pgtable (either via
+>>>>> mmap() or GUP on top of it), then afaiu it could work similarly like
+>>>>> MISSING faults, because anything trying to access it will be trapped.
+>>>
+>>> [1]
+>>>
+>>> --
+>>> Peter Xu
+>>>
+>>
+>>
+> 
+> --
+> Peter Xu
+> 
 
 
