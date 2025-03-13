@@ -1,463 +1,342 @@
-Return-Path: <kvm+bounces-40983-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40992-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4954A6013F
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 20:31:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2DAFA60218
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 21:12:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 242BE17EDBC
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 19:31:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D92C14221EF
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 20:12:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B3421F426C;
-	Thu, 13 Mar 2025 19:30:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A67C51F869E;
+	Thu, 13 Mar 2025 20:10:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lAYlWLyh"
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="tdilPyni";
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="ifVa4l3P"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from mx0a-002c1b01.pphosted.com (mx0a-002c1b01.pphosted.com [148.163.151.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0DCD1F2B8E;
-	Thu, 13 Mar 2025 19:30:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741894234; cv=none; b=UgWrZ6Hq0zU0anjSyXWwkSkrL/cRDEunOAbjkcOyMgWSabW2KXQOVdRhwn2VLrHXNyqVQhZTi1jkT0CXd2ZMx8AO3bv1xppKSF4tK8S4Em1RbAGEdIAZo7kBhfyZ5CEPsriybdYWDX7OkweaTkt7E5R8leFenPxPJCkSyB8z9gk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741894234; c=relaxed/simple;
-	bh=m9pFossgCGcXjpcoSyY9EZnbRwOUVVstdwWOxCL3+AI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=bEp5Xos+BHuk7YkJ0yuXSt0rMsftA8cB73YUxqbpP7lz1JKz2QRGcew+XbVSoveV/yhYmLoCBBWyJcdZDuPV9aLM6xjEBgpgbuz5AAQPalZQIAxoo8v63NhUPptGnpHAb/JcCbAZPxLpfvyp1nNBwRw/8nK6G1/7sdmjOkygn0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lAYlWLyh; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741894233; x=1773430233;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=m9pFossgCGcXjpcoSyY9EZnbRwOUVVstdwWOxCL3+AI=;
-  b=lAYlWLyhRdDl9FR2ZhicG5yKmthGZbv7jO/PBa1HCLu9dYfe/nlWwIeq
-   aTy/1c+89HQy8GoWr3SBjly98WHTQqEmQ25geqFU8ano70AVJriES6qHa
-   Q2zU7CoEGSnv+6RBhk96YbfZAmlOJHdgR2AmHLWy5vOVTfTjM95ogh0hl
-   hwSB7GQxYqLt9w8dDNO32mmllG92+xeqJHlRs+YrfN4VMV2OlGbe4UGjZ
-   U+6ygJWpzWCVDYuwTVPI0tsFkb7O9ys6fVQ74QOnnr0IRVNVZtghK8jIn
-   fZLjyVtd+l7IpcnPXfUiVGyMDrBiIEV+RYB9p/e5CeIbp+5tyR3hdbK3E
-   w==;
-X-CSE-ConnectionGUID: B0b4iQJtQcy1UoiJjDTDQg==
-X-CSE-MsgGUID: q+Aw9XRkQ2WdKVMstY5vxg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11372"; a="43237124"
-X-IronPort-AV: E=Sophos;i="6.14,245,1736841600"; 
-   d="scan'208";a="43237124"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 12:30:30 -0700
-X-CSE-ConnectionGUID: wrOZFM1IT5+yRgQhwbWuwQ==
-X-CSE-MsgGUID: cG4TPFHQT2CQnjeKpVGdiw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,245,1736841600"; 
-   d="scan'208";a="151988225"
-Received: from vverma7-desk1.amr.corp.intel.com (HELO [192.168.1.200]) ([10.125.108.107])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 12:30:29 -0700
-From: Vishal Verma <vishal.l.verma@intel.com>
-Date: Thu, 13 Mar 2025 13:30:04 -0600
-Subject: [PATCH 4/4] KVM: VMX: Clean up and macrofy x86_ops
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3ED31F4CAB;
+	Thu, 13 Mar 2025 20:10:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.151.68
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741896641; cv=fail; b=ZyPmKKVAXy2vJIwGcYlS2x9TNlIkNPyRoOMvlX6H1jhmTs0wEq276YY/pWgcvDZqXBe8pLSzcNNgNOBwIjbNoIF1V3QrPxjTudx7j1SbHlEx++Ri9KdpHmPfBH7mthe9g4Kp5DISLV4H8nwOJugrOF52cUGTSQ57Oc4edaKQE6E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741896641; c=relaxed/simple;
+	bh=Qjd9ENq8dsCIMA18rfKc918wPCdXWmANk3S2DDy5v/I=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=pZvj6xMxsDo22Q7jXJGxGWfK5ZX83XC90xGZ4dI6W1h6RLwSv2fvm5oxuZj8RzcibjmM6NrY12Y1nf2P6udRxeGYoFUi+CTBad653rj8r7gaKxtHSTtNWFkcHqskEysmOTcEolYyoD1uwhMv51Vc+2uigYNi/euVqPI0JVfJjMc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com; spf=pass smtp.mailfrom=nutanix.com; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=tdilPyni; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=ifVa4l3P; arc=fail smtp.client-ip=148.163.151.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nutanix.com
+Received: from pps.filterd (m0127838.ppops.net [127.0.0.1])
+	by mx0a-002c1b01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52DEkL3G008473;
+	Thu, 13 Mar 2025 13:09:58 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=proofpoint20171006; bh=gprSYzdNxg65W
+	VMJDyclY6H2sc631LXxfLygD2zCcSw=; b=tdilPyni6OtcRj+1Hkslz9ssJer2E
+	3abuBSt3kbP90Y9cqfeL7OoNsJ9QmqMGkS/SxHKmW0CjehP8AecTF1UEaAQbONyY
+	7QOGJkAPKtGcYoWg1xJc9t1lmqUzxyYrDNvhfNX/5AmSbtbYD/vxC85WY4Q+Jcq4
+	3XnVfvIKzDjFSrow/TcA0j67q8eh7Nj9vWcs3rYr0zCtu7PXTHNBFrcCQBjl2f92
+	ieNXJvUdwLcS1s16wKQcGt++m4Z5dmBFMT06yX7NtqLn5ti+j+ZCZy+0JiQrLaaz
+	lQB2hfvQYD5l91erp7JO3ZSdwUB21D8vitQdDMdNWdgQqhRRGdUr0trpw==
+Received: from sa9pr02cu001.outbound.protection.outlook.com (mail-southcentralusazlp17011026.outbound.protection.outlook.com [40.93.14.26])
+	by mx0a-002c1b01.pphosted.com (PPS) with ESMTPS id 45au9gp937-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 13 Mar 2025 13:09:57 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jAN/huGRW07WZ31hZ//U3ckDAdJ0POi79tYHD7nOfz2/aHphWvTDRgsQHXowoN3YqVDS3/jw2l+sKtQ7u9g1nbiLvWBZYv7Vxf/W3lp3hHOTHeUXPqhUyCF/UVlzTi5CBSrBJXw7fd6E4D08nckxT9qjuoyg1lqlCFt1sfkRdVh6x23CEuA9jYBSbj6p4BRD5GKB+radHgCA2Pq0LxfteHDWytYNTCPJwXKOq8DlUVOhYBAStGAdkwJZdQznyftd/wp6F42L/7pkLMTx6PcjgQU7nGPn3eXPBEl5FJgqYUMNwYb1M33QtCNlrKbf27Oh1X0SIK1WRamxKC7pbTRwkw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gprSYzdNxg65WVMJDyclY6H2sc631LXxfLygD2zCcSw=;
+ b=t2eOl3Vk0ITMByHyNaAiyMZW2rdwyonNOuapuZJ79oY7KBPJqSm+TIzWBecseifPZd++vGkM0sxfCvSvK/KswomdTaWFYmSRvz1n/ZGnrYnfXD/a/TqUyzMCwqt7L3aYhkXnH4SLgz9fIiYvZQq7L6xTGiRsr0Je0p9Argfa6HQNyvlqCZbcr/Wn7uV75G6AKU4M/wg4lf2DViAwpc7RBbdTlUQGi/dYdnXXneVLZqnqSIhIvat31RVYx25X9a0a8eG7EWE0dsRTLLTVhXGlTfCJPDI5G/AMcbXmxcai6qlFOnl/NtUVwAeTutwk6XSJmvRErBSjYCvSFRGCD74qPg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gprSYzdNxg65WVMJDyclY6H2sc631LXxfLygD2zCcSw=;
+ b=ifVa4l3Phw7MMyLYZrdSmA9fmxLuPVHZTDH5ZPy3043o+elGfks3sjrkY/o3wFXBlYqNJp3mt8ZyYYSnF6I+JlLeGoJ2SAT1ludxfYXlq4/b2pDrSdgZR1HefiSlplI7s1qCg+ifc2CJm3HPyDRcSo7zwJHv5lMhQlGmddpSGUCWG35P3z9jUfgBve8AglR85DytUOnWpOIJ8XwP8QeXggNAKMui85G2l0QPMVertulcgiGN980NeXihg01kOUi5YoTOSuqdTPyPBHj+CJXCXtQeSfEG7ZXqEBRUhOsUOSXYzohoa8Tl593wtH9lPVW9P2XjTr9coh+4FvtdImTN+A==
+Received: from LV8PR02MB10287.namprd02.prod.outlook.com
+ (2603:10b6:408:1fa::10) by PH0PR02MB9384.namprd02.prod.outlook.com
+ (2603:10b6:510:280::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.28; Thu, 13 Mar
+ 2025 20:09:51 +0000
+Received: from LV8PR02MB10287.namprd02.prod.outlook.com
+ ([fe80::b769:6234:fd94:5054]) by LV8PR02MB10287.namprd02.prod.outlook.com
+ ([fe80::b769:6234:fd94:5054%4]) with mapi id 15.20.8534.028; Thu, 13 Mar 2025
+ 20:09:50 +0000
+From: Jon Kohler <jon@nutanix.com>
+To: seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc: Jon Kohler <jon@nutanix.com>,
+        Alexander Grest <Alexander.Grest@microsoft.com>,
+        Nicolas Saenz Julienne <nsaenz@amazon.es>,
+        "Madhavan T . Venkataraman" <madvenka@linux.microsoft.com>,
+        =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
+        Tao Su <tao1.su@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
+        Zhao Liu <zhao1.liu@intel.com>
+Subject: [RFC PATCH 00/18] KVM: VMX: Introduce Intel Mode-Based Execute Control (MBEC)
+Date: Thu, 13 Mar 2025 13:36:39 -0700
+Message-ID: <20250313203702.575156-1-jon@nutanix.com>
+X-Mailer: git-send-email 2.43.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: PH8PR02CA0007.namprd02.prod.outlook.com
+ (2603:10b6:510:2d0::18) To LV8PR02MB10287.namprd02.prod.outlook.com
+ (2603:10b6:408:1fa::10)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250313-vverma7-cleanup_x86_ops-v1-4-0346c8211a0c@intel.com>
-References: <20250313-vverma7-cleanup_x86_ops-v1-0-0346c8211a0c@intel.com>
-In-Reply-To: <20250313-vverma7-cleanup_x86_ops-v1-0-0346c8211a0c@intel.com>
-To: Sean Christopherson <seanjc@google.com>, 
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Rick Edgecombe <rick.p.edgecombe@intel.com>, 
- Vishal Verma <vishal.l.verma@intel.com>
-X-Mailer: b4 0.15-dev-c25d1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=14593;
- i=vishal.l.verma@intel.com; h=from:subject:message-id;
- bh=m9pFossgCGcXjpcoSyY9EZnbRwOUVVstdwWOxCL3+AI=;
- b=owGbwMvMwCXGf25diOft7jLG02pJDOmXjYIt1wRHtN2qErMPZalyuyWSZ39jpej0O5EHFijPb
- zp1RepfRykLgxgXg6yYIsvfPR8Zj8ltz+cJTHCEmcPKBDKEgYtTACbioMLI8PbIL5eVn99pnt36
- 45393j7nhrCNR5oc65w+b8pOSjE5uJCRoVH8K8eLnjdKOYynl9Y6f019Jpn+I/Js89yayFtGcmk
- vWAA=
-X-Developer-Key: i=vishal.l.verma@intel.com; a=openpgp;
- fpr=F8682BE134C67A12332A2ED07AFA61BEA3B84DFF
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV8PR02MB10287:EE_|PH0PR02MB9384:EE_
+X-MS-Office365-Filtering-Correlation-Id: c9646193-ceef-44ce-f74b-08dd626b02fb
+x-proofpoint-crosstenant: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|52116014|1800799024|376014|7416014|366016|921020|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?TnJUOWJqYjFJMWdyWUpTeDFaK0lTNHg0NTQ0cW1oS1g0eUdvclRUUWJOdzFa?=
+ =?utf-8?B?RzdPdDhyRHlwWTgwN0xTSEMzWHNKMHhucmI2Y0RCOWRpV0h2VGszWkxvckFE?=
+ =?utf-8?B?aG4vY3V6bXQ5eDV5MzVZS1R6VFl1NFFYdVFVR2lHSDIwQ0xWN2cwTE0zVlQz?=
+ =?utf-8?B?NzEwdEhqcU1HT3FyT0Uwb1BZa01UdFlhaElMYjI2SmFTYjBIczZKV2xkaXdK?=
+ =?utf-8?B?bitWZ3ROQ29YelpnOEdUdGlseVdkZ2tMNDgydDY3b3ZVMEJ1ZExvdWhsMVBV?=
+ =?utf-8?B?K29IOGNZU3VFSmF0U2lhalNTYnllZXlqeEtMRkpPbHVUZVVKQ2RIRzl6ejYz?=
+ =?utf-8?B?c29lMG1hWk05c0RvRUQ3Skk2N0wxdGZLZkhCOW44NExTQTZIdjVZYWwxY3Fu?=
+ =?utf-8?B?U2Fkc1UvMmhESWZ2UWswQmN4NXlWQmswQXJjbXJrNjdobE55bklXTm9YNity?=
+ =?utf-8?B?VHhtV2VHcUVOZkozWk9GRFdSWTk0MTZjKzVJQit5OWVrNC96NHh6V0RBUmlx?=
+ =?utf-8?B?L2s1Q3h6SHRNditxRDdsc1VoK2JSUE5VV3JHTnBZV3ZMMFdkbnZrVHdFejFp?=
+ =?utf-8?B?T2dFMEpDYVVsbjQxS0hDVHRDMjJxdXJoQWZ4Sm0waEl6SDBJVm83ZGI1Q3lk?=
+ =?utf-8?B?V1FwQ2tlTnl2dVpFZnB5ZDlWWFZ6amRsYXJhb0lsYXI0OWlxczRzbS90b2t6?=
+ =?utf-8?B?S0RQc0hxQ3liUHg2L0ZwSytRaEFGaTk4bWxKM1dsbzBhT091RitRNWloYWVR?=
+ =?utf-8?B?YTEyNW5aTm45dHNYOThqYTN6ZTQ2aEl5d0pDY24wUGp6Umk1bit1ZkpnVURk?=
+ =?utf-8?B?bGdET25kaVRLQTFTdmhxcHlEekp1SndnYXJHOCs2ZG96NVBvMURHS3VRenRS?=
+ =?utf-8?B?R1FqcFFiVkl5bEU1QUZnZWpRREl1U2tjRjA0RTlvRjk0bGk1ZlQ5UnpOeU5h?=
+ =?utf-8?B?elVFbGpMUWtSR2o0U3dqWXNDeXUrZEpZODUvQlVDUkFsOHlWUXBHMzEvS25S?=
+ =?utf-8?B?UVBRREFMT0VZRndWaWptc0l6c0huR3J0cUduN2lQZ05nenEwbms2YUs5WDN1?=
+ =?utf-8?B?OXZrSHhneVNCRGdhQjBMeDhNQ040NFJGV1dCTWluNC9uVWxmaDFweDc1R0VT?=
+ =?utf-8?B?OHRiRmZRNy9VTFRXZ1EvV0JTUWI0RHFNazVUS1orc1czVnpTUUlkSWMwZlVz?=
+ =?utf-8?B?cXQ5dEtDU01FekJ5K01LOU9iV2o5b2t0MDExRThweG9VdUZHd0ljMU1kaGlp?=
+ =?utf-8?B?cGo0RnBmM0xtTStYWEYyU2srbzQ5eHNjQitobjlQaEpDZnZnM3hJR0hBQ2hx?=
+ =?utf-8?B?UEJGZ1FzWUV0V3o5UlVYVEl5U0V0UVFjUklMRTlRdXhtYk9BKzIzdW1mditB?=
+ =?utf-8?B?cjg2aUp2VElLaHZ4YXV2V0ViaDB1dkZxa0RGNGMxWW9HOUF0dmdad3E5T3Nn?=
+ =?utf-8?B?eHkwLy9nTUphN2FHOC9zRkN3Rk1Ud1pvamNmaDhQS3g3VUFhQ0lVL09oYm52?=
+ =?utf-8?B?bjhKb3RWQ1ByV1gyYytKUDVQRnAxSkJJZ3p6ZFRLT3M4UGN3TjZORzBhTmIv?=
+ =?utf-8?B?V1ZSQVh0RmllNTRBdlJzUFV2WjJVSVZEa1VIdy9teTJBZWJnTlYyQWlRb1Jp?=
+ =?utf-8?B?RjZvbG4wNm9zeWtUVGVGa0xNQ3p4SlR1NHpjdHhyNTlGMFdDMDMyaUdzdUJE?=
+ =?utf-8?B?UG5IZ05HRXFUZTBkTGU3cjd1ZEdaa3g2Y2hxZVljcktoUEhHUnpzQXhSWlRa?=
+ =?utf-8?B?R1p2Q0tIRUhURVRHZ3k4TUdEN0I4VEZhemRYd2pUN09LT0hqUkE2WGJGSHND?=
+ =?utf-8?B?TGE5K05VR1h3VldqMGlydzdIbWhsaHREVzJwbHovTDJRbWw3OHZBWjRhSTJL?=
+ =?utf-8?B?RGU0VDBxb2UyQjllWXFRMndoM2JJYWsxOVhiY2JQaXlWb2c9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR02MB10287.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(1800799024)(376014)(7416014)(366016)(921020)(38350700014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?eDFTdVVlQ0Q2WHVabU81VldIei95QlRGeUpRYVdCZHNjZ3pLTDF1c2VOSWY4?=
+ =?utf-8?B?Z2V6dWxDSjg0RHRIN0JSYlVDR2ZpYk5ERFNLOWRuSldkRjBPQjc0alNmRDBr?=
+ =?utf-8?B?K0tGNXp4dmlNNjY5UTJSVGRnSVZ1dGhLSUxQMEVNSVdlaWhPb1Bnc1ZXamdD?=
+ =?utf-8?B?VjV1blo4Wjl6M1BkRThSMFV2RytIcWlaRmZQYW9nOGt5bFUwNDVla2YyQXp4?=
+ =?utf-8?B?SlgreGEyWjBaSUY1YlA0Vy9MSXVZNjJVLzZEczRVRmhUeTUrdC9rcnY5NWpt?=
+ =?utf-8?B?elozMnRmMUU3R1ZzYkFnaW1rSUZtdjAzekxVaWFUdUVEVEM2T1VqN2FUbzZB?=
+ =?utf-8?B?SUU3UWNOaGZCSEhSWkVKZjV4dENUUXdWeHFRb1N3STdBYjhQTTJQTmRCVjFq?=
+ =?utf-8?B?cEI0YmlVbnNGWlUzd0h0QVgrYUhWNktXR01ESEVlalFWNTByY29iKzFtY3JM?=
+ =?utf-8?B?L3hOcjZHY1k2YUxhZlNreG11QmpDL2ZnaEtpdWsrNFluRThHZS9VZjh2amY5?=
+ =?utf-8?B?bVN5NlFZeWZvYklDNnV2SzJ4a0hBZ1JZbUpzTk10Z2xSKzVxNVBTeEJRWm5a?=
+ =?utf-8?B?NXBQY1U1SVpibGpVRzQxQ3lKZUdhZzBUdEZIV29JNWRtZUZKaDZJODhrWjhq?=
+ =?utf-8?B?UldYei9WczRtY2NxRUFuKytwUWJwRjROam54S29JeUJ2Zis5UzdJeTdvc3F0?=
+ =?utf-8?B?RnV4cXc1UzM3WTczSENrR2JEd2dWV21yNFZ4cjdZdG1lcXh1Q09HS25tN3pS?=
+ =?utf-8?B?ajl6T0RNQkdMZmhwVGFYelRzcGM0WmNlcm40SnVoY3M3ZEpjeENON1hzSzAz?=
+ =?utf-8?B?c010MUV1U2ozTHRxaHVYSlRNT0hkcHpxeUF4WmdPUHpDZnRsM0NyM2VrZmJ4?=
+ =?utf-8?B?VkVORUFNU1ZYdFJBaHZQOURrQzA5MUhxVHFlNnVFYy9OTGR5VEdJRlZtdmpl?=
+ =?utf-8?B?MSs5aitnNHdLekpCdWIreGpiS2U5bE1FbmNXTHZiMnpDMVgyRHpwUFVMeWI1?=
+ =?utf-8?B?V2tKN1J4OUNUc0VWdXY3UnluSGs2cmhVcTVHeVdxNUJWcm1RVzJPZk9kTEpq?=
+ =?utf-8?B?OHhtKzdTTzFIRVBmOWpteVZxTjg1Rm5PazkvZTUxbkVmN2ZQdCt0WGoxQkk2?=
+ =?utf-8?B?UUl6ZXZDYytjN0gzVkJDekR4cWRXdVlrMU1YZnJmblF4WTBZa0lTbnkxQnJR?=
+ =?utf-8?B?NEpaMTR2K3lTTWZ2R1NiSW9VeWRtQnBhWWVZa29rc2IrUHRMRjZSMHY0S2pw?=
+ =?utf-8?B?dXRzYlpqbDlLL2NFVzREVTB0Qlpwa1NmUnh0K2NFc2NFWmk2MVlTWmp1VzEz?=
+ =?utf-8?B?d3JrVjdYS1Y1ZE5uMTJTSUl4SnpySzhmaXl3QTdDckpvWm1aL1NOU2VDd2dN?=
+ =?utf-8?B?U0hpaWhkMnVwcTZJNlQ2UzhhMzRaWHF1ZnI1RHJUNVRjYjQvcVM0OUg0dUlv?=
+ =?utf-8?B?cmd5SEx6SG9QMEhyNGtLMVg3Mkt2Y0lmeGF1NnM4azdpTUlyOURwMGswTjVY?=
+ =?utf-8?B?cGErNHpYRFdUQnRXNWFxNkQrYlNtRWNMbVR2aS92RTc2VGQ3c1JSaFJ3aUJz?=
+ =?utf-8?B?VzhYWWdDQU1pZXhhellLZlhLQXZXeExDVGtja0VYYXQ4NjZHRXVpYktON045?=
+ =?utf-8?B?dzcwcHd0SDZIaXc3blh6b0ZZQ0JPNWdTVzhiamFlWG05M0ROb3p1M25ibHZu?=
+ =?utf-8?B?My9hbEd5MFpIYTRJcnpWUzRCeHFFTjEwemIyMXJCVHdXeUJ6cUFsYjNlTzh3?=
+ =?utf-8?B?aWV2UjYxNmdUL0NITkMyaHQ3NkJ5NGk1bUpUMzdDZUMvSFIrMHlnNmd3SlBX?=
+ =?utf-8?B?eVJOMmRzZUFjNFVkVGc4Z2NaTXBQb0h3T3g4dHhXelBPRmxJaVVsSGNYVXBZ?=
+ =?utf-8?B?NTJWNzE1eGhlQm16c0ZjM0MxMnQrT1dZQWdYV1c2ZnpORlVzeFlpdlJNOEFC?=
+ =?utf-8?B?SWpvZ3lXQW9BZG1vL09QazBlSDYzVlE4OUpsU1JzWDU3cEFTYnV5czBQempT?=
+ =?utf-8?B?cWhrdm5oempodGlVU3ZUZjB4bzZKN2ROTVZHZTBvd2Fmdk1ObmEwRXBxUmw2?=
+ =?utf-8?B?M2lJblF3ZWE0RTRHSjdROUNQem1wUkpBT1VpYk5pZCtNajU5TWpMdWs1TFht?=
+ =?utf-8?B?Ry91UVYwWW1GMlBCR25OTWpmNy9pUk05TFU3MWhKR0VIMGdhRUo3N3Y1UkFI?=
+ =?utf-8?B?SFE9PQ==?=
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c9646193-ceef-44ce-f74b-08dd626b02fb
+X-MS-Exchange-CrossTenant-AuthSource: LV8PR02MB10287.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2025 20:09:50.9090
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LK5gsI+zvFRAgWC261+TCqYDY41cXPZ3CYL5om5K+aAoIgAEDLikTjOilkefZDq6arXXSRVPbu+RaDpUBlm+6l97PMlnTUnz+LbOzab0/Ws=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR02MB9384
+X-Proofpoint-GUID: XC-QTZygNlX-hm52BqdRuEW_Gh6tUXYx
+X-Proofpoint-ORIG-GUID: XC-QTZygNlX-hm52BqdRuEW_Gh6tUXYx
+X-Authority-Analysis: v=2.4 cv=WMl/XmsR c=1 sm=1 tr=0 ts=67d33b95 cx=c_pps a=GnUjYDbtZuq/T0BoTQNfSw==:117 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=Vs1iUdzkB0EA:10 a=H5OGdu5hBBwA:10 a=0kUYKlekyDsA:10 a=yMhMjlubAAAA:8 a=VwQbUJbxAAAA:8 a=edGIuiaXAAAA:8 a=NEAV23lmAAAA:8 a=QyXUC8HyAAAA:8 a=Xiv-YnGf6EIgopWwbTwA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=4kyDAASA-Eebq_PzFVE6:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-13_09,2025-03-13_01,2024-11-22_01
+X-Proofpoint-Spam-Reason: safe
 
-Eliminate a lot of stub definitions by using macros to define the TDX vs
-non-TDX versions of various x86_ops. This also allows nearly all of
-vmx/main.c to go under a single #ifdef, eliminating trampolines in the
-generated code, and almost all of the stubs.
+## Summary
+This series introduces support for Intel Mode-Based Execute Control
+(MBEC) to KVM and nested VMX virtualization, aiming to significantly
+reduce VMexits and improve performance for Windows guests running with
+Hypervisor-Protected Code Integrity (HVCI).
 
-For example, with CONFIG_KVM_INTEL_TDX=n, before this cleanup,
-vt_refresh_apicv_exec_ctrl() would produce:
+## What?
+Intel MBEC is a hardware feature, introduced in the Kabylake
+generation, that allows for more granular control over execution
+permissions. MBEC enables the separation and tracking of execution
+permissions for supervisor (kernel) and user-mode code. It is used as
+an accelerator for Microsoft's Memory Integrity [1] (also known as
+hypervisor-protected code integrity or HVCI).
 
-0000000000036490 <vt_refresh_apicv_exec_ctrl>:
-   36490:       f3 0f 1e fa             endbr64
-   36494:       e8 00 00 00 00          call   36499 <vt_refresh_apicv_exec_ctrl+0x9>
-                        36495: R_X86_64_PLT32   __fentry__-0x4
-   36499:       e9 00 00 00 00          jmp    3649e <vt_refresh_apicv_exec_ctrl+0xe>
-                        3649a: R_X86_64_PLT32   vmx_refresh_apicv_exec_ctrl-0x4
-   3649e:       66 90                   xchg   %ax,%ax
+## Why?
+The primary reason for this feature is performance.
 
-After this patch, this is completely eliminated.
+Without hardware-level MBEC, enabling Windows HVCI runs a 'software
+MBEC' known as Restricted User Mode, which imposes a runtime overhead
+due to increased state transitions between the guest's L2 root
+partition and the L2 secure partition for running kernel mode code
+integrity operations.
 
-Based on a patch by Sean Christopherson <seanjc@google.com>
+In practice, this results in a significant number of exits. For
+example, playing a YouTube video within the Edge Browser produces
+roughly 1.2 million VMexits/second across an 8 vCPU Windows 11 guest.
 
-Link: https://lore.kernel.org/kvm/Z6v9yjWLNTU6X90d@google.com/
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
----
- arch/x86/kvm/vmx/x86_ops.h |  65 ----------------
- arch/x86/kvm/vmx/main.c    | 190 +++++++++++++++++++++++----------------------
- 2 files changed, 98 insertions(+), 157 deletions(-)
+Most of these exits are VMREAD/VMWRITE operations, which can be
+emulated with Enlightened VMCS (eVMCS). However, even with eVMCS, this
+configuration still produces around 200,000 VMexits/second.
 
-diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index 112dabce83aa..e628318fc3fc 100644
---- a/arch/x86/kvm/vmx/x86_ops.h
-+++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -165,71 +165,6 @@ void tdx_flush_tlb_current(struct kvm_vcpu *vcpu);
- void tdx_flush_tlb_all(struct kvm_vcpu *vcpu);
- void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level);
- int tdx_gmem_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn);
--#else
--static inline void tdx_disable_virtualization_cpu(void) {}
--static inline int tdx_vm_init(struct kvm *kvm) { return -EOPNOTSUPP; }
--static inline void tdx_mmu_release_hkid(struct kvm *kvm) {}
--static inline void tdx_vm_destroy(struct kvm *kvm) {}
--static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOPNOTSUPP; }
--
--static inline int tdx_vcpu_create(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
--static inline void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event) {}
--static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
--static inline void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu) {}
--static inline int tdx_vcpu_pre_run(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
--static inline fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediate_exit)
--{
--	return EXIT_FASTPATH_NONE;
--}
--static inline void tdx_prepare_switch_to_guest(struct kvm_vcpu *vcpu) {}
--static inline void tdx_vcpu_put(struct kvm_vcpu *vcpu) {}
--static inline bool tdx_protected_apic_has_interrupt(struct kvm_vcpu *vcpu) { return false; }
--static inline int tdx_handle_exit(struct kvm_vcpu *vcpu,
--		enum exit_fastpath_completion fastpath) { return 0; }
--
--static inline void tdx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
--					 int trig_mode, int vector) {}
--static inline void tdx_inject_nmi(struct kvm_vcpu *vcpu) {}
--static inline void tdx_get_exit_info(struct kvm_vcpu *vcpu, u32 *reason, u64 *info1,
--				     u64 *info2, u32 *intr_info, u32 *error_code) {}
--static inline bool tdx_has_emulated_msr(u32 index) { return false; }
--static inline int tdx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr) { return 1; }
--static inline int tdx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr) { return 1; }
--
--static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
--
--static inline int tdx_sept_link_private_spt(struct kvm *kvm, gfn_t gfn,
--					    enum pg_level level,
--					    void *private_spt)
--{
--	return -EOPNOTSUPP;
--}
--
--static inline int tdx_sept_free_private_spt(struct kvm *kvm, gfn_t gfn,
--					    enum pg_level level,
--					    void *private_spt)
--{
--	return -EOPNOTSUPP;
--}
--
--static inline int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
--					    enum pg_level level,
--					    kvm_pfn_t pfn)
--{
--	return -EOPNOTSUPP;
--}
--
--static inline int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
--					       enum pg_level level,
--					       kvm_pfn_t pfn)
--{
--	return -EOPNOTSUPP;
--}
--
--static inline void tdx_flush_tlb_current(struct kvm_vcpu *vcpu) {}
--static inline void tdx_flush_tlb_all(struct kvm_vcpu *vcpu) {}
--static inline void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level) {}
--static inline int tdx_gmem_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn) { return 0; }
- #endif
- 
- #endif /* __KVM_X86_VMX_X86_OPS_H */
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index e46005c81e5f..218078ba039f 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -878,7 +878,13 @@ static int vt_gmem_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
- 
- 	return 0;
- }
--#endif
-+
-+#define vt_op(name) vt_##name
-+#define vt_op_tdx_only(name) vt_##name
-+#else /* CONFIG_KVM_INTEL_TDX */
-+#define vt_op(name) vmx_##name
-+#define vt_op_tdx_only(name) NULL
-+#endif /* CONFIG_KVM_INTEL_TDX */
- 
- #define VMX_REQUIRED_APICV_INHIBITS				\
- 	(BIT(APICV_INHIBIT_REASON_DISABLED) |			\
-@@ -897,113 +903,113 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.hardware_unsetup = vmx_hardware_unsetup,
- 
- 	.enable_virtualization_cpu = vmx_enable_virtualization_cpu,
--	.disable_virtualization_cpu = vt_disable_virtualization_cpu,
-+	.disable_virtualization_cpu = vt_op(disable_virtualization_cpu),
- 	.emergency_disable_virtualization_cpu = vmx_emergency_disable_virtualization_cpu,
- 
--	.has_emulated_msr = vt_has_emulated_msr,
-+	.has_emulated_msr = vt_op(has_emulated_msr),
- 
- 	.vm_size = sizeof(struct kvm_vmx),
- 
--	.vm_init = vt_vm_init,
--	.vm_pre_destroy = vt_vm_pre_destroy,
--	.vm_destroy = vt_vm_destroy,
-+	.vm_init = vt_op(vm_init),
-+	.vm_destroy = vt_op(vm_destroy),
-+	.vm_pre_destroy = vt_op_tdx_only(vm_pre_destroy),
- 
--	.vcpu_precreate = vt_vcpu_precreate,
--	.vcpu_create = vt_vcpu_create,
--	.vcpu_free = vt_vcpu_free,
--	.vcpu_reset = vt_vcpu_reset,
-+	.vcpu_precreate = vt_op(vcpu_precreate),
-+	.vcpu_create = vt_op(vcpu_create),
-+	.vcpu_free = vt_op(vcpu_free),
-+	.vcpu_reset = vt_op(vcpu_reset),
- 
--	.prepare_switch_to_guest = vt_prepare_switch_to_guest,
--	.vcpu_load = vt_vcpu_load,
--	.vcpu_put = vt_vcpu_put,
-+	.prepare_switch_to_guest = vt_op(prepare_switch_to_guest),
-+	.vcpu_load = vt_op(vcpu_load),
-+	.vcpu_put = vt_op(vcpu_put),
- 
--	.update_exception_bitmap = vt_update_exception_bitmap,
-+	.update_exception_bitmap = vt_op(update_exception_bitmap),
- 	.get_feature_msr = vmx_get_feature_msr,
--	.get_msr = vt_get_msr,
--	.set_msr = vt_set_msr,
-+	.get_msr = vt_op(get_msr),
-+	.set_msr = vt_op(set_msr),
- 
--	.get_segment_base = vt_get_segment_base,
--	.get_segment = vt_get_segment,
--	.set_segment = vt_set_segment,
--	.get_cpl = vt_get_cpl,
--	.get_cpl_no_cache = vt_get_cpl_no_cache,
--	.get_cs_db_l_bits = vt_get_cs_db_l_bits,
--	.is_valid_cr0 = vt_is_valid_cr0,
--	.set_cr0 = vt_set_cr0,
--	.is_valid_cr4 = vt_is_valid_cr4,
--	.set_cr4 = vt_set_cr4,
--	.set_efer = vt_set_efer,
--	.get_idt = vt_get_idt,
--	.set_idt = vt_set_idt,
--	.get_gdt = vt_get_gdt,
--	.set_gdt = vt_set_gdt,
--	.set_dr6 = vt_set_dr6,
--	.set_dr7 = vt_set_dr7,
--	.sync_dirty_debug_regs = vt_sync_dirty_debug_regs,
--	.cache_reg = vt_cache_reg,
--	.get_rflags = vt_get_rflags,
--	.set_rflags = vt_set_rflags,
--	.get_if_flag = vt_get_if_flag,
-+	.get_segment_base = vt_op(get_segment_base),
-+	.get_segment = vt_op(get_segment),
-+	.set_segment = vt_op(set_segment),
-+	.get_cpl = vt_op(get_cpl),
-+	.get_cpl_no_cache = vt_op(get_cpl_no_cache),
-+	.get_cs_db_l_bits = vt_op(get_cs_db_l_bits),
-+	.is_valid_cr0 = vt_op(is_valid_cr0),
-+	.set_cr0 = vt_op(set_cr0),
-+	.is_valid_cr4 = vt_op(is_valid_cr4),
-+	.set_cr4 = vt_op(set_cr4),
-+	.set_efer = vt_op(set_efer),
-+	.get_idt = vt_op(get_idt),
-+	.set_idt = vt_op(set_idt),
-+	.get_gdt = vt_op(get_gdt),
-+	.set_gdt = vt_op(set_gdt),
-+	.set_dr6 = vt_op(set_dr6),
-+	.set_dr7 = vt_op(set_dr7),
-+	.sync_dirty_debug_regs = vt_op(sync_dirty_debug_regs),
-+	.cache_reg = vt_op(cache_reg),
-+	.get_rflags = vt_op(get_rflags),
-+	.set_rflags = vt_op(set_rflags),
-+	.get_if_flag = vt_op(get_if_flag),
- 
--	.flush_tlb_all = vt_flush_tlb_all,
--	.flush_tlb_current = vt_flush_tlb_current,
--	.flush_tlb_gva = vt_flush_tlb_gva,
--	.flush_tlb_guest = vt_flush_tlb_guest,
-+	.flush_tlb_all = vt_op(flush_tlb_all),
-+	.flush_tlb_current = vt_op(flush_tlb_current),
-+	.flush_tlb_gva = vt_op(flush_tlb_gva),
-+	.flush_tlb_guest = vt_op(flush_tlb_guest),
- 
--	.vcpu_pre_run = vt_vcpu_pre_run,
--	.vcpu_run = vt_vcpu_run,
--	.handle_exit = vt_handle_exit,
-+	.vcpu_pre_run = vt_op(vcpu_pre_run),
-+	.vcpu_run = vt_op(vcpu_run),
-+	.handle_exit = vt_op(handle_exit),
- 	.skip_emulated_instruction = vmx_skip_emulated_instruction,
- 	.update_emulated_instruction = vmx_update_emulated_instruction,
--	.set_interrupt_shadow = vt_set_interrupt_shadow,
--	.get_interrupt_shadow = vt_get_interrupt_shadow,
--	.patch_hypercall = vt_patch_hypercall,
--	.inject_irq = vt_inject_irq,
--	.inject_nmi = vt_inject_nmi,
--	.inject_exception = vt_inject_exception,
--	.cancel_injection = vt_cancel_injection,
--	.interrupt_allowed = vt_interrupt_allowed,
--	.nmi_allowed = vt_nmi_allowed,
--	.get_nmi_mask = vt_get_nmi_mask,
--	.set_nmi_mask = vt_set_nmi_mask,
--	.enable_nmi_window = vt_enable_nmi_window,
--	.enable_irq_window = vt_enable_irq_window,
--	.update_cr8_intercept = vt_update_cr8_intercept,
-+	.set_interrupt_shadow = vt_op(set_interrupt_shadow),
-+	.get_interrupt_shadow = vt_op(get_interrupt_shadow),
-+	.patch_hypercall = vt_op(patch_hypercall),
-+	.inject_irq = vt_op(inject_irq),
-+	.inject_nmi = vt_op(inject_nmi),
-+	.inject_exception = vt_op(inject_exception),
-+	.cancel_injection = vt_op(cancel_injection),
-+	.interrupt_allowed = vt_op(interrupt_allowed),
-+	.nmi_allowed = vt_op(nmi_allowed),
-+	.get_nmi_mask = vt_op(get_nmi_mask),
-+	.set_nmi_mask = vt_op(set_nmi_mask),
-+	.enable_nmi_window = vt_op(enable_nmi_window),
-+	.enable_irq_window = vt_op(enable_irq_window),
-+	.update_cr8_intercept = vt_op(update_cr8_intercept),
- 
- 	.x2apic_icr_is_split = false,
--	.set_virtual_apic_mode = vt_set_virtual_apic_mode,
--	.set_apic_access_page_addr = vt_set_apic_access_page_addr,
--	.refresh_apicv_exec_ctrl = vt_refresh_apicv_exec_ctrl,
--	.load_eoi_exitmap = vt_load_eoi_exitmap,
-+	.set_virtual_apic_mode = vt_op(set_virtual_apic_mode),
-+	.set_apic_access_page_addr = vt_op(set_apic_access_page_addr),
-+	.refresh_apicv_exec_ctrl = vt_op(refresh_apicv_exec_ctrl),
-+	.load_eoi_exitmap = vt_op(load_eoi_exitmap),
- 	.apicv_pre_state_restore = pi_apicv_pre_state_restore,
- 	.required_apicv_inhibits = VMX_REQUIRED_APICV_INHIBITS,
--	.hwapic_isr_update = vt_hwapic_isr_update,
--	.sync_pir_to_irr = vt_sync_pir_to_irr,
--	.deliver_interrupt = vt_deliver_interrupt,
-+	.hwapic_isr_update = vt_op(hwapic_isr_update),
-+	.sync_pir_to_irr = vt_op(sync_pir_to_irr),
-+	.deliver_interrupt = vt_op(deliver_interrupt),
- 	.dy_apicv_has_pending_interrupt = pi_has_pending_interrupt,
- 
--	.set_tss_addr = vt_set_tss_addr,
--	.set_identity_map_addr = vt_set_identity_map_addr,
-+	.set_tss_addr = vt_op(set_tss_addr),
-+	.set_identity_map_addr = vt_op(set_identity_map_addr),
- 	.get_mt_mask = vmx_get_mt_mask,
- 
--	.get_exit_info = vt_get_exit_info,
--	.get_entry_info = vt_get_entry_info,
-+	.get_exit_info = vt_op(get_exit_info),
-+	.get_entry_info = vt_op(get_entry_info),
- 
--	.vcpu_after_set_cpuid = vt_vcpu_after_set_cpuid,
-+	.vcpu_after_set_cpuid = vt_op(vcpu_after_set_cpuid),
- 
- 	.has_wbinvd_exit = cpu_has_vmx_wbinvd_exit,
- 
--	.get_l2_tsc_offset = vt_get_l2_tsc_offset,
--	.get_l2_tsc_multiplier = vt_get_l2_tsc_multiplier,
--	.write_tsc_offset = vt_write_tsc_offset,
--	.write_tsc_multiplier = vt_write_tsc_multiplier,
-+	.get_l2_tsc_offset = vt_op(get_l2_tsc_offset),
-+	.get_l2_tsc_multiplier = vt_op(get_l2_tsc_multiplier),
-+	.write_tsc_offset = vt_op(write_tsc_offset),
-+	.write_tsc_multiplier = vt_op(write_tsc_multiplier),
- 
--	.load_mmu_pgd = vt_load_mmu_pgd,
-+	.load_mmu_pgd = vt_op(load_mmu_pgd),
- 
- 	.check_intercept = vmx_check_intercept,
- 	.handle_exit_irqoff = vmx_handle_exit_irqoff,
- 
--	.update_cpu_dirty_logging = vt_update_cpu_dirty_logging,
-+	.update_cpu_dirty_logging = vt_op(update_cpu_dirty_logging),
- 
- 	.nested_ops = &vmx_nested_ops,
- 
-@@ -1011,38 +1017,38 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.pi_start_assignment = vmx_pi_start_assignment,
- 
- #ifdef CONFIG_X86_64
--	.set_hv_timer = vt_set_hv_timer,
--	.cancel_hv_timer = vt_cancel_hv_timer,
-+	.set_hv_timer = vt_op(set_hv_timer),
-+	.cancel_hv_timer = vt_op(cancel_hv_timer),
- #endif
- 
--	.setup_mce = vt_setup_mce,
-+	.setup_mce = vt_op(setup_mce),
- 
- #ifdef CONFIG_KVM_SMM
--	.smi_allowed = vt_smi_allowed,
--	.enter_smm = vt_enter_smm,
--	.leave_smm = vt_leave_smm,
--	.enable_smi_window = vt_enable_smi_window,
-+	.smi_allowed = vt_op(smi_allowed),
-+	.enter_smm = vt_op(enter_smm),
-+	.leave_smm = vt_op(leave_smm),
-+	.enable_smi_window = vt_op(enable_smi_window),
- #endif
- 
--	.check_emulate_instruction = vt_check_emulate_instruction,
--	.apic_init_signal_blocked = vt_apic_init_signal_blocked,
-+	.check_emulate_instruction = vt_op(check_emulate_instruction),
-+	.apic_init_signal_blocked = vt_op(apic_init_signal_blocked),
- 	.migrate_timers = vmx_migrate_timers,
- 
--	.msr_filter_changed = vt_msr_filter_changed,
--	.complete_emulated_msr = vt_complete_emulated_msr,
-+	.msr_filter_changed = vt_op(msr_filter_changed),
-+	.complete_emulated_msr = vt_op(complete_emulated_msr),
- 
- 	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
- 
- 	.get_untagged_addr = vmx_get_untagged_addr,
- 
--	.mem_enc_ioctl = vt_mem_enc_ioctl,
--	.vcpu_mem_enc_ioctl = vt_vcpu_mem_enc_ioctl,
-+	.mem_enc_ioctl = vt_op_tdx_only(mem_enc_ioctl),
-+	.vcpu_mem_enc_ioctl = vt_op_tdx_only(vcpu_mem_enc_ioctl),
- 
--	.private_max_mapping_level = vt_gmem_private_max_mapping_level
-+	.private_max_mapping_level = vt_op_tdx_only(gmem_private_max_mapping_level)
- };
- 
- struct kvm_x86_init_ops vt_init_ops __initdata = {
--	.hardware_setup = vt_hardware_setup,
-+	.hardware_setup = vt_op(hardware_setup),
- 	.handle_intel_pt_intr = NULL,
- 
- 	.runtime_ops = &vt_x86_ops,
+With MBEC exposed to the L1 Windows Hypervisor, the same scenario
+results in approximately 50,000 VMexits/second, a *24x* reduction from
+the baseline.
+
+Not a typo, 24x reduction in VMexits.
+
+## How?
+This series implements core KVM support for exposing the MBEC bit in
+secondary execution controls (bit 22) to L1 and L2, based on
+configuration from user space and a module parameter
+'enable_pt_guest_exec_control'. The inspiration for this series
+started with Mickaël's series for Heki [3], where we've extracted,
+refactored, and extended the MBEC-specific use case to be
+general-purpose.
+
+MBEC, which appears in Linux /proc/cpuinfo as ept_mode_based_exec,
+splits the EPT exec bit (bit 2 in PTE) into two bits. When secondary
+execution control bit 22 is set, PTE bit 2 reflects supervisor mode
+executable, and PTE bit 10 reflects user mode executable.
+
+The semantics for EPT violation qualifications also change when MBEC
+is enabled, with bit 5 reflecting supervisor/kernel mode execute
+permissions and bit 6 reflecting user mode execute permissions.
+This ultimately serves to expose this feature to the L1 hypervisor,
+which consumes MBEC and informs the L2 partitions not to use the
+software MBEC by removing bit 14 in 0x40000004 EAX [4].
+
+## Where?
+Enablement spans both VMX code and MMU code to teach the shadow MMU
+about the different execution modes, as well as user space VMM to pass
+secondary execution control bit 22. A patch for QEMU enablement is
+available [5].
+
+## Testing
+Initial testing has been on done on 6.12-based code with:
+  Guests
+    - Windows 11 24H2 26100.2894
+    - Windows Server 2025 24H2 26100.2894
+    - Windows Server 2022 W1H2 20348.825
+  Processors:
+    - Intel Skylake 6154
+    - Intel Sapphire Rapids 6444Y
+
+## Acknowledgements
+Special thanks to all contributors and reviewers who have provided
+valuable feedback and support for this patch series.
+
+[1] https://learn.microsoft.com/en-us/windows/security/hardware-security/enable-virtualization-based-protection-of-code-integrity
+[2] https://learn.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/nested-virtualization#enlightened-vmcs-intel
+[3] https://patchwork.kernel.org/project/kvm/patch/20231113022326.24388-6-mic@digikod.net/
+[4] https://learn.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/feature-discovery#implementation-recommendations---0x40000004
+[5] https://github.com/JonKohler/qemu/tree/mbec-rfc-v1
+
+Cc: Alexander Grest <Alexander.Grest@microsoft.com>
+Cc: Nicolas Saenz Julienne <nsaenz@amazon.es>
+Cc: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+Cc: Mickaël Salaün <mic@digikod.net>
+Cc: Tao Su <tao1.su@linux.intel.com>
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Zhao Liu <zhao1.liu@intel.com>
+
+Jon Kohler (11):
+  KVM: x86: Add module parameter for Intel MBEC
+  KVM: x86: Add pt_guest_exec_control to kvm_vcpu_arch
+  KVM: VMX: Wire up Intel MBEC enable/disable logic
+  KVM: x86/mmu: Remove SPTE_PERM_MASK
+  KVM: VMX: Extend EPT Violation protection bits
+  KVM: x86/mmu: Introduce shadow_ux_mask
+  KVM: x86/mmu: Adjust SPTE_MMIO_ALLOWED_MASK to understand MBEC
+  KVM: x86/mmu: Extend make_spte to understand MBEC
+  KVM: nVMX: Setup Intel MBEC in nested secondary controls
+  KVM: VMX: Allow MBEC with EVMCS
+  KVM: x86: Enable module parameter for MBEC
+
+Mickaël Salaün (5):
+  KVM: VMX: add cpu_has_vmx_mbec helper
+  KVM: VMX: Define VMX_EPT_USER_EXECUTABLE_MASK
+  KVM: x86/mmu: Extend access bitfield in kvm_mmu_page_role
+  KVM: VMX: Enhance EPT violation handler for PROT_USER_EXEC
+  KVM: x86/mmu: Extend is_executable_pte to understand MBEC
+
+Nikolay Borisov (1):
+  KVM: VMX: Remove EPT_VIOLATIONS_ACC_*_BIT defines
+
+Sean Christopherson (1):
+  KVM: nVMX: Decouple EPT RWX bits from EPT Violation protection bits
+
+ arch/x86/include/asm/kvm_host.h | 13 +++++----
+ arch/x86/include/asm/vmx.h      | 45 ++++++++++++++++++++---------
+ arch/x86/kvm/mmu.h              |  3 +-
+ arch/x86/kvm/mmu/mmu.c          | 13 +++++----
+ arch/x86/kvm/mmu/mmutrace.h     | 23 ++++++++++-----
+ arch/x86/kvm/mmu/paging_tmpl.h  | 19 +++++++++---
+ arch/x86/kvm/mmu/spte.c         | 51 ++++++++++++++++++++++++++++-----
+ arch/x86/kvm/mmu/spte.h         | 36 +++++++++++++++--------
+ arch/x86/kvm/mmu/tdp_mmu.c      |  2 +-
+ arch/x86/kvm/vmx/capabilities.h |  6 ++++
+ arch/x86/kvm/vmx/hyperv.c       |  5 +++-
+ arch/x86/kvm/vmx/hyperv_evmcs.h |  1 +
+ arch/x86/kvm/vmx/nested.c       |  4 +++
+ arch/x86/kvm/vmx/vmx.c          | 21 ++++++++++++--
+ arch/x86/kvm/vmx/vmx.h          |  7 +++++
+ arch/x86/kvm/x86.c              |  4 +++
+ 16 files changed, 192 insertions(+), 61 deletions(-)
 
 -- 
-2.48.1
+2.43.0
 
 
