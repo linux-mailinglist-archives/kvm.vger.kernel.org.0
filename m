@@ -1,168 +1,94 @@
-Return-Path: <kvm+bounces-40946-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40947-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77B2AA5FA20
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 16:38:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EE84A5FA23
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 16:39:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCC5A16FAA1
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 15:38:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFC351889C5F
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 15:39:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E7E72690C8;
-	Thu, 13 Mar 2025 15:38:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BCBF26869C;
+	Thu, 13 Mar 2025 15:38:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SikGgxv8"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="CAtPMP+N"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76030267738
-	for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 15:38:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA9835966
+	for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 15:38:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741880295; cv=none; b=u0iOyKVkmoNwbRRFsrQhZEJTwxMj6yrpvJJHbJNsqoO0Yrc6lHuY87UM6Pn1JPE78W7V+qMn+nCP6J7fchOZTQ1SrUroCagIG3A6E3sR9ht6vCikCGF3VqNTCWdurJf/E9sRJu8IlCpMUP8BUBCddT0ER0vPPjbRgSdxlkkzRfQ=
+	t=1741880331; cv=none; b=dpZV6504kNCulK26Ka8RdcKhWdWh5kjyjnvQMkxWlZvN7s9yyvbMNjoGk1pkifUG6xV5QKmF48v4Ip+BrUGspPE0TAGbOypr0MKazajjYDB0BsqJn6tt7M/Ap7Wdej2pLt0JivFRGYRW1mj/9c0Wp6TboJU6fb9wqs/KVNiJgcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741880295; c=relaxed/simple;
-	bh=e0igfCTK9/hzb01DEL2PKJuifzTCiu9TjzJhL9w9tCo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R+BYyPsGocSBP6pXANBQoW4E68rF5g3ohnOXiiWg7cvABMH8uTNQYUdLhk+E1q5YhXsjHKS0KHrGfE2rfS9oQjBBxGjHBKoIj8qzcopjpmvYnP4vkrSd3UD20QbI4clf3wgBtNlX48EjUYdAfUn7humuGeaK0Br3pDSJKqZKsGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SikGgxv8; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2240aad70f2so190735ad.0
-        for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 08:38:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741880293; x=1742485093; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QjT6YyAXUn5VTwVWHShjFFHYQBmkQMKGYi0zBc0+AWA=;
-        b=SikGgxv8AToDco7oYitkg/Z+dJ6l1BdV3H8b2AERZCO3FBaVkYoIikB3+pUPsFwrPa
-         bGJWpHeS7alLdkCI4zjyPLdoYFQlEJg6c9BvDnlrnHc8NPGW+8BZT8mhFO4QE8AI8QtR
-         YdLHNBSmuectid8YTk/ICeRyJmSxlw0Ia5g/7Aoir6B4+CRpZLUIT+1g6BrDXBudax2P
-         YZlsL1zdY2cA6RQ4SnCe74qUU1/mxdvxmM9wAX1pjnC3mR0UtNtcUZ8TmqsorEZhVBcp
-         MUZbLXY5bZ9Cbvay6e2FBDlT/lklQrCEeaVYo0ap6k/ILfC98pzL9M1fOyA+ACe66IzK
-         n+hQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741880293; x=1742485093;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QjT6YyAXUn5VTwVWHShjFFHYQBmkQMKGYi0zBc0+AWA=;
-        b=fC+euf327cTLkh9KWlFHcikBZQ7QwyqQ91qP/vU0/TjmE2aC5+ufQYyX7XevQdNNOo
-         Cx8bheoqyrawEtYv6gVTFT8bk7PJO6WANk6a0K/OhpBVuPyfMxHqQ8vrcZVPJfosgqTI
-         nfLhPQw7kMj+eD5ti0UyX5D7ol9QzrH00EYAvDIDNIuC0kaqXqwWNSbB1nfv1w8klHhm
-         ja0aj2s06QFiLeDzruO/HfZe96PmxcB0hzL8dLLiFD4NsGA2vZfiXvb3wiWRznOispw2
-         9iFRh9ClKQWQbmCr5VuLPN4lmEMSHcWW2p4WsFnr4n+HCqhYZCSwfqjd4VT4FU+2+J1N
-         fcJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUZLaNe5C3mL1f8Vcb3djsTx+A9GrvXNhArTMljAIeDCTMoesQFjlzSvT/NlTFnwQb2sWs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwhU28KoXTtDnCouW/gMZ357cp7y/pIWfc8RL602FvEMl2lAR2v
-	FW1+qLxUN5q7nEQpUvVGqy9UirrarlPjzltxI8vp6HfjUqxh7pmbpWWo6HvexigSFy56NgroJfL
-	lnjRphUps1Hp04AbV6MT/tXoCrqYg9AEBz79e
-X-Gm-Gg: ASbGncsarhUKgdsjBhWwJvjVD3PDnFMAhFrT+IzIk2vl+5/FmsDxRulc4OYDDRqJrKX
-	Fq1l5o+ErGovqQFn2mEeNX8eFndBHzhiw86mGZ7YE9LEg9xoI81k8dD+ikpavqz7UmsZNfzhJjs
-	ihy0w1FTS8x7uBwcaryqaVaQw7rUQ=
-X-Google-Smtp-Source: AGHT+IGJAXZPJwYtCYE1bwu7PfpLXhz2HdoG/Tco2Xx2kSrvJEpgKAwhhVDmJx6nzuZRXrJN0XJtv6Oed3xhRIh49X0=
-X-Received: by 2002:a17:902:f549:b0:21f:631c:7fc9 with SMTP id
- d9443c01a7336-225c4cc8b48mr3034115ad.0.1741880292423; Thu, 13 Mar 2025
- 08:38:12 -0700 (PDT)
+	s=arc-20240116; t=1741880331; c=relaxed/simple;
+	bh=GysdnbCK4s2pMB+USzpXYLT/KXbSq4/APftQNpF11ag=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Yf9IfLCmqZ2wcvPZpzC2c3B57nka9QbksvTDJqxVehAlYshadY0vV9C2xNs1FRoQTneL/XAEwVwVpFD0U5aMybyV6FClQSWo0syNKnhcecmQTaUMRCGQRsb1/HMqhRlpA0JsZE+Tcou0mjWpjoGmfZtC9z0fXNqgyFo0W7tTbjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=CAtPMP+N; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 915F940E0219;
+	Thu, 13 Mar 2025 15:38:43 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id USX3RhScKhse; Thu, 13 Mar 2025 15:38:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1741880319; bh=G9I6iPpUsdtO6XtOfZxS/0uOeMdWvTOiHDb22KYFY74=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CAtPMP+NC7s21FOoicKlIM6Fr+uRwKngFeHaUnY2gF2weok1hM3O4nOi5Yzl/+pss
+	 2nH1fDJXJzYRcIdg7S3yJ5Oip4hPJO/M7DGr9aDaU0tJMXOD9oHMdYg7PYOSdN0Ncl
+	 aQJ+CquOD1UfJEoVY9vh2Bsd6enh3lmNWzHMhRNbvEQeNM0zQpno+Q3my5YNsvzbJl
+	 Z1Jnji+c38fQI1N5AVq7cQq5GGlJv6JBVLb5u8uGGwWzTQB/tfpnXtA+jcH5OorbLp
+	 Ul76GmD4BJB8AIqXEKQGzH3VY7pUS94g/PiTBv+dl50GipdHNULVAAcgx9jcFxceTD
+	 c3ctOiTTN09ZhFIMbFFHwAAdLgxPh5lYRPfvw1AfdaelGL6vnncFFjeg24kwS8jkp/
+	 DFc0mKDjThDt6RbqiiVer5BfNIXCin4qAWs1dVbeOviCDoIp+gkEvXZkAt6oI5xYUc
+	 79Pz57LJ4qGKVUYqNsEgtoN+U6mPdr4vBtzNuHAQjoQ7/3kaA30OteOMLjWj5v+nKV
+	 fYLkGaom/+Gh7XBELaf/t4FsKDFhWqZUBjRGrU+HM9gN65af3epoQ62SBL7YzqH3VK
+	 rILOOCTWOvmMrO2EsLnN0mXM57/Cx/L3EzRKq5Zzjy9Y/lxLIS7LXsqsvG46Sfwe9c
+	 0y+2/68fHNmxSFfU8KuvTGwU=
+Received: from zn.tnic (pd95303ce.dip0.t-ipconnect.de [217.83.3.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 9896740E01AC;
+	Thu, 13 Mar 2025 15:38:31 +0000 (UTC)
+Date: Thu, 13 Mar 2025 16:38:23 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Vaishali Thakkar <vaishali.thakkar@suse.com>
+Cc: Nikunj A Dadhania <nikunj@amd.com>, seanjc@google.com,
+	pbonzini@redhat.com, kvm@vger.kernel.org, thomas.lendacky@amd.com,
+	santosh.shukla@amd.com, isaku.yamahata@intel.com
+Subject: Re: [PATCH v4 1/5] x86/cpufeatures: Add SNP Secure TSC
+Message-ID: <20250313153823.GCZ9L774MuRQ3ZhArk@fat_crate.local>
+References: <20250310063938.13790-1-nikunj@amd.com>
+ <20250310064347.13986-1-nikunj@amd.com>
+ <63bc72ee-4959-4f08-8db4-2bf6634dc1a6@suse.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250308214045.1160445-1-almasrymina@google.com>
- <20250308214045.1160445-3-almasrymina@google.com> <87e8bde7-b05e-4a1b-bcef-f6bb3a12315a@redhat.com>
-In-Reply-To: <87e8bde7-b05e-4a1b-bcef-f6bb3a12315a@redhat.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 13 Mar 2025 08:37:59 -0700
-X-Gm-Features: AQ5f1Jph-1jzVMznweflaH2GTTsjHi97dpZrZmSTIYAsEqCVMDjRyvtUSvvjsmI
-Message-ID: <CAHS8izPbWVXS9gPBbuR4EisT806+3woqD=njDHj8hNJLcDU4DA@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 2/9] net: add get_netmem/put_netmem support
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
-	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Jeroen de Borst <jeroendb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <63bc72ee-4959-4f08-8db4-2bf6634dc1a6@suse.com>
 
-On Thu, Mar 13, 2025 at 3:47=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On 3/8/25 10:40 PM, Mina Almasry wrote:
-> > Currently net_iovs support only pp ref counts, and do not support a
-> > page ref equivalent.
-> >
-> > This is fine for the RX path as net_iovs are used exclusively with the
-> > pp and only pp refcounting is needed there. The TX path however does no=
-t
-> > use pp ref counts, thus, support for get_page/put_page equivalent is
-> > needed for netmem.
-> >
-> > Support get_netmem/put_netmem. Check the type of the netmem before
-> > passing it to page or net_iov specific code to obtain a page ref
-> > equivalent.
-> >
-> > For dmabuf net_iovs, we obtain a ref on the underlying binding. This
-> > ensures the entire binding doesn't disappear until all the net_iovs hav=
-e
-> > been put_netmem'ed. We do not need to track the refcount of individual
-> > dmabuf net_iovs as we don't allocate/free them from a pool similar to
-> > what the buddy allocator does for pages.
-> >
-> > This code is written to be extensible by other net_iov implementers.
-> > get_netmem/put_netmem will check the type of the netmem and route it to
-> > the correct helper:
-> >
-> > pages -> [get|put]_page()
-> > dmabuf net_iovs -> net_devmem_[get|put]_net_iov()
-> > new net_iovs ->       new helpers
-> >
-> > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> > Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-> >
-> > ---
-> >
-> > v5: https://lore.kernel.org/netdev/20250227041209.2031104-2-almasrymina=
-@google.com/
-> >
-> > - Updated to check that the net_iov is devmem before calling
-> >   net_devmem_put_net_iov().
-> >
-> > - Jakub requested that callers of __skb_frag_ref()/skb_page_unref be
-> >   inspected to make sure that they generate / anticipate skbs with the
-> >   correct pp_recycle and unreadable setting:
-> >
-> > skb_page_unref
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >
-> > - callers that are unreachable for unreadable skbs:
-> >
-> > gro_pull_from_frag0, skb_copy_ubufs, __pskb_pull_tail
->
-> Why `__pskb_pull_tail` is not reachable? it's called by __pskb_trim(),
-> via skb_condense().
->
+On Thu, Mar 13, 2025 at 04:15:14PM +0100, Vaishali Thakkar wrote:
+> I think it'll be nice to add this as a flag for /proc/cpuinfo.
 
-I meant to say "the skb_page_unref call from __skb_pull_tail is not
-reachable for unreadable skbs". This is because __skb_pull_tail early
-returns on unreadable skbs.
+Documentation/arch/x86/cpuinfo.rst
 
---=20
-Thanks,
-Mina
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
