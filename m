@@ -1,34 +1,34 @@
-Return-Path: <kvm+bounces-40927-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40926-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80EA6A5F4E0
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 13:49:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B0D2DA5F4DF
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 13:49:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C32116BF02
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 12:48:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EF9642016D
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 12:48:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B93D6267B0B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C97D267B06;
 	Thu, 13 Mar 2025 12:48:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OeJ0QX6k"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BeAchXyk"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ABCB2676F2
-	for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 12:47:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CD712676F3
+	for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 12:48:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741870081; cv=none; b=Ay6mv3KwQatu3xACSpUNFL75I1qqAQMMC5UEG2YMvjnlC+8oVkKjF6m/a+nvaEbGX9c8BWlvvKqiRyVdgLSx6kZltv+i1xO6PzSysdDTH7ypqZ1oqxjrCc4Km/KgfatJigu0i4/CV5R31797mbj1E3Zu0HCeg29VtIZuwK31vw4=
+	t=1741870081; cv=none; b=KlEZA7Pf4aalUurFqH+96Rgbqp+YldHfajeyatJ/Ac58NyriTF/IzR2BDeWPkBPw1KeT2utXZpAIpDFtMPF4Zn1CIN2WVI8xB1RsWRinCCLo868tKlQsCgCPzQXVpUvbuN72kGxRpTD1FDU/4uJHoBp6T1KstMOM+Kf7rBNZ8PA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1741870081; c=relaxed/simple;
-	bh=8csem5A7kRdfdWUeU3nWExqMdRsWoGi8C+G2sr7HFJ4=;
+	bh=LRaXO1+32bJRdfqcjTqD5LQPp1lOusyunjM2/8RSuoQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=inKJzSV2bPGlT3oF2qm/vMh44fycCcuWd8CZ7fhMzTzm4iNl/n8gdfEnqd1ruxEhgIG8VJGOmkZefXWQ9KCTCTj5y1lXf7FJX2Fn5i8ScMJLQ3FIq3IGTYWUqjgmwwLNcTOEKIQ1OddC+vocPgb5GgLdr0fnSQ+TeOtJyQlEUrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OeJ0QX6k; arc=none smtp.client-ip=198.175.65.10
+	 MIME-Version; b=MpH28uDzzCSPdBCqk0N4jON8J6JqAnWHeAIeOBsnUhzEaLMWmjJpycllNHGAPJ6CkR33TQHbqIul5Ci786JtXZh+/8gK92yPtQl6NCJwHsweJgQXIDj0TPRUAR3XlgiPX/v+r0ZEhM32e8A72qfC/Puo9D+X2oYTzt4KyuJQJnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BeAchXyk; arc=none smtp.client-ip=198.175.65.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,26 +36,26 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1741870081; x=1773406081;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=8csem5A7kRdfdWUeU3nWExqMdRsWoGi8C+G2sr7HFJ4=;
-  b=OeJ0QX6k1RfZuKyxiuLuvHyekx//CSg6qmBODDsRxz8hSdoSV0DuMD9T
-   0wslkUMBowI3Ip/q0DGlZmFqDBDCx/O9r1UNfNOlmHRg9kKol9+dfNNm2
-   u6H/nW3OWzQBuKrEmC/zrc4rTlk8v+OxjZJLPKeNcBly5qJfmg7g7ApoJ
-   7KQvfvVQdZhOWbMx6CJhTG1ur5AQsuEBwOA3W092ucHMM63lppkdXy8vj
-   DCTW7dn3KH8YWZJPuTGlGPbL4YNu62gf6AjI6/9q4N40BMC+M6qPqW4qG
-   G0ykxfFHgFP3hBDbSuD6zsj1N06dC94IFJKNB2uUe8p4ML1lz/j5CDBA2
-   Q==;
-X-CSE-ConnectionGUID: RA/93YnyROKZnYbeaA1MxA==
-X-CSE-MsgGUID: wu6wsUw4RqOmkcBkev6COA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11372"; a="60383577"
+  bh=LRaXO1+32bJRdfqcjTqD5LQPp1lOusyunjM2/8RSuoQ=;
+  b=BeAchXykZqgk78B8k+RE6Zxj35YCPkfFOKn2AJJ1evxzMcHMp5mC/Ict
+   DsRvWQW4dNMtspkqZBrH0b9ahjFOhgz+GT44SYAvkdh0NiXeN/s4fzJ1G
+   j+v/KR6xgoKWoUJ0RVMED8HvCDqOe0lAQZC+Wpl3e/kjHsRhViDCwVD2B
+   FKnSoY6E86DsMZGFxhgBU4eKVPalUg2flxTIYYBuPxsWE+6AqtiKpM//o
+   MwHfM1lVMEU2qSSUkGYzC6EfgMLyELfqmlf2Ia8tMNkSsG6QNqbfb4GDn
+   yaOWpy+ba46LniVw31iNOKmtBpsclai01MHLop3RzrIUVzSp/EkomJzE+
+   g==;
+X-CSE-ConnectionGUID: KhycJIAYTj65tVtt+rKLwg==
+X-CSE-MsgGUID: 5Bl8R8EjQDmzeW9zwMDDeg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11372"; a="60383583"
 X-IronPort-AV: E=Sophos;i="6.14,244,1736841600"; 
-   d="scan'208";a="60383577"
+   d="scan'208";a="60383583"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
   by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 05:47:56 -0700
-X-CSE-ConnectionGUID: apDpraOvSTqKS3UIARZQ4w==
-X-CSE-MsgGUID: vQ0xVvYmTtyZMYxSDvwRXA==
+X-CSE-ConnectionGUID: LaqVLtGzQxa9vNiItoNApw==
+X-CSE-MsgGUID: F46jp/s6SeK6IFKOixQIgw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.14,244,1736841600"; 
-   d="scan'208";a="158095333"
+   d="scan'208";a="158095337"
 Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
   by orviesa001.jf.intel.com with ESMTP; 13 Mar 2025 05:47:55 -0700
 From: Yi Liu <yi.l.liu@intel.com>
@@ -71,9 +71,9 @@ Cc: jgg@nvidia.com,
 	willy@infradead.org,
 	zhangfei.gao@linaro.org,
 	vasant.hegde@amd.com
-Subject: [PATCH v8 4/5] iommufd: Extend IOMMU_GET_HW_INFO to report PASID capability
-Date: Thu, 13 Mar 2025 05:47:52 -0700
-Message-Id: <20250313124753.185090-5-yi.l.liu@intel.com>
+Subject: [PATCH v8 5/5] iommufd/selftest: Add coverage for reporting max_pasid_log2 via IOMMU_HW_INFO
+Date: Thu, 13 Mar 2025 05:47:53 -0700
+Message-Id: <20250313124753.185090-6-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250313124753.185090-1-yi.l.liu@intel.com>
 References: <20250313124753.185090-1-yi.l.liu@intel.com>
@@ -85,187 +85,140 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-PASID usage requires PASID support in both device and IOMMU. Since the
-iommu drivers always enable the PASID capability for the device if it
-is supported, this extends the IOMMU_GET_HW_INFO to report the PASID
-capability to userspace. Also, enhances the selftest accordingly.
+IOMMU_HW_INFO is extended to report max_pasid_log2, hence add coverage
+for it.
 
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-Tested-by: Zhangfei Gao <zhangfei.gao@linaro.org> #aarch64 platform
 Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 ---
- drivers/iommu/iommufd/device.c | 35 +++++++++++++++++++++++++++++++++-
- drivers/pci/ats.c              | 33 ++++++++++++++++++++++++++++++++
- include/linux/pci-ats.h        |  3 +++
- include/uapi/linux/iommufd.h   | 14 +++++++++++++-
- 4 files changed, 83 insertions(+), 2 deletions(-)
+ tools/testing/selftests/iommu/iommufd.c        | 18 ++++++++++++++++++
+ .../testing/selftests/iommu/iommufd_fail_nth.c |  3 ++-
+ tools/testing/selftests/iommu/iommufd_utils.h  | 17 +++++++++++++----
+ 3 files changed, 33 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/iommu/iommufd/device.c b/drivers/iommu/iommufd/device.c
-index 70da39f5e227..1f3bec61bcf9 100644
---- a/drivers/iommu/iommufd/device.c
-+++ b/drivers/iommu/iommufd/device.c
-@@ -3,6 +3,8 @@
-  */
- #include <linux/iommu.h>
- #include <linux/iommufd.h>
-+#include <linux/pci.h>
-+#include <linux/pci-ats.h>
- #include <linux/slab.h>
- #include <uapi/linux/iommufd.h>
- #include <linux/msi.h>
-@@ -1535,7 +1537,8 @@ int iommufd_get_hw_info(struct iommufd_ucmd *ucmd)
- 	void *data;
- 	int rc;
+diff --git a/tools/testing/selftests/iommu/iommufd.c b/tools/testing/selftests/iommu/iommufd.c
+index c41d15e91983..f06e0f554608 100644
+--- a/tools/testing/selftests/iommu/iommufd.c
++++ b/tools/testing/selftests/iommu/iommufd.c
+@@ -342,12 +342,14 @@ FIXTURE(iommufd_ioas)
+ 	uint32_t hwpt_id;
+ 	uint32_t device_id;
+ 	uint64_t base_iova;
++	uint32_t pasid_device_id;
+ };
  
--	if (cmd->flags || cmd->__reserved)
-+	if (cmd->flags || cmd->__reserved[0] || cmd->__reserved[1] ||
-+	    cmd->__reserved[2])
- 		return -EOPNOTSUPP;
+ FIXTURE_VARIANT(iommufd_ioas)
+ {
+ 	unsigned int mock_domains;
+ 	unsigned int memory_limit;
++	bool pasid_capable;
+ };
  
- 	idev = iommufd_get_device(ucmd, cmd->dev_id);
-@@ -1592,6 +1595,36 @@ int iommufd_get_hw_info(struct iommufd_ucmd *ucmd)
- 	if (device_iommu_capable(idev->dev, IOMMU_CAP_DIRTY_TRACKING))
- 		cmd->out_capabilities |= IOMMU_HW_CAP_DIRTY_TRACKING;
- 
-+	cmd->out_max_pasid_log2 = 0;
-+	/*
-+	 * Currently, all iommu drivers enable PASID in the probe_device()
-+	 * op if iommu and device supports it. So the max_pasids stored in
-+	 * dev->iommu indicates both PASID support and enable status. A
-+	 * non-zero dev->iommu->max_pasids means PASID is supported and
-+	 * enabled. The iommufd only reports PASID capability to userspace
-+	 * if it's enabled.
-+	 */
-+	if (idev->dev->iommu->max_pasids) {
-+		cmd->out_max_pasid_log2 = ilog2(idev->dev->iommu->max_pasids);
+ FIXTURE_SETUP(iommufd_ioas)
+@@ -372,6 +374,12 @@ FIXTURE_SETUP(iommufd_ioas)
+ 					     IOMMU_TEST_DEV_CACHE_DEFAULT);
+ 		self->base_iova = MOCK_APERTURE_START;
+ 	}
 +
-+		if (dev_is_pci(idev->dev)) {
-+			struct pci_dev *pdev = to_pci_dev(idev->dev);
-+			int ctrl;
-+
-+			ctrl = pci_pasid_status(pdev);
-+
-+			WARN_ON_ONCE(ctrl < 0 ||
-+				     !(ctrl & PCI_PASID_CTRL_ENABLE));
-+
-+			if (ctrl & PCI_PASID_CTRL_EXEC)
-+				cmd->out_capabilities |=
-+						IOMMU_HW_CAP_PCI_PASID_EXEC;
-+			if (ctrl & PCI_PASID_CTRL_PRIV)
-+				cmd->out_capabilities |=
-+						IOMMU_HW_CAP_PCI_PASID_PRIV;
-+		}
-+	}
-+
- 	rc = iommufd_ucmd_respond(ucmd, sizeof(*cmd));
- out_free:
- 	kfree(data);
-diff --git a/drivers/pci/ats.c b/drivers/pci/ats.c
-index c6b266c772c8..ec6c8dbdc5e9 100644
---- a/drivers/pci/ats.c
-+++ b/drivers/pci/ats.c
-@@ -538,4 +538,37 @@ int pci_max_pasids(struct pci_dev *pdev)
- 	return (1 << FIELD_GET(PCI_PASID_CAP_WIDTH, supported));
++	if (variant->pasid_capable)
++		test_cmd_mock_domain_flags(self->ioas_id,
++					   MOCK_FLAGS_DEVICE_PASID,
++					   NULL, NULL,
++					   &self->pasid_device_id);
  }
- EXPORT_SYMBOL_GPL(pci_max_pasids);
-+
-+/**
-+ * pci_pasid_status - Check the PASID status
-+ * @pdev: PCI device structure
-+ *
-+ * Returns a negative value when no PASID capability is present.
-+ * Otherwise the value of the control register is returned.
-+ * Status reported are:
-+ *
-+ * PCI_PASID_CTRL_ENABLE - PASID enabled
-+ * PCI_PASID_CTRL_EXEC - Execute permission enabled
-+ * PCI_PASID_CTRL_PRIV - Privileged mode enabled
-+ */
-+int pci_pasid_status(struct pci_dev *pdev)
-+{
-+	int pasid;
-+	u16 ctrl;
-+
-+	if (pdev->is_virtfn)
-+		pdev = pci_physfn(pdev);
-+
-+	pasid = pdev->pasid_cap;
-+	if (!pasid)
-+		return -EINVAL;
-+
-+	pci_read_config_word(pdev, pasid + PCI_PASID_CTRL, &ctrl);
-+
-+	ctrl &= PCI_PASID_CTRL_ENABLE | PCI_PASID_CTRL_EXEC |
-+		PCI_PASID_CTRL_PRIV;
-+
-+	return ctrl;
-+}
-+EXPORT_SYMBOL_GPL(pci_pasid_status);
- #endif /* CONFIG_PCI_PASID */
-diff --git a/include/linux/pci-ats.h b/include/linux/pci-ats.h
-index 0e8b74e63767..75c6c86cf09d 100644
---- a/include/linux/pci-ats.h
-+++ b/include/linux/pci-ats.h
-@@ -42,6 +42,7 @@ int pci_enable_pasid(struct pci_dev *pdev, int features);
- void pci_disable_pasid(struct pci_dev *pdev);
- int pci_pasid_features(struct pci_dev *pdev);
- int pci_max_pasids(struct pci_dev *pdev);
-+int pci_pasid_status(struct pci_dev *pdev);
- #else /* CONFIG_PCI_PASID */
- static inline int pci_enable_pasid(struct pci_dev *pdev, int features)
- { return -EINVAL; }
-@@ -50,6 +51,8 @@ static inline int pci_pasid_features(struct pci_dev *pdev)
- { return -EINVAL; }
- static inline int pci_max_pasids(struct pci_dev *pdev)
- { return -EINVAL; }
-+static inline int pci_pasid_status(struct pci_dev *pdev)
-+{ return -EINVAL; }
- #endif /* CONFIG_PCI_PASID */
  
- #endif /* LINUX_PCI_ATS_H */
-diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
-index 75905f59b87f..ac9469576b51 100644
---- a/include/uapi/linux/iommufd.h
-+++ b/include/uapi/linux/iommufd.h
-@@ -611,9 +611,17 @@ enum iommu_hw_info_type {
-  *                                   IOMMU_HWPT_GET_DIRTY_BITMAP
-  *                                   IOMMU_HWPT_SET_DIRTY_TRACKING
-  *
-+ * @IOMMU_HW_CAP_PASID_EXEC: Execute Permission Supported, user ignores it
-+ *                           when the struct iommu_hw_info::out_max_pasid_log2
-+ *                           is zero.
-+ * @IOMMU_HW_CAP_PASID_PRIV: Privileged Mode Supported, user ignores it
-+ *                           when the struct iommu_hw_info::out_max_pasid_log2
-+ *                           is zero.
-  */
- enum iommufd_hw_capabilities {
- 	IOMMU_HW_CAP_DIRTY_TRACKING = 1 << 0,
-+	IOMMU_HW_CAP_PCI_PASID_EXEC = 1 << 1,
-+	IOMMU_HW_CAP_PCI_PASID_PRIV = 1 << 2,
+ FIXTURE_TEARDOWN(iommufd_ioas)
+@@ -387,6 +395,7 @@ FIXTURE_VARIANT_ADD(iommufd_ioas, no_domain)
+ FIXTURE_VARIANT_ADD(iommufd_ioas, mock_domain)
+ {
+ 	.mock_domains = 1,
++	.pasid_capable = true,
  };
  
- /**
-@@ -629,6 +637,9 @@ enum iommufd_hw_capabilities {
-  *                 iommu_hw_info_type.
-  * @out_capabilities: Output the generic iommu capability info type as defined
-  *                    in the enum iommu_hw_capabilities.
-+ * @out_max_pasid_log2: Output the width of PASIDs. 0 means no PASID support.
-+ *                      PCI devices turn to out_capabilities to check if the
-+ *                      specific capabilities is supported or not.
-  * @__reserved: Must be 0
-  *
-  * Query an iommu type specific hardware information data from an iommu behind
-@@ -652,7 +663,8 @@ struct iommu_hw_info {
- 	__u32 data_len;
- 	__aligned_u64 data_uptr;
- 	__u32 out_data_type;
--	__u32 __reserved;
-+	__u8 out_max_pasid_log2;
-+	__u8 __reserved[3];
- 	__aligned_u64 out_capabilities;
- };
- #define IOMMU_GET_HW_INFO _IO(IOMMUFD_TYPE, IOMMUFD_CMD_GET_HW_INFO)
+ FIXTURE_VARIANT_ADD(iommufd_ioas, two_mock_domain)
+@@ -752,6 +761,8 @@ TEST_F(iommufd_ioas, get_hw_info)
+ 	} buffer_smaller;
+ 
+ 	if (self->device_id) {
++		uint8_t max_pasid = 0;
++
+ 		/* Provide a zero-size user_buffer */
+ 		test_cmd_get_hw_info(self->device_id, NULL, 0);
+ 		/* Provide a user_buffer with exact size */
+@@ -766,6 +777,13 @@ TEST_F(iommufd_ioas, get_hw_info)
+ 		 * the fields within the size range still gets updated.
+ 		 */
+ 		test_cmd_get_hw_info(self->device_id, &buffer_smaller, sizeof(buffer_smaller));
++		test_cmd_get_hw_info_pasid(self->device_id, &max_pasid);
++		ASSERT_EQ(0, max_pasid);
++		if (variant->pasid_capable) {
++			test_cmd_get_hw_info_pasid(self->pasid_device_id,
++						   &max_pasid);
++			ASSERT_EQ(20, max_pasid);
++		}
+ 	} else {
+ 		test_err_get_hw_info(ENOENT, self->device_id,
+ 				     &buffer_exact, sizeof(buffer_exact));
+diff --git a/tools/testing/selftests/iommu/iommufd_fail_nth.c b/tools/testing/selftests/iommu/iommufd_fail_nth.c
+index 6bbdc187a986..121e714a3183 100644
+--- a/tools/testing/selftests/iommu/iommufd_fail_nth.c
++++ b/tools/testing/selftests/iommu/iommufd_fail_nth.c
+@@ -664,7 +664,8 @@ TEST_FAIL_NTH(basic_fail_nth, device)
+ 					&self->stdev_id, NULL, &idev_id))
+ 		return -1;
+ 
+-	if (_test_cmd_get_hw_info(self->fd, idev_id, &info, sizeof(info), NULL))
++	if (_test_cmd_get_hw_info(self->fd, idev_id, &info,
++				  sizeof(info), NULL, NULL))
+ 		return -1;
+ 
+ 	if (_test_cmd_hwpt_alloc(self->fd, idev_id, ioas_id, 0,
+diff --git a/tools/testing/selftests/iommu/iommufd_utils.h b/tools/testing/selftests/iommu/iommufd_utils.h
+index 523ff28e4bc9..8ed05838787d 100644
+--- a/tools/testing/selftests/iommu/iommufd_utils.h
++++ b/tools/testing/selftests/iommu/iommufd_utils.h
+@@ -757,7 +757,8 @@ static void teardown_iommufd(int fd, struct __test_metadata *_metadata)
+ 
+ /* @data can be NULL */
+ static int _test_cmd_get_hw_info(int fd, __u32 device_id, void *data,
+-				 size_t data_len, uint32_t *capabilities)
++				 size_t data_len, uint32_t *capabilities,
++				 uint8_t *max_pasid)
+ {
+ 	struct iommu_test_hw_info *info = (struct iommu_test_hw_info *)data;
+ 	struct iommu_hw_info cmd = {
+@@ -802,6 +803,9 @@ static int _test_cmd_get_hw_info(int fd, __u32 device_id, void *data,
+ 			assert(!info->flags);
+ 	}
+ 
++	if (max_pasid)
++		*max_pasid = cmd.out_max_pasid_log2;
++
+ 	if (capabilities)
+ 		*capabilities = cmd.out_capabilities;
+ 
+@@ -810,14 +814,19 @@ static int _test_cmd_get_hw_info(int fd, __u32 device_id, void *data,
+ 
+ #define test_cmd_get_hw_info(device_id, data, data_len)               \
+ 	ASSERT_EQ(0, _test_cmd_get_hw_info(self->fd, device_id, data, \
+-					   data_len, NULL))
++					   data_len, NULL, NULL))
+ 
+ #define test_err_get_hw_info(_errno, device_id, data, data_len)               \
+ 	EXPECT_ERRNO(_errno, _test_cmd_get_hw_info(self->fd, device_id, data, \
+-						   data_len, NULL))
++						   data_len, NULL, NULL))
+ 
+ #define test_cmd_get_hw_capabilities(device_id, caps, mask) \
+-	ASSERT_EQ(0, _test_cmd_get_hw_info(self->fd, device_id, NULL, 0, &caps))
++	ASSERT_EQ(0, _test_cmd_get_hw_info(self->fd, device_id, NULL, \
++					   0, &caps, NULL))
++
++#define test_cmd_get_hw_info_pasid(device_id, max_pasid)              \
++	ASSERT_EQ(0, _test_cmd_get_hw_info(self->fd, device_id, NULL, \
++					   0, NULL, max_pasid))
+ 
+ static int _test_ioctl_fault_alloc(int fd, __u32 *fault_id, __u32 *fault_fd)
+ {
 -- 
 2.34.1
 
