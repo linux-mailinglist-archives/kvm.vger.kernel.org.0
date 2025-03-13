@@ -1,87 +1,87 @@
-Return-Path: <kvm+bounces-40988-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40989-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 583E6A60210
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 21:11:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B7DEA60211
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 21:11:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1699B1893EC4
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 20:11:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA2E619C32E0
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 20:12:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE09E1F5616;
-	Thu, 13 Mar 2025 20:10:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34CA21F582A;
+	Thu, 13 Mar 2025 20:10:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="UNpWwRFt";
-	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="EwxlRRyV"
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="wUJsdM40";
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="Xvk9PFqH"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0a-002c1b01.pphosted.com (mx0a-002c1b01.pphosted.com [148.163.151.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 475091F460A;
-	Thu, 13 Mar 2025 20:10:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEBA01F461A;
+	Thu, 13 Mar 2025 20:10:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.151.68
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741896638; cv=fail; b=kID+jH4l2relUdjDgdXESw/UZ9p92eHDzBqmwbbIt0JD9FcXf9p0UTx2wbe89yS1cCKgcZD1fhSeCk0uIso1DlNqYaOa0y7v7MpOd7UExmrtf6IdiyH3gvV03xqWj3Zc3RsovrFj2fmtZQyQmP3PxHJlo3hDqupmCUfPy7O74Nc=
+	t=1741896639; cv=fail; b=FtOQqRbd2IqrvEC2Tinsb7yxFskoV/kgHTYzXfW0r5fS8X14b6ioEG3XWjMZaTIZ6Uz0z+MhFqArMyxpx40UDtflir/DRhK6hjwVp+CUNr+Z/O0rZkBYKrLEfacTIskZ0iykiXCKXiIbSZJqzr5xqaR2hGOHHYDn2zZxXq7tWIY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741896638; c=relaxed/simple;
-	bh=DRKjt0qA81aiSZvCi2IxGF62FCtcNJgDkKWReNddGfQ=;
+	s=arc-20240116; t=1741896639; c=relaxed/simple;
+	bh=EqGC0XyMKe+4qwe2v8z2VCLzfFzDi+/BUAlMhzLbAJY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=KlZywWEBuOWmrDjCLUqYBC0/SK6hAHnAmtPthAAeRA4gYTiN/7TOzICClEP0bZOJnlz4oEwf7PJsUyheGXY18BV8RueZzXm4QMGP5RLsi9adizUEdGIUfjTr3xnTR+lFCwxC5XTXCnk0JzXmJjf6IznpHQnb3A0EH3WncTHfYOM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com; spf=pass smtp.mailfrom=nutanix.com; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=UNpWwRFt; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=EwxlRRyV; arc=fail smtp.client-ip=148.163.151.68
+	 Content-Type:MIME-Version; b=Uiy5RhHR283OhLehqi5NOR51xZEeNW2BGO6ViXVrVczETE/RyTrHfl/l7JW7CQuShz5UbRy952AXuBJv4iRnoGj4OgipmN6sKJUvwQ6UVZjtGM239DsP98bgww1HkNoIT+2zhLWsIShh7NS96Qod2mgiVIM3/khlYkTfeL1wYbk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com; spf=pass smtp.mailfrom=nutanix.com; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=wUJsdM40; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=Xvk9PFqH; arc=fail smtp.client-ip=148.163.151.68
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nutanix.com
-Received: from pps.filterd (m0127837.ppops.net [127.0.0.1])
-	by mx0a-002c1b01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52DF21e2009007;
-	Thu, 13 Mar 2025 13:10:03 -0700
+Received: from pps.filterd (m0127840.ppops.net [127.0.0.1])
+	by mx0a-002c1b01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52DEHlEQ011333;
+	Thu, 13 Mar 2025 13:10:06 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=
-	proofpoint20171006; bh=mwggFSD4i1qyf+HJLFYEPAPR9S5ROs80B8RwNDIwb
-	VQ=; b=UNpWwRFt4HFzAbGkIHuR300QGnoxD9F7ivVauFwnLeeb86u8JwRh5W6ca
-	PU3Fq5GPmxfdGa2n/iHjPO+B6oKg5LH4eLQbSVsmKs2/3/gXwpEd9T1SsvIcqIvM
-	YxMlP3g3N2TGkiGFuC4LmKzz9sXS+m0Qh5aa4ijp1kf65Dwi8kd4u/lTs72IX2UI
-	rUL8DHqaKJg5yJtkuk7Xn0xDwLK9PVQ4w7He2jvIkpxT977xbAmMSumSOMJVEL/U
-	JAy7seJDDNJkaUhUm5NAeem8LRLIEv27GpTnnARMjk6jZCscKYc3BB337gQoTOgo
-	nGIsXc0JDcY1cV/AvJevBWOB8Rr/g==
-Received: from cy3pr05cu001.outbound.protection.outlook.com (mail-westcentralusazlp17013078.outbound.protection.outlook.com [40.93.6.78])
-	by mx0a-002c1b01.pphosted.com (PPS) with ESMTPS id 45au9g67gr-1
+	proofpoint20171006; bh=2DmUMIV4J8hEjE5cHRymeGyE2BjOoY2xnCA0PVk1k
+	xs=; b=wUJsdM40CEpb7d63dumEgyRZMzYV0IfV99by0synT7/46Phg5pKy7nUDN
+	+zy3YnkaldgR972KnoXzdT3RViOCX/zLqZG8JuY3oDPvsNUY1osfL2cgMAjQ+shd
+	KKTFJQLlfSRGgEWTqNltF6D+SJ8dWD2cFs+O8w6kTxSPxvtMvqc6hO2pdhBNlPSw
+	B2OeN8vOl3JIl6WnDEcdTd3qbo2qA/3MaFBiQmMgZtvblSGr5X2eWh1yKVCWPxO3
+	OTUvvudvHN/YMmp08J93c+Adiq1AbF0x/LsiQppBLP/RxuG0L4S3S36mmxSIXNHx
+	9zwmO7A495A/LQSTBqGBEkM9ROeLg==
+Received: from sa9pr02cu001.outbound.protection.outlook.com (mail-southcentralusazlp17011030.outbound.protection.outlook.com [40.93.14.30])
+	by mx0a-002c1b01.pphosted.com (PPS) with ESMTPS id 45au9ge75p-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 13 Mar 2025 13:10:02 -0700 (PDT)
+	Thu, 13 Mar 2025 13:10:06 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qo0t+3t+mrr6LpNmkVDpFnNxBCyTkH3T/pBcHr0QBLrWIsPLMgt9H07cVJ6ntzc7IcBjiY7TVNFTfgFFOkJelo83RonfjgDC6aqoUH4mGSuqjHudcUvY9U3mi78h5vsgBY6qzEJUqxTFp23plMizsaZOWLrtF52yot7Miks4TexU6JGUnFavY3xWnTHeyfK9JEt3LTQa7NbtuZ9eBmZydS5I9H+d61Q9WYSfyCKoTk5TeddGaTTmAeZYdGrQF+//QE2gCyXyUHzdwaT6emGKVQn7giq6FGcTGOA013BWf8KPhp+JvZ2VxLW+tbjA9aS9OSPJMf3woYXhO6YTnHqv2Q==
+ b=XeD+G+ZAxzdkbX58cWlleRQ4oH4KcbLK3U61dp0PfcPLs5YXk8Twg1jySsfd1YvpYJl/K/pdIve8iHtxHe/TigSGe0KpcHOzzBI+Opdbyd0c1y3F7DbBlm7VeXvJLz++UtdmSDrJldHaYF/Gtoa9STPDg8A0exoSrRaV3OfB3nqU5XjkbJUds1iiPWDbN+ya2sdVOQjr/FDLDeq//D8E3K32O1Twg9VphpZBRx53szdmZ5hzah5aA7p3twbH49XMdXZRi18gnsk3viU0AmiGehAn4Qr4L9rlwdf9IJ68ccv8eSoiWbpbbvRgHLbzaGl9nlOX2zq2pdW2VTmOgJqszg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mwggFSD4i1qyf+HJLFYEPAPR9S5ROs80B8RwNDIwbVQ=;
- b=hgMD+Jb/NCQaVct/n4WRjOocjTETHTTPr0rTPj+h/Osm+3vYgaM0E7O2Qn1R/KKRI8Obt5gSIB9a8N6Us7VoayZ3E0MRovIRtp57hi/qocY7V3xDLru54+wYrWmRANZ8am16kxDvGoiquHZ0uZmXfRAqIgL5LW8dU7BMY7awXNq+patirqWRsPAwA5Y37nCRp0iJCnwATuXL6mMAMxW3QkdhwMo/KVdTsHmUWtMRPkf6ffHxtxmnn9KnzTKnqqcnodZBrOlFSzlHbEJuIDdCOJV0xqQcwsNYNgpgRn2RKCngfH09NV6hBoYE0YzM5iCj4IhF8qr0IrLGh6U00d5cQw==
+ bh=2DmUMIV4J8hEjE5cHRymeGyE2BjOoY2xnCA0PVk1kxs=;
+ b=ZRRT1a7TeO8gOrUW20C0+v7rdXkTfjL1O3iV3JeFItU4SuOYD/m68YmLB+RvQB7sVDX0Ygnm3568VaytqwzLknqJhRqY5Wv6QRUOnvNNdbrbQltecPq44Jr9Yc931F08wRmwOOs1vvmvZ9Ij3+tK+JN5l6K2/cU67V98pKhZZxcDN9PtoAdTXBLD6I5mGEYODPPnmmpeR3OWnckHFUgf9KqP+e2Y8EZhdkiOUT7TqZMgMyay8HoxMIF6uVz++cHn2WpO4S1nCcv+F/loL3++gcHI5ZiiEv8Nfddh/g/kJfGrdcftF5FaTthuhXFdhHEGBvhoTc0veMeo293EqAdLPw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
  dkim=pass header.d=nutanix.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mwggFSD4i1qyf+HJLFYEPAPR9S5ROs80B8RwNDIwbVQ=;
- b=EwxlRRyVe0SoOBsdsa4d0F/NWDF51O+yzgXYLqlCyxG+qQ8jOWfk6Oq+ppUiGiB3DbEaU4fEqT7X7lxOhlEWQ9qry3bm/LLAvLOBJr+gyqj37yeqcprh5VhSi+WS4eJyFeQwcDIAK0dmpwkUZZug3s0IUzSQ/tc4z3Oabmt5KcYD2KpRzHW1IPd6AfZoTnuEwvDPGJj1pZKSE68vUiEiw37KtJ4BAp3UkcsLrT20dqIy88sZBaHgfsiL73d6874ijZWWzlx0zvmC4W/ZU5/XT/1+vwtPqIPAEvjwIVPqfrhU3xV6raKRsXAmPG8FvpAVbCbNQXWiNIJBqs3oNgPfpw==
+ bh=2DmUMIV4J8hEjE5cHRymeGyE2BjOoY2xnCA0PVk1kxs=;
+ b=Xvk9PFqHY2L9vZ0Y26d2IUpOHoZZ7Pw/7+EoNbXCV09fnfOAVADiSPHgQhycs1+RN2n2LzhN5kqd/hOSebkHdFPFSdRG4WgF3AcbiKSK2Ywi44tk1gyfX62HfvjLouYpximVNeTCuSjlPfwJiEzDII1Y5GaOeDlFjtx145Uki0GxkbAaPDgDCFOgkviILcMiuG6D6I7v9/9O1mLPl0bvWirn4R9qvPex3SJmMDy+2I5YTxb4Ec3Im/Q9CgXV+HRwLVd5Irjcfpb1qVbD87s/WFlCNyROmP26JyWZuEIU74OIFBoeoaDy+1lCvOR8/lZKLqWkTJHKNM8pblJ8ywXgeQ==
 Received: from LV8PR02MB10287.namprd02.prod.outlook.com
  (2603:10b6:408:1fa::10) by PH0PR02MB9384.namprd02.prod.outlook.com
  (2603:10b6:510:280::17) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.28; Thu, 13 Mar
- 2025 20:10:01 +0000
+ 2025 20:10:04 +0000
 Received: from LV8PR02MB10287.namprd02.prod.outlook.com
  ([fe80::b769:6234:fd94:5054]) by LV8PR02MB10287.namprd02.prod.outlook.com
  ([fe80::b769:6234:fd94:5054%4]) with mapi id 15.20.8534.028; Thu, 13 Mar 2025
- 20:10:01 +0000
+ 20:10:04 +0000
 From: Jon Kohler <jon@nutanix.com>
 To: seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
         mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
         x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Cc: Jon Kohler <jon@nutanix.com>, Nikolay Borisov <nik.borisov@suse.com>
-Subject: [RFC PATCH 02/18] KVM: nVMX: Decouple EPT RWX bits from EPT Violation protection bits
-Date: Thu, 13 Mar 2025 13:36:41 -0700
-Message-ID: <20250313203702.575156-3-jon@nutanix.com>
+Cc: Jon Kohler <jon@nutanix.com>
+Subject: [RFC PATCH 03/18] KVM: x86: Add module parameter for Intel MBEC
+Date: Thu, 13 Mar 2025 13:36:42 -0700
+Message-ID: <20250313203702.575156-4-jon@nutanix.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250313203702.575156-1-jon@nutanix.com>
 References: <20250313203702.575156-1-jon@nutanix.com>
@@ -98,175 +98,133 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: LV8PR02MB10287:EE_|PH0PR02MB9384:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2fac5f9d-e011-41f2-3bcc-08dd626b08f9
+X-MS-Office365-Filtering-Correlation-Id: 6b23c938-4c7d-44e7-c27e-08dd626b0b0c
 x-proofpoint-crosstenant: true
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|52116014|1800799024|376014|7416014|366016|921020|38350700014|7053199007;
+	BCL:0;ARA:13230040|52116014|1800799024|376014|7416014|366016|921020|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Nzon/eTT9FMiUGoVFe4dbv+Fdnh+EVgoIdXAAjHsvfFV4489738/1riNLEAI?=
- =?us-ascii?Q?xPmjMXg6qtFhSNngLpk5QQhBB6VS/9N/FeCpniCfiiMNIusMHu4sTSmFs8Uk?=
- =?us-ascii?Q?fMCmQ2RSuTQFumnkQ+CRvnJXndB+9rjQqjXYcUY2qDwqyr7VgF7q0IkSL5W9?=
- =?us-ascii?Q?1xPdwF2Dfp5nMj4feoE7EBBG/xMVSicEMxdfYWfHlmyKMWDq7CT3Oe+8hUiV?=
- =?us-ascii?Q?EydsUY45WpwYfKmoZDCwJUQndH8XjrkEAIZ4Gg7ffg39L3H7C2hf8OPlW59j?=
- =?us-ascii?Q?bCnjOiWMXKFokQeYsZEmPrkBz9wMm+8Vx5KTGSMS2sVJCEZV15m3Lb4Il/hN?=
- =?us-ascii?Q?4NAw6gn4SzYQRUR0SPiP2ufzM5TGntWBS4DIgIuAy8mikwlRQBUKhD+ThKlp?=
- =?us-ascii?Q?TCLSugNN7T98PwtPR7kfJWqMJW/QBpC53YyjJJ0vsyiilpZVflT0G9YCHT+y?=
- =?us-ascii?Q?0Ztxd4vGeLmgRSpVWiZx/DfnZSDQCBPPr450bjhzADcn/vPuTRdUM6jbAeJM?=
- =?us-ascii?Q?qYsOzu5D1WLgYNGVX+99dHvNORZVcdqXL8gUHB0uNMFRShVING5hMYQDA09F?=
- =?us-ascii?Q?JY+lp3LAq5VOcOWjx41CaylitTozMNAqs3hTs6Qv3Xczx1tJC2+NS1QwDBAr?=
- =?us-ascii?Q?dV6VRpvdxljKS3Pyg2EQWeE1nM0dPfLEs62bjAtkUsAWBXHgufzlpFdt/oUI?=
- =?us-ascii?Q?oa19Gdg1x+0juoU+8i5X58KRyidj7KanLtIc6hgbUvr2H2NBlwY0GBVMBEMf?=
- =?us-ascii?Q?8NuXRL5B/i6hu7hCaClGreWVeocZtngCF5aiBmJDuFJ2uSp9VJFCESWJWlqt?=
- =?us-ascii?Q?i3q8hWVhtr3wNJAKcdF2U2HbLUju5RXVJHKx32FRTPpRyd6yGMa3USHcqsWs?=
- =?us-ascii?Q?ZS1oFaQy7mnEVSvLXMd+nPSCptqB/ttKuouecVcDWGQhExlflcOUn3chkdIO?=
- =?us-ascii?Q?ehu1SJyTfNIm9tbAt3w0U4xwqRFPytUWVHvY+UnBKy+82GQp2W0kD+61aGP+?=
- =?us-ascii?Q?lepkjUZk0t45mKdqOk2rEVNzN/45uIgpavifqpM4ikH4qdQAS7+hF5KGb8t4?=
- =?us-ascii?Q?EsHOKuzowe/jtjbHjaXbn2s26aCMTA2eJdVYHUC7jPU53fJCyYGt/WdU1soj?=
- =?us-ascii?Q?kPRfQamRwxYufYAH0m47WdE275HexJm0nxUbnMdc2N53Sm3bHSYomM1oiKZq?=
- =?us-ascii?Q?3XoXFK5/Hj92lglbvz+7odQNVj6hmi9a6/VZt/ePpim3lw7xnCEXeihv3ejf?=
- =?us-ascii?Q?BLMG1Iafxx7eIbRAPEYpJ5Q8gDzoj1PcHJ4mtgD8+tqHUsxuVJiIiyUM4dDc?=
- =?us-ascii?Q?m72FvDaC/i38vqP6uouMrZTeohXirg31qGjGU3eJ4WqZhYTjJsqX74ZtfV3f?=
- =?us-ascii?Q?78I+vowDh0k5/fQae0o1JhhQS/A0sh80qhPxHzq1YrahqakIhnIJQ0ZFdTDo?=
- =?us-ascii?Q?o6DCCJ5BLzVv0NsI+kJzMM3dcfHlSeW5F0YyENo/FxC4/LU4mHfc+w=3D=3D?=
+	=?us-ascii?Q?ystjVftkTglv2+CFio428WOxHKNuo//KUZBUpCNZ9X+S+fERyRFNI984SyaE?=
+ =?us-ascii?Q?ZSe5pFsUxsWyrIyXGwkGC9pg+4HrXOUHmdH/B2WmKjbxsObmhRol2/6QWb69?=
+ =?us-ascii?Q?0g9HluXHo5z0YBnY2W6LkR15nrpTeL/gaQlryBFm/3hwtEvHpvej45aoEP8n?=
+ =?us-ascii?Q?gshX4d83+1CYnJly/sFJ1+wDFC6XxRE4RyxItV+bR+wad2wh58DAjsva9KXS?=
+ =?us-ascii?Q?AvTQc/Cl1S7JHejUGPDPJESwxlD2PJ0A3migmCwm/rh3suenIJgPZ+AeniTB?=
+ =?us-ascii?Q?+/Dc1Bmstb0yZfS7SweMxhTLKuHoxP6HxTWqxbdY3e5ghlLYagurqHjVyNej?=
+ =?us-ascii?Q?JbMrsFMZ5gxSbTTa5Hj0Sr5QMdqIlKHX+CNviKDGNbhO40sId2TA4FjSk1rM?=
+ =?us-ascii?Q?ykOvyjNVu678OdKrMmJetFqzSXGDiKR6cOhff+ajBIBWr0zHzaNpBDgxSKEK?=
+ =?us-ascii?Q?hzQR2LWutBGGV7us/oRAaPg8HYwj4gqOEaKTbSWlZpzKRxHHGmOyZroSDRCL?=
+ =?us-ascii?Q?2YCozwBp/ZDkLBvYCGJBNlZc4XkyV52gPTmx1l+m7xJq9xSacBJRwnxfmmoA?=
+ =?us-ascii?Q?iN0e4cqRALMR66UW8CaeRB9wmc5P8qcvbPh9G0fLypkPz1sEsL6CEiwuyp7I?=
+ =?us-ascii?Q?PMPyOb00hfEoNlpw0m6Lwq1zkIuFAUqzr5GoYLLbTBcV+ocwYPsrNiWoCKV8?=
+ =?us-ascii?Q?/4xsSttB04kNs3Kv2HaNSUA+u+iBiLuwtQRqusOfEzb/MlCY+qW2UiZ7WNFz?=
+ =?us-ascii?Q?3x29Lb657WTfY4ghcDvuXE74cFx2z8ktbNBjy2vjHYLQpszAjHgVdTATIQiz?=
+ =?us-ascii?Q?Mvq6E/yL/aQXOZovdUjZyiZXR6JNW+IkIVfnGUdZ/7xzSZ0n4UqtPiC68PbN?=
+ =?us-ascii?Q?TVkaVi7X2weiUDwj59Iw+XBgU5zjNGq/Y9oAoI2zH+kq7fzEIcEUTqt9HvR8?=
+ =?us-ascii?Q?FhnqphDQW36lHYBD0CDiYRtcy+6mVQXghEAPLZ0YCUhgQTwqwwNLp+tllQF7?=
+ =?us-ascii?Q?F0eHWBh7XcVFg/hUF1zbuSzvwygogcaqgbU4dDhA96GoBw7QvBsXw6CTJzJs?=
+ =?us-ascii?Q?B0wjf5fTHidTRf4q5jj1nqE63IffmTzMu3xnBSKjRa8rWjt93OyJb5g4Tu7O?=
+ =?us-ascii?Q?1/MgipOgGOH2cV+z4M4oqk7HCjCtYY74lao8/1rphGPBsiEelan6d2YJpbzo?=
+ =?us-ascii?Q?NT6P/tr7v2y6Xk9jOYdE85n3mUniY1c6IJej9tvsHHLug3H/6xx/ui37PXcS?=
+ =?us-ascii?Q?J+MDreAJYQz3szYzsXsiHgXcgmTHFqJXam+VvmKuFe6f7oWR1zAIX6OAc8Zp?=
+ =?us-ascii?Q?wSllMJK/A8oZC/NLxIPpJgwGU5LUdjONN1SfdD/yfbgZf4MYhcVE3l/qyU7f?=
+ =?us-ascii?Q?PidudmrokHonMjq+3n4ET9YWkGlElNnCOU4sKFxKFJWcBgeBFpxP4HhaV1p3?=
+ =?us-ascii?Q?HvhWUOnrsOPasTC/4XEzK2c1a/slb4YjG+10c+Xs1mdHZZU5Prmh6g=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR02MB10287.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(1800799024)(376014)(7416014)(366016)(921020)(38350700014)(7053199007);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR02MB10287.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(1800799024)(376014)(7416014)(366016)(921020)(38350700014);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?AFUQk56AD+VfZfHX3BRfflBWWjdO/wcyD8MEDlejkAC1LrBoGjjFW2aCru/f?=
- =?us-ascii?Q?0rhARqnavvk3T9okN+v/N075vyMhMBlpKKAbDoT8FJZIKjAumloeW53nBCIX?=
- =?us-ascii?Q?8bkvu0V5nRuovWMWlJ+3KnnEApLxuN3TolPwZJ+M/81qg0otDFGy66UPbWbI?=
- =?us-ascii?Q?t0Gv6gL9wEylgFik/vSpHvmvrXzvD0K7Jeq0YEqYCemnVmOxE8KavjAckkPe?=
- =?us-ascii?Q?i+PdWzfgk3xs4adgnaHCxpfX8WnaWIOrKFJ6A+zymtE/O+U9o4UsDReaVHZa?=
- =?us-ascii?Q?+z3pbRx1HMrGjlhuqmDCN2Rfy6ynpb+dfYc9ZFyqnBoU9AHcv4dSE2jFWvtw?=
- =?us-ascii?Q?Bn7pvrh7A/3cy/HKR7OE2TnDbh9tzr9o8veEGACkuTz23ZdosYGdLDt+Gn54?=
- =?us-ascii?Q?UijbfXYSLY135DT5g/K9pCXeeG/ECcazPczVQ2tZzdnhm86wKelxWQBA30IL?=
- =?us-ascii?Q?jmKedLuU/9WuWS3QBHtFiMnDbUt6XhAqp7Mg29ZFYkhirRWi98xQ55a71ahf?=
- =?us-ascii?Q?nYtlqzYso0b8ADSbyBhCRVeR7a8KVsaHxh2fVCrR2yfPsWHPebxQn9XSnKh8?=
- =?us-ascii?Q?jL5e+oWrIz6rUkG2JJoIfYwhTX1HFwexeFC0XvXoqqeXw4aPlqO6epiEzKd4?=
- =?us-ascii?Q?K8eKNTd5LtnQEOBsEWjh/pAY+y6OZZd1CHYjZNUtnoUcW7CnLutgIuE8doBA?=
- =?us-ascii?Q?8l1Th+GzUyYJPWdw1j0g2yadskB28J01ZyPJANU8cc/fqdccxD970y09grL7?=
- =?us-ascii?Q?y0ED3JDgEerrzpcaRgnj9aQtJo2m620ZTG9IZHZjRf4ArbBMy4txxMjhEpe4?=
- =?us-ascii?Q?FP3BNK9PKjZXFGE40jOJt4brb7rKKcmB1i5sowD/fVCdHPdWnULQdOnn9Z2I?=
- =?us-ascii?Q?jFBFXwEgGk2XFKYsZt/FOpFcnH9VTSq+F/iIgDCWhIaPn1fK45AegiQ0UpOs?=
- =?us-ascii?Q?RZ8ZAGNrtL2TC+wEa0uaP79ShD/oPwoixbGEl3XLb6S1B5IBifBDy1i9ac5f?=
- =?us-ascii?Q?RSpUtJyYD2nWfggSmsTNQmaA0HGTDmREIxQNukfAXz1lJ9MoUD286PbzMfjA?=
- =?us-ascii?Q?uR1b+Rp04eD3OT5zdwdGIumosYkPy3ArQrxYWcuwhN4v6eQE5FizdyEaKV1j?=
- =?us-ascii?Q?mtRU89KEvC5niyNYyQxIsRc9Uy0q7oa6pnWG4Z3Rz7oR484h3t0nxCkNrbik?=
- =?us-ascii?Q?/LjpE5dNCXhzPKoGzKjdt3Xi+Q0BLo8Hi5cePFiuM2pATLgPiLFrcLkfqyF7?=
- =?us-ascii?Q?gm7y/wqXza8qZyb6W5g+f/GvyMoOMUHFH47tGVAHrLWwtr5DXlXoVOJ9MqUb?=
- =?us-ascii?Q?cmlXZg2LaPqaj4uF2gvXP6CfneLhZXlvWlXRZFOxhTqZV1q5mzP2/su4SIBL?=
- =?us-ascii?Q?G8OqgGqfQB4Fd+8/MMDYuz/ZUnRjJirSoaCWhFDoafnYfmlOpTtJOXQtA3zr?=
- =?us-ascii?Q?iqnw973GTIMtqCf4i+lLXxRLNXbpf1wxBsvNQ8GBbquph7T625HPTVtdipJJ?=
- =?us-ascii?Q?bdSSjNnL+KaZRjvpjuahCeH7n9JH1XWgeTHp/XqRNMI9bEkm7OuNEyb/oPsv?=
- =?us-ascii?Q?oVcal04sAQINFiDxJMxZ3bcy0TSgKGjc0EwaapaaHqEVbiSCiNB6kKtV30B8?=
- =?us-ascii?Q?pw=3D=3D?=
+	=?us-ascii?Q?KccG8f5nNSiM19OvOLHptjr0ICk3gVidTq3/Y7CX3AVOIwfRam3Bknz3xvYl?=
+ =?us-ascii?Q?F7uxk7VjVE3C9sPumCT1/MWgmDwj7OjziKCTdFBZHW0pNpSUDF5XAYPLy9yx?=
+ =?us-ascii?Q?URh0bikohi5J9yGuB/RbKcC95RAAE1zZtkjSq33qWhZFpoI6EBwecfv9tOzT?=
+ =?us-ascii?Q?WQBC3DsAoVkK5NyQsFqqj8g1c8tFm4VPa2eScCExFfLTF4IqRQyQm5eYiQ5h?=
+ =?us-ascii?Q?7BfRq043JU1pA1KIdYxTlvPbBa4Ta0dDL+2V9MKOnvDWmIs+noGmMaudL8zQ?=
+ =?us-ascii?Q?xF+b3VPwt7pVbqQoAqwhzBpTZoeFAL2n3BHjeFYK2Jo+CP307Bi2CxX/Neuw?=
+ =?us-ascii?Q?X4Xt5DQGT1FZjz2nD5/+/k78YkYk0HW5fhAr4E6Ttrek0RCq+B7LrY1ERbbt?=
+ =?us-ascii?Q?afnCPoLinAa0OipyJPX+RdYpxeq/DuHHZTTplz646Oj5AM/F7c3GLA7N9Iw4?=
+ =?us-ascii?Q?JpFZBwQ/sBVK4gd4hzU8NwolbfeFJye2fsVDsWaIo6UveEBemz/CF9xJdVis?=
+ =?us-ascii?Q?PzRmD59AkxzDt9olm1bKAaxKQzhOXes3ALCw3aWhkg+HY8h0ojWqBcguXMqV?=
+ =?us-ascii?Q?UQ0J0yJQtJd5ATzeEZTuzQljw5hZFcTdbREmoKmt8aatN4DLAXatAcFxcpy/?=
+ =?us-ascii?Q?q7d72MjJpBqqZI/fTyiSmlhpidrsguWVGjscmCPUGCfNBm0EXvLXKEsoLyBP?=
+ =?us-ascii?Q?eI7LZfWc8modGXKoCexld177n6nlSalXKImDXhWp00aTEinsqmJXyUBQh56H?=
+ =?us-ascii?Q?PkMdy7QMUUDITunztD4c3GFpwqT6VQPIMkqdhirvqdVTQpNDvDl3W2AD73NL?=
+ =?us-ascii?Q?pKxCmJHAj2QI+Wv4FTVG6Ch4dyqXKQ/+MPrHldhRn1CJfRxfapvx0zDnReg7?=
+ =?us-ascii?Q?qqE/He5SP5Xnw8+izEKBujmPZLqkU4xw7s1AMKuIF83o+hG3Alme0zIFglQJ?=
+ =?us-ascii?Q?/Hkj/Y3mIOqFi/wDgLVoUUiE8Eyt44yaO+HMU1m0F5BudIqH86JjyJp+M0jt?=
+ =?us-ascii?Q?c9htN9U7ATpwyutYi+ZTYLz/WxvWaBgXKi/BWzTzsrI+ffU4k+plgg1ClCuH?=
+ =?us-ascii?Q?bgafnJl2ZKhv27maoeRdbDooOB2eLqJYADWRrUXjZr8W+M8zhIbYkGN/YUgr?=
+ =?us-ascii?Q?iMCZlxdYWC1tuK6QZ9gpUfRPjZzMCirBNqrOSR9d8FfrDJymXcL2iKXMSMsp?=
+ =?us-ascii?Q?WnzgzBuUi8tVd+TRHKm3fgopOm+KovIm3z8l8GJTj95DLgYlM9E0yFqqMQUR?=
+ =?us-ascii?Q?eaD75I014QKZyx9EQK7m0iQJ1F3hUSfLkZhx8LExrZFnbdbLnzcVjuLm63Zz?=
+ =?us-ascii?Q?z9jYohpOS+y9iKjAToQ1lXJtuwP6gvIId68BsODw8RIiXElE+gUqf/hsYnw8?=
+ =?us-ascii?Q?Xi1ChfarhHcN6EuYGOg8sgbl4Zsw6xbu3qG4lexhDt02/4bnbA9pn568XGwE?=
+ =?us-ascii?Q?j+sWv1DGzkZKi92QaFVX/OpDCFkhnbaoffjSAlD6z6QXG2QjXa2bSIC1VALT?=
+ =?us-ascii?Q?zJypgYFZSN5Xlf33O/iKJbe5+gydv9G7r3Pc6LLMNIiwO2EbkGKP299FWtba?=
+ =?us-ascii?Q?bMU15AD9JOCgS/xtXppTwR24hv8E2ACtHLoEjOh4CH1duk2hEWbE3ymJmEVM?=
+ =?us-ascii?Q?3Q=3D=3D?=
 X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2fac5f9d-e011-41f2-3bcc-08dd626b08f9
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6b23c938-4c7d-44e7-c27e-08dd626b0b0c
 X-MS-Exchange-CrossTenant-AuthSource: LV8PR02MB10287.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2025 20:10:00.9580
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2025 20:10:04.4300
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: bb047546-786f-4de1-bd75-24e5b6f79043
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GN5TuPYqXYXwuTnk9OVKuGDWpuu/bgXaCnq0XzVLXvrtkTg0y6N6hqacZri81vaEBFxmcoMvNhJkASU4D58ErAz2eac/BncdWL8ioB662Go=
+X-MS-Exchange-CrossTenant-UserPrincipalName: SamjOmiLcpJLOTerjn/azDslRuA4BhX8j3evAhIEW+owSfNs2DMjabJCTqPfSNP4cfmKNAh6oWp2tHN0nDnvtVc1NCVpY5FjdIwRk2jk4PU=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR02MB9384
-X-Proofpoint-GUID: whR_QPESW8BAYtz--ZZsK4VUYjw963fV
-X-Proofpoint-ORIG-GUID: whR_QPESW8BAYtz--ZZsK4VUYjw963fV
-X-Authority-Analysis: v=2.4 cv=c4erQQ9l c=1 sm=1 tr=0 ts=67d33b9b cx=c_pps a=BALyy5icRfvvzfOMzojctg==:117 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=Vs1iUdzkB0EA:10
- a=H5OGdu5hBBwA:10 a=0kUYKlekyDsA:10 a=VwQbUJbxAAAA:8 a=1XWaLZrsAAAA:8 a=64Cc0HZtAAAA:8 a=iox4zFpeAAAA:8 a=3metJUBeehsC971iASgA:9 a=WzC6qhA0u3u7Ye7llzcV:22
+X-Proofpoint-GUID: oOYjARsPLUnahVdQ0vpl3EbJFDUzg5mD
+X-Proofpoint-ORIG-GUID: oOYjARsPLUnahVdQ0vpl3EbJFDUzg5mD
+X-Authority-Analysis: v=2.4 cv=P8U6hjAu c=1 sm=1 tr=0 ts=67d33b9e cx=c_pps a=uiDhKFZJcG2N7b6OoV3sKg==:117 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=Vs1iUdzkB0EA:10
+ a=H5OGdu5hBBwA:10 a=0kUYKlekyDsA:10 a=64Cc0HZtAAAA:8 a=jDXRym9R1P1Z0Gk8e-cA:9
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-03-13_09,2025-03-13_01,2024-11-22_01
 X-Proofpoint-Spam-Reason: safe
 
-From: Sean Christopherson <seanjc@google.com>
+Add 'enable_pt_guest_exec_control' module parameter to x86 code, with
+default value false. This parameter will control enablement for
+exposing Intel Mode Based Execution Control (aka MBEC).
 
-Define independent macros for the RWX protection bits that are enumerated
-via EXIT_QUALIFICATION for EPT Violations, and tie them to the RWX bits in
-EPT entries via compile-time asserts.  Piggybacking the EPTE defines works
-for now, but it creates holes in the EPT_VIOLATION_xxx macros and will
-cause headaches if/when KVM emulates Mode-Based Execution (MBEC), or any
-other features that introduces additional protection information.
+Place parameter in x86 common code as, notionally, AMD has a similar
+feature called Guest Mode Execute Trap (GMET), which may want to build
+off of this parameter in the future, similar to how 'enable_apicv' is
+shared across both Intel APICv and AMD AVIC.
 
-Opportunistically rename EPT_VIOLATION_RWX_MASK to EPT_VIOLATION_PROT_MASK
-so that it doesn't become stale if/when MBEC support is added.
-
-No functional change intended.
-
-Cc: Jon Kohler <jon@nutanix.com>
-Cc: Nikolay Borisov <nik.borisov@suse.com>
-Reviewed-by: Nikolay Borisov <nik.borisov@suse.com>
-Link: https://lore.kernel.org/r/20250227000705.3199706-3-seanjc@google.com
-Signed-off-by: Sean Christopherson <seanjc@google.com>
-(cherry picked from commit 61146f67e4cb67064ce3003d94ee19302d314fff)
-(cherry picked from commit 8cddacdb6a6a459c9425b4abd4c982cec89c25e4)
+Signed-off-by: Jon Kohler <jon@nutanix.com>
 
 ---
- arch/x86/include/asm/vmx.h     | 13 +++++++++++--
- arch/x86/kvm/mmu/paging_tmpl.h |  3 +--
- arch/x86/kvm/vmx/vmx.c         |  2 +-
- 3 files changed, 13 insertions(+), 5 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 1 +
+ arch/x86/kvm/x86.c              | 4 ++++
+ 2 files changed, 5 insertions(+)
 
-diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-index aabc223c6498..8707361b24da 100644
---- a/arch/x86/include/asm/vmx.h
-+++ b/arch/x86/include/asm/vmx.h
-@@ -580,14 +580,23 @@ enum vm_entry_failure_code {
- /*
-  * Exit Qualifications for EPT Violations
-  */
--#define EPT_VIOLATION_RWX_SHIFT		3
- #define EPT_VIOLATION_ACC_READ		BIT(0)
- #define EPT_VIOLATION_ACC_WRITE		BIT(1)
- #define EPT_VIOLATION_ACC_INSTR		BIT(2)
--#define EPT_VIOLATION_RWX_MASK		(VMX_EPT_RWX_MASK << EPT_VIOLATION_RWX_SHIFT)
-+#define EPT_VIOLATION_PROT_READ		BIT(3)
-+#define EPT_VIOLATION_PROT_WRITE	BIT(4)
-+#define EPT_VIOLATION_PROT_EXEC		BIT(5)
-+#define EPT_VIOLATION_PROT_MASK		(EPT_VIOLATION_PROT_READ  | \
-+					 EPT_VIOLATION_PROT_WRITE | \
-+					 EPT_VIOLATION_PROT_EXEC)
- #define EPT_VIOLATION_GVA_IS_VALID	BIT(7)
- #define EPT_VIOLATION_GVA_TRANSLATED	BIT(8)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 7cf2025a64a0..fd37dad38670 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1883,6 +1883,7 @@ struct kvm_arch_async_pf {
+ extern u32 __read_mostly kvm_nr_uret_msrs;
+ extern bool __read_mostly allow_smaller_maxphyaddr;
+ extern bool __read_mostly enable_apicv;
++extern bool __read_mostly enable_pt_guest_exec_control;
+ extern struct kvm_x86_ops kvm_x86_ops;
  
-+#define EPT_VIOLATION_RWX_TO_PROT(__epte) (((__epte) & VMX_EPT_RWX_MASK) << 3)
-+
-+static_assert(EPT_VIOLATION_RWX_TO_PROT(VMX_EPT_RWX_MASK) ==
-+	      (EPT_VIOLATION_PROT_READ | EPT_VIOLATION_PROT_WRITE | EPT_VIOLATION_PROT_EXEC));
+ #define kvm_x86_call(func) static_call(kvm_x86_##func)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 7bae9e9cc14e..4b2fbb9088ea 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -197,6 +197,10 @@ module_param(eager_page_split, bool, 0644);
+ static bool __read_mostly mitigate_smt_rsb;
+ module_param(mitigate_smt_rsb, bool, 0444);
+ 
++bool __read_mostly enable_pt_guest_exec_control;
++EXPORT_SYMBOL_GPL(enable_pt_guest_exec_control);
++module_param(enable_pt_guest_exec_control, bool, 0444);
 +
  /*
-  * Exit Qualifications for NOTIFY VM EXIT
-  */
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index ae7d39ff2d07..9bc3fc4a238b 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -510,8 +510,7 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
- 		 * Note, pte_access holds the raw RWX bits from the EPTE, not
- 		 * ACC_*_MASK flags!
- 		 */
--		walker->fault.exit_qualification |= (pte_access & VMX_EPT_RWX_MASK) <<
--						     EPT_VIOLATION_RWX_SHIFT;
-+		walker->fault.exit_qualification |= EPT_VIOLATION_RWX_TO_PROT(pte_access);
- 	}
- #endif
- 	walker->fault.address = addr;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 87206dabf020..7a98f03ef146 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5831,7 +5831,7 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
- 	error_code |= (exit_qualification & EPT_VIOLATION_ACC_INSTR)
- 		      ? PFERR_FETCH_MASK : 0;
- 	/* ept page table entry is present? */
--	error_code |= (exit_qualification & EPT_VIOLATION_RWX_MASK)
-+	error_code |= (exit_qualification & EPT_VIOLATION_PROT_MASK)
- 		      ? PFERR_PRESENT_MASK : 0;
- 
- 	if (error_code & EPT_VIOLATION_GVA_IS_VALID)
+  * Restoring the host value for MSRs that are only consumed when running in
+  * usermode, e.g. SYSCALL MSRs and TSC_AUX, can be deferred until the CPU
 -- 
 2.43.0
 
