@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-40900-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40901-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48263A5ECDE
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 08:22:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EECD7A5ECE1
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 08:23:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 867D53B6B4F
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 07:21:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D59371899B01
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 07:23:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CDA11FCFEC;
-	Thu, 13 Mar 2025 07:21:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FB951FE46C;
+	Thu, 13 Mar 2025 07:21:53 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4D021FCFD8;
-	Thu, 13 Mar 2025 07:21:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E3C1FE462;
+	Thu, 13 Mar 2025 07:21:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741850479; cv=none; b=RAoxwwgP+7NDLXDAtGLc+cl1Zjj8p4xln9vGyRCR8F/f3shsgDgNxFGOJc0CQ//lQ+C2pRSEvS70Yg5rs+4tOG2d1mJKf6bLm+SbENANFC9GHEiTn/rPc2EPeMfTYwVR9GyhNsk+qFukqghXz2nETjZqGy/OnguWyg4YghgrZos=
+	t=1741850512; cv=none; b=fJCELSXR04lhabISWCN9kLqxvSjuhORaR5h/SoVcvVVXfsc1KhKiGEZFJxsMlq/15HPYfQ0dLXmkOAq5rtiPDpP44BW/g2+KDkd5SdAVin+JmdsmiTaNuzMP1EiDzw9Iv7gTKvhhdd5qT5jrVAbPTJX5805AOT7dRqde4vk0E/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741850479; c=relaxed/simple;
-	bh=S467IL2al7IcCPUj4hfHZzYZN2jJjDv3J69qQJP9vog=;
+	s=arc-20240116; t=1741850512; c=relaxed/simple;
+	bh=3IozYO/eR/kQuw7+sST29tdLq1X0HD/pbb+i53spYM0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BTqt6mq7rXPFSyQNGyy0HZNbgD19c0AV2OTuILrfQXvkIHPRjaAzNRX6BWMCirf/ZeTVbH590oNtpw2TqmDLzxslCK3YBKQCjGrXxleuRJuPNaW5NsCvOmZ6lT9yDDQ/7cwV7K3ftuXpG34cjATLzxzY4MkYnnSU5ecRA4DtTE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+	 MIME-Version:Content-Type; b=f51TJsNNKYhYOuVk36q+CrGX1heKqrsZKeMvCNinHAOkmbTEkWAP77w0lKvK1/7+cBICnv4n8EfjSZlHwLajO1xyxi6lVWd8FEax+PNzfgb+ThaaiKkkzOd+Jgs6UyCgyXcN42yZaIcEXxXYDb3yHr92FAZy5bt4bw51lAfcCHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4ZCzN45rWJzvWpQ;
-	Thu, 13 Mar 2025 15:17:24 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4ZCzR91NJJz1R6XK;
+	Thu, 13 Mar 2025 15:20:05 +0800 (CST)
 Received: from kwepemg500006.china.huawei.com (unknown [7.202.181.43])
-	by mail.maildlp.com (Postfix) with ESMTPS id C1739140156;
-	Thu, 13 Mar 2025 15:21:15 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id B27CE1A0188;
+	Thu, 13 Mar 2025 15:21:46 +0800 (CST)
 Received: from huawei.com (10.50.165.33) by kwepemg500006.china.huawei.com
  (7.202.181.43) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 13 Mar
- 2025 15:21:15 +0800
+ 2025 15:21:46 +0800
 From: Longfang Liu <liulongfang@huawei.com>
 To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
 	<shameerali.kolothum.thodi@huawei.com>, <jonathan.cameron@huawei.com>
 CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<linuxarm@openeuler.org>, <liulongfang@huawei.com>
-Subject: [PATCH v5 2/5] hisi_acc_vfio_pci: add eq and aeq interruption restore
-Date: Thu, 13 Mar 2025 15:20:07 +0800
-Message-ID: <20250313072010.57199-3-liulongfang@huawei.com>
+Subject: [PATCH v5 3/5] hisi_acc_vfio_pci: bugfix cache write-back issue
+Date: Thu, 13 Mar 2025 15:20:08 +0800
+Message-ID: <20250313072010.57199-4-liulongfang@huawei.com>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20250313072010.57199-1-liulongfang@huawei.com>
 References: <20250313072010.57199-1-liulongfang@huawei.com>
@@ -58,55 +58,60 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
  kwepemg500006.china.huawei.com (7.202.181.43)
 
-In order to ensure that the task packets of the accelerator
-device are not lost during the migration process, it is necessary
-to send an EQ and AEQ command to the device after the live migration
-is completed and to update the completion position of the task queue.
+At present, cache write-back is placed in the device data
+copy stage after stopping the device operation.
+Writing back to the cache at this stage will cause the data
+obtained by the cache to be written back to be empty.
 
-Let the device recheck the completed tasks data and if there are
-uncollected packets, device resend a task completion interrupt
-to the software.
+In order to ensure that the cache data is written back
+successfully, the data needs to be written back into the
+stop device stage.
 
 Fixes: b0eed085903e ("hisi_acc_vfio_pci: Add support for VFIO live migration")
 Signed-off-by: Longfang Liu <liulongfang@huawei.com>
 Reviewed-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 ---
- drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-index 304dbdfa0e95..80217aea5475 100644
+index 80217aea5475..d96446f499ed 100644
 --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
 +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-@@ -470,6 +470,19 @@ static int vf_qm_get_match_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
- 	return 0;
- }
- 
-+static void vf_qm_xeqc_save(struct hisi_qm *qm,
-+			    struct hisi_acc_vf_migration_file *migf)
-+{
-+	struct acc_vf_data *vf_data = &migf->vf_data;
-+	u16 eq_head, aeq_head;
-+
-+	eq_head = vf_data->qm_eqc_dw[0] & 0xFFFF;
-+	qm_db(qm, 0, QM_DOORBELL_CMD_EQ, eq_head, 0);
-+
-+	aeq_head = vf_data->qm_aeqc_dw[0] & 0xFFFF;
-+	qm_db(qm, 0, QM_DOORBELL_CMD_AEQ, aeq_head, 0);
-+}
-+
- static int vf_qm_load_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
- 			   struct hisi_acc_vf_migration_file *migf)
+@@ -566,7 +566,6 @@ static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
  {
-@@ -578,6 +591,9 @@ static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
- 		return -EINVAL;
+ 	struct acc_vf_data *vf_data = &migf->vf_data;
+ 	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+-	struct device *dev = &vf_qm->pdev->dev;
+ 	int ret;
  
- 	migf->total_length = sizeof(struct acc_vf_data);
-+	/* Save eqc and aeqc interrupt information */
-+	vf_qm_xeqc_save(vf_qm, migf);
+ 	if (unlikely(qm_wait_dev_not_ready(vf_qm))) {
+@@ -580,12 +579,6 @@ static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+ 	vf_data->vf_qm_state = QM_READY;
+ 	hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
+ 
+-	ret = vf_qm_cache_wb(vf_qm);
+-	if (ret) {
+-		dev_err(dev, "failed to writeback QM Cache!\n");
+-		return ret;
+-	}
+-
+ 	ret = vf_qm_read_data(vf_qm, vf_data);
+ 	if (ret)
+ 		return -EINVAL;
+@@ -1012,6 +1005,13 @@ static int hisi_acc_vf_stop_device(struct hisi_acc_vf_core_device *hisi_acc_vdev
+ 		dev_err(dev, "failed to check QM INT state!\n");
+ 		return ret;
+ 	}
++
++	ret = vf_qm_cache_wb(vf_qm);
++	if (ret) {
++		dev_err(dev, "failed to writeback QM cache!\n");
++		return ret;
++	}
 +
  	return 0;
  }
