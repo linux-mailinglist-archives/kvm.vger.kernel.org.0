@@ -1,184 +1,202 @@
-Return-Path: <kvm+bounces-40921-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-40922-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B76AEA5F4C5
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 13:44:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01601A5F4DC
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 13:49:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECA181746B1
-	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 12:44:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2082A19C216D
+	for <lists+kvm@lfdr.de>; Thu, 13 Mar 2025 12:48:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C26B42676CB;
-	Thu, 13 Mar 2025 12:44:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6250B2676E0;
+	Thu, 13 Mar 2025 12:47:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="o/GrbqLC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dCR/HFhx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2996B26659C
-	for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 12:44:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24DEE42052
+	for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 12:47:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741869861; cv=none; b=i/qDlqOQnfQB/v/WaoFy9eBMgrFg1YNtN1/eVzGEYjcV+kOUk8aIyfLhBgAY+LsEPzZ6y2FvmNmTjmiglRzopciPZRKTsmLeAlzkMV4oLV/gMQps+owOsiWP5O7wrahRQRyZj9VddyjpB6JQDqSHJIcRsWAWvfqkA93mkG34ulg=
+	t=1741870077; cv=none; b=Z8wgSyXMaedPJiUbbwPbRi1x4Skf2i60dpKA8CfvdyfL8m6HnXsLRuNZgEG+T8+gfIYivranxMbWaac0ZcNMtbIWi9j4YOjoUrlYnn8CUCXLrlWdo7kHd82gkjmp2q34I6BOoWTgPypxoMatGaJ+kzqe460RQ2z2ZB41Gc5fxBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741869861; c=relaxed/simple;
-	bh=EleUDN0p7TORHE0wSEwSE0kj+mfdR9PO/rSWsPpYYTw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C931trAEHRiUWgePGEs8EHqTC3nb1/9wMHJ8sa35D0s1Bjz3DN1zO+eZV5EqDurMjzvB8Yy3b/d01gqCYXjmbJ3BxyINCBLhep12+oBwIpEiYLlhS1nWLYWEbG4/UHi36nmmSHbpUFv/GPhSpKjPBunWZ0Wo0Tew7Z8ZQXm3OSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=o/GrbqLC; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3914aba1ce4so736836f8f.2
-        for <kvm@vger.kernel.org>; Thu, 13 Mar 2025 05:44:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1741869857; x=1742474657; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=p4eBilR3cQKKkUL6iTV1U2gPm+aqkc/I2/ErCrbp51A=;
-        b=o/GrbqLCeyyu8Cw/4q1t9rjSCjvoqeKges7sjFAbL8xsEX4XHQpHVCLphDjin3B9OI
-         bzH0u6lO2okzsgxF40lvXb5ECkMBJO6/cCjV6DKWv6Kglw7bDGRuvSQCrUntcbN9VjSS
-         nQH0avWE+dP1UHHjTjRQ5e4RlCeU4leL0UL107u6LhJYTBUi7fey8r6o3xMEVgwBW+EB
-         KFjWy39uxnnNuTrhFMFPiOvmuCqxhDcbXQ9U0Y1+4lHLBJ4+IX6f47JFGM0jPYQOYCiy
-         0VBR2fo1zX4/RvWsoHbsxtYsWV8x+Ja7FTK46XSHdb4t66myUDN/WnJX6+2lVUWsnuei
-         WYpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741869857; x=1742474657;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=p4eBilR3cQKKkUL6iTV1U2gPm+aqkc/I2/ErCrbp51A=;
-        b=dhevCIEX5NmcNN5ZKqJLypBNiftjvw+oM8hRIECZLXFUxbFMy2la4xnvJEeArVhfyx
-         QYns6J9uaFqvCp5rIruIDFMnIwu2Gk+Mbm7qssVBMf5r+rmroOUXiZmuwZyClHwSAmIk
-         fuNK8qYF6q99o4uHaZuPz6sjOmgeE+OKwX5rWkOvAxogqRaJmOTv1FAdRMbEz1yTqHJu
-         SwA3OOK3gejqtGOiGpAzv0C3TNeNoN0XJ52/gleiZVvS9ZRd1BtX8P5fnrrQHrAe/9sX
-         8NYpIDM7PnXYC1Zhs6En779AMAc2h2akv+39olONlas0OG1qiLBRRlUJ7Y2hXoEMvQzc
-         1O/A==
-X-Forwarded-Encrypted: i=1; AJvYcCVsSF3ZObEG+XtMygR9ZZgfACV8itdINf16Ca1eDRYnn9VCU8147bfJLZUobgyOFLKQB+Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzcR4N2gyrDFaFU3RdyFPvSW9znZ3ovrm8IVxZyHqdSN37IY2SV
-	9uBlHhBSuWFOgDVtQUlfT7I+6EWhRxvFmqlgtnrzYOOsgyABrsMROgiWiDqaPrY=
-X-Gm-Gg: ASbGnctSj7K7eCDZyvBk0D/4S9xhDOZe7OXarC+sQVuGG/FTMESwpVDMrZgBfTAYUOm
-	BJeVdVH6Cngq4aUFYV4dWmYc1//37LFoID7Tla5mTxI/qpiJJsZ8dkVWBKbt0pYUT89HJIVpD6d
-	89PgOtw1mlUAlNb77i4ns3KcppXOQK1iStinzGCOtv+mjAfSw/C/HQ/hXpio30pDKSsUP8OZV7f
-	CFe02r1RSWGa40AzysnuxM6+zYC+xB4kJJxJjHaLOXaXaR5oR5p6iK+5lylmdPP0HMzvk52+XhL
-	YGxLaexE4+QZOWCjoxKEnnH0U6rN8ae3nj2cIw5FAoU=
-X-Google-Smtp-Source: AGHT+IEVKvciONpN7IaLFK/qsTCvmNWqORyhjjKaAjaSuACjOZk+fDyP3VpTM/ig5PwqolpsjOd7kg==
-X-Received: by 2002:a05:6000:1a87:b0:391:1923:5a91 with SMTP id ffacd0b85a97d-39132dc4395mr17992640f8f.55.1741869857406;
-        Thu, 13 Mar 2025 05:44:17 -0700 (PDT)
-Received: from localhost ([2a02:8308:a00c:e200::59a5])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395c83b6e87sm2097439f8f.32.2025.03.13.05.44.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Mar 2025 05:44:16 -0700 (PDT)
-Date: Thu, 13 Mar 2025 13:44:16 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-Cc: Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
-	Samuel Holland <samuel.holland@sifive.com>
-Subject: Re: [PATCH v3 03/17] riscv: sbi: add SBI FWFT extension calls
-Message-ID: <20250313-ce439653d16b484dba6a8d3e@orel>
-References: <20250310151229.2365992-1-cleger@rivosinc.com>
- <20250310151229.2365992-4-cleger@rivosinc.com>
+	s=arc-20240116; t=1741870077; c=relaxed/simple;
+	bh=hmx653zL143kIVyGVsOmRKge/68TxvtqEaAMykoc25U=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FsJ4DShyUBFuL8rTU5hXtaKuQF5iXEtukoBt+dEN4RVWX2D4KDLraHVwPhvhoovYvSB/NzrZUyQOPo5e26merJy9AvhYBcmw7MCcjH17A7JSUetMlhVbogrM/o39EGXIrgD8MZ/1u3wBnAkPvdnLxbfJmVbjC3e4ftG+ekvbcPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dCR/HFhx; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741870076; x=1773406076;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=hmx653zL143kIVyGVsOmRKge/68TxvtqEaAMykoc25U=;
+  b=dCR/HFhxGMNSYcg9cvu4BcjgmHbkekrM4q6STx3MRta2fDBHN6mNjFEF
+   RjAjdSA4nTam7Ha2rOTqzvmpQG3ftMTPdt6RBpG9QjCzylL4imxdNgKZS
+   7ATKRtVx3U3aYvSpCOQcK7Kncj5CLzasiiQY+ynckKlxeP1ZCtdAJk9yP
+   bAzDD/YQMB0qgBG91Ug9h/czPtgnHNlwXsyBAGwsLX8p4K7RPdk0fsda7
+   7Ia4ccOOJSJKWcSivv0lCqv6/eFuNRk0RaItGFSfBinuG8syvW0fCrE3c
+   sLhLo/yYcA9MQz/jKxE+eLNiHMKf+f1v73ZXRwg7Fup+DQj8torGkvGXV
+   w==;
+X-CSE-ConnectionGUID: uoqBAfRJTu6o8X/aL34gOQ==
+X-CSE-MsgGUID: 3oPpgF52STqYXyL3InpcwQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11372"; a="60383551"
+X-IronPort-AV: E=Sophos;i="6.14,244,1736841600"; 
+   d="scan'208";a="60383551"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 05:47:55 -0700
+X-CSE-ConnectionGUID: CfX7nKq/Sti0CtRLsPZE8A==
+X-CSE-MsgGUID: L+8hTWX2TvqXTn/hhXkIbA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,244,1736841600"; 
+   d="scan'208";a="158095320"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by orviesa001.jf.intel.com with ESMTP; 13 Mar 2025 05:47:54 -0700
+From: Yi Liu <yi.l.liu@intel.com>
+To: alex.williamson@redhat.com,
+	kevin.tian@intel.com
+Cc: jgg@nvidia.com,
+	eric.auger@redhat.com,
+	nicolinc@nvidia.com,
+	kvm@vger.kernel.org,
+	yi.l.liu@intel.com,
+	chao.p.peng@linux.intel.com,
+	zhenzhong.duan@intel.com,
+	willy@infradead.org,
+	zhangfei.gao@linaro.org,
+	vasant.hegde@amd.com
+Subject: [PATCH v8 0/5] vfio-pci support pasid attach/detach
+Date: Thu, 13 Mar 2025 05:47:48 -0700
+Message-Id: <20250313124753.185090-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250310151229.2365992-4-cleger@rivosinc.com>
 
-On Mon, Mar 10, 2025 at 04:12:10PM +0100, Clément Léger wrote:
-> Add FWFT extension calls. This will be ratified in SBI V3.0 hence, it is
-> provided as a separate commit that can be left out if needed.
-> 
-> Signed-off-by: Clément Léger <cleger@rivosinc.com>
-> ---
->  arch/riscv/kernel/sbi.c | 30 ++++++++++++++++++++++++++++--
->  1 file changed, 28 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/riscv/kernel/sbi.c b/arch/riscv/kernel/sbi.c
-> index 256910db1307..af8e2199e32d 100644
-> --- a/arch/riscv/kernel/sbi.c
-> +++ b/arch/riscv/kernel/sbi.c
-> @@ -299,9 +299,19 @@ static int __sbi_rfence_v02(int fid, const struct cpumask *cpu_mask,
->  	return 0;
->  }
->  
-> +static bool sbi_fwft_supported;
-> +
->  int sbi_fwft_get(u32 feature, unsigned long *value)
->  {
-> -	return -EOPNOTSUPP;
-> +	struct sbiret ret;
-> +
-> +	if (!sbi_fwft_supported)
-> +		return -EOPNOTSUPP;
-> +
-> +	ret = sbi_ecall(SBI_EXT_FWFT, SBI_EXT_FWFT_GET,
-> +			feature, 0, 0, 0, 0, 0);
-> +
-> +	return sbi_err_map_linux_errno(ret.error);
->  }
->  
->  /**
-> @@ -314,7 +324,15 @@ int sbi_fwft_get(u32 feature, unsigned long *value)
->   */
->  int sbi_fwft_set(u32 feature, unsigned long value, unsigned long flags)
->  {
-> -	return -EOPNOTSUPP;
-> +	struct sbiret ret;
-> +
-> +	if (!sbi_fwft_supported)
-> +		return -EOPNOTSUPP;
-> +
-> +	ret = sbi_ecall(SBI_EXT_FWFT, SBI_EXT_FWFT_SET,
-> +			feature, value, flags, 0, 0, 0);
-> +
-> +	return sbi_err_map_linux_errno(ret.error);
+This series introduces the PASID attach/detach user APIs (uAPIs) that
+allow userspace to attach or detach a device's PASID to or from a specified
+IOAS/hwpt. Currently, only the vfio-pci driver is enabled in this series.
 
-sbi_err_map_linux_errno() doesn't know about SBI_ERR_DENIED_LOCKED.
+Following this update, PASID-capable devices bound to vfio-pci can report
+PASID capabilities to userspace and virtual machines (VMs), facilitating
+PASID use cases such as Shared Virtual Addressing (SVA). In discussions
+about reporting the virtual PASID (vPASID) to VMs [1], it was agreed that
+the userspace virtual machine monitor (VMM) will synthesize the vPASID
+capability. The VMM must identify a suitable location to insert the vPASID
+capability, including handling hidden bits for certain devices. However,
+this responsibility lies with userspace and is not the focus of this series.
 
->  }
->  
->  struct fwft_set_req {
-> @@ -389,6 +407,9 @@ static int sbi_fwft_feature_local_set(u32 feature, unsigned long value,
->  int sbi_fwft_all_cpus_set(u32 feature, unsigned long value, unsigned long flags,
->  			  bool revert_on_fail)
->  {
-> +	if (!sbi_fwft_supported)
-> +		return -EOPNOTSUPP;
-> +
->  	if (feature & SBI_FWFT_GLOBAL_FEATURE_BIT)
->  		return sbi_fwft_set(feature, value, flags);
->  
-> @@ -719,6 +740,11 @@ void __init sbi_init(void)
->  			pr_info("SBI DBCN extension detected\n");
->  			sbi_debug_console_available = true;
->  		}
-> +		if ((sbi_spec_version >= sbi_mk_version(2, 0)) &&
+This series begins by adding helpers for PASID attachment in the vfio core,
+then extends the device character device (cdev) attach/detach ioctls to
+support PASID attach/detach operations. At the conclusion of this series,
+the IOMMU_GET_HW_INFO ioctl is extended to report PCI PASID capabilities
+to userspace. Userspace should verify this capability before utilizing any
+PASID-related uAPIs provided by VFIO, as agreed in [2]. This series depends
+on the iommufd PASID attach/detach series [3].
 
-Should check sbi_mk_version(3, 0)
+The complete code is available at [4] and has been tested with a modified
+QEMU branch [5].
 
-> +		    (sbi_probe_extension(SBI_EXT_FWFT) > 0)) {
-> +			pr_info("SBI FWFT extension detected\n");
-> +			sbi_fwft_supported = true;
-> +		}
->  	} else {
->  		__sbi_set_timer = __sbi_set_timer_v01;
->  		__sbi_send_ipi	= __sbi_send_ipi_v01;
-> -- 
-> 2.47.2
->
+[1] https://lore.kernel.org/kvm/BN9PR11MB5276318969A212AD0649C7BE8CBE2@BN9PR11MB5276.namprd11.prod.outlook.com/
+[2] https://lore.kernel.org/kvm/4f2daf50-a5ad-4599-ab59-bcfc008688d8@intel.com/
+[3] https://lore.kernel.org/linux-iommu/20250313123532.103522-1-yi.l.liu@intel.com/
+[4] https://github.com/yiliu1765/iommufd/tree/iommufd_pasid
+[5] https://github.com/yiliu1765/qemu/tree/wip/zhenzhong/iommufd_nesting_rfcv2-test-pasid
 
-Thanks,
-drew
+Change log:
+
+v8:
+ - Rebased on top of the latest iommufd series, mainly using the latest
+   kAPI for pasid attach
+
+v7: https://lore.kernel.org/kvm/20250216054638.24603-1-yi.l.liu@intel.com/#t
+ - Add Alex's and Kevin's r-b on vfio patches
+ - Minor tweaks on patch 04 (Kevin)
+
+v6: https://lore.kernel.org/kvm/20241219133534.16422-1-yi.l.liu@intel.com/
+ - Drop the vfio_copy_user_data() generalization as it is not totally clear
+   what it would cover. (Alex)
+ - Reworked the patch 03 of v5 a bit. e.g. lift the pasid_{at|de}tach_ioas op test
+   before the second user data copy; make 'if (xend > minsz)' to be 'if (xend)'
+   and remove the comment accordingly. This is because we don't generalize
+   the user data copy now, so xend is either 0 or non-zero, no need to check
+   against minsz.
+ - Make the IOMMU_GET_HW_INFO report out_max_pasid_log2 by checking the
+   dev->iommu->max_pasids. This is because iommu drivers enables PASID
+   as long as it supports. So checking it is enough. Also, it is more friendly
+   to non-PCI PASID supports compared with reading the PCI config space to
+   check if PASID is enabled.
+ - Add selftest coverage for reporting max_pasid_log2 in IOMMU_HW_INFO ioctl.
+
+v5: https://lore.kernel.org/kvm/20241108121742.18889-1-yi.l.liu@intel.com/
+ - Fix a wrong return value (Alex)
+ - Fix the policy of setting the xend array per flag extension (Alex)
+ - A separate patch to generalize the code of copy user data (Alex)
+
+v4: https://lore.kernel.org/kvm/20241104132732.16759-1-yi.l.liu@intel.com/
+ - Add acked-by for the ida patch from Matthew
+ - Add r-b from Kevin and Jason on patch 01, 02 and 04 of v3
+ - Add common code to copy user data for the user struct with new fields
+ - Extend the VFIO_DEVICE_[AT|DE]TACH_IOMMUFD_PT to support pasid, patch 03
+   is updated per this change. Hence drop r-b of it. (Kevin, Alex)
+ - Add t-b from Zhangfei for patch 4 of v3
+ - Nits from Vasant
+
+v3: https://lore.kernel.org/linux-iommu/20240912131729.14951-1-yi.l.liu@intel.com/
+ - Misc enhancement on patch 01 of v2 (Alex, Jason)
+ - Add Jason's r-b to patch 03 of v2
+ - Drop the logic that report PASID via VFIO_DEVICE_FEATURE ioctl
+ - Extend IOMMU_GET_HW_INFO to report PASID support (Kevin, Jason, Alex)
+
+v2: https://lore.kernel.org/kvm/20240412082121.33382-1-yi.l.liu@intel.com/
+ - Use IDA to track if PASID is attached or not in VFIO. (Jason)
+ - Fix the issue of calling pasid_at[de]tach_ioas callback unconditionally (Alex)
+ - Fix the wrong data copy in vfio_df_ioctl_pasid_detach_pt() (Zhenzhong)
+ - Minor tweaks in comments (Kevin)
+
+v1: https://lore.kernel.org/kvm/20231127063909.129153-1-yi.l.liu@intel.com/
+ - Report PASID capability via VFIO_DEVICE_FEATURE (Alex)
+
+rfc: https://lore.kernel.org/linux-iommu/20230926093121.18676-1-yi.l.liu@intel.com/
+
+Regards,
+	Yi Liu
+
+Yi Liu (5):
+  ida: Add ida_find_first_range()
+  vfio-iommufd: Support pasid [at|de]tach for physical VFIO devices
+  vfio: VFIO_DEVICE_[AT|DE]TACH_IOMMUFD_PT support pasid
+  iommufd: Extend IOMMU_GET_HW_INFO to report PASID capability
+  iommufd/selftest: Add coverage for reporting max_pasid_log2 via
+    IOMMU_HW_INFO
+
+ drivers/iommu/iommufd/device.c                | 35 +++++++++-
+ drivers/pci/ats.c                             | 33 +++++++++
+ drivers/vfio/device_cdev.c                    | 60 +++++++++++++---
+ drivers/vfio/iommufd.c                        | 50 +++++++++++++
+ drivers/vfio/pci/vfio_pci.c                   |  2 +
+ include/linux/idr.h                           | 11 +++
+ include/linux/pci-ats.h                       |  3 +
+ include/linux/vfio.h                          | 14 ++++
+ include/uapi/linux/iommufd.h                  | 14 +++-
+ include/uapi/linux/vfio.h                     | 29 +++++---
+ lib/idr.c                                     | 67 ++++++++++++++++++
+ lib/test_ida.c                                | 70 +++++++++++++++++++
+ tools/testing/selftests/iommu/iommufd.c       | 18 +++++
+ .../selftests/iommu/iommufd_fail_nth.c        |  3 +-
+ tools/testing/selftests/iommu/iommufd_utils.h | 17 +++--
+ 15 files changed, 401 insertions(+), 25 deletions(-)
+
+-- 
+2.34.1
+
 
