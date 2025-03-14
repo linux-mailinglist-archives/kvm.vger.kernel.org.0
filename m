@@ -1,130 +1,116 @@
-Return-Path: <kvm+bounces-41023-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41024-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F890A607DF
-	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 04:47:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE684A60931
+	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 07:27:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 226A619C0E19
-	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 03:47:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C1F13B7985
+	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 06:27:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ED1213D279;
-	Fri, 14 Mar 2025 03:47:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Qsb9XeYS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A92F1547C5;
+	Fri, 14 Mar 2025 06:26:57 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E2F02E3368;
-	Fri, 14 Mar 2025 03:47:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD91313541B
+	for <kvm@vger.kernel.org>; Fri, 14 Mar 2025 06:26:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741924033; cv=none; b=SlpCFTQxXKYG2LILWSDaZcRs73vthZObwy+EGIvlfxr1SD11xgNDY/bMLJ/8Q+jNRPse6gQfcRLxaMAMu4Jg9FG3YBNRnPbZ3kvagRUB5s+UIXLdNpciNB2Hx7qILh63AdJKRRvvoONdyRtKJ8OXZakVQj7H1SDSNcM1ml0jhKM=
+	t=1741933616; cv=none; b=BXYGj3viTDVbiafwqCYpte2YXokH+7l6vXozebFtVPvQ8b7ZkMvUIQQPk48x1mmmgTibB4slKpyLLPwIKPUl2xfABBKSugqgjxKTSDKByps4BwEv45dTssLul3RcshTPAEm+v3VEHwdUC5iLpzrzHPbnhifM/vYToyL5BJXtJkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741924033; c=relaxed/simple;
-	bh=5csq7Xilf/ZeCp0TAlwqDeQoXcKSZIer57d9vlUbrfE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SIVgLF2RaTunfA/5hWbv597x9duCc2j5qyKz3S2OydY6WQ5JLS3FKAD4LOPA2Fd3fTKOpn+mSIUxy3P7WZkRTI306isZgAduVYkFed9t0b6RaM+3kPPhhaS2WgEGwjMkqHrDQBTFfV+gbVmPHfxKNwtKf8nZVTqwujQ2+1Nzw+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Qsb9XeYS; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52DNOuSx030460;
-	Fri, 14 Mar 2025 03:46:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=JXua5c
-	aTwTNUTtdBvGHDVqyhcKPAlSgEyDPOfiwv554=; b=Qsb9XeYSWL6uv6usciKbcH
-	6j8mtMqjAlvVTbvYL0Z8cwvqAODUDf4AVUSDCXjQJbADa7QZNsOIFizxuhnsD/mt
-	yDy2FHcXvhUf4RxpO7V10v81zPY28NCqMOUP4E066bOQNNo9Or1rGAvrmaFA7+E3
-	tfHguPylMLn0XkMkQKRGortUB0ZRP1514ykq9dq0GVQaO9TPExs+JziiQYhZCUxa
-	DpDLhfZRe6Q1gApAVtkN6lTKaBwz5VgmrFJqEuj0eQa+BUaP8VZMwTBn2ZT2/6Dw
-	Dk40THwCA2ddQfwSgh7dDko5vTbaDW1m+JAwElj33q4fFRRFeYm0JVMmHuWS0yTg
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45byd8v1ns-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Mar 2025 03:46:53 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 52E3jDN1014449;
-	Fri, 14 Mar 2025 03:46:53 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45byd8v1nq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Mar 2025 03:46:53 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52DNlWnS003127;
-	Fri, 14 Mar 2025 03:46:52 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 45atstw3a7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Mar 2025 03:46:52 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52E3km0331719790
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 14 Mar 2025 03:46:48 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D06F120040;
-	Fri, 14 Mar 2025 03:46:48 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1F1D620043;
-	Fri, 14 Mar 2025 03:46:46 +0000 (GMT)
-Received: from li-c439904c-24ed-11b2-a85c-b284a6847472.in.ibm.com (unknown [9.204.206.207])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 14 Mar 2025 03:46:45 +0000 (GMT)
-From: Madhavan Srinivasan <maddy@linux.ibm.com>
-To: Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        Amit Machhiwal <amachhiw@linux.ibm.com>
-Cc: Vaibhav Jain <vaibhav@linux.ibm.com>,
-        Shivaprasad G Bhat <sbhat@linux.ibm.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Naveen N Rao <naveen@kernel.org>, kvm@vger.kernel.org,
-        stable@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>
-Subject: Re: [PATCH v3] KVM: PPC: Enable CAP_SPAPR_TCE_VFIO on pSeries KVM guests
-Date: Fri, 14 Mar 2025 09:16:45 +0530
-Message-ID: <174192385435.14370.11531277481779566442.b4-ty@linux.ibm.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250220070002.1478849-1-amachhiw@linux.ibm.com>
-References: <20250220070002.1478849-1-amachhiw@linux.ibm.com>
+	s=arc-20240116; t=1741933616; c=relaxed/simple;
+	bh=nXOXUD+vv+d+W9cL0ecIjsjZEQ1To7AGKKBZZtkauPs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VLKA6yg0eFZb5tbRP33YTUMQcJ009UpdXa6qk5mt7qpTL5NVK8aWcWvGHj0mDkVLPWSEvPc1hy7x/uX/y9iORfVkjbKhG5mdHkiBlierMQyPHrM8xWVh/VrZA/UQFKy8L0l/MfJW6zn0xpaUT0OoDKYVa1Vv2odZPfkJDl0aa5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4ZDZ9Y1y2JztQgr;
+	Fri, 14 Mar 2025 14:25:21 +0800 (CST)
+Received: from kwepemk500007.china.huawei.com (unknown [7.202.194.92])
+	by mail.maildlp.com (Postfix) with ESMTPS id 310331800E4;
+	Fri, 14 Mar 2025 14:26:50 +0800 (CST)
+Received: from huawei.com (10.246.99.19) by kwepemk500007.china.huawei.com
+ (7.202.194.92) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 14 Mar
+ 2025 14:26:48 +0800
+From: zoudongjie <zoudongjie@huawei.com>
+To: <kvm@vger.kernel.org>, <seanjc@google.com>, <pbonzini@redhat.com>,
+	<kai.huang@intel.com>, <yuan.yao@intel.com>, <michael.roth@amd.com>,
+	<wei.w.wang@intel.com>
+CC: <luolongmin@huawei.com>, <suxiaodong1@huawei.com>,
+	<jiangkunkun@huawei.com>, <wangjian161@huawei.com>,
+	<tangzhongwei2@huawei.com>, <mujinsheng@huawei.com>, <alex.chen@huawei.com>,
+	<eric.fangyi@huawei.com>, <zoudongjie@huawei.com>, <chenjianfei3@huawei.com>,
+	<renxuming@huawei.com>
+Subject: [bug report] KVM: x86: Syzkaller has discovered an use-after-free issue in complete_emulated_mmio of kernel 5.10
+Date: Fri, 14 Mar 2025 14:26:20 +0800
+Message-ID: <20250314062620.1169174-1-zoudongjie@huawei.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: I-iNyNSGkOlt7gHk5ndV6xI-yg1ozl1W
-X-Proofpoint-ORIG-GUID: HfY6S5Tm98aVoIP7IKzo1zopnf1RSUjU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-14_01,2025-03-13_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- malwarescore=0 impostorscore=0 priorityscore=1501 bulkscore=0 phishscore=0
- lowpriorityscore=0 suspectscore=0 mlxlogscore=679 clxscore=1015 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2502280000
- definitions=main-2503140026
+Content-Type: text/plain
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemk500007.china.huawei.com (7.202.194.92)
 
-On Thu, 20 Feb 2025 12:30:02 +0530, Amit Machhiwal wrote:
-> Currently on book3s-hv, the capability KVM_CAP_SPAPR_TCE_VFIO is only
-> available for KVM Guests running on PowerNV and not for the KVM guests
-> running on pSeries hypervisors. This prevents a pSeries L2 guest from
-> leveraging the in-kernel acceleration for H_PUT_TCE_INDIRECT and
-> H_STUFF_TCE hcalls that results in slow startup times for large memory
-> guests.
-> 
-> [...]
+Hi all,
 
-Applied to powerpc/next.
+I have discovered a use-after-free issue in complete_emulated_mmio during kernel fuzz testing
+with Syzkaller, the Call Trace is as follows:
 
-[1/1] KVM: PPC: Enable CAP_SPAPR_TCE_VFIO on pSeries KVM guests
-      https://git.kernel.org/powerpc/c/b4392813bbc3b05fc01a33c64d8b8c6c62c32cfa
+Call Trace:
+ dump_stack+0xbe/0xfd
+ print_address_description.constprop.0+0x19/0x170
+ __kasan_report.cold+0x6c/0x84
+ kasan_report+0x3a/0x50
+ check_memory_region+0xfd/0x1f0
+ memcpy+0x20/0x60
+ complete_emulated_mmio+0x305/0x420
+ kvm_arch_vcpu_ioctl_run+0x63f/0x6d0
+ kvm_vcpu_ioctl+0x413/0xb20
+ __se_sys_ioctl+0x111/0x160
+ do_syscall_64+0x30/0x40
+ entry_SYSCALL_64_after_hwframe+0x67/0xd1
 
-Thanks
+RIP: 0033:0x45570d
+Code: 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f93213e9048 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 000000000058c1f0 RCX: 000000000045570d
+RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000005
+RBP: 000000000058c1f0 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 0000000000425750 R15: 00007fff27f167f0
+
+The buggy address belongs to the page:
+page:000000005de3ae57 refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x111bff
+flags: 0x17ffffc0000000(node=0|zone=2|lastcpupid=0x1fffff)
+raw: 0017ffffc0000000 0000000000000000 dead000000000122 0000000000000000
+raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff888111bff780: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+ ffff888111bff800: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+>ffff888111bff880: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+                                                 ^
+ ffff888111bff900: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+ ffff888111bff980: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+
+==================================================================
+
+Do you have any suggestions regarding this issue?
+Any insights or debugging strategies would be greatly appreciated.
+
+Thanks,
+Dongjie Zou
+
 
