@@ -1,138 +1,200 @@
-Return-Path: <kvm+bounces-41062-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41063-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B101DA6133F
-	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 14:59:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 180CAA61365
+	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 15:12:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC76F3BB3D7
-	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 13:59:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1EBB883A3F
+	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 14:11:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D509E200136;
-	Fri, 14 Mar 2025 13:59:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5674020110B;
+	Fri, 14 Mar 2025 14:11:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Oc6RBS7/"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="A2OhWF5J"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870791FCF7D
-	for <kvm@vger.kernel.org>; Fri, 14 Mar 2025 13:59:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E50271FF7C1
+	for <kvm@vger.kernel.org>; Fri, 14 Mar 2025 14:11:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741960786; cv=none; b=ErqJZJLXWSLhU2DNotx6QWlPkK03d7iRXECtBzMW1wx7bCeBptMQd4QGYSUZfbfsDuNsIHH1hpiG36rMupr6qETKq4c5E8NPt3K1Y72YTlio5PkDhfLFO0b58Z7qVWtTeu0n4UCGhdRd1gip+5Wx6qWPkU/dGH4KjHIBr8PTUYk=
+	t=1741961482; cv=none; b=GFbaN2Mz5BZEc//KrjSvmD+754P1h/wHbjxpivAHkMZ22u/xDf08pwlGWMShVQ96BMT18ekXRXV+F0NJrC+OEzfSgx5WiXK6P4AgysE6fWLrWaq7Voz7MRQbbsSJI9saFVkUDTmSiUzKeem3ustM/T10Q78o9Cg6rOnD8+SZwVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741960786; c=relaxed/simple;
-	bh=o3oN2teH7/7o/cu7y1Rd54JOjYsOskM2i0aoFrFKLiE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=EOIu3eafv6CnBq7qKF+xCRwceiljo7eNQIxS/fpRPL0KW/bTxYcODibz3TiQkNQ0rabcoLL8AeZsE9PByxHCIsEKCPnupKgTheVRo7L0aIBgAn1yHRThKZCYwdWg8Ci2k5iS/LFx0ws+QAHfkIXRkcyy+vy2gT9ChtA5uywY1Is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Oc6RBS7/; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff799be8f5so3493638a91.1
-        for <kvm@vger.kernel.org>; Fri, 14 Mar 2025 06:59:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741960785; x=1742565585; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9Z5anCDrhhJBcWeJWw8bzxe9xmdp2wEmwmhN3IyuUVI=;
-        b=Oc6RBS7/sf/VuH8SbzjmiOdeRUCSmi8+qomLdeXMV3fZK38DW20M4tsSAyte7bKsTN
-         Iz8Hck2mH+3e6tsSyumKyC1/QBV/FrOTxLyLT7alYexjx2M5K2TiwVuMr+jTCI3h1+iw
-         W6yAHZOkIvgbByqA3dpI5JMPuBlWUXBIma8vxvAbNF+AI7JPIcuNiFQRh5pG+jbIadxB
-         tCqSIczWBeREPEBbt3dWJjWyD9DxGtaB79j8MJEs36wW8T5wm2s6dNpMzXxDKmruD7iS
-         o+mg573yQYzVNBl8sSt30aQ1+nuyc4Gr6hMgDVJr+GwQV4SbsAdAeEclHehh8RaQrNQ6
-         rnKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741960785; x=1742565585;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=9Z5anCDrhhJBcWeJWw8bzxe9xmdp2wEmwmhN3IyuUVI=;
-        b=fER5aalyO+iIk5AtEz2Fl+Zt0tuxCwU9XHdLrBhVcHYgAnPM19SSX27Cnl13WEidVW
-         XqxtejEXivAX9dNYaODF3uYgY3K8lzsJWJb4sj5fpOjGfP6oAvPllVxmAwzrCoxRJm9u
-         7JZeYL6VEkO/jO3Z4w73gGpC+sDi+r41bxQJuIOFgGk3+ZksFKKBtaNlLGqTLjdiP20V
-         HnGoUZN2bSzJKTlb358ADHVwcudmTbSepTD7ujkThODwh4U8+jbhg5wgZ8iPuZ6XX9OC
-         vAOK9V0C1ShvB68izvPej1j27dJoW4IoEhQfQrsUMnuCqUguMMOcK5FnDt4dvpSfzCQI
-         XgUg==
-X-Forwarded-Encrypted: i=1; AJvYcCUlcjNsmhkW2q0shZDS+aj2OAurQ0kTMb66M8W9pwtV+KzqjsqIYIJ6HkzO0LdFgHR73LM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxpv8kKB3EV4frhxVT+JEARKX5q7lzdPORzlofU3Bv5I7zFSiyK
-	Z3ABGtmo2xbVdSAPCDn9e/K3bUPw7gJI+spnkW2FQJdHWHiYJnpMIu4hwPxQ9S5Bu+hoVnx1HES
-	Nvw==
-X-Google-Smtp-Source: AGHT+IGgEhJygXWlQRTO92MWBmqXs9qWrE1SN+ZobB60ohCV46iptd/VxXMOsljTLGS/n3Tl5HFX5KwPYeY=
-X-Received: from pjboi8.prod.google.com ([2002:a17:90b:3a08:b0:2ea:3a1b:f493])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4986:b0:2ee:f550:3848
- with SMTP id 98e67ed59e1d1-30151c75fcamr3212802a91.5.1741960784871; Fri, 14
- Mar 2025 06:59:44 -0700 (PDT)
-Date: Fri, 14 Mar 2025 06:59:42 -0700
-In-Reply-To: <CALMp9eRHrEZX4-JWyGXNRvafU2dNbfa6ZjT5HhrDBYujGYEvaw@mail.gmail.com>
+	s=arc-20240116; t=1741961482; c=relaxed/simple;
+	bh=zBCgISH3posrm6P5IkNvIF504v8Bf1gHw3iaJezx0rM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hmxu6mZtop4Rucg+xjXgrEHhMLocHCwA+zcx/4vAPMi8Cfa5aGQYJ5jR2I6/0xJR5vUaD8QetJ9QLqKW2Ek5BRukUbBGjIRc4ZlGR446FL4G6CNdxByfoXT0hRfIDFNKyDw8OOxq29Bdk9B45ja1bqpHbLJMo33c0LY4WritwBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=A2OhWF5J; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Fri, 14 Mar 2025 15:11:14 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1741961477;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iE/wJzW/iMea/0NTGsZB5pMBUzUt6UFrylXVlwTLhN4=;
+	b=A2OhWF5J+h372lLcm8Kiy+kwtYrhFwPi7CL0wsgT+V2w3D8A+iPvEGcHmpQcD3e4oTwQYu
+	bEsnOmAp3CPC8M8G4wazS6PF1q2dxDx56m9Yijdo2qfo2HW+UMndj+shsymEM11CAPw1hz
+	lkPlvDg4l+AFMMt4jv5mcteEJTmOlVE=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	Andrew Jones <ajones@ventanamicro.com>, Anup Patel <apatel@ventanamicro.com>, 
+	Atish Patra <atishp@rivosinc.com>
+Subject: Re: [kvm-unit-tests PATCH v9 6/6] riscv: sbi: Add SSE extension tests
+Message-ID: <20250314-0940c2c0dcd92b285f43e4ca@orel>
+References: <20250314111030.3728671-1-cleger@rivosinc.com>
+ <20250314111030.3728671-7-cleger@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250225004708.1001320-1-jmattson@google.com> <CALMp9eRHrEZX4-JWyGXNRvafU2dNbfa6ZjT5HhrDBYujGYEvaw@mail.gmail.com>
-Message-ID: <Z9Q2Tl50AjxpwAKG@google.com>
-Subject: Re: [PATCH] KVM: x86: Provide a capability to disable APERF/MPERF
- read intercepts
-From: Sean Christopherson <seanjc@google.com>
-To: Jim Mattson <jmattson@google.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250314111030.3728671-7-cleger@rivosinc.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Mar 13, 2025, Jim Mattson wrote:
-> On Mon, Feb 24, 2025 at 4:47=E2=80=AFPM Jim Mattson <jmattson@google.com>=
- wrote:
-> >
-> > Allow a guest to read the physical IA32_APERF and IA32_MPERF MSRs
-> > without interception.
-> >
-> > The IA32_APERF and IA32_MPERF MSRs are not virtualized. Writes are not
-> > handled at all. The MSR values are not zeroed on vCPU creation, saved
-> > on suspend, or restored on resume. No accommodation is made for
-> > processor migration or for sharing a logical processor with other
-> > tasks. No adjustments are made for non-unit TSC multipliers. The MSRs
-> > do not account for time the same way as the comparable PMU events,
-> > whether the PMU is virtualized by the traditional emulation method or
-> > the new mediated pass-through approach.
-> >
-> > Nonetheless, in a properly constrained environment, this capability
-> > can be combined with a guest CPUID table that advertises support for
-> > CPUID.6:ECX.APERFMPERF[bit 0] to induce a Linux guest to report the
-> > effective physical CPU frequency in /proc/cpuinfo. Moreover, there is
-> > no performance cost for this capability.
-> >
-> > Signed-off-by: Jim Mattson <jmattson@google.com>
-> > ---
-
+On Fri, Mar 14, 2025 at 12:10:29PM +0100, Clément Léger wrote:
 ...
+> +static void sse_test_inject_local(uint32_t event_id)
+> +{
+> +	int cpu;
+> +	uint64_t timeout;
+> +	struct sbiret ret;
+> +	struct sse_local_per_cpu *cpu_args, *cpu_arg;
+> +	struct sse_foreign_cpu_test_arg *handler_arg;
+> +
+> +	cpu_args = calloc(NR_CPUS, sizeof(struct sbi_sse_handler_arg));
+> +
+> +	report_prefix_push("local_dispatch");
+> +	for_each_online_cpu(cpu) {
+> +		cpu_arg = &cpu_args[cpu];
+> +		cpu_arg->handler_arg.event_id = event_id;
+> +		cpu_arg->args.stack = sse_alloc_stack();
+> +		cpu_arg->args.handler = sse_foreign_cpu_handler;
+> +		cpu_arg->args.handler_data = (void *)&cpu_arg->handler_arg;
+> +		cpu_arg->state = SBI_SSE_STATE_UNUSED;
+> +	}
+> +
+> +	on_cpus(sse_register_enable_local, cpu_args);
+> +	for_each_online_cpu(cpu) {
+> +		cpu_arg = &cpu_args[cpu];
+> +		ret = cpu_arg->ret;
+> +		if (ret.error) {
+> +			report_fail("CPU failed to register/enable event: %ld", ret.error);
+> +			goto cleanup;
+> +		}
+> +
+> +		handler_arg = &cpu_arg->handler_arg;
+> +		WRITE_ONCE(handler_arg->expected_cpu, cpu);
+> +		/* For handler_arg content to be visible for other CPUs */
+> +		smp_wmb();
+> +		ret = sbi_sse_inject(event_id, cpus[cpu].hartid);
+> +		if (ret.error) {
+> +			report_fail("CPU failed to inject event: %ld", ret.error);
+> +			goto cleanup;
+> +		}
+> +	}
+> +
+> +	for_each_online_cpu(cpu) {
+> +		handler_arg = &cpu_args[cpu].handler_arg;
+> +		smp_rmb();
+> +
+> +		timeout = sse_event_get_complete_timeout();
+> +		while (!READ_ONCE(handler_arg->done) || timer_get_cycles() < timeout) {
 
-> Any thoughts?
+I pointed this out in the last review, the || should be a &&. We don't
+want to keep waiting until we reach the timeout if we get the done signal
+earlier.
 
-It's absolutely absurd, but I like it.  I would much rather provide functio=
-nality
-that is flawed in obvious ways, as opposed to functionality that is flawed =
-in
-subtle and hard-to-grok ways.  Especially when the former is orders of magn=
-itude
-less complex.
+> +			/* For handler_arg update to be visible */
+> +			smp_rmb();
+> +			cpu_relax();
+> +		}
+> +		report(READ_ONCE(handler_arg->done), "Event handled");
+> +		WRITE_ONCE(handler_arg->done, false);
+> +	}
+> +
+> +cleanup:
+> +	on_cpus(sbi_sse_disable_unregister_local, cpu_args);
+> +	for_each_online_cpu(cpu) {
+> +		cpu_arg = &cpu_args[cpu];
+> +		ret = READ_ONCE(cpu_arg->ret);
+> +		if (ret.error)
+> +			report_fail("CPU failed to disable/unregister event: %ld", ret.error);
+> +	}
+> +
+> +	for_each_online_cpu(cpu) {
+> +		cpu_arg = &cpu_args[cpu];
+> +		sse_free_stack(cpu_arg->args.stack);
+> +	}
+> +
+> +	report_prefix_pop();
+> +}
+> +
+> +static void sse_test_inject_global_cpu(uint32_t event_id, unsigned int cpu,
+> +				       struct sse_foreign_cpu_test_arg *test_arg)
+> +{
+> +	unsigned long value;
+> +	struct sbiret ret;
+> +	uint64_t timeout;
+> +	enum sbi_sse_state state;
+> +
+> +	WRITE_ONCE(test_arg->expected_cpu, cpu);
+> +	/* For test_arg content to be visible for other CPUs */
+> +	smp_wmb();
+> +	value = cpu;
+> +	ret = sbi_sse_write_attrs(event_id, SBI_SSE_ATTR_PREFERRED_HART, 1, &value);
+> +	if (!sbiret_report_error(&ret, SBI_SUCCESS, "Set preferred hart"))
+> +		return;
+> +
+> +	ret = sbi_sse_enable(event_id);
+> +	if (!sbiret_report_error(&ret, SBI_SUCCESS, "Enable event"))
+> +		return;
+> +
+> +	ret = sbi_sse_inject(event_id, cpu);
+> +	if (!sbiret_report_error(&ret, SBI_SUCCESS, "Inject event"))
+> +		goto disable;
+> +
+> +	smp_rmb();
+> +	timeout = sse_event_get_complete_timeout();
+> +	while (!READ_ONCE(test_arg->done) || timer_get_cycles() < timeout) {
 
-I have no objections, so long as we add very explicit disclaimers in the do=
-cs.
+same comment
 
-FWIW, the only reason my response was delayed is because I was trying to fi=
-gure
-out if there's a clean way to avoid adding a large number of a capabilities=
- for
-things like this.  E.g. if we can add generic uAPI to let userspace disable=
- MSR
-interception.  But AFAICT, there aren't very many MSRs where it would be sa=
-ne to
-let the guest read unadultered MSRs, so it's probably not worth the complex=
-ity.
+> +		/* For shared test_arg structure */
+> +		smp_rmb();
+> +		cpu_relax();
+> +	}
+> +
+> +	report(READ_ONCE(test_arg->done), "event handler called");
+> +	WRITE_ONCE(test_arg->done, false);
+> +
+> +	timeout = sse_event_get_complete_timeout();
+> +	/* Wait for event to be back in ENABLED state */
+> +	do {
+> +		ret = sse_event_get_state(event_id, &state);
+> +		if (ret.error)
+> +			goto disable;
+> +		cpu_relax();
+> +	} while (state != SBI_SSE_STATE_ENABLED || timer_get_cycles() < timeout);
+
+same comment
+
+Otherwise,
+
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+
+Thanks,
+drew
 
