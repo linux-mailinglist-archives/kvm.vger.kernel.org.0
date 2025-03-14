@@ -1,64 +1,79 @@
-Return-Path: <kvm+bounces-41085-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41086-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28860A6172B
-	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 18:13:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87479A61765
+	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 18:21:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E792E1B60BA5
-	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 17:13:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27A1A880C9C
+	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 17:20:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18E3B204692;
-	Fri, 14 Mar 2025 17:12:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9C632045B5;
+	Fri, 14 Mar 2025 17:20:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="m99CFGec"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eBPAKLfh"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C53317579;
-	Fri, 14 Mar 2025 17:12:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A03202F8B
+	for <kvm@vger.kernel.org>; Fri, 14 Mar 2025 17:20:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741972371; cv=none; b=sPxlHl6kAESbHNLeYlbEurAExhoXJgdAX6QHfifBVZMM3KMaOmCRiL8Ciw/v1qnHuTkWKE+J6yCEulmRx7VS7DIeqPGC5tEzNWERuC0OCusooOxIQgRGijVu4ROugBfKZWznGX4Phlk6ibTblgKX+ktVZTOyd/brVa1z/8Mu/go=
+	t=1741972834; cv=none; b=PxnawNnRogk2aBeBoI7LQeROAQZvcga2k4Q+1ysZlPlzhx8SXmT8JWPz1FtUp1MiyGSeJ5xnLYSiaMTD5c2yEK20DivT4l42VXcbCn+wEjNso0+eqvXiKkwEMZuc/lqwcws+Qa+9XYo1qUFz0V1FfGTv1b9pvRfB5Kj3HrleBN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741972371; c=relaxed/simple;
-	bh=Gte+tyJJhHhkQ4HCK5AFq1SUTXMbefl2oe3vqXFLODc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=KYZfys++kqTwCsBa7ofgUeBMRJe7YHbvtplLHxmhGsIaStEb718vADGvbiuw/g8sr857ITrPAQumhSzOtoEnbYXuo1FO3Mtx/vuSGCoA3GyhgO42H1l1b9QbUfYHRjnwy+jn9cIfaAUIi2G8D9qey939Yw0kGAUFvV/+H1kLZcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=m99CFGec; arc=none smtp.client-ip=52.119.213.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+	s=arc-20240116; t=1741972834; c=relaxed/simple;
+	bh=a5uI9l6UCKskW9i73TdQVph6R+fkIHS1QDQcdT6ZCI4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ukRR14o2DYLJjveu31o7vrek88aNy7foZMDbmN6CGPfXrLDVawVizwi+Wy8zJWsXluYqC2smfg3nAgHxxBF4jRam0l5cds4U+QHjeSHwJXunPAomuGOJhghjR5Ey931wn6ou91jnTtrCUQHQPm6chr8oGzNOAo8KsvDJbHQFHaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=eBPAKLfh; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-300fefb8e06so4169003a91.0
+        for <kvm@vger.kernel.org>; Fri, 14 Mar 2025 10:20:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1741972369; x=1773508369;
-  h=message-id:date:mime-version:reply-to:subject:to:cc:
-   references:from:in-reply-to:content-transfer-encoding;
-  bh=oyAepvDv+0bsEwZzYOM+K7FhxhX7gKg3uHeMpyD+04E=;
-  b=m99CFGec5UA1CsU4NgmcR6G8jAAmlA9lBOGEKjfZaEp86qAjDS/4Vqq1
-   RZcpFaGeJVKX0ahqfLVukdPVeW0BBE1e8Pu1bBkFUiH7xlJfWY6B+c7T2
-   4i6jtp4S8NASSN0lYRA5MxSGs/muWab2c9BevrfYFtSOynhv44hku6t/A
-   c=;
-X-IronPort-AV: E=Sophos;i="6.14,246,1736812800"; 
-   d="scan'208";a="74461133"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2025 17:12:45 +0000
-Received: from EX19MTAEUB002.ant.amazon.com [10.0.17.79:48372]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.37.123:2525] with esmtp (Farcaster)
- id a718f9c8-6f48-4c18-94f5-eb2eba6844c3; Fri, 14 Mar 2025 17:12:45 +0000 (UTC)
-X-Farcaster-Flow-ID: a718f9c8-6f48-4c18-94f5-eb2eba6844c3
-Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 14 Mar 2025 17:12:38 +0000
-Received: from [192.168.30.216] (10.106.83.27) by
- EX19D022EUC002.ant.amazon.com (10.252.51.137) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 14 Mar 2025 17:12:36 +0000
-Message-ID: <24528be7-8f7a-4928-8bca-5869cf14eace@amazon.com>
-Date: Fri, 14 Mar 2025 17:12:35 +0000
+        d=linaro.org; s=google; t=1741972832; x=1742577632; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3Z8Ejyf5gVIQB49egYugEEvIlbhLo/s2/9aU/7U8kVY=;
+        b=eBPAKLfhDY4QC3gOyBTPnTnoNfVAszg+FOGFcbT47xbDYPG1ID9A/ZepsmnzkLwx65
+         eCkeZkfn3FnyhnB1A0kGPwSImRfBUjD/XAM5GuGAvia/JurX2SxVQO6GpO57we/dyYJB
+         QU0sdtQePOdS9+ANNMyAqMTCpTQN+vSE43mikNg0OwRb3tqOzQnJc6o+sea5IEpkfws+
+         WIlFOepEys+rM2XnPIyysbRuS52IrOwBl+RVGW5aYXzxAJT1nqfKkiYZThAUkkmfzYda
+         da1VPMAeUzTD4uIpULmzda7/Fzhd7mFuMJS2Swp+6ofXekKb9cUbhezUAMIiMWWwZJgy
+         NHCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741972832; x=1742577632;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3Z8Ejyf5gVIQB49egYugEEvIlbhLo/s2/9aU/7U8kVY=;
+        b=P4G4xBwsdm2v0Bu/h428b2aZlHBnDKNobruFf3l2jyj9dBfmYwpmqbOc3uZnt1i1xL
+         PPVQaM8xktfT0eq4wSQ3hho7ZBqEccvnNIN3ostmG7Wq4Ypcqk72TsuoBfY98Tnz1pAE
+         hDqxVfJqJDlzexbJBtwihZ8FoLEJRDFAY0tJuYZ1Fzq+/mywpo+X77U9A44fdd1z76aN
+         Z/g0r9EXy9ed2T6Piv61x26XPdcxNmHwojzHOhRA2f71MhJ9JvAcmMLPVQ4dec11/xk8
+         XVJGWe+7wJJzf86E+2wnw6wt6WkzkJsPzWcgJ4fRuRm1fN9BE5Xa27fA/qSe4qoLKSuv
+         8P5A==
+X-Forwarded-Encrypted: i=1; AJvYcCXzNzCdIOuxxZxyZt147ZGWz6DUncvoeKQnQr2fub3QR1c8OWAXYaWqQ306qeCiEohifdo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3UG9jCaDjh4uHuvC/1EowcpzGyjnp49KXJ3yGbVUbkFR8dKhL
+	zNtFbT80DUmi1hN5tSUVEbUWdZ20EN1nOTrzoYKJWZcZfNOJBvTo7Ap19eQZZGM=
+X-Gm-Gg: ASbGncuAICK0UWTjml8+NU5/aLVkCO0Pe+tJOtQ/IlfTiyVtmhVruV+Pm2lparDw0e7
+	rFS1qSXF51UFDY7UA63Tk3wRDCpAhZ1WujL9Xup2CXJehze91mV5FgLGZXtxoTc32Qx8Eh96PAj
+	nMOgAk5ad2j6kY4MuPOjv0sSg9kKaqHzXktow4hf8xm8I6xu175zw9KhhouxToP8wJrByr4Bssm
+	zsosRcN645uUbHywmuZBOzK2FUovA46oy7mqIVd9unStQQdudswVIbk6zU0bAgR8wLUjC/Qd35W
+	6BeQs+sh9iksab6yCg0Jmm2olxS7JLPoK3THIose1qAndhEJ/umOYgyVB6Almd7jKM8J
+X-Google-Smtp-Source: AGHT+IH14/vkNdOBVlHqTbsYx0wGv8KV3ghiAEvAGkec1UsA+oGhZP9+b0le8JVQuRL27/WBey/Lyg==
+X-Received: by 2002:a17:90a:da87:b0:2ff:5e4e:861 with SMTP id 98e67ed59e1d1-30151d9d4d8mr119507a91.24.1741972831743;
+        Fri, 14 Mar 2025 10:20:31 -0700 (PDT)
+Received: from [192.168.1.67] ([38.39.164.180])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-301539d40a1sm1393009a91.1.2025.03.14.10.20.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 14 Mar 2025 10:20:31 -0700 (PDT)
+Message-ID: <a04d4b3e-c2d6-4193-a95b-b8f61645dc27@linaro.org>
+Date: Fri, 14 Mar 2025 10:20:30 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -66,109 +81,67 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: <kalyazin@amazon.com>
-Subject: Re: [RFC PATCH 0/5] KVM: guest_memfd: support for uffd missing
-To: Peter Xu <peterx@redhat.com>
-CC: James Houghton <jthoughton@google.com>, <akpm@linux-foundation.org>,
-	<pbonzini@redhat.com>, <shuah@kernel.org>, <kvm@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-mm@kvack.org>, <lorenzo.stoakes@oracle.com>, <david@redhat.com>,
-	<ryan.roberts@arm.com>, <quic_eberman@quicinc.com>, <graf@amazon.de>,
-	<jgowans@amazon.com>, <roypat@amazon.co.uk>, <derekmn@amazon.com>,
-	<nsaenz@amazon.es>, <xmarcalx@amazon.com>
-References: <Z8i0HXen8gzVdgnh@x1.local>
- <fdae95e3-962b-4eaf-9ae7-c6bd1062c518@amazon.com> <Z89EFbT_DKqyJUxr@x1.local>
- <9e7536cc-211d-40ca-b458-66d3d8b94b4d@amazon.com> <Z9GsIDVYWoV8d8-C@x1.local>
- <7c304c72-1f9c-4a5a-910b-02d0f1514b01@amazon.com> <Z9HhTjEWtM58Zfxf@x1.local>
- <69dc324f-99fb-44ec-8501-086fe7af9d0d@amazon.com> <Z9MuC5NCFUpCZ9l8@x1.local>
- <507e6ad7-2e28-4199-948a-4001e0d6f421@amazon.com> <Z9NeTQsn4xwTtU06@x1.local>
+Subject: Re: [PATCH v4 12/17] hw/xen: add stubs for various functions
 Content-Language: en-US
-From: Nikita Kalyazin <kalyazin@amazon.com>
-Autocrypt: addr=kalyazin@amazon.com; keydata=
- xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
- JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
- BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
- IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
- CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
- ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
- ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
- i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
-In-Reply-To: <Z9NeTQsn4xwTtU06@x1.local>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+To: Anthony PERARD <anthony.perard@vates.tech>
+Cc: qemu-devel@nongnu.org, Paul Durrant <paul@xen.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Harsh Prateek Bora <harshpb@linux.ibm.com>,
+ Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ xen-devel@lists.xenproject.org, Peter Xu <peterx@redhat.com>,
+ alex.bennee@linaro.org, manos.pitsidianakis@linaro.org,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org,
+ Richard Henderson <richard.henderson@linaro.org>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Weiwei Li <liwei1518@gmail.com>, qemu-riscv@nongnu.org,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>,
+ Daniel Henrique Barboza <danielhb413@gmail.com>,
+ Nicholas Piggin <npiggin@gmail.com>
+References: <20250313163903.1738581-1-pierrick.bouvier@linaro.org>
+ <20250313163903.1738581-13-pierrick.bouvier@linaro.org>
+ <Z9Qwg4PC_1bEaOLK@l14>
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+In-Reply-To: <Z9Qwg4PC_1bEaOLK@l14>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EX19D006EUA003.ant.amazon.com (10.252.50.176) To
- EX19D022EUC002.ant.amazon.com (10.252.51.137)
 
+On 3/14/25 06:35, Anthony PERARD wrote:
+> On Thu, Mar 13, 2025 at 09:38:58AM -0700, Pierrick Bouvier wrote:
+>> Those functions are used by system/physmem.c, and are called only if
+>> xen is enabled (which happens only if CONFIG_XEN is not set).
+> 
+> You mean, 's/is not set/is set/'?
 
+Right, I'll update the comment.
 
-On 13/03/2025 22:38, Peter Xu wrote:
-> On Thu, Mar 13, 2025 at 10:13:23PM +0000, Nikita Kalyazin wrote:
->> Yes, that's right, mmap() + memcpy() is functionally sufficient. write() is
->> an optimisation.  Most of the pages in guest_memfd are only ever accessed by
->> the vCPU (not userspace) via TDP (stage-2 pagetables) so they don't need
->> userspace pagetables set up.  By using write() we can avoid VMA faults,
->> installing corresponding PTEs and double page initialisation we discussed
->> earlier.  The optimised path only contains pagecache population via write().
->> Even TDP faults can be avoided if using KVM prefaulting API [1].
 >>
->> [1] https://docs.kernel.org/virt/kvm/api.html#kvm-pre-fault-memory
+>> So we can crash in case those are called.
+>>
+>> Acked-by: Richard Henderson <richard.henderson@linaro.org>
+>> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+>> ---
+>> diff --git a/hw/xen/xen_stubs.c b/hw/xen/xen_stubs.c
+>> new file mode 100644
+>> index 00000000000..19cee84bbb4
+>> --- /dev/null
+>> +++ b/hw/xen/xen_stubs.c
+>> +
+>> +void xen_invalidate_map_cache(void)
+>> +{
 > 
-> Could you elaborate why VMA faults matters in perf?
+> Is this stub actually necessary? xen_invalidate_map_cache() doesn't
+> seems to be used outside of xen's code.
+>
 
-Based on my experiments, I can populate 3GiB of guest_memfd with write() 
-in 980 ms, while memcpy takes 2140 ms.  When I was profiling it, I saw 
-~63% of memcpy time spent in the exception handler, which made me think 
-VMA faults mattered.
+You're right again, I added it by mistake.
 
-> If we're talking about postcopy-like migrations on top of KVM guest-memfd,
-> IIUC the VMAs can be pre-faulted too just like the TDP pgtables, e.g. with
-> MADV_POPULATE_WRITE.
-
-Yes, I was thinking about MADV_POPULATE_WRITE as well, but AFAIK it 
-isn't available in guest_memfd, at least with direct map removed due to 
-[1] being updated in [2]:
-
-diff --git a/mm/gup.c b/mm/gup.c
-index 3883b307780e..7ddaf93c5b6a 100644
---- a/mm/gup.c
-+++ b/mm/gup.c
-@@ -1283,7 +1283,7 @@ static int check_vma_flags(struct vm_area_struct 
-*vma, unsigned long gup_flags)
-  	if ((gup_flags & FOLL_LONGTERM) && vma_is_fsdax(vma))
-  		return -EOPNOTSUPP;
-
--	if (vma_is_secretmem(vma))
-+	if (vma_is_secretmem(vma) || vma_is_no_direct_map(vma))
-  		return -EFAULT;
-
-  	if (write) {
-
-[1] https://elixir.bootlin.com/linux/v6.13.6/source/mm/gup.c#L1286
-[2] 
-https://lore.kernel.org/kvm/20250221160728.1584559-1-roypat@amazon.co.uk/T/#m05b5c6366be27c98a86baece52b2f408c455e962
-
-> Normally, AFAIU userapp optimizes IOs the other way round.. to change
-> write()s into mmap()s, which at least avoids one round of copy.
+> In anycase:
+> Acked-by: Anthony PERARD <anthony.perard@vates.tech>
 > 
-> For postcopy using minor traps (and since guest-memfd is always shared and
-> non-private..), it's also possible to feed the mmap()ed VAs to NIC as
-> buffers (e.g. in recvmsg(), for example, as part of iovec[]), and as long
-> as the mmap()ed ranges are not registered by KVM memslots, there's no
-> concern on non-atomic copy.
-
-Yes, I see what you mean.  It may be faster depending on the setup, if 
-it's possible to remove one copy.
-
-Anyway, it looks like the solution we discussed allows to choose between 
-memcpy-only and memcpy/write-combined userspace implementations.  I'm 
-going to work on the next version of the series that would include MINOR 
-trap and avoiding KVM dependency in mm via calling vm_ops->fault() in 
-UFFDIO_CONTINUE.
-
 > Thanks,
-> 
-> --
-> Peter Xu
 > 
 
 
