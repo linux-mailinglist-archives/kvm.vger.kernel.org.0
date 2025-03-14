@@ -1,255 +1,227 @@
-Return-Path: <kvm+bounces-41058-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41059-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C226A61200
-	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 14:06:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 83CACA6124F
+	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 14:16:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 004B47AC9A0
-	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 13:05:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36BE17AD92B
+	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 13:15:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3683A1FF602;
-	Fri, 14 Mar 2025 13:06:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A18CC1FFC76;
+	Fri, 14 Mar 2025 13:14:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Qt7A+jjd"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="buQiEUuv"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6B201FECD7
-	for <kvm@vger.kernel.org>; Fri, 14 Mar 2025 13:06:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 957481FFC4B;
+	Fri, 14 Mar 2025 13:14:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741957577; cv=none; b=YDuVM8nKo3jY1Ba5rDMXqFKlQu2Yk1nY0LFn0J+W7D3Vts0quA3Ih2sMBXMLM5JnBKRQzqZO3EjN0YgctzHGinZoGekBvV5OIOo/2wElH9fvO4lQ+terQdYOy6irF9W9hJY9RNKY/762rpNlRwKcaRcxll4/mrpN3JplDY3xiyU=
+	t=1741958086; cv=none; b=SnesYz5dMdknQU0aJidjJpBhdpyBhJ45CRwAjKFumk3AhA5RWn0GrJM2mTKYzypjE5P6nnbmXZXW7u367kLNZHOoWJfQ9U5uVxs+PEH7P73yqjIHNdARA82iiKLTeITghfi7mKMpoQYnPS8cy9Bm0JEwwRmhbExbzh++oCGoMwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741957577; c=relaxed/simple;
-	bh=jWYC3l/X7RCTru27D9HBK2LHAOLEY0xgwRuVigXMpCc=;
+	s=arc-20240116; t=1741958086; c=relaxed/simple;
+	bh=7DMjWm8n/7fLinZzNMznJvbWq1as/rJpVihvFho7YMY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=syCNBRNoCjBFtUgxPLuFtQOUlbjFG/91LMxBoZ2DlYLwH0BHSG991OCCsSs0dxf1d1JNubvoEUmwIfnRCHtLGE4f/9O+2A3tQ3B7+XLR9DapZh59/kCLj4F8L0/7bhKKnX3GEGoLQrzgAW3z2y2JgpoB2HGWZ1fNmB7jWVq7TVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Qt7A+jjd; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 14 Mar 2025 14:06:10 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1741957572;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nXG9bZIXoZ73nsstowcLvW7wv03XBMEdZ2ZnOb4mhno=;
-	b=Qt7A+jjdtO8UcCBA+h7G1lyrMXP+pauYHZWiZAIXcGSC8xoyYCpqIMRhocJ4bz9ueZag6q
-	KCZ5Y6snH9AmPwzX2gZ5e3+iiuX2cIUwf6z9I3FKvg+7V2dxdV/cymHyrYuq0zy4EXY8Hs
-	UP8eV+xsYVnVU9iwUncMWfMsR4xmsOM=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Akshay Behl <akshaybehl231@gmail.com>
-Cc: kvm@vger.kernel.org, cleger@rivosinc.com, atishp@rivosinc.com
-Subject: Re: [RFC kvm-unit-tests PATCH v2] riscv: Refactoring sbi fwft tests
-Message-ID: <20250314-de170e6be9663465ab8f577e@orel>
-References: <20250313075845.411130-1-akshaybehl231@gmail.com>
- <20250313171223.551383-1-akshaybehl231@gmail.com>
- <20250314-e4eb6916a20814ac24aae5e6@orel>
+	 Content-Type:Content-Disposition:In-Reply-To; b=J3TOLdDKiTyrYTYZqmpiQCF2o1z4VF8WS36X/+Uslc9xR1a8QbMy4UEosSIdLbrnZTGU9mPJGxT2D9S/JiKXHjT8egU4b5M3tAZ/bCcUGzGiTGBbedyzuOSRwFXx9UbAWZdhJZCoLETMzRaEF3nwDdRZXgBTFdSMWvo/kr0MZRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=buQiEUuv; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 270D340E015E;
+	Fri, 14 Mar 2025 13:14:41 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id z-pXS9vvo2h3; Fri, 14 Mar 2025 13:14:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1741958076; bh=rK3jFCPqqItfl6ZwdgpRWuAuoUZAqjm53rLp3ckpUT0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=buQiEUuvGPz5ahlbn9PZtwPr+7vVbnqzon3HVoWjnvJq7YlGd1eCukMFuwc5DbzNq
+	 +BBRyB87TCk0D6ai9KuTHjQxQgVo83ZljRWXRyJ5xCSwl3aEOfYGhGUX3zDZDLnqn+
+	 s2MU7ElEGXfjAV89BWTTnroEzUBIS3Wf3RUT/kV2+7OjClA9DQG/Hvopy2xRaK7Bn8
+	 lmG1GyeoHZ8k5v3BYHWevFZgw8ryzPcmzY7T/A8YyzHsCdFH//sIIUfXajgXZbotnx
+	 IhXKl0/iiNsMHRKO7/uUyXgXoiIaz5gaEaAA8W8VdjBES3RrkRV+0aDAd3j+6kSHUV
+	 6k++mMLZZyAN2jc0Hu6M4sR91Y9zoHt/jS7tc7Bgbr/ypFP1R4MkETlxEvEn8gvWO/
+	 Y7rPYfvUfrnjUTMWCLU9v/5/s2XYAqsS6ftcIib2NBhMmT2R7V3ROm6PNzSbzb3Rvl
+	 9JgDLtLPWisWvlUMzaDaH5Unqhf8eG2wm/sVnKTsR98OQDs/Ooj0UY6GeH6Pu6P1J/
+	 2qAAJ83OLDHUGkfe0hPZzL6plpiHGeQlHlXjJoHhtm8q57frspkNwtX2/53ad6KY0u
+	 S32/I19c9GIX27/+TaNuIc4iI9x2XZe0tre/KLSLBG8Wtyc5d6Fs/HOtJAVxxel8/N
+	 jmLhNS9GU2k3ONwVLl4hBbDw=
+Received: from zn.tnic (pd95303ce.dip0.t-ipconnect.de [217.83.3.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1A99F40E023B;
+	Fri, 14 Mar 2025 13:14:25 +0000 (UTC)
+Date: Fri, 14 Mar 2025 14:14:19 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Brendan Jackman <jackmanb@google.com>
+Cc: akpm@linux-foundation.org, dave.hansen@linux.intel.com,
+	yosryahmed@google.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	peterz@infradead.org, seanjc@google.com, tglx@linutronix.de,
+	x86@kernel.org
+Subject: Re: [PATCH RFC v2 03/29] mm: asi: Introduce ASI core API
+Message-ID: <20250314131419.GJZ9Qrq8scAtDyBUcg@fat_crate.local>
+References: <20250227120607.GPZ8BVL2762we1j3uE@fat_crate.local>
+ <20250228084355.2061899-1-jackmanb@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250314-e4eb6916a20814ac24aae5e6@orel>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20250228084355.2061899-1-jackmanb@google.com>
 
-On Fri, Mar 14, 2025 at 01:57:45PM +0100, Andrew Jones wrote:
-> On Thu, Mar 13, 2025 at 10:42:23PM +0530, Akshay Behl wrote:
-> > This patch refactors the current sbi fwft tests
-> > (pte_ad_hw_updating, misaligned_exc_deleg)
-> > 
-> > v2:
-> >  - Made env_or_skip and env_enabled methods shared by adding
-> >    them to sbi-tests.h
-> >  - Used env_enabled check instead of env_or_skip for
-> >    platform support
-> >  - Added the reset to 0/1 test back for pte_ad_hw_updating
-> >  - Made other suggested changes
+On Fri, Feb 28, 2025 at 08:43:55AM +0000, Brendan Jackman wrote:
+> Yeah I see what you mean. I think the issues are:
 > 
-> The v2 changelog should go under the '---' below to keep it out of the
-> file commit message.
+> 1. We're mixing up two different aspects in the API:
 > 
-> > 
-> > Signed-off-by: Akshay Behl <akshaybehl231@gmail.com>
-> > ---
-> >  riscv/sbi-tests.h | 22 ++++++++++++++++++++++
-> >  riscv/sbi-fwft.c  | 38 +++++++++++++++++++++++++++-----------
-> >  riscv/sbi.c       | 17 -----------------
-> >  3 files changed, 49 insertions(+), 28 deletions(-)
-> > 
-> > diff --git a/riscv/sbi-tests.h b/riscv/sbi-tests.h
-> > index b081464d..91eba7b7 100644
-> > --- a/riscv/sbi-tests.h
-> > +++ b/riscv/sbi-tests.h
-> > @@ -70,6 +70,28 @@
-> >  #define sbiret_check(ret, expected_error, expected_value) \
-> >  	sbiret_report(ret, expected_error, expected_value, "check sbi.error and sbi.value")
-> >  
-> > +/**
-> > + * Check if environment variable exists, skip test if missing
-> > + *
-> > + * @param env The environment variable name to check
-> > + * @return true if environment variable exists, false otherwise
-> > + */
+>    a. Starting and finishing "critical sections" (i.e. the region
+>       between asi_enter() and asi_relax())
+> 
+>    b. Actually triggering address space transitions.
+> 
+> 2. There is a fundamental asymmetry at play here: asi_enter() and
+>    asi_exit() can both be NOPs (when we're already in the relevant
+>    address space), and asi_enter() being a NOP is really the _whole
+>    point of ASI_.
 
-I also dropped this comment block. The '/**' made check-kerneldoc complain
-and the comment didn't tell us anything that the four lines of code that
-the function has was already easily telling us.
+I'm guessing you mean this thing in __asi_enter():
 
-Thanks,
-drew
++	if (!target || target == this_cpu_read(curr_asi))
++		return;
 
-> > +static inline bool env_or_skip(const char *env)
-> > +{
-> > +	if (!getenv(env)) {
-> > +		report_skip("missing %s environment variable", env);
-> > +		return false;
-> > +	}
-> > +	return true;
-> > +}
-> > +
-> > +static inline bool env_enabled(const char *env)
-> > +{
-> > +	char *s = getenv(env);
-> > +
-> > +	return s && (*s == '1' || *s == 'y' || *s == 'Y');
-> > +}
+The assumption being that curr_asi will be the target most of the time after
+having done the expensive switch once...
+
+>    The ideal world is where asi_exit() is very very rare, so
+>    asi_enter() is almost always a NOP.
+
+... asi_exit() being the actual switch to the unrestricted CR3.
+
+And asi_relax() being the switch of current task's asi target ptr to NULL.
+Comment says
+
+"Domain to enter when returning to process context."
+
+but I'm none-the-wiser.
+
+So, why are we doing that relaxing thing?
+
+I'm guessing the relaxing is marking the end of the region where we're running
+untrusted code. After asi_relax() we are still in the restricted CR3 but we're
+not running untrusted code.
+
+> So we could disentangle part 1 by just rejigging things as you suggest,
+> and I think the naming would be like:
 > 
-> We should include libcflat.h now that we've added these functions. Make
-> sure the include is under the '#ifndef __ASSEMBLER__' (and above the
-> '#include <asm/sbi.h>')
+> asi_enter
+>   asi_start_critical
+>   asi_end_critical
+> asi_exit
+
+Yap, that's what I was gonna suggest: asi_enter and asi_exit do the actual CR3
+build and switch and start_critical and end_critical do the cheaper tracking
+thing.
+
+> But the issue with that is that asi_start_critical() _must_ imply
+> asi_enter()
+
+What does that mean exactly?
+
+asi_start_critical() must never be called before asi_enter()?
+
+If so, I'm sure there are ways to track and check that and warn if not, right?
+
+> (otherwise if we get an NMI between asi_enter() and
+> asi_start_critical(), and that causes a #PF, we will start the
+> critical section in the wrong address space and ASI won't do its job).
+> So, we are somewhat forced to mix up a. and b. from above.
+
+I don't understand: asi_enter() can be interrupted by an NMI at any random
+point. How is the current, imbalanced interface not vulnerable to this
+scenario?
+
+> BTW, there is another thing complicating this picture a little: ASI
+> "clients" (really just meaning KVM code at this point) are not not
+> really supposed to care at all about the actual address space, the fact
+> that they currently have to call asi_exit() in part 4b is just a
+> temporary thing to simplify the initial implementation. It has a
+> performance cost (not enormous, serious KVM platforms try pretty hard
+
+You mean the switch to the unrestricted_cr3? I can imagine...
+
+> to avoid returning to user space, but it does still matter) so
+> Google's internal version has already got rid of it and that's where I
+> expect this thing to evolve too. But for now it just lets us keep
+> things simple since e.g. we never have to think about context
+> switching in the restricted address space.
 > 
-> > +
-> >  void sbi_bad_fid(int ext);
-> >  
-> >  #endif /* __ASSEMBLER__ */
-> > diff --git a/riscv/sbi-fwft.c b/riscv/sbi-fwft.c
-> > index ac2e3486..581cbf6b 100644
-> > --- a/riscv/sbi-fwft.c
-> > +++ b/riscv/sbi-fwft.c
-> > @@ -66,6 +66,14 @@ static void fwft_check_reserved(unsigned long id)
-> >  	sbiret_report_error(&ret, SBI_ERR_DENIED, "set reserved feature 0x%lx", id);
-> >  }
-> >  
-> > +/* Must be called before any fwft_set() call is made for @feature */
-> > +static void fwft_check_reset(uint32_t feature, unsigned long reset)
-> > +{
-> > +	struct sbiret ret = fwft_get(feature);
-> > +
-> > +	sbiret_report(&ret, SBI_SUCCESS, reset, "resets to %lu", reset);
-> > +}
-> > +
-> >  static void fwft_check_base(void)
-> >  {
-> >  	report_prefix_push("base");
-> > @@ -99,18 +107,28 @@ static struct sbiret fwft_misaligned_exc_get(void)
-> >  static void fwft_check_misaligned_exc_deleg(void)
-> >  {
-> >  	struct sbiret ret;
-> > +	unsigned long expected;
-> >  
-> >  	report_prefix_push("misaligned_exc_deleg");
-> >  
-> >  	ret = fwft_misaligned_exc_get();
-> > -	if (ret.error == SBI_ERR_NOT_SUPPORTED) {
-> > -		report_skip("SBI_FWFT_MISALIGNED_EXC_DELEG is not supported");
-> > +	if (ret.error != SBI_SUCCESS) {
-> > +		if (env_enabled("SBI_HAVE_FWFT_MISALIGNED_EXC_DELEG")) {
-> > +			sbiret_report_error(&ret, SBI_SUCCESS, "supported");
-> > +			return;
-> > +		}
-> > +		report_skip("not supported by platform");
-> >  		return;
-> >  	}
-> >  
-> >  	if (!sbiret_report_error(&ret, SBI_SUCCESS, "Get misaligned deleg feature"))
-> >  		return;
-> >  
-> > +	if (env_or_skip("MISALIGNED_EXC_DELEG_RESET")) {
-> > +		expected = strtoul(getenv("MISALIGNED_EXC_DELEG_RESET"), NULL, 0);
-> > +		fwft_check_reset(SBI_FWFT_MISALIGNED_EXC_DELEG, expected);
-> > +	}
-> > +
-> >  	ret = fwft_misaligned_exc_set(2, 0);
-> >  	sbiret_report_error(&ret, SBI_ERR_INVALID_PARAM,
-> >  			    "Set misaligned deleg feature invalid value 2");
-> > @@ -129,16 +147,10 @@ static void fwft_check_misaligned_exc_deleg(void)
-> >  #endif
-> >  
-> >  	/* Set to 0 and check after with get */
-> > -	ret = fwft_misaligned_exc_set(0, 0);
-> > -	sbiret_report_error(&ret, SBI_SUCCESS, "Set misaligned deleg feature value 0");
-> > -	ret = fwft_misaligned_exc_get();
-> > -	sbiret_report(&ret, SBI_SUCCESS, 0, "Get misaligned deleg feature expected value 0");
-> > +	fwft_set_and_check_raw("", SBI_FWFT_MISALIGNED_EXC_DELEG, 0, 0);
-> >  
-> >  	/* Set to 1 and check after with get */
-> > -	ret = fwft_misaligned_exc_set(1, 0);
-> > -	sbiret_report_error(&ret, SBI_SUCCESS, "Set misaligned deleg feature value 1");
-> > -	ret = fwft_misaligned_exc_get();
-> > -	sbiret_report(&ret, SBI_SUCCESS, 1, "Get misaligned deleg feature expected value 1");
-> > +	fwft_set_and_check_raw("", SBI_FWFT_MISALIGNED_EXC_DELEG, 1, 0);
-> >  
-> >  	install_exception_handler(EXC_LOAD_MISALIGNED, misaligned_handler);
-> >  
-> > @@ -261,7 +273,11 @@ static void fwft_check_pte_ad_hw_updating(void)
-> >  	report_prefix_push("pte_ad_hw_updating");
-> >  
-> >  	ret = fwft_get(SBI_FWFT_PTE_AD_HW_UPDATING);
-> > -	if (ret.error == SBI_ERR_NOT_SUPPORTED) {
-> > +	if (ret.error != SBI_SUCCESS) {
-> > +		if (env_enabled("SBI_HAVE_FWFT_PTE_AD_HW_UPDATING")) {
-> > +			sbiret_report_error(&ret, SBI_SUCCESS, "supported");
-> > +			return;
-> > +		}
-> >  		report_skip("not supported by platform");
-> >  		return;
-> >  	} else if (!sbiret_report_error(&ret, SBI_SUCCESS, "get")) {
-> > diff --git a/riscv/sbi.c b/riscv/sbi.c
-> > index 0404bb81..219f7187 100644
-> > --- a/riscv/sbi.c
-> > +++ b/riscv/sbi.c
-> > @@ -131,23 +131,6 @@ static phys_addr_t get_highest_addr(void)
-> >  	return highest_end - 1;
-> >  }
-> >  
-> > -static bool env_enabled(const char *env)
-> > -{
-> > -	char *s = getenv(env);
-> > -
-> > -	return s && (*s == '1' || *s == 'y' || *s == 'Y');
-> > -}
-> > -
-> > -static bool env_or_skip(const char *env)
-> > -{
-> > -	if (!getenv(env)) {
-> > -		report_skip("missing %s environment variable", env);
-> > -		return false;
-> > -	}
-> > -
-> > -	return true;
-> > -}
-> > -
-> >  static bool get_invalid_addr(phys_addr_t *paddr, bool allow_default)
-> >  {
-> >  	if (env_enabled("INVALID_ADDR_AUTO")) {
-> > -- 
-> > 2.34.1
-> >
+> With that in mind, what if it looked like this:
 > 
-> Other than the two comments above, it looks good. I've made the changes
-> myself while applying to riscv/sbi
+> ioctl(KVM_RUN) {
+>     enter_from_user_mode()
+>     while !need_userspace_handling()
+> 	// This implies asi_enter(), but this code "doesn't care"
+> 	// about that.
+>         asi_start_critical();
+>         vmenter();
+>         asi_end_critical();
+>     }
+>     // TODO: This is temporary, it should not be needed.
+>     asi_exit();
+>     exit_to_user_mode()
+> }
 > 
-> https://gitlab.com/jones-drew/kvm-unit-tests/-/commits/riscv/sbi
-> 
-> Thanks,
-> drew
+> Once the asi_exit() call disappears, it will be symmetrical from the
+> "client API"'s point of view. And while we still mix up address space
+> switching with critical section boundaries, the address space
+> switching is "just an implementation detail" and not really visible as
+> part of the API.
+
+So I'm still unclear on that whole design here so I'm asking silly questions
+but I know that:
+
+1. you can do empty calls to keep the interface balanced and easy to use
+
+2. once you can remove asi_exit(), you should be able to replace all in-tree
+   users in one atomic change so that they're all switched to the new,
+   simplified interface
+
+But I still have the feeling that we could re-jig what asi_enter/relax/exit do
+and thus have a balanced interface. We'll see...
+
+> I have now setup Mutt.
+
+I did that 20 years ago. Never looked back. I'd say you're on the right track
+:-)
+
+> But, for now I am replying with plan vim + git-send-email, because I also
+> sent this RFC to a ridiculous CC list (I just blindly used the
+> get_maintainers.pl output, I don't know why I thought that was a reasonable
+> approach) and it turns out this is the easiest way to trim it in a reply!
+> Hopefully I can get the headers right...
+
+Yeah, works. On the next version, you could trim it to the couple relevant
+lists and to whoever reviewed this. The others can always get the thread from
+lore and there's really no need anymore to Cc the whole world :)
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
