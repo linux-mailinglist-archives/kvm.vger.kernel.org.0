@@ -1,152 +1,136 @@
-Return-Path: <kvm+bounces-41071-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41072-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C578AA613D6
-	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 15:41:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BD63A61405
+	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 15:48:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA7033B1D00
-	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 14:40:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 932C43BFCB4
+	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 14:48:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E478420101E;
-	Fri, 14 Mar 2025 14:40:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29E082010E3;
+	Fri, 14 Mar 2025 14:48:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="iGT/Lh2B"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e9bkylei"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BF00200BB8
-	for <kvm@vger.kernel.org>; Fri, 14 Mar 2025 14:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CCF01FF7BB
+	for <kvm@vger.kernel.org>; Fri, 14 Mar 2025 14:48:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741963216; cv=none; b=GxcrA9ZO4Pkwn5Wp0g4jouQf3grHekROvz2oeqDw2+2TA36OhgN35WlDERbRhynRUy+Wn/pbN7qG19SKTUrTO+DmhhpmSs7675Zf98Rz90EznIJRfxWjf6wMOwaF8kfMIa/ae9UaMclzUjsNc3oOSmD3zNLEG5EhHvxhifUMAME=
+	t=1741963708; cv=none; b=KQFPiAzOgybxLQhOhh/0/+hNq8fD/aTLCPQUqHYEtLEf2YHVT7LL0GEPSPdl9S7cqFl0eC8wj0LbRhfWrqH6q3K6qf4bWtsSJ2yyxQCjzPGc7ActPjaj9QRwyuLCo7baBKms18/Yuk1JvvXBXUwb4P0zbCnpUj9z9FoccLqF7gY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741963216; c=relaxed/simple;
-	bh=nfw0RtGDs+JYFChSu3zbhx0B/5coaK9bdLpUJTsFWJ0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WQZtD6SooNGUkrfRoq6oSHvxzBZK44Aq+n4BxnInsPmg8XCjCsipHLFbSFjr2fsmxUBrz5IWFibG0WIgUipEz7YMMT7jEIUU4qx9Zs1w++tKnksHbZU1j53n+47DRccXL+GTJuKQXVlCLe3FUJCPmq8nPOdDKDYyNl+WgMRKEEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=iGT/Lh2B; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-39141ffa9fcso1832693f8f.0
-        for <kvm@vger.kernel.org>; Fri, 14 Mar 2025 07:40:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1741963211; x=1742568011; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Fxgj92qNVf8hUC6pVQUheuB7d74bdJSB97loH4AdJvM=;
-        b=iGT/Lh2BsYNMA4q5iHCJ4XF/7XgxQWQve6wBHJ07KgPVOtyI66gpo2ZCk767OHkZQL
-         7ZpVAN1bP1QryxCenPO++HL0t1PbclHlMRlHOXhsZTRNzYtxq0+x2QN3q5AFH+7le6EK
-         Tb9qntaLGlNzhE8aTcL86P0O9aU9Uof2QleYDUmuXXxLQtnNEbg0Nsl0IFiShk+2XShi
-         9LLRvoP3xUL10vQq1Wd2K0c8XZjubX4gX8uVcL4G0HvUc/t0ja+W1dLYm8Zo/2WHBzcZ
-         Nl8iVLob4Zt8MGcvXCbFnGay+O3lTC4KMj/FcC7tyO18Q3szOUDXW9ot0iGoBGTW4HqB
-         1S+g==
+	s=arc-20240116; t=1741963708; c=relaxed/simple;
+	bh=AxZCEgDggaThJawcb274lrza9l/Ka1paShEZneTzReA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bctvlhWReTGwxDph99AWE3ypoeDdn+NgJFuPTrlRu+CyO91m7WfSP9yWCsxCD+eGzyCdcBONAcxJjaRDDKnbEnyYQpNWieFKj/Y2Ny/aruLBTyffa3WrvVO5HgFeY4muP+B+TUad7msIj+k/iL+gFtUYiL/vML3fLsDOywE8ZcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e9bkylei; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741963705;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=I9NEmY1/3EX+C0jP6fbQDXPtdDIUrIk5k8tCSlroRrI=;
+	b=e9bkyleimzcyijcu7t+GK34ePsxZc7f92goAdRwZ2tqWhfF55d2J3VNr/ZQMfk0jsOaK+I
+	Xkp1Jx0vscmyx+20YvB+xHhCClDFtjp6hAm25Ek4SvN1iFuIYf7/7IP3aiyUBeApUUHx4q
+	1E2nTj93GVAuF0QKcU+nx2cIgA9M3sk=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-29-NpZuFgr6MnuHecDRj1BwEg-1; Fri, 14 Mar 2025 10:48:24 -0400
+X-MC-Unique: NpZuFgr6MnuHecDRj1BwEg-1
+X-Mimecast-MFC-AGG-ID: NpZuFgr6MnuHecDRj1BwEg_1741963703
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3ce7aa85930so4385415ab.2
+        for <kvm@vger.kernel.org>; Fri, 14 Mar 2025 07:48:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741963211; x=1742568011;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fxgj92qNVf8hUC6pVQUheuB7d74bdJSB97loH4AdJvM=;
-        b=dCosW455PpIgE2cF+6XSrnjBMDEnGwZ8Tb0OZ+81Ng0NlOxQ/JfBUrnCHid9nHyXVT
-         Nw0gPV4I6iwCRwba8+mtajn1Kz9BBVOFG2f7bZV75im6oP7QLj+sy94O7wfCREtTKnOH
-         LCyizmXJwk+nuUzAnvx3dgoKdzIxWCp4MLACNJJDxIllCImY/VXG7AJIusA2/dfcJuxH
-         lmIhFlqmJbhHbJ5tfLvJEGwamUerUMaq0pPCC5hYa5BocPRkRfj2iSOASFT3aZgWwQ0K
-         1rE47H2FdEwXwsmBbuPTpk+l3nStfIf3XhslY4xbPhnAyuN/M6L+b212KmK1f2lw3Il6
-         BhZQ==
-X-Gm-Message-State: AOJu0Yyul6GRG8Ud2jmcfjaUnfN1vISFLWkIdKMYRO9DWYesYhTFmQNb
-	KnuNyPtN+snTvzNgpM5MZNeVDYx+h9je9HKaxiaTmLWyDlmTCxwHCHPnY6OOXCI=
-X-Gm-Gg: ASbGncugEhdu09hhwmZC4E+xj7ykgQXA1S6rfgN07JBiBe+57pV2Kl4E9b5qhMi5Nre
-	MwjXhUnxPCj/iRz01t6w9QOMxnmzWBZ9vvyfZ+nOpoTpuKIJGS8pbxaZMXqn6reHf9QRgdx77QI
-	LxH4IFU/z8Ofpn0c7BReW18kVbS4KYadeyTQXfCYIJEcEKOWM1Dng/RjZABOwe/QBx0An8wDVa/
-	yvIGdOE+C2Mj4WvmhnsB3SRFompPJEXOL4b0j/pvUzVidZ8MpM5KwFK2gaLT5t1HUXfiOdaoeBR
-	qjnKF2WzdKrTPaJ5suL8IxwZEkTeJ/5yPjBYrRC47/Lf1cahnsXsI87MUk/UeMzlRh1hnapUgmz
-	X6vPVfm3butrZmk3nkJkMwH+y
-X-Google-Smtp-Source: AGHT+IFa+aTBGHkeFzcMLxBXa2JTRA6YhHMQUjt/9S3iJBqwVboXGugV53IwLhO2jIlrkkQYoi0gig==
-X-Received: by 2002:a5d:584d:0:b0:38d:e304:7470 with SMTP id ffacd0b85a97d-3971d8015d6mr3449285f8f.25.1741963211193;
-        Fri, 14 Mar 2025 07:40:11 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:e17:9700:16d2:7456:6634:9626? ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d1ffb62ccsm19220165e9.7.2025.03.14.07.40.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Mar 2025 07:40:10 -0700 (PDT)
-Message-ID: <d9a386a5-2ee6-483f-b78b-91e682925700@rivosinc.com>
-Date: Fri, 14 Mar 2025 15:40:10 +0100
+        d=1e100.net; s=20230601; t=1741963703; x=1742568503;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=I9NEmY1/3EX+C0jP6fbQDXPtdDIUrIk5k8tCSlroRrI=;
+        b=kgy/gThW/63R41c2MkghxprIUJKUrZi5ipbPqTcuvS/h3o96Y4vdMQkQFPmLRAOiC/
+         ZvGwLzHOp4i9MF95bhJWKRdvELl6MMLu3OdeaO5LeOXWebGT/7HLoEl/OPsN9utxDzab
+         hWHS0szqKaV/swRVpp3CLDhQgybKUcwv+c9+xSXKqFbe0cvKbcLTEQCisn8SEbUj3Xq9
+         et/bbU0zoHX7pRJ+YsAc+Q+PCJCuV251TQjMn+n7gadc48EXlvVCGG2JbFC6VypEdg1T
+         ry98kF2enDYW/K6XobaNjtbIcQN7EZxzNtnzbf7lqRALUuHSnnQgFffiUXcbrYq2be3V
+         iFtw==
+X-Forwarded-Encrypted: i=1; AJvYcCV5ufCFE0IoR5rjY+gxCzTAZnNTxT4dM1zffT82Pd9FpGVrMzewdszIZLi4n4z7MUbZciM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2cqMt1Bzl7dXOM1iy8iVS2UmSLu0Dij1zUoWzb5Iy0kZ+GBE3
+	orgZHU+PngsIwexqcsr2VxHHSdK5IDikUxOnXy6IhDIXEmiYoixHtcfJphoFz/AfqCh+BcNC/P7
+	NXE4qu8A/0Tu/Mo1XqvyD34xD84p/9XMQhxy/srbm3PHr2sHygQ==
+X-Gm-Gg: ASbGncvLtg7Y6g1eD9tkPLZW5N+MJc3dBACUnau6SLjeL6p0A1zd1js5eZiZGKjYExk
+	+ykvX9NC2SZlRpAm4gVS3787ppwUUo2li9zK0NaTF/Aurf3rBB+hc+SwNnqFofdz5XRTKb94ih4
+	tAIes1PYWPucBYilxGwyplHx3Ii+CKrj5pF6aLDLUZtiKST6ekUHccOkF0DgZJGI+X/ipvRYl4+
+	QSra7pWYHVpM3DofMEYiWgEFTmdQvAzz3EYNLjOL4LMRAvBGad2xEE5qkebmftWipUJoHsGuiNw
+	FI3jTOUmpXWqmcLK5cQ=
+X-Received: by 2002:a05:6e02:1a2c:b0:3d2:ae27:10f6 with SMTP id e9e14a558f8ab-3d483a7909bmr6063375ab.6.1741963703455;
+        Fri, 14 Mar 2025 07:48:23 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEsRk7IYGumLFporN/Er4EBhO3DvN0XX2yIAK9lIhR2xUTzIY3johMT+3KWQzhsVAP/T7QbiQ==
+X-Received: by 2002:a05:6e02:1a2c:b0:3d2:ae27:10f6 with SMTP id e9e14a558f8ab-3d483a7909bmr6063255ab.6.1741963702743;
+        Fri, 14 Mar 2025 07:48:22 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f263701f78sm899291173.5.2025.03.14.07.48.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Mar 2025 07:48:22 -0700 (PDT)
+Date: Fri, 14 Mar 2025 08:48:13 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yi Liu <yi.l.liu@intel.com>
+Cc: kevin.tian@intel.com, jgg@nvidia.com, eric.auger@redhat.com,
+ nicolinc@nvidia.com, kvm@vger.kernel.org, chao.p.peng@linux.intel.com,
+ zhenzhong.duan@intel.com, willy@infradead.org, zhangfei.gao@linaro.org,
+ vasant.hegde@amd.com
+Subject: Re: [PATCH v8 0/5] vfio-pci support pasid attach/detach
+Message-ID: <20250314084813.1a263b66.alex.williamson@redhat.com>
+In-Reply-To: <20250313124753.185090-1-yi.l.liu@intel.com>
+References: <20250313124753.185090-1-yi.l.liu@intel.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v9 0/6] riscv: add SBI SSE extension tests
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- Andrew Jones <ajones@ventanamicro.com>, Anup Patel
- <apatel@ventanamicro.com>, Atish Patra <atishp@rivosinc.com>
-References: <20250314111030.3728671-1-cleger@rivosinc.com>
- <20250314-eb8cf0b719942c912e254ab2@orel>
- <eaf88dbb-39bb-4755-830a-7c801099c790@rivosinc.com>
- <20250314-2452599f59b82e53e99100e7@orel>
-Content-Language: en-US
-From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-In-Reply-To: <20250314-2452599f59b82e53e99100e7@orel>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Thu, 13 Mar 2025 05:47:48 -0700
+Yi Liu <yi.l.liu@intel.com> wrote:
 
-
-On 14/03/2025 15:34, Andrew Jones wrote:
-> On Fri, Mar 14, 2025 at 03:23:39PM +0100, Clément Léger wrote:
->>
->>
->> On 14/03/2025 15:19, Andrew Jones wrote:
->>> On Fri, Mar 14, 2025 at 12:10:23PM +0100, Clément Léger wrote:
->>>> This series adds tests for SBI SSE extension as well as needed
->>>> infrastructure for SSE support. It also adds test specific asm-offsets
->>>> generation to use custom OFFSET and DEFINE from the test directory.
->>>
->>> Is there an opensbi branch I should be using to test this? There are
->>> currently 54 failures reported with opensbi's master branch, and, with
->>> opensbi v1.5.1, which is the version provided by qemu's master branch,
->>> I get a crash which leads to a recursive stack walk. The crash occurs
->>> in what I'm guessing is sbi_sse_inject() by the last successful output.
->>
->> Yeah that's due to a6/a7 being inverted at injection time.
->>
->>>
->>> I can't merge this without it skipping/kfailing with qemu's opensbi,
->>> otherwise it'll fail CI. We could change CI to be more tolerant, but I'd
->>> rather use kfail instead, and of course not crash.
->>
->> Yes, the branch dev/cleger/sse on github can be used:
->>
->> https://github.com/rivosinc/opensbi/tree/dev/cleger/sse
->>
->> I'm waiting for the specification error changes to be merged before
->> sending this one.
+> This series introduces the PASID attach/detach user APIs (uAPIs) that
+> allow userspace to attach or detach a device's PASID to or from a specified
+> IOAS/hwpt. Currently, only the vfio-pci driver is enabled in this series.
 > 
-> While ugly, I'm not opposed to doing an SBI implementation ID and
-> version check at the entry of the SSE tests and then just SKIP
-> when we detect opensbi and not a late enough version of it. If we
-> go that route, then please create a separate patch that adds a
-> couple functions in lib/riscv/sbi allowing all sbi unit tests to
-> easily check for specific SBI implementations and versions. (We'll
-> probably want to steal the kernel's sbi_mk_version and add an enum
-> or defines for the SBI implementation IDs.)
-
-Based on the fact that it actually crashes on earlier OpenSBI version, I
-feel like we are not going to cut it if we want it to be reliable on all
-OpenSBI versions. I'll take a look at what you propose.
-
-Thanks,
-
-Clément
-
+> Following this update, PASID-capable devices bound to vfio-pci can report
+> PASID capabilities to userspace and virtual machines (VMs), facilitating
+> PASID use cases such as Shared Virtual Addressing (SVA). In discussions
+> about reporting the virtual PASID (vPASID) to VMs [1], it was agreed that
+> the userspace virtual machine monitor (VMM) will synthesize the vPASID
+> capability. The VMM must identify a suitable location to insert the vPASID
+> capability, including handling hidden bits for certain devices. However,
+> this responsibility lies with userspace and is not the focus of this series.
 > 
-> Thanks,
-> drew
+> This series begins by adding helpers for PASID attachment in the vfio core,
+> then extends the device character device (cdev) attach/detach ioctls to
+> support PASID attach/detach operations. At the conclusion of this series,
+> the IOMMU_GET_HW_INFO ioctl is extended to report PCI PASID capabilities
+> to userspace. Userspace should verify this capability before utilizing any
+> PASID-related uAPIs provided by VFIO, as agreed in [2]. This series depends
+> on the iommufd PASID attach/detach series [3].
+> 
+> The complete code is available at [4] and has been tested with a modified
+> QEMU branch [5].
+
+What's missing for this to go in and which tree will take it?  At a
+glance it seems like 4/ needs a PCI sign-off and 5/ needs an IOMMUFD
+sign-off.  Thanks,
+
+Alex
 
 
