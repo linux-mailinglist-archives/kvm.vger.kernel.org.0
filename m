@@ -1,251 +1,216 @@
-Return-Path: <kvm+bounces-41113-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41114-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C780CA619C3
-	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 19:47:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D20FA619CF
+	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 19:49:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EA384626A5
-	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 18:47:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CBB5D7AE62A
+	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 18:48:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EB53204851;
-	Fri, 14 Mar 2025 18:47:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9894C204C3A;
+	Fri, 14 Mar 2025 18:49:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FN/oBLGA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rQVmjcjZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5550E2E3374
-	for <kvm@vger.kernel.org>; Fri, 14 Mar 2025 18:47:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F39913A26D;
+	Fri, 14 Mar 2025 18:49:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741978022; cv=none; b=njoGhJf8UfXUg8WSVfH0VNMwKrNXvKawN49XtWTOOq97uPEpfl3sTH2YVxQNKoVnslk29RvfOPFtl1MkO1Uix00zxFFMlLU6QnLF6jV5p4wRvc00wlLgLpqOz1NjG7eJkp2saQTjV4d3tF96BejeIKKWwSm1VRXCSbdCMUVIVHQ=
+	t=1741978157; cv=none; b=Rfwp00l7YChLwnfv2D+qvaSMdEVw1AreDkDDDNwQzwyC2a345rvLAWq8TG9Dywqhqyw98QPazUfpYgeY9Al0JzksAc4Mwk44OIfneIJeJUKTsNPLYy4w1zRBPftr5mKlafeLRX7/Qjz5VX8o7Dj9ndpXiatN1qg96M52qDxwdRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741978022; c=relaxed/simple;
-	bh=AgbQKLqFLJAfqdpZRBFIBDOuKoYd51gzvN+7n5heP+w=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=Hev2OdUwuDlSMlAXA15fayOKWoL+v+fPO2QpPj8hY/qkr5hp5k8MkwIRgN0C5mLZqQdr1eo4J4rqbR1sR1RxTpyPbb7wO3sPmR6X8ZZYRWo75uwbtVgktb7NPgbPF07qCV9VjwLRkxLwvjahbsyhNfWzNW4RgxUJXbfbnyjhvrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FN/oBLGA; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ff6aaa18e8so56387a91.1
-        for <kvm@vger.kernel.org>; Fri, 14 Mar 2025 11:47:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741978020; x=1742582820; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=G8BSRuYn8KeNNKWnEiWpWmj0CAZVyouloPrj65g6XRA=;
-        b=FN/oBLGAHCphYq4fHlNxJAjJJCtWRoiVGkC/k5jLqIG2lyze/JiJWlbz7cFxHcAvkp
-         zytc/JdY/71gyYdKMXway87OWJ5x221QqNJrGZYoyYBP45mRgkhMyRhhpWHU+xNSsZCC
-         v/6ljeasLvGjYj2SEoWmKuzX4RHMDTR+y/KGDZA8figQ08MUOY0S4vfUZ2xctK3r0rfX
-         ++9YxVE9hfwLl2cHM00USnjOscuG0kbSuhXG1bdqEvMTYPoGJEani5vqs6BWHtsfAqma
-         urETYFTB/ju2CS92UyGDN9MfZtWHOE4hnYPXUla+I7UPM7rPiscaRs3AGi4VLIzU41uS
-         NG/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741978020; x=1742582820;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=G8BSRuYn8KeNNKWnEiWpWmj0CAZVyouloPrj65g6XRA=;
-        b=wV4MY/f7kgBkWDaa8J3gA4OZvzkUKRmdVkPTUJHw0Y+naqTpXCpcPslULdEba6jBEV
-         G39/unVj+/Sk+ht1VmFjPhbokUBZI+Ya45XNsLTZH4hUvC6JUBRKmj85ZJrT4JawvJ2f
-         0ZFrodk04E7qs15sHmLBoVcY5DvaCZtf8ae873AwLxa4ZnrTf35oD96jvxGoEb7gpSRY
-         5PdVTB3jWpZcM0RD5pbO+2Jng8rrzkB60EjzywTbxDnnbXsx1zHDjM83nzBNOmWy0oD+
-         yq5evfjrcHONGWhtKN1YNJdacIk7Ri9SJZEdcpTXbds3jg0k3syzFpPEZ0WE883Jzupu
-         Uhiw==
-X-Gm-Message-State: AOJu0YxnkkbuOX7qz2miESdDDWf/Jc3D8CdKShD3beqAFTnhLz87Kfqf
-	cHXBntkKmBkN9kOn9d63ixKx0SombSjoymEt8ngyr3M7dxIBxwz/E7Wbac7itKtgzHhgKOX8Hq8
-	r3gGIGU5WJPY5VN1z23/fjw==
-X-Google-Smtp-Source: AGHT+IFnOUHozyBvrEzVKU15S1zj0eWgSlNFNHQ78f1k2qNDSePcqu/68jFbMHYM2FfRGrD7HcNv9AiHGbMehyTTNw==
-X-Received: from pjwx4.prod.google.com ([2002:a17:90a:c2c4:b0:2f5:63a:4513])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:3a08:b0:2fe:8217:2da6 with SMTP id 98e67ed59e1d1-30151d9d6eemr3990810a91.22.1741978020486;
- Fri, 14 Mar 2025 11:47:00 -0700 (PDT)
-Date: Fri, 14 Mar 2025 18:46:58 +0000
-In-Reply-To: <20250312175824.1809636-5-tabba@google.com> (message from Fuad
- Tabba on Wed, 12 Mar 2025 17:58:17 +0000)
+	s=arc-20240116; t=1741978157; c=relaxed/simple;
+	bh=O6TQHcNZOIDORUQUex99gbjkbXRSAsx+LziCN6QYCcQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XRiC/ALWiGdDRnu3t9+TNmp2WE4FzEkuuQpnHJWJ1ue3RLEWuflPvd+mKPiw+yQRyhtZvud2ba2W8pNmOZxDsOJtB8ilWir8dyaU/ycLGwPBAqtl/3Y3JXfH9BKmC1ybq0dn3NNPjGFSytbWyfTDFZFpjRluh1ptVui85nhswDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rQVmjcjZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C4A3C4CEE9;
+	Fri, 14 Mar 2025 18:49:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741978156;
+	bh=O6TQHcNZOIDORUQUex99gbjkbXRSAsx+LziCN6QYCcQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rQVmjcjZhe/sj5yONxV2qVxL98CsQ/XLSI8I1aZI9aDjryLW+sVGMqcfI9Bca9bOS
+	 BjeRuzyi8Km8hWOU7pWxLh0zSj3Q5xmQc8mdYFqkiDMoJN2jPM4GlDtxa49auZ9+wv
+	 o4Atu8WInpcl8PAepC/fXyU6iiNJ15uue0LdQRbYK1nJzWh83j90x9tnoa0sRasVK1
+	 38iJcCj/HUFJNu/wqR3UGB0O36uPS2R51CHZ5YoiakTWuHP1tXd0Pvob4wtZn293CI
+	 sVep3kKdHjc3A4MK0/PKcdqXaMCX1hnu3s63bSmSw7dabMqNw6WwX2YJoxC1T+nsVF
+	 6r+AVkQEbO0Yg==
+Date: Fri, 14 Mar 2025 20:49:11 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Robin Murphy <robin.murphy@arm.com>, Christoph Hellwig <hch@lst.de>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH v7 00/17] Provide a new two step DMA mapping API
+Message-ID: <20250314184911.GR1322339@unreal>
+References: <cover.1738765879.git.leonro@nvidia.com>
+ <20250220124827.GR53094@unreal>
+ <CGME20250228195423eucas1p221736d964e9aeb1b055d3ee93a4d2648@eucas1p2.samsung.com>
+ <1166a5f5-23cc-4cce-ba40-5e10ad2606de@arm.com>
+ <d408b1c7-eabf-4a1e-861c-b2ddf8bf9f0e@samsung.com>
+ <20250312193249.GI1322339@unreal>
+ <adb63b87-d8f2-4ae6-90c4-125bde41dc29@samsung.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <diqzplijjvq5.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [PATCH v6 04/10] KVM: guest_memfd: Allow host to map
- guest_memfd() pages
-From: Ackerley Tng <ackerleytng@google.com>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, mail@maciej.szmigiero.name, david@redhat.com, 
-	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
-	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
-	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
-	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
-	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
-	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
-	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
-	hughd@google.com, jthoughton@google.com, peterx@redhat.com, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <adb63b87-d8f2-4ae6-90c4-125bde41dc29@samsung.com>
 
-Fuad Tabba <tabba@google.com> writes:
+On Fri, Mar 14, 2025 at 11:52:58AM +0100, Marek Szyprowski wrote:
+> On 12.03.2025 20:32, Leon Romanovsky wrote:
+> > On Wed, Mar 12, 2025 at 10:28:32AM +0100, Marek Szyprowski wrote:
+> >> Hi Robin
+> >>
+> >> On 28.02.2025 20:54, Robin Murphy wrote:
+> >>> On 20/02/2025 12:48 pm, Leon Romanovsky wrote:
+> >>>> On Wed, Feb 05, 2025 at 04:40:20PM +0200, Leon Romanovsky wrote:
+> >>>>> From: Leon Romanovsky <leonro@nvidia.com>
+> >>>>>
+> >>>>> Changelog:
+> >>>>> v7:
+> >>>>>    * Rebased to v6.14-rc1
+> >>>> <...>
+> >>>>
+> >>>>> Christoph Hellwig (6):
+> >>>>>     PCI/P2PDMA: Refactor the p2pdma mapping helpers
+> >>>>>     dma-mapping: move the PCI P2PDMA mapping helpers to pci-p2pdma.h
+> >>>>>     iommu: generalize the batched sync after map interface
+> >>>>>     iommu/dma: Factor out a iommu_dma_map_swiotlb helper
+> >>>>>     dma-mapping: add a dma_need_unmap helper
+> >>>>>     docs: core-api: document the IOVA-based API
+> >>>>>
+> >>>>> Leon Romanovsky (11):
+> >>>>>     iommu: add kernel-doc for iommu_unmap and iommu_unmap_fast
+> >>>>>     dma-mapping: Provide an interface to allow allocate IOVA
+> >>>>>     dma-mapping: Implement link/unlink ranges API
+> >>>>>     mm/hmm: let users to tag specific PFN with DMA mapped bit
+> >>>>>     mm/hmm: provide generic DMA managing logic
+> >>>>>     RDMA/umem: Store ODP access mask information in PFN
+> >>>>>     RDMA/core: Convert UMEM ODP DMA mapping to caching IOVA and page
+> >>>>>       linkage
+> >>>>>     RDMA/umem: Separate implicit ODP initialization from explicit ODP
+> >>>>>     vfio/mlx5: Explicitly use number of pages instead of allocated
+> >>>>> length
+> >>>>>     vfio/mlx5: Rewrite create mkey flow to allow better code reuse
+> >>>>>     vfio/mlx5: Enable the DMA link API
+> >>>>>
+> >>>>>    Documentation/core-api/dma-api.rst   |  70 ++++
+> >>>>    drivers/infiniband/core/umem_odp.c   | 250 +++++---------
+> >>>>>    drivers/infiniband/hw/mlx5/mlx5_ib.h |  12 +-
+> >>>>>    drivers/infiniband/hw/mlx5/odp.c     |  65 ++--
+> >>>>>    drivers/infiniband/hw/mlx5/umr.c     |  12 +-
+> >>>>>    drivers/iommu/dma-iommu.c            | 468
+> >>>>> +++++++++++++++++++++++----
+> >>>>>    drivers/iommu/iommu.c                |  84 ++---
+> >>>>>    drivers/pci/p2pdma.c                 |  38 +--
+> >>>>>    drivers/vfio/pci/mlx5/cmd.c          | 375 +++++++++++----------
+> >>>>>    drivers/vfio/pci/mlx5/cmd.h          |  35 +-
+> >>>>>    drivers/vfio/pci/mlx5/main.c         |  87 +++--
+> >>>>>    include/linux/dma-map-ops.h          |  54 ----
+> >>>>>    include/linux/dma-mapping.h          |  85 +++++
+> >>>>>    include/linux/hmm-dma.h              |  33 ++
+> >>>>>    include/linux/hmm.h                  |  21 ++
+> >>>>>    include/linux/iommu.h                |   4 +
+> >>>>>    include/linux/pci-p2pdma.h           |  84 +++++
+> >>>>>    include/rdma/ib_umem_odp.h           |  25 +-
+> >>>>>    kernel/dma/direct.c                  |  44 +--
+> >>>>>    kernel/dma/mapping.c                 |  18 ++
+> >>>>>    mm/hmm.c                             | 264 +++++++++++++--
+> >>>>>    21 files changed, 1435 insertions(+), 693 deletions(-)
+> >>>>>    create mode 100644 include/linux/hmm-dma.h
+> >>>> Kind reminder.
+> > <...>
+> >
+> >> Removing the need for scatterlists was advertised as the main goal of
+> >> this new API, but it looks that similar effects can be achieved with
+> >> just iterating over the pages and calling page-based DMA API directly.
+> > Such iteration can't be enough because P2P pages don't have struct pages,
+> > so you can't use reliably and efficiently dma_map_page_attrs() call.
+> >
+> > The only way to do so is to use dma_map_sg_attrs(), which relies on SG
+> > (the one that we want to remove) to map P2P pages.
+> 
+> That's something I don't get yet. How P2P pages can be used with 
+> dma_map_sg_attrs(), but not with dma_map_page_attrs()? Both operate 
+> internally on struct page pointer.
 
-> Add support for mmap() and fault() for guest_memfd backed memory
-> in the host for VMs that support in-place conversion between
-> shared and private. To that end, this patch adds the ability to
-> check whether the VM type supports in-place conversion, and only
-> allows mapping its memory if that's the case.
->
-> Also add the KVM capability KVM_CAP_GMEM_SHARED_MEM, which
-> indicates that the VM supports shared memory in guest_memfd, or
-> that the host can create VMs that support shared memory.
-> Supporting shared memory implies that memory can be mapped when
-> shared with the host.
->
-> This is controlled by the KVM_GMEM_SHARED_MEM configuration
-> option.
->
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  include/linux/kvm_host.h |  11 +++++
->  include/uapi/linux/kvm.h |   1 +
->  virt/kvm/guest_memfd.c   | 102 +++++++++++++++++++++++++++++++++++++++
->  virt/kvm/kvm_main.c      |   4 ++
->  4 files changed, 118 insertions(+)
->
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 3ad0719bfc4f..601bbcaa5e41 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -728,6 +728,17 @@ static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
->  }
->  #endif
->  
-> +/*
-> + * Arch code must define kvm_arch_gmem_supports_shared_mem if support for
-> + * private memory is enabled and it supports in-place shared/private conversion.
-> + */
-> +#if !defined(kvm_arch_gmem_supports_shared_mem) && !IS_ENABLED(CONFIG_KVM_GMEM_SHARED_MEM)
-> +static inline bool kvm_arch_gmem_supports_shared_mem(struct kvm *kvm)
-> +{
-> +	return false;
-> +}
-> +#endif
-> +
->  #ifndef kvm_arch_has_readonly_mem
->  static inline bool kvm_arch_has_readonly_mem(struct kvm *kvm)
->  {
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 45e6d8fca9b9..117937a895da 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -929,6 +929,7 @@ struct kvm_enable_cap {
->  #define KVM_CAP_PRE_FAULT_MEMORY 236
->  #define KVM_CAP_X86_APIC_BUS_CYCLES_NS 237
->  #define KVM_CAP_X86_GUEST_MODE 238
-> +#define KVM_CAP_GMEM_SHARED_MEM 239
->  
->  struct kvm_irq_routing_irqchip {
->  	__u32 irqchip;
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index 5fc414becae5..eea44e003ed1 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -320,7 +320,109 @@ static pgoff_t kvm_gmem_get_index(struct kvm_memory_slot *slot, gfn_t gfn)
->  	return gfn - slot->base_gfn + slot->gmem.pgoff;
->  }
->  
-> +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
-> +static bool folio_offset_is_shared(const struct folio *folio, struct file *file, pgoff_t index)
-> +{
-> +	struct kvm_gmem *gmem = file->private_data;
-> +
-> +	VM_BUG_ON_FOLIO(!folio_test_locked(folio), folio);
+Yes, and no.
+See users of is_pci_p2pdma_page(...) function. In dma_*_sg() APIs, there
+is a real check and support for p2p. In dma_map_page_attrs() variants,
+this support is missing (ignored, or error is returned).
 
-I should've commented on this in the last series, but why must folio
-lock be held to check if this offset is shared?
+> 
+> >> Maybe I missed something. I still see some advantages in this DMA API
+> >> extension, but I would also like to see the clear benefits from
+> >> introducing it, like perf logs or other benchmark summary.
+> > We didn't focus yet on performance, however Christoph mentioned in his
+> > block RFC [1] that even simple conversion should improve performance as
+> > we are performing one P2P lookup per-bio and not per-SG entry as was
+> > before [2]. In addition it decreases memory [3] too.
+> >
+> > [1] https://lore.kernel.org/all/cover.1730037261.git.leon@kernel.org/
+> > [2] https://lore.kernel.org/all/34d44537a65aba6ede215a8ad882aeee028b423a.1730037261.git.leon@kernel.org/
+> > [3] https://lore.kernel.org/all/383557d0fa1aa393dbab4e1daec94b6cced384ab.1730037261.git.leon@kernel.org/
+> >
+> > So clear benefits are:
+> > 1. Ability to use native for subsystem structure, e.g. bio for block,
+> > umem for RDMA, dmabuf for DRM, e.t.c. It removes current wasteful
+> > conversions from and to SG in order to work with DMA API.
+> > 2. Batched request and iotlb sync optimizations (perform only once).
+> > 3. Avoid very expensive call to pgmap pointer.
+> > 4. Expose MMIO over VFIO without hacks (PCI BAR doesn't have struct pages).
+> > See this series for such a hack
+> > https://lore.kernel.org/all/20250307052248.405803-1-vivek.kasireddy@intel.com/
+> 
+> I see those benefits and I admit that for typical DMA-with-IOMMU case it 
+> would improve some things. I think that main concern from Robin was how 
+> to handle it for the cases without an IOMMU.
 
-I was thinking to use the filemap's lock (filemap_invalidate_lock()) to
-guard mappability races. Does that work too?
+In such case, we fallback to non-IOMMU flow (old, well-established one).
+See this HMM patch as an example https://lore.kernel.org/all/a796da065fa8a9cb35d591ce6930400619572dcc.1738765879.git.leonro@nvidia.com/
++dma_addr_t hmm_dma_map_pfn(struct device *dev, struct hmm_dma_map *map,
++			   size_t idx,
++			   struct pci_p2pdma_map_state *p2pdma_state)
+...
++	if (dma_use_iova(state)) {
+...
++	} else {
+...
++		dma_addr = dma_map_page(dev, page, 0, map->dma_entry_size,
++					DMA_BIDIRECTIONAL);
 
-> +
-> +	/* For now, VMs that support shared memory share all their memory. */
-> +	return kvm_arch_gmem_supports_shared_mem(gmem->kvm);
-> +}
-> +
-> +static vm_fault_t kvm_gmem_fault(struct vm_fault *vmf)
-> +{
-> +	struct inode *inode = file_inode(vmf->vma->vm_file);
-> +	struct folio *folio;
-> +	vm_fault_t ret = VM_FAULT_LOCKED;
-> +
-> +	filemap_invalidate_lock_shared(inode->i_mapping);
-> +
-> +	folio = kvm_gmem_get_folio(inode, vmf->pgoff);
-> +	if (IS_ERR(folio)) {
-> +		int err = PTR_ERR(folio);
-> +
-> +		if (err == -EAGAIN)
-> +			ret = VM_FAULT_RETRY;
-> +		else
-> +			ret = vmf_error(err);
-> +
-> +		goto out_filemap;
-> +	}
-> +
-> +	if (folio_test_hwpoison(folio)) {
-> +		ret = VM_FAULT_HWPOISON;
-> +		goto out_folio;
-> +	}
-> +
-> +	if (!folio_offset_is_shared(folio, vmf->vma->vm_file, vmf->pgoff)) {
-> +		ret = VM_FAULT_SIGBUS;
-> +		goto out_folio;
-> +	}
-> +
-> +	/*
-> +	 * Shared folios would not be marked as "guestmem" so far, and we only
-> +	 * expect shared folios at this point.
-> +	 */
-> +	if (WARN_ON_ONCE(folio_test_guestmem(folio)))  {
-> +		ret = VM_FAULT_SIGBUS;
-> +		goto out_folio;
-> +	}
-> +
-> +	/* No support for huge pages. */
-> +	if (WARN_ON_ONCE(folio_test_large(folio))) {
-> +		ret = VM_FAULT_SIGBUS;
-> +		goto out_folio;
-> +	}
-> +
-> +	if (!folio_test_uptodate(folio)) {
-> +		clear_highpage(folio_page(folio, 0));
-> +		kvm_gmem_mark_prepared(folio);
-> +	}
-> +
-> +	vmf->page = folio_file_page(folio, vmf->pgoff);
-> +
-> +out_folio:
-> +	if (ret != VM_FAULT_LOCKED) {
-> +		folio_unlock(folio);
-> +		folio_put(folio);
-> +	}
-> +
-> +out_filemap:
-> +	filemap_invalidate_unlock_shared(inode->i_mapping);
-> +
-> +	return ret;
-> +}
-> +
-> <snip>
+Thanks
+
+> 
+> Best regards
+> -- 
+> Marek Szyprowski, PhD
+> Samsung R&D Institute Poland
+> 
 
