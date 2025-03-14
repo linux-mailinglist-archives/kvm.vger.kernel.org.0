@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-41019-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41020-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0C3FA6078B
-	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 03:36:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E372FA60797
+	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 03:42:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0DFD177C0D
-	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 02:36:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E4DD460F00
+	for <lists+kvm@lfdr.de>; Fri, 14 Mar 2025 02:42:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 904CB42AA3;
-	Fri, 14 Mar 2025 02:36:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 261D57083F;
+	Fri, 14 Mar 2025 02:42:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YY3zkSNS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iNJSIRIR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A34E82E3364;
-	Fri, 14 Mar 2025 02:36:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34AA02E3364;
+	Fri, 14 Mar 2025 02:42:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741919810; cv=none; b=kDAYxHCmUMPJVqRIGbf/QI997JP08PyrKtVK/DcRPZWo6Ar+2lUaMlQoMM0XsVdztvQWFsknfvRtCa/X223ZOdku1UCrbpEOQmSJPgFrUOP5nQhpDmMlbKrZpkGbnJnI9nmq3DHNPpty5mVRsqILKubvSSqPFC7lvF/dGMPTwLw=
+	t=1741920168; cv=none; b=ugdI4JgjrJFtxdmnacDnV9gDt1H1izhscM8xCZ5knrTru+TrHiiroVmQv3Z8Q1FoW3ZvxqVdlWUKGvisinMFZzqGl6UtdI0CZpGh9+1HHw3yOn1/jknnhzOK8SOvIgG7ng1ENxQVTLRmqOmP5JZuHOCqGP6txfEpCdSz+CeRVh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741919810; c=relaxed/simple;
-	bh=LnanVkXfTh7RXO0JmowPIVzjCd7u/lrefAHiW1FCTnM=;
+	s=arc-20240116; t=1741920168; c=relaxed/simple;
+	bh=IHnkLmOiLY3MQ7jD5itWUipEQMKkVCo+vJ9rLn/FtWA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fw4DmroO1Mvc/WixxtnKc681GFn4ljte92BX49Fn3AR9JrbrIKl3kgcN2dX1U1ukaviHlwqvwZKVlj4N0UyABO9SVcTe0sMcVi4OMvnj3B4F6A9Uh10N/+4BPUaGKYwafhVJVct0nqiYxuFirWVXZWHzQG34+vqEeY/4Qi1Ezmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YY3zkSNS; arc=none smtp.client-ip=198.175.65.15
+	 In-Reply-To:Content-Type; b=d+/+QYk1im+e6FBK/y4t318vEcqDd/svv6t5th9kKBW2l51/FT7Z1tsiH1dHG8xqvhfklFcBAGDgCoBVSH9iq0/Yshll5jEK2d2A7wM8OZGXiPLdGvJHatnAbmJNvMoz1YG/V8gO5zsHHs9SkArOpFiFJ10U/fMzb1VHG2dxCow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iNJSIRIR; arc=none smtp.client-ip=198.175.65.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741919809; x=1773455809;
+  t=1741920167; x=1773456167;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=LnanVkXfTh7RXO0JmowPIVzjCd7u/lrefAHiW1FCTnM=;
-  b=YY3zkSNSkVZO20W53etL3gw3t+ilFxOuKMVF3NKPvyC916xm/cchKilA
-   RufpdxPaYMB1cOmEwtf7dIr+bc9FHtVr+qtBt3yHrVziYmgh+I/P+kky0
-   h/6ZfT087epRwCshITwgZhchzh9VP2L5ui9WNv7Giypi8nusEuVrdjVVF
-   OVKF/DMBRjkB9abjWPMS0QnKSnpPeq3qyiCubZumhZWMaWEk0p3VVKmht
-   1zEP1u838WSRwgNwzhbjftKcAV/9Mhk/l5zxs6A59ZNnDD+peNfCiBRXA
-   InVlzNxgZKAvg8US3FgqGFXs0zdBKveuDSA4+eSNtCcJC4tghBfaa/63T
-   Q==;
-X-CSE-ConnectionGUID: o/WnD/08QaWXCI35+Hy7FA==
-X-CSE-MsgGUID: M10xHwAjShCjhDtTRgeHjg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11372"; a="46709641"
+  bh=IHnkLmOiLY3MQ7jD5itWUipEQMKkVCo+vJ9rLn/FtWA=;
+  b=iNJSIRIRHN6p75lSfYRnsVAFzTlGEutwvISczHye/53wiDjZorSYH+V8
+   lK7b+Tg7pyuVm5MLTWtJ0TsI+zs0pbjDtj7m46Km7MAZGeu4nBcoubd2M
+   uaHheY/fzbd/65HEjwGxPZO0vjMbfjUVwaWE1wZf5YEgZv8kM/ETe+uVc
+   Mj3eCZCVUkZz3V8gLxSEnaBAN7113aXlV0jfRZlK1ifl9dLao+z7QH3lI
+   K8yuJ39tQKPSn3h/B+JJYtAqFV4ZhFr4bO5Jkn3tV4KYO0ZEWWpbHoRnv
+   bU+lFN7xWW298A2KoaWVJvt72NLj6EZo2zB5ffW+DLpUifacBTlrRBXsU
+   A==;
+X-CSE-ConnectionGUID: 6z14DKQxQl+DwdiPzxPMbA==
+X-CSE-MsgGUID: 5kWp/787RtatmVZyyT7bUw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11372"; a="54441853"
 X-IronPort-AV: E=Sophos;i="6.14,246,1736841600"; 
-   d="scan'208";a="46709641"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 19:36:48 -0700
-X-CSE-ConnectionGUID: v+GV0h9WTU6t9RBQ+5IsHg==
-X-CSE-MsgGUID: i8iziBRoRuWN4hNhyiJ9pA==
+   d="scan'208";a="54441853"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 19:42:46 -0700
+X-CSE-ConnectionGUID: /fBGos3pRraA3qEmRRAnxQ==
+X-CSE-MsgGUID: eklPN9yvSoGwGSLZPfu0xg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.14,246,1736841600"; 
-   d="scan'208";a="122061086"
+   d="scan'208";a="120858659"
 Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.240.54]) ([10.124.240.54])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 19:36:46 -0700
-Message-ID: <24ada86a-131f-4624-8333-baa37e2a4a67@linux.intel.com>
-Date: Fri, 14 Mar 2025 10:36:43 +0800
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 19:42:44 -0700
+Message-ID: <d4c19589-baa4-47a8-8d3d-bff10ba6aa64@linux.intel.com>
+Date: Fri, 14 Mar 2025 10:42:41 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,26 +67,34 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/4] KVM: TDX: Move apicv_pre_state_restore to
- posted_intr.c
+Subject: Re: [PATCH 2/4] KVM: VMX: Move x86_ops wrappers under
+ CONFIG_KVM_INTEL_TDX
 To: Vishal Verma <vishal.l.verma@intel.com>,
  Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
  Rick Edgecombe <rick.p.edgecombe@intel.com>
 References: <20250313-vverma7-cleanup_x86_ops-v1-0-0346c8211a0c@intel.com>
- <20250313-vverma7-cleanup_x86_ops-v1-1-0346c8211a0c@intel.com>
+ <20250313-vverma7-cleanup_x86_ops-v1-2-0346c8211a0c@intel.com>
 Content-Language: en-US
 From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20250313-vverma7-cleanup_x86_ops-v1-1-0346c8211a0c@intel.com>
+In-Reply-To: <20250313-vverma7-cleanup_x86_ops-v1-2-0346c8211a0c@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
 On 3/14/2025 3:30 AM, Vishal Verma wrote:
-> In preparation for a cleanup of the x86_ops struct for TDX, which turns
-> several of the ops definitions to macros, move the
-> vt_apicv_pre_state_restore() helper into posted_intr.c.
+> Rather than have a lot of stubs for x86_ops helpers, simply omit the
+> wrappers when CONFIG_KVM_INTEL_TDX=n.  This allows nearly all of
+> vmx/main.c to go under a single #ifdef.  That eliminates all the
+> trampolines in the generated code, and almost all of the stubs.
+
+In this patch, these vt_xxx() functions still are common code.
+Move these functions inside CONFIG_KVM_INTEL_TDX will break the build for
+kvm-intel when CONFIG_KVM_INTEL_TDX=n.
+
+Maybe just squash this patch into 4/4?
+
 >
 > Based on a patch by Sean Christopherson <seanjc@google.com>
 >
@@ -94,74 +102,61 @@ On 3/14/2025 3:30 AM, Vishal Verma wrote:
 > Cc: Sean Christopherson <seanjc@google.com>
 > Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>
 > Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
-
-Reviewed-by: Binbin Wu <binbin.wu@linxu.intel.com>
-
 > ---
->   arch/x86/kvm/vmx/posted_intr.h |  1 +
->   arch/x86/kvm/vmx/main.c        | 10 +---------
->   arch/x86/kvm/vmx/posted_intr.c |  8 ++++++++
->   3 files changed, 10 insertions(+), 9 deletions(-)
+>   arch/x86/kvm/vmx/tdx.h     | 2 +-
+>   arch/x86/kvm/vmx/x86_ops.h | 2 +-
+>   arch/x86/kvm/vmx/main.c    | 4 ++--
+>   3 files changed, 4 insertions(+), 4 deletions(-)
 >
-> diff --git a/arch/x86/kvm/vmx/posted_intr.h b/arch/x86/kvm/vmx/posted_intr.h
-> index 68605ca7ef68..9d0677a2ba0e 100644
-> --- a/arch/x86/kvm/vmx/posted_intr.h
-> +++ b/arch/x86/kvm/vmx/posted_intr.h
-> @@ -11,6 +11,7 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu);
->   void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu);
->   void pi_wakeup_handler(void);
->   void __init pi_init_cpu(int cpu);
-> +void pi_apicv_pre_state_restore(struct kvm_vcpu *vcpu);
->   bool pi_has_pending_interrupt(struct kvm_vcpu *vcpu);
->   int vmx_pi_update_irte(struct kvm *kvm, unsigned int host_irq,
->   		       uint32_t guest_irq, bool set);
+> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+> index 8f8070d0f55e..b43d7a7c8f1c 100644
+> --- a/arch/x86/kvm/vmx/tdx.h
+> +++ b/arch/x86/kvm/vmx/tdx.h
+> @@ -5,7 +5,7 @@
+>   #include "tdx_arch.h"
+>   #include "tdx_errno.h"
+>   
+> -#ifdef CONFIG_INTEL_TDX_HOST
+> +#ifdef CONFIG_KVM_INTEL_TDX
+>   #include "common.h"
+>   
+>   int tdx_bringup(void);
+> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+> index 19f770b0fc81..4704bed033b1 100644
+> --- a/arch/x86/kvm/vmx/x86_ops.h
+> +++ b/arch/x86/kvm/vmx/x86_ops.h
+> @@ -121,7 +121,7 @@ void vmx_cancel_hv_timer(struct kvm_vcpu *vcpu);
+>   #endif
+>   void vmx_setup_mce(struct kvm_vcpu *vcpu);
+>   
+> -#ifdef CONFIG_INTEL_TDX_HOST
+> +#ifdef CONFIG_KVM_INTEL_TDX
+>   void tdx_disable_virtualization_cpu(void);
+>   int tdx_vm_init(struct kvm *kvm);
+>   void tdx_mmu_release_hkid(struct kvm *kvm);
 > diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> index 320c96e1e80a..9d201ddb794a 100644
+> index 9d201ddb794a..ccb81a8b73f7 100644
 > --- a/arch/x86/kvm/vmx/main.c
 > +++ b/arch/x86/kvm/vmx/main.c
-> @@ -315,14 +315,6 @@ static void vt_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
->   	return vmx_set_virtual_apic_mode(vcpu);
->   }
+> @@ -10,9 +10,8 @@
+>   #include "tdx.h"
+>   #include "tdx_arch.h"
 >   
-> -static void vt_apicv_pre_state_restore(struct kvm_vcpu *vcpu)
-> -{
-> -	struct pi_desc *pi = vcpu_to_pi_desc(vcpu);
-> -
-> -	pi_clear_on(pi);
-> -	memset(pi->pir, 0, sizeof(pi->pir));
-> -}
-> -
->   static void vt_hwapic_isr_update(struct kvm_vcpu *vcpu, int max_isr)
->   {
->   	if (is_td_vcpu(vcpu))
-> @@ -983,7 +975,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
->   	.set_apic_access_page_addr = vt_set_apic_access_page_addr,
->   	.refresh_apicv_exec_ctrl = vt_refresh_apicv_exec_ctrl,
->   	.load_eoi_exitmap = vt_load_eoi_exitmap,
-> -	.apicv_pre_state_restore = vt_apicv_pre_state_restore,
-> +	.apicv_pre_state_restore = pi_apicv_pre_state_restore,
->   	.required_apicv_inhibits = VMX_REQUIRED_APICV_INHIBITS,
->   	.hwapic_isr_update = vt_hwapic_isr_update,
->   	.sync_pir_to_irr = vt_sync_pir_to_irr,
-> diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-> index f2ca37b3f606..a140af060bb8 100644
-> --- a/arch/x86/kvm/vmx/posted_intr.c
-> +++ b/arch/x86/kvm/vmx/posted_intr.c
-> @@ -241,6 +241,14 @@ void __init pi_init_cpu(int cpu)
->   	raw_spin_lock_init(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
->   }
+> -#ifdef CONFIG_INTEL_TDX_HOST
+> +#ifdef CONFIG_KVM_INTEL_TDX
+>   static_assert(offsetof(struct vcpu_vmx, vt) == offsetof(struct vcpu_tdx, vt));
+> -#endif
 >   
-> +void pi_apicv_pre_state_restore(struct kvm_vcpu *vcpu)
-> +{
-> +	struct pi_desc *pi = vcpu_to_pi_desc(vcpu);
-> +
-> +	pi_clear_on(pi);
-> +	memset(pi->pir, 0, sizeof(pi->pir));
-> +}
-> +
->   bool pi_has_pending_interrupt(struct kvm_vcpu *vcpu)
+>   static void vt_disable_virtualization_cpu(void)
 >   {
->   	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
+> @@ -879,6 +878,7 @@ static int vt_gmem_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
+>   
+>   	return 0;
+>   }
+> +#endif
+>   
+>   #define VMX_REQUIRED_APICV_INHIBITS				\
+>   	(BIT(APICV_INHIBIT_REASON_DISABLED) |			\
 >
 
 
