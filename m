@@ -1,141 +1,154 @@
-Return-Path: <kvm+bounces-41129-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41130-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B768CA62414
-	for <lists+kvm@lfdr.de>; Sat, 15 Mar 2025 02:34:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95F6BA624AE
+	for <lists+kvm@lfdr.de>; Sat, 15 Mar 2025 03:35:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1835422927
-	for <lists+kvm@lfdr.de>; Sat, 15 Mar 2025 01:34:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 94D1E19C1AC2
+	for <lists+kvm@lfdr.de>; Sat, 15 Mar 2025 02:35:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 663DE176AC5;
-	Sat, 15 Mar 2025 01:34:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E60B11885B8;
+	Sat, 15 Mar 2025 02:35:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qsipS0Dv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vjvPYez7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37BECF4E2
-	for <kvm@vger.kernel.org>; Sat, 15 Mar 2025 01:34:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76BE3A41
+	for <kvm@vger.kernel.org>; Sat, 15 Mar 2025 02:35:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742002477; cv=none; b=FNTi2qTR+zQPu2Lu22bl/pgPdTyyTHQpHV6NHLph/thpN+nlVN48ZRKEZlwwduZcXeVTeFC0ywG5s7L+UYa3VGf5ri6GKXcChAs3H/WjYQB3NKVVGAt1vwH/yu4549mIxV0YQlKlcFRvR5GPmCv8R1Nj7B7olE0Kxxc31PfrEbc=
+	t=1742006104; cv=none; b=GxRWsGIsWnimZPyuQxIWR+nxrm/eOAcy4+yqTjaStan8vmV6D1T5mMjoU3GsKzgJB7oBelRLkFSOjNKTg2NE+1lsDv0oP3S8PI399K9Sk5u84kHJSkkVG1dTFy21eVU53Y20XHLGoKZa1z4Kd9XSOb9+Ofgs3yEplCM6VeDFwWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742002477; c=relaxed/simple;
-	bh=rqMz50M9H3yFzreuyediMHQhfMZFiLl0qZcUoOUte4E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=L0+1+ebHlvDDGPCVlo3oVNTrgtINGQo0ldMSoQegOzbVygsKRfiPROB6C6bDlJubrksaJ/TcOe0yLMiWxQoCcNTK6QkO/pa6vneZzTW0A9DqKz2LZ634ggYq1g1H2DQnsF5Zz/gqRAIBhxTRVa8jO0/FlEaMHXliI97TKpWnVuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qsipS0Dv; arc=none smtp.client-ip=209.85.214.170
+	s=arc-20240116; t=1742006104; c=relaxed/simple;
+	bh=bt6b+H0+Tq29i30rceRXL9x4MJus4+Bpjrr9EgkPhpM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ObIcqoMhStZ9KXk06DcStRLNEFWaOqPG1HdIu3GVWNU3qh1xDhSEcONcoNmJRBJ7qfdr1edkRNSWqn4Khk/4CxoZ5GEjXj9Oo8Mx8UKa4a+UpexAWAAY4BKUbZvPZ6VkJMx/MhGXoKygkSuTFGTJ41Bdyys9YjECcnVfQSZXsZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vjvPYez7; arc=none smtp.client-ip=209.85.160.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2240aad70f2so100755ad.0
-        for <kvm@vger.kernel.org>; Fri, 14 Mar 2025 18:34:35 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-476900d10caso63546461cf.0
+        for <kvm@vger.kernel.org>; Fri, 14 Mar 2025 19:35:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742002475; x=1742607275; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hvIL3fKVMU4+5xbZi0gtfEp1oSKzKEUDT0T+fM5EEa8=;
-        b=qsipS0DvEm8/HNQ/WmePhcZd1gLMZLCDiKyJU6hYFnteiTpYLo0n1g92EKoZrZ02av
-         1+cUOQHCLuBeBWyjBaJBlqaVDKKHrHoX0Mk3luKVeHOBRODiEVKN/Xt5tYwesj35/C4q
-         7STmAizNI8gck4VafbavnVhfoow2dkglIR04WWX32ppwGXxfIK0RzsqrzmdRVCHxn+et
-         Mvua5F1XodGvyXrrf61Y+IYM2aj31PHUkPuLg95mxddSUcA95zmYNsM0TCP+7cjIQ481
-         zu3oh9sCKN8NQDP1WEaFPte4FXIXXk4r59iU+4hcFjnLQj/+ofOkAjNMeApHEr+9w4lM
-         zw2w==
+        d=google.com; s=20230601; t=1742006101; x=1742610901; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wUw+0S4IAaDwD3W5stow5kvzTojbmPGuc8IbGH7DBLM=;
+        b=vjvPYez7ioSweuaiPSQTx0y4jWU4atN6Oh6Tbx6erD4VXit0yHWJNeU7Vp3jrPZZgQ
+         KH13OcC4vfyb0HfvnPI3xEyRIfChkDsiBiRyGXs10ANtSIHhXohWw20OILwRZpoSAmWB
+         3LZuRNKli/wMwoD76UYqD8kIFWuPqLC/CLEk/IOjK8YvlA03C2jpDAEPIvIgXy7cv7MH
+         OaYYR4Eo3eWWHZojX4x4M8IwGIrZTxV+NejhAc1jIyCw/w7yJStztdnm38Yp3sEaPZC+
+         u0SF6QYE1uBCO90SkFA46jO4AzjljP9woqxmjW8FyV24I1zu4mD8vweF06iOFIKEQAiV
+         vxgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742002475; x=1742607275;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1742006101; x=1742610901;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hvIL3fKVMU4+5xbZi0gtfEp1oSKzKEUDT0T+fM5EEa8=;
-        b=oRfcM/aL+D55FurA7cON2npWgwrvlJtT09YVqJ0604eFvQ+ULjn/7e98DExcVlt/pL
-         H+O4jFe1oMBzmR2pm0qKhP9D+KkR7miAPg2BjfMpmZ0iIZoNA0SXrGkL3QCo06tx+Pbr
-         mlsHMQ09WLF/o5fIogXeN36Wr1zuIMc6owaB1MttEl2laPULSz9yyuSlIfVb/ms0jrQF
-         +8Gvp2Bf1cwrSCE2Zia290PDWVVe4M9D22lmOp8bf1jpzr/+cXA+njqeIinr9SPCGOgS
-         5usPQkTy3O4frfUHmNDVnC/xWapeZu3yaEHigKw2mpsohe1u1/zIGi5gXMl9rrulrV/V
-         SSqA==
-X-Forwarded-Encrypted: i=1; AJvYcCUU7qANoKnq0iLNKPohrlmYYXrI1z1Y+7eb7+3CQyiaKemgJYw1Uo1OrbX9mMDoPqMEznc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNgfdR6nYukqt8tJa4HW/aLjBTl1xwBOAeFd/okQwy7cvz57xq
-	AyRYmvTK0D6neZAH2fOl0qiD5jYL/3NvNR8My2ldHx3+QK6orcJ1um9jOPAing==
-X-Gm-Gg: ASbGnct2Hl8Dt0yQUw78uX97SDjUS6U5K8X93eW6/G6pvFfQRoXHRTT6xLi3iJA9jR+
-	5su1fBmjg5cnv3l0HcfBmKKpe1wgJ6iguRLilecz5GZfpbSqgXhFoGIPhK7ikQhY/q08DYP+NPv
-	fRqPYEXXdFuTSX7mlYbtMYGxziHgNqY6Ae4+y2oXBBjvbZPbBeLp3x2raurOIM6+soph/Xae7Rb
-	z08c0wb68j0qDItJ1nsJE3ZU78uZPCOgGp8csQHmjQRsBqKh8ADVVeCXzJHTvC9MDSBxmemGfUe
-	zC2qAlgwD25j7TUso7WXvH4W8EuADHrhma+B57nCfvdRFV4XBIt9YDDM2YmbwhavVZ3E0cNSABI
-	PjdWzMCxW0FMW/U1M7A==
-X-Google-Smtp-Source: AGHT+IGtQWEpjfINSgs1H4vMHK6YoCgbTmxFs82ZqbvJLldcI2qhAcTUK9ygq9RBHTYJszRC0D1L4A==
-X-Received: by 2002:a17:903:2441:b0:20c:f40e:6ec3 with SMTP id d9443c01a7336-225f3eb1adbmr1168425ad.22.1742002474719;
-        Fri, 14 Mar 2025 18:34:34 -0700 (PDT)
-Received: from ?IPV6:2600:1700:38d4:55d0:5a27:ba32:f0cd:cc20? ([2600:1700:38d4:55d0:5a27:ba32:f0cd:cc20])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-737116b1ed7sm3638401b3a.176.2025.03.14.18.34.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Mar 2025 18:34:33 -0700 (PDT)
-Message-ID: <5aa114f7-3efb-4dab-8579-cb9af4abd3c0@google.com>
-Date: Fri, 14 Mar 2025 18:34:32 -0700
+        bh=wUw+0S4IAaDwD3W5stow5kvzTojbmPGuc8IbGH7DBLM=;
+        b=Mao7zk2poqTWCxQSndN3hTHVpKqLspWQLL1GtXsMHtoL1oiRH2rYCeydnB49uV/kW8
+         sPVguCCLnXC31RaId2ovT7JBJbG8CqEWP3OUcxiDqYtctlDM4V5oIS1p2EYV6EBZfLZg
+         ypTylrBd/rjr00fPm2crdb4lYrAnnCxMtqj5+MhxK9I9fJRLZ9wHR54wPB1NE66WQrtl
+         xPhHTUJotOHgbaqKVgf4g2u+Aq6kFqrc4iRqdXs0gs03dq9MaTWYQdxzcRszhWmGeQBJ
+         qaS2uGhoASr04/7mgXLlK3dbZ6mEJ7SplvvvQt4hYXIeXoBkAECS8oX4ESWNmpdlxawl
+         zThQ==
+X-Gm-Message-State: AOJu0YxD5MLxWlib1lJPWkICJaEVbN3m2rvwxtnfb2V/kDhRnXYh34ba
+	TbkSwgZHG4XmlyED1AM0KqbbdnezPlTozL8bcj9ugxDnHpDNahALBRjKKaEK1eYwbbWj8BQTwjw
+	I0Q==
+X-Google-Smtp-Source: AGHT+IF020CXLzNRsrx3v6dX0rbzclkdn2qtBV7z55bEEyPLl1wfqcSdtChwztGq7Tqi5jOTVvEIHKoL1lo=
+X-Received: from pgbbw33.prod.google.com ([2002:a05:6a02:4a1:b0:af2:357f:4269])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:9005:b0:1f5:8678:183d
+ with SMTP id adf61e73a8af0-1f5c1178019mr6816987637.14.1742006090522; Fri, 14
+ Mar 2025 19:34:50 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri, 14 Mar 2025 19:34:48 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v2 03/29] mm: asi: Introduce ASI core API
-To: Borislav Petkov <bp@alien8.de>, Brendan Jackman <jackmanb@google.com>
-Cc: akpm@linux-foundation.org, dave.hansen@linux.intel.com,
- yosryahmed@google.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, peterz@infradead.org, seanjc@google.com,
- tglx@linutronix.de, x86@kernel.org
-References: <20250227120607.GPZ8BVL2762we1j3uE@fat_crate.local>
- <20250228084355.2061899-1-jackmanb@google.com>
- <20250314131419.GJZ9Qrq8scAtDyBUcg@fat_crate.local>
-Content-Language: en-US
-From: Junaid Shahid <junaids@google.com>
-In-Reply-To: <20250314131419.GJZ9Qrq8scAtDyBUcg@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.rc1.451.g8f38331e32-goog
+Message-ID: <20250315023448.2358456-1-seanjc@google.com>
+Subject: [PATCH] KVM: x86/mmu: Wrap sanity check on number of TDP MMU pages
+ with KVM_PROVE_MMU
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 3/14/25 6:14 AM, Borislav Petkov wrote:
-> On Fri, Feb 28, 2025 at 08:43:55AM +0000, Brendan Jackman wrote:
->> (otherwise if we get an NMI between asi_enter() and
->> asi_start_critical(), and that causes a #PF, we will start the
->> critical section in the wrong address space and ASI won't do its job).
->> So, we are somewhat forced to mix up a. and b. from above.
-> 
-> I don't understand: asi_enter() can be interrupted by an NMI at any random
-> point. How is the current, imbalanced interface not vulnerable to this
-> scenario?
-> 
+Wrap the TDP MMU page counter in CONFIG_KVM_PROVE_MMU so that the sanity
+check is omitted from production builds, and more importantly to remove
+the atomic accesses to account pages.  A one-off memory leak in production
+is relatively uninteresting, and a WARN_ON won't help mitigate a systemic
+issue; it's as much about helping triage memory leaks as it is about
+detecting them in the first place, and doesn't magically stop the leaks.
+I.e. production environments will be quite sad if a severe KVM bug escapes,
+regardless of whether or not KVM WARNs.
 
-The reason this isn't a problem with the current asi_enter() is because there 
-the equivalent of asi_start_critical() happens _before_ the address space 
-switch. That ensures that even if an NMI arrives in the middle of asi_enter(), 
-the NMI epilog will switch to the restricted address space and there is no 
-window where an NMI (or any other interrupt/exception for that matter) would 
-result in going into vmenter with an unrestricted address space.
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/include/asm/kvm_host.h | 7 ++++++-
+ arch/x86/kvm/mmu/tdp_mmu.c      | 8 +++++++-
+ 2 files changed, 13 insertions(+), 2 deletions(-)
 
-So
-	asi_enter();
-	asi_start_critical();
-	vmenter();
-	asi_end_critical();
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index d881e7d276b1..30b81a81a1c7 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1471,8 +1471,13 @@ struct kvm_arch {
+ 	struct once nx_once;
+ 
+ #ifdef CONFIG_X86_64
+-	/* The number of TDP MMU pages across all roots. */
++#ifdef CONFIG_KVM_PROVE_MMU
++	/*
++	 * The number of TDP MMU pages across all roots.  Used only to sanity
++	 * check that KVM isn't leaking TDP MMU pages.
++	 */
+ 	atomic64_t tdp_mmu_pages;
++#endif
+ 
+ 	/*
+ 	 * List of struct kvm_mmu_pages being used as roots.
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 7cc0564f5f97..21a3b8166242 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -40,7 +40,9 @@ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
+ 	kvm_tdp_mmu_invalidate_roots(kvm, KVM_VALID_ROOTS);
+ 	kvm_tdp_mmu_zap_invalidated_roots(kvm, false);
+ 
+-	WARN_ON(atomic64_read(&kvm->arch.tdp_mmu_pages));
++#ifdef CONFIG_KVM_PROVE_MMU
++	KVM_MMU_WARN_ON(atomic64_read(&kvm->arch.tdp_mmu_pages));
++#endif
+ 	WARN_ON(!list_empty(&kvm->arch.tdp_mmu_roots));
+ 
+ 	/*
+@@ -325,13 +327,17 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ static void tdp_account_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+ {
+ 	kvm_account_pgtable_pages((void *)sp->spt, +1);
++#ifdef CONFIG_KVM_PROVE_MMU
+ 	atomic64_inc(&kvm->arch.tdp_mmu_pages);
++#endif
+ }
+ 
+ static void tdp_unaccount_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+ {
+ 	kvm_account_pgtable_pages((void *)sp->spt, -1);
++#ifdef CONFIG_KVM_PROVE_MMU
+ 	atomic64_dec(&kvm->arch.tdp_mmu_pages);
++#endif
+ }
+ 
+ /**
 
-is broken as there is a problematic window between asi_enter() and 
-asi_start_critical() as Brendan pointed out.
-
-However,
-	asi_start_critical();
-	asi_enter();
-	vmenter();
-	asi_end_critical();
-
-would work perfectly fine.
-
-Perhaps that might be the way to refactor the API?
-
-Thanks,
-Junaid
+base-commit: 7d2154117a02832ab3643fe2da4cdc9d2090dcb2
+-- 
+2.49.0.rc1.451.g8f38331e32-goog
 
 
