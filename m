@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-41137-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41138-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC86AA624E3
-	for <lists+kvm@lfdr.de>; Sat, 15 Mar 2025 03:46:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F22C5A624FF
+	for <lists+kvm@lfdr.de>; Sat, 15 Mar 2025 03:56:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E12BC3BFAA9
-	for <lists+kvm@lfdr.de>; Sat, 15 Mar 2025 02:46:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 620B97AAA91
+	for <lists+kvm@lfdr.de>; Sat, 15 Mar 2025 02:55:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACD3417E473;
-	Sat, 15 Mar 2025 02:46:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C15A518B47D;
+	Sat, 15 Mar 2025 02:56:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rwUddyvU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SIHyem9I"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D7732F42
-	for <kvm@vger.kernel.org>; Sat, 15 Mar 2025 02:46:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F7332E3381
+	for <kvm@vger.kernel.org>; Sat, 15 Mar 2025 02:56:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742006787; cv=none; b=dGi8+5Y0y7q2jlACKmtyhOunqGq7HHBKYebUC+cAEkbupXfbNcpDSLEkI95SEMJbgJbQnHE7rqh0VubzZosiIXmnoWFOZ+0jXQxaIH9mq7MT4pz2yAn4pSToaJUAhMvAFBsIx60Mu3MkhbD9Gbm3hbqtYfRCgTxbsYDwPvV15a4=
+	t=1742007380; cv=none; b=TNIfGBcEPNSkaflQa64nQOvvNOBSX3tOGNIUYaEBykdNjlO5bfyNALeRDAyiX2pdmogb2FuhVfn7gqOFp80DTS3/INdzQor59L5c/YVY4OAaqG+m2vCtpD7oag5ajAHO2gass8D6GbnQABidVt+wb8zAClKBa0gvgVmgK1HG5Hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742006787; c=relaxed/simple;
-	bh=zE2x2+fnsLlPa6R+8WbeaprDfUWrnn0g2dGoFppplYQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=uRXGTQ2ZxnDec46VK//KesCo+cjtWj4diKgZ4fxtB6hfl3q/M3D/faKBYBEBXVKnRGuyCqAVk+hwivyyYUZR+moZiW7rsJnqe+C3Bv1rN/3E1Tn5iLodHeSMGWa18Kgryyx21DjwouFW0N322yiC9H8rbyKNFxI9vKYCSRZq3MA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rwUddyvU; arc=none smtp.client-ip=209.85.214.201
+	s=arc-20240116; t=1742007380; c=relaxed/simple;
+	bh=+ZZX7qNnfCLLvOhiQ9gHJeVtbxbDuqzZFOIXg6bI5cw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=kmuoexqFaZK1G7xf6HOzqtMcRiUCoYDOl1NVRM0/y5gSScSaCiBtMNNNTvQJucdeyIqVvJ4I8jsDEi8gymO8IT3Nay1oEAG4IMPP5+K1piWs7nI9HbofQqRgPSk5VtjeXKpyUDi19GmwnGUlhsCy9krTLO/B0/FlO6d0a7DvKQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SIHyem9I; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-224191d9228so53062215ad.3
-        for <kvm@vger.kernel.org>; Fri, 14 Mar 2025 19:46:26 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-225505d1ca5so45119085ad.2
+        for <kvm@vger.kernel.org>; Fri, 14 Mar 2025 19:56:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742006786; x=1742611586; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1742007378; x=1742612178; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=BaEBGOtjjM3QZjXXOToF+8tuzgxFy135iBSbOXF+4mM=;
-        b=rwUddyvU+ITtKrkqzDWm1PNWysVR2iDIyB95s7QNeJayyYvMJ8Kly6zcO7wh9YgYZH
-         QGLkpeJoWEU7IfZWGu7wnKldSlNPjMHAhP+kzqkMDtWvpOJUNMdryu5egR0E3Lz8mEAS
-         0ZSefoiXSRyMikLFErL1AmnKev6ah0CRbgD4D9scFLIHIgdtPI0K4Wmee/wrsdyvq9Xb
-         e1oCmYlIO3BTxQsYGmkZ2lBICkq2DA7XQDme+g+/QvRUk7r/0uHlW9uSqFNNQSDmNWXm
-         JKODP4+UhwdV1hMyymGnvXU5RFsnUX4LZUD//auSFoWkq4fQrglHtGoJBtcryZaBiGrk
-         hfaA==
+        bh=Z62zBIuHLmtXad0Z5pdn1xvMGSFxR5nD2NTwFzgeqeI=;
+        b=SIHyem9I/tewT0YmfB9bPyORS1krQQ8ZcpfxpGb763VrGWl/dSGhAEZLgtirelPzeN
+         xfw14efMLtGu0fRrniezitc7cGjO86z0KAjHNo2775Xib4BRkf0GrRLUMkSnhBOPp8iJ
+         oJ60m+BhGwjMKe3NTPuoyTos6JvsweZeZ2l742CYFmjns97ljT80BbHVNMY7Ud1ptdeE
+         De09cOa5QSEO3UgFSKuQQ+dqJwBzhH/YWhkJde8SwRMgZfsswo5JJ3JLN1EOl1Nd7ivG
+         fYbCeJlJ0uziDbZnN/f7rk8eU7vLO8sVVGzhz3GVM5Jq9EZGfyNnl1iOQW44wKAcJ7hx
+         KiSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742006786; x=1742611586;
+        d=1e100.net; s=20230601; t=1742007378; x=1742612178;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BaEBGOtjjM3QZjXXOToF+8tuzgxFy135iBSbOXF+4mM=;
-        b=Se2h8XvIPcuFslc2mw0hzhIKsm3ijyh0n2plP0AVF47uE6lUy11XSGkgS/gVSwG3+C
-         dJag8Vm33/6SparT1MTrd1ZIgy8u0R+EPlW9t6ikzCsNu26PiONGctNHk6SuRCZGb2lf
-         zvuxImpwnr8CsPY4ZDntqBcCGf08zQWYo3FrUpckA2++BInRRZfaPSGIbBPMz0FIGoH7
-         r5KZf3EPyky2C3w4qf211uz+bNDWdEIP4GCC1VUaQAXh1XOxPqBhREvKWBJcduU2k6DJ
-         tCiJ8WyufEqK2btfSmvO0sdbUSXlsWou1YE3OxlURfkCFnIvk+VqMl8yAirxSoyYXN8f
-         FDig==
-X-Gm-Message-State: AOJu0YykMwoLdbBjeB/KMBue66YIenldOM5Nea9PSOgiDWl+upVjz4Rm
-	p0H9KbRzOkuzx0Jp6Bhl/2hcxHBy2oCUEbr4M9ah4EGEmAETx2WwAxHMMxuqjwCpwX5I8neXpWM
-	J8w==
-X-Google-Smtp-Source: AGHT+IFSxPMqmVW0H6TDp8BIElDyX64QgkLUzwVsPfN7ljR5rpZkAu9lBMlhG8hmy9YQm6yHIr1MoOS8wDI=
-X-Received: from pfbha9.prod.google.com ([2002:a05:6a00:8509:b0:736:9d24:ae31])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:3cc8:b0:736:5b85:a911
- with SMTP id d2e1a72fcca58-7372239a441mr6858418b3a.8.1742006785800; Fri, 14
- Mar 2025 19:46:25 -0700 (PDT)
+        bh=Z62zBIuHLmtXad0Z5pdn1xvMGSFxR5nD2NTwFzgeqeI=;
+        b=ipSZpUE5HNxGJheCFoUrvzrPM4sJXz/gJB7NHpEIN42/ZBGZiLEh59eWOpgmE68Smb
+         p/8qdH1AeOv/APn9lBui0KxRrLLN6Z3KFAez7o5PI2Mh6UndYTDcl2Yoje1mIsjsPUrU
+         UE2eUcfAaWJP/SR+GQVV8OMjKZEuiXFyIQcu02X9wYIDwyK/l7wYNzki4xidNMcxF8OY
+         1dDcn/yb25rUrepu0NRzxZmR2EhyzqABsjunH+9cFuxX8Zyo90n5syCvymd/Q3upBUrm
+         +ya0fRzF/FLYO9Y5vQAEG0rVG+nHx2dDFp2Asj5CBd0wYu5keg8UkXIed7GvWmZl/AMT
+         NStQ==
+X-Gm-Message-State: AOJu0Yy9Pi9wfeN76B1UQojok/mwCMvSCt0TM5ZRiUimhkRs0tuar0U3
+	9N+L4/UjZ+LmkHuDmFluWXWLp7fWvjrptqqIZAliifqf/+BaeeDGyV3JQ8Twmc04pnf89p+yiD7
+	ncA==
+X-Google-Smtp-Source: AGHT+IGGn3fc2zoHlksKBIechNzdvEm7Uhf7t5xNZPQBPITxQ4BguguvN/F5A1Ol5OtNBXp+F53DF6fEjkA=
+X-Received: from pfu10.prod.google.com ([2002:a05:6a00:a38a:b0:736:59f0:d272])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1950:b0:736:53bc:f1ab
+ with SMTP id d2e1a72fcca58-737223b908dmr5473148b3a.12.1742007377854; Fri, 14
+ Mar 2025 19:56:17 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 14 Mar 2025 19:46:23 -0700
+Date: Fri, 14 Mar 2025 19:56:15 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,108 +71,116 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.49.0.rc1.451.g8f38331e32-goog
-Message-ID: <20250315024623.2363994-1-seanjc@google.com>
-Subject: [PATCH] KVM: Allow building irqbypass.ko as as module when kvm.ko is
- a module
+Message-ID: <20250315025615.2367411-1-seanjc@google.com>
+Subject: [PATCH] KVM: x86: Add a module param to control and enumerate device
+ posted IRQs
 From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Convert HAVE_KVM_IRQ_BYPASS into a tristate so that selecting
-IRQ_BYPASS_MANAGER follows KVM={m,y}, i.e. doesn't force irqbypass.ko to
-be built-in.
+Add a module param to allow disabling device posted interrupts without
+having to sacrifice all of APICv/AVIC, and to also effectively enumerate
+to userspace whether or not KVM may be utilizing device posted IRQs.
+Disabling device posted interrupts is very desirable for testing, and can
+even be desirable for production environments, e.g. if the host kernel
+wants to interpose on device interrupts.
 
-Note, PPC allows building KVM as a module, but selects HAVE_KVM_IRQ_BYPASS
-from a boolean Kconfig, i.e. KVM PPC unnecessarily forces irqbpass.ko to
-be built-in.  But that flaw is a longstanding PPC specific issue.
-
-Fixes: 61df71ee992d ("kvm: move "select IRQ_BYPASS_MANAGER" to common code")
-Cc: stable@vger.kernel.org
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- include/linux/kvm_host.h |  2 +-
- virt/kvm/Kconfig         |  2 +-
- virt/kvm/eventfd.c       | 10 +++++-----
- 3 files changed, 7 insertions(+), 7 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 1 +
+ arch/x86/kvm/svm/avic.c         | 3 +--
+ arch/x86/kvm/vmx/posted_intr.c  | 7 +++----
+ arch/x86/kvm/x86.c              | 9 ++++++++-
+ 4 files changed, 13 insertions(+), 7 deletions(-)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index f34f4cfaa513..be7e1cd516d1 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -2382,7 +2382,7 @@ static inline bool kvm_is_visible_memslot(struct kvm_memory_slot *memslot)
- struct kvm_vcpu *kvm_get_running_vcpu(void);
- struct kvm_vcpu * __percpu *kvm_get_running_vcpus(void);
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index d881e7d276b1..bf11c5ee50cb 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1922,6 +1922,7 @@ struct kvm_arch_async_pf {
+ extern u32 __read_mostly kvm_nr_uret_msrs;
+ extern bool __read_mostly allow_smaller_maxphyaddr;
+ extern bool __read_mostly enable_apicv;
++extern bool __read_mostly enable_device_posted_irqs;
+ extern struct kvm_x86_ops kvm_x86_ops;
  
--#ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
-+#if IS_ENABLED(CONFIG_HAVE_KVM_IRQ_BYPASS)
- bool kvm_arch_has_irq_bypass(void);
- int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *,
- 			   struct irq_bypass_producer *);
-diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-index 54e959e7d68f..570938f0455c 100644
---- a/virt/kvm/Kconfig
-+++ b/virt/kvm/Kconfig
-@@ -75,7 +75,7 @@ config KVM_COMPAT
-        depends on KVM && COMPAT && !(S390 || ARM64 || RISCV)
+ #define kvm_x86_call(func) static_call(kvm_x86_##func)
+diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+index 65fd245a9953..e0f519565393 100644
+--- a/arch/x86/kvm/svm/avic.c
++++ b/arch/x86/kvm/svm/avic.c
+@@ -898,8 +898,7 @@ int avic_pi_update_irte(struct kvm *kvm, unsigned int host_irq,
+ 	struct kvm_irq_routing_table *irq_rt;
+ 	int idx, ret = 0;
  
- config HAVE_KVM_IRQ_BYPASS
--       bool
-+       tristate
-        select IRQ_BYPASS_MANAGER
+-	if (!kvm_arch_has_assigned_device(kvm) ||
+-	    !irq_remapping_cap(IRQ_POSTING_CAP))
++	if (!kvm_arch_has_assigned_device(kvm) || !enable_device_posted_irqs)
+ 		return 0;
  
- config HAVE_KVM_VCPU_ASYNC_IOCTL
-diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-index 249ba5b72e9b..11e5d1e3f12e 100644
---- a/virt/kvm/eventfd.c
-+++ b/virt/kvm/eventfd.c
-@@ -149,7 +149,7 @@ irqfd_shutdown(struct work_struct *work)
- 	/*
- 	 * It is now safe to release the object's resources
- 	 */
--#ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
-+#if IS_ENABLED(CONFIG_HAVE_KVM_IRQ_BYPASS)
- 	irq_bypass_unregister_consumer(&irqfd->consumer);
- #endif
- 	eventfd_ctx_put(irqfd->eventfd);
-@@ -274,7 +274,7 @@ static void irqfd_update(struct kvm *kvm, struct kvm_kernel_irqfd *irqfd)
- 	write_seqcount_end(&irqfd->irq_entry_sc);
+ 	pr_debug("SVM: %s: host_irq=%#x, guest_irq=%#x, set=%#x\n",
+diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
+index ec08fa3caf43..a03988a138c5 100644
+--- a/arch/x86/kvm/vmx/posted_intr.c
++++ b/arch/x86/kvm/vmx/posted_intr.c
+@@ -134,9 +134,8 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
+ 
+ static bool vmx_can_use_vtd_pi(struct kvm *kvm)
+ {
+-	return irqchip_in_kernel(kvm) && enable_apicv &&
+-		kvm_arch_has_assigned_device(kvm) &&
+-		irq_remapping_cap(IRQ_POSTING_CAP);
++	return irqchip_in_kernel(kvm) && enable_device_posted_irqs &&
++	       kvm_arch_has_assigned_device(kvm);
  }
  
--#ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
-+#if IS_ENABLED(CONFIG_HAVE_KVM_IRQ_BYPASS)
- void __attribute__((weak)) kvm_arch_irq_bypass_stop(
- 				struct irq_bypass_consumer *cons)
+ /*
+@@ -254,7 +253,7 @@ bool pi_has_pending_interrupt(struct kvm_vcpu *vcpu)
+  */
+ void vmx_pi_start_assignment(struct kvm *kvm)
  {
-@@ -424,7 +424,7 @@ kvm_irqfd_assign(struct kvm *kvm, struct kvm_irqfd *args)
- 	if (events & EPOLLIN)
- 		schedule_work(&irqfd->inject);
+-	if (!irq_remapping_cap(IRQ_POSTING_CAP))
++	if (!enable_device_posted_irqs)
+ 		return;
  
--#ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
-+#if IS_ENABLED(CONFIG_HAVE_KVM_IRQ_BYPASS)
- 	if (kvm_arch_has_irq_bypass()) {
- 		irqfd->consumer.token = (void *)irqfd->eventfd;
- 		irqfd->consumer.add_producer = kvm_arch_irq_bypass_add_producer;
-@@ -609,14 +609,14 @@ void kvm_irq_routing_update(struct kvm *kvm)
- 	spin_lock_irq(&kvm->irqfds.lock);
+ 	kvm_make_all_cpus_request(kvm, KVM_REQ_UNBLOCK);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 69c20a68a3f0..1b14319975b7 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -227,6 +227,10 @@ EXPORT_SYMBOL_GPL(allow_smaller_maxphyaddr);
+ bool __read_mostly enable_apicv = true;
+ EXPORT_SYMBOL_GPL(enable_apicv);
  
- 	list_for_each_entry(irqfd, &kvm->irqfds.items, list) {
--#ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
-+#if IS_ENABLED(CONFIG_HAVE_KVM_IRQ_BYPASS)
- 		/* Under irqfds.lock, so can read irq_entry safely */
- 		struct kvm_kernel_irq_routing_entry old = irqfd->irq_entry;
- #endif
++bool __read_mostly enable_device_posted_irqs = true;
++module_param(enable_device_posted_irqs, bool, 0444);
++EXPORT_SYMBOL_GPL(enable_device_posted_irqs);
++
+ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+ 	KVM_GENERIC_VM_STATS(),
+ 	STATS_DESC_COUNTER(VM, mmu_shadow_zapped),
+@@ -9772,6 +9776,9 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+ 	if (r != 0)
+ 		goto out_mmu_exit;
  
- 		irqfd_update(kvm, irqfd);
++	enable_device_posted_irqs = enable_device_posted_irqs && enable_apicv &&
++				    irq_remapping_cap(IRQ_POSTING_CAP);
++
+ 	kvm_ops_update(ops);
  
--#ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
-+#if IS_ENABLED(CONFIG_HAVE_KVM_IRQ_BYPASS)
- 		if (irqfd->producer &&
- 		    kvm_arch_irqfd_route_changed(&old, &irqfd->irq_entry)) {
- 			int ret = kvm_arch_update_irqfd_routing(
+ 	for_each_online_cpu(cpu) {
+@@ -13552,7 +13559,7 @@ EXPORT_SYMBOL_GPL(kvm_arch_has_noncoherent_dma);
+ 
+ bool kvm_arch_has_irq_bypass(void)
+ {
+-	return enable_apicv && irq_remapping_cap(IRQ_POSTING_CAP);
++	return enable_device_posted_irqs;
+ }
+ 
+ int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
 
-base-commit: ea9bd29a9c0d757b3384ae3e633e6bbaddf00725
+base-commit: c9ea48bb6ee6b28bbc956c1e8af98044618fed5e
 -- 
 2.49.0.rc1.451.g8f38331e32-goog
 
