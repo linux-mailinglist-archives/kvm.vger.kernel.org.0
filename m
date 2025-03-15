@@ -1,69 +1,70 @@
-Return-Path: <kvm+bounces-41138-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41139-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F22C5A624FF
-	for <lists+kvm@lfdr.de>; Sat, 15 Mar 2025 03:56:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10B35A62517
+	for <lists+kvm@lfdr.de>; Sat, 15 Mar 2025 04:06:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 620B97AAA91
-	for <lists+kvm@lfdr.de>; Sat, 15 Mar 2025 02:55:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 460793BF75D
+	for <lists+kvm@lfdr.de>; Sat, 15 Mar 2025 03:06:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C15A518B47D;
-	Sat, 15 Mar 2025 02:56:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17F8918DB05;
+	Sat, 15 Mar 2025 03:06:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SIHyem9I"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lu/1AfyR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F7332E3381
-	for <kvm@vger.kernel.org>; Sat, 15 Mar 2025 02:56:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E89A6178CF8
+	for <kvm@vger.kernel.org>; Sat, 15 Mar 2025 03:06:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742007380; cv=none; b=TNIfGBcEPNSkaflQa64nQOvvNOBSX3tOGNIUYaEBykdNjlO5bfyNALeRDAyiX2pdmogb2FuhVfn7gqOFp80DTS3/INdzQor59L5c/YVY4OAaqG+m2vCtpD7oag5ajAHO2gass8D6GbnQABidVt+wb8zAClKBa0gvgVmgK1HG5Hg=
+	t=1742007994; cv=none; b=a+ZrkpdOfZ5p9eTw2Ny7/pp5qG+0mghKsKfyN4+b1D3HCd85iNyeN/KR4PEgGDwGdKPWa9fvzX9bYr/o5ViV/E6AqnmVL19fa+xtVCZOTnbbfRgWncKwoBilOUbMZh019XUn25U6uuh1wmV/7N6Hxi/siygjvQ1cOm206gICKHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742007380; c=relaxed/simple;
-	bh=+ZZX7qNnfCLLvOhiQ9gHJeVtbxbDuqzZFOIXg6bI5cw=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=kmuoexqFaZK1G7xf6HOzqtMcRiUCoYDOl1NVRM0/y5gSScSaCiBtMNNNTvQJucdeyIqVvJ4I8jsDEi8gymO8IT3Nay1oEAG4IMPP5+K1piWs7nI9HbofQqRgPSk5VtjeXKpyUDi19GmwnGUlhsCy9krTLO/B0/FlO6d0a7DvKQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SIHyem9I; arc=none smtp.client-ip=209.85.214.201
+	s=arc-20240116; t=1742007994; c=relaxed/simple;
+	bh=YFjSxhw5wICpqlhn2+SBT+UI7aYyjrHGuxj/z7Cm2Sw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=b0YpQulG1CO9ZscPx0Ww4+1dbNLRzQI/Ld5SV6bzsnMUTjBQkJp9wNOamHDUktBzwOkhrr1usw4IP5RA5R4PKYtznO3vh1ZztRI+xK7pmEsTlmIzSeL9EpzMtwJ8hU14iY+DW2OAfpeMnYrLsmaepmD6vgcbedQrObSTOvsEd8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lu/1AfyR; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-225505d1ca5so45119085ad.2
-        for <kvm@vger.kernel.org>; Fri, 14 Mar 2025 19:56:18 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-223d86b4df0so52343065ad.3
+        for <kvm@vger.kernel.org>; Fri, 14 Mar 2025 20:06:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742007378; x=1742612178; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1742007992; x=1742612792; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Z62zBIuHLmtXad0Z5pdn1xvMGSFxR5nD2NTwFzgeqeI=;
-        b=SIHyem9I/tewT0YmfB9bPyORS1krQQ8ZcpfxpGb763VrGWl/dSGhAEZLgtirelPzeN
-         xfw14efMLtGu0fRrniezitc7cGjO86z0KAjHNo2775Xib4BRkf0GrRLUMkSnhBOPp8iJ
-         oJ60m+BhGwjMKe3NTPuoyTos6JvsweZeZ2l742CYFmjns97ljT80BbHVNMY7Ud1ptdeE
-         De09cOa5QSEO3UgFSKuQQ+dqJwBzhH/YWhkJde8SwRMgZfsswo5JJ3JLN1EOl1Nd7ivG
-         fYbCeJlJ0uziDbZnN/f7rk8eU7vLO8sVVGzhz3GVM5Jq9EZGfyNnl1iOQW44wKAcJ7hx
-         KiSA==
+        bh=b2ZX01PI6Yqklh+FBYpkhlAmh91WriSaacZw2NWi3Oc=;
+        b=lu/1AfyRbd5V+74YK/HJHe9W5c1Vg8AHYyvmHz+oR/WOn6fYgGh7vCSfdniB8RHV19
+         wvDophw8uBUpeQdxIB1jt705oW/pidqcxHTtfhvz+o704GBOAhUx2txSrDW6T++yiIx3
+         3KuNNPSbmgyusIMVqd4J/RpXPnIGUY0wwK7OMXpZo8TULBJFtxcsTYZAHvxjiKurjiyC
+         NzFQYMZ5YIO6GQ/dw9XZo2bD2ZJIQ2HkE1HVn+JEGQUVYQ032Qt/iDfPwdIBIwlxW/dt
+         1Qv5Vxb3Kku6vWFIYe0NmzyIn1Xa3O8CzogH1jNZrkR7mDahL2RxcSsnAhHKcE0Ftmmp
+         DpIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742007378; x=1742612178;
+        d=1e100.net; s=20230601; t=1742007992; x=1742612792;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z62zBIuHLmtXad0Z5pdn1xvMGSFxR5nD2NTwFzgeqeI=;
-        b=ipSZpUE5HNxGJheCFoUrvzrPM4sJXz/gJB7NHpEIN42/ZBGZiLEh59eWOpgmE68Smb
-         p/8qdH1AeOv/APn9lBui0KxRrLLN6Z3KFAez7o5PI2Mh6UndYTDcl2Yoje1mIsjsPUrU
-         UE2eUcfAaWJP/SR+GQVV8OMjKZEuiXFyIQcu02X9wYIDwyK/l7wYNzki4xidNMcxF8OY
-         1dDcn/yb25rUrepu0NRzxZmR2EhyzqABsjunH+9cFuxX8Zyo90n5syCvymd/Q3upBUrm
-         +ya0fRzF/FLYO9Y5vQAEG0rVG+nHx2dDFp2Asj5CBd0wYu5keg8UkXIed7GvWmZl/AMT
-         NStQ==
-X-Gm-Message-State: AOJu0Yy9Pi9wfeN76B1UQojok/mwCMvSCt0TM5ZRiUimhkRs0tuar0U3
-	9N+L4/UjZ+LmkHuDmFluWXWLp7fWvjrptqqIZAliifqf/+BaeeDGyV3JQ8Twmc04pnf89p+yiD7
-	ncA==
-X-Google-Smtp-Source: AGHT+IGGn3fc2zoHlksKBIechNzdvEm7Uhf7t5xNZPQBPITxQ4BguguvN/F5A1Ol5OtNBXp+F53DF6fEjkA=
-X-Received: from pfu10.prod.google.com ([2002:a05:6a00:a38a:b0:736:59f0:d272])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1950:b0:736:53bc:f1ab
- with SMTP id d2e1a72fcca58-737223b908dmr5473148b3a.12.1742007377854; Fri, 14
- Mar 2025 19:56:17 -0700 (PDT)
+        bh=b2ZX01PI6Yqklh+FBYpkhlAmh91WriSaacZw2NWi3Oc=;
+        b=QyoT25bldxLzIbS48Z11+8gdg2cOVFfqm+I79vWpW1oY41n1ZQAUQkP3gf3FlzRiyj
+         vlx4iEw+4pPvvmn2YgHdqvNKh6itSwEAOuhdymf9YJSuY4XCSFtmoxLrE+6Hb0P+NI8e
+         MzAf03j6jezEOj+C1Kyf5NFmNagrrwJ/AeUGGzfj0UAfmscjapb38LE4l+ZKra/ftm+l
+         AFHbHENNAv7V4LPvvBZbLu9ZJSu1yU3gdwPbI/lORd+RxQ93rlWGq1EyYA2c0eBiC50y
+         MoRBOWaGwbRJllIw6zTCuN7UgKne73SDL3NTwg7+UEm6Se1sQ25pPu2H2H/FbkhgKXhu
+         daUw==
+X-Forwarded-Encrypted: i=1; AJvYcCX6dRaI9kLj7+Ka4AXGszOeq7aMdaBTxzUOsbxujZ2rGoGjYvtXoxKseBVKQ+Q2j1QMZQY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqGkUkPz8F+wP1aKj10MfBgsrof66rMTxMVAfPLaW1GLLkSpjo
+	Dd7GeH7Gm+84sXwXhLY5QS2dhEl1PFFcLiu/3J+/uB/IfbTxn4FDZZhG2vQ4lZDnUYgRF1FNLIo
+	jGg==
+X-Google-Smtp-Source: AGHT+IHL2LYaXR50kWQxDhmTJ+tOm7KlWU3qKMdLw3ptqdSgC3BqQWsYyFqF2SrHhElRbe2bRC4mBlr8l50=
+X-Received: from pfbfv4.prod.google.com ([2002:a05:6a00:6184:b0:730:96d1:c213])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:b95:b0:736:3c2b:c38e
+ with SMTP id d2e1a72fcca58-7372235aca9mr5294705b3a.13.1742007992145; Fri, 14
+ Mar 2025 20:06:32 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 14 Mar 2025 19:56:15 -0700
+Date: Fri, 14 Mar 2025 20:06:21 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,114 +72,41 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.49.0.rc1.451.g8f38331e32-goog
-Message-ID: <20250315025615.2367411-1-seanjc@google.com>
-Subject: [PATCH] KVM: x86: Add a module param to control and enumerate device
- posted IRQs
+Message-ID: <20250315030630.2371712-1-seanjc@google.com>
+Subject: [PATCH 0/8] x86/irq: KVM: Optimize KVM's PIR harvesting
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	Jacob Pan <jacob.jun.pan@linux.intel.com>, Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add a module param to allow disabling device posted interrupts without
-having to sacrifice all of APICv/AVIC, and to also effectively enumerate
-to userspace whether or not KVM may be utilizing device posted IRQs.
-Disabling device posted interrupts is very desirable for testing, and can
-even be desirable for production environments, e.g. if the host kernel
-wants to interpose on device interrupts.
+Optimizing KVM's PIR harvesting using the same techniques as posted MSIs,
+most notably to use 8-byte accesses on 64-bit kernels (/facepalm).
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/include/asm/kvm_host.h | 1 +
- arch/x86/kvm/svm/avic.c         | 3 +--
- arch/x86/kvm/vmx/posted_intr.c  | 7 +++----
- arch/x86/kvm/x86.c              | 9 ++++++++-
- 4 files changed, 13 insertions(+), 7 deletions(-)
+Fix a few warts along the way, and finish up by adding a helper to dedup
+the PIR harvesting code between KVM and posted MSIs.
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index d881e7d276b1..bf11c5ee50cb 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1922,6 +1922,7 @@ struct kvm_arch_async_pf {
- extern u32 __read_mostly kvm_nr_uret_msrs;
- extern bool __read_mostly allow_smaller_maxphyaddr;
- extern bool __read_mostly enable_apicv;
-+extern bool __read_mostly enable_device_posted_irqs;
- extern struct kvm_x86_ops kvm_x86_ops;
- 
- #define kvm_x86_call(func) static_call(kvm_x86_##func)
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 65fd245a9953..e0f519565393 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -898,8 +898,7 @@ int avic_pi_update_irte(struct kvm *kvm, unsigned int host_irq,
- 	struct kvm_irq_routing_table *irq_rt;
- 	int idx, ret = 0;
- 
--	if (!kvm_arch_has_assigned_device(kvm) ||
--	    !irq_remapping_cap(IRQ_POSTING_CAP))
-+	if (!kvm_arch_has_assigned_device(kvm) || !enable_device_posted_irqs)
- 		return 0;
- 
- 	pr_debug("SVM: %s: host_irq=%#x, guest_irq=%#x, set=%#x\n",
-diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-index ec08fa3caf43..a03988a138c5 100644
---- a/arch/x86/kvm/vmx/posted_intr.c
-+++ b/arch/x86/kvm/vmx/posted_intr.c
-@@ -134,9 +134,8 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
- 
- static bool vmx_can_use_vtd_pi(struct kvm *kvm)
- {
--	return irqchip_in_kernel(kvm) && enable_apicv &&
--		kvm_arch_has_assigned_device(kvm) &&
--		irq_remapping_cap(IRQ_POSTING_CAP);
-+	return irqchip_in_kernel(kvm) && enable_device_posted_irqs &&
-+	       kvm_arch_has_assigned_device(kvm);
- }
- 
- /*
-@@ -254,7 +253,7 @@ bool pi_has_pending_interrupt(struct kvm_vcpu *vcpu)
-  */
- void vmx_pi_start_assignment(struct kvm *kvm)
- {
--	if (!irq_remapping_cap(IRQ_POSTING_CAP))
-+	if (!enable_device_posted_irqs)
- 		return;
- 
- 	kvm_make_all_cpus_request(kvm, KVM_REQ_UNBLOCK);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 69c20a68a3f0..1b14319975b7 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -227,6 +227,10 @@ EXPORT_SYMBOL_GPL(allow_smaller_maxphyaddr);
- bool __read_mostly enable_apicv = true;
- EXPORT_SYMBOL_GPL(enable_apicv);
- 
-+bool __read_mostly enable_device_posted_irqs = true;
-+module_param(enable_device_posted_irqs, bool, 0444);
-+EXPORT_SYMBOL_GPL(enable_device_posted_irqs);
-+
- const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
- 	KVM_GENERIC_VM_STATS(),
- 	STATS_DESC_COUNTER(VM, mmu_shadow_zapped),
-@@ -9772,6 +9776,9 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
- 	if (r != 0)
- 		goto out_mmu_exit;
- 
-+	enable_device_posted_irqs = enable_device_posted_irqs && enable_apicv &&
-+				    irq_remapping_cap(IRQ_POSTING_CAP);
-+
- 	kvm_ops_update(ops);
- 
- 	for_each_online_cpu(cpu) {
-@@ -13552,7 +13559,7 @@ EXPORT_SYMBOL_GPL(kvm_arch_has_noncoherent_dma);
- 
- bool kvm_arch_has_irq_bypass(void)
- {
--	return enable_apicv && irq_remapping_cap(IRQ_POSTING_CAP);
-+	return enable_device_posted_irqs;
- }
- 
- int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
+Sean Christopherson (8):
+  x86/irq: Ensure initial PIR loads are performed exactly once
+  x86/irq: Track if IRQ was found in PIR during initial loop (to load
+    PIR vals)
+  KVM: VMX: Ensure vIRR isn't reloaded at odd times when sync'ing PIR
+  x86/irq: KVM: Track PIR bitmap as an "unsigned long" array
+  KVM: VMX: Process PIR using 64-bit accesses on 64-bit kernels
+  KVM: VMX: Isolate pure loads from atomic XCHG when processing PIR
+  KVM: VMX: Use arch_xchg() when processing PIR to avoid instrumentation
+  x86/irq: KVM: Add helper for harvesting PIR to deduplicate KVM and
+    posted MSIs
+
+ arch/x86/include/asm/posted_intr.h | 79 +++++++++++++++++++++++++++---
+ arch/x86/kernel/irq.c              | 63 ++++--------------------
+ arch/x86/kvm/lapic.c               | 20 ++++----
+ arch/x86/kvm/lapic.h               |  4 +-
+ arch/x86/kvm/vmx/posted_intr.h     |  2 +-
+ 5 files changed, 96 insertions(+), 72 deletions(-)
+
 
 base-commit: c9ea48bb6ee6b28bbc956c1e8af98044618fed5e
 -- 
