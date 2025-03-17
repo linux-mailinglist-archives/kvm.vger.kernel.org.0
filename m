@@ -1,219 +1,219 @@
-Return-Path: <kvm+bounces-41248-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41249-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 763FEA65892
-	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 17:42:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1935FA65941
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 17:58:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 70F847A2D84
-	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 16:41:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC1AC3B503B
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 16:53:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6615A204097;
-	Mon, 17 Mar 2025 16:38:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 817C61EB5CC;
+	Mon, 17 Mar 2025 16:49:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="imcNWENI"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="xXCPuzPw"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2042.outbound.protection.outlook.com [40.107.102.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989241B0424;
-	Mon, 17 Mar 2025 16:38:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742229512; cv=fail; b=jncB6QRkIk+lHEruIGx0WyqPdWjCdbIAbHHQYBC6pBo+Cx/gBVRW57ixLwY16TlJrsV3JiSXW52J2vXutH7hm6HBxUR1/WvjMiE/6a8LRVg1bzYRmMP936mmTKqlpW8W72UVb3wtee+V59twVPtV2jruzQJMAwO3nP7zAzutMN0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742229512; c=relaxed/simple;
-	bh=l7MU9KXEoZL5qyriI/1rn+jlEw2h3IlvUR90tgYsCPc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=SSkyBqcow4C4tlu+9Lrv7UNtLU+tf2aDerxRHesERsBqt020HrLquW2C8gjN51AzPBmXTKaOyZ0oe735WVPMVZK6NLrDD8q/YjLbsu7nca85WlCwwa0qgbgenqoNxtkRgZhROXwSaIyZJyAXMk8faR/08lbMsl2ZGFFHgefHMKk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=imcNWENI; arc=fail smtp.client-ip=40.107.102.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=RSs2Jmu2t6deLdxIQUaKNEAu8qMpqoO0jCwSHJHVrJ5M/ikCEAi5KfZIEdLJzXZ/CGLKExm4KjBH0AN4RyT53mQU0g7AFG4pIVjcJvwgCoIP9gyP299njdkqh5rFGsfZ+CNdR5aTahzkiky69NA1RAotwaT2Qw1YSRQ2ToimzJKnYhkmJw/+KGbF6w09JBqe5X9WkHrZCklaJERBUgOgVlJCWDR9yalWw5ONFqgMWhkdtol8yYSb2FKakF/YhuyOGcSReKJEpRhPH1hAmH7aagYoF02nWHXTvMH++2sxqMSUs4+QAiiblpEgEvGaCgGMCyesvfp19sOKTDv0BPrGeA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KMR+033BL8YtE0zJD+p3KFTKRLda1626i4IzJtvXTK8=;
- b=nrCcPlsHkHui4CW/zsOLY361lVAzJH+nl6B9vQ2unYGwOAjTtIfvcF9faCtIxqxBX2iWUMFqtm69vCpUbkmirxDEMlElD930c603J1HbwYqOfeqzTdgh0z8ryMxxrTzEm3ve1KoaDhGCw1kCUEV9HNemR4AI3xCtnAkCHceIjh2Y8zPmZD0YOtyKF6msQg8oBS/p5QhFZN62TiOfq6IrpAXapkIeKdFxtBukjoqLxTzDFQBOizvtjJt1vXO0rqMEdJBYpRCCHdchQNNS1hljEKbT8NraVbomAxbTMfQCJc9iOZL/S4RlkTgCAYILGFWN3s6SF/46yMEUK0brkC23ow==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KMR+033BL8YtE0zJD+p3KFTKRLda1626i4IzJtvXTK8=;
- b=imcNWENITuSQfbkQhaTR3waaZH+V2DsCopTfe9k5uP2och/k1uIcITsD7q0hwRjG5jVvFJIxdRjrmezHPgzN9YhSGXS3CTBMfwPdBj4VVzmaLuwwSAqVXd6jRQpCQU3Bu9RnrFYxRpHiJrgQP2WlBo2Sy7DMOdTUWDEZxZXl1u0+KuhOHUkP1GvfFJRtpTGCdifg6ESXc75F1J72gdrf8f2j/PdjvAzFHExHbRdOEJW0omQc4+NElUXftVimokam/i3KJgtd7OfplDSsEh7JXLC2fqfZoC9RhcxQ3R1d2mGsS7Bor4vVUVJ0+tVUSFsw1X3vDHjwWUJdFvuu90lXaQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by MN0PR12MB5788.namprd12.prod.outlook.com (2603:10b6:208:377::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.33; Mon, 17 Mar
- 2025 16:38:27 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.8534.031; Mon, 17 Mar 2025
- 16:38:27 +0000
-Date: Mon, 17 Mar 2025 13:38:25 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Dan Williams <dan.j.williams@intel.com>
-Cc: Alexey Kardashevskiy <aik@amd.com>, Baolu Lu <baolu.lu@linux.intel.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>, kvm@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
-	christian.koenig@amd.com, pbonzini@redhat.com, seanjc@google.com,
-	alex.williamson@redhat.com, vivek.kasireddy@intel.com,
-	yilun.xu@intel.com, linux-coco@lists.linux.dev,
-	linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
-	daniel.vetter@ffwll.ch, leon@kernel.org, zhenzhong.duan@intel.com,
-	tao1.su@intel.com
-Subject: Re: [RFC PATCH 08/12] vfio/pci: Create host unaccessible dma-buf for
- private device
-Message-ID: <20250317163825.GL9311@nvidia.com>
-References: <20250113164935.GP5556@nvidia.com>
- <ZnDGqww5SLbVD6ET@yilunxu-OptiPlex-7050>
- <20250114133553.GB5556@nvidia.com>
- <17cd9b77-4620-4883-9a6a-8d1cab822c88@amd.com>
- <20250115130102.GM5556@nvidia.com>
- <f1ac048f-64b1-4343-ab86-ad98c24a44f5@linux.intel.com>
- <20250117132523.GA5556@nvidia.com>
- <835c7751-d8ba-4af0-812f-2b3a9a91d0bc@amd.com>
- <20250120132843.GI5556@nvidia.com>
- <67d0e549d4d27_201f029458@dwillia2-xfh.jf.intel.com.notmuch>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <67d0e549d4d27_201f029458@dwillia2-xfh.jf.intel.com.notmuch>
-X-ClientProxiedBy: MN0P221CA0001.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:208:52a::7) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90BBA1A0BF3
+	for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 16:49:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742230184; cv=none; b=nYugFuMNv5l5hDKwvMR0NvPpwiD0Vx8NGjvpwxBE3VJVMKWpgdYxgC2UvkMBp1UtPcfGZT04J+nhVFdm7/gb6I2A7JPBA8xsnpjQhwHdPHEp5FwazqpwvDgR3e9de7hCVUzlVinrVw8I3MBS7Naxh09Wv+PfX7Q1V9RyEBGX2W8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742230184; c=relaxed/simple;
+	bh=zKY2O+h44vg2AZUyM+fybeTrhOsDX/DE1x+MEN0imN0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hzjKk6HdZynvcvils8IDIq+dEZNIrE0um4EbwSFj+3KfKMciykBWJsNgUY771S4uLbR8+JlpZ+MmdbKAv0BeshlZvaIElNUJksv7jWc7Khpo4QJf54qvH2W0uvVrx/8LxlY4j483nUxiDDOwRgYoDuoJT4MI05Sk16DjqCLI4Mw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=xXCPuzPw; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3912baafc58so4054515f8f.1
+        for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 09:49:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1742230178; x=1742834978; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=u7ZptfcVywAs5S9WPv2/GeL62BfGTfGlQVZZ9GYrYds=;
+        b=xXCPuzPwRdZcCGVhJJsIWj4cjrFj3PSClUMQaM2QspF/R/PiLFVmfQyKa3kWP2UE9v
+         fMDG5Rqq0ZFM9vmDII6FUq4EkQZXl5vo3DIvgPSZNmpYwCbCnTWle3jvvhZnvuvhHT4q
+         5A1rFfBbGjizyFWtUPsO3qP/ZlnsLHAFKRNy6X1pF5kDhVGNRfc/O32YpyjZzVDZePiK
+         nEX8/PEEq08VSLkFs428VaDruKG0hqTpm+UKx4ICufeGn2N+Ra4llNF6Lbad9JbXHGXb
+         ttWKzMqafPIb1tlQNq+tkG0DBxyL0d3PSajfhCrZ2kPUaA8IO5qcVrRnVP+6cNLqoKEP
+         QMww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742230178; x=1742834978;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=u7ZptfcVywAs5S9WPv2/GeL62BfGTfGlQVZZ9GYrYds=;
+        b=BcrB3nHHRrd9jxc2IK8sDxdvEXhYYoKVz3u1221SIbeAKmQUDlb14Bexi99+CHzAz6
+         JzhPufeMn923gLwvCpwkuhRd6kkE5JPsNSg4QqYt7Txj7jM1sSJWtpCrsAffvYklMzlo
+         6xTLHZJy5EmykVFbcq+5EEYCOHSNRGt7YQNmgjfltx8pH2p3nvrHOig+aVu21EHVq6EK
+         tCvzhLanqwuGh9iwfqLrQyS562PUyYdTy2EuAfypf6WZkFtMn4ZKcFbsjE0gyiItTs4/
+         d0TI9I2Yz9EeKqNny9uZ13gmENipaELLaUN75MPqVYhX91qGjx0vQ1Un6+7MoBrSR/pa
+         W8Sw==
+X-Gm-Message-State: AOJu0YwVdKyxw/pJ8j4mnuGlP32NVl6iDgF17z1WqtONQfGfjl94wbYF
+	OHplGWx4cV2QyRWYNXPwmPxRW1nXFaUx+9fV4iHxpQ6nZUJV5fVNyVGx5w/sM0ES2q0F9y4tQ8w
+	jiqw=
+X-Gm-Gg: ASbGncvy/guMjzOcg3holyk9ttAxedNYPShRlRzneXT5rmsJRKb+spsj3nQtuVxKLQr
+	kmhhsi3ZMIbU0pS3ybR5p3DmoJM4zmkmtrL4h/u+HFan9cqMUnuAFYzF8eGvHj0XhmoNpt1J9QS
+	BMu+4KJghUpMBZ2lVDjcfmBdahfzRQN7JmCm/H3Ouc0LyKE3lwPnmi2T9F+Nfyuc0jtRdr8yGwK
+	SHPd46SGYi5aBoeVasxg9xhA19EnmHrMR7s9RBx9Mk3jNbe4AeNc1b2+IjxNKl/F67RkCihTaOc
+	02M/tC9CNvOfsGatnMDn7kolO70oLqfZis5OAHT0dlW9UQ==
+X-Google-Smtp-Source: AGHT+IFvFLEtNts4+EjupQj7tKz7Ub/sfS5CRz526ULsf0t9rBwSNgpmM3LhpFRnB8TblPnkZ0kchg==
+X-Received: by 2002:a5d:47ac:0:b0:391:13d6:c9f0 with SMTP id ffacd0b85a97d-3971f9e7813mr13297922f8f.47.1742230178319;
+        Mon, 17 Mar 2025 09:49:38 -0700 (PDT)
+Received: from carbon-x1.. ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395cb318a80sm15785845f8f.61.2025.03.17.09.49.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Mar 2025 09:49:37 -0700 (PDT)
+From: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>
+To: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org
+Cc: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>,
+	Andrew Jones <ajones@ventanamicro.com>,
+	Anup Patel <apatel@ventanamicro.com>,
+	Atish Patra <atishp@rivosinc.com>
+Subject: [kvm-unit-tests PATCH v11 0/8] riscv: add SBI SSE extension tests
+Date: Mon, 17 Mar 2025 17:46:45 +0100
+Message-ID: <20250317164655.1120015-1-cleger@rivosinc.com>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|MN0PR12MB5788:EE_
-X-MS-Office365-Filtering-Correlation-Id: 117cc56d-05ef-4cd1-e26d-08dd65722482
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?9BO/lCk2kcMXmq49JmMSS8LGKmIFZHXGm3hXrFwima1giu1gkf9L1N5eQ47m?=
- =?us-ascii?Q?KGXIKbll9oZ5wJOgduwwjuRBhWU1lxcrULWZIshwjJRSLdy4RILEfe+5Z17r?=
- =?us-ascii?Q?UQXglsiJ+7wZZ1qOm5qaMmUKL81lREd1og3GUmKMGPoL1zMNTq6kqht8D1bO?=
- =?us-ascii?Q?Adx8zpdLomTNmr3DGqGoYEuR9X86LqKL9Xg6SgD59pHupidzx5H5vnRUzleA?=
- =?us-ascii?Q?CjtL0VNDKujHM5N/F3O7MoJdkwr42BVTe7k8ecFyN5I9qDQHxdggyBZm+kX5?=
- =?us-ascii?Q?SR51cOS1kvwDOMEkvseTcbhYFIoVQTxuA8vsMoev5LQFUaqvLIq0TO+M99qr?=
- =?us-ascii?Q?3dBlG71Ha32QOnmOfuUvLZpStrzG9+mcsAuJ/Nl0rLXEgF7aaLM+IsTlTcWq?=
- =?us-ascii?Q?U1rNWqReaW3Dj/hgfumTk371elC2/Jg4wU7kP1RjHg6ESDdak9exoI9WIloz?=
- =?us-ascii?Q?Yf4hsYm8RE5ewkG25DljAXXVFedSVu57j77eRmOca/LeOWIpVnDuNV6EuNLz?=
- =?us-ascii?Q?0rO6/TfIexqZudVghMv9JksAmv378/KrvicI+cfoniXFqpc3TipXMAOBa8xK?=
- =?us-ascii?Q?wZSLaLE6lWgkfkSVY8Es8iuQ/7g3x0VrWp8F8cqTey95HioG8rYDDuXrhkcr?=
- =?us-ascii?Q?HcZtN7HAKIFvJOg9IsFnQKoewddhxvOVTj3YZkN2g/T2/4UUZYWoNfK6UJI9?=
- =?us-ascii?Q?vgx/TNqIem4jAw1NIhbGx46pehbmsDDH7QzI5V21gUIOSZQwGv7adja3rWkl?=
- =?us-ascii?Q?UwNKsWjmmRy4QOZ5b7jVAkxIricW5tU9GXvowZBjBK/wJjzDNIVZ1wV79jME?=
- =?us-ascii?Q?hI73tXTgsMqI6AkKFrrznbdHGu7JtjzW72szGYC0DY6wlekO288+vyY7fc1W?=
- =?us-ascii?Q?szeYEwbv8/+wZ9T4xeTw7zQ2Y4INZtUQ3bEw56OTCWU+HnPUEDz9k7mKnSh4?=
- =?us-ascii?Q?LxsfZbNIIkkcZDu4k8AbCokGEmozacJxHxIHAaPYnTn+BULiHAA1zz2NH6BN?=
- =?us-ascii?Q?q9n3cVMydOvwGRhIAdcm6gMKtQII59wZFLTJXH0Ctoe3NLaeyb3UDzizebw3?=
- =?us-ascii?Q?gOP4AvtS5721V3a2sOPNGsyuSIfVQ2vUScJgiocQg4Vh2XrQ2+VWa7zAXNZq?=
- =?us-ascii?Q?oLZYPg9R/bBlzOlHRuHvCQh80nyElYuFhGiPzsuSpe4tfgpP+f+Thn/Xgweu?=
- =?us-ascii?Q?7tY1YKCDoaQ6i9GPwUt66PoIGzl1TPWOMV/CM2c2xoXbiaFMZRFwp++Lsdkt?=
- =?us-ascii?Q?7Ymuvp/Nq2cryybkT0faNLwkXKyQLCMDFNJI5wxr49FBL6TrsUJOpuOwklc2?=
- =?us-ascii?Q?T3DK3qct6wLjILz2GpSEE1Q38ANw85jcH/GXh2jxSiPMDj1AeRNrln54LbRI?=
- =?us-ascii?Q?5RpPunX2UJSmCeAwG4cfBN32/1jR?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?MAq4S5LX+W1/NrBZwJoU4vC3X6IkdbIgJrsUeI1M74+LrM81YtMJxE2AOBZr?=
- =?us-ascii?Q?Vn97VhyIGSOJaivoy1EuGR4jhBFvRRqW8YzOsOgIMApVwzhEb169CLXLkHta?=
- =?us-ascii?Q?n28eHTNqmmGpg3tu80KyaCQ94qKyzjGcCW6K0io6xFUpDP8PJUuo0nuM1v6Z?=
- =?us-ascii?Q?n1SJfm3Ppilucnb6TEljLIHZWxEbo9XfwaSOLRo3GgWxvLkCy5Gzb6kGrv4a?=
- =?us-ascii?Q?7w7sprX/ncRfwHG28Eu7A3hseUBvL9be0ZRGs4uag4jZ48QaRICniIESR4qy?=
- =?us-ascii?Q?bQB7X7tw6PbARv9qoUOGYkWhRNA3Od/nLS60EIixJWfOzQMH8DHTUZ+1WgC+?=
- =?us-ascii?Q?RFI6Pb5PNtQyCr8AZQQ3xB0TFa/IksrUcBXsPgjLXcbA2sN9JfUVG+GmN4Gu?=
- =?us-ascii?Q?j360LS4OBO2OKcWQqBOPEtXTrvz6MXpl4Mb/E6SP7ar1t7dNBg2qwi0gAccL?=
- =?us-ascii?Q?oV7atC6+u7KYsvFUk4uRx/yhhLI6awWs49pB3l/tCIIyfxfiQ77aQPzQMEhN?=
- =?us-ascii?Q?4wAiaezOisYzOKNYjDmxe4KWHQPwjM+eekjHm407A+dkzxmBSNAGpxhiEYIQ?=
- =?us-ascii?Q?xusgRaitUZgkMjj19eDJxoh3W5BkBl1xn0ZONIdCBIX5u3OB8v3avWI/AsoS?=
- =?us-ascii?Q?OQRpcMZdCaJ/kQdlfvIqzEXQMcV13Gi7PqqigJiEizcpokl05fxmfxcOoJkj?=
- =?us-ascii?Q?UARMKLze4nghlqAtMgx3yC0IRS9Rs3TL+yNQKySHkbV1pmYVDQNAJa7hZG86?=
- =?us-ascii?Q?wCnPaei1WI2iQiwMYq/3rVWjUUiUObgft4IYALjThFRmxJ4MPG3Yu0XYHL3E?=
- =?us-ascii?Q?p7arDsiYExfs15on6/OcD8iSOiKIHk5pIuGwO69l15Xot+V+5VjvHJvEnURf?=
- =?us-ascii?Q?zLZCjlwB/YGfm4+iobIWxwDvgwFFyimeEWQnp6u2BbzB/9FBOccRiA0RuPVr?=
- =?us-ascii?Q?XYO5hK9/ozGie0u8YYp8YwRCtuRLlE9jA08qe5ZES7PQw6bM7PtgqEayTAgc?=
- =?us-ascii?Q?P8ij1XMre3ZnN1M+OLfk70QfKqOYI7DCK3UnZP6U/xct/cI4xm6zYLwTSttI?=
- =?us-ascii?Q?LuaFyk7xYYyMOdF7Y2CzyGOxaUloDVRT2ZBBlmm2OrZZp7qn+aKdYgQLUPEO?=
- =?us-ascii?Q?uia56jv/VH1lLZ/uYIhbcQQZAen5KuguPrak2XuYvo2ECUDpoT3szMl4gAMv?=
- =?us-ascii?Q?SoYP7kTMMSoQESUFdD67HUfg6Xwr+W3RhuBEbGd/CcC/Js4DPQS+nR9bswaA?=
- =?us-ascii?Q?jh/+BPFY2Yk9jH0iugzRDA3MRe9eDuWh76ocXZqNwPrnH67EAuJ22BxrYQ9V?=
- =?us-ascii?Q?s6MNex3OXKqZLZTKrP+CYnRiNShL7rYQh7TOIWBWHJAWVILebcxasP8KSgGV?=
- =?us-ascii?Q?AX9vZEWHJXI6AUHjH4ELTZhUQPiOiYrjMAZeLGML0808E4vEigY6KooZFzaM?=
- =?us-ascii?Q?veazZBnslP3EYDlj+DlDNR2JzdtUM0socs0L5EVf8onX6BAk8jBNeE9AVnco?=
- =?us-ascii?Q?1FTCp9nL7Gg4FJH6yUXwowHtgJY56/mW2F2Jccy0o1IDSOlxw8bELntKne7P?=
- =?us-ascii?Q?+wy5SSghn558wMY4Ct9BRevxLxns4WF6vwWC/FyK?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 117cc56d-05ef-4cd1-e26d-08dd65722482
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2025 16:38:27.2579
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8egIt5/ccd0soGnswQUBqEJcQfyIeidvsbw5NNZ3waTnWadJDPHfx1T9sOy80rT7
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5788
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Mar 11, 2025 at 06:37:13PM -0700, Dan Williams wrote:
+This series adds tests for SBI SSE extension as well as needed
+infrastructure for SSE support. It also adds test specific asm-offsets
+generation to use custom OFFSET and DEFINE from the test directory.
 
-> > There is a use case for using TDISP and getting devices up into an
-> > ecrypted/attested state on pure bare metal without any KVM, VFIO
-> > should work in that use case too.
-> 
-> Are you sure you are not confusing the use case for native PCI CMA plus
-> PCIe IDE *without* PCIe TDISP?
+These tests can be run using an OpenSBI version that implements latest
+specifications modification [1]
 
-Oh maybe, who knows with all this complexity :\
+Link: https://github.com/rivosinc/opensbi/tree/dev/cleger/sse [1]
 
-I see there is a crossover point, once you start getting T=1 traffic
-then you need a KVM handle to process it, yes, but everything prior to
-T=0, including all the use cases with T=0 IDE, attestation and so on,
-still need to be working.
+---
 
-> In other words validate device measurements over a secure session
-> and set up link encryption, but not enable DMA to private
-> memory. Without a cVM there is no private memory for the device to
-> talk to in the TDISP run state, but you can certainly encrypt the
-> PCIe link.
+V11:
+ - Use mask inside sbi_impl_opensbi_mk_version()
+ - Mask the SBI version with a new mask
+ - Use assert inside sbi_get_impl_id/version()
+ - Remove sbi_check_impl()
+ - Increase completion timeout as events failed completing under 1000
+   micros when system is loaded.
 
-Right. But can you do that all without touching tdisp?
+V10:
+ - Use && instead of || for timeout handling
+ - Add SBI patches which introduce function to get implementer ID and
+   version as well as implementer ID defines.
+ - Skip injection tests in OpenSBI < v1.6
 
-> However that pretty much only gets you an extension of a secure session
-> to a PCIe link state. It does not enable end-to-end MMIO and DMA
-> integrity+confidentiality.
+V9:
+ - Use __ASSEMBLER__ instead of __ASSEMBLY__
+ - Remove extra spaces
+ - Use assert to check global event in
+   sse_global_event_set_current_hart()
+ - Tabulate SSE events names table
+ - Use sbi_sse_register() instead of sbi_sse_register_raw() in error
+   testing
+ - Move a report_pass() out of error path
+ - Rework all injection tests with better error handling
+ - Use an env var for sse event completion timeout
+ - Add timeout for some potentially infinite while() loops
 
-But that is the point, right? You want to bind your IDE encryption to
-the device attestation and get all of those things. I thought you
-needed some TDISP for that?
- 
-> Note that to my knowledge all but the Intel TEE I/O implementation
-> disallow routing T=0 traffic over IDE.
+V8:
+ - Short circuit current event tests if failure happens
+ - Remove SSE from all report strings
+ - Indent .prio field
+ - Add cpu_relax()/smp_rmb() where needed
+ - Add timeout for global event ENABLED state check
+ - Added BIT(32) aliases tests for attribute/event_id.
 
-I'm not sure that will hold up long term, I hear alot of people
-talking about using IDE to solve all kinds of PCI problems that have
-nothing to do with CC.
+V7:
+ - Test ids/attributes/attributes count > 32 bits
+ - Rename all SSE function to sbi_sse_*
+ - Use event_id instead of event/evt
+ - Factorize read/write test
+ - Use virt_to_phys() for attributes read/write.
+ - Extensively use sbiret_report_error()
+ - Change check function return values to bool.
+ - Added assert for stack size to be below or equal to PAGE_SIZE
+ - Use en env variable for the maximum hart ID
+ - Check that individual read from attributes matches the multiple
+   attributes read.
+ - Added multiple attributes write at once
+ - Used READ_ONCE/WRITE_ONCE
+ - Inject all local event at once rather than looping fopr each core.
+ - Split test_arg for local_dispatch test so that all CPUs can run at
+   once.
+ - Move SSE entry and generic code to lib/riscv for other tests
+ - Fix unmask/mask state checking
 
-> The uapi proposed in the PCI/TSM series [1] is all about the setup of PCI
-> CMA + PCIe IDE without KVM as a precuror to all the VFIO + KVM + IOMMUFD
-> work needed to get the TDI able to publish private MMIO and DMA to
-> private memory.
+V6:
+ - Add missing $(generated-file) dependencies for "-deps" objects
+ - Split SSE entry from sbi-asm.S to sse-asm.S and all SSE core functions
+   since it will be useful for other tests as well (dbltrp).
 
-That seems reasonable
+V5:
+ - Update event ranges based on latest spec
+ - Rename asm-offset-test.c to sbi-asm-offset.c
 
-Jason
+V4:
+ - Fix typo sbi_ext_ss_fid -> sbi_ext_sse_fid
+ - Add proper asm-offset generation for tests
+ - Move SSE specific file from lib/riscv to riscv/
+
+V3:
+ - Add -deps variable for test specific dependencies
+ - Fix formatting errors/typo in sbi.h
+ - Add missing double trap event
+ - Alphabetize sbi-sse.c includes
+ - Fix a6 content after unmasking event
+ - Add SSE HART_MASK/UNMASK test
+ - Use mv instead of move
+ - move sbi_check_sse() definition in sbi.c
+ - Remove sbi_sse test from unitests.cfg
+
+V2:
+ - Rebased on origin/master and integrate it into sbi.c tests
+
+Clément Léger (8):
+  kbuild: Allow multiple asm-offsets file to be generated
+  riscv: Set .aux.o files as .PRECIOUS
+  riscv: Use asm-offsets to generate SBI_EXT_HSM values
+  lib: riscv: Add functions for version checking
+  lib: riscv: Add functions to get implementer ID and version
+  riscv: lib: Add SBI SSE extension definitions
+  lib: riscv: Add SBI SSE support
+  riscv: sbi: Add SSE extension tests
+
+ scripts/asm-offsets.mak |   22 +-
+ riscv/Makefile          |    5 +-
+ lib/riscv/asm/csr.h     |    1 +
+ lib/riscv/asm/sbi.h     |  177 +++++-
+ lib/riscv/sbi-sse-asm.S |  102 ++++
+ lib/riscv/asm-offsets.c |    9 +
+ lib/riscv/sbi.c         |  105 +++-
+ riscv/sbi-tests.h       |    1 +
+ riscv/sbi-asm.S         |    6 +-
+ riscv/sbi-asm-offsets.c |   11 +
+ riscv/sbi-sse.c         | 1278 +++++++++++++++++++++++++++++++++++++++
+ riscv/sbi.c             |    2 +
+ riscv/.gitignore        |    1 +
+ 13 files changed, 1707 insertions(+), 13 deletions(-)
+ create mode 100644 lib/riscv/sbi-sse-asm.S
+ create mode 100644 riscv/sbi-asm-offsets.c
+ create mode 100644 riscv/sbi-sse.c
+ create mode 100644 riscv/.gitignore
+
+-- 
+2.47.2
+
 
