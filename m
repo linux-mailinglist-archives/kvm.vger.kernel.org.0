@@ -1,137 +1,194 @@
-Return-Path: <kvm+bounces-41231-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41232-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A10BCA6518D
-	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 14:45:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EE244A6524C
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 15:07:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C0773A7D74
-	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 13:44:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E215D3ADB6C
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 14:06:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B54023F417;
-	Mon, 17 Mar 2025 13:44:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5545623E35D;
+	Mon, 17 Mar 2025 14:07:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ILjGPW3O"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="C2cVaibU"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 364618F5E;
-	Mon, 17 Mar 2025 13:44:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24DAF22759C
+	for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 14:06:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742219084; cv=none; b=Ict+NBx8MfG2IOxsg9gxld0xhoxSEnRuwujxxkj59ctSMP2ykcOr+RL+oM37/NEDl0JoKSJ39x7Sd4zXeNvTx2ATXOXCb2Hp+bV4zBDK8TapgGR4e3kzbU9MvQVgW07PlIdnM3SjK9eNan8uASqCfHxkBrdhiZ7KUDu6oGom0/U=
+	t=1742220418; cv=none; b=CU6Jr8HeJjtFO+N9GpSp5HBKccPv8EZhmyNjppQ7r++jnj0kDIwtOcCdVRwswWOUln1xDIikkgKUkEDoKe51pU/O6KB6Ytv76DHR5VrpaMwMxSGS9F+51qSeE2bVn8uyrJHJMjH9TPswcI3e8X3xwNYmgGEP5bJC5kydR0c9sac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742219084; c=relaxed/simple;
-	bh=Nivyt0eviFTvQGhEOEf8ZZpxVSrnlmwhnY5tRfaE3Wg=;
+	s=arc-20240116; t=1742220418; c=relaxed/simple;
+	bh=UoGa+vKR2t6VuobmP944gXr+lihV+L+v/NWUH9e74CA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kAAzZwriSWF2xspYOIdgiKAIl8KIw/qPbtnxUo4iNFnC5QUvVUu582nm2/bigPaoHY/gnqbSloez+a63ieHD1aFaoEUdEGbbQplflBmFS5FNaXaldcXIMXc4EEzZ7p0Wws3yiaKWKXNg0sUesReEMg1b7uDvn3hJnj+E8j8+ybQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ILjGPW3O; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE2E6C4CEE3;
-	Mon, 17 Mar 2025 13:44:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742219083;
-	bh=Nivyt0eviFTvQGhEOEf8ZZpxVSrnlmwhnY5tRfaE3Wg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ILjGPW3OLQcmOrkMv5AH8aq1hrAnpRAPMTAQgLR7RHFsJF2bLoRw3BTOgmHBq56Li
-	 RCNNwy/ccowtgdxyVVPCv0ACNvWo78Z/Cvu5jcsLgefi4PUDEch8eU1Oviz3EuYzg5
-	 XUIEGSx2UA3cLHJWgIltL+b6l4V15ww+2bB6RDXFXhGG+65hftuhRbA0B/Wi3ffTrq
-	 1vQsHc29chbUvptRWKtzZwyE1x1581v27MnBNJCKTXUw8791ZidkW0v3U8o4LXMJS3
-	 W5yBnsLldEWaxyxVsmdLLyDaZrnHRHhHavJ+TGx31Iv9mQtnnuwHaY0Ofdxp9EFxBU
-	 dA3ZPdJHhLs9A==
-Date: Mon, 17 Mar 2025 15:44:39 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Niklas Schnelle <schnelle@linux.ibm.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Robin Murphy <robin.murphy@arm.com>, Jens Axboe <axboe@kernel.dk>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH v7 03/17] iommu: generalize the batched sync after map
- interface
-Message-ID: <20250317134439.GX1322339@unreal>
-References: <cover.1738765879.git.leonro@nvidia.com>
- <ad8b0dc927ea21238457a47537d39cd746751f4b.1738765879.git.leonro@nvidia.com>
- <d83afae060351f49fe0ba661f69c1d0b00538a35.camel@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=S2zxeQ9log96qw3X4NwALLMOD+vWnjthKzI3YCkzA8l7F1pwgEuqY8gN5Xntt4UMiTY5WyUWP8W1HYK80mhLQUxvugXOWyU+/xWpNQ3pVALjQAZ8l+CCxpeaTQYYKbmyspU9SDw6uWtgu1jmGvYyJd/UmSjk0ysFV5hS6eK0Dgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=C2cVaibU; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Mon, 17 Mar 2025 15:06:47 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1742220412;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Wss88VUd3dbCFczW0s5ffm7y3Bwzv0TgpH/oNvGdxCM=;
+	b=C2cVaibUbS/gIzC1dvWWnMy4ER/tBzWgs4ToaCS5SBVmpc2Tf+/1B3BH0SewohelABt13i
+	LHfYBJzDBbEVlvdLveAl9S2uffe1cuDFUAC9zVErZWKo8RYph8VleaFPKKnChvUWHGMF1D
+	3Qjd2ln0+zUOEj1DFGZvSs09A3oT/nY=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+Cc: Akshay Behl <akshaybehl231@gmail.com>, kvm@vger.kernel.org, 
+	atishp@rivosinc.com
+Subject: Re: [kvm-unit-tests PATCH] riscv: Refactor SBI FWFT lock tests
+Message-ID: <20250317-99cb18316f78fe06236b5695@orel>
+References: <20250316123209.100561-1-akshaybehl231@gmail.com>
+ <0432fb3a-98db-45c5-8630-43ad52f27769@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <d83afae060351f49fe0ba661f69c1d0b00538a35.camel@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <0432fb3a-98db-45c5-8630-43ad52f27769@rivosinc.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Mar 17, 2025 at 10:52:11AM +0100, Niklas Schnelle wrote:
-> On Wed, 2025-02-05 at 16:40 +0200, Leon Romanovsky wrote:
-> > From: Christoph Hellwig <hch@lst.de>
+On Mon, Mar 17, 2025 at 09:20:27AM +0100, Clément Léger wrote:
+> 
+> 
+> On 16/03/2025 13:32, Akshay Behl wrote:
+> > This patch adds a generic function for lock tests for all
+> > the sbi fwft features. It expects the feature is already
+> > locked before being called and tests the locked feature.
 > > 
-> > For the upcoming IOVA-based DMA API we want to use the interface batch the
-> > sync after mapping multiple entries from dma-iommu without having a
-> > scatterlist.
-> > 
-> > For that move more sanity checks from the callers into __iommu_map and
-> > make that function available outside of iommu.c as iommu_map_nosync.
-> > 
-> > Add a wrapper for the map_sync as iommu_sync_map so that callers don't
-> > need to poke into the methods directly.
-> > 
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > Acked-by: Will Deacon <will@kernel.org>
-> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > Signed-off-by: Akshay Behl <akshaybehl231@gmail.com>
 > > ---
-> >  drivers/iommu/iommu.c | 65 +++++++++++++++++++------------------------
-> >  include/linux/iommu.h |  4 +++
-> >  2 files changed, 33 insertions(+), 36 deletions(-)
+> >  riscv/sbi-fwft.c | 48 ++++++++++++++++++++++++++++++++----------------
+> >  1 file changed, 32 insertions(+), 16 deletions(-)
 > > 
-> > 
-> --- snip ---
-> > +
-> >  	return mapped;
+> > diff --git a/riscv/sbi-fwft.c b/riscv/sbi-fwft.c
+> > index 581cbf6b..5c0a7f6f 100644
+> > --- a/riscv/sbi-fwft.c
+> > +++ b/riscv/sbi-fwft.c
+> > @@ -74,6 +74,33 @@ static void fwft_check_reset(uint32_t feature, unsigned long reset)
+> >  	sbiret_report(&ret, SBI_SUCCESS, reset, "resets to %lu", reset);
+> >  }
 > >  
-> >  out_err:
-> > diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-> > index 38c65e92ecd0..7ae9aa3a1894 100644
-> > --- a/include/linux/iommu.h
-> > +++ b/include/linux/iommu.h
-> > @@ -857,6 +857,10 @@ extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
-> >  extern struct iommu_domain *iommu_get_dma_domain(struct device *dev);
-> >  extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
-> >  		     phys_addr_t paddr, size_t size, int prot, gfp_t gfp);
-> > +int iommu_map_nosync(struct iommu_domain *domain, unsigned long iova,
-> > +		phys_addr_t paddr, size_t size, int prot, gfp_t gfp);
-> > +int iommu_sync_map(struct iommu_domain *domain, unsigned long iova,
-> > +		size_t size);
+> > +/* Must be called after locking the feature using SBI_FWFT_SET_FLAG_LOCK */
+> > +static void fwft_feature_lock_test(int32_t feature, unsigned long locked_value)
+                                        ^
+                                        ^ uint32_t
+
+> > +{
+> > +    struct sbiret ret;
+> > +    unsigned long alt_value = locked_value ? 0 : 1;
 > 
-> There are two different word orders in the function names.
-> iommu_sync_map() vs iommu_map_nosync(). I'd prefer to be consistent
-> with e.g. iommu_map_sync() vs iommu_map_nosync().
+> Hi Akshay,
+> 
+> This will work for boolean FWFT features but might not work for PMLEN
+> for instance. It could be good to pass the alt value (or values for
+> PMLEN) as an argument to this function.
 
-The naming came from refactoring different functions, one was simple *_map() and
-another was iotlb_*_sync(), but yes we can name it consistently.
+Yup,
 
-Thanks
+ static void fwft_feature_lock_test_values(uint32_t feature, size_t nr_values,
+                                           unsigned long test_values[])
+ {
+	for (i = 0; i < nr_values; ++i) {
+	    ... test without lock flag ...
+	    ... test with lock flag ...
+	}
+
+	... test get ...
+ }
+ 
+ static void fwft_feature_lock_test(uint32_t feature)
+ {
+    unsigned long values[] = { 0, 1 };
+
+    fwft_feature_lock_test_values(feature, 2, values);
+ }
+
+So we have fwft_feature_lock_test() for boolean features (likely most of
+them) and also fwft_feature_lock_test_values() for everything else.
+
+Thanks,
+drew
 
 > 
-> >  extern size_t iommu_unmap(struct iommu_domain *domain, unsigned long iova,
-> >  			  size_t size);
-> >  extern size_t iommu_unmap_fast(struct iommu_domain *domain,
+> Thanks,
+> 
+> Clément
+> 
+> > +
+> > +    ret = fwft_set(feature, locked_value, 0);
+> > +    sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED,
+> > +        "Set locked feature to %lu without lock", locked_value);
+> > +
+> > +    ret = fwft_set(feature, locked_value, SBI_FWFT_SET_FLAG_LOCK);
+> > +    sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED,
+> > +        "Set locked feature to %lu with lock", locked_value);
+> > +
+> > +    ret = fwft_set(feature, alt_value, 0);
+> > +    sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED,
+> > +        "Set locked feature to %lu without lock", alt_value);
+> > +
+> > +    ret = fwft_set(feature, alt_value, SBI_FWFT_SET_FLAG_LOCK);
+> > +    sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED,
+> > +        "Set locked feature to %lu with lock", alt_value);
+> > +
+> > +    ret = fwft_get(feature);
+> > +    sbiret_report(&ret, SBI_SUCCESS, locked_value,
+> > +        "Get locked feature value %lu", locked_value);
+> > +}
+> > +
+> >  static void fwft_check_base(void)
+> >  {
+> >  	report_prefix_push("base");
+> > @@ -181,11 +208,9 @@ static void fwft_check_misaligned_exc_deleg(void)
+> >  	/* Lock the feature */
+> >  	ret = fwft_misaligned_exc_set(0, SBI_FWFT_SET_FLAG_LOCK);
+> >  	sbiret_report_error(&ret, SBI_SUCCESS, "Set misaligned deleg feature value 0 and lock");
+> > -	ret = fwft_misaligned_exc_set(1, 0);
+> > -	sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED,
+> > -			    "Set locked misaligned deleg feature to new value");
+> > -	ret = fwft_misaligned_exc_get();
+> > -	sbiret_report(&ret, SBI_SUCCESS, 0, "Get misaligned deleg locked value 0");
+> > +
+> > +	/* Test feature lock */
+> > +	fwft_feature_lock_test(SBI_FWFT_MISALIGNED_EXC_DELEG, 0);
+> >  
+> >  	report_prefix_pop();
+> >  }
+> > @@ -326,17 +351,8 @@ adue_inval_tests:
+> >  	else
+> >  		enabled = !enabled;
+> >  
+> > -	ret = fwft_set(SBI_FWFT_PTE_AD_HW_UPDATING, !enabled, 0);
+> > -	sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED, "set locked to %d without lock", !enabled);
+> > -
+> > -	ret = fwft_set(SBI_FWFT_PTE_AD_HW_UPDATING, !enabled, 1);
+> > -	sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED, "set locked to %d with lock", !enabled);
+> > -
+> > -	ret = fwft_set(SBI_FWFT_PTE_AD_HW_UPDATING, enabled, 0);
+> > -	sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED, "set locked to %d without lock", enabled);
+> > -
+> > -	ret = fwft_set(SBI_FWFT_PTE_AD_HW_UPDATING, enabled, 1);
+> > -	sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED, "set locked to %d with lock", enabled);
+> > +	/* Test the feature lock */
+> > +	fwft_feature_lock_test(SBI_FWFT_PTE_AD_HW_UPDATING, enabled);
+> >  
+> >  adue_done:
+> >  	install_exception_handler(EXC_LOAD_PAGE_FAULT, NULL);
 > 
 
