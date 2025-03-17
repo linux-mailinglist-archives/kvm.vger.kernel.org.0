@@ -1,275 +1,218 @@
-Return-Path: <kvm+bounces-41202-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41203-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7C9FA649A5
-	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 11:25:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BE07A64AA1
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 11:45:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28AE816805C
-	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 10:25:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B75133B6286
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 10:39:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A75238D22;
-	Mon, 17 Mar 2025 10:21:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41D2122FF39;
+	Mon, 17 Mar 2025 10:36:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aRdKU9Md"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J0EFHRQy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F07D235BF8
-	for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 10:21:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742206902; cv=fail; b=rtlPcwwrEbl1PJ4CCdysdqW908ilv4OktRaFQ+MOaiwWlhKeF1MZyuqLTqeMJ9wG00k6zRmSQlTEq/erI5c46viENQKi6Hc3vOaUlcMxDxXuo9zyoIPPzkoUeidE3ETH5S9h+RW6YY42KSbHaZPV3wDR/zZ9AslMzSVWyu/rDIM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742206902; c=relaxed/simple;
-	bh=8eZwxGQsbwUhmKhXiHWiRZVa17wjcE+/wofsYMVBd1I=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=XmLEjtanLdjMhCQpU4ynBZmlFxIs1r2Np5a0zJ2TaeXpP704frHmStms91yXf5KqSlHwjLuma5p3m41xf+TOOJ4Wl4jojFxc2vnqGkkOqLvPVDDooDVslTx2gAphMm4UQinsj1vhn7JdbDeo/gICQoIy9nOuPaobt8BSluCzCtA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aRdKU9Md; arc=fail smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1742206900; x=1773742900;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=8eZwxGQsbwUhmKhXiHWiRZVa17wjcE+/wofsYMVBd1I=;
-  b=aRdKU9MdrC2TSP8sqHmQmS625tK5glFW7bojRdJmUMwuJIkceXdaB06C
-   eHfeLrXTJoYX9m+NIyweEkSOpgVMDPTMyR2H3OEwzU4U/inSJ4p1N28uo
-   IJgdhUGtP5ip5sBmZWB8BVgiTailwhyZWwigoc5aYzHcmfDcb5E9WRdH5
-   8DxBKewW1ucl2+ssHiqYQoZ5p1cyxv3qPxDKi72SWK/EYEr5r1KKLu6C7
-   g0tiHJFbasycaNAK7IKcYJBuE/VH3K+04VXOSzWuxL6lmsqDWQqn+sPny
-   kjhr4dSQUe3kmxO/MQO2e/lndZrhXtla+nfkhkiLktKFbTuHGfWKP0Ato
-   w==;
-X-CSE-ConnectionGUID: gc4GMeZUR/K7EVZjrjHi8A==
-X-CSE-MsgGUID: fdPcMF0vS4OEC2R0fffQkg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11375"; a="65758085"
-X-IronPort-AV: E=Sophos;i="6.14,253,1736841600"; 
-   d="scan'208";a="65758085"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2025 03:21:40 -0700
-X-CSE-ConnectionGUID: eY//4nVpSPC4jJgvCu/Rsw==
-X-CSE-MsgGUID: D9gG5JcYT2OSb1azQQBkCA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,253,1736841600"; 
-   d="scan'208";a="121706230"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2025 03:21:39 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Mon, 17 Mar 2025 03:21:38 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Mon, 17 Mar 2025 03:21:38 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.176)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Mon, 17 Mar 2025 03:21:38 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NX3SDSPPAxGrWCnS83Ie19fS5CtXY/THVtMayvXHp+RokAYmHtlFXgbGE3AkoHFSOjzxdw6yS7Vd5GsquTudoz2Zh1KBvgrGfZc6JXNNI7Nd6BHwawB/faV+A1mk84DBrN59GXjrketzZxAF6pAsSWDSORyDV7d2IPD1d5TDkXamYnyLZRpbw7gOCRRYX4fmHLrcLcce+bUroGG8Br1Piz8llRHgIWKPNYDgLdwJ4Uzj/TbgbKZmJdwNNV0a60Gg0vt2zWpZdmTkVK0kzJp0iOZ17CoRfazqDNSs7hZAhsETSuT8hB4I23YYNDrUf6o8JqQJjcGdHmR6HCESOoYgRQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EvTxy2OKg4NiQdp52nxJblkmdzLDUV9ZVmp9A+Maat0=;
- b=FFXF8ibDiZUBn7LoQheIT5FE0dfkNKfvv8qWOLtX0XxD6ywMOHHKK5FIr4lXJ+MJtIrBGs53mtwhwPmBncIaGUuPi5+R5j4daSEqypYOiE2of9ypGbAjo1CQDmGKs4RE1Gx4ieAOZS6iuUojzc5a8Jx3QTLmtCbE8jGTmzuJpTKA4mAAjXZBUlDA4wEhqJmknlFEXRyAg6OIpMrCES6rQ25Eger3ZI7cODTnVnbh3qt0bxn8e1OgI/uH1nc+QHwqmKfVboOobWruGG1G3t9fihpidJNpX0QEXBiJsBIY7rhKMF40IvS8aKNiQWl1yof3aTm7Zo4MgNnIQUdlwEAkfg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM3PR11MB8735.namprd11.prod.outlook.com (2603:10b6:0:4b::20) by
- CH3PR11MB8466.namprd11.prod.outlook.com (2603:10b6:610:1ae::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8534.33; Mon, 17 Mar 2025 10:21:23 +0000
-Received: from DM3PR11MB8735.namprd11.prod.outlook.com
- ([fe80::3225:d39b:ca64:ab95]) by DM3PR11MB8735.namprd11.prod.outlook.com
- ([fe80::3225:d39b:ca64:ab95%7]) with mapi id 15.20.8534.031; Mon, 17 Mar 2025
- 10:21:23 +0000
-Message-ID: <ebc6f8ed-3525-4bd8-8be0-143b1c7e75ee@intel.com>
-Date: Mon, 17 Mar 2025 18:21:13 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 6/7] memory: Attach MemoryAttributeManager to
- guest_memfd-backed RAMBlocks
-To: Tony Lindgren <tony.lindgren@linux.intel.com>
-CC: David Hildenbrand <david@redhat.com>, Alexey Kardashevskiy <aik@amd.com>,
-	Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>, Michael Roth
-	<michael.roth@amd.com>, <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>,
-	Williams Dan J <dan.j.williams@intel.com>, Peng Chao P
-	<chao.p.peng@intel.com>, Gao Chao <chao.gao@intel.com>, Xu Yilun
-	<yilun.xu@intel.com>, Li Xiaoyao <xiaoyao.li@intel.com>, "Maloor, Kishen"
-	<kishen.maloor@intel.com>
-References: <20250310081837.13123-1-chenyi.qiang@intel.com>
- <20250310081837.13123-7-chenyi.qiang@intel.com>
- <Z9e-0OcFoKpaG796@tlindgre-MOBL1>
- <b158a3ef-b115-4961-a9c3-6e90b49e3366@intel.com>
- <Z9fvNU4EvnI6ScWv@tlindgre-MOBL1>
-Content-Language: en-US
-From: Chenyi Qiang <chenyi.qiang@intel.com>
-In-Reply-To: <Z9fvNU4EvnI6ScWv@tlindgre-MOBL1>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2P153CA0008.APCP153.PROD.OUTLOOK.COM (2603:1096::18) To
- DM3PR11MB8735.namprd11.prod.outlook.com (2603:10b6:0:4b::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB63F21CC70
+	for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 10:36:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742207785; cv=none; b=gZI9B8uumdzYvemS54kp3H7MJN36s5MvPbkAwjm/vLgTUdJ0ymP9m/6xufqKjLNwOE3N2sgSDQrTpAhUPkLrA+Fr3AnqCy25seWfv6B3aYA/hDZw8r9KQBTZ0M2JnSaxryFcaNovxsDs+DnxE4Yr8RH561bXM30+y+HeKFV+HeI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742207785; c=relaxed/simple;
+	bh=UzTCuVM4BpViUSL7Fn3zkH/+iRoJXAEOxsNDcO88B/4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uATHTyXn7qLA62GIoUXxJy+VJ+aEF6fxUpwtngf/heJ2wpL3mUq7GO9XrZXoh0ErqUKIWc5ueCuQ2RVUXzs7kBNn0hq20aTa3h7VhtISSSZ/2E4Mu4Gm0TKTfiLPla3QTszTJ/F55BKwQxgV3B0oFlQdd/MiNDRigFVgzZwCCpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J0EFHRQy; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742207782;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=bM2dyKJpstUzKe5NW+C4OxEF497of7da5cfefbVtcrg=;
+	b=J0EFHRQy7FbJkBgge9OSnSrrTxY+KYEGdo5KB7WF7FUkwcIng20/dixbFZwDN8fZ5sOYr2
+	TQrbs0UM7AREB7PWXt/lilNTJRvNqRIQsewHGa8DIPPT4BGYVNjPPEmMWtQQm0EyDsskYw
+	wuA231m3BH5USjjG79Z/nj2sPPWjhk8=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-169-kEiwUcnxO7aGwiD1DhmzCw-1; Mon, 17 Mar 2025 06:36:21 -0400
+X-MC-Unique: kEiwUcnxO7aGwiD1DhmzCw-1
+X-Mimecast-MFC-AGG-ID: kEiwUcnxO7aGwiD1DhmzCw_1742207780
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43943bd1409so12265735e9.3
+        for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 03:36:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742207780; x=1742812580;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=bM2dyKJpstUzKe5NW+C4OxEF497of7da5cfefbVtcrg=;
+        b=HcdDCBq9tf9lbfdHPAEAXUcMW4HdWA38J7iVzBGRIu4euF5EerhFZqYTsX/tjcQkdM
+         uYm5wmdw8HmsF1CjXDDm/PLNlOuXjWXdhQWJ/Xp9OdF1P4qyQwxQqUq0COhszgWmmbk8
+         juKxGlRblcbUUYmT0vQWuHYjlN9FaujAX8DI2w/Ba3NamQSmzlxfdnh52I1Tdh1kf48a
+         PbEijtMsAGX15/VnJ4fw79qF0TPsPZ/aoK84NT3b3xqwYmf7dyIe6zPG/7SuKBu3qabz
+         mCBGQUsy0tfkgBZmLGqU07hVWH13Rnlq29/apye45OumB/1juA1IJ/wSqiSiAVfntxId
+         y4Ig==
+X-Forwarded-Encrypted: i=1; AJvYcCXdOjgJVkuZKkayYnHGY5LA3R2lAK/n0pphfn4qjuDLTU4R2dyPIgShlLKKfZ/+JMNoixQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQ7sedaBCgEZEsVY+xjt7uxs+ZzdqRFBL3VuHNs5xVrcPynhaj
+	FmLRP+66Jx8/MpWoup9Ri6u2dIYF6uP+eNRTAoRjDeJzw6uIEK7UukicLwCV1gbtDFVhZnNciFj
+	QWouAFQguiL5Vl6VVu9OU82aMFDrgcuMI8YITovtxFtgcONPVJA==
+X-Gm-Gg: ASbGncs+bwKtD+0OTmOtZsiO3LuJaNQ/P9P3XPolsnDcyd/A2pQ7nlG8KtzQJmhA71a
+	rfiJJIbZhPb/2hPtSfQ2Zn9T9izky7CfQb7fX3qX+hoBNJjjj2Q2hLeXhJGG/EKESd4EuQEm/NA
+	SLD+c4r+ug/J1tkjLrTB+HgyuMv6kfYBD0TKpnqQbaWpyZCSBby/KCwa5qzGzgL/qEkcUFnOno/
+	heO3HyNNM/VoLOp16QnISmC7QL70Jdx2BnLwPz9rt0Y0+1s8oNbkKXp/cygYNCrI0TTB3pVK4d4
+	ky6nQLnNr3IbpJjOnIi8NhuUgeaibi2wJB+v/VxdyDkht9+Zg+ia7ZMKzYPREXGJCBE1t2lfPmS
+	hdrc6jyL6qEncIoJSF4HhZMnnxJKSKC/6LZzk83olekg=
+X-Received: by 2002:a5d:64cf:0:b0:38f:2efb:b829 with SMTP id ffacd0b85a97d-3971f5113f7mr10374677f8f.50.1742207779895;
+        Mon, 17 Mar 2025 03:36:19 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFWs4TgZN7EpkNdNwfgAZlMLTvoqVsv2Gn4ZHvm/LbyORj0yeGh6VUTmO0DyNPbaa2C5WSJTg==
+X-Received: by 2002:a5d:64cf:0:b0:38f:2efb:b829 with SMTP id ffacd0b85a97d-3971f5113f7mr10374655f8f.50.1742207779487;
+        Mon, 17 Mar 2025 03:36:19 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c73c:aa00:ab00:6415:bbb7:f3a1? (p200300cbc73caa00ab006415bbb7f3a1.dip0.t-ipconnect.de. [2003:cb:c73c:aa00:ab00:6415:bbb7:f3a1])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395cb7eb953sm14725162f8f.93.2025.03.17.03.36.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Mar 2025 03:36:19 -0700 (PDT)
+Message-ID: <58ad6709-b229-4223-9956-fa9474bad4a6@redhat.com>
+Date: Mon, 17 Mar 2025 11:36:18 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM3PR11MB8735:EE_|CH3PR11MB8466:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3d47d118-4b5d-4d49-7811-08dd653d7761
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?S3dMSjFHVzM3VytkdlYzVkpZOWJQYUw4ZGpvZUhBQjgvZjRXNVpxNThrQnZP?=
- =?utf-8?B?aHgzZ0NrNWE2L1VtRVpDTW0wUE5JbDZYSVNtR1d2c2VDNzQ2dVplYzdod2Fq?=
- =?utf-8?B?RG9OYm5nd1gyVzBwVnhqMHdrNnNETVNSdW9UL0NvbFZhU29VVFdKcm1UakJz?=
- =?utf-8?B?K1VnbEpmZjBPYVEzeC9ybDQ3bXE2dFAwZ0NkME8rNzNTOS9McGNLVnkvNm9B?=
- =?utf-8?B?bkdNeUU4OG1uM1Bvc0JQYmlrNGJNUFdVUnRuRVc1TkJOUDlsSXZCOUlVSWlm?=
- =?utf-8?B?M3ZDNWN0NDZVcXNXTzROTUxuK3N0cjJZSmZOUmJrcXprSm1RbDJkMUNubmhz?=
- =?utf-8?B?bDhFNm5UcUd1OHczcG9LSS9yd200ZCtENi9GcVBwcDN5YmliVWtsVHM5NGJi?=
- =?utf-8?B?bVN0MXl4eGlPWWRZZisrV0J3TklMQmtPck83MGxseCsyQUlnT3hlWFNubGpU?=
- =?utf-8?B?c2lRNFE5azJoTWFYNHFkVW1GRnBMQUt1U1B0R0dSenF3TWZNekRtS05ZZ3Bq?=
- =?utf-8?B?OC9RYkZaT2s1OHF6U0t3cnRGSFdHd09mM3lMOEZNc2Ewb0NLS2syN1AyY2x3?=
- =?utf-8?B?dmxPbW4xc3pnMTFxVG02WW51bi81YTZTeHNQbGo2V0hOVlNXK3NYYWJaRmEw?=
- =?utf-8?B?ekUyMEpkV0QzYXF1aXRVNXJPK2pRTDNDbDF2L2VGcC9hYWlZVktRNC92Q1Zn?=
- =?utf-8?B?UXo5b3I2ek9Va3RQVThRdWt4K3U1R2ErcXJ6ZzQyc2p4RUdVS2hHNzNDZWlH?=
- =?utf-8?B?Z3p6cE93VGRHOHpzTStnb0xiNko4SGpwL1NDV05qRncvbjNpN3pFTklacEc2?=
- =?utf-8?B?TndMMzF2cThVNEV5bFhHdHlJY1o3bGpWT2dmVk81VmIzZXRhd3ZtRkpkblJL?=
- =?utf-8?B?aDdNM0FSZGRZWEQ2QjRGVkhUZHBsUHBuVFpKS2g0bjY0UXI4aE95WVpkd05H?=
- =?utf-8?B?TFFuMWgvYXV0NGxTc1N2R0tQdWQ0WE5kK0N6bktaV3dZaVJDU2pKc0VNa2Vw?=
- =?utf-8?B?ODdEQlVNYnpnTEhxSEl1UlFCcTNRZk1xb21LVjBQRzF6WW5XbnIxT2xkTnRM?=
- =?utf-8?B?TFJDN2xDckJZMEFhbmNtMVBpR2twZmJFcU5OSWpWSGFaa3duQ0M0MU41ZUxx?=
- =?utf-8?B?OWViZDJPeEdPSVdrVk1yWkdvZDJiM0hxZXNtWEpJbTN5WHd5UG9yVHRRUU9w?=
- =?utf-8?B?b1hablZ6NzNaaTRmaTYyT3dWTkl1SzExMDE2R1I1UVdJSnI0M1lNZTlwMVJE?=
- =?utf-8?B?WEtEbytUaDFwVTB0bk9VSVlsN1VBTUN1MTFvbVU3NVRUTjdvYmNYS2xBMjB0?=
- =?utf-8?B?MDV1dlBzNWpDTHpFTlFoaDUvMk9UaFhTanBOSDFjaTIxcTdYcUJpSkFWMGlC?=
- =?utf-8?B?SjFrR3ZZZkRPWjcxOEptUFoycWRmYUR5Z3Jtb1VLZHNUM3drb0s3S1gxUU0z?=
- =?utf-8?B?eHhOSnozaFRTTWxmYzBwZ1lDZDVQTCtTMi9jeEhGekRoempmMlZ0YzBmZjlm?=
- =?utf-8?B?UWpNeUVaS1E3ZmNtOTlJMDhIdHJJSlBTSzN3dmxvNm5hYjJCNlVQMk5HMlNi?=
- =?utf-8?B?S0Znc2k2cEZSWmg5blVBL2tEOUNyWGhRYVlpYWYwcEZzRWxLc01kZUJpSXR3?=
- =?utf-8?B?MEhKU2lvTHpDMmlYS3ZCQmdxYTVpL0ZYU2xtVFBKNnZ6WkRYR1p6V2NGcWdz?=
- =?utf-8?B?SS9HTFZoTmFCUFRoa2I0Yjd3OWZmNlBIRDdPRkhsSHRTWUdkazcvKzk5VHZn?=
- =?utf-8?B?Z3doNmZZdVYvTExkbkg0WWZnL2F3cFdFQW4zamxSenIyYTN4OGQ4ZGo0RUpo?=
- =?utf-8?B?Ym56WlJ2ZmVEU0puTTVJWUgyUjRkbDdKZDV6ZXdkOUN2RitUMTBnRjFqSTc2?=
- =?utf-8?Q?AVHbs6pmy+rEP?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM3PR11MB8735.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?d3VNSUUrbFovMkpxdXJ6RkV2VGRUeXg5c3hiS1F3Ymg5S0lqdmVIbnVuUnk2?=
- =?utf-8?B?UStQNWJ5bXF6eHVmNHNwVTdiY1Y1bm0vNEpGQTcrSStoZCtBVkxwWjVTblFh?=
- =?utf-8?B?S3BmeGl6U01sQVpTN0RWNDB6UG1QNVZ3VjhZWDBYQ3dNR0lqZThoK3gwWFJ2?=
- =?utf-8?B?SzBVMUJoY1BFTmE0c1d0M3V4ZWlyNm4zcWJSWVNVS2Exb0UxVkovK3gxcGcx?=
- =?utf-8?B?YnFMeWVnVFVXZnpCQkhqV1RURWo4blk3L2JuU1RMbnA4TjNMU1RMK1J3S2h6?=
- =?utf-8?B?MERwK1NpWmEvMlJveC9aVDhxZzFzaHNmdThuZkxIZW42cUFmeUNXemt2WWls?=
- =?utf-8?B?NEh2UUlSaGkwcHhxczBud3pxMHRESE0xaVBzcjIreWtyenpJVWVqSklRdVdT?=
- =?utf-8?B?cEhGSzJ3MVZNUHdja1hmRmRxMzdKVHo0aUZEUmtYYU9UYWtLQWZ5TSs4UXVQ?=
- =?utf-8?B?ZTdpeGoyT29yODErbTMwSnFzOWNtcG4rVTBkQ1hkMmNGUFhBQzg0YmEvZVdN?=
- =?utf-8?B?UkQzRXlMS2RobGtKcmR2UzFZcXo1UXV0T0dZeXl2M3RPb2pCTFg1NlNlYTMx?=
- =?utf-8?B?bUgwek8rQW5tQkZCSTRYVTVTQmFEQVluR2hHcHh5c1VHM0pKa1NhSjVuLzJL?=
- =?utf-8?B?anNBTHcvMWE1dldvZzlBTklzK3ByeEs0MEt0TW1PL1ZBRlpxM2V6SWJwYjRD?=
- =?utf-8?B?TzlMTDY3alpWbk5FZm0zMHJkKzhCbXpHMlJ3Ykp3ZnE0ZWlzSCs0UU1rNVJs?=
- =?utf-8?B?L0lTMGRkYytreEtlR1V5QkVrTjByV3pJZzlEemd4RFZYM2liaXZ5czYzYVMw?=
- =?utf-8?B?VDF5MkpkZlFXNUxCdFdUUlZjWmFqYTNmZ3NsbE0wOXc2UUd6dDlqVTduQ01s?=
- =?utf-8?B?UW84QkVJV2pyWUhzakkrL1dGVlMzaUFndEZvVU9ZL2Y4ODZWdnpndmJBMTM1?=
- =?utf-8?B?UkpEcWRnVmNyeVZwdDZZa1pRaDd3RTRUMGtRYUFkOTBTa2dEeFlFVnU4S21X?=
- =?utf-8?B?bks5RnBJNFRsOWg0Z3lpTjZXemxxUlhvM0RHVGlRSStjcXNnQnJPK3hqbUl6?=
- =?utf-8?B?MDliMkgvQk9BbTN5dU92cWFkK1JLUlA3ZXdYUmdxLzA2aXpzQmdjMDZyZjBZ?=
- =?utf-8?B?SWkzRENNZSsySS81V1d4TThwN2RiczdpSklTejlWREY3QUk2L0ZHM0pXb2NH?=
- =?utf-8?B?N3ZhdjZia1RldEFncHRMNmFPRWd0eVc3cXBnL0xxem1UUnRsbEloS0Z3Vy95?=
- =?utf-8?B?Nk1kL2w5aTRoYkNFUHFkNVJ2ZGJTTWh2V3MwcWhiK2Y3UTdJQi9aMlpvUy9J?=
- =?utf-8?B?SU41djBudnV4V3hoZnlrNnZ6dWl4RGJvMjIrNkxGeDAwMk9KRDRkNXpyN1Qz?=
- =?utf-8?B?WWhXRG5yc2NiUEJoS0tndXVrYXBqcTJ4dXB0MDNkQ0tMZGtKV29qZFNNcXJm?=
- =?utf-8?B?d2NHQjh5YjFhYzV1YnV2VkFveHpUL1I2YVIvSHphaWVkQjVGSGlXdncxZzNm?=
- =?utf-8?B?NFJ0Ny9kZURXK09YZ1lOeXBtMkN5Z01zWVRFU3p2dE0vcVMyQWwzRnlUT1VV?=
- =?utf-8?B?bFNFSEM2Q1JYVkJUMyt2SVhURXltR291c2U2ZGpyUUxVcWZsb2NwV2JMaE14?=
- =?utf-8?B?Qnc3ZkFmRkVpVndNa3d4cGVUOXRLWlZMc3JXUitGa1JNUENBRVhvekw2OFh5?=
- =?utf-8?B?Ri9VeHB3a3ZmMkthOHg2VTdlOGpnMWRUaVFxa3BnVzZQckZsSEoxZDc1eXpq?=
- =?utf-8?B?dFRmd0s4dE9idEw4c0dUMDlTNk94dlMrOVZra0hTM1ZkL1JQbUE5dWNoUUZ6?=
- =?utf-8?B?SXNOTTNQeXo0ZjdNMmx4QklwRXYrL1RvRm9BWGUxY3ROVjg0NUZwaDc1aUFr?=
- =?utf-8?B?WjRlblduWjFWMTRJWXo3c1hqZUtINjVZQldOeVVlLzZzaDNyNVV3WGM3U21S?=
- =?utf-8?B?YlF4dDhPNHVxZFJYQkNkQXFVMU1oRlJEZko1TGZwSEp4ZkhhRjQ5ZGx3ZWtY?=
- =?utf-8?B?ZWNkdHNDWk5nS1gveTloSEhCZXgyUENFK0hlM3FFMHhvdmt5WVF2WmZONncv?=
- =?utf-8?B?NDlUZ0srNXd2MFRTS2dPWWUwUWY4b0lTejM2VElpOFJoZFdNa09IOFZJNDVp?=
- =?utf-8?B?SnhYZXFzOHliRWRPRmRabjdTbU5BanpvWkh6SklKbXczakdvTk5DTytqVUhD?=
- =?utf-8?B?UVE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3d47d118-4b5d-4d49-7811-08dd653d7761
-X-MS-Exchange-CrossTenant-AuthSource: DM3PR11MB8735.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2025 10:21:23.0581
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1fHwe3CnUXrNRhMl9QSHtyeNahJdpoOfSvYjaxhP2CCx+aTYxI21zgAXZa8yzZzQnNGwBWq6vOq6/5xOByyiTg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8466
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 4/7] memory-attribute-manager: Introduce
+ MemoryAttributeManager to manage RAMBLock with guest_memfd
+To: Chenyi Qiang <chenyi.qiang@intel.com>,
+ "Gupta, Pankaj" <pankaj.gupta@amd.com>, Alexey Kardashevskiy <aik@amd.com>,
+ Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Michael Roth <michael.roth@amd.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
+ Williams Dan J <dan.j.williams@intel.com>,
+ Peng Chao P <chao.p.peng@intel.com>, Gao Chao <chao.gao@intel.com>,
+ Xu Yilun <yilun.xu@intel.com>, Li Xiaoyao <xiaoyao.li@intel.com>
+References: <20250310081837.13123-1-chenyi.qiang@intel.com>
+ <20250310081837.13123-5-chenyi.qiang@intel.com>
+ <2ab368b2-62ca-4163-a483-68e9d332201a@amd.com>
+ <3907507d-4383-41bc-a3cb-581694f1adfa@intel.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+ dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+ QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+ XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+ Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+ PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+ WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+ UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+ jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+ B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
+ ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZgEEwEIAEICGwMGCwkIBwMCBhUIAgkKCwQW
+ AgMBAh4BAheAAhkBFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl8Ox4kFCRKpKXgACgkQTd4Q
+ 9wD/g1oHcA//a6Tj7SBNjFNM1iNhWUo1lxAja0lpSodSnB2g4FCZ4R61SBR4l/psBL73xktp
+ rDHrx4aSpwkRP6Epu6mLvhlfjmkRG4OynJ5HG1gfv7RJJfnUdUM1z5kdS8JBrOhMJS2c/gPf
+ wv1TGRq2XdMPnfY2o0CxRqpcLkx4vBODvJGl2mQyJF/gPepdDfcT8/PY9BJ7FL6Hrq1gnAo4
+ 3Iv9qV0JiT2wmZciNyYQhmA1V6dyTRiQ4YAc31zOo2IM+xisPzeSHgw3ONY/XhYvfZ9r7W1l
+ pNQdc2G+o4Di9NPFHQQhDw3YTRR1opJaTlRDzxYxzU6ZnUUBghxt9cwUWTpfCktkMZiPSDGd
+ KgQBjnweV2jw9UOTxjb4LXqDjmSNkjDdQUOU69jGMUXgihvo4zhYcMX8F5gWdRtMR7DzW/YE
+ BgVcyxNkMIXoY1aYj6npHYiNQesQlqjU6azjbH70/SXKM5tNRplgW8TNprMDuntdvV9wNkFs
+ 9TyM02V5aWxFfI42+aivc4KEw69SE9KXwC7FSf5wXzuTot97N9Phj/Z3+jx443jo2NR34XgF
+ 89cct7wJMjOF7bBefo0fPPZQuIma0Zym71cP61OP/i11ahNye6HGKfxGCOcs5wW9kRQEk8P9
+ M/k2wt3mt/fCQnuP/mWutNPt95w9wSsUyATLmtNrwccz63XOwU0EVcufkQEQAOfX3n0g0fZz
+ Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
+ T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
+ 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
+ CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
+ NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
+ 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
+ 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
+ lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
+ AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
+ N7eop7uh+6bezi+rugUI+w6DABEBAAHCwXwEGAEIACYCGwwWIQQb2cqtc1xMOkYN/MpN3hD3
+ AP+DWgUCXw7HsgUJEqkpoQAKCRBN3hD3AP+DWrrpD/4qS3dyVRxDcDHIlmguXjC1Q5tZTwNB
+ boaBTPHSy/Nksu0eY7x6HfQJ3xajVH32Ms6t1trDQmPx2iP5+7iDsb7OKAb5eOS8h+BEBDeq
+ 3ecsQDv0fFJOA9ag5O3LLNk+3x3q7e0uo06XMaY7UHS341ozXUUI7wC7iKfoUTv03iO9El5f
+ XpNMx/YrIMduZ2+nd9Di7o5+KIwlb2mAB9sTNHdMrXesX8eBL6T9b+MZJk+mZuPxKNVfEQMQ
+ a5SxUEADIPQTPNvBewdeI80yeOCrN+Zzwy/Mrx9EPeu59Y5vSJOx/z6OUImD/GhX7Xvkt3kq
+ Er5KTrJz3++B6SH9pum9PuoE/k+nntJkNMmQpR4MCBaV/J9gIOPGodDKnjdng+mXliF3Ptu6
+ 3oxc2RCyGzTlxyMwuc2U5Q7KtUNTdDe8T0uE+9b8BLMVQDDfJjqY0VVqSUwImzTDLX9S4g/8
+ kC4HRcclk8hpyhY2jKGluZO0awwTIMgVEzmTyBphDg/Gx7dZU1Xf8HFuE+UZ5UDHDTnwgv7E
+ th6RC9+WrhDNspZ9fJjKWRbveQgUFCpe1sa77LAw+XFrKmBHXp9ZVIe90RMe2tRL06BGiRZr
+ jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <3907507d-4383-41bc-a3cb-581694f1adfa@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-
-
-On 3/17/2025 5:45 PM, Tony Lindgren wrote:
-> On Mon, Mar 17, 2025 at 03:32:16PM +0800, Chenyi Qiang wrote:
->>
->>
->> On 3/17/2025 2:18 PM, Tony Lindgren wrote:
->>> Hi,
+On 17.03.25 03:54, Chenyi Qiang wrote:
+> 
+> 
+> On 3/14/2025 8:11 PM, Gupta, Pankaj wrote:
+>> On 3/10/2025 9:18 AM, Chenyi Qiang wrote:
+>>> As the commit 852f0048f3 ("RAMBlock: make guest_memfd require
+>>> uncoordinated discard") highlighted, some subsystems like VFIO may
+>>> disable ram block discard. However, guest_memfd relies on the discard
+>>> operation to perform page conversion between private and shared memory.
+>>> This can lead to stale IOMMU mapping issue when assigning a hardware
+>>> device to a confidential VM via shared memory. To address this, it is
+>>> crucial to ensure systems like VFIO refresh its IOMMU mappings.
 >>>
->>> On Mon, Mar 10, 2025 at 04:18:34PM +0800, Chenyi Qiang wrote:
->>>> --- a/system/physmem.c
->>>> +++ b/system/physmem.c
->>>> @@ -1885,6 +1886,16 @@ static void ram_block_add(RAMBlock *new_block, Error **errp)
->>>>              qemu_mutex_unlock_ramlist();
->>>>              goto out_free;
->>>>          }
->>>> +
->>>> +        new_block->memory_attribute_manager = MEMORY_ATTRIBUTE_MANAGER(object_new(TYPE_MEMORY_ATTRIBUTE_MANAGER));
->>>> +        if (memory_attribute_manager_realize(new_block->memory_attribute_manager, new_block->mr)) {
->>>> +            error_setg(errp, "Failed to realize memory attribute manager");
->>>> +            object_unref(OBJECT(new_block->memory_attribute_manager));
->>>> +            close(new_block->guest_memfd);
->>>> +            ram_block_discard_require(false);
->>>> +            qemu_mutex_unlock_ramlist();
->>>> +            goto out_free;
->>>> +        }
->>>>      }
->>>>  
->>>>      ram_size = (new_block->offset + new_block->max_length) >> TARGET_PAGE_BITS;
+>>> RamDiscardManager is an existing concept (used by virtio-mem) to adjust
+>>> VFIO mappings in relation to VM page assignment. Effectively page
+>>> conversion is similar to hot-removing a page in one mode and adding it
+>>> back in the other. Therefore, similar actions are required for page
+>>> conversion events. Introduce the RamDiscardManager to guest_memfd to
+>>> facilitate this process.
 >>>
->>> Might as well put the above into a separate memory manager init function
->>> to start with. It keeps the goto out_free error path unified, and makes
->>> things more future proof if the rest of ram_block_add() ever develops a
->>> need to check for errors.
+>>> Since guest_memfd is not an object, it cannot directly implement the
+>>> RamDiscardManager interface. One potential attempt is to implement it in
+>>> HostMemoryBackend. This is not appropriate because guest_memfd is per
+>>> RAMBlock. Some RAMBlocks have a memory backend but others do not. In
+>>> particular, the ones like virtual BIOS calling
+>>> memory_region_init_ram_guest_memfd() do not.
+>>>
+>>> To manage the RAMBlocks with guest_memfd, define a new object named
+>>> MemoryAttributeManager to implement the RamDiscardManager interface. The
 >>
->> Which part to be defined in a separate function? The init function of
->> object_new() + realize(), or the error handling operation
->> (object_unref() + close() + ram_block_discard_require(false))?
+>> Isn't this should be the other way around. 'MemoryAttributeManager'
+>> should be an interface and RamDiscardManager a type of it, an
+>> implementation?
 > 
-> I was thinking the whole thing, including freeing :) But maybe there's
-> something more to consider to keep calls paired.
+> We want to use 'MemoryAttributeManager' to represent RAMBlock to
+> implement the RamDiscardManager interface callbacks because RAMBlock is
+> not an object. It includes some metadata of guest_memfd like
+> shared_bitmap at the same time.
+> 
+> I can't get it that make 'MemoryAttributeManager' an interface and
+> RamDiscardManager a type of it. Can you elaborate it a little bit? I
+> think at least we need someone to implement the RamDiscardManager interface.
 
-If putting the whole thing separately, I think the rest part to do error
-handling still needs to add the same operation. Or I misunderstand
-something?
+shared <-> private is translated (abstracted) to "populated <-> 
+discarded", which makes sense. The other way around would be wrong.
 
-> 
->> If need to check for errors in the rest of ram_block_add() in future,
->> how about adding a new label before out_free and move the error handling
->> there?
-> 
-> Yeah that would work too.
+It's going to be interesting once we have more logical states, for 
+example supporting virtio-mem for confidential VMs.
 
-I'm not sure if we should add such change directly, or we can wait for
-the real error check introduced in future.
+Then we'd have "shared+populated, private+populated, shared+discard, 
+private+discarded". Not sure if this could simply be achieved by 
+allowing multiple RamDiscardManager that are effectively chained, or if 
+we'd want a different interface.
 
-> 
-> Regards,
-> 
-> Tony
+-- 
+Cheers,
+
+David / dhildenb
 
 
