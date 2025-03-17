@@ -1,137 +1,211 @@
-Return-Path: <kvm+bounces-41192-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41193-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 539F8A6492D
-	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 11:16:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3AE1A6499A
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 11:23:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0AA051896D5E
-	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 10:15:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A21BB166444
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 10:23:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D7E1238164;
-	Mon, 17 Mar 2025 10:14:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D52CA237185;
+	Mon, 17 Mar 2025 10:20:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XkLpEo+l"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="AFSjQf6R"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF552376E1
-	for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 10:13:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45E162343B5
+	for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 10:20:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742206442; cv=none; b=c18lcTHhpGq6nAQzL+JlWiSA/9KFN4EGSN6OsVQ2q7Vl3JXw4rpTS+W0sOhF5L9p210cAjJRxFvCsDBqVunrtj0rAJ/zeckVxakWCm1dWCED1O0L5yljlUQu2clgqlfUKhrB4bcVxOES1BewSG8rSbxaZNVceVN/LKc5iYeNXH0=
+	t=1742206815; cv=none; b=J2WeKNyQ4tyR4A40KnJu64prupP90+vAJ8lRUpEaQMhp84+OcfCG8N2FGj5W2da98Xj2S+SS7f5Q57spRxdb+Qvnj3zz3l/ET9seQFu2PeuB8ea9ujgfeSz2zPSOHRsakIlsW3xu+9ciQ20gkkJ7W4dQhhejv4eX50bCWyiq0dw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742206442; c=relaxed/simple;
-	bh=C8ZKDv6FkFMfofUcLGU0v3SKi0zrd0R8M/pLyeWdZUE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DLQ7zog6u8ubRWxUTNBBGV5+42ZI4FuvXLQ0OT5bJv+2gYPsgXmMSGsh+P//0+fx30shy/FJrg163ju9to7hp1wUm90jfzAMYt3S2AJrdK8mabDE2KDFTI8QoaBTzICtIw7YQkDceQKPkLhV/8IvnxuLfYVmkPqd8Z/J+XztVa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XkLpEo+l; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742206438;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tRBnMFtFaoL3oPsaYEgEoYjcIycECPlznLIMwEBWC2U=;
-	b=XkLpEo+lJDRfwFDDP8SBBxdQG6FuNZa4oB9HyDPsMWovR0MJfxBEmF/86hmVivRmg6UX+W
-	89MwjVoWsnrXl34HD1BkuFNrmzCzVgjXBwNkFBAFCjkH2L/QMwhi5NoqLs2Mt8yAIdbGF2
-	mxoyRjfOdhB4W+ZUTXI4fsoeCdu8Nh4=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-66-AnEEceivOPWW2rXkQxamDg-1; Mon, 17 Mar 2025 06:13:57 -0400
-X-MC-Unique: AnEEceivOPWW2rXkQxamDg-1
-X-Mimecast-MFC-AGG-ID: AnEEceivOPWW2rXkQxamDg_1742206436
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7c5750ca8b2so710992085a.0
-        for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 03:13:57 -0700 (PDT)
+	s=arc-20240116; t=1742206815; c=relaxed/simple;
+	bh=IVr8ji9E7+MrwwWwU/TyFzqkrhimDK9rKt0ajVH5P58=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pGaEsngQW8MK8qQLm7ZAyV4cHW8ECxqk6+M+S60QjNVfG0Fhm0F5+h5b3KeYpKGsMHMrYh3X7gCDlIgihQQJyBdIgboQeqpLrxcULunjnwSvYDs1krkqEvdXvDNhGTYuEgTPiixqr1cezqykH9HJkBlpIaC+HX5jRPUUXunwNsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=AFSjQf6R; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3912baafc58so3645931f8f.1
+        for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 03:20:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1742206810; x=1742811610; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=V7YMV+JZ6BIdacMpDlgwQ3lr6Io+aBiXLOqXA4jr1cs=;
+        b=AFSjQf6R7ktftAefqq5zr9nIJmq53lCvuYvspAoY3SGuWSxKoG8bSiz1/GhZHXyEkM
+         fW/M26//SBOAm2+gK9JpW9OVzDGCb0tP/TWCAcrYC5F7R7SrPbyNZQ5VJN3XwBfD8PXK
+         H3klWIxNHuO7oybpGn9ZmSy5BEeYgl/fYeP7EizBDx575AuJZs7gYeYuoqDJ7/GlozeV
+         m6drCD4NlLgtBSmA40Vtb1mcPAq0pIekmDrhSfg1MLJXAqCT1mLuBbEkCvXvQsmq3euD
+         B1hEizFmxd2EyBT/OALmyx6eD8lkbakFoxWq4j1ig2X5qQLejmW7u/gntJLwu6sxlEuw
+         WbSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742206436; x=1742811236;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1742206810; x=1742811610;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=tRBnMFtFaoL3oPsaYEgEoYjcIycECPlznLIMwEBWC2U=;
-        b=Tjh6LFJ1pHFCmT4flFaRT42uVeX+YcS1TgKv8zqE+KBisDow3K0q50F7PoDM56WBVY
-         YDPSw0Sca2cQRM083W4PhPFqqYbTiTh/MPi7EM9kJX0KQaj4P+/tPSqVaMq3HMVN+IQ9
-         kM27NUDO72trKBx0XCTLb37mLiP/jD6r0yMGwhKXlPtqGcdixvnZRHClSB8OtYtlfxpp
-         RgsToWe9reSyu9ZVc96siN/WFapLl/fd6vWFB9dB276hVByAQ+1J2l5r9KBPt1xCfwJf
-         25x/BkPsuU6iwGDXxqr68xbiYbecYrpMPXape7qG8mbl7ct7VOO12580IRE0uJAcPkFG
-         vb9A==
-X-Forwarded-Encrypted: i=1; AJvYcCX4VS8w5Ah/8P37vKkDhJUwP2SSxV9TtMCRN2RKjr5QtxDATOz2Z7KwTLtnUzPLOgWUkB8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzDjeYO2pQrir3AenNkCpIw01ytcPQGmflMUy9kIvlQumnEHHh
-	ijtNQYlveOBXgD1w8gJG1/qYVKwmBuT2KbS86HrRUaadmN9xO/iD/8ByLWct6brWoR1NmdSr9B4
-	pZE8m/AeujWBzStlW3978A2e5QJfDjDcWAiSysRNpuwwURkQahQ==
-X-Gm-Gg: ASbGncu2Tn6BMN61Sg+lNNcNcwLno/txTOURiVthGWHpLGGt1WquHobAjkHdNwtFKRc
-	mWJF6QIYULgZ2NV/hA7+cmz+zj3nIVYYh5dLLF/fqhWIJ5fcqBQ0FW0iPMhMPGBediJLpAbGoeH
-	bqSyCojHOcBlmYvuKodG9Krv/680tElVI9XO/z5URBFTJrVYKh/Fbl1ffAxV7mklgHS6XqvvSKB
-	tbspmKeKNkYbj06HvpqeksZu9MBkjsv4Xgk02u1QoC/MDbaMX5HlQG8JTPfWOjdniaU3GPOfg3a
-	JmMqD/MhIfvDxRbrlNldr1NItCmqnnU0qHWQjX+MX1XtAUbQI6CMz+4/IimOrsA=
-X-Received: by 2002:a05:620a:2948:b0:7c5:5768:40ac with SMTP id af79cd13be357-7c57c7c20f3mr1847837285a.30.1742206436613;
-        Mon, 17 Mar 2025 03:13:56 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHIOCaxHvQVjTZIrGZZ+aLZbn1xQMAi5UZQbQFIiZdjRyvxK5f639qijZj7sKktMuvUlWabOQ==
-X-Received: by 2002:a05:620a:2948:b0:7c5:5768:40ac with SMTP id af79cd13be357-7c57c7c20f3mr1847834685a.30.1742206436273;
-        Mon, 17 Mar 2025 03:13:56 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c573c7d869sm566706385a.39.2025.03.17.03.13.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Mar 2025 03:13:55 -0700 (PDT)
-Message-ID: <1ad28176-d564-4d62-898d-d1d80a2609b0@redhat.com>
-Date: Mon, 17 Mar 2025 11:13:52 +0100
+        bh=V7YMV+JZ6BIdacMpDlgwQ3lr6Io+aBiXLOqXA4jr1cs=;
+        b=wo7Db0tSNUrUZZbulAoDcjKTOylyz21Cx5S4jVDiAuNj9HuGzL+BolE6lIazEjhfLR
+         eJZI/AECs7KU2zTjHryRr6osB9uIqXwIaVev24NC8be/NIZgnMRlsPv3eR5RsyDpmTRe
+         4Yw/rVYB1r+iau49Izsy5HoKG7TsNTWXN8h0TI/LHoUDozULgtBprOL9Z3kWftEUr3Ti
+         nH3uqc1iQL3C9PAPLCrHpzFk3ighCMUK1Vc4wIwqnZiXMPYwlMcZDA5CvDnE5vZTc/ti
+         1bjeLa51+DdfF5HIRp7YooodQ+3PQEfuGzV4NrwYaa/zWqnjmJ0Rlahyllp2ApyH72r0
+         N/CQ==
+X-Gm-Message-State: AOJu0Yy9bF3IG99kDfLNv5ecDTlxNYM+sqGAbW/cLcJzBe5bE0qiyism
+	swRHYqjBGlu5lXRtYh/HelB0gGDS2ul3+NO57lJTV1INamdTg+Q9WybJL4zJiV+X5qa5sOKxu2L
+	mfBk=
+X-Gm-Gg: ASbGncstWH1dGa0aO2s8pav27EtYNH+Vct1Pws1SV0gYzZYJt/t5mKvv9cO7aNgzm3m
+	IpsAaKV/IyayOR0Zw/1/hOE1ObI+fI6fEyTgEXcUug4Lyrh3TqJLsEU1MFaqd13w09tiaIxqm8J
+	JR+ZwGciUSn0lMvAxsKUmCMvAqdoCSjCDlrOCOkRkyscFjNonyvwTi5sJBTlDj6piZrWWyXQXYj
+	wGYB/h0fYOOv/6bd2JMs4GOnygR/zEQbOn+HdgOyI07vtzRY5gSFtp6n04WLLVy/waaY7//PWM0
+	jD4CvTmCjkz9HB3vVAZ5g94F/cpXr174wStfSAPFGtzFXQ==
+X-Google-Smtp-Source: AGHT+IGB0yHt2wBIw/462+iVCrcdpb1AXU0/1jVzuJx2gVAvTV2tfhGeP63NL8dy7sY2qzSw+SbxPQ==
+X-Received: by 2002:a05:6000:1acc:b0:38f:39e5:6b5d with SMTP id ffacd0b85a97d-3971f7fa1e8mr11120342f8f.44.1742206809700;
+        Mon, 17 Mar 2025 03:20:09 -0700 (PDT)
+Received: from carbon-x1.. ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395cb7ebe3csm14749824f8f.99.2025.03.17.03.20.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Mar 2025 03:20:09 -0700 (PDT)
+From: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>
+To: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org
+Cc: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>,
+	Andrew Jones <ajones@ventanamicro.com>,
+	Anup Patel <apatel@ventanamicro.com>,
+	Atish Patra <atishp@rivosinc.com>
+Subject: [kvm-unit-tests PATCH v10 0/8] riscv: add SBI SSE extension tests
+Date: Mon, 17 Mar 2025 11:19:46 +0100
+Message-ID: <20250317101956.526834-1-cleger@rivosinc.com>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2 5/5] arm64: Use -cpu max as the default
- for TCG
-Content-Language: en-US
-To: Jean-Philippe Brucker <jean-philippe@linaro.org>, andrew.jones@linux.dev,
- alexandru.elisei@arm.com
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
- kvm-riscv@lists.infradead.org, vladimir.murzin@arm.com
-References: <20250314154904.3946484-2-jean-philippe@linaro.org>
- <20250314154904.3946484-7-jean-philippe@linaro.org>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20250314154904.3946484-7-jean-philippe@linaro.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Jean-Philippe,
+This series adds tests for SBI SSE extension as well as needed
+infrastructure for SSE support. It also adds test specific asm-offsets
+generation to use custom OFFSET and DEFINE from the test directory.
 
+These tests can be run using an OpenSBI version that implements latest
+specifications modification [1]
 
-On 3/14/25 4:49 PM, Jean-Philippe Brucker wrote:
-> In order to test all the latest features, default to "max" as the QEMU
-> CPU type on arm64.
->
-> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Link: https://github.com/rivosinc/opensbi/tree/dev/cleger/sse [1]
 
-Eric
-> ---
->  arm/run | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arm/run b/arm/run
-> index 561bafab..84232e28 100755
-> --- a/arm/run
-> +++ b/arm/run
-> @@ -45,7 +45,7 @@ if [ -z "$qemu_cpu" ]; then
->  			qemu_cpu+=",aarch64=off"
->  		fi
->  	elif [ "$ARCH" = "arm64" ]; then
-> -		qemu_cpu="cortex-a57"
-> +		qemu_cpu="max"
->  	else
->  		qemu_cpu="cortex-a15"
->  	fi
+---
+
+V10:
+ - Use && instead of || for timeout handling
+ - Add SBI patches which introduce function to get implementer ID and
+   version as well as implementer ID defines.
+ - Skip injection tests in OpenSBI < v1.6
+
+V9:
+ - Use __ASSEMBLER__ instead of __ASSEMBLY__
+ - Remove extra spaces
+ - Use assert to check global event in
+   sse_global_event_set_current_hart()
+ - Tabulate SSE events names table
+ - Use sbi_sse_register() instead of sbi_sse_register_raw() in error
+   testing
+ - Move a report_pass() out of error path
+ - Rework all injection tests with better error handling
+ - Use an env var for sse event completion timeout
+ - Add timeout for some potentially infinite while() loops
+
+V8:
+ - Short circuit current event tests if failure happens
+ - Remove SSE from all report strings
+ - Indent .prio field
+ - Add cpu_relax()/smp_rmb() where needed
+ - Add timeout for global event ENABLED state check
+ - Added BIT(32) aliases tests for attribute/event_id.
+
+V7:
+ - Test ids/attributes/attributes count > 32 bits
+ - Rename all SSE function to sbi_sse_*
+ - Use event_id instead of event/evt
+ - Factorize read/write test
+ - Use virt_to_phys() for attributes read/write.
+ - Extensively use sbiret_report_error()
+ - Change check function return values to bool.
+ - Added assert for stack size to be below or equal to PAGE_SIZE
+ - Use en env variable for the maximum hart ID
+ - Check that individual read from attributes matches the multiple
+   attributes read.
+ - Added multiple attributes write at once
+ - Used READ_ONCE/WRITE_ONCE
+ - Inject all local event at once rather than looping fopr each core.
+ - Split test_arg for local_dispatch test so that all CPUs can run at
+   once.
+ - Move SSE entry and generic code to lib/riscv for other tests
+ - Fix unmask/mask state checking
+
+V6:
+ - Add missing $(generated-file) dependencies for "-deps" objects
+ - Split SSE entry from sbi-asm.S to sse-asm.S and all SSE core functions
+   since it will be useful for other tests as well (dbltrp).
+
+V5:
+ - Update event ranges based on latest spec
+ - Rename asm-offset-test.c to sbi-asm-offset.c
+
+V4:
+ - Fix typo sbi_ext_ss_fid -> sbi_ext_sse_fid
+ - Add proper asm-offset generation for tests
+ - Move SSE specific file from lib/riscv to riscv/
+
+V3:
+ - Add -deps variable for test specific dependencies
+ - Fix formatting errors/typo in sbi.h
+ - Add missing double trap event
+ - Alphabetize sbi-sse.c includes
+ - Fix a6 content after unmasking event
+ - Add SSE HART_MASK/UNMASK test
+ - Use mv instead of move
+ - move sbi_check_sse() definition in sbi.c
+ - Remove sbi_sse test from unitests.cfg
+
+V2:
+ - Rebased on origin/master and integrate it into sbi.c tests
+
+Clément Léger (8):
+  kbuild: Allow multiple asm-offsets file to be generated
+  riscv: Set .aux.o files as .PRECIOUS
+  riscv: Use asm-offsets to generate SBI_EXT_HSM values
+  riscv: sbi: Add functions for version checking
+  lib: riscv: add functions to get implementer ID and version
+  riscv: lib: Add SBI SSE extension definitions
+  lib: riscv: Add SBI SSE support
+  riscv: sbi: Add SSE extension tests
+
+ scripts/asm-offsets.mak |   22 +-
+ riscv/Makefile          |    5 +-
+ lib/riscv/asm/csr.h     |    1 +
+ lib/riscv/asm/sbi.h     |  187 +++++-
+ lib/riscv/sbi-sse-asm.S |  102 ++++
+ lib/riscv/asm-offsets.c |    9 +
+ lib/riscv/sbi.c         |   95 ++-
+ riscv/sbi-tests.h       |    1 +
+ riscv/sbi-asm.S         |    6 +-
+ riscv/sbi-asm-offsets.c |   11 +
+ riscv/sbi-sse.c         | 1280 +++++++++++++++++++++++++++++++++++++++
+ riscv/sbi.c             |    2 +
+ riscv/.gitignore        |    1 +
+ 13 files changed, 1709 insertions(+), 13 deletions(-)
+ create mode 100644 lib/riscv/sbi-sse-asm.S
+ create mode 100644 riscv/sbi-asm-offsets.c
+ create mode 100644 riscv/sbi-sse.c
+ create mode 100644 riscv/.gitignore
+
+-- 
+2.47.2
 
 
