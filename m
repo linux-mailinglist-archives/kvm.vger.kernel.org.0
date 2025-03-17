@@ -1,150 +1,161 @@
-Return-Path: <kvm+bounces-41316-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41317-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2E5BA6621B
-	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 23:54:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF7BCA662FA
+	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 00:52:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC16D17A5AE
-	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 22:54:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A00CF176D25
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 23:52:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7481620468F;
-	Mon, 17 Mar 2025 22:53:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CDEB2063C0;
+	Mon, 17 Mar 2025 23:51:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J4bB+RNE"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="XjmkDS/d"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 087891EEA20
-	for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 22:53:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10CA1205505;
+	Mon, 17 Mar 2025 23:51:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742252037; cv=none; b=A0bYLt0HfNSjIZ4B071EChh/3v28ZM97QXjCx9aRdIOTv8YRDKYMHsjizA+yd0yWuNQIgMtj1PM3LbVbKWLdpNVPQM2qVygXV7SQ/HKSiKDyhyo3UzsLQ13naMM7lifEdBbJnA4/A7l3ZCON1UMvt1LGLCSkC/ArbvQAe2v5K6Y=
+	t=1742255512; cv=none; b=na7H1+VZHMJ7YHckAgAOo0pkXY2bJSKd99sgH4G1el36O1YrjaovutaKDVo90pto94JZkE6Y5bOQDs0gS5Iwyp0/buInAgrXQUA+RAW5KIj+GoYRLSjJnnzaGcJft6lGk48UmQAuOsBrkVbuuSOKK+mHwtq0RtfWSDi45ApDv7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742252037; c=relaxed/simple;
-	bh=UqqUcGLUoEgIzTCuGW12ZWOGkPyqd3Ag/HBeGljWbT0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZJRLJm1fzL21p59kP+nPBpOLflqlntkEoLYpLL709wgwaG8Pj/SX5IT0NSQrNR4Svjok7uAdmp3LeZuQLvFHrH5TwS50Mud/BLhU/LrGBpm9Hpka6scm9wFTO5RZO0ZF6DtIaKJDyzQGcXXgcMw/GAc6G2PtWCTJjjsL/q5D9Ds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J4bB+RNE; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742252034;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XqeIPRzyfwbqLejnBmV657w90fLz0MxvVllnZ0oEcM0=;
-	b=J4bB+RNE904B2gwM26Gu0CJXdi3DCWPM5ITe+V8jjTEo43WMtTnntR+thVEKW/5Ttro5L1
-	ucYpnNhvPFuDIHNDxFUHLzNSU6yzp+17MGfFbybwMIvyuT5NvwmH17uOZ7GgbGdBF1ERTv
-	AbECwuEbgHj0/8rqGPcVsTVV2ErT7Eg=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-690-499vvNvON9y1A0WQndSEog-1; Mon, 17 Mar 2025 18:53:53 -0400
-X-MC-Unique: 499vvNvON9y1A0WQndSEog-1
-X-Mimecast-MFC-AGG-ID: 499vvNvON9y1A0WQndSEog_1742252033
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-85da07ce5cbso75057439f.2
-        for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 15:53:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742252032; x=1742856832;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XqeIPRzyfwbqLejnBmV657w90fLz0MxvVllnZ0oEcM0=;
-        b=BWr5+UwBClrwf5H7afIxNYNrGqd1Df/iJDDpkFvClqbiSlyro17FT+p4o1ov8TZSdg
-         J/cbx+4v5DICnYwfy6zSpEKZn3U9rcmsp7jEMMCTINB/Z5L+aLYYE717KkMjmsiqUkoQ
-         EXvQH9T+JSdpQdaIX5Edi3hFqN7Yv0YB3skiH9SlW+7CWN6JhZGWfMA+Hn97LXgrrkEU
-         jSg8Fy4sZ9g9DL59WSNndEsvnr5RKpL9G4XMApN8L7YADV+/dWEGlnXz3QgJ2N99N1kg
-         lzQQZ18aUsehhBR2DQ1V1n1xqFtDtM9e3kNGuI6rVxWSSOJLuSMn1y82EQgo44SEzc39
-         uIlw==
-X-Forwarded-Encrypted: i=1; AJvYcCWGRCGHKLjO6kEAj575S3KJPdqOYQw5BuXTcqh4GrsBHOEDOiDNSVb+iOR/gaQFKwMQiMk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2XZ4aFRqMU6SiFue0NnYAxBOohJSjYtg7vYBCgvuh0J7supE0
-	Si5zF68A4h0otU3DHrhdjv7g7bkCFcqEHhGXrHFzHl2ukf6EBg1n+wuejuuKe3cMj5UY/lNMkLQ
-	xRrO4LKIjUlHKAw5PxsKueGOj+3DGlff13U/sMcCPOsqPpOKJbwyQ7CGBzw==
-X-Gm-Gg: ASbGncuH31FipBNuEOCalqGk+HnV31KK32Y02tmYH7UxKDGmnJoagn1516AD9smXNUC
-	kRAh+HnSJtqFXyt50D5HsZtcsAUqfslpcvdGAAHG7BRT/IT+PM5m3We/6eWj1v0v9mp1B8EpDKP
-	26VEwo41imjModcOI/NKnMuNycCOaZyKR/BMYCpwiGjrKpeLNhe7gEfr2izBGlBWyiofWrdYEfN
-	2UaxiyhdjHSHqCG7L76d778eLiaCHac8e9I6oJA5tNpBleAS1p0H1oj1u/OHmAt9luipy1aUM16
-	RIEGmgqMXgBUHMlIORo=
-X-Received: by 2002:a05:6602:1409:b0:85d:9d7c:b89 with SMTP id ca18e2360f4ac-85dc47b5c8cmr488422739f.1.1742252032067;
-        Mon, 17 Mar 2025 15:53:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHlSewvQ29QnuXkQ61c+40Yzz0vpfEUUBSSfqQEV1xh1D9Rw7K7g3CylefoLZYw9k9hSl17UA==
-X-Received: by 2002:a05:6602:1409:b0:85d:9d7c:b89 with SMTP id ca18e2360f4ac-85dc47b5c8cmr488422139f.1.1742252031712;
-        Mon, 17 Mar 2025 15:53:51 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-85dcbfdebfcsm179398639f.22.2025.03.17.15.53.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Mar 2025 15:53:50 -0700 (PDT)
-Date: Mon, 17 Mar 2025 16:53:47 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Keith Busch <kbusch@meta.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH] vfio/type1: conditional rescheduling while pinning
-Message-ID: <20250317165347.269621e5.alex.williamson@redhat.com>
-In-Reply-To: <Z9iilzUTwLKzcVfK@kbusch-mbp.dhcp.thefacebook.com>
-References: <20250312225255.617869-1-kbusch@meta.com>
-	<20250317154417.7503c094.alex.williamson@redhat.com>
-	<Z9iilzUTwLKzcVfK@kbusch-mbp.dhcp.thefacebook.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1742255512; c=relaxed/simple;
+	bh=XsNjQyivH1Hog8A2iZ+anJbWkZpmM+zPGmHGJX63sTY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t4n/OHjhi2jP49BaWmkLQhAmeRx/yt/+UWcMnjdXww0++Ni680cMkQhu3Ux7dV+Y0ZolKlScJo4cqa3i0qgt7ynh9aWWOwt8mxMyMO3kfzdTN9czmcHITJ1uqYeCZsqjLz4WDOo/5z8MGqu5LQFvOQHif89Ik+QfAALpq8X2HTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=XjmkDS/d; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52HLuhUO029836;
+	Mon, 17 Mar 2025 23:51:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2023-11-20; bh=2c4Tw6svFVVlMG5F1jrrJOHoil02h
+	jZZOtzQ9FEz1Hc=; b=XjmkDS/degSYOs30P9v6YK8zMDZzuoaBFVKatpuNs34Ex
+	vwCVEEnUF0xK5Aw/3SHHO+AiKKrMSRs5f59rmr/Mvfa8KX812tl9QbMYMlC/lpCz
+	+zmQ77dYUONLOk9ZkIADZtAw+LwrBbao+33/sJfNvuywOhKtARYhwgSxxkpR0fNh
+	hxsTMCjAz+mL2S10CZhRWyz3JVeOZ9ToVCtm/HeCBcdA6leVsRC8Ngy/rVo32xCr
+	0wqG28JCnuMI6G6PHQX+XV3RH6tbbmY3CFdiucUvNVMKW3Gazw561sOS/OXa9W0w
+	+PIU6m6XIlcH0XiK9VDqot7zCVWxPTNgN4r/iZhlw==
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 45d23rv2yv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 17 Mar 2025 23:51:45 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 52HLjXp0022498;
+	Mon, 17 Mar 2025 23:51:45 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 45dxeekf77-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 17 Mar 2025 23:51:45 +0000
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 52HNpi2f016519;
+	Mon, 17 Mar 2025 23:51:44 GMT
+Received: from localhost.localdomain (ca-dev80.us.oracle.com [10.211.9.80])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 45dxeekf68-1;
+	Mon, 17 Mar 2025 23:51:44 +0000
+From: Dongli Zhang <dongli.zhang@oracle.com>
+To: virtualization@lists.linux.dev, kvm@vger.kernel.org,
+        netdev@vger.kernel.org
+Cc: mst@redhat.com, jasowang@redhat.com, michael.christie@oracle.com,
+        pbonzini@redhat.com, stefanha@redhat.com, eperezma@redhat.com,
+        joao.m.martins@oracle.com, joe.jin@oracle.com, si-wei.liu@oracle.com,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2 00/10] vhost-scsi: log write descriptors for live migration (and three bugfix)
+Date: Mon, 17 Mar 2025 16:55:08 -0700
+Message-ID: <20250317235546.4546-1-dongli.zhang@oracle.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-17_10,2025-03-17_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0 mlxscore=0
+ adultscore=0 mlxlogscore=999 spamscore=0 malwarescore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2502280000
+ definitions=main-2503170173
+X-Proofpoint-GUID: zpUf-Csj4TO_jCYy7QHMXr_QTfgwFaBB
+X-Proofpoint-ORIG-GUID: zpUf-Csj4TO_jCYy7QHMXr_QTfgwFaBB
 
-On Mon, 17 Mar 2025 16:30:47 -0600
-Keith Busch <kbusch@kernel.org> wrote:
+The live migration with vhost-scsi has been enabled by QEMU commit
+b3e89c941a85 ("vhost-scsi: Allow user to enable migration"), which
+thoroughly explains the workflow that QEMU collaborates with vhost-scsi on
+the live migration.
 
-> On Mon, Mar 17, 2025 at 03:44:17PM -0600, Alex Williamson wrote:
-> > On Wed, 12 Mar 2025 15:52:55 -0700  
-> > > @@ -679,6 +679,7 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
-> > >  
-> > >  		if (unlikely(disable_hugepages))
-> > >  			break;
-> > > +		cond_resched();
-> > >  	}
-> > >  
-> > >  out:  
-> > 
-> > Hey Keith, is this still necessary with:
-> > 
-> > https://lore.kernel.org/all/20250218222209.1382449-1-alex.williamson@redhat.com/  
-> 
-> Thank you for the suggestion. I'll try to fold this into a build, and
-> see what happens. But from what I can tell, I'm not sure it will help.
-> We're simply not getting large folios in this path and dealing with
-> individual pages. Though it is a large contiguous range (~60GB, not
-> necessarily aligned). Shoould we expect to only be dealing with PUD and
-> PMD levels with these kinds of mappings?
+Although it logs dirty data for the used ring, it doesn't log any write
+descriptor (VRING_DESC_F_WRITE).
 
-IME with QEMU, PMD alignment basically happens without any effort and
-gets 90+% of the way there, PUD alignment requires a bit of work[1].
- 
-> > This is currently in linux-next from the vfio next branch and should
-> > pretty much eliminate any stalls related to DMA mapping MMIO BARs.
-> > Also the code here has been refactored in next, so this doesn't apply
-> > anyway, and if there is a resched still needed, this location would
-> > only affect DMA mapping of memory, not device BARs.  Thanks,  
-> 
-> Thanks for the head's up. Regardless, it doesn't look like bad place to
-> cond_resched(), but may not trigger any cpu stall indicator outside this
-> vfio fault path.
+In comparison, vhost-net logs write descriptors via vhost_log_write(). The
+SPDK (vhost-user-scsi backend) also logs write descriptors via
+vhost_log_req_desc().
 
-Note that we already have a cond_resched() in vfio_iommu_map(), which
-we'll hit any time we get a break in a contiguous mapping.  We may hit
-that regularly enough that it's not an issue for RAM mapping, but I've
-certainly seen soft lockups when we have many GiB of contiguous pfnmaps
-prior to the series above.  Thanks,
+As a result, there is likely data mismatch between memory and vhost-scsi
+disk during the live migration.
 
-Alex
+1. Suppose there is high workload and high memory usage. Suppose some
+systemd userspace pages are swapped out to the swap disk.
 
-[1]https://gitlab.com/qemu-project/qemu/-/commit/00b519c0bca0e933ed22e2e6f8bca6b23f41f950
+2. Upon request from systemd, the kernel reads some pages from the swap
+disk to the memory via vhost-scsi.
+
+3. Although those userspace pages' data are updated, they are not marked as
+dirty by vhost-scsi (this is the bug). They are not going to migrate to the
+target host during memory transfer iterations.
+
+4. Suppose systemd doesn't write to those pages any longer. Those pages
+never get the chance to be dirty or migrated any longer.
+
+5. Once the guest VM is resumed on the target host, because of the lack of
+those dirty pages' data, the systemd may run into abnormal status, i.e.,
+there may be systemd segfault.
+
+Log all write descriptors to fix the issue.
+
+In addition, the patchset also fixes three bugs in vhost-scsi.
+
+Changed since v1:
+  - Rebase on top of most recent vhost changes.
+  - Don't allocate log buffer during initialization. Allocate during
+    VHOST_SET_FEATURES or VHOST_SCSI_SET_ENDPOINT.
+  - Add bugfix for vhost_scsi_send_status().
+
+Dongli Zhang (vhost-scsi bugfix):
+  vhost-scsi: protect vq->log_used with vq->mutex
+  vhost-scsi: Fix vhost_scsi_send_bad_target()
+  vhost-scsi: Fix vhost_scsi_send_status()
+
+Dongli Zhang (log descriptor, suggested by Joao Martins):
+  vhost: modify vhost_log_write() for broader users
+  vhost-scsi: adjust vhost_scsi_get_desc() to log vring descriptors
+  vhost-scsi: cache log buffer in I/O queue vhost_scsi_cmd
+  vhost-scsi: log I/O queue write descriptors
+  vhost-scsi: log control queue write descriptors
+  vhost-scsi: log event queue write descriptors
+  vhost: add WARNING if log_num is more than limit
+
+ drivers/vhost/net.c   |   2 +-
+ drivers/vhost/scsi.c  | 314 ++++++++++++++++++++++++++++++++++++++++-----
+ drivers/vhost/vhost.c |  46 +++++--
+ drivers/vhost/vhost.h |   2 +-
+ 4 files changed, 322 insertions(+), 42 deletions(-)
+
+
+base-commit: 9d8960672d63db4b3b04542f5622748b345c637a
+branch: remotes/origin/linux-next
+tree: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git
+
+Thank you very much!
+
+Dongli Zhang
 
 
