@@ -1,205 +1,178 @@
-Return-Path: <kvm+bounces-41280-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41282-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A36F2A65A4C
-	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 18:18:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19FC7A65A6D
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 18:20:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEBEA3AA7F9
-	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 17:14:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 55645189F3F9
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 17:16:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9D732063ED;
-	Mon, 17 Mar 2025 17:08:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D65951DDC15;
+	Mon, 17 Mar 2025 17:11:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="xjlWxnSL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hrr2/brR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F75220550A
-	for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 17:08:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C67A1A315F
+	for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 17:11:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742231312; cv=none; b=DPdJjmOGJCh3/p7f7VzmjzaETKFtePYEdojvpaz7+lfef8duX4OMrVUyah018wVBCFXnS8KttW6Hib6ZpnjMqWNBSp6exy38hDYD385VjaNTcYd0lLqMnoBRuCHRTsyQsaABMjevaryQyWRVsefTBfX0IZYwbfChNFMt1Xz3f4k=
+	t=1742231464; cv=none; b=FlI72DfaUXatJDMGMLDyzEm4Eml/SXra7hjr+Fq0RxxqzvMEt3TO9pXlLbarBwzZDaqsJ/XJ1DSOGbzeG9miLbLu9uA7yJt/7HapL/ikRXFZp6XR2LiDO8dIlS6hFDmZYjbArd7nABsUFXDQjjVAhTIFbmeku5y+ztRlS+JHxgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742231312; c=relaxed/simple;
-	bh=4He7dvOKishM2ucXHkTOK3TfNl17p9VqU9eRpxqFxeo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IFhwweN/0Nv0wCkJm0ZXZwBi3Jrl6wmmpk6jV5sVbWXkLRV9Jj2wRXOqmZnCsIgW6LDLJxcw+VqE2ifoeJjsIfW/oPcujDZZlq+IcE1ZQMy2wnVrVGTL1UmnjIRs7SZDAO9QtpYsvltIgRHZnnjP4eqK6n/jK5FbWtMfmGvfRGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=xjlWxnSL; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4394036c0efso16189085e9.2
-        for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 10:08:29 -0700 (PDT)
+	s=arc-20240116; t=1742231464; c=relaxed/simple;
+	bh=E7NRVoeW6QLMS+MWBGrVvpxiEuhVlHkMez1FQSllQdc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=efAtc6dgI9ZZ72wghs/ODXU9ePp3JAgQpXLJRhUvELRGmW1Zl3jDbObt1r13VjM4JbIf1WUM/I4VaJHn1xmJbojF1JJAWuYKMLgAx7d+RMv+/yqCN0fa6tpLtr7Eo+kWKZnNjIVfSkPbjA10o44nx7VnP81+VDE33ZW0JiA22MU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hrr2/brR; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2233b764fc8so80377875ad.3
+        for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 10:11:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1742231308; x=1742836108; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=P8A8Qnnc9KJsjMpibTJNoHdSMni25LFd1e2ExEX8AcE=;
-        b=xjlWxnSLh6PdUsNvp3BNdORMZz3Az9IpPa3hSuX1GcrPNJJw6fi8wrqWDDvbmuTxQg
-         nfjiRaRmsYBV2SBZSsPMK0Q9G5RFEfE4VimhCdcAAOgt/yPrBpQKiU5FkNj03B7pLgXY
-         ARtTOal2PIyExzpb2OhTVW7rWd98Wm3eO4Lt90+jeH/QJzMDAt9NbwEc/2T9xwkaR08p
-         iwNwAOc7bmHoSpP4Uv8bTcAv0NfxwKg/I7AyEQFPwY8wEU44z6ckvvy9/Fj5hDLl4wue
-         UhaX+fKRQLFF0EZUkxQFpouH9ZXvns8vXhWYLBMd5yr0AdcJ0RvJpIjj4SObCh1zsIG/
-         uwWQ==
+        d=google.com; s=20230601; t=1742231462; x=1742836262; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=T9knZPJpn8PhD+WzxR4XtImTK5+wb3pUib9drnoaFpE=;
+        b=hrr2/brRm1nE8tx86eN1N9bZkUb8/CJwGH2QR22fS+m35YdmwD8MuSXSWnJlnfNIPq
+         s5QD7m14IMKwg9U6YseuMz4NzNdMG2MfjyNpLaOCyZwE4ZPJ7xacT/csBcVudFEPsIEd
+         KBdawP9cFWFNgmv+A1o8lbidWO+espqN0xSA659/KgyiCq/ChMRKMKCx1kzEB4qYP1zX
+         mw9HL2wJnBzmGWTvCdR0jmJj0oM6Y7xafbvf2y9PRyrsuquSMir6K7ZT6stQCVXXXkP0
+         McJsIU+tICgJFolluD0neF0Hygtv9kYvraavrOlDDp3SwvMe7t4AaHu8QjrFW6OWjixO
+         JuGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742231308; x=1742836108;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=P8A8Qnnc9KJsjMpibTJNoHdSMni25LFd1e2ExEX8AcE=;
-        b=O6sxNLegZ/hA246TonZ1qY3TKdbxCExhLpLA69RYQ8E+1+LDAKImKlvVEEumqHOYua
-         nLjEkbPMyrjvcEYQd9LagmtTYN/JlDOgxyFq6RKeIhWNcQuQsSbYw6v1glv/c6Qs1arq
-         N7bdR5drySQSuyQlPoq4PH7HTDGSKscChJoqMIpejrtuNfChMMWZCmfxNB3uN3oe163T
-         b4L9rXE3WUkzcmOIRiZJ+rwvSWfDUSlNoBFE9HeVQY+PKxFZBUVQLDivI/BTfmQ4U/9A
-         KH9vRfSAwh2fAbgzyf01R9P9GKRsBNI9dF80xTidULCobdByv1HyOzv+5DGkx7mhiVQ1
-         vlrA==
-X-Forwarded-Encrypted: i=1; AJvYcCXbt/+iIVvaoQ/fBMK3ZF9ypTkJ8zAEZOX8ypVl6qroWYXEE0Wpt4OZ1TCGwkUa+69WbfQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBLoiyGb4To74CY5MeHVCWQhLLw6/HA4ik3qx7LcfMJL2x3guL
-	5nzv3EDReGrXw4SoOrinzNwpDN1WK/uhk8lKII7dhsOJ9uA6JBYpbZ25xdnTlvk=
-X-Gm-Gg: ASbGncsK1msRlWM0KdTDMb5z/eWpZpAhJCv9XgrVntbIwxZ/EdOm3kKszzyC8V5bjvz
-	dELRxWs41RKbv4sm37lFjXLzzfzLrjzo5kWeX645Y87ob+0TCb2Hb7jQhpRK3+vJV4lmMZzJeQL
-	4iWkS4kt8vohBliv6PQFARUCVSDK0lcdqFRrpqhZWfE3RRIMUDltkWUPP7d7uaAarB3B8vuJyqo
-	7LkApY2hfqbnHqoWt2Fhj6Exj572k5Jhoq7FsUWkBhRneuJDp9M2+qTKd5KJydC3I1Bde8LEE/g
-	0gBoB92hkKrQ7W62JwHoIB/QnBodLPSNDlKTOQiWXlRPzw==
-X-Google-Smtp-Source: AGHT+IGdYqlnvEy/PawZt8Sx5CxSE5paeIGe9C/m17bEJMfGQaAbMdJsnw0bGmy+W1Inh7nCACydaQ==
-X-Received: by 2002:a05:600c:4f0f:b0:43d:683:8caa with SMTP id 5b1f17b1804b1-43d1ec8632dmr150023255e9.15.1742231308146;
-        Mon, 17 Mar 2025 10:08:28 -0700 (PDT)
-Received: from carbon-x1.. ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d23cddb2asm96014505e9.39.2025.03.17.10.08.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Mar 2025 10:08:27 -0700 (PDT)
-From: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>
-To: Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	linux-kselftest@vger.kernel.org
-Cc: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>,
-	Samuel Holland <samuel.holland@sifive.com>,
-	Andrew Jones <ajones@ventanamicro.com>,
-	Deepak Gupta <debug@rivosinc.com>
-Subject: [PATCH v4 18/18] RISC-V: KVM: add support for SBI_FWFT_MISALIGNED_DELEG
-Date: Mon, 17 Mar 2025 18:06:24 +0100
-Message-ID: <20250317170625.1142870-19-cleger@rivosinc.com>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250317170625.1142870-1-cleger@rivosinc.com>
-References: <20250317170625.1142870-1-cleger@rivosinc.com>
+        d=1e100.net; s=20230601; t=1742231462; x=1742836262;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=T9knZPJpn8PhD+WzxR4XtImTK5+wb3pUib9drnoaFpE=;
+        b=gDgKINfZEawfzug5JpMqBzH7z++kiQeGz4BZqYdoObBsCtxV5bQ/kC/zIx3ZH6ceT9
+         EiQpok3tDG/duC5eNCkhi01P4rLQfnSLjzv41v5d2wao5BU2wIUs98EEE6HXjBe0rcE+
+         0CYft5TIKcnvO1RQZOp9snaRT9Vrd9K8MBLDQ1B19PMU0HdpLOXpomTcSOGda8UDc71L
+         +AG42IUDp1324z7stN3cVtJ8U61kHyL+wzBDbpBzk6JqnCIq5mlSJGYw4xUa+3O7pDKI
+         eRbnN7Y7PB+LNvdnLAXMKzPEMciFHvpyMkMQvxYqGBQmFrsfkyW7f1q6bY00YBxhcdut
+         I1Fg==
+X-Forwarded-Encrypted: i=1; AJvYcCWYbsDdWgscHTO4no8yiQqxbGc0SsIQa4UPYSVwimml04THKUKaY4Kb9xF253na1AJ9KFk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsJ0EG8czNeUjFIEvMoOh8Juh2TflpqoegLIXkJoZTYMLr01DH
+	ss1vrxGHQpFSAOUYdiK+hv/qkIFB21xPTtO+87F9CIIl6mIewdzmyUmeS9+CRWroDxajP7AbQ0Q
+	HTw==
+X-Google-Smtp-Source: AGHT+IH1zZ9W/kpTUJXF2FPrO8JqvpUawmfI5OD8mApbCpcciEbhqh+L5kndo4w5LOOpGmVgZxZq3OOAQTk=
+X-Received: from pgfb2.prod.google.com ([2002:a63:a102:0:b0:af2:7bd1:57e6])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:2d22:b0:1f5:6878:1a43
+ with SMTP id adf61e73a8af0-1f5c1183cdcmr18936810637.14.1742231461786; Mon, 17
+ Mar 2025 10:11:01 -0700 (PDT)
+Date: Mon, 17 Mar 2025 10:11:00 -0700
+In-Reply-To: <20250317163732.GA1863989.vipinsh@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20250315024010.2360884-1-seanjc@google.com> <20250315024010.2360884-2-seanjc@google.com>
+ <20250317163732.GA1863989.vipinsh@google.com>
+Message-ID: <Z9hXpERDYZX9pj6V@google.com>
+Subject: Re: [PATCH 1/3] KVM: x86/mmu: Dynamically allocate shadow MMU's
+ hashed page list
+From: Sean Christopherson <seanjc@google.com>
+To: Vipin Sharma <vipinsh@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-SBI_FWFT_MISALIGNED_DELEG needs hedeleg to be modified to delegate
-misaligned load/store exceptions. Save and restore it during CPU
-load/put.
+On Mon, Mar 17, 2025, Vipin Sharma wrote:
+> On 2025-03-14 19:40:08, Sean Christopherson wrote:
+> > Dynamically allocate the (massive) array of hashed lists used to track
+> > shadow pages, as the array itself is 32KiB, i.e. is an order-3 allocation
+> > all on its own, and is *exactly* an order-3 allocation.  Dynamically
+> > allocating the array will allow allocating "struct kvm" using regular
+> > kmalloc(), and will also allow deferring allocation of the array until
+> > it's actually needed, i.e. until the first shadow root is allocated.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/x86/include/asm/kvm_host.h |  4 ++--
+> >  arch/x86/kvm/mmu/mmu.c          | 21 ++++++++++++++++++++-
+> >  arch/x86/kvm/x86.c              |  5 ++++-
+> >  3 files changed, 26 insertions(+), 4 deletions(-)
+> > 
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -6673,13 +6685,19 @@ static void kvm_mmu_zap_all_fast(struct kvm *kvm)
+> >  		kvm_tdp_mmu_zap_invalidated_roots(kvm, true);
+> >  }
+> >  
+> > -void kvm_mmu_init_vm(struct kvm *kvm)
+> > +int kvm_mmu_init_vm(struct kvm *kvm)
+> >  {
+> > +	int r;
+> > +
+> >  	kvm->arch.shadow_mmio_value = shadow_mmio_value;
+> >  	INIT_LIST_HEAD(&kvm->arch.active_mmu_pages);
+> >  	INIT_LIST_HEAD(&kvm->arch.possible_nx_huge_pages);
+> >  	spin_lock_init(&kvm->arch.mmu_unsync_pages_lock);
+> >  
+> > +	r = kvm_mmu_alloc_page_hash(kvm);
+> > +	if (r)
+> > +		return r;
+> > +
+> 
+> In the patch 3, shouldn't this be moved to else part of the below 
+> 'if (tdp_mmu_enabled)' line? Otherwise, this hash array will always get
+> allocated.
 
-Signed-off-by: Clément Léger <cleger@rivosinc.com>
-Reviewed-by: Deepak Gupta <debug@rivosinc.com>
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
----
- arch/riscv/kvm/vcpu.c          |  3 +++
- arch/riscv/kvm/vcpu_sbi_fwft.c | 36 ++++++++++++++++++++++++++++++++++
- 2 files changed, 39 insertions(+)
+Ugh, I botched the rebase, and didn't point test that the allocations actually
+went away.
 
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index 542747e2c7f5..d98e379945c3 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -646,6 +646,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- {
- 	void *nsh;
- 	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
-+	struct kvm_vcpu_config *cfg = &vcpu->arch.cfg;
- 
- 	vcpu->cpu = -1;
- 
-@@ -671,6 +672,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- 		csr->vstval = nacl_csr_read(nsh, CSR_VSTVAL);
- 		csr->hvip = nacl_csr_read(nsh, CSR_HVIP);
- 		csr->vsatp = nacl_csr_read(nsh, CSR_VSATP);
-+		cfg->hedeleg = nacl_csr_read(nsh, CSR_HEDELEG);
- 	} else {
- 		csr->vsstatus = csr_read(CSR_VSSTATUS);
- 		csr->vsie = csr_read(CSR_VSIE);
-@@ -681,6 +683,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- 		csr->vstval = csr_read(CSR_VSTVAL);
- 		csr->hvip = csr_read(CSR_HVIP);
- 		csr->vsatp = csr_read(CSR_VSATP);
-+		cfg->hedeleg = csr_read(CSR_HEDELEG);
- 	}
- }
- 
-diff --git a/arch/riscv/kvm/vcpu_sbi_fwft.c b/arch/riscv/kvm/vcpu_sbi_fwft.c
-index 8a7cfe1fe7a7..b0556d66e775 100644
---- a/arch/riscv/kvm/vcpu_sbi_fwft.c
-+++ b/arch/riscv/kvm/vcpu_sbi_fwft.c
-@@ -14,6 +14,8 @@
- #include <asm/kvm_vcpu_sbi.h>
- #include <asm/kvm_vcpu_sbi_fwft.h>
- 
-+#define MIS_DELEG (BIT_ULL(EXC_LOAD_MISALIGNED) | BIT_ULL(EXC_STORE_MISALIGNED))
-+
- struct kvm_sbi_fwft_feature {
- 	/**
- 	 * @id: Feature ID
-@@ -68,7 +70,41 @@ static bool kvm_fwft_is_defined_feature(enum sbi_fwft_feature_t feature)
- 	return false;
- }
- 
-+static bool kvm_sbi_fwft_misaligned_delegation_supported(struct kvm_vcpu *vcpu)
-+{
-+	return misaligned_traps_can_delegate();
-+}
-+
-+static long kvm_sbi_fwft_set_misaligned_delegation(struct kvm_vcpu *vcpu,
-+					struct kvm_sbi_fwft_config *conf,
-+					unsigned long value)
-+{
-+	if (value == 1)
-+		csr_set(CSR_HEDELEG, MIS_DELEG);
-+	else if (value == 0)
-+		csr_clear(CSR_HEDELEG, MIS_DELEG);
-+	else
-+		return SBI_ERR_INVALID_PARAM;
-+
-+	return SBI_SUCCESS;
-+}
-+
-+static long kvm_sbi_fwft_get_misaligned_delegation(struct kvm_vcpu *vcpu,
-+					struct kvm_sbi_fwft_config *conf,
-+					unsigned long *value)
-+{
-+	*value = (csr_read(CSR_HEDELEG) & MIS_DELEG) != 0;
-+
-+	return SBI_SUCCESS;
-+}
-+
- static const struct kvm_sbi_fwft_feature features[] = {
-+	{
-+		.id = SBI_FWFT_MISALIGNED_EXC_DELEG,
-+		.supported = kvm_sbi_fwft_misaligned_delegation_supported,
-+		.set = kvm_sbi_fwft_set_misaligned_delegation,
-+		.get = kvm_sbi_fwft_get_misaligned_delegation,
-+	},
- };
- 
- static struct kvm_sbi_fwft_config *
--- 
-2.47.2
+Before commit 0df9dab891ff ("KVM: x86/mmu: Stop zapping invalidated TDP MMU roots
+asynchronously"), kvm_mmu_init_tdp_mmu() returned a value and so the code was:
 
+	if (tdp_mmu_enabled)
+		r = kvm_mmu_init_tdp_mmu(kvm);
+	else
+		r = kvm_mmu_alloc_page_hash(kvm);
+	if (r < 0)
+		return r;
+
+I suppose the least ugly approach is:
+
+	if (tdp_mmu_enabled) {
+		kvm_mmu_init_tdp_mmu(kvm);
+	} else {
+		r = kvm_mmu_alloc_page_hash(kvm);
+		if (r)
+			return r;
+	}
+
+> >  	if (tdp_mmu_enabled)
+> >  		kvm_mmu_init_tdp_mmu(kvm);
+> >  
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -12704,7 +12704,9 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+> >  	if (ret)
+> >  		goto out;
+> >  
+> > -	kvm_mmu_init_vm(kvm);
+> > +	ret = kvm_mmu_init_vm(kvm);
+> > +	if (ret)
+> > +		goto out_cleanup_page_track;
+> >  
+> >  	ret = kvm_x86_call(vm_init)(kvm);
+> >  	if (ret)
+> > @@ -12757,6 +12759,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+> >  
+> >  out_uninit_mmu:
+> >  	kvm_mmu_uninit_vm(kvm);
+> > +out_cleanup_page_track:
+> 
+> I think there is a memory leak in this series.
+
+/facepalm
+
+Good job, me.
+
+Thanks for the review!
 
