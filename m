@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-41186-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41187-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F01A6A648D5
-	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 11:09:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92949A648E4
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 11:09:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7149E169539
-	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 10:09:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F5E53ADCAB
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 10:09:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15E7223236A;
-	Mon, 17 Mar 2025 10:09:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44643230BFD;
+	Mon, 17 Mar 2025 10:09:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jSI6nJdB"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="sKNWvAh3"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78E23944E;
-	Mon, 17 Mar 2025 10:09:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86A2621CC70;
+	Mon, 17 Mar 2025 10:09:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742206145; cv=none; b=rnK7CbQOXn5GJwml/+W8xl2p8z7stv1lWkB7buwMRpyPV4I8+toGHq3wSQXqDkc6ewSu75jbJbxuSVIPmbHfly53hZhj1c38HYEFxTkO0yGNhb32d3KjkNwhddLLsHIEVBA/Z/a4tDsfk38945bKBdpY9nRvaFaNc4l1xR88GK8=
+	t=1742206150; cv=none; b=JRyxHCHxYdmYX03LZcp2U/LPP2xvkMlVBiMsKo/7CzBXTYvneD8WE2J7EN7ktk0/0t6ru9FQh0RVa3/uVIYvOjVHiLdOdIV6pPqsUo4J4nvxPP9omE67oV0HHxKSxyYwzoP3AzUlNFySZuo6WhrpNElQy4rR8gZ/VUo3dHLGkEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742206145; c=relaxed/simple;
-	bh=ndVQP1RQkHpSwsfRVDJ3pqBGs1UQtw7G1sqAOUt47aQ=;
+	s=arc-20240116; t=1742206150; c=relaxed/simple;
+	bh=5PgJW3lv1IXvRobpZ3su60rw3zwyxkzjFILhiZyVsUg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VDmK+lAh201/0UAXIo7LrVOfwWBHqcIpaKmu0kN4OjWRWQbRzTpDsvSAzXPDgwSrXe+04UhCHfWUufanyJHxb4YR6hboGEMXLqwU7nk3ifuX/s4GTKo8VsTsmJ35nsnF04ICfHsDnKndYjNwZJPgKT5IFHepToBpVwpSi8u0onA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=jSI6nJdB; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version; b=nfWFHoYotachdJDCdlsDqpJiINz1u/Jq7aAK+8qiXbPW4wy7bPc2WonrYa9Hkhy6XdGUl4vYOSY2b88t5Fdil4TgszOTa31EC/idMgBSWS4yujkyB23zwiwo7eMBVgyg9xdQvsozLN/LDzM1sssPQJYKS2ZiEZHlceRXxfXpzSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=sKNWvAh3; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52GKb30Z020098;
-	Mon, 17 Mar 2025 10:08:53 GMT
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52H9xjEh017693;
+	Mon, 17 Mar 2025 10:08:59 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=BkOQKPYEOSEZSmObA
-	rNGM1L7wwULiz/z2gw8hWd4riE=; b=jSI6nJdBv1T2UYmZTQwWPHLxOi+gQdA6A
-	Q48lqPpyAR1J68paw7B+yfbFeVIlqkQD3y116ErwIbOlV79VGkPRdtakLuaVG4nk
-	6+pdQA7XbTKEWlPM0F19y9TQkKGmxD7FNrVEpel5CfuSqCFJWkIS7PTomGDsjgmX
-	/TAxI8FRQRxImwHP9C3H5NMzYFMhAcoIR3c5FbBCCdZ8TTbEmvOzqG0vOTr7sTEw
-	fOuFH65jKLMz6uentAukArEQvzGUOcC3Cu/jGoyYTECB+VdCpZc4nOz8eCr63D7d
-	okWwytVv2icYrhWjYn1yxTxWFpoAwTXOMcMlMQrtTilwsOwahrhFQ==
+	:mime-version:references:subject:to; s=pp1; bh=E66H4vqSoodkZeF0D
+	kcA46SVRBp6chwIqfkMjZpt9/I=; b=sKNWvAh3KhGRMfIoQuUr+OOlKbXBUxc7c
+	gXDngwaUOTtQAJUr397+N2uxJd0XMHNZtK6VcGjWDeOqcLYvvm3KPr8SyiGb1mAx
+	NTpSbgZaUrW+1txuTAFrUH5C9eWZEekUKFAxVYJdVCG9zJjMyJ1gWdeOg0W5jvo8
+	eEg+WSSBYGNO0yAmQIrZtv6sX0/Sb9sVKWNsCW4GDsFqIP9GDXpxpMfYrj4cknz/
+	pLJzI4kxxcL5QvpW3rxmnvVrET+XcUu9fKX7Dj5kL0uAbJr1023FlPRSZHIhgXij
+	NvuO9xsjM1bPLzmQzLgIvuGjTaZyCgU4AALMvTwpooClmb9RDRW/A==
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45e5tpanmq-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45e5tpann2-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 17 Mar 2025 10:08:53 +0000 (GMT)
+	Mon, 17 Mar 2025 10:08:59 +0000 (GMT)
 Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 52HA8qjX003543;
-	Mon, 17 Mar 2025 10:08:52 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45e5tpanmn-1
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 52H97r7J027566;
+	Mon, 17 Mar 2025 10:08:58 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45e5tpanmw-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 17 Mar 2025 10:08:52 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52H8UYrR012350;
-	Mon, 17 Mar 2025 10:08:52 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 45dmvnnjvk-1
+	Mon, 17 Mar 2025 10:08:58 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52H9LXcO024440;
+	Mon, 17 Mar 2025 10:08:57 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 45dnckwfr8-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 17 Mar 2025 10:08:52 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52HA8mdN31982230
+	Mon, 17 Mar 2025 10:08:57 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52HA8sl448496910
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 17 Mar 2025 10:08:48 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 371E020063;
-	Mon, 17 Mar 2025 10:08:48 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5127820095;
-	Mon, 17 Mar 2025 10:08:43 +0000 (GMT)
+	Mon, 17 Mar 2025 10:08:54 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 14DDA20080;
+	Mon, 17 Mar 2025 10:08:54 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A4C0F2007F;
+	Mon, 17 Mar 2025 10:08:49 +0000 (GMT)
 Received: from vaibhav?linux.ibm.com (unknown [9.124.208.110])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Mon, 17 Mar 2025 10:08:43 +0000 (GMT)
-Received: by vaibhav@linux.ibm.com (sSMTP sendmail emulation); Mon, 17 Mar 2025 15:38:42 +0530
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Mon, 17 Mar 2025 10:08:49 +0000 (GMT)
+Received: by vaibhav@linux.ibm.com (sSMTP sendmail emulation); Mon, 17 Mar 2025 15:38:48 +0530
 From: Vaibhav Jain <vaibhav@linux.ibm.com>
 To: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
         kvm-ppc@vger.kernel.org
@@ -84,11 +84,10 @@ Cc: Vaibhav Jain <vaibhav@linux.ibm.com>,
         Nicholas Piggin <npiggin@gmail.com>,
         Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
         sbhat@linux.ibm.com, gautam@linux.ibm.com, kconsul@linux.ibm.com,
-        amachhiw@linux.ibm.com, Athira Rajeev <atrajeev@linux.vnet.ibm.com>,
-        linux-doc@vger.kernel.org, Bagas Sanjaya <bagasdotme@gmail.com>
-Subject: [PATCH v5 1/6] powerpc: Document APIv2 KVM hcall spec for Hostwide counters
-Date: Mon, 17 Mar 2025 15:38:28 +0530
-Message-ID: <20250317100834.451452-2-vaibhav@linux.ibm.com>
+        amachhiw@linux.ibm.com, Athira Rajeev <atrajeev@linux.vnet.ibm.com>
+Subject: [PATCH v5 2/6] kvm powerpc/book3s-apiv2: Add support for Hostwide GSB elements
+Date: Mon, 17 Mar 2025 15:38:29 +0530
+Message-ID: <20250317100834.451452-3-vaibhav@linux.ibm.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250317100834.451452-1-vaibhav@linux.ibm.com>
 References: <20250317100834.451452-1-vaibhav@linux.ibm.com>
@@ -100,8 +99,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: B5m6wfL497b_c6F4nhG7aPh7dmYr3o8f
-X-Proofpoint-ORIG-GUID: IfMqWeKUgIgQQdwF1GzQ0uG4YxX4N6tp
+X-Proofpoint-GUID: z6xnaVlt6SU8rZIydRQC9PjkyiuEvQo5
+X-Proofpoint-ORIG-GUID: ROcjRnlBz8xhkzQvs5WmxOFzoEpB0-At
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-03-17_03,2025-03-17_01,2024-11-22_01
@@ -111,102 +110,266 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulksco
  suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.19.0-2502280000 definitions=main-2503170073
 
-Update kvm-nested APIv2 documentation to include five new
-Guest-State-Elements to fetch the hostwide counters. These counters are
-per L1-Lpar and indicate the amount of Heap/Page-table memory allocated,
-available and Page-table memory reclaimed for all L2-Guests active
-instances
+Add support for adding and parsing Hostwide elements to the
+Guest-state-buffer data structure used in apiv2. These elements are used to
+share meta-information pertaining to entire L1-Lpar and this
+meta-information is maintained by L0-PowerVM hypervisor. Example of this
+include the amount of the page-table memory currently used by L0-PowerVM
+for hosting the Shadow-Pagetable of all active L2-Guests. More of the are
+documented in kernel-documentation at [1]. The Hostwide GSB elements are
+currently only support with H_GUEST_SET_STATE hcall with a special flag
+namely 'KVMPPC_GS_FLAGS_HOST_WIDE'.
 
-Cc: linux-doc@vger.kernel.org
-Cc: linuxppc-dev@lists.ozlabs.org
-Cc: Madhavan Srinivasan <maddy@linux.ibm.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>
+The patch introduces new defs for the 5 new Hostwide GSB elements including
+their GSIDs as well as introduces a new class of GSB elements namely
+'KVMPPC_GS_CLASS_HOSTWIDE' to indicate to GSB construction/parsing
+infrastructure in 'kvm/guest-state-buffer.c'. Also
+gs_msg_ops_vcpu_get_size(), kvmppc_gsid_type() and
+kvmppc_gse_{flatten,unflatten}_iden() are updated to appropriately indicate
+the needed size for these Hostwide GSB elements as well as how to
+flatten/unflatten their GSIDs so that they can be marked as available in
+GSB bitmap.
+
+[1] Documention/arch/powerpc/kvm-nested.rst
+
 Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
-Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
-
 ---
 Changelog
 
 v4->v5:
-* None
+None
 
 v3->v4:
-* Added reviewed by [ Bagas Sanjaya ]
+None
 
 v2->v3:
-* Minor reword for the cumulative reclaim counter [ Gautam ]
+None
 
 v1->v2:
-* Reworded section on GSID [Gautam]
+None
 ---
- Documentation/arch/powerpc/kvm-nested.rst | 40 +++++++++++++++++------
- 1 file changed, 30 insertions(+), 10 deletions(-)
+ arch/powerpc/include/asm/guest-state-buffer.h | 35 ++++++++++++++---
+ arch/powerpc/include/asm/hvcall.h             | 13 ++++---
+ arch/powerpc/kvm/book3s_hv_nestedv2.c         |  6 +++
+ arch/powerpc/kvm/guest-state-buffer.c         | 39 +++++++++++++++++++
+ 4 files changed, 81 insertions(+), 12 deletions(-)
 
-diff --git a/Documentation/arch/powerpc/kvm-nested.rst b/Documentation/arch/powerpc/kvm-nested.rst
-index 5defd13cc6c1..574592505604 100644
---- a/Documentation/arch/powerpc/kvm-nested.rst
-+++ b/Documentation/arch/powerpc/kvm-nested.rst
-@@ -208,13 +208,9 @@ associated values for each ID in the GSB::
-       flags:
-          Bit 0: getGuestWideState: Request state of the Guest instead
-            of an individual VCPU.
--         Bit 1: takeOwnershipOfVcpuState Indicate the L1 is taking
--           over ownership of the VCPU state and that the L0 can free
--           the storage holding the state. The VCPU state will need to
--           be returned to the Hypervisor via H_GUEST_SET_STATE prior
--           to H_GUEST_RUN_VCPU being called for this VCPU. The data
--           returned in the dataBuffer is in a Hypervisor internal
--           format.
-+         Bit 1: getHostWideState: Request stats of the Host. This causes
-+           the guestId and vcpuId parameters to be ignored and attempting
-+           to get the VCPU/Guest state will cause an error.
-          Bits 2-63: Reserved
-       guestId: ID obtained from H_GUEST_CREATE
-       vcpuId: ID of the vCPU pass to H_GUEST_CREATE_VCPU
-@@ -406,9 +402,10 @@ the partition like the timebase offset and partition scoped page
- table information.
+diff --git a/arch/powerpc/include/asm/guest-state-buffer.h b/arch/powerpc/include/asm/guest-state-buffer.h
+index d107abe1468f..acd61eb36d59 100644
+--- a/arch/powerpc/include/asm/guest-state-buffer.h
++++ b/arch/powerpc/include/asm/guest-state-buffer.h
+@@ -28,6 +28,21 @@
+  /* Process Table Info */
+ #define KVMPPC_GSID_PROCESS_TABLE		0x0006
  
- +--------+-------+----+--------+----------------------------------+
--|   ID   | Size  | RW | Thread | Details                          |
--|        | Bytes |    | Guest  |                                  |
--|        |       |    | Scope  |                                  |
-+|   ID   | Size  | RW |(H)ost  | Details                          |
-+|        | Bytes |    |(G)uest |                                  |
-+|        |       |    |(T)hread|                                  |
-+|        |       |    |Scope   |                                  |
- +========+=======+====+========+==================================+
- | 0x0000 |       | RW |   TG   | NOP element                      |
- +--------+-------+----+--------+----------------------------------+
-@@ -434,6 +431,29 @@ table information.
- |        |       |    |        |- 0x8 Table size.                 |
- +--------+-------+----+--------+----------------------------------+
- | 0x0007-|       |    |        | Reserved                         |
-+| 0x07FF |       |    |        |                                  |
-++--------+-------+----+--------+----------------------------------+
-+| 0x0800 | 0x08  | R  |   H    | Current usage in bytes of the    |
-+|        |       |    |        | L0's Guest Management Space      |
-+|        |       |    |        | for an L1-Lpar.                  |
-++--------+-------+----+--------+----------------------------------+
-+| 0x0801 | 0x08  | R  |   H    | Max bytes available in the       |
-+|        |       |    |        | L0's Guest Management Space for  |
-+|        |       |    |        | an L1-Lpar                       |
-++--------+-------+----+--------+----------------------------------+
-+| 0x0802 | 0x08  | R  |   H    | Current usage in bytes of the    |
-+|        |       |    |        | L0's Guest Page Table Management |
-+|        |       |    |        | Space for an L1-Lpar             |
-++--------+-------+----+--------+----------------------------------+
-+| 0x0803 | 0x08  | R  |   H    | Max bytes available in the L0's  |
-+|        |       |    |        | Guest Page Table Management      |
-+|        |       |    |        | Space for an L1-Lpar             |
-++--------+-------+----+--------+----------------------------------+
-+| 0x0804 | 0x08  | R  |   H    | Cumulative Reclaimed bytes from  |
-+|        |       |    |        | L0 Guest's Page Table Management |
-+|        |       |    |        | Space due to overcommit          |
-++--------+-------+----+--------+----------------------------------+
-+| 0x0805-|       |    |        | Reserved                         |
- | 0x0BFF |       |    |        |                                  |
- +--------+-------+----+--------+----------------------------------+
- | 0x0C00 | 0x10  | RW |   T    |Run vCPU Input Buffer:            |
++/* Guest Management Heap Size */
++#define KVMPPC_GSID_L0_GUEST_HEAP		0x0800
++
++/* Guest Management Heap Max Size */
++#define KVMPPC_GSID_L0_GUEST_HEAP_MAX		0x0801
++
++/* Guest Pagetable Size */
++#define KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE	0x0802
++
++/* Guest Pagetable Max Size */
++#define KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE_MAX	0x0803
++
++/* Guest Pagetable Reclaim in bytes */
++#define KVMPPC_GSID_L0_GUEST_PGTABLE_RECLAIM	0x0804
++
+ /* H_GUEST_RUN_VCPU input buffer Info */
+ #define KVMPPC_GSID_RUN_INPUT			0x0C00
+ /* H_GUEST_RUN_VCPU output buffer Info */
+@@ -106,6 +121,11 @@
+ #define KVMPPC_GSE_GUESTWIDE_COUNT \
+ 	(KVMPPC_GSE_GUESTWIDE_END - KVMPPC_GSE_GUESTWIDE_START + 1)
+ 
++#define KVMPPC_GSE_HOSTWIDE_START KVMPPC_GSID_L0_GUEST_HEAP
++#define KVMPPC_GSE_HOSTWIDE_END KVMPPC_GSID_L0_GUEST_PGTABLE_RECLAIM
++#define KVMPPC_GSE_HOSTWIDE_COUNT \
++	(KVMPPC_GSE_HOSTWIDE_END - KVMPPC_GSE_HOSTWIDE_START + 1)
++
+ #define KVMPPC_GSE_META_START KVMPPC_GSID_RUN_INPUT
+ #define KVMPPC_GSE_META_END KVMPPC_GSID_VPA
+ #define KVMPPC_GSE_META_COUNT (KVMPPC_GSE_META_END - KVMPPC_GSE_META_START + 1)
+@@ -130,7 +150,8 @@
+ 	(KVMPPC_GSE_INTR_REGS_END - KVMPPC_GSE_INTR_REGS_START + 1)
+ 
+ #define KVMPPC_GSE_IDEN_COUNT                                 \
+-	(KVMPPC_GSE_GUESTWIDE_COUNT + KVMPPC_GSE_META_COUNT + \
++	(KVMPPC_GSE_HOSTWIDE_COUNT + \
++	 KVMPPC_GSE_GUESTWIDE_COUNT + KVMPPC_GSE_META_COUNT + \
+ 	 KVMPPC_GSE_DW_REGS_COUNT + KVMPPC_GSE_W_REGS_COUNT + \
+ 	 KVMPPC_GSE_VSRS_COUNT + KVMPPC_GSE_INTR_REGS_COUNT)
+ 
+@@ -139,10 +160,11 @@
+  */
+ enum {
+ 	KVMPPC_GS_CLASS_GUESTWIDE = 0x01,
+-	KVMPPC_GS_CLASS_META = 0x02,
+-	KVMPPC_GS_CLASS_DWORD_REG = 0x04,
+-	KVMPPC_GS_CLASS_WORD_REG = 0x08,
+-	KVMPPC_GS_CLASS_VECTOR = 0x10,
++	KVMPPC_GS_CLASS_HOSTWIDE = 0x02,
++	KVMPPC_GS_CLASS_META = 0x04,
++	KVMPPC_GS_CLASS_DWORD_REG = 0x08,
++	KVMPPC_GS_CLASS_WORD_REG = 0x10,
++	KVMPPC_GS_CLASS_VECTOR = 0x18,
+ 	KVMPPC_GS_CLASS_INTR = 0x20,
+ };
+ 
+@@ -164,6 +186,7 @@ enum {
+  */
+ enum {
+ 	KVMPPC_GS_FLAGS_WIDE = 0x01,
++	KVMPPC_GS_FLAGS_HOST_WIDE = 0x02,
+ };
+ 
+ /**
+@@ -287,7 +310,7 @@ struct kvmppc_gs_msg_ops {
+  * struct kvmppc_gs_msg - a guest state message
+  * @bitmap: the guest state ids that should be included
+  * @ops: modify message behavior for reading and writing to buffers
+- * @flags: guest wide or thread wide
++ * @flags: host wide, guest wide or thread wide
+  * @data: location where buffer data will be written to or from.
+  *
+  * A guest state message is allows flexibility in sending in receiving data
+diff --git a/arch/powerpc/include/asm/hvcall.h b/arch/powerpc/include/asm/hvcall.h
+index 65d1f291393d..1c12713538a4 100644
+--- a/arch/powerpc/include/asm/hvcall.h
++++ b/arch/powerpc/include/asm/hvcall.h
+@@ -489,14 +489,15 @@
+ #define H_RPTI_PAGE_ALL (-1UL)
+ 
+ /* Flags for H_GUEST_{S,G}_STATE */
+-#define H_GUEST_FLAGS_WIDE     (1UL<<(63-0))
++#define H_GUEST_FLAGS_WIDE     (1UL << (63 - 0))
++#define H_GUEST_FLAGS_HOST_WIDE	(1UL << (63 - 1))
+ 
+ /* Flag values used for H_{S,G}SET_GUEST_CAPABILITIES */
+-#define H_GUEST_CAP_COPY_MEM	(1UL<<(63-0))
+-#define H_GUEST_CAP_POWER9	(1UL<<(63-1))
+-#define H_GUEST_CAP_POWER10	(1UL<<(63-2))
+-#define H_GUEST_CAP_POWER11	(1UL<<(63-3))
+-#define H_GUEST_CAP_BITMAP2	(1UL<<(63-63))
++#define H_GUEST_CAP_COPY_MEM	(1UL << (63 - 0))
++#define H_GUEST_CAP_POWER9	(1UL << (63 - 1))
++#define H_GUEST_CAP_POWER10	(1UL << (63 - 2))
++#define H_GUEST_CAP_POWER11	(1UL << (63 - 3))
++#define H_GUEST_CAP_BITMAP2	(1UL << (63 - 63))
+ 
+ #ifndef __ASSEMBLY__
+ #include <linux/types.h>
+diff --git a/arch/powerpc/kvm/book3s_hv_nestedv2.c b/arch/powerpc/kvm/book3s_hv_nestedv2.c
+index e5c7ce1fb761..87691cf86cae 100644
+--- a/arch/powerpc/kvm/book3s_hv_nestedv2.c
++++ b/arch/powerpc/kvm/book3s_hv_nestedv2.c
+@@ -123,6 +123,12 @@ static size_t gs_msg_ops_vcpu_get_size(struct kvmppc_gs_msg *gsm)
+ 		case KVMPPC_GSID_PROCESS_TABLE:
+ 		case KVMPPC_GSID_RUN_INPUT:
+ 		case KVMPPC_GSID_RUN_OUTPUT:
++		  /* Host wide counters */
++		case KVMPPC_GSID_L0_GUEST_HEAP:
++		case KVMPPC_GSID_L0_GUEST_HEAP_MAX:
++		case KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE:
++		case KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE_MAX:
++		case KVMPPC_GSID_L0_GUEST_PGTABLE_RECLAIM:
+ 			break;
+ 		default:
+ 			size += kvmppc_gse_total_size(kvmppc_gsid_size(iden));
+diff --git a/arch/powerpc/kvm/guest-state-buffer.c b/arch/powerpc/kvm/guest-state-buffer.c
+index b80dbc58621f..871cf60ddeb6 100644
+--- a/arch/powerpc/kvm/guest-state-buffer.c
++++ b/arch/powerpc/kvm/guest-state-buffer.c
+@@ -92,6 +92,10 @@ static int kvmppc_gsid_class(u16 iden)
+ 	    (iden <= KVMPPC_GSE_GUESTWIDE_END))
+ 		return KVMPPC_GS_CLASS_GUESTWIDE;
+ 
++	if ((iden >= KVMPPC_GSE_HOSTWIDE_START) &&
++	    (iden <= KVMPPC_GSE_HOSTWIDE_END))
++		return KVMPPC_GS_CLASS_HOSTWIDE;
++
+ 	if ((iden >= KVMPPC_GSE_META_START) && (iden <= KVMPPC_GSE_META_END))
+ 		return KVMPPC_GS_CLASS_META;
+ 
+@@ -118,6 +122,21 @@ static int kvmppc_gsid_type(u16 iden)
+ 	int type = -1;
+ 
+ 	switch (kvmppc_gsid_class(iden)) {
++	case KVMPPC_GS_CLASS_HOSTWIDE:
++		switch (iden) {
++		case KVMPPC_GSID_L0_GUEST_HEAP:
++			fallthrough;
++		case KVMPPC_GSID_L0_GUEST_HEAP_MAX:
++			fallthrough;
++		case KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE:
++			fallthrough;
++		case KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE_MAX:
++			fallthrough;
++		case KVMPPC_GSID_L0_GUEST_PGTABLE_RECLAIM:
++			type = KVMPPC_GSE_BE64;
++			break;
++		}
++		break;
+ 	case KVMPPC_GS_CLASS_GUESTWIDE:
+ 		switch (iden) {
+ 		case KVMPPC_GSID_HOST_STATE_SIZE:
+@@ -187,6 +206,9 @@ unsigned long kvmppc_gsid_flags(u16 iden)
+ 	case KVMPPC_GS_CLASS_GUESTWIDE:
+ 		flags = KVMPPC_GS_FLAGS_WIDE;
+ 		break;
++	case KVMPPC_GS_CLASS_HOSTWIDE:
++		flags = KVMPPC_GS_FLAGS_HOST_WIDE;
++		break;
+ 	case KVMPPC_GS_CLASS_META:
+ 	case KVMPPC_GS_CLASS_DWORD_REG:
+ 	case KVMPPC_GS_CLASS_WORD_REG:
+@@ -310,6 +332,13 @@ static inline int kvmppc_gse_flatten_iden(u16 iden)
+ 
+ 	bit += KVMPPC_GSE_GUESTWIDE_COUNT;
+ 
++	if (class == KVMPPC_GS_CLASS_HOSTWIDE) {
++		bit += iden - KVMPPC_GSE_HOSTWIDE_START;
++		return bit;
++	}
++
++	bit += KVMPPC_GSE_HOSTWIDE_COUNT;
++
+ 	if (class == KVMPPC_GS_CLASS_META) {
+ 		bit += iden - KVMPPC_GSE_META_START;
+ 		return bit;
+@@ -356,6 +385,12 @@ static inline u16 kvmppc_gse_unflatten_iden(int bit)
+ 	}
+ 	bit -= KVMPPC_GSE_GUESTWIDE_COUNT;
+ 
++	if (bit < KVMPPC_GSE_HOSTWIDE_COUNT) {
++		iden = KVMPPC_GSE_HOSTWIDE_START + bit;
++		return iden;
++	}
++	bit -= KVMPPC_GSE_HOSTWIDE_COUNT;
++
+ 	if (bit < KVMPPC_GSE_META_COUNT) {
+ 		iden = KVMPPC_GSE_META_START + bit;
+ 		return iden;
+@@ -588,6 +623,8 @@ int kvmppc_gsb_send(struct kvmppc_gs_buff *gsb, unsigned long flags)
+ 
+ 	if (flags & KVMPPC_GS_FLAGS_WIDE)
+ 		hflags |= H_GUEST_FLAGS_WIDE;
++	if (flags & KVMPPC_GS_FLAGS_HOST_WIDE)
++		hflags |= H_GUEST_FLAGS_HOST_WIDE;
+ 
+ 	rc = plpar_guest_set_state(hflags, gsb->guest_id, gsb->vcpu_id,
+ 				   __pa(gsb->hdr), gsb->capacity, &i);
+@@ -613,6 +650,8 @@ int kvmppc_gsb_recv(struct kvmppc_gs_buff *gsb, unsigned long flags)
+ 
+ 	if (flags & KVMPPC_GS_FLAGS_WIDE)
+ 		hflags |= H_GUEST_FLAGS_WIDE;
++	if (flags & KVMPPC_GS_FLAGS_HOST_WIDE)
++		hflags |= H_GUEST_FLAGS_HOST_WIDE;
+ 
+ 	rc = plpar_guest_get_state(hflags, gsb->guest_id, gsb->vcpu_id,
+ 				   __pa(gsb->hdr), gsb->capacity, &i);
 -- 
 2.48.1
 
