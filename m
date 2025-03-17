@@ -1,175 +1,482 @@
-Return-Path: <kvm+bounces-41150-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41151-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5EB3A635A0
-	for <lists+kvm@lfdr.de>; Sun, 16 Mar 2025 13:32:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20DEDA639CC
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 02:13:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 519D03A6712
-	for <lists+kvm@lfdr.de>; Sun, 16 Mar 2025 12:32:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2809D188E087
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 01:13:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 196E31A3162;
-	Sun, 16 Mar 2025 12:32:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82C22286A9;
+	Mon, 17 Mar 2025 01:13:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VY/2MVD6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e2+SrshA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7094C80
-	for <kvm@vger.kernel.org>; Sun, 16 Mar 2025 12:32:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83FF322F01
+	for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 01:13:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742128342; cv=none; b=VCgwfYyohrj9oYONzcsvHaflZVyLQ2o8aMT/N1UGvUCIhMQ3Nws3qmkshEJDhkFIIpey0s8Tc4wN9/2UWCshBbXtnCIt4ESEw0f8pLMpZ/0MaLNr19eTIAYX0YZBUTgPX0EhEh4hSxMDXFEMoKideDSlx2F73vgF6+AKuCD8UC4=
+	t=1742173998; cv=none; b=sYcdcTAlup3SbxZ7/zdaKobZbziqBDc8/1WRq/gGxKLUwWQ87WdcgNCvs654pVf61BMUlfmnHg7Xr5Vhvqiw/Uu7Wnzw+1ibOWPmJtepLqTLOor5MVxMny8HuuJ6mdefqzTBjWOISqi4RclqyOdc8LhOPbqV6DlftGM15nEkRLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742128342; c=relaxed/simple;
-	bh=CUVNu0g2BZiohMpaaAh9Dc8yr2IRcp76y3bUeOZFquY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LA+VPokJAt0aDUDRcc/Aw6KyZSTrbAPUKRq2wohe7r0sOay3fFp+pdLnqmaiZ4z0q/Ao5uQoS4N5YeGi4Ht36YL4GCtw7/wrf80nheNXWopNGXN4FQayLr3BsFUMHKP1Nwz0dnJFbGrJTx5qA8z+N6yqwSMnw8AGVVVzZRY3ulg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VY/2MVD6; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2232aead377so77463915ad.0
-        for <kvm@vger.kernel.org>; Sun, 16 Mar 2025 05:32:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742128340; x=1742733140; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8gXkoweNZfvd6vggmfwAo2x61nHzo2G44/su8xJiRE8=;
-        b=VY/2MVD6z5t80bJA7Tw3ScMLKDb9sGmI27wsZqfOSMHLgSsB8sw+gWa17qsyAkkNSX
-         H1jZFE3H5afk6GiZTlITwe5okVrMyQ3j+wpU+mcvvl9Sx/+i0T5jgVshCec+ImsLOEk2
-         /7vTVmt3bKhXa1a35TLwIFtDi/0OqASM4VggNSaNz27Qb3IAgai/7njTSJBF0GQskB7B
-         t3ZlUr9Y2im9zt3Vzsb0UqgEI/frjhUJIycHZscURc1jdtz/crYAFlkSGYMUa2cjEsOs
-         BBRPhjv9++mZnhGUTTnbLNkdUzzeYrk0SZvt2+hrK8jjsHfR0E36Ezb9ZuMr5FwuIvJF
-         B18Q==
+	s=arc-20240116; t=1742173998; c=relaxed/simple;
+	bh=MegtryvFqQIppHgHOLxnS74N/rMKL/rK/AZO/E8X+fA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dlUldixj/xzyE5UbO+N9dgGBuRK3MP3M/Vy+EYfpeHAewjTIjserSQCzyWqX5ZJvY2Nj1t8I+DdDYIxeA0oFlwCDLZE03xYbajyuiqTj2ilp+9R7YGCVhViIbbibgz7tPdyPP8CHeFyKQpa5cs3i9CBx7qFEnxf3Qpyi/euMHxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e2+SrshA; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742173994;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=p2pU2CrvJxs42XXvKO0iiqoJ6d0A377CzdEe/BLeOmM=;
+	b=e2+SrshAHehNMFqdaGfVzTqPhM/ygIgWB44p7UX9Vjm/ZV1J1i180t6ePR1puPDld6r3Kg
+	EdsV4aQ/QEWqckkbvWyCytZg1UPLJ5h+UMRFQm2XVU29A2SVHsvxuHyskv3gG0dftMWPZ8
+	s7ZkxsbjpyrdEKU1nClNYWJRorMSVWk=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-61-kDIDhyhxPoKNu5kEsNXQwA-1; Sun, 16 Mar 2025 21:13:12 -0400
+X-MC-Unique: kDIDhyhxPoKNu5kEsNXQwA-1
+X-Mimecast-MFC-AGG-ID: kDIDhyhxPoKNu5kEsNXQwA_1742173992
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2ff8c5d185aso5193988a91.1
+        for <kvm@vger.kernel.org>; Sun, 16 Mar 2025 18:13:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742128340; x=1742733140;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8gXkoweNZfvd6vggmfwAo2x61nHzo2G44/su8xJiRE8=;
-        b=UeriYn2i6hsoGZNoU8PvsK1v82hcDOdOB2NntT8NduGZQs7y4890NK8oH9xIkFHLqK
-         NTWQewQCU/OkAI7LpSHg6ovo1f5J6fqrCGrYTHP7LSut0dt5Lw5APq3bTaZrEvwwwMSz
-         PcylxSiTdirdH9QkLKl1MCyVGm7Rdz8taM9v3SYrBTtHK7pSWswduubUX6nTX5GrodPt
-         0/z5wcL4/HYQXmDP1K63P62k+y/Mvj3P6XTt+DxnNZCg5tQcf5lpgYg2W9BNsFri4hjo
-         43Rr0E9QoZI+aPcEX2iPYRSQA8foE8T8U2FNpznNMHhsgSdMeuOsrGuSfzzZMphR/Xq3
-         jOew==
-X-Gm-Message-State: AOJu0Yz90NWE63tSLNvCkaWkzl6ko4HYMf234aOYj8qks6CZ+TwXFMPx
-	aXx20/wHhNXKcapt03BGeEEqUvo80LiRfUXgKyb2jJ+W0J4riJSaxGwPwthALmAA2g==
-X-Gm-Gg: ASbGncubom0fODa6BVImawRMRoaG7g5lwQya33fLzRJH24AgPiyQ6Y7DTDH0p6Y0yuM
-	faNJUZIV0c5gwPJnQslUY3YmcpAro9jVNJIhDKOLPtCEmLXE5BePQabEWbHW/97PC1ujiyMSIM/
-	5wP7yIvQ4zFqc2owJKUBhcAesSafDOSgF8Gr50jDuYhIdP5D0G4aQAbUoHNs4YtIharK+K43vPS
-	6hW1lnrfjhVVn49cH6RX+XI3vmoioprhT3aC5NlX7h3h8CtdiK9+RFfYM/x33+BBkGXZv4gJVNQ
-	3DF1o6BEoNRebcDTGS3ZqH7lZ0f5tbllZPA3zgxEgooioCYvmg==
-X-Google-Smtp-Source: AGHT+IGerUc53YZzXXblJZ3QvRzovokoF0kYUEsfoBla5jR0HQhfMb3ZZ1HBEU0X1MwTJjgg8NsmiQ==
-X-Received: by 2002:a17:902:cecd:b0:21f:164d:93fe with SMTP id d9443c01a7336-225e0b49ed6mr119837485ad.53.1742128339421;
-        Sun, 16 Mar 2025 05:32:19 -0700 (PDT)
-Received: from pop-os.. ([2401:4900:8380:12ae:c6ae:aee9:6221:d820])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-225c68a8106sm57290995ad.89.2025.03.16.05.32.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Mar 2025 05:32:18 -0700 (PDT)
-From: Akshay Behl <akshaybehl231@gmail.com>
-To: kvm@vger.kernel.org
-Cc: andrew.jones@linux.dev,
-	cleger@rivosinc.com,
-	atishp@rivosinc.com,
-	Akshay Behl <akshaybehl231@gmail.com>
-Subject: [kvm-unit-tests PATCH] riscv: Refactor SBI FWFT lock tests
-Date: Sun, 16 Mar 2025 18:02:09 +0530
-Message-Id: <20250316123209.100561-1-akshaybehl231@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1742173992; x=1742778792;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=p2pU2CrvJxs42XXvKO0iiqoJ6d0A377CzdEe/BLeOmM=;
+        b=MQwdU+evImTlp1Qt++FlB1tBMaGa9li6ysZyKERSH7jkHThM4caAiQZuR1YrK7oPW3
+         ocznvmQntr4LLfSRO13AgBv5kY/w3NtgzMyaewRltgFk/6kt+5SQbSKWY2ISd17o598c
+         Z4fe+MtPAMWymXu9GIGmG5T6f7Cgxe17nzb4vhUd49K/eu9cOy7qO0WadvtuFvL+Aq6a
+         ebfMOWFmnj/czcnoeqe/FC6sm7YSkD5LcU4HpovvMc8UEbDpTagxWP4QMD4MpVsgYRVK
+         JHQTbg+5ejM7D3ywiMMni9c5DZyVnDB6MCHAIldiV91oW92AkT7XufzBMEX/3lVCmQaz
+         /S5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVj7XJV4I0AB1F3W0YelNXKGznm1qTenoqBHf+5CJ0yPxw9Y/pOmCEALKXbFsdXYnTRoog=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+OaxFgYcanOOCk2Zqn/nzfFeJ6aXSz00az7jpThnSq5+HWzq8
+	xYa3QxMYqkjZXOiiSCcXJnNrvvqHP9Zb//BwUIuL+6k6p3s/tPXWzVpk/uUMJiLvSEJ0YiNUkZa
+	Ga1n0NTTaJSW07TirUJiYNIyjiUncCeOFnFCObGCExakWdzloXax9uWI9R0EZ4fO6fBYF+BSlGm
+	JPV1H+bwy3lnoNUJGrZMyOtcPo
+X-Gm-Gg: ASbGncswe84o/JXaUVhvKCRUF1bI4PiuooyzG+09PI4zjzLb91KgP+gnL8NQHWuwJfu
+	cjIOpgoxzMiO7IM7YL1CUSsHVeuSeK5eX/CtIJ9HrHn8ROnOlU/ijqORN0s6l9Phl6OH1Uud8Nw
+	==
+X-Received: by 2002:a17:90b:5102:b0:2fe:b774:3ec8 with SMTP id 98e67ed59e1d1-30151d579ecmr10888997a91.23.1742173991635;
+        Sun, 16 Mar 2025 18:13:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEuBDM83agWgP1LGBHRibz0QSEGG1pr8LmZzWFhUfvQBdUmUysCUWVrJ07Kz47gQgoB9eSK9yIwcoU5NY2+Bds=
+X-Received: by 2002:a17:90b:5102:b0:2fe:b774:3ec8 with SMTP id
+ 98e67ed59e1d1-30151d579ecmr10888965a91.23.1742173991176; Sun, 16 Mar 2025
+ 18:13:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250307-rss-v9-0-df76624025eb@daynix.com> <20250307-rss-v9-3-df76624025eb@daynix.com>
+ <CACGkMEsNHba=PY5UQoH1zdGQRiHC8FugMG1nkXqOj1TBdOQrww@mail.gmail.com>
+ <7978dfd5-8499-44f3-9c30-e53a01449281@daynix.com> <CACGkMEsR4_RreDbYQSEk5Cr29_26WNUYheWCQBjyMNUn=1eS2Q@mail.gmail.com>
+ <edf41317-2191-458f-a315-87d5af42a264@daynix.com> <CACGkMEta3k_JOhKv44XiBXZb=WuS=KbSeJNpYxCdeiAgRY2azg@mail.gmail.com>
+ <ff7916cf-8a9c-4c27-baaf-ca408817c063@daynix.com>
+In-Reply-To: <ff7916cf-8a9c-4c27-baaf-ca408817c063@daynix.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 17 Mar 2025 09:12:58 +0800
+X-Gm-Features: AQ5f1JpbovIUWP4Gme3peFz6NLeQE0mM1LrLEOCV_o8YXlq3HxnPfJrMBa6T7m4
+Message-ID: <CACGkMEsVgbJPhz2d2ATm5fr3M2uSEoSXWW7tXZ_FrkQtmmu1wA@mail.gmail.com>
+Subject: Re: [PATCH net-next v9 3/6] tun: Introduce virtio-net hash feature
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>, 
+	Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, 
+	Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This patch adds a generic function for lock tests for all
-the sbi fwft features. It expects the feature is already
-locked before being called and tests the locked feature.
+On Wed, Mar 12, 2025 at 1:03=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix=
+.com> wrote:
+>
+> On 2025/03/12 11:35, Jason Wang wrote:
+> > On Tue, Mar 11, 2025 at 2:11=E2=80=AFPM Akihiko Odaki <akihiko.odaki@da=
+ynix.com> wrote:
+> >>
+> >> On 2025/03/11 9:38, Jason Wang wrote:
+> >>> On Mon, Mar 10, 2025 at 3:45=E2=80=AFPM Akihiko Odaki <akihiko.odaki@=
+daynix.com> wrote:
+> >>>>
+> >>>> On 2025/03/10 12:55, Jason Wang wrote:
+> >>>>> On Fri, Mar 7, 2025 at 7:01=E2=80=AFPM Akihiko Odaki <akihiko.odaki=
+@daynix.com> wrote:
+> >>>>>>
+> >>>>>> Hash reporting
+> >>>>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >>>>>>
+> >>>>>> Allow the guest to reuse the hash value to make receive steering
+> >>>>>> consistent between the host and guest, and to save hash computatio=
+n.
+> >>>>>>
+> >>>>>> RSS
+> >>>>>> =3D=3D=3D
+> >>>>>>
+> >>>>>> RSS is a receive steering algorithm that can be negotiated to use =
+with
+> >>>>>> virtio_net. Conventionally the hash calculation was done by the VM=
+M.
+> >>>>>> However, computing the hash after the queue was chosen defeats the
+> >>>>>> purpose of RSS.
+> >>>>>>
+> >>>>>> Another approach is to use eBPF steering program. This approach ha=
+s
+> >>>>>> another downside: it cannot report the calculated hash due to the
+> >>>>>> restrictive nature of eBPF steering program.
+> >>>>>>
+> >>>>>> Introduce the code to perform RSS to the kernel in order to overco=
+me
+> >>>>>> thse challenges. An alternative solution is to extend the eBPF ste=
+ering
+> >>>>>> program so that it will be able to report to the userspace, but I =
+didn't
+> >>>>>> opt for it because extending the current mechanism of eBPF steerin=
+g
+> >>>>>> program as is because it relies on legacy context rewriting, and
+> >>>>>> introducing kfunc-based eBPF will result in non-UAPI dependency wh=
+ile
+> >>>>>> the other relevant virtualization APIs such as KVM and vhost_net a=
+re
+> >>>>>> UAPIs.
+> >>>>>>
+> >>>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> >>>>>> Tested-by: Lei Yang <leiyang@redhat.com>
+> >>>>>> ---
+> >>>>>>     Documentation/networking/tuntap.rst |   7 ++
+> >>>>>>     drivers/net/Kconfig                 |   1 +
+> >>>>>>     drivers/net/tap.c                   |  68 ++++++++++++++-
+> >>>>>>     drivers/net/tun.c                   |  98 +++++++++++++++++---=
+--
+> >>>>>>     drivers/net/tun_vnet.h              | 159 ++++++++++++++++++++=
+++++++++++++++--
+> >>>>>>     include/linux/if_tap.h              |   2 +
+> >>>>>>     include/linux/skbuff.h              |   3 +
+> >>>>>>     include/uapi/linux/if_tun.h         |  75 +++++++++++++++++
+> >>>>>>     net/core/skbuff.c                   |   4 +
+> >>>>>>     9 files changed, 386 insertions(+), 31 deletions(-)
+> >>>>>>
+> >>>>>> diff --git a/Documentation/networking/tuntap.rst b/Documentation/n=
+etworking/tuntap.rst
+> >>>>>> index 4d7087f727be5e37dfbf5066a9e9c872cc98898d..86b4ae8caa8ad062c1=
+e558920be42ce0d4217465 100644
+> >>>>>> --- a/Documentation/networking/tuntap.rst
+> >>>>>> +++ b/Documentation/networking/tuntap.rst
+> >>>>>> @@ -206,6 +206,13 @@ enable is true we enable it, otherwise we dis=
+able it::
+> >>>>>>           return ioctl(fd, TUNSETQUEUE, (void *)&ifr);
+> >>>>>>       }
+> >>>>>>
+> >
+> > [...]
+> >
+> >>>>>> +static inline long tun_vnet_ioctl_sethash(struct tun_vnet_hash_co=
+ntainer __rcu **hashp,
+> >>>>>> +                                         bool can_rss, void __use=
+r *argp)
+> >>>>>
+> >>>>> So again, can_rss seems to be tricky. Looking at its caller, it tir=
+es
+> >>>>> to make eBPF and RSS mutually exclusive. I still don't understand w=
+hy
+> >>>>> we need this. Allow eBPF program to override some of the path seems=
+ to
+> >>>>> be common practice.
+> >>>>>
+> >>>>> What's more, we didn't try (or even can't) to make automq and eBPF =
+to
+> >>>>> be mutually exclusive. So I still didn't see what we gain from this
+> >>>>> and it complicates the codes and may lead to ambiguous uAPI/behavio=
+ur.
+> >>>>
+> >>>> automq and eBPF are mutually exclusive; automq is disabled when an e=
+BPF
+> >>>> steering program is set so I followed the example here.
+> >>>
+> >>> I meant from the view of uAPI, the kernel doesn't or can't reject eBP=
+F
+> >>> while using automq.
+> >>   > >>
+> >>>> We don't even have an interface for eBPF to let it fall back to anot=
+her
+> >>>> alogirhtm.
+> >>>
+> >>> It doesn't even need this, e.g XDP overrides the default receiving pa=
+th.
+> >>>
+> >>>> I could make it fall back to RSS if the eBPF steeering
+> >>>> program is designed to fall back to automq when it returns e.g., -1.=
+ But
+> >>>> such an interface is currently not defined and defining one is out o=
+f
+> >>>> scope of this patch series.
+> >>>
+> >>> Just to make sure we are on the same page, I meant we just need to
+> >>> make the behaviour consistent: allow eBPF to override the behaviour o=
+f
+> >>> both automq and rss.
+> >>
+> >> That assumes eBPF takes precedence over RSS, which is not obvious to m=
+e.
+> >
+> > Well, it's kind of obvious. Not speaking the eBPF selector, we have
+> > other eBPF stuffs like skbedit etc.
+> >
+> >>
+> >> Let's add an interface for the eBPF steering program to fall back to
+> >> another steering algorithm. I said it is out of scope before, but it
+> >> makes clear that the eBPF steering program takes precedence over other
+> >> algorithms and allows us to delete the code for the configuration
+> >> validation in this patch.
+> >
+> > Fallback is out of scope but it's not what I meant.
+> >
+> > I meant in the current uAPI take eBPF precedence over automq. It's
+> > much more simpler to stick this precedence unless we see obvious
+> > advanatge.
+>
+> We still have three different design options that preserve the current
+> precedence:
+>
+> 1) Precedence order: eBPF -> RSS -> automq
+> 2) Precedence order: RSS -> eBPF -> automq
+> 3) Precedence order: eBPF OR RSS -> automq where eBPF and RSS are
+> mutually exclusive
+>
+> I think this is a unique situation for this steering program and I could
+> not find another example in other eBPF stuffs.
 
-Signed-off-by: Akshay Behl <akshaybehl231@gmail.com>
----
- riscv/sbi-fwft.c | 48 ++++++++++++++++++++++++++++++++----------------
- 1 file changed, 32 insertions(+), 16 deletions(-)
+As described above, queue mapping could be overridden by tc-ebpf. So
+there's no way to guarantee the RSS will work:
 
-diff --git a/riscv/sbi-fwft.c b/riscv/sbi-fwft.c
-index 581cbf6b..5c0a7f6f 100644
---- a/riscv/sbi-fwft.c
-+++ b/riscv/sbi-fwft.c
-@@ -74,6 +74,33 @@ static void fwft_check_reset(uint32_t feature, unsigned long reset)
- 	sbiret_report(&ret, SBI_SUCCESS, reset, "resets to %lu", reset);
- }
- 
-+/* Must be called after locking the feature using SBI_FWFT_SET_FLAG_LOCK */
-+static void fwft_feature_lock_test(int32_t feature, unsigned long locked_value)
-+{
-+    struct sbiret ret;
-+    unsigned long alt_value = locked_value ? 0 : 1;
-+
-+    ret = fwft_set(feature, locked_value, 0);
-+    sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED,
-+        "Set locked feature to %lu without lock", locked_value);
-+
-+    ret = fwft_set(feature, locked_value, SBI_FWFT_SET_FLAG_LOCK);
-+    sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED,
-+        "Set locked feature to %lu with lock", locked_value);
-+
-+    ret = fwft_set(feature, alt_value, 0);
-+    sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED,
-+        "Set locked feature to %lu without lock", alt_value);
-+
-+    ret = fwft_set(feature, alt_value, SBI_FWFT_SET_FLAG_LOCK);
-+    sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED,
-+        "Set locked feature to %lu with lock", alt_value);
-+
-+    ret = fwft_get(feature);
-+    sbiret_report(&ret, SBI_SUCCESS, locked_value,
-+        "Get locked feature value %lu", locked_value);
-+}
-+
- static void fwft_check_base(void)
- {
- 	report_prefix_push("base");
-@@ -181,11 +208,9 @@ static void fwft_check_misaligned_exc_deleg(void)
- 	/* Lock the feature */
- 	ret = fwft_misaligned_exc_set(0, SBI_FWFT_SET_FLAG_LOCK);
- 	sbiret_report_error(&ret, SBI_SUCCESS, "Set misaligned deleg feature value 0 and lock");
--	ret = fwft_misaligned_exc_set(1, 0);
--	sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED,
--			    "Set locked misaligned deleg feature to new value");
--	ret = fwft_misaligned_exc_get();
--	sbiret_report(&ret, SBI_SUCCESS, 0, "Get misaligned deleg locked value 0");
-+
-+	/* Test feature lock */
-+	fwft_feature_lock_test(SBI_FWFT_MISALIGNED_EXC_DELEG, 0);
- 
- 	report_prefix_pop();
- }
-@@ -326,17 +351,8 @@ adue_inval_tests:
- 	else
- 		enabled = !enabled;
- 
--	ret = fwft_set(SBI_FWFT_PTE_AD_HW_UPDATING, !enabled, 0);
--	sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED, "set locked to %d without lock", !enabled);
--
--	ret = fwft_set(SBI_FWFT_PTE_AD_HW_UPDATING, !enabled, 1);
--	sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED, "set locked to %d with lock", !enabled);
--
--	ret = fwft_set(SBI_FWFT_PTE_AD_HW_UPDATING, enabled, 0);
--	sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED, "set locked to %d without lock", enabled);
--
--	ret = fwft_set(SBI_FWFT_PTE_AD_HW_UPDATING, enabled, 1);
--	sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED, "set locked to %d with lock", enabled);
-+	/* Test the feature lock */
-+	fwft_feature_lock_test(SBI_FWFT_PTE_AD_HW_UPDATING, enabled);
- 
- adue_done:
- 	install_exception_handler(EXC_LOAD_PAGE_FAULT, NULL);
--- 
-2.34.1
+https://github.com/DPDK/dpdk/blob/main/drivers/net/tap/bpf/tap_rss.c#L262
+
+Making eBPF first leaves a chance for the management layer to override
+the choice of Qemu.
+
+>
+> The current version implements 3) because it is not obvious whether we
+> should choose either 1) or 2).
+
+But you didn't explain why you choose 3), and it leads to tricky code
+(e.g the can_rss stuff etc).
+
+> But 1) will be the most capable option if
+> eBPF has a fall-back feature.
+>
+> >
+> >>
+> >>>
+> >>>>
+> >>>>>
+> >
+> > [...]
+> >
+> >>>>> Is there a chance that we can reach here without TUN_VNET_HASH_REPO=
+RT?
+> >>>>> If yes, it should be a bug.
+> >>>>
+> >>>> It is possible to use RSS without TUN_VNET_HASH_REPORT.
+> >>>
+> >>> Another call to separate the ioctls then.
+> >>
+> >> RSS and hash reporting are not completely independent though.
+> >
+> > Spec said:
+> >
+> > """
+> > VIRTIO_NET_F_RSSRequires VIRTIO_NET_F_CTRL_VQ.
+> > """
+>
+> I meant the features can be enabled independently, but they will share
+> the hash type set when they are enabled at the same time.
+
+Looking at the spec:
+
+Hash repot uses:
+
+"""
+struct virtio_net_hash_config {
+    le32 hash_types;
+    le16 reserved[4];
+    u8 hash_key_length;
+    u8 hash_key_data[hash_key_length];
+};
+"""
+
+RSS uses
+
+"""
+struct rss_rq_id {
+   le16 vq_index_1_16: 15; /* Bits 1 to 16 of the virtqueue index */
+   le16 reserved: 1; /* Set to zero */
+};
+
+struct virtio_net_rss_config {
+    le32 hash_types;
+    le16 indirection_table_mask;
+    struct rss_rq_id unclassified_queue;
+    struct rss_rq_id indirection_table[indirection_table_length];
+    le16 max_tx_vq;
+    u8 hash_key_length;
+    u8 hash_key_data[hash_key_length];
+};
+"""
+
+Instead of trying to figure out whether we can share some data
+structures, why not simply start from what has been done in the spec?
+This would ease the usersapce as well where it can simply do 1:1
+mapping between ctrl vq command and tun uAPI.
+
+>
+> >
+> >>
+> >> A plot twist is the "types" parameter; it is a parameter that is
+> >> "common" for RSS and hash reporting.
+> >
+> > So we can share part of the structure through the uAPI.
+>
+> Isn't that what this patch does?
+
+I didn't see, basically I see only one TUNSETVNETHASH that is used to
+set both hash report and rss:
+
+"""
++/**
++ * define TUNSETVNETHASH - ioctl to configure virtio_net hashing
++ *
++ * The argument is a pointer to &struct tun_vnet_hash.
++ *
++ * The argument is a pointer to the compound of the following in order if
++ * %TUN_VNET_HASH_RSS is set:
++ *
++ * 1. &struct tun_vnet_hash
++ * 2. &struct tun_vnet_hash_rss
++ * 3. Indirection table
++ * 4. Key
++ *
+"""
+
+And it seems to lack parameters like max_tx_vq.
+
+What's more, we've already had virito-net uAPI. Why not simply reusing them=
+?
+
+>
+> >
+> >> RSS and hash reporting must share
+> >> this parameter when both are enabled at the same time; otherwise RSS m=
+ay
+> >> compute hash values that are not suited for hash reporting.
+> >
+> > Is this mandated by the spec? If yes, we can add a check. If not,
+> > userspace risk themselves as a mis-configuration which we don't need
+> > to bother.
+>
+> Yes, it is mandated. 5.1.6.4.3 Hash calculation for incoming packets says=
+:
+>  > A device attempts to calculate a per-packet hash in the following
+>  > cases:
+>  >
+>  >   - The feature VIRTIO_NET_F_RSS was negotiated. The device uses the
+>  >     hash to determine the receive virtqueue to place incoming packets.
+>  >   - The feature VIRTIO_NET_F_HASH_REPORT was negotiated. The device
+>  >     reports the hash value and the hash type with the packet.
+>  >
+>  > If the feature VIRTIO_NET_F_RSS was negotiated:
+>  >
+>  >   - The device uses hash_types of the virtio_net_rss_config structure
+>  >     as =E2=80=99Enabled hash types=E2=80=99 bitmask.
+>  >   - The device uses a key as defined in hash_key_data and
+>        hash_key_length of the virtio_net_rss_config structure (see
+>  >      5.1.6.5.7.1).
+>  >
+>  > If the feature VIRTIO_NET_F_RSS was not negotiated:
+>  >
+>  >   - The device uses hash_types of the virtio_net_hash_config structure
+>  >     as =E2=80=99Enabled hash types=E2=80=99 bitmask.
+>  >   - The device uses a key as defined in hash_key_data and
+>  >     hash_key_length of the virtio_net_hash_config structure (see
+>  >      .1.6.5.6.4).
+>
+> So when both VIRTIO_NET_F_RSS and VIRTIO_NET_F_HASH_REPORT are
+> negotiated, virtio_net_rss_config not only controls RSS but also the
+> reported hash values and types. They cannot be divergent.
+>
+> >
+> > Note that spec use different commands for hash_report and rss.
+>
+> TUNSETVNETHASH is different from these commands in terms that it also
+> negotiates VIRTIO_NET_F_HASH_REPORT and VIRTIO_NET_F_RSS.
+>
+
+There Are different "issues" here:
+
+1) Whether or not we need to use a unified API for negotiating RSS and
+HASH_REPORT features
+2) Whether or not we need to sue a unified API for setting RSS and
+HASH_REPORT configuration
+
+What I want to say is point 2. But what you raise is point 1.
+
+For simplicity, it looks to me like it's a call for having separated
+ioctls for feature negotiation (for example via TUNSETIFF). You may
+argue that either RSS or HASH_REPORT requires configurations, we can
+just follow what spec defines or not (e.g what happens if
+RSS/HASH_REPORT were negotiated but no configurations were set).
+
+> In the virtio-net specification, it is not defined what would happen if
+> these features are negotiated but the VIRTIO_NET_CTRL_MQ_RSS_CONFIG or
+> VIRTIO_NET_CTRL_MQ_HASH_CONFIG commands are not sent. There is no such
+> ambiguity with TUNSETVNETHASH.
+
+So I don't see advantages of unifying hash reports and rss into a
+single ioctl. Let's just follow what has been done in the spec that
+uses separated commands. Tuntap is not a good place to debate whether
+those commands could be unified or not. We need to move it to the spec
+but assuming spec has been done, it might be too late or too few
+advantages for having another design.
+
+Thanks
+
+>
+> Regards,
+> Akihiko Odaki
+>
+> >
+> >>
+> >> The paramter will be duplicated if we have separate ioctls for RSS and
+> >> hash reporting, and the kernel will have a chiken-egg problem when
+> >> ensuring they are synchronized; when the ioctl for RSS is issued, shou=
+ld
+> >> the kernel ensure the "types" parameter is identical with one specifie=
+d
+> >> for hash reporting? It will not work if the userspace may decide to
+> >> configure hash reporting after RSS.
+> >>
+> >
+> > See my reply above.
+> >
+> > Thanks
+> >
+>
 
 
