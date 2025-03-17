@@ -1,341 +1,119 @@
-Return-Path: <kvm+bounces-41165-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41166-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32DA6A640C6
-	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 07:08:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACF99A6412C
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 07:19:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F0953A4BEE
-	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 06:08:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4DE73A8361
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 06:19:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A05021931B;
-	Mon, 17 Mar 2025 06:08:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DA532192EE;
+	Mon, 17 Mar 2025 06:19:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="ZXnix3xq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Y+a8xTuA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B795A146A60
-	for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 06:08:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D2491E1DFF
+	for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 06:19:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742191712; cv=none; b=XvcOStpmJz8ukpbPvuyAy/tzfSZQ/9Ux04/W8iI2uhDXpeQoFEmu2DUuf5VNvHallG5GZ+y2KqKRRhi8taLTyS6pmVnaJbsuhfItMFMrJ8M15dvZAkaDn+dXShBv5dElVV+I8oYjIqIE7QiGgCVTzzRxwmdPube/AgmBFlot3d0=
+	t=1742192348; cv=none; b=IayyDlkOYBxqJ17033rApXWU9XyPT9lIVjI7SmWMnMUZdJ0NH7edfxStwwQPSINRPrFJR+jE8d67F3RiYHLaNwD0Q+cyYxP3uNXKzf63nkbmIcKotFAGJ27HUhuOKmYJpZIblbyf1qIywuhjXKlqgrKjruk34ZHpAkrOuYfrm1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742191712; c=relaxed/simple;
-	bh=IvNJR1CXhaIBt4hzQw1toiWztLSbiCGrla6GsFJVXKI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pJm/bGPiKGFtBolyhv0ni8hOYEXEWti7uK2dlork1SYhLZRahKM6TjjaiSd5Isk+C30phlZkE+IzC+4G0BwuMCSqXnAHY0gixeAWmxHbpuSl9HIHciZ1Y8fdGaxofbHmNsSnousCVaFnrjp1Hj+pLxxroDAhzvLCx3Q9LbXzkhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=ZXnix3xq; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-22438c356c8so67153585ad.1
-        for <kvm@vger.kernel.org>; Sun, 16 Mar 2025 23:08:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1742191710; x=1742796510; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wBWUop9hBNztgWdtuzQCjGkKpdUlBMvpymPGtusXugE=;
-        b=ZXnix3xqLhmLeuRaXUeLmZJ1HtEXgmIiQLNhkODhnfhql5OTtS3BXKoWljn8bhl21j
-         LuMqVa6jkA/HEXBI37J5RBF1Jfz9oCMZXs/Ex5Lxjpeozu3Qet5vVCXFVcukU98abp01
-         ouDrDEEeWbex/yMSFsVfMNWDaSNsD2xhWqgfsztZkqLRauXyRci7w+rZixrvSrhGlOLt
-         FRXJp7BnMiidmf/GeAiXycCYrWv0BgIsZp8ECPKnDlqsl3DG4gem6+dKhrEVMUL0XFeA
-         zYV1NnCdNu4pZvBazpNJQ9Eqwws2HTpepQE0CLk74R7HC+M9tLe8jyNwhuZcbEoDIgUq
-         zNZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742191710; x=1742796510;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wBWUop9hBNztgWdtuzQCjGkKpdUlBMvpymPGtusXugE=;
-        b=P4/EKdIDBeP9KhlbVf7isB8LS0UG+LIrHU6DH6J8cI3J4HRGXwhiK90aYQArEzVdlO
-         9L5IRwadFkmCecLb2FDM2Y9Z6esuA43zm9j8u16X5Mp6caGU8GnGlx4AYG0Xzk+c0Daz
-         SqbevHHHTCOaZ0PytHqFUZ7aYh+MuqVhfp4JSUIq2dFdHruNET5bA0FLZ/eN3sKEjADg
-         ngnWVmAeTSWt4z2hkGs70MXQ2Vwm0dPbZRrns4GFzl0tlkkL1mSm5BAY75f0sdkGOD3e
-         r4wUpEvL7/03Lzi02c9KuGJfLWJwPrtJ3vJoaPFCklIitIuOVtbwwdhTdbyqluHoWWP6
-         LprA==
-X-Forwarded-Encrypted: i=1; AJvYcCU0m230vzQWcBnEu26Mg5lahE05tTR5qYyDsYgRbrtS164caVL/GYxi7F+6gUrdNTt7j/c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxl8Lhjih54YoXDwSUlhtK5vZY1zWNpfzUbY64pkSGXKG4mkeK+
-	AYPwEOy+V0K9iK5z5uJJeVmORfMBBZBBVvJAzIHM73HCJkhFsRj3aWntMLHijUo=
-X-Gm-Gg: ASbGncuz/1bW5qA+8bjEJWl+S0Z71EJhvgT8h9QuEk4udmAAfQKLKxfnNtfMApKFywD
-	Bc5ZKmfgDZabgF2TKSSejEBJ46Z/jWU89LmrJHC0wC/VpWD60jhh0pH/OZewc8kOLQDrH6cJ3hQ
-	Q3/9MZDXN5S5kjvUCeg8p6WZj2LHxqsql9KadGQCGs3ufAVfq074J9uMasNBA6fMXjwKvaVGYkH
-	oWdfRs+7m8/ulCIZtDXZq6c3/Ye5gd6t+Lg6MSfxgMe5cb9zWdIhP5lNlX12N3Ahoxu86m+owUR
-	nIfsp3I1SPqA1aK++xy+21ZdDs9zAI1KUrkqzdG/YI2MV58N7gahftpkCw==
-X-Google-Smtp-Source: AGHT+IGoQLPthZhSthgnNJ0I5Yj2jn7eld4kAuLi8jvyiFCGmV6WYXwPCIBZuiv2agvX1E5gEnyKQg==
-X-Received: by 2002:a17:903:18e:b0:223:325c:89de with SMTP id d9443c01a7336-225e0a5282bmr127005685ad.1.1742191709771;
-        Sun, 16 Mar 2025 23:08:29 -0700 (PDT)
-Received: from [157.82.207.107] ([157.82.207.107])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-225c68a6dfesm67327865ad.71.2025.03.16.23.08.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 16 Mar 2025 23:08:29 -0700 (PDT)
-Message-ID: <cf4bf799-3a6e-44dc-96ca-fa8d616e6ba7@daynix.com>
-Date: Mon, 17 Mar 2025 15:08:24 +0900
+	s=arc-20240116; t=1742192348; c=relaxed/simple;
+	bh=h0BsSohuwjOJjBU5oHdhP3ZYhu82D4a41VuNYAddxVI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ukw+JovGGMkL6FTgZFdFyGlEAcw4LApkameP+8A10IjU9bJdTth10J0fLPzECF8VDj57YPmPvY7ENKQ5Lovw6qTmSnK5GOyJUpgkqB6/waraCpYHJjag1BVMkOBG9NE0O6gX/ytI6d21WTxfJrqUa8DroYAFQDqm2wqRvZW3MRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Y+a8xTuA; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1742192347; x=1773728347;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=h0BsSohuwjOJjBU5oHdhP3ZYhu82D4a41VuNYAddxVI=;
+  b=Y+a8xTuAMmLzGTb/0TM67BAr3hkLKrZ0nbDB2oqqdyyQoUtzNy2sLnjd
+   uT0E+YKURFRNEZ+NyovnmSR8JwPW84bQVdw55pAHOkse6/RH204wia6MH
+   xhYOp4dnwyj8TzbSF9M4LoNOhXHsJ81+dJhpIxviCuv09qOEb9NwTefcP
+   IN16MC4xp1G0XKw5qjbgNyxtmCNhqsAIULp4Qp72PAkB9xQjsCoHGuG8P
+   XzAkIDw/3Gdt1ihivGte7R0uIbG5/sBNmdQlf2aaGr4cl2xaEWRBo6GX+
+   mngRkaHg4gK0K5MMZWsH2+rdI6zXHMRm08Z5hWgqIZXwJ0d8PF3G1rtT/
+   Q==;
+X-CSE-ConnectionGUID: 6VLBoK1xTgCaeSoJNlgRuA==
+X-CSE-MsgGUID: 5iCqc/5jR0SxgCNnkyUnew==
+X-IronPort-AV: E=McAfee;i="6700,10204,11375"; a="60664465"
+X-IronPort-AV: E=Sophos;i="6.14,253,1736841600"; 
+   d="scan'208";a="60664465"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2025 23:19:07 -0700
+X-CSE-ConnectionGUID: k0gWf8DHS9GhD4uHidG+4w==
+X-CSE-MsgGUID: N//J7haCQVeK8ULxe6wvBA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,253,1736841600"; 
+   d="scan'208";a="122590083"
+Received: from klitkey1-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.246.8])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2025 23:19:01 -0700
+Date: Mon, 17 Mar 2025 08:18:56 +0200
+From: Tony Lindgren <tony.lindgren@linux.intel.com>
+To: Chenyi Qiang <chenyi.qiang@intel.com>
+Cc: David Hildenbrand <david@redhat.com>,
+	Alexey Kardashevskiy <aik@amd.com>, Peter Xu <peterx@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, Williams Dan J <dan.j.williams@intel.com>,
+	Peng Chao P <chao.p.peng@intel.com>, Gao Chao <chao.gao@intel.com>,
+	Xu Yilun <yilun.xu@intel.com>, Li Xiaoyao <xiaoyao.li@intel.com>,
+	"Maloor, Kishen" <kishen.maloor@intel.com>
+Subject: Re: [PATCH v3 6/7] memory: Attach MemoryAttributeManager to
+ guest_memfd-backed RAMBlocks
+Message-ID: <Z9e-0OcFoKpaG796@tlindgre-MOBL1>
+References: <20250310081837.13123-1-chenyi.qiang@intel.com>
+ <20250310081837.13123-7-chenyi.qiang@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 1/6] virtio_net: Add functions for hashing
-To: Jason Wang <jasowang@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>,
- Andrew Melnychenko <andrew@daynix.com>,
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
- Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>
-References: <20250307-rss-v9-0-df76624025eb@daynix.com>
- <20250307-rss-v9-1-df76624025eb@daynix.com>
- <CACGkMEvxkwe9OJRZPb7zz-sRfVpeuoYSz4c2kh9_jjtGbkb_qA@mail.gmail.com>
- <2e27f18b-1fc9-433d-92e9-8b2e3b1b65dc@daynix.com>
- <CACGkMEssbh0-BKJq7M=T1z9seMu==4OJzmDPU+HEx4OA95E3ng@mail.gmail.com>
- <26592324-c1f0-4ff5-918b-7a9366c4cf71@daynix.com>
- <CACGkMEtapdjiXCPd1JZUF8JP3F1Ks-AtrbFBNGtORYnXPPrBEQ@mail.gmail.com>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <CACGkMEtapdjiXCPd1JZUF8JP3F1Ks-AtrbFBNGtORYnXPPrBEQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250310081837.13123-7-chenyi.qiang@intel.com>
 
-On 2025/03/17 10:24, Jason Wang wrote:
-> On Tue, Mar 11, 2025 at 1:49 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>
->> On 2025/03/11 9:47, Jason Wang wrote:
->>> On Mon, Mar 10, 2025 at 2:53 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>>
->>>> On 2025/03/10 12:55, Jason Wang wrote:
->>>>> On Fri, Mar 7, 2025 at 7:01 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>>>>
->>>>>> They are useful to implement VIRTIO_NET_F_RSS and
->>>>>> VIRTIO_NET_F_HASH_REPORT.
->>>>>>
->>>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
->>>>>> Tested-by: Lei Yang <leiyang@redhat.com>
->>>>>> ---
->>>>>>     include/linux/virtio_net.h | 188 +++++++++++++++++++++++++++++++++++++++++++++
->>>>>>     1 file changed, 188 insertions(+)
->>>>>>
->>>>>> diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
->>>>>> index 02a9f4dc594d02372a6c1850cd600eff9d000d8d..426f33b4b82440d61b2af9fdc4c0b0d4c571b2c5 100644
->>>>>> --- a/include/linux/virtio_net.h
->>>>>> +++ b/include/linux/virtio_net.h
->>>>>> @@ -9,6 +9,194 @@
->>>>>>     #include <uapi/linux/tcp.h>
->>>>>>     #include <uapi/linux/virtio_net.h>
->>>>>>
->>>>>> +struct virtio_net_hash {
->>>>>> +       u32 value;
->>>>>> +       u16 report;
->>>>>> +};
->>>>>> +
->>>>>> +struct virtio_net_toeplitz_state {
->>>>>> +       u32 hash;
->>>>>> +       const u32 *key;
->>>>>> +};
->>>>>> +
->>>>>> +#define VIRTIO_NET_SUPPORTED_HASH_TYPES (VIRTIO_NET_RSS_HASH_TYPE_IPv4 | \
->>>>>> +                                        VIRTIO_NET_RSS_HASH_TYPE_TCPv4 | \
->>>>>> +                                        VIRTIO_NET_RSS_HASH_TYPE_UDPv4 | \
->>>>>> +                                        VIRTIO_NET_RSS_HASH_TYPE_IPv6 | \
->>>>>> +                                        VIRTIO_NET_RSS_HASH_TYPE_TCPv6 | \
->>>>>> +                                        VIRTIO_NET_RSS_HASH_TYPE_UDPv6)
->>>>>
->>>>> Let's explain why
->>>>>
->>>>> #define VIRTIO_NET_HASH_REPORT_IPv6_EX         7
->>>>> #define VIRTIO_NET_HASH_REPORT_TCPv6_EX        8
->>>>> #define VIRTIO_NET_HASH_REPORT_UDPv6_EX        9
->>>>>
->>>>> are missed here.
->>>>
->>>> Because they require parsing IPv6 options and I'm not sure how many we
->>>> need to parse. QEMU's eBPF program has a hard-coded limit of 30 options;
->>>> it has some explanation for this limit, but it does not seem definitive
->>>> either:
->>>> https://gitlab.com/qemu-project/qemu/-/commit/f3fa412de28ae3cb31d38811d30a77e4e20456cc#6ec48fc8af2f802e92f5127425e845c4c213ff60_0_165
->>>>
->>>
->>> How about the usersapce datapath RSS in Qemu? (We probably don't need
->>> to align with eBPF RSS as it's just a reference implementation)
->>
->> The userspace datapath RSS has no limit.
->>
->> The reference implementation is the userspace datapath. The eBPF program
->>    is intended to bring real performance benefit to Windows guests in
->> contrary.
->>
->> The userspace implementation does its best to provide defined RSS
->> capabilities but may not be performant. Parsing all IPv6 options have a
->> performance implication, but it is fine because it is not intended to be
->> performant in the first place.
->>
->> The performance problem is inherent to the userspace implementation,
->> which adds an extra overhead to the datapath. The eBPF program on the
->> other hand does not incur such overhead because it replaces the existing
->> steering algorithm (automq) instead of adding another layer. Hence the
->> eBPF program can be practical.
->>
->> That said, it is not that important to align with the userspace and eBPF
->> RSS in QEMU because they are still experimental anyway; the eBPF RSS has
->> potential to become a practical implementation but it is still in
->> development. The libvirt integration for the eBPF RSS is still not
->> complete, and we occasionally add fixes for RSS and hash reporting
->> without backporting to the stable branch.
->>
->> I'm adding interfaces to negotiate hash types rather for the future
->> extensibility. The specification may gain more hash types in the future
->> and other vhost backends may have a different set of hash types
->> supported. Figuring out how to deal with different sets of supported
->> hash typs is essential for both the kernel and QEMU.
->>
->>>
->>>> In this patch series, I add an ioctl to query capability instead; it
->>>> allows me leaving those hash types unimplemented and is crucial to
->>>> assure extensibility for future additions of hash types anyway. Anyone
->>>> who find these hash types useful can implement in the future.
->>>
->>> Yes, but we need to make sure no userspace visible behaviour changes
->>> after migration.
->>
->> Indeed, the goal is to make extensibility and migration compatible.
-> 
-> So I see this part:
-> 
-> + uint32_t supported_hash_types = n->rss_data.supported_hash_types;
-> + uint32_t peer_hash_types = n->rss_data.peer_hash_types;
-> + bool use_own_hash =
-> + (supported_hash_types & VIRTIO_NET_RSS_SUPPORTED_HASHES) ==
-> + supported_hash_types;
-> + bool use_peer_hash =
-> + n->rss_data.peer_hash_available &&
-> + (supported_hash_types & peer_hash_types) == supported_hash_types;
-> 
-> It looks like it would be a challenge to support vhost-user in the
-> future if vhost-user supports hash feature others than source?
+Hi,
 
-The vhost-user backend will need to retrieve the supported hash types 
-with VHOST_USER_GET_CONFIG as the vhost-vdpa backend does with 
-VHOST_VDPA_GET_CONFIG.
+On Mon, Mar 10, 2025 at 04:18:34PM +0800, Chenyi Qiang wrote:
+> --- a/system/physmem.c
+> +++ b/system/physmem.c
+> @@ -1885,6 +1886,16 @@ static void ram_block_add(RAMBlock *new_block, Error **errp)
+>              qemu_mutex_unlock_ramlist();
+>              goto out_free;
+>          }
+> +
+> +        new_block->memory_attribute_manager = MEMORY_ATTRIBUTE_MANAGER(object_new(TYPE_MEMORY_ATTRIBUTE_MANAGER));
+> +        if (memory_attribute_manager_realize(new_block->memory_attribute_manager, new_block->mr)) {
+> +            error_setg(errp, "Failed to realize memory attribute manager");
+> +            object_unref(OBJECT(new_block->memory_attribute_manager));
+> +            close(new_block->guest_memfd);
+> +            ram_block_discard_require(false);
+> +            qemu_mutex_unlock_ramlist();
+> +            goto out_free;
+> +        }
+>      }
+>  
+>      ram_size = (new_block->offset + new_block->max_length) >> TARGET_PAGE_BITS;
 
-> 
->>
->>>
->>>>
->>>>>
->>>>> And explain how we could maintain migration compatibility
->>>>>
->>>>> 1) Does those three work for userspace datapath in Qemu? If yes,
->>>>> migration will be broken.
->>>>
->>>> They work for userspace datapath so my RFC patch series for QEMU uses
->>>> TUNGETVNETHASHCAP to prevent breaking migration:
->>>> https://patchew.org/QEMU/20240915-hash-v3-0-79cb08d28647@daynix.com/
->>>>
->>>
->>> Ok, let's mention this in the cover letter. Another interesting thing
->>> is the migration from 10.0 to 9.0.
->>
->> The patch series is already mentioned in the cover letter. A description
->> of the intended use case of TUNGETVNETHASHCAP will be a good addition.
->> I'll add it to this patch so that it will be kept in tree after it gets
->> merged.
->>
->> Migration between two different QEMU versions should be handled with
->> versioned machine types.
->>
->> When a machine created in 9.0 is being migrated to 10.0, the machine
->> must set the hash type properties to match with the hash types supported
->> by the existing implementations, which means it sets the property for
->> VIRTIO_NET_HASH_REPORT_IPv6_EX to true, for example. Because this hash
->> type is currently not included in TUNGETVNETHASHCAP, the machine will
->> keep using the implementation used previously. The machine can be also
->> migrated back to 9.0 again.
->>
->> A machine type with version 10.0 cannot be migrated to 9.0 by design so
->> there is no new problem.
-> 
-> I meant migrate qemu 11.0 with machine type 10.0 to qemu 10.0 with
-> machine 10.0 etc.
-
-Let's assume QEMU 10.0 will support this new ioctl while QEMU 9.0 doesn't.
-
-The description in my previous email was wrong. Checking the patch 
-series again, I found I bumped the version number of 
-vmstate_virtio_net_rss. So migrating QEMU 10.0 with machine type 9.0 to 
-QEMU 9.0 will result in an error.
-
-We can remove this error by introducing a compatibility property, but I 
-don't think it's worth. As I noted in the previous email, the RSS 
-feature is still in development and I don't think we need to support 
-migrating to older QEMU versions. It gives an error instead of silently 
-breaking a migrated VM at least.
+Might as well put the above into a separate memory manager init function
+to start with. It keeps the goto out_free error path unified, and makes
+things more future proof if the rest of ram_block_add() ever develops a
+need to check for errors.
 
 Regards,
-Akihiko Odaki
 
-> 
->>
->>>
->>>> This patch series first adds configuration options for users to choose
->>>> hash types. QEMU then automatically picks one implementation from the
->>>> following (the earlier one is the more preferred):
->>>> 1) The hash capability of vhost hardware
->>>> 2) The hash capability I'm proposing here
->>>> 3) The eBPF program
->>>> 4) The pure userspace implementation
->>>>
->>>> This decision depends on the following:
->>>> - The required hash types; supported ones are queried for 1) and 2)
->>>> - Whether vhost is enabled or not and what vhost backend is used
->>>> - Whether hash reporting is enabled; 3) is incompatible with this
->>>>
->>>> The network device will not be realized if no implementation satisfies
->>>> the requirements.
->>>
->>> This makes sense, let's add this in the cover letter.
->>
->> I'll add it to the QEMU patch as it's more about details of QEMU.
->> The message of this patch will explain how TUNGETVNETHASHCAP and
->> TUNSETVNETHASH makes extensibility and migrattion compatible in general.
->>
->> Regards,
->> Akihiko Odaki
->>
->>>
->>>>
->>>>> 2) once we support those three in the future. For example, is the qemu
->>>>> expected to probe this via TUNGETVNETHASHCAP in the destination and
->>>>> fail the migration?
->>>>
->>>> QEMU is expected to use TUNGETVNETHASHCAP, but it can selectively enable
->>>> hash types with TUNSETVNETHASH to keep migration working.
->>>>
->>>> In summary, this patch series provides a sufficient facility for the
->>>> userspace to make extensibility and migration compatible;
->>>> TUNGETVNETHASHCAP exposes all of the kernel capabilities and
->>>> TUNSETVNETHASH allows the userspace to limit them.
->>>>
->>>> Regards,
->>>> Akihiko Odaki
->>>
->>> Fine.
->>>
->>> Thanks
->>>
-> 
-> Thanks
-> 
-
+Tony
 
