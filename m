@@ -1,161 +1,150 @@
-Return-Path: <kvm+bounces-41242-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41243-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6428A657A3
-	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 17:13:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 147CDA65798
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 17:11:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F536885DD8
-	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 16:08:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E136179C12
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 16:08:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 157C41917FB;
-	Mon, 17 Mar 2025 16:08:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2232194A6C;
+	Mon, 17 Mar 2025 16:08:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3B6TmCqY"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Tr3mAMVj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1B814A4F9
-	for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 16:08:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E47417A2EC
+	for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 16:08:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742227691; cv=none; b=EYJ7B1M0y7Kc4wLQUsQIZX1Cf/cEnE4yJK6AdPRMX8Aj/bRb/uc7wIhYTkbuUhJzfPO3En7w2hsmyOeQJxHt3kqNiiOBsSKIn9BZV8TG9n780WzWqD8EsYAveOrxgqEqugcsciF0l8v8kSZ6ZU8fdeke+xglOGhhXiMv1C4FqBA=
+	t=1742227707; cv=none; b=gSel09FaJ+Cf6nY//T0409uajwTpFaPdN2QBoJJy32s5tzVQamVUrwowz0JAeOhjTkuiYPcabRcAtgfD97ghaBUd0vkMYapbxL+V9As+Xahn+Uz1lV39BlCQ2yWjravu0c4HFDPFE8Tqk+FjQcmrudZmejoqUTTg5gsybnZxJVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742227691; c=relaxed/simple;
-	bh=egIWuxBaIjnaXMdoXaDCft2vbzvuOzWQFmi9GgQvLBE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=iLNlKcVU5uxvQjr+tfCPHVsS9Hf7ti3zmpG0/L7OtFLFYaHwXe6mvYZO7gbTYiOHGqGNWQHNkmV3jL+zJPzyiTFCjvU60lNTcYgoTmyu5RTwa2wTyDfJJE9sTvWU26cL7VfTwvR0LxwK9+iP/2yCs+j2BSUpRwLfhXK4xQ6EnMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3B6TmCqY; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff6943febeso3045285a91.0
-        for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 09:08:09 -0700 (PDT)
+	s=arc-20240116; t=1742227707; c=relaxed/simple;
+	bh=mzbTl5nkQKFBnmZRI2ae2XnEho9KAwozFu9d7AODj48=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MpKG9Yy6V2apa0X+tsS+3XajRkBf52h+9MBV5b/EDFNrpHarKWkP8mi6l3uhMJl3XMFEC7ufZi057kxxddkfZkZjk8MNKxvfwJ65L7nQh4KpRtKajhKjew8RY+ZVUdBiKyxDIWmEn2Tdovsh7CysTifsuCwd7VW6P1DlNmHyXmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Tr3mAMVj; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2255003f4c6so78926475ad.0
+        for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 09:08:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742227689; x=1742832489; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kFGsIS9GUasJNsr+AyNzSWrAC+Oat7GEq5DJqh+FPjE=;
-        b=3B6TmCqY/xB7CV5e9CNaSuiXYHC29peBFDE1xoRUgRGFwB5N7FlNnRPZ4iOa8No7xl
-         FbhkT5HtaJEajavFPKbTiGR/d8dMOZqb4/NhcYF+R1elyLV2jH+BKikIHX1UsdWvwEF0
-         yX8RAg0cg+aQCsyQaOOFlRS6yxYKaZdnXxaqyy6SgKzc+BGkBneFUelU1HxoupDw89AO
-         HDMAo/hBtV4jHHuX8JBkNLVTMXdh1K2zBZnyit2ObPZCPW+YMaY6h495yeIY8cgiZeVM
-         lpmoI52qfp/KS+avL9J7M0yjN72VNvW0b5+JzhE9zD9tDuq7EpCpwutSU1LhzeIGofXn
-         QR+A==
+        d=linaro.org; s=google; t=1742227705; x=1742832505; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mzbTl5nkQKFBnmZRI2ae2XnEho9KAwozFu9d7AODj48=;
+        b=Tr3mAMVjTZZQyoVV3YjSZdeY0Uf0MfllxFo1FtTq6JAkNiaMJqPkFof4esrPzts8Uo
+         ev4q+U2MEiLqirZ0lQZq/jmtHl/xphGpc410WrxSEYprLNQm3pSMGiLRhxlEJ/m1gfHX
+         5dB7ud20UHZfRP/vfcly3abJAN/1ebpxWq027Uobn0MVXkcx1y4PXgiXzKVel374sdOn
+         vCdyN3JS6RYy32eAeLFumxYxGL1yKGfg8HgfVhMgtoZxGGihRxg5VRrUJk77Z7gMMhZ8
+         aQgs8RmAd5QahEleW7eUt9hZU/VHUU5/iZ4Ad2fAxM96A9VZJqjoQLv4mL1hqbPuNLvP
+         ByOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742227689; x=1742832489;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kFGsIS9GUasJNsr+AyNzSWrAC+Oat7GEq5DJqh+FPjE=;
-        b=aQf5mJz6RvXfddY0hkOgqr8otKR96kMMSfregjXO12JGFXNuqhnO6KjcKipz0caFTt
-         seOBkNnoSnQlJTUohEcYRbciAvLlUQmmtmvgwmaRzsONnDwPnr7Jlev3+1TkkxeLI98Z
-         hceO8sa4Na6VvxRRRMuo7QuZvgql1EI5eOMWrbHevnuU1ptUy/w4tmFaY/4ymgfzX39r
-         LwCC/4vHhniZQlrDNZQDtTkNkpdif3C8E5Eax5qdJoR6zRQeYVdVRSskN/JHTsiYD+Pv
-         V6/6wbf/v5ebP4Ou8kRTiHWFCP8+McbQAX/5WCBCcSK1CeSDYID9xHdU3vX9o8Xa7PtW
-         h1uQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUY1t+oIq1TQCo4q6xP9zkfdvQZ2r1vYnPWhlic+MR8/rnftTOs+nNPsa+kiC7g+eFGG3w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2l02yZHQE+EH3P+0dVOq6x4TnVjpMgRKYvxn7pgEeaeDaA4Z4
-	xsirUfawGzzfSuyA+7PW8rhDAkuWb94Xbq9gDxZydv2alEIUXlcYiPDA4e+AEa8/EVm1GdvD6YM
-	I/zRwls5/ysj+5ygkn9gKPlDqCpNMfXnkEbyAR8s7+oqCyPj1Ppk+qp4=
-X-Google-Smtp-Source: AGHT+IF+hruQfmOR7ShC4vLyikmFYkRsFWDD656xmQF7xQnZ3FiYAQLSOrsH0dqIoNXqWj4kGILXNWg7yAo=
-X-Received: from pjbli15.prod.google.com ([2002:a17:90b:48cf:b0:2ef:d136:17fc])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2e48:b0:2fa:4926:d18d
- with SMTP id 98e67ed59e1d1-3019f4f043cmr10445a91.13.1742227688937; Mon, 17
- Mar 2025 09:08:08 -0700 (PDT)
-Date: Mon, 17 Mar 2025 09:08:06 -0700
-In-Reply-To: <20250317-kvm_exit_fix-v1-1-aa5240c5dbd2@rivosinc.com>
+        d=1e100.net; s=20230601; t=1742227705; x=1742832505;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mzbTl5nkQKFBnmZRI2ae2XnEho9KAwozFu9d7AODj48=;
+        b=aPVe+sTiRFyolh7ui1efy+GsgBUMMCcxf2Jh18M/2sQnL6yK1CFFjo7Ss+I3nkNuSL
+         geNZTKaO8PVSdwt/AhQhD3CLqFG0rHRiiZEl6dUmmyTyh5OiJwH/mjD23uNgPLckBK3P
+         vytOtslDoxond/F5RZSr1bXQKPOMYn52O0kmviOwNHQOxK2neQABroDC8B7gvkcLyTxS
+         9UjW79WEmAd41RRkYza+Mh8BsccPHXLqHtQ0qmeKfY8y0DaeTjSK5QfAXSYsVmukcTwk
+         XF1h+97eeGc4KdAXT/w82M53y/5A8gNov3WEnSohKLyk+DnHiIe3/scp/JXPFBp13lfu
+         GVqw==
+X-Forwarded-Encrypted: i=1; AJvYcCXEn/BInDubEID0j/Ny+eEOiFdbAy8GK1295/t+/rQAoM5GaDtanhaaztm+9uYSOYdJT5A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywd3BKwNSHpPc34aQxm3XmltOKONdjFxYd2KZKY0iKPCjx0iI6s
+	6yBgMWbwoPdJjlT8rSe/FeHOpCVIHhp3N3fDxDKXoQjmXxGQ0MTQi5DN9gtdhVI=
+X-Gm-Gg: ASbGncsLx2+eCbxEwFFA1slUyR2kry7P2P+FXS0aIuSjPgiSnjwIedsvfdjlRfAU7Cy
+	KLE0yogc5cs3qLlwhbgby1HpGMgyygeTDpHvSHvoO9caBYEKoS/GpBbXFmUtIGrMhsHJVcsy7Xb
+	G62fVLS4YvxR0cxCuOboZ1MCyTV5W8NWi6WOfwkGJ9j4a+g6o4SPYwKK8OKVHVDTfQFKeVS9Rot
+	yLykVybKMU8mPqfuRznjBof7DUuxVjgb0iYEnILhNepEWRmnkPsCZ352DoOYLSdr/cCxQmMweKO
+	+Wz0QpnMuYZjI40s8d71+J1Z/EMpYgascgz69BJN6EQfKoepwAbq++W+IA==
+X-Google-Smtp-Source: AGHT+IF6KgkWQt4kB3+J3NVrqV33E3W11zYKhfEgS1LyTWV2K7KDq8lWeWA7BEGG4QAbFg5GBaiRXg==
+X-Received: by 2002:a05:6a20:cf8a:b0:1f5:80a3:b006 with SMTP id adf61e73a8af0-1f5c1201c3fmr19005019637.21.1742227704759;
+        Mon, 17 Mar 2025 09:08:24 -0700 (PDT)
+Received: from [192.168.1.67] ([38.39.164.180])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af56ea7c718sm7406992a12.62.2025.03.17.09.08.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Mar 2025 09:08:24 -0700 (PDT)
+Message-ID: <7430b4de-284b-46b9-b29d-f018d0639431@linaro.org>
+Date: Mon, 17 Mar 2025 09:08:23 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250317-kvm_exit_fix-v1-1-aa5240c5dbd2@rivosinc.com>
-Message-ID: <Z9hI5vEHngcKvvRa@google.com>
-Subject: Re: [PATCH] RISC-V: KVM: Teardown riscv specific bits after kvm_exit
-From: Sean Christopherson <seanjc@google.com>
-To: Atish Patra <atishp@rivosinc.com>
-Cc: Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Alexandre Ghiti <alex@ghiti.fr>, Andrew Jones <ajones@ventanamicro.com>, 
-	Anup Patel <apatel@ventanamicro.com>, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-ccpol: medium
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 05/17] exec/memory.h: make devend_memop "target
+ defines" agnostic
+Content-Language: en-US
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Yoshinori Sato <ysato@users.sourceforge.jp>,
+ Paul Durrant <paul@xen.org>, Peter Xu <peterx@redhat.com>,
+ alex.bennee@linaro.org, Harsh Prateek Bora <harshpb@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+ Nicholas Piggin <npiggin@gmail.com>,
+ Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-riscv@nongnu.org,
+ manos.pitsidianakis@linaro.org, Palmer Dabbelt <palmer@dabbelt.com>,
+ Anthony PERARD <anthony@xenproject.org>, kvm@vger.kernel.org,
+ xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Weiwei Li <liwei1518@gmail.com>
+References: <20250314173139.2122904-1-pierrick.bouvier@linaro.org>
+ <20250314173139.2122904-6-pierrick.bouvier@linaro.org>
+ <d5e2aa98-5b9c-4521-927f-86585b7b2cfa@linaro.org>
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+In-Reply-To: <d5e2aa98-5b9c-4521-927f-86585b7b2cfa@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-On Mon, Mar 17, 2025, Atish Patra wrote:
-> During a module removal, kvm_exit invokes arch specific disable
-> call which disables AIA. However, we invoke aia_exit before kvm_exit
-> resulting in the following warning. KVM kernel module can't be inserted
-> afterwards due to inconsistent state of IRQ.
-> 
-> [25469.031389] percpu IRQ 31 still enabled on CPU0!
-> [25469.031732] WARNING: CPU: 3 PID: 943 at kernel/irq/manage.c:2476 __free_percpu_irq+0xa2/0x150
-> [25469.031804] Modules linked in: kvm(-)
-> [25469.031848] CPU: 3 UID: 0 PID: 943 Comm: rmmod Not tainted 6.14.0-rc5-06947-g91c763118f47-dirty #2
-> [25469.031905] Hardware name: riscv-virtio,qemu (DT)
-> [25469.031928] epc : __free_percpu_irq+0xa2/0x150
-> [25469.031976]  ra : __free_percpu_irq+0xa2/0x150
-> [25469.032197] epc : ffffffff8007db1e ra : ffffffff8007db1e sp : ff2000000088bd50
-> [25469.032241]  gp : ffffffff8131cef8 tp : ff60000080b96400 t0 : ff2000000088baf8
-> [25469.032285]  t1 : fffffffffffffffc t2 : 5249207570637265 s0 : ff2000000088bd90
-> [25469.032329]  s1 : ff60000098b21080 a0 : 037d527a15eb4f00 a1 : 037d527a15eb4f00
-> [25469.032372]  a2 : 0000000000000023 a3 : 0000000000000001 a4 : ffffffff8122dbf8
-> [25469.032410]  a5 : 0000000000000fff a6 : 0000000000000000 a7 : ffffffff8122dc10
-> [25469.032448]  s2 : ff60000080c22eb0 s3 : 0000000200000022 s4 : 000000000000001f
-> [25469.032488]  s5 : ff60000080c22e00 s6 : ffffffff80c351c0 s7 : 0000000000000000
-> [25469.032582]  s8 : 0000000000000003 s9 : 000055556b7fb490 s10: 00007ffff0e12fa0
-> [25469.032621]  s11: 00007ffff0e13e9a t3 : ffffffff81354ac7 t4 : ffffffff81354ac7
-> [25469.032664]  t5 : ffffffff81354ac8 t6 : ffffffff81354ac7
-> [25469.032698] status: 0000000200000100 badaddr: ffffffff8007db1e cause: 0000000000000003
-> [25469.032738] [<ffffffff8007db1e>] __free_percpu_irq+0xa2/0x150
-> [25469.032797] [<ffffffff8007dbfc>] free_percpu_irq+0x30/0x5e
-> [25469.032856] [<ffffffff013a57dc>] kvm_riscv_aia_exit+0x40/0x42 [kvm]
-> [25469.033947] [<ffffffff013b4e82>] cleanup_module+0x10/0x32 [kvm]
-> [25469.035300] [<ffffffff8009b150>] __riscv_sys_delete_module+0x18e/0x1fc
-> [25469.035374] [<ffffffff8000c1ca>] syscall_handler+0x3a/0x46
-> [25469.035456] [<ffffffff809ec9a4>] do_trap_ecall_u+0x72/0x134
-> [25469.035536] [<ffffffff809f5e18>] handle_exception+0x148/0x156
-> 
-> Invoke aia_exit and other arch specific cleanup functions after kvm_exit
-> so that disable gets a chance to be called first before exit.
-> 
-> Fixes: 54e43320c2ba ("RISC-V: KVM: Initial skeletal support for AIA")
-> 
-> Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> ---
-
-FWIW,
-
-Reviewed-by: Sean Christopherson <seanjc@google.com>
-
->  arch/riscv/kvm/main.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
-> index 1fa8be5ee509..4b24705dc63a 100644
-> --- a/arch/riscv/kvm/main.c
-> +++ b/arch/riscv/kvm/main.c
-> @@ -172,8 +172,8 @@ module_init(riscv_kvm_init);
->  
->  static void __exit riscv_kvm_exit(void)
->  {
-> -	kvm_riscv_teardown();
-> -
->  	kvm_exit();
-> +
-> +	kvm_riscv_teardown();
-
-I wonder if there's a way we can guard against kvm_init()/kvm_exit() being called
-too early/late.  x86 had similar bugs for a very long time, e.g. see commit
-e32b120071ea ("KVM: VMX: Do _all_ initialization before exposing /dev/kvm to userspace").
-
-E.g. maybe we do something like create+destroy a VM at the end of kvm_init() and
-the beginning of kvm_exit()?  Not sure if that would work for kvm_exit(), but it
-should definitely be fine for kvm_init().
-
-It wouldn't prevent bugs, but maybe it would help detect them during development?
+T24gMy8xNy8yNSAwODo0OCwgUGhpbGlwcGUgTWF0aGlldS1EYXVkw6kgd3JvdGU6DQo+IE9u
+IDE0LzMvMjUgMTg6MzEsIFBpZXJyaWNrIEJvdXZpZXIgd3JvdGU6DQo+PiBXaWxsIGFsbG93
+IHRvIG1ha2Ugc3lzdGVtL21lbW9yeS5jIGNvbW1vbiBsYXRlci4NCj4+DQo+PiBSZXZpZXdl
+ZC1ieTogUmljaGFyZCBIZW5kZXJzb24gPHJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmc+
+DQo+PiBTaWduZWQtb2ZmLWJ5OiBQaWVycmljayBCb3V2aWVyIDxwaWVycmljay5ib3V2aWVy
+QGxpbmFyby5vcmc+DQo+PiAtLS0NCj4+ICAgIGluY2x1ZGUvZXhlYy9tZW1vcnkuaCB8IDE2
+ICsrKystLS0tLS0tLS0tLS0NCj4+ICAgIDEgZmlsZSBjaGFuZ2VkLCA0IGluc2VydGlvbnMo
+KyksIDEyIGRlbGV0aW9ucygtKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2V4ZWMv
+bWVtb3J5LmggYi9pbmNsdWRlL2V4ZWMvbWVtb3J5LmgNCj4+IGluZGV4IGRhMjFlOTE1MGI1
+Li4wNjkwMjFhYzNmZiAxMDA2NDQNCj4+IC0tLSBhL2luY2x1ZGUvZXhlYy9tZW1vcnkuaA0K
+Pj4gKysrIGIvaW5jbHVkZS9leGVjL21lbW9yeS5oDQo+PiBAQCAtMzEzOCwyNSArMzEzOCwx
+NyBAQCBhZGRyZXNzX3NwYWNlX3dyaXRlX2NhY2hlZChNZW1vcnlSZWdpb25DYWNoZSAqY2Fj
+aGUsIGh3YWRkciBhZGRyLA0KPj4gICAgTWVtVHhSZXN1bHQgYWRkcmVzc19zcGFjZV9zZXQo
+QWRkcmVzc1NwYWNlICphcywgaHdhZGRyIGFkZHIsDQo+PiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICB1aW50OF90IGMsIGh3YWRkciBsZW4sIE1lbVR4QXR0cnMgYXR0cnMp
+Ow0KPj4gICAgDQo+PiAtI2lmZGVmIENPTVBJTElOR19QRVJfVEFSR0VUDQo+PiAgICAvKiBl
+bnVtIGRldmljZV9lbmRpYW4gdG8gTWVtT3AuICAqLw0KPj4gICAgc3RhdGljIGlubGluZSBN
+ZW1PcCBkZXZlbmRfbWVtb3AoZW51bSBkZXZpY2VfZW5kaWFuIGVuZCkNCj4+ICAgIHsNCj4+
+ICAgICAgICBRRU1VX0JVSUxEX0JVR19PTihERVZJQ0VfSE9TVF9FTkRJQU4gIT0gREVWSUNF
+X0xJVFRMRV9FTkRJQU4gJiYNCj4+ICAgICAgICAgICAgICAgICAgICAgICAgICBERVZJQ0Vf
+SE9TVF9FTkRJQU4gIT0gREVWSUNFX0JJR19FTkRJQU4pOw0KPj4gICAgDQo+PiAtI2lmIEhP
+U1RfQklHX0VORElBTiAhPSBUQVJHRVRfQklHX0VORElBTg0KPj4gLSAgICAvKiBTd2FwIGlm
+IG5vbi1ob3N0IGVuZGlhbm5lc3Mgb3IgbmF0aXZlICh0YXJnZXQpIGVuZGlhbm5lc3MgKi8N
+Cj4+IC0gICAgcmV0dXJuIChlbmQgPT0gREVWSUNFX0hPU1RfRU5ESUFOKSA/IDAgOiBNT19C
+U1dBUDsNCj4+IC0jZWxzZQ0KPj4gLSAgICBjb25zdCBpbnQgbm9uX2hvc3RfZW5kaWFubmVz
+cyA9DQo+PiAtICAgICAgICBERVZJQ0VfTElUVExFX0VORElBTiBeIERFVklDRV9CSUdfRU5E
+SUFOIF4gREVWSUNFX0hPU1RfRU5ESUFOOw0KPj4gLQ0KPj4gLSAgICAvKiBJbiB0aGlzIGNh
+c2UsIG5hdGl2ZSAodGFyZ2V0KSBlbmRpYW5uZXNzIG5lZWRzIG5vIHN3YXAuICAqLw0KPj4g
+LSAgICByZXR1cm4gKGVuZCA9PSBub25faG9zdF9lbmRpYW5uZXNzKSA/IE1PX0JTV0FQIDog
+MDsNCj4+IC0jZW5kaWYNCj4+ICsgICAgYm9vbCBiaWdfZW5kaWFuID0gKGVuZCA9PSBERVZJ
+Q0VfTkFUSVZFX0VORElBTg0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgPyB0YXJnZXRf
+d29yZHNfYmlnZW5kaWFuKCkNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgIDogZW5kID09
+IERFVklDRV9CSUdfRU5ESUFOKTsNCj4gDQo+IFVubmVjZXNzYXJ5IHBhcmVudGhlc2lzPw0K
+PiANCg0KTm90IHN0cmljdGx5IG5lZWRlZCBpbmRlZWQuDQpDb2RlIGlzIHJlZmFjdG9yZWQg
+aW4gcGF0Y2ggMTQgYW55d2F5cy4NCg0KPj4gKyAgICByZXR1cm4gYmlnX2VuZGlhbiA/IE1P
+X0JFIDogTU9fTEU7DQo+PiAgICB9DQo+PiAtI2VuZGlmIC8qIENPTVBJTElOR19QRVJfVEFS
+R0VUICovDQo+PiAgICANCj4+ICAgIC8qDQo+PiAgICAgKiBJbmhpYml0IHRlY2hub2xvZ2ll
+cyB0aGF0IHJlcXVpcmUgZGlzY2FyZGluZyBvZiBwYWdlcyBpbiBSQU0gYmxvY2tzLCBlLmcu
+LA0KPiANCg0K
 
