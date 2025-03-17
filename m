@@ -1,243 +1,247 @@
-Return-Path: <kvm+bounces-41245-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41246-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 993B9A657EA
-	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 17:24:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB263A657FE
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 17:28:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81143179D5F
-	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 16:23:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE1571893684
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 16:28:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF58819D8A2;
-	Mon, 17 Mar 2025 16:23:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 357FA19E998;
+	Mon, 17 Mar 2025 16:27:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ShZPyNqr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w9SreRvH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFD4516F8F5
-	for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 16:23:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E445117A2E5
+	for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 16:27:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742228630; cv=none; b=Czfs21srUwgH2Q320g9Du2e43FN+kCm/g8bhSi4J9OaBjWpt2i1WgsI6S3auTJPN9x/sSPAo9fS3FHxZwmp9IRF3eEb/NaBOWGR/L9Lpxs8uK6cBUhtfAJguPu7NV49AS520xwDtCZ/r56MypMGfGrHF99cb5XKZDBK5+aIyk8o=
+	t=1742228876; cv=none; b=tqTWX9XqoZsZFu5Wiq15EdYvf6vY4SudiZEzvHZgh0O3tX5oI/5DrLmnz2/2VKGoZ1nt0YeaHFJnG85RUCEKZUtHxSBJczCbNIpR5lwtgGDqcIM7H1n7TEGO9fDFk19Pny7pHVHpdzsDhj9pT6cpt4LkdztMmWbNj7YbLGQHVus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742228630; c=relaxed/simple;
-	bh=m6vFdRioa4CBmeBIm8XkhpWztB3JJhDBiHXopcBmf4o=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=VRATMEYlGAZzFLmOXemROUA8F1bMLl8YPav1gAB+JUv3JTVRlqhGodMXgCk9xS/lLCxbS/yR1IC/G2AwhfBeMB/Kru9CN9mIJFskcnk8tCGsmZ5SI0kvuqQAKRrn7qxATViSjwxi3yKed4jge/tWdfftu27gSQHDVFkXbyhSKsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ShZPyNqr; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-390e3b3d3f4so2764697f8f.2
-        for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 09:23:48 -0700 (PDT)
+	s=arc-20240116; t=1742228876; c=relaxed/simple;
+	bh=LeEmEJJ9eGeq8YfwJZC1ZtfJPbwd3P8PaOZPDHYHIfE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=rJQjC5JgDicDPavphjn9OKlIb5dTUhs1gpl1xB58uh0WlTfqYDAVMiqZFFN9on39XfnSBXOn/LK0NfCnevEzZwkLjanso2bBBctQvpxuVJoGskGsyn4ZPaQ3rCL455KiBqznHCD9yBxXNP+oAhkdtvuGonqVIBdQvueDWYSvGh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=w9SreRvH; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ff55176edcso3131669a91.1
+        for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 09:27:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1742228627; x=1742833427; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=avfzUeOggfHVdiAQhDfUOVX9Fi+u2OCZ2GM9j7NAP70=;
-        b=ShZPyNqr/h8VsGh09yCfWFG0CDrZZW2e2338QLVMyzqkeU0Y7ggQld9YZuHWCHf43A
-         sfsJvZlBAF1kBfRccNuX2gWzl9Ngglz2lNMbAAEyfL1vAmoA3srbIcsdDvud3Z+kMZeT
-         4pu/uRYYddAjqkXfJJ/dYz9qmNWdMtF5siPZlWuLpUIHGIMJ5iYNsMf51xoMnPoITmbN
-         83lVmruWvIYDc/E0j6cJNZSrnChLy9NWZ/H39Agt53lziuhkm3a0O/hvECDTJZRIOoV0
-         QAojcpqt0XmHyQZ/5sXCou/Ha0Q5kZ5LW8eUmu2ixPtRcyWMdHYD7CSF03xD3SgWFr/d
-         uqpA==
+        d=google.com; s=20230601; t=1742228874; x=1742833674; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=W8d3f9bwZb24F92RREK1YCHX2o38Tp6QBPGEvO0sKaU=;
+        b=w9SreRvHsssw11edOVYLPDQSXWlOA64JhzuDZT0tn6l3wtlBqHu+sIIw2j+E2e41iv
+         sz3fOmVX3B4/WDmB3v4/ZBtnLOdIvic0pS0hDMmshIm7EO7khc7ks6Ypm3KqXJuSJpbr
+         TCTvdaBkSbMx0SNSvFkSWsP6TmgJdxa4V1/6xHc2F6GlmJy9WYGpJ3i8cfQ+P1RfjN8h
+         u/QSkVTzEEIWx8XweA+tQQgztTeQmGVWrmTReHUuVxIUBd3MXPNk0FLyRQmztRdPk8Sh
+         gUfOUKXraeZ0/eIMvEQtgULUh1K4CC85ygN3GlOWuiE4625omKI200fYdi8n87EIA8TV
+         5kYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742228627; x=1742833427;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=avfzUeOggfHVdiAQhDfUOVX9Fi+u2OCZ2GM9j7NAP70=;
-        b=RtIHI7fwYLfgl+97faW6a57+eyJDWhDG7aZIBZCPeN1Wr/t2Ahef4b7hwS90yCRxok
-         dz0R52qB8xtUfw9zJyrAFS+TSI8mqIXI4DYTGDupUMb5fG3SWOKFgpgKkhQO71CdzB8X
-         75mUaVURgBJ+6USM4cYboKwizZsGgpt17S5sS8B0K2X4Qp85/MBR/y96R9+aNAcxMwWO
-         2LsjfYLxY6MujPLWneSKQimzsqTrxbmOkzQP1ZYYYrHeqiKBmzLDYVyrWBAPmGbnUjVj
-         9BUWJv5tQc7QWAuRxENuIZcr3Nl5MMw9F/+JniS2LlqwpMtSTIAt+rioWZi5jreP1Son
-         8h6w==
-X-Forwarded-Encrypted: i=1; AJvYcCV2qqkzEqTKjFtXz0K/MI3ELBaPF+4shvtTb1t46rXRAzA6vVWaP6o83jcFFLnzlmwgzmY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQFXfDmPhsfNpi/ev/eJpXrfgCUBtA6fvXoXXKH9AzIx97p/QA
-	TETdCJ8gvsReO7FfTnGp6ziQYF1ggxNfprSfOBu45ki6na7W7toOhin9rB8PQuE=
-X-Gm-Gg: ASbGncthELauf/Y/1HUg5BbhL4VpOWsILrWNgPKZF/JfooodJK9Adr1UsEC8kBm8RnL
-	V8yZORZCZAooETvrBQmc/QY9daju4Ov6CDDHtMq47UYxAWXrClpC14YkOdUnEHjJZAntMcCC5cz
-	qkU5kQyk2zaLMEwRbor/UcfGtwsT48YOdYTc34KgzqBH3qhdh+9l7oVRn4toLsd7uI3Kfjtj/Yu
-	0v6qUHZcB5bFkdxLbNaNvJl7zd4phG0VBurwFjl1Xyj9GSjGKaOXjGLRgDyFYRILrrgHGyxe6NT
-	fqB+iUOyifbqKfMYO7XNNZKybFB0NN/2g9VUqg3+3n1HaJWCIb34LrqE4OFCqB9aisrBIKNrHxP
-	/Kr7zfwFaiw==
-X-Google-Smtp-Source: AGHT+IEamG3WdlxD2LrQxwdmg89i4SPc4GJaByF7u76Lrx89qJx15nBJz8iHq3PU1coEHuSB+Sy0JA==
-X-Received: by 2002:a05:6000:1ac6:b0:391:48f7:bd8a with SMTP id ffacd0b85a97d-3996b467819mr185608f8f.30.1742228627083;
-        Mon, 17 Mar 2025 09:23:47 -0700 (PDT)
-Received: from [192.168.1.74] (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395c83b6b2bsm15083896f8f.26.2025.03.17.09.23.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Mar 2025 09:23:46 -0700 (PDT)
-Message-ID: <d93f6514-6d42-467d-826b-c95c6efd66b1@linaro.org>
-Date: Mon, 17 Mar 2025 17:23:45 +0100
+        d=1e100.net; s=20230601; t=1742228874; x=1742833674;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=W8d3f9bwZb24F92RREK1YCHX2o38Tp6QBPGEvO0sKaU=;
+        b=TnRKCCU6sR4jxCWZApwSweH3GvoYhGocDBEpS+0S61MaLiVGsmTZhCp5G618GeiAXD
+         QGMqXaVjzc1T0ITAFRAqpIOota2EY6EA7HqA+4nvnTq3gvCIzReYDptdrkaRuH3ieipC
+         bUwwhaxmbM58VQeWtZ+1HlXt/pVuW5vjoLMfjUnnvWdJ5KrSm6Pg96dD4DeNfap+LcZO
+         43ufvinnfIfPCPMQnHnAvJOqlusUO1wE890yLpWJVoZ7QQDkF2oWcKzS8cs0KF4mkA3r
+         /ty97zBGWGDeVdKF6X1jSUwk0LD2b+KyJzoNSqz8bFDoDZNSz8bn2js8PFrviKp6Czyr
+         9JeA==
+X-Gm-Message-State: AOJu0Yz4hvNKb08cXb+qQ5s9LoFWjj7xFO2izfn5FZwhH7mhlO3gcrUb
+	g8972+UlCvkMlES51A1kmhGQioeTZsunR/AFGY9KG4o9AQNSNCyas4sO/fhSNGp/nKMEJxuunLq
+	EALb1nR0sAuhxD3u92H3uDA==
+X-Google-Smtp-Source: AGHT+IG4WirUOV3+r5B2lb31NOl3SYbtGGIlb7cjVN18KcQU2Z2EqVpQ/NTkkFp10CSOZgMn9KFkZaVD4S3aseWUuQ==
+X-Received: from pjn6.prod.google.com ([2002:a17:90b:5706:b0:2f9:e05f:187f])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:2e44:b0:2ff:502e:62d4 with SMTP id 98e67ed59e1d1-30151d5bcdamr14234779a91.32.1742228874055;
+ Mon, 17 Mar 2025 09:27:54 -0700 (PDT)
+Date: Mon, 17 Mar 2025 16:27:52 +0000
+In-Reply-To: <fe2955d4-c0a2-411a-9e50-a25cc15c75dd@suse.cz>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 11/17] exec/ram_addr: call xen_hvm_modified_memory only
- if xen is enabled
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-To: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, Yoshinori Sato <ysato@users.sourceforge.jp>,
- Paul Durrant <paul@xen.org>, Peter Xu <peterx@redhat.com>,
- alex.bennee@linaro.org, Harsh Prateek Bora <harshpb@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
- Nicholas Piggin <npiggin@gmail.com>,
- Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-riscv@nongnu.org,
- manos.pitsidianakis@linaro.org, Palmer Dabbelt <palmer@dabbelt.com>,
- Anthony PERARD <anthony@xenproject.org>, kvm@vger.kernel.org,
- xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Weiwei Li <liwei1518@gmail.com>
-References: <20250314173139.2122904-1-pierrick.bouvier@linaro.org>
- <20250314173139.2122904-12-pierrick.bouvier@linaro.org>
- <ad7cdcaf-46d6-460f-8593-a9b74c600784@linaro.org>
- <edc3bc03-b34f-4bed-be0d-b0fb776a115b@linaro.org>
- <9c55662e-0c45-4bb6-83bf-54b131e30f48@linaro.org>
-Content-Language: en-US
-In-Reply-To: <9c55662e-0c45-4bb6-83bf-54b131e30f48@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <diqzy0x9rqf4.fsf@ackerleytng-ctop.c.googlers.com> <fe2955d4-c0a2-411a-9e50-a25cc15c75dd@suse.cz>
+Message-ID: <diqzmsdjk4fr.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [PATCH v6 03/10] KVM: guest_memfd: Handle kvm_gmem_handle_folio_put()
+ for KVM as a module
+From: Ackerley Tng <ackerleytng@google.com>
+To: Vlastimil Babka <vbabka@suse.cz>, Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vannapurve@google.com, 
+	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, 
+	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 17/3/25 17:22, Philippe Mathieu-Daudé wrote:
-> On 17/3/25 17:07, Pierrick Bouvier wrote:
->> On 3/17/25 08:50, Philippe Mathieu-Daudé wrote:
->>> On 14/3/25 18:31, Pierrick Bouvier wrote:
->>>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->>>> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
->>>> ---
->>>>    include/exec/ram_addr.h | 8 ++++++--
->>>>    1 file changed, 6 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
->>>> index f5d574261a3..92e8708af76 100644
->>>> --- a/include/exec/ram_addr.h
->>>> +++ b/include/exec/ram_addr.h
->>>> @@ -339,7 +339,9 @@ static inline void 
->>>> cpu_physical_memory_set_dirty_range(ram_addr_t start,
->>>>            }
->>>>        }
->>>> -    xen_hvm_modified_memory(start, length);
->>>> +    if (xen_enabled()) {
->>>> +        xen_hvm_modified_memory(start, length);
+Vlastimil Babka <vbabka@suse.cz> writes:
+
+> On 3/13/25 14:49, Ackerley Tng wrote:
+>> Fuad Tabba <tabba@google.com> writes:
+>> 
+>>> In some architectures, KVM could be defined as a module. If there is a
+>>> pending folio_put() while KVM is unloaded, the system could crash. By
+>>> having a helper check for that and call the function only if it's
+>>> available, we are able to handle that case more gracefully.
 >>>
->>> Please remove the stub altogether.
+>>> Signed-off-by: Fuad Tabba <tabba@google.com>
 >>>
->>
->> We can eventually ifdef this code under CONFIG_XEN, but it may still 
->> be available or not. The matching stub for xen_hvm_modified_memory() 
->> will assert in case it is reached.
->>
->> Which change would you expect precisely?
-> 
-> -- >8 --
-> diff --git a/include/system/xen-mapcache.h b/include/system/xen-mapcache.h
-> index b68f196ddd5..bb454a7c96c 100644
-> --- a/include/system/xen-mapcache.h
-> +++ b/include/system/xen-mapcache.h
-> @@ -14,8 +14,6 @@
-> 
->   typedef hwaddr (*phys_offset_to_gaddr_t)(hwaddr phys_offset,
->                                            ram_addr_t size);
-> -#ifdef CONFIG_XEN_IS_POSSIBLE
-> -
->   void xen_map_cache_init(phys_offset_to_gaddr_t f,
->                           void *opaque);
->   uint8_t *xen_map_cache(MemoryRegion *mr, hwaddr phys_addr, hwaddr size,
-> @@ -28,44 +26,5 @@ void xen_invalidate_map_cache(void);
->   uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr,
->                                    hwaddr new_phys_addr,
->                                    hwaddr size);
-> -#else
-> -
-> -static inline void xen_map_cache_init(phys_offset_to_gaddr_t f,
-> -                                      void *opaque)
-> -{
-> -}
-> -
-> -static inline uint8_t *xen_map_cache(MemoryRegion *mr,
-> -                                     hwaddr phys_addr,
-> -                                     hwaddr size,
-> -                                     ram_addr_t ram_addr_offset,
-> -                                     uint8_t lock,
-> -                                     bool dma,
-> -                                     bool is_write)
-> -{
-> -    abort();
-> -}
-> -
-> -static inline ram_addr_t xen_ram_addr_from_mapcache(void *ptr)
-> -{
-> -    abort();
-> -}
-> -
-> -static inline void xen_invalidate_map_cache_entry(uint8_t *buffer)
-> -{
-> -}
-> -
-> -static inline void xen_invalidate_map_cache(void)
-> -{
-> -}
-> -
-> -static inline uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr,
-> -                                               hwaddr new_phys_addr,
-> -                                               hwaddr size)
-> -{
-> -    abort();
-> -}
-> -
-> -#endif
-> 
->   #endif /* XEN_MAPCACHE_H */
+>>> ---
+>>>
+>>> This patch could be squashed with the previous one of the maintainers
+>>> think it would be better.
+>>> ---
+>>>  include/linux/kvm_host.h |  5 +----
+>>>  mm/swap.c                | 20 +++++++++++++++++++-
+>>>  virt/kvm/guest_memfd.c   |  8 ++++++++
+>>>  3 files changed, 28 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+>>> index 7788e3625f6d..3ad0719bfc4f 100644
+>>> --- a/include/linux/kvm_host.h
+>>> +++ b/include/linux/kvm_host.h
+>>> @@ -2572,10 +2572,7 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+>>>  #endif
+>>>  
+>>>  #ifdef CONFIG_KVM_GMEM_SHARED_MEM
+>>> -static inline void kvm_gmem_handle_folio_put(struct folio *folio)
+>>> -{
+>>> -	WARN_ONCE(1, "A placeholder that shouldn't trigger. Work in progress.");
+>>> -}
+>>> +void kvm_gmem_handle_folio_put(struct folio *folio);
+>>>  #endif
+>>>  
+>>>  #endif
+>>> diff --git a/mm/swap.c b/mm/swap.c
+>>> index 241880a46358..27dfd75536c8 100644
+>>> --- a/mm/swap.c
+>>> +++ b/mm/swap.c
+>>> @@ -98,6 +98,24 @@ static void page_cache_release(struct folio *folio)
+>>>  		unlock_page_lruvec_irqrestore(lruvec, flags);
+>>>  }
+>>>  
+>>> +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+>>> +static void gmem_folio_put(struct folio *folio)
+>>> +{
+>>> +#if IS_MODULE(CONFIG_KVM)
+>>> +	void (*fn)(struct folio *folio);
+>>> +
+>>> +	fn = symbol_get(kvm_gmem_handle_folio_put);
+>>> +	if (WARN_ON_ONCE(!fn))
+>>> +		return;
+>>> +
+>>> +	fn(folio);
+>>> +	symbol_put(kvm_gmem_handle_folio_put);
+>>> +#else
+>>> +	kvm_gmem_handle_folio_put(folio);
+>>> +#endif
+>>> +}
+>>> +#endif
+>
+> Yeah, this is not great. The vfio code isn't setting a good example to follow :(
+>
+>> Sorry about the premature sending earlier!
+>> 
+>> I was thinking about having a static function pointer in mm/swap.c that
+>> will be filled in when KVM is loaded and cleared when KVM is unloaded.
+>> 
+>> One benefit I see is that it'll avoid the lookup that symbol_get() does
+>> on every folio_put(), but some other pinning on KVM would have to be
+>> done to prevent KVM from being unloaded in the middle of
+>> kvm_gmem_handle_folio_put() call.
+>
+> Isn't there some "natural" dependency between things such that at the point
+> the KVM module is able to unload itself, no guest_memfd areas should be
+> existing anymore at that point, and thus also not any pages that would use
+> this callback should exist? In that case it would mean there's a memory leak
+> if that happens so while we might be trying to avoid calling a function that
+> was unleaded, we don't need to try has hard as symbol_get()/put() on every
+> invocation, but a racy check would be good enough?
+> Or would such a late folio_put() be legitimate to happen because some
+> short-lived folio_get() from e.g. a pfn scanner could prolong the page's
+> lifetime beyond the KVM module? I'd hope that since you want to make pages
+> PGTY_guestmem only in certain points of their lifetime, then maybe this
+> should not be possible to happen?
+>
 
-(sorry, the include/system/xen-mapcache.h change is for the next patch)
+IIUC the last refcount on a guest_memfd folio may not be held by
+guest_memfd if the folios is already truncated from guest_memfd. The
+inode could already be closed. If the inode is closed then the KVM is
+free to be unloaded.
 
-> diff --git a/include/system/xen.h b/include/system/xen.h
-> index 990c19a8ef0..04fe30cca50 100644
-> --- a/include/system/xen.h
-> +++ b/include/system/xen.h
-> @@ -30,25 +30,16 @@ extern bool xen_allowed;
-> 
->   #define xen_enabled()           (xen_allowed)
-> 
-> -void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length);
-> -void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size,
-> -                   struct MemoryRegion *mr, Error **errp);
-> -
->   #else /* !CONFIG_XEN_IS_POSSIBLE */
-> 
->   #define xen_enabled() 0
-> -static inline void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t 
-> length)
-> -{
-> -    /* nothing */
-> -}
-> -static inline void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size,
-> -                                 MemoryRegion *mr, Error **errp)
-> -{
-> -    g_assert_not_reached();
-> -}
-> 
->   #endif /* CONFIG_XEN_IS_POSSIBLE */
-> 
-> +void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length);
-> +void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size,
-> +                   MemoryRegion *mr, Error **errp);
-> +
->   bool xen_mr_is_memory(MemoryRegion *mr);
->   bool xen_mr_is_grants(MemoryRegion *mr);
->   #endif
-> ---
+This means that someone could hold on to the last refcount, unload KVM,
+and then drop the last refcount and have the folio_put() call a
+non-existent callback.
 
+If we first check that folio->mapping != NULL and then do
+kvm_gmem_handle_folio_put(), then I think what you suggested would work,
+since folio->mapping is only NULL when the folio has been disassociated
+from the inode.
+
+gmem_folio_put() should probably end with
+
+if (folio_ref_count(folio) == 0)
+	__folio_put(folio)
+
+so that if kvm_gmem_handle_folio_put() is done with whatever it needs to
+(e.g. complete the conversion) gmem_folio_put() will free the folio.
+
+>> Do you/anyone else see pros/cons either way?
+>> 
+>>> +
+>>>  static void free_typed_folio(struct folio *folio)
+>>>  {
+>>>  	switch (folio_get_type(folio)) {
+>>> @@ -108,7 +126,7 @@ static void free_typed_folio(struct folio *folio)
+>>>  #endif
+>>>  #ifdef CONFIG_KVM_GMEM_SHARED_MEM
+>>>  	case PGTY_guestmem:
+>>> -		kvm_gmem_handle_folio_put(folio);
+>>> +		gmem_folio_put(folio);
+>>>  		return;
+>>>  #endif
+>>>  	default:
+>>> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+>>> index b2aa6bf24d3a..5fc414becae5 100644
+>>> --- a/virt/kvm/guest_memfd.c
+>>> +++ b/virt/kvm/guest_memfd.c
+>>> @@ -13,6 +13,14 @@ struct kvm_gmem {
+>>>  	struct list_head entry;
+>>>  };
+>>>  
+>>> +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+>>> +void kvm_gmem_handle_folio_put(struct folio *folio)
+>>> +{
+>>> +	WARN_ONCE(1, "A placeholder that shouldn't trigger. Work in progress.");
+>>> +}
+>>> +EXPORT_SYMBOL_GPL(kvm_gmem_handle_folio_put);
+>>> +#endif /* CONFIG_KVM_GMEM_SHARED_MEM */
+>>> +
+>>>  /**
+>>>   * folio_file_pfn - like folio_file_page, but return a pfn.
+>>>   * @folio: The folio which contains this index.
 
