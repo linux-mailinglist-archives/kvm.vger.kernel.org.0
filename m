@@ -1,217 +1,341 @@
-Return-Path: <kvm+bounces-41163-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41165-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97C57A63F8A
-	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 06:24:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32DA6A640C6
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 07:08:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1A6B16E279
-	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 05:24:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F0953A4BEE
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 06:08:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E62D219315;
-	Mon, 17 Mar 2025 05:23:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A05021931B;
+	Mon, 17 Mar 2025 06:08:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="P6pG6ksN"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="ZXnix3xq"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2083.outbound.protection.outlook.com [40.107.244.83])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DA012192FE
-	for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 05:23:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.83
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742189017; cv=fail; b=XrvcFI72+u2al/GsQEid+gcri19GteXRYlpSdYEUJ4frCaiwSix7hxsGHa7RR6frwnpz7kfftNnNa/Q1SO0nY/k4K1Ze5FzCXDpkLpfl0jHky2uyJziWGlYkAl7x/iBfz5hmb1SKOH+Yr55qpS3ujedzD44HPCbSOjNH2HlAS4o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742189017; c=relaxed/simple;
-	bh=L+j0mICvho2cH89udWEvNx3OeDCj4z0Iys34gCGJugc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JCNZ+at7Vyxwck20ZX58EIJ/2ATGUiIAb9vrjBru32vFktxeeUkusB4Zo6rFW6+oOv4yz+qbF7vXoBN0VlHj5puzFOgRVzpHAlP2W03ge4BVHdIaKIQqz+ejM6qHhNLR/ZDP+L1cdpac+8BPqInHlujvPNpLFaSu5jjxCuA7B7g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=P6pG6ksN; arc=fail smtp.client-ip=40.107.244.83
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XOOHI53MfMNAzhxplbSmrbCq3cALcowNaQhsZGmtKZWnnGmEa9fn17dIZgowEvTIi8bpbPW0Hf1h4/dkDHDC/Yt1hWThCFWFUtWwuixblX/JARDA0KOJQSsMWUnbn9EV6mevPn9HIqcBrsxffeXh5pOPV4l9DyDq3ytLH8n3YzY2qZZ65xxNUuekYEyfrl7CXtVM3AQ1EgzEa7EItorVOOKHBr3zl3BQkZYMvAM+PLtlaVoA9sg0y5Gd4EEvMu6gvEw7LWl5jlNssXmvJh5PF9peMeQTmIwHaxKNjgcL3KuMza9tsNgVLV3cO1Ady7jQZ7JXGzuwB14O6SyOg6Zhyw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UvN5ncm/qCjwOIIdRNldezf/Pfmlh/JE2XxX5tGiZVI=;
- b=SGYfd2O2nwrc/EoAm9/OmtVlDdHEY+2UeYtmMXATCTYeAM/urbTI6P0Uwc7N2JYvr6t2g2/xMvHILuAnDHMC3bxgzvYEz+LRRfFcPuSgRDcLNFjvlb31br1lwwH0B3M5JXadUiZgi7Md95wW2gJ2/WDhq6K4Mh7QZ19UoUos2XpQyVUP0Jlipu9pUuVBlXcavjOtTD5a/pmUfLPeAl/+T/yHLwSMIJZz4oSx0Q2RN41mw2AbBe5dI/2V/AeZNGUMemyshNgqYbUYopDyvsvqXcuOp68BU9sETWzYRuyOBoKMMG4PS809JJCHdxsYc1J7FGcz/kXrPUzrQTOQd21JQQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UvN5ncm/qCjwOIIdRNldezf/Pfmlh/JE2XxX5tGiZVI=;
- b=P6pG6ksNCoDWv1mJyL+1GoLz60EMvFQwRe7s+k3bmq/EddbiDI05W07H3CCJuMbR6RfD6VVJF59riM0HAzMvZe3iyX3Ef9X2SgZjJkyPMYRRoKZ+rZCFUkznaMbXZ4kN2WM3CNQ+SOxRsyp+1mNaGhGSsezNCsrPNjGelBILebA=
-Received: from BL1PR13CA0282.namprd13.prod.outlook.com (2603:10b6:208:2bc::17)
- by CH1PPF0B4A257F6.namprd12.prod.outlook.com (2603:10b6:61f:fc00::605) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.27; Mon, 17 Mar
- 2025 05:23:33 +0000
-Received: from BN1PEPF00006002.namprd05.prod.outlook.com
- (2603:10b6:208:2bc:cafe::62) by BL1PR13CA0282.outlook.office365.com
- (2603:10b6:208:2bc::17) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8534.30 via Frontend Transport; Mon,
- 17 Mar 2025 05:23:33 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN1PEPF00006002.mail.protection.outlook.com (10.167.243.234) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8534.20 via Frontend Transport; Mon, 17 Mar 2025 05:23:33 +0000
-Received: from gomati.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 17 Mar
- 2025 00:23:30 -0500
-From: Nikunj A Dadhania <nikunj@amd.com>
-To: <seanjc@google.com>, <pbonzini@redhat.com>, <kvm@vger.kernel.org>
-CC: <thomas.lendacky@amd.com>, <santosh.shukla@amd.com>, <bp@alien8.de>,
-	<nikunj@amd.com>, <isaku.yamahata@intel.com>
-Subject: [PATCH v5 4/4] KVM: SVM: Enable Secure TSC for SNP guests
-Date: Mon, 17 Mar 2025 10:53:08 +0530
-Message-ID: <20250317052308.498244-5-nikunj@amd.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250317052308.498244-1-nikunj@amd.com>
-References: <20250317052308.498244-1-nikunj@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B795A146A60
+	for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 06:08:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742191712; cv=none; b=XvcOStpmJz8ukpbPvuyAy/tzfSZQ/9Ux04/W8iI2uhDXpeQoFEmu2DUuf5VNvHallG5GZ+y2KqKRRhi8taLTyS6pmVnaJbsuhfItMFMrJ8M15dvZAkaDn+dXShBv5dElVV+I8oYjIqIE7QiGgCVTzzRxwmdPube/AgmBFlot3d0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742191712; c=relaxed/simple;
+	bh=IvNJR1CXhaIBt4hzQw1toiWztLSbiCGrla6GsFJVXKI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pJm/bGPiKGFtBolyhv0ni8hOYEXEWti7uK2dlork1SYhLZRahKM6TjjaiSd5Isk+C30phlZkE+IzC+4G0BwuMCSqXnAHY0gixeAWmxHbpuSl9HIHciZ1Y8fdGaxofbHmNsSnousCVaFnrjp1Hj+pLxxroDAhzvLCx3Q9LbXzkhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=ZXnix3xq; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-22438c356c8so67153585ad.1
+        for <kvm@vger.kernel.org>; Sun, 16 Mar 2025 23:08:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1742191710; x=1742796510; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wBWUop9hBNztgWdtuzQCjGkKpdUlBMvpymPGtusXugE=;
+        b=ZXnix3xqLhmLeuRaXUeLmZJ1HtEXgmIiQLNhkODhnfhql5OTtS3BXKoWljn8bhl21j
+         LuMqVa6jkA/HEXBI37J5RBF1Jfz9oCMZXs/Ex5Lxjpeozu3Qet5vVCXFVcukU98abp01
+         ouDrDEEeWbex/yMSFsVfMNWDaSNsD2xhWqgfsztZkqLRauXyRci7w+rZixrvSrhGlOLt
+         FRXJp7BnMiidmf/GeAiXycCYrWv0BgIsZp8ECPKnDlqsl3DG4gem6+dKhrEVMUL0XFeA
+         zYV1NnCdNu4pZvBazpNJQ9Eqwws2HTpepQE0CLk74R7HC+M9tLe8jyNwhuZcbEoDIgUq
+         zNZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742191710; x=1742796510;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wBWUop9hBNztgWdtuzQCjGkKpdUlBMvpymPGtusXugE=;
+        b=P4/EKdIDBeP9KhlbVf7isB8LS0UG+LIrHU6DH6J8cI3J4HRGXwhiK90aYQArEzVdlO
+         9L5IRwadFkmCecLb2FDM2Y9Z6esuA43zm9j8u16X5Mp6caGU8GnGlx4AYG0Xzk+c0Daz
+         SqbevHHHTCOaZ0PytHqFUZ7aYh+MuqVhfp4JSUIq2dFdHruNET5bA0FLZ/eN3sKEjADg
+         ngnWVmAeTSWt4z2hkGs70MXQ2Vwm0dPbZRrns4GFzl0tlkkL1mSm5BAY75f0sdkGOD3e
+         r4wUpEvL7/03Lzi02c9KuGJfLWJwPrtJ3vJoaPFCklIitIuOVtbwwdhTdbyqluHoWWP6
+         LprA==
+X-Forwarded-Encrypted: i=1; AJvYcCU0m230vzQWcBnEu26Mg5lahE05tTR5qYyDsYgRbrtS164caVL/GYxi7F+6gUrdNTt7j/c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxl8Lhjih54YoXDwSUlhtK5vZY1zWNpfzUbY64pkSGXKG4mkeK+
+	AYPwEOy+V0K9iK5z5uJJeVmORfMBBZBBVvJAzIHM73HCJkhFsRj3aWntMLHijUo=
+X-Gm-Gg: ASbGncuz/1bW5qA+8bjEJWl+S0Z71EJhvgT8h9QuEk4udmAAfQKLKxfnNtfMApKFywD
+	Bc5ZKmfgDZabgF2TKSSejEBJ46Z/jWU89LmrJHC0wC/VpWD60jhh0pH/OZewc8kOLQDrH6cJ3hQ
+	Q3/9MZDXN5S5kjvUCeg8p6WZj2LHxqsql9KadGQCGs3ufAVfq074J9uMasNBA6fMXjwKvaVGYkH
+	oWdfRs+7m8/ulCIZtDXZq6c3/Ye5gd6t+Lg6MSfxgMe5cb9zWdIhP5lNlX12N3Ahoxu86m+owUR
+	nIfsp3I1SPqA1aK++xy+21ZdDs9zAI1KUrkqzdG/YI2MV58N7gahftpkCw==
+X-Google-Smtp-Source: AGHT+IGoQLPthZhSthgnNJ0I5Yj2jn7eld4kAuLi8jvyiFCGmV6WYXwPCIBZuiv2agvX1E5gEnyKQg==
+X-Received: by 2002:a17:903:18e:b0:223:325c:89de with SMTP id d9443c01a7336-225e0a5282bmr127005685ad.1.1742191709771;
+        Sun, 16 Mar 2025 23:08:29 -0700 (PDT)
+Received: from [157.82.207.107] ([157.82.207.107])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-225c68a6dfesm67327865ad.71.2025.03.16.23.08.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 16 Mar 2025 23:08:29 -0700 (PDT)
+Message-ID: <cf4bf799-3a6e-44dc-96ca-fa8d616e6ba7@daynix.com>
+Date: Mon, 17 Mar 2025 15:08:24 +0900
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 1/6] virtio_net: Add functions for hashing
+To: Jason Wang <jasowang@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
+ Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Andrew Melnychenko <andrew@daynix.com>,
+ Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
+ Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>
+References: <20250307-rss-v9-0-df76624025eb@daynix.com>
+ <20250307-rss-v9-1-df76624025eb@daynix.com>
+ <CACGkMEvxkwe9OJRZPb7zz-sRfVpeuoYSz4c2kh9_jjtGbkb_qA@mail.gmail.com>
+ <2e27f18b-1fc9-433d-92e9-8b2e3b1b65dc@daynix.com>
+ <CACGkMEssbh0-BKJq7M=T1z9seMu==4OJzmDPU+HEx4OA95E3ng@mail.gmail.com>
+ <26592324-c1f0-4ff5-918b-7a9366c4cf71@daynix.com>
+ <CACGkMEtapdjiXCPd1JZUF8JP3F1Ks-AtrbFBNGtORYnXPPrBEQ@mail.gmail.com>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <CACGkMEtapdjiXCPd1JZUF8JP3F1Ks-AtrbFBNGtORYnXPPrBEQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN1PEPF00006002:EE_|CH1PPF0B4A257F6:EE_
-X-MS-Office365-Filtering-Correlation-Id: 60249786-cc8f-4cfc-fb73-08dd6513dc7b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?s8G+QPx9bH5bmS07BI2WHrkvZuptnMYKicHzQGg7sKIMfHaGfh5+UZQ56Vlb?=
- =?us-ascii?Q?IjAm5Nez3HgLU40B0kL94AXiZ+ehgr70F5aCKZzuvwCOPxQUWusH67blwuMU?=
- =?us-ascii?Q?pFjzmqM5e0q7DDztlikfacmfS6DtLcj8w6RBWw1UaHzFxe7m+O5ygPL/XwcT?=
- =?us-ascii?Q?4vrvPr/4Fs5cKXTCbFCVq8E1BxLxNvZ0T9yNLp2Cnxgw0DHEbPCGZaqATcUY?=
- =?us-ascii?Q?rR0R63imwZnFhH4HBH2ZhGk9qcn8Zv3aMi40MqLNckeBAkZVS0HCUjc1kF4/?=
- =?us-ascii?Q?6utuD4HIQT7TtsxWJDF66sm2RYfsSpFzIm2exDDVxtxAhrgfxhI3oXJtaCcW?=
- =?us-ascii?Q?93gxH1VwcC4VwTFaX+U4TW/Y3HVU+OnoL3uxeUHPfKtPptghu0UMEmaSeCUE?=
- =?us-ascii?Q?JAZRyQv9mvANqdfe+eie+l2mdeuIe/4WNweRC4acIjo6cX+mPVTItIbSoBxy?=
- =?us-ascii?Q?gfvA16JFEp0E9WJHk6W++Xhamo7j/FDA/iZR7c/uPEJ0oCByYVCDJH6btmYV?=
- =?us-ascii?Q?kgtALKNiE99HdjKZ8Bt7/rIQGAiPgdSETPIYfKU6b2Rn3ObDrugEInC1xO+T?=
- =?us-ascii?Q?BX41vMzVrkI3Wt3mCRuF1ukxnxtW/bIQ39GE8q77rtxxUMtLBTyvV3bKcGun?=
- =?us-ascii?Q?KAolNfQTQWOIr10IDSK6ZK4CRN3I669byM4Iv8oU2gvYGh0yUFtdfY5Ai7J0?=
- =?us-ascii?Q?OlOOvMXwxfAMOMHyl9Zwl+kmx8z/2+bA1kF6N3bIHFzEHNUr2b8ZabuD0ObX?=
- =?us-ascii?Q?0yEcB6lVllFnpiVJwkYsQjKPRBNsuI7IDYbFfK4aVfcxhi1Ymm+U1qeebH8P?=
- =?us-ascii?Q?xaz8+hRyNPBNPX/BylYA33EqYmmB3VufgYuRxmh555+fA1sFAfFWnEJYyG0O?=
- =?us-ascii?Q?dIvsEuzIpbKi0cSu0EIZzV10uc2FW8grJC7nMgqTy+auuRTKDZcLwZSqjML1?=
- =?us-ascii?Q?GJwSiwjjM0mQopf8kzCQdytLlvELB6hI0jDNe5ZoyUj45AmeJnwj9ABJ9QH4?=
- =?us-ascii?Q?WK/uS9YH5Punp/re8C2RWk+3tkEA1gaDZBmEv1XvojPaI5zPQsBLX4fWQCeX?=
- =?us-ascii?Q?PgCzHy51ZEjnVpBRhcdtqfebld7mWhU1cUF0sN+1viQ/wYi8AV+DgMrnrS9f?=
- =?us-ascii?Q?T6HzNV7S8+BT0fLG0EKaMFtf2N6AnzXv3ic1FabNdnYobd9pPFBQTxneTNIQ?=
- =?us-ascii?Q?sRERtz4ZFbDP9qmVHhsaPYyONGn8Kzjb2j4uvhPBwBLt8ery721YWifwJwy5?=
- =?us-ascii?Q?Hc8z2ampWiOJZYPiTrhzrKUMo/oF8Lai/Otez9p+ptsDZj5pz7IXjQ4pdwQQ?=
- =?us-ascii?Q?/UsGLuS2qxrDvhuTZ3kGOYBQp3RgISz44T1hIFwEz2q78IfN0fOzyw504lsk?=
- =?us-ascii?Q?tm0xfEKmbcd+Z9WwkqDPEEyU6mkv/pOf1gTrfHUwM3BYWMR97Wt2beLg2PEs?=
- =?us-ascii?Q?NCsnc+kFCGEClPyWqMVfYwG7UUHfVGi+FCCaHRcKz+cAOb/VgcZLC0C+CQXY?=
- =?us-ascii?Q?SbfprjYEz8PA+m4=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2025 05:23:33.3906
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 60249786-cc8f-4cfc-fb73-08dd6513dc7b
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN1PEPF00006002.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH1PPF0B4A257F6
 
-From: Ketan Chaturvedi <Ketan.Chaturvedi@amd.com>
+On 2025/03/17 10:24, Jason Wang wrote:
+> On Tue, Mar 11, 2025 at 1:49 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>
+>> On 2025/03/11 9:47, Jason Wang wrote:
+>>> On Mon, Mar 10, 2025 at 2:53 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>
+>>>> On 2025/03/10 12:55, Jason Wang wrote:
+>>>>> On Fri, Mar 7, 2025 at 7:01 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>>>
+>>>>>> They are useful to implement VIRTIO_NET_F_RSS and
+>>>>>> VIRTIO_NET_F_HASH_REPORT.
+>>>>>>
+>>>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+>>>>>> Tested-by: Lei Yang <leiyang@redhat.com>
+>>>>>> ---
+>>>>>>     include/linux/virtio_net.h | 188 +++++++++++++++++++++++++++++++++++++++++++++
+>>>>>>     1 file changed, 188 insertions(+)
+>>>>>>
+>>>>>> diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
+>>>>>> index 02a9f4dc594d02372a6c1850cd600eff9d000d8d..426f33b4b82440d61b2af9fdc4c0b0d4c571b2c5 100644
+>>>>>> --- a/include/linux/virtio_net.h
+>>>>>> +++ b/include/linux/virtio_net.h
+>>>>>> @@ -9,6 +9,194 @@
+>>>>>>     #include <uapi/linux/tcp.h>
+>>>>>>     #include <uapi/linux/virtio_net.h>
+>>>>>>
+>>>>>> +struct virtio_net_hash {
+>>>>>> +       u32 value;
+>>>>>> +       u16 report;
+>>>>>> +};
+>>>>>> +
+>>>>>> +struct virtio_net_toeplitz_state {
+>>>>>> +       u32 hash;
+>>>>>> +       const u32 *key;
+>>>>>> +};
+>>>>>> +
+>>>>>> +#define VIRTIO_NET_SUPPORTED_HASH_TYPES (VIRTIO_NET_RSS_HASH_TYPE_IPv4 | \
+>>>>>> +                                        VIRTIO_NET_RSS_HASH_TYPE_TCPv4 | \
+>>>>>> +                                        VIRTIO_NET_RSS_HASH_TYPE_UDPv4 | \
+>>>>>> +                                        VIRTIO_NET_RSS_HASH_TYPE_IPv6 | \
+>>>>>> +                                        VIRTIO_NET_RSS_HASH_TYPE_TCPv6 | \
+>>>>>> +                                        VIRTIO_NET_RSS_HASH_TYPE_UDPv6)
+>>>>>
+>>>>> Let's explain why
+>>>>>
+>>>>> #define VIRTIO_NET_HASH_REPORT_IPv6_EX         7
+>>>>> #define VIRTIO_NET_HASH_REPORT_TCPv6_EX        8
+>>>>> #define VIRTIO_NET_HASH_REPORT_UDPv6_EX        9
+>>>>>
+>>>>> are missed here.
+>>>>
+>>>> Because they require parsing IPv6 options and I'm not sure how many we
+>>>> need to parse. QEMU's eBPF program has a hard-coded limit of 30 options;
+>>>> it has some explanation for this limit, but it does not seem definitive
+>>>> either:
+>>>> https://gitlab.com/qemu-project/qemu/-/commit/f3fa412de28ae3cb31d38811d30a77e4e20456cc#6ec48fc8af2f802e92f5127425e845c4c213ff60_0_165
+>>>>
+>>>
+>>> How about the usersapce datapath RSS in Qemu? (We probably don't need
+>>> to align with eBPF RSS as it's just a reference implementation)
+>>
+>> The userspace datapath RSS has no limit.
+>>
+>> The reference implementation is the userspace datapath. The eBPF program
+>>    is intended to bring real performance benefit to Windows guests in
+>> contrary.
+>>
+>> The userspace implementation does its best to provide defined RSS
+>> capabilities but may not be performant. Parsing all IPv6 options have a
+>> performance implication, but it is fine because it is not intended to be
+>> performant in the first place.
+>>
+>> The performance problem is inherent to the userspace implementation,
+>> which adds an extra overhead to the datapath. The eBPF program on the
+>> other hand does not incur such overhead because it replaces the existing
+>> steering algorithm (automq) instead of adding another layer. Hence the
+>> eBPF program can be practical.
+>>
+>> That said, it is not that important to align with the userspace and eBPF
+>> RSS in QEMU because they are still experimental anyway; the eBPF RSS has
+>> potential to become a practical implementation but it is still in
+>> development. The libvirt integration for the eBPF RSS is still not
+>> complete, and we occasionally add fixes for RSS and hash reporting
+>> without backporting to the stable branch.
+>>
+>> I'm adding interfaces to negotiate hash types rather for the future
+>> extensibility. The specification may gain more hash types in the future
+>> and other vhost backends may have a different set of hash types
+>> supported. Figuring out how to deal with different sets of supported
+>> hash typs is essential for both the kernel and QEMU.
+>>
+>>>
+>>>> In this patch series, I add an ioctl to query capability instead; it
+>>>> allows me leaving those hash types unimplemented and is crucial to
+>>>> assure extensibility for future additions of hash types anyway. Anyone
+>>>> who find these hash types useful can implement in the future.
+>>>
+>>> Yes, but we need to make sure no userspace visible behaviour changes
+>>> after migration.
+>>
+>> Indeed, the goal is to make extensibility and migration compatible.
+> 
+> So I see this part:
+> 
+> + uint32_t supported_hash_types = n->rss_data.supported_hash_types;
+> + uint32_t peer_hash_types = n->rss_data.peer_hash_types;
+> + bool use_own_hash =
+> + (supported_hash_types & VIRTIO_NET_RSS_SUPPORTED_HASHES) ==
+> + supported_hash_types;
+> + bool use_peer_hash =
+> + n->rss_data.peer_hash_available &&
+> + (supported_hash_types & peer_hash_types) == supported_hash_types;
+> 
+> It looks like it would be a challenge to support vhost-user in the
+> future if vhost-user supports hash feature others than source?
 
-Add support for Secure TSC, allowing userspace to configure the Secure TSC
-feature for SNP guests. Use the SNP specification's desired TSC frequency
-parameter during the SNP_LAUNCH_START command to set the mean TSC
-frequency in KHz for Secure TSC enabled guests.
+The vhost-user backend will need to retrieve the supported hash types 
+with VHOST_USER_GET_CONFIG as the vhost-vdpa backend does with 
+VHOST_VDPA_GET_CONFIG.
 
-As the frequency needs to be set in the SNP_LAUNCH_START command, userspace
-should set the frequency using the KVM_CAP_SET_TSC_KHZ VM ioctl instead of
-the VCPU ioctl. The desired_tsc_khz defaults to kvm->arch.default_tsc_khz.
+> 
+>>
+>>>
+>>>>
+>>>>>
+>>>>> And explain how we could maintain migration compatibility
+>>>>>
+>>>>> 1) Does those three work for userspace datapath in Qemu? If yes,
+>>>>> migration will be broken.
+>>>>
+>>>> They work for userspace datapath so my RFC patch series for QEMU uses
+>>>> TUNGETVNETHASHCAP to prevent breaking migration:
+>>>> https://patchew.org/QEMU/20240915-hash-v3-0-79cb08d28647@daynix.com/
+>>>>
+>>>
+>>> Ok, let's mention this in the cover letter. Another interesting thing
+>>> is the migration from 10.0 to 9.0.
+>>
+>> The patch series is already mentioned in the cover letter. A description
+>> of the intended use case of TUNGETVNETHASHCAP will be a good addition.
+>> I'll add it to this patch so that it will be kept in tree after it gets
+>> merged.
+>>
+>> Migration between two different QEMU versions should be handled with
+>> versioned machine types.
+>>
+>> When a machine created in 9.0 is being migrated to 10.0, the machine
+>> must set the hash type properties to match with the hash types supported
+>> by the existing implementations, which means it sets the property for
+>> VIRTIO_NET_HASH_REPORT_IPv6_EX to true, for example. Because this hash
+>> type is currently not included in TUNGETVNETHASHCAP, the machine will
+>> keep using the implementation used previously. The machine can be also
+>> migrated back to 9.0 again.
+>>
+>> A machine type with version 10.0 cannot be migrated to 9.0 by design so
+>> there is no new problem.
+> 
+> I meant migrate qemu 11.0 with machine type 10.0 to qemu 10.0 with
+> machine 10.0 etc.
 
-Signed-off-by: Ketan Chaturvedi <Ketan.Chaturvedi@amd.com>
-Co-developed-by: Nikunj A Dadhania <nikunj@amd.com>
-Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
----
- arch/x86/include/uapi/asm/kvm.h |  3 ++-
- arch/x86/kvm/svm/sev.c          | 14 ++++++++++++++
- 2 files changed, 16 insertions(+), 1 deletion(-)
+Let's assume QEMU 10.0 will support this new ioctl while QEMU 9.0 doesn't.
 
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 9e75da97bce0..87ed9f77314d 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -836,7 +836,8 @@ struct kvm_sev_snp_launch_start {
- 	__u64 policy;
- 	__u8 gosvw[16];
- 	__u16 flags;
--	__u8 pad0[6];
-+	__u8 pad0[2];
-+	__u32 desired_tsc_khz;
- 	__u64 pad1[4];
- };
- 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 80a80929e6a3..4ee8d233f61f 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2226,6 +2226,14 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 
- 	start.gctx_paddr = __psp_pa(sev->snp_context);
- 	start.policy = params.policy;
-+
-+	if (snp_secure_tsc_enabled(kvm)) {
-+		if (!kvm->arch.default_tsc_khz)
-+			return -EINVAL;
-+
-+		start.desired_tsc_khz = kvm->arch.default_tsc_khz;
-+	}
-+
- 	memcpy(start.gosvw, params.gosvw, sizeof(params.gosvw));
- 	rc = __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_LAUNCH_START, &start, &argp->error);
- 	if (rc) {
-@@ -2467,6 +2475,9 @@ static int snp_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 		}
- 
- 		svm->vcpu.arch.guest_state_protected = true;
-+		if (snp_secure_tsc_enabled(kvm))
-+			svm->vcpu.arch.guest_tsc_protected = true;
-+
- 		/*
- 		 * SEV-ES (and thus SNP) guest mandates LBR Virtualization to
- 		 * be _always_ ON. Enable it only after setting
-@@ -3079,6 +3090,9 @@ void __init sev_hardware_setup(void)
- 	sev_supported_vmsa_features = 0;
- 	if (sev_es_debug_swap_enabled)
- 		sev_supported_vmsa_features |= SVM_SEV_FEAT_DEBUG_SWAP;
-+
-+	if (sev_snp_enabled && cpu_feature_enabled(X86_FEATURE_SNP_SECURE_TSC))
-+		sev_supported_vmsa_features |= SVM_SEV_FEAT_SECURE_TSC;
- }
- 
- void sev_hardware_unsetup(void)
--- 
-2.43.0
+The description in my previous email was wrong. Checking the patch 
+series again, I found I bumped the version number of 
+vmstate_virtio_net_rss. So migrating QEMU 10.0 with machine type 9.0 to 
+QEMU 9.0 will result in an error.
+
+We can remove this error by introducing a compatibility property, but I 
+don't think it's worth. As I noted in the previous email, the RSS 
+feature is still in development and I don't think we need to support 
+migrating to older QEMU versions. It gives an error instead of silently 
+breaking a migrated VM at least.
+
+Regards,
+Akihiko Odaki
+
+> 
+>>
+>>>
+>>>> This patch series first adds configuration options for users to choose
+>>>> hash types. QEMU then automatically picks one implementation from the
+>>>> following (the earlier one is the more preferred):
+>>>> 1) The hash capability of vhost hardware
+>>>> 2) The hash capability I'm proposing here
+>>>> 3) The eBPF program
+>>>> 4) The pure userspace implementation
+>>>>
+>>>> This decision depends on the following:
+>>>> - The required hash types; supported ones are queried for 1) and 2)
+>>>> - Whether vhost is enabled or not and what vhost backend is used
+>>>> - Whether hash reporting is enabled; 3) is incompatible with this
+>>>>
+>>>> The network device will not be realized if no implementation satisfies
+>>>> the requirements.
+>>>
+>>> This makes sense, let's add this in the cover letter.
+>>
+>> I'll add it to the QEMU patch as it's more about details of QEMU.
+>> The message of this patch will explain how TUNGETVNETHASHCAP and
+>> TUNSETVNETHASH makes extensibility and migrattion compatible in general.
+>>
+>> Regards,
+>> Akihiko Odaki
+>>
+>>>
+>>>>
+>>>>> 2) once we support those three in the future. For example, is the qemu
+>>>>> expected to probe this via TUNGETVNETHASHCAP in the destination and
+>>>>> fail the migration?
+>>>>
+>>>> QEMU is expected to use TUNGETVNETHASHCAP, but it can selectively enable
+>>>> hash types with TUNSETVNETHASH to keep migration working.
+>>>>
+>>>> In summary, this patch series provides a sufficient facility for the
+>>>> userspace to make extensibility and migration compatible;
+>>>> TUNGETVNETHASHCAP exposes all of the kernel capabilities and
+>>>> TUNSETVNETHASH allows the userspace to limit them.
+>>>>
+>>>> Regards,
+>>>> Akihiko Odaki
+>>>
+>>> Fine.
+>>>
+>>> Thanks
+>>>
+> 
+> Thanks
+> 
 
 
