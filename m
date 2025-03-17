@@ -1,86 +1,88 @@
-Return-Path: <kvm+bounces-41179-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41180-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79F8DA645B2
-	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 09:35:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E36CDA6464B
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 09:53:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC0AF169155
-	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 08:35:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C8613B2615
+	for <lists+kvm@lfdr.de>; Mon, 17 Mar 2025 08:53:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B603A221577;
-	Mon, 17 Mar 2025 08:34:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2120220694;
+	Mon, 17 Mar 2025 08:53:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EfAwxosm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Egdktkr+"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D2D5191499
-	for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 08:34:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C391221714
+	for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 08:53:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742200497; cv=none; b=JfEGUQCwLiI9jlT+bXJUPrKAd19cwIZsh1jZVLDOlWyFCjfAziTFTU4JyS8KZZql7/F2e3yZIuLzsJ+NxOZKSs/UXDNEIz2mcSvTlrquBbv9m+fjZE/Tz6QRg4szgZdeCv16uyenTXhrlp+1RM/EcOG8AkHWAqeE4iEvZbjqYPs=
+	t=1742201603; cv=none; b=tKb3/qm46ZkIFCwxvrCu8aj2bhonzfFyqMBxoijcDfqAoN8ZjTTnjGYqKX2xLcSX8lY24BeyrgQlFIAuaLuRmIDn9P8zpv+5WsmxySlwce1TJEYA5MZzttS79sPY8uEMEpk9xUZrDRiPY8anizExrg+vZGlxhgDn1qSU1Q6x4tM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742200497; c=relaxed/simple;
-	bh=c2n1Fx835UhBJSllbwffn7zGDt95tdAKPpRn0ntoO54=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Wi0KTUvly3H4BD4v2jIec4HNo81rfs8vLH88sYybNvu9U18I3M0WW9QGqpURZuxFC+H70kYgNfO4jCFfuv3tT1DxJ5tpAX5rUXnUBIsMR41k2o1ioNMKESKxw3DJGWluRcRo2WOlhXj3vfMmBWI8kQltwS9nzEqJ/seY/bUfPQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EfAwxosm; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1742201603; c=relaxed/simple;
+	bh=aq2spCsdG3P3lfElF89LUbXKEryZhClx9wsvSo0M+Hk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jDY1uDlLjwWsxKNMCjhtYaA5QTeWZFU/iI0OsBBqdtptCbo75NsYHg4w20SDfk0dSDrYAX5NfGeRZ44iUXjAckSnPFRTcvBbeGuO84xY1ciYYlZG/1lSbQmpZGZM/HbmmLfWcwAXlNS8SX9n9spOnd0471O34K6Q3mj9Daa7mV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Egdktkr+; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742200495;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	s=mimecast20190719; t=1742201599;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=K8fFsxESP3H629nCG6gkvjmwLt+3pqm+G1ABejpl59E=;
-	b=EfAwxosmi2kuQHPFTccyZ/hzPapseqk7aATs16x3QEEFIoDFVzkopbMjLm3bqQlxTGx0rx
-	XvvkLWSgCCephjVsZKdAqRCKI83X45+gw9iMlo7Ik4+wUHig4AJYFl8h8b7t3i0xtSvvGq
-	pK+uf6fjwLimgrKzYJm68G+5cYv55Pg=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=8Z0UeEMmq83xCl69Q71PKJopRqUbkXECgaGSxsoBFy8=;
+	b=Egdktkr+t7IIEybO9Z+N8T0mMTbFSRD6ZARwngbrUPZHOb+54Plt+lL2KB6wWsa4533AmU
+	OjogXj2/RLWju2Iunyw2rKV6h4YVOZTG5mw7qzMiEoSdUzonvR8KEUF+yI9xr6EzLWBDof
+	4MhxWCOeTzZI1ebbhLy+55dd60dOgiw=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-404-PIcNnv3qMxeBkFvq1kdZCQ-1; Mon, 17 Mar 2025 04:34:53 -0400
-X-MC-Unique: PIcNnv3qMxeBkFvq1kdZCQ-1
-X-Mimecast-MFC-AGG-ID: PIcNnv3qMxeBkFvq1kdZCQ_1742200492
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3912d5f6689so2604628f8f.1
-        for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 01:34:53 -0700 (PDT)
+ us-mta-6-OqYlu3lFM6ijiDPacLR-4A-1; Mon, 17 Mar 2025 04:53:18 -0400
+X-MC-Unique: OqYlu3lFM6ijiDPacLR-4A-1
+X-Mimecast-MFC-AGG-ID: OqYlu3lFM6ijiDPacLR-4A_1742201598
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-85db19e5e0eso399558639f.0
+        for <kvm@vger.kernel.org>; Mon, 17 Mar 2025 01:53:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742200492; x=1742805292;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=K8fFsxESP3H629nCG6gkvjmwLt+3pqm+G1ABejpl59E=;
-        b=CSdxYohewZhaOvoA6T/aksFDqgzs42rMhWedb7ynShihdw96FqOs5ziaKylSjtmOV2
-         NVneLuN2eziMrjcXYEHhvjvFXYD1VGRe2P+B5kW5ttOg8GH4wO37+nNj8Mm8qPPn6o7q
-         XRvzwLE9Y96B+bmf6wyL1diZ8x6+TTG6Wr1iUuAcXz2ybwF8EhMMK7bhrBKb79I2rSza
-         Ti2e1unUXSOJY/OLpmQpKLFSRT0M/Z2aauZrFHmdoqz4rKDu0GBf8YQfh2FEpQt/Oxe+
-         A4xWuYrtKuVuDzas6/QcIojg4P84wVZmTmk/1+eRscsROWheOTqgP/Q0KZw7s1rPkqay
-         08BQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW0uIkxXJ8lgD9LBoPKo+k8Tk6hs9aaIM/K1v4q3Q6QeeC+gldNnUXF+ooLHaMvzsHyVA8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzxp2isuSYCtsv7Rr5CDAbgNJj5kY/zw5lOoUg7gdcKO92itNsx
-	Bu0LlZY0g5dGUqgqlt1FlPvdcT7Q14acAkVeopx7ZfhH9WV0kXNYTpG38xZzhlc4sQw4ksQkhj3
-	OZ/Tfd1EeDbciZvFsxWJSEfywaf+pLvwcBzHV5VOPSLPd+LpRQg==
-X-Gm-Gg: ASbGncuxCNgghvxM2/j8o8pR9l9An8dijNKqFE2M1cAGx0vjVeWR98K9dyihFXS1si/
-	LjLHtJ+5smxY+xCPgZgGziM20ia5D09kBoYvzjrZlPElE1QQzJEgZvzpqlKTEBV1kWo4kubqlBU
-	9yhOEUt12s5tevONhzsbpCSyKrybBSjKoeLD1mOmmTrynQG5XBZ+iQx9ziUBsdov8WkG8y0k3+9
-	35HQK4fY3LYStZC04EhL77RekVxy7eIzZA610q0uCKVLzOXQyYB7GOOnHeOaBTeJA5T+bbdvVdw
-	h/SdZ2w2vi/ojCBlwK6uf/AY0FhCJ+UiQH4VBMPlbrqnvw==
-X-Received: by 2002:a5d:6c6c:0:b0:38d:e6b6:508b with SMTP id ffacd0b85a97d-3971d23508dmr10794772f8f.9.1742200492285;
-        Mon, 17 Mar 2025 01:34:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGV3AlBDqXOJvZL9/HUdYQCvelee3VTZFcDu+UlzkczKdH898voG07Nf0T2P5NkPsevzif4lw==
-X-Received: by 2002:a5d:6c6c:0:b0:38d:e6b6:508b with SMTP id ffacd0b85a97d-3971d23508dmr10794744f8f.9.1742200491924;
-        Mon, 17 Mar 2025 01:34:51 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-10-172.dyn.eolo.it. [146.241.10.172])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d200fae4asm98193875e9.27.2025.03.17.01.34.50
+        d=1e100.net; s=20230601; t=1742201597; x=1742806397;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8Z0UeEMmq83xCl69Q71PKJopRqUbkXECgaGSxsoBFy8=;
+        b=VskcsKs6k/+bhC0rTmG5q9PgNCuW42FOuuqAU9+xWbl+yNOSbnhEKokEhINsPy32wB
+         GUcs3xFWv8pk+7FoJ5cKjrvIjmlllBTEiTtyRD8ZcrbTVjiqmZDgxRobsc+sNbdhQyE5
+         WV3aO3cn7qoHfc771QMF0gfFBimWYkqsyqqAQBJj7Jt5vhEp7zyLS77NeN2MPWUpN2Sm
+         BrHs0TQjf6EiJyHpJ862byVuZQAZoeNcZlFrktXLOLZd08w9TDJlQDY4xIyLUKUMdmu2
+         wcxqY2RMdggrBOeRSyqM4MA7AJh7Bifm+B1wbdX7x/8MO1ky9CIA4lZ1GrlZkPnJOlLW
+         6gtw==
+X-Forwarded-Encrypted: i=1; AJvYcCWDw/KqUdQr+Zv0lNcebL5HhWbNLO3PUI/B0LCYDgL1swBlLTVYC889/wJcoqr5oYhGDHI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPOpIw+yEFYiY7UmWbeYqFev/0lWwMrVOo0RukYtFX6XTAQuSZ
+	wD7QT+1v9wnVo6sj54a0ADEDk/0dTC4luXWn4tcqmgpa7ERS0GkfSsoYX2DG2OlXze8YC8CLGsa
+	w0t+KXkAtGhdjCaSoUYawYSeph9fIBZVlo86Gs+t3j/08rU1Rqi98k/ynmQ==
+X-Gm-Gg: ASbGncs86wjdCAC/Lc+Px9So7vTog3YsW+2KIqYhQqEZTc3YU72OrLuVjyem3ukB53w
+	rXQSQimb+O/DJkMsUsB28HqPaO+Mp1MvJBBkvGfvl9jCIqT6kYmuYOh3Ubuy95Zxz5SR7fx9sS8
+	LJq15fOkYTnBnFiKyWzuimnjCj6LROV7yccAby8GEZRgV1Wu8vPaftGWjVXgp3tvO/HAfdiE2OV
+	iDDEPVrzadFzxPZsbxQX2mEzqtaAd3g1YbVPBqmBqmcYSawhS5tqnA+P0VA11RjLPdSzoRTejqc
+	e4vDOXwisuoiIxUjciX2/xNEoL75VzMXze87yy91Dj+iIqlBCVQDNSdXM3Lv1Ng=
+X-Received: by 2002:a05:6602:2cd6:b0:85b:4d28:2aa9 with SMTP id ca18e2360f4ac-85dc4792a8dmr1487055139f.4.1742201597316;
+        Mon, 17 Mar 2025 01:53:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFhvA6uoxE9FkDt+/PrcVIKJmkPlXjaFVJVOpZAvngURmdObKJVrgiM4GTTPXD1x6LoFTwjrg==
+X-Received: by 2002:a05:6602:2cd6:b0:85b:4d28:2aa9 with SMTP id ca18e2360f4ac-85dc4792a8dmr1487053639f.4.1742201597020;
+        Mon, 17 Mar 2025 01:53:17 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f2638147c9sm2161677173.112.2025.03.17.01.53.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Mar 2025 01:34:51 -0700 (PDT)
-Message-ID: <5b9d622e-7404-490a-a13c-1181d196d7c6@redhat.com>
-Date: Mon, 17 Mar 2025 09:34:49 +0100
+        Mon, 17 Mar 2025 01:53:16 -0700 (PDT)
+Message-ID: <4ab33998-4d16-4ecb-aa76-3919afcbf2d7@redhat.com>
+Date: Mon, 17 Mar 2025 09:53:12 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,63 +90,178 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v10 06/10] tap: Introduce virtio-net hash feature
-To: Akihiko Odaki <akihiko.odaki@daynix.com>, Jonathan Corbet
- <corbet@lwn.net>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>,
- Andrew Melnychenko <andrew@daynix.com>,
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
- Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>
-References: <20250313-rss-v10-0-3185d73a9af0@daynix.com>
- <20250313-rss-v10-6-3185d73a9af0@daynix.com>
+Reply-To: eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v2 4/5] configure: Add --qemu-cpu option
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250313-rss-v10-6-3185d73a9af0@daynix.com>
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>, andrew.jones@linux.dev,
+ alexandru.elisei@arm.com
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, vladimir.murzin@arm.com
+References: <20250314154904.3946484-2-jean-philippe@linaro.org>
+ <20250314154904.3946484-6-jean-philippe@linaro.org>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20250314154904.3946484-6-jean-philippe@linaro.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 3/13/25 8:01 AM, Akihiko Odaki wrote:
-> @@ -998,6 +1044,16 @@ static long tap_ioctl(struct file *file, unsigned int cmd,
->  		rtnl_unlock();
->  		return ret;
+Hi Jean-Philippe,
+
+
+On 3/14/25 4:49 PM, Jean-Philippe Brucker wrote:
+> Add the --qemu-cpu option to let users set the CPU type to run on.
+> At the moment --processor allows to set both GCC -mcpu flag and QEMU
+> -cpu. On Arm we'd like to pass `-cpu max` to QEMU in order to enable all
+> the TCG features by default, and it could also be nice to let users
+> modify the CPU capabilities by setting extra -cpu options.
+> Since GCC -mcpu doesn't accept "max" or "host", separate the compiler
+> and QEMU arguments.
+>
+> `--processor` is now exclusively for compiler options, as indicated by
+> its documentation ("processor to compile for"). So use $QEMU_CPU on
+> RISC-V as well.
+>
+> Suggested-by: Andrew Jones <andrew.jones@linux.dev>
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> ---
+>  scripts/mkstandalone.sh |  2 +-
+>  arm/run                 | 17 +++++++++++------
+>  riscv/run               |  8 ++++----
+>  configure               |  7 +++++++
+>  4 files changed, 23 insertions(+), 11 deletions(-)
+>
+> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
+> index 2318a85f..6b5f725d 100755
+> --- a/scripts/mkstandalone.sh
+> +++ b/scripts/mkstandalone.sh
+> @@ -42,7 +42,7 @@ generate_test ()
 >  
-> +	case TUNGETVNETHASHCAP:
-> +		return tun_vnet_ioctl_gethashcap(argp);
-> +
-> +	case TUNSETVNETHASH:
-> +		rtnl_lock();
-> +		tap = rtnl_dereference(q->tap);
-> +		ret = tap ? tun_vnet_ioctl_sethash(&tap->vnet_hash, argp) : -EBADFD;
+>  	config_export ARCH
+>  	config_export ARCH_NAME
+> -	config_export PROCESSOR
+> +	config_export QEMU_CPU
+>  
+>  	echo "echo BUILD_HEAD=$(cat build-head)"
+>  
+> diff --git a/arm/run b/arm/run
+> index efdd44ce..561bafab 100755
+> --- a/arm/run
+> +++ b/arm/run
+> @@ -8,7 +8,7 @@ if [ -z "$KUT_STANDALONE" ]; then
+>  	source config.mak
+>  	source scripts/arch-run.bash
+>  fi
+> -processor="$PROCESSOR"
+> +qemu_cpu="$QEMU_CPU"
+>  
+>  if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
+>     [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ] &&
+> @@ -37,12 +37,17 @@ if [ "$ACCEL" = "kvm" ]; then
+>  	fi
+>  fi
+>  
+> -if [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ]; then
+> -	if [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ]; then
+> -		processor="host"
+> +if [ -z "$qemu_cpu" ]; then
+> +	if ( [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ] ) &&
+> +	   ( [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ] ); then
+> +		qemu_cpu="host"
+>  		if [ "$ARCH" = "arm" ] && [ "$HOST" = "aarch64" ]; then
+> -			processor+=",aarch64=off"
+> +			qemu_cpu+=",aarch64=off"
+>  		fi
+> +	elif [ "$ARCH" = "arm64" ]; then
+> +		qemu_cpu="cortex-a57"
+> +	else
+> +		qemu_cpu="cortex-a15"
+>  	fi
+>  fi
+>  
+> @@ -71,7 +76,7 @@ if $qemu $M -device '?' | grep -q pci-testdev; then
+>  fi
+>  
+>  A="-accel $ACCEL$ACCEL_PROPS"
+> -command="$qemu -nodefaults $M $A -cpu $processor $chr_testdev $pci_testdev"
+> +command="$qemu -nodefaults $M $A -cpu $qemu_cpu $chr_testdev $pci_testdev"
+>  command+=" -display none -serial stdio"
+>  command="$(migration_cmd) $(timeout_cmd) $command"
+>  
+> diff --git a/riscv/run b/riscv/run
+> index e2f5a922..02fcf0c0 100755
+> --- a/riscv/run
+> +++ b/riscv/run
+> @@ -11,12 +11,12 @@ fi
+>  
+>  # Allow user overrides of some config.mak variables
+>  mach=$MACHINE_OVERRIDE
+> -processor=$PROCESSOR_OVERRIDE
+> +qemu_cpu=$QEMU_CPU_OVERRIDE
+>  firmware=$FIRMWARE_OVERRIDE
+>  
+> -[ "$PROCESSOR" = "$ARCH" ] && PROCESSOR="max"
+> +[ -z "$QEMU_CPU" ] && QEMU_CPU="max"
+>  : "${mach:=virt}"
+> -: "${processor:=$PROCESSOR}"
+> +: "${qemu_cpu:=$QEMU_CPU}"
+>  : "${firmware:=$FIRMWARE}"
+>  [ "$firmware" ] && firmware="-bios $firmware"
+>  
+> @@ -32,7 +32,7 @@ fi
+>  mach="-machine $mach"
+>  
+>  command="$qemu -nodefaults -nographic -serial mon:stdio"
+> -command+=" $mach $acc $firmware -cpu $processor "
+> +command+=" $mach $acc $firmware -cpu $qemu_cpu "
+>  command="$(migration_cmd) $(timeout_cmd) $command"
+>  
+>  if [ "$UEFI_SHELL_RUN" = "y" ]; then
+> diff --git a/configure b/configure
+> index 5306bad3..d25bd23e 100755
+> --- a/configure
+> +++ b/configure
+> @@ -52,6 +52,7 @@ page_size=
+>  earlycon=
+>  efi=
+>  efi_direct=
+> +qemu_cpu=
+>  
+>  # Enable -Werror by default for git repositories only (i.e. developer builds)
+>  if [ -e "$srcdir"/.git ]; then
+> @@ -69,6 +70,8 @@ usage() {
+>  	    --arch=ARCH            architecture to compile for ($arch). ARCH can be one of:
+>  	                           arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
+>  	    --processor=PROCESSOR  processor to compile for ($processor)
+> +	    --qemu-cpu=CPU         the CPU model to run on. The default depends on
+> +	                           the configuration, usually it is "host" or "max".
+nit: I would remove 'usually it is "host" or "max"'. I don't see any
+consistency check between qemu_cpu and processor in case it is
+explicitly set? Do we care? Eric
 
+>  	    --target=TARGET        target platform that the tests will be running on (qemu or
+>  	                           kvmtool, default is qemu) (arm/arm64 only)
+>  	    --cross-prefix=PREFIX  cross compiler prefix
+> @@ -142,6 +145,9 @@ while [[ $optno -le $argc ]]; do
+>          --processor)
+>  	    processor="$arg"
+>  	    ;;
+> +	--qemu-cpu)
+> +	    qemu_cpu="$arg"
+> +	    ;;
+>  	--target)
+>  	    target="$arg"
+>  	    ;;
+> @@ -464,6 +470,7 @@ ARCH=$arch
+>  ARCH_NAME=$arch_name
+>  ARCH_LIBDIR=$arch_libdir
+>  PROCESSOR=$processor
+> +QEMU_CPU=$qemu_cpu
+>  CC=$cc
+>  CFLAGS=$cflags
+>  LD=$cross_prefix$ld
 
-Not really a review, but apparently this is causing intermittent memory
-leak in self tests:
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-xx__-> echo scan > /sys/kernel/debug/kmemleak && cat
-/sys/kernel/debug/kmemleak
-unreferenced object 0xffff88800c6ec248 (size 8):
-  comm "tap", pid 21124, jiffies 4299141559
-  hex dump (first 8 bytes):
-    00 00 00 00 00 00 00 00                          ........
-  backtrace (crc 0):
-    __kmalloc_cache_noprof+0x2df/0x390
-    tun_vnet_ioctl_sethash+0xbf/0x3a0
-    tap_ioctl+0x6f2/0xc10
-    __x64_sys_ioctl+0x11f/0x180
-    do_syscall_64+0xc1/0x1d0
-    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Eric
 
-Could you please have a look?
-
-Thanks!
-
-Paolo
 
 
