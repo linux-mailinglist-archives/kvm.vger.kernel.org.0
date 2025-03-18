@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-41340-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41341-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F79EA6652C
-	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 02:35:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 026CFA6652E
+	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 02:35:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FF97176BDA
-	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 01:34:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01B0E17AF1D
+	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 01:35:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1485D146D65;
-	Tue, 18 Mar 2025 01:34:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF24414D2BB;
+	Tue, 18 Mar 2025 01:35:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Hf+XGVFA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OvVBJbPJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A12BC335C0;
-	Tue, 18 Mar 2025 01:34:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9201D3FC2;
+	Tue, 18 Mar 2025 01:34:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742261679; cv=none; b=Gnd+UYO4dy99XSEr1ZYFe1QoPWxBj5Rws69JnQ/r1tVlCxYP+2mZACTtWF5vKDZF4quylb1RZjDm3GCwj44hx/Mdgnnp6nFrAJwgKOL5Shpk4s2liOBV0qiShG9aC31RAx9g10IJwBtg9HaDO89+odfuZkQMvkikhYxODhNZ+Rg=
+	t=1742261701; cv=none; b=su3voaj7lV/Tg757FBtgu831Sru5QzyuPy6xpu5Rfoz1cNUFHaCf9cyH8zsa3c4FhqYWhus5bNZbinNZtZnoDyq0yyNXoQYXtytDoNslfWbHXXxB+94RwERXJcyTvNtYDKxzUAy7L6q0rXhD3faU73q7TIkY7aw2thfm+0XibDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742261679; c=relaxed/simple;
-	bh=vvkZUaLrHnUJHGxnetVQdXOSxMK2s/AEG29SSV0tqc0=;
+	s=arc-20240116; t=1742261701; c=relaxed/simple;
+	bh=pLa7nmBIJgWzueqkPk4AGuMVC9d7jDDRLX/NlIBoDkQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HFyRPu74Q368/JpSxk710qOnVmBzb1ATaKUGnpek+Pq0MTtjof97S/ivDEDOHkHKsd/EFu2zGeCWJWqVsGrGdjOAmmbbdM77ezsIC0MvXR32lUIXm5lQHSJNx9KoOuqdNKXRI1rRA+G/JEsya2bClQ1cdVUK9i9NhgoRZWwsiWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Hf+XGVFA; arc=none smtp.client-ip=192.198.163.12
+	 MIME-Version; b=rR8dTBbhycszZCaw83CyIea1BYKJjq+5mOl0fANvEved1s9cKkgtbvCHyOkUi1izdy49LkE06M5g7tKdpZMWOx7S6FjlIXl6PQZPK0/Mz7uY0YtKtCTEL/TGwXvKT9ubM5ZuAE5PJb08tQkSmUlwRKVQs6GWOZc8vguu9zz7Br0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OvVBJbPJ; arc=none smtp.client-ip=192.198.163.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1742261678; x=1773797678;
+  t=1742261699; x=1773797699;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=vvkZUaLrHnUJHGxnetVQdXOSxMK2s/AEG29SSV0tqc0=;
-  b=Hf+XGVFA2n5R2d42UH5nolEapapT6OVwgwsU/cUjSGq0WvX/20nOk7A/
-   9f/eWw8JndEC9DkPMjamVGaPBr/ZZKaxM4c2yunfecoicc41e1qwBF5WA
-   n+c8wXUTYIwpQmkmCreUQFizl8xpb3DxScQuEl7sdnLHxSiybqopvbpKP
-   hSA9Fsarw9qm5txil1sfYm1LyFp/8oFp1mUCGHPOvjRrsoSpupiMa1baK
-   w+ElmakP0JV7G/QdnltaVpM0adcG5Iyr5rhTqQRw4dXqEv5VzByfAjWv7
-   zh3Az6G7Cp6C+J0oLiRwUAsr0lwdXZxBMzkDu+Mmh5fhDzRBe0g6HLGCE
+  bh=pLa7nmBIJgWzueqkPk4AGuMVC9d7jDDRLX/NlIBoDkQ=;
+  b=OvVBJbPJkR/m4ylhBtL2MKFUzIzvhfoN0fqjRwqvXSwb9pe9LIp5BmPE
+   j+uCrXLtKGg4CZPpJ3veK8ytqshoXxZuwywv7o94awrvQr0vOfYIUoIaz
+   z3BVt8SAwj+c0WHXZaH9fb4DT+Npn/jU47z9FQu853rmPsexCUgC1TCTo
+   Zit8fAbZvlaNUFZynDHLH+4DEwdL0374LSLDYOYRkkA9wRTaSLOwme6ZP
+   ywGSa7VbYTrv3yg+4tXfhsn+Hn8neBoajIWLqfh+eb/8NhqedKD/2zlSU
+   E1vzjboSggSA+k2ijgu1Wu8Y7TV0XMW68chqLCG12SzN6Pm4nePz0cUiw
    A==;
-X-CSE-ConnectionGUID: 9XMKcNb6Tuagua1kwILeGA==
-X-CSE-MsgGUID: 6tvOL6YPSE2eWUrKlDuNOw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11376"; a="47269874"
+X-CSE-ConnectionGUID: Opk93W7WQmq3+K/FC3CCBw==
+X-CSE-MsgGUID: xRFtpcyeQla3gHhonYOaow==
+X-IronPort-AV: E=McAfee;i="6700,10204,11376"; a="54009598"
 X-IronPort-AV: E=Sophos;i="6.14,255,1736841600"; 
-   d="scan'208";a="47269874"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2025 18:34:37 -0700
-X-CSE-ConnectionGUID: NDAEbuUDR2uGardIrFORsA==
-X-CSE-MsgGUID: fiedTt/KRaWdBpeKeQapgA==
+   d="scan'208";a="54009598"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2025 18:34:59 -0700
+X-CSE-ConnectionGUID: P78im2mWSXK+g/BfK4CEXA==
+X-CSE-MsgGUID: MOrFEG6sR8iuttfa+EO9kA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.14,255,1736841600"; 
-   d="scan'208";a="122131390"
+   d="scan'208";a="127284151"
 Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2025 18:34:35 -0700
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2025 18:34:57 -0700
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com
 Cc: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
 	Yan Zhao <yan.y.zhao@intel.com>
-Subject: [PATCH v2 4/5] KVM: x86/mmu: Warn if PFN changes on shadow-present SPTE in shadow MMU
-Date: Tue, 18 Mar 2025 09:33:10 +0800
-Message-ID: <20250318013310.5781-1-yan.y.zhao@intel.com>
+Subject: [PATCH v2 5/5] KVM: x86/mmu: Check and free obsolete roots in kvm_mmu_reload()
+Date: Tue, 18 Mar 2025 09:33:33 +0800
+Message-ID: <20250318013333.5817-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20250318013038.5628-1-yan.y.zhao@intel.com>
 References: <20250318013038.5628-1-yan.y.zhao@intel.com>
@@ -78,48 +78,59 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Warn if PFN changes on shadow-present SPTE in mmu_set_spte().
+Check request KVM_REQ_MMU_FREE_OBSOLETE_ROOTS to free obsolete roots in
+kvm_mmu_reload() to prevent kvm_mmu_reload() from seeing a stale obsolete
+root.
 
-KVM should _never_ change the PFN of a shadow-present SPTE. In
-mmu_set_spte(), there is a WARN_ON_ONCE() on pfn changes on shadow-present
-SPTE in mmu_spte_update() to detect this condition. However, that
-WARN_ON_ONCE() is not hittable since mmu_set_spte() invokes drop_spte()
-earlier before mmu_spte_update(), which clears SPTE to a !shadow-present
-state. So, before invoking drop_spte(), add a WARN_ON_ONCE() in
-mmu_set_spte() to warn PFN change of a shadow-present SPTE.
+Since kvm_mmu_reload() can be called outside the
+vcpu_enter_guest() path (e.g., kvm_arch_vcpu_pre_fault_memory()), it may be
+invoked after a root has been marked obsolete and before vcpu_enter_guest()
+is invoked to process KVM_REQ_MMU_FREE_OBSOLETE_ROOTS and set root.hpa to
+invalid. This causes kvm_mmu_reload() to fail to load a new root, which
+can lead to kvm_arch_vcpu_pre_fault_memory() being stuck in the while
+loop in kvm_tdp_map_page() since RET_PF_RETRY is always returned due to
+is_page_fault_stale().
 
-For the spurious prefetch fault, only return RET_PF_SPURIOUS directly when
-PFN is not changed. When PFN changes, fall through to follow the sequence
-of drop_spte(), warn of PFN change, make_spte(), flush tlb, rmap_add().
+Keep the existing check of KVM_REQ_MMU_FREE_OBSOLETE_ROOTS in
+vcpu_enter_guest() since the cost of kvm_check_request() is negligible,
+especially a check that's guarded by kvm_request_pending().
 
+Export symbol of kvm_mmu_free_obsolete_roots() as kvm_mmu_reload() is
+inline and may be called outside of kvm.ko.
+
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ arch/x86/kvm/mmu.h     | 3 +++
+ arch/x86/kvm/mmu/mmu.c | 1 +
+ 2 files changed, 4 insertions(+)
 
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index 050a0e229a4d..f2b36d32ef40 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -104,6 +104,9 @@ void kvm_mmu_track_write(struct kvm_vcpu *vcpu, gpa_t gpa, const u8 *new,
+ 
+ static inline int kvm_mmu_reload(struct kvm_vcpu *vcpu)
+ {
++	if (kvm_check_request(KVM_REQ_MMU_FREE_OBSOLETE_ROOTS, vcpu))
++		kvm_mmu_free_obsolete_roots(vcpu);
++
+ 	/*
+ 	 * Checking root.hpa is sufficient even when KVM has mirror root.
+ 	 * We can have either:
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 94c677f8cc05..607cbb19ea96 100644
+index 607cbb19ea96..15fd4838e4f2 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2846,7 +2846,8 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
- 	}
+@@ -5802,6 +5802,7 @@ void kvm_mmu_free_obsolete_roots(struct kvm_vcpu *vcpu)
+ 	__kvm_mmu_free_obsolete_roots(vcpu->kvm, &vcpu->arch.root_mmu);
+ 	__kvm_mmu_free_obsolete_roots(vcpu->kvm, &vcpu->arch.guest_mmu);
+ }
++EXPORT_SYMBOL_GPL(kvm_mmu_free_obsolete_roots);
  
- 	if (is_shadow_present_pte(*sptep)) {
--		if (prefetch && is_last_spte(*sptep, level))
-+		if (prefetch && is_last_spte(*sptep, level) &&
-+		    pfn == spte_to_pfn(*sptep))
- 			return RET_PF_SPURIOUS;
- 
- 		/*
-@@ -2860,7 +2861,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
- 			child = spte_to_child_sp(pte);
- 			drop_parent_pte(vcpu->kvm, child, sptep);
- 			flush = true;
--		} else if (pfn != spte_to_pfn(*sptep)) {
-+		} else if (WARN_ON_ONCE(pfn != spte_to_pfn(*sptep))) {
- 			drop_spte(vcpu->kvm, sptep);
- 			flush = true;
- 		} else
+ static u64 mmu_pte_write_fetch_gpte(struct kvm_vcpu *vcpu, gpa_t *gpa,
+ 				    int *bytes)
 -- 
 2.43.2
 
