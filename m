@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-41426-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41424-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2852A67B93
-	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 19:06:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E100A67B8F
+	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 19:06:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8008C8857B9
-	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 18:04:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FCCC88340B
+	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 18:03:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE58E213E81;
-	Tue, 18 Mar 2025 18:03:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1DBD2135B1;
+	Tue, 18 Mar 2025 18:03:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Nh0/yY3G"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jFWwKe1d"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20599212FA2
-	for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 18:03:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB17A212B05
+	for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 18:03:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742320997; cv=none; b=sz5ANffISwk43FZwVoL6VqMHFfPOln66xclkLgyMemqMPfA1+4v1eNgbTmJjrRq5czLM0BzVcmTZWx1QOA3sGiClMX1noYaxueVfCfnhXnn3sYy6jaHoaq3qaHce1ILtSl5WJuAhkq2fffUP/Hgy0sNtGWF3esEmalHUb8bkGos=
+	t=1742320994; cv=none; b=Z+86obzbpPyYQwqEEleV7IVyB254e/gkwwQeJee834BUkBlbn/g+Ru3dE1NExo1j14fOYealf3Yw3Qy2Jz8dSc2bzGxDxkscSC4Ic4Rs9nMfWV2lKa3FHEpEhtol/hKVyO4RjDdYVBj8gb4Ys/qN1Zqe3JoC3f8kZaKbwrF/dOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742320997; c=relaxed/simple;
-	bh=XaNGJLkWPs0Qmbxt043B99FS4bhKF+GrcE4g0MLQJNU=;
+	s=arc-20240116; t=1742320994; c=relaxed/simple;
+	bh=GK/Jq82TjnTyp0ZDk6HXhisugMDOk6munK5wzO9dtw0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gt9SLcd84aDM3mfrlgnNgQJb1JRnTNMYIpoNymSPcCOazIY9TM05cChMMqeNv0RPIBIqmW8O8sq6GRwZ2+WwUlEBl0Xs8VXPCAABUcEOjtoDGKRJrSfHRWvXAFJ6CH/Z4tYIDVt6B3bcc7xCOEaEI8EJSNwW342sG0gfOJ+Ha94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Nh0/yY3G; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=XViPctzqpJQEda+ckGLWE8VU8q9/i3HzwLHj7eRcmcHIpAb6w6cRm8Aqv8e2ADqT6C0zjnC46tiL/CoYq3ZLrQqUhjO5pqs/x0rnVMECX6kMmAwUzpb9Z4kQZpTlfStHH1zDITlXsXzPG0oh/tprafZnh3j/O+J7AZ9F5+wtLmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jFWwKe1d; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff605a7a43so9293768a91.3
-        for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 11:03:09 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-22403329f9eso91916825ad.3
+        for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 11:03:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742320989; x=1742925789; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1742320991; x=1742925791; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=LnxJk4vBSHp9N1LYFKJLt0e8ikcWRVhvPtecH3/Bee4=;
-        b=Nh0/yY3G5b1sdJkbN58sr2FAcrLAnmUr4RBP5rCe05GR51Sf7urOCTV0E8oPDD2Zlf
-         /Zs7EJ89bBzyvveDqXWTSLfS3EsobAcxAL/5CZIoYOpe47grN9CNzMJJ0WauW+lo1xcF
-         WutNW4IrXFMtu2v/I/Ac5UKyQrmmyjDyGDh/0DpEoEPNkbIrNA5uqSwtmJzae9p/HCuW
-         zryO/1M5FC36DMbKrHT1bNeCgBnFbgH8jIgf7KXYdS70KvdkJGUXj9ByOJwozBfEzkXn
-         EW2qEaNB/LuyvZTkjmhBzAaapNh/CwjVuXdnyXlm/COxyNlojul377gDFUCd/2EcYtxF
-         rORA==
+        bh=hfhGZI1wf8iWTOyCG90KTDrGIGyW4OXH3t2Rrrzll5M=;
+        b=jFWwKe1dpVcKYWoU47VE6U6OUBHV1lISjuVw0bvBc5VEZ0aE4KruXhzS3ktjeyxb4q
+         jakVj6yXiAwp6yIkmrg390dj6LH73011eFT8vQgIxr50QQj3Z5dEJ45KTFXZWSEN8i8x
+         eNrffB2ksQzIc6Uc9qCzrlItOvVKQCPJazAL37AoAPDp+Ec6gPCgSbamzpJoo7G8Yfh+
+         +1mkznkTk7HLwCm0jnYRga3kaww5ce75b9t7Dh5r6zeKe+wPCwuBDwbuOo9L6X4gbQxx
+         Rf6dNt1F/zHU20L93hyKajB0xbwXNtw3CjWixV8Kq15+xr6PKPYjKXPAiTz8pSZzZXn7
+         dwZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742320989; x=1742925789;
+        d=1e100.net; s=20230601; t=1742320991; x=1742925791;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=LnxJk4vBSHp9N1LYFKJLt0e8ikcWRVhvPtecH3/Bee4=;
-        b=RuHlKTaABtCSheIHIjoita8I7WZZE4OF0Rv+cxqg3QXSoR7/7UhvvqFEfd3ti7qO3t
-         x3muRPDcJ6OqsxgafJ+WV68r+yrm+DJ71E5lEbn9A6w2hy5XzoyO33VeInYtDjDDFq5n
-         RvwP34EuKCk4jiKXRHmITqeTUFRFPckm3odTb3JuiD7aIMIZeGC7HAIC0FOX7gyu9b0U
-         7oya1Eb9DANq94iIzyGSxt+tqrUpM5ksFsyl2INcPXjzfdsXnU+FOj3yfytkkjMkG8wp
-         Tm/b1raI/x72JTbJ1Kn1CqlVSMusfN+ZbmDzfInxbDd5BQzGbtOjJ50mujO+jHwJMP1R
-         79vQ==
-X-Gm-Message-State: AOJu0YxY7UxlQnm8AUoTiMjoZqDLCF2G6aHOQNGneraom3oCGzVQ4TW5
-	XAj++70Il4C8mEac1ojQRTIXo8vPmlyFE5bnO9nRLBVS4kQOpCykXCAe4CUObeo0inJDCmFYcW+
-	AZg==
-X-Google-Smtp-Source: AGHT+IHZwwToMGKFE4smkp6DkYNdKGE/kbs13n/bLX0z07PsjJvXq6Jp/hz8OiDvzRRG1V1mnoUZJJtQRjQ=
-X-Received: from pjbsd13.prod.google.com ([2002:a17:90b:514d:b0:2ea:5084:5297])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:388b:b0:2fe:b907:562f
- with SMTP id 98e67ed59e1d1-301a5b0d3fdmr4269014a91.14.1742320989263; Tue, 18
- Mar 2025 11:03:09 -0700 (PDT)
+        bh=hfhGZI1wf8iWTOyCG90KTDrGIGyW4OXH3t2Rrrzll5M=;
+        b=eRw9S5nUOAVi+Z3pPTx8nwk1lZeVMjtGl5Dg6FjfsA3FkzfrdG8ho8EH1MuNAcs8kQ
+         1MtIK/NGOqx/TZodebfVxeyD+sZG0XbYMjUMA9ZmHa171I254KvufcrP65y45uvPv9Zf
+         MtyJ8ndWEVBCwzh8u0Vxhmul+3FNgQQx6aUbu3PveBa/jrCB5q+YhzMId+0jQOCbmRiJ
+         dvedblV1O39ep59w57hHgo06zorYvhaES6QZBcIVm0lvqReMJ4TaY+7XFpmh8YQVq9pY
+         INQTSmuTY5+LEYPYDOKHAAorRjbXn2/1KkoVCReFPol0XecFHIdQDbQ8uy4M4T2y5jOW
+         7xbw==
+X-Gm-Message-State: AOJu0Yx+DoW8won1uQn/xbPO7g+xHsBv3NUbKR4ZNg0HxedTlQqT6goN
+	6gotoa24RjTBh1mrJV+K7mNrToZUr2P155dQ8gcpovou0J2i1d5GqZcQmGrs6VCOOJ7cQt4G17C
+	X0Q==
+X-Google-Smtp-Source: AGHT+IHZyJniuUGJb80kY6TBDAKitKRZc4VUdJYUBBNt6eCyhq66AFnESWyFZkAGJ3I6GiaAO5I1FnvE9Zs=
+X-Received: from pfpk14.prod.google.com ([2002:aa7:9d0e:0:b0:734:f775:648f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:431e:b0:1f5:6f61:a0c2
+ with SMTP id adf61e73a8af0-1f5c12ec629mr28938766637.34.1742320991112; Tue, 18
+ Mar 2025 11:03:11 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 18 Mar 2025 11:02:56 -0700
+Date: Tue, 18 Mar 2025 11:02:57 -0700
 In-Reply-To: <20250318180303.283401-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,20 +75,16 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250318180303.283401-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.rc1.451.g8f38331e32-goog
-Message-ID: <20250318180303.283401-2-seanjc@google.com>
-Subject: [GIT PULL] KVM: x86: Misc changes for 6.15
+Message-ID: <20250318180303.283401-3-seanjc@google.com>
+Subject: [GIT PULL] KVM: x86: MMU changes for 6.15
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-A variety of cleanups and minor fixes, and improved support (and fixes) for
-honoring L1 intercepts when emulating instructions on behalf of L2.
-
-FWIW, unless I'm missing something, the severity of the L2 emulation bugs means
-that emulating instructions while L2 is active is _very_ rare for real world
-use cases.  I.e. the fixes are not urgent.
+Except for a minor cleanup, the MMU changes for 6.15 are all about adding
+support for aging SPTEs without holding mmu_lock.  Details in the tag.
 
 The following changes since commit a64dcfb451e254085a7daee5fe51bf22959d52d3:
 
@@ -96,93 +92,69 @@ The following changes since commit a64dcfb451e254085a7daee5fe51bf22959d52d3:
 
 are available in the Git repository at:
 
-  https://github.com/kvm-x86/linux.git tags/kvm-x86-misc-6.15
+  https://github.com/kvm-x86/linux.git tags/kvm-x86-mmu-6.15
 
-for you to fetch changes up to e6c8728a8e2d20b262209c70a8ca67719a628833:
+for you to fetch changes up to 0dab791f05ce2c9f0215f50cb46ed0c3126fe211:
 
-  KVM: x86: Remove the unreachable case for 0x80000022 leaf in __do_cpuid_func() (2025-03-04 09:19:49 -0800)
-
-----------------------------------------------------------------
-KVM x86 misc changes for 6.15:
-
- - Fix a bug in PIC emulation that caused KVM to emit a spurious KVM_REQ_EVENT.
-
- - Add a helper to consolidate handling of mp_state transitions, and use it to
-   clear pv_unhalted whenever a vCPU is made RUNNABLE.
-
- - Defer runtime CPUID updates until KVM emulates a CPUID instruction, to
-   coalesce updates when multiple pieces of vCPU state are changing, e.g. as
-   part of a nested transition.
-
- - Fix a variety of nested emulation bugs, and add VMX support for synthesizing
-   nested VM-Exit on interception (instead of injecting #UD into L2).
-
- - Drop "support" for PV Async #PF with proctected guests without SEND_ALWAYS,
-   as KVM can't get the current CPL.
-
- - Misc cleanups
+  KVM: x86/tdp_mmu: Remove tdp_mmu_for_each_pte() (2025-02-28 09:14:20 -0800)
 
 ----------------------------------------------------------------
-Ethan Zhao (1):
-      KVM: x86/cpuid: add type suffix to decimal const 48 fix building warning
+KVM x86/mmu changes for 6.15
 
-Jim Mattson (2):
-      KVM: x86: Introduce kvm_set_mp_state()
-      KVM: x86: Clear pv_unhalted on all transitions to KVM_MP_STATE_RUNNABLE
+Add support for "fast" aging of SPTEs in both the TDP MMU and Shadow MMU, where
+"fast" means "without holding mmu_lock".  Not taking mmu_lock allows multiple
+aging actions to run in parallel, and more importantly avoids stalling vCPUs,
+e.g. due to holding mmu_lock for an extended duration while a vCPU is faulting
+in memory.
 
-Li RongQing (1):
-      KVM: x86: Use kvfree_rcu() to free old optimized APIC map
+For the TDP MMU, protect aging via RCU; the page tables are RCU-protected and
+KVM doesn't need to access any metadata to age SPTEs.
 
-Liam Ni (1):
-      KVM: x86: Wake vCPU for PIC interrupt injection iff a valid IRQ was found
+For the Shadow MMU, use bit 1 of rmap pointers (bit 0 is used to terminate a
+list of rmaps) to implement a per-rmap single-bit spinlock.  When aging a gfn,
+acquire the rmap's spinlock with read-only permissions, which allows hardening
+and optimizing the locking and aging, e.g. locking an rmap for write requires
+mmu_lock to also be held.  The lock is NOT a true R/W spinlock, i.e. multiple
+concurrent readers aren't supported.
 
-Sean Christopherson (19):
-      KVM: x86: Use for-loop to iterate over XSTATE size entries
-      KVM: x86: Apply TSX_CTRL_CPUID_CLEAR if and only if the vCPU has RTM or HLE
-      KVM: x86: Query X86_FEATURE_MWAIT iff userspace owns the CPUID feature bit
-      KVM: x86: Defer runtime updates of dynamic CPUID bits until CPUID emulation
-      KVM: nVMX: Check PAUSE_EXITING, not BUS_LOCK_DETECTION, on PAUSE emulation
-      KVM: nSVM: Pass next RIP, not current RIP, for nested VM-Exit on emulation
-      KVM: nVMX: Allow emulating RDPID on behalf of L2
-      KVM: nVMX: Emulate HLT in L2 if it's not intercepted
-      KVM: nVMX: Consolidate missing X86EMUL_INTERCEPTED logic in L2 emulation
-      KVM: x86: Plumb the src/dst operand types through to .check_intercept()
-      KVM: x86: Plumb the emulator's starting RIP into nested intercept checks
-      KVM: x86: Add a #define for the architectural max instruction length
-      KVM: nVMX: Allow the caller to provide instruction length on nested VM-Exit
-      KVM: nVMX: Synthesize nested VM-Exit for supported emulation intercepts
-      KVM: selftests: Add a nested (forced) emulation intercept test for x86
-      KVM: x86: Don't inject PV async #PF if SEND_ALWAYS=0 and guest state is protected
-      KVM: x86: Rename and invert async #PF's send_user_only flag to send_always
-      KVM: x86: Use a dedicated flow for queueing re-injected exceptions
-      KVM: x86: Always set mp_state to RUNNABLE on wakeup from HLT
+To avoid forcing all SPTE updates to use atomic operations (clearing the
+Accessed bit out of mmu_lock makes it inherently volatile), rework and rename
+spte_has_volatile_bits() to spte_needs_atomic_update() and deliberately exclude
+the Accessed bit.  KVM (and mm/) already tolerates false positives/negatives
+for Accessed information, and all testing has shown that reducing the latency
+of aging is far more beneficial to overall system performance than providing
+"perfect" young/old information.
 
-Ted Chen (1):
-      KVM: x86: Remove unused iommu_domain and iommu_noncoherent from kvm_arch
+----------------------------------------------------------------
+James Houghton (6):
+      KVM: Rename kvm_handle_hva_range()
+      KVM: Allow lockless walk of SPTEs when handing aging mmu_notifier event
+      KVM: x86/mmu: Factor out spte atomic bit clearing routine
+      KVM: x86/mmu: Don't force atomic update if only the Accessed bit is volatile
+      KVM: x86/mmu: Skip shadow MMU test_young if TDP MMU reports page as young
+      KVM: x86/mmu: Only check gfn age in shadow MMU if indirect_shadow_pages > 0
 
-Xiaoyao Li (1):
-      KVM: x86: Remove the unreachable case for 0x80000022 leaf in __do_cpuid_func()
+Nikolay Borisov (1):
+      KVM: x86/tdp_mmu: Remove tdp_mmu_for_each_pte()
 
- arch/x86/include/asm/kvm_host.h                    |   9 +-
- arch/x86/kvm/cpuid.c                               |  52 ++++----
- arch/x86/kvm/cpuid.h                               |   9 +-
- arch/x86/kvm/emulate.c                             |   5 +-
- arch/x86/kvm/i8259.c                               |   2 +-
- arch/x86/kvm/kvm_emulate.h                         |   7 +-
- arch/x86/kvm/lapic.c                               |  17 +--
- arch/x86/kvm/smm.c                                 |   2 +-
- arch/x86/kvm/svm/nested.c                          |   2 +-
- arch/x86/kvm/svm/sev.c                             |   7 +-
- arch/x86/kvm/svm/svm.c                             |  17 ++-
- arch/x86/kvm/trace.h                               |  14 +-
- arch/x86/kvm/vmx/nested.c                          |  18 +--
- arch/x86/kvm/vmx/nested.h                          |  22 +++-
- arch/x86/kvm/vmx/vmx.c                             | 120 ++++++++++++-----
- arch/x86/kvm/x86.c                                 | 136 +++++++++----------
- arch/x86/kvm/x86.h                                 |   7 +
- arch/x86/kvm/xen.c                                 |   4 +-
- tools/testing/selftests/kvm/Makefile.kvm           |   1 +
- .../selftests/kvm/x86/nested_emulation_test.c      | 146 +++++++++++++++++++++
- 20 files changed, 416 insertions(+), 181 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/x86/nested_emulation_test.c
+Sean Christopherson (6):
+      KVM: x86/mmu: Always update A/D-disabled SPTEs atomically
+      KVM: x86/mmu: Age TDP MMU SPTEs without holding mmu_lock
+      KVM: x86/mmu: Refactor low level rmap helpers to prep for walking w/o mmu_lock
+      KVM: x86/mmu: Add infrastructure to allow walking rmaps outside of mmu_lock
+      KVM: x86/mmu: Add support for lockless walks of rmap SPTEs
+      KVM: x86/mmu: Walk rmaps (shadow MMU) without holding mmu_lock when aging gfns
+
+ Documentation/virt/kvm/locking.rst |   4 +-
+ arch/x86/include/asm/kvm_host.h    |   4 +-
+ arch/x86/kvm/Kconfig               |   1 +
+ arch/x86/kvm/mmu/mmu.c             | 363 +++++++++++++++++++++++++++----------
+ arch/x86/kvm/mmu/spte.c            |  31 ++--
+ arch/x86/kvm/mmu/spte.h            |   2 +-
+ arch/x86/kvm/mmu/tdp_iter.h        |  34 ++--
+ arch/x86/kvm/mmu/tdp_mmu.c         |  45 +++--
+ include/linux/kvm_host.h           |   1 +
+ virt/kvm/Kconfig                   |   4 +
+ virt/kvm/kvm_main.c                |  53 +++---
+ 11 files changed, 373 insertions(+), 169 deletions(-)
 
