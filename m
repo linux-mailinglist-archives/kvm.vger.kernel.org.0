@@ -1,132 +1,156 @@
-Return-Path: <kvm+bounces-41416-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41417-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 558E0A67AFA
-	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 18:30:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CD84A67B35
+	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 18:43:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 740A24234C9
-	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 17:30:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E18FE3BEE28
+	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 17:42:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D6DE212D6B;
-	Tue, 18 Mar 2025 17:29:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7390C2116F4;
+	Tue, 18 Mar 2025 17:42:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nZs4DP7H"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NR/trxNj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4081113C908;
-	Tue, 18 Mar 2025 17:29:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D51C721129C
+	for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 17:42:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742318984; cv=none; b=Kxb/awfmiWztAeZG/VfxF5zHfNSwN8zgm9CB1xbLDMIjcjmzCUoCMXJtzaazqi76duFQIJ+s7jojo66uMsjUzZaidJqb3HKsVYbaXXj29fqpNO9WePUkCCvWoMpi6FxjvEPawQ0Drlzl3Y7OL5Fh2c05R0N5v9iYWCZFGpMEwVc=
+	t=1742319761; cv=none; b=FVQMyMdJMd889IRVGojDeCnY7JXLY9ChO/2wCkZxxlV/emcZacVmf+vMjbEarKjkikrLcBPM+gSdQ/folcoY2BPtyp+CXTrh387vUs+wZxPyseRulbayGZQsoB+aSOo0Op9A75B50LUBbbjXoj5kvC3BSCwwjv9lkx6eLmjZ8AQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742318984; c=relaxed/simple;
-	bh=l+3cKI1Pbb9aYDDHtKWGxSIx2x/V6YyBxyEjqF+ZFk0=;
-	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=lJr9H8KxPpTFgky3uPQietm/aFUOaeZjJdA5bTvWvAIXc3k4FICb58OpJEVXPeTFuMj1o5y8aYFlsiznSM+F4pCDQqYqY7TRhpy/ChHIMp5I6iOS88sC3lnl55Lwwt+mmW4w95YrvnY4v+BJBxHN2Y72qvRbytDN1MzJZr2CTtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nZs4DP7H; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52IH0CmN011598;
-	Tue, 18 Mar 2025 17:29:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pp1; bh=9ehkTcd0d43Pw/Xfl6py7gyh3x8O
-	mdwtD261Y4DK4V8=; b=nZs4DP7HD/JYIUdO4l3LuAjn0J8SbQas17+w6+dmDR42
-	u06rMHFb69K0pWq10yzAFf7DyeZIOlotlELcuGxGjEDLrgBOMmtzREQ5xAjwZGcA
-	tLKPWw8/PbMzk4GIyAOkAPqexvAjbqJGisMwyd+bS3mu61t1anmm1XcTjB4Eg86L
-	Wtbx/8S/MKtWhdfYi5GnXlH/VRE011GawCHuNJS/wqUOsnGEeE6md47ZuLJQIvZq
-	nlOmdlpYoMqzkyW1d6xvi/pyyq+9GidPsoa7WOSukkPyUztNDdSu2AiTWU0wrYAw
-	lM72HMqT8v5uqh6Rq20dtIErD60Dpng/yUgWopoATQ==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45eu55w7yc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 18 Mar 2025 17:29:28 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52IH0XNh031974;
-	Tue, 18 Mar 2025 17:29:28 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 45dkvtdap1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 18 Mar 2025 17:29:28 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52IHTOOF19202428
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 18 Mar 2025 17:29:24 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5332320043;
-	Tue, 18 Mar 2025 17:29:24 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 95BA120040;
-	Tue, 18 Mar 2025 17:29:22 +0000 (GMT)
-Received: from [172.17.0.2] (unknown [9.3.101.137])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 18 Mar 2025 17:29:22 +0000 (GMT)
-Subject: [PATCH] vfio: pci: Advertise INTx only if LINE is connected
-From: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-To: alex.williamson@redhat.com, jgg@ziepe.ca, kevin.tian@intel.com
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, yi.l.liu@intel.com,
-        Yunxiang.Li@amd.com, pstanner@redhat.com, maddy@linux.ibm.com,
-        linuxppc-dev@lists.ozlabs.org, sbhat@linux.ibm.com
-Date: Tue, 18 Mar 2025 17:29:21 +0000
-Message-ID: <174231895238.2295.12586708771396482526.stgit@linux.ibm.com>
-User-Agent: StGit/1.1
+	s=arc-20240116; t=1742319761; c=relaxed/simple;
+	bh=e7H2rTlg7EsT45u+6vx9fQXGua6kYfYyLqILh3T4vwk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CB+rbb41tmdVmTg996UMKIxD+3lqK9YFTVvDQuAXLKOe1zSflb89JJuLr7STgeqjrae72uyV9AyYIc9qesbOAwOuqD4+QnUQQMwoVDPKJWF4LxFkWk440AwK04bPK9qZUGmFgWoT4TPveKlrfqxhN5H/3RwQt+0PWqR4iJfg9oc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=NR/trxNj; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-43cef035a3bso26581355e9.1
+        for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 10:42:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1742319754; x=1742924554; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=17SVMOF/Nhdsp+4dVpqTL9OX4gq5t4F3wmy4D//jp7U=;
+        b=NR/trxNjsCScaTaTKkfJrTpz32rjQTTQNhwrha6iFBnQhRdH/AI/kiQecABs9fGZGh
+         tLmFaBdguLONnO1PDJgpt/sUgFH6WG8jcvLY7HTP0g57n5CSYVfKtD1eERS1HajeQoMB
+         XUP74ACGGVmE9+sVn+jqy24TgiJMB43JKX88osoqQkEMMYJxIIu2Q1VoqS0ymU7IPx4h
+         uqFVXfKTI5Z/4pq1CN5x+vBrCucCViaL4c6emm9MR0rgrZIkJDlcQbEQl5tHFEHP4DVk
+         l5W4GS7yxSeUPJxxllNZtNhbdwWn6nguhviKMsdgGpT8yilsbKPPRjMqyqlqsit18EEK
+         5gzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742319754; x=1742924554;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=17SVMOF/Nhdsp+4dVpqTL9OX4gq5t4F3wmy4D//jp7U=;
+        b=Sng+y0dyBwD835ULHERR/z7782JMiat5jrD5y3eG6N4Yn8erQRAmw/x/+Lbf8Mmzxn
+         uf2GYiKAZLXtOk6sQOM5mJjP5J1cihocT3IMccO7/s20qB1ft+yf0H9cgFBlJU/ZTsLf
+         OyOu1lh7YDzuDbfPApVKlwr+5/xiTlb4YauqyJQyDGWlocjGQ567NereM+5+z3fYzJEC
+         bFKXUnwgdImrgsnsyp7PEs8ALP6Ht7Ap4seXUpmL461AgIYl+/9La50ZPbyYN9/Oobdg
+         Dcoo4WcFBrlfbXMguI5+EU1QRyAlA4SYkgJTT8a9V05CF3iqMaA4WTzBMh95oJwjQAhM
+         Mnhg==
+X-Forwarded-Encrypted: i=1; AJvYcCXD6Fs1uu5TA7Tzsv4wK5otulwwbv/an9MXw2c97/LOGCd1peJvtpb3qMBYkiE3rmZGhPY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+S10tMFUb1d4lil0EfyVH+ZtiIkWxPtWp59UhaKZR2IDQjAtP
+	vYTnKRVssYqSuucXM5EMP7M97NDVkf8sguYG9q8a9FkOAVtNlc0JkJC7xeWmfrs=
+X-Gm-Gg: ASbGncvPWXlEmcZ7XotSECQ8ajzwCzEDGG+dbtNIMoTpISgX9GZU7uGBfgBbFlrSYDi
+	T4kJ6oR6VqI/awT5ou4avKiqWwKAwp3JeJSrfXbXni47zj57y3hW+pgq2UBY0QRwvkfwSV9l3Y/
+	WEa/LjYSAw2jeV+dRA0O3meZOcyeoIxvzRWXjmLxSIr1bnQh8ntHa4EFGCW9/eHlgMywoGGCxfM
+	3GMZdrmvy57CCEZw+QwybZeGvXpmKY96LBLRnW4/KbxHW+3IOPxZvwRSlv7syGKcreYW9R2Yu4D
+	zNUwTIkzVAttO/1p0Ou9ip7KwesxXfr3Y09K99Tu1C9svrzoD3GxaX62qDDrLuEd68uSZrAXlut
+	RzcEA+8g3yhFH
+X-Google-Smtp-Source: AGHT+IHNhODWTF+JiipsrlWDdQ9MdXQw/X10v5jVQIbHnGx/mcJwin8Hy3ZzvMzwWdXdLV4Tkjm9qw==
+X-Received: by 2002:a5d:6da2:0:b0:390:f394:6271 with SMTP id ffacd0b85a97d-39720966395mr18326969f8f.43.1742319753993;
+        Tue, 18 Mar 2025 10:42:33 -0700 (PDT)
+Received: from [192.168.69.235] (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395cb40cdafsm18871927f8f.62.2025.03.18.10.42.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Mar 2025 10:42:33 -0700 (PDT)
+Message-ID: <8a24a29c-9d2a-47c9-a183-c92242c82bd9@linaro.org>
+Date: Tue, 18 Mar 2025 18:42:32 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 11/13] target/arm/cpu: remove inline stubs for aarch32
+ emulation
+To: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-arm@nongnu.org, alex.bennee@linaro.org,
+ Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>
+References: <20250318045125.759259-1-pierrick.bouvier@linaro.org>
+ <20250318045125.759259-12-pierrick.bouvier@linaro.org>
+Content-Language: en-US
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <20250318045125.759259-12-pierrick.bouvier@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: GDDIVZyl4q0rZUaHaDFiqrzscpzhIBL1
-X-Proofpoint-GUID: GDDIVZyl4q0rZUaHaDFiqrzscpzhIBL1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-18_08,2025-03-17_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
- mlxlogscore=999 priorityscore=1501 adultscore=0 suspectscore=0
- impostorscore=0 mlxscore=0 lowpriorityscore=0 clxscore=1011 phishscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502280000 definitions=main-2503180127
 
-On POWER systems, when the device is behind the io expander,
-not all PCI slots would have the PCI_INTERRUPT_LINE connected.
-The firmware assigns a valid PCI_INTERRUPT_PIN though. In such
-configuration, the irq_info ioctl currently advertizes the
-irq count as 1 as the PCI_INTERRUPT_PIN is valid.
+On 18/3/25 05:51, Pierrick Bouvier wrote:
+> Directly condition associated calls in target/arm/helper.c for now.
+> 
+> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+> ---
+>   target/arm/cpu.h    | 8 --------
+>   target/arm/helper.c | 6 ++++++
+>   2 files changed, 6 insertions(+), 8 deletions(-)
+> 
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 51b6428cfec..9205cbdec43 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -1222,7 +1222,6 @@ int arm_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
+>    */
+>   void arm_emulate_firmware_reset(CPUState *cpustate, int target_el);
+>   
+> -#ifdef TARGET_AARCH64
+>   int aarch64_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, int reg);
+>   int aarch64_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+>   void aarch64_sve_narrow_vq(CPUARMState *env, unsigned vq);
+> @@ -1254,13 +1253,6 @@ static inline uint64_t *sve_bswap64(uint64_t *dst, uint64_t *src, int nr)
+>   #endif
+>   }
+>   
+> -#else
+> -static inline void aarch64_sve_narrow_vq(CPUARMState *env, unsigned vq) { }
+> -static inline void aarch64_sve_change_el(CPUARMState *env, int o,
+> -                                         int n, bool a)
+> -{ }
+> -#endif
+> -
+>   void aarch64_sync_32_to_64(CPUARMState *env);
+>   void aarch64_sync_64_to_32(CPUARMState *env);
+>   
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index b46b2bffcf3..774e1ee0245 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -6562,7 +6562,9 @@ static void zcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>        */
+>       new_len = sve_vqm1_for_el(env, cur_el);
+>       if (new_len < old_len) {
+> +#ifdef TARGET_AARCH64
 
-The patch adds the additional check[1] if the irq is assigned
-for the PIN which is done iff the LINE is connected.
+What about using runtime check instead?
 
-[1]: https://lore.kernel.org/qemu-devel/20250131150201.048aa3bf.alex.williamson@redhat.com/
+  if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64) && new_len < old_len) {
 
-Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-Suggested-By: Alex Williamson <alex.williamson@redhat.com>
----
- drivers/vfio/pci/vfio_pci_core.c |    4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index 586e49efb81b..4ce70f05b4a8 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -734,6 +734,10 @@ static int vfio_pci_get_irq_count(struct vfio_pci_core_device *vdev, int irq_typ
- 			return 0;
- 
- 		pci_read_config_byte(vdev->pdev, PCI_INTERRUPT_PIN, &pin);
-+#if IS_ENABLED(CONFIG_PPC64)
-+		if (!vdev->pdev->irq)
-+			pin = 0;
-+#endif
- 
- 		return pin ? 1 : 0;
- 	} else if (irq_type == VFIO_PCI_MSI_IRQ_INDEX) {
-
+>           aarch64_sve_narrow_vq(env, new_len + 1);
+> +#endif
+>       }
+>   }
 
 
