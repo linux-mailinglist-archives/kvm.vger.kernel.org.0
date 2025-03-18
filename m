@@ -1,203 +1,166 @@
-Return-Path: <kvm+bounces-41361-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41362-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF07CA66A55
-	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 07:20:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DB51A66A93
+	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 07:36:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE677189C50A
-	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 06:20:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C3303B8D8E
+	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 06:35:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECB031DE2DA;
-	Tue, 18 Mar 2025 06:20:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CB1A1DE8B7;
+	Tue, 18 Mar 2025 06:35:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XmAUG3f0"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 831A742A83;
-	Tue, 18 Mar 2025 06:20:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA5E46426;
+	Tue, 18 Mar 2025 06:35:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742278838; cv=none; b=BsXzvgzFCJxG9a/t2FAKcAzcO/3pF+WB6uv5BAcWa3KKUYBrpJrYb5bq6yItZJmPLm9wYo7mM1T8Mj4pZE+tbm7APHyO8VEOcUnH4XYzPMnrVFC6NhheT4f7Kqj4ytL5K+ISGmrK0t34k7S23KvcjnsKmYAzl7TBAC0M/WzeCtY=
+	t=1742279751; cv=none; b=mqy835bngdJVwjhCw13Ml1gGkKQwAwOHFPrj5rH0fjO4wSXcoa6Uk6NceysMN9ox+KKEzwRgN0eX1zNzoiu01YWfxcIQrVB3FfuekSfCNDigHv5GC67Bp0aw+hYs0qwwI/4yqftVoBRvokN7KoRlocxsBrZB4KrL1WYVu1aCsbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742278838; c=relaxed/simple;
-	bh=JzXyaXcy650eMpJNgaYCrDvYqDRVK3fLIBCQZ8xEcqI=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=d4peu3u/5plVp1w+RUH7RmFFrNXEKLE4nGFKzfrMj33DYOkJGWRHQFC5CKG7OT1hRaGwz2z3h0dZz+YXI58BKwyUu0mvXAE0xjp/LThouXnHxaG3FagVq/Zczg57gKc47OdXUV/0m1V4tkzA/HpM9W03nLQC5OzMIDDLPCPs6LY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4ZH1rL4V7QztQyd;
-	Tue, 18 Mar 2025 14:18:58 +0800 (CST)
-Received: from kwepemg500006.china.huawei.com (unknown [7.202.181.43])
-	by mail.maildlp.com (Postfix) with ESMTPS id BA2C2140367;
-	Tue, 18 Mar 2025 14:20:26 +0800 (CST)
-Received: from [10.67.121.110] (10.67.121.110) by
- kwepemg500006.china.huawei.com (7.202.181.43) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 18 Mar 2025 14:20:26 +0800
-Subject: Re: [PATCH v5 5/5] hisi_acc_vfio_pci: bugfix live migration function
- without VF device driver
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com"
-	<jgg@nvidia.com>, Jonathan Cameron <jonathan.cameron@huawei.com>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linuxarm@openeuler.org" <linuxarm@openeuler.org>
-References: <20250313072010.57199-1-liulongfang@huawei.com>
- <20250313072010.57199-6-liulongfang@huawei.com>
- <53d0f91f3d8440bc91858dd4811b7170@huawei.com>
-From: liulongfang <liulongfang@huawei.com>
-Message-ID: <4c7aa4c8-433e-49e2-b499-1ca47d1cc7ce@huawei.com>
-Date: Tue, 18 Mar 2025 14:20:25 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1742279751; c=relaxed/simple;
+	bh=rOHbCLNwUuQ0MCHqcCbere0AhcqH/e8hZR21LTzO8A0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=WYzXSZ/hTL/pUyaQzjS9qOwKRYsYwlFp/AQ/Lim4SXxT3Gz0Ut5aOX1oCtvWPKcdUCnL/SXXH7IzYSHlOEf4CslJqPW4JhB+BViDIJKXW2XKQmoXW604GHlWkQS0A9r9obCR+J1t4POMfJMjmv+NlQhw7DO2/mHy0ksSLM2toTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XmAUG3f0; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1742279750; x=1773815750;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=rOHbCLNwUuQ0MCHqcCbere0AhcqH/e8hZR21LTzO8A0=;
+  b=XmAUG3f0vcISBCVMSirEIp/FYaxKEryvtSex0VR1kJ8QJtLKSIsGVpsR
+   NlMutFFw5JZsSTcXMhqTRJzUGhbfLdBKGSmWeINdTT70vbPBPvJLJD+ew
+   JjcQNfBhC7KjJ8HvTkokPfjaL06jcAGJtY9ZidVvhHlk9f/5NfDDK0psY
+   qjDrcHpAEaebpn4c8tqKx9/Hn1OJYwc9Ypt4Gh+5WtLJQ0V2bkMTYf7X9
+   6ZSSmoEZC3+xQY4X5DM9XjNK57sxYjiLHWwabv0uThIma+kvrBs0sHfUn
+   wJvv0DWKnl4Spvwx77dQv2kFRZVQu7cuJ9aI9f90gW4glfpp1YpNJyZxK
+   g==;
+X-CSE-ConnectionGUID: yNSKG1e/RDGpErUcYbPnyw==
+X-CSE-MsgGUID: z54N1lnIR3OUyOgc1Msm1Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11376"; a="53613407"
+X-IronPort-AV: E=Sophos;i="6.14,256,1736841600"; 
+   d="scan'208";a="53613407"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2025 23:35:49 -0700
+X-CSE-ConnectionGUID: PYYJ/dY/T1OFBLqUorXGGg==
+X-CSE-MsgGUID: ENPWH/G0SvKEh5EGg2Rb5Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,256,1736841600"; 
+   d="scan'208";a="153147525"
+Received: from vverma7-desk1.amr.corp.intel.com (HELO [192.168.1.200]) ([10.125.109.119])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2025 23:35:47 -0700
+From: Vishal Verma <vishal.l.verma@intel.com>
+Subject: [PATCH v2 0/4] KVM: TDX: Cleanup the kvm_x86_ops structure for
+ vmx/tdx
+Date: Tue, 18 Mar 2025 00:35:05 -0600
+Message-Id: <20250318-vverma7-cleanup_x86_ops-v2-0-701e82d6b779@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <53d0f91f3d8440bc91858dd4811b7170@huawei.com>
-Content-Type: text/plain; charset="gbk"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemg500006.china.huawei.com (7.202.181.43)
+X-B4-Tracking: v=1; b=H4sIABkU2WcC/4WNQQ6CMBQFr0K6tqa/QEFW3sMQUstHmkBLWmwwh
+ LtbiAtXupyXzLyVeHQaPamSlTgM2mtrIvBTQlQvzQOpbiMTznjOUgAaArpRFlQNKM1zapZSNHb
+ yVAmOOcOsAC5ItCeHnV6O8q2O3Gs/W/c6jgLs6/9mAMrohd8RuxJEK7qrNjMOZ2XH/eLjp799l
+ mZClRxAMvXl19u2vQHGs+GJ/gAAAA==
+X-Change-ID: 20250311-vverma7-cleanup_x86_ops-c62e50e47126
+To: Sean Christopherson <seanjc@google.com>, 
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Binbin Wu <binbin.wu@linxu.intel.com>, 
+ Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+ Vishal Verma <vishal.l.verma@intel.com>
+X-Mailer: b4 0.15-dev-c25d1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2999;
+ i=vishal.l.verma@intel.com; h=from:subject:message-id;
+ bh=rOHbCLNwUuQ0MCHqcCbere0AhcqH/e8hZR21LTzO8A0=;
+ b=owGbwMvMwCXGf25diOft7jLG02pJDOk3RcxsZddvSPTw+tnjZnqy3KRuVlqK1kWBgiUPV750P
+ rlI7dmKjlIWBjEuBlkxRZa/ez4yHpPbns8TmOAIM4eVCWQIAxenAEzE34Dhf+Zp5ddbvC4G8Sau
+ 0fz4/npMeqfpB51r3y9qPWeYevzTZR+GP9xhnN+Xz3gwc36oySK1WreH99KK179Yqd8ZHHtBbyL
+ HL1YA
+X-Developer-Key: i=vishal.l.verma@intel.com; a=openpgp;
+ fpr=F8682BE134C67A12332A2ED07AFA61BEA3B84DFF
 
-On 2025/3/14 16:11, Shameerali Kolothum Thodi wrote:
-> 
-> 
->> -----Original Message-----
->> From: liulongfang <liulongfang@huawei.com>
->> Sent: Thursday, March 13, 2025 7:20 AM
->> To: alex.williamson@redhat.com; jgg@nvidia.com; Shameerali Kolothum
->> Thodi <shameerali.kolothum.thodi@huawei.com>; Jonathan Cameron
->> <jonathan.cameron@huawei.com>
->> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
->> linuxarm@openeuler.org; liulongfang <liulongfang@huawei.com>
->> Subject: [PATCH v5 5/5] hisi_acc_vfio_pci: bugfix live migration function
->> without VF device driver
->>
->> If the VF device driver is not loaded in the Guest OS and we attempt to
->> perform device data migration, the address of the migrated data will
->> be NULL.
->> The live migration recovery operation on the destination side will
->> access a null address value, which will cause access errors.
->>
->> Therefore, live migration of VMs without added VF device drivers
->> does not require device data migration.
->> In addition, when the queue address data obtained by the destination
->> is empty, device queue recovery processing will not be performed.
->>
->> Fixes: b0eed085903e ("hisi_acc_vfio_pci: Add support for VFIO live
->> migration")
->> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
->> ---
->>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 25 +++++++++++++------
->>  1 file changed, 18 insertions(+), 7 deletions(-)
->>
->> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->> index cadc82419dca..44fa2d16bbcc 100644
->> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->> @@ -426,13 +426,6 @@ static int vf_qm_check_match(struct
->> hisi_acc_vf_core_device *hisi_acc_vdev,
->>  		return -EINVAL;
->>  	}
->>
->> -	ret = qm_write_regs(vf_qm, QM_VF_STATE, &vf_data->vf_qm_state,
->> 1);
->> -	if (ret) {
->> -		dev_err(dev, "failed to write QM_VF_STATE\n");
->> -		return ret;
->> -	}
->> -
->> -	hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
->>  	hisi_acc_vdev->match_done = true;
->>  	return 0;
->>  }
->> @@ -498,6 +491,13 @@ static int vf_qm_load_data(struct
->> hisi_acc_vf_core_device *hisi_acc_vdev,
->>  	if (migf->total_length < sizeof(struct acc_vf_data))
->>  		return -EINVAL;
->>
->> +	ret = qm_write_regs(qm, QM_VF_STATE, &vf_data->vf_qm_state, 1);
->> +	if (ret) {
->> +		dev_err(dev, "failed to write QM_VF_STATE\n");
->> +		return -EINVAL;
->> +	}
->> +	hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
->> +
->>  	qm->eqe_dma = vf_data->eqe_dma;
->>  	qm->aeqe_dma = vf_data->aeqe_dma;
->>  	qm->sqc_dma = vf_data->sqc_dma;
->> @@ -506,6 +506,12 @@ static int vf_qm_load_data(struct
->> hisi_acc_vf_core_device *hisi_acc_vdev,
->>  	qm->qp_base = vf_data->qp_base;
->>  	qm->qp_num = vf_data->qp_num;
->>
->> +	if (!vf_data->eqe_dma || !vf_data->aeqe_dma ||
->> +	    !vf_data->sqc_dma || !vf_data->cqc_dma) {
->> +		dev_err(dev, "resume dma addr is NULL!\n");
->> +		return -EINVAL;
->> +	}
->> +
->>  	ret = qm_set_regs(qm, vf_data);
->>  	if (ret) {
->>  		dev_err(dev, "set VF regs failed\n");
->> @@ -726,8 +732,12 @@ static int hisi_acc_vf_load_state(struct
->> hisi_acc_vf_core_device *hisi_acc_vdev)
->>  {
->>  	struct device *dev = &hisi_acc_vdev->vf_dev->dev;
->>  	struct hisi_acc_vf_migration_file *migf = hisi_acc_vdev-
->>> resuming_migf;
->> +	struct acc_vf_data *vf_data = &migf->vf_data;
->>  	int ret;
->>
->> +	if (vf_data->vf_qm_state != QM_READY)
->> +		return 0;
-> 
-> I don't think we need to check the above. In vf_qm_satte_save(), 
-> If  vf_qm_state !=  QM_READY, we set the
->  migf->total_length = QM_MATCH_SIZE.
-> 
-> Hence it will return 0 in the below  vf_qm_load_data() anyway.
->
+This is a cleanup that should follow the initial TDX base support (i.e.
+not an immediate fix needed for kvm-coco-queue).
 
-After removing this judgment code, the live migration function works normally
-without loading the VM driver.
-I will remove this judgment in the next version.
+Patch 1 is a precursory fix for a build warning/error found when
+manually testing the CONFIG_INTEL_TDX_HOST=n case.
 
-Thanks.
-Longfang.
+For Patches 2-4:
 
-> With that corrected,
-> 
-> Reviewed-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> 
-> Thanks,
-> Shameer
-> 
->> +
->>  	/* Recover data to VF */
->>  	ret = vf_qm_load_data(hisi_acc_vdev, migf);
->>  	if (ret) {
->> @@ -1531,6 +1541,7 @@ static int hisi_acc_vfio_pci_migrn_init_dev(struct
->> vfio_device *core_vdev)
->>  	hisi_acc_vdev->vf_id = pci_iov_vf_id(pdev) + 1;
->>  	hisi_acc_vdev->pf_qm = pf_qm;
->>  	hisi_acc_vdev->vf_dev = pdev;
->> +	hisi_acc_vdev->vf_qm_state = QM_NOT_READY;
->>  	mutex_init(&hisi_acc_vdev->state_mutex);
->>  	mutex_init(&hisi_acc_vdev->open_mutex);
->>
->> --
->> 2.24.0
-> 
-> .
-> 
+In [1], Sean points out that the kvm_x86_ops structure and its
+associated helpers and wrappers can be cleaned up a lot by -
+
+1. Putting the wrappers under CONFIG_KVM_INTEL_TDX, and
+2. Defining the helpers with macros that switch between the tdx and
+   non-tdx case, as well as NULL out the TDX-only stubs when needed.
+
+This cleans up the generated code by completely removing trampolines
+that would otherwise be left behind in the CONFIG_KVM_INTEL_TDX=n case.
+
+[1]: https://lore.kernel.org/kvm/Z6v9yjWLNTU6X90d@google.com/
+
+For example, looking at vt_refresh_apicv_exec_ctrl(), before this cleanup,
+when CONFIG_KVM_INTEL_TDX=n, the following asm is generated:
+
+0000000000036490 <vt_refresh_apicv_exec_ctrl>:
+   36490:       f3 0f 1e fa             endbr64
+   36494:       e8 00 00 00 00          call   36499 <vt_refresh_apicv_exec_ctrl+0x9>
+                        36495: R_X86_64_PLT32   __fentry__-0x4
+   36499:       e9 00 00 00 00          jmp    3649e <vt_refresh_apicv_exec_ctrl+0xe>
+                        3649a: R_X86_64_PLT32   vmx_refresh_apicv_exec_ctrl-0x4
+   3649e:       66 90                   xchg   %ax,%ax
+
+But with these patches, it goes away completely.
+
+These patches have been tested with TDX kvm-unit-tests, booting a Linux
+TD, TDX enhanced KVM selftests, and building and examining the generated
+assembly (or lack thereof) with both CONFIG_KVM_INTEL_TDX=y and
+CONFIG_KVM_INTEL_TDX=n
+
+Based on a patch by Sean Christopherson <seanjc@google.com>
+
+Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
+---
+Changes in v2:
+- Collect review tags (Binbin)
+- Add a new patch (patch 1) as a precursor that fixes a build problem
+- Squash the config change into patch 4 that converts ops to macros to
+avoid breaking the build when CONFIG_KVM_INTEL_TDX=n (Binbin)
+- Link to v1: https://lore.kernel.org/r/20250313-vverma7-cleanup_x86_ops-v1-0-0346c8211a0c@intel.com
+
+---
+Vishal Verma (4):
+      KVM: TDX: Fix definition of tdx_guest_nr_guest_keyids()
+      KVM: VMX: Move apicv_pre_state_restore to posted_intr.c
+      KVM: VMX: Make naming consistent for kvm_complete_insn_gp via define
+      KVM: VMX: Clean up and macrofy x86_ops
+
+ arch/x86/include/asm/tdx.h     |   2 +-
+ arch/x86/kvm/vmx/posted_intr.h |   1 +
+ arch/x86/kvm/vmx/tdx.h         |   2 +-
+ arch/x86/kvm/vmx/x86_ops.h     |  68 +-------------
+ arch/x86/kvm/vmx/main.c        | 204 ++++++++++++++++++++---------------------
+ arch/x86/kvm/vmx/posted_intr.c |   8 ++
+ 6 files changed, 114 insertions(+), 171 deletions(-)
+---
+base-commit: 85c9490bbed74b006a614e542da404a55ff5938f
+change-id: 20250311-vverma7-cleanup_x86_ops-c62e50e47126
+
+Best regards,
+-- 
+Vishal Verma <vishal.l.verma@intel.com>
+
 
