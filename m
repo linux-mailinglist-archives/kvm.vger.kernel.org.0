@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-41463-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41464-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D62CA67FED
-	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 23:44:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FAD6A67FF6
+	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 23:46:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FD3D423B90
-	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 22:44:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7472E4254DE
+	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 22:45:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23C8320765F;
-	Tue, 18 Mar 2025 22:44:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4C4F207A37;
+	Tue, 18 Mar 2025 22:45:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F1GaKgwz"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n7cCbhWA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9DCE7E9
-	for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 22:44:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D7A21E1E13
+	for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 22:45:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742337846; cv=none; b=ogjOPQrvB+IQztlK+zJ4gLj0giQicZsKFB3aZ4NMWmhvLQbTJU89bog0sbR+8TF7rXmyzt4plKY2+U8sJ+6j6dnyRvEiLi0fJukYnlzb7bQ+jTSVRIiIORzTiRaRkAg6eY3y+GTHUl09a4gDVL/dblstOgKhFZ3M9BByv1ZR1Xk=
+	t=1742337947; cv=none; b=UEyxZuCCokBArBjLF2apIx/DtCqFXO/RFKBcx+w8C1i3xqSAGyjYhOrd266XOC0jtwwP7r7mbj5rzqsK2OUgvmO0rz441QS2liD6Rh4OCkuxwyzh5K7rXVyiqE9II65FgKwpPFb+zRiKgv9aHGE8M7lrgTvnivu4BxA2BsNkKKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742337846; c=relaxed/simple;
-	bh=A3OP6rV0SFZRpR1JtzoS4/chOsn57vR6r5KU1TEMBjo=;
+	s=arc-20240116; t=1742337947; c=relaxed/simple;
+	bh=0Ritl5CvsgIQIngXso3taiq8aNQR+f1ehPS2NueXhPs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rXDiftCQgtWvtximBZ1mcrEv+33SPvUl82ubRoVqdv8CEOe4VdFOkNSyLnUhfcisaK+WZeAwVdItagj2JxMpVsp9LeG3oantEt4qGjLgmJCi3dnqkwk0b5bbH7Dx3OjYPfWKiZntoEOpv+sPlY5zMpjdvvSJ1wTm3YLeHuvMQOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=F1GaKgwz; arc=none smtp.client-ip=209.85.216.53
+	 In-Reply-To:Content-Type; b=bVB52jIhuMwHpG9pQrZeCalubVYDTe+5RazwrrBD8hOFpdkKzJlnYp6HT+7pUw1saAiZVscbEm7Qu050kR4vm1M/ldgHUn03e3J07ShUmYOeWoYaa2oOZ6f7m3WXIakXLPvUR3FlqhJvzFt9rWsqH7w+Ew+Ykz9ljgzjQeXnyVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=n7cCbhWA; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-30155bbbed9so5003234a91.1
-        for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 15:44:04 -0700 (PDT)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-225fbdfc17dso57240575ad.3
+        for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 15:45:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1742337844; x=1742942644; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1742337945; x=1742942745; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=yOVNEjfmFvFaGr73ny22aVzhc1cEgsoNeJFbAEdgGWE=;
-        b=F1GaKgwzWLJprhCMnH3Q1YKzU9AeRdclFb4B5LTQEpmSmuBKtLGL3OzccOQRnASOlI
-         8rsMD1BRcYB079mi/erbAPkfc2CHG64RRo+xIOwzInYILTtSBc82PboPQh8yr57lZ4zW
-         pRoWUXbZQpHEvItNhzbpyQM4F3yDJW3TeyxEQJXg9rW0XPgYA6/rSbB67Igw62MLSLHS
-         +zI0xwtpMiDQ9RLB3sFCmqXPxQFSXtrIWpgcbnywdHX1dUFR3GIkZZQPXCHAa8DeuFcg
-         MmHbIwVfgOZrfFqEqenmJZ06pWztB0kBMO82QV2CEiS2WqYE9+7DtLsIFccAVtdqUV31
-         NqoA==
+        bh=OYj2m8wY9HvQL8f9sPwRIBivPUDXh/Fmsum2H+ZPr40=;
+        b=n7cCbhWAAdyRBKAFIqepi12Ut58y5akcuzVAnNd/6RVX01/RuNSFJGScmWD6xRUVxM
+         Iewkh/Ja56ytdrYN2O8WiprZ7aYNIyHaJB/R/qJ4Xp8CAYbfq+C2bjaDXPqt0ZbylWWk
+         uYGmjj2zlPCvAvJ2cp7p8g+TgJFBpNw7ufGHeptqD41o63ZvcQmOoZ3NApNi2PUXMSiJ
+         dflDK3dkCpd0ahz6GLdzKiSfnYw7kdsUQwPOnQJFlMqvsogUuVDAkrTRlL2azwar77Pd
+         RoBfEAKFmPhbr5ZMPYieJHP0NXFih73yLLFojVdkDqNYX7fIF/Qr67z6+cNDsiJykRzu
+         O9Hg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742337844; x=1742942644;
+        d=1e100.net; s=20230601; t=1742337945; x=1742942745;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yOVNEjfmFvFaGr73ny22aVzhc1cEgsoNeJFbAEdgGWE=;
-        b=Zr4XuXRdelmulc924dDYXRfF2mdUYBLcqUNMZukJJvogp17Jwi2QcpyY/NqsHHzGR6
-         D0cyM7IMOX0mB2bX3Ip9pGf7f4oHY5cXPLaNdFUf+MMnE2hohETxM+9NRv0asTw/8I8g
-         Lzym57JbP+NOLxX5qtl5CHYs08kKAnSkkBnSLeF1w8f4NAhY8SupUvj/ijKS/RgqrTnL
-         XIsZDpMVXsUUkctOUXEQ9InQAeEMGRPa0keHkhOpw9O7Q1qjXmDCvaAVlZCQaKfrKNpR
-         IJjqNypVmSOtRhXYIzzzCZwxw2kAwev/aiUXZMxVWn+axtnhs7jqy3o7Bgkx27wAz9b0
-         C/7w==
-X-Forwarded-Encrypted: i=1; AJvYcCWhUtbtFsWV+sekzEIZWzatUk6gbVb4+emN2Acgb6y50vEV+4o9svi1VT3qBxHKwP16LRs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJgYHpBLsCkzr5x93NdyVLWOTmpRV19m8oQvJx+7gbjb+Jfh6E
-	0UW+lkRhmv69WGTx6pgfjYCHA3NY4FAB/u6UnIWiAwLGTJ+BwU/Dcj0wR1lRYfo=
-X-Gm-Gg: ASbGncv2K/EFb4CtkKC6zRTObBAXqCaSx552/hpZWL2hQ1VbI8XiN20a849CXhpZY0n
-	lMC+Q129cJwxFkkrcp60eXSlt4Jgg/mTg5Mdb6OSWW5RfSm9oLEvptKGXzTnsH1SZM+vdH1mcvo
-	/1CQ+HQH7yACGDsOsKFRQ5mFWjD5t9hROceqMiPS5ldC6PZJQRW8Udx4n5CR4whgy71P7lAbov3
-	XhIKANtcTQ5KndkSpZvO7BZ/Yh9lJa4lTjoUq7E4cNRMc098rfW1F9Kb7p9PX3ROb9miKgQEBiP
-	5WExKDCLmCimojoHm/NDZRC+/zHHUPaEA7+k+KYJxijQDAAShYt383Fn7xR8uRjyZngaOvyL1Hw
-	3tXju/IFi
-X-Google-Smtp-Source: AGHT+IFyxI6FD/xN+KIxUzJPTwzCWqBluNiU/Pz5vcaoPz3M5Hxd1qYrSVE4IjPJNZKkULxY2fHDBA==
-X-Received: by 2002:a17:90b:2dd2:b0:2ff:5e4e:861 with SMTP id 98e67ed59e1d1-301be1e72dcmr768418a91.24.1742337844092;
-        Tue, 18 Mar 2025 15:44:04 -0700 (PDT)
+        bh=OYj2m8wY9HvQL8f9sPwRIBivPUDXh/Fmsum2H+ZPr40=;
+        b=b8df+sT7DK67/jgOtjsukYMAnnso1tXJ0Yqfl5xbbnRBRT82ppVmg4DVr8AT3cXeQ4
+         CXK/quCOUg205KC/wuQ5uMEMW8dxZnfwMJdqMhFmAX0/ZgJ8lN6Vx5f6d8afwqKj3w1C
+         IY0gSZXhJ3pkPcAF47INmNOTrSuxsr0vOHPpyHZ+BxJSWqv0CXshnGMaBVJdp1nblEl7
+         QQELnkQkno3f4dFJI1wKlLF985ra+Gf3hje/bjY33JH8RFmOljs5jmWPb6QUunl6B5l4
+         MyBzZk90MHY/lmLZnSlDF9wD0Zgq63BJKxEEBNswB7+EhfJqTAS06+LlXY5r3GfxuPVh
+         KeVg==
+X-Forwarded-Encrypted: i=1; AJvYcCV8+ueGxPNdEDGmirduyKSR/YwBEQ6ADpWu6LaeNk9DDmzi7Qh+gKnEsfaw+W5MkQYHweg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YybG40L80ORnH0o7iDuukwMlO/nu0TVRc9pbWQa7Jg7PygdvBfZ
+	VJcO7fR22UQ3AQnQzyKu5gG3kdVRPQzfYgy3B+G21c3eYoWpDtNKFGfnwUXe0R0=
+X-Gm-Gg: ASbGncuy4oIXKf7GkhyB+Yk5hZCM+kExU12vbjJy+yWLE2Gqs0uBm37PZ1jTVCi/UXM
+	5V4QSQnyw0hWx+U6Y7N2cukWhZBTOsXKuzvKxzcLy9K4L4d0hVoyQGgqXDFgvJC1YcLfRlx0nYg
+	K7dCTrMEqaTB9RLqx8F/G/sxsBbbhSL+wc7X7+Uu4FT2ofESCDJGomoH+An5Y3I946uiQPJGSuW
+	WLJdyofeqA2NoDAEQzteHViAhgp0nY9tWcCcmea0v6/msetGcnPRJTqN5ewJuPvpjiCl/hiNYJt
+	qnxsesFyhP3Zq+XUrV6oZrGHUTW3Hlad+ycajX9H++3JK2YJBXCQq+4ekPpV9uuaK3OjYU1iDhc
+	lAHtvGi0z
+X-Google-Smtp-Source: AGHT+IH99wFLHvDNK9DJaCFMZ+buTxPrONpqtpx2Dm9CE5AsWM3wvi5vYKeaIugwzTzbLBTrpVb69Q==
+X-Received: by 2002:a05:6a21:a44:b0:1f5:873b:3d32 with SMTP id adf61e73a8af0-1fbed503e74mr557864637.39.1742337944753;
+        Tue, 18 Mar 2025 15:45:44 -0700 (PDT)
 Received: from [192.168.0.4] (174-21-74-48.tukw.qwest.net. [174.21.74.48])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-301bf61b525sm37172a91.35.2025.03.18.15.44.03
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af56ea947afsm9656324a12.71.2025.03.18.15.45.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Mar 2025 15:44:03 -0700 (PDT)
-Message-ID: <e8881e57-abfb-46e7-bf2f-e9cad988d547@linaro.org>
-Date: Tue, 18 Mar 2025 15:44:02 -0700
+        Tue, 18 Mar 2025 15:45:44 -0700 (PDT)
+Message-ID: <2b438e13-b377-4b4e-a4ff-0b219d7f3964@linaro.org>
+Date: Tue, 18 Mar 2025 15:45:42 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,8 +82,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 09/13] target/arm/cpu: define ARM_MAX_VQ once for aarch32
- and aarch64
+Subject: Re: [PATCH 10/13] target/arm/cpu: define same set of registers for
+ aarch32 and aarch64
 To: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
 Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
  qemu-arm@nongnu.org, alex.bennee@linaro.org,
@@ -92,25 +92,36 @@ Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
  =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
  =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 References: <20250318045125.759259-1-pierrick.bouvier@linaro.org>
- <20250318045125.759259-10-pierrick.bouvier@linaro.org>
+ <20250318045125.759259-11-pierrick.bouvier@linaro.org>
 Content-Language: en-US
 From: Richard Henderson <richard.henderson@linaro.org>
-In-Reply-To: <20250318045125.759259-10-pierrick.bouvier@linaro.org>
+In-Reply-To: <20250318045125.759259-11-pierrick.bouvier@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 3/17/25 21:51, Pierrick Bouvier wrote:
-> This will affect zregs field for aarch32.
-> This field is used for MVE and SVE implementations. MVE implementation
-> is clipping index value to 0 or 1 for zregs[*].d[],
-> so we should not touch the rest of data in this case anyway.
+> To eliminate TARGET_AARCH64, we need to make various definitions common
+> between 32 and 64 bit Arm targets.
+> Added registers are used only by aarch64 code, and the only impact is on
+> the size of CPUARMState, and added zarray
+> (ARMVectorReg zarray[ARM_MAX_VQ * 16]) member (+64KB)
+> 
+> It could be eventually possible to allocate this array only for aarch64
+> emulation, but I'm not sure it's worth the hassle to save a few KB per
+> vcpu. Running qemu-system takes already several hundreds of MB of
+> (resident) memory, and qemu-user takes dozens of MB of (resident) memory
+> anyway.
 > 
 > Signed-off-by: Pierrick Bouvier<pierrick.bouvier@linaro.org>
 > ---
->   target/arm/cpu.h | 6 +-----
->   1 file changed, 1 insertion(+), 5 deletions(-)
+>   target/arm/cpu.h | 6 ------
+>   1 file changed, 6 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+I think this could easily squash with ARM_MAX_VQ, since the
+rationale is better spelled out here.
+
 
 r~
 
