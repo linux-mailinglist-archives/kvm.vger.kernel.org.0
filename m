@@ -1,86 +1,86 @@
-Return-Path: <kvm+bounces-41373-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41374-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99730A66BF3
-	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 08:38:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D08B1A66E9B
+	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 09:40:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 528FB3BBEDD
-	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 07:37:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7390A18988F4
+	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 08:40:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 861FF1F8726;
-	Tue, 18 Mar 2025 07:35:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E824A204C34;
+	Tue, 18 Mar 2025 08:39:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O9EQUDDJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fj/Y5uSO"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D12C91DE3A5
-	for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 07:35:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64BB31F8758
+	for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 08:39:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742283338; cv=none; b=phXxJ7wpIYubWZral8OpGKWN6PZ/WnNxVS5R40AC3oKuMoXIS1ju+pANqdHijO4gJAz8/YzT1Xoj9v5kKXzLnUeFSrCgktDnffMUgK/pXhrsgj+WjIi3SKjvMocwigKEcjN+E4RkyPSCGpxSML/oNvHdp0pOhl/kbn+KqPSLyC8=
+	t=1742287171; cv=none; b=jKwsygzuunjoeolYgqyl9Bo8KNq5RIUrUvhQkjtBDPwmfYKNy5IHHaGRWGSWWrs7m+DQkKLBb0N3r9HRG2b5ZSRNf0PIqBRHv+Zx1yEx5eyYnOpqwzY3rbEgn4f6BMlkiEuEAL1qlv31s6RnKmwhgmhhtlAqWjEtc7KxqcHg+E0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742283338; c=relaxed/simple;
-	bh=0qhGQ+HQ7zNnhH9ynNxTdqGRv2YLBNszkQmYn8f0aXM=;
+	s=arc-20240116; t=1742287171; c=relaxed/simple;
+	bh=FQ4xSX7c3WjFB6LdpO8VQQHptKeGaZvZ79lk7PEmeu4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KwD+vswTlkYOUknZv6JM/uTPAqzQ+p+pnKY77z35qeu9HNJXj9rLJFdze6KM/d0OSpytlq5ivhI2eKOHy6N+2NPZf1fM5o3jJjvevF5HmpzOX5o0mGZ0BCxSc3rOMve7FobJo3OA9b3YXQ3qoDHG+YMyThdX/6KBy7xVafDLFmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O9EQUDDJ; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=GfiYrxQ55Qv//j2YYsW33zYQ6/V4rEzWZxjXvQK8srdMGCxhuzMZ6oBs4w2YKhmwLXPTUhiMLs0uaglBWEqWhyLQPSfkvO/uYrixSkXr0dSekJGvkOehotzwniKPtyCWOQOyAq7gEvmHZ/Js1uYcOhjKqpeYiQLoQoctudRo/6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Fj/Y5uSO; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742283335;
+	s=mimecast20190719; t=1742287163;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0i8L8ErIHIcKjhHNLC1JQVz75Bq37QLmHg8dkfMBKIw=;
-	b=O9EQUDDJnloLxARvYmo6vQwkca4P8MoJHVvZpWE/Gaqq4Zsu3VomicKuhBKAq1C6/r00WH
-	lYvqrzN9oSvn3cMm+bWCAg151cL6JXMjbYLbOGzZMNmuJs1UJOVvM5EfJ0QK93PQGNUEHY
-	eOkKYlQTxG87TuUlJdkg6K2AQykn6jI=
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=QJ0VMEseaolIU+CS+bme3Nsh7S58tb1KlcpXTP+Vo3o=;
+	b=Fj/Y5uSOPZI52WMg0mfjr313t0wVd8o2mAvwCXVjiAY+ItZi1/Ho4oXivUGIR+2yGjwx/V
+	pR2viuhJcWZnfi2hkP/8T9JA5vhx6/4+Z1i5+jBrhX9Zo+zA5nV+SsY+w+RnYdpdWJ6kjv
+	YZ5Hxcy7SaM695bQxmJr+zXQYNfkXtY=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-627-ctBV5eW6OUuvwHk3eoEnQQ-1; Tue, 18 Mar 2025 03:35:34 -0400
-X-MC-Unique: ctBV5eW6OUuvwHk3eoEnQQ-1
-X-Mimecast-MFC-AGG-ID: ctBV5eW6OUuvwHk3eoEnQQ_1742283333
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2242ca2a4a5so72842655ad.2
-        for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 00:35:33 -0700 (PDT)
+ us-mta-499-Ogqidu21Mt-h-qOmspLGxg-1; Tue, 18 Mar 2025 04:39:22 -0400
+X-MC-Unique: Ogqidu21Mt-h-qOmspLGxg-1
+X-Mimecast-MFC-AGG-ID: Ogqidu21Mt-h-qOmspLGxg_1742287161
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43cf172ff63so18447555e9.3
+        for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 01:39:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742283333; x=1742888133;
+        d=1e100.net; s=20230601; t=1742287161; x=1742891961;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0i8L8ErIHIcKjhHNLC1JQVz75Bq37QLmHg8dkfMBKIw=;
-        b=QWYmaIdjLd8HVAa4e9esSIA9Pa0HMXfCnb8ADYW2kpcfHEuBch9BR3dDpJ439NgVJE
-         D8SzSXGYuHBdIgJ/KjBlZ9K7u+7FvNi/VYCJzp8tkq0g5fHOCVEaoJcS1I+w1cbQclsd
-         KjXZR5ZaY+6lH9I45GJHCcV2QnjjE8zIMm2x1TJ4ECdUvNNaPzLN41mPtEs1+WBiGFcH
-         qgszbrM+kVaE+8NMmYQ/P4CtcFXKC0pBvHM91IMOW/bNAoIBZlBdq+KT/vlszwv8dhvD
-         LMdZyXRIcrCG3nSNM89g1fuLTfvmuzBAt7TkwDqTlBSetg2S2gSBwy87FJSi2Zwxx2BO
-         AU6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXNxqVB8F8TZGbOtU0mJgK0vrhhKlnu59XwRl+zWhisfW0/668cTLFO5pvI6qTPNO6sHG8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJx4FbJ0Qf3E7eAEm9ydaRi6hrPN45kXlMTPbiaUACLqRRio+e
-	PNRBSsBR0OCitisWFgbKJcT1DYQ1jL1Q4Fbe+HmVe3dt33VJ0F+tySJ53CcyoFy0o7xu74Oqjsm
-	V9kzksXqaQMOd503E19mXtNt89kQhOEDbLOmSN4ECCOhmfgQNCQ==
-X-Gm-Gg: ASbGncufQwiYWzIIHIrP7aUDo8LqVw3+fFK0EfZI7sdXfZhYMFEryDjcKJumENS2vt9
-	XKyFKmDO+RQZ3QG+9Pc2Iy+HqR5QHH0FBz49apkHykgQJu1MIDQ1+jbndLKi1Xa/elNxQgqhwNE
-	Df0K+gO2yKubAU6ttHoRh9JvbuEEtgoDEXv40ax3jGM36SQZTUGbgA0LQnmlVSP2nOZtVEMPuel
-	o9JlBbtbap6G+NAuvOsqMUJUA5p0SFiGSTo6et7KoUz7QREkLjtwEtsnBapZXsn9E3fxFkCyKkP
-	3eEgh6q8msnPlMABRbwT
-X-Received: by 2002:a05:6a00:b95:b0:736:3d7c:2368 with SMTP id d2e1a72fcca58-73722353269mr18334327b3a.7.1742283332989;
-        Tue, 18 Mar 2025 00:35:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGMBK6qKus8FijqhGiMuo2MbhTRc59Wm2bEqfErgelC1XdI0dRfHYg9Umo5MnegCAbEJXhSgg==
-X-Received: by 2002:a05:6a00:b95:b0:736:3d7c:2368 with SMTP id d2e1a72fcca58-73722353269mr18334273b3a.7.1742283332537;
-        Tue, 18 Mar 2025 00:35:32 -0700 (PDT)
-Received: from [10.72.116.163] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7371152958csm8856772b3a.26.2025.03.18.00.35.25
+        bh=QJ0VMEseaolIU+CS+bme3Nsh7S58tb1KlcpXTP+Vo3o=;
+        b=WZ+DIugiPr48RlKf9i0lxljYyPNX2hqxysDLPDpzRZG6VuFaUzYVCN+f0C4HmXiYcz
+         /awX1I4PsWhKAXaO8UtWgWHO1cnp3jdn68qHbxRz/amERuAeAVE4YCTdJ2VDvGMhjlj0
+         6evDK6vG4wV4Xrx0MwzvWY6F90Ko1wfELMgBBvbebrDjBb7BW8/mVO9ll3SEW9tE9Mlv
+         J5xn3MRlAoL7PHfXKr1xWq7zioJ2309vMofOzdg/9QrrBR5GMsd4O2H1cZ+zWjGXNnCN
+         E26o2sePwtIeYQW4mO7PsZlNxu0763gNg2YMbrE2Kl7NIJPjSzsluvu6Kbrg1G6QYaSI
+         LI5g==
+X-Forwarded-Encrypted: i=1; AJvYcCVIEsAUnxBcoS2786RRalNwhPqlmiAsi6Gxr+eBNOtCZNneYkjcaq65NzYEbg0chQWBnTI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWW/CoufzxEvXz31veztYPXxCvDhaDx5te4xYwWZIMjsxLrNNw
+	51JmsD9IBeqxKaI6+StlenjmD/g69JbsjqgSxC/XbAeuGOV9hIA1G3dDtsUZH/V0DPoYC2mf62y
+	4HGfRfXi07msuCAHEj4hWTtZekj/BFF3C6dtiya+nlG5euvu6BQ==
+X-Gm-Gg: ASbGncsN/wopHyBuUWoF9XIjCNyWwymK/XweVCe3INImn+bBlJKeSN6xAtO7GKKf7Hq
+	uu73n8Etqp5v2mu3ztC7BcBE4Z0ZUWHushVdCD8lOGEvsn/oMdDmhElpLN0nfNMZXPqwAnOaPGy
+	ReuQKpO+hw6v6bNQ9l3JFYW9jADmX66C6XuLbA+y4RvIqzbRvYz4gh8nTLiZTmsfnn3KZW/1Q20
+	+iL7bB5s3wRMnbZcS6r6Z9EGuiscbitiHLY3lw9TB7vsZgP0ql+vMHns7IXt0NADbx4Wgmg50H0
+	ibD+vaMbqPjiMZmwCNbNcDlBfqUzg3LWt+rorPo0LfCrMA==
+X-Received: by 2002:a5d:6484:0:b0:390:df02:47f0 with SMTP id ffacd0b85a97d-3971ee444e2mr15972243f8f.42.1742287160753;
+        Tue, 18 Mar 2025 01:39:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH7stufewyuFI6UX+sGIqRr7QTxoyguINXWTrLlPA7lpLF9hM8oFkQrmLLjxUlPq2VCHq/n8Q==
+X-Received: by 2002:a5d:6484:0:b0:390:df02:47f0 with SMTP id ffacd0b85a97d-3971ee444e2mr15972216f8f.42.1742287160309;
+        Tue, 18 Mar 2025 01:39:20 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-10-172.dyn.eolo.it. [146.241.10.172])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395c83b748bsm17684458f8f.39.2025.03.18.01.39.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Mar 2025 00:35:31 -0700 (PDT)
-Message-ID: <2fe2a98d-f70f-4996-b04e-d81f66d5863f@redhat.com>
-Date: Tue, 18 Mar 2025 15:35:24 +0800
+        Tue, 18 Mar 2025 01:39:19 -0700 (PDT)
+Message-ID: <8fb48d36-f5ce-40ce-bb05-b4c342da8b4f@redhat.com>
+Date: Tue, 18 Mar 2025 09:39:17 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,195 +88,164 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC v2 0/5] accel/kvm: Support KVM PMU filter
-To: Zhao Liu <zhao1.liu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Michael Roth <michael.roth@amd.com>,
- =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <eduardo@habkost.net>, Marcelo Tosatti
- <mtosatti@redhat.com>, Eric Auger <eauger@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier
- <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Sebastian Ott <sebott@redhat.com>, Gavin Shan <gshan@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-arm@nongnu.org,
- Dapeng Mi <dapeng1.mi@intel.com>, Yi Lai <yi1.lai@intel.com>
-References: <20250122090517.294083-1-zhao1.liu@intel.com>
+Subject: Re: [PATCH net-next v7 3/9] net: devmem: TCP tx netlink api
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ kvm@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-kselftest@vger.kernel.org
+Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Jeroen de Borst <jeroendb@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn
+ <willemb@google.com>, David Ahern <dsahern@kernel.org>,
+ Neal Cardwell <ncardwell@google.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin"
+ <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Shuah Khan <shuah@kernel.org>, sdf@fomichev.me,
+ asml.silence@gmail.com, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Victor Nogueira <victor@mojatatu.com>, Pedro Tammela
+ <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
+References: <20250308214045.1160445-1-almasrymina@google.com>
+ <20250308214045.1160445-4-almasrymina@google.com>
 Content-Language: en-US
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20250122090517.294083-1-zhao1.liu@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250308214045.1160445-4-almasrymina@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi Zhao,
-
-Thanks for your effort to respin the PMU Filter series.
-
-I tried your series on ARM64, but it reports error at compile time, here 
-is the error output:
-
-qapi/kvm.json:59:Unexpected indentation.
-
-While I compiled it on x86, everything is ok. Could you please check why 
-it failed on ARM64?
-
-By the mean time, I will review and test this series.
-
-Thanks,
-Shaoqin
-
-On 1/22/25 5:05 PM, Zhao Liu wrote:
-> Hi folks,
+On 3/8/25 10:40 PM, Mina Almasry wrote:
+> From: Stanislav Fomichev <sdf@fomichev.me>
 > 
-> Sorry for the long wait, but RFC v2 is here at last.
+> Add bind-tx netlink call to attach dmabuf for TX; queue is not
+> required, only ifindex and dmabuf fd for attachment.
 > 
-> Compared with v1 [1], v2 mianly makes `action` as a global parameter,
-> and all events (and fixed counters) are based on a unified action.
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
 > 
-> Learned from the discussion with Shaoqin in v1, current pmu-filter QOM
-> design could meet the requirements from the ARM KVM side.
-> 
-> 
-> Background
-> ==========
-> 
-> I picked up Shaoqing's previous work [2] on the KVM PMU filter for arm,
-> and now is trying to support this feature for x86 with a JSON-compatible
-> API.
-> 
-> While arm and x86 use different KVM ioctls to configure the PMU filter,
-> considering they all have similar inputs (PMU event + action), it is
-> still possible to abstract a generic, cross-architecture kvm-pmu-filter
-> object and provide users with a sufficiently generic or near-consistent
-> QAPI interface.
-> 
-> That's what I did in this series, a new kvm-pmu-filter object, with the
-> API like:
-> 
-> -object '{"qom-type":"kvm-pmu-filter","id":"f0","action":"allow","events":[{"format":"raw","code":"0xc4"}]}'
-> 
-> For i386, this object is inserted into kvm accelerator and is extended
-> to support fixed-counter and more formats ("x86-default" and
-> "x86-masked-entry"):
-> 
-> -accel kvm,pmu-filter=f0 \
-> -object pmu='{"qom-type":"kvm-pmu-filter","id":"f0","action":"allow","x86-fixed-counter":{"bitmap":"0x0"},"events":[{"format":"x86-masked-entry","select":"0xc4","mask":"0xff","match":"0","exclude":true},{"format":"x86-masked-entry","select":"0xc5","mask":"0xff","match":"0","exclude":true}]}'
-> 
-> This object can still be added as the property to the arch CPU if it is
-> desired as a per CPU feature (as Shaoqin did for arm before).
-> 
-> 
-> Introduction
-> ============
-> 
-> 
-> Formats supported in kvm-pmu-filter
-> -----------------------------------
-> 
-> This series supports 3 formats:
-> 
-> * raw format (general format).
-> 
->    This format indicates the code that has been encoded to be able to
->    index the PMU events, and which can be delivered directly to the KVM
->    ioctl. For arm, this means the event code, and for i386, this means
->    the raw event with the layout like:
-> 
->        select high bit | umask | select low bits
-> 
-> * x86-default format (i386 specific)
-> 
->    x86 commonly uses select&umask to identify PMU events, and this format
->    is used to support the select&umask. Then QEMU will encode select and
->    umask into a raw format code.
-> 
-> * x86-masked-entry (i386 specific)
-> 
->    This is a special format that x86's KVM_SET_PMU_EVENT_FILTER supports.
-> 
-> 
-> Hexadecimal value string
-> ------------------------
-> 
-> In practice, the values associated with PMU events (code for arm, select&
-> umask for x86) are often expressed in hexadecimal. Further, from linux
-> perf related information (tools/perf/pmu-events/arch/*/*/*.json), x86/
-> arm64/riscv/nds32/powerpc all prefer the hexadecimal numbers and only
-> s390 uses decimal value.
-> 
-> Therefore, it is necessary to support hexadecimal in order to honor PMU
-> conventions.
-> 
-> However, unfortunately, standard JSON (RFC 8259) does not support
-> hexadecimal numbers. So I can only consider using the numeric string in
-> the QAPI and then parsing it to a number.
-> 
-> To achieve this, I defined two versions of PMU-related structures in
-> kvm.json:
->   * a native version that accepts numeric values, which is used for
->     QEMU's internal code processing,
-> 
->   * and a variant version that accepts numeric string, which is used to
->     receive user input.
-> 
-> kvm-pmu-filter object will take care of converting the string version
-> of the event/counter information into the numeric version.
-> 
-> The related implementation can be found in patch 1.
-> 
-> 
-> CPU property v.s. KVM property
-> ------------------------------
-> 
-> In Shaoqin's previous implementation [2], KVM PMU filter is made as a
-> arm CPU property. This is because arm uses a per CPU ioctl
-> (KVM_SET_DEVICE_ATTR) to configure KVM PMU filter.
-> 
-> However, for x86, the dependent ioctl (KVM_SET_PMU_EVENT_FILTER) is per
-> VM. In the meantime, considering that for hybrid architecture, maybe in
-> the future there will be a new per vCPU ioctl, or there will be
-> practices to support filter fixed counter by configuring CPUIDs.
-> 
-> Based on the above thoughts, for x86, it is not appropriate to make the
-> current per-VM ioctl-based PMU filter a CPU property. Instead, I make it
-> a kvm property and configure it via "-accel kvm,pmu-filter=obj_id".
-> 
-> So in summary, it is feasible to use the KVM PMU filter as either a CPU
-> or a KVM property, depending on whether it is used as a CPU feature or a
-> VM feature.
-> 
-> The kvm-pmu-filter object, as an abstraction, is general enough to
-> support filter configurations for different scopes (per-CPU or per-VM).
-> 
-> [1]: https://lore.kernel.org/qemu-devel/20240710045117.3164577-1-zhao1.liu@intel.com/
-> [2]: https://lore.kernel.org/qemu-devel/20240409024940.180107-1-shahuang@redhat.com/
-> 
-> Thanks and Best Regards,
-> Zhao
 > ---
-> Zhao Liu (5):
->    qapi/qom: Introduce kvm-pmu-filter object
->    i386/kvm: Support basic KVM PMU filter
->    i386/kvm: Support event with select & umask format in KVM PMU filter
->    i386/kvm: Support event with masked entry format in KVM PMU filter
->    i386/kvm: Support fixed counter in KVM PMU filter
 > 
->   MAINTAINERS              |   1 +
->   accel/kvm/kvm-pmu.c      | 386 +++++++++++++++++++++++++++++++++++++++
->   accel/kvm/meson.build    |   1 +
->   include/system/kvm-pmu.h |  44 +++++
->   include/system/kvm_int.h |   2 +
->   qapi/kvm.json            | 246 +++++++++++++++++++++++++
->   qapi/meson.build         |   1 +
->   qapi/qapi-schema.json    |   1 +
->   qapi/qom.json            |   3 +
->   target/i386/kvm/kvm.c    | 176 ++++++++++++++++++
->   10 files changed, 861 insertions(+)
->   create mode 100644 accel/kvm/kvm-pmu.c
->   create mode 100644 include/system/kvm-pmu.h
->   create mode 100644 qapi/kvm.json
+> v3:
+> - Fix ynl-regen.sh error (Simon).
 > 
+> ---
+>  Documentation/netlink/specs/netdev.yaml | 12 ++++++++++++
+>  include/uapi/linux/netdev.h             |  1 +
+>  net/core/netdev-genl-gen.c              | 13 +++++++++++++
+>  net/core/netdev-genl-gen.h              |  1 +
+>  net/core/netdev-genl.c                  |  6 ++++++
+>  tools/include/uapi/linux/netdev.h       |  1 +
+>  6 files changed, 34 insertions(+)
+> 
+> diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
+> index 36f1152bfac3..e560b05eb528 100644
+> --- a/Documentation/netlink/specs/netdev.yaml
+> +++ b/Documentation/netlink/specs/netdev.yaml
+> @@ -743,6 +743,18 @@ operations:
+>              - defer-hard-irqs
+>              - gro-flush-timeout
+>              - irq-suspend-timeout
+> +    -
+> +      name: bind-tx
+> +      doc: Bind dmabuf to netdev for TX
+> +      attribute-set: dmabuf
+> +      do:
+> +        request:
+> +          attributes:
+> +            - ifindex
+> +            - fd
+> +        reply:
+> +          attributes:
+> +            - id
+>  
+>  kernel-family:
+>    headers: [ "linux/list.h"]
+> diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
+> index 7600bf62dbdf..7eb9571786b8 100644
+> --- a/include/uapi/linux/netdev.h
+> +++ b/include/uapi/linux/netdev.h
+> @@ -219,6 +219,7 @@ enum {
+>  	NETDEV_CMD_QSTATS_GET,
+>  	NETDEV_CMD_BIND_RX,
+>  	NETDEV_CMD_NAPI_SET,
+> +	NETDEV_CMD_BIND_TX,
+>  
+>  	__NETDEV_CMD_MAX,
+>  	NETDEV_CMD_MAX = (__NETDEV_CMD_MAX - 1)
+> diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
+> index 996ac6a449eb..f27608d6301c 100644
+> --- a/net/core/netdev-genl-gen.c
+> +++ b/net/core/netdev-genl-gen.c
+> @@ -99,6 +99,12 @@ static const struct nla_policy netdev_napi_set_nl_policy[NETDEV_A_NAPI_IRQ_SUSPE
+>  	[NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT] = { .type = NLA_UINT, },
+>  };
+>  
+> +/* NETDEV_CMD_BIND_TX - do */
+> +static const struct nla_policy netdev_bind_tx_nl_policy[NETDEV_A_DMABUF_FD + 1] = {
+> +	[NETDEV_A_DMABUF_IFINDEX] = NLA_POLICY_MIN(NLA_U32, 1),
+> +	[NETDEV_A_DMABUF_FD] = { .type = NLA_U32, },
+> +};
+> +
+>  /* Ops table for netdev */
+>  static const struct genl_split_ops netdev_nl_ops[] = {
+>  	{
+> @@ -190,6 +196,13 @@ static const struct genl_split_ops netdev_nl_ops[] = {
+>  		.maxattr	= NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT,
+>  		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
+>  	},
+> +	{
+> +		.cmd		= NETDEV_CMD_BIND_TX,
+> +		.doit		= netdev_nl_bind_tx_doit,
+> +		.policy		= netdev_bind_tx_nl_policy,
+> +		.maxattr	= NETDEV_A_DMABUF_FD,
+> +		.flags		= GENL_CMD_CAP_DO,
+> +	},
+>  };
+>  
+>  static const struct genl_multicast_group netdev_nl_mcgrps[] = {
+> diff --git a/net/core/netdev-genl-gen.h b/net/core/netdev-genl-gen.h
+> index e09dd7539ff2..c1fed66e92b9 100644
+> --- a/net/core/netdev-genl-gen.h
+> +++ b/net/core/netdev-genl-gen.h
+> @@ -34,6 +34,7 @@ int netdev_nl_qstats_get_dumpit(struct sk_buff *skb,
+>  				struct netlink_callback *cb);
+>  int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info);
+>  int netdev_nl_napi_set_doit(struct sk_buff *skb, struct genl_info *info);
+> +int netdev_nl_bind_tx_doit(struct sk_buff *skb, struct genl_info *info);
+>  
+>  enum {
+>  	NETDEV_NLGRP_MGMT,
+> diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+> index 2b774183d31c..6e5f2de4d947 100644
+> --- a/net/core/netdev-genl.c
+> +++ b/net/core/netdev-genl.c
+> @@ -931,6 +931,12 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
+>  	return err;
+>  }
+>  
+> +/* stub */
+> +int netdev_nl_bind_tx_doit(struct sk_buff *skb, struct genl_info *info)
+> +{
+> +	return 0;
+> +}
+> +
+>  void netdev_nl_sock_priv_init(struct list_head *priv)
+>  {
+>  	INIT_LIST_HEAD(priv);
 
--- 
-Shaoqin
+I'm sorry, but this chunck does not apply cleanly anymore.
+
+Please rebase.
+
+Disclaimer: unfortunately I must note that due to the long backlog
+pending and the upcoming merge window, I'm unsure I'll be able to
+process the next revision before the net-next closing.
+
+Thanks.
+
+Paolo
 
 
