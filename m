@@ -1,178 +1,158 @@
-Return-Path: <kvm+bounces-41418-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41420-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B23E3A67B3B
-	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 18:44:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C37CA67B5D
+	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 18:50:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09FB0176A7F
-	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 17:44:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E47257A2CED
+	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 17:49:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AA02211A1E;
-	Tue, 18 Mar 2025 17:44:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FBB9212B32;
+	Tue, 18 Mar 2025 17:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iycGJODf"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UMB5VEtQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5255E21171B
-	for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 17:44:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F14EF20CCF0
+	for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 17:50:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742319843; cv=none; b=NXyCtSUcATgjXB1rz9E0Y2kA4tOH5tLQk8KOStogjfBKDLDt0psJF1R2QsZfzufedQR7CSd/w65HjbUAcRIWvHr2St6Bs6p5kste48p0RDiHyGZ8aWtlrZcIWbwiz+lRNUJeCgRP6R2WW2W8pDWCocfJlsYbqjvU5nWEZLivdzk=
+	t=1742320226; cv=none; b=Hp9DxxywC1yzGU02cUcfTRihh15uqK4tMhhSmCyGuhaJ4sLg9UWSOBFZ3dzan9bhmdz9FQSInHJdknbITYM2IdBYnDG70yY7aHGISkTGQGTRsUzX8izayc9NPuKrCDLbLcv88sfcOYDMY8Wi0k5Qg+32ZAUORT1bEAMupv2EAUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742319843; c=relaxed/simple;
-	bh=epaCrFfbWUsA8XnaTnYrPEUbLzZ78QMnV7ml61VmCiA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QsCxdyFv+ZrJ7UavuqlGb5x8wBxYsDX6/RsIo+o5C8tkPzo9mtERvF9ySDIbUnJgM5sgrJ8LXxsYHdKUVPSOTv/L8vzjZ6Js9l93w8As2vT0sV+fBoreLHuyP4Wljv2a9c6FtyjckFhfX3tV5NvGQknrum2JPll9kZ8m1ahLStM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iycGJODf; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-223f4c06e9fso101090515ad.1
-        for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 10:44:01 -0700 (PDT)
+	s=arc-20240116; t=1742320226; c=relaxed/simple;
+	bh=HfnCyJnpqVQfiCB0/RnmqToGYAJOIDIhOFOPIBG07hA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RGQvkqy8pPA+CCZEmvcKr9vvXwlgpfhatIMy8OYk2cWHA6HhoyjrRhobQrvkNQNSasmVnlwoS+wgtyEnfdm6m2DRoh85Y8wZEyIv0+gJb8ttX69+lMk+JIL1khTDtKP5J8pKwUURXWVKaIJzPPgyj2LC5ub/Lkb8+8iVQvNKAjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=UMB5VEtQ; arc=none smtp.client-ip=209.85.219.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-e6412063976so2227790276.2
+        for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 10:50:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742319840; x=1742924640; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Gzd/AWXu2d300Kr8/Og94+uidnchSMYyagQ2b7TSLcE=;
-        b=iycGJODfOpzSB8mDPXj4BMsn4Do9Eeha9DTmHmDJVaPv/H9wfgvN6FfzEEMAOjRPfb
-         4lmKMVV7GW+nLwzZCrkPRqub7BNoZ9ixOPppWRihu1uA9PBoFzzUmcFPjU5rrEPg03TO
-         5aQb0CnCxT8f/dUReq40yJEoUUdCnQC8rFuPDNyOLPAkseFf+IsNt4hEazR/BlJ3dTU1
-         lKWaFRD/Jgbf53KQc71LSpzMiC41y9Zd8RZLGROEEIxmoyaSNekDgIBnYiCaDRWg+VkB
-         yukHLA9PKBYWej5w6yeU5PqbAo1Z3p20oMaFq0OvX8MuYtUBs2Eaktr8LzqGaZSQ6G5k
-         Q2pw==
+        d=linaro.org; s=google; t=1742320224; x=1742925024; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OvJ1Chpj2jYmxujQHwHr5y5q3DIlYijmy0IxxUrM06M=;
+        b=UMB5VEtQuH9mCAp/2WEgZierv/jVHS1MXOY/kUX43FpZG00FUhuo5VAGI9i4Yi+MIk
+         b7FeQPEYxNVuiF44j2cdsHOVJd+m0uKVERg8Vhu70S8mE6UxxrbSb5bj1XnEjMhhWXYn
+         v6hG1RxsF28yDZ7b1A/LXm/evW6SB7yWVjnovEdyQ4VcDTcga8clVK/DM7H2iuL7WpXl
+         1GUVu0O6ArgUQ1SbzUZibWTpXEC0Vn63Nl2d3Q1k3cVAdW0l2dw06SdI+76DXNv+N5gY
+         bc3uwRlTuQ5GIbbICgXU/JanuRqgvIXJDlny4PS8g57wJcgIEM+ZKmjNEQJeSGdjVoMt
+         tLQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742319840; x=1742924640;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Gzd/AWXu2d300Kr8/Og94+uidnchSMYyagQ2b7TSLcE=;
-        b=n/zxJ56FPi8tce6ux5ZXZ+ifcwf4GnUN+oj0ZuiUyVF3mUwDE/L35uYeZCajHd6UZe
-         hhoUDrPve25KpfxRyyKguDhswxeA+pLAUVw0J9gHvWBPdTbMJKF9oYefgNwJ7G0gq9B3
-         ZSacNt2YQItyL6dtG9jAIwnt5mun54vJp46mxuySQeJ8tmLTzWWf1JGzGimWd1K3fX34
-         hwq/aiKp8CP9KgRB7bJ5cFKTXlfcsxrBMJbY1ZfF15h7bRqBLAdDwKopLlVRRLAptN73
-         6Ee1M3KC52UuZkiQPfHYepLE5XlkPeWJNe7+DqtC3PW6Zfkc1H2/Q9jjx/9MXDq3OBFN
-         Z9tw==
-X-Gm-Message-State: AOJu0Yxl4NtM9Vz/BFejU9DLv6smhZzt9vuByVZK8XADmKRARzY6yu+p
-	UyAzvctow+4+IpqfXwQnlD2nbrLVwDTWtRUEkX2xN1xUVCE2EYfqu3z/f5ovaRn4H/77
-X-Gm-Gg: ASbGncuXBgVSVUTNVHrI5lvjPQ1n+fmR9EnPhNKjLstXuGzFqWbVKSfnyafFMIoZbly
-	9Rx5FbhkXztzWrK9tHCZ+ZWTglKxT4+zoKchD38DHgFhrx0+qGPQDrp4Bjl4Sw71y0YpQXPNUBb
-	NjIJSEKn3ZokvjD1iWBEI/ULjVpmgkA523vXQ1L/L3EBQB66CIZa0Q/IWe2ZnO+eEDnT8lOj0o+
-	tSbTDcIpzkLEwhgLXY89BlXj83RrTiY5smUfsgP9cjmWXRxYlPlF94zL1IBmoOBFV23TTzSHaRh
-	yX2/Hc16Wq+MHe/h+vhXPIJ7NGVII0OulMXhmUvS0SDUeK24hZWhXnJqrizJ
-X-Google-Smtp-Source: AGHT+IHTpMEOqE+5z19dql/ZsbkUd3JWrA0xKMNihIuEhUxeHsbLJB/FOrPLhQ+XNLNeWovnRBNcEA==
-X-Received: by 2002:a17:902:e743:b0:226:3392:3704 with SMTP id d9443c01a7336-226339237e9mr48967805ad.12.1742319840012;
-        Tue, 18 Mar 2025 10:44:00 -0700 (PDT)
-Received: from pop-os.. ([2401:4900:51e3:9f29:521c:e54f:4b71:5fa3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-225c68aa837sm98065385ad.103.2025.03.18.10.43.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Mar 2025 10:43:59 -0700 (PDT)
-From: Akshay Behl <akshaybehl231@gmail.com>
-To: kvm@vger.kernel.org
-Cc: andrew.jones@linux.dev,
-	cleger@rivosinc.com,
-	atishp@rivosinc.com,
-	Akshay Behl <akshaybehl231@gmail.com>
-Subject: [kvm-unit-tests PATCH v2] riscv: Refactor SBI FWFT lock tests
-Date: Tue, 18 Mar 2025 23:13:49 +0530
-Message-Id: <20250318174349.178646-1-akshaybehl231@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1742320224; x=1742925024;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OvJ1Chpj2jYmxujQHwHr5y5q3DIlYijmy0IxxUrM06M=;
+        b=cSY9BPV40wTb7kf/12BqLnxTRv0rvsoKMzDguxKLar1o0rqjDsrCL5cMtL39qMoeT8
+         IauCZI9jvtuQnqLCwWaGEwz8I+HT/rB6JcNhov2GhxLG2u8O1/Epv2FEKBfyI8uWoNVf
+         7OB2OEpeaScOIMo4Nyw82A7JAuBTFHtseDWt38VELEuWwcCTM3OzUBQI5TOitjnNR2l4
+         wpQ6AD5FqqejtIpyForxUmEGVbuWiW1xD+k9/3Kmcp+2h5anOiED//EkSw/dp8VOUJul
+         w4GzkGHd46tgN6KyyzNMzhDmeHEk59N92PNeL+R+EXxBQKDRicvXteYlI9vxFd2upDF2
+         hXSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWYoaTA7jzESD2SWAomD5XbVVfKBiIBm+jL/tFyT5etJQptOMAj1OXYaQ0i5Yc9zU7q5Is=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDFt+7nIBpJzxKM/br65JUoZPpJS75h6y90gp7T8XDJNCrgN53
+	u9i7OifycTtpCUBYVcKAPBStumiAoL2MN+ptJVJwli09bvdF1XVMmnZalQHECbpmxVrHnpf5S3S
+	QhiuSB1NKaPxf/hj4tLPT9uN9aqSNiskmjtx06Q==
+X-Gm-Gg: ASbGncu27PkUtSngH8YlHE2D7m1g4UZXFbnTpXsLCL5cZFyvF0SPT0FzF+vHcZO6f0S
+	3MgXhPdTJxOF7FAp4y5fGfRnCsDZMm+Iq+tX4xBW93Fuuv21uQ7DUaLCsPcDiaDrrGuLkK1Zqit
+	4a7VsD1gkTZ8dEvT728pg8ZnZnf4I=
+X-Google-Smtp-Source: AGHT+IGorLR4vpvSPH7Y1YAxXeFqCzaxkKZMA/+kwGP1IAahctRspftJyPmwcr0ynAjnueUx7zlU29wbFehiSxJqtI8=
+X-Received: by 2002:a05:6902:4812:b0:e65:c4be:6fb9 with SMTP id
+ 3f1490d57ef6-e6679026c82mr264264276.25.1742320223682; Tue, 18 Mar 2025
+ 10:50:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250318045125.759259-1-pierrick.bouvier@linaro.org>
+ <20250318045125.759259-12-pierrick.bouvier@linaro.org> <8a24a29c-9d2a-47c9-a183-c92242c82bd9@linaro.org>
+In-Reply-To: <8a24a29c-9d2a-47c9-a183-c92242c82bd9@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 18 Mar 2025 17:50:11 +0000
+X-Gm-Features: AQ5f1Jq64ZMc3wNHD96Q-O52LvCc-sDu2DSilR-8cUO11vSS_VSAPQPzax2vqWI
+Message-ID: <CAFEAcA--jw3GmS70NTwviAEhdWeJ1UXE+ucNSkR60BXk6G8B6g@mail.gmail.com>
+Subject: Re: [PATCH 11/13] target/arm/cpu: remove inline stubs for aarch32 emulation
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>
+Cc: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org, 
+	=?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, 
+	qemu-arm@nongnu.org, alex.bennee@linaro.org, kvm@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, 
+	=?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This patch adds a generic function for lock tests for all
-the sbi fwft features. It expects the feature is already
-locked before being called and tests the locked feature.
+On Tue, 18 Mar 2025 at 17:42, Philippe Mathieu-Daud=C3=A9 <philmd@linaro.or=
+g> wrote:
+>
+> On 18/3/25 05:51, Pierrick Bouvier wrote:
+> > Directly condition associated calls in target/arm/helper.c for now.
+> >
+> > Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+> > ---
+> >   target/arm/cpu.h    | 8 --------
+> >   target/arm/helper.c | 6 ++++++
+> >   2 files changed, 6 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> > index 51b6428cfec..9205cbdec43 100644
+> > --- a/target/arm/cpu.h
+> > +++ b/target/arm/cpu.h
+> > @@ -1222,7 +1222,6 @@ int arm_cpu_write_elf32_note(WriteCoreDumpFunctio=
+n f, CPUState *cs,
+> >    */
+> >   void arm_emulate_firmware_reset(CPUState *cpustate, int target_el);
+> >
+> > -#ifdef TARGET_AARCH64
+> >   int aarch64_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, int=
+ reg);
+> >   int aarch64_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int r=
+eg);
+> >   void aarch64_sve_narrow_vq(CPUARMState *env, unsigned vq);
+> > @@ -1254,13 +1253,6 @@ static inline uint64_t *sve_bswap64(uint64_t *ds=
+t, uint64_t *src, int nr)
+> >   #endif
+> >   }
+> >
+> > -#else
+> > -static inline void aarch64_sve_narrow_vq(CPUARMState *env, unsigned vq=
+) { }
+> > -static inline void aarch64_sve_change_el(CPUARMState *env, int o,
+> > -                                         int n, bool a)
+> > -{ }
+> > -#endif
+> > -
+> >   void aarch64_sync_32_to_64(CPUARMState *env);
+> >   void aarch64_sync_64_to_32(CPUARMState *env);
+> >
+> > diff --git a/target/arm/helper.c b/target/arm/helper.c
+> > index b46b2bffcf3..774e1ee0245 100644
+> > --- a/target/arm/helper.c
+> > +++ b/target/arm/helper.c
+> > @@ -6562,7 +6562,9 @@ static void zcr_write(CPUARMState *env, const ARM=
+CPRegInfo *ri,
+> >        */
+> >       new_len =3D sve_vqm1_for_el(env, cur_el);
+> >       if (new_len < old_len) {
+> > +#ifdef TARGET_AARCH64
+>
+> What about using runtime check instead?
+>
+>   if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64) && new_len < old_len) {
+>
 
-Signed-off-by: Akshay Behl <akshaybehl231@gmail.com>
----
-v2:
- - Made changes to handel non boolean feature tests.
- riscv/sbi-fwft.c | 49 ++++++++++++++++++++++++++++++++----------------
- 1 file changed, 33 insertions(+), 16 deletions(-)
+That would be a dead check: it is not possible to get here
+unless ARM_FEATURE_AARCH64 is set.
 
-diff --git a/riscv/sbi-fwft.c b/riscv/sbi-fwft.c
-index 581cbf6b..7d9735d7 100644
---- a/riscv/sbi-fwft.c
-+++ b/riscv/sbi-fwft.c
-@@ -74,6 +74,34 @@ static void fwft_check_reset(uint32_t feature, unsigned long reset)
- 	sbiret_report(&ret, SBI_SUCCESS, reset, "resets to %lu", reset);
- }
- 
-+/* Must be called after locking the feature using SBI_FWFT_SET_FLAG_LOCK */
-+static void fwft_feature_lock_test_values(uint32_t feature, size_t nr_values,
-+										unsigned long test_values[], unsigned long locked_value)
-+{
-+	struct sbiret ret;
-+
-+	for (int i = 0; i < nr_values; ++i) {
-+		ret = fwft_set(feature, test_values[i], 0);
-+		sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED,
-+			"Set locked feature to %lu without lock", test_values[i]);
-+
-+		ret = fwft_set(feature, test_values[i], SBI_FWFT_SET_FLAG_LOCK);
-+		sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED,
-+			"Set locked feature to %lu with lock", test_values[i]);
-+	}
-+
-+	ret = fwft_get(feature);
-+	sbiret_report(&ret, SBI_SUCCESS, locked_value,
-+		"Get locked feature value %lu", locked_value);
-+}
-+
-+static void fwft_feature_lock_test(uint32_t feature, unsigned long locked_value)
-+{
-+	unsigned long values[] = {0, 1};
-+
-+	fwft_feature_lock_test_values(feature, 2 , values, locked_value);
-+}
-+
- static void fwft_check_base(void)
- {
- 	report_prefix_push("base");
-@@ -181,11 +209,9 @@ static void fwft_check_misaligned_exc_deleg(void)
- 	/* Lock the feature */
- 	ret = fwft_misaligned_exc_set(0, SBI_FWFT_SET_FLAG_LOCK);
- 	sbiret_report_error(&ret, SBI_SUCCESS, "Set misaligned deleg feature value 0 and lock");
--	ret = fwft_misaligned_exc_set(1, 0);
--	sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED,
--			    "Set locked misaligned deleg feature to new value");
--	ret = fwft_misaligned_exc_get();
--	sbiret_report(&ret, SBI_SUCCESS, 0, "Get misaligned deleg locked value 0");
-+
-+	/* Test feature lock */
-+	fwft_feature_lock_test(SBI_FWFT_MISALIGNED_EXC_DELEG, 0);
- 
- 	report_prefix_pop();
- }
-@@ -326,17 +352,8 @@ adue_inval_tests:
- 	else
- 		enabled = !enabled;
- 
--	ret = fwft_set(SBI_FWFT_PTE_AD_HW_UPDATING, !enabled, 0);
--	sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED, "set locked to %d without lock", !enabled);
--
--	ret = fwft_set(SBI_FWFT_PTE_AD_HW_UPDATING, !enabled, 1);
--	sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED, "set locked to %d with lock", !enabled);
--
--	ret = fwft_set(SBI_FWFT_PTE_AD_HW_UPDATING, enabled, 0);
--	sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED, "set locked to %d without lock", enabled);
--
--	ret = fwft_set(SBI_FWFT_PTE_AD_HW_UPDATING, enabled, 1);
--	sbiret_report_error(&ret, SBI_ERR_DENIED_LOCKED, "set locked to %d with lock", enabled);
-+	/* Test the feature lock */
-+	fwft_feature_lock_test(SBI_FWFT_PTE_AD_HW_UPDATING, enabled);
- 
- adue_done:
- 	install_exception_handler(EXC_LOAD_PAGE_FAULT, NULL);
--- 
-2.34.1
-
+thanks
+-- PMM
 
