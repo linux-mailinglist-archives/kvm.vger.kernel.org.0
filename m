@@ -1,80 +1,81 @@
-Return-Path: <kvm+bounces-41455-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41456-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9493A67FA4
-	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 23:20:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F92FA67FA7
+	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 23:21:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE27019C7042
-	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 22:20:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CD771896473
+	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 22:21:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FDF3202971;
-	Tue, 18 Mar 2025 22:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1B9A1FECD1;
+	Tue, 18 Mar 2025 22:21:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tqSpIyRR"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aIqJY/sE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37F6ADDC5
-	for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 22:19:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E25DDC5
+	for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 22:21:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742336389; cv=none; b=Hd3wTebx1bINpwJEB73PBY1gcsOiITnV7MiSRSYoICfKEw5WE/RZDy1sFFIOGmEA3JUJZhwiLiGEBp3vcGhKtAOXawpHgNOZuBcMjg3BqXAb1e7CajVeQfCra+0xRNeGRpGhp4T7iq+wSPMMY9rzzthdvtieOcIX2+OzO16NknQ=
+	t=1742336478; cv=none; b=VgqKvYSLXLPv4YkhLreqBF6xtSwsoRmTRF5gyanwABjD2raiV9+4oH/1/UXHIYtLiRjdsjYoRCovCb2oElVKqlN0A2faG0MYbZbptwhWz/UJmDIJZk9b+jvQRUIOl2G4H7x9WViGRSCtti2nBYhraKmFY3Qywu5MLwxhdPYEFpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742336389; c=relaxed/simple;
-	bh=ZrWK6UbSGG/VakvYF3MMBArOrBiVPNYP8p7Ws4YeDIY=;
+	s=arc-20240116; t=1742336478; c=relaxed/simple;
+	bh=uWOdlwzs12si8aRBT+zJ20K8yji5ecJymP6IOyuFGoU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jy9L1P/ixgqeD2vsXRb8N+nafAJ0/B9TOHPoJTRK4Sjv3w7TBt6ALtwK+B/nF3gYXPhxLjRN9Svmp6r2sphcbA7dzC8uC2RbBh35CVlXa8za1uMZk/EdlIJhLMIB31AGq5lDwqhTRW4NupyMYzK50qAlY+Xot1ue1E2Pntj+hn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=tqSpIyRR; arc=none smtp.client-ip=209.85.214.175
+	 In-Reply-To:Content-Type; b=JJXIQvXuqKppiUUSem2HtyUlnoQZqBVUvA/PnAXq1AhV+bHiA++5fUquu4Zr1RJTUlIi/auH2u6k1uthYO4UMgHAHut0F3YP306Gqsb0GZk+vBc0FulgPGMetU3KFoBV8HrPYw4MsIE6WsMMYMx5WH824VQqrmblMsJP6jXfalI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=aIqJY/sE; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-224019ad9edso5347515ad.1
-        for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 15:19:47 -0700 (PDT)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-225e3002dffso69350575ad.1
+        for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 15:21:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1742336387; x=1742941187; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1742336476; x=1742941276; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=VTGGUtCqvaeyCv5ha1EwY7WPOyRwsuePzUbQ67x00IU=;
-        b=tqSpIyRRVFhU6WE/P2edj+F4fNGOUqM7nVgsyJ7s0QXQ0MgOufEtfhGxoHAYMmoy62
-         ybu/5sbNno5g99CYaZkc9HomGoMsUKUnKfXJ4xlYc6ucIPCz/cHcsHcoewtS+hfNlnom
-         2nI9YyUsstMR4+GaE4POqmU/K2ftuXGawzU1Ro6s6MYCtTD2JsJb00NKcL06su0cId9J
-         4vveo6vHQZm519sI8zlnJkrizOpfBAdTqYCHAbnl7bz+eGGN+Z9crb4H8GYRG4JsMihw
-         vflNWLbF6L/9F2tOfIDwWKJ0BKV04Kf/R/pdkf9/4PGM98GUksQ1nFaxbC688V/JJCoK
-         /xZQ==
+        bh=oMWyKhFjYGpE1Bc3+5PVG/lcM9O7ug1FTKJVkXkKJkQ=;
+        b=aIqJY/sEut7QQaD3+YaNL8pL9B+8ZJ32ZqRCd7pZ5j53USURdALp6yJYp7fJbKsIaw
+         Uvz2i4/ZNKDpUkvbTjp+eJEsGW8P3m1PzZODcvLkT74sZ4P2q2WbZqTC9ucD+g3/I08s
+         Io6h+ItxXiEQB37HTna4DqxnFKnPkfxjMyqzNzsHjgjfpPuwN/a5mp3uuDDjy0bc9Lwo
+         RytfpSYUcG7xnzA2wo2qptMFU2qMEOW1+pXpSly59isuYYDUhYm90WSUG0h7CPnQhWh3
+         mNptMYjHB1kOupNdmrCqOM5K4lqCCi45Uj545cqRWFiS5Kz4CoZ2jUeSO5piD+QcJY7N
+         bMAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742336387; x=1742941187;
+        d=1e100.net; s=20230601; t=1742336476; x=1742941276;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VTGGUtCqvaeyCv5ha1EwY7WPOyRwsuePzUbQ67x00IU=;
-        b=ktWi3qdmQqQBIQsMsnyhjy7UkFR9enxqDYxqNs8PBDLE+ZiEyjYAxF2MQBotTXACVD
-         jaE4t1ScSSIdLNUEJvDX3zTik76CZc/c+mApbL1PqbqWNx6qtP/+VU+mRU5xLQ7UIs9c
-         Uj6iIB6dsdFYgKF5fPaAlBx6QO5UJ7+otgmx9IVx4GVlwA6wgi5HacwJK5MOTEa7zX5R
-         5hzzWKqgyqR6LBLGubFNlxAbJHsQJkU7zNxiyHVr2RkE0B/KsEfdZ/Ip5BLeqFoCw7tb
-         YRdFK6oqbyZiDQqDViGT9K02Acm4lDIttCV3K5yRI9oSXFUo+MLtSrSUggHIlDKSky11
-         crBA==
-X-Forwarded-Encrypted: i=1; AJvYcCW++J2nTlz4x+HfKibCHUeSUkMjnlabIoOZT+TyJWJcMe71PA5vmEH3liTj02p6nYlf5ps=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmQdxx3Wv87FA3a9XVPQ8YYE4Uc0hJY77QWNQeyPBCiwemqpCD
-	bsL3IoWeYxDl5SGatqJtvF4hFz3JX1o394+n/Z8NXvzSKdpLO8ZlAcobtXUnxIY=
-X-Gm-Gg: ASbGncvVUXCc7wSMl9/ikub7H5TIE3UsjEbAEFogqJq9NVXfG6GrMm7gD0sHcQcF8zP
-	4RcQYc/takH6MEWSGTb/3hT1ZM+zDOt51vbsekl/Tn6TsirX68Mh72t9az7goWv40sTueCYNzGQ
-	MzSLyVb8qCoPt0NT2zRhLg6aqpM+YxUheyimBn+EG6x70Tor+7w7dYj5ZEXz/sCSXXEGSzC9GRu
-	4L9Z6d9fY7VtvU1GI/0jloDKwwPrULOt12KNfEJ+D8BQUk/zWHhafakxvP7LKQtO2KBmtN62/m7
-	GQ+P51tQkm/n8CHYsjqGqAZveFWLQ8a+rGvJFWUjG3ZHO5RjVCXlr6+vbt9880uIEP9OL0oFy5W
-	NF0hkdhNN
-X-Google-Smtp-Source: AGHT+IG3WL2UZjLRcBSxDIrHyiZ799+Zj+pvjdJn5gm7VGBFlAyVOVO0vmRFXWt9lA78bwybkCPvEw==
-X-Received: by 2002:a05:6a21:168b:b0:1f5:9cb2:28a2 with SMTP id adf61e73a8af0-1fbebc846e5mr518960637.19.1742336387525;
-        Tue, 18 Mar 2025 15:19:47 -0700 (PDT)
+        bh=oMWyKhFjYGpE1Bc3+5PVG/lcM9O7ug1FTKJVkXkKJkQ=;
+        b=ln7GN91hGlpZ+6Tz1wtEJAWs2i7WA8aws8+qYGDZ/fQayG4MP8B+yDcMGfWDJnOVQJ
+         fXcKAQ5+aWFQKqzMjq5Wrow8cjpmipl9T+4fiytuDj4a45rvxIx6IS87279AfyiPw901
+         BppmoDNM5kcP+SbTxIcqisSmlrGxaZiDqjQ2pJ4VBeN3odV00LBEXd0gJkPCuH1lVyb9
+         i7qy7BzBsO4nhF/LZYVOK3Soip/TOy9TmdBY+TIH4cLDRj/HxnhWjbJWcbIipnGec4ca
+         OO09g0wFASgg/4ca1WTkycVZQvN5egmbBu1kgkCt6HblLOPZlZWugk3O4AUEdR7t7xhb
+         Baiw==
+X-Forwarded-Encrypted: i=1; AJvYcCVOTnQ6C/N7JDSYG2EbIbWdUt4eCyrJnhHo3HBa1sX/O5GEx1ts8GJ6gyBbf/I58m7kKiQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxquqP9GiD8GPDXyasjJXJfu1AGqmlFZy5AwGwdQ8Ky80U1SYPV
+	WPW4bWd95cWABjiueMwWiHNVIu34SynBYXvAG7mH39IeLHEebprDEmHgrpq4E/+U6nLgTx2++kJ
+	D
+X-Gm-Gg: ASbGncutUmuDj4BA7p979zCOTNjb5G+/SosUNs8pbNAm70XY9SEs6/ivwuZB3IHyNY9
+	26U+321bIEhODqIUMmbylJfxGAqBfxcMDcqpX+OWNAu/gPgCVdMctnVysx/ZRGpggpi787O19kh
+	iurgBj/HlvKZr+TrEs0GtCregmq7G1lXGpVKbNdlfegeS1fCwa48zhRgJjgn92U6lWJdWFB5NuG
+	PeFa6ialw/Udnjzbzm2D2+3zGcVAPgiIWICNBKr8axmKhcoJBkoEW2YlnWN191UprgQHhVIGHuC
+	xz4pJWYCeNvSqxQXqbt5zx2SWfIB/i415pFPYYzxAPvuG8mCw1K7ZiRSXag0TKCaPc6sQs/HKZb
+	oa1wdVLz0
+X-Google-Smtp-Source: AGHT+IHyyJCsiABK+wwwJ/lgyfO1ls36ZQt3JXsVmvsivUDUtxpenS401D2LRtb8OdsmEgQFuXJjhg==
+X-Received: by 2002:a05:6a00:13a7:b0:730:9801:d3e2 with SMTP id d2e1a72fcca58-7376d5fee6emr654299b3a.8.1742336475698;
+        Tue, 18 Mar 2025 15:21:15 -0700 (PDT)
 Received: from [192.168.0.4] (174-21-74-48.tukw.qwest.net. [174.21.74.48])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af56e9ca494sm8061555a12.5.2025.03.18.15.19.46
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73711559269sm10478181b3a.65.2025.03.18.15.21.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Mar 2025 15:19:47 -0700 (PDT)
-Message-ID: <f1ce73a6-717b-4230-95cd-45505fecf039@linaro.org>
-Date: Tue, 18 Mar 2025 15:19:45 -0700
+        Tue, 18 Mar 2025 15:21:15 -0700 (PDT)
+Message-ID: <0c6f23d5-d220-4fa7-957e-8721f1aa732f@linaro.org>
+Date: Tue, 18 Mar 2025 15:21:13 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,8 +83,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 05/13] target/arm/cpu: move KVM_HAVE_MCE_INJECTION to
- kvm-all.c file directly
+Subject: Re: [PATCH 04/13] exec/cpu-all: allow to include specific cpu
 To: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
 Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
  qemu-arm@nongnu.org, alex.bennee@linaro.org,
@@ -92,37 +92,24 @@ Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
  =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
  =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 References: <20250318045125.759259-1-pierrick.bouvier@linaro.org>
- <20250318045125.759259-6-pierrick.bouvier@linaro.org>
+ <20250318045125.759259-5-pierrick.bouvier@linaro.org>
+ <35c90e78-2c2c-4bbb-9996-4031c9eef08a@linaro.org>
+ <7202c9e9-1002-4cdc-9ce4-64785aac5de4@linaro.org>
 Content-Language: en-US
 From: Richard Henderson <richard.henderson@linaro.org>
-In-Reply-To: <20250318045125.759259-6-pierrick.bouvier@linaro.org>
+In-Reply-To: <7202c9e9-1002-4cdc-9ce4-64785aac5de4@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 3/17/25 21:51, Pierrick Bouvier wrote:
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index f89568bfa39..28de3990699 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -13,6 +13,10 @@
->    *
->    */
->   
-> +#ifdef TARGET_AARCH64
-> +#define KVM_HAVE_MCE_INJECTION 1
-> +#endif
-> +
->   #include "qemu/osdep.h"
->   #include <sys/ioctl.h>
->   #include <poll.h>
+On 3/18/25 15:16, Pierrick Bouvier wrote:
+>> This doesn't make any sense to me.  CPU_INCLUDE is defined within the very file that
+>> you're trying to include by avoiding "cpu.h".
+>>
+> 
+> Every target/X/cpu.h includes cpu-all.h, which includes "cpu.h" itself, relying on per 
+> target include path set by build system.
 
-I think this define should go after all #includes, emphasizing that it only affects this file.
-
-I think the #ifdef should use __aarch64__.  KVM is explicitly only for the host, so 
-TARGET_AARCH64 really means the host is also AArch64.
-
-I think you should go ahead and adjust x86_64 either with the same patch or immediately 
-afterward.  There are only two users after all.
+So, another solution would be to fix the silly include loop?
 
 
 r~
