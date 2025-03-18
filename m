@@ -1,189 +1,179 @@
-Return-Path: <kvm+bounces-41432-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41433-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A921A67BA4
-	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 19:08:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84CCFA67BB9
+	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 19:14:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9D9917BC61
-	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 18:06:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E1713B1771
+	for <lists+kvm@lfdr.de>; Tue, 18 Mar 2025 18:13:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61058212B3D;
-	Tue, 18 Mar 2025 18:06:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 262EE212FAC;
+	Tue, 18 Mar 2025 18:13:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="C9/SqLq9"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KHV6gcuX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B191D212B0C
-	for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 18:06:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00755212D65
+	for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 18:13:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742321196; cv=none; b=Aonn57kGoPrJxvwyI//myeHpNJN8P3gpPc/LV/Up4tBsi8Gi3uysjZRTdWc0NJ2zNycJ15iC673jbGYJ68gEgAWh+ewQpIG6dxV/KgMXk50lgdbQY9CZpu+MThobVQU6hErHIP2eVLXa9C0/WQO26EEu2+tr6wVa2dWz/M9es9k=
+	t=1742321636; cv=none; b=FQzxI0AC/48Re/SSHZrxMkrjKXVaKGSGXHj3r8B23DdRBT4im80N+906/DggRCrR6wMJiUrz1J+fs8cXFLlAde3mZmmnOMy1grbcCo53fleDKG0l5HorBPYwUFXz7UBSWrEGFctMupQlYPJKcTSuNBGU9Z+JKuv6p+pY/A/vN+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742321196; c=relaxed/simple;
-	bh=SgeIxsT4lJaCS6YWl9Jg1PXvl4hRl3t8bvPxTdVy9hk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LIicnOEJuSsWVdzw5H/Sqc97Dvgcy1KWa3Kj8of5FZI8hup2cx1t5jILmh5uEmrcy9/dmIn8ceTdgzc1XQOs9GnD4lfGUE/4enQ3T73Ltuzahr14Et08ynXJLDqgFvZUmWMf4HfLadSoLdbKTL21TZvooA8whSNzboC02oBQt64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=C9/SqLq9; arc=none smtp.client-ip=209.85.219.171
+	s=arc-20240116; t=1742321636; c=relaxed/simple;
+	bh=lmUQbfDb36TKJU3sYGzcNnijG6zoXKkNnWbTZWel+Eg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=i1keqq6yR1FQIbs82k9Sia0zQVHeXyEpV4SX34GQiJwapAsjpyzSyHwIZSalCLvAsaTNa+RyG33XtznYkUztvolND15nFPMC4/bCIvmAThjmcsPsW+pbB8LNRnUmIZ2LK0gw/VCh4M/CRS0mj/fNRSFYfySkPufp9LRSli5rjDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KHV6gcuX; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-e63504bedd0so4083015276.0
-        for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 11:06:34 -0700 (PDT)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-22403cbb47fso113523615ad.0
+        for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 11:13:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1742321193; x=1742925993; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pIKBRtlhzPsM9FYHmDEFkH3srgSNrGh/z0c4h/04G2w=;
-        b=C9/SqLq9hX0gR97g69FaSlJ7N0qfvt7xDKl3bS59Byw4CkXQ0GvFNVJnNUUHERh2HI
-         20xD4jd2RPNmwd9K+6Hmf3P62cZc4ORyCUANzUHTp25TlKw9srTsr1OimxPr0TqQ2td1
-         HdWYlcxDJEd/zpOsRj/ZY5fbfta3RvhMJ7yvRDooRl8YuHqVA0u8qgdBD7gtab8RE6WQ
-         efPBuji85nkUycrDPaVSsBZ+A3CB9beiLqPuedjGBZlb9FoqDg4FWvXiY507E/7pIKFV
-         6gluIOyyh1qBNSJ4KS/jPicSWVNBI+UpAGn04HbaO4VGPOIdnMD3A77kPGqFq1sDRxO6
-         fq1g==
+        d=linaro.org; s=google; t=1742321633; x=1742926433; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lmUQbfDb36TKJU3sYGzcNnijG6zoXKkNnWbTZWel+Eg=;
+        b=KHV6gcuXYicOJ/WumIJcGTsZXBxYBW9wWSMbaENz+WCVammAtj82xF6Jd9/bJNHwVB
+         staSBmnpg33Md5VbEayL6uAFgnSnMNHze7EcX+O2/kT7NL89AgoWm6NMyCeWRCoaylkJ
+         Y5Zmp4e4p7JyKgHiR0JUfO3X3siLCK4DHt3Wjbd/f7sWu+9UCoSVQSuwj9b9Am1T5V4q
+         X/9cV/AWiXwZXuCrsEL6pBgoTqnwVFmH527CrgpxllU8hU6PviBQASrz5/lhTWI0YeZd
+         EvMFgaKt57vHjV6XHKCqgCuMehBDtwygQKERE+Yiy2uVBsxEqHO8UgseMODH4MWdkCvn
+         YyJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742321193; x=1742925993;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pIKBRtlhzPsM9FYHmDEFkH3srgSNrGh/z0c4h/04G2w=;
-        b=EpytV8dIewcT45Ul6ayioNTBg/K9km40Z3rVxOjUH/J3XzamuFMzP4hnLtcReAK+Hz
-         S85p+4D5Ctn7zC9bI53vSEuGXVVkyVx5EkdGJ8r/mGRBVGQyxaWt31IRUn2c0NHQvgCp
-         Xb75qcWKawqVl/krLsiZlad8JL782s0AWkzpE4X7GY9/gjlbcEn3Rdyn0bNjxhjk0Yhn
-         JEjTjGjpA9FRDpLBArT6N3vCaA5cYow/J1PdPALTk2DdWSPQe7I/AjKdEJ5zEQ+dkhky
-         4tha+Ny056gVE4i8ihEm6Eq2w6lj6iLzsBxU/g1Zeq8zx+PEwcFYxe5egZHHWYEvhVGU
-         4gWg==
-X-Forwarded-Encrypted: i=1; AJvYcCXyzxo8F5A0ejWsSrVGIoXj31wIx2+VLpLIwc0/Njk5PC1dFiNvipLmfHA5Ztf+8kPqZlo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8fb5OfirNr2sOOWWn4uHKGDfZWmbZNKsttjbaDQ1WoSieAoKh
-	ve+Z9VJWrq9RzBrIJ3CGJDS9+pz9YekoxhzGmPsN9iYL4WEoXeRgbv0B5qk0I4U2J1HXe3KHUnE
-	csRkCDXFnQDEHAvpHo7u5yWR5DDVgGP6gRkGkSA==
-X-Gm-Gg: ASbGnctB9jb5ZGzCo68a5zj3nqtwxkd5xpZR21JQr066uL003/+9rEoRHvwJNuPprLh
-	rU1VwH4vFjtZsLB1qdRAFMSr/oIJJo06J2jhMo9DDtdbUoE05aA70Hy9k1pftfmN4uZlEDMJ8Al
-	t9eqoI14Hp4jy6prTLuTVieUI2R4A=
-X-Google-Smtp-Source: AGHT+IFgxkES2TvRDqY5GNivdNl51kTxz2g9VDNygV9JwUiXyElJy4gopiu2DAfAvXAWyzKjQGh6IUkQZopqxj4Z26Q=
-X-Received: by 2002:a05:6902:2405:b0:e5d:d9e4:532e with SMTP id
- 3f1490d57ef6-e63f652e146mr20848324276.24.1742321193595; Tue, 18 Mar 2025
- 11:06:33 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1742321633; x=1742926433;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lmUQbfDb36TKJU3sYGzcNnijG6zoXKkNnWbTZWel+Eg=;
+        b=s3Rqa8u+XIn7xAVJr4IN+IcIQD+YzuBBcwbXccrwauY4oi2xJoz9pHthG9t+zIioO6
+         /7lfb5a/nneT5etKzulcN+5WihiwjUCEPv849O+KlbPdg5aSBWz+mQbmoRtvyepHbd+Z
+         YIXzeLy1f5l9BtHicT4tlWfxCJW1BDiM+GwE3FfWooIIjBppAO3+2vGJRXJLsJjp5cfe
+         BSZecCbxtQQWPzkjWYIFELxqhENBcXKvuaX2dR79QyoVZ4xCNnDxV23RNF9U/vzPhFX/
+         v2vzJHtYqkfB3Vky/LlWgWsWqWDSAkyhFKtFxPBErh6jEezSGzT+eq4WKtyz+S2Btum8
+         sfiw==
+X-Forwarded-Encrypted: i=1; AJvYcCW4z7x/pg2SovbyQiv4IipoRh5ILqjMxaieV4ToKCfgPhdOOHEhi0r1OTa2SuGSnUxkMoE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhdbpiHe1b8bsCwW5M+bWsN9Kzy+9EQ4jFgenu+sU43RAcYXhD
+	A32gH2fq7FQvYkrHyQ9W3759xB5IDEijhiPSkalNN0f2wXX4SjKdxM/oA05MJBo=
+X-Gm-Gg: ASbGncumIRPPggJjXEY9AI5gYS8g1WYxQYT6sSiHUx6DxwThINGbQRiK3zm82he9sQK
+	3nKhnsGrde7qymwDPC3iLfNLsd6qmKdFBlKE43Jy4G5rN0T7b5TNgJvoB6od8Fg+CcFrrRZga0q
+	gxOm7z4yWI59YxrIig6hTbNbp4ohFKmLMMM88qwDlxNHb6NQuCyqKDG618pkM5jt4g6Ue5E/JAx
+	fZKxDANCirsVBkoQyQZ17fEBoWV1agpGonx67bBBoylQcXCNJy95ypgBkoe6tRA2dlIuesLm5i+
+	Y25aK5rZePabe6lBRx49HUiPfXr4vcG37TozQLgRzZJyzzUjKDedfmHfug==
+X-Google-Smtp-Source: AGHT+IGC4O6xkU9iAtNKj1qbqiWAy/fyUW5mk3mtgeMn6dcnh9ulFRbfkTwNDCZJfKmGVlCQn/E7NQ==
+X-Received: by 2002:a05:6a00:4f92:b0:736:532b:7c10 with SMTP id d2e1a72fcca58-737223fccabmr22570526b3a.21.1742321633062;
+        Tue, 18 Mar 2025 11:13:53 -0700 (PDT)
+Received: from [192.168.1.67] ([38.39.164.180])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-737116b1103sm9939246b3a.167.2025.03.18.11.13.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Mar 2025 11:13:52 -0700 (PDT)
+Message-ID: <8291b89a-9e97-47e6-9ee6-fd407066c3bf@linaro.org>
+Date: Tue, 18 Mar 2025 11:13:51 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 11/13] target/arm/cpu: remove inline stubs for aarch32
+ emulation
+Content-Language: en-US
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ qemu-devel@nongnu.org, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?=
+ <berrange@redhat.com>, qemu-arm@nongnu.org, alex.bennee@linaro.org,
+ kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>
 References: <20250318045125.759259-1-pierrick.bouvier@linaro.org>
- <20250318045125.759259-12-pierrick.bouvier@linaro.org> <8a24a29c-9d2a-47c9-a183-c92242c82bd9@linaro.org>
- <CAFEAcA--jw3GmS70NTwviAEhdWeJ1UXE+ucNSkR60BXk6G8B6g@mail.gmail.com> <a3b61916-2466-4ec8-a4e1-567581be7a2b@linaro.org>
-In-Reply-To: <a3b61916-2466-4ec8-a4e1-567581be7a2b@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 18 Mar 2025 18:06:22 +0000
-X-Gm-Features: AQ5f1JpnElkFWteuW9nidJdWxKahaGJiIURK8S1_MEu9ArX9YDqVQFuSsoQL1Lk
-Message-ID: <CAFEAcA9jsFqD-BR+zTzWV1V92fJqpghaOrGq1rDcdidm=R94Pw@mail.gmail.com>
-Subject: Re: [PATCH 11/13] target/arm/cpu: remove inline stubs for aarch32 emulation
-To: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
-	qemu-devel@nongnu.org, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, 
-	qemu-arm@nongnu.org, alex.bennee@linaro.org, kvm@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, 
-	=?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+ <20250318045125.759259-12-pierrick.bouvier@linaro.org>
+ <8a24a29c-9d2a-47c9-a183-c92242c82bd9@linaro.org>
+ <CAFEAcA--jw3GmS70NTwviAEhdWeJ1UXE+ucNSkR60BXk6G8B6g@mail.gmail.com>
+ <a3b61916-2466-4ec8-a4e1-567581be7a2b@linaro.org>
+ <CAFEAcA9jsFqD-BR+zTzWV1V92fJqpghaOrGq1rDcdidm=R94Pw@mail.gmail.com>
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+In-Reply-To: <CAFEAcA9jsFqD-BR+zTzWV1V92fJqpghaOrGq1rDcdidm=R94Pw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-On Tue, 18 Mar 2025 at 17:52, Pierrick Bouvier
-<pierrick.bouvier@linaro.org> wrote:
->
-> On 3/18/25 10:50, Peter Maydell wrote:
-> > On Tue, 18 Mar 2025 at 17:42, Philippe Mathieu-Daud=C3=A9 <philmd@linar=
-o.org> wrote:
-> >>
-> >> On 18/3/25 05:51, Pierrick Bouvier wrote:
-> >>> Directly condition associated calls in target/arm/helper.c for now.
-> >>>
-> >>> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-> >>> ---
-> >>>    target/arm/cpu.h    | 8 --------
-> >>>    target/arm/helper.c | 6 ++++++
-> >>>    2 files changed, 6 insertions(+), 8 deletions(-)
-> >>>
-> >>> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> >>> index 51b6428cfec..9205cbdec43 100644
-> >>> --- a/target/arm/cpu.h
-> >>> +++ b/target/arm/cpu.h
-> >>> @@ -1222,7 +1222,6 @@ int arm_cpu_write_elf32_note(WriteCoreDumpFunct=
-ion f, CPUState *cs,
-> >>>     */
-> >>>    void arm_emulate_firmware_reset(CPUState *cpustate, int target_el)=
-;
-> >>>
-> >>> -#ifdef TARGET_AARCH64
-> >>>    int aarch64_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, =
-int reg);
-> >>>    int aarch64_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, in=
-t reg);
-> >>>    void aarch64_sve_narrow_vq(CPUARMState *env, unsigned vq);
-> >>> @@ -1254,13 +1253,6 @@ static inline uint64_t *sve_bswap64(uint64_t *=
-dst, uint64_t *src, int nr)
-> >>>    #endif
-> >>>    }
-> >>>
-> >>> -#else
-> >>> -static inline void aarch64_sve_narrow_vq(CPUARMState *env, unsigned =
-vq) { }
-> >>> -static inline void aarch64_sve_change_el(CPUARMState *env, int o,
-> >>> -                                         int n, bool a)
-> >>> -{ }
-> >>> -#endif
-> >>> -
-> >>>    void aarch64_sync_32_to_64(CPUARMState *env);
-> >>>    void aarch64_sync_64_to_32(CPUARMState *env);
-> >>>
-> >>> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> >>> index b46b2bffcf3..774e1ee0245 100644
-> >>> --- a/target/arm/helper.c
-> >>> +++ b/target/arm/helper.c
-> >>> @@ -6562,7 +6562,9 @@ static void zcr_write(CPUARMState *env, const A=
-RMCPRegInfo *ri,
-> >>>         */
-> >>>        new_len =3D sve_vqm1_for_el(env, cur_el);
-> >>>        if (new_len < old_len) {
-> >>> +#ifdef TARGET_AARCH64
-> >>
-> >> What about using runtime check instead?
-> >>
-> >>    if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64) && new_len < old_le=
-n) {
-> >>
-> >
-> > That would be a dead check: it is not possible to get here
-> > unless ARM_FEATURE_AARCH64 is set.
-> >
->
-> We can then assert it, to make sure there is no regression around that.
-
-We have a lot of write/read/access fns for AArch64-only sysregs, and
-we don't need to assert in all of them that they're called only when
-the CPU has AArch64 enabled.
-
-> We now have another conversation and something to decide in another
-> file, and that's why I chose to do the minimal change ("ifdef the
-> issue") instead of trying to do any change.
-
-I think we can fairly easily avoid ifdeffing the callsite of
-aarch64_sve_narrow_vq(). Currently we have:
- * a real version of the function, whose definition is inside
-   an ifdef TARGET_AARCH64 in target/arm/helper.c
- * a stub version, inline in the cpu.h header
-
-If we don't want to have the stub version with ifdefs, then we can
-move the real implementation of the function to not be inside the
-ifdef (matching the fact that the prototype is no longer inside
-an ifdef). The function doesn't call any other functions that are
-TARGET_AARCH64 only, so it shouldn't be a "now we have to move
-50 other things" problem, I hope.
-
-thanks
--- PMM
+T24gMy8xOC8yNSAxMTowNiwgUGV0ZXIgTWF5ZGVsbCB3cm90ZToNCj4gT24gVHVlLCAxOCBN
+YXIgMjAyNSBhdCAxNzo1MiwgUGllcnJpY2sgQm91dmllcg0KPiA8cGllcnJpY2suYm91dmll
+ckBsaW5hcm8ub3JnPiB3cm90ZToNCj4+DQo+PiBPbiAzLzE4LzI1IDEwOjUwLCBQZXRlciBN
+YXlkZWxsIHdyb3RlOg0KPj4+IE9uIFR1ZSwgMTggTWFyIDIwMjUgYXQgMTc6NDIsIFBoaWxp
+cHBlIE1hdGhpZXUtRGF1ZMOpIDxwaGlsbWRAbGluYXJvLm9yZz4gd3JvdGU6DQo+Pj4+DQo+
+Pj4+IE9uIDE4LzMvMjUgMDU6NTEsIFBpZXJyaWNrIEJvdXZpZXIgd3JvdGU6DQo+Pj4+PiBE
+aXJlY3RseSBjb25kaXRpb24gYXNzb2NpYXRlZCBjYWxscyBpbiB0YXJnZXQvYXJtL2hlbHBl
+ci5jIGZvciBub3cuDQo+Pj4+Pg0KPj4+Pj4gU2lnbmVkLW9mZi1ieTogUGllcnJpY2sgQm91
+dmllciA8cGllcnJpY2suYm91dmllckBsaW5hcm8ub3JnPg0KPj4+Pj4gLS0tDQo+Pj4+PiAg
+ICAgdGFyZ2V0L2FybS9jcHUuaCAgICB8IDggLS0tLS0tLS0NCj4+Pj4+ICAgICB0YXJnZXQv
+YXJtL2hlbHBlci5jIHwgNiArKysrKysNCj4+Pj4+ICAgICAyIGZpbGVzIGNoYW5nZWQsIDYg
+aW5zZXJ0aW9ucygrKSwgOCBkZWxldGlvbnMoLSkNCj4+Pj4+DQo+Pj4+PiBkaWZmIC0tZ2l0
+IGEvdGFyZ2V0L2FybS9jcHUuaCBiL3RhcmdldC9hcm0vY3B1LmgNCj4+Pj4+IGluZGV4IDUx
+YjY0MjhjZmVjLi45MjA1Y2JkZWM0MyAxMDA2NDQNCj4+Pj4+IC0tLSBhL3RhcmdldC9hcm0v
+Y3B1LmgNCj4+Pj4+ICsrKyBiL3RhcmdldC9hcm0vY3B1LmgNCj4+Pj4+IEBAIC0xMjIyLDcg
+KzEyMjIsNiBAQCBpbnQgYXJtX2NwdV93cml0ZV9lbGYzMl9ub3RlKFdyaXRlQ29yZUR1bXBG
+dW5jdGlvbiBmLCBDUFVTdGF0ZSAqY3MsDQo+Pj4+PiAgICAgICovDQo+Pj4+PiAgICAgdm9p
+ZCBhcm1fZW11bGF0ZV9maXJtd2FyZV9yZXNldChDUFVTdGF0ZSAqY3B1c3RhdGUsIGludCB0
+YXJnZXRfZWwpOw0KPj4+Pj4NCj4+Pj4+IC0jaWZkZWYgVEFSR0VUX0FBUkNINjQNCj4+Pj4+
+ICAgICBpbnQgYWFyY2g2NF9jcHVfZ2RiX3JlYWRfcmVnaXN0ZXIoQ1BVU3RhdGUgKmNwdSwg
+R0J5dGVBcnJheSAqYnVmLCBpbnQgcmVnKTsNCj4+Pj4+ICAgICBpbnQgYWFyY2g2NF9jcHVf
+Z2RiX3dyaXRlX3JlZ2lzdGVyKENQVVN0YXRlICpjcHUsIHVpbnQ4X3QgKmJ1ZiwgaW50IHJl
+Zyk7DQo+Pj4+PiAgICAgdm9pZCBhYXJjaDY0X3N2ZV9uYXJyb3dfdnEoQ1BVQVJNU3RhdGUg
+KmVudiwgdW5zaWduZWQgdnEpOw0KPj4+Pj4gQEAgLTEyNTQsMTMgKzEyNTMsNiBAQCBzdGF0
+aWMgaW5saW5lIHVpbnQ2NF90ICpzdmVfYnN3YXA2NCh1aW50NjRfdCAqZHN0LCB1aW50NjRf
+dCAqc3JjLCBpbnQgbnIpDQo+Pj4+PiAgICAgI2VuZGlmDQo+Pj4+PiAgICAgfQ0KPj4+Pj4N
+Cj4+Pj4+IC0jZWxzZQ0KPj4+Pj4gLXN0YXRpYyBpbmxpbmUgdm9pZCBhYXJjaDY0X3N2ZV9u
+YXJyb3dfdnEoQ1BVQVJNU3RhdGUgKmVudiwgdW5zaWduZWQgdnEpIHsgfQ0KPj4+Pj4gLXN0
+YXRpYyBpbmxpbmUgdm9pZCBhYXJjaDY0X3N2ZV9jaGFuZ2VfZWwoQ1BVQVJNU3RhdGUgKmVu
+diwgaW50IG8sDQo+Pj4+PiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBpbnQgbiwgYm9vbCBhKQ0KPj4+Pj4gLXsgfQ0KPj4+Pj4gLSNlbmRpZg0KPj4+Pj4g
+LQ0KPj4+Pj4gICAgIHZvaWQgYWFyY2g2NF9zeW5jXzMyX3RvXzY0KENQVUFSTVN0YXRlICpl
+bnYpOw0KPj4+Pj4gICAgIHZvaWQgYWFyY2g2NF9zeW5jXzY0X3RvXzMyKENQVUFSTVN0YXRl
+ICplbnYpOw0KPj4+Pj4NCj4+Pj4+IGRpZmYgLS1naXQgYS90YXJnZXQvYXJtL2hlbHBlci5j
+IGIvdGFyZ2V0L2FybS9oZWxwZXIuYw0KPj4+Pj4gaW5kZXggYjQ2YjJiZmZjZjMuLjc3NGUx
+ZWUwMjQ1IDEwMDY0NA0KPj4+Pj4gLS0tIGEvdGFyZ2V0L2FybS9oZWxwZXIuYw0KPj4+Pj4g
+KysrIGIvdGFyZ2V0L2FybS9oZWxwZXIuYw0KPj4+Pj4gQEAgLTY1NjIsNyArNjU2Miw5IEBA
+IHN0YXRpYyB2b2lkIHpjcl93cml0ZShDUFVBUk1TdGF0ZSAqZW52LCBjb25zdCBBUk1DUFJl
+Z0luZm8gKnJpLA0KPj4+Pj4gICAgICAgICAgKi8NCj4+Pj4+ICAgICAgICAgbmV3X2xlbiA9
+IHN2ZV92cW0xX2Zvcl9lbChlbnYsIGN1cl9lbCk7DQo+Pj4+PiAgICAgICAgIGlmIChuZXdf
+bGVuIDwgb2xkX2xlbikgew0KPj4+Pj4gKyNpZmRlZiBUQVJHRVRfQUFSQ0g2NA0KPj4+Pg0K
+Pj4+PiBXaGF0IGFib3V0IHVzaW5nIHJ1bnRpbWUgY2hlY2sgaW5zdGVhZD8NCj4+Pj4NCj4+
+Pj4gICAgIGlmIChhcm1fZmVhdHVyZSgmY3B1LT5lbnYsIEFSTV9GRUFUVVJFX0FBUkNINjQp
+ICYmIG5ld19sZW4gPCBvbGRfbGVuKSB7DQo+Pj4+DQo+Pj4NCj4+PiBUaGF0IHdvdWxkIGJl
+IGEgZGVhZCBjaGVjazogaXQgaXMgbm90IHBvc3NpYmxlIHRvIGdldCBoZXJlDQo+Pj4gdW5s
+ZXNzIEFSTV9GRUFUVVJFX0FBUkNINjQgaXMgc2V0Lg0KPj4+DQo+Pg0KPj4gV2UgY2FuIHRo
+ZW4gYXNzZXJ0IGl0LCB0byBtYWtlIHN1cmUgdGhlcmUgaXMgbm8gcmVncmVzc2lvbiBhcm91
+bmQgdGhhdC4NCj4gDQo+IFdlIGhhdmUgYSBsb3Qgb2Ygd3JpdGUvcmVhZC9hY2Nlc3MgZm5z
+IGZvciBBQXJjaDY0LW9ubHkgc3lzcmVncywgYW5kDQo+IHdlIGRvbid0IG5lZWQgdG8gYXNz
+ZXJ0IGluIGFsbCBvZiB0aGVtIHRoYXQgdGhleSdyZSBjYWxsZWQgb25seSB3aGVuDQo+IHRo
+ZSBDUFUgaGFzIEFBcmNoNjQgZW5hYmxlZC4NCj4gDQo+PiBXZSBub3cgaGF2ZSBhbm90aGVy
+IGNvbnZlcnNhdGlvbiBhbmQgc29tZXRoaW5nIHRvIGRlY2lkZSBpbiBhbm90aGVyDQo+PiBm
+aWxlLCBhbmQgdGhhdCdzIHdoeSBJIGNob3NlIHRvIGRvIHRoZSBtaW5pbWFsIGNoYW5nZSAo
+ImlmZGVmIHRoZQ0KPj4gaXNzdWUiKSBpbnN0ZWFkIG9mIHRyeWluZyB0byBkbyBhbnkgY2hh
+bmdlLg0KPiANCj4gSSB0aGluayB3ZSBjYW4gZmFpcmx5IGVhc2lseSBhdm9pZCBpZmRlZmZp
+bmcgdGhlIGNhbGxzaXRlIG9mDQo+IGFhcmNoNjRfc3ZlX25hcnJvd192cSgpLiBDdXJyZW50
+bHkgd2UgaGF2ZToNCj4gICAqIGEgcmVhbCB2ZXJzaW9uIG9mIHRoZSBmdW5jdGlvbiwgd2hv
+c2UgZGVmaW5pdGlvbiBpcyBpbnNpZGUNCj4gICAgIGFuIGlmZGVmIFRBUkdFVF9BQVJDSDY0
+IGluIHRhcmdldC9hcm0vaGVscGVyLmMNCj4gICAqIGEgc3R1YiB2ZXJzaW9uLCBpbmxpbmUg
+aW4gdGhlIGNwdS5oIGhlYWRlcg0KPiANCj4gSWYgd2UgZG9uJ3Qgd2FudCB0byBoYXZlIHRo
+ZSBzdHViIHZlcnNpb24gd2l0aCBpZmRlZnMsIHRoZW4gd2UgY2FuDQo+IG1vdmUgdGhlIHJl
+YWwgaW1wbGVtZW50YXRpb24gb2YgdGhlIGZ1bmN0aW9uIHRvIG5vdCBiZSBpbnNpZGUgdGhl
+DQo+IGlmZGVmIChtYXRjaGluZyB0aGUgZmFjdCB0aGF0IHRoZSBwcm90b3R5cGUgaXMgbm8g
+bG9uZ2VyIGluc2lkZQ0KPiBhbiBpZmRlZikuIFRoZSBmdW5jdGlvbiBkb2Vzbid0IGNhbGwg
+YW55IG90aGVyIGZ1bmN0aW9ucyB0aGF0IGFyZQ0KPiBUQVJHRVRfQUFSQ0g2NCBvbmx5LCBz
+byBpdCBzaG91bGRuJ3QgYmUgYSAibm93IHdlIGhhdmUgdG8gbW92ZQ0KPiA1MCBvdGhlciB0
+aGluZ3MiIHByb2JsZW0sIEkgaG9wZS4NCj4gDQoNCkknbGwgdHJ5IHRvIGp1c3QgbGV0IHRo
+ZSBjYWxsIGJlIGRvbmUsIGFuZCBzZWUgd2hhdCBoYXBwZW5zLg0KQnV0IGlmIEkgbWVldCBh
+IHJlZ3Jlc3Npb24gc29tZXdoZXJlIGluIHRhcmdldC9hcm0vKiwgSSdsbCBzaW1wbHkNCmxl
+dCB0aGUgY3VycmVudCBpZmRlZiBmb3Igbm93Lg0KDQpJIHVuZGVyc3RhbmQgaXQgInNob3Vs
+ZCBiZSBvayIsIGJ1dCBJIGp1c3Qgd2FudCB0byBmb2N1cyBvbiBody9hcm0sIGFuZCANCm5v
+dCBzdGFydCBmdXJ0aGVyIGNoYW5nZXMgaW4gdGFyZ2V0L2FybS9oZWxwZXIuYyBhcyBhIHNp
+ZGUgZWZmZWN0IG9mIA0Kc2ltcGx5IG1vdmluZyBhbiBpZmRlZiBpbiBhIGhlYWRlci4NCg0K
+PiB0aGFua3MNCj4gLS0gUE1NDQoNCg==
 
