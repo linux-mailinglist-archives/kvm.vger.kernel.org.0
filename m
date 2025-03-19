@@ -1,188 +1,114 @@
-Return-Path: <kvm+bounces-41525-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41526-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F390BA69C49
-	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 23:50:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF206A69C4D
+	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 23:55:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3272E189D5CA
-	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 22:50:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0A7B983045
+	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 22:53:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BF4922068D;
-	Wed, 19 Mar 2025 22:50:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D38AC214815;
+	Wed, 19 Mar 2025 22:53:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xr4t/+Oe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YtV0RUua"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B5791E0DF5
-	for <kvm@vger.kernel.org>; Wed, 19 Mar 2025 22:49:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0284A1E0DF5;
+	Wed, 19 Mar 2025 22:53:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742424599; cv=none; b=CuLleVlLidPDKTdCBxpY8R8t3B6ZRBlqkFxMeUvNE+TzR9DNoZ5BQXzLHKGrdmIflmKxP4tN5NjEzELzWDvcFbzQUhYH/Oaz7sbifqfFK8B2U+Se82ssCx1bCz8SvePWSWDQL6HPv518UgRuomfhBFl+QtdUq3/XWbDCYy5D20Y=
+	t=1742424803; cv=none; b=Q7HZz15MJ6QAy9mrRrWSetnbx+vunP88fa/rCAsc7sDEeJdjwwfhd3cFE7ov/24YL+cT+7Rvqb03IbTvbrrJpxDHbQR3I1ZdIT3gyg5PFW+Urvw2AYdGvtVEmInsHlh4HjdplYUbMJu3KIMIjAN9DWE99gYbK9wWraryN+uxrY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742424599; c=relaxed/simple;
-	bh=lrSy91elUFWeNXInEMPTCJnyaZA6B+FgQTIyrb7pjko=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Ve0ALregYql1aCHqrXGtAH/1udTzOFehUJv00T+DJo3pv/NaYPeowNzCLTxr9fgpCgNNdH9TG8D5/5LdIp/HPxFxonyRa0RjgD9pgeoV4s00gaOGry6rWlgLsUHy9KbOyaYQCq2jLuloEJvRGyKqgSAoPWDS4j7z1vYpt8l+5fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xr4t/+Oe; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742424596;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pcULRLq0h/6Rw82rbFxYL3W3UEU4Ef8C8Kke2Ri6KhA=;
-	b=Xr4t/+OedCnRpyaSW7efy83SS4oFT13uRbL9C6jPMRho3/acW2OzwrxkMcDH3roTUPeYRG
-	dsmSQpmD7KNKMaw9KPL/WKEOnCKArUbYIrOjSVB2AqgprW6pR6Eg/m+oCsUz/fYgsDl6xu
-	Pvfv/itnoQqVz/0FZVfZqs3HPpFMU/o=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-660-zL6bDqW9MnSzTNVKDYY9dQ-1; Wed, 19 Mar 2025 18:49:55 -0400
-X-MC-Unique: zL6bDqW9MnSzTNVKDYY9dQ-1
-X-Mimecast-MFC-AGG-ID: zL6bDqW9MnSzTNVKDYY9dQ_1742424594
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6eada773c0eso4611776d6.3
-        for <kvm@vger.kernel.org>; Wed, 19 Mar 2025 15:49:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742424594; x=1743029394;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pcULRLq0h/6Rw82rbFxYL3W3UEU4Ef8C8Kke2Ri6KhA=;
-        b=nqH7tmPk81ee6FG42YrzPsNrmLV5dHloUxIRb5z9hSG8d8pwFuExmBxLqscyCdJ4HS
-         3GoRgn/TRcYPX+X5wU70RsVLVRjhT8tvphwjg2ogyS9FgCuMm8wKLxl3aKvi2hDQ+Hzg
-         mMaTvAPWxFO2RFLlQ3P1XqLJOE+624zu/Rnv2HVCw6yOGniobS6lKA1lvjr3dfXVcaBn
-         VC2jfcP7eMAEgtlD0H+rGAyfws29eQ+NCZazOHpbMuhg2ImItPOueSphXFeRI+WkjC6o
-         vxdMxBBT2hgtC9j9+cgDMdJ9EdlWnWpmXBXqf3VGxusXFpCI3dslv8J7o0ZUv/6OpL5T
-         7sxQ==
-X-Gm-Message-State: AOJu0YwfY1cHRGYdaITQxNuNm4f0vsNHewDIYy1RX0H0CZsM7mM3K0/0
-	1gvtGHkY8Q/VbV/foXXWFGzgnmpYS0j8gLW7yurRa1N6tpTfmrhcfggUbjAgXrWmRZEaq6s0YdZ
-	+Yd2ze8X1lPbeap9S8t/MpIc5NpaMXYZVAG5lOdm+L3SLegHcLg==
-X-Gm-Gg: ASbGncup3lZ6oWUJvNJd3H7ngRq7CGjAAx9GdA3Do9JfL5KMudPBm10iFE1VvRzpnfn
-	/r6Gbsal5IbOvUODttKSXgYPDKSeXCxiWlRxjqmG4aXPBbln08e0bm5A0snCHRAt4QeFf0qwA0g
-	VXBibYlAhD6VJsEvp5SvsuJVJaoZ5teTeYDxahilfaDaO0IYIAivSVPAeRCy9zC0pw+6uB19evg
-	DK5cLaISlMycgLpb2zYy3H1HpkOUaiDbaGRKFeVp2IHrLSPNwhRc9/uWRq3/hv3+CkWeHuW/go1
-	9THWRO/letcjfag=
-X-Received: by 2002:a05:6214:2404:b0:6ea:d69c:a247 with SMTP id 6a1803df08f44-6eb2926b1a5mr89245136d6.4.1742424594435;
-        Wed, 19 Mar 2025 15:49:54 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEYwumfJhgcIfUQ2Qhve0p1Wq69ZGlgHwoTjJBdbbbfJKxqvi4R/lzcTuY2uFhZaiTMWx/OXA==
-X-Received: by 2002:a05:6214:2404:b0:6ea:d69c:a247 with SMTP id 6a1803df08f44-6eb2926b1a5mr89244856d6.4.1742424594103;
-        Wed, 19 Mar 2025 15:49:54 -0700 (PDT)
-Received: from starship ([2607:fea8:fc01:8d8d:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6eade334639sm85327636d6.90.2025.03.19.15.49.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Mar 2025 15:49:53 -0700 (PDT)
-Message-ID: <9687cbc0b80932fce13fa42a0f3982bd834af926.camel@redhat.com>
-Subject: Re: Lockdep failure due to 'wierd' per-cpu wakeup_vcpus_on_cpu_lock
- lock
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Yan Zhao
-	 <yan.y.zhao@intel.com>, James Houghton <jthoughton@google.com>
-Date: Wed, 19 Mar 2025 18:49:52 -0400
-In-Reply-To: <Z9ruIETbibTgPvue@google.com>
-References: <e61d23ddc87cb45063637e0e5375cc4e09db18cd.camel@redhat.com>
-	 <Z9ruIETbibTgPvue@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+	s=arc-20240116; t=1742424803; c=relaxed/simple;
+	bh=d+VUlRbK15AHSFijWQvk3uMYQmbTQJLLjN8PURft8ho=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=npCpqhbHrnfVmPKZggzabTHD8/xwytL5T+frS2iKT8rH3fC8av7MiBNoQ/kP04ZXGYDmBPLe9VHXZif4NaXkLAM6BnBWjOrGmYe6zi50xQsulZUJy6ofvltOx99IhDHhyo5j1Ug7Y4nre+acY8RisuWHrIze6xYFL+ULhHEdfRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YtV0RUua; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBFFBC4CEE4;
+	Wed, 19 Mar 2025 22:53:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742424802;
+	bh=d+VUlRbK15AHSFijWQvk3uMYQmbTQJLLjN8PURft8ho=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YtV0RUuaJkhmaEiHB2PZgmeMLgwQjqAjWPMrJzalJ5tRkWiU3WCYb2rYplF0qvr+K
+	 i5ozLcRQ1OlREyfH48tOvBsxYt8jTyaIMyXgbEAca6fi8fi+p/9Gq/MRJ7Bh2uVqUN
+	 wmI7HM4E3ma4o8IXmYOyYnICbjxoBcT+m6es1oj9vlLDldHht8CNIBmVWR8cx510b7
+	 ym5o/hft4iG4Zk4jNqPqe4RAJ+xS9ngXXJGD/HvBrZ+PTkLGRhMe20E2P4MDYweGDw
+	 NYT0xOhlkQnL39VU5LlqSOCljukD8PlM396DMxP1/UdyMhQC+yHuzUuE2FaB6fsGtc
+	 Lsip1fIhVxvwA==
+Date: Wed, 19 Mar 2025 16:53:18 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	Gavin Shan <gshan@redhat.com>,
+	Catalin Marinas <catalin.marinas@arm.com>, x86@kernel.org,
+	Ingo Molnar <mingo@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Alistair Popple <apopple@nvidia.com>, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Sean Christopherson <seanjc@google.com>,
+	Oscar Salvador <osalvador@suse.de>,
+	Jason Gunthorpe <jgg@nvidia.com>, Borislav Petkov <bp@alien8.de>,
+	Zi Yan <ziy@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>,
+	David Hildenbrand <david@redhat.com>,
+	Yan Zhao <yan.y.zhao@intel.com>, Will Deacon <will@kernel.org>,
+	Kefeng Wang <wangkefeng.wang@huawei.com>,
+	Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH v2 18/19] mm/arm64: Support large pfn mappings
+Message-ID: <Z9tK3gEchs9X0k7h@kbusch-mbp.dhcp.thefacebook.com>
+References: <20240826204353.2228736-1-peterx@redhat.com>
+ <20240826204353.2228736-19-peterx@redhat.com>
+ <Z9tDjOk-JdV_fCY4@kbusch-mbp.dhcp.thefacebook.com>
+ <Z9tJMsJ4PzZk2ZQS@x1.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z9tJMsJ4PzZk2ZQS@x1.local>
 
-On Wed, 2025-03-19 at 09:17 -0700, Sean Christopherson wrote:
-> +James and Yan
-> 
-> On Tue, Mar 18, 2025, Maxim Levitsky wrote:
-> > Hi!
+On Wed, Mar 19, 2025 at 06:46:35PM -0400, Peter Xu wrote:
+> On Wed, Mar 19, 2025 at 04:22:04PM -0600, Keith Busch wrote:
+> > On Mon, Aug 26, 2024 at 04:43:52PM -0400, Peter Xu wrote:
+> > > +#ifdef CONFIG_ARCH_SUPPORTS_PUD_PFNMAP
+> > > +#define pud_special(pte)	pte_special(pud_pte(pud))
+> > > +#define pud_mkspecial(pte)	pte_pud(pte_mkspecial(pud_pte(pud)))
+> > > +#endif
 > > 
-> > I recently came up with an interesting failure in the CI pipeline.
-> > 
-> > 
-> > [  592.704446] WARNING: possible circular locking dependency detected 
-> > [  592.710625] 6.12.0-36.el10.x86_64+debug #1 Not tainted 
-> > [  592.715764] ------------------------------------------------------ 
-> > [  592.721946] swapper/19/0 is trying to acquire lock: 
-> > [  592.726823] ff110001b0e64ec0 (&p->pi_lock)\{-.-.}-\{2:2}, at: try_to_wake_up+0xa7/0x15c0 
-> > [  592.734761]  
-> > [  592.734761] but task is already holding lock: 
-> > [  592.740596] ff1100079ec0c058 (&per_cpu(wakeup_vcpus_on_cpu_lock, cpu))\{-...}-\{2:2}, at: pi_wakeup_handler+0x60/0x130 [kvm_intel] 
-> > [  592.752185]  
-> > [  592.752185] which lock already depends on the new lock. 
+> > Sorry for such a late reply, but this looked a bit weird as I'm doing
+> > some backporting. Not that I'm actually interested in this arch, so I
+> > can't readily test this, but I believe the intention was to name the
+> > macro argument "pud", not "pte".
 > 
-> ...
+> Probably no way to test it from anyone yet, as I don't see aarch64 selects
+> HAVE_ARCH_TRANSPARENT_HUGEPAGE_PUD, which means IIUC this two lines (before
+> PUD being enabled on aarch64) won't be compiled.. which also matches with
+> the test results in the cover letter, that we only tried pmd on arm.
 > 
-> > As far as I see, there is no race, but lockdep doesn't understand this.
+> The patch will still be needed though for pmd to work.
 > 
-> Yep :-(
+> I can draft a patch to change this, but considering arm's PUD support isn't
+> there anyway.. maybe I should instead draft a change to remove these as
+> they're dead code so far, and see if anyone would like to collect it.
 > 
-> This splat fires every time (literally) I run through my battery of tests on
-> systems with IPI virtualization, it's basically an old friend at this point.
-> 
-> > It thinks that:
-> > 
-> > 1. pi_enable_wakeup_handler is called from schedule() which holds rq->lock, and it itself takes wakeup_vcpus_on_cpu_lock lock
-> > 
-> > 2. pi_wakeup_handler takes wakeup_vcpus_on_cpu_lock and then calls try_to_wake_up which can eventually take rq->lock
-> > (at the start of the function there is a list of cases when it takes it)
-> > 
-> > I don't know lockdep well yet, but maybe a lockdep annotation will help, 
-> > if we can tell it that there are multiple 'wakeup_vcpus_on_cpu_lock' locks.
-> 
-> Yan posted a patch to fudge around the issue[*], I strongly objected (and still
-> object) to making a functional and confusing code change to fudge around a lockdep
-> false positive.
-> 
-> James has also looked at the issue, and wasn't able to find a way to cleanly tell
-> lockdep about the situation.
-> 
-> Looking at this (yet) again, what if we temporarily tell lockdep that
-> wakeup_vcpus_on_cpu_lock isn't held when calling kvm_vcpu_wake_up()?  Gross, but
-> more surgical than disabling lockdep entirely on the lock.  This appears to squash
-> the warning without any unwanted side effects.
-> 
-> diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-> index ec08fa3caf43..5984ad6f6f21 100644
-> --- a/arch/x86/kvm/vmx/posted_intr.c
-> +++ b/arch/x86/kvm/vmx/posted_intr.c
-> @@ -224,9 +224,17 @@ void pi_wakeup_handler(void)
->  
->         raw_spin_lock(spinlock);
->         list_for_each_entry(vmx, wakeup_list, pi_wakeup_list) {
-> -
-> +               /*
-> +                * Temporarily lie to lockdep to avoid false positives due to
-> +                * lockdep not understanding that deadlock is impossible.  This
-> +                * is called only in IRQ context, and the problematic locks
-> +                * taken in the kvm_vcpu_wake_up() call chain are only acquired
-> +                * with IRQs disabled.
-> +                */
-> +               spin_release(&spinlock->dep_map, _RET_IP_);
->                 if (pi_test_on(&vmx->pi_desc))
->                         kvm_vcpu_wake_up(&vmx->vcpu);
-> +               spin_acquire(&spinlock->dep_map, 0, 0, _RET_IP_);
->         }
->         raw_spin_unlock(spinlock);
->  }
-> 
-> [*] https://lore.kernel.org/all/20230313111022.13793-1-yan.y.zhao@intel.com
-> 
+> Thanks for reporting this.  I'll prepare something soon and keep you
+> posted.
 
-This is a good idea.
+Thanks, good to know it wasn't reachable.
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-
-Best regards,
-	Maxim Levitsky
-
-
+The reason I was conerned is because the only caller, insert_pfn_pud(),
+just so happens to have a variable named "pud" in scope, but it's not
+the pud passed into the macro. So if this macro was used, it would just
+so happen to compile by that coincidence, but its using the wrong pud.
 
