@@ -1,190 +1,170 @@
-Return-Path: <kvm+bounces-41476-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41477-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8569A68521
-	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 07:35:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0360FA6856C
+	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 08:05:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 499F64223D0
-	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 06:35:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D82917564E
+	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 07:04:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC69B212D96;
-	Wed, 19 Mar 2025 06:35:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A5A6211711;
+	Wed, 19 Mar 2025 07:04:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="f57pklXC"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZbcOX+P3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BF9635972
-	for <kvm@vger.kernel.org>; Wed, 19 Mar 2025 06:35:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B83C910E0
+	for <kvm@vger.kernel.org>; Wed, 19 Mar 2025 07:03:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742366111; cv=none; b=Hvl8QB6xWCs1ZWJrcBG4aifaDgY0hX456QfnHCWt+JsuXRiZd3uZ1o+6HypqWZIM20erpumVfHHgU/M3OYPBTxbTKIutNfvT+G4bnSP2eVIWTNWFQbzESRr6eRxM/SQA9GBc4aUG8krf+ww1GUVa7nOiddI2db4xIZxsKz8OOUo=
+	t=1742367841; cv=none; b=Z3vspIjEMuqxLnFe6rNST/mC+qcWedeUv/ALtxmT9EMO6mv6vKb8HlisvXJ6NhVenIZSFrPyyCqyVNLNQZnXAiuDhzpSbA/NQXkrVTn+pZRTjV2Qd0sO1JnxRwQF941/sacuo4L1fmB35zG8mSQabEjMid+yb46srmMtdsJQ7Cw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742366111; c=relaxed/simple;
-	bh=3C2fH56/ANPFLK5srhoeuXlQMjKMqMfCndGH5a7mUAE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZXTKEXHVkbHFcwvnkqkiyRyplpSrBrTVT2wbE8H9/58s9H5xc3S03euAujg94M+wNkchcPD4MhtXe0lFFdrGfgfhiKUbD7w81AHv533llLN7TIxwgdFE4ai4onohE6aVQCuSnosTwpOIG5OeJDvaa6BssLOCjbm9NbkcmQY4nGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=f57pklXC; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-54ac9b3ddf6so589974e87.1
-        for <kvm@vger.kernel.org>; Tue, 18 Mar 2025 23:35:08 -0700 (PDT)
+	s=arc-20240116; t=1742367841; c=relaxed/simple;
+	bh=hO+Z2StPlMZ0VFGcpdtU+ukb6hiUDrkrDHBibuMtABg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZO+B4tsZB2R6SOtCgUwspmO4dIKHXmENHVfzNjc9TvfeCQF3VLmcZ9qX+dHcWYyPW0aw5UYKqI4vRTrrmV8J1St7IRCwBY6shfVPC9fvFnLSwyHJs+Mi8iU/fmcqrTbEYqpX7gIUxw4slcGVLdTSAhx3JK2mRx+dOK2VquWH/Zk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ZbcOX+P3; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3996af42857so215838f8f.0
+        for <kvm@vger.kernel.org>; Wed, 19 Mar 2025 00:03:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1742366107; x=1742970907; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nRcMBAnBB1cdPSStkQP8KD4Ik0+X3f5WUJpWyEcmszQ=;
-        b=f57pklXCk1ulSi5raEGocP5b89UxVGNCODC3W0kcDuRMkWmmgd4rHos1dkxd0432eg
-         zlhvDnxPuankZHKJyw+ZaUbY6mLGwn+SLgw+J2dZtN58ntRuFrN+Lww2ThWiAd7aPYqS
-         xE40NxaHHPNROU9vv2zhj8s7LGUm8YQqdUFn5df013IQvc+DpXaSLqJPMD+JvS7EVpYp
-         62PD4xYXSvApQ+dd9Ow6Ggnmcwr2lj1X/HSFUKW9KCS2buWsQzQz7V+fsir+I6A02jui
-         QUUBZR+Ll5AFzSB6iC3AbJ2XJHt8F8VnPbTZjbm+4tM08ywwMJkiel0q4N3s6gPeURse
-         577g==
+        d=linaro.org; s=google; t=1742367838; x=1742972638; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7fzQMjdihmdHdTMPhZwn9J/dZihgq/4Rbt5LNPXzbk8=;
+        b=ZbcOX+P3rUudw/u/NBK65CTNjWALzSgnHgiy7RSjRj+36kbWdMmV2/EUDmq+5t74rC
+         KUd4IJMyNcMg+9WVrqQTF8CbbiS6XWcyDJe9UYlUrdo6lh9favk1Ab77T7CQrk61ijAH
+         lHLyLtt2dbB7bdv5rIwMwlDQZKRkQ3x/QnieJQUrZg8lddHDCDF/r0soAliiLizXYVf5
+         1yU+iLneGaMJEKmJW5xfaIgVBFPHH3UcZ7RQudi2R0zDPrrY350Q8p6wdAMQLh3ZZwi/
+         a/49AIbfgWe7CkvFRsW1JjaSJ6AU35XeVNawg06AeVNZ7J0PvU5Qr8odCame8v8x04D8
+         qOSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742366107; x=1742970907;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nRcMBAnBB1cdPSStkQP8KD4Ik0+X3f5WUJpWyEcmszQ=;
-        b=hz9C4VWWl37JAVS7RIjnxTLVi26QyeFNtkrtUXO+A9lktdQhQlqr6bJsdtjR8EDHIL
-         8YvhqCx5GGu+20OR760xOH72lw+CzbIep56SsAsKZWWTPwIvsQzHvRC9kUZethFURXI+
-         MyroTp1MO+Sqj5MvBY5kmXnJhXeIIpxRuMT+1alAqLyh783wKq7ZojIm7jIqLjWIXEn0
-         fZczTnon2B82+mDRXz6EHr+4B72DQAyjmeg/w5T3tGSyOfO2/nD+Kh5wlwk617B3ivcQ
-         e5GU8BpF25oiIhdVIcC3P07jJUF/Hj49cJmS/V2ySeqHjIsLuakWWdJq6zbN7hoPFc9M
-         s/Bg==
-X-Forwarded-Encrypted: i=1; AJvYcCXkP91hPnbsfAXCrZ78FtiNGo3Hxxj76fQlLHqqw7gU3aWiQvbTuosbccCLzsFC8O0MNmI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2r7PZrlIE4zI1r2toS9SrVm5iqJU1a3+XznE0mfJmDS/ZO18v
-	aYB5eHAFFxGQew56Xn9Te4+lK48yLJ6FGM4smqFGC1ss0+fAuEOG1lygjGHLZDUxNukCVRKk7aW
-	ccKQtLY7RCXkiUzVpKWGCQGDsr6UaawHD178Edw==
-X-Gm-Gg: ASbGncsH6G+0gCSaUdKjPUBTntrpx7UGvTWbBU1pDUlERyiZTPNihU0s0HL4o+68UdD
-	j5kkSu8RR6AdhhRSV0XXctYnOAJtU+TCubjS46AS3l03Drtc+trajgnVM0CcA1T9JhKXdzzYzwY
-	EdOgJ1aqInzXQeDPjsBf1fRveLMb4=
-X-Google-Smtp-Source: AGHT+IG2DF9ysJOnGisWYlJRKJjNI7goJzS2EHde/phn2/2Rqicusog58ZNjwKuNH+aDT8iIlFKP1DPR1Tk9Qcbg6iY=
-X-Received: by 2002:a05:6512:2c89:b0:54a:cc09:eacc with SMTP id
- 2adb3069b0e04-54acc09ebcemr366625e87.39.1742366106954; Tue, 18 Mar 2025
- 23:35:06 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1742367838; x=1742972638;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7fzQMjdihmdHdTMPhZwn9J/dZihgq/4Rbt5LNPXzbk8=;
+        b=DVkBZEwgFEV1ddk1K0hQ5YYocc2fojqHp7/pXPd122mDS7uXhe3J8NeTUh9o6es6aM
+         8KNawm+lh9O4C6Ta3bZMA7360PUW0v2VtvpB3BEknS28pYLH1OsNQ5gDtr+2/MUEWhjF
+         YxYs0ATst7z4jeL34PVdh1VkMhPsILKBA4+d5Nfb1T8f+20oplamrU400WNdluvjOsvK
+         UkKv10nm0xmqITAYY5zVaFSgb9cqhPGF+cyWxyu0Q2KKzs25aA7tSIPzJDr+b83wjnud
+         /vv4IVqlyupN2BcgrRfY3QVASec7ODw1gLEp1aKNKT26BgmvjVJQoam+Zd2k0HWuCbqb
+         o4pg==
+X-Forwarded-Encrypted: i=1; AJvYcCXyh2njH45QOzjDRQZ05Hcj2IZRD4jij+Wnrss8kfMuY6NfMzDb1QyW9eq/g7rRd/BBtoQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw58k2e5riCQgQiOUfDQuMAJO4SIGaVExntdLz7SMnO6EJyZS1M
+	RISIktV9ro35KtoO0Rwl4m9Rz4uxT9IIzRsJ7TSmG1yhLUAe7hyDdTAPHurwVA0=
+X-Gm-Gg: ASbGncvMIkb8KZvwPjZY3oHn1auueLvStGAqovLW1JWy5vRW9ZTBbyk82OdLUXs2N3T
+	0UAVIEJt44LOYWlEK/c2Bo3O/wsSj9QXqEhiNWPacdHEcUG/n0bS9QRY7T+REceWPP6QGFfpIbp
+	6ZvqwONuDaf5GStJjxki4mW7yqkPxk5D8vr8YZM4Zh54mnfv8kB9MMJ8CrFSCI7tI5BnB8ElI75
+	VRfbyYJ8Wk8ypT2RUkjenI0TXGVVfKSb1VcbHsiIKIclZI1TdqjPHS1mIFUyeK+7MkzWB1k7IOc
+	OqH2r0hPqvE2TZ7kylW114Y7TDGkx2Iantpgd8lecZO6CAXgy8W063ZTBAY3uR9lpoCMkEsDu3b
+	lmNV40fbGxU0z
+X-Google-Smtp-Source: AGHT+IGZ1OYYU+hacx0hWCwMirBGV2FRtf+/lifMq6+bgxTMfGuPKE3k3/xaTQ/8RTztiUkGX9yLLg==
+X-Received: by 2002:a5d:5f93:0:b0:390:ec6e:43ea with SMTP id ffacd0b85a97d-3996bb51f57mr5507704f8f.15.1742367837893;
+        Wed, 19 Mar 2025 00:03:57 -0700 (PDT)
+Received: from [192.168.69.235] (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395c888167bsm20067597f8f.45.2025.03.19.00.03.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Mar 2025 00:03:57 -0700 (PDT)
+Message-ID: <52c8b6dc-048c-49d2-b535-4855b9f3d26b@linaro.org>
+Date: Wed, 19 Mar 2025 08:03:56 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250317-kvm_exit_fix-v1-1-aa5240c5dbd2@rivosinc.com>
-In-Reply-To: <20250317-kvm_exit_fix-v1-1-aa5240c5dbd2@rivosinc.com>
-From: Anup Patel <apatel@ventanamicro.com>
-Date: Wed, 19 Mar 2025 12:04:55 +0530
-X-Gm-Features: AQ5f1JqvoOcfbMQnETX7LXFFQmbgXKx4mcvkbI8cra0TF1szaF4KZK20bqrxCC4
-Message-ID: <CAK9=C2XzuUO3NiKOwwa+Xyh+j7XUtHNBb=YCbe49kHHJY0Ke8Q@mail.gmail.com>
-Subject: Re: [PATCH] RISC-V: KVM: Teardown riscv specific bits after kvm_exit
-To: Atish Patra <atishp@rivosinc.com>
-Cc: Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Alexandre Ghiti <alex@ghiti.fr>, Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 09/13] target/arm/cpu: define ARM_MAX_VQ once for aarch32
+ and aarch64
+To: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-arm@nongnu.org, alex.bennee@linaro.org,
+ Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>
+References: <20250318045125.759259-1-pierrick.bouvier@linaro.org>
+ <20250318045125.759259-10-pierrick.bouvier@linaro.org>
+ <a88f54cb-73be-4947-b3be-aa12b120f07e@linaro.org>
+ <52000c3d-827f-4e21-afa3-f191c6636b9d@linaro.org>
+Content-Language: en-US
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <52000c3d-827f-4e21-afa3-f191c6636b9d@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 17, 2025 at 1:11=E2=80=AFPM Atish Patra <atishp@rivosinc.com> w=
-rote:
->
-> During a module removal, kvm_exit invokes arch specific disable
-> call which disables AIA. However, we invoke aia_exit before kvm_exit
-> resulting in the following warning. KVM kernel module can't be inserted
-> afterwards due to inconsistent state of IRQ.
->
-> [25469.031389] percpu IRQ 31 still enabled on CPU0!
-> [25469.031732] WARNING: CPU: 3 PID: 943 at kernel/irq/manage.c:2476 __fre=
-e_percpu_irq+0xa2/0x150
-> [25469.031804] Modules linked in: kvm(-)
-> [25469.031848] CPU: 3 UID: 0 PID: 943 Comm: rmmod Not tainted 6.14.0-rc5-=
-06947-g91c763118f47-dirty #2
-> [25469.031905] Hardware name: riscv-virtio,qemu (DT)
-> [25469.031928] epc : __free_percpu_irq+0xa2/0x150
-> [25469.031976]  ra : __free_percpu_irq+0xa2/0x150
-> [25469.032197] epc : ffffffff8007db1e ra : ffffffff8007db1e sp : ff200000=
-0088bd50
-> [25469.032241]  gp : ffffffff8131cef8 tp : ff60000080b96400 t0 : ff200000=
-0088baf8
-> [25469.032285]  t1 : fffffffffffffffc t2 : 5249207570637265 s0 : ff200000=
-0088bd90
-> [25469.032329]  s1 : ff60000098b21080 a0 : 037d527a15eb4f00 a1 : 037d527a=
-15eb4f00
-> [25469.032372]  a2 : 0000000000000023 a3 : 0000000000000001 a4 : ffffffff=
-8122dbf8
-> [25469.032410]  a5 : 0000000000000fff a6 : 0000000000000000 a7 : ffffffff=
-8122dc10
-> [25469.032448]  s2 : ff60000080c22eb0 s3 : 0000000200000022 s4 : 00000000=
-0000001f
-> [25469.032488]  s5 : ff60000080c22e00 s6 : ffffffff80c351c0 s7 : 00000000=
-00000000
-> [25469.032582]  s8 : 0000000000000003 s9 : 000055556b7fb490 s10: 00007fff=
-f0e12fa0
-> [25469.032621]  s11: 00007ffff0e13e9a t3 : ffffffff81354ac7 t4 : ffffffff=
-81354ac7
-> [25469.032664]  t5 : ffffffff81354ac8 t6 : ffffffff81354ac7
-> [25469.032698] status: 0000000200000100 badaddr: ffffffff8007db1e cause: =
-0000000000000003
-> [25469.032738] [<ffffffff8007db1e>] __free_percpu_irq+0xa2/0x150
-> [25469.032797] [<ffffffff8007dbfc>] free_percpu_irq+0x30/0x5e
-> [25469.032856] [<ffffffff013a57dc>] kvm_riscv_aia_exit+0x40/0x42 [kvm]
-> [25469.033947] [<ffffffff013b4e82>] cleanup_module+0x10/0x32 [kvm]
-> [25469.035300] [<ffffffff8009b150>] __riscv_sys_delete_module+0x18e/0x1fc
-> [25469.035374] [<ffffffff8000c1ca>] syscall_handler+0x3a/0x46
-> [25469.035456] [<ffffffff809ec9a4>] do_trap_ecall_u+0x72/0x134
-> [25469.035536] [<ffffffff809f5e18>] handle_exception+0x148/0x156
->
-> Invoke aia_exit and other arch specific cleanup functions after kvm_exit
-> so that disable gets a chance to be called first before exit.
->
-> Fixes: 54e43320c2ba ("RISC-V: KVM: Initial skeletal support for AIA")
+On 18/3/25 23:02, Pierrick Bouvier wrote:
+> On 3/18/25 11:50, Philippe Mathieu-Daudé wrote:
+>> On 18/3/25 05:51, Pierrick Bouvier wrote:
+>>> This will affect zregs field for aarch32.
+>>> This field is used for MVE and SVE implementations. MVE implementation
+>>> is clipping index value to 0 or 1 for zregs[*].d[],
+>>> so we should not touch the rest of data in this case anyway.
+>>
+>> We should describe why it is safe for migration.
+>>
+>> I.e. vmstate_za depends on za_needed() -> SME, not included in 32-bit
+>> cpus, etc.
+>>
+>> Should we update target/arm/machine.c in this same patch, or a
+>> preliminary one?
+>>
+> 
+> vmstate_za definition and inclusion in vmstate_arm_cpu is under #ifdef 
+> TARGET_AARCH64. In this case (TARGET_AARCH64), ARM_MAX_VQ was already 
+> defined as 16, so there should not be any change.
 
-The kvm_riscv_treadown() was introduced by some other commit so
-we should include a second Fixes tag which is:
+I'm not saying this is invalid, I'm trying to say we need to document
+why it is safe.
 
-Fixes: eded6754f398 ("riscv: KVM: add basic support for host vs guest
-profiling")
+> Other values depending on ARM_MAX_VQ, for migration, are as well under 
+> TARGET_AARCH64 ifdefs (vmstate_zreg_hi_reg, vmstate_preg_reg, 
+> vmstate_vreg).
+> 
+> And for vmstate_vfp, which is present for aarch32 as well, the size of 
+> data under each register is specifically set to 2.
+> VMSTATE_UINT64_SUB_ARRAY(env.vfp.zregs[0].d, ARMCPU, 0, 2)
+> 
+> So even if storage has more space, it should not impact any usage of it.
+> 
+> Even though this change is trivial, I didn't do it blindly to "make it 
+> compile" and I checked the various usages of ARM_MAX_VQ and zregs, and I 
+> didn't see anything that seems to be a problem.
 
->
-> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+You did the analysis once, let's add it in the commit description so
+other developers looking at this commit won't have to do it again.
 
-Otherwise, this looks good to me.
+> 
+>>>
+>>> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+>>> ---
+>>>    target/arm/cpu.h | 6 +-----
+>>>    1 file changed, 1 insertion(+), 5 deletions(-)
+>>>
+>>> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+>>> index 27a0d4550f2..00f78d64bd8 100644
+>>> --- a/target/arm/cpu.h
+>>> +++ b/target/arm/cpu.h
+>>> @@ -169,11 +169,7 @@ typedef struct ARMGenericTimer {
+>>>     * Align the data for use with TCG host vector operations.
+>>>     */
+>>> -#ifdef TARGET_AARCH64
+>>> -# define ARM_MAX_VQ    16
+>>> -#else
+>>> -# define ARM_MAX_VQ    1
+>>> -#endif
+>>> +#define ARM_MAX_VQ    16
+>>>    typedef struct ARMVectorReg {
+>>>        uint64_t d[2 * ARM_MAX_VQ] QEMU_ALIGNED(16);
+>>
+> 
 
-Reviewed-by: Anup Patel <anup@brainfault.org>
-
-Regards,
-Anup
-
-> ---
->  arch/riscv/kvm/main.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
-> index 1fa8be5ee509..4b24705dc63a 100644
-> --- a/arch/riscv/kvm/main.c
-> +++ b/arch/riscv/kvm/main.c
-> @@ -172,8 +172,8 @@ module_init(riscv_kvm_init);
->
->  static void __exit riscv_kvm_exit(void)
->  {
-> -       kvm_riscv_teardown();
-> -
->         kvm_exit();
-> +
-> +       kvm_riscv_teardown();
->  }
->  module_exit(riscv_kvm_exit);
->
-> ---
-> base-commit: 4701f33a10702d5fc577c32434eb62adde0a1ae1
-> change-id: 20250316-kvm_exit_fix-77cd0632d740
-> --
-> Regards,
-> Atish patra
->
 
