@@ -1,162 +1,154 @@
-Return-Path: <kvm+bounces-41504-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41505-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D448CA696AB
-	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 18:36:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85C1BA696B8
+	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 18:41:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A209F7A6360
-	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 17:35:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B5FE07AD1E1
+	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 17:40:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 307181F5844;
-	Wed, 19 Mar 2025 17:36:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFAEA204F8D;
+	Wed, 19 Mar 2025 17:41:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cXZc7K/3"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="nV/VpToK"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEAC71D6DAD
-	for <kvm@vger.kernel.org>; Wed, 19 Mar 2025 17:36:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 687AF1E9B17
+	for <kvm@vger.kernel.org>; Wed, 19 Mar 2025 17:41:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742405778; cv=none; b=ILjs0kyxKAWuN5DLTc8lxcy3A3VfINXL8uUUUv6lkeDL9di62zCgb5CjReHEcZwZxk6dHPl49Mj8oeTjx10mnYq+JSfsPEg1diqzPwOGBlH9VIxAlfg/WRXd8j0767papWT5+3eVEpIDMhUb7jsXpbjH/NhCDngf2GlNdrk5G5A=
+	t=1742406062; cv=none; b=YucmUj/ICjHxGynTDAH1Kg3OMi4y2RZkJR8CN29p1GFOflMFDocSSNLxl/dTJ5rGIeCL7/gR1AEZYCbVStCbdtmN+fUKqouehuy7tOZC0ZEZ99kkSxpmhpju7UQCS1MniKN+KjCc24lJ1BCp6sML2ndrxuh5xcgvzfYcaTPMvs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742405778; c=relaxed/simple;
-	bh=+Sb07lLXEfsD+WvHXblNw56cpR3oNDoxbEWMnQBwUUU=;
+	s=arc-20240116; t=1742406062; c=relaxed/simple;
+	bh=Uup4ij0e3QxR7P+2AXE6ojI6gZ035al5TOyCCZJD8FY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GYPdKptguomBizEobdI881pSnt5bTdc8RrB//2lAiu6uN3QubjVQ9g7rKueMIF6MDjujAeIZSRzPYMBgt4LKeTL9uKxvIC6X4U4+qsgf5mRd5zK1ArSYBXKwoh0LJJHthXMmhP3KKhFgWbS2IH0SQ/YB/CedQNXWk/s7v6nyT8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cXZc7K/3; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 19 Mar 2025 18:36:06 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742405773;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ErWkhu1m3mOlbwmYksVgSmppKgKfD3xu4om11C7ZndA=;
-	b=cXZc7K/3uRl2umO2QqWHI8wOEvg5I2uPhREU3yeRvj/OpimxjI1J+kpUvywK20JtmF3EqK
-	Esemtcfm8jz8fhpxQ9B33uGdXvQEWYK3HTeoKmV8dN6gGTu8w/1peZKOUti+XhyjiwI4xA
-	mOEO7gjaHylWW5QOWIwGbONz0IACwLE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	Andrew Jones <ajones@ventanamicro.com>, Anup Patel <apatel@ventanamicro.com>, 
-	Atish Patra <atishp@rivosinc.com>
-Subject: Re: [kvm-unit-tests PATCH v11 5/8] lib: riscv: Add functions to get
- implementer ID and version
-Message-ID: <20250319-093901c8531b82e99d02ea8e@orel>
-References: <20250317164655.1120015-1-cleger@rivosinc.com>
- <20250317164655.1120015-6-cleger@rivosinc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=QYbyoeCmcFgrcqmNVGS10k7LMYVWz3pJNfbN1QNoXgoyh7uHPGoXf0aRFdSBpb5MJhFnLaYIgWrqcxFHPL7uzqJ0Nrv/gKPOsyxo5sanPdKp1ep5nEe/ehryfQYnX/Vc1vH1RQf9tvuXLM6UQ9ZC5j1UVyfKVkgrzYi2bJvCQ+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=nV/VpToK; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7c542ffec37so705335385a.2
+        for <kvm@vger.kernel.org>; Wed, 19 Mar 2025 10:41:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1742406059; x=1743010859; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=leCUW9KEkZQcVeVok9ACFyeDj4RZoftXqhcJPMWCJYU=;
+        b=nV/VpToKK1Aoc35hYasv8EBUTMZK3YWljurPD2RE8K95jFcoCmONYbBpbib1QPyFbd
+         zSv/Fnk+PNhWJ/yPZHfQrWxfNZCut2KGrxd3hZas9X5TZ7EXb7a/dokHKpxOytAT4pQ9
+         gfeyNgK4YiJtjD06hxgzxo38t1AVC0Vdkwe+i1EL1u+f4qzlchDtmyVqmWb5xb9CtAnf
+         CMt/PYJWppWD+Yuqh6qT9h2143TT+qM7QypYtCpfyJf8bTECAWu3m0vRYjgL+whCaBCP
+         +g+MkRpdKaz0uAvhepSHNFG2+jIm5/kc50U3IlZji0KHpX/QBJGLS8rOlfY0KbgUMJAR
+         wnZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742406059; x=1743010859;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=leCUW9KEkZQcVeVok9ACFyeDj4RZoftXqhcJPMWCJYU=;
+        b=nxrG47pN8gSPhjsr3DU31PNTMbmasvvdprNMGfi9f2u32/LoCViEz8W+8OomYOG2+b
+         +ppY60KCiGX3KHg9Z0Kx3YrJQmrT4QGHiVvrLBl7mnU3fq8ZWlpciZQYtCCKa6QAFHML
+         6keZKXaYqXW6JY95QbkfvFTTkRkRS8tEJVlmDSLdr9EoCe1ru5wtRTpOw2MLUCXQNVKr
+         F6g5P8EM97XKlWfT/JhRMhFR1mMm2uha7g0w555jQwvZv4SVbSB1yNUJ6CvdBWwAf6+G
+         LvSEv5ruhBLminahWrfw9e4rKJFCg9TLVcPD+OPVWSVmhIyXyMZiSTvvn6tHl3qxls1w
+         DlzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWmNBChpNro9JA1v4wRwsapC225UHKX9TMwMr/NgaUrkUCY1qbSad77fbPXrIfrAyyeVAw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSwvcFwifD5WLAkn6+iWkcmgVopMDK3lZQt18eeBU64ipH26WX
+	hGQEG2FlULD7EFTSmVwk3uHk0smbXn4TvDl/wch6GJXOJP6B/sY7/7/gbUu8aEY=
+X-Gm-Gg: ASbGncvuOTyFvSwJa62K9uO5DS7ZUFvVXw5YcWrBYh966vzT+FV1r5yi6emM+Fefs3K
+	xjZeKDvj1yBUrBOP1sJ5TGmxLGroM59GW33uqx12vTp6MT+32FwsLlqp1rjsP+o6Nf2hEfHLMNJ
+	EDeNqfLLF4G1pxHNO36VdA+GUqc0Kl7TjAd/tvDBxHrh3LeATQ56XD95jtvJySwh1gSyGE7F1SB
+	MSb0c70re5qYE/VXHqz6lcTRY1gk/JeKvukcj0L7M0QJ6Q2R0+fgAD2Ed46F6zHKib1AQ6JW9GG
+	zx/BNv/lC2MyL1twWqz87M0Vyt+d+ownd+iNkcbsep0rB08I7IurSXoEUta8sprpesXcAmIMa+N
+	ezYUQEsBTOLBs1YN4o0dTuv6s5RKr
+X-Google-Smtp-Source: AGHT+IFoJAQ9bGba/Z0yZg+D8yG6xp2ytZSUuDU+bbhNp9w3ofz/kSX0XQcOY4VVJjVXQ+26hrcvHQ==
+X-Received: by 2002:a05:620a:57b:b0:7c5:6ba5:dd65 with SMTP id af79cd13be357-7c5a84a3654mr479964285a.55.1742406059344;
+        Wed, 19 Mar 2025 10:40:59 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c573c4dd2bsm884915085a.14.2025.03.19.10.40.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Mar 2025 10:40:58 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1tuxPW-00000000WcK-0irF;
+	Wed, 19 Mar 2025 14:40:58 -0300
+Date: Wed, 19 Mar 2025 14:40:58 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Alexey Kardashevskiy <aik@amd.com>
+Cc: Michael Roth <michael.roth@amd.com>, x86@kernel.org,
+	kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>,
+	Joao Martins <joao.m.martins@oracle.com>,
+	Nicolin Chen <nicolinc@nvidia.com>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Steve Sistare <steven.sistare@oracle.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
+	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
+	Zhi Wang <zhiw@nvidia.com>, AXu Yilun <yilun.xu@linux.intel.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: Re: [RFC PATCH v2 12/22] iommufd: Allow mapping from guest_memfd
+Message-ID: <20250319174058.GF10600@ziepe.ca>
+References: <20250218111017.491719-1-aik@amd.com>
+ <20250218111017.491719-13-aik@amd.com>
+ <20250218141634.GI3696814@ziepe.ca>
+ <340d8dba-1b09-4875-8604-cd9f66ca1407@amd.com>
+ <20250218235105.GK3696814@ziepe.ca>
+ <06b850ab-5321-4134-9b24-a83aaab704bf@amd.com>
+ <20250219133516.GL3696814@ziepe.ca>
+ <20250219202324.uq2kq27kmpmptbwx@amd.com>
+ <20250219203708.GO3696814@ziepe.ca>
+ <604c0d0e-048f-402a-893a-62e1ce8d24ba@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250317164655.1120015-6-cleger@rivosinc.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <604c0d0e-048f-402a-893a-62e1ce8d24ba@amd.com>
 
-On Mon, Mar 17, 2025 at 05:46:50PM +0100, Clément Léger wrote:
-> These functions will be used by SSE tests to check for a specific OpenSBI
-> version.
-> 
-> Signed-off-by: Clément Léger <cleger@rivosinc.com>
-> ---
->  lib/riscv/asm/sbi.h | 20 ++++++++++++++++++++
->  lib/riscv/sbi.c     | 20 ++++++++++++++++++++
->  2 files changed, 40 insertions(+)
-> 
-> diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
-> index ee9d6e50..90111628 100644
-> --- a/lib/riscv/asm/sbi.h
-> +++ b/lib/riscv/asm/sbi.h
-> @@ -18,6 +18,19 @@
->  #define SBI_ERR_IO			-13
->  #define SBI_ERR_DENIED_LOCKED		-14
->  
-> +#define SBI_IMPL_BBL		0
-> +#define SBI_IMPL_OPENSBI	1
-> +#define SBI_IMPL_XVISOR		2
-> +#define SBI_IMPL_KVM		3
-> +#define SBI_IMPL_RUSTSBI	4
-> +#define SBI_IMPL_DIOSIX		5
-> +#define SBI_IMPL_COFFER		6
-> +#define SBI_IMPL_XEN		7
-> +#define SBI_IMPL_POLARFIRE_HSS	8
-> +#define SBI_IMPL_COREBOOT	9
-> +#define SBI_IMPL_OREBOOT	10
-> +#define SBI_IMPL_BHYVE		11
-> +
->  /* SBI spec version fields */
->  #define SBI_SPEC_VERSION_MAJOR_SHIFT	24
->  #define SBI_SPEC_VERSION_MAJOR_MASK	0x7f
-> @@ -124,6 +137,11 @@ static inline unsigned long sbi_mk_version(unsigned long major, unsigned long mi
->  		| (minor & SBI_SPEC_VERSION_MINOR_MASK);
->  }
->  
-> +static inline unsigned long sbi_impl_opensbi_mk_version(unsigned long major, unsigned long minor)
-> +{
-> +	return (((major & 0xffff) << 16) | (minor & 0xffff));
-> +}
-> +
->  struct sbiret sbi_ecall(int ext, int fid, unsigned long arg0,
->  			unsigned long arg1, unsigned long arg2,
->  			unsigned long arg3, unsigned long arg4,
-> @@ -139,6 +157,8 @@ struct sbiret sbi_send_ipi_cpumask(const cpumask_t *mask);
->  struct sbiret sbi_send_ipi_broadcast(void);
->  struct sbiret sbi_set_timer(unsigned long stime_value);
->  struct sbiret sbi_get_spec_version(void);
-> +unsigned long sbi_get_imp_version(void);
-> +unsigned long sbi_get_imp_id(void);
->  long sbi_probe(int ext);
->  
->  #endif /* !__ASSEMBLER__ */
-> diff --git a/lib/riscv/sbi.c b/lib/riscv/sbi.c
-> index 9d4eb541..ab032e3e 100644
-> --- a/lib/riscv/sbi.c
-> +++ b/lib/riscv/sbi.c
-> @@ -107,6 +107,26 @@ struct sbiret sbi_set_timer(unsigned long stime_value)
->  	return sbi_ecall(SBI_EXT_TIME, SBI_EXT_TIME_SET_TIMER, stime_value, 0, 0, 0, 0, 0);
->  }
->  
-> +unsigned long sbi_get_imp_version(void)
-> +{
-> +	struct sbiret ret;
-> +
-> +	ret = sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_GET_IMP_VERSION, 0, 0, 0, 0, 0, 0);
-> +	assert(!ret.error);
-> +
-> +	return ret.value;
-> +}
-> +
-> +unsigned long sbi_get_imp_id(void)
-> +{
-> +	struct sbiret ret;
-> +
-> +	ret = sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_GET_IMP_ID, 0, 0, 0, 0, 0, 0);
-> +	assert(!ret.error);
-> +
-> +	return ret.value;
-> +}
-> +
->  struct sbiret sbi_get_spec_version(void)
->  {
->  	return sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_GET_SPEC_VERSION, 0, 0, 0, 0, 0, 0);
-> -- 
-> 2.47.2
->
+On Thu, Mar 13, 2025 at 03:51:13PM +1100, Alexey Kardashevskiy wrote:
 
-LGTM
+> About this atomical restructure - I looked at yours iommu-pt branch on
+> github but  __cut_mapping()->pt_table_install64() only atomically swaps the
+> PDE but it does not do IOMMU TLB invalidate, have I missed it? 
 
-Thanks,
-drew
+That branch doesn't have the invalidation wired in, there is another
+branch that has invalidation but not cut yet.. It is a journey
+
+> And if it did so, that would not be atomic but it won't matter as
+> long as we do not destroy the old PDE before invalidating IOMMU TLB,
+> is this the idea? Thanks,
+
+When splitting the change in the PDE->PTE doesn't change the
+translation in effect.
+
+So if the IOTLB has cached the PDE, the SW will update it to an array
+of PTEs of same address, any concurrent DMA will continue to hit the
+same address, then when we invalidate the IOTLB the PDE will get
+dropped from cache and the next DMA will load PTEs.
+
+When I say atomic I mean from the perspective of the DMA initator
+there is no visible alteration. Perhaps I should say hitless.
+
+Jason
 
