@@ -1,59 +1,71 @@
-Return-Path: <kvm+bounces-41522-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41523-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCB79A69BD9
-	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 23:13:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EB36A69BFA
+	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 23:22:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DAB1188B830
-	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 22:13:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D21A18A4D58
+	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 22:22:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1112821859F;
-	Wed, 19 Mar 2025 22:13:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 685C721C9EA;
+	Wed, 19 Mar 2025 22:22:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bet/bQTs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i12ijldI"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ADFB20899C
-	for <kvm@vger.kernel.org>; Wed, 19 Mar 2025 22:13:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BBD821B9FE;
+	Wed, 19 Mar 2025 22:22:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742422415; cv=none; b=CfHv58h+Eu7Si/E8+sZBJJ2K+RtIQ87jCEkEjpemgmBYG89/I1p3wusBNMFUWpMVGy3h721/Sw/dAzlGz9jjIHhGcm7vjxa0oHDAOUDDooA2/4QuppX1M7nbSxk78hRULr4vU/ZauxvWTIJF66HRKcZTx5d33lOc51e9xyIXaMw=
+	t=1742422928; cv=none; b=APglaSnUvj6pA7cLT9uXssXXfRE5fWsg0cSEzOoMDc9SsLXvKlQgXTVLFsjiZbEr7O6VIquCN82gGsegvCye1PjI2T2PH6tM4UazMlqdBopjeAn/hnTEMH/DiNNDJH2M7RKl7MueWP/8e/zoDSLsO6K2VoG0jXPCDGDotuHmA28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742422415; c=relaxed/simple;
-	bh=qnScDBSJ3R9O74B9eP383x1WJ8iVdJtGp5bq/wzDgUs=;
+	s=arc-20240116; t=1742422928; c=relaxed/simple;
+	bh=xqfK+KqTEmnvRkw96spNfhu/mnuaNMYujybAAL7pUSE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cOean2cc+t8wmtUh1NoMdJKMgxxIGrxVIvXiDM+0sSkOKv3z8Cc5ClAW/0EpHdxsE8iWCQXN4UhDqzq+sckbeqCdCtN9HwGojRX815grd+EeniyaBvnS0FJkVQC1zOfNIEzaFZwBjOvvMDPRhjoGqMK90dygFf0Nt5K5+niHy/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bet/bQTs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76136C4CEE7;
-	Wed, 19 Mar 2025 22:13:34 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=HqDOo6UJrPEtLt+ARFri+0XDEzrvOWXy3Scwku5aP5Trl0yLbmEyF3pVNTOIPU+AwWP0mjHYosH0QvuVsvPzEfDtHnsWR82txTM2NBMsvsZW5SIsIxtEKAd/TT79j7f52Vhd1Vjd2oGiHuhL17tHk5Dn6x2K4UWP38cfK0k/9I8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i12ijldI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6922DC4CEE4;
+	Wed, 19 Mar 2025 22:22:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742422414;
-	bh=qnScDBSJ3R9O74B9eP383x1WJ8iVdJtGp5bq/wzDgUs=;
+	s=k20201202; t=1742422928;
+	bh=xqfK+KqTEmnvRkw96spNfhu/mnuaNMYujybAAL7pUSE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bet/bQTsqri9XssnOOwhShFPCXuZr4aqhkKuepf0vZv66uzuz5WOp4DAwy4xMuCIH
-	 c7GrkzPlHg0DtFqCvFTXQ22ZZDhiEmLkOoHgMQXzr+FQckaHjeHi82cBVwRkQbMvq/
-	 W8CY/D8B0OuQpnoiQlxubBrhsTMmXMp5EOCFBt7Y+EiJ0+7npAu2bD6VLcMXNXEYQw
-	 sr2/ZMny0FviiX3/QqXGck6LKj8YQz7jx9zAJaaLziUZhQvC/HAPwdUwuV4PI4Ru+e
-	 3Akm54FqN/KWUQPHkHBeWfCO+prMYaVf1fDMhThh921c4S2UV1x/aSwyR5HXeXdX/U
-	 mrnWev3JBHHSw==
-Date: Wed, 19 Mar 2025 16:13:31 -0600
+	b=i12ijldI5N0ICNvlgfikLn9YZT+PfpoaQYGzVCqV5QVQakxF/kzqU2Lqv2CAB6IHV
+	 oukxy6WIyS2CbLWL7kxfJdMzkQu7gqAxRZOAa1p2mfOrX+2GDDmeDGZqVjp/kO/OLY
+	 lwEEla+OizUzPM7ncFgeV1l4jIsIX4q4G8RT1EJZzEiZKhwLbsiVu+L39WLQHfLziX
+	 5bZhlsYi0RShAQ0VdBbdCe0vn/QJAWYr/WEw/0VnTz19eLmx/UXR9f4QnnLZ+9C87U
+	 7MKDh9fs6qsNuxlXnfxJaI1+lKuR+cSMWr2KN6CCJDgb4WPeN3wUpXKgXYd3V8OUrd
+	 1bYWGngG+fTXg==
+Date: Wed, 19 Mar 2025 16:22:04 -0600
 From: Keith Busch <kbusch@kernel.org>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Keith Busch <kbusch@meta.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH] vfio/type1: conditional rescheduling while pinning
-Message-ID: <Z9tBixVi-orYROTt@kbusch-mbp.dhcp.thefacebook.com>
-References: <20250312225255.617869-1-kbusch@meta.com>
- <20250317154417.7503c094.alex.williamson@redhat.com>
- <Z9iilzUTwLKzcVfK@kbusch-mbp.dhcp.thefacebook.com>
- <20250317165347.269621e5.alex.williamson@redhat.com>
- <Z9rm-Y-B2et9uvKc@kbusch-mbp>
- <20250319121704.7744c73e.alex.williamson@redhat.com>
- <Z9sOPykPIqJWYzca@kbusch-mbp>
+To: Peter Xu <peterx@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	Gavin Shan <gshan@redhat.com>,
+	Catalin Marinas <catalin.marinas@arm.com>, x86@kernel.org,
+	Ingo Molnar <mingo@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Alistair Popple <apopple@nvidia.com>, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Sean Christopherson <seanjc@google.com>,
+	Oscar Salvador <osalvador@suse.de>,
+	Jason Gunthorpe <jgg@nvidia.com>, Borislav Petkov <bp@alien8.de>,
+	Zi Yan <ziy@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>,
+	David Hildenbrand <david@redhat.com>,
+	Yan Zhao <yan.y.zhao@intel.com>, Will Deacon <will@kernel.org>,
+	Kefeng Wang <wangkefeng.wang@huawei.com>,
+	Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH v2 18/19] mm/arm64: Support large pfn mappings
+Message-ID: <Z9tDjOk-JdV_fCY4@kbusch-mbp.dhcp.thefacebook.com>
+References: <20240826204353.2228736-1-peterx@redhat.com>
+ <20240826204353.2228736-19-peterx@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -62,25 +74,16 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z9sOPykPIqJWYzca@kbusch-mbp>
+In-Reply-To: <20240826204353.2228736-19-peterx@redhat.com>
 
-On Wed, Mar 19, 2025 at 12:34:39PM -0600, Keith Busch wrote:
-> On Wed, Mar 19, 2025 at 12:17:04PM -0600, Alex Williamson wrote:
-> > Since you mention folding in the changes, are you working on an upstream
-> > kernel or a downstream backport?  Huge pfnmap support was added in
-> > v6.12 via [1].  Without that you'd never see better than a order-a
-> > fault.  I hope that's it because with all the kernel pieces in place it
-> > should "Just work".  Thanks,
-> 
-> Yep, this is a backport to 6.11, and I included that series. There were
-> a few extra patches outside it needed to port that far back, but nothing
-> difficult.
-> 
-> Anyway since my last email, things are looking more successful now. We
-> changed a few things in both user and kernel side, so we're just doing
-> more tests to confirm what part was the necessary change.
+On Mon, Aug 26, 2024 at 04:43:52PM -0400, Peter Xu wrote:
+> +#ifdef CONFIG_ARCH_SUPPORTS_PUD_PFNMAP
+> +#define pud_special(pte)	pte_special(pud_pte(pud))
+> +#define pud_mkspecial(pte)	pte_pud(pte_mkspecial(pud_pte(pud)))
+> +#endif
 
-Looks like we're okay now. I think the user space part was missing a
-MADV_HUGEPAGE in one of the paths, so we were never getting the huge
-faults.
+Sorry for such a late reply, but this looked a bit weird as I'm doing
+some backporting. Not that I'm actually interested in this arch, so I
+can't readily test this, but I believe the intention was to name the
+macro argument "pud", not "pte".
 
