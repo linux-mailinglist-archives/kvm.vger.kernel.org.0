@@ -1,183 +1,270 @@
-Return-Path: <kvm+bounces-41510-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41511-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 297A8A6975C
-	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 19:03:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CE31A69768
+	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 19:04:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 411E94662F0
-	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 17:59:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 027794811AD
+	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 18:01:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B2C720A5DF;
-	Wed, 19 Mar 2025 17:58:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18F9A20AF69;
+	Wed, 19 Mar 2025 18:01:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="JswssZao"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ThXiZDXk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B963D20A5F7
-	for <kvm@vger.kernel.org>; Wed, 19 Mar 2025 17:58:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F661DFD98
+	for <kvm@vger.kernel.org>; Wed, 19 Mar 2025 18:01:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742407124; cv=none; b=iTxTqnK4L2mInHmP0UrJnm7KHjkUYMd1Qnw5zYzA1x9uRdICM69Ca37mu0mHPE5hKRD7D+yxEgmLk8UVySd49WfcmGbbeYwdMQj0TbycjPw10MNMaxlj1HWkXJMJ5iz9u4e2l6pFwUqkiHa3wpEwNzOeAUzm6lTza166KT4p+bo=
+	t=1742407300; cv=none; b=jCsYO1Q3FXnttegpjC1VZW935u+W/po2UwmY80cSf0t3wQV6PS5Mt2l1UKBx49Lcl/4G1ke/6UknpTttdY8QCE/dCQMmvzrR9eos7pXbtevKtKN3/3W4lzsBTrVXQaC1Dvs6bflUDrc/7N7K9nicjvLB4oXPtm+/LAYTqUsYfqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742407124; c=relaxed/simple;
-	bh=O1aeb0KFlrkj4Yiw1nWYiPzizeq56+6Mn3GDJKk7WrE=;
+	s=arc-20240116; t=1742407300; c=relaxed/simple;
+	bh=ozrsp8lQbU75KXAdu3yGzkQ4vlD+a7yW9bwEsScQpvM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DqSCf9xEfppRrlgkAIbht10ur8YDrOCIp9gQdzD7GnCTG4kwCWlyFhDRi1bW2asPsGAJhi9A7DbZ+gvcGZZ4Mufru+nl5J/f8NscXBwBFI3up8f3d5d8alFvTzvmOApqnY/kxeFZIbd9BVqfor21hQfGziHpmqSZcW6in6Yv9B0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=JswssZao; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7c597760323so241751485a.3
-        for <kvm@vger.kernel.org>; Wed, 19 Mar 2025 10:58:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1742407121; x=1743011921; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tk5ycb3N9meE73NCm46CD0AtZuFHAdivFMZfwt24RPU=;
-        b=JswssZaoSvcGZ3Nb3HuBG6yTTepkbVvops9jz8GX0QPSsMZFW5TAmeqJyqUmyrXh5e
-         9yd0D5+xit2h+NbfDPGcgydDHXSJ2ZawWNZlNKWiPsbscwgJO3I/D/ccaEd6sXaQefXL
-         P8IaxLiPCwfg4vuJ9yijo8Qifjg8jhUnuqW3o6y37oeE1UjF0yLhoJ0ffNsqWWhVLzbx
-         03eQ6VGcXdRNbfKzRLeEWywvgzyxONJ2hS86uSYluPzy0M0PxKuFPIYJfQH/xuM5OYQ5
-         s5XDR6OMjA+U7S70WxOERiIXTMPnvEsyw3TOvGC0iyLiroIrIpuMe5vEkwUAUWF5OZqs
-         GzCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742407121; x=1743011921;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tk5ycb3N9meE73NCm46CD0AtZuFHAdivFMZfwt24RPU=;
-        b=vVlyDTEeiIZSDwjGC7dKpVGjVJHC75lrpqQEhGZkEHj0k2aDOLuJU6euZH+ceQAswF
-         3AvHaB/UkLjRw2JUe9nJKV1ZGPbvJstYa5gEppPNrR+j5CmcjhHiFfiaJcjWOUz8exlG
-         6rIVZYEKstAT7kk5qd0Zr+mXeSEG67yileynmhl5V9GTVScWFea2l37ZGbZqKOFWZWqX
-         UFOlkna6EN0+POSJdY9lCH8TuQaMsuIvnk+Y5D8GfmJzK3hk+nhAT0pgJelYhghTqt4a
-         gCu9KzYUsUtq8M9glczEh041TgYrg3kPQa748/r6I1DI0AmRXE7X3DedmU2ICZDCelxK
-         TSig==
-X-Forwarded-Encrypted: i=1; AJvYcCVdzm94ceSTrLBa5O+L0l+KM9+6IFiaOaKD5SZTR0ztFUtLc3CRNhzQpxX8DpWIVqWt6vM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxt0BdmQxGoZ1zOpqmdOBQZFGK/+ffQtMtDkvgJyJJsyVAxleXK
-	7YWr0xTb1R7OUZ/wd/j8aA8q20FgmjLBrFwxlPCNdjvnm1mhHvgFOdUrYOzn9i0=
-X-Gm-Gg: ASbGncttTk+OSDGpbNYga7QjOZQfCHm31W2AAZHNNv54P6GRZX+F/UHjKh2sK1CYBNe
-	y3tJtb/Mk7v18NqNhsl4p2k4nXB72sY4FQQvvKhGCnP80BVnYORY+hWD4Z6BUE6koSBD7xCSUY3
-	gsG+BiN5ma6Z6RSd+wrFczLOiJRdNozBYhnm1Nu9fiiuV7j/hBTYHGMf0QhsMDC/kTNtUWoqhTf
-	J+cGuTKHFGRRD6Ra+RRPS+/GgEBagqJFBLRnzX0ycImJPZg0a6Dc08xmIt4qxVbdRqaxVXLSdkE
-	T+wV9UxxDPAUXpGAL0gyjZsczgM/BTt8A5Xw9iWr5SQM8oib89XidJ1AeVmIpL+AgMbRNBP4BY3
-	GNVkVR1SgYpPH0Mt6ew==
-X-Google-Smtp-Source: AGHT+IH//pIx1EBbRFqDU6QPhXC6odo+Ppd2dshOt/mNgQMR0e3nRHsssO7Vo2UonDgQd/fB3+YCbw==
-X-Received: by 2002:a05:620a:3189:b0:7c5:5154:cb2 with SMTP id af79cd13be357-7c5a839688cmr568357985a.15.1742407121681;
-        Wed, 19 Mar 2025 10:58:41 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c573d8a62asm885096585a.96.2025.03.19.10.58.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Mar 2025 10:58:40 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1tuxge-00000000Wns-1mXJ;
-	Wed, 19 Mar 2025 14:58:40 -0300
-Date: Wed, 19 Mar 2025 14:58:40 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Marek Szyprowski <m.szyprowski@samsung.com>
-Cc: Leon Romanovsky <leon@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH v7 00/17] Provide a new two step DMA mapping API
-Message-ID: <20250319175840.GG10600@ziepe.ca>
-References: <cover.1738765879.git.leonro@nvidia.com>
- <20250220124827.GR53094@unreal>
- <CGME20250228195423eucas1p221736d964e9aeb1b055d3ee93a4d2648@eucas1p2.samsung.com>
- <1166a5f5-23cc-4cce-ba40-5e10ad2606de@arm.com>
- <d408b1c7-eabf-4a1e-861c-b2ddf8bf9f0e@samsung.com>
- <20250312193249.GI1322339@unreal>
- <adb63b87-d8f2-4ae6-90c4-125bde41dc29@samsung.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=CQP8KSMxChuW1PsuoxqlGnpl9XtSev5FNaLuar6qRth2nlAbgZyHeOwLHtmGhzk2DxMBUrWJzX7Cq2sXyhPzwsN9gDseTsd+3sIiPOCo2xBcxujX2aj0zb5vxXqjbr06xtyAXbAjmxxlxjg6bGzuFGPpUfHo7nwGkAE+CeU5d7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ThXiZDXk; arc=none smtp.client-ip=95.215.58.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 19 Mar 2025 19:01:24 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1742407295;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3cPypWvZWL+yCXURrCTAIOf/TsaF6PV1P+aYAM5N5BE=;
+	b=ThXiZDXkqAT7qVn0ArUMnVWq9STNeHk8SlqWGgaW8qY+YwCeGyStzsl0tskCE3irgAF0on
+	d1O1tbtGallmMhI1wey6XjsR5w1q0c6k8VXfvI/cj1Vv0oMLotAGFJG9StoFtg7y6RJjxh
+	4yjFM6CRkrTBmDt1UOR+KADNO++0MiA=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	Andrew Jones <ajones@ventanamicro.com>, Anup Patel <apatel@ventanamicro.com>, 
+	Atish Patra <atishp@rivosinc.com>
+Subject: Re: [kvm-unit-tests PATCH v11 0/8] riscv: add SBI SSE extension tests
+Message-ID: <20250319-ff9d4b4904195050638f77f1@orel>
+References: <20250317164655.1120015-1-cleger@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <adb63b87-d8f2-4ae6-90c4-125bde41dc29@samsung.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250317164655.1120015-1-cleger@rivosinc.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Mar 14, 2025 at 11:52:58AM +0100, Marek Szyprowski wrote:
+Hi Clément,
 
-> > The only way to do so is to use dma_map_sg_attrs(), which relies on SG
-> > (the one that we want to remove) to map P2P pages.
+I'd like to merge this, but we still have 50 failures with the latest
+opensbi and over 30 with the opensbi QEMU provides. Testing with [1]
+and bumping the timeout to 6000 allowed me to avoid failures, however
+we can't count on that for CI.
+
+[1] https://lists.infradead.org/pipermail/opensbi/2025-March/008190.html
+
+I'm thinking about just doing the following. What do you think?
+
+Thanks,
+drew
+
+diff --git a/riscv/sbi-sse.c b/riscv/sbi-sse.c
+index a31c84c32303..fb4ee7dd44b2 100644
+--- a/riscv/sbi-sse.c
++++ b/riscv/sbi-sse.c
+@@ -1217,7 +1217,6 @@ void check_sse(void)
+ {
+        struct sse_event_info *info;
+        unsigned long i, event_id;
+-       bool sbi_skip_inject = false;
+        bool supported;
+
+        report_prefix_push("sse");
+@@ -1228,6 +1227,13 @@ void check_sse(void)
+                return;
+        }
+
++       if (sbi_get_imp_id() == SBI_IMPL_OPENSBI &&
++           sbi_get_imp_version() < sbi_impl_opensbi_mk_version(1, 7)) {
++               report_skip("OpenSBI < v1.7 detected, skipping tests");
++               report_prefix_pop();
++               return;
++       }
++
+        sse_check_mask();
+
+        /*
+@@ -1237,18 +1243,6 @@ void check_sse(void)
+         */
+        on_cpus(sse_secondary_boot_and_unmask, NULL);
+
+-       /* Check for OpenSBI to support injection */
+-       if (sbi_get_imp_id() == SBI_IMPL_OPENSBI) {
+-               if (sbi_get_imp_version() < sbi_impl_opensbi_mk_version(1, 6)) {
+-                       /*
+-                        * OpenSBI < v1.6 crashes kvm-unit-tests upon injection since injection
+-                        * arguments (a6/a7) were reversed. Skip injection tests.
+-                        */
+-                       report_skip("OpenSBI < v1.6 detected, skipping injection tests");
+-                       sbi_skip_inject = true;
+-               }
+-       }
+-
+        sse_test_invalid_event_id();
+
+        for (i = 0; i < ARRAY_SIZE(sse_event_infos); i++) {
+@@ -1265,14 +1259,12 @@ void check_sse(void)
+                sse_test_attrs(event_id);
+                sse_test_register_error(event_id);
+
+-               if (!sbi_skip_inject)
+-                       run_inject_test(info);
++               run_inject_test(info);
+
+                report_prefix_pop();
+        }
+
+-       if (!sbi_skip_inject)
+-               sse_test_injection_priority();
++       sse_test_injection_priority();
+
+        report_prefix_pop();
+ }
+
+On Mon, Mar 17, 2025 at 05:46:45PM +0100, Clément Léger wrote:
+> This series adds tests for SBI SSE extension as well as needed
+> infrastructure for SSE support. It also adds test specific asm-offsets
+> generation to use custom OFFSET and DEFINE from the test directory.
 > 
-> That's something I don't get yet. How P2P pages can be used with 
-> dma_map_sg_attrs(), but not with dma_map_page_attrs()? Both operate 
-> internally on struct page pointer.
-
-It is a bit subtle, I ran in to this when exploring enabling proper
-P2P for dma_map_resource() too.
-
-The API signatures are:
-
-dma_addr_t dma_map_page_attrs(struct device *dev, struct page *page,
-		size_t offset, size_t size, enum dma_data_direction dir,
-		unsigned long attrs);
-void dma_unmap_page_attrs(struct device *dev, dma_addr_t addr, size_t size,
-		enum dma_data_direction dir, unsigned long attrs);
-
-The thing to notice immediately is that the unmap path does not get
-passed a struct page.
-
-So, lets think about the flow when the iommu is turned on. 
-
-For normal struct page memory:
-
- - dma_map_page_attrs() allocates some IOVA and returns it in the
-   dma_addr_t and then maps the struct page to the iommu page table
-
- - dma_unmap_page_attrs() frees the IOVA from the given dma_addr_t
- 
-If we think about P2P now:
-
- - dma_map_page_attrs() can inspect the struct page and determine it
-   is P2P. It computes a bus address which is not an IOVA, and does
-   not transit through the IOMMU. No IOVA allocation is performed. the
-   bus address is returned as the dma_addr_t
-
- - dma_unmap_page_attrs() ... is impossible. We just get this
-   dma_addr_t that doesn't have enough information to tell anymore if
-   the address is a P2P bus address or not, so we can't tell if we
-   should unmap an iova from the dma_addr_t :\
-
-The sg path fixes this because it introduced a new flag in the
-scatterlist, SG_DMA_BUS_ADDRESS, that allows the sg map path to record
-the information for the unmap path so it can do the right thing.
-
-Leon's approach fixes this by putting an overarching transaction state
-around the DMA operation so that map and unmap operations can look in
-the state and determine if this is a P2P or non P2P map and then know
-how to unmap.
-
-For some background here, Christoph gave me this idea back at LSF/MM
-in Vancouver (two years ago now). At the time I was looking at
-replacing scatterlist and giving new DMA API ops to operate on a
-"scatterlist v2" structure.
-
-Christoph's vision was to make a performance DMA API path that could
-be used to implement any scatterlist-like data structure very
-efficiently without having to teach the DMA API about all sorts of 
-scatterlist-like things.
-
-Jason
+> These tests can be run using an OpenSBI version that implements latest
+> specifications modification [1]
+> 
+> Link: https://github.com/rivosinc/opensbi/tree/dev/cleger/sse [1]
+> 
+> ---
+> 
+> V11:
+>  - Use mask inside sbi_impl_opensbi_mk_version()
+>  - Mask the SBI version with a new mask
+>  - Use assert inside sbi_get_impl_id/version()
+>  - Remove sbi_check_impl()
+>  - Increase completion timeout as events failed completing under 1000
+>    micros when system is loaded.
+> 
+> V10:
+>  - Use && instead of || for timeout handling
+>  - Add SBI patches which introduce function to get implementer ID and
+>    version as well as implementer ID defines.
+>  - Skip injection tests in OpenSBI < v1.6
+> 
+> V9:
+>  - Use __ASSEMBLER__ instead of __ASSEMBLY__
+>  - Remove extra spaces
+>  - Use assert to check global event in
+>    sse_global_event_set_current_hart()
+>  - Tabulate SSE events names table
+>  - Use sbi_sse_register() instead of sbi_sse_register_raw() in error
+>    testing
+>  - Move a report_pass() out of error path
+>  - Rework all injection tests with better error handling
+>  - Use an env var for sse event completion timeout
+>  - Add timeout for some potentially infinite while() loops
+> 
+> V8:
+>  - Short circuit current event tests if failure happens
+>  - Remove SSE from all report strings
+>  - Indent .prio field
+>  - Add cpu_relax()/smp_rmb() where needed
+>  - Add timeout for global event ENABLED state check
+>  - Added BIT(32) aliases tests for attribute/event_id.
+> 
+> V7:
+>  - Test ids/attributes/attributes count > 32 bits
+>  - Rename all SSE function to sbi_sse_*
+>  - Use event_id instead of event/evt
+>  - Factorize read/write test
+>  - Use virt_to_phys() for attributes read/write.
+>  - Extensively use sbiret_report_error()
+>  - Change check function return values to bool.
+>  - Added assert for stack size to be below or equal to PAGE_SIZE
+>  - Use en env variable for the maximum hart ID
+>  - Check that individual read from attributes matches the multiple
+>    attributes read.
+>  - Added multiple attributes write at once
+>  - Used READ_ONCE/WRITE_ONCE
+>  - Inject all local event at once rather than looping fopr each core.
+>  - Split test_arg for local_dispatch test so that all CPUs can run at
+>    once.
+>  - Move SSE entry and generic code to lib/riscv for other tests
+>  - Fix unmask/mask state checking
+> 
+> V6:
+>  - Add missing $(generated-file) dependencies for "-deps" objects
+>  - Split SSE entry from sbi-asm.S to sse-asm.S and all SSE core functions
+>    since it will be useful for other tests as well (dbltrp).
+> 
+> V5:
+>  - Update event ranges based on latest spec
+>  - Rename asm-offset-test.c to sbi-asm-offset.c
+> 
+> V4:
+>  - Fix typo sbi_ext_ss_fid -> sbi_ext_sse_fid
+>  - Add proper asm-offset generation for tests
+>  - Move SSE specific file from lib/riscv to riscv/
+> 
+> V3:
+>  - Add -deps variable for test specific dependencies
+>  - Fix formatting errors/typo in sbi.h
+>  - Add missing double trap event
+>  - Alphabetize sbi-sse.c includes
+>  - Fix a6 content after unmasking event
+>  - Add SSE HART_MASK/UNMASK test
+>  - Use mv instead of move
+>  - move sbi_check_sse() definition in sbi.c
+>  - Remove sbi_sse test from unitests.cfg
+> 
+> V2:
+>  - Rebased on origin/master and integrate it into sbi.c tests
+> 
+> Clément Léger (8):
+>   kbuild: Allow multiple asm-offsets file to be generated
+>   riscv: Set .aux.o files as .PRECIOUS
+>   riscv: Use asm-offsets to generate SBI_EXT_HSM values
+>   lib: riscv: Add functions for version checking
+>   lib: riscv: Add functions to get implementer ID and version
+>   riscv: lib: Add SBI SSE extension definitions
+>   lib: riscv: Add SBI SSE support
+>   riscv: sbi: Add SSE extension tests
+> 
+>  scripts/asm-offsets.mak |   22 +-
+>  riscv/Makefile          |    5 +-
+>  lib/riscv/asm/csr.h     |    1 +
+>  lib/riscv/asm/sbi.h     |  177 +++++-
+>  lib/riscv/sbi-sse-asm.S |  102 ++++
+>  lib/riscv/asm-offsets.c |    9 +
+>  lib/riscv/sbi.c         |  105 +++-
+>  riscv/sbi-tests.h       |    1 +
+>  riscv/sbi-asm.S         |    6 +-
+>  riscv/sbi-asm-offsets.c |   11 +
+>  riscv/sbi-sse.c         | 1278 +++++++++++++++++++++++++++++++++++++++
+>  riscv/sbi.c             |    2 +
+>  riscv/.gitignore        |    1 +
+>  13 files changed, 1707 insertions(+), 13 deletions(-)
+>  create mode 100644 lib/riscv/sbi-sse-asm.S
+>  create mode 100644 riscv/sbi-asm-offsets.c
+>  create mode 100644 riscv/sbi-sse.c
+>  create mode 100644 riscv/.gitignore
+> 
+> -- 
+> 2.47.2
+> 
 
