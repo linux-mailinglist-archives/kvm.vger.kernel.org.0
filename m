@@ -1,249 +1,229 @@
-Return-Path: <kvm+bounces-41479-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41480-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B85EA68637
-	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 08:55:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 65155A686D4
+	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 09:31:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6AFBF17A6CA
-	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 07:54:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B142817B6F5
+	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 08:31:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA3812505C7;
-	Wed, 19 Mar 2025 07:54:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C49AA2517A1;
+	Wed, 19 Mar 2025 08:31:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="DqG01zv6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k/ZmCalc"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66B9C24EF7F;
-	Wed, 19 Mar 2025 07:53:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C994D20F091;
+	Wed, 19 Mar 2025 08:31:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742370839; cv=none; b=Lg6sqvoScINW1kI9rKECYQ9gsBXUh/ArTwCH4NU/uIPFPmZlEJlCIN8dqVPzDaaw6vnXATzTVjJJ3+Z5uFqdEhZjA0ZF1yyg6Zmq3Zqlzm74Ey4Nbw9YCZkBR2RWLpC0UlVT6RX0tJ6+8eR7D/EvIHXxi1+c++qFZAQnYMghf4w=
+	t=1742373064; cv=none; b=RzdkwKfac6Rf+c9N9OBTOIuZiLPR4sBUmgcHPxk72VnU/5NutxShNmzge43QSrV3vvdEktIhE2ri81Y1nbdvTBZpSyjNW/vgS8PL/A9NYTrhpae/kgu7+eLemU5GkIzWddUQ6uEGjQwu8DZS/C+H1UotPz6s931hb8TuF5CFDdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742370839; c=relaxed/simple;
-	bh=ky3jiM1bjOMzTVRWpEBEoFuEvp1kviCET1tz7ZVwE2M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=p8sRDjXxkj5H37obxICefLjVocm67tUslQfkJU9E4m66fo/T/qiVAZsDROPRwgK1Xib8zjrb78p4Oqi+ZCZ73ZV1OtIFnUaNHon6XPgQwJawgSc7/Uca9hfi41azEqJNHIAUEVAmM2Z2LhjnkGVhM9IbCuFKjFv3A7IipfNRQEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=DqG01zv6; arc=none smtp.client-ip=52.95.48.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1742370839; x=1773906839;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=jXl/8vzx6TOy29mjcSY/yyQLEaXHaFbsfFs77FD/cV4=;
-  b=DqG01zv6efHOu5qF8LBUlJK8bGv0/di64ealz+ky2yRSAraysEpZX/O3
-   l2+gmCRnUavBY4q3NPaHk+z5e6b1t40AyTs91I43cpNU/2YCpZPnWb2Mz
-   i793CHBoh7ICQm8BJLz1StnIFOzDBVveVbW4sPRklXxGx2dAklUCRYBZj
-   4=;
-X-IronPort-AV: E=Sophos;i="6.14,259,1736812800"; 
-   d="scan'208";a="472339262"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2025 07:53:51 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:10937]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.62.245:2525] with esmtp (Farcaster)
- id f1034041-96c5-4fa3-9e32-0aaec99408b2; Wed, 19 Mar 2025 07:53:50 +0000 (UTC)
-X-Farcaster-Flow-ID: f1034041-96c5-4fa3-9e32-0aaec99408b2
-Received: from EX19D020UWA001.ant.amazon.com (10.13.138.249) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 19 Mar 2025 07:53:50 +0000
-Received: from EX19MTAUEC002.ant.amazon.com (10.252.135.146) by
- EX19D020UWA001.ant.amazon.com (10.13.138.249) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 19 Mar 2025 07:53:49 +0000
-Received: from email-imr-corp-prod-iad-all-1a-f1af3bd3.us-east-1.amazon.com
- (10.43.8.6) by mail-relay.amazon.com (10.252.135.146) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1544.14 via Frontend Transport; Wed, 19 Mar 2025 07:53:49 +0000
-Received: from [127.0.0.1] (dev-dsk-roypat-1c-dbe2a224.eu-west-1.amazon.com [172.19.88.180])
-	by email-imr-corp-prod-iad-all-1a-f1af3bd3.us-east-1.amazon.com (Postfix) with ESMTPS id 5C81F40881;
-	Wed, 19 Mar 2025 07:53:45 +0000 (UTC)
-Message-ID: <ad359b73-e50c-48e0-a5b5-4df9823fa289@amazon.co.uk>
-Date: Wed, 19 Mar 2025 07:53:43 +0000
+	s=arc-20240116; t=1742373064; c=relaxed/simple;
+	bh=w3JmB7o8CKormT/Akok+UN9U+U8VYEVmbKd3okiCYoE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WcgP+Rt+xPObIsmt1BqHd3kuIvYuVeA+JzlrwHBTJngo8cyeE61nA38kDLiV+xG6gNN1eG/sT+YCRh7/yn+BKu2pG3h0MnAqWDOD0mSfrL+Lt8Sa7Al9oLz1f8aVVDhO2E1wUo4FW4mnQhyivBvyDGOtJB972JsS+wlirjcumWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k/ZmCalc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96DF5C4CEE9;
+	Wed, 19 Mar 2025 08:31:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742373063;
+	bh=w3JmB7o8CKormT/Akok+UN9U+U8VYEVmbKd3okiCYoE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=k/ZmCalc1dPOZG6tOAhA+Vbavt7ywew9AlCIx2pzmLHVBTMjREfKHqE2Yum/A2k90
+	 Mgo+utD6esZ3GSzapnLqbyG8yVsrTWUf4LItvlOCrYiiwuNO3yR2hQSEZpAOU6nnCo
+	 ZQRiEYn2mZ5bFSK8HEji2pCWj4CLMwBv5PoBA514qIBaTnW4NxRHmPJsRxHz6F9LM6
+	 DEj4Vkpkiz3HR+9d8OInlfDxTa9WdUELXV90gpobKxd8KKBd5UGsQL7y13D0qR11Xw
+	 1V/5hXHr1Z4zSHswxS63wOUI6bDFZ2FK5D8dKbOltHWG9ThPOmE1f0m3YkoTz1ruoI
+	 rs/FbXe+RBpfw==
+Date: Wed, 19 Mar 2025 10:30:58 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Robin Murphy <robin.murphy@arm.com>, Christoph Hellwig <hch@lst.de>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH v7 00/17] Provide a new two step DMA mapping API
+Message-ID: <20250319083058.GG1322339@unreal>
+References: <cover.1738765879.git.leonro@nvidia.com>
+ <20250220124827.GR53094@unreal>
+ <CGME20250228195423eucas1p221736d964e9aeb1b055d3ee93a4d2648@eucas1p2.samsung.com>
+ <1166a5f5-23cc-4cce-ba40-5e10ad2606de@arm.com>
+ <d408b1c7-eabf-4a1e-861c-b2ddf8bf9f0e@samsung.com>
+ <20250312193249.GI1322339@unreal>
+ <adb63b87-d8f2-4ae6-90c4-125bde41dc29@samsung.com>
+ <20250314184911.GR1322339@unreal>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 03/12] KVM: guest_memfd: Add flag to remove from direct
- map
-To: David Hildenbrand <david@redhat.com>, <rppt@kernel.org>,
-	<seanjc@google.com>
-CC: <pbonzini@redhat.com>, <corbet@lwn.net>, <willy@infradead.org>,
-	<akpm@linux-foundation.org>, <song@kernel.org>, <jolsa@kernel.org>,
-	<ast@kernel.org>, <daniel@iogearbox.net>, <andrii@kernel.org>,
-	<martin.lau@linux.dev>, <eddyz87@gmail.com>, <yonghong.song@linux.dev>,
-	<john.fastabend@gmail.com>, <kpsingh@kernel.org>, <sdf@fomichev.me>,
-	<haoluo@google.com>, <Liam.Howlett@oracle.com>, <lorenzo.stoakes@oracle.com>,
-	<vbabka@suse.cz>, <jannh@google.com>, <shuah@kernel.org>,
-	<kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-	<linux-mm@kvack.org>, <bpf@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <tabba@google.com>, <jgowans@amazon.com>,
-	<graf@amazon.com>, <kalyazin@amazon.com>, <xmarcalx@amazon.com>,
-	<derekmn@amazon.com>, <jthoughton@google.com>, Elliot Berman
-	<quic_eberman@quicinc.com>
-References: <20250221160728.1584559-1-roypat@amazon.co.uk>
- <20250221160728.1584559-4-roypat@amazon.co.uk>
- <a3178c50-2e76-4743-8008-9a33bd0af93f@redhat.com>
- <8642de57-553a-47ec-81af-803280a360ec@amazon.co.uk>
- <bfe43591-66b6-4fb9-bf6c-df79ddeffb17@redhat.com>
- <7f38018b-dc89-4d79-a309-149557796121@amazon.co.uk>
- <9ffce724-23c9-4aa1-bc53-8292e1029991@redhat.com>
-From: Patrick Roy <roypat@amazon.co.uk>
-Content-Language: en-US
-Autocrypt: addr=roypat@amazon.co.uk; keydata=
- xjMEY0UgYhYJKwYBBAHaRw8BAQdA7lj+ADr5b96qBcdINFVJSOg8RGtKthL5x77F2ABMh4PN
- NVBhdHJpY2sgUm95IChHaXRodWIga2V5IGFtYXpvbikgPHJveXBhdEBhbWF6b24uY28udWs+
- wpMEExYKADsWIQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbAwULCQgHAgIiAgYVCgkI
- CwIEFgIDAQIeBwIXgAAKCRBVg4tqeAbEAmQKAQC1jMl/KT9pQHEdALF7SA1iJ9tpA5ppl1J9
- AOIP7Nr9SwD/fvIWkq0QDnq69eK7HqW14CA7AToCF6NBqZ8r7ksi+QLOOARjRSBiEgorBgEE
- AZdVAQUBAQdAqoMhGmiXJ3DMGeXrlaDA+v/aF/ah7ARbFV4ukHyz+CkDAQgHwngEGBYKACAW
- IQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbDAAKCRBVg4tqeAbEAtjHAQDkh5jZRIsZ
- 7JMNkPMSCd5PuSy0/Gdx8LGgsxxPMZwePgEAn5Tnh4fVbf00esnoK588bYQgJBioXtuXhtom
- 8hlxFQM=
-In-Reply-To: <9ffce724-23c9-4aa1-bc53-8292e1029991@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250314184911.GR1322339@unreal>
 
-Hi David!
-
-On Wed, 2025-02-26 at 15:30 +0000, David Hildenbrand wrote:
-> On 26.02.25 16:14, Patrick Roy wrote:
->>
->>
->> On Wed, 2025-02-26 at 09:08 +0000, David Hildenbrand wrote:
->>> On 26.02.25 09:48, Patrick Roy wrote:
->>>>
->>>>
->>>> On Tue, 2025-02-25 at 16:54 +0000, David Hildenbrand wrote:> On 21.02.25 17:07, Patrick Roy wrote:
->>>>>> Add KVM_GMEM_NO_DIRECT_MAP flag for KVM_CREATE_GUEST_MEMFD() ioctl. When
->>>>>> set, guest_memfd folios will be removed from the direct map after
->>>>>> preparation, with direct map entries only restored when the folios are
->>>>>> freed.
->>>>>>
->>>>>> To ensure these folios do not end up in places where the kernel cannot
->>>>>> deal with them, set AS_NO_DIRECT_MAP on the guest_memfd's struct
->>>>>> address_space if KVM_GMEM_NO_DIRECT_MAP is requested.
->>>>>>
->>>>>> Note that this flag causes removal of direct map entries for all
->>>>>> guest_memfd folios independent of whether they are "shared" or "private"
->>>>>> (although current guest_memfd only supports either all folios in the
->>>>>> "shared" state, or all folios in the "private" state if
->>>>>> !IS_ENABLED(CONFIG_KVM_GMEM_SHARED_MEM)). The usecase for removing
->>>>>> direct map entries of also the shared parts of guest_memfd are a special
->>>>>> type of non-CoCo VM where, host userspace is trusted to have access to
->>>>>> all of guest memory, but where Spectre-style transient execution attacks
->>>>>> through the host kernel's direct map should still be mitigated.
->>>>>>
->>>>>> Note that KVM retains access to guest memory via userspace
->>>>>> mappings of guest_memfd, which are reflected back into KVM's memslots
->>>>>> via userspace_addr. This is needed for things like MMIO emulation on
->>>>>> x86_64 to work. Previous iterations attempted to instead have KVM
->>>>>> temporarily restore direct map entries whenever such an access to guest
->>>>>> memory was needed, but this turned out to have a significant performance
->>>>>> impact, as well as additional complexity due to needing to refcount
->>>>>> direct map reinsertion operations and making them play nicely with gmem
->>>>>> truncations.
->>>>>>
->>>>>> This iteration also doesn't have KVM perform TLB flushes after direct
->>>>>> map manipulations. This is because TLB flushes resulted in a up to 40x
->>>>>> elongation of page faults in guest_memfd (scaling with the number of CPU
->>>>>> cores), or a 5x elongation of memory population. On the one hand, TLB
->>>>>> flushes are not needed for functional correctness (the virt->phys
->>>>>> mapping technically stays "correct",  the kernel should simply to not it
->>>>>> for a while), so this is a correct optimization to make. On the other
->>>>>> hand, it means that the desired protection from Spectre-style attacks is
->>>>>> not perfect, as an attacker could try to prevent a stale TLB entry from
->>>>>> getting evicted, keeping it alive until the page it refers to is used by
->>>>>> the guest for some sensitive data, and then targeting it using a
->>>>>> spectre-gadget.
->>>>>>
->>>>>> Signed-off-by: Patrick Roy <roypat@amazon.co.uk>
->>>>>
->>>>> ...
->>>>>
->>>>>>
->>>>>> +static bool kvm_gmem_test_no_direct_map(struct inode *inode)
->>>>>> +{
->>>>>> +     return ((unsigned long) inode->i_private) & KVM_GMEM_NO_DIRECT_MAP;
->>>>>> +}
->>>>>> +
->>>>>>     static inline void kvm_gmem_mark_prepared(struct folio *folio)
->>>>>>     {
->>>>>> +     struct inode *inode = folio_inode(folio);
->>>>>> +
->>>>>> +     if (kvm_gmem_test_no_direct_map(inode)) {
->>>>>> +             int r = set_direct_map_valid_noflush(folio_page(folio, 0), folio_nr_pages(folio),
->>>>>> +                                                  false);
->>>>>
->>>>> Will this work if KVM is built as a module, or is this another good
->>>>> reason why we might want guest_memfd core part of core-mm?
->>>>
->>>> mh, I'm admittedly not too familiar with the differences that would come
->>>> from building KVM as a module vs not. I do remember something about the
->>>> direct map accessors not being available for modules, so this would
->>>> indeed not work. Does that mean moving gmem into core-mm will be a
->>>> pre-requisite for the direct map removal stuff?
->>>
->>> Likely, we'd need some shim.
->>>
->>> Maybe for the time being it could be fenced using #if IS_BUILTIN() ...
->>> but that sure won't win in a beauty contest.
->>
->> Is anyone working on such a shim at the moment? Otherwise, would it make
->> sense for me to look into it? (although I'll probably need a pointer or
->> two for what is actually needed)
->>
->> I saw your comment on Fuad's series [1] indicating that he'll also need
->> some shim, so probably makes sense to tackle it anyway instead of
->> hacking around it with #if-ery.
+On Fri, Mar 14, 2025 at 08:49:11PM +0200, Leon Romanovsky wrote:
+> On Fri, Mar 14, 2025 at 11:52:58AM +0100, Marek Szyprowski wrote:
+> > On 12.03.2025 20:32, Leon Romanovsky wrote:
+> > > On Wed, Mar 12, 2025 at 10:28:32AM +0100, Marek Szyprowski wrote:
+> > >> Hi Robin
+> > >>
+> > >> On 28.02.2025 20:54, Robin Murphy wrote:
+> > >>> On 20/02/2025 12:48 pm, Leon Romanovsky wrote:
+> > >>>> On Wed, Feb 05, 2025 at 04:40:20PM +0200, Leon Romanovsky wrote:
+> > >>>>> From: Leon Romanovsky <leonro@nvidia.com>
+> > >>>>>
+> > >>>>> Changelog:
+> > >>>>> v7:
+> > >>>>>    * Rebased to v6.14-rc1
+> > >>>> <...>
+> > >>>>
+> > >>>>> Christoph Hellwig (6):
+> > >>>>>     PCI/P2PDMA: Refactor the p2pdma mapping helpers
+> > >>>>>     dma-mapping: move the PCI P2PDMA mapping helpers to pci-p2pdma.h
+> > >>>>>     iommu: generalize the batched sync after map interface
+> > >>>>>     iommu/dma: Factor out a iommu_dma_map_swiotlb helper
+> > >>>>>     dma-mapping: add a dma_need_unmap helper
+> > >>>>>     docs: core-api: document the IOVA-based API
+> > >>>>>
+> > >>>>> Leon Romanovsky (11):
+> > >>>>>     iommu: add kernel-doc for iommu_unmap and iommu_unmap_fast
+> > >>>>>     dma-mapping: Provide an interface to allow allocate IOVA
+> > >>>>>     dma-mapping: Implement link/unlink ranges API
+> > >>>>>     mm/hmm: let users to tag specific PFN with DMA mapped bit
+> > >>>>>     mm/hmm: provide generic DMA managing logic
+> > >>>>>     RDMA/umem: Store ODP access mask information in PFN
+> > >>>>>     RDMA/core: Convert UMEM ODP DMA mapping to caching IOVA and page
+> > >>>>>       linkage
+> > >>>>>     RDMA/umem: Separate implicit ODP initialization from explicit ODP
+> > >>>>>     vfio/mlx5: Explicitly use number of pages instead of allocated
+> > >>>>> length
+> > >>>>>     vfio/mlx5: Rewrite create mkey flow to allow better code reuse
+> > >>>>>     vfio/mlx5: Enable the DMA link API
+> > >>>>>
+> > >>>>>    Documentation/core-api/dma-api.rst   |  70 ++++
+> > >>>>    drivers/infiniband/core/umem_odp.c   | 250 +++++---------
+> > >>>>>    drivers/infiniband/hw/mlx5/mlx5_ib.h |  12 +-
+> > >>>>>    drivers/infiniband/hw/mlx5/odp.c     |  65 ++--
+> > >>>>>    drivers/infiniband/hw/mlx5/umr.c     |  12 +-
+> > >>>>>    drivers/iommu/dma-iommu.c            | 468
+> > >>>>> +++++++++++++++++++++++----
+> > >>>>>    drivers/iommu/iommu.c                |  84 ++---
+> > >>>>>    drivers/pci/p2pdma.c                 |  38 +--
+> > >>>>>    drivers/vfio/pci/mlx5/cmd.c          | 375 +++++++++++----------
+> > >>>>>    drivers/vfio/pci/mlx5/cmd.h          |  35 +-
+> > >>>>>    drivers/vfio/pci/mlx5/main.c         |  87 +++--
+> > >>>>>    include/linux/dma-map-ops.h          |  54 ----
+> > >>>>>    include/linux/dma-mapping.h          |  85 +++++
+> > >>>>>    include/linux/hmm-dma.h              |  33 ++
+> > >>>>>    include/linux/hmm.h                  |  21 ++
+> > >>>>>    include/linux/iommu.h                |   4 +
+> > >>>>>    include/linux/pci-p2pdma.h           |  84 +++++
+> > >>>>>    include/rdma/ib_umem_odp.h           |  25 +-
+> > >>>>>    kernel/dma/direct.c                  |  44 +--
+> > >>>>>    kernel/dma/mapping.c                 |  18 ++
+> > >>>>>    mm/hmm.c                             | 264 +++++++++++++--
+> > >>>>>    21 files changed, 1435 insertions(+), 693 deletions(-)
+> > >>>>>    create mode 100644 include/linux/hmm-dma.h
+> > >>>> Kind reminder.
+> > > <...>
+> > >
+> > >> Removing the need for scatterlists was advertised as the main goal of
+> > >> this new API, but it looks that similar effects can be achieved with
+> > >> just iterating over the pages and calling page-based DMA API directly.
+> > > Such iteration can't be enough because P2P pages don't have struct pages,
+> > > so you can't use reliably and efficiently dma_map_page_attrs() call.
+> > >
+> > > The only way to do so is to use dma_map_sg_attrs(), which relies on SG
+> > > (the one that we want to remove) to map P2P pages.
+> > 
+> > That's something I don't get yet. How P2P pages can be used with 
+> > dma_map_sg_attrs(), but not with dma_map_page_attrs()? Both operate 
+> > internally on struct page pointer.
 > 
-> Elliot (CC) was working on "guestmem library" project [1], but it was
-> unclear what we could factor out into the core.
+> Yes, and no.
+> See users of is_pci_p2pdma_page(...) function. In dma_*_sg() APIs, there
+> is a real check and support for p2p. In dma_map_page_attrs() variants,
+> this support is missing (ignored, or error is returned).
 > 
-> Looks like a simple shim for such stuff might be a good starting point,
-> although not the final idea of encapsulating more in the library.
-
-So I started looking into this based on what we talked about at the last
-guest_memfd sync. I tried to sort of go the way you hinted at when this
-topic of "direct map removal from modules" came up in the past [1], and
-hide it behind some sort of "alloc/free" abstraction. E.g. have the
-library/shim expose gmem_get_folio(struct inode *inode, pgoff_t index)
-that is a sorta equivalent of today __kvm_gmem_get_pfn(), which grabs a
-new folio from the filemap, prepares it via a callback provided by KVM,
-and then direct map removes it before returning it proper. But then,
-that could still be "abused" by module code to just remove arbitrary
-folios from the direct map, if a caller messed up any old struct inode
-to look sufficiently like a gmem inode for the purposes of
-gmem_get_folio(). But I also couldn't really come up with anything that
-_wouldn't_ allow something like this. What're your thoughts on this? Do
-we need to find a way to prevent this sort of stuff, and is that even
-possible? I checked some of Elliot's old submissions that contain
-direct map removal as part of the library and they run into the
-same problem.
-
-Best, 
-Patrick
-
-[1]: https://lore.kernel.org/all/49d14780-56f4-478d-9f5f-0857e788c667@redhat.com/
- 
-> @Elliot, are you currently still looking into this?
->
-> [1]
-> https://lore.kernel.org/all/20241113-guestmem-library-v3-0-71fdee85676b@quicinc.com/T/#u
+> > 
+> > >> Maybe I missed something. I still see some advantages in this DMA API
+> > >> extension, but I would also like to see the clear benefits from
+> > >> introducing it, like perf logs or other benchmark summary.
+> > > We didn't focus yet on performance, however Christoph mentioned in his
+> > > block RFC [1] that even simple conversion should improve performance as
+> > > we are performing one P2P lookup per-bio and not per-SG entry as was
+> > > before [2]. In addition it decreases memory [3] too.
+> > >
+> > > [1] https://lore.kernel.org/all/cover.1730037261.git.leon@kernel.org/
+> > > [2] https://lore.kernel.org/all/34d44537a65aba6ede215a8ad882aeee028b423a.1730037261.git.leon@kernel.org/
+> > > [3] https://lore.kernel.org/all/383557d0fa1aa393dbab4e1daec94b6cced384ab.1730037261.git.leon@kernel.org/
+> > >
+> > > So clear benefits are:
+> > > 1. Ability to use native for subsystem structure, e.g. bio for block,
+> > > umem for RDMA, dmabuf for DRM, e.t.c. It removes current wasteful
+> > > conversions from and to SG in order to work with DMA API.
+> > > 2. Batched request and iotlb sync optimizations (perform only once).
+> > > 3. Avoid very expensive call to pgmap pointer.
+> > > 4. Expose MMIO over VFIO without hacks (PCI BAR doesn't have struct pages).
+> > > See this series for such a hack
+> > > https://lore.kernel.org/all/20250307052248.405803-1-vivek.kasireddy@intel.com/
+> > 
+> > I see those benefits and I admit that for typical DMA-with-IOMMU case it 
+> > would improve some things. I think that main concern from Robin was how 
+> > to handle it for the cases without an IOMMU.
 > 
-> -- 
-> Cheers,
+> In such case, we fallback to non-IOMMU flow (old, well-established one).
+> See this HMM patch as an example https://lore.kernel.org/all/a796da065fa8a9cb35d591ce6930400619572dcc.1738765879.git.leonro@nvidia.com/
+> +dma_addr_t hmm_dma_map_pfn(struct device *dev, struct hmm_dma_map *map,
+> +			   size_t idx,
+> +			   struct pci_p2pdma_map_state *p2pdma_state)
+> ...
+> +	if (dma_use_iova(state)) {
+> ...
+> +	} else {
+> ...
+> +		dma_addr = dma_map_page(dev, page, 0, map->dma_entry_size,
+> +					DMA_BIDIRECTIONAL);
 > 
-> David / dhildenb
+> Thanks
+
+Marek,
+
+Did it answer your concerns?
+
+How can we progress here? As you can see, the chances to get meaningful
+response to your review request and my questions are not high.
+
+Thanks
+
+> 
+> > 
+> > Best regards
+> > -- 
+> > Marek Szyprowski, PhD
+> > Samsung R&D Institute Poland
+> > 
 > 
 
