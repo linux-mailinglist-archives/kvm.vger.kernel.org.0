@@ -1,146 +1,188 @@
-Return-Path: <kvm+bounces-41524-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41525-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D36B7A69C44
-	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 23:47:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F390BA69C49
+	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 23:50:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4B528A1577
-	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 22:46:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3272E189D5CA
+	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 22:50:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9BF0221DB2;
-	Wed, 19 Mar 2025 22:46:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BF4922068D;
+	Wed, 19 Mar 2025 22:50:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F1FG2F0L"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xr4t/+Oe"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8834B213232
-	for <kvm@vger.kernel.org>; Wed, 19 Mar 2025 22:46:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B5791E0DF5
+	for <kvm@vger.kernel.org>; Wed, 19 Mar 2025 22:49:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742424407; cv=none; b=FKDhoSdzsu/L/OyKNnY2E0mEO4CCUguvf0w2dl04hVwrYyVS5eDknPxaukK6jcDufR/0Vm7Ws8RZ1R+l9+FFr9FmBxP5IkVV1HyvmsVbG2mCAzS2kQOjHGcDqOGA62z9nUST1E4TQgAGxEb9u4YuDywKiL9ISmFPYaohiKEe6hU=
+	t=1742424599; cv=none; b=CuLleVlLidPDKTdCBxpY8R8t3B6ZRBlqkFxMeUvNE+TzR9DNoZ5BQXzLHKGrdmIflmKxP4tN5NjEzELzWDvcFbzQUhYH/Oaz7sbifqfFK8B2U+Se82ssCx1bCz8SvePWSWDQL6HPv518UgRuomfhBFl+QtdUq3/XWbDCYy5D20Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742424407; c=relaxed/simple;
-	bh=bWwwTw53iGMdQjWhFpPpRcdxkNkBr9cpl6cenki4Ur0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Uct0qd1MA+GRgce/8LxABkeJOv7arhCWrTUml296EU0F2WTA6BJv/shJEjhC4n2CJ1OffatSrD+9SOlifgLbgGRIP7vK5FSPH+6XervhkW74iPeS4TpFAdQqM9wrFPT6zicsna1exWs53KpeXUNGcN0Q9ooRrpBzOMH9Y9QoMD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F1FG2F0L; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1742424599; c=relaxed/simple;
+	bh=lrSy91elUFWeNXInEMPTCJnyaZA6B+FgQTIyrb7pjko=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Ve0ALregYql1aCHqrXGtAH/1udTzOFehUJv00T+DJo3pv/NaYPeowNzCLTxr9fgpCgNNdH9TG8D5/5LdIp/HPxFxonyRa0RjgD9pgeoV4s00gaOGry6rWlgLsUHy9KbOyaYQCq2jLuloEJvRGyKqgSAoPWDS4j7z1vYpt8l+5fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xr4t/+Oe; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742424404;
+	s=mimecast20190719; t=1742424596;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=3Axll5Mi+5wEaWyklP7NmIivlU8IChwyIqobsotZaqY=;
-	b=F1FG2F0LsXT+maITJpbmhQq1fCkfq40OUuzAhmByY5YvHiPw8uq2Fb6y9guwtZgSRfEzwP
-	I8bnWKBFyH0qdW/HmVuug5Yy0C62VjZSlxIg7nzyMO2EYeKIp8XPGIPKZYWMLyrGyViqPf
-	LRPYLXB7CCF+OKrucHfxeZzYuuy7jCk=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=pcULRLq0h/6Rw82rbFxYL3W3UEU4Ef8C8Kke2Ri6KhA=;
+	b=Xr4t/+OedCnRpyaSW7efy83SS4oFT13uRbL9C6jPMRho3/acW2OzwrxkMcDH3roTUPeYRG
+	dsmSQpmD7KNKMaw9KPL/WKEOnCKArUbYIrOjSVB2AqgprW6pR6Eg/m+oCsUz/fYgsDl6xu
+	Pvfv/itnoQqVz/0FZVfZqs3HPpFMU/o=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-444-e5E36XLDME-4uPVDUVyGyw-1; Wed, 19 Mar 2025 18:46:41 -0400
-X-MC-Unique: e5E36XLDME-4uPVDUVyGyw-1
-X-Mimecast-MFC-AGG-ID: e5E36XLDME-4uPVDUVyGyw_1742424400
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7c572339444so33802285a.3
-        for <kvm@vger.kernel.org>; Wed, 19 Mar 2025 15:46:41 -0700 (PDT)
+ us-mta-660-zL6bDqW9MnSzTNVKDYY9dQ-1; Wed, 19 Mar 2025 18:49:55 -0400
+X-MC-Unique: zL6bDqW9MnSzTNVKDYY9dQ-1
+X-Mimecast-MFC-AGG-ID: zL6bDqW9MnSzTNVKDYY9dQ_1742424594
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6eada773c0eso4611776d6.3
+        for <kvm@vger.kernel.org>; Wed, 19 Mar 2025 15:49:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742424400; x=1743029200;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3Axll5Mi+5wEaWyklP7NmIivlU8IChwyIqobsotZaqY=;
-        b=SlljwEasamuaanPWVEtJluSmQd21TwA4UHFxolmoXk7SJVgtfDeA6Z3eTaRFtGrJ2w
-         A2l55QFQMiAgaeTPE4XcJLB445lOeMGcIQ5iJrE460NRjoav79aMZHT/y5KcGSlw116F
-         Kw6K+jjpWqzKkj8ws29VSw3Bf0mjaV7sOc3jm7R8jObdEe0zxl8WrZ2Q/wFT0ep/cRFr
-         zDtTzInZYEV2o3K945xgnr+iR5fQuHHmobgyPaGfXwZEbvQgJKVlKkZe1Nt8RdWVsWek
-         jPZ81bE6lPtZ5WqMGkmhWvwrsS3VpxMI3q9e8Q5205Sr88vFv99WSwaSKKxYkOTHBge1
-         xE8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWAuay8AO9TaIko7ib5FpAa9mAmB5m0PoXD1GHi1kWL4OwtAWvL6WosVbA56uNOHzen6wc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz3WyD6GQVAfR/aDc0+YA+qkU0JjNGFymKLa3ifOOV2K9uAKfJ6
-	48jpuCrZKVYe9x/lSc5xjUlhPWDDSedFZytkPWnfPasWBIiBzuFjWG5SbsxvFdHYxEUFxbU0gpY
-	DFGU4azwPkZ7h1w9+jdOpo5PyGAcVOahyQyhzqXdNUnVkn7ahhQ==
-X-Gm-Gg: ASbGncu+1tiW7LHmZ+AIiQZzYC5J2UVV8+tQa6FLlTUycgxoPcGAZghT7mhV1ZUj5jF
-	+FLFD/JK7GeMa7MLyToOWo2ieXyWdza4/fiOph1kbEIacGfSbRI4g+AGJtVxDd6NWOgaEivVe0P
-	R9l8pyyf/aTuCpnc5jRW+zSG52jFcRFrG9xSth4jquxQAOjAi7TsMU4qF9ju0ZpKLJJmBjhpxDy
-	RsaQOaEXzUq7rMpEShYDgx/hewTBLOEDkGwNCclbJaJMiXKa7rO3IkONyg+RssxBNPN9Bjp1aL8
-	iad+2ds=
-X-Received: by 2002:a05:620a:46a3:b0:7c5:3b52:517d with SMTP id af79cd13be357-7c5a84d9048mr821830085a.54.1742424400709;
-        Wed, 19 Mar 2025 15:46:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFHVqyT+WlTFMbuzlij17W/8zZbsASQKuVXERgdl8uzrUKPSgGPykK/7AJobATtMc4xtw1MMQ==
-X-Received: by 2002:a05:620a:46a3:b0:7c5:3b52:517d with SMTP id af79cd13be357-7c5a84d9048mr821825685a.54.1742424400401;
-        Wed, 19 Mar 2025 15:46:40 -0700 (PDT)
-Received: from x1.local ([85.131.185.92])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c573d6fbbasm920353785a.78.2025.03.19.15.46.38
+        d=1e100.net; s=20230601; t=1742424594; x=1743029394;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pcULRLq0h/6Rw82rbFxYL3W3UEU4Ef8C8Kke2Ri6KhA=;
+        b=nqH7tmPk81ee6FG42YrzPsNrmLV5dHloUxIRb5z9hSG8d8pwFuExmBxLqscyCdJ4HS
+         3GoRgn/TRcYPX+X5wU70RsVLVRjhT8tvphwjg2ogyS9FgCuMm8wKLxl3aKvi2hDQ+Hzg
+         mMaTvAPWxFO2RFLlQ3P1XqLJOE+624zu/Rnv2HVCw6yOGniobS6lKA1lvjr3dfXVcaBn
+         VC2jfcP7eMAEgtlD0H+rGAyfws29eQ+NCZazOHpbMuhg2ImItPOueSphXFeRI+WkjC6o
+         vxdMxBBT2hgtC9j9+cgDMdJ9EdlWnWpmXBXqf3VGxusXFpCI3dslv8J7o0ZUv/6OpL5T
+         7sxQ==
+X-Gm-Message-State: AOJu0YwfY1cHRGYdaITQxNuNm4f0vsNHewDIYy1RX0H0CZsM7mM3K0/0
+	1gvtGHkY8Q/VbV/foXXWFGzgnmpYS0j8gLW7yurRa1N6tpTfmrhcfggUbjAgXrWmRZEaq6s0YdZ
+	+Yd2ze8X1lPbeap9S8t/MpIc5NpaMXYZVAG5lOdm+L3SLegHcLg==
+X-Gm-Gg: ASbGncup3lZ6oWUJvNJd3H7ngRq7CGjAAx9GdA3Do9JfL5KMudPBm10iFE1VvRzpnfn
+	/r6Gbsal5IbOvUODttKSXgYPDKSeXCxiWlRxjqmG4aXPBbln08e0bm5A0snCHRAt4QeFf0qwA0g
+	VXBibYlAhD6VJsEvp5SvsuJVJaoZ5teTeYDxahilfaDaO0IYIAivSVPAeRCy9zC0pw+6uB19evg
+	DK5cLaISlMycgLpb2zYy3H1HpkOUaiDbaGRKFeVp2IHrLSPNwhRc9/uWRq3/hv3+CkWeHuW/go1
+	9THWRO/letcjfag=
+X-Received: by 2002:a05:6214:2404:b0:6ea:d69c:a247 with SMTP id 6a1803df08f44-6eb2926b1a5mr89245136d6.4.1742424594435;
+        Wed, 19 Mar 2025 15:49:54 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEYwumfJhgcIfUQ2Qhve0p1Wq69ZGlgHwoTjJBdbbbfJKxqvi4R/lzcTuY2uFhZaiTMWx/OXA==
+X-Received: by 2002:a05:6214:2404:b0:6ea:d69c:a247 with SMTP id 6a1803df08f44-6eb2926b1a5mr89244856d6.4.1742424594103;
+        Wed, 19 Mar 2025 15:49:54 -0700 (PDT)
+Received: from starship ([2607:fea8:fc01:8d8d:6adb:55ff:feaa:b156])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6eade334639sm85327636d6.90.2025.03.19.15.49.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Mar 2025 15:46:39 -0700 (PDT)
-Date: Wed, 19 Mar 2025 18:46:35 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Keith Busch <kbusch@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	Gavin Shan <gshan@redhat.com>,
-	Catalin Marinas <catalin.marinas@arm.com>, x86@kernel.org,
-	Ingo Molnar <mingo@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Alistair Popple <apopple@nvidia.com>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Sean Christopherson <seanjc@google.com>,
-	Oscar Salvador <osalvador@suse.de>,
-	Jason Gunthorpe <jgg@nvidia.com>, Borislav Petkov <bp@alien8.de>,
-	Zi Yan <ziy@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>,
-	David Hildenbrand <david@redhat.com>,
-	Yan Zhao <yan.y.zhao@intel.com>, Will Deacon <will@kernel.org>,
-	Kefeng Wang <wangkefeng.wang@huawei.com>,
-	Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH v2 18/19] mm/arm64: Support large pfn mappings
-Message-ID: <Z9tJMsJ4PzZk2ZQS@x1.local>
-References: <20240826204353.2228736-1-peterx@redhat.com>
- <20240826204353.2228736-19-peterx@redhat.com>
- <Z9tDjOk-JdV_fCY4@kbusch-mbp.dhcp.thefacebook.com>
+        Wed, 19 Mar 2025 15:49:53 -0700 (PDT)
+Message-ID: <9687cbc0b80932fce13fa42a0f3982bd834af926.camel@redhat.com>
+Subject: Re: Lockdep failure due to 'wierd' per-cpu wakeup_vcpus_on_cpu_lock
+ lock
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Yan Zhao
+	 <yan.y.zhao@intel.com>, James Houghton <jthoughton@google.com>
+Date: Wed, 19 Mar 2025 18:49:52 -0400
+In-Reply-To: <Z9ruIETbibTgPvue@google.com>
+References: <e61d23ddc87cb45063637e0e5375cc4e09db18cd.camel@redhat.com>
+	 <Z9ruIETbibTgPvue@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Z9tDjOk-JdV_fCY4@kbusch-mbp.dhcp.thefacebook.com>
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 19, 2025 at 04:22:04PM -0600, Keith Busch wrote:
-> On Mon, Aug 26, 2024 at 04:43:52PM -0400, Peter Xu wrote:
-> > +#ifdef CONFIG_ARCH_SUPPORTS_PUD_PFNMAP
-> > +#define pud_special(pte)	pte_special(pud_pte(pud))
-> > +#define pud_mkspecial(pte)	pte_pud(pte_mkspecial(pud_pte(pud)))
-> > +#endif
+On Wed, 2025-03-19 at 09:17 -0700, Sean Christopherson wrote:
+> +James and Yan
 > 
-> Sorry for such a late reply, but this looked a bit weird as I'm doing
-> some backporting. Not that I'm actually interested in this arch, so I
-> can't readily test this, but I believe the intention was to name the
-> macro argument "pud", not "pte".
+> On Tue, Mar 18, 2025, Maxim Levitsky wrote:
+> > Hi!
+> > 
+> > I recently came up with an interesting failure in the CI pipeline.
+> > 
+> > 
+> > [  592.704446] WARNING: possible circular locking dependency detected 
+> > [  592.710625] 6.12.0-36.el10.x86_64+debug #1 Not tainted 
+> > [  592.715764] ------------------------------------------------------ 
+> > [  592.721946] swapper/19/0 is trying to acquire lock: 
+> > [  592.726823] ff110001b0e64ec0 (&p->pi_lock)\{-.-.}-\{2:2}, at: try_to_wake_up+0xa7/0x15c0 
+> > [  592.734761]  
+> > [  592.734761] but task is already holding lock: 
+> > [  592.740596] ff1100079ec0c058 (&per_cpu(wakeup_vcpus_on_cpu_lock, cpu))\{-...}-\{2:2}, at: pi_wakeup_handler+0x60/0x130 [kvm_intel] 
+> > [  592.752185]  
+> > [  592.752185] which lock already depends on the new lock. 
+> 
+> ...
+> 
+> > As far as I see, there is no race, but lockdep doesn't understand this.
+> 
+> Yep :-(
+> 
+> This splat fires every time (literally) I run through my battery of tests on
+> systems with IPI virtualization, it's basically an old friend at this point.
+> 
+> > It thinks that:
+> > 
+> > 1. pi_enable_wakeup_handler is called from schedule() which holds rq->lock, and it itself takes wakeup_vcpus_on_cpu_lock lock
+> > 
+> > 2. pi_wakeup_handler takes wakeup_vcpus_on_cpu_lock and then calls try_to_wake_up which can eventually take rq->lock
+> > (at the start of the function there is a list of cases when it takes it)
+> > 
+> > I don't know lockdep well yet, but maybe a lockdep annotation will help, 
+> > if we can tell it that there are multiple 'wakeup_vcpus_on_cpu_lock' locks.
+> 
+> Yan posted a patch to fudge around the issue[*], I strongly objected (and still
+> object) to making a functional and confusing code change to fudge around a lockdep
+> false positive.
+> 
+> James has also looked at the issue, and wasn't able to find a way to cleanly tell
+> lockdep about the situation.
+> 
+> Looking at this (yet) again, what if we temporarily tell lockdep that
+> wakeup_vcpus_on_cpu_lock isn't held when calling kvm_vcpu_wake_up()?  Gross, but
+> more surgical than disabling lockdep entirely on the lock.  This appears to squash
+> the warning without any unwanted side effects.
+> 
+> diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
+> index ec08fa3caf43..5984ad6f6f21 100644
+> --- a/arch/x86/kvm/vmx/posted_intr.c
+> +++ b/arch/x86/kvm/vmx/posted_intr.c
+> @@ -224,9 +224,17 @@ void pi_wakeup_handler(void)
+>  
+>         raw_spin_lock(spinlock);
+>         list_for_each_entry(vmx, wakeup_list, pi_wakeup_list) {
+> -
+> +               /*
+> +                * Temporarily lie to lockdep to avoid false positives due to
+> +                * lockdep not understanding that deadlock is impossible.  This
+> +                * is called only in IRQ context, and the problematic locks
+> +                * taken in the kvm_vcpu_wake_up() call chain are only acquired
+> +                * with IRQs disabled.
+> +                */
+> +               spin_release(&spinlock->dep_map, _RET_IP_);
+>                 if (pi_test_on(&vmx->pi_desc))
+>                         kvm_vcpu_wake_up(&vmx->vcpu);
+> +               spin_acquire(&spinlock->dep_map, 0, 0, _RET_IP_);
+>         }
+>         raw_spin_unlock(spinlock);
+>  }
+> 
+> [*] https://lore.kernel.org/all/20230313111022.13793-1-yan.y.zhao@intel.com
+> 
 
-Probably no way to test it from anyone yet, as I don't see aarch64 selects
-HAVE_ARCH_TRANSPARENT_HUGEPAGE_PUD, which means IIUC this two lines (before
-PUD being enabled on aarch64) won't be compiled.. which also matches with
-the test results in the cover letter, that we only tried pmd on arm.
+This is a good idea.
 
-The patch will still be needed though for pmd to work.
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
-I can draft a patch to change this, but considering arm's PUD support isn't
-there anyway.. maybe I should instead draft a change to remove these as
-they're dead code so far, and see if anyone would like to collect it.
+Best regards,
+	Maxim Levitsky
 
-Thanks for reporting this.  I'll prepare something soon and keep you
-posted.
-
--- 
-Peter Xu
 
 
