@@ -1,76 +1,100 @@
-Return-Path: <kvm+bounces-41515-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41516-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9149A6985D
-	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 19:48:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F8C2A6988C
+	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 20:01:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0EF619C3465
-	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 18:48:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6412519C5154
+	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 19:01:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3774B212FA0;
-	Wed, 19 Mar 2025 18:47:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20FD3213E79;
+	Wed, 19 Mar 2025 19:00:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xaQi4Ef4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dvp2WXO0"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F387C21146D;
-	Wed, 19 Mar 2025 18:47:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED7620C48E;
+	Wed, 19 Mar 2025 19:00:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742410076; cv=none; b=KcJX3Md+RLqmsTqsEN+3KHaPOmKDKfaZo+hyoh++4x1W6ScQvuftPY8pMX0ib6r9KlKDz+KKACAXOOQFlQXjig9WNin4cS4/+e62Gycnm9JJqESd51QL/BSHpMyDVzZkNWBcVN8f8vmU31IVSzDogsYbbT/DNpv/d5eHLcn9i5w=
+	t=1742410854; cv=none; b=ErIAnC3LS0zzata/qGXz88/+U1jN9YZ/4IOBiOzgNRBHUxu9UpzA/Fy27OpsQ+5gKIUpKDOGmU/sTnWL/0qYWtJzh1A7NLIAe4cFTEfDCsLHLWVr0AE3t2neJkibts8xZPvXqmSvw/JmKhllyMFoH54+FmUZ4+Za/m4jeWlhFIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742410076; c=relaxed/simple;
-	bh=Z67lfJxfXOSQRQn2QgIM7XZlMuhz0KwFLbCo1PIaWSw=;
+	s=arc-20240116; t=1742410854; c=relaxed/simple;
+	bh=bQ81Fc55GF5vLNCh1KjcH+C7ekGu0HyxorM23JbvqCw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=epwxGcHsOZI8YdYLKE/WHNcxOcE+2wVYNOlzuGRDTMXaMX24RDU4bVVL2RhuJ2YYLLj24e6di7zrODAHPfeJZg4edpdWMjHDXgRRsHbV1WREEeQ/Axfvg78u5HgJcnFidrfznr6km2q6xf4KeuxYcmsJ2aBog9ReOWWn8j/W1WE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xaQi4Ef4; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 19 Mar 2025 18:47:31 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742410061;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zqyBVaYb9ts4lSaXiElKMyansdaMcGaJGQGVhzkplWo=;
-	b=xaQi4Ef4746B+A1AJBeekKoem5X9BsU2Zv43rk34K1b57B9N/UUB0WB7+ebMMyAm4dfIwQ
-	po8r8m5IqUgNRKUb/IkSMFPDZP7ikmojvJbVFmFRwuujjWoxhQaSwuSjM3plvtnggGTY0s
-	MOiuRmYvVaZE3dOZtPg1/9XMdLYCzcU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Brendan Jackman <jackmanb@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org,
-	linux-kernel@vger.kernel.org, linux-alpha@vger.kernel.org,
-	linux-snps-arc@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-csky@vger.kernel.org,
-	linux-hexagon@vger.kernel.org, loongarch@lists.linux.dev,
-	linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
-	linux-openrisc@vger.kernel.org, linux-parisc@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
-	sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-trace-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org, kvm@vger.kernel.org,
-	linux-efi@vger.kernel.org, Junaid Shahid <junaids@google.com>
-Subject: Re: [PATCH RFC v2 04/29] mm: asi: Add infrastructure for boot-time
- enablement
-Message-ID: <Z9sRQ0cK0rupEiT-@google.com>
-References: <20250110-asi-rfc-v2-v2-0-8419288bc805@google.com>
- <20250110-asi-rfc-v2-v2-4-8419288bc805@google.com>
- <20250319172935.GMZ9r-_zzXhyhHBLfj@fat_crate.local>
+	 Content-Type:Content-Disposition:In-Reply-To; b=RughQXQD9zsIDrysJJWs/kI3B1jcTcCITlEXQELSniJzt+Gvsm7Z/wk8RGgEGikbGPPJacLkg3aainXlio9sOV6bPAugctvXWqtII76xOjh/21chCW0ZlXOVM6QodvwpKxTgPtEzihM8X3DODnrKkfMsxF1MPF9WxQ2robCwHVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dvp2WXO0; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-3012a0c8496so6314376a91.2;
+        Wed, 19 Mar 2025 12:00:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742410852; x=1743015652; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=biXjJdX1FFK2ilJDVmzGFQ2LcLuqE/zLttPI8Z+C5Dc=;
+        b=Dvp2WXO0pOBKXaMk9/jCrA50w8ja6VjmXoJgSpKe9lN2D3fk7wJleg19N8qbaAaKEP
+         EHRguW1Qb1HneGa7yf9HqLi5b14+oKcrOucLyDKb819/rWk8UGhqGexclMsRn5l/ORLy
+         ONNeaWgqc74OmvhlkASN1vXcGhCfwuYxKwmiCTUh7dUoimQsqjEF7SPZQLHNzf+iGYwh
+         qPAgPBKORu4y+8fOoPKxwenwF8pwyxWtWWxrikG/ICHUht6wEGhajsZkjrzDMbcuUpcP
+         kJRtTp1pdw7sknF57hLMEL2K5ivlRD1+egoGdE5KUMF1C+iR4Ls9XccHy03xW96xbfAp
+         udEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742410852; x=1743015652;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=biXjJdX1FFK2ilJDVmzGFQ2LcLuqE/zLttPI8Z+C5Dc=;
+        b=Jd0BCy3uIih5HH9v+A3Nj0TmsTao2vB1nQ5dmmQbaojyVjIEWcPByK/mKlNHbJtNVT
+         v553VMg337liwR1uGbtvwypqkMJj6k0j6IdSxw+cJ1dyX1ymjl5wvbnaZ0y3Z53Pv7qY
+         k7V3LrwPshSIYUgPX5VduoCPhDMXZC2MNQsJ9FkcCKUWRMWZ7AQcw38T7Z5t4P0m7ZIL
+         ud1hXpW+hroTFpxWjWshSoGXkZ+PUnL2War7LJg8ZJGIblxGs2bsuTkdUEwsyfOyZzA4
+         0s4SEtKSA8T7bBchGlKNVaqn/0gp92eCcCnJqLueQwC01M+dnl1gIqQdmIYL7OQtI0+y
+         eSpw==
+X-Forwarded-Encrypted: i=1; AJvYcCUirSapKaIv5p3gHYyl+ADOCeccwVXOxqng/lOvQVYtpufuHfafQXO9uPySxci46zYCxhs=@vger.kernel.org, AJvYcCWa2HSddg3NH7/Aj35O9c8w4LdRqv8dCQ7mkG3TUF597lzEMqZfB/1xBdLhdbWAJVT+4YxCygoOjqgmWB0s@vger.kernel.org, AJvYcCWsbRRCvaci5U93FKWFBxqpnR23E6LpeG50r8ojSN/QwnmgVlqa0V4g2u9CjIi/oUnfiA5UxmMY5e6hwK6r@vger.kernel.org, AJvYcCWub422hB/9HLONkUCKnQ6XsnoQmgYzvch77iXjTjmeqGXUyH2Wpu1AYrQGkH5QDvSM2gTbbdIp@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjOBiHxA149bKHxx/uzUD7OjGwyQMLj8u/BR0m6tFRhpMWhoAJ
+	fAofJ2DT/i+YhdJGUQn8Y4208TLQmP/UGQ4v06RCFRRhLoC+804S
+X-Gm-Gg: ASbGncuU+6bH1QOAC+ixtY1IbJ8HwbEmk8WYksDOlpX4bzE/Q2/aFsSr2UaqFboPIKr
+	OSKIKrVzh8H8cUVxqNPQC55GW7d9AG6SK0byRXLNlJvVbKZ073DDIP+z9XBj2Qc7kSC5ypYEDEJ
+	77yS1e0EwRu9Oq5H/9sJheeHoTpGv/DWzUsikWLoFTCj6JZhMsbfeQuQYPlNc58ZqktPQFpvqD5
+	IBqK2XAXjvzrqgCZJwNxMPqGgIHePgTvtTSlegfmeHZP3bpV6REjlAFVxHaKjrfjYm7scswWi8v
+	dKwQcc8b4LbQv71P6GvTa2EwWlJk+eahrltrUvqvA0McKwVM4isAARn0BcKEoEIbIA==
+X-Google-Smtp-Source: AGHT+IExM0pI9/JU5Crfnd4d50aC7MIsk6BLw9VYIOpGl+RqOsh+7wpYyCT51g4e/BejE8WXLNDy4g==
+X-Received: by 2002:a17:90b:3c0f:b0:301:1d03:93cd with SMTP id 98e67ed59e1d1-301be201d9dmr6662434a91.24.1742410851540;
+        Wed, 19 Mar 2025 12:00:51 -0700 (PDT)
+Received: from devvm6277.cco0.facebook.com ([2a03:2880:2ff:1::])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-301bf589fbcsm2030123a91.12.2025.03.19.12.00.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Mar 2025 12:00:50 -0700 (PDT)
+Date: Wed, 19 Mar 2025 12:00:38 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v2 1/3] vsock: add network namespace support
+Message-ID: <Z9sUVs1Tq3SN83MQ@devvm6277.cco0.facebook.com>
+References: <20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com>
+ <20250312-vsock-netns-v2-1-84bffa1aa97a@gmail.com>
+ <sqvqvlovlxpfo2tlkazugkocwmlhc7iay2kvq7b75bgwk7vhfw@tvgfe5fj3mw6>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -79,135 +103,271 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250319172935.GMZ9r-_zzXhyhHBLfj@fat_crate.local>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <sqvqvlovlxpfo2tlkazugkocwmlhc7iay2kvq7b75bgwk7vhfw@tvgfe5fj3mw6>
 
-On Wed, Mar 19, 2025 at 06:29:35PM +0100, Borislav Petkov wrote:
-> On Fri, Jan 10, 2025 at 06:40:30PM +0000, Brendan Jackman wrote:
-> > Add a boot time parameter to control the newly added X86_FEATURE_ASI.
-> > "asi=on" or "asi=off" can be used in the kernel command line to enable
-> > or disable ASI at boot time. If not specified, ASI enablement depends
-> > on CONFIG_ADDRESS_SPACE_ISOLATION_DEFAULT_ON, which is off by default.
+On Wed, Mar 19, 2025 at 02:02:32PM +0100, Stefano Garzarella wrote:
+> On Wed, Mar 12, 2025 at 01:59:35PM -0700, Bobby Eshleman wrote:
+> > From: Stefano Garzarella <sgarzare@redhat.com>
+> > 
+> > This patch adds a check of the "net" assigned to a socket during
+> > the vsock_find_bound_socket() and vsock_find_connected_socket()
+> > to support network namespace, allowing to share the same address
+> > (cid, port) across different network namespaces.
+> > 
+> > This patch preserves old behavior, and does not yet bring up namespace
+> > support fully.
+> > 
+> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 > 
-> I don't know yet why we need this default-on thing...
-
-It's a convenience to avoid needing to set asi=on if you want ASI to be
-on by default. It's similar to HUGETLB_PAGE_OPTIMIZE_VMEMMAP_DEFAULT_ON
-or ZSWAP_DEFAULT_ON.
-
-[..]
-> > @@ -175,7 +184,11 @@ static __always_inline bool asi_is_restricted(void)
-> >  	return (bool)asi_get_current();
-> >  }
-> >  
-> > -/* If we exit/have exited, can we stay that way until the next asi_enter? */
-> > +/*
-> > + * If we exit/have exited, can we stay that way until the next asi_enter?
+> I'd describe here a bit the new behaviour related to `fallback` that you
+> developed.
 > 
-> What is that supposed to mean here?
+> Or we can split this patch in two patches, one with my changes without
+> fallback, and another with fallback as you as author.
+> 
+> WDYT?
+> 
 
-asi_is_relaxed() checks if the thread is outside an ASI critical
-section.
-
-I say "the thread" because it will also return true if we are executing
-an interrupt that arrived during the critical section, even though the
-interrupt handler is not technically part of the critical section.
-
-Now the reason it says "if we exit we stay that way" is probably
-referring to the fact that an asi_exit() when interrupting a critical
-section will be undone in the interrupt epilogue by re-entering ASI.
-
-I agree the wording here is confusing. We should probably describe this
-more explicitly and probably rename the function after the API
-discussions you had in the previous patch.
+I like the idea of splitting it, that way any unforeseen issues in the
+new logic can be isolated to the one patch.
 
 > 
-> > + *
-> > + * When ASI is disabled, this returns true.
-> > + */
-> >  static __always_inline bool asi_is_relaxed(void)
-> >  {
-> >  	return !asi_get_target(current);
-[..]
-> > @@ -66,10 +73,36 @@ const char *asi_class_name(enum asi_class_id class_id)
-> >  	return asi_class_names[class_id];
-> >  }
-> >  
-> > +void __init asi_check_boottime_disable(void)
-> > +{
-> > +	bool enabled = IS_ENABLED(CONFIG_MITIGATION_ADDRESS_SPACE_ISOLATION_DEFAULT_ON);
-> > +	char arg[4];
-> > +	int ret;
+> > Signed-off-by: Bobby Eshleman <bobbyeshleman@gmail.com>
+> > ---
+> > v1 -> v2:
+> > * remove 'netns' module param
+> > * remove vsock_net_eq()
+> > * use vsock_global_net() for "global" namespace
+> > * use fallback logic in socket lookup functions, giving precedence to
+> >  non-global vsock namespaces
+> > 
+> > RFC -> v1
+> > * added 'netns' module param
+> > * added 'vsock_net_eq()' to check the "net" assigned to a socket
+> >  only when 'netns' support is enabled
+> > ---
+> > include/net/af_vsock.h                  |  7 +++--
+> > net/vmw_vsock/af_vsock.c                | 55 ++++++++++++++++++++++++---------
+> > net/vmw_vsock/hyperv_transport.c        |  2 +-
+> > net/vmw_vsock/virtio_transport_common.c |  5 +--
+> > net/vmw_vsock/vmci_transport.c          |  4 +--
+> > 5 files changed, 51 insertions(+), 22 deletions(-)
+> > 
+> > diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+> > index 9e85424c834353d016a527070dd62e15ff3bfce1..41afbc18648c953da27a93571d408de968aa7668 100644
+> > --- a/include/net/af_vsock.h
+> > +++ b/include/net/af_vsock.h
+> > @@ -213,9 +213,10 @@ void vsock_enqueue_accept(struct sock *listener, struct sock *connected);
+> > void vsock_insert_connected(struct vsock_sock *vsk);
+> > void vsock_remove_bound(struct vsock_sock *vsk);
+> > void vsock_remove_connected(struct vsock_sock *vsk);
+> > -struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr);
+> > +struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr, struct net *net);
+> > struct sock *vsock_find_connected_socket(struct sockaddr_vm *src,
+> > -					 struct sockaddr_vm *dst);
+> > +					 struct sockaddr_vm *dst,
+> > +					 struct net *net);
+> > void vsock_remove_sock(struct vsock_sock *vsk);
+> > void vsock_for_each_connected_socket(struct vsock_transport *transport,
+> > 				     void (*fn)(struct sock *sk));
+> > @@ -255,4 +256,6 @@ static inline bool vsock_msgzerocopy_allow(const struct vsock_transport *t)
+> > {
+> > 	return t->msgzerocopy_allow && t->msgzerocopy_allow();
+> > }
 > > +
-> > +	ret = cmdline_find_option(boot_command_line, "asi", arg, sizeof(arg));
-> > +	if (ret == 3 && !strncmp(arg, "off", 3)) {
-> > +		enabled = false;
-> > +		pr_info("ASI disabled through kernel command line.\n");
-> > +	} else if (ret == 2 && !strncmp(arg, "on", 2)) {
-> > +		enabled = true;
-> > +		pr_info("Ignoring asi=on param while ASI implementation is incomplete.\n");
-> > +	} else {
-> > +		pr_info("ASI %s by default.\n",
-> > +			enabled ? "enabled" : "disabled");
-> > +	}
-> > +
-> > +	if (enabled)
-> > +		pr_info("ASI enablement ignored due to incomplete implementation.\n");
+> > +struct net *vsock_global_net(void);
 > 
-> Incomplete how?
-
-This is referring to the fact that ASI is still not fully/correctly
-functional, but it will be after the following patches.
-
-I think it will be clearer if we just add the feature flag here so that
-we have something to check for in the following patches, but add the
-infrastructure for boot-time enablement at the end of the series when
-the impelemntation is complete.
-
-Basically start by a feature flag that has no way of being enabled, use
-it in the implmentation, then add means of enabling it.
-
+> If it just returns null, maybe we can make it inline here.
 > 
+
+Roger that.
+
+> > #endif /* __AF_VSOCK_H__ */
+> > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> > index 7e3db87ae4333cf63327ec105ca99253569bb9fe..d206489bf0a81cf989387c7c8063be91a7c21a7d 100644
+> > --- a/net/vmw_vsock/af_vsock.c
+> > +++ b/net/vmw_vsock/af_vsock.c
+> > @@ -235,37 +235,60 @@ static void __vsock_remove_connected(struct vsock_sock *vsk)
+> > 	sock_put(&vsk->sk);
+> > }
+> > 
+> > -static struct sock *__vsock_find_bound_socket(struct sockaddr_vm *addr)
+> > +struct net *vsock_global_net(void)
+> > {
+> > +	return NULL;
 > > +}
+> > +EXPORT_SYMBOL_GPL(vsock_global_net);
 > > +
-> >  static void __asi_destroy(struct asi *asi)
-> >  {
-> > -	lockdep_assert_held(&asi->mm->asi_init_lock);
-> > +	WARN_ON_ONCE(asi->ref_count <= 0);
-> > +	if (--(asi->ref_count) > 0)
+> > +static struct sock *__vsock_find_bound_socket(struct sockaddr_vm *addr,
+> > +					      struct net *net)
+> > +{
 > 
-> Switch that to
+> Please add a comment here to describe what fallback is used for.
+> And I would suggest also something on top of this file to explain a bit
+> how netns are handled in AF_VSOCK.
 > 
-> include/linux/kref.h
-> 
-> It gives you a sanity-checking functionality too so you don't need the WARN...
 
-I think we hve internal changes that completely get rid of this
-ref_count and simplifies the lifetime handling that we can squash here.
-We basically keep ASI objects around until the process is torn down,
-which makes this simpler and avoids the need for complex synchronization
-when we try to context switch or run userspace without exiting ASI
-(spoiler alert :) ).
+sgtm!
 
+> > +	struct sock *fallback = NULL;
+> > 	struct vsock_sock *vsk;
+> > 
+> > 	list_for_each_entry(vsk, vsock_bound_sockets(addr), bound_table) {
+> > -		if (vsock_addr_equals_addr(addr, &vsk->local_addr))
+> > -			return sk_vsock(vsk);
+> > +		if (vsock_addr_equals_addr(addr, &vsk->local_addr)) {
+> > +			if (net_eq(net, sock_net(sk_vsock(vsk))))
+> > +				return sk_vsock(vsk);
+> > 
+> > +			if (net_eq(net, vsock_global_net()))
+> > +				fallback = sk_vsock(vsk);
+> > +		}
+> > 		if (addr->svm_port == vsk->local_addr.svm_port &&
+> > 		    (vsk->local_addr.svm_cid == VMADDR_CID_ANY ||
+> > -		     addr->svm_cid == VMADDR_CID_ANY))
+> > -			return sk_vsock(vsk);
+> > +		     addr->svm_cid == VMADDR_CID_ANY)) {
+> > +			if (net_eq(net, sock_net(sk_vsock(vsk))))
+> > +				return sk_vsock(vsk);
+> > +
+> > +			if (net_eq(net, vsock_global_net()))
+> > +				fallback = sk_vsock(vsk);
+> > +		}
+> > 	}
+> > 
+> > -	return NULL;
+> > +	return fallback;
+> > }
+> > 
+> > static struct sock *__vsock_find_connected_socket(struct sockaddr_vm *src,
+> > -						  struct sockaddr_vm *dst)
+> > +						  struct sockaddr_vm *dst,
+> > +						  struct net *net)
+> > {
+> > +	struct sock *fallback = NULL;
+> > 	struct vsock_sock *vsk;
+> > 
+> > 	list_for_each_entry(vsk, vsock_connected_sockets(src, dst),
+> > 			    connected_table) {
+> > 		if (vsock_addr_equals_addr(src, &vsk->remote_addr) &&
+> > 		    dst->svm_port == vsk->local_addr.svm_port) {
+> > -			return sk_vsock(vsk);
+> > +			if (net_eq(net, sock_net(sk_vsock(vsk))))
+> > +				return sk_vsock(vsk);
+> > +
+> > +			if (net_eq(net, vsock_global_net()))
+> > +				fallback = sk_vsock(vsk);
 > 
-> > +		return;
-> >  
-> > +	free_pages((ulong)asi->pgd, PGD_ALLOCATION_ORDER);
-> > +	memset(asi, 0, sizeof(struct asi));
+> This pattern seems to be repeated 3 times, can we make a function/macro?
 > 
-> And then you can do:
+
+yep, no problem!
+
+> > 		}
+> > 	}
+> > 
+> > -	return NULL;
+> > +	return fallback;
+> > }
+> > 
+> > static void vsock_insert_unbound(struct vsock_sock *vsk)
+> > @@ -304,12 +327,12 @@ void vsock_remove_connected(struct vsock_sock *vsk)
+> > }
+> > EXPORT_SYMBOL_GPL(vsock_remove_connected);
+> > 
+> > -struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr)
+> > +struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr, struct net *net)
+> > {
+> > 	struct sock *sk;
+> > 
+> > 	spin_lock_bh(&vsock_table_lock);
+> > -	sk = __vsock_find_bound_socket(addr);
+> > +	sk = __vsock_find_bound_socket(addr, net);
+> > 	if (sk)
+> > 		sock_hold(sk);
+> > 
+> > @@ -320,12 +343,13 @@ struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr)
+> > EXPORT_SYMBOL_GPL(vsock_find_bound_socket);
+> > 
+> > struct sock *vsock_find_connected_socket(struct sockaddr_vm *src,
+> > -					 struct sockaddr_vm *dst)
+> > +					 struct sockaddr_vm *dst,
+> > +					 struct net *net)
+> > {
+> > 	struct sock *sk;
+> > 
+> > 	spin_lock_bh(&vsock_table_lock);
+> > -	sk = __vsock_find_connected_socket(src, dst);
+> > +	sk = __vsock_find_connected_socket(src, dst, net);
+> > 	if (sk)
+> > 		sock_hold(sk);
+> > 
+> > @@ -644,6 +668,7 @@ static int __vsock_bind_connectible(struct vsock_sock *vsk,
+> > {
+> > 	static u32 port;
+> > 	struct sockaddr_vm new_addr;
+> > +	struct net *net = sock_net(sk_vsock(vsk));
+> > 
+> > 	if (!port)
+> > 		port = get_random_u32_above(LAST_RESERVED_PORT);
+> > @@ -660,7 +685,7 @@ static int __vsock_bind_connectible(struct vsock_sock *vsk,
+> > 
+> > 			new_addr.svm_port = port++;
+> > 
+> > -			if (!__vsock_find_bound_socket(&new_addr)) {
+> > +			if (!__vsock_find_bound_socket(&new_addr, net)) {
+> > 				found = true;
+> > 				break;
+> > 			}
+> > @@ -677,7 +702,7 @@ static int __vsock_bind_connectible(struct vsock_sock *vsk,
+> > 			return -EACCES;
+> > 		}
+> > 
+> > -		if (__vsock_find_bound_socket(&new_addr))
+> > +		if (__vsock_find_bound_socket(&new_addr, net))
+> > 			return -EADDRINUSE;
+> > 	}
+> > 
+> > diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
+> > index 31342ab502b4fc35feb812d2c94e0e35ded73771..253609898d24f8a484fcfc3296011c6f501a72a8 100644
+> > --- a/net/vmw_vsock/hyperv_transport.c
+> > +++ b/net/vmw_vsock/hyperv_transport.c
+> > @@ -313,7 +313,7 @@ static void hvs_open_connection(struct vmbus_channel *chan)
+> > 		return;
+> > 
+> > 	hvs_addr_init(&addr, conn_from_host ? if_type : if_instance);
+> > -	sk = vsock_find_bound_socket(&addr);
+> > +	sk = vsock_find_bound_socket(&addr, NULL);
+> > 	if (!sk)
+> > 		return;
+> > 
+> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> > index 7f7de6d8809655fe522749fbbc9025df71f071bd..256d2a4fe482b3cb938a681b6924be69b2065616 100644
+> > --- a/net/vmw_vsock/virtio_transport_common.c
+> > +++ b/net/vmw_vsock/virtio_transport_common.c
+> > @@ -1590,6 +1590,7 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
+> > 			       struct sk_buff *skb)
+> > {
+> > 	struct virtio_vsock_hdr *hdr = virtio_vsock_hdr(skb);
+> > +	struct net *net = vsock_global_net();
 > 
-> 	if (kref_put())
-> 		free_pages...
+> Why using vsock_global_net() in virtio and directly NULL in the others
+> transports?
 > 
-> and so on.
-> 
-> Thx.
-> 
-> -- 
-> Regards/Gruss,
->     Boris.
-> 
-> https://people.kernel.org/tglx/notes-about-netiquette
-> 
+
+This was an oversight on my part, I found an unnamed NULL harder to
+reason about, switched to the func, but forgot to switch over the other
+transports.
+
+BTW, I was unsure about just making NULL a macro (e.g.,
+VIRTIO_VSOCK_GLOBAL_NET?) instead of a function. I just used a function
+because A) I noticed in the prior rev that the default net was a
+function instead of some macro to &init_net, and B) the function seemed
+a little more flexible for future changes. What are your thoughts here?
+
+
+Thanks for the review!
+
+Best,
+Bobby
 
