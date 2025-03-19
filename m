@@ -1,270 +1,181 @@
-Return-Path: <kvm+bounces-41511-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41512-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CE31A69768
-	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 19:04:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE7E6A697CC
+	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 19:16:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 027794811AD
-	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 18:01:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 889C14812F8
+	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 18:15:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18F9A20AF69;
-	Wed, 19 Mar 2025 18:01:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E45521DF747;
+	Wed, 19 Mar 2025 18:13:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ThXiZDXk"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Xofb6H+X"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2075.outbound.protection.outlook.com [40.107.94.75])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F661DFD98
-	for <kvm@vger.kernel.org>; Wed, 19 Mar 2025 18:01:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742407300; cv=none; b=jCsYO1Q3FXnttegpjC1VZW935u+W/po2UwmY80cSf0t3wQV6PS5Mt2l1UKBx49Lcl/4G1ke/6UknpTttdY8QCE/dCQMmvzrR9eos7pXbtevKtKN3/3W4lzsBTrVXQaC1Dvs6bflUDrc/7N7K9nicjvLB4oXPtm+/LAYTqUsYfqY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742407300; c=relaxed/simple;
-	bh=ozrsp8lQbU75KXAdu3yGzkQ4vlD+a7yW9bwEsScQpvM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CQP8KSMxChuW1PsuoxqlGnpl9XtSev5FNaLuar6qRth2nlAbgZyHeOwLHtmGhzk2DxMBUrWJzX7Cq2sXyhPzwsN9gDseTsd+3sIiPOCo2xBcxujX2aj0zb5vxXqjbr06xtyAXbAjmxxlxjg6bGzuFGPpUfHo7nwGkAE+CeU5d7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ThXiZDXk; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 19 Mar 2025 19:01:24 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742407295;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3cPypWvZWL+yCXURrCTAIOf/TsaF6PV1P+aYAM5N5BE=;
-	b=ThXiZDXkqAT7qVn0ArUMnVWq9STNeHk8SlqWGgaW8qY+YwCeGyStzsl0tskCE3irgAF0on
-	d1O1tbtGallmMhI1wey6XjsR5w1q0c6k8VXfvI/cj1Vv0oMLotAGFJG9StoFtg7y6RJjxh
-	4yjFM6CRkrTBmDt1UOR+KADNO++0MiA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	Andrew Jones <ajones@ventanamicro.com>, Anup Patel <apatel@ventanamicro.com>, 
-	Atish Patra <atishp@rivosinc.com>
-Subject: Re: [kvm-unit-tests PATCH v11 0/8] riscv: add SBI SSE extension tests
-Message-ID: <20250319-ff9d4b4904195050638f77f1@orel>
-References: <20250317164655.1120015-1-cleger@rivosinc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 529FA1DC9A7
+	for <kvm@vger.kernel.org>; Wed, 19 Mar 2025 18:12:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.75
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742407981; cv=fail; b=JBJd8OoRHu/n562yyqwo4Q1VHkQAH1fyGfs3mN79PLwWBQzYeKWYLyE8p6lADL2jA8T9HQNKlSZtQZuaQTUheX8Je6KjOXsfLKGYoJZNYyOoSELGx0n06HjYlHX5nHdVDr8Euhtmnaghh29hVB6E4d5pmkrDzfVh+dJUUmc4DCY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742407981; c=relaxed/simple;
+	bh=Oe5qTa3suq2T9nraryxhP4pVFb2lN+LbErByAKQ0YKY=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ck2YuOv6b6kRR/s7SB0IlZcZ+N5DuhaJiN2SVvxdH1S8zezIkIotrHtiBfqBlvak+ku4xrPUKfGd4Lj+XpbDQbm+YjlJ0kX4nO33wZ5UhzfcnBsujxyVR1Ag/6tX3006KskJvMqq8i62Q7FNvjDzoRLJsNno3xbsWy/U1/48z2g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Xofb6H+X; arc=fail smtp.client-ip=40.107.94.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=DR7tmBfmejoWXOR562d4B6J8sbvjUrpguYgXTm48rZSnHYinaMlvI8/hJL9mY2FBqj5kQeHgo/eEgAuXrDZwA0D872sI7Sl3FetV4iww5Nz6PUjAGCfXIyGQviF+jhtmF/jrKquCxkejZE9zKdrrhmIvNnz+EvMClAes25pWjxObH3in0v3hlxpJ08G55G/fEVoFkhoie0XDwAF7dFJrEe3lPBgkE71dHdMQWv+NIkwqgolloqAw3NWJEKjvECRzKCpMU6HA1bNhY4OotYRidaerPG9CaK4mWmbeD4jomPWrByTK0WP7nF0wUvF0d6v6lxJytmth5Y7JlBBweE46vw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WP1jVF1z/l1ThOB4/EN5tVcGr2AV4aLtJ13q1avCGCQ=;
+ b=AD4Kh2hy3QqucLiaoc0BGOMXNLB/R/gdULav3eKpujrergqzp86UwXCStheDlIWvoR44WuHzsA8k7qpXFGqtc35PA2ogRSR4E4WfAqRDR8lJ2bTe4JnujdID/y1qCpEm5U7eBCRunK/Q3KCsIt5+n9dJqdYpWnctpxSOVMrAROOuefgoVZqCHAdZdh1+Z0tlx4qnptbkFSPm4tS7yfh6eXdmqTK3k1rKYvZuCLS5liqVDpXNdIBAJJmUn9jn3hx/QbjoMQm/z9jsM20Cibptui7dPFxH7LEI+0zm5mygXF6r3MpcDVRkEEiHslO8U7gxigXk9bV2jcGMHgwrkceqzw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WP1jVF1z/l1ThOB4/EN5tVcGr2AV4aLtJ13q1avCGCQ=;
+ b=Xofb6H+X7C3/TGawjO1pUdU7kf0Fl79Nkr2uuBpkyQCpMkzp7ixQZiaX/7al06SDI7jLmCBfUT+qcYRJBTna+RIg0MMv/ZYDB4aT3HCkFnfLArJv5SVKAJMeJtsRDWy8ns/RNeaRTCyXYYGtGezQQY3wLIVvjz2a4ssYKonsNBXOufO6VmL2PG+0lErf0MhbCSocZ48rSlTZ2njdIIBkWL6AdJ5n7etTdF2/EbOF/O16DDu3EGCvQEAonbLJMHQchfLX3KJC4m2nSYeWHkOP2TpH2WJz6+N2jaDo5OJ5fQlwFjpvRdhNxzVaei+UWALUAtJ0H3LTCHPExzUrgF2dKA==
+Received: from SJ0PR13CA0123.namprd13.prod.outlook.com (2603:10b6:a03:2c6::8)
+ by SA5PPF7D510B798.namprd12.prod.outlook.com (2603:10b6:80f:fc04::8d0) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.33; Wed, 19 Mar
+ 2025 18:12:57 +0000
+Received: from CO1PEPF000075EE.namprd03.prod.outlook.com
+ (2603:10b6:a03:2c6:cafe::7f) by SJ0PR13CA0123.outlook.office365.com
+ (2603:10b6:a03:2c6::8) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8534.33 via Frontend Transport; Wed,
+ 19 Mar 2025 18:12:55 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CO1PEPF000075EE.mail.protection.outlook.com (10.167.249.37) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8534.20 via Frontend Transport; Wed, 19 Mar 2025 18:12:55 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 19 Mar
+ 2025 11:12:37 -0700
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 19 Mar
+ 2025 11:12:37 -0700
+Received: from Asurada-Nvidia (10.127.8.13) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14 via Frontend
+ Transport; Wed, 19 Mar 2025 11:12:36 -0700
+Date: Wed, 19 Mar 2025 11:12:34 -0700
+From: Nicolin Chen <nicolinc@nvidia.com>
+To: Yi Liu <yi.l.liu@intel.com>
+CC: <alex.williamson@redhat.com>, <kevin.tian@intel.com>, <jgg@nvidia.com>,
+	<eric.auger@redhat.com>, <kvm@vger.kernel.org>,
+	<chao.p.peng@linux.intel.com>, <zhenzhong.duan@intel.com>,
+	<willy@infradead.org>, <zhangfei.gao@linaro.org>, <vasant.hegde@amd.com>
+Subject: Re: [PATCH v8 5/5] iommufd/selftest: Add coverage for reporting
+ max_pasid_log2 via IOMMU_HW_INFO
+Message-ID: <Z9sJEu7Q71f8V4Ju@Asurada-Nvidia>
+References: <20250313124753.185090-1-yi.l.liu@intel.com>
+ <20250313124753.185090-6-yi.l.liu@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250317164655.1120015-1-cleger@rivosinc.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20250313124753.185090-6-yi.l.liu@intel.com>
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000075EE:EE_|SA5PPF7D510B798:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3dd57384-eb0c-460a-4356-08dd6711abe8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|1800799024|7416014|36860700013|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?NLiZXhcoVhcY4veH1cvb6RxOryQZaJMp0uv7izxjhFufnb0/8Mi0c12+Z3Ix?=
+ =?us-ascii?Q?4OMOStHqGha7E1b5+7jjuDq0g1niWQQadRVywqaEtka8Vo6roFKMqdmOyXLf?=
+ =?us-ascii?Q?3qsi5b89fvWh6eGg48Y8cI6F9mqzeFlbJl+cOXI6468eJDjIthqaWeptI8Yh?=
+ =?us-ascii?Q?94S9wMeX83k4L9TSBHUXepjlo6GA4oBp9SwpgOMSI6cqvrvtDOBJqPLN9JZ6?=
+ =?us-ascii?Q?DjAcknsbwwYb3FHUgKuaqm8TQA5Wl1+BHp8kivvJyW5ht+ELZv25pi/mYWV/?=
+ =?us-ascii?Q?cAgLphJB4fU4P3mjG2bR9469GqBexwR20PnMgQEv0VHHylJrzq+TCj75obRI?=
+ =?us-ascii?Q?A3SqO+CTSMWPX7e97O0kittMDPX1xOuHVZ0+zG80B1I8tQ7jgQrhx6qIrTTo?=
+ =?us-ascii?Q?jKj4hbI0fzGYsGue5mEmIZnpg6PN/bkxxkW5J0ch8QPrnVUw6xI0e7MYa/Wj?=
+ =?us-ascii?Q?3sRUJlpI5/w/Dl5WusjY32vmbxmNG2WpdpHyuCecAZDd/cKljmWW9Fnm/nFv?=
+ =?us-ascii?Q?lMzauzkXSxLi9Nrhpyri/y2tLl9lQ2wdIptORQV2bEnIAa/IJohAOsHiXYZC?=
+ =?us-ascii?Q?ltKfUZoXEHWZeYatp05hUMtHoDC0PuBBfKP7hZnCn/nyv7PF4ODVKjSL7vxb?=
+ =?us-ascii?Q?OHZg5doHSVBYBEcmONp8NXmxjfrfh9APLCZeIaLgk8NJNS9ldO5rXI4cCWbC?=
+ =?us-ascii?Q?QMhQWTNWemEcC/3CjjMl9JP/fFCkn1CMU7A24eJT4X4/c/n6rqnfm6gz0LRc?=
+ =?us-ascii?Q?rHSeXsH/kONTcQ80bNjC4YP6o3wXw7GLU4wlF/w5B+IbnQ5JvJk3wbw7ysY8?=
+ =?us-ascii?Q?oRgxPvB3Hr3yHeGzHm7OW5nGAv026sIpmV+PAR7ATgKzgS9TXIAEWbdHu/KR?=
+ =?us-ascii?Q?4hjeNlVF+f6HlcE1a9ALe5EaXxM9FzJV9xKh15uwBn0UrJMWJVtmOqRcwNsS?=
+ =?us-ascii?Q?McvThSwdfi6Dw/+P46QJibN3HC1j3ok/OVVG60ENLWqlyWzeT6wJt7lS84wf?=
+ =?us-ascii?Q?dvHGKTqhwQ8rkUxUzKY4nQVpBup/CwYS2OnMMvGO8bedcGwjT8wLk3k93Qsb?=
+ =?us-ascii?Q?eRF+FcqP6A9wYQQS6uCeF9xP1/YwGcKUuK+5zvNNHXdht7YAKDtvpvXvepJA?=
+ =?us-ascii?Q?u7tmch+P/up8wPdy1mQiMlmou1QSOnLFUPXi3cKfNKGQM95jNZtxn5u9Gesl?=
+ =?us-ascii?Q?e8i635cjGBwhIGBe94bhS9ZfbDbPGUcl3DbJvB8VM9Uw+/VQHng/ryiGK/HP?=
+ =?us-ascii?Q?G6rA/WcQvEa3nKaDSd8tVujO5oDmnj6cEzFVarZZvJa8iO7GLVnYNL4k0/rH?=
+ =?us-ascii?Q?nuY86Gxfl4gQrc0D2SZGyXkPknsYaD3vGGwjBRxIt7pkIIGVvCanOZWWbNIC?=
+ =?us-ascii?Q?A5dSVoDWqGUSWF7O4041+08NDhPW0UcpJOE++vs7K49UQ6QIghR3OqqQ1VNu?=
+ =?us-ascii?Q?oEQFodHs9hEg2BDasKhucdGZ2qfaaPItmkLbkLHF4znnWMoPdsMH0Frc5VET?=
+ =?us-ascii?Q?KH7n9DfAY5prsHA=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(7416014)(36860700013)(7053199007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2025 18:12:55.1301
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3dd57384-eb0c-460a-4356-08dd6711abe8
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000075EE.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA5PPF7D510B798
 
-Hi Clément,
+On Thu, Mar 13, 2025 at 05:47:53AM -0700, Yi Liu wrote:
+> IOMMU_HW_INFO is extended to report max_pasid_log2, hence add coverage
+> for it.
+> 
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 
-I'd like to merge this, but we still have 50 failures with the latest
-opensbi and over 30 with the opensbi QEMU provides. Testing with [1]
-and bumping the timeout to 6000 allowed me to avoid failures, however
-we can't count on that for CI.
+Reviewed-by: Nicolin Chen <nicolinc@nvidia.com>
 
-[1] https://lists.infradead.org/pipermail/opensbi/2025-March/008190.html
+Two nits:
 
-I'm thinking about just doing the following. What do you think?
+> @@ -342,12 +342,14 @@ FIXTURE(iommufd_ioas)
+>  	uint32_t hwpt_id;
+>  	uint32_t device_id;
+>  	uint64_t base_iova;
+> +	uint32_t pasid_device_id;
 
-Thanks,
-drew
+Maybe "device_pasid_id", matching with "MOCK_FLAGS_DEVICE_PASID"?
 
-diff --git a/riscv/sbi-sse.c b/riscv/sbi-sse.c
-index a31c84c32303..fb4ee7dd44b2 100644
---- a/riscv/sbi-sse.c
-+++ b/riscv/sbi-sse.c
-@@ -1217,7 +1217,6 @@ void check_sse(void)
- {
-        struct sse_event_info *info;
-        unsigned long i, event_id;
--       bool sbi_skip_inject = false;
-        bool supported;
+> +		if (variant->pasid_capable) {
+> +			test_cmd_get_hw_info_pasid(self->pasid_device_id,
+> +						   &max_pasid);
+> +			ASSERT_EQ(20, max_pasid);
 
-        report_prefix_push("sse");
-@@ -1228,6 +1227,13 @@ void check_sse(void)
-                return;
-        }
+Maybe add a define in the iommufd_test.h file? Since the selftest
+in the kernel needs to provide a "20" also.
 
-+       if (sbi_get_imp_id() == SBI_IMPL_OPENSBI &&
-+           sbi_get_imp_version() < sbi_impl_opensbi_mk_version(1, 7)) {
-+               report_skip("OpenSBI < v1.7 detected, skipping tests");
-+               report_prefix_pop();
-+               return;
-+       }
-+
-        sse_check_mask();
-
-        /*
-@@ -1237,18 +1243,6 @@ void check_sse(void)
-         */
-        on_cpus(sse_secondary_boot_and_unmask, NULL);
-
--       /* Check for OpenSBI to support injection */
--       if (sbi_get_imp_id() == SBI_IMPL_OPENSBI) {
--               if (sbi_get_imp_version() < sbi_impl_opensbi_mk_version(1, 6)) {
--                       /*
--                        * OpenSBI < v1.6 crashes kvm-unit-tests upon injection since injection
--                        * arguments (a6/a7) were reversed. Skip injection tests.
--                        */
--                       report_skip("OpenSBI < v1.6 detected, skipping injection tests");
--                       sbi_skip_inject = true;
--               }
--       }
--
-        sse_test_invalid_event_id();
-
-        for (i = 0; i < ARRAY_SIZE(sse_event_infos); i++) {
-@@ -1265,14 +1259,12 @@ void check_sse(void)
-                sse_test_attrs(event_id);
-                sse_test_register_error(event_id);
-
--               if (!sbi_skip_inject)
--                       run_inject_test(info);
-+               run_inject_test(info);
-
-                report_prefix_pop();
-        }
-
--       if (!sbi_skip_inject)
--               sse_test_injection_priority();
-+       sse_test_injection_priority();
-
-        report_prefix_pop();
- }
-
-On Mon, Mar 17, 2025 at 05:46:45PM +0100, Clément Léger wrote:
-> This series adds tests for SBI SSE extension as well as needed
-> infrastructure for SSE support. It also adds test specific asm-offsets
-> generation to use custom OFFSET and DEFINE from the test directory.
-> 
-> These tests can be run using an OpenSBI version that implements latest
-> specifications modification [1]
-> 
-> Link: https://github.com/rivosinc/opensbi/tree/dev/cleger/sse [1]
-> 
-> ---
-> 
-> V11:
->  - Use mask inside sbi_impl_opensbi_mk_version()
->  - Mask the SBI version with a new mask
->  - Use assert inside sbi_get_impl_id/version()
->  - Remove sbi_check_impl()
->  - Increase completion timeout as events failed completing under 1000
->    micros when system is loaded.
-> 
-> V10:
->  - Use && instead of || for timeout handling
->  - Add SBI patches which introduce function to get implementer ID and
->    version as well as implementer ID defines.
->  - Skip injection tests in OpenSBI < v1.6
-> 
-> V9:
->  - Use __ASSEMBLER__ instead of __ASSEMBLY__
->  - Remove extra spaces
->  - Use assert to check global event in
->    sse_global_event_set_current_hart()
->  - Tabulate SSE events names table
->  - Use sbi_sse_register() instead of sbi_sse_register_raw() in error
->    testing
->  - Move a report_pass() out of error path
->  - Rework all injection tests with better error handling
->  - Use an env var for sse event completion timeout
->  - Add timeout for some potentially infinite while() loops
-> 
-> V8:
->  - Short circuit current event tests if failure happens
->  - Remove SSE from all report strings
->  - Indent .prio field
->  - Add cpu_relax()/smp_rmb() where needed
->  - Add timeout for global event ENABLED state check
->  - Added BIT(32) aliases tests for attribute/event_id.
-> 
-> V7:
->  - Test ids/attributes/attributes count > 32 bits
->  - Rename all SSE function to sbi_sse_*
->  - Use event_id instead of event/evt
->  - Factorize read/write test
->  - Use virt_to_phys() for attributes read/write.
->  - Extensively use sbiret_report_error()
->  - Change check function return values to bool.
->  - Added assert for stack size to be below or equal to PAGE_SIZE
->  - Use en env variable for the maximum hart ID
->  - Check that individual read from attributes matches the multiple
->    attributes read.
->  - Added multiple attributes write at once
->  - Used READ_ONCE/WRITE_ONCE
->  - Inject all local event at once rather than looping fopr each core.
->  - Split test_arg for local_dispatch test so that all CPUs can run at
->    once.
->  - Move SSE entry and generic code to lib/riscv for other tests
->  - Fix unmask/mask state checking
-> 
-> V6:
->  - Add missing $(generated-file) dependencies for "-deps" objects
->  - Split SSE entry from sbi-asm.S to sse-asm.S and all SSE core functions
->    since it will be useful for other tests as well (dbltrp).
-> 
-> V5:
->  - Update event ranges based on latest spec
->  - Rename asm-offset-test.c to sbi-asm-offset.c
-> 
-> V4:
->  - Fix typo sbi_ext_ss_fid -> sbi_ext_sse_fid
->  - Add proper asm-offset generation for tests
->  - Move SSE specific file from lib/riscv to riscv/
-> 
-> V3:
->  - Add -deps variable for test specific dependencies
->  - Fix formatting errors/typo in sbi.h
->  - Add missing double trap event
->  - Alphabetize sbi-sse.c includes
->  - Fix a6 content after unmasking event
->  - Add SSE HART_MASK/UNMASK test
->  - Use mv instead of move
->  - move sbi_check_sse() definition in sbi.c
->  - Remove sbi_sse test from unitests.cfg
-> 
-> V2:
->  - Rebased on origin/master and integrate it into sbi.c tests
-> 
-> Clément Léger (8):
->   kbuild: Allow multiple asm-offsets file to be generated
->   riscv: Set .aux.o files as .PRECIOUS
->   riscv: Use asm-offsets to generate SBI_EXT_HSM values
->   lib: riscv: Add functions for version checking
->   lib: riscv: Add functions to get implementer ID and version
->   riscv: lib: Add SBI SSE extension definitions
->   lib: riscv: Add SBI SSE support
->   riscv: sbi: Add SSE extension tests
-> 
->  scripts/asm-offsets.mak |   22 +-
->  riscv/Makefile          |    5 +-
->  lib/riscv/asm/csr.h     |    1 +
->  lib/riscv/asm/sbi.h     |  177 +++++-
->  lib/riscv/sbi-sse-asm.S |  102 ++++
->  lib/riscv/asm-offsets.c |    9 +
->  lib/riscv/sbi.c         |  105 +++-
->  riscv/sbi-tests.h       |    1 +
->  riscv/sbi-asm.S         |    6 +-
->  riscv/sbi-asm-offsets.c |   11 +
->  riscv/sbi-sse.c         | 1278 +++++++++++++++++++++++++++++++++++++++
->  riscv/sbi.c             |    2 +
->  riscv/.gitignore        |    1 +
->  13 files changed, 1707 insertions(+), 13 deletions(-)
->  create mode 100644 lib/riscv/sbi-sse-asm.S
->  create mode 100644 riscv/sbi-asm-offsets.c
->  create mode 100644 riscv/sbi-sse.c
->  create mode 100644 riscv/.gitignore
-> 
-> -- 
-> 2.47.2
-> 
+Thanks
+Nicolin
 
