@@ -1,181 +1,169 @@
-Return-Path: <kvm+bounces-41512-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41513-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE7E6A697CC
-	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 19:16:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA89EA697D7
+	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 19:17:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 889C14812F8
-	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 18:15:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10AAF188AFF2
+	for <lists+kvm@lfdr.de>; Wed, 19 Mar 2025 18:17:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E45521DF747;
-	Wed, 19 Mar 2025 18:13:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0078620899C;
+	Wed, 19 Mar 2025 18:17:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Xofb6H+X"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SZyv/HCp"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2075.outbound.protection.outlook.com [40.107.94.75])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 529FA1DC9A7
-	for <kvm@vger.kernel.org>; Wed, 19 Mar 2025 18:12:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.75
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742407981; cv=fail; b=JBJd8OoRHu/n562yyqwo4Q1VHkQAH1fyGfs3mN79PLwWBQzYeKWYLyE8p6lADL2jA8T9HQNKlSZtQZuaQTUheX8Je6KjOXsfLKGYoJZNYyOoSELGx0n06HjYlHX5nHdVDr8Euhtmnaghh29hVB6E4d5pmkrDzfVh+dJUUmc4DCY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742407981; c=relaxed/simple;
-	bh=Oe5qTa3suq2T9nraryxhP4pVFb2lN+LbErByAKQ0YKY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ck2YuOv6b6kRR/s7SB0IlZcZ+N5DuhaJiN2SVvxdH1S8zezIkIotrHtiBfqBlvak+ku4xrPUKfGd4Lj+XpbDQbm+YjlJ0kX4nO33wZ5UhzfcnBsujxyVR1Ag/6tX3006KskJvMqq8i62Q7FNvjDzoRLJsNno3xbsWy/U1/48z2g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Xofb6H+X; arc=fail smtp.client-ip=40.107.94.75
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DR7tmBfmejoWXOR562d4B6J8sbvjUrpguYgXTm48rZSnHYinaMlvI8/hJL9mY2FBqj5kQeHgo/eEgAuXrDZwA0D872sI7Sl3FetV4iww5Nz6PUjAGCfXIyGQviF+jhtmF/jrKquCxkejZE9zKdrrhmIvNnz+EvMClAes25pWjxObH3in0v3hlxpJ08G55G/fEVoFkhoie0XDwAF7dFJrEe3lPBgkE71dHdMQWv+NIkwqgolloqAw3NWJEKjvECRzKCpMU6HA1bNhY4OotYRidaerPG9CaK4mWmbeD4jomPWrByTK0WP7nF0wUvF0d6v6lxJytmth5Y7JlBBweE46vw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WP1jVF1z/l1ThOB4/EN5tVcGr2AV4aLtJ13q1avCGCQ=;
- b=AD4Kh2hy3QqucLiaoc0BGOMXNLB/R/gdULav3eKpujrergqzp86UwXCStheDlIWvoR44WuHzsA8k7qpXFGqtc35PA2ogRSR4E4WfAqRDR8lJ2bTe4JnujdID/y1qCpEm5U7eBCRunK/Q3KCsIt5+n9dJqdYpWnctpxSOVMrAROOuefgoVZqCHAdZdh1+Z0tlx4qnptbkFSPm4tS7yfh6eXdmqTK3k1rKYvZuCLS5liqVDpXNdIBAJJmUn9jn3hx/QbjoMQm/z9jsM20Cibptui7dPFxH7LEI+0zm5mygXF6r3MpcDVRkEEiHslO8U7gxigXk9bV2jcGMHgwrkceqzw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WP1jVF1z/l1ThOB4/EN5tVcGr2AV4aLtJ13q1avCGCQ=;
- b=Xofb6H+X7C3/TGawjO1pUdU7kf0Fl79Nkr2uuBpkyQCpMkzp7ixQZiaX/7al06SDI7jLmCBfUT+qcYRJBTna+RIg0MMv/ZYDB4aT3HCkFnfLArJv5SVKAJMeJtsRDWy8ns/RNeaRTCyXYYGtGezQQY3wLIVvjz2a4ssYKonsNBXOufO6VmL2PG+0lErf0MhbCSocZ48rSlTZ2njdIIBkWL6AdJ5n7etTdF2/EbOF/O16DDu3EGCvQEAonbLJMHQchfLX3KJC4m2nSYeWHkOP2TpH2WJz6+N2jaDo5OJ5fQlwFjpvRdhNxzVaei+UWALUAtJ0H3LTCHPExzUrgF2dKA==
-Received: from SJ0PR13CA0123.namprd13.prod.outlook.com (2603:10b6:a03:2c6::8)
- by SA5PPF7D510B798.namprd12.prod.outlook.com (2603:10b6:80f:fc04::8d0) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.33; Wed, 19 Mar
- 2025 18:12:57 +0000
-Received: from CO1PEPF000075EE.namprd03.prod.outlook.com
- (2603:10b6:a03:2c6:cafe::7f) by SJ0PR13CA0123.outlook.office365.com
- (2603:10b6:a03:2c6::8) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8534.33 via Frontend Transport; Wed,
- 19 Mar 2025 18:12:55 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CO1PEPF000075EE.mail.protection.outlook.com (10.167.249.37) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8534.20 via Frontend Transport; Wed, 19 Mar 2025 18:12:55 +0000
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 19 Mar
- 2025 11:12:37 -0700
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail204.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 19 Mar
- 2025 11:12:37 -0700
-Received: from Asurada-Nvidia (10.127.8.13) by mail.nvidia.com (10.129.68.7)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14 via Frontend
- Transport; Wed, 19 Mar 2025 11:12:36 -0700
-Date: Wed, 19 Mar 2025 11:12:34 -0700
-From: Nicolin Chen <nicolinc@nvidia.com>
-To: Yi Liu <yi.l.liu@intel.com>
-CC: <alex.williamson@redhat.com>, <kevin.tian@intel.com>, <jgg@nvidia.com>,
-	<eric.auger@redhat.com>, <kvm@vger.kernel.org>,
-	<chao.p.peng@linux.intel.com>, <zhenzhong.duan@intel.com>,
-	<willy@infradead.org>, <zhangfei.gao@linaro.org>, <vasant.hegde@amd.com>
-Subject: Re: [PATCH v8 5/5] iommufd/selftest: Add coverage for reporting
- max_pasid_log2 via IOMMU_HW_INFO
-Message-ID: <Z9sJEu7Q71f8V4Ju@Asurada-Nvidia>
-References: <20250313124753.185090-1-yi.l.liu@intel.com>
- <20250313124753.185090-6-yi.l.liu@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34730208970
+	for <kvm@vger.kernel.org>; Wed, 19 Mar 2025 18:17:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742408234; cv=none; b=plVelxy0imMfLOsyAhiCiS7zg9SOn0HVz6JvxwC5b1oe28owJsN4jUV1SoNLRcguHqOGMqgHZZcFw8o8X+w3AMWwiQbjHwEHiAKkaH1LcVQb6/sNEvw1ewH61HGEYhzM43Pvci4j0jzlvr4BmlvHcT4UnVsupj1oINAQBY/sXv4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742408234; c=relaxed/simple;
+	bh=a9f/6tpQ5Nfjmt6Y9fBtdPMfU8jJKk5Ka2jWsqH446s=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=n4a6IuJeo8QXbL3Pd+JzA0PJuylS8MMQK3/7JrNlmIYYZIu2QuZFY0Hhizl7N2pCOVaniL9byOAqcybOg30VUOioVPSxhYOUpCuyIJ76szc8XeL3bKx3uWwUR0P9XqMktdkWDElZb0GhSxFby2Au6ovGu5IJP1EYpmCf6w+kKMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SZyv/HCp; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742408231;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JFUr0M69ODhF7brZUSPn837tWR3hKo9DP9FR/CuzQWU=;
+	b=SZyv/HCpSqddEeSiu50M9EnxyDFrrWcCSB4dYBYmQHb71o3L0S4j5iOndTSfoxSYGiJc5u
+	xZQsHS0D/20D9vF9rA99nWZ5lnCFvaVeNP6J8RoJ5FvkJfHbtUXm5Ic30GSr76EiZ2Ce0N
+	fCE4yFWHWVaeRFCiY+LgsdpbPbF5Pqg=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-669-2K3E8Jl_PAaq34QrrrWLow-1; Wed, 19 Mar 2025 14:17:09 -0400
+X-MC-Unique: 2K3E8Jl_PAaq34QrrrWLow-1
+X-Mimecast-MFC-AGG-ID: 2K3E8Jl_PAaq34QrrrWLow_1742408229
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-849e7868f6eso72672239f.0
+        for <kvm@vger.kernel.org>; Wed, 19 Mar 2025 11:17:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742408228; x=1743013028;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JFUr0M69ODhF7brZUSPn837tWR3hKo9DP9FR/CuzQWU=;
+        b=fI4xt170DflWCMt/p0ku/hBIb9mlcD1U7kuzXE0zkEfXsbEzPxXgGKH7ueY+GHoETN
+         a3YoEcistvKI00F+cdVsMsZVIrGzOlzNMxL7VKU+v0N6TIN5hA1f7RB/H2JbgmofrGFg
+         xP2ChQQEm8JxAnTeuSf1YqfB+B+m71aEjdoNmaevuGEONUYE6HQjkvZg6QBavhtmtgkT
+         y9u7hHIYukMZGGAUqyhC3HfcmVyQT5aiSubAzn6ZubsZ6xYEmwrmyrr4NZXBwWkhZ503
+         Dq4jjXJmwcHMQi2AFZs9i2AUNZ1yDdgk9fBMtMAROL8KcH9Efojgd4AnQeCReCQACS2+
+         oBwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXBa/+/u+HVQJPqXHwnis+lxRJTU8IYoNMPa5MJ3xFzApBRLEzqQfM++oLNFWeip0TK4SQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YznqExD6ASA4Pb7ZnJKhN074vG7+8DckZBiEcq9B2YCSQk0C9C7
+	s6hfQ7saiNQ8VIIrhsJHORcmZtrB0oQQ2tqc5A0cMXPpTMVaWwKxWI2S09xJEnoWx7LmdASwmIW
+	6gnTNgCqYU/j1/PgWTAfWu/EEKosdPzO2EFVAXn+UpQ91l/Y+Mak/Nceq9Q==
+X-Gm-Gg: ASbGnctKypel/1ET/JhOKLBDOwUdM0gJZv/uDVFOI+2o3ikGGvm5rEiASLjNFNgmsPt
+	a7NKSUuLgXWLhjvu/wAhdug9YFT0h1Acuh4qxw1xigr95xAcAYXHFaDMSBjy3tUfLcWNGcNc3KF
+	2DviWEeIC5HX1PqRccgvFsCJhykk7J3DTH8Sj2Xks2/yDZmQxNJ3TtD7rMsee4OaiSQyX7TNbYj
+	8uIkQG0aNfP0oPzUh80ntiKRs6pHPnhaFgT2aorjtJAtGkQXzjMGNelf2G6JYuyzE6/KXvUf7ZE
+	nbddzuzF8m/fzhmMaLw=
+X-Received: by 2002:a05:6e02:1707:b0:3d3:e547:475e with SMTP id e9e14a558f8ab-3d586bd6020mr11398745ab.5.1742408227777;
+        Wed, 19 Mar 2025 11:17:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGFLBoeUjxXSXS4W+ipHr8w9aF4a13A5Kze4QyVbHstkka4sLj6Rw3yDxWqMIHbyTrf9xEosw==
+X-Received: by 2002:a05:6e02:1707:b0:3d3:e547:475e with SMTP id e9e14a558f8ab-3d586bd6020mr11398615ab.5.1742408227366;
+        Wed, 19 Mar 2025 11:17:07 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f2637fb81esm3337752173.89.2025.03.19.11.17.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Mar 2025 11:17:06 -0700 (PDT)
+Date: Wed, 19 Mar 2025 12:17:04 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Keith Busch <kbusch@meta.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH] vfio/type1: conditional rescheduling while pinning
+Message-ID: <20250319121704.7744c73e.alex.williamson@redhat.com>
+In-Reply-To: <Z9rm-Y-B2et9uvKc@kbusch-mbp>
+References: <20250312225255.617869-1-kbusch@meta.com>
+	<20250317154417.7503c094.alex.williamson@redhat.com>
+	<Z9iilzUTwLKzcVfK@kbusch-mbp.dhcp.thefacebook.com>
+	<20250317165347.269621e5.alex.williamson@redhat.com>
+	<Z9rm-Y-B2et9uvKc@kbusch-mbp>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250313124753.185090-6-yi.l.liu@intel.com>
-X-NV-OnPremToCloud: AnonymousSubmission
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000075EE:EE_|SA5PPF7D510B798:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3dd57384-eb0c-460a-4356-08dd6711abe8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|1800799024|7416014|36860700013|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?NLiZXhcoVhcY4veH1cvb6RxOryQZaJMp0uv7izxjhFufnb0/8Mi0c12+Z3Ix?=
- =?us-ascii?Q?4OMOStHqGha7E1b5+7jjuDq0g1niWQQadRVywqaEtka8Vo6roFKMqdmOyXLf?=
- =?us-ascii?Q?3qsi5b89fvWh6eGg48Y8cI6F9mqzeFlbJl+cOXI6468eJDjIthqaWeptI8Yh?=
- =?us-ascii?Q?94S9wMeX83k4L9TSBHUXepjlo6GA4oBp9SwpgOMSI6cqvrvtDOBJqPLN9JZ6?=
- =?us-ascii?Q?DjAcknsbwwYb3FHUgKuaqm8TQA5Wl1+BHp8kivvJyW5ht+ELZv25pi/mYWV/?=
- =?us-ascii?Q?cAgLphJB4fU4P3mjG2bR9469GqBexwR20PnMgQEv0VHHylJrzq+TCj75obRI?=
- =?us-ascii?Q?A3SqO+CTSMWPX7e97O0kittMDPX1xOuHVZ0+zG80B1I8tQ7jgQrhx6qIrTTo?=
- =?us-ascii?Q?jKj4hbI0fzGYsGue5mEmIZnpg6PN/bkxxkW5J0ch8QPrnVUw6xI0e7MYa/Wj?=
- =?us-ascii?Q?3sRUJlpI5/w/Dl5WusjY32vmbxmNG2WpdpHyuCecAZDd/cKljmWW9Fnm/nFv?=
- =?us-ascii?Q?lMzauzkXSxLi9Nrhpyri/y2tLl9lQ2wdIptORQV2bEnIAa/IJohAOsHiXYZC?=
- =?us-ascii?Q?ltKfUZoXEHWZeYatp05hUMtHoDC0PuBBfKP7hZnCn/nyv7PF4ODVKjSL7vxb?=
- =?us-ascii?Q?OHZg5doHSVBYBEcmONp8NXmxjfrfh9APLCZeIaLgk8NJNS9ldO5rXI4cCWbC?=
- =?us-ascii?Q?QMhQWTNWemEcC/3CjjMl9JP/fFCkn1CMU7A24eJT4X4/c/n6rqnfm6gz0LRc?=
- =?us-ascii?Q?rHSeXsH/kONTcQ80bNjC4YP6o3wXw7GLU4wlF/w5B+IbnQ5JvJk3wbw7ysY8?=
- =?us-ascii?Q?oRgxPvB3Hr3yHeGzHm7OW5nGAv026sIpmV+PAR7ATgKzgS9TXIAEWbdHu/KR?=
- =?us-ascii?Q?4hjeNlVF+f6HlcE1a9ALe5EaXxM9FzJV9xKh15uwBn0UrJMWJVtmOqRcwNsS?=
- =?us-ascii?Q?McvThSwdfi6Dw/+P46QJibN3HC1j3ok/OVVG60ENLWqlyWzeT6wJt7lS84wf?=
- =?us-ascii?Q?dvHGKTqhwQ8rkUxUzKY4nQVpBup/CwYS2OnMMvGO8bedcGwjT8wLk3k93Qsb?=
- =?us-ascii?Q?eRF+FcqP6A9wYQQS6uCeF9xP1/YwGcKUuK+5zvNNHXdht7YAKDtvpvXvepJA?=
- =?us-ascii?Q?u7tmch+P/up8wPdy1mQiMlmou1QSOnLFUPXi3cKfNKGQM95jNZtxn5u9Gesl?=
- =?us-ascii?Q?e8i635cjGBwhIGBe94bhS9ZfbDbPGUcl3DbJvB8VM9Uw+/VQHng/ryiGK/HP?=
- =?us-ascii?Q?G6rA/WcQvEa3nKaDSd8tVujO5oDmnj6cEzFVarZZvJa8iO7GLVnYNL4k0/rH?=
- =?us-ascii?Q?nuY86Gxfl4gQrc0D2SZGyXkPknsYaD3vGGwjBRxIt7pkIIGVvCanOZWWbNIC?=
- =?us-ascii?Q?A5dSVoDWqGUSWF7O4041+08NDhPW0UcpJOE++vs7K49UQ6QIghR3OqqQ1VNu?=
- =?us-ascii?Q?oEQFodHs9hEg2BDasKhucdGZ2qfaaPItmkLbkLHF4znnWMoPdsMH0Frc5VET?=
- =?us-ascii?Q?KH7n9DfAY5prsHA=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(7416014)(36860700013)(7053199007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2025 18:12:55.1301
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3dd57384-eb0c-460a-4356-08dd6711abe8
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000075EE.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA5PPF7D510B798
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 13, 2025 at 05:47:53AM -0700, Yi Liu wrote:
-> IOMMU_HW_INFO is extended to report max_pasid_log2, hence add coverage
-> for it.
+On Wed, 19 Mar 2025 09:47:05 -0600
+Keith Busch <kbusch@kernel.org> wrote:
+
+> On Mon, Mar 17, 2025 at 04:53:47PM -0600, Alex Williamson wrote:
+> > On Mon, 17 Mar 2025 16:30:47 -0600
+> > Keith Busch <kbusch@kernel.org> wrote:
+> >   
+> > > On Mon, Mar 17, 2025 at 03:44:17PM -0600, Alex Williamson wrote:  
+> > > > On Wed, 12 Mar 2025 15:52:55 -0700    
+> > > > > @@ -679,6 +679,7 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
+> > > > >  
+> > > > >  		if (unlikely(disable_hugepages))
+> > > > >  			break;
+> > > > > +		cond_resched();
+> > > > >  	}
+> > > > >  
+> > > > >  out:    
+> > > > 
+> > > > Hey Keith, is this still necessary with:
+> > > > 
+> > > > https://lore.kernel.org/all/20250218222209.1382449-1-alex.williamson@redhat.com/    
+> > > 
+> > > Thank you for the suggestion. I'll try to fold this into a build, and
+> > > see what happens. But from what I can tell, I'm not sure it will help.
+> > > We're simply not getting large folios in this path and dealing with
+> > > individual pages. Though it is a large contiguous range (~60GB, not
+> > > necessarily aligned). Shoould we expect to only be dealing with PUD and
+> > > PMD levels with these kinds of mappings?  
+> > 
+> > IME with QEMU, PMD alignment basically happens without any effort and
+> > gets 90+% of the way there, PUD alignment requires a bit of work[1].
+> >    
+> > > > This is currently in linux-next from the vfio next branch and should
+> > > > pretty much eliminate any stalls related to DMA mapping MMIO BARs.
+> > > > Also the code here has been refactored in next, so this doesn't apply
+> > > > anyway, and if there is a resched still needed, this location would
+> > > > only affect DMA mapping of memory, not device BARs.  Thanks,    
+> > > 
+> > > Thanks for the head's up. Regardless, it doesn't look like bad place to
+> > > cond_resched(), but may not trigger any cpu stall indicator outside this
+> > > vfio fault path.  
+> > 
+> > Note that we already have a cond_resched() in vfio_iommu_map(), which
+> > we'll hit any time we get a break in a contiguous mapping.  We may hit
+> > that regularly enough that it's not an issue for RAM mapping, but I've
+> > certainly seen soft lockups when we have many GiB of contiguous pfnmaps
+> > prior to the series above.  Thanks,  
 > 
-> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> So far adding the additional patches has not changed anything. We've
+> ensured we are using an address and length aligned to 2MB, but it sure
+> looks like vfio's fault handler is only getting order-0 faults. I'm not
+> finding anything immediately obvious about what we can change to get the
+> desired higher order behvaior, though. Any other hints or information I
+> could provide?
 
-Reviewed-by: Nicolin Chen <nicolinc@nvidia.com>
+Since you mention folding in the changes, are you working on an upstream
+kernel or a downstream backport?  Huge pfnmap support was added in
+v6.12 via [1].  Without that you'd never see better than a order-a
+fault.  I hope that's it because with all the kernel pieces in place it
+should "Just work".  Thanks,
 
-Two nits:
+Alex
 
-> @@ -342,12 +342,14 @@ FIXTURE(iommufd_ioas)
->  	uint32_t hwpt_id;
->  	uint32_t device_id;
->  	uint64_t base_iova;
-> +	uint32_t pasid_device_id;
+[1] https://lore.kernel.org/all/20240826204353.2228736-1-peterx@redhat.com/
 
-Maybe "device_pasid_id", matching with "MOCK_FLAGS_DEVICE_PASID"?
-
-> +		if (variant->pasid_capable) {
-> +			test_cmd_get_hw_info_pasid(self->pasid_device_id,
-> +						   &max_pasid);
-> +			ASSERT_EQ(20, max_pasid);
-
-Maybe add a define in the iommufd_test.h file? Since the selftest
-in the kernel needs to provide a "20" also.
-
-Thanks
-Nicolin
 
