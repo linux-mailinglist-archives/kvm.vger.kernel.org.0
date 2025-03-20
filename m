@@ -1,187 +1,513 @@
-Return-Path: <kvm+bounces-41540-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41541-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0DBCA69F5D
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 06:35:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA26FA69F6A
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 06:39:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9EAB189E216
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 05:35:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70BC13B9FF3
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 05:38:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2C5F1E5734;
-	Thu, 20 Mar 2025 05:34:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 614771DE3A8;
+	Thu, 20 Mar 2025 05:39:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="A+sZvOjb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TX3QX7Kc"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2058.outbound.protection.outlook.com [40.107.237.58])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F3671DE3A8;
-	Thu, 20 Mar 2025 05:34:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.58
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742448883; cv=fail; b=cPD4sN2KcXJUMXmZgx6elp6UVKyT7vgTMJQje3h9fB7iwXCB/ws753okCm/KZY1iTVx9JAh/c2BzQYAhBRtR3DHaE1gIZlszlss/uX0Mie/6vopMbb/7C12cdUE6iiGd8zwhAII2kQSGmN/D1Skz0KM87BHN5eYSlhxZlp4JsRs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742448883; c=relaxed/simple;
-	bh=w2fYFYyCph0huuTBuIvANv9XqTa83RNHkOO9g1srgSw=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=l6GHE3Ks8aoYMgQ2BRH6kBYfGT5k7RER3yLKikEw7xWrnj9AplKwUfxFOme1fDhNKuiOR/O5wOhn3kneKPDU3nBdwhdkYHIQwT7gSWTlgTalb4sdPMGt7fm8ukTqw0a3BROYw/enTgwq/qvqm+dqmWr4DvO3YuouGLcu3xJpRt0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=A+sZvOjb; arc=fail smtp.client-ip=40.107.237.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=up8IlvMGVSKZOuCyH5aCqHwGizu6Vtehd2szw5rLz4vqvC62GfTYXGqOFlvCNfnMxGcIo+3RR1Bvv6/aFjfhhauGkZYxBlB3EneEchG8D5KS7UPVzvJu/DkBzwKykO7ie9A+FxfeqFRmJ7OFqDDWcPGBjjD8UYMSSkkfyOP5ge99ShbtBUTsDw1K4W16+sP0sqF+iXI1AseQoPh3UTMzUPe8ocz3cnP6TvukbijRlE42M0FzMAsX1CabSdNkOpBZdftf0cg0uc5GvBIExnR2BFew8g/Z90w5jX+VwU0fORXTRSTjOpd8Up397tIdvXgF7UFul9qZvI6Md62vZOD8Ag==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KOZwjOmiqDJJ2srqH9lnYey3x7XaBNktqWlfkalEK4E=;
- b=IrEEpKYTXiHY56bFJv84oDW7IwQFE64tQbV+W2r9/KDI81LGNRvgNFGVSQSJ/bB4mLZ8KK61oWjz/xXMinLmoKG9imXLT69DvXL8+vVVtrW0kdpQ0tu5qZTTB5mXSqqID014HuDtjU9/w+2dBgf6J4WXXJWnTwcCCSB4jrPdw0Oc1fCh6p2WsavadlR3/dm1ikBeUB4WXXObUdPnoUK90q0v4lzyrdlcLqng9lvg0fRTYSOpTma18lCEN5vaWIOBFNGPa7baXF2x0q4LWNi2hKbBRFl+pWmdLDg6q1zGpR5XITtqKP/W3s4rWli+brJDo2piv/QAHQismiRlVK3VGA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KOZwjOmiqDJJ2srqH9lnYey3x7XaBNktqWlfkalEK4E=;
- b=A+sZvOjbuagTH9Zp439qp4SAGoqqMrD8tLk4OKoYpTMVXX9xmSQkHUlmn9nruJlaJZtXLYhFDqhYgrWOqaPlSp0ChXxTs/lqUiBVW0f0tVnLmGZvJbHqxI6zO3C2spNdtRuDEqCQETVPXRAhvI04tXNKW04i/We5huMF8SBiHbk=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6048.namprd12.prod.outlook.com (2603:10b6:8:9f::5) by
- PH7PR12MB7377.namprd12.prod.outlook.com (2603:10b6:510:20c::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.33; Thu, 20 Mar
- 2025 05:34:37 +0000
-Received: from DS7PR12MB6048.namprd12.prod.outlook.com
- ([fe80::6318:26e5:357a:74a5]) by DS7PR12MB6048.namprd12.prod.outlook.com
- ([fe80::6318:26e5:357a:74a5%4]) with mapi id 15.20.8534.031; Thu, 20 Mar 2025
- 05:34:37 +0000
-Message-ID: <aac3b9ab-8dbf-424e-856a-d02135323c8b@amd.com>
-Date: Thu, 20 Mar 2025 11:04:29 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 0/2] KVM: SVM: Add support for 4096 vcpus with x2AVIC
-To: "Naveen N Rao (AMD)" <naveen@kernel.org>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-References: <cover.1740036492.git.naveen@kernel.org>
-Content-Language: en-US
-From: Vasant Hegde <vasant.hegde@amd.com>
-In-Reply-To: <cover.1740036492.git.naveen@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN3PR01CA0174.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:de::15) To DS7PR12MB6048.namprd12.prod.outlook.com
- (2603:10b6:8:9f::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C7ED2AEE2;
+	Thu, 20 Mar 2025 05:39:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742449142; cv=none; b=EnnkWk6B8JOKT6dXakX7cgz6IWmv1gaEz2xWAfRwlFdLuMS9oyMlvS/lGSIaDb81Bt08Tv05sXXxnKBxnZHMzKigGveP7+Cc+ewtE3qwR5WimeyGg3+rPobBNlX5qUHAJjz7FZcuNcr5od5TU/MzRf+LxHsxzN8EDazy+W3vvMs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742449142; c=relaxed/simple;
+	bh=aqAfScZNafJ2YuAEWLsGSFTZyifN7Y4Ioe0h1fXDprQ=;
+	h=Message-ID:Date:MIME-Version:From:Subject:Cc:To:Content-Type; b=DM0ZVRP2Nx4gkt8aXEVo1tZ+86MxdJnS4YuCX7q/E90Y6dk8C00WBT/e1e+7Vh8e5rQTxSaS+OattzSBkf/nMauE1dO3pypFE6T0ib22OpHhNKuYVpoXxB9ig1orb9exNANetaD8+5SaiRgZhaBaAcFppu//pLuHnw6Em5D0Puw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TX3QX7Kc; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4769f3e19a9so2705631cf.0;
+        Wed, 19 Mar 2025 22:39:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742449137; x=1743053937; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:cc:subject:from:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XnnCAk1bM3a/Ji5x3FEZTFGouGduUgtZCKxXqfSHDBM=;
+        b=TX3QX7KcqqWnJMTAjo0AJ3veGNW9iPROuBDqC6vrEV0Zv7+4PaccyTjG6zrpUHXp1q
+         lBE6MJ4FTvjboh1d+XKdB37VDSh7RXu1jdBhA64GNuWq/dEibIzNo3idq1hIyhmrC0/t
+         uNwX9KLoozE7pG3wUqfUN2kDiWAGtkjd/3fLDhaaSSzTzSUt8q2IrwgfPs4hc3ShqZ9g
+         d6+PV21frcJpbS7ebQmG3LNH05vi5UvPnH/Ul7ILgn4txCC8ny3r+X2KOPucIhHUF/3f
+         uf2ZvNMTzwb88a9EgP+Ns89bPETbzyPz+RPKLVDShDpVFsSsISLF/5og45nanj5yh+3q
+         Kt0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742449137; x=1743053937;
+        h=content-transfer-encoding:to:cc:subject:from:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=XnnCAk1bM3a/Ji5x3FEZTFGouGduUgtZCKxXqfSHDBM=;
+        b=Ai2Xfps5FT9qI6qfgMWaMJ9Vdjrml2JLUS2Cyway/TXGvTkbtEI0bl44iow2w7xN4w
+         qLtsyU9w2fJo3joeMEiU4wAGfmkSr+MqAE817u60Vg3phHiAO7ZgX+VluDKZZcFoc2Hg
+         VADlMli6tIO5Eh2uRGthi7m8fnLa88fmZ4qNQVdSNNMrA2DMoyzDDjq6bU9jS7nkysQW
+         QlaZqBvdnzomaey8BEjfrPDsuTItxGKtD0cch+foexVfhdxVJVripmcdFiq7F+CD1inH
+         5lvHjSezg5iKF0slK8tP9dnGVDoRh3YZx+l1DehicywMS7/j+ew8DGwdzvHIUK71j7rx
+         DkAg==
+X-Gm-Message-State: AOJu0YywbMAn48YdhXxjUOcgs/E+nLKOhzjXXSNozeqiSwC6tXnfnmtH
+	GYvJZPNTIGHUSjKRdloh9IH7mpIph2gjgoZAC/nECPKPF0RMC+XPoO9y9g==
+X-Gm-Gg: ASbGncttgwumld8Ysjy4fNCfvNwbwqLe4c4rOd1p8P6swttzle4E6MnG9+1HqQaecs4
+	0etUSgsJKkmgsKQSZTXmRsAHg1ZpD9JXHZ7Yk4UoH4Ng9iauONor4TR1M/hftHl3eMNy1FRV4ms
+	1auc9FQ1qdNAbsvlLtn/jyk98ZoIqXAJWTg3TGhSlYr+/YE1kW5/Ms0spnLRI4HJwHbWDdWcuQJ
+	jTu7Hr+z/AW52fpTBkKYd0dEgz+YKomY/0tHjlM0dMdTrep23XnAQBXX5seFZVMmzI75D0yD2Sb
+	Ub7QoCcCMMeYo1S4FEaAH1WgobwPyFN/eFDHyCnCbORfKTcXbTJJBugZsHR26gx1HHSI7XHtI+M
+	qxl8kYIGFiCknsvwvVD+/
+X-Google-Smtp-Source: AGHT+IG5yOPynP8w8g7NbFtS3J7WPKjna9g/bpevYlYkOKoeZeoUE1nlkhW7DrLsklnNmt94yImQUA==
+X-Received: by 2002:a05:620a:2990:b0:7c5:5e5b:2fdb with SMTP id af79cd13be357-7c5b0d06e96mr217664685a.41.1742449137486;
+        Wed, 19 Mar 2025 22:38:57 -0700 (PDT)
+Received: from [10.139.221.89] (c-174-160-16-133.hsd1.ca.comcast.net. [174.160.16.133])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c573c714c0sm958440285a.40.2025.03.19.22.38.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Mar 2025 22:38:56 -0700 (PDT)
+Message-ID: <facda6e2-3655-4f2c-9013-ebb18d0e6972@gmail.com>
+Date: Wed, 19 Mar 2025 22:38:53 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6048:EE_|PH7PR12MB7377:EE_
-X-MS-Office365-Filtering-Correlation-Id: c45f4195-a247-468b-42ef-08dd6770e707
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?cUZaRzNOVVdXSUFpb01OUklJakZJZC92MXVNUDFyTDYrd2JnNTQxd05qYlg3?=
- =?utf-8?B?RkdrYWNVTUNtejdSdUd2NGRXMmdPYzJ6N0ZWOFNEeUN6bG1uenF0ZEc5d2VX?=
- =?utf-8?B?RkV2UDNSRFRUK29VYm1USnFXNFUxbVRteVFxNVlPMU1QOUJ3cnNOSG1jYjMx?=
- =?utf-8?B?aWM5aTVrYjBDcHdqMVpBZUpoRGZ0QVpMTks1NUVJUHQ5ME9GRkN1SVdsSDBv?=
- =?utf-8?B?b2RNa0JPc3NWMVljMDcySFRBS004cWpQQjNKRStseHc2OHNRT2IzZUJNayt1?=
- =?utf-8?B?SlduQnU2cDZBb1JITlZPdGdDNy9FWnZGdzhpeWlWSjdnSDRsdUt0VTZUcmpO?=
- =?utf-8?B?S25wOThIaTlzNm5BcHM1WWhxNDE0d0xFdWtIR2dlR25uS1J5eWxIUnBkTVkw?=
- =?utf-8?B?OSt1cWY4SUhWSW1VNmpPa2puMnZOcGZkN09QWFZydWZFYkE0RUhBZDBNb3Ru?=
- =?utf-8?B?YmNqK1lsbW9YNzVLbm9YMHNjVTdHRjNicVByQW5VejBGSm9YOTJjTXFDMzRs?=
- =?utf-8?B?NkNpTUg4RkFaeEo0bEt2akQyakk4NUZyMnJOaW9CTUxZZFlIVzZVMHVYTHZE?=
- =?utf-8?B?cjVxOTBBWEFDSFhLcm9hNUFHdVlaTUNUYVN5R2R5VUdEY3pzOGJBa1JJMmJE?=
- =?utf-8?B?Yml0STRaam53cHo1cVJROHFiM0NTcUhNb1V6L1pacnR1bE11L3ZoWWpOSnZj?=
- =?utf-8?B?YzZjSnMxR3RWRnlWYVpVVkZ4WXlzYUVoaE9xUU5TdFdZSi9rbnJUZVMvMTdu?=
- =?utf-8?B?a25scUpTRy94bG1FWTZTMzNqcG1KVnRJb1RvR2J6SFpJam1xNXdhbG1qRldt?=
- =?utf-8?B?bldpSitkbGE5ZmQxUjBsc1Z6NTVzaGZSU0thRmlHM1gxSlhCS2VxdmJ0eGcr?=
- =?utf-8?B?UUE3elZhTHlTSlZzQ0ZrbjhaVk00ZXhTQlAxNWRJd2JUZUtKSTNCYks5K0FQ?=
- =?utf-8?B?K1VRTHlYaWZEc0NLRVR0SGV3TzdhaHFrcG8vZGVaYXBMRGg1TXJxRmcyRkkr?=
- =?utf-8?B?ZysvM3hVcE9vTThLZERnRDg0ei9Ec3RtSUpLdncwc1hpN0ZFNUlXTTB3ZFdn?=
- =?utf-8?B?U3lGM21GY3EzZStuaW9EYkRCWkdvZEJKbHBwejNyZitnZ0p5a29vSVJXMEg4?=
- =?utf-8?B?TlZMTjFVekFzMEdRZE9jS0VDQTg4NUZxcjl1QTBCZzIzNFlOaVN5TVMzT1lv?=
- =?utf-8?B?NTlyOFFGTWNzMHgyd2RhSGpKSUFzbDdLVEZEYVZEcUFxa0UraU5EaW5Lem1k?=
- =?utf-8?B?VE1MRFZ2MzBKcGJvTWQxd3FzK0pVM0lvY1pXS1F6RTdVQ0xGNTVpYnpmaEFn?=
- =?utf-8?B?Ykt6N3NzT3RQUVlVUmFDb295enNRaUQxWTVob1E5clJnemFiTFJwUGNkNTl0?=
- =?utf-8?B?Y2NqcVV0WGVQWjJ0TUNXYnR3WFhJbk1RZW1CMnNGN2RtSjZXWTN5eUhRaXdt?=
- =?utf-8?B?dk9tRXdoVFhLRlN3VVRYc3A2OEQxRUJuMlZJYTJjTlpKU2lWaS9SQUtkdlFU?=
- =?utf-8?B?RTNnRFpSRU1WVnQxVWwrLzlma3BFeFVabmd3M1RwaVpQbko1blhTK0JoRWkw?=
- =?utf-8?B?TUxLemtId2oreHpRQ3VYR09yejdZSUNneVNNRzlHVjJublU3R2VuZm45Tyt5?=
- =?utf-8?B?Vi9hViszK0pJZm5uWlhxc0dsWjhibGZvbzJycVVKbEczdFpTd25EdmppQlRV?=
- =?utf-8?B?MG5Jd2VFMFBaeFowbHlBUStWYloxRDRnNnMrVDk0dndrVkt6YUR3cURJckdy?=
- =?utf-8?B?WUNXSDZqbHQwZHpZaWJwcjRUUWhxZmpzWGZpejB5NGtSMFlWSXVKcm1tSWQx?=
- =?utf-8?B?T1hKNElwMlN1NHQ2Zjc5NGJCdjN6RnY4U0pYMXI5eEJ5eEY2UkY3UVpiNmVR?=
- =?utf-8?Q?NSP47TDfF4do9?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6048.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?dXFSTjczWXVFZFNqaGJncW9hZHE3NGUrWW41QjVPMjZNWnFtbjdoUmhycmRP?=
- =?utf-8?B?SkVYUW5NZ3ZSd29ibytXWnlxSmppNWVHQVIwbm9NejhZTlJuL2FIcDBLOEJy?=
- =?utf-8?B?TjJEaUd1TlhiVmVPZGJnRk5WS2srb21SdjAvUm5TV1pOVkxvOFh4dEZTa1p6?=
- =?utf-8?B?eXJ4UkZxWEEzekFPeVV1dG1hdEx1ZTA5Nlg5OGFDOE9RVFV0RFptTHFsWGFw?=
- =?utf-8?B?U2lhbFozV05FZWpuejZXV1dBMzhZUUpNb2NmdlU1ZkRYVldQaUdQZUo0U3J3?=
- =?utf-8?B?MUFWZHFIa1FFRkczZHdyUGpNMW5IcTBvdzJjMUlFeWdYdUp6ZXRId0srTFRQ?=
- =?utf-8?B?Z1BTazIyZFB4SHpOK0wzTVRlVzMzZnlIcVRrcktSUnFMQjB4eWo2aGR0QWZz?=
- =?utf-8?B?KzJXeEFxMUFqcHN2d0ptakM3UzdScnRPbVJNckp2am9zZ0c5ZmRYTGIyTFBj?=
- =?utf-8?B?a0tNUlZ5WWgvMVFOMTBVOGR5allJTXg2eHdjdUR6em9OeXFkVlJ5aXJrYW9t?=
- =?utf-8?B?WjM2d1UvWldXU1VXYjg3TEl3KzVJdzBMZE5DdVk1MXYvWHZPMnA4bXYyNkFs?=
- =?utf-8?B?MmtUaStFVTFzci9YMlRleWtJTWJxaHE4OHpTc2pnSXF6VURWOElKU2NwRk5W?=
- =?utf-8?B?eHdjZVVqNkFGVnBEeXovaUVKL0lKb05Va0hHdnZ5U1I2OG02ckxDaWU0U0o5?=
- =?utf-8?B?UzMvVnZXYTErWUpxVStDb3BZdEh5UVkwcURMYWc1ckNDZk1uLzdzbVVMZTEy?=
- =?utf-8?B?TUZmbWRvYXJLNzhRUHpWU3FWaldyajFER0htQVdFOUdITU5DZEJIM0ZHeGVJ?=
- =?utf-8?B?ek5JbWZzUXJwNUVGUkVwVmozYkRBZFdZcFBMZ3ZML1I0VEs4dkErT3NsVVMx?=
- =?utf-8?B?ODBFQmphYUJPdlYxUXJ3WGRMaVNqZXZ1ZWJRQTZ1SUVnR05IVTVuQW01ajhk?=
- =?utf-8?B?R3A1YjhBU0tTQnR5V3J1Y0pZZ0ZoM2ZHY0k0cmE4dHVFUjFHYy9MQ2NUcWlw?=
- =?utf-8?B?RG9QWFNkUElDQ2FCdy9uamdtOFlySHM5Y1loU0xZVlBZQ1BGbUtYVGtSQ09j?=
- =?utf-8?B?UUN0dzd2OEM2dDA2RGhqNzUxN2tTc2VPNzZvRTJHMnVwT25UbjdybDNsNE1D?=
- =?utf-8?B?WEI3ZlVFZlFJVU1PcW5sZEptYlNrOFE5ODVoNDFFTllEK2lJS08xNWJvRTRt?=
- =?utf-8?B?QzBQdjRhMGxsZ3BTdUgrV2ZNUmtXMVJZRGhyWmZ1MkxDdE9nNk9XdzlnUTh0?=
- =?utf-8?B?STdCZVNTWjc0OU15TzZkS0VUTzNEMERoOW9vUVBkUG1sblpEdUxJd1hKN3NT?=
- =?utf-8?B?TGZqdEtHOXJwTGYxMmRxM0JYcUNpL2g3ZXlIMFNNQTRlQzFOSWJmb3hLYzl5?=
- =?utf-8?B?ZDgzdnpIV2p5YVlDTmNKcCtkVkdvMHJiNVY5WTN6L092OTJnTHplZnQ5VGRw?=
- =?utf-8?B?eWRNRmRjbUVYcmlna2ZRMkdFOVo0enhWZFBpcHo2Z2lQd1VpN2gwVW5CM0tH?=
- =?utf-8?B?bGpadnhUbkxNWTV6ZFEyTG9TRUZSZFhRRlliSkdsVHlIclJId1RpRWRGMUc1?=
- =?utf-8?B?ODFDOE5vZW9NU0E4VFBGMTYyMW1jaHlpSmNTYmQ1V3BhTWc2T05QMkFQL0pZ?=
- =?utf-8?B?TFZ0aDVXZktKT2x4ZC9CMFRzNmEwbGZFMXNRdVdtbUNsNjRveTUzck9zQTE5?=
- =?utf-8?B?c0M3YzNZMGl5bFh6UUY3SkRDYmM4bkFTcHdScmFYd1Bqb2hqc250eXZOTUlp?=
- =?utf-8?B?YldXZnF0V0o1TUNKSkxycWN0ckMwZzcxRWxxaUdybHgvME9XVmE4Njg3LzZC?=
- =?utf-8?B?Ry9ibTZrVyt4c3oxelpYRDZUSXZ5TDVPOHlSUVhhMTlIOGVaU0hrVE5iZ3gw?=
- =?utf-8?B?TGppYk1RdnlzTm9RL0NTZEhiSEdUVUJwQ2JEeENaRnFoVFNsYnVnMXJOL3ph?=
- =?utf-8?B?TytvTWVST041VHpIK1VoazRWdHR4dHhmR1A5VTB1eVYrcEpBb3RkTm5PTW1W?=
- =?utf-8?B?K3NucG53czVOdnAvODNRa2dzZUwzMjR0OVY3TFJuNTJzK1FodjJYczlnbGQ3?=
- =?utf-8?B?RnpidnAwY2lMY3grTnZtdmphNWhQcDhRMVY1dTFWMkwyRVZ3RmNnbEY5Mjl4?=
- =?utf-8?Q?xur0u5NJjArbes7oMMXcgEPpy?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c45f4195-a247-468b-42ef-08dd6770e707
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6048.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2025 05:34:37.0894
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dGztK/TxoB8Pfnjd9fnBncLuCKjvKOJ2JQLdYZMFVWlQyquX4xYcp7Nk3atxNP4yaqGCKKLKE0caOOQoFgfJ5Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7377
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+From: Ming Lin <minggr@gmail.com>
+Subject: pvclock time drifting backward
+Cc: linux-kernel@vger.kernel.org, minggr@gmail.com
+To: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 2/20/2025 1:08 PM, Naveen N Rao (AMD) wrote:
-> This is v3 of the series posted at:
-> http://lkml.kernel.org/r/cover.1738563890.git.naveen@kernel.org
-> 
-> The first patch adds support for up to 4096 vcpus with x2AVIC, while the 
-> second patch limits the value that is programmed into 
-> AVIC_PHYSICAL_MAX_INDEX in the VMCB based on the max APIC ID indicated 
-> by the VMM.
+Hi,
 
-Reviewed-by: Vasant Hegde <vasant.hegde@amd.com>
+After performing a live migration on a QEMU guest OS that had been running for over 30 days,
+we noticed that the guest OS time was more than 2 seconds behind the actual time.
 
--Vasant
+After extensive debugging, we found that this issue is related to master_kernel_ns and master_cycle_now.
+
+When the guest OS starts, the host initializes a pair of master_kernel_ns and master_cycle_now values.
+After live migration, the host updates these values.
+
+Our debugging showed that if the host does not update master_kernel_ns/master_cycle_now,
+the guest OS time remains correct.
+
+To illustrate how updating master_kernel_ns/master_cycle_now leads to the guest OS time drifting backward,
+we applied the following debug patch:
+
+The patch adds a KVM debugfs entry to trigger time calculations and print the results.
+The patch runs on the host side, but we use __pvclock_read_cycles() to simulate the guest OS updating its time.
+
+Example Output:
+
+# cat /sys/kernel/debug/kvm/946-13/pvclock
+old: master_kernel_ns: 15119778316
+old: master_cycle_now: 37225912658
+old: ns: 1893199569691
+new: master_kernel_ns: 1908210098649
+new: master_cycle_now: 4391329912268
+new: ns: 1893199548401
+
+tsc 4391329912368
+kvmclock_offset -15010550291
+diff: ns: 21290
+
+Explanation of Parameters:
+
+Input:
+"old: master_kernel_ns:" The master_kernel_ns value recorded when the guest OS started (remains unchanged during testing).
+"old: master_cycle_now:" The master_cycle_now value recorded when the guest OS started (remains unchanged during testing).
+"new: master_kernel_ns:" The latest master_kernel_ns value at the time of reading.
+"new: master_cycle_now:" The latest master_cycle_now value at the time of reading.
+tsc: The rdtsc() value at the time of reading.
+kvmclock_offset: The offset recorded by KVM_SET_CLOCK when the guest OS started (remains unchanged during testing).
+
+Output:
+"old: ns:" Time in nanoseconds calculated using the old master_kernel_ns/master_cycle_now.
+"new: ns:" Time in nanoseconds calculated using the new master_kernel_ns/master_cycle_now.
+"diff: ns:" (old ns - new ns), representing the time drift relative to the guest OS start time.
+
+Test Script:
+#!/bin/bash
+
+qemu_pid=$(pidof qemu-system-x86_64)
+
+while [ 1 ] ; do
+     echo "====================================="
+     echo "Guest OS running time: $(ps -p $qemu_pid -o etime= | awk '{print $1}')"
+     cat /sys/kernel/debug/kvm/*/pvclock
+     echo
+     sleep 10
+done
+
+Test Results:
+Below are the first and last parts of a >2-hour test run.
+As time progresses, the time drift calculated using the latest master_kernel_ns/master_cycle_now increases monotonically.
+
+After 2 hours and 18 minutes, the guest OS time drifted by approximately 93 milliseconds.
+
+I have uploaded an image for a more intuitive visualization of the time drift:
+https://postimg.cc/crCDWtD7
+
+Is this a real problem?
+
+If there is any fix patch, I’d be happy to test it. Thanks!
+
+
+     1 =====================================
+     2 guest os running time: 00:50
+     3 old: master_kernel_ns: 15119778316
+     4 old: master_cycle_now: 37225912658
+     5 old: ns: 48092694964
+     6 new: master_kernel_ns: 63103244699
+     7 new: master_cycle_now: 147587790614
+     8 new: ns: 48092694425
+     9
+    10 tsc 147587790654
+    11 kvmclock_offset -15010550291
+    12 diff: ns: 539
+    13
+    14 =====================================
+    15 guest os running time: 01:00
+    16 old: master_kernel_ns: 15119778316
+    17 old: master_cycle_now: 37225912658
+    18 old: ns: 58139026532
+    19 new: master_kernel_ns: 73149576143
+    20 new: master_cycle_now: 170694333104
+    21 new: ns: 58139025879
+    22
+    23 tsc 170694333168
+    24 kvmclock_offset -15010550291
+    25 diff: ns: 653
+    26
+    27 =====================================
+    28 guest os running time: 01:10
+    29 old: master_kernel_ns: 15119778316
+    30 old: master_cycle_now: 37225912658
+    31 old: ns: 68183772122
+    32 new: master_kernel_ns: 83194321616
+    33 new: master_cycle_now: 193797227862
+    34 new: ns: 68183771357
+    35
+    36 tsc 193797227936
+    37 kvmclock_offset -15010550291
+    38 diff: ns: 765
+    39
+    40 =====================================
+    41 guest os running time: 01:20
+    42 old: master_kernel_ns: 15119778316
+    43 old: master_cycle_now: 37225912658
+    44 old: ns: 78225289157
+    45 new: master_kernel_ns: 93235838545
+    46 new: master_cycle_now: 216892696976
+    47 new: ns: 78225288279
+    48
+    49 tsc 216892697034
+    50 kvmclock_offset -15010550291
+    51 diff: ns: 878
+    52
+    53 =====================================
+    54 guest os running time: 01:30
+    55 old: master_kernel_ns: 15119778316
+    56 old: master_cycle_now: 37225912658
+    57 old: ns: 88268955340
+    58 new: master_kernel_ns: 103279504612
+    59 new: master_cycle_now: 239993109102
+    60 new: ns: 88268954349
+    61
+    62 tsc 239993109168
+    63 kvmclock_offset -15010550291
+    64 diff: ns: 991
+    65
+    66 =====================================
+    67 guest os running time: 01:40
+    68 old: master_kernel_ns: 15119778316
+    69 old: master_cycle_now: 37225912658
+    70 old: ns: 98313212581
+    71 new: master_kernel_ns: 113323761740
+    72 new: master_cycle_now: 263094880668
+    73 new: ns: 98313211476
+    74
+    75 tsc 263094880732
+    76 kvmclock_offset -15010550291
+    77 diff: ns: 1105
+.....
+.....
+10160 =====================================
+10161 guest os running time: 02:17:11
+10162 old: master_kernel_ns: 15119778316
+10163 old: master_cycle_now: 37225912658
+10164 old: ns: 8229817213297
+10165 new: master_kernel_ns: 8244827670997
+10166 new: master_cycle_now: 18965537819524
+10167 new: ns: 8229817120748
+10168
+10169 tsc 18965537819622
+10170 kvmclock_offset -15010550291
+10171 diff: ns: 92549
+10172 =====================================
+10173 guest os running time: 02:17:21
+10174 old: master_kernel_ns: 15119778316
+10175 old: master_cycle_now: 37225912658
+10176 old: ns: 8239861074959
+10177 new: master_kernel_ns: 8254871532564
+10178 new: master_cycle_now: 18988638681302
+10179 new: ns: 8239860982297
+10180
+10181 tsc 18988638681358
+10182 kvmclock_offset -15010550291
+10183 diff: ns: 92662
+10184 =====================================
+10185 guest os running time: 02:17:31
+10186 old: master_kernel_ns: 15119778316
+10187 old: master_cycle_now: 37225912658
+10188 old: ns: 8249904622988
+10189 new: master_kernel_ns: 8264915080459
+10190 new: master_cycle_now: 19011738821632
+10191 new: ns: 8249904530213
+10192
+10193 tsc 19011738821736
+10194 kvmclock_offset -15010550291
+10195 diff: ns: 92775^@
+10196 =====================================
+10197 guest os running time: 02:17:41
+10198 old: master_kernel_ns: 15119778316
+10199 old: master_cycle_now: 37225912658
+10200 old: ns: 8259949369203
+10201 new: master_kernel_ns: 8274959826576
+10202 new: master_cycle_now: 19034841717872
+10203 new: ns: 8259949276315
+10204
+10205 tsc 19034841717942
+10206 kvmclock_offset -15010550291
+10207 diff: ns: 92888
+10208 =====================================
+10209 guest os running time: 02:17:51
+10210 old: master_kernel_ns: 15119778316
+10211 old: master_cycle_now: 37225912658
+10212 old: ns: 8269996849598
+10213 new: master_kernel_ns: 8285007306846
+10214 new: master_cycle_now: 19057950902658
+10215 new: ns: 8269996756597
+10216
+10217 tsc 19057950902756
+10218 kvmclock_offset -15010550291
+10219 diff: ns: 93001^@
+10220 =====================================
+10221 guest os running time: 02:18:02
+10222 old: master_kernel_ns: 15119778316
+10223 old: master_cycle_now: 37225912658
+10224 old: ns: 8280039094317
+10225 new: master_kernel_ns: 8295049551453
+10226 new: master_cycle_now: 19081048045430
+10227 new: ns: 8280039001203
+10228
+10229 tsc 19081048045526
+10230 kvmclock_offset -15010550291
+10231 diff: ns: 93114^@
+
+
+
+     pvclock debugfs patch
+---
+  arch/x86/include/asm/kvm_host.h |  4 +++
+  arch/x86/kvm/x86.c              | 29 +++++++++++++++-
+  b.sh                            |  1 +
+  virt/kvm/kvm_main.c             | 75 +++++++++++++++++++++++++++++++++++++++++
+  4 files changed, 108 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 32ae3aa50c7e..5a82a69bfe7a 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1411,6 +1411,10 @@ struct kvm_arch {
+      struct delayed_work kvmclock_update_work;
+      struct delayed_work kvmclock_sync_work;
+  
++    u64 old_master_kernel_ns;
++    u64 old_master_cycle_now;
++    s64 old_kvmclock_offset;
++
+      struct kvm_xen_hvm_config xen_hvm_config;
+  
+      /* reads protected by irq_srcu, writes by irq_lock */
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 4b64ab350bcd..a56511ed8c5b 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2819,7 +2819,7 @@ static inline u64 vgettsc(struct pvclock_clock *clock, u64 *tsc_timestamp,
+   * As with get_kvmclock_base_ns(), this counts from boot time, at the
+   * frequency of CLOCK_MONOTONIC_RAW (hence adding gtos->offs_boot).
+   */
+-static int do_kvmclock_base(s64 *t, u64 *tsc_timestamp)
++int do_kvmclock_base(s64 *t, u64 *tsc_timestamp)
+  {
+      struct pvclock_gtod_data *gtod = &pvclock_gtod_data;
+      unsigned long seq;
+@@ -2861,6 +2861,27 @@ static int do_monotonic(s64 *t, u64 *tsc_timestamp)
+      return mode;
+  }
+  
++u64 mydebug_get_kvmclock_ns(u64 master_kernel_ns, u64 master_cycle_now, s64 kvmclock_offset, u64 tsc)
++{
++        struct pvclock_vcpu_time_info hv_clock;
++        u64 ret;
++
++        hv_clock.tsc_timestamp = master_cycle_now;
++        hv_clock.system_time = master_kernel_ns + kvmclock_offset;
++
++        /* both __this_cpu_read() and rdtsc() should be on the same cpu */
++        get_cpu();
++
++        kvm_get_time_scale(NSEC_PER_SEC, __this_cpu_read(cpu_tsc_khz) * 1000LL,
++                                   &hv_clock.tsc_shift,
++                                   &hv_clock.tsc_to_system_mul);
++        ret = __pvclock_read_cycles(&hv_clock, tsc);
++
++        put_cpu();
++
++        return ret;
++}
++
+  static int do_realtime(struct timespec64 *ts, u64 *tsc_timestamp)
+  {
+      struct pvclock_gtod_data *gtod = &pvclock_gtod_data;
+@@ -2988,6 +3009,10 @@ static void pvclock_update_vm_gtod_copy(struct kvm *kvm)
+      host_tsc_clocksource = kvm_get_time_and_clockread(
+                      &ka->master_kernel_ns,
+                      &ka->master_cycle_now);
++    ka->old_master_kernel_ns = ka->master_kernel_ns;
++    ka->old_master_cycle_now = ka->master_cycle_now;
++    printk("MYDEBUG: old_master_kernel_ns = %llu, old_master_cycle_now = %llu\n",
++            ka->old_master_kernel_ns, ka->old_master_cycle_now);
+  
+      ka->use_master_clock = host_tsc_clocksource && vcpus_matched
+                  && !ka->backwards_tsc_observed
+@@ -6989,6 +7014,8 @@ static int kvm_vm_ioctl_set_clock(struct kvm *kvm, void __user *argp)
+      else
+          now_raw_ns = get_kvmclock_base_ns();
+      ka->kvmclock_offset = data.clock - now_raw_ns;
++    ka->old_kvmclock_offset = ka->kvmclock_offset;
++    printk("MYDEBUG: old_kvmclock_offset = %lld\n", ka->old_kvmclock_offset);
+      kvm_end_pvclock_update(kvm);
+      return 0;
+  }
+diff --git a/b.sh b/b.sh
+new file mode 120000
+index 000000000000..0ff9a93fd53f
+--- /dev/null
++++ b/b.sh
+@@ -0,0 +1 @@
++/home/mlin/build.upstream/b.sh
+\ No newline at end of file
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index ba0327e2d0d3..d6b9a6e7275e 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -399,6 +399,7 @@ int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity,
+              return mc->nobjs >= min ? 0 : -ENOMEM;
+          mc->objects[mc->nobjs++] = obj;
+      }
++
+      return 0;
+  }
+  
+@@ -998,6 +999,78 @@ static void kvm_destroy_vm_debugfs(struct kvm *kvm)
+      }
+  }
+  
++extern int do_kvmclock_base(s64 *t, u64 *tsc_timestamp);
++extern u64 mydebug_get_kvmclock_ns(u64 master_kernel_ns, u64 master_cycle_now, s64 kvmclock_offset, u64 tsc);
++
++static ssize_t kvm_mydebug_pvclock_read(struct file *file, char __user *buf,
++                                size_t len, loff_t *ppos)
++{
++    struct kvm *kvm = file->private_data;
++    struct kvm_arch *ka;
++    char buffer[256];
++    ssize_t ret, copied;
++    u64 new_master_kernel_ns;
++    u64 new_master_cycle_now;
++    u64 old_ns, new_ns;
++    u64 tsc;
++
++    if (!kvm) {
++        pr_err("file->private_data is NULL\n");
++        return -EINVAL;
++    }
++
++    ka = &kvm->arch;
++
++    do_kvmclock_base(&new_master_kernel_ns, &new_master_cycle_now);
++
++    tsc = rdtsc();
++
++    old_ns = mydebug_get_kvmclock_ns(ka->old_master_kernel_ns, ka->old_master_cycle_now, ka->old_kvmclock_offset, tsc);
++    new_ns = mydebug_get_kvmclock_ns(new_master_kernel_ns, new_master_cycle_now, ka->old_kvmclock_offset, tsc);
++
++    ret = snprintf(buffer, sizeof(buffer),
++                   "old: master_kernel_ns: %llu\n"
++                   "old: master_cycle_now: %llu\n"
++                   "old: ns: %llu\n"
++                   "new: master_kernel_ns: %llu\n"
++                   "new: master_cycle_now: %llu\n"
++                   "new: ns: %llu\n\n"
++                   "tsc %llu\n"
++                   "kvmclock_offset %lld\n"
++                   "diff: ns: %lld\n",
++                   ka->old_master_kernel_ns, ka->old_master_cycle_now, old_ns,
++                   new_master_kernel_ns, new_master_cycle_now, new_ns,
++                   tsc, ka->old_kvmclock_offset,
++                  old_ns - new_ns
++                  );
++
++    if (ret < 0)
++        return ret;
++
++    if ((size_t)ret > sizeof(buffer))
++        ret = sizeof(buffer);
++
++    if (*ppos >= ret)
++        return 0; /* EOF */
++
++    copied = min(len, (size_t)(ret - *ppos));
++
++    if (copy_to_user(buf, buffer + *ppos, copied)) {
++        pr_err("copy_to_user failed\n");
++        return -EFAULT;
++    }
++
++    *ppos += copied;
++
++    return copied;
++}
++
++static const struct file_operations kvm_pvclock_fops = {
++    .owner = THIS_MODULE,
++    .read = kvm_mydebug_pvclock_read,
++    .open = simple_open,
++};
++
+  static int kvm_create_vm_debugfs(struct kvm *kvm, const char *fdname)
+  {
+      static DEFINE_MUTEX(kvm_debugfs_lock);
+@@ -1063,6 +1136,8 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, const char *fdname)
+                      &stat_fops_per_vm);
+      }
+  
++    debugfs_create_file("pvclock", 0444, kvm->debugfs_dentry, kvm, &kvm_pvclock_fops);
++
+      kvm_arch_create_vm_debugfs(kvm);
+      return 0;
+  out_err:
 
 
