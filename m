@@ -1,118 +1,278 @@
-Return-Path: <kvm+bounces-41581-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41582-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFFF1A6AB82
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 17:54:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BF34A6AB9A
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 18:00:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52CE3188472D
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 16:54:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CD591887A67
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 16:59:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 807152222DC;
-	Thu, 20 Mar 2025 16:54:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gh3CG3zv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 320A1223311;
+	Thu, 20 Mar 2025 16:59:01 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CA2919DF98
-	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 16:54:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 144671E25EB
+	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 16:58:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742489660; cv=none; b=tPIOcELi2NUczlkBycGSaqwg9gQ/lyaNFaWSNIFbeTNP+sf8AcVWO0ACh5oKhEdRt+2ermdXm465DCgYwfAlNr6NSPU8x1i1M6EphFa3+Uyit6NdpwcoazW9jSjxMWx0G+CIkclIoeHL9XxXbv0MBMjDUD1ozymGqOH0+mLeYB0=
+	t=1742489940; cv=none; b=MYgC7zsRpmHnhaJehpGKURVwN+LNbEBGoOpZzP62B9NtcAAR1Qh65CfydMCjPbvjHyU3LWCGMv0Cw9gc657M2ZCtHQwhuMKy6BSPnYAnDAL9Xj13eBG6kIVsZvLOiZX+ZfOrW2dkAu++g15Be+dbAqBBM+o/KNCAwIohKJ/P6Io=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742489660; c=relaxed/simple;
-	bh=Qzs7lXSCEOdVamoYUmTO0qwA7wo38Km/t3XnMT38O6g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=F7/nZQMiJhNiUM+ExoL+yyLf4H72kU8ZWgo6Ilf1err3O7ctA0KHrSC/M8Vz80MYMq2gOdUnU5yN2jlw0Bnt/YLMDsTJ3uKI8Y9tsV3TjsEL/SS/B6gz18N0iiCcibQDOLnqIEjlahF9lrzARlQB5KYXqBnEKaJAVu1i5+sBVAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gh3CG3zv; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742489658;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Qzs7lXSCEOdVamoYUmTO0qwA7wo38Km/t3XnMT38O6g=;
-	b=gh3CG3zvQ9zPm+A1QMUlCUXvCJyIejrTzxGfDmTrcLM7oORcFsPyEJvn8yBlQeKsVdvW/A
-	R0nXLkFILH/3MWGlZ/0z/dNpz0NzkyRtxjaHVPoVimiaVdtQ1LD6EEKdBha4T8wuSb/OZr
-	pkyRWOEUTlWYzCIIV3YDDIQDCe1/v+c=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-641-hvDgIiZ9MLuiO2QInSmNkg-1; Thu, 20 Mar 2025 12:54:16 -0400
-X-MC-Unique: hvDgIiZ9MLuiO2QInSmNkg-1
-X-Mimecast-MFC-AGG-ID: hvDgIiZ9MLuiO2QInSmNkg_1742489655
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-39126c3469fso456200f8f.3
-        for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 09:54:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742489655; x=1743094455;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Qzs7lXSCEOdVamoYUmTO0qwA7wo38Km/t3XnMT38O6g=;
-        b=fr7dfSj2BK5XlQwYrsgv7sykMt7WthpJrjU2+WNhihj36dY/0r94q+d6zkI6IoKL4b
-         saQrRLQC2KkHF6phGwG77Dndt+yD8UB47hrQmDhetK3LR9+K9hxsQsmjygY3f8Ua6lIl
-         NkejTY/uf6/ZFngIHaoviTBZVDs1RoIfopEc383NE2+IqDJ7Nld6hbDnAdftR5N+Tovu
-         47Gx4/P6bUVxFDANu950oI8i3x8jXnhsT1Ltjf1RXt5oz/wxT4am+Vq54nN2WtLE55V5
-         mw/P7/eDy/scyUTyHh63kj/1qhRv6Ri1Y9AhpBSza+I3B36bFG9Jr/oRfOFHxJjZgOJs
-         r48A==
-X-Forwarded-Encrypted: i=1; AJvYcCWJhJVDnhNXYkdWUjKm1ZCR3ok6PWy4Eb3/4uAQ6zbqSmuLrUU42KNIQHpIrJeCnH1z0JE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YznhsRiDc7+/+Wu2ZuSNTw3YZGP+ap6sQUFNNH4Na8NsVvSdwyC
-	WwGMZTqGKOJRjMI61LO7kQ7IoJeDUQvOb7QnNGnuH0VXbTPgWB0zw+UgdO3Ouco/bAmZTxQxr1P
-	olsPd0AghmSpmkpY9qKJgtgKVsd3ynYN1ATkzKL87k0cfJs6gbBxlo95e5uhvXAR8WccIm3jG2n
-	J+JXoHsUuI4SsBYKuf43iYxwWo
-X-Gm-Gg: ASbGnctjZrK72wIIHGLkQoRPlde03ICv33O5j9+itmSDH7l0ebe4aDajTo/tbMad7Ak
-	kuofJdCon6UW1brEP0wECtxKayKA7s9GrXIryVFLDSFHVpbmxwwxnnbWJZFSQslklFKayzfAiCA
-	==
-X-Received: by 2002:a05:6000:4188:b0:391:4999:776c with SMTP id ffacd0b85a97d-3997f932c74mr219921f8f.40.1742489654950;
-        Thu, 20 Mar 2025 09:54:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFj9pl7GARtWFq3jbXWirX8oR8zmkq+Vb5cM05rQzCwUuLwhvW30WXCS+Nl/XDDl7rMvPzTyG7iVBUS8ETq7S4=
-X-Received: by 2002:a05:6000:4188:b0:391:4999:776c with SMTP id
- ffacd0b85a97d-3997f932c74mr219900f8f.40.1742489654526; Thu, 20 Mar 2025
- 09:54:14 -0700 (PDT)
+	s=arc-20240116; t=1742489940; c=relaxed/simple;
+	bh=PC20kkYy5oBft7eQoQ2A3mtQbuM39LN8zulNHXEYwek=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YVKn0e85e9wmQpiwlLpCMDBz04GoVURqd31TNITGqQm7si8XVtqwqI8JZYXke9iplNeFw+jy7c5h1f4KvnEKfuQpopT9uo8VA1g+kLC/i439xic9cqubY3Ok+3301gNx3yH8WixyFFNslBWxi+kZBFDVOfBwMyXga3Bqtj4ZQtg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D91D2113E;
+	Thu, 20 Mar 2025 09:59:04 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3ABAF3F673;
+	Thu, 20 Mar 2025 09:58:56 -0700 (PDT)
+Date: Thu, 20 Mar 2025 16:58:53 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	Will Deacon <will@kernel.org>,
+	Julien Thierry <julien.thierry.kdev@gmail.com>
+Subject: Re: [RFC kvmtool 1/9] Drop support for 32-bit arm
+Message-ID: <Z9xJTZeXnkfWcWNl@raptor>
+References: <20250314222516.1302429-1-oliver.upton@linux.dev>
+ <20250314222516.1302429-2-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAAhSdy380StEE03G=RPjKoxtY89nLeufpXbjYwbRypzzrkQN+g@mail.gmail.com>
-In-Reply-To: <CAAhSdy380StEE03G=RPjKoxtY89nLeufpXbjYwbRypzzrkQN+g@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 20 Mar 2025 17:54:01 +0100
-X-Gm-Features: AQ5f1Jp_WB0jgmaoJDDes32ApEWmT6Y0Q3VLmJo-2VN8hWbZcGCzV2rcn3utTOA
-Message-ID: <CABgObfYbgLN6aqDYTXq=t2G5+KsHjUmdFFCuwmzdEZSVDTrOxA@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/riscv changes for 6.15
-To: Anup Patel <anup@brainfault.org>
-Cc: Palmer Dabbelt <palmer@rivosinc.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Atish Patra <atishp@rivosinc.com>, 
-	Atish Patra <atishp@atishpatra.org>, 
-	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, KVM General <kvm@vger.kernel.org>, 
-	linux-riscv <linux-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250314222516.1302429-2-oliver.upton@linux.dev>
 
-On Thu, Mar 20, 2025 at 3:15=E2=80=AFPM Anup Patel <anup@brainfault.org> wr=
-ote:
->
-> Hi Paolo,
->
-> We mainly have two fixes and few PMU selftests improvements
-> for 6.15. There are quite a few in-flight patches dependent on
-> SBI v3.0 specification which will freeze soon.
->
-> Please pull.
+Hi Oliver,
 
-Pulled, thanks.
+I tried to apply the patch on top of e48563f5c4a48fe6a6bc2a98a9a7c84a10f043be,
+which is the base commit from the cover letter, and I got these errors:
 
-Paolo
+Applying: Drop support for 32-bit arm
+error: removal patch leaves file contents
+error: arm/aarch32/arm-cpu.c: patch does not apply
+error: removal patch leaves file contents
+error: arm/aarch32/include/asm/kernel.h: patch does not apply
+error: removal patch leaves file contents
+error: arm/aarch32/include/asm/kvm.h: patch does not apply
+error: removal patch leaves file contents
+error: arm/aarch32/include/kvm/barrier.h: patch does not apply
+error: removal patch leaves file contents
+error: arm/aarch32/include/kvm/fdt-arch.h: patch does not apply
+error: removal patch leaves file contents
+error: arm/aarch32/include/kvm/kvm-arch.h: patch does not apply
+error: removal patch leaves file contents
+error: arm/aarch32/include/kvm/kvm-config-arch.h: patch does not apply
+error: removal patch leaves file contents
+error: arm/aarch32/include/kvm/kvm-cpu-arch.h: patch does not apply
+error: removal patch leaves file contents
+error: arm/aarch32/kvm-cpu.c: patch does not apply
+error: removal patch leaves file contents
+error: arm/aarch32/kvm.c: patch does not apply
 
-> Regards,
-> Anup
+When I delete the files manually, the resulting commit has diffs like this for
+the deleted files:
 
+diff --git a/arm/aarch32/arm-cpu.c b/arm/aarch32/arm-cpu.c
+deleted file mode 100644
+index 16bba5524caf..000000000000
+--- a/arm/aarch32/arm-cpu.c
++++ /dev/null
+@@ -1,50 +0,0 @@
+-#include "kvm/kvm.h"
+-#include "kvm/kvm-cpu.h"
+-#include "kvm/util.h"
+-
+-#include "arm-common/gic.h"
+-#include "arm-common/timer.h"
+[..]
+
+.. and so on.
+
+Am I missing a knob for applying the patch? FYI, this happens for all the
+patches in this series with files deleted.
+
+One more comment below.
+
+On Fri, Mar 14, 2025 at 03:25:08PM -0700, Oliver Upton wrote:
+> Linux dropped support for KVM in 32-bit arm kernels almost 5 years ago
+> in the 5.7 kernel release. In addition to that KVM/arm64 never had
+> 32-bit compat support, so it is a safe assumption that usage of 32-bit
+> kvmtool is pretty much dead at this point.
+> 
+> Do not despair -- 32-bit guests are still supported with a 64-bit
+> userspace.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  INSTALL                                   |   9 +-
+>  Makefile                                  |  31 +--
+>  arm/aarch32/arm-cpu.c                     |  50 ----
+>  arm/aarch32/include/asm/kernel.h          |   8 -
+>  arm/aarch32/include/asm/kvm.h             | 311 ----------------------
+>  arm/aarch32/include/kvm/barrier.h         |  10 -
+>  arm/aarch32/include/kvm/fdt-arch.h        |   6 -
+>  arm/aarch32/include/kvm/kvm-arch.h        |  18 --
+>  arm/aarch32/include/kvm/kvm-config-arch.h |   8 -
+>  arm/aarch32/include/kvm/kvm-cpu-arch.h    |  24 --
+>  arm/aarch32/kvm-cpu.c                     | 132 ---------
+>  arm/aarch32/kvm.c                         |  14 -
+>  12 files changed, 14 insertions(+), 607 deletions(-)
+>  delete mode 100644 arm/aarch32/arm-cpu.c
+>  delete mode 100644 arm/aarch32/include/asm/kernel.h
+>  delete mode 100644 arm/aarch32/include/asm/kvm.h
+>  delete mode 100644 arm/aarch32/include/kvm/barrier.h
+>  delete mode 100644 arm/aarch32/include/kvm/fdt-arch.h
+>  delete mode 100644 arm/aarch32/include/kvm/kvm-arch.h
+>  delete mode 100644 arm/aarch32/include/kvm/kvm-config-arch.h
+>  delete mode 100644 arm/aarch32/include/kvm/kvm-cpu-arch.h
+>  delete mode 100644 arm/aarch32/kvm-cpu.c
+>  delete mode 100644 arm/aarch32/kvm.c
+> 
+> diff --git a/INSTALL b/INSTALL
+> index 2a65735..0e1e63e 100644
+> --- a/INSTALL
+> +++ b/INSTALL
+> @@ -26,7 +26,7 @@ For Fedora based systems:
+>  For OpenSUSE based systems:
+>  	# zypper install glibc-devel-static
+>  
+> -Architectures which require device tree (PowerPC, ARM, ARM64, RISC-V) also
+> +Architectures which require device tree (PowerPC, ARM64, RISC-V) also
+>  require libfdt.
+>  	deb: $ sudo apt-get install libfdt-dev
+>  	Fedora: # yum install libfdt-devel
+> @@ -61,16 +61,15 @@ to the Linux name of the architecture. Architectures supported:
+>  - i386
+>  - x86_64
+>  - powerpc
+> -- arm
+>  - arm64
+>  - mips
+>  - riscv
+>  If ARCH is not provided, the target architecture will be automatically
+>  determined by running "uname -m" on your host, resulting in a native build.
+>  
+> -To cross-compile to ARM for instance, install a cross-compiler, put the
+> +To cross-compile to arm64 for instance, install a cross-compiler, put the
+>  required libraries in the cross-compiler's SYSROOT and type:
+> -$ make CROSS_COMPILE=arm-linux-gnueabihf- ARCH=arm
+> +$ make CROSS_COMPILE=aarch64-linux-gnu- ARCH=arm64
+>  
+>  Missing libraries when cross-compiling
+>  ---------------------------------------
+> @@ -82,7 +81,7 @@ On multiarch system you should be able to install those be appending
+>  the architecture name after the package (example for ARM64):
+>  $ sudo apt-get install libfdt-dev:arm64
+>  
+> -PowerPC, ARM/ARM64 and RISC-V require libfdt to be installed. If you cannot use
+> +PowerPC, ARM64 and RISC-V require libfdt to be installed. If you cannot use
+>  precompiled mulitarch packages, you could either copy the required header and
+>  library files from an installed target system into the SYSROOT (you will need
+>  /usr/include/*fdt*.h and /usr/lib64/libfdt-v.v.v.so and its symlinks), or you
+> diff --git a/Makefile b/Makefile
+> index d84dc8e..462659b 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -166,35 +166,24 @@ ifeq ($(ARCH), powerpc)
+>  	ARCH_WANT_LIBFDT := y
+>  endif
+>  
+> -# ARM
+> -OBJS_ARM_COMMON		:= arm/fdt.o arm/gic.o arm/gicv2m.o arm/ioport.o \
+> -			   arm/kvm.o arm/kvm-cpu.o arm/pci.o arm/timer.o \
+> -			   hw/serial.o
+> -HDRS_ARM_COMMON		:= arm/include
+> -ifeq ($(ARCH), arm)
+> -	DEFINES		+= -DCONFIG_ARM
+
+Found a couple of instances of CONFIG_ARM using grep.
+
+There also one instance of the architecture name ARM in a comment in
+hw/cfi_flash.c, I think that was a typo and it was meant to say ARM64.
+
+Other than that, looks good.
+
+Thanks,
+Alex
+
+> -	OBJS		+= $(OBJS_ARM_COMMON)
+> -	OBJS		+= arm/aarch32/arm-cpu.o
+> -	OBJS		+= arm/aarch32/kvm-cpu.o
+> -	OBJS		+= arm/aarch32/kvm.o
+> -	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
+> -	ARCH_INCLUDE	+= -Iarm/aarch32/include
+> -	CFLAGS		+= -march=armv7-a
+> -
+> -	ARCH_WANT_LIBFDT := y
+> -	ARCH_HAS_FLASH_MEM := y
+> -endif
+> -
+>  # ARM64
+>  ifeq ($(ARCH), arm64)
+>  	DEFINES		+= -DCONFIG_ARM64
+> -	OBJS		+= $(OBJS_ARM_COMMON)
+> +	OBJS		+= arm/fdt.o
+> +	OBJS		+= arm/gic.o
+> +	OBJS		+= arm/gicv2m.o
+> +	OBJS		+= arm/ioport.o
+> +	OBJS		+= arm/kvm.o
+> +	OBJS		+= arm/kvm-cpu.o
+> +	OBJS		+= arm/pci.o
+> +	OBJS		+= arm/timer.o
+> +	OBJS		+= hw/serial.o
+>  	OBJS		+= arm/aarch64/arm-cpu.o
+>  	OBJS		+= arm/aarch64/kvm-cpu.o
+>  	OBJS		+= arm/aarch64/kvm.o
+>  	OBJS		+= arm/aarch64/pvtime.o
+>  	OBJS		+= arm/aarch64/pmu.o
+> -	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
+> +	ARCH_INCLUDE	:= arm/include
+>  	ARCH_INCLUDE	+= -Iarm/aarch64/include
+>  
+>  	ARCH_WANT_LIBFDT := y
+> diff --git a/arm/aarch32/arm-cpu.c b/arm/aarch32/arm-cpu.c
+> deleted file mode 100644
+> index 16bba55..0000000
+> diff --git a/arm/aarch32/include/asm/kernel.h b/arm/aarch32/include/asm/kernel.h
+> deleted file mode 100644
+> index 6129609..0000000
+> diff --git a/arm/aarch32/include/asm/kvm.h b/arm/aarch32/include/asm/kvm.h
+> deleted file mode 100644
+> index a4217c1..0000000
+> diff --git a/arm/aarch32/include/kvm/barrier.h b/arm/aarch32/include/kvm/barrier.h
+> deleted file mode 100644
+> index 94913a9..0000000
+> diff --git a/arm/aarch32/include/kvm/fdt-arch.h b/arm/aarch32/include/kvm/fdt-arch.h
+> deleted file mode 100644
+> index e448bf1..0000000
+> diff --git a/arm/aarch32/include/kvm/kvm-arch.h b/arm/aarch32/include/kvm/kvm-arch.h
+> deleted file mode 100644
+> index 0333cf4..0000000
+> diff --git a/arm/aarch32/include/kvm/kvm-config-arch.h b/arm/aarch32/include/kvm/kvm-config-arch.h
+> deleted file mode 100644
+> index acf0d23..0000000
+> diff --git a/arm/aarch32/include/kvm/kvm-cpu-arch.h b/arm/aarch32/include/kvm/kvm-cpu-arch.h
+> deleted file mode 100644
+> index fd0b387..0000000
+> diff --git a/arm/aarch32/kvm-cpu.c b/arm/aarch32/kvm-cpu.c
+> deleted file mode 100644
+> index 95fb1da..0000000
+> diff --git a/arm/aarch32/kvm.c b/arm/aarch32/kvm.c
+> deleted file mode 100644
+> index 768a56b..0000000
+> -- 
+> 2.39.5
+> 
+> 
 
