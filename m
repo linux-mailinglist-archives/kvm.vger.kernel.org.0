@@ -1,76 +1,76 @@
-Return-Path: <kvm+bounces-41604-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41606-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43CABA6B0C9
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 23:31:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BE753A6B0CA
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 23:31:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 136474A21D9
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 22:30:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B439D487873
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 22:30:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4A1022ACDB;
-	Thu, 20 Mar 2025 22:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7F6B224249;
+	Thu, 20 Mar 2025 22:30:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="STs37TQ4"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xGM3s5ro"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E001B228CB8
-	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 22:30:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9092212FBD
+	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 22:30:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742509818; cv=none; b=uTyiIAxaNh/rSbIicIBn3JZbKyp7UlkrlPGF0CWSoB+i+IOF3gugf1hCSh/9y7DoG2yjHPrVOxVh2S8WbLlqf5o/KlKMh+rGsKn9nnOph6J0tFlJmHfSfQAoLOxeMPvreTaM0EcyZd/CGCMKyI0gJCVp9zJXjf/7l45JrRGzttE=
+	t=1742509819; cv=none; b=T3/ectsNcqiMmIjt1WoTk8tJOv5SI2boluAyjSZOVzmi4onp0ggiWBVYBiY7JsUT4DSgLwFGxET7S8WlwfwvUne9VcHXlRJuTeOBJrIwNOYhepGfhUti36uPH0XLvcSmcqomeIS15wYiQ4IJmCb2uwtSPAB1PDXWHZpqnKmlob0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742509818; c=relaxed/simple;
-	bh=8032EpNxG6iAj8mji3XCprkzPyTYvtWM95QAJORZa4w=;
+	s=arc-20240116; t=1742509819; c=relaxed/simple;
+	bh=q8LoSEtntGYcmZOiP+ERuy3LMJdXU55737mDN4SxQcA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AnWkL4ron0Mo80/qnKaW+AdkPC9xySHhjaOErPTUNv8WNLLXpkjz2E1eHqdDUBAAozx1EKJzPeT2BWnA2XJqveAG7PXxze42xpmCccCTm/EEbcdeZXlZOmMLKi032G2EgkoINQB8WqhFv3bax8L0XZxP8mKPjtFpNJolh2GiCIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=STs37TQ4; arc=none smtp.client-ip=209.85.214.171
+	 MIME-Version; b=KqbPGWAYUnkyNtaTgvnmQT+AtHgSRp4xLjIPQypRJ9F72efpHjfjHoDv4z+E613z0rEpV1e/LYqiiWY4LveuAmhE1z+evugy2dsVcbH1TOc9J4MhTxC0rB6pU5CN1ZCAYFFE3OWsNg1QITWyg7RAu6NS7hIEfuGRK3e7iA4izmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=xGM3s5ro; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-224019ad9edso32560825ad.1
-        for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 15:30:15 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-22438c356c8so26170995ad.1
+        for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 15:30:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1742509815; x=1743114615; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1742509816; x=1743114616; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EUQWJa8M2i9P17T56WC7L1ajUU3UpMhiv0rwi6K2NYA=;
-        b=STs37TQ4hS/sTLR9F8zTxAIQQ5g/u1QMEHD351LTXegV+312/26R8AnTq3aHaxkc1l
-         j4/rPXCANBAjKPNVV0aQT1qFmG+TMAmYDXVmv/UGpBb+Es1fs0FSnJJBPiN8hJjguMfB
-         7Qvz7FRmWKD0PTKGcytX/ONMp8UU2coQcPyCMIU5zsJZQEn8rsymIZbKR75MZ4Xg6DX+
-         gnhOOVw9wxToHfC1rSwAHZfSgPdZw5Eq/22yNZSrWIkmlflz9/AGhuGVf4K2BvecfapX
-         grPKQ3WJKLtEER8TQaqtHvIcj9m2b2p4qpe2LG3R52pjNSM8rNnlwaLsGf5ERXKwoZVN
-         tUfA==
+        bh=7atg1QNlMwiRcOtfC+g1XTGtA+tIvR9K19RwCptDexg=;
+        b=xGM3s5roHWISXvp2y9mAYm6ZAtgsBjFY3FuYRmUkULocEUtWOwye432+ZqfdfngD9V
+         3hMgP+3oLNtfIG6fMlja9d2cJd70VqZQePHCwozbMkjKfnJn2k+pK86QBn1DrH1tKPgE
+         /wfni4BNaugVX2VpEWvRHeFLye8wSoFjk1PmmNH41QDO0XS/zquhJzhuRUOamMYeU1Az
+         sE6FaCXccD9CxPKBn+O5ReDNOUs/gFIO/rD7CBs+JZlgj6iDSPE5oiU+4jvJ2Wo8wKMH
+         CRqAixMvVoBiYbF67Q8ei0oS6yTc2AGPTi7x54DuciYqud3Uajv6jgIyayIYar3dW/Np
+         IezQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742509815; x=1743114615;
+        d=1e100.net; s=20230601; t=1742509816; x=1743114616;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=EUQWJa8M2i9P17T56WC7L1ajUU3UpMhiv0rwi6K2NYA=;
-        b=BXfZzyjkiGDoyTd6ztzoFVLB9xSu3kOpjaf9qyWkXD5bQtEk/D/btmyyInmmQ0zg86
-         jBem/IA+xDgbtw8m+XJR1G82grgAuEun5Fq0oC7O/4/Au3HkvMqO9h141b0Levyvv6UA
-         1buSL0JXY+xqbT5P8xqTrRZ10LwaUBa1X8+YcSkGrVsb6+eWe0HRmhp+VeBcwq/zDFC5
-         NB/E7NZOZY3P25+InabMVYFVSNoVBcd69/lHbs5kwFFx0pi6NmGb6QUXKe4N9CFl32V/
-         KPxFiIVbRjfF9THITp5lw6yDXwbN4HNcrgskbLMqjziU+baEJ0g5dLwt6bD2uDUgLHNB
-         q5lA==
-X-Gm-Message-State: AOJu0YzibG3e6aY3qnpabccxloqJkeQgm68mu+70/aKg3CBXBWqZYhJJ
-	tVFsl9u+hIwpgpvBKLmUpndbN6V/Klr8ag2XEgKQI10wzTBoDg0en7DNGd/LhAE=
-X-Gm-Gg: ASbGncsFlulNzDjrlcaK0j4xChTbWN1Y2hNB3Wg8x30XDQJEPUJshjo2WkA/1kFhPc8
-	wqQNISd3J8THZ1IIJqH0cga2c828gUNqi/fZ4ar4IX0cr4sNT1bYxZuDV8D/un07l+Mv6pj344X
-	yE2brvan6yrrkWlFgzutKaqDBMP50TKimtkHEd4Z3EwEGocDGudM+0iwgCK0XxPXt0+VQp7hMnT
-	WFo3O1FtLSzG1Pac91VsCHuTjdINANgf/4+pHGYmtzXEFBS6/li/tbvwtU7F/cKI10gkZr/xR4/
-	TB8sjrrn9YiWFkpee0zMUVQfroKcNrfyyNScCHgG2wiK
-X-Google-Smtp-Source: AGHT+IH6ZvqlVmR/vgYitM0gTW8xnrCBbOkByuhosGlG4c0RqGsCkRYzWH0d/KpBtFj4JuB9Fwyv6A==
-X-Received: by 2002:a17:902:f20c:b0:224:256e:5e3f with SMTP id d9443c01a7336-22780d8370amr16464875ad.25.1742509815082;
-        Thu, 20 Mar 2025 15:30:15 -0700 (PDT)
+        bh=7atg1QNlMwiRcOtfC+g1XTGtA+tIvR9K19RwCptDexg=;
+        b=om49Z2u201swwKzESXQ8FlJgdpQ6vFYoQiKHWGjxMcHroaf6/pInkt4dnSL7uSpBF7
+         PZt7KaEa62ry6WrzTFGfgwa8LL7TeTJ193gy5UXhWCSrroQY6foksVQjmJVR0zuH3dFG
+         8z0FF8FgQDpp9tz9Hh7P5LNVyk4qqtcPeOoWXSFq2jf6M6qTr22L7prhtizhJDUK9IPR
+         HCNM1gRb3UZke5kj/ontPj5P6BUb3YyYbIi47VB5fDFBXnOb/ta0Dup5t5QwIg7YQRQs
+         fCDyMjAXROA2gu+xjPlHcgZDrKDjeF/XXDcSJdUZJkL5QhGoOC/knniFPGZ5TOJRk12r
+         YJCw==
+X-Gm-Message-State: AOJu0Yx6dz87c67OmlARHUOqoLMO/KbfUPmTVFoFtCdkzHKvk584Mumo
+	rVe++RPiWIqHGDH+9NKn15lgYCCTje385bUMBogLBlzeLWnsbgkvZMUBMZKKaBs=
+X-Gm-Gg: ASbGncv8rXr3CfprWYjvmdZefRw6nu9t4+AV8N8tupZRRSgA8chNm8Jw8kCbN4lnCR/
+	AV4ygDCgUmr+4Hnb3sNeq31rZCdEh0Ln6OaPCyjUKEGbkV3kpxo7RAvdqjNHHlPkODcGscv8BDy
+	4v10L3WQNDYOEtf60iqEXbZigGglzZmi2lNA1Z2MSLVrb0F08PIKYP/qpwp6OCXCy5eijv7+ODL
+	plbjUmSnS/w6VSDIn0jtRahORZOdAQyNUlopF56GlkJU/Y6Bt9GSYEX9nG3Ol+PWpKZ1DsbR1o4
+	hzixXgwQnqLtrIJVhqYhDlAa39uivPonOEa5r4i9GahB
+X-Google-Smtp-Source: AGHT+IFhrj0Ju18mZ4zB7Xxugx+gQPBMv57HUAn1z52UjX2P86odC+k4hNfGzhAwTQWLPYDhPHuNiQ==
+X-Received: by 2002:a17:902:e951:b0:224:11fc:40c0 with SMTP id d9443c01a7336-22780c54e1amr15128535ad.11.1742509816076;
+        Thu, 20 Mar 2025 15:30:16 -0700 (PDT)
 Received: from pc.. ([38.39.164.180])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22780f4581csm3370145ad.59.2025.03.20.15.30.11
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22780f4581csm3370145ad.59.2025.03.20.15.30.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Mar 2025 15:30:11 -0700 (PDT)
+        Thu, 20 Mar 2025 15:30:15 -0700 (PDT)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: kvm@vger.kernel.org,
@@ -81,9 +81,9 @@ Cc: kvm@vger.kernel.org,
 	Richard Henderson <richard.henderson@linaro.org>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v2 01/30] exec/cpu-all: remove BSWAP_NEEDED
-Date: Thu, 20 Mar 2025 15:29:33 -0700
-Message-Id: <20250320223002.2915728-2-pierrick.bouvier@linaro.org>
+Subject: [PATCH v2 02/30] exec/cpu-all: extract tlb flags defines to exec/tlb-flags.h
+Date: Thu, 20 Mar 2025 15:29:34 -0700
+Message-Id: <20250320223002.2915728-3-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250320223002.2915728-1-pierrick.bouvier@linaro.org>
 References: <20250320223002.2915728-1-pierrick.bouvier@linaro.org>
@@ -95,192 +95,336 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This identifier is poisoned, so it can't be used from common code
-anyway. We replace all occurrences with its definition directly.
-
 Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 ---
- include/exec/cpu-all.h    | 12 ------------
- linux-user/syscall_defs.h |  2 +-
- bsd-user/elfload.c        |  6 +++---
- hw/ppc/mac_newworld.c     |  4 +---
- hw/ppc/mac_oldworld.c     |  4 +---
- hw/sparc/sun4m.c          |  6 +-----
- hw/sparc64/sun4u.c        |  6 +-----
- linux-user/elfload.c      |  8 ++++----
- 8 files changed, 12 insertions(+), 36 deletions(-)
+ include/exec/cpu-all.h               | 63 --------------------
+ include/exec/tlb-flags.h             | 87 ++++++++++++++++++++++++++++
+ accel/tcg/cputlb.c                   |  1 +
+ accel/tcg/user-exec.c                |  1 +
+ semihosting/uaccess.c                |  1 +
+ target/arm/ptw.c                     |  1 +
+ target/arm/tcg/helper-a64.c          |  1 +
+ target/arm/tcg/mte_helper.c          |  1 +
+ target/arm/tcg/sve_helper.c          |  1 +
+ target/i386/tcg/system/excp_helper.c |  1 +
+ target/riscv/op_helper.c             |  1 +
+ target/riscv/vector_helper.c         |  1 +
+ target/s390x/tcg/mem_helper.c        |  1 +
+ target/sparc/mmu_helper.c            |  1 +
+ 14 files changed, 99 insertions(+), 63 deletions(-)
+ create mode 100644 include/exec/tlb-flags.h
 
 diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-index 981a08e3bb3..013fcc9412a 100644
+index 013fcc9412a..d2895fb55b1 100644
 --- a/include/exec/cpu-all.h
 +++ b/include/exec/cpu-all.h
-@@ -28,18 +28,6 @@
- #include "system/memory.h"
- #endif
+@@ -36,69 +36,6 @@ CPUArchState *cpu_copy(CPUArchState *env);
  
--/* some important defines:
-- *
-- * HOST_BIG_ENDIAN : whether the host cpu is big endian and
-- * otherwise little endian.
-- *
-- * TARGET_BIG_ENDIAN : same for the target cpu
+ #include "cpu.h"
+ 
+-#ifdef CONFIG_USER_ONLY
+-
+-/*
+- * Allow some level of source compatibility with softmmu.  We do not
+- * support any of the more exotic features, so only invalid pages may
+- * be signaled by probe_access_flags().
 - */
+-#define TLB_INVALID_MASK    (1 << (TARGET_PAGE_BITS_MIN - 1))
+-#define TLB_MMIO            (1 << (TARGET_PAGE_BITS_MIN - 2))
+-#define TLB_WATCHPOINT      0
 -
--#if HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN
--#define BSWAP_NEEDED
--#endif
+-#else
 -
- /* page related stuff */
- #include "exec/cpu-defs.h"
- #include "exec/target_page.h"
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 86d773add75..5d227599924 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -462,7 +462,7 @@ typedef struct {
-     abi_ulong sig[TARGET_NSIG_WORDS];
- } target_sigset_t;
- 
--#ifdef BSWAP_NEEDED
-+#if HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN
- static inline void tswap_sigset(target_sigset_t *d, const target_sigset_t *s)
- {
-     int i;
-diff --git a/bsd-user/elfload.c b/bsd-user/elfload.c
-index 833fa3bd057..3bca0cc9ede 100644
---- a/bsd-user/elfload.c
-+++ b/bsd-user/elfload.c
-@@ -44,7 +44,7 @@ static inline void memcpy_fromfs(void *to, const void *from, unsigned long n)
-     memcpy(to, from, n);
- }
- 
--#ifdef BSWAP_NEEDED
-+#if HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN
- static void bswap_ehdr(struct elfhdr *ehdr)
- {
-     bswap16s(&ehdr->e_type);            /* Object file type */
-@@ -111,7 +111,7 @@ static void bswap_note(struct elf_note *en)
-     bswap32s(&en->n_type);
- }
- 
--#else /* ! BSWAP_NEEDED */
+-/*
+- * Flags stored in the low bits of the TLB virtual address.
+- * These are defined so that fast path ram access is all zeros.
+- * The flags all must be between TARGET_PAGE_BITS and
+- * maximum address alignment bit.
+- *
+- * Use TARGET_PAGE_BITS_MIN so that these bits are constant
+- * when TARGET_PAGE_BITS_VARY is in effect.
+- *
+- * The count, if not the placement of these bits is known
+- * to tcg/tcg-op-ldst.c, check_max_alignment().
+- */
+-/* Zero if TLB entry is valid.  */
+-#define TLB_INVALID_MASK    (1 << (TARGET_PAGE_BITS_MIN - 1))
+-/* Set if TLB entry references a clean RAM page.  The iotlb entry will
+-   contain the page physical address.  */
+-#define TLB_NOTDIRTY        (1 << (TARGET_PAGE_BITS_MIN - 2))
+-/* Set if TLB entry is an IO callback.  */
+-#define TLB_MMIO            (1 << (TARGET_PAGE_BITS_MIN - 3))
+-/* Set if TLB entry writes ignored.  */
+-#define TLB_DISCARD_WRITE   (1 << (TARGET_PAGE_BITS_MIN - 4))
+-/* Set if the slow path must be used; more flags in CPUTLBEntryFull. */
+-#define TLB_FORCE_SLOW      (1 << (TARGET_PAGE_BITS_MIN - 5))
+-
+-/*
+- * Use this mask to check interception with an alignment mask
+- * in a TCG backend.
+- */
+-#define TLB_FLAGS_MASK \
+-    (TLB_INVALID_MASK | TLB_NOTDIRTY | TLB_MMIO \
+-    | TLB_FORCE_SLOW | TLB_DISCARD_WRITE)
+-
+-/*
+- * Flags stored in CPUTLBEntryFull.slow_flags[x].
+- * TLB_FORCE_SLOW must be set in CPUTLBEntry.addr_idx[x].
+- */
+-/* Set if TLB entry requires byte swap.  */
+-#define TLB_BSWAP            (1 << 0)
+-/* Set if TLB entry contains a watchpoint.  */
+-#define TLB_WATCHPOINT       (1 << 1)
+-/* Set if TLB entry requires aligned accesses.  */
+-#define TLB_CHECK_ALIGNED    (1 << 2)
+-
+-#define TLB_SLOW_FLAGS_MASK  (TLB_BSWAP | TLB_WATCHPOINT | TLB_CHECK_ALIGNED)
+-
+-/* The two sets of flags must not overlap. */
+-QEMU_BUILD_BUG_ON(TLB_FLAGS_MASK & TLB_SLOW_FLAGS_MASK);
+-
+-#endif /* !CONFIG_USER_ONLY */
+-
+ /* Validate correct placement of CPUArchState. */
+ QEMU_BUILD_BUG_ON(offsetof(ArchCPU, parent_obj) != 0);
+ QEMU_BUILD_BUG_ON(offsetof(ArchCPU, env) != sizeof(CPUState));
+diff --git a/include/exec/tlb-flags.h b/include/exec/tlb-flags.h
+new file mode 100644
+index 00000000000..c371ae77602
+--- /dev/null
++++ b/include/exec/tlb-flags.h
+@@ -0,0 +1,87 @@
++/*
++ * TLB flags definition
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ */
++#ifndef TLB_FLAGS_H
++#define TLB_FLAGS_H
++
++#include "exec/cpu-defs.h"
++
++#ifdef CONFIG_USER_ONLY
++
++/*
++ * Allow some level of source compatibility with softmmu.  We do not
++ * support any of the more exotic features, so only invalid pages may
++ * be signaled by probe_access_flags().
++ */
++#define TLB_INVALID_MASK    (1 << (TARGET_PAGE_BITS_MIN - 1))
++#define TLB_MMIO            (1 << (TARGET_PAGE_BITS_MIN - 2))
++#define TLB_WATCHPOINT      0
++
 +#else
++
++/*
++ * Flags stored in the low bits of the TLB virtual address.
++ * These are defined so that fast path ram access is all zeros.
++ * The flags all must be between TARGET_PAGE_BITS and
++ * maximum address alignment bit.
++ *
++ * Use TARGET_PAGE_BITS_MIN so that these bits are constant
++ * when TARGET_PAGE_BITS_VARY is in effect.
++ *
++ * The count, if not the placement of these bits is known
++ * to tcg/tcg-op-ldst.c, check_max_alignment().
++ */
++/* Zero if TLB entry is valid.  */
++#define TLB_INVALID_MASK    (1 << (TARGET_PAGE_BITS_MIN - 1))
++/* Set if TLB entry references a clean RAM page.  The iotlb entry will
++   contain the page physical address.  */
++#define TLB_NOTDIRTY        (1 << (TARGET_PAGE_BITS_MIN - 2))
++/* Set if TLB entry is an IO callback.  */
++#define TLB_MMIO            (1 << (TARGET_PAGE_BITS_MIN - 3))
++/* Set if TLB entry writes ignored.  */
++#define TLB_DISCARD_WRITE   (1 << (TARGET_PAGE_BITS_MIN - 4))
++/* Set if the slow path must be used; more flags in CPUTLBEntryFull. */
++#define TLB_FORCE_SLOW      (1 << (TARGET_PAGE_BITS_MIN - 5))
++
++/*
++ * Use this mask to check interception with an alignment mask
++ * in a TCG backend.
++ */
++#define TLB_FLAGS_MASK \
++    (TLB_INVALID_MASK | TLB_NOTDIRTY | TLB_MMIO \
++    | TLB_FORCE_SLOW | TLB_DISCARD_WRITE)
++
++/*
++ * Flags stored in CPUTLBEntryFull.slow_flags[x].
++ * TLB_FORCE_SLOW must be set in CPUTLBEntry.addr_idx[x].
++ */
++/* Set if TLB entry requires byte swap.  */
++#define TLB_BSWAP            (1 << 0)
++/* Set if TLB entry contains a watchpoint.  */
++#define TLB_WATCHPOINT       (1 << 1)
++/* Set if TLB entry requires aligned accesses.  */
++#define TLB_CHECK_ALIGNED    (1 << 2)
++
++#define TLB_SLOW_FLAGS_MASK  (TLB_BSWAP | TLB_WATCHPOINT | TLB_CHECK_ALIGNED)
++
++/* The two sets of flags must not overlap. */
++QEMU_BUILD_BUG_ON(TLB_FLAGS_MASK & TLB_SLOW_FLAGS_MASK);
++
++#endif /* !CONFIG_USER_ONLY */
++
++#endif /* TLB_FLAGS_H */
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index 613f919fffb..b2db49e305e 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -34,6 +34,7 @@
+ #include "qemu/error-report.h"
+ #include "exec/log.h"
+ #include "exec/helper-proto-common.h"
++#include "exec/tlb-flags.h"
+ #include "qemu/atomic.h"
+ #include "qemu/atomic128.h"
+ #include "tb-internal.h"
+diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
+index ebc7c3ecf54..667c5e03543 100644
+--- a/accel/tcg/user-exec.c
++++ b/accel/tcg/user-exec.c
+@@ -21,6 +21,7 @@
+ #include "disas/disas.h"
+ #include "exec/vaddr.h"
+ #include "exec/exec-all.h"
++#include "exec/tlb-flags.h"
+ #include "tcg/tcg.h"
+ #include "qemu/bitops.h"
+ #include "qemu/rcu.h"
+diff --git a/semihosting/uaccess.c b/semihosting/uaccess.c
+index a9578911669..cb64725a37c 100644
+--- a/semihosting/uaccess.c
++++ b/semihosting/uaccess.c
+@@ -11,6 +11,7 @@
+ #include "exec/cpu-all.h"
+ #include "exec/cpu-mmu-index.h"
+ #include "exec/exec-all.h"
++#include "exec/tlb-flags.h"
+ #include "semihosting/uaccess.h"
  
- static void bswap_ehdr(struct elfhdr *ehdr) { }
- static void bswap_phdr(struct elf_phdr *phdr, int phnum) { }
-@@ -119,7 +119,7 @@ static void bswap_shdr(struct elf_shdr *shdr, int shnum) { }
- static void bswap_sym(struct elf_sym *sym) { }
- static void bswap_note(struct elf_note *en) { }
+ void *uaccess_lock_user(CPUArchState *env, target_ulong addr,
+diff --git a/target/arm/ptw.c b/target/arm/ptw.c
+index 43309003486..8d4e9e07a94 100644
+--- a/target/arm/ptw.c
++++ b/target/arm/ptw.c
+@@ -12,6 +12,7 @@
+ #include "qemu/main-loop.h"
+ #include "exec/exec-all.h"
+ #include "exec/page-protection.h"
++#include "exec/tlb-flags.h"
+ #include "cpu.h"
+ #include "internals.h"
+ #include "cpu-features.h"
+diff --git a/target/arm/tcg/helper-a64.c b/target/arm/tcg/helper-a64.c
+index 9244848efed..fa79d19425f 100644
+--- a/target/arm/tcg/helper-a64.c
++++ b/target/arm/tcg/helper-a64.c
+@@ -31,6 +31,7 @@
+ #include "exec/cpu-common.h"
+ #include "exec/exec-all.h"
+ #include "exec/cpu_ldst.h"
++#include "exec/tlb-flags.h"
+ #include "qemu/int128.h"
+ #include "qemu/atomic128.h"
+ #include "fpu/softfloat.h"
+diff --git a/target/arm/tcg/mte_helper.c b/target/arm/tcg/mte_helper.c
+index 80164a80504..888c6707547 100644
+--- a/target/arm/tcg/mte_helper.c
++++ b/target/arm/tcg/mte_helper.c
+@@ -31,6 +31,7 @@
+ #endif
+ #include "exec/cpu_ldst.h"
+ #include "exec/helper-proto.h"
++#include "exec/tlb-flags.h"
+ #include "accel/tcg/cpu-ops.h"
+ #include "qapi/error.h"
+ #include "qemu/guest-random.h"
+diff --git a/target/arm/tcg/sve_helper.c b/target/arm/tcg/sve_helper.c
+index d786b4b1118..e3bed77b48e 100644
+--- a/target/arm/tcg/sve_helper.c
++++ b/target/arm/tcg/sve_helper.c
+@@ -23,6 +23,7 @@
+ #include "exec/exec-all.h"
+ #include "exec/page-protection.h"
+ #include "exec/helper-proto.h"
++#include "exec/tlb-flags.h"
+ #include "tcg/tcg-gvec-desc.h"
+ #include "fpu/softfloat.h"
+ #include "tcg/tcg.h"
+diff --git a/target/i386/tcg/system/excp_helper.c b/target/i386/tcg/system/excp_helper.c
+index 6876329de21..b0b74df72fd 100644
+--- a/target/i386/tcg/system/excp_helper.c
++++ b/target/i386/tcg/system/excp_helper.c
+@@ -22,6 +22,7 @@
+ #include "exec/cpu_ldst.h"
+ #include "exec/cputlb.h"
+ #include "exec/page-protection.h"
++#include "exec/tlb-flags.h"
+ #include "tcg/helper-tcg.h"
  
--#endif /* ! BSWAP_NEEDED */
-+#endif /* HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN */
+ typedef struct TranslateParams {
+diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+index 0d4220ba93b..8208bec078a 100644
+--- a/target/riscv/op_helper.c
++++ b/target/riscv/op_helper.c
+@@ -25,6 +25,7 @@
+ #include "exec/cputlb.h"
+ #include "exec/cpu_ldst.h"
+ #include "exec/helper-proto.h"
++#include "exec/tlb-flags.h"
+ #include "trace.h"
  
- #include "elfcore.c"
+ /* Exceptions processing helpers */
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 7773df6a7c7..ff05390baef 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -25,6 +25,7 @@
+ #include "exec/cpu_ldst.h"
+ #include "exec/page-protection.h"
+ #include "exec/helper-proto.h"
++#include "exec/tlb-flags.h"
+ #include "fpu/softfloat.h"
+ #include "tcg/tcg-gvec-desc.h"
+ #include "internals.h"
+diff --git a/target/s390x/tcg/mem_helper.c b/target/s390x/tcg/mem_helper.c
+index 8187b917ba1..0ff2e10d816 100644
+--- a/target/s390x/tcg/mem_helper.c
++++ b/target/s390x/tcg/mem_helper.c
+@@ -29,6 +29,7 @@
+ #include "exec/cputlb.h"
+ #include "exec/page-protection.h"
+ #include "exec/cpu_ldst.h"
++#include "exec/tlb-flags.h"
+ #include "accel/tcg/cpu-ops.h"
+ #include "qemu/int128.h"
+ #include "qemu/atomic128.h"
+diff --git a/target/sparc/mmu_helper.c b/target/sparc/mmu_helper.c
+index 4a0cedd9e21..cce3046b694 100644
+--- a/target/sparc/mmu_helper.c
++++ b/target/sparc/mmu_helper.c
+@@ -23,6 +23,7 @@
+ #include "exec/cputlb.h"
+ #include "exec/cpu-mmu-index.h"
+ #include "exec/page-protection.h"
++#include "exec/tlb-flags.h"
+ #include "qemu/qemu-print.h"
+ #include "trace.h"
  
-diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index cb3dc3ab482..624c2731a65 100644
---- a/hw/ppc/mac_newworld.c
-+++ b/hw/ppc/mac_newworld.c
-@@ -199,9 +199,7 @@ static void ppc_core99_init(MachineState *machine)
-     if (machine->kernel_filename) {
-         int bswap_needed = 0;
- 
--#ifdef BSWAP_NEEDED
--        bswap_needed = 1;
--#endif
-+        bswap_needed = HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN;
-         kernel_base = KERNEL_LOAD_ADDR;
-         kernel_size = load_elf(machine->kernel_filename, NULL,
-                                translate_kernel_address, NULL, NULL, NULL,
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index 0dbcea035c3..439953fc29e 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -155,9 +155,7 @@ static void ppc_heathrow_init(MachineState *machine)
-     if (machine->kernel_filename) {
-         int bswap_needed = 0;
- 
--#ifdef BSWAP_NEEDED
--        bswap_needed = 1;
--#endif
-+        bswap_needed = HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN;
-         kernel_base = KERNEL_LOAD_ADDR;
-         kernel_size = load_elf(machine->kernel_filename, NULL,
-                                translate_kernel_address, NULL, NULL, NULL,
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index a48d3622c5a..d27a9b693a5 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -235,11 +235,7 @@ static unsigned long sun4m_load_kernel(const char *kernel_filename,
-     if (linux_boot) {
-         int bswap_needed;
- 
--#ifdef BSWAP_NEEDED
--        bswap_needed = 1;
--#else
--        bswap_needed = 0;
--#endif
-+        bswap_needed = HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN;
-         kernel_size = load_elf(kernel_filename, NULL,
-                                translate_kernel_address, NULL,
-                                NULL, NULL, NULL, NULL,
-diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index 8ab5cf0461f..c7bccf584e6 100644
---- a/hw/sparc64/sun4u.c
-+++ b/hw/sparc64/sun4u.c
-@@ -170,11 +170,7 @@ static uint64_t sun4u_load_kernel(const char *kernel_filename,
-     if (linux_boot) {
-         int bswap_needed;
- 
--#ifdef BSWAP_NEEDED
--        bswap_needed = 1;
--#else
--        bswap_needed = 0;
--#endif
-+        bswap_needed = HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN;
-         kernel_size = load_elf(kernel_filename, NULL, NULL, NULL, kernel_entry,
-                                kernel_addr, &kernel_top, NULL,
-                                ELFDATA2MSB, EM_SPARCV9, 0, 0);
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index f54054dce3d..99811af5e7b 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -2122,7 +2122,7 @@ static inline void memcpy_fromfs(void * to, const void * from, unsigned long n)
-     memcpy(to, from, n);
- }
- 
--#ifdef BSWAP_NEEDED
-+#if HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN
- static void bswap_ehdr(struct elfhdr *ehdr)
- {
-     bswap16s(&ehdr->e_type);            /* Object file type */
-@@ -3144,7 +3144,7 @@ static bool parse_elf_properties(const ImageSource *src,
-      * The contents of a valid PT_GNU_PROPERTY is a sequence of uint32_t.
-      * Swap most of them now, beyond the header and namesz.
-      */
--#ifdef BSWAP_NEEDED
-+#if HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN
-     for (int i = 4; i < n / 4; i++) {
-         bswap32s(note.data + i);
-     }
-@@ -4000,7 +4000,7 @@ struct target_elf_prpsinfo {
-     char    pr_psargs[ELF_PRARGSZ]; /* initial part of arg list */
- };
- 
--#ifdef BSWAP_NEEDED
-+#if HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN
- static void bswap_prstatus(struct target_elf_prstatus *prstatus)
- {
-     prstatus->pr_info.si_signo = tswap32(prstatus->pr_info.si_signo);
-@@ -4039,7 +4039,7 @@ static void bswap_note(struct elf_note *en)
- static inline void bswap_prstatus(struct target_elf_prstatus *p) { }
- static inline void bswap_psinfo(struct target_elf_prpsinfo *p) {}
- static inline void bswap_note(struct elf_note *en) { }
--#endif /* BSWAP_NEEDED */
-+#endif /* HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN */
- 
- /*
-  * Calculate file (dump) size of given memory region.
 -- 
 2.39.5
 
