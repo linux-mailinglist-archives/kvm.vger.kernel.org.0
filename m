@@ -1,134 +1,100 @@
-Return-Path: <kvm+bounces-41565-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41566-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DB37A6A81E
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 15:15:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAEBFA6A843
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 15:20:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B44E07B085D
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 14:14:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A07748A40D9
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 14:17:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A98122259C;
-	Thu, 20 Mar 2025 14:15:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95B1E224AF2;
+	Thu, 20 Mar 2025 14:17:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="B+eBeDPL"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Nzlx+CG2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF52023A6
-	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 14:15:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9F81224228;
+	Thu, 20 Mar 2025 14:17:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742480123; cv=none; b=oTiIao9moI6Qp74gg7D1TRv8+JqeUEwTPo3BBb0F71md4r6ZWXiOmH9wRtfKl/IWfEY9gbOnJTGJHqg2foUw36xOE4PKvbi6TpaQP7ZOa8jLG1wvyZ4RGHJQOzE63zKt1isdqinv1gYqqhGBvwbqTgDN2EgOusD5A4qH72NrxMw=
+	t=1742480252; cv=none; b=ZbTOuTqgOid3fYMatCM4mQKHQe5GYjTvQIzxk+49E7GFqNvoEl7seq4oqoqoy8DULWmG+HXwNgHhZsXRCLLrDuyu/BhhtTnaq1CdVKbcpOE6b87rRnc/ghNKKTejHJ9mex4sDPhn+zWJMpUeuZUnwWlFy2ktWhgvLDea3bOVocw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742480123; c=relaxed/simple;
-	bh=fV1yjLAbR7t1oyJZijuLOHxXpXwF7qb6O3metD+K0Io=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=aLSjJLmIOetC+/ggogVvc3C5A2wwliR6mE1BYLE4KSqXMIGW7d5ZAKX4P4q1GU2Chg35CdtTET8gC0BMzy95/Dm87QPKPPZup1kdrxJfO8E5g3MTzQT376450pVajVfPp5p8UrkOqv215dXJK6ReAkbnOtvrCpGn5a3KMaeMpig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=B+eBeDPL; arc=none smtp.client-ip=209.85.166.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-85e15dc8035so16788739f.0
-        for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 07:15:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1742480121; x=1743084921; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=pOuUOTjtcVbSe8J5UUkNu5FVmT0qaTxwu9FnCnOOamg=;
-        b=B+eBeDPLWJhzlNRR4uRExf1xc9lmqxFzikqlO8fudTyJBJ8kRen6ljbl8luvKRbFVu
-         2iS2a1INwBerO3dhWrL7qscpdsPBSPK+nb7eJBSRRWblxfmurD29YsCSd8C1FMiBblBb
-         X9PEWuQAj+XmTQLn4m9xnIvJ7wqRG892oWHccs+DCrx2rWxhr0mI01oHzerbN93UWp15
-         O8sDC3sAlpRWl+l0Ina+MRaIVYUy4wLpqR4/rvC0pVL4cp9eoL4Jx0iBNHFkT/yPnbvD
-         rHp3EBpklYDDgxu3d30OFcW4nrD4+ZbWb8dSmBNqzMWUmCSZKz3GZEySd+IRd9cQW6YW
-         cJTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742480121; x=1743084921;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pOuUOTjtcVbSe8J5UUkNu5FVmT0qaTxwu9FnCnOOamg=;
-        b=GeJzL0ZCu+ZVa3MMQ+XHypUD1QwagpNVnjzkBr9ihWwSwyE7E5WuYBLbvPDV1Z5pkL
-         ToSKi1RKcXUpfpEretZ6YSZu3/M13LYiAn+3MY9WcL8i7UdZbpYyWJzlH1w9nygbOriQ
-         L7xrNEPQ5qpQ7SdnXZ7l1rAbSsZjVFj5DGYOBmhIRCXFR84nrUCny0DelVokXNOCS9P+
-         fBdIyoQWxYyPHA2yGG+dlCJbre72C2Z8S5wyeqWgsgYoFZTr2Do86cc66EztDLWqagmk
-         GeRHd8SVPhcJv7HegvYXWpMegBWF/6VUABhQuu/uVsNi7Guy5kBNe6exlbz3t/1EAkL9
-         onuA==
-X-Forwarded-Encrypted: i=1; AJvYcCU81co58oi5Lwz4YNFzoChAZNrNenlUjyG+QR2D2K+f2JGSP01HfGFidMjkck0GeFaZN9s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAoM3/Np0PK+V6K57gKsLhAgZNS7/yfOaihg+JWY0qSa8yrYdd
-	fuZqQ2eHWATDc2vzwrkkpvzLxG3lHT8KVQvrsrBIQQocGD34fwhswP2Qv2x4Yf+Rn9E/wzHX52d
-	AUJf9CjZoCOmOCyxeQx2cl8Tvw1sj9VyZ54kGSQ==
-X-Gm-Gg: ASbGnctxGpIiGOeNB3+srlQZwMFZ2RVpbk1tuxnbg+k+KvuPAM2A3bkDpPfXN9SLddm
-	7P6nWIhihKRvftgwyAtEscy/7B5x7PQhZiZu39AK3kstdUOMyAf5LQSZZ8eOA/B55T36h5BUTr6
-	Vf+eNWlQs0Ov4wZkR4IL8ZOZ+KV68=
-X-Google-Smtp-Source: AGHT+IFK5YVWMg7oHmMx8fPJHlpZWuvdFWhVDFV08fjTW/MyiiCgPNx7YiNRyCTVAurBTzb3xFeOlwvq/fI1K8EDP74=
-X-Received: by 2002:a05:6e02:370a:b0:3cf:bac5:d90c with SMTP id
- e9e14a558f8ab-3d586baad39mr81833385ab.18.1742480120521; Thu, 20 Mar 2025
- 07:15:20 -0700 (PDT)
+	s=arc-20240116; t=1742480252; c=relaxed/simple;
+	bh=FVcikiI2lacP9JSxWJbrpt9jBAjCrBGlViup+ZG8GzU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QXWgSWEcHqLCiSWPPjqAu9mhycdMNYE9zfC+cQ7dKqRnm3teerm+5TKrBc3r+SGQzuwS7oVzN2hrmh6o+bgc+7nuvMlNkbGxQIBiuJSxKKuCSSBBqsoFwkcAy7MQ0XpbdSQzWW7GBubd6MVs/OUlfMnvgjrTp/Ji/KzDlkcXOBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Nzlx+CG2; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id DD30540E01AC;
+	Thu, 20 Mar 2025 14:17:27 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 9e4An085VCGt; Thu, 20 Mar 2025 14:17:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1742480243; bh=R4nwaOnRrRfOppIp7hpeF6UCm7njwKvTCIA2w/B2up4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Nzlx+CG24LcU6YmUASZx8vBP+huyJCCy9K3TJO90BhBbOAumoMZJbF6bfArS0nfQy
+	 x7M8d3pqjxaTeC6yYkk04NpTPJKRwK7bG24/etXUoRggLbEXFJi5DMsPrYzCF9ZdTl
+	 xkh+KZNECNaBiWD4isdQbNuRNd0viNaXo3UmhY6vxNs5c8H16LT5pPCWiA0wnnPJ5n
+	 HCn5ksoTWBYSgYR0uA2Ok1h5iofA/xmuzW6ZVfXAuRnxgko4LGUj5Pv6lgMBwTmEzZ
+	 FdRqdDJCh2hTPMfvhpdcHLqNhL6HwIETLmzEKrRcNLSlmxJrZt/f/RePP2WFIZj6GM
+	 7uTGdTkP5Oehk1G0Jb/D2C9gTCLERHB1uWaD+S+FrcrqvRXkYolMZU21mYG1l7kDXE
+	 hlytzq/ff3l35FBuqcwV/e5hjEO8TF1iAKdwXQwobxF1KzusrtYxnsXLQTLLMhJAu0
+	 134rLbHIE8RKEhN4sXd0f+jitSvWNkF5kYlcOBT0Q3nhcvurB4ffOsLCvbelZNZmeB
+	 0brJlOzj/OD7pIB4qXJkqmnWgUjBl4uSmMzUQGZ5EeHSKpcgKmH/iuu+8OdDRdiJt/
+	 G1XeX5msuafOlAzXbAUnAti6dbCuvSQYcgyAAmtolS+1YqT11dRbNkoXPOxploHtJq
+	 toHgg5KGTvYhXyw6mJxGlGkY=
+Received: from zn.tnic (pd95303ce.dip0.t-ipconnect.de [217.83.3.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D58FD40E0213;
+	Thu, 20 Mar 2025 14:17:12 +0000 (UTC)
+Date: Thu, 20 Mar 2025 15:17:07 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Michael Roth <michael.roth@amd.com>
+Subject: Re: [PATCH 0/5] Provide SEV-ES/SEV-SNP support for decrypting the
+ VMSA
+Message-ID: <20250320141707.GBZ9wjY42cY7_dQ4ql@fat_crate.local>
+References: <cover.1742477213.git.thomas.lendacky@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Anup Patel <anup@brainfault.org>
-Date: Thu, 20 Mar 2025 19:45:09 +0530
-X-Gm-Features: AQ5f1Jrt7GwUjf0k1HKl9UBx8575Wok6_pgNuJLSWasl2rfXma4VEBXKWaRUvPU
-Message-ID: <CAAhSdy380StEE03G=RPjKoxtY89nLeufpXbjYwbRypzzrkQN+g@mail.gmail.com>
-Subject: [GIT PULL] KVM/riscv changes for 6.15
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Palmer Dabbelt <palmer@rivosinc.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Atish Patra <atishp@rivosinc.com>, 
-	Atish Patra <atishp@atishpatra.org>, 
-	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, KVM General <kvm@vger.kernel.org>, 
-	linux-riscv <linux-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <cover.1742477213.git.thomas.lendacky@amd.com>
 
-Hi Paolo,
+On Thu, Mar 20, 2025 at 08:26:48AM -0500, Tom Lendacky wrote:
+> This series adds support for decrypting an SEV-ES/SEV-SNP VMSA in
+> dump_vmcb() when the guest policy allows debugging.
 
-We mainly have two fixes and few PMU selftests improvements
-for 6.15. There are quite a few in-flight patches dependent on
-SBI v3.0 specification which will freeze soon.
+I would really really love to have that so
 
-Please pull.
+Acked-by: Borislav Petkov (AMD) <bp@alien8.de>
 
-Regards,
-Anup
+-- 
+Regards/Gruss,
+    Boris.
 
-The following changes since commit 7eb172143d5508b4da468ed59ee857c6e5e01da6:
-
-  Linux 6.14-rc5 (2025-03-02 11:48:20 -0800)
-
-are available in the Git repository at:
-
-  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-6.15-1
-
-for you to fetch changes up to b3f263a98d30fe2e33eefea297598c590ee3560e:
-
-  RISC-V: KVM: Optimize comments in kvm_riscv_vcpu_isa_disable_allowed
-(2025-03-20 11:33:56 +0530)
-
-----------------------------------------------------------------
-KVM/riscv changes for 6.15
-
-- Disable the kernel perf counter during configure
-- KVM selftests improvements for PMU
-- Fix warning at the time of KVM module removal
-
-----------------------------------------------------------------
-Atish Patra (5):
-      RISC-V: KVM: Disable the kernel perf counter during configure
-      KVM: riscv: selftests: Do not start the counter in the overflow handler
-      KVM: riscv: selftests: Change command line option
-      KVM: riscv: selftests: Allow number of interrupts to be configurable
-      RISC-V: KVM: Teardown riscv specific bits after kvm_exit
-
-Chao Du (1):
-      RISC-V: KVM: Optimize comments in kvm_riscv_vcpu_isa_disable_allowed
-
- arch/riscv/kvm/main.c                            |  4 +-
- arch/riscv/kvm/vcpu_onereg.c                     |  2 +-
- arch/riscv/kvm/vcpu_pmu.c                        |  1 +
- tools/testing/selftests/kvm/riscv/sbi_pmu_test.c | 81 ++++++++++++++++--------
- 4 files changed, 60 insertions(+), 28 deletions(-)
+https://people.kernel.org/tglx/notes-about-netiquette
 
