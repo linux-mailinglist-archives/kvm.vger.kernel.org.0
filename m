@@ -1,334 +1,204 @@
-Return-Path: <kvm+bounces-41547-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41548-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FF4BA6A24C
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 10:15:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3898A6A3F2
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 11:45:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADD221898499
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 09:15:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 965164233CC
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 10:44:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59826219A67;
-	Thu, 20 Mar 2025 09:15:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D802224AF6;
+	Thu, 20 Mar 2025 10:44:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QfpC0FH+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Kdj3JpaA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E44B91EDA27;
-	Thu, 20 Mar 2025 09:15:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE0F224256
+	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 10:44:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742462111; cv=none; b=LpSSnOC9htVpj6CEytY0jUuTWImo0SP/hCY7bcqlsj6VXsojHM8dRQ2ucEEMRd7sAvxBdyTj4kMJRLO2r2pmoExKZ/yuoemJJBSn/eftvEGCADXcDL9bjHhUpsi1AThsXdFIHcZZQsI/TYU9MAm7lm4nCQD7yI4OwLX994UxbxI=
+	t=1742467485; cv=none; b=a0RIonvIdqqA9lJpqsDHUpWxyS49Bib4hfZxFl0yGHqoOKQUQmDASam9JqI+H+rNNCOQatuu5MtaiRr+v9cH4+MVsNgKwB5L/xpnkslf/+0QUJn23SytR1sm5BN9VTuQdLXNZV94Ugx3joFYYUxgBUA46zW0+lbCzU65ZndZIJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742462111; c=relaxed/simple;
-	bh=9c2KsvgWRUAPh6owXxe+tla9TE3unmNvI9VT56yT0Os=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=pjt2KL7kF/6E4q09FvSvKO5pbU759WZaTkXsSbhDHP+g7OjtxnjfJQGTNOa1zPSr2hn/pY/GlxKRsFtffqVKuGhWaIzsCqibW8V5xgGQ3cCmGZJ6UdMecGEDFGZMHN2vA14TMaiMuO/SQcSatfVY/m6rQEC88EFe1z2EZSr2lmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=QfpC0FH+; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52K7fQNe011884;
-	Thu, 20 Mar 2025 09:14:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=9c2Ksv
-	gWRUAPh6owXxe+tla9TE3unmNvI9VT56yT0Os=; b=QfpC0FH+oLXEmDJ7ijoOC5
-	X0+ZTGDj74UVPjiTFsRTDKhzyz0758mv6lVTNWW3Omqfjwu5nxLaTHHZXsMXgDrG
-	6kZL7DR7T+1n0I0+5/1RPtHRkocQExjVCkjZYzq72bMlZNjyoTsawRlVgMVUYDqo
-	lQJdvz75buqQlKu9ddtYBOJUuwBfhWNV9AkiEFYBEa0R8BCDpKvHlDRqILSclwtg
-	TnX54T3lOXwTj8bojvQz8JTyAplpwfncHZWm3wX5luz88cGKIW9SUgUhKbPGvMVz
-	xlR0V8gfuX7tAzNqLlvFSjqHkkLtkAYu/zkEklnxI2Wh+MBVqcQ3nJuGg7TeS72A
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45fwy25wf7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 20 Mar 2025 09:14:58 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 52K9EhAn032342;
-	Thu, 20 Mar 2025 09:14:58 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45fwy25wf4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 20 Mar 2025 09:14:58 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52K85Xkm012350;
-	Thu, 20 Mar 2025 09:14:57 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 45dmvp72x0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 20 Mar 2025 09:14:56 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52K9ErZt40829334
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 20 Mar 2025 09:14:53 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1479C20043;
-	Thu, 20 Mar 2025 09:14:53 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2374320040;
-	Thu, 20 Mar 2025 09:14:45 +0000 (GMT)
-Received: from smtpclient.apple (unknown [9.61.250.131])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Thu, 20 Mar 2025 09:14:44 +0000 (GMT)
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1742467485; c=relaxed/simple;
+	bh=O8zyyL1p84aMCSSYT842uw6SFy2rTfsgAblLzeFkCR0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=N0+X74Zu+SI+fksYt0sDMezki4xZg/osUhykjCICLsQSxQTSTa9SNHmGIKew1jgDdy7BcuGW2aHVBEKOUiK1ADfvIQm1DkU4MoySBUGTB0pjcMdOqxYFQc5oO3XD1i5mVa+AW6zRnAOkHWUym/LfqR7zKhuezlqruj9TsYqCcn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Kdj3JpaA; arc=none smtp.client-ip=209.85.128.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-43d3b211d0eso9419175e9.1
+        for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 03:44:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1742467480; x=1743072280; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=j11DFSETqOLtc+vMOz1k4rHgXFA118EedepjEdU8Zqw=;
+        b=Kdj3JpaAcTMsJX0fWv0whfnlnrjaZjQkUoIxaVNNWymywgQ1lxYjwO8r7iq1JNp6QM
+         Ojbu13PJrvGpih/A3lZ8h//bm+lQo87tlhkP9QV9OC12v7CPJ6kEgjQXJce0C5ni+hLc
+         WK8hRYGR3L0Fg1Ms6LVwx4HmFLLx967l5J71fKJh2+DS8uT7oCIJlhzicsDfSOQYSkWF
+         sHWVXfORZG9aTGDrruW97o37vT+nFRgMDzAibG+h4BCecMAJVWL9zR8i+Q2//u9V8cvF
+         qTDTgtuLxb6b7EYFGNlNI/IdDW+67sG2wCaCd7GvxlgTKp/aIF7rCtp1mbYDuCw4iql2
+         FLfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742467480; x=1743072280;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=j11DFSETqOLtc+vMOz1k4rHgXFA118EedepjEdU8Zqw=;
+        b=icbYjBHuOw0RIGFWr1yMQ6lXe8FFZuAg3DEAD1x6DyseeJ4yyu4Kp/T5+sWKCjPGKS
+         /BEWF18lAB3N/Xsyvrk4k8GmLpT3uXCVf4SxDndv0XwVJOJNVSkb39btNPqvG6tzqsqX
+         nUQRcgvoAmq59ecY0BojLAF3rzfQLynk06hmqWQmRkzjfvqOCw3nx+VsbwqIkftv8N+x
+         qj+7r+c79e+7qaj6lJZFxV086UyCHH0QyHetMkXBOj1VwTf52CrZ4teeno/1Y4J4UxqX
+         9L56YIYRWwJV0RvykiEAeqIdhH4KlvHIOwiYtc35O4Ey0naICZAszTkN0LO2hs0i8J3Y
+         vCDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXicfAqSb48ZWIj9XTNex9lmFGhT3ljoI/R2aILAP1h5YFouI5ZpH58y+6KyjizFlSlghY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzH2sPG0BuOkT0uEOIdPPaL6xhOK5G9/RRMbFHveKrPptbHsLVX
+	s6HHRWGvsGpJIHbMvFxD/bkFIoUStXZl1OiVgxT3M8ptxsNooSa/CdlTXMW0bY+h78I1SNnoBNJ
+	mYBZ3gAy/zg==
+X-Google-Smtp-Source: AGHT+IHmhdHTuCMOMffmpvyIMCzJObzjHJotMPvb7/CKZriBN1WJ2Qe2CHVhTxdEuiWThlixsbw8H9oOiShQMA==
+X-Received: from wmgg15.prod.google.com ([2002:a05:600d:f:b0:43b:c450:ea70])
+ (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:1da2:b0:439:5f04:4f8d with SMTP id 5b1f17b1804b1-43d49187ba9mr20806165e9.12.1742467480075;
+ Thu, 20 Mar 2025 03:44:40 -0700 (PDT)
+Date: Thu, 20 Mar 2025 10:44:38 +0000
+In-Reply-To: <Z9sRQ0cK0rupEiT-@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3776.700.51\))
-Subject: Re: [PATCH v5 6/6] powerpc/kvm-hv-pmu: Add perf-events for Hostwide
- counters
-From: Athira Rajeev <atrajeev@linux.ibm.com>
-In-Reply-To: <20250317100834.451452-7-vaibhav@linux.ibm.com>
-Date: Thu, 20 Mar 2025 14:44:30 +0530
-Cc: linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, Madhavan Srinivasan <maddy@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
-        sbhat@linux.ibm.com, gautam@linux.ibm.com, kconsul@linux.ibm.com,
-        amachhiw@linux.ibm.com, Athira Rajeev <atrajeev@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <B0FA3AB4-52CA-4DBB-8F7E-3838CB0F400F@linux.ibm.com>
-References: <20250317100834.451452-1-vaibhav@linux.ibm.com>
- <20250317100834.451452-7-vaibhav@linux.ibm.com>
-To: Vaibhav Jain <vaibhav@linux.ibm.com>
-X-Mailer: Apple Mail (2.3776.700.51)
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: vcMmGWK0zxr2Q04aSx4ooKAc3JvORBac
-X-Proofpoint-GUID: 3FFBHcuvPudiFgRqQdh3EgPhbqmjLEj6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-20_03,2025-03-19_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- bulkscore=0 spamscore=0 malwarescore=0 mlxlogscore=999 suspectscore=0
- adultscore=0 priorityscore=1501 mlxscore=0 lowpriorityscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2502280000
- definitions=main-2503200053
+Mime-Version: 1.0
+References: <20250110-asi-rfc-v2-v2-0-8419288bc805@google.com>
+ <20250110-asi-rfc-v2-v2-4-8419288bc805@google.com> <20250319172935.GMZ9r-_zzXhyhHBLfj@fat_crate.local>
+ <Z9sRQ0cK0rupEiT-@google.com>
+X-Mailer: aerc 0.18.2
+Message-ID: <D8L164U8HBTB.G5MS86AIISLM@google.com>
+Subject: Re: [PATCH RFC v2 04/29] mm: asi: Add infrastructure for boot-time enablement
+From: Brendan Jackman <jackmanb@google.com>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>, Borislav Petkov <bp@alien8.de>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
+	Josh Poimboeuf <jpoimboe@kernel.org>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
+	<x86@kernel.org>, <linux-kernel@vger.kernel.org>, 
+	<linux-alpha@vger.kernel.org>, <linux-snps-arc@lists.infradead.org>, 
+	<linux-arm-kernel@lists.infradead.org>, <linux-csky@vger.kernel.org>, 
+	<linux-hexagon@vger.kernel.org>, <loongarch@lists.linux.dev>, 
+	<linux-m68k@lists.linux-m68k.org>, <linux-mips@vger.kernel.org>, 
+	<linux-openrisc@vger.kernel.org>, <linux-parisc@vger.kernel.org>, 
+	<linuxppc-dev@lists.ozlabs.org>, <linux-riscv@lists.infradead.org>, 
+	<linux-s390@vger.kernel.org>, <linux-sh@vger.kernel.org>, 
+	<sparclinux@vger.kernel.org>, <linux-um@lists.infradead.org>, 
+	<linux-arch@vger.kernel.org>, <linux-mm@kvack.org>, 
+	<linux-trace-kernel@vger.kernel.org>, <linux-perf-users@vger.kernel.org>, 
+	<kvm@vger.kernel.org>, <linux-efi@vger.kernel.org>, 
+	Junaid Shahid <junaids@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
+On Wed Mar 19, 2025 at 6:47 PM UTC, Yosry Ahmed wrote:
+> On Wed, Mar 19, 2025 at 06:29:35PM +0100, Borislav Petkov wrote:
+> > On Fri, Jan 10, 2025 at 06:40:30PM +0000, Brendan Jackman wrote:
+> > > Add a boot time parameter to control the newly added X86_FEATURE_ASI.
+> > > "asi=on" or "asi=off" can be used in the kernel command line to enable
+> > > or disable ASI at boot time. If not specified, ASI enablement depends
+> > > on CONFIG_ADDRESS_SPACE_ISOLATION_DEFAULT_ON, which is off by default.
+> > 
+> > I don't know yet why we need this default-on thing...
+>
+> It's a convenience to avoid needing to set asi=on if you want ASI to be
+> on by default. It's similar to HUGETLB_PAGE_OPTIMIZE_VMEMMAP_DEFAULT_ON
+> or ZSWAP_DEFAULT_ON.
+>
+> [..]
+> > > @@ -175,7 +184,11 @@ static __always_inline bool asi_is_restricted(void)
+> > >  	return (bool)asi_get_current();
+> > >  }
+> > >  
+> > > -/* If we exit/have exited, can we stay that way until the next asi_enter? */
+> > > +/*
+> > > + * If we exit/have exited, can we stay that way until the next asi_enter?
+> > 
+> > What is that supposed to mean here?
+>
+> asi_is_relaxed() checks if the thread is outside an ASI critical
+> section.
+>
+> I say "the thread" because it will also return true if we are executing
+> an interrupt that arrived during the critical section, even though the
+> interrupt handler is not technically part of the critical section.
+>
+> Now the reason it says "if we exit we stay that way" is probably
+> referring to the fact that an asi_exit() when interrupting a critical
+> section will be undone in the interrupt epilogue by re-entering ASI.
+>
+> I agree the wording here is confusing. We should probably describe this
+> more explicitly and probably rename the function after the API
+> discussions you had in the previous patch.
 
+Yeah, this is confusing. It's trying to very concisely define the
+concept of "relaxed" but now I see it through Boris' eyes I realise
+it's really unhelpful to try and do that. And yeah we should probably
+just rework the terminology/API.
 
-> On 17 Mar 2025, at 3:38=E2=80=AFPM, Vaibhav Jain =
-<vaibhav@linux.ibm.com> wrote:
->=20
-> Update 'kvm-hv-pmu.c' to add five new perf-events mapped to the five
-> Hostwide counters. Since these newly introduced perf events are at =
-system
-> wide scope and can be read from any L1-Lpar CPU, 'kvmppc_pmu' scope =
-and
-> capabilities are updated appropriately.
->=20
-> Also introduce two new helpers. First is kvmppc_update_l0_stats() that =
-uses
-> the infrastructure introduced in previous patches to issues the
-> H_GUEST_GET_STATE hcall L0-PowerVM to fetch guest-state-buffer holding =
-the
-> latest values of these counters which is then parsed and 'l0_stats'
-> variable updated.
->=20
-> Second helper is kvmppc_pmu_event_update() which is called from
-> 'kvmppv_pmu' callbacks and uses kvmppc_update_l0_stats() to update
-> 'l0_stats' and the update the 'struct perf_event's event-counter.
->=20
-> Some minor updates to kvmppc_pmu_{add, del, read}() to remove some =
-debug
-> scaffolding code.
->=20
-> Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
+To re-iterate what Yosry said, aside from my too-clever comment style
+the more fundamental thing that's confusing here is that, using the
+terminology currently in the code there are two concepts at play:
 
-Thanks Vaibhav for including the changes in V5. Changes looks good to me =
-in patches for perf events.
+- The critical section: this is the path from asi_enter() to
+  asi_relax(). The critical section can be interrupted, and code
+  running in those interupts is not said to be "in the critical
+  section".
 
-Reviewed-by: Athira Rajeev <atrajeev@linux.ibm.com>
+- Being "tense" vs "relaxed". Being "tense" means the _task_ is in a
+  critical section, but the current code might not be.
 
-Thanks
-Athira
-> ---
-> Changelog
->=20
-> v4->v5:
-> * Call kvmppc_pmu_event_update() during pmu's 'del()' callback [ =
-Atheera ]
->=20
-> v3->v4:
-> * Minor tweaks to patch description and code as its now being built as =
-a
-> separate kernel module.
->=20
-> v2->v3:
-> None
->=20
-> v1->v2:
-> None
-> ---
-> arch/powerpc/perf/kvm-hv-pmu.c | 92 +++++++++++++++++++++++++++++++++-
-> 1 file changed, 91 insertions(+), 1 deletion(-)
->=20
-> diff --git a/arch/powerpc/perf/kvm-hv-pmu.c =
-b/arch/powerpc/perf/kvm-hv-pmu.c
-> index 705be24ccb43..ae264c9080ef 100644
-> --- a/arch/powerpc/perf/kvm-hv-pmu.c
-> +++ b/arch/powerpc/perf/kvm-hv-pmu.c
-> @@ -30,6 +30,11 @@
-> #include "asm/guest-state-buffer.h"
->=20
-> enum kvmppc_pmu_eventid {
-> + KVMPPC_EVENT_HOST_HEAP,
-> + KVMPPC_EVENT_HOST_HEAP_MAX,
-> + KVMPPC_EVENT_HOST_PGTABLE,
-> + KVMPPC_EVENT_HOST_PGTABLE_MAX,
-> + KVMPPC_EVENT_HOST_PGTABLE_RECLAIM,
-> KVMPPC_EVENT_MAX,
-> };
->=20
-> @@ -61,8 +66,14 @@ static DEFINE_SPINLOCK(lock_l0_stats);
-> /* GSB related structs needed to talk to L0 */
-> static struct kvmppc_gs_msg *gsm_l0_stats;
-> static struct kvmppc_gs_buff *gsb_l0_stats;
-> +static struct kvmppc_gs_parser gsp_l0_stats;
->=20
-> static struct attribute *kvmppc_pmu_events_attr[] =3D {
-> + KVMPPC_PMU_EVENT_ATTR(host_heap, KVMPPC_EVENT_HOST_HEAP),
-> + KVMPPC_PMU_EVENT_ATTR(host_heap_max, KVMPPC_EVENT_HOST_HEAP_MAX),
-> + KVMPPC_PMU_EVENT_ATTR(host_pagetable, KVMPPC_EVENT_HOST_PGTABLE),
-> + KVMPPC_PMU_EVENT_ATTR(host_pagetable_max, =
-KVMPPC_EVENT_HOST_PGTABLE_MAX),
-> + KVMPPC_PMU_EVENT_ATTR(host_pagetable_reclaim, =
-KVMPPC_EVENT_HOST_PGTABLE_RECLAIM),
-> NULL,
-> };
->=20
-> @@ -71,7 +82,7 @@ static const struct attribute_group =
-kvmppc_pmu_events_group =3D {
-> .attrs =3D kvmppc_pmu_events_attr,
-> };
->=20
-> -PMU_FORMAT_ATTR(event, "config:0");
-> +PMU_FORMAT_ATTR(event, "config:0-5");
-> static struct attribute *kvmppc_pmu_format_attr[] =3D {
-> &format_attr_event.attr,
-> NULL,
-> @@ -88,6 +99,79 @@ static const struct attribute_group =
-*kvmppc_pmu_attr_groups[] =3D {
-> NULL,
-> };
->=20
-> +/*
-> + * Issue the hcall to get the L0-host stats.
-> + * Should be called with l0-stat lock held
-> + */
-> +static int kvmppc_update_l0_stats(void)
-> +{
-> + int rc;
-> +
-> + /* With HOST_WIDE flags guestid and vcpuid will be ignored */
-> + rc =3D kvmppc_gsb_recv(gsb_l0_stats, KVMPPC_GS_FLAGS_HOST_WIDE);
-> + if (rc)
-> + goto out;
-> +
-> + /* Parse the guest state buffer is successful */
-> + rc =3D kvmppc_gse_parse(&gsp_l0_stats, gsb_l0_stats);
-> + if (rc)
-> + goto out;
-> +
-> + /* Update the l0 returned stats*/
-> + memset(&l0_stats, 0, sizeof(l0_stats));
-> + rc =3D kvmppc_gsm_refresh_info(gsm_l0_stats, gsb_l0_stats);
-> +
-> +out:
-> + return rc;
-> +}
-> +
-> +/* Update the value of the given perf_event */
-> +static int kvmppc_pmu_event_update(struct perf_event *event)
-> +{
-> + int rc;
-> + u64 curr_val, prev_val;
-> + unsigned long flags;
-> + unsigned int config =3D event->attr.config;
-> +
-> + /* Ensure no one else is modifying the l0_stats */
-> + spin_lock_irqsave(&lock_l0_stats, flags);
-> +
-> + rc =3D kvmppc_update_l0_stats();
-> + if (!rc) {
-> + switch (config) {
-> + case KVMPPC_EVENT_HOST_HEAP:
-> + curr_val =3D l0_stats.guest_heap;
-> + break;
-> + case KVMPPC_EVENT_HOST_HEAP_MAX:
-> + curr_val =3D l0_stats.guest_heap_max;
-> + break;
-> + case KVMPPC_EVENT_HOST_PGTABLE:
-> + curr_val =3D l0_stats.guest_pgtable_size;
-> + break;
-> + case KVMPPC_EVENT_HOST_PGTABLE_MAX:
-> + curr_val =3D l0_stats.guest_pgtable_size_max;
-> + break;
-> + case KVMPPC_EVENT_HOST_PGTABLE_RECLAIM:
-> + curr_val =3D l0_stats.guest_pgtable_reclaim;
-> + break;
-> + default:
-> + rc =3D -ENOENT;
-> + break;
-> + }
-> + }
-> +
-> + spin_unlock_irqrestore(&lock_l0_stats, flags);
-> +
-> + /* If no error than update the perf event */
-> + if (!rc) {
-> + prev_val =3D local64_xchg(&event->hw.prev_count, curr_val);
-> + if (curr_val > prev_val)
-> + local64_add(curr_val - prev_val, &event->count);
-> + }
-> +
-> + return rc;
-> +}
-> +
-> static int kvmppc_pmu_event_init(struct perf_event *event)
-> {
-> unsigned int config =3D event->attr.config;
-> @@ -110,15 +194,19 @@ static int kvmppc_pmu_event_init(struct =
-perf_event *event)
->=20
-> static void kvmppc_pmu_del(struct perf_event *event, int flags)
-> {
-> + kvmppc_pmu_event_update(event);
-> }
->=20
-> static int kvmppc_pmu_add(struct perf_event *event, int flags)
-> {
-> + if (flags & PERF_EF_START)
-> + return kvmppc_pmu_event_update(event);
-> return 0;
-> }
->=20
-> static void kvmppc_pmu_read(struct perf_event *event)
-> {
-> + kvmppc_pmu_event_update(event);
-> }
->=20
-> /* Return the size of the needed guest state buffer */
-> @@ -302,6 +390,8 @@ static struct pmu kvmppc_pmu =3D {
-> .read =3D kvmppc_pmu_read,
-> .attr_groups =3D kvmppc_pmu_attr_groups,
-> .type =3D -1,
-> + .scope =3D PERF_PMU_SCOPE_SYS_WIDE,
-> + .capabilities =3D PERF_PMU_CAP_NO_EXCLUDE | =
-PERF_PMU_CAP_NO_INTERRUPT,
-> };
->=20
-> static int __init kvmppc_register_pmu(void)
-> --=20
-> 2.48.1
->=20
+This distinction is theoretically relevant because e.g. it's a bug to
+access sensitive data in a critical section, but it's OK to access it
+while in the tense state (we will switch to the restricted address
+space, but this is OK because we will have a chance to asi_enter()
+again before we get back to the untrusted code). 
 
+BTW, just to be clear:
+
+1. Both of these are only relevant to code that's pretty deeply aware
+   of ASI. (TLB flushing code, entry code, stuff like that).
+
+2. To be honest whenever you write:
+
+     if (asi_in_critical_section())
+
+   You probably mean:
+
+     if (WARN_ON(asi_in_critical_section()))
+
+   For example if we try to flush the TLB in the critical section,
+   there's a thing we can do to handle it. But that really shouldn't
+   be necessary.  We want the critical section code to be very small
+   and straight-line code.
+
+   And indeed in the present code we don't use
+   asi_in_critical_section() for anything bur WARNing.
+
+> asi_is_relaxed() checks if the thread is outside an ASI critical
+> section.
+
+Now I see it written this way, this is probably the best way to
+conceptualise it. Instead of having two concepts "tense/relaxed" vs
+"ASI critical section" we could just say "the task is in a critical
+section" vs "the CPU is in a critical section". So we could have
+something like:
+
+bool asi_task_critical(void);
+bool asi_cpu_critical(void);
+
+(They could also accept an argument for the task/CPU, but I can't see
+any reason why you'd peek at another context like that).
+
+--
+
+For everything else, Ack to Boris or +1 to Yosry respectively.
 
