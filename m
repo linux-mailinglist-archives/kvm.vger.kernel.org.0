@@ -1,57 +1,55 @@
-Return-Path: <kvm+bounces-41593-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41594-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C075CA6ACFA
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 19:16:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1018EA6AD00
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 19:18:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09E1F17F6C7
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 18:14:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6E0E18971D4
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 18:18:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AB60226CF9;
-	Thu, 20 Mar 2025 18:14:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EF3C225A5B;
+	Thu, 20 Mar 2025 18:18:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LIgZL3UD"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="floBr6rA"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 043CD22687A
-	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 18:14:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2012AD20
+	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 18:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742494489; cv=none; b=SMFaPcc8mOYs7FyUocgoMex+O7L3jJwG+8xvjR8hSIYPh2nGM1n+xYtNRcwT4Oxt0ErvjCXzsc7ZxewgysoJLMR70eGKtDsMuXg6tGpbxdUHt7estoiyuvYQYJa0BxOXMvQLHiJiIaAuiHQ3uMOujDLRTwSmXu1W1RKymafbWW4=
+	t=1742494687; cv=none; b=N8C9aW8cR0wCStc2XT/OxLKUBfp1+5/TPCjSr/7K0o/5bAmduc8vuvVXyhsn2FoSYufBQSbU8fY3LavF86sXTeIZUK1fHY3UCJqCXHIid/lrYsxeXrHFEzKS0FeGu8kdAxqisx+6px3JE9ZBPBd3320gCOekjLE/1NBhFi/nhds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742494489; c=relaxed/simple;
-	bh=eHSnvQ6XhTYWAELznlpd0nObhNjlz62IdHaH+ijNn74=;
+	s=arc-20240116; t=1742494687; c=relaxed/simple;
+	bh=kgFhOZDJMI9KaBTW80gZMe9l4SBqoP/TrIDZAvlNvqA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JbsUetSazI0VZbb/ZAB61hczJGzYKQ39jxvl7TcwJjidprhULDU3b1XZ/O8ilgsHHzc6PvCW9pUvGIK92V4nMFsla1hgk2aNN5ZpjPuEXsdI9k8Og22CP+/joMMy1CeLL2qIdYpwnbBXI6MVmp/CkVn8zzcjgZk3Ez3hx55qy68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LIgZL3UD; arc=none smtp.client-ip=95.215.58.181
+	 Content-Type:Content-Disposition:In-Reply-To; b=j3a88yd5zZBkGh6EhW8LzZ9DVBbAQ0csxI4vHBKv7tKUWpVhNQd8/75qULkShWLwRYEeUOKYP7HfRbF3WwQKvbFGNjhX0Vf4iQ168DMS2p3iIaYu3jrgvfHLA4dwOZmAhv8Oa0ow5ft8mX/dHuSl4ihwUCQxrGkDU7WZbYokR6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=floBr6rA; arc=none smtp.client-ip=95.215.58.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Thu, 20 Mar 2025 18:14:29 +0000
+Date: Thu, 20 Mar 2025 18:17:47 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742494474;
+	t=1742494672;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=g2IOmTqSF8VusdmE8MxtCc32BNiyhroRu8EGEaXViXs=;
-	b=LIgZL3UD90N22INzZ79F/FPzmDaP+LUXj4N/xLoR5oBlA90P1ZCl0xgXcmDwPzYdTLByfz
-	uTJ4Su47fkYozmqg/kjY6gEzkg+WVksySdFEx6IVMO0ovaPZduK9n7Xo0t7jqnrhMw4gMD
-	cFG2mgUW71l7taAI9OjyBpFsdRyXTK8=
+	bh=/5YlZC3aik6HXiACmy6t8g/Xv3GypRFT+iIORLPcXhI=;
+	b=floBr6rAIg13qL8F9bU99ViTJh2SLb2SrPwf6ZzNDuMLN1xQR++em9wwem45oGlsVChuGH
+	+YWx4v4vCrgXuVv3KL3Qif/a8bejRgzb63psulsdaYvzTHF0a5Uyonjm0f+G4X0nS1zt9y
+	QhA821oesnGLrc7U4D50wK2e5zO8uY4=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] KVM: x86: Add a module param to control and
- enumerate device posted IRQs
-Message-ID: <Z9xbBSaephBj-OO1@google.com>
-References: <20250320142022.766201-1-seanjc@google.com>
- <20250320142022.766201-4-seanjc@google.com>
- <Z9xXd5CoHh5Eo2TK@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Maxim Levitsky <mlevitsk@redhat.com>, x86@kernel.org,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/7] Make ASIDs static for SVM
+Message-ID: <Z9xby4dSWWvHSjgL@google.com>
+References: <20250313215540.4171762-1-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -60,81 +58,94 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z9xXd5CoHh5Eo2TK@google.com>
+In-Reply-To: <20250313215540.4171762-1-yosry.ahmed@linux.dev>
 X-Migadu-Flow: FLOW_OUT
 
-On Thu, Mar 20, 2025 at 10:59:19AM -0700, Sean Christopherson wrote:
-> On Thu, Mar 20, 2025, Sean Christopherson wrote:
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index f76d655dc9a8..e7eb2198db26 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -227,6 +227,10 @@ EXPORT_SYMBOL_GPL(allow_smaller_maxphyaddr);
-> >  bool __read_mostly enable_apicv = true;
-> >  EXPORT_SYMBOL_GPL(enable_apicv);
-> >  
-> > +bool __read_mostly enable_device_posted_irqs = true;
-> > +module_param(enable_device_posted_irqs, bool, 0444);
-> > +EXPORT_SYMBOL_GPL(enable_device_posted_irqs);
-> > +
-> >  const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
-> >  	KVM_GENERIC_VM_STATS(),
-> >  	STATS_DESC_COUNTER(VM, mmu_shadow_zapped),
-> > @@ -9772,6 +9776,9 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
-> >  	if (r != 0)
-> >  		goto out_mmu_exit;
-> >  
-> > +	enable_device_posted_irqs &= enable_apicv &&
-> > +				     irq_remapping_cap(IRQ_POSTING_CAP);
+On Thu, Mar 13, 2025 at 09:55:33PM +0000, Yosry Ahmed wrote:
+> This series changes SVM to use a single ASID per-VM, instead of using
+> dynamic generation-based ASIDs per-vCPU. Dynamic ASIDs were added for
+> CPUs without FLUSHBYASID to avoid full TLB flushes, but as Sean said,
+> FLUSHBYASID was added in 2010, and the case for this is no longer as
+> strong [1].
 > 
-> Drat, this is flawed.  Putting the module param in kvm.ko means that loading
-> kvm.ko with enable_device_posted_irqs=true, but a vendor module with APICv/AVIC
-> disabled, leaves enable_device_posted_irqs disabled for the lifetime of kvm.ko.
-> I.e. reloading the vendor module with APICv/AVIC enabled can't enable device
-> posted IRQs.
+> Furthermore, having different ASIDs for different vCPUs is not required.
+> ASIDs are local to physical CPUs. The only requirement is to make sure
+> the ASID is flushed before a differnet vCPU runs on the same physical
+> CPU (see below). Furthermore, SEV VMs have been using with a single ASID
+> per-VM anyway (required for different reasons).
 > 
-> Option #1 is to do what we do for enable_mmio_caching, and snapshot userspace's
-> desire.
+> A new ASID is currently allocated in 3 cases:
+> (a) Once when the vCPU is initialized.
+> (b) When the vCPU moves to a new physical CPU.
+> (c) On TLB flushes when FLUSHBYASID is not available.
 > 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index e7eb2198db26..c84ad9109108 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -228,6 +228,7 @@ bool __read_mostly enable_apicv = true;
->  EXPORT_SYMBOL_GPL(enable_apicv);
->  
->  bool __read_mostly enable_device_posted_irqs = true;
-> +bool __ro_after_init allow_device_posted_irqs;
->  module_param(enable_device_posted_irqs, bool, 0444);
->  EXPORT_SYMBOL_GPL(enable_device_posted_irqs);
->  
-> @@ -9776,8 +9777,8 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
->         if (r != 0)
->                 goto out_mmu_exit;
->  
-> -       enable_device_posted_irqs &= enable_apicv &&
-> -                                    irq_remapping_cap(IRQ_POSTING_CAP);
-> +       enable_device_posted_irqs = allow_device_posted_irqs && enable_apicv &&
-> +                                   irq_remapping_cap(IRQ_POSTING_CAP);
->  
->         kvm_ops_update(ops);
->  
-> @@ -14033,6 +14034,8 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_rmp_fault);
->  
->  static int __init kvm_x86_init(void)
->  {
-> +       allow_device_posted_irqs = enable_device_posted_irqs;
-> +
->         kvm_init_xstate_sizes();
->  
->         kvm_mmu_x86_module_init();
+> Case (a) is trivial, instead the ASID is allocated for VM creation.
+> Case (b) is handled by flushing the ASID instead of assigning a new one.
+> Case (c) is handled by doing a full TLB flush (i.e.
+> TLB_CONTROL_FLUSH_ALL_ASID) instead of assinging a new ASID. This is
+> a bit aggressive, but FLUSHBYASID is available in all modern CPUs.
 > 
+> The series is organized as follows:
+> - Patch 1 generalizes the VPID allocation code in VMX to be
+>   vendor-neutral, to reuse for SVM.
+> - Patches 2-3 do some refactoring and cleanups.
+> - Patches 4-5 address cases (b) and (c) above.
+> - Patch 6 moves to single ASID per-VM.
+> - Patch 7 performs some minimal unification between SVM and SEV code.
+>   More unification can be done. In particular, SEV can use the
+>   generalized kvm_tlb_tags to allocate ASIDs, and can stop tracking the
+>   ASID separately in struct kvm_sev_info. However, I didn't have enough
+>   SEV knowledge (or testability) to do this.
 > 
-> Option #2 is to shove the module param into vendor code, but leave the variable
-> in kvm.ko, like we do for enable_apicv.
+> The performance impact does not seem to be that bad. To test this
+> series, I ran 3 benchmarks in an SVM guest on a Milan machine:
+> - netperf
+> - cpuid_rate [2]
+> - A simple program doing mmap() and munmap() of 100M for 100 iterations,
+>   to trigger MMU syncs and TLB flushes when using the shadow MMU.
 > 
-> I'm leaning toward option #2, as it's more flexible, arguably more intuitive, and
-> doesn't prevent putting the logic in kvm_x86_vendor_init().
+> The benchmarks were ran with and without the patches for 5 iterations
+> each, and also with and without NPT and FLUSBYASID to emulate old
+> hardware. In all cases, there was either no difference or a 1-2%
+> performance hit for the old hardware case. The performance hit could be
+> larger for specific workloads, but niche performance-sensitive workloads
+> should not be running on very old hardware.
 
-+1, option #1 seems a bit confusing to me.
+This series has several bugs. It allows a VM to use ASID 0 if we run out
+of space (which is not allowed by VMRUN), and it does not handle the
+case where multiple vCPUs of the same VM with the same ASID run on the
+same CPU (handled by SEV through svm_cpu_data.sev_vmcbs).
+
+I also think it's useful to see how the nSVM TLB flushing looks like on
+top of this. So please hold off on reviewing this series, I will send a
+new combined series.
+
+> 
+> [1] https://lore.kernel.org/lkml/Z8JOvMx6iLexT3pK@google.com/
+> [2] https://lore.kernel.org/kvm/20231109180646.2963718-1-khorenko@virtuozzo.com/
+> 
+> Yosry Ahmed (7):
+>   KVM: VMX: Generalize VPID allocation to be vendor-neutral
+>   KVM: SVM: Use cached local variable in init_vmcb()
+>   KVM: SVM: Add helpers to set/clear ASID flush
+>   KVM: SVM: Flush everything if FLUSHBYASID is not available
+>   KVM: SVM: Flush the ASID when running on a new CPU
+>   KVM: SVM: Use a single ASID per VM
+>   KVM: SVM: Share more code between pre_sev_run() and pre_svm_run()
+> 
+>  arch/x86/include/asm/svm.h |  5 ---
+>  arch/x86/kvm/svm/nested.c  |  4 +-
+>  arch/x86/kvm/svm/sev.c     | 26 +++++-------
+>  arch/x86/kvm/svm/svm.c     | 87 ++++++++++++++++++++------------------
+>  arch/x86/kvm/svm/svm.h     | 28 ++++++++----
+>  arch/x86/kvm/vmx/nested.c  |  4 +-
+>  arch/x86/kvm/vmx/vmx.c     | 38 +++--------------
+>  arch/x86/kvm/vmx/vmx.h     |  4 +-
+>  arch/x86/kvm/x86.c         | 58 +++++++++++++++++++++++++
+>  arch/x86/kvm/x86.h         | 13 ++++++
+>  10 files changed, 161 insertions(+), 106 deletions(-)
+> 
+> -- 
+> 2.49.0.rc1.451.g8f38331e32-goog
+> 
 
