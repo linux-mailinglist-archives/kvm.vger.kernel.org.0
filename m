@@ -1,180 +1,107 @@
-Return-Path: <kvm+bounces-41588-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41589-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D5A9A6AC5A
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 18:46:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1474A6AC85
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 18:54:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FE9B189166C
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 17:46:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7F57188C4D8
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 17:54:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EBBB2236FC;
-	Thu, 20 Mar 2025 17:46:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9AA9226548;
+	Thu, 20 Mar 2025 17:54:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GEmmKRoM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="byNzrn0C"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0785579F2;
-	Thu, 20 Mar 2025 17:46:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B011822577C
+	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 17:54:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742492781; cv=none; b=lz+EpsY4iuZO1zj9xDQzqhqgdDMstfxyxB2i9AZgyhGbG+T61nuQUOMOpz18txCj8xTSskG21hqgO/Mwc0XSfrqlxZwGmDVmwSra8Tz0flcZrDapC1NCeheyzCaewD5bTLjv6qLOBwMu1qlW8NXvsyz2IH2k878LuTboqDoCW+M=
+	t=1742493274; cv=none; b=j+aFYGet6hRbefsDDVyUkpTiMPRCOKwcwrhuaGqO0dmf+6pOea03oIZ3aYkXzZfaQd8jR1gN6GeejiJf5hoq8ltR9DY6rpVgHWlmyTWBWPpwbT+VeH4tFFcy6ItaqKsH4OgviBFSlrXQqWUSzyr0StUx0kEWgx+2Ftm5MSRO9h0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742492781; c=relaxed/simple;
-	bh=EUkmoBUO/3XHU00lALn7PlB6uJZI/M9I+UhX7Fk0KQM=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:Cc:To:Subject:
-	 References:In-Reply-To; b=rIq0IBu4lP9Js57heXF0R348Wru/JORuyDp6Jt7FZbjw+K2n9S0aU4z1xCwVQe4yEzNU09bfIuWxLMbsX7o+vu0OypszfhUkuveLwMIfhkIjIm4yjP/6EZQUXGJjOZT+8E1iZWcvEtvtIqMB8Jb/TTmfzqxjsBJx0dPtmOIU49I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=GEmmKRoM; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52KCRrcD030255;
-	Thu, 20 Mar 2025 17:46:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=XI+qQc
-	d22f+3nzHsKCNofRRcntEIcxfYcOnpUtKW9h8=; b=GEmmKRoM5AfyBLgANQj8HJ
-	Vcz8MAj9TvyLSHKTtNWfuWI8FCDYsWB1+lgA42boqjleEpms3ei88giYSIQCjnEB
-	p44RK4URfnkTehZA78IOdpuq/XgFF+KyO1CNNwFaKKbuZMyvitBNMxHntvypXVj2
-	hBcYcmka0EOUzMB+Dxk6PVp8d+184AdEkquQyEU+dliszIMPiXhE4YLrtZc/wcvt
-	r4KKSN7u3qWUpuitktf5953pvDDmPhtDjEosTGLE0ov1QaNqSQmIIRcxcUUPYxRs
-	+FCtilpJEfPVU4cB96C5KIVT6eQELLQgwppFzx8fZqVw4+uRAaUeL/ijG5ukaG5Q
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45gk21stj1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 20 Mar 2025 17:46:17 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52KHiRwu005628;
-	Thu, 20 Mar 2025 17:46:16 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 45dm909cpd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 20 Mar 2025 17:46:15 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52KHkCQb59572496
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 20 Mar 2025 17:46:12 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EBDA12004B;
-	Thu, 20 Mar 2025 17:46:11 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B8A9820043;
-	Thu, 20 Mar 2025 17:46:11 +0000 (GMT)
-Received: from darkmoore (unknown [9.171.36.179])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 20 Mar 2025 17:46:11 +0000 (GMT)
+	s=arc-20240116; t=1742493274; c=relaxed/simple;
+	bh=ycFdkzxtakEGnyZBK6i8pj/Lu02w+pmZ7EzHe02D5xc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=QsYRWE753CXUcIK80e47qVaHY0dNkym/3xrEm4aS+JAmiaLcG23JmQWBbETEx1rH3RH2PH38f914tKElJ+KzrW2QTgzP2v/qQl3F+62mse+LnfHsl++jQcgZbOjqISZRXaIyx74QI1AEjqO3tkj0Y13uxYLQaRuwP5immqtrESU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=byNzrn0C; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ff8a2c7912so1664215a91.1
+        for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 10:54:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1742493272; x=1743098072; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ycFdkzxtakEGnyZBK6i8pj/Lu02w+pmZ7EzHe02D5xc=;
+        b=byNzrn0C0Y0qyQo0EnNH+e6auz+bGIHY/LvyABC+B9lv7PpUs2ZnYF5bURd1HLGVPL
+         D2koSM2W53Qhptd4w4/yQdTjajqjIVEj8JThsuX+sa8Slu8C19n2nMDdAd8oRX+sNbHN
+         sf2Hw7Th6WrNjSQZZUfdklGknc8G01yb4SirDj41lKBRIZz9Cn4UK13JsBqPvIoHj8L2
+         wFX6lV6FTT/fwk2VNC+nupkBsgoMCsbgeJcTFHdJGmEJDKFHnXt3rW7EmmYPxlAXigqj
+         IHCwNR8E5m6f3rJXNj/9KUCNrlTDObmUlj4BSbGvO9s3OJwDlXc7DpxcSXAiaDfIla9c
+         u7yw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742493272; x=1743098072;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ycFdkzxtakEGnyZBK6i8pj/Lu02w+pmZ7EzHe02D5xc=;
+        b=jJTbMYN1t+JW5bt1s01GS6jD5EloC/8jGWJwudWrr+vwNVdrE0qoj8d26rv0nZUKNd
+         H+qxAFeF0BJMr5HKwytYhuyiz2qP8l8+5w78f1zN1EjtBcfAjXEDJopZVZbkk+gQtjwp
+         xBajqOaMM+VWmSCObwz6Jid65Hot2JWdLt0GvV64BV07tmPnbxRxdNMCjxV7YLai/BvD
+         1j/8kpSpzKAfzMksVzqYGQR3wr1HugACYGtwccTu5PgSSe4FctYD5FRJ+X0Ki8AA7boe
+         q8dPV1wV6vELkdt7zqsYuOikTkfqiXSktRHfVNqNUfrcwAPbruiLCA8pyR+dPOXx85ur
+         IMtg==
+X-Forwarded-Encrypted: i=1; AJvYcCXOp7LnaiWBZgAMHljj6orxwGkSG4ovzDRyglbzuupHP9lHRrFWjHHRRgB1vaBYQfYteMQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywaxr/AbdmrJUw1bhbdY9kxUcTCy6+BAcdD+lKgV+7M2H3UWvBT
+	M6uQNXSM2StHQ4wRvkRC9pU/h/2tlVASMCML9L0yueP9X1IJ+NZtNdBVHYtmMbIlKALYqAOi4S2
+	zSg==
+X-Google-Smtp-Source: AGHT+IGDSdE1ytyBoBFw7qVwuVm3wbv2xNCX9zlmSDFB9e6T2jpMlLpSaA4AhKeFzgmz0ROgTRp2/3598EM=
+X-Received: from pjbpd14.prod.google.com ([2002:a17:90b:1dce:b0:2fa:e9b:33b7])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3844:b0:2ff:53d6:2b82
+ with SMTP id 98e67ed59e1d1-301d43a2db5mr6626003a91.11.1742493271988; Thu, 20
+ Mar 2025 10:54:31 -0700 (PDT)
+Date: Thu, 20 Mar 2025 10:54:30 -0700
+In-Reply-To: <CALMp9eRLfpM4Oev_UeaL-Jc25izkgEqaPqeC41MayPRf6m0AZw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250320142022.766201-1-seanjc@google.com> <20250320142022.766201-4-seanjc@google.com>
+ <CALMp9eRLfpM4Oev_UeaL-Jc25izkgEqaPqeC41MayPRf6m0AZw@mail.gmail.com>
+Message-ID: <Z9xWVkDx6hnpFw5Z@google.com>
+Subject: Re: [PATCH v2 3/3] KVM: x86: Add a module param to control and
+ enumerate device posted IRQs
+From: Sean Christopherson <seanjc@google.com>
+To: Jim Mattson <jmattson@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Yosry Ahmed <yosry.ahmed@linux.dev>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 20 Mar 2025 18:46:06 +0100
-Message-Id: <D8LA4TZSP197.BFRXHQBPA6SJ@linux.ibm.com>
-From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
-Cc: "Christian Borntraeger" <borntraeger@linux.ibm.com>,
-        "Janosch Frank"
- <frankja@linux.ibm.com>,
-        "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
-        "David Hildenbrand" <david@redhat.com>,
-        "Sven Schnelle"
- <svens@linux.ibm.com>,
-        "Paolo Bonzini" <pbonzini@redhat.com>, <linux-s390@vger.kernel.org>
-To: "Nico Boehr" <nrb@linux.ibm.com>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH RFC 3/5] KVM: s390: Shadow VSIE SCA in guest-1
-X-Mailer: aerc 0.20.1
-References: <20250318-vsieie-v1-0-6461fcef3412@linux.ibm.com>
- <20250318-vsieie-v1-3-6461fcef3412@linux.ibm.com>
- <D8L732XS5NQW.1M5J3D0TFMQMD@linux.ibm.com>
-In-Reply-To: <D8L732XS5NQW.1M5J3D0TFMQMD@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 8WE2WiiYQxGTMnHat-MZefTV_BclGeuD
-X-Proofpoint-GUID: 8WE2WiiYQxGTMnHat-MZefTV_BclGeuD
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-20_05,2025-03-20_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1015
- bulkscore=0 adultscore=0 priorityscore=1501 spamscore=0 mlxlogscore=969
- malwarescore=0 phishscore=0 impostorscore=0 lowpriorityscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2502280000
- definitions=main-2503200111
 
-On Thu Mar 20, 2025 at 4:22 PM CET, Nico Boehr wrote:
-> On Tue Mar 18, 2025 at 7:59 PM CET, Christoph Schlameuss wrote:
-> [...]
->> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kv=
-m_host.h
->> index 0aca5fa01f3d772c3b3dd62a22134c0d4cb9dc22..4ab196caa9e79e4c4d295d23=
-fed65e1a142e6ab1 100644
->> --- a/arch/s390/include/asm/kvm_host.h
->> +++ b/arch/s390/include/asm/kvm_host.h
-> [...]
->> +static struct ssca_vsie *get_ssca(struct kvm *kvm, struct vsie_page *vs=
-ie_page)
->> +{
->> +	u64 sca_o_hva =3D vsie_page->sca_o;
->> +	phys_addr_t sca_o_hpa =3D virt_to_phys((void *)sca_o_hva);
->> +	struct ssca_vsie *ssca, *ssca_new =3D NULL;
->> +
->> +	/* get existing ssca */
->> +	down_read(&kvm->arch.vsie.ssca_lock);
->> +	ssca =3D get_existing_ssca(kvm, sca_o_hva);
->> +	up_read(&kvm->arch.vsie.ssca_lock);
->> +	if (ssca)
->> +		return ssca;
->
-> I would assume this is the most common case, no?
->
-> And below only happens rarely, right?
->
+On Thu, Mar 20, 2025, Jim Mattson wrote:
+> On Thu, Mar 20, 2025 at 7:31=E2=80=AFAM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > Add a module param to allow disabling device posted interrupts without
+> > having to sacrifice all of APICv/AVIC, and to also effectively enumerat=
+e
+> > to userspace whether or not KVM may be utilizing device posted IRQs.
+> > Disabling device posted interrupts is very desirable for testing, and c=
+an
+> > even be desirable for production environments, e.g. if the host kernel
+> > wants to interpose on device interrupts.
+>=20
+> Are you referring to CONFIG_X86_POSTED_MSI, or something else that
+> doesn't exist yet?
 
-By far, yes.
-
->> +	/*
->> +	 * Allocate new ssca, it will likely be needed below.
->> +	 * We want at least #online_vcpus shadows, so every VCPU can execute t=
-he
->> +	 * VSIE in parallel. (Worst case all single core VMs.)
->> +	 */
->> +	if (kvm->arch.vsie.ssca_count < atomic_read(&kvm->online_vcpus)) {
->> +		BUILD_BUG_ON(offsetof(struct ssca_block, cpu) !=3D 64);
->> +		BUILD_BUG_ON(offsetof(struct ssca_vsie, ref_count) !=3D 0x2200);
->> +		BUILD_BUG_ON(sizeof(struct ssca_vsie) > ((1UL << SSCA_PAGEORDER)-1) *=
- PAGE_SIZE);
->> +		ssca_new =3D (struct ssca_vsie *)__get_free_pages(GFP_KERNEL_ACCOUNT =
-| __GFP_ZERO,
->> +								SSCA_PAGEORDER);
->> +		if (!ssca_new) {
->> +			ssca =3D ERR_PTR(-ENOMEM);
->> +			goto out;
->> +		}
->> +		init_ssca(vsie_page, ssca_new);
->> +	}
->> +
->> +	/* enter write lock and recheck to make sure ssca has not been created=
- by other cpu */
->> +	down_write(&kvm->arch.vsie.ssca_lock);
->
-> I am wondering whether it's really worth having this optimization of tryi=
-ng to
-> avoid taking the lock? Maybe we can accept a bit of contention on the rwl=
-ock
-> since it shouldn't happen very often and keep the code a bit less complex=
-?
-
-With that reasoning I did not try to reduce the section under the write loc=
-k
-further than it is now. I would hope this is a somewhat good balance. The
-allocation really is the "worst" bit I would rather not do under the write =
-lock
-if possible.
-
-I can try to make this a bit easier to read.
+Yeah, that, and/or out-of-tree hackery to do similar coalescing (or ratelim=
+iting).
 
