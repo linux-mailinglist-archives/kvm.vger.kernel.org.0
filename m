@@ -1,244 +1,313 @@
-Return-Path: <kvm+bounces-41633-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41634-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2021A6B0E9
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 23:33:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36FB8A6B144
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 23:50:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 56865189999A
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 22:33:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6997D1893BE2
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 22:49:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0AC822AE68;
-	Thu, 20 Mar 2025 22:30:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 920AB22256C;
+	Thu, 20 Mar 2025 22:49:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LNqI96Vv"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YnV5jLl4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 522D022AE49
-	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 22:30:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2ACA1B4138
+	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 22:49:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742509844; cv=none; b=J25/FMFH+KySwlCNRcM3PQ+r2R+g6kQ8fHiqgVBTQP79mSxiIKkTpXOVKWn6awAWb9+gNm9Ajs9aSCzpK7unmHu6zE4+bOFMcezxcrof1ti2+k4evK0fPSiTl5JGmQ7loVaXyr8MON5hY05lyx/uHuoBqTj8s1caJpepdqyHleU=
+	t=1742510952; cv=none; b=ByV9m2487fjRTwzBwWVD5OUD7a03MMXeg+/hiukQEnzmSeHrRpeRw3dTnI77kTujKtv+aAmD2qjkf9THWiAYyk8HTQh+wB+maMSKWFoyVTJKBO8Z4mONPvzbUwmdbAD9lry3ZfkZZCNVeaiZtyNkeyrZkNrvrevbu2sfk8WAnqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742509844; c=relaxed/simple;
-	bh=x+ToD/As2XrMOsCu4JuHj9NMIdqvRa61LZejFh9BH+4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hDpANM4BrHcKLJrzERQW+uOlApV0V6bghAu6HJ3vdVNUi/9PAj5F++GM9J58U5fgSbLaYJhyYp3bnNf/lnqZKuZC5AJMDIPHf49ThbHivLlBlljFJKQMfd1WfMMMwnK05PrCkEo6GeHqgzqkIgGf1PWF3w1UqFa0o8BHtPcBffo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=LNqI96Vv; arc=none smtp.client-ip=209.85.214.179
+	s=arc-20240116; t=1742510952; c=relaxed/simple;
+	bh=ZrrlhSh6rvGL5zKtVEZElNgEjXeV63mCwrsW7NtjRp0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IvDKP2xs7RApWeYBmnnoq3amWHK6fvTijQcowiw2/DmrDCtCoFS40iWzlppDn24e2IsD8Jrg01DdXiJ28D+F43XK8PFjfliXDcffJKV1iJVQoQ3DWv8K13JSnJm1k86e81Wb+cF1hhIkGy888GnmmaoN1e2Ob0Awec/+SLHkSWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=YnV5jLl4; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-226185948ffso26879025ad.0
-        for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 15:30:41 -0700 (PDT)
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-22580c9ee0aso28237325ad.2
+        for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 15:49:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1742509841; x=1743114641; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yn2Xz9RB0NXRkBKqvuaaiEm9yg8jr17YbtEabY7lMZc=;
-        b=LNqI96Vv0DgnyhL4rA36tb1+aSmTgqDEGw935EHlZdr4sqQWczKrHtSbFd7+RapK3C
-         1A50i76Ppz1uCEmmhI2YgjnPo9+/aewacMg8vbWYKdnjIHxDFWvneZJfQf5wAmNjGznl
-         YsBWV/YTkObPEAenteovYh/OpeVbzL3nD9ePQRrKYQuOxXwhtRuU771NToC/SkMHevJ0
-         Sa5O5dWplRjGgJeVq3yX87Zi/8GcTKerON7zYPSGpMe3TKJp+KwnBND2RdvQ/d7fpd3o
-         q5D9koE6MFdXMxmsR9zTKRoIkCP82pw25VOmN2XWdu5Qa8lUzrnIH19VzgtjMENa66D+
-         WUkA==
+        d=linaro.org; s=google; t=1742510949; x=1743115749; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DUl0JJOAWC6Np6+7L2wwmwznYFQPYtStKsZfNLj2wV0=;
+        b=YnV5jLl4XbNlmkewuxgLRBj8dA9gvyyJlhgW9Gs6U8KPJzVH3T3cyOElUiKOOhrpyz
+         4Rp2rwPZ+bGIX59xOji4L8GNbuna9Cn/uozpMzR/Z9q58I2beZwA6pVZfkUHltTv5582
+         EWQQTrT67bs2sgBLIXcAwIEn5WZpJwDw6vLkgCOKDMMf38lhM29KjYytRMaHuGNTeBSG
+         iKMOIxDYAlX5KBfuK7mtl+u8EWUv8pxLxIJAaP+VC4dzJp0DVPTmw2RTKaCLgPUMHXtR
+         pr6H+TxZ3Rr7Ydtzi3GLhXszemBn6stl3PlTERq4wWwLdZYoL3sZSaclgDOOqTkShwgU
+         vMnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742509841; x=1743114641;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yn2Xz9RB0NXRkBKqvuaaiEm9yg8jr17YbtEabY7lMZc=;
-        b=fDD84AcFY8k2C6DQjndYv2GdnGxd1CO+9P73wTvLz6FuoUCLEZLLJtDy6D360a9skt
-         NkfxH14R5Y/x/5N8iactsUvh+HYFhcwyJUQsVYTjfAh4p+MngyHWNslwCCdhZ2UhpGu0
-         wY0hwgZOQ55j4IgLY9UCy/E6W3sGxqdVBMmRmIVS+J1kz23GKmuS3pMIIO4XFPF9G/fz
-         +LdAiDBCg+0diWBtTuFZPWzWbUiZ/IKELchjJDN41fJnmSupwgvGX7rf5JftMjgKQ08I
-         xgOVoUcLwcVVaB1ooTr9t0k8UaVxVZz+hAzqCw/94UOQNP4WHynR3s0UWw+LrZBfhBwk
-         2lCw==
-X-Gm-Message-State: AOJu0Yz5J97wfbDGedDcLyVfX0gChG3RGGsJIPi9rMAtngJPNf/c8F0o
-	Y0hj0J5b5rsUqOmYC4OaH9cdexmwtmq2X+Qa8T9Oy2F7h/5JTe4Z7xfRR+oxVYc=
-X-Gm-Gg: ASbGncuSMquk4GyQdFLkDVvu4AaD+RsZ04JXqPzm36lD5j5qkSyNW0xS+81AicaK7mj
-	MILnD/BR2yn4gFjrT6LorDkY8z+7IfZbqVRLSdHANR5TXlloEAP28q9qPywc1TvfhJiaXOqbG7C
-	dcIiZWCGfv1utlBNsVk+KnYFMujI9yi3fJS6e1N5YBnPRSN9Yb4PJf5uh6UZStY8AQYAnxhf9Ie
-	ZUzqV6nWd9EtwoXqq3qIhnWn4GJojlUwLaQXtNRAqrb0PLwBHyKOo6fAqjAGSCMmiEoH2R3nJP4
-	pmp1BGaLTbG0QIR9Ao0410Kak4gWIwfVhoOctDwpz/zU
-X-Google-Smtp-Source: AGHT+IEzJbf92WCs5cdn48gdTqOAmHjHUL79CRGln7SjLlFgI+95i4LaCr+ImDqPmlnxNCrWkwC3Xw==
-X-Received: by 2002:a17:902:fc4b:b0:226:38ff:1d6a with SMTP id d9443c01a7336-22780c68a1amr17471675ad.7.1742509840610;
-        Thu, 20 Mar 2025 15:30:40 -0700 (PDT)
-Received: from pc.. ([38.39.164.180])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22780f4581csm3370145ad.59.2025.03.20.15.30.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Mar 2025 15:30:40 -0700 (PDT)
-From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-To: qemu-devel@nongnu.org
-Cc: kvm@vger.kernel.org,
-	qemu-arm@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v2 30/30] hw/arm: make most of the compilation units common
-Date: Thu, 20 Mar 2025 15:30:02 -0700
-Message-Id: <20250320223002.2915728-31-pierrick.bouvier@linaro.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250320223002.2915728-1-pierrick.bouvier@linaro.org>
-References: <20250320223002.2915728-1-pierrick.bouvier@linaro.org>
+        d=1e100.net; s=20230601; t=1742510949; x=1743115749;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DUl0JJOAWC6Np6+7L2wwmwznYFQPYtStKsZfNLj2wV0=;
+        b=eaGqnzeigQL9oCoQACLBWkwCKRvtpAHAQMOjNJHuxvyaaVRA8hNBC7kGMnCc/0SzF3
+         nzP5JjrLKAScIy3JyLYYPjF4lUHdQ3LAWot2NsZGUnCxQyzi1a39JxfkVDOz9pQ9DugO
+         E/9hQbT3S6cn0Y6D37RAdSGfxGZHBA8O4df7QVQdhNAKDkdNwFdbqZgV+PeV+f+CBWPW
+         nxqhVwJC5VuXIonlt6QMCxWw9jT1Z9vwrstgPI4a+pyfXCb6VP/ZqDSJWjl6sdlQvtAM
+         KKevIGxepx6XSQK01aOziNy/N5T1eSoR8t66aw6uoIPIur45AEuYH8nToTqFTK3smzGM
+         Exdw==
+X-Gm-Message-State: AOJu0YyJWCQsi552wSYLn8cVkPciaKGEsdt4zneflDvC08spcNM5irkC
+	pCu5AI/RBoMCGUYj+GGnlXNyW9IcD1ifOeIWUxSsrW5+YNVxXGedFUtvSpTzIz4=
+X-Gm-Gg: ASbGncsY9JRVKfz33HPKTowupemgsXyd/gPW2IhzwFjI8k9JXQm/UxBeGZActjSlgtO
+	m2bricOkXfY6sxGyhf6XFIwdyx6D58ed44wBBb3j9oJOZ/FDO/Nc64Xq3e3ad1AoDWMy7C+/DVN
+	3L1M3KyenGBGQ19pfjMwNDUxRX29vqtbhZQsMshoa2++3ebSTPlwz5Dtu6NGJeqO7EnlP4zo5iL
+	D2Mk7iXHIKRszyeQV4OaSr/I4x3Yq8etxJCQnoryovmE3NzBVSqYHy9MSx337kcZlhnRfsqltdK
+	pCtsZntQlb0e5Qo8BKEYdPfcs5HQEj7s2SAJBgA/11Fsts1TucJil9prpA==
+X-Google-Smtp-Source: AGHT+IE8LLmohCWT2OM79Ks/Gq6iUQEWxb5HMBUe5lAqyFpMafS7tISb53AHsVvLi0PowRFtPDy4Pg==
+X-Received: by 2002:a17:903:40cb:b0:215:b75f:a1cb with SMTP id d9443c01a7336-22780c5570dmr16516475ad.9.1742510948798;
+        Thu, 20 Mar 2025 15:49:08 -0700 (PDT)
+Received: from [192.168.1.67] ([38.39.164.180])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-227811da2eesm3395725ad.172.2025.03.20.15.49.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Mar 2025 15:49:07 -0700 (PDT)
+Message-ID: <2f5703db-5ee4-4790-9301-e81ee7d79279@linaro.org>
+Date: Thu, 20 Mar 2025 15:49:07 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 00/30] single-binary: start make hw/arm/ common
+Content-Language: en-US
+To: qemu-devel@nongnu.org
+Cc: kvm@vger.kernel.org, qemu-arm@nongnu.org,
+ Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
+ <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
+ <philmd@linaro.org>, Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+References: <20250320223002.2915728-1-pierrick.bouvier@linaro.org>
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+In-Reply-To: <20250320223002.2915728-1-pierrick.bouvier@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
----
- hw/arm/meson.build | 112 ++++++++++++++++++++++-----------------------
- 1 file changed, 56 insertions(+), 56 deletions(-)
+On 3/20/25 15:29, Pierrick Bouvier wrote:
+> This series focuses on removing compilation units duplication in hw/arm. We
+> start with this architecture because it should not be too hard to transform it,
+> and should give us some good hints on the difficulties we'll meet later.
+> 
+> We first start by making changes in global headers to be able to not rely on
+> specific target defines. In particular, we completely remove cpu-all.h.
+> We then focus on removing those defines from target/arm/cpu.h.
+> 
+>  From there, we modify build system to create a new hw common library (per base
+> architecture, "arm" in this case), instead of compiling the same files for every
+> target.
+> 
+> Finally, we can declare hw/arm/boot.c, and most of the boards as common as a
+> first step for this part.
+> 
+> - Based-on: 20250317183417.285700-1-pierrick.bouvier@linaro.org
+> ("[PATCH v6 00/18] make system memory API available for common code")
+> https://lore.kernel.org/qemu-devel/20250317183417.285700-1-pierrick.bouvier@linaro.org/
+> - Based-on: 20250318213209.2579218-1-richard.henderson@linaro.org
+> ("[PATCH v2 00/42] accel/tcg, codebase: Build once patches")
+> https://lore.kernel.org/qemu-devel/20250318213209.2579218-1-richard.henderson@linaro.org
+> 
+> v2:
+> - rebase on top of Richard series
+> - add target include in hw_common lib
+> - hw_common_lib uses -DCOMPILE_SYSTEM_VS_USER introduced by Richard series
+> - remove cpu-all header
+> - remove BSWAP_NEEDED define
+> - new tlb-flags header
+> - Cleanup i386 KVM_HAVE_MCE_INJECTION definition + move KVM_HAVE_MCE_INJECTION
+> - remove comment about cs_base in target/arm/cpu.h
+> - updated commit message about registers visibility between aarch32/aarch64
+> - tried remove ifdefs in target/arm/helper.c but this resulted in more a ugly
+>    result. So just comment calls for now, as we'll clean this file later.
+> - make most of the boards in hw/arm common
+> 
+> Pierrick Bouvier (30):
+>    exec/cpu-all: remove BSWAP_NEEDED
+>    exec/cpu-all: extract tlb flags defines to exec/tlb-flags.h
+>    exec/cpu-all: move cpu_copy to linux-user/qemu.h
+>    include/exec/cpu-all: move compile time check for CPUArchState to
+>      cpu-target.c
+>    exec/cpu-all: remove system/memory include
+>    exec/cpu-all: remove exec/page-protection include
+>    exec/cpu-all: remove tswap include
+>    exec/cpu-all: remove exec/cpu-interrupt include
+>    exec/cpu-all: remove exec/cpu-defs include
+>    exec/cpu-all: remove exec/target_page include
+>    exec/cpu-all: remove hw/core/cpu.h include
+>    accel/tcg: fix missing includes for TCG_GUEST_DEFAULT_MO
+>    accel/tcg: fix missing includes for TARGET_HAS_PRECISE_SMC
+>    exec/cpu-all: remove cpu include
+>    exec/cpu-all: transfer exec/cpu-common include to cpu.h headers
+>    exec/cpu-all: remove this header
+>    exec/target_page: runtime defintion for TARGET_PAGE_BITS_MIN
+>    accel/kvm: move KVM_HAVE_MCE_INJECTION define to kvm-all.c
+>    exec/poison: KVM_HAVE_MCE_INJECTION can now be poisoned
+>    target/arm/cpu: always define kvm related registers
+>    target/arm/cpu: flags2 is always uint64_t
+>    target/arm/cpu: define same set of registers for aarch32 and aarch64
+>    target/arm/cpu: remove inline stubs for aarch32 emulation
+>    meson: add common hw files
+>    hw/arm/boot: make compilation unit hw common
+>    hw/arm/armv7m: prepare compilation unit to be common
+>    hw/arm/digic_boards: prepare compilation unit to be common
+>    hw/arm/xlnx-zynqmp: prepare compilation unit to be common
+>    hw/arm/xlnx-versal: prepare compilation unit to be common
+>    hw/arm: make most of the compilation units common
+> 
+>   meson.build                             |  37 +++++++-
+>   accel/tcg/internal-target.h             |   1 +
+>   accel/tcg/tb-internal.h                 |   1 -
+>   hw/s390x/ipl.h                          |   2 +
+>   include/exec/cpu_ldst.h                 |   1 +
+>   include/exec/exec-all.h                 |   1 +
+>   include/exec/poison.h                   |   4 +
+>   include/exec/target_page.h              |   3 +
+>   include/exec/{cpu-all.h => tlb-flags.h} |  38 +-------
+>   include/hw/core/cpu.h                   |   2 +-
+>   include/qemu/bswap.h                    |   2 +-
+>   include/system/kvm.h                    |   2 -
+>   linux-user/qemu.h                       |   3 +
+>   linux-user/sparc/target_syscall.h       |   2 +
+>   linux-user/syscall_defs.h               |   2 +-
+>   target/alpha/cpu.h                      |   4 +-
+>   target/arm/cpu.h                        |  40 ++------
+>   target/arm/internals.h                  |   1 +
+>   target/avr/cpu.h                        |   4 +-
+>   target/hexagon/cpu.h                    |   3 +-
+>   target/hppa/cpu.h                       |   5 +-
+>   target/i386/cpu.h                       |   5 +-
+>   target/i386/hvf/vmx.h                   |   1 +
+>   target/loongarch/cpu.h                  |   4 +-
+>   target/m68k/cpu.h                       |   4 +-
+>   target/microblaze/cpu.h                 |   4 +-
+>   target/mips/cpu.h                       |   4 +-
+>   target/openrisc/cpu.h                   |   4 +-
+>   target/ppc/cpu.h                        |   4 +-
+>   target/ppc/mmu-hash32.h                 |   2 +
+>   target/ppc/mmu-hash64.h                 |   2 +
+>   target/riscv/cpu.h                      |   4 +-
+>   target/rx/cpu.h                         |   4 +-
+>   target/s390x/cpu.h                      |   4 +-
+>   target/sh4/cpu.h                        |   4 +-
+>   target/sparc/cpu.h                      |   4 +-
+>   target/tricore/cpu.h                    |   3 +-
+>   target/xtensa/cpu.h                     |   4 +-
+>   accel/kvm/kvm-all.c                     |   5 +
+>   accel/tcg/cpu-exec.c                    |   3 +-
+>   accel/tcg/cputlb.c                      |   1 +
+>   accel/tcg/tb-maint.c                    |   1 +
+>   accel/tcg/translate-all.c               |   1 +
+>   accel/tcg/user-exec.c                   |   2 +
+>   bsd-user/elfload.c                      |   6 +-
+>   cpu-target.c                            |   5 +
+>   hw/alpha/dp264.c                        |   1 +
+>   hw/alpha/typhoon.c                      |   1 +
+>   hw/arm/armv7m.c                         |  12 ++-
+>   hw/arm/boot.c                           |   2 +
+>   hw/arm/digic_boards.c                   |   2 +-
+>   hw/arm/smmuv3.c                         |   1 +
+>   hw/arm/xlnx-versal.c                    |   2 -
+>   hw/arm/xlnx-zynqmp.c                    |   2 -
+>   hw/hppa/machine.c                       |   1 +
+>   hw/i386/multiboot.c                     |   1 +
+>   hw/i386/pc.c                            |   1 +
+>   hw/i386/pc_sysfw_ovmf.c                 |   1 +
+>   hw/i386/vapic.c                         |   1 +
+>   hw/loongarch/virt.c                     |   1 +
+>   hw/m68k/next-cube.c                     |   1 +
+>   hw/m68k/q800.c                          |   1 +
+>   hw/m68k/virt.c                          |   1 +
+>   hw/openrisc/boot.c                      |   1 +
+>   hw/pci-host/astro.c                     |   1 +
+>   hw/ppc/e500.c                           |   1 +
+>   hw/ppc/mac_newworld.c                   |   5 +-
+>   hw/ppc/mac_oldworld.c                   |   5 +-
+>   hw/ppc/ppc.c                            |   1 +
+>   hw/ppc/ppc_booke.c                      |   1 +
+>   hw/ppc/prep.c                           |   1 +
+>   hw/ppc/spapr_hcall.c                    |   1 +
+>   hw/ppc/spapr_ovec.c                     |   1 +
+>   hw/riscv/riscv-iommu-pci.c              |   1 +
+>   hw/riscv/riscv-iommu.c                  |   1 +
+>   hw/s390x/s390-pci-bus.c                 |   1 +
+>   hw/s390x/s390-pci-inst.c                |   1 +
+>   hw/s390x/s390-skeys.c                   |   1 +
+>   hw/sparc/sun4m.c                        |   7 +-
+>   hw/sparc64/sun4u.c                      |   7 +-
+>   hw/xtensa/pic_cpu.c                     |   1 +
+>   linux-user/elfload.c                    |   8 +-
+>   monitor/hmp-cmds-target.c               |   1 +
+>   semihosting/uaccess.c                   |   2 +-
+>   target/alpha/helper.c                   |   2 +
+>   target/arm/gdbstub64.c                  |   1 +
+>   target/arm/helper.c                     |   6 ++
+>   target/arm/hvf/hvf.c                    |   1 +
+>   target/arm/ptw.c                        |   1 +
+>   target/arm/tcg/helper-a64.c             |   1 +
+>   target/arm/tcg/hflags.c                 |   4 +-
+>   target/arm/tcg/mte_helper.c             |   1 +
+>   target/arm/tcg/sve_helper.c             |   1 +
+>   target/arm/tcg/tlb-insns.c              |   1 +
+>   target/avr/helper.c                     |   2 +
+>   target/hexagon/translate.c              |   1 +
+>   target/i386/arch_memory_mapping.c       |   1 +
+>   target/i386/helper.c                    |   2 +
+>   target/i386/hvf/hvf.c                   |   1 +
+>   target/i386/kvm/hyperv.c                |   1 +
+>   target/i386/kvm/kvm.c                   |   1 +
+>   target/i386/kvm/xen-emu.c               |   1 +
+>   target/i386/sev.c                       |   1 +
+>   target/i386/tcg/system/excp_helper.c    |   2 +
+>   target/i386/tcg/system/misc_helper.c    |   1 +
+>   target/i386/tcg/system/tcg-cpu.c        |   1 +
+>   target/i386/xsave_helper.c              |   1 +
+>   target/loongarch/cpu_helper.c           |   1 +
+>   target/loongarch/tcg/translate.c        |   1 +
+>   target/m68k/helper.c                    |   1 +
+>   target/microblaze/helper.c              |   1 +
+>   target/microblaze/mmu.c                 |   1 +
+>   target/mips/tcg/system/cp0_helper.c     |   1 +
+>   target/mips/tcg/translate.c             |   1 +
+>   target/openrisc/mmu.c                   |   1 +
+>   target/ppc/excp_helper.c                |   1 +
+>   target/ppc/mmu-book3s-v3.c              |   1 +
+>   target/ppc/mmu-hash64.c                 |   1 +
+>   target/ppc/mmu-radix64.c                |   1 +
+>   target/riscv/cpu_helper.c               |   1 +
+>   target/riscv/op_helper.c                |   1 +
+>   target/riscv/pmp.c                      |   1 +
+>   target/riscv/vector_helper.c            |   2 +
+>   target/rx/cpu.c                         |   1 +
+>   target/s390x/helper.c                   |   1 +
+>   target/s390x/ioinst.c                   |   1 +
+>   target/s390x/tcg/mem_helper.c           |   1 +
+>   target/sparc/ldst_helper.c              |   1 +
+>   target/sparc/mmu_helper.c               |   2 +
+>   target/tricore/helper.c                 |   1 +
+>   target/xtensa/helper.c                  |   1 +
+>   target/xtensa/mmu_helper.c              |   1 +
+>   target/xtensa/op_helper.c               |   1 +
+>   target/xtensa/xtensa-semi.c             |   1 +
+>   tcg/tcg-op-ldst.c                       |   2 +-
+>   hw/arm/meson.build                      | 117 ++++++++++++------------
+>   136 files changed, 302 insertions(+), 205 deletions(-)
+>   rename include/exec/{cpu-all.h => tlb-flags.h} (78%)
+> 
 
-diff --git a/hw/arm/meson.build b/hw/arm/meson.build
-index 9e8c96059eb..09b1cfe5b57 100644
---- a/hw/arm/meson.build
-+++ b/hw/arm/meson.build
-@@ -2,43 +2,43 @@ arm_ss = ss.source_set()
- arm_common_ss = ss.source_set()
- arm_ss.add(when: 'CONFIG_ARM_VIRT', if_true: files('virt.c'))
- arm_ss.add(when: 'CONFIG_ACPI', if_true: files('virt-acpi-build.c'))
--arm_ss.add(when: 'CONFIG_DIGIC', if_true: files('digic_boards.c'))
--arm_ss.add(when: 'CONFIG_EMCRAFT_SF2', if_true: files('msf2-som.c'))
--arm_ss.add(when: 'CONFIG_HIGHBANK', if_true: files('highbank.c'))
--arm_ss.add(when: 'CONFIG_INTEGRATOR', if_true: files('integratorcp.c'))
--arm_ss.add(when: 'CONFIG_MICROBIT', if_true: files('microbit.c'))
--arm_ss.add(when: 'CONFIG_MPS3R', if_true: files('mps3r.c'))
--arm_ss.add(when: 'CONFIG_MUSICPAL', if_true: files('musicpal.c'))
--arm_ss.add(when: 'CONFIG_NETDUINOPLUS2', if_true: files('netduinoplus2.c'))
--arm_ss.add(when: 'CONFIG_OLIMEX_STM32_H405', if_true: files('olimex-stm32-h405.c'))
--arm_ss.add(when: 'CONFIG_NPCM7XX', if_true: files('npcm7xx.c', 'npcm7xx_boards.c'))
--arm_ss.add(when: 'CONFIG_NPCM8XX', if_true: files('npcm8xx.c', 'npcm8xx_boards.c'))
--arm_ss.add(when: 'CONFIG_REALVIEW', if_true: files('realview.c'))
-+arm_common_ss.add(when: 'CONFIG_DIGIC', if_true: files('digic_boards.c'))
-+arm_common_ss.add(when: 'CONFIG_EMCRAFT_SF2', if_true: files('msf2-som.c'))
-+arm_common_ss.add(when: 'CONFIG_HIGHBANK', if_true: files('highbank.c'))
-+arm_common_ss.add(when: 'CONFIG_INTEGRATOR', if_true: files('integratorcp.c'))
-+arm_common_ss.add(when: 'CONFIG_MICROBIT', if_true: files('microbit.c'))
-+arm_common_ss.add(when: 'CONFIG_MPS3R', if_true: files('mps3r.c'))
-+arm_common_ss.add(when: 'CONFIG_MUSICPAL', if_true: [pixman, files('musicpal.c')])
-+arm_common_ss.add(when: 'CONFIG_NETDUINOPLUS2', if_true: files('netduinoplus2.c'))
-+arm_common_ss.add(when: 'CONFIG_OLIMEX_STM32_H405', if_true: files('olimex-stm32-h405.c'))
-+arm_common_ss.add(when: 'CONFIG_NPCM7XX', if_true: files('npcm7xx.c', 'npcm7xx_boards.c'))
-+arm_common_ss.add(when: 'CONFIG_NPCM8XX', if_true: files('npcm8xx.c', 'npcm8xx_boards.c'))
-+arm_common_ss.add(when: 'CONFIG_REALVIEW', if_true: files('realview.c'))
- arm_ss.add(when: 'CONFIG_SBSA_REF', if_true: files('sbsa-ref.c'))
--arm_ss.add(when: 'CONFIG_STELLARIS', if_true: files('stellaris.c'))
--arm_ss.add(when: 'CONFIG_STM32VLDISCOVERY', if_true: files('stm32vldiscovery.c'))
--arm_ss.add(when: 'CONFIG_ZYNQ', if_true: files('xilinx_zynq.c'))
--arm_ss.add(when: 'CONFIG_SABRELITE', if_true: files('sabrelite.c'))
-+arm_common_ss.add(when: 'CONFIG_STELLARIS', if_true: files('stellaris.c'))
-+arm_common_ss.add(when: 'CONFIG_STM32VLDISCOVERY', if_true: files('stm32vldiscovery.c'))
-+arm_common_ss.add(when: 'CONFIG_ZYNQ', if_true: files('xilinx_zynq.c'))
-+arm_common_ss.add(when: 'CONFIG_SABRELITE', if_true: files('sabrelite.c'))
- 
--arm_ss.add(when: 'CONFIG_ARM_V7M', if_true: files('armv7m.c'))
--arm_ss.add(when: 'CONFIG_EXYNOS4', if_true: files('exynos4210.c'))
--arm_ss.add(when: 'CONFIG_DIGIC', if_true: files('digic.c'))
--arm_ss.add(when: 'CONFIG_OMAP', if_true: files('omap1.c'))
--arm_ss.add(when: 'CONFIG_ALLWINNER_A10', if_true: files('allwinner-a10.c', 'cubieboard.c'))
--arm_ss.add(when: 'CONFIG_ALLWINNER_H3', if_true: files('allwinner-h3.c', 'orangepi.c'))
--arm_ss.add(when: 'CONFIG_ALLWINNER_R40', if_true: files('allwinner-r40.c', 'bananapi_m2u.c'))
-+arm_common_ss.add(when: 'CONFIG_ARM_V7M', if_true: files('armv7m.c'))
-+arm_common_ss.add(when: 'CONFIG_EXYNOS4', if_true: files('exynos4210.c'))
-+arm_common_ss.add(when: 'CONFIG_DIGIC', if_true: files('digic.c'))
-+arm_common_ss.add(when: 'CONFIG_OMAP', if_true: files('omap1.c'))
-+arm_common_ss.add(when: 'CONFIG_ALLWINNER_A10', if_true: files('allwinner-a10.c', 'cubieboard.c'))
-+arm_common_ss.add(when: 'CONFIG_ALLWINNER_H3', if_true: files('allwinner-h3.c', 'orangepi.c'))
-+arm_common_ss.add(when: 'CONFIG_ALLWINNER_R40', if_true: files('allwinner-r40.c', 'bananapi_m2u.c'))
- arm_ss.add(when: 'CONFIG_RASPI', if_true: files('bcm2836.c', 'raspi.c'))
--arm_ss.add(when: ['CONFIG_RASPI', 'TARGET_AARCH64'], if_true: files('bcm2838.c', 'raspi4b.c'))
--arm_ss.add(when: 'CONFIG_STM32F100_SOC', if_true: files('stm32f100_soc.c'))
--arm_ss.add(when: 'CONFIG_STM32F205_SOC', if_true: files('stm32f205_soc.c'))
--arm_ss.add(when: 'CONFIG_STM32F405_SOC', if_true: files('stm32f405_soc.c'))
--arm_ss.add(when: 'CONFIG_B_L475E_IOT01A', if_true: files('b-l475e-iot01a.c'))
--arm_ss.add(when: 'CONFIG_STM32L4X5_SOC', if_true: files('stm32l4x5_soc.c'))
--arm_ss.add(when: 'CONFIG_XLNX_ZYNQMP_ARM', if_true: files('xlnx-zynqmp.c', 'xlnx-zcu102.c'))
--arm_ss.add(when: 'CONFIG_XLNX_VERSAL', if_true: files('xlnx-versal.c', 'xlnx-versal-virt.c'))
--arm_ss.add(when: 'CONFIG_FSL_IMX25', if_true: files('fsl-imx25.c', 'imx25_pdk.c'))
--arm_ss.add(when: 'CONFIG_FSL_IMX31', if_true: files('fsl-imx31.c', 'kzm.c'))
--arm_ss.add(when: 'CONFIG_FSL_IMX6', if_true: files('fsl-imx6.c'))
-+arm_common_ss.add(when: ['CONFIG_RASPI', 'TARGET_AARCH64'], if_true: files('bcm2838.c', 'raspi4b.c'))
-+arm_common_ss.add(when: 'CONFIG_STM32F100_SOC', if_true: files('stm32f100_soc.c'))
-+arm_common_ss.add(when: 'CONFIG_STM32F205_SOC', if_true: files('stm32f205_soc.c'))
-+arm_common_ss.add(when: 'CONFIG_STM32F405_SOC', if_true: files('stm32f405_soc.c'))
-+arm_common_ss.add(when: 'CONFIG_B_L475E_IOT01A', if_true: files('b-l475e-iot01a.c'))
-+arm_common_ss.add(when: 'CONFIG_STM32L4X5_SOC', if_true: files('stm32l4x5_soc.c'))
-+arm_common_ss.add(when: 'CONFIG_XLNX_ZYNQMP_ARM', if_true: files('xlnx-zynqmp.c', 'xlnx-zcu102.c'))
-+arm_common_ss.add(when: 'CONFIG_XLNX_VERSAL', if_true: files('xlnx-versal.c', 'xlnx-versal-virt.c'))
-+arm_common_ss.add(when: 'CONFIG_FSL_IMX25', if_true: files('fsl-imx25.c', 'imx25_pdk.c'))
-+arm_common_ss.add(when: 'CONFIG_FSL_IMX31', if_true: files('fsl-imx31.c', 'kzm.c'))
-+arm_common_ss.add(when: 'CONFIG_FSL_IMX6', if_true: files('fsl-imx6.c'))
- arm_ss.add(when: 'CONFIG_ASPEED_SOC', if_true: files(
-   'aspeed.c',
-   'aspeed_soc_common.c',
-@@ -47,33 +47,33 @@ arm_ss.add(when: 'CONFIG_ASPEED_SOC', if_true: files(
-   'aspeed_ast10x0.c',
-   'aspeed_eeprom.c',
-   'fby35.c'))
--arm_ss.add(when: ['CONFIG_ASPEED_SOC', 'TARGET_AARCH64'], if_true: files('aspeed_ast27x0.c'))
--arm_ss.add(when: 'CONFIG_MPS2', if_true: files('mps2.c'))
--arm_ss.add(when: 'CONFIG_MPS2', if_true: files('mps2-tz.c'))
--arm_ss.add(when: 'CONFIG_MSF2', if_true: files('msf2-soc.c'))
--arm_ss.add(when: 'CONFIG_MUSCA', if_true: files('musca.c'))
--arm_ss.add(when: 'CONFIG_ARMSSE', if_true: files('armsse.c'))
--arm_ss.add(when: 'CONFIG_FSL_IMX7', if_true: files('fsl-imx7.c', 'mcimx7d-sabre.c'))
--arm_ss.add(when: 'CONFIG_FSL_IMX8MP', if_true: files('fsl-imx8mp.c'))
--arm_ss.add(when: 'CONFIG_FSL_IMX8MP_EVK', if_true: files('imx8mp-evk.c'))
--arm_ss.add(when: 'CONFIG_ARM_SMMUV3', if_true: files('smmuv3.c'))
--arm_ss.add(when: 'CONFIG_FSL_IMX6UL', if_true: files('fsl-imx6ul.c', 'mcimx6ul-evk.c'))
--arm_ss.add(when: 'CONFIG_NRF51_SOC', if_true: files('nrf51_soc.c'))
-+arm_common_ss.add(when: ['CONFIG_ASPEED_SOC', 'TARGET_AARCH64'], if_true: files('aspeed_ast27x0.c'))
-+arm_common_ss.add(when: 'CONFIG_MPS2', if_true: files('mps2.c'))
-+arm_common_ss.add(when: 'CONFIG_MPS2', if_true: files('mps2-tz.c'))
-+arm_common_ss.add(when: 'CONFIG_MSF2', if_true: files('msf2-soc.c'))
-+arm_common_ss.add(when: 'CONFIG_MUSCA', if_true: files('musca.c'))
-+arm_common_ss.add(when: 'CONFIG_ARMSSE', if_true: files('armsse.c'))
-+arm_common_ss.add(when: 'CONFIG_FSL_IMX7', if_true: files('fsl-imx7.c', 'mcimx7d-sabre.c'))
-+arm_common_ss.add(when: 'CONFIG_FSL_IMX8MP', if_true: files('fsl-imx8mp.c'))
-+arm_common_ss.add(when: 'CONFIG_FSL_IMX8MP_EVK', if_true: files('imx8mp-evk.c'))
-+arm_common_ss.add(when: 'CONFIG_ARM_SMMUV3', if_true: files('smmuv3.c'))
-+arm_common_ss.add(when: 'CONFIG_FSL_IMX6UL', if_true: files('fsl-imx6ul.c', 'mcimx6ul-evk.c'))
-+arm_common_ss.add(when: 'CONFIG_NRF51_SOC', if_true: files('nrf51_soc.c'))
- arm_ss.add(when: 'CONFIG_XEN', if_true: files(
-   'xen-stubs.c',
-   'xen-pvh.c',
- ))
- 
--system_ss.add(when: 'CONFIG_ARM_SMMUV3', if_true: files('smmu-common.c'))
--system_ss.add(when: 'CONFIG_COLLIE', if_true: files('collie.c'))
--system_ss.add(when: 'CONFIG_EXYNOS4', if_true: files('exynos4_boards.c'))
--system_ss.add(when: 'CONFIG_NETDUINO2', if_true: files('netduino2.c'))
--system_ss.add(when: 'CONFIG_RASPI', if_true: files('bcm2835_peripherals.c'))
--system_ss.add(when: 'CONFIG_RASPI', if_true: files('bcm2838_peripherals.c'))
--system_ss.add(when: 'CONFIG_STRONGARM', if_true: files('strongarm.c'))
--system_ss.add(when: 'CONFIG_SX1', if_true: files('omap_sx1.c'))
--system_ss.add(when: 'CONFIG_VERSATILE', if_true: files('versatilepb.c'))
--system_ss.add(when: 'CONFIG_VEXPRESS', if_true: files('vexpress.c'))
-+arm_common_ss.add(when: 'CONFIG_ARM_SMMUV3', if_true: files('smmu-common.c'))
-+arm_common_ss.add(when: 'CONFIG_COLLIE', if_true: files('collie.c'))
-+arm_common_ss.add(when: 'CONFIG_EXYNOS4', if_true: files('exynos4_boards.c'))
-+arm_common_ss.add(when: 'CONFIG_NETDUINO2', if_true: files('netduino2.c'))
-+arm_common_ss.add(when: 'CONFIG_RASPI', if_true: files('bcm2835_peripherals.c'))
-+arm_common_ss.add(when: 'CONFIG_RASPI', if_true: files('bcm2838_peripherals.c'))
-+arm_common_ss.add(when: 'CONFIG_STRONGARM', if_true: files('strongarm.c'))
-+arm_common_ss.add(when: 'CONFIG_SX1', if_true: files('omap_sx1.c'))
-+arm_common_ss.add(when: 'CONFIG_VERSATILE', if_true: files('versatilepb.c'))
-+arm_common_ss.add(when: 'CONFIG_VEXPRESS', if_true: files('vexpress.c'))
- 
- arm_common_ss.add(fdt, files('boot.c'))
- 
--- 
-2.39.5
-
+This series has been built for:
+- Linux x64 and arm64 host
+- MacOS x64 and arm64 host
+- Windows x64 host
+All tests have been ran on linux x64 host.
+https://github.com/pbo-linaro/qemu/actions/runs/13977201084/
 
