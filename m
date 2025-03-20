@@ -1,155 +1,111 @@
-Return-Path: <kvm+bounces-41591-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41592-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68D71A6AC9B
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 19:00:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7781DA6ACCE
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 19:08:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8423F1898B4A
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 17:59:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D748488AC6
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 18:07:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 085C6226CFB;
-	Thu, 20 Mar 2025 17:59:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47EC1226CF6;
+	Thu, 20 Mar 2025 18:06:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c8J2fgUL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G5g2stWj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9C68225413
-	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 17:59:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A43731EB18F
+	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 18:06:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742493563; cv=none; b=HYkPAC+3wJNF/4GwRj3Nz3QNY9f8cKOjNLbLbpiH4HhHkSotKerK44peUgW5xa0rv+4nhpYvkWOKPGc4SS8s1jSaRmNzcmEL6HwrHzgyoekiRYBYKjNK0dvoXRYTU4epknRmCUlkr+xKWZTekkMdOXPsSENHIjnaPzDlO6fMFAU=
+	t=1742494018; cv=none; b=Ai3zQo4m+DggpKM4hzJqp9KwZoz9cUtLllz3B6aI09QDPuhc0sydsjq+dokDlNFy12LyrzGeqeu9kwWvnx5Fmqtf+jemj/elKDTeaIGSJwU+0FryUfhZhVxaVQcxq8XF/nmy9v8mfMw4gF5I5DFu9fqlwPN7+mi/1EVeAdI41mQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742493563; c=relaxed/simple;
-	bh=Z7ZUdOd1Qu0akPYKGzYTaas6tJ63tvSTqgDH4om2eDk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Content-Type; b=DowhLxnnQCSyyyUG+bZXvWgFDpsyw3wLKDN/XTqyuzBArD86u6jd6M3frvtphZW/9FSxqUWHjbhv9CBWv3zGKWAjDT1ooIZ2w3ZBvEMW26LSJmtYJfEYAFZyu82ryk/sqAlVTLfrZuZCdvdbiMd+OTUMudiy4iiM8/gE9sBja6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c8J2fgUL; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ff7f9a0b9bso1803758a91.0
-        for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 10:59:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742493561; x=1743098361; darn=vger.kernel.org;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gtjBMjBZnb8gIPfwNEw+gjcHeYhjJgmG8Gm1x0OUREY=;
-        b=c8J2fgUL0MNMVEFoqzAlBUkfUYeAesz0D7fCkmZWL0Kxxs86TSNizBDaSJRKKOT1bW
-         Rny2AFvUzkVpAMtZigVcoMyXeSO+aVTWFEVXt+RNEBgQ1iKSnf/W9sBp3M+6i8EXlSGh
-         SbOtaXSpXjcm9b6l9pvA19xGZayogrdJr0GKmPUy82Xqqv+PwBNFj7ExJ5xrj9cIJQWG
-         sb+FI8iyizoNjT9y8J12k40DpvyjbHMAxb5X25ojHb8vn0CLr6P0iAceA8xM8mKzn++f
-         Hwetxywy5DAmrtjJheOo6DEaR/CzqfqPPbzl34bEmf4WlMVRtQaPqqXHfm1VFg8srnn1
-         5SDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742493561; x=1743098361;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gtjBMjBZnb8gIPfwNEw+gjcHeYhjJgmG8Gm1x0OUREY=;
-        b=sz2XtyWLoG7MvNWFgGLEi+9MJZSPdkmvp51T6quSLce6srryFr+hcartWdPCLe4vj6
-         6wjWzD/HHOhH3CvtIfA2cijc2tEskOPstqv9PvQJ7YFWhpOHWXeJ1dBEKlLSOJD4opM5
-         ph44VQOly4JB3+hyioIdyEKVAetpepTD1UzcdCB0Ks/ppRhIG8mDfzbE0SXRdfIAgmKP
-         sLp5+dZN2GZOcG5MA0YjolUZC4vh9rfeoatsfdrNSs2DMtPK42F5vkKpJWZHpwepipuP
-         5shUCop/9wZ9YBJlZUYcb27cpsKGaZUVNdkdgK6NIucbRJy81N8WeYX0bf+JqCCQ4AvL
-         vLNg==
-X-Forwarded-Encrypted: i=1; AJvYcCU3WUaDCXOL0dGhvQUg+rKNGnn8hircqdJNzjgT7U6eEywx+hM66ZFalCowPkVyiVixXqg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHN+Ri02f/y68Ykb9fAQTDLfpVypdiPSSurFV8jtFojYmwyK0Q
-	TbELb5jAndvkOZA4OGePFL+0K+WI/4/8J6dhXvIo1lW7exU/uOlOBILoB3ww47R7DsCSjDrt4vr
-	2Ng==
-X-Google-Smtp-Source: AGHT+IFFDux1CbiuMzkBtnyPZqPK4Cl0AlpMwyk2P7kdhcy6JyBURFc0XcLg0BWALe2g4ffe15lbm7EMEl4=
-X-Received: from pjbqj7.prod.google.com ([2002:a17:90b:28c7:b0:301:1ea9:63b0])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2ed0:b0:2fe:b470:dde4
- with SMTP id 98e67ed59e1d1-3030fe8bcb9mr311450a91.12.1742493561104; Thu, 20
- Mar 2025 10:59:21 -0700 (PDT)
-Date: Thu, 20 Mar 2025 10:59:19 -0700
-In-Reply-To: <20250320142022.766201-4-seanjc@google.com>
+	s=arc-20240116; t=1742494018; c=relaxed/simple;
+	bh=VbcBXlqxQ8R1Ak3EnW4jRzK2MT9B93mYiE6a4eqTPeg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M1NatakEDvdhtXBjq9KNJiaRDS3KePZQS/hNAzwUYDZW0TSHKsIyARiiV4wQv7ptbOtLFFNYGpIGmSMzkwETurWO1SzhZfP1s2P3Ug+pwBs3BRH82ikccnipiJC3TSzE/uy0duaLKMPkY4PTLIb8r0ru6hgwvBhFHcMLPp/b0d8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G5g2stWj; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742494015;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=4KWDo96DATcrCi+aZaGajcdmZmzyQjrvIRx3fYoFil0=;
+	b=G5g2stWjE1aTDWjIzLgcI6hVG/LtAQ4AeJtUUMPwy+cYOS1m4Hl8Zji9B5j0c5Inxvmm8S
+	ZSemdO9P6CVwWDADfOjJaPtJo9LtZJdl8tDlmMrNbJ+PTEGw7WbVPHZawKXG0QXDtAMR1P
+	F1IFXZoOd1Hz1DIF2JcWv4OLyS5Ky/U=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-451-mhjdh0KtNu6c-5W776kB4Q-1; Thu,
+ 20 Mar 2025 14:05:25 -0400
+X-MC-Unique: mhjdh0KtNu6c-5W776kB4Q-1
+X-Mimecast-MFC-AGG-ID: mhjdh0KtNu6c-5W776kB4Q_1742493924
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 385AB1933B48;
+	Thu, 20 Mar 2025 18:05:24 +0000 (UTC)
+Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 91CAC1828A83;
+	Thu, 20 Mar 2025 18:05:23 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: torvalds@linux-foundation.org
+Cc: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: [GIT PULL] KVM fix for Linux 6.14 final
+Date: Thu, 20 Mar 2025 14:05:22 -0400
+Message-ID: <20250320180522.155371-1-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250320142022.766201-1-seanjc@google.com> <20250320142022.766201-4-seanjc@google.com>
-Message-ID: <Z9xXd5CoHh5Eo2TK@google.com>
-Subject: Re: [PATCH v2 3/3] KVM: x86: Add a module param to control and
- enumerate device posted IRQs
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Yosry Ahmed <yosry.ahmed@linux.dev>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Thu, Mar 20, 2025, Sean Christopherson wrote:
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index f76d655dc9a8..e7eb2198db26 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -227,6 +227,10 @@ EXPORT_SYMBOL_GPL(allow_smaller_maxphyaddr);
->  bool __read_mostly enable_apicv = true;
->  EXPORT_SYMBOL_GPL(enable_apicv);
->  
-> +bool __read_mostly enable_device_posted_irqs = true;
-> +module_param(enable_device_posted_irqs, bool, 0444);
-> +EXPORT_SYMBOL_GPL(enable_device_posted_irqs);
-> +
->  const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
->  	KVM_GENERIC_VM_STATS(),
->  	STATS_DESC_COUNTER(VM, mmu_shadow_zapped),
-> @@ -9772,6 +9776,9 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
->  	if (r != 0)
->  		goto out_mmu_exit;
->  
-> +	enable_device_posted_irqs &= enable_apicv &&
-> +				     irq_remapping_cap(IRQ_POSTING_CAP);
+Linus,
 
-Drat, this is flawed.  Putting the module param in kvm.ko means that loading
-kvm.ko with enable_device_posted_irqs=true, but a vendor module with APICv/AVIC
-disabled, leaves enable_device_posted_irqs disabled for the lifetime of kvm.ko.
-I.e. reloading the vendor module with APICv/AVIC enabled can't enable device
-posted IRQs.
+The following changes since commit 4701f33a10702d5fc577c32434eb62adde0a1ae1:
 
-Option #1 is to do what we do for enable_mmio_caching, and snapshot userspace's
-desire.
+  Linux 6.14-rc7 (2025-03-16 12:55:17 -1000)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index e7eb2198db26..c84ad9109108 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -228,6 +228,7 @@ bool __read_mostly enable_apicv = true;
- EXPORT_SYMBOL_GPL(enable_apicv);
- 
- bool __read_mostly enable_device_posted_irqs = true;
-+bool __ro_after_init allow_device_posted_irqs;
- module_param(enable_device_posted_irqs, bool, 0444);
- EXPORT_SYMBOL_GPL(enable_device_posted_irqs);
- 
-@@ -9776,8 +9777,8 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
-        if (r != 0)
-                goto out_mmu_exit;
- 
--       enable_device_posted_irqs &= enable_apicv &&
--                                    irq_remapping_cap(IRQ_POSTING_CAP);
-+       enable_device_posted_irqs = allow_device_posted_irqs && enable_apicv &&
-+                                   irq_remapping_cap(IRQ_POSTING_CAP);
- 
-        kvm_ops_update(ops);
- 
-@@ -14033,6 +14034,8 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_rmp_fault);
- 
- static int __init kvm_x86_init(void)
- {
-+       allow_device_posted_irqs = enable_device_posted_irqs;
-+
-        kvm_init_xstate_sizes();
- 
-        kvm_mmu_x86_module_init();
+are available in the Git repository at:
 
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-Option #2 is to shove the module param into vendor code, but leave the variable
-in kvm.ko, like we do for enable_apicv.
+for you to fetch changes up to abab683b972cb99378e0a1426c8f9db835fa43b4:
 
-I'm leaning toward option #2, as it's more flexible, arguably more intuitive, and
-doesn't prevent putting the logic in kvm_x86_vendor_init().
+  Merge tag 'kvm-s390-master-6.14-1' of https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into HEAD (2025-03-19 09:01:53 -0400)
+
+----------------------------------------------------------------
+A lone fix for a s390 regression.  An earlier 6.14 commit stopped
+taking the pte lock for pages that are being converted to secure,
+but it was needed to avoid races.
+
+The patch was in development for a while and is finally ready, but
+I wish it was split into 3-4 commits at least.
+
+----------------------------------------------------------------
+Claudio Imbrenda (1):
+      KVM: s390: pv: fix race when making a page secure
+
+Paolo Bonzini (1):
+      Merge tag 'kvm-s390-master-6.14-1' of https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into HEAD
+
+ arch/s390/include/asm/gmap.h |   1 -
+ arch/s390/include/asm/uv.h   |   2 +-
+ arch/s390/kernel/uv.c        | 136 ++++++++++++++++++++++++++++++++++++++++---
+ arch/s390/kvm/gmap.c         | 103 ++------------------------------
+ arch/s390/kvm/kvm-s390.c     |  25 ++++----
+ arch/s390/mm/gmap.c          |  28 ---------
+ 6 files changed, 151 insertions(+), 144 deletions(-)
+
 
