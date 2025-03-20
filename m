@@ -1,111 +1,140 @@
-Return-Path: <kvm+bounces-41592-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41593-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7781DA6ACCE
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 19:08:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C075CA6ACFA
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 19:16:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D748488AC6
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 18:07:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09E1F17F6C7
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 18:14:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47EC1226CF6;
-	Thu, 20 Mar 2025 18:06:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AB60226CF9;
+	Thu, 20 Mar 2025 18:14:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G5g2stWj"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LIgZL3UD"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A43731EB18F
-	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 18:06:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 043CD22687A
+	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 18:14:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742494018; cv=none; b=Ai3zQo4m+DggpKM4hzJqp9KwZoz9cUtLllz3B6aI09QDPuhc0sydsjq+dokDlNFy12LyrzGeqeu9kwWvnx5Fmqtf+jemj/elKDTeaIGSJwU+0FryUfhZhVxaVQcxq8XF/nmy9v8mfMw4gF5I5DFu9fqlwPN7+mi/1EVeAdI41mQ=
+	t=1742494489; cv=none; b=SMFaPcc8mOYs7FyUocgoMex+O7L3jJwG+8xvjR8hSIYPh2nGM1n+xYtNRcwT4Oxt0ErvjCXzsc7ZxewgysoJLMR70eGKtDsMuXg6tGpbxdUHt7estoiyuvYQYJa0BxOXMvQLHiJiIaAuiHQ3uMOujDLRTwSmXu1W1RKymafbWW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742494018; c=relaxed/simple;
-	bh=VbcBXlqxQ8R1Ak3EnW4jRzK2MT9B93mYiE6a4eqTPeg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M1NatakEDvdhtXBjq9KNJiaRDS3KePZQS/hNAzwUYDZW0TSHKsIyARiiV4wQv7ptbOtLFFNYGpIGmSMzkwETurWO1SzhZfP1s2P3Ug+pwBs3BRH82ikccnipiJC3TSzE/uy0duaLKMPkY4PTLIb8r0ru6hgwvBhFHcMLPp/b0d8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G5g2stWj; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742494015;
+	s=arc-20240116; t=1742494489; c=relaxed/simple;
+	bh=eHSnvQ6XhTYWAELznlpd0nObhNjlz62IdHaH+ijNn74=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JbsUetSazI0VZbb/ZAB61hczJGzYKQ39jxvl7TcwJjidprhULDU3b1XZ/O8ilgsHHzc6PvCW9pUvGIK92V4nMFsla1hgk2aNN5ZpjPuEXsdI9k8Og22CP+/joMMy1CeLL2qIdYpwnbBXI6MVmp/CkVn8zzcjgZk3Ez3hx55qy68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LIgZL3UD; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Thu, 20 Mar 2025 18:14:29 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1742494474;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=4KWDo96DATcrCi+aZaGajcdmZmzyQjrvIRx3fYoFil0=;
-	b=G5g2stWjE1aTDWjIzLgcI6hVG/LtAQ4AeJtUUMPwy+cYOS1m4Hl8Zji9B5j0c5Inxvmm8S
-	ZSemdO9P6CVwWDADfOjJaPtJo9LtZJdl8tDlmMrNbJ+PTEGw7WbVPHZawKXG0QXDtAMR1P
-	F1IFXZoOd1Hz1DIF2JcWv4OLyS5Ky/U=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-451-mhjdh0KtNu6c-5W776kB4Q-1; Thu,
- 20 Mar 2025 14:05:25 -0400
-X-MC-Unique: mhjdh0KtNu6c-5W776kB4Q-1
-X-Mimecast-MFC-AGG-ID: mhjdh0KtNu6c-5W776kB4Q_1742493924
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 385AB1933B48;
-	Thu, 20 Mar 2025 18:05:24 +0000 (UTC)
-Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 91CAC1828A83;
-	Thu, 20 Mar 2025 18:05:23 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM fix for Linux 6.14 final
-Date: Thu, 20 Mar 2025 14:05:22 -0400
-Message-ID: <20250320180522.155371-1-pbonzini@redhat.com>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=g2IOmTqSF8VusdmE8MxtCc32BNiyhroRu8EGEaXViXs=;
+	b=LIgZL3UD90N22INzZ79F/FPzmDaP+LUXj4N/xLoR5oBlA90P1ZCl0xgXcmDwPzYdTLByfz
+	uTJ4Su47fkYozmqg/kjY6gEzkg+WVksySdFEx6IVMO0ovaPZduK9n7Xo0t7jqnrhMw4gMD
+	cFG2mgUW71l7taAI9OjyBpFsdRyXTK8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 3/3] KVM: x86: Add a module param to control and
+ enumerate device posted IRQs
+Message-ID: <Z9xbBSaephBj-OO1@google.com>
+References: <20250320142022.766201-1-seanjc@google.com>
+ <20250320142022.766201-4-seanjc@google.com>
+ <Z9xXd5CoHh5Eo2TK@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z9xXd5CoHh5Eo2TK@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-Linus,
+On Thu, Mar 20, 2025 at 10:59:19AM -0700, Sean Christopherson wrote:
+> On Thu, Mar 20, 2025, Sean Christopherson wrote:
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index f76d655dc9a8..e7eb2198db26 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -227,6 +227,10 @@ EXPORT_SYMBOL_GPL(allow_smaller_maxphyaddr);
+> >  bool __read_mostly enable_apicv = true;
+> >  EXPORT_SYMBOL_GPL(enable_apicv);
+> >  
+> > +bool __read_mostly enable_device_posted_irqs = true;
+> > +module_param(enable_device_posted_irqs, bool, 0444);
+> > +EXPORT_SYMBOL_GPL(enable_device_posted_irqs);
+> > +
+> >  const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+> >  	KVM_GENERIC_VM_STATS(),
+> >  	STATS_DESC_COUNTER(VM, mmu_shadow_zapped),
+> > @@ -9772,6 +9776,9 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+> >  	if (r != 0)
+> >  		goto out_mmu_exit;
+> >  
+> > +	enable_device_posted_irqs &= enable_apicv &&
+> > +				     irq_remapping_cap(IRQ_POSTING_CAP);
+> 
+> Drat, this is flawed.  Putting the module param in kvm.ko means that loading
+> kvm.ko with enable_device_posted_irqs=true, but a vendor module with APICv/AVIC
+> disabled, leaves enable_device_posted_irqs disabled for the lifetime of kvm.ko.
+> I.e. reloading the vendor module with APICv/AVIC enabled can't enable device
+> posted IRQs.
+> 
+> Option #1 is to do what we do for enable_mmio_caching, and snapshot userspace's
+> desire.
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e7eb2198db26..c84ad9109108 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -228,6 +228,7 @@ bool __read_mostly enable_apicv = true;
+>  EXPORT_SYMBOL_GPL(enable_apicv);
+>  
+>  bool __read_mostly enable_device_posted_irqs = true;
+> +bool __ro_after_init allow_device_posted_irqs;
+>  module_param(enable_device_posted_irqs, bool, 0444);
+>  EXPORT_SYMBOL_GPL(enable_device_posted_irqs);
+>  
+> @@ -9776,8 +9777,8 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+>         if (r != 0)
+>                 goto out_mmu_exit;
+>  
+> -       enable_device_posted_irqs &= enable_apicv &&
+> -                                    irq_remapping_cap(IRQ_POSTING_CAP);
+> +       enable_device_posted_irqs = allow_device_posted_irqs && enable_apicv &&
+> +                                   irq_remapping_cap(IRQ_POSTING_CAP);
+>  
+>         kvm_ops_update(ops);
+>  
+> @@ -14033,6 +14034,8 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_rmp_fault);
+>  
+>  static int __init kvm_x86_init(void)
+>  {
+> +       allow_device_posted_irqs = enable_device_posted_irqs;
+> +
+>         kvm_init_xstate_sizes();
+>  
+>         kvm_mmu_x86_module_init();
+> 
+> 
+> Option #2 is to shove the module param into vendor code, but leave the variable
+> in kvm.ko, like we do for enable_apicv.
+> 
+> I'm leaning toward option #2, as it's more flexible, arguably more intuitive, and
+> doesn't prevent putting the logic in kvm_x86_vendor_init().
 
-The following changes since commit 4701f33a10702d5fc577c32434eb62adde0a1ae1:
-
-  Linux 6.14-rc7 (2025-03-16 12:55:17 -1000)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to abab683b972cb99378e0a1426c8f9db835fa43b4:
-
-  Merge tag 'kvm-s390-master-6.14-1' of https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into HEAD (2025-03-19 09:01:53 -0400)
-
-----------------------------------------------------------------
-A lone fix for a s390 regression.  An earlier 6.14 commit stopped
-taking the pte lock for pages that are being converted to secure,
-but it was needed to avoid races.
-
-The patch was in development for a while and is finally ready, but
-I wish it was split into 3-4 commits at least.
-
-----------------------------------------------------------------
-Claudio Imbrenda (1):
-      KVM: s390: pv: fix race when making a page secure
-
-Paolo Bonzini (1):
-      Merge tag 'kvm-s390-master-6.14-1' of https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into HEAD
-
- arch/s390/include/asm/gmap.h |   1 -
- arch/s390/include/asm/uv.h   |   2 +-
- arch/s390/kernel/uv.c        | 136 ++++++++++++++++++++++++++++++++++++++++---
- arch/s390/kvm/gmap.c         | 103 ++------------------------------
- arch/s390/kvm/kvm-s390.c     |  25 ++++----
- arch/s390/mm/gmap.c          |  28 ---------
- 6 files changed, 151 insertions(+), 144 deletions(-)
-
++1, option #1 seems a bit confusing to me.
 
