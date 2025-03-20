@@ -1,313 +1,198 @@
-Return-Path: <kvm+bounces-41634-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41635-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36FB8A6B144
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 23:50:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36DBCA6B1B2
+	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 00:41:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6997D1893BE2
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 22:49:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B36788A4288
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 23:40:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 920AB22256C;
-	Thu, 20 Mar 2025 22:49:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AECD721D3DD;
+	Thu, 20 Mar 2025 23:41:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YnV5jLl4"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="J46txKu2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2078.outbound.protection.outlook.com [40.107.94.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2ACA1B4138
-	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 22:49:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742510952; cv=none; b=ByV9m2487fjRTwzBwWVD5OUD7a03MMXeg+/hiukQEnzmSeHrRpeRw3dTnI77kTujKtv+aAmD2qjkf9THWiAYyk8HTQh+wB+maMSKWFoyVTJKBO8Z4mONPvzbUwmdbAD9lry3ZfkZZCNVeaiZtyNkeyrZkNrvrevbu2sfk8WAnqw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742510952; c=relaxed/simple;
-	bh=ZrrlhSh6rvGL5zKtVEZElNgEjXeV63mCwrsW7NtjRp0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IvDKP2xs7RApWeYBmnnoq3amWHK6fvTijQcowiw2/DmrDCtCoFS40iWzlppDn24e2IsD8Jrg01DdXiJ28D+F43XK8PFjfliXDcffJKV1iJVQoQ3DWv8K13JSnJm1k86e81Wb+cF1hhIkGy888GnmmaoN1e2Ob0Awec/+SLHkSWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=YnV5jLl4; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-22580c9ee0aso28237325ad.2
-        for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 15:49:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1742510949; x=1743115749; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DUl0JJOAWC6Np6+7L2wwmwznYFQPYtStKsZfNLj2wV0=;
-        b=YnV5jLl4XbNlmkewuxgLRBj8dA9gvyyJlhgW9Gs6U8KPJzVH3T3cyOElUiKOOhrpyz
-         4Rp2rwPZ+bGIX59xOji4L8GNbuna9Cn/uozpMzR/Z9q58I2beZwA6pVZfkUHltTv5582
-         EWQQTrT67bs2sgBLIXcAwIEn5WZpJwDw6vLkgCOKDMMf38lhM29KjYytRMaHuGNTeBSG
-         iKMOIxDYAlX5KBfuK7mtl+u8EWUv8pxLxIJAaP+VC4dzJp0DVPTmw2RTKaCLgPUMHXtR
-         pr6H+TxZ3Rr7Ydtzi3GLhXszemBn6stl3PlTERq4wWwLdZYoL3sZSaclgDOOqTkShwgU
-         vMnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742510949; x=1743115749;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DUl0JJOAWC6Np6+7L2wwmwznYFQPYtStKsZfNLj2wV0=;
-        b=eaGqnzeigQL9oCoQACLBWkwCKRvtpAHAQMOjNJHuxvyaaVRA8hNBC7kGMnCc/0SzF3
-         nzP5JjrLKAScIy3JyLYYPjF4lUHdQ3LAWot2NsZGUnCxQyzi1a39JxfkVDOz9pQ9DugO
-         E/9hQbT3S6cn0Y6D37RAdSGfxGZHBA8O4df7QVQdhNAKDkdNwFdbqZgV+PeV+f+CBWPW
-         nxqhVwJC5VuXIonlt6QMCxWw9jT1Z9vwrstgPI4a+pyfXCb6VP/ZqDSJWjl6sdlQvtAM
-         KKevIGxepx6XSQK01aOziNy/N5T1eSoR8t66aw6uoIPIur45AEuYH8nToTqFTK3smzGM
-         Exdw==
-X-Gm-Message-State: AOJu0YyJWCQsi552wSYLn8cVkPciaKGEsdt4zneflDvC08spcNM5irkC
-	pCu5AI/RBoMCGUYj+GGnlXNyW9IcD1ifOeIWUxSsrW5+YNVxXGedFUtvSpTzIz4=
-X-Gm-Gg: ASbGncsY9JRVKfz33HPKTowupemgsXyd/gPW2IhzwFjI8k9JXQm/UxBeGZActjSlgtO
-	m2bricOkXfY6sxGyhf6XFIwdyx6D58ed44wBBb3j9oJOZ/FDO/Nc64Xq3e3ad1AoDWMy7C+/DVN
-	3L1M3KyenGBGQ19pfjMwNDUxRX29vqtbhZQsMshoa2++3ebSTPlwz5Dtu6NGJeqO7EnlP4zo5iL
-	D2Mk7iXHIKRszyeQV4OaSr/I4x3Yq8etxJCQnoryovmE3NzBVSqYHy9MSx337kcZlhnRfsqltdK
-	pCtsZntQlb0e5Qo8BKEYdPfcs5HQEj7s2SAJBgA/11Fsts1TucJil9prpA==
-X-Google-Smtp-Source: AGHT+IE8LLmohCWT2OM79Ks/Gq6iUQEWxb5HMBUe5lAqyFpMafS7tISb53AHsVvLi0PowRFtPDy4Pg==
-X-Received: by 2002:a17:903:40cb:b0:215:b75f:a1cb with SMTP id d9443c01a7336-22780c5570dmr16516475ad.9.1742510948798;
-        Thu, 20 Mar 2025 15:49:08 -0700 (PDT)
-Received: from [192.168.1.67] ([38.39.164.180])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-227811da2eesm3395725ad.172.2025.03.20.15.49.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Mar 2025 15:49:07 -0700 (PDT)
-Message-ID: <2f5703db-5ee4-4790-9301-e81ee7d79279@linaro.org>
-Date: Thu, 20 Mar 2025 15:49:07 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6754215770
+	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 23:41:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.78
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742514065; cv=fail; b=R6Wr0gt/R8zkcn2AUpSCt7y06HyAzxgOWy5hM/+0ixJSqT7lqGbzIa8PpwEpKs4mVkGtec8LCaczpGXfeuFVAelCZ/M8NTLpsG1nR01TSDLQ/f4Ij8ebAZKddw4Yu/kHoGXTtFoVJ/I7KeHfqZb2OnPO1GCcYtFuvmEnJkJh64I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742514065; c=relaxed/simple;
+	bh=dNNOKkSjBXjjGjpq48Z1JetLE31Qpz174qzhBdRTmQk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=gkotXfENOfNzIBTIcvu7L3GTo3sT/sE+vRvWAty/c3Gddhlavj5GlHHpM/LAgGIKbPH5n7/nWjaJBJZk4twkplAN2fV/VA6fptSR6TLJRLfAhGZah2DzcrdQ/ouVbHoYeCNVWbM5x4N/NZfwt4Ky+gJaKzg1wtju1UXhkqGW41U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=J46txKu2; arc=fail smtp.client-ip=40.107.94.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZlYCJi67XmU/9XHa+O2zpDmdr/DmeNzTlxiIMuJ5ncv9elhXFMJBXRu9xyFgFr8ykBhR1W0FUvo/ZJ4kc27jVspROthlPXHtxlMj56A5q6oJN5njD4MnC3fTs16yh2o/mwXdPuwr/0T2T1mAFp12wNXavmkwQRGCH3hQTP30lTV8ATidikkvaCfcODYIG2OA+CvMyN+pUY/bph4W1Ow5JUIkvt2h8NnHrCHqSqKmM9Bmjb0ptmuybYU26kgwxa88CaDLh4JBompNYBCAZmvbCGAEmDIK80D8m1H+2RFbTzMvP6PV7ogNeJLaWJEnAR+OxBiBAVkEJGmuzijLmIwOpA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9zjkoov3W7cZtZcgLhn+f5sYhDCclA/flbKwfQNyebA=;
+ b=e+cDGdV9rKAg+PkhYhCJztayKuSl3BXeHP3IgXXehD+5/hlGjkn6TEoIl85Job9URKDVTOKTDY+STpNPQJYd20lQclv51NNISmbGCJc17lIdtYl4jS0RuoSKQtEx+M+P1fF6W8Y418pTwvtXstjRx9mvGyRVvHjL7mNFLv2eIi5b88rlWYOJOi8IxmyD44FN0P3qGbqLy9bI4WFwkf32c8UDa6K00wX3uv3dZoqfjn2yWrgpvcYK2dzNj5k9pOXqiAIT0tF1Q6ANoRwI0PrA8deGvGkcKpPUEewSvs+RD3D3lWOcUFrAZwErbvfQYEx13cXddp5OzYRDGrCGOTGBHw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9zjkoov3W7cZtZcgLhn+f5sYhDCclA/flbKwfQNyebA=;
+ b=J46txKu2+9DFWrL40vHuirEXOSXZXOgiYiEpmJ4zxkOReBMLkyC6Mrgnh7IzCbnCKL9osiKLo5oevlgvb0+3gplL9gsv8Kfs7p8/E7RU/ljqLoZG7kPYHGmJYRu5g3UdJlPnzEPVBjHMX6VOnWbc5RHt5cNimQD4L1ZmCDOq11VXA/4ZL1KbzXTTklhRWo4ITeEC7GIBsbIdvqTHNBJxBYk7zCXaaJYGYwY57GRlNRgA3aa5pwO0AIgb4O5I7H14bSFjnEvjvjdIRCffu+hffqrLithYh4IFGjeDPO1XeiNGvLOdIoFcQxCyHTLtj/l9Mn3MvuNf4r/yc6ZkItJuDw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by PH7PR12MB6761.namprd12.prod.outlook.com (2603:10b6:510:1ab::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.34; Thu, 20 Mar
+ 2025 23:40:58 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.8534.036; Thu, 20 Mar 2025
+ 23:40:58 +0000
+Date: Thu, 20 Mar 2025 20:40:57 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Nicolin Chen <nicolinc@nvidia.com>
+Cc: Yi Liu <yi.l.liu@intel.com>, alex.williamson@redhat.com,
+	kevin.tian@intel.com, eric.auger@redhat.com, kvm@vger.kernel.org,
+	chao.p.peng@linux.intel.com, zhenzhong.duan@intel.com,
+	willy@infradead.org, zhangfei.gao@linaro.org, vasant.hegde@amd.com
+Subject: Re: [PATCH v8 4/5] iommufd: Extend IOMMU_GET_HW_INFO to report PASID
+ capability
+Message-ID: <20250320234057.GS206770@nvidia.com>
+References: <20250313124753.185090-1-yi.l.liu@intel.com>
+ <20250313124753.185090-5-yi.l.liu@intel.com>
+ <Z9sFteIJ70PicRHB@Asurada-Nvidia>
+ <444284f3-2dae-4aa9-a897-78a36e1be3ca@intel.com>
+ <Z9xGpLRE8wPHlUAV@Asurada-Nvidia>
+ <20250320185726.GF206770@nvidia.com>
+ <Z9x0AFJkrfWMGLsV@Asurada-Nvidia>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z9x0AFJkrfWMGLsV@Asurada-Nvidia>
+X-ClientProxiedBy: MN0PR05CA0019.namprd05.prod.outlook.com
+ (2603:10b6:208:52c::26) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 00/30] single-binary: start make hw/arm/ common
-Content-Language: en-US
-To: qemu-devel@nongnu.org
-Cc: kvm@vger.kernel.org, qemu-arm@nongnu.org,
- Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
- <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>, Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-References: <20250320223002.2915728-1-pierrick.bouvier@linaro.org>
-From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-In-Reply-To: <20250320223002.2915728-1-pierrick.bouvier@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|PH7PR12MB6761:EE_
+X-MS-Office365-Filtering-Correlation-Id: a90a9593-d9ef-4cfd-004c-08dd6808aa7d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?fbNVPBBXlcMwrRMcK/1R6zM/2Y2b/k050t5QewVFuvfcm0k/Cyw9NN8hCXnP?=
+ =?us-ascii?Q?Bj9Mg3RHAW0SOtaSlUHkRmq+LKIcylWPsAMe2NgH8F308zy0AwgOhFgi4ok0?=
+ =?us-ascii?Q?VSE5H/v4ZqC0fR57KG+PRXhsYFWKlzLkA7AzW5dXuDYxZf0y2HUOBdwT243c?=
+ =?us-ascii?Q?p2JyGSnk2c3x/DztA1u3SRZ0czGPhvMdXCLVncUhrIXUTYoDDN3kxp/Q3yY1?=
+ =?us-ascii?Q?o9KLXdrqYDjye15HvNdhl1cVTTSVSBv35l6M791/wDReB18ew/iWQo7aOPey?=
+ =?us-ascii?Q?LeRd3dNkjZxq6zdhedr+PK7YoFfhiYlbU9yQFyEG+r3UvXG0EWGlpyQ4WrOm?=
+ =?us-ascii?Q?4ytoijVqqXHvcgnxzEkjGekUsGH3TZ9fjr5H0bVih+d9c+1vI4X910o+JaSz?=
+ =?us-ascii?Q?9BPXbY2B+Rq1xJD+ilwKSk8kbmDyfRVsdUmaK7WMiF6QmtXfVRDjsOkCRtjC?=
+ =?us-ascii?Q?07UUflY6DTo/Mdi56pNgS4v5ZI2Ib7H0LD367yjIqBK6XaSAFqC9Goe1Rkds?=
+ =?us-ascii?Q?Il9R/0izHZzOAFijo7vvrcxZD1AEztmT4vYiGnfAnzQey37EZGLr7eY0kg7f?=
+ =?us-ascii?Q?oV6ElbvoMylWMEfwil7tS1060Ols4/7lqxuYxe9HYFDUBwOPY5Fz1neMY4e/?=
+ =?us-ascii?Q?yASwgHHY8XCKEbcqdFCOJ2D19SdSwCD0hUKQkrXb2WgLdW62MTIdNP32DjuZ?=
+ =?us-ascii?Q?seEIt9mlbo7lZ7RRDkW/xxZGXHLn0K6zV/LhvFAf8ihKnpV8ZGg+VLjl6tSn?=
+ =?us-ascii?Q?9Ysqgpxdpz54rQi0pSsGWVIXQ39veB3c8dBLZ+vDqAKMvMYqp9VOIas/Dep7?=
+ =?us-ascii?Q?UOnfBInJQ+IixDeU7t272NcgH7EabH8vwa4Fxq/QAX727l/8uuJtTqn5WeND?=
+ =?us-ascii?Q?Q9yNaAFC5Z7i9get9vgO5v4t59OU6no/azA1zingF8IuqUGYKbsIUqDhL6j+?=
+ =?us-ascii?Q?oh5NBbOjA+oQcbqyMZjo3KcQqCxZx7Wu3bPAuuLa0uTe9f35ftkKwbgtvPN2?=
+ =?us-ascii?Q?eAQxyWlY0IazEE079XAva1EDWNsTSVpy+3v6f9pFFGfSOfzQ9RzZtQer1f3K?=
+ =?us-ascii?Q?u2CrteR+axhGHxWmp283Q3baB/GplWFWz+gFF1sEd1wgzpC5jyHq987EGnXA?=
+ =?us-ascii?Q?UR+kuwlTQ7Qn79SULyn77lNr5M0nDJmtWhrgMr/GJsl63yXT5BE5279rEhuZ?=
+ =?us-ascii?Q?9xla5R4PskVLRg9BMObi3YeT2GOTmOgtr6qmyQGOZsjSDsCr+cmToxdOLYy6?=
+ =?us-ascii?Q?flsLcQe5vGJGaCm1H+tk4Y21WzgmqSy9qg37iDlju7CXW4S5CmWoPrsgdVKT?=
+ =?us-ascii?Q?lvEbQd0rlLYMXnBMkXL9LKEKoPWTu8Q+ylhYbVcschv5lKyGn1PzGPm9lQEH?=
+ =?us-ascii?Q?HZyrU9r/gheBT5V78rtP4XSfLSnw?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?M54edRtbzveCbgQGAA/kRbvkB0VV48idd4Ik2LNWbDIkO7EYeJRoyS1CbBRY?=
+ =?us-ascii?Q?u8gwziV0qj1ZmUQCJnpLeTRHiFTSMn0HOxZuNcuEorzzJwumyotraBnr94ut?=
+ =?us-ascii?Q?Us2m+wqJ+i+6UdjU4nAMmpMX7BMO3VjtOsyYSEgH6q7+w+CxtXj1LzoehmKj?=
+ =?us-ascii?Q?qxRMkdrxdOcmYLKdNeBHKO9+t0/YaomXVDlZGAmyeZHRRr7I9ouLcHRuZSTW?=
+ =?us-ascii?Q?q2OVv9nfExibX9oEfcchIpb3aPRWgbJWnlJ4Jbs5dfbq7RxOAqQ3ruJGNHYi?=
+ =?us-ascii?Q?U1rd51HtWV8z2+04XgcqpYytge3jORijG7zKU9bKxP7LYuJxQz5A8zIIyQAC?=
+ =?us-ascii?Q?eLC8Yl2RkG64CJKUfadp59373p3SKzK75jbhIiaGfLCZvJ13Nc4QIpUWuCxS?=
+ =?us-ascii?Q?mBR+BjA/gmZgGM6IX6aStvciUOGpo/sLV8hMsi36erMHIsws3WnHPgj+41zh?=
+ =?us-ascii?Q?394/+kSZkigou6kwSyJtTITUKWQmt2WUmPPnyiH07fwKuHxGpRr70UC+6LG+?=
+ =?us-ascii?Q?85GyH3tyD4yijjHt8jWeFiOL3BzPYsX//o2AczxMs8Z83qGXa8Yuz2S/sSJ6?=
+ =?us-ascii?Q?XsUmOIDBZK/DNFxMSYT/suIMzpSIbKRdeND43zogNbvodft46iGj/HKZWxqq?=
+ =?us-ascii?Q?+59JaFzbK4Gy3HI+00mwQPronQ5ExGkCluhw+Co+R1hJCBe4fkD8u4aFT+b6?=
+ =?us-ascii?Q?8M4q3ZqsPvKm2C2UbmxqqS5uVdXoa+v3He2EYZSJ4KPNC8OsQhYWzxZHL1hy?=
+ =?us-ascii?Q?pFL4CWTThRriJxrZZlJY+1l2gKRzlEOyDhF8+U+QHc7EP9sWEEyQUJIUcnUE?=
+ =?us-ascii?Q?LV6v1+pjKGqS1AhyhY7p7VrVXzzMgCN4kxPFknvylpi5bW5ULNGbsLQIE5bP?=
+ =?us-ascii?Q?6l9fgDjCk0CVvnwJXzQOkHqWjDye+u9P9e5Nd0mnq8Wb3PvaFa3IT2ACtiuM?=
+ =?us-ascii?Q?YAa1BWZngC5RiikzjcsyuCoIe2OOWyKQ8mM/b3WDv+KXeBpNBy14OCQuR5jn?=
+ =?us-ascii?Q?3eH0QO7I9u7TcNxRiEDpTDPHJubEdroP6WQW5Q39WRWYdykYWbYWswpe9z+n?=
+ =?us-ascii?Q?CLEmMUzTxkVL7yV3L9ECVsn2MsVF8KQ7CrsXdbLuaTCqHX2KLgYhiqcxojzc?=
+ =?us-ascii?Q?et98yfnwo0mEs0LiDyVm+Uzw8/qs7PAejH8FrPhb5mSHFeEH3oUX3zan/SyX?=
+ =?us-ascii?Q?7ckkmzlu6L8Bl8ZvrCfUQkZ2EGCI3cwl5x/FTY5g2NS5zcaf976mcwA3eIc/?=
+ =?us-ascii?Q?FZBdTryUhMt2YJiZMz/Str+y7sCJS2uYLxJU/G8qMfcooq694sNFaO7Ag9ev?=
+ =?us-ascii?Q?1jpD8KNSqBYALLCNMLj9sQQgTlC7LSPuaqyOTjCF3QXS4zsxqGGi6sqdhGPq?=
+ =?us-ascii?Q?62ghEWPqZ5GDeI6jWnna+yaPkYPdLQ+Ole0/Pa3EBfoS7MviSBbh+Xg2DhAg?=
+ =?us-ascii?Q?6JMrI8tS0JLbVJMEvKSO5/P7+S1OagdaSXrMVdeiGKdKmEgCsAPWBYoGAcNP?=
+ =?us-ascii?Q?2wtnUiqUH10scoo9PjC6JD30bRbg8WCT2fjxoyK1F3bOEfmNFxnjOi3Ry9Nt?=
+ =?us-ascii?Q?ZBIB3NjNtZWByGulDEb0fGT2lbs8eundhqxY1jvm?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a90a9593-d9ef-4cfd-004c-08dd6808aa7d
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2025 23:40:58.7145
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2N9ZvX6BcFRdvrRBEAiuqfvmYSFEoPNR7pdRCMxf9p3CQ41C70wOBjmNmfqch07/
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6761
 
-On 3/20/25 15:29, Pierrick Bouvier wrote:
-> This series focuses on removing compilation units duplication in hw/arm. We
-> start with this architecture because it should not be too hard to transform it,
-> and should give us some good hints on the difficulties we'll meet later.
+On Thu, Mar 20, 2025 at 01:02:54PM -0700, Nicolin Chen wrote:
+> On Thu, Mar 20, 2025 at 03:57:26PM -0300, Jason Gunthorpe wrote:
+> > On Thu, Mar 20, 2025 at 09:47:32AM -0700, Nicolin Chen wrote:
+> > 
+> > > In that regard, honestly, I don't quite get this out_capabilities.
+> > 
+> > Yeah, I think it is best thought of as place to put discoverability if
+> > people want discoverability.
+> > 
+> > I have had a wait and see feeling in this area since I don't know what
+> > qemu or libvirt would actually use.
 > 
-> We first start by making changes in global headers to be able to not rely on
-> specific target defines. In particular, we completely remove cpu-all.h.
-> We then focus on removing those defines from target/arm/cpu.h.
-> 
->  From there, we modify build system to create a new hw common library (per base
-> architecture, "arm" in this case), instead of compiling the same files for every
-> target.
-> 
-> Finally, we can declare hw/arm/boot.c, and most of the boards as common as a
-> first step for this part.
-> 
-> - Based-on: 20250317183417.285700-1-pierrick.bouvier@linaro.org
-> ("[PATCH v6 00/18] make system memory API available for common code")
-> https://lore.kernel.org/qemu-devel/20250317183417.285700-1-pierrick.bouvier@linaro.org/
-> - Based-on: 20250318213209.2579218-1-richard.henderson@linaro.org
-> ("[PATCH v2 00/42] accel/tcg, codebase: Build once patches")
-> https://lore.kernel.org/qemu-devel/20250318213209.2579218-1-richard.henderson@linaro.org
-> 
-> v2:
-> - rebase on top of Richard series
-> - add target include in hw_common lib
-> - hw_common_lib uses -DCOMPILE_SYSTEM_VS_USER introduced by Richard series
-> - remove cpu-all header
-> - remove BSWAP_NEEDED define
-> - new tlb-flags header
-> - Cleanup i386 KVM_HAVE_MCE_INJECTION definition + move KVM_HAVE_MCE_INJECTION
-> - remove comment about cs_base in target/arm/cpu.h
-> - updated commit message about registers visibility between aarch32/aarch64
-> - tried remove ifdefs in target/arm/helper.c but this resulted in more a ugly
->    result. So just comment calls for now, as we'll clean this file later.
-> - make most of the boards in hw/arm common
-> 
-> Pierrick Bouvier (30):
->    exec/cpu-all: remove BSWAP_NEEDED
->    exec/cpu-all: extract tlb flags defines to exec/tlb-flags.h
->    exec/cpu-all: move cpu_copy to linux-user/qemu.h
->    include/exec/cpu-all: move compile time check for CPUArchState to
->      cpu-target.c
->    exec/cpu-all: remove system/memory include
->    exec/cpu-all: remove exec/page-protection include
->    exec/cpu-all: remove tswap include
->    exec/cpu-all: remove exec/cpu-interrupt include
->    exec/cpu-all: remove exec/cpu-defs include
->    exec/cpu-all: remove exec/target_page include
->    exec/cpu-all: remove hw/core/cpu.h include
->    accel/tcg: fix missing includes for TCG_GUEST_DEFAULT_MO
->    accel/tcg: fix missing includes for TARGET_HAS_PRECISE_SMC
->    exec/cpu-all: remove cpu include
->    exec/cpu-all: transfer exec/cpu-common include to cpu.h headers
->    exec/cpu-all: remove this header
->    exec/target_page: runtime defintion for TARGET_PAGE_BITS_MIN
->    accel/kvm: move KVM_HAVE_MCE_INJECTION define to kvm-all.c
->    exec/poison: KVM_HAVE_MCE_INJECTION can now be poisoned
->    target/arm/cpu: always define kvm related registers
->    target/arm/cpu: flags2 is always uint64_t
->    target/arm/cpu: define same set of registers for aarch32 and aarch64
->    target/arm/cpu: remove inline stubs for aarch32 emulation
->    meson: add common hw files
->    hw/arm/boot: make compilation unit hw common
->    hw/arm/armv7m: prepare compilation unit to be common
->    hw/arm/digic_boards: prepare compilation unit to be common
->    hw/arm/xlnx-zynqmp: prepare compilation unit to be common
->    hw/arm/xlnx-versal: prepare compilation unit to be common
->    hw/arm: make most of the compilation units common
-> 
->   meson.build                             |  37 +++++++-
->   accel/tcg/internal-target.h             |   1 +
->   accel/tcg/tb-internal.h                 |   1 -
->   hw/s390x/ipl.h                          |   2 +
->   include/exec/cpu_ldst.h                 |   1 +
->   include/exec/exec-all.h                 |   1 +
->   include/exec/poison.h                   |   4 +
->   include/exec/target_page.h              |   3 +
->   include/exec/{cpu-all.h => tlb-flags.h} |  38 +-------
->   include/hw/core/cpu.h                   |   2 +-
->   include/qemu/bswap.h                    |   2 +-
->   include/system/kvm.h                    |   2 -
->   linux-user/qemu.h                       |   3 +
->   linux-user/sparc/target_syscall.h       |   2 +
->   linux-user/syscall_defs.h               |   2 +-
->   target/alpha/cpu.h                      |   4 +-
->   target/arm/cpu.h                        |  40 ++------
->   target/arm/internals.h                  |   1 +
->   target/avr/cpu.h                        |   4 +-
->   target/hexagon/cpu.h                    |   3 +-
->   target/hppa/cpu.h                       |   5 +-
->   target/i386/cpu.h                       |   5 +-
->   target/i386/hvf/vmx.h                   |   1 +
->   target/loongarch/cpu.h                  |   4 +-
->   target/m68k/cpu.h                       |   4 +-
->   target/microblaze/cpu.h                 |   4 +-
->   target/mips/cpu.h                       |   4 +-
->   target/openrisc/cpu.h                   |   4 +-
->   target/ppc/cpu.h                        |   4 +-
->   target/ppc/mmu-hash32.h                 |   2 +
->   target/ppc/mmu-hash64.h                 |   2 +
->   target/riscv/cpu.h                      |   4 +-
->   target/rx/cpu.h                         |   4 +-
->   target/s390x/cpu.h                      |   4 +-
->   target/sh4/cpu.h                        |   4 +-
->   target/sparc/cpu.h                      |   4 +-
->   target/tricore/cpu.h                    |   3 +-
->   target/xtensa/cpu.h                     |   4 +-
->   accel/kvm/kvm-all.c                     |   5 +
->   accel/tcg/cpu-exec.c                    |   3 +-
->   accel/tcg/cputlb.c                      |   1 +
->   accel/tcg/tb-maint.c                    |   1 +
->   accel/tcg/translate-all.c               |   1 +
->   accel/tcg/user-exec.c                   |   2 +
->   bsd-user/elfload.c                      |   6 +-
->   cpu-target.c                            |   5 +
->   hw/alpha/dp264.c                        |   1 +
->   hw/alpha/typhoon.c                      |   1 +
->   hw/arm/armv7m.c                         |  12 ++-
->   hw/arm/boot.c                           |   2 +
->   hw/arm/digic_boards.c                   |   2 +-
->   hw/arm/smmuv3.c                         |   1 +
->   hw/arm/xlnx-versal.c                    |   2 -
->   hw/arm/xlnx-zynqmp.c                    |   2 -
->   hw/hppa/machine.c                       |   1 +
->   hw/i386/multiboot.c                     |   1 +
->   hw/i386/pc.c                            |   1 +
->   hw/i386/pc_sysfw_ovmf.c                 |   1 +
->   hw/i386/vapic.c                         |   1 +
->   hw/loongarch/virt.c                     |   1 +
->   hw/m68k/next-cube.c                     |   1 +
->   hw/m68k/q800.c                          |   1 +
->   hw/m68k/virt.c                          |   1 +
->   hw/openrisc/boot.c                      |   1 +
->   hw/pci-host/astro.c                     |   1 +
->   hw/ppc/e500.c                           |   1 +
->   hw/ppc/mac_newworld.c                   |   5 +-
->   hw/ppc/mac_oldworld.c                   |   5 +-
->   hw/ppc/ppc.c                            |   1 +
->   hw/ppc/ppc_booke.c                      |   1 +
->   hw/ppc/prep.c                           |   1 +
->   hw/ppc/spapr_hcall.c                    |   1 +
->   hw/ppc/spapr_ovec.c                     |   1 +
->   hw/riscv/riscv-iommu-pci.c              |   1 +
->   hw/riscv/riscv-iommu.c                  |   1 +
->   hw/s390x/s390-pci-bus.c                 |   1 +
->   hw/s390x/s390-pci-inst.c                |   1 +
->   hw/s390x/s390-skeys.c                   |   1 +
->   hw/sparc/sun4m.c                        |   7 +-
->   hw/sparc64/sun4u.c                      |   7 +-
->   hw/xtensa/pic_cpu.c                     |   1 +
->   linux-user/elfload.c                    |   8 +-
->   monitor/hmp-cmds-target.c               |   1 +
->   semihosting/uaccess.c                   |   2 +-
->   target/alpha/helper.c                   |   2 +
->   target/arm/gdbstub64.c                  |   1 +
->   target/arm/helper.c                     |   6 ++
->   target/arm/hvf/hvf.c                    |   1 +
->   target/arm/ptw.c                        |   1 +
->   target/arm/tcg/helper-a64.c             |   1 +
->   target/arm/tcg/hflags.c                 |   4 +-
->   target/arm/tcg/mte_helper.c             |   1 +
->   target/arm/tcg/sve_helper.c             |   1 +
->   target/arm/tcg/tlb-insns.c              |   1 +
->   target/avr/helper.c                     |   2 +
->   target/hexagon/translate.c              |   1 +
->   target/i386/arch_memory_mapping.c       |   1 +
->   target/i386/helper.c                    |   2 +
->   target/i386/hvf/hvf.c                   |   1 +
->   target/i386/kvm/hyperv.c                |   1 +
->   target/i386/kvm/kvm.c                   |   1 +
->   target/i386/kvm/xen-emu.c               |   1 +
->   target/i386/sev.c                       |   1 +
->   target/i386/tcg/system/excp_helper.c    |   2 +
->   target/i386/tcg/system/misc_helper.c    |   1 +
->   target/i386/tcg/system/tcg-cpu.c        |   1 +
->   target/i386/xsave_helper.c              |   1 +
->   target/loongarch/cpu_helper.c           |   1 +
->   target/loongarch/tcg/translate.c        |   1 +
->   target/m68k/helper.c                    |   1 +
->   target/microblaze/helper.c              |   1 +
->   target/microblaze/mmu.c                 |   1 +
->   target/mips/tcg/system/cp0_helper.c     |   1 +
->   target/mips/tcg/translate.c             |   1 +
->   target/openrisc/mmu.c                   |   1 +
->   target/ppc/excp_helper.c                |   1 +
->   target/ppc/mmu-book3s-v3.c              |   1 +
->   target/ppc/mmu-hash64.c                 |   1 +
->   target/ppc/mmu-radix64.c                |   1 +
->   target/riscv/cpu_helper.c               |   1 +
->   target/riscv/op_helper.c                |   1 +
->   target/riscv/pmp.c                      |   1 +
->   target/riscv/vector_helper.c            |   2 +
->   target/rx/cpu.c                         |   1 +
->   target/s390x/helper.c                   |   1 +
->   target/s390x/ioinst.c                   |   1 +
->   target/s390x/tcg/mem_helper.c           |   1 +
->   target/sparc/ldst_helper.c              |   1 +
->   target/sparc/mmu_helper.c               |   2 +
->   target/tricore/helper.c                 |   1 +
->   target/xtensa/helper.c                  |   1 +
->   target/xtensa/mmu_helper.c              |   1 +
->   target/xtensa/op_helper.c               |   1 +
->   target/xtensa/xtensa-semi.c             |   1 +
->   tcg/tcg-op-ldst.c                       |   2 +-
->   hw/arm/meson.build                      | 117 ++++++++++++------------
->   136 files changed, 302 insertions(+), 205 deletions(-)
->   rename include/exec/{cpu-all.h => tlb-flags.h} (78%)
-> 
+> Both ARM and Intel have max_pasid_log2 being reported somewhere
+> in their vendor data structures. So, unless user space really
+> wants that info immediately without involving the vendor IOMMU,
+> this max_pasid_log2 seems to be redundant.
 
-This series has been built for:
-- Linux x64 and arm64 host
-- MacOS x64 and arm64 host
-- Windows x64 host
-All tests have been ran on linux x64 host.
-https://github.com/pbo-linaro/qemu/actions/runs/13977201084/
+I don't expect that PASID support should require a userspace driver
+component, it should work generically. So generic userspace should
+have a generic way to get the pasid range.
+
+> Also, this patch polls two IOMMU caps out of pci_pasid_status()
+> that is a per device function. Is this okay?
+
+I think so, the hw_info is a per-device operation
+
+> Can it end up with two devices (one has PASID; the other doesn't)
+> behind the same IOMMU reporting two different sets of
+> out_capabilities, which were supposed to be the same since it the
+> same IOMMU HW?
+
+Yes it can report differences, but that is OK as the iommu is not
+required to be uniform across all devices? Did you mean something else?
+
+Jason
 
