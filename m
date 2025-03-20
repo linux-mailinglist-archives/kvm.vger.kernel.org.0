@@ -1,143 +1,116 @@
-Return-Path: <kvm+bounces-41596-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41597-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C72F6A6AE2C
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 20:09:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CA76A6AEA6
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 20:42:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 127164A1917
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 19:04:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B51231882F22
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 19:42:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C21222B8CD;
-	Thu, 20 Mar 2025 19:00:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92E5F227EBE;
+	Thu, 20 Mar 2025 19:42:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OiZNM9IM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bp2t8Yrl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFBE0227EBD
-	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 19:00:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49DD82AEFE
+	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 19:41:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742497243; cv=none; b=WApD9YaGtAo++y0brL5Mmz/4fw/u3MvwX4wxaMRGZ4SDcacVDmPEX1DtTWyAx77E9/tgT1ppY9C9B8hwJoM9bGjy4Vi29b4qONBMT2/+RWrr4Foi7pG34ReJa2I5HZHy6FcLfn0k/t3pEKtdYfD2JcBCmF7XUs5VmaUwt3on/DQ=
+	t=1742499719; cv=none; b=FZsKG21PTIpWjR+uJcsWODpokuptda46y3Wfac3pKC06HixMwh10ra79WeQFJc6w3fXGKwP4PB8YwfX8AG55Y/Ms1ijz9zl6GemG0yPI9QKnlIfz7/3Epke+hkSgeRHApBLjaYWH//gIftz0wqpChl9kgo6EFQh9KRxSrs1pzf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742497243; c=relaxed/simple;
-	bh=Ke2sAOf9NryAkew3g0U5wgxrfipfdN6+LjpIWxFt9zU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dDrilz3wFKB+ZXkoJaruQNkOjI/esgj/JjdPJTtt+OJXAAc0EvL5S9sEvUCQbg1Nu247woAgrL5i4AGuIR6kgcVxM1WisoIXmGvLRxBc2QixDJv+Gc4AUwxHLXUkDXibfXN2oAtewkXaR/RnAMFRgdoycRYFBIg7q+HSQp1Xc00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=OiZNM9IM; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-223fb0f619dso24916005ad.1
-        for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 12:00:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1742497241; x=1743102041; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=weHsotjSjln9MgHLKOIKUdAUmOsOwzultrmV4EVkHwc=;
-        b=OiZNM9IMIrgm0g/07D5iAeVAwn/9/FAir5gBdcm14la6cFEBUVC/ZmOIvbboB94Mdz
-         nTMVK/CEUybV5LQxuD+pQnMny1wntLLbT03WtbmqHboZvha80weA1iW4DfNA86H2Spld
-         hJEUPkJCpWfNLAYhIHOKU7fiULjuUiyZ4sNUlk53/7nEyX6iUYifReA8mE2nBFSdKDm9
-         rfT7W5JvMIwKcqJY2W/cwUfsEywrEOCNjpm0KegKfjIq3GrgnH7F0RQWe5pXw7+nDDn/
-         IwT/WjVEzhXf+CTcYI5PrD828zawSxlTL0HWES0zDh+9KuDu+aMInfrl9qBpq6zAd4Ma
-         ajvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742497241; x=1743102041;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=weHsotjSjln9MgHLKOIKUdAUmOsOwzultrmV4EVkHwc=;
-        b=gj9pA6yDA+WJehOx6Ruv8bZg3QQTj+cg8JQb5DQ2FL1qMx4O3knPA0snCDwjx42WLv
-         0a29r85Ou97DXN7/FcaaR434OIWi6b73KtuZ4gEgsn1RRUDKcp7eByRn45tV5u3LZ5Es
-         XQKIdsHKYKD0YfZGJpO4OfZXm/rlZtETucKcyQwu9JBUj2uq4b2N9RORatUtBXNthhcr
-         6TPhwxpcNO3yuIESpD2MIcVVL1Gl8AM0bA9/JYUGqN8QO+Wk+S81jXK7WVRqgk9rYhYe
-         veinPjLUwPduTPKjRRWu1BcHMLz6WcN6dl3wWnfIQg85QBpp2/FfZMNKChG+3e2VyQpk
-         Iw4A==
-X-Forwarded-Encrypted: i=1; AJvYcCVkvuC5LxpTN61/y5L241yLBdyDDEgN9WUihicXMIdeRYaNqGwHeT3jo6gsTQRIdPEuLAY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwzSAkyTDAm+eJ0yVkbf+ULYWFTlnSha8PQYcLV8PBND6eGJpAn
-	AJMYuQAr2c572bxu5s1Rjz0jDQqqS+mSMuj4zoXwaRiIGnag25uvsc6SbKd/zyDz56eqO+P8xip
-	f
-X-Gm-Gg: ASbGncvEI5ddElrf8JR1L9YZgN7z7PVTYEzfYUV0Ch0UUIJ4M7E8Saqtz2k8cLIHGmT
-	pn0pNeWWvdv2S1fiRWMsw9k1pHS+zO7ekz/Q0oRuMfBNJQtp404K3nu4mB9MllTqy8Z6GaDb0JA
-	GKFYeFoK0zc2PPe3myuGwhiZBWBXasEWpfYtm2i55A26oxRAB3/eklPTBNaWAwwMb1RnOif7dG8
-	GqzQc91aE6W1MP17IHiVBAO+GoMK+z6aFSGWme1v7G99cQzbywJaVL1iN63rmmzmFBNHdKCZTM5
-	lW6ob+eNhRdR0rezILPptcyGyy7jwL2lO1ljBNs6GiaO95GrMAcKEBJEbc70blnww2Dn
-X-Google-Smtp-Source: AGHT+IEDts3benM6NmGItX5fga4Aa+CyXqI9YpnoThtJBcl6IK/cPPeYhxJyUZDqG2wUkSMleZOB0A==
-X-Received: by 2002:a17:903:8c4:b0:224:76f:9e4a with SMTP id d9443c01a7336-22780c74ad2mr8405635ad.14.1742497241060;
-        Thu, 20 Mar 2025 12:00:41 -0700 (PDT)
-Received: from [192.168.1.67] ([38.39.164.180])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22780f3964bsm1511655ad.32.2025.03.20.12.00.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Mar 2025 12:00:40 -0700 (PDT)
-Message-ID: <5a97e6c4-72aa-492b-8e7f-c0f874ffaf23@linaro.org>
-Date: Thu, 20 Mar 2025 12:00:39 -0700
+	s=arc-20240116; t=1742499719; c=relaxed/simple;
+	bh=8Xkkx7cSUBPFhheIny+Y5Avt1EwGq0KlBksucgZfnE8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vh+yEE1J5OGpvZHai/foC3MZSFwbObYqT2YOgkwVmPTAEbjuayR/cWr5B1+LZJvYecHnhFkWoiiMwAIGVm25OkGQM5eRVz7gF2G7dqQge6tWrBj/7akSahh8yoTBRLO6KK7vcFs09Tq+Onl1gsTbq9/1djw0Bg/CX0cKpcZVbDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bp2t8Yrl; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742499717;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=dOpkcvXWmwXW7oImhKpb3CoC8jp/UH4cPDEcdQv5dyg=;
+	b=bp2t8Yrlxb7FSs/6lOJEHfOySQf1nc4Tcpou24sEDbRFSl1hk+WMHJVzRCT+CU2gvnO5JJ
+	JPXF+rgmw2aojIIcnzqq9rbNxyhIkr6ZQ+w+KXCDPYPWVbPAYlKQX3EvMvdskyiMM4ZgMz
+	XnzIft+VT/5wtRjQH0DsRH8xFoNNC2E=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-171-PkVHJK0aPzClx-GspYN6hQ-1; Thu,
+ 20 Mar 2025 15:41:55 -0400
+X-MC-Unique: PkVHJK0aPzClx-GspYN6hQ-1
+X-Mimecast-MFC-AGG-ID: PkVHJK0aPzClx-GspYN6hQ_1742499714
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AE1F7196B344;
+	Thu, 20 Mar 2025 19:41:54 +0000 (UTC)
+Received: from omen.home.shazbot.org (unknown [10.22.89.109])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BCF631800944;
+	Thu, 20 Mar 2025 19:41:52 +0000 (UTC)
+From: Alex Williamson <alex.williamson@redhat.com>
+To: alex.williamson@redhat.com
+Cc: kvm@vger.kernel.org,
+	sbhat@linux.ibm.com,
+	kevin.tian@intel.com
+Subject: [PATCH] vfio/pci: Virtualize zero INTx PIN if no pdev->irq
+Date: Thu, 20 Mar 2025 13:41:42 -0600
+Message-ID: <20250320194145.2816379-1-alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 0/7] hw/hyperv: remove duplication compilation units
-To: qemu-devel@nongnu.org
-Cc: philmd@linaro.org, Paolo Bonzini <pbonzini@redhat.com>,
- kvm@vger.kernel.org, alex.bennee@linaro.org,
- Marcelo Tosatti <mtosatti@redhat.com>,
- "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
- richard.henderson@linaro.org, manos.pitsidianakis@linaro.org
-References: <20250307215623.524987-1-pierrick.bouvier@linaro.org>
-Content-Language: en-US
-From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-In-Reply-To: <20250307215623.524987-1-pierrick.bouvier@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On 3/7/25 13:56, Pierrick Bouvier wrote:
-> Work towards having a single binary, by removing duplicated object files.
-> 
-> hw/hyperv/hyperv.c was excluded at this time, because it depends on target
-> dependent symbols:
-> - from system/kvm.h
->      - kvm_check_extension
->      - kvm_vm_ioctl
-> - from exec/cpu-all.h | memory_ldst_phys.h.inc
->      - ldq_phys
-> 
-> v2
-> - remove osdep from header
-> - use hardcoded buffer size for syndbg, assuming page size is always 4Kb.
-> 
-> v3
-> - fix assert for page size.
-> 
-> v4
-> - use KiB unit
-> 
-> Pierrick Bouvier (7):
->    hw/hyperv/hv-balloon-stub: common compilation unit
->    hw/hyperv/hyperv.h: header cleanup
->    hw/hyperv/vmbus: common compilation unit
->    hw/hyperv/hyperv-proto: move SYNDBG definition from target/i386
->    hw/hyperv/syndbg: common compilation unit
->    hw/hyperv/balloon: common balloon compilation units
->    hw/hyperv/hyperv_testdev: common compilation unit
-> 
->   include/hw/hyperv/hyperv-proto.h | 12 ++++++++
->   include/hw/hyperv/hyperv.h       |  3 +-
->   target/i386/kvm/hyperv-proto.h   | 12 --------
->   hw/hyperv/syndbg.c               | 11 +++++--
->   hw/hyperv/vmbus.c                | 50 ++++++++++++++++----------------
->   hw/hyperv/meson.build            |  9 +++---
->   6 files changed, 52 insertions(+), 45 deletions(-)
-> 
+Typically pdev->irq is consistent with whether the device itself
+supports INTx, where device support is reported via the PIN register.
+Therefore the PIN register is often already zero if pdev->irq is zero.
 
-I've been able to address comments and conver last compilation unit 
-missing (hw/hyperv/hyperv.c).
+Recently virtualization of the PIN register was expanded to include
+the case where the device supports INTx but the platform does not
+route the interrupt.  This is reported by a value of IRQ_NOTCONNECTED
+on some architectures.  Other architectures just report zero for
+pdev->irq.
 
-However, another series is needed to make this compile.
-Thus, I'll wait for this to be merged before sending the v5 here.
+We already disallow INTx setup if pdev->irq is zero, therefore add
+this to the PIN register virtualization criteria so that a consistent
+view is provided to userspace through virtualized config space and
+ioctls.
+
+Reported-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
+Link: https://lore.kernel.org/all/174231895238.2295.12586708771396482526.stgit@linux.ibm.com/
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
+
+Applies over https://lore.kernel.org/all/20250311230623.1264283-1-alex.williamson@redhat.com/
+
+ drivers/vfio/pci/vfio_pci_config.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+index 14437396d721..8f02f236b5b4 100644
+--- a/drivers/vfio/pci/vfio_pci_config.c
++++ b/drivers/vfio/pci/vfio_pci_config.c
+@@ -1815,7 +1815,7 @@ int vfio_config_init(struct vfio_pci_core_device *vdev)
+ 	}
+ 
+ 	if (!IS_ENABLED(CONFIG_VFIO_PCI_INTX) || vdev->nointx ||
+-	    vdev->pdev->irq == IRQ_NOTCONNECTED)
++	    !vdev->pdev->irq || vdev->pdev->irq == IRQ_NOTCONNECTED)
+ 		vconfig[PCI_INTERRUPT_PIN] = 0;
+ 
+ 	ret = vfio_cap_init(vdev);
+-- 
+2.48.1
+
 
