@@ -1,204 +1,227 @@
-Return-Path: <kvm+bounces-41637-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41638-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E863A6B1D2
-	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 00:50:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 582FEA6B1DC
+	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 00:53:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 483D71898E4F
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 23:49:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 340258880C6
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 23:52:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7363521C9E7;
-	Thu, 20 Mar 2025 23:48:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 137E921C9E7;
+	Thu, 20 Mar 2025 23:52:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="X37JO+3w"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="ut2npbg4"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2054.outbound.protection.outlook.com [40.107.95.54])
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBDCA1FC7D9
-	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 23:48:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742514525; cv=fail; b=Pxbv0MiowfNXyB2RyyiCTiH/QsPiv7USetTPDZpXJicVsaRSr3fqqTkVnHpJMGPYO5Y/upszteM8NC4g2xHNVTPWk+6m4SXu8Fy341n57iinwr/PY76AAAz51h5y11bV3/UgU2nuaWkpO2Rq2Gwl8RElCSa/aaKSjzkTzhxDwj0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742514525; c=relaxed/simple;
-	bh=hnsptirepJ/xUwVBbxqXssoZUUOGMUVcvuO6DnVK2H8=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DqQR6cDe3teWgHsa0djzd8sBxwsV90VmCWdFRX3v8VFBjZBR6RMUWdtGv17dOwov0B5Wd6cCsYUr3yp7N0xRzxWBPkzevV0iofqzP9+jX8oP4xcwJif/dKWF80JtWJYDNDBrPbjy/8JjhcBsX42w7KKYOjouhedIyWMoASogWUQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=X37JO+3w; arc=fail smtp.client-ip=40.107.95.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=pEke5INxqD0gpcNtPduTb4VlZTHOdc7ZvklrJZKzXaoQKdtv/rpj55MFGlrnXrpK+BHr+Vb3v91DMfWczpbbJ6AogUyTW6dkW8++OK9Mav3Ar7yypfhNdn9TJvYGQg2twQ6rBBGIQCxHb7jcViwoP6Edafez1pZq6CBxi/LhZWZBvtT7HxX3mUZQUPTG0N7tb4yLVqzNuXb6J5+dPUbUWIddNXtiklwtj5CQgMCsklTCeLc7YDVIB2BGIto1IF4OFayQx9mSI+Ut/qerlyGrxv+FjKVKRKMZ1RyoC1J5e34/mfKzSohzO51wsI3IL+yYu51NgSjhscsj7D7iFwDKlw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oJgyKtN/Vgcdc9yZpBQKO0bfwfqUP16i3PHimPPrQ6w=;
- b=YYqFfrUxm4rVl7NQ0WcAjDh7kHkE1xdNQCygMzSA7D/fxDQtzQvCwinT76it4JESB94tlMyRYTEOYl3popL0frf6hMyIgSZ/As2RaNK5AeYQuXnSOF1UGA6MrHjoHEA+UQYpkbZVz+uRBYuUUl5htxk9QuK/SwnSYR802qNyutdazXLbHi6rk+XvoMOet/Piq4IUyT1sIL+XNJlx7lYTYvzo15Me88MAruYKvUgtoiMZyRyhxh6gwEOSfN4FEB90T4kpUHDyXJ6aOTO9MqFes8xSUcg3ho8V+sr5DQ9sreCYGZBKU4ApmJGKim6XNzHA9/b7JBpTRu+6K4V4nnJWsA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.233) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oJgyKtN/Vgcdc9yZpBQKO0bfwfqUP16i3PHimPPrQ6w=;
- b=X37JO+3wwlGcXZLbLzJ2HTeFaihrKOLrgZ7eaTPHD5zqag+McyK6eHQjAn++85FxiWIbs+8deYrAOe6khMM2FsEU4/Aa+GjCb+cvGGO7UyxsQM+I7x5q2QDlM2MdahCOI9GcjQgwFtyEB2hPt6V7qHRjwkS1TEvFPthMVXBVU3IFt2mSXbL5/+dDl8Hi5PV4CZIG3AHuJW5vx0oK/5BaT1cmwOdbedC1FyWIMzJUFEBfS8b3CIuekRgfTdnntZe8+/eFTwNj5e+vjYxpLaVkkQo/RaODKzITDLgocNu0v37H1wB6gyQLNESm13FWqeK5EaXs/fJa//P8xgN85OSq+g==
-Received: from PH7PR17CA0020.namprd17.prod.outlook.com (2603:10b6:510:324::11)
- by BN7PPFFC4F04B28.namprd12.prod.outlook.com (2603:10b6:40f:fc02::6ea) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.34; Thu, 20 Mar
- 2025 23:48:39 +0000
-Received: from SN1PEPF00036F40.namprd05.prod.outlook.com
- (2603:10b6:510:324:cafe::92) by PH7PR17CA0020.outlook.office365.com
- (2603:10b6:510:324::11) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8534.33 via Frontend Transport; Thu,
- 20 Mar 2025 23:48:39 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.233) by
- SN1PEPF00036F40.mail.protection.outlook.com (10.167.248.24) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8534.20 via Frontend Transport; Thu, 20 Mar 2025 23:48:39 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 20 Mar
- 2025 16:48:33 -0700
-Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Thu, 20 Mar 2025 16:48:33 -0700
-Received: from Asurada-Nvidia (10.127.8.13) by mail.nvidia.com
- (10.126.190.181) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14 via Frontend
- Transport; Thu, 20 Mar 2025 16:48:32 -0700
-Date: Thu, 20 Mar 2025 16:48:30 -0700
-From: Nicolin Chen <nicolinc@nvidia.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-CC: Yi Liu <yi.l.liu@intel.com>, <alex.williamson@redhat.com>,
-	<kevin.tian@intel.com>, <eric.auger@redhat.com>, <kvm@vger.kernel.org>,
-	<chao.p.peng@linux.intel.com>, <zhenzhong.duan@intel.com>,
-	<willy@infradead.org>, <zhangfei.gao@linaro.org>, <vasant.hegde@amd.com>
-Subject: Re: [PATCH v8 4/5] iommufd: Extend IOMMU_GET_HW_INFO to report PASID
- capability
-Message-ID: <Z9ypThcqtCQwp2ps@Asurada-Nvidia>
-References: <20250313124753.185090-1-yi.l.liu@intel.com>
- <20250313124753.185090-5-yi.l.liu@intel.com>
- <Z9sFteIJ70PicRHB@Asurada-Nvidia>
- <444284f3-2dae-4aa9-a897-78a36e1be3ca@intel.com>
- <Z9xGpLRE8wPHlUAV@Asurada-Nvidia>
- <20250320185726.GF206770@nvidia.com>
- <Z9x0AFJkrfWMGLsV@Asurada-Nvidia>
- <20250320234057.GS206770@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F57B1EDA05
+	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 23:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742514767; cv=none; b=V0CtgJY7ztJUUxP3hnispPM82NGoTM7pxof15N01ojvk4WrZn1cUlHJqvb1YykeMv9HxMPN9/CbA6n0JK4f4r9KTAw/YaH+mXl+pDaX/6lCTbu5cW9yROYOsZcdxVItimafOXg9cD3zAShOUF0Ow3f9Vi1imVMjb62hKkFuT8cE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742514767; c=relaxed/simple;
+	bh=VKx7RH8Mg8DPC+U1B1C8czPF3VXsHpYGIbro1lkVn6s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=l9oeC7WTCGP+MsTyXQhyQMaosXlwqaMTy9+JVvzGCdry+9TihUHcrP8H6X3Iv3krtDLrd/dBJB9Umt6Rq6m55/Ih7doqvZxyThk0XusjqxOis/oEmDZp/dTRxkrokS3Tb1DuGNYGcq/vmC7a3GjRXvFYH91LwuplCcHk/gO41TI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=ut2npbg4; arc=none smtp.client-ip=210.118.77.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20250320235237euoutp012a9bb9b98de7a63d3d78324f531d41a1~up-CtAv8O0702507025euoutp01T
+	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 23:52:37 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20250320235237euoutp012a9bb9b98de7a63d3d78324f531d41a1~up-CtAv8O0702507025euoutp01T
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1742514758;
+	bh=V40Yt8b5UQP5CQRebMaM4XT/r0qYRmMZ1DD0U7kvnK4=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=ut2npbg4/kdcP2bqSdFlfrUbOPb3A5+wIWFnP1CDcxcmTBdUP5JsoPTmaSPgllVtW
+	 12v/xbNbkMJ8m2iNY9Y0f+LGHF28UMshTJ8v7BXonnoeHcoMfhc6dJCAR4w6RO+Biz
+	 v0cL49lJyjsjlqArWlGlfnAFNqjgUfI3WAGoW4Jk=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+	20250320235236eucas1p2d25a78b8b13dc4ab1b2ca298ada0dfd6~up-BT_ZSP1299312993eucas1p2O;
+	Thu, 20 Mar 2025 23:52:36 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+	eusmges1new.samsung.com (EUCPMTA) with SMTP id 33.34.20821.44AACD76; Thu, 20
+	Mar 2025 23:52:36 +0000 (GMT)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20250320235235eucas1p20083fac3310cb507f47cd27594507feb~up-Ah0Xfl1299312993eucas1p2N;
+	Thu, 20 Mar 2025 23:52:35 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20250320235235eusmtrp147af0699b5659e6df38f53ef4ac28c3e~up-AhBruB1931419314eusmtrp12;
+	Thu, 20 Mar 2025 23:52:35 +0000 (GMT)
+X-AuditID: cbfec7f2-b09c370000005155-97-67dcaa4406f9
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+	eusmgms1.samsung.com (EUCPMTA) with SMTP id 4F.88.19920.34AACD76; Thu, 20
+	Mar 2025 23:52:35 +0000 (GMT)
+Received: from [106.210.134.192] (unknown [106.210.134.192]) by
+	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20250320235231eusmtip12043beb3ef63386f7348b314310b8aad~up_9CwvKL2854028540eusmtip1R;
+	Thu, 20 Mar 2025 23:52:31 +0000 (GMT)
+Message-ID: <1034b694-2b25-4649-a004-19e601061b90@samsung.com>
+Date: Fri, 21 Mar 2025 00:52:30 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250320234057.GS206770@nvidia.com>
-X-NV-OnPremToCloud: AnonymousSubmission
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF00036F40:EE_|BN7PPFFC4F04B28:EE_
-X-MS-Office365-Filtering-Correlation-Id: b8fd2725-671e-497b-4c04-08dd6809bd2d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|7416014|82310400026|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?DMAuSF3saFm2rmKBOqdTtCDbMta46O537OuEXP9iPDyuumbz2scXSgqism0S?=
- =?us-ascii?Q?vXQvMsHf/2x6VzDh4VuUMz7l15jSYhsHwXS9QRijv/XtcRpo71meZXE5tZap?=
- =?us-ascii?Q?lvGZ8KbgGECm5p/FZFX+Ao+YeA9A1YO+jHDawxBaXfD3wWYpyhiGw3avAC4s?=
- =?us-ascii?Q?wldh4nh2z0cdAYPcIh4PVBOa0BWAIJRjrCMkSD08HkKErgxUDvCWU0jpevM+?=
- =?us-ascii?Q?EyHXm7ktuzP95AwHLkC4Fi4Gkvz+PDVpRNXvNVEBYJq+IcXfDd/SP8mVPi/v?=
- =?us-ascii?Q?GnONh6XUwl7gT/2B29AyDwmzerfSRPHmgPpsl3x1uJ2SEcV2zvMA9mPRAY6D?=
- =?us-ascii?Q?cZGXrt/rYeb4cQsAdKLmgWI+XXDJNQYUd+9tTVxH1x0tCKrV12nDOZONT9wk?=
- =?us-ascii?Q?2OAEFiDrM2joI8jfDmVzMEqgUWo4njwnTxqRS64Yro8XkBSQJbEP6eh1vxxR?=
- =?us-ascii?Q?mNEgB6CicBDs2g4e9PhLlPFg9/51d+xLXX6MU4o/FXLYJAD0rxBr1XvIgVx0?=
- =?us-ascii?Q?WDRB620HiX1tJAa7wqMhEkjlR6YHwQFNDiwqDX2/2eJ7NkfeLvdzs7QEACGN?=
- =?us-ascii?Q?Bi6WBdXQqxHa2LzzNAvt6FXW5tNvroILBEJ/xJHkg3k1iREdXeMyMv7JK8vG?=
- =?us-ascii?Q?R4CMS7QFqvgf6bt6cuIs9jESs3SUvQj6RJX973L26XPCiN1rHbbr/m/z7arW?=
- =?us-ascii?Q?oT3MwFY75kgvzajXD8SrZZF5tC8k50ne/SBULVWWoVNXv6fMRAKSfZQVmvKc?=
- =?us-ascii?Q?FuMfGU8ZMEdUFK8cFIguU6GTtmVgCGG+anbuKaK4eUuGhi+8Q2kZGrychIFt?=
- =?us-ascii?Q?gh0UbZotTPiFot7X9C5+C2JgTuzdHfudshu1hg1JSRWfOfgA4XdoTZDeL4Xy?=
- =?us-ascii?Q?f5FbEMeK/69E7jZyHa4S8VB7XaMdZPupuk0NOZ+fvzoBhVzWeQQnpfU13N7A?=
- =?us-ascii?Q?U+9p0h2QgBMK/YuYqimXj/iTrOkydIIJhd+Pc2shb0xAI6P1DQQLiM4prF54?=
- =?us-ascii?Q?CQFkW71vdOm6lpOGDJW4xYMbsYtt41pGlrqE8ENsSOxpU8Mz/qiO4dfN4jBs?=
- =?us-ascii?Q?Tn42r0VdObs46Yp5aN7E54aRGcRKVnHzbyn6cHduNL/Y4GWriAyBEzImQ02J?=
- =?us-ascii?Q?WXZadmSsldfgVOQwT6Gin4OpPjN7XXTo7g3+Tsky5ddKGXad3XNwNw1thfAe?=
- =?us-ascii?Q?SWHBmooCsdy0EQCwaJt0PfFE+CwNbN02jwuwzSLXwJcABQ4sTCx90m3jexFX?=
- =?us-ascii?Q?Ijsd5KrCBcADY8/mHOapm6/pRshDqEsZ7M77J3BMd5L2G/JJ0ZzUM468kwpc?=
- =?us-ascii?Q?vhoW1Z5i9+fNXDK6JkYdFcQXFUmCfxl4kTc5ynJYBfBdAZMghw3YgIDpOnTX?=
- =?us-ascii?Q?ML86WhaGk+XBZ9oOt/aZOorWr/AbxN4f+/GfwGUzGpF/U3HhYZCR2eddgFzP?=
- =?us-ascii?Q?3lEk4O1nB5FIbZLRCARJidpQ08dKpbpSD8DnQiC7202JqNpuvZpJokOLiAfJ?=
- =?us-ascii?Q?QMQLK8szLbuo1qs=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(7416014)(82310400026)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2025 23:48:39.3397
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b8fd2725-671e-497b-4c04-08dd6809bd2d
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF00036F40.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PPFFC4F04B28
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 00/17] Provide a new two step DMA mapping API
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Leon Romanovsky <leon@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Joerg Roedel
+	<joro@8bytes.org>, Will Deacon <will@kernel.org>, Sagi Grimberg
+	<sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>, Bjorn Helgaas
+	<bhelgaas@google.com>, Logan Gunthorpe <logang@deltatee.com>, Yishai Hadas
+	<yishaih@nvidia.com>, Shameer Kolothum
+	<shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>, Andrew Morton
+	<akpm@linux-foundation.org>, Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org, Randy
+	Dunlap <rdunlap@infradead.org>
+Content-Language: en-US
+From: Marek Szyprowski <m.szyprowski@samsung.com>
+In-Reply-To: <20250319175840.GG10600@ziepe.ca>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA01SbUxTVxjOuff2tjQpuRQcB2UjK5MFNgrdNJ5kwMCw5U7/4H5sGcviGrkW
+	t1K1tYgk2zrGl11RKLCWwko3y4eF8C1gFYQiK4QJDCNiBTsTZEztBsJ0fAxHe3Xj3/M+z/N+
+	PCeHhws7yO28I4oTjFIhlYtIPtH508podLJtWhY71BiIqpobSfT4qY5EDTNnSWTNSUezfQUA
+	nW8YxNDqMkIVxiGAKg3zGDpd2cJFesckQDWeC1xUVX4cla3W4KjH9Rr6Id9KoOv2KhLdaXzK
+	QdW197jomtlJojlHEYGseZvIM20gUP/CLAc1PfiTQF03cjgod3o3qi3nJ4bSs/1mjG40NwJ6
+	7sYcoC1tanrsTitB5171cOj2+ij63OXfMfr6NTXdZjtN0m2P9Fx6yLhG0O3Wr+j59gpAX7ql
+	IelzZ0o5KUGp/Lg0Rn4kk1HGJHzKTz/v6CWPbYRkDRdWExowEKQFfjxI7YITXeOYFvB5Qqoe
+	wG8vDZJeQUgtA6hxxbPCEoC3NXr8eUeBuxBnhToA6w1zBFssAqgtrfa1C6gEaC4x+DBB7YSa
+	xRKc5QPgcMUs4cXbqDDodhm5XhxIJcO+TtYTRIlgr72E6x2KU51caJpfxLwCTgVD12y1D5OU
+	BGo9Wt8CP0oMS8bmnnnCYJen6tmpPXzo7E7RAt4mToZVRRKWDoT3nR1cFofCkVKdLwCkCgC0
+	rLkxtijezP+bC7Cut+D06CrpHYRTkbDZHsPSSXD8r7tcdr4/nPIEsCf4Q32nAWdpASzMF7Lu
+	CGhyNv23tn98Ai8GItOWVzFtCWnaEsb0/14LIGwgmFGrMmSMSqJgTopV0gyVWiETHzqa0QY2
+	P/bIhvNRN/j+/qLYATAecADIw0VBgqDC2zKhIE16KptRHj2oVMsZlQPs4BGiYMGPV/JkQkom
+	PcF8zjDHGOVzFeP5bddgqbkxO+oK9yxULue/+apiwhhge6XBP+lJZsIv4nj9njMD+6s5kfbo
+	vZaQfR91L67Y4tt7i12Wla+L392bvYTVt7uN6Ilj6hvzzNquy1+EvDEzaD8QR6jOmsqOl4X1
+	JYa/3KLTW9HFn4u4bcHY+8v+fusvuK/8un7h1MmWOOvBT4bX/7l44O/3djo/nH67qzYl1uGp
+	e5Bz8+qSOWUsemXI4Hp8C6xt8D+2CMOSbdnNqff+GI35kp7MGi6TK16aVC7dVH23sC8p0ZaZ
+	Jw+u0EVQD2vsD/PQ67EfhN9NM4QuROoGWnts68ShEUVTXYdjqnX3O11Z5ZPWiM8U+qjD2yTp
+	4bkvHhYRqnSpJApXqqT/ApX9M15HBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SfUxTZxTG8957e1uqXS61pi/oYDZxc+oqBVpflrZjH3HXLDMkhmRzG6zC
+	tTRAi70tkS1mjWMCzZyrFoFKWrTFjNK5rY1CABvo1EoMQyCSwQAH1spYikgWEoXJKM0S/vvl
+	nOc5z8nJ4eHCfk4qT6c3MUa9pkxC8om7L8KTb7zrndBmDNrTUPNPPhItrX5LovbJsyTynCpB
+	kd4agNrab2Ho+T8INTXeAehiwyyG6i7+zEXnQqMAtcaucVFz/XFkf96Koxvje9Cl0x4CjXQ1
+	k2jKt8pBriuPuGjAGSZRNHSGQJ5v1ig20UCgvoUIB139+wmBOu6f4qDqCTm6Us/P3U5H+pwY
+	7XP6AB29HwV0i99MD079QtDVN2McOvDDbtrd8xdGjwyYab+3jqT9i+e49J3GZYIOeL6iZwNN
+	gO4es5C0+7vznDzREanSaDCbmFdKDKxJJflEhjKlshwkzczOkcqy9n/2ZqZcsk+tLGbKdJWM
+	cZ/6c2lJWyhIVrxIOdFf6yIs4FeRFSTxIJUNax7U4lbA5wmpVgB7Fn/EE43tsP+ChZPgLXBl
+	1EomRE8A9J5d5MYbAkoNnbYGMs4EtRNantrwRD0Z9jdFiDhvpdLhg/HGdf0W6j3Yez2hEVES
+	GOyyceNDcaqTC4e6wlgi4QwOH12eX4/GKTEcj7iwOJOUDFpj1vW0JEoKbYNRLKFRQOs1K0hw
+	OuyINePfA6FjwyKODaMcGyyODZYWQHiBiDGz5dpyViZlNeWsWa+VFhnK/WDtp67ffhboBM65
+	p9IQwHggBCAPl4gEoto/tEJBsabqC8ZoKDSayxg2BORr17DhqVuLDGtPqTcVyhQZclm2IidD
+	nqPIkogFB0YGjwkprcbElDJMBWP834fxklItWOl0L9ItF7g+euwDqsX+HcaV9kO/hXVfpqpe
+	L25r+1Q79afD61DOvR8eyh1Gy3vempoVpvk387pVWSbvRNrC2LG9p2fGYkdP7OrUFAqTu6Em
+	N7Ksyg8etCuSH6fGQuik+8LDg/zjoV0dtfXBqzvu3VhoKSlYiKmml8r61GI3/m/KtqMVhw+3
+	z/w+XjbQ6vmw+jw7D6O5Kfbp2qqu18YqOUpD3jv5O5eKOh7e4yuH82sCz3RzH0xs6t58+/K2
+	7gGKSb/lLvDZxZbiHuPbwqG6m/MnZ1ZW1XLMtp8NCzqrXHurJ0eDw1/XZR3p0XNe8i+9vCk3
+	cDfPKa50lr5a+XG9hGBLNLLduJHV/AehhEaR3AMAAA==
+X-CMS-MailID: 20250320235235eucas1p20083fac3310cb507f47cd27594507feb
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20250228195423eucas1p221736d964e9aeb1b055d3ee93a4d2648
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20250228195423eucas1p221736d964e9aeb1b055d3ee93a4d2648
+References: <cover.1738765879.git.leonro@nvidia.com>
+	<20250220124827.GR53094@unreal>
+	<CGME20250228195423eucas1p221736d964e9aeb1b055d3ee93a4d2648@eucas1p2.samsung.com>
+	<1166a5f5-23cc-4cce-ba40-5e10ad2606de@arm.com>
+	<d408b1c7-eabf-4a1e-861c-b2ddf8bf9f0e@samsung.com>
+	<20250312193249.GI1322339@unreal>
+	<adb63b87-d8f2-4ae6-90c4-125bde41dc29@samsung.com>
+	<20250319175840.GG10600@ziepe.ca>
 
-On Thu, Mar 20, 2025 at 08:40:57PM -0300, Jason Gunthorpe wrote:
-> On Thu, Mar 20, 2025 at 01:02:54PM -0700, Nicolin Chen wrote:
-> > On Thu, Mar 20, 2025 at 03:57:26PM -0300, Jason Gunthorpe wrote:
-> > > On Thu, Mar 20, 2025 at 09:47:32AM -0700, Nicolin Chen wrote:
-> > > 
-> > > > In that regard, honestly, I don't quite get this out_capabilities.
-> > > 
-> > > Yeah, I think it is best thought of as place to put discoverability if
-> > > people want discoverability.
-> > > 
-> > > I have had a wait and see feeling in this area since I don't know what
-> > > qemu or libvirt would actually use.
-> > 
-> > Both ARM and Intel have max_pasid_log2 being reported somewhere
-> > in their vendor data structures. So, unless user space really
-> > wants that info immediately without involving the vendor IOMMU,
-> > this max_pasid_log2 seems to be redundant.
-> 
-> I don't expect that PASID support should require a userspace driver
-> component, it should work generically. So generic userspace should
-> have a generic way to get the pasid range.
+On 19.03.2025 18:58, Jason Gunthorpe wrote:
+> On Fri, Mar 14, 2025 at 11:52:58AM +0100, Marek Szyprowski wrote:
+>
+>>> The only way to do so is to use dma_map_sg_attrs(), which relies on SG
+>>> (the one that we want to remove) to map P2P pages.
+>> That's something I don't get yet. How P2P pages can be used with
+>> dma_map_sg_attrs(), but not with dma_map_page_attrs()? Both operate
+>> internally on struct page pointer.
+> It is a bit subtle, I ran in to this when exploring enabling proper
+> P2P for dma_map_resource() too.
+>
+> The API signatures are:
+>
+> dma_addr_t dma_map_page_attrs(struct device *dev, struct page *page,
+> 		size_t offset, size_t size, enum dma_data_direction dir,
+> 		unsigned long attrs);
+> void dma_unmap_page_attrs(struct device *dev, dma_addr_t addr, size_t size,
+> 		enum dma_data_direction dir, unsigned long attrs);
+>
+> The thing to notice immediately is that the unmap path does not get
+> passed a struct page.
 
-OK.
+I see, thanks for pointing this out. It looks that I've encountered this 
+issue too long time ago when I was implementing first 
+iommu-to-dma-mapping glue for ARM arch. The lack of some kind of 
+'object' returned from dma_map* (and dma_alloc*) and passed back to 
+dma_unmap* (and dma_free_*) required some non-trivial workarounds there 
+and made the unmap/free path a bit more complicated.
 
-> > Also, this patch polls two IOMMU caps out of pci_pasid_status()
-> > that is a per device function. Is this okay?
-> 
-> I think so, the hw_info is a per-device operation
-> 
-> > Can it end up with two devices (one has PASID; the other doesn't)
-> > behind the same IOMMU reporting two different sets of
-> > out_capabilities, which were supposed to be the same since it the
-> > same IOMMU HW?
-> 
-> Yes it can report differences, but that is OK as the iommu is not
-> required to be uniform across all devices? Did you mean something else?
+> So, lets think about the flow when the iommu is turned on.
+>
+> For normal struct page memory:
+>
+>   - dma_map_page_attrs() allocates some IOVA and returns it in the
+>     dma_addr_t and then maps the struct page to the iommu page table
+>
+>   - dma_unmap_page_attrs() frees the IOVA from the given dma_addr_t
+>   
+> If we think about P2P now:
+>
+>   - dma_map_page_attrs() can inspect the struct page and determine it
+>     is P2P. It computes a bus address which is not an IOVA, and does
+>     not transit through the IOMMU. No IOVA allocation is performed. the
+>     bus address is returned as the dma_addr_t
+>
+>   - dma_unmap_page_attrs() ... is impossible. We just get this
+>     dma_addr_t that doesn't have enough information to tell anymore if
+>     the address is a P2P bus address or not, so we can't tell if we
+>     should unmap an iova from the dma_addr_t :\
+>
+> The sg path fixes this because it introduced a new flag in the
+> scatterlist, SG_DMA_BUS_ADDRESS, that allows the sg map path to record
+> the information for the unmap path so it can do the right thing.
+>
+> Leon's approach fixes this by putting an overarching transaction state
+> around the DMA operation so that map and unmap operations can look in
+> the state and determine if this is a P2P or non P2P map and then know
+> how to unmap.
+>
+> For some background here, Christoph gave me this idea back at LSF/MM
+> in Vancouver (two years ago now). At the time I was looking at
+> replacing scatterlist and giving new DMA API ops to operate on a
+> "scatterlist v2" structure.
+>
+> Christoph's vision was to make a performance DMA API path that could
+> be used to implement any scatterlist-like data structure very
+> efficiently without having to teach the DMA API about all sorts of
+> scatterlist-like things.
 
-Hmm, I thought hw_info is all about a single IOMMU instance.
+Thanks for explaining one more motivation behind this patchset!
 
-Although the ioctl is per-device operation, it feels odd that
-different devices behind the same IOMMU will return different
-copies of "IOMMU" hw_info for that IOMMU HW..
+Best regards
+-- 
+Marek Szyprowski, PhD
+Samsung R&D Institute Poland
 
-Thanks
-Nicolin
 
