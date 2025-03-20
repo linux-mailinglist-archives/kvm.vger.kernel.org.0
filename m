@@ -1,74 +1,76 @@
-Return-Path: <kvm+bounces-41603-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41604-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21FD0A6B0C6
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 23:30:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43CABA6B0C9
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 23:31:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 081E6987F7B
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 22:30:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 136474A21D9
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 22:30:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7541C22A7F0;
-	Thu, 20 Mar 2025 22:30:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4A1022ACDB;
+	Thu, 20 Mar 2025 22:30:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lpxhq8ve"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="STs37TQ4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD143223707
-	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 22:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E001B228CB8
+	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 22:30:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742509813; cv=none; b=TRhX5l5ZGXq4pdzEnuPrqr5wnN96MtmUdXRmb8Oo3Q3v1yxyhTcTIBLWykjJ0ZNimNHxkchTTbpuayfvg23Un7W5TTN/zJALsx1jP8eXRkvB15ByHSOfXnS2+MQabzy78azI56rrnZC4qcY63RC1/EzcYsdTryEIeX72TPP6qx0=
+	t=1742509818; cv=none; b=uTyiIAxaNh/rSbIicIBn3JZbKyp7UlkrlPGF0CWSoB+i+IOF3gugf1hCSh/9y7DoG2yjHPrVOxVh2S8WbLlqf5o/KlKMh+rGsKn9nnOph6J0tFlJmHfSfQAoLOxeMPvreTaM0EcyZd/CGCMKyI0gJCVp9zJXjf/7l45JrRGzttE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742509813; c=relaxed/simple;
-	bh=A8t9/UQ/F6dgOl4CV/crVKcvm/z/FnLkTJUHG5htwIY=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=RWfK4TJMk3H8pvvQzKcIJgXLguwoc8lAPvW6P4Ifgu70GBtzcSAnTIZVs9H/8nGd07SmxqlaENhT7vvxBF9V0EDWbKdx/1gUb5gGdP2DyftTsKsA+EGNj95e7bUdflrQf/CeFE8llkaBYNHleSb+ZO+pGAspJ8OxS6rT2WwVXVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=lpxhq8ve; arc=none smtp.client-ip=209.85.214.177
+	s=arc-20240116; t=1742509818; c=relaxed/simple;
+	bh=8032EpNxG6iAj8mji3XCprkzPyTYvtWM95QAJORZa4w=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=AnWkL4ron0Mo80/qnKaW+AdkPC9xySHhjaOErPTUNv8WNLLXpkjz2E1eHqdDUBAAozx1EKJzPeT2BWnA2XJqveAG7PXxze42xpmCccCTm/EEbcdeZXlZOmMLKi032G2EgkoINQB8WqhFv3bax8L0XZxP8mKPjtFpNJolh2GiCIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=STs37TQ4; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-225a28a511eso29428385ad.1
-        for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 15:30:11 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-224019ad9edso32560825ad.1
+        for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 15:30:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1742509811; x=1743114611; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=iqhwlkf8vVBUTfdErW46dXre9tdQWHJk62D7NGKBzrU=;
-        b=lpxhq8veGG2lVrQv7A6oTe2zTZbo27QBgu1vPEKfh9Ey0Zmnx+Rl8M0t2QRUZHZtSv
-         8MokDjb1pEYJHN8nOt6YOSZZCO72kw4oU2QZz99wYqYySGSAQHHpK4NxCEULkvHMvDPZ
-         U+otjCbuiHRoils+l2iG4JfhHOMHDROGUcuztGfCEkD60SPavVDhMy/mrpLMaBQvW1h6
-         lfBbDPkURQHSkpmVo9qANt+bKe5JJf2eDLSqE1KrhTY+z+vkO2cFD41keY38xAxhMLl7
-         bVf+LKm1LcBKJ8zj2o8+BMUeYz/nuAmpZ4Rzxc5x1dBG08CkS0fc62sTEJXcBx/zxt21
-         N0+g==
+        d=linaro.org; s=google; t=1742509815; x=1743114615; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EUQWJa8M2i9P17T56WC7L1ajUU3UpMhiv0rwi6K2NYA=;
+        b=STs37TQ4hS/sTLR9F8zTxAIQQ5g/u1QMEHD351LTXegV+312/26R8AnTq3aHaxkc1l
+         j4/rPXCANBAjKPNVV0aQT1qFmG+TMAmYDXVmv/UGpBb+Es1fs0FSnJJBPiN8hJjguMfB
+         7Qvz7FRmWKD0PTKGcytX/ONMp8UU2coQcPyCMIU5zsJZQEn8rsymIZbKR75MZ4Xg6DX+
+         gnhOOVw9wxToHfC1rSwAHZfSgPdZw5Eq/22yNZSrWIkmlflz9/AGhuGVf4K2BvecfapX
+         grPKQ3WJKLtEER8TQaqtHvIcj9m2b2p4qpe2LG3R52pjNSM8rNnlwaLsGf5ERXKwoZVN
+         tUfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742509811; x=1743114611;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iqhwlkf8vVBUTfdErW46dXre9tdQWHJk62D7NGKBzrU=;
-        b=pemQYEHPTTK2wbIhK2bJah5KAKcqt0nbxfp3pvQgjEVHI6nhi3rKN/utby6fuIty45
-         USt7O9uaWpv/kcyKQTPOfwPsqVbUfKFw9XQrBq7ctQZrnv3QjbSQIgb4CJrhyVEgpAxW
-         HJXUTc3Mw+13a9TU+IVXEdqVtfcOYCu3Q1IQX8TWbfzodllE27J4r5jDCQSRL7oRIKh9
-         LvXDmYiy3LrRrTyCnIgcJLgxw5m3noQ1PoXOhSXChgHTB1XGTqDb0N68nU8/SMZGmt7T
-         iiRU+VGrXoxG5tl7UbcgjU/6vp/hbGSPsQZCdTM6vAWj6uI4f9Y7NGIHW7X9S2WgUt7E
-         5j7w==
-X-Gm-Message-State: AOJu0YzgmCO9a0nGNz1k5cQe4m6y+GE28hbZgjfkLbsYluVryPn0wHp+
-	dxhUgXIVi9Yu8OTEttuYn58AuXuePaYYzCus2ddxXcpwKKrg9r9b7mIWGWZSbwU=
-X-Gm-Gg: ASbGncs6RWK0/ubjzCaEoobu21hXDsvZSuS639brNLiFDA8oKOe1vHBVxLSzPa91zdy
-	+1cTLfMoTsG47X/AB46rUDNMMzC99TB4/WBPg7Gtswp3dIWXRFxOlX+VIiMoaz3h6WgL4DnY08W
-	EA/PU8xg8m2avIWsThH6NAH4ILIdyxKjwFJWgdnHxwr8dIQTM+7NRTqkHkCW3xg+mZe2lqbLlZo
-	WrlAq2Z5pqIVbdbpxlYchiimcGq1q7lELRo1VQ81DGjR/QsUMnyIV7sO6V0ybOpLP/sE4SGePaM
-	Au9kjCa3tAM/Fl7gk640gKU12n0HACXfFvtzt37resXrIvZtTOmQ4ac=
-X-Google-Smtp-Source: AGHT+IF7rxq36QivV5DZYlbW16JQVFyK0VK5/tg8mquF2bSISfiJtuxjSj/kyOctpc9S1USrnAuYdg==
-X-Received: by 2002:a17:903:1110:b0:21f:ba77:c45e with SMTP id d9443c01a7336-22780e20562mr11953595ad.45.1742509810917;
-        Thu, 20 Mar 2025 15:30:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1742509815; x=1743114615;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EUQWJa8M2i9P17T56WC7L1ajUU3UpMhiv0rwi6K2NYA=;
+        b=BXfZzyjkiGDoyTd6ztzoFVLB9xSu3kOpjaf9qyWkXD5bQtEk/D/btmyyInmmQ0zg86
+         jBem/IA+xDgbtw8m+XJR1G82grgAuEun5Fq0oC7O/4/Au3HkvMqO9h141b0Levyvv6UA
+         1buSL0JXY+xqbT5P8xqTrRZ10LwaUBa1X8+YcSkGrVsb6+eWe0HRmhp+VeBcwq/zDFC5
+         NB/E7NZOZY3P25+InabMVYFVSNoVBcd69/lHbs5kwFFx0pi6NmGb6QUXKe4N9CFl32V/
+         KPxFiIVbRjfF9THITp5lw6yDXwbN4HNcrgskbLMqjziU+baEJ0g5dLwt6bD2uDUgLHNB
+         q5lA==
+X-Gm-Message-State: AOJu0YzibG3e6aY3qnpabccxloqJkeQgm68mu+70/aKg3CBXBWqZYhJJ
+	tVFsl9u+hIwpgpvBKLmUpndbN6V/Klr8ag2XEgKQI10wzTBoDg0en7DNGd/LhAE=
+X-Gm-Gg: ASbGncsFlulNzDjrlcaK0j4xChTbWN1Y2hNB3Wg8x30XDQJEPUJshjo2WkA/1kFhPc8
+	wqQNISd3J8THZ1IIJqH0cga2c828gUNqi/fZ4ar4IX0cr4sNT1bYxZuDV8D/un07l+Mv6pj344X
+	yE2brvan6yrrkWlFgzutKaqDBMP50TKimtkHEd4Z3EwEGocDGudM+0iwgCK0XxPXt0+VQp7hMnT
+	WFo3O1FtLSzG1Pac91VsCHuTjdINANgf/4+pHGYmtzXEFBS6/li/tbvwtU7F/cKI10gkZr/xR4/
+	TB8sjrrn9YiWFkpee0zMUVQfroKcNrfyyNScCHgG2wiK
+X-Google-Smtp-Source: AGHT+IH6ZvqlVmR/vgYitM0gTW8xnrCBbOkByuhosGlG4c0RqGsCkRYzWH0d/KpBtFj4JuB9Fwyv6A==
+X-Received: by 2002:a17:902:f20c:b0:224:256e:5e3f with SMTP id d9443c01a7336-22780d8370amr16464875ad.25.1742509815082;
+        Thu, 20 Mar 2025 15:30:15 -0700 (PDT)
 Received: from pc.. ([38.39.164.180])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22780f4581csm3370145ad.59.2025.03.20.15.30.10
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22780f4581csm3370145ad.59.2025.03.20.15.30.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Mar 2025 15:30:10 -0700 (PDT)
+        Thu, 20 Mar 2025 15:30:11 -0700 (PDT)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: kvm@vger.kernel.org,
@@ -79,11 +81,12 @@ Cc: kvm@vger.kernel.org,
 	Richard Henderson <richard.henderson@linaro.org>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v2 00/30] single-binary: start make hw/arm/ common
-Date: Thu, 20 Mar 2025 15:29:32 -0700
-Message-Id: <20250320223002.2915728-1-pierrick.bouvier@linaro.org>
+Subject: [PATCH v2 01/30] exec/cpu-all: remove BSWAP_NEEDED
+Date: Thu, 20 Mar 2025 15:29:33 -0700
+Message-Id: <20250320223002.2915728-2-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.39.5
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20250320223002.2915728-1-pierrick.bouvier@linaro.org>
+References: <20250320223002.2915728-1-pierrick.bouvier@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -92,214 +95,192 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series focuses on removing compilation units duplication in hw/arm. We
-start with this architecture because it should not be too hard to transform it,
-and should give us some good hints on the difficulties we'll meet later.
+This identifier is poisoned, so it can't be used from common code
+anyway. We replace all occurrences with its definition directly.
 
-We first start by making changes in global headers to be able to not rely on
-specific target defines. In particular, we completely remove cpu-all.h.
-We then focus on removing those defines from target/arm/cpu.h.
+Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+---
+ include/exec/cpu-all.h    | 12 ------------
+ linux-user/syscall_defs.h |  2 +-
+ bsd-user/elfload.c        |  6 +++---
+ hw/ppc/mac_newworld.c     |  4 +---
+ hw/ppc/mac_oldworld.c     |  4 +---
+ hw/sparc/sun4m.c          |  6 +-----
+ hw/sparc64/sun4u.c        |  6 +-----
+ linux-user/elfload.c      |  8 ++++----
+ 8 files changed, 12 insertions(+), 36 deletions(-)
 
-From there, we modify build system to create a new hw common library (per base
-architecture, "arm" in this case), instead of compiling the same files for every
-target.
-
-Finally, we can declare hw/arm/boot.c, and most of the boards as common as a
-first step for this part.
-
-- Based-on: 20250317183417.285700-1-pierrick.bouvier@linaro.org
-("[PATCH v6 00/18] make system memory API available for common code")
-https://lore.kernel.org/qemu-devel/20250317183417.285700-1-pierrick.bouvier@linaro.org/
-- Based-on: 20250318213209.2579218-1-richard.henderson@linaro.org
-("[PATCH v2 00/42] accel/tcg, codebase: Build once patches")
-https://lore.kernel.org/qemu-devel/20250318213209.2579218-1-richard.henderson@linaro.org
-
-v2:
-- rebase on top of Richard series
-- add target include in hw_common lib
-- hw_common_lib uses -DCOMPILE_SYSTEM_VS_USER introduced by Richard series
-- remove cpu-all header
-- remove BSWAP_NEEDED define
-- new tlb-flags header
-- Cleanup i386 KVM_HAVE_MCE_INJECTION definition + move KVM_HAVE_MCE_INJECTION
-- remove comment about cs_base in target/arm/cpu.h
-- updated commit message about registers visibility between aarch32/aarch64
-- tried remove ifdefs in target/arm/helper.c but this resulted in more a ugly
-  result. So just comment calls for now, as we'll clean this file later.
-- make most of the boards in hw/arm common
-
-Pierrick Bouvier (30):
-  exec/cpu-all: remove BSWAP_NEEDED
-  exec/cpu-all: extract tlb flags defines to exec/tlb-flags.h
-  exec/cpu-all: move cpu_copy to linux-user/qemu.h
-  include/exec/cpu-all: move compile time check for CPUArchState to
-    cpu-target.c
-  exec/cpu-all: remove system/memory include
-  exec/cpu-all: remove exec/page-protection include
-  exec/cpu-all: remove tswap include
-  exec/cpu-all: remove exec/cpu-interrupt include
-  exec/cpu-all: remove exec/cpu-defs include
-  exec/cpu-all: remove exec/target_page include
-  exec/cpu-all: remove hw/core/cpu.h include
-  accel/tcg: fix missing includes for TCG_GUEST_DEFAULT_MO
-  accel/tcg: fix missing includes for TARGET_HAS_PRECISE_SMC
-  exec/cpu-all: remove cpu include
-  exec/cpu-all: transfer exec/cpu-common include to cpu.h headers
-  exec/cpu-all: remove this header
-  exec/target_page: runtime defintion for TARGET_PAGE_BITS_MIN
-  accel/kvm: move KVM_HAVE_MCE_INJECTION define to kvm-all.c
-  exec/poison: KVM_HAVE_MCE_INJECTION can now be poisoned
-  target/arm/cpu: always define kvm related registers
-  target/arm/cpu: flags2 is always uint64_t
-  target/arm/cpu: define same set of registers for aarch32 and aarch64
-  target/arm/cpu: remove inline stubs for aarch32 emulation
-  meson: add common hw files
-  hw/arm/boot: make compilation unit hw common
-  hw/arm/armv7m: prepare compilation unit to be common
-  hw/arm/digic_boards: prepare compilation unit to be common
-  hw/arm/xlnx-zynqmp: prepare compilation unit to be common
-  hw/arm/xlnx-versal: prepare compilation unit to be common
-  hw/arm: make most of the compilation units common
-
- meson.build                             |  37 +++++++-
- accel/tcg/internal-target.h             |   1 +
- accel/tcg/tb-internal.h                 |   1 -
- hw/s390x/ipl.h                          |   2 +
- include/exec/cpu_ldst.h                 |   1 +
- include/exec/exec-all.h                 |   1 +
- include/exec/poison.h                   |   4 +
- include/exec/target_page.h              |   3 +
- include/exec/{cpu-all.h => tlb-flags.h} |  38 +-------
- include/hw/core/cpu.h                   |   2 +-
- include/qemu/bswap.h                    |   2 +-
- include/system/kvm.h                    |   2 -
- linux-user/qemu.h                       |   3 +
- linux-user/sparc/target_syscall.h       |   2 +
- linux-user/syscall_defs.h               |   2 +-
- target/alpha/cpu.h                      |   4 +-
- target/arm/cpu.h                        |  40 ++------
- target/arm/internals.h                  |   1 +
- target/avr/cpu.h                        |   4 +-
- target/hexagon/cpu.h                    |   3 +-
- target/hppa/cpu.h                       |   5 +-
- target/i386/cpu.h                       |   5 +-
- target/i386/hvf/vmx.h                   |   1 +
- target/loongarch/cpu.h                  |   4 +-
- target/m68k/cpu.h                       |   4 +-
- target/microblaze/cpu.h                 |   4 +-
- target/mips/cpu.h                       |   4 +-
- target/openrisc/cpu.h                   |   4 +-
- target/ppc/cpu.h                        |   4 +-
- target/ppc/mmu-hash32.h                 |   2 +
- target/ppc/mmu-hash64.h                 |   2 +
- target/riscv/cpu.h                      |   4 +-
- target/rx/cpu.h                         |   4 +-
- target/s390x/cpu.h                      |   4 +-
- target/sh4/cpu.h                        |   4 +-
- target/sparc/cpu.h                      |   4 +-
- target/tricore/cpu.h                    |   3 +-
- target/xtensa/cpu.h                     |   4 +-
- accel/kvm/kvm-all.c                     |   5 +
- accel/tcg/cpu-exec.c                    |   3 +-
- accel/tcg/cputlb.c                      |   1 +
- accel/tcg/tb-maint.c                    |   1 +
- accel/tcg/translate-all.c               |   1 +
- accel/tcg/user-exec.c                   |   2 +
- bsd-user/elfload.c                      |   6 +-
- cpu-target.c                            |   5 +
- hw/alpha/dp264.c                        |   1 +
- hw/alpha/typhoon.c                      |   1 +
- hw/arm/armv7m.c                         |  12 ++-
- hw/arm/boot.c                           |   2 +
- hw/arm/digic_boards.c                   |   2 +-
- hw/arm/smmuv3.c                         |   1 +
- hw/arm/xlnx-versal.c                    |   2 -
- hw/arm/xlnx-zynqmp.c                    |   2 -
- hw/hppa/machine.c                       |   1 +
- hw/i386/multiboot.c                     |   1 +
- hw/i386/pc.c                            |   1 +
- hw/i386/pc_sysfw_ovmf.c                 |   1 +
- hw/i386/vapic.c                         |   1 +
- hw/loongarch/virt.c                     |   1 +
- hw/m68k/next-cube.c                     |   1 +
- hw/m68k/q800.c                          |   1 +
- hw/m68k/virt.c                          |   1 +
- hw/openrisc/boot.c                      |   1 +
- hw/pci-host/astro.c                     |   1 +
- hw/ppc/e500.c                           |   1 +
- hw/ppc/mac_newworld.c                   |   5 +-
- hw/ppc/mac_oldworld.c                   |   5 +-
- hw/ppc/ppc.c                            |   1 +
- hw/ppc/ppc_booke.c                      |   1 +
- hw/ppc/prep.c                           |   1 +
- hw/ppc/spapr_hcall.c                    |   1 +
- hw/ppc/spapr_ovec.c                     |   1 +
- hw/riscv/riscv-iommu-pci.c              |   1 +
- hw/riscv/riscv-iommu.c                  |   1 +
- hw/s390x/s390-pci-bus.c                 |   1 +
- hw/s390x/s390-pci-inst.c                |   1 +
- hw/s390x/s390-skeys.c                   |   1 +
- hw/sparc/sun4m.c                        |   7 +-
- hw/sparc64/sun4u.c                      |   7 +-
- hw/xtensa/pic_cpu.c                     |   1 +
- linux-user/elfload.c                    |   8 +-
- monitor/hmp-cmds-target.c               |   1 +
- semihosting/uaccess.c                   |   2 +-
- target/alpha/helper.c                   |   2 +
- target/arm/gdbstub64.c                  |   1 +
- target/arm/helper.c                     |   6 ++
- target/arm/hvf/hvf.c                    |   1 +
- target/arm/ptw.c                        |   1 +
- target/arm/tcg/helper-a64.c             |   1 +
- target/arm/tcg/hflags.c                 |   4 +-
- target/arm/tcg/mte_helper.c             |   1 +
- target/arm/tcg/sve_helper.c             |   1 +
- target/arm/tcg/tlb-insns.c              |   1 +
- target/avr/helper.c                     |   2 +
- target/hexagon/translate.c              |   1 +
- target/i386/arch_memory_mapping.c       |   1 +
- target/i386/helper.c                    |   2 +
- target/i386/hvf/hvf.c                   |   1 +
- target/i386/kvm/hyperv.c                |   1 +
- target/i386/kvm/kvm.c                   |   1 +
- target/i386/kvm/xen-emu.c               |   1 +
- target/i386/sev.c                       |   1 +
- target/i386/tcg/system/excp_helper.c    |   2 +
- target/i386/tcg/system/misc_helper.c    |   1 +
- target/i386/tcg/system/tcg-cpu.c        |   1 +
- target/i386/xsave_helper.c              |   1 +
- target/loongarch/cpu_helper.c           |   1 +
- target/loongarch/tcg/translate.c        |   1 +
- target/m68k/helper.c                    |   1 +
- target/microblaze/helper.c              |   1 +
- target/microblaze/mmu.c                 |   1 +
- target/mips/tcg/system/cp0_helper.c     |   1 +
- target/mips/tcg/translate.c             |   1 +
- target/openrisc/mmu.c                   |   1 +
- target/ppc/excp_helper.c                |   1 +
- target/ppc/mmu-book3s-v3.c              |   1 +
- target/ppc/mmu-hash64.c                 |   1 +
- target/ppc/mmu-radix64.c                |   1 +
- target/riscv/cpu_helper.c               |   1 +
- target/riscv/op_helper.c                |   1 +
- target/riscv/pmp.c                      |   1 +
- target/riscv/vector_helper.c            |   2 +
- target/rx/cpu.c                         |   1 +
- target/s390x/helper.c                   |   1 +
- target/s390x/ioinst.c                   |   1 +
- target/s390x/tcg/mem_helper.c           |   1 +
- target/sparc/ldst_helper.c              |   1 +
- target/sparc/mmu_helper.c               |   2 +
- target/tricore/helper.c                 |   1 +
- target/xtensa/helper.c                  |   1 +
- target/xtensa/mmu_helper.c              |   1 +
- target/xtensa/op_helper.c               |   1 +
- target/xtensa/xtensa-semi.c             |   1 +
- tcg/tcg-op-ldst.c                       |   2 +-
- hw/arm/meson.build                      | 117 ++++++++++++------------
- 136 files changed, 302 insertions(+), 205 deletions(-)
- rename include/exec/{cpu-all.h => tlb-flags.h} (78%)
-
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index 981a08e3bb3..013fcc9412a 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -28,18 +28,6 @@
+ #include "system/memory.h"
+ #endif
+ 
+-/* some important defines:
+- *
+- * HOST_BIG_ENDIAN : whether the host cpu is big endian and
+- * otherwise little endian.
+- *
+- * TARGET_BIG_ENDIAN : same for the target cpu
+- */
+-
+-#if HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN
+-#define BSWAP_NEEDED
+-#endif
+-
+ /* page related stuff */
+ #include "exec/cpu-defs.h"
+ #include "exec/target_page.h"
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 86d773add75..5d227599924 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -462,7 +462,7 @@ typedef struct {
+     abi_ulong sig[TARGET_NSIG_WORDS];
+ } target_sigset_t;
+ 
+-#ifdef BSWAP_NEEDED
++#if HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN
+ static inline void tswap_sigset(target_sigset_t *d, const target_sigset_t *s)
+ {
+     int i;
+diff --git a/bsd-user/elfload.c b/bsd-user/elfload.c
+index 833fa3bd057..3bca0cc9ede 100644
+--- a/bsd-user/elfload.c
++++ b/bsd-user/elfload.c
+@@ -44,7 +44,7 @@ static inline void memcpy_fromfs(void *to, const void *from, unsigned long n)
+     memcpy(to, from, n);
+ }
+ 
+-#ifdef BSWAP_NEEDED
++#if HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN
+ static void bswap_ehdr(struct elfhdr *ehdr)
+ {
+     bswap16s(&ehdr->e_type);            /* Object file type */
+@@ -111,7 +111,7 @@ static void bswap_note(struct elf_note *en)
+     bswap32s(&en->n_type);
+ }
+ 
+-#else /* ! BSWAP_NEEDED */
++#else
+ 
+ static void bswap_ehdr(struct elfhdr *ehdr) { }
+ static void bswap_phdr(struct elf_phdr *phdr, int phnum) { }
+@@ -119,7 +119,7 @@ static void bswap_shdr(struct elf_shdr *shdr, int shnum) { }
+ static void bswap_sym(struct elf_sym *sym) { }
+ static void bswap_note(struct elf_note *en) { }
+ 
+-#endif /* ! BSWAP_NEEDED */
++#endif /* HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN */
+ 
+ #include "elfcore.c"
+ 
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index cb3dc3ab482..624c2731a65 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -199,9 +199,7 @@ static void ppc_core99_init(MachineState *machine)
+     if (machine->kernel_filename) {
+         int bswap_needed = 0;
+ 
+-#ifdef BSWAP_NEEDED
+-        bswap_needed = 1;
+-#endif
++        bswap_needed = HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN;
+         kernel_base = KERNEL_LOAD_ADDR;
+         kernel_size = load_elf(machine->kernel_filename, NULL,
+                                translate_kernel_address, NULL, NULL, NULL,
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index 0dbcea035c3..439953fc29e 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -155,9 +155,7 @@ static void ppc_heathrow_init(MachineState *machine)
+     if (machine->kernel_filename) {
+         int bswap_needed = 0;
+ 
+-#ifdef BSWAP_NEEDED
+-        bswap_needed = 1;
+-#endif
++        bswap_needed = HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN;
+         kernel_base = KERNEL_LOAD_ADDR;
+         kernel_size = load_elf(machine->kernel_filename, NULL,
+                                translate_kernel_address, NULL, NULL, NULL,
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index a48d3622c5a..d27a9b693a5 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -235,11 +235,7 @@ static unsigned long sun4m_load_kernel(const char *kernel_filename,
+     if (linux_boot) {
+         int bswap_needed;
+ 
+-#ifdef BSWAP_NEEDED
+-        bswap_needed = 1;
+-#else
+-        bswap_needed = 0;
+-#endif
++        bswap_needed = HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN;
+         kernel_size = load_elf(kernel_filename, NULL,
+                                translate_kernel_address, NULL,
+                                NULL, NULL, NULL, NULL,
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index 8ab5cf0461f..c7bccf584e6 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -170,11 +170,7 @@ static uint64_t sun4u_load_kernel(const char *kernel_filename,
+     if (linux_boot) {
+         int bswap_needed;
+ 
+-#ifdef BSWAP_NEEDED
+-        bswap_needed = 1;
+-#else
+-        bswap_needed = 0;
+-#endif
++        bswap_needed = HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN;
+         kernel_size = load_elf(kernel_filename, NULL, NULL, NULL, kernel_entry,
+                                kernel_addr, &kernel_top, NULL,
+                                ELFDATA2MSB, EM_SPARCV9, 0, 0);
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index f54054dce3d..99811af5e7b 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -2122,7 +2122,7 @@ static inline void memcpy_fromfs(void * to, const void * from, unsigned long n)
+     memcpy(to, from, n);
+ }
+ 
+-#ifdef BSWAP_NEEDED
++#if HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN
+ static void bswap_ehdr(struct elfhdr *ehdr)
+ {
+     bswap16s(&ehdr->e_type);            /* Object file type */
+@@ -3144,7 +3144,7 @@ static bool parse_elf_properties(const ImageSource *src,
+      * The contents of a valid PT_GNU_PROPERTY is a sequence of uint32_t.
+      * Swap most of them now, beyond the header and namesz.
+      */
+-#ifdef BSWAP_NEEDED
++#if HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN
+     for (int i = 4; i < n / 4; i++) {
+         bswap32s(note.data + i);
+     }
+@@ -4000,7 +4000,7 @@ struct target_elf_prpsinfo {
+     char    pr_psargs[ELF_PRARGSZ]; /* initial part of arg list */
+ };
+ 
+-#ifdef BSWAP_NEEDED
++#if HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN
+ static void bswap_prstatus(struct target_elf_prstatus *prstatus)
+ {
+     prstatus->pr_info.si_signo = tswap32(prstatus->pr_info.si_signo);
+@@ -4039,7 +4039,7 @@ static void bswap_note(struct elf_note *en)
+ static inline void bswap_prstatus(struct target_elf_prstatus *p) { }
+ static inline void bswap_psinfo(struct target_elf_prpsinfo *p) {}
+ static inline void bswap_note(struct elf_note *en) { }
+-#endif /* BSWAP_NEEDED */
++#endif /* HOST_BIG_ENDIAN != TARGET_BIG_ENDIAN */
+ 
+ /*
+  * Calculate file (dump) size of given memory region.
 -- 
 2.39.5
 
