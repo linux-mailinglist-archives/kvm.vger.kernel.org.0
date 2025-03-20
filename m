@@ -1,76 +1,76 @@
-Return-Path: <kvm+bounces-41616-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41617-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9695FA6B0DB
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 23:32:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09AD4A6B0D7
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 23:32:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 242009824D8
-	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 22:31:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7712916D03E
+	for <lists+kvm@lfdr.de>; Thu, 20 Mar 2025 22:31:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B88B922A7F1;
-	Thu, 20 Mar 2025 22:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B88E422D4D4;
+	Thu, 20 Mar 2025 22:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jYjtQq+j"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KKOdtcuR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88F9422A7E5
-	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 22:30:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73E9322CBD5
+	for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 22:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742509828; cv=none; b=C+ezQdBzSAbyDevFWeCBG/WUA3NK5Tyd3r/7dZ34ShwT+WvcNKwIGWdenSljrCMht4WlPuJKQIRCCoxlsYi8xQxdRezzrFUZKgaCUmK4GQ8K3ubUHCugOfDrY4bW63CA5Hk2dozHP8kFaqTDSra0mwCb8KBIPh3+yMPDh5vEA3A=
+	t=1742509828; cv=none; b=cE0zMTDY4CesypBn154Mm20Vd2ky4656QCxpSf8meTYnSqfApsEU63ANWIzrKm59KxllQehLv3eAV/IcAoHRll2ysuNGgkF2dpnYJQtTKVGftDpBqYIOeIrShIn1n7ZNa/LG0jnwj/sHip7C2MrBFyM8OvORdH1oGX86F8WVG34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1742509828; c=relaxed/simple;
-	bh=1v/Wc/sz3jGZAAU0A2kkqCFlelDJtNXufKxX1y5icdo=;
+	bh=KuR3P7dku+j4RJkQjcmMbQhWsF+ZTERAUSX8qarQPTo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bkDboMqHE1fLTKd1KqpgREKZE4WkD3WCsTp4AMcC33v7wjZ+P3yhJzRC9m4HmpuUyToxXNcvClpKA0VwMkzcPD6EFMuQDIvGwvSNGcNxKS8KStLdtZofTlTgmIwcU6xcQwyqZsu+PqW7IS9O+stfMItfTG65cN3Rc3VuAwEBJYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=jYjtQq+j; arc=none smtp.client-ip=209.85.214.174
+	 MIME-Version; b=Krv82aLyfpU6QGqHShAlvfHoqxHFJUziJiWFBIJLXdLzUy7KqjGUDuTx5d8/wievZWumWf0enjlRyYaOXTvRkNCp0/qw5c/xTYvDAV2WkIoRnRgPkMgFn7M7Up6xz7TAdYeYBFpKmxDGfnsBD0IgsFDScZZFsiyfJsid1IK7Iio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KKOdtcuR; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-223f4c06e9fso22984575ad.1
-        for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 15:30:26 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-225a28a511eso29432605ad.1
+        for <kvm@vger.kernel.org>; Thu, 20 Mar 2025 15:30:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1742509826; x=1743114626; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1742509827; x=1743114627; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=avokc7PtwidAIhGAXsNkScUiPBrKycg0jtKiMA4KDgs=;
-        b=jYjtQq+jR2xyu4ruixS3sT6CFROjGoyP4VmEvija5KH1FP1xhELA3j5UgayauaLCnl
-         pjYw71vQPkwjzQS1XcFxhZhGnpUw7mH/95Lst6XGOqnfTRaL2VdWea9Ut0V6uFGLg8vQ
-         d6uqnvZ3oIxrt6ZlajbGb6fCwJA5g6Em/gxE5GZl7tmgQEO/7cLQmnewZUJ4ptUESS2n
-         JMjLLZntWnbVvPyf1GOCsAPXimoPMeXF5XQT8/kTtz3MKh9KFSn+i1Jko50uLsnTyJ9v
-         fC2Tyu8jXUO6m9c7JxnNKzruvtq3BLdRn5B7+eoV61jBA/GlnNXfMcRi1VURsKw6sufY
-         iTNg==
+        bh=z/4XryTOWm6w/MZRVd6kifOMES+Py2IKRoyOKSLgV8g=;
+        b=KKOdtcuRhZKL77R0twU8Fjbp69AiGVsFAlM9EEyu+7nufhp4qBD9Y2gnoTa/gPypWY
+         AHNWiVlBEWd/kzJHxSwGAhA+vsMdJMs12vWuuQT6eBG7h0kRXd4amgHhVu5/HSBj1PCb
+         v/eGnU0Kfmcn5my5NEGT90qetNv1bad28ZsW1VkgLr5zDWV9j9IQg/La+TBke/LHTRn8
+         99TIGgH6AT/dlJw0Y6mIUzp15pGVrCGvboTScMcbQ0g07qv0WNhwwjSMKEHyTeaiWTRS
+         4kdlIbcz5VefSYXM2v43S26G+nNnbjpWR+4ZI2JPUie5+yGKpmcXyQ/VoHsPdR+rCMkj
+         j3TQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742509826; x=1743114626;
+        d=1e100.net; s=20230601; t=1742509827; x=1743114627;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=avokc7PtwidAIhGAXsNkScUiPBrKycg0jtKiMA4KDgs=;
-        b=hOp6nqMjULn3G3Pm0xpZZt7PjGHTxV4zB9k3OMMJY/Sw+b5HsqboFrw9MQ66e3sXqO
-         DkVdT8YqM8Ebj5QheAP7m6WF21o8y/4td/lj689x0F9OJ3t8seDy46Af0tvQAdhFqV1m
-         bBTjbliK6ge4DkeI7/aMM7O2tu6pQjLaGOex870qbOThcxU9auMLDewJaoKYwhptpEl4
-         i2TYvb01p9oevuS6fLBFpRG7kjRbIFoWhL/6he+rZhYFfrVwthmhh0YLh1TP3h2YOPXf
-         BeckvecRlNrn0SqHyaf6LGpFny8Dj+OcIqXjWVIEXsOROID7R6V85uDFAoOa1iZSrM1n
-         HGSw==
-X-Gm-Message-State: AOJu0YzNGRkCr45lllONhNIoGtrbPOiarlcD7t9qWyjwGARbhbovhUaX
-	HO5C0S6mpZTxOmaB5Ky+3CYhVg9S3ZWO1F6Kas8fjOGYTdmttCIoNYzy8ugmPs0=
-X-Gm-Gg: ASbGnctQxSpoGsQQYoY6bCSt+qcH78FLC5aN4aD1rdZNM6lnnMAZzpxSoxyz4fLVsRG
-	yXGreI+9wKjetGTm1FGf72RkpI19FVOZ7PWptGrhkKSjYQZikVruHlYwxCAn4N/ncwZZshFKX+n
-	nO8zhStpOb8QNKx7MBP6srWoW15Ar0yZAYeYnwJ4jTwpbEskkzWZEtggvjd1deWQpCUXB0zp5u6
-	CkWW4oSyXCBrpfb20nkiI83KHgL+IdD54Rstni+g4dbmG5WqSgiw3kT6Kc+x8CaJOqaunnryVkX
-	PK/qB1DSqzOUzU4Pr7J/QqnZ030Ei85wavE2F3l3c8xL
-X-Google-Smtp-Source: AGHT+IGEEKE91spkEXTcAVV49R6+3YhJ1RqwkB0C8ZoyykH1H01x06i5gZ0hciM5xTE4CtOtK2OMPw==
-X-Received: by 2002:a17:902:ef4f:b0:21f:1348:10e6 with SMTP id d9443c01a7336-227806cfff4mr22432425ad.13.1742509825855;
-        Thu, 20 Mar 2025 15:30:25 -0700 (PDT)
+        bh=z/4XryTOWm6w/MZRVd6kifOMES+Py2IKRoyOKSLgV8g=;
+        b=ERQWAemQBbF0dDa41NJT28RCyjXPW8sWcHIgQyhbZTLSX8ofryegaXMj3kXUWNq4Vm
+         VztY1TsmPu+axZqsooSo9d7cP3U1m+pX1yjWXoL3o4VJSDsHF+REkBZs7sfXTwTyjTRB
+         zsE8DuO8MLSQQIFfj2Oz/9tCHKLH/J+mDHDTJ3O6pFwP2mpPMdRrC84X24ITbbht+58W
+         p01DaSBy+dB28TJwBdUgZK74NdhPnPUEL01yo4WgBUCLoFs8ZVxlV9w/AVgJGgW/AGi0
+         YCqkiAAjb8OoJ0O/JbxPAVb/cjNfmv1deuH0D/a57ErUiC1lcHFfBdx/rCsIC0psCsck
+         wrBw==
+X-Gm-Message-State: AOJu0Yzl8qafRanKUaucC9OXbg/oRCUKseivA1uzIEcTxduMNdb04TGD
+	z4udm4sd1XF/CTL2kHWfzdkck9/BQVuC28lgTwTL1+Nmwtmz2bFfuLaWN84lMX4=
+X-Gm-Gg: ASbGncvRmo8+eDHzEF9JTe5jPUH3or5JCfM7r0vCmYCFysGrpbgtb+KKjOTJR5GokYn
+	8Zt8sDVhQs/57EtPf+hTe6aNP9Lko97YKILROeJFMr6ufhZv3DSDXBVB20tqwkN70wYYBHh5PxT
+	InpJ2ykynwHUTRLQvR5hZZNRRMG+Zb8ySskrc+1zTDSbXJhk5wt8pcnQdms1pRuRGiImodrN8/3
+	32ODjeXcWVc0kx2I8X7x7y3JsW/IEYO7CHuLc/ZTePK+K9ygPFloKm9H5xurwR+XGq2IMuGYCg7
+	x3NOfewj1zTYhZ0MgQJlhG5K6pAj+IMHOSaoK9xEe0ce
+X-Google-Smtp-Source: AGHT+IEsmAbnRKeqDLb8Obh57hU4D8dne9W2d0POjgz1H5aMyJvN3a79EMmmYiR7WIxM0NHx2HlH/A==
+X-Received: by 2002:a17:903:41c6:b0:215:b1a3:4701 with SMTP id d9443c01a7336-22780c7ab87mr14047555ad.13.1742509826750;
+        Thu, 20 Mar 2025 15:30:26 -0700 (PDT)
 Received: from pc.. ([38.39.164.180])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22780f4581csm3370145ad.59.2025.03.20.15.30.25
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22780f4581csm3370145ad.59.2025.03.20.15.30.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Mar 2025 15:30:25 -0700 (PDT)
+        Thu, 20 Mar 2025 15:30:26 -0700 (PDT)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: kvm@vger.kernel.org,
@@ -81,9 +81,9 @@ Cc: kvm@vger.kernel.org,
 	Richard Henderson <richard.henderson@linaro.org>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v2 13/30] accel/tcg: fix missing includes for TARGET_HAS_PRECISE_SMC
-Date: Thu, 20 Mar 2025 15:29:45 -0700
-Message-Id: <20250320223002.2915728-14-pierrick.bouvier@linaro.org>
+Subject: [PATCH v2 14/30] exec/cpu-all: remove cpu include
+Date: Thu, 20 Mar 2025 15:29:46 -0700
+Message-Id: <20250320223002.2915728-15-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250320223002.2915728-1-pierrick.bouvier@linaro.org>
 References: <20250320223002.2915728-1-pierrick.bouvier@linaro.org>
@@ -95,55 +95,38 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We prepare to remove cpu.h from cpu-all.h, which will transitively
-remove it from accel/tcg/tb-internal.h, and thus from most of tcg
-compilation units.
-
-Note: this was caught by a test regression for s390x-softmmu.
+Now we made sure important defines are included using their direct
+path, we can remove cpu.h from cpu-all.h.
 
 Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 ---
- include/exec/poison.h | 1 +
- accel/tcg/tb-maint.c  | 1 +
- accel/tcg/user-exec.c | 1 +
- 3 files changed, 3 insertions(+)
+ include/exec/cpu-all.h | 2 --
+ accel/tcg/cpu-exec.c   | 1 +
+ 2 files changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/include/exec/poison.h b/include/exec/poison.h
-index 964cbd5081c..c72f56df921 100644
---- a/include/exec/poison.h
-+++ b/include/exec/poison.h
-@@ -38,6 +38,7 @@
- #pragma GCC poison TARGET_SUPPORTS_MTTCG
- #pragma GCC poison TARGET_BIG_ENDIAN
- #pragma GCC poison TCG_GUEST_DEFAULT_MO
-+#pragma GCC poison TARGET_HAS_PRECISE_SMC
- #pragma GCC poison BSWAP_NEEDED
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index d4d05d82315..da8f5dd10c5 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -21,6 +21,4 @@
  
- #pragma GCC poison TARGET_LONG_BITS
-diff --git a/accel/tcg/tb-maint.c b/accel/tcg/tb-maint.c
-index d5899ad0475..efe90d2d695 100644
---- a/accel/tcg/tb-maint.c
-+++ b/accel/tcg/tb-maint.c
-@@ -20,6 +20,7 @@
- #include "qemu/osdep.h"
- #include "qemu/interval-tree.h"
- #include "qemu/qtree.h"
-+#include "cpu.h"
- #include "exec/cputlb.h"
+ #include "exec/cpu-common.h"
+ 
+-#include "cpu.h"
+-
+ #endif /* CPU_ALL_H */
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index 207416e0212..813113c51ea 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -36,6 +36,7 @@
  #include "exec/log.h"
- #include "exec/exec-all.h"
-diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
-index 667c5e03543..9d82d22bf40 100644
---- a/accel/tcg/user-exec.c
-+++ b/accel/tcg/user-exec.c
-@@ -19,6 +19,7 @@
- #include "qemu/osdep.h"
- #include "accel/tcg/cpu-ops.h"
- #include "disas/disas.h"
+ #include "qemu/main-loop.h"
+ #include "exec/cpu-all.h"
 +#include "cpu.h"
- #include "exec/vaddr.h"
- #include "exec/exec-all.h"
- #include "exec/tlb-flags.h"
+ #include "exec/icount.h"
+ #include "exec/replay-core.h"
+ #include "system/tcg.h"
 -- 
 2.39.5
 
