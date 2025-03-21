@@ -1,202 +1,274 @@
-Return-Path: <kvm+bounces-41645-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41646-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D37EA6B3AA
-	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 05:28:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07F08A6B3AE
+	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 05:30:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F8DF3AAF59
-	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 04:27:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CEFC483114
+	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 04:30:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADDB91E7C0B;
-	Fri, 21 Mar 2025 04:27:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FFE61E990E;
+	Fri, 21 Mar 2025 04:30:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="SEODApSB"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="DVEpDhE+"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2082.outbound.protection.outlook.com [40.107.220.82])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24D80B664
-	for <kvm@vger.kernel.org>; Fri, 21 Mar 2025 04:27:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.82
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742531264; cv=fail; b=iWduDxb8KXl4C5HfJPxZjhykmjeyGg56yzArskFNq/hCyvz/fRq2EGzvmCvfwky4tgh3TZLiORfyucfCkBHHDw8hI/7khtkxSa67tDsoqVdXMM7TxKJHze7ox7zB/6gbgVwO8lFBkLMd84NuQt0RQLqewoJ51P/lreKVdCjeIHc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742531264; c=relaxed/simple;
-	bh=sxY02XxyB88e/YCuiVDBu2AoJchP/FpKA2dfuXvcApI=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u/U3yzwmN9JOgC/YIm8PKb1JqRyrQAUn8Rtat98tMoJ16RiaN1j+tnMAH4cH+6VZcd4yLI1x4YiOhow5v2v7RFbNMZlXl8J/Hh7Vzv8u8MudMfqfMpNiZGUvUP6+I8kMoJcNdeyQEHiVlywIR5bKtu1peSKY54+4o/lqfpdKgIs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=SEODApSB; arc=fail smtp.client-ip=40.107.220.82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ORY9q7+XIw65Eg+49WeQH3qEei03GFLPbO2T8NEK94jFrc0wPN7VzruGwwq52hgxJCXBxUqncMju54tKSd2ZP+XTYQmKygh1k2vd93zmtgjO2EzjMoFylPqe+fgv8gFPBL/7CKNP1BN9MvQ5oJGfibAwXOmTFVHifFypeZ/Li9g33nRk0emzE4dCb9RXch2poGKAnS7jjikkxiCPhyiq2NsZhToL9B1J4LhAFfv9MKN0/60h40jHuCZblalLc+NHc2B25B6/ROYXqPAnzKhtq8EVV68OKlHbnK/o7MXHVFvz60v3aoIIKpOnnPSAo/NWe3Gg5zURQPSXjYjXb/b1oQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YSnVlVSN6/MGN0WfsI04Qx88uow+UwZ9kgkqBXVBqzc=;
- b=ginGWeyfJXox8rLebm7Jzn5dtbG3eWZsQpBwsbdJcOg94HVubSk4ZdBmh/mO06BQbG4MbswdSn3RVQ+1crNAEFVdSfessZ1PEhEjxa7GbVk7JSY6lwDeHI/KdtwPgCGwfw5NHvvMIqAnTS6mH+WyoOQghKlaL4Mlw9xKZiYIBebkwcb4GfOFkq+RDROLPwHvrGFEZHi692SUo6/GtMqzpGPhY3k7La/FKbbUCCz5PwNWrHR6i5YqS2MSJVQvCN9Rct//jCI5jRr+vpIkdRg/5rCTaRUcklFL+Bc2x3K8JI8j0h4mmtDw2TXsWH2OQR+3ARFRFmif+fikmOcf2vtc1w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.233) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YSnVlVSN6/MGN0WfsI04Qx88uow+UwZ9kgkqBXVBqzc=;
- b=SEODApSBlMASmgf4EKe3mtO0ty/g4PxbxMncVMKr6EASg2Md6BuVeiFJEZjFjSIw0GeaT/ESWI0cfHexYCSi4XgIqB5s7iBXHB/qwboCScqIjVMnMrEU1s3w2q92hGG0F9iDwoOca/EW/HRB/wKhHYSR//s7aDpBO8w8vRy0quDmeWxKwoTI7xu09VeZOvqrWoaK6VUHkztHlezyXqElh64zukL6kg6CN+RLEMU1cViQF6bebaJOVttK6PkHWNbhYnafcW6Uf8TmL08MgPUjfrQ4W1W0+Ai50y2Avk6HHXl4uUNWmUElbPNs9GebQUZnkQp2zRrHiikj70StezshHQ==
-Received: from MW2PR2101CA0009.namprd21.prod.outlook.com (2603:10b6:302:1::22)
- by LV8PR12MB9419.namprd12.prod.outlook.com (2603:10b6:408:206::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.36; Fri, 21 Mar
- 2025 04:27:38 +0000
-Received: from SJ1PEPF000023D2.namprd02.prod.outlook.com
- (2603:10b6:302:1:cafe::be) by MW2PR2101CA0009.outlook.office365.com
- (2603:10b6:302:1::22) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8534.20 via Frontend Transport; Fri,
- 21 Mar 2025 04:27:37 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.233) by
- SJ1PEPF000023D2.mail.protection.outlook.com (10.167.244.9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8534.20 via Frontend Transport; Fri, 21 Mar 2025 04:27:37 +0000
-Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
- (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 20 Mar
- 2025 21:27:35 -0700
-Received: from drhqmail203.nvidia.com (10.126.190.182) by
- drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Thu, 20 Mar 2025 21:27:34 -0700
-Received: from Asurada-Nvidia (10.127.8.13) by mail.nvidia.com
- (10.126.190.182) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14 via Frontend
- Transport; Thu, 20 Mar 2025 21:27:33 -0700
-Date: Thu, 20 Mar 2025 21:27:32 -0700
-From: Nicolin Chen <nicolinc@nvidia.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-CC: Yi Liu <yi.l.liu@intel.com>, <alex.williamson@redhat.com>,
-	<kevin.tian@intel.com>, <eric.auger@redhat.com>, <kvm@vger.kernel.org>,
-	<chao.p.peng@linux.intel.com>, <zhenzhong.duan@intel.com>,
-	<willy@infradead.org>, <zhangfei.gao@linaro.org>, <vasant.hegde@amd.com>
-Subject: Re: [PATCH v8 4/5] iommufd: Extend IOMMU_GET_HW_INFO to report PASID
- capability
-Message-ID: <Z9zqtA7l4aJPRhL2@Asurada-Nvidia>
-References: <20250313124753.185090-1-yi.l.liu@intel.com>
- <20250313124753.185090-5-yi.l.liu@intel.com>
- <Z9sFteIJ70PicRHB@Asurada-Nvidia>
- <444284f3-2dae-4aa9-a897-78a36e1be3ca@intel.com>
- <Z9xGpLRE8wPHlUAV@Asurada-Nvidia>
- <20250320185726.GF206770@nvidia.com>
- <Z9x0AFJkrfWMGLsV@Asurada-Nvidia>
- <20250320234057.GS206770@nvidia.com>
- <Z9ypThcqtCQwp2ps@Asurada-Nvidia>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D74C1B664;
+	Fri, 21 Mar 2025 04:29:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742531405; cv=none; b=Ue468iubYQA9UPxFSJ4Uu7lxzTIcRYrqWxp9+OCH1jaK9cgEwlj3z+A5WhA8htKnhUNx5vW/qM4LaqqRbIGgy8p/1PddCBBZT8/gBgSPpOnBZId17Zzjiq6hoOA0fvsGr5tvdCBwTx3X17K0XXLbD1CzKEIlPHIR48m2O15IHrg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742531405; c=relaxed/simple;
+	bh=K3uz40tk8l4FQvHosvvh3hDNWs8nec3XOBvNz8AMz6A=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KWJYy6JsWg7t0dkchcM/ncUHkhNtVw78fd0cJoqsNLZglJUD6CST6g2G+cy1kC2Co1Y5KA/B6T+h7s/bcWKK7QoZglepcW7n3NSooK3+4CyGTUYBAh6fxnZdEkl1RwlDcODvdjIcFy/3VfjEFdGvYUcGC9+aOdwFClAlMgdaiO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=DVEpDhE+; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1742531397;
+	bh=9LPlOVa7EM6+dhZWS2UYDtcUeCmZ1BJ3Bl4/7DTmRgg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DVEpDhE+fL2UmmQfJw5P5is/GrG4YuxFubvQ0Q0wxwSkYRtQHcHoJiVZJxNjNDtsx
+	 02gaNKl2nL+yb4coNGY6n8Ps/U32T2k/vqUAgI00S6AsHEGy3z43maGl1TWwOJiMRQ
+	 86e2UDR+8W5PW8lxqOOpHe4CRQvvSRVPmq7Y0oJ4DMEcqug0d7PV1G8ouGU7UGdtQ5
+	 v0ifiUN2AfzTDvb1qjcwNVLPfvxqJCGuj/01wEVjzoPSAN3l2BKrdF/C1POsH+rPU3
+	 jhM4yM3AoY7Hc9HX4GTKt7zsZVsk1jq89TwPcTPLfHYYzy+6NOpixCY/SaK5Uk7hsy
+	 ibcgsKxRBKe0w==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4ZJqH84gNkz4wnp;
+	Fri, 21 Mar 2025 15:29:56 +1100 (AEDT)
+Date: Fri, 21 Mar 2025 15:29:55 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon
+ <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Christoffer Dall <cdall@cs.columbia.edu>, Marc Zyngier <maz@kernel.org>,
+ Douglas Anderson <dianders@chromium.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, KVM
+ <kvm@vger.kernel.org>
+Subject: Re: linux-next: manual merge of the kvm-arm tree with the arm64
+ tree
+Message-ID: <20250321152955.18426a1d@canb.auug.org.au>
+In-Reply-To: <20250317171701.71c8677a@canb.auug.org.au>
+References: <20250317171701.71c8677a@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <Z9ypThcqtCQwp2ps@Asurada-Nvidia>
-X-NV-OnPremToCloud: AnonymousSubmission
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF000023D2:EE_|LV8PR12MB9419:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6b273cde-cbc2-4e19-b92b-08dd6830b5d0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|7416014|376014|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?MSbIo3F4+5PyIbCcwQn2C7yaCwuMXhjgSrCT2WKQ/w0FPrINzRKrTmKQELQv?=
- =?us-ascii?Q?tXJgzapgT3P2Lj1j09HyyDDvXzSH683KUTRRLRRyNYUKpkIdi6ABOUxpfejk?=
- =?us-ascii?Q?JuAtloapCMLHKoYFqyxD+trpvap/PBs8EN3rdw7K0T9fn1E8TE0iLdEk36zU?=
- =?us-ascii?Q?NeFDklhaoX7e7B7f9xDr2eXmstLmOJWoCu6rfCILMgbB6H24pK1r+RqG0AgN?=
- =?us-ascii?Q?9zw6Y9OxccEterv1/gwsjZrYVm11bl5yuaZN7cLLcdJ/zlnD56YMH00X/m1E?=
- =?us-ascii?Q?K2yZ4TdmnXQ2RQaeWTzcZ+EX4qmUC/8qXCSLQPo4SBoIGujmRkh7fbPbJLf5?=
- =?us-ascii?Q?X9iPnUqh2+ItPmamVlPjBD5Pbb4HNejJJH7fP6vz0yb1w6wkZFZ1G7y4AJAX?=
- =?us-ascii?Q?rGVs8OXiX6X4Gv7TkMQ21D3pwBPMD3rwP4XGZidbYoYliT0KuCBZ7KaC6lVh?=
- =?us-ascii?Q?C1qQi1qLSDrJoAHqAeZMiAHvwdZDlfPU395lllEkn3p3ZDJqxxEhf+cwViXH?=
- =?us-ascii?Q?/wfj8lCOJjqD3EJnKH7ba7ciTHHICcEyLmKVn3bRCAfcBVt7HlSCHQWQXvxb?=
- =?us-ascii?Q?ORPH0IPsuTElJeePCekIW7Zhy03ZPlFawN0ZtcnlFYzIhko9SS+VyujcwXxH?=
- =?us-ascii?Q?MmVwpIdrZre5RNZnhz6ZuxowCC7p9z1mxkMLy/kLll4il2y1TQR4i/kCCQj7?=
- =?us-ascii?Q?R35qYzuQJEnrsgSz97wMDAhMaYTRpQWw3zxn58olmbeg+C1ECMNhcrwYhMXD?=
- =?us-ascii?Q?ackYsO34/Xjqdiuj2SwZ6YyIuOlgcC63N1LzSOjr+CsfdIYzDF02uivO26Kt?=
- =?us-ascii?Q?rpzPZLtWivx/VwOEjrNpJ9kMYjO8C9/fTGjHvg57PA5mCUke73fEwemDGgxJ?=
- =?us-ascii?Q?BCKbXKlQ+EeDs6TXJy+zgzb7z0cvo2sbjmGuEo/yB4JucFCX1RXFoaiP9KFb?=
- =?us-ascii?Q?xXY4vYHUENo7rxZ5EI1sw3ltlp0iX34Sgy/jorVmXxxr6iFiRlikiS3e3x/2?=
- =?us-ascii?Q?z4aR6jJ0LJ4d7QTC9TNdep84aNkvimPwyfUPHgXh6++CqahEykmPuxMC6Hqm?=
- =?us-ascii?Q?smSxFJs1GTh14cjG+CG0BQLkqs2Z3bQfyFDF4I1NPlgIBdr+0G5YeW0IaT/3?=
- =?us-ascii?Q?V0njIxB2XNyeSJ1JEeRFosnKQLIdOx/DcS9GdJWFdJqhTm33rzwzybAtxou6?=
- =?us-ascii?Q?7SwLnHL+alt+JBbtX0Ui3CeLNf7m9EqhvGWzz/j73jqL+b99/5WOT+BB62Xj?=
- =?us-ascii?Q?iH+uKfSPM1z+VmLtX4fQmB8IMfgkNGMmCm1IMv8TPQH42+KdrAiUK0Vday1Y?=
- =?us-ascii?Q?C3ECx+3tuIdxknqoxb0f9AITtbINJ29LKozZ6XMMn+7ooHXVX66rV1wf/oBo?=
- =?us-ascii?Q?OC4oJghCZtETatvjNMWqnnZNwBMiKgGrNYHN7Fid97vlo/C/ZWiE5MwWOyKJ?=
- =?us-ascii?Q?hNbYqrmLxoDASIng2kNemmBQ2GZuV1kvQFsm90ejco/s0OUOXkSArdgET7ey?=
- =?us-ascii?Q?jTsn+Yr60xWO71s=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(7416014)(376014)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Mar 2025 04:27:37.4396
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6b273cde-cbc2-4e19-b92b-08dd6830b5d0
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF000023D2.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9419
+Content-Type: multipart/signed; boundary="Sig_/W=n.2.FLSeUV4GP3L4eaeWE";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Thu, Mar 20, 2025 at 04:48:33PM -0700, Nicolin Chen wrote:
-> > > Also, this patch polls two IOMMU caps out of pci_pasid_status()
-> > > that is a per device function. Is this okay?
-> > 
-> > I think so, the hw_info is a per-device operation
-> > 
-> > > Can it end up with two devices (one has PASID; the other doesn't)
-> > > behind the same IOMMU reporting two different sets of
-> > > out_capabilities, which were supposed to be the same since it the
-> > > same IOMMU HW?
-> > 
-> > Yes it can report differences, but that is OK as the iommu is not
-> > required to be uniform across all devices? Did you mean something else?
-> 
-> Hmm, I thought hw_info is all about a single IOMMU instance.
-> 
-> Although the ioctl is per-device operation, it feels odd that
-> different devices behind the same IOMMU will return different
-> copies of "IOMMU" hw_info for that IOMMU HW..
+--Sig_/W=n.2.FLSeUV4GP3L4eaeWE
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Reading this further, I found that Yi did report VFIO device cap
-for PASID via a VFIO ioctl in the early versions but switched to
-using the IOMMU_GET_HW_INFO since v3 (nearly a year ago). So, I
-see that's a made decision.
+Hi all,
 
-Given that our IOMMU_GET_HW_INFO defines this:
-  * Query an iommu type specific hardware information data from an iommu behind
-  * a given device that has been bound to iommufd. This hardware info data will
-  * be used to sync capabilities between the virtual iommu and the physical
-  * iommu, e.g. a nested translation setup needs to check the hardware info, so
-  * a guest stage-1 page table can be compatible with the physical iommu.
+On Mon, 17 Mar 2025 17:17:01 +1100 Stephen Rothwell <sfr@canb.auug.org.au> =
+wrote:
+>=20
+> Today's linux-next merge of the kvm-arm tree got a conflict in:
+>=20
+>   arch/arm64/kernel/proton-pack.c
+>=20
+> between commits:
+>=20
+>   e403e8538359 ("arm64: errata: Assume that unknown CPUs _are_ vulnerable=
+ to Spectre BHB")
+>   a5951389e58d ("arm64: errata: Add newer ARM cores to the spectre_bhb_lo=
+op_affected() lists")
+>=20
+> from the arm64 tree and commit:
+>=20
+>   e3121298c7fc ("arm64: Modify _midr_range() functions to read MIDR/REVID=
+R internally")
+>=20
+> from the kvm-arm tree.
+>=20
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
+>=20
+>=20
+> diff --cc arch/arm64/kernel/proton-pack.c
+> index 0f51fd10b4b0,a573fa40d4b6..000000000000
+> --- a/arch/arm64/kernel/proton-pack.c
+> +++ b/arch/arm64/kernel/proton-pack.c
+> @@@ -845,86 -845,52 +845,86 @@@ static unsigned long system_bhb_mitigat
+>    * This must be called with SCOPE_LOCAL_CPU for each type of CPU, befor=
+e any
+>    * SCOPE_SYSTEM call will give the right answer.
+>    */
+>  -u8 spectre_bhb_loop_affected(int scope)
+>  +static bool is_spectre_bhb_safe(int scope)
+>  +{
+>  +	static const struct midr_range spectre_bhb_safe_list[] =3D {
+>  +		MIDR_ALL_VERSIONS(MIDR_CORTEX_A35),
+>  +		MIDR_ALL_VERSIONS(MIDR_CORTEX_A53),
+>  +		MIDR_ALL_VERSIONS(MIDR_CORTEX_A55),
+>  +		MIDR_ALL_VERSIONS(MIDR_CORTEX_A510),
+>  +		MIDR_ALL_VERSIONS(MIDR_CORTEX_A520),
+>  +		MIDR_ALL_VERSIONS(MIDR_BRAHMA_B53),
+>  +		MIDR_ALL_VERSIONS(MIDR_QCOM_KRYO_2XX_SILVER),
+>  +		MIDR_ALL_VERSIONS(MIDR_QCOM_KRYO_3XX_SILVER),
+>  +		MIDR_ALL_VERSIONS(MIDR_QCOM_KRYO_4XX_SILVER),
+>  +		{},
+>  +	};
+>  +	static bool all_safe =3D true;
+>  +
+>  +	if (scope !=3D SCOPE_LOCAL_CPU)
+>  +		return all_safe;
+>  +
+> - 	if (is_midr_in_range_list(read_cpuid_id(), spectre_bhb_safe_list))
+> ++	if (is_midr_in_range_list(spectre_bhb_safe_list))
+>  +		return true;
+>  +
+>  +	all_safe =3D false;
+>  +
+>  +	return false;
+>  +}
+>  +
+>  +static u8 spectre_bhb_loop_affected(void)
+>   {
+>   	u8 k =3D 0;
+>  -	static u8 max_bhb_k;
+>  =20
+>  -	if (scope =3D=3D SCOPE_LOCAL_CPU) {
+>  -		static const struct midr_range spectre_bhb_k32_list[] =3D {
+>  -			MIDR_ALL_VERSIONS(MIDR_CORTEX_A78),
+>  -			MIDR_ALL_VERSIONS(MIDR_CORTEX_A78AE),
+>  -			MIDR_ALL_VERSIONS(MIDR_CORTEX_A78C),
+>  -			MIDR_ALL_VERSIONS(MIDR_CORTEX_X1),
+>  -			MIDR_ALL_VERSIONS(MIDR_CORTEX_A710),
+>  -			MIDR_ALL_VERSIONS(MIDR_CORTEX_X2),
+>  -			MIDR_ALL_VERSIONS(MIDR_NEOVERSE_N2),
+>  -			MIDR_ALL_VERSIONS(MIDR_NEOVERSE_V1),
+>  -			{},
+>  -		};
+>  -		static const struct midr_range spectre_bhb_k24_list[] =3D {
+>  -			MIDR_ALL_VERSIONS(MIDR_CORTEX_A76),
+>  -			MIDR_ALL_VERSIONS(MIDR_CORTEX_A77),
+>  -			MIDR_ALL_VERSIONS(MIDR_NEOVERSE_N1),
+>  -			{},
+>  -		};
+>  -		static const struct midr_range spectre_bhb_k11_list[] =3D {
+>  -			MIDR_ALL_VERSIONS(MIDR_AMPERE1),
+>  -			{},
+>  -		};
+>  -		static const struct midr_range spectre_bhb_k8_list[] =3D {
+>  -			MIDR_ALL_VERSIONS(MIDR_CORTEX_A72),
+>  -			MIDR_ALL_VERSIONS(MIDR_CORTEX_A57),
+>  -			{},
+>  -		};
+>  +	static const struct midr_range spectre_bhb_k132_list[] =3D {
+>  +		MIDR_ALL_VERSIONS(MIDR_CORTEX_X3),
+>  +		MIDR_ALL_VERSIONS(MIDR_NEOVERSE_V2),
+>  +	};
+>  +	static const struct midr_range spectre_bhb_k38_list[] =3D {
+>  +		MIDR_ALL_VERSIONS(MIDR_CORTEX_A715),
+>  +		MIDR_ALL_VERSIONS(MIDR_CORTEX_A720),
+>  +	};
+>  +	static const struct midr_range spectre_bhb_k32_list[] =3D {
+>  +		MIDR_ALL_VERSIONS(MIDR_CORTEX_A78),
+>  +		MIDR_ALL_VERSIONS(MIDR_CORTEX_A78AE),
+>  +		MIDR_ALL_VERSIONS(MIDR_CORTEX_A78C),
+>  +		MIDR_ALL_VERSIONS(MIDR_CORTEX_X1),
+>  +		MIDR_ALL_VERSIONS(MIDR_CORTEX_A710),
+>  +		MIDR_ALL_VERSIONS(MIDR_CORTEX_X2),
+>  +		MIDR_ALL_VERSIONS(MIDR_NEOVERSE_N2),
+>  +		MIDR_ALL_VERSIONS(MIDR_NEOVERSE_V1),
+>  +		{},
+>  +	};
+>  +	static const struct midr_range spectre_bhb_k24_list[] =3D {
+>  +		MIDR_ALL_VERSIONS(MIDR_CORTEX_A76),
+>  +		MIDR_ALL_VERSIONS(MIDR_CORTEX_A76AE),
+>  +		MIDR_ALL_VERSIONS(MIDR_CORTEX_A77),
+>  +		MIDR_ALL_VERSIONS(MIDR_NEOVERSE_N1),
+>  +		MIDR_ALL_VERSIONS(MIDR_QCOM_KRYO_4XX_GOLD),
+>  +		{},
+>  +	};
+>  +	static const struct midr_range spectre_bhb_k11_list[] =3D {
+>  +		MIDR_ALL_VERSIONS(MIDR_AMPERE1),
+>  +		{},
+>  +	};
+>  +	static const struct midr_range spectre_bhb_k8_list[] =3D {
+>  +		MIDR_ALL_VERSIONS(MIDR_CORTEX_A72),
+>  +		MIDR_ALL_VERSIONS(MIDR_CORTEX_A57),
+>  +		{},
+>  +	};
+>  =20
+> - 	if (is_midr_in_range_list(read_cpuid_id(), spectre_bhb_k132_list))
+>  -		if (is_midr_in_range_list(spectre_bhb_k32_list))
+>  -			k =3D 32;
+>  -		else if (is_midr_in_range_list(spectre_bhb_k24_list))
+>  -			k =3D 24;
+>  -		else if (is_midr_in_range_list(spectre_bhb_k11_list))
+>  -			k =3D 11;
+>  -		else if (is_midr_in_range_list(spectre_bhb_k8_list))
+>  -			k =3D  8;
+>  -
+>  -		max_bhb_k =3D max(max_bhb_k, k);
+>  -	} else {
+>  -		k =3D max_bhb_k;
+>  -	}
+> ++	if (is_midr_in_range_list(spectre_bhb_k132_list))
+>  +		k =3D 132;
+> - 	else if (is_midr_in_range_list(read_cpuid_id(), spectre_bhb_k38_list))
+> ++	else if (is_midr_in_range_list(spectre_bhb_k38_list))
+>  +		k =3D 38;
+> - 	else if (is_midr_in_range_list(read_cpuid_id(), spectre_bhb_k32_list))
+> ++	else if (is_midr_in_range_list(spectre_bhb_k32_list))
+>  +		k =3D 32;
+> - 	else if (is_midr_in_range_list(read_cpuid_id(), spectre_bhb_k24_list))
+> ++	else if (is_midr_in_range_list(spectre_bhb_k24_list))
+>  +		k =3D 24;
+> - 	else if (is_midr_in_range_list(read_cpuid_id(), spectre_bhb_k11_list))
+> ++	else if (is_midr_in_range_list(spectre_bhb_k11_list))
+>  +		k =3D 11;
+> - 	else if (is_midr_in_range_list(read_cpuid_id(), spectre_bhb_k8_list))
+> ++	else if (is_midr_in_range_list(spectre_bhb_k8_list))
+>  +		k =3D  8;
+>  =20
+>   	return k;
+>   }
 
-max_pasid_log2 is something that fits well. But PCI device cap
-still feels odd in that regard, as it repurposes the ioctl.
+This is now a conflict between the kvm tree and the arm64 tree.
 
-So, perhaps we should update the uAPI documentation and ask user
-space to run IOMMU_GET_HW_INFO for every iommufd_device, because
-the output out_capabilities may be different per iommufd_device,
-even if both devices are correctly assigned to the same vIOMMU.
+--=20
+Cheers,
+Stephen Rothwell
 
-Thanks
-Nicolin
+--Sig_/W=n.2.FLSeUV4GP3L4eaeWE
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmfc60MACgkQAVBC80lX
+0Gx1KQf/QakLQJaI3LaakUKeYthZeFl4BCWmch4uy7UcxqvQTqqmwyFR61rE9cNn
+V9D2H1hW4226U1Ms76XRp8ujypxWHgh7851QfyU36EY24fhrsHUSp3TTJu9vWAur
+q3mpufSvqgDf7uLZQGPiaI28NLnHLyJCsSVcZuy6xUtFEPCGcrTOSZccOQtjXoKt
+TlHk+oBTfBRUw0mLfAr/WXGl9D9Vh0BGZu2ftXIS9hnfhXGl3c+HPUWHlEMCVFnK
+1yGQP4p+wvP1nPUsKn/AMmyaGefS0Fc4dCU0UCC4BUDLeQcNmvfrf7zbdpcSy39i
+Y+2ou91gQSPFLksK4bXItdLFtpB0Sw==
+=QH2I
+-----END PGP SIGNATURE-----
+
+--Sig_/W=n.2.FLSeUV4GP3L4eaeWE--
 
