@@ -1,137 +1,121 @@
-Return-Path: <kvm+bounces-41726-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41727-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C9C7A6C471
-	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 21:45:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA17EA6C5B4
+	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 23:15:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD271484B03
-	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 20:44:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E41107A8430
+	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 22:14:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3276E230BD6;
-	Fri, 21 Mar 2025 20:44:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33DB123312D;
+	Fri, 21 Mar 2025 22:15:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X3PjzLhS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vJuJtnCx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15D0C230277
-	for <kvm@vger.kernel.org>; Fri, 21 Mar 2025 20:44:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009CF1519BE
+	for <kvm@vger.kernel.org>; Fri, 21 Mar 2025 22:15:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742589891; cv=none; b=DKUYc0hbmAQg8Fjn6ggUENI/sq6DpNvhnOOUGAhXD22bHSH89lebo6eZ75HrYt9URw8RdJDun3HAGWH+YUPXmgMIBx+Wlj/TuQDfY9YwkdcamrKiflNwFJrY5K5TE4m5Yvab4VpwNXQEw2DtD6bC31M13VnSnui41rgllKyWqL0=
+	t=1742595302; cv=none; b=qxTV1g918WwdL9G8GRswWVvVWdiArADapRBRQdpEcoMgIifzgyPsZpxfFkMxA3+C++oTmVnXRLS0fQcejshdyvqp7QMxZyhy3nInuQeu1IRtLgbOHBE+d18iO8ew50lA9g/sqATLeA/14sRHJ1kXRuz97UhF3vPxcJXUmoJ0iAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742589891; c=relaxed/simple;
-	bh=54tcRDgahcG66vhxHIRsWfMsMsPcgCWCIQX1MVxe0Nw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=c9Hjlc6JjUPfeZtVcbTwBC/kv2o26zuu4Qev6j2DAWG+d+JUstFa1PAyAK5hcPTUMKtlhuv3bf1fKNB27KKwLzp5klFn0gGupEjg/plYW4y9jRU55g2cbd2lefSPpYkpmj0WGfkNbWkBkQDjlPLmm95XR6Jx18fQ/Pw2TnyzIYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X3PjzLhS; arc=none smtp.client-ip=209.85.214.202
+	s=arc-20240116; t=1742595302; c=relaxed/simple;
+	bh=NPx5hgwLn/mzDYrm99FpYVYQnE7Gcf2Lkd9dI+JFYfA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=VRjeuxPapU/m6l088uqTA670Esr863YFDl0z7ahCsvSJJqcMO3B9Sy3dtHcrTeK2tsX3X4plR0xNpd1k3bY+gj6AiNy9eL3V/NCxTwVsixFlaVB1ak1kPVXcvlajTDVOaJThUrwwsTmCJiTcIzNW8PcBkQ7oBHI2XTWD/kGc6M0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vJuJtnCx; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-22412127fd7so28648145ad.0
-        for <kvm@vger.kernel.org>; Fri, 21 Mar 2025 13:44:49 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ff6167e9ccso5557926a91.1
+        for <kvm@vger.kernel.org>; Fri, 21 Mar 2025 15:15:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742589889; x=1743194689; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GEMU6p1y8XG7aTq5OrE99edboR3QeK6rt4oPFIwBxB0=;
-        b=X3PjzLhSY/XeGFNVtQGVAPW9mC/+udcR/gtQGn8VK4Jh/+NqjBb5sMqRUlApSfzP/A
-         Z98vLBspz/R3iLANvT0ogFM5RtCiq7mBSq5GlkhUm4qdqTeRfmIGloEVyN5NkjyhOIUM
-         163VCTgOfOsudDMHVLn9N7WWZvJLjQ+3BbiCxLB4LE1OwuxmfVWhMgCDaQDQ17HWchQB
-         C5D9simFVxgPJFg/jNypf1SCanWqdlIbIKwxt8ghBxBisDZO41jolkjN19RoE0VEwait
-         L8WKh6/RSKOzbcAn4lVAZuLJuY+kt9ID4tcqMq6e0OE5AvbbyqmIXjkykNocqmIm8NKM
-         tzew==
+        d=google.com; s=20230601; t=1742595300; x=1743200100; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=gder4ZBeakmzoOVPhL4CX5O/w/7AtN56Adx2b1zHtms=;
+        b=vJuJtnCxqUYXZ/2mT1OG47xJpsbWCQomg2qZ4IGKbu3fTWsLkh5Axw5bcXHMtUvFpM
+         8j+xGCwlAWr+TOUV9tKW5S3DcsrXVJxI9rSPmvOSXz5iPBw7EOsKjg6wvmNN6+FxHwmZ
+         vMKEKLTEB6B4zOi5Jgx4Jg+vc9CtdfWv24CanHBNL+ozWGxQxqv4yPLmMeVufQ14xt3r
+         hWfY13cT4h7q7KXyoRLcjmmu6eokMTguhIwvWKr8UAr26MBqnBgTOQ51KPCv6KqAyv3x
+         f+bDfedC/xuEe8BlR2743QgyLWObODXlhIt4hZhoSj+8O7fbD287TJRb3k6pRfjUFErp
+         CXmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742589889; x=1743194689;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GEMU6p1y8XG7aTq5OrE99edboR3QeK6rt4oPFIwBxB0=;
-        b=k3SviowP559ensyF4k9CGXDygkEHVqfjcmKaT4psyplXxX/rzy7QoNEux0bV5w/5QG
-         UF7iKsLX+AtK2c00Zd94m8KEIao7z+e8WmOES4yC5rj3+CGWEoIv5wLCJKipi0ATdqJi
-         CzyoqDWq7MeaLyyvhxk9KN0duHOVw2L+HQ6mNrTxs6CGlND3XmLIHedAkWAeZFJCJJMB
-         Sn0CtRsCIzjvP1sgAHD46msJHEy9N5PhJeOqurOvBx98SqMsZUbcW7TfTY0reUwszu5l
-         HptiDLkrXeQvRW0rqDqo2ymTczm0MqfgQKUD4iLMEfVQaU8Fg0jtTHkXr3Y6hAytLsAh
-         PF3g==
-X-Forwarded-Encrypted: i=1; AJvYcCUu+zsf6uAiQS7kj9H68Dzn/r0qy0UnOIhJ7w6WTkwFDi5pM4wAS4TZ1TXPDtYHg47OajA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzI3JWWj3J+Zj/7Yf5TsHFvWE1kTTbhfZTplBFh8dD5hDMx5nSI
-	Bm6x1Ef72oD4Z1oe25+qiQHEcsODOwFw6zBhg9jfFeyaAlMsYqLEFGLqWQ3z51T+15Kk/prVyFy
-	HOQ==
-X-Google-Smtp-Source: AGHT+IF09wFzorMUM4Gi7oaYBSS+7g0HTnWRlVNYWepX7kLirX/lzxgzzddN7SGhZH0LCUn3aRIezx8SRCU=
-X-Received: from pjbsc7.prod.google.com ([2002:a17:90b:5107:b0:2ff:5fee:5e17])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:c949:b0:220:da88:2009
- with SMTP id d9443c01a7336-22780e23fcfmr60355015ad.45.1742589889236; Fri, 21
- Mar 2025 13:44:49 -0700 (PDT)
-Date: Fri, 21 Mar 2025 13:44:47 -0700
-In-Reply-To: <Z9zHju4PIJ+eunli@intel.com>
+        d=1e100.net; s=20230601; t=1742595300; x=1743200100;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gder4ZBeakmzoOVPhL4CX5O/w/7AtN56Adx2b1zHtms=;
+        b=IcJS0GpgmObXwOQT36eUzyiHwKGmOlevg/rz4z49mj/bxwqd+yOm+284QcRtrO/SCP
+         yqnFcDWrkjX57BHyBNTdLLX/YkG1LyKR23O3qJgoNRr9YOLmR87vr2s7VUjK+oDCmwYc
+         WiXvQACzhsSYIQYpToTthV+JfEeX/AOu/2Lf04yhvgu3ivaPMQKc4nnmLDU+g2m918Kv
+         RMavuVB2Bu61d25fPjID6SZ8bDDGWWV2VbCEWNnWT/uFoniLXzzAHMCuSdudK+s3eB5g
+         uk1ROkxOEZ0clVqwyyuVL3fMsepcnntI4DK9VEZFuoVkXq+U/MWIHrhk1ZZCRjqgQmlQ
+         w2RQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWDF9Y068llSeU/AvRPwvocr8h02usg6mYHs9Czp1zRAJl7VWAKp6cL3QosgVrWQKwIZYo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYeYiJizxhKZq1AqUwgpWkLfo6usPyDVZITk5yIsqsQbQeWkEn
+	TeAFdMi+C2ltwUVOzrzAMtzBr65NVaFPHaFiuZBF0tLTveaIY0V4X7L7Cz5ChMrgl6oly84GE6Q
+	N/uZdUIl84g==
+X-Google-Smtp-Source: AGHT+IF5w0t2qfhlsv5r6Ydy0x+ymrJUxEI6TT+RPvL+KWo7KyBDAXfDTqZ2P8K5xXqmj3lr2SY2M/S6ki5lzg==
+X-Received: from pjbsc4.prod.google.com ([2002:a17:90b:5104:b0:2fc:2e92:6cf])
+ (user=jmattson job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:2747:b0:301:1bce:c258 with SMTP id 98e67ed59e1d1-3030feeb4c6mr6805659a91.22.1742595300337;
+ Fri, 21 Mar 2025 15:15:00 -0700 (PDT)
+Date: Fri, 21 Mar 2025 15:14:29 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250320142022.766201-1-seanjc@google.com> <20250320142022.766201-4-seanjc@google.com>
- <Z9xXd5CoHh5Eo2TK@google.com> <Z9zHju4PIJ+eunli@intel.com>
-Message-ID: <Z93Pv0HWYvq9Nz2h@google.com>
-Subject: Re: [PATCH v2 3/3] KVM: x86: Add a module param to control and
- enumerate device posted IRQs
-From: Sean Christopherson <seanjc@google.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Yosry Ahmed <yosry.ahmed@linux.dev>
-Content-Type: text/plain; charset="us-ascii"
+X-Mailer: git-send-email 2.49.0.395.g12beb8f557-goog
+Message-ID: <20250321221444.2449974-1-jmattson@google.com>
+Subject: [PATCH v3 0/2] KVM: x86: Provide a capability to disable APERF/MPERF
+ read intercepts
+From: Jim Mattson <jmattson@google.com>
+To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Mar 21, 2025, Chao Gao wrote:
-> On Thu, Mar 20, 2025 at 10:59:19AM -0700, Sean Christopherson wrote:
-> >@@ -9776,8 +9777,8 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
-> >        if (r != 0)
-> >                goto out_mmu_exit;
-> > 
-> >-       enable_device_posted_irqs &= enable_apicv &&
-> >-                                    irq_remapping_cap(IRQ_POSTING_CAP);
-> >+       enable_device_posted_irqs = allow_device_posted_irqs && enable_apicv &&
-> >+                                   irq_remapping_cap(IRQ_POSTING_CAP);
-> 
-> Can we simply drop this ...
-> 
-> > 
-> >        kvm_ops_update(ops);
-> > 
-> >@@ -14033,6 +14034,8 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_rmp_fault);
-> > 
-> > static int __init kvm_x86_init(void)
-> > {
-> >+       allow_device_posted_irqs = enable_device_posted_irqs;
-> >+
-> >        kvm_init_xstate_sizes();
-> > 
-> >        kvm_mmu_x86_module_init();
-> >
-> >
-> >Option #2 is to shove the module param into vendor code, but leave the variable
-> >in kvm.ko, like we do for enable_apicv.
-> >
-> >I'm leaning toward option #2, as it's more flexible, arguably more intuitive, and
-> >doesn't prevent putting the logic in kvm_x86_vendor_init().
-> >
-> 
-> and do
-> 
-> bool kvm_arch_has_irq_bypass(void)
-> {
-> 	return enable_device_posted_irqs && enable_apicv &&
-> 	       irq_remapping_cap(IRQ_POSTING_CAP);
-> }
+Allow guest reads of IA32_APERF and IA32_MPERF, so that it can
+determine the effective frequency multiplier for the physical LPU.
 
-That would avoid the vendor module issues, but it would result in
-allow_device_posted_irqs not reflecting the state of KVM.  We could partially
-address that by having the variable incorporate irq_remapping_cap(IRQ_POSTING_CAP)
-but not enable_apicv, but that's still a bit funky.
+Commit b51700632e0e ("KVM: X86: Provide a capability to disable cstate
+msr read intercepts") allowed the userspace VMM to grant a guest read
+access to four core C-state residency MSRs. Do the same for IA32_APERF
+and IA32_MPERF.
 
-Given that enable_apicv already has the "variable in kvm.ko, module param in
-kvm-{amd,intel}.ko" behavior, and that I am planning on giving enable_ipiv the
-same treatment (long story), my strong vote is to go with option #2 as it's the
-most flexibile, most accurate, and consistent with existing knobs.
+While this isn't sufficient to claim support for
+CPUID.6:ECX.APERFMPERF[bit 0], it may suffice in a sufficiently
+restricted environment (i.e. vCPUs pinned to LPUs, no TSC multiplier,
+and no suspend/resume).
+
+v1 -> v2: Add {IA32_APERF,IA32_MPERF} to vmx_possible_passthrough_msrs[]
+v2 -> v3: Add a selftest
+
+Jim Mattson (2):
+  KVM: x86: Provide a capability to disable APERF/MPERF read intercepts
+  KVM: selftests: Test behavior of KVM_X86_DISABLE_EXITS_APERFMPERF
+
+ Documentation/virt/kvm/api.rst                |   1 +
+ arch/x86/include/asm/kvm_host.h               |   1 +
+ arch/x86/kvm/svm/svm.c                        |   7 +
+ arch/x86/kvm/svm/svm.h                        |   2 +-
+ arch/x86/kvm/vmx/vmx.c                        |   6 +
+ arch/x86/kvm/vmx/vmx.h                        |   2 +-
+ arch/x86/kvm/x86.c                            |   8 +-
+ arch/x86/kvm/x86.h                            |   5 +
+ include/uapi/linux/kvm.h                      |   1 +
+ tools/include/uapi/linux/kvm.h                |   4 +-
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../selftests/kvm/x86/aperfmperf_test.c       | 162 ++++++++++++++++++
+ 12 files changed, 196 insertions(+), 4 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86/aperfmperf_test.c
+
+-- 
+2.49.0.395.g12beb8f557-goog
+
 
