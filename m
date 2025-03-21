@@ -1,250 +1,133 @@
-Return-Path: <kvm+bounces-41731-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41732-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4FA7A6C5D4
-	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 23:20:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66E90A6C5DA
+	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 23:21:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C74C01B61CB8
-	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 22:18:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E3A01886D51
+	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 22:19:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E61D23643A;
-	Fri, 21 Mar 2025 22:16:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9F741F3BB7;
+	Fri, 21 Mar 2025 22:19:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k9QaZ2IE"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ve6b5koF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0361C1EFFBB
-	for <kvm@vger.kernel.org>; Fri, 21 Mar 2025 22:16:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 542211519BE
+	for <kvm@vger.kernel.org>; Fri, 21 Mar 2025 22:19:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742595373; cv=none; b=brDfysRCxRZOOyYTxcU2rsVUP7fipSvFOL2svnaec6HsXosrEZicNqeWW/YZ3euyqXSRSqL3LGYYvNt5GEYTbzgDdGYhueJH5dVQ7tso2C2273aqPx0XSbz62Ufuy/7w9dJRM5MglWO2GqD3scRc5vwJxJB4bz6qIiU8ylp4d0Y=
+	t=1742595564; cv=none; b=mXxl9YXDx7SpIPVJZCK7Ze+7OAGvuH+75No2QwP1Cn7Dc7Vd5SW0sGIP8OtPpW3dOldnXBE7KaUL7Id5KapPk3ywGeh1wNg/BWBS7bh0cP2HOXyxrAU7xJDixERV8i3y6ky3aX231b92gtjsk8g4NL/1Usz3mJBALbPD9jU0CZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742595373; c=relaxed/simple;
-	bh=xTN8uHl1SeuIX+6Go9vzBRBl5rKlx9/gkpF9UMsFCuE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kIw8aqvEm7WfdBsyXiPrFmqa2KhUkzi0l1J11aoHPcY/P/FgxY+LD0pDQ3mw17OewLhJoiWYZzd/k+jBB/jZ3fhjIhiPtr2LZ3/mSA4Nrw8oRG8bc7fgW8q6n8LFkv58dJxlT+Eklx6C9OuSP3A4+onYGF+kuey+O3Vusmtjd4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k9QaZ2IE; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2242ac37caeso27285ad.1
-        for <kvm@vger.kernel.org>; Fri, 21 Mar 2025 15:16:10 -0700 (PDT)
+	s=arc-20240116; t=1742595564; c=relaxed/simple;
+	bh=E6vCNsKbFDL5t+Oh9vylOnfFyrtyqOxq9LAWiye5QGo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=O8bdTV14qBpu4FOWlVs8KyEaFtS+eD9c46DS5bYlEkMbAhXWxIKrumnITHwRG5QZmUuCP2Z0mfWVMy7aM4WVe4FAd+JWhCduGibDXwCyy25V5ZmmnSUOM+uuYBWoIGvdOGXqfQ3wVnaS+eAh/BRDyuHY+dHFY017CcOOBvdC+3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Ve6b5koF; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-224019ad9edso62016005ad.1
+        for <kvm@vger.kernel.org>; Fri, 21 Mar 2025 15:19:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742595370; x=1743200170; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+KM/OqzMgVHyAstUImFrYrGve1V5xobanjZKdFyJS9w=;
-        b=k9QaZ2IEHPEZY5y/aOSkfFUXsm0QLdx4ngo8Rd2qKM0/vjWIZFwDp3J+bMRNrGnqqQ
-         wYtDm1aPW9NkgxH3Gc/mYv08vEL7Sb/b+qnMdDcjIbhqsNyusfcqeKVZZj3nL2Q4k36/
-         fKntHDbZ6AXjF/t2TK6rSCiXwsGTXkBjUfR+MZ1uUZ9PVNFoJciPgX4iDSwFjHKfz+5g
-         QGLmRR4bPTUQhJdoz1oBNpYbJ50bNNAEYjKOQhTS+d6dppdPZOIXY0j8HTGW2poytBt9
-         Bt7/NL7iwcBZXVoXnx65s1OikkdWCbbFGYmYPXy5atrYI5l/ohbF59EXL595VDcf75Ym
-         KdSQ==
+        d=linaro.org; s=google; t=1742595562; x=1743200362; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2m5L+7pt7GeWrU7Kt4b77ijay6+lliI8NzQ5LxIHZMQ=;
+        b=Ve6b5koFKvUl/O06TuQEjccD6w6RPamQIQp9z6p4p8oBRbj/KW4xRu2o44l9LmbQbA
+         fHWf1gP2jrxJAW12SwAAyvpS2bziwpZhphhV924ip/etdSlXfoTptsQvzKhLGZPwngQt
+         ZvAQOuBrGXp1XUGGH7UgR//3SABl0Va7u+V9K369YwH33jGzF8Eno7ATjPiKbr6Npt+C
+         QlVtlboPu2zjdrnJDHZk/BjhPzXAuf46ZaBlxUuzyjP8SqJjDiO5eNqMqqoo8iRNnDNj
+         20iq6P2983x/ATw5zPhTAOofuk4NexpiIRN6nA+hYNeaE9afCwosvONVEPSyjn5KLq4a
+         LC0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742595370; x=1743200170;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+KM/OqzMgVHyAstUImFrYrGve1V5xobanjZKdFyJS9w=;
-        b=qOKqmlDdFPWXbGa+O46mY0G16WPSvG+fk35Kf7s/XSBcfCGSudJAjOMNDCEc8iEcVE
-         PoeIjM8umQAk8AUqPqck5tufCXVSOzhYKlifXM8ZOlw+0qvsQg00mSW99r11bF1k/YQS
-         284hu00I5lCxBIN3xhUH5WMzXh7uMJqooVks5uCy9ReMJJY1vSfOjKWMVfRKXKnz8MWs
-         A+xR3kOqcKSa7sRbhPNIQnpASmEgDWxi1616K3rj02SwMm/rFNpA0SLe1VfjAwLA5mFV
-         0WTVLYtkn1ec+QgElwYBYizxSt+3flGm20rCbwes0P7NH0o6ARQElOZW0CliHLsuTGoS
-         HPPg==
-X-Forwarded-Encrypted: i=1; AJvYcCWQDNX07nkpWdB0v7QvMMA1548DrjIewW2ZuMxMJjcaCtCIPAbjTfqqxfFWlJER73dNXM4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0y7EWXSz0BQG0U+CXOPH2KaCPpMtj0YvGbHX2pbdRj+z++xhO
-	GnxEu4BDOYo/+S6k5EzuIcfTy2/A7jLe/fn+JOZccYftx21pCfW5jDnflL8PasBH/4E9Vv5NevO
-	bYLGPU55zInzJDMGhTmLz5M4T07c+ZzcZIMyu
-X-Gm-Gg: ASbGncsTQnVa3vXZkFZTZF0SYlSlhYGUL5ygfjHIjzwJPNMSfNbEPsOhccljpmZJW1F
-	5F/oEwdJUn0SWBVfM1ClfzkSdtOgR1q/dhAHmogkZvTklajhtSZ1Bkr27GO7jZCL+u3dZjsZdZu
-	Co+fs3kgdIiMsIwSoLlQqZzR0R9+uwBBNsqTky1UVUyGJjcplruxQDC7A=
-X-Google-Smtp-Source: AGHT+IFB6PSWq8585YC3bfe4eP32Yir6EYNkFzXJi8bOkq8iwWtXfNlhA5baw0lPh6UvS7ldsM4iZisORLPef1bKOlA=
-X-Received: by 2002:a17:903:19e4:b0:215:86bf:7e46 with SMTP id
- d9443c01a7336-22799f6adb8mr317095ad.7.1742595369962; Fri, 21 Mar 2025
- 15:16:09 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1742595562; x=1743200362;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2m5L+7pt7GeWrU7Kt4b77ijay6+lliI8NzQ5LxIHZMQ=;
+        b=M/mHQ+ujtXHc9XhQRBb1mMe6xIdHbkSjv9CiG4EfQO/eta8yC5s5RFL/skC7brNCOy
+         sI89DNOziZw/Bq5N0SvMSBZwrP8/7aEYo5np73L3NRLUWt1iazbykbeg7Z6MYMSkovx6
+         WCYvIinQ9zfEnr9N+i299paq1LjQontIxWhabcxdYZXQ/Qd/2C0L65TtZsY3r3a4iVgA
+         PwPUC9WdYdWRn3zXL6GBi50twSMgzDVEGSpitdgDPKEQ4DOR8Ige0uWSazwzxx4xmxMx
+         3+ypu4hSVT5ZfdutRqM8db/So16iWlGvKDig2VYCOVdRV1KYNx9HwiK3KLn8MIatw2O/
+         4N4g==
+X-Gm-Message-State: AOJu0YzRApwYVuYR0CNd0BjEs7vesoz/YxsTN0FYEMrPANUHazW64QHH
+	LVTQJ6BaPvikWnxy1Q38gP1DTvVVaaEJzfKKKGpF7hFwzyFgf3G1IatCdSYANEY=
+X-Gm-Gg: ASbGncsUN1Fu8FV02sjXprhF7lxa0/hjww0S5KzRyO5VoTLFx1w29Aqy2Cra9z2Y7MC
+	zbKqwaBTdaE//eXlrZTTePUBHA8uCkSDzkA8jOnIAtHxb1cKtxs5PBhyW9cELYOku5Uk78Fc1HN
+	ro/90qHbFWLonV0SIuXcp4SyEEmVwwfhQJKz/H4M+AtjQTTC1mD0+QUWO7D5FRne18ArzXm3hhq
+	ePdLSucEp7kk/Fn7HT8IrcLqRV3EyYYQGBCvxDDKviq5I0e3BDtarDog3Qkzf+26E9G1CX7oybB
+	gypLynAMgo2VRNO/MgBweQEyD3Er/z232oAqRbALqJKAO0eefvMHTxkuw8IRGRE8wbu7VkMd73L
+	UmOnICvJdHywyWtkV0l0=
+X-Google-Smtp-Source: AGHT+IEW6cQdABbMHDm5Jw4zpDdOGnA50ctGXbvRzVQOXJyT4XTYONXfp+PmiJ5E+lNB/pujFV4exg==
+X-Received: by 2002:a05:6a20:2d23:b0:1f5:6f5d:3366 with SMTP id adf61e73a8af0-1fe434371c4mr9545558637.37.1742595562592;
+        Fri, 21 Mar 2025 15:19:22 -0700 (PDT)
+Received: from [192.168.0.4] (174-21-74-48.tukw.qwest.net. [174.21.74.48])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af8a28058f9sm2346075a12.24.2025.03.21.15.19.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Mar 2025 15:19:22 -0700 (PDT)
+Message-ID: <c0e338f5-6592-4d83-9f17-120b9c4f039e@linaro.org>
+Date: Fri, 21 Mar 2025 15:19:20 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250308214045.1160445-1-almasrymina@google.com>
- <20250308214045.1160445-4-almasrymina@google.com> <8fb48d36-f5ce-40ce-bb05-b4c342da8b4f@redhat.com>
-In-Reply-To: <8fb48d36-f5ce-40ce-bb05-b4c342da8b4f@redhat.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 21 Mar 2025 15:15:57 -0700
-X-Gm-Features: AQ5f1JqTqeE1hEQJimNEPqykmM1XOpBm4kOaF6t5YahF7_VNclL_518XjsZaXEs
-Message-ID: <CAHS8izNu6biiVg==pri8PeDVP9unZthGrwSj4fGr84o61sLFgg@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 3/9] net: devmem: TCP tx netlink api
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
-	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Jeroen de Borst <jeroendb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 17/30] exec/target_page: runtime defintion for
+ TARGET_PAGE_BITS_MIN
+To: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
+Cc: kvm@vger.kernel.org, qemu-arm@nongnu.org,
+ Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
+ <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
+ <philmd@linaro.org>, =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+References: <20250320223002.2915728-1-pierrick.bouvier@linaro.org>
+ <20250320223002.2915728-18-pierrick.bouvier@linaro.org>
+ <2e667bb0-7357-4caf-ab60-4e57aabdceeb@linaro.org>
+ <e738b8b8-e06f-48d0-845e-f263adb3dee5@linaro.org>
+ <a67d17bb-e0dc-4767-8a43-8f057db70c71@linaro.org>
+ <216a39c6-384d-4f9e-b615-05af18c6ef59@linaro.org>
+Content-Language: en-US
+From: Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <216a39c6-384d-4f9e-b615-05af18c6ef59@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Mar 18, 2025 at 1:39=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On 3/8/25 10:40 PM, Mina Almasry wrote:
-> > From: Stanislav Fomichev <sdf@fomichev.me>
-> >
-> > Add bind-tx netlink call to attach dmabuf for TX; queue is not
-> > required, only ifindex and dmabuf fd for attachment.
-> >
-> > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-> > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> >
-> > ---
-> >
-> > v3:
-> > - Fix ynl-regen.sh error (Simon).
-> >
-> > ---
-> >  Documentation/netlink/specs/netdev.yaml | 12 ++++++++++++
-> >  include/uapi/linux/netdev.h             |  1 +
-> >  net/core/netdev-genl-gen.c              | 13 +++++++++++++
-> >  net/core/netdev-genl-gen.h              |  1 +
-> >  net/core/netdev-genl.c                  |  6 ++++++
-> >  tools/include/uapi/linux/netdev.h       |  1 +
-> >  6 files changed, 34 insertions(+)
-> >
-> > diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/ne=
-tlink/specs/netdev.yaml
-> > index 36f1152bfac3..e560b05eb528 100644
-> > --- a/Documentation/netlink/specs/netdev.yaml
-> > +++ b/Documentation/netlink/specs/netdev.yaml
-> > @@ -743,6 +743,18 @@ operations:
-> >              - defer-hard-irqs
-> >              - gro-flush-timeout
-> >              - irq-suspend-timeout
-> > +    -
-> > +      name: bind-tx
-> > +      doc: Bind dmabuf to netdev for TX
-> > +      attribute-set: dmabuf
-> > +      do:
-> > +        request:
-> > +          attributes:
-> > +            - ifindex
-> > +            - fd
-> > +        reply:
-> > +          attributes:
-> > +            - id
-> >
-> >  kernel-family:
-> >    headers: [ "linux/list.h"]
-> > diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-> > index 7600bf62dbdf..7eb9571786b8 100644
-> > --- a/include/uapi/linux/netdev.h
-> > +++ b/include/uapi/linux/netdev.h
-> > @@ -219,6 +219,7 @@ enum {
-> >       NETDEV_CMD_QSTATS_GET,
-> >       NETDEV_CMD_BIND_RX,
-> >       NETDEV_CMD_NAPI_SET,
-> > +     NETDEV_CMD_BIND_TX,
-> >
-> >       __NETDEV_CMD_MAX,
-> >       NETDEV_CMD_MAX =3D (__NETDEV_CMD_MAX - 1)
-> > diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
-> > index 996ac6a449eb..f27608d6301c 100644
-> > --- a/net/core/netdev-genl-gen.c
-> > +++ b/net/core/netdev-genl-gen.c
-> > @@ -99,6 +99,12 @@ static const struct nla_policy netdev_napi_set_nl_po=
-licy[NETDEV_A_NAPI_IRQ_SUSPE
-> >       [NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT] =3D { .type =3D NLA_UINT, },
-> >  };
-> >
-> > +/* NETDEV_CMD_BIND_TX - do */
-> > +static const struct nla_policy netdev_bind_tx_nl_policy[NETDEV_A_DMABU=
-F_FD + 1] =3D {
-> > +     [NETDEV_A_DMABUF_IFINDEX] =3D NLA_POLICY_MIN(NLA_U32, 1),
-> > +     [NETDEV_A_DMABUF_FD] =3D { .type =3D NLA_U32, },
-> > +};
-> > +
-> >  /* Ops table for netdev */
-> >  static const struct genl_split_ops netdev_nl_ops[] =3D {
-> >       {
-> > @@ -190,6 +196,13 @@ static const struct genl_split_ops netdev_nl_ops[]=
- =3D {
-> >               .maxattr        =3D NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT,
-> >               .flags          =3D GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
-> >       },
-> > +     {
-> > +             .cmd            =3D NETDEV_CMD_BIND_TX,
-> > +             .doit           =3D netdev_nl_bind_tx_doit,
-> > +             .policy         =3D netdev_bind_tx_nl_policy,
-> > +             .maxattr        =3D NETDEV_A_DMABUF_FD,
-> > +             .flags          =3D GENL_CMD_CAP_DO,
-> > +     },
-> >  };
-> >
-> >  static const struct genl_multicast_group netdev_nl_mcgrps[] =3D {
-> > diff --git a/net/core/netdev-genl-gen.h b/net/core/netdev-genl-gen.h
-> > index e09dd7539ff2..c1fed66e92b9 100644
-> > --- a/net/core/netdev-genl-gen.h
-> > +++ b/net/core/netdev-genl-gen.h
-> > @@ -34,6 +34,7 @@ int netdev_nl_qstats_get_dumpit(struct sk_buff *skb,
-> >                               struct netlink_callback *cb);
-> >  int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info=
-);
-> >  int netdev_nl_napi_set_doit(struct sk_buff *skb, struct genl_info *inf=
-o);
-> > +int netdev_nl_bind_tx_doit(struct sk_buff *skb, struct genl_info *info=
-);
-> >
-> >  enum {
-> >       NETDEV_NLGRP_MGMT,
-> > diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-> > index 2b774183d31c..6e5f2de4d947 100644
-> > --- a/net/core/netdev-genl.c
-> > +++ b/net/core/netdev-genl.c
-> > @@ -931,6 +931,12 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, st=
-ruct genl_info *info)
-> >       return err;
-> >  }
-> >
-> > +/* stub */
-> > +int netdev_nl_bind_tx_doit(struct sk_buff *skb, struct genl_info *info=
-)
-> > +{
-> > +     return 0;
-> > +}
-> > +
-> >  void netdev_nl_sock_priv_init(struct list_head *priv)
-> >  {
-> >       INIT_LIST_HEAD(priv);
->
-> I'm sorry, but this chunck does not apply cleanly anymore.
->
-> Please rebase.
->
-> Disclaimer: unfortunately I must note that due to the long backlog
-> pending and the upcoming merge window, I'm unsure I'll be able to
-> process the next revision before the net-next closing.
->
+On 3/21/25 13:11, Pierrick Bouvier wrote:
+> On 3/21/25 12:27, Richard Henderson wrote:
+>> On 3/21/25 11:09, Pierrick Bouvier wrote:
+>>>> Mmm, ok I guess.  Yesterday I would have suggested merging this with page-vary.h, but
+>>>> today I'm actively working on making TARGET_PAGE_BITS_MIN a global constant.
+>>>>
+>>>
+>>> When you mention this, do you mean "constant accross all architectures", or a global
+>>> (const) variable vs having a function call?
+>> The first -- constant across all architectures.
+>>
+> 
+> That's great.
+> Does choosing the min(set_of(TARGET_PAGE_BITS_MIN)) is what we want there, or is the 
+> answer more subtle than that?
 
-Thanks Paolo. I have also been under the weather the last couple of
-days so I haven't even been able to repost. I guess I'll repost after
-the merge window if netdev closes today.
+It will be, yes.
 
---
-Thanks,
-Mina
+This isn't as hard as it seems, because there are exactly two targets with
+TARGET_PAGE_BITS < 12: arm and avr.
+
+Because we still support armv4, TARGET_PAGE_BITS_MIN must be <= 10.
+
+AVR currently has TARGET_PAGE_BITS == 8, which is a bit of a problem.
+My first task is to allow avr to choose TARGET_PAGE_BITS_MIN >= 10.
+
+Which will leave us with TARGET_PAGE_BITS_MIN == 10.
+
+
+r~
 
