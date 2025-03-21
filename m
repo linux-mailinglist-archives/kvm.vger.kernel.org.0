@@ -1,116 +1,125 @@
-Return-Path: <kvm+bounces-41652-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41653-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 772BAA6BA1F
-	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 12:50:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37274A6BAFA
+	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 13:45:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F9D848310D
-	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 11:50:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B64AA19C1E37
+	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 12:44:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 915612236F6;
-	Fri, 21 Mar 2025 11:50:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09B3E229B16;
+	Fri, 21 Mar 2025 12:44:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h2F0pVmG"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="J286fOZ9";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="//HKCAf4"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 503BF1F1527
-	for <kvm@vger.kernel.org>; Fri, 21 Mar 2025 11:49:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD9E0CA5A;
+	Fri, 21 Mar 2025 12:44:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742557800; cv=none; b=YhqDUKmgpqcHaYcGcf0tlqOpNTg9rTkAMqRXoAzcbMCIy85B0oTHXwZyAjxQSXsshJ2O/59n4vZNQkVRCAXc/qNmr67T2nkbWSaY/XmC1R9BN+mnhMlxgPh+7Q/nRa4zf0Os5NfVb0Fl9TDKv84cmm2JH0riRBXgYahy+pTebTI=
+	t=1742561071; cv=none; b=AUnxh3ZEtAkdNwtw/LnBnXRfMqcyUlRNVbmT9GKzH+WQvcdu/G0ALqDKFvAJSEjHsUrUzSRAzoXnLJsPbQCamgBtJATsRazOqgOQZ5q+XdX/HwpVl7zyYkTLruyGzsWnhOoAoZ6sJ0IiQHEwHWZVfaSEpwbjRGtJJ2razxJoKVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742557800; c=relaxed/simple;
-	bh=qa1pULEViJpZCrEX7jstluPXowLxDjXAaXD2cx0gXCQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O6oJpCFP9WbUQH/aeMYNLKXpSzhpRZE0vSypSkuMGVHR4hkgXS0x3BJUAt91tDdKA48hNaM3XCo7o6+F5EceL2QYr+Y7hUCHkmYkD+lP/HEtpmehW/dsSPQmv3EEA0ODltUXQC2gfmBZnhDuqWmUsiRQGlXp1aqJRitXk2DuuTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h2F0pVmG; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742557797;
+	s=arc-20240116; t=1742561071; c=relaxed/simple;
+	bh=F9wq5b/9Z4dapIc7zXI602s+CF0Jvw8EUgIT8hhy2R4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=jvkZ/OvsnfVKppaDOaKJJE4zgGWsvMNcbeHXQKTWf1w5/1pDvwstHb3LFOb92qSVa1Dz7zldOZ9US4E5psC6pcyGiecvQrzKYfk/LF9rATrlz3U7ZTSb3JSHSYcYWdC95DHk95OHzmhqqI8PjF8FHrD32WG/U10Ca9OwDwmpgjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=J286fOZ9; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=//HKCAf4; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1742561067;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1U9d1S34dJA/yYSBtaTmCkKeKqx6OuwipBYsRctHH18=;
-	b=h2F0pVmGytSeN1O4bBCKoalV4EKdNqZktUltLQI4HxQHoahlg1QZF8SnuAK+c/5NJbbmTS
-	2Z3bDSrQR6x+PGyKq0CjGWqHdPUYoc12fEi8iwHRnXxpfj0c7UHAyhI4En79lMTIzFkVot
-	hPA5424TiArQ/CcJeu3QX7/KPcQOb+0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-197-QJCgmOdKOo6JbZ5adMtbog-1; Fri, 21 Mar 2025 07:49:56 -0400
-X-MC-Unique: QJCgmOdKOo6JbZ5adMtbog-1
-X-Mimecast-MFC-AGG-ID: QJCgmOdKOo6JbZ5adMtbog_1742557795
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-39142ce2151so812337f8f.1
-        for <kvm@vger.kernel.org>; Fri, 21 Mar 2025 04:49:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742557794; x=1743162594;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1U9d1S34dJA/yYSBtaTmCkKeKqx6OuwipBYsRctHH18=;
-        b=rGX9xJfgXPBc5S6spPaAEAoQ0GeXt2jpZv0++1xuNCzBeYuccg1LE/o1NXgr66QTkO
-         9uYwdf1M128Orz9+Rc/0FUw0TsDSzxl4vdxoafushXUrtasy7Id6QbKaHcSQa1y2UcCb
-         iftlqzFuAXZNp7qr8eLLVEQec+vwvEYvo4imdmxCTLQC440orb+Njvwz1ztAy4bPUwM7
-         Ap7r3fLX8Ae9GqNHGvvitZDLtwBMXKmKN82rJmPVx4JLGSNv2a5v9zYcopm2lceyWj+G
-         ns2KBBLCH4M6ygZH0wJ+sXSfHKIjwSCpGL5KfOwieuf4zfbZUhdhAjKngxQyVIntKjjT
-         lTnw==
-X-Forwarded-Encrypted: i=1; AJvYcCUKLSFfSW3tCqUpAWV14xxD4DI8Huf/Uty+sZliUvxEgpVkMJxohR0Lii/dnoRP+0QHY7U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGki40DKnMRP95u/LViK6BKyHpDhD1xdTsdmaG1kk7U9dFiFLZ
-	65nF01MZnyu5swcXuL5mH4UVetdWvHU7gJDOKH9gLx9W4sb5tYngVDBIeD9SCGlSO68ZRrqfoZb
-	AYDwNEJUJwjisxhD/+yZeAvZebdsolE16Ep9BVoftHbqUoRPtAxh2u3N1SiGyoOgRGJpPj/z+1l
-	EblyssD3QAXdSG7CnvBJPjtMPOz+F4aGZorLo=
-X-Gm-Gg: ASbGncu/tZ6nxTWD9Qu60NOu8X7wjGTBsRAAl/SAGWAYz182kEMTmqKz/s96CQQ7XRV
-	s+xKtGRWdGbAB723VqvZmkDyTaK3VYFJt16MYFWbsM7aOiP0ivwivcbh9bizQxlkVCEoEyzKhMw
-	==
-X-Received: by 2002:a05:6000:2cd:b0:390:eacd:7009 with SMTP id ffacd0b85a97d-3997f92d09bmr3058090f8f.42.1742557794237;
-        Fri, 21 Mar 2025 04:49:54 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGNUFCv0i56r7CJ8VGtM5M48sVRuttBFnEKe3e3lhtMlyZTFQc3EnUKgwS93nkXZtN1GSB0GosWtSsc4sxvw6o=
-X-Received: by 2002:a05:6000:2cd:b0:390:eacd:7009 with SMTP id
- ffacd0b85a97d-3997f92d09bmr3058075f8f.42.1742557793891; Fri, 21 Mar 2025
- 04:49:53 -0700 (PDT)
+	bh=Am601bcXnuFlc/N4uLCf/HWK0YPPJaXK8WE1j4yk+iU=;
+	b=J286fOZ9VN5WGsx5h/T6XssjTTBzhwY718WOsyMRF77NVLajGd4GHl3cpyyPPLUUonwXVG
+	W6lVUXZtTdFpl9TkMiX+nMDT+REKuB2a6iMtXhJ86umfx14GhI8URiOVitvRrqTLWtE9u8
+	BZmjU7k9657UvunRzXPRFtrRBy4KP5Imqv/hrJx+t2dkYtpnlxx9pRXQ3IrdtozrJcWEKr
+	psGykefvLNEFBXKF6rjXfijwWxCyGqM34derkWZ6QV3QuQIopp54kU8b1ZD2FtV8JZX4sF
+	Ao/ERPPZ8Ee6kGxPGSutTcYW+LxLCZxVnk0ROdKNzYW63Bhyg/QY4r0JyB2a1w==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1742561067;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Am601bcXnuFlc/N4uLCf/HWK0YPPJaXK8WE1j4yk+iU=;
+	b=//HKCAf4IS4MMPxsCNmcDmlzn4zZfIf6gE90eO9g92wxxQkvS6PbLjHpb6lEEhP0B/c3mj
+	JGkj0qat56ZrB8Ag==
+To: Borislav Petkov <bp@alien8.de>, Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+Cc: linux-kernel@vger.kernel.org, mingo@redhat.com,
+ dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com, nikunj@amd.com,
+ Santosh.Shukla@amd.com, Vasant.Hegde@amd.com,
+ Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, x86@kernel.org,
+ hpa@zytor.com, peterz@infradead.org, seanjc@google.com,
+ pbonzini@redhat.com, kvm@vger.kernel.org, kirill.shutemov@linux.intel.com,
+ huibo.wang@amd.com, naveen.rao@amd.com
+Subject: Re: [RFC v2 01/17] x86/apic: Add new driver for Secure AVIC
+In-Reply-To: <20250320155150.GNZ9w5lh9ndTenkr_S@fat_crate.local>
+References: <20250226090525.231882-1-Neeraj.Upadhyay@amd.com>
+ <20250226090525.231882-2-Neeraj.Upadhyay@amd.com>
+ <20250320155150.GNZ9w5lh9ndTenkr_S@fat_crate.local>
+Date: Fri, 21 Mar 2025 13:44:26 +0100
+Message-ID: <87y0wy3651.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <e61d23ddc87cb45063637e0e5375cc4e09db18cd.camel@redhat.com> <Z9ruIETbibTgPvue@google.com>
-In-Reply-To: <Z9ruIETbibTgPvue@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 21 Mar 2025 12:49:42 +0100
-X-Gm-Features: AQ5f1JoYTlPe6JAy0NvJAqvSCjTLVyZUzSbA7EqUgIebFZzwtfOE1aR1uOhKJe4
-Message-ID: <CABgObfa1ApR6Pgk8UaxvU0giNeEfZ_u9o56Gx2Y2vSJPL-KwAQ@mail.gmail.com>
-Subject: Re: Lockdep failure due to 'wierd' per-cpu wakeup_vcpus_on_cpu_lock lock
-To: Sean Christopherson <seanjc@google.com>
-Cc: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, 
-	Yan Zhao <yan.y.zhao@intel.com>, James Houghton <jthoughton@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Wed, Mar 19, 2025 at 5:17=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
-> Yan posted a patch to fudge around the issue[*], I strongly objected (and=
- still
-> object) to making a functional and confusing code change to fudge around =
-a lockdep
-> false positive.
+On Thu, Mar 20 2025 at 16:51, Borislav Petkov wrote:
+> On Wed, Feb 26, 2025 at 02:35:09PM +0530, Neeraj Upadhyay wrote:
+>> +static int x2apic_savic_probe(void)
+>> +{
+>> +	if (!cc_platform_has(CC_ATTR_SNP_SECURE_AVIC))
+>> +		return 0;
+>> +
+>> +	if (!x2apic_mode) {
+>> +		pr_err("Secure AVIC enabled in non x2APIC mode\n");
+>> +		snp_abort();
+>> +	}
+>> +
+>> +	pr_info("Secure AVIC Enabled\n");
+>
+> That's not necessary.
+>
+> Actually, you could figure out why that
+>
+> 	pr_info("Switched APIC routing to: %s\n", driver->name);
+>
+> doesn't come out in current kernels anymore:
+>
+> $ dmesg | grep -i "switched apic"
+> $
+>
+> and fix that as a separate patch.
+>
+> Looks like it broke in 6.10 or so:
+>
+> $ grep -E "Switched APIC" *
+> 10-rc1+:APIC: Switched APIC routing to: physical flat
+> 10-rc6+:APIC: Switched APIC routing to: physical flat
 
-In that thread I had made another suggestion, which Yan also tried,
-which was to use subclasses:
+It's very simple. Before that the default driver was logical flat.
 
-- in the sched_out path, which cannot race with the others:
-  raw_spin_lock_nested(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu), 1);
+838ba7733e4e ("x86/apic: Remove logical destination mode for 64-bit")
 
-- in the irq and sched_in paths, which can race with each other:
-  raw_spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
+Removed logical destination mode and defaulted to physical flat.
 
-Paolo
+So if you box does not switch to something else it keeps the default and
+does not print. See the first condition in apic_install_driver().
 
+But that SNP thing will switch and print....
+
+Thanks,
+
+        tglx
 
