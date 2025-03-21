@@ -1,191 +1,252 @@
-Return-Path: <kvm+bounces-41678-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41679-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53197A6BEE1
-	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 16:57:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9F5DA6BF11
+	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 17:06:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78C3716C3E7
-	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 15:53:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B02D43AA441
+	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 16:05:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D13822C34A;
-	Fri, 21 Mar 2025 15:52:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XAMKgAws"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CAAC1C5F14;
+	Fri, 21 Mar 2025 16:05:33 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 596A6224253
-	for <kvm@vger.kernel.org>; Fri, 21 Mar 2025 15:52:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B4191DB366;
+	Fri, 21 Mar 2025 16:05:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742572369; cv=none; b=Ol2h7e5SVYxBZHfbtDVRwPpr/5SRIaNivUD9mQt6OrfkkUf8hyCdFddju+GRWSawDa6uqlSDAyWmCBT5U5T2LLFDU3IrKcHSw2JKJEEkn/VAnUEy9OQqjiFF/pyQ/PIZtzq2DxR8+AWzoWwUcF8ZZamtyDoszMeCzbqBnGRoUIM=
+	t=1742573132; cv=none; b=M9RLeV+Jq4QBICEkVo4CKlwiciww5sbx4M5UhYZPod3p6sRKTriVoV05aX6u6SeIig60A94fQ9otILF4gYcECo2dsXUdXf+W7hY0uK53nik+PyyjuMC9mhv69w8cEJSc3+BDBbOtRs1DqwL7Zf7Z9aBTQRgSb2ih6Ig+kBYDJfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742572369; c=relaxed/simple;
-	bh=GnYJNN30ArioqBq84YCpxjxypr/yQcxXAVwcizPHgMw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NlsBcyuELVp9dlVQI0WWMs8uq6Z698SR5BOYfDJMTn4pNVj80r0pPtN28/z36WX3CrsNjW7p5BQnX51WvnbaGBFdb9onx2rvf8wjrMymk18ajKWn5fzbK2whgNlEgreOFbROSp3hycs2QIcIQtQ0Ze34ytD1yt0MmONxP9JP4Ts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XAMKgAws; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742572366;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lw4tIV8t2velBqSGDFXs1U2au71hmJlMHn//DKDjNqU=;
-	b=XAMKgAwsCNExPs85uOmLskerZi5Tj/NiMAgvpCMmvCEI8CZRl9xT0xzhA3iHdQM87YvILX
-	6A8kA3tN7/Idy+L2oLt06g9JWmj8GJ1pDMAqC4wi/NZcSljot+LQr4WXoOPq18ccjtDfaS
-	WJ9Px7Xi5jeO7EqtEfifFEYsMgzMOpY=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-582-xLfC95OMOLu108sQMNwGzw-1; Fri, 21 Mar 2025 11:52:44 -0400
-X-MC-Unique: xLfC95OMOLu108sQMNwGzw-1
-X-Mimecast-MFC-AGG-ID: xLfC95OMOLu108sQMNwGzw_1742572364
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-85da07ce5cbso31231939f.2
-        for <kvm@vger.kernel.org>; Fri, 21 Mar 2025 08:52:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742572364; x=1743177164;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lw4tIV8t2velBqSGDFXs1U2au71hmJlMHn//DKDjNqU=;
-        b=PRk9ZMIgKY2DYht9/tq1GdHywZHqjdhiBGtj+p3KiwHA14uk38EkVYotVHLhtCnDiF
-         5RfoMvR8RIqj+7H/SUfq53Qf56etl2Z4VZ87eZ7B82wzA/xwxjtBEtNdb3VZZejJ6PYC
-         itzLJGFxnvmKzYKsg3eMp69QaDiKKpt5u9jffITQne2Bij9LVXMKDhMhWIOkri8PM9dP
-         mOKXdyic7uJAoA9rwfJ8TTEA62eMONUDEOE2HfmJqq2rcI2Ng7MwuA128Ff+KhYCoCbl
-         Id7sDPDI8extyMypWp9Erh0VoPEw1NvanoLT9puPP6+1pP5V8tseMinkV3588YMYrho7
-         NZng==
-X-Forwarded-Encrypted: i=1; AJvYcCXkldjst+dPz/XXwHocGq60+76nAgw3V+yO3VPpy2UUUUOWlEp4kBMnIgthI8pfgAfQb4U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxmO06cwCc47AS/AxK0AhtH4vESG34A2sS8cBY8bqu+exuuzX5
-	hvGr7I3QCv+6sApFaNqMzY/gZRPgpw8RBv2y0Ec7RJ0bpdtAk4+y/9Q+l8/MwN4vuvG0554bXqh
-	o6mQIDXDJUPrsua5mWk1p4IvI/GFcxVLK9H1yFpPkxVhcfIhzdw==
-X-Gm-Gg: ASbGnctYpwlzG7QhOj0yoo9JpT3k3AIbPBNLqMWFYFkZQsn8AEbDhD0jr59AekUegUe
-	2zmSIl3AmPJtVbhvOdJJWMqgCmRjlb4nXF50muG5RWEC1mwN5+nKd1c8Ro11LPaSzniRIO+g+Aq
-	7sddDgavXREkpF5A6Xo1IknZuRqXzoUj8p8OXLW93TdhHdB0neUktat47V1inyWGng+ZL8ao1jE
-	hd40mW18D/2w9HhqbBN56mKUImIDGMG+K4LllDu54hcJFZN71L/lZYGWcDsa1zLbT1rQYssixel
-	YNPOz98w3qvQArjh5fY=
-X-Received: by 2002:a92:cd87:0:b0:3d3:d187:7481 with SMTP id e9e14a558f8ab-3d59c331683mr416375ab.1.1742572363833;
-        Fri, 21 Mar 2025 08:52:43 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGNF0rfCObrqaWNyBO2CmHGiB8P4GBb5NFORtVt9K+hAaNEXXDIxgqmXZW65xMhulGgmm8UVA==
-X-Received: by 2002:a92:cd87:0:b0:3d3:d187:7481 with SMTP id e9e14a558f8ab-3d59c331683mr416305ab.1.1742572363420;
-        Fri, 21 Mar 2025 08:52:43 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f2cbdb3befsm493367173.24.2025.03.21.08.52.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Mar 2025 08:52:42 -0700 (PDT)
-Date: Fri, 21 Mar 2025 09:52:40 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Longfang Liu <liulongfang@huawei.com>
-Cc: <jgg@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
- <jonathan.cameron@huawei.com>, <kvm@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>
-Subject: Re: [PATCH v6 5/5] hisi_acc_vfio_pci: bugfix live migration
- function without VF device driver
-Message-ID: <20250321095240.40bf55ec.alex.williamson@redhat.com>
-In-Reply-To: <20250318064548.59043-6-liulongfang@huawei.com>
-References: <20250318064548.59043-1-liulongfang@huawei.com>
-	<20250318064548.59043-6-liulongfang@huawei.com>
-Organization: Red Hat
+	s=arc-20240116; t=1742573132; c=relaxed/simple;
+	bh=qIz7FnCtIzm+M/hfQ0kA5l5WgdPkfOv0pSUhcKOdNFU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=I1a9qKUOZqTEFl/hE2OCMEltRS5YqjeI3pjD0GIN+4k4H1BsOuyEE9MPrV05qA2gmqvxYEnUryai2djgoyTwKsAvTxUotA1ehZcWOMpJIqQRxKEfbErhjmHlheDw5H5p6ym0ZY9+WTNWDA2rrsBF7oJrcQfMizrHmobBLIeq1l0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EAACF106F;
+	Fri, 21 Mar 2025 09:05:34 -0700 (PDT)
+Received: from [10.1.196.40] (e121345-lin.cambridge.arm.com [10.1.196.40])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D56D53F63F;
+	Fri, 21 Mar 2025 09:05:23 -0700 (PDT)
+Message-ID: <e024fe3d-bddf-4006-8535-656fd0a3fada@arm.com>
+Date: Fri, 21 Mar 2025 16:05:22 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 00/17] Provide a new two step DMA mapping API
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+ Keith Busch <kbusch@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+ Logan Gunthorpe <logang@deltatee.com>, Yishai Hadas <yishaih@nvidia.com>,
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ Kevin Tian <kevin.tian@intel.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Jonathan Corbet <corbet@lwn.net>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+ iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+ linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+ Randy Dunlap <rdunlap@infradead.org>
+References: <cover.1738765879.git.leonro@nvidia.com>
+ <20250220124827.GR53094@unreal>
+ <1166a5f5-23cc-4cce-ba40-5e10ad2606de@arm.com>
+ <20250302085717.GO53094@unreal>
+From: Robin Murphy <robin.murphy@arm.com>
+Content-Language: en-GB
+In-Reply-To: <20250302085717.GO53094@unreal>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Tue, 18 Mar 2025 14:45:48 +0800
-Longfang Liu <liulongfang@huawei.com> wrote:
-
-> If the VF device driver is not loaded in the Guest OS and we attempt to
-> perform device data migration, the address of the migrated data will
-> be NULL.
-> The live migration recovery operation on the destination side will
-> access a null address value, which will cause access errors.
+On 02/03/2025 8:57 am, Leon Romanovsky wrote:
+> On Fri, Feb 28, 2025 at 07:54:11PM +0000, Robin Murphy wrote:
+>> On 20/02/2025 12:48 pm, Leon Romanovsky wrote:
+>>> On Wed, Feb 05, 2025 at 04:40:20PM +0200, Leon Romanovsky wrote:
+>>>> From: Leon Romanovsky <leonro@nvidia.com>
+>>>>
+>>>> Changelog:
+>>>> v7:
+>>>>    * Rebased to v6.14-rc1
+>>>
+>>> <...>
+>>>
+>>>> Christoph Hellwig (6):
+>>>>     PCI/P2PDMA: Refactor the p2pdma mapping helpers
+>>>>     dma-mapping: move the PCI P2PDMA mapping helpers to pci-p2pdma.h
+>>>>     iommu: generalize the batched sync after map interface
+>>>>     iommu/dma: Factor out a iommu_dma_map_swiotlb helper
+>>>>     dma-mapping: add a dma_need_unmap helper
+>>>>     docs: core-api: document the IOVA-based API
+>>>>
+>>>> Leon Romanovsky (11):
+>>>>     iommu: add kernel-doc for iommu_unmap and iommu_unmap_fast
+>>>>     dma-mapping: Provide an interface to allow allocate IOVA
+>>>>     dma-mapping: Implement link/unlink ranges API
+>>>>     mm/hmm: let users to tag specific PFN with DMA mapped bit
+>>>>     mm/hmm: provide generic DMA managing logic
+>>>>     RDMA/umem: Store ODP access mask information in PFN
+>>>>     RDMA/core: Convert UMEM ODP DMA mapping to caching IOVA and page
+>>>>       linkage
+>>>>     RDMA/umem: Separate implicit ODP initialization from explicit ODP
+>>>>     vfio/mlx5: Explicitly use number of pages instead of allocated length
+>>>>     vfio/mlx5: Rewrite create mkey flow to allow better code reuse
+>>>>     vfio/mlx5: Enable the DMA link API
+>>>>
+>>>>    Documentation/core-api/dma-api.rst   |  70 ++++
+>>>    drivers/infiniband/core/umem_odp.c   | 250 +++++---------
+>>>>    drivers/infiniband/hw/mlx5/mlx5_ib.h |  12 +-
+>>>>    drivers/infiniband/hw/mlx5/odp.c     |  65 ++--
+>>>>    drivers/infiniband/hw/mlx5/umr.c     |  12 +-
+>>>>    drivers/iommu/dma-iommu.c            | 468 +++++++++++++++++++++++----
+>>>>    drivers/iommu/iommu.c                |  84 ++---
+>>>>    drivers/pci/p2pdma.c                 |  38 +--
+>>>>    drivers/vfio/pci/mlx5/cmd.c          | 375 +++++++++++----------
+>>>>    drivers/vfio/pci/mlx5/cmd.h          |  35 +-
+>>>>    drivers/vfio/pci/mlx5/main.c         |  87 +++--
+>>>>    include/linux/dma-map-ops.h          |  54 ----
+>>>>    include/linux/dma-mapping.h          |  85 +++++
+>>>>    include/linux/hmm-dma.h              |  33 ++
+>>>>    include/linux/hmm.h                  |  21 ++
+>>>>    include/linux/iommu.h                |   4 +
+>>>>    include/linux/pci-p2pdma.h           |  84 +++++
+>>>>    include/rdma/ib_umem_odp.h           |  25 +-
+>>>>    kernel/dma/direct.c                  |  44 +--
+>>>>    kernel/dma/mapping.c                 |  18 ++
+>>>>    mm/hmm.c                             | 264 +++++++++++++--
+>>>>    21 files changed, 1435 insertions(+), 693 deletions(-)
+>>>>    create mode 100644 include/linux/hmm-dma.h
+>>>
+>>> Kind reminder.
+>>
+>> ...that you've simply reposted the same thing again? Without doing anything
+>> to address the bugs, inconsistencies, fundamental design flaws in claiming
+>> to be something it cannot possibly be, the egregious abuse of
+>> DMA_ATTR_SKIP_CPU_SYNC proudly highlighting how unfit-for-purpose the most
+>> basic part of the whole idea is, nor *still* the complete lack of any
+>> demonstrable justification of how callers who supposedly can't use the IOMMU
+>> API actually benefit from adding all the complexity of using the IOMMU API
+>> in a hat but also still the streaming DMA API as well?
 > 
-> Therefore, live migration of VMs without added VF device drivers
-> does not require device data migration.
-> In addition, when the queue address data obtained by the destination
-> is empty, device queue recovery processing will not be performed.
+> Can you please provide concrete list of "the bugs, inconsistencies, fundamental
+> design flaws", so we can address/fix them?
 > 
-> Fixes: b0eed085903e ("hisi_acc_vfio_pci: Add support for VFIO live migration")
-> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
-> Reviewed-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> ---
->  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 21 ++++++++++++-------
->  1 file changed, 14 insertions(+), 7 deletions(-)
+> We are in v7 now and out of all postings you replied to v1 and v5 only with
+> followups from three of us (Christoph, Jason and me).
+
+Let's start with just the first 3 specific points from one patch in v1:
+
+"If you really imagine this can support non-coherent operation and
+DMA_ATTR_SKIP_CPU_SYNC, where are the corresponding explicit sync
+operations? dma_sync_single_*() sure as heck aren't going to work..."
+
+Still completely unaddressed in v7.
+
+"In fact, same goes for SWIOTLB bouncing even in the coherent case."
+
+Still completely unaddressed in v7.
+
+"Plus if the aim is to pass P2P and whatever arbitrary physical 
+addresses through here as well, how can we be sure this isn't going to 
+explode?"
+
+Still completely unaddressed in v7 for SWIOTLB; sort-of-addressed for 
+cache coherency in v3 by egregious abuse of DMA_ATTR_SKIP_CPU_SYNC in 
+callers, which when you pinged v5 I pointed out still cannot work in 
+general for the way the API claims to be able to operate (even with a 
+less-abusive dedicated attribute).
+
+And I'm going to stop there because that's already more than enough to 
+demonstrate that the whole thing is nowhere near what it claims to be.
+
+>> Yeah, consider me reminded.
 > 
-> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> index cadc82419dca..68b1c7204cad 100644
-> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> @@ -426,13 +426,6 @@ static int vf_qm_check_match(struct hisi_acc_vf_core_device *hisi_acc_vdev,
->  		return -EINVAL;
->  	}
->  
-> -	ret = qm_write_regs(vf_qm, QM_VF_STATE, &vf_data->vf_qm_state, 1);
-> -	if (ret) {
-> -		dev_err(dev, "failed to write QM_VF_STATE\n");
-> -		return ret;
-> -	}
-> -
-> -	hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
->  	hisi_acc_vdev->match_done = true;
->  	return 0;
->  }
-> @@ -498,6 +491,13 @@ static int vf_qm_load_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
->  	if (migf->total_length < sizeof(struct acc_vf_data))
->  		return -EINVAL;
->  
-> +	ret = qm_write_regs(qm, QM_VF_STATE, &vf_data->vf_qm_state, 1);
-> +	if (ret) {
-> +		dev_err(dev, "failed to write QM_VF_STATE\n");
-> +		return -EINVAL;
-> +	}
-> +	hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
-> +
->  	qm->eqe_dma = vf_data->eqe_dma;
->  	qm->aeqe_dma = vf_data->aeqe_dma;
->  	qm->sqc_dma = vf_data->sqc_dma;
-> @@ -506,6 +506,12 @@ static int vf_qm_load_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
->  	qm->qp_base = vf_data->qp_base;
->  	qm->qp_num = vf_data->qp_num;
->  
-> +	if (!vf_data->eqe_dma || !vf_data->aeqe_dma ||
-> +	    !vf_data->sqc_dma || !vf_data->cqc_dma) {
-> +		dev_err(dev, "resume dma addr is NULL!\n");
-> +		return -EINVAL;
-> +	}
-> +
+> Silence means agreement.
 
-I'm not sure how this fits in based on the commit log.  IIUC, we're
-actually rejecting the migration data here, which will cause a
-migration failure.  We're also testing the validity of the data *after*
-we've actually applied it to the hisi_qm object, which seems backwards.
+No, silence means I already pointed out significant issues, and so until 
+I see patches actually doing anything to attempt to address those issues 
+I've got better things to do than repeat myself.
 
-Are we just not processing the migration data because there's no driver
-or are we failing the migration?  There shouldn't be a requirement on
-the state of the guest driver for a successful migration.  Thanks,
+>> In case I need to make it any more explicit, NAK to this not-generic
+>> not-DMA-mapping API, until you can come up with either something which *can*
+>> actually work in any kind of vaguely generic manner as claimed, or instead
+>> settle on a reasonable special-case solution for justifiable special cases.
+>> Bikeshedding and rebasing through half a dozen versions, while ignoring
+>> fundamental issues I've been pointing out from the very beginning, has not
+>> somehow magically made this series mature and acceptable to merge.
+> 
+> You never responded to Christoph's answers, so please try your best and
+> be professional, write down the list of things you want to see handled
+> in next version and it will be done. It is impossible to guess what you
+> want if you are not saying it clearly.
 
-Alex
+Do I really need to spell out that if these broken scenarios are not 
+actually supposed to be supported, then there should not be dead code 
+purporting to support them, and there should be input checks 
+guaranteeing they can't happen.
 
->  	ret = qm_set_regs(qm, vf_data);
->  	if (ret) {
->  		dev_err(dev, "set VF regs failed\n");
-> @@ -1531,6 +1537,7 @@ static int hisi_acc_vfio_pci_migrn_init_dev(struct vfio_device *core_vdev)
->  	hisi_acc_vdev->vf_id = pci_iov_vf_id(pdev) + 1;
->  	hisi_acc_vdev->pf_qm = pf_qm;
->  	hisi_acc_vdev->vf_dev = pdev;
-> +	hisi_acc_vdev->vf_qm_state = QM_NOT_READY;
->  	mutex_init(&hisi_acc_vdev->state_mutex);
->  	mutex_init(&hisi_acc_vdev->open_mutex);
->  
+However I have to say I'm not entirely convinced that mixing kernel 
+memory and P2P won't happen, given the effort Logan went to to make sure 
+it was supported in the scatterlist case...
 
+> The main issue which we are trying to solve "abuse of SG lists for
+> things without struct page", is not going to disappear by itself.
+
+What everyone seems to have missed is that while it is technically true 
+that the streaming DMA API doesn't need a literal struct page, it still 
+very much depends on something which having a struct page makes it 
+sufficiently safe to assume: that what it's being given is valid kernel 
+memory that it can do things like phys_to_virt() or kmap_atomic() on. A 
+completely generic DMA mapping API which could do the right thing for 
+any old PFN on any system would be a very hard thing to achieve, and I 
+suspect even harder to do efficiently. And pushing the complexity into 
+every caller to encourage and normalise drivers calling virt_to_phys() 
+all over (_so_ many bugs there...) and pass magic flags to influence 
+internal behaviour of the API implementation clearly isn't scalable. 
+Don't think I haven't seen the other thread where Christian had the same 
+concern that this "sounds like an absolutely horrible design."
+
+Yes, it's a hard problem. No, I can't give you the right answer. But 
+that doesn't mean I have to accept a wrong answer either.
+
+>>
+>> Honestly, given certain other scenarios we may also end up having to deal
+>> with, if by the time everything broken is taken away, it were to end up
+>> stripped all the way back to something well-reasoned like:
+>>
+>> "Some drivers want more control of their DMA buffer layout than the
+>> general-purpose IOVA allocator is able to provide though the DMA mapping
+>> APIs, but also would rather not have to deal with managing an entire IOMMU
+>> domain and address space, making MSIs work, etc. Expose
+>> iommu_dma_alloc_iova() and some trivial IOMMU API wrappers to allow drivers
+>> of coherent devices to claim regions of the default domain wherein they can
+>> manage their own mappings directly."
+>>
+>> ...I wouldn't necessarily disagree.
+> 
+> Something like that was done in first RFC version, but the overall
+> feeling was that it is layer violation with unclear path to support
+> swiotlb for NVMe.
+
+So what is it now, a layering violation in a hat with still no clear 
+path to support SWIOTLB? What, are we going to suggest that non-IOMMU 
+systems should reserve gigabytes of SWIOTLB space so that every DMA 
+mapping can preallocate a DMA address (in PA space) and then be forcibly 
+bounced? You do realise that the people who *really* care about DMA 
+mapping performance above all else are putting the IOMMU in passthrough 
+where iommu-dma is out of the picture, right?
+
+Thanks,
+Robin.
 
