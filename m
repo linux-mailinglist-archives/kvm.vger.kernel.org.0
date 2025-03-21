@@ -1,252 +1,207 @@
-Return-Path: <kvm+bounces-41679-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41680-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9F5DA6BF11
-	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 17:06:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08056A6BF31
+	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 17:10:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B02D43AA441
-	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 16:05:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF6644642FD
+	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 16:09:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CAAC1C5F14;
-	Fri, 21 Mar 2025 16:05:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 696BF22A7E3;
+	Fri, 21 Mar 2025 16:09:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="j9jB+01r"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B4191DB366;
-	Fri, 21 Mar 2025 16:05:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742573132; cv=none; b=M9RLeV+Jq4QBICEkVo4CKlwiciww5sbx4M5UhYZPod3p6sRKTriVoV05aX6u6SeIig60A94fQ9otILF4gYcECo2dsXUdXf+W7hY0uK53nik+PyyjuMC9mhv69w8cEJSc3+BDBbOtRs1DqwL7Zf7Z9aBTQRgSb2ih6Ig+kBYDJfY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742573132; c=relaxed/simple;
-	bh=qIz7FnCtIzm+M/hfQ0kA5l5WgdPkfOv0pSUhcKOdNFU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I1a9qKUOZqTEFl/hE2OCMEltRS5YqjeI3pjD0GIN+4k4H1BsOuyEE9MPrV05qA2gmqvxYEnUryai2djgoyTwKsAvTxUotA1ehZcWOMpJIqQRxKEfbErhjmHlheDw5H5p6ym0ZY9+WTNWDA2rrsBF7oJrcQfMizrHmobBLIeq1l0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EAACF106F;
-	Fri, 21 Mar 2025 09:05:34 -0700 (PDT)
-Received: from [10.1.196.40] (e121345-lin.cambridge.arm.com [10.1.196.40])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D56D53F63F;
-	Fri, 21 Mar 2025 09:05:23 -0700 (PDT)
-Message-ID: <e024fe3d-bddf-4006-8535-656fd0a3fada@arm.com>
-Date: Fri, 21 Mar 2025 16:05:22 +0000
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2064.outbound.protection.outlook.com [40.107.92.64])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 025D478F51;
+	Fri, 21 Mar 2025 16:09:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.64
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742573378; cv=fail; b=TMzmYAuj0O7Y5wvZ0pUrW7ZFWlw0o8M61+NqW+oHe1Ww9bsbYyvBRD45sU25xbfL+6+41bn0UWLh5TwsopIFhMYxS/J3dn2SWKY6J+5+GnPUN2MqH3w4DoReL4MCeFmCZOtukcBD5ak3Rwd02tRLQHbAHqOYA6/Ofd0kH5aVWH4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742573378; c=relaxed/simple;
+	bh=7z3svyFZOMLfkXuyo7weWcao53AiL46/wH0PIEyQQw8=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=TfjBRrY2rk+PQSs3lwlAGUZkXyMa5I2AwPuVHGSfe4LUhYDNa21mwr+8W+zmN69+XDqM67U1WYFCQxugoI4yDgAoO1DX05u8rByYhAcCu/QnoGimAaG56smg/WWs4lk5WcSpPmHsWT/jgJv8cW/EI6XolR/HxP6VdOteGiOWPMc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=j9jB+01r; arc=fail smtp.client-ip=40.107.92.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=elSp8K3PbZWubYXYWHHljzbuCCyPJ/wAEMfGpFZNS2RavuAKWEQYekyd8QHthqaE6BTcsmzqpyE87jF5e0H5wZew3eU9CiXGRZL4Mratg0tmt66qInFR3zb1rT1uzWqRsLAfAKafmAhS2iDDMrNgQuhcFAutzB8LzVUm6WwGKYwQRSc090UUieXIgVLwweF91AumuVHsgJFx1UZAZkHIfGW6U+UCIZIjFpsyqwO9VyQT4XYgJrsljRCkXY3gyelbHd6aS40I21Q0YnoYZXBfGrvaQep1/0yHE5+a9aqnO+fFWbO8FgPMkbHGbNsLXUG+666VlCk4v75OSNOGDYS4FA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AYo/b9zlQKdFIIJbd+tXIt6k857RN5pMAdrvK8mxD1Q=;
+ b=g2Uht2EiY8THnJfPT0w3oMfqdMStGp9eDNzX+YF++AjhLxZ09Bqjy1WBOFHZRFPldUEy5M/En4d9+FCUVDjgV7Z0Wbuj3owpTV3gux4YVt2sk+nwrYilHHLXhn2S5JkkwJyKdb0CmmoPAN7dWK5Xr4tGBPRpZacWSs33gge+Kh1+Q/6HsaShT98TrUBp6kslOYnJCh/i3pp88zhnXDmdyhq75UsaXDjYrdtFTmQGYBXjlyTt0pWb7s2WIGoV5wO59so86ql2rE/Al3BM20xapBHemsqLHbzhF/uabVRmyKqDC48X1przSAX1RP8TTd0i1ompCB/hTBtwvljDIpoNhw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AYo/b9zlQKdFIIJbd+tXIt6k857RN5pMAdrvK8mxD1Q=;
+ b=j9jB+01reKs729Q9Zwy1g8tYYxhEryv0Xl9hyMsJInLTBD/kHhwM0mTOFVwuoEdDn6CZWTP12ucP3O9oriYT/IAAYmXfCAPcklN8LuZcwO22zWl1hvZ/J3ti4sLEtr8DP042RWCzVNKejgFvaGUBSJ8EXZFjzHUpge1FJ73cc3U=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS0PR12MB6608.namprd12.prod.outlook.com (2603:10b6:8:d0::10) by
+ IA0PR12MB8088.namprd12.prod.outlook.com (2603:10b6:208:409::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8534.37; Fri, 21 Mar 2025 16:09:32 +0000
+Received: from DS0PR12MB6608.namprd12.prod.outlook.com
+ ([fe80::b71d:8902:9ab3:f627]) by DS0PR12MB6608.namprd12.prod.outlook.com
+ ([fe80::b71d:8902:9ab3:f627%4]) with mapi id 15.20.8534.034; Fri, 21 Mar 2025
+ 16:09:32 +0000
+Message-ID: <e0362a96-4b3a-44b1-8d54-806a6b045799@amd.com>
+Date: Fri, 21 Mar 2025 21:39:22 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC v2 01/17] x86/apic: Add new driver for Secure AVIC
+To: Borislav Petkov <bp@alien8.de>
+Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+ dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com, nikunj@amd.com,
+ Santosh.Shukla@amd.com, Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com,
+ David.Kaplan@amd.com, x86@kernel.org, hpa@zytor.com, peterz@infradead.org,
+ seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+ kirill.shutemov@linux.intel.com, huibo.wang@amd.com, naveen.rao@amd.com
+References: <20250226090525.231882-1-Neeraj.Upadhyay@amd.com>
+ <20250226090525.231882-2-Neeraj.Upadhyay@amd.com>
+ <20250320155150.GNZ9w5lh9ndTenkr_S@fat_crate.local>
+ <a7422464-4571-4eb3-b90c-863d8b74adca@amd.com>
+ <20250321135540.GCZ91v3N5bYyR59WjK@fat_crate.local>
+Content-Language: en-US
+From: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+In-Reply-To: <20250321135540.GCZ91v3N5bYyR59WjK@fat_crate.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: JH0PR01CA0055.apcprd01.prod.exchangelabs.com
+ (2603:1096:990:5d::6) To DS0PR12MB6608.namprd12.prod.outlook.com
+ (2603:10b6:8:d0::10)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 00/17] Provide a new two step DMA mapping API
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@ziepe.ca>,
- Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
- Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
- Keith Busch <kbusch@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
- Logan Gunthorpe <logang@deltatee.com>, Yishai Hadas <yishaih@nvidia.com>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- Kevin Tian <kevin.tian@intel.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>, Jonathan Corbet <corbet@lwn.net>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
- iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
- linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
- Randy Dunlap <rdunlap@infradead.org>
-References: <cover.1738765879.git.leonro@nvidia.com>
- <20250220124827.GR53094@unreal>
- <1166a5f5-23cc-4cce-ba40-5e10ad2606de@arm.com>
- <20250302085717.GO53094@unreal>
-From: Robin Murphy <robin.murphy@arm.com>
-Content-Language: en-GB
-In-Reply-To: <20250302085717.GO53094@unreal>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6608:EE_|IA0PR12MB8088:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8bd1db4a-d7ce-4218-e731-08dd6892c400
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?eldiejVsTWZIRWwvL2VHSzdzSEpNblpSeXI1aUhtaGx0a0FHVjltN2pscjl0?=
+ =?utf-8?B?c3JQSGEveXk0bG5YaUxiWlZhM0REODJRS0FwNVhLUTJJM1YyMGlWaVRsUGNt?=
+ =?utf-8?B?Um5BTHh0bEhZMndVVXRtUzl2ZnIyZ2FjS2FveVlEeGVyWnd3STI4dnN3YXFx?=
+ =?utf-8?B?NTZBNHlUenpxWTQxeTg0cmFCelN6Q01qd25VYU5KN0NPamNzcFByUms2U0s5?=
+ =?utf-8?B?S0dIK2N2ZkVpSlNtckNPVjNyR3B4WGlncFA3TmRqdzhaNUlvV0luUWEwUE1x?=
+ =?utf-8?B?Vms5d2xucnBvL0pudFVCeGtEbFVUaTd5TkZmRTFUNUdjSDBmUFlSRXQrWTNU?=
+ =?utf-8?B?L3JKQm04WEd0ZEJZRVJzL0ZpMW9GQmtjMEhxakhPcVBLU2dHdUd1eWpici9Y?=
+ =?utf-8?B?RHdBZ3FzM05DOVg3a0VrQVN6cTRxTndWUC9PdS9Nd0lDRzFTV1oraDN5Vm95?=
+ =?utf-8?B?dW5zSFNkbDZHQlZsQTBEV3JJeHhhZEovaytjcU13SGw3YkI0Z3hoZkk4NU5y?=
+ =?utf-8?B?RVpoRjlEaTd0SmYwV0FkSU1KRTJvNnBDQXdrWDBMTm1wdDJ0cXRaeDV1QU41?=
+ =?utf-8?B?MDJING55MWJOdjRISXhsU0ljbDdYS0RvTnh1UVlrN2t1T2J4RkhLZlk4R0ox?=
+ =?utf-8?B?ZjJQYWJZaWdOcS81Y043ZThCNTdXaVM4Zy9FOGpNek1odzVNdC9lM0x2bm93?=
+ =?utf-8?B?NUVMSlJuKzVZYmZKa0R2aENWZFdQeFZGdFE5OEJhSFBIaDFBWFdhbTZJQ2dS?=
+ =?utf-8?B?TjJPVmlablAzd0R2UzVHcFdmS2Q3VXJELzNlNjB6RlRFYUJ2SGR6RE5ZQ1VU?=
+ =?utf-8?B?L2dTdGh4TTBLeUZHaGl1Mk1YK2RuWExtYlNPcitxdU1nMFUveFgxS3FzcmxH?=
+ =?utf-8?B?Tm1NWXlTWWhLQ21JRU5zQ1ZWcnFER0ZIZFBSWE1FcGxWdmhFRytCSUFMQUp4?=
+ =?utf-8?B?OEhxTjYrRnVaVGhiNklQWnYrbXlkdU1Jc0FHb0V6ajF0THN1Mml1OFQzTlli?=
+ =?utf-8?B?TDN0eFZQMWFtVlZ6K056bkdLZHFzTUZOV1krT1NrTFFOYVdkRVhXUjl0T1dk?=
+ =?utf-8?B?dkxYdVpmQXlzVmVhZnVvRExlYjNjMUk3N2dNM1hRMDJ2dS8wRmFiMFB5Ui8v?=
+ =?utf-8?B?aDFNRHdJOWc4TEVoQ0NPRlJDV3dvZkswaVpMaHhMQ2JUR3lQYnVlaXlxbjVp?=
+ =?utf-8?B?d0lQYzFUaGZWYmJtV2J6YmMvZ3BKSDU4WTd2VVlXNUd3RDZKMSt5TDBUb3lz?=
+ =?utf-8?B?eGFDRmFISWhjUzg4MXRqVmoxZDR0WVpoTlpJM1BvL0UwNC9iNnNOYnlLOUxM?=
+ =?utf-8?B?WlltdStYT2VqZklzWU9SUVpiaG1UbURtaXd0eEhnNU5RR1pqV0d5VVRneE9y?=
+ =?utf-8?B?SitzSDBCUVlHNmljOXpiemxqUXhVTCtEb0FBeU9TWnJkbm0zeGFnbTlVRUJH?=
+ =?utf-8?B?Qytock12SnJLQlFTckhYR1dmUE1MUFZXVXdBTDRzZ21KT2ZJamZEWG5zTlFj?=
+ =?utf-8?B?K2NSMjZ6amdsMHIxYU1QbitiNVQ2K2kzOWk3WlA0b0dLN1NFYUdJWlVtakRQ?=
+ =?utf-8?B?d3BSdjB0MXQxaGZDdXBhWlZRa3BBREZZSG1QRTlJM2IzRklZN2ZncmwxaEVp?=
+ =?utf-8?B?WWwrc04vczhuMHNHeGwrMHliVW5Pc2g3OERFQXZLNGQ2YkRrZW5CczNJaDFx?=
+ =?utf-8?B?dkg4YlRBYVNGU0xsMzhUTmhMbUExQ1VlRW1ZRU9YRUY5bjJuMW0zZGlFYUZC?=
+ =?utf-8?B?VkJyallGaE9xYzNqRVV3QkhXS0p3K1FVTlh5cWJsVFhXY3VhNjFudUFLL203?=
+ =?utf-8?B?cDdCdkMxTHdSVGdWeUIrTittTXpCcFk5cGllLzNHWU1vbmhxR3hXWjlsWnJE?=
+ =?utf-8?Q?YCXEZy2AND2ru?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6608.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?cFkzdWpUMHcrbVhmb21KTFZlc0hiMFgrK2RCSnE3UzRRdkowRnJ6Q25rZnNu?=
+ =?utf-8?B?YXR1bFlUbThyZ0ZCRlBXUldlbmlRSDJHQW1BdTNLVTVhMTJzRklRVFEwZWFh?=
+ =?utf-8?B?bHVyK0FkWGlVYUw1RS9CUkZ6bXNLaXdOckpUVnFUd25BQi92QUNjR2FnclIx?=
+ =?utf-8?B?YkZsVG9SeGgwOUIwR1RNZURQeklRaXREKytuUzNqbTJhRXpmTjAwdFJkY1A2?=
+ =?utf-8?B?ejZZVmtoOGMwTGxmbzNWOHFyckNQTjVaV0tnOUpyQmJydEV3L0tLbkZsWjVm?=
+ =?utf-8?B?dWlWV1pDUXp6cTdJOGJkazZXdm9lWHpuY1NpWE4xaGhSS2RxaXRNZHlqS096?=
+ =?utf-8?B?VmxBZXIxbTRCeGl6Q09ITytjU2s5U2t4cTVLUzZ6cC9pUzVGN1o5MDBPekZm?=
+ =?utf-8?B?b0lmSHY2MzdyUUg2ZlVHRDV2anQ3N3Vwc2FuYTY0dHE2SkdLYmdsM0ZXbEV3?=
+ =?utf-8?B?am43RUQ3bFdnVDltYUlSTTJzNklhQkNVeDUyNVZJL2xrUmp0V2dIK1hUQnV2?=
+ =?utf-8?B?QUJ4TC9vTmRWUnljRXBnR2JqY2dGL2pNcGtrK0JkckpiR2R3NzlTZ3kyQnB4?=
+ =?utf-8?B?M2tyeXY1YlBzTGhHRS9HeXhQNk9LZFRnVklaa1lqUnBQdit2b29aMnNRV3FP?=
+ =?utf-8?B?RmRHMTNQVk5DY3hqMjRKT2NDalppYzBmbkFzV0c4M3k0cUpreUxIVGp5OUQx?=
+ =?utf-8?B?YTVnNVZUTjR2ZVJxc21HNW43Qm83b3ZpNUdvMldpbm9UNWNzZFNMUlBqTlNQ?=
+ =?utf-8?B?MHBLT1BkTU5DbzFCd2ZOQmN0QUh1WE5uakFqQ2tBNTVuY28vYXZnRzdKcHpl?=
+ =?utf-8?B?YkhuUWlocnFSL2tGTVJyOGxHNVQvNUdSclNiL2l4RDM1VUZ4UGZTa3pNR1lv?=
+ =?utf-8?B?NVc4S1k4S1dqb1hBanJtOXhVbWFrZVdLQnp2c2V5WjhsSWJoODkxejNPY2d6?=
+ =?utf-8?B?VFRyc20zMG84VTJidEFHYVl1NTFSMzJobzZtRGFHTmh6SHZ0Um1GWWJGTWdQ?=
+ =?utf-8?B?bnY5SmR6R3JNY2dKV2sxVnh5bGhwNWZmNk15bWtaNFNua2tLbDJEQW4xbXVn?=
+ =?utf-8?B?eW5FVGIwd0dJdFAxUWRIR2tCS2VpSVpVK3BVRTVlam1aN1lFVzdNb3Vzc2F1?=
+ =?utf-8?B?Q1RGVWhnYVlnVnh1Zm90Tm92REVLNWE2Y1BUT1pRZ1JpWWozb1NRM0tWNFZp?=
+ =?utf-8?B?NVJGYm1JZVpZR2hqcXVEU2xVMFZlakNnUFdHT1JKMkpaTDUwQXBaRGFkcnNv?=
+ =?utf-8?B?b05wZWh3TXpxT2gvaWxyN2tKUmdJOVM3V1R4Q0FoWGRBUEo1SzlDd2FBNDNT?=
+ =?utf-8?B?bmR5NjJORFlMS0Rxb3JWYXczK3pUNGx2Nk1CampsUk1UYkxMVkxNMUJhbjg4?=
+ =?utf-8?B?RitNUE16a2U0TGYvcGRUdDFiLzMwTitlTElvMGRKUERkMEJPOVloY2MvSGJH?=
+ =?utf-8?B?Z1BkaEdwbGNyWEc2VlJLbTA0blp6Z3B6Q0VMQ3czVGZ3L1VXT1dkN3RvTStR?=
+ =?utf-8?B?UXRkU2Z0MU5tUnV6K3Jxdmc1dXVYcDV6TW9tK3hwQWNrT2JYUzBWUGRVRS93?=
+ =?utf-8?B?UWRwTm8rcCt2RkNKem1ydDM3bHQ2MWt1RHc5SkxoSlFLc2J4ZGE3c0hlQklP?=
+ =?utf-8?B?YjJVMUJ6SXVjN1d0YnhCUDNXck1pVVVYZ1BNVkhRbTF6eG1hVzNCdkIzMmI5?=
+ =?utf-8?B?ZnE4eFd0OWNpOFFNTUg2ZkVrMmJ2ZzZZSGQ2bzloK2JSbWNjVVZpcHpKSEEx?=
+ =?utf-8?B?Nko4cmRBR2NDcThUZ0ZoNDZVL0p2cGs3STRGelY5bXFlcE56TVlFYmNteGh0?=
+ =?utf-8?B?VnptdUY0STM0UDNzSnNETmVjTlJUcGJaV25ycTBta0E3WTVESTkydUF5eVQw?=
+ =?utf-8?B?Mk5lVi9qRXVzZWpuUDlpcU5RWDdITzZwUlJsSnhka3I4bFo1ZmhuMVErdjRN?=
+ =?utf-8?B?NzdLT2FCd3IzdzdlWGZQRGZTcTRZaTlES1Y3Yjl0ZEI3WGN5K2dkK2JUckRM?=
+ =?utf-8?B?c0toV2x6Z1F0N0RqVFl2ZVdhb2dHUmtyR0JlMHJ2K20zZlY4THRnUktQYjVp?=
+ =?utf-8?B?MGUrUVFwUHBRUU9XTERTeWczYnhVV3RMS3ZIUjBBYnN1NXppYUZZdjRkdk56?=
+ =?utf-8?Q?vg0nwVQUQcxMfsg69aDZ0DHoa?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8bd1db4a-d7ce-4218-e731-08dd6892c400
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6608.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Mar 2025 16:09:32.1123
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HtEJOvUzPjOfoGOUl6DvNFcZT01M3iNqowYJCOB18ZOoF4uSY/dl0qusQCjQqnVe3MsiybeBt/es2emTo2x3fQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8088
 
-On 02/03/2025 8:57 am, Leon Romanovsky wrote:
-> On Fri, Feb 28, 2025 at 07:54:11PM +0000, Robin Murphy wrote:
->> On 20/02/2025 12:48 pm, Leon Romanovsky wrote:
->>> On Wed, Feb 05, 2025 at 04:40:20PM +0200, Leon Romanovsky wrote:
->>>> From: Leon Romanovsky <leonro@nvidia.com>
->>>>
->>>> Changelog:
->>>> v7:
->>>>    * Rebased to v6.14-rc1
->>>
->>> <...>
->>>
->>>> Christoph Hellwig (6):
->>>>     PCI/P2PDMA: Refactor the p2pdma mapping helpers
->>>>     dma-mapping: move the PCI P2PDMA mapping helpers to pci-p2pdma.h
->>>>     iommu: generalize the batched sync after map interface
->>>>     iommu/dma: Factor out a iommu_dma_map_swiotlb helper
->>>>     dma-mapping: add a dma_need_unmap helper
->>>>     docs: core-api: document the IOVA-based API
->>>>
->>>> Leon Romanovsky (11):
->>>>     iommu: add kernel-doc for iommu_unmap and iommu_unmap_fast
->>>>     dma-mapping: Provide an interface to allow allocate IOVA
->>>>     dma-mapping: Implement link/unlink ranges API
->>>>     mm/hmm: let users to tag specific PFN with DMA mapped bit
->>>>     mm/hmm: provide generic DMA managing logic
->>>>     RDMA/umem: Store ODP access mask information in PFN
->>>>     RDMA/core: Convert UMEM ODP DMA mapping to caching IOVA and page
->>>>       linkage
->>>>     RDMA/umem: Separate implicit ODP initialization from explicit ODP
->>>>     vfio/mlx5: Explicitly use number of pages instead of allocated length
->>>>     vfio/mlx5: Rewrite create mkey flow to allow better code reuse
->>>>     vfio/mlx5: Enable the DMA link API
->>>>
->>>>    Documentation/core-api/dma-api.rst   |  70 ++++
->>>    drivers/infiniband/core/umem_odp.c   | 250 +++++---------
->>>>    drivers/infiniband/hw/mlx5/mlx5_ib.h |  12 +-
->>>>    drivers/infiniband/hw/mlx5/odp.c     |  65 ++--
->>>>    drivers/infiniband/hw/mlx5/umr.c     |  12 +-
->>>>    drivers/iommu/dma-iommu.c            | 468 +++++++++++++++++++++++----
->>>>    drivers/iommu/iommu.c                |  84 ++---
->>>>    drivers/pci/p2pdma.c                 |  38 +--
->>>>    drivers/vfio/pci/mlx5/cmd.c          | 375 +++++++++++----------
->>>>    drivers/vfio/pci/mlx5/cmd.h          |  35 +-
->>>>    drivers/vfio/pci/mlx5/main.c         |  87 +++--
->>>>    include/linux/dma-map-ops.h          |  54 ----
->>>>    include/linux/dma-mapping.h          |  85 +++++
->>>>    include/linux/hmm-dma.h              |  33 ++
->>>>    include/linux/hmm.h                  |  21 ++
->>>>    include/linux/iommu.h                |   4 +
->>>>    include/linux/pci-p2pdma.h           |  84 +++++
->>>>    include/rdma/ib_umem_odp.h           |  25 +-
->>>>    kernel/dma/direct.c                  |  44 +--
->>>>    kernel/dma/mapping.c                 |  18 ++
->>>>    mm/hmm.c                             | 264 +++++++++++++--
->>>>    21 files changed, 1435 insertions(+), 693 deletions(-)
->>>>    create mode 100644 include/linux/hmm-dma.h
->>>
->>> Kind reminder.
->>
->> ...that you've simply reposted the same thing again? Without doing anything
->> to address the bugs, inconsistencies, fundamental design flaws in claiming
->> to be something it cannot possibly be, the egregious abuse of
->> DMA_ATTR_SKIP_CPU_SYNC proudly highlighting how unfit-for-purpose the most
->> basic part of the whole idea is, nor *still* the complete lack of any
->> demonstrable justification of how callers who supposedly can't use the IOMMU
->> API actually benefit from adding all the complexity of using the IOMMU API
->> in a hat but also still the streaming DMA API as well?
+
+
+On 3/21/2025 7:25 PM, Borislav Petkov wrote:
+> On Fri, Mar 21, 2025 at 09:14:15AM +0530, Neeraj Upadhyay wrote:
+>> Do you think we should handle this case differently and not force select
+>> AMD_SECURE_AVIC config when AMD_MEM_ENCRYPT config is enabled?
 > 
-> Can you please provide concrete list of "the bugs, inconsistencies, fundamental
-> design flaws", so we can address/fix them?
+> Yeah, you'd have to do some simple CONFIG_AMD_SECURE_AVIC ifdeffery and add
+> (or not) the flag to SNP_FEATURES_PRESENT, depending...
 > 
-> We are in v7 now and out of all postings you replied to v1 and v5 only with
-> followups from three of us (Christoph, Jason and me).
 
-Let's start with just the first 3 specific points from one patch in v1:
+Ok, something like below?
 
-"If you really imagine this can support non-coherent operation and
-DMA_ATTR_SKIP_CPU_SYNC, where are the corresponding explicit sync
-operations? dma_sync_single_*() sure as heck aren't going to work..."
 
-Still completely unaddressed in v7.
++#ifdef CONFIG_AMD_SECURE_AVIC
++#define SNP_SECURE_AVIC    MSR_AMD64_SNP_SECURE_AVIC
++#else
++#define SNP_SECURE_AVIC    0
++#endif
++
 
-"In fact, same goes for SWIOTLB bouncing even in the coherent case."
+ #define SNP_FEATURES_PRESENT   (MSR_AMD64_SNP_DEBUG_SWAP |     \
+                                 MSR_AMD64_SNP_SECURE_TSC |     \
+-                                MSR_AMD64_SNP_SECURE_AVIC)
++                                SNP_SECURE_AVIC)
 
-Still completely unaddressed in v7.
 
-"Plus if the aim is to pass P2P and whatever arbitrary physical 
-addresses through here as well, how can we be sure this isn't going to 
-explode?"
-
-Still completely unaddressed in v7 for SWIOTLB; sort-of-addressed for 
-cache coherency in v3 by egregious abuse of DMA_ATTR_SKIP_CPU_SYNC in 
-callers, which when you pinged v5 I pointed out still cannot work in 
-general for the way the API claims to be able to operate (even with a 
-less-abusive dedicated attribute).
-
-And I'm going to stop there because that's already more than enough to 
-demonstrate that the whole thing is nowhere near what it claims to be.
-
->> Yeah, consider me reminded.
-> 
-> Silence means agreement.
-
-No, silence means I already pointed out significant issues, and so until 
-I see patches actually doing anything to attempt to address those issues 
-I've got better things to do than repeat myself.
-
->> In case I need to make it any more explicit, NAK to this not-generic
->> not-DMA-mapping API, until you can come up with either something which *can*
->> actually work in any kind of vaguely generic manner as claimed, or instead
->> settle on a reasonable special-case solution for justifiable special cases.
->> Bikeshedding and rebasing through half a dozen versions, while ignoring
->> fundamental issues I've been pointing out from the very beginning, has not
->> somehow magically made this series mature and acceptable to merge.
-> 
-> You never responded to Christoph's answers, so please try your best and
-> be professional, write down the list of things you want to see handled
-> in next version and it will be done. It is impossible to guess what you
-> want if you are not saying it clearly.
-
-Do I really need to spell out that if these broken scenarios are not 
-actually supposed to be supported, then there should not be dead code 
-purporting to support them, and there should be input checks 
-guaranteeing they can't happen.
-
-However I have to say I'm not entirely convinced that mixing kernel 
-memory and P2P won't happen, given the effort Logan went to to make sure 
-it was supported in the scatterlist case...
-
-> The main issue which we are trying to solve "abuse of SG lists for
-> things without struct page", is not going to disappear by itself.
-
-What everyone seems to have missed is that while it is technically true 
-that the streaming DMA API doesn't need a literal struct page, it still 
-very much depends on something which having a struct page makes it 
-sufficiently safe to assume: that what it's being given is valid kernel 
-memory that it can do things like phys_to_virt() or kmap_atomic() on. A 
-completely generic DMA mapping API which could do the right thing for 
-any old PFN on any system would be a very hard thing to achieve, and I 
-suspect even harder to do efficiently. And pushing the complexity into 
-every caller to encourage and normalise drivers calling virt_to_phys() 
-all over (_so_ many bugs there...) and pass magic flags to influence 
-internal behaviour of the API implementation clearly isn't scalable. 
-Don't think I haven't seen the other thread where Christian had the same 
-concern that this "sounds like an absolutely horrible design."
-
-Yes, it's a hard problem. No, I can't give you the right answer. But 
-that doesn't mean I have to accept a wrong answer either.
-
->>
->> Honestly, given certain other scenarios we may also end up having to deal
->> with, if by the time everything broken is taken away, it were to end up
->> stripped all the way back to something well-reasoned like:
->>
->> "Some drivers want more control of their DMA buffer layout than the
->> general-purpose IOVA allocator is able to provide though the DMA mapping
->> APIs, but also would rather not have to deal with managing an entire IOMMU
->> domain and address space, making MSIs work, etc. Expose
->> iommu_dma_alloc_iova() and some trivial IOMMU API wrappers to allow drivers
->> of coherent devices to claim regions of the default domain wherein they can
->> manage their own mappings directly."
->>
->> ...I wouldn't necessarily disagree.
-> 
-> Something like that was done in first RFC version, but the overall
-> feeling was that it is layer violation with unclear path to support
-> swiotlb for NVMe.
-
-So what is it now, a layering violation in a hat with still no clear 
-path to support SWIOTLB? What, are we going to suggest that non-IOMMU 
-systems should reserve gigabytes of SWIOTLB space so that every DMA 
-mapping can preallocate a DMA address (in PA space) and then be forcibly 
-bounced? You do realise that the people who *really* care about DMA 
-mapping performance above all else are putting the IOMMU in passthrough 
-where iommu-dma is out of the picture, right?
-
-Thanks,
-Robin.
+- Neeraj
 
