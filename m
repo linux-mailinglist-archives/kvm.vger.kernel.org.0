@@ -1,142 +1,119 @@
-Return-Path: <kvm+bounces-41695-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41696-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77724A6C0CD
-	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 18:04:51 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61554A6C0EE
+	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 18:11:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5B60482BE8
-	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 17:04:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC0CE7A5853
+	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 17:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EF9D22D7A0;
-	Fri, 21 Mar 2025 17:04:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65D6622DF9E;
+	Fri, 21 Mar 2025 17:11:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r8gXM74F"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YMKA0vlI"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB821D5ADC;
-	Fri, 21 Mar 2025 17:04:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7BE722DF83
+	for <kvm@vger.kernel.org>; Fri, 21 Mar 2025 17:11:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742576674; cv=none; b=IT32SJBGTEBonZYzEmCJi6QJQzGPedqXi0Vv8CxI9fHB0eRchP0XoVA8wquTLGEHnDHi9l8Byb9WJgQJ12QcRHR66RjVMHXdW5eNWRENzaISsA2a5qzgzQHCGhTcf+58gCWopWDau6AhMWVdwoaLbPLXmmADSfoGaQnXFy9JvI0=
+	t=1742577072; cv=none; b=S5NhZqpjrnhf0+CYwIsCtn67iIUFirIojqozsJqW0aQkeRxmIB4YcO1i6fBUT3Q5vMy+iRbX5kafr7gmOKNM/KFAfdor79d1i8PZEHHgiB0xjmMyIp2gDeSYavy9teAsKriUH++jIK/6YKQXQ8ryNJJeY13xIJupfaskz+7pqEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742576674; c=relaxed/simple;
-	bh=4BIhvc3+qX0OSvURR+5GbIbaBgN0H4vLEDwiLUkmYk0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EFqHb+Ag8sl6+ZU2tZWO/aaM3NdBL4bSC1ugsiUfUw1MVWCfsmDfkC1KqJyUlvFo/Y5d3kcOfpwHMEURML5K9QiXPSYR9T5cBTqfFYY/payoQz+VuFlnl3l/iGPVuxvpgC8Lg6AxH7SzA7hCfEIuWMCqJxyq9kD4jaNk/EtMpwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r8gXM74F; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D58BC4CEE3;
-	Fri, 21 Mar 2025 17:04:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742576674;
-	bh=4BIhvc3+qX0OSvURR+5GbIbaBgN0H4vLEDwiLUkmYk0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=r8gXM74F/+FGR0yRaBVaczuaUVE0HAnVuuKBIGwW1wkvw57XgJlAzu5Txf+qOg1yU
-	 Pm1KKfAGtuXFjrY2VX+79XtObxfKBwV/wCQDl5/J/oiNix0bXDH6oll9RRVBVYK3zk
-	 Wlb6hHOE8FhyDF/V4ggnKrje+iy/YKeb8AVrdDl2JnFBEFIPpYAAWgaRZpHay70pRo
-	 u0noL0xozzR6HommJQd7dnQKAQOhT30qDW891zYRxQPM2tZvNAb+mWzqeJvf2mYBn+
-	 wNmpsGilzTsHBW7YEyPi79Z7T/Bjh+n4vYrQEnNDCzZvGvd+4nzwyGipOFSEKg0MDL
-	 cutBPKbjuLuIg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tvfnL-00Frrz-HD;
-	Fri, 21 Mar 2025 17:04:31 +0000
-Date: Fri, 21 Mar 2025 17:04:22 +0000
-Message-ID: <87cyeaqprd.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Ricardo Koller <ricarkol@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Andrew Jones <drjones@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] KVM: selftests: Fix a couple "prio" signedness bugs
-In-Reply-To: <ca579322-dc9d-4300-bd74-7e9240e930c7@stanley.mountain>
-References: <ca579322-dc9d-4300-bd74-7e9240e930c7@stanley.mountain>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1742577072; c=relaxed/simple;
+	bh=XLV+kVClLI9qsCWDLyKlt3evct7GKZ9yWu2AEeUJCfI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=CQ9RImtXqjzWsAr+fUtlptAItmnetPmb8PloAURC6WqVQbxJNqGe65n4zExCczPCsdDKaY2liCgcc//EkwT8+r3ozsDDEjqi7eFAVcVGy89LsJAaYpUMd67/ddpX2JUezL3KZY6ZenP4BfNWyzyqe/effw9ZJijyZDPAFTBWyaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YMKA0vlI; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff8340d547so3844818a91.2
+        for <kvm@vger.kernel.org>; Fri, 21 Mar 2025 10:11:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1742577067; x=1743181867; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jZcCaE0eVuNlPG5p578LcbkklGBnH9nl3P1MA70Z8AM=;
+        b=YMKA0vlI9E4K9UPPRELSa4EnyYmaPUD0ecMnzXghAxTb9C6i2NU+3YITvUeY033qgh
+         ZhjU62VU3QfRBjUtuU9hXeXW7y2TsNjlvPsY5jwmX7rwEr46ut8TYy6VfJtGiiMfcqnM
+         8MLTNUW05EKROknsWWF+nXK4woXOI/jCHIfovWTXsoEQtSEthM27gET6eq3iOsXpRXqp
+         qaok9VadERZhAsP/Z0WLTzkdiqHYUWVasMe1XxP5iAvMXPaWRkISm8rHl+abgq4jF25B
+         oDK5gg/cMQkP0su6x548RQgL1cKB2vptG7vXXbYsDmuiB624HAtNqOQLAmBaQ2exNq4q
+         rT9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742577067; x=1743181867;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jZcCaE0eVuNlPG5p578LcbkklGBnH9nl3P1MA70Z8AM=;
+        b=NmEIThUg5mAT5iGp2wR30nFP3St7R+me9X9dcg2PD6t5/pSVL88YjTjygXFevAD85Y
+         kZqnrNbwWViCRzELuYcS68IccVWZW/cmmOpw9AgbX2OTxftQ6N6KI0jv+rL57aDNJFCx
+         El4e5SU/GYCsiPeQ5Vj7IolniRIsKSHLpjrqWdvI1GtKn5NS3GTQM614XAszAYhpxSBT
+         g4vTKwZrGjlfCcN5ubBjs7bBOsQvks/V/twMcdqYriaShNCA7TKD8tRTR04X8x5jXxKx
+         PO98ulWwJoLEK36QqgMFTdboIzTkkaGBh4vvFTBIkK2Ro98jGdHJ9UUJF0lIii/1K83A
+         tXSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUT3tyS6aOz0YIzw9R6J0H42C3PUqeZNpZyO0QP0YHgpambz5T/G4PkiD9d1D8GM6nw0hA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHMcFVekZeOoVPLO55ErV8PhTet2b+WKcIrYyH+jAXHCCqm2Rt
+	VorQTjcy+2z6yLi4tEbLDAlgL4pNvYanAnjKUrYYbmfXhzedyqX+A3/GEmwQDf/ABO+iYXN76tO
+	9tg==
+X-Google-Smtp-Source: AGHT+IHvo2uFLbO0X/Ntlpb9CNP/4H4/Y0afbFJGOtw8GTISI8pdAkD5BbQTOhDIfCrikuggvFoQobAHfEg=
+X-Received: from pjur6.prod.google.com ([2002:a17:90a:d406:b0:2ee:4a90:3d06])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5407:b0:2f9:cf97:56ac
+ with SMTP id 98e67ed59e1d1-3030fb219f6mr7694936a91.0.1742577067168; Fri, 21
+ Mar 2025 10:11:07 -0700 (PDT)
+Date: Fri, 21 Mar 2025 10:11:04 -0700
+In-Reply-To: <87cyea2xxi.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: dan.carpenter@linaro.org, ricarkol@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com, shuah@kernel.org, drjones@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20250226090525.231882-1-Neeraj.Upadhyay@amd.com>
+ <20250226090525.231882-14-Neeraj.Upadhyay@amd.com> <87cyea2xxi.ffs@tglx>
+Message-ID: <Z92dqEhfj1GG6Fxb@google.com>
+Subject: Re: [RFC v2 13/17] x86/apic: Handle EOI writes for SAVIC guests
+From: Sean Christopherson <seanjc@google.com>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>, linux-kernel@vger.kernel.org, bp@alien8.de, 
+	mingo@redhat.com, dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com, 
+	nikunj@amd.com, Santosh.Shukla@amd.com, Vasant.Hegde@amd.com, 
+	Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, x86@kernel.org, 
+	hpa@zytor.com, peterz@infradead.org, pbonzini@redhat.com, kvm@vger.kernel.org, 
+	kirill.shutemov@linux.intel.com, huibo.wang@amd.com, naveen.rao@amd.com
+Content-Type: text/plain; charset="us-ascii"
 
-Hey Dan,
-
-On Fri, 21 Mar 2025 14:32:53 +0000,
-Dan Carpenter <dan.carpenter@linaro.org> wrote:
+On Fri, Mar 21, 2025, Thomas Gleixner wrote:
+> On Wed, Feb 26 2025 at 14:35, Neeraj Upadhyay wrote:
+> > +static int find_highest_isr(void *backing_page)
+> > +{
+> > +	int vec_per_reg = 32;
+> > +	int max_vec = 256;
+> > +	u32 reg;
+> > +	int vec;
+> > +
+> > +	for (vec = max_vec - 32; vec >= 0; vec -= vec_per_reg) {
+> > +		reg = get_reg(backing_page, APIC_ISR + REG_POS(vec));
+> > +		if (reg)
+> > +			return __fls(reg) + vec;
+> > +	}
+> > +
+> > +	return -1;
 > 
-> There is an assert which relies on "prio" to be signed.
-> 
-> 	GUEST_ASSERT(prio >= 0);
-> 
-> Change the type from uint32_t to int.
-> 
-> Fixes: 728fcc46d2c2 ("KVM: selftests: aarch64: Add test for restoring active IRQs")
-> Fixes: 0ad3ff4a6adc ("KVM: selftests: aarch64: Add preemption tests in vgic_irq")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> ---
-> ---
->  tools/testing/selftests/kvm/arm64/vgic_irq.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/arm64/vgic_irq.c b/tools/testing/selftests/kvm/arm64/vgic_irq.c
-> index f4ac28d53747..e89c0fc5eef3 100644
-> --- a/tools/testing/selftests/kvm/arm64/vgic_irq.c
-> +++ b/tools/testing/selftests/kvm/arm64/vgic_irq.c
-> @@ -294,7 +294,8 @@ static void guest_restore_active(struct test_args *args,
->  		uint32_t first_intid, uint32_t num,
->  		kvm_inject_cmd cmd)
->  {
-> -	uint32_t prio, intid, ap1r;
-> +	uint32_t intid, ap1r;
-> +	int prio;
->  	int i;
->  
->  	/*
-> @@ -362,7 +363,8 @@ static void test_inject_preemption(struct test_args *args,
->  		uint32_t first_intid, int num,
->  		kvm_inject_cmd cmd)
->  {
-> -	uint32_t intid, prio, step = KVM_PRIO_STEPS;
-> +	uint32_t intid, step = KVM_PRIO_STEPS;
-> +	int prio;
->  	int i;
->  
->  	/* Set the priorities of the first (KVM_NUM_PRIOS - 1) IRQs
+> Congrats. You managed to re-implement find_last_bit() in the most
+> incomprehesible way.
 
-I think this is going in the wrong direction. A GIC priority is an
-unsigned 8bit value as per the architecture definition.
+Heh, having burned myself quite badly by trying to use find_last_bit() to get
+pending/in-service IRQs in KVM code...
 
-So the type used by the test the first place looks wrong (it is too
-wide), and the assertion is pointless.
+Using find_last_bit() doesn't work because the ISR chunks aren't contiguous,
+they're 4-byte registers at 16-byte strides.
 
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+That said, copy+pasting the aforementioned KVM code is absurd.  Please extract
+KVM's find_highest_vector() to common code, along with any other APIC utilities
+in KVM that would be useful.  I haven't looked at this series, but I suspect
+there's a _lot_ of code in KVM's local APIC emulation that can be shared.
 
