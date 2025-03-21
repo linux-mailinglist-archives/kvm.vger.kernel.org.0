@@ -1,226 +1,116 @@
-Return-Path: <kvm+bounces-41706-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41707-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F021A6C202
-	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 19:02:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98D7CA6C203
+	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 19:02:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 119A6464109
-	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 18:02:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E1F61B60CFA
+	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 18:02:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8496A22FF5E;
-	Fri, 21 Mar 2025 18:01:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B3C922E41B;
+	Fri, 21 Mar 2025 18:02:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BzjrrMWq"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yuWiwugY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2492A22FAFD
-	for <kvm@vger.kernel.org>; Fri, 21 Mar 2025 18:01:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA5122B8D7
+	for <kvm@vger.kernel.org>; Fri, 21 Mar 2025 18:02:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742580111; cv=none; b=AuHgB+wwMjWD0igfM1oq/BeL94kWg3r9KzzZwbOvJuSp1CdWtrHh3oduIoCCda6+hKHWNIoG47L70PpDXyOOxVcjdXFFODL7rAit9sLqE0E9YtbHZLD8e68Rvo7V0uoC2CzdN1BQuTJWmSatMGcaggJlAiiuUIH0DSngIQMq/10=
+	t=1742580141; cv=none; b=tLVfQYi1aIDhxesKQKjb/Yxi7ihh+Hj3tQ0Lkqh3DzQFgOs64C2Cm2oFlJxFWs4tm9Gzs5x3hIvhWIJVJy2yJB3ut43QJUTBuksZnpIRWMn8BloFc693RkhsUjuSXA9y7Tnmz+MlgDK0Vy3uduRtL/d0/Pw333lYVEpoRsVhyY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742580111; c=relaxed/simple;
-	bh=7PMTq5liFdrq9AL3d/OEmRder4cDS77P5CSA1CK+eWY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=itEny19Ax/hBz7/PwIRjqcJVmEw1EphGWUvS9IGz5PRxscSVVGDWrJOnuf/uNrBFCkZuBbOOV5YPyxWNwx3B12D9PG0Tz8g4iaqsaZsERdsMHECOHjC8IvIc/Ou9xoJIYoPaEpj8DvNC+670dRrACKbeekZ22jxoDvZJqJ4EEaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BzjrrMWq; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1742580110; x=1774116110;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=7PMTq5liFdrq9AL3d/OEmRder4cDS77P5CSA1CK+eWY=;
-  b=BzjrrMWqjHXW+FvSuIWEZHle3lJToFNYbT7HpwDSN7U8CggCi4Mva4fa
-   gI4N7HCkDqMxRdO5bNItTs1R46PWyufgNE8NUcGLIxk+6hHSD5F1C5JKz
-   EP8KWdvX7GAx9VmY6EgRmGMgTgUUb3qSKjl/FJhuJcECpC2F4G0hzH+GC
-   1alFSZ0ZoIixHCI04bPevYkwvPVzyfPpkXwkpHmoGLQNd+CeC3FwmEdUV
-   8X9FUTD/o5eO3Mqlx/Cg3Ug7q/hxAxkccgy/xJzgnF4YMHfH4RCP1tvRY
-   eFonf8VFbjNttuxd1Vh2XM2RTWTYbequVS2tygpXW+Nr/LpoUaGkPRyNq
-   w==;
-X-CSE-ConnectionGUID: +7wu/tfYQ0aLiEfTkWHpLQ==
-X-CSE-MsgGUID: xJxhuvkvQlOqT0bmOmZe6g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11380"; a="55234687"
-X-IronPort-AV: E=Sophos;i="6.14,265,1736841600"; 
-   d="scan'208";a="55234687"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2025 11:01:48 -0700
-X-CSE-ConnectionGUID: vAJOZdh2QvWCU98TLX40gA==
-X-CSE-MsgGUID: hPOg2vHkQwCKUluNJ8hJAw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,265,1736841600"; 
-   d="scan'208";a="160694127"
-Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by orviesa001.jf.intel.com with ESMTP; 21 Mar 2025 11:01:48 -0700
-From: Yi Liu <yi.l.liu@intel.com>
-To: alex.williamson@redhat.com
-Cc: jgg@nvidia.com,
-	yi.l.liu@intel.com,
-	kevin.tian@intel.com,
-	eric.auger@redhat.com,
-	kvm@vger.kernel.org,
-	chao.p.peng@linux.intel.com,
-	zhenzhong.duan@intel.com,
-	willy@infradead.org,
-	zhangfei.gao@linaro.org,
-	vasant.hegde@amd.com,
-	Nicolin Chen <nicolinc@nvidia.com>
-Subject: [PATCH v9 5/5] iommufd/selftest: Add coverage for reporting max_pasid_log2 via IOMMU_HW_INFO
-Date: Fri, 21 Mar 2025 11:01:43 -0700
-Message-Id: <20250321180143.8468-6-yi.l.liu@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250321180143.8468-1-yi.l.liu@intel.com>
-References: <20250321180143.8468-1-yi.l.liu@intel.com>
+	s=arc-20240116; t=1742580141; c=relaxed/simple;
+	bh=hxtnyaEpNvrnURB6bG523pgF4GaNkibU9SjRhF599JI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hkY6Cve976K2/Hb4W8NmmQEKKEVbi+m3wsSFHBjYoJ+BkXQhVAiPXM8fFMfmLewmXLXzvqAxR9RkXyOZyQZvrLpMJ6B/y8MHR++AWwkfsZHYsXbGJoZKVtS4GAAgvDp0boHLpbv1V6CVF8ASIaxI4Qkr55RfDjY+yMJW1N3KI5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=yuWiwugY; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-223a7065ff8so16544935ad.0
+        for <kvm@vger.kernel.org>; Fri, 21 Mar 2025 11:02:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1742580139; x=1743184939; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=A9wfgTNVwbh5MviuCEEjiqNP7cX1EHVYoRPAjNSeYzY=;
+        b=yuWiwugYGBDDfVHxwO0bQofjlltpHWnpx++M/WnWt2xiUoLnYetaECkSRmE5FHcjbl
+         p8ivxVBNZj/bynSAUFyXOwJx1/8zkrAcZ32LVrveEawShBrtAaanMS4sZHN3yDWhWQ4o
+         ioTRm4nQ4r2+lXE5Sg8QeJ5jNkT9yqiS6XwUe2ERfsycgzSmW6NmLC7by6RL2LEeInBW
+         cSDAIHOX3FiHz+3jZ0fCkC4cs273gzXuagfBihuiv/DhdxtZJY2rQanLjEdwsjwO05Yu
+         6aQIywKznaDg1Mq5dne0s0kWVESq8gaZjeacdxFUOg7jri2b7EHtzBGNd5pMkYTKshNw
+         +h6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742580139; x=1743184939;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=A9wfgTNVwbh5MviuCEEjiqNP7cX1EHVYoRPAjNSeYzY=;
+        b=lue2VWHqI14AJjoxrpfy0ZMFg0fRlHYulMmI4XvMaj592k0of9dR2BJJLMBSFIkzMP
+         oAEyH0LBt2yUZZ9YtHhFjXfFk31HiUAMhKr4Mnr/aR3YHwSP6CfiRVVU7ptw+VbuVpq+
+         jnRdfyMOafyR0xyNbXDC4gAQF1e0exFwMuIQrREuvwTZvMjwmN2zCI7oyZgbS3dqJiKE
+         vAoBHIdZA5z622EovuV7kjE2YFADA7Xqq4TlkCDCV0qoTfSv2udAszUe0O5hg5OgFkF4
+         39fxBhBLvoHSSujPQLogHBRfL2fphlLtEsYpHDgKumRzHhTKbK1APYtq9LvQuMiY7BRZ
+         UlWw==
+X-Gm-Message-State: AOJu0Yy+IJZbNy3UhFEfmiDbzwyvbnbDqQbzoFRIa/VJJptwa0tNdHpg
+	obCRi9ley42mjP4V2JS3xquS98dpswQqK/PRWBsqGG46wSk1uaWrm+h57UatSpM=
+X-Gm-Gg: ASbGncuDnpmQgY+CeocHRenLfwTi63R/2zrPtBaR113qETj0jAE6ajaC6yFxu35xUPV
+	5Wahl5I1kp4skpPQWcNU4UqBe5BCsvWfbjx0EegZWMqriNUCn6okN0E5BMSsDnShhP1O25fFMS9
+	yOs/oxjWEBiSN8PCIXmClSnpWZiKil0NiNLhHvD2+IPAKL16eT2UCirx6PfNeAFHDPHHn17jBGW
+	hbDOoPlBNaTgsSVbs1Q5Wn6fh200k7DJa/k2NfQ+I7UZod2i9GOVKBk25ducR+WXLQKBF/WYMGm
+	rDc05IHT6ykJPbo6F3qrrS0sfMmSglTx5+0ydRPbMc2xbSlT/s0EqpigLWhD3raboq+OEJ5HsBn
+	PiFgVMkLH
+X-Google-Smtp-Source: AGHT+IHbW47WrFwn8bPtk5JBZarkAnDdE580JK1jViCoJJP9Ixi4V6AItwt378nhBF0j1KTuI5MAIw==
+X-Received: by 2002:a05:6a21:e545:b0:1fa:9819:b064 with SMTP id adf61e73a8af0-1fe42f2cd03mr7722012637.18.1742580139449;
+        Fri, 21 Mar 2025 11:02:19 -0700 (PDT)
+Received: from [192.168.0.4] (174-21-74-48.tukw.qwest.net. [174.21.74.48])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af8a292b1ffsm2070387a12.61.2025.03.21.11.02.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Mar 2025 11:02:19 -0700 (PDT)
+Message-ID: <a5104aeb-6b4e-4634-9d46-9dab4e09595f@linaro.org>
+Date: Fri, 21 Mar 2025 11:02:17 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 13/30] accel/tcg: fix missing includes for
+ TARGET_HAS_PRECISE_SMC
+To: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
+Cc: kvm@vger.kernel.org, qemu-arm@nongnu.org,
+ Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
+ <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
+ <philmd@linaro.org>, =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+References: <20250320223002.2915728-1-pierrick.bouvier@linaro.org>
+ <20250320223002.2915728-14-pierrick.bouvier@linaro.org>
+Content-Language: en-US
+From: Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <20250320223002.2915728-14-pierrick.bouvier@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-IOMMU_HW_INFO is extended to report max_pasid_log2, hence add coverage
-for it.
+On 3/20/25 15:29, Pierrick Bouvier wrote:
+> We prepare to remove cpu.h from cpu-all.h, which will transitively
+> remove it from accel/tcg/tb-internal.h, and thus from most of tcg
+> compilation units.
+> 
+> Note: this was caught by a test regression for s390x-softmmu.
+> 
+> Signed-off-by: Pierrick Bouvier<pierrick.bouvier@linaro.org>
+> ---
+>   include/exec/poison.h | 1 +
+>   accel/tcg/tb-maint.c  | 1 +
+>   accel/tcg/user-exec.c | 1 +
+>   3 files changed, 3 insertions(+)
 
-Reviewed-by: Nicolin Chen <nicolinc@nvidia.com>
-Signed-off-by: Yi Liu <yi.l.liu@intel.com>
----
- tools/testing/selftests/iommu/iommufd.c        | 18 ++++++++++++++++++
- .../testing/selftests/iommu/iommufd_fail_nth.c |  3 ++-
- tools/testing/selftests/iommu/iommufd_utils.h  | 17 +++++++++++++----
- 3 files changed, 33 insertions(+), 5 deletions(-)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/tools/testing/selftests/iommu/iommufd.c b/tools/testing/selftests/iommu/iommufd.c
-index c39222b9869b..7eb7ee149f2b 100644
---- a/tools/testing/selftests/iommu/iommufd.c
-+++ b/tools/testing/selftests/iommu/iommufd.c
-@@ -342,12 +342,14 @@ FIXTURE(iommufd_ioas)
- 	uint32_t hwpt_id;
- 	uint32_t device_id;
- 	uint64_t base_iova;
-+	uint32_t device_pasid_id;
- };
- 
- FIXTURE_VARIANT(iommufd_ioas)
- {
- 	unsigned int mock_domains;
- 	unsigned int memory_limit;
-+	bool pasid_capable;
- };
- 
- FIXTURE_SETUP(iommufd_ioas)
-@@ -372,6 +374,12 @@ FIXTURE_SETUP(iommufd_ioas)
- 					     IOMMU_TEST_DEV_CACHE_DEFAULT);
- 		self->base_iova = MOCK_APERTURE_START;
- 	}
-+
-+	if (variant->pasid_capable)
-+		test_cmd_mock_domain_flags(self->ioas_id,
-+					   MOCK_FLAGS_DEVICE_PASID,
-+					   NULL, NULL,
-+					   &self->device_pasid_id);
- }
- 
- FIXTURE_TEARDOWN(iommufd_ioas)
-@@ -387,6 +395,7 @@ FIXTURE_VARIANT_ADD(iommufd_ioas, no_domain)
- FIXTURE_VARIANT_ADD(iommufd_ioas, mock_domain)
- {
- 	.mock_domains = 1,
-+	.pasid_capable = true,
- };
- 
- FIXTURE_VARIANT_ADD(iommufd_ioas, two_mock_domain)
-@@ -752,6 +761,8 @@ TEST_F(iommufd_ioas, get_hw_info)
- 	} buffer_smaller;
- 
- 	if (self->device_id) {
-+		uint8_t max_pasid = 0;
-+
- 		/* Provide a zero-size user_buffer */
- 		test_cmd_get_hw_info(self->device_id, NULL, 0);
- 		/* Provide a user_buffer with exact size */
-@@ -766,6 +777,13 @@ TEST_F(iommufd_ioas, get_hw_info)
- 		 * the fields within the size range still gets updated.
- 		 */
- 		test_cmd_get_hw_info(self->device_id, &buffer_smaller, sizeof(buffer_smaller));
-+		test_cmd_get_hw_info_pasid(self->device_id, &max_pasid);
-+		ASSERT_EQ(0, max_pasid);
-+		if (variant->pasid_capable) {
-+			test_cmd_get_hw_info_pasid(self->device_pasid_id,
-+						   &max_pasid);
-+			ASSERT_EQ(MOCK_PASID_WIDTH, max_pasid);
-+		}
- 	} else {
- 		test_err_get_hw_info(ENOENT, self->device_id,
- 				     &buffer_exact, sizeof(buffer_exact));
-diff --git a/tools/testing/selftests/iommu/iommufd_fail_nth.c b/tools/testing/selftests/iommu/iommufd_fail_nth.c
-index 8fd6f4500090..e11ec4b121fc 100644
---- a/tools/testing/selftests/iommu/iommufd_fail_nth.c
-+++ b/tools/testing/selftests/iommu/iommufd_fail_nth.c
-@@ -666,7 +666,8 @@ TEST_FAIL_NTH(basic_fail_nth, device)
- 					&self->stdev_id, NULL, &idev_id))
- 		return -1;
- 
--	if (_test_cmd_get_hw_info(self->fd, idev_id, &info, sizeof(info), NULL))
-+	if (_test_cmd_get_hw_info(self->fd, idev_id, &info,
-+				  sizeof(info), NULL, NULL))
- 		return -1;
- 
- 	if (_test_cmd_hwpt_alloc(self->fd, idev_id, ioas_id, 0,
-diff --git a/tools/testing/selftests/iommu/iommufd_utils.h b/tools/testing/selftests/iommu/iommufd_utils.h
-index 27794b6f58fc..72f6636e5d90 100644
---- a/tools/testing/selftests/iommu/iommufd_utils.h
-+++ b/tools/testing/selftests/iommu/iommufd_utils.h
-@@ -758,7 +758,8 @@ static void teardown_iommufd(int fd, struct __test_metadata *_metadata)
- 
- /* @data can be NULL */
- static int _test_cmd_get_hw_info(int fd, __u32 device_id, void *data,
--				 size_t data_len, uint32_t *capabilities)
-+				 size_t data_len, uint32_t *capabilities,
-+				 uint8_t *max_pasid)
- {
- 	struct iommu_test_hw_info *info = (struct iommu_test_hw_info *)data;
- 	struct iommu_hw_info cmd = {
-@@ -803,6 +804,9 @@ static int _test_cmd_get_hw_info(int fd, __u32 device_id, void *data,
- 			assert(!info->flags);
- 	}
- 
-+	if (max_pasid)
-+		*max_pasid = cmd.out_max_pasid_log2;
-+
- 	if (capabilities)
- 		*capabilities = cmd.out_capabilities;
- 
-@@ -811,14 +815,19 @@ static int _test_cmd_get_hw_info(int fd, __u32 device_id, void *data,
- 
- #define test_cmd_get_hw_info(device_id, data, data_len)               \
- 	ASSERT_EQ(0, _test_cmd_get_hw_info(self->fd, device_id, data, \
--					   data_len, NULL))
-+					   data_len, NULL, NULL))
- 
- #define test_err_get_hw_info(_errno, device_id, data, data_len)               \
- 	EXPECT_ERRNO(_errno, _test_cmd_get_hw_info(self->fd, device_id, data, \
--						   data_len, NULL))
-+						   data_len, NULL, NULL))
- 
- #define test_cmd_get_hw_capabilities(device_id, caps, mask) \
--	ASSERT_EQ(0, _test_cmd_get_hw_info(self->fd, device_id, NULL, 0, &caps))
-+	ASSERT_EQ(0, _test_cmd_get_hw_info(self->fd, device_id, NULL, \
-+					   0, &caps, NULL))
-+
-+#define test_cmd_get_hw_info_pasid(device_id, max_pasid)              \
-+	ASSERT_EQ(0, _test_cmd_get_hw_info(self->fd, device_id, NULL, \
-+					   0, NULL, max_pasid))
- 
- static int _test_ioctl_fault_alloc(int fd, __u32 *fault_id, __u32 *fault_fd)
- {
--- 
-2.34.1
-
+r~
 
