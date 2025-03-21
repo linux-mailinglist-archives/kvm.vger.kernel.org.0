@@ -1,64 +1,65 @@
-Return-Path: <kvm+bounces-41670-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41671-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D44DDA6BE01
-	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 16:12:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83824A6BE5F
+	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 16:36:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 900EA7A5F24
-	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 15:11:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4F1146522F
+	for <lists+kvm@lfdr.de>; Fri, 21 Mar 2025 15:36:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18BBB1D79A0;
-	Fri, 21 Mar 2025 15:12:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DACF1DF721;
+	Fri, 21 Mar 2025 15:36:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="TNvp4Ou5"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="PIQHcQR0"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2061.outbound.protection.outlook.com [40.107.95.61])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2070.outbound.protection.outlook.com [40.107.223.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5218942A94;
-	Fri, 21 Mar 2025 15:12:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BAE49461;
+	Fri, 21 Mar 2025 15:36:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.70
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742569934; cv=fail; b=D51hxNT8KT5Q9f0vguphFYuhiCVbF1wdFCWfh4zJ0Zz9vNPfiJfD44E3Np9IfMxfQWoVop2sr9TuNFfv7dtBK4QR7CSq/ZjC1KP0YNhrHmf/qzM1Vwqbtj8qpgK4LmqoBKqlxkooZNgFYeT1/sQePMwQ6TjrEDLvldbTRN6rOjM=
+	t=1742571371; cv=fail; b=Jg0UKyfj7drooGb4l9qvYLvnkv+5a4nWJKHGrT6lMx3uogdenjjDFizRWXMUepun1I5ZreyVpYQRDXWVb/AVYY6/eOpvZdX3bd8c41UAXEJW9SZBhTkcNOG9m04DzXhTC+Q4Xi41cDlUDxytrEEqSQE1rVnPHMR/KBFlRowG2SU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742569934; c=relaxed/simple;
-	bh=3FVT2140Y84UX6jNE+y7NUsj1ykaufkEGUzi73gi1e4=;
+	s=arc-20240116; t=1742571371; c=relaxed/simple;
+	bh=YyYems16syuOLpThbpIe2IW2wIPHoEyR+EAuCna7hh8=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=RQrf3zEv7eTMCRXu+v5kr6g5GDolmGyNOCKFqkECsM7jTVeJ0yLX8r7h+vILXidU/Oxihshh+FwWV1pCm/PTOhowsbxap9I3U9w3zjtTZhhBeVPqq6Rcoe/Ab/J0ocAMG+t1Zrn6ESqcZV0urZfXMAoF6QPsdFaHjnZlfhjeadE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=TNvp4Ou5; arc=fail smtp.client-ip=40.107.95.61
+	 Content-Type:MIME-Version; b=htHzrBDJzPmBmz4b2RVWUXu5MbxlUe4Dx/VtvLHjUnoBVS7O+E7qAJXuwGbEy7NHLxLHfBu0oze39CERqLhjzVILwFQLjMUZX+WgqTXZ73aVAC6jDiG1au3PE+8KmbSISMRbXtyKSP++qf+U2UtsB9bKGQsidy4U4s3JIqXZ2hw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=PIQHcQR0; arc=fail smtp.client-ip=40.107.223.70
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Ny/uq3EJ54sLE2i5Qjb1XMJSIuoyDnfRvEdY0nuznGwnhhmm9fcloUltC09UYPM+MsFaGX69p5z06cAwFSfsJxKm7fxWXWdg+MG2Jlvyv43SCcVejDLCGF5lIiFuyprcPoSBWnQ0QAQeK7qZvTI+N5sgQHz8zAx9R90aDqacTZPboojLB5/UshJ7rpUN4AK5KLok+KERyVMBSRphNozLorX/ScabCr5Zk09ZCX3N5yV70G9UKpo1khWFBogNkrcxgOuhwfbn1uUGgxwRcfQJ+siCow11VgKUvXPJRmnCDTRZJtujAF0YWUSULxiPvuFAQErqDv8SwxeZmlGspYtrpA==
+ b=y9wTPKtwqP2lUwBWCuKtUjruCJz7TVoatisxvnt+gl5q7EDQOBJGTRoHt//crBYRHCzpYWwXWhomAkAYpWtPqUasYfN9AXgVtKlzPs0CW3Z2gK+C78+pf8JLlK2K+XhgKA6OvEXg6Db98d6ypVjAkFdLpXvKV8Pr11wSsO0eCRimge8Rc8f4KrTrpjAbKBn7u9BYU1j9MCh74KV9+p+7UC44uBQoLC6J0ceX+CrupALudxDhmhotv01ZbVPQ/5Q+k6sTRtEojpOyhEvkZ042aOgP/y3eqxHboxAUNX9ig3/tLL3uOUXjd9+pDtMN4Kp3YIg7f67uhxwxoR5ubq9LRA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wS0AWsdB4gg8ujDUugGNNhGvTplzBfzLDIMOhmz45mA=;
- b=zE1gUnO38W4Hb34ZK1VZZGCVE73Am0VTAnl1GkjhcoCb/7gPv8iizEziYD069ky3nEAYZO+BIue5Ew/FKP1a22KP0Ga2Hei8/GIqMuULn3q2E42QIOw/ri97NiPSGwf68phGruJ2x/BM1Ard2MVGEWETrbiToAr7HFP7rFe/yuOazE5yLDOPk7zTDoM6i0Iul0gumX5hAnMxmAF8mvut3mB12iHYrngfFIUZ76xFwsMqj563UqV9Xa0Wvx2zxyYUfMMISvkWrb9XMDB9Rt1rjb9tQSIcDQeA8w+SeCdnMxit3jObvKNxKQDC20vBiPQ+WgWHJSHbuv5Ppcqe4NPsQw==
+ bh=CPGZHjYhG6Dy8tkk6aHc94806I4Z6LoPe6oj+3TqGTM=;
+ b=QjGJOHesxipKfCh2lOa1Y0/vvE5j3wEoA/UMPwY2zcCTFRRPdyoh8f1/llu4i9cxW53EUA64+lNroYSB1LVKThurPDsjq66/6MnBoRFQimnTyBevhFKwqTuJ5LxH6iXW7zJRO/88le6xhVmClCO77ahFW2LvHyco4qVdwrweeBuZkiVAz1BOrxkjcggiZjZzbNQO6+Xl0gxwjf2hZsFdkL14NGOtnIxVJPTpZbkEuGlFQYkvofcJabWhh2QFnyW5S3qzGftjxF/7r8GbedvjxvFm6W9KxjR0CXXBvT7ixuz+VgW0PyGt0S1ceST+lmgD7vv6PmxxBK6qoOZFEPmVVg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wS0AWsdB4gg8ujDUugGNNhGvTplzBfzLDIMOhmz45mA=;
- b=TNvp4Ou52KXTsx0hBigvLnU/QOxVPAxJZ5e0N3vOoDxY2J4akDdc+7NDEXIKVfYaw/rBMsF/1+Miz24CeSkC+f7+tskV+3CapXyiWid7xMCn0ZlaJAVoEFHni0C1clQtshSMfCUu90XjPJGXiiiPvxo+8rTkfBmFzZBR/T0uztQ=
+ bh=CPGZHjYhG6Dy8tkk6aHc94806I4Z6LoPe6oj+3TqGTM=;
+ b=PIQHcQR0KCNXJ+zEeH2aYBHTLG93a534vR5x04JTRHRSNUXzZFlYni7r1R8n6QncARQ+dD5h0uwow3J6r0in1Av8rrbTHl1eHiqda0Yorm2hTYtseNTg6qYwBSQovwaPYf8mQFX+7utFUTTwibV/dKOkSXvavSQMr3HVibfTfIs=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from DS0PR12MB6608.namprd12.prod.outlook.com (2603:10b6:8:d0::10) by
- SA0PR12MB7462.namprd12.prod.outlook.com (2603:10b6:806:24b::5) with Microsoft
+ CY5PR12MB6621.namprd12.prod.outlook.com (2603:10b6:930:43::15) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8511.28; Fri, 21 Mar 2025 15:12:09 +0000
+ 15.20.8534.36; Fri, 21 Mar 2025 15:36:06 +0000
 Received: from DS0PR12MB6608.namprd12.prod.outlook.com
  ([fe80::b71d:8902:9ab3:f627]) by DS0PR12MB6608.namprd12.prod.outlook.com
  ([fe80::b71d:8902:9ab3:f627%4]) with mapi id 15.20.8534.034; Fri, 21 Mar 2025
- 15:12:09 +0000
-Message-ID: <b7097ff8-2a9d-48f6-985e-b190cb404156@amd.com>
-Date: Fri, 21 Mar 2025 20:41:59 +0530
+ 15:36:06 +0000
+Message-ID: <ecc20053-42ae-43ba-b1b3-748abe9d5b3b@amd.com>
+Date: Fri, 21 Mar 2025 21:05:56 +0530
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC v2 04/17] x86/apic: Initialize APIC ID for Secure AVIC
+Subject: Re: [RFC v2 05/17] x86/apic: Add update_vector callback for Secure
+ AVIC
 To: Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org
 Cc: bp@alien8.de, mingo@redhat.com, dave.hansen@linux.intel.com,
  Thomas.Lendacky@amd.com, nikunj@amd.com, Santosh.Shukla@amd.com,
@@ -67,14 +68,14 @@ Cc: bp@alien8.de, mingo@redhat.com, dave.hansen@linux.intel.com,
  pbonzini@redhat.com, kvm@vger.kernel.org, kirill.shutemov@linux.intel.com,
  huibo.wang@amd.com, naveen.rao@amd.com
 References: <20250226090525.231882-1-Neeraj.Upadhyay@amd.com>
- <20250226090525.231882-5-Neeraj.Upadhyay@amd.com> <87msde32z8.ffs@tglx>
+ <20250226090525.231882-6-Neeraj.Upadhyay@amd.com> <87jz8i31dv.ffs@tglx>
 Content-Language: en-US
 From: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
-In-Reply-To: <87msde32z8.ffs@tglx>
+In-Reply-To: <87jz8i31dv.ffs@tglx>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2PR01CA0126.apcprd01.prod.exchangelabs.com
- (2603:1096:4:40::30) To DS0PR12MB6608.namprd12.prod.outlook.com
+X-ClientProxiedBy: SI2P153CA0030.APCP153.PROD.OUTLOOK.COM
+ (2603:1096:4:190::15) To DS0PR12MB6608.namprd12.prod.outlook.com
  (2603:10b6:8:d0::10)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -83,198 +84,258 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6608:EE_|SA0PR12MB7462:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8e2d7bb6-49f8-4b06-cf68-08dd688abfe1
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6608:EE_|CY5PR12MB6621:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6e80e7d1-900d-408e-4c19-08dd688e188d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?R2RZRFZzUUN6eVo4NmpNQUtRZk1CRXlqR2x4Rkp6SnJQN29sbGk1ck4zWjhD?=
- =?utf-8?B?SWE0S2VzbkRyaXY2UWM4L1VNbEh3NzZxY2U4bG1xTWcyYWE4dnhud2NNeHB3?=
- =?utf-8?B?TDBLSUwvMG1pdnRYbmxOSFFHVDZ0ZXZBTjBxVGlQa09acGtycm5BWUsxV3Rp?=
- =?utf-8?B?Zk00aVp6dmZlUE5WT2kyL0lXNGtPSlF6SGd1SExxS0U4a2JERVJpeE44eXBk?=
- =?utf-8?B?a0wzQ2Z0d2JuTzJMbmN3YlIzdzBjSHJ4cDREMGZmL2hqMnVvVldFa0R2MkJL?=
- =?utf-8?B?MU5KWU5NV0JzY2F4MGk3Sis0S3U1Rzg4eGh2bXIxeWFNeVRHQjdDbVpMTzJT?=
- =?utf-8?B?eG9USmdFUE0waWgxUUdlYnJwWFNiNXRvMXRUS2lPd2JhdXhYdU5Nb1piK3hj?=
- =?utf-8?B?VjVxbHI3VzFTdXJFM2RUSXpiZFpiZkhoNStXaXQ2cFFhY0l1STMvK0dtZ1po?=
- =?utf-8?B?OU9kQzdUZ2JMam1rUUpId1ozWGpLOWNRZWx4OFdjYjFDdmJ1NFBrUmdGKzc0?=
- =?utf-8?B?ano5c2EyREZremwwckN1QXhvTTZsTFFqSE9FWEdqdlpZYVJjczNSK2ZzeEw3?=
- =?utf-8?B?WnhkNDc3eXNwVXN0aXBiT29PelpuaGdRZE5wMkNkN256MkJwWkNKODZTZXJL?=
- =?utf-8?B?dk0wd1NmN3NyZ0JQT0hYSzQ0K0FpU2hBc2x4alR5eSswVVFOazJFT1U2QzdE?=
- =?utf-8?B?blZUNmVxZzczK0tJSldodUk4ZWduQ2tQeFdoSWNjWmlJakc5V0ljOXVxUlBY?=
- =?utf-8?B?am9BRVhsaFcyQkVkL3ZtZitkMUphK0xxVDMwS25RSmszR0QzNnlHWEN6ZEJU?=
- =?utf-8?B?Qy92SVhwZHU1VUo0bmZQYWpZQ1pabDg1YnBvaHZyalZMMUg4Qmg2RUNPOEow?=
- =?utf-8?B?c0QxRXRUbDNwK0RSYWppL1VjYW0rRlF0a0hOWm9NSWllenlSbWFnZFpHQWNI?=
- =?utf-8?B?TWxZZFBiWXltRlZEb25ya0hhN2JIeXdyQldGd1gyL2l6Vmk5cXFneStwdmVX?=
- =?utf-8?B?RzhBM3NxRXcvRDlMY0h0VmNUWk4zTFRCMXdGRlM4WkRDdlVOMkQ0eGtseW5l?=
- =?utf-8?B?aTNJb3JxQ0ZyaENtZHE3ZUlXTmo4RlJ1M0Rwd2hVaVhIWTdOTE1LV0REWHVp?=
- =?utf-8?B?RTNrWHNmeUkrY0JvUWNZTk9jVkI4UWl0V2w0SUlMdGRMRkptRng2dnpIbXlQ?=
- =?utf-8?B?WUJ4elJFR2hyc29qUmlQMm9uWFFxRVpmK2tPanViRU02eUxEbmNUZDcwTXUz?=
- =?utf-8?B?anZSWG9WMUNQUStrTysxMkhUNGhnKzNMNDgwSU1sQ1VzWm5ldHZaUWVFMTFv?=
- =?utf-8?B?U2k3Y2ZSdUticXhoclhXdUxNdEVQcGV6UjNYZ3B5U2JFZHh6cWJRbUJLbFBZ?=
- =?utf-8?B?bGJ3TkRkSkxTRmFhd3JmSWhjNzBEbzNJeS9qYTlOSmlqUFVRYXVWVUc5ZlZJ?=
- =?utf-8?B?SVM1L3hQeHFEUDd3SFZPVmVCZjBiNzdvYS9yekNzdW9wdkFFb0RTYnRJUEdj?=
- =?utf-8?B?YUI4SlYzYjNFKzV5TXVhRDZyQTdLSjlzek5KM2ZSNkYrRFJqMjhIcFEzR0xn?=
- =?utf-8?B?d3AyMTIyd3hVcWlSOUtUblI1Q2tWSmZOTy9mQmZFazFMWkMzZlUydjkveGJF?=
- =?utf-8?B?ZXdkQzFJMjZOdnVXKytHTEdFQ1RqWmp1blduTVoyU2JsZlR6SVBLTU1PNE1O?=
- =?utf-8?B?b0VpZE85TWg2NElIMGhuN2N1NGFqUGQvVCtBOWpmRG9ndGZGT21RUndGZElR?=
- =?utf-8?B?ZVZaOFZnSjl1aFhobmhGMWxqOGtkd1E0eEFyK1RNQi81SC9wejh6QzlOSnpM?=
- =?utf-8?B?dXBxR0IwOWNMdXhoUUdKQT09?=
+	=?utf-8?B?RG12TGFRS1Y0WCt3MTNoNnVXRUlsWThzMXZFbFVmUTRVcGZicVNyVnNXMjYz?=
+ =?utf-8?B?eE5kbDFtWWhTVVc1N0pFZVA4a1diWkRVaXdlUGFrOW9VdkNLempDNEh2ZU5O?=
+ =?utf-8?B?dE9JWnhycXVJT0g2RWdQMFNWNXBPUWsxRjQ2K2daT3ZONUpYN1lxTXUxRURT?=
+ =?utf-8?B?Sk1CeExLcWZRM1E0QXZ2eFdtZXZJcTdyOU9qWXhtYzhxaGVTRHpLMjBPdkJI?=
+ =?utf-8?B?b2NnY09OQ3ZqMkdlREZCbFNxNW5RS2dSSXpkakRPQnZvaGUrdE1oNkt1Z0Vp?=
+ =?utf-8?B?bm5GOFBhcDJLd0MrQUVQQzRNalB4bU9JcDJGK1Arb0hHL1FqSzU0YTY5MEcr?=
+ =?utf-8?B?SmF0dThrTlhGanArK2F5d1pGdVZLRTVSdDZROUprSW5rSkJUTkJyQno5SDdh?=
+ =?utf-8?B?dXFsZzJiN3REUWFCSVRhR05PVFJMTTVTWGEvVjlKWEVUczduVnhvRjNYdFJi?=
+ =?utf-8?B?RExBWmU1cUZmYWR3ZzRlZXlNemZDUWFURm0zN3loU0FtYmNBWkp3YmJBRGly?=
+ =?utf-8?B?NFV5c1VLUEJ2UG8yTG9lOGs3dXRXM3hlcGwxWHJJNkRZNno4R2lGZlVMNnBW?=
+ =?utf-8?B?K1dxWXdqKzBLd2dkRHByb2JPWjgxUmhxdWRmZ1N6YVRLY0krc0dxcHMzZUVu?=
+ =?utf-8?B?Z0hTZzQvdTJRQjJ0U29NNURXaWova1BjQ0tyTGcxLzI4WFFwWFpyOXp5YmQ4?=
+ =?utf-8?B?aWU0VEc3Yk5EMFF5SEIwcWg0YzhYMHhHdjQ2RzRwN2FuQWNiL2tRS3M3SVk4?=
+ =?utf-8?B?QU9CTVJuYnlza3V0QWZNUmVJdC9sTnNVUDFjL1B2enpHdDhiQ1RIbU9QOVRv?=
+ =?utf-8?B?eEdaa0xjWkFaVWNFZmhXZCtxTjlPdE5VU0cwT3FTL0FKb1JDamZPbmVWT1ND?=
+ =?utf-8?B?WlBDTG9NazF5aitOaE5yNHlDQTA4RHlrZlBHMTMzRmYwTkdJV09BSTRPZm1o?=
+ =?utf-8?B?SEpDek5Gam5YZ1EwTFQ3MWxXZ0lDL0drZ2QzNzdFNkVYOWZhcXFZSm11amtI?=
+ =?utf-8?B?R3l5Sk5RdXdzRFlETXFaYlJLVlhNK3JNM0RoSG0yK3dzU1VFa3dNbk12NHNn?=
+ =?utf-8?B?T0pNUWN4enJCNVZhclVhcHRrWThDR05KNUZTSGorZCt0dlAxMkxSOUpCOHIv?=
+ =?utf-8?B?bllaYzgvK3ppNGJyTi8zdWpMZGJveVpsK3BZdE9pNlVtZHlSald0MzZ4VGZp?=
+ =?utf-8?B?RmF2Skl0ckM5WVc0NVB1L21lWVE5aWV0TU5JVmZkVkw5WTREaEd6QTFtZnFp?=
+ =?utf-8?B?VmRPOEtiV2l1Ny9udzdxTG5IU0o0V29zZmJKLy9OMkk0RFZ3L2VLMkppK3l4?=
+ =?utf-8?B?RmFOc2t4Qy9aUFdnQnhRTHZpK2QvbnhUalRVdm0zSENmd2lxYlFYeUQ2YkQw?=
+ =?utf-8?B?Q3BpY0M2Z1dhaExiakI1WWMxQWtHcU9VY0RlUjk3RndIY0xuTEorSUx6ejFj?=
+ =?utf-8?B?OEVBakw4UEpGT0VkNGJFeWg5SjZWYTVHSXBxR0JoL0R2QmhxMEVjbGkvUjlr?=
+ =?utf-8?B?U0h4SmxGZlJ6WE1NVG9iOTZGVUcxZ29YU2lpVi9VeXFuWlZLWHgwNnZFc0xM?=
+ =?utf-8?B?NDc4NXVIYVh3bG92N29KY3BqZjVzelN3bklqdUdLK2s0NGl3aUdERm83Rmpy?=
+ =?utf-8?B?THArN0M3RXUweWhySk9nVk9GWXYxZGNXTlg3cGlzTnBwS2dSY2RkeXh1Ritl?=
+ =?utf-8?B?ZVFwSVVNa3VUOEVXeEU0NG9HWnpNcTdwTkh3L1dWelIyemxqZzJKSkx1bkJF?=
+ =?utf-8?B?K0xRcnAxVEhmLzMwRGFvZ2FDSzJ2dHo2dXdVRkh2NjB4a2ttcEdQNld2OGpV?=
+ =?utf-8?B?QlcwSGpzZ3ltTno0Q3c1dz09?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6608.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6608.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?eEFGaGxENHFuUnNiWUJDQTRmRmIxNGgvRWhWc3dadzZVaFNOeHJLeE01aENX?=
- =?utf-8?B?aVZ6NXRnQmJHZjM4cnlxYzZRblJyY2xkN3dvdEtFMXdDVjFJZTlVTTZmd0w1?=
- =?utf-8?B?Q1c1dUxoQ01TUHI1VzEwU1V3MWNacmM0RVZDMEkvaHY4bkN0ZURsdFdWd1RD?=
- =?utf-8?B?QjhoUjJ2Si9TcnZUdCswRWJxdDVCR0dHOHJBTlVwTmZCc0ltNjZGM3k2MUtX?=
- =?utf-8?B?amg0V2VHUmYrNW83ekpBSmpRUUFmSDRJbmxIcE5vS2hyTDluR1RtZG1HbFd4?=
- =?utf-8?B?eVFVWFhTdURKa2RHMDVqK2hPTkJKR0RWMU5LcU1wdy9VaGVCRXlKaWVWUkxH?=
- =?utf-8?B?UENWaEJPeVIyZ3gvRUhtVzJKNzRqMkE1RWRKWXJLZWF0UGdoSzZQVE5oM3FL?=
- =?utf-8?B?eEI0TUc4N1JBdEJCK2RxSUluS1d1YSsrYW5vZTRyVjJHZ2FTVjhDMHJwK044?=
- =?utf-8?B?WmJQVnhIMGloYm5OMG9XOFJWMGdhc3ZyNUVNUFhLdDd6SW15SzVuSGJoZjBK?=
- =?utf-8?B?T2J1VmdkcFY3bFhJbUN4cnRxWnRadlZnMlY2UVJRRW5LS20rL2p6dDZVc0dN?=
- =?utf-8?B?RGtoMnZ3cjk5UWxGR0xqZGpxb3ROakVOZCt3NUpPYWZxMzJDbGtJQ2k2ejJy?=
- =?utf-8?B?RFJPOXFzaHQ0VnYveklKYUxyOU9lY2NCNkR0ZTlmamNYQnNLWXBac2IzU1RK?=
- =?utf-8?B?cGJWSlpyVmRGTEFwT2hLOUMwaWJJR1JNbHIwSm5TN1M5dE1iQUNOVDVXVkZv?=
- =?utf-8?B?RVU4OHVJa0VsKy9SYzYyNFBodzM0Nk5LZmFQL3RKenMwL1F5cVBEaGN6ZlF1?=
- =?utf-8?B?RC9sTlJkN3BFKzRLTmNORnRjMFdGZXNqYzgrTDNQUFJkN0NEZHBkS1VtTklo?=
- =?utf-8?B?eHFPTGt5RDBHcTBkN09VckFmdmpRemc0ZEgrenNMSWl0Y1BGUm9GS2t1Z3F2?=
- =?utf-8?B?RS83N2lhcEdCZUt1QXo0QVRLTytDc25OQ3IyWDh2SzlGbFFPMklIakZtc1I5?=
- =?utf-8?B?UkJhMHYzNHNGeEhvdUt3dEVlN0JNandlbjFNQmI3WnRZdGpYZFdINVRjWXly?=
- =?utf-8?B?ZlZ5SUFGMElpcktzaktUUS82VkNsSzdMWGErUmZzaHQvWkV3enZGUlhRTUg2?=
- =?utf-8?B?cUplcWhacUlxczl3dThhUFFHVGFoNGQ1NFh3dzRnNzVWM3VhNEwybHBCOG5v?=
- =?utf-8?B?MDNmM3hYbDR2NlJMcGVtcU54YzdnRkJDbURXTVZWdDNIVUVVRTZsVVlmNWVF?=
- =?utf-8?B?S3lBZng0ekxLZmRaV1ZoUVArd3FTcDloNEcxY1l6a0hTYndCcXk3NWVFekYv?=
- =?utf-8?B?ZWEwZWZRSnlhdXM1Si9LV3ZYdkVNRXRybXlNUzJNSkNDSkZ4b0NIZ2JUUkQw?=
- =?utf-8?B?Zm4yazc1U2FDOVJTYnJXbys4WklDUU82dy93b0VyaWtOeWFicStlSWE0VGRJ?=
- =?utf-8?B?clhCWXluVHV0OE1VOEMweGloeTIzVHluaEptL1IzSFNZSXhQbUtFejJhc0l2?=
- =?utf-8?B?TEtYK0tOaE5wcFowaGEzR1BZbGxsUjFaMWVEaXlsRHBvYUcwRzNNdkpRUmxu?=
- =?utf-8?B?V1UveTFjTjlQdDdwSlh1a21ReFMvVHByc0FybE5UVWxBZnZzUENUOE4zTUQx?=
- =?utf-8?B?M01zM29sMzlyNGNIN1YvQ1pUOHFiRnBYMVZlOFJ2UTd6c0NtR3ZqY2Jzam1r?=
- =?utf-8?B?S0U1bVhNSGd3TUdrdEVQTW1STVlRS01zcEdwQW11UExGQkZud0M2VkhLckJ6?=
- =?utf-8?B?K1FEcXF5d0lueFFKMEhJUktjUExlbHBYUjA0aUpEcG1iRFpEQWZSbXdBcTND?=
- =?utf-8?B?bkdvUnVYbFllSDBIM3IrQUtXTlNWK0s2VUlMdXV2dlVYMlZKRlJuS2FpUWh2?=
- =?utf-8?B?Vnh4VkxGam1xTTZNcjBMWU0reTdCVjJBcC8vOGpKMTlJcEtzdWcvNXUwbFdB?=
- =?utf-8?B?OXUvTWVySXJmY3hRdlRkcTB6YkVuUlZNUzk2VGEyWGpmdGtIeHZNa2RpS1JS?=
- =?utf-8?B?VDFJNVd6UGpaeDVwdFJIbEQxY1U0MmQwS2FGUDExTUp6b25RSmdGTjFVb1Mz?=
- =?utf-8?B?MHkzeDhDSWVNdzJHUHllSlg2L3FBTTlRTzBzMDNqRVZ3K3lVZGJTRVRicndN?=
- =?utf-8?Q?d9tTzibhhr/MF4NUAfEaq+f0i?=
+	=?utf-8?B?NWgzalJuQnRrNUk0WUJIUVJXWlpJZmNkSTlXeEx2YXNsVkpqVlFOZ3hBY0Nn?=
+ =?utf-8?B?QzBPTW1mRXBVQUIxMWRnbU1Ndyt5RnQvOEJqZGlTWmlENnAyTWZFdk1hZENy?=
+ =?utf-8?B?M1E5bDhVWkxCWkRSeVpQS2t1ZHZGQlJTUm5KTThaME1DQ1FoWHBaRjlrbEY3?=
+ =?utf-8?B?RXk1UmViV0RoNTRnSm1pZmQ5WjRXejZHL0dBb3NxcXZJaXMvcmEzczU3TlJu?=
+ =?utf-8?B?QzYrY1EwT0dIZ0pDYVJmTTNjdnJvaDBYaW53QUN4TG9jMmtyNHZ1OXVPQmhP?=
+ =?utf-8?B?c0xqQ0ZEd3U5MHNoNm05UWpqL0tDV0hhVEpqYkx6WUJHYzVXVkwrVndySnhN?=
+ =?utf-8?B?ODF1QUZJUHVPenVWOVNESEF2UlZCZTNNM3lmTEJVQ3Jxa2o0RTNLQzFpSjZu?=
+ =?utf-8?B?Z2xhQWZUekxZN0J0T2F3a1cwa0l4ckhieklQZUNURlVqODBYTk9SNVpSa0xL?=
+ =?utf-8?B?eUJvZ0FqV2E4SnVKeXNBeHFOc3NuMXFRWHEvNVZYZFhsVkZJSG1Ra2dJQ3NR?=
+ =?utf-8?B?MFlHeGtXd3F3VVZNRExDZUM5OWpabU9XSjVobjVUTTQxTGJJN2dpeUdiN0lq?=
+ =?utf-8?B?ekwvZk9ZdVFIaGY0NHF5N3lEamk0a1cxUVBOZVd6RG02bS9QSk51ZmN0UUNY?=
+ =?utf-8?B?YWJ3Uno1QXNTRjZRNlJmQ0UzWFQ5b3VHMktjdUtvZUxKZHpSTGRXZjd3Vit5?=
+ =?utf-8?B?M2ZvdXhpZ1JMSnVCWGlrMkR6WHhMbER1SDZLYUlDWjAzNFhMMUlNMFFhYk8x?=
+ =?utf-8?B?aFBBMmF5ZVgxeFBUR1J3MEVzV1pnaXZReStBVXFDV2pwYlU0OUpid0o1U3J4?=
+ =?utf-8?B?eFNjNzN0WUF6aGhKRjRPZlI1YmgwRlBlZ29JRmR2QktuOWFhbWVsRVJqZ1JC?=
+ =?utf-8?B?L2NpbGhYKzA3YUhPcnA5aVE4TW9rbldnMG93alYvT1VEMnZXZDUrOCt4bG9k?=
+ =?utf-8?B?OEI1MWlqZlFjVnJzTy9aTHBDb3czK0EzTWdDS05KYmMxdkFDMnh3S3ZrTnFL?=
+ =?utf-8?B?OW1FZEhMei9OK3NWbHRVL1dZRzlhQ0VhZnl6Zm5BV0R0R1FRcUJCd3hRQkZ2?=
+ =?utf-8?B?QmRIbVB4MXV0MnF4OFhLNEJ0S2o2czRnV3BsK2R0QjhwbG1aZ2c2amJBa0dE?=
+ =?utf-8?B?L2I3VFhHN2JFSjFleXlCU1hjanN2T1RLdTZpOEZvbHNqSGJLZFp5L3pWR2Z5?=
+ =?utf-8?B?VzI1TTFLQkVCS1pVaFVRcDBZK3ZlekQxaHFQODRBNG5RNTgyaTZpeWcvSWhl?=
+ =?utf-8?B?REUxbkV1OHdDK0RWc1VqbmVuaEFwNGxSbHE0eU1jZ0hCUE5XRFo2YmFoak9U?=
+ =?utf-8?B?TmE5cHNjOWpzV0NCOVlFWHNWdnJlallYNmZlSmVhTXNIR3hTdkJwYksxVGVu?=
+ =?utf-8?B?cVc3bEZBcWZ5MEwybWhXNmZRYVVreEdKWGQzRlFzUmVZOVFleVVDNnJaQ2JD?=
+ =?utf-8?B?bWhrbjQ4VUxia0lQZjdhTWNoOHBMTVBLZjVicy9PejR1Q3k0YWs1TkhCZzl5?=
+ =?utf-8?B?bG9oejVJTDVDMUhoYnVJOWF1VTd5cUo1NExWNTZRSVZqTnNRZ0xBZlNDMkx5?=
+ =?utf-8?B?R21ScXJsakwrcmwweTRST29QcXFvUXhzcUdtZDNYb3A1OVp4QXlhTlIvUjQx?=
+ =?utf-8?B?RkdQQUdoKzdEUkdRcHZCTmFPb0xVazZ4NG5JV2JXY2Y4b1BCT3dWejJtc2lk?=
+ =?utf-8?B?cisvTi9yam9ROGM2VzY1cVIwRHJRRGpSTmw4MlBmQ0lYbEZzeHozOWdlNEVM?=
+ =?utf-8?B?c0xEWkc0SEdkTC9XbXFnaFg3U2JtMVBtVmF5NjNmUnRjTHVSdWZmN1NxT3Br?=
+ =?utf-8?B?QTVGYitXMWFUWmg5S0c4cnRWZlV6UTZHSnpIcGtBM3F0RStxNUlaZU9yWk5I?=
+ =?utf-8?B?UGk3VnBlT3Q1aTZHb0ZaRGwyZEgwSDdJNFU5S0R4bThUNkM1dTlZR2FjeHlD?=
+ =?utf-8?B?Ukp3ZkRJdUJHNVhXdlFzUEx3cm9yLzU1enhMTWFvMGpUS3NjMUljZVdzN3p0?=
+ =?utf-8?B?WHVhTGp1K3Mrb0poNlVHRWFYOU5pcE1pSmJCcUhyZDlGYmRxOGhYdWhjdHFm?=
+ =?utf-8?B?dU9ZSFpDWXg2N2wxTTIzU045VzV4VXNEamQvd3hqcjhzNC9CYnd3K1pIYXph?=
+ =?utf-8?Q?LiMuROgkn1W+goiJxwU6Z9GLG?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8e2d7bb6-49f8-4b06-cf68-08dd688abfe1
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6e80e7d1-900d-408e-4c19-08dd688e188d
 X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6608.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Mar 2025 15:12:09.3944
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Mar 2025 15:36:06.6266
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: NeS4v97Zh2o5YDttn+ZuOAu1g/slo6dLQx01MV+fTLwJAUZ2gfUytibWzcTq0X+3LShhZgUutmRapssgipV8Ug==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB7462
+X-MS-Exchange-CrossTenant-UserPrincipalName: cQL6tinV9guMLy3lsY8yXHDKSxzYNR8Lp1GW/bl4Co8hOJUy3qM3zKCA8BYYNdAqOPwysGan5OMN/YazjySoQA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6621
 
 
 
-On 3/21/2025 7:22 PM, Thomas Gleixner wrote:
+On 3/21/2025 7:57 PM, Thomas Gleixner wrote:
 > On Wed, Feb 26 2025 at 14:35, Neeraj Upadhyay wrote:
->> Initialize the APIC ID in the Secure AVIC APIC backing page with
->> the APIC_ID msr value read from Hypervisor. Maintain a hashmap to
->> check and report same APIC_ID value returned by Hypervisor for two
->> different vCPUs.
+>> Add update_vector callback to set/clear ALLOWED_IRR field in
+>> the APIC backing page. The ALLOWED_IRR field indicates the
+>> interrupt vectors which the guest allows the hypervisor to
+>> send (typically for emulated devices). Interrupt vectors used
+>> exclusively by the guest itself (like IPI vectors) should not
+>> be allowed to be injected into the guest for security reasons.
+>> The update_vector callback is invoked from APIC vector domain
+>> whenever a vector is allocated, freed or moved.
 > 
-> What for?
+> Your changelog tells a lot about the WHAT. Please read and follow the
+> documentation, which describes how a change log should be structured.
+> 
+> https://www.kernel.org/doc/html/latest/process/maintainer-tip.html#changelog
 > 
 
-Guest CPU reads the APIC ID from Hypervisor's vCPU (emulated) APIC state
-and updates it in the APIC backing page which is used by Secure AVIC
-hardware. As Hypervisor in untrusted, guest does a check for duplicate
-APIC IDs. Guest and hypervisor's APIC ID for a vCPU need to match for
-IPI flow to work.
+Ok
 
-IPI flow:
+>> diff --git a/arch/x86/kernel/apic/vector.c b/arch/x86/kernel/apic/vector.c
+>> index 72fa4bb78f0a..e0c9505e05f8 100644
+>> --- a/arch/x86/kernel/apic/vector.c
+>> +++ b/arch/x86/kernel/apic/vector.c
+>> @@ -174,6 +174,8 @@ static void apic_update_vector(struct irq_data *irqd, unsigned int newvec,
+>>  		apicd->prev_cpu = apicd->cpu;
+>>  		WARN_ON_ONCE(apicd->cpu == newcpu);
+>>  	} else {
+>> +		if (apic->update_vector)
+>> +			apic->update_vector(apicd->cpu, apicd->vector, false);
+>>  		irq_matrix_free(vector_matrix, apicd->cpu, apicd->vector,
+>>  				managed);
+>>  	}
+>> @@ -183,6 +185,8 @@ static void apic_update_vector(struct irq_data *irqd, unsigned int newvec,
+>>  	apicd->cpu = newcpu;
+>>  	BUG_ON(!IS_ERR_OR_NULL(per_cpu(vector_irq, newcpu)[newvec]));
+>>  	per_cpu(vector_irq, newcpu)[newvec] = desc;
+>> +	if (apic->update_vector)
+>> +		apic->update_vector(apicd->cpu, apicd->vector, true);
+> 
+> A trivial
+> 
+> static inline void apic_update_vector(....)
+> {
+>         if (apic->update_vector)
+>            ....
+> }
+> 
+> would be too easy to read and add not enough line count, right?
+> 
 
-1. Guest source CPU updates the IRR bit in the destination vCPU's APIC backing page.
-2. Guest source vCPU takes an exit to hypervisor (icr write msr vmexit). The
-   destination APIC ID in ICR data contains guest APIC ID for the destination vCPU.
-3. Hypervisor uses the apic id in the icr data provided by guest, to either kick
-   the corresponding destination vCPU (if not running) or write to AVIC doorbell
-   to notify the running destination vCPU about the new interrupt.
+Yes.
 
+>>  static void vector_assign_managed_shutdown(struct irq_data *irqd)
+>> @@ -528,11 +532,15 @@ static bool vector_configure_legacy(unsigned int virq, struct irq_data *irqd,
+>>  	if (irqd_is_activated(irqd)) {
+>>  		trace_vector_setup(virq, true, 0);
+>>  		apic_update_irq_cfg(irqd, apicd->vector, apicd->cpu);
+>> +		if (apic->update_vector)
+>> +			apic->update_vector(apicd->cpu, apicd->vector, true);
+>>  	} else {
+>>  		/* Release the vector */
+>>  		apicd->can_reserve = true;
+>>  		irqd_set_can_reserve(irqd);
+>>  		clear_irq_vector(irqd);
+>> +		if (apic->update_vector)
+>> +			apic->update_vector(apicd->cpu, apicd->vector, false);
+>>  		realloc = true;
+> 
+> This is as incomplete as it gets. None of the other code paths which
+> invoke clear_irq_vector() nor those which invoke free_moved_vector() are
+> mopping up the leftovers in the backing page.
+> 
+> And no, you don't sprinkle this nonsense all over the call sites. There
+> is only a very limited number of functions which are involed in setting
+> up and tearing down a vector. Doing this at the call sites is a
+> guarantee for missing out as you demonstrated.
+> 
+
+This is the part where I was looking for guidance. As ALLOWED_IRR (which
+tells if Hypervisor is allowed to inject a vector to guest vCPU) is per
+CPU, intent was to call it at places where vector's CPU affinity changes.
+I surely have missed cleaning up ALLOWED_IRR on previously affined CPU.
+I will follow your suggestion to do it during setup/teardown of vector (need
+to figure out those functions) and configure it for all CPUs in those
+functions.
+
+>> +#define VEC_POS(v)	((v) & (32 - 1))
+>> +#define REG_POS(v)	(((v) >> 5) << 4)
+> 
+> This is unreadable, undocumented and incomprehensible garbage.
+> 
+
+I will update it.
+
+>>  static DEFINE_PER_CPU(void *, apic_backing_page);
+>>  
+>>  struct apic_id_node {
+>> @@ -192,6 +195,22 @@ static void x2apic_savic_send_IPI_mask_allbutself(const struct cpumask *mask, in
+>>  	__send_IPI_mask(mask, vector, APIC_DEST_ALLBUT);
+>>  }
+>>  
+>> +static void x2apic_savic_update_vector(unsigned int cpu, unsigned int vector, bool set)
+>> +{
+>> +	void *backing_page;
+>> +	unsigned long *reg;
+>> +	int reg_off;
+>> +
+>> +	backing_page = per_cpu(apic_backing_page, cpu);
+>> +	reg_off = SAVIC_ALLOWED_IRR_OFFSET + REG_POS(vector);
+>> +	reg = (unsigned long *)((char *)backing_page + reg_off);
+>> +
+>> +	if (set)
+>> +		test_and_set_bit(VEC_POS(vector), reg);
+>> +	else
+>> +		test_and_clear_bit(VEC_POS(vector), reg);
+>> +}
+> 
+> What's the test_and_ for if you ignore the return value anyway?
+>
+
+To not set it again if it already set. I will switch to set_bit/clear_bit()
+as test_and_ is not necessary.
 
  
->> +struct apic_id_node {
->> +	 struct llist_node node;
->> +	 u32 apic_id;
->> +	 int cpu;
->> +};
-> 
-> https://www.kernel.org/doc/html/latest/process/maintainer-tip.html#struct-declarations-and-initializers
-> 
-> and please read the rest of the document too.
+> Als I have no idea what SAVIC_ALLOWED_IRR_OFFSET means. Whether it's
+> something from the datashit or a made up thing does not matter. It's
+> patently non-informative.
 > 
 
-Ok.
+Ok, I had tried to give some details in the cover letter. These APIC
+regs are at offset APIC_IRR(n) + 4 and are used by guest to configure the
+interrupt vectors which can be injected by Hypervisor to Guest.
 
->> +static void init_backing_page(void *backing_page)
->> +{
->> +	struct apic_id_node *next_node, *this_cpu_node;
->> +	unsigned int apic_map_slot;
->> +	u32 apic_id;
->> +	int cpu;
->> +
->> +	/*
->> +	 * Before Secure AVIC is enabled, APIC msr reads are
->> +	 * intercepted. APIC_ID msr read returns the value
->> +	 * from hv.
-> 
-> Can you please write things out? i.e. s/hv/hypervisor/ This is not twatter.
-> 
 
-Ok.
-
->> +	 */
->> +	apic_id = native_apic_msr_read(APIC_ID);
->> +	set_reg(backing_page, APIC_ID, apic_id);
->> +
->> +	if (!apic_id_map)
->> +		return;
->> +
->> +	cpu = smp_processor_id();
->> +	this_cpu_node = &per_cpu(apic_id_node, cpu);
->> +	this_cpu_node->apic_id = apic_id;
->> +	this_cpu_node->cpu = cpu;
->> +	/*
->> +	 * In common case, apic_ids for CPUs are sequentially numbered.
->> +	 * So, each CPU should hash to a different slot in the apic id
->> +	 * map.
->> +	 */
->> +	apic_map_slot = apic_id % nr_cpu_ids;
->> +	llist_add(&this_cpu_node->node, &apic_id_map[apic_map_slot]);
+> Again:
 > 
-> Why does this need to be a llist? What's wrong about a trivial hlist?
+> struct apic_page {
+> 	union {
+> 		u32	regs[NR_APIC_REGS];
+> 		u8	bytes[PAGE_SIZE];
+> 	};
+> };                
+> 
+>        struct apic_page *ap = this_cpu_ptr(apic_page);
+>        unsigned long *sirr;
+> 
+>        /*
+>         * apic_page.regs[SAVIC_ALLOWED_IRR_OFFSET...] is an array of
+>         * consecutive 32-bit registers, which represents a vector bitmap.
+>         */
+>         sirr = (unsigned long *) &ap->regs[SAVIC_ALLOWED_IRR_OFFSET];
+>         if (set)
+>         	set_bit(sirr, vector);
+>         else
+>         	clear_bit(sirr, vector);
+> 
+> See how code suddenly becomes self explaining, obvious and
+> comprehensible?
 > 
 
-I was not sure if the setup() can run in parallel on 2 CPUs. So,
-used an atomic list.
-
->> +	/* Each CPU checks only its next nodes for duplicates. */
->> +	llist_for_each_entry(next_node, this_cpu_node->node.next, node) {
->> +		if (WARN_ONCE(next_node->apic_id == apic_id,
->> +			      "Duplicate APIC %u for cpu %d and cpu %d. IPI handling will suffer!",
->> +			      apic_id, cpu, next_node->cpu))
->> +			break;
->> +	}
-> 
-> This does not make any sense at all. The warning is completely useless
-> because two milliseconds later the topology evaluation code will yell
-> about mismatch of APIC IDs and catch the duplicate.
-> 
-> So what is this overengineered thing buying you? Just more
-> incomprehensible security voodoo for no value.
-> 
-
-I see. I was not aware of the mismatch check in topology code. I will
-remove this code.
-
+Yes, thank you!
 
 - Neeraj
 
