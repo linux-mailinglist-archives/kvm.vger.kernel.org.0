@@ -1,57 +1,57 @@
-Return-Path: <kvm+bounces-41750-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41754-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 260C9A6C9DA
-	for <lists+kvm@lfdr.de>; Sat, 22 Mar 2025 12:08:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DDE7A6C9E5
+	for <lists+kvm@lfdr.de>; Sat, 22 Mar 2025 12:25:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 11D561B65BDE
-	for <lists+kvm@lfdr.de>; Sat, 22 Mar 2025 11:08:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC4F24644D1
+	for <lists+kvm@lfdr.de>; Sat, 22 Mar 2025 11:25:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30B461F76B4;
-	Sat, 22 Mar 2025 11:08:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00D491FC111;
+	Sat, 22 Mar 2025 11:25:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OZSExehV"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="w8tD0vKS"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6852613C695
-	for <kvm@vger.kernel.org>; Sat, 22 Mar 2025 11:07:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62BDAD27
+	for <kvm@vger.kernel.org>; Sat, 22 Mar 2025 11:25:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742641681; cv=none; b=B5TOAZFgl2HYQ+wXgV8ruaUcJ5qt0C41wDUNSwLJG5Yle5nxnvbJGuDSdtgeXbicMWZ9CjIxHgiFCF5TPzF3kh2K0BIMEpvxVR/Ke0oJp9Eio1yi8xSXQBNZSUIHUPdqr6RE/SVbQCTPkCkGqbQ1AJNWVk7BkaQV/UrjKmiBzSY=
+	t=1742642717; cv=none; b=GgBPyCfG5YK8UoakMZli8Wx0vfSdT8e6ybX1BP8RGrQ7g9dgcZ4JMyuIzPfePJWtPt+u6e7oUPMf9IGUOHJQ9jSekIDyKlJEyKCmLFQmvEqAgOIyAVIdWAIBj9CZHukH3mgHUf4yB7o1v+QGROwgbjdKvDLViENEX1On3O0jl8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742641681; c=relaxed/simple;
-	bh=lpBRv6CDQNK5cobIGCaLkKX3Q9wQAbjrmt5PDBshefo=;
+	s=arc-20240116; t=1742642717; c=relaxed/simple;
+	bh=tvjwqnEvt6QStVcfy4Rtfr52n68UsZuO9plyfyU7FrA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MoPspkNp9IhpOQoz+fAB1DRLBn93hD8yH9KBFsmp/M5gjBJh7Qqye7DVj0lZDGe8j3v1LMcxZhi/D65KfmhZCGg+EWctpChB97tr1pA2lWIeyvnJu48zjsZtiU3ttoTRICEVz0mgSgMaG67Hr26yRpywL3ugT/i/NN7Qsj55q1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OZSExehV; arc=none smtp.client-ip=95.215.58.186
+	 Content-Type:Content-Disposition:In-Reply-To; b=uk0ZStJDrZc9bKW0wZiCFQbNouwldjWXf/8F3E+417U0Yjkd94GKtExKFOnYC3om982jwOWEuIFVHBssYcJTQ91NlNp0wWq6vsJI8UyPTzLxXw6HqI8KnOj1JcqNq1ndfFzSIRlUsuTPDB9m5GiJkd8s+lWQIPFJ6SHvMIezw8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=w8tD0vKS; arc=none smtp.client-ip=95.215.58.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Sat, 22 Mar 2025 12:07:55 +0100
+Date: Sat, 22 Mar 2025 12:25:02 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742641677;
+	t=1742642710;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CjtNir/s/35qdSIzvyp6dHUQSm2La3Nl/s11z2mMpvE=;
-	b=OZSExehV3WAbNTvoN9AHSengUjhTW2Buz3OILRVbR4410vdVK+jVvZt8TiUwbJkT6wAJXo
-	PVFYSvf/2nnZy19LtkV2KrylKW5hYQfexcLn14B/A82N0r8FaXW8NGeHqZDyb1wZAbskA3
-	HnPsbqoCSHDE7c4NQKyXJsUytvJzUc0=
+	bh=vkm0wuie4+J7Oy46hCMinD5wTVCsPYzKlHvlkij180U=;
+	b=w8tD0vKSU1lQJ9NP40XB9yM0wVGnZ6HrC0Eolf/SvvqAyYTx585fgc/mUSp24IVCwCEJfb
+	Vp/WCEYtHpAIMZ90MziuFkZJRN3151g4GRn0kALI3aQU4zeLGL5lKmJUuCUI3zmz7bk61e
+	FqtAWwc9sypScHd0/FINLxpt3RfZuFU=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Andrew Jones <andrew.jones@linux.dev>
-To: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Cc: alexandru.elisei@arm.com, eric.auger@redhat.com, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	vladimir.murzin@arm.com
-Subject: Re: [kvm-unit-tests PATCH v2 2/5] configure: arm/arm64: Display the
- correct default processor
-Message-ID: <20250322-0b1d267fc4717085047e1739@orel>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>, 
+	eric.auger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, vladimir.murzin@arm.com
+Subject: Re: [kvm-unit-tests PATCH v2 4/5] configure: Add --qemu-cpu option
+Message-ID: <20250322-f2d94472d7ebc003a54d7a9d@orel>
 References: <20250314154904.3946484-2-jean-philippe@linaro.org>
- <20250314154904.3946484-4-jean-philippe@linaro.org>
+ <20250314154904.3946484-6-jean-philippe@linaro.org>
+ <Z9wbKfRJ7P0tms6L@raptor>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -60,95 +60,73 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250314154904.3946484-4-jean-philippe@linaro.org>
+In-Reply-To: <Z9wbKfRJ7P0tms6L@raptor>
 X-Migadu-Flow: FLOW_OUT
 
-On Fri, Mar 14, 2025 at 03:49:02PM +0000, Jean-Philippe Brucker wrote:
-> From: Alexandru Elisei <alexandru.elisei@arm.com>
+On Thu, Mar 20, 2025 at 01:42:01PM +0000, Alexandru Elisei wrote:
+...
+> >  mach=$MACHINE_OVERRIDE
+> > -processor=$PROCESSOR_OVERRIDE
+> > +qemu_cpu=$QEMU_CPU_OVERRIDE
 > 
-> The help text for the --processor option displays the architecture name as
-> the default processor type. But the default for arm is cortex-a15, and for
-> arm64 is cortex-a57. Teach configure to display the correct default
-> processor type for these two architectures.
+> The name QEMU_CPU_OVERRIDE makes more sense, but I think this will break
+> existing setups where people use PROCESSOR_OVERRIDE to pass a particular
+> -cpu value to qemu.
 > 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  configure | 30 ++++++++++++++++++++++--------
->  1 file changed, 22 insertions(+), 8 deletions(-)
+> If I were to guess, the environment variable was added to pass a value to
+> -cpu different than what it can be specified with ./configure --processor,
+> which is exactly what --qemu-cpu does. But I'll let Drew comment on that.
+
+Yeah, ideally we wouldn't rename environment variables, but I'll cross my
+fingers that nobody will notice. Indeed, it was created to avoid needing
+to reconfigure for experimenting with different QEMU cpu models, so, even
+with --qemu-cpu we'll want something and the renaming here makes sense.
+
 > 
-> diff --git a/configure b/configure
-> index dc3413fc..5306bad3 100755
-> --- a/configure
-> +++ b/configure
-> @@ -5,6 +5,24 @@ if [ -z "${BASH_VERSINFO[0]}" ] || [ "${BASH_VERSINFO[0]}" -lt 4 ] ; then
->      exit 1
->  fi
->  
-> +function get_default_processor()
-> +{
-> +    local arch="$1"
-> +
-> +    case "$arch" in
-> +    "arm")
-> +        default_processor="cortex-a15"
-> +        ;;
-> +    "arm64")
-> +        default_processor="cortex-a57"
-> +        ;;
-> +    *)
-> +        default_processor=$arch
+> >  firmware=$FIRMWARE_OVERRIDE
+> >  
+> > -[ "$PROCESSOR" = "$ARCH" ] && PROCESSOR="max"
+> > +[ -z "$QEMU_CPU" ] && QEMU_CPU="max"
+> >  : "${mach:=virt}"
+> > -: "${processor:=$PROCESSOR}"
+> > +: "${qemu_cpu:=$QEMU_CPU}"
+> >  : "${firmware:=$FIRMWARE}"
+> >  [ "$firmware" ] && firmware="-bios $firmware"
+> >  
+> > @@ -32,7 +32,7 @@ fi
+> >  mach="-machine $mach"
+> >  
+> >  command="$qemu -nodefaults -nographic -serial mon:stdio"
+> > -command+=" $mach $acc $firmware -cpu $processor "
+> > +command+=" $mach $acc $firmware -cpu $qemu_cpu "
+> >  command="$(migration_cmd) $(timeout_cmd) $command"
+> >  
+> >  if [ "$UEFI_SHELL_RUN" = "y" ]; then
+> > diff --git a/configure b/configure
+> > index 5306bad3..d25bd23e 100755
+> > --- a/configure
+> > +++ b/configure
+> > @@ -52,6 +52,7 @@ page_size=
+> >  earlycon=
+> >  efi=
+> >  efi_direct=
+> > +qemu_cpu=
+> >  
+> >  # Enable -Werror by default for git repositories only (i.e. developer builds)
+> >  if [ -e "$srcdir"/.git ]; then
+> > @@ -69,6 +70,8 @@ usage() {
+> >  	    --arch=ARCH            architecture to compile for ($arch). ARCH can be one of:
+> >  	                           arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
+> >  	    --processor=PROCESSOR  processor to compile for ($processor)
+> > +	    --qemu-cpu=CPU         the CPU model to run on. The default depends on
+> > +	                           the configuration, usually it is "host" or "max".
+> 
+> Nitpick here, would you mind changing this to "The default value depends on
+> the host system and the test configuration [..]", to make it clear that it also
+> depends on the machine the tests are being run on?
 
-Missing ';;'
+I agree.
 
-> +    esac
-> +
-> +    echo "$default_processor"
-> +}
-> +
->  srcdir=$(cd "$(dirname "$0")"; pwd)
->  prefix=/usr/local
->  cc=gcc
-> @@ -43,13 +61,14 @@ else
->  fi
->  
->  usage() {
-> +    [ -z "$processor" ] && processor=$(get_default_processor $arch)
-
-Seeing this convinces me that the additional arch=arm64 from the last
-patch should be done here above this.
-
->      cat <<-EOF
->  	Usage: $0 [options]
->  
->  	Options include:
->  	    --arch=ARCH            architecture to compile for ($arch). ARCH can be one of:
->  	                           arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
-> -	    --processor=PROCESSOR  processor to compile for ($arch)
-> +	    --processor=PROCESSOR  processor to compile for ($processor)
->  	    --target=TARGET        target platform that the tests will be running on (qemu or
->  	                           kvmtool, default is qemu) (arm/arm64 only)
->  	    --cross-prefix=PREFIX  cross compiler prefix
-> @@ -319,13 +338,8 @@ if [ "$earlycon" ]; then
->      fi
->  fi
->  
-> -[ -z "$processor" ] && processor="$arch"
-> -
-> -if [ "$processor" = "arm64" ]; then
-> -    processor="cortex-a57"
-> -elif [ "$processor" = "arm" ]; then
-> -    processor="cortex-a15"
-> -fi
-> +# $arch will have changed when cross-compiling.
-> +[ -z "$processor" ] && processor=$(get_default_processor $arch)
->  
->  if [ "$arch" = "i386" ] || [ "$arch" = "x86_64" ]; then
->      testdir=x86
-> -- 
-> 2.48.1
->
-
-Otherwise,
-
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+Thanks,
+drew
 
