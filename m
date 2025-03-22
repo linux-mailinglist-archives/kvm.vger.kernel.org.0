@@ -1,148 +1,146 @@
-Return-Path: <kvm+bounces-41757-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41758-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAB66A6C9FE
-	for <lists+kvm@lfdr.de>; Sat, 22 Mar 2025 12:50:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64851A6CA07
+	for <lists+kvm@lfdr.de>; Sat, 22 Mar 2025 13:06:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0CC16482C33
-	for <lists+kvm@lfdr.de>; Sat, 22 Mar 2025 11:50:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF3B9883EB8
+	for <lists+kvm@lfdr.de>; Sat, 22 Mar 2025 12:06:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 841A221CC6A;
-	Sat, 22 Mar 2025 11:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2223A21B9D5;
+	Sat, 22 Mar 2025 12:06:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JSPi173G"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="pfVWZLGf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12D451F237C;
-	Sat, 22 Mar 2025 11:50:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9947B1F237D
+	for <kvm@vger.kernel.org>; Sat, 22 Mar 2025 12:06:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742644219; cv=none; b=OmPfjLO7edpQ7SWVBCmP/MOzVqU39sFwyE4Vcp3pIqjpDXy7J1lQHKPOHVD///9To1G2Ex7G4PUQyUFFRrm26mHSHx3x9MUl70ogL1Dg4GZjpWYtkx5+4B03puyHcvRhbu38sMlnjhibZaaRfp13q0ShE+w10R7pZ4DDIKrs2hk=
+	t=1742645169; cv=none; b=oB8gmgQh3wJlrcG8is21df/1RtPgkFraWQbPoxAMtKz8jARfLEIvkXcTK5X520n3XBnTxLUp8CaGB6+BsW0pDdNr+ehAQyquODBeVv2zSimgEe7PL8iCrjVgT5+PcT9vCwTcSD3Jar8TWawXEu5jpC2mCdbeFVSnItbSU4XtW+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742644219; c=relaxed/simple;
-	bh=dlb2c5+73X9T17Ga2GDXTcwT6vGIJCUSgIzW59AQZWg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:Content-Type:
-	 MIME-Version; b=rNu/UdTsJ1c5pdO2yRzhP45iGJGLb6WzIYPtw0M5oFFy3wcgFisFPOYlutfZE/oHwYCEnXBiXmd48mCJKFbC0lKX6u1dQxSe6SoWFLvWzDAFHwwzMrTb4gu5ewn9ETXTXhvFoOBukzapP4an6O01Jq2dt12/zbui0So78zMC6aE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JSPi173G; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-ac2902f7c2aso483215066b.1;
-        Sat, 22 Mar 2025 04:50:17 -0700 (PDT)
+	s=arc-20240116; t=1742645169; c=relaxed/simple;
+	bh=oOwIic0xoWcK/W7bScwvvNxG27FtWKsUDiBHcGLGMEg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cd6WAdB4dqwuKHm/DGGevl+Y8E3NJxHcnGFtxrzH6b+quH33/d0PLNIdFpMKfdgY/gWfYZEcQpkZoMlHGlOYRrGMIcQeElBT1EQYLFwZXQ83g4rD47ADEGvlejPmVkxnWicFrgCe/Rp5CNucZ/7dsRmBchcUl/pG+jGV5eNhQ2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=pfVWZLGf; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4393dc02b78so18983625e9.3
+        for <kvm@vger.kernel.org>; Sat, 22 Mar 2025 05:06:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742644216; x=1743249016; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:in-reply-to:date
-         :cc:to:from:subject:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JeCMKd6FN5Dtrxtkveh1+h24l/CzYAUf5GBYjF0Tj9I=;
-        b=JSPi173Gy9EisqpIuqxLAdt39Xzhxyi86yrBYhtu3gQ9Bsl+F68pXBXzEdYSsTnd7l
-         WSQNuJW6GLAFDTN8LRqAbhofx8u//QbbbI/KThok4rxMwo1e1YokPhXhb47TFqx+W+qF
-         jUF0gbKlsrw915WMfmz5dgZExnnXV2qsvlQH9dXDnfbLzjnxGyCpBt79eg/YSd6c+YaQ
-         nCegTCjWUDdI93OBACZ4LxfmfKgjPoPse7KZ30a+BdninHvI/iV8C5ALMX0R7r/DoqFn
-         icdZxEK7irobWx9TB+2bsZMg/53brsOdo2GOJb+iU0WqDHnFQqm+Xr4krAM5mIxYAyom
-         V62A==
+        d=ventanamicro.com; s=google; t=1742645166; x=1743249966; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ZKCRWgSlF1v0cutxAi8x3LCFESHSHWoNhfvIYKSJItY=;
+        b=pfVWZLGfHoQsMmWHi54ghr7KbiyyJFpAMemHA4DI398Vhpz1z/JsE643sFQ1ehK9zl
+         Clw4wgHobbHkiCQXGyiU7Eqj6nStsGZz5jalsceV3p31r5hpN89/3D39dBQCN672KKhY
+         SlT2poaxnVeXaFVC5PpFbax3DQh5ipvKlna28PGbWmGvwKg60CnFyq4GuSViWAbNAaHE
+         b6nQbieQAmhXUuyUeZL+6TAJtCS7BfvAmIsFfE8Xt8GwYRtvBdSwVUzyjIulhBEqH10m
+         8CmvdvayXOc0Vo+uLQJ+81AL56LPVMRdXEh24EohL+YfeAwVv85vSlJfwMRS6/HhLA0B
+         DoLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742644216; x=1743249016;
-        h=mime-version:user-agent:content-transfer-encoding:in-reply-to:date
-         :cc:to:from:subject:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=JeCMKd6FN5Dtrxtkveh1+h24l/CzYAUf5GBYjF0Tj9I=;
-        b=U+UgbvZ9dVbLTg4Q6gCTbe2jZE6v1HP4ev+gGg+GKVZpaANIIHT5mA4U/23AoAdzjN
-         3via79vm48Z1VCsTn1Qr970LKV6eJhoNOOSTxrypWaBEFpI/XIizdxADnZVi37BmHrhS
-         oPzRf9zGUPEgd+uDtg0UY7/8ocQuYKOee1eyEP4cKaWAZ6MHxO3faZRvDWsBthMfaWG1
-         oMNBlJ8NeXiWyG5Y0klEnRTbko53wf3yrh7Fh1ZaZKrcxky2PwVN4w4VXxTefyArLDVs
-         uVpirV00M6/NVeyQFwJ4qp4mUjep+c3i2Aa483QLzR5VC4JKFJpDoaswDKDRiNfaOnJb
-         YCdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUthLpHEKjq9kGU3PlowSene2JsY2dAIeE7jaSCeCcruLo2ZyoFRFWnw2ApPUuDrdKzffyfKfN9TxXXwA==@vger.kernel.org, AJvYcCWCjhZU/rhMFSTkM1ClSNdEq3LrM2GOg+iyHBAJAdEReusXE8lRpgXBU42k+KjXWTxdA2sbgekBmGpy@vger.kernel.org, AJvYcCWuMU6e8Wl5rrm48hXee7iaxWOSa7I/8vO904BnrPFFpjFm4u8u52fOONNxJm2pAqkC0Xs=@vger.kernel.org, AJvYcCWzcfwm8d5a4o+dPUMM9boHmg442qy6VzNcnHQfRJK+eS0KAabpY9rJfU1BH0xLpdhb7XbST5ZLWtNs3MBc@vger.kernel.org
-X-Gm-Message-State: AOJu0YyUfzkeoghv+3UP9DpHrvrIisU0YENgnHrOzHrrhmNA7iItopuR
-	1sVX5KsILBs6NyPOflZkZ7oAu/1FNzBumSMmVvW76tXyyiYJpANv
-X-Gm-Gg: ASbGncu++nUuEKwWdvUvOKgVDG3MxX27HCZ3beBkDgHk6RSvnCAph1m2SF9cSLfwsCb
-	DJYe0xPO9JDgOcpD6n/n4axqI659vDcI5w6oMs662oyX3DN+TAXG9932U4yOQT1tF9Eq9YPAo1p
-	yyRnd9aNYm7CB+1ItIzC0kwMJgofD+Ej8eKjlfWmaLTYES8kEk7+c6Ho322cze0Q6irPFThekWq
-	HjQhVILrpfY5Pyxici++gLSOlPjaQqreQovGxWi3aqRS/Ggh4pM5HNAlbIUdGERsuPQkeLzHyE3
-	TIWSYvlsYCf9Vsna5aPR+v/L8kXZVEq9I1P1B2DtjysetYzjO6gn0CBafbpkDCAE1cb1lojTERL
-	MijCTeV/tCSN8m7wcwXeHXUo=
-X-Google-Smtp-Source: AGHT+IEphkVCVCfxAVXmQkZdk1aaFCEcND/QMO8xPKoiUSmAYimS0LjW+bLOcrDDhpSGnYro5fRwfQ==
-X-Received: by 2002:a17:907:ec81:b0:ac4:2b0:216f with SMTP id a640c23a62f3a-ac402b024c3mr372266766b.43.1742644215830;
-        Sat, 22 Mar 2025 04:50:15 -0700 (PDT)
-Received: from ?IPv6:2001:b07:5d29:f42d:82af:f891:3144:66d? ([2001:b07:5d29:f42d:82af:f891:3144:66d])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3efd4798dsm326399066b.161.2025.03.22.04.50.13
+        d=1e100.net; s=20230601; t=1742645166; x=1743249966;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZKCRWgSlF1v0cutxAi8x3LCFESHSHWoNhfvIYKSJItY=;
+        b=avIiJ1ub09fixeGezScI1xVquhYTyYt4b3AQiHHsUjBtYKOXmsuS4uRS4M3lG3jTFS
+         PWkj9+O0uyy838BfZFj6z48M7RCqxa80OB3xXHgHlcJtELYR6djg3wWyZtOpGGnABdBV
+         LpDeD//YmAWz86ofbxguph25ZYSoFCuUANciVJ3aSsovx2ZpCHKzCD7vgGA8Reop03qw
+         zWD9NCjEAkSCMXkh3CFE5XIpX7LttAMJf2p3Ijq8oTLTiRWYa+hxsrPHOGlfGggiluJz
+         n7KLe2hfGb/MG9MJEqzjIMQMUrPzpvjKqp3gdIYEpFe3CvPLV0jfsGKhFO6HQ2DQc5qH
+         bhYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUN3PiIK6AQNnEc60/VIM34Qzn9MwEzorJ6okEVZHnlEoKJfcuFUjvrAfdR1Btq7vQdQEM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YynC60QaPn7UmFjPz1HNI9pas9X8YuCqdoXLL75q+8QfQkkyX45
+	emIPVCu9C5ZkxNi+C0Gt/hsAlwG3ophbjNwnJXh85J4mJIJ3At3XEI7qQQIcR+E=
+X-Gm-Gg: ASbGncuwfSiLZnhE0xVDxI9xP6qTP+6vo7sRhZ4gEikN1LZ/3Ug8CK0lfKIFnLAlxe+
+	tvoX4SGMRvR+kdhOa3z394O0rIFDxivxviV+CPZPceCDIGzrHxJUiMkGYVroPJCrfNIU5OKFAtf
+	BqGOQ2OirozpBRLe9ZBpC/UasgrsMO9708LpVJ56yNd/YyRCiXrLxYGhCQJVYmVNWyvVqDiM1+T
+	LRXGaVWvKJ1oZ6qjduB5tCCwYploesklFucl1cnRT09+4JN1v7ezc2P/1lCPL0T+uFYwyc5VLDj
+	Rc+T1h/VoyrE/WkFX209MLBjCmpkoqPzbs5Z9MGKsSWvwsxuY/ARzLDK+GBs6SO7SBcuoKe1OA=
+	=
+X-Google-Smtp-Source: AGHT+IFTfC3V3Y+aXvtwsAGDzN2r/TELBK33hItKDRr/I6qX4Pf8OQOcC8wMhwn6dPn+tHwLQGn1PA==
+X-Received: by 2002:a05:600c:470f:b0:43c:fe15:41e1 with SMTP id 5b1f17b1804b1-43d509e190fmr61771675e9.4.1742645165642;
+        Sat, 22 Mar 2025 05:06:05 -0700 (PDT)
+Received: from localhost (cst2-173-28.cust.vodafone.cz. [31.30.173.28])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3997f9ef23esm4932401f8f.81.2025.03.22.05.06.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 Mar 2025 04:50:15 -0700 (PDT)
-Message-ID: <7177c7ae24b9f7ebbfc001166e09beadb81305ae.camel@gmail.com>
-Subject: Re: [RFC PATCH v2 05/22] crypto: ccp: Enable SEV-TIO feature in the
- PSP when supported
-From: Francesco Lavra <francescolavra.fl@gmail.com>
-To: aik@amd.com
-Cc: Jonathan.Cameron@huawei.com, aneesh.kumar@kernel.org,
- ashish.kalra@amd.com,  baolu.lu@linux.intel.com, bhelgaas@google.com,
- dan.j.williams@intel.com,  dionnaglaze@google.com, hch@lst.de,
- iommu@lists.linux.dev, jgg@ziepe.ca,  joao.m.martins@oracle.com,
- joro@8bytes.org, kevin.tian@intel.com,  kvm@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-coco@lists.linux.dev, 
- linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org, lukas@wunner.de, 
- michael.roth@amd.com, nicolinc@nvidia.com, nikunj@amd.com,
- pbonzini@redhat.com,  robin.murphy@arm.com, seanjc@google.com,
- steven.sistare@oracle.com,  suravee.suthikulpanit@amd.com,
- suzuki.poulose@arm.com, thomas.lendacky@amd.com,  vasant.hegde@amd.com,
- x86@kernel.org, yi.l.liu@intel.com, yilun.xu@linux.intel.com, 
- zhiw@nvidia.com
-Date: Sat, 22 Mar 2025 12:50:12 +0100
-In-Reply-To: <20250218111017.491719-6-aik@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+        Sat, 22 Mar 2025 05:06:05 -0700 (PDT)
+Date: Sat, 22 Mar 2025 13:06:04 +0100
+From: Andrew Jones <ajones@ventanamicro.com>
+To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+Cc: Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
+	Samuel Holland <samuel.holland@sifive.com>
+Subject: Re: [PATCH v4 02/18] riscv: sbi: add new SBI error mappings
+Message-ID: <20250322-cce038c88db88dd119a49846@orel>
+References: <20250317170625.1142870-1-cleger@rivosinc.com>
+ <20250317170625.1142870-3-cleger@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250317170625.1142870-3-cleger@rivosinc.com>
 
-On 2025-02-18 at 11:09, Alexey Kardashevskiy wrote:
-> @@ -601,6 +603,25 @@ struct sev_data_snp_addr {
->  	u64 address;				/* In/Out */
->  } __packed;
-> =20
-> +/**
-> + * struct sev_data_snp_feature_info - SEV_CMD_SNP_FEATURE_INFO
-> command params
-> + *
-> + * @len: length of this struct
-> + * @ecx_in: subfunction index of CPUID Fn8000_0024
-> + * @feature_info_paddr: physical address of a page with
-> sev_snp_feature_info
-> + */
-> +#define SNP_FEATURE_FN8000_0024_EBX_X00_SEVTIO	1
+On Mon, Mar 17, 2025 at 06:06:08PM +0100, Clément Léger wrote:
+> A few new errors have been added with SBI V3.0, maps them as close as
+> possible to errno values.
+> 
+> Signed-off-by: Clément Léger <cleger@rivosinc.com>
+> ---
+>  arch/riscv/include/asm/sbi.h | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/arch/riscv/include/asm/sbi.h b/arch/riscv/include/asm/sbi.h
+> index bb077d0c912f..d11d22717b49 100644
+> --- a/arch/riscv/include/asm/sbi.h
+> +++ b/arch/riscv/include/asm/sbi.h
+> @@ -536,11 +536,20 @@ static inline int sbi_err_map_linux_errno(int err)
+>  	case SBI_SUCCESS:
+>  		return 0;
+>  	case SBI_ERR_DENIED:
+> +	case SBI_ERR_DENIED_LOCKED:
+>  		return -EPERM;
+>  	case SBI_ERR_INVALID_PARAM:
+> +	case SBI_ERR_INVALID_STATE:
+> +	case SBI_ERR_BAD_RANGE:
+>  		return -EINVAL;
+>  	case SBI_ERR_INVALID_ADDRESS:
+>  		return -EFAULT;
+> +	case SBI_ERR_NO_SHMEM:
+> +		return -ENOMEM;
+> +	case SBI_ERR_TIMEOUT:
+> +		return -ETIME;
+> +	case SBI_ERR_IO:
+> +		return -EIO;
+>  	case SBI_ERR_NOT_SUPPORTED:
+>  	case SBI_ERR_FAILURE:
+>  	default:
+> -- 
+> 2.47.2
+>
 
-According to the SNP firmware ABI spec, support for SEV TIO commands is
-indicated by bit 1 (bit 0 is for SEV legacy commands).
+I'm not a huge fan sbi_err_map_linux_errno() since the mappings seem a bit
+arbitrary, but if we're going to do it, then these look pretty good to me.
+Only other thought I had was E2BIG for bad-range, but nah...
 
-> +static int snp_get_feature_info(struct sev_device *sev, u32 ecx,
-> struct sev_snp_feature_info *fi)
-> +{
-> +	struct sev_user_data_snp_status status =3D { 0 };
-> +	int psp_ret =3D 0, ret;
-> +
-> +	ret =3D snp_platform_status_locked(sev, &status, &psp_ret);
-> +	if (ret)
-> +		return ret;
-> +	if (ret !=3D SEV_RET_SUCCESS)
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 
-s/ret/psp_ret/
-
-> +		return -EFAULT;
-> +	if (!status.feature_info)
-> +		return -ENOENT;
-> +
-> +	ret =3D snp_feature_info_locked(sev, ecx, fi, &psp_ret);
-> +	if (ret)
-> +		return ret;
-> +	if (ret !=3D SEV_RET_SUCCESS)
-
-Same here
+Thanks,
+drew
 
