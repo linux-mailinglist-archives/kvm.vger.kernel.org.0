@@ -1,149 +1,167 @@
-Return-Path: <kvm+bounces-41735-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41736-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 826B3A6C6A5
-	for <lists+kvm@lfdr.de>; Sat, 22 Mar 2025 01:20:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68C79A6C6B0
+	for <lists+kvm@lfdr.de>; Sat, 22 Mar 2025 01:30:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C9CD7A6FEA
-	for <lists+kvm@lfdr.de>; Sat, 22 Mar 2025 00:19:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C43CA466233
+	for <lists+kvm@lfdr.de>; Sat, 22 Mar 2025 00:30:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 460E34A3C;
-	Sat, 22 Mar 2025 00:20:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 079F2DDDC;
+	Sat, 22 Mar 2025 00:30:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qqiQnGDx"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="eoZnzRlb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAB091FC3
-	for <kvm@vger.kernel.org>; Sat, 22 Mar 2025 00:20:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4E342E338D;
+	Sat, 22 Mar 2025 00:30:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742602816; cv=none; b=uOHR9nRFLiN8k6cmr8AltTeMw2NAi5fM+Q3P400jJaT47M0ftitHI/0W+MhrFEGigqBbX6CYQ9T3pm50cHnydJF6dqVgk60ifaycC7rh160YgU0C5BlkXQj1aEp9DFHuB7ZIzYCVr5xVmzqGl+gTr89qyL96gkqsXIs31dgNZDc=
+	t=1742603447; cv=none; b=cTG4p0uA+YLqph0VEo2zFVeuXGMxfAMd5UWdRzmrw7dvIjkjXHQWq0GjPonsO7I9Up/iiohj7+tOYAcJmkWUp7OhcjCr4kQ5JtIKFOY4N56UX478nyBnQUOxEqnLO74DJZrqNWgkg0fl1nb5TcoLncOjFsnF26zBCjClNI5MrO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742602816; c=relaxed/simple;
-	bh=gmihTeepoM01G32VwMRKIpoRxTtCyWjhxO8/HlXx56w=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=teNcNXhFPq3QrSppszTSl+C2hQSaNa3mp8gRiuczJjoBWZWSSOHRcKvf0FELyYwHhcouHg0Lbz5AN7bhn8mAvenaHzzeGou9msF3pG3xbbZ+/2wYcTCxW2s/VjWUzVyBXsDJFHVQ4L61SMk9EjZH0P9Fx8aKZKkdJ1JxPgKYApo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qqiQnGDx; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2279915e06eso2490145ad.1
-        for <kvm@vger.kernel.org>; Fri, 21 Mar 2025 17:20:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1742602814; x=1743207614; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=gmihTeepoM01G32VwMRKIpoRxTtCyWjhxO8/HlXx56w=;
-        b=qqiQnGDx0VWooNe16zQCO5Sb3CZZ5+06+b2B1rEAQ1ITdHQAumheMBVRVm0MLf8KZM
-         b8kyg7duEe5UK+gPMWrEDam3GUEl8wb6YlUy7u+1Feb/f65gj1qwYh72SZw98pllB9PM
-         s8x4/YbVhlc+Ic4svWUO82MCeR2+Ly3nE6gP0FOpixJvdLXZbRdZPl0obE+T3ldqfr8b
-         ejvEq6ZS8j1Z1CrN5Ej/U2jLdKJY0ln06+EcEkArQNMyk1V3INvbDc+mhxQSvLOiuCYu
-         HvCLYwxJpOFGWdU4L347GKxpm1zo4qIPM+sY1mo/XEm7ZRyUae9h+gqnsfUKfeBlLcbe
-         C/VA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742602814; x=1743207614;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gmihTeepoM01G32VwMRKIpoRxTtCyWjhxO8/HlXx56w=;
-        b=PNEHWnKD0uZffo4sY6mWein1cyZtgx8j8iSoj46q6liN8gLanNOu4qLMdirNIa3/6H
-         g91GxS86I/+a5Kd0otOz9G3l6ZsMc9c9cBZ2aKNfIlggffnUbbuuUbF8QXZla955d20N
-         3oO8DF3PclLjjQ2bwz8n0V7MyBp+FQf/v4NQU4X9JqIazXCqxYRwFgt5hm24bz7sjJmx
-         fUpF5Nit0xDVdtcV2TcEBJ0bgHHiUPC/5mJkLjaWvu7CAHrKExTe9Y2EChqgNzcAiU0p
-         cMZfvVKe+hIGByPPVW+g3/kkZameFGezQXrZs417LdCm5NMVdcudgtfQyN+JYfPHdvmD
-         WRzw==
-X-Gm-Message-State: AOJu0YyyobzyTY/8E9S0LigfxO/vJrtME4IVN0AUGOAG1PZZIcodLZMr
-	fGsjxxlFXttY/hR93m6QqtewND/oZvg5Y0G2Mi0QuwbGzMnfhPgjF45NhUZkTh8=
-X-Gm-Gg: ASbGncst1l4Y5vvbFGlYPpCpSy53ybFiKMFYbU2jAkvuNTNrHeHS7lxN43MhYOeiD/x
-	MvFzPfxoVVie3QJ9jrLmaD0UeANszM5f9VjREBPiOw+YKztemrxb09eZDJOg1So5oC5Fu4qkXjj
-	scHTvK+iT3cskOFMjrrOwDxkv8YZdFFCQICbCbjANgclTO/79zRTvVYtq9LI7HUiGGdh04PIR19
-	cabEa6N5IbJPs9z3R6wO60bkDcEnLyUAG2WYOMObsM0RGRLXvIEZuGKcm1MBo+O1InRaPws7wHd
-	Twhzh2mrvYZy+h3BWJXkUrZ6E7efmBFIHdSAftlUGpef0zux/fmcAj1gFCZEfZsJa7uA
-X-Google-Smtp-Source: AGHT+IEiwshH0mEB0ml11+5ohr1OVAQK1GvcSU9JeTsnEj9XYL0ycGei7ChHq5z6xhuvXYlP6cdGKQ==
-X-Received: by 2002:a17:903:18c:b0:220:d909:1734 with SMTP id d9443c01a7336-22780c7a955mr74702015ad.14.1742602814010;
-        Fri, 21 Mar 2025 17:20:14 -0700 (PDT)
-Received: from [192.168.1.67] ([38.39.164.180])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-301bf576aa7sm6892181a91.4.2025.03.21.17.20.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Mar 2025 17:20:13 -0700 (PDT)
-Message-ID: <c1b7b73e-0a59-46cf-bf33-5712df5d9b75@linaro.org>
-Date: Fri, 21 Mar 2025 17:20:12 -0700
+	s=arc-20240116; t=1742603447; c=relaxed/simple;
+	bh=lN4Q4A9YNgkvH7lpVQ0JhefFRV9Re5xizYrgR+p3TKg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=df/7L5DE9Cxi8Dk9VJPbE4OAdNPE6qbSJLiceTRu2bm9ewxr+1L5OzCLkms7VG2f6XmganszDZacW3P89ohrCckatz6RkP4gMNhU57lNdt64CDfjbk8hX2RvY2DH7tySKuWWomnApFz/77T8Np3nEiIijbMlRbT9VrfLsSaxgnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=eoZnzRlb; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52LNjnbv011028;
+	Sat, 22 Mar 2025 00:30:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=e00NzVFYgAd4gt4uYOzRzXvv1OrjX8bIBRC9EuVAZ
+	jA=; b=eoZnzRlb8I6KMFtCeJhSL7bFbQovUiX/hCuCbqiaR+3EVaQI9BncHQvn/
+	30/HQhNjK0LNjP2UQKg0JFLcol+lHw6kVoCnTJrXp4m3bbPrte7en79U+sEz8mUI
+	nEqWtMX6fTjbJsweqo07nZ9fvvA7Ri8KgFfoD1rW7+KxWnQmOYZ99raOx5QUWiC8
+	jHP0uhPnx24ZEga1YBuw/FQs1PVMkhQtoFOEFDH1FDh3TwBq+eBpfNQ+KdENlBBE
+	/mHhLKHnsDoehqpJipKn0hdc3E9CjEv/yoEZk6H2Bd5nvL/hSJ44cZIuIgi5LhBn
+	RVF8h0uKASf5PmbiqJ9495NdaIQFg==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45h852k661-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 22 Mar 2025 00:30:30 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52LMvJj7004646;
+	Sat, 22 Mar 2025 00:30:29 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 45dkvu058s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 22 Mar 2025 00:30:29 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52M0UPct31457794
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 22 Mar 2025 00:30:25 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BB59D20043;
+	Sat, 22 Mar 2025 00:30:25 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 87FC020040;
+	Sat, 22 Mar 2025 00:30:25 +0000 (GMT)
+Received: from tuxmaker.lnxne.boe (unknown [9.152.85.9])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Sat, 22 Mar 2025 00:30:25 +0000 (GMT)
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, stable@vger.kernel.org,
+        "Maximilian Immanuel Brandtner" <maxbr@linux.ibm.com>
+Subject: [PATCH 1/1] virtio_console: fix missing byte order handling for cols and rows
+Date: Sat, 22 Mar 2025 01:29:54 +0100
+Message-ID: <20250322002954.3129282-1-pasic@linux.ibm.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 17/30] exec/target_page: runtime defintion for
- TARGET_PAGE_BITS_MIN
-From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: kvm@vger.kernel.org, qemu-arm@nongnu.org,
- Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
- <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>, =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-References: <20250320223002.2915728-1-pierrick.bouvier@linaro.org>
- <20250320223002.2915728-18-pierrick.bouvier@linaro.org>
- <2e667bb0-7357-4caf-ab60-4e57aabdceeb@linaro.org>
- <e738b8b8-e06f-48d0-845e-f263adb3dee5@linaro.org>
- <a67d17bb-e0dc-4767-8a43-8f057db70c71@linaro.org>
- <216a39c6-384d-4f9e-b615-05af18c6ef59@linaro.org>
- <c0e338f5-6592-4d83-9f17-120b9c4f039e@linaro.org>
- <ebd25730-1947-4360-af36-cf1131f4155c@linaro.org>
-Content-Language: en-US
-In-Reply-To: <ebd25730-1947-4360-af36-cf1131f4155c@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: WVWwkCZ8kEb1FH98jTvXiEM2qMbzrBN-
+X-Proofpoint-ORIG-GUID: WVWwkCZ8kEb1FH98jTvXiEM2qMbzrBN-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-21_08,2025-03-21_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
+ clxscore=1011 impostorscore=0 spamscore=0 mlxscore=0 suspectscore=0
+ mlxlogscore=999 priorityscore=1501 phishscore=0 lowpriorityscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502280000 definitions=main-2503220002
 
-T24gMy8yMS8yNSAxNzowMSwgUGllcnJpY2sgQm91dmllciB3cm90ZToNCj4gT24gMy8yMS8y
-NSAxNToxOSwgUmljaGFyZCBIZW5kZXJzb24gd3JvdGU6DQo+PiBPbiAzLzIxLzI1IDEzOjEx
-LCBQaWVycmljayBCb3V2aWVyIHdyb3RlOg0KPj4+IE9uIDMvMjEvMjUgMTI6MjcsIFJpY2hh
-cmQgSGVuZGVyc29uIHdyb3RlOg0KPj4+PiBPbiAzLzIxLzI1IDExOjA5LCBQaWVycmljayBC
-b3V2aWVyIHdyb3RlOg0KPj4+Pj4+IE1tbSwgb2sgSSBndWVzcy7CoCBZZXN0ZXJkYXkgSSB3
-b3VsZCBoYXZlIHN1Z2dlc3RlZCBtZXJnaW5nIHRoaXMgd2l0aCBwYWdlLXZhcnkuaCwgYnV0
-DQo+Pj4+Pj4gdG9kYXkgSSdtIGFjdGl2ZWx5IHdvcmtpbmcgb24gbWFraW5nIFRBUkdFVF9Q
-QUdFX0JJVFNfTUlOIGEgZ2xvYmFsIGNvbnN0YW50Lg0KPj4+Pj4+DQo+Pj4+Pg0KPj4+Pj4g
-V2hlbiB5b3UgbWVudGlvbiB0aGlzLCBkbyB5b3UgbWVhbiAiY29uc3RhbnQgYWNjcm9zcyBh
-bGwgYXJjaGl0ZWN0dXJlcyIsIG9yIGEgZ2xvYmFsDQo+Pj4+PiAoY29uc3QpIHZhcmlhYmxl
-IHZzIGhhdmluZyBhIGZ1bmN0aW9uIGNhbGw/DQo+Pj4+IFRoZSBmaXJzdCAtLSBjb25zdGFu
-dCBhY3Jvc3MgYWxsIGFyY2hpdGVjdHVyZXMuDQo+Pj4+DQo+Pj4NCj4+PiBUaGF0J3MgZ3Jl
-YXQuDQo+Pj4gRG9lcyBjaG9vc2luZyB0aGUgbWluKHNldF9vZihUQVJHRVRfUEFHRV9CSVRT
-X01JTikpIGlzIHdoYXQgd2Ugd2FudCB0aGVyZSwgb3IgaXMgdGhlDQo+Pj4gYW5zd2VyIG1v
-cmUgc3VidGxlIHRoYW4gdGhhdD8NCj4+DQo+PiBJdCB3aWxsIGJlLCB5ZXMuDQo+Pg0KPj4g
-VGhpcyBpc24ndCBhcyBoYXJkIGFzIGl0IHNlZW1zLCBiZWNhdXNlIHRoZXJlIGFyZSBleGFj
-dGx5IHR3byB0YXJnZXRzIHdpdGgNCj4+IFRBUkdFVF9QQUdFX0JJVFMgPCAxMjogYXJtIGFu
-ZCBhdnIuDQo+Pg0KPj4gQmVjYXVzZSB3ZSBzdGlsbCBzdXBwb3J0IGFybXY0LCBUQVJHRVRf
-UEFHRV9CSVRTX01JTiBtdXN0IGJlIDw9IDEwLg0KPj4NCj4+IEFWUiBjdXJyZW50bHkgaGFz
-IFRBUkdFVF9QQUdFX0JJVFMgPT0gOCwgd2hpY2ggaXMgYSBiaXQgb2YgYSBwcm9ibGVtLg0K
-Pj4gTXkgZmlyc3QgdGFzayBpcyB0byBhbGxvdyBhdnIgdG8gY2hvb3NlIFRBUkdFVF9QQUdF
-X0JJVFNfTUlOID49IDEwLg0KPj4NCj4+IFdoaWNoIHdpbGwgbGVhdmUgdXMgd2l0aCBUQVJH
-RVRfUEFHRV9CSVRTX01JTiA9PSAxMC4NCj4+DQo+IA0KPiBPay4NCj4gDQo+ICAgRnJvbSB3
-aGF0IEkgdW5kZXJzdGFuZCwgd2UgbWFrZSBzdXJlIHRsYiBmbGFncyBhcmUgc3RvcmVkIGlu
-IGFuDQo+IGltbXV0YWJsZSBwb3NpdGlvbiwgd2l0aGluIHZpcnR1YWwgYWRkcmVzc2VzIHJl
-bGF0ZWQgdG8gZ3Vlc3QsIGJ5IHVzaW5nDQo+IGxvd2VyIGJpdHMgYmVsb25naW5nIHRvIGFk
-ZHJlc3MgcmFuZ2UgaW5zaWRlIGEgZ2l2ZW4gcGFnZSwgc2luY2UgcGFnZQ0KPiBhZGRyZXNz
-ZXMgYXJlIGFsaWduZWQgb24gcGFnZSBzaXplLCBsZWF2aW5nIHRob3NlIGJpdHMgZnJlZS4N
-Cj4gDQo+IGJpdHMgWzAuLjIpIGFyZSBic3dhcCwgd2F0Y2hwb2ludCBhbmQgY2hlY2tfYWxp
-Z25lZC4NCj4gYml0cyBbVEFSR0VUX1BBR0VfQklUU19NSU4gLSA1Li5UQVJHRVRfUEFHRV9C
-SVRTX01JTikgYXJlIHNsb3csDQo+IGRpc2NhcmRfd3JpdGUsIG1taW8sIG5vdGRpcnR5LCBh
-bmQgaW52YWxpZCBtYXNrLg0KPiBBbmQgdGhlIGNvbXBpbGUgdGltZSBjaGVjayB3ZSBoYXZl
-IGlzIHRvIG1ha2Ugc3VyZSB3ZSBkb24ndCBvdmVybGFwDQo+IHRob3NlIHNldHMgKHdvdWxk
-IGhhcHBlbiBpbiBUQVJHRVRfUEFHRV9CSVRTX01JTiA8PSA3KS4NCj4gDQo+IEkgd29uZGVy
-IHdoeSB3ZSBjYW4ndCB1c2UgYml0cyBbMy4uOCkgZXZlcnl3aGVyZSwgbGlrZSBpdCdzIGRv
-bmUgZm9yDQo+IEFWUiwgZXZlbiBmb3IgYmlnZ2VyIHBhZ2Ugc2l6ZXMuIEkgbm90aWNlZCB0
-aGUgY29tbWVudCBhYm91dCAiYWRkcmVzcw0KPiBhbGlnbm1lbnQgYml0cyIsIGJ1dCBJJ20g
-Y29uZnVzZWQgd2h5IGJpdHMgWzAuLjIpIGNhbiBiZSB1c2VkLCBhbmQgbm90DQo+IHVwcGVy
-IG9uZXMuDQo+IA0KPiBBcmUgd2Ugc3RvcmluZyBzb21ldGhpbmcgZWxzZSBpbiB0aGUgbWlk
-ZGxlIG9uIG90aGVyIGFyY2hzLCBvciBkaWQgSQ0KPiBtaXNzIHNvbWUgcGllY2Ugb2YgdGhl
-IHB1enpsZT8NCj4gDQoNCkFmdGVyIGxvb2tpbmcgYmV0dGVyLCBUTEJfU0xPV19GTEFHUyBh
-cmUgbm90IHBhcnQgb2YgYWRkcmVzcywgc28gd2UgDQpkb24ndCB1c2UgYml0cyBbMC4uMiku
-DQoNCkZvciBhIGdpdmVuIFRBUkdFVF9QQUdFX1NJWkUsIGhvdyBkbyB3ZSBkZWZpbmUgYWxp
-Z25tZW50IGJpdHM/DQoNCj4gVGhhbmtzLA0KPiBQaWVycmljaw0KPiANCj4+DQo+PiByfg0K
-PiANCg0K
+As per virtio spec the fields cols and rows are specified as little
+endian. Although there is no legacy interface requirement that would
+state that cols and rows need to be handled as native endian when legacy
+interface is used, unlike for the fields of the adjacent struct
+virtio_console_control, I decided to err on the side of caution based
+on some non-conclusive virtio spec repo archaeology and opt for using
+virtio16_to_cpu() much like for virtio_console_control.event. Strictly
+by the letter of the spec virtio_le_to_cpu() would have been sufficient.
+But when the legacy interface is not used, it boils down to the same.
+
+And when using the legacy interface, the device formatting these as
+little endian when the guest is big endian would surprise me more than
+it using guest native byte order (which would make it compatible with
+the current implementation). Nevertheless somebody trying to implement
+the spec following it to the letter could end up forcing little endian
+byte order when the legacy interface is in use. So IMHO this ultimately
+needs a judgement call by the maintainers.
+
+Fixes: 8345adbf96fc1 ("virtio: console: Accept console size along with resize control message")
+Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+Cc: stable@vger.kernel.org # v2.6.35+
+---
+
+@Michael: I think it would be nice to add a clarification on the byte
+order to be used for cols and rows when the legacy interface is used to
+the spec, regardless of what we decide the right byte order is. If
+it is native endian that shall be stated much like it is stated for
+virtio_console_control. If it is little endian, I would like to add
+a sentence that states that unlike for the fields of virtio_console_control
+the byte order of the fields of struct virtio_console_resize is little
+endian also when the legacy interface is used.
+
+@Maximilian: Would you mind giving this a spin with your implementation
+on the device side of things in QEMU?
+---
+ drivers/char/virtio_console.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/char/virtio_console.c b/drivers/char/virtio_console.c
+index 18f92dd44d45..fc698e2b1da1 100644
+--- a/drivers/char/virtio_console.c
++++ b/drivers/char/virtio_console.c
+@@ -1579,8 +1579,8 @@ static void handle_control_message(struct virtio_device *vdev,
+ 		break;
+ 	case VIRTIO_CONSOLE_RESIZE: {
+ 		struct {
+-			__u16 rows;
+-			__u16 cols;
++			__virtio16 rows;
++			__virtio16 cols;
+ 		} size;
+ 
+ 		if (!is_console_port(port))
+@@ -1588,7 +1588,8 @@ static void handle_control_message(struct virtio_device *vdev,
+ 
+ 		memcpy(&size, buf->buf + buf->offset + sizeof(*cpkt),
+ 		       sizeof(size));
+-		set_console_size(port, size.rows, size.cols);
++		set_console_size(port, virtio16_to_cpu(vdev, size.rows),
++				 virtio16_to_cpu(vdev, size.cols));
+ 
+ 		port->cons.hvc->irq_requested = 1;
+ 		resize_console(port);
+
+base-commit: b3ee1e4609512dfff642a96b34d7e5dfcdc92d05
+-- 
+2.45.2
+
 
