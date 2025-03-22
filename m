@@ -1,284 +1,195 @@
-Return-Path: <kvm+bounces-41762-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41763-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B41FA6CA26
-	for <lists+kvm@lfdr.de>; Sat, 22 Mar 2025 13:30:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06B67A6CC8C
+	for <lists+kvm@lfdr.de>; Sat, 22 Mar 2025 21:55:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98B881896A87
-	for <lists+kvm@lfdr.de>; Sat, 22 Mar 2025 12:30:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42B3C3B0FEF
+	for <lists+kvm@lfdr.de>; Sat, 22 Mar 2025 20:55:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9F49221F11;
-	Sat, 22 Mar 2025 12:30:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 806DC2343C9;
+	Sat, 22 Mar 2025 20:55:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="IAXC+Ym5"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JMlk8owM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE48199FA8
-	for <kvm@vger.kernel.org>; Sat, 22 Mar 2025 12:30:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDD3A29405
+	for <kvm@vger.kernel.org>; Sat, 22 Mar 2025 20:55:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742646616; cv=none; b=G4Hi+yKIKZMcCOGQd2ejNImZkQvfWzH3zG/kxKEqeoh8oPifR/r46V+b5zNv7SD9JC6OpT99vYN8EY/tTG4nrmhF5acpDPAW5+2Oe05dCHZ1FFsLoF8sQ/fMoEczj9z6pQodEjqK6XI2MJvAGrFEBh0lZ9ROHg1LKqw0EW3xSxo=
+	t=1742676943; cv=none; b=XBxqz91JO+JVqnc/Pu79YgPThvYXpU17FWumewVM7vACFyFANve9dAK55qz0kuMJ7dmdQbmrz+mzrN9pHAQqr2N2+Bero9LrpNGgImab6ArdD7VwtVIX+ua49LFqTNmOfP4M6/TBC09S+/ftcFksSqib/JD07RA1YmEiPrELGsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742646616; c=relaxed/simple;
-	bh=QUGx4dCY8/tgal3QRY5pUyGAdjuiqwTT+LhsulM4JMo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s+/Kjsbb8sXnil41DSptQrJpp0JxHkf8mnDZCrzRK/jKTsZ4FZrbBho/9NJ6jlti1c9ez8Gmjt7LV0iHUhiOrK3LKvMsRQO99G+zisKPFdJH6tCNxPVb0wJJw1QDv4YJpwHndUu2UeH3DByV52I8p218yMFS+uYozDQ2P8uQ21U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=IAXC+Ym5; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-43d0618746bso19329825e9.2
-        for <kvm@vger.kernel.org>; Sat, 22 Mar 2025 05:30:13 -0700 (PDT)
+	s=arc-20240116; t=1742676943; c=relaxed/simple;
+	bh=MtskfZeQW4nfvlI8qS1LHIZzJ/KLCdghCrjEztI+WO4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bGP/DeaFvn750xSVhddVSBl/D1YcPbk69Ix1Q3kezt9pWY6yj04Csn4ssF4jVL37KTXCF/Fe+Vu4xfiH0SYhvR8cKesK6/yRi9GUR8OEDEiW+OyghafOCC7JGQ9Jkc9DAJKMWBjXkzoHIrqGqDbDlFFoNjljrLhMNE6gzvohZ/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=JMlk8owM; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2264aefc45dso40748065ad.0
+        for <kvm@vger.kernel.org>; Sat, 22 Mar 2025 13:55:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1742646612; x=1743251412; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=XK2TAqZG341EzHEinXnSfJT8xoYCNibzBDqkY726Y1s=;
-        b=IAXC+Ym5dURzYvBmBTyPDwL2aHOHSMjIZUIsvnKIY5mNtSpL/n9TMz2fU+2gbkhYBp
-         NpuCnt6lgR6e8OqlwnUFcwtiHCRK7mR6VabEtEMExu+d7TxLwXh6Bd97+ukfXf9V2Jl9
-         kDZbr4FbOnj6ZfZOdbkdlZg8dBxn5lVTvapDw+DdzH/om+JtdqZ4HW8u/pwleXXX/3kN
-         Fv4n6Il+jV5UXtneKMOk7Kw8obM1xDeZIaZie3hh734ZlQPEMqd2KoNOm4gyYjh8nbBY
-         Dbrw6f6M8IcXTVUM/2upSByEqbwjT1lBWhWfbrQ0cuq9l2uk+GBQxPwzyeU7Kjs1Jtet
-         4wuA==
+        d=linaro.org; s=google; t=1742676941; x=1743281741; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kgGmWC6PM5wLnaG1uyNrtF3HfvNjTFidfhpw5ptOU8I=;
+        b=JMlk8owMJ72v8SqiljD3Be4nyVE3zoAtvUiJOK1t94CbMspFqhIHzv271CFaTCSvER
+         m5jnI2IzRoQhq6Ra5PCxoURRu+Uyl2QfDdJmcjJV+ac4PdFjvI/MBIfEaZ58IU6qPNhk
+         oN0wkqwwEWGI4ymo2lSOtiQzGu0zdf44kQGWN2pVwWS090V6SxQQZmQAKFw524zVzAUA
+         rhLLOz2s0C5qARSsr52XqRBBEM4ZT30qHW+mSNwOoLPQFDuzAUsOH/z8DGdZgPZub0ZB
+         xRw+f/cVfI19mF5E6ASMQhcK914b8kQ/qxWzq9pChGzZZhZAO+MvPYB0lSEz67K/NNqR
+         LurA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742646612; x=1743251412;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1742676941; x=1743281741;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XK2TAqZG341EzHEinXnSfJT8xoYCNibzBDqkY726Y1s=;
-        b=nqUP7SY7dmzOl1NU9OjKf6ef0asLCzJN226gtMoR60UT96Jt1wmpq52hpL7sQyU4oR
-         Ejf0QQXoh6LrS1PeGe/jQh4Ggb80njyXZFGzwuzxUYQmyRTuPSIz7BNECE0G4PGGhnrk
-         plFIVne1JuuzJYLQaYxUZ9lf9isBSJhlQeaG5AaWWEU/OiupGoAI8Gfx3TK0G4F3Obnb
-         ZN/kfSEqT+rbmKrYskbdLHjIC4Fs6k4hQUTh9zW+qBAAXGPA/iE3tByD3PLLfUGPa08B
-         +OXb7fgnzJ/kCam8W/nmMLHd6dY61Zz9k2dH9jbMfGwOKlPZ+03TddhEBk8yOKi5GfqI
-         VFWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVZe0KimM5ewoqqdCEABeihh8TZussysEEo21V4y84FbH6rT89fpEssrdm3TQWu60v+xIs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjfF79VjcFR5cU1ngnN65PiBGQjuSQCPbGxJ45zTvlQPRakAO9
-	Z8VQwUhFrZQb9ELhWmW2JgLvSi2jL2ODQjdOZdOh3iK1mpuYnS4v+54DWaznAL0=
-X-Gm-Gg: ASbGncv0B0j4BoefzkgALAHwwk4MVbXG56LxAsS6FK18itZ8fnhA/gwCbH/BSCmTL/1
-	lC/hHVJqCOGBuQdR7mWrUG4C+oX2VJXgk+v9AeQZUXPH33tPLULCg1QiGpXQ2VJYvt8fjtHpTlW
-	18Pj5C3CeanA7Q9C6vP1U5DHM73d5e/OOaC+nuhkyjVh6AfeeLqvNp/kT54J1dtkb93OEOwDkKv
-	5kt3Qa5p3qJgbj3dMa8+4z/bOOkon/5PYoSR/DV1ls8OO1iJMrI16f1gLbyjCe0RjYcG3MzQNgo
-	VltxjbvuqnY8yOOXQ5OW7jIT+YeJ2RffGtMwYXeZNCe1nlKqmuLWN7kflqRjvGWFnXEtcW8L8w=
-	=
-X-Google-Smtp-Source: AGHT+IG8oeOIoiATGf2n/eErF/v1UJz5jBt3u89DGuQOGIaGoIkUZOrdT8f7P/SGIIjTK+RAQA8QjA==
-X-Received: by 2002:a05:600c:83c4:b0:43c:fffc:7886 with SMTP id 5b1f17b1804b1-43d509ec52fmr59753085e9.8.1742646611632;
-        Sat, 22 Mar 2025 05:30:11 -0700 (PDT)
-Received: from localhost (cst2-173-28.cust.vodafone.cz. [31.30.173.28])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d440eda26sm106789645e9.36.2025.03.22.05.30.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 Mar 2025 05:30:11 -0700 (PDT)
-Date: Sat, 22 Mar 2025 13:30:10 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-Cc: Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
-	Samuel Holland <samuel.holland@sifive.com>
-Subject: Re: [PATCH v4 17/18] RISC-V: KVM: add support for FWFT SBI extension
-Message-ID: <20250322-c4eaee71aa9c1f0b13ca8fef@orel>
-References: <20250317170625.1142870-1-cleger@rivosinc.com>
- <20250317170625.1142870-18-cleger@rivosinc.com>
+        bh=kgGmWC6PM5wLnaG1uyNrtF3HfvNjTFidfhpw5ptOU8I=;
+        b=DTdll27VDJXSpuTWfjiOsUX+SrUT+Debejr+mldVdVxW8bOyuiUvKfrsFk3nzljdXN
+         jTOa/daFzOHRYpZk744r57RpcWJKlKkNKOs5UcGoFWq0HI+DYjCzuO9CI3c2L+QCE4jR
+         Mk8DI6XkQxDQOsfdpyIYphMrrDwk3d1fEXASdCpYkimrVYjEAyy7DqMJdPwjWVSFmp9W
+         H/hW38B5I3Z+/wRIvsBwDWR3d4gpkiYMQ/J/w4CbyFm5IIdGiRip3NbQbOxZFgm30XaW
+         znxZFGUllmyL/k2MVBhTjsjbQh2X+WpUL3YdY4Z7EvJQNWCZqOhAomwwM9MCZARJnYsS
+         bzgg==
+X-Gm-Message-State: AOJu0YwtU5uGTXWRoEA+1sVdektNjq5cMnWbgvt8OLs5hNnahwi6/yRf
+	iczV2TYquBqeQ/Uk7xqJLFsX14W+dJtcE/+mHPGRHxOY4445vaHLuV+V/cZRWEQ=
+X-Gm-Gg: ASbGncuVxM5ne4gnRp+dmIboVluRY/uuts04KNuZnVLwmIzNvyB5S4qF9U89OBao5BS
+	KCt2VuHbJ5Uqycl8d/zq/Vjfq8/Tqiirb/WfOL9vcfzOVnmUKmjEBu7ITQDR/MtA2R7hRkRYwVZ
+	25Q6vFvP0ZeUEFVtCX5psW5xHc/yp466Pb0sNnzsmRQCKrIScWSpUG/exiT5HWe8C4uyUMK+sya
+	/nnjjXW3A0Of+zVgj0SETjneKYjApnOxduQVTblFlwqZtNo7g7GaM2z+2OaISDZ//pLM8iGLEGl
+	tOFzki6/FmqwHOI+JZS4oUkricaPm2F+npF7t+xy2G/4VK39GfitgM8Net+SC/9JvmZsyxQJLps
+	yNEPJt6tx
+X-Google-Smtp-Source: AGHT+IF8bW/hQCXsQIR/yUOm9ZATK+QQ55egz4OhUwbr//UE3L/jkw+NaL2jvImzW0JB60ZAK94q9g==
+X-Received: by 2002:a17:903:298b:b0:223:5a6e:b16 with SMTP id d9443c01a7336-22780c55886mr145113575ad.5.1742676941062;
+        Sat, 22 Mar 2025 13:55:41 -0700 (PDT)
+Received: from [192.168.0.4] (174-21-74-48.tukw.qwest.net. [174.21.74.48])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22780f3b242sm40132835ad.41.2025.03.22.13.55.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 22 Mar 2025 13:55:40 -0700 (PDT)
+Message-ID: <392cd6e5-0c73-4702-8733-d3047db76f77@linaro.org>
+Date: Sat, 22 Mar 2025 13:55:38 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 17/30] exec/target_page: runtime defintion for
+ TARGET_PAGE_BITS_MIN
+To: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
+Cc: kvm@vger.kernel.org, qemu-arm@nongnu.org,
+ Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
+ <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
+ <philmd@linaro.org>, =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+References: <20250320223002.2915728-1-pierrick.bouvier@linaro.org>
+ <20250320223002.2915728-18-pierrick.bouvier@linaro.org>
+ <2e667bb0-7357-4caf-ab60-4e57aabdceeb@linaro.org>
+ <e738b8b8-e06f-48d0-845e-f263adb3dee5@linaro.org>
+ <a67d17bb-e0dc-4767-8a43-8f057db70c71@linaro.org>
+ <216a39c6-384d-4f9e-b615-05af18c6ef59@linaro.org>
+ <c0e338f5-6592-4d83-9f17-120b9c4f039e@linaro.org>
+ <ebd25730-1947-4360-af36-cf1131f4155c@linaro.org>
+ <c1b7b73e-0a59-46cf-bf33-5712df5d9b75@linaro.org>
+Content-Language: en-US
+From: Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <c1b7b73e-0a59-46cf-bf33-5712df5d9b75@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250317170625.1142870-18-cleger@rivosinc.com>
 
-On Mon, Mar 17, 2025 at 06:06:23PM +0100, Clément Léger wrote:
-> Add basic infrastructure to support the FWFT extension in KVM.
+On 3/21/25 17:20, Pierrick Bouvier wrote:
+> On 3/21/25 17:01, Pierrick Bouvier wrote:
+>> On 3/21/25 15:19, Richard Henderson wrote:
+>>> On 3/21/25 13:11, Pierrick Bouvier wrote:
+>>>> On 3/21/25 12:27, Richard Henderson wrote:
+>>>>> On 3/21/25 11:09, Pierrick Bouvier wrote:
+>>>>>>> Mmm, ok I guess.Â  Yesterday I would have suggested merging this with page-vary.h, but
+>>>>>>> today I'm actively working on making TARGET_PAGE_BITS_MIN a global constant.
+>>>>>>>
+>>>>>>
+>>>>>> When you mention this, do you mean "constant accross all architectures", or a global
+>>>>>> (const) variable vs having a function call?
+>>>>> The first -- constant across all architectures.
+>>>>>
+>>>>
+>>>> That's great.
+>>>> Does choosing the min(set_of(TARGET_PAGE_BITS_MIN)) is what we want there, or is the
+>>>> answer more subtle than that?
+>>>
+>>> It will be, yes.
+>>>
+>>> This isn't as hard as it seems, because there are exactly two targets with
+>>> TARGET_PAGE_BITS < 12: arm and avr.
+>>>
+>>> Because we still support armv4, TARGET_PAGE_BITS_MIN must be <= 10.
+>>>
+>>> AVR currently has TARGET_PAGE_BITS == 8, which is a bit of a problem.
+>>> My first task is to allow avr to choose TARGET_PAGE_BITS_MIN >= 10.
+>>>
+>>> Which will leave us with TARGET_PAGE_BITS_MIN == 10.
+>>>
+>>
+>> Ok.
+>>
+>> Â  From what I understand, we make sure tlb flags are stored in an
+>> immutable position, within virtual addresses related to guest, by using
+>> lower bits belonging to address range inside a given page, since page
+>> addresses are aligned on page size, leaving those bits free.
+>>
+>> bits [0..2) are bswap, watchpoint and check_aligned.
+>> bits [TARGET_PAGE_BITS_MIN - 5..TARGET_PAGE_BITS_MIN) are slow,
+>> discard_write, mmio, notdirty, and invalid mask.
+>> And the compile time check we have is to make sure we don't overlap
+>> those sets (would happen in TARGET_PAGE_BITS_MIN <= 7).
+>>
+>> I wonder why we can't use bits [3..8) everywhere, like it's done for
+>> AVR, even for bigger page sizes. I noticed the comment about "address
+>> alignment bits", but I'm confused why bits [0..2) can be used, and not
+>> upper ones.
+>>
+>> Are we storing something else in the middle on other archs, or did I
+>> miss some piece of the puzzle?
+>>
 > 
-> Signed-off-by: Clément Léger <cleger@rivosinc.com>
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> ---
->  arch/riscv/include/asm/kvm_host.h          |   4 +
->  arch/riscv/include/asm/kvm_vcpu_sbi.h      |   1 +
->  arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h |  29 +++
->  arch/riscv/include/uapi/asm/kvm.h          |   1 +
->  arch/riscv/kvm/Makefile                    |   1 +
->  arch/riscv/kvm/vcpu_sbi.c                  |   4 +
->  arch/riscv/kvm/vcpu_sbi_fwft.c             | 216 +++++++++++++++++++++
->  7 files changed, 256 insertions(+)
->  create mode 100644 arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
->  create mode 100644 arch/riscv/kvm/vcpu_sbi_fwft.c
+> After looking better, TLB_SLOW_FLAGS are not part of address, so we don't use bits [0..2).
 > 
-> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-> index bb93d2995ea2..c0db61ba691a 100644
-> --- a/arch/riscv/include/asm/kvm_host.h
-> +++ b/arch/riscv/include/asm/kvm_host.h
-> @@ -19,6 +19,7 @@
->  #include <asm/kvm_vcpu_fp.h>
->  #include <asm/kvm_vcpu_insn.h>
->  #include <asm/kvm_vcpu_sbi.h>
-> +#include <asm/kvm_vcpu_sbi_fwft.h>
->  #include <asm/kvm_vcpu_timer.h>
->  #include <asm/kvm_vcpu_pmu.h>
->  
-> @@ -281,6 +282,9 @@ struct kvm_vcpu_arch {
->  	/* Performance monitoring context */
->  	struct kvm_pmu pmu_context;
->  
-> +	/* Firmware feature SBI extension context */
-> +	struct kvm_sbi_fwft fwft_context;
-> +
->  	/* 'static' configurations which are set only once */
->  	struct kvm_vcpu_config cfg;
->  
-> diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/include/asm/kvm_vcpu_sbi.h
-> index cb68b3a57c8f..ffd03fed0c06 100644
-> --- a/arch/riscv/include/asm/kvm_vcpu_sbi.h
-> +++ b/arch/riscv/include/asm/kvm_vcpu_sbi.h
-> @@ -98,6 +98,7 @@ extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_hsm;
->  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_dbcn;
->  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_susp;
->  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_sta;
-> +extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_fwft;
->  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_experimental;
->  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_vendor;
->  
-> diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h b/arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
-> new file mode 100644
-> index 000000000000..9ba841355758
-> --- /dev/null
-> +++ b/arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
-> @@ -0,0 +1,29 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (c) 2025 Rivos Inc.
-> + *
-> + * Authors:
-> + *     Clément Léger <cleger@rivosinc.com>
-> + */
-> +
-> +#ifndef __KVM_VCPU_RISCV_FWFT_H
-> +#define __KVM_VCPU_RISCV_FWFT_H
-> +
-> +#include <asm/sbi.h>
-> +
-> +struct kvm_sbi_fwft_feature;
-> +
-> +struct kvm_sbi_fwft_config {
-> +	const struct kvm_sbi_fwft_feature *feature;
-> +	bool supported;
-> +	unsigned long flags;
-> +};
-> +
-> +/* FWFT data structure per vcpu */
-> +struct kvm_sbi_fwft {
-> +	struct kvm_sbi_fwft_config *configs;
-> +};
-> +
-> +#define vcpu_to_fwft(vcpu) (&(vcpu)->arch.fwft_context)
-> +
-> +#endif /* !__KVM_VCPU_RISCV_FWFT_H */
-> diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
-> index f06bc5efcd79..fa6eee1caf41 100644
-> --- a/arch/riscv/include/uapi/asm/kvm.h
-> +++ b/arch/riscv/include/uapi/asm/kvm.h
-> @@ -202,6 +202,7 @@ enum KVM_RISCV_SBI_EXT_ID {
->  	KVM_RISCV_SBI_EXT_DBCN,
->  	KVM_RISCV_SBI_EXT_STA,
->  	KVM_RISCV_SBI_EXT_SUSP,
-> +	KVM_RISCV_SBI_EXT_FWFT,
->  	KVM_RISCV_SBI_EXT_MAX,
->  };
->  
-> diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
-> index 4e0bba91d284..06e2d52a9b88 100644
-> --- a/arch/riscv/kvm/Makefile
-> +++ b/arch/riscv/kvm/Makefile
-> @@ -26,6 +26,7 @@ kvm-y += vcpu_onereg.o
->  kvm-$(CONFIG_RISCV_PMU_SBI) += vcpu_pmu.o
->  kvm-y += vcpu_sbi.o
->  kvm-y += vcpu_sbi_base.o
-> +kvm-y += vcpu_sbi_fwft.o
->  kvm-y += vcpu_sbi_hsm.o
->  kvm-$(CONFIG_RISCV_PMU_SBI) += vcpu_sbi_pmu.o
->  kvm-y += vcpu_sbi_replace.o
-> diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
-> index 50be079b5528..0748810c0252 100644
-> --- a/arch/riscv/kvm/vcpu_sbi.c
-> +++ b/arch/riscv/kvm/vcpu_sbi.c
-> @@ -78,6 +78,10 @@ static const struct kvm_riscv_sbi_extension_entry sbi_ext[] = {
->  		.ext_idx = KVM_RISCV_SBI_EXT_STA,
->  		.ext_ptr = &vcpu_sbi_ext_sta,
->  	},
-> +	{
-> +		.ext_idx = KVM_RISCV_SBI_EXT_FWFT,
-> +		.ext_ptr = &vcpu_sbi_ext_fwft,
-> +	},
->  	{
->  		.ext_idx = KVM_RISCV_SBI_EXT_EXPERIMENTAL,
->  		.ext_ptr = &vcpu_sbi_ext_experimental,
-> diff --git a/arch/riscv/kvm/vcpu_sbi_fwft.c b/arch/riscv/kvm/vcpu_sbi_fwft.c
-> new file mode 100644
-> index 000000000000..8a7cfe1fe7a7
-> --- /dev/null
-> +++ b/arch/riscv/kvm/vcpu_sbi_fwft.c
-> @@ -0,0 +1,216 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (c) 2025 Rivos Inc.
-> + *
-> + * Authors:
-> + *     Clément Léger <cleger@rivosinc.com>
-> + */
-> +
-> +#include <linux/errno.h>
-> +#include <linux/err.h>
-> +#include <linux/kvm_host.h>
-> +#include <asm/cpufeature.h>
-> +#include <asm/sbi.h>
-> +#include <asm/kvm_vcpu_sbi.h>
-> +#include <asm/kvm_vcpu_sbi_fwft.h>
-> +
-> +struct kvm_sbi_fwft_feature {
-> +	/**
-> +	 * @id: Feature ID
-> +	 */
-> +	enum sbi_fwft_feature_t id;
-> +
-> +	/**
-> +	 * @supported: Check if the feature is supported on the vcpu
-> +	 *
-> +	 * This callback is optional, if not provided the feature is assumed to
-> +	 * be supported
-> +	 */
-> +	bool (*supported)(struct kvm_vcpu *vcpu);
-> +
-> +	/**
-> +	 * @set: Set the feature value
-> +	 *
-> +	 * Return SBI_SUCCESS on success or an SBI error (SBI_ERR_*)
-> +	 *
-> +	 * This callback is mandatory
-> +	 */
-> +	long (*set)(struct kvm_vcpu *vcpu, struct kvm_sbi_fwft_config *conf, unsigned long value);
-> +
-> +	/**
-> +	 * @get: Get the feature current value
-> +	 *
-> +	 * Return SBI_SUCCESS on success or an SBI error (SBI_ERR_*)
-> +	 *
-> +	 * This callback is mandatory
-> +	 */
-> +	 long (*get)(struct kvm_vcpu *vcpu, struct kvm_sbi_fwft_config *conf, unsigned long *value);
-        ^ 
-	extra space here
+> For a given TARGET_PAGE_SIZE, how do we define alignment bits?
+
+Alignment bits are the least significant bits that must be 0 in order to enforce a 
+particular alignment.  The specific alignment is requested via MO_ALIGN et al as part of 
+the guest memory reference.
+
+I think the piece you're missing is the softmmu fast path test in the generated code.
+
+We begin by indexing the tlb to find an entry.  At that index, the entry may or may not 
+match because (1) we have never looked up the page so the entry is empty, (2) we have 
+looked up a different page that aliases, or (3) the page is present and (3a) correct, or 
+(3b) invalidated, or (3c) some other condition that forces the slow path.
+
+The target address and the comparator have several fields:
+
+   page address   [63 ... TARGET_PAGE_BITS]
+   page flags     [TARGET_PAGE_BITS - 1 ... TARGET_PAGE_BITS - 5]
+   unused         [TARGET_PAGE_BITS - 6 ... align_bits], or empty.
+   alignment      [align_bits - 1 ... 0], or empty
+
+In the comparator, the unused and alignment bits are always zero; the page flags may be 
+non-zero in order to force the comparison to fail.
+
+In the target address, we mask the page flags and unused bits; if the alignment bits of 
+the address are set, then the address is of course unaligned and so the comparison fails.
+
+In order for all this work, the alignment field cannot overlap the page flags.
+
+The maximum alignment currently used by any guest is 5 bits, for Arm Neon,
+which means the minimum value for TARGET_PAGE_BITS_MIN is 10.
 
 
-Thanks,
-drew
+r~
 
