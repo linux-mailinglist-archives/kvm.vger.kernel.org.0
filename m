@@ -1,167 +1,163 @@
-Return-Path: <kvm+bounces-41736-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41737-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68C79A6C6B0
-	for <lists+kvm@lfdr.de>; Sat, 22 Mar 2025 01:30:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C225A6C6C0
+	for <lists+kvm@lfdr.de>; Sat, 22 Mar 2025 01:41:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C43CA466233
-	for <lists+kvm@lfdr.de>; Sat, 22 Mar 2025 00:30:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E95263B9ED1
+	for <lists+kvm@lfdr.de>; Sat, 22 Mar 2025 00:41:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 079F2DDDC;
-	Sat, 22 Mar 2025 00:30:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE1FB171A1;
+	Sat, 22 Mar 2025 00:41:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="eoZnzRlb"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="R7B8UWhJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4E342E338D;
-	Sat, 22 Mar 2025 00:30:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 756DC523A
+	for <kvm@vger.kernel.org>; Sat, 22 Mar 2025 00:41:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742603447; cv=none; b=cTG4p0uA+YLqph0VEo2zFVeuXGMxfAMd5UWdRzmrw7dvIjkjXHQWq0GjPonsO7I9Up/iiohj7+tOYAcJmkWUp7OhcjCr4kQ5JtIKFOY4N56UX478nyBnQUOxEqnLO74DJZrqNWgkg0fl1nb5TcoLncOjFsnF26zBCjClNI5MrO4=
+	t=1742604094; cv=none; b=HXR9AQ3oVu5pG5zWZxxm/3cFDg1nHMnKKx9TChhjfWXg35RnPQM9Zi4caautZXmSrzwzmedIlHWOh11I0i5aBSLF//cJYC7bav+JkrD0ZTufPsoTlXJGzwrt9s5SuZpdy/76q/tJ8na423mYxv6JIHJUS2kq9PF08rxtjzcRLJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742603447; c=relaxed/simple;
-	bh=lN4Q4A9YNgkvH7lpVQ0JhefFRV9Re5xizYrgR+p3TKg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=df/7L5DE9Cxi8Dk9VJPbE4OAdNPE6qbSJLiceTRu2bm9ewxr+1L5OzCLkms7VG2f6XmganszDZacW3P89ohrCckatz6RkP4gMNhU57lNdt64CDfjbk8hX2RvY2DH7tySKuWWomnApFz/77T8Np3nEiIijbMlRbT9VrfLsSaxgnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=eoZnzRlb; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52LNjnbv011028;
-	Sat, 22 Mar 2025 00:30:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=e00NzVFYgAd4gt4uYOzRzXvv1OrjX8bIBRC9EuVAZ
-	jA=; b=eoZnzRlb8I6KMFtCeJhSL7bFbQovUiX/hCuCbqiaR+3EVaQI9BncHQvn/
-	30/HQhNjK0LNjP2UQKg0JFLcol+lHw6kVoCnTJrXp4m3bbPrte7en79U+sEz8mUI
-	nEqWtMX6fTjbJsweqo07nZ9fvvA7Ri8KgFfoD1rW7+KxWnQmOYZ99raOx5QUWiC8
-	jHP0uhPnx24ZEga1YBuw/FQs1PVMkhQtoFOEFDH1FDh3TwBq+eBpfNQ+KdENlBBE
-	/mHhLKHnsDoehqpJipKn0hdc3E9CjEv/yoEZk6H2Bd5nvL/hSJ44cZIuIgi5LhBn
-	RVF8h0uKASf5PmbiqJ9495NdaIQFg==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45h852k661-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 22 Mar 2025 00:30:30 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52LMvJj7004646;
-	Sat, 22 Mar 2025 00:30:29 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 45dkvu058s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 22 Mar 2025 00:30:29 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52M0UPct31457794
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sat, 22 Mar 2025 00:30:25 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BB59D20043;
-	Sat, 22 Mar 2025 00:30:25 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 87FC020040;
-	Sat, 22 Mar 2025 00:30:25 +0000 (GMT)
-Received: from tuxmaker.lnxne.boe (unknown [9.152.85.9])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Sat, 22 Mar 2025 00:30:25 +0000 (GMT)
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>, stable@vger.kernel.org,
-        "Maximilian Immanuel Brandtner" <maxbr@linux.ibm.com>
-Subject: [PATCH 1/1] virtio_console: fix missing byte order handling for cols and rows
-Date: Sat, 22 Mar 2025 01:29:54 +0100
-Message-ID: <20250322002954.3129282-1-pasic@linux.ibm.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1742604094; c=relaxed/simple;
+	bh=hqoJRCdWhjuEg7TGBkaWxPiFOMvAutcwW1byYHxtnno=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q5RqYTR1XXEixaxXElr+AUr0CfLMMX52Q+BoLDMffG2G9KM4k80754pchmnPbUTUXR1q0caVwOnOPXgy+rU/mx2VgLrv1traA5lnqEq56t39ds63SwvTxu4N+lgX53H1fCaIeysSJpZuJOSsHEH1Lf1FDHPyFDTk8f4nyP2hEDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=R7B8UWhJ; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-476977848c4so26020931cf.1
+        for <kvm@vger.kernel.org>; Fri, 21 Mar 2025 17:41:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1742604091; x=1743208891; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7w18pLCxgYQdbgr4L7Ilx5M+dDme30Hw40dLx2kJ/Cs=;
+        b=R7B8UWhJvzY42pvGEXzc6g/CCpxVufGWlUhFok38uou2OkWlLPGuDJtZw2zv0X4g2t
+         8J5H7J4iv1COZfvtScYcLqv9UYzmPga9O/PMs2PLCjtHMbt/F0sr/E5TOwdCISHFdnc8
+         exaOwDFrFSeER/EDk/U5R5I4ss8/9qVJpHWvlC5zpAs/igjUOeO+/BxSk93pH1UXx+SP
+         LgqpLAQwbAZ0onbxeHG4Mp3udUsn+AaBi8XeRFKkfmStyPwJPUKi1tgDkHRXr9OXgZbx
+         VNuHyNVmP70zXrP/aA9tz91BGWewef+tcco1OglHPjxMOipK+QxDWUYAtcqogWNoxQ8a
+         yiYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742604091; x=1743208891;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7w18pLCxgYQdbgr4L7Ilx5M+dDme30Hw40dLx2kJ/Cs=;
+        b=sASW7Flv+ZiBeRE2jiHZV6HcWxFrY+amsSSAba55onYwdT3XppjFVVMU+dj5V4MeG6
+         oTDdaE0psLvP1sohR4rufkeGpGD9MfXCSgZgRkxrOdSGfQ3mkAuAFB1NAKy4D1I5ELuE
+         1hmVPWtyMTk2HOZd+r7jTCjSmw3eTLPiEVg0EQ6bvBPZ9hkfyoDWPN+1IcQyxK1ObVfC
+         U2btlOpl3QHHL8dDYNwGUYgHKBcJXAHWvvC9u7+F9jxBLEnuFqJ5gqJqWy7WieK9bzgZ
+         htJaLsfbnsdza7FQ0jn9Qb+oLrGsmaDhUKNKKKVaohWRlgma9+aH+LoUrExQZQqI5C/M
+         gsjA==
+X-Forwarded-Encrypted: i=1; AJvYcCVFabpUDQXc1niN2yfTEhpAGxFUVeASwGN9DaJXn3BkUvmulR2r/c/qr3oPhU/QqtS9apc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzeMLn5WkZBPfdr6CluisTZMp2zmlBXlXBNSjIQQsPrvf0S0Krz
+	QheORUttv+wPY8Ay0+Idi0IApppm8Qy7nW0i/S+9oWhkbALTPTjndgXHXdKZYYI=
+X-Gm-Gg: ASbGncuql9bwr04dY9E+I24h3Q8KNpS78EQ8+57m/suwU4jgp20tLs7Jc49maCzWV7s
+	Y0sk+KMUQs4DgS+f7AgaM4Co09dzm6vgOX8E5ZmInQcaDqXf3TIotGXd4CdcZcsdv8NBV0XNpXQ
+	7WBI0JMI1qPVMRAlNBfGTjFw3ElxXgmsd3cXxbP28mMf4lADPaRQmywnK0IPVMztvdDX8tDMlU+
+	VJMVBRLk16+EE4lMt/R1VRdk6xuso4uygq5o8JrPE+yWxRVhXwi4xCzvne2nJjDHxV8Bp5/FKXL
+	xmidEuZRUVqCzt61FIprI2vZDS1JkV0VXQmg+/RfhQccDmu0nXNnb7vLQKUO+KYtHGJmWOWdVMx
+	8NsLS/YtS/0X0XsVnW24bWVY=
+X-Google-Smtp-Source: AGHT+IF3UkobCdIF7lNWuu9KRAhdJDE5q4DcYOtKKTS+FcoMl1AlUzXXVqHHTKDK0VlDF9Mdifo+AQ==
+X-Received: by 2002:a05:622a:480c:b0:476:b7e2:385c with SMTP id d75a77b69052e-4771dd5d0e6mr84261721cf.2.1742604091376;
+        Fri, 21 Mar 2025 17:41:31 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-167-219-86.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.219.86])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4771d0ad87esm18121731cf.0.2025.03.21.17.41.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Mar 2025 17:41:30 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1tvmva-00000001CZm-0pDT;
+	Fri, 21 Mar 2025 21:41:30 -0300
+Date: Fri, 21 Mar 2025 21:41:30 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH v7 00/17] Provide a new two step DMA mapping API
+Message-ID: <20250322004130.GS126678@ziepe.ca>
+References: <cover.1738765879.git.leonro@nvidia.com>
+ <20250220124827.GR53094@unreal>
+ <CGME20250228195423eucas1p221736d964e9aeb1b055d3ee93a4d2648@eucas1p2.samsung.com>
+ <1166a5f5-23cc-4cce-ba40-5e10ad2606de@arm.com>
+ <d408b1c7-eabf-4a1e-861c-b2ddf8bf9f0e@samsung.com>
+ <20250312193249.GI1322339@unreal>
+ <adb63b87-d8f2-4ae6-90c4-125bde41dc29@samsung.com>
+ <20250319175840.GG10600@ziepe.ca>
+ <1034b694-2b25-4649-a004-19e601061b90@samsung.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: WVWwkCZ8kEb1FH98jTvXiEM2qMbzrBN-
-X-Proofpoint-ORIG-GUID: WVWwkCZ8kEb1FH98jTvXiEM2qMbzrBN-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-21_08,2025-03-21_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
- clxscore=1011 impostorscore=0 spamscore=0 mlxscore=0 suspectscore=0
- mlxlogscore=999 priorityscore=1501 phishscore=0 lowpriorityscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502280000 definitions=main-2503220002
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1034b694-2b25-4649-a004-19e601061b90@samsung.com>
 
-As per virtio spec the fields cols and rows are specified as little
-endian. Although there is no legacy interface requirement that would
-state that cols and rows need to be handled as native endian when legacy
-interface is used, unlike for the fields of the adjacent struct
-virtio_console_control, I decided to err on the side of caution based
-on some non-conclusive virtio spec repo archaeology and opt for using
-virtio16_to_cpu() much like for virtio_console_control.event. Strictly
-by the letter of the spec virtio_le_to_cpu() would have been sufficient.
-But when the legacy interface is not used, it boils down to the same.
+On Fri, Mar 21, 2025 at 12:52:30AM +0100, Marek Szyprowski wrote:
+> > Christoph's vision was to make a performance DMA API path that could
+> > be used to implement any scatterlist-like data structure very
+> > efficiently without having to teach the DMA API about all sorts of
+> > scatterlist-like things.
+> 
+> Thanks for explaining one more motivation behind this patchset!
 
-And when using the legacy interface, the device formatting these as
-little endian when the guest is big endian would surprise me more than
-it using guest native byte order (which would make it compatible with
-the current implementation). Nevertheless somebody trying to implement
-the spec following it to the letter could end up forcing little endian
-byte order when the legacy interface is in use. So IMHO this ultimately
-needs a judgement call by the maintainers.
+Sure, no problem.
 
-Fixes: 8345adbf96fc1 ("virtio: console: Accept console size along with resize control message")
-Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-Cc: stable@vger.kernel.org # v2.6.35+
----
+To close the loop on the bigger picture here..
 
-@Michael: I think it would be nice to add a clarification on the byte
-order to be used for cols and rows when the legacy interface is used to
-the spec, regardless of what we decide the right byte order is. If
-it is native endian that shall be stated much like it is stated for
-virtio_console_control. If it is little endian, I would like to add
-a sentence that states that unlike for the fields of virtio_console_control
-the byte order of the fields of struct virtio_console_resize is little
-endian also when the legacy interface is used.
+When you put the parts together:
 
-@Maximilian: Would you mind giving this a spin with your implementation
-on the device side of things in QEMU?
----
- drivers/char/virtio_console.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ 1) dma_map_sg is the only API that is both performant and fully
+    functional
 
-diff --git a/drivers/char/virtio_console.c b/drivers/char/virtio_console.c
-index 18f92dd44d45..fc698e2b1da1 100644
---- a/drivers/char/virtio_console.c
-+++ b/drivers/char/virtio_console.c
-@@ -1579,8 +1579,8 @@ static void handle_control_message(struct virtio_device *vdev,
- 		break;
- 	case VIRTIO_CONSOLE_RESIZE: {
- 		struct {
--			__u16 rows;
--			__u16 cols;
-+			__virtio16 rows;
-+			__virtio16 cols;
- 		} size;
- 
- 		if (!is_console_port(port))
-@@ -1588,7 +1588,8 @@ static void handle_control_message(struct virtio_device *vdev,
- 
- 		memcpy(&size, buf->buf + buf->offset + sizeof(*cpkt),
- 		       sizeof(size));
--		set_console_size(port, size.rows, size.cols);
-+		set_console_size(port, virtio16_to_cpu(vdev, size.rows),
-+				 virtio16_to_cpu(vdev, size.cols));
- 
- 		port->cons.hvc->irq_requested = 1;
- 		resize_console(port);
+ 2) scatterlist is a horrible leaky design and badly misued all over
+    the place. When Logan added SG_DMA_BUS_ADDRESS it became quite
+    clear that any significant changes to scatterlist are infeasible,
+    or at least we'd break a huge number of untestable legacy drivers
+    in the process.
 
-base-commit: b3ee1e4609512dfff642a96b34d7e5dfcdc92d05
--- 
-2.45.2
+ 3) We really want to do full featured performance DMA *without* a
+    struct page. This requires changing scatterlist, inventing a new
+    scatterlist v2 and DMA map for it, or this idea here of a flexible
+    lower level DMA API entry point.
 
+    Matthew has been talking about struct-pageless for a long time now
+    from the block/mm direction using folio & memdesc and this is
+    meeting his work from the other end of the stack by starting to
+    build a way to do DMA on future struct pageless things. This is 
+    going to be huge multi-year project but small parts like this need
+    to be solved and agreed to make progress.
+
+ 4) In the immediate moment we still have problems in VFIO, RDMA, and
+    DRM managing P2P transfers because dma_map_resource/page() don't
+    properly work, and we don't have struct pages to use
+    dma_map_sg(). Hacks around the DMA API have been in the kernel for
+    a long time now, we want to see a properly architected solution.
+
+Jason
 
