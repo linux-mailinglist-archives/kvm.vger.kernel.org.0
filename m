@@ -1,217 +1,147 @@
-Return-Path: <kvm+bounces-41854-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41855-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EBDFA6E1D7
-	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 18:58:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5763CA6E1F1
+	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 19:01:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09800163B50
-	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 17:56:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 625D7188EC54
+	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 17:57:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEDD22641DC;
-	Mon, 24 Mar 2025 17:56:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2307F263F54;
+	Mon, 24 Mar 2025 17:57:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ey8acH8B"
+	dkim=pass (1024-bit key) header.d=rosa.ru header.i=@rosa.ru header.b="PBL5wDwg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from forward100a.mail.yandex.net (forward100a.mail.yandex.net [178.154.239.83])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F371DC985;
-	Mon, 24 Mar 2025 17:56:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E399450;
+	Mon, 24 Mar 2025 17:57:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.83
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742838977; cv=none; b=Wcv3jV7XrHF65iP/vTtmygOt6PbSpI6Hrrs4W3KQtn48ya+9qVvf0ocp778Rp0PNUvHl/TuTGMeljWvRi/2vIpKZ7fiesoaei350XXRaUPE0JqOVAScxRpgRCgXvsHp2Ie5f+aecaytCqjA0JYv0SOdDuLxq8kTAu3cZCiVoR3I=
+	t=1742839049; cv=none; b=Hxx/0ZAl7EnOUEMIpBa+lJpaBDebyw9+SLR4Khg3g211trMLrPPwPsgZzMIEjHSYrT9iiRQSKNUIREReudqj32iV0qxnqzaxKunUvI9TZ4dgawvsVt90P6UZf+Mep+X3/tPebBxdc+L1KmoKLL2NGbQarJFFqRUPu+7Ijk4uNKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742838977; c=relaxed/simple;
-	bh=55aSHf+XbnaEkNNtZWAap9c2eiaxcY92LDR82+5KUkE=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=I1U/7IGDhHXntW0kDWRxDQ88i/NCnPBRjyIShpL68NTUsUWr4uhqecc4C0RA+v1Bj7nPe9ab88FjANvcTB0p+t8nLIMIfvdE6oA8Oz042JOuZxdnQeDkjQNRBw0hH80YzsuaVKlcEBen572yjSZXLfYdMAjqjLqLmHPIvVisDtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ey8acH8B; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52OHBZPn027062;
-	Mon, 24 Mar 2025 17:56:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=prxcL7
-	Ol0gDHWADygOhfxw4rXA3/txwyq4L2EIdtr0o=; b=ey8acH8BhQQpV7Rkkcv3qk
-	iYB1qdSCJmXBJGd5tKEllxA4e4tHn0M8AaS5H/npjL1f62a34tG0sEoSVSmmvkGo
-	/g+qF9pA6KqTiYYMh/8IqXXEByZvU8t6HNij+2AwOXo4fVEpKZGZyfVgYs3K5QNw
-	858npq/6lkGam1ZJ8E/osa1RPW4zcKFLJ5aDph5BZzVe1oizfHkY3wS3aJUFHeik
-	r8irsF+5AfGF8s0f5my4vKdFcu1HykPo+9L183UaOSMJO1fKRbhBtT7RXDng1LJD
-	+SPOA7N6PkSBOGzaElIOq6FlJA5LY+06l3eHd9I/4gzGsLBdeSPRPuVV2kvU93yA
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45kbjwr6v4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 24 Mar 2025 17:56:06 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52OFKECV030330;
-	Mon, 24 Mar 2025 17:56:06 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 45j7ht7nw4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 24 Mar 2025 17:56:06 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52OHu4RE33292630
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 24 Mar 2025 17:56:04 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5DF7220043;
-	Mon, 24 Mar 2025 17:56:04 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3654120040;
-	Mon, 24 Mar 2025 17:56:04 +0000 (GMT)
-Received: from li-9b52914c-2c8b-11b2-a85c-a36f6d484b4a.boeblingen.de.ibm.com (unknown [9.155.199.15])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon, 24 Mar 2025 17:56:04 +0000 (GMT)
-Message-ID: <3920c0f0da1b6e324d6367cbff22d313d6981742.camel@linux.ibm.com>
-Subject: Re: [PATCH 1/1] virtio_console: fix missing byte order handling for
- cols and rows
-From: Maximilian Immanuel Brandtner <maxbr@linux.ibm.com>
-To: Halil Pasic <pasic@linux.ibm.com>, Amit Shah <amit@kernel.org>,
-        Arnd
- Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: stable@vger.kernel.org
-Date: Mon, 24 Mar 2025 18:56:03 +0100
-In-Reply-To: <20250322002954.3129282-1-pasic@linux.ibm.com>
-References: <20250322002954.3129282-1-pasic@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	s=arc-20240116; t=1742839049; c=relaxed/simple;
+	bh=NWMa0LZi+vB8RiQmxqV47sxMrBDDPBMaWAHnbcE9oBY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hY8XCr8Kg/6FkYJlpkM4LdoNkzIcbG5dCTzeKskURSuP20MnIOLfFC6kIZtTeQLRLDbqTtIOAuEUweC58GiJbzRB82/Mz2oN4eQ/XCXIXSmla8YyGI/attkZE7JHfRotEaNOxETD8MdINfpxh50Dw67GwYiPtvMkti/jL/kzWAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosa.ru; spf=pass smtp.mailfrom=rosa.ru; dkim=pass (1024-bit key) header.d=rosa.ru header.i=@rosa.ru header.b=PBL5wDwg; arc=none smtp.client-ip=178.154.239.83
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosa.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rosa.ru
+Received: from mail-nwsmtp-smtp-production-main-81.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-81.vla.yp-c.yandex.net [IPv6:2a02:6b8:c1d:4795:0:640:c576:0])
+	by forward100a.mail.yandex.net (Yandex) with ESMTPS id C05DB46D06;
+	Mon, 24 Mar 2025 20:57:14 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-81.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id CvSVLw4LiqM0-RnaISLm5;
+	Mon, 24 Mar 2025 20:57:14 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rosa.ru; s=mail;
+	t=1742839034; bh=f0JglIfLdiJdCiELGSM17hESlAkEOahyf16djTIKSYU=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=PBL5wDwg7MAbXY6t78q8y4M1UiOLqiX617xviqHqJ2ktIE/d3tDeMXk/wm0aHN50V
+	 3ZohWMKB6dxSCAGPydPlTZ37jGToShxnfpU0e0WQpPgnLeLm3mbNSKJWgA8eMptyiK
+	 130MFmmr8WJp16rc+sai/9YGhgTxj9lKB9h2NtG0=
+Authentication-Results: mail-nwsmtp-smtp-production-main-81.vla.yp-c.yandex.net; dkim=pass header.i=@rosa.ru
+From: Mikhail Lobanov <m.lobanov@rosa.ru>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Mikhail Lobanov <m.lobanov@rosa.ru>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	stable@vger.kernel.org
+Subject: [PATCH] KVM: x86: forcibly leave SMM mode on vCPU reset
+Date: Mon, 24 Mar 2025 20:57:07 +0300
+Message-ID: <20250324175707.19925-1-m.lobanov@rosa.ru>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: INZKdWk_pasSNB8PIaiuDorK7o5Zx59a
-X-Proofpoint-ORIG-GUID: INZKdWk_pasSNB8PIaiuDorK7o5Zx59a
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-24_06,2025-03-21_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- priorityscore=1501 lowpriorityscore=0 phishscore=0 spamscore=0
- clxscore=1011 bulkscore=0 adultscore=0 suspectscore=0 malwarescore=0
- mlxlogscore=999 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502280000 definitions=main-2503240125
+Content-Transfer-Encoding: 8bit
 
-On Sat, 2025-03-22 at 01:29 +0100, Halil Pasic wrote:
-> As per virtio spec the fields cols and rows are specified as little
-> endian. Although there is no legacy interface requirement that would
-> state that cols and rows need to be handled as native endian when
-> legacy
-> interface is used, unlike for the fields of the adjacent struct
-> virtio_console_control, I decided to err on the side of caution based
-> on some non-conclusive virtio spec repo archaeology and opt for using
-> virtio16_to_cpu() much like for virtio_console_control.event.
-> Strictly
-> by the letter of the spec virtio_le_to_cpu() would have been
-> sufficient.
-> But when the legacy interface is not used, it boils down to the same.
->=20
-> And when using the legacy interface, the device formatting these as
-> little endian when the guest is big endian would surprise me more
-> than
-> it using guest native byte order (which would make it compatible with
-> the current implementation). Nevertheless somebody trying to
-> implement
-> the spec following it to the letter could end up forcing little
-> endian
-> byte order when the legacy interface is in use. So IMHO this
-> ultimately
-> needs a judgement call by the maintainers.
->=20
-> Fixes: 8345adbf96fc1 ("virtio: console: Accept console size along
-> with resize control message")
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> Cc: stable@vger.kernel.org=C2=A0# v2.6.35+
-> ---
->=20
-> @Michael: I think it would be nice to add a clarification on the byte
-> order to be used for cols and rows when the legacy interface is used
-> to
-> the spec, regardless of what we decide the right byte order is. If
-> it is native endian that shall be stated much like it is stated for
-> virtio_console_control. If it is little endian, I would like to add
-> a sentence that states that unlike for the fields of
-> virtio_console_control
-> the byte order of the fields of struct virtio_console_resize is
-> little
-> endian also when the legacy interface is used.
->=20
-> @Maximilian: Would you mind giving this a spin with your
-> implementation
-> on the device side of things in QEMU?
-> ---
-> =C2=A0drivers/char/virtio_console.c | 7 ++++---
-> =C2=A01 file changed, 4 insertions(+), 3 deletions(-)
->=20
-> diff --git a/drivers/char/virtio_console.c
-> b/drivers/char/virtio_console.c
-> index 18f92dd44d45..fc698e2b1da1 100644
-> --- a/drivers/char/virtio_console.c
-> +++ b/drivers/char/virtio_console.c
-> @@ -1579,8 +1579,8 @@ static void handle_control_message(struct
-> virtio_device *vdev,
-> =C2=A0		break;
-> =C2=A0	case VIRTIO_CONSOLE_RESIZE: {
-> =C2=A0		struct {
-> -			__u16 rows;
-> -			__u16 cols;
-> +			__virtio16 rows;
-> +			__virtio16 cols;
-> =C2=A0		} size;
-> =C2=A0
-> =C2=A0		if (!is_console_port(port))
-> @@ -1588,7 +1588,8 @@ static void handle_control_message(struct
-> virtio_device *vdev,
-> =C2=A0
-> =C2=A0		memcpy(&size, buf->buf + buf->offset +
-> sizeof(*cpkt),
-> =C2=A0		=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sizeof(size));
-> -		set_console_size(port, size.rows, size.cols);
-> +		set_console_size(port, virtio16_to_cpu(vdev,
-> size.rows),
-> +				 virtio16_to_cpu(vdev, size.cols));
-> =C2=A0
-> =C2=A0		port->cons.hvc->irq_requested =3D 1;
-> =C2=A0		resize_console(port);
->=20
-> base-commit: b3ee1e4609512dfff642a96b34d7e5dfcdc92d05
+Previously, commit ed129ec9057f ("KVM: x86: forcibly leave nested mode
+on vCPU reset") addressed an issue where a triple fault occurring in
+nested mode could lead to use-after-free scenarios. However, the commit
+did not handle the analogous situation for System Management Mode (SMM).
 
-It took me a while to recompile the kernel, but now that it has
-compiled it works! Unfortunately, images don't lend themselves well to
-mailing lists, but here is tmux running at 18x55(you'll just have to
-trust me that it's over a virtio serial console)
+This omission results in triggering a WARN when a vCPU reset occurs
+while still in SMM mode, due to the check in kvm_vcpu_reset(). This
+situation was reprodused using Syzkaller by:
+1) Creating a KVM VM and vCPU
+2) Sending a KVM_SMI ioctl to explicitly enter SMM
+3) Executing invalid instructions causing consecutive exceptions and
+eventually a triple fault
 
-                           =E2=94=82top - 12:54:04 up 4 min,  1
-~                          =E2=94=82Tasks: 222 total,   1 runni
-~                          =E2=94=82%Cpu(s):  0.0 us,  0.0 sy,=20
-~                          =E2=94=82MiB Mem :  15987.2 total, =20
-~                          =E2=94=82MiB Swap:   8192.0 total, =20
-~                          =E2=94=82
-~                          =E2=94=82    PID USER      PR  NI=20
-~                          =E2=94=82      1 root      20   0=20
-~                          =E2=94=82      2 root      20   0=20
-~                          =E2=94=82      3 root      20   0=20
-~                          =E2=94=82      4 root       0 -20=20
-~                          =E2=94=82      5 root       0 -20=20
-~                          =E2=94=82      6 root       0 -20=20
-~                          =E2=94=82      7 root       0 -20=20
-~                          =E2=94=82      8 root       0 -20=20
-[No Name]     0,0-1     All=E2=94=82      9 root      20   0=20
-                           =E2=94=82     10 root       0 -20=20
-[0] 0:zsh*                     "fedora" 12:53 24-Mar-25
+The issue manifests as follows:
 
-Cheers,
-Max
+WARNING: CPU: 0 PID: 25506 at arch/x86/kvm/x86.c:12112
+kvm_vcpu_reset+0x1d2/0x1530 arch/x86/kvm/x86.c:12112
+Modules linked in:
+CPU: 0 PID: 25506 Comm: syz-executor.0 Not tainted
+6.1.130-syzkaller-00157-g164fe5dde9b6 #0
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
+BIOS 1.12.0-1 04/01/2014
+RIP: 0010:kvm_vcpu_reset+0x1d2/0x1530 arch/x86/kvm/x86.c:12112
+Call Trace:
+ <TASK>
+ shutdown_interception+0x66/0xb0 arch/x86/kvm/svm/svm.c:2136
+ svm_invoke_exit_handler+0x110/0x530 arch/x86/kvm/svm/svm.c:3395
+ svm_handle_exit+0x424/0x920 arch/x86/kvm/svm/svm.c:3457
+ vcpu_enter_guest arch/x86/kvm/x86.c:10959 [inline]
+ vcpu_run+0x2c43/0x5a90 arch/x86/kvm/x86.c:11062
+ kvm_arch_vcpu_ioctl_run+0x50f/0x1cf0 arch/x86/kvm/x86.c:11283
+ kvm_vcpu_ioctl+0x570/0xf00 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4122
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x19a/0x210 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x35/0x80 arch/x86/entry/common.c:81
+ entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+
+Considering that hardware CPUs exit SMM mode completely upon receiving
+a triple fault by triggering a hardware reset (which inherently leads
+to exiting SMM), explicitly perform SMM exit prior to the WARN check.
+Although subsequent code clears vCPU hflags, including the SMM flag,
+calling kvm_smm_changed ensures the exit from SMM is handled correctly
+and explicitly, aligning precisely with hardware behavior.
+
+
+Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
+
+Fixes: ed129ec9057f ("KVM: x86: forcibly leave nested mode on vCPU reset")
+Cc: stable@vger.kernel.org
+Signed-off-by: Mikhail Lobanov <m.lobanov@rosa.ru>
+---
+ arch/x86/kvm/x86.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 4b64ab350bcd..f1c95c21703a 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12409,6 +12409,9 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 	if (is_guest_mode(vcpu))
+ 		kvm_leave_nested(vcpu);
+ 
++	if (is_smm(vcpu))
++		kvm_smm_changed(vcpu, false);
++
+ 	kvm_lapic_reset(vcpu, init_event);
+ 
+ 	WARN_ON_ONCE(is_guest_mode(vcpu) || is_smm(vcpu));
+-- 
+2.47.2
 
 
