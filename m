@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-41816-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41817-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6DEAA6E0E3
-	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 18:33:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 925B8A6E0EB
+	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 18:34:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D602B1892493
-	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 17:33:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6BFB3B3E7B
+	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 17:33:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82FD9264A71;
-	Mon, 24 Mar 2025 17:32:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0091B264F9C;
+	Mon, 24 Mar 2025 17:32:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oPryfCnr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FZcODbSk"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3DEC26462B
-	for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 17:32:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D6A326463F
+	for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 17:32:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742837575; cv=none; b=AgcVEzry893GZkqTWCQcQtWUUtpQN3qUpWbnKztO0eRomroqnFF0U28t0RCJLzIDKAI3VS5TGcqeWHYcQkT/7pw5JQwxijwu420zg19JjdYi8aVYNLcX+wG4WhZJimRbDsrgKyivgSfysQVhNLcYygMrjm+YNYVihhdiBK0kJtM=
+	t=1742837578; cv=none; b=FPBYox4FmDwkFM7sN/Vkqs0VvejreKcXGytdZtMJMgVOSpyceyoq80PFOcFVaTywOUuF6i8LcYf+WI/o7tRP+RQdbljm2jsWk78VkPiTffan6f0F2RZ/eJnDG0J5u1ufcHne6m7I2e03aXhBpVRqezeg0H3RUgbLFG86w8cqsqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742837575; c=relaxed/simple;
-	bh=jqeh4Xsv0CfKNigyiQO9yN1pSEojv6cGJrdFDQycpnA=;
+	s=arc-20240116; t=1742837578; c=relaxed/simple;
+	bh=/f1zw2NQVdrvC1p5SxX0ny1y+81MhhF+V4C2TQ4BIug=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VeydidzgaN+0bMrEVHzSpUNNlIoI0JYbtO7zek51o4cmLD/HUrc81kUVNzw7qO1J1LWWEk0lA78DhNPLUuMibYsz8FGtgU7OkkSLM3rlOQiCwOTUFjzj1JVR4LymRJq+l/tM0bc2HZSdVGZ2Zbg2EdbimooyHAfr3tgr7iV1U2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oPryfCnr; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=rdzLoqUIY8Nh3H7xF3HSODepHcaQ3cbOYU3I3cUTdGUiUKsKAnsxtHw7fG640/M/1DOpDFFs0QAoG5dIQNUAeqoQGKGiLGYTnnde0473nD+mRtYMTORu5BRoF/QhX+ZXzTJ5pnfibsDCyeuxo/NK898jZFXxIglAJyPSAyCmGZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FZcODbSk; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff7aecba07so7830110a91.2
-        for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 10:32:53 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff6aaa18e8so7023295a91.1
+        for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 10:32:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742837573; x=1743442373; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1742837575; x=1743442375; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=1Ya/oFtnNY7+pGYqinZGprl0k84EEnI1q0ZfiObPFs0=;
-        b=oPryfCnrKtpuKA6tboavd6yT+pxkFANrE3KQ+RSArD94HF0q3uM7ie/NBcvt53j8Q9
-         fkVkohFX2K2Z9WFpOJ60GQujjHKkGW6p+OTPcJ1fcS0PPVeI+zpj1r6ibNT+kdoLTjod
-         0Pspe3tjIgPiDwU9iejXo83Lol59q4JeyjbhqP+DwNrqMyUezWVA0R1sZhbnwGqUjomQ
-         +SZGiJGB13x8fMJfsTzf3O3Wu9fnJM3yP9dmUa6SHwe/GD+BPg57GXDQ4D2Q4yP3ZiJ1
-         6GXyVYTBFhtMFkH5BL8VtUdZzL/QAf35TN0kSGvmneNa0EBjdyriceBBvqm9HRTammuP
-         sU5A==
+        bh=NpZkmVtYxhQ/ofswPdkBbPONzCRhKPTufy96IjDt+/w=;
+        b=FZcODbSkBG9ZF8cZNTkkFG5AyEqtTKCZkjQpnbZi1NU2khHaEsOldyaSJtcSmbDXzL
+         qGcrH3m50Rgbo7HlLfaonp0+iipQHNqKkJw30xAlz3V1TGDN5KLi9jmuCfER1dTkjyml
+         PUgatp6W6/1vh0tbzhAtmRLwRLvsjrDYoYMhYoR9a0Hui2SY76YJCCFAkPjMeHAs58fF
+         KEkBUIw099MyqaO0Pln/3d+NfSOCuhzu8EwDxmJLRceUQ+XhK/F0ateb+ojeFOP/ASmD
+         fW8lMHFH/ezfeQWrG454xatACMMyKdHBqHa1/bKjB++9IF36CjLv+5/xd7pOj4CEUDc0
+         c3lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742837573; x=1743442373;
+        d=1e100.net; s=20230601; t=1742837575; x=1743442375;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=1Ya/oFtnNY7+pGYqinZGprl0k84EEnI1q0ZfiObPFs0=;
-        b=YngfPOIj2X+XG1KnuwBjUqJJTa9ZPY5gcHqN1yT4ZpiodpGHkaJrZkd+kqpUexGNPt
-         0TTB5oa31MIf3xHL8/OOIS0r5CydBRSIzxpryn0l18meEZt63TTK6DPqaV/TtLLpMmsw
-         bLPae8usTqwp+m7D7Tlda1owTnErLp+j8zx6+s/RzI5DcZLrfGDNcHvC9lMXWM9rrg9t
-         TDUD3vav3BCm4wTetEQMlVua9Z9WikUJT9+aRMH8h6f01vtjOhuZJO8HDO3D7YNv5OJ5
-         q5N7UDx57vtHRuzJqiO+uS4o8DoN/zmjEIUHQvina25m7TChPCxRLE9mjFhgND98wduN
-         vW1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWmz7xWjtUj16Y5vfKUiINbjxyfRdsqQyT2evpM5EqZYS+3Go86Rw7Qyg272iMoQtndYgY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrLb4joUrWpIbNGwZmlKysWNB36GQsslGLglk2T6E4O1b7kMqZ
-	z14XV4ecipIarSt75zHXBh3PDkydoalVItuPPqieS3E1sZxw/c8XwkePx1NsR3J3hhVjmgg8Dnq
-	5c/4tjQ==
-X-Google-Smtp-Source: AGHT+IGpguu4/NyJujzClyWSa0WQRqb1Suj/mOYzqbowa3BrBAeAJiAlTWZpsBT1An9QqH4xJtO2xBiGOtyQ
-X-Received: from pjd6.prod.google.com ([2002:a17:90b:54c6:b0:2e5:5ffc:1c36])
- (user=mizhang job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d008:b0:2fe:a545:4c84
- with SMTP id 98e67ed59e1d1-3030ff03212mr18790033a91.34.1742837573143; Mon, 24
- Mar 2025 10:32:53 -0700 (PDT)
+        bh=NpZkmVtYxhQ/ofswPdkBbPONzCRhKPTufy96IjDt+/w=;
+        b=wPQNIg0u34AnRPz6dNLkkIYXUDHSunjVAHYCN7bkuPyKJYUww+kSXP2P5WDUj+nKxB
+         36dygt5/6HwAVmblwpk0UZrATXc4zE/bB1z5q4lckDHawtXGBYsFRPvUeyftVJ11r/8E
+         lVMEX3uFboVSFZYhSMFr6XeXDwltxOrLbD6txb8tJSodRWbM2Xpu0oAPR8JG0LcVfG0G
+         4HU1zUzmd8Y5im9GLYg69F/txNvklrvSM0wTcQlUjAIVPgipqz4ZfwxECncJqLWwB9V/
+         ok70QccUmfPzVKbF0sfXk2qztNcIWCN/BoV/oNyVr4Za3nXbRKWj6NO/k460zbQ2SNg8
+         VzBw==
+X-Forwarded-Encrypted: i=1; AJvYcCUav4B4jLSqpKmGEwxbMYP45Lyg68eBDOEh6X+F6221LM9IHxe3Ouw0hgoaJk5Azq46kag=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIos9N7ipYFrONIuy3hbzsJSKEjJkwJHPz2BqpCOuLEY17g8Ld
+	5xH9bytPSM4CyINI/nHGWB4DwcTOC1wsiAqphF0xhKqBEnlR23Opff2bjWqYGrOFHGMLryKH2oM
+	oXfcosQ==
+X-Google-Smtp-Source: AGHT+IF7xewnBsDRdx97NTiWXEVuLkQEPX52IbGBsRyPp1wqsjb1vaTTVeIfoBjFih/I+7gdk4u7wG31sMt1
+X-Received: from pjk8.prod.google.com ([2002:a17:90b:5588:b0:2fc:ccfe:368])
+ (user=mizhang job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4c52:b0:2fe:e9c6:689e
+ with SMTP id 98e67ed59e1d1-3030fe87ea4mr21917270a91.8.1742837574859; Mon, 24
+ Mar 2025 10:32:54 -0700 (PDT)
 Reply-To: Mingwei Zhang <mizhang@google.com>
-Date: Mon, 24 Mar 2025 17:30:41 +0000
+Date: Mon, 24 Mar 2025 17:30:42 +0000
 In-Reply-To: <20250324173121.1275209-1-mizhang@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250324173121.1275209-1-mizhang@google.com>
 X-Mailer: git-send-email 2.49.0.395.g12beb8f557-goog
-Message-ID: <20250324173121.1275209-2-mizhang@google.com>
-Subject: [PATCH v4 01/38] perf: Support get/put mediated PMU interfaces
+Message-ID: <20250324173121.1275209-3-mizhang@google.com>
+Subject: [PATCH v4 02/38] perf: Skip pmu_ctx based on event_type
 From: Mingwei Zhang <mizhang@google.com>
 To: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
 	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
@@ -98,193 +98,278 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Kan Liang <kan.liang@linux.intel.com>
 
-Currently, the guest and host share the PMU resources when a guest is
-running. KVM has to create an extra virtual event to simulate the
-guest's event, which brings several issues, e.g., high overhead, not
-accuracy and etc.
+To optimize the cgroup context switch, the perf_event_pmu_context
+iteration skips the PMUs without cgroup events. A bool cgroup was
+introduced to indicate the case. It can work, but this way is hard to
+extend for other cases, e.g. skipping non-passthrough PMUs. It doesn't
+make sense to keep adding bool variables.
 
-A new mediated PMU method is proposed to address the issue. It requires
-that the PMU resources can be fully occupied by the guest while it's
-running. Two new interfaces are implemented to fulfill the requirement.
-The hypervisor should invoke the interface while creating a guest which
-wants the mediated PMU capability.
+Pass the event_type instead of the specific bool variable. Check both
+the event_type and related pmu_ctx variables to decide whether skipping
+a PMU.
 
-The PMU resources should only be temporarily occupied as a whole when a
-guest is running. When the guest is out, the PMU resources are still
-shared among different users.
+Event flags, e.g., EVENT_CGROUP, should be cleard in the ctx->is_active.
+Add EVENT_FLAGS to indicate such event flags.
 
-The exclude_guest event modifier is used to guarantee the exclusive
-occupation of the PMU resources. When creating a guest, the hypervisor
-should check whether there are !exclude_guest events in the system.
-If yes, the creation should fail. Because some PMU resources have been
-occupied by other users.
-If no, the PMU resources can be safely accessed by the guest directly.
-Perf guarantees that no new !exclude_guest events are created when a
-guest is running.
+No functional change.
 
-Only the mediated PMU is affected, but not for other PMU e.g., uncore
-and SW PMU. The behavior of those PMUs are not changed. The guest
-enter/exit interfaces should only impact the supported PMUs.
-Add a new PERF_PMU_CAP_MEDIATED_VPMU flag to indicate the PMUs that
-support the feature.
-
-Add nr_include_guest_events to track the !exclude_guest events of PMU
-with PERF_PMU_CAP_MEDIATED_VPMU.
-
-Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
+Tested-by: Yongwei Ma <yongwei.ma@intel.com>
 Signed-off-by: Mingwei Zhang <mizhang@google.com>
 ---
- include/linux/perf_event.h | 11 +++++++
- kernel/events/core.c       | 66 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 77 insertions(+)
+ kernel/events/core.c | 73 ++++++++++++++++++++++++--------------------
+ 1 file changed, 40 insertions(+), 33 deletions(-)
 
-diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
-index 8333f132f4a9..54018dd0b2a4 100644
---- a/include/linux/perf_event.h
-+++ b/include/linux/perf_event.h
-@@ -301,6 +301,8 @@ struct perf_event_pmu_context;
- #define PERF_PMU_CAP_AUX_OUTPUT			0x0080
- #define PERF_PMU_CAP_EXTENDED_HW_TYPE		0x0100
- #define PERF_PMU_CAP_AUX_PAUSE			0x0200
-+/* Support to passthrough whole PMU resoure to guest */
-+#define PERF_PMU_CAP_MEDIATED_VPMU		0x0400
- 
- /**
-  * pmu::scope
-@@ -1811,6 +1813,8 @@ extern void perf_event_task_tick(void);
- extern int perf_event_account_interrupt(struct perf_event *event);
- extern int perf_event_period(struct perf_event *event, u64 value);
- extern u64 perf_event_pause(struct perf_event *event, bool reset);
-+int perf_get_mediated_pmu(void);
-+void perf_put_mediated_pmu(void);
- #else /* !CONFIG_PERF_EVENTS: */
- static inline void *
- perf_aux_output_begin(struct perf_output_handle *handle,
-@@ -1901,6 +1905,13 @@ static inline int perf_exclude_event(struct perf_event *event, struct pt_regs *r
- {
- 	return 0;
- }
-+
-+static inline int perf_get_mediated_pmu(void)
-+{
-+	return 0;
-+}
-+
-+static inline void perf_put_mediated_pmu(void)			{ }
- #endif
- 
- #if defined(CONFIG_PERF_EVENTS) && defined(CONFIG_CPU_SUP_INTEL)
 diff --git a/kernel/events/core.c b/kernel/events/core.c
-index bcb09e011e9e..be623701dc48 100644
+index be623701dc48..8d3a0cc59fb4 100644
 --- a/kernel/events/core.c
 +++ b/kernel/events/core.c
-@@ -431,6 +431,20 @@ static atomic_t nr_bpf_events __read_mostly;
- static atomic_t nr_cgroup_events __read_mostly;
- static atomic_t nr_text_poke_events __read_mostly;
- static atomic_t nr_build_id_events __read_mostly;
-+static atomic_t nr_include_guest_events __read_mostly;
-+
-+static atomic_t nr_mediated_pmu_vms;
-+static DEFINE_MUTEX(perf_mediated_pmu_mutex);
-+
-+/* !exclude_guest event of PMU with PERF_PMU_CAP_MEDIATED_VPMU */
-+static inline bool is_include_guest_event(struct perf_event *event)
+@@ -163,7 +163,7 @@ enum event_type_t {
+ 	/* see ctx_resched() for details */
+ 	EVENT_CPU	= 0x10,
+ 	EVENT_CGROUP	= 0x20,
+-
++	EVENT_FLAGS	= EVENT_CGROUP,
+ 	/* compound helpers */
+ 	EVENT_ALL         = EVENT_FLEXIBLE | EVENT_PINNED,
+ 	EVENT_TIME_FROZEN = EVENT_TIME | EVENT_FROZEN,
+@@ -733,27 +733,37 @@ do {									\
+ 	___p;								\
+ })
+ 
+-#define for_each_epc(_epc, _ctx, _pmu, _cgroup)				\
++static bool perf_skip_pmu_ctx(struct perf_event_pmu_context *pmu_ctx,
++			      enum event_type_t event_type)
 +{
-+	if ((event->pmu->capabilities & PERF_PMU_CAP_MEDIATED_VPMU) &&
-+	    !event->attr.exclude_guest)
++	if ((event_type & EVENT_CGROUP) && !pmu_ctx->nr_cgroups)
 +		return true;
-+
 +	return false;
 +}
- 
- static LIST_HEAD(pmus);
- static DEFINE_MUTEX(pmus_lock);
-@@ -5320,6 +5334,9 @@ static void _free_event(struct perf_event *event)
- 
- 	unaccount_event(event);
- 
-+	if (is_include_guest_event(event))
-+		atomic_dec(&nr_include_guest_events);
 +
- 	security_perf_event_free(event);
++#define for_each_epc(_epc, _ctx, _pmu, _event_type)			\
+ 	list_for_each_entry(_epc, &((_ctx)->pmu_ctx_list), pmu_ctx_entry) \
+-		if (_cgroup && !_epc->nr_cgroups)			\
++		if (perf_skip_pmu_ctx(_epc, _event_type))		\
+ 			continue;					\
+ 		else if (_pmu && _epc->pmu != _pmu)			\
+ 			continue;					\
+ 		else
  
- 	if (event->rb) {
-@@ -5877,6 +5894,36 @@ u64 perf_event_pause(struct perf_event *event, bool reset)
- }
- EXPORT_SYMBOL_GPL(perf_event_pause);
+-static void perf_ctx_disable(struct perf_event_context *ctx, bool cgroup)
++static void perf_ctx_disable(struct perf_event_context *ctx,
++			     enum event_type_t event_type)
+ {
+ 	struct perf_event_pmu_context *pmu_ctx;
  
-+/*
-+ * Currently invoked at VM creation to
-+ * - Check whether there are existing !exclude_guest events of PMU with
-+ *   PERF_PMU_CAP_MEDIATED_VPMU
-+ * - Set nr_mediated_pmu_vms to prevent !exclude_guest event creation on
-+ *   PMUs with PERF_PMU_CAP_MEDIATED_VPMU
-+ *
-+ * No impact for the PMU without PERF_PMU_CAP_MEDIATED_VPMU. The perf
-+ * still owns all the PMU resources.
-+ */
-+int perf_get_mediated_pmu(void)
-+{
-+	guard(mutex)(&perf_mediated_pmu_mutex);
-+	if (atomic_inc_not_zero(&nr_mediated_pmu_vms))
-+		return 0;
-+
-+	if (atomic_read(&nr_include_guest_events))
-+		return -EBUSY;
-+
-+	atomic_inc(&nr_mediated_pmu_vms);
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(perf_get_mediated_pmu);
-+
-+void perf_put_mediated_pmu(void)
-+{
-+	atomic_dec(&nr_mediated_pmu_vms);
-+}
-+EXPORT_SYMBOL_GPL(perf_put_mediated_pmu);
-+
- /*
-  * Holding the top-level event's child_mutex means that any
-  * descendant process that has inherited this event will block
-@@ -12210,6 +12257,17 @@ static void account_event(struct perf_event *event)
- 	account_pmu_sb_event(event);
+-	for_each_epc(pmu_ctx, ctx, NULL, cgroup)
++	for_each_epc(pmu_ctx, ctx, NULL, event_type)
+ 		perf_pmu_disable(pmu_ctx->pmu);
  }
  
-+static int perf_account_include_guest_event(void)
-+{
-+	guard(mutex)(&perf_mediated_pmu_mutex);
-+
-+	if (atomic_read(&nr_mediated_pmu_vms))
-+		return -EOPNOTSUPP;
-+
-+	atomic_inc(&nr_include_guest_events);
-+	return 0;
-+}
-+
- /*
-  * Allocate and initialize an event structure
-  */
-@@ -12435,11 +12493,19 @@ perf_event_alloc(struct perf_event_attr *attr, int cpu,
- 	if (err)
- 		goto err_callchain_buffer;
+-static void perf_ctx_enable(struct perf_event_context *ctx, bool cgroup)
++static void perf_ctx_enable(struct perf_event_context *ctx,
++			    enum event_type_t event_type)
+ {
+ 	struct perf_event_pmu_context *pmu_ctx;
  
-+	if (is_include_guest_event(event)) {
-+		err = perf_account_include_guest_event();
-+		if (err)
-+			goto err_security_alloc;
-+	}
-+
- 	/* symmetric to unaccount_event() in _free_event() */
- 	account_event(event);
+-	for_each_epc(pmu_ctx, ctx, NULL, cgroup)
++	for_each_epc(pmu_ctx, ctx, NULL, event_type)
+ 		perf_pmu_enable(pmu_ctx->pmu);
+ }
  
- 	return event;
+@@ -913,7 +923,7 @@ static void perf_cgroup_switch(struct task_struct *task)
+ 		return;
  
-+err_security_alloc:
-+	security_perf_event_free(event);
- err_callchain_buffer:
- 	if (!event->parent) {
- 		if (event->attr.sample_type & PERF_SAMPLE_CALLCHAIN)
+ 	perf_ctx_lock(cpuctx, cpuctx->task_ctx);
+-	perf_ctx_disable(&cpuctx->ctx, true);
++	perf_ctx_disable(&cpuctx->ctx, EVENT_CGROUP);
+ 
+ 	ctx_sched_out(&cpuctx->ctx, NULL, EVENT_ALL|EVENT_CGROUP);
+ 	/*
+@@ -929,7 +939,7 @@ static void perf_cgroup_switch(struct task_struct *task)
+ 	 */
+ 	ctx_sched_in(&cpuctx->ctx, NULL, EVENT_ALL|EVENT_CGROUP);
+ 
+-	perf_ctx_enable(&cpuctx->ctx, true);
++	perf_ctx_enable(&cpuctx->ctx, EVENT_CGROUP);
+ 	perf_ctx_unlock(cpuctx, cpuctx->task_ctx);
+ }
+ 
+@@ -2796,11 +2806,11 @@ static void ctx_resched(struct perf_cpu_context *cpuctx,
+ 
+ 	event_type &= EVENT_ALL;
+ 
+-	for_each_epc(epc, &cpuctx->ctx, pmu, false)
++	for_each_epc(epc, &cpuctx->ctx, pmu, 0)
+ 		perf_pmu_disable(epc->pmu);
+ 
+ 	if (task_ctx) {
+-		for_each_epc(epc, task_ctx, pmu, false)
++		for_each_epc(epc, task_ctx, pmu, 0)
+ 			perf_pmu_disable(epc->pmu);
+ 
+ 		task_ctx_sched_out(task_ctx, pmu, event_type);
+@@ -2820,11 +2830,11 @@ static void ctx_resched(struct perf_cpu_context *cpuctx,
+ 
+ 	perf_event_sched_in(cpuctx, task_ctx, pmu);
+ 
+-	for_each_epc(epc, &cpuctx->ctx, pmu, false)
++	for_each_epc(epc, &cpuctx->ctx, pmu, 0)
+ 		perf_pmu_enable(epc->pmu);
+ 
+ 	if (task_ctx) {
+-		for_each_epc(epc, task_ctx, pmu, false)
++		for_each_epc(epc, task_ctx, pmu, 0)
+ 			perf_pmu_enable(epc->pmu);
+ 	}
+ }
+@@ -3374,11 +3384,10 @@ static void
+ ctx_sched_out(struct perf_event_context *ctx, struct pmu *pmu, enum event_type_t event_type)
+ {
+ 	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
++	enum event_type_t active_type = event_type & ~EVENT_FLAGS;
+ 	struct perf_event_pmu_context *pmu_ctx;
+ 	int is_active = ctx->is_active;
+-	bool cgroup = event_type & EVENT_CGROUP;
+ 
+-	event_type &= ~EVENT_CGROUP;
+ 
+ 	lockdep_assert_held(&ctx->lock);
+ 
+@@ -3409,7 +3418,7 @@ ctx_sched_out(struct perf_event_context *ctx, struct pmu *pmu, enum event_type_t
+ 	 * see __load_acquire() in perf_event_time_now()
+ 	 */
+ 	barrier();
+-	ctx->is_active &= ~event_type;
++	ctx->is_active &= ~active_type;
+ 
+ 	if (!(ctx->is_active & EVENT_ALL)) {
+ 		/*
+@@ -3430,7 +3439,7 @@ ctx_sched_out(struct perf_event_context *ctx, struct pmu *pmu, enum event_type_t
+ 
+ 	is_active ^= ctx->is_active; /* changed bits */
+ 
+-	for_each_epc(pmu_ctx, ctx, pmu, cgroup)
++	for_each_epc(pmu_ctx, ctx, pmu, event_type)
+ 		__pmu_ctx_sched_out(pmu_ctx, is_active);
+ }
+ 
+@@ -3622,7 +3631,7 @@ perf_event_context_sched_out(struct task_struct *task, struct task_struct *next)
+ 		raw_spin_lock_nested(&next_ctx->lock, SINGLE_DEPTH_NESTING);
+ 		if (context_equiv(ctx, next_ctx)) {
+ 
+-			perf_ctx_disable(ctx, false);
++			perf_ctx_disable(ctx, 0);
+ 
+ 			/* PMIs are disabled; ctx->nr_no_switch_fast is stable. */
+ 			if (local_read(&ctx->nr_no_switch_fast) ||
+@@ -3647,7 +3656,7 @@ perf_event_context_sched_out(struct task_struct *task, struct task_struct *next)
+ 			perf_ctx_sched_task_cb(ctx, false);
+ 			perf_event_swap_task_ctx_data(ctx, next_ctx);
+ 
+-			perf_ctx_enable(ctx, false);
++			perf_ctx_enable(ctx, 0);
+ 
+ 			/*
+ 			 * RCU_INIT_POINTER here is safe because we've not
+@@ -3671,13 +3680,13 @@ perf_event_context_sched_out(struct task_struct *task, struct task_struct *next)
+ 
+ 	if (do_switch) {
+ 		raw_spin_lock(&ctx->lock);
+-		perf_ctx_disable(ctx, false);
++		perf_ctx_disable(ctx, 0);
+ 
+ inside_switch:
+ 		perf_ctx_sched_task_cb(ctx, false);
+ 		task_ctx_sched_out(ctx, NULL, EVENT_ALL);
+ 
+-		perf_ctx_enable(ctx, false);
++		perf_ctx_enable(ctx, 0);
+ 		raw_spin_unlock(&ctx->lock);
+ 	}
+ }
+@@ -3981,11 +3990,9 @@ static void
+ ctx_sched_in(struct perf_event_context *ctx, struct pmu *pmu, enum event_type_t event_type)
+ {
+ 	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
++	enum event_type_t active_type = event_type & ~EVENT_FLAGS;
+ 	struct perf_event_pmu_context *pmu_ctx;
+ 	int is_active = ctx->is_active;
+-	bool cgroup = event_type & EVENT_CGROUP;
+-
+-	event_type &= ~EVENT_CGROUP;
+ 
+ 	lockdep_assert_held(&ctx->lock);
+ 
+@@ -4003,7 +4010,7 @@ ctx_sched_in(struct perf_event_context *ctx, struct pmu *pmu, enum event_type_t
+ 		barrier();
+ 	}
+ 
+-	ctx->is_active |= (event_type | EVENT_TIME);
++	ctx->is_active |= active_type | EVENT_TIME;
+ 	if (ctx->task) {
+ 		if (!(is_active & EVENT_ALL))
+ 			cpuctx->task_ctx = ctx;
+@@ -4018,13 +4025,13 @@ ctx_sched_in(struct perf_event_context *ctx, struct pmu *pmu, enum event_type_t
+ 	 * in order to give them the best chance of going on.
+ 	 */
+ 	if (is_active & EVENT_PINNED) {
+-		for_each_epc(pmu_ctx, ctx, pmu, cgroup)
++		for_each_epc(pmu_ctx, ctx, pmu, event_type)
+ 			__pmu_ctx_sched_in(pmu_ctx, EVENT_PINNED);
+ 	}
+ 
+ 	/* Then walk through the lower prio flexible groups */
+ 	if (is_active & EVENT_FLEXIBLE) {
+-		for_each_epc(pmu_ctx, ctx, pmu, cgroup)
++		for_each_epc(pmu_ctx, ctx, pmu, event_type)
+ 			__pmu_ctx_sched_in(pmu_ctx, EVENT_FLEXIBLE);
+ 	}
+ }
+@@ -4041,11 +4048,11 @@ static void perf_event_context_sched_in(struct task_struct *task)
+ 
+ 	if (cpuctx->task_ctx == ctx) {
+ 		perf_ctx_lock(cpuctx, ctx);
+-		perf_ctx_disable(ctx, false);
++		perf_ctx_disable(ctx, 0);
+ 
+ 		perf_ctx_sched_task_cb(ctx, true);
+ 
+-		perf_ctx_enable(ctx, false);
++		perf_ctx_enable(ctx, 0);
+ 		perf_ctx_unlock(cpuctx, ctx);
+ 		goto rcu_unlock;
+ 	}
+@@ -4058,7 +4065,7 @@ static void perf_event_context_sched_in(struct task_struct *task)
+ 	if (!ctx->nr_events)
+ 		goto unlock;
+ 
+-	perf_ctx_disable(ctx, false);
++	perf_ctx_disable(ctx, 0);
+ 	/*
+ 	 * We want to keep the following priority order:
+ 	 * cpu pinned (that don't need to move), task pinned,
+@@ -4068,7 +4075,7 @@ static void perf_event_context_sched_in(struct task_struct *task)
+ 	 * events, no need to flip the cpuctx's events around.
+ 	 */
+ 	if (!RB_EMPTY_ROOT(&ctx->pinned_groups.tree)) {
+-		perf_ctx_disable(&cpuctx->ctx, false);
++		perf_ctx_disable(&cpuctx->ctx, 0);
+ 		ctx_sched_out(&cpuctx->ctx, NULL, EVENT_FLEXIBLE);
+ 	}
+ 
+@@ -4077,9 +4084,9 @@ static void perf_event_context_sched_in(struct task_struct *task)
+ 	perf_ctx_sched_task_cb(cpuctx->task_ctx, true);
+ 
+ 	if (!RB_EMPTY_ROOT(&ctx->pinned_groups.tree))
+-		perf_ctx_enable(&cpuctx->ctx, false);
++		perf_ctx_enable(&cpuctx->ctx, 0);
+ 
+-	perf_ctx_enable(ctx, false);
++	perf_ctx_enable(ctx, 0);
+ 
+ unlock:
+ 	perf_ctx_unlock(cpuctx, ctx);
 -- 
 2.49.0.395.g12beb8f557-goog
 
