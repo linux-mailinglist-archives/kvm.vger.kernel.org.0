@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-41829-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41830-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9D8AA6E118
-	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 18:39:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C156BA6E11B
+	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 18:39:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10A06173C7E
-	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 17:37:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EC9E168AD1
+	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 17:37:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AC5B264A68;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED7C6267AFC;
 	Mon, 24 Mar 2025 17:33:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wdFiMiBl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B0ky/j4t"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B22EF26770E
-	for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 17:33:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48CE126771E
+	for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 17:33:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742837598; cv=none; b=lbzs4qY8FGp3X4nrW4QDXqxnQ8m/9xC9Lng8ieXdqxysFsQYfXBGxtvg0dNXLrxC9XnQol5p6A/LoKqbos+iqWnSyh9LOExl6Y0vgP4aaqVDJDqnMmni3znyFQpS1ejqXIvmN3XqshfYh3YnG3GUEW38yfmfMYvR6wBbOQ31qa4=
+	t=1742837599; cv=none; b=PZoC+7ahSS/8IXcYaRMnrB8YGlnk8cragjp7V9atrhB8PD76r0gSwYtytdlyY6MRFiPqdVODyEGLCw4u9VdebyO6UU5U5YR5hYzDlzy8BoKQTQytSrCcXmZa7HyH+dkeyYRU9TFxfk7dL2vFUZrPSYpndQgr42rclPMg9kyOgwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742837598; c=relaxed/simple;
-	bh=7DB+Pot4S4YTvYSOXJ71A2ta9CwwBpBvOTGdR4Q5yl8=;
+	s=arc-20240116; t=1742837599; c=relaxed/simple;
+	bh=2UZFS7ZtPOsOdbmjBqXwodQu0sg74b205rrAfdCfezc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=rU+EnUC6Tm6i61Cjt2mlu970sV7b+aFDd5+3VaLAG36Bv2ycBoYeIbCZKUk2ctJ+YiWPrW8RBlQ/qQUQjGySVmsDtgVX3FUP4vLjQyJ5ljXZsuZoTfY4jizt+MCHeogPH6bA69nwvhhl1Ywx4+RediycqRg0RXV96sg1GBuWnNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wdFiMiBl; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=qXjbyAlq/IT6/0yWf43jSVoUXcW3b8c3w30WXgJ8c8RUEkgO1xejP00wjjMn04rAk/XIjPUF4QzIF59tMhNHCBNbftKAYt8TQC+lyDi8ucz72/jNDywKC3B9+XoGygHQ/Ol33zW67eUZBuXim3hS37P6Xq0HYlS94TE2nKIfFrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B0ky/j4t; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff6943febeso6438336a91.0
-        for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 10:33:15 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ff854a2541so7690717a91.0
+        for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 10:33:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742837595; x=1743442395; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1742837596; x=1743442396; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=QEZcrdvDcdB438jq0C+7mJLnHmCqXMR/6Rcp3Tn0Nqk=;
-        b=wdFiMiBlpKp4Z6RhkjNuMD1pvjZeW3HRRm3pGdlKtZM9kzt4I57Puby0B+zI7g9nf/
-         g7ydZbUGR61/xzTA9UtvN8bYR+81PwwqvyUFYIalos+CL354YdczNBwK9DDcsti/skxS
-         +FYNTccARUTrhpqb5350TTKym/g1xhtapm8iU9YZbnbkL/5O9o5boNhOf53k/9M2mHMZ
-         vIowWt3QuRHAyuBcrewdQaynE09FhXVYL0SLnGJgBSva9+JV1eNqU0Iro1t/UTwVBPn3
-         BVlZ2rb7NooGSZPITp14Sw8I5NNce1i3QMRUtonJwqWSlEQu3C+z9oOU+x6iqFJAcHGR
-         GSig==
+        bh=/pjum03NzkfgM+Q+OY/G0cb0GEix9DxH7FdvQDwo0sM=;
+        b=B0ky/j4ttoOO7HETzD0jLw2boowsp81uwV2unwnFMKdWBGKvilL+7xAvqJClQVMNhS
+         LbKHR+f3/bvLQS3m+cEO7c/6sMS0IsYZiWoJxrzAgJgjNeJt4nL707m2If25c1ZsjtNh
+         NvsIM08qRieZrME1aoe2J9AFbl+hAyxjNzWdOTdtriawnQWgunwLtpkJBXvRMda7KaQc
+         upCP2NoMO3RUMFo5wSdv495K7fb3GJP8IuWSwRUd0tlVwjE9KQvMRkZtC2+P5a4UYWEx
+         21AFlA/9I+XH26OXaRgIQeG8Nn4TCA5ZgY1UuiTiTxZlsvqEixTnyUAP1t/Kb7npX/r9
+         g71g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742837595; x=1743442395;
+        d=1e100.net; s=20230601; t=1742837596; x=1743442396;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=QEZcrdvDcdB438jq0C+7mJLnHmCqXMR/6Rcp3Tn0Nqk=;
-        b=icOsR/ecMseOWj/KEQPHwfcg8FqgdcVoPdCsz/aACt7dM8ByvhU5X+1EQqnxFqPj5A
-         DJtUYIkK4tZDcJAO9wnZi8WabezLq/+dtgWK248jscM8lgzm7C5oWVZZtoeezn+J8eEx
-         FrH6gUTEtgXayRjfS83FDnMsyeIrOW8uqVRuq58GeifI9VRkK2x5WUdBTABfg1GYCNJb
-         1d9wGzR/f0fY10nk8L2NLAYe9Y0JHSXx6B9qFAFvpwswaO2JAGlBg3bx8uhlS3wBz75L
-         Os7saqOyEsbGRklwi1TJdCnK3iL1hNIyjCuq5sPTsMbG3KUSnyIWWEVAAs+ZkJDhCGiU
-         RJlw==
-X-Forwarded-Encrypted: i=1; AJvYcCUZHNNrLLJOMRVVlLIklipW94aG3iE3jgtc4QCWn+43UuhfD90oghH7VempflCn2SWK+xE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwsrxelMuNKxYwEsYX5v1PDyyTgTadpPrTnMP1XzEtOFq7RKi1
-	4V53peYCAytJIWlxOjesD/TeCXmF/1dvizdcoKSUdtN335uoB4L3Tco+S+sya6F2P93su5OFKTP
-	5mCPwdg==
-X-Google-Smtp-Source: AGHT+IHVJlsFAJG1/M0zW8PXxbMMRp3WQsNEDZjGK9sn+7Jy4KFkZOOTViFL/FbZWizRdlX7RVil8rLqGVWL
-X-Received: from pjh3.prod.google.com ([2002:a17:90b:3f83:b0:2fe:7f7a:74b2])
- (user=mizhang job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:544f:b0:2ff:5267:e7da
- with SMTP id 98e67ed59e1d1-3030e5509f2mr22819736a91.3.1742837594906; Mon, 24
- Mar 2025 10:33:14 -0700 (PDT)
+        bh=/pjum03NzkfgM+Q+OY/G0cb0GEix9DxH7FdvQDwo0sM=;
+        b=WPy9NL4nyVBPMLWGDPsNmLVpR4c7SRzP5AWK5E8hcARk2TXImMkV8QNmYtFQiPLXQR
+         DukFw+RlRTjD+J2jtd+fUtS9izB/XSpNOfYbs4v1q7CLAU1rXjs7KIxtgpGMW07byvn0
+         5atMU9bhfBxr+xaAm3VQLEsSHhoAdI3zfY3ObXphN0dV5wiztH9CnSg48j0TwLAXSfKy
+         RHBQWBJ+7Lu5tRkCwaB0h3TQZjtpYP1JyOQL9XjBxDQXRH7K9OGCA9Hf4EcQD38lWsmh
+         z8tjkgNVYwaIerDwxcGQGfqvnNXVPeIqMwiTw7PNLtMFOq6hkZ3xTmnSqYjmuoGOWodt
+         TZlw==
+X-Forwarded-Encrypted: i=1; AJvYcCX7TcrQag2T8Crfv/R42ERO3k6oXxKCatFLZNIa9UAytinIkhTCCpBvxvr30ULXLta+6vA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyp/gYY8oFFQHZ/9Bdd+9FcXlAXde3Q+BR0hmC9noPN97B08M3Q
+	uCCsAEFOgEuAuXvAtciItTeUVeOS9f+JXIV1OookOJDO2/MbNXMgYJHqQy8xl28q4MTG/tUmsJp
+	Q1XWAlw==
+X-Google-Smtp-Source: AGHT+IEp4Ey07lcVugyBVSb+j22AJh8dSqNsTLQcXlHV08cAfBwc+uLQMdNHEOqok620nmaX8Fc8YALvVfam
+X-Received: from pjm7.prod.google.com ([2002:a17:90b:2fc7:b0:2f8:49ad:406c])
+ (user=mizhang job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3e47:b0:2f4:4500:bb4d
+ with SMTP id 98e67ed59e1d1-3030fec4e66mr22976717a91.20.1742837596673; Mon, 24
+ Mar 2025 10:33:16 -0700 (PDT)
 Reply-To: Mingwei Zhang <mizhang@google.com>
-Date: Mon, 24 Mar 2025 17:30:54 +0000
+Date: Mon, 24 Mar 2025 17:30:55 +0000
 In-Reply-To: <20250324173121.1275209-1-mizhang@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,8 +76,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250324173121.1275209-1-mizhang@google.com>
 X-Mailer: git-send-email 2.49.0.395.g12beb8f557-goog
-Message-ID: <20250324173121.1275209-15-mizhang@google.com>
-Subject: [PATCH v4 14/38] KVM: x86/pmu: Introduce enable_mediated_pmu global parameter
+Message-ID: <20250324173121.1275209-16-mizhang@google.com>
+Subject: [PATCH v4 15/38] KVM: x86/pmu: Check PMU cpuid configuration from
+ user space
 From: Mingwei Zhang <mizhang@google.com>
 To: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
 	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
@@ -98,225 +99,93 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Dapeng Mi <dapeng1.mi@linux.intel.com>
 
-Introduce enable_mediated_pmu global parameter to control if mediated
-vPMU can be enabled on KVM level. Even enable_mediated_pmu is set to
-true in KVM, user space hypervisor still need to enable mediated vPMU
-explicitly by calling KVM_CAP_PMU_CAPABILITY ioctl. This gives
-hypervisor flexibility to enable or disable mediated vPMU for each VM.
+Check user space's PMU cpuid configuration and filter the invalid
+configuration.
 
-Mediated vPMU depends on some PMU features on higher PMU version, like
-PERF_GLOBAL_STATUS_SET MSR in v4+ for Intel PMU. Thus introduce a
-pmu_ops variable MIN_MEDIATED_PMU_VERSION to indicates the minimum host
-PMU version which mediated vPMU needs.
+Either legacy perf-based vPMU or mediated vPMU needs kernel to support
+local APIC, otherwise PMI has no way to be injected into guest. If
+kernel doesn't support local APIC, reject user space to enable PMU
+cpuid.
 
-Currently enable_mediated_pmu is not exposed to user space as a module
-parameter until all mediated vPMU code are in place.
+User space configured PMU version must be no larger than KVM supported
+maximum pmu version for mediated vPMU, otherwise guest may manipulate
+some unsupported or unallowed PMU MSRs, this is dangerous and harmful.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Co-developed-by: Mingwei Zhang <mizhang@google.com>
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
+If the pmu version is larger than 1 but smaller than 5, CPUID.AH.ECX
+must be 0 as well which is required by SDM.
+
+Suggested-by: Zide Chen <zide.chen@intel.com>
 Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Signed-off-by: Mingwei Zhang <mizhang@google.com>
 ---
- arch/x86/kvm/pmu.c              |  3 ++-
- arch/x86/kvm/pmu.h              | 11 +++++++++
- arch/x86/kvm/svm/pmu.c          |  1 +
- arch/x86/kvm/vmx/capabilities.h |  3 ++-
- arch/x86/kvm/vmx/pmu_intel.c    |  5 ++++
- arch/x86/kvm/vmx/vmx.c          |  3 ++-
- arch/x86/kvm/x86.c              | 44 ++++++++++++++++++++++++++++++---
- arch/x86/kvm/x86.h              |  1 +
- 8 files changed, 64 insertions(+), 7 deletions(-)
+ arch/x86/kvm/cpuid.c | 15 +++++++++++++++
+ arch/x86/kvm/pmu.c   |  7 +++++--
+ arch/x86/kvm/pmu.h   |  1 +
+ 3 files changed, 21 insertions(+), 2 deletions(-)
 
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 8eb3a88707f2..f849ced9deba 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -179,6 +179,21 @@ static int kvm_check_cpuid(struct kvm_vcpu *vcpu)
+ 			return -EINVAL;
+ 	}
+ 
++	best = kvm_find_cpuid_entry(vcpu, 0xa);
++	if (vcpu->kvm->arch.enable_pmu && best) {
++		union cpuid10_eax eax;
++
++		eax.full = best->eax;
++		if (enable_mediated_pmu &&
++		    eax.split.version_id > kvm_pmu_cap.version)
++			return -EINVAL;
++		if (eax.split.version_id > 0 && !vcpu_pmu_can_enable(vcpu))
++			return -EINVAL;
++		if (eax.split.version_id > 1 && eax.split.version_id < 5 &&
++		    best->ecx != 0)
++			return -EINVAL;
++	}
++
+ 	/*
+ 	 * Exposing dynamic xfeatures to the guest requires additional
+ 	 * enabling in the FPU, e.g. to expand the guest XSAVE state size.
 diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 75e9cfc689f8..4f455afe4009 100644
+index 4f455afe4009..92c742ead663 100644
 --- a/arch/x86/kvm/pmu.c
 +++ b/arch/x86/kvm/pmu.c
-@@ -775,7 +775,8 @@ void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
+@@ -743,6 +743,10 @@ static void kvm_pmu_reset(struct kvm_vcpu *vcpu)
+ 	kvm_pmu_call(reset)(vcpu);
+ }
+ 
++inline bool vcpu_pmu_can_enable(struct kvm_vcpu *vcpu)
++{
++	return vcpu->kvm->arch.enable_pmu && lapic_in_kernel(vcpu);
++}
+ 
+ /*
+  * Refresh the PMU configuration for the vCPU, e.g. if userspace changes CPUID
+@@ -775,8 +779,7 @@ void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
  	pmu->pebs_data_cfg_rsvd = ~0ull;
  	bitmap_zero(pmu->all_valid_pmc_idx, X86_PMC_IDX_MAX);
  
--	if (!vcpu->kvm->arch.enable_pmu)
-+	if (!vcpu->kvm->arch.enable_pmu ||
-+	    (!lapic_in_kernel(vcpu) && enable_mediated_pmu))
+-	if (!vcpu->kvm->arch.enable_pmu ||
+-	    (!lapic_in_kernel(vcpu) && enable_mediated_pmu))
++	if (!vcpu_pmu_can_enable(vcpu))
  		return;
  
  	kvm_pmu_call(refresh)(vcpu);
 diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index ad89d0bd6005..dd45a0c6be74 100644
+index dd45a0c6be74..e1d0096f249b 100644
 --- a/arch/x86/kvm/pmu.h
 +++ b/arch/x86/kvm/pmu.h
-@@ -45,6 +45,7 @@ struct kvm_pmu_ops {
- 	const u64 EVENTSEL_EVENT;
- 	const int MAX_NR_GP_COUNTERS;
- 	const int MIN_NR_GP_COUNTERS;
-+	const int MIN_MEDIATED_PMU_VERSION;
- };
+@@ -284,6 +284,7 @@ void kvm_pmu_cleanup(struct kvm_vcpu *vcpu);
+ void kvm_pmu_destroy(struct kvm_vcpu *vcpu);
+ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp);
+ void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 eventsel);
++bool vcpu_pmu_can_enable(struct kvm_vcpu *vcpu);
  
- void kvm_pmu_ops_update(const struct kvm_pmu_ops *pmu_ops);
-@@ -63,6 +64,12 @@ static inline bool kvm_pmu_has_perf_global_ctrl(struct kvm_pmu *pmu)
- 	return pmu->version > 1;
- }
+ bool is_vmware_backdoor_pmc(u32 pmc_idx);
  
-+static inline bool kvm_mediated_pmu_enabled(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu->kvm->arch.enable_pmu &&
-+	       enable_mediated_pmu && vcpu_to_pmu(vcpu)->version;
-+}
-+
- /*
-  * KVM tracks all counters in 64-bit bitmaps, with general purpose counters
-  * mapped to bits 31:0 and fixed counters mapped to 63:32, e.g. fixed counter 0
-@@ -210,6 +217,10 @@ static inline void kvm_init_pmu_capability(const struct kvm_pmu_ops *pmu_ops)
- 			enable_pmu = false;
- 	}
- 
-+	if (!enable_pmu || !kvm_pmu_cap.mediated ||
-+	    pmu_ops->MIN_MEDIATED_PMU_VERSION > kvm_pmu_cap.version)
-+		enable_mediated_pmu = false;
-+
- 	if (!enable_pmu) {
- 		memset(&kvm_pmu_cap, 0, sizeof(kvm_pmu_cap));
- 		return;
-diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-index 288f7f2a46f2..c8b9fd9b5350 100644
---- a/arch/x86/kvm/svm/pmu.c
-+++ b/arch/x86/kvm/svm/pmu.c
-@@ -239,4 +239,5 @@ struct kvm_pmu_ops amd_pmu_ops __initdata = {
- 	.EVENTSEL_EVENT = AMD64_EVENTSEL_EVENT,
- 	.MAX_NR_GP_COUNTERS = KVM_MAX_NR_AMD_GP_COUNTERS,
- 	.MIN_NR_GP_COUNTERS = AMD64_NUM_COUNTERS,
-+	.MIN_MEDIATED_PMU_VERSION = 2,
- };
-diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-index cb6588238f46..fac2c80ddbab 100644
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@ -390,7 +390,8 @@ static inline bool vmx_pt_mode_is_host_guest(void)
- 
- static inline bool vmx_pebs_supported(void)
- {
--	return boot_cpu_has(X86_FEATURE_PEBS) && kvm_pmu_cap.pebs_ept;
-+	return boot_cpu_has(X86_FEATURE_PEBS) &&
-+	       !enable_mediated_pmu && kvm_pmu_cap.pebs_ept;
- }
- 
- static inline bool cpu_has_notify_vmexit(void)
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 77012b2eca0e..425e93d4b1c6 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -739,4 +739,9 @@ struct kvm_pmu_ops intel_pmu_ops __initdata = {
- 	.EVENTSEL_EVENT = ARCH_PERFMON_EVENTSEL_EVENT,
- 	.MAX_NR_GP_COUNTERS = KVM_MAX_NR_INTEL_GP_COUNTERS,
- 	.MIN_NR_GP_COUNTERS = 1,
-+	/*
-+	 * Intel mediated vPMU support depends on
-+	 * MSR_CORE_PERF_GLOBAL_STATUS_SET which is supported from 4+.
-+	 */
-+	.MIN_MEDIATED_PMU_VERSION = 4,
- };
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 00ac94535c21..a4b5b6455c7b 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7916,7 +7916,8 @@ static __init u64 vmx_get_perf_capabilities(void)
- 	if (boot_cpu_has(X86_FEATURE_PDCM))
- 		rdmsrl(MSR_IA32_PERF_CAPABILITIES, host_perf_cap);
- 
--	if (!cpu_feature_enabled(X86_FEATURE_ARCH_LBR)) {
-+	if (!cpu_feature_enabled(X86_FEATURE_ARCH_LBR) &&
-+	    !enable_mediated_pmu) {
- 		x86_perf_get_lbr(&vmx_lbr_caps);
- 
- 		/*
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 72995952978a..1ebe169b88b6 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -188,6 +188,14 @@ bool __read_mostly enable_pmu = true;
- EXPORT_SYMBOL_GPL(enable_pmu);
- module_param(enable_pmu, bool, 0444);
- 
-+/*
-+ * Enable/disable mediated passthrough PMU virtualization.
-+ * Don't expose it to userspace as a module paramerter until
-+ * all mediated vPMU code is in place.
-+ */
-+bool __read_mostly enable_mediated_pmu;
-+EXPORT_SYMBOL_GPL(enable_mediated_pmu);
-+
- bool __read_mostly eager_page_split = true;
- module_param(eager_page_split, bool, 0644);
- 
-@@ -6643,9 +6651,28 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 			break;
- 
- 		mutex_lock(&kvm->lock);
--		if (!kvm->created_vcpus) {
--			kvm->arch.enable_pmu = !(cap->args[0] & KVM_PMU_CAP_DISABLE);
--			r = 0;
-+		/*
-+		 * To keep PMU configuration "simple", setting vPMU support is
-+		 * disallowed if vCPUs are created, or if mediated PMU support
-+		 * was already enabled for the VM.
-+		 */
-+		if (!kvm->created_vcpus &&
-+		    (!enable_mediated_pmu || !kvm->arch.enable_pmu)) {
-+			bool pmu_enable = !(cap->args[0] & KVM_PMU_CAP_DISABLE);
-+
-+			if (enable_mediated_pmu && pmu_enable) {
-+				char *err_msg = "Fail to enable mediated vPMU, " \
-+					"please disable system wide perf events or nmi_watchdog " \
-+					"(echo 0 > /proc/sys/kernel/nmi_watchdog).\n";
-+
-+				r = perf_get_mediated_pmu();
-+				if (r)
-+					kvm_err("%s", err_msg);
-+			} else
-+				r = 0;
-+
-+			if (!r)
-+				kvm->arch.enable_pmu = pmu_enable;
- 		}
- 		mutex_unlock(&kvm->lock);
- 		break;
-@@ -12723,7 +12750,14 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	kvm->arch.default_tsc_khz = max_tsc_khz ? : tsc_khz;
- 	kvm->arch.apic_bus_cycle_ns = APIC_BUS_CYCLE_NS_DEFAULT;
- 	kvm->arch.guest_can_read_msr_platform_info = true;
--	kvm->arch.enable_pmu = enable_pmu;
-+
-+	/*
-+	 * PMU virtualization is opt-in when mediated PMU support is enabled.
-+	 * KVM_CAP_PMU_CAPABILITY ioctl must be called explicitly to enable
-+	 * mediated vPMU. For legacy perf-based vPMU, its behavior isn't changed,
-+	 * KVM_CAP_PMU_CAPABILITY ioctl is optional.
-+	 */
-+	kvm->arch.enable_pmu = enable_pmu && !enable_mediated_pmu;
- 
- #if IS_ENABLED(CONFIG_HYPERV)
- 	spin_lock_init(&kvm->arch.hv_root_tdp_lock);
-@@ -12876,6 +12910,8 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
- 		__x86_set_memory_region(kvm, TSS_PRIVATE_MEMSLOT, 0, 0);
- 		mutex_unlock(&kvm->slots_lock);
- 	}
-+	if (kvm->arch.enable_pmu && enable_mediated_pmu)
-+		perf_put_mediated_pmu();
- 	kvm_unload_vcpu_mmus(kvm);
- 	kvm_x86_call(vm_destroy)(kvm);
- 	kvm_free_msr_filter(srcu_dereference_check(kvm->arch.msr_filter, &kvm->srcu, 1));
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 91e50a513100..dbf9973b3d09 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -391,6 +391,7 @@ extern struct kvm_caps kvm_caps;
- extern struct kvm_host_values kvm_host;
- 
- extern bool enable_pmu;
-+extern bool enable_mediated_pmu;
- 
- /*
-  * Get a filtered version of KVM's supported XCR0 that strips out dynamic
 -- 
 2.49.0.395.g12beb8f557-goog
 
