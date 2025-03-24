@@ -1,181 +1,217 @@
-Return-Path: <kvm+bounces-41853-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41854-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC3F9A6E187
-	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 18:50:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EBDFA6E1D7
+	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 18:58:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E0683B5C6A
-	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 17:45:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09800163B50
+	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 17:56:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9384C26FD95;
-	Mon, 24 Mar 2025 17:33:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEDD22641DC;
+	Mon, 24 Mar 2025 17:56:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0XyQvbI1"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ey8acH8B"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48F5826FA55
-	for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 17:33:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F371DC985;
+	Mon, 24 Mar 2025 17:56:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742837635; cv=none; b=Xt8yOPV1+O0UOse+f3t8/hS+66q9TkkEEL6eYKs80YQA49f9unEsAV1RNfB3miNqnqK8vF9ZamYbfCJPwFAwh/h1niIIosHgILOve7qEA9YWfB0oobDWTwjTNWUfgIERZm+Ghltc9wcVJu80PAUJmsJPniv7h96BnOBJWGVG1uA=
+	t=1742838977; cv=none; b=Wcv3jV7XrHF65iP/vTtmygOt6PbSpI6Hrrs4W3KQtn48ya+9qVvf0ocp778Rp0PNUvHl/TuTGMeljWvRi/2vIpKZ7fiesoaei350XXRaUPE0JqOVAScxRpgRCgXvsHp2Ie5f+aecaytCqjA0JYv0SOdDuLxq8kTAu3cZCiVoR3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742837635; c=relaxed/simple;
-	bh=Fzdu3CbhlWwdv5ErNtNQUvoyT6udvNORVBxBG5rpyUw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qEEtg69LZR3LX64nfVECyEMHESvkb6K60/CUGW3uFcLogpxNVj7IaWvhYSkXCetcdcJnlLEu9YYApDzGkWzSJ6yJPNq2irZPPOlzsReBDESDVQdtgjyaF6IWIoDDny74jrDxi8926RncqJBt9IBKh6kNYKeHpR8FrMennkOXTYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0XyQvbI1; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-22412127fd7so58455785ad.0
-        for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 10:33:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742837634; x=1743442434; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=88C2UbjNetqKIudE+7P6t/BsF0Q2P+IjVPGB7Q/ZhWo=;
-        b=0XyQvbI1xqPbubC9grfv9wVTIfiSKn6Cv4HPN/QlYcOEVHj20FFrced+pBcJIs57jW
-         qM5RNvPwkJQpBrFw587YcjBbkb9N5N4m8K7fg02ocXD7zZqXMDNtj9cp6NzKGvx3WjUr
-         Q//l+Bxtli4E3tLhtubZqN/g7WToDWDk37y95nzMXPBcl3+q7D31sd+qXwx0e520h9e2
-         HYbuI5tWpkje9sPpiUMfslRRgDavvufOSWQfvIBQ+w+ghZ/QsAOYTTLeIQOcJ8LKDQua
-         dL1VzyqC2HLA/Yol00qB687zYIsAht8eWGgucc/B4wR/qLTZROc2J6BNyp3mhpLOgNni
-         2png==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742837634; x=1743442434;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=88C2UbjNetqKIudE+7P6t/BsF0Q2P+IjVPGB7Q/ZhWo=;
-        b=q6o5KyrvPAN/Z+f9S3nWIi6UoARHyjg0g8zJsnbGBldsj0FJEoBzVOBvttF4U8QdIK
-         i+IhiZfse5rg9rnnFQCVxlDQzIlWKQM/gop+EUt2J+mJK/e3gNuMoSDJ4vtVU704VgU6
-         Bqce3l8QEMFf1xN1GJzZvsbn/S/2bpwG7sE+aasWRnPYgRFRvBEqdp1FI6LO+LZEzplK
-         Q7WyYepyhEsvOGvsTNjYpPVAwHflhibZPts3E9CPpcNT5gof4bFSpgaWIpcrALFNQIzp
-         x4XlBMfs0tkVhFHPkhvKHYQ6u7FYidYVO4vBnHjPgh8bZTdSQm2KMcxs2OQ9843P8mjk
-         fmmA==
-X-Forwarded-Encrypted: i=1; AJvYcCUmh3mqmWj6I5McY1NTUAkZmqBBdiQnaUPJQxTcFOV1ILc0x3BKWUTtKF//HvmJbDU0AOo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzaMFtabRdk/YfrjMdNWQwvHgpeB8YshE2PWY/pKiSL91kK8Clw
-	92/chTMre01EN/uk6hfEo1hGgixhmkMqUiO7YmClbtslr580pfF+vKCjOeHtmtWTUEFfEYYEljw
-	j5ZYZfg==
-X-Google-Smtp-Source: AGHT+IFbsFBFAVlfGnjEPNOWOEliKW5tmQpe2OOWwOf9zNzJ3tQktbRTua3NsLOUyOjEGtnHL9GXrfWkJCng
-X-Received: from plbmg13.prod.google.com ([2002:a17:903:348d:b0:220:efca:379c])
- (user=mizhang job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:c40a:b0:223:fabd:4f99
- with SMTP id d9443c01a7336-22780c529ffmr247929475ad.5.1742837633604; Mon, 24
- Mar 2025 10:33:53 -0700 (PDT)
-Reply-To: Mingwei Zhang <mizhang@google.com>
-Date: Mon, 24 Mar 2025 17:31:18 +0000
-In-Reply-To: <20250324173121.1275209-1-mizhang@google.com>
+	s=arc-20240116; t=1742838977; c=relaxed/simple;
+	bh=55aSHf+XbnaEkNNtZWAap9c2eiaxcY92LDR82+5KUkE=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=I1U/7IGDhHXntW0kDWRxDQ88i/NCnPBRjyIShpL68NTUsUWr4uhqecc4C0RA+v1Bj7nPe9ab88FjANvcTB0p+t8nLIMIfvdE6oA8Oz042JOuZxdnQeDkjQNRBw0hH80YzsuaVKlcEBen572yjSZXLfYdMAjqjLqLmHPIvVisDtk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ey8acH8B; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52OHBZPn027062;
+	Mon, 24 Mar 2025 17:56:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=prxcL7
+	Ol0gDHWADygOhfxw4rXA3/txwyq4L2EIdtr0o=; b=ey8acH8BhQQpV7Rkkcv3qk
+	iYB1qdSCJmXBJGd5tKEllxA4e4tHn0M8AaS5H/npjL1f62a34tG0sEoSVSmmvkGo
+	/g+qF9pA6KqTiYYMh/8IqXXEByZvU8t6HNij+2AwOXo4fVEpKZGZyfVgYs3K5QNw
+	858npq/6lkGam1ZJ8E/osa1RPW4zcKFLJ5aDph5BZzVe1oizfHkY3wS3aJUFHeik
+	r8irsF+5AfGF8s0f5my4vKdFcu1HykPo+9L183UaOSMJO1fKRbhBtT7RXDng1LJD
+	+SPOA7N6PkSBOGzaElIOq6FlJA5LY+06l3eHd9I/4gzGsLBdeSPRPuVV2kvU93yA
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45kbjwr6v4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 24 Mar 2025 17:56:06 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52OFKECV030330;
+	Mon, 24 Mar 2025 17:56:06 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 45j7ht7nw4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 24 Mar 2025 17:56:06 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52OHu4RE33292630
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 24 Mar 2025 17:56:04 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5DF7220043;
+	Mon, 24 Mar 2025 17:56:04 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3654120040;
+	Mon, 24 Mar 2025 17:56:04 +0000 (GMT)
+Received: from li-9b52914c-2c8b-11b2-a85c-a36f6d484b4a.boeblingen.de.ibm.com (unknown [9.155.199.15])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon, 24 Mar 2025 17:56:04 +0000 (GMT)
+Message-ID: <3920c0f0da1b6e324d6367cbff22d313d6981742.camel@linux.ibm.com>
+Subject: Re: [PATCH 1/1] virtio_console: fix missing byte order handling for
+ cols and rows
+From: Maximilian Immanuel Brandtner <maxbr@linux.ibm.com>
+To: Halil Pasic <pasic@linux.ibm.com>, Amit Shah <amit@kernel.org>,
+        Arnd
+ Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: stable@vger.kernel.org
+Date: Mon, 24 Mar 2025 18:56:03 +0100
+In-Reply-To: <20250322002954.3129282-1-pasic@linux.ibm.com>
+References: <20250322002954.3129282-1-pasic@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250324173121.1275209-1-mizhang@google.com>
-X-Mailer: git-send-email 2.49.0.395.g12beb8f557-goog
-Message-ID: <20250324173121.1275209-39-mizhang@google.com>
-Subject: [PATCH v4 38/38] KVM: Selftests: Fix pmu_counters_test error for
- mediated vPMU
-From: Mingwei Zhang <mizhang@google.com>
-To: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Mark Rutland <mark.rutland@arm.com>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, Liang@google.com, 
-	Kan <kan.liang@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Mingwei Zhang <mizhang@google.com>, Yongwei Ma <yongwei.ma@intel.com>, 
-	Xiong Zhang <xiong.y.zhang@linux.intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
-	Jim Mattson <jmattson@google.com>, Sandipan Das <sandipan.das@amd.com>, 
-	Zide Chen <zide.chen@intel.com>, Eranian Stephane <eranian@google.com>, 
-	Das Sandipan <Sandipan.Das@amd.com>, Shukla Manali <Manali.Shukla@amd.com>, 
-	Nikunj Dadhania <nikunj.dadhania@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: INZKdWk_pasSNB8PIaiuDorK7o5Zx59a
+X-Proofpoint-ORIG-GUID: INZKdWk_pasSNB8PIaiuDorK7o5Zx59a
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-24_06,2025-03-21_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ priorityscore=1501 lowpriorityscore=0 phishscore=0 spamscore=0
+ clxscore=1011 bulkscore=0 adultscore=0 suspectscore=0 malwarescore=0
+ mlxlogscore=999 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502280000 definitions=main-2503240125
 
-From: Dapeng Mi <dapeng1.mi@linux.intel.com>
+On Sat, 2025-03-22 at 01:29 +0100, Halil Pasic wrote:
+> As per virtio spec the fields cols and rows are specified as little
+> endian. Although there is no legacy interface requirement that would
+> state that cols and rows need to be handled as native endian when
+> legacy
+> interface is used, unlike for the fields of the adjacent struct
+> virtio_console_control, I decided to err on the side of caution based
+> on some non-conclusive virtio spec repo archaeology and opt for using
+> virtio16_to_cpu() much like for virtio_console_control.event.
+> Strictly
+> by the letter of the spec virtio_le_to_cpu() would have been
+> sufficient.
+> But when the legacy interface is not used, it boils down to the same.
+>=20
+> And when using the legacy interface, the device formatting these as
+> little endian when the guest is big endian would surprise me more
+> than
+> it using guest native byte order (which would make it compatible with
+> the current implementation). Nevertheless somebody trying to
+> implement
+> the spec following it to the letter could end up forcing little
+> endian
+> byte order when the legacy interface is in use. So IMHO this
+> ultimately
+> needs a judgement call by the maintainers.
+>=20
+> Fixes: 8345adbf96fc1 ("virtio: console: Accept console size along
+> with resize control message")
+> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> Cc: stable@vger.kernel.org=C2=A0# v2.6.35+
+> ---
+>=20
+> @Michael: I think it would be nice to add a clarification on the byte
+> order to be used for cols and rows when the legacy interface is used
+> to
+> the spec, regardless of what we decide the right byte order is. If
+> it is native endian that shall be stated much like it is stated for
+> virtio_console_control. If it is little endian, I would like to add
+> a sentence that states that unlike for the fields of
+> virtio_console_control
+> the byte order of the fields of struct virtio_console_resize is
+> little
+> endian also when the legacy interface is used.
+>=20
+> @Maximilian: Would you mind giving this a spin with your
+> implementation
+> on the device side of things in QEMU?
+> ---
+> =C2=A0drivers/char/virtio_console.c | 7 ++++---
+> =C2=A01 file changed, 4 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/drivers/char/virtio_console.c
+> b/drivers/char/virtio_console.c
+> index 18f92dd44d45..fc698e2b1da1 100644
+> --- a/drivers/char/virtio_console.c
+> +++ b/drivers/char/virtio_console.c
+> @@ -1579,8 +1579,8 @@ static void handle_control_message(struct
+> virtio_device *vdev,
+> =C2=A0		break;
+> =C2=A0	case VIRTIO_CONSOLE_RESIZE: {
+> =C2=A0		struct {
+> -			__u16 rows;
+> -			__u16 cols;
+> +			__virtio16 rows;
+> +			__virtio16 cols;
+> =C2=A0		} size;
+> =C2=A0
+> =C2=A0		if (!is_console_port(port))
+> @@ -1588,7 +1588,8 @@ static void handle_control_message(struct
+> virtio_device *vdev,
+> =C2=A0
+> =C2=A0		memcpy(&size, buf->buf + buf->offset +
+> sizeof(*cpkt),
+> =C2=A0		=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sizeof(size));
+> -		set_console_size(port, size.rows, size.cols);
+> +		set_console_size(port, virtio16_to_cpu(vdev,
+> size.rows),
+> +				 virtio16_to_cpu(vdev, size.cols));
+> =C2=A0
+> =C2=A0		port->cons.hvc->irq_requested =3D 1;
+> =C2=A0		resize_console(port);
+>=20
+> base-commit: b3ee1e4609512dfff642a96b34d7e5dfcdc92d05
 
-As previous patch commit 'f8905c638eb7 ("KVM: x86/pmu: Check PMU cpuid
-configuration from user space")', KVM would check if user space configured
-pmu version is larger than KVM supported maximum pmu version for
-mediated vPMU, or if fixed counter bitmap is configured incorrectly,
-if so, KVM would return an error.
+It took me a while to recompile the kernel, but now that it has
+compiled it works! Unfortunately, images don't lend themselves well to
+mailing lists, but here is tmux running at 18x55(you'll just have to
+trust me that it's over a virtio serial console)
 
-This enhanced check would lead to pmu_counters_test fails, thus limit
-pmu_counters_test only validate KVM supported pmu versions for mediated
-vPMU and only validate 0 fixed counter bitmap if pmu version is less than
-5.
+                           =E2=94=82top - 12:54:04 up 4 min,  1
+~                          =E2=94=82Tasks: 222 total,   1 runni
+~                          =E2=94=82%Cpu(s):  0.0 us,  0.0 sy,=20
+~                          =E2=94=82MiB Mem :  15987.2 total, =20
+~                          =E2=94=82MiB Swap:   8192.0 total, =20
+~                          =E2=94=82
+~                          =E2=94=82    PID USER      PR  NI=20
+~                          =E2=94=82      1 root      20   0=20
+~                          =E2=94=82      2 root      20   0=20
+~                          =E2=94=82      3 root      20   0=20
+~                          =E2=94=82      4 root       0 -20=20
+~                          =E2=94=82      5 root       0 -20=20
+~                          =E2=94=82      6 root       0 -20=20
+~                          =E2=94=82      7 root       0 -20=20
+~                          =E2=94=82      8 root       0 -20=20
+[No Name]     0,0-1     All=E2=94=82      9 root      20   0=20
+                           =E2=94=82     10 root       0 -20=20
+[0] 0:zsh*                     "fedora" 12:53 24-Mar-25
 
-Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
----
- .../selftests/kvm/include/x86/processor.h     |  8 ++++++++
- .../selftests/kvm/x86/pmu_counters_test.c     | 20 ++++++++++++++++---
- 2 files changed, 25 insertions(+), 3 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
-index d60da8966772..7db34f48427a 100644
---- a/tools/testing/selftests/kvm/include/x86/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86/processor.h
-@@ -1311,6 +1311,14 @@ static inline bool kvm_is_pmu_enabled(void)
- 	return get_kvm_param_bool("enable_pmu");
- }
- 
-+static inline bool kvm_is_mediated_pmu_enabled(void)
-+{
-+	if (host_cpu_is_intel)
-+		return get_kvm_intel_param_bool("enable_mediated_pmu");
-+	else
-+		return get_kvm_amd_param_bool("enable_mediated_pmu");
-+}
-+
- static inline bool kvm_is_forced_emulation_enabled(void)
- {
- 	return !!get_kvm_param_integer("force_emulation_prefix");
-diff --git a/tools/testing/selftests/kvm/x86/pmu_counters_test.c b/tools/testing/selftests/kvm/x86/pmu_counters_test.c
-index 441c66f314fb..4745f82ce860 100644
---- a/tools/testing/selftests/kvm/x86/pmu_counters_test.c
-+++ b/tools/testing/selftests/kvm/x86/pmu_counters_test.c
-@@ -564,8 +564,14 @@ static void test_intel_counters(void)
- 	 * Test up to PMU v5, which is the current maximum version defined by
- 	 * Intel, i.e. is the last version that is guaranteed to be backwards
- 	 * compatible with KVM's existing behavior.
-+	 *
-+	 * Whereas for mediated vPMU, limit max_pmu_version to KVM supported
-+	 * maximum pmu version since KVM rejects PMU versions larger than KVM
-+	 * supported maximum PMU version to avoid guest to manipulate unsupported
-+	 * or unallowed PMU MSRs directly.
- 	 */
--	uint8_t max_pmu_version = max_t(typeof(pmu_version), pmu_version, 5);
-+	uint8_t max_pmu_version = kvm_is_mediated_pmu_enabled() ?
-+				  pmu_version : max_t(typeof(pmu_version), pmu_version, 5);
- 
- 	/*
- 	 * Detect the existence of events that aren't supported by selftests.
-@@ -622,8 +628,16 @@ static void test_intel_counters(void)
- 			pr_info("Testing fixed counters, PMU version %u, perf_caps = %lx\n",
- 				v, perf_caps[i]);
- 			for (j = 0; j <= nr_fixed_counters; j++) {
--				for (k = 0; k <= (BIT(nr_fixed_counters) - 1); k++)
--					test_fixed_counters(v, perf_caps[i], j, k);
-+				/*
-+				 * pmu version less than 5 doesn't support fixed counter
-+				 * bitmap, so only set fixed counter bitamp to 0.
-+				 */
-+				if (v < 5) {
-+					test_fixed_counters(v, perf_caps[i], j, 0);
-+				} else {
-+					for (k = 0; k <= (BIT(nr_fixed_counters) - 1); k++)
-+						test_fixed_counters(v, perf_caps[i], j, k);
-+				}
- 			}
- 		}
- 	}
--- 
-2.49.0.395.g12beb8f557-goog
+Cheers,
+Max
 
 
