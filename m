@@ -1,112 +1,162 @@
-Return-Path: <kvm+bounces-41785-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41786-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44E3AA6D605
-	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 09:19:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB765A6D624
+	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 09:30:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 751C03A6629
-	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 08:19:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70FDA3AFBD7
+	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 08:29:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC0A625D211;
-	Mon, 24 Mar 2025 08:19:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8076025D524;
+	Mon, 24 Mar 2025 08:29:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ahUaKnIr"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="gMsoovib"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFB811459F6
-	for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 08:19:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2846725D205
+	for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 08:29:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742804377; cv=none; b=OmkGVDK+A7rmrcWCA7NRseenomv7ZavKy+i9Aq5fy8OwfLnXvw7Zr++IUGssSOOKA9HUirDZzfbeX97UOKzdy36D7A+CDPxQYpkj8afWOGwZxB3I5nF9mjwIDSrRVcBwxhFQtC15sfSmpKcF1m0E8Mudg0/n5HovfAh8ZzYyGFE=
+	t=1742804989; cv=none; b=hj2PHWNL5gArN3GeFpU/HwFeIey/j4zGchTlzWy/zu5nRGwFgG/D0/C2Vfhs1lQAuimdiuUi8ZuqXKwh+eOTBlfxUIgCTkhOQoy9hbHv0GgE07n2gaLcilVqelfDItSDlhonH7dE4T0t+r3wCsO37Z9BsVRPabw27Cm/qIQYhzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742804377; c=relaxed/simple;
-	bh=HpC2xZP6pHOQg4gFKaI13BrMJ2BTkRXT+0OmjqNcfyM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e/qUlJLOVkJendWgLO3u1FsWB0HvuHrWzEq+HMgDWQ926ElEnn5ZkZFKQ8NfuizwkgagLBXwreNaz9QH6SHNDyJji9poB2gw0F2ZfrnM344kr45uqAYTUmFOdt5Y5QBw0N8hkWjtOQwkh+wKR6cMzSYXyQdOfkxy+pgO6xBfF8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ahUaKnIr; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 24 Mar 2025 09:19:27 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742804371;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+nT01jyxPvL4ghruc69ok3n46Axe+IpSGm70ZkWQJRI=;
-	b=ahUaKnIrSBCACk4IdyabSmxr/6vgjA5fyJuHRCIrOS/aVRhrf/Z6vuFiwWaQgPFaaMzNnS
-	w0DJsBqj0pJ6a8PjUN5c86WdRA+19FNRqeh7CLwbO623X7su18G8g9fU3jsJbnBCf6JRQg
-	/9jvvbsrvd279KUaiZ4OVIbV6r76tbg=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>, 
-	eric.auger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, vladimir.murzin@arm.com
-Subject: Re: [kvm-unit-tests PATCH v2 4/5] configure: Add --qemu-cpu option
-Message-ID: <20250324-5d22d8ad79a9db37b1cf6961@orel>
-References: <20250314154904.3946484-2-jean-philippe@linaro.org>
- <20250314154904.3946484-6-jean-philippe@linaro.org>
- <20250322-91a8125ad8651b24246e5799@orel>
- <Z9_tg6WhKvIJtBai@raptor>
+	s=arc-20240116; t=1742804989; c=relaxed/simple;
+	bh=NzJP8TqEb08WGj9kYfvDbx+CpZLoCO3wvBykc6g+6mo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dvQ8laPlv0W1GB+DnoBKOxwqdTCfrD6COtY4pnuazvsFgG9Ar+xxrpPdhTtkJ82af46jMF6neh5gwQs+ksLqSccX+DI8LwK5tcZtAvO+d0lbrd8UkxwPg5A5PDtZO5eATOwYem0xtZSSjP5g9FVbUuxuWd9mzw1Rb/hiEh944Sc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=gMsoovib; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-225477548e1so71048235ad.0
+        for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 01:29:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1742804986; x=1743409786; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2qMUlDAaek7Ax30c0AGSTiyhNrDt/tYOpdl5MsMoLow=;
+        b=gMsoovibKmSv81FaIAbJ9TjBXOxhesE6qDSuZej0OaUgJK9k9PZ43q2GBOsJ50HJSo
+         BYlXxmAt2EBq60V91lo6qmWoOn0u4ZqDiCk75leuCFnH0zqpcKfhaAHbs9By3tswSTN8
+         FPNGMuA6ndcnQkQ9JbLkSMR3WHZ2q4aQFQ02bLbfmTt2bIb2a9+UY2bLUjQ+75Socqol
+         VuiT85EyHZ0AN1NHVNdSSDxBm9sJGn8UAK6tGtMGXqI4BR+2AMb9sMTBqaYAsugBxydW
+         e1pTLS7nN4aKWsSUWv5d9DOYThG+qTy11Fi6a4Q2eZngH2BeEVLNl2Noq+E3cVZ11Rdm
+         KA/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742804986; x=1743409786;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2qMUlDAaek7Ax30c0AGSTiyhNrDt/tYOpdl5MsMoLow=;
+        b=DQMaK4aUWPW3pxwABSqNS3SM4r6hbezeM83S47zx35OO4HhdnTJmPQC0fLPqcndo87
+         ge8vGqNWdRtWnNy/zmNRGWyPJxvNtWtWcvUbnk9cwDtSz6HSL8U4HSN/vcBzK4L5W/eW
+         LNk6Isznyu/j0uyIHRW7h5aHH14fwCmE+MA2tor1kjVDleAyLmLd5ejs4vzQS5wpsPO/
+         XiTbDl6GM0QLJ5IfF60xBuxOl8RxSIxh24pGGxDqxaBylNHf4jhygQ8JMYirys/gtMBT
+         K2SjL2ko0tgRIMoN5SGj9W32DtBeDD5A3DgMmGXF+qjTwUaRJPnbYZRyYfEf3oP4EoUN
+         Km8w==
+X-Forwarded-Encrypted: i=1; AJvYcCUIyqU33M9hJNsll4qUfIsgDxGKHcwxipvAH5hG5Nk3MvydTQZ64A27iXWoPZLo9hpKX78=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+dYGTdbeP9lkBo3m4Ed7LcMFuqaC6V2sbTmqQwUq6Ewnuyf3w
+	qsOUHaMA/lEOuYwMMRy3TXfhYzDuD7MOXIqh+hfgSt4On3aIqrS5UqHeBUbBuPw=
+X-Gm-Gg: ASbGnctkQHPF2fJ1r3fHGWAWFK6ZowzO70ezKA+hV7UNXqUcOgMuMSLg5uT87H8tcLi
+	jX9yBTERitkQb0LcJHW6Lyjqsk8MNb6412Kiz21eXMo+xQ741Tfbg22ziLj9yTbrTZ8Tm+/AlQ6
+	FwS8TRCT5ahoOBJs8jmiMwGSCJUoxGswf07Q5+mTC0pxzJv9rSy5GFv460vqYJmFZLgd6aSUpKo
+	Zz8/CR4Hzc/K5fZdVUZWWUypXFDKbBPx8CLxjU2l6YNMRyFJsaJltoVxmqzaYtn0jAp6s0EzSMw
+	FIqitOp1uhecSLFr56hNI9kyZX3U+sxHY2IJ4hHCS+Vgmvropsp07KkZ77XoGRfOE61Ulb5fLLR
+	LbLlj4dS7cg6lRQ==
+X-Google-Smtp-Source: AGHT+IE/svKRMr10qo5TWA29tMIKA3okBWKKu6uK4vQbAlDiEPBzS0bf2OPavcRs7sE+zsZm2iXV3g==
+X-Received: by 2002:a05:6a20:a109:b0:1f5:7007:9eb7 with SMTP id adf61e73a8af0-1fe433193c6mr24677051637.37.1742804986196;
+        Mon, 24 Mar 2025 01:29:46 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:e17:9700:16d2:7456:6634:9626? ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af8a2a4747bsm6509935a12.68.2025.03.24.01.29.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Mar 2025 01:29:45 -0700 (PDT)
+Message-ID: <779c137d-5030-4212-b957-3d2620448ea9@rivosinc.com>
+Date: Mon, 24 Mar 2025 09:29:33 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z9_tg6WhKvIJtBai@raptor>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 02/18] riscv: sbi: add new SBI error mappings
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Anup Patel <anup@brainfault.org>,
+ Atish Patra <atishp@atishpatra.org>, Shuah Khan <shuah@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ linux-kselftest@vger.kernel.org, Samuel Holland <samuel.holland@sifive.com>
+References: <20250317170625.1142870-1-cleger@rivosinc.com>
+ <20250317170625.1142870-3-cleger@rivosinc.com>
+ <20250322-cce038c88db88dd119a49846@orel>
+Content-Language: en-US
+From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+In-Reply-To: <20250322-cce038c88db88dd119a49846@orel>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sun, Mar 23, 2025 at 11:16:19AM +0000, Alexandru Elisei wrote:
-...
-> > > +if [ -z "$qemu_cpu" ]; then
-> > > +	if ( [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ] ) &&
-> > > +	   ( [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ] ); then
-> > > +		qemu_cpu="host"
-> > >  		if [ "$ARCH" = "arm" ] && [ "$HOST" = "aarch64" ]; then
-> > > -			processor+=",aarch64=off"
-> > > +			qemu_cpu+=",aarch64=off"
-> > >  		fi
-> > > +	elif [ "$ARCH" = "arm64" ]; then
-> > > +		qemu_cpu="cortex-a57"
-> > > +	else
-> > > +		qemu_cpu="cortex-a15"
-> > 
-> > configure could set this in config.mak as DEFAULT_PROCESSOR, avoiding the
-> > need to duplicate it here.
-> 
-> That was my first instinct too, having the default value in config.mak seemed
-> like the correct solution.
-> 
-> But the problem with this is that the default -cpu type depends on -accel (set
-> via unittests.cfg or as an environment variable), host and test architecture
-> combination. All of these variables are known only at runtime.
-> 
-> Let's say we have DEFAULT_QEMU_CPU=cortex-a57 in config.mak. If we keep the
-> above heuristic, arm/run will override it with host,aarch64=off. IMO, having it
-> in config.mak, but arm/run using it only under certain conditions is worse than
-> not having it at all. arm/run choosing the default value **all the time** is at
-> least consistent.
 
-I think having 'DEFAULT' in the name implies that it will only be used if
-there's nothing better, and we don't require everything in config.mak to
-be used (there's even some s390x-specific stuff in there for all
-architectures...)
 
+On 22/03/2025 13:06, Andrew Jones wrote:
+> On Mon, Mar 17, 2025 at 06:06:08PM +0100, Clément Léger wrote:
+>> A few new errors have been added with SBI V3.0, maps them as close as
+>> possible to errno values.
+>>
+>> Signed-off-by: Clément Léger <cleger@rivosinc.com>
+>> ---
+>>  arch/riscv/include/asm/sbi.h | 9 +++++++++
+>>  1 file changed, 9 insertions(+)
+>>
+>> diff --git a/arch/riscv/include/asm/sbi.h b/arch/riscv/include/asm/sbi.h
+>> index bb077d0c912f..d11d22717b49 100644
+>> --- a/arch/riscv/include/asm/sbi.h
+>> +++ b/arch/riscv/include/asm/sbi.h
+>> @@ -536,11 +536,20 @@ static inline int sbi_err_map_linux_errno(int err)
+>>  	case SBI_SUCCESS:
+>>  		return 0;
+>>  	case SBI_ERR_DENIED:
+>> +	case SBI_ERR_DENIED_LOCKED:
+>>  		return -EPERM;
+>>  	case SBI_ERR_INVALID_PARAM:
+>> +	case SBI_ERR_INVALID_STATE:
+>> +	case SBI_ERR_BAD_RANGE:
+>>  		return -EINVAL;
+>>  	case SBI_ERR_INVALID_ADDRESS:
+>>  		return -EFAULT;
+>> +	case SBI_ERR_NO_SHMEM:
+>> +		return -ENOMEM;
+>> +	case SBI_ERR_TIMEOUT:
+>> +		return -ETIME;
+>> +	case SBI_ERR_IO:
+>> +		return -EIO;
+>>  	case SBI_ERR_NOT_SUPPORTED:
+>>  	case SBI_ERR_FAILURE:
+>>  	default:
+>> -- 
+>> 2.47.2
+>>
 > 
-> We could modify the help text for --qemu-cpu to say something like "If left
-> unset, the $ARCH/run script will choose a best value based on the host system
-> and test configuration."
+> I'm not a huge fan sbi_err_map_linux_errno() since the mappings seem a bit
+> arbitrary, but if we're going to do it, then these look pretty good to me.
+> Only other thought I had was E2BIG for bad-range, but nah...
 
-This is helpful, so we should add it regardless.
+Yeah I also think some mappings are a bit odd even though I skimmed
+through the whole errno list to find the best possible mappings. I'd be
+happy to find something better though.
 
 Thanks,
-drew
+
+Clément
+
+> 
+> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> 
+> Thanks,
+> drew
+
 
