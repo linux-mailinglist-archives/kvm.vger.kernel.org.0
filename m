@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-41857-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41858-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 712C8A6E4BE
-	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 21:55:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B129A6E55B
+	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 22:16:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B5BB16A171
-	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 20:55:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4BC26188EC4E
+	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 21:13:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72D0B1DDC37;
-	Mon, 24 Mar 2025 20:54:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88A861E8346;
+	Mon, 24 Mar 2025 21:12:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ExwuBYu6"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dBXc7jeP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3276A1C84A7
-	for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 20:54:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 003E31DE8A3
+	for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 21:11:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742849694; cv=none; b=TahxzeQsaDGvIUSyK3f18mSteEc9dGBcTL1Fg6yN6x2HWSpR67q/QJWxTApjEQvc+k/YNOCh9m78JiZdFQCP1nJ8K6u3vRtv2kiCWudCsljbJEMx0eRU79FGpfn44mWgFd0XxzyykO31WlfUCfNDMiaYcXdTRqi3xa7i3TOd3f0=
+	t=1742850721; cv=none; b=dVH6p4QrAr3imf2O8KePTaXgat7kAM+wWDE1MGyU6bF098+ckloGH9GWJ9s8To0RX1h1unjJ9kKh8OoE4iQEIxCTaVHahUXa8INqSNSypfDUJDb/qFbc7LjSLSk8O5nPp753PU5yqj5KAbCnMR7dkHKwg/u38LF9tKZiKCUBdSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742849694; c=relaxed/simple;
-	bh=/WbA1YpQFFLroHO8xChvgfJkRX+I/7xoP44Ad1PNZzA=;
+	s=arc-20240116; t=1742850721; c=relaxed/simple;
+	bh=TuwJ3eaL0pDi2Dz/wBm40uABFpqQRakxIYQxazoNYGs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ox9riu1fDryEyeE6PCfLQU1Rt/mVwgAuwdSpkapyTiuciy45KxLKrD/sRg9nRr/ZMttMduMWxM2pAnXIgqV/MBV7kMZz4EzouOKdiQ+9D7eiVKrT6yDIL/ZNLlcqzsxkIqYg864nj+fm05YO+hNggChjeCvyW418e7rnb3e7V1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ExwuBYu6; arc=none smtp.client-ip=209.85.214.175
+	 In-Reply-To:Content-Type; b=s/HT7z+ut0IGBMtJeJP26zJ5r+TwBK7fMbAzJZOjUzpQnD1zAbmvDeb8RaoNoLGJ8/i+J0CLI4VH/7nbtRSqsI19BgLOpKCQ/sxJDIifceSWv1lkjlVuzxHx8tu4buivctDfMmVk/uFCz7+uMD+FL3xKIzOdZiRhnuRq8lhYgPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dBXc7jeP; arc=none smtp.client-ip=209.85.214.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-227b828de00so30121295ad.1
-        for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 13:54:52 -0700 (PDT)
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2260c91576aso82575315ad.3
+        for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 14:11:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1742849692; x=1743454492; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1742850719; x=1743455519; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=IjcUgPK06/izKZfVvH05gncc+9DrDMjLcc2e2JeXhy0=;
-        b=ExwuBYu6FXT23T+CfJJYh67v79pht8EoRcTNurcKzO1IrfXAMhYIs5fGdjT8JbLB7a
-         8NJrAdHbDV5sEDuhWmN4eE7PpLY2O3dj0lVvnl0FJwRUbCelFLYHxBQKd2SosUt+iDRl
-         bmF42CKoENZj4cRaTY2XgXIFQbK15NLSiRql3UKqVnw9wAnvjaXf3XoCVU+r7mpRNou4
-         3wGM+WYktXH5uAp7AYaIlhu0FjQ+D++UsS7ktLtr9uakdYZ3xReOJdQT7KJWgp8DJ8Li
-         NDpzkys0P9Rj25A3LzTzX5C2B/t/L2sImxIzDRJmMf19EUDMO9iPYh0g79vz7es8rh/t
-         OJWA==
+        bh=0QyIWcLuKy6ayyJnu5/t5A5DBKW0SwtVnX/A9OP+mX0=;
+        b=dBXc7jePINvnrn80sihPGhbCt/j+rRVBo6XiJgW6QEis3EeYlsSEI93Kbp3CKTBssF
+         CO5+rg/Cvtl2mXmgE63FbJo/xPiXpLZyKvUczWocU7coJR3v5722Z4JRx1ylKDkzUGQJ
+         y1IUJmwYf6TdemQICHK3CjyKRDMpQLnci7p9De4FasyyUKzihQUu5ENn/rf2Q/KkeTD3
+         ObfzAtqlp69pedby+0o4TuoPNQNPf6Z6UHQvWD12rhsUiSGIGuPwtNBG/O9GIefJ08FY
+         nfdsovSTkIR7KLsPtAoiT2ogmTw/JDQ9X9BEj2rVYdpo1ILuyDlDsQ4m2h32bUab9WRv
+         bExA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742849692; x=1743454492;
+        d=1e100.net; s=20230601; t=1742850719; x=1743455519;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IjcUgPK06/izKZfVvH05gncc+9DrDMjLcc2e2JeXhy0=;
-        b=gWjCSp2ilrg/Qi2MnjEbk2LJE6DvD/psk7EcHkjBkVa9t256h4LL4CTjAxtqlemrSG
-         ZGGs3XcCZXWlhcu1DUVpskRyNDf0Gu4gAz01/Mt1GOi1BJU0V8l3K1X6YjtGrZnWtthJ
-         /MDpD/51amUj7ESJ7qSSHfeOUcsf7GASbcFzyyBpEWSvsTnw+w183dYHljvDVhtaLCle
-         vYlKWtFRezgO7xTnIagekDPeUJQQqHgU2T5gk1Iit8g2/98yszj8bA4KMqdRMjdDZfQt
-         63CkK3Md5NzbPd4APDkGz4ziPtqJkcgEXHa9+Z5r611BYrVgc3/qOVZkDNbMdM4ZoS5o
-         M5QA==
-X-Gm-Message-State: AOJu0Yy0T0wnV6LG6COreb6AnFZepHIpJZsvpg6Q4aJ7Vd332DqAqSiB
-	g9LzPCISvpEp7Tbgfsb24m91zZuKEz8SC9ekw4dxgF9SAlfjySAweRowg4qrQsA=
-X-Gm-Gg: ASbGncsRGHS5F9O+6/d6YW7Do/y7Itm0bAC2EJ+7vdwC+7ip05eh9Jo47nqNPhRo2oI
-	75Jk2fiIAvS/+2Hjj34FZFwEh92KU3n2360Co6Kp6EeHicqsVozXbBtQblH50W4gPbRmCGo2vNc
-	pEbQ5RDg4QmcJ2Jk2WeePSbafaNM+vHVrjSny4rn7hEPSzWSEVUJbSymZAZHOT19FZksYFlj68x
-	OcSnD3uHbadixtfAWIXZAhtl9hfbMgGS69t3XAPZjjURVvgkyVRuXnKaxQ75tfavNW+pZuvrMBh
-	T6YkgFclTLo03qGVYjPWpkCRjqs/fWSihCOHMw/bArDMiZ6yNEZLNxS4L5GubNtanSTN
-X-Google-Smtp-Source: AGHT+IGJzNx9IZ5b2eNR9WIGYzP1pk30sz3PbrZFL+zU4w+xOKfS1nIh78+kz3DyaBP6HUlThar6YQ==
-X-Received: by 2002:a05:6a20:c901:b0:1f3:345e:4054 with SMTP id adf61e73a8af0-1fe42f32676mr25724414637.14.1742849692427;
-        Mon, 24 Mar 2025 13:54:52 -0700 (PDT)
+        bh=0QyIWcLuKy6ayyJnu5/t5A5DBKW0SwtVnX/A9OP+mX0=;
+        b=ph4Ozk6NXRaAyRDjzipmFPlM7dabGpjw5BKJXUkqh5C0EwuqLnV+S7zIoSrLCJLZ4C
+         ++RdSNdC0D6LqKQh/0EusmAkQy5qBzSpmhxreKY3K0m4s2apO7lJJs6lb6M3XbqChk+/
+         3mnsLzCumRc38rixZhGu6RF+IA2zPMnxwSSnTiKzc3xn9MYSjIutD5D3ReFL6VLZambE
+         cl2hsQBDQ8BmbBRC+zEFTJUDwflYjtr0rPhwQaybXKROnhqV6ABX6DOJ+NhQA+NXri04
+         ScuwJJ7CUnORghlCTKQ4/IFa20x9vWu/0ma3v8mIMpzaoQ8oxCRkHpMqHcpeD2jNZasJ
+         rXNA==
+X-Gm-Message-State: AOJu0Yw2YRL+n8+S0RKEOR9I+cPTR0IVi4X0bCTjaEXK1XG/GMZrgb+F
+	sHUEBPD/BZf3sC//50HTVifBxJk63OWqaEE6Fk9PyvJTWEv2ZuPb71cEBOfxj4A=
+X-Gm-Gg: ASbGncthY4LH0xVFH3X1oeBbMftUcIZxkxLVOvaJbhslhDLrhC+RYQWKa6FDqonE4gQ
+	TqSlgqy9UXppncPBvMd6HBTT0rwoDrkXowUMB7wTZ96dWGq1uboKbbEHNHxLPxTRe0xG4Nqebag
+	XTsNWjUHhcwh7ONMO/s4lXmiltHdzhLZRCah3ovbiol2yFv8YpP+1yO3IYd0n1QwEhXS9/EIuKX
+	l3quCJBLiseiFv7Z+K4SdhaB30c8wwNMwpWWQdM2qjcA0qlsKhhplm35hnn5u4bS18H2PFq+K6Y
+	g8nHLeCzWJpQZ4zOR2XQjzw3LCQCcL3B12NuITEC+EyPYo4hxsY6GlLdMw==
+X-Google-Smtp-Source: AGHT+IHhKhK1Wampe7HG5CfLYgXfzWCQTUvTf2PVOHx87p/lS/w3GjKKNRuQC3jxYB7GAzu+vy6I7g==
+X-Received: by 2002:a05:6a00:1702:b0:736:3ea8:4805 with SMTP id d2e1a72fcca58-7390597f7eamr17945734b3a.7.1742850719026;
+        Mon, 24 Mar 2025 14:11:59 -0700 (PDT)
 Received: from [192.168.1.67] ([38.39.164.180])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af8a27db8e5sm7724126a12.14.2025.03.24.13.54.51
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73939d2bdb1sm1805196b3a.144.2025.03.24.14.11.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Mar 2025 13:54:51 -0700 (PDT)
-Message-ID: <6a3f794d-3403-4e80-8fd4-9449a78a4ceb@linaro.org>
-Date: Mon, 24 Mar 2025 13:54:51 -0700
+        Mon, 24 Mar 2025 14:11:58 -0700 (PDT)
+Message-ID: <11b5441f-c7c0-4b4c-8061-471a49e8465a@linaro.org>
+Date: Mon, 24 Mar 2025 14:11:57 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -80,7 +80,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 01/30] exec/cpu-all: remove BSWAP_NEEDED
+Subject: Re: [PATCH v2 20/30] target/arm/cpu: always define kvm related
+ registers
 Content-Language: en-US
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Cc: kvm@vger.kernel.org, qemu-arm@nongnu.org,
@@ -88,34 +89,61 @@ Cc: kvm@vger.kernel.org, qemu-arm@nongnu.org,
  <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
  <philmd@linaro.org>, =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
 References: <20250320223002.2915728-1-pierrick.bouvier@linaro.org>
- <20250320223002.2915728-2-pierrick.bouvier@linaro.org>
- <61f1bc3a-abcd-4cf5-9d56-1132c8fc3ba7@linaro.org>
+ <20250320223002.2915728-21-pierrick.bouvier@linaro.org>
+ <1109fe22-9008-47c6-b14d-7323f9888822@linaro.org>
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-In-Reply-To: <61f1bc3a-abcd-4cf5-9d56-1132c8fc3ba7@linaro.org>
+In-Reply-To: <1109fe22-9008-47c6-b14d-7323f9888822@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 3/23/25 12:26, Richard Henderson wrote:
+On 3/23/25 12:37, Richard Henderson wrote:
 > On 3/20/25 15:29, Pierrick Bouvier wrote:
->> This identifier is poisoned, so it can't be used from common code
->> anyway. We replace all occurrences with its definition directly.
+>> This does not hurt, even if they are not used.
 >>
->> Signed-off-by: Pierrick Bouvier<pierrick.bouvier@linaro.org>
+>> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 >> ---
->>    include/exec/cpu-all.h    | 12 ------------
->>    linux-user/syscall_defs.h |  2 +-
->>    bsd-user/elfload.c        |  6 +++---
->>    hw/ppc/mac_newworld.c     |  4 +---
->>    hw/ppc/mac_oldworld.c     |  4 +---
->>    hw/sparc/sun4m.c          |  6 +-----
->>    hw/sparc64/sun4u.c        |  6 +-----
->>    linux-user/elfload.c      |  8 ++++----
->>    8 files changed, 12 insertions(+), 36 deletions(-)
+>>    target/arm/cpu.h | 2 --
+>>    1 file changed, 2 deletions(-)
+>>
+>> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+>> index a8a1a8faf6b..ab7412772bc 100644
+>> --- a/target/arm/cpu.h
+>> +++ b/target/arm/cpu.h
+>> @@ -971,7 +971,6 @@ struct ArchCPU {
+>>         */
+>>        uint32_t kvm_target;
+>>    
+>> -#ifdef CONFIG_KVM
+>>        /* KVM init features for this CPU */
+>>        uint32_t kvm_init_features[7];
+>>    
+>> @@ -984,7 +983,6 @@ struct ArchCPU {
+>>    
+>>        /* KVM steal time */
+>>        OnOffAuto kvm_steal_time;
+>> -#endif /* CONFIG_KVM */
+>>    
+>>        /* Uniprocessor system with MP extensions */
+>>        bool mp_is_up;
 > 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> I'm not sure what this achieves?   CONFIG_KVM is a configure-time selection.
+>
+
+CONFIG_KVM is a poisoned identifier.
+It's included via config-target.h, and not config-host.h. So common code 
+relying on it might do the wrong thing.
+As well, its presence is conditioned by target architecture (see 
+meson.build), so it can't be enabled for all targets.
+
+For this patch, it's only cpu definition, but for code based on 
+CONFIG_KVM/TCG/HVF/XEN, we should probably check {accel}_enabled() 
+accordingly.
+
+However, at the moment, I'm not sure what is the best way to deal with 
+it for common code, as {accel}_enabled() symbol can only be present once 
+in the end.
+
 > 
 > r~
 
-For information, this patch was already merged (by Paolo who cleanup 
-bswap_needed from hw/*).
 
