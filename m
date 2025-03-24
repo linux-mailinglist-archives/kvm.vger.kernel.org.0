@@ -1,442 +1,121 @@
-Return-Path: <kvm+bounces-41856-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41857-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4B01A6E3CB
-	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 20:46:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 712C8A6E4BE
+	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 21:55:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51D0A7A61B6
-	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 19:45:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B5BB16A171
+	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 20:55:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4134C194AC7;
-	Mon, 24 Mar 2025 19:46:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72D0B1DDC37;
+	Mon, 24 Mar 2025 20:54:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kFOYXEQU"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ExwuBYu6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F234199EA2
-	for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 19:46:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3276A1C84A7
+	for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 20:54:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742845599; cv=none; b=gpmP/4zPI5VYPuUj2vEWAIbkdl3icPvYYcvyYBYYM+CDdq8kHatsLZiO3UslJ3CSQkUPpurd37qNFWwJBC8QEfp+5DgLL8/fwRkq6ScCY/+pvOtZNV60b7Vql5tX+M8WRovtSxlHS3EeAEvV+Ndxml1F7cx/eG5Fm1Suu9ZQRdk=
+	t=1742849694; cv=none; b=TahxzeQsaDGvIUSyK3f18mSteEc9dGBcTL1Fg6yN6x2HWSpR67q/QJWxTApjEQvc+k/YNOCh9m78JiZdFQCP1nJ8K6u3vRtv2kiCWudCsljbJEMx0eRU79FGpfn44mWgFd0XxzyykO31WlfUCfNDMiaYcXdTRqi3xa7i3TOd3f0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742845599; c=relaxed/simple;
-	bh=MGa9Z+XMKoNXcWSNjsXUJf9A9dDcVntcNWws2ioK92A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bymeK4assCEmO1hj8lfUNY+F8QSq/Gnk2JoA/lauO60IKYcEjRUS1/pBNY+240YYO+PVVad9eDYw0muIe13B9v+zIGIBjUMOvQgZPScG0zoMNg1x0ciZDdZYCYx8M/zt/frkavaQsg0TuGNvfRlxt3ZDMD7yxRd2YpZOalwyjMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kFOYXEQU; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2263428c8baso5965ad.1
-        for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 12:46:36 -0700 (PDT)
+	s=arc-20240116; t=1742849694; c=relaxed/simple;
+	bh=/WbA1YpQFFLroHO8xChvgfJkRX+I/7xoP44Ad1PNZzA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ox9riu1fDryEyeE6PCfLQU1Rt/mVwgAuwdSpkapyTiuciy45KxLKrD/sRg9nRr/ZMttMduMWxM2pAnXIgqV/MBV7kMZz4EzouOKdiQ+9D7eiVKrT6yDIL/ZNLlcqzsxkIqYg864nj+fm05YO+hNggChjeCvyW418e7rnb3e7V1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ExwuBYu6; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-227b828de00so30121295ad.1
+        for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 13:54:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742845596; x=1743450396; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZrzTfUAD+ubxSxcRWiQNVlkzHInPHF8YG9aMVD/9Buo=;
-        b=kFOYXEQUaLOfPvK9E7NnID/IrgsrXlTmNV5AEugouJhCm/draC8WTwiSf45EOLMMrt
-         ENaSeUUF2fxqAfHSgFHJ2MTBFEdSAFf+n9qp/98tKa96FhcEkFBQQEoV7N3Gsxgk2Iie
-         Ri6Qw45aH9N2d5WWFstingQBZta6UOsGQOgHATffMOtUFDgUb/WnIY6aXI56jOkrjdvT
-         JB5tHvwXRhkkS1SB+Ag6bmo5OjO6JcXX6NZt5JYYXwaHa1t+t+47DThuQUEQsr73Nf5W
-         JlAx3uIKWhVueaCwBpmyMFFaNO113xTc/ue08zVQm9oxbvNSl/b7CvlxAFHNAfFFt1a4
-         Zv2Q==
+        d=linaro.org; s=google; t=1742849692; x=1743454492; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IjcUgPK06/izKZfVvH05gncc+9DrDMjLcc2e2JeXhy0=;
+        b=ExwuBYu6FXT23T+CfJJYh67v79pht8EoRcTNurcKzO1IrfXAMhYIs5fGdjT8JbLB7a
+         8NJrAdHbDV5sEDuhWmN4eE7PpLY2O3dj0lVvnl0FJwRUbCelFLYHxBQKd2SosUt+iDRl
+         bmF42CKoENZj4cRaTY2XgXIFQbK15NLSiRql3UKqVnw9wAnvjaXf3XoCVU+r7mpRNou4
+         3wGM+WYktXH5uAp7AYaIlhu0FjQ+D++UsS7ktLtr9uakdYZ3xReOJdQT7KJWgp8DJ8Li
+         NDpzkys0P9Rj25A3LzTzX5C2B/t/L2sImxIzDRJmMf19EUDMO9iPYh0g79vz7es8rh/t
+         OJWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742845596; x=1743450396;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZrzTfUAD+ubxSxcRWiQNVlkzHInPHF8YG9aMVD/9Buo=;
-        b=qLzbmwMjbaofQubQNjYL/pf4TXd2AxOjjAaO9laKhajsFRBZ73+S5CtH7dSRYtLV66
-         ZskbWm1qMNLqEcQkpTMK4FucBEOQQGE8QTSA1qXuhvtAdBpBGlX57igUnR4HF8QbLGUF
-         rW2T5hoGdDzFUREVp6BZ1qw/jkINqg+G5xEHulMwYk3+7+M0AcFySSecglqShBjWgZa4
-         Ks4jrdPsjCplajtTLIgT9gFaLOIP8Pagl5TqNgTOnfYyebFssr7bV7H7zCMNoWKJaXKC
-         diNkZotjbG3RaduxlXjsd1UbOHmk5eLVs/TW4MeC/htg+sU9/Tp7ABz+MKrNRuiKaaLr
-         C0pw==
-X-Forwarded-Encrypted: i=1; AJvYcCUIIQj9daCDdt+DTC5T7vH/xd2YyDI2HNyOZ4jIj427/7ZgV8YdMCg1lVaokQWHx6wLGO0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzcY94cq1y6tUA3MbGTEvHbqCgb3FAfoCW8Zv0Yq2BV9w4h3xUo
-	HUnS70maKSyPJ24+ID/iddu1cld2JUjjHD+Q45DTn/UbJP3rXlm5IoagztWiApxHnt4NUUxI22G
-	/xq9Cw3dKrpokDOT0SwYy9kHiVhEr74y+WVv3
-X-Gm-Gg: ASbGncuGNmcbIXWzdtrpnez2WU/zSq3j+8db+hIgX7Nn5Nca143eGMC07DcEEtUMhL9
-	PLcYRcnLVpdBpEv7awP4rKovbRYDYhBn+oor0XkRI60G3joHYQv4bcmr8mplc0H0YzeedRiLyTG
-	RBLr+uwUVCOe96kdQvyOL6BK/FIK37wgvpD1Uud0O/F061BI+tIbPVfXArlPAY14KJe0Y=
-X-Google-Smtp-Source: AGHT+IEzEJbvdguVz7wlOoAmjYfMgRXxuV/ZTxzCdgp0SxDyPLpdbn3v2LVYJxcHF97qNoir/CYkElC2NXK5jb1a7HE=
-X-Received: by 2002:a17:902:d505:b0:223:ff93:322f with SMTP id
- d9443c01a7336-227982abd4fmr5356755ad.2.1742845595786; Mon, 24 Mar 2025
- 12:46:35 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1742849692; x=1743454492;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IjcUgPK06/izKZfVvH05gncc+9DrDMjLcc2e2JeXhy0=;
+        b=gWjCSp2ilrg/Qi2MnjEbk2LJE6DvD/psk7EcHkjBkVa9t256h4LL4CTjAxtqlemrSG
+         ZGGs3XcCZXWlhcu1DUVpskRyNDf0Gu4gAz01/Mt1GOi1BJU0V8l3K1X6YjtGrZnWtthJ
+         /MDpD/51amUj7ESJ7qSSHfeOUcsf7GASbcFzyyBpEWSvsTnw+w183dYHljvDVhtaLCle
+         vYlKWtFRezgO7xTnIagekDPeUJQQqHgU2T5gk1Iit8g2/98yszj8bA4KMqdRMjdDZfQt
+         63CkK3Md5NzbPd4APDkGz4ziPtqJkcgEXHa9+Z5r611BYrVgc3/qOVZkDNbMdM4ZoS5o
+         M5QA==
+X-Gm-Message-State: AOJu0Yy0T0wnV6LG6COreb6AnFZepHIpJZsvpg6Q4aJ7Vd332DqAqSiB
+	g9LzPCISvpEp7Tbgfsb24m91zZuKEz8SC9ekw4dxgF9SAlfjySAweRowg4qrQsA=
+X-Gm-Gg: ASbGncsRGHS5F9O+6/d6YW7Do/y7Itm0bAC2EJ+7vdwC+7ip05eh9Jo47nqNPhRo2oI
+	75Jk2fiIAvS/+2Hjj34FZFwEh92KU3n2360Co6Kp6EeHicqsVozXbBtQblH50W4gPbRmCGo2vNc
+	pEbQ5RDg4QmcJ2Jk2WeePSbafaNM+vHVrjSny4rn7hEPSzWSEVUJbSymZAZHOT19FZksYFlj68x
+	OcSnD3uHbadixtfAWIXZAhtl9hfbMgGS69t3XAPZjjURVvgkyVRuXnKaxQ75tfavNW+pZuvrMBh
+	T6YkgFclTLo03qGVYjPWpkCRjqs/fWSihCOHMw/bArDMiZ6yNEZLNxS4L5GubNtanSTN
+X-Google-Smtp-Source: AGHT+IGJzNx9IZ5b2eNR9WIGYzP1pk30sz3PbrZFL+zU4w+xOKfS1nIh78+kz3DyaBP6HUlThar6YQ==
+X-Received: by 2002:a05:6a20:c901:b0:1f3:345e:4054 with SMTP id adf61e73a8af0-1fe42f32676mr25724414637.14.1742849692427;
+        Mon, 24 Mar 2025 13:54:52 -0700 (PDT)
+Received: from [192.168.1.67] ([38.39.164.180])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af8a27db8e5sm7724126a12.14.2025.03.24.13.54.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Mar 2025 13:54:51 -0700 (PDT)
+Message-ID: <6a3f794d-3403-4e80-8fd4-9449a78a4ceb@linaro.org>
+Date: Mon, 24 Mar 2025 13:54:51 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250308214045.1160445-1-almasrymina@google.com>
- <20250308214045.1160445-5-almasrymina@google.com> <Z-GHXCOgP0pZBSlS@mini-arch>
-In-Reply-To: <Z-GHXCOgP0pZBSlS@mini-arch>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 24 Mar 2025 12:46:23 -0700
-X-Gm-Features: AQ5f1Jq28M7yfy88YYEv6Cp39eNsmSWafLu0RQhyhop8yesTxg9Zcsyp-y3frMU
-Message-ID: <CAHS8izNjdDwtf-Zb+wbmWW4k6+9=fnpY4XO_G=xMu4M-TaMw5Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 4/9] net: devmem: Implement TX path
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
-	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Jeroen de Borst <jeroendb@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>, 
-	Kaiyuan Zhang <kaiyuanz@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 01/30] exec/cpu-all: remove BSWAP_NEEDED
+Content-Language: en-US
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: kvm@vger.kernel.org, qemu-arm@nongnu.org,
+ Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
+ <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
+ <philmd@linaro.org>, =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+References: <20250320223002.2915728-1-pierrick.bouvier@linaro.org>
+ <20250320223002.2915728-2-pierrick.bouvier@linaro.org>
+ <61f1bc3a-abcd-4cf5-9d56-1132c8fc3ba7@linaro.org>
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+In-Reply-To: <61f1bc3a-abcd-4cf5-9d56-1132c8fc3ba7@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 24, 2025 at 9:25=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
-l.com> wrote:
->
-> On 03/08, Mina Almasry wrote:
-> > Augment dmabuf binding to be able to handle TX. Additional to all the R=
-X
-> > binding, we also create tx_vec needed for the TX path.
-> >
-> > Provide API for sendmsg to be able to send dmabufs bound to this device=
-:
-> >
-> > - Provide a new dmabuf_tx_cmsg which includes the dmabuf to send from.
-> > - MSG_ZEROCOPY with SCM_DEVMEM_DMABUF cmsg indicates send from dma-buf.
-> >
-> > Devmem is uncopyable, so piggyback off the existing MSG_ZEROCOPY
-> > implementation, while disabling instances where MSG_ZEROCOPY falls back
-> > to copying.
-> >
-> > We additionally pipe the binding down to the new
-> > zerocopy_fill_skb_from_devmem which fills a TX skb with net_iov netmems
-> > instead of the traditional page netmems.
-> >
-> > We also special case skb_frag_dma_map to return the dma-address of thes=
-e
-> > dmabuf net_iovs instead of attempting to map pages.
-> >
-> > The TX path may release the dmabuf in a context where we cannot wait.
-> > This happens when the user unbinds a TX dmabuf while there are still
-> > references to its netmems in the TX path. In that case, the netmems wil=
-l
-> > be put_netmem'd from a context where we can't unmap the dmabuf, Resolve
-> > this by making __net_devmem_dmabuf_binding_free schedule_work'd.
-> >
-> > Based on work by Stanislav Fomichev <sdf@fomichev.me>. A lot of the mea=
-t
-> > of the implementation came from devmem TCP RFC v1[1], which included th=
-e
-> > TX path, but Stan did all the rebasing on top of netmem/net_iov.
-> >
-> > Cc: Stanislav Fomichev <sdf@fomichev.me>
-> > Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
-> > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> > Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-> >
-> > ---
-> >
-> > v6:
-> > - Retain behavior that MSG_FASTOPEN succeeds even if cmsg is invalid
-> >   (Paolo).
-> > - Rework the freeing of tx_vec slightly to improve readability. Now it
-> >   has its own err label (Paolo).
-> > - Squash making unbinding scheduled work (Paolo).
-> > - Add comment to clarify that net_iovs stuck in the transmit path hold
-> >   a ref on the underlying dmabuf binding (David).
-> > - Fix the comment on how binding refcounting works on RX (the comment
-> >   was not matching the existing code behavior).
-> >
-> > v5:
-> > - Return -EFAULT from zerocopy_fill_skb_from_devmem (Stan)
-> > - don't null check before kvfree (stan).
-> >
-> > v4:
-> > - Remove dmabuf_tx_cmsg definition and just use __u32 for the dma-buf i=
-d
-> >   (Willem).
-> > - Check that iov_iter_type() is ITER_IOVEC in
-> >   zerocopy_fill_skb_from_iter() (Pavel).
-> > - Fix binding->tx_vec not being freed on error paths (Paolo).
-> > - Make devmem patch mutually exclusive with msg->ubuf_info path (Pavel)=
-.
-> > - Check that MSG_ZEROCOPY and SOCK_ZEROCOPY are provided when
-> >   sockc.dmabuf_id is provided.
-> > - Don't mm_account_pinned_pages() on devmem TX (Pavel).
-> >
-> > v3:
-> > - Use kvmalloc_array instead of kcalloc (Stan).
-> > - Fix unreachable code warning (Simon).
-> >
-> > v2:
-> > - Remove dmabuf_offset from the dmabuf cmsg.
-> > - Update zerocopy_fill_skb_from_devmem to interpret the
-> >   iov_base/iter_iov_addr as the offset into the dmabuf to send from
-> >   (Stan).
-> > - Remove the confusing binding->tx_iter which is not needed if we
-> >   interpret the iov_base/iter_iov_addr as offset into the dmabuf (Stan)=
-.
-> > - Remove check for binding->sgt and binding->sgt->nents in dmabuf
-> >   binding.
-> > - Simplify the calculation of binding->tx_vec.
-> > - Check in net_devmem_get_binding that the binding we're returning
-> >   has ifindex matching the sending socket (Willem).
-> > ---
-> >  include/linux/skbuff.h                  |  17 +++-
-> >  include/net/sock.h                      |   1 +
-> >  net/core/datagram.c                     |  48 ++++++++++-
-> >  net/core/devmem.c                       | 105 ++++++++++++++++++++++--
-> >  net/core/devmem.h                       |  61 +++++++++++---
-> >  net/core/netdev-genl.c                  |  64 ++++++++++++++-
-> >  net/core/skbuff.c                       |  18 ++--
-> >  net/core/sock.c                         |   6 ++
-> >  net/ipv4/ip_output.c                    |   3 +-
-> >  net/ipv4/tcp.c                          |  50 ++++++++---
-> >  net/ipv6/ip6_output.c                   |   3 +-
-> >  net/vmw_vsock/virtio_transport_common.c |   5 +-
-> >  12 files changed, 330 insertions(+), 51 deletions(-)
-> >
-> > diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> > index 14517e95a46c..67a7e069a9bf 100644
-> > --- a/include/linux/skbuff.h
-> > +++ b/include/linux/skbuff.h
-> > @@ -1707,13 +1707,16 @@ static inline void skb_set_end_offset(struct sk=
-_buff *skb, unsigned int offset)
-> >  extern const struct ubuf_info_ops msg_zerocopy_ubuf_ops;
-> >
-> >  struct ubuf_info *msg_zerocopy_realloc(struct sock *sk, size_t size,
-> > -                                    struct ubuf_info *uarg);
-> > +                                    struct ubuf_info *uarg, bool devme=
-m);
-> >
-> >  void msg_zerocopy_put_abort(struct ubuf_info *uarg, bool have_uref);
-> >
-> > +struct net_devmem_dmabuf_binding;
-> > +
-> >  int __zerocopy_sg_from_iter(struct msghdr *msg, struct sock *sk,
-> >                           struct sk_buff *skb, struct iov_iter *from,
-> > -                         size_t length);
-> > +                         size_t length,
-> > +                         struct net_devmem_dmabuf_binding *binding);
-> >
-> >  int zerocopy_fill_skb_from_iter(struct sk_buff *skb,
-> >                               struct iov_iter *from, size_t length);
-> > @@ -1721,12 +1724,14 @@ int zerocopy_fill_skb_from_iter(struct sk_buff =
-*skb,
-> >  static inline int skb_zerocopy_iter_dgram(struct sk_buff *skb,
-> >                                         struct msghdr *msg, int len)
-> >  {
-> > -     return __zerocopy_sg_from_iter(msg, skb->sk, skb, &msg->msg_iter,=
- len);
-> > +     return __zerocopy_sg_from_iter(msg, skb->sk, skb, &msg->msg_iter,=
- len,
-> > +                                    NULL);
-> >  }
-> >
-> >  int skb_zerocopy_iter_stream(struct sock *sk, struct sk_buff *skb,
-> >                            struct msghdr *msg, int len,
-> > -                          struct ubuf_info *uarg);
-> > +                          struct ubuf_info *uarg,
-> > +                          struct net_devmem_dmabuf_binding *binding);
-> >
-> >  /* Internal */
-> >  #define skb_shinfo(SKB)      ((struct skb_shared_info *)(skb_end_point=
-er(SKB)))
-> > @@ -3697,6 +3702,10 @@ static inline dma_addr_t __skb_frag_dma_map(stru=
-ct device *dev,
-> >                                           size_t offset, size_t size,
-> >                                           enum dma_data_direction dir)
-> >  {
-> > +     if (skb_frag_is_net_iov(frag)) {
-> > +             return netmem_to_net_iov(frag->netmem)->dma_addr + offset=
- +
-> > +                    frag->offset;
-> > +     }
-> >       return dma_map_page(dev, skb_frag_page(frag),
-> >                           skb_frag_off(frag) + offset, size, dir);
-> >  }
-> > diff --git a/include/net/sock.h b/include/net/sock.h
-> > index 8daf1b3b12c6..59875bed75e7 100644
-> > --- a/include/net/sock.h
-> > +++ b/include/net/sock.h
-> > @@ -1816,6 +1816,7 @@ struct sockcm_cookie {
-> >       u32 tsflags;
-> >       u32 ts_opt_id;
-> >       u32 priority;
-> > +     u32 dmabuf_id;
-> >  };
-> >
-> >  static inline void sockcm_init(struct sockcm_cookie *sockc,
-> > diff --git a/net/core/datagram.c b/net/core/datagram.c
-> > index f0693707aece..09c74a1d836b 100644
-> > --- a/net/core/datagram.c
-> > +++ b/net/core/datagram.c
-> > @@ -63,6 +63,8 @@
-> >  #include <net/busy_poll.h>
-> >  #include <crypto/hash.h>
-> >
-> > +#include "devmem.h"
-> > +
-> >  /*
-> >   *   Is a socket 'connection oriented' ?
-> >   */
-> > @@ -692,9 +694,49 @@ int zerocopy_fill_skb_from_iter(struct sk_buff *sk=
-b,
-> >       return 0;
-> >  }
-> >
-> > +static int
-> > +zerocopy_fill_skb_from_devmem(struct sk_buff *skb, struct iov_iter *fr=
-om,
-> > +                           int length,
-> > +                           struct net_devmem_dmabuf_binding *binding)
-> > +{
-> > +     int i =3D skb_shinfo(skb)->nr_frags;
-> > +     size_t virt_addr, size, off;
-> > +     struct net_iov *niov;
-> > +
-> > +     /* Devmem filling works by taking an IOVEC from the user where th=
-e
-> > +      * iov_addrs are interpreted as an offset in bytes into the dma-b=
-uf to
-> > +      * send from. We do not support other iter types.
-> > +      */
-> > +     if (iov_iter_type(from) !=3D ITER_IOVEC)
-> > +             return -EFAULT;
-> > +
-> > +     while (length && iov_iter_count(from)) {
-> > +             if (i =3D=3D MAX_SKB_FRAGS)
-> > +                     return -EMSGSIZE;
-> > +
-> > +             virt_addr =3D (size_t)iter_iov_addr(from);
-> > +             niov =3D net_devmem_get_niov_at(binding, virt_addr, &off,=
- &size);
-> > +             if (!niov)
-> > +                     return -EFAULT;
-> > +
-> > +             size =3D min_t(size_t, size, length);
-> > +             size =3D min_t(size_t, size, iter_iov_len(from));
-> > +
-> > +             get_netmem(net_iov_to_netmem(niov));
-> > +             skb_add_rx_frag_netmem(skb, i, net_iov_to_netmem(niov), o=
-ff,
-> > +                                    size, PAGE_SIZE);
-> > +             iov_iter_advance(from, size);
-> > +             length -=3D size;
-> > +             i++;
-> > +     }
-> > +
-> > +     return 0;
-> > +}
-> > +
-> >  int __zerocopy_sg_from_iter(struct msghdr *msg, struct sock *sk,
-> >                           struct sk_buff *skb, struct iov_iter *from,
-> > -                         size_t length)
-> > +                         size_t length,
-> > +                         struct net_devmem_dmabuf_binding *binding)
-> >  {
-> >       unsigned long orig_size =3D skb->truesize;
-> >       unsigned long truesize;
-> > @@ -702,6 +744,8 @@ int __zerocopy_sg_from_iter(struct msghdr *msg, str=
-uct sock *sk,
-> >
-> >       if (msg && msg->msg_ubuf && msg->sg_from_iter)
-> >               ret =3D msg->sg_from_iter(skb, from, length);
-> > +     else if (unlikely(binding))
-> > +             ret =3D zerocopy_fill_skb_from_devmem(skb, from, length, =
-binding);
-> >       else
-> >               ret =3D zerocopy_fill_skb_from_iter(skb, from, length);
-> >
-> > @@ -735,7 +779,7 @@ int zerocopy_sg_from_iter(struct sk_buff *skb, stru=
-ct iov_iter *from)
-> >       if (skb_copy_datagram_from_iter(skb, 0, from, copy))
-> >               return -EFAULT;
-> >
-> > -     return __zerocopy_sg_from_iter(NULL, NULL, skb, from, ~0U);
-> > +     return __zerocopy_sg_from_iter(NULL, NULL, skb, from, ~0U, NULL);
-> >  }
-> >  EXPORT_SYMBOL(zerocopy_sg_from_iter);
-> >
-> > diff --git a/net/core/devmem.c b/net/core/devmem.c
-> > index 0cf3d189f06c..393e30d72dc8 100644
-> > --- a/net/core/devmem.c
-> > +++ b/net/core/devmem.c
-> > @@ -17,6 +17,7 @@
-> >  #include <net/netdev_rx_queue.h>
-> >  #include <net/page_pool/helpers.h>
-> >  #include <net/page_pool/memory_provider.h>
-> > +#include <net/sock.h>
-> >  #include <trace/events/page_pool.h>
-> >
-> >  #include "devmem.h"
-> > @@ -54,8 +55,10 @@ static dma_addr_t net_devmem_get_dma_addr(const stru=
-ct net_iov *niov)
-> >              ((dma_addr_t)net_iov_idx(niov) << PAGE_SHIFT);
-> >  }
-> >
-> > -void __net_devmem_dmabuf_binding_free(struct net_devmem_dmabuf_binding=
- *binding)
-> > +void __net_devmem_dmabuf_binding_free(struct work_struct *wq)
-> >  {
-> > +     struct net_devmem_dmabuf_binding *binding =3D container_of(wq, ty=
-peof(*binding), unbind_w);
-> > +
-> >       size_t size, avail;
-> >
-> >       gen_pool_for_each_chunk(binding->chunk_pool,
-> > @@ -73,8 +76,10 @@ void __net_devmem_dmabuf_binding_free(struct net_dev=
-mem_dmabuf_binding *binding)
-> >       dma_buf_detach(binding->dmabuf, binding->attachment);
-> >       dma_buf_put(binding->dmabuf);
-> >       xa_destroy(&binding->bound_rxqs);
-> > +     kvfree(binding->tx_vec);
-> >       kfree(binding);
-> >  }
-> > +EXPORT_SYMBOL(__net_devmem_dmabuf_binding_free);
-> >
-> >  struct net_iov *
-> >  net_devmem_alloc_dmabuf(struct net_devmem_dmabuf_binding *binding)
-> > @@ -119,6 +124,13 @@ void net_devmem_unbind_dmabuf(struct net_devmem_dm=
-abuf_binding *binding)
-> >       unsigned long xa_idx;
-> >       unsigned int rxq_idx;
-> >
-> > +     xa_erase(&net_devmem_dmabuf_bindings, binding->id);
-> > +
-> > +     /* Ensure no tx net_devmem_lookup_dmabuf() are in flight after th=
-e
-> > +      * erase.
-> > +      */
-> > +     synchronize_net();
-> > +
-> >       if (binding->list.next)
-> >               list_del(&binding->list);
-> >
->
-> One thing forgot to mention: we should probably do the same for the
-> allocation path? Move the binding->id allocation to the end of the
-> routine to make sure we 'post' fully initialized bindings? Otherwise,
-> net_devmem_bind_dmabuf migh race with the sendmsg?
+On 3/23/25 12:26, Richard Henderson wrote:
+> On 3/20/25 15:29, Pierrick Bouvier wrote:
+>> This identifier is poisoned, so it can't be used from common code
+>> anyway. We replace all occurrences with its definition directly.
+>>
+>> Signed-off-by: Pierrick Bouvier<pierrick.bouvier@linaro.org>
+>> ---
+>>    include/exec/cpu-all.h    | 12 ------------
+>>    linux-user/syscall_defs.h |  2 +-
+>>    bsd-user/elfload.c        |  6 +++---
+>>    hw/ppc/mac_newworld.c     |  4 +---
+>>    hw/ppc/mac_oldworld.c     |  4 +---
+>>    hw/sparc/sun4m.c          |  6 +-----
+>>    hw/sparc64/sun4u.c        |  6 +-----
+>>    linux-user/elfload.c      |  8 ++++----
+>>    8 files changed, 12 insertions(+), 36 deletions(-)
+> 
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> 
+> r~
 
-Ah, good point. Although sane userspace will wait for the bind to
-finish to get the id, and then pass the id to sendmsg. Only userspace
-looking for trouble will be able to trigger any race here, but yes we
-should handle that a bit better.
-
---
-Thanks,
-Mina
+For information, this patch was already merged (by Paolo who cleanup 
+bswap_needed from hw/*).
 
