@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-41868-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41869-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E233A6E5A4
-	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 22:25:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 278EAA6E5AA
+	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 22:26:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A11016DB76
-	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 21:21:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C235188B054
+	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 21:24:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECA2A1DF99D;
-	Mon, 24 Mar 2025 21:21:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 747AD1E1020;
+	Mon, 24 Mar 2025 21:24:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tUNa+dzS"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AXujlnWF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C581A254E
-	for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 21:21:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F33ED1DE8A5
+	for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 21:23:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742851266; cv=none; b=uFQLIkEtirCH1nrGWxYRnSkiEFO2UuZ3KirKcFPYW6XzuXLc9rKWq2/N2nwASSMjAjn47vfutAle6iDX/g6qMgaPvAjTwuuuW7+PysdTj1M4qc/NmWk0VFjzVbTmCtWEz6xQqzWOQKSGrxY2O8FTH1OIhZ+fQZFGtcxBGfP3Huw=
+	t=1742851441; cv=none; b=XIsV5knptGkB8fzOLMQB8nqaYsPK6msQ2TzdvKFnRymhZW1gsdm0yUYMAPRXoPnWkSUvyNROs83oJ31D7pGl8IpGZqrHVWTIKPsQ2mNC+qDJrHAE5bwwPbp2kbWC0WoZ8GHKFZ60j6uhRoZwPUM8icUoiG1gFR1PX2Rf9pSSMZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742851266; c=relaxed/simple;
-	bh=QFqX+GSHwEz2P0f8fm96ij7NUOpR+a4N2z6WqCQx210=;
+	s=arc-20240116; t=1742851441; c=relaxed/simple;
+	bh=+I+tg0zav5R0xJhktJlDUjoPn/cJHqwZ7lWzZoKaKJw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NVwFLvpLSywOEUDHkj22cRzUVfdQhC4KSZ/hEHZYCfcH3iPNQ7GXid55PVOBkVlSKgdpxCxgawlVCHIlcvpH/Wt03188VUQQAkVaDBX3gONgDOUQar1B6/e8mthW0s3Lzu1WquLukJA9hPwlbJI4Syp9xxYb3uILzD73Q331G8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=tUNa+dzS; arc=none smtp.client-ip=209.85.214.170
+	 In-Reply-To:Content-Type; b=jpISkjbmoDAjxCCj14NaLmYMzOoHn5pMZv20k+apw4M7YRSJ6YDgQvlgImLmBKzPiuABpzEGJErboZedY9hTUC9+Xf0lh91JIhVeylNCnA75s+O0bJyzDDFsHwPYZR5jIlzEqNLBLXgndDRQJSTVq/pkDwaQk4zehpdEiktRHQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=AXujlnWF; arc=none smtp.client-ip=209.85.216.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2254e0b4b79so83711565ad.2
-        for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 14:21:04 -0700 (PDT)
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2ff4a4f901fso9027819a91.2
+        for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 14:23:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1742851264; x=1743456064; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1742851438; x=1743456238; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=8KoheoYm5HA8VcAgE260OGydvMzV1ButV3Mzz5BT064=;
-        b=tUNa+dzS8+4Z19cM8fmmfCRFH5ZYzXCogJkb3R/xsD6t07unomF4whkPntB5U7irzF
-         VcR/jtodD+69HVvgKn0zAjN05AQ3s0Jck7XW228yJx/MJD5l9KbZDT71SP9sL62nfgIL
-         efH0cnj1SQid/GmoEias8R2hgW0MuKOKen/BP2gmHZ1Gfeb2Ucui7S2t3Uh4gNHxc8sn
-         aGaamv3saB4wD9XuLhicBfH+H/HdDxYXHDif/mSa02VrgdhWdc6jNKBhiUMoP3oEjIii
-         QMHjsMNylTLgKpLY8RPsli0vbRjCw2wppVmp0Befc6ubAgQUyJB9VIpHXsPGumRGl4NP
-         Kftw==
+        bh=YFDA0JeDDrgv1GyZMFNeItH4CS9p72cfNWmfFzJWQlc=;
+        b=AXujlnWFIHC0r7qlSZI687ItXTtnl3srv8kiy5UvqGbkhS5sTXZlTEbX+IqqTVpnq9
+         lQ74893z6nwUdaA95DGz4CMu5sY7oKDYtlXu55WYutaT9TivK1Au44mm4t7f3jE4QyH+
+         QRwv1auoUq1EJMlHbUSbfb1IBcHN10hW2zYbYYSCPCzyFxHSu9Cw3yYKgU+5Wyb8SdI6
+         X5oawA3HAgG59UPJenTc1s5tLbcOgztwtBxByYF9/9NRkacMBGWgyYQ3ubdUhSABLLIC
+         yeRWffeEp8gwCLuAQLbhktlE9jxrtK2VonEh5Npioh2w2HbbjXrfm/R/RYiBmOkptZ0Z
+         41kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742851264; x=1743456064;
+        d=1e100.net; s=20230601; t=1742851438; x=1743456238;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8KoheoYm5HA8VcAgE260OGydvMzV1ButV3Mzz5BT064=;
-        b=aDQF0I9Fx2yoO1quqbQX/IMGqpNjJeITO8bAIwyeFD5ui2WXPLq45O/0IQNQJk7Iuz
-         Im/K5fSidFiLi/IjR3y4MaHh40IDKFQh07nbyVqtjAONKMdtbFvW7QVm4QV78OiGHme8
-         TuLRYEWNPWSqXJm/g6rfhzlhhBRWa1wrMFwdDwj3KB/TfmKZAnjwpT1APdtW1VMrvcbI
-         FhR3klGMU27phagy6G6MupcUwxOvklWOBUQMUmTjjXh61txwlCZLHP3x3O7hr1UtnOV5
-         eN5M1p7V+wbm1D64CzgttaBw2hJRwnlLPvC0UwuFDvSUn2hPobh8zq0oWrKUomoSz2Nf
-         b6iQ==
-X-Gm-Message-State: AOJu0YxqGnRqzrn7ea/Gu7xrRJjYVfoGXqVB8Wc1MIFUVn3LXcSGXgq5
-	UA+iyjOx/PpS8xJ4Uc0vikwB7G9xLFOUj7eQZcW3ZgzpF4yWOl5HvswoTbvONr8=
-X-Gm-Gg: ASbGncv8lzgI3YYH4+khfmg8mnv5nLTjqFOpr94blWJiPFXsuGUh0M4Qbkh6p+6tOFe
-	GCegTNoPVqUe0KJ44YQb3DoajvhvLcy6Z5MZ4mrOcfpvP5LLlitucHAmyuwEjgZ2giQOPpW3mII
-	DWulX176G3d04hYutQuQTw5f6uPCrQCb9ZZj2g7HFHwzUdcYIj6/SK94ktHuzVX3WXAHPbhyga2
-	/Ow2D396P9r2W1HQ0DBsmPc+O8HY0Ts47FeHvfPpaY/k7/N2CQdJut8onslmL1wJJp+OGwq5Rjn
-	n9RUhuVX0rFSRrNPeAo9nDQz1k5q/pJNMpLSXDbsyfuEG9XqNNoRKLItfQ==
-X-Google-Smtp-Source: AGHT+IEf4rgByTR4aUAXXQim/ntEXH4+OOahy31CtY4lDoOHPzpvMBWbyGzjrmwJx01AD+FrvarBrQ==
-X-Received: by 2002:a17:902:f648:b0:224:fa0:36da with SMTP id d9443c01a7336-22780c7c06fmr193333595ad.18.1742851263523;
-        Mon, 24 Mar 2025 14:21:03 -0700 (PDT)
+        bh=YFDA0JeDDrgv1GyZMFNeItH4CS9p72cfNWmfFzJWQlc=;
+        b=Ggg2jThyn1lbhKEycbYpyR59eUf0R/7PhUIVTbg6qbh1EdHy2pZWJHH9EFe/iXNMi5
+         ImXmYHT52CtzYkV/8uCUqYMaHRJr36ke7CBgY8yfrrB3asI1ied/6oJHPTYLUXfoc9DT
+         D+O5siRIW9ez91wTa8YrI+Ax9RZ4Lif3RRb4DnPYG8YZUAY4JqEAM5Kz8Qj4cVRP9+uy
+         hJyMOgxhEqrU4BvihwCeKPh/OMjFhFX/Fjfwz7oMpZQ2v0dIgGOoGV0MaNLZiE9fJQ6L
+         gOtQlrxtt2561eqaVJNbpmybcGycSyOGR8BHCmPPm/xSnZqI79DPNLZ08/46Ayyrt/1m
+         iPHw==
+X-Gm-Message-State: AOJu0Yz2RH77lU2FSTT9y4VTfV51XTwWIwxSHZZQI+kFC4/eh+PZxM1h
+	XT/WY4Ss6UrquqrvJi/qHhNgxy4uNcWsCIaF/AMdGRXZoPmwvqzPZQDu1/CTjMY=
+X-Gm-Gg: ASbGncvz93EBFeo1br+2eeSBQsqimvbTPqJzGpHOCvBkT4Zf94//BFwgRtPrevNIE6P
+	yF40ymKu+/8UvjiAA2NRWr1+xlbrStwb/0YnKzEujMdleDNw4uQ8Qh3/sDYbucnc0wmF8hYkFZN
+	+dKMowiZt1pcvQF40ZT8bDiEjYBUVcOcV11MsrCm9KyROOyO9UpRdkIbuu+vIkel5npK94yKkvV
+	eiM9tPqifFjLAU6LRJkSoEeFBGHdJEn8xCrbMBSnVkbzegHPDxLy2uCPs4EeABiSK/oHq7RzF3L
+	toxDEHVq6XtUkT+86VqyCexWcA7SgPLghXJ56XG4CXbyXwfp1iwsjOPZ4A==
+X-Google-Smtp-Source: AGHT+IHB6vBc7OKIKXxCYp0nll+Xe+XOOJIvF5rYK/LZ5u7+okuz4kyrpEKI3McVEYD3sWnzIOGaLQ==
+X-Received: by 2002:a17:90b:2688:b0:2ff:784b:ffe with SMTP id 98e67ed59e1d1-3030fe93ef7mr24860497a91.11.1742851438122;
+        Mon, 24 Mar 2025 14:23:58 -0700 (PDT)
 Received: from [192.168.1.67] ([38.39.164.180])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7390611d3c0sm8504961b3a.89.2025.03.24.14.21.02
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3030f5b7891sm8763029a91.1.2025.03.24.14.23.57
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Mar 2025 14:21:03 -0700 (PDT)
-Message-ID: <231d6e5a-f8c8-4b16-a455-44e9bb8dd011@linaro.org>
-Date: Mon, 24 Mar 2025 14:21:02 -0700
+        Mon, 24 Mar 2025 14:23:57 -0700 (PDT)
+Message-ID: <314709e0-3b1f-410d-bafe-37031629eed1@linaro.org>
+Date: Mon, 24 Mar 2025 14:23:56 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -80,7 +80,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 24/30] meson: add common hw files
+Subject: Re: [PATCH v2 28/30] hw/arm/xlnx-zynqmp: prepare compilation unit to
+ be common
 Content-Language: en-US
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Cc: kvm@vger.kernel.org, qemu-arm@nongnu.org,
@@ -88,95 +89,43 @@ Cc: kvm@vger.kernel.org, qemu-arm@nongnu.org,
  <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
  <philmd@linaro.org>, =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
 References: <20250320223002.2915728-1-pierrick.bouvier@linaro.org>
- <20250320223002.2915728-25-pierrick.bouvier@linaro.org>
- <2650a767-a829-4544-99f9-42e23b131da3@linaro.org>
+ <20250320223002.2915728-29-pierrick.bouvier@linaro.org>
+ <2a7a2a78-02cc-4954-85cf-b72f37678f36@linaro.org>
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-In-Reply-To: <2650a767-a829-4544-99f9-42e23b131da3@linaro.org>
+In-Reply-To: <2a7a2a78-02cc-4954-85cf-b72f37678f36@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 3/23/25 12:58, Richard Henderson wrote:
-> On 3/20/25 15:29, Pierrick Bouvier wrote:
->> Those files will be compiled once per base architecture ("arm" in this
->> case), instead of being compiled for every variant/bitness of
->> architecture.
->>
->> We make sure to not include target cpu definitions (exec/cpu-defs.h) by
->> defining header guard directly. This way, a given compilation unit can
->> access a specific cpu definition, but not access to compile time defines
->> associated.
->>
->> Previous commits took care to clean up some headers to not rely on
->> cpu-defs.h content.
->>
+On 3/23/25 12:50, Richard Henderson wrote:
+> On 3/20/25 15:30, Pierrick Bouvier wrote:
 >> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 >> ---
->>    meson.build | 37 ++++++++++++++++++++++++++++++++++++-
->>    1 file changed, 36 insertions(+), 1 deletion(-)
+>>    hw/arm/xlnx-zynqmp.c | 2 --
+>>    1 file changed, 2 deletions(-)
 >>
->> diff --git a/meson.build b/meson.build
->> index c21974020dd..994d3e5d536 100644
->> --- a/meson.build
->> +++ b/meson.build
->> @@ -3691,6 +3691,7 @@ hw_arch = {}
->>    target_arch = {}
->>    target_system_arch = {}
->>    target_user_arch = {}
->> +hw_common_arch = {}
+>> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+>> index d6022ff2d3d..ec2b3a41eda 100644
+>> --- a/hw/arm/xlnx-zynqmp.c
+>> +++ b/hw/arm/xlnx-zynqmp.c
+>> @@ -22,9 +22,7 @@
+>>    #include "hw/intc/arm_gic_common.h"
+>>    #include "hw/misc/unimp.h"
+>>    #include "hw/boards.h"
+>> -#include "system/kvm.h"
+>>    #include "system/system.h"
+>> -#include "kvm_arm.h"
+>>    #include "target/arm/cpu-qom.h"
+>>    #include "target/arm/gtimer.h"
 >>    
->>    # NOTE: the trace/ subdirectory needs the qapi_trace_events variable
->>    # that is filled in by qapi/.
->> @@ -4089,6 +4090,34 @@ common_all = static_library('common',
->>                                implicit_include_directories: false,
->>                                dependencies: common_ss.all_dependencies())
->>    
->> +# construct common libraries per base architecture
->> +hw_common_arch_libs = {}
->> +foreach target : target_dirs
->> +  config_target = config_target_mak[target]
->> +  target_base_arch = config_target['TARGET_BASE_ARCH']
->> +
->> +  # check if already generated
->> +  if target_base_arch in hw_common_arch_libs
->> +    continue
->> +  endif
->> +
->> +  if target_base_arch in hw_common_arch
->> +    target_inc = [include_directories('target' / target_base_arch)]
->> +    src = hw_common_arch[target_base_arch]
->> +    lib = static_library(
->> +      'hw_' + target_base_arch,
->> +      build_by_default: false,
->> +      sources: src.all_sources() + genh,
->> +      include_directories: common_user_inc + target_inc,
->> +      implicit_include_directories: false,
->> +      # prevent common code to access cpu compile time
->> +      # definition, but still allow access to cpu.h
->> +      c_args: ['-DCPU_DEFS_H', '-DCOMPILING_SYSTEM_VS_USER', '-DCONFIG_SOFTMMU'],
 > 
-> Oof.  This really seems like a hack, but it does work,
-> and I'm not sure what else to suggest.
+> Is a better description that these headers are unused?
 > 
+> Anyway,
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>
 
-Yes, it's the best (least-worst in reality) solution I found.
+Yes, I'll add this to commit message.
 
-Initially I simply tried to add them to libsystem.
-However, it has some problems:
-- Impossible to link arch files only for concerned targets (or you need 
-to add when: [TARGET_X] everywhere, which is not convenient).
-- They need specific flags (most notably header guard -DCPU_DEFS_H, to 
-ensure we don't rely on cpu compile time defines), which is only 
-achievable through static lib hack already used in our build system. So 
-another library needs to be declared.
-
-> All the rest of the meson-foo looks ok, but a second eye couldn't hurt.
-> 
-
-If someone else has a better idea achieving the same result (maybe 
-Paolo?), I would be happy to implement it.
-
-> Acked-by: Richard Henderson <richard.henderson@linaro.org>
-> 
 > 
 > r~
 
