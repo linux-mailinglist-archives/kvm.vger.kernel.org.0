@@ -1,86 +1,93 @@
-Return-Path: <kvm+bounces-41795-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41796-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA488A6D8AB
-	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 11:53:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3E28A6D9F6
+	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 13:17:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA986165FCC
-	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 10:53:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C75361889FA7
+	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 12:17:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01BDF25DD07;
-	Mon, 24 Mar 2025 10:53:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C1CA25EF85;
+	Mon, 24 Mar 2025 12:17:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u2gRqq4x"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="emVMVq6Z"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 771F51A5B87
-	for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 10:53:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28A825E81F;
+	Mon, 24 Mar 2025 12:17:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742813626; cv=none; b=JdFJCiubx5gzLsAtqaoXQ/LWWLdZMxOyjDwALpjvWzoNdLMiOjaK4Zf7s+Tfzbbae0UL6VNs2qqqKvsZsMNHHeh4+ZaLmxwAlq/zAkvTI/09JrO985OktbQrLe7cqWMgkgX96Zn6dTqiOUWqz1xxQpTavjV0r+dcpciq++Q0I9o=
+	t=1742818646; cv=none; b=HR/R65oi+sbCl9O2GWipRz7s5tyC+LcGawUwK54J2mUYVHe+VDRRSv9RnEN64/wdxf7WRCTOSeLVei4yZIdMx1z0rHK2jTe8Rb4azw7B7l+3jIzdLldXnlhGP4qdm2WnEX2QtdNbCy9Ut9VXFnfBeWNRd7VK1oOg1LfoHQ9I77E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742813626; c=relaxed/simple;
-	bh=KjVsYB/6NbKNMWPMw7dJEN7gZajXIZf6BXVWnnRlI4I=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=GpikAH40jzCoTzotnyw8x/g8sa6jeWF/0pTNjyYo5IOMQD2Y+6orerWUzRwYtUo69iGSeS6qcysCtGvwPlW4Pwa1uIkYRMielo30G6O7ZSbM0+G8AzX8BG2eAB8IQYsDi9G0XFy1wqsLvJmXSYNj0WLifPFyBaEONxWyYxnY59U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=u2gRqq4x; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-399676b7c41so2158321f8f.3
-        for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 03:53:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1742813623; x=1743418423; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zRBBC5Y50DbrnY2KR5VRMIecYWoom7fg1aMey6lzMKw=;
-        b=u2gRqq4xM612zQdS3dWg6nQFyzVa10fpHoXTlO+kz3hITmqKAZlltof+qevYCZ1yxc
-         DV7eFO3UBTRQPVJoJX5GctNElfwrB/8r1X1KTQZLK0gOkm7bckrrVzotx6dINS/XVwnZ
-         SL38Bav8DEUU+4sfETBxHyFD6RnFeQU2NgogmtM45SvtDHtpVPlCUZ3BO21xaKS5v/ge
-         AFimaf+puDTnpaAH7gamOUoRo8sU2bZoPZ979FRnhrJyxskeaPQTBEka7QWQmPkPXwrX
-         socKWRgglXcGkyrVx74vBkV8gYLs1JDuyAyOXWrr1s6sl7m8TkdLdqOw7YQYQNGDIgfr
-         n48A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742813623; x=1743418423;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zRBBC5Y50DbrnY2KR5VRMIecYWoom7fg1aMey6lzMKw=;
-        b=M8v//oW5puxaQAw8t/L7/mzLgimFlbCVWY9KIHspskwDlP9Xzlko0nYHhflOENVFjj
-         K3N0NjGPVd2Vv/+es2kxc+WQ2l+OL2wZW6GaZzYQirwFmXEHbpt6jCUyLgcCwslttbQI
-         s010iAFgAiVirHGYVqy6qOtZdXJIrpggctyzfmG0JSAg/x9aAoq9GiY//W01IxCf+haI
-         HW7QndisWZKhCueJI4m6szju45tUViGnZG1fOEX9ncZSTtFsBIdp8zM3HTsfgECjsdX8
-         UYzCsA16vQLSalcQIdhfYhWWI/sOJpWQ0dqHRnRgK+Y6HHhRs7RNjawqr/r8ILkxv9Zu
-         Du2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWtR/1ifN9WCCg04cI5+e21AQPpbs7TW3eGLW4sgkEf1mKyqK3T0Ns9tdejHfbpwAf1ibY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgvcmGO28KnpwLdlNCgWJy1TFdqs3wmGn3JIa9EhFFHWRnuqB0
-	zZawAq2dXeKZwWVab/9i/KbDHF1iFWxGN7+VNnUgLzCoATVvQVJ+4UANbni7Xc8=
-X-Gm-Gg: ASbGncufhDLqt2xBDW5dzB0U0qJKZI2bOdpfMCpYU1crkjQbboPHLq6TWRP8dD5Altq
-	wwnJELwVyE3NOhF+Vh4ZhN/oRH3mku7ztwkMvvaPLhZyfw9gAXhWgx/eeffXVKl+y65ZAeN/DIR
-	2PlUH9dTKCWwp5zoBScUtBao5DizhNRf0tOW56GyHVz/sTdC2IWM1pe06k/EoLAGkKZqGU8HuNH
-	KOkbRVdPSsjFyK02UyE6tfpoPopTc7w7bvqC85Q2mHcQ7YjVDOIi64KGZ/Qw1Rkxm9kVCnhEXaQ
-	RTyCyHRAtbcTGwFFqsCxW6hSZrCkPpd3OIIMNs3iIWsrtMkEwQ==
-X-Google-Smtp-Source: AGHT+IG6+X0RvQWAACJrJUGE18q5oXGZ8dddeugBl2ClpDLyua8TAmKdOcrERT6mZXU5Gy8dfa/gpw==
-X-Received: by 2002:a5d:588b:0:b0:38d:de45:bf98 with SMTP id ffacd0b85a97d-3997f8ef175mr10199407f8f.8.1742813622782;
-        Mon, 24 Mar 2025 03:53:42 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-3997f9b260fsm10435247f8f.43.2025.03.24.03.53.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Mar 2025 03:53:42 -0700 (PDT)
-Date: Mon, 24 Mar 2025 13:53:39 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] KVM: x86: clean up a return
-Message-ID: <7604cbbf-15e6-45a8-afec-cf5be46c2924@stanley.mountain>
+	s=arc-20240116; t=1742818646; c=relaxed/simple;
+	bh=ntVLPB558jkDqC6dAc3SwXIASugn2A1XtzkJc5zU8MQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JurpTDpNi6Er0bXGCIQfkW2YI63zIYw4ejv+lWaJXJ9heZvkTvbKdD1bN7xJP97vl1O4hZLtjlKkxBWKqRjr6uyfaOXQSEjztiafoBa0fJHL9Im6KH070F0qkkfHrdwTfSetJM6hqvE7YVZjhPRPENDncUuKgwPRAasttYv7Dw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=emVMVq6Z; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52O9uEVw010776;
+	Mon, 24 Mar 2025 12:17:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=ntVLPB558jkDqC6dAc3SwXIASugn2A
+	1XtzkJc5zU8MQ=; b=emVMVq6ZKJVFE11W3h3r6kl+aArjRUzrVMKgYre5SlYZbD
+	gesBBqKbCECszumzqzLz8+nQbYbLWKyju/JdwcD5Pwcth9BVrZ44kSM5oyEwJuRK
+	i5UlocRBijSfAJkmcwXLjsEsT4h7+z0NmIPKiOex71jTciZG7x+vCCj+V5HtVhGw
+	IPsoBQ1QaPqrDWfbiuci5OuDPW3nPO3PVrn8wOAJ5qFcrWcNKdK4K7u0mGghef+d
+	xqNyV3q3UnHBAMviEo6SbA1cvJbR+KBkLpFNan520GJ8u7f00QzGKHdEy7shsdhL
+	NPXU12r2gXlbwD7VcBYWy+c+Im0Ug6XTfzj5U6Bw==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45jsfpbc7a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 24 Mar 2025 12:17:12 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 52OCHBcq021741;
+	Mon, 24 Mar 2025 12:17:12 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45jsfpbc78-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 24 Mar 2025 12:17:11 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52O89tSE020639;
+	Mon, 24 Mar 2025 12:17:11 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 45j8hnp4hq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 24 Mar 2025 12:17:11 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52OCH7Sc20250938
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 24 Mar 2025 12:17:07 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5178920043;
+	Mon, 24 Mar 2025 12:17:07 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3966A20040;
+	Mon, 24 Mar 2025 12:17:05 +0000 (GMT)
+Received: from li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.ibm.com (unknown [9.204.206.66])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon, 24 Mar 2025 12:17:05 +0000 (GMT)
+Date: Mon, 24 Mar 2025 17:47:01 +0530
+From: Gautam Menghani <gautam@linux.ibm.com>
+To: Vaibhav Jain <vaibhav@linux.ibm.com>
+Cc: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
+        sbhat@linux.ibm.com, kconsul@linux.ibm.com, amachhiw@linux.ibm.com,
+        Athira Rajeev <atrajeev@linux.vnet.ibm.com>
+Subject: Re: [PATCH v5 0/6] kvm powerpc/book3s-hv: Expose Hostwide counters
+ as perf-events
+Message-ID: <hap6g4knk2uery5axusfrqi5pbe6nlpohs6tvbdkcyegvov47y@x5eaysm2er4f>
+References: <20250317100834.451452-1-vaibhav@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,30 +96,22 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+In-Reply-To: <20250317100834.451452-1-vaibhav@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: PCxRnUfJxcDLFEHzcqIICkyFCwuHQ83Q
+X-Proofpoint-GUID: Kn_dDUiodvBLm1dE6Rq2GnogDazR4uYy
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-24_04,2025-03-21_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ priorityscore=1501 clxscore=1011 suspectscore=0 adultscore=0
+ lowpriorityscore=0 bulkscore=0 impostorscore=0 phishscore=0 malwarescore=0
+ mlxlogscore=502 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502280000 definitions=main-2503240087
 
-Returning a literal X86EMUL_CONTINUE is slightly clearer than returning
-rc.
 
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- arch/x86/kvm/x86.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Tested on both KVM on LPAR and KVM for bare metal.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index c734ec0d809b..3e963aeb839e 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7998,7 +7998,7 @@ static int emulator_read_write(struct x86_emulate_ctxt *ctxt,
- 		return rc;
- 
- 	if (!vcpu->mmio_nr_fragments)
--		return rc;
-+		return X86EMUL_CONTINUE;
- 
- 	gpa = vcpu->mmio_fragments[0].gpa;
- 
--- 
-2.47.2
-
+For the series:
+Tested-by: Gautam Menghani <gautam@linux.ibm.com>
 
