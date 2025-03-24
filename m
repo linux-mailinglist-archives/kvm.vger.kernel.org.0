@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-41845-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41846-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2705CA6E156
-	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 18:46:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7013CA6E15C
+	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 18:46:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F439188F5DA
-	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 17:43:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 030011892A26
+	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 17:43:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9BA426B08E;
-	Mon, 24 Mar 2025 17:33:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC63B26A1C4;
+	Mon, 24 Mar 2025 17:33:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pWdIytrK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B7bVphVA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF9526A1C4
-	for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 17:33:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB8B126AA9B
+	for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 17:33:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742837623; cv=none; b=lXAPWAwbado0T9I9t5VqhD5Ewp23mX8GNKUrd2NIXfd0C1YnRTMqmwRSqGwrg5o1H6EKsfAgM6XnLpQ/wDUU3t39MGTlxlW3ENJJm8mMhPM+TEiOuWqC/M0MsdPpIvRbZscgdu38XysIkIKt9rOKHvrUWRD+LyzBHCr8LY/1hUk=
+	t=1742837624; cv=none; b=r9XFWkiErlZdxLJ289cQORemvjgQIDOwzRvH6UqD4zedkF1rdw6KsMJs0SbdJocDYoRLkwMKvDS/D2nkOZDs1L5HeDbOcsZWLwJh/nlpdzCnEKwfBZjR4aYe/8QYVEO1EQr8SYf3nNBDvFR9QmFO07LVDLUvQ0v1tKQPiPeBuM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742837623; c=relaxed/simple;
-	bh=smO9N5SKxgy1G1fUozBHmUGxKKNDlxNMEJJCN3XB7VI=;
+	s=arc-20240116; t=1742837624; c=relaxed/simple;
+	bh=s6ocOzT71CXmbbBcXEYyjJ6D7W58hm1QwCnGVXZRsjo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PfsOzjMqOhtoUcqvvjHuysv123TdP6++kva0w8qiRv5XCnoAWkxwifXL7v+sNCShVnVdAw/Y3p0hso1gLZfbbNGVELUE/wm4q20IcKfU6j5ngQw4pX/U83p/4oEGj1NIJqclj22bL7pl/PxrgS/KqiSVyc/oZslKe1LG3Pq23wU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pWdIytrK; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=q10bY8QrAyTVVz2tOJI+DYbYnq8yCFnD+ECT0Hs2Ti8nbfUJ38SvPuSwQmZDg4PDVLMCH09EzKdzUSgn6C6aUL/vkwDkyUqnhtTtkjF/PDTvCvHxVN7RhzVTYKI9Hj1wMqsVXc5BEgwUg9TZq5snPnvl/TRVcQTAI/MN0Pftvmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B7bVphVA; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-224364f2492so68873335ad.3
-        for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 10:33:41 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3032f4ea8cfso3072069a91.3
+        for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 10:33:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742837621; x=1743442421; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1742837622; x=1743442422; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=wEVPDgzOlF/JMd1kCpp/+G+/XVxiSfG9ZpDB6GPsH7w=;
-        b=pWdIytrKGuvU8gmfl8qv2Z4TTK75FrMMYRq77MToIiQBgzT2zexuQw6PhOzh30BCF/
-         JnqsK43be8E60ZEJDmWUTvCqaftdnkba2PF028Uzet8s96bdmRa2uYgCfdyzYuUn3P61
-         hda2hTpvpmft1KcD+JsQu/fQ5flNIk1N/GMnWoBMzsgC0YwgryJCrbszxRDqvshiEvjF
-         E4wnXtMCApK/L9L1Qy1UmWay6gf56wfPfQbPtsjNREWkuAz+rUj6nuEuxWLWQk3r8IJu
-         6AHSZZURF3MzAd9+Ip/sZ9cFMMPAYWJx/6su1byaDG21s2UDHxu+Tef59hX8Ak22byCM
-         dUQg==
+        bh=6+V904KeUQ21IQza0CY3IXyrVqbjYbDjSx/YwFPJNc8=;
+        b=B7bVphVAKFRdiBLk/ckAzE4Qx7EgpIr9Drzsub9aImOB15uXfu5cq6x3VZcPjcgyzh
+         T0GgLWUC73LaQQ18uLZUuu1Cv4bj1Cg2mK7j08qz1AY3/nthuPlfwaMtvtbxMi/pFCMW
+         HNhBp9trPImqUCmXXXsOlV1e+fvv0KzWYvciAAULcL/9uCxmS+vJw3GqEUxqi9OS4QPG
+         b/EFHRA0bfkquAYPiqE6sFIYh/Jpk5CphwhHU7biwF7gU5e7feFl2h6IE/nM+FQisE7V
+         95pNjnrFN/nAGzGmRSrFwmNUmvxlouitFMEdwxulh++RW/qsvDLJk/DB5mVV9PN53PDW
+         i9zQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742837621; x=1743442421;
+        d=1e100.net; s=20230601; t=1742837622; x=1743442422;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=wEVPDgzOlF/JMd1kCpp/+G+/XVxiSfG9ZpDB6GPsH7w=;
-        b=BeFnqLQUP7hYf7y5ZYPUj02PSXD+K6Yb/P2EUvCkWGNMU1i2ZPYDpIxIF7noAyYi9P
-         4Ya5qr/WhCrImm+aQQIGaEEKvRCe12MQMgKHVnFmdApY+3lnsjL6TUbbpFFxCiBopRL9
-         g/hg+X/GJ7RjqiSsS5FH9CQXM5EqynLtuFw1TH5D1ATvQteJtsKcIiRw4rVDlJP8HI43
-         sM0OFuB3fyZhq57gS6A6s/vI/mjPvjz1HH1LElDD94mj5ll09r/+CAT3sFmqa4Kr8Sko
-         2L8zNo+x6qlNzg/az2A5p/vv0aUSo8o45Zwl0ePg8cTAKJoTUMasg3OHYU2yaoSZn+ps
-         aagg==
-X-Forwarded-Encrypted: i=1; AJvYcCXvTIXtMMDl9Vlq9N/BjecrgywOt18eAf17fj5DAmoyvPG3wNzpzt/OR+5SAUKeYIIqYy0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx45BCVJBr81tn9DNEQ19dAmZB8wqKC0+6kKH/S9u7bzj7nd56+
-	URuIA6/qVGsm1L7h8YBPs7wUT0yYe6M6WCeEG8WQFR9AFDtO6Y6oCJujuWcMBNbzdtMF5FhEcDF
-	wDPp3SA==
-X-Google-Smtp-Source: AGHT+IGI6p2Pj6Fn8aHHQEXMJiBqaTwbmqGsVWU5LIiIRgo44ugxKecCqHQMA+tuCDEL1Vi+10l8dSdDlnrF
-X-Received: from plblc15.prod.google.com ([2002:a17:902:fa8f:b0:223:67ac:e082])
- (user=mizhang job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:320b:b0:224:10a2:cae7
- with SMTP id d9443c01a7336-22780e42056mr246605315ad.40.1742837620663; Mon, 24
- Mar 2025 10:33:40 -0700 (PDT)
+        bh=6+V904KeUQ21IQza0CY3IXyrVqbjYbDjSx/YwFPJNc8=;
+        b=qNp5jrEoH7QLpSO6X59+i2wYdh6Er4QW06BNDwTWhmex3Qoefdq/PUT1ieQOzpv9qL
+         IHWRP4wdTIkpHUwLZifcuENTg0yH1IlWG7PfNfiX2S911w61Lk61MtBDgeClUcTZE1Vm
+         Fdi0V+uS/M3PgNZ+irEhrsYvIBuMRMtJJBrVi24d/qBPHtl0Ur3OfODzoQkwUw2w8oEw
+         fR+wAiSuoOMvMGzZ6Np+ExMNkktc8wtgPA1+sa7T6NOFhU8MPFBog5NLxpWjLxpC8Co8
+         s+lsJD5jyJlq6bXKhIIYj0C3phB4XMXPWfRAPOcrgvbNPH7csCt5f0EmLC33ImVDAYSD
+         JOng==
+X-Forwarded-Encrypted: i=1; AJvYcCWfyVFjpgfrpmF8Ap9MqhEXaXfaCU3i/1xgWsoWtlIzNdthAKTl04tTv+vfD5r1BSF5WH8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYyKvFY2XmupfpgiyfkXdcZ5VsHhJTLJq86XeHK5SOZQewEluX
+	3ckFrAYI1P+tdV/RosXd9sJ0QSwHrF46TRi0x932lGG6jW3afCQjTsr+1Vl5xUI7nQ2Pb9TSe+7
+	nLOPrUw==
+X-Google-Smtp-Source: AGHT+IHIqBrwCBT2VgNzdu6a3SRF1WZmbb7R9Sly1cPBTsCVjyp/BdAE9Odk3iiE+395mJznbAYwK1AFqmr6
+X-Received: from pjyd8.prod.google.com ([2002:a17:90a:dfc8:b0:2ff:5516:6add])
+ (user=mizhang job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:45:b0:2ff:58a4:9db3
+ with SMTP id 98e67ed59e1d1-3030ff0b351mr22679948a91.35.1742837622350; Mon, 24
+ Mar 2025 10:33:42 -0700 (PDT)
 Reply-To: Mingwei Zhang <mizhang@google.com>
-Date: Mon, 24 Mar 2025 17:31:10 +0000
+Date: Mon, 24 Mar 2025 17:31:11 +0000
 In-Reply-To: <20250324173121.1275209-1-mizhang@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,9 +76,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250324173121.1275209-1-mizhang@google.com>
 X-Mailer: git-send-email 2.49.0.395.g12beb8f557-goog
-Message-ID: <20250324173121.1275209-31-mizhang@google.com>
-Subject: [PATCH v4 30/38] KVM: x86/pmu: Handle emulated instruction for
- mediated vPMU
+Message-ID: <20250324173121.1275209-32-mizhang@google.com>
+Subject: [PATCH v4 31/38] KVM: nVMX: Add macros to simplify nested MSR
+ interception setting
 From: Mingwei Zhang <mizhang@google.com>
 To: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
 	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
@@ -99,76 +99,70 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Dapeng Mi <dapeng1.mi@linux.intel.com>
 
-Mediated vPMU needs to accumulate the emulated instructions into counter
-and load the counter into HW at vm-entry.
-
-Moreover, if the accumulation leads to counter overflow, KVM needs to
-update GLOBAL_STATUS and inject PMI into guest as well.
+Add macros nested_vmx_merge_msr_bitmaps_xxx() to simplify nested MSR
+interception setting. No function change intended.
 
 Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 Signed-off-by: Mingwei Zhang <mizhang@google.com>
 ---
- arch/x86/kvm/pmu.c | 44 ++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 42 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 35 +++++++++++++++++++----------------
+ 1 file changed, 19 insertions(+), 16 deletions(-)
 
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 68f203454bbc..f71009ec92cf 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -911,10 +911,50 @@ void kvm_pmu_destroy(struct kvm_vcpu *vcpu)
- 	kvm_pmu_reset(vcpu);
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index ecf72394684d..cf557acf91f8 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -613,6 +613,19 @@ static inline void nested_vmx_set_intercept_for_msr(struct vcpu_vmx *vmx,
+ 						   msr_bitmap_l0, msr);
  }
  
-+static bool pmc_pmi_enabled(struct kvm_pmc *pmc)
-+{
-+	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
-+	u8 fixed_ctr_ctrl;
-+	bool pmi_enabled;
++#define nested_vmx_merge_msr_bitmaps(msr, type)	\
++	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1,	\
++					 msr_bitmap_l0, msr, type)
 +
-+	if (pmc_is_gp(pmc)) {
-+		pmi_enabled = pmc->eventsel & ARCH_PERFMON_EVENTSEL_INT;
-+	} else {
-+		fixed_ctr_ctrl = fixed_ctrl_field(pmu->fixed_ctr_ctrl,
-+						  pmc->idx - KVM_FIXED_PMC_BASE_IDX);
-+		pmi_enabled = fixed_ctr_ctrl & INTEL_FIXED_0_ENABLE_PMI;
-+	}
++#define nested_vmx_merge_msr_bitmaps_read(msr) \
++	nested_vmx_merge_msr_bitmaps(msr, MSR_TYPE_R)
 +
-+	return pmi_enabled;
-+}
++#define nested_vmx_merge_msr_bitmaps_write(msr) \
++	nested_vmx_merge_msr_bitmaps(msr, MSR_TYPE_W)
 +
- static void kvm_pmu_incr_counter(struct kvm_pmc *pmc)
- {
--	pmc->emulated_counter++;
--	kvm_pmu_request_counter_reprogram(pmc);
-+	struct kvm_vcpu *vcpu = pmc->vcpu;
++#define nested_vmx_merge_msr_bitmaps_rw(msr) \
++	nested_vmx_merge_msr_bitmaps(msr, MSR_TYPE_RW)
 +
-+	/*
-+	 * For perf-based PMUs, accumulate software-emulated events separately
-+	 * from pmc->counter, as pmc->counter is offset by the count of the
-+	 * associated perf event. Request reprogramming, which will consult
-+	 * both emulated and hardware-generated events to detect overflow.
-+	 */
-+	if (!kvm_mediated_pmu_enabled(vcpu)) {
-+		pmc->emulated_counter++;
-+		kvm_pmu_request_counter_reprogram(pmc);
-+		return;
-+	}
-+
-+	/*
-+	 * For mediated PMUs, pmc->counter is updated when the vCPU's PMU is
-+	 * put, and will be loaded into hardware when the PMU is loaded. Simply
-+	 * increment the counter and signal overflow if it wraps to zero.
-+	 */
-+	pmc->counter = (pmc->counter + 1) & pmc_bitmask(pmc);
-+	if (!pmc->counter) {
-+		pmc_to_pmu(pmc)->global_status |= BIT_ULL(pmc->idx);
-+		if (pmc_pmi_enabled(pmc))
-+			kvm_make_request(KVM_REQ_PMI, vcpu);
-+	}
- }
+ /*
+  * Merge L0's and L1's MSR bitmap, return false to indicate that
+  * we do not use the hardware.
+@@ -696,23 +709,13 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
+ 	 * other runtime changes to vmcs01's bitmap, e.g. dynamic pass-through.
+ 	 */
+ #ifdef CONFIG_X86_64
+-	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
+-					 MSR_FS_BASE, MSR_TYPE_RW);
+-
+-	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
+-					 MSR_GS_BASE, MSR_TYPE_RW);
+-
+-	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
+-					 MSR_KERNEL_GS_BASE, MSR_TYPE_RW);
++	nested_vmx_merge_msr_bitmaps_rw(MSR_FS_BASE);
++	nested_vmx_merge_msr_bitmaps_rw(MSR_GS_BASE);
++	nested_vmx_merge_msr_bitmaps_rw(MSR_KERNEL_GS_BASE);
+ #endif
+-	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
+-					 MSR_IA32_SPEC_CTRL, MSR_TYPE_RW);
+-
+-	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
+-					 MSR_IA32_PRED_CMD, MSR_TYPE_W);
+-
+-	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
+-					 MSR_IA32_FLUSH_CMD, MSR_TYPE_W);
++	nested_vmx_merge_msr_bitmaps_rw(MSR_IA32_SPEC_CTRL);
++	nested_vmx_merge_msr_bitmaps_write(MSR_IA32_PRED_CMD);
++	nested_vmx_merge_msr_bitmaps_write(MSR_IA32_FLUSH_CMD);
  
- static inline bool cpl_is_matched(struct kvm_pmc *pmc)
+ 	kvm_vcpu_unmap(vcpu, &map);
+ 
 -- 
 2.49.0.395.g12beb8f557-goog
 
