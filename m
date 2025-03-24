@@ -1,153 +1,122 @@
-Return-Path: <kvm+bounces-41805-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41806-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 239EFA6DBCE
-	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 14:42:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD6F9A6DC91
+	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 15:06:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06C751887B82
-	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 13:41:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D89753B1EF7
+	for <lists+kvm@lfdr.de>; Mon, 24 Mar 2025 14:05:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E211825F7AA;
-	Mon, 24 Mar 2025 13:41:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E92CA25F978;
+	Mon, 24 Mar 2025 14:05:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ou7ZU8Lb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="c5+jaFFO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D141625F780
-	for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 13:41:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E77425F786;
+	Mon, 24 Mar 2025 14:05:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742823689; cv=none; b=IY8YVIDIonI4OCCdyNGZv6VAV//tNWQyz47HkuzybZLzXxa99T2x9kZpN35gqeoE4+sjdp8CHLkIb0oWwUgiwbfLivPigu4CqI3ULB0BaWrFNwIWWQum8mPyPmDtPnRnoALanaDhdOZ/FbEylPzb9XsJdLuDu3dCwxDHZKkDq7c=
+	t=1742825133; cv=none; b=d7ZKRG9tkhMgqrF9UHP/aTDVtGmv9J296N48GKIB09yRROLCdQHDE9kWaZbaNgpYTQibu8CjrmR/K8Tpb4Piv0rnh7AXNYHp5PSfOivEvFBlxu5CA3dg58LW/xPfbXpfl/PZzVfDPe1MrjECTIi1PqeB/BpO4TY7UTXQXn5uFw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742823689; c=relaxed/simple;
-	bh=NoaI0VIXS9nDnrTt+JbrnYNyk4JDEUMVi5yyzjmnMZs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TUWgQ2Kg5c2fxO8C77VQmGCJYj5QRcm7sRvGuen+l3rffPB6klw6N0gJ9yOwPqz2wZpOKlY9uSrTDkxWTKfIM1dM7tmNWspQZZsQmwwocAEPLjfAH1Q4lu86n8nfaJfDknhuFEFEcMC3MVwmIP6DsrB5o8rfRwLZmv1Sg/UOA6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ou7ZU8Lb; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2241aad40f3so64254685ad.1
-        for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 06:41:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742823686; x=1743428486; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TOMUBa0uAqlf20qeqn3I3utJD4aHpZ+FGIRL3z6psP8=;
-        b=ou7ZU8LbVY/7W2aEhi1Upbob78ioGSWTh4lyohHgOV+r4Lvzo/p0DS/NddMqrr8IZl
-         QufYtYD3qxfTaXUHwk993jzmLQ+KWMPsHxu749JqhehLGRBQ87lZTiO1BjqZjkojBmu5
-         sXFsAJmaqI9/pWtV235012MCBg8gU7lk4llYecCT2VU4etfrj1aXiwWwS3GSCPyfDswb
-         7wzgwn/NHNcqXSeRRZmXqMttRY6nNaMEjG3XqRNfXjFj1jX0j4i/v1E3jU202fKjosVt
-         z0875nloLPHowiLGf3ntuvPgT6HIu9N6HJ+pqkivnzpakCA/isAog66SiIsy15tkAGGp
-         ENwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742823686; x=1743428486;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TOMUBa0uAqlf20qeqn3I3utJD4aHpZ+FGIRL3z6psP8=;
-        b=RpgrfKDgbqqdFACChgoPuMexmACVDKamkQaXt5cXNbPhCrGtXRHew7pQnDlr64RPu2
-         2PeHyN8II7+ffk/v0zIa1ZEnREVFZph7iE6pN+1yzx/JHmm4A6a/2MqcRcxn611NXKRd
-         3gQzMKJxy+jESWf5CMjRnTkIOjh8XwfZeFO3pmd3HRDDLrrKp1+DKxIu21venIq/h+S2
-         JGUxb+PVJGASCXfQ1KPNpDXWh2UiUM9L5hR4x1PNAZqGJ9ldenNmz9z0Ol0Qj0tasBhg
-         iDohR0xvG7ktG7Dtaj+ZZGEJ26hfa4dOXlwMmvy/FfVqIiPtjyYA6Mffw3UU2z3m5k42
-         C9mw==
-X-Forwarded-Encrypted: i=1; AJvYcCVE4qTM05xRGv+vqcY68sEQlkJivNf8XHGJGBP2avbO3hX4D1+gtHI89VZKvwZaeV0tm14=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+m2FNGH/e0znNvfMq0cS8Afc5YNFkEsNhu5p2IzLMQZineXBR
-	0wXlO/9EEFWgCjjDqroOxBNNCjBaWT7UW4cj9qURRYePmmW71PVaDifvRWZK4VVhMkGMxXf4zPl
-	wGQ==
-X-Google-Smtp-Source: AGHT+IF1FB4A8qFLi8Ozqi3+nCx7rU7glmRRUDo35MhMjgvHg/5rVBEXCQVZGbO5vn6nku0l/wkKqu1AtRw=
-X-Received: from plsu3.prod.google.com ([2002:a17:902:bf43:b0:223:f487:afc6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:fc4f:b0:223:60ce:2451
- with SMTP id d9443c01a7336-22780c7b70emr208367505ad.15.1742823686205; Mon, 24
- Mar 2025 06:41:26 -0700 (PDT)
-Date: Mon, 24 Mar 2025 06:41:24 -0700
-In-Reply-To: <Z+ElLSmJHkBqDPIT@intel.com>
+	s=arc-20240116; t=1742825133; c=relaxed/simple;
+	bh=c2eCQz13BKIBKZv81BY7z0CDOjaxqpyzhQRwa3SkYKg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R7ZkgnyVNP3I7lFU5uBIhke146p9JHkFZCYuDbAY45/BsXak5EJJCOSjeK3Vi3jotBTs57rlZbk2QHH0GSTh3mKrKovrlzu1VHQ6vAOBgD01yvcozMhUKPt2gz92wxFZ9v/hDXI5M+gZonkTXWZPYwDA+CV7zs5rmTRWr2F2yLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=c5+jaFFO; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1742825132; x=1774361132;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=c2eCQz13BKIBKZv81BY7z0CDOjaxqpyzhQRwa3SkYKg=;
+  b=c5+jaFFOUAZR48Yo1HTewiZ2eYsqrfVF4ZGSjHL4WbqgMk5+jpGeEQMz
+   dTlItEqSZPNiD/kT5D77Dbo6lDMDN1DdNDqziCf834LX4ShjXWKn3pbtI
+   wARN3TNRX0G5EWz/DGmgmbsB68mCffiF1ifx2jcVefSPCBjYWEp6d6eDi
+   SXa8e1dQTgzILdNVo24aiZB4CbdARQDwd7qOj2TaHQT/8YS08boRyp9Gk
+   Ne4h/DRnRS/yscLNymb3MXu8W1Qlg90jULGK4HqecL4xRFYxyWyoC9Bhb
+   Gn+m1i1lT/t60zYEws04oAy9qa7fmA2XJM0ualiL1uDsUMGLm57ObAtPe
+   Q==;
+X-CSE-ConnectionGUID: xSnqsL7LQzy+Fj+KVqV1Mg==
+X-CSE-MsgGUID: cx53YatITmO4i4cBnh+zgw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11383"; a="54666845"
+X-IronPort-AV: E=Sophos;i="6.14,272,1736841600"; 
+   d="scan'208";a="54666845"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2025 07:05:31 -0700
+X-CSE-ConnectionGUID: /AnTqYGVQGCBN9JWKPRoPg==
+X-CSE-MsgGUID: rqCGAJgMQ6yBS3xkwvUkyw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,272,1736841600"; 
+   d="scan'208";a="129250116"
+Received: from spr.sh.intel.com ([10.239.53.19])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2025 07:05:28 -0700
+From: Chao Gao <chao.gao@intel.com>
+To: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Chao Gao <chao.gao@intel.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>
+Subject: [PATCH] KVM: VMX: Flush shadow VMCS on emergency reboot
+Date: Mon, 24 Mar 2025 22:08:48 +0800
+Message-ID: <20250324140849.2099723-1-chao.gao@intel.com>
+X-Mailer: git-send-email 2.46.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250320142022.766201-1-seanjc@google.com> <20250320142022.766201-4-seanjc@google.com>
- <Z9xXd5CoHh5Eo2TK@google.com> <Z9zHju4PIJ+eunli@intel.com>
- <Z93Pv0HWYvq9Nz2h@google.com> <Z+ElLSmJHkBqDPIT@intel.com>
-Message-ID: <Z-FhBHJW2cJb9eZG@google.com>
-Subject: Re: [PATCH v2 3/3] KVM: x86: Add a module param to control and
- enumerate device posted IRQs
-From: Sean Christopherson <seanjc@google.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Yosry Ahmed <yosry.ahmed@linux.dev>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 24, 2025, Chao Gao wrote:
-> On Fri, Mar 21, 2025 at 01:44:47PM -0700, Sean Christopherson wrote:
-> >On Fri, Mar 21, 2025, Chao Gao wrote:
-> >> On Thu, Mar 20, 2025 at 10:59:19AM -0700, Sean Christopherson wrote:
-> >> >@@ -9776,8 +9777,8 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
-> >> >        if (r != 0)
-> >> >                goto out_mmu_exit;
-> >> > 
-> >> >-       enable_device_posted_irqs &= enable_apicv &&
-> >> >-                                    irq_remapping_cap(IRQ_POSTING_CAP);
-> >> >+       enable_device_posted_irqs = allow_device_posted_irqs && enable_apicv &&
-> >> >+                                   irq_remapping_cap(IRQ_POSTING_CAP);
-> >> 
-> >> Can we simply drop this ...
-> >> 
-> >> > 
-> >> >        kvm_ops_update(ops);
-> >> > 
-> >> >@@ -14033,6 +14034,8 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_rmp_fault);
-> >> > 
-> >> > static int __init kvm_x86_init(void)
-> >> > {
-> >> >+       allow_device_posted_irqs = enable_device_posted_irqs;
-> >> >+
-> >> >        kvm_init_xstate_sizes();
-> >> > 
-> >> >        kvm_mmu_x86_module_init();
-> >> >
-> >> >
-> >> >Option #2 is to shove the module param into vendor code, but leave the variable
-> >> >in kvm.ko, like we do for enable_apicv.
-> >> >
-> >> >I'm leaning toward option #2, as it's more flexible, arguably more intuitive, and
-> >> >doesn't prevent putting the logic in kvm_x86_vendor_init().
-> >> >
-> >> 
-> >> and do
-> >> 
-> >> bool kvm_arch_has_irq_bypass(void)
-> >> {
-> >> 	return enable_device_posted_irqs && enable_apicv &&
-> >> 	       irq_remapping_cap(IRQ_POSTING_CAP);
-> >> }
-> >
-> >That would avoid the vendor module issues, but it would result in
-> >allow_device_posted_irqs not reflecting the state of KVM.  We could partially
-> 
-> Ok. I missed that.
-> 
-> btw, is using module_param_cb() a bad idea? like:
-> 
-> module_param_cb(nx_huge_pages, &nx_huge_pages_ops, &nx_huge_pages, 0644);
-> 
-> with a proper .get callback, we can reflect the state of KVM to userspace
-> accurately.
+Ensure the shadow VMCS cache is evicted during an emergency reboot to
+prevent potential memory corruption if the cache is evicted after reboot.
 
-It's not a bad idea, but it comes with tradeoffs too.  A little bit more code,
-but more importantly enable_device_posted_irqs wouldn't reflect KVM's internal
-state, which could result in bugs if KVM were to check the module param directly.
-I don't think that'd be likely to happen, but given that pretty much every other
-"simple" param in KVM reflects KVM's state directly, it'd be an easy mistake to
-make.
+This issue was identified through code inspection, as __loaded_vmcs_clear()
+flushes both the normal VMCS and the shadow VMCS.
 
-That, and being able to set toggle the param when reloading the vendor module is
-actually valuable, as there are setups where kvm.ko is built-in, but the vendor
-modules are not.
+Avoid checking the "launched" state during an emergency reboot, unlike the
+behavior in __loaded_vmcs_clear(). This is important because reboot NMIs
+can interfere with operations like copy_shadow_to_vmcs12(), where shadow
+VMCSes are loaded directly using VMPTRLD. In such cases, if NMIs occur
+right after the VMCS load, the shadow VMCSes will be active but the
+"launched" state may not be set.
+
+Signed-off-by: Chao Gao <chao.gao@intel.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index b70ed72c1783..dccd1c9939b8 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -769,8 +769,11 @@ void vmx_emergency_disable_virtualization_cpu(void)
+ 		return;
+ 
+ 	list_for_each_entry(v, &per_cpu(loaded_vmcss_on_cpu, cpu),
+-			    loaded_vmcss_on_cpu_link)
++			    loaded_vmcss_on_cpu_link) {
+ 		vmcs_clear(v->vmcs);
++		if (v->shadow_vmcs)
++			vmcs_clear(v->shadow_vmcs);
++	}
+ 
+ 	kvm_cpu_vmxoff();
+ }
+-- 
+2.46.1
+
 
