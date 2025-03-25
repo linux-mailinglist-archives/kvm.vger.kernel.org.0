@@ -1,81 +1,79 @@
-Return-Path: <kvm+bounces-41877-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41878-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7473DA6E7AB
-	for <lists+kvm@lfdr.de>; Tue, 25 Mar 2025 01:41:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E3F9A6E7AC
+	for <lists+kvm@lfdr.de>; Tue, 25 Mar 2025 01:41:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C9A23B7D83
-	for <lists+kvm@lfdr.de>; Tue, 25 Mar 2025 00:41:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B253717518E
+	for <lists+kvm@lfdr.de>; Tue, 25 Mar 2025 00:41:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0350F188734;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8454718B47D;
 	Tue, 25 Mar 2025 00:40:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="S+rchpqw"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="i934I2iE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A869C14900B
-	for <kvm@vger.kernel.org>; Tue, 25 Mar 2025 00:40:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F16F1149E16
+	for <kvm@vger.kernel.org>; Tue, 25 Mar 2025 00:40:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742863248; cv=none; b=CLD/g+MU4AHhxluVE2/oNVmju9GAz2S8rmSqJFhw83xxrOsYlmANd/Vin9fDarkPNzh496YU/p2RVsCB4UyaiJDvymw2ifzjuXB5s5Riup4VggjTQi2lWlJdN11gQi7PXPK7gXpY2zsNioGarzKpZllhJjgoRf+Yj8AuMgjFESc=
+	t=1742863248; cv=none; b=h8tZNH29C7q5Evpji5WarAuU0D200W9VBfi1kt1+e0rmOptF+H2b1HUJGOe2bJS9bh8UAutA0UfM+jNSNzf+QILTCDRG7yjh3mSPt7gdptRuOJKlQUf7go+W+TKv3ACVF0qhVest/3NcN0vGKsxaX3+qsqSAdhed9jxtEu1Sf6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1742863248; c=relaxed/simple;
-	bh=QN3DCBPWjckW+ez0UByt9KYuOWBHnXzOgLR953n7h0A=;
+	bh=qRWvFNmtF//vHxX52E+O6O7fduE/eyyjc2L4rSswFs4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=GXpFYbnXDRgiqRU+0P8ArnvLov9tVm2p19t3ppaC013DciFwCLFINtp5685s4R4bAEU3asXYfehcKq4oyFViYU2muT1RXga8o/itfQnWaMxhIo2GSR15Uru3eLEPaAtvTvE3yzMsMsEAFtZ9/BNboiP7Ve987Ov+7e1B7ZI+cVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=S+rchpqw; arc=none smtp.client-ip=209.85.214.173
+	 In-Reply-To:To:Cc; b=ckQu9Pc45Aeih1d51UytuebMSMnckAJGh0wZEmM0WsKn6s9ItAi8KpMXoPhDCq2+PhOjMwK5c0jctCnztydQGtcOloueS84LnYbUh/Bb7FxObLqDDDhTVfe7orKFjlo+CeCpu/Zx/NxL1/PZPfOulht3pGfmpn8fcR9Hj0zDtm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=i934I2iE; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-225df540edcso116624475ad.0
-        for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 17:40:45 -0700 (PDT)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2240b4de12bso25691635ad.2
+        for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 17:40:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1742863245; x=1743468045; darn=vger.kernel.org;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1742863246; x=1743468046; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=XNqfGek6IDvMlkuJpE58iTKo9lOFsf02qvhKRUoqiBo=;
-        b=S+rchpqwX3GqxetPRwgVkbKcIbDUhzD5zp+05pG88hfrAtn05/C3DtLSgJah9XLsow
-         Ci/R633dCnYoWbztOXMkM8N/TWkq5eytQbwqYI6Pf5HjLvs0rT/ueQKvNeOZQ9XqAA6/
-         2seT/U0G4Tp22BR3jJQ92tYyeGh1tK38P/eG50umCBuwqCpxTToy9Iz0QuKhNIFTl2QL
-         JReO3iwL/tUEWXR6LDueJ9h8SrKC3CT44vHfOpO0R2qbEBapXn+nKcSJnO85rBnr0HsZ
-         2KYX9ut354DUCTDn4CV0q9+jcy3Y6+HHt9l7rsoN9beUglovm1x+J945Dtk1nZu1M+U/
-         IaZA==
+        bh=itl/W4XiPHQgafNA6elnqIZsMFzXb5vTM+wl8RewrvY=;
+        b=i934I2iEwTP/NysO1QuVEsoVlLLPMjwKHz/H+LpVuuNba5P6DE2z34s9K8CUBaXzPu
+         F0LhPM1rf3T5/3+g4CHn+eyl9Zilqcr3aWsOAi7wfvfLdYUA+iJ1F+UWTsSn37NVD5V4
+         NA8CLfuJuzvG2ZLY5L1EsX4KQbrxlhMZWTb4norNuyjEasxf6KwQP2WkL+R9YvQDwiob
+         wcqZ0TKiiXzEX+ZHOXM/UvObq2Hi9Yho6EYMNUE6eUYAe4YSfVHh0yh0Nm+KPvE0M7fz
+         63HR+InKy4Zmnef0aOsYAwcum6DJfHeWcwuOEtPINn4s9zM7shNkmM9EFMj7Nx0KQgKS
+         J1ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742863245; x=1743468045;
+        d=1e100.net; s=20230601; t=1742863246; x=1743468046;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XNqfGek6IDvMlkuJpE58iTKo9lOFsf02qvhKRUoqiBo=;
-        b=PtzMiQb+2ljxjwiHNJT3Mq3vFWLOjY11LUrqlSksG+FuT+yjNhQUowDWcg6dfPDokQ
-         QsgGRrrlPX0kZalkBg7ud7YKOu2koX0xicLikGlfcgEDKo182NgmOSKql15Qlog9wnvG
-         0V//vJFlGQzwGgXH8fJSvVTzfUUSqIFHC/o0teHKpV8oCtmuXg/zHuyBwhJEPgcmUmIH
-         C3xGpxZ8IAr64TBY0Zv9JTnju5cvQNwz9gYj2dXeSUzwQHNjVhAF7oVjsNA409UeYThm
-         CFQGoYeHtG4Sz+0OPyd4S1+zJ2OSXdfifeulR1z6lXxreXanCJbjsieENhXGw2dGZ4Hk
-         cufA==
-X-Gm-Message-State: AOJu0YzmImBzjNGCCDiCK2TFpUUBSeDdM6qbMgYuQG9PHtvhhdcRbXDp
-	Ll+7ga0Yu7i7Xs0BqG2PCZGL7dtfPWhIuoSp6qAqN9ujhqtHJgEdYp5vrEebyjafaWpQUxGdQuL
-	u
-X-Gm-Gg: ASbGncuZPPg64f0GP5eLc77uFfOgidYnFdB2xPTne0YLIIDo5MZjDh82fSnfuQDpUbD
-	ZrteLCar9+EsfmtvVdQ8u/1vJuqBRkRG/r3Fd2MWbPUEmbCw2gKP1v78iopPPMwVlZms2jvywgr
-	qn3wQD3MPBm7xwHUw9W+bIpdxq/yNmPv2+JKym7ojY9DHgxzOYOI/UJlJ+l9qX4gPxUKT3gz8fz
-	C1djyeHgAOxCf8dfNvhCTZYRDlJQcjjL8bMfyoEmVRA3KrsLewcd+gQ7eJnajQIwpeLA/4M+49x
-	dgbqCudGuNivuOGb4r3jfRmSLSZdALmYWdpyndq4odzoJ9U3iNg+ffZxpg==
-X-Google-Smtp-Source: AGHT+IEyY0aS2TVZ43j4wneKeZ/YRErGKGqWBRTFQa7kE7mGVqq6ifmaSYPLNtOafQQXufixCh8D6Q==
-X-Received: by 2002:a05:6a00:638d:b0:736:aea8:c9b7 with SMTP id d2e1a72fcca58-7377a08766dmr27319740b3a.2.1742863244847;
-        Mon, 24 Mar 2025 17:40:44 -0700 (PDT)
+        bh=itl/W4XiPHQgafNA6elnqIZsMFzXb5vTM+wl8RewrvY=;
+        b=lXx3g/GoFHh0PoUxHdQkxP4RBUovyeyIuv9cBJrojmAH6tszq+nIngCa96y0pk1LlB
+         4rMfOKm47ZMWgY7oOXe/7zFkb1viUuocwGe+6uDpwixMCMTXUHG45efH1lqAZe9jrAuK
+         bqnraeAIc6RLP2+Non2O/mWmQ5QPDzlB2cNQ8N0sP53RJew4xrxbIf4YoXA+uakgu5Xa
+         GXV8gHAY/rWBRUl4DQn+QBuVj0DWIMijo37cbCHL8vm7spPuifGkjQMl5/QJgJhrCHbN
+         nc2Tz6EaeAbiPLH9UVOUobnsg2t4mVLsYBvn0b+Vf3JMEet14X7wQ7TtcKOGS6WX0Asb
+         lw+Q==
+X-Gm-Message-State: AOJu0YzVtw9eHIvA3Wz7dnHxhUOZ3nogpY+s2ZlbolQTQCNFCLat+GGi
+	mhtuA7anhcxPJXPS3iT7q49JDmNjT9cjNbimJCdC7mFC2wHfPW5qkaZrJAK+Njs=
+X-Gm-Gg: ASbGncuoWeMW+NfmoZ50aYnaK6zRFiY7MSMrEiGIfv2kDBS5yums/kVwyLN5dvpWJ5X
+	utR/xHxwQH5BV+Z1LeRsy0Tyq/FMvkIPTSUVCJHu1K+bZ2/lERw7z4r+5BnHAzC7qNKwfYsVwn2
+	s+Yey851K9Tk27mL241Zrw0MgWv83JnzZyc5+Yu9TO93ZDGaodTtOehOH91HdMczFNXG7/9xL7m
+	LaR5/c6I+uJf0pzaJ9kb+bwflNLn/NR6A2sb4oA2tb4vrT5QjBrA+80bDxp7xYyGNTVJy9jfKbN
+	ed8ul+aNNylhb0vFo78x9AjblVORN25hJJW1ApaWz03PsKNlwJZ8nXYC0A==
+X-Google-Smtp-Source: AGHT+IFGW52sOnfDnF40+MnlNb+49O0NM6Hh5OhPgbLG38/LdNTWeRaD7LR3pQqJksaPXkInel2pCQ==
+X-Received: by 2002:a05:6a00:4648:b0:736:a973:748 with SMTP id d2e1a72fcca58-73905a2515emr21659592b3a.22.1742863245956;
+        Mon, 24 Mar 2025 17:40:45 -0700 (PDT)
 Received: from atishp.ba.rivosinc.com ([64.71.180.162])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7390600a501sm8705513b3a.79.2025.03.24.17.40.43
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7390600a501sm8705513b3a.79.2025.03.24.17.40.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Mar 2025 17:40:44 -0700 (PDT)
+        Mon, 24 Mar 2025 17:40:45 -0700 (PDT)
 From: Atish Patra <atishp@rivosinc.com>
-Date: Mon, 24 Mar 2025 17:40:30 -0700
-Subject: [PATCH 2/3] KVM: riscv: selftests: Decode stval to identify exact
- exception type
+Date: Mon, 24 Mar 2025 17:40:31 -0700
+Subject: [PATCH 3/3] KVM: riscv: selftests: Add vector extension tests
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,7 +82,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250324-kvm_selftest_improve-v1-2-583620219d4f@rivosinc.com>
+Message-Id: <20250324-kvm_selftest_improve-v1-3-583620219d4f@rivosinc.com>
 References: <20250324-kvm_selftest_improve-v1-0-583620219d4f@rivosinc.com>
 In-Reply-To: <20250324-kvm_selftest_improve-v1-0-583620219d4f@rivosinc.com>
 To: Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
@@ -96,69 +94,194 @@ Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
  linux-kernel@vger.kernel.org, Atish Patra <atishp@rivosinc.com>
 X-Mailer: b4 0.15-dev-42535
 
-Currently, the sbi_pmu_test continues if the exception type is illegal
-instruction because access to hpmcounter will generate that. However, we
-may get illegal for other reasons as well which should result in test
-assertion.
-
-Use the stval to decode the exact type of instructions and which csrs are
-being accessed if it is csr access instructions. Assert in all cases
-except if it is a csr access instructions that access valid PMU related
-registers.
+Add vector related tests with the ISA extension standard template.
+However, the vector registers are bit tricky as the register length is
+variable based on vlenb value of the system. That's why the macros are
+defined with a default and overidden with actual value at runtime.
 
 Signed-off-by: Atish Patra <atishp@rivosinc.com>
 ---
- tools/testing/selftests/kvm/riscv/sbi_pmu_test.c | 32 ++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+ tools/testing/selftests/kvm/riscv/get-reg-list.c | 111 ++++++++++++++++++++++-
+ 1 file changed, 110 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c b/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
-index 03406de4989d..11bde69b5238 100644
---- a/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
-+++ b/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
-@@ -128,11 +128,43 @@ static void stop_counter(unsigned long counter, unsigned long stop_flags)
- 		       "Unable to stop counter %ld error %ld\n", counter, ret.error);
+diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/testing/selftests/kvm/riscv/get-reg-list.c
+index 8515921dfdbf..576ab8eb7368 100644
+--- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
++++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
+@@ -145,7 +145,9 @@ void finalize_vcpu(struct kvm_vcpu *vcpu, struct vcpu_reg_list *c)
+ {
+ 	unsigned long isa_ext_state[KVM_RISCV_ISA_EXT_MAX] = { 0 };
+ 	struct vcpu_reg_sublist *s;
+-	uint64_t feature;
++	uint64_t feature = 0;
++	u64 reg, size;
++	unsigned long vlenb_reg;
+ 	int rc;
+ 
+ 	for (int i = 0; i < KVM_RISCV_ISA_EXT_MAX; i++)
+@@ -173,6 +175,23 @@ void finalize_vcpu(struct kvm_vcpu *vcpu, struct vcpu_reg_list *c)
+ 		switch (s->feature_type) {
+ 		case VCPU_FEATURE_ISA_EXT:
+ 			feature = RISCV_ISA_EXT_REG(s->feature);
++			if (s->feature == KVM_RISCV_ISA_EXT_V) {
++				/* Enable V extension so that we can get the vlenb register */
++				__vcpu_set_reg(vcpu, feature, 1);
++				/* Compute the correct vector register size */
++				rc = __vcpu_get_reg(vcpu, s->regs[4], &vlenb_reg);
++				if (rc < 0)
++				/* The vector test may fail if the default reg size doesn't match */
++					break;
++				size = __builtin_ctzl(vlenb_reg);
++				size <<= KVM_REG_SIZE_SHIFT;
++				for (int i = 0; i < 32; i++) {
++					reg = KVM_REG_RISCV | KVM_REG_RISCV_VECTOR | size |
++					      KVM_REG_RISCV_VECTOR_REG(i);
++					s->regs[5 + i] = reg;
++				}
++				__vcpu_set_reg(vcpu, feature, 0);
++			}
+ 			break;
+ 		case VCPU_FEATURE_SBI_EXT:
+ 			feature = RISCV_SBI_EXT_REG(s->feature);
+@@ -408,6 +427,35 @@ static const char *fp_d_id_to_str(const char *prefix, __u64 id)
+ 	return strdup_printf("%lld /* UNKNOWN */", reg_off);
  }
  
-+#define INSN_OPCODE_MASK	0x007c
-+#define INSN_OPCODE_SHIFT	2
-+#define INSN_OPCODE_SYSTEM	28
++static const char *vector_id_to_str(const char *prefix, __u64 id)
++{
++	/* reg_off is the offset into struct __riscv_v_ext_state */
++	__u64 reg_off = id & ~(REG_MASK | KVM_REG_RISCV_VECTOR);
++	int reg_index = 0;
 +
-+#define INSN_MASK_FUNCT3	0x7000
-+#define INSN_SHIFT_FUNCT3	12
++	assert((id & KVM_REG_RISCV_TYPE_MASK) == KVM_REG_RISCV_VECTOR);
 +
-+#define INSN_CSR_MASK		0xfff00000
-+#define INSN_CSR_SHIFT		20
++	if (reg_off >= KVM_REG_RISCV_VECTOR_REG(0))
++		reg_index = reg_off -  KVM_REG_RISCV_VECTOR_REG(0);
++	switch (reg_off) {
++	case KVM_REG_RISCV_VECTOR_REG(0) ...
++	     KVM_REG_RISCV_VECTOR_REG(31):
++		return strdup_printf("KVM_REG_RISCV_VECTOR_REG(%d)", reg_index);
++	case KVM_REG_RISCV_VECTOR_CSR_REG(vstart):
++		return "KVM_REG_RISCV_VECTOR_CSR_REG(vstart)";
++	case KVM_REG_RISCV_VECTOR_CSR_REG(vl):
++		return "KVM_REG_RISCV_VECTOR_CSR_REG(vl)";
++	case KVM_REG_RISCV_VECTOR_CSR_REG(vtype):
++		return "KVM_REG_RISCV_VECTOR_CSR_REG(vtype)";
++	case KVM_REG_RISCV_VECTOR_CSR_REG(vcsr):
++		return "KVM_RISCV_VCPU_VECTOR_CSR_REG(vcsr)";
++	case KVM_REG_RISCV_VECTOR_CSR_REG(vlenb):
++		return "KVM_REG_RISCV_VECTOR_CSR_REG(vlenb)";
++	}
 +
-+#define GET_RM(insn)            (((insn) & INSN_MASK_FUNCT3) >> INSN_SHIFT_FUNCT3)
-+#define GET_CSR_NUM(insn)       (((insn) & INSN_CSR_MASK) >> INSN_CSR_SHIFT)
++	return strdup_printf("%lld /* UNKNOWN */", reg_off);
++}
 +
- static void guest_illegal_exception_handler(struct ex_regs *regs)
- {
-+	unsigned long insn;
-+	int opcode, csr_num, funct3;
-+
- 	__GUEST_ASSERT(regs->cause == EXC_INST_ILLEGAL,
- 		       "Unexpected exception handler %lx\n", regs->cause);
+ #define KVM_ISA_EXT_ARR(ext)		\
+ [KVM_RISCV_ISA_EXT_##ext] = "KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_" #ext
  
-+	insn = regs->stval;
-+	opcode = (insn & INSN_OPCODE_MASK) >> INSN_OPCODE_SHIFT;
-+	__GUEST_ASSERT(opcode == INSN_OPCODE_SYSTEM,
-+		       "Unexpected instruction with opcode 0x%x insn 0x%lx\n", opcode, insn);
+@@ -635,6 +683,9 @@ void print_reg(const char *prefix, __u64 id)
+ 	case KVM_REG_SIZE_U128:
+ 		reg_size = "KVM_REG_SIZE_U128";
+ 		break;
++	case KVM_REG_SIZE_U256:
++		reg_size = "KVM_REG_SIZE_U256";
++		break;
+ 	default:
+ 		printf("\tKVM_REG_RISCV | (%lld << KVM_REG_SIZE_SHIFT) | 0x%llx /* UNKNOWN */,\n",
+ 		       (id & KVM_REG_SIZE_MASK) >> KVM_REG_SIZE_SHIFT, id & ~REG_MASK);
+@@ -666,6 +717,10 @@ void print_reg(const char *prefix, __u64 id)
+ 		printf("\tKVM_REG_RISCV | %s | KVM_REG_RISCV_FP_D | %s,\n",
+ 				reg_size, fp_d_id_to_str(prefix, id));
+ 		break;
++	case KVM_REG_RISCV_VECTOR:
++		printf("\tKVM_REG_RISCV | %s | KVM_REG_RISCV_VECTOR | %s,\n",
++		       reg_size, vector_id_to_str(prefix, id));
++		break;
+ 	case KVM_REG_RISCV_ISA_EXT:
+ 		printf("\tKVM_REG_RISCV | %s | KVM_REG_RISCV_ISA_EXT | %s,\n",
+ 				reg_size, isa_ext_id_to_str(prefix, id));
+@@ -870,6 +925,54 @@ static __u64 fp_d_regs[] = {
+ 	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_D,
+ };
+ 
++/* Define a default vector registers with length. This will be overwritten at runtime */
++static __u64 vector_regs[] = {
++	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_VECTOR |
++	KVM_REG_RISCV_VECTOR_CSR_REG(vstart),
++	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_VECTOR |
++	KVM_REG_RISCV_VECTOR_CSR_REG(vl),
++	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_VECTOR |
++	KVM_REG_RISCV_VECTOR_CSR_REG(vtype),
++	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_VECTOR |
++	KVM_REG_RISCV_VECTOR_CSR_REG(vcsr),
++	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_VECTOR |
++	KVM_REG_RISCV_VECTOR_CSR_REG(vlenb),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(0),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(1),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(2),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(3),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(4),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(5),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(6),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(7),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(8),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(9),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(10),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(11),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(12),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(13),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(14),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(15),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(16),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(17),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(18),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(19),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(20),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(21),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(22),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(23),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(24),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(25),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(26),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(27),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(28),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(29),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(30),
++	KVM_REG_RISCV | KVM_REG_SIZE_U128 | KVM_REG_RISCV_VECTOR | KVM_REG_RISCV_VECTOR_REG(31),
++	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE |
++	KVM_RISCV_ISA_EXT_V,
++};
 +
-+	csr_num = GET_CSR_NUM(insn);
-+	funct3 = GET_RM(insn);
-+	/* Validate if it is a CSR read/write operation */
-+	__GUEST_ASSERT(funct3 <= 7 && (funct3 != 0 || funct3 != 4),
-+		       "Unexpected system opcode with funct3 0x%x csr_num 0x%x\n",
-+		       funct3, csr_num);
+ #define SUBLIST_BASE \
+ 	{"base", .regs = base_regs, .regs_n = ARRAY_SIZE(base_regs), \
+ 	 .skips_set = base_skips_set, .skips_set_n = ARRAY_SIZE(base_skips_set),}
+@@ -894,6 +997,10 @@ static __u64 fp_d_regs[] = {
+ 	{"fp_d", .feature = KVM_RISCV_ISA_EXT_D, .regs = fp_d_regs, \
+ 		.regs_n = ARRAY_SIZE(fp_d_regs),}
+ 
++#define SUBLIST_V \
++	{"v", .feature = KVM_RISCV_ISA_EXT_V, .regs = vector_regs, \
++		.regs_n = ARRAY_SIZE(vector_regs),}
 +
-+	/* Validate if it is a HPMCOUNTER CSR operation */
-+	__GUEST_ASSERT(csr_num == CSR_CYCLE || csr_num <= CSR_HPMCOUNTER31,
-+		       "Unexpected csr_num 0x%x\n", csr_num);
-+
- 	illegal_handler_invoked = true;
- 	/* skip the trapping instruction */
- 	regs->epc += 4;
+ #define KVM_ISA_EXT_SIMPLE_CONFIG(ext, extu)			\
+ static __u64 regs_##ext[] = {					\
+ 	KVM_REG_RISCV | KVM_REG_SIZE_ULONG |			\
+@@ -962,6 +1069,7 @@ KVM_SBI_EXT_SIMPLE_CONFIG(susp, SUSP);
+ KVM_ISA_EXT_SUBLIST_CONFIG(aia, AIA);
+ KVM_ISA_EXT_SUBLIST_CONFIG(fp_f, FP_F);
+ KVM_ISA_EXT_SUBLIST_CONFIG(fp_d, FP_D);
++KVM_ISA_EXT_SUBLIST_CONFIG(v, V);
+ KVM_ISA_EXT_SIMPLE_CONFIG(h, H);
+ KVM_ISA_EXT_SIMPLE_CONFIG(smnpm, SMNPM);
+ KVM_ISA_EXT_SUBLIST_CONFIG(smstateen, SMSTATEEN);
+@@ -1034,6 +1142,7 @@ struct vcpu_reg_list *vcpu_configs[] = {
+ 	&config_fp_f,
+ 	&config_fp_d,
+ 	&config_h,
++	&config_v,
+ 	&config_smnpm,
+ 	&config_smstateen,
+ 	&config_sscofpmf,
 
 -- 
 2.43.0
