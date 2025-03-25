@@ -1,182 +1,163 @@
-Return-Path: <kvm+bounces-41969-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41970-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8462BA70014
-	for <lists+kvm@lfdr.de>; Tue, 25 Mar 2025 14:11:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EBC7A700C0
+	for <lists+kvm@lfdr.de>; Tue, 25 Mar 2025 14:16:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12ACD19A281F
-	for <lists+kvm@lfdr.de>; Tue, 25 Mar 2025 12:58:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02D641766F9
+	for <lists+kvm@lfdr.de>; Tue, 25 Mar 2025 13:09:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FCC329AAE5;
-	Tue, 25 Mar 2025 12:27:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FF1526B087;
+	Tue, 25 Mar 2025 12:36:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BOK/wPKS"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="R6aoxlLP"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30A5D26656F;
-	Tue, 25 Mar 2025 12:27:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F1C29CB20
+	for <kvm@vger.kernel.org>; Tue, 25 Mar 2025 12:36:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742905630; cv=none; b=lSA3gxwGMP/D51a9ShRV/Oui4UEy61exe2Mv+BKBak0UgB7m4jJIHGjj0+7TLuFR2KNhEFA/mczgbvnRp03mEMupxoD1KJHWdo+Eujo1UCBc+T2KCqPNJp3JJWS/nBdfOfzxjPuPTxGe3gYu5R7Ep3kT/Q4o1XEk6hLYrPSeR0c=
+	t=1742906202; cv=none; b=B4k0G+YpyabpIsRmN+dEe7Q6p40uFDaOIwMZaWJzGBYuFcoKo5lgbWiBJYrcOg9BAmHoASGOZtWhonvmqQvd8GjuNkvDrEPeQ0ggtdFLUp0349Tbri6zLVthHU95LAbI5Bc/knzzfTSmyQZ9HdktJ8CFJJ/EuQqKI9Cov12vgbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742905630; c=relaxed/simple;
-	bh=AWjl4tBrnhRkcRiex/88q6k6fRAmxNwISnnYEf7182Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=m7H9qapBaAXxp+Tk/PZCNHDJ6C4mD/pSePwrd1a/6/Tpx1ArkIgEI3BWkrsbOuqwD6m/wzfajLNCAzXD44K6TbUyVOB/5XfCwq9++a2oUEsNuZanagW71We/UNy58cXcTT44MAPbwL1lWHgx6/qYWxj98cbkeF7XQEDU70gebQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BOK/wPKS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EF18C4CEE4;
-	Tue, 25 Mar 2025 12:26:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742905629;
-	bh=AWjl4tBrnhRkcRiex/88q6k6fRAmxNwISnnYEf7182Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BOK/wPKSymoONoK8d8zXPGGMy5MG+aYpHf3TkadCLwDPTOQJGUAW9et07ZG7zCZWv
-	 ef4pdsDxtkJTHjY+SAKtAcW26il80oDtB38MozaTEhXlGd4IkrTlN3tIWkXmAwnoLn
-	 BzHu8ImCylu3Yb81WL68Buni1g0ODfLOGd7OBrnKV/M2af0y77JoFV43LSNATjnN4G
-	 9CzIE3AozXUaiD7HuaDWAl0wAkWF1HUbFGm1CJxGQ45QPczxfx9HKr6TYKmSS9kPAD
-	 gZpFZHUBEZFz8k7KsyAguseekaOJzmeEib25mONLZRMhFlnpUorLwGTrqPnI6I56MM
-	 2bv1z0/9P4X3A==
-From: guoren@kernel.org
-To: arnd@arndb.de,
-	gregkh@linuxfoundation.org,
-	torvalds@linux-foundation.org,
-	paul.walmsley@sifive.com,
-	palmer@dabbelt.com,
-	anup@brainfault.org,
-	atishp@atishpatra.org,
-	oleg@redhat.com,
-	kees@kernel.org,
-	tglx@linutronix.de,
-	will@kernel.org,
-	mark.rutland@arm.com,
-	brauner@kernel.org,
-	akpm@linux-foundation.org,
-	rostedt@goodmis.org,
-	edumazet@google.com,
-	unicorn_wang@outlook.com,
-	inochiama@outlook.com,
-	gaohan@iscas.ac.cn,
-	shihua@iscas.ac.cn,
-	jiawei@iscas.ac.cn,
-	wuwei2016@iscas.ac.cn,
-	drew@pdp7.com,
-	prabhakar.mahadev-lad.rj@bp.renesas.com,
-	ctsai390@andestech.com,
-	wefu@redhat.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	josef@toxicpanda.com,
-	dsterba@suse.com,
-	mingo@redhat.com,
-	peterz@infradead.org,
-	boqun.feng@gmail.com,
-	guoren@kernel.org,
-	xiao.w.wang@intel.com,
-	qingfang.deng@siflower.com.cn,
-	leobras@redhat.com,
-	jszhang@kernel.org,
-	conor.dooley@microchip.com,
-	samuel.holland@sifive.com,
-	yongxuan.wang@sifive.com,
-	luxu.kernel@bytedance.com,
-	david@redhat.com,
-	ruanjinjie@huawei.com,
-	cuiyunhui@bytedance.com,
-	wangkefeng.wang@huawei.com,
-	qiaozhe@iscas.ac.cn
-Cc: ardb@kernel.org,
-	ast@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-input@vger.kernel.org,
-	linux-perf-users@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org,
-	maple-tree@lists.infradead.org,
-	linux-trace-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-atm-general@lists.sourceforge.net,
-	linux-btrfs@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	linux-nfs@vger.kernel.org,
-	linux-sctp@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	linux-media@vger.kernel.org
-Subject: [RFC PATCH V3 43/43] riscv: Fixup address space overlay of print_mlk
-Date: Tue, 25 Mar 2025 08:16:24 -0400
-Message-Id: <20250325121624.523258-44-guoren@kernel.org>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20250325121624.523258-1-guoren@kernel.org>
-References: <20250325121624.523258-1-guoren@kernel.org>
+	s=arc-20240116; t=1742906202; c=relaxed/simple;
+	bh=kF/4SP83eP8Xbwc4RoYXxSygK8pZn4d3t2Dba+Ka8B8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aIxl3s1BETCyNnOlwYouZz7WwYXHan81bXGgSk5xTOCD0/hJNWETV2G6stA9EP2Wpcyo/fXwxGEzsZQo0FfyrAbTybSujTzvrixuQo7n3vrYZLuueetCe83GJzE8uYVom7Q1RHuNW01LmfynJ+8S52bxlNuYAOGZjfehkrdx2hY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=R6aoxlLP; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-47688ae873fso56414241cf.0
+        for <kvm@vger.kernel.org>; Tue, 25 Mar 2025 05:36:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1742906199; x=1743510999; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kF/4SP83eP8Xbwc4RoYXxSygK8pZn4d3t2Dba+Ka8B8=;
+        b=R6aoxlLPQAkjRJPVn6UQKY+axJtOgCb9opi7uMwdqzSxq6yDpzVJboXoMURzqFNmXG
+         L4O6evUJSpFvB1ok/nkAvZ2ctxsJoJGXuCD5Hfcl44KP64YYXU13GEP0YO8Nau/AluDo
+         dwmvpAQBTe1LqtUycADgDK7X5PVMkLiTdnUNXX0D9l0eroks0GyGaEG2e0DV8VX4ddgC
+         7zSjqhv0fWoL3gPf+VGU1+rXRM5Nwx0srQafUgfbqXPk3xjimSWRPzLHwxPFJ/VzIJm8
+         styI2AyIntvNjgTTu1Uz79TV7Z9P2nkoB/bDnkzGibSm9AMzCtsSkHlsSbxQRi2emnYn
+         A+Nw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742906199; x=1743510999;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kF/4SP83eP8Xbwc4RoYXxSygK8pZn4d3t2Dba+Ka8B8=;
+        b=JKgbkuNOEfYikJqmg/BDAkLTiVhjqfirJX3QApRSSf+7gwlipkQSdk5MIHJf9GygCc
+         AbRJL7dnPY8EZ0eZT5iXL+DFk9lS4ySSBUCEnrlWlXAusoIjZdhJs1qu3Dx5oRF8y5lT
+         +kDvpGZrnnMl1h2QBmXGmeUJSzYKl6ADC+0WtHlswRmz2v7Nr94bquTiboWAK+b9C54d
+         B/jYDa4V0HB2YIu1o1cSmRZ9RVD5sOhy1eLluRmg6mRDp/w1p0VTKSk8agNu+cKxHTBa
+         8O06G3qJfkjaC4mqqLElzf/wceeCe4TfZC4MwQBQVX79SidTYiDAsN7WuhYeoN3QzGWw
+         YOvA==
+X-Forwarded-Encrypted: i=1; AJvYcCUxOlTvOC4yr8PC0UVnqn35EdIj9UdvPNULApGSXzAQ802hh4CWs6UsUwk+9V0OJorZpaE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPs3KTE0Q0ro6h038QWahmVhD5/cDaU9I91KEFEH+glpvFh8zK
+	Mo6sRgm3wTmRy6m3BEs14VBzO6rHifJuOl5uvFMnXbot9uoyjx+uCeb9lqmBeao=
+X-Gm-Gg: ASbGncuOtm3/sIIJGIiZKW+BY6rjvC3kYRm86OV6W93OsEMHUPTsUY0XPkz4s1dd/ir
+	hbOIWMhc3wOR77Es8XCOD5MoRO49TIE41WgZ3iaKz0m2FhK+z5LWK0MC7PtifpUlIx3d3VREwwF
+	f0Oo/Dt7mBTwwRxJaFsdP3/SlJvzfHk/x5YLzU8XvQ+J2d35qZXCA6iVeFNBfluPt3HLzPr8V5O
+	l8zzHaRStb8nj7tHkWVkYm/gGz338f8C3hoas5bGrwRxbRTMFFdRMN61GqMUs0ngh6iSRc8PU8H
+	w0oz0vVnlh8E4MsahA==
+X-Google-Smtp-Source: AGHT+IFaGG2Y6kZs0f1G4EEOh4+V+xY6UlM60nMPDSox/R89SepA61uky3NuOhrbXo7zMnxqikKbBQ==
+X-Received: by 2002:a05:622a:4106:b0:477:cc4:cb76 with SMTP id d75a77b69052e-4771dd54452mr310138501cf.3.1742906199124;
+        Tue, 25 Mar 2025 05:36:39 -0700 (PDT)
+Received: from ziepe.ca ([99.209.85.25])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4771d63597dsm59500991cf.71.2025.03.25.05.36.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Mar 2025 05:36:38 -0700 (PDT)
+Received: from jgg by jggl with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1tx3WH-0003AX-NS;
+	Tue, 25 Mar 2025 09:36:37 -0300
+Date: Tue, 25 Mar 2025 09:36:37 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Robin Murphy <robin.murphy@arm.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH v7 00/17] Provide a new two step DMA mapping API
+Message-ID: <Z+KjVVpPttE3Ci62@ziepe.ca>
+References: <cover.1738765879.git.leonro@nvidia.com>
+ <20250220124827.GR53094@unreal>
+ <1166a5f5-23cc-4cce-ba40-5e10ad2606de@arm.com>
+ <20250302085717.GO53094@unreal>
+ <e024fe3d-bddf-4006-8535-656fd0a3fada@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e024fe3d-bddf-4006-8535-656fd0a3fada@arm.com>
 
-From: "Guo Ren (Alibaba DAMO Academy)" <guoren@kernel.org>
+On Fri, Mar 21, 2025 at 04:05:22PM +0000, Robin Murphy wrote:
 
-If phyical memory is 1GiB for ilp32 linux, then print_mlk would be:
-lowmem : 0xc0000000 - 0x00000000   ( 1024 MB)
+> What everyone seems to have missed is that while it is technically true that
+> the streaming DMA API doesn't need a literal struct page, it still very much
+> depends on something which having a struct page makes it sufficiently safe
+> to assume: that what it's being given is valid kernel memory that it can do
+> things like phys_to_virt() or kmap_atomic() on.
 
-After fixup:
-lowmem : 0xc0000000 - 0xffffffff   ( 1024 MB)
+No one has missed this, we are not yet at the point of implementing a
+non-struct page PFN only path. That is going to be a followup series,
+and yes there are going to need to be some cases where DMA will get
+EOPNOTSUPP. You can't swiotlb something without a kmap, or MMIO for
+instance.
 
-Signed-off-by: Guo Ren (Alibaba DAMO Academy) <guoren@kernel.org>
----
- arch/riscv/mm/init.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+> efficiently. And pushing the complexity into every caller to encourage and
+> normalise drivers calling virt_to_phys() all over (_so_ many bugs there...)
 
-diff --git a/arch/riscv/mm/init.c b/arch/riscv/mm/init.c
-index 3cdbb033860e..e09286d4916a 100644
---- a/arch/riscv/mm/init.c
-+++ b/arch/riscv/mm/init.c
-@@ -105,26 +105,26 @@ static void __init zone_sizes_init(void)
- 
- static inline void print_mlk(char *name, unsigned long b, unsigned long t)
- {
--	pr_notice("%12s : 0x%08lx - 0x%08lx   (%4ld kB)\n", name, b, t,
-+	pr_notice("%12s : 0x%08lx - 0x%08lx   (%4ld kB)\n", name, b, t - 1,
- 		  (((t) - (b)) >> LOG2_SZ_1K));
- }
- 
- static inline void print_mlm(char *name, unsigned long b, unsigned long t)
- {
--	pr_notice("%12s : 0x%08lx - 0x%08lx   (%4ld MB)\n", name, b, t,
-+	pr_notice("%12s : 0x%08lx - 0x%08lx   (%4ld MB)\n", name, b, t - 1,
- 		  (((t) - (b)) >> LOG2_SZ_1M));
- }
- 
- static inline void print_mlg(char *name, unsigned long b, unsigned long t)
- {
--	pr_notice("%12s : 0x%08lx - 0x%08lx   (%4ld GB)\n", name, b, t,
-+	pr_notice("%12s : 0x%08lx - 0x%08lx   (%4ld GB)\n", name, b, t - 1,
- 		   (((t) - (b)) >> LOG2_SZ_1G));
- }
- 
- #if BITS_PER_LONG == 64
- static inline void print_mlt(char *name, unsigned long b, unsigned long t)
- {
--	pr_notice("%12s : 0x%08lx - 0x%08lx   (%4ld TB)\n", name, b, t,
-+	pr_notice("%12s : 0x%08lx - 0x%08lx   (%4ld TB)\n", name, b, t - 1,
- 		   (((t) - (b)) >> LOG2_SZ_1T));
- }
- #else
--- 
-2.40.1
+That is unlikely to be how things end up.
 
+> and pass magic flags to influence internal behaviour of the API
+> implementation clearly isn't scalable. Don't think I haven't seen the other
+> thread where Christian had the same concern that this "sounds like an
+> absolutely horrible design."
+
+Christian's perspective is thinking about DMABUF exporters using CPU
+PFNs to mmap them to VMAs. Which is a uniquely DRM API abuse.
+
+I think everyone who has really dug into this stuff understands that
+the driver that is going to perform the DMA should be the one to do
+the DMA mapping. It makes little sense for the driver providing the
+memory to do the DMA mapping on behalf of the driver programming the
+HW for DMA.
+
+Regardless it doesn't really change this series as the same DMA API
+interface to the driver is required to do the work. It doesn't matter
+if the DMABUF API puts the calls on the exporter or importer side of
+it's API.
+
+> So what is it now, a layering violation in a hat with still no clear path to
+> support SWIOTLB?
+
+I was under the impression Leon had been testing SWIOTLB?
+
+What does "no clear path to support SWIOTLB" mean?
+
+Jason
 
