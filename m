@@ -1,212 +1,211 @@
-Return-Path: <kvm+bounces-41885-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41886-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61AE6A6E832
-	for <lists+kvm@lfdr.de>; Tue, 25 Mar 2025 02:59:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C77CA6E845
+	for <lists+kvm@lfdr.de>; Tue, 25 Mar 2025 03:15:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A31D3B8C6E
-	for <lists+kvm@lfdr.de>; Tue, 25 Mar 2025 01:58:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 238BF1892C84
+	for <lists+kvm@lfdr.de>; Tue, 25 Mar 2025 02:14:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E9D4190477;
-	Tue, 25 Mar 2025 01:58:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S6r7GxtJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD124171E49;
+	Tue, 25 Mar 2025 02:14:39 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE3D142A9D
-	for <kvm@vger.kernel.org>; Tue, 25 Mar 2025 01:57:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BECFD2AF07;
+	Tue, 25 Mar 2025 02:14:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742867879; cv=none; b=YpNX1pTj4++xZHYMdScEOQ1+pDP62LmhYCVGsXB84o+wSo6SPulYQPZt07dgfUyoaf+iqsaOAsNE5AsHqk148v/WC3l0jjT9E9MQU3W1jjm505SHzNlCdBX+smHEqth47EWIML49f7ckP5Joc9jr1ZkB3OcT1GnaRr28fXvrso4=
+	t=1742868879; cv=none; b=goaPMJUEkMWcSM0qYtuoUFBSHSoyV8JbBB6cKsuf6Nz+bzm9N62BM/z5maqEfzCuJqifOC5JsEW2nCwOSQdFcwAa/U4s+kZMhlASGS1TxowSp4LAF7qzzpChdbqlKpK/DCjgVc7+Oaor4D/HFAqIbwYp9GOoxvZ/xfFRRY7YtO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742867879; c=relaxed/simple;
-	bh=ugsMpxNkJUSFp+7lz8ioeDr01ht/xTBvE8gTxUNDI9A=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=oOwfQ5SAEDTzZ2UOP5IumapnSIQXpURMaDg/d92sLyfbPuqKpvCQPR7SE6XIxUiEVAtbaelHOjCn9a2/9xe5gosugl/IohIB8h40kl/FTRvKpVcxzu/0Z+cuNKv7O6KXFQRyim4Hc4MOFdtdh9f2nUAQPu9kmB1NJSFqcIRmO2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S6r7GxtJ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742867875;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QJ8V4OG2SIBR15qRmgINunGJlllawBsHryHVXkf+1VU=;
-	b=S6r7GxtJCD6/GXxcDswQl+yWPVHx+PBBbJTJtVijLyFpi9g+qprbRqsmoitwy/z2715NBJ
-	B+p6SJy5/oNL6ONqZhITKDfdahCef4sTywPxoGGYabCurt09SBl8guy6D32ZFRWeznTQyA
-	0QIfw1gW6Ke5g49+StdCuw0wpOETdgU=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-16-QrdUzY6RNTiwNCnTTmx6UQ-1; Mon,
- 24 Mar 2025 21:57:52 -0400
-X-MC-Unique: QrdUzY6RNTiwNCnTTmx6UQ-1
-X-Mimecast-MFC-AGG-ID: QrdUzY6RNTiwNCnTTmx6UQ_1742867870
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3680619560BB;
-	Tue, 25 Mar 2025 01:57:50 +0000 (UTC)
-Received: from starship.lan (unknown [10.22.65.191])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BE190180176A;
-	Tue, 25 Mar 2025 01:57:47 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: kvm@vger.kernel.org
-Cc: Muhammad Usama Anjum <usama.anjum@collabora.com>,
-	linux-kernel@vger.kernel.org,
-	Sean Christopherson <seanjc@google.com>,
-	Maxim Levitsky <mlevitsk@redhat.com>,
-	James Houghton <jthoughton@google.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	linux-kselftest@vger.kernel.org,
-	Anup Patel <anup@brainfault.org>
-Subject: [PATCH v2 2/2] KVM: selftests: access_tracking_perf_test: add option to skip the sanity check
-Date: Mon, 24 Mar 2025 21:57:41 -0400
-Message-Id: <20250325015741.2478906-3-mlevitsk@redhat.com>
-In-Reply-To: <20250325015741.2478906-1-mlevitsk@redhat.com>
-References: <20250325015741.2478906-1-mlevitsk@redhat.com>
+	s=arc-20240116; t=1742868879; c=relaxed/simple;
+	bh=jqUSCzJ3m/V47PgBm4XDMGM6+4BqyAaqVaAF0z8nO50=;
+	h=Subject:From:To:Cc:References:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=PuDnLmYXcSiISMZJZkasn2g3nUtDhEO5zcQDNh/sP2ZxsokkmDRHsOQoC1pdR60nkiphT3J349Zkb+rbiVNZZMPm0wOJHZXUl1TnRgG0krp6d5haQLHoLUJn690TXYL07TADzqydUG5ivQdPxDfuWtkM9W8JkL/mBdJzwyjp+O0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8DxjXKCEeJn9gWlAA--.14796S3;
+	Tue, 25 Mar 2025 10:14:26 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowMCxbsV9EeJnzKJeAA--.19172S3;
+	Tue, 25 Mar 2025 10:14:25 +0800 (CST)
+Subject: Re: [RFC V2] LoongArch: KVM: Handle interrupt early before enabling
+ irq
+From: bibo mao <maobibo@loongson.cn>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ Sean Christopherson <seanjc@google.com>
+Cc: Huacai Chen <chenhuacai@kernel.org>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>, loongarch@lists.linux.dev,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20250311074737.3160546-1-maobibo@loongson.cn>
+Message-ID: <c220d043-2314-85bb-e99d-dc2c609aa739@loongson.cn>
+Date: Tue, 25 Mar 2025 10:13:41 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <20250311074737.3160546-1-maobibo@loongson.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-CM-TRANSID:qMiowMCxbsV9EeJnzKJeAA--.19172S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxur4kGrW5Jry5ZF18ZF4kKrX_yoWrZr18pF
+	W7CanYkrs5JFyxXwnrtw4v9r13WrZ3Kry3Z3s7J3ySyw4ayFy8tr4kK39IqF1rK3ykJ3WI
+	qFyFkw1qk3Z8twcCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6F4UJVW0owAaw2AFwI0_Jrv_JF1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
+	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jrv_
+	JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrw
+	CYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
+	6r4UMxCIbckI1I0E14v26r1Y6r17MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
+	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AK
+	xVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxU2MKZDUUUU
 
-Add an option to skip sanity check of number of still idle pages,
-and set it by default to skip, in case hypervisor or NUMA balancing
-is detected.
+Hi Paolo, Sean
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- .../selftests/kvm/access_tracking_perf_test.c | 33 ++++++++++++++++---
- .../testing/selftests/kvm/include/test_util.h |  1 +
- tools/testing/selftests/kvm/lib/test_util.c   |  7 ++++
- 3 files changed, 37 insertions(+), 4 deletions(-)
+This idea comes from x86, do you have any guidance or suggestion about it?
 
-diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-index 3c7defd34f56..6d50c829f00c 100644
---- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
-+++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-@@ -65,6 +65,8 @@ static int vcpu_last_completed_iteration[KVM_MAX_VCPUS];
- /* Whether to overlap the regions of memory vCPUs access. */
- static bool overlap_memory_access;
- 
-+static int warn_on_too_many_idle_pages = -1;
-+
- struct test_params {
- 	/* The backing source for the region of memory. */
- 	enum vm_mem_backing_src_type backing_src;
-@@ -184,11 +186,10 @@ static void mark_vcpu_memory_idle(struct kvm_vm *vm,
- 	 * are cached and the guest won't see the "idle" bit cleared.
- 	 */
- 	if (still_idle >= pages / 10) {
--#ifdef __x86_64__
--		TEST_ASSERT(this_cpu_has(X86_FEATURE_HYPERVISOR),
-+		TEST_ASSERT(warn_on_too_many_idle_pages,
- 			    "vCPU%d: Too many pages still idle (%lu out of %lu)",
- 			    vcpu_idx, still_idle, pages);
--#endif
-+
- 		printf("WARNING: vCPU%d: Too many pages still idle (%lu out of %lu), "
- 		       "this will affect performance results.\n",
- 		       vcpu_idx, still_idle, pages);
-@@ -342,6 +343,8 @@ static void help(char *name)
- 	printf(" -v: specify the number of vCPUs to run.\n");
- 	printf(" -o: Overlap guest memory accesses instead of partitioning\n"
- 	       "     them into a separate region of memory for each vCPU.\n");
-+	printf(" -w: Skip or force enable the check that after dirtying the guest memory, most (90%%) of \n"
-+	       "it is reported as dirty again (0/1)");
- 	backing_src_help("-s");
- 	puts("");
- 	exit(0);
-@@ -359,7 +362,7 @@ int main(int argc, char *argv[])
- 
- 	guest_modes_append_default();
- 
--	while ((opt = getopt(argc, argv, "hm:b:v:os:")) != -1) {
-+	while ((opt = getopt(argc, argv, "hm:b:v:os:w:")) != -1) {
- 		switch (opt) {
- 		case 'm':
- 			guest_modes_cmdline(optarg);
-@@ -376,6 +379,11 @@ int main(int argc, char *argv[])
- 		case 's':
- 			params.backing_src = parse_backing_src_type(optarg);
- 			break;
-+		case 'w':
-+			warn_on_too_many_idle_pages =
-+				atoi_non_negative("1 - enable warning, 0 - disable",
-+						  optarg);
-+			break;
- 		case 'h':
- 		default:
- 			help(argv[0]);
-@@ -386,6 +394,23 @@ int main(int argc, char *argv[])
- 	page_idle_fd = open("/sys/kernel/mm/page_idle/bitmap", O_RDWR);
- 	__TEST_REQUIRE(page_idle_fd >= 0,
- 		       "CONFIG_IDLE_PAGE_TRACKING is not enabled");
-+	if (warn_on_too_many_idle_pages == -1) {
-+#ifdef __x86_64__
-+		if (this_cpu_has(X86_FEATURE_HYPERVISOR)) {
-+			printf("Skipping idle page count sanity check, because the test is run nested\n");
-+			warn_on_too_many_idle_pages = 0;
-+		} else
-+#endif
-+		if (is_numa_balancing_enabled()) {
-+			printf("Skipping idle page count sanity check, because NUMA balance is enabled\n");
-+			warn_on_too_many_idle_pages = 0;
-+		} else {
-+			warn_on_too_many_idle_pages = 1;
-+		}
-+	} else if (!warn_on_too_many_idle_pages) {
-+		printf("Skipping idle page count sanity check, because this was requested by the user\n");
-+	}
-+
- 	close(page_idle_fd);
- 
- 	for_each_guest_mode(run_test, &params);
-diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
-index 3e473058849f..1bc9b0a92427 100644
---- a/tools/testing/selftests/kvm/include/test_util.h
-+++ b/tools/testing/selftests/kvm/include/test_util.h
-@@ -153,6 +153,7 @@ bool is_backing_src_hugetlb(uint32_t i);
- void backing_src_help(const char *flag);
- enum vm_mem_backing_src_type parse_backing_src_type(const char *type_name);
- long get_run_delay(void);
-+bool is_numa_balancing_enabled(void);
- 
- /*
-  * Whether or not the given source type is shared memory (as opposed to
-diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
-index 3dc8538f5d69..03eb99af9b8d 100644
---- a/tools/testing/selftests/kvm/lib/test_util.c
-+++ b/tools/testing/selftests/kvm/lib/test_util.c
-@@ -176,6 +176,13 @@ size_t get_trans_hugepagesz(void)
- 	return get_sysfs_val("/sys/kernel/mm/transparent_hugepage/hpage_pmd_size");
- }
- 
-+bool is_numa_balancing_enabled(void)
-+{
-+	if (!test_sysfs_path("/proc/sys/kernel/numa_balancing"))
-+		return false;
-+	return get_sysfs_val("/proc/sys/kernel/numa_balancing") == 1;
-+}
-+
- size_t get_def_hugetlb_pagesz(void)
- {
- 	char buf[64];
--- 
-2.26.3
+Also I notice that there is such irq_enable()/irq_disable() pair on x86, 
+I do not know why it is so.
+     local_irq_enable();
+     ++vcpu->stat.exits;
+     local_irq_disable();
+     guest_timing_exit_irqoff();
+     local_irq_enable();
+
+Regards
+Bibo Mao
+
+On 2025/3/11 下午3:47, Bibo Mao wrote:
+> If interrupt arrive when vCPU is running, vCPU will exit because of
+> interrupt exception. Currently interrupt exception is handled after
+> local_irq_enable() is called, and it is handled by host kernel rather
+> than KVM hypervisor. It will introduce extra another interrupt
+> exception and then host will handle irq.
+> 
+> If KVM hypervisor detect that it is interrupt exception, interrupt
+> can be handle early in KVM hypervisor before local_irq_enable() is
+> called.
+> 
+> On 3C5000 dual-way machine, there will be 10% -- 15% performance
+> improvement with netperf UDP_RR option with 10G ethernet card.
+>                     original     with patch    improvement
+>    netperf UDP_RR     7200          8100           +12%
+> 
+> The total performance is low because irqchip is emulated in qemu VMM,
+> however from the same testbed, there is performance improvement
+> actually.
+> 
+> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+> ---
+> v1 ... v2:
+>    1. Move guest_timing_exit_irqoff() after host interrupt handling like
+>       other architectures.
+>    2. Construct interrupt context pt_regs from guest entering context
+>    3. Add cond_resched() after irq enabling
+> ---
+>   arch/loongarch/kernel/traps.c |  1 +
+>   arch/loongarch/kvm/vcpu.c     | 36 ++++++++++++++++++++++++++++++++++-
+>   2 files changed, 36 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/loongarch/kernel/traps.c b/arch/loongarch/kernel/traps.c
+> index 2ec3106c0da3..eed0d8b02ee3 100644
+> --- a/arch/loongarch/kernel/traps.c
+> +++ b/arch/loongarch/kernel/traps.c
+> @@ -1114,6 +1114,7 @@ asmlinkage void noinstr do_vint(struct pt_regs *regs, unsigned long sp)
+>   
+>   	irqentry_exit(regs, state);
+>   }
+> +EXPORT_SYMBOL(do_vint);
+>   
+>   unsigned long eentry;
+>   unsigned long tlbrentry;
+> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+> index 9e1a9b4aa4c6..bab7a71eb965 100644
+> --- a/arch/loongarch/kvm/vcpu.c
+> +++ b/arch/loongarch/kvm/vcpu.c
+> @@ -5,6 +5,7 @@
+>   
+>   #include <linux/kvm_host.h>
+>   #include <linux/entry-kvm.h>
+> +#include <asm/exception.h>
+>   #include <asm/fpu.h>
+>   #include <asm/lbt.h>
+>   #include <asm/loongarch.h>
+> @@ -304,6 +305,23 @@ static int kvm_pre_enter_guest(struct kvm_vcpu *vcpu)
+>   	return ret;
+>   }
+>   
+> +static void kvm_handle_irq(struct kvm_vcpu *vcpu)
+> +{
+> +	struct pt_regs regs, *old;
+> +
+> +	/*
+> +	 * Construct pseudo pt_regs, only necessary registers is added
+> +	 * Interrupt context coming from guest enter context
+> +	 */
+> +	old = (struct pt_regs *)(vcpu->arch.host_sp - sizeof(struct pt_regs));
+> +	/* Disable preemption in irq exit function irqentry_exit() */
+> +	regs.csr_prmd = 0;
+> +	regs.regs[LOONGARCH_GPR_SP] = vcpu->arch.host_sp;
+> +	regs.regs[LOONGARCH_GPR_FP] = old->regs[LOONGARCH_GPR_FP];
+> +	regs.csr_era = old->regs[LOONGARCH_GPR_RA];
+> +	do_vint(&regs, (unsigned long)&regs);
+> +}
+> +
+>   /*
+>    * Return 1 for resume guest and "<= 0" for resume host.
+>    */
+> @@ -321,8 +339,23 @@ static int kvm_handle_exit(struct kvm_run *run, struct kvm_vcpu *vcpu)
+>   
+>   	kvm_lose_pmu(vcpu);
+>   
+> -	guest_timing_exit_irqoff();
+>   	guest_state_exit_irqoff();
+> +
+> +	/*
+> +	 * VM exit because of host interrupts
+> +	 * Handle irq directly before enabling irq
+> +	 */
+> +	if (!ecode && intr)
+> +		kvm_handle_irq(vcpu);
+> +
+> +	/*
+> +	 * Wait until after servicing IRQs to account guest time so that any
+> +	 * ticks that occurred while running the guest are properly accounted
+> +	 * to the guest. Waiting until IRQs are enabled degrades the accuracy
+> +	 * of accounting via context tracking, but the loss of accuracy is
+> +	 * acceptable for all known use cases.
+> +	 */
+> +	guest_timing_exit_irqoff();
+>   	local_irq_enable();
+>   
+>   	trace_kvm_exit(vcpu, ecode);
+> @@ -331,6 +364,7 @@ static int kvm_handle_exit(struct kvm_run *run, struct kvm_vcpu *vcpu)
+>   	} else {
+>   		WARN(!intr, "vm exiting with suspicious irq\n");
+>   		++vcpu->stat.int_exits;
+> +		cond_resched();
+>   	}
+>   
+>   	if (ret == RESUME_GUEST)
+> 
+> base-commit: 80e54e84911a923c40d7bee33a34c1b4be148d7a
+> 
 
 
