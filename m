@@ -1,211 +1,137 @@
-Return-Path: <kvm+bounces-41886-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41887-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C77CA6E845
-	for <lists+kvm@lfdr.de>; Tue, 25 Mar 2025 03:15:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB6CFA6E8CE
+	for <lists+kvm@lfdr.de>; Tue, 25 Mar 2025 05:14:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 238BF1892C84
-	for <lists+kvm@lfdr.de>; Tue, 25 Mar 2025 02:14:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49F5017202E
+	for <lists+kvm@lfdr.de>; Tue, 25 Mar 2025 04:14:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD124171E49;
-	Tue, 25 Mar 2025 02:14:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81F3C1A5B86;
+	Tue, 25 Mar 2025 04:14:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bTSvGoW2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BECFD2AF07;
-	Tue, 25 Mar 2025 02:14:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33A7353365
+	for <kvm@vger.kernel.org>; Tue, 25 Mar 2025 04:13:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742868879; cv=none; b=goaPMJUEkMWcSM0qYtuoUFBSHSoyV8JbBB6cKsuf6Nz+bzm9N62BM/z5maqEfzCuJqifOC5JsEW2nCwOSQdFcwAa/U4s+kZMhlASGS1TxowSp4LAF7qzzpChdbqlKpK/DCjgVc7+Oaor4D/HFAqIbwYp9GOoxvZ/xfFRRY7YtO0=
+	t=1742876041; cv=none; b=j8Qn//2N5KIyFatJSwCLEtcG/q++3iKjChR3kM5HoUucgvaGV82tP3vysrfgS5G2tvMHGjSpwtuyiy4WD6vBZYCVdq1l8kGn5JRYclIS72peuQNz5UsTnZ4hYBAgR4BVbLUfhnjfe9lZnCU2aToKiPmoGE8AQKjmIt9zIPPJys4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742868879; c=relaxed/simple;
-	bh=jqUSCzJ3m/V47PgBm4XDMGM6+4BqyAaqVaAF0z8nO50=;
-	h=Subject:From:To:Cc:References:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=PuDnLmYXcSiISMZJZkasn2g3nUtDhEO5zcQDNh/sP2ZxsokkmDRHsOQoC1pdR60nkiphT3J349Zkb+rbiVNZZMPm0wOJHZXUl1TnRgG0krp6d5haQLHoLUJn690TXYL07TADzqydUG5ivQdPxDfuWtkM9W8JkL/mBdJzwyjp+O0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8DxjXKCEeJn9gWlAA--.14796S3;
-	Tue, 25 Mar 2025 10:14:26 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowMCxbsV9EeJnzKJeAA--.19172S3;
-	Tue, 25 Mar 2025 10:14:25 +0800 (CST)
-Subject: Re: [RFC V2] LoongArch: KVM: Handle interrupt early before enabling
- irq
-From: bibo mao <maobibo@loongson.cn>
-To: Paolo Bonzini <pbonzini@redhat.com>,
- Sean Christopherson <seanjc@google.com>
-Cc: Huacai Chen <chenhuacai@kernel.org>,
- Tianrui Zhao <zhaotianrui@loongson.cn>, loongarch@lists.linux.dev,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20250311074737.3160546-1-maobibo@loongson.cn>
-Message-ID: <c220d043-2314-85bb-e99d-dc2c609aa739@loongson.cn>
-Date: Tue, 25 Mar 2025 10:13:41 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1742876041; c=relaxed/simple;
+	bh=3TAwYkMl/7Jrwu+foCwYFjf4/ZKYpnei3D4Wl9VvD1A=;
+	h=Date:Message-Id:Mime-Version:Subject:From:To:Cc:Content-Type; b=Y+kaelzWfQmFtT/LsotD/BC5DttBtzJgOUERy7WcEVQDa2I0OlJjqsdSnsyA6Q2yTryFrQZCuUlgNMYjHVBsN7udG9B+bYpnHz/xS5l1TaOKkC+qekwPh+Xdrobdyfrpe88U5KMp4menm0hL0n1zgB8fTvMW5rokm4lSzUC3DXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--suleiman.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bTSvGoW2; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--suleiman.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e582bfcada6so8139386276.1
+        for <kvm@vger.kernel.org>; Mon, 24 Mar 2025 21:13:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1742876039; x=1743480839; darn=vger.kernel.org;
+        h=cc:to:from:subject:mime-version:message-id:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=EJASGRGmrPcwpU7CqSRwJwZcThKb/XyXZK/AkLrGpAk=;
+        b=bTSvGoW2tcKUFol305j8zVwTqtJBPxwgMsiZ1O9M3/gj/0eG+pJ0eO+42EJNTIYkDj
+         VJUdpk8zyIWkT9RXKickVnaRPogW0bHMT6kuyjKOa6Nd3LXWWD3Rz3v9eJDMTMITsNCB
+         nuIQlff3Lf3EXwwkvBJL44aqlfeyEFy8qZDlWq87szTkkJdDhgBDZo6rjHPsyGnS562m
+         YK6/2xsux1BRWqmzWEtPFp01TVd9vi3kuQz5y01XZRl7i6OsuQFLsRkuetx3TUzzc+h5
+         1diN6d4W5ltYMNSbquVfC1ASBrDSEwda2vGn+ZdP5kGO9tYOtWwjc+C110ZlIWwyz53j
+         D3Ew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742876039; x=1743480839;
+        h=cc:to:from:subject:mime-version:message-id:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EJASGRGmrPcwpU7CqSRwJwZcThKb/XyXZK/AkLrGpAk=;
+        b=wwlEvkQsQRvgWAb0u/+eNmRZdyG7FLzeGtDVKOdMAGsR6C3zKw3JVKpyo6Miag/owp
+         RjkzJAMd1vHAQBeXRBHgNwcfFLTXqfEu6U86Zzqu+W1UEw8ImE4NMjLE52YCD/hjjabZ
+         ee474+jvdQ46hmjuQCOLhUoKRjUK/GIWrcLNnSQRNDjn7HSxLMFB+htHCUgYehBk4+ut
+         GS46lSRx+8Gayx2UwRnpSv+yhWdGrWGACfDJTWCygn0Mt3C0A00eO1iWOQWb3v/2d+Kv
+         /vzyCgncYD0z4i62bSrRLpqJrnRHsocLkJcrV6zrrxQiHpbe6vgO4j4TpkIiQ3ih5J8d
+         8kkA==
+X-Forwarded-Encrypted: i=1; AJvYcCU90xql0UAFSE3fq6zzMyUCDLFecuTPbAC6rSo6g+/dzFoTyfJFdYZ9lUzGHga6g2Aj64Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxjH/TqCGLg49D/lHNS+Xlih6mrMB8IHaJRLvVGzy1vGWCQ7tV+
+	cOsKtHX9lEgB56Mu/GLc96y/c3Kr9oYbU64u552OI4+cDtf+KMnPdh0b52CvcNaJC72WC0ivz3z
+	W23Fsj9U7lA==
+X-Google-Smtp-Source: AGHT+IFRXyADSH1VG1iqof3ddCopTGj+wUY0S7x/42w9GR77Lq+bRsylsnD/Z9GFSuEUsXLsmUb1Qkhap5kX8Q==
+X-Received: from suleiman1.tok.corp.google.com ([2401:fa00:8f:203:858a:76d0:aa73:eec8])
+ (user=suleiman job=sendgmr) by 2002:a25:b582:0:b0:e63:65c4:798a with SMTP id
+ 3f1490d57ef6-e66a4fd11a3mr11205276.7.1742876038884; Mon, 24 Mar 2025 21:13:58
+ -0700 (PDT)
+Date: Tue, 25 Mar 2025 13:13:48 +0900
+Message-Id: <20250325041350.1728373-1-suleiman@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20250311074737.3160546-1-maobibo@loongson.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMCxbsV9EeJnzKJeAA--.19172S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWxur4kGrW5Jry5ZF18ZF4kKrX_yoWrZr18pF
-	W7CanYkrs5JFyxXwnrtw4v9r13WrZ3Kry3Z3s7J3ySyw4ayFy8tr4kK39IqF1rK3ykJ3WI
-	qFyFkw1qk3Z8twcCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6F4UJVW0owAaw2AFwI0_Jrv_JF1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
-	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jrv_
-	JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrw
-	CYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
-	6r4UMxCIbckI1I0E14v26r1Y6r17MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
-	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
-	0xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
-	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AK
-	xVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxU2MKZDUUUU
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.395.g12beb8f557-goog
+Subject: [PATCH v5 0/2] KVM: x86: Include host suspended time in steal time
+From: Suleiman Souhlal <suleiman@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Chao Gao <chao.gao@intel.com>, 
+	David Woodhouse <dwmw2@infradead.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	ssouhlal@freebsd.org, Suleiman Souhlal <suleiman@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Paolo, Sean
+This series makes it so that the time that the host is suspended is
+included in guests' steal time.
 
-This idea comes from x86, do you have any guidance or suggestion about it?
+When the host resumes from a suspend, the guest thinks any task
+that was running during the suspend ran for a long time, even though
+the effective run time was much shorter, which can end up having
+negative effects with scheduling.
 
-Also I notice that there is such irq_enable()/irq_disable() pair on x86, 
-I do not know why it is so.
-     local_irq_enable();
-     ++vcpu->stat.exits;
-     local_irq_disable();
-     guest_timing_exit_irqoff();
-     local_irq_enable();
+To mitigate this issue, we include the time that the host was
+suspended in steal time, which lets the guest can subtract the
+duration from the tasks' runtime.
 
-Regards
-Bibo Mao
+In addition, we make the guest TSC behavior consistent whether the
+host TSC went backwards or not.
 
-On 2025/3/11 下午3:47, Bibo Mao wrote:
-> If interrupt arrive when vCPU is running, vCPU will exit because of
-> interrupt exception. Currently interrupt exception is handled after
-> local_irq_enable() is called, and it is handled by host kernel rather
-> than KVM hypervisor. It will introduce extra another interrupt
-> exception and then host will handle irq.
-> 
-> If KVM hypervisor detect that it is interrupt exception, interrupt
-> can be handle early in KVM hypervisor before local_irq_enable() is
-> called.
-> 
-> On 3C5000 dual-way machine, there will be 10% -- 15% performance
-> improvement with netperf UDP_RR option with 10G ethernet card.
->                     original     with patch    improvement
->    netperf UDP_RR     7200          8100           +12%
-> 
-> The total performance is low because irqchip is emulated in qemu VMM,
-> however from the same testbed, there is performance improvement
-> actually.
-> 
-> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
-> ---
-> v1 ... v2:
->    1. Move guest_timing_exit_irqoff() after host interrupt handling like
->       other architectures.
->    2. Construct interrupt context pt_regs from guest entering context
->    3. Add cond_resched() after irq enabling
-> ---
->   arch/loongarch/kernel/traps.c |  1 +
->   arch/loongarch/kvm/vcpu.c     | 36 ++++++++++++++++++++++++++++++++++-
->   2 files changed, 36 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/loongarch/kernel/traps.c b/arch/loongarch/kernel/traps.c
-> index 2ec3106c0da3..eed0d8b02ee3 100644
-> --- a/arch/loongarch/kernel/traps.c
-> +++ b/arch/loongarch/kernel/traps.c
-> @@ -1114,6 +1114,7 @@ asmlinkage void noinstr do_vint(struct pt_regs *regs, unsigned long sp)
->   
->   	irqentry_exit(regs, state);
->   }
-> +EXPORT_SYMBOL(do_vint);
->   
->   unsigned long eentry;
->   unsigned long tlbrentry;
-> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-> index 9e1a9b4aa4c6..bab7a71eb965 100644
-> --- a/arch/loongarch/kvm/vcpu.c
-> +++ b/arch/loongarch/kvm/vcpu.c
-> @@ -5,6 +5,7 @@
->   
->   #include <linux/kvm_host.h>
->   #include <linux/entry-kvm.h>
-> +#include <asm/exception.h>
->   #include <asm/fpu.h>
->   #include <asm/lbt.h>
->   #include <asm/loongarch.h>
-> @@ -304,6 +305,23 @@ static int kvm_pre_enter_guest(struct kvm_vcpu *vcpu)
->   	return ret;
->   }
->   
-> +static void kvm_handle_irq(struct kvm_vcpu *vcpu)
-> +{
-> +	struct pt_regs regs, *old;
-> +
-> +	/*
-> +	 * Construct pseudo pt_regs, only necessary registers is added
-> +	 * Interrupt context coming from guest enter context
-> +	 */
-> +	old = (struct pt_regs *)(vcpu->arch.host_sp - sizeof(struct pt_regs));
-> +	/* Disable preemption in irq exit function irqentry_exit() */
-> +	regs.csr_prmd = 0;
-> +	regs.regs[LOONGARCH_GPR_SP] = vcpu->arch.host_sp;
-> +	regs.regs[LOONGARCH_GPR_FP] = old->regs[LOONGARCH_GPR_FP];
-> +	regs.csr_era = old->regs[LOONGARCH_GPR_RA];
-> +	do_vint(&regs, (unsigned long)&regs);
-> +}
-> +
->   /*
->    * Return 1 for resume guest and "<= 0" for resume host.
->    */
-> @@ -321,8 +339,23 @@ static int kvm_handle_exit(struct kvm_run *run, struct kvm_vcpu *vcpu)
->   
->   	kvm_lose_pmu(vcpu);
->   
-> -	guest_timing_exit_irqoff();
->   	guest_state_exit_irqoff();
-> +
-> +	/*
-> +	 * VM exit because of host interrupts
-> +	 * Handle irq directly before enabling irq
-> +	 */
-> +	if (!ecode && intr)
-> +		kvm_handle_irq(vcpu);
-> +
-> +	/*
-> +	 * Wait until after servicing IRQs to account guest time so that any
-> +	 * ticks that occurred while running the guest are properly accounted
-> +	 * to the guest. Waiting until IRQs are enabled degrades the accuracy
-> +	 * of accounting via context tracking, but the loss of accuracy is
-> +	 * acceptable for all known use cases.
-> +	 */
-> +	guest_timing_exit_irqoff();
->   	local_irq_enable();
->   
->   	trace_kvm_exit(vcpu, ecode);
-> @@ -331,6 +364,7 @@ static int kvm_handle_exit(struct kvm_run *run, struct kvm_vcpu *vcpu)
->   	} else {
->   		WARN(!intr, "vm exiting with suspicious irq\n");
->   		++vcpu->stat.int_exits;
-> +		cond_resched();
->   	}
->   
->   	if (ret == RESUME_GUEST)
-> 
-> base-commit: 80e54e84911a923c40d7bee33a34c1b4be148d7a
-> 
+v5:
+- Fix grammar mistakes in commit message.
+
+v4: https://lore.kernel.org/kvm/20250221053927.486476-1-suleiman@google.com/T/
+- Advance guest TSC on suspends where host TSC goes backwards.
+- Block vCPUs from running until resume notifier.
+- Move suspend duration accounting out of machine-independent kvm to
+  x86.
+- Merge code and documentation patches.
+- Reworded documentation.
+
+v3: https://lore.kernel.org/kvm/Z5AB-6bLRNLle27G@google.com/T/
+- Use PM notifier instead of syscore ops (kvm_suspend()/kvm_resume()),
+  because the latter doesn't get called on shallow suspend.
+- Don't call function under UACCESS.
+- Whitespace.
+
+v2: https://lore.kernel.org/lkml/20241118043745.1857272-1-suleiman@google.com/
+- Accumulate suspend time at machine-independent kvm layer and track per-VCPU
+  instead of per-VM.
+- Document changes.
+
+v1: https://lore.kernel.org/kvm/20240710074410.770409-1-suleiman@google.com/
+
+Suleiman Souhlal (2):
+  KVM: x86: Advance guest TSC after deep suspend.
+  KVM: x86: Include host suspended time in steal time
+
+ Documentation/virt/kvm/x86/msr.rst | 10 +++-
+ arch/x86/include/asm/kvm_host.h    |  7 +++
+ arch/x86/kvm/x86.c                 | 84 +++++++++++++++++++++++++++++-
+ 3 files changed, 98 insertions(+), 3 deletions(-)
+
+-- 
+2.49.0.395.g12beb8f557-goog
 
 
