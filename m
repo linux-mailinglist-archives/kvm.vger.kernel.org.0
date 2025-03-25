@@ -1,141 +1,199 @@
-Return-Path: <kvm+bounces-41990-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41991-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5654CA709B7
-	for <lists+kvm@lfdr.de>; Tue, 25 Mar 2025 19:58:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8B77A709C4
+	for <lists+kvm@lfdr.de>; Tue, 25 Mar 2025 20:01:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3BA96189D97A
-	for <lists+kvm@lfdr.de>; Tue, 25 Mar 2025 18:52:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 603298428CF
+	for <lists+kvm@lfdr.de>; Tue, 25 Mar 2025 18:56:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C8A1E1E1D;
-	Tue, 25 Mar 2025 18:46:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C11391F417A;
+	Tue, 25 Mar 2025 18:51:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yv1r0u2H"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IfOPRDuI"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E855B1C6FFF
-	for <kvm@vger.kernel.org>; Tue, 25 Mar 2025 18:46:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531D61F4179
+	for <kvm@vger.kernel.org>; Tue, 25 Mar 2025 18:51:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742928409; cv=none; b=d/8YC9sAJhgSTEspolRbkxK9fvqaueRvkIYzQQrDI+AYGh3frUnEChkA5NGem9CTVE1Iw90mhM3M6jG1eDMbf1RH53eS/m8jbC0dcyt+hCSnuAT7GN84AXs/Jm5nV+x6yTRk5SEsdIj1JZ1xnv3P1+WZGQyOUEARnlGQiTe9K3E=
+	t=1742928717; cv=none; b=HIgmp+bE5RdC9MUz774qrfwupAxPCg+J//Qge05Px1G/UJuYuJrkjy3VemPs66o9zn+7Jp1ZyLDfMuJyk9HXidxEoJsh8KkJZ4ZwljLnx7/WZJyMdkQ2xX3HOghr9fBiO9kw7aJIWnvw+7wiAbGCe0llZif3X5wHiQEZYXsG1cs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742928409; c=relaxed/simple;
-	bh=uH3irTP3zXmAb3aGzFghU1gKMvLS5WMAIkInFcjJdEA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E4ztn/trOr5J0rhErQzURzC+ECri/Ns5KE8c0JlkERus0KLyJXTe+gB3QOiWsfk+YAAz2hoKfYp/d7N54VE8ZIIRuTnpV9z8R7gUZO0RGmMfQbRZSRFh1aVrisKtFL8yJMYVPrLqPwa9xkJ84PAdO8GF12Sxzgkyc3Izy30mV5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Yv1r0u2H; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1742928717; c=relaxed/simple;
+	bh=2xXGFLVwkInmobcJUBE5/1UQyq/cvN0CxyPECWhZDZM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ISwhFp2DNpPUjhzCm+j1pRPv9S62ne2A7DXQ4wpvMuKD8JU34lBwr6H/iTQqfnX5gr37vVXT4kqDAb5azO4ifmzp5o5mnJ0eHeXNaaSMkMRCtxcVu2sAnijqYRMmoxFVyEkRARouZmP4pD47RpL8ql+BuICwHnTwuX9Ow9vxzg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IfOPRDuI; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742928406;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
-	bh=hKa7QnrXX6+uetxxUeYkejthJ5t555o/0s469UnOHVg=;
-	b=Yv1r0u2HgTU1xWgOhurEK70CR5OHyPuraaQyrnx1/EoQhW8UXgDMUamv0CNcpKw2UGAEnB
-	ocW8c4asFodbaenwhDpsejNPU8iKK9LJDx9wYWa5y9MFdjISpSMPgNahDOXcFYMNvb8FQV
-	xY19/o9REH+7nz8gUCAZ1HushNyOeWI=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-604-4C4bLYNMPJ-qjfR7jXaPDA-1; Tue,
- 25 Mar 2025 14:46:43 -0400
-X-MC-Unique: 4C4bLYNMPJ-qjfR7jXaPDA-1
-X-Mimecast-MFC-AGG-ID: 4C4bLYNMPJ-qjfR7jXaPDA_1742928402
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B9574180AF50;
-	Tue, 25 Mar 2025 18:46:41 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.28.51])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DD9DD1801756;
-	Tue, 25 Mar 2025 18:46:36 +0000 (UTC)
-Date: Tue, 25 Mar 2025 18:46:33 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Igor Mammedov <imammedo@redhat.com>, Zhao Liu <zhao1.liu@intel.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Eric Blake <eblake@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	Francesco Lavra <francescolavra.fl@gmail.com>,
-	qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v7 52/52] docs: Add TDX documentation
-Message-ID: <Z-L6CSajU284qAJ4@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20250124132048.3229049-1-xiaoyao.li@intel.com>
- <20250124132048.3229049-53-xiaoyao.li@intel.com>
+	s=mimecast20190719; t=1742928713;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=t8j8FcQOo2vXT0+x/EC8FM0KhlfrmjmrMAU0Mg5SiOs=;
+	b=IfOPRDuIJb6mcD26eVv03HxOHVXjlqMmW0qdvja63G+EVtDAVTS+71vN8WxEgkUXbDe99M
+	F67N3MqKl7LwUKqlMCtKh+lQlo/4gADy46882U41Z5/rvMgl+tWjJ2qPpXZZMw7G37rYlA
+	IDue9AQ4G+f8s20KPbZEqVHW7WgO2E8=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-74-XwQsMSYWO2-tjtDj3XZEMw-1; Tue, 25 Mar 2025 14:51:52 -0400
+X-MC-Unique: XwQsMSYWO2-tjtDj3XZEMw-1
+X-Mimecast-MFC-AGG-ID: XwQsMSYWO2-tjtDj3XZEMw_1742928711
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6e8f9450b19so2507206d6.1
+        for <kvm@vger.kernel.org>; Tue, 25 Mar 2025 11:51:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742928711; x=1743533511;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=t8j8FcQOo2vXT0+x/EC8FM0KhlfrmjmrMAU0Mg5SiOs=;
+        b=wEHS51NnS76mlHrn8kj+62ysj/aNUVCUfKBSvCOO0HDu7zBTWFwmWscFA8AsnczPTA
+         Y2n+UWJvYKwLrYH5J2WSdSCVFaGUOuCrk+JMcr7ONbOxi8GY6nUr7Vf45JyWXT3T3rh5
+         PFrn7+nxQOEtm+BCojDpaFezjjSUTmwQ6lbmG5MLoh4qIwvDZn0fpH3kSorb/+6lHGBf
+         TGtvj/rTSuZRxiY4ZCGeLB2SnNbAIHTypFm8fXCkTZWSWMdQuW0VjUGSgFgCJKrT0Vrm
+         4IVfk4iGFR5hbqLuBI7fPIX0bJMq8HkOy6/Abs23wS7H30SZP1gpH77dS6AszZzqY6lv
+         Diug==
+X-Forwarded-Encrypted: i=1; AJvYcCX5lhyT4TaD1/7vhx7s+UEZ4X78AERaxmw8buWFTQlm3UAiyVQuU6O2k3rMY7/zdOeikFg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnQD8Y3EAwjIYXRRwh2IXjEtom00iT3nPYyN3ujNcycNrkW/ac
+	M7XHHIzq6UfiFKsO1tsRX6LgyRTCyRI4Zfw5ANGkAeO2QXMEguYQZ9qLBKZDECRULFGZ+R+5D+e
+	AeqU1FoTj+G9L3+LDLwZBlagPxVVDAsm39nRBjB5m5PsUJPHk0Q==
+X-Gm-Gg: ASbGncstxln3yZBxNxhR40Vy0utzgae/3Tzv6nDQufhBv934JfxOv0H9P9bUfVM+cCa
+	RC1lIEKRNmTskm8nFioTUj8lxDaD8zql/8PDL/qUF2QgIk70RM3C18/4kcKJ45P+sGOtlM7B+IN
+	LamHUI6AP9lhp/5JJ9ZM0MgNMJq0rDhBQj8+OQJhQKdO2wE4eeMeqkEZQ2M19VS2+gf82mNZJLv
+	ytOW2BCt3TxEivOZn+xlkfNY6eqFiHOCuSKLvYr66pwU8SlFQzxRjwluJdHB+9x1QP6zqm+DFS+
+	Uqvqpm8tE+ly
+X-Received: by 2002:a0c:eb46:0:b0:6ea:d503:6cfd with SMTP id 6a1803df08f44-6ed16cde3f6mr12230706d6.19.1742928711434;
+        Tue, 25 Mar 2025 11:51:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFqYQjFn4K1j4fuehDL2vDnCV4xeKoEsPSC3k3g7nw2h2mfdx1DkNTmzNbOxS9v9bBBC08uag==
+X-Received: by 2002:a0c:eb46:0:b0:6ea:d503:6cfd with SMTP id 6a1803df08f44-6ed16cde3f6mr12229966d6.19.1742928710955;
+        Tue, 25 Mar 2025 11:51:50 -0700 (PDT)
+Received: from [172.20.3.205] ([99.209.85.25])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6eb3efc5952sm58924306d6.83.2025.03.25.11.51.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Mar 2025 11:51:50 -0700 (PDT)
+Message-ID: <0e1d8823-620f-420c-86a5-35495ccbd10f@redhat.com>
+Date: Tue, 25 Mar 2025 19:51:47 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250124132048.3229049-53-xiaoyao.li@intel.com>
-User-Agent: Mutt/2.2.13 (2024-03-09)
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH V3 00/43] rv64ilp32_abi: Build CONFIG_64BIT
+ kernel-self with ILP32 ABI
+To: Peter Zijlstra <peterz@infradead.org>, guoren@kernel.org
+Cc: arnd@arndb.de, gregkh@linuxfoundation.org, torvalds@linux-foundation.org,
+ paul.walmsley@sifive.com, palmer@dabbelt.com, anup@brainfault.org,
+ atishp@atishpatra.org, oleg@redhat.com, kees@kernel.org, tglx@linutronix.de,
+ will@kernel.org, mark.rutland@arm.com, brauner@kernel.org,
+ akpm@linux-foundation.org, rostedt@goodmis.org, edumazet@google.com,
+ unicorn_wang@outlook.com, inochiama@outlook.com, gaohan@iscas.ac.cn,
+ shihua@iscas.ac.cn, jiawei@iscas.ac.cn, wuwei2016@iscas.ac.cn,
+ drew@pdp7.com, prabhakar.mahadev-lad.rj@bp.renesas.com,
+ ctsai390@andestech.com, wefu@redhat.com, kuba@kernel.org, pabeni@redhat.com,
+ josef@toxicpanda.com, dsterba@suse.com, mingo@redhat.com,
+ boqun.feng@gmail.com, xiao.w.wang@intel.com, qingfang.deng@siflower.com.cn,
+ leobras@redhat.com, jszhang@kernel.org, conor.dooley@microchip.com,
+ samuel.holland@sifive.com, yongxuan.wang@sifive.com,
+ luxu.kernel@bytedance.com, ruanjinjie@huawei.com, cuiyunhui@bytedance.com,
+ wangkefeng.wang@huawei.com, qiaozhe@iscas.ac.cn, ardb@kernel.org,
+ ast@kernel.org, linux-kernel@vger.kernel.org,
+ linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, linux-mm@kvack.org,
+ linux-crypto@vger.kernel.org, bpf@vger.kernel.org,
+ linux-input@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-serial@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-arch@vger.kernel.org, maple-tree@lists.infradead.org,
+ linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-atm-general@lists.sourceforge.net, linux-btrfs@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ linux-nfs@vger.kernel.org, linux-sctp@vger.kernel.org,
+ linux-usb@vger.kernel.org, linux-media@vger.kernel.org
+References: <20250325121624.523258-1-guoren@kernel.org>
+ <20250325122640.GK36322@noisy.programming.kicks-ass.net>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20250325122640.GK36322@noisy.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jan 24, 2025 at 08:20:48AM -0500, Xiaoyao Li wrote:
-> Add docs/system/i386/tdx.rst for TDX support, and add tdx in
-> confidential-guest-support.rst
+On 25.03.25 13:26, Peter Zijlstra wrote:
+> On Tue, Mar 25, 2025 at 08:15:41AM -0400, guoren@kernel.org wrote:
+>> From: "Guo Ren (Alibaba DAMO Academy)" <guoren@kernel.org>
+>>
+>> Since 2001, the CONFIG_64BIT kernel has been built with the LP64 ABI,
+>> but this patchset allows the CONFIG_64BIT kernel to use an ILP32 ABI
 > 
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> ---
+> I'm thinking you're going to be finding a metric ton of assumptions
+> about 'unsigned long' being 64bit when 64BIT=y throughout the kernel.
+> 
+> I know of a couple of places where 64BIT will result in different math
+> such that a 32bit 'unsigned long' will trivially overflow.
+> 
+> Please, don't do this. This adds a significant maintenance burden on all
+> of us.
+> 
 
-> ---
->  docs/system/confidential-guest-support.rst |   1 +
->  docs/system/i386/tdx.rst                   | 156 +++++++++++++++++++++
->  docs/system/target-i386.rst                |   1 +
->  3 files changed, 158 insertions(+)
->  create mode 100644 docs/system/i386/tdx.rst
+Fully agreed.
 
-
-> +Launching a TD (TDX VM)
-> +-----------------------
-> +
-> +To launch a TD, the necessary command line options are tdx-guest object and
-> +split kernel-irqchip, as below:
-> +
-> +.. parsed-literal::
-> +
-> +    |qemu_system_x86| \\
-> +        -object tdx-guest,id=tdx0 \\
-> +        -machine ...,kernel-irqchip=split,confidential-guest-support=tdx0 \\
-> +        -bios OVMF.fd \\
-> +
-> +Restrictions
-> +------------
-> +
-> + - kernel-irqchip must be split;
-
-Is there a reason why we don't make QEMU set kernel-irqchip=split
-automatically when tdx-guest is enabled ?
-
-It feels silly to default to a configuration that is known to be
-broken with TDX. I thought about making libvirt automatically
-set kernel-irqchip=split, or even above that making virt-install
-automatically set it. Addressing it in QEMU would seem the most
-appropriate place though.
-
-
-With regards,
-Daniel
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Cheers,
+
+David / dhildenb
 
 
