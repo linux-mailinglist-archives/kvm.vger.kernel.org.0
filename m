@@ -1,199 +1,243 @@
-Return-Path: <kvm+bounces-41991-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-41992-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8B77A709C4
-	for <lists+kvm@lfdr.de>; Tue, 25 Mar 2025 20:01:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 700EAA709D7
+	for <lists+kvm@lfdr.de>; Tue, 25 Mar 2025 20:03:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 603298428CF
-	for <lists+kvm@lfdr.de>; Tue, 25 Mar 2025 18:56:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FBF617E35C
+	for <lists+kvm@lfdr.de>; Tue, 25 Mar 2025 18:56:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C11391F417A;
-	Tue, 25 Mar 2025 18:51:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A99CB1C6FEC;
+	Tue, 25 Mar 2025 18:52:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IfOPRDuI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="13wNtudt"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f202.google.com (mail-il1-f202.google.com [209.85.166.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531D61F4179
-	for <kvm@vger.kernel.org>; Tue, 25 Mar 2025 18:51:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F31919B5A7
+	for <kvm@vger.kernel.org>; Tue, 25 Mar 2025 18:52:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742928717; cv=none; b=HIgmp+bE5RdC9MUz774qrfwupAxPCg+J//Qge05Px1G/UJuYuJrkjy3VemPs66o9zn+7Jp1ZyLDfMuJyk9HXidxEoJsh8KkJZ4ZwljLnx7/WZJyMdkQ2xX3HOghr9fBiO9kw7aJIWnvw+7wiAbGCe0llZif3X5wHiQEZYXsG1cs=
+	t=1742928761; cv=none; b=eNhZPGSozhBVHKMnwzcIJfj43if4726JfyAhzka2wLLsfVhbjelKJmxvtkNbKHJt14Ry7OQVFjfdb5tEzeatBnJOmbc5uzmtR5xMQZq363fJG/taVe5HBhIBZSCzK3qxaDNKPN2g6tFgvqHQEhl6I+nyD0ccnSxk2FSKSPmG/gc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742928717; c=relaxed/simple;
-	bh=2xXGFLVwkInmobcJUBE5/1UQyq/cvN0CxyPECWhZDZM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ISwhFp2DNpPUjhzCm+j1pRPv9S62ne2A7DXQ4wpvMuKD8JU34lBwr6H/iTQqfnX5gr37vVXT4kqDAb5azO4ifmzp5o5mnJ0eHeXNaaSMkMRCtxcVu2sAnijqYRMmoxFVyEkRARouZmP4pD47RpL8ql+BuICwHnTwuX9Ow9vxzg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IfOPRDuI; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742928713;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=t8j8FcQOo2vXT0+x/EC8FM0KhlfrmjmrMAU0Mg5SiOs=;
-	b=IfOPRDuIJb6mcD26eVv03HxOHVXjlqMmW0qdvja63G+EVtDAVTS+71vN8WxEgkUXbDe99M
-	F67N3MqKl7LwUKqlMCtKh+lQlo/4gADy46882U41Z5/rvMgl+tWjJ2qPpXZZMw7G37rYlA
-	IDue9AQ4G+f8s20KPbZEqVHW7WgO2E8=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-74-XwQsMSYWO2-tjtDj3XZEMw-1; Tue, 25 Mar 2025 14:51:52 -0400
-X-MC-Unique: XwQsMSYWO2-tjtDj3XZEMw-1
-X-Mimecast-MFC-AGG-ID: XwQsMSYWO2-tjtDj3XZEMw_1742928711
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6e8f9450b19so2507206d6.1
-        for <kvm@vger.kernel.org>; Tue, 25 Mar 2025 11:51:52 -0700 (PDT)
+	s=arc-20240116; t=1742928761; c=relaxed/simple;
+	bh=mjUlY3jFSJjaOKRM/bqH7VbePb3z1ii+rpI0lBwhP68=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=FptR2I4xAfN/kKo5qEt/0ruJ0n5tljN1G5v3vtX88ay41UNG4LAt7e/VE3phNlemb4IyX/VUkcAy1RQHtc2iPLlnyrt65MD3GpouKEBgYD1Aex76VrHxp994S8rrTXDcVdxrhoE7wZCJobHcdeGrllgCK3CVcdwwHmjZFosZRgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=13wNtudt; arc=none smtp.client-ip=209.85.166.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-il1-f202.google.com with SMTP id e9e14a558f8ab-3d585d76b79so52283305ab.1
+        for <kvm@vger.kernel.org>; Tue, 25 Mar 2025 11:52:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1742928759; x=1743533559; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=nH4P9eJG9ixX5QbX8zMqKoULuBPy5l5wVy3PBOk0b0g=;
+        b=13wNtudt0qEtd4TWuza1iSfb4nWqnBZBclPosKMI9tpwnNj3XiWh82wK2wpnDwQR1H
+         z0Ro7vOMEhI7nBGi1kLpVPxdhH53Z5e5e7wvE8rKhRtg+z3dDWvpET5BlDChhUviM+aM
+         gDdM0nIGkHrNUM/pB8V3vFyR5oUVGLbOHXUskmMGbKJJyYNQyzK/xKx0BfCNaM32MX6V
+         ee82p37rOyGD3jAo69WPD7BAB00ZYkV5JklFuNmpVe8uutPw6hbroHAyxvkhV83u5m1t
+         qHPZR6rXQyUwKjllUmHwx/P4/C6YNQ+lQUfLfTsSHzaKsyHpBJ+iOC0H9cd/w90nX/xn
+         tBLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742928711; x=1743533511;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=t8j8FcQOo2vXT0+x/EC8FM0KhlfrmjmrMAU0Mg5SiOs=;
-        b=wEHS51NnS76mlHrn8kj+62ysj/aNUVCUfKBSvCOO0HDu7zBTWFwmWscFA8AsnczPTA
-         Y2n+UWJvYKwLrYH5J2WSdSCVFaGUOuCrk+JMcr7ONbOxi8GY6nUr7Vf45JyWXT3T3rh5
-         PFrn7+nxQOEtm+BCojDpaFezjjSUTmwQ6lbmG5MLoh4qIwvDZn0fpH3kSorb/+6lHGBf
-         TGtvj/rTSuZRxiY4ZCGeLB2SnNbAIHTypFm8fXCkTZWSWMdQuW0VjUGSgFgCJKrT0Vrm
-         4IVfk4iGFR5hbqLuBI7fPIX0bJMq8HkOy6/Abs23wS7H30SZP1gpH77dS6AszZzqY6lv
-         Diug==
-X-Forwarded-Encrypted: i=1; AJvYcCX5lhyT4TaD1/7vhx7s+UEZ4X78AERaxmw8buWFTQlm3UAiyVQuU6O2k3rMY7/zdOeikFg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnQD8Y3EAwjIYXRRwh2IXjEtom00iT3nPYyN3ujNcycNrkW/ac
-	M7XHHIzq6UfiFKsO1tsRX6LgyRTCyRI4Zfw5ANGkAeO2QXMEguYQZ9qLBKZDECRULFGZ+R+5D+e
-	AeqU1FoTj+G9L3+LDLwZBlagPxVVDAsm39nRBjB5m5PsUJPHk0Q==
-X-Gm-Gg: ASbGncstxln3yZBxNxhR40Vy0utzgae/3Tzv6nDQufhBv934JfxOv0H9P9bUfVM+cCa
-	RC1lIEKRNmTskm8nFioTUj8lxDaD8zql/8PDL/qUF2QgIk70RM3C18/4kcKJ45P+sGOtlM7B+IN
-	LamHUI6AP9lhp/5JJ9ZM0MgNMJq0rDhBQj8+OQJhQKdO2wE4eeMeqkEZQ2M19VS2+gf82mNZJLv
-	ytOW2BCt3TxEivOZn+xlkfNY6eqFiHOCuSKLvYr66pwU8SlFQzxRjwluJdHB+9x1QP6zqm+DFS+
-	Uqvqpm8tE+ly
-X-Received: by 2002:a0c:eb46:0:b0:6ea:d503:6cfd with SMTP id 6a1803df08f44-6ed16cde3f6mr12230706d6.19.1742928711434;
-        Tue, 25 Mar 2025 11:51:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFqYQjFn4K1j4fuehDL2vDnCV4xeKoEsPSC3k3g7nw2h2mfdx1DkNTmzNbOxS9v9bBBC08uag==
-X-Received: by 2002:a0c:eb46:0:b0:6ea:d503:6cfd with SMTP id 6a1803df08f44-6ed16cde3f6mr12229966d6.19.1742928710955;
-        Tue, 25 Mar 2025 11:51:50 -0700 (PDT)
-Received: from [172.20.3.205] ([99.209.85.25])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6eb3efc5952sm58924306d6.83.2025.03.25.11.51.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Mar 2025 11:51:50 -0700 (PDT)
-Message-ID: <0e1d8823-620f-420c-86a5-35495ccbd10f@redhat.com>
-Date: Tue, 25 Mar 2025 19:51:47 +0100
+        d=1e100.net; s=20230601; t=1742928759; x=1743533559;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nH4P9eJG9ixX5QbX8zMqKoULuBPy5l5wVy3PBOk0b0g=;
+        b=Jn36C7pp/bJLU+o79SbehmD3LuTPMawWkT5oPJMERCuaFDrrDbC06rS1CcbWgVHFLZ
+         PjjW+kS+CU77lmErc2LD7aKqTiasMD9fvHx/igRcUjxiAarbk/np0Y38zetV1gkxll0w
+         2KHHmf8J31eWRdIgt9HUI70qFLjuKsZg/kR7v9doe3wnlY6Xl1agJHs4Qxuw5RsmtPaT
+         3KBHBeT//dl43YOzUJibuU8uvX//Ef974k6tDZZ9IkfpAvTc+7UMfdkQJlw8oNxf8ciE
+         pPcwkC7MddUVRJP59kFOe5hxFVvthq/hrZwauC66wKv15xEja2Xbk23NtaoCC8580Pxn
+         K6CQ==
+X-Gm-Message-State: AOJu0YwbRjq6tL3zsOAfTWsckuby/6KL4ig5qhOvR+zQ/YWm+7m7XMkU
+	VH/cmgV59IHH4+G4oJcM5IuHp8draS/EpAM4ZrCEY6JUGIC0fxITMCv6kWHhoJ8vZDZgDE4P9TQ
+	e9GXqOejxqOazxkIxzGJwqw==
+X-Google-Smtp-Source: AGHT+IFihTn29mkx1GCcsdzB1BWaATm719zstIXb77dxFcanWyTVCgHo5XFcuAcWL7Ck6Mq9GEViCbd4LSLj7nsAJQ==
+X-Received: from ilbcp4.prod.google.com ([2002:a05:6e02:3984:b0:3d2:ad2f:c829])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6e02:3d86:b0:3d0:443d:a5c3 with SMTP id e9e14a558f8ab-3d5960c1226mr193021365ab.3.1742928759319;
+ Tue, 25 Mar 2025 11:52:39 -0700 (PDT)
+Date: Tue, 25 Mar 2025 18:52:38 +0000
+In-Reply-To: <8450a182-5c62-4546-ab91-5d39eb252254@linaro.org> (message from
+ James Clark on Mon, 24 Mar 2025 14:52:26 +0000)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH V3 00/43] rv64ilp32_abi: Build CONFIG_64BIT
- kernel-self with ILP32 ABI
-To: Peter Zijlstra <peterz@infradead.org>, guoren@kernel.org
-Cc: arnd@arndb.de, gregkh@linuxfoundation.org, torvalds@linux-foundation.org,
- paul.walmsley@sifive.com, palmer@dabbelt.com, anup@brainfault.org,
- atishp@atishpatra.org, oleg@redhat.com, kees@kernel.org, tglx@linutronix.de,
- will@kernel.org, mark.rutland@arm.com, brauner@kernel.org,
- akpm@linux-foundation.org, rostedt@goodmis.org, edumazet@google.com,
- unicorn_wang@outlook.com, inochiama@outlook.com, gaohan@iscas.ac.cn,
- shihua@iscas.ac.cn, jiawei@iscas.ac.cn, wuwei2016@iscas.ac.cn,
- drew@pdp7.com, prabhakar.mahadev-lad.rj@bp.renesas.com,
- ctsai390@andestech.com, wefu@redhat.com, kuba@kernel.org, pabeni@redhat.com,
- josef@toxicpanda.com, dsterba@suse.com, mingo@redhat.com,
- boqun.feng@gmail.com, xiao.w.wang@intel.com, qingfang.deng@siflower.com.cn,
- leobras@redhat.com, jszhang@kernel.org, conor.dooley@microchip.com,
- samuel.holland@sifive.com, yongxuan.wang@sifive.com,
- luxu.kernel@bytedance.com, ruanjinjie@huawei.com, cuiyunhui@bytedance.com,
- wangkefeng.wang@huawei.com, qiaozhe@iscas.ac.cn, ardb@kernel.org,
- ast@kernel.org, linux-kernel@vger.kernel.org,
- linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
- kvm-riscv@lists.infradead.org, linux-mm@kvack.org,
- linux-crypto@vger.kernel.org, bpf@vger.kernel.org,
- linux-input@vger.kernel.org, linux-perf-users@vger.kernel.org,
- linux-serial@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-arch@vger.kernel.org, maple-tree@lists.infradead.org,
- linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-atm-general@lists.sourceforge.net, linux-btrfs@vger.kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- linux-nfs@vger.kernel.org, linux-sctp@vger.kernel.org,
- linux-usb@vger.kernel.org, linux-media@vger.kernel.org
-References: <20250325121624.523258-1-guoren@kernel.org>
- <20250325122640.GK36322@noisy.programming.kicks-ass.net>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20250325122640.GK36322@noisy.programming.kicks-ass.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Message-ID: <gsnty0wtlz7t.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [RFC PATCH v3 7/8] perf: arm_pmuv3: Keep out of guest counter partition
+From: Colton Lewis <coltonlewis@google.com>
+To: James Clark <james.clark@linaro.org>
+Cc: kvm@vger.kernel.org, linux@armlinux.org.uk, catalin.marinas@arm.com, 
+	will@kernel.org, maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, 
+	pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-On 25.03.25 13:26, Peter Zijlstra wrote:
-> On Tue, Mar 25, 2025 at 08:15:41AM -0400, guoren@kernel.org wrote:
->> From: "Guo Ren (Alibaba DAMO Academy)" <guoren@kernel.org>
->>
->> Since 2001, the CONFIG_64BIT kernel has been built with the LP64 ABI,
->> but this patchset allows the CONFIG_64BIT kernel to use an ILP32 ABI
-> 
-> I'm thinking you're going to be finding a metric ton of assumptions
-> about 'unsigned long' being 64bit when 64BIT=y throughout the kernel.
-> 
-> I know of a couple of places where 64BIT will result in different math
-> such that a 32bit 'unsigned long' will trivially overflow.
-> 
-> Please, don't do this. This adds a significant maintenance burden on all
-> of us.
-> 
+James Clark <james.clark@linaro.org> writes:
 
-Fully agreed.
+> On 13/02/2025 6:03 pm, Colton Lewis wrote:
+>> If the PMU is partitioned, keep the driver out of the guest counter
+>> partition and only use the host counter partition. Partitioning is
+>> defined by the MDCR_EL2.HPMN register field and saved in
+>> cpu_pmu->hpmn. The range 0..HPMN-1 is accessible by EL1 and EL0 while
+>> HPMN..PMCR.N is reserved for EL2.
 
--- 
-Cheers,
+>> Define some macros that take HPMN as an argument and construct
+>> mutually exclusive bitmaps for testing which partition a particular
+>> counter is in. Note that despite their different position in the
+>> bitmap, the cycle and instruction counters are always in the guest
+>> partition.
 
-David / dhildenb
+>> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+>> ---
+>>    arch/arm/include/asm/arm_pmuv3.h |  2 +
+>>    arch/arm64/include/asm/kvm_pmu.h |  5 +++
+>>    arch/arm64/kvm/pmu-part.c        | 16 +++++++
+>>    drivers/perf/arm_pmuv3.c         | 73 +++++++++++++++++++++++++++-----
+>>    include/linux/perf/arm_pmuv3.h   |  8 ++++
+>>    5 files changed, 94 insertions(+), 10 deletions(-)
 
+>> diff --git a/arch/arm/include/asm/arm_pmuv3.h  
+>> b/arch/arm/include/asm/arm_pmuv3.h
+>> index 2ec0e5e83fc9..dadd4ddf51af 100644
+>> --- a/arch/arm/include/asm/arm_pmuv3.h
+>> +++ b/arch/arm/include/asm/arm_pmuv3.h
+>> @@ -227,6 +227,8 @@ static inline bool kvm_set_pmuserenr(u64 val)
+>>    }
+
+>>    static inline void kvm_vcpu_pmu_resync_el0(void) {}
+>> +static inline void kvm_pmu_host_counters_enable(void) {}
+>> +static inline void kvm_pmu_host_counters_disable(void) {}
+
+>>    /* PMU Version in DFR Register */
+>>    #define ARMV8_PMU_DFR_VER_NI        0
+>> diff --git a/arch/arm64/include/asm/kvm_pmu.h  
+>> b/arch/arm64/include/asm/kvm_pmu.h
+>> index 174b7f376d95..8f25754fde47 100644
+>> --- a/arch/arm64/include/asm/kvm_pmu.h
+>> +++ b/arch/arm64/include/asm/kvm_pmu.h
+>> @@ -25,6 +25,8 @@ void kvm_host_pmu_init(struct arm_pmu *pmu);
+>>    u8 kvm_pmu_get_reserved_counters(void);
+>>    u8 kvm_pmu_hpmn(u8 nr_counters);
+>>    void kvm_pmu_partition(struct arm_pmu *pmu);
+>> +void kvm_pmu_host_counters_enable(void);
+>> +void kvm_pmu_host_counters_disable(void);
+
+>>    #else
+
+>> @@ -37,6 +39,9 @@ static inline bool kvm_set_pmuserenr(u64 val)
+>>    static inline void kvm_vcpu_pmu_resync_el0(void) {}
+>>    static inline void kvm_host_pmu_init(struct arm_pmu *pmu) {}
+
+>> +static inline void kvm_pmu_host_counters_enable(void) {}
+>> +static inline void kvm_pmu_host_counters_disable(void) {}
+>> +
+>>    #endif
+
+>>    #endif
+>> diff --git a/arch/arm64/kvm/pmu-part.c b/arch/arm64/kvm/pmu-part.c
+>> index e74fecc67e37..51da65c678f9 100644
+>> --- a/arch/arm64/kvm/pmu-part.c
+>> +++ b/arch/arm64/kvm/pmu-part.c
+>> @@ -45,3 +45,19 @@ void kvm_pmu_partition(struct arm_pmu *pmu)
+>>    		pmu->partitioned = false;
+>>    	}
+>>    }
+>> +
+>> +void kvm_pmu_host_counters_enable(void)
+>> +{
+>> +	u64 mdcr = read_sysreg(mdcr_el2);
+>> +
+>> +	mdcr |= MDCR_EL2_HPME;
+>> +	write_sysreg(mdcr, mdcr_el2);
+>> +}
+>> +
+>> +void kvm_pmu_host_counters_disable(void)
+>> +{
+>> +	u64 mdcr = read_sysreg(mdcr_el2);
+>> +
+>> +	mdcr &= ~MDCR_EL2_HPME;
+>> +	write_sysreg(mdcr, mdcr_el2);
+>> +}
+>> diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
+>> index 0e360feb3432..442dcff56d5b 100644
+>> --- a/drivers/perf/arm_pmuv3.c
+>> +++ b/drivers/perf/arm_pmuv3.c
+>> @@ -730,15 +730,19 @@ static void armv8pmu_disable_event_irq(struct  
+>> perf_event *event)
+>>    	armv8pmu_disable_intens(BIT(event->hw.idx));
+>>    }
+
+>> -static u64 armv8pmu_getreset_flags(void)
+>> +static u64 armv8pmu_getreset_flags(struct arm_pmu *cpu_pmu)
+>>    {
+>>    	u64 value;
+
+>>    	/* Read */
+>>    	value = read_pmovsclr();
+
+>> +	if (cpu_pmu->partitioned)
+>> +		value &= ARMV8_PMU_HOST_CNT_PART(cpu_pmu->hpmn);
+>> +	else
+>> +		value &= ARMV8_PMU_OVERFLOWED_MASK;
+>> +
+>>    	/* Write to clear flags */
+>> -	value &= ARMV8_PMU_OVERFLOWED_MASK;
+>>    	write_pmovsclr(value);
+
+>>    	return value;
+>> @@ -765,6 +769,18 @@ static void armv8pmu_disable_user_access(void)
+>>    	update_pmuserenr(0);
+>>    }
+
+>> +static bool armv8pmu_is_guest_part(struct arm_pmu *cpu_pmu, u8 idx)
+>> +{
+>> +	return cpu_pmu->partitioned &&
+>> +		(BIT(idx) & ARMV8_PMU_GUEST_CNT_PART(cpu_pmu->hpmn));
+>> +}
+>> +
+>> +static bool armv8pmu_is_host_part(struct arm_pmu *cpu_pmu, u8 idx)
+>> +{
+>> +	return !cpu_pmu->partitioned ||
+>> +		(BIT(idx) & ARMV8_PMU_HOST_CNT_PART(cpu_pmu->hpmn));
+>> +}
+>> +
+>>    static void armv8pmu_enable_user_access(struct arm_pmu *cpu_pmu)
+>>    {
+>>    	int i;
+>> @@ -773,6 +789,8 @@ static void armv8pmu_enable_user_access(struct  
+>> arm_pmu *cpu_pmu)
+>>    	if (is_pmuv3p9(cpu_pmu->pmuver)) {
+>>    		u64 mask = 0;
+>>    		for_each_set_bit(i, cpuc->used_mask, ARMPMU_MAX_HWEVENTS) {
+>> +			if (armv8pmu_is_guest_part(cpu_pmu, i))
+>> +				continue;
+
+> Hi Colton,
+
+> Is it possible to keep the guest bits out of used_mask and cntr_mask in
+> the first place? Then all these loops don't need to have the logic for
+> is_guest_part()/is_host_part().
+
+It should be possible.
+
+> That leads me to wonder about updating the printout:
+
+>    hw perfevents: enabled with armv8_pmuv3_0 PMU driver, 7 (0,8000003f)
+>      counters available
+
+> It might be a bit confusing if that doesn't quite reflect reality anymore.
+
+Good point.
 
