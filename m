@@ -1,228 +1,248 @@
-Return-Path: <kvm+bounces-42040-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42041-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E41BEA71D60
-	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 18:40:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3F03A71E90
+	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 19:41:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20A731888A68
-	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 17:39:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 626E017913B
+	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 18:41:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7783723E323;
-	Wed, 26 Mar 2025 17:38:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABA88253335;
+	Wed, 26 Mar 2025 18:41:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qAf8GKhs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xz8HToQ+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4CE23E235
-	for <kvm@vger.kernel.org>; Wed, 26 Mar 2025 17:38:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00E8B24EF67
+	for <kvm@vger.kernel.org>; Wed, 26 Mar 2025 18:41:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743010720; cv=none; b=cqRiBfOMHMGzNct8ZekvtdZa7Vg1Lq2u/Xn+uj7WtVDalugCoNatPB7ez3TpyY1abVcmV4MoGEKwUtOiOCStX1WTCd8+Z+9wJfDP6gwcA8qZJ0PT6aukDiDHyMx+RRVQBo0Vfetui/Nd1m2WEWhKr03Ds8cXoG934Y4NzexpgJw=
+	t=1743014506; cv=none; b=IXk345eryw5xyyhWpPxLzYKYl9DylF42CCiCgriTRK5xl5hTNzsbt+1eIYUN1o3y8M5MjVOm+w9QRBZxn9zU30/Il0lfEPQosvWwRcLZJGd4QEAKRWwb4JWf35Pi8wxS7LHw7NlhVlSWBbsDlwBKpxRVD7ulmf9bUoE8eoyAiIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743010720; c=relaxed/simple;
-	bh=2oIE0G5XW4T1LPwCREw3CNOAFjNp0UmQyd+rq0p3SvM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tuGEM5oby90YMubdOEOkuGINiPxRMXZbFecnZAQOYBlLCIIUqoSjDHfCZLgnnO60I79QBvPx8Ajj2RqnEw6X6T4tDOxlauDbF5cNwCw9LREz/OdII4zhLtYn+XUhZWejvRZJPs9mW/n1a87UCSg9ErT+qQU9GhjW+9Woon0rtmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qAf8GKhs; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-43cef035a3bso1013765e9.1
-        for <kvm@vger.kernel.org>; Wed, 26 Mar 2025 10:38:37 -0700 (PDT)
+	s=arc-20240116; t=1743014506; c=relaxed/simple;
+	bh=VVc2l+RicUNkNGY2b16Zifrn/ayX0O/xBaNwcPR177s=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=gMr7o3o3eSzCKpWpoGOqIkFV+ROwCkKgeIY7+TFfciZ2cNFFswXnX1C0q1ss42w7+R1+nsZm+LqM2i5+6iUAMhXKu463CDM66lCAeFfweIxqdspeS/t5yOtsELYLA9e020XxNsz4d6xttB3qp4SL40nmVUEiue/xhoW1CpWv+rI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xz8HToQ+; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ff69646218so258045a91.3
+        for <kvm@vger.kernel.org>; Wed, 26 Mar 2025 11:41:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1743010716; x=1743615516; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8qVND4tenJBQx/xK/Ve6LMeZrg3oeI6UK9LzOuingT0=;
-        b=qAf8GKhs0mwZ5APlu1v6/MlD3HXENHCsRwusJcb2T7JaxMCsb20kceDcdrvEyfYgJf
-         zAEynptz/CFcxNrXFHvTQXP3Q1HoP8n5CwBEvhY2vHmbeIwVPzm0LOrGb4Xg4q8zAgLb
-         fpH25XTmjLsrkFDyGb1gjjWqi7T7p3BYlFW8R4MWW50qZCu7VRZ8vCgVlYC1N82glLW3
-         QqK/G2jFgfSEJ3jpJusF6XYYiWqRCXiQDDxXg/4DTd7f+BG6l/6iGNX0tJY1XYdFDj9d
-         Ww5h9TAekOIIeCo+wgdQoEN8m4yH4Q3DAgAqfEo9oOFHcetzq4ViBfy10+m9j+hqG6/i
-         k8+Q==
+        d=google.com; s=20230601; t=1743014504; x=1743619304; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=b0rQ7XUfLkQfGZ5vjukC+h9cixCqTMdpfEOutTgyqNI=;
+        b=xz8HToQ+ylbG0V6i48ssIeX9WI/dVoFrhOeEvWWshavZQq5x+FsNpg67X01+6cK/QG
+         gDsmKDWZqwLD+2mhpUGNTfCjwfqM3rnVq86um8iJ64gsFgPOuJcJUogCQrH+ljlTJEM4
+         YY7E2PZaf/om9R1m5pKq7/TsEzJPfXdwHByj1107orAeyn63iDnAwgzZJ8o0y6fOeQQ8
+         n8bvwOcZ/ElfXox5msnNrP9xliL/i0J3u/gTkTf0Bfa3y/8pDBNmb6xMyj0i2jL4ASOD
+         jywiNyr7RXz8tSoeMOLa7kreTBV2vEGmU2LTfMgQTkf5DLEdrUFpirlrNtYRrdv48kQB
+         bdVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743010716; x=1743615516;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8qVND4tenJBQx/xK/Ve6LMeZrg3oeI6UK9LzOuingT0=;
-        b=xMSWXJWi/g7h7niYdXm2i+t88hVAZfyz1HoQT+Ejt4PxYt9RphU/0CdfzGSRiQW23F
-         NQ+KcFfCE6HDbVCOpQpLyZeYYzK8X7wWSeG6wtwMiMBMXbKsRWKCMz47KcgF35YLF2A2
-         KzbsLNFv/qfO4gMl354Sr5ShdvRz2ZrQKkRgnm+tmHcsYsnbZQ76A4fMKvVmaBGwO0fu
-         /Nd1pcLMPAiC5mJYs5Gi1+XNxIYkwmiXNCLHcI3hTIk/6klS3kBgG2zfGDa095hLDy9P
-         SfXqgVCfZocIvxG94qI9Z8ARsVySTziXsbn5W9PjaR/YWGfmGAg8Yi1rUqxGGw8Wm+BQ
-         +uXQ==
-X-Gm-Message-State: AOJu0Yxy/NyISswavUukpoKZrGJU6E++y39tMOH4EtdeNq1bYR8uK4Wm
-	RByioWuFFA70wCAihVf7W2L+8HUHMDPxyfOtc30pggDf4k1g4uNLa7CnIWkmKtw=
-X-Gm-Gg: ASbGncuy4FEWlixYDHk8xQx/DEmvtfHXlxC4JMuKrwQyUdTwImKirJMh4i0Ph/ie+jc
-	oqzVabmNt4dw8KuuR2GeKmXcX6mxDl4aGLDQajUSB7qBk/Wlw8t4K9hrPglSvCec6iC0aB0SRNj
-	dznF10YNgLeR2FO/6fMeKQ/ifPQorXoQ/0TFfMJ9HYwOfF6wf/kX/v7vxnpoghS0TccXI3FCl/L
-	1YMJ5cqAnVgC4blBdUYvBbItd9nJhPRFBS+1s+l2URX4rUQK3bNhCUARLnUsgY+iqKVoaCQxku6
-	tmoXgMLspxgvgU/y+s2CHAQAMPNC0/eabvJy6XpVIhHt5f2R5A==
-X-Google-Smtp-Source: AGHT+IFWImSgAxE2tnY9m2ZViZ+epH+rNo6E42n/cKyi3Pxy880VgCejpCzrgRBe13sBLMsd3ILXAQ==
-X-Received: by 2002:a05:600c:1e0d:b0:43d:10c:2f60 with SMTP id 5b1f17b1804b1-43d8524f43cmr2296105e9.24.1743010716400;
-        Wed, 26 Mar 2025 10:38:36 -0700 (PDT)
-Received: from [192.168.1.247] ([77.81.75.81])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3997f9a6326sm17050515f8f.29.2025.03.26.10.38.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Mar 2025 10:38:36 -0700 (PDT)
-Message-ID: <f7d543f6-2660-460f-88ac-741dd47ed440@linaro.org>
-Date: Wed, 26 Mar 2025 17:38:34 +0000
+        d=1e100.net; s=20230601; t=1743014504; x=1743619304;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=b0rQ7XUfLkQfGZ5vjukC+h9cixCqTMdpfEOutTgyqNI=;
+        b=CGyYydjFIAL2qVHI+hcqXumC1kVv9QLSEGWkB+tgL1ePgR4DZOIC/KrcWbHMWqrl3H
+         YDituGfjfMRERO2valreyli1tGHymTrjbSvSbuDiT/Si8NNoXPj416hAcNBqVWqYIbpl
+         Sy3t2Is7MjfgK1yG5cWlL2rwiT12P2iVFY/IYSsKrtVTbBTrgLPeH3jRUQOmDxCBQ1bl
+         U+jEhjdNT/HcUVVSX//MEVI+ffI76rK/SfeoRvZDGq/eKjstrm0cG1JHynxihPsgUwKK
+         WLrtWbtGyL5nrRTu2MmO6mphqwUycz6qVem8oNNGk/1e9tNwSwLvVH5Kc3ZwfJc9z+Pz
+         Rxhw==
+X-Forwarded-Encrypted: i=1; AJvYcCX9UvJL4FspSmzcjmg9+a+o5w2GBNyGx7VyI6CYtvWgbAxQb3ICQ1u4TB11IWfgA4BfEk0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVJ8JjtABiTRVRBaA65yiuYC4H5gZ6Tw4Qw/J6kVzf0HYJJE+W
+	93AZ7gJI2IJZABM5DjEb579QiJL1swkUWek+hJ2qR68bQTij1QFDyiuYjZ3SisSMcBehnFjxSJy
+	IxA==
+X-Google-Smtp-Source: AGHT+IGYOoK6Qcw78W9ZnM4jh2jTBVQGR9cWfoA9Lc2F9ro2+49zKJCs1PFrziVBd1fP1tMWosQcGl/OD1k=
+X-Received: from pjl13.prod.google.com ([2002:a17:90b:2f8d:b0:2ea:46ed:5d3b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:c106:b0:2ff:6aa6:47a3
+ with SMTP id 98e67ed59e1d1-303a9171aa0mr1173178a91.25.1743014504284; Wed, 26
+ Mar 2025 11:41:44 -0700 (PDT)
+Date: Wed, 26 Mar 2025 11:41:42 -0700
+In-Reply-To: <CADrL8HWrgbV+coEod_EUnvG27HX3WtJDMua3FPiReCRCtXaNhw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 5/8] KVM: arm64: Introduce module param to
- partition the PMU
-To: Colton Lewis <coltonlewis@google.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvm@vger.kernel.org, robh@kernel.org, linux@armlinux.org.uk,
- catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
- oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
- yuzenghui@huawei.com, mark.rutland@arm.com, pbonzini@redhat.com,
- shuah@kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <gsnt1pulnepv.fsf@coltonlewis-kvm.c.googlers.com>
-Content-Language: en-US
-From: James Clark <james.clark@linaro.org>
-In-Reply-To: <gsnt1pulnepv.fsf@coltonlewis-kvm.c.googlers.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20250325015741.2478906-1-mlevitsk@redhat.com> <20250325015741.2478906-3-mlevitsk@redhat.com>
+ <CADrL8HWrgbV+coEod_EUnvG27HX3WtJDMua3FPiReCRCtXaNhw@mail.gmail.com>
+Message-ID: <Z-RKZsQngjEgcfVU@google.com>
+Subject: Re: [PATCH v2 2/2] KVM: selftests: access_tracking_perf_test: add
+ option to skip the sanity check
+From: Sean Christopherson <seanjc@google.com>
+To: James Houghton <jthoughton@google.com>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, 
+	Muhammad Usama Anjum <usama.anjum@collabora.com>, linux-kernel@vger.kernel.org, 
+	Shuah Khan <shuah@kernel.org>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, 
+	linux-kselftest@vger.kernel.org, Anup Patel <anup@brainfault.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Mar 25, 2025, James Houghton wrote:
+> On Mon, Mar 24, 2025 at 6:57=E2=80=AFPM Maxim Levitsky <mlevitsk@redhat.c=
+om> wrote:
+> >
+> > Add an option to skip sanity check of number of still idle pages,
+> > and set it by default to skip, in case hypervisor or NUMA balancing
+> > is detected.
+> >
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+>=20
+> Thanks Maxim! I'm still working on a respin of this test with MGLRU
+> integration, like [1]. Sorry it's taking me so long. I'll apply my
+> changes on top of yours.
+>=20
+> [1]: https://lore.kernel.org/kvm/20241105184333.2305744-12-jthoughton@goo=
+gle.com/
+>=20
+> > ---
+> >  .../selftests/kvm/access_tracking_perf_test.c | 33 ++++++++++++++++---
+> >  .../testing/selftests/kvm/include/test_util.h |  1 +
+> >  tools/testing/selftests/kvm/lib/test_util.c   |  7 ++++
+> >  3 files changed, 37 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/=
+tools/testing/selftests/kvm/access_tracking_perf_test.c
+> > index 3c7defd34f56..6d50c829f00c 100644
+> > --- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> > +++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> > @@ -65,6 +65,8 @@ static int vcpu_last_completed_iteration[KVM_MAX_VCPU=
+S];
+> >  /* Whether to overlap the regions of memory vCPUs access. */
+> >  static bool overlap_memory_access;
+> >
+> > +static int warn_on_too_many_idle_pages =3D -1;
+> > +
+> >  struct test_params {
+> >         /* The backing source for the region of memory. */
+> >         enum vm_mem_backing_src_type backing_src;
+> > @@ -184,11 +186,10 @@ static void mark_vcpu_memory_idle(struct kvm_vm *=
+vm,
+> >          * are cached and the guest won't see the "idle" bit cleared.
+> >          */
+> >         if (still_idle >=3D pages / 10) {
+> > -#ifdef __x86_64__
+> > -               TEST_ASSERT(this_cpu_has(X86_FEATURE_HYPERVISOR),
+> > +               TEST_ASSERT(warn_on_too_many_idle_pages,
+>=20
+> I think this assertion is flipped (or how warn_on_too_many_idle_pages
+> is being set is flipped, see below).
+>=20
+> >                             "vCPU%d: Too many pages still idle (%lu out=
+ of %lu)",
+> >                             vcpu_idx, still_idle, pages);
+> > -#endif
+> > +
+> >                 printf("WARNING: vCPU%d: Too many pages still idle (%lu=
+ out of %lu), "
+> >                        "this will affect performance results.\n",
+> >                        vcpu_idx, still_idle, pages);
+> > @@ -342,6 +343,8 @@ static void help(char *name)
+> >         printf(" -v: specify the number of vCPUs to run.\n");
+> >         printf(" -o: Overlap guest memory accesses instead of partition=
+ing\n"
+> >                "     them into a separate region of memory for each vCP=
+U.\n");
+> > +       printf(" -w: Skip or force enable the check that after dirtying=
+ the guest memory, most (90%%) of \n"
+> > +              "it is reported as dirty again (0/1)");
+> >         backing_src_help("-s");
+> >         puts("");
+> >         exit(0);
+> > @@ -359,7 +362,7 @@ int main(int argc, char *argv[])
+> >
+> >         guest_modes_append_default();
+> >
+> > -       while ((opt =3D getopt(argc, argv, "hm:b:v:os:")) !=3D -1) {
+> > +       while ((opt =3D getopt(argc, argv, "hm:b:v:os:w:")) !=3D -1) {
+> >                 switch (opt) {
+> >                 case 'm':
+> >                         guest_modes_cmdline(optarg);
+> > @@ -376,6 +379,11 @@ int main(int argc, char *argv[])
+> >                 case 's':
+> >                         params.backing_src =3D parse_backing_src_type(o=
+ptarg);
+> >                         break;
+> > +               case 'w':
+> > +                       warn_on_too_many_idle_pages =3D
+> > +                               atoi_non_negative("1 - enable warning, =
+0 - disable",
+> > +                                                 optarg);
+>=20
+> We still get a "warning" either way, right? Maybe this should be
+> called "fail_on_too_many_idle_pages" (in which case the above
+> assertion is indeed flipped). Or "warn_on_too_many_idle_pages" should
+> mean *only* warn, i.e., *don't* fail, in which case, below we need to
+> flip how we set it below.
 
 
+Agreed.  I like the "warn" terminology,  Maybe this?
 
-On 25/03/2025 6:32 pm, Colton Lewis wrote:
-> Hi James,
-> 
-> Thanks for the review.
-> 
-> James Clark <james.clark@linaro.org> writes:
-> 
->> On 13/02/2025 6:03 pm, Colton Lewis wrote:
->>> For PMUv3, the register MDCR_EL2.HPMN partitiones the PMU counters
->>> into two ranges where counters 0..HPMN-1 are accessible by EL1 and, if
->>> allowed, EL0 while counters HPMN..N are only accessible by EL2.
-> 
->>> Introduce a module parameter in KVM to set this register. The name
->>> reserved_host_counters reflects the intent to reserve some counters
->>> for the host so the guest may eventually be allowed direct access to a
->>> subset of PMU functionality for increased performance.
-> 
->>> Track HPMN and whether the pmu is partitioned in struct arm_pmu
->>> because both KVM and the PMUv3 driver will need to know that to handle
->>> guests correctly.
-> 
->>> Due to the difficulty this feature would create for the driver running
->>> at EL1 on the host, partitioning is only allowed in VHE mode. Working
->>> on nVHE mode would require a hypercall for every register access
->>> because the counters reserved for the host by HPMN are now only
->>> accessible to EL2.
-> 
->>> The parameter is only configurable at boot time. Making the parameter
->>> configurable on a running system is dangerous due to the difficulty of
->>> knowing for sure no counters are in use anywhere so it is safe to
->>> reporgram HPMN.
-> 
-> 
->> Hi Colton,
-> 
->> For some high level feedback for the RFC, it probably makes sense to
->> include the other half of the feature at the same time. I think there is
->> a risk that it requires something slightly different than what's here
->> and there ends up being some churn.
-> 
-> I agree. That's what I'm working on now. I justed wanted an iteration or
-> two in public so I'm not building on something that needs drastic change
-> later.
-> 
->> Other than that I think it looks ok apart from some minor code review 
->> nits.
-> 
-> Thank you
-> 
->> I was also thinking about how BRBE interacts with this. Alex has done
->> some analysis that finds that it's difficult to use BRBE in guests with
->> virtualized counters due to the fact that BRBE freezes on any counter
->> overflow, rather than just guest ones. That leaves the guest with branch
->> blackout windows in the delay between a host counter overflowing and the
->> interrupt being taken and BRBE being restarted.
-> 
->> But with HPMN, BRBE does allow freeze on overflow of only one partition
->> or the other (or both, but I don't think we'd want that) e.g.:
-> 
->>    RNXCWF: If EL2 is implemented, a BRBE freeze event occurs when all of
->>    the following are true:
-> 
->>    * BRBCR_EL1.FZP is 1.
->>    * Generation of Branch records is not paused.
->>    * PMOVSCLR_EL0[(MDCR_EL2.HPMN-1):0] is nonzero.
->>    * The PE is in a BRBE Non-prohibited region.
-> 
->> Unfortunately that means we could only let guests use BRBE with a
->> partitioned PMU, which would massively reduce flexibility if hosts have
->> to lose counters just so the guest can use BRBE.
-> 
->> I don't know if this is a stupid idea, but instead of having a fixed
->> number for the partition, wouldn't it be nice if we could trap and
->> increment HPMN on the first guest use of a counter, then decrement it on
->> guest exit depending on what's still in use? The host would always
->> assign its counters from the top down, and guests go bottom up if they
->> want PMU passthrough. Maybe it's too complicated or won't work for
->> various reasons, but because of BRBE the counter partitioning changes go
->> from an optimization to almost a necessity.
-> 
-> This is a cool idea that would enable useful things. I can think of a
-> few potential problems.
-> 
-> 1. Partitioning will give guests direct access to some PMU counter
-> registers. There is no reliable way for KVM to determine what is in use
-> from that state. A counter that is disabled guest at exit might only be
-> so temporarily, which could lead to a lot of thrashing allocating and
-> deallocating counters.
-> 
-> 2. HPMN affects reads of PMCR_EL0.N, which is the standard way to
-> determine how many counters there are. If HPMN starts as a low number,
-> guests have no way of knowing there are more counters
-> available. Dynamically changing the counters available could be
-> confusing for guests.
-> 
+	printf(" -w: Control whether the test warns or fails if more than 10%\n"
+               "     of pages are still seen as idle/old after accessing gu=
+est\n"
+               "     memory.  >0 =3D=3D warn only, 0 =3D=3D fail, <0 =3D=3D=
+ auto.  For auto\n"
+               "     mode, the test fails by default, but switches to warn =
+only\n"
+               "     if NUMA balancing is enabled or the test detects it's =
+running\n"
+               "     in a VM.");
 
-Yes I was expecting that PMCR would have to be trapped and N reported to 
-be the number of physical counters rather than how many are in the guest 
-partition.
+And let the user explicitly select auto:
 
-> 3. If guests were aware they could write beyond HPMN and get the
-> counters allocated to them, nothing stops them from writing at counter
-> N and taking as many counters as possible to starve the host.
-> 
+		case 'w':
+			warn_only =3D atoi_paranoid(optarg);
+			break;
 
-Is that much different than how it is now with virtualized PMUs? As in, 
-the guest can use all of the counters and the host's events will have to 
-contend with them.
+Then the auto resolving works as below, and as James pointed out, the asser=
+t
+becomes
 
-You can still have a module param, except it's more of a limit to the 
-size of the partition rather than fixing it upfront. The default value 
-would be the max number of counters, allowing the most flexibility for 
-the common use case where it's unlikely that both host and guests are 
-contending for all counters. But if you really want to make sure the 
-host doesn't get starved you can set it to a lower value.
+		TEST_ASSERT(!warn_only, ....);
 
-All this does sound a bit like it could be done on top of the simple 
-partitioning though. And it's mainly for making BRBE more accessible, 
-which I'm not 100% convinced that the blackout windows are that big of a 
-problem. We could say BRBE may have some holes if the host happens to be 
-using counters at the same time, and if you want to be certain of no 
-holes, use a host with partitioned counters.
+>=20
+> > +                       break;
+> >                 case 'h':
+> >                 default:
+> >                         help(argv[0]);
+> > @@ -386,6 +394,23 @@ int main(int argc, char *argv[])
+> >         page_idle_fd =3D open("/sys/kernel/mm/page_idle/bitmap", O_RDWR=
+);
+> >         __TEST_REQUIRE(page_idle_fd >=3D 0,
+> >                        "CONFIG_IDLE_PAGE_TRACKING is not enabled");
+> > +       if (warn_on_too_many_idle_pages =3D=3D -1) {
+> > +#ifdef __x86_64__
+> > +               if (this_cpu_has(X86_FEATURE_HYPERVISOR)) {
+> > +                       printf("Skipping idle page count sanity check, =
+because the test is run nested\n");
+> > +                       warn_on_too_many_idle_pages =3D 0;
+> > +               } else
+> > +#endif
+> > +               if (is_numa_balancing_enabled()) {
+> > +                       printf("Skipping idle page count sanity check, =
+because NUMA balance is enabled\n");
+> > +                       warn_on_too_many_idle_pages =3D 0;
+> > +               } else {
+> > +                       warn_on_too_many_idle_pages =3D 1;
+> > +               }
+> > +       } else if (!warn_on_too_many_idle_pages) {
+> > +               printf("Skipping idle page count sanity check, because =
+this was requested by the user\n");
 
-James
-
+Eh, I vote to omit this.  The sanity check is still there, it's just degrad=
+ed to
+a warn.  I'm not totally against it, just seems superfluous and potentially=
+ confusing.
 
