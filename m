@@ -1,159 +1,85 @@
-Return-Path: <kvm+bounces-42031-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42032-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D8C8A71328
-	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 09:56:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 255F7A71386
+	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 10:22:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E912E3ABD8B
-	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 08:56:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A99BA1891A40
+	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 09:22:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 699671A83E5;
-	Wed, 26 Mar 2025 08:56:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D00C41ACEDD;
+	Wed, 26 Mar 2025 09:22:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yfhi5Fez"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CKZIhDpm"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B1581A4E98
-	for <kvm@vger.kernel.org>; Wed, 26 Mar 2025 08:56:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D1F1AB528
+	for <kvm@vger.kernel.org>; Wed, 26 Mar 2025 09:22:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742979375; cv=none; b=BrYorJGpFBk/DeDLwa+R3/QS04/D7VEDyihPkM7nBHZD3usyL5+DJPt8TzewPP5C/3n6BiKNlxDVdSXtJ02NGXW+ZCaRtcDjdls5YDw8DA9Wmfks8eMOUT1e/nHn5hVr2R3BNGkA0691pUiynj7djNzAdO+YmLHcZ2+LgfQ3pf0=
+	t=1742980948; cv=none; b=Yitf5Ulpsom0ENPvL61I8nUyUDNHe2Es5rAcB9vmFw+dpYbjuJpSo7FQ4XqoViaAn6CLZoQ200aCGys6TJh90dMoWrbWQOFVDw5gdi+/gmPtbGFw2tL6Fbjtihis5aQIi/gBphLgJIs8GpASd5UfDIP8orGutCYEhiakdc1DkOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742979375; c=relaxed/simple;
-	bh=F1foF754pT94sYW+RFuaojIiZBGsMyKzZaxtQLw5N2w=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=mge8GvlWvYvbjdAAKX4x0y4YMGbZmizrl4WknOhwRAXMZcUXWceYXpKCCd68rocFoapa2T3RFBEIdSKTJF0iPbJwW6KjP3Jf1L2Z9pHZgDZf9/eYJht1MZyJNNhXXYTIg8yf8aBAAvimyJhBBD8y7b4UtBOa/joOU9ezK9iV8LM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Yfhi5Fez; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1742980948; c=relaxed/simple;
+	bh=4d6hTJYx34XSzfBv466w/guqsQgF+23NvvB4MOgKWF0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ol/j1jmFhrpwGG/NqpHyeuxasy3zyF9nT5x1pm99CClGUJRR5dswHxxRjRed5GC9SzQ+et4yEH/in7i+dPGbEzFF6rMWmau/fqWkYKhjcQWbJ2sWJt2ptAPdfuPDrL+pxj3G1/kvA7ecB0yCoAjYSzPWG7BQmjsH0yaIJVRhR04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CKZIhDpm; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742979372;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	s=mimecast20190719; t=1742980945;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ctJ2iKS2diL395+WMoYK5u4EcCy52/qwtJ7bficlTlI=;
-	b=Yfhi5Fezki67ljs+vfIlE/81Mso6xrv5nuZ7fPeDMK6fu7mYlLHIo9iF3mg3xgQKjY1yk1
-	E6/zZwNvVWzbt+iBbMXz3X0SSRHG9FqnZ7aEsdMBo0H9uOLR6LjzHwbOHKoP0fae0k0K2u
-	p/gGMSK+IreznDYsmXWDdt3ikTiZlDU=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-104-47q05ck7OUOQO5aWNQKknQ-1; Wed, 26 Mar 2025 04:56:11 -0400
-X-MC-Unique: 47q05ck7OUOQO5aWNQKknQ-1
-X-Mimecast-MFC-AGG-ID: 47q05ck7OUOQO5aWNQKknQ_1742979370
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43d209dc2d3so39476955e9.3
-        for <kvm@vger.kernel.org>; Wed, 26 Mar 2025 01:56:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742979370; x=1743584170;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ctJ2iKS2diL395+WMoYK5u4EcCy52/qwtJ7bficlTlI=;
-        b=fFPDX6uFHVK3GZDMM04Xhb8Ed5pdzWvDUFrB3IetrbEVVZqwqp/iOaBpInY9uNlOxP
-         sdIgtxkAt1LKx++EKTCjrlkTl5iWfG0Sz8lAn798I0jAG1EcuMmAgBIQwbWCOX1oMBqj
-         XHIdNnf+rDCzny+N0Y13gE21Z577ouQSpK9C5DklGaEkRfB5J72TKMD4jMxZkP2g0bSB
-         levtC/zyOhr8h3qFP2Cu8vVY9JiH7J7jOchBGucEp6gpbEonjnzsRerrxNynC/I9prge
-         bYS5s/iatCY+x2yV98VMT3gImpOpPJMIPLEqh3k5dUCYgBRvJ4Y+y49QJK/gT0w086YN
-         k5KQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW7+rh9JjDFOWVJY1HFHDNsEMsnFJpIZ1EhyIi8Ofs8Baltgc9llKNtQCNsY7Db03TzRWc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxboZmhwPtliJFaYDddqYonqaTZ5leoduy8tY2aqLzxxMfbP6vw
-	5cSIH8adiEIe0Gm1TCnAy7Gxc3FVYfi1jSpdgD3lXIwW7HlKIEIg83YYKLeGtvRNPY66ws4zemG
-	4J/FesFc1BfiKrWPwg7PKu4LbklKSZd4CmI0/SK63JD98jOn5eA==
-X-Gm-Gg: ASbGncskCbUvGoBNjgzk30x6cxfh5KCJM4DkjSKbJhOKWQGsGujthMZfSZtqpSXAbkG
-	kncVXO7sj9mCoOSAcuAS2jOT7HNf7t0Da3ekjkxbjOcenbeG8/sn+XqkW8LeltYWN8GKtdQX8/V
-	uFhXi65eB+DSxglctcIaHrFOsgPNWA9o2thA0+WR9Aet1bWUuJl8beXwJvJn+Lpqze546I92WAj
-	gYtaaGU3ALvMeoQztcj6Kq9l81vxPxWOA97qp2wDeAiilkzIZhjK3hKP7BeihGfNPzA1vNjKdek
-	z9l2MinY846B3E6EYP61C7bfwwu/Wna11K4YLszn1y0rl7ncnAtsipgLchLglyKAmYiFugsHOli
-	M
-X-Received: by 2002:a05:600c:5025:b0:43d:300f:fa51 with SMTP id 5b1f17b1804b1-43d509ea850mr177278265e9.9.1742979369947;
-        Wed, 26 Mar 2025 01:56:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGmtDcswSiHFvojL/8/X8XbIAG8pFv35YFW9PLdaiNFn4jtJsKwcY6xoArge3H5jo1mJzUGFA==
-X-Received: by 2002:a05:600c:5025:b0:43d:300f:fa51 with SMTP id 5b1f17b1804b1-43d509ea850mr177277375e9.9.1742979369446;
-        Wed, 26 Mar 2025 01:56:09 -0700 (PDT)
-Received: from vschneid-thinkpadt14sgen2i.remote.csb (213-44-141-166.abo.bbox.fr. [213.44.141.166])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39ac67970a2sm5909443f8f.16.2025.03.26.01.56.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Mar 2025 01:56:08 -0700 (PDT)
-From: Valentin Schneider <vschneid@redhat.com>
-To: Jann Horn <jannh@google.com>, Rik van Riel <riel@surriel.com>
-Cc: Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
- x86@kernel.org, virtualization@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
- linux-riscv@lists.infradead.org, linux-perf-users@vger.kernel.org,
- xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
- linux-arch@vger.kernel.org, rcu@vger.kernel.org,
- linux-hardening@vger.kernel.org, linux-mm@kvack.org,
- linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
- bcm-kernel-feedback-list@broadcom.com, Juergen Gross <jgross@suse.com>,
- Ajay Kaher <ajay.kaher@broadcom.com>, Alexey Makhalov
- <alexey.amakhalov@broadcom.com>, Russell King <linux@armlinux.org.uk>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, Paul
- Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave
- Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Peter Zijlstra <peterz@infradead.org>, Arnaldo Carvalho de Melo
- <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Mark Rutland
- <mark.rutland@arm.com>, Alexander Shishkin
- <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, Ian
- Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>,
- "Liang, Kan" <kan.liang@linux.intel.com>, Boris Ostrovsky
- <boris.ostrovsky@oracle.com>, Josh Poimboeuf <jpoimboe@kernel.org>, Pawan
- Gupta <pawan.kumar.gupta@linux.intel.com>, Sean Christopherson
- <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, Andy Lutomirski
- <luto@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Frederic Weisbecker
- <frederic@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>, Jason
- Baron <jbaron@akamai.com>, Steven Rostedt <rostedt@goodmis.org>, Ard
- Biesheuvel <ardb@kernel.org>, Neeraj Upadhyay
- <neeraj.upadhyay@kernel.org>, Joel Fernandes <joel@joelfernandes.org>,
- Josh Triplett <josh@joshtriplett.org>, Boqun Feng <boqun.feng@gmail.com>,
- Uladzislau Rezki <urezki@gmail.com>, Mathieu Desnoyers
- <mathieu.desnoyers@efficios.com>, Lai Jiangshan <jiangshanlai@gmail.com>,
- Zqiang <qiang.zhang1211@gmail.com>, Juri Lelli <juri.lelli@redhat.com>,
- Clark Williams <williams@redhat.com>, Yair Podemsky <ypodemsk@redhat.com>,
- Tomas Glozar <tglozar@redhat.com>, Vincent Guittot
- <vincent.guittot@linaro.org>, Dietmar Eggemann <dietmar.eggemann@arm.com>,
- Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, Kees Cook
- <kees@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Christoph
- Hellwig <hch@infradead.org>, Shuah Khan <shuah@kernel.org>, Sami Tolvanen
- <samitolvanen@google.com>, Miguel Ojeda <ojeda@kernel.org>, Alice Ryhl
- <aliceryhl@google.com>, "Mike Rapoport (Microsoft)" <rppt@kernel.org>,
- Samuel Holland <samuel.holland@sifive.com>, Rong Xu <xur@google.com>,
- Nicolas Saenz Julienne <nsaenzju@redhat.com>, Geert Uytterhoeven
- <geert@linux-m68k.org>, Yosry Ahmed <yosryahmed@google.com>, "Kirill A.
- Shutemov" <kirill.shutemov@linux.intel.com>, "Masami Hiramatsu (Google)"
- <mhiramat@kernel.org>, Jinghao Jia <jinghao7@illinois.edu>, Luis
- Chamberlain <mcgrof@kernel.org>, Randy Dunlap <rdunlap@infradead.org>,
- Tiezhu Yang <yangtiezhu@loongson.cn>
-Subject: Re: [PATCH v4 29/30] x86/mm, mm/vmalloc: Defer
- flush_tlb_kernel_range() targeting NOHZ_FULL CPUs
-In-Reply-To: <CAG48ez2bSh6=J8cXJhqYX=Y8pXcGsFgC05HsGcF0b1sJK2VH7A@mail.gmail.com>
-References: <20250114175143.81438-1-vschneid@redhat.com>
- <20250114175143.81438-30-vschneid@redhat.com>
- <CAG48ez1Mh+DOy0ysOo7Qioxh1W7xWQyK9CLGNU9TGOsLXbg=gQ@mail.gmail.com>
- <xhsmh34hhh37q.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
- <CAG48ez3H8OVP1GxBLdmFgusvT1gQhwu2SiXbgi8T9uuCYVK52w@mail.gmail.com>
- <xhsmh5xlhk5p2.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
- <CAG48ez1EAATYcX520Nnw=P8XtUDSr5pe+qGH1YVNk3xN2LE05g@mail.gmail.com>
- <xhsmh34gkk3ls.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
- <352317e3-c7dc-43b4-b4cb-9644489318d0@intel.com>
- <xhsmhjz9mj2qo.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
- <d0450bc8-6585-49ca-9cad-49e65934bd5c@intel.com>
- <xhsmhh64qhssj.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
- <eef09bdc-7546-462b-9ac0-661a44d2ceae@intel.com>
- <xhsmhfrk84k5k.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
- <408ebd8b-4bfb-4c4f-b118-7fe853c6e897@intel.com>
- <xhsmhy0wtngkd.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
- <CAG48ez2bSh6=J8cXJhqYX=Y8pXcGsFgC05HsGcF0b1sJK2VH7A@mail.gmail.com>
-Date: Wed, 26 Mar 2025 09:56:06 +0100
-Message-ID: <xhsmhv7rwnpax.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+	bh=qdqljVMQXTwG4flLDGUH9vTVfQiEjvsG0BNUDJyHj5w=;
+	b=CKZIhDpmi5h8tT2B7WrCozGujeVExg38XInx6jqseyS7EqzeWpr9USoGtROfw1nhhtLYfC
+	XsNORiYzQBe5n8fJXoefRAb64PMs7btaI3xTJyQVN6yYd+3Pn2i62mckp0y6R2pv1xQm/p
+	LP62i0kgvrcVoWNEkDoImv3PT/frN9E=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-327-DK_IWoKlPsel9EDgM1PdNA-1; Wed,
+ 26 Mar 2025 05:22:20 -0400
+X-MC-Unique: DK_IWoKlPsel9EDgM1PdNA-1
+X-Mimecast-MFC-AGG-ID: DK_IWoKlPsel9EDgM1PdNA_1742980938
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2ADF21933B4F;
+	Wed, 26 Mar 2025 09:22:18 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.107])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 46F8E1801751;
+	Wed, 26 Mar 2025 09:22:12 +0000 (UTC)
+Date: Wed, 26 Mar 2025 09:22:09 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Igor Mammedov <imammedo@redhat.com>, Zhao Liu <zhao1.liu@intel.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Eric Blake <eblake@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>,
+	Francesco Lavra <francescolavra.fl@gmail.com>,
+	qemu-devel@nongnu.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v7 52/52] docs: Add TDX documentation
+Message-ID: <Z-PHQW9lVao-DY1F@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20250124132048.3229049-1-xiaoyao.li@intel.com>
+ <20250124132048.3229049-53-xiaoyao.li@intel.com>
+ <Z-L6CSajU284qAJ4@redhat.com>
+ <81e9d055-377c-4521-9588-a6bad60b3a6d@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -161,60 +87,130 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <81e9d055-377c-4521-9588-a6bad60b3a6d@intel.com>
+User-Agent: Mutt/2.2.13 (2024-03-09)
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On 25/03/25 19:41, Jann Horn wrote:
-> On Tue, Mar 25, 2025 at 6:52=E2=80=AFPM Valentin Schneider <vschneid@redh=
-at.com> wrote:
->> On 20/02/25 09:38, Dave Hansen wrote:
->> > But, honestly, I'm still not sure this is worth all the trouble. If
->> > folks want to avoid IPIs for TLB flushes, there are hardware features
->> > that *DO* that. Just get new hardware instead of adding this complicat=
-ed
->> > pile of software that we have to maintain forever. In 10 years, we'll
->> > still have this software *and* 95% of our hardware has the hardware
->> > feature too.
->>
->> Sorry, you're going to have to deal with my ignorance a little bit longe=
-r...
->>
->> Were you thinking x86 hardware specifically, or something else?
->> AIUI things like arm64's TLBIVMALLE1IS can do what is required without a=
-ny
->> IPI:
->>
->> C5.5.78
->> """
->> The invalidation applies to all PEs in the same Inner Shareable shareabi=
-lity domain as the PE that
->> executes this System instruction.
->> """
->>
->> But for (at least) these architectures:
->>
->>   alpha
->>   x86
->>   loongarch
->>   mips
->>   (non-freescale 8xx) powerpc
->>   riscv
->>   xtensa
->>
->> flush_tlb_kernel_range() has a path with a hardcoded use of on_each_cpu(=
-),
->> so AFAICT for these the IPIs will be sent no matter the hardware.
->
-> On X86, both AMD and Intel have some fairly recently introduced CPU
-> features that can shoot down TLBs remotely.
->
-> The patch series
-> <https://lore.kernel.org/all/20250226030129.530345-1-riel@surriel.com/>
-> adds support for the AMD flavor; that series landed in the current
-> merge window (it's present in the mainline git repository now and should
-> be part of 6.15). I think support for the Intel flavor has not yet
-> been implemented, but the linked patch series mentions a plan to look
-> at the Intel flavor next.
+On Wed, Mar 26, 2025 at 11:36:09AM +0800, Xiaoyao Li wrote:
+> On 3/26/2025 2:46 AM, Daniel P. Berrangé wrote:
+> > On Fri, Jan 24, 2025 at 08:20:48AM -0500, Xiaoyao Li wrote:
+> > > Add docs/system/i386/tdx.rst for TDX support, and add tdx in
+> > > confidential-guest-support.rst
+> > > 
+> > > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> > > ---
+> > 
+> > > ---
+> > >   docs/system/confidential-guest-support.rst |   1 +
+> > >   docs/system/i386/tdx.rst                   | 156 +++++++++++++++++++++
+> > >   docs/system/target-i386.rst                |   1 +
+> > >   3 files changed, 158 insertions(+)
+> > >   create mode 100644 docs/system/i386/tdx.rst
+> > 
+> > 
+> > > +Launching a TD (TDX VM)
+> > > +-----------------------
+> > > +
+> > > +To launch a TD, the necessary command line options are tdx-guest object and
+> > > +split kernel-irqchip, as below:
+> > > +
+> > > +.. parsed-literal::
+> > > +
+> > > +    |qemu_system_x86| \\
+> > > +        -object tdx-guest,id=tdx0 \\
+> > > +        -machine ...,kernel-irqchip=split,confidential-guest-support=tdx0 \\
+> > > +        -bios OVMF.fd \\
+> > > +
+> > > +Restrictions
+> > > +------------
+> > > +
+> > > + - kernel-irqchip must be split;
+> > 
+> > Is there a reason why we don't make QEMU set kernel-irqchip=split
+> > automatically when tdx-guest is enabled ?
+> > 
+> > It feels silly to default to a configuration that is known to be
+> > broken with TDX. I thought about making libvirt automatically
+> > set kernel-irqchip=split, or even above that making virt-install
+> > automatically set it. Addressing it in QEMU would seem the most
+> > appropriate place though.
+> 
+> For x86, if not with machine older than machine-4.0, the default
+> kernel_irqchip is set to split when users don't set a value explicitly:
 
-Thanks for the info!
+I think you may have mis-read the code. *ONLY* pc-q35-4.0 uses
+the split IRQ chip. Everything both older and newer than that
+uses kernel IRQ chip by default. So our default machine type
+settings are incompatible with TDX, except for pc-q35-4.0
+
+We initially tried to use the split IRQ chip by default for 4.0:
+
+  commit b2fc91db84470a78f8e93f5b5f913c17188792c8
+  Author: Peter Xu <peterx@redhat.com>
+  Date:   Thu Dec 20 13:40:35 2018 +0800
+
+    q35: set split kernel irqchip as default
+    
+    Starting from QEMU 4.0, let's specify "split" as the default value for
+    kernel-irqchip.
+
+but had to revert this in the very next release
+
+  commit c87759ce876a7a0b17c2bf4f0b964bd51f0ee871
+  Author: Alex Williamson <alex.williamson@redhat.com>
+  Date:   Tue May 14 14:14:41 2019 -0600
+
+    q35: Revert to kernel irqchip
+    
+    Commit b2fc91db8447 ("q35: set split kernel irqchip as default") changed
+    the default for the pc-q35-4.0 machine type to use split irqchip, which
+    turned out to have disasterous effects on vfio-pci INTx support.
+
+> 
+>  if (s->kernel_irqchip_split == ON_OFF_AUTO_AUTO) {
+>         s->kernel_irqchip_split = mc->default_kernel_irqchip_split ?
+> ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
+>     }
+> 
+> 
+> I think QEMU should only set it to split automatically for TDX guest when
+> users don't provide a explicit value. And current code just works as
+> expected.
+>
+> Further, I think we can at least add the check in tdx_kvm_init() like this
+> 
+> if (kvm_state->kernel_irqchip_split != ON_OFF_AUTO_ON) {
+> 	error_setg(errp, "TDX VM requires kernel_irqchip to be split");
+> 	return -EINVAL;
+> }
+> 
+> Are you OK with it?
+
+IMHO we need to modify the current check for
+
+  "kernel_irqchip_split == ON_OFF_AUTO_AUTO"
+
+so that it sets to 'ON_OFF_AUTO_ON', if  TDX is enabled.
+
+ie something more like
+
+  if (s->kernel_irqchip_split == ON_OFF_AUTO_AUTO) {
+       if (...tdx...) {
+          s->kernel_irqchip_split = ON_OFF_AUTO_ON;
+       } else {
+         s->kernel_irqchip_split = mc->default_kernel_irqchip_split ?
+> ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
+       }
+  }
+
+
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
