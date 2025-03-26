@@ -1,122 +1,146 @@
-Return-Path: <kvm+bounces-42034-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42035-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32149A7194D
-	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 15:50:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0979A71A09
+	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 16:18:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E5EC17B891
-	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 14:45:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A3291894FD2
+	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 15:10:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC1071F5850;
-	Wed, 26 Mar 2025 14:43:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C75E1F3BB9;
+	Wed, 26 Mar 2025 15:09:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SSDHVgs8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PncpYpop"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 272CD1F3BA5;
-	Wed, 26 Mar 2025 14:43:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DEE31E1E0D
+	for <kvm@vger.kernel.org>; Wed, 26 Mar 2025 15:09:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743000191; cv=none; b=p+e3z+FxWtGF5+tLFi1DUmSuVHYDlx9ji3YBBeSj8tGCiuOPH0Cu8Xzf5IvBVD/IJH1hCvRsDuI7vgYQvhnsai9bdmJ81fKcqgdfLXbiyJlCCbOPGpmzhvYyySt2MiRHHUNm79ZzJZNbunQaKWXAExNq7OV8F5bnGTd8oCjRTJI=
+	t=1743001796; cv=none; b=lqxrEYTVPXBw9IghEcBHd5VdV6rd3Ho1XcltQYL++aRCJ4KKe4aaCXOb3CzSsFrNbTy0/xq4YYEtbzNOMzs6QFg5+yoq5Yc3XQodwSQutuRUnF8okh+lvXHletrQY9/WtNnoRuRHIKEH7rYd0p8BycqlpZysPeneNHVWrHX63uw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743000191; c=relaxed/simple;
-	bh=8ruiAexsDkLplsXd3Wz44waqyHX3oMolkpYe0zqHwws=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BhArWI9ea/iPofzZ2+ysowmh+NwsmN9xU9pqDEf+AfTWyvu4IZkvfEyqWGTpYASWEkyOs/KkkOTl21AuVOdrP92G06Kyn1dVvpngDvfoi59TqdQbEpLczxPm3nrYEyzAlJQNX0+IfALneR9eAEQTsylODESpuFmPkNicNHt2nsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SSDHVgs8; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1743000190; x=1774536190;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=8ruiAexsDkLplsXd3Wz44waqyHX3oMolkpYe0zqHwws=;
-  b=SSDHVgs80DhSOJ4IaxTDZFC4NnhPvaGqJZnSDJJbgkU06JCwJOOiBgpx
-   DeiT1qKKuHtGrEM+O3Nm/LUWjXy0uDV3BVk/moJo75uy6TOPQmFqBb8EM
-   GZCl3v+dgcz9HPTv+bUz+uGlunIY46uwXNGQlWOOAIjKwoDHlRY1PvbYi
-   1Fejm+zU8UhMKykVZzpOobE61QTvGWE4Dkqrlgp9Wg+RImu/CWQt3qxkR
-   zsu/+qfG3G5gZSLE05LnsTtOuXzbt5es0L5NXSpG5/3gIZ+NdCdGtlF+J
-   /lxGVVISn7Bl8XlJ45zECVYDVdjCzEYLHXKXUUPxHm9uVBbE5v6ariW7v
-   Q==;
-X-CSE-ConnectionGUID: UsGm2F4rSjqe6LxcxbN7lA==
-X-CSE-MsgGUID: JeLbZT73R0qCnltNYzZGcA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11385"; a="44179686"
-X-IronPort-AV: E=Sophos;i="6.14,278,1736841600"; 
-   d="scan'208";a="44179686"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2025 07:43:09 -0700
-X-CSE-ConnectionGUID: jI/+7xQ0QY+hOlssQhJQDA==
-X-CSE-MsgGUID: oVDthJJ2SIuQ1QogZ8W1Rw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,278,1736841600"; 
-   d="scan'208";a="129982866"
-Received: from lkp-server02.sh.intel.com (HELO e98e3655d6d2) ([10.239.97.151])
-  by orviesa005.jf.intel.com with ESMTP; 26 Mar 2025 07:43:03 -0700
-Received: from kbuild by e98e3655d6d2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1txRy0-0005oR-1c;
-	Wed, 26 Mar 2025 14:42:55 +0000
-Date: Wed, 26 Mar 2025 22:42:20 +0800
-From: kernel test robot <lkp@intel.com>
-To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
-	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
-	xiaoyao.li@intel.com, yilun.xu@intel.com,
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
-	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net,
-	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com,
-	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com,
-	wei.w.wang@intel.com
-Subject: Re: [PATCH v7 5/9] KVM: x86: Mark KVM_X86_SW_PROTECTED_VM as
- supporting guest_memfd shared memory
-Message-ID: <202503262202.WSGvs92t-lkp@intel.com>
-References: <20250318161823.4005529-6-tabba@google.com>
+	s=arc-20240116; t=1743001796; c=relaxed/simple;
+	bh=LvPznTTQMeL5HHEqwAw5mQEy+wnALOSIcXn/tKHfL/k=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=tbK8xk9gzhWuvuSc+9tl3xovXUGmtp20INaM0zfExRjYKwj5jUAeHO40ObmS2skD4ZcNiYqHxq7nEJ/mWfz71+CCvmG7HLu2VabXxOilq8OIVch1MziYBZhMBF8SVUw4ZEJL5fyb977jIoOifwzofqJBZJ1bSp1KCST74zA2ge0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PncpYpop; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff6aaa18e8so10722703a91.1
+        for <kvm@vger.kernel.org>; Wed, 26 Mar 2025 08:09:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1743001794; x=1743606594; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FkOqbfERQdrw9bi6YeAMxlXl0dXPXrj8aIpOruTKiGo=;
+        b=PncpYpopJN6KMaAn5otdzkkkvbbKBHwBdmeiUgMDdjQSkPMT3QtY4WMpoUHEhjIjRq
+         PHjvi+G963jnXV7xnE0KLVKGDSvU3hTOffNDLoMB58ULFr0fGx6AP7TjosouaKhwq61y
+         27aCifCGEwzmMzYVPfTiwguPV2jD35atRzkO1k8v19POPXOOyoz8guEyOyfSdx6/d9U7
+         jQ9FGaurcqE0J6bXt4eTW7T7rIMhRqMC2tgHbyPgiyPPd0p/AjpJM3tboJDRZ6nADTcA
+         SP9MjvWuHyHJBmZ3FaIuKz4LhlHLCkk8McmSOrvOiIDj4zDVIoqzfymAMaDaNZ3eRuzG
+         OInw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743001794; x=1743606594;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=FkOqbfERQdrw9bi6YeAMxlXl0dXPXrj8aIpOruTKiGo=;
+        b=h9M+tGzRUkRBhfhWmuk9+NaPFOfBlkuUD3HpfuIA3V20Hif+npziMv0eYBkryh9va5
+         gWmL0nDcLLJl/k+OpMSztY1Pb31GrpeXdtprDclqm2v0+PSJzBWzWT8egGkKFgpcKX95
+         UVTa9Mtn7mEhkkyh50iFMXSmrX2DXD13BbDBNv01Lxk1vTYNxe7pYD07RbLyVqM+kQO+
+         KzbB1i969i8Jvepu4nFoDvJ7EH23oL6yGRNDMoJYY4BKZcQcXhAnSUPzBIlQg8dj3z6l
+         bSxzLKXhsxO6HEa49LcjG5JTi+z1F2zCJUDDMMq4mwMmxU5EfkjbppBGx9vD9mvFnua4
+         ndLA==
+X-Forwarded-Encrypted: i=1; AJvYcCU14zh9f+w8EFr0beOKJsEr7pqt81MxOiL1GMEuXuWnRS1PafkW2D75dVZHjTiRCDv9tgQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxUQTnwQhCGbxr7oqoHArUu6h1Ygixjlku9qBHslaEN/n/Z9FfE
+	6A0ug4OCBYcthuXT15q8zxD5ogiiHP86rf/ZxvNPF9SzdEFKY3Olmt8vj1r0ueCt44B2UWNAGHL
+	3Fg==
+X-Google-Smtp-Source: AGHT+IGaEwe4msZVS1TKiQxfZo1Kl1wf0fVTRtC8U+SRmC7/tJzqPC3DpOBHSnHN51MOxacJYlojeP9LBP0=
+X-Received: from pfbch5.prod.google.com ([2002:a05:6a00:2885:b0:730:96d1:c213])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:9217:b0:1f5:6a1a:329b
+ with SMTP id adf61e73a8af0-1fea2f635e9mr263486637.32.1743001794420; Wed, 26
+ Mar 2025 08:09:54 -0700 (PDT)
+Date: Wed, 26 Mar 2025 08:09:53 -0700
+In-Reply-To: <c220d043-2314-85bb-e99d-dc2c609aa739@loongson.cn>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250318161823.4005529-6-tabba@google.com>
+Mime-Version: 1.0
+References: <20250311074737.3160546-1-maobibo@loongson.cn> <c220d043-2314-85bb-e99d-dc2c609aa739@loongson.cn>
+Message-ID: <Z-QYwWxhBH_nvmWH@google.com>
+Subject: Re: [RFC V2] LoongArch: KVM: Handle interrupt early before enabling irq
+From: Sean Christopherson <seanjc@google.com>
+To: bibo mao <maobibo@loongson.cn>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Huacai Chen <chenhuacai@kernel.org>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, loongarch@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Fuad,
+On Tue, Mar 25, 2025, bibo mao wrote:
+> Hi Paolo, Sean
+>=20
+> This idea comes from x86, do you have any guidance or suggestion about it=
+?
+>=20
+> Also I notice that there is such irq_enable()/irq_disable() pair on x86, =
+I
+> do not know why it is so.
 
-kernel test robot noticed the following build errors:
+Because on AMD (SVM), IRQ VM-Exits don't consume the IRQ, i.e. the exit is =
+purely
+a notification.  KVM still needs to enable IRQs to actually handle the pend=
+ing IRQ.
+And if the IRQ that triggered VM-Exit is for the host's tick, then it's des=
+irable
+to handle the tick IRQ before guest_timing_exit_irqoff() so that the timesl=
+ice is
+accounted to the guest, not the host (the tick IRQ arrived while the guest =
+was
+active).
 
-[auto build test ERROR on 4701f33a10702d5fc577c32434eb62adde0a1ae1]
+On Intel (VMX), KVM always runs in a mode where the VM-Exit acknowledge/con=
+sumes
+the IRQ, and so KVM _must_ manually call into the appropriate interrupt han=
+dler.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Fuad-Tabba/mm-Consolidate-freeing-of-typed-folios-on-final-folio_put/20250319-003340
-base:   4701f33a10702d5fc577c32434eb62adde0a1ae1
-patch link:    https://lore.kernel.org/r/20250318161823.4005529-6-tabba%40google.com
-patch subject: [PATCH v7 5/9] KVM: x86: Mark KVM_X86_SW_PROTECTED_VM as supporting guest_memfd shared memory
-config: x86_64-randconfig-078-20250326 (https://download.01.org/0day-ci/archive/20250326/202503262202.WSGvs92t-lkp@intel.com/config)
-compiler: clang version 20.1.1 (https://github.com/llvm/llvm-project 424c2d9b7e4de40d0804dd374721e6411c27d1d1)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250326/202503262202.WSGvs92t-lkp@intel.com/reproduce)
+>     local_irq_enable();
+>     ++vcpu->stat.exits;
+>     local_irq_disable();
+>     guest_timing_exit_irqoff();
+>     local_irq_enable();
+>=20
+> Regards
+> Bibo Mao
+>=20
+> On 2025/3/11 =E4=B8=8B=E5=8D=883:47, Bibo Mao wrote:
+> > If interrupt arrive when vCPU is running, vCPU will exit because of
+> > interrupt exception. Currently interrupt exception is handled after
+> > local_irq_enable() is called, and it is handled by host kernel rather
+> > than KVM hypervisor. It will introduce extra another interrupt
+> > exception and then host will handle irq.
+> >=20
+> > If KVM hypervisor detect that it is interrupt exception, interrupt
+> > can be handle early in KVM hypervisor before local_irq_enable() is
+> > called.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202503262202.WSGvs92t-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> ld.lld: error: undefined symbol: kvm_gmem_handle_folio_put
-   >>> referenced by swap.c:110 (mm/swap.c:110)
-   >>>               mm/swap.o:(free_typed_folio) in archive vmlinux.a
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+The correctness of this depends on how LoongArch virtualization processes I=
+RQs.
+If the IRQ is consumed by the VM-Exit, then manually handling the IRQ early=
+ is
+both optimal and necessary for correctness.  If the IRQ is NOT consumed by =
+the
+VM-Exit, then manually calling the interrupt handler from KVM will result i=
+n every
+IRQ effectively happening twice: once on the manual call, and against when =
+KVM
+enables IRQs and the "real" IRQ fires.
 
