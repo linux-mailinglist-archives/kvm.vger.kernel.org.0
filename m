@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-42068-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42069-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC562A71F72
-	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 20:47:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7334DA71F89
+	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 20:49:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 258AD17C1EB
-	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 19:45:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74F0E3B5D2E
+	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 19:45:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B70D257AEC;
-	Wed, 26 Mar 2025 19:45:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66F9E2580F2;
+	Wed, 26 Mar 2025 19:45:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UD+UUtIW"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EWULYkf9"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B515335C7
-	for <kvm@vger.kernel.org>; Wed, 26 Mar 2025 19:45:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18D6E255E32
+	for <kvm@vger.kernel.org>; Wed, 26 Mar 2025 19:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743018307; cv=none; b=bfXefm4m9wwV2x8LmCkYYxuo4X2UNC+WRkqm49cL+oLg/0UEV8VEALnTcZIUs2yp6BOW90jpvvXrn5AisIu4e8MiCiSgWT38hbSMhXE7Y/+LRTJXQz/pY1RBCqAxoxnHeO+UeMAmArjFV9209GyrLSxDUGgvm7lqMLPkYsQ0Tvc=
+	t=1743018308; cv=none; b=VAYMx58RrUzB+LE/JaO7VPIUvGctxawBMv92+xV2NI29oar3OX4X8XY0GYHYdFhjfrU29Qmw9PG75f64cmUS3GwgpjZw4e2Ov6vcMKg9BkmAe7njl89/0ql5mlcN3jFbQvx2sSMOWSm3ecfHDr6qoUZFNrCLbP9zK0BPCbJPhnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743018307; c=relaxed/simple;
-	bh=Q+u4MZuDKUNqegWFP2vQgLiAAQq8Sl2SpCPgZZN3GX4=;
+	s=arc-20240116; t=1743018308; c=relaxed/simple;
+	bh=UeVHYpmQSDO76eE41wf9EKaMRSdXPXbn7WRLWP2Qsn4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NZM9vSIFY0cD9CCuyISvHGYkldICqPqaXGWzFJHOTl9CYLydoTCVDETMQgY8MyYYj86DycoZYuPCg+hdXF/kDLHP94pRoM8KTKy6JLv4yOyiw5+HpNjFae5Xn9AvjQD5Yz74/QGK0RaJhvYq/vE9OolZJAd09dxv5A8QM6Y9fvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UD+UUtIW; arc=none smtp.client-ip=95.215.58.187
+	 MIME-Version; b=ArpBzE79qRSAfuIz3hD0uBI60DoqtyuAk0V7BQUsnhzJtqgeoFE3OjzzBCMBMrFqc1amLHGHgDBqmJJVg3ChD0tPMkDdq3xSSNlaSk8ikJfZxKJsh3eSZztxHqDQEQ3FRtKqwWn6JeqNNqicHRBhjG+yk6v0MXFQeuzizbjONc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EWULYkf9; arc=none smtp.client-ip=95.215.58.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1743018300;
+	t=1743018305;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=w0ttQrYyxTXxPea/MErL3ctFGOlp5LmJRLSVUgf6cSc=;
-	b=UD+UUtIWQ6E6kzaZGNUJP5OuSS2zSK1ztioh/MCvV8yo/KJ7ijB1QmtDoCCvW6CmihclMc
-	Mq9MQaIcgvFC4iq1Mx1+XvCsAyHLVJ95wojzKbf2bn+2uAB3DtipJznSfqTSkIu1k2Q0gT
-	JUFe5O6En8Dw22T9nUDDJ7UQQHBeKYw=
+	bh=mC9adyeMRha61zAgAYp8mHu/RuLTfUqFd1dxgCKdmws=;
+	b=EWULYkf9OLzgzfxEi3t8FEHJOcvrOeq3/BlyQY9R4x4wibs58G0WVnj+hADDUkaYQQ31Tq
+	s2ezRVLKbGIpXO0zcZWtvVZUnD/QJ/+qIWyIg+SW0USxXDVbe3I2mJ3T6Xp+aszml2uXkq
+	gsDff4OZA2cdWISGnsPmVAbsSf6ZdUM=
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
@@ -54,9 +54,9 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Yosry Ahmed <yosry.ahmed@linux.dev>
-Subject: [RFC PATCH 22/24] KVM: nSVM: Handle INVLPGA interception correctly
-Date: Wed, 26 Mar 2025 19:44:21 +0000
-Message-ID: <20250326194423.3717668-3-yosry.ahmed@linux.dev>
+Subject: [RFC PATCH 23/24] KVM: nSVM: Allocate a new ASID for nested guests
+Date: Wed, 26 Mar 2025 19:44:22 +0000
+Message-ID: <20250326194423.3717668-4-yosry.ahmed@linux.dev>
 In-Reply-To: <20250326194423.3717668-1-yosry.ahmed@linux.dev>
 References: <20250326193619.3714986-1-yosry.ahmed@linux.dev>
  <20250326194423.3717668-1-yosry.ahmed@linux.dev>
@@ -69,116 +69,84 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Currently, INVPLGA interception handles it like INVLPG, which flushes
-L1's TLB translations for the address. It was implemented in this way
-because L1 and L2 shared an ASID. Now, L1 and L2 have separate ASIDs. It
-is still harmless to flush L1's translations, but it's only correct
-because all translations are flushed on nested transitions anyway.
-
-In preparation for stopping unconditional flushes on nested transitions,
-handle INVPLGA interception properly. If L1 specified zero as the ASID,
-this is equivalent to INVLPG, so handle it as such. Otherwise, use
-INVPLGA to flush the translations of the appropriate ASID tracked by
-KVM, if any. Sync the shadow MMU as well, as L1 invalidated L2's
-mappings.
+Now that nested TLB flushes are properly tracked, start allocating a
+separate ASID for nested guests. This allows dropping the unconditional
+TLB flushes on nested transitions and doing finer grained TLB flushing
+when necessary.
 
 Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 ---
- arch/x86/include/asm/kvm_host.h |  2 ++
- arch/x86/kvm/mmu/mmu.c          |  5 +++--
- arch/x86/kvm/svm/svm.c          | 36 +++++++++++++++++++++++++++++++--
- 3 files changed, 39 insertions(+), 4 deletions(-)
+ arch/x86/kvm/svm/nested.c | 11 +++++++++--
+ arch/x86/kvm/svm/svm.c    |  5 +++--
+ arch/x86/kvm/svm/svm.h    |  3 +++
+ 3 files changed, 15 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index d881e7d276b12..a158d324168a0 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -2237,6 +2237,8 @@ int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 error_code,
- 		       void *insn, int insn_len);
- void kvm_mmu_print_sptes(struct kvm_vcpu *vcpu, gpa_t gpa, const char *msg);
- void kvm_mmu_invlpg(struct kvm_vcpu *vcpu, gva_t gva);
-+void __kvm_mmu_invalidate_addr(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
-+			       u64 addr, unsigned long roots, bool gva_flush);
- void kvm_mmu_invalidate_addr(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
- 			     u64 addr, unsigned long roots);
- void kvm_mmu_invpcid_gva(struct kvm_vcpu *vcpu, gva_t gva, unsigned long pcid);
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index e2b1994f12753..d3baa12df84e7 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -6355,8 +6355,8 @@ static void kvm_mmu_invalidate_addr_in_root(struct kvm_vcpu *vcpu,
- 	write_unlock(&vcpu->kvm->mmu_lock);
- }
- 
--static void __kvm_mmu_invalidate_addr(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
--				      u64 addr, unsigned long roots, bool gva_flush)
-+void __kvm_mmu_invalidate_addr(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
-+			       u64 addr, unsigned long roots, bool gva_flush)
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index 544913461693c..0c887c91bd50d 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -1204,6 +1204,7 @@ int svm_allocate_nested(struct vcpu_svm *svm)
  {
- 	int i;
+ 	struct kvm_svm *kvm_svm = to_kvm_svm(svm->vcpu.kvm);
+ 	struct page *vmcb02_page;
++	unsigned int asid;
  
-@@ -6382,6 +6382,7 @@ static void __kvm_mmu_invalidate_addr(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu
- 			kvm_mmu_invalidate_addr_in_root(vcpu, mmu, addr, mmu->prev_roots[i].hpa);
- 	}
- }
-+EXPORT_SYMBOL_GPL(__kvm_mmu_invalidate_addr);
+ 	if (svm->nested.initialized)
+ 		return 0;
+@@ -1221,8 +1222,14 @@ int svm_allocate_nested(struct vcpu_svm *svm)
  
- void kvm_mmu_invalidate_addr(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
- 			     u64 addr, unsigned long roots)
+ 	svm->nested.initialized = true;
+ 
+-	if (!kvm_svm->nested_asid)
+-		kvm_svm->nested_asid = kvm_svm->asid;
++	if (!kvm_svm->nested_asid) {
++		asid = kvm_tlb_tags_alloc(&svm_asids);
++		if (asid && !svm_register_asid(asid)) {
++			kvm_tlb_tags_free(&svm_asids, asid);
++			asid = 0;
++		}
++		kvm_svm->nested_asid = asid ?: fallback_asid;
++	}
+ 
+ 	return 0;
+ 
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 3649707c61d3e..4b95fd6b501e6 100644
+index 4b95fd6b501e6..196f5bca57a0e 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -2505,6 +2505,7 @@ static int clgi_interception(struct kvm_vcpu *vcpu)
+@@ -249,8 +249,8 @@ static unsigned long iopm_base;
  
- static int invlpga_interception(struct kvm_vcpu *vcpu)
- {
-+	struct vcpu_svm *svm = to_svm(vcpu);
- 	gva_t gva = kvm_rax_read(vcpu);
- 	u32 asid = kvm_rcx_read(vcpu);
+ DEFINE_PER_CPU(struct svm_cpu_data, svm_data);
  
-@@ -2514,8 +2515,39 @@ static int invlpga_interception(struct kvm_vcpu *vcpu)
+-static struct kvm_tlb_tags svm_asids;
+-static unsigned int fallback_asid;
++struct kvm_tlb_tags svm_asids;
++unsigned int fallback_asid;
  
- 	trace_kvm_invlpga(to_svm(vcpu)->vmcb->save.rip, asid, gva);
- 
--	/* Let's treat INVLPGA the same as INVLPG (can be optimized!) */
--	kvm_mmu_invlpg(vcpu, gva);
-+	/*
-+	 * APM is silent about using INVLPGA to flush the host ASID (i.e. 0).
-+	 * Do the logical thing and handle it like INVLPG.
-+	 */
-+	if (asid == 0) {
-+		kvm_mmu_invlpg(vcpu, gva);
-+		return kvm_skip_emulated_instruction(vcpu);
-+	}
-+
-+	/*
-+	 * Check if L1 specified the L2 ASID we are currently tracking. If it
-+	 * isn't, do nothing as we have to handle the TLB flush when switching
-+	 * to the new ASID anyway.
-+	 */
-+	if (asid == svm->nested.last_asid)
-+		invlpga(gva, svm_nested_asid(vcpu->kvm));
-+
-+	/*
-+	 * If NPT is disabled, sync the shadow page tables as L1 is invalidating
-+	 * mappings for L2. Sync all roots as ASIDs are not tracked in the MMU
-+	 * role.
-+	 *
-+	 * As we are not flushing the current context, skip the gva flush from
-+	 * __kvm_mmu_invalidate_addr(), it would flush the wrong ASID anyway.
-+	 * The correct TLB flush was done above (if needed).
-+	 *
-+	 * This always operates on root_mmu because L1 and L2 share an MMU when
-+	 * NPT is disabled. This can be optimized by invalidating guest roots
-+	 * only.
-+	 */
-+	if (!npt_enabled)
-+		__kvm_mmu_invalidate_addr(vcpu, &vcpu->arch.root_mmu, gva,
-+					  KVM_MMU_ROOTS_ALL, false);
- 
- 	return kvm_skip_emulated_instruction(vcpu);
+ /*
+  * Only MSR_TSC_AUX is switched via the user return hook.  EFER is switched via
+@@ -5127,6 +5127,7 @@ static void svm_vm_destroy(struct kvm *kvm)
+ 	avic_vm_destroy(kvm);
+ 	sev_vm_destroy(kvm);
+ 	kvm_tlb_tags_free(&svm_asids, kvm_svm->asid);
++	kvm_tlb_tags_free(&svm_asids, kvm_svm->nested_asid);
  }
+ 
+ static int svm_vm_init(struct kvm *kvm)
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 0c44133bc05ca..220d10d2b1a5c 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -630,6 +630,9 @@ static inline void svm_vmgexit_no_action(struct vcpu_svm *svm, u64 data)
+ 
+ extern bool dump_invalid_vmcb;
+ 
++extern struct kvm_tlb_tags svm_asids;
++extern unsigned int fallback_asid;
++
+ u32 svm_msrpm_offset(u32 msr);
+ u32 *svm_vcpu_alloc_msrpm(void);
+ void svm_vcpu_init_msrpm(struct kvm_vcpu *vcpu, u32 *msrpm);
 -- 
 2.49.0.395.g12beb8f557-goog
 
