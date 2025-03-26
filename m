@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-42054-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42055-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F34EA71F54
-	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 20:41:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8FF9A71F50
+	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 20:40:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 711883B475E
-	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 19:38:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F277417AC18
+	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 19:39:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B7E9264A7C;
-	Wed, 26 Mar 2025 19:37:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0A47264F9E;
+	Wed, 26 Mar 2025 19:37:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="P+h1Ofhs"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MYuIWsfT"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7110A2561AA
-	for <kvm@vger.kernel.org>; Wed, 26 Mar 2025 19:37:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA8A326463D
+	for <kvm@vger.kernel.org>; Wed, 26 Mar 2025 19:37:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743017829; cv=none; b=sTAbSpeTB3Bw+MDBd1ozMDcy7i+ar0xgXp1cNYUKH9YNQFEYuKmSsEWFCIv45v0WYK9bjN40dMjnSmnZtkf88xxFu3UqV9IFb6rWr7bxyJfjjVtm+XVqf9YFPPXc8uq66NCs8hUO3hdGm7JWuZ6I1LekVcDsGN+ZErkYgZ2qhqo=
+	t=1743017832; cv=none; b=tXUgObWZHsC87VqYPleURq49jf9Xia+GRBSakR7VzM4keJdKxbvsA/i7Lkks9V5jnQo/48f2MoAldiz3amdD40vWKjvy0UXoo/sviz38koTjaoZzmh5xmJar094xcY94OyZjtc0VmuCvQrS0nxdiD0f3t0U8n5MVBhJMOJwCqOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743017829; c=relaxed/simple;
-	bh=kpX2Hv3Ns3UxCoKX6tVxj8f47gVGi0U8q7Q+/pzcrTU=;
+	s=arc-20240116; t=1743017832; c=relaxed/simple;
+	bh=07QhuqeNA9CJD62Y+nMX4jvn7vUJEesW/aZwULJ3kqY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=S4WWFkKTVEDPu24xkwdjHP5Cj1ZtupMCS4C98CjknKefYbpSYlPeOU5HFPorN6vkN46/o2SFmudSprObaXuLLGQ6IC0i6tqLizz1ZCzhUxyHI+2TzyOQqGCXYRTW477w6NFyw9RGhlUB3R6+JuBaHxIpVALGc/AL7NEseuR00p0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=P+h1Ofhs; arc=none smtp.client-ip=91.218.175.182
+	 MIME-Version; b=Hd5PgPnL/4oEun1oy0l2jXkLuoKIPr4T9w3SqEN617yIjRvJtV1q6shOgyAOFXH0zjwMB+KWxf7ZIb1xYsVdJ00CO3wrwr110EbXRgzfnsm0Ai+QPhmk5SUCWj9lovVEKYITqJpq8grSwUWGcJMD+MaOVfzIdJXOMOjErQKZTms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MYuIWsfT; arc=none smtp.client-ip=91.218.175.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1743017825;
+	t=1743017828;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=l9a7sV51gGMamG7lbl5gcaoCKmIXlJVosIr7/PH8LQA=;
-	b=P+h1OfhsJw6sW++kcvayFXKkqM9FatBS4sbnNL3UrWTf/e47iFphcoVEimunFn9gSZWRHT
-	6sf3pdHGmIBoyMI4OpwkXhe4K/cGPmPWQmK2KJMnR+vTXsDAAlozC9JYp1fMT5BlAdeGhS
-	I3QyxwGs03T4paR0H+0i81QWqNVVPpA=
+	bh=DWp8V6B+MtBpnYUkj3PF06YLrN5y+cuwzDwPbUJIa9I=;
+	b=MYuIWsfT3UqRqeoMpj7hq1zw0XJKvHc/E+xJnlPwAIPKCxfKWfJdQMWqxEM2oO2H5IS2TE
+	q1w/Ci3VekkhDTz1mxzU9014RxEDy/mc6mivus37e1xJxH3U/5rcHjnSNsQfYmSfEL2ItH
+	3GVE0UV8DWTpg383VNJAslKTov45/S4=
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
@@ -54,9 +54,9 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Yosry Ahmed <yosry.ahmed@linux.dev>
-Subject: [RFC PATCH 09/24] KVM: SEV: Generalize tracking ASID->vCPU with xarrays
-Date: Wed, 26 Mar 2025 19:36:04 +0000
-Message-ID: <20250326193619.3714986-10-yosry.ahmed@linux.dev>
+Subject: [RFC PATCH 10/24] KVM: SVM: Use a single ASID per VM
+Date: Wed, 26 Mar 2025 19:36:05 +0000
+Message-ID: <20250326193619.3714986-11-yosry.ahmed@linux.dev>
 In-Reply-To: <20250326193619.3714986-1-yosry.ahmed@linux.dev>
 References: <20250326193619.3714986-1-yosry.ahmed@linux.dev>
 Precedence: bulk
@@ -68,225 +68,377 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Following changes will track ASID to vCPU mappings for all ASIDs, not
-just SEV ASIDs. Using per-CPU arrays with the maximum possible number of
-ASIDs would be too expensive. Use xarrays to generalize tracking the
-mappings instead. The logic is also mostly moved outside the SEV code to
-allow future changes to reuse it for normal SVM VMs.
+The ASID generation and dynamic ASID allocation logic is now only used
+by initialization the generation to 0 to trigger a new ASID allocation
+per-vCPU on the first VMRUN, so the ASID is more-or-less static
+per-vCPU.
 
-Storing into an xarray is more expensive than reading/writing to an
-array, but is only done on vCPU load and should be mostly uncontended.
-Also, the size of the xarray should be O(# of VMs), so it is not
-expected to be huge. In fact, the xarray will probably use less memory
-than the normal array even for SEV on machines that only run a few VMs.
+Moreover, having a unique ASID per-vCPU is not required. ASIDs are local
+to each physical CPU, and the ASID is flushed when a vCPU is migrated to
+a new physical CPU anyway. SEV VMs have been using a single ASID per VM
+already for other reasons.
 
-When a new ASID is allocated, reserve an entry for it on all xarrays on
-all CPUs. This allows the memory allocations to happen in a more relaxed
-context (allowing reclaim and accounting), and failures to be handled at
-VM creation time. However, entries will be allocated even on CPUs that
-never run the VM.
+Use a static ASID per VM and drop the dynamic ASID allocation logic. The
+ASID is allocated during vCPU reset (SEV allocates its own ASID), and
+the ASID is always flushed on first use in case it was used by another
+VM previously.
 
-The alternative is relying on on-demand GFP_ATOMIC allocations with
-xa_store() on vCPU load.  These allocations are more likely to fail and
-more difficult to handle since vCPU load cannot fail. Flushing the TLB
-if the xa_store() fails is probably sufficient handling, but
-preallocations are easier to reason about.
+The existing check for whether the ASID in the VMCB matches the per-vCPU
+ASID is turned into a WARN because it is not expected behavior anymore,
+and is moved from svm_vcpu_run() to pre_svm_run() such that it's not
+checked for SEV guests. The check does not apply as-is for SEV, and a
+separate check is added in pre_sev_run() instead. These checks will be
+consolidated (among other code) in a followup change.
 
+As ASIDs cannot be disabled (like how VPIDs can be disabled on Intel),
+handle ASID allocation failure by falling back to a single shared ASID
+allocated during hardware setup. This ASID is flushed on every VMRUN if
+it is in use to avoid sharing TLB entries between different guests. This
+should be unlikely with modern AMD CPUs as they have over 32k ASIDs.
+
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 ---
- arch/x86/kvm/svm/sev.c | 25 ++++-----------------
- arch/x86/kvm/svm/svm.c | 50 +++++++++++++++++++++++++++++++-----------
- arch/x86/kvm/svm/svm.h |  7 +++---
- 3 files changed, 44 insertions(+), 38 deletions(-)
+ arch/x86/kvm/svm/nested.c |   3 +-
+ arch/x86/kvm/svm/svm.c    | 129 ++++++++++++++++++++++----------------
+ arch/x86/kvm/svm/svm.h    |  10 +--
+ 3 files changed, 80 insertions(+), 62 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 1742f51d4c194..c11da3259c089 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -211,6 +211,9 @@ static int sev_asid_new(struct kvm_sev_info *sev)
- 		goto e_uncharge;
- 	}
- 
-+	if (!svm_register_asid(asid))
-+		goto e_uncharge;
-+
- 	__set_bit(asid, sev_asid_bitmap);
- 
- 	mutex_unlock(&sev_bitmap_lock);
-@@ -231,18 +234,10 @@ unsigned int sev_get_asid(struct kvm *kvm)
- 
- static void sev_asid_free(struct kvm_sev_info *sev)
- {
--	struct svm_cpu_data *sd;
--	int cpu;
-+	svm_unregister_asid(sev->asid);
- 
- 	mutex_lock(&sev_bitmap_lock);
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index 11b02a0340d9e..81184b2fb27fd 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -677,8 +677,7 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
+ 	vmcb02->control.nested_ctl = vmcb01->control.nested_ctl;
+ 	vmcb02->control.iopm_base_pa = vmcb01->control.iopm_base_pa;
+ 	vmcb02->control.msrpm_base_pa = vmcb01->control.msrpm_base_pa;
 -
- 	__set_bit(sev->asid, sev_reclaim_asid_bitmap);
--
--	for_each_possible_cpu(cpu) {
--		sd = per_cpu_ptr(&svm_data, cpu);
--		sd->sev_vcpus[sev->asid] = NULL;
--	}
--
- 	mutex_unlock(&sev_bitmap_lock);
+-	/* Done at vmrun: asid.  */
++	vmcb02->control.asid = svm_asid(vcpu->kvm);
  
- 	sev_misc_cg_uncharge(sev);
-@@ -3076,18 +3071,6 @@ void sev_hardware_unsetup(void)
- 	misc_cg_set_capacity(MISC_CG_RES_SEV_ES, 0);
- }
- 
--int sev_cpu_init(struct svm_cpu_data *sd)
--{
--	if (!sev_enabled)
--		return 0;
--
--	sd->sev_vcpus = kcalloc(nr_asids, sizeof(void *), GFP_KERNEL);
--	if (!sd->sev_vcpus)
--		return -ENOMEM;
--
--	return 0;
--}
--
- /*
-  * Pages used by hardware to hold guest encrypted state must be flushed before
-  * returning them to the system.
+ 	/* Also overwritten later if necessary.  */
+ 	vmcb_clr_flush_asid(vmcb02);
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index ce67112732e8c..b740114a9d9bc 100644
+index b740114a9d9bc..f028d006f69dc 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -694,7 +694,7 @@ static void svm_cpu_uninit(int cpu)
- 	if (!sd->save_area)
- 		return;
+@@ -249,6 +249,9 @@ static unsigned long iopm_base;
  
--	kfree(sd->sev_vcpus);
-+	xa_destroy(&sd->asid_vcpu);
- 	__free_page(__sme_pa_to_page(sd->save_area_pa));
- 	sd->save_area_pa = 0;
- 	sd->save_area = NULL;
-@@ -711,18 +711,11 @@ static int svm_cpu_init(int cpu)
- 	if (!save_area_page)
- 		return ret;
+ DEFINE_PER_CPU(struct svm_cpu_data, svm_data);
  
--	ret = sev_cpu_init(sd);
--	if (ret)
--		goto free_save_area;
-+	xa_init(&sd->asid_vcpu);
++static struct kvm_tlb_tags svm_asids;
++static unsigned int fallback_asid;
++
+ /*
+  * Only MSR_TSC_AUX is switched via the user return hook.  EFER is switched via
+  * the VMCB, and the SYSCALL/SYSENTER MSRs are handled by VMLOAD/VMSAVE.
+@@ -621,10 +624,6 @@ static int svm_enable_virtualization_cpu(void)
+ 		return -EBUSY;
  
- 	sd->save_area = page_address(save_area_page);
- 	sd->save_area_pa = __sme_page_pa(save_area_page);
- 	return 0;
--
--free_save_area:
--	__free_page(save_area_page);
--	return ret;
--
+ 	sd = per_cpu_ptr(&svm_data, me);
+-	sd->asid_generation = 1;
+-	sd->max_asid = cpuid_ebx(SVM_CPUID_FUNC) - 1;
+-	sd->next_asid = sd->max_asid + 1;
+-	sd->min_asid = max_sev_asid + 1;
+ 
+ 	wrmsrl(MSR_EFER, efer | EFER_SVME);
+ 
+@@ -1119,6 +1118,7 @@ static void svm_hardware_unsetup(void)
+ 
+ 	__free_pages(__sme_pa_to_page(iopm_base), get_order(IOPM_SIZE));
+ 	iopm_base = 0;
++	kvm_tlb_tags_destroy(&svm_asids);
  }
  
- static void set_dr_intercepts(struct vcpu_svm *svm)
-@@ -1557,6 +1550,7 @@ static void svm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	unsigned int asid;
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, cpu);
-+	struct kvm_vcpu *prev;
- 
- 	if (vcpu->scheduled_out && !kvm_pause_in_guest(vcpu->kvm))
- 		shrink_ple_window(vcpu);
-@@ -1573,13 +1567,13 @@ static void svm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	if (sev_guest(vcpu->kvm)) {
- 		/*
- 		 * Flush the TLB when a different vCPU using the same ASID is
--		 * run on the same CPU.
-+		 * run on the same CPU. xa_store() should always succeed because
-+		 * the entry is reserved when the ASID is allocated.
- 		 */
- 		asid = sev_get_asid(vcpu->kvm);
--		if (sd->sev_vcpus[asid] != vcpu) {
--			sd->sev_vcpus[asid] = vcpu;
-+		prev = xa_store(&sd->asid_vcpu, asid, vcpu, GFP_ATOMIC);
-+		if (prev != vcpu || WARN_ON_ONCE(xa_err(prev)))
- 			kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
--		}
+ static void init_seg(struct vmcb_seg *seg)
+@@ -1225,6 +1225,20 @@ static inline void init_vmcb_after_set_cpuid(struct kvm_vcpu *vcpu)
  	}
  }
  
-@@ -5047,6 +5041,36 @@ static void svm_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
- 	sev_vcpu_deliver_sipi_vector(vcpu, vector);
++unsigned int svm_asid(struct kvm *kvm)
++{
++	return to_kvm_svm(kvm)->asid;
++}
++
++static unsigned int svm_get_current_asid(struct vcpu_svm *svm)
++{
++	struct kvm *kvm = svm->vcpu.kvm;
++
++	if (sev_guest(kvm))
++		return sev_get_asid(kvm);
++	return svm_asid(kvm);
++}
++
+ static void init_vmcb(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+@@ -1300,6 +1314,8 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
+ 	control->iopm_base_pa = iopm_base;
+ 	control->msrpm_base_pa = __sme_set(__pa(svm->msrpm));
+ 	control->int_ctl = V_INTR_MASKING_MASK;
++	control->asid = svm_asid(vcpu->kvm);
++	vmcb_set_flush_asid(svm->vmcb);
+ 
+ 	init_seg(&save->es);
+ 	init_seg(&save->ss);
+@@ -1332,8 +1348,6 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
+ 		save->g_pat = vcpu->arch.pat;
+ 		save->cr3 = 0;
+ 	}
+-	svm->current_vmcb->asid_generation = 0;
+-	svm->asid = 0;
+ 
+ 	svm->nested.vmcb12_gpa = INVALID_GPA;
+ 	svm->nested.last_vmcb12_gpa = INVALID_GPA;
+@@ -1547,9 +1561,9 @@ static void svm_prepare_host_switch(struct kvm_vcpu *vcpu)
+ 
+ static void svm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ {
+-	unsigned int asid;
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, cpu);
++	unsigned int asid = svm_get_current_asid(svm);
+ 	struct kvm_vcpu *prev;
+ 
+ 	if (vcpu->scheduled_out && !kvm_pause_in_guest(vcpu->kvm))
+@@ -1564,17 +1578,14 @@ static void svm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	if (kvm_vcpu_apicv_active(vcpu))
+ 		avic_vcpu_load(vcpu, cpu);
+ 
+-	if (sev_guest(vcpu->kvm)) {
+-		/*
+-		 * Flush the TLB when a different vCPU using the same ASID is
+-		 * run on the same CPU. xa_store() should always succeed because
+-		 * the entry is reserved when the ASID is allocated.
+-		 */
+-		asid = sev_get_asid(vcpu->kvm);
+-		prev = xa_store(&sd->asid_vcpu, asid, vcpu, GFP_ATOMIC);
+-		if (prev != vcpu || WARN_ON_ONCE(xa_err(prev)))
+-			kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
+-	}
++	/*
++	 * Flush the TLB when a different vCPU using the same ASID is
++	 * run on the same CPU. xa_store() should always succeed because
++	 * the entry is reserved when the ASID is allocated.
++	 */
++	prev = xa_store(&sd->asid_vcpu, asid, vcpu, GFP_ATOMIC);
++	if (prev != vcpu || WARN_ON_ONCE(xa_err(prev)))
++		kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
  }
  
-+void svm_unregister_asid(unsigned int asid)
-+{
-+	struct svm_cpu_data *sd;
-+	int cpu;
-+
-+	for_each_possible_cpu(cpu) {
-+		sd = per_cpu_ptr(&svm_data, cpu);
-+		xa_erase(&sd->asid_vcpu, asid);
-+	}
-+}
-+
-+bool svm_register_asid(unsigned int asid)
-+{
-+	struct svm_cpu_data *sd;
-+	int cpu;
+ static void svm_vcpu_put(struct kvm_vcpu *vcpu)
+@@ -1989,19 +2000,6 @@ static void svm_update_exception_bitmap(struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
+-static void new_asid(struct vcpu_svm *svm, struct svm_cpu_data *sd)
+-{
+-	if (sd->next_asid > sd->max_asid) {
+-		++sd->asid_generation;
+-		sd->next_asid = sd->min_asid;
+-		svm->vmcb->control.tlb_ctl = TLB_CONTROL_FLUSH_ALL_ASID;
+-		vmcb_mark_dirty(svm->vmcb, VMCB_ASID);
+-	}
+-
+-	svm->current_vmcb->asid_generation = sd->asid_generation;
+-	svm->asid = sd->next_asid++;
+-}
+-
+ static void svm_set_dr6(struct kvm_vcpu *vcpu, unsigned long value)
+ {
+ 	struct vmcb *vmcb = to_svm(vcpu)->vmcb;
+@@ -3629,8 +3627,16 @@ static int svm_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
+ 
+ static int pre_svm_run(struct kvm_vcpu *vcpu)
+ {
+-	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, vcpu->cpu);
+ 	struct vcpu_svm *svm = to_svm(vcpu);
++	unsigned int asid = svm_get_current_asid(svm);
 +
 +	/*
-+	 * Preallocate entries on all CPUs for the ASID to avoid memory
-+	 * allocations in the vCPU load path.
++	 * Reject KVM_RUN if userspace attempts to run the vCPU with an invalid
++	 * VMSA, e.g. if userspace forces the vCPU to be RUNNABLE after an SNP
++	 * AP Destroy event.
 +	 */
-+	for_each_possible_cpu(cpu) {
-+		sd = per_cpu_ptr(&svm_data, cpu);
-+		if (xa_reserve(&sd->asid_vcpu, asid, GFP_KERNEL_ACCOUNT)) {
-+			svm_unregister_asid(asid);
-+			return false;
-+		}
-+	}
-+	return true;
-+}
-+
++	if (sev_es_guest(vcpu->kvm) && !VALID_PAGE(svm->vmcb->control.vmsa_pa))
++		return -EINVAL;
+ 
+ 	/*
+ 	 * If the previous VMRUN of the VMCB occurred on a different physical
+@@ -3643,25 +3649,20 @@ static int pre_svm_run(struct kvm_vcpu *vcpu)
+ 		svm->current_vmcb->cpu = vcpu->cpu;
+         }
+ 
+-	if (sev_guest(vcpu->kvm)) {
+-		/* Assign the asid allocated with this SEV guest */
+-		svm->asid = sev_get_asid(vcpu->kvm);
++	/*
++	 * If we run out of space and ASID allocation fails, we fallback to a
++	 * shared fallback ASID. For that ASID, we need to flush the TLB on
++	 * every VMRUN to avoid sharing TLB entries between different guests.
++	 */
++	if (unlikely(asid == fallback_asid))
++		vmcb_set_flush_asid(svm->vmcb);
+ 
+-		/*
+-		 * Reject KVM_RUN if userspace attempts to run the vCPU with an invalid
+-		 * VMSA, e.g. if userspace forces the vCPU to be RUNNABLE after an SNP
+-		 * AP Destroy event.
+-		 */
+-		if (sev_es_guest(vcpu->kvm) &&
+-		    !VALID_PAGE(svm->vmcb->control.vmsa_pa))
+-			return -EINVAL;
+-		return 0;
++	if (WARN_ON_ONCE(svm->vmcb->control.asid != asid)) {
++		vmcb_set_flush_asid(svm->vmcb);
++		svm->vmcb->control.asid = asid;
++		vmcb_mark_dirty(svm->vmcb, VMCB_ASID);
+ 	}
+ 
+-	/* FIXME: handle wraparound of asid_generation */
+-	if (svm->current_vmcb->asid_generation != sd->asid_generation)
+-		new_asid(svm, sd);
+-
+ 	return 0;
+ }
+ 
+@@ -4062,7 +4063,7 @@ static void svm_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t gva)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 
+-	invlpga(gva, svm->vmcb->control.asid);
++	invlpga(gva, svm_get_current_asid(svm));
+ }
+ 
+ static inline void sync_cr8_to_lapic(struct kvm_vcpu *vcpu)
+@@ -4308,10 +4309,6 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu,
+ 
+ 	sync_lapic_to_cr8(vcpu);
+ 
+-	if (unlikely(svm->asid != svm->vmcb->control.asid)) {
+-		svm->vmcb->control.asid = svm->asid;
+-		vmcb_mark_dirty(svm->vmcb, VMCB_ASID);
+-	}
+ 	svm->vmcb->save.cr2 = vcpu->arch.cr2;
+ 
+ 	svm_hv_update_vp_id(svm->vmcb, vcpu);
+@@ -5073,13 +5070,18 @@ bool svm_register_asid(unsigned int asid)
+ 
  static void svm_vm_destroy(struct kvm *kvm)
  {
++	struct kvm_svm *kvm_svm = to_kvm_svm(kvm);
++
  	avic_vm_destroy(kvm);
+ 	sev_vm_destroy(kvm);
++	kvm_tlb_tags_free(&svm_asids, kvm_svm->asid);
+ }
+ 
+ static int svm_vm_init(struct kvm *kvm)
+ {
++	struct kvm_svm *kvm_svm = to_kvm_svm(kvm);
+ 	int type = kvm->arch.vm_type;
++	unsigned int asid;
+ 
+ 	if (type != KVM_X86_DEFAULT_VM &&
+ 	    type != KVM_X86_SW_PROTECTED_VM) {
+@@ -5100,6 +5102,13 @@ static int svm_vm_init(struct kvm *kvm)
+ 			return ret;
+ 	}
+ 
++	asid = kvm_tlb_tags_alloc(&svm_asids);
++	if (asid && !svm_register_asid(asid)) {
++		kvm_tlb_tags_free(&svm_asids, asid);
++		asid = 0;
++	}
++	kvm_svm->asid = asid ?: fallback_asid;
++
+ 	return 0;
+ }
+ 
+@@ -5381,6 +5390,7 @@ static __init int svm_hardware_setup(void)
+ 	void *iopm_va;
+ 	int r;
+ 	unsigned int order = get_order(IOPM_SIZE);
++	unsigned int min_asid, max_asid;
+ 
+ 	/*
+ 	 * NX is required for shadow paging and for NPT if the NX huge pages
+@@ -5473,6 +5483,13 @@ static __init int svm_hardware_setup(void)
+ 	 */
+ 	sev_hardware_setup();
+ 
++	/* Consumes max_sev_asid initialized by sev_hardware_setup() */
++	min_asid = max_sev_asid + 1;
++	max_asid = cpuid_ebx(SVM_CPUID_FUNC) - 1;
++	r = kvm_tlb_tags_init(&svm_asids, min_asid, max_asid);
++	if (r)
++		goto err;
++
+ 	svm_hv_hardware_setup();
+ 
+ 	for_each_possible_cpu(cpu) {
+@@ -5481,6 +5498,12 @@ static __init int svm_hardware_setup(void)
+ 			goto err;
+ 	}
+ 
++	fallback_asid = kvm_tlb_tags_alloc(&svm_asids);
++	WARN_ON_ONCE(!fallback_asid);
++
++	/* Needs to be after svm_cpu_init() initializes the per-CPU xarrays */
++	svm_register_asid(fallback_asid);
++
+ 	enable_apicv = avic = avic && avic_hardware_setup();
+ 
+ 	if (!enable_apicv) {
 diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 3ab2a424992c1..4929b96d3d700 100644
+index 4929b96d3d700..436b7e83141b9 100644
 --- a/arch/x86/kvm/svm/svm.h
 +++ b/arch/x86/kvm/svm/svm.h
-@@ -340,8 +340,7 @@ struct svm_cpu_data {
+@@ -117,6 +117,8 @@ struct kvm_sev_info {
+ struct kvm_svm {
+ 	struct kvm kvm;
  
- 	struct vmcb *current_vmcb;
- 
--	/* index = sev_asid, value = vcpu pointer */
--	struct kvm_vcpu **sev_vcpus;
-+	struct xarray asid_vcpu;
++	unsigned int asid;
++
+ 	/* Struct members for AVIC */
+ 	u32 avic_vm_id;
+ 	struct page *avic_logical_id_table_page;
+@@ -132,7 +134,6 @@ struct kvm_vmcb_info {
+ 	struct vmcb *ptr;
+ 	unsigned long pa;
+ 	int cpu;
+-	uint64_t asid_generation;
  };
  
- DECLARE_PER_CPU(struct svm_cpu_data, svm_data);
-@@ -655,6 +654,8 @@ void set_msr_interception(struct kvm_vcpu *vcpu, u32 *msrpm, u32 msr,
- void svm_set_x2apic_msr_interception(struct vcpu_svm *svm, bool disable);
- void svm_complete_interrupt_delivery(struct kvm_vcpu *vcpu, int delivery_mode,
+ struct vmcb_save_area_cached {
+@@ -247,7 +248,6 @@ struct vcpu_svm {
+ 	struct vmcb *vmcb;
+ 	struct kvm_vmcb_info vmcb01;
+ 	struct kvm_vmcb_info *current_vmcb;
+-	u32 asid;
+ 	u32 sysenter_esp_hi;
+ 	u32 sysenter_eip_hi;
+ 	uint64_t tsc_aux;
+@@ -330,11 +330,6 @@ struct vcpu_svm {
+ };
+ 
+ struct svm_cpu_data {
+-	u64 asid_generation;
+-	u32 max_asid;
+-	u32 next_asid;
+-	u32 min_asid;
+-
+ 	struct vmcb *save_area;
+ 	unsigned long save_area_pa;
+ 
+@@ -656,6 +651,7 @@ void svm_complete_interrupt_delivery(struct kvm_vcpu *vcpu, int delivery_mode,
  				     int trig_mode, int vec);
-+bool svm_register_asid(unsigned int asid);
-+void svm_unregister_asid(unsigned int asid);
+ bool svm_register_asid(unsigned int asid);
+ void svm_unregister_asid(unsigned int asid);
++unsigned int svm_asid(struct kvm *kvm);
  
  /* nested.c */
  
-@@ -793,7 +794,6 @@ void sev_vm_destroy(struct kvm *kvm);
- void __init sev_set_cpu_caps(void);
- void __init sev_hardware_setup(void);
- void sev_hardware_unsetup(void);
--int sev_cpu_init(struct svm_cpu_data *sd);
- int sev_dev_get_attr(u32 group, u64 attr, u64 *val);
- extern unsigned int max_sev_asid;
- void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code);
-@@ -817,7 +817,6 @@ static inline void sev_vm_destroy(struct kvm *kvm) {}
- static inline void __init sev_set_cpu_caps(void) {}
- static inline void __init sev_hardware_setup(void) {}
- static inline void sev_hardware_unsetup(void) {}
--static inline int sev_cpu_init(struct svm_cpu_data *sd) { return 0; }
- static inline int sev_dev_get_attr(u32 group, u64 attr, u64 *val) { return -ENXIO; }
- #define max_sev_asid 0
- static inline void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code) {}
 -- 
 2.49.0.395.g12beb8f557-goog
 
