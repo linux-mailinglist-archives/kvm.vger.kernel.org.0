@@ -1,384 +1,651 @@
-Return-Path: <kvm+bounces-42010-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42011-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 246D0A70EDD
-	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 03:17:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 62EBEA70F93
+	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 04:36:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 780B93BFE1D
-	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 02:16:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 567573BD8C3
+	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 03:36:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF362146588;
-	Wed, 26 Mar 2025 02:15:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 285D1183CB0;
+	Wed, 26 Mar 2025 03:36:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="AhnIIln2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Obw1flVE"
 X-Original-To: kvm@vger.kernel.org
-Received: from esa20.fujitsucc.c3s2.iphmx.com (esa20.fujitsucc.c3s2.iphmx.com [216.71.158.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7172413DDAA;
-	Wed, 26 Mar 2025 02:15:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.158.65
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742955359; cv=fail; b=ZwOPJc52+1KR44JxfXw8sjWlTH4KAFZti9OLXsJ0JafqCS61TOsvXj77WdEENY/PKIdk1/MmpIeX8zmfKbaOZrP0ZzKlnzFYided5qPrxp1knQmJPc7ivpBhwr6XY6JQeew124241ubHk6wqn0RvERbGKc1FuJMzJMiN0sA5Slk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742955359; c=relaxed/simple;
-	bh=0/dZinhkHePVcIzf3+xj3YOvaZDucSSYg9pCldOSVUo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=WztyQooaBT723oTv4MfxPmpDOkxvq76nKW7og1Ov1cZJCzqSG0y6LaYx3DcfNX8QVgMVq2heRs62DT7fWVUtDo+UrynamMZ5lY57r+EstiGTuC1sJpmNaqbgvjCvn7d3OoOc/jbQkMTat4MR9GRcVmbrYg8n8xexxgiCpwCGLX4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=AhnIIln2; arc=fail smtp.client-ip=216.71.158.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj1;
-  t=1742955357; x=1774491357;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=0/dZinhkHePVcIzf3+xj3YOvaZDucSSYg9pCldOSVUo=;
-  b=AhnIIln2M9z219lRxYScgVFu7mdzVz35f8l0XxGQT7Ve5Xc/vEkzuA4R
-   ymKlew8MnL5zyH7v7Q18SBXHbIKQqRG7Gv3WaiRXCDTweHvb0N15ebJZE
-   1xFCZnsqixIxWSqRUw5msNxrt1+IEEHQFQGB4530veDRLqLf8z1DH2T6b
-   3oLNYWlWyhgr9FQDllUofFx2zvKiRc9H2lXGBDbB7qjhWFAOvyJ7TxdiK
-   NUcAQLrZRcxcG25UN+lezF/KbaUW2aELRm7rA1cdp4V4WJika/JHxSyP0
-   VxdvoMWYg3BkVJORleOckGEjNFr794SF1I9CvX938AYZhagWYkb8we8NZ
-   g==;
-X-CSE-ConnectionGUID: mF/3BsZaTDy0bAU3Dje42A==
-X-CSE-MsgGUID: nc1n1KONRbu3rra7YEO7aA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11384"; a="150543806"
-X-IronPort-AV: E=Sophos;i="6.14,276,1736780400"; 
-   d="scan'208";a="150543806"
-Received: from mail-japanwestazlp17011027.outbound.protection.outlook.com (HELO OS0P286CU010.outbound.protection.outlook.com) ([40.93.130.27])
-  by ob1.fujitsucc.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2025 11:14:40 +0900
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rfAhRBcPeUYK0VIAKmyYR+N9Z4ZygXbERaHdTE1vXd9tjOpSqfaaBa2cHDqapk/5zf1wp+vrqcLB9wh18VOEORgb+k9ZX9pWkLRpx9q69oC9DEtrwRU41GRV0NjLA5bjs6m2np9kY3ReICX7TwHUvK1a6ZQXTVPO7HKCic8mAstFnlI13dd43nCPPoGvhyp4tGc0HCMnVfJHmDcSFwHzWdh8uLX87WF95goyj8hj6d1BwRPJcfHdd3gIU25dfo8j7xRDrtrcrYoqaGWrQ01Jmokrdy65F48JWR7ieYcnTBb5I8rr0KuOyXJr2l2YK8MK27KH5byO7eSF0/nVEb30NA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0/dZinhkHePVcIzf3+xj3YOvaZDucSSYg9pCldOSVUo=;
- b=YAPazRioJXxd1AH4HyJPJp3Qt5F7L7SeEjfLrbpBzCVWHH27jpXEb7BkvWRC7JubBNt2Awd20fNe1fOUjqsUdQtTPG8r887lEYaV8ngKeQ1OinnYmLIAcU71WoadbBLhGue5iO42E44z+rKwmognj6SP2erxApR1YXKtz0ku1l9W7W4B2JQVSaR4k6+a/oGr1kVYiX5smoCnquHQRbOYBuRvO5a1InLv+A3Sb3I7volPIOD3dC+ioG7wzRuOhrPn2dMFDR+6IvswpzI3RL/ymH2CHsPyshqyuvkUgOU0C52BhOeijAa5sz8nIqjiXjQJX14RWLalKA6SYJLiVOllGA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=fujitsu.com; dmarc=pass action=none header.from=fujitsu.com;
- dkim=pass header.d=fujitsu.com; arc=none
-Received: from TYCPR01MB11463.jpnprd01.prod.outlook.com
- (2603:1096:400:389::10) by OS0PR01MB5299.jpnprd01.prod.outlook.com
- (2603:1096:604:a0::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.43; Wed, 26 Mar
- 2025 02:14:36 +0000
-Received: from TYCPR01MB11463.jpnprd01.prod.outlook.com
- ([fe80::5df7:5225:6f58:e8e8]) by TYCPR01MB11463.jpnprd01.prod.outlook.com
- ([fe80::5df7:5225:6f58:e8e8%7]) with mapi id 15.20.8534.042; Wed, 26 Mar 2025
- 02:14:36 +0000
-From: "Emi Kisanuki (Fujitsu)" <fj0570is@fujitsu.com>
-To: 'Steven Price' <steven.price@arm.com>, "'kvm@vger.kernel.org'"
-	<kvm@vger.kernel.org>, "'kvmarm@lists.linux.dev'" <kvmarm@lists.linux.dev>
-CC: 'Catalin Marinas' <catalin.marinas@arm.com>, 'Marc Zyngier'
-	<maz@kernel.org>, 'Will Deacon' <will@kernel.org>, 'James Morse'
-	<james.morse@arm.com>, 'Oliver Upton' <oliver.upton@linux.dev>, 'Suzuki K
- Poulose' <suzuki.poulose@arm.com>, 'Zenghui Yu' <yuzenghui@huawei.com>,
-	"'linux-arm-kernel@lists.infradead.org'"
-	<linux-arm-kernel@lists.infradead.org>, "'linux-kernel@vger.kernel.org'"
-	<linux-kernel@vger.kernel.org>, 'Joey Gouly' <joey.gouly@arm.com>, 'Alexandru
- Elisei' <alexandru.elisei@arm.com>, 'Christoffer Dall'
-	<christoffer.dall@arm.com>, 'Fuad Tabba' <tabba@google.com>,
-	"'linux-coco@lists.linux.dev'" <linux-coco@lists.linux.dev>, 'Ganapatrao
- Kulkarni' <gankulkarni@os.amperecomputing.com>, 'Gavin Shan'
-	<gshan@redhat.com>, 'Shanker Donthineni' <sdonthineni@nvidia.com>, 'Alper
- Gun' <alpergun@google.com>, "'Aneesh Kumar K . V'" <aneesh.kumar@kernel.org>
-Subject: RE: [PATCH v7 00/45] arm64: Support for Arm CCA in KVM
-Thread-Topic: [PATCH v7 00/45] arm64: Support for Arm CCA in KVM
-Thread-Index: AQEtDkc9LTcodmkzl5rPqzVBxQkHJ7ThxWSA
-Date: Wed, 26 Mar 2025 02:14:35 +0000
-Message-ID:
- <TYCPR01MB11463C8CCEFEDAF79868E9BBCC3A62@TYCPR01MB11463.jpnprd01.prod.outlook.com>
-References: <20250213161426.102987-1-steven.price@arm.com>
-In-Reply-To: <20250213161426.102987-1-steven.price@arm.com>
-Accept-Language: ja-JP, en-US
-Content-Language: ja-JP
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- =?utf-8?B?TVNJUF9MYWJlbF8xZTkyZWY3My0wYWQxLTQwYzUtYWQ1NS00NmRlMzM5Njgw?=
- =?utf-8?B?MmZfQWN0aW9uSWQ9ZTY1NDY3N2QtMzk4MC00OTQ4LTg0ZTEtY2VlYzUwYjFj?=
- =?utf-8?B?Y2Y5O01TSVBfTGFiZWxfMWU5MmVmNzMtMGFkMS00MGM1LWFkNTUtNDZkZTMz?=
- =?utf-8?B?OTY4MDJmX0NvbnRlbnRCaXRzPTA7TVNJUF9MYWJlbF8xZTkyZWY3My0wYWQx?=
- =?utf-8?B?LTQwYzUtYWQ1NS00NmRlMzM5NjgwMmZfRW5hYmxlZD10cnVlO01TSVBfTGFi?=
- =?utf-8?B?ZWxfMWU5MmVmNzMtMGFkMS00MGM1LWFkNTUtNDZkZTMzOTY4MDJmX01ldGhv?=
- =?utf-8?B?ZD1Qcml2aWxlZ2VkO01TSVBfTGFiZWxfMWU5MmVmNzMtMGFkMS00MGM1LWFk?=
- =?utf-8?B?NTUtNDZkZTMzOTY4MDJmX05hbWU9RlVKSVRTVS1QVUJMSUPigIs7TVNJUF9M?=
- =?utf-8?B?YWJlbF8xZTkyZWY3My0wYWQxLTQwYzUtYWQ1NS00NmRlMzM5NjgwMmZfU2V0?=
- =?utf-8?B?RGF0ZT0yMDI1LTAzLTI2VDAxOjUzOjE1WjtNU0lQX0xhYmVsXzFlOTJlZjcz?=
- =?utf-8?B?LTBhZDEtNDBjNS1hZDU1LTQ2ZGUzMzk2ODAyZl9TaXRlSWQ9YTE5ZjEyMWQt?=
- =?utf-8?Q?81e1-4858-a9d8-736e267fd4c7;?=
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=fujitsu.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TYCPR01MB11463:EE_|OS0PR01MB5299:EE_
-x-ms-office365-filtering-correlation-id: 01df9341-ca3d-4e0b-1028-08dd6c0bf48c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|7416014|366016|376014|38070700018|1580799027;
-x-microsoft-antispam-message-info:
- =?utf-8?B?RjJwQ3orY3d1TkxVSzFrLzkrYklId1JZQk9ZMjZlZVpkWlErUlFKMDVQeC9D?=
- =?utf-8?B?TVFFMTJrZnNkQTR2WElDTFVFUExJSFBKYjBzemtmN2h0eU1VM3hpLzJQWWVh?=
- =?utf-8?B?Z3ZwM1l1MUpEV0V3eU1MdHRQcmd1TFIrMUIrSlg1cE9IYU9GUEgvaDBLb294?=
- =?utf-8?B?c3k1VGU0cWM3eGxIQnRodjU0WmxuZHhCVnBDZkpLZWxIWXl1SWlqWWU4SDZo?=
- =?utf-8?B?RUVmNjFHUnE3bFhiOE8vQmNpczFYUmlqQmNyNWlKaC9PSm1EVERsVjhHVmpC?=
- =?utf-8?B?QlV6clBlVDhYeVQ4ajROSit4UE1scnNEajdBM3pnRXRqOUlFOVhPOGNQb0x0?=
- =?utf-8?B?VVN0Q1ZoLzdIVWhKbWRrVmpjd2pIdVhpNStvNXAyM0Q3d2NRQzlVcG9jZmFC?=
- =?utf-8?B?QUIzekhMZkRwc3VDeEl2SDJTL094UEVHOXZGSk1mUHNhMzZGbDY0eDR3SXln?=
- =?utf-8?B?b1BIbFFaTEdEdDNhOTFuWUxNeW8xV0lkeFlTNWU1TGh0enVmbUlBQWpza0sv?=
- =?utf-8?B?NmlSaW85QndLdjJ4TEUwM2FSZzMvcG9UdElVd3VEK1BOTHhpSWRBNHN5a3Zz?=
- =?utf-8?B?TTVoU0dMV25aUmxBWmVWcWZDNWNORXhkR3hBaysrZmRZVHB2YzlleDJBODlK?=
- =?utf-8?B?SWF5SzZQamMzSlZzbk9JWW9Bem02dnNuT0h3Z1U2TXVsNTgvMUVycDZrakJV?=
- =?utf-8?B?bEVXUXBpK1M3dnNhL1JqNThuNkZrWDVOdkNMZEhUa0hQbG0xY0U0LzAvM1ND?=
- =?utf-8?B?QkEvWnlEbTdFN3RyVGQxQ1VyL25kT3BhS205WXIvVmtZenl3R2FISGhZK003?=
- =?utf-8?B?ak45aFp3VFFCU2d1eHdaM09TWS85WDBFWkt4NlNUdGZPdzFjSVdiS3lIdUN1?=
- =?utf-8?B?eEY4MFc2d2tHalRpMjN1Y29taFJOU0Y3K2ZicEFnT09IU1NLcnB3MmxRR1Rl?=
- =?utf-8?B?eThiMUE0RGVpUVBUNWF6WTlLWXVSdmRBS0JUdmRkL3lDRXI1eWpZRnF0cE9M?=
- =?utf-8?B?bEczZWZHRWFRVWlMYjEraVl1STdnWTJxb3lUbUFTOXpXQWZncDA4cCtMdnMy?=
- =?utf-8?B?VFJSY1A0bUhFTnlWbTZJeFhpT3NJQjhqN1d3N0ZmYi9RbnFWT1dBU1JpOFB4?=
- =?utf-8?B?Vmdad0FqTmZhVGkrR1NBckp1WCs5TE0yZHZsRStaa1VZTGhJQ0VHelZWcTdw?=
- =?utf-8?B?eXBRc1VPSmdPaUJlZm1DTzBCMFUzUkorcUFBNGUrelRSRG4yTDFXZ1FhWnZD?=
- =?utf-8?B?UUlmZnFISHkrSjhLaThmTUYvc3JNUHJxZnlHOWNHdTYxOE56TXVmVmFaeEs1?=
- =?utf-8?B?bkhOYVl5M2k3NFlvL2JRblp6UXZYTmdFSktFN0JPMGdhdnJuNWVuK3BVT3My?=
- =?utf-8?B?OXJjbEczam9yODdvMmdVZy82T0VBK0lMWElacUZiVk9ETEhtMm1oa3BYcGNs?=
- =?utf-8?B?cHZPTHNWQXp5dHpWcExJL05kUXJHVEpjbGNTMjRJU09pVmNwVnZ5ZU5kVkZ5?=
- =?utf-8?B?TnZsM1ViTU5SODF0QnZlb2FscFk5YWo3RGt0WXFvYXZQTEs1cWZoVG1Xclkr?=
- =?utf-8?B?eTVNSTZyYzNTaS9RcEV5MnhLN3N4cFZrNXZPeDhGTzc4bHBwZnV6bkdnUXhK?=
- =?utf-8?B?SlFWS3dRR1NOWjEwOUFJanVwNEpxamdVQUl5UC9pS1RGYTdVbDNiNms0WnQ1?=
- =?utf-8?B?bzF3bDVMOUR6ZEU4UVZja2tjY3ZPQWVweVVHMTBtOE9JVDkvTzE5MmxMRTZs?=
- =?utf-8?B?RVNsOUF2RUtRMlZ4aHZWdk5veTVJTnV6ZXhpVnZzTlBLajhIZW5aZWUxVWRR?=
- =?utf-8?B?SHZOMTdiM1JMa2QvTDJJZmpDQkNCTC9FdkMxYVRaSDZsbWk4RGh6WWdLTkps?=
- =?utf-8?B?UkxBNmkwcHpLck9xd3ZiUU9ObzJqdEZORlBDZ015d2xsYkdLZGdzU2xRQTM3?=
- =?utf-8?B?SmxoN1NNRWtxSTlORmVZb3FXOFk3NExpYnhma3JFSHBQN3lrOFcvUjFTc2dF?=
- =?utf-8?B?emJMNU5KaU5BPT0=?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:ja;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYCPR01MB11463.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(366016)(376014)(38070700018)(1580799027);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?VWZBSWsyTkFIaTJJVjdzZUsxSmRkWU82dFBmYW9IOUFnMzB3eHFhM2tQcFQ3?=
- =?utf-8?B?TE0vQWI0cXF6ZHRWSXdudkJzTlArL0ZtanArVGxIQ1hkbWRZRWN1WUFKNXJl?=
- =?utf-8?B?Z1pPTzRsUGNVNVl4cXhWcG5RK0dNOEpJQ0lDdm11dmFvZXlQYmpXSjdlUFdi?=
- =?utf-8?B?SHNpRDA3MFpoSElEb001Y0xGamxhZ2ZkNVFrR2hsWEp6NUNYSXNiSGdSbTRL?=
- =?utf-8?B?blJManA4bmFWRXJselZKRTROWXl3VXNiTTg4UzF1ZW95WFlYRTBMZysvTUZ5?=
- =?utf-8?B?ckVMMTNBMlBHSjVvbHQwWU1CODJVTTlrQnZ3cmxNbGxtQjVTY0o3SUtTU0Rw?=
- =?utf-8?B?NmppbVkrMjNOSkxvYlVzQ1ZkK240d3A2SFB0NUJjNkwzbTVLZktmNVRaTnpn?=
- =?utf-8?B?ays1aDV3S1JFMmdPTkRuN3hlbjJqQkV1YnQ2NkhXeVhJYTZGRlZRaTNuUUNh?=
- =?utf-8?B?cWxQbHdmbnZUd05pTG0rZE9scjA5MG1VWkY4NU9GVlIvVzNsUkVXMzE0WEZi?=
- =?utf-8?B?UFg2TTJhQ0NGNDdRaWdzeUd0aTNiMXJXaFUwTjRjVGRzNUVlZ3RGVVE4K2l3?=
- =?utf-8?B?Z1ZvZEd3QW9YS0dJRlkvNUg2emp2OGJtaXM1QkJ1elNyd3dKVWZIOWtpRDlT?=
- =?utf-8?B?NkVQVUttTFRKZHVqNDJlS3NJeW5YdnowbkxvdkhTdnJLa3cvcEd5dDlOcGV2?=
- =?utf-8?B?TWxQanRsbHFSd00xNFhBZXp6TGZIZlZKVll0a2FNa1pmVHR6QzNmYXd6cjd6?=
- =?utf-8?B?STJPWnlxdUlEU2pZeEpaMmdZeWduTEJ2cXZEMHZIa0x6ODJ2NHZyOG04Z3JK?=
- =?utf-8?B?SCszbnZOdFk3Q1FOQ1RFV3V4d0UzcG5jK0U0Y0lDczdBTm1hVjhneitYQUhD?=
- =?utf-8?B?b1dld2VjajVSUjVDU3o5MCtZSG9GdkJRM1FYOWw0L3I0NFNTU2FnU1c5STho?=
- =?utf-8?B?N0lqZk9aV0VzK2dIRWxpWFlnTmF1dUllL1pCQlB5Q1gwS096MVRMWjBaUU40?=
- =?utf-8?B?R0l5VVBjYnNnYWpHdXF5M3FjZ1Z1RFcxNlpGZ0dMdkxteUovV2twZ1BkeU9m?=
- =?utf-8?B?N3puK1BUc00wd2NoNitVUWx2SXJLMWQ2OHJBSUtlMU1DNGFBUFdoci9aUy9s?=
- =?utf-8?B?ajg5QzhtZkpaa2hYcUtBamZQejN6dE9CeGNBVjhNb09BMXB4RTRlTmxPUjdv?=
- =?utf-8?B?a2MxcjFWcTU4M1VTazVLQ3p6VnpqSUpXWHc4Zm9GRUdlbC93V1V6aGxGUUhn?=
- =?utf-8?B?RUhQb0lFMDU1Q29KS3VWaXNqVnZPNFVGUkNDeDV6ejV0STB2R1ZIL3hiS1h3?=
- =?utf-8?B?NkxlNXMyS3pCNmpFbmZGY0Q1YmpPNWp3MzBGeW9pbUIrTExMUThGTy9HOHhC?=
- =?utf-8?B?Sjg3MHVvM01LS1FqcitKbVRqSVljQ0IzcEVDcVpWaFNyaVZPTHhKQWplTDI0?=
- =?utf-8?B?S2RuVFErZ0hrUGZYRFVBNGhWY2xpVXBsQjl3L1k4WXFhZnlEWHNhOFEwdk1s?=
- =?utf-8?B?ZGZNdjFRWUQ0NWQwVy9PQnpNNEUwaGdrR3BZZkNySWN6QnZhR2JoaWtUVklX?=
- =?utf-8?B?WmlueHFMbnl5WTd1aVB1MUJQb2VYclNoSTE5aDNDSzAzd2ZOUzQ3SXNwU2Fw?=
- =?utf-8?B?R3ZuMVBXa0NUMldlZmZ2SmtNcldlSUdVUWZzL0FOVklWUWNHZ3FFMVJDMFZE?=
- =?utf-8?B?UlExOTZJd0JJMzhxSjFZcU8vakFGb1h0d1hBNGhFdUNtc0tWV3dxV2FXUnVC?=
- =?utf-8?B?Z3VUaTROOTkraGZxUmdSYlZsVmYzdzkyOVpjZmlWMld0UVBJdC9zcmpmZnFE?=
- =?utf-8?B?cVpEcmFTYTlvaDJFNEVabitUbnk4bi9OYXFhbHJtb2tNWWpQb0UxN21rcHpo?=
- =?utf-8?B?WVhrSTVlQ0hzZDdYV2tNMTlqdXhRQlBGa1U3WWR5RFN6K3NyeURJYWlvdUJS?=
- =?utf-8?B?QzltVU9VRDZUc3FtMUE2NlFZWmhWYjBlMFlxYWxUOWZHZXFCVTU3K082aytQ?=
- =?utf-8?B?L2l2TmRTcFBFVmNhV0xZUStMOVI0bUNyOVhXTG40Q2hqNHZrS2xBaDI1M1di?=
- =?utf-8?B?eXpxMWRNcTFEcEZpaFo2c1pUR2xRNTV4L2JiWkttdVBoazdXdFZyc1JiOXg4?=
- =?utf-8?B?aGJoaUNLMG9kT2JVK3htQ1BreWVlakhUWFNXMVpsWG1YVUQ0ZzBSeFVkUlRv?=
- =?utf-8?B?S3c9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E55145B3F;
+	Wed, 26 Mar 2025 03:35:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742960159; cv=none; b=oTdIvpfQHuLd6ypjD5wvleewi3rhO5xIR+spUKnw88/kIM6SBbX4dUzG5XngkBMDkcepkBB+vavVxOcf1f/i6OYldjtjodLeLbh8lp7Zo1nwlYToBHjTLqOV+oyuD+x/m/zrXV7XGfu+UB1bKRu/SsviBTMY2tPKpqSXX+BNmQA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742960159; c=relaxed/simple;
+	bh=zQNN1ki8h9kqS90OTVQimlrFmuW5TF2JapKQcSFEGKQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fP92l2KTlwtbFsRB0T/++CwgjpLx+9/AUCBGSBBHIOHC8ZwSCntcPzEugyhRgt4ed+i14vAQOb1w8EDaoFSrlWqYdwVNgnmfXqQcDTaCnSNw98a/gD7sXkjH7p9RkK9auSQSouBgO1C/HxdZHywgGfWrVw2/ixv+Nly4Z526+cI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Obw1flVE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EF7BC4CEFB;
+	Wed, 26 Mar 2025 03:35:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742960158;
+	bh=zQNN1ki8h9kqS90OTVQimlrFmuW5TF2JapKQcSFEGKQ=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Obw1flVEtxyMUW/At/kneqHxfCrKDMIfEBFv6McvFjYFOdcgZ6npv9tpvKo8mv8ez
+	 wGZczvLlTbwcByRGQXLWST31lvnljN0K1TYOEQNl++JU6gesu67Lv09Sf66/NYLzNi
+	 /BlGafMrBXix8SlQf7Ytl8uqTnChZahZwTUOXdN5gobvhjt5mEDD01xJpFOu0bvDPf
+	 5OrUG8/fLcLDvWMTCvvqLQzKrAPQzWEoHP21x4jU85mEJpCNChLVCiwhu1hXuNLtfi
+	 CQrEykMsCttEVhpMlGtOu4ZYvulksl9mU2IGksPM9t0ie19bmWEXivkDoSyGD/JTFt
+	 c3ClMFEb/+6hA==
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43d0618746bso43352855e9.2;
+        Tue, 25 Mar 2025 20:35:58 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU94UNJklLRj0/LqLKSuD7MSthhNRWN+94q+Tm/YR99BWxJ9wjl5VTFKITOmcXrGEHA+sqNFZYRyW8tBg==@vger.kernel.org, AJvYcCUHtw2rdXI9nkHnBx1JWMuFhpvrKL7JMqEXJ2JDbR0BXs39vFww6DZ1WPrMzr/2dlYmqMdCJva3@vger.kernel.org, AJvYcCUN/rM3OyqzCji3yAAeuNbj+SFLrsEEc1r+MvtFSYIm7n2J9cq2EQKFtmFJSOjemeuMsKVP/79Loa5uLw==@vger.kernel.org, AJvYcCUOJB1k0WH8VsooQHBQBGpMQC3qK4+0mjkFMvp2MPiW1saMEhpNMKTk8zaswMiF60tgC+WHQB7Hcpuw@vger.kernel.org, AJvYcCUUOtusO85bu5sTv0/LZr9uwIfQNrWr+If90I8mY5C8liOam0CxCWlLqQX4oEJzOJE7FnqaSa5bQkfI3zPq@vger.kernel.org, AJvYcCUkgBw/8lWusfr0oUUtoHHLI5WJrx3Gq5ludqJmtWPW9ABe/HImtpRDvA8feyd6d9yMLIM=@vger.kernel.org, AJvYcCV0y9Rp3WyPr+ROHj8Tc5kMkkyfJ5Pa75mbmqtaQKskXMN23z3v2w4WM99LpKCaxXT5Ym9jKsf67VoSoyE6@vger.kernel.org, AJvYcCVHngYl9Doxk/6LTaPNnyOiEHMRCWnWRrQqP4E6UrlgQXiJaDqUTCq7wC9ddAxtAcW3+emRCDWkespEF54=@vger.kernel.org, AJvYcCVi9vOGzA1eRUJElCgNM+zvgpssGgSbcMwTF45ZqAoeiJMlLhtIzlTZ+E9gnAF40Mkh/0Gcv4794usD@vger.kernel.org, AJvYcCVqhEJuF1WZppYCb8LsY8uabRpjVB+Zt6cYy4fU
+ rrVXZF+X5xErJXvHe4bHHnGYVnmF7gqDQv/BuuoLMOrT5lcafwKH@vger.kernel.org, AJvYcCW63N7tDBzrwRDfJ4GTXHwrSwJ1MLfOI2sF5yDuo4PBhVzYvQa6kRIug1IPRFlK2Gh34YEvHamkCS27lzNw+Q==@vger.kernel.org, AJvYcCWVheI2MNIJfkbYTdARgJi0TI5N64CPT+eNN1CkLkhEQ3xwtUYozLUct3lcQAiguwVH9mnQYNS9OeJFSVw=@vger.kernel.org, AJvYcCWw/FIx9s/hJj7CY6egS9rkj6exEkqbzz0armpOF6cGPeEzaY2x5b8oGkCPs99p2/SjrzTf@vger.kernel.org, AJvYcCXS3QV/jjstlIc//zcyb3qmBu2e5MtCCu12+3p7PF6e+LOoTttgT4pjX7inT1JSaTK3t4ZsgoTg+Hfp2zhW@vger.kernel.org, AJvYcCXmRi+YVC5n4A0R2C0x/2mFcBlyYBILrM7xJsy1syggC+VryuohIrPxDZFdNcSBDciMSP4KNaCKHqNYyX9oBvpn@vger.kernel.org, AJvYcCXtqN9GUfDfas3BqMfcTH9GLaakjUO8b6S45fhqKZFLlFzldaFOBCkrmY5tZhMPv9gwbsHrSjamR/1MV8E=@vger.kernel.org, AJvYcCXvriLTZuDx01UMTmS5vRafnOnASNeXfgADwPyt0mbTvJR+7FoXN4nwt8aaqLb/JRa5m6+i0tqDimi29qYEW2Gecw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxS648DyRW2DuLvMGgQ8DuxpfOpfwGJVx077LqucmlumDBpT8nh
+	f7tiZ3otVZs0WgyGHzfhVOsXw5SuzllvlxBbQcK5XMLK2SOyK20g5yri/h1VZgp4jE9h43w8Aa+
+	joSvcgKx9JAEBi7rwVNX9WOjc7eM=
+X-Google-Smtp-Source: AGHT+IH1qAC7M1zI/GB1SjlJsBUYduB5Ay6a4l3UglXrL2dMWn8mYzFqq7sfxGeFxk8syVmgNIyhBxbe8f3JJEoNutw=
+X-Received: by 2002:a5d:5885:0:b0:391:23e7:968d with SMTP id
+ ffacd0b85a97d-3997f959582mr18193138f8f.47.1742960156337; Tue, 25 Mar 2025
+ 20:35:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	1KQ9m3YWu62q6BdDExD39R9uxvVkm5tT7Rm+bWgr381na7sn13l5qgEp7jsxVGxI3lr+Ue0BHUoSxD4ZACLz4gYJ9sjw8CpDRcWh4vXxIHRAY1egyL8txFl1o8fr0dS+oZINyPJM/tpuLfUWTBXvHH7W0RRjPs95t0LGYBI7Ed+geM6euMCCVaxc5MQjceIzUO3/hTWPm56WuqbIpO5zO2fdRNcfDobaxi9YE3wty+BwaGOYVsKgS0FTTmz1MYoKlC5Up2aLnaHVC0QTqrjCZPRk6G9vH0RVHxhtcGJ7FqYEVjGTxwj/IC0E16YE6MVAZ9hPtEWpWHu7jydvbfQibmp6/U4WK/LuNJemBEbCt1Ezik0orMDDLjb3aWzVd2XFbNiMrjKDSjUhrji8oev1y4pxFvyMnLF5Qqcs86n0cVqnAch1od0HK+HETErG8vyoOaEJhNjK4aKoJ4lcP4NL40NLAzHzVVBz4/MQ8I0OWqJxMm2NR0Icm/XA1uUHeuyE+bOBI8P3KbXl5Suqv0wcTSSZtYjkxjs2NflpjeXhWTVZcZaLEtHmeRlCclFlMwgmgWfQLOozheHr19Gjn5EdE16IeEk7oKCQZtnyqWdSConPUQAq2dIdTuK8joAbIifX
-X-OriginatorOrg: fujitsu.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TYCPR01MB11463.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 01df9341-ca3d-4e0b-1028-08dd6c0bf48c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Mar 2025 02:14:35.9645
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a19f121d-81e1-4858-a9d8-736e267fd4c7
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: M5Kb4N+9wHdN6tVYjtRyKQKlXNQW/dFHrkLV8MVXrCtEFjTg8R9HIlp1WVVfyXwzJVLPFDbOJYIc7xUdl0/FR+EV1eAzYOsVDVQ8oQiso1w=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: OS0PR01MB5299
+References: <20250325121624.523258-1-guoren@kernel.org> <20250325121624.523258-2-guoren@kernel.org>
+ <0024788o-35r0-73q1-1s54-q564p457q33s@vanv.qr>
+In-Reply-To: <0024788o-35r0-73q1-1s54-q564p457q33s@vanv.qr>
+From: Guo Ren <guoren@kernel.org>
+Date: Wed, 26 Mar 2025 11:35:43 +0800
+X-Gmail-Original-Message-ID: <CAJF2gTT8oATgSmOZNMRTRshbAo0kCZWHwZov7qgE5NqjHvsJMQ@mail.gmail.com>
+X-Gm-Features: AQ5f1JrGUbEH86Vmh44AHPZHOEZYFZr2PCQWEd8Vzn0mDV8EcIgvHnzVisOp1Qw
+Message-ID: <CAJF2gTT8oATgSmOZNMRTRshbAo0kCZWHwZov7qgE5NqjHvsJMQ@mail.gmail.com>
+Subject: Re: [RFC PATCH V3 01/43] rv64ilp32_abi: uapi: Reuse lp64 ABI interface
+To: Jan Engelhardt <ej@inai.de>
+Cc: arnd@arndb.de, gregkh@linuxfoundation.org, torvalds@linux-foundation.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, anup@brainfault.org, 
+	atishp@atishpatra.org, oleg@redhat.com, kees@kernel.org, tglx@linutronix.de, 
+	will@kernel.org, mark.rutland@arm.com, brauner@kernel.org, 
+	akpm@linux-foundation.org, rostedt@goodmis.org, edumazet@google.com, 
+	unicorn_wang@outlook.com, inochiama@outlook.com, gaohan@iscas.ac.cn, 
+	shihua@iscas.ac.cn, jiawei@iscas.ac.cn, wuwei2016@iscas.ac.cn, drew@pdp7.com, 
+	prabhakar.mahadev-lad.rj@bp.renesas.com, ctsai390@andestech.com, 
+	wefu@redhat.com, kuba@kernel.org, pabeni@redhat.com, josef@toxicpanda.com, 
+	dsterba@suse.com, mingo@redhat.com, peterz@infradead.org, 
+	boqun.feng@gmail.com, xiao.w.wang@intel.com, qingfang.deng@siflower.com.cn, 
+	leobras@redhat.com, jszhang@kernel.org, conor.dooley@microchip.com, 
+	samuel.holland@sifive.com, yongxuan.wang@sifive.com, 
+	luxu.kernel@bytedance.com, david@redhat.com, ruanjinjie@huawei.com, 
+	cuiyunhui@bytedance.com, wangkefeng.wang@huawei.com, qiaozhe@iscas.ac.cn, 
+	ardb@kernel.org, ast@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-mm@kvack.org, 
+	linux-crypto@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-input@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	linux-serial@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, maple-tree@lists.infradead.org, 
+	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-atm-general@lists.sourceforge.net, linux-btrfs@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	linux-nfs@vger.kernel.org, linux-sctp@vger.kernel.org, 
+	linux-usb@vger.kernel.org, linux-media@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-SGkgYWxsLA0KDQpJIHRlc3RlZCBMaW51eC1jY2EgY2NhLWhvc3QvdjcgcGF0Y2ggd2l0aCBvdXIg
-SW50ZXJuYWwgc2ltdWxhdG9yIGJhc2VkIG9uIFFFTVUgKHdpdGggQ0NBIGFuZCBNUEFNIHN1cHBv
-cnQpLg0KQSBwYW5pYyBvY2N1cnJlZCB3aGVuIHN0YXJ0aW5nIFJlYWxtLCBidXQgSSBkb24ndCB0
-aGluayB0aGlzIGlzIGEgcHJvYmxlbSB3aXRoIHRoZSBjY2EtaG9zdC92NyBwYXRjaC4NClRoZSBs
-b2NhdGlvbiBvZiB0aGUgcGFuaWMgaXMgWzFdLg0KDQpbMV1odHRwczovL2xvcmUua2VybmVsLm9y
-Zy9saW51eC1hcm0ta2VybmVsLzIwMjQxMDMwMTYwMzE3LjI1MjgyMDktNC1qb2V5LmdvdWx5QGFy
-bS5jb20NCmRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2tlcm5lbC9jcHVpbmZvLmMgYi9hcmNoL2Fy
-bTY0L2tlcm5lbC9jcHVpbmZvLmMNCmluZGV4IDQ0NzE4ZDA0ODJiMy4uNDZiYTMwZDQyYjliIDEw
-MDY0NA0KLS0tIGEvYXJjaC9hcm02NC9rZXJuZWwvY3B1aW5mby5jDQorKysgYi9hcmNoL2FybTY0
-L2tlcm5lbC9jcHVpbmZvLmMNCkBAIC00NzgsNiArNDc4LDkgQEAgc3RhdGljIHZvaWQgX19jcHVp
-bmZvX3N0b3JlX2NwdShzdHJ1Y3QgY3B1aW5mb19hcm02NCAqaW5mbykNCiAJaWYgKGlkX2FhNjRw
-ZnIwXzMyYml0X2VsMChpbmZvLT5yZWdfaWRfYWE2NHBmcjApKQ0KIAkJX19jcHVpbmZvX3N0b3Jl
-X2NwdV8zMmJpdCgmaW5mby0+YWFyY2gzMik7DQogDQorCWlmIChpZF9hYTY0cGZyMF9tcGFtKGlu
-Zm8tPnJlZ19pZF9hYTY0cGZyMCkpDQorCQlpbmZvLT5yZWdfbXBhbWlkciA9IHJlYWRfY3B1aWQo
-TVBBTUlEUl9FTDEpOyAvLy8vLy8vIHBhbmljIG9jY3VycmVkIGhlcmUuIA0KKw0KIAljcHVpbmZv
-X2RldGVjdF9pY2FjaGVfcG9saWN5KGluZm8pOw0KIH0NCg0KVGhlcmUgd2FzIG5vIHByb2JsZW0g
-d2l0aCB0aGUgY2NhLWhvc3QvdjUgcGF0Y2ggKGJhc2VkIG9uIHY2LjEyKS4NClRoaXMgcGFuaWMg
-aXMgY2F1c2VkIGJ5IGFjY2Vzc2luZyBNUEFNSURSX0VMMSB3aGVuIHRoZSBjaGlwIHN1cHBvcnRz
-IE1QQU0uDQpUaGlzIGZ1bmN0aW9uYWxpdHkgd2FzIGVuYWJsZWQgd2hlbiB0aGUgY2NhIGhvc3Qg
-cGF0Y2ggYmFzZSB2ZXJzaW9uIHdhcyByZWJhc2VkIGZyb20gdjYuMTIgdG8gdjYuMTMuDQoNCkkg
-YW0gbm90IGZhbWlsaWFyIHdpdGggVEYtQSwgYnV0IEkgdGhpbmsgdGhpcyBtYXliZSBhIFRGLUEn
-cyBidWcuDQpCZWNhdXNlIEl0IHNlZW1zIFRGLUEgc2V0cyBNUEFNM19FTDMuVFJBUExPV0VSIHRv
-IDAgZHVyaW5nIG5vcm1hbCBndWVzdCBib290IGluIG1hbmFnZV9leHRlbnNpb25zX25vbnNlY3Vy
-ZV9wZXJfd29ybGQgZnVuY3Rpb25bMl0uDQpIb3dldmVyLCBURi1BIGRvZXMgbm90IHNldCBpdCB0
-byAwIGR1cmluZyBSZWFsbSBndWVzdCBib290IGluIG1hbmFnZV9leHRlbnNpb25zX3NlY3VyZV9w
-ZXJfd29ybGQgZnVuY3Rpb24uDQpUaGVyZWZvcmUsIGEgdHJhcCBvY2N1cnMgYWdhaW5zdCBFTDMg
-KFRGLUEpLCBhbmQgaXQgaXMgbGlrZWx5IGJlaW5nIHByb2Nlc3NlZCBhcyBhbiBpbnZhbGlkIGlu
-c3RydWN0aW9uIChVbmRlZikuDQoNClsyXWh0dHBzOi8vZ2l0LmNvZGVsaW5hcm8ub3JnL2xpbmFy
-by9kY2FwL3RmLWEvdHJ1c3RlZC1maXJtd2FyZS1hLy0vYmxvYi9jY2EvdjQvbGliL2VsM19ydW50
-aW1lL2FhcmNoNjQvY29udGV4dF9tZ210LmM/cmVmX3R5cGU9aGVhZHMjTDcwMg0KDQpCZXN0IFJl
-Z2FyZHMsDQpFbWkgS2lzYW51a2kNCg0KPiBTdWJqZWN0OiBbUEFUQ0ggdjcgMDAvNDVdIGFybTY0
-OiBTdXBwb3J0IGZvciBBcm0gQ0NBIGluIEtWTQ0KPiANCj4gVGhpcyBzZXJpZXMgYWRkcyBzdXBw
-b3J0IGZvciBydW5uaW5nIHByb3RlY3RlZCBWTXMgdXNpbmcgS1ZNIHVuZGVyIHRoZSBBcm0NCj4g
-Q29uZmlkZW50aWFsIENvbXB1dGUgQXJjaGl0ZWN0dXJlIChDQ0EpLg0KPiANCj4gVGhlIHJlbGF0
-ZWQgZ3Vlc3Qgc3VwcG9ydCB3YXMgbWVyZ2VkIGZvciB2Ni4xNC1yYzEgc28geW91IG5vIGxvbmdl
-ciBuZWVkIHRoYXQNCj4gc2VwYXJhdGVseS4NCj4gDQo+IFRoZXJlIGFyZSBzZXZlcmFsIGNoYW5n
-ZXMgc2luY2UgdjYsIG1hbnkgdGhhbmtzIGZvciB0aGUgcmV2aWV3IGNvbW1lbnRzLiBUaGUNCj4g
-aGlnaGxpZ2h0cyBhcmUgYmVsb3csIGFuZCBpbmRpdmlkdWFsIHBhdGNoZXMgaGF2ZSBhIGNoYW5n
-ZWxvZy4NCj4gDQo+ICAqIFNlcGFyYXRpb24gb2YgdGhlIGNvbmNlcHRzIG9mIFJNTSBncmFudWxl
-IHNpemUgYW5kIFBBR0VfU0laRS4gSXQncw0KPiAgICBub3cgcG9zc2libGUgdG8gcnVuIHdpdGgg
-YSBob3N0IFBBR0VfU0laRSBsYXJnZXIgdGhhbiA0ayAoYnV0IHNlZQ0KPiAgICBiZWxvdykuDQo+
-IA0KPiAgKiBSZXR1cm4gd2l0aCAtRUZBVUxUIGVycm9yIGZvciBLVk1fRVhJVF9NRU1PUllfRkFV
-TFQgYXMgcGVyIHRoZQ0KPiAgICBkb2N1bWVudGF0aW9uLg0KPiANCj4gICogUmV0dXJuIC1FUEVS
-TSByYXRoZXIgdGhhbiAtRUlOVkFMIGluIGNhc2VzIHdoZXJlIGEgcmVhbG0gZnVuY3Rpb24gaXMN
-Cj4gICAgcGVyZm9ybWVkIG9uIGEgbm9uLXJlYWxtIGd1ZXN0Lg0KPiANCj4gICogU2V2ZXJhbCBp
-bXByb3ZlbWVudHMgdG8gbmFtZXMgb2YgZnVuY3Rpb25zL2RlZmluZXMgYW5kIG90aGVyIG1pbm9y
-DQo+ICAgIGNoYW5nZXMgZm9sbG93aW5nIHJldmlldyBmZWVkYmFjayAtIHRoYW5rcyENCj4gDQo+
-IFRoaW5ncyB0byBub3RlOg0KPiANCj4gICogWW91IHdpbGwgbmVlZCBhbiB1cGRhdGVkIGt2bXRv
-b2wgYmVjYXVzZSBvZiB0aGUgS1ZNX0VYSVRfTUVNT1JZX0ZBVUxUDQo+ICAgIGNoYW5nZSBtZW50
-aW9uZWQgYWJvdmUuIFNlZSBiZWxvdyBmb3IgYSBsaW5rLg0KPiANCj4gICogS1ZNX1ZDUFVfTUFY
-X0ZFQVRVUkVTIGlzIGluY3JlbWVudGVkLiAqTk9URSo6IFRoaXMgZWZmZWN0aXZlbHkNCj4gICAg
-ZXhwb3NlcyB0aGUgbmVzdGVkIHZpcnR1YWxpc2F0aW9uIGZlYXR1cmUuIFNvIHRoaXMgc2VyaWVz
-IGFzIGl0DQo+ICAgIHN0YW5kcyBoYXMgYSBkZXBlbmRlbmN5IG9uIHRoYXQgYmVpbmcgZmluaXNo
-ZWQgYmVmb3JlIGl0IGNhbiBiZQ0KPiAgICBtZXJnZWQuIFNlZSBbMl0gZm9yIG1vcmUgZGV0YWls
-cy4NCj4gDQo+ICAqIFRoZSBmaW5hbCBwYXRjaCBlbmFibGVzIHRoZSBob3N0J3MgcGFnZSBzaXpl
-IHRvIGJlIGxhcmdlciB0aGFuIDRrLg0KPiAgICBUaGUgc3VwcG9ydCBpcyBhbGwgaW4gdGhlIHBy
-ZXZpb3VzIHBhdGNoZXMsIGJ1dCB0aGVyZSBpcyBtb3JlIHdvcmsgdG8NCj4gICAgZG8gYmVmb3Jl
-IEkgY29uc2lkZXIgdGhpcyByZWFkeSwgc3BlY2lmaWNhbGx5Og0KPiANCj4gICAgLSBUaGUgY29k
-ZSB0byBhbGxvY2F0ZSBSVFRzIChzdGFnZSAyIHBhZ2UgdGFibGVzKSBmb3IgdGhlIFJNTSBzdGls
-bA0KPiAgICAgIGNvbmZsYXRlcyBwYWdlcyBhbmQgZ3JhbnVsZXMuIFRoaXMgbWVhbnMgdGhhdCBm
-b3IgZXZlcnkgUlRUIGFuDQo+ICAgICAgZW50aXJlIGhvc3QgcGFnZSBpcyBhbGxvY2F0ZWQgcG90
-ZW50aWFsbHkgdXNpbmcgMTZ4IHRoZSByZXF1aXJlZA0KPiAgICAgIG1lbW9yeSBmb3IgdGhlIFJU
-VHMuDQo+IA0KPiAgICAtIEhhdmluZyB0aGUgZ3Vlc3QncyBwYWdlIHNpemUgc21hbGxlciB0aGFu
-IHRoZSBob3N0J3MgY3VycmVudGx5DQo+ICAgICAgZG9lc24ndCB3b3JrLiBUaGUgaXNzdWUgaXMg
-dGhlIGd1ZXN0IG5lZWRzIHRvIGtub3cgd2hhdCBncmFudWxhdGl0eQ0KPiAgICAgIGl0IGNhbiB0
-cmFuc2l0aW9uIHBhZ2VzIGJldHdlZW4gc2hhcmVkIGFuZCBwcml2YXRlLiAgRXhhY3RseSBob3cN
-Cj4gICAgICB0aGlzIHNob3VsZCB3b3JrIGlzIGFuIG9wZW4gYXJlYSBvZiBkaXNjdXNzaW9uLg0K
-PiANCj4gICAgLSBUaGlzIGNvbmZpZ3VyYXRpb24gaXNuJ3Qgd2VsbCB0ZXN0ZWQsIEkgd291bGQg
-YmUgdW5zdXJwcmlzZWQgaWYNCj4gICAgICB0aGVyZSBhcmUgbWFqb3IgYnVncyEgOykgQnV0IGEg
-c2ltcGxlIExpbnV4IGd1ZXN0IG9mIHRoZSBzYW1lIHBhZ2UNCj4gICAgICBzaXplIHdvcmtzLg0K
-PiANCj4gVGhlIEFCSSB0byB0aGUgUk1NICh0aGUgUk1JKSBpcyBiYXNlZCBvbiBSTU0gdjEuMC1y
-ZWwwIHNwZWNpZmljYXRpb25bMV0uDQo+IA0KPiBUaGlzIHNlcmllcyBpcyBiYXNlZCBvbiB2Ni4x
-NC1yYzEuIEl0IGlzIGFsc28gYXZhaWxhYmxlIGFzIGEgZ2l0DQo+IHJlcG9zaXRvcnk6DQo+IA0K
-PiBodHRwczovL2dpdGxhYi5hcm0uY29tL2xpbnV4LWFybS9saW51eC1jY2EgY2NhLWhvc3QvdjcN
-Cj4gDQo+IFdvcmsgaW4gcHJvZ3Jlc3MgY2hhbmdlcyBmb3Iga3ZtdG9vbCBhcmUgYXZhaWxhYmxl
-IGZyb20gdGhlIGdpdCByZXBvc2l0b3J5IGJlbG93Og0KPiANCj4gaHR0cHM6Ly9naXRsYWIuYXJt
-LmNvbS9saW51eC1hcm0va3ZtdG9vbC1jY2EgY2NhL3Y1DQo+IA0KPiBbMV0gaHR0cHM6Ly9kZXZl
-bG9wZXIuYXJtLmNvbS9kb2N1bWVudGF0aW9uL2RlbjAxMzcvMS0wcmVsMC8NCj4gWzJdDQo+IGh0
-dHBzOi8vbG9yZS5rZXJuZWwub3JnL3IvYTcwMTE3MzgtYTA4NC00NmZhLTk0N2YtMzk1ZDkwYjM3
-ZjhiJTQwYXJtLmNvbQ0KPiANCj4gSmVhbi1QaGlsaXBwZSBCcnVja2VyICg3KToNCj4gICBhcm02
-NDogUk1FOiBQcm9wYWdhdGUgbnVtYmVyIG9mIGJyZWFrcG9pbnRzIGFuZCB3YXRjaHBvaW50cyB0
-bw0KPiAgICAgdXNlcnNwYWNlDQo+ICAgYXJtNjQ6IFJNRTogU2V0IGJyZWFrcG9pbnQgcGFyYW1l
-dGVycyB0aHJvdWdoIFNFVF9PTkVfUkVHDQo+ICAgYXJtNjQ6IFJNRTogSW5pdGlhbGl6ZSBQTUNS
-Lk4gd2l0aCBudW1iZXIgY291bnRlciBzdXBwb3J0ZWQgYnkgUk1NDQo+ICAgYXJtNjQ6IFJNRTog
-UHJvcGFnYXRlIG1heCBTVkUgdmVjdG9yIGxlbmd0aCBmcm9tIFJNTQ0KPiAgIGFybTY0OiBSTUU6
-IENvbmZpZ3VyZSBtYXggU1ZFIHZlY3RvciBsZW5ndGggZm9yIGEgUmVhbG0NCj4gICBhcm02NDog
-Uk1FOiBQcm92aWRlIHJlZ2lzdGVyIGxpc3QgZm9yIHVuZmluYWxpemVkIFJNRSBSRUNzDQo+ICAg
-YXJtNjQ6IFJNRTogUHJvdmlkZSBhY2N1cmF0ZSByZWdpc3RlciBsaXN0DQo+IA0KPiBKb2V5IEdv
-dWx5ICgyKToNCj4gICBhcm02NDogcm1lOiBhbGxvdyB1c2Vyc3BhY2UgdG8gaW5qZWN0IGFib3J0
-cw0KPiAgIGFybTY0OiBybWU6IHN1cHBvcnQgUlNJX0hPU1RfQ0FMTA0KPiANCj4gU2VhbiBDaHJp
-c3RvcGhlcnNvbiAoMSk6DQo+ICAgS1ZNOiBQcmVwYXJlIGZvciBoYW5kbGluZyBvbmx5IHNoYXJl
-ZCBtYXBwaW5ncyBpbiBtbXVfbm90aWZpZXIgZXZlbnRzDQo+IA0KPiBTdGV2ZW4gUHJpY2UgKDMy
-KToNCj4gICBhcm02NDogUk1FOiBIYW5kbGUgR3JhbnVsZSBQcm90ZWN0aW9uIEZhdWx0cyAoR1BG
-cykNCj4gICBhcm02NDogUk1FOiBBZGQgU01DIGRlZmluaXRpb25zIGZvciBjYWxsaW5nIHRoZSBS
-TU0NCj4gICBhcm02NDogUk1FOiBBZGQgd3JhcHBlcnMgZm9yIFJNSSBjYWxscw0KPiAgIGFybTY0
-OiBSTUU6IENoZWNrIGZvciBSTUUgc3VwcG9ydCBhdCBLVk0gaW5pdA0KPiAgIGFybTY0OiBSTUU6
-IERlZmluZSB0aGUgdXNlciBBQkkNCj4gICBhcm02NDogUk1FOiBpb2N0bHMgdG8gY3JlYXRlIGFu
-ZCBjb25maWd1cmUgcmVhbG1zDQo+ICAgYXJtNjQ6IGt2bTogQWxsb3cgcGFzc2luZyBtYWNoaW5l
-IHR5cGUgaW4gS1ZNIGNyZWF0aW9uDQo+ICAgYXJtNjQ6IFJNRTogUlRUIHRlYXIgZG93bg0KPiAg
-IGFybTY0OiBSTUU6IEFsbG9jYXRlL2ZyZWUgUkVDcyB0byBtYXRjaCB2Q1BVcw0KPiAgIEtWTTog
-YXJtNjQ6IHZnaWM6IFByb3ZpZGUgaGVscGVyIGZvciBudW1iZXIgb2YgbGlzdCByZWdpc3RlcnMN
-Cj4gICBhcm02NDogUk1FOiBTdXBwb3J0IGZvciB0aGUgVkdJQyBpbiByZWFsbXMNCj4gICBLVk06
-IGFybTY0OiBTdXBwb3J0IHRpbWVycyBpbiByZWFsbSBSRUNzDQo+ICAgYXJtNjQ6IFJNRTogQWxs
-b3cgVk1NIHRvIHNldCBSSVBBUw0KPiAgIGFybTY0OiBSTUU6IEhhbmRsZSByZWFsbSBlbnRlci9l
-eGl0DQo+ICAgYXJtNjQ6IFJNRTogSGFuZGxlIFJNSV9FWElUX1JJUEFTX0NIQU5HRQ0KPiAgIEtW
-TTogYXJtNjQ6IEhhbmRsZSByZWFsbSBNTUlPIGVtdWxhdGlvbg0KPiAgIGFybTY0OiBSTUU6IEFs
-bG93IHBvcHVsYXRpbmcgaW5pdGlhbCBjb250ZW50cw0KPiAgIGFybTY0OiBSTUU6IFJ1bnRpbWUg
-ZmF1bHRpbmcgb2YgbWVtb3J5DQo+ICAgS1ZNOiBhcm02NDogSGFuZGxlIHJlYWxtIFZDUFUgbG9h
-ZA0KPiAgIEtWTTogYXJtNjQ6IFZhbGlkYXRlIHJlZ2lzdGVyIGFjY2VzcyBmb3IgYSBSZWFsbSBW
-TQ0KPiAgIEtWTTogYXJtNjQ6IEhhbmRsZSBSZWFsbSBQU0NJIHJlcXVlc3RzDQo+ICAgS1ZNOiBh
-cm02NDogV0FSTiBvbiBpbmplY3RlZCB1bmRlZiBleGNlcHRpb25zDQo+ICAgYXJtNjQ6IERvbid0
-IGV4cG9zZSBzdG9sZW4gdGltZSBmb3IgcmVhbG0gZ3Vlc3RzDQo+ICAgYXJtNjQ6IFJNRTogQWx3
-YXlzIHVzZSA0ayBwYWdlcyBmb3IgcmVhbG1zDQo+ICAgYXJtNjQ6IHJtZTogUHJldmVudCBEZXZp
-Y2UgbWFwcGluZ3MgZm9yIFJlYWxtcw0KPiAgIGFybV9wbXU6IFByb3ZpZGUgYSBtZWNoYW5pc20g
-Zm9yIGRpc2FibGluZyB0aGUgcGh5c2ljYWwgSVJRDQo+ICAgYXJtNjQ6IHJtZTogRW5hYmxlIFBN
-VSBzdXBwb3J0IHdpdGggYSByZWFsbSBndWVzdA0KPiAgIGt2bTogcm1lOiBIaWRlIEtWTV9DQVBf
-UkVBRE9OTFlfTUVNIGZvciByZWFsbSBndWVzdHMNCj4gICBhcm02NDoga3ZtOiBFeHBvc2Ugc3Vw
-cG9ydCBmb3IgcHJpdmF0ZSBtZW1vcnkNCj4gICBLVk06IGFybTY0OiBFeHBvc2UgS1ZNX0FSTV9W
-Q1BVX1JFQyB0byB1c2VyIHNwYWNlDQo+ICAgS1ZNOiBhcm02NDogQWxsb3cgYWN0aXZhdGluZyBy
-ZWFsbXMNCj4gICBXSVA6IEVuYWJsZSBzdXBwb3J0IGZvciBQQUdFX1NJWkU+NGsNCj4gDQo+IFN1
-enVraSBLIFBvdWxvc2UgKDMpOg0KPiAgIGt2bTogYXJtNjQ6IEluY2x1ZGUga3ZtX2VtdWxhdGUu
-aCBpbiBrdm0vYXJtX3BzY2kuaA0KPiAgIGt2bTogYXJtNjQ6IEV4cG9zZSBkZWJ1ZyBIVyByZWdp
-c3RlciBudW1iZXJzIGZvciBSZWFsbQ0KPiAgIGFybTY0OiBybWU6IEFsbG93IGNoZWNraW5nIFNW
-RSBvbiBWTSBpbnN0YW5jZQ0KPiANCj4gIERvY3VtZW50YXRpb24vdmlydC9rdm0vYXBpLnJzdCAg
-ICAgICB8ICAgIDMgKw0KPiAgYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1fZW11bGF0ZS5oIHwg
-ICA0MCArDQo+ICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggICAgfCAgIDE3ICst
-DQo+ICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ybWUuaCAgICAgfCAgMTI4ICsrDQo+ICBh
-cmNoL2FybTY0L2luY2x1ZGUvYXNtL3JtaV9jbWRzLmggICAgfCAgNTA4ICsrKysrKysrDQo+ICBh
-cmNoL2FybTY0L2luY2x1ZGUvYXNtL3JtaV9zbWMuaCAgICAgfCAgMjU5ICsrKysNCj4gIGFyY2gv
-YXJtNjQvaW5jbHVkZS9hc20vdmlydC5oICAgICAgICB8ICAgIDEgKw0KPiAgYXJjaC9hcm02NC9p
-bmNsdWRlL3VhcGkvYXNtL2t2bS5oICAgIHwgICA0OSArDQo+ICBhcmNoL2FybTY0L2t2bS9LY29u
-ZmlnICAgICAgICAgICAgICAgfCAgICAxICsNCj4gIGFyY2gvYXJtNjQva3ZtL01ha2VmaWxlICAg
-ICAgICAgICAgICB8ICAgIDMgKy0NCj4gIGFyY2gvYXJtNjQva3ZtL2FyY2hfdGltZXIuYyAgICAg
-ICAgICB8ICAgNDUgKy0NCj4gIGFyY2gvYXJtNjQva3ZtL2FybS5jICAgICAgICAgICAgICAgICB8
-ICAxNzMgKystDQo+ICBhcmNoL2FybTY0L2t2bS9ndWVzdC5jICAgICAgICAgICAgICAgfCAgMTA0
-ICstDQo+ICBhcmNoL2FybTY0L2t2bS9oeXBlcmNhbGxzLmMgICAgICAgICAgfCAgICA0ICstDQo+
-ICBhcmNoL2FybTY0L2t2bS9pbmplY3RfZmF1bHQuYyAgICAgICAgfCAgICA1ICstDQo+ICBhcmNo
-L2FybTY0L2t2bS9tbWlvLmMgICAgICAgICAgICAgICAgfCAgIDE2ICstDQo+ICBhcmNoL2FybTY0
-L2t2bS9tbXUuYyAgICAgICAgICAgICAgICAgfCAgMTk5ICsrLQ0KPiAgYXJjaC9hcm02NC9rdm0v
-cG11LWVtdWwuYyAgICAgICAgICAgIHwgICAgNiArDQo+ICBhcmNoL2FybTY0L2t2bS9wc2NpLmMg
-ICAgICAgICAgICAgICAgfCAgIDMwICsNCj4gIGFyY2gvYXJtNjQva3ZtL3Jlc2V0LmMgICAgICAg
-ICAgICAgICB8ICAgMjMgKy0NCj4gIGFyY2gvYXJtNjQva3ZtL3JtZS1leGl0LmMgICAgICAgICAg
-ICB8ICAxOTkgKysrDQo+ICBhcmNoL2FybTY0L2t2bS9ybWUuYyAgICAgICAgICAgICAgICAgfCAx
-NzEwDQo+ICsrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ICBhcmNoL2FybTY0L2t2bS9zeXNf
-cmVncy5jICAgICAgICAgICAgfCAgIDc5ICstDQo+ICBhcmNoL2FybTY0L2t2bS92Z2ljL3ZnaWMt
-aW5pdC5jICAgICAgfCAgICAyICstDQo+ICBhcmNoL2FybTY0L2t2bS92Z2ljL3ZnaWMtdjMuYyAg
-ICAgICAgfCAgICA1ICsNCj4gIGFyY2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy5jICAgICAgICAgICB8
-ICAgNTQgKy0NCj4gIGFyY2gvYXJtNjQvbW0vZmF1bHQuYyAgICAgICAgICAgICAgICB8ICAgMzEg
-Ky0NCj4gIGRyaXZlcnMvcGVyZi9hcm1fcG11LmMgICAgICAgICAgICAgICB8ICAgMTUgKw0KPiAg
-aW5jbHVkZS9rdm0vYXJtX2FyY2hfdGltZXIuaCAgICAgICAgIHwgICAgMiArDQo+ICBpbmNsdWRl
-L2t2bS9hcm1fcG11LmggICAgICAgICAgICAgICAgfCAgICA0ICsNCj4gIGluY2x1ZGUva3ZtL2Fy
-bV9wc2NpLmggICAgICAgICAgICAgICB8ICAgIDIgKw0KPiAgaW5jbHVkZS9saW51eC9rdm1faG9z
-dC5oICAgICAgICAgICAgIHwgICAgMiArDQo+ICBpbmNsdWRlL2xpbnV4L3BlcmYvYXJtX3BtdS5o
-ICAgICAgICAgfCAgICA1ICsNCj4gIGluY2x1ZGUvdWFwaS9saW51eC9rdm0uaCAgICAgICAgICAg
-ICB8ICAgMzEgKy0NCj4gIHZpcnQva3ZtL2t2bV9tYWluLmMgICAgICAgICAgICAgICAgICB8ICAg
-IDcgKw0KPiAgMzUgZmlsZXMgY2hhbmdlZCwgMzY1OCBpbnNlcnRpb25zKCspLCAxMDQgZGVsZXRp
-b25zKC0pICBjcmVhdGUgbW9kZSAxMDA2NDQNCj4gYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1f
-cm1lLmggIGNyZWF0ZSBtb2RlIDEwMDY0NA0KPiBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL3JtaV9j
-bWRzLmggIGNyZWF0ZSBtb2RlIDEwMDY0NA0KPiBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL3JtaV9z
-bWMuaCAgY3JlYXRlIG1vZGUgMTAwNjQ0DQo+IGFyY2gvYXJtNjQva3ZtL3JtZS1leGl0LmMgIGNy
-ZWF0ZSBtb2RlIDEwMDY0NCBhcmNoL2FybTY0L2t2bS9ybWUuYw0KPiANCj4gLS0NCj4gMi40My4w
-DQo+IA0KPiANCg0K
+On Wed, Mar 26, 2025 at 4:31=E2=80=AFAM Jan Engelhardt <ej@inai.de> wrote:
+>
+>
+> On Tuesday 2025-03-25 13:15, guoren@kernel.org wrote:
+>
+> >diff --git a/include/uapi/linux/netfilter/x_tables.h b/include/uapi/linu=
+x/netfilter/x_tables.h
+> >index 796af83a963a..7e02e34c6fad 100644
+> >--- a/include/uapi/linux/netfilter/x_tables.h
+> >+++ b/include/uapi/linux/netfilter/x_tables.h
+> >@@ -18,7 +18,11 @@ struct xt_entry_match {
+> >                       __u8 revision;
+> >               } user;
+> >               struct {
+> >+#if __riscv_xlen =3D=3D 64
+> >+                      __u64 match_size;
+> >+#else
+> >                       __u16 match_size;
+> >+#endif
+> >
+> >                       /* Used inside the kernel */
+> >                       struct xt_match *match;
+>
+> The __u16 is the common prefix of the union which is exposed to userspace=
+.
+> If anything, you need to use __attribute__((aligned(8))) to move
+> `match` to a fixed location.
+>
+> However, that sub-struct is only used inside the kernel and never exposed=
+,
+> so the alignment of `match` should not play a role.
+>
+> Moreover, change from u16 to u64 would break RISC-V Big-Endian. Even if t=
+here
+> currently is no big-endian variant, let's not introduce such breakage.
+You're correct. The __u64 modification is too raw from the proof of
+concept. It's not correct, so I would accept your advice.
+
+>
+>
+> >--- a/include/uapi/linux/netfilter_ipv4/ip_tables.h
+> >+++ b/include/uapi/linux/netfilter_ipv4/ip_tables.h
+> >@@ -200,7 +200,14 @@ struct ipt_replace {
+> >       /* Number of counters (must be equal to current number of entries=
+). */
+> >       unsigned int num_counters;
+> >       /* The old entries' counters. */
+> >+#if __riscv_xlen =3D=3D 64
+> >+      union {
+> >+              struct xt_counters __user *counters;
+> >+              __u64 __counters;
+> >+      };
+> >+#else
+> >       struct xt_counters __user *counters;
+> >+#endif
+> >
+> >       /* The entries (hang off end: not really an array). */
+> >       struct ipt_entry entries[];
+>
+> This seems ok, but perhaps there is a better name for __riscv_xlen (ifdef
+> CONFIG_????ilp32), so it is not strictly tied to riscv,
+> in case other platform wants to try ilp32-self mode.
+Yes, I want that macro, but Linus has suggested "compat stuff". I
+would have to try.
+
+Thx for the reviewing!
+
+>
+> >+#if __riscv_xlen =3D=3D 64
+> >+      union {
+> >+              int __user *auth_flavours;              /* 1 */
+> >+              __u64 __auth_flavours;
+> >+      };
+> >+#else
+> >       int __user *auth_flavours;              /* 1 */
+> >+#endif
+> > };
+> >
+> > /* bits in the flags field */
+> >diff --git a/include/uapi/linux/ppp-ioctl.h b/include/uapi/linux/ppp-ioc=
+tl.h
+> >index 1cc5ce0ae062..8d48eab430c1 100644
+> >--- a/include/uapi/linux/ppp-ioctl.h
+> >+++ b/include/uapi/linux/ppp-ioctl.h
+> >@@ -59,7 +59,14 @@ struct npioctl {
+> >
+> > /* Structure describing a CCP configuration option, for PPPIOCSCOMPRESS=
+ */
+> > struct ppp_option_data {
+> >+#if __riscv_xlen =3D=3D 64
+> >+      union {
+> >+              __u8    __user *ptr;
+> >+              __u64   __ptr;
+> >+      };
+> >+#else
+> >       __u8    __user *ptr;
+> >+#endif
+> >       __u32   length;
+> >       int     transmit;
+> > };
+> >diff --git a/include/uapi/linux/sctp.h b/include/uapi/linux/sctp.h
+> >index b7d91d4cf0db..46a06fddcd2f 100644
+> >--- a/include/uapi/linux/sctp.h
+> >+++ b/include/uapi/linux/sctp.h
+> >@@ -1024,6 +1024,9 @@ struct sctp_getaddrs_old {
+> > #else
+> >       struct sockaddr         *addrs;
+> > #endif
+> >+#if (__riscv_xlen =3D=3D 64) && (__SIZEOF_LONG__ =3D=3D 4)
+> >+      __u32                   unused;
+> >+#endif
+> > };
+>
+>
+> >
+> > struct sctp_getaddrs {
+> >diff --git a/include/uapi/linux/sem.h b/include/uapi/linux/sem.h
+> >index 75aa3b273cd9..de9f441913cd 100644
+> >--- a/include/uapi/linux/sem.h
+> >+++ b/include/uapi/linux/sem.h
+> >@@ -26,10 +26,29 @@ struct semid_ds {
+> >       struct ipc_perm sem_perm;               /* permissions .. see ipc=
+.h */
+> >       __kernel_old_time_t sem_otime;          /* last semop time */
+> >       __kernel_old_time_t sem_ctime;          /* create/last semctl() t=
+ime */
+> >+#if __riscv_xlen =3D=3D 64
+> >+      union {
+> >+              struct sem      *sem_base;              /* ptr to first s=
+emaphore in array */
+> >+              __u64 __sem_base;
+> >+      };
+> >+      union {
+> >+              struct sem_queue *sem_pending;          /* pending operat=
+ions to be processed */
+> >+              __u64 __sem_pending;
+> >+      };
+> >+      union {
+> >+              struct sem_queue **sem_pending_last;    /* last pending o=
+peration */
+> >+              __u64 __sem_pending_last;
+> >+      };
+> >+      union {
+> >+              struct sem_undo *undo;                  /* undo requests =
+on this array */
+> >+              __u64 __undo;
+> >+      };
+> >+#else
+> >       struct sem      *sem_base;              /* ptr to first semaphore=
+ in array */
+> >       struct sem_queue *sem_pending;          /* pending operations to =
+be processed */
+> >       struct sem_queue **sem_pending_last;    /* last pending operation=
+ */
+> >       struct sem_undo *undo;                  /* undo requests on this =
+array */
+> >+#endif
+> >       unsigned short  sem_nsems;              /* no. of semaphores in a=
+rray */
+> > };
+> >
+> >@@ -46,10 +65,29 @@ struct sembuf {
+> > /* arg for semctl system calls. */
+> > union semun {
+> >       int val;                        /* value for SETVAL */
+> >+#if __riscv_xlen =3D=3D 64
+> >+      union {
+> >+              struct semid_ds __user *buf;    /* buffer for IPC_STAT & =
+IPC_SET */
+> >+              __u64 ___buf;
+> >+      };
+> >+      union {
+> >+              unsigned short __user *array;   /* array for GETALL & SET=
+ALL */
+> >+              __u64 __array;
+> >+      };
+> >+      union {
+> >+              struct seminfo __user *__buf;   /* buffer for IPC_INFO */
+> >+              __u64 ____buf;
+> >+      };
+> >+      union {
+> >+              void __user *__pad;
+> >+              __u64 ____pad;
+> >+      };
+> >+#else
+> >       struct semid_ds __user *buf;    /* buffer for IPC_STAT & IPC_SET =
+*/
+> >       unsigned short __user *array;   /* array for GETALL & SETALL */
+> >       struct seminfo __user *__buf;   /* buffer for IPC_INFO */
+> >       void __user *__pad;
+> >+#endif
+> > };
+> >
+> > struct  seminfo {
+> >diff --git a/include/uapi/linux/socket.h b/include/uapi/linux/socket.h
+> >index d3fcd3b5ec53..5f7a83649395 100644
+> >--- a/include/uapi/linux/socket.h
+> >+++ b/include/uapi/linux/socket.h
+> >@@ -22,7 +22,14 @@ struct __kernel_sockaddr_storage {
+> >                               /* space to achieve desired size, */
+> >                               /* _SS_MAXSIZE value minus size of ss_fam=
+ily */
+> >               };
+> >+#if __riscv_xlen =3D=3D 64
+> >+              union {
+> >+                      void *__align; /* implementation specific desired=
+ alignment */
+> >+                      u64 ___align;
+> >+              };
+> >+#else
+> >               void *__align; /* implementation specific desired alignme=
+nt */
+> >+#endif
+> >       };
+> > };
+> >
+> >diff --git a/include/uapi/linux/sysctl.h b/include/uapi/linux/sysctl.h
+> >index 8981f00204db..8ed7b29897f9 100644
+> >--- a/include/uapi/linux/sysctl.h
+> >+++ b/include/uapi/linux/sysctl.h
+> >@@ -33,13 +33,45 @@
+> >                                  member of a struct __sysctl_args to ha=
+ve? */
+> >
+> > struct __sysctl_args {
+> >+#if __riscv_xlen =3D=3D 64
+> >+      union {
+> >+              int __user *name;
+> >+              __u64 __name;
+> >+      };
+> >+#else
+> >       int __user *name;
+> >+#endif
+> >       int nlen;
+> >+#if __riscv_xlen =3D=3D 64
+> >+      union {
+> >+              void __user *oldval;
+> >+              __u64 __oldval;
+> >+      };
+> >+#else
+> >       void __user *oldval;
+> >+#endif
+> >+#if __riscv_xlen =3D=3D 64
+> >+      union {
+> >+              size_t __user *oldlenp;
+> >+              __u64 __oldlenp;
+> >+      };
+> >+#else
+> >       size_t __user *oldlenp;
+> >+#endif
+> >+#if __riscv_xlen =3D=3D 64
+> >+      union {
+> >+              void __user *newval;
+> >+              __u64 __newval;
+> >+      };
+> >+#else
+> >       void __user *newval;
+> >+#endif
+> >       size_t newlen;
+> >+#if __riscv_xlen =3D=3D 64
+> >+      unsigned long long __unused[4];
+> >+#else
+> >       unsigned long __unused[4];
+> >+#endif
+> > };
+> >
+> > /* Define sysctl names first */
+> >diff --git a/include/uapi/linux/uhid.h b/include/uapi/linux/uhid.h
+> >index cef7534d2d19..4a774dbd3de8 100644
+> >--- a/include/uapi/linux/uhid.h
+> >+++ b/include/uapi/linux/uhid.h
+> >@@ -130,7 +130,14 @@ struct uhid_create_req {
+> >       __u8 name[128];
+> >       __u8 phys[64];
+> >       __u8 uniq[64];
+> >+#if __riscv_xlen =3D=3D 64
+> >+      union {
+> >+              __u8 __user *rd_data;
+> >+              __u64 __rd_data;
+> >+      };
+> >+#else
+> >       __u8 __user *rd_data;
+> >+#endif
+> >       __u16 rd_size;
+> >
+> >       __u16 bus;
+> >diff --git a/include/uapi/linux/uio.h b/include/uapi/linux/uio.h
+> >index 649739e0c404..27dfd6032dc6 100644
+> >--- a/include/uapi/linux/uio.h
+> >+++ b/include/uapi/linux/uio.h
+> >@@ -16,8 +16,19 @@
+> >
+> > struct iovec
+> > {
+> >+#if __riscv_xlen =3D=3D 64
+> >+      union {
+> >+              void __user *iov_base;  /* BSD uses caddr_t (1003.1g requ=
+ires void *) */
+> >+              __u64 __iov_base;
+> >+      };
+> >+      union {
+> >+              __kernel_size_t iov_len; /* Must be size_t (1003.1g) */
+> >+              __u64 __iov_len;
+> >+      };
+> >+#else
+> >       void __user *iov_base;  /* BSD uses caddr_t (1003.1g requires voi=
+d *) */
+> >       __kernel_size_t iov_len; /* Must be size_t (1003.1g) */
+> >+#endif
+> > };
+> >
+> > struct dmabuf_cmsg {
+> >diff --git a/include/uapi/linux/usb/tmc.h b/include/uapi/linux/usb/tmc.h
+> >index d791cc58a7f0..443ec5356caf 100644
+> >--- a/include/uapi/linux/usb/tmc.h
+> >+++ b/include/uapi/linux/usb/tmc.h
+> >@@ -51,7 +51,14 @@ struct usbtmc_request {
+> >
+> > struct usbtmc_ctrlrequest {
+> >       struct usbtmc_request req;
+> >+#if __riscv_xlen =3D=3D 64
+> >+      union {
+> >+              void __user *data; /* pointer to user space */
+> >+              __u64 __data; /* pointer to user space */
+> >+      };
+> >+#else
+> >       void __user *data; /* pointer to user space */
+> >+#endif
+> > } __attribute__ ((packed));
+> >
+> > struct usbtmc_termchar {
+> >@@ -70,7 +77,14 @@ struct usbtmc_message {
+> >       __u32 transfer_size; /* size of bytes to transfer */
+> >       __u32 transferred; /* size of received/written bytes */
+> >       __u32 flags; /* bit 0: 0 =3D synchronous; 1 =3D asynchronous */
+> >+#if __riscv_xlen =3D=3D 64
+> >+      union {
+> >+              void __user *message; /* pointer to header and data in us=
+er space */
+> >+              __u64 __message;
+> >+      };
+> >+#else
+> >       void __user *message; /* pointer to header and data in user space=
+ */
+> >+#endif
+> > } __attribute__ ((packed));
+> >
+> > /* Request values for USBTMC driver's ioctl entry point */
+> >diff --git a/include/uapi/linux/usbdevice_fs.h b/include/uapi/linux/usbd=
+evice_fs.h
+> >index 74a84e02422a..8c8efef74c3c 100644
+> >--- a/include/uapi/linux/usbdevice_fs.h
+> >+++ b/include/uapi/linux/usbdevice_fs.h
+> >@@ -44,14 +44,28 @@ struct usbdevfs_ctrltransfer {
+> >       __u16 wIndex;
+> >       __u16 wLength;
+> >       __u32 timeout;  /* in milliseconds */
+> >+#if __riscv_xlen =3D=3D 64
+> >+      union {
+> >+              void __user *data;
+> >+              __u64 __data;
+> >+      };
+> >+#else
+> >       void __user *data;
+> >+#endif
+> > };
+> >
+> > struct usbdevfs_bulktransfer {
+> >       unsigned int ep;
+> >       unsigned int len;
+> >       unsigned int timeout; /* in milliseconds */
+> >+#if __riscv_xlen =3D=3D 64
+> >+      union {
+> >+              void __user *data;
+> >+              __u64 __data;
+> >+      };
+> >+#else
+> >       void __user *data;
+> >+#endif
+> > };
+> >
+> > struct usbdevfs_setinterface {
+> >@@ -61,7 +75,14 @@ struct usbdevfs_setinterface {
+> >
+> > struct usbdevfs_disconnectsignal {
+> >       unsigned int signr;
+> >+#if __riscv_xlen =3D=3D 64
+> >+      union {
+> >+              void __user *context;
+> >+              __u64 __context;
+> >+      };
+> >+#else
+> >       void __user *context;
+> >+#endif
+> > };
+> >
+> > #define USBDEVFS_MAXDRIVERNAME 255
+> >@@ -119,7 +140,14 @@ struct usbdevfs_urb {
+> >       unsigned char endpoint;
+> >       int status;
+> >       unsigned int flags;
+> >+#if __riscv_xlen =3D=3D 64
+> >+      union {
+> >+              void __user *buffer;
+> >+              __u64 __buffer;
+> >+      };
+> >+#else
+> >       void __user *buffer;
+> >+#endif
+> >       int buffer_length;
+> >       int actual_length;
+> >       int start_frame;
+> >@@ -130,7 +158,14 @@ struct usbdevfs_urb {
+> >       int error_count;
+> >       unsigned int signr;     /* signal to be sent on completion,
+> >                                 or 0 if none should be sent. */
+> >+#if __riscv_xlen =3D=3D 64
+> >+      union {
+> >+              void __user *usercontext;
+> >+              __u64 __usercontext;
+> >+      };
+> >+#else
+> >       void __user *usercontext;
+> >+#endif
+> >       struct usbdevfs_iso_packet_desc iso_frame_desc[];
+> > };
+> >
+> >@@ -139,7 +174,14 @@ struct usbdevfs_ioctl {
+> >       int     ifno;           /* interface 0..N ; negative numbers rese=
+rved */
+> >       int     ioctl_code;     /* MUST encode size + direction of data s=
+o the
+> >                                * macros in <asm/ioctl.h> give correct v=
+alues */
+> >+#if __riscv_xlen =3D=3D 64
+> >+      union {
+> >+              void __user *data;      /* param buffer (in, or out) */
+> >+              __u64 __pad;
+> >+      };
+> >+#else
+> >       void __user *data;      /* param buffer (in, or out) */
+> >+#endif
+> > };
+> >
+> > /* You can do most things with hubs just through control messages,
+> >@@ -195,9 +237,17 @@ struct usbdevfs_streams {
+> > #define USBDEVFS_SUBMITURB         _IOR('U', 10, struct usbdevfs_urb)
+> > #define USBDEVFS_SUBMITURB32       _IOR('U', 10, struct usbdevfs_urb32)
+> > #define USBDEVFS_DISCARDURB        _IO('U', 11)
+> >+#if __riscv_xlen =3D=3D 64
+> >+#define USBDEVFS_REAPURB           _IOW('U', 12, __u64)
+> >+#else
+> > #define USBDEVFS_REAPURB           _IOW('U', 12, void *)
+> >+#endif
+> > #define USBDEVFS_REAPURB32         _IOW('U', 12, __u32)
+> >+#if __riscv_xlen =3D=3D 64
+> >+#define USBDEVFS_REAPURBNDELAY     _IOW('U', 13, __u64)
+> >+#else
+> > #define USBDEVFS_REAPURBNDELAY     _IOW('U', 13, void *)
+> >+#endif
+> > #define USBDEVFS_REAPURBNDELAY32   _IOW('U', 13, __u32)
+> > #define USBDEVFS_DISCSIGNAL        _IOR('U', 14, struct usbdevfs_discon=
+nectsignal)
+> > #define USBDEVFS_DISCSIGNAL32      _IOR('U', 14, struct usbdevfs_discon=
+nectsignal32)
+> >diff --git a/include/uapi/linux/uvcvideo.h b/include/uapi/linux/uvcvideo=
+.h
+> >index f86185456dc5..3ccb99039a43 100644
+> >--- a/include/uapi/linux/uvcvideo.h
+> >+++ b/include/uapi/linux/uvcvideo.h
+> >@@ -54,7 +54,14 @@ struct uvc_xu_control_mapping {
+> >       __u32 v4l2_type;
+> >       __u32 data_type;
+> >
+> >+#if __riscv_xlen =3D=3D 64
+> >+      union {
+> >+              struct uvc_menu_info __user *menu_info;
+> >+              __u64 __menu_info;
+> >+      };
+> >+#else
+> >       struct uvc_menu_info __user *menu_info;
+> >+#endif
+> >       __u32 menu_count;
+> >
+> >       __u32 reserved[4];
+> >@@ -66,7 +73,14 @@ struct uvc_xu_control_query {
+> >       __u8 query;             /* Video Class-Specific Request Code, */
+> >                               /* defined in linux/usb/video.h A.8.  */
+> >       __u16 size;
+> >+#if __riscv_xlen =3D=3D 64
+> >+      union {
+> >+              __u8 __user *data;
+> >+              __u64 __data;
+> >+      };
+> >+#else
+> >       __u8 __user *data;
+> >+#endif
+> > };
+> >
+> > #define UVCIOC_CTRL_MAP               _IOWR('u', 0x20, struct uvc_xu_co=
+ntrol_mapping)
+> >diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> >index c8dbf8219c4f..0a1dc2a780fb 100644
+> >--- a/include/uapi/linux/vfio.h
+> >+++ b/include/uapi/linux/vfio.h
+> >@@ -1570,7 +1570,14 @@ struct vfio_iommu_type1_dma_map {
+> > struct vfio_bitmap {
+> >       __u64        pgsize;    /* page size for bitmap in bytes */
+> >       __u64        size;      /* in bytes */
+> >+      #if __riscv_xlen =3D=3D 64
+> >+      union {
+> >+              __u64 __user *data;     /* one bit per page */
+> >+              __u64 __data;
+> >+      };
+> >+      #else
+> >       __u64 __user *data;     /* one bit per page */
+> >+      #endif
+> > };
+> >
+> > /**
+> >diff --git a/include/uapi/linux/videodev2.h b/include/uapi/linux/videode=
+v2.h
+> >index e7c4dce39007..8e5391f07626 100644
+> >--- a/include/uapi/linux/videodev2.h
+> >+++ b/include/uapi/linux/videodev2.h
+> >@@ -1898,7 +1898,14 @@ struct v4l2_ext_controls {
+> >       __u32 error_idx;
+> >       __s32 request_fd;
+> >       __u32 reserved[1];
+> >+#if __riscv_xlen =3D=3D 64
+> >+      union {
+> >+              struct v4l2_ext_control *controls;
+> >+              __u64 __controls;
+> >+      };
+> >+#else
+> >       struct v4l2_ext_control *controls;
+> >+#endif
+> > };
+> >
+> > #define V4L2_CTRL_ID_MASK       (0x0fffffff)
+> >--
+> >2.40.1
+> >
+> >
+
+
+
+--=20
+Best Regards
+ Guo Ren
 
