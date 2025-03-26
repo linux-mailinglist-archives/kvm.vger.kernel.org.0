@@ -1,175 +1,228 @@
-Return-Path: <kvm+bounces-42039-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42040-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D57ADA71CFA
-	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 18:20:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E41BEA71D60
+	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 18:40:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BFE419C0939
-	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 17:18:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20A731888A68
+	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 17:39:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C37821FDA92;
-	Wed, 26 Mar 2025 17:17:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7783723E323;
+	Wed, 26 Mar 2025 17:38:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NE2Ouqek"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qAf8GKhs"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06B8D1FECDB
-	for <kvm@vger.kernel.org>; Wed, 26 Mar 2025 17:17:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4CE23E235
+	for <kvm@vger.kernel.org>; Wed, 26 Mar 2025 17:38:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743009470; cv=none; b=JjLbMMVnPBqAxvJWFkX6NHmJNpqO+yTRKhGcFj/oMit1gYY2mGMKSI3yq8sHtA3pa32TFQi0KXRsrYemCQRD9wcVElnKysygL6pd+OsMoMXSNRtmIZYz95d+3geUywHNdvfcSmNeNTCJT1VpJ4UfFuTZqC4EFon+fGbR6iaaclU=
+	t=1743010720; cv=none; b=cqRiBfOMHMGzNct8ZekvtdZa7Vg1Lq2u/Xn+uj7WtVDalugCoNatPB7ez3TpyY1abVcmV4MoGEKwUtOiOCStX1WTCd8+Z+9wJfDP6gwcA8qZJ0PT6aukDiDHyMx+RRVQBo0Vfetui/Nd1m2WEWhKr03Ds8cXoG934Y4NzexpgJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743009470; c=relaxed/simple;
-	bh=LMWgUoP8H5hud2jquf3xDSpzfKmXw3BzZ/VDXBFKOC0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XEGfX3yu1McGsGTzk+Oh9oDJDM5rfBay7C0kc0y7K4xk3Ikt+T6LOJOzSOyO6SVABjvVRRci9sswcFvf68NkfmV5sOnK2A6y97p8A15XjeLyN11alhGm09ahArevB3ZW99BwN/aZjcnkOzsW6bTMQubw+0ui5rpA0CNeGoR10xw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NE2Ouqek; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff8340d547so20605a91.2
-        for <kvm@vger.kernel.org>; Wed, 26 Mar 2025 10:17:47 -0700 (PDT)
+	s=arc-20240116; t=1743010720; c=relaxed/simple;
+	bh=2oIE0G5XW4T1LPwCREw3CNOAFjNp0UmQyd+rq0p3SvM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tuGEM5oby90YMubdOEOkuGINiPxRMXZbFecnZAQOYBlLCIIUqoSjDHfCZLgnnO60I79QBvPx8Ajj2RqnEw6X6T4tDOxlauDbF5cNwCw9LREz/OdII4zhLtYn+XUhZWejvRZJPs9mW/n1a87UCSg9ErT+qQU9GhjW+9Woon0rtmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qAf8GKhs; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-43cef035a3bso1013765e9.1
+        for <kvm@vger.kernel.org>; Wed, 26 Mar 2025 10:38:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743009467; x=1743614267; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hluGm6VRaRlKKkj14E5M+udWDJDyW7msOhz4xM53G1w=;
-        b=NE2OuqekmtU+8vrT6qtX4HdCRpMAMILxmHf2Mz1ij7rPqhi9aY0eL71xspsUANAoXD
-         t8UgJTvn6OXYeK9xLKYlGjj1FnILK4e87T/een0GGFfGyoVVVAUyBBCgsgI8fAVhtEKm
-         8FOo1btREtKugQ1YUqDXpXvzLr9qdc8Bu/ty5MBLypS4EbHyBh1NYurP3qoF2HzyNSQR
-         8kC24rPCvvqkm3CfeytsBUDkQqhzMED9fae9Yw8pgzNL04XNTRl5HeRAW1rrIRDd0/ni
-         vp9+sMgl9Y83rAla6oZhRFFDwszFbZofsJ56Xf1UwOIf6S/WhT95SG+9m8rF1KYNFIGH
-         w2mA==
+        d=linaro.org; s=google; t=1743010716; x=1743615516; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8qVND4tenJBQx/xK/Ve6LMeZrg3oeI6UK9LzOuingT0=;
+        b=qAf8GKhs0mwZ5APlu1v6/MlD3HXENHCsRwusJcb2T7JaxMCsb20kceDcdrvEyfYgJf
+         zAEynptz/CFcxNrXFHvTQXP3Q1HoP8n5CwBEvhY2vHmbeIwVPzm0LOrGb4Xg4q8zAgLb
+         fpH25XTmjLsrkFDyGb1gjjWqi7T7p3BYlFW8R4MWW50qZCu7VRZ8vCgVlYC1N82glLW3
+         QqK/G2jFgfSEJ3jpJusF6XYYiWqRCXiQDDxXg/4DTd7f+BG6l/6iGNX0tJY1XYdFDj9d
+         Ww5h9TAekOIIeCo+wgdQoEN8m4yH4Q3DAgAqfEo9oOFHcetzq4ViBfy10+m9j+hqG6/i
+         k8+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743009467; x=1743614267;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hluGm6VRaRlKKkj14E5M+udWDJDyW7msOhz4xM53G1w=;
-        b=MF1u8Hw9yET7DNr0XEfnH1ZD67fhWmvVI4Pw6/ujfNX54zRCe5IBJI7tAOMiGLVjCZ
-         MzQnwm7gdUc3h0bgDdRHxQ/j2cBCNutCO32cCQIpt9pshnTU0NP5DCgGnvKX22s8HTRl
-         6XngMzgl7QzDwIhCBHQqjGXZRU2ZcL2prcmTgjsvleR92RJaG0Qvn6f8Q1OJ/gWxpz7q
-         NhiTyBogJ49pp9dTZnSKi8lW9w5pGPDAQap71lMABAvjY1HKklwZpBetuRHTz4fft6ai
-         FVIV2vigF4ZCXN/v0SH1rOaoDuqN26vRF5Gfe7VXxkw2XyqmGYkhTn8Hshz9D9njXmq2
-         EyHw==
-X-Gm-Message-State: AOJu0Yyh1+narfNehTlXWqNT1x9kmCEK0vwK5nk887RSmydxGfMt0tcU
-	oIjMWDXWXp/imTa5xiPzvnxvvEiZcobiIVvvzH7N3o3XkMlweYBk0tf4NgtK62FElGyk9/iHAr+
-	DBA==
-X-Google-Smtp-Source: AGHT+IEJBmy0VbIydSttkDIQEZdME5KE7UTUfEYnfDQDlN3EXThMA4yqR2HKH7n59GKJLZV+S/r5RRpuLWY=
-X-Received: from pjbof13.prod.google.com ([2002:a17:90b:39cd:b0:2fa:15aa:4d2b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:c2cd:b0:301:1bce:c252
- with SMTP id 98e67ed59e1d1-303a8d81d2bmr548198a91.27.1743009467251; Wed, 26
- Mar 2025 10:17:47 -0700 (PDT)
-Date: Wed, 26 Mar 2025 10:17:45 -0700
-In-Reply-To: <41bfb025-008c-db03-2f6d-33b2d542ae65@amd.com>
+        d=1e100.net; s=20230601; t=1743010716; x=1743615516;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8qVND4tenJBQx/xK/Ve6LMeZrg3oeI6UK9LzOuingT0=;
+        b=xMSWXJWi/g7h7niYdXm2i+t88hVAZfyz1HoQT+Ejt4PxYt9RphU/0CdfzGSRiQW23F
+         NQ+KcFfCE6HDbVCOpQpLyZeYYzK8X7wWSeG6wtwMiMBMXbKsRWKCMz47KcgF35YLF2A2
+         KzbsLNFv/qfO4gMl354Sr5ShdvRz2ZrQKkRgnm+tmHcsYsnbZQ76A4fMKvVmaBGwO0fu
+         /Nd1pcLMPAiC5mJYs5Gi1+XNxIYkwmiXNCLHcI3hTIk/6klS3kBgG2zfGDa095hLDy9P
+         SfXqgVCfZocIvxG94qI9Z8ARsVySTziXsbn5W9PjaR/YWGfmGAg8Yi1rUqxGGw8Wm+BQ
+         +uXQ==
+X-Gm-Message-State: AOJu0Yxy/NyISswavUukpoKZrGJU6E++y39tMOH4EtdeNq1bYR8uK4Wm
+	RByioWuFFA70wCAihVf7W2L+8HUHMDPxyfOtc30pggDf4k1g4uNLa7CnIWkmKtw=
+X-Gm-Gg: ASbGncuy4FEWlixYDHk8xQx/DEmvtfHXlxC4JMuKrwQyUdTwImKirJMh4i0Ph/ie+jc
+	oqzVabmNt4dw8KuuR2GeKmXcX6mxDl4aGLDQajUSB7qBk/Wlw8t4K9hrPglSvCec6iC0aB0SRNj
+	dznF10YNgLeR2FO/6fMeKQ/ifPQorXoQ/0TFfMJ9HYwOfF6wf/kX/v7vxnpoghS0TccXI3FCl/L
+	1YMJ5cqAnVgC4blBdUYvBbItd9nJhPRFBS+1s+l2URX4rUQK3bNhCUARLnUsgY+iqKVoaCQxku6
+	tmoXgMLspxgvgU/y+s2CHAQAMPNC0/eabvJy6XpVIhHt5f2R5A==
+X-Google-Smtp-Source: AGHT+IFWImSgAxE2tnY9m2ZViZ+epH+rNo6E42n/cKyi3Pxy880VgCejpCzrgRBe13sBLMsd3ILXAQ==
+X-Received: by 2002:a05:600c:1e0d:b0:43d:10c:2f60 with SMTP id 5b1f17b1804b1-43d8524f43cmr2296105e9.24.1743010716400;
+        Wed, 26 Mar 2025 10:38:36 -0700 (PDT)
+Received: from [192.168.1.247] ([77.81.75.81])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3997f9a6326sm17050515f8f.29.2025.03.26.10.38.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Mar 2025 10:38:36 -0700 (PDT)
+Message-ID: <f7d543f6-2660-460f-88ac-741dd47ed440@linaro.org>
+Date: Wed, 26 Mar 2025 17:38:34 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <6053e8eba1456e4c1bf667f38cc20a0ea05bc72c.1742232014.git.thomas.lendacky@amd.com>
- <48899db8-c506-b4d1-06cd-6ba9041437f7@amd.com> <Z9hbwkqwDKlyPsqv@google.com>
- <8c0ed363-9ecc-19b2-b8d7-5b77538bda50@amd.com> <91b5126e-4b3e-bcbf-eb0d-1670a12b5216@amd.com>
- <29b0a4fc-530f-29bf-84d4-7912aba7fecb@amd.com> <aeabbd86-0978-dbd1-a865-328c413aa346@amd.com>
- <Z93zl54pdFJ2wtns@google.com> <9a36b230-bf41-8802-e7ba-397b7feb5073@amd.com> <41bfb025-008c-db03-2f6d-33b2d542ae65@amd.com>
-Message-ID: <Z-Q2uQ0perBQiZh-@google.com>
-Subject: Re: [PATCH] KVM: SVM: Fix SNP AP destroy race with VMRUN
-From: Sean Christopherson <seanjc@google.com>
-To: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Ingo Molnar <mingo@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Michael Roth <michael.roth@amd.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 5/8] KVM: arm64: Introduce module param to
+ partition the PMU
+To: Colton Lewis <coltonlewis@google.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvm@vger.kernel.org, robh@kernel.org, linux@armlinux.org.uk,
+ catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+ oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+ yuzenghui@huawei.com, mark.rutland@arm.com, pbonzini@redhat.com,
+ shuah@kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+ linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <gsnt1pulnepv.fsf@coltonlewis-kvm.c.googlers.com>
+Content-Language: en-US
+From: James Clark <james.clark@linaro.org>
+In-Reply-To: <gsnt1pulnepv.fsf@coltonlewis-kvm.c.googlers.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Mar 26, 2025, Tom Lendacky wrote:
-> On 3/25/25 12:49, Tom Lendacky wrote:
-> > On 3/21/25 18:17, Sean Christopherson wrote:
-> >> On Fri, Mar 21, 2025, Tom Lendacky wrote:
-> >>> On 3/18/25 08:47, Tom Lendacky wrote:
-> >>>> On 3/18/25 07:43, Tom Lendacky wrote:
-> >>>>>>> Very off-the-cuff, but I assume KVM_REQ_UPDATE_PROTECTED_GUEST_STATE just needs
-> >>>>>>> to be annotated with KVM_REQUEST_WAIT.
-> >>>>>>
-> >>>>>> Ok, nice. I wasn't sure if KVM_REQUEST_WAIT would be appropriate here.
-> >>>>>> This is much simpler. Let me test it out and resend if everything goes ok.
-> >>>>>
-> >>>>> So that doesn't work. I can still get an occasional #VMEXIT_INVALID. Let
-> >>>>> me try to track down what is happening with this approach...
-> >>>>
-> >>>> Looks like I need to use kvm_make_vcpus_request_mask() instead of just a
-> >>>> plain kvm_make_request() followed by a kvm_vcpu_kick().
-> >>
-> >> Ugh, I was going to say "you don't need to do that", but I forgot that
-> >> kvm_vcpu_kick() subtly doesn't honor KVM_REQUEST_WAIT.
-> >>
-> >> Ooof, I'm 99% certain that's causing bugs elsewhere.  E.g. arm64's KVM_REQ_SLEEP
-> >> uses the same "broken" pattern (LOL, which means that of course RISC-V does too).
-> >> In quotes, because kvm_vcpu_kick() is the one that sucks.
-> >>
-> >> I would rather fix that a bit more directly and obviously.  IMO, converting to
-> >> smp_call_function_single() isntead of bastardizing smp_send_reschedule() is worth
-> >> doing regardless of the WAIT mess.  This will allow cleaning up a bunch of
-> >> make_request+kick pairs, it'll just take a bit of care to make sure we don't
-> >> create a WAIT where one isn't wanted (though those probably should have a big fat
-> >> comment anyways).
 
-...
 
-> >> @@ -3764,12 +3764,12 @@ void kvm_vcpu_kick(struct kvm_vcpu *vcpu)
-> >>         if (kvm_arch_vcpu_should_kick(vcpu)) {
-> >>                 cpu = READ_ONCE(vcpu->cpu);
-> >>                 if (cpu != me && (unsigned)cpu < nr_cpu_ids && cpu_online(cpu))
-> >> -                       smp_send_reschedule(cpu);
-> >> +                       smp_call_function_single(cpu, ack_kick, NULL, wait);
-> > 
-> > In general, this approach works. However, this change triggered
-> > 
-> >  WARN_ON_ONCE(cpu_online(this_cpu) && irqs_disabled()
-> > 	      && !oops_in_progress);
-> > 
-> > in kernel/smp.c.
-
-Drat, I forgot that smp_call_function_xxx() can deadlock even if wait=false due
-to needing to take locks to set the callback function.
-
-> Is keeping the old behavior desirable when IRQs are disabled? Something
-> like:
+On 25/03/2025 6:32 pm, Colton Lewis wrote:
+> Hi James,
 > 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index a6fedcadd036..81cbc55eac3a 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -3754,8 +3754,14 @@ void __kvm_vcpu_kick(struct kvm_vcpu *vcpu, bool wait)
->  	 */
->  	if (kvm_arch_vcpu_should_kick(vcpu)) {
->  		cpu = READ_ONCE(vcpu->cpu);
-> -		if (cpu != me && (unsigned)cpu < nr_cpu_ids && cpu_online(cpu))
-> -			smp_call_function_single(cpu, ack_kick, NULL, wait);
-> +		if (cpu != me && (unsigned)cpu < nr_cpu_ids && cpu_online(cpu)) {
-> +			WARN_ON_ONCE(wait && irqs_disabled());
-> +
-> +			if (irqs_disabled())
-> +				smp_send_reschedule(cpu);
-> +			else
-> +				smp_call_function_single(cpu, ack_kick, NULL, wait);
-> +		}
->  	}
->  out:
->  	put_cpu();
+> Thanks for the review.
+> 
+> James Clark <james.clark@linaro.org> writes:
+> 
+>> On 13/02/2025 6:03 pm, Colton Lewis wrote:
+>>> For PMUv3, the register MDCR_EL2.HPMN partitiones the PMU counters
+>>> into two ranges where counters 0..HPMN-1 are accessible by EL1 and, if
+>>> allowed, EL0 while counters HPMN..N are only accessible by EL2.
+> 
+>>> Introduce a module parameter in KVM to set this register. The name
+>>> reserved_host_counters reflects the intent to reserve some counters
+>>> for the host so the guest may eventually be allowed direct access to a
+>>> subset of PMU functionality for increased performance.
+> 
+>>> Track HPMN and whether the pmu is partitioned in struct arm_pmu
+>>> because both KVM and the PMUv3 driver will need to know that to handle
+>>> guests correctly.
+> 
+>>> Due to the difficulty this feature would create for the driver running
+>>> at EL1 on the host, partitioning is only allowed in VHE mode. Working
+>>> on nVHE mode would require a hypercall for every register access
+>>> because the counters reserved for the host by HPMN are now only
+>>> accessible to EL2.
+> 
+>>> The parameter is only configurable at boot time. Making the parameter
+>>> configurable on a running system is dangerous due to the difficulty of
+>>> knowing for sure no counters are in use anywhere so it is safe to
+>>> reporgram HPMN.
+> 
+> 
+>> Hi Colton,
+> 
+>> For some high level feedback for the RFC, it probably makes sense to
+>> include the other half of the feature at the same time. I think there is
+>> a risk that it requires something slightly different than what's here
+>> and there ends up being some churn.
+> 
+> I agree. That's what I'm working on now. I justed wanted an iteration or
+> two in public so I'm not building on something that needs drastic change
+> later.
+> 
+>> Other than that I think it looks ok apart from some minor code review 
+>> nits.
+> 
+> Thank you
+> 
+>> I was also thinking about how BRBE interacts with this. Alex has done
+>> some analysis that finds that it's difficult to use BRBE in guests with
+>> virtualized counters due to the fact that BRBE freezes on any counter
+>> overflow, rather than just guest ones. That leaves the guest with branch
+>> blackout windows in the delay between a host counter overflowing and the
+>> interrupt being taken and BRBE being restarted.
+> 
+>> But with HPMN, BRBE does allow freeze on overflow of only one partition
+>> or the other (or both, but I don't think we'd want that) e.g.:
+> 
+>>    RNXCWF: If EL2 is implemented, a BRBE freeze event occurs when all of
+>>    the following are true:
+> 
+>>    * BRBCR_EL1.FZP is 1.
+>>    * Generation of Branch records is not paused.
+>>    * PMOVSCLR_EL0[(MDCR_EL2.HPMN-1):0] is nonzero.
+>>    * The PE is in a BRBE Non-prohibited region.
+> 
+>> Unfortunately that means we could only let guests use BRBE with a
+>> partitioned PMU, which would massively reduce flexibility if hosts have
+>> to lose counters just so the guest can use BRBE.
+> 
+>> I don't know if this is a stupid idea, but instead of having a fixed
+>> number for the partition, wouldn't it be nice if we could trap and
+>> increment HPMN on the first guest use of a counter, then decrement it on
+>> guest exit depending on what's still in use? The host would always
+>> assign its counters from the top down, and guests go bottom up if they
+>> want PMU passthrough. Maybe it's too complicated or won't work for
+>> various reasons, but because of BRBE the counter partitioning changes go
+>> from an optimization to almost a necessity.
+> 
+> This is a cool idea that would enable useful things. I can think of a
+> few potential problems.
+> 
+> 1. Partitioning will give guests direct access to some PMU counter
+> registers. There is no reliable way for KVM to determine what is in use
+> from that state. A counter that is disabled guest at exit might only be
+> so temporarily, which could lead to a lot of thrashing allocating and
+> deallocating counters.
+> 
+> 2. HPMN affects reads of PMCR_EL0.N, which is the standard way to
+> determine how many counters there are. If HPMN starts as a low number,
+> guests have no way of knowing there are more counters
+> available. Dynamically changing the counters available could be
+> confusing for guests.
+> 
 
-That, or keying off wait, and letting smp_call_function_xxx() yell about trying
-to use it with IRQs disabled, i.e.
+Yes I was expecting that PMCR would have to be trapped and N reported to 
+be the number of physical counters rather than how many are in the guest 
+partition.
 
-			if (wait)
-				smp_call_function_single(cpu, ack_kick, NULL, wait);
-			else
-				smp_send_reschedule(cpu);
+> 3. If guests were aware they could write beyond HPMN and get the
+> counters allocated to them, nothing stops them from writing at counter
+> N and taking as many counters as possible to starve the host.
+> 
 
-My vote would be for the checking "wait", so that the behavior is consistent for
-a given request.
+Is that much different than how it is now with virtualized PMUs? As in, 
+the guest can use all of the counters and the host's events will have to 
+contend with them.
+
+You can still have a module param, except it's more of a limit to the 
+size of the partition rather than fixing it upfront. The default value 
+would be the max number of counters, allowing the most flexibility for 
+the common use case where it's unlikely that both host and guests are 
+contending for all counters. But if you really want to make sure the 
+host doesn't get starved you can set it to a lower value.
+
+All this does sound a bit like it could be done on top of the simple 
+partitioning though. And it's mainly for making BRBE more accessible, 
+which I'm not 100% convinced that the blackout windows are that big of a 
+problem. We could say BRBE may have some holes if the host happens to be 
+using counters at the same time, and if you want to be certain of no 
+holes, use a host with partitioned counters.
+
+James
+
 
