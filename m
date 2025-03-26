@@ -1,125 +1,150 @@
-Return-Path: <kvm+bounces-42015-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42016-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58902A71078
-	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 07:15:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2BB2A710A7
+	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 07:37:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA8C617425A
-	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 06:15:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAD10189B5F6
+	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 06:35:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 936DC15442A;
-	Wed, 26 Mar 2025 06:15:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6197919AD70;
+	Wed, 26 Mar 2025 06:34:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OuiqmHTL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oqWCSEWg"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCD0518D63A
-	for <kvm@vger.kernel.org>; Wed, 26 Mar 2025 06:15:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B49F15381A;
+	Wed, 26 Mar 2025 06:34:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742969720; cv=none; b=n+IRigZfSh+/yPYsud549UBqDhCBCH/0lDB5Btku2zCtXDHQKonCAuw/DkcNyo0DF8YAgeVFF5h+Yl9bccbcTK/UU74P+PwHh7AdA3v9+tGA0pUAUiBxXzchJ9OFG2xtCD5/cTwmPCqkK7KWNOM4AXekMyVQeDoE7gw1r5MXY98=
+	t=1742970889; cv=none; b=rc9ipidDLJ1K1tCNBOxyi5M37nQpYbh/5+j+1GkaeCQWxePYK0PHuWwQ//gg2tjT8jWGVylJbhEy8VO+Kfaqi6H0EZLukBNvI9PtQWPYDPmYNHxAzij0dDfTnR0GGTtZQBn9FGUFUjY/eclfJEPZR49LUu1VWNB6CJV6ZoxavaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742969720; c=relaxed/simple;
-	bh=DW8Fy2HTTgoGtISvZcT+E3D97xdwk6+3h+vam6MJfPE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U6QwLIxTpqgDeSu/0UZ9jOC59al2UPaPxaGlQNtLo83KSGXCW7BgmhYF3Xr3V5ibKzs4EjBj33R7Qeizmnz6EsP3EiKg5+LX6ynZph+CXFrti5507JZrB+trTejk1mv4lRGzl7k9cJdvJeJS4lJuNFiJUCDJRDu2QUXaT9CL2Zs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OuiqmHTL; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 25 Mar 2025 23:14:40 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742969702;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=slCF2xs2ElnaTVorgRjJtJXFeYpLhzlPphzcbXRpqBA=;
-	b=OuiqmHTL8r1gLM/KKEIjqAjSmMsNYpkvBf0rF1fapMbUROPNKPJrNCuIniEZweIt2hcbQL
-	zVCmBXHOplOtEyzKqjZRA+blDaXiM047RrfHp6qItXfsJFcV6cpMoOiCI/Y01E5Hi1/f8w
-	jCLrNhkoLu/Hgj/xfyHkzQiqiV4nuHw=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: "Emi Kisanuki (Fujitsu)" <fj0570is@fujitsu.com>
-Cc: 'Steven Price' <steven.price@arm.com>,
-	"'kvm@vger.kernel.org'" <kvm@vger.kernel.org>,
-	"'kvmarm@lists.linux.dev'" <kvmarm@lists.linux.dev>,
-	'Catalin Marinas' <catalin.marinas@arm.com>,
-	'Marc Zyngier' <maz@kernel.org>, 'Will Deacon' <will@kernel.org>,
-	'James Morse' <james.morse@arm.com>,
-	'Suzuki K Poulose' <suzuki.poulose@arm.com>,
-	'Zenghui Yu' <yuzenghui@huawei.com>,
-	"'linux-arm-kernel@lists.infradead.org'" <linux-arm-kernel@lists.infradead.org>,
-	"'linux-kernel@vger.kernel.org'" <linux-kernel@vger.kernel.org>,
-	'Joey Gouly' <joey.gouly@arm.com>,
-	'Alexandru Elisei' <alexandru.elisei@arm.com>,
-	'Christoffer Dall' <christoffer.dall@arm.com>,
-	'Fuad Tabba' <tabba@google.com>,
-	"'linux-coco@lists.linux.dev'" <linux-coco@lists.linux.dev>,
-	'Ganapatrao Kulkarni' <gankulkarni@os.amperecomputing.com>,
-	'Gavin Shan' <gshan@redhat.com>,
-	'Shanker Donthineni' <sdonthineni@nvidia.com>,
-	'Alper Gun' <alpergun@google.com>,
-	"'Aneesh Kumar K . V'" <aneesh.kumar@kernel.org>
-Subject: Re: [PATCH v7 00/45] arm64: Support for Arm CCA in KVM
-Message-ID: <Z-ObUJQn2dGsgSsO@linux.dev>
-References: <20250213161426.102987-1-steven.price@arm.com>
- <TYCPR01MB11463C8CCEFEDAF79868E9BBCC3A62@TYCPR01MB11463.jpnprd01.prod.outlook.com>
+	s=arc-20240116; t=1742970889; c=relaxed/simple;
+	bh=2MGPnAtzDlcfNFkgrjhcbs+PSZK/71xFqiqfm4ICurw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=N1BwKyi41vq1bPoormQrP6RfW1WVndmK57FDr+17ZZ+F/MUx/p7rjhG3S8tCxsdTW+QOY8yMe9sUqX+ODXpLBlHsi4BVKiW1lcTtFMt1MKvdEzI+lB3LMkgDb++lOneohVJXnX82tGXPvClW90H2mIniMavmF/sE5YKdh6+usR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oqWCSEWg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E46EC4CEFD;
+	Wed, 26 Mar 2025 06:34:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742970888;
+	bh=2MGPnAtzDlcfNFkgrjhcbs+PSZK/71xFqiqfm4ICurw=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=oqWCSEWgqSzuZihIGSGxBq/NFjOUhZjOlwZMMZY+/2ybNPO86h100+06K+NuCc9Mt
+	 WYnoiWB1I5d60B7CRE6XuosOocePqX6eDdBEP/8SE+DYlhSfcxkLZF9LrlQ68Y4veL
+	 H8xWmZsln8RTeTMzlPXP6pl8crUOBBsMQcncsHm3UJYg5K3kU3IXi4FH/Qc4qv2wOO
+	 yEJnquI42uVFFeIsvvRh3GMWQ+sFTb7U/WMNtlSVXjGbMeRckEm9GTcI5P7A0b/Ro3
+	 nMSrwoZKByN/PZoX2e4Jn/Y5mLcclU97Oe6eskkQTsOcmnMnijIJvWokjpBxxC2uqF
+	 n5hVyTRxxXDfw==
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3913d45a148so5217717f8f.3;
+        Tue, 25 Mar 2025 23:34:48 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU0Z8fFKCF0vRhplQweEWYJYb4VDCWeUT4Bm1nCypoBk/n/uxsih6rHY58p6FeUcq+Wry1k9YuiK8p1@vger.kernel.org, AJvYcCU4GAChg4xxzAN3U6zdOKIqvtxfwHDLeuD2G5iqstMAIST5NKH7KjJxH5D7n8szeHjoA9LEIoZYfkCwTD+G@vger.kernel.org, AJvYcCUFkl+fLz2Ty4CUosoSsnoduEM8NcjlVOBB+wGeVVmhTCeluHI1NGAUhGT93dGFpJMBhk0kncI9ONob2JmU3K3D0g==@vger.kernel.org, AJvYcCULDFP2m8ArapfMbFHal25WKy2OQVT9dJFZNasejpHyPNDdlsIs1MfY6E262dno7+4xhui7b5SlOUfwGyyFk5b1@vger.kernel.org, AJvYcCUUsJfP0jLy3Jsw7aPbOSO8BKLtCSp+frnkq1Zls74YGFbVK6DtCKcjZNkFxTvGvDf5GObi5jPz/0EN@vger.kernel.org, AJvYcCUXr2P3qruuhJlosLngrSNHmvD70TBKJ6pnDElYTRlILCHOlPsQMooFdVGO2HAxQno3vDd8NzUmw3O/cuA=@vger.kernel.org, AJvYcCUZj9Pcy+b/+sBQHNmT0l0jL2Qw7x5GePbmuQH5lvxOggSGbmLq2ac+ILT5GNh/RW0fgUi5DkgxyoCUCA==@vger.kernel.org, AJvYcCUdyhsoB72OG79gi1NoOaqP78cOx+RMBeV0OLOvNFYEY5F3t33sbho+EKNBRc+LJ0xVKy6rEaX2P/XtYSk=@vger.kernel.org, AJvYcCUv+aZYOjNJCQBrjBYu2lhDf6McfFEOyLeTxcqAZLVC7XBo3afNbKcgvseKWbNSZMPihiT1+KKpw3zrWXI=@vger.kernel.org, AJvYcCV3puId
+ FA0KYAx327zBT/qFJcQ2dbJ7yxWunHB4vyO8kYVhtxsM42JSRNPrHb6ncDmiu83N@vger.kernel.org, AJvYcCVKvsdgscn4uqo6A/K28+75ZkFcH53m5a3RN7f9ysrXqDH155/YZuaO1ixmgv1ZO6RUNbKT/B0Y@vger.kernel.org, AJvYcCVguDGFLvtm/rcALP/PZ5+JqxAGWr/Z5FFnnkGQXwQeBRYpwVLDdyTK7ntwruahdlxwkzY=@vger.kernel.org, AJvYcCWCMyj1EvsfYGiSabQwTiT7uvTmasRiKXCDGdJ2HG6KIxn8nCMbQpW791eGMWH3g4iCnnbtk/yOM+SOTDVpKiWugrAb@vger.kernel.org, AJvYcCWEqtQIvpooCRV44g/lVmuuKDjUO/tE0l1IZGYe8b77mdtTRqrYT6msUdpnF7Me4UTdHrHSIdyuJ8LXmw==@vger.kernel.org, AJvYcCWPx+zO84CE/K6pV+HY5Ri9Z0F2AqInOdTtFBqiosG9yGtbL1jRWZ/EHQi0aUtXXcjsYQDBDokXAPltC3V2fg==@vger.kernel.org, AJvYcCWn0O9iCTJ9d/OvkKxW/Eh1PkNijLdm9bnrMSApgfS+yDT9xod9Du3vVK80Z6CoznHnPh+0d77p1rvpLsyw@vger.kernel.org, AJvYcCXmzcG79gR7jXjdwHfzZVXx+XUq+ZcO5IQljshTRFINu9zIzWvy0NnPErfx8A5/+Uv4wq8V5bpZVytIugLs@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsRDEZMjBSsppymsMoksIPjPv0rlVGrfIct04Ab/4Ug7QBY8St
+	bIVe21apUi5Bk6svytNeUK5qMJ0xgJJsi2cTcTkn0+HZojxoRXUcbw0No1yyLbGjddk7HqdRzne
+	kxb/9eVlCS6QwWzfVxO2b1dJrd08=
+X-Google-Smtp-Source: AGHT+IGIApydo9VgmdhIDcmOnmG1sSv1FEEmzeINRVbJ26tbvLOq+REJlE+tfl+WofDYebAF8b+RY6kbO+n3ISps8p8=
+X-Received: by 2002:a5d:47c6:0:b0:38d:d371:e04d with SMTP id
+ ffacd0b85a97d-3997f937cd7mr16526330f8f.34.1742970886849; Tue, 25 Mar 2025
+ 23:34:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <TYCPR01MB11463C8CCEFEDAF79868E9BBCC3A62@TYCPR01MB11463.jpnprd01.prod.outlook.com>
-X-Migadu-Flow: FLOW_OUT
+References: <20250325121624.523258-1-guoren@kernel.org> <20250325121624.523258-2-guoren@kernel.org>
+ <CAHk-=wiVgTJpSxrQbEi28pUOmuWXrox45vV9kPhe9q5CcRxEbw@mail.gmail.com>
+In-Reply-To: <CAHk-=wiVgTJpSxrQbEi28pUOmuWXrox45vV9kPhe9q5CcRxEbw@mail.gmail.com>
+From: Guo Ren <guoren@kernel.org>
+Date: Wed, 26 Mar 2025 14:34:32 +0800
+X-Gmail-Original-Message-ID: <CAJF2gTRZyAAgrM1RMrTi7Zi+Vx_VBnM1=CWwZZtLy+uHZ=vZpw@mail.gmail.com>
+X-Gm-Features: AQ5f1JpGXhmRPDvCQOc_Kwk_PFeqm824JtKAYEkQji0TkGjMeyznsoqjkxAkPig
+Message-ID: <CAJF2gTRZyAAgrM1RMrTi7Zi+Vx_VBnM1=CWwZZtLy+uHZ=vZpw@mail.gmail.com>
+Subject: Re: [RFC PATCH V3 01/43] rv64ilp32_abi: uapi: Reuse lp64 ABI interface
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: arnd@arndb.de, gregkh@linuxfoundation.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, anup@brainfault.org, atishp@atishpatra.org, 
+	oleg@redhat.com, kees@kernel.org, tglx@linutronix.de, will@kernel.org, 
+	mark.rutland@arm.com, brauner@kernel.org, akpm@linux-foundation.org, 
+	rostedt@goodmis.org, edumazet@google.com, unicorn_wang@outlook.com, 
+	inochiama@outlook.com, gaohan@iscas.ac.cn, shihua@iscas.ac.cn, 
+	jiawei@iscas.ac.cn, wuwei2016@iscas.ac.cn, drew@pdp7.com, 
+	prabhakar.mahadev-lad.rj@bp.renesas.com, ctsai390@andestech.com, 
+	wefu@redhat.com, kuba@kernel.org, pabeni@redhat.com, josef@toxicpanda.com, 
+	dsterba@suse.com, mingo@redhat.com, peterz@infradead.org, 
+	boqun.feng@gmail.com, xiao.w.wang@intel.com, qingfang.deng@siflower.com.cn, 
+	leobras@redhat.com, jszhang@kernel.org, conor.dooley@microchip.com, 
+	samuel.holland@sifive.com, yongxuan.wang@sifive.com, 
+	luxu.kernel@bytedance.com, david@redhat.com, ruanjinjie@huawei.com, 
+	cuiyunhui@bytedance.com, wangkefeng.wang@huawei.com, qiaozhe@iscas.ac.cn, 
+	ardb@kernel.org, ast@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-mm@kvack.org, 
+	linux-crypto@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-input@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	linux-serial@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, maple-tree@lists.infradead.org, 
+	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-atm-general@lists.sourceforge.net, linux-btrfs@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	linux-nfs@vger.kernel.org, linux-sctp@vger.kernel.org, 
+	linux-usb@vger.kernel.org, linux-media@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Emi,
+On Wed, Mar 26, 2025 at 4:41=E2=80=AFAM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+>
+> On Tue, 25 Mar 2025 at 05:17, <guoren@kernel.org> wrote:
+> >
+> > The rv64ilp32 abi kernel accommodates the lp64 abi userspace and
+> > leverages the lp64 abi Linux interface. Hence, unify the
+> > BITS_PER_LONG =3D 32 memory layout to match BITS_PER_LONG =3D 64.
+>
+> No.
+>
+> This isn't happening.
+>
+> You can't do crazy things in the RISC-V code and then expect the rest
+> of the kernel to just go "ok, we'll do crazy things".
+>
+> We're not doing crazy __riscv_xlen hackery with random structures
+> containing 64-bit values that the kernel then only looks at the low 32
+> bits. That's wrong on *so* many levels.
+>
+> I'm willing to say "big-endian is dead", but I'm not willing to accept
+> this kind of crazy hackery.
+>
+> Not today, not ever.
+>
+> If you want to run a ilp32 kernel on 64-bit hardware (and support
+> 64-bit ABI just in a 32-bit virtual memory size), I would suggest you
+>
+>  (a) treat the kernel as natively 32-bit (obviously you can then tell
+> the compiler to use the rv64 instructions, which I presume you're
+> already doing - I didn't look)
+I used CONFIG_32BIT in v1 and v2, but I've abandoned them because,
+based on CONFIG_64BIT, I gain more functionality by inheriting the
+lp64-abi kernel. I want the full functionality of the CONFIG_64BIT
+Linux kernel, which can be equivalent, used interchangeably, and
+seamlessly.
 
-On Wed, Mar 26, 2025 at 02:14:35AM +0000, Emi Kisanuki (Fujitsu) wrote:
-> Hi all,
-> 
-> I tested Linux-cca cca-host/v7 patch with our Internal simulator based on QEMU (with CCA and MPAM support).
-> A panic occurred when starting Realm, but I don't think this is a problem with the cca-host/v7 patch.
-> The location of the panic is [1].
-> 
-> [1]https://lore.kernel.org/linux-arm-kernel/20241030160317.2528209-4-joey.gouly@arm.com
-> diff --git a/arch/arm64/kernel/cpuinfo.c b/arch/arm64/kernel/cpuinfo.c
-> index 44718d0482b3..46ba30d42b9b 100644
-> --- a/arch/arm64/kernel/cpuinfo.c
-> +++ b/arch/arm64/kernel/cpuinfo.c
-> @@ -478,6 +478,9 @@ static void __cpuinfo_store_cpu(struct cpuinfo_arm64 *info)
->  	if (id_aa64pfr0_32bit_el0(info->reg_id_aa64pfr0))
->  		__cpuinfo_store_cpu_32bit(&info->aarch32);
->  
-> +	if (id_aa64pfr0_mpam(info->reg_id_aa64pfr0))
-> +		info->reg_mpamidr = read_cpuid(MPAMIDR_EL1); /////// panic occurred here. 
-> +
->  	cpuinfo_detect_icache_policy(info);
->  }
-> 
-> There was no problem with the cca-host/v5 patch (based on v6.12).
-> This panic is caused by accessing MPAMIDR_EL1 when the chip supports MPAM.
-> This functionality was enabled when the cca host patch base version was rebased from v6.12 to v6.13.
-> 
-> I am not familiar with TF-A, but I think this maybe a TF-A's bug.
-> Because It seems TF-A sets MPAM3_EL3.TRAPLOWER to 0 during normal guest boot in manage_extensions_nonsecure_per_world function[2].
-> However, TF-A does not set it to 0 during Realm guest boot in manage_extensions_secure_per_world function.
-> Therefore, a trap occurs against EL3 (TF-A), and it is likely being processed as an invalid instruction (Undef).
+>
+>  (b) look at making the compat stuff do the conversion the "wrong way".
+>
+> And btw, that (b) implies *not* just ignoring the high bits. If
+> user-space gives 64-bit pointer, you don't just treat it as a 32-bit
+> one by dropping the high bits. You add some logic to convert it to an
+> invalid pointer so that user space gets -EFAULT.
+Thanks for the advice. I'm looking at how to make the compat stuff.
 
-Your instinct is correct that this is *not* a kernel bug. It is the
-responsibility of the RMM to provide a consistent feature set to the
-Realm.
-
-Looks like this was addressed recently in TF-RMM by hiding FEAT_MPAM:
-
-https://github.com/TF-RMM/tf-rmm/commit/7b0874403726d215c40054abfd5d8704049f8dac
-
-Thanks,
-Oliver
+--=20
+Best Regards
+ Guo Ren
 
