@@ -1,129 +1,174 @@
-Return-Path: <kvm+bounces-42074-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42075-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF99CA72014
-	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 21:41:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AEDFA7201C
+	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 21:46:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9BE8F188F6EF
-	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 20:40:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A95F516AA21
+	for <lists+kvm@lfdr.de>; Wed, 26 Mar 2025 20:46:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E1025E473;
-	Wed, 26 Mar 2025 20:40:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9766825E476;
+	Wed, 26 Mar 2025 20:46:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tiut/nE5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nuIH7naF"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00F651EA7F3
-	for <kvm@vger.kernel.org>; Wed, 26 Mar 2025 20:40:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 480E21EA7F3
+	for <kvm@vger.kernel.org>; Wed, 26 Mar 2025 20:46:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743021636; cv=none; b=rsGdF0O/z8uwnYTRxUJsOVbHne0/9MjlsFixj5iTfD0kWivWyrgzAerWFOyvXE/bvL/7UPL3Gy2jG8h3qjbJWkRA+b21qwzAvGq8YAK4JPThXL9Cq3aGouZviwk3h/dJTjxR7Cs/Q7TNpf2wnueQBvR6+eT1iMYIZRikq/kvdHQ=
+	t=1743021968; cv=none; b=NlIq73FQ/7IghtsFZO5+FRIV3LDMZFJ+obV2jQ+4nzARpObfLkjVrny/WvXTP2wXAIvrjtT1lLtRpa0HWa+KX3nPnaOqi3xHoy0bJjI0hulgKxSM45WKhLRl8nC3ZD0SsBQW8Nf4my6TIxWx8WI9OGo+dw+SRXeFkHErIYzzQKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743021636; c=relaxed/simple;
-	bh=vsDzlSImn7SIlQBYWw98T4RqAX3WL8B/3H0BPKPwr7g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JO1zotAWXMBsus2N2CeuV2BAj7QgTeuWc00g5ELLLPmrX5t4YnaOEuerC5nh1hoiQ7hts7ex+rz3oz3bnQS/kx7SsVir+6851Zu+12rLdYbPRCeGbC7V9Ga6Gkr7+7Eik9pgOMh+ftseSsq8w37ZntJd01dLAHrgnupzbJJQ9Lc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tiut/nE5; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 26 Mar 2025 13:40:16 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1743021623;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wg2P5N/lgAa+Pjwmt6Xv30iT0//GYcryM47I3itLJEs=;
-	b=tiut/nE5Sd50+xXN1DOthjMja5xf6A769EkXEIuON8c27ybVj1FLwM/UIPbk4rdmXybG84
-	MMf9m+ycBH8XC+mocUwwkhYuTmxb62uNkK5Q8sdlZMjJf2WeVJy1t7AgzpI1pZFHYMrCT/
-	k9ZPVoxbEfJk42i66cO5qQ4rwyy9WmI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: James Clark <james.clark@linaro.org>
-Cc: Colton Lewis <coltonlewis@google.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
-	robh@kernel.org, linux@armlinux.org.uk, catalin.marinas@arm.com,
-	will@kernel.org, maz@kernel.org, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com,
-	pbonzini@redhat.com, shuah@kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [RFC PATCH v3 5/8] KVM: arm64: Introduce module param to
- partition the PMU
-Message-ID: <Z-RmMLkTuwsea7Uk@linux.dev>
-References: <gsnt1pulnepv.fsf@coltonlewis-kvm.c.googlers.com>
- <f7d543f6-2660-460f-88ac-741dd47ed440@linaro.org>
+	s=arc-20240116; t=1743021968; c=relaxed/simple;
+	bh=Y6AhyK49pxkzn1ksbUR43T1pZXDv+BVv5QZJqfe+jkw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=CsIxbinTWmC9y+hvgTlq+UONjbEQXb3ZSRGEi7+hN8xQ5mEKHNzmX9cKUmwAqC6PRj3WkzfGneZ1vj+M5Qj0U0jbjoKPazx963m2M3pSibEH8xKfxterXw8d/VRhyi43NkhuR5/pVh/13CI3hTno5upUO7QVynrUmQ/oS0zUh7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nuIH7naF; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-22647ff3cf5so4529975ad.0
+        for <kvm@vger.kernel.org>; Wed, 26 Mar 2025 13:46:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1743021966; x=1743626766; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=o4TnW2Uz5dKZRhVJDSlrRtrZST0v5S6K4ANZzv9qPFY=;
+        b=nuIH7naFl3andnO/WLEGB0RkwVV1XsSxdZhCZDP90ZTXCuBa3lSoNuhM6FeWE4A0FE
+         Y3TOuPt8vB7HSJ2smQ/e8CEAtaz9zFQ6n7RIRiOoE6EV8cLWX432CG8XBitNDYRDdPHC
+         OLNP9hdFH0EjQemyjhk4KyIhuOeG2usFuN76u1NSc3tEUwWBJrgsyI6TSa5zqLXOBSsJ
+         6kT2qaHhHIZK6OTIMLDZNnVVsVUfpqS4JzRtIfzYIrrpLJkTmmOQuv2eNHzeABwn4JO0
+         YSXV7+UOkLIDUpAoWltMYZvAjZU5GxemKKnw8hWCzE5uSZJJ4NMTH3eW0Ko5yXCzen56
+         oVhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743021966; x=1743626766;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=o4TnW2Uz5dKZRhVJDSlrRtrZST0v5S6K4ANZzv9qPFY=;
+        b=WDMaOS82E5kngcxS7X/maMCxBzVi5Bmi6a0ZWjlyZe+fVKmzWrEXXPOF2D90+aLrUD
+         fkV7pd1S5t1T0SEEoZbUtd9O0RZHT9BXWpci2tsvJgmDT7SEoHRGtkJ5h6k5g9T4vOXc
+         rCBwvmiQ+8fwAH0b0dheaZfBCTzOyBP4+GdFXajvnVaUQ3ONdsAmj1ezHRG8vNCVGbGg
+         tstINv8Mrk4WpMyp3ggFh+T/EhEEsJS3QJiGEoP5+pE/mn30ERYPJQL3NeoTSpkd6Esf
+         eP6079hc4lagWwYsT+lnG0I81qUqGynTEDCk6ACfMm/7tyZpmrgdvGe1trW6Z+1Aw7Ih
+         xwmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXezS6CHijIscHvL7ZkuHaFA5yuFPadO3GkMsvul4BUJwsrGd0Pm+M/AEqbq3Oi2MhONWA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbA9e4SlLF4ZztqGTxKWpvr/ZAQwyOq36uwx5lTgmSgWCENWx6
+	bOQbH+olxK5mp3o7r5H6jYi2cQDMeUCrjl259fXqQywwKfuDmdf6JG77a0VANBogVofGNt2N1fg
+	Keg==
+X-Google-Smtp-Source: AGHT+IG8fkyy0WUh4763nYORNLKBqfCAbmVWPy9jfWL/7DeLL3/hOCRU5DW9gPneZ9vs+KSuQSR91LQmU04=
+X-Received: from pfbdf2.prod.google.com ([2002:a05:6a00:4702:b0:736:adf0:d154])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:198f:b0:739:4a30:b900
+ with SMTP id d2e1a72fcca58-73960e3239dmr1232609b3a.7.1743021966483; Wed, 26
+ Mar 2025 13:46:06 -0700 (PDT)
+Date: Wed, 26 Mar 2025 13:46:04 -0700
+In-Reply-To: <20250320013759.3965869-1-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f7d543f6-2660-460f-88ac-741dd47ed440@linaro.org>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20250320013759.3965869-1-yosry.ahmed@linux.dev>
+Message-ID: <Z-RnjKsXPwNWKsKU@google.com>
+Subject: Re: [PATCH] KVM: x86: Unify cross-vCPU IBPB
+From: Sean Christopherson <seanjc@google.com>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, x86@kernel.org, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Mar 26, 2025 at 05:38:34PM +0000, James Clark wrote:
-> On 25/03/2025 6:32 pm, Colton Lewis wrote:
-> > > I don't know if this is a stupid idea, but instead of having a fixed
-> > > number for the partition, wouldn't it be nice if we could trap and
-> > > increment HPMN on the first guest use of a counter, then decrement it on
-> > > guest exit depending on what's still in use? The host would always
-> > > assign its counters from the top down, and guests go bottom up if they
-> > > want PMU passthrough. Maybe it's too complicated or won't work for
-> > > various reasons, but because of BRBE the counter partitioning changes go
-> > > from an optimization to almost a necessity.
-> > 
-> > This is a cool idea that would enable useful things. I can think of a
-> > few potential problems.
-> > 
-> > 1. Partitioning will give guests direct access to some PMU counter
-> > registers. There is no reliable way for KVM to determine what is in use
-> > from that state. A counter that is disabled guest at exit might only be
-> > so temporarily, which could lead to a lot of thrashing allocating and
-> > deallocating counters.
-
-KVM must always have a reliable way to determine if the PMU is in use.
-If there's any counter in the vPMU for which kvm_pmu_counter_is_enabled()
-is true would do the trick...
-
-Generally speaking, I would like to see the guest/host context switch in
-KVM modeled in a way similar to the debug registers, where the vPMU
-registers are loaded onto hardware lazily if either:
-
-  1) The above definition of an in-use PMU is satisfied
-
-  2) The guest accessed a PMU register since the last vcpu_load()
-
-> > 2. HPMN affects reads of PMCR_EL0.N, which is the standard way to
-> > determine how many counters there are. If HPMN starts as a low number,
-> > guests have no way of knowing there are more counters
-> > available. Dynamically changing the counters available could be
-> > confusing for guests.
-> > 
+On Thu, Mar 20, 2025, Yosry Ahmed wrote:
+>  arch/x86/kvm/svm/svm.c    | 24 ------------------------
+>  arch/x86/kvm/svm/svm.h    |  2 --
+>  arch/x86/kvm/vmx/nested.c |  6 +++---
+>  arch/x86/kvm/vmx/vmx.c    | 15 ++-------------
+>  arch/x86/kvm/vmx/vmx.h    |  3 +--
+>  arch/x86/kvm/x86.c        | 19 ++++++++++++++++++-
+>  6 files changed, 24 insertions(+), 45 deletions(-)
 > 
-> Yes I was expecting that PMCR would have to be trapped and N reported to be
-> the number of physical counters rather than how many are in the guest
-> partition.
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 8abeab91d329d..89bda9494183e 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -1484,25 +1484,10 @@ static int svm_vcpu_create(struct kvm_vcpu *vcpu)
+>  	return err;
+>  }
+>  
+> -static void svm_clear_current_vmcb(struct vmcb *vmcb)
+> -{
+> -	int i;
+> -
+> -	for_each_online_cpu(i)
+> -		cmpxchg(per_cpu_ptr(&svm_data.current_vmcb, i), vmcb, NULL);
 
-I'm not sure this is aligned with the spirit of the feature.
+Ha!  I was going to say that processing only online CPUs is likely wrong, but
+you made that change on the fly.  I'll probably split that to a separate commit
+since it's technically a bug fix.
 
-Colton's aim is to minimize the overheads of trapping the PMU *and*
-relying on the perf subsystem for event scheduling. To do dynamic
-partitioning as you've described, KVM would need to unconditionally trap
-the PMU registers so it can pack the guest counters into the guest
-partition. We cannot assume the VM will allocate counters sequentially.
+A few other nits, but I'll take care of them when applying.
 
-Dynamic counter allocation can be had with the existing PMU
-implementation. The partitioned PMU is an alternative userspace can
-select, not a replacement for what we already have.
+Overall, nice cleanup!
 
-Thanks,
-Oliver
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 69c20a68a3f01..4034190309a61 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4961,6 +4961,8 @@ static bool need_emulate_wbinvd(struct kvm_vcpu *vcpu)
+>  	return kvm_arch_has_noncoherent_dma(vcpu->kvm);
+>  }
+>  
+> +static DEFINE_PER_CPU(struct kvm_vcpu *, last_vcpu);
+> +
+>  void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  {
+>  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+> @@ -4983,6 +4985,18 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  
+>  	kvm_x86_call(vcpu_load)(vcpu, cpu);
+>  
+> +	if (vcpu != per_cpu(last_vcpu, cpu)) {
+
+I have a slight preference for using this_cpu_read() (and write) so that it's more
+obvious this is operating on the current CPU.
+
+> +		/*
+> +		 * Flush the branch predictor when switching vCPUs on the same physical
+> +		 * CPU, as each vCPU should have its own branch prediction domain. No
+> +		 * IBPB is needed when switching between L1 and L2 on the same vCPU
+> +		 * unless IBRS is advertised to the vCPU. This is handled on the nested
+> +		 * VM-Exit path.
+> +		 */
+> +		indirect_branch_prediction_barrier();
+> +		per_cpu(last_vcpu, cpu) = vcpu;
+> +	}
+> +
+>  	/* Save host pkru register if supported */
+>  	vcpu->arch.host_pkru = read_pkru();
+>  
+> @@ -12367,10 +12381,13 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
+>  
+>  void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+>  {
+> -	int idx;
+> +	int idx, cpu;
+>  
+>  	kvmclock_reset(vcpu);
+>  
+> +	for_each_possible_cpu(cpu)
+> +		cmpxchg(per_cpu_ptr(&last_vcpu, cpu), vcpu, NULL);
+
+It's definitely worth keeping a version of SVM's comment to explaining the cross-CPU
+nullification.
+
+> +
+>  	kvm_x86_call(vcpu_free)(vcpu);
+>  
+>  	kmem_cache_free(x86_emulator_cache, vcpu->arch.emulate_ctxt);
+> -- 
+> 2.49.0.395.g12beb8f557-goog
+> 
 
