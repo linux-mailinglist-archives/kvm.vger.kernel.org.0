@@ -1,170 +1,142 @@
-Return-Path: <kvm+bounces-42086-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42087-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73103A727DB
-	for <lists+kvm@lfdr.de>; Thu, 27 Mar 2025 01:45:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D0B4A72812
+	for <lists+kvm@lfdr.de>; Thu, 27 Mar 2025 02:24:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11772179A0E
-	for <lists+kvm@lfdr.de>; Thu, 27 Mar 2025 00:45:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 328F21895443
+	for <lists+kvm@lfdr.de>; Thu, 27 Mar 2025 01:25:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC0ECC2E0;
-	Thu, 27 Mar 2025 00:44:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A68213BBF2;
+	Thu, 27 Mar 2025 01:24:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nxBt8+8L"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="smPIZ4DO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f202.google.com (mail-vk1-f202.google.com [209.85.221.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82C772E3392
-	for <kvm@vger.kernel.org>; Thu, 27 Mar 2025 00:44:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 520593596A
+	for <kvm@vger.kernel.org>; Thu, 27 Mar 2025 01:24:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743036298; cv=none; b=d1UwCgsmJxFwImS8ALGEB2VCHbwvscag/vM+1g94t7NXUeYPKNwXYDhS0a7S1FWEfxJ8iXWiPsV5/5xgfAgka77ee7TAlZzdbxZ6ebYNtThjI+unDJPDsLJe6nbHoIclWGiX8lbzHlFpPcgu8qGiQ6mgdXdxNlOU3VgYsXnyrGI=
+	t=1743038687; cv=none; b=GDEXHTtwGWI/J7GPML/Y0Grk0uxsFSEjZ0LSsyLY9ZfR1dw8e9E4in1/fJuHKCThRKu6m2sEWNqRNEpFfSybmz6CBLdGSbOe6aWA83fnWIQqGSLsiU4YPC4O8khsECREOWx25z1xEPtiE4Pqv2A73wwKhoRdva/AqPlEP/8DHe4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743036298; c=relaxed/simple;
-	bh=1E4OhdxDCA+uUeKjgwsdCTwJzIJ0Qula+rwvE/bkIEY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I9yvZqDE8o8AqTvNb/IwYNVtzVp/+rVb1c7dw5nLYHjQ9Zb2fsdEEGGH5ANjTizO1oLYiyTKqjRnVQxymxSGg9kgIX45xxv7L22k1/BGoEWRCo72GbfI1dLAsa27BNB1gPuGyzYxs2n4Z0LpUvocZmEBHeBNx8+v62dDbRsohvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nxBt8+8L; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1743036297; x=1774572297;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=1E4OhdxDCA+uUeKjgwsdCTwJzIJ0Qula+rwvE/bkIEY=;
-  b=nxBt8+8LoR26VfB8ZWYfhLMe0fryEMJy3C2pdSnjjJv6/S4jSRCcyvRl
-   kr84Bva6ee6PZ55sja5DgJIZDh4AH1rs0/icVx85QQ0It3OPhjjXzv9jn
-   KStBQej+dHggU2Cd8YgG119W3NyOTKEl2WDld7pMPr937ULQCL0Zuw4ca
-   1AyJbd3eB90zunZehT2ElfRuErw5ucB5BhOLQtaiP85vjOPb4rdgZP8Xv
-   rC5+edwXID/JtwJ+qMKGnPWtcdX+MdVdfjeP2H6Vx3T7ZNTOmQAL2PCKs
-   n5Rf/qwjioGbsXZ5vM9slmII29ovfW0U9N551wMZkF9kOZcXCtdFdY63Q
-   g==;
-X-CSE-ConnectionGUID: JZD/25irTyu52ZWegbILPw==
-X-CSE-MsgGUID: C5j4TklYReq/kpqTTaEgbw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11385"; a="55716619"
-X-IronPort-AV: E=Sophos;i="6.14,279,1736841600"; 
-   d="scan'208";a="55716619"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2025 17:44:52 -0700
-X-CSE-ConnectionGUID: YIbrI9zcR7KAaP4Tjq0uDA==
-X-CSE-MsgGUID: MQK7FOH/RfO2gqkRsn9DOQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,279,1736841600"; 
-   d="scan'208";a="130014402"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2025 17:44:48 -0700
-Message-ID: <a8e4649d-5402-4c3a-bc86-1d1b76122541@linux.intel.com>
-Date: Thu, 27 Mar 2025 08:44:44 +0800
+	s=arc-20240116; t=1743038687; c=relaxed/simple;
+	bh=3kxkXpBhoJScEEurm+b8lsAO1U7qWl5x/4lmhlHIsxA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=D7eZtw/pcUYglsD5tkPMY0g8kbpfesxOUeudYOWff5ozsuZtfWT/H1L9ZI/fo5XhNb9BIr5pxfgbJ7xvmoPDW1EIgT9ooZAiMIbjl6/KWqVBet/uhkoATSqs7+H6vuzu/W03LNlQJgHIzwIn3XrFJ9kJDHU9tgrQw+5YGHpzN0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=smPIZ4DO; arc=none smtp.client-ip=209.85.221.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
+Received: by mail-vk1-f202.google.com with SMTP id 71dfb90a1353d-5243f067a34so74207e0c.3
+        for <kvm@vger.kernel.org>; Wed, 26 Mar 2025 18:24:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1743038685; x=1743643485; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=OnBfyElwB7pR2NOpIQEhHFwjTaj6cxlSHySqE1g9O24=;
+        b=smPIZ4DO9v02diZOUzVSnZP4+S4t8KfxLaB40rAD+oKbLjQEJDYakIVyYMLM6p6PyZ
+         IDBYG12flFMFcarU8zOWUITvgPgx9oQV4k8wxyom65D4TLRNwupvigR7/6UCRo/NNUQ8
+         Pmx6zSegz+5qZfGvcV0rVS6hi8xrKIaK6dmjzc7m/QDLbkvtvC03V4sZR3arGQ78j1K7
+         xRgZ5NPTjwq7g63QkEKrqQGqE3ZDac4vtsoT8PhG1oeuu4/jrZMDEMXqrwOkkjhk+FjL
+         PqfUisWScyqG6PtfDhgZMGSjvKSj1d4Ncl4qlW27pjGTvtMErEK6WWO7c3RN2GAVq80H
+         MYGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743038685; x=1743643485;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OnBfyElwB7pR2NOpIQEhHFwjTaj6cxlSHySqE1g9O24=;
+        b=BY4nmrJOM0jXDMTS8R5z0qLpcYfDIVEXh3r2EpnMYl9T75s+gOdfuWYgRAJRVh5+zV
+         irnCYP9f/UZ22kDdGSyt8wwFSX4cuGFM4WvoJ87qf0ggw1QCnvDelr7lmSW0gbPZFQfY
+         H1fRSo8vVmE5VIere74jpd6GJkVaMfBtuaOaZNCnnnb9rrZ2QC8dIhs2tvBZwUqHZ0vB
+         kqhoGdGV5aDRB1JuHILdE0ZXd2om6RSxUbOnOe9LPrmyOopNAgPSqj7wN9CliBzkAaW0
+         l9El2unnY74CyYhiauIaamwBvEq2nMFjJt3Kp/6Xeh5/5ciJujquy6n4frAgL6Frvqz3
+         jFTA==
+X-Forwarded-Encrypted: i=1; AJvYcCUZxF8XPs0ocP08LgpzkLOisrIWjZESnOAck7rw3mkozcgju3l2rrvlKvkEuku2dyJkB3U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLrPkG59twNo129MfRUVxBakzcZLq0E0UtN5zj7nXfNkl39zVo
+	cgD3VfiZcqhxE3BQebuflFAVbyiqibsX/EZfD7MG3wEDCotbJb9clL7bvBt4yTr+/r4Bd7roqg0
+	va7LXAEUjPFp4mKaLYA==
+X-Google-Smtp-Source: AGHT+IEMXalzFI1RmQMmbOxY3dwo1qPrh8Qx1TkLKs2CMrepip9P0Lapptz92/BHPG+Q/ecCwOSxQ1kdXgRemPD4
+X-Received: from vkb18.prod.google.com ([2002:a05:6122:8112:b0:51c:af44:e006])
+ (user=jthoughton job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6122:3d0e:b0:523:9ee7:7f8e with SMTP id 71dfb90a1353d-526009144f9mr1633987e0c.4.1743038685245;
+ Wed, 26 Mar 2025 18:24:45 -0700 (PDT)
+Date: Thu, 27 Mar 2025 01:23:45 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] target/i386: Call KVM_CAP_PMU_CAPABILITY iotcl to
- enable/disable PMU
-To: Dongli Zhang <dongli.zhang@oracle.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Zhao Liu
- <zhao1.liu@intel.com>, Zide Chen <zide.chen@intel.com>,
- Xiaoyao Li <xiaoyao.li@intel.com>, Mingwei Zhang <mizhang@google.com>,
- Sean Christopherson <seanjc@google.com>, Das Sandipan
- <Sandipan.Das@amd.com>, Shukla Manali <Manali.Shukla@amd.com>,
- Dapeng Mi <dapeng1.mi@intel.com>, Paolo Bonzini <pbonzini@redhat.com>
-References: <20250324123712.34096-1-dapeng1.mi@linux.intel.com>
- <20250324123712.34096-3-dapeng1.mi@linux.intel.com>
- <3a01b0d8-8f0b-4068-8176-37f61295f87f@oracle.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <3a01b0d8-8f0b-4068-8176-37f61295f87f@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.395.g12beb8f557-goog
+Message-ID: <20250327012350.1135621-1-jthoughton@google.com>
+Subject: [PATCH 0/5] KVM: selftests: access_tracking_perf_test fixes for NUMA
+ balancing and MGLRU
+From: James Houghton <jthoughton@google.com>
+To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
+Cc: Maxim Levitsky <mlevitsk@redhat.com>, Axel Rasmussen <axelrasmussen@google.com>, 
+	Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, mkoutny@suse.com, 
+	Yu Zhao <yuzhao@google.com>, James Houghton <jthoughton@google.com>, cgroups@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+
+This is a follow-up from Maxim's recent v2[1] and the selftest changes
+from the v8 of the x86 lockless aging series[2].
+
+With MGLRU, touching a page doesn't necessarily clear the Idle flag.
+This has come up in the past, and the recommendation was to use MGLRU
+generation numbers[3], which is what this series does.
+
+With NUMA balancing, pages are temporarily mapped as PROT_NONE, so the
+SPTEs will be zapped, losing the Accessed bits. The fix here is, in the
+event we have lost access information to print a warning and continue
+with the test, just like what we do if the test is running a nested VM.
+
+A flag is added for the user to specify if they wish for the test to
+always enforce or always skip this check.
+
+Based on kvm/next.
+
+[1]: https://lore.kernel.org/all/20250325015741.2478906-1-mlevitsk@redhat.com/
+[2]: https://lore.kernel.org/kvm/20241105184333.2305744-12-jthoughton@google.com/
+[3]: https://lore.kernel.org/all/CAOUHufZeADNp_y=Ng+acmMMgnTR=ZGFZ7z-m6O47O=CmJauWjw@mail.gmail.com/
+
+James Houghton (3):
+  cgroup: selftests: Move cgroup_util into its own library
+  KVM: selftests: Build and link selftests/cgroup/lib into KVM selftests
+  KVM: selftests: access_tracking_perf_test: Use MGLRU for access
+    tracking
+
+Maxim Levitsky (1):
+  KVM: selftests: access_tracking_perf_test: Add option to skip the
+    sanity check
+
+Sean Christopherson (1):
+  KVM: selftests: Extract guts of THP accessor to standalone sysfs
+    helpers
+
+ tools/testing/selftests/cgroup/Makefile       |  21 +-
+ .../selftests/cgroup/{ => lib}/cgroup_util.c  |   3 +-
+ .../cgroup/{ => lib/include}/cgroup_util.h    |   4 +-
+ .../testing/selftests/cgroup/lib/libcgroup.mk |  12 +
+ tools/testing/selftests/kvm/Makefile.kvm      |   4 +-
+ .../selftests/kvm/access_tracking_perf_test.c | 263 ++++++++++--
+ .../selftests/kvm/include/lru_gen_util.h      |  51 +++
+ .../testing/selftests/kvm/include/test_util.h |   1 +
+ .../testing/selftests/kvm/lib/lru_gen_util.c  | 383 ++++++++++++++++++
+ tools/testing/selftests/kvm/lib/test_util.c   |  42 +-
+ 10 files changed, 726 insertions(+), 58 deletions(-)
+ rename tools/testing/selftests/cgroup/{ => lib}/cgroup_util.c (99%)
+ rename tools/testing/selftests/cgroup/{ => lib/include}/cgroup_util.h (99%)
+ create mode 100644 tools/testing/selftests/cgroup/lib/libcgroup.mk
+ create mode 100644 tools/testing/selftests/kvm/include/lru_gen_util.h
+ create mode 100644 tools/testing/selftests/kvm/lib/lru_gen_util.c
 
 
-On 3/26/2025 2:46 PM, Dongli Zhang wrote:
-> Hi Dapeng,
->
-> PATCH 1-4 from the below patchset are already reviewed. (PATCH 5-10 are for PMU
-> registers reset).
->
-> https://lore.kernel.org/all/20250302220112.17653-1-dongli.zhang@oracle.com/
->
-> They require only trivial modification. i.e.:
->
-> https://github.com/finallyjustice/patchset/tree/master/qemu-amd-pmu-mid/v03
->
-> Therefore, since PATCH 5-10 are for another topic, any chance if I re-send 1-4
-> as a prerequisite for the patch to explicitly call KVM_CAP_PMU_CAPABILITY?
+base-commit: 782f9feaa9517caf33186dcdd6b50a8f770ed29b
+-- 
+2.49.0.395.g12beb8f557-goog
 
-any option is fine for me, spiting it into two separated ones or still keep
-in a whole patch series. I would rebase this this patchset on top of your
-v3 patches.
-
-
->
-> In addition, I have a silly question. Can mediated vPMU coexist with legacy
-> perf-based vPMU, that is, something like tdp and tdp_mmu? Or the legacy
-> perf-based vPMU is going to be purged from the most recent kernel?
-
-No, they can't. As long as mediated vPMU is enabled, it would totally
-replace the legacy perf-based vPMU. The legacy perf-based vPMU code would
-still be kept in the kernel in near future, but the long-term target is to
-totally remove the perf-based vPMU once mediated vPMU is mature.
-
-
->
-> If they can coexist, how about add property to QEMU control between
-> legacy/modern? i.e. by default use legacy and change to modern as default in the
-> future once the feature is stable.
->
-> Thank you very much!
->
-> Dongli Zhang
->
-> On 3/24/25 5:37 AM, Dapeng Mi wrote:
->> After introducing mediated vPMU, mediated vPMU must be enabled by
->> explicitly calling KVM_CAP_PMU_CAPABILITY to enable. Thus call
->> KVM_CAP_PMU_CAPABILITY to enable/disable PMU base on user configuration.
->>
->> Suggested-by: Zhao Liu <zhao1.liu@intel.com>
->> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
->> ---
->>  target/i386/kvm/kvm.c | 17 +++++++++++++++++
->>  1 file changed, 17 insertions(+)
->>
->> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
->> index f41e190fb8..d3e6984844 100644
->> --- a/target/i386/kvm/kvm.c
->> +++ b/target/i386/kvm/kvm.c
->> @@ -2051,8 +2051,25 @@ full:
->>      abort();
->>  }
->>  
->> +static bool pmu_cap_set = false;
->>  int kvm_arch_pre_create_vcpu(CPUState *cpu, Error **errp)
->>  {
->> +    KVMState *s = kvm_state;
->> +    X86CPU *x86_cpu = X86_CPU(cpu);
->> +
->> +    if (!pmu_cap_set && kvm_check_extension(s, KVM_CAP_PMU_CAPABILITY)) {
->> +        int r = kvm_vm_enable_cap(s, KVM_CAP_PMU_CAPABILITY, 0,
->> +                                  KVM_PMU_CAP_DISABLE & !x86_cpu->enable_pmu);
->> +        if (r < 0) {
->> +            error_report("kvm: Failed to %s pmu cap: %s",
->> +                         x86_cpu->enable_pmu ? "enable" : "disable",
->> +                         strerror(-r));
->> +            return r;
->> +        }
->> +
->> +        pmu_cap_set = true;
->> +    }
->> +
->>      return 0;
->>  }
->>  
 
