@@ -1,64 +1,48 @@
-Return-Path: <kvm+bounces-42131-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42132-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D921A73A32
-	for <lists+kvm@lfdr.de>; Thu, 27 Mar 2025 18:13:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BEB20A73A3A
+	for <lists+kvm@lfdr.de>; Thu, 27 Mar 2025 18:15:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4B1E188D4FE
-	for <lists+kvm@lfdr.de>; Thu, 27 Mar 2025 17:13:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 11D361888DC0
+	for <lists+kvm@lfdr.de>; Thu, 27 Mar 2025 17:15:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 067021B043F;
-	Thu, 27 Mar 2025 17:13:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="I8/r+u3L"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EAF61AD3E0;
+	Thu, 27 Mar 2025 17:14:47 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D26335964;
-	Thu, 27 Mar 2025 17:13:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72DD335964
+	for <kvm@vger.kernel.org>; Thu, 27 Mar 2025 17:14:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743095616; cv=none; b=bKy+zKFJ/0lYZI4eu1+s7rgbOcudta+NjzatjZ9EYpdMBLY6sjHaj/8t8iQado/QZ+G/ro6UCGt3cp3mgvyuVZSR0B6Ia7/EMbXPQzrq3KO4vFCgmywBsJpqMl9sebLwJVrYrP985YUi5NAw15qmRwXmN8hCBGZmuSX5Ck1lPR4=
+	t=1743095686; cv=none; b=lP1rBDB+pF6X9UxB7pL3qEOu2TXmgpaGzp+HVU7BxaQGmvTAQgpvtM0Moaf7XxFq4Uw8iBF4d+1U3mQlVnRhqt7Wio2aMvRC7HDPluVFfl2lW11bSmNFr1x4vVMXAz/TKh28NSA7OWZCyypYXujK/2fC483tQZzTTN0EUaQTZsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743095616; c=relaxed/simple;
-	bh=0F5hDRGrtH34ZiFv8FHU4LvUue9UPi9JIQv3kr2M8Lg=;
+	s=arc-20240116; t=1743095686; c=relaxed/simple;
+	bh=36H2nFKQuOYYAaS7kREkGUJa69T0XGM7MGmLDdYCBu4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bS0SnAXd2PuHwnVrDARKBDuCjQPS469hwG1GuIrZis1GHZD5DDFxco7do+KASnXS3nPrur+P3pxN3VnDMbcAHUexLFOAaij8BffJsdqAoad2hGNreOX2GSYotXlfNhJ3/tZgD0KZ349kXq+yDXBwduRqhtnJMdpRXdZCvF6xXYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=I8/r+u3L; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Thu, 27 Mar 2025 17:13:21 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1743095610;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=T4vVy2hfIRDZguybe4291Ps0BWWaT7ji3NBdsRJu5BE=;
-	b=I8/r+u3LNiMkvufXflcdlzfC5h8JpimuFTL4sAT60ECX00tBtHwZpzm8McvgYkonkIaZ0L
-	ECyJLbvwkjEDlgG+ZDHPdqTsRKH0E1Gyr0Au/4nlKOW3Rse5LHkTIvwC9o0+7X3xtIToXW
-	8uhJkc3+b403Gkk72aUrJ7ZMSMwUScc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Nikunj A Dadhania <nikunj@amd.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jim Mattson <jmattson@google.com>,
-	Maxim Levitsky <mlevitsk@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Rik van Riel <riel@surriel.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>, x86@kernel.org,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Manali Shukla <manali.shukla@amd.com>, santosh.shukla@amd.com
-Subject: Re: [RFC PATCH 01/24] KVM: VMX: Generalize VPID allocation to be
- vendor-neutral
-Message-ID: <Z-WHMZPvCNLsXZ_1@google.com>
-References: <20250326193619.3714986-1-yosry.ahmed@linux.dev>
- <20250326193619.3714986-2-yosry.ahmed@linux.dev>
- <855xjun3jc.fsf@amd.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qZ22QEK0sDlv83RaEwbAgirxOPEsI4RwluDTpx658b5txwsGEaMgxRObRmyxHUTxTenY+u9ppsncGawbaNAWpG3uu19DR4g38d6R51rmJxw8rAJxcDV1m3ocZGOJXgErmaTvHDULbo7ei69pl1p2rYtOW8NDhq00zsOv8w0iGRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D9F691063;
+	Thu, 27 Mar 2025 10:14:48 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7F5D53F63F;
+	Thu, 27 Mar 2025 10:14:42 -0700 (PDT)
+Date: Thu, 27 Mar 2025 17:14:39 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Cc: andrew.jones@linux.dev, eric.auger@redhat.com, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+	vladimir.murzin@arm.com
+Subject: Re: [kvm-unit-tests PATCH v3 4/5] configure: Add --qemu-cpu option
+Message-ID: <Z-WHf02_ZQKwzQej@raptor>
+References: <20250325160031.2390504-3-jean-philippe@linaro.org>
+ <20250325160031.2390504-7-jean-philippe@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,251 +51,190 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <855xjun3jc.fsf@amd.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20250325160031.2390504-7-jean-philippe@linaro.org>
 
-On Thu, Mar 27, 2025 at 10:58:31AM +0000, Nikunj A Dadhania wrote:
-> Yosry Ahmed <yosry.ahmed@linux.dev> writes:
-> 
-> > Generalize the VMX VPID allocation code and make move it to common
-> > code
-> 
-> s/make//
-> 
-> > in preparation for sharing with SVM. Create a generic struct
-> > kvm_tlb_tags, representing a factory for VPIDs (or ASIDs later), and use
-> > one for VPIDs.
-> >
-> > Most of the functionality remains the same, with the following
-> > differences:
-> > - The enable_vpid checks are moved to the callers for allocate_vpid()
-> >   and free_vpid(), as they are specific to VMX.
-> > - The bitmap allocation is now dynamic (which will be required for SVM),
-> >   so it is initialized and cleaned up in vmx_hardware_{setup/unsetup}().
-> > - The range of valid TLB tags is expressed in terms of min/max instead
-> >   of the number of tags to support SVM use cases.
-> >
-> > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
-> > ---
-> >  arch/x86/kvm/vmx/nested.c |  4 +--
-> >  arch/x86/kvm/vmx/vmx.c    | 38 +++++--------------------
-> >  arch/x86/kvm/vmx/vmx.h    |  4 +--
-> >  arch/x86/kvm/x86.c        | 58 +++++++++++++++++++++++++++++++++++++++
-> >  arch/x86/kvm/x86.h        | 13 +++++++++
-> >  5 files changed, 82 insertions(+), 35 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > index d06e50d9c0e79..b017bd2eb2382 100644
-> > --- a/arch/x86/kvm/vmx/nested.c
-> > +++ b/arch/x86/kvm/vmx/nested.c
-> > @@ -343,7 +343,7 @@ static void free_nested(struct kvm_vcpu *vcpu)
-> >  	vmx->nested.vmxon = false;
-> >  	vmx->nested.smm.vmxon = false;
-> >  	vmx->nested.vmxon_ptr = INVALID_GPA;
-> > -	free_vpid(vmx->nested.vpid02);
-> > +	kvm_tlb_tags_free(&vmx_vpids, vmx->nested.vpid02);
-> >  	vmx->nested.posted_intr_nv = -1;
-> >  	vmx->nested.current_vmptr = INVALID_GPA;
-> >  	if (enable_shadow_vmcs) {
-> > @@ -5333,7 +5333,7 @@ static int enter_vmx_operation(struct kvm_vcpu *vcpu)
-> >  		     HRTIMER_MODE_ABS_PINNED);
-> >  	vmx->nested.preemption_timer.function = vmx_preemption_timer_fn;
-> >  
-> > -	vmx->nested.vpid02 = allocate_vpid();
-> > +	vmx->nested.vpid02 = enable_vpid ? kvm_tlb_tags_alloc(&vmx_vpids) : 0;
-> >  
-> >  	vmx->nested.vmcs02_initialized = false;
-> >  	vmx->nested.vmxon = true;
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index b70ed72c1783d..f7ce75842fa26 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -496,8 +496,7 @@ DEFINE_PER_CPU(struct vmcs *, current_vmcs);
-> >   */
-> >  static DEFINE_PER_CPU(struct list_head, loaded_vmcss_on_cpu);
-> >  
-> > -static DECLARE_BITMAP(vmx_vpid_bitmap, VMX_NR_VPIDS);
-> > -static DEFINE_SPINLOCK(vmx_vpid_lock);
-> > +struct kvm_tlb_tags vmx_vpids;
-> >  
-> >  struct vmcs_config vmcs_config __ro_after_init;
-> >  struct vmx_capability vmx_capability __ro_after_init;
-> > @@ -3972,31 +3971,6 @@ static void seg_setup(int seg)
-> >  	vmcs_write32(sf->ar_bytes, ar);
-> >  }
-> >  
-> > -int allocate_vpid(void)
-> > -{
-> > -	int vpid;
-> > -
-> > -	if (!enable_vpid)
-> > -		return 0;
-> > -	spin_lock(&vmx_vpid_lock);
-> > -	vpid = find_first_zero_bit(vmx_vpid_bitmap, VMX_NR_VPIDS);
-> > -	if (vpid < VMX_NR_VPIDS)
-> > -		__set_bit(vpid, vmx_vpid_bitmap);
-> > -	else
-> > -		vpid = 0;
-> > -	spin_unlock(&vmx_vpid_lock);
-> > -	return vpid;
-> > -}
-> > -
-> > -void free_vpid(int vpid)
-> > -{
-> > -	if (!enable_vpid || vpid == 0)
-> > -		return;
-> > -	spin_lock(&vmx_vpid_lock);
-> > -	__clear_bit(vpid, vmx_vpid_bitmap);
-> > -	spin_unlock(&vmx_vpid_lock);
-> > -}
-> > -
-> >  static void vmx_msr_bitmap_l01_changed(struct vcpu_vmx *vmx)
-> >  {
-> >  	/*
-> > @@ -7559,7 +7533,7 @@ void vmx_vcpu_free(struct kvm_vcpu *vcpu)
-> >  
-> >  	if (enable_pml)
-> >  		vmx_destroy_pml_buffer(vmx);
-> > -	free_vpid(vmx->vpid);
-> > +	kvm_tlb_tags_free(&vmx_vpids, vmx->vpid);
-> >  	nested_vmx_free_vcpu(vcpu);
-> >  	free_loaded_vmcs(vmx->loaded_vmcs);
-> >  	free_page((unsigned long)vmx->ve_info);
-> > @@ -7578,7 +7552,7 @@ int vmx_vcpu_create(struct kvm_vcpu *vcpu)
-> >  
-> >  	err = -ENOMEM;
-> >  
-> > -	vmx->vpid = allocate_vpid();
-> > +	vmx->vpid = enable_vpid ? kvm_tlb_tags_alloc(&vmx_vpids) : 0;
-> >  
-> >  	/*
-> >  	 * If PML is turned on, failure on enabling PML just results in failure
-> > @@ -7681,7 +7655,7 @@ int vmx_vcpu_create(struct kvm_vcpu *vcpu)
-> >  free_pml:
-> >  	vmx_destroy_pml_buffer(vmx);
-> >  free_vpid:
-> > -	free_vpid(vmx->vpid);
-> > +	kvm_tlb_tags_free(&vmx_vpids, vmx->vpid);
-> >  	return err;
-> >  }
-> >  
-> > @@ -8373,6 +8347,7 @@ void vmx_hardware_unsetup(void)
-> >  		nested_vmx_hardware_unsetup();
-> >  
-> >  	free_kvm_area();
-> > +	kvm_tlb_tags_destroy(&vmx_vpids);
-> >  }
-> >  
-> >  void vmx_vm_destroy(struct kvm *kvm)
-> > @@ -8591,7 +8566,8 @@ __init int vmx_hardware_setup(void)
-> >  	kvm_caps.has_bus_lock_exit = cpu_has_vmx_bus_lock_detection();
-> >  	kvm_caps.has_notify_vmexit = cpu_has_notify_vmexit();
-> >  
-> > -	set_bit(0, vmx_vpid_bitmap); /* 0 is reserved for host */
-> > +	/* VPID 0 is reserved for host, so min=1  */
-> > +	kvm_tlb_tags_init(&vmx_vpids, 1, VMX_NR_VPIDS - 1);
-> 
-> This needs to handle errors from kvm_tlb_tags_init().
-> 
-> >  
-> >  	if (enable_ept)
-> >  		kvm_mmu_set_ept_masks(enable_ept_ad_bits,
-> > diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> > index 951e44dc9d0ea..9bece3ea63eaa 100644
-> > --- a/arch/x86/kvm/vmx/vmx.h
-> > +++ b/arch/x86/kvm/vmx/vmx.h
-> > @@ -376,10 +376,10 @@ struct kvm_vmx {
-> >  	u64 *pid_table;
-> >  };
-> >  
-> > +extern struct kvm_tlb_tags vmx_vpids;
-> > +
-> >  void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
-> >  			struct loaded_vmcs *buddy);
-> > -int allocate_vpid(void);
-> > -void free_vpid(int vpid);
-> >  void vmx_set_constant_host_state(struct vcpu_vmx *vmx);
-> >  void vmx_prepare_switch_to_guest(struct kvm_vcpu *vcpu);
-> >  void vmx_set_host_fs_gs(struct vmcs_host_state *host, u16 fs_sel, u16 gs_sel,
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 69c20a68a3f01..182f18ebc62f3 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -13992,6 +13992,64 @@ int kvm_sev_es_string_io(struct kvm_vcpu *vcpu, unsigned int size,
-> >  }
-> >  EXPORT_SYMBOL_GPL(kvm_sev_es_string_io);
-> >  
-> > +int kvm_tlb_tags_init(struct kvm_tlb_tags *tlb_tags, unsigned int min,
-> > +		      unsigned int max)
-> > +{
-> > +	/*
-> > +	 * 0 is assumed to be the host's TLB tag and is returned on failed
-> > +	 * allocations.
-> > +	 */
-> > +	if (WARN_ON_ONCE(min == 0))
-> > +		return -1;
-> 
-> Probably -EINVAL ?
+Hi Jean-Philippe,
 
-Yeah we can use error codes for clarity, thanks.
+On Tue, Mar 25, 2025 at 04:00:32PM +0000, Jean-Philippe Brucker wrote:
+> Add the --qemu-cpu option to let users set the CPU type to run on.
+> At the moment --processor allows to set both GCC -mcpu flag and QEMU
+> -cpu. On Arm we'd like to pass `-cpu max` to QEMU in order to enable all
+> the TCG features by default, and it could also be nice to let users
+> modify the CPU capabilities by setting extra -cpu options.  Since GCC
+> -mcpu doesn't accept "max" or "host", separate the compiler and QEMU
+> arguments.
+> 
+> `--processor` is now exclusively for compiler options, as indicated by
+> its documentation ("processor to compile for"). So use $QEMU_CPU on
+> RISC-V as well.
+> 
+> Suggested-by: Andrew Jones <andrew.jones@linux.dev>
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> ---
+>  scripts/mkstandalone.sh |  3 ++-
+>  arm/run                 | 15 +++++++++------
+>  riscv/run               |  8 ++++----
+>  configure               | 24 ++++++++++++++++++++++++
+>  4 files changed, 39 insertions(+), 11 deletions(-)
+> 
+> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
+> index 2318a85f..9b4f983d 100755
+> --- a/scripts/mkstandalone.sh
+> +++ b/scripts/mkstandalone.sh
+> @@ -42,7 +42,8 @@ generate_test ()
+>  
+>  	config_export ARCH
+>  	config_export ARCH_NAME
+> -	config_export PROCESSOR
+> +	config_export QEMU_CPU
+> +	config_export DEFAULT_QEMU_CPU
+>  
+>  	echo "echo BUILD_HEAD=$(cat build-head)"
+>  
+> diff --git a/arm/run b/arm/run
+> index efdd44ce..4675398f 100755
+> --- a/arm/run
+> +++ b/arm/run
+> @@ -8,7 +8,7 @@ if [ -z "$KUT_STANDALONE" ]; then
+>  	source config.mak
+>  	source scripts/arch-run.bash
+>  fi
+> -processor="$PROCESSOR"
+> +qemu_cpu="$QEMU_CPU"
+>  
+>  if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
+>     [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ] &&
+> @@ -37,12 +37,15 @@ if [ "$ACCEL" = "kvm" ]; then
+>  	fi
+>  fi
+>  
+> -if [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ]; then
+> -	if [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ]; then
+> -		processor="host"
+> +if [ -z "$qemu_cpu" ]; then
+> +	if ( [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ] ) &&
+> +	   ( [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ] ); then
+> +		qemu_cpu="host"
+>  		if [ "$ARCH" = "arm" ] && [ "$HOST" = "aarch64" ]; then
+> -			processor+=",aarch64=off"
+> +			qemu_cpu+=",aarch64=off"
+>  		fi
+> +	else
+> +		qemu_cpu="$DEFAULT_QEMU_CPU"
+>  	fi
+>  fi
+>  
+> @@ -71,7 +74,7 @@ if $qemu $M -device '?' | grep -q pci-testdev; then
+>  fi
+>  
+>  A="-accel $ACCEL$ACCEL_PROPS"
+> -command="$qemu -nodefaults $M $A -cpu $processor $chr_testdev $pci_testdev"
+> +command="$qemu -nodefaults $M $A -cpu $qemu_cpu $chr_testdev $pci_testdev"
+>  command+=" -display none -serial stdio"
+>  command="$(migration_cmd) $(timeout_cmd) $command"
+>  
+> diff --git a/riscv/run b/riscv/run
+> index e2f5a922..02fcf0c0 100755
+> --- a/riscv/run
+> +++ b/riscv/run
+> @@ -11,12 +11,12 @@ fi
+>  
+>  # Allow user overrides of some config.mak variables
+>  mach=$MACHINE_OVERRIDE
+> -processor=$PROCESSOR_OVERRIDE
+> +qemu_cpu=$QEMU_CPU_OVERRIDE
+>  firmware=$FIRMWARE_OVERRIDE
+>  
+> -[ "$PROCESSOR" = "$ARCH" ] && PROCESSOR="max"
+> +[ -z "$QEMU_CPU" ] && QEMU_CPU="max"
 
-> 
-> > +
-> > +	/*
-> > +	 * Allocate enough bits to index the bitmap directly by the tag,
-> > +	 * potentially wasting a bit of memory.
-> > +	 */
-> > +	tlb_tags->bitmap = bitmap_zalloc(max + 1, GFP_KERNEL);
-> > +	if (!tlb_tags->bitmap)
-> > +		return -1;
-> 
-> -ENOMEM ?
-> 
-> > +
-> > +	tlb_tags->min = min;
-> > +	tlb_tags->max = max;
-> > +	spin_lock_init(&tlb_tags->lock);
-> > +	return 0;
-> > +}
-> > +EXPORT_SYMBOL_GPL(kvm_tlb_tags_init);
-> > +
-> > +void kvm_tlb_tags_destroy(struct kvm_tlb_tags *tlb_tags)
-> > +{
-> > +	bitmap_free(tlb_tags->bitmap);
-> 
-> Do we need to take tlb_tabs->lock here ?
+If you make DEFAULT_QEMU_CPU=max for riscv, you can use it instead of "max",
+just like arm/arm64 does. Not sure if it's worth another respin.
 
-Hmm we could, but I think it's a bug from the caller if they allow
-kvm_tlb_tags_destroy() and any of the other functions (init/alloc/free)
-to race. kvm_tlb_tags_destroy() should be called when we are done using
-the factory.
+Otherwise the patch looks good to me.
 
-> 
-> > +}
-> > +EXPORT_SYMBOL_GPL(kvm_tlb_tags_destroy);
-> > +
-> > +unsigned int kvm_tlb_tags_alloc(struct kvm_tlb_tags *tlb_tags)
-> > +{
-> > +	unsigned int tag;
-> > +
-> > +	spin_lock(&tlb_tags->lock);
-> > +	tag = find_next_zero_bit(tlb_tags->bitmap, tlb_tags->max + 1,
-> > +				 tlb_tags->min);
-> > +	if (tag <= tlb_tags->max)
-> > +		__set_bit(tag, tlb_tags->bitmap);
-> > +	else
-> > +		tag = 0;
-> 
-> In the event that the KVM runs out of tags, adding WARN_ON_ONCE() here will
-> help debugging.
+Thanks,
+Alex
 
-Yeah I wanted to do that, but we do not currently WARN in VMX if we run
-out of VPIDs. I am fine with doing adding it if others are. My main
-concern was if there's some existing use case that routinely runs out of
-VPIDs (although I cannot imagine one).
-
-> 
-> Regards
-> Nikunj
+>  : "${mach:=virt}"
+> -: "${processor:=$PROCESSOR}"
+> +: "${qemu_cpu:=$QEMU_CPU}"
+>  : "${firmware:=$FIRMWARE}"
+>  [ "$firmware" ] && firmware="-bios $firmware"
+>  
+> @@ -32,7 +32,7 @@ fi
+>  mach="-machine $mach"
+>  
+>  command="$qemu -nodefaults -nographic -serial mon:stdio"
+> -command+=" $mach $acc $firmware -cpu $processor "
+> +command+=" $mach $acc $firmware -cpu $qemu_cpu "
+>  command="$(migration_cmd) $(timeout_cmd) $command"
+>  
+>  if [ "$UEFI_SHELL_RUN" = "y" ]; then
+> diff --git a/configure b/configure
+> index b4875ef3..b79145a5 100755
+> --- a/configure
+> +++ b/configure
+> @@ -23,6 +23,21 @@ function get_default_processor()
+>      esac
+>  }
+>  
+> +# Return the default CPU type to run on
+> +function get_default_qemu_cpu()
+> +{
+> +    local arch="$1"
+> +
+> +    case "$arch" in
+> +    "arm")
+> +        echo "cortex-a15"
+> +        ;;
+> +    "arm64")
+> +        echo "cortex-a57"
+> +        ;;
+> +    esac
+> +}
+> +
+>  srcdir=$(cd "$(dirname "$0")"; pwd)
+>  prefix=/usr/local
+>  cc=gcc
+> @@ -52,6 +67,7 @@ earlycon=
+>  console=
+>  efi=
+>  efi_direct=
+> +qemu_cpu=
+>  
+>  # Enable -Werror by default for git repositories only (i.e. developer builds)
+>  if [ -e "$srcdir"/.git ]; then
+> @@ -70,6 +86,9 @@ usage() {
+>  	    --arch=ARCH            architecture to compile for ($arch). ARCH can be one of:
+>  	                           arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
+>  	    --processor=PROCESSOR  processor to compile for ($processor)
+> +	    --qemu-cpu=CPU         the CPU model to run on. If left unset, the run script
+> +	                           selects the best value based on the host system and the
+> +	                           test configuration.
+>  	    --target=TARGET        target platform that the tests will be running on (qemu or
+>  	                           kvmtool, default is qemu) (arm/arm64 only)
+>  	    --cross-prefix=PREFIX  cross compiler prefix
+> @@ -146,6 +165,9 @@ while [[ $optno -le $argc ]]; do
+>          --processor)
+>  	    processor="$arg"
+>  	    ;;
+> +	--qemu-cpu)
+> +	    qemu_cpu="$arg"
+> +	    ;;
+>  	--target)
+>  	    target="$arg"
+>  	    ;;
+> @@ -471,6 +493,8 @@ ARCH=$arch
+>  ARCH_NAME=$arch_name
+>  ARCH_LIBDIR=$arch_libdir
+>  PROCESSOR=$processor
+> +QEMU_CPU=$qemu_cpu
+> +DEFAULT_QEMU_CPU=$(get_default_qemu_cpu $arch)
+>  CC=$cc
+>  CFLAGS=$cflags
+>  LD=$cross_prefix$ld
+> -- 
+> 2.49.0
 > 
 
