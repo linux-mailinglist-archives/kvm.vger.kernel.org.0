@@ -1,299 +1,237 @@
-Return-Path: <kvm+bounces-42108-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42109-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FED7A72D6D
-	for <lists+kvm@lfdr.de>; Thu, 27 Mar 2025 11:10:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D7C7A72DBC
+	for <lists+kvm@lfdr.de>; Thu, 27 Mar 2025 11:27:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE14F16B958
-	for <lists+kvm@lfdr.de>; Thu, 27 Mar 2025 10:10:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 287861892014
+	for <lists+kvm@lfdr.de>; Thu, 27 Mar 2025 10:28:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2BEB20E03F;
-	Thu, 27 Mar 2025 10:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4907720E6F6;
+	Thu, 27 Mar 2025 10:27:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FbO2Ik4B"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ysu+mUme";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ZTe9E+Fe"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A019158553;
-	Thu, 27 Mar 2025 10:10:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743070221; cv=fail; b=fE/QNnYkNQ2b7/+jCQUzjRnQEkpS5T2xk96+Op90eqog1Oq0OxNduFD+8R+rh4WT2DbmpC9lT2IpP7jAbI6S1Nr94ZydUyl/QCU+2ZcxbM91uv7kn9L2963qqDrVvmRiCX4L3jjHlq9O+bXQaQnta97Nc59wEEDGhRqVQjX4EdE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743070221; c=relaxed/simple;
-	bh=MnvPD0TKmA2Ma4BT55tmXEsOlAx3ZSr/v0jqVoHTrNo=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=uT+vvIy2jBmNTWKYxHETC0mCrFpE/idGW0hlL+LO224MIz6DxBdh7/yjJCDatCNxGgZYmF/uCZU4QdY2tmtMlm67W9vwYm1qg3+nS3qrWA2uOrGonoP+I88liMsiIZyRondplipCP6e6yBv40Dds8FfQGqDk85L+Jf8Rz32cxFk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FbO2Ik4B; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1743070219; x=1774606219;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=MnvPD0TKmA2Ma4BT55tmXEsOlAx3ZSr/v0jqVoHTrNo=;
-  b=FbO2Ik4BnOhWFXrQNg1sUblASP7x1VZXVt6HDD2khP/+6UqbZt9lsH3F
-   G6U6jcTBRUoT5F15VAvCFGt9xeDfDhRJ8P0fCciHPzDGa1lWRY2G5U8l9
-   rnvs52zARyzvDrTAxSdz665I30hF8ZsTUOnVQt7ZWw5iKmInofOsy6k4z
-   CTz0BVRUghTp9Y6Sstb7y1vqybwAPfaGNFNmMVJWXF/MDpSzRzUzQWHaM
-   eBLi9ZSvwfgMqavJlwNgi4rrmd/phcbH6YD5KUkhnCpp3FwWJhcAB9HHy
-   wR0LOnAXS6FnmOAmulxDRUnD49nMUjLnuUiB5Gf0+24nnSg6LBGp+QYsb
-   A==;
-X-CSE-ConnectionGUID: HvTW+Y7rQcSKSftSZ3RbpA==
-X-CSE-MsgGUID: 8Z0sCv9ZQU+X+/iDmuskZA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11385"; a="55760188"
-X-IronPort-AV: E=Sophos;i="6.14,280,1736841600"; 
-   d="scan'208";a="55760188"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2025 03:10:18 -0700
-X-CSE-ConnectionGUID: Zs3rboHMQ+Oh/t4SnuAPQA==
-X-CSE-MsgGUID: mFQffcG1QzGRQRKba+umgQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,280,1736841600"; 
-   d="scan'208";a="129775994"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2025 03:10:18 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Thu, 27 Mar 2025 03:10:17 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Thu, 27 Mar 2025 03:10:17 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.44) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Thu, 27 Mar 2025 03:10:17 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sDahKzURcaklTQFW/8U7A/Uwky6iOv/TlZiSQllxePWyTmTt9cRdtBwumjM668vNwwpCpN8/pQh4YjPdJ9WKFiSbcyi4yTOYIHT8a2ONt/KqM13PIVrGKgM+MmBL2sIo42JabXLccpix9kHjnL/2Ikb4m+CHNiPtLIdWA8kXu8IjdBqs1US/Ueg/nmMpj/DgGcvxIRtm8wxyAxD3HRwJ1ARrBQGAZTT3kQJsNU2WcRyWCDYibRruhNsCBoyuK4rCj5Npgq/ZF6yjQkMF+zD7fw+uqsaOiChghTQHK6X+oC1WVEstpVO2uy8saBXG2XnOIcoa6AJHVao7N/dvYPkQCw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=txdEziHm6ozvuGjYF0cNPyNof8eyrn6TnCs1YgzzECA=;
- b=DjyabrV2i426fQU0mUFdXotkSLOg94crrHGRs124Jr7TBEMhw92PvJfLGYVH0X5LtZq+o6Noo7c0F6ydLcX1wdFva3hJBec6wE2mHXPMy/0YFM9uLCKMaKay+VxO1RAUZLv02T1ClJNKTR3oNlfN0W7cxZZHdgAOAcjz7XpDl4us+q9/C/VlxwNyyMmbmEmB2uczEx9VxROGPEgKGDX298VK2AvWr1WPYshyUo/MrCnaqGZMBbch7RW3at9SDCE/FX2z/F3QB2s01j5f5gOogUnbzZEP1mI2Pp6jgWDiTdhQpvfxWyXQCJje9Yye7fU1NFsfKCPaKe5TbcO8MNltaQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BYAPR11MB3605.namprd11.prod.outlook.com (2603:10b6:a03:f5::33)
- by DS0PR11MB7557.namprd11.prod.outlook.com (2603:10b6:8:14d::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.44; Thu, 27 Mar
- 2025 10:10:15 +0000
-Received: from BYAPR11MB3605.namprd11.prod.outlook.com
- ([fe80::1c0:cc01:1bf0:fb89]) by BYAPR11MB3605.namprd11.prod.outlook.com
- ([fe80::1c0:cc01:1bf0:fb89%4]) with mapi id 15.20.8534.043; Thu, 27 Mar 2025
- 10:10:15 +0000
-Message-ID: <8d0a4585-9e48-4e8d-8acb-7cb99142654c@intel.com>
-Date: Thu, 27 Mar 2025 12:10:05 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC] KVM: TDX: Defer guest memory removal to decrease
- shutdown time
-To: Vishal Annapurve <vannapurve@google.com>
-CC: <pbonzini@redhat.com>, <seanjc@google.com>, <kvm@vger.kernel.org>,
-	<rick.p.edgecombe@intel.com>, <kirill.shutemov@linux.intel.com>,
-	<kai.huang@intel.com>, <reinette.chatre@intel.com>, <xiaoyao.li@intel.com>,
-	<tony.lindgren@linux.intel.com>, <binbin.wu@linux.intel.com>,
-	<isaku.yamahata@intel.com>, <linux-kernel@vger.kernel.org>,
-	<yan.y.zhao@intel.com>, <chao.gao@intel.com>
-References: <20250313181629.17764-1-adrian.hunter@intel.com>
- <CAGtprH_o_Vbvk=jONSep64wRhAJ+Y51uZfX7-DDS28vh=ALQOA@mail.gmail.com>
-Content-Language: en-US
-From: Adrian Hunter <adrian.hunter@intel.com>
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-In-Reply-To: <CAGtprH_o_Vbvk=jONSep64wRhAJ+Y51uZfX7-DDS28vh=ALQOA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: VI1PR09CA0162.eurprd09.prod.outlook.com
- (2603:10a6:800:120::16) To BYAPR11MB3605.namprd11.prod.outlook.com
- (2603:10b6:a03:f5::33)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B11CC20C497;
+	Thu, 27 Mar 2025 10:27:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743071267; cv=none; b=rjRsAGKsCzSdas5UxBP+nPPswCZmj/4g9Nl+fZE/WaJvDUdbx+PcuZqALpT+HIuCTeWZwfHoafMoveeItUHS4Ep+7jYXf82TlAq2llqdw2zLdeBAA0xX3zPUfR7T4LigLj6HMoUX5tNHBr90uH/xwfIyv5fHzSWVmMi5zcUcSto=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743071267; c=relaxed/simple;
+	bh=DjighT6KaNkerXFcx2sqy6Gx28dAGuH/PznLd/ld0Zo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=O4lRm7TzPt/1V8wQ7LX7Aup96uKXiEJ8meQW9dW7JXhRjC0Y6cDMLXkH/p/0KsR2UJUXlKrQrkyZyZWjfXUxE4OyNjj4vpgMFgZKMxkLUxNqx3D4aUdpfg/LUySWMXn2gmnp0O/P5832s5TGlx5kzhp7RsvF+3OOqpbzov+FggQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ysu+mUme; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ZTe9E+Fe; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1743071263;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XJIKKbFoyEHcQK4utFLPZUfIHZoC09dJJcZQegR1TyU=;
+	b=ysu+mUmeYV7gknCnLdGpoOsjn6en58saEIsr6dHf60CXxJSH/ZG5I2CgYg30Juq8wtW83b
+	8BQUgGzPxz5PuPnbXlCaQKPc9Zk3Iaz+nTt7D2M6JXT6XjVnqyA8Mj9gyZ/S+64EZSso52
+	F0RsvjbYnQV/ZgPbvGWdWZwpYqcN7rQ10FcWz3w4ax3NN0pGtRao7JrJRT3CzaJFBbqUJv
+	rvwMQHe/WSWZI5YS1rb6l8gdDsajxvzqESf74/jsLGfoh8nahrY0/g2Adnrf+taqDv4BHO
+	438kJOpIcdB1mzx+EIt4I9XdF+NgK6e32LYTSKU5OB5PWaCLYp3UP3j/4GeM9A==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1743071263;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XJIKKbFoyEHcQK4utFLPZUfIHZoC09dJJcZQegR1TyU=;
+	b=ZTe9E+FeZ2VWC364LVwHqPmckhAl05CeUGgjUUsunGhELxPNnJOnVY2q7LBjwixrKh9QVa
+	x+FeUrnpmWuinJAQ==
+To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>, linux-kernel@vger.kernel.org
+Cc: bp@alien8.de, mingo@redhat.com, dave.hansen@linux.intel.com,
+ Thomas.Lendacky@amd.com, nikunj@amd.com, Santosh.Shukla@amd.com,
+ Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com,
+ x86@kernel.org, hpa@zytor.com, peterz@infradead.org, seanjc@google.com,
+ pbonzini@redhat.com, kvm@vger.kernel.org, kirill.shutemov@linux.intel.com,
+ huibo.wang@amd.com, naveen.rao@amd.com
+Subject: Re: [RFC v2 05/17] x86/apic: Add update_vector callback for Secure
+ AVIC
+In-Reply-To: <e86f71ec-94f7-46be-87fe-79ca26fa91d7@amd.com>
+References: <20250226090525.231882-1-Neeraj.Upadhyay@amd.com>
+ <20250226090525.231882-6-Neeraj.Upadhyay@amd.com> <87jz8i31dv.ffs@tglx>
+ <ecc20053-42ae-43ba-b1b3-748abe9d5b3b@amd.com>
+ <e86f71ec-94f7-46be-87fe-79ca26fa91d7@amd.com>
+Date: Thu, 27 Mar 2025 11:27:42 +0100
+Message-ID: <871puizs2p.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR11MB3605:EE_|DS0PR11MB7557:EE_
-X-MS-Office365-Filtering-Correlation-Id: 57b159e5-9280-4c9a-1851-08dd6d179190
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?SmdBT2xnQjdYTjZJVEltZFFjOVJmSndCTWRabDdPRWgvZkc4MDZJU0FOMGlF?=
- =?utf-8?B?TysyRHd2VUNyeDQrSlpCSDRJSE5GaHFBMU5saWhJdDRXVWFuVTBqSXU2TWxP?=
- =?utf-8?B?aXF4dXlwRUhOMi9pbEdVSzdwbGMyTHd4U001MzlGVldCdlV1YjE0QXppOHU5?=
- =?utf-8?B?d01XYXJOU0ZCK1FUbHJLTzkzdVc3VEYzOFZjRHZNMVFWWGF4VEZlVjJtRVdw?=
- =?utf-8?B?MHI0bkVHbHU2WjFRbncraWd4NVoycU1WdFdOcG1jeTNqNEowamhZa0VtZEpx?=
- =?utf-8?B?OFFFZWtXU2MrK04rQk5BdWJoUHdZYUtSa0NnbVdJVEtseFVmOUQycHZjOTJL?=
- =?utf-8?B?dXdHYTY3SGU2dlpSbXN3akk0T1VsV3pGa2UxTUcvRkpYc2MwL25UYjR2WDgr?=
- =?utf-8?B?NCtzZzhleE5sTUF2U0kyaWEyT1dGSGh5dEs0YVIwSlhIV01rQXBMR0Zla2E5?=
- =?utf-8?B?VnhpZjJlbWxWUHdSRmlBQittcFpVN1QwSVl5TTkzTHo2UE0vdWpMcXNSSnhq?=
- =?utf-8?B?bGdzeThGMkZTZFYzQTU2MCtLaGJzMW9OQzRPTWxZMnJONmNmWHhCS01rZklG?=
- =?utf-8?B?WEwrMFpYbEREKzFjOG52cGZyMytFTEpTR1hHUjRNT2diL0pTUHcreUlaN0dU?=
- =?utf-8?B?S2FNM3U4cU5xVW5PclVPYUNoanV6TnRxYWlVZ1FxYVVJdmxLUEx4UTRlNDVq?=
- =?utf-8?B?dHR4OGpCWUhTcmRFWkI3N1lqZlVHSXh1Sm5xTVc4Y29tVVRrbE5QTmlrSTFw?=
- =?utf-8?B?eEh5SHdlT1ZvNmJKZ3hFSzBBOTVjR3UyVWF2NjdkNDBkZ0p4ZkFYMVZ3NzBK?=
- =?utf-8?B?TVhwZmdteFlMeGVESjJ5TXJpcjJJUE80ellNUFhoUXBseit5S2FseVFJK1Ev?=
- =?utf-8?B?b2lRZVliRldkcGw3NTZlci9aOXRYWXhVOFNGLzRyZG42aHpGSkdEUEt0T3Jm?=
- =?utf-8?B?anp6d3Q5NU56SHd0S0o5bExac2JTSzdsQzdQb2J1eU1GaTA3VjNGb1dWYitR?=
- =?utf-8?B?SGhVNFYwRFc1S2tNVGowK01NNmJ1TEovT05td2lMYlhRN1U2U2NYc2JkVjFE?=
- =?utf-8?B?a2gyL1BPREF0d0JFR0lxNzRrL1hQRVR5S2R6anFSSitmVmpiaHpBblQ1OGp3?=
- =?utf-8?B?dWlDQ0hGdEJWUkJhc3ZhNFlWd2l5eHRxcC9YWkFwMlFDK2NVTWIzVnlYWEtB?=
- =?utf-8?B?MkxldkU3bjdVQ0g2Z1hZVmZEWUFvTExCYXlPcmJkY08zWUtJQitLemcvVzJh?=
- =?utf-8?B?ekUrdkxURTlnYXcySno1Y3V0cFlwdWxMM2NJMmQxcXNjc2RDcmZwSWVmYUlC?=
- =?utf-8?B?aWgrYUt5YjhtNTZzUXlZYnhCb3VSZTFmdjBUMVFSa0VtN2ZUaTJLWmpuNWl3?=
- =?utf-8?B?VVJ4a2pwU0x0R25Vbk1EL2l3eVZZUStVS21uNkMzUFlxMVJPekJOMmx4TDFF?=
- =?utf-8?B?SHJsNUNQclZtbElQOS9EeGJUTFE4MFdlMXJzOVFXenVXSnE3WlVPc3NaOCtC?=
- =?utf-8?B?N3JyVitRZldXZlNvWXJBOXdPUEE1UXNqRHBiS0dEN2lnWXZ5SHQyYlFtZldQ?=
- =?utf-8?B?SDcvRkJ5bGpzRnpwaEpiNllYbUFmajh1NDkxQ1JSV0xDWkFMY0dkVWx2bnV1?=
- =?utf-8?B?T242eTUycHdDT0hGVmtUVEJiRGZVUEZyTXlTT29vZ2c5ZXhLU28yTlhQYUdx?=
- =?utf-8?B?cU9FUVgxSTMxbXdZTVYzS3VBcFJyZ3d2TU00Rk10di8vRmJ5TE1XdkVUL1F2?=
- =?utf-8?B?WThQMnUrL0J1eDgwbzNDRjhmSjlSOHBGa1J4TE1ZbDM0YWJrQjJQaWhtSENr?=
- =?utf-8?B?ODMvQTdrR2xDc3dKNUlodW13Rmo2VTI3YUZNSnhGc1U4ZmpNOEpSNUdiWVhv?=
- =?utf-8?B?WE4xYVV5M2t3YWRtc1d2YjFNWEJEam44VXlQeHBqMnVWSUE9PQ==?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3605.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Q1Y2RzIrQlVCOFcrMzdCNW8yVTRlYnk1clRyVWN5NGtnTkRsUXdNYkNIQldG?=
- =?utf-8?B?L21Ja0pOUHRhUUZ2SGoydmxpWlBhVlU2S0xlaGIxV2k2RGg1Y3dsR3ByYTlq?=
- =?utf-8?B?RmFDMkpCN2RvWXI0cVJFWlY3Y2kxK0cvNlVGNWpwVHI2Wk9rd3ljak05K1Bj?=
- =?utf-8?B?aTBRWFNqQVFQbzdvT2lwLytEd3dKTDJQaThycnY1VDBrdFZvSDBIVkZEZkll?=
- =?utf-8?B?alloMm0ybEhnaXlhWUpmT0c4UG1jZGVVMXR0M3lQRjZpVURMcGt0cWtSTXRT?=
- =?utf-8?B?QjVhQUkvV0RqMjRCcHdZRWc3cGRzWVloVExncm9xdlBFZWhBWk1qNnowQits?=
- =?utf-8?B?ZWU3MkFyZUNCek9NUWJCRi9UUGg1aXhQN1J3VzJSazNwZm5OV3ZaQi8vUXRB?=
- =?utf-8?B?dHZESDduZ1Nmay9ES2kxNFhMOHF4dDZlNmw5N2twRm9CUmJVR0N6VWkyc3Mw?=
- =?utf-8?B?VGQyaTdmTjA4S0dKdnpoTmREc3J3d3dTN3RlSWk3RnYyZGNqNmkxZFlXVDJI?=
- =?utf-8?B?cmdNbnhIY3FXRHlwVlhJeFNGSFRrRFlneUFubjlsdEI0VkFoY29KY1NCU0c3?=
- =?utf-8?B?cnFXK21rdlJGR3pDeWlBa2xTQThqbDRwQjJOTjZFWHl1bDlDbkp0M2pBVjhw?=
- =?utf-8?B?dk5TOTByOUxVbm9UUkM4TXlGN1ZBMmFKc0hNalNwdHh1ZFF2aTBXc0dSMlNy?=
- =?utf-8?B?OGlxR0tSVXc4bDY3UTdIN3A2OUVFbjQ4NlVaN2MyMFZKc1RubFE2bnQzeGVK?=
- =?utf-8?B?RHI2UVNZMDFUWGd1TXpTUDBrY0VaQkFleEx5dmRScnB3Yk43T0owWlFHcElh?=
- =?utf-8?B?MGhpRyszczhTY2JVYW5aQXA0YWU4a0ovSXRKWXdLT1IyRzlPQkh3UzhhbEda?=
- =?utf-8?B?eXl1akRUUXZnNVJraTB5YURadHNLZzJVYzZmeFAzSktPUWwveHdvQ2hudUJk?=
- =?utf-8?B?SXEyU1ZJMW5NTmdNV3ErL2hQenN3M3d0Q0x6Y0YvYkJCdWlZNTE3RGVvcW1G?=
- =?utf-8?B?V1FUUmJTNmJMVkV0MTJPL2JScVQ2MDl5TWJVeFo2Y2sxWDhEajlYdTRHVHJl?=
- =?utf-8?B?cG9Oa2lJRWVxbEJDQU9EdC9NYi96YWEyRXZHdHA4MHFFUkE3aHVUMlF0dzlW?=
- =?utf-8?B?Smg4OWJ4Q1NHVGp2WWMwMUFZS2RLK0RaNlBvYmRkOG9zMXh1YnZYdjd3S0di?=
- =?utf-8?B?NW81YUN1VjJYR21JcTRybHV0OHVrMzBKUUdxaitEM09DVUtzSFZMVEN3REtO?=
- =?utf-8?B?WGRCQ0RlZ3d2Ui9ScFc1R3pnV0cxYjg0TGtKMkgyZ3A3MzdzYlJIa1NZc1k0?=
- =?utf-8?B?Mml0andSQklaTW9vM1hjNjViQ2dINXI3N3M0RkZ1RlBzNUY2WVJTMzZXMkQz?=
- =?utf-8?B?OXpwZVBFeEl3cWxLWHdSSjQ5SG9IWVNtTE9iRHE0UzJ0aHFMRGRVMDVtSzVh?=
- =?utf-8?B?Y1pDaFg1L2xISUNCSDRBb09VSjI4ZzFFRThITC9sTVo3WnJKZitoTHhMdDFL?=
- =?utf-8?B?TTNmME1vc1Y3MnRidXQ5UUZaU3VyMlU2QUhqdjRnMWthdUZuQjR4WDBuVTly?=
- =?utf-8?B?VEZCdFl3SGtmbGFSeFNkZVdUUGp5S2tnalcyVm4rQllTYVFQaWx0OFlVTmxJ?=
- =?utf-8?B?cTVOVTBEUkZUMm8yT0lobXFibW4xMlk1bWRpMzlRbVhubXpId1dPbXA0YTVz?=
- =?utf-8?B?MjhMRXg1aWlsd0JnYzBjcG4xb004U0pFZlpUeC9YWFRveUJ1L20vRnFUaUta?=
- =?utf-8?B?NUNUMUdaSEljTnFiWTVhMCsvTERISVg2UmdsSjdZbnI1cElYZGkwcFNLZDVh?=
- =?utf-8?B?Qi91MTY4TzFqSGtXRnlQWnZUWW41MWRvMXNqR1VSSEIvSEZFTGRjYnhUcWpD?=
- =?utf-8?B?UEFCYlVIcUE5alM5dUpoTm9UWkR4UW9JUVBPeWNCVHc0UVl2eDJ5bnZoVDlZ?=
- =?utf-8?B?aUVpOU45b0p0cGFEeDRXd1YyVzJhQzJhT2dKa0dhRXBDNkRieVgvcGkzOThM?=
- =?utf-8?B?UWEwbkpUaUJBNHRzdXc1ZTIrUzhsa3F4bXVtc0o3TFRhZzJ4WklxclZ0eTlI?=
- =?utf-8?B?OW15ZUFQbEp3U2tHejZMbXBieTl4MmplV3hEYmh4cTNJcVRqckwzYUl5N1Nn?=
- =?utf-8?B?dkRMdUhOOGJWa2ErdW9NZGZpRDFlNG0vaE1BSGhTTmdTcWdDWGdJQzAwU2tv?=
- =?utf-8?B?aEE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 57b159e5-9280-4c9a-1851-08dd6d179190
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3605.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Mar 2025 10:10:15.2324
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: AV6ZXcKOwQAvJ43IAxmOl0Ii1U7Jl4QgppJTo6HIXiErYj/E5EabNQJfk2vJbDY5RcUD7FiQyGL/iMDnD9lnDA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7557
-X-OriginatorOrg: intel.com
+Content-Type: text/plain
 
-On 27/03/25 10:14, Vishal Annapurve wrote:
-> On Thu, Mar 13, 2025 at 11:17 AM Adrian Hunter <adrian.hunter@intel.com> wrote:
->> ...
->> == Problem ==
->>
->> Currently, Dynamic Page Removal is being used when the TD is being
->> shutdown for the sake of having simpler initial code.
->>
->> This happens when guest_memfds are closed, refer kvm_gmem_release().
->> guest_memfds hold a reference to struct kvm, so that VM destruction cannot
->> happen until after they are released, refer kvm_gmem_release().
->>
->> Reclaiming TD Pages in TD_TEARDOWN State was seen to decrease the total
->> reclaim time.  For example:
->>
->>         VCPUs   Size (GB)       Before (secs)   After (secs)
->>          4       18              72              24
->>         32      107             517             134
-> 
-> If the time for reclaim grows linearly with memory size, then this is
-> a significantly high value for TD cleanup (~21 minutes for a 1TB VM).
-> 
->>
->> Note, the V19 patch set:
->>
->>         https://lore.kernel.org/all/cover.1708933498.git.isaku.yamahata@intel.com/
->>
->> did not have this issue because the HKID was released early, something that
->> Sean effectively NAK'ed:
->>
->>         "No, the right answer is to not release the HKID until the VM is
->>         destroyed."
->>
->>         https://lore.kernel.org/all/ZN+1QHGa6ltpQxZn@google.com/
-> 
-> IIUC, Sean is suggesting to treat S-EPT page removal and page reclaim
-> separately. Through his proposal:
+On Tue, Mar 25 2025 at 17:40, Neeraj Upadhyay wrote:
+> On 3/21/2025 9:05 PM, Neeraj Upadhyay wrote:
+> diff --git a/arch/x86/kernel/apic/vector.c b/arch/x86/kernel/apic/vector.c
+> index 736f62812f5c..fef6faffeed1 100644
+> --- a/arch/x86/kernel/apic/vector.c
+> +++ b/arch/x86/kernel/apic/vector.c
+> @@ -139,6 +139,46 @@ static void apic_update_irq_cfg(struct irq_data *irqd, unsigned int vector,
+>                             apicd->hw_irq_cfg.dest_apicid);
+>  }
+>
+> +static inline void apic_drv_update_vector(unsigned int cpu, unsigned int vector, bool set)
+> +{
+> +       if (apic->update_vector)
+> +               apic->update_vector(cpu, vector, set);
+> +}
+> +
+> +static int irq_alloc_vector(const struct cpumask *dest, bool resvd, unsigned int *cpu)
+> +{
+> +       int vector;
+> +
+> +       vector = irq_matrix_alloc(vector_matrix, dest, resvd, cpu);
+> +
+> +       if (vector < 0)
+> +               return vector;
+> +
+> +       apic_drv_update_vector(*cpu, vector, true);
+> +
+> +       return vector;
+> +}
 
-Thanks for looking at this!
+static int irq_alloc_vector(const struct cpumask *dest, bool resvd, unsigned int *cpu)
+{
+	int vector = irq_matrix_alloc(vector_matrix, dest, resvd, cpu);
 
-It seems I am using the term "reclaim" wrongly.  Sorry!
+	if (vector > 0)
+		apic_drv_update_vector(*cpu, vector, true);
+        return vector;
+}
 
-I am talking about taking private memory away from the guest,
-not what happens to it subsequently.  When the TDX VM is in "Runnable"
-state, taking private memory away is slow (slow S-EPT removal).
-When the TDX VM is in "Teardown" state, taking private memory away
-is faster (a TDX SEAMCALL named TDH.PHYMEM.PAGE.RECLAIM which is where
-I picked up the term "reclaim")
+Perhaps?
 
-Once guest memory is removed from S-EPT, further action is not
-needed to reclaim it.  It belongs to KVM at that point.
+> After checking more on this, set_bit(vector, ) cannot be used directly  here, as
+> 32-bit registers are not consecutive. Each register is aligned at 16 byte
+> boundary.
 
-guest_memfd memory can be added directly to S-EPT.  No intermediate
-state or step is used.  Any guest_memfd memory not given to the
-MMU (S-EPT), can be freed directly if userspace/KVM wants to.
-Again there is no intermediate state or (reclaim) step.
+Fair enough.
 
-> 1) If userspace drops last reference on gmem inode before/after
-> dropping the VM reference
->     -> slow S-EPT removal and slow page reclaim
+> So, I changed it to below:
+>
+> --- a/arch/x86/kernel/apic/x2apic_savic.c
+> +++ b/arch/x86/kernel/apic/x2apic_savic.c
+> @@ -19,6 +19,26 @@
+>
+>  /* APIC_EILVTn(3) is the last defined APIC register. */
+>  #define NR_APIC_REGS   (APIC_EILVTn(4) >> 2)
+> +/*
+> + * APIC registers such as APIC_IRR, APIC_ISR, ... are mapped as
+> + * 32-bit registers and are aligned at 16-byte boundary. For
+> + * example, APIC_IRR registers mapping looks like below:
+> + *
+> + * #Offset    #bits         Description
+> + *  0x200      31:0         vectors 0-31
+> + *  0x210      31:0         vectors 32-63
+> + *  ...
+> + *  0x270      31:0         vectors 224-255
+> + *
+> + * VEC_BIT_POS gives the bit position of a vector in the APIC
+> + * reg containing its state.
+> + */
+> +#define VEC_BIT_POS(v) ((v) & (32 - 1))
+> +/*
+> + * VEC_REG_OFF gives the relative (from the start offset of that APIC
+> + * register) offset of the APIC register containing state for a vector.
+> + */
+> +#define VEC_REG_OFF(v) (((v) >> 5) << 4)
+>
+>  struct apic_page {
+>         union {
+> @@ -185,6 +205,35 @@ static void x2apic_savic_send_IPI_mask_allbutself(const struct cpumask *mask, in
+>         __send_IPI_mask(mask, vector, APIC_DEST_ALLBUT);
+>  }
+>
+> +static void x2apic_savic_update_vector(unsigned int cpu, unsigned int vector, bool set)
+> +{
+> +       struct apic_page *ap = per_cpu_ptr(apic_backing_page, cpu);
+> +       unsigned long *sirr;
+> +       int vec_bit;
+> +       int reg_off;
+> +
+> +       /*
+> +        * ALLOWED_IRR registers are mapped in the apic_page at below byte
+> +        * offsets. Each register is a 32-bit register aligned at 16-byte
+> +        * boundary.
+> +        *
+> +        * #Offset                    #bits     Description
+> +        * SAVIC_ALLOWED_IRR_OFFSET   31:0      Guest allowed vectors 0-31
+> +        * "" + 0x10                  31:0      Guest allowed vectors 32-63
+> +        * ...
+> +        * "" + 0x70                  31:0      Guest allowed vectors 224-255
+> +        *
+> +        */
+> +       reg_off = SAVIC_ALLOWED_IRR_OFFSET + VEC_REG_OFF(vector);
+> +       sirr = (unsigned long *) &ap->regs[reg_off >> 2];
+> +       vec_bit = VEC_BIT_POS(vector);
+> +
+> +       if (set)
+> +               set_bit(vec_bit, sirr);
+> +       else
+> +               clear_bit(vec_bit, sirr);
+> +}
 
-Currently slow S-EPT removal happens when the file is released.
+If you need 20 lines of horrific comments to explain incomprehensible
+macros and code, then something is fundamentally wrong. Then you want to
+sit back and think about whether this can't be expressed in simple and
+obvious ways. Let's look at the math.
 
-> 2) If memslots are removed before closing the gmem and dropping the VM reference
->     -> slow S-EPT page removal and no page reclaim until the gmem is around.
-> 
-> Reclaim should ideally happen when the host wants to use that memory
-> i.e. for following scenarios:
-> 1) Truncation of private guest_memfd ranges
-> 2) Conversion of private guest_memfd ranges to shared when supporting
-> in-place conversion (Could be deferred to the faulting in as shared as
-> well).
-> 
-> Would it be possible for you to provide the split of the time spent in
-> slow S-EPT page removal vs page reclaim?
+The relevant registers are starting at regs[SAVIC_ALLOWED_IRR]. Due to
+the 16-byte alignment the vector number obviously cannot be used for
+linear bitmap addressing.
 
-Based on what I wrote above, all the time is spent removing pages
-from S-EPT.  Greater that 99% of shutdown time is kvm_gmem_release().
+But the resulting bit number can be trivially calculated with:
 
-> 
-> It might be worth exploring the possibility of parallelizing or giving
-> userspace the flexibility to parallelize both these operations to
-> bring the cleanup time down (to be comparable with non-confidential VM
-> cleanup time for example).
+   bit = vector + 32 * (vector / 32);
 
+which can be converted to:
+
+   bit = vector + (vector & ~0x1f);
+
+That conversion should be done by any reasonable compiler.
+
+Ergo the whole thing can be condensed to:
+
+static void x2apic_savic_update_vector(unsigned int cpu, unsigned int vector, bool set)
+{
+	struct apic_page *ap = per_cpu_ptr(apic_backing_page, cpu);
+	unsigned long *sirr = (unsigned long *) &ap->regs[SAVIC_ALLOWED_IRR];
+
+        /*
+         * The registers are 32-bit wide and 16-byte aligned.
+         * Compensate for the resulting bit number spacing.
+         */
+        unsigned int bit = vector + 32 * (vector / 32);
+
+	if (set)
+		set_bit(vec_bit, sirr);
+	else
+		clear_bit(vec_bit, sirr);
+}
+
+Two comment lines plus one line of trivial math makes this
+comprehensible and obvious. No?
+
+If you need that adjustment for other places as well, then you can
+provide a trivial and documented inline function for it.
+
+Thanks,
+
+        tglx
 
