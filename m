@@ -1,211 +1,157 @@
-Return-Path: <kvm+bounces-42102-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42103-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 270BBA72B21
-	for <lists+kvm@lfdr.de>; Thu, 27 Mar 2025 09:11:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B8050A72B2F
+	for <lists+kvm@lfdr.de>; Thu, 27 Mar 2025 09:15:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA25D1762D8
-	for <lists+kvm@lfdr.de>; Thu, 27 Mar 2025 08:11:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 260F6176A02
+	for <lists+kvm@lfdr.de>; Thu, 27 Mar 2025 08:14:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 543451FFC4D;
-	Thu, 27 Mar 2025 08:10:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02DB31FFC74;
+	Thu, 27 Mar 2025 08:14:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qkmx23NX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h1qX1ibi"
 X-Original-To: kvm@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F011FFC6E;
-	Thu, 27 Mar 2025 08:10:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE621FF615
+	for <kvm@vger.kernel.org>; Thu, 27 Mar 2025 08:14:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743063054; cv=none; b=Eqp/eT2EyIGbhdLWr7jxb1Mv/GpzR3Rq0oaeuZ/VFEiry36ecUy1fib+tp7RdUKxjodCbOtI/5ACzCp+8rzdDvLSDUO2gRV/g8F6Q0PGj4TOaJOFzhpxMRz4YJhlvtgLsPgT9mAhU6v0ds0xA9//SDrCM6p8GbK4UlhjR7Y0w88=
+	t=1743063285; cv=none; b=haKj9Tk7Z+dDAPV5If6FEZOUIKyGg4LT+KNxSske0zmzX3qbVE2S4O96b0oPL86inhoSJm34k8mQzdmYkiM5QbGomF4ta34oKJfsc+xWc6Uf0VLPTUufMBH+X5WiGpgakCPXSnv8j4s4D45ma8Qjps1nU5suOhIMshwrKnCrLps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743063054; c=relaxed/simple;
-	bh=e5odK2PRBJXEv4YxSLBFs+Dv9VVjIh1oo4VKosx0RYc=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=pLkYuwC5zncstaH8yObhuW8nxOnpC95k08dX1/dufxUfAaR+KWek+ss64zVBxaO2h91HyIzbBODsX5gIMAFZtv/FJ+WnEhTzV2GuPA8M6cplpRal/48bPD+YwYnRTYKWU8ynFzC3XFGT8w4RDURIMUUJ3ZFWJbhMnZCNyPqIInI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=qkmx23NX; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=e5odK2PRBJXEv4YxSLBFs+Dv9VVjIh1oo4VKosx0RYc=; b=qkmx23NXv+iZDjEWUA9jsE5gxY
-	lu5NZ45WkHcrQrNtd2kB6MPws1xQBjdxtNok9dSF5m/3091KImCyy1g5M4w35Dr1QdSb0GlargLSZ
-	hP9LKwFWIvHN+aSJOY0x8Ffa7QtDG25BH2dSeGwRQaCvIr9GbvlkPEcxE4vbFQgqy5j+APKslp3La
-	7T4n4RMSG6KeC4+1B2pr9ATdVjaAYlxF7y/3JPIxZZKnG73VK6GnTfG1GB4wu6WvXLyZyfuabuOfx
-	mE6WxkxkaJrpAK2wE4htbmRKJI6DUvQUFJbQqviO6gqzLioLfWznxaSew50AqznX33DGD81ic3/e2
-	Vt1i2VaQ==;
-Received: from [172.31.31.145] (helo=u09cd745991455d.lumleys.internal)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.1 #2 (Red Hat Linux))
-	id 1txiK7-00000005wfh-3moI;
-	Thu, 27 Mar 2025 08:10:48 +0000
-Message-ID: <830d2e06c064e24bd143650ce97522c2bc470a90.camel@infradead.org>
-Subject: Re: pvclock time drifting backward
-From: David Woodhouse <dwmw2@infradead.org>
-To: Ming Lin <minggr@gmail.com>
-Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, Paolo
- Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org
-Date: Thu, 27 Mar 2025 08:10:47 +0000
-In-Reply-To: <CAF1ivSbVZVSibZq+=VaDrETP_hEurCyyftCCaDEMa5r7HAV67A@mail.gmail.com>
-References: <facda6e2-3655-4f2c-9013-ebb18d0e6972@gmail.com>
-	 <Z-HiqG_uk0-f6Ry1@google.com>
-	 <4eda127551d240b9e19c1eced16ad6f6ed5c2f80.camel@infradead.org>
-	 <CAF1ivSbVZVSibZq+=VaDrETP_hEurCyyftCCaDEMa5r7HAV67A@mail.gmail.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-PWrEyYhwl7qjzJQn6i3Q"
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	s=arc-20240116; t=1743063285; c=relaxed/simple;
+	bh=dqDAKLbnS5sjnD7NkwvXo/kZFn7+fO2d0R6Ff+ZBKJc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=q3DqnPLzHe+L786wPjfluYOsnLAK1EV5KVTbwrQJzJci61Ha0PQ6lm7AQfdGWSAS3e76DYKm/8cfmHxYsTTsDs0sG/8lfB4FXQnLl6NLXneIIcPfd8AXAzUgIV4bID3ZQeasoVpjaUfOX79bUqwk94Uhbi9YEmekk3NghWBCo9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h1qX1ibi; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2264c9d0295so152685ad.0
+        for <kvm@vger.kernel.org>; Thu, 27 Mar 2025 01:14:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1743063283; x=1743668083; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h9a5QRkmmOyJeIvB5Cn9PmXfV97y4kQAOBXvf9QzfDM=;
+        b=h1qX1ibi9fM1XUcL6NrpzaPOn028Ine3Rf2tl6ZF1NVV0eQRqIEx6VhdC3oSKoGpgg
+         THur3ZekWWo/5f0FUBO/ij9ah4vMBpjJ1Btliaj9X06+TGfUeMIwjyTDjHC1/UY4jrBX
+         6RPBF1oQS/fSpDzJa7T5j3gWDMFFVIySuDELVGmot50uzj0nlNq7zNBZN9vdyUjxFPcD
+         iI939mdFfF2h7k8wcYuulfLD50UH03ekSjFLpkxb7AJpANJzymGs3xzYPC8qdvAJu0QS
+         OOwgR+2ZGy1uemrZ3ioc2Mv5QH+PBJI0WbqWoDwlnjxnPObh1OuyKZ2qBvuiytfIcSQk
+         5ufA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743063283; x=1743668083;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=h9a5QRkmmOyJeIvB5Cn9PmXfV97y4kQAOBXvf9QzfDM=;
+        b=YDmjT/F6ivZgoykxFn4ko+RHmpcEAsVWYidMI5Vu4+Yo25hJQFS90PyzY0YJLUBrOl
+         BnZBjgiTTjU1AHPqD1nlJGDdN6POk+NMiYkNOOdpQcqt7SDXHzO5kpFjc6iG0J+SHdLA
+         hZ3ypMSqhDo8sPiU7sSq5neaoak2MSYuxhbg1r/KGf6EEJZ17fbeHGLX4fZQrSqhTxAs
+         Gp6+zTZQJli2klW0+FuvIa02p5NDArQiz4FXlwNVVJ470Sp0A78lhXTEsLbyNnDXJ+07
+         VcShK3wDvi6V/Y66t2HIIYHspIxb6d05gBgEVkh5eL2tsmI/mVsAmuZKrDzwHOa6+ijB
+         v4lg==
+X-Forwarded-Encrypted: i=1; AJvYcCWTKVMNJ9h5+/Bb5hV10My4ERh1bzG2Ex67OMT+GlervUeIhGRWe57wTD1Qhcp2wfseSH4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiudS6U1nerSn4gGiTT2KW3tEWMnu9PMgyBxiwDriuBtZYkfI2
+	ms08fOIJWpi86A+RWs8X8G92emf3aUxCNyGx7MT4YItQoHPQ1YAu1PZ5z+WOHmpg9dk9WRBZrtX
+	xUmjV4UKbQoneOvXCXWn9l8Ask4mPb0Nez/+R
+X-Gm-Gg: ASbGncvQdsprkQezRknIVgx1aqLsmWrDdmFDTdqvjo1m7mfeNjdK7uH1dif18Ux125g
+	fWji0I7D5NRaWKd1n2+tWBSm1fswHuHlR+nnzNZAUMtgc3J+e9dS2Sg5fh/aZhaVpRWdBek/Bo9
+	rTVN+X0yb9O8P9uFhAnBdn3wnCGJ/J9VN88Kxs1F2Y83MhtOca9b3TFxXl8v+NmV1Bjrro6w==
+X-Google-Smtp-Source: AGHT+IHgfzrQlEamv4gYgjx/fwFVnfQvhKeODD0LFSb3f0rLf6g/j0CVYOoteVLkG0M+nr3xqexqfLuYGBQj9X7EB6c=
+X-Received: by 2002:a17:903:1a0b:b0:215:8723:42d1 with SMTP id
+ d9443c01a7336-22806bc133bmr1942515ad.10.1743063282486; Thu, 27 Mar 2025
+ 01:14:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
-
-
---=-PWrEyYhwl7qjzJQn6i3Q
+References: <20250313181629.17764-1-adrian.hunter@intel.com>
+In-Reply-To: <20250313181629.17764-1-adrian.hunter@intel.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Thu, 27 Mar 2025 01:14:29 -0700
+X-Gm-Features: AQ5f1JpB0AViQmQuFfLvDkCuf5x_Lo9CiwkMjG3MaJ-5wwbn2bayOkBOcIzzqck
+Message-ID: <CAGtprH_o_Vbvk=jONSep64wRhAJ+Y51uZfX7-DDS28vh=ALQOA@mail.gmail.com>
+Subject: Re: [PATCH RFC] KVM: TDX: Defer guest memory removal to decrease
+ shutdown time
+To: Adrian Hunter <adrian.hunter@intel.com>
+Cc: pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org, 
+	rick.p.edgecombe@intel.com, kirill.shutemov@linux.intel.com, 
+	kai.huang@intel.com, reinette.chatre@intel.com, xiaoyao.li@intel.com, 
+	tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com, 
+	isaku.yamahata@intel.com, linux-kernel@vger.kernel.org, yan.y.zhao@intel.com, 
+	chao.gao@intel.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2025-03-26 at 08:54 -0700, Ming Lin wrote:
-> I applied the patch series on top of 6.9 cleanly and tested it with my
-> debug tool patch.
-> But it seems the time drift still increased monotonically.
->=20
-> Would you help take a look if the tool patch makes sense?
-> https://github.com/minggr/linux/commit/5284a211b6bdc9f9041b669539558a6a85=
-8e88d0
->=20
-> The tool patch adds a KVM debugfs entry to trigger time calculations
-> and print the results.
-> See my first email for more detail.
+On Thu, Mar 13, 2025 at 11:17=E2=80=AFAM Adrian Hunter <adrian.hunter@intel=
+.com> wrote:
+> ...
+> =3D=3D Problem =3D=3D
+>
+> Currently, Dynamic Page Removal is being used when the TD is being
+> shutdown for the sake of having simpler initial code.
+>
+> This happens when guest_memfds are closed, refer kvm_gmem_release().
+> guest_memfds hold a reference to struct kvm, so that VM destruction canno=
+t
+> happen until after they are released, refer kvm_gmem_release().
+>
+> Reclaiming TD Pages in TD_TEARDOWN State was seen to decrease the total
+> reclaim time.  For example:
+>
+>         VCPUs   Size (GB)       Before (secs)   After (secs)
+>          4       18              72              24
+>         32      107             517             134
 
-Your first message seemed to say that the problem occurred with live
-migration. This message says "the time drift still increased
-monotonically".=20
+If the time for reclaim grows linearly with memory size, then this is
+a significantly high value for TD cleanup (~21 minutes for a 1TB VM).
 
-Trying to make sure I fully understand... the time drift between the
-host's CLOCK_MONOTONIC_RAW and the guest's kvmclock increases
-monotonically *but* the guest only observes the change when its
-master_kernel_ns/master_cycle_now are updated (e.g. on live migration)
-and its kvmclock is reset back to the host's CLOCK_MONOTONIC_RAW?
+>
+> Note, the V19 patch set:
+>
+>         https://lore.kernel.org/all/cover.1708933498.git.isaku.yamahata@i=
+ntel.com/
+>
+> did not have this issue because the HKID was released early, something th=
+at
+> Sean effectively NAK'ed:
+>
+>         "No, the right answer is to not release the HKID until the VM is
+>         destroyed."
+>
+>         https://lore.kernel.org/all/ZN+1QHGa6ltpQxZn@google.com/
 
-Is this live migration from one VMM to another on the same host, so we
-don't have to worry about the accuracy of the TSC itself? The guest TSC
-remains consistent? And presumably your host does *have* a stable TSC,
-and the guest's test case really ought to be checking the
-PVCLOCK_TSC_STABLE_BIT to make sure of that?
+IIUC, Sean is suggesting to treat S-EPT page removal and page reclaim
+separately. Through his proposal:
+1) If userspace drops last reference on gmem inode before/after
+dropping the VM reference
+    -> slow S-EPT removal and slow page reclaim
+2) If memslots are removed before closing the gmem and dropping the VM refe=
+rence
+    -> slow S-EPT page removal and no page reclaim until the gmem is around=
+.
 
-If all the above assumptions/interpretations of mine are true, I still
-think it's expected that your clock will jump on live migration
-*unless* you also taught your VMM to use the new KVM_[GS]ET_CLOCK_GUEST
-ioctls which were added in my patch series, specifically to preserve
-the mathematical relationship between guest TSC and kvmclock across a
-migration.
+Reclaim should ideally happen when the host wants to use that memory
+i.e. for following scenarios:
+1) Truncation of private guest_memfd ranges
+2) Conversion of private guest_memfd ranges to shared when supporting
+in-place conversion (Could be deferred to the faulting in as shared as
+well).
 
+Would it be possible for you to provide the split of the time spent in
+slow S-EPT page removal vs page reclaim?
 
-
---=-PWrEyYhwl7qjzJQn6i3Q
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDMyNzA4MTA0
-N1owLwYJKoZIhvcNAQkEMSIEIGYuvivYIuTKGjn6zbqLWi91ahcNZlLPCnKY+tmGUFeNMGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIARCOeb8AU32Kn
-y9jS8M4YWc7t/vkyzUGyMQ6lcXGHdo0YP0yarp2PvBMrcRVU2PVHceTuiXESHaUvBYBKtUk1RrmN
-UY+snouJT3DfElwGtC/rRl/LeanFGdf02e0T4/0KYU+YgVJFAI/RNEyMzVUdAH3aSgl3jcLOceeH
-Dc+eZYo0LatMzKjtBPAm+1P23tuNVBa8KmIwHc57rie8XctHD86HSkLRkbqYzpuyaTEmIfmHnLHo
-qCFAWsFP5aZypD8pCVm53MlYk1ZMIISLUciVV/up28ZHiMw7A2Tq6GHzHi8aP+sNTJFFs+5aaOHm
-WIJrJgd/d1acjrGL6T68YhzH9rW+Lc8B0eXkZhCQHxkKr3OtAqsMUNRebkEgA/emJkRGdyaXn9kv
-8NhOzYE9c/iL6iHhzAGscUBK8F81cvqd04CquMHJ8br7nSfBSlSDcDuij1nyPHIxahoScCNCmaRp
-1urANlDtwzo/ddCjNl7103vWVpyL/nidhfP3xMqiBJVKQ7AbHSJ/TBR1o7IUXMLEMrLxoLfb7K38
-eK9U3ucR0qr/ARq9HgARc91Iv6U9zJ2FCrr4Jizvp8D9Y95f0uTEx1NSWgyDLDdMyf4BZEpPAPE6
-Vr8rB3RlDjGWsgujShtu4VK1F8kIRiA28qi1WrvjjmwMX4ntSinS7r+gFs+N3+YAAAAAAAA=
-
-
---=-PWrEyYhwl7qjzJQn6i3Q--
+It might be worth exploring the possibility of parallelizing or giving
+userspace the flexibility to parallelize both these operations to
+bring the cleanup time down (to be comparable with non-confidential VM
+cleanup time for example).
 
