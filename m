@@ -1,100 +1,114 @@
-Return-Path: <kvm+bounces-42128-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42129-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3F90A73769
-	for <lists+kvm@lfdr.de>; Thu, 27 Mar 2025 17:55:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F312A73A2A
+	for <lists+kvm@lfdr.de>; Thu, 27 Mar 2025 18:11:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B49F33BE269
-	for <lists+kvm@lfdr.de>; Thu, 27 Mar 2025 16:54:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8389C16FE0D
+	for <lists+kvm@lfdr.de>; Thu, 27 Mar 2025 17:11:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBE5D218E9F;
-	Thu, 27 Mar 2025 16:54:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="MRKVto5V";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="rfEmn8mN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FA6B1A8F9E;
+	Thu, 27 Mar 2025 17:11:31 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6052B20F08F;
-	Thu, 27 Mar 2025 16:54:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CBC01DFF8
+	for <kvm@vger.kernel.org>; Thu, 27 Mar 2025 17:11:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743094469; cv=none; b=Ioh6e7MznZV0adwJqitTV0HAkQNUfwRGSmGYPdr8d7Rwpdde7DFLYZ8c0hB541tJ5sP6CA45XgvkSiriKHwDtR25WkDO87q6TL3LC1jFoOeISAamAloHPLaQ2BNdroBGZeSwTOf3Pbm7JyaCd2/FOdNSVBDGBMGjuCqv7qwRTyY=
+	t=1743095491; cv=none; b=alqiyAeV2nLHOBZFfCmIybfWbVx5wfxdQiN83+pqjRY1KwC7PYAP3V/Wb4vq6Mey4jDEObpIv9U+ko1r1w/jMtRCEPvrDpI73yYxAW6f16xGlWDFMuDvbOS0D47vOZ8Ju6hBmBh+458fGsXC6TNb+kBajQz/Nkih2QfeiGcEo+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743094469; c=relaxed/simple;
-	bh=yFrOb8eMPn1WoypdICkaT+V9GJUCJhdw8B40GhbjSTE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=tGkd/sfbMkH6Lwx2gVEf2RPWkXdfbwOwhKt/KTELyt8wdg6sOagqDUAEIMA6dAvSW/OQm4Knlbne+F2qxfmGK8Y2mvCYjWJ2gZInM0gSiL5bqNFjHcSn5AnMlH8bpzMVljtGefpozZ6qDlgFl37ZrJ88ZEGaa4ACc2Lsd8cyT/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=MRKVto5V; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=rfEmn8mN; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1743094463;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mvmmSMDji6eqm6wByVqHVd/iVMKatGBNcOhBfpert1g=;
-	b=MRKVto5VQo5AIi/17gmUKCtC3jbN7HrvI6COwvWafXYEjvXLjnUOgAtGv/8E7E87OcTkNP
-	EoaJ0u+5QmBMNrQmYLMcd7+rJ38WOTeesaTCw/MzJ0kqBamrotxjXoLtIq4Nwq5i/Fjizq
-	m4pSyRFU5Qfgex/tTOfou88EQCNwmyRJywKWVk32+rrAOEqp4X7JtpSRf4y6ekJ6EzRTTQ
-	DgEeUTrLKey+TV8KAxgB4nP9viYM4sW7cTp9HtT1tgHhzouVCzsEIijUj6ZyvVRgFaKqV6
-	KWNHZzJu98tfMf5XiihBDZ3qOyFowC0hb2fBm4c2t1MiZu2FqQSUSly/96s26Q==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1743094463;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mvmmSMDji6eqm6wByVqHVd/iVMKatGBNcOhBfpert1g=;
-	b=rfEmn8mNg0sKXnQflIayaQoPREuiePkR6rDb7OPgque/DmG9VsqrSGOvPilp/6yAEdPdKk
-	z2CqHZ6bBe0diTAw==
-To: Sean Christopherson <seanjc@google.com>
-Cc: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>, linux-kernel@vger.kernel.org,
- bp@alien8.de, mingo@redhat.com, dave.hansen@linux.intel.com,
- Thomas.Lendacky@amd.com, nikunj@amd.com, Santosh.Shukla@amd.com,
- Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com,
- x86@kernel.org, hpa@zytor.com, peterz@infradead.org, pbonzini@redhat.com,
- kvm@vger.kernel.org, kirill.shutemov@linux.intel.com, huibo.wang@amd.com,
- naveen.rao@amd.com
-Subject: Re: [RFC v2 13/17] x86/apic: Handle EOI writes for SAVIC guests
-In-Reply-To: <Z-VeW0IuqMI8dYlH@google.com>
-References: <20250226090525.231882-1-Neeraj.Upadhyay@amd.com>
- <20250226090525.231882-14-Neeraj.Upadhyay@amd.com> <87cyea2xxi.ffs@tglx>
- <Z92dqEhfj1GG6Fxb@google.com> <87y0wqycj8.ffs@tglx> <87msd6y8a7.ffs@tglx>
- <Z-VeW0IuqMI8dYlH@google.com>
-Date: Thu, 27 Mar 2025 17:54:22 +0100
-Message-ID: <87h63exvlt.ffs@tglx>
+	s=arc-20240116; t=1743095491; c=relaxed/simple;
+	bh=BuEIdozODnu8Pi8cV2q1qibFyh11cZdTbxRUiasKPU8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H+MoeVw0a+n2xFSuns6TRDfzIHGwjsqPfV/lAGm8GdjAV3kWXJOWfwjCzlFB5NtaDifdENBwPxuf/AlhsH45xdt3eQJ7ec378DWMLpvpqBoscwSs6Y4kBPCXmdf8G8YMeZnmSowk88ghhPfJyRaNHXWb1knMkhVZXMUw+fW5rZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BDCD81063;
+	Thu, 27 Mar 2025 10:11:32 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 645FE3F63F;
+	Thu, 27 Mar 2025 10:11:26 -0700 (PDT)
+Date: Thu, 27 Mar 2025 17:11:23 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Cc: andrew.jones@linux.dev, eric.auger@redhat.com, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+	vladimir.murzin@arm.com
+Subject: Re: [kvm-unit-tests PATCH v3 1/5] configure: arm64: Don't display
+ 'aarch64' as the default architecture
+Message-ID: <Z-WGuyzy4qxAcJD4@raptor>
+References: <20250325160031.2390504-3-jean-philippe@linaro.org>
+ <20250325160031.2390504-4-jean-philippe@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250325160031.2390504-4-jean-philippe@linaro.org>
 
-On Thu, Mar 27 2025 at 07:19, Sean Christopherson wrote:
-> On Thu, Mar 27, 2025, Thomas Gleixner wrote:
->> Actually no. As this is for 8 byte alignment. For 16 byte it's 
->> 
->> 	bit = vector + 96 * (vector / 32);
->> ergo
->>         vector = bit - 24 * (bit / 32);
->> 
->> Which is still just shifts and add/sub.
->
-> IIUC, the suggestion is to use find_last_bit() to walk the entire 128-byte range
-> covered by ISR registers, under the assumption that the holes are guaranteed to
-> be zero.  I suppose that works for Secure AVIC, but I don't want to do that for
-> KVM since KVM can't guarantee the holes are zero (userspace can stuff APIC state).
+Hi Jean-Philippe
 
-Fair enough. So yes, then making the current KVM function generic is the
-right thing to do.
+On Tue, Mar 25, 2025 at 04:00:29PM +0000, Jean-Philippe Brucker wrote:
+> From: Alexandru Elisei <alexandru.elisei@arm.com>
+> 
+> --arch=aarch64, intentional or not, has been supported since the initial
+> arm64 support, commit 39ac3f8494be ("arm64: initial drop"). However,
+> "aarch64" does not show up in the list of supported architectures, but
+> it's displayed as the default architecture if doing ./configure --help
+> on an arm64 machine.
+> 
+> Keep everything consistent and make sure that the default value for
+> $arch is "arm64", but still allow --arch=aarch64, in case they are users
+> that use this configuration for kvm-unit-tests.
+
+You can drop this paragraph, since the change to the default value for $arch was
+dropped.
+
+With this change:
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
 Thanks,
+Alex
 
-        tglx
+> 
+> The help text for --arch changes from:
+> 
+>    --arch=ARCH            architecture to compile for (aarch64). ARCH can be one of:
+>                            arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
+> 
+> to:
+> 
+>     --arch=ARCH            architecture to compile for (arm64). ARCH can be one of:
+>                            arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> ---
+>  configure | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/configure b/configure
+> index 52904d3a..010c68ff 100755
+> --- a/configure
+> +++ b/configure
+> @@ -43,6 +43,7 @@ else
+>  fi
+>  
+>  usage() {
+> +    [ "$arch" = "aarch64" ] && arch="arm64"
+>      cat <<-EOF
+>  	Usage: $0 [options]
+>  
+> -- 
+> 2.49.0
+> 
 
