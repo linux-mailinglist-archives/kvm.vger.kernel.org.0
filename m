@@ -1,160 +1,293 @@
-Return-Path: <kvm+bounces-42208-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42209-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A3D1A75067
-	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 19:30:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B410A750D1
+	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 20:32:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF4D17A2CC9
-	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 18:29:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04D03172F5D
+	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 19:32:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 367091E04B9;
-	Fri, 28 Mar 2025 18:30:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E6711E3779;
+	Fri, 28 Mar 2025 19:32:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FZGnlSqx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Abk/1qNK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5EE818FDD2;
-	Fri, 28 Mar 2025 18:30:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922CE1DF24F
+	for <kvm@vger.kernel.org>; Fri, 28 Mar 2025 19:32:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743186647; cv=none; b=G+5aGuVA0ua0rFE7vLkyUyUXJtYu0S8Lt7+v1b2jk5/xbpBACNnAzqE+TZyYGmrOA2x1lAl1msbeedc702DohSk9QpQWrvJlcotjAEcpPUmL2s7gQwe0YAHVoxJ9+rNM152pSPEGI0azbPI9BSrdx8zU7DlIzBksWEVtIkpr/5U=
+	t=1743190366; cv=none; b=fsgItqkmIHNUcWySy8ayWqJDIXJkiIBqjXqqTbNh21lAhpmY7TBS1xUoGm/zRZTFJOpWFQwqSbqJy6HfzX7N9w5NFE4FZbaokhncNhHDOl9wg8BnPol44VFBkWcHzn9Dt4OU9Uq5i9CCRrAepnyP1XeNJ/PdZYQ89L3Dp5SkcBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743186647; c=relaxed/simple;
-	bh=9XTj0tQhvYxAAdsXUfuCQwK5MFHkVzti01U9d2paLt8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MLvT7bkI7bVtNMSbjwFfKZS3jWRy8p5V8ueLF+EV/QIKRhL5ckINXS4W0+/wug2EnDNJBxNBw7WebuG8qZZYQMl2Ih6rFVP67U11my3iWCFn0cIW9iag5brhFWN4GIhflbHBRIWefcIZL8RqsOxOYXNDoy4mYuwW0onEqgr0C0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FZGnlSqx; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-54991d85f99so3666230e87.1;
-        Fri, 28 Mar 2025 11:30:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743186644; x=1743791444; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9XTj0tQhvYxAAdsXUfuCQwK5MFHkVzti01U9d2paLt8=;
-        b=FZGnlSqx9fxJ7lG+vP/t9H2Q5rd2IFZtPY6S2o8BYAr8fbItAVhtjNmFfHQYaF4fL4
-         DU17thOjgteFW4cdz3+ab9HwkdXe6eSVCi+dQngNlOn6SUitCKUrFZiabph3yDB3o7Sp
-         H+x3wksZm22CtBxO5uZL7VzNt2yOgpljzWFFMNwLzPmks4iA3H+nCDm/RASmF+B8uIwA
-         gXKA8JlAbg5ltnaffFOgTMMCyPAAcg05CWNUUAWjE1qX59HaZ8wZ5+SE+PpAk4i/8uRc
-         GMHUaEcE2eJi9rgF7Lx9Hz2Q7cKdU9B3BA/KSf+OqgLU1N/X77XleXbRa/6kKH/58O0z
-         Z28A==
+	s=arc-20240116; t=1743190366; c=relaxed/simple;
+	bh=P3RoBtnRTWh0+Qe3N0FkyP1eVcCc9ZdIc/pM9bs+Z/8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=d6bdyd14pdDY2hKy3d0p8YpNmSNjxhSZG7PdnjDzkeLvYfNCOgTCVcpM8rodyjYLDoHu5XBN8R1cvQg2B6DphbxUVpAplPwjm3kg+d+3fcVrvUj37XywYM17eCQcEaDXjApOvK64SMO1Vp0W9e5In/hajUU5ycGwdF35SN7cpRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Abk/1qNK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743190362;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mOrICwGOkzKQ/+jrTMKKxHEEgn8NmGcpycUWQdIHE6U=;
+	b=Abk/1qNKKK6tlMxsuD17mtxrO2LSQFyv080wQi8tksY73SclMvWtoBUs0krvFJbsDgtTYa
+	XYfeghZtOdI1ofeSaiPTRoEcUclfrhMfHrAcFjY6vBOqkWDV0UD0h9GJK8QS25KqvwjUgZ
+	Y+tlJWFiV3Vt0PrLiaIGewSCJZbGfec=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-255-yrLgGsifOOijXAVCTFCzjA-1; Fri, 28 Mar 2025 15:32:41 -0400
+X-MC-Unique: yrLgGsifOOijXAVCTFCzjA-1
+X-Mimecast-MFC-AGG-ID: yrLgGsifOOijXAVCTFCzjA_1743190361
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7c3c8f8ab79so373554285a.2
+        for <kvm@vger.kernel.org>; Fri, 28 Mar 2025 12:32:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743186644; x=1743791444;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9XTj0tQhvYxAAdsXUfuCQwK5MFHkVzti01U9d2paLt8=;
-        b=LJcveduNp5ZTi06kuxEp6ka4vzTBThvbaut7TroGdU3JGLcrzDmsA/5/w6w7zAYAMx
-         VLvUexPSB2i4Ncayv03WU92eZXNpk2QGU0q5cEfC1bkvTG5OWY7Z/VI+ZxnzWyI4Mki2
-         8ymoMy8f0I5Tb2bv/8aUv2z4802+GfnfwEE8s91z+JBw0Cu5MRWHqNdvHINzUiWjzD3z
-         qkEYo0R51eGPTV4DVr575vD7+zgCYYmjM9POBGBa0xMtE8/abIp/Va6Ncmak6N88/l0t
-         6pomKCSFILoUyOVOfybhv0Thx5Z26np52LwwxwQjlLvotyBNDLGeU/nak8WpCTi3D8pq
-         fk5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU+r24HcnY8F36e9TZuwYPb4UrRTPLcTWIo3p1+OU1rDG4Gkqda+YLf6OCMKk8+3UM6Zot6KbZaVLVoy6xV@vger.kernel.org, AJvYcCVVwdVKyYdXpcYKSWrmTDL+a8dng/MvIDDYlanrM5HqWX/sccVLmgvz7ExZgpXSvZplce8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywc171JCbnf7j+14vI7FtDLSW7JryKxmu+EGP4Nq2USt/C7qtlp
-	uZNb2qHeBsVwM7ceRV6iUPElwJMa3RzvBYtz3JD2RnyrjQTtoSCVAsCg1eFdnm6J/KARpHDWCR0
-	48pScrUX+cf0LC+IU29IKCbsopAQ=
-X-Gm-Gg: ASbGnctnA/vwmgt61YUXRCtdk1tV/hbFJgvr8Am2nvBldNTBpk05V/O+a0YwVqSfJ10
-	EEj9X+q/ANBiqelsmu3FdkF0LttrQKV2bWGH0kdQwmuuFGSzYpyKCwhH5tWRDuhTJ2MfTjRB7zr
-	T/eWFLB8Krzhp/S5TMBnl3RfEXHTHA
-X-Google-Smtp-Source: AGHT+IG8WMab1JJv4PwctVvswElQQEk3CtJtwWMH2HFu53xkAFaHVK4jcuKz2Yn1sEJZPelip91uB1EuozYZEwmDsi8=
-X-Received: by 2002:a2e:bd84:0:b0:30b:c608:22bf with SMTP id
- 38308e7fff4ca-30ddf7f737dmr2355461fa.9.1743186643528; Fri, 28 Mar 2025
- 11:30:43 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743190361; x=1743795161;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mOrICwGOkzKQ/+jrTMKKxHEEgn8NmGcpycUWQdIHE6U=;
+        b=FxBqgdmX2on6pVg+1fvDbzm3NWXT5OoE+rX0XPdLjSj8wi5yE4ReJAv0CdLVBLS29f
+         R5esC4AR3qAboa48cOyGk0aFWTsHyGu86iCc1yVN0rL/0JCfE9lJangFxXa64pw5VsLT
+         8XZ8vo0sa2UHjNPxsnnAO2znmkPy5WhnjJ8jNomEtloSmVOfONPAP0g0h0oDYvzlECWF
+         ZdxNO3OOwcWkyjON/OS+tio0B0C+KiAsMaykTESX2tY/u4DhKHrx5Wvht8oXrXXHGlJ6
+         ULS339yfWCXlcJysC/c64fm4oUmszKjLRewB9+M9Gj4YZOqbVDA2PJVxCAIGTSQ+yykm
+         vhzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWGABHkL3fQoF/H9fgl0jtdmgUzLSK47xwhdwRnS8ahVJl7YMRgxZXlKGQMu41MAZ4XXSk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkIj4CGTRm9Dncw218tJ164KQjFxm4AR8HwmI7MDwreKiP4Icq
+	BkL/JyqhIcfw5c3V9ZD+9Ri+YREZEVsNS1CDzeSQHoa41oHBL7ngxZHqN1diiixYA0W2yl9Q5P2
+	suf8gjKuzVAEElsvVT/9X7FUjWUzPBUsi8VyL+jg7N6joNCR0Eg==
+X-Gm-Gg: ASbGnctFKXqSi7nG7iU1J2G5DADTiTvd2G7g1DFxs9UAJ/Dc8uHfGAGK0ZT8dvau1m8
+	Zo0+riPdTptlx3TBcV3BuYJ7JE3FogQJ+A6kip9avIxjiNjPT7SUe5JDAAG/2P6TKStiZr2k18j
+	InYTy/wsOzKPbesCWowbjy/f/b52Lw13cHXVYjQ4mljNtX97b2M67SJqg5ddVPExYaAjL6FXBMn
+	MradHJnijPGrcY/2ftu+/Mz+vZ9UGfzD0lbU5mOYVq8Us5lb9DyeQtAO8k7tOH/Qz83mqpGmK1p
+	q1Ith1sVPiLYNCA=
+X-Received: by 2002:a05:620a:28cc:b0:7c0:bb3f:e285 with SMTP id af79cd13be357-7c690733764mr41925085a.24.1743190360487;
+        Fri, 28 Mar 2025 12:32:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGmxAH9Bkj6EcEA5G5CNFC/EUweXAoFqmSdTdkpGvOkNntLjjGVyjFGykTnKnzw0NPHOYaRNQ==
+X-Received: by 2002:a05:620a:28cc:b0:7c0:bb3f:e285 with SMTP id af79cd13be357-7c690733764mr41921485a.24.1743190359985;
+        Fri, 28 Mar 2025 12:32:39 -0700 (PDT)
+Received: from starship ([2607:fea8:fc01:8d8d:6adb:55ff:feaa:b156])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c5f765f9e8sm156980985a.12.2025.03.28.12.32.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Mar 2025 12:32:39 -0700 (PDT)
+Message-ID: <c04233d3c35e2bad5a864ab72d0f55b3919100f3.camel@redhat.com>
+Subject: Re: [PATCH 2/5] KVM: selftests: access_tracking_perf_test: Add
+ option to skip the sanity check
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: James Houghton <jthoughton@google.com>, Sean Christopherson
+	 <seanjc@google.com>, kvm@vger.kernel.org
+Cc: Axel Rasmussen <axelrasmussen@google.com>, Tejun Heo <tj@kernel.org>, 
+ Johannes Weiner <hannes@cmpxchg.org>, mkoutny@suse.com, Yu Zhao
+ <yuzhao@google.com>, cgroups@vger.kernel.org,  linux-kernel@vger.kernel.org
+Date: Fri, 28 Mar 2025 15:32:38 -0400
+In-Reply-To: <20250327012350.1135621-3-jthoughton@google.com>
+References: <20250327012350.1135621-1-jthoughton@google.com>
+	 <20250327012350.1135621-3-jthoughton@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <facda6e2-3655-4f2c-9013-ebb18d0e6972@gmail.com>
- <Z-HiqG_uk0-f6Ry1@google.com> <4eda127551d240b9e19c1eced16ad6f6ed5c2f80.camel@infradead.org>
- <CAF1ivSbVZVSibZq+=VaDrETP_hEurCyyftCCaDEMa5r7HAV67A@mail.gmail.com> <830d2e06c064e24bd143650ce97522c2bc470a90.camel@infradead.org>
-In-Reply-To: <830d2e06c064e24bd143650ce97522c2bc470a90.camel@infradead.org>
-From: Ming Lin <minggr@gmail.com>
-Date: Fri, 28 Mar 2025 11:30:30 -0700
-X-Gm-Features: AQ5f1Jq88iPNABeVpuLMSb4SzToojs9keJJVckPlXEcfU-dqZqC42wzY1lmPsJo
-Message-ID: <CAF1ivSaEz0brSGfpv08oKnTjT=h99hs_G0ju0UGPwzoLvOSV8A@mail.gmail.com>
-Subject: Re: pvclock time drifting backward
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 27, 2025 at 1:10=E2=80=AFAM David Woodhouse <dwmw2@infradead.or=
-g> wrote:
->
-> On Wed, 2025-03-26 at 08:54 -0700, Ming Lin wrote:
-> > I applied the patch series on top of 6.9 cleanly and tested it with my
-> > debug tool patch.
-> > But it seems the time drift still increased monotonically.
-> >
-> > Would you help take a look if the tool patch makes sense?
-> > https://github.com/minggr/linux/commit/5284a211b6bdc9f9041b669539558a6a=
-858e88d0
-> >
-> > The tool patch adds a KVM debugfs entry to trigger time calculations
-> > and print the results.
-> > See my first email for more detail.
->
-> Your first message seemed to say that the problem occurred with live
-> migration. This message says "the time drift still increased
-> monotonically".
+On Thu, 2025-03-27 at 01:23 +0000, James Houghton wrote:
+> From: Maxim Levitsky <mlevitsk@redhat.com>
+> 
+> Add an option to skip sanity check of number of still idle pages,
+> and set it by default to skip, in case hypervisor or NUMA balancing
+> is detected.
+> 
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> Co-developed-by: James Houghton <jthoughton@google.com>
+> Signed-off-by: James Houghton <jthoughton@google.com>
+> ---
+>  .../selftests/kvm/access_tracking_perf_test.c | 61 ++++++++++++++++---
+>  .../testing/selftests/kvm/include/test_util.h |  1 +
+>  tools/testing/selftests/kvm/lib/test_util.c   |  7 +++
+>  3 files changed, 60 insertions(+), 9 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> index 447e619cf856e..0e594883ec13e 100644
+> --- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> +++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> @@ -65,6 +65,16 @@ static int vcpu_last_completed_iteration[KVM_MAX_VCPUS];
+>  /* Whether to overlap the regions of memory vCPUs access. */
+>  static bool overlap_memory_access;
+>  
+> +/*
+> + * If the test should only warn if there are too many idle pages (i.e., it is
+> + * expected).
+> + * -1: Not yet set.
+> + *  0: We do not expect too many idle pages, so FAIL if too many idle pages.
+> + *  1: Having too many idle pages is expected, so merely print a warning if
+> + *     too many idle pages are found.
+> + */
+> +static int idle_pages_warn_only = -1;
+> +
+>  struct test_params {
+>  	/* The backing source for the region of memory. */
+>  	enum vm_mem_backing_src_type backing_src;
+> @@ -177,18 +187,12 @@ static void mark_vcpu_memory_idle(struct kvm_vm *vm,
+>  	 * arbitrary; high enough that we ensure most memory access went through
+>  	 * access tracking but low enough as to not make the test too brittle
+>  	 * over time and across architectures.
+> -	 *
+> -	 * When running the guest as a nested VM, "warn" instead of asserting
+> -	 * as the TLB size is effectively unlimited and the KVM doesn't
+> -	 * explicitly flush the TLB when aging SPTEs.  As a result, more pages
+> -	 * are cached and the guest won't see the "idle" bit cleared.
+>  	 */
+>  	if (still_idle >= pages / 10) {
+> -#ifdef __x86_64__
+> -		TEST_ASSERT(this_cpu_has(X86_FEATURE_HYPERVISOR),
+> +		TEST_ASSERT(idle_pages_warn_only,
+>  			    "vCPU%d: Too many pages still idle (%lu out of %lu)",
+>  			    vcpu_idx, still_idle, pages);
+> -#endif
+> +
+>  		printf("WARNING: vCPU%d: Too many pages still idle (%lu out of %lu), "
+>  		       "this will affect performance results.\n",
+>  		       vcpu_idx, still_idle, pages);
+> @@ -328,6 +332,31 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>  	memstress_destroy_vm(vm);
+>  }
+>  
+> +static int access_tracking_unreliable(void)
+> +{
+> +#ifdef __x86_64__
+> +	/*
+> +	 * When running nested, the TLB size is effectively unlimited and the
+> +	 * KVM doesn't explicitly flush the TLB when aging SPTEs.  As a result,
+> +	 * more pages are cached and the guest won't see the "idle" bit cleared.
+> +	 */
+Tiny nitpick: nested on KVM, because on other hypervisors it might work differently,
+but overall most of them probably suffer from the same problem,
+so its probably better to say something like that:
 
-Yes, we discovered this issue in our production environment, where the time
-inside the guest OS slowed down by more than 2 seconds. This problem
-occurred both during live upgrades locally and live migrations remotely.
-However, the issue is only noticeable after the guest OS has been
-running for a long time, typically over 30 days.
-Since 30 days is too long to wait, I wrote a debugfs tool to quickly reprod=
-uce
-the original issue, but now I'm not sure if the tool is working correctly.
+'When running nested, the TLB size might be effectively unlimited, 
+for example this is the case when running on top of KVM L0'
 
->
-> Trying to make sure I fully understand... the time drift between the
-> host's CLOCK_MONOTONIC_RAW and the guest's kvmclock increases
-> monotonically *but* the guest only observes the change when its
-> master_kernel_ns/master_cycle_now are updated (e.g. on live migration)
-> and its kvmclock is reset back to the host's CLOCK_MONOTONIC_RAW?
 
-Yes, we are using the 5.4 kernel and have verified that the guest OS time
-remains correct after live upgrades/migrations, as long as
-master_kernel_ns / master_cycle_now are not updated
-(i.e., if the old master_kernel_ns / master_cycle_now values are retained).
+> +	if (this_cpu_has(X86_FEATURE_HYPERVISOR)) {
+> +		puts("Skipping idle page count sanity check, because the test is run nested");
+> +		return 1;
+> +	}
+> +#endif
+> +	/*
+> +	 * When NUMA balancing is enabled, guest memory can be mapped
+> +	 * PROT_NONE, and the Accessed bits won't be queriable.
 
->
-> Is this live migration from one VMM to another on the same host, so we
-> don't have to worry about the accuracy of the TSC itself? The guest TSC
-> remains consistent? And presumably your host does *have* a stable TSC,
-> and the guest's test case really ought to be checking the
-> PVCLOCK_TSC_STABLE_BIT to make sure of that?
+Tiny nitpick: the accessed bit in this case are lost, because KVM no longer propagates
+it from secondary to primary paging, and the secondary mapping might be lost due to zapping,
+and the biggest offender of this is NUMA balancing.
 
-The live migration is from one VMM to another on a remote host, and we
-have also observed the same issue during live upgrades on the same host.
+> +	 */
+> +	if (is_numa_balancing_enabled()) {
+> +		puts("Skipping idle page count sanity check, because NUMA balancing is enabled");
+> +		return 1;
+> +	}
+> +
+> +	return 0;
+> +}
 
->
-> If all the above assumptions/interpretations of mine are true, I still
-> think it's expected that your clock will jump on live migration
-> *unless* you also taught your VMM to use the new KVM_[GS]ET_CLOCK_GUEST
-> ioctls which were added in my patch series, specifically to preserve
-> the mathematical relationship between guest TSC and kvmclock across a
-> migration.
->
+Very good idea of extracting this logic into a function and documenting it.
 
-We are planning to test the patches on a 6.9 kernel (where they can be
-applied cleanly) and modify the live upgrade/migration code to use the new
-KVM_[GS]ET_CLOCK_GUEST ioctls.
+> +
+>  static void help(char *name)
+>  {
+>  	puts("");
+> @@ -342,6 +371,12 @@ static void help(char *name)
+>  	printf(" -v: specify the number of vCPUs to run.\n");
+>  	printf(" -o: Overlap guest memory accesses instead of partitioning\n"
+>  	       "     them into a separate region of memory for each vCPU.\n");
+> +	printf(" -w: Control whether the test warns or fails if more than 10%\n"
+> +	       "     of pages are still seen as idle/old after accessing guest\n"
+> +	       "     memory.  >0 == warn only, 0 == fail, <0 == auto.  For auto\n"
+> +	       "     mode, the test fails by default, but switches to warn only\n"
+> +	       "     if NUMA balancing is enabled or the test detects it's running\n"
+> +	       "     in a VM.\n");
+>  	backing_src_help("-s");
+>  	puts("");
+>  	exit(0);
+> @@ -359,7 +394,7 @@ int main(int argc, char *argv[])
+>  
+>  	guest_modes_append_default();
+>  
+> -	while ((opt = getopt(argc, argv, "hm:b:v:os:")) != -1) {
+> +	while ((opt = getopt(argc, argv, "hm:b:v:os:w:")) != -1) {
+>  		switch (opt) {
+>  		case 'm':
+>  			guest_modes_cmdline(optarg);
+> @@ -376,6 +411,11 @@ int main(int argc, char *argv[])
+>  		case 's':
+>  			params.backing_src = parse_backing_src_type(optarg);
+>  			break;
+> +		case 'w':
+> +			idle_pages_warn_only =
+> +				atoi_non_negative("Idle pages warning",
+> +						  optarg);
+> +			break;
+>  		case 'h':
+>  		default:
+>  			help(argv[0]);
+> @@ -388,6 +428,9 @@ int main(int argc, char *argv[])
+>  		       "CONFIG_IDLE_PAGE_TRACKING is not enabled");
+>  	close(page_idle_fd);
+>  
+> +	if (idle_pages_warn_only == -1)
+> +		idle_pages_warn_only = access_tracking_unreliable();
+> +
+>  	for_each_guest_mode(run_test, &params);
+>  
+>  	return 0;
+> diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
+> index 77d13d7920cb8..c6ef895fbd9ab 100644
+> --- a/tools/testing/selftests/kvm/include/test_util.h
+> +++ b/tools/testing/selftests/kvm/include/test_util.h
+> @@ -153,6 +153,7 @@ bool is_backing_src_hugetlb(uint32_t i);
+>  void backing_src_help(const char *flag);
+>  enum vm_mem_backing_src_type parse_backing_src_type(const char *type_name);
+>  long get_run_delay(void);
+> +bool is_numa_balancing_enabled(void);
+>  
+>  /*
+>   * Whether or not the given source type is shared memory (as opposed to
+> diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
+> index 3dc8538f5d696..03eb99af9b8de 100644
+> --- a/tools/testing/selftests/kvm/lib/test_util.c
+> +++ b/tools/testing/selftests/kvm/lib/test_util.c
+> @@ -176,6 +176,13 @@ size_t get_trans_hugepagesz(void)
+>  	return get_sysfs_val("/sys/kernel/mm/transparent_hugepage/hpage_pmd_size");
+>  }
+>  
+> +bool is_numa_balancing_enabled(void)
+> +{
+> +	if (!test_sysfs_path("/proc/sys/kernel/numa_balancing"))
+> +		return false;
+> +	return get_sysfs_val("/proc/sys/kernel/numa_balancing") == 1;
+> +}
+> +
+>  size_t get_def_hugetlb_pagesz(void)
+>  {
+>  	char buf[64];
 
-BTW, what is the plan for upstreaming these patches?
 
-Thanks,
-Ming
+
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+
+Best regards,
+	Maxim Levitsky
+
 
