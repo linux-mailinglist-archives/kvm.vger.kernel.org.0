@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-42200-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42193-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA178A74F0A
-	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 18:16:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 032CFA74EF9
+	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 18:15:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 203D7170EA5
-	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 17:15:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C41A63BAD68
+	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 17:14:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2792E1E835E;
-	Fri, 28 Mar 2025 17:13:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BB2F1E47A8;
+	Fri, 28 Mar 2025 17:13:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="J03dG0E0"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="EttgfVOr"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19BB61DE2B8;
-	Fri, 28 Mar 2025 17:13:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB4E81DB92E;
+	Fri, 28 Mar 2025 17:13:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743181997; cv=none; b=nsBa3bKwtvD5VEHRCKwasUaWCkAyqc/l1111uYq1KBW9fbmz3i+YPG9nJUhOukf/Nnc3XJFQIBu15i2WtskCxd1x0BHSFfqTMtD6QMXxIBCJXQxs+yvQUDDv1XWFppZiVGRW457T+nutxWiYT8swrtY+RqS1REXqSvKuhZAnBek=
+	t=1743181995; cv=none; b=n8K76W8L54oveSAkthjVUfywkyfkBbQPMiEYccIzynZq4jm0QFEwC/BbdjXei/CCThR6q3FXOk2X2rnWqoWLLlTELjvfXQ4kx2RpSSJJqGaLPfvGOEF1YrYXyHt7aTaTwwldD5vPLfjg6RtV8NllhonWXxyWhMmZkyj4haLHI0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743181997; c=relaxed/simple;
-	bh=DjpXGYTqW+oN0pcbi/BIo2DyIW0aumrpHeRSqmnqWII=;
+	s=arc-20240116; t=1743181995; c=relaxed/simple;
+	bh=4wma8mX/ALMe1JI5XdcKj3gsJHbl9FGvETP63iX2Ul8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=k5VcRH2V8XI1kl4noEiMlM5kDFLtnn4vlyD2EjJI0LVdwagQnwiGr5rWzNMkm/ngwQx/mpRjWhhrdEZu+Y0kuEYkV9xhbKzBMJbHbpnh7NwH8bElMXx+Y/K7cHvwpnrJZne0jFflj4GxgcLKL9J7DzhZfMgVv4Hg7Talt86dHOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=J03dG0E0; arc=none smtp.client-ip=198.137.202.136
+	 MIME-Version; b=kklsIcmIcS76sVNLtJ/P+aNRqoTeOsKDDjwBMXq2rGFgIfyZSXE1MaQiIKHqxS73GQa0L1B3g8d/e1IugLWqDJLLGEeEewRjeBnN/pQvc8XExb5mx4P5Qgt82JVm4WEw2mDyGGYbRLtQNeqxwPZ0GglvD7p5IUIuZW/GESUhgCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=EttgfVOr; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from terminus.zytor.com (terminus.zytor.com [IPv6:2607:7c80:54:3:0:0:0:136])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 52SHC6vg2029344
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 52SHC6vh2029344
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Fri, 28 Mar 2025 10:12:23 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 52SHC6vg2029344
+	Fri, 28 Mar 2025 10:12:24 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 52SHC6vh2029344
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025032001; t=1743181943;
-	bh=yhTDPP19hdgHeNReB0pNN5sFSefCqVELyPm8UacfdAE=;
+	s=2025032001; t=1743181944;
+	bh=M68rVVpgbm7WYAqMdT8pLqMh8yGPZciRr5JmzGA0HfQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=J03dG0E0txBrdqieO9uUVWFl0B5E3oSHKhAogIb83XcbmuJyd46JX4vJPCcd/K0XN
-	 HlVFMp67rmyMIP463O6xcZE+dLCLQGrzqfevrT2aKe3Bj//0/Bs1MN6YSS6LQzeODA
-	 ZVIrsx+Wf18ii6PX++rn/m4Zzeb340BwtyZZz6ShsClMoCsfL61FCDv0YE5Dww/OFw
-	 n5l0xDoKSBtcXTzr35VSUdaXMGO6b76hAnbNT86MwaIdt+PHgTZRv30JAknOhxmZjK
-	 RORIQa8/PWI8tIT9++KpptNeVS4Vsb5QJS72IcBEddhaIs2QBEbLG+fX92WxV0OC9Y
-	 5Doiemz/Kq6Mg==
+	b=EttgfVOrNutGoQY2shCv/a9CZObHoMcCEI1vtm1bOzUoJDw1K0nzg0Kc0hqwHcGyv
+	 y9PfAUVsBMwF/Vc//16VtpYRHiL+aE+qYEPMbozFGULx9SEPX7Y5zMN7bM2szmqTxb
+	 uzWMnfVszmZ0N5piFav9hriH8iA4Fksvambmy63oeqaQbUjN0hRX26phDt395JLRSt
+	 kWmhg1j7rH8O15CGE1i6l2SlydQTSHD3kHSatJE9qJJfaeBanyxuR8+cmBieyYsupa
+	 TcXLNyKKFcXZhEourq0gAphwE6QPBHnWsJ3ycj9CJMo60VS9qiXkGoItNRzXHgOc11
+	 f+ThNsw4sqs3w==
 From: "Xin Li (Intel)" <xin@zytor.com>
 To: pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
         linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
@@ -54,9 +54,9 @@ Cc: corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
         andrew.cooper3@citrix.com, luto@kernel.org, peterz@infradead.org,
         chao.gao@intel.com, xin3.li@intel.com
-Subject: [PATCH v4 10/19] KVM: VMX: Virtualize FRED event_data
-Date: Fri, 28 Mar 2025 10:11:56 -0700
-Message-ID: <20250328171205.2029296-11-xin@zytor.com>
+Subject: [PATCH v4 11/19] KVM: VMX: Virtualize FRED nested exception tracking
+Date: Fri, 28 Mar 2025 10:11:57 -0700
+Message-ID: <20250328171205.2029296-12-xin@zytor.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250328171205.2029296-1-xin@zytor.com>
 References: <20250328171205.2029296-1-xin@zytor.com>
@@ -70,217 +70,199 @@ Content-Transfer-Encoding: 8bit
 
 From: Xin Li <xin3.li@intel.com>
 
-Set injected-event data when injecting a #PF, #DB, or #NM caused
-by extended feature disable using FRED event delivery, and save
-original-event data for being used as injected-event data.
+Set the VMX nested exception bit in VM-entry interruption information
+field when injecting a nested exception using FRED event delivery to
+ensure:
+  1) A nested exception is injected on a correct stack level.
+  2) The nested bit defined in FRED stack frame is set.
 
-Unlike IDT using some extra CPU register as part of an event
-context, e.g., %cr2 for #PF, FRED saves a complete event context
-in its stack frame, e.g., FRED saves the faulting linear address
-of a #PF into the event data field defined in its stack frame.
+The event stack level used by FRED event delivery depends on whether
+the event was a nested exception encountered during delivery of an
+earlier event, because a nested exception is "regarded" as happening
+on ring 0.  E.g., when #PF is configured to use stack level 1 in
+IA32_FRED_STKLVLS MSR:
+  - nested #PF will be delivered on the stack pointed by IA32_FRED_RSP1
+    MSR when encountered in ring 3 and ring 0.
+  - normal #PF will be delivered on the stack pointed by IA32_FRED_RSP0
+    MSR when encountered in ring 3.
 
-Thus a new VMX control field called injected-event data is added
-to provide the event data that will be pushed into a FRED stack
-frame for VM entries that inject an event using FRED event delivery.
-In addition, a new VM exit information field called original-event
-data is added to store the event data that would have saved into a
-FRED stack frame for VM exits that occur during FRED event delivery.
-After such a VM exit is handled to allow the original-event to be
-delivered, the data in the original-event data VMCS field needs to
-be set into the injected-event data VMCS field for the injection of
-the original event.
+The VMX nested-exception support ensures a correct event stack level is
+chosen when a VM entry injects a nested exception.
 
 Signed-off-by: Xin Li <xin3.li@intel.com>
-[ Sean: reworked event data injection for nested ]
+[ Sean: reworked kvm_requeue_exception() to simply the code changes ]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Xin Li (Intel) <xin@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 ---
 
-Change in v3:
-* Rework event data injection for nested (Chao Gao & Sean Christopherson).
+Change in v4:
+* Move the check is_fred_enable() from kvm_multiple_exception() to
+  vmx_inject_exception() thus avoid bleeding FRED details into
+  kvm_multiple_exception() (Chao Gao).
 
-Changes in v2:
-* Document event data should be equal to CR2/DR6/IA32_XFD_ERR instead
-  of using WARN_ON() (Chao Gao).
-* Zero event data if a #NM was not caused by extended feature disable
-  (Chao Gao).
+Change in v3:
+* Rework kvm_requeue_exception() to simply the code changes (Sean
+  Christopherson).
+
+Change in v2:
+* Set the nested flag when there is an original interrupt (Chao Gao).
 ---
- arch/x86/include/asm/kvm_host.h |  3 ++-
- arch/x86/include/asm/vmx.h      |  4 ++++
+ arch/x86/include/asm/kvm_host.h |  4 +++-
+ arch/x86/include/asm/vmx.h      |  5 ++++-
  arch/x86/kvm/svm/svm.c          |  2 +-
- arch/x86/kvm/vmx/vmx.c          | 22 ++++++++++++++++++----
- arch/x86/kvm/x86.c              | 16 +++++++++++++++-
- 5 files changed, 40 insertions(+), 7 deletions(-)
+ arch/x86/kvm/vmx/vmx.c          |  6 +++++-
+ arch/x86/kvm/x86.c              | 13 ++++++++++++-
+ arch/x86/kvm/x86.h              |  1 +
+ 6 files changed, 26 insertions(+), 5 deletions(-)
 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index a884ab544335..85b6713702d2 100644
+index 85b6713702d2..c5f92a1befc0 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
 @@ -741,6 +741,7 @@ struct kvm_queued_exception {
  	u32 error_code;
  	unsigned long payload;
  	bool has_payload;
-+	u64 event_data;
++	bool nested;
+ 	u64 event_data;
  };
  
- /*
-@@ -2168,7 +2169,7 @@ void kvm_queue_exception(struct kvm_vcpu *vcpu, unsigned nr);
+@@ -2169,7 +2170,8 @@ void kvm_queue_exception(struct kvm_vcpu *vcpu, unsigned nr);
  void kvm_queue_exception_e(struct kvm_vcpu *vcpu, unsigned nr, u32 error_code);
  void kvm_queue_exception_p(struct kvm_vcpu *vcpu, unsigned nr, unsigned long payload);
  void kvm_requeue_exception(struct kvm_vcpu *vcpu, unsigned int nr,
--			   bool has_error_code, u32 error_code);
-+			   bool has_error_code, u32 error_code, u64 event_data);
+-			   bool has_error_code, u32 error_code, u64 event_data);
++			   bool has_error_code, u32 error_code, bool nested,
++			   u64 event_data);
  void kvm_inject_page_fault(struct kvm_vcpu *vcpu, struct x86_exception *fault);
  void kvm_inject_emulated_page_fault(struct kvm_vcpu *vcpu,
  				    struct x86_exception *fault);
 diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-index 8a2b097aadf2..1f20a28c9262 100644
+index 1f20a28c9262..a019a06d21aa 100644
 --- a/arch/x86/include/asm/vmx.h
 +++ b/arch/x86/include/asm/vmx.h
-@@ -265,8 +265,12 @@ enum vmcs_field {
- 	PID_POINTER_TABLE_HIGH		= 0x00002043,
- 	SECONDARY_VM_EXIT_CONTROLS	= 0x00002044,
- 	SECONDARY_VM_EXIT_CONTROLS_HIGH	= 0x00002045,
-+	INJECTED_EVENT_DATA		= 0x00002052,
-+	INJECTED_EVENT_DATA_HIGH	= 0x00002053,
- 	GUEST_PHYSICAL_ADDRESS          = 0x00002400,
- 	GUEST_PHYSICAL_ADDRESS_HIGH     = 0x00002401,
-+	ORIGINAL_EVENT_DATA		= 0x00002404,
-+	ORIGINAL_EVENT_DATA_HIGH	= 0x00002405,
- 	VMCS_LINK_POINTER               = 0x00002800,
- 	VMCS_LINK_POINTER_HIGH          = 0x00002801,
- 	GUEST_IA32_DEBUGCTL             = 0x00002802,
+@@ -137,6 +137,7 @@
+ #define VMX_BASIC_DUAL_MONITOR_TREATMENT	BIT_ULL(49)
+ #define VMX_BASIC_INOUT				BIT_ULL(54)
+ #define VMX_BASIC_TRUE_CTLS			BIT_ULL(55)
++#define VMX_BASIC_NESTED_EXCEPTION		BIT_ULL(58)
+ 
+ static inline u32 vmx_basic_vmcs_revision_id(u64 vmx_basic)
+ {
+@@ -432,13 +433,15 @@ enum vmcs_field {
+ #define INTR_INFO_INTR_TYPE_MASK        0x700           /* 10:8 */
+ #define INTR_INFO_DELIVER_CODE_MASK     0x800           /* 11 */
+ #define INTR_INFO_UNBLOCK_NMI		0x1000		/* 12 */
++#define INTR_INFO_NESTED_EXCEPTION_MASK	0x2000		/* 13 */
+ #define INTR_INFO_VALID_MASK            0x80000000      /* 31 */
+-#define INTR_INFO_RESVD_BITS_MASK       0x7ffff000
++#define INTR_INFO_RESVD_BITS_MASK       0x7fffd000
+ 
+ #define VECTORING_INFO_VECTOR_MASK           	INTR_INFO_VECTOR_MASK
+ #define VECTORING_INFO_TYPE_MASK        	INTR_INFO_INTR_TYPE_MASK
+ #define VECTORING_INFO_DELIVER_CODE_MASK    	INTR_INFO_DELIVER_CODE_MASK
+ #define VECTORING_INFO_VALID_MASK       	INTR_INFO_VALID_MASK
++#define VECTORING_INFO_NESTED_EXCEPTION_MASK	INTR_INFO_NESTED_EXCEPTION_MASK
+ 
+ #define INTR_TYPE_EXT_INTR		(EVENT_TYPE_EXTINT << 8)	/* external interrupt */
+ #define INTR_TYPE_RESERVED		(EVENT_TYPE_RESERVED << 8)	/* reserved */
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index d5d0c5c3300b..73bde84ca9a4 100644
+index 73bde84ca9a4..d96d6cec4a34 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
 @@ -4172,7 +4172,7 @@ static void svm_complete_interrupts(struct kvm_vcpu *vcpu)
  
  		kvm_requeue_exception(vcpu, vector,
  				      exitintinfo & SVM_EXITINTINFO_VALID_ERR,
--				      error_code);
-+				      error_code, 0);
+-				      error_code, 0);
++				      error_code, false, 0);
  		break;
  	}
  	case SVM_EXITINTINFO_TYPE_INTR:
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index ae9712624413..ae6d275aab6a 100644
+index ae6d275aab6a..c76015e1e3f8 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1918,6 +1918,9 @@ void vmx_inject_exception(struct kvm_vcpu *vcpu)
+@@ -1913,8 +1913,11 @@ void vmx_inject_exception(struct kvm_vcpu *vcpu)
+ 		vmcs_write32(VM_ENTRY_INSTRUCTION_LEN,
+ 			     vmx->vcpu.arch.event_exit_inst_len);
+ 		intr_info |= INTR_TYPE_SOFT_EXCEPTION;
+-	} else
++	} else {
+ 		intr_info |= INTR_TYPE_HARD_EXCEPTION;
++		if (ex->nested && is_fred_enabled(vcpu))
++			intr_info |= INTR_INFO_NESTED_EXCEPTION_MASK;
++	}
  
  	vmcs_write32(VM_ENTRY_INTR_INFO_FIELD, intr_info);
  
-+	if (is_fred_enabled(vcpu))
-+		vmcs_write64(INJECTED_EVENT_DATA, ex->event_data);
-+
- 	vmx_clear_hlt(vcpu);
- }
- 
-@@ -7295,7 +7298,8 @@ static void vmx_recover_nmi_blocking(struct vcpu_vmx *vmx)
- static void __vmx_complete_interrupts(struct kvm_vcpu *vcpu,
- 				      u32 idt_vectoring_info,
- 				      int instr_len_field,
--				      int error_code_field)
-+				      int error_code_field,
-+				      int event_data_field)
- {
- 	u8 vector;
- 	int type;
-@@ -7330,13 +7334,17 @@ static void __vmx_complete_interrupts(struct kvm_vcpu *vcpu,
- 		fallthrough;
- 	case INTR_TYPE_HARD_EXCEPTION: {
- 		u32 error_code = 0;
-+		u64 event_data = 0;
- 
- 		if (idt_vectoring_info & VECTORING_INFO_DELIVER_CODE_MASK)
- 			error_code = vmcs_read32(error_code_field);
-+		if (is_fred_enabled(vcpu))
-+			event_data = vmcs_read64(event_data_field);
- 
+@@ -7344,6 +7347,7 @@ static void __vmx_complete_interrupts(struct kvm_vcpu *vcpu,
  		kvm_requeue_exception(vcpu, vector,
  				      idt_vectoring_info & VECTORING_INFO_DELIVER_CODE_MASK,
--				      error_code);
-+				      error_code,
-+				      event_data);
+ 				      error_code,
++				      idt_vectoring_info & VECTORING_INFO_NESTED_EXCEPTION_MASK,
+ 				      event_data);
  		break;
  	}
- 	case INTR_TYPE_SOFT_INTR:
-@@ -7354,7 +7362,8 @@ static void vmx_complete_interrupts(struct vcpu_vmx *vmx)
- {
- 	__vmx_complete_interrupts(&vmx->vcpu, vmx->idt_vectoring_info,
- 				  VM_EXIT_INSTRUCTION_LEN,
--				  IDT_VECTORING_ERROR_CODE);
-+				  IDT_VECTORING_ERROR_CODE,
-+				  ORIGINAL_EVENT_DATA);
- }
- 
- void vmx_cancel_injection(struct kvm_vcpu *vcpu)
-@@ -7362,7 +7371,8 @@ void vmx_cancel_injection(struct kvm_vcpu *vcpu)
- 	__vmx_complete_interrupts(vcpu,
- 				  vmcs_read32(VM_ENTRY_INTR_INFO_FIELD),
- 				  VM_ENTRY_INSTRUCTION_LEN,
--				  VM_ENTRY_EXCEPTION_ERROR_CODE);
-+				  VM_ENTRY_EXCEPTION_ERROR_CODE,
-+				  INJECTED_EVENT_DATA);
- 
- 	vmcs_write32(VM_ENTRY_INTR_INFO_FIELD, 0);
- }
-@@ -7493,6 +7503,10 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
- 
- 	vmx_disable_fb_clear(vmx);
- 
-+	/*
-+	 * Note, even though FRED delivers the faulting linear address via the
-+	 * event data field on the stack, CR2 is still updated.
-+	 */
- 	if (vcpu->arch.cr2 != native_read_cr2())
- 		native_write_cr2(vcpu->arch.cr2);
- 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 007577143337..d1d42926ac67 100644
+index d1d42926ac67..7f013ff97067 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -777,9 +777,22 @@ void kvm_deliver_exception_payload(struct kvm_vcpu *vcpu,
- 		 * breakpoint), it is reserved and must be zero in DR6.
- 		 */
- 		vcpu->arch.dr6 &= ~BIT(12);
-+
-+		/*
-+		 * FRED #DB event data matches DR6, but follows the polarity of
-+		 * VMX's pending debug exceptions, not DR6.
-+		 */
-+		ex->event_data = ex->payload & ~BIT(12);
-+		break;
-+	case NM_VECTOR:
-+		ex->event_data = ex->payload;
- 		break;
- 	case PF_VECTOR:
- 		vcpu->arch.cr2 = ex->payload;
-+		ex->event_data = ex->payload;
-+		break;
-+	default:
-+		ex->event_data = 0;
- 		break;
- 	}
+@@ -841,6 +841,10 @@ static void kvm_multiple_exception(struct kvm_vcpu *vcpu, unsigned int nr,
+ 		vcpu->arch.exception.pending = true;
+ 		vcpu->arch.exception.injected = false;
  
-@@ -887,7 +900,7 @@ static void kvm_queue_exception_e_p(struct kvm_vcpu *vcpu, unsigned nr,
++		vcpu->arch.exception.nested = vcpu->arch.exception.nested ||
++					      vcpu->arch.nmi_injected ||
++					      vcpu->arch.interrupt.injected;
++
+ 		vcpu->arch.exception.has_error_code = has_error;
+ 		vcpu->arch.exception.vector = nr;
+ 		vcpu->arch.exception.error_code = error_code;
+@@ -870,8 +874,13 @@ static void kvm_multiple_exception(struct kvm_vcpu *vcpu, unsigned int nr,
+ 		vcpu->arch.exception.injected = false;
+ 		vcpu->arch.exception.pending = false;
+ 
++		/* #DF is NOT a nested event, per its definition. */
++		vcpu->arch.exception.nested = false;
++
+ 		kvm_queue_exception_e(vcpu, DF_VECTOR, 0);
+ 	} else {
++		vcpu->arch.exception.nested = true;
++
+ 		/* replace previous exception with a new one in a hope
+ 		   that instruction re-execution will regenerate lost
+ 		   exception */
+@@ -900,7 +909,8 @@ static void kvm_queue_exception_e_p(struct kvm_vcpu *vcpu, unsigned nr,
  }
  
  void kvm_requeue_exception(struct kvm_vcpu *vcpu, unsigned int nr,
--			   bool has_error_code, u32 error_code)
-+			   bool has_error_code, u32 error_code, u64 event_data)
+-			   bool has_error_code, u32 error_code, u64 event_data)
++			   bool has_error_code, u32 error_code, bool nested,
++			   u64 event_data)
  {
  
  	/*
-@@ -912,6 +925,7 @@ void kvm_requeue_exception(struct kvm_vcpu *vcpu, unsigned int nr,
+@@ -925,6 +935,7 @@ void kvm_requeue_exception(struct kvm_vcpu *vcpu, unsigned int nr,
  	vcpu->arch.exception.error_code = error_code;
  	vcpu->arch.exception.has_payload = false;
  	vcpu->arch.exception.payload = 0;
-+	vcpu->arch.exception.event_data = event_data;
++	vcpu->arch.exception.nested = nested;
+ 	vcpu->arch.exception.event_data = event_data;
  }
  EXPORT_SYMBOL_GPL(kvm_requeue_exception);
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 02514f5b9c0b..13dbd87970db 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -142,6 +142,7 @@ static inline void kvm_clear_exception_queue(struct kvm_vcpu *vcpu)
+ {
+ 	vcpu->arch.exception.pending = false;
+ 	vcpu->arch.exception.injected = false;
++	vcpu->arch.exception.nested = false;
+ 	vcpu->arch.exception_vmexit.pending = false;
+ }
  
 -- 
 2.48.1
