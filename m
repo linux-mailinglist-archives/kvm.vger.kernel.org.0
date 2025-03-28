@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-42202-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42204-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 048AEA74F13
-	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 18:17:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72542A74F17
+	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 18:17:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B981F177808
-	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 17:15:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D345816F2A8
+	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 17:16:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3432E1EFF8A;
-	Fri, 28 Mar 2025 17:13:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53B341F4179;
+	Fri, 28 Mar 2025 17:13:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="JrVWVVso"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="Uhxe4C+V"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68EE81DF270;
-	Fri, 28 Mar 2025 17:13:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E4F81E51F4;
+	Fri, 28 Mar 2025 17:13:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743181998; cv=none; b=fIAxzOmgrO90kS8DlDzdnIuh0SZOujsvQy/3Kslj/eT2hXE4sm/WxtLv/OtmlhStmjI4zLg+jUT3+hpw+0wPj+lYrOBu55IRdX+WVlvYPrJ05h93nvdPOMuzS0rrH15lqrl86KSnGto2h96ZHDKwhtfIIyHslOQJDXVJR5AUtF8=
+	t=1743181999; cv=none; b=pILnULL6T+CH8YPDvmRDpZ258OOvvuti88ThYJ7GtHv3+kKsSICk8OpiFBP5PKchOLr87Ss6xN35MH0hdUolGK54o0TIdXBdaJlVS0ugrplqq306VpgLa2Gmbt+HosFLU9tlhiFzwAY/X1j6djNoEA5oWInDtIISlxryeOEEO5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743181998; c=relaxed/simple;
-	bh=gebgWyVkhjoOy4t4bTNTbbSDcBOSmbnTCuPZiJq+ICc=;
+	s=arc-20240116; t=1743181999; c=relaxed/simple;
+	bh=05S5aXGHh+c1z/f1P1kRRIsqJSjPN89APQt4mJYUABY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PPqrru8w1Jc5pJ6PbEauIwHkn/qXDEqCBBdOXf6YOud/SGWkU4jzKsbedwqcBeHKmR0f88VMhdEpraXVKYf8tDJpUXJRBi3mbipXEUOPBPFKEalQknjgxmQct1lkF/E0CivvSRMmgR5YhzfzNFhqJdleFwMeXF5UqEBrujv3oh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=JrVWVVso; arc=none smtp.client-ip=198.137.202.136
+	 MIME-Version; b=pGDgKwbJyzApBwIYckQG9mkdR02XT7LdMnX7bTgZsXaoLy4BRUoinSK87hrYJyjLim0R0CjCu4Dd0Kur42WYiBuSyl6Cjw157PLxJnGk9RoVAx3LfwePd7PXPddTAzSptAj1L1qXErSxBipt3Ot27Oi3g6i/dLQKAqpTRVh8uhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=Uhxe4C+V; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from terminus.zytor.com (terminus.zytor.com [IPv6:2607:7c80:54:3:0:0:0:136])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 52SHC6vZ2029344
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 52SHC6va2029344
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Fri, 28 Mar 2025 10:12:16 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 52SHC6vZ2029344
+	Fri, 28 Mar 2025 10:12:17 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 52SHC6va2029344
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025032001; t=1743181937;
-	bh=a9aWUyvGAoEKwOVYYfSru+/Z/oKl0P1AvWbOapVtHaU=;
+	s=2025032001; t=1743181938;
+	bh=/4tX6ccTMOAoI9WvAyPzpCV9OFj9tKgHimPD+Eu2d8A=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JrVWVVsoVe6gopIVnEJ+yOY2iMe6XlrMoqoUVzI0VBF8VPCdfr4sDHu8qR87m/j5j
-	 rs4cqQsLR+vCLJjjnrYPvZMNKaKUFM7m68b+gmwSJecl1CHGqjGVS3vF0l2A6wgBQe
-	 UI7sTVlOh925AWYvl46tQe+A9BFUfvoOStBRxN0jFD79i/kZ8eoDyxxAMhf2gWI/mz
-	 ZHuUKZLVht+VA2b9jqz4V/ebh+cTWUPOaNdz9xRJ+BG+1aJQVtbuvPyPq732/g/OSp
-	 EEzl2a3Lm0SlaGjWkB6DUU0D6rM0T2M9MQpFi5XzADRIbWIxjLu2okqB+CwfVhcyOd
-	 eotze1R39aiQQ==
+	b=Uhxe4C+V9ZJK88ROy2+vKy9WXxgNJcOc4XuQhMjBIM62Gd5i1Ll4fkdgcQdd62IVM
+	 afwIcQXZ07GVcr3L0Emya16j7jO/FuMRICRq9tXPMfsveVUc6GLHWfaRPRIuNZP3aZ
+	 XccnxvdwnNjsarSwKet6c9anOkL0MIDBC5s72zbRqx7RUUbYjIwKWCDXaY4JIEWEgd
+	 PaLIkgP5eFINTrSsOjI9NysxFkWyt8lbrQ61m6LOUgMa94cfdmTssZ/678ywRytLyh
+	 5Burx/etGWTw1hMklt4K125YDVkH5g0Ye0ALogkZGcI4a8AwZrdF2AzhMn4WXqsEV5
+	 UWoGn+DSo/udg==
 From: "Xin Li (Intel)" <xin@zytor.com>
 To: pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
         linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
@@ -54,9 +54,9 @@ Cc: corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
         andrew.cooper3@citrix.com, luto@kernel.org, peterz@infradead.org,
         chao.gao@intel.com, xin3.li@intel.com
-Subject: [PATCH v4 03/19] KVM: VMX: Disable FRED if FRED consistency checks fail
-Date: Fri, 28 Mar 2025 10:11:49 -0700
-Message-ID: <20250328171205.2029296-4-xin@zytor.com>
+Subject: [PATCH v4 04/19] x86/cea: Export per CPU array 'cea_exception_stacks' for KVM to use
+Date: Fri, 28 Mar 2025 10:11:50 -0700
+Message-ID: <20250328171205.2029296-5-xin@zytor.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250328171205.2029296-1-xin@zytor.com>
 References: <20250328171205.2029296-1-xin@zytor.com>
@@ -68,64 +68,43 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Xin Li <xin3.li@intel.com>
+The per CPU array 'cea_exception_stacks' points to per CPU stacks
+for #DB, NMI and #DF.  It is normally referenced via the #define:
+__this_cpu_ist_top_va().
 
-Do not virtualize FRED if FRED consistency checks fail.
+FRED introduced new fields in the host-state area of the VMCS for
+stack levels 1->3 (HOST_IA32_FRED_RSP[123]), each respectively
+corresponding to per CPU stacks for #DB, NMI and #DF.  KVM must
+populate these each time a vCPU is loaded onto a CPU.
 
-Either on broken hardware, or when run KVM on top of another hypervisor
-before the underlying hypervisor implements nested FRED correctly.
-
-Suggested-by: Chao Gao <chao.gao@intel.com>
-Signed-off-by: Xin Li <xin3.li@intel.com>
 Signed-off-by: Xin Li (Intel) <xin@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
-Reviewed-by: Chao Gao <chao.gao@intel.com>
 ---
 
 Change in v4:
-* Call out the reason why not check FRED VM-exit controls in
-  cpu_has_vmx_fred() (Chao Gao).
+* Rewrite the change log and add comments to the export (Dave Hansen).
 ---
- arch/x86/kvm/vmx/capabilities.h | 11 +++++++++++
- arch/x86/kvm/vmx/vmx.c          |  3 +++
- 2 files changed, 14 insertions(+)
+ arch/x86/mm/cpu_entry_area.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-index b2aefee59395..b4f49a4690ca 100644
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@ -400,6 +400,17 @@ static inline bool vmx_pebs_supported(void)
- 	return boot_cpu_has(X86_FEATURE_PEBS) && kvm_pmu_cap.pebs_ept;
- }
+diff --git a/arch/x86/mm/cpu_entry_area.c b/arch/x86/mm/cpu_entry_area.c
+index 575f863f3c75..bc0d687de376 100644
+--- a/arch/x86/mm/cpu_entry_area.c
++++ b/arch/x86/mm/cpu_entry_area.c
+@@ -17,6 +17,13 @@ static DEFINE_PER_CPU_PAGE_ALIGNED(struct entry_stack_page, entry_stack_storage)
+ #ifdef CONFIG_X86_64
+ static DEFINE_PER_CPU_PAGE_ALIGNED(struct exception_stacks, exception_stacks);
+ DEFINE_PER_CPU(struct cea_exception_stacks*, cea_exception_stacks);
++/*
++ * FRED introduced new fields in the host-state area of the VMCS for
++ * stack levels 1->3 (HOST_IA32_FRED_RSP[123]), each respectively
++ * corresponding to per CPU stacks for #DB, NMI and #DF.  KVM must
++ * populate these each time a vCPU is loaded onto a CPU.
++ */
++EXPORT_PER_CPU_SYMBOL(cea_exception_stacks);
  
-+static inline bool cpu_has_vmx_fred(void)
-+{
-+	/*
-+	 * setup_vmcs_config() guarantees FRED VM-entry/exit controls
-+	 * are either all set or none.  So, no need to check FRED VM-exit
-+	 * controls.
-+	 */
-+	return cpu_feature_enabled(X86_FEATURE_FRED) &&
-+		(vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_IA32_FRED);
-+}
-+
- static inline bool cpu_has_notify_vmexit(void)
- {
- 	return vmcs_config.cpu_based_2nd_exec_ctrl &
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index e38545d0dd17..ab84939ace96 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8052,6 +8052,9 @@ static __init void vmx_set_cpu_caps(void)
- 		kvm_cpu_cap_check_and_set(X86_FEATURE_DTES64);
- 	}
+ static DEFINE_PER_CPU_READ_MOSTLY(unsigned long, _cea_offset);
  
-+	if (!cpu_has_vmx_fred())
-+		kvm_cpu_cap_clear(X86_FEATURE_FRED);
-+
- 	if (!enable_pmu)
- 		kvm_cpu_cap_clear(X86_FEATURE_PDCM);
- 	kvm_caps.supported_perf_cap = vmx_get_perf_capabilities();
 -- 
 2.48.1
 
