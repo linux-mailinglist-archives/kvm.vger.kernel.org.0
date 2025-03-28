@@ -1,274 +1,205 @@
-Return-Path: <kvm+bounces-42173-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42174-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBD01A74C04
-	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 15:07:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 166F4A74C4C
+	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 15:19:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B1CF16B22D
-	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 14:04:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C8053A98CA
+	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 14:18:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36BE6189919;
-	Fri, 28 Mar 2025 14:03:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCFA51BD9CE;
+	Fri, 28 Mar 2025 14:18:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hVPDCuIk"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="LzJ9hYAu"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8434917A304
-	for <kvm@vger.kernel.org>; Fri, 28 Mar 2025 14:03:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 652A018785D
+	for <kvm@vger.kernel.org>; Fri, 28 Mar 2025 14:18:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743170634; cv=none; b=uV9h48vfkRQOuyT8p4Jlzd5fLxXVYcHnb34eXlGNYSi8C62IJfwJTjIk7aTgkZfLYjOlm/jmepGeFE2TAKtEA7by68mqlI87QlOR/uTan1HjTvbWqB15QPJqV4kRDiYPF1IeUHc3W6dpoJ6D5A9geU7enFxGdl/f+Uk49CGBCto=
+	t=1743171532; cv=none; b=ezRbM/goKB0DW7NqWxBkjH1IRp1F+MrxjMPIrPAu2Kb/hOfL+HiCIGAus/xq67whwKVPv3j77hIMg8Q3y/ovjj4dU1CZr382FDYx9GoEa9h5CDb+g57E7xsNjPcHqS8zqT+Tnn+0tm8LWyQh195SFHW3Y0+uod8vAuHDHCZuRNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743170634; c=relaxed/simple;
-	bh=40aQCT4O8fEvX6ZHUOSbqQHr8x+W1Av6fkZgp7Bd9Ow=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qOIjeWgRIMvezllIfdMeLR+Ztm1xqa4dFQvkBejm3zrjT6nte9P0ONpZYHhP286RzBkOL3Ijlz32s2v8WtnZ7fCAyAtzS90q6RqYC/v/EvgELx2CJsymCj7Q4M0dMF0Z3wx9bqVcI+zGryxOjZPC7iZRDm/QsgNU4ry4nsspHfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hVPDCuIk; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743170631;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=75wYxT3IroHLlrMDZKWsJPHcaRpOEmpxaKWKNfx9sEA=;
-	b=hVPDCuIk+anBFnAfrVNV0FiBInLOTTeCYB4Hv+RaLTn6WYggZSKECQAYlWpw9farcaDsKa
-	WW7BpxgI83aEY+fK3xKiHhoqSEdzt0FgaaWQm+VmOvUMvh45ytrLr1/oMGpXKZXGI9/Xpi
-	M6IY3N4PAw/eSl/TC+TiUcyw4T+MH+Q=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-607-zR8yUEueM9WBqOqyql8Ktg-1; Fri, 28 Mar 2025 10:03:50 -0400
-X-MC-Unique: zR8yUEueM9WBqOqyql8Ktg-1
-X-Mimecast-MFC-AGG-ID: zR8yUEueM9WBqOqyql8Ktg_1743170629
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3d48e11525fso803735ab.0
-        for <kvm@vger.kernel.org>; Fri, 28 Mar 2025 07:03:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743170629; x=1743775429;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=75wYxT3IroHLlrMDZKWsJPHcaRpOEmpxaKWKNfx9sEA=;
-        b=SdOuMhc+fVQp21rAWvztJ8pOE5CbyJ6rF+rWjCCBK85aJ/cQ3ltNKN2GazKxhv6fKy
-         UoEPBuURBYpQtaDNpem4kWUcrrrCKYvfuVyqWUEewhLoEkADDWDaEg/rH3U6hcyWWOvf
-         CjVAjl5nMyDJ2swSzrzEwxnYVA53yZ3zAhJm7XX/1O5GSDb/Ygd1BzS0su+H2RjB6dam
-         TwYgjgYxAyBFUhlHIwGjCCi3OEljFWuZg7z9xQBl+o1Z/EkbweIfxqjehRAOH2uQUfxH
-         zuGBW5H/RXpd9oKFdZ978/ZiAM7v4QMO71snLz1VK0jRrS/Yh1Q7qCfKJ169NyABZIi2
-         sZfw==
-X-Forwarded-Encrypted: i=1; AJvYcCU36Z+2yXAHsqSBE4jKuvoSZiPXVdoHzpYFeJNbkzTtlent8cbFopspYklZ+ok6cFdksiI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4c7LTbgQBr2vClPXPSjPaiknpEwuUm0BDGvJ9mlHbrFLwlwgM
-	wFnI4t1MfCOPR++jXwsAd/uOO2q0Xwsy2novnxuO8qZYsCuMT34MTcrCJyHNqXbgFlmIwOnQZry
-	ljPdWxC/sdPtzxkp7DPkzjhGuaz5gFI2AoYVrCMlymZ8pTobPQw==
-X-Gm-Gg: ASbGncsQDK8lPkZNYljgf9xo8Oizv0f5dAidEPAhubpNzd5DZtb/YHQ+6lA2CHiusy5
-	tKCytC/kJRbechW+dfeAEg8wSoQS2sLrAkcgQwX2Gwm/WxFSkEnqDZv4unb0A5VL3XgF0QRFWZG
-	+K77gAsRn+9lLmUmwIVWip9jAyMOJi+RZNUPYSJDV2F+AbOCr4ZYRdZln8YnbCL64R8xrSb9TZQ
-	H9YY/yc36gm/wkGegwOrMqwKT/0/cXnhHwUjHmq1JJs/pFwL/RpKPJpZOB5T6sXPuupJuGP9j/y
-	BVXFIGHgpjOkpGSCLrQ=
-X-Received: by 2002:a05:6e02:3309:b0:3d4:3fbf:967f with SMTP id e9e14a558f8ab-3d5ce2379d6mr22848465ab.7.1743170629384;
-        Fri, 28 Mar 2025 07:03:49 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG2yhoc9K+rOe3eFD1M2GGgLaXgUCMXwvTcs9i8ZSO2bSdARCXsSVRM8GpdG/TKPqPqUbl0rA==
-X-Received: by 2002:a05:6e02:3309:b0:3d4:3fbf:967f with SMTP id e9e14a558f8ab-3d5ce2379d6mr22848155ab.7.1743170628693;
-        Fri, 28 Mar 2025 07:03:48 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d5d5a6c645sm4784945ab.19.2025.03.28.07.03.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Mar 2025 07:03:46 -0700 (PDT)
-Date: Fri, 28 Mar 2025 08:03:43 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: liulongfang <liulongfang@huawei.com>
-Cc: <jgg@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
- <jonathan.cameron@huawei.com>, <kvm@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>
-Subject: Re: [PATCH v6 1/5] hisi_acc_vfio_pci: fix XQE dma address error
-Message-ID: <20250328080343.2bfb6fdf.alex.williamson@redhat.com>
-In-Reply-To: <f72a87ed-5884-2a6f-02e1-b0bcd172a4e8@huawei.com>
-References: <20250318064548.59043-1-liulongfang@huawei.com>
-	<20250318064548.59043-2-liulongfang@huawei.com>
-	<20250321095140.4980c7c0.alex.williamson@redhat.com>
-	<f72a87ed-5884-2a6f-02e1-b0bcd172a4e8@huawei.com>
-Organization: Red Hat
+	s=arc-20240116; t=1743171532; c=relaxed/simple;
+	bh=aRsjjWJzK8Szt9gdEbaPUx+/TAhrL4HukvLzIArcr1M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=b8+fGG5rqEXoIRj5WjJfvByUyC+fXlhivewmuyVugNoBsgotSDStRRgaeUAFGRKoaPAk6BfcgaXcZmHJEQzu0Dcc8y8G4R9jx2Ab2UzpQEnlnU15BV5hQQr9q5pmvyREP3ROLYiASjux4c52o7FExIsB7mKMwFAfqtddqeVMGGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=LzJ9hYAu; arc=none smtp.client-ip=210.118.77.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20250328141842euoutp019004ed19ae90b43abb8b09203599f34d~w-UOIHMM72877728777euoutp01j
+	for <kvm@vger.kernel.org>; Fri, 28 Mar 2025 14:18:42 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20250328141842euoutp019004ed19ae90b43abb8b09203599f34d~w-UOIHMM72877728777euoutp01j
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1743171522;
+	bh=lO48Yx1dRxN6L1ypDuwiGhfZgN4Rzqi6MuK49Ng7t8Q=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=LzJ9hYAuVORDdpPDNoaAsSxqQPvxAGN70JzbeWTmHFXBBQgApzHABzlGOwL7v/NTq
+	 Bt8Py3MY06YHzpCwrOOD4l40Zl0MQ/FF8ERl5yImACnQCUZssD16PAHT56NCF007wz
+	 90uDi0LLMtuZPUD23/QJMqJdaUkIsTHwBiJmT6tk=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+	20250328141841eucas1p1619292970847f923dcfe86bb5c47ab46~w-UNvtGSP2939129391eucas1p1d;
+	Fri, 28 Mar 2025 14:18:41 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+	eusmges1new.samsung.com (EUCPMTA) with SMTP id C6.C6.20821.1CFA6E76; Fri, 28
+	Mar 2025 14:18:41 +0000 (GMT)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20250328141841eucas1p246ea46aed1be0fbf2d32f4681bff0ebf~w-UNT_XZY0412104121eucas1p2i;
+	Fri, 28 Mar 2025 14:18:41 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+	eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20250328141841eusmtrp2242bde5cbf852d9b3900ec6a0b0bf6da~w-UNS7Wbt0154501545eusmtrp2_;
+	Fri, 28 Mar 2025 14:18:41 +0000 (GMT)
+X-AuditID: cbfec7f2-b11c470000005155-8c-67e6afc17b98
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+	eusmgms1.samsung.com (EUCPMTA) with SMTP id A7.C7.19920.1CFA6E76; Fri, 28
+	Mar 2025 14:18:41 +0000 (GMT)
+Received: from [106.210.134.192] (unknown [106.210.134.192]) by
+	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20250328141839eusmtip22afc9ba3e6f88769393f971c378bbae1~w-ULzCb-Z1176711767eusmtip2M;
+	Fri, 28 Mar 2025 14:18:39 +0000 (GMT)
+Message-ID: <c916a21e-2d95-476d-9895-4d91873fc5d5@samsung.com>
+Date: Fri, 28 Mar 2025 15:18:39 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 00/17] Provide a new two step DMA mapping API
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Leon Romanovsky <leon@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Joerg Roedel
+	<joro@8bytes.org>, Will Deacon <will@kernel.org>, Sagi Grimberg
+	<sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>, Bjorn Helgaas
+	<bhelgaas@google.com>, Logan Gunthorpe <logang@deltatee.com>, Yishai Hadas
+	<yishaih@nvidia.com>, Shameer Kolothum
+	<shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>, Andrew Morton
+	<akpm@linux-foundation.org>, Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org, Randy
+	Dunlap <rdunlap@infradead.org>
+Content-Language: en-US
+From: Marek Szyprowski <m.szyprowski@samsung.com>
+In-Reply-To: <20250322004130.GS126678@ziepe.ca>
 Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA01Se0xTVxzuaW/vvTS2uxYmR6cjqWEPl7Uj2eMsoLJA3DViHHu4jOhYM+8K
+	4aUtdUyTiQRhFiYVZYUWC4yCCAQEZlGUjVZmyxigAzbpamFZqQg0rMg2pWaM9uLGf9/5Hr/v
+	/E4OyRNfwjeQqZnZjDJTni7BBZj5xsOhFy2tHsVLDyakqLK1GUd/LRXjqOlOCY5MeSnI3VMI
+	0IWm77locQGhinI7QAbdFBedNFwkUKn1Z4DqvJcIVFl2CJ1drOOhbscLqKbAhKHhrkocuZqX
+	+KiqfpJAA0YbjjzWLzFkOrGMvE4dhix/uPmoZWYOQ52jeXyU73wF1ZcJYjfSbouRSzcbmwHt
+	GfUAurpdTQ+52jA6v9fLpzsattC11+5x6eEBNd3eeBKn2+dLCdpe7sfoDtMxeqqjAtBXx3Jx
+	uvbUGf5bYUmCmANMeuphRinb9pEgxVVTzz9oF+cUjw2BXFAl0oAQElIvQ1/hKE8DBKSYagDw
+	xm0bPyCIqQUA68oBK9wHUOe/Ax4nbk3cwljTeQAnF5JZkw9AX4WTCAhCahtsah4KTsKoSDhd
+	6uCx/FrYV+EOhp+kIuC4ozzoD6XiYY/5dNATRkngt12nicBQHmUmoH7Kxw0IPCocOtxVQYxT
+	UVDj1eABHELJoLHfxWc9EbDTWxncB1LdAjhWNsJnrx0PB4w/rKwQCqdt3xAs3giXrgSGBgKF
+	AFb7x1cOWgBz7zpWEtHQObi4XEcuVzwPW7tkLP0GvPnnb0SAhpQI3vauZS8hgqVmHY+lhfCL
+	AjHrfgbqbS3/1Vpu/sTTAol+1bvoV62pX7WO/v/eaoA1gnBGrcpQMKqoTOZTqUqeoVJnKqQf
+	Z2W0g+Wf3f+Pbf4yODftk1oBlwRWAEmeJEy4fsStEAsPyD87wiizkpXqdEZlBU+RmCRc+PV3
+	JxRiSiHPZtIY5iCjfKxyyZANudwd+2y1u+b6x/UciSlyZnechJIl1vSqZt3xYW+WvL6Gsz02
+	YSH577vX7Rfn9xr2J3I+3AOjYyzJO1skv86F9l0w+jBfQbT/uPZHTsMnxLqxWUPao63D+4jo
+	Pp9j73ZTI6mNsHlEZnlqvPq+9omchznvlnNadr+2xmI/luY8/JyhbZ1+fCDhF//+9WrzB73Z
+	5DWdKi7JOfn5SIzrq9B3PC5r0YBXTt/Lcm4KGQlXOaHm2d8TwvqV08pXW+OSrh6dLYrdLNqE
+	Py051/P+2WzDoevwvYnJK/NHyrr37Kiwt5XUDmYZNw++/WDnrqPFx21bTxX10ImyzsjzUzmX
+	DdKZR/lTeRJMlSKP2sJTquT/AioQlFtIBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrJKsWRmVeSWpSXmKPExsVy+t/xe7oH1z9LN5hxkc9izvo1bBbf/vew
+	Way+289msaQpw+LJgXZGi5WrjzJZ/PpiYTFzxglGi9nTXzBZdM7ewG4x6dA1Roulb7eyW8yZ
+	Wmgx5ddSZou9t7QtFrYtYbG4vGsOm8W9Nf9ZLeYve8pucXbecTaLZ4d6WSyWtAJZb+9MZ7E4
+	+OEJq8W61+9ZLLZfbWK1aLljarFsKpeDjMeTg/OYPNbMW8Po8ezqM0aPBZtKPc7f28ji0XLk
+	LavH5hVaHov3vGTyuHy21GPTqk42j02fJrF7nJjxm8Vj85J6jxebZzJ67L7ZwOaxuG8ya4BI
+	lJ5NUX5pSapCRn5xia1StKGFkZ6hpYWekYmlnqGxeayVkamSvp1NSmpOZllqkb5dgl7GvYXL
+	WAtOCFX03DzP2MA4n6+LkZNDQsBE4uKDiyxdjFwcQgJLGSVamtqZIBIyEienNbBC2MISf651
+	sUEUvWeUOHNsGSNIglfATmL1mvNgRSwCqhKvJt1ihogLSpyc+YQFxBYVkJe4f2sGO4gtLOAi
+	cWDbRLAaEQEliX27JrKDDGUW2MEucXHXcSaIDc+ZJf52HwLrYBYQl7j1ZD7YSWwChhJdb0HO
+	4OTgFNCXmHf6HitEjZlE19YuRghbXmL72znMExiFZiE5ZBaSUbOQtMxC0rKAkWUVo0hqaXFu
+	em6xoV5xYm5xaV66XnJ+7iZGYJraduzn5h2M81591DvEyMTBeIhRgoNZSYRX8sqTdCHelMTK
+	qtSi/Pii0pzU4kOMpsDQmMgsJZqcD0yUeSXxhmYGpoYmZpYGppZmxkrivG6Xz6cJCaQnlqRm
+	p6YWpBbB9DFxcEo1MFldaJWPjrp8esKyTQs39a9UPna0699GGZvqxVrZ/Os/tK/rO79/ab2J
+	le6Uzt+/AhhsVefceLSfwc2YK/L/qhsbJhX5r/apvuecIXGXNVfrpphdj+vqWS9UbEVy4h+d
+	3tdz9A5zYfifi62yU6vfK7judn5w0HxL9cmj999GxvsVFSzI1Y3945SdYOV8c+HLvHPfmoML
+	ub/+mO0treTxo55p5XXxsB2/whqjhP+eLsgL2tcUedx3oU79lK4bbzka1PjS7TU9NfVnBPuY
+	TZ4n86Bp4enTZSr/Zq7ScXQ4yWjM6u63uHD9G/HCo4t4nQ7yRjFMZ4yT26/+vLKep6HxZe73
+	Nk0v3w9bvGdOc/mrpcRSnJFoqMVcVJwIAGW+P3ncAwAA
+X-CMS-MailID: 20250328141841eucas1p246ea46aed1be0fbf2d32f4681bff0ebf
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20250228195423eucas1p221736d964e9aeb1b055d3ee93a4d2648
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20250228195423eucas1p221736d964e9aeb1b055d3ee93a4d2648
+References: <cover.1738765879.git.leonro@nvidia.com>
+	<20250220124827.GR53094@unreal>
+	<CGME20250228195423eucas1p221736d964e9aeb1b055d3ee93a4d2648@eucas1p2.samsung.com>
+	<1166a5f5-23cc-4cce-ba40-5e10ad2606de@arm.com>
+	<d408b1c7-eabf-4a1e-861c-b2ddf8bf9f0e@samsung.com>
+	<20250312193249.GI1322339@unreal>
+	<adb63b87-d8f2-4ae6-90c4-125bde41dc29@samsung.com>
+	<20250319175840.GG10600@ziepe.ca>
+	<1034b694-2b25-4649-a004-19e601061b90@samsung.com>
+	<20250322004130.GS126678@ziepe.ca>
 
-On Fri, 28 Mar 2025 16:04:17 +0800
-liulongfang <liulongfang@huawei.com> wrote:
+On 22.03.2025 01:41, Jason Gunthorpe wrote:
+> On Fri, Mar 21, 2025 at 12:52:30AM +0100, Marek Szyprowski wrote:
+>>> Christoph's vision was to make a performance DMA API path that could
+>>> be used to implement any scatterlist-like data structure very
+>>> efficiently without having to teach the DMA API about all sorts of
+>>> scatterlist-like things.
+>> Thanks for explaining one more motivation behind this patchset!
+> Sure, no problem.
+>
+> To close the loop on the bigger picture here..
+>
+> When you put the parts together:
+>
+>   1) dma_map_sg is the only API that is both performant and fully
+>      functional
+>
+>   2) scatterlist is a horrible leaky design and badly misued all over
+>      the place. When Logan added SG_DMA_BUS_ADDRESS it became quite
+>      clear that any significant changes to scatterlist are infeasible,
+>      or at least we'd break a huge number of untestable legacy drivers
+>      in the process.
+>
+>   3) We really want to do full featured performance DMA *without* a
+>      struct page. This requires changing scatterlist, inventing a new
+>      scatterlist v2 and DMA map for it, or this idea here of a flexible
+>      lower level DMA API entry point.
+>
+>      Matthew has been talking about struct-pageless for a long time now
+>      from the block/mm direction using folio & memdesc and this is
+>      meeting his work from the other end of the stack by starting to
+>      build a way to do DMA on future struct pageless things. This is
+>      going to be huge multi-year project but small parts like this need
+>      to be solved and agreed to make progress.
 
-> on 2025/3/21 23:51, Alex Williamson wrote:
-> > On Tue, 18 Mar 2025 14:45:44 +0800
-> > Longfang Liu <liulongfang@huawei.com> wrote:
-> >   
-> >> The dma addresses of EQE and AEQE are wrong after migration and
-> >> results in guest kernel-mode encryption services  failure.
-> >> Comparing the definition of hardware registers, we found that
-> >> there was an error when the data read from the register was
-> >> combined into an address. Therefore, the address combination
-> >> sequence needs to be corrected.
-> >>
-> >> Even after fixing the above problem, we still have an issue
-> >> where the Guest from an old kernel can get migrated to
-> >> new kernel and may result in wrong data.
-> >>
-> >> In order to ensure that the address is correct after migration,
-> >> if an old magic number is detected, the dma address needs to be
-> >> updated.
-> >>
-> >> Fixes: b0eed085903e ("hisi_acc_vfio_pci: Add support for VFIO live migration")
-> >> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
-> >> Reviewed-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> >> ---
-> >>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 41 ++++++++++++++++---
-> >>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    | 14 ++++++-
-> >>  2 files changed, 47 insertions(+), 8 deletions(-)
-> >>
-> >> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> >> index 451c639299eb..304dbdfa0e95 100644
-> >> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> >> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> >> @@ -350,6 +350,32 @@ static int vf_qm_func_stop(struct hisi_qm *qm)
-> >>  	return hisi_qm_mb(qm, QM_MB_CMD_PAUSE_QM, 0, 0, 0);
-> >>  }
-> >>  
-> >> +static int vf_qm_version_check(struct acc_vf_data *vf_data, struct device *dev)
-> >> +{
-> >> +	switch (vf_data->acc_magic) {
-> >> +	case ACC_DEV_MAGIC_V2:
-> >> +		if (vf_data->major_ver != ACC_DRV_MAJOR_VER) {
-> >> +			dev_info(dev, "migration driver version<%u.%u> not match!\n",
-> >> +				 vf_data->major_ver, vf_data->minor_ver);
-> >> +			return -EINVAL;
-> >> +		}
-> >> +		break;
-> >> +	case ACC_DEV_MAGIC_V1:
-> >> +		/* Correct dma address */
-> >> +		vf_data->eqe_dma = vf_data->qm_eqc_dw[QM_XQC_ADDR_HIGH];
-> >> +		vf_data->eqe_dma <<= QM_XQC_ADDR_OFFSET;
-> >> +		vf_data->eqe_dma |= vf_data->qm_eqc_dw[QM_XQC_ADDR_LOW];
-> >> +		vf_data->aeqe_dma = vf_data->qm_aeqc_dw[QM_XQC_ADDR_HIGH];
-> >> +		vf_data->aeqe_dma <<= QM_XQC_ADDR_OFFSET;
-> >> +		vf_data->aeqe_dma |= vf_data->qm_aeqc_dw[QM_XQC_ADDR_LOW];
-> >> +		break;
-> >> +	default:
-> >> +		return -EINVAL;
-> >> +	}
-> >> +
-> >> +	return 0;
-> >> +}
-> >> +
-> >>  static int vf_qm_check_match(struct hisi_acc_vf_core_device *hisi_acc_vdev,
-> >>  			     struct hisi_acc_vf_migration_file *migf)
-> >>  {
-> >> @@ -363,7 +389,8 @@ static int vf_qm_check_match(struct hisi_acc_vf_core_device *hisi_acc_vdev,
-> >>  	if (migf->total_length < QM_MATCH_SIZE || hisi_acc_vdev->match_done)
-> >>  		return 0;
-> >>  
-> >> -	if (vf_data->acc_magic != ACC_DEV_MAGIC) {
-> >> +	ret = vf_qm_version_check(vf_data, dev);
-> >> +	if (ret) {
-> >>  		dev_err(dev, "failed to match ACC_DEV_MAGIC\n");
-> >>  		return -EINVAL;
-> >>  	}  
-> > 
-> > Nit, we store the return value here, but never use it beyond testing
-> > non-zero.  This is a pattern throughout this driver that should be
-> > fixed (maybe in a future series).  We should return the errno from the
-> > sub-function rather than overriding it unless we have a specific reason
-> > to do otherwise.  Thanks,
-> >  
-> 
-> You've raised a point that seems to apply in multiple places.
-> Could this be addressed in a future bugfix patch?
+Again, thanks for another summary!
 
-Yes, I've noted that above.  Thanks,
+>   4) In the immediate moment we still have problems in VFIO, RDMA, and
+>      DRM managing P2P transfers because dma_map_resource/page() don't
+>      properly work, and we don't have struct pages to use
+>      dma_map_sg(). Hacks around the DMA API have been in the kernel for
+>      a long time now, we want to see a properly architected solution.
 
-Alex
+What kind of a fix is needed to dma_map_resource()/dma_unmap_resource() 
+API to make it usable with P2P DMA? It looks that this API is closest to 
+the mentioned dma_map_phys() and has little clients, so potentially 
+changing the function signature should be quite easy.
 
-> >> @@ -418,7 +445,9 @@ static int vf_qm_get_match_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
-> >>  	int vf_id = hisi_acc_vdev->vf_id;
-> >>  	int ret;
-> >>  
-> >> -	vf_data->acc_magic = ACC_DEV_MAGIC;
-> >> +	vf_data->acc_magic = ACC_DEV_MAGIC_V2;
-> >> +	vf_data->major_ver = ACC_DRV_MAJOR_VER;
-> >> +	vf_data->minor_ver = ACC_DRV_MINOR_VER;
-> >>  	/* Save device id */
-> >>  	vf_data->dev_id = hisi_acc_vdev->vf_dev->device;
-> >>  
-> >> @@ -496,12 +525,12 @@ static int vf_qm_read_data(struct hisi_qm *vf_qm, struct acc_vf_data *vf_data)
-> >>  		return -EINVAL;
-> >>  
-> >>  	/* Every reg is 32 bit, the dma address is 64 bit. */
-> >> -	vf_data->eqe_dma = vf_data->qm_eqc_dw[1];
-> >> +	vf_data->eqe_dma = vf_data->qm_eqc_dw[QM_XQC_ADDR_HIGH];
-> >>  	vf_data->eqe_dma <<= QM_XQC_ADDR_OFFSET;
-> >> -	vf_data->eqe_dma |= vf_data->qm_eqc_dw[0];
-> >> -	vf_data->aeqe_dma = vf_data->qm_aeqc_dw[1];
-> >> +	vf_data->eqe_dma |= vf_data->qm_eqc_dw[QM_XQC_ADDR_LOW];
-> >> +	vf_data->aeqe_dma = vf_data->qm_aeqc_dw[QM_XQC_ADDR_HIGH];
-> >>  	vf_data->aeqe_dma <<= QM_XQC_ADDR_OFFSET;
-> >> -	vf_data->aeqe_dma |= vf_data->qm_aeqc_dw[0];
-> >> +	vf_data->aeqe_dma |= vf_data->qm_aeqc_dw[QM_XQC_ADDR_LOW];
-> >>  
-> >>  	/* Through SQC_BT/CQC_BT to get sqc and cqc address */
-> >>  	ret = qm_get_sqc(vf_qm, &vf_data->sqc_dma);
-> >> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-> >> index 245d7537b2bc..91002ceeebc1 100644
-> >> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-> >> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-> >> @@ -39,6 +39,9 @@
-> >>  #define QM_REG_ADDR_OFFSET	0x0004
-> >>  
-> >>  #define QM_XQC_ADDR_OFFSET	32U
-> >> +#define QM_XQC_ADDR_LOW	0x1
-> >> +#define QM_XQC_ADDR_HIGH	0x2
-> >> +
-> >>  #define QM_VF_AEQ_INT_MASK	0x0004
-> >>  #define QM_VF_EQ_INT_MASK	0x000c
-> >>  #define QM_IFC_INT_SOURCE_V	0x0020
-> >> @@ -50,10 +53,15 @@
-> >>  #define QM_EQC_DW0		0X8000
-> >>  #define QM_AEQC_DW0		0X8020
-> >>  
-> >> +#define ACC_DRV_MAJOR_VER 1
-> >> +#define ACC_DRV_MINOR_VER 0
-> >> +
-> >> +#define ACC_DEV_MAGIC_V1	0XCDCDCDCDFEEDAACC
-> >> +#define ACC_DEV_MAGIC_V2	0xAACCFEEDDECADEDE
-> >> +
-> >>  struct acc_vf_data {
-> >>  #define QM_MATCH_SIZE offsetofend(struct acc_vf_data, qm_rsv_state)
-> >>  	/* QM match information */
-> >> -#define ACC_DEV_MAGIC	0XCDCDCDCDFEEDAACC
-> >>  	u64 acc_magic;
-> >>  	u32 qp_num;
-> >>  	u32 dev_id;
-> >> @@ -61,7 +69,9 @@ struct acc_vf_data {
-> >>  	u32 qp_base;
-> >>  	u32 vf_qm_state;
-> >>  	/* QM reserved match information */
-> >> -	u32 qm_rsv_state[3];
-> >> +	u16 major_ver;
-> >> +	u16 minor_ver;
-> >> +	u32 qm_rsv_state[2];
-> >>  
-> >>  	/* QM RW regs */
-> >>  	u32 aeq_int_mask;  
-> > 
-> > 
-> > 
-> > .
-> >   
-> 
+Best regards
+-- 
+Marek Szyprowski, PhD
+Samsung R&D Institute Poland
 
 
