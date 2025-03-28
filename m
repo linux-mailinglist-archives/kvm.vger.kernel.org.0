@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-42204-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42201-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72542A74F17
-	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 18:17:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFAB3A74EFB
+	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 18:15:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D345816F2A8
-	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 17:16:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41D8E3B3D50
+	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 17:15:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53B341F4179;
-	Fri, 28 Mar 2025 17:13:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 463F21E9B30;
+	Fri, 28 Mar 2025 17:13:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="Uhxe4C+V"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="JTYicqRe"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E4F81E51F4;
-	Fri, 28 Mar 2025 17:13:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1988D1DE2AD;
+	Fri, 28 Mar 2025 17:13:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743181999; cv=none; b=pILnULL6T+CH8YPDvmRDpZ258OOvvuti88ThYJ7GtHv3+kKsSICk8OpiFBP5PKchOLr87Ss6xN35MH0hdUolGK54o0TIdXBdaJlVS0ugrplqq306VpgLa2Gmbt+HosFLU9tlhiFzwAY/X1j6djNoEA5oWInDtIISlxryeOEEO5Y=
+	t=1743181997; cv=none; b=My70fC1IymJbSYrxrtndwTZGj0PLfG015eIbWLT8c8l8JoWVU/ZwwdalKy9SF4CfQQBmLR3ZFO+TORB0FiBLdaSEoZ6aeONPU0pA3+03g6VtnNfiEnfWUNpDI062nciD15iT4TKfzBwSjhEGn+YDJY8TDCzYyisuO9POgHlauiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743181999; c=relaxed/simple;
-	bh=05S5aXGHh+c1z/f1P1kRRIsqJSjPN89APQt4mJYUABY=;
+	s=arc-20240116; t=1743181997; c=relaxed/simple;
+	bh=+GrcDE+iyNBEfI641Q88Svz3/KfvEfJjvCsRnN60OI0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pGDgKwbJyzApBwIYckQG9mkdR02XT7LdMnX7bTgZsXaoLy4BRUoinSK87hrYJyjLim0R0CjCu4Dd0Kur42WYiBuSyl6Cjw157PLxJnGk9RoVAx3LfwePd7PXPddTAzSptAj1L1qXErSxBipt3Ot27Oi3g6i/dLQKAqpTRVh8uhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=Uhxe4C+V; arc=none smtp.client-ip=198.137.202.136
+	 MIME-Version; b=VbwyVtz1SDkiJrssGbShu7qAzUH+bghnD+tKv3/gNUX+Pa6Nsx2lgFfpMpItuz0Iq8KK9JwAmy9wc2FYDJveLZlv6RyUmAxHLNKP1COTfGM/COPZRGD6xZaFwvcjsEP+2YMh7jevukLS8/WmUMOgkKwZZE1U2zqr6uhPnBoizDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=JTYicqRe; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from terminus.zytor.com (terminus.zytor.com [IPv6:2607:7c80:54:3:0:0:0:136])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 52SHC6va2029344
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 52SHC6vb2029344
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Fri, 28 Mar 2025 10:12:17 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 52SHC6va2029344
+	Fri, 28 Mar 2025 10:12:18 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 52SHC6vb2029344
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025032001; t=1743181938;
-	bh=/4tX6ccTMOAoI9WvAyPzpCV9OFj9tKgHimPD+Eu2d8A=;
+	s=2025032001; t=1743181939;
+	bh=SmsFc1qkkjl08LmQJ/Q/xdV7Uhx65lB3FyLUulp3rKw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Uhxe4C+V9ZJK88ROy2+vKy9WXxgNJcOc4XuQhMjBIM62Gd5i1Ll4fkdgcQdd62IVM
-	 afwIcQXZ07GVcr3L0Emya16j7jO/FuMRICRq9tXPMfsveVUc6GLHWfaRPRIuNZP3aZ
-	 XccnxvdwnNjsarSwKet6c9anOkL0MIDBC5s72zbRqx7RUUbYjIwKWCDXaY4JIEWEgd
-	 PaLIkgP5eFINTrSsOjI9NysxFkWyt8lbrQ61m6LOUgMa94cfdmTssZ/678ywRytLyh
-	 5Burx/etGWTw1hMklt4K125YDVkH5g0Ye0ALogkZGcI4a8AwZrdF2AzhMn4WXqsEV5
-	 UWoGn+DSo/udg==
+	b=JTYicqReRTjgEGiHG1oY6tNasuMgPd3s469lCHbyXhBiK3NNLwBGBa2YdPlpAIQtu
+	 3E/R92gmrAUzxBRNW6eRQu20bxd+7G4gTuZy9E1cV7TCzay0DLoXwaS1PaR2647EdA
+	 n0QALPpOpy++M+C9Y/tx6QJO6NC+RK1Rm45w7Qu0u2noLiO40uD7eY6+cSrBkqruGr
+	 sk78I27ZLZJdKyW8v5I8ej5GJO5SRDw4OTfyt4WHRTYaaxkeqA35RXMODX1n4I9C5j
+	 E9tPrNvySSHfGQg4Jy0OiDeHmSgZbBfNHkeRNr0IKnkTUW2r7pXpmM7lQa12Q079hv
+	 x8mfGDlM6wZtA==
 From: "Xin Li (Intel)" <xin@zytor.com>
 To: pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
         linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
@@ -54,9 +54,9 @@ Cc: corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
         andrew.cooper3@citrix.com, luto@kernel.org, peterz@infradead.org,
         chao.gao@intel.com, xin3.li@intel.com
-Subject: [PATCH v4 04/19] x86/cea: Export per CPU array 'cea_exception_stacks' for KVM to use
-Date: Fri, 28 Mar 2025 10:11:50 -0700
-Message-ID: <20250328171205.2029296-5-xin@zytor.com>
+Subject: [PATCH v4 05/19] KVM: VMX: Initialize VMCS FRED fields
+Date: Fri, 28 Mar 2025 10:11:51 -0700
+Message-ID: <20250328171205.2029296-6-xin@zytor.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250328171205.2029296-1-xin@zytor.com>
 References: <20250328171205.2029296-1-xin@zytor.com>
@@ -68,43 +68,189 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The per CPU array 'cea_exception_stacks' points to per CPU stacks
-for #DB, NMI and #DF.  It is normally referenced via the #define:
-__this_cpu_ist_top_va().
+From: Xin Li <xin3.li@intel.com>
 
-FRED introduced new fields in the host-state area of the VMCS for
-stack levels 1->3 (HOST_IA32_FRED_RSP[123]), each respectively
-corresponding to per CPU stacks for #DB, NMI and #DF.  KVM must
-populate these each time a vCPU is loaded onto a CPU.
+Initialize host VMCS FRED fields with host FRED MSRs' value and
+guest VMCS FRED fields to 0.
 
+FRED CPU state is managed in 9 new FRED MSRs:
+        IA32_FRED_CONFIG,
+        IA32_FRED_STKLVLS,
+        IA32_FRED_RSP0,
+        IA32_FRED_RSP1,
+        IA32_FRED_RSP2,
+        IA32_FRED_RSP3,
+        IA32_FRED_SSP1,
+        IA32_FRED_SSP2,
+        IA32_FRED_SSP3,
+as well as a few existing CPU registers and MSRs:
+        CR4.FRED,
+        IA32_STAR,
+        IA32_KERNEL_GS_BASE,
+        IA32_PL0_SSP (also known as IA32_FRED_SSP0).
+
+CR4, IA32_KERNEL_GS_BASE and IA32_STAR are already well managed.
+Except IA32_FRED_RSP0 and IA32_FRED_SSP0, all other FRED CPU state
+MSRs have corresponding VMCS fields in both the host-state and
+guest-state areas.  So KVM just needs to initialize them, and with
+proper VM entry/exit FRED controls, a FRED CPU will keep tracking
+host and guest FRED CPU state in VMCS automatically.
+
+Signed-off-by: Xin Li <xin3.li@intel.com>
 Signed-off-by: Xin Li (Intel) <xin@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 ---
 
 Change in v4:
-* Rewrite the change log and add comments to the export (Dave Hansen).
----
- arch/x86/mm/cpu_entry_area.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+* Initialize host SSP[1-3] to 0s in vmx_set_constant_host_state()
+  because Linux doesn't support kernel shadow stacks (Chao Gao).
 
-diff --git a/arch/x86/mm/cpu_entry_area.c b/arch/x86/mm/cpu_entry_area.c
-index 575f863f3c75..bc0d687de376 100644
---- a/arch/x86/mm/cpu_entry_area.c
-+++ b/arch/x86/mm/cpu_entry_area.c
-@@ -17,6 +17,13 @@ static DEFINE_PER_CPU_PAGE_ALIGNED(struct entry_stack_page, entry_stack_storage)
- #ifdef CONFIG_X86_64
- static DEFINE_PER_CPU_PAGE_ALIGNED(struct exception_stacks, exception_stacks);
- DEFINE_PER_CPU(struct cea_exception_stacks*, cea_exception_stacks);
-+/*
-+ * FRED introduced new fields in the host-state area of the VMCS for
-+ * stack levels 1->3 (HOST_IA32_FRED_RSP[123]), each respectively
-+ * corresponding to per CPU stacks for #DB, NMI and #DF.  KVM must
-+ * populate these each time a vCPU is loaded onto a CPU.
-+ */
-+EXPORT_PER_CPU_SYMBOL(cea_exception_stacks);
+Change in v3:
+* Use structure kvm_host_values to keep host fred config & stack levels
+  (Sean Christopherson).
+
+Changes in v2:
+* Use kvm_cpu_cap_has() instead of cpu_feature_enabled() to decouple
+  KVM's capability to virtualize a feature and host's enabling of a
+  feature (Chao Gao).
+* Move guest FRED state init into __vmx_vcpu_reset() (Chao Gao).
+---
+ arch/x86/include/asm/vmx.h | 32 ++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/vmx.c     | 36 ++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/x86.h         |  3 +++
+ 3 files changed, 71 insertions(+)
+
+diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+index 5598517617a5..8a2b097aadf2 100644
+--- a/arch/x86/include/asm/vmx.h
++++ b/arch/x86/include/asm/vmx.h
+@@ -289,12 +289,44 @@ enum vmcs_field {
+ 	GUEST_BNDCFGS_HIGH              = 0x00002813,
+ 	GUEST_IA32_RTIT_CTL		= 0x00002814,
+ 	GUEST_IA32_RTIT_CTL_HIGH	= 0x00002815,
++	GUEST_IA32_FRED_CONFIG		= 0x0000281a,
++	GUEST_IA32_FRED_CONFIG_HIGH	= 0x0000281b,
++	GUEST_IA32_FRED_RSP1		= 0x0000281c,
++	GUEST_IA32_FRED_RSP1_HIGH	= 0x0000281d,
++	GUEST_IA32_FRED_RSP2		= 0x0000281e,
++	GUEST_IA32_FRED_RSP2_HIGH	= 0x0000281f,
++	GUEST_IA32_FRED_RSP3		= 0x00002820,
++	GUEST_IA32_FRED_RSP3_HIGH	= 0x00002821,
++	GUEST_IA32_FRED_STKLVLS		= 0x00002822,
++	GUEST_IA32_FRED_STKLVLS_HIGH	= 0x00002823,
++	GUEST_IA32_FRED_SSP1		= 0x00002824,
++	GUEST_IA32_FRED_SSP1_HIGH	= 0x00002825,
++	GUEST_IA32_FRED_SSP2		= 0x00002826,
++	GUEST_IA32_FRED_SSP2_HIGH	= 0x00002827,
++	GUEST_IA32_FRED_SSP3		= 0x00002828,
++	GUEST_IA32_FRED_SSP3_HIGH	= 0x00002829,
+ 	HOST_IA32_PAT			= 0x00002c00,
+ 	HOST_IA32_PAT_HIGH		= 0x00002c01,
+ 	HOST_IA32_EFER			= 0x00002c02,
+ 	HOST_IA32_EFER_HIGH		= 0x00002c03,
+ 	HOST_IA32_PERF_GLOBAL_CTRL	= 0x00002c04,
+ 	HOST_IA32_PERF_GLOBAL_CTRL_HIGH	= 0x00002c05,
++	HOST_IA32_FRED_CONFIG		= 0x00002c08,
++	HOST_IA32_FRED_CONFIG_HIGH	= 0x00002c09,
++	HOST_IA32_FRED_RSP1		= 0x00002c0a,
++	HOST_IA32_FRED_RSP1_HIGH	= 0x00002c0b,
++	HOST_IA32_FRED_RSP2		= 0x00002c0c,
++	HOST_IA32_FRED_RSP2_HIGH	= 0x00002c0d,
++	HOST_IA32_FRED_RSP3		= 0x00002c0e,
++	HOST_IA32_FRED_RSP3_HIGH	= 0x00002c0f,
++	HOST_IA32_FRED_STKLVLS		= 0x00002c10,
++	HOST_IA32_FRED_STKLVLS_HIGH	= 0x00002c11,
++	HOST_IA32_FRED_SSP1		= 0x00002c12,
++	HOST_IA32_FRED_SSP1_HIGH	= 0x00002c13,
++	HOST_IA32_FRED_SSP2		= 0x00002c14,
++	HOST_IA32_FRED_SSP2_HIGH	= 0x00002c15,
++	HOST_IA32_FRED_SSP3		= 0x00002c16,
++	HOST_IA32_FRED_SSP3_HIGH	= 0x00002c17,
+ 	PIN_BASED_VM_EXEC_CONTROL       = 0x00004000,
+ 	CPU_BASED_VM_EXEC_CONTROL       = 0x00004002,
+ 	EXCEPTION_BITMAP                = 0x00004004,
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index ab84939ace96..ac6aa2d091c3 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1505,6 +1505,15 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
+ 				    (unsigned long)(cpu_entry_stack(cpu) + 1));
+ 		}
  
- static DEFINE_PER_CPU_READ_MOSTLY(unsigned long, _cea_offset);
++		/* Per-CPU FRED MSRs */
++		if (kvm_cpu_cap_has(X86_FEATURE_FRED)) {
++#ifdef CONFIG_X86_64
++			vmcs_write64(HOST_IA32_FRED_RSP1, __this_cpu_ist_top_va(DB));
++			vmcs_write64(HOST_IA32_FRED_RSP2, __this_cpu_ist_top_va(NMI));
++			vmcs_write64(HOST_IA32_FRED_RSP3, __this_cpu_ist_top_va(DF));
++#endif
++		}
++
+ 		vmx->loaded_vmcs->cpu = cpu;
+ 	}
+ }
+@@ -4388,6 +4397,17 @@ void vmx_set_constant_host_state(struct vcpu_vmx *vmx)
+ 	 */
+ 	vmcs_write16(HOST_DS_SELECTOR, 0);
+ 	vmcs_write16(HOST_ES_SELECTOR, 0);
++
++	if (kvm_cpu_cap_has(X86_FEATURE_FRED)) {
++		/* FRED CONFIG and STKLVLS are the same on all CPUs */
++		vmcs_write64(HOST_IA32_FRED_CONFIG, kvm_host.fred_config);
++		vmcs_write64(HOST_IA32_FRED_STKLVLS, kvm_host.fred_stklvls);
++
++		/* Linux doesn't support kernel shadow stacks, thus SSPs are 0s */
++		vmcs_write64(HOST_IA32_FRED_SSP1, 0);
++		vmcs_write64(HOST_IA32_FRED_SSP2, 0);
++		vmcs_write64(HOST_IA32_FRED_SSP3, 0);
++	}
+ #else
+ 	vmcs_write16(HOST_DS_SELECTOR, __KERNEL_DS);  /* 22.2.4 */
+ 	vmcs_write16(HOST_ES_SELECTOR, __KERNEL_DS);  /* 22.2.4 */
+@@ -4889,6 +4909,17 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+ 	}
  
+ 	vmx_setup_uret_msrs(vmx);
++
++	if (kvm_cpu_cap_has(X86_FEATURE_FRED)) {
++		vmcs_write64(GUEST_IA32_FRED_CONFIG, 0);
++		vmcs_write64(GUEST_IA32_FRED_RSP1, 0);
++		vmcs_write64(GUEST_IA32_FRED_RSP2, 0);
++		vmcs_write64(GUEST_IA32_FRED_RSP3, 0);
++		vmcs_write64(GUEST_IA32_FRED_STKLVLS, 0);
++		vmcs_write64(GUEST_IA32_FRED_SSP1, 0);
++		vmcs_write64(GUEST_IA32_FRED_SSP2, 0);
++		vmcs_write64(GUEST_IA32_FRED_SSP3, 0);
++	}
+ }
+ 
+ static void __vmx_vcpu_reset(struct kvm_vcpu *vcpu)
+@@ -8705,6 +8736,11 @@ __init int vmx_hardware_setup(void)
+ 
+ 	kvm_set_posted_intr_wakeup_handler(pi_wakeup_handler);
+ 
++	if (kvm_cpu_cap_has(X86_FEATURE_FRED)) {
++		rdmsrl(MSR_IA32_FRED_CONFIG, kvm_host.fred_config);
++		rdmsrl(MSR_IA32_FRED_STKLVLS, kvm_host.fred_stklvls);
++	}
++
+ 	return r;
+ }
+ 
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 9dc32a409076..02514f5b9c0b 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -46,6 +46,9 @@ struct kvm_host_values {
+ 	u64 xcr0;
+ 	u64 xss;
+ 	u64 arch_capabilities;
++
++	u64 fred_config;
++	u64 fred_stklvls;
+ };
+ 
+ void kvm_spurious_fault(void);
 -- 
 2.48.1
 
