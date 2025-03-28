@@ -1,231 +1,232 @@
-Return-Path: <kvm+bounces-42168-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42169-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A886EA7441E
-	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 07:46:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B43CEA744EB
+	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 09:04:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B3927A7756
-	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 06:45:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 76E2A7A7404
+	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 08:03:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B24AA211474;
-	Fri, 28 Mar 2025 06:46:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64EF8212D67;
+	Fri, 28 Mar 2025 08:04:31 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [61.152.208.219])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42364C2C8
-	for <kvm@vger.kernel.org>; Fri, 28 Mar 2025 06:46:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.152.208.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C8A211704;
+	Fri, 28 Mar 2025 08:04:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743144399; cv=none; b=q6qaPy2fvaKPG9OcuGwrtGACPfavjc8w2YqetjTkgvSbrFl2mF60/OgC7svcKkRizOFcukEfkuEShyCuhawl8gUw99phHPNrmvf+7TY4eSr/S/0yOaqBaZRVRwrvEoNTdzLclHqaVAMbdn3sQwn6Y/YYl8wb57aiQdau9PJpQyw=
+	t=1743149070; cv=none; b=VwE3vkGOdUpSXaCqTjmSCYlDxjv+O2rqeBF1x9yndsCDl2B3kt+5pdXRj6caiGB7rOYrJPj91k4FSMTA55Yxmi1L8STYZ/mdNJOPYDjHT/B6WnrkedEO+480T4ZB6hZ4Szg78JbCfbval6Qntswjh89xbXcF9I1EUNHFIY9PrHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743144399; c=relaxed/simple;
-	bh=4bifKUtnw91pNgb9LRonAJTlnH/Z8/Uz/YnGQZH2foo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=SyYhiQwLsyTLYfoRbcrtJNHyno5ZzuXjSz3lnY4R47ixSGYZXvn+v8RpkrZ+vyWStQn+SmOeDfZg9007q3BIL1EC7VkYTjsjH+/1142XCdRbU+0bzUugnQXJtq3h65KPLJ6tis/mO7Kto5FTaKL7hKLSipSR6AozlkB431K1cPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=61.152.208.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
-X-ASG-Debug-ID: 1743143375-1eb14e79ffeed90001-HEqcsx
-Received: from ZXSHMBX1.zhaoxin.com (ZXSHMBX1.zhaoxin.com [10.28.252.163]) by mx2.zhaoxin.com with ESMTP id ESUnGPrVZzb3uQ01 (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Fri, 28 Mar 2025 14:29:35 +0800 (CST)
-X-Barracuda-Envelope-From: EwanHai-oc@zhaoxin.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.163
-Received: from ZXSHMBX2.zhaoxin.com (10.28.252.164) by ZXSHMBX1.zhaoxin.com
- (10.28.252.163) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.44; Fri, 28 Mar
- 2025 14:29:35 +0800
-Received: from ZXSHMBX2.zhaoxin.com ([fe80::4dfc:4f6a:c0cf:4298]) by
- ZXSHMBX2.zhaoxin.com ([fe80::4dfc:4f6a:c0cf:4298%4]) with mapi id
- 15.01.2507.044; Fri, 28 Mar 2025 14:29:35 +0800
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.163
-Received: from [192.168.31.91] (10.28.66.62) by zxbjmbx1.zhaoxin.com
- (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.44; Fri, 28 Mar
- 2025 14:29:08 +0800
-Message-ID: <8a547bf5-bdd4-4a49-883a-02b4aa0cc92c@zhaoxin.com>
-Date: Fri, 28 Mar 2025 14:29:05 +0800
+	s=arc-20240116; t=1743149070; c=relaxed/simple;
+	bh=XDAO6UlxQygNyGKtC5TzlRyeGz/e0D4z71Hgnqd6Y7c=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=BVCp66uA4d8srkLk54QjAbjUPoGzFo6V6mcAtzT18eE3LWf1um4bKJKvOyzWd2QZksrjD/48pElOi9wi8GUYKo2sOCPUAZXTgp0rRFem2u9v+rI1XA/JN2sZdjncuaaq8j/cX125dKQ26a6HjoPIX6bEWxBcRGXSfrJojRQFlXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4ZPCk11RVLz27hJf;
+	Fri, 28 Mar 2025 16:04:57 +0800 (CST)
+Received: from kwepemg500006.china.huawei.com (unknown [7.202.181.43])
+	by mail.maildlp.com (Postfix) with ESMTPS id 19AB51A0188;
+	Fri, 28 Mar 2025 16:04:19 +0800 (CST)
+Received: from [10.67.121.110] (10.67.121.110) by
+ kwepemg500006.china.huawei.com (7.202.181.43) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 28 Mar 2025 16:04:18 +0800
+Subject: Re: [PATCH v6 1/5] hisi_acc_vfio_pci: fix XQE dma address error
+To: Alex Williamson <alex.williamson@redhat.com>
+CC: <jgg@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
+	<jonathan.cameron@huawei.com>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>
+References: <20250318064548.59043-1-liulongfang@huawei.com>
+ <20250318064548.59043-2-liulongfang@huawei.com>
+ <20250321095140.4980c7c0.alex.williamson@redhat.com>
+From: liulongfang <liulongfang@huawei.com>
+Message-ID: <f72a87ed-5884-2a6f-02e1-b0bcd172a4e8@huawei.com>
+Date: Fri, 28 Mar 2025 16:04:17 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 08/10] target/i386/kvm: reset AMD PMU registers during
- VM reset
-To: Dongli Zhang <dongli.zhang@oracle.com>, <qemu-devel@nongnu.org>,
-	<kvm@vger.kernel.org>
-X-ASG-Orig-Subj: Re: [PATCH v2 08/10] target/i386/kvm: reset AMD PMU registers during
- VM reset
-CC: <pbonzini@redhat.com>, <zhao1.liu@intel.com>, <mtosatti@redhat.com>,
-	<sandipan.das@amd.com>, <babu.moger@amd.com>, <likexu@tencent.com>,
-	<like.xu.linux@gmail.com>, <zhenyuw@linux.intel.com>, <groug@kaod.org>,
-	<khorenko@virtuozzo.com>, <alexander.ivanov@virtuozzo.com>,
-	<den@virtuozzo.com>, <davydov-max@yandex-team.ru>, <xiaoyao.li@intel.com>,
-	<dapeng1.mi@linux.intel.com>, <joe.jin@oracle.com>, <ewanhai@zhaoxin.com>,
-	<cobechen@zhaoxin.com>, <louisqi@zhaoxin.com>, <liamni@zhaoxin.com>,
-	<frankzhu@zhaoxin.com>, <silviazhao@zhaoxin.com>
-References: <20250302220112.17653-1-dongli.zhang@oracle.com>
- <20250302220112.17653-9-dongli.zhang@oracle.com>
-From: ewanhai <ewanhai-oc@zhaoxin.com>
-In-Reply-To: <20250302220112.17653-9-dongli.zhang@oracle.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
- zxbjmbx1.zhaoxin.com (10.29.252.163)
-X-Moderation-Data: 3/28/2025 2:29:34 PM
-X-Barracuda-Connect: ZXSHMBX1.zhaoxin.com[10.28.252.163]
-X-Barracuda-Start-Time: 1743143375
-X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
-X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at zhaoxin.com
-X-Barracuda-Scan-Msg-Size: 4725
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
-X-Barracuda-Spam-Score: -2.01
-X-Barracuda-Spam-Status: No, SCORE=-2.01 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=TRACK_DBX_001
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.139134
-	Rule breakdown below
-	 pts rule name              description
-	---- ---------------------- --------------------------------------------------
-	0.01 TRACK_DBX_001          Custom rule TRACK_DBX_001
+In-Reply-To: <20250321095140.4980c7c0.alex.williamson@redhat.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemg500006.china.huawei.com (7.202.181.43)
 
-Hi Zhao,
+on 2025/3/21 23:51, Alex Williamson wrote:
+> On Tue, 18 Mar 2025 14:45:44 +0800
+> Longfang Liu <liulongfang@huawei.com> wrote:
+> 
+>> The dma addresses of EQE and AEQE are wrong after migration and
+>> results in guest kernel-mode encryption services  failure.
+>> Comparing the definition of hardware registers, we found that
+>> there was an error when the data read from the register was
+>> combined into an address. Therefore, the address combination
+>> sequence needs to be corrected.
+>>
+>> Even after fixing the above problem, we still have an issue
+>> where the Guest from an old kernel can get migrated to
+>> new kernel and may result in wrong data.
+>>
+>> In order to ensure that the address is correct after migration,
+>> if an old magic number is detected, the dma address needs to be
+>> updated.
+>>
+>> Fixes: b0eed085903e ("hisi_acc_vfio_pci: Add support for VFIO live migration")
+>> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+>> Reviewed-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+>> ---
+>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 41 ++++++++++++++++---
+>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    | 14 ++++++-
+>>  2 files changed, 47 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> index 451c639299eb..304dbdfa0e95 100644
+>> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> @@ -350,6 +350,32 @@ static int vf_qm_func_stop(struct hisi_qm *qm)
+>>  	return hisi_qm_mb(qm, QM_MB_CMD_PAUSE_QM, 0, 0, 0);
+>>  }
+>>  
+>> +static int vf_qm_version_check(struct acc_vf_data *vf_data, struct device *dev)
+>> +{
+>> +	switch (vf_data->acc_magic) {
+>> +	case ACC_DEV_MAGIC_V2:
+>> +		if (vf_data->major_ver != ACC_DRV_MAJOR_VER) {
+>> +			dev_info(dev, "migration driver version<%u.%u> not match!\n",
+>> +				 vf_data->major_ver, vf_data->minor_ver);
+>> +			return -EINVAL;
+>> +		}
+>> +		break;
+>> +	case ACC_DEV_MAGIC_V1:
+>> +		/* Correct dma address */
+>> +		vf_data->eqe_dma = vf_data->qm_eqc_dw[QM_XQC_ADDR_HIGH];
+>> +		vf_data->eqe_dma <<= QM_XQC_ADDR_OFFSET;
+>> +		vf_data->eqe_dma |= vf_data->qm_eqc_dw[QM_XQC_ADDR_LOW];
+>> +		vf_data->aeqe_dma = vf_data->qm_aeqc_dw[QM_XQC_ADDR_HIGH];
+>> +		vf_data->aeqe_dma <<= QM_XQC_ADDR_OFFSET;
+>> +		vf_data->aeqe_dma |= vf_data->qm_aeqc_dw[QM_XQC_ADDR_LOW];
+>> +		break;
+>> +	default:
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>  static int vf_qm_check_match(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>>  			     struct hisi_acc_vf_migration_file *migf)
+>>  {
+>> @@ -363,7 +389,8 @@ static int vf_qm_check_match(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>>  	if (migf->total_length < QM_MATCH_SIZE || hisi_acc_vdev->match_done)
+>>  		return 0;
+>>  
+>> -	if (vf_data->acc_magic != ACC_DEV_MAGIC) {
+>> +	ret = vf_qm_version_check(vf_data, dev);
+>> +	if (ret) {
+>>  		dev_err(dev, "failed to match ACC_DEV_MAGIC\n");
+>>  		return -EINVAL;
+>>  	}
+> 
+> Nit, we store the return value here, but never use it beyond testing
+> non-zero.  This is a pattern throughout this driver that should be
+> fixed (maybe in a future series).  We should return the errno from the
+> sub-function rather than overriding it unless we have a specific reason
+> to do otherwise.  Thanks,
+>
 
-Thank you for pointing out the potential impact on Zhaoxin CPUs!
+You've raised a point that seems to apply in multiple places.
+Could this be addressed in a future bugfix patch?
 
-Hi Dongli,
+Thanks.
+Longfang.
 
-Zhaoxin (including vendor "__shanghai__" and "centaurhauls")'s PMU is
-compatible with Intel, so I have some advice for this patch.
-
-=E5=9C=A8 2025/3/3 06:00, Dongli Zhang =E5=86=99=E9=81=93:
-> [snip]
-> +
-> +static bool is_same_vendor(CPUX86State *env)
-> +{
-> +    static uint32_t host_cpuid_vendor1;
-> +    static uint32_t host_cpuid_vendor2;
-> +    static uint32_t host_cpuid_vendor3;
-> +
-> +    host_cpuid(0x0, 0, NULL, &host_cpuid_vendor1, &host_cpuid_vendor3,
-> +               &host_cpuid_vendor2);
-> +
-> +    return env->cpuid_vendor1 =3D=3D host_cpuid_vendor1 &&
-> +           env->cpuid_vendor2 =3D=3D host_cpuid_vendor2 &&
-> +           env->cpuid_vendor3 =3D=3D host_cpuid_vendor3;
-> +}
-Should we consider a special case, such as emulating Intel CPUs on a
-Zhaoxin platform, or vice versa? If so, maybe we can write a
-'vendor_compatible()' helper. After all, before this patchset, QEMU
-supported behavior-similar CPU emulation, e.g., emulating an Intel VCPU on
-a Zhaoxin PCPU.
-> +static void kvm_init_pmu_info(CPUState *cs)
-> +{
-> +    X86CPU *cpu =3D X86_CPU(cs);
-> +    CPUX86State *env =3D &cpu->env;
-> +
-> +    /*
-> +     * The PMU virtualization is disabled by kvm.enable_pmu=3DN.
-> +     */
-> +    if (kvm_pmu_disabled) {
-> +        return;
-> +    }
-> +
-> +    /*
-> +     * It is not supported to virtualize AMD PMU registers on Intel
-> +     * processors, nor to virtualize Intel PMU registers on AMD processo=
-rs.
-> +     */
-> +    if (!is_same_vendor(env)) {
-> +        return;
-> +    }
-
-ditto.
-
-> [snip]
-> +    /*
-> +     * If KVM_CAP_PMU_CAPABILITY is not supported, there is no way to
-> +     * disable the AMD pmu virtualization.
-> +     *
-> +     * If KVM_CAP_PMU_CAPABILITY is supported !cpu->enable_pmu
-> +     * indicates the KVM has already disabled the PMU virtualization.
-> +     */
-> +    if (has_pmu_cap && !cpu->enable_pmu) {
-> +        return;
-> +    }
-> +
-> +    if (IS_INTEL_CPU(env)) {
-> +        kvm_init_pmu_info_intel(env);
-We can use "if (IS_INTEL_CPU(env) || IS_ZHAOXIN_CPU(env))" instead. This
-helper was introduced to QEMU in commit 5d20aa540b.
-
-The function name kvm_init_pmu_info_"intel"() is acceptable since the
-current Zhaoxin and Intel PMU architectures are compatible. However,
-if Zhaoxin develop any exclusive features in the future, we can always
-implement a separate "zhaoxin" version of the PMU info initialization
-function.
-> +    } else if (IS_AMD_CPU(env)) {
-> +        kvm_init_pmu_info_amd(env);
-> +    }
-> +}
-> +
-[snip]
->   int kvm_arch_init_vcpu(CPUState *cs)
->   {
->       struct {
-> @@ -2288,7 +2376,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->       cpuid_i =3D kvm_x86_build_cpuid(env, cpuid_data.entries, cpuid_i);
->       cpuid_data.cpuid.nent =3D cpuid_i;
->  =20
-> -    kvm_init_pmu_info(env);
-> +    kvm_init_pmu_info(cs);
->  =20
->       if (((env->cpuid_version >> 8)&0xF) >=3D 6
->           && (env->features[FEAT_1_EDX] & (CPUID_MCE | CPUID_MCA)) =3D=3D
-> @@ -4064,7 +4152,7 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
->               kvm_msr_entry_add(cpu, MSR_KVM_POLL_CONTROL, env->poll_cont=
-rol_msr);
->           }
->  =20
-> -        if (has_pmu_version > 0) {
-> +        if (IS_INTEL_CPU(env) && has_pmu_version > 0) {
-Also use 'if (IS_INTEL_CPU(env) || IS_ZHAOXIN_CPU(env))' instead.
->               if (has_pmu_version > 1) {
->                   /* Stop the counter.  */
->                   kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0)=
-;
-> @@ -4095,6 +4183,38 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
->                                     env->msr_global_ctrl);
->               }
->           }
-> +
-> +        if (IS_AMD_CPU(env) && has_pmu_version > 0) {
-> +            uint32_t sel_base =3D MSR_K7_EVNTSEL0;
-> +            uint32_t ctr_base =3D MSR_K7_PERFCTR0;
-> ...
-[snip]
-> @@ -4542,7 +4662,8 @@ static int kvm_get_msrs(X86CPU *cpu)
->       if (env->features[FEAT_KVM] & CPUID_KVM_POLL_CONTROL) {
->           kvm_msr_entry_add(cpu, MSR_KVM_POLL_CONTROL, 1);
->       }
-> -    if (has_pmu_version > 0) {
-> +
-> +    if (IS_INTEL_CPU(env) && has_pmu_version > 0) {
-Also use 'if (IS_INTEL_CPU(env) || IS_ZHAOXIN_CPU(env))' instead.
->           if (has_pmu_version > 1) {
->               kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
->               kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
-> @@ -4558,6 +4679,35 @@ static int kvm_get_msrs(X86CPU *cpu)
->           }
->       }
->  =20
-> +    if (IS_AMD_CPU(env) && has_pmu_version > 0) {
-> +        uint32_t sel_base =3D MSR_K7_EVNTSEL0;
-> +        uint32_t ctr_base =3D MSR_K7_PERFCTR0;
-> ...
-
+> Alex
+> 
+>> @@ -418,7 +445,9 @@ static int vf_qm_get_match_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>>  	int vf_id = hisi_acc_vdev->vf_id;
+>>  	int ret;
+>>  
+>> -	vf_data->acc_magic = ACC_DEV_MAGIC;
+>> +	vf_data->acc_magic = ACC_DEV_MAGIC_V2;
+>> +	vf_data->major_ver = ACC_DRV_MAJOR_VER;
+>> +	vf_data->minor_ver = ACC_DRV_MINOR_VER;
+>>  	/* Save device id */
+>>  	vf_data->dev_id = hisi_acc_vdev->vf_dev->device;
+>>  
+>> @@ -496,12 +525,12 @@ static int vf_qm_read_data(struct hisi_qm *vf_qm, struct acc_vf_data *vf_data)
+>>  		return -EINVAL;
+>>  
+>>  	/* Every reg is 32 bit, the dma address is 64 bit. */
+>> -	vf_data->eqe_dma = vf_data->qm_eqc_dw[1];
+>> +	vf_data->eqe_dma = vf_data->qm_eqc_dw[QM_XQC_ADDR_HIGH];
+>>  	vf_data->eqe_dma <<= QM_XQC_ADDR_OFFSET;
+>> -	vf_data->eqe_dma |= vf_data->qm_eqc_dw[0];
+>> -	vf_data->aeqe_dma = vf_data->qm_aeqc_dw[1];
+>> +	vf_data->eqe_dma |= vf_data->qm_eqc_dw[QM_XQC_ADDR_LOW];
+>> +	vf_data->aeqe_dma = vf_data->qm_aeqc_dw[QM_XQC_ADDR_HIGH];
+>>  	vf_data->aeqe_dma <<= QM_XQC_ADDR_OFFSET;
+>> -	vf_data->aeqe_dma |= vf_data->qm_aeqc_dw[0];
+>> +	vf_data->aeqe_dma |= vf_data->qm_aeqc_dw[QM_XQC_ADDR_LOW];
+>>  
+>>  	/* Through SQC_BT/CQC_BT to get sqc and cqc address */
+>>  	ret = qm_get_sqc(vf_qm, &vf_data->sqc_dma);
+>> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>> index 245d7537b2bc..91002ceeebc1 100644
+>> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>> @@ -39,6 +39,9 @@
+>>  #define QM_REG_ADDR_OFFSET	0x0004
+>>  
+>>  #define QM_XQC_ADDR_OFFSET	32U
+>> +#define QM_XQC_ADDR_LOW	0x1
+>> +#define QM_XQC_ADDR_HIGH	0x2
+>> +
+>>  #define QM_VF_AEQ_INT_MASK	0x0004
+>>  #define QM_VF_EQ_INT_MASK	0x000c
+>>  #define QM_IFC_INT_SOURCE_V	0x0020
+>> @@ -50,10 +53,15 @@
+>>  #define QM_EQC_DW0		0X8000
+>>  #define QM_AEQC_DW0		0X8020
+>>  
+>> +#define ACC_DRV_MAJOR_VER 1
+>> +#define ACC_DRV_MINOR_VER 0
+>> +
+>> +#define ACC_DEV_MAGIC_V1	0XCDCDCDCDFEEDAACC
+>> +#define ACC_DEV_MAGIC_V2	0xAACCFEEDDECADEDE
+>> +
+>>  struct acc_vf_data {
+>>  #define QM_MATCH_SIZE offsetofend(struct acc_vf_data, qm_rsv_state)
+>>  	/* QM match information */
+>> -#define ACC_DEV_MAGIC	0XCDCDCDCDFEEDAACC
+>>  	u64 acc_magic;
+>>  	u32 qp_num;
+>>  	u32 dev_id;
+>> @@ -61,7 +69,9 @@ struct acc_vf_data {
+>>  	u32 qp_base;
+>>  	u32 vf_qm_state;
+>>  	/* QM reserved match information */
+>> -	u32 qm_rsv_state[3];
+>> +	u16 major_ver;
+>> +	u16 minor_ver;
+>> +	u32 qm_rsv_state[2];
+>>  
+>>  	/* QM RW regs */
+>>  	u32 aeq_int_mask;
+> 
+> 
+> 
+> .
+> 
 
