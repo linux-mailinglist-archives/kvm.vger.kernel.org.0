@@ -1,258 +1,277 @@
-Return-Path: <kvm+bounces-42212-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42213-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5473A75177
-	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 21:30:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73E0CA7521A
+	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 22:26:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 378847A61E5
-	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 20:29:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B34F3A939A
+	for <lists+kvm@lfdr.de>; Fri, 28 Mar 2025 21:26:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 587B21E2616;
-	Fri, 28 Mar 2025 20:30:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C471F0989;
+	Fri, 28 Mar 2025 21:26:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="dUZQ49kq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="29auB3hB"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2075.outbound.protection.outlook.com [40.107.95.75])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f202.google.com (mail-vk1-f202.google.com [209.85.221.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B54E35FEE6
-	for <kvm@vger.kernel.org>; Fri, 28 Mar 2025 20:30:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.75
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743193845; cv=fail; b=WNs+sK40r5lkKNf5yvjWaWV148Gd1WyAojXv3C94TiLWEi7yOPyiWSCjBCtAwJlgZekFSqfTk8rUiAx8qtz8OW6+l1IzjT7LSBspSCO+ao6ka2X4IkATZrSNn0UKpS2vLBsexP/lgY9Lx6LwyPud4iKrYYqFVkf3UV7ULLz0NiY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743193845; c=relaxed/simple;
-	bh=wqOdBdXaRco47GH0IS2eBx5OzmRuzh9iGRnvBa3WG4U=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gVwSM3C8UZZlmiuNuTjQNHQrQC2ac8rit38/1v5T8ziDPqXcRfOq92Kt3WBRoLVhDWTShkvoKU7x3Of3rUxUNW1AQ1RVfRF+5zEEneBKOb50h0tvS5FGonqfyEyAQk4UdVpZyClq8yBS93akeedxRhShRqF2gQOJeTC34mrWfkw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=dUZQ49kq; arc=fail smtp.client-ip=40.107.95.75
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FOUI/Gnz8n2J9vNh9oW3UTrcMpmmf6tYpJSxGDpA/A9dtFdYQ2PhRnudhJG8TdvCTH3wlKoWRaLOdmplnM1LlEp8y3ajWPOGp4ww39JBDHX/EThiMwhBE2wXpXcrge0dzCTpzNIAHF1taRroFIcw+tf7MPMwM+/iykTWXqmyP4UlaTq4oYTblz6HJNE+COE4z1FQprzPpc60wGDPtihM/sTTUVrt97B2qNfhMFjNXeQFrfyDvgzg6AqPxpKBiRZFo1/u9xNImg8rUhNVWLm0HyRyECst54InxIuZA5uAil5GKyhMVKEJJZztRY8xyHOdJVmIJemGs1P/mDBUy2lMLQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=p6c4vrdcUl6OB478viD1C+bFcJJfOLl/5+YYSOUHV14=;
- b=OmZQNqmO4YfjiDuBnR1ecjq9Z7XKSQHjNd4PgU6QQlykytGSoifkuYtTnXhp4lB9QcpBR4OqzUHd3OH3Q0jvFMD4EtywJ9jEuoVyMeN2ojZlnt68bwjUnsiLJ0ZVPLSInb06vF34fFNhv5ArHn1tQBceabEtrpwzbBLqk9S3zkm0nfMQz4NFZOzvKC6noHjMaFys2ni44pgn4utvJ9gjGmE2EGIuoaNj3Nx9Qc+pL/aDrqlH6K5ThEyL3AR3QPxPIAyaC6j9WudHWp5YeK9sR7ccOao5XDI/NcWTa/zwx6CaMLTqRXT5q0Bs+IuHM1wMzA3pe9ZI2Z/2uhBVhpwvww==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=nongnu.org smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=p6c4vrdcUl6OB478viD1C+bFcJJfOLl/5+YYSOUHV14=;
- b=dUZQ49kqsSrLZ8/HMLs4MFNvnA/nKvcz7L3b8byAJ1FEmcl5p7+K4qSjJ/bqDRK0BBRuum05W0eUs3wEI+opk+HxlfJvMnMznbIVoIT6xMiUbzb8gZ7GaQD45E3li1zv4R82A1l7PpU9J82GZSQTEPZVs+U975tbTTagnU9JlXE=
-Received: from SJ0PR05CA0078.namprd05.prod.outlook.com (2603:10b6:a03:332::23)
- by IA1PR12MB6281.namprd12.prod.outlook.com (2603:10b6:208:3e7::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.44; Fri, 28 Mar
- 2025 20:30:39 +0000
-Received: from SJ5PEPF000001F5.namprd05.prod.outlook.com
- (2603:10b6:a03:332:cafe::78) by SJ0PR05CA0078.outlook.office365.com
- (2603:10b6:a03:332::23) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8534.43 via Frontend Transport; Fri,
- 28 Mar 2025 20:30:39 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ5PEPF000001F5.mail.protection.outlook.com (10.167.242.73) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8534.20 via Frontend Transport; Fri, 28 Mar 2025 20:30:39 +0000
-Received: from tlendack-t1.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 28 Mar
- 2025 15:30:38 -0500
-From: Tom Lendacky <thomas.lendacky@amd.com>
-To: <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-CC: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti
-	<mtosatti@redhat.com>, Michael Roth <michael.roth@amd.com>
-Subject: [PATCH] i386/kvm: Prefault memory on page state change
-Date: Fri, 28 Mar 2025 15:30:24 -0500
-Message-ID: <f5411c42340bd2f5c14972551edb4e959995e42b.1743193824.git.thomas.lendacky@amd.com>
-X-Mailer: git-send-email 2.46.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A7211E0E1A
+	for <kvm@vger.kernel.org>; Fri, 28 Mar 2025 21:26:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743197193; cv=none; b=nNr0wWtrS/22FN6iuY/mUQ4RUhYLVQzqdPkMRhpsZNjSSuyeDeewOc7a9Vfh7bOrrEjHDwJsk1KKjrXOLTF+kiZjaZMResomcE+GZZ2d0eEZEiyfrnhbQWsSOT3TViwsGBaCcwWNzRn2Ty/K5WQQwkfz8GIlRvfml1umA87nvsE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743197193; c=relaxed/simple;
+	bh=yecGsCrsQo1B4hn5+/Mj4gFgydWrhHzcrGDbHTeB4/o=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=dy3pd2N8FJY0ck5fhvJB0teMnDJeWQNn7Zp9btXKAQNBuxruH9JjN//4KgXt7ivAUjiCLcldcvoC9gm5BuSe6yMXvA+/yyiRmnrh6UqFdTlOlM9Fxftuu+7kuvKlYctaLEllNkjVx0GNNeN5/IyDOvtMVcnC1ZpKQXddZMJRXWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=29auB3hB; arc=none smtp.client-ip=209.85.221.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
+Received: by mail-vk1-f202.google.com with SMTP id 71dfb90a1353d-523eaf9631eso749893e0c.2
+        for <kvm@vger.kernel.org>; Fri, 28 Mar 2025 14:26:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1743197189; x=1743801989; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=w8m4zXBwsuwd+TpPXsReUYFUJslyYnLsiTdphFGmuAI=;
+        b=29auB3hBnNZwvt2CpP7mpIlJ3yiLPYxnhdknHktsQQP01L9LADwDkTXZLpQdp+4bdC
+         xnKBfiHZj87QEqz244UHmflYnh9TClFQFCjnMONdUWw/3e63JMrgjA0zw3pM0iPZAwNt
+         qMYStrKlodgr+YM5yFEGkAXk0R5pHHZAy39kmxPZlVcaHSN6Hf/tN9jPyf7Xl0Yu58kM
+         yzVn5ZTL1SGs9UVZcQnKHS9Cl+yND0acER7nTgIg549Zm5uz2AyIq/jr/uBvbk/NfNfX
+         dHTklJa2l3mvX2TNt831NOTQSWnwzL1jqMM3BXi32sQFnJ6bcJfAAnNeEf52DXEnDQDI
+         MoaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743197189; x=1743801989;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=w8m4zXBwsuwd+TpPXsReUYFUJslyYnLsiTdphFGmuAI=;
+        b=GUUIcc0PgjJT68aXz39YNZSRpW0Ka4mM759FEOQjOBhxSZjHVisO+ySEPpuVjzJLlx
+         f7CBZFvsv9O848pzumCtnU6rHi8O6nku6obIKVULYIdDe1NULlP43M1+Ia8uo1jJhHPW
+         8m909L0INuTYRv8fxIopj5VKtTPZ4G4+TyP8KPjHZRbi+Rb4PbpD5RAGwi+z8BYAuZXo
+         MXaB/1DwWSGL049E6D0WzSBZsucFULlMrWCE4CFfCAYwnIjBH89l+LPdcR8o5A6LLZaT
+         Hr7UX8dxnIY3gK+zsE1Ok6CtyMSPieHPlyOniAzNQdUCZfmvi8tFp79Mvv++JlMFhAMS
+         CU/w==
+X-Forwarded-Encrypted: i=1; AJvYcCXTxDj3hKGzm285aPWFlVnLEbdtGRo1UpzJEpis11QFEF5z/34WUpnd5eFQZ8f6pDlG/Uw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHII/p+/l8ZZdIRCSkeOyVoylbB84ROuxCtkKNlrHuyeRoz3Aw
+	LNDTnQqCrp/aGAONSRQwXdPEQw2m1oSLY1Sx77vV0Q4T5GUD4UyzvGw27+qZZahxYn3gn9MSVRe
+	AmAOu1KMZMdGrHUhz4A==
+X-Google-Smtp-Source: AGHT+IHivVsC++z1BFup0tqwkOd7GYrq8moTlRg/GpRhWDoE3Ghyz4O+IMFvuK9BuVDldT8TyVBFOBtgde1ZgIOF
+X-Received: from vkbfs2.prod.google.com ([2002:a05:6122:3b82:b0:523:87b6:c79a])
+ (user=jthoughton job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6122:328c:b0:523:dd87:fe86 with SMTP id 71dfb90a1353d-5261d46ad97mr1034796e0c.6.1743197189310;
+ Fri, 28 Mar 2025 14:26:29 -0700 (PDT)
+Date: Fri, 28 Mar 2025 21:26:27 +0000
+In-Reply-To: <c04233d3c35e2bad5a864ab72d0f55b3919100f3.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001F5:EE_|IA1PR12MB6281:EE_
-X-MS-Office365-Filtering-Correlation-Id: 46dc4762-d35a-4257-e2fc-08dd6e37677a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|34020700016|36860700013|376014|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?fujIVgKifcK/hYpirgO9r5Qx8jCY542/EABFns/R2gELiKkFfVBGTIu6ZtLN?=
- =?us-ascii?Q?QpwoHf8a43SdAEaIxgKG6bBOKOnR/1kqXmmW3gX+5kTBvGK5uiIIH7Dj5dhL?=
- =?us-ascii?Q?6FYx30efK75llMwYHNwh2gX/vzF6KQfXWcmEh0l4cFdt6tIA8i7fy+ie+Jrn?=
- =?us-ascii?Q?7izg0BSHTlPL957pBtWMb0V9w++GnbtIlh2ad0mYzLZV0Ca60g8bKiskPHhi?=
- =?us-ascii?Q?87B6x1OoZmf/Km387Au3BnxTcgZJE1opeUiaVaduDCtIhimUjcmk1cVAmvKN?=
- =?us-ascii?Q?6kQgcVou5/SGi32RYhDBlT7NwAog55FwS5yXQYPJIh4oLhXx3lBlbrDubQ3+?=
- =?us-ascii?Q?FVXfjgNOIa6/S+Bd1Fo85p0b6XRHNDccSTSXukUVKtGoVYfKTxvd+xB00KNr?=
- =?us-ascii?Q?mqp1sPi4kBHdMeUWMjOtRdjYV848AsmUOC0y3WNaPdwsYbx2qZaOkZDvDpmJ?=
- =?us-ascii?Q?GY2mrqolCj81dezu1+LLgdIdTlogTxFUCC1pku1xxE51fkN/CDNTzM+U3uwy?=
- =?us-ascii?Q?A/oRYGInuV8DjGzZ51IzFSuo5zb6T5Lt2+1QIRAjfy+tmk42NhU35THMxvfo?=
- =?us-ascii?Q?60oX3z1SFseJ5oj84GNzY5GjRkYyP1pAaTi27v7BpE0pxRpoDwRtHi6++8KY?=
- =?us-ascii?Q?l73bmIg1LLH3RcX0qdbNRNn6cGdc4goFj/ZIyhOey+jrF9rYPkIIN5XWDs9r?=
- =?us-ascii?Q?2aYRWPtvagQsBWx74BmdzTUSYMXR4jhXnLIbg+YJsvR/cYSCaze86yBXqKJz?=
- =?us-ascii?Q?CQWIfBIwFE9neYxy2w8gNFkmcOsdw2mERJSvwOOpAh52NAOTPj/BUM3ajTTL?=
- =?us-ascii?Q?SD0FsDlM0624LgAeydq9a3fGKRugFA46F7hziLmuthSMEy7E6Scnr7RFF1PG?=
- =?us-ascii?Q?n8tLmq6GNLOTabq+mMpbEFrwTuoyw4xWIWO7rmCZ/wVBbscf2n4YgeA9gb7R?=
- =?us-ascii?Q?2VeAt+m5SJiJA7RZwhYPdcJI6vaYDxy9qwY9XiXFFF5VDOyZSuYDwpTIGfRS?=
- =?us-ascii?Q?oCDlcWKUMtv7viHOiASqqGob7FPZEi1jtBuPTnwHc9PbEv2P+3cv00ZhkjC7?=
- =?us-ascii?Q?XCc+zpoJmauJl3NR4IRWfxISNPfmrr3k5CFMbwCLyXkc/Qq6TfrpbZ+U+IcI?=
- =?us-ascii?Q?SwmyPyD0NJTlqYGJSnt7AU5w6ufxCLtEHeURAJvU/AzhcdGgMhlpKskECQuQ?=
- =?us-ascii?Q?5+SNqCYKzD8TA/+Mp7cNhG29NmglPZLMiTqxccqdduTocfSVbyB3MlMT47/E?=
- =?us-ascii?Q?oWogZXA133Aj7tmm6g/kXx45MIb7sEvdyBEFV0UBWrNDsDE7T01MFHKAVDZ9?=
- =?us-ascii?Q?bO5eKSkJ+8/BHjov6Zkk4ECZM1O/VyjxM6OYAg2ZMew1ILm4Y7DwSMWmx00n?=
- =?us-ascii?Q?am0RQ82W7wRpDDL9IfJmMXTK93eoVyA+ez/sy3Ovc/qqLXKtVX8wkwYDquzV?=
- =?us-ascii?Q?HtMTjXhNwO+r6XDHYFBdVxOwfzE6ax1HeY0ht94wDYxOwNNVXPfcUw=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(34020700016)(36860700013)(376014)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Mar 2025 20:30:39.3435
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 46dc4762-d35a-4257-e2fc-08dd6e37677a
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001F5.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6281
+Mime-Version: 1.0
+References: <c04233d3c35e2bad5a864ab72d0f55b3919100f3.camel@redhat.com>
+X-Mailer: git-send-email 2.49.0.472.ge94155a9ec-goog
+Message-ID: <20250328212628.2235898-1-jthoughton@google.com>
+Subject: Re: [PATCH 2/5] KVM: selftests: access_tracking_perf_test: Add option
+ to skip the sanity check
+From: James Houghton <jthoughton@google.com>
+To: mlevitsk@redhat.com
+Cc: axelrasmussen@google.com, cgroups@vger.kernel.org, hannes@cmpxchg.org, 
+	jthoughton@google.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	mkoutny@suse.com, seanjc@google.com, tj@kernel.org, yuzhao@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-A page state change is typically followed by an access of the page(s) and
-results in another VMEXIT in order to map the page into the nested page
-table. Depending on the size of page state change request, this can
-generate a number of additional VMEXITs. For example, under SNP, when
-Linux is utilizing lazy memory acceptance, memory is typically accepted in
-4M chunks. A page state change request is submitted to mark the pages as
-private, followed by validation of the memory. Since the guest_memfd
-currently only supports 4K pages, each page validation will result in
-VMEXIT to map the page, resulting in 1024 additional exits.
+On Fri, Mar 28, 2025 at 12:32=E2=80=AFPM Maxim Levitsky <mlevitsk@redhat.co=
+m> wrote:
+>
+> On Thu, 2025-03-27 at 01:23 +0000, James Houghton wrote:
+> > From: Maxim Levitsky <mlevitsk@redhat.com>
+> >
+> > Add an option to skip sanity check of number of still idle pages,
+> > and set it by default to skip, in case hypervisor or NUMA balancing
+> > is detected.
+> >
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > Co-developed-by: James Houghton <jthoughton@google.com>
+> > Signed-off-by: James Houghton <jthoughton@google.com>
+> > ---
+> > =C2=A0.../selftests/kvm/access_tracking_perf_test.c | 61 ++++++++++++++=
+++---
+> > =C2=A0.../testing/selftests/kvm/include/test_util.h | =C2=A01 +
+> > =C2=A0tools/testing/selftests/kvm/lib/test_util.c =C2=A0 | =C2=A07 +++
+> > =C2=A03 files changed, 60 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/=
+tools/testing/selftests/kvm/access_tracking_perf_test.c
+> > index 447e619cf856e..0e594883ec13e 100644
+> > --- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> > +++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> > @@ -65,6 +65,16 @@ static int vcpu_last_completed_iteration[KVM_MAX_VCP=
+US];
+> > =C2=A0/* Whether to overlap the regions of memory vCPUs access. */
+> > =C2=A0static bool overlap_memory_access;
+> >=20
+> > +/*
+> > + * If the test should only warn if there are too many idle pages (i.e.=
+, it is
+> > + * expected).
+> > + * -1: Not yet set.
+> > + * =C2=A00: We do not expect too many idle pages, so FAIL if too many =
+idle pages.
+> > + * =C2=A01: Having too many idle pages is expected, so merely print a =
+warning if
+> > + * =C2=A0 =C2=A0 too many idle pages are found.
+> > + */
+> > +static int idle_pages_warn_only =3D -1;
+> > +
+> > =C2=A0struct test_params {
+> > =C2=A0 =C2=A0 =C2=A0 /* The backing source for the region of memory. */
+> > =C2=A0 =C2=A0 =C2=A0 enum vm_mem_backing_src_type backing_src;
+> > @@ -177,18 +187,12 @@ static void mark_vcpu_memory_idle(struct kvm_vm *=
+vm,
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0* arbitrary; high enough that we ensure most=
+ memory access went through
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0* access tracking but low enough as to not m=
+ake the test too brittle
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0* over time and across architectures.
+> > - =C2=A0 =C2=A0 =C2=A0*
+> > - =C2=A0 =C2=A0 =C2=A0* When running the guest as a nested VM, "warn" i=
+nstead of asserting
+> > - =C2=A0 =C2=A0 =C2=A0* as the TLB size is effectively unlimited and th=
+e KVM doesn't
+> > - =C2=A0 =C2=A0 =C2=A0* explicitly flush the TLB when aging SPTEs. =C2=
+=A0As a result, more pages
+> > - =C2=A0 =C2=A0 =C2=A0* are cached and the guest won't see the "idle" b=
+it cleared.
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0*/
+> > =C2=A0 =C2=A0 =C2=A0 if (still_idle >=3D pages / 10) {
+> > -#ifdef __x86_64__
+> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 TEST_ASSERT(this_cpu_has(X8=
+6_FEATURE_HYPERVISOR),
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 TEST_ASSERT(idle_pages_warn=
+_only,
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 "vCPU%d: Too many pages still idle (%lu out of %lu)",
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 vcpu_idx, still_idle, pages);
+> > -#endif
+> > +
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 printf("WARNING: vCPU%=
+d: Too many pages still idle (%lu out of %lu), "
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0"this will affect performance results.\n",
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0vcpu_idx, still_idle, pages);
+> > @@ -328,6 +332,31 @@ static void run_test(enum vm_guest_mode mode, void=
+ *arg)
+> > =C2=A0 =C2=A0 =C2=A0 memstress_destroy_vm(vm);
+> > =C2=A0}
+> >=20
+> > +static int access_tracking_unreliable(void)
+> > +{
+> > +#ifdef __x86_64__
+> > + =C2=A0 =C2=A0 /*
+> > + =C2=A0 =C2=A0 =C2=A0* When running nested, the TLB size is effectivel=
+y unlimited and the
+> > + =C2=A0 =C2=A0 =C2=A0* KVM doesn't explicitly flush the TLB when aging=
+ SPTEs. =C2=A0As a result,
+> > + =C2=A0 =C2=A0 =C2=A0* more pages are cached and the guest won't see t=
+he "idle" bit cleared.
+> > + =C2=A0 =C2=A0 =C2=A0*/
+> Tiny nitpick: nested on KVM, because on other hypervisors it might work d=
+ifferently,
+> but overall most of them probably suffer from the same problem,
+> so its probably better to say something like that:
+>
+> 'When running nested, the TLB size might be effectively unlimited,
+> for example this is the case when running on top of KVM L0'
 
-When performing a page state change, invoke KVM_PRE_FAULT_MEMORY for the
-size of the page state change in order to pre-map the pages and avoid the
-additional VMEXITs. This helps speed up boot times.
+Added this clarification (see below), thanks!
 
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
----
- accel/kvm/kvm-all.c   |  2 ++
- include/system/kvm.h  |  1 +
- target/i386/kvm/kvm.c | 31 ++++++++++++++++++++++++++-----
- 3 files changed, 29 insertions(+), 5 deletions(-)
+This wording was left as-is from before, but I agree that it could be bette=
+r.
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index f89568bfa3..0cd487cea7 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -93,6 +93,7 @@ bool kvm_allowed;
- bool kvm_readonly_mem_allowed;
- bool kvm_vm_attributes_allowed;
- bool kvm_msi_use_devid;
-+bool kvm_pre_fault_memory_supported;
- static bool kvm_has_guest_debug;
- static int kvm_sstep_flags;
- static bool kvm_immediate_exit;
-@@ -2732,6 +2733,7 @@ static int kvm_init(MachineState *ms)
-         kvm_check_extension(s, KVM_CAP_GUEST_MEMFD) &&
-         kvm_check_extension(s, KVM_CAP_USER_MEMORY2) &&
-         (kvm_supported_memory_attributes & KVM_MEMORY_ATTRIBUTE_PRIVATE);
-+    kvm_pre_fault_memory_supported = kvm_vm_check_extension(s, KVM_CAP_PRE_FAULT_MEMORY);
- 
-     if (s->kernel_irqchip_split == ON_OFF_AUTO_AUTO) {
-         s->kernel_irqchip_split = mc->default_kernel_irqchip_split ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
-diff --git a/include/system/kvm.h b/include/system/kvm.h
-index ab17c09a55..492ea8a383 100644
---- a/include/system/kvm.h
-+++ b/include/system/kvm.h
-@@ -42,6 +42,7 @@ extern bool kvm_gsi_routing_allowed;
- extern bool kvm_gsi_direct_mapping;
- extern bool kvm_readonly_mem_allowed;
- extern bool kvm_msi_use_devid;
-+extern bool kvm_pre_fault_memory_supported;
- 
- #define kvm_enabled()           (kvm_allowed)
- /**
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 6c749d4ee8..7c39d30c5f 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -5999,9 +5999,11 @@ static bool host_supports_vmx(void)
-  * because private/shared page tracking is already provided through other
-  * means, these 2 use-cases should be treated as being mutually-exclusive.
-  */
--static int kvm_handle_hc_map_gpa_range(struct kvm_run *run)
-+static int kvm_handle_hc_map_gpa_range(X86CPU *cpu, struct kvm_run *run)
+>
+>
+> > + =C2=A0 =C2=A0 if (this_cpu_has(X86_FEATURE_HYPERVISOR)) {
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 puts("Skipping idle page co=
+unt sanity check, because the test is run nested");
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return 1;
+> > + =C2=A0 =C2=A0 }
+> > +#endif
+> > + =C2=A0 =C2=A0 /*
+> > + =C2=A0 =C2=A0 =C2=A0* When NUMA balancing is enabled, guest memory ca=
+n be mapped
+> > + =C2=A0 =C2=A0 =C2=A0* PROT_NONE, and the Accessed bits won't be queri=
+able.
+>
+> Tiny nitpick: the accessed bit in this case are lost, because KVM no long=
+er propagates
+> it from secondary to primary paging, and the secondary mapping might be l=
+ost due to zapping,
+> and the biggest offender of this is NUMA balancing.
+
+Reworded this bit. The current wording is indeed misleading.
+
+> > + =C2=A0 =C2=A0 =C2=A0*/
+> > + =C2=A0 =C2=A0 if (is_numa_balancing_enabled()) {
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 puts("Skipping idle page co=
+unt sanity check, because NUMA balancing is enabled");
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return 1;
+> > + =C2=A0 =C2=A0 }
+> > +
+> > + =C2=A0 =C2=A0 return 0;
+> > +}
+>
+> Very good idea of extracting this logic into a function and documenting i=
+t.
+
+:)
+
+> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+
+Thanks, though I've already included your Signed-off-by. I'll just keep you=
+r
+Signed-off-by and From:.
+
+I'm applying the following diff for the next version:
+
+diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tool=
+s/testing/selftests/kvm/access_tracking_perf_test.c
+index 0e594883ec13e..1770998c7675b 100644
+--- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
++++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+@@ -336,9 +336,10 @@ static int access_tracking_unreliable(void)
  {
-+    struct kvm_pre_fault_memory mem;
-     uint64_t gpa, size, attributes;
-+    int ret;
- 
-     if (!machine_require_guest_memfd(current_machine))
-         return -EINVAL;
-@@ -6012,13 +6014,32 @@ static int kvm_handle_hc_map_gpa_range(struct kvm_run *run)
- 
-     trace_kvm_hc_map_gpa_range(gpa, size, attributes, run->hypercall.flags);
- 
--    return kvm_convert_memory(gpa, size, attributes & KVM_MAP_GPA_RANGE_ENCRYPTED);
-+    ret = kvm_convert_memory(gpa, size, attributes & KVM_MAP_GPA_RANGE_ENCRYPTED);
-+    if (ret || !kvm_pre_fault_memory_supported) {
-+        return ret;
-+    }
-+
-+    /*
-+     * Opportunistically pre-fault memory in. Failures are ignored so that any
-+     * errors in faulting in the memory will get captured in KVM page fault
-+     * path when the guest first accesses the page.
-+     */
-+    memset(&mem, 0, sizeof(mem));
-+    mem.gpa = gpa;
-+    mem.size = size;
-+    while (mem.size) {
-+        if (kvm_vcpu_ioctl(CPU(cpu), KVM_PRE_FAULT_MEMORY, &mem)) {
-+            break;
-+        }
-+    }
-+
-+    return 0;
- }
- 
--static int kvm_handle_hypercall(struct kvm_run *run)
-+static int kvm_handle_hypercall(X86CPU *cpu, struct kvm_run *run)
- {
-     if (run->hypercall.nr == KVM_HC_MAP_GPA_RANGE)
--        return kvm_handle_hc_map_gpa_range(run);
-+        return kvm_handle_hc_map_gpa_range(cpu, run);
- 
-     return -EINVAL;
- }
-@@ -6118,7 +6139,7 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
-         break;
+ #ifdef __x86_64__
+ 	/*
+-	 * When running nested, the TLB size is effectively unlimited and the
+-	 * KVM doesn't explicitly flush the TLB when aging SPTEs.  As a result,
+-	 * more pages are cached and the guest won't see the "idle" bit cleared.
++	 * When running nested, the TLB size may be effectively unlimited (for
++	 * example, this is the case when running on KVM L0), and KVM doesn't
++	 * explicitly flush the TLB when aging SPTEs.  As a result, more pages
++	 * are cached and the guest won't see the "idle" bit cleared.
+ 	 */
+ 	if (this_cpu_has(X86_FEATURE_HYPERVISOR)) {
+ 		puts("Skipping idle page count sanity check, because the test is run nes=
+ted");
+@@ -346,8 +347,8 @@ static int access_tracking_unreliable(void)
+ 	}
  #endif
-     case KVM_EXIT_HYPERCALL:
--        ret = kvm_handle_hypercall(run);
-+        ret = kvm_handle_hypercall(cpu, run);
-         break;
-     default:
-         fprintf(stderr, "KVM: unknown exit reason %d\n", run->exit_reason);
-
-base-commit: 0f15892acaf3f50ecc20c6dad4b3ebdd701aa93e
--- 
-2.46.2
-
+ 	/*
+-	 * When NUMA balancing is enabled, guest memory can be mapped
+-	 * PROT_NONE, and the Accessed bits won't be queriable.
++	 * When NUMA balancing is enabled, guest memory will be unmapped to get
++	 * NUMA faults, dropping the Accessed bits.
+ 	 */
+ 	if (is_numa_balancing_enabled()) {
+ 		puts("Skipping idle page count sanity check, because NUMA balancing is e=
+nabled");
 
