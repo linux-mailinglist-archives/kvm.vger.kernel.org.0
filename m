@@ -1,67 +1,66 @@
-Return-Path: <kvm+bounces-42216-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42217-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59591A7549B
-	for <lists+kvm@lfdr.de>; Sat, 29 Mar 2025 08:28:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9D4CA7551D
+	for <lists+kvm@lfdr.de>; Sat, 29 Mar 2025 09:20:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B58D1895148
-	for <lists+kvm@lfdr.de>; Sat, 29 Mar 2025 07:28:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC0561893C5B
+	for <lists+kvm@lfdr.de>; Sat, 29 Mar 2025 08:20:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6823217BCE;
-	Sat, 29 Mar 2025 07:28:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36782198A08;
+	Sat, 29 Mar 2025 08:20:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="QCZYPfrT"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="QAVmXVor"
 X-Original-To: kvm@vger.kernel.org
 Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50761DDC5
-	for <kvm@vger.kernel.org>; Sat, 29 Mar 2025 07:28:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 938FA35972;
+	Sat, 29 Mar 2025 08:20:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743233301; cv=none; b=PqlvdA0RQDPwTxM67vcCXu5xmuRlRdIdrqB11AMoWAwhIPs0JWoWEPPCINm/5crAqqIWTmTMlazR3UNCWFCFSklT5BXUzcm5kTeCi6/VpOpzVJeX0so5s8JIqpfy3AtcU6u/MULrKMDs15C04CD5Y5/LuyXeLvp5f+WDnbkcsVI=
+	t=1743236439; cv=none; b=U2GfejXsLeHZaqAMghrU9q8Q55zcVbXGgZ5O44Q79f75+7KJ2oSVSNZTcV2O8gsyESM1lSuXQOY+KziQSJCeNnqZn+AFQwUXlbyPlbaFagjYIZt6cNuGii1ZZYL3vrwuyfmgrHzl6t+KiN9Srv81Vog+TRQnaywv7PcTRubyLUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743233301; c=relaxed/simple;
-	bh=zqRQRvMqP58GGF27+w0jE5jRAVowyr7RhMyHFpDNVVc=;
+	s=arc-20240116; t=1743236439; c=relaxed/simple;
+	bh=y0SeCUL36wrOR7V4n+9xCfJTAjKCoOuyD7AomtkeFi4=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=e3HmYWyXhl3jpzEqRngv2YdhCFu9Nu/Mn8jf1edmE7DH1P9CItr0hl2QZ35k74vRbvewevv+jS1wdCy6R5ZDdaeW3wLJJ5rqYChXgF3eBGx0BsAWM6GAMBhwTd/uF1WqIniaCYvuzNTx0qpRfZecbSAwluPYqKUR8GTeR75eZv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=QCZYPfrT; arc=none smtp.client-ip=90.155.92.199
+	 Content-Type:MIME-Version; b=pRgMSiDnt5XS/pZPjVPQyPfnwjal5CWig8CaYV9fIcxjwEUnHvmrbwQxbWTCYThK6D7qGyNjwvIXv3wBWWhptEZMnzoToY6jQ3cqxXS78rm1LKkp+k0nL2PgHK7H9KBnQuqOFfkoRXWjLAuVknH2p4nEEKLrY1JL7an2+cOupsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=QAVmXVor; arc=none smtp.client-ip=90.155.92.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
 	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=zqRQRvMqP58GGF27+w0jE5jRAVowyr7RhMyHFpDNVVc=; b=QCZYPfrTmJC1L40gJOHb3mhIMy
-	/OFPSVEY3XPCzol6EsuV3ddhGUEf59B/mpcEQiY0RgxL6onoJagGoImOgat/0WNXmSLnrw+gQvWiy
-	cSYU+bO5DLRJbMeXojfPECrnjtRBzj+0F0R6eos9IdQrInONm/Tj6Lz+rvJum/bBpRfHfnvemMHUw
-	n2s8JNelP2uT/SZpouu53FkPfDLXnhmt1yZaVLtr9rkfMTIH1MPeeVPzIkIGtkhp0ybV40aSq2YY2
-	dy38wrHyfwSqanHIJOiRFZxR/4OZ/q/b7DMzE8/MVGRJTMB3XtH9MRdYCzl8zU0+PH2Gg6dU0FzVp
-	NSJ/rV0w==;
+	bh=y0SeCUL36wrOR7V4n+9xCfJTAjKCoOuyD7AomtkeFi4=; b=QAVmXVor+lphg6/xt8xVfR847Y
+	TLDVCIxR6+RsuzYf8Y54wdObPh3ORL9w7t0/4OMNfH6eVZHVLxpmuIIZ/NEm2LoIrNm0R4s8BZaY4
+	Ns052O2iNKi/ja7sDgvP5hNXrAVXFVm6HEXIRepyZINlgd2XlLFwfNGVJq2UjVTna+OQ+4BMfzpjM
+	8zuBIT5QO1c8y97GOjulERbPtJaB+UCGaC6PnYUmo/uyjzcX2mSymtoQ/W2QjNN91FL0re3AHmgkf
+	RXS+AKJ3Y7yxacK1oNlq4/CH00ZTxI0tZsBJ7JDt0uoOxVjxJI1H9nd9T2b3LYDPWrpQ+LLXmgr12
+	vDNwfvBg==;
 Received: from [172.31.31.145] (helo=u09cd745991455d.lumleys.internal)
 	by desiato.infradead.org with esmtpsa (Exim 4.98.1 #2 (Red Hat Linux))
-	id 1tyQbz-00000006Ih3-4AXv;
-	Sat, 29 Mar 2025 07:28:12 +0000
-Message-ID: <1512f2704fe0a3acc6e673d69e1173543f920608.camel@infradead.org>
-Subject: Re: [PATCH 1/2] i386/xen: Move KVM_XEN_HVM_CONFIG ioctl to
- kvm_xen_init_vcpu()
+	id 1tyRQe-00000006J2m-4AC4;
+	Sat, 29 Mar 2025 08:20:34 +0000
+Message-ID: <eaa33f756bc2e66ca193180a9847ee43fbdaa8ad.camel@infradead.org>
+Subject: Re: pvclock time drifting backward
 From: David Woodhouse <dwmw2@infradead.org>
-To: qemu-devel@nongnu.org
-Cc: Stefano Stabellini <sstabellini@kernel.org>, Anthony PERARD
- <anthony@xenproject.org>, Paul Durrant <paul@xen.org>, "Edgar E. Iglesias"
- <edgar.iglesias@gmail.com>, Kevin Wolf <kwolf@redhat.com>, Hanna Reitz
- <hreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti
- <mtosatti@redhat.com>, xen-devel@lists.xenproject.org,
- qemu-block@nongnu.org,  kvm@vger.kernel.org, Sean Christopherson
- <seanjc@google.com>
-Date: Sat, 29 Mar 2025 07:28:11 +0000
-In-Reply-To: <20250207143724.30792-1-dwmw2@infradead.org>
-References: <20250207143724.30792-1-dwmw2@infradead.org>
+To: Ming Lin <minggr@gmail.com>
+Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, Paolo
+ Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org
+Date: Sat, 29 Mar 2025 08:20:32 +0000
+In-Reply-To: <CAF1ivSaEz0brSGfpv08oKnTjT=h99hs_G0ju0UGPwzoLvOSV8A@mail.gmail.com>
+References: <facda6e2-3655-4f2c-9013-ebb18d0e6972@gmail.com>
+	 <Z-HiqG_uk0-f6Ry1@google.com>
+	 <4eda127551d240b9e19c1eced16ad6f6ed5c2f80.camel@infradead.org>
+	 <CAF1ivSbVZVSibZq+=VaDrETP_hEurCyyftCCaDEMa5r7HAV67A@mail.gmail.com>
+	 <830d2e06c064e24bd143650ce97522c2bc470a90.camel@infradead.org>
+	 <CAF1ivSaEz0brSGfpv08oKnTjT=h99hs_G0ju0UGPwzoLvOSV8A@mail.gmail.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-NVTjRxKb98yb4LXt36VZ"
+	boundary="=-De4fXDMSM33XN+Rcrt85"
 User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -72,26 +71,59 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-NVTjRxKb98yb4LXt36VZ
+--=-De4fXDMSM33XN+Rcrt85
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2025-02-07 at 14:37 +0000, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
+On Fri, 2025-03-28 at 11:30 -0700, Ming Lin wrote:
 >=20
-> At the time kvm_xen_init() is called, hyperv_enabled() doesn't yet work, =
-so
-> the correct MSR index to use for the hypercall page isn't known.
+> >=20
+> > Is this live migration from one VMM to another on the same host, so we
+> > don't have to worry about the accuracy of the TSC itself? The guest TSC
+> > remains consistent? And presumably your host does *have* a stable TSC,
+> > and the guest's test case really ought to be checking the
+> > PVCLOCK_TSC_STABLE_BIT to make sure of that?
 >=20
-> Rather than setting it to the default and then shifting it later for the
-> Hyper-V case with a confusing second call to kvm_init_xen(), just do it
-> once in kvm_xen_init_vcpu().
->=20
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> The live migration is from one VMM to another on a remote host, and we
+> have also observed the same issue during live upgrades on the same host.
 
-Ping?
+Moving to a remote host also requires that you get the guest TSC to be
+reasonably synchronised on the destination. Which is another litany of
+sadness, especially if you have TSC scaling in the mix. Or even if your
+two "identical" hosts calculated a slightly different TSC frequency
+when they measured it at first boot.
 
---=-NVTjRxKb98yb4LXt36VZ
+In that latter case, the mul/scale factors advertised to the guest in
+the pvclock will be *slightly* different on the new host. Your test in
+the guest would then fail if it requires that the pvclock be
+*identical*. The actual criterion is that the result should be
+identical at the time of the live migration (when the TSC frequency
+effectively changes).
+
+The code currently requires that the old and new TSC frequencies are
+within =C2=B11kHz of each other.
+
+> >=20
+> > If all the above assumptions/interpretations of mine are true, I still
+> > think it's expected that your clock will jump on live migration
+> > *unless* you also taught your VMM to use the new KVM_[GS]ET_CLOCK_GUEST
+> > ioctls which were added in my patch series, specifically to preserve
+> > the mathematical relationship between guest TSC and kvmclock across a
+> > migration.
+> >=20
+>=20
+> We are planning to test the patches on a 6.9 kernel (where they can be
+> applied cleanly) and modify the live upgrade/migration code to use the ne=
+w
+> KVM_[GS]ET_CLOCK_GUEST ioctls.
+>=20
+> BTW, what is the plan for upstreaming these patches?
+
+I need to find the time to rebase, rework and retest them. You're doing
+some of the testing and increasing the motivation... I'll see if I can
+get it done in the next week or three.
+
+--=-De4fXDMSM33XN+Rcrt85
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -170,22 +202,22 @@ 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
-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
+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
-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
+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
 
 
---=-NVTjRxKb98yb4LXt36VZ--
+--=-De4fXDMSM33XN+Rcrt85--
 
