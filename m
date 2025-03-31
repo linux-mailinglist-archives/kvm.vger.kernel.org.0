@@ -1,157 +1,223 @@
-Return-Path: <kvm+bounces-42229-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42230-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C891EA75DA6
-	for <lists+kvm@lfdr.de>; Mon, 31 Mar 2025 03:36:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C3065A75EAF
+	for <lists+kvm@lfdr.de>; Mon, 31 Mar 2025 07:57:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA272188A507
-	for <lists+kvm@lfdr.de>; Mon, 31 Mar 2025 01:36:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC9CB1888925
+	for <lists+kvm@lfdr.de>; Mon, 31 Mar 2025 05:57:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF8EB82866;
-	Mon, 31 Mar 2025 01:36:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="IC5BxK1l"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E4A316D4E6;
+	Mon, 31 Mar 2025 05:56:54 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from mx1.zhaoxin.com (MX1.ZHAOXIN.COM [210.0.225.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6081F6A33B
-	for <kvm@vger.kernel.org>; Mon, 31 Mar 2025 01:36:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3731258A
+	for <kvm@vger.kernel.org>; Mon, 31 Mar 2025 05:56:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.0.225.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743384990; cv=none; b=NqbT+6HUoqZZKm7T8NJJzGr3cuAwb4aWlb52P+DMRevUIgn6Ka1Splt4MllFAPb0pHA2/vm7jnFDgxpnFCLwk5CKmVbJF3ObNJrJTyjDU2ZFedGfbfZKAWsuiOsOXVMSx7SUUsLQeeXB3G7F89Egv9t41CoCYoXFhQL78pahJY0=
+	t=1743400614; cv=none; b=lMBydLtI7ojwn/tW0OETUv/aH6wtglWnTbifKc/xsjT138bRYb1ViOKlzpPIb131yqdZke67Ow1vw2nXj6Wksp59N62Na6oY0NXcfz8lm7fKA9jXvE3s5P2nAT3nOCQcI0+P6QaT7YqamLa09NI/GussiqqA9+Ab3Ix5A8JNdxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743384990; c=relaxed/simple;
-	bh=Mc2S/QOOjF/HnI1POBii2WiJWciXB3NdkfArDcHJ/s4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DokWbicBFdPQxqoGruo+rPxp35HJf60I3LW4vYR7vWmaDZWX87yxO+cyclU3uP9b++MNeISfqcsG8CpCn+1T2mdgU+ws+JrlJXoV4GcR1mb1ButKd0l866iHpda51rKapOxKZuD4QV4QIM0N5xKu+fSBgQ2yCdcoHC3dQnB++Qw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=IC5BxK1l; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52UMFPsk029810;
-	Mon, 31 Mar 2025 01:35:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2023-11-20; bh=ks9XS
-	JOP65MEaXjpEgcJryGfRqzAJHRu8wLXEsmLCVo=; b=IC5BxK1lZARMYlYl1rDH3
-	h2926dV5oK/Tj5EOtlUemh3+LwOD7HtEQepErA+qS41eKLpYyiiVjx2bSlvKaFTc
-	E6D17k4ZBjl3dJCJJnjZgMyaxg41QD3KhNvPBK6id/UzpZnFdg2TP/b6SY3WZT29
-	uSh2oUe0kQDki1a2mSQQqUYJ6Bags6iJ0umliIx+UfYbtDNq1sKnedYkQGLb3Tbg
-	aP5pmtXLu4LQLHzpQS7f/T7gT0sYosjbZA+ToED/9OQP+No8srtuinmppZ81B/Mr
-	Pb1mD12Fp0XztPM43dpCDOy5evAixGTyeHpURIcv8LgqNrVrh1hkL1gZJ1DbGlx3
-	A==
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 45p8wcaewa-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 31 Mar 2025 01:35:06 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 52V1BJJo033642;
-	Mon, 31 Mar 2025 01:35:05 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 45p7a7ddvf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 31 Mar 2025 01:35:05 +0000
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 52V1YfxZ015214;
-	Mon, 31 Mar 2025 01:35:03 GMT
-Received: from localhost.localdomain (ca-dev80.us.oracle.com [10.211.9.80])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 45p7a7ddms-11;
-	Mon, 31 Mar 2025 01:35:03 +0000
-From: Dongli Zhang <dongli.zhang@oracle.com>
-To: qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-arm@nongnu.org,
-        qemu-ppc@nongnu.org, qemu-riscv@nongnu.org, qemu-s390x@nongnu.org
-Cc: pbonzini@redhat.com, zhao1.liu@intel.com, mtosatti@redhat.com,
-        sandipan.das@amd.com, babu.moger@amd.com, likexu@tencent.com,
-        like.xu.linux@gmail.com, groug@kaod.org, khorenko@virtuozzo.com,
-        alexander.ivanov@virtuozzo.com, den@virtuozzo.com,
-        davydov-max@yandex-team.ru, xiaoyao.li@intel.com,
-        dapeng1.mi@linux.intel.com, joe.jin@oracle.com,
-        peter.maydell@linaro.org, gaosong@loongson.cn, chenhuacai@kernel.org,
-        philmd@linaro.org, aurelien@aurel32.net, jiaxun.yang@flygoat.com,
-        arikalo@gmail.com, npiggin@gmail.com, danielhb413@gmail.com,
-        palmer@dabbelt.com, alistair.francis@wdc.com, liwei1518@gmail.com,
-        zhiwei_liu@linux.alibaba.com, pasic@linux.ibm.com,
-        borntraeger@linux.ibm.com, richard.henderson@linaro.org,
-        david@redhat.com, iii@linux.ibm.com, thuth@redhat.com,
-        flavra@baylibre.com, ewanhai-oc@zhaoxin.com, ewanhai@zhaoxin.com,
-        cobechen@zhaoxin.com, louisqi@zhaoxin.com, liamni@zhaoxin.com,
-        frankzhu@zhaoxin.com, silviazhao@zhaoxin.com
-Subject: [PATCH v3 10/10] target/i386/kvm: don't stop Intel PMU counters
-Date: Sun, 30 Mar 2025 18:32:29 -0700
-Message-ID: <20250331013307.11937-11-dongli.zhang@oracle.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20250331013307.11937-1-dongli.zhang@oracle.com>
-References: <20250331013307.11937-1-dongli.zhang@oracle.com>
+	s=arc-20240116; t=1743400614; c=relaxed/simple;
+	bh=j236MPhWOMjQBUzdR9fdfI8gls63fxeSy89/WIjX99s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=KtsPoQOqOhWd5qz4w33LC91dT2ypXu1qOjOaW+obXOf5W2W9Aem0McBYppC8v6w5cJTbbfsrbcTlbxPtXqu+unmuDfQLPqy9TKx47k6gZhEMOZl7XXBC04bNMXfTXT+nBRzf9HYFYWNxsiavmbHhgsGSzrTTDM4FFQ12vhH8wjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=210.0.225.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
+X-ASG-Debug-ID: 1743400597-086e231f495ce10001-HEqcsx
+Received: from ZXSHMBX1.zhaoxin.com (ZXSHMBX1.zhaoxin.com [10.28.252.163]) by mx1.zhaoxin.com with ESMTP id 4IFvjzZrweWMK5SK (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Mon, 31 Mar 2025 13:56:37 +0800 (CST)
+X-Barracuda-Envelope-From: EwanHai-oc@zhaoxin.com
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.163
+Received: from ZXSHMBX3.zhaoxin.com (10.28.252.165) by ZXSHMBX1.zhaoxin.com
+ (10.28.252.163) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.44; Mon, 31 Mar
+ 2025 13:56:37 +0800
+Received: from ZXSHMBX3.zhaoxin.com ([fe80::8cc5:5bc6:24ec:65f2]) by
+ ZXSHMBX3.zhaoxin.com ([fe80::8cc5:5bc6:24ec:65f2%6]) with mapi id
+ 15.01.2507.044; Mon, 31 Mar 2025 13:56:37 +0800
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.163
+Received: from [192.168.31.91] (10.28.66.62) by zxbjmbx1.zhaoxin.com
+ (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.44; Mon, 31 Mar
+ 2025 11:55:21 +0800
+Message-ID: <e3a64575-ab1f-4b6f-a91d-37a862715742@zhaoxin.com>
+Date: Mon, 31 Mar 2025 11:55:20 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-30_11,2025-03-27_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0
- suspectscore=0 mlxscore=0 malwarescore=0 spamscore=0 bulkscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2502280000 definitions=main-2503310009
-X-Proofpoint-GUID: 37-REWe4adbPewXhfiex0uHxINcpNQyE
-X-Proofpoint-ORIG-GUID: 37-REWe4adbPewXhfiex0uHxINcpNQyE
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 08/10] target/i386/kvm: reset AMD PMU registers during
+ VM reset
+To: Dongli Zhang <dongli.zhang@oracle.com>, <qemu-devel@nongnu.org>,
+	<kvm@vger.kernel.org>, <zhao1.liu@intel.com>
+X-ASG-Orig-Subj: Re: [PATCH v2 08/10] target/i386/kvm: reset AMD PMU registers during
+ VM reset
+CC: <pbonzini@redhat.com>, <mtosatti@redhat.com>, <sandipan.das@amd.com>,
+	<babu.moger@amd.com>, <likexu@tencent.com>, <like.xu.linux@gmail.com>,
+	<zhenyuw@linux.intel.com>, <groug@kaod.org>, <khorenko@virtuozzo.com>,
+	<alexander.ivanov@virtuozzo.com>, <den@virtuozzo.com>,
+	<davydov-max@yandex-team.ru>, <xiaoyao.li@intel.com>,
+	<dapeng1.mi@linux.intel.com>, <joe.jin@oracle.com>, <ewanhai@zhaoxin.com>,
+	<cobechen@zhaoxin.com>, <louisqi@zhaoxin.com>, <liamni@zhaoxin.com>,
+	<frankzhu@zhaoxin.com>, <silviazhao@zhaoxin.com>
+References: <20250302220112.17653-1-dongli.zhang@oracle.com>
+ <20250302220112.17653-9-dongli.zhang@oracle.com>
+ <8a547bf5-bdd4-4a49-883a-02b4aa0cc92c@zhaoxin.com>
+ <84653627-3a20-44fd-8955-a19264bd2348@oracle.com>
+From: ewanhai <ewanhai-oc@zhaoxin.com>
+In-Reply-To: <84653627-3a20-44fd-8955-a19264bd2348@oracle.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
+ zxbjmbx1.zhaoxin.com (10.29.252.163)
+X-Moderation-Data: 3/31/2025 1:56:35 PM
+X-Barracuda-Connect: ZXSHMBX1.zhaoxin.com[10.28.252.163]
+X-Barracuda-Start-Time: 1743400597
+X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
+X-Barracuda-URL: https://10.28.252.35:4443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at zhaoxin.com
+X-Barracuda-Scan-Msg-Size: 5602
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
+X-Barracuda-Spam-Score: -1.61
+X-Barracuda-Spam-Status: No, SCORE=-1.61 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=BSF_SC0_SA085b, TRACK_DBX_001
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.139273
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------------------------
+	0.01 TRACK_DBX_001          Custom rule TRACK_DBX_001
+	0.40 BSF_SC0_SA085b         Custom Rule SA085b
 
-The kvm_put_msrs() sets the MSRs using KVM_SET_MSRS. The x86 KVM processes
-these MSRs one by one in a loop, only saving the config and triggering the
-KVM_REQ_PMU request. This approach does not immediately stop the event
-before updating PMC.
+Hi Dongli,
 
-In additional, PMU MSRs are set only at levels >= KVM_PUT_RESET_STATE,
-excluding runtime. Therefore, updating these MSRs without stopping events
-should be acceptable.
+I noticed you've sent the V3 patchset, but I believe it's more appropriate to
+continue the discussion about the issues you encountered in this thread.
 
-Finally, KVM creates kernel perf events with host mode excluded
-(exclude_host = 1). While the events remain active, they don't increment
-the counter during QEMU vCPU userspace mode.
+On 3/29/25 12:42 AM, Dongli Zhang wrote:
+> The vendor and CPU are different. i.e., if we use Zhaoxin CPU without
+> configuring vendor: "-cpu YongFeng,+pmu \" on Intel KVM.
+>
+> The CPU is Zhaoxin while vendor is still Intel.
+[1] QEMU always sets the vCPU's vendor to match the host's vendor when
+acceleration (KVM or HVF) is enabled(except for users set guest vendor
+with -cpu xx, vendor=xx).
+> The PMU selection is based on vendor, not CPU.
+>
+> [    0.321163] smpboot: CPU0: Intel Zhaoxin YongFeng Processor (family: 0x7,
+> model: 0xb, stepping: 0x3)
+> [    0.321996] Performance Events: generic architected perfmon, Intel PMU driver.
+> [    0.322867] ... version:                2
+> [    0.323738] ... bit width:              48
+> [    0.323864] ... generic registers:      4
+> [    0.324776] ... value mask:             0000ffffffffffff
+> [    0.324864] ... max period:             000000007fffffff
+> [    0.325864] ... fixed-purpose events:   3
+> [    0.326749] ... event mask:             000000070000000f
+>
+> By default, IS_INTEL_CPU() still returns true even we emulate Zhaoxin on Intel KVM.
 
-No Fixed tag is going to be added for the commit 0d89436786b0 ("kvm:
-migrate vPMU state"), because this isn't a bugfix.
+[2] As mentioned in [1], QEMU always sets the vCPU's vendor to match the host's vendor
+when acceleration (KVM or HVF) is enabled. Therefore, if users want to emulate a
+Zhaoxin CPU on an Intel host, the vendor must be set manually.Furthermore, should we display a warning to users who enable both vPMU and KVM acceleration but do not manually set the guest vendor when it differs from the host vendor?
+> I did many efforts, and I could not use Zhaoxin's PMU on Intel hypervisor.
+>
+> According to arch/x86/events/zhaoxin/core.c, the Zhaoxin's PMU is working in
+> limited conditions, especially only when stepping >= 0xe.
+>
+> switch (boot_cpu_data.x86) {
+> case 0x06:
+>      /*
+>       * Support Zhaoxin CPU from ZXC series, exclude Nano series through FMS.
+>       * Nano FMS: Family=6, Model=F, Stepping=[0-A][C-D]
+>       * ZXC FMS: Family=6, Model=F, Stepping=E-F OR Family=6, Model=0x19,
+> Stepping=0-3
+>       */
+>      if ((boot_cpu_data.x86_model == 0x0f && boot_cpu_data.x86_stepping >= 0x0e) ||
+>              boot_cpu_data.x86_model == 0x19) {
+>
+>
+>  From QEMU, the stepping of YongFeng is always 3.
+>
+> 5502         .name = "YongFeng",
+> 5503         .level = 0x1F,
+> 5504         .vendor = CPUID_VENDOR_ZHAOXIN1,
+> 5505         .family = 7,
+> 5506         .model = 11,
+> 5507         .stepping = 3,
+>
+> Therefore, I cannot enable Zhaoxin's PMU on Intel KVM.
+>
+> -cpu YongFeng,vendor="CentaurHauls",+pmu \
+>
+> [    0.253229] smpboot: CPU0: Centaur Zhaoxin YongFeng Processor (family: 0x7,
+> model: 0xb, stepping: 0x3)
+> [    0.254009] Performance Events:
+> [    0.254009] core: Welcome to zhaoxin pmu!
+> [    0.254880] core: Version check pass!
+> [    0.255567] no PMU driver, software events only.
+>
+>
+> It doesn't work on Intel Icelake hypervisor too, even with "host".
+>
+> -cpu host,vendor="CentaurHauls",+pmu \
+>
+> [    0.268434] smpboot: CPU0: Centaur Intel(R) Xeon(R) Gold 6354 CPU @ 3.00GHz
+> (family: 0x6, model: 0x6a, stepping: 0x6)
+> [    0.269237] Performance Events:
+> [    0.269237] core: Welcome to zhaoxin pmu!
+> [    0.270112] core: Version check pass!
+> [    0.270768] no PMU driver, software events only.
+>
+>
+> The PMU never works, although cpuid returns PMU config.
+>
+> [root@vm ~]# cpuid -1 -l 0xa
+> CPU:
+>     Architecture Performance Monitoring Features (0xa):
+>        version ID                               = 0x2 (2)
+>        number of counters per logical processor = 0x8 (8)
+>        bit width of counter                     = 0x30 (48)
+>        length of EBX bit vector                 = 0x8 (8)
+>        core cycle event                         = available
+>        instruction retired event                = available
+>        reference cycles event                   = available
+>        last-level cache ref event               = available
+>        last-level cache miss event              = available
+>        branch inst retired event                = available
+>        branch mispred retired event             = available
+>        top-down slots event                     = available
+> ... ...
+>        number of contiguous fixed counters      = 0x3 (3)
+>        bit width of fixed counters              = 0x30 (48)
+>        anythread deprecation                    = true
+>
+>
+> So far I am not able to use Zhaoxin PMU on Intel hypervisor.
+>
+> Since I don't have Zhaoxin environment, I am not sure about "vice versa".
+>
+> Unless there is more suggestion from Zhao, I may replace is_same_vendor() with
+> vendor_compatible().
+I'm sorry I didn't provide you with enough information about the Zhaoxin PMU.
 
-Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
----
- target/i386/kvm/kvm.c | 9 ---------
- 1 file changed, 9 deletions(-)
+1. I made a mistake in the Zhaoxin YongFeng vCPU model patch. The correct model
+should be 0x5b, but I mistakenly set it to 0xb (11). The mistake happened because
+I overlooked the extended model bits from cpuid[eax=0x1].eax and only used the
+base model. I'll send a fix patch soon.
 
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 4c3908e09e..d9c6c9905e 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -4170,13 +4170,6 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-         }
- 
-         if ((IS_INTEL_CPU(env) || IS_ZHAOXIN_CPU(env)) && pmu_version > 0) {
--            if (pmu_version > 1) {
--                /* Stop the counter.  */
--                kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
--                kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
--            }
--
--            /* Set the counter values.  */
-             for (i = 0; i < num_pmu_fixed_counters; i++) {
-                 kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR0 + i,
-                                   env->msr_fixed_counters[i]);
-@@ -4192,8 +4185,6 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-                                   env->msr_global_status);
-                 kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
-                                   env->msr_global_ovf_ctrl);
--
--                /* Now start the PMU.  */
-                 kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL,
-                                   env->msr_fixed_ctr_ctrl);
-                 kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL,
--- 
-2.39.3
+2. As you can see in zhaoxin_pmu_init() in the Linux kernel, there is no handling
+for CPUs with family 0x7 and model (base + extended) 0x5b. The reason is clear:
+we submitted a patch for zhaoxin_pmu_init() to support YongFeng two years ago
+(https://lore.kernel.org/lkml/20230323024026.823-1-silviazhao-oc@zhaoxin.com/),
+but received no response. We will keep trying to resubmit it.
+
 
 
