@@ -1,71 +1,57 @@
-Return-Path: <kvm+bounces-42251-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42252-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A821A7642C
-	for <lists+kvm@lfdr.de>; Mon, 31 Mar 2025 12:27:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 68CA1A7672B
+	for <lists+kvm@lfdr.de>; Mon, 31 Mar 2025 15:54:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3BD267A4D21
-	for <lists+kvm@lfdr.de>; Mon, 31 Mar 2025 10:25:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 895077A4908
+	for <lists+kvm@lfdr.de>; Mon, 31 Mar 2025 13:53:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 321DA1E0E0C;
-	Mon, 31 Mar 2025 10:26:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EB3B212FAB;
+	Mon, 31 Mar 2025 13:54:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SNKRTAv+"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qi5NsyOH"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F8D51DF26A;
-	Mon, 31 Mar 2025 10:26:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57AA3211A35
+	for <kvm@vger.kernel.org>; Mon, 31 Mar 2025 13:54:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743416799; cv=none; b=J4TLaoF3L0UkFJPKmddp1G75c53k2RrVgKPRaspYzzhwUcJg/f+RQzzCvnjUasq43AGJ+Ahy9cLCSft4Ek/ezYXTRtNtDWYCQmApYMKrWDTznqKcyBJ0eQdL+mdp4V2huVNfNQ+Sm8MLW+widjVdexlbAN8XvvlqQTfq7cUgj+c=
+	t=1743429289; cv=none; b=mircllatV2sRF4jKxoVtvagQgr9pydQtXWvDRkXJu3HQmryENCpwdmZZ8znWQXla0MmM79NwAyAqD+9ExL6Wt0yCfmEDJk9is9vnZnSWJW+dJyRT2XjMBv+jyOdUxPHrTWndzo017N7Zxx1RqrjQK7jZhOnIMy9GarsjXjDxcTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743416799; c=relaxed/simple;
-	bh=4YXZdHVM0TkXA+0kc8GIpKW5NQU7AZ4Je/lg8aqKF/Q=;
+	s=arc-20240116; t=1743429289; c=relaxed/simple;
+	bh=9zUiklNL0MnwE41sFbosKgDp5LV/LyFsB2buYJgA0zM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WWV1iVhFAJ2IW4yyT6mWt+uZS49rdqf9/WN8JSh1ieIDDA2uGVEg52iXXjMkCBqQGBeAXN0V8M0rZPC5IVU1cjTZcYfcQ6G+S5XQFxZeKyjcASeHuHEnlhQOwVD56gmD14sCX6R0OaI6NCzPlBaQeyeDM0IBiWbUP3rSGnjt3as=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SNKRTAv+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C478CC4CEE5;
-	Mon, 31 Mar 2025 10:26:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743416798;
-	bh=4YXZdHVM0TkXA+0kc8GIpKW5NQU7AZ4Je/lg8aqKF/Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SNKRTAv+gMnEVEwVPROIdVIANRJxm8LbYKcIVbFb3ADa4Tkur5F2mIuL95LZ7LZb1
-	 5fqJ0aBp2v5cFupU9A4gdGZiDQ1FWpWF3RCKNziWJG18GDcV6Jku/oKEjoRuxnV9/n
-	 tqlZBxLFrIHJZzvGETM/513c/sebuShZlti7+3NBoNv5JHNxaHW/38O4XPILpzN97I
-	 97iuaFpjHX7UB0m+lxE7N2TRS5XllBFMdKrljOLOTYBow7YWoYoVOY+uLAOAiLaGN5
-	 pBXF5L41ks0BVBoY1cpe8K/TydBaKSrGHdJwYFT4xSUwiCnyQTV/TVlvgKRxOXMEvV
-	 AeHP4P5OJqZDg==
-Date: Mon, 31 Mar 2025 12:26:21 +0200
-From: Ingo Molnar <mingo@kernel.org>
-To: "Xin Li (Intel)" <xin@zytor.com>
-Cc: linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
-	linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
-	linux-edac@vger.kernel.org, kvm@vger.kernel.org,
-	xen-devel@lists.xenproject.org, linux-ide@vger.kernel.org,
-	linux-pm@vger.kernel.org, bpf@vger.kernel.org, llvm@lists.linux.dev,
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-	jgross@suse.com, andrew.cooper3@citrix.com, peterz@infradead.org,
-	acme@kernel.org, namhyung@kernel.org, mark.rutland@arm.com,
-	alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-	irogers@google.com, adrian.hunter@intel.com,
-	kan.liang@linux.intel.com, wei.liu@kernel.org,
-	ajay.kaher@broadcom.com, alexey.amakhalov@broadcom.com,
-	bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
-	pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
-	luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
-	haiyangz@microsoft.com, decui@microsoft.com
-Subject: Re: [RFC PATCH v1 02/15] x86/msr: Replace __rdmsr() with
- native_rdmsrl()
-Message-ID: <Z-ptzZBePzh05HQI@gmail.com>
-References: <20250331082251.3171276-1-xin@zytor.com>
- <20250331082251.3171276-3-xin@zytor.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=VH7hZuwxATT6cYG4KVO1UuEgtYpkyI1Pw1/G//wuP35B7Ws/+OQeRJPvZqcahR0yh4DlB8eFc4Myb6gfvVCe8pp0BIgWmYlq6TTP+YGZFYkw6X4zPXfPRIFNxcGBuPZi1ffPgkqnzk5ZCxxY72ablafcVR++GfEFGOztFbfcckA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qi5NsyOH; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Mon, 31 Mar 2025 15:54:40 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1743429284;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1pj9Mgf9/7BDpyZNmQYfwtt/XC9QiCZdJQaI7DnM3Ag=;
+	b=qi5NsyOHbHr3uo9gdtAcMDfdJPeSJor7+G2XGFYIkKqnFIZA6bWSLoNVjydDT2xokOGhgj
+	MuyfMjXn9T2GkKz61Pb3O3S+1w7KG5e3oYYNOtzfLio2zMBYlEt1vBqcFqREE+X5OIdS7R
+	VbhS/++zxnrPrXPV1IBV3cf2tCc7NkA=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>, 
+	eric.auger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, vladimir.murzin@arm.com
+Subject: Re: [kvm-unit-tests PATCH v3 4/5] configure: Add --qemu-cpu option
+Message-ID: <20250331-11789f26d058d11c1aeeaa51@orel>
+References: <20250325160031.2390504-3-jean-philippe@linaro.org>
+ <20250325160031.2390504-7-jean-philippe@linaro.org>
+ <Z-WHf02_ZQKwzQej@raptor>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -74,32 +60,217 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250331082251.3171276-3-xin@zytor.com>
+In-Reply-To: <Z-WHf02_ZQKwzQej@raptor>
+X-Migadu-Flow: FLOW_OUT
 
+On Thu, Mar 27, 2025 at 05:14:39PM +0000, Alexandru Elisei wrote:
+> Hi Jean-Philippe,
+> 
+> On Tue, Mar 25, 2025 at 04:00:32PM +0000, Jean-Philippe Brucker wrote:
+> > Add the --qemu-cpu option to let users set the CPU type to run on.
+> > At the moment --processor allows to set both GCC -mcpu flag and QEMU
+> > -cpu. On Arm we'd like to pass `-cpu max` to QEMU in order to enable all
+> > the TCG features by default, and it could also be nice to let users
+> > modify the CPU capabilities by setting extra -cpu options.  Since GCC
+> > -mcpu doesn't accept "max" or "host", separate the compiler and QEMU
+> > arguments.
+> > 
+> > `--processor` is now exclusively for compiler options, as indicated by
+> > its documentation ("processor to compile for"). So use $QEMU_CPU on
+> > RISC-V as well.
+> > 
+> > Suggested-by: Andrew Jones <andrew.jones@linux.dev>
+> > Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> > ---
+> >  scripts/mkstandalone.sh |  3 ++-
+> >  arm/run                 | 15 +++++++++------
+> >  riscv/run               |  8 ++++----
+> >  configure               | 24 ++++++++++++++++++++++++
+> >  4 files changed, 39 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
+> > index 2318a85f..9b4f983d 100755
+> > --- a/scripts/mkstandalone.sh
+> > +++ b/scripts/mkstandalone.sh
+> > @@ -42,7 +42,8 @@ generate_test ()
+> >  
+> >  	config_export ARCH
+> >  	config_export ARCH_NAME
+> > -	config_export PROCESSOR
+> > +	config_export QEMU_CPU
+> > +	config_export DEFAULT_QEMU_CPU
+> >  
+> >  	echo "echo BUILD_HEAD=$(cat build-head)"
+> >  
+> > diff --git a/arm/run b/arm/run
+> > index efdd44ce..4675398f 100755
+> > --- a/arm/run
+> > +++ b/arm/run
+> > @@ -8,7 +8,7 @@ if [ -z "$KUT_STANDALONE" ]; then
+> >  	source config.mak
+> >  	source scripts/arch-run.bash
+> >  fi
+> > -processor="$PROCESSOR"
+> > +qemu_cpu="$QEMU_CPU"
+> >  
+> >  if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
+> >     [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ] &&
+> > @@ -37,12 +37,15 @@ if [ "$ACCEL" = "kvm" ]; then
+> >  	fi
+> >  fi
+> >  
+> > -if [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ]; then
+> > -	if [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ]; then
+> > -		processor="host"
+> > +if [ -z "$qemu_cpu" ]; then
+> > +	if ( [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ] ) &&
+> > +	   ( [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ] ); then
+> > +		qemu_cpu="host"
+> >  		if [ "$ARCH" = "arm" ] && [ "$HOST" = "aarch64" ]; then
+> > -			processor+=",aarch64=off"
+> > +			qemu_cpu+=",aarch64=off"
+> >  		fi
+> > +	else
+> > +		qemu_cpu="$DEFAULT_QEMU_CPU"
+> >  	fi
+> >  fi
+> >  
+> > @@ -71,7 +74,7 @@ if $qemu $M -device '?' | grep -q pci-testdev; then
+> >  fi
+> >  
+> >  A="-accel $ACCEL$ACCEL_PROPS"
+> > -command="$qemu -nodefaults $M $A -cpu $processor $chr_testdev $pci_testdev"
+> > +command="$qemu -nodefaults $M $A -cpu $qemu_cpu $chr_testdev $pci_testdev"
+> >  command+=" -display none -serial stdio"
+> >  command="$(migration_cmd) $(timeout_cmd) $command"
+> >  
+> > diff --git a/riscv/run b/riscv/run
+> > index e2f5a922..02fcf0c0 100755
+> > --- a/riscv/run
+> > +++ b/riscv/run
+> > @@ -11,12 +11,12 @@ fi
+> >  
+> >  # Allow user overrides of some config.mak variables
+> >  mach=$MACHINE_OVERRIDE
+> > -processor=$PROCESSOR_OVERRIDE
+> > +qemu_cpu=$QEMU_CPU_OVERRIDE
+> >  firmware=$FIRMWARE_OVERRIDE
+> >  
+> > -[ "$PROCESSOR" = "$ARCH" ] && PROCESSOR="max"
+> > +[ -z "$QEMU_CPU" ] && QEMU_CPU="max"
+> 
+> If you make DEFAULT_QEMU_CPU=max for riscv, you can use it instead of "max",
+> just like arm/arm64 does. Not sure if it's worth another respin.
 
-* Xin Li (Intel) <xin@zytor.com> wrote:
+Yup, we'll also need
 
-> __rdmsr() is the lowest level primitive MSR read API, and its direct 
-> use is NOT preferred.  Use its wrapper function native_rdmsrl() 
-> instead.
-
-This description is very misleading. As of today, native_rdmsrl() 
-doesn't exist in-tree, so it cannot be 'preferred' in any fashion.
-
-We have native_read_msr(), a confusingly similar function name, and 
-this changelog doesn't make it clear, at all, why the extra 
-native_rdmsrl() indirection is introduced.
-
-Please split this into two changes and explain them properly:
-
- - x86/msr: Add the native_rdmsrl() helper
- - x86/msr: Convert __rdmsr() uses to native_rdmsrl() uses
-
-For the first patch you should explain why you want an extra layer of 
-indirection within these APIs and how it relates to native_read_msr() 
-and why there is a _read_msr() and a _rdmsr() variant...
+diff --git a/configure b/configure
+index b86ccc0c338b..541b9577a718 100755
+--- a/configure
++++ b/configure
+@@ -32,7 +32,7 @@ function get_default_qemu_cpu()
+     "arm")
+         echo "cortex-a15"
+         ;;
+-    "arm64")
++    "arm64" | "riscv32" | "riscv64")
+         echo "max"
+         ;;
+     esac
 
 Thanks,
+drew
 
-	Ingo
+> 
+> Otherwise the patch looks good to me.
+> 
+> Thanks,
+> Alex
+> 
+> >  : "${mach:=virt}"
+> > -: "${processor:=$PROCESSOR}"
+> > +: "${qemu_cpu:=$QEMU_CPU}"
+> >  : "${firmware:=$FIRMWARE}"
+> >  [ "$firmware" ] && firmware="-bios $firmware"
+> >  
+> > @@ -32,7 +32,7 @@ fi
+> >  mach="-machine $mach"
+> >  
+> >  command="$qemu -nodefaults -nographic -serial mon:stdio"
+> > -command+=" $mach $acc $firmware -cpu $processor "
+> > +command+=" $mach $acc $firmware -cpu $qemu_cpu "
+> >  command="$(migration_cmd) $(timeout_cmd) $command"
+> >  
+> >  if [ "$UEFI_SHELL_RUN" = "y" ]; then
+> > diff --git a/configure b/configure
+> > index b4875ef3..b79145a5 100755
+> > --- a/configure
+> > +++ b/configure
+> > @@ -23,6 +23,21 @@ function get_default_processor()
+> >      esac
+> >  }
+> >  
+> > +# Return the default CPU type to run on
+> > +function get_default_qemu_cpu()
+> > +{
+> > +    local arch="$1"
+> > +
+> > +    case "$arch" in
+> > +    "arm")
+> > +        echo "cortex-a15"
+> > +        ;;
+> > +    "arm64")
+> > +        echo "cortex-a57"
+> > +        ;;
+> > +    esac
+> > +}
+> > +
+> >  srcdir=$(cd "$(dirname "$0")"; pwd)
+> >  prefix=/usr/local
+> >  cc=gcc
+> > @@ -52,6 +67,7 @@ earlycon=
+> >  console=
+> >  efi=
+> >  efi_direct=
+> > +qemu_cpu=
+> >  
+> >  # Enable -Werror by default for git repositories only (i.e. developer builds)
+> >  if [ -e "$srcdir"/.git ]; then
+> > @@ -70,6 +86,9 @@ usage() {
+> >  	    --arch=ARCH            architecture to compile for ($arch). ARCH can be one of:
+> >  	                           arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
+> >  	    --processor=PROCESSOR  processor to compile for ($processor)
+> > +	    --qemu-cpu=CPU         the CPU model to run on. If left unset, the run script
+> > +	                           selects the best value based on the host system and the
+> > +	                           test configuration.
+> >  	    --target=TARGET        target platform that the tests will be running on (qemu or
+> >  	                           kvmtool, default is qemu) (arm/arm64 only)
+> >  	    --cross-prefix=PREFIX  cross compiler prefix
+> > @@ -146,6 +165,9 @@ while [[ $optno -le $argc ]]; do
+> >          --processor)
+> >  	    processor="$arg"
+> >  	    ;;
+> > +	--qemu-cpu)
+> > +	    qemu_cpu="$arg"
+> > +	    ;;
+> >  	--target)
+> >  	    target="$arg"
+> >  	    ;;
+> > @@ -471,6 +493,8 @@ ARCH=$arch
+> >  ARCH_NAME=$arch_name
+> >  ARCH_LIBDIR=$arch_libdir
+> >  PROCESSOR=$processor
+> > +QEMU_CPU=$qemu_cpu
+> > +DEFAULT_QEMU_CPU=$(get_default_qemu_cpu $arch)
+> >  CC=$cc
+> >  CFLAGS=$cflags
+> >  LD=$cross_prefix$ld
+> > -- 
+> > 2.49.0
+> > 
+> 
+> -- 
+> kvm-riscv mailing list
+> kvm-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/kvm-riscv
 
