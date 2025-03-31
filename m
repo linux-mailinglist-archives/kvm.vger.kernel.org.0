@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-42273-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42272-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A59A0A77029
-	for <lists+kvm@lfdr.de>; Mon, 31 Mar 2025 23:31:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44963A7702A
+	for <lists+kvm@lfdr.de>; Mon, 31 Mar 2025 23:31:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4BF7188CDE4
-	for <lists+kvm@lfdr.de>; Mon, 31 Mar 2025 21:31:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FE5F3AC634
+	for <lists+kvm@lfdr.de>; Mon, 31 Mar 2025 21:31:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D758B21E0BA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38A9A21D5BC;
 	Mon, 31 Mar 2025 21:30:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gRSr1fci"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FTL77fvC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+Received: from mail-vk1-f201.google.com (mail-vk1-f201.google.com [209.85.221.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCC9921C183
-	for <kvm@vger.kernel.org>; Mon, 31 Mar 2025 21:30:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C397121CA17
+	for <kvm@vger.kernel.org>; Mon, 31 Mar 2025 21:30:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743456637; cv=none; b=KhCNaW1gB1VzvS6pwEkeAOy/8lEFm512zDGL0ke8z6NcRTqQwL964TODvkWIAgoIStYisWf3mbOGJxPRSjOyY/b8t6GOCy3udzn6dUTB8iMigQG345NU6i3CstsdRkrlgq41SmlqlfX7fBYgROSw+X+lARnDIN+ksZoOZi0ulSY=
+	t=1743456637; cv=none; b=RFxw4T0cHHEAXCvq369io6qL+KgSIxAp1BAf8IiCrsEWssTPcKF+/GdFBOE2gS0G9gL5pHijasgj9CeR8GcbTQupEwDhe/8zTbRCSq7u9Q3aG07XpbdVmfPHqml1ctRElhO9KSmLSsyJpcfsj6V0EboNDtM6AqxO6zpUxH5Kr5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1743456637; c=relaxed/simple;
-	bh=mjpU6MDhgU6cTqhOoVD4es2HPtgPtqp4bKNwM9P9cG4=;
+	bh=DlDaNBmiP+Lmsrd4wjzooOyHQDU6I4mrrw8YnqHQ8qs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=P+OuLjgHSVIoKvuJSnFCMQZU/pEgrwfTnTtw/ItfIoO7Q2mB7+csKjoBp7UQWURhiOdki0quWS1ECKqA2WZOVUuEg7oRLgtu6McNLcZ8YiV9T1ZRW+pyyh77T4k6QO8Y3xvQ/FAxLewCy5wBMiV183AUby0q+U8lluozDyPwvYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gRSr1fci; arc=none smtp.client-ip=209.85.222.201
+	 To:Cc:Content-Type; b=q4euzHGSzXSiHyq+eadarjOGF7hxB0CaNRSH6kjJ4MKHMsgyFIjGZG40y/zO47s3vfzRSqGAbPIA8kq/ehtRMtTfcx4LvNAEr3hRStoWxABUdKbE+Fhj1hSGEYMYrdMsWFC9nwTKtBcrMA2IEvQyL24D/2CqbP74v0w5glyoozk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FTL77fvC; arc=none smtp.client-ip=209.85.221.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-7c5d608e703so892135085a.3
-        for <kvm@vger.kernel.org>; Mon, 31 Mar 2025 14:30:34 -0700 (PDT)
+Received: by mail-vk1-f201.google.com with SMTP id 71dfb90a1353d-523f7c7e061so3511015e0c.0
+        for <kvm@vger.kernel.org>; Mon, 31 Mar 2025 14:30:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20230601; t=1743456634; x=1744061434; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ekwv7KGdyZFU+jTcpCSyOgzKWCtQSrak75BLH4Eza8c=;
-        b=gRSr1fcia8FO0KiWIRW5/jXB+lPLbtzVnnzakUDQSZGeZgwKOokWVmjlDBNMT+5jbL
-         YQk0HYHStuQbBwFL9GTXieIkidmlDtgZvAFnnFk+5joECfrKkdRZW/Wy7zrNU2OLh9eA
-         PF+//oB9nzvNCw3xJNaUFXTrWRgJ5Mm95wwe8btk1F1WhOPYEKBg1GJeVluP+eQODMoo
-         24dkQCWoyCfg65vfMkBpgaxs+Hpqa8IZYn+vXPgYu9ICdnMfSKdO4fIpOFNsD2ShKyBm
-         hIqhsfOX+GQauQB3++jI26PBsmCGTH9xqjW8QojZUaWbz9ChUmQmdmfKWO8xSHRbzuSK
-         YRMQ==
+        bh=AMmGEtr9mP14oGMDJzQtzY0m4v3Phg9hGuUxD5cZ2iA=;
+        b=FTL77fvCQVtYAynoxFLfrCKwL2TWhbtip/uZrh7MwoQwZHIe0OcufFIVKRXD8QSHH+
+         MXlDo994VrUlcxIPN6ZPz+K0ozVg/bQwBhtUQ4kSXH3MZTFY0JCmGScoHbzp5nU4QJGx
+         yabGCM/5+cOZTFggRExme76lJWWJ0erUuEwZJ0KqFIpc58H6gAJ1L7rSOR7YmDSzp8vm
+         lK8sSJIoazEirB5k5SNdZ6CVXTh+17irrstWMJ24D7DdkC8V0hha/vP7PFY6TzSeUj8C
+         +r6u11tZ2AX7dksyADFy93cxn2v2rC2k1fWRgYMw2daiYV7ZHYuEAfq9i2XRifimB369
+         ofiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1743456634; x=1744061434;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ekwv7KGdyZFU+jTcpCSyOgzKWCtQSrak75BLH4Eza8c=;
-        b=fTcbSac52VEAWN4XZMbKaIoQgjjQucfv/2laTW7z0FdM6p0k7wxn0YquAiPZlwxHFW
-         Lgj80NS92JUOp+90dxw6shjWo+HFa730J4vF7t64BLWm33DUJFGA0IDGAJXM5eAqsSga
-         Crvn8BFwi2oyprQmB+ivHZwaCQUszXRPQXqSKY20DtpPyPDmSmFTFi0Psaxhq79cSlk+
-         +rSXc/DD0KYZXBdRVXp9mEDf6nKYjKRwJ+zf6FAR4cO6AZB6wfZwu/vlMerkmKGfnjtQ
-         N8C9GpEdPa8ZY+GTjJaq+i6h5gBV7HKAS1/H5Uvq0g4rqGlrLkznahT8hrHSrJ3BG+a3
-         2SYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWidx1wpk+XlNmlWCVjLYTFdQYhFVkeDVJ4VmzP3ttf+iLfPq8J6G2RdYf9k00m6MmGLxY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjCDowljitVjHk6gLy6ISROhQl29TIeFSbITikeKZ7Cx8H7KXW
-	YZ14YOmQLfAPsgp6hwCpTWZ533sIT3y480Da1/moZxV8b2CHJuuDzXueum5byRQzOzD/i3V69GX
-	4GzMFj3hmjXkTb1RYsA==
-X-Google-Smtp-Source: AGHT+IFAnmoz1fj2tWiXC7ZF3nNAKY9wbok9MzxIrTwJ7bxeF0N65ecJB0+NIisgqGxEkKRMPYj00++Iyp0hSJd5
-X-Received: from qkjx24.prod.google.com ([2002:a05:620a:14b8:b0:7c5:e0ba:1600])
+        bh=AMmGEtr9mP14oGMDJzQtzY0m4v3Phg9hGuUxD5cZ2iA=;
+        b=JTiLsSLQUcy8thpU7ANjgraffZPZA4kQyPRQ1i0yEHACLd/0wbsxs4S/SkQ5kP66oA
+         oUt2O+HHNUiOxJgsec53VTfNNXOaHYRKA+6MaKkjfQ+Igeimil29E2ByrbGniWQ9bcAl
+         gpvmdlX2SbqmvXSnoQcg6qrUlfHeX5ufK8SY9V+QtePEFJG/Eq78MVevnJaEpWAG0+1V
+         JiX/yS73H4BoBQs8SODZipBxfUWXt5eBFtGjrqn3cHLQyLUt6mNvg244R0eK3vMEMvpX
+         JWkOithh5MOrNogQ7zHRQR3yoDQ69tAbxN/AUKprY11/Fnx9YQtrx7C2yHgx4A7b293X
+         kPpw==
+X-Forwarded-Encrypted: i=1; AJvYcCWMhdFBFwKQOYTWtDOoc+C59KacAKXJoHr8N717UeaEDl+hiAZVwkygEilR4ZPMiyWU9/s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIJunFkOmSbdXMbi6KSv18msgAndtHd2paPKYxeDPbUd6IN2RX
+	T/WnUdijrgF3a6zIC/hxRw9t8tvSgAhnd8YID7uwRsMVk75YwH7sUORS5hn3wCYlIFA+ny4hPZv
+	ObPRu6GzUxqNjK1h2Sg==
+X-Google-Smtp-Source: AGHT+IHgagkSKWGlDovr5gDvy/QEUbGDo/w32g+pQ7uHEVkF+t8NIV8URx2AUHB2qjSBJFbxSuIK8xNpCMDSjF+R
+X-Received: from vkbes13.prod.google.com ([2002:a05:6122:1b8d:b0:523:79d3:7e63])
  (user=jthoughton job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:bca:b0:7c5:3c69:2bce with SMTP id af79cd13be357-7c6862ebd1cmr1569629685a.7.1743456633860;
- Mon, 31 Mar 2025 14:30:33 -0700 (PDT)
-Date: Mon, 31 Mar 2025 21:30:23 +0000
+ 2002:a05:6122:3c8b:b0:523:7c70:bc9c with SMTP id 71dfb90a1353d-5261d3ca2b3mr7267971e0c.5.1743456634617;
+ Mon, 31 Mar 2025 14:30:34 -0700 (PDT)
+Date: Mon, 31 Mar 2025 21:30:24 +0000
 In-Reply-To: <20250331213025.3602082-1-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,117 +74,48 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250331213025.3602082-1-jthoughton@google.com>
 X-Mailer: git-send-email 2.49.0.472.ge94155a9ec-goog
-Message-ID: <20250331213025.3602082-4-jthoughton@google.com>
-Subject: [PATCH v2 3/5] cgroup: selftests: Move cgroup_util into its own library
+Message-ID: <20250331213025.3602082-5-jthoughton@google.com>
+Subject: [PATCH v2 4/5] KVM: selftests: Build and link selftests/cgroup/lib
+ into KVM selftests
 From: James Houghton <jthoughton@google.com>
 To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
 Cc: Maxim Levitsky <mlevitsk@redhat.com>, Axel Rasmussen <axelrasmussen@google.com>, 
 	Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, mkoutny@suse.com, 
 	Yosry Ahmed <yosry.ahmed@linux.dev>, Yu Zhao <yuzhao@google.com>, 
 	James Houghton <jthoughton@google.com>, cgroups@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-KVM selftests will soon need to use some of the cgroup creation and
-deletion functionality from cgroup_util.
+libcgroup.o is built separately from KVM selftests and cgroup selftests,
+so different compiler flags used by the different selftests will not
+conflict with each other.
 
-Suggested-by: David Matlack <dmatlack@google.com>
 Signed-off-by: James Houghton <jthoughton@google.com>
 ---
- tools/testing/selftests/cgroup/Makefile       | 21 ++++++++++---------
- .../selftests/cgroup/{ => lib}/cgroup_util.c  |  2 +-
- .../cgroup/{ => lib/include}/cgroup_util.h    |  4 ++--
- .../testing/selftests/cgroup/lib/libcgroup.mk | 14 +++++++++++++
- 4 files changed, 28 insertions(+), 13 deletions(-)
- rename tools/testing/selftests/cgroup/{ => lib}/cgroup_util.c (99%)
- rename tools/testing/selftests/cgroup/{ => lib/include}/cgroup_util.h (99%)
- create mode 100644 tools/testing/selftests/cgroup/lib/libcgroup.mk
+ tools/testing/selftests/kvm/Makefile.kvm | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/cgroup/Makefile b/tools/testing/selftests/cgroup/Makefile
-index 1b897152bab6e..e01584c2189ac 100644
---- a/tools/testing/selftests/cgroup/Makefile
-+++ b/tools/testing/selftests/cgroup/Makefile
-@@ -21,14 +21,15 @@ TEST_GEN_PROGS += test_zswap
- LOCAL_HDRS += $(selfdir)/clone3/clone3_selftests.h $(selfdir)/pidfd/pidfd.h
- 
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+index f773f8f992494..c86a680f52b28 100644
+--- a/tools/testing/selftests/kvm/Makefile.kvm
++++ b/tools/testing/selftests/kvm/Makefile.kvm
+@@ -219,6 +219,7 @@ OVERRIDE_TARGETS = 1
+ # importantly defines, i.e. overwrites, $(CC) (unless `make -e` or `make CC=`,
+ # which causes the environment variable to override the makefile).
  include ../lib.mk
-+include lib/libcgroup.mk
++include ../cgroup/lib/libcgroup.mk
  
--$(OUTPUT)/test_core: cgroup_util.c
--$(OUTPUT)/test_cpu: cgroup_util.c
--$(OUTPUT)/test_cpuset: cgroup_util.c
--$(OUTPUT)/test_freezer: cgroup_util.c
--$(OUTPUT)/test_hugetlb_memcg: cgroup_util.c
--$(OUTPUT)/test_kill: cgroup_util.c
--$(OUTPUT)/test_kmem: cgroup_util.c
--$(OUTPUT)/test_memcontrol: cgroup_util.c
--$(OUTPUT)/test_pids: cgroup_util.c
--$(OUTPUT)/test_zswap: cgroup_util.c
-+$(OUTPUT)/test_core: $(LIBCGROUP_O)
-+$(OUTPUT)/test_cpu: $(LIBCGROUP_O)
-+$(OUTPUT)/test_cpuset: $(LIBCGROUP_O)
-+$(OUTPUT)/test_freezer: $(LIBCGROUP_O)
-+$(OUTPUT)/test_hugetlb_memcg: $(LIBCGROUP_O)
-+$(OUTPUT)/test_kill: $(LIBCGROUP_O)
-+$(OUTPUT)/test_kmem: $(LIBCGROUP_O)
-+$(OUTPUT)/test_memcontrol: $(LIBCGROUP_O)
-+$(OUTPUT)/test_pids: $(LIBCGROUP_O)
-+$(OUTPUT)/test_zswap: $(LIBCGROUP_O)
-diff --git a/tools/testing/selftests/cgroup/cgroup_util.c b/tools/testing/selftests/cgroup/lib/cgroup_util.c
-similarity index 99%
-rename from tools/testing/selftests/cgroup/cgroup_util.c
-rename to tools/testing/selftests/cgroup/lib/cgroup_util.c
-index 1e2d46636a0ca..f047d8adaec65 100644
---- a/tools/testing/selftests/cgroup/cgroup_util.c
-+++ b/tools/testing/selftests/cgroup/lib/cgroup_util.c
-@@ -17,7 +17,7 @@
- #include <unistd.h>
+ INSTALL_HDR_PATH = $(top_srcdir)/usr
+ LINUX_HDR_PATH = $(INSTALL_HDR_PATH)/include/
+@@ -272,7 +273,7 @@ LIBKVM_S := $(filter %.S,$(LIBKVM))
+ LIBKVM_C_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_C))
+ LIBKVM_S_OBJ := $(patsubst %.S, $(OUTPUT)/%.o, $(LIBKVM_S))
+ LIBKVM_STRING_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_STRING))
+-LIBKVM_OBJS = $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ) $(LIBKVM_STRING_OBJ)
++LIBKVM_OBJS = $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ) $(LIBKVM_STRING_OBJ) $(LIBCGROUP_O)
+ SPLIT_TEST_GEN_PROGS := $(patsubst %, $(OUTPUT)/%, $(SPLIT_TESTS))
+ SPLIT_TEST_GEN_OBJ := $(patsubst %, $(OUTPUT)/$(ARCH)/%.o, $(SPLIT_TESTS))
  
- #include "cgroup_util.h"
--#include "../clone3/clone3_selftests.h"
-+#include "../../clone3/clone3_selftests.h"
- 
- /* Returns read len on success, or -errno on failure. */
- static ssize_t read_text(const char *path, char *buf, size_t max_len)
-diff --git a/tools/testing/selftests/cgroup/cgroup_util.h b/tools/testing/selftests/cgroup/lib/include/cgroup_util.h
-similarity index 99%
-rename from tools/testing/selftests/cgroup/cgroup_util.h
-rename to tools/testing/selftests/cgroup/lib/include/cgroup_util.h
-index 19b131ee77072..7a0441e5eb296 100644
---- a/tools/testing/selftests/cgroup/cgroup_util.h
-+++ b/tools/testing/selftests/cgroup/lib/include/cgroup_util.h
-@@ -2,9 +2,9 @@
- #include <stdbool.h>
- #include <stdlib.h>
- 
--#include "../kselftest.h"
--
-+#ifndef PAGE_SIZE
- #define PAGE_SIZE 4096
-+#endif
- 
- #define MB(x) (x << 20)
- 
-diff --git a/tools/testing/selftests/cgroup/lib/libcgroup.mk b/tools/testing/selftests/cgroup/lib/libcgroup.mk
-new file mode 100644
-index 0000000000000..12323041a5ce6
---- /dev/null
-+++ b/tools/testing/selftests/cgroup/lib/libcgroup.mk
-@@ -0,0 +1,14 @@
-+CGROUP_DIR := $(selfdir)/cgroup
-+
-+LIBCGROUP_C := lib/cgroup_util.c
-+
-+LIBCGROUP_O := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBCGROUP_C))
-+
-+CFLAGS += -I$(CGROUP_DIR)/lib/include
-+
-+EXTRA_HDRS := $(selfdir)/clone3/clone3_selftests.h
-+
-+$(LIBCGROUP_O): $(OUTPUT)/%.o : $(CGROUP_DIR)/%.c $(EXTRA_HDRS)
-+	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
-+
-+EXTRA_CLEAN += $(LIBCGROUP_O)
 -- 
 2.49.0.472.ge94155a9ec-goog
 
