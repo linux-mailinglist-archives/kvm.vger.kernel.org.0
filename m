@@ -1,79 +1,82 @@
-Return-Path: <kvm+bounces-42269-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42270-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17EDDA7701D
-	for <lists+kvm@lfdr.de>; Mon, 31 Mar 2025 23:30:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C35BA77021
+	for <lists+kvm@lfdr.de>; Mon, 31 Mar 2025 23:30:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41AB73AAC46
-	for <lists+kvm@lfdr.de>; Mon, 31 Mar 2025 21:30:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8DFB3ABE7F
+	for <lists+kvm@lfdr.de>; Mon, 31 Mar 2025 21:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC9A121C189;
-	Mon, 31 Mar 2025 21:30:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E37B821CA1E;
+	Mon, 31 Mar 2025 21:30:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CtRIxl4H"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Fz+Uxl4Y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ua1-f73.google.com (mail-ua1-f73.google.com [209.85.222.73])
+Received: from mail-vk1-f202.google.com (mail-vk1-f202.google.com [209.85.221.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 868328472
-	for <kvm@vger.kernel.org>; Mon, 31 Mar 2025 21:30:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55EA31B4138
+	for <kvm@vger.kernel.org>; Mon, 31 Mar 2025 21:30:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743456634; cv=none; b=UjCJJEa1jYvRsGICkP+re5Zm788JhhH4L12j9+myfKTw89+egQ9POjnG/hIlaLt+5SVFJdcGpKdG6FU8HVav3yknSg2NrDdgXMttYL5s65rSCbpEoqvFG+gh00UazUuu9WaWN0ocX4TmINrUIE54BGY1xMeELiWc7riKzBhJyzQ=
+	t=1743456634; cv=none; b=GArwJFyGV+Bi0qbJeviwAna+ZUq4aveA4XZExUs8yDX3cSHFeykiZff6wSQXC162FQMFXv7mK1Vq5qlkGzxAD7xmW5WPgqiL6XFRKsWxqH2EXkys/0HxtQN5jxX35Pvxh090IWdjKH6HmQFscZ9y16+2elFezV0/suo9fm0m+KM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1743456634; c=relaxed/simple;
-	bh=m+a1512eWC5Aolg7MHTyKu0JSZdfCl5aGM/QIhGmIPU=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=oQg2s8OsGmu+uG3RvL6IQeup0bJbC9CpIQbjp65dExFHFc+wAwgY5XzzyF0eF8UKhd3OzDiFAJaITcFnlLHllOfAyOAVMnlTRxIbhA8jOXPgMtm1dpaA3oojIJq5t9dAk9jw9fbaKY+0Jcj3azwhpESVE2dpf5vk1f1jwbuLyE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CtRIxl4H; arc=none smtp.client-ip=209.85.222.73
+	bh=QVzyFescXVWpRPbHhysiEv6lNMR7Z84PTEV+3tefm0Q=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=qTZRLo8w4EEMvaNzFpy2IixeqfbBrkp2JRX4PRiczmw+AKU+yp1Gi4rgWgH4xazjBK8FTi8a0E5opyPC4xHuhwbxDlsk2Fl+iY21aULk4ruT1uvHKorEN7tmuBUZxEON8E5CA30EfXaNDYeumzKQqw4ozDjej4RxLeEa3DtgO1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Fz+Uxl4Y; arc=none smtp.client-ip=209.85.221.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
-Received: by mail-ua1-f73.google.com with SMTP id a1e0cc1a2514c-86d8c567446so1336374241.1
-        for <kvm@vger.kernel.org>; Mon, 31 Mar 2025 14:30:32 -0700 (PDT)
+Received: by mail-vk1-f202.google.com with SMTP id 71dfb90a1353d-524021ac776so1318469e0c.2
+        for <kvm@vger.kernel.org>; Mon, 31 Mar 2025 14:30:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743456631; x=1744061431; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=YnBVRG7AqLb7xr89r4O+vGsRgEAXMy8MYL822Tz4er4=;
-        b=CtRIxl4HV+leW1rkrZzrwNC4YfTWr6UyN8yBSsUgDXPPOcLGDCTnbO5LIsaKmjDifI
-         XbDbAPRSVDG/LfY11OVjCxwS/oHxxTYH6VsxW2+E8n6UvclwSx7x5MIpFTaLh62pc4Qm
-         JtGKu80+RX7M3HojudsoIMpBKn8A7Fd2l98IbwbGGMdp5awGl0KpA4c9/haU+VU91tlC
-         DRdtNua/ZXy53NprsaHfFl8vdaaRB3AXdk/7QgeFxZ0qUqdBx7Xf4qnCgFnVNSjACVaS
-         XSQthcJWToHwk6gVYGdzskj2wmgWD6hFnOt2yoXooO3/LKmaVcgiguA1hxWJdYipldgk
-         tkTw==
+        d=google.com; s=20230601; t=1743456632; x=1744061432; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=42KzVy5OOxbX2nRYaugEY43/RWNtB+bmjk11XtO+x8A=;
+        b=Fz+Uxl4YzmkYqXYrJ/sJbzTzRTBjv7YsGcxg9+0rWaOTL/jX4IsGuxInosI0ACCvLD
+         5DL0DbKrHF5J479+gC1oIn3zzqszj4oo6JbuNYqFtb9wdyZTORHU3TYFcc5pygfQMLAd
+         tICNtGbfEhk6voOu5iCX0tDP+L4zkorV1zR+0WYiAr1fFFa/qUbSMHWR/nnrDIt7e6Oe
+         KPkl81PAtQsYB7t2MzpOph8gI07eoVx573LHr9fdLlWuu0n704umZOpj0sq/9+I6pWME
+         zTmVKRmndHo5hLjmzo32iihKCGrrVjWp6QAfrG24KfEQtlgz/CRZ/HXHWCJEq5yQw5jb
+         cWLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743456631; x=1744061431;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YnBVRG7AqLb7xr89r4O+vGsRgEAXMy8MYL822Tz4er4=;
-        b=RYwNTJQmAcqLrybhMbN3201gqn9NiLNco9rM5nyRdq+x8QoqkaSEOC7pVHyhnl2Tw8
-         vOW8KtygVx5gmrsKhe15THc0/CZxyVJpkp6qw6IFzjGV2TcEgpSUcGmiZ2jx/IOBQYFc
-         +QyaTbMHdwi7lrOAurCSgFHa+h1We5Ru7fM53+3eQTvhiGUldKRvsFYqnNZ+kKr6kvPn
-         s/lbsO5EVVgJHgGmQID/mhccRy+uhPvP7Snr22d6jh134AykKmmyV/DMyBtbtw/OqgOq
-         VRAoDA934wT8ibVsUgwyTWTy2DdDJURv4rOWEtOcdkrNgitpcqi6oTXHD/p/Gb2EB9nz
-         ChSg==
-X-Forwarded-Encrypted: i=1; AJvYcCUFTWuQJGg2rU61B+IT4fDvcfkr5UOJTlvwhdtFTC0PvGa0LfnPgldXgyKvc3qn/pYaC3g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIIC3m1d2dP8AEwM9Nj2uYDrH2R+ZvoOmHL+hbLfv+p8tzyScr
-	73I0zUwNZ1Bg8fpP9M0JZnxPUmGam/FlQMkaXLxJ6Bjz2S3HbAC4K6GRqMOq/pGKXupnJK7MfDX
-	Wwuracp/8dxu8ig9L5g==
-X-Google-Smtp-Source: AGHT+IFWVNNFOxiuezsuclw1+KNEMTqJF5KQh/veAmDaG6NDK/j85VNvjpwNcmZuM9lBmMP4/oNT8YmtEmU0cfcq
-X-Received: from vsvo20.prod.google.com ([2002:a05:6102:3f94:b0:4bb:c5bf:4524])
+        d=1e100.net; s=20230601; t=1743456632; x=1744061432;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=42KzVy5OOxbX2nRYaugEY43/RWNtB+bmjk11XtO+x8A=;
+        b=l10/jTTclbj785kemqcss5RVgR8gBbgJKITc9xPT0IxC7AQezud4ZSm9rtIutfYx4t
+         wLbiOQ+aMs2XOzvNwoGVh+llEJrivs9pw3pa+m6YK/VFpHcEMlh0mJEjq0qdwzvJN8ny
+         XlERux4wzS5uIrMXK9voLUKuhBFWh/4t7oL5XWF/1T3zvoJi3n7dO/hU7IJSAgEBEVkk
+         kcdy86CBVifrXscwcrtygTXiQO1v2TEgVovcWNX6I6vT60R2MzCpvIyWizvlT2YNYL+P
+         HzlmzPtf/dqISXsZpbPuVCdiaf4/bDOZ25tkXNr3xvKP7mAE0fddoOk77aP/1IQyGuzB
+         TCug==
+X-Forwarded-Encrypted: i=1; AJvYcCXvJJeYcZypMo55jBkU/6g+I8qCADZglppe6CWZJJ7QdMwz/h2rCC1gS3gyXLR1SEJisg8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySS2kNmQXMA1kp4rhMCkY9PJuegqtxrsUb8FvcA+C2TJl5tUtF
+	Dtnu62oWEUa1cVHhwkQbFaWcdPfRZYO5V7pEuZ1oSvtpsrLOok0VEvU8YvUtSmG5HREw9PO6PW9
+	MJcs2rmXG62bP4HpffQ==
+X-Google-Smtp-Source: AGHT+IH1S5Pqrxcnd6Psp4+cbC6TmHHG0jz3SYfEB8vHri/pTtyy440S8+fa1zRdaeI5w8d7xLGt0MgU/VoSpbkI
+X-Received: from vkci17.prod.google.com ([2002:a05:6122:62f1:b0:526:98a:f3d2])
  (user=jthoughton job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6102:3e08:b0:4bb:e511:15a3 with SMTP id ada2fe7eead31-4c6d38685demr7168495137.8.1743456631452;
- Mon, 31 Mar 2025 14:30:31 -0700 (PDT)
-Date: Mon, 31 Mar 2025 21:30:20 +0000
+ 2002:a05:6122:218b:b0:520:51a4:b81c with SMTP id 71dfb90a1353d-5261d478794mr5909701e0c.6.1743456632248;
+ Mon, 31 Mar 2025 14:30:32 -0700 (PDT)
+Date: Mon, 31 Mar 2025 21:30:21 +0000
+In-Reply-To: <20250331213025.3602082-1-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250331213025.3602082-1-jthoughton@google.com>
 X-Mailer: git-send-email 2.49.0.472.ge94155a9ec-goog
-Message-ID: <20250331213025.3602082-1-jthoughton@google.com>
-Subject: [PATCH v2 0/5] KVM: selftests: access_tracking_perf_test fixes for
- NUMA balancing and MGLRU
+Message-ID: <20250331213025.3602082-2-jthoughton@google.com>
+Subject: [PATCH v2 1/5] KVM: selftests: Extract guts of THP accessor to
+ standalone sysfs helpers
 From: James Houghton <jthoughton@google.com>
 To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
 Cc: Maxim Levitsky <mlevitsk@redhat.com>, Axel Rasmussen <axelrasmussen@google.com>, 
@@ -83,65 +86,87 @@ Cc: Maxim Levitsky <mlevitsk@redhat.com>, Axel Rasmussen <axelrasmussen@google.c
 	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-This series fixes some issues with access_tracking_perf_test when MGLRU
-or NUMA balancing are in use.
+From: Sean Christopherson <seanjc@google.com>
 
-With MGLRU, touching a page doesn't necessarily clear the Idle flag.
-This has come up in the past, and the recommendation was to use MGLRU
-generation numbers[1], which this series does.
+Extract the guts of thp_configured() and get_trans_hugepagesz() to
+standalone helpers so that the core logic can be reused for other sysfs
+files, e.g. to query numa_balancing.
 
-With NUMA balancing, pages are temporarily mapped as PROT_NONE, so the
-SPTEs will be zapped, losing the Accessed bits. The fix here is, in the
-event we have lost access information to print a warning and continue
-with the test, just like what we do if the test is running a nested VM.
+Opportunistically assert that the initial fscanf() read at least one byte,
+and add a comment explaining the second call to fscanf().
 
-A flag is added for the user to specify if they wish for the test to
-always enforce or always skip this check.
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+---
+ tools/testing/selftests/kvm/lib/test_util.c | 35 ++++++++++++++-------
+ 1 file changed, 24 insertions(+), 11 deletions(-)
 
-Based on kvm/next.
-
-Changelog:
-
-v1[2] -> v2:
-- Re-add clone3_selftests.h for cgroup selftests (thanks Michal!)
-- Some comment fixes, patches 2 and 5 (thanks Maxim!).
-
-[1]: https://lore.kernel.org/all/CAOUHufZeADNp_y=Ng+acmMMgnTR=ZGFZ7z-m6O47O=CmJauWjw@mail.gmail.com/
-[2]: https://lore.kernel.org/kvm/20250327012350.1135621-1-jthoughton@google.com/
-
-James Houghton (3):
-  cgroup: selftests: Move cgroup_util into its own library
-  KVM: selftests: Build and link selftests/cgroup/lib into KVM selftests
-  KVM: selftests: access_tracking_perf_test: Use MGLRU for access
-    tracking
-
-Maxim Levitsky (1):
-  KVM: selftests: access_tracking_perf_test: Add option to skip the
-    sanity check
-
-Sean Christopherson (1):
-  KVM: selftests: Extract guts of THP accessor to standalone sysfs
-    helpers
-
- tools/testing/selftests/cgroup/Makefile       |  21 +-
- .../selftests/cgroup/{ => lib}/cgroup_util.c  |   2 +-
- .../cgroup/{ => lib/include}/cgroup_util.h    |   4 +-
- .../testing/selftests/cgroup/lib/libcgroup.mk |  14 +
- tools/testing/selftests/kvm/Makefile.kvm      |   4 +-
- .../selftests/kvm/access_tracking_perf_test.c | 263 ++++++++++--
- .../selftests/kvm/include/lru_gen_util.h      |  51 +++
- .../testing/selftests/kvm/include/test_util.h |   1 +
- .../testing/selftests/kvm/lib/lru_gen_util.c  | 383 ++++++++++++++++++
- tools/testing/selftests/kvm/lib/test_util.c   |  42 +-
- 10 files changed, 728 insertions(+), 57 deletions(-)
- rename tools/testing/selftests/cgroup/{ => lib}/cgroup_util.c (99%)
- rename tools/testing/selftests/cgroup/{ => lib/include}/cgroup_util.h (99%)
- create mode 100644 tools/testing/selftests/cgroup/lib/libcgroup.mk
- create mode 100644 tools/testing/selftests/kvm/include/lru_gen_util.h
- create mode 100644 tools/testing/selftests/kvm/lib/lru_gen_util.c
-
-
-base-commit: 782f9feaa9517caf33186dcdd6b50a8f770ed29b
+diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
+index 8ed0b74ae8373..3dc8538f5d696 100644
+--- a/tools/testing/selftests/kvm/lib/test_util.c
++++ b/tools/testing/selftests/kvm/lib/test_util.c
+@@ -132,37 +132,50 @@ void print_skip(const char *fmt, ...)
+ 	puts(", skipping test");
+ }
+ 
+-bool thp_configured(void)
++static bool test_sysfs_path(const char *path)
+ {
+-	int ret;
+ 	struct stat statbuf;
++	int ret;
+ 
+-	ret = stat("/sys/kernel/mm/transparent_hugepage", &statbuf);
++	ret = stat(path, &statbuf);
+ 	TEST_ASSERT(ret == 0 || (ret == -1 && errno == ENOENT),
+-		    "Error in stating /sys/kernel/mm/transparent_hugepage");
++		    "Error in stat()ing '%s'", path);
+ 
+ 	return ret == 0;
+ }
+ 
+-size_t get_trans_hugepagesz(void)
++bool thp_configured(void)
++{
++	return test_sysfs_path("/sys/kernel/mm/transparent_hugepage");
++}
++
++static size_t get_sysfs_val(const char *path)
+ {
+ 	size_t size;
+ 	FILE *f;
+ 	int ret;
+ 
+-	TEST_ASSERT(thp_configured(), "THP is not configured in host kernel");
+-
+-	f = fopen("/sys/kernel/mm/transparent_hugepage/hpage_pmd_size", "r");
+-	TEST_ASSERT(f != NULL, "Error in opening transparent_hugepage/hpage_pmd_size");
++	f = fopen(path, "r");
++	TEST_ASSERT(f, "Error opening '%s'", path);
+ 
+ 	ret = fscanf(f, "%ld", &size);
++	TEST_ASSERT(ret > 0, "Error reading '%s'", path);
++
++	/* Re-scan the input stream to verify the entire file was read. */
+ 	ret = fscanf(f, "%ld", &size);
+-	TEST_ASSERT(ret < 1, "Error reading transparent_hugepage/hpage_pmd_size");
+-	fclose(f);
++	TEST_ASSERT(ret < 1, "Error reading '%s'", path);
+ 
++	fclose(f);
+ 	return size;
+ }
+ 
++size_t get_trans_hugepagesz(void)
++{
++	TEST_ASSERT(thp_configured(), "THP is not configured in host kernel");
++
++	return get_sysfs_val("/sys/kernel/mm/transparent_hugepage/hpage_pmd_size");
++}
++
+ size_t get_def_hugetlb_pagesz(void)
+ {
+ 	char buf[64];
 -- 
 2.49.0.472.ge94155a9ec-goog
 
