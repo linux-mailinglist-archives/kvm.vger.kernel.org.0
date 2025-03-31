@@ -1,137 +1,158 @@
-Return-Path: <kvm+bounces-42258-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42259-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 949AFA76CE4
-	for <lists+kvm@lfdr.de>; Mon, 31 Mar 2025 20:27:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95E88A76D3F
+	for <lists+kvm@lfdr.de>; Mon, 31 Mar 2025 21:06:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA22A3AA040
-	for <lists+kvm@lfdr.de>; Mon, 31 Mar 2025 18:27:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90B1F188CF7C
+	for <lists+kvm@lfdr.de>; Mon, 31 Mar 2025 19:06:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FFC621772B;
-	Mon, 31 Mar 2025 18:27:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94FB521A446;
+	Mon, 31 Mar 2025 19:06:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Wt8pRrPR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bRXvAGek"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0928C1E2613
-	for <kvm@vger.kernel.org>; Mon, 31 Mar 2025 18:27:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AB9B219A97
+	for <kvm@vger.kernel.org>; Mon, 31 Mar 2025 19:05:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743445627; cv=none; b=f7sS3HZ4LqqJgo0sukrec9DAwZkwncgoAi4uK/yzJDOA6juBbFCWchzFpCYWa4tSKwmfk/C1pTYc64mGUOLp7SkxyYVTs5F6VY0UyaUmgSXpiGeu5uFslloaXwP/qRnrVVPl309kQXEF7pOL43zm6CA0ls7cHZC2EZMG4coHR0o=
+	t=1743447961; cv=none; b=Uz8DRNmv8K9ykDsEsa1la+rHKlRtQJnUuAtccny//eXw0b5zsMeRnn6f1+Kepq6HWnX51nsXbQduc92o4jFexzzTYUWC7GxqACDL4XNtKvc9uoztG4H10cZgE6iGVhi25kQWmgvHNhaKPkq8guIeR7pw8gWRazRQGDZnfj6vvZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743445627; c=relaxed/simple;
-	bh=VLeEC0uxP7p7Qxgwk6jBT/2tB9FcHfRZeZYItPwC9lQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Jt6PftXIEaQG2CSIpR+PVtYHG7s4LXyV0ABvzzcATytwkN8P1aJ2nqRUjGsVKINFdHBrAFEi+hGMpiZ7WmH6kToVmjaj9UuUVfW49CHEekuoxRF8MAJsDuNZDJRM3keEJTMXkyoeBYdEApK1o+JHhJzJ0o5Y7CmSgoFsxSavmn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Wt8pRrPR; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3011bee1751so7857678a91.1
-        for <kvm@vger.kernel.org>; Mon, 31 Mar 2025 11:27:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743445625; x=1744050425; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/pd2nm65FwNh6FkK7APuxjmignZQ8EE6F/lay1fSaQY=;
-        b=Wt8pRrPRDebI9/Sb6Dp0CnbaZbd5Ln8JpEzk+ZbjhzGJjZy6auF4pP+eEafo7jgEBt
-         uRF0nVA6ZpBVEe1Il4lOKKHfwUPZeI0jms8BOJhf+WbOu2IYbWLjGIfA/mtLEKUp8I1d
-         xmfAIxK8HUtDq6d7ph6jrmaUDYKIQcdUeh9dtQp85QJIqIlow5q2lUaAm207MC8bez0t
-         kNbwbRUDvagjRXRgAM8FIYGm0eEN+/Y8O8DXkyK73SAdmMMpA8P2sJHPzKgDohoaYHKh
-         tAto8G9sfhyv+7o8MEfUZgNHQ339Ouufg3yaB1KcEjKfq8RRDHfGaRHDn4Ptx+i9zxRD
-         fiRg==
+	s=arc-20240116; t=1743447961; c=relaxed/simple;
+	bh=ymtz3LKXQelnMrMnB1EtIZhse9Mr3gBZyo+pb7yu+nI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=GCiLMQY/gFUAM5UzbJOyhMzwTZTDHa8MwVk3zzA+wQGq796P3U/Fb2DqEQJMF5iDS1cMET0+Ne/IRPOzUshJhn5EZ1VmW+7vFcxeeBRiFer7oFNwLXheZAPUqfmCeITTsL7vxLdspPD/Sd1nncqI1pMNxjKS5sM48kDUp6W8Tys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bRXvAGek; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743447959;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=uzKnw77swTeh7HXFgYoBa2NfI5F2/BsDtkjgKan+l0U=;
+	b=bRXvAGekhd7fXqhK8wL1dCep70UH9qMYOZYXhruLjfJc/64D8veJ37U63RvgC2YY4LSbLs
+	DF2OAkmmmDuE9OqzCySF6mPeKDGCZ6xfNLZq7rNsT46ghiGXY6c7gGEPX6167AfKYW31n5
+	dhxb75SLra3sZlRWCuLpE0YEUPkl7hc=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-149-93dtu5nBNFu8yMU371zeJw-1; Mon, 31 Mar 2025 15:05:57 -0400
+X-MC-Unique: 93dtu5nBNFu8yMU371zeJw-1
+X-Mimecast-MFC-AGG-ID: 93dtu5nBNFu8yMU371zeJw_1743447957
+Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-72c40acf311so74567a34.2
+        for <kvm@vger.kernel.org>; Mon, 31 Mar 2025 12:05:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743445625; x=1744050425;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/pd2nm65FwNh6FkK7APuxjmignZQ8EE6F/lay1fSaQY=;
-        b=es55wbUyGm6AoAbRPc7GVz1qYttNswj8GfSFjLjlmij2q+TCnhU5shLjyYQ/wjOrJD
-         fMHbhczegysApBfQW/vFt1vawcdom7Eu7huKyotkL3YLNn0ABW5sEitBlfcSLj2+m0CJ
-         tyeJZzcxHW0PMqj2TNxXrA81boNt4FjD54DynuQGxLFXnArGJI0Tfjlh/iQR3GoP+ZFo
-         9ya/2cCU8Dxc5LEBS6AP4I1OqtkuIPiDVu+8F+CGHw3XksLcvMMYkprGyzczuksE7qzn
-         LuJ2zACaAhmaC0s38/fXFuDN412Tew+tsnl31VPPgGx2Q8dtdB+SNYZk8Cq+HFeb/BHB
-         iPhg==
-X-Gm-Message-State: AOJu0YxRu9cp3p27be7n/5KIjNm1thPUnm8WcnIaBsKRziXtQiEKQDWV
-	0/lOdevoS4fV3M8flHUtr6LRYZsqBEGKMuaaW4Zl2DbtKf2A+4j8GxZjY7ugvEehCLSdzwUziJe
-	zTw==
-X-Google-Smtp-Source: AGHT+IE7/Ln+Jxwi1mydQwY17OY/8d3EivlMQrIxCkvH79DxswQfD41orcj9o7Y3pcs2rnJaFmVNwhu0ZYw=
-X-Received: from pjm7.prod.google.com ([2002:a17:90b:2fc7:b0:2fc:c98:ea47])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2801:b0:2ff:4bac:6fbf
- with SMTP id 98e67ed59e1d1-30531f7be36mr16361724a91.7.1743445625372; Mon, 31
- Mar 2025 11:27:05 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Mon, 31 Mar 2025 11:27:03 -0700
+        d=1e100.net; s=20230601; t=1743447956; x=1744052756;
+        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
+         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uzKnw77swTeh7HXFgYoBa2NfI5F2/BsDtkjgKan+l0U=;
+        b=jXWq3divi50KTCue/QPsmZy98iXN85lKJdtoxDW7es86S2LgwmeU6a87G3tGpKdw5T
+         hNgmdQCnJqc85iWm2Hx9CLVsVoQbjfmIWU+sjbMwlHWR9pWggTpxMDcPENUk97GklNF1
+         YcdSqleuBGfkxNSiHUGWaljoFyIfQmWVQATI/FXd4vIsOMdQRNNH2Xk0331uEpzaZTGU
+         cGkWmolTCt/2bBdkdUwwNUUtl0ZTuWsVsL11KElfSs8FAJ7bbGI/LshItiCAFdO3Lr4V
+         pQ2Bz/bRM79LO5xY3KBKvjQT9UnmpqqBe+oUJrr+mTQtfYjx1td8cpJDF61gPwsg9KES
+         KSaw==
+X-Forwarded-Encrypted: i=1; AJvYcCUNddFTlQ76Xm/7Rr2AxZ/Bx/vjfyF/dxgXSSo8LOBZWWk/yWokbKFsSdcmgHIQwvHXR1U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7CA42LVn3/kSayhsdPHZIO/6T9G9kFqTcWiIxbLhMRXdqqwBQ
+	nDmfbXPEaIjh0+F7tiMSioixM4IvJWo0Effv6hGGbKlqkySPpb4j4jnXZXL9bON1428jRKTJ46J
+	sxAw3zSQ9H/7DEVfqUT2uahRJJlB0zdVK8t2NUvh8WWvh7G8lC/Fh3e5Kog==
+X-Gm-Gg: ASbGnctkcjFH+EpDdDNT4ktbKJ1OW0+MT2dG3IMo42/a89ws77xBGp4UMd0ji96mjou
+	VxKPenpc6iyUVNy8MQvwY7URB239Ul4jCqPFwRxPfpp9aOVRz59QuO/s+a9yy4W+bDsrsYCDmKm
+	kDR1fgkxw1U/gByW9ZDk5yp++EmL4jkq3zsuiYjrHA7sXKf3Wa6u64MOQ0z1jDghscwDkaJfFda
+	uW85n9m4buM4LD3/LRrDlg7dq2TdHS4XXZb/0CuT9TIAOgIfOkahc+5YAL7hZ7C+1gyPbr0xNqh
+	K4ukCFG4HdtOfUiznps=
+X-Received: by 2002:a05:6871:4f12:b0:2cc:36b1:8c19 with SMTP id 586e51a60fabf-2cc36b1dd66mr41788fac.0.1743447955852;
+        Mon, 31 Mar 2025 12:05:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGI7UGahoFOzLlam2TphSYmw3If0g3Dxd3FZsZxKkq/Qcp8nUCuQBdZUJ41G/+wxHja5olD4Q==
+X-Received: by 2002:a05:6871:4f12:b0:2cc:36b1:8c19 with SMTP id 586e51a60fabf-2cc36b1dd66mr41781fac.0.1743447955518;
+        Mon, 31 Mar 2025 12:05:55 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-2c86a90e132sm1970717fac.45.2025.03.31.12.05.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Mar 2025 12:05:54 -0700 (PDT)
+Date: Mon, 31 Mar 2025 13:05:50 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org"
+ <kvm@vger.kernel.org>
+Subject: [GIT PULL] VFIO updates for v6.15-rc1
+Message-ID: <20250331130550.2f9ba79e.alex.williamson@redhat.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.49.0.472.ge94155a9ec-goog
-Message-ID: <20250331182703.725214-1-seanjc@google.com>
-Subject: [PATCH] KVM: x86/mmu: Use kvm_x86_call() instead of manual static_call()
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Use KVM's preferred kvm_x86_call() wrapper to invoke static calls related
-to mirror page tables.
+Hi Linus,
 
-No functional change intended.
+The following changes since commit d082ecbc71e9e0bf49883ee4afd435a77a5101b6:
 
-Fixes: 77ac7079e66d ("KVM: x86/tdp_mmu: Propagate building mirror page tables")
-Fixes: 94faba8999b9 ("KVM: x86/tdp_mmu: Propagate tearing down mirror page tables")
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu/tdp_mmu.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+  Linux 6.14-rc4 (2025-02-23 12:32:57 -0800)
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 7cc0564f5f97..cbea40ccf4b8 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -372,7 +372,7 @@ static void remove_external_spte(struct kvm *kvm, gfn_t gfn, u64 old_spte,
- 	/* Zapping leaf spte is allowed only when write lock is held. */
- 	lockdep_assert_held_write(&kvm->mmu_lock);
- 	/* Because write lock is held, operation should success. */
--	ret = static_call(kvm_x86_remove_external_spte)(kvm, gfn, level, old_pfn);
-+	ret = kvm_x86_call(remove_external_spte)(kvm, gfn, level, old_pfn);
- 	KVM_BUG_ON(ret, kvm);
- }
- 
-@@ -479,8 +479,8 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
- 	}
- 
- 	if (is_mirror_sp(sp) &&
--	    WARN_ON(static_call(kvm_x86_free_external_spt)(kvm, base_gfn, sp->role.level,
--							  sp->external_spt))) {
-+	    WARN_ON(kvm_x86_call(free_external_spt)(kvm, base_gfn, sp->role.level,
-+						    sp->external_spt))) {
- 		/*
- 		 * Failed to free page table page in mirror page table and
- 		 * there is nothing to do further.
-@@ -532,12 +532,12 @@ static int __must_check set_external_spte_present(struct kvm *kvm, tdp_ptep_t sp
- 	 * external page table, or leaf.
- 	 */
- 	if (is_leaf) {
--		ret = static_call(kvm_x86_set_external_spte)(kvm, gfn, level, new_pfn);
-+		ret = kvm_x86_call(set_external_spte)(kvm, gfn, level, new_pfn);
- 	} else {
- 		void *external_spt = get_external_spt(gfn, new_spte, level);
- 
- 		KVM_BUG_ON(!external_spt, kvm);
--		ret = static_call(kvm_x86_link_external_spt)(kvm, gfn, level, external_spt);
-+		ret = kvm_x86_call(link_external_spt)(kvm, gfn, level, external_spt);
- 	}
- 	if (ret)
- 		__kvm_tdp_mmu_write_spte(sptep, old_spte);
+are available in the Git repository at:
 
-base-commit: 782f9feaa9517caf33186dcdd6b50a8f770ed29b
--- 
-2.49.0.472.ge94155a9ec-goog
+  https://github.com/awilliam/linux-vfio.git tags/vfio-v6.15-rc1
+
+for you to fetch changes up to 860be250fc32de9cb24154bf21b4e36f40925707:
+
+  vfio/pci: Handle INTx IRQ_NOTCONNECTED (2025-03-17 15:15:17 -0600)
+
+----------------------------------------------------------------
+VFIO updates for v6.15-rc1
+
+ - Relax IGD support code to match display class device rather than
+   specifically requiring a VGA device. (Tomita Moeko)
+
+ - Accelerate DMA mapping of device MMIO by iterating at PMD and PUD
+   levels to take advantage of huge pfnmap support added in v6.12.
+   (Alex Williamson)
+
+ - Extend virtio vfio-pci variant driver to include migration support
+   for block devices where enabled by the PF. (Yishai Hadas)
+
+ - Virtualize INTx PIN register for devices where the platform does
+   not route legacy PCI interrupts for the device and the interrupt
+   is reported as IRQ_NOTCONNECTED. (Alex Williamson)
+
+----------------------------------------------------------------
+Alex Williamson (7):
+      vfio/type1: Catch zero from pin_user_pages_remote()
+      vfio/type1: Convert all vaddr_get_pfns() callers to use vfio_batch
+      vfio/type1: Use vfio_batch for vaddr_get_pfns()
+      vfio/type1: Use consistent types for page counts
+      mm: Provide address mask in struct follow_pfnmap_args
+      vfio/type1: Use mapping page mask for pfnmaps
+      vfio/pci: Handle INTx IRQ_NOTCONNECTED
+
+Tomita Moeko (1):
+      vfio/pci: match IGD devices in display controller class
+
+Yishai Hadas (1):
+      vfio/virtio: Enable support for virtio-block live migration
+
+ drivers/vfio/pci/vfio_pci.c         |   4 +-
+ drivers/vfio/pci/vfio_pci_config.c  |   3 +-
+ drivers/vfio/pci/vfio_pci_core.c    |  10 +--
+ drivers/vfio/pci/vfio_pci_igd.c     |   6 ++
+ drivers/vfio/pci/vfio_pci_intrs.c   |   2 +-
+ drivers/vfio/pci/vfio_pci_priv.h    |   6 ++
+ drivers/vfio/pci/virtio/Kconfig     |   6 +-
+ drivers/vfio/pci/virtio/legacy_io.c |   4 +-
+ drivers/vfio/pci/virtio/main.c      |   5 +-
+ drivers/vfio/vfio_iommu_type1.c     | 123 ++++++++++++++++++++++--------------
+ include/linux/mm.h                  |   2 +
+ mm/memory.c                         |   1 +
+ 12 files changed, 106 insertions(+), 66 deletions(-)
 
 
