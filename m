@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-42287-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42289-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23045A773F2
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 07:30:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 61C2AA77437
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 07:54:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C63DF165D11
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 05:30:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 125991693D3
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 05:54:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6A631DF739;
-	Tue,  1 Apr 2025 05:30:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A6031E0DB0;
+	Tue,  1 Apr 2025 05:54:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="PuNRo8V6"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="mCuaWYHp"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1AE2AF14;
-	Tue,  1 Apr 2025 05:30:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB5F642052;
+	Tue,  1 Apr 2025 05:54:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743485414; cv=none; b=PyhfN+RN6EEXHZc6xvg05kJpMjOIUlySyN0nrdwnXWtsc7fRAS/S/xSJuBpDWqt5Bmg9A3dbcN711psJB8rA8c8zHSysknZj/Y24AqLTS0LbILZ1jZ6sw8Q0682cFEAv4RdX1kdXGyMkotD8MOuuncEXnrwSROx5g5WiLL2ykQA=
+	t=1743486877; cv=none; b=jqraQH8ZgKJKBr9zzy58IBiG9GLVukZBmmGPUxl0ZCqCbQLD9XeUVL46xVtMVe0cOzbF0P87v5U191qYJ0t+wd2lXQip6uZXMdC5UPCYBF+GieA8wxysWvaSNdpvuabI2hdAMg3wMyZHwTEjcRPOnGnwC1RyxkW/MoG8uxIpnh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743485414; c=relaxed/simple;
-	bh=Y7pIpOOOgYadkjudSTcnTBayny0VQdBZUYXqpf4vEzc=;
+	s=arc-20240116; t=1743486877; c=relaxed/simple;
+	bh=muRCcD6CdqjTJbWO6ypcG2B5pstkv7hwz4Gjs5E8a64=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oPAAHHeZ+j9m91X8QgobPxsHSP6xw5xq7jSJbvN+Nzp4LOfOTpyKuwcaoX6yvggry1c5ngPrNOgVwLuSXs2BghKAtIZiRMl7Y5/BVKsNo7blmPFt2PXjOdFpxH9zjBSe0MxrUYcyxJL7Szusbzh0TRKeqbIq3bkAsX2gTXV6Tkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=PuNRo8V6; arc=none smtp.client-ip=198.137.202.136
+	 In-Reply-To:Content-Type; b=ZTXWvadwcBfMAVeIum3PT/KA9ho8/2f8Rc1rBry+jNZZYH5/ejX429sujiVV6JDy9PqvSjx8cQJJY71+ZIafMjV/gkwGpkMbZKCId+XSvN8xqAH4o+VDIRbCURG2G3Anude0/dRCxR9J/bpUufE66VuWdVij4cP2NP5yWed7eNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=mCuaWYHp; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from [192.168.7.202] ([71.202.166.45])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 5315TLRJ3578162
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 5315rnna3585174
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Mon, 31 Mar 2025 22:29:22 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 5315TLRJ3578162
+	Mon, 31 Mar 2025 22:53:50 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 5315rnna3585174
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025032001; t=1743485364;
-	bh=tuYUVWHXKKCOA8JUjduDbXOfJ32573HPzEBPhF28G1U=;
+	s=2025032001; t=1743486833;
+	bh=IsfDg+Xsar+P1dKxOMDHesRyrvTgpQ4ZnItmblKhbNo=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=PuNRo8V6ftJc3Js38Xt4+TPl7kcUwg2H/x5pUpEyYzi5yh4DDLkLlfTh1+cPv15Ju
-	 dWziFt2BjmW6G8CLCEsUhjN9zmSFpxd5hIVv9cdXt52fpANXDQAF4mQigMq0+0E0CE
-	 7/6oUfZw2t3Ler+zOXMQ8swzm01cbejNDrBEd8Q2Z5fBJmEFZL9uYdaS0txe/IvZ/i
-	 e5OGXzLYWtkOw6AtYS5H4IMxdvILUBb9AFccmBXaVWsdDmNMkIr7xMXEIHaglNHoxU
-	 yMzPh3IKZ+Ue5Am3ilhBA2dMtkCPTsFDGLanh6aCEHH/0mNg/Lm28JEuiML1/KzRw6
-	 RrhgzdOxIVCTw==
-Message-ID: <0084e9a9-8247-456f-b1a5-c5cd7bb62710@zytor.com>
-Date: Mon, 31 Mar 2025 22:29:21 -0700
+	b=mCuaWYHpnRlQenAgliGLWATiV5WBBr6xjToONzu4sHItD9CcH/Hn50bDSEPtXNZHr
+	 EmqrAKW9JffJBkWQby7YDNbuh5dAusXyZylpGe//cf2TIpo8U9KQTebtElsvd5V6YU
+	 HF8RdPMDVbhf6+t7dYSnb9ysczMAV1Fx5VJE/67I9mU0mkx81L5F9z8nRvdhiz9hLN
+	 sCK8LNjY5ocO9OXH0mW1yJE2ZnmLSV7SipWK2RChNsbc23C/QGRt/kc29IMVpQqyvo
+	 nZSU48inZXaexf0KV8NOAQgpc90SasTMpL5bfOFSYTA0+0PAcMy4DOrsLjm31CtW80
+	 qxOV8xFK/xmlw==
+Message-ID: <a0254e73-bf7c-4876-b64e-b08e96044666@zytor.com>
+Date: Mon, 31 Mar 2025 22:53:49 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -58,27 +58,26 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [RFC PATCH v1 01/15] x86/msr: Replace __wrmsr() with
  native_wrmsrl()
-To: "H. Peter Anvin" <hpa@zytor.com>,
-        Andrew Cooper <andrew.cooper3@citrix.com>,
-        linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+To: "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
         linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
         linux-edac@vger.kernel.org, kvm@vger.kernel.org,
         xen-devel@lists.xenproject.org, linux-ide@vger.kernel.org,
-        linux-pm@vger.kernel.org, bpf@vger.kernel.org, llvm@lists.linux.dev
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        linux-pm@vger.kernel.org, bpf@vger.kernel.org, llvm@lists.linux.dev,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         dave.hansen@linux.intel.com, x86@kernel.org, jgross@suse.com,
-        peterz@infradead.org, acme@kernel.org, namhyung@kernel.org,
-        mark.rutland@arm.com, alexander.shishkin@linux.intel.com,
-        jolsa@kernel.org, irogers@google.com, adrian.hunter@intel.com,
-        kan.liang@linux.intel.com, wei.liu@kernel.org, ajay.kaher@broadcom.com,
+        andrew.cooper3@citrix.com, peterz@infradead.org, acme@kernel.org,
+        namhyung@kernel.org, mark.rutland@arm.com,
+        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
+        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
+        wei.liu@kernel.org, ajay.kaher@broadcom.com,
         alexey.amakhalov@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
         tony.luck@intel.com, pbonzini@redhat.com, vkuznets@redhat.com,
         seanjc@google.com, luto@kernel.org, boris.ostrovsky@oracle.com,
         kys@microsoft.com, haiyangz@microsoft.com, decui@microsoft.com
 References: <20250331082251.3171276-1-xin@zytor.com>
- <20250331082251.3171276-2-xin@zytor.com>
- <0da43a86-81b0-4388-b47b-3a76b15f2a4c@citrix.com>
- <03874E9B-FAEB-4ACA-B13D-0BED7D54F443@zytor.com>
+ <20250331082251.3171276-2-xin@zytor.com> <Z-pruogreCuU66wm@gmail.com>
+ <9D15DE81-2E68-4FCD-A133-4963602E18C9@zytor.com>
 Content-Language: en-US
 From: Xin Li <xin@zytor.com>
 Autocrypt: addr=xin@zytor.com; keydata=
@@ -115,34 +114,55 @@ Autocrypt: addr=xin@zytor.com; keydata=
  PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
  gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
  l75w1xInsg==
-In-Reply-To: <03874E9B-FAEB-4ACA-B13D-0BED7D54F443@zytor.com>
+In-Reply-To: <9D15DE81-2E68-4FCD-A133-4963602E18C9@zytor.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 3/31/2025 10:13 PM, H. Peter Anvin wrote:
-> On March 31, 2025 2:45:43 PM PDT, Andrew Cooper <andrew.cooper3@citrix.com> wrote:
->> On 31/03/2025 9:22 am, Xin Li (Intel) wrote:
->>> __wrmsr() is the lowest level primitive MSR write API, and its direct
->>> use is NOT preferred.  Use its wrapper function native_wrmsrl() instead.
->>>
->>> No functional change intended.
->>>
->>> Signed-off-by: Xin Li (Intel) <xin@zytor.com>
+On 3/31/2025 1:32 PM, H. Peter Anvin wrote:
+> On March 31, 2025 3:17:30 AM PDT, Ingo Molnar <mingo@kernel.org> wrote:
 >>
->> The critical piece of information you're missing from the commit message
->> is that the MSR_IMM instructions take a single u64.
+>> * Xin Li (Intel) <xin@zytor.com> wrote:
 >>
->> Therefore to use them, you've got to arrange for all callers to provide
->> a single u64, rather than a split u32 pair.
+>>> -	__wrmsr      (MSR_AMD_DBG_EXTN_CFG, val | 3ULL << 3, val >> 32);
+>>> +	native_wrmsrl(MSR_AMD_DBG_EXTN_CFG, val | 3ULL << 3);
 >>
->> ~Andrew
+>> This is an improvement.
+>>
+>>> -	__wrmsr      (MSR_IA32_PQR_ASSOC, rmid_p, plr->closid);
+>>> +	native_wrmsrl(MSR_IA32_PQR_ASSOC, (u64)plr->closid << 32 | rmid_p);
+>>
+>>> -	__wrmsr      (MSR_IA32_PQR_ASSOC, rmid_p, closid_p);
+>>> +	native_wrmsrl(MSR_IA32_PQR_ASSOC, (u64)closid_p << 32 | rmid_p);
+>>
+>> This is not an improvement.
+>>
+>> Please provide a native_wrmsrl() API variant where natural [rmid_p, closid_p]
+>> high/lo parameters can be used, without the shift-uglification...
+>>
+>> Thanks,
+>>
+>> 	Ingo
 > 
-> That being said, there is nothing wrong with having a two-word convenience wrapper.
+> Directing this question primarily to Ingo, who is more than anyone else the namespace consistency guardian:
+> 
+> On the subject of msr function naming ... *msrl() has always been misleading. The -l suffix usually means 32 bits; sometimes it means the C type "long" (which in the kernel is used instead of size_t/uintptr_t, which might end up being "fun" when 128-bit architectures appear some time this century), but for a fixed 64-but type we normally use -q.
+> 
+> Should we rename the *msrl() functions to *msrq() as part of this overhaul?
 > 
 
-Yes, I ended up keeping the two-word convenience wrapper in this patch
-set, and the wrapper calls a lower level API that takes a u64 argument.
+Per "struct msr" defined in arch/x86/include/asm/shared/msr.h:
 
-And yes, as Ingo said, some of the conversion is NOT an improvement.
+struct msr {
+         union {
+                 struct {
+                         u32 l;
+                         u32 h;
+                 };
+                 u64 q;
+         };
+};
+
+Probably *msrq() is what we want?
+
 
 
