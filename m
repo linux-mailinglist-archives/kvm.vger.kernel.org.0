@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-42313-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42314-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDFD0A779C3
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 13:41:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4C5DA779CE
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 13:42:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A910166FA2
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 11:41:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C28623AE20F
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 11:41:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA0111FBCB1;
-	Tue,  1 Apr 2025 11:40:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0E111FBEA9;
+	Tue,  1 Apr 2025 11:41:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="U0J+MBZi"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="SN4MOQs1"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2086.outbound.protection.outlook.com [40.107.92.86])
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2062.outbound.protection.outlook.com [40.107.100.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59C181F03EC;
-	Tue,  1 Apr 2025 11:40:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.86
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E701FBC87;
+	Tue,  1 Apr 2025 11:41:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.62
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743507648; cv=fail; b=QIWE8bJ85MwQx9HSZBNuk8cB5SyuNZXLqaMZ6eDlZN1K4LQ2pHkCr0b2JWTGyy09SOsMiHkyU4SLrps8Evj8cHBGe6SG44r8C2qZt1/TT8Dyq9rqGKHIXr8mFEE2eXeSW72bxc+t2EDxpghzXHi1x+gphX43DDiDLMeVbs7vFH4=
+	t=1743507664; cv=fail; b=LxQUdrPwYZIVRoYoy5ligDGHVrd+F54SU/5GBSlsGQ9W3AGuEe4eQBzgJQkm3BaU7CWL0WrwQug7o4B8JOLTO9datE7KLs80mHN1rV8bAc8PbU1TdC7EnOg9S3LjUs3GHZg07yFv26HDc/vDqgfMXafA6/mBJ7G1ENhKPnmt4Uc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743507648; c=relaxed/simple;
-	bh=j45KukHnrCXDwEqZwIHp0LT592etLkeFjJo1Cv23Uss=;
+	s=arc-20240116; t=1743507664; c=relaxed/simple;
+	bh=J+foIHVLTfp6k7crsleO1XiGt/6+s97ST7gWKX/kIzE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=B9NxEWws26QjGegcnZ7HLQlUqrUXPklYVi9gTyE7iXnvX0e5hXrSDukv3sM596sO2oB65+r27EcUqMA1P56k4//cYuaU2sk4ReTuPtigDhgWWmmdhL4cr5oeOmglvRb1BGQTs4/HZ5lArjf5OfXeoe21ksOW4eGxKowI47jDLlE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=U0J+MBZi; arc=fail smtp.client-ip=40.107.92.86
+	 MIME-Version:Content-Type; b=OwooStf49j0cUcApzd9AEuXX3pRs5jpeuv9LO40oxYZolVId2PgHLYoUiYhLPIXuV4+dLd4JMF4j6TzTNOtu7f+GmgdOxTKFjjoQGPzCfu1S64Sf0yxdsFk7RSom8Jiq4srQkLYrpwqx4Bpxd+T2e8zFb9MhrMibG9Vslepi88E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=SN4MOQs1; arc=fail smtp.client-ip=40.107.100.62
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=IlhByEGqRBrFJxnJA8lOmubGIH0TvBJJnuvyMRC1+Ay0hi+SsFjfsmihRFD6BKA0YVeX8i3bkBhYMgJrPeQXhQEyL6+VwBj91Fn5HA9bf5CuBLcUlKzA5OVZdDDFoTZuAzoztbvZ5D67Gpj8+WquotaQry4SS9skq3N0FsaCkNxJZUX3e4MtWeJo4kT4szUa873YIjKDpVnWQn25US9AY7WIqG4XJIU3vkD9cc449aUKIMlRsYMwW9UnKYm/wrQBRH1G2Q3+5Lvs5R6zpS1YkKByIpxvDrdJOdvACWCGwaGcZN3jmaa0DHMgWcZKAr4koE0p+MsrBX+FmCScdYI1EA==
+ b=XAzdPANUzI4mhj+80k8g1HXxwpuqZiTEey6bpl/omzrbvhQmWYEyYUs8N+7nHHAcTbsSqsT8HP1rrA5jiRvogFGPLyCfBwc+/LaIpwSmveIdO/Ov+HAbOOr/wRVAlU3TXiEgf7J4JsfI6N0EpKxBRM1IBviZdwCDUdt0Xf3oD5I4cVF+FVTFLuTu17RzP64IuGcvTjFTNg422MxLIuPOxcngktLDvFdY0yalPr0qECiC77DqzWAfJrKB22eON4RDWRwwefl6CoMlZYpDKHsUAtdr0vfmcEZsnuGuR2Ix+oFcdE1NSghVee2BI45wdTqXqTgo95NBCPw9aYxFsZSwCQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OqYeoKzXKpg0THxeVdKhgK0yotvM5Eyjv4tZOKTQ9to=;
- b=CrAmITfy8BBZJfCNB2A/PnzI0+w42lWkdILzKwMTTKompTgyEeBUhHrST/J2obwLGYDWEIA9cs9k75v4XY+NIq/04OHsztV20M5+m/4KIw/q0yIlGbwYbr7Qa48yypw0NrCKG7dPynMy7QNag872zFEwguK5FRLS7KG1cDqHjMppmb07YE+fgIa/MdMO0ulqgluMWnpLc5bmr0XXNVd+CONRMxVpiEnnkTTwbpRERKextt9pLjgnUcjbF+1TrmaTvpmv57uCmRL/+CeqmzZ/TQePxM5z0IsvgLvd4S0X+rdcNGpXgluXleX8RGt8RxktWvVljRAmWABwe6oRhZp8ow==
+ bh=RS4sxldrG+K+gQZwT3+DSbuX6TczT41ZqBH+CxQQoXo=;
+ b=Pz9QZ2cY7odWl9rd3lYW3bt6IqoSx0q7ORvaJIFDtPXPmOdcOMQ+fDrdounVKHUBafB9hs6u5k+epud9ZByDSCq5QbwDpeEizir3oKaSw6zkPaSmVgmE5X4npF2Cm911VrkX28AGgRe5AiQjRWn3mtsZIJdZ3/iHzNSj81SJwCm10Uk+5N2f+gVDvBRHqt3wUm2rK+HxiFoq9695FrCckEUrzJALT6Aqh9kJ67auckQ2Eg4NgiM4TVGv5ggxEQFs9Dek+Ly5B0bdiEgOcBhQxF/3LEG320wPvTdSfICzsDhNXEN4yKkDHJMcHwQNO6lkhwjMcABBjcZyN7AXgx++Zg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OqYeoKzXKpg0THxeVdKhgK0yotvM5Eyjv4tZOKTQ9to=;
- b=U0J+MBZiwJuwGw6d7/vlEHLm0tegETIDzLE3VtFJrAsLMz3ezhJBLzvNc9i9vntr7XSUmhoLKW6mm+9lUHgi09yHQC+VC6qO9Y7HCNdVMN47VNxabdAQae3K/9Wd2n0jGdFnlVeIY9/4oJAPtB8y1MAdBIKPaUMFoju0QwS1N+Q=
-Received: from MW4P220CA0022.NAMP220.PROD.OUTLOOK.COM (2603:10b6:303:115::27)
- by PH7PR12MB6417.namprd12.prod.outlook.com (2603:10b6:510:1ff::14) with
+ bh=RS4sxldrG+K+gQZwT3+DSbuX6TczT41ZqBH+CxQQoXo=;
+ b=SN4MOQs1sT1vK2+LJ5g3XQbVUOI77LriS7GBzw8zIPAUkLr1J5IzR08FYRK86F7vz91Ac6BGuiA/PyuZThuAhxBEu4LE5dtyIWUWXAthuorUXtOjupiwqhiMHAxl6qvVY/fH1mRKOmiWyMR8xXBtfeolBs9ZhS1tHn3GWqQQt84=
+Received: from PH8PR07CA0022.namprd07.prod.outlook.com (2603:10b6:510:2cd::21)
+ by CY5PR12MB6299.namprd12.prod.outlook.com (2603:10b6:930:20::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.44; Tue, 1 Apr
- 2025 11:40:38 +0000
-Received: from CO1PEPF000044FB.namprd21.prod.outlook.com
- (2603:10b6:303:115:cafe::d9) by MW4P220CA0022.outlook.office365.com
- (2603:10b6:303:115::27) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8583.37 via Frontend Transport; Tue,
- 1 Apr 2025 11:40:38 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.47; Tue, 1 Apr
+ 2025 11:40:57 +0000
+Received: from CO1PEPF000044FD.namprd21.prod.outlook.com
+ (2603:10b6:510:2cd:cafe::94) by PH8PR07CA0022.outlook.office365.com
+ (2603:10b6:510:2cd::21) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8534.54 via Frontend Transport; Tue,
+ 1 Apr 2025 11:40:57 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,13 +63,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1PEPF000044FB.mail.protection.outlook.com (10.167.241.201) with Microsoft
+ CO1PEPF000044FD.mail.protection.outlook.com (10.167.241.203) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8632.2 via Frontend Transport; Tue, 1 Apr 2025 11:40:38 +0000
+ 15.20.8632.2 via Frontend Transport; Tue, 1 Apr 2025 11:40:57 +0000
 Received: from BLR-L-NUPADHYA.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 1 Apr
- 2025 06:40:32 -0500
+ 2025 06:40:51 -0500
 From: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
 To: <linux-kernel@vger.kernel.org>
 CC: <bp@alien8.de>, <tglx@linutronix.de>, <mingo@redhat.com>,
@@ -80,9 +80,9 @@ CC: <bp@alien8.de>, <tglx@linutronix.de>, <mingo@redhat.com>,
 	<pbonzini@redhat.com>, <kvm@vger.kernel.org>,
 	<kirill.shutemov@linux.intel.com>, <huibo.wang@amd.com>,
 	<naveen.rao@amd.com>, <francescolavra.fl@gmail.com>
-Subject: [PATCH v3 13/17] x86/apic: Handle EOI writes for SAVIC guests
-Date: Tue, 1 Apr 2025 17:06:12 +0530
-Message-ID: <20250401113616.204203-14-Neeraj.Upadhyay@amd.com>
+Subject: [PATCH v3 14/17] x86/apic: Add kexec support for Secure AVIC
+Date: Tue, 1 Apr 2025 17:06:13 +0530
+Message-ID: <20250401113616.204203-15-Neeraj.Upadhyay@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250401113616.204203-1-Neeraj.Upadhyay@amd.com>
 References: <20250401113616.204203-1-Neeraj.Upadhyay@amd.com>
@@ -98,285 +98,183 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000044FB:EE_|PH7PR12MB6417:EE_
-X-MS-Office365-Filtering-Correlation-Id: 739254bd-ccba-4a5f-b81c-08dd71120674
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044FD:EE_|CY5PR12MB6299:EE_
+X-MS-Office365-Filtering-Correlation-Id: 63f9005a-6e92-463c-1166-08dd71121186
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|376014|7416014;
+	BCL:0;ARA:13230040|82310400026|376014|7416014|36860700013|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?MhbJEm0DCQb6jQTWH0bzGp8izchTDFbjMs99TGlaNB//LXMBYpAhiabGBFvL?=
- =?us-ascii?Q?AiIlZUWQJuCuk5Ey9dEbQi7D3n9F+Lu9JWwY1QeOs3T3ADYvvLmOWFCyliCh?=
- =?us-ascii?Q?iKzgNDpIZVqmGSBDDUOqqDgOad7bnmfYjjEsx+JuzX8/EoO2OQ4v0bwP+GOT?=
- =?us-ascii?Q?W/w1HpcjnN4+iM7/L93H57LIHmgpyOYNS8q3P0uWoCuURpGbE5WrTFC7Ywto?=
- =?us-ascii?Q?T2jZoP45DOYSveKsNaGFYOJw1TmQM21zmqB159TsDO3u4IGuK9WbcTUWJJwO?=
- =?us-ascii?Q?CheZFHKPltSHZB4DC4VsZ0LSsnylLwSCDEqOc5/m6qslkkVV+dvn9QBvZ5rE?=
- =?us-ascii?Q?bOf/ITXK3YTcGlevml1KchYiyrVx2IwG7pa61edsMsKJrqKmbqPYd+zdVxo8?=
- =?us-ascii?Q?8Kj6mjktNA72I91LpPzipNBemEYYgYLvhA+YoOTeOcnreQO5av/zVPFdjFEa?=
- =?us-ascii?Q?P64G9/8rPL9UFQHq6d5dSNnPDBuo9cBa4JywLG2YKziq9RkDarLxHKiHM34H?=
- =?us-ascii?Q?VnI/czreygo5mEUrvLsUe8O+8bGDv0tq+Rnhk8ychLG2CQVDMc6dBHnAJqfy?=
- =?us-ascii?Q?8IoYXqmxwBqZKlfgvOF43NK3yZzMUE8Wz6tjZHMpc+9+5iGEjsMuYRPbnKLq?=
- =?us-ascii?Q?km3bWCI/Hij24JQZXe+GlIQlArM52yPmsDoNF4HAysWDJKWNyGFbD5TRu/OF?=
- =?us-ascii?Q?FO9Xtcrm2e6KCStSomjkoT83yGsJN1Z2F7H1wktyTdtSuxGX3cx2B6UgUdBM?=
- =?us-ascii?Q?L2y/y83MgMgUcbp/J6knLKFFRD8Ep+ae8mqeZ3jKUkTJSF/slAmMbXyJbSXL?=
- =?us-ascii?Q?fGvi0NF11tX3IbsvcqLLS6ZMuaROXJQWU3fqasjOmf2VNy96D749M58v/bKS?=
- =?us-ascii?Q?F9tF4FlC/fa0dKU0+LBoWxR8HDBkgc18haYoBpMR24SXZFlgdXz14BCak1jz?=
- =?us-ascii?Q?23S5VmtWgYj3QlP3wQZvYdaskIKMdeRzxZwVhrtTI5p7kYqBoQ+9CeeyXeca?=
- =?us-ascii?Q?yGlPTxbLRGEWZiRPUx8VRWfJgSquzDU/maU56CTDkuvdCEPPBDr7+lzq+BOh?=
- =?us-ascii?Q?cDEFL+98kszUnWq56wlf4BGE2wHB9GE3fJmrEcyuLeDI4yjQbvGvpV0sYlO0?=
- =?us-ascii?Q?oIKB8MNnc0aPM1PmZ4VRW3QHz2DgBiwiC+RsZC0uV9YSVpyw6qylRXXy0aMD?=
- =?us-ascii?Q?zu4ndNWZJbdYhRLet2DmX242bpdH9srL59mLzqLVyj+5ljIpeEjXdMh3YcIE?=
- =?us-ascii?Q?+7AaNEKUolhBLMGpwJtUwYnPQOAAwTj+DU+lG9FdGBDvr6lPWw9Y08PrB3Zb?=
- =?us-ascii?Q?KcZn/U6q5RvvJR0Rf+P9SahejgUcDwOxxK1EIZATqbzRwGNBdA5/vmGGCndR?=
- =?us-ascii?Q?QQnObCXwtfq14mxt5dA77n9yDN3g0fz439fFO6yXAPv0xUiFC8UUl6Q6cXFp?=
- =?us-ascii?Q?wHz5YmBQxaZs/D5NopTwqx5ObAojUKrvvhn5kWwnmaj8h0UIS9X6El4PK4Ci?=
- =?us-ascii?Q?ztB2cC23r3SqhSo=3D?=
+	=?us-ascii?Q?1AZMmMNNW8u7OWwH+okKRisIQ90c4wKxGWOeNnR8c/J/GqlU98TJ3OsPl+uH?=
+ =?us-ascii?Q?/ns2tJJ5o8sk7cYqsEQN+CUuMydKJShrIJWNrNmEhXeXRP7GE5jnDUBG1mrI?=
+ =?us-ascii?Q?cLI3Rw8coP8eOdNCCrM1oYvs0PbzC2j7E3JVcPcCdBHF/UySo5Y7Pt5bYvrd?=
+ =?us-ascii?Q?PU2DKxe58Oghfur/zxBffKeV5YrSEgxwz6HGGlDHdayQnC0IKVlOQWNsxev+?=
+ =?us-ascii?Q?dfiCCbYUJ3U877ZM6kbxRuV9idwOQUBeG6LmeoXsYljKVHfs7LpYd8cKdINo?=
+ =?us-ascii?Q?Stvh3o1JlngWjV0SxwbBUss+Oo3Rpg0YJveg0n9oH9mhhfvoEvKPLl61YlN3?=
+ =?us-ascii?Q?6KKDuAPOSC5BklsxA/xd44CRdyP4zvT9qpb4mJuUrYWuLfKbtIRlizVMUPB0?=
+ =?us-ascii?Q?8SLXVf4zpmYi3X7nluvTaRbkApfESaOXgGZK5Euj25WulRyD3Fhgm9NpiqOJ?=
+ =?us-ascii?Q?zkUDKPI9KHwzhy1NAUw0YuoUtAUapQtaJAt0ZTVSNU2gH2Eyw1FW9jqnQ2qm?=
+ =?us-ascii?Q?fkY5QbPPLfBc+HT7RDz2jhOKv5tdBu/3IYDPhQz7AIWa4BfJuDA4+2IuAOaQ?=
+ =?us-ascii?Q?ost+6sHNEtbu2w06EmOk9HN8Ipziz6EnCF5GZerfWuj3ZUx+SLFzqkePHUL9?=
+ =?us-ascii?Q?VHH49Kd5MVJILB11BRKOTFeoi3++vO2ZDoN+cTJRSwSEeXW5ZwHajtBoZ8Ha?=
+ =?us-ascii?Q?qkC1J8lGOLaUrXWz5zL7jjwEbgqjA+xrAHYrwVYbqHZj3o7h3Wev0IDZob+M?=
+ =?us-ascii?Q?WKXIZuExfPfT9d9OXXjL7H4a1TCDyqOAQFfjh5U6cfZiHokyTEpv8fE30Dfv?=
+ =?us-ascii?Q?6SaRzbrRMbro8bJiMXDkbSqCdLZHs+kMJCa7P7WVDFk5UfbSoAZP0pZghHGG?=
+ =?us-ascii?Q?4Va81IalcYo4+I8x4ZJBg0pml8h4rjtK+zSDO+7bzoQa+vtcTf2Z8jn8eSkt?=
+ =?us-ascii?Q?a8/cZjk2Ju7z4l+0PmShOCZz1nBjVsQVcYSFTMNgVvlgq3dxh/xhv/Xhoh8B?=
+ =?us-ascii?Q?1YLbqig6J5h1t+p92Xd4kBpdBmBS0L5WtLmE2U1fbaCoQG1gH4ZnfRrrqEbp?=
+ =?us-ascii?Q?BqCW0//K0TLOX7E5AJzU2tvy9AxRjRMCXuSS9RbNsxExFrjWSSWKTunwbmja?=
+ =?us-ascii?Q?9Ce2EdII/DP4Na9cfh+y1zG4cKzA6lPGESepT1pO7UyWFfzPB6HKbcpbIuhK?=
+ =?us-ascii?Q?GbZ2n8aUmaoUW+1WGw7k+tNKKG7LvUgOoSu7aVzjsSY5NC7IFOe5r281dXRS?=
+ =?us-ascii?Q?DAU/qOLFiMAyDGtEnAlkrx2kFU7C+sjGsAfuBNjU3QdzCOQoKA8euEhCpCgY?=
+ =?us-ascii?Q?KcYNgChx2ZYbqbjTk/bpXTBNx4mGm/+qWuCXtDwQ5ok4V7mRNpXScvYH+JAx?=
+ =?us-ascii?Q?1nzVDoPBDbxjs/wmp+IUXru5I6Pz7NlWczQFjLby/TEQW1LC09O518Wx4AnY?=
+ =?us-ascii?Q?obPGCgxbWtLLNkDt8IVNKhDmDju81pQazWbOjrEP4meePjVeQVTeJPmDP1dX?=
+ =?us-ascii?Q?hQ4EaHO7HrNJuZw=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(7416014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2025 11:40:38.6569
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2025 11:40:57.2349
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 739254bd-ccba-4a5f-b81c-08dd71120674
+X-MS-Exchange-CrossTenant-Network-Message-Id: 63f9005a-6e92-463c-1166-08dd71121186
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000044FB.namprd21.prod.outlook.com
+	CO1PEPF000044FD.namprd21.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6417
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6299
 
-Secure AVIC accelerates guest's EOI msr writes for edge-triggered
-interrupts. For level-triggered interrupts, EOI msr writes trigger
-VC exception with SVM_EXIT_AVIC_UNACCELERATED_ACCESS error code. The
-VC handler would need to trigger a GHCB protocol MSR write event to
-to notify the Hypervisor about completion of the level-triggered
-interrupt. This is required for cases like emulated IOAPIC. VC exception
-handling adds extra performance overhead for APIC register write. In
-addition, some unaccelerated APIC register msr writes are trapped,
-whereas others are faulted. This results in additional complexity in
-VC exception handling for unacclerated accesses. So, directly do a GHCB
-protocol based EOI write from apic->eoi() callback for level-triggered
-interrupts. Use wrmsr for edge-triggered interrupts, so that hardware
-re-evaluates any pending interrupt which can be delivered to guest vCPU.
-For level-triggered interrupts, re-evaluation happens on return from
-VMGEXIT corresponding to the GHCB event for EOI msr write.
+Add a apic->teardown() callback to disable Secure AVIC before
+rebooting into the new kernel. This ensures that the new
+kernel does not access the old APIC backing page which was
+allocated by the previous kernel. Such accesses can happen
+if there are any APIC accesses done during guest boot before
+Secure AVIC driver probe is done by the new kernel (as Secure
+AVIC would have remained enabled in the Secure AVIC control
+msr).
 
 Signed-off-by: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
 ---
 Changes since v2:
- - Reuse find_highest_vector() from kvm/lapic.c
- - Misc cleanups.
+ - Change savic_unregister_gpa() interface to allow GPA unregistration
+   only for local CPU.
 
- arch/x86/include/asm/apic-emul.h    | 28 +++++++++++++
- arch/x86/kernel/apic/x2apic_savic.c | 62 +++++++++++++++++++++++++----
- arch/x86/kvm/lapic.c                | 23 ++---------
- 3 files changed, 85 insertions(+), 28 deletions(-)
- create mode 100644 arch/x86/include/asm/apic-emul.h
+ arch/x86/coco/sev/core.c            | 25 +++++++++++++++++++++++++
+ arch/x86/include/asm/apic.h         |  1 +
+ arch/x86/include/asm/sev.h          |  2 ++
+ arch/x86/kernel/apic/apic.c         |  3 +++
+ arch/x86/kernel/apic/x2apic_savic.c |  8 ++++++++
+ 5 files changed, 39 insertions(+)
 
-diff --git a/arch/x86/include/asm/apic-emul.h b/arch/x86/include/asm/apic-emul.h
-new file mode 100644
-index 000000000000..60d9e88fefc6
---- /dev/null
-+++ b/arch/x86/include/asm/apic-emul.h
-@@ -0,0 +1,28 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+#ifndef _ASM_X86_APIC_EMUL_H
-+#define _ASM_X86_APIC_EMUL_H
-+
-+#define MAX_APIC_VECTOR			256
-+#define APIC_VECTORS_PER_REG		32
-+
-+static inline int apic_find_highest_vector(void *bitmap)
+diff --git a/arch/x86/coco/sev/core.c b/arch/x86/coco/sev/core.c
+index 9ade2b1993ad..2381859491db 100644
+--- a/arch/x86/coco/sev/core.c
++++ b/arch/x86/coco/sev/core.c
+@@ -1588,6 +1588,31 @@ enum es_result savic_register_gpa(u64 gpa)
+ 	return res;
+ }
+ 
++enum es_result savic_unregister_gpa(u64 *gpa)
 +{
-+	unsigned int regno;
-+	unsigned int vec;
-+	u32 *reg;
++	struct ghcb_state state;
++	struct es_em_ctxt ctxt;
++	unsigned long flags;
++	struct ghcb *ghcb;
++	int ret = 0;
 +
-+	/*
-+	 * The registers int the bitmap are 32-bit wide and 16-byte
-+	 * aligned. State of a vector is stored in a single bit.
-+	 */
-+	for (regno = MAX_APIC_VECTOR / APIC_VECTORS_PER_REG - 1; regno >= 0; regno--) {
-+		vec = regno * APIC_VECTORS_PER_REG;
-+		reg = bitmap + regno * 16;
-+		if (*reg)
-+			return __fls(*reg) + vec;
-+	}
++	local_irq_save(flags);
 +
-+	return -1;
++	ghcb = __sev_get_ghcb(&state);
++
++	vc_ghcb_invalidate(ghcb);
++
++	ghcb_set_rax(ghcb, -1ULL);
++	ret = sev_es_ghcb_hv_call(ghcb, &ctxt, SVM_VMGEXIT_SECURE_AVIC,
++			SVM_VMGEXIT_SECURE_AVIC_UNREGISTER_GPA, 0);
++	if (gpa && ret == ES_OK)
++		*gpa = ghcb->save.rbx;
++	__sev_put_ghcb(&state);
++
++	local_irq_restore(flags);
++	return ret;
 +}
 +
-+#endif /* _ASM_X86_APIC_EMUL_H */
+ static void snp_register_per_cpu_ghcb(void)
+ {
+ 	struct sev_es_runtime_data *data;
+diff --git a/arch/x86/include/asm/apic.h b/arch/x86/include/asm/apic.h
+index 7616a622248c..0cd9315226d2 100644
+--- a/arch/x86/include/asm/apic.h
++++ b/arch/x86/include/asm/apic.h
+@@ -306,6 +306,7 @@ struct apic {
+ 	/* Probe, setup and smpboot functions */
+ 	int	(*probe)(void);
+ 	void	(*setup)(void);
++	void	(*teardown)(void);
+ 	int	(*acpi_madt_oem_check)(char *oem_id, char *oem_table_id);
+ 
+ 	void	(*init_apic_ldr)(void);
+diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+index 7c942b9c593a..8a08a03183b4 100644
+--- a/arch/x86/include/asm/sev.h
++++ b/arch/x86/include/asm/sev.h
+@@ -484,6 +484,7 @@ int snp_send_guest_request(struct snp_msg_desc *mdesc, struct snp_guest_req *req
+ void __init snp_secure_tsc_prepare(void);
+ void __init snp_secure_tsc_init(void);
+ enum es_result savic_register_gpa(u64 gpa);
++enum es_result savic_unregister_gpa(u64 *gpa);
+ u64 savic_ghcb_msr_read(u32 reg);
+ void savic_ghcb_msr_write(u32 reg, u64 value);
+ 
+@@ -530,6 +531,7 @@ static inline int snp_send_guest_request(struct snp_msg_desc *mdesc, struct snp_
+ static inline void __init snp_secure_tsc_prepare(void) { }
+ static inline void __init snp_secure_tsc_init(void) { }
+ static inline enum es_result savic_register_gpa(u64 gpa) { return ES_UNSUPPORTED; }
++static inline enum es_result savic_unregister_gpa(u64 *gpa) { return ES_UNSUPPORTED; }
+ static inline void savic_ghcb_msr_write(u32 reg, u64 value) { }
+ static inline u64 savic_ghcb_msr_read(u32 reg) { return 0; }
+ 
+diff --git a/arch/x86/kernel/apic/apic.c b/arch/x86/kernel/apic/apic.c
+index 86f9c3c7df1c..b5236c8c3032 100644
+--- a/arch/x86/kernel/apic/apic.c
++++ b/arch/x86/kernel/apic/apic.c
+@@ -1169,6 +1169,9 @@ void disable_local_APIC(void)
+ 	if (!apic_accessible())
+ 		return;
+ 
++	if (apic->teardown)
++		apic->teardown();
++
+ 	apic_soft_disable();
+ 
+ #ifdef CONFIG_X86_32
 diff --git a/arch/x86/kernel/apic/x2apic_savic.c b/arch/x86/kernel/apic/x2apic_savic.c
-index 4adb9cad0a0c..9e2a9bdb0762 100644
+index 9e2a9bdb0762..8cfffdc4cf8b 100644
 --- a/arch/x86/kernel/apic/x2apic_savic.c
 +++ b/arch/x86/kernel/apic/x2apic_savic.c
-@@ -13,6 +13,7 @@
- #include <linux/align.h>
- 
- #include <asm/apic.h>
-+#include <asm/apic-emul.h>
- #include <asm/sev.h>
- 
- #include "local.h"
-@@ -49,20 +50,27 @@ static __always_inline void set_reg(unsigned int offset, u32 val)
- 	WRITE_ONCE(this_cpu_ptr(apic_page)->regs[offset >> 2], val);
+@@ -349,6 +349,13 @@ static void init_apic_page(void)
+ 	set_reg(APIC_ID, apic_id);
  }
  
--#define SAVIC_ALLOWED_IRR	0x204
--
--static inline void update_vector(unsigned int cpu, unsigned int offset,
--				 unsigned int vector, bool set)
-+static inline unsigned long *get_reg_bitmap(unsigned int cpu, unsigned int offset)
- {
- 	struct apic_page *ap = per_cpu_ptr(apic_page, cpu);
--	unsigned long *reg = (unsigned long *) &ap->bytes[offset];
--	unsigned int bit;
- 
-+	return (unsigned long *) &ap->bytes[offset];
++static void x2apic_savic_teardown(void)
++{
++	/* Disable Secure AVIC */
++	native_wrmsr(MSR_AMD64_SECURE_AVIC_CONTROL, 0, 0);
++	savic_unregister_gpa(NULL);
 +}
 +
-+static inline unsigned int get_vec_bit(unsigned int vector)
-+{
- 	/*
- 	 * The registers are 32-bit wide and 16-byte aligned.
- 	 * Compensate for the resulting bit number spacing.
- 	 */
--	bit = vector + 96 * (vector / 32);
-+	return vector + 96 * (vector / 32);
-+}
-+
-+static inline void update_vector(unsigned int cpu, unsigned int offset,
-+				 unsigned int vector, bool set)
-+{
-+	unsigned long *reg = get_reg_bitmap(cpu, offset);
-+	unsigned int bit = get_vec_bit(vector);
- 
- 	if (set)
- 		set_bit(bit, reg);
-@@ -70,6 +78,16 @@ static inline void update_vector(unsigned int cpu, unsigned int offset,
- 		clear_bit(bit, reg);
- }
- 
-+static inline bool test_vector(unsigned int cpu, unsigned int offset, unsigned int vector)
-+{
-+	unsigned long *reg = get_reg_bitmap(cpu, offset);
-+	unsigned int bit = get_vec_bit(vector);
-+
-+	return test_bit(bit, reg);
-+}
-+
-+#define SAVIC_ALLOWED_IRR	0x204
-+
- static u32 x2apic_savic_read(u32 reg)
+ static void x2apic_savic_setup(void)
  {
- 	/*
-@@ -374,6 +392,34 @@ static int x2apic_savic_probe(void)
- 	return 1;
- }
+ 	void *backing_page;
+@@ -426,6 +433,7 @@ static struct apic apic_x2apic_savic __ro_after_init = {
+ 	.probe				= x2apic_savic_probe,
+ 	.acpi_madt_oem_check		= x2apic_savic_acpi_madt_oem_check,
+ 	.setup				= x2apic_savic_setup,
++	.teardown			= x2apic_savic_teardown,
  
-+static void x2apic_savic_eoi(void)
-+{
-+	unsigned int cpu;
-+	int vec;
-+
-+	cpu = raw_smp_processor_id();
-+	vec = apic_find_highest_vector(get_reg_bitmap(cpu, APIC_ISR));
-+	if (WARN_ONCE(vec == -1, "EOI write while no active interrupt in APIC_ISR"))
-+		return;
-+
-+	if (test_vector(cpu, APIC_TMR, vec)) {
-+		update_vector(cpu, APIC_ISR, vec, false);
-+		/*
-+		 * Propagate the EOI write to hv for level-triggered interrupts.
-+		 * Return to guest from GHCB protocol event takes care of
-+		 * re-evaluating interrupt state.
-+		 */
-+		savic_ghcb_msr_write(APIC_EOI, 0);
-+	} else {
-+		/*
-+		 * Hardware clears APIC_ISR and re-evaluates the interrupt state
-+		 * to determine if there is any pending interrupt which can be
-+		 * delivered to CPU.
-+		 */
-+		native_apic_msr_eoi();
-+	}
-+}
-+
- static struct apic apic_x2apic_savic __ro_after_init = {
+ 	.dest_mode_logical		= false,
  
- 	.name				= "secure avic x2apic",
-@@ -403,7 +449,7 @@ static struct apic apic_x2apic_savic __ro_after_init = {
- 
- 	.read				= x2apic_savic_read,
- 	.write				= x2apic_savic_write,
--	.eoi				= native_apic_msr_eoi,
-+	.eoi				= x2apic_savic_eoi,
- 	.icr_read			= native_x2apic_icr_read,
- 	.icr_write			= x2apic_savic_icr_write,
- 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 28e3317124fd..8269af8666b8 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -27,6 +27,7 @@
- #include <linux/export.h>
- #include <linux/math64.h>
- #include <linux/slab.h>
-+#include <asm/apic-emul.h>
- #include <asm/processor.h>
- #include <asm/mce.h>
- #include <asm/msr.h>
-@@ -55,9 +56,6 @@
- /* 14 is the version for Xeon and Pentium 8.4.8*/
- #define APIC_VERSION			0x14UL
- #define LAPIC_MMIO_LENGTH		(1 << 12)
--/* followed define is not in apicdef.h */
--#define MAX_APIC_VECTOR			256
--#define APIC_VECTORS_PER_REG		32
- 
- /*
-  * Enable local APIC timer advancement (tscdeadline mode only) with adaptive
-@@ -626,21 +624,6 @@ static const unsigned int apic_lvt_mask[KVM_APIC_MAX_NR_LVT_ENTRIES] = {
- 	[LVT_CMCI] = LVT_MASK | APIC_MODE_MASK
- };
- 
--static int find_highest_vector(void *bitmap)
--{
--	int vec;
--	u32 *reg;
--
--	for (vec = MAX_APIC_VECTOR - APIC_VECTORS_PER_REG;
--	     vec >= 0; vec -= APIC_VECTORS_PER_REG) {
--		reg = bitmap + REG_POS(vec);
--		if (*reg)
--			return __fls(*reg) + vec;
--	}
--
--	return -1;
--}
--
- static u8 count_vectors(void *bitmap)
- {
- 	int vec;
-@@ -704,7 +687,7 @@ EXPORT_SYMBOL_GPL(kvm_apic_update_irr);
- 
- static inline int apic_search_irr(struct kvm_lapic *apic)
- {
--	return find_highest_vector(apic->regs + APIC_IRR);
-+	return apic_find_highest_vector(apic->regs + APIC_IRR);
- }
- 
- static inline int apic_find_highest_irr(struct kvm_lapic *apic)
-@@ -779,7 +762,7 @@ static inline int apic_find_highest_isr(struct kvm_lapic *apic)
- 	if (likely(apic->highest_isr_cache != -1))
- 		return apic->highest_isr_cache;
- 
--	result = find_highest_vector(apic->regs + APIC_ISR);
-+	result = apic_find_highest_vector(apic->regs + APIC_ISR);
- 	ASSERT(result == -1 || result >= 16);
- 
- 	return result;
 -- 
 2.34.1
 
