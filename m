@@ -1,79 +1,84 @@
-Return-Path: <kvm+bounces-42370-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42371-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EE1FA780B8
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 18:43:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0496DA780BA
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 18:43:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF1FD1666AC
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 16:43:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D74673A4E32
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 16:43:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5AD620DD5C;
-	Tue,  1 Apr 2025 16:43:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D0D220E33E;
+	Tue,  1 Apr 2025 16:43:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NcZQotf7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2RV4GpZl"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EFA09461
-	for <kvm@vger.kernel.org>; Tue,  1 Apr 2025 16:43:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E82E220D4F4
+	for <kvm@vger.kernel.org>; Tue,  1 Apr 2025 16:43:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743525795; cv=none; b=ROlB5rWhg1rouc/32bDSvwKRtYv4PKzBPGFQbkn+WmKiWm8V7ssIWpQQ8YelaAcOdYfQkTA0mL/JjP0ezY4FDWPglgNQC1KI/y8l60B1Rs8/mweuG5vjw3Fx1j6UJtlL3YJHqyYtX3qRIaolxrF57ay/mYF/tTtISEC/Dg4iJpY=
+	t=1743525797; cv=none; b=pK3YRFu1qHUupc8IioiybcWNwK3z0MMNvneuVU4Ax4GEqMTn76AhYiCbB6fl/w4fWAGeZG9bvWP3EHeplrrsPOufCK5VZtA+TncGwQCxrpYpu0vcKMPBQd4Bwivltk7azWcPlcu7qHJtb1G0DNl9Mks0Q32ISi0EUSSbrfT28eA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743525795; c=relaxed/simple;
-	bh=M2TWGxm2NnULLddMhVhPkqPLLNeRUG1H8C4s84FThmU=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jjEA3ScKukIeTsowX0us4TlauRzASWblES/4e4K8pq2U31KlI56KUEQaY31/tRHz1vXUFdx0fwMnQ1Kj5C9AUSVxMFq3XBqTdR8rleNlLQCT1tAJjoGfC8jx/AufToMS2/RZCcfAB7u+vHQ96q1W7K/5vpqXN1yCeelYRuM5JwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NcZQotf7; arc=none smtp.client-ip=209.85.214.201
+	s=arc-20240116; t=1743525797; c=relaxed/simple;
+	bh=IX2hIEFDZxr1s7mPt549rL+2MP5J40qc7gWfaob7z2I=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=SIeDx+HmqCNe6jOQXA8WeXRXbDEltBULpKqRM6l2Y+Ode6SBrJ3KW11bKxHQzNFrWZIErYWP3PTdvd3grl/XRfTbmHuKD7waaikz8ZyXUH810bXCs/1ZuHnl95t82bE934OVZRssdVPQ+lTw/xhjFITj2oMTPHwh3Br667dBsas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2RV4GpZl; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2240a7aceeaso106659045ad.0
-        for <kvm@vger.kernel.org>; Tue, 01 Apr 2025 09:43:14 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-229170fbe74so86380615ad.2
+        for <kvm@vger.kernel.org>; Tue, 01 Apr 2025 09:43:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743525794; x=1744130594; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WUK/6WGgSJ/C4fjzbbO0q/5WO+lyppJyX3j10SVag1Y=;
-        b=NcZQotf7j27GUQOvVdAb/vG8T6lvb5ReHuVA1DeI28ozGxYYzoymTG1AoW20OlTYa2
-         ceVgq3d0CHQ5f+3byczq7H4is0bz8LecbGZ626idV4E+hYrCVgOSH91W6nD7JeGUhNXb
-         BWP7ssORJE8aeYxjrkKjW9/khxPLuol4b2GYpZhrlQjnlNNcOXKAF0AzNzr+xD4GBHW4
-         GCMPk0wR0iH0VW5H3gXft7QZ5AaTQ1ediHQ48FEugQ0uuCXxedKvvYPhvHiv+VlvHpVD
-         SpmVaHhzcmpfL3b0TljmEMnUGBOmJ7CH71dOU6iamm7/j7ptxX2rtm/a606yanCwJzZU
-         75qw==
+        d=google.com; s=20230601; t=1743525795; x=1744130595; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=tjqTIWn86XObYZ0dlBWL1fKISTH8kVDuFqpN5liSeqY=;
+        b=2RV4GpZlnot4SCQ5wABLNoj1h5/geg50gJV/aZ0WrLzGYB/VV3xhNfojzwmHO0uDYz
+         g31k7XvWqBamA1iirpWdFwlIerGnukt8vXTN16dbap04aiQd38ioMrYWgU3kFFc5odti
+         G3p58wvcGb0TWKOKcZh4W9l5+3syRSR1wYrrRMdvuji2Yn4VG1pIqMWInZnmw4M6Sezs
+         7l2ZkZNNoe0TUoaH4AB6Ite60SMnnBmvXQgUhl2So3HEUiHXZv9jlhMmxdb3We6fpkHa
+         8wqwkYjn53FsRSZfxI7C7rZRuTeCyd7KO4GJrlszzn9sFKa8uVGmvZKcdJaFMIDs46Ln
+         Ejhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743525794; x=1744130594;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WUK/6WGgSJ/C4fjzbbO0q/5WO+lyppJyX3j10SVag1Y=;
-        b=ik5N08FoN0OCZ9NPuNN5YMI/ssVMpbZdiOnd3dKayRcPw7sv/UI/Q02s4xyUf6GXbX
-         DyWky2M45piBEwWyis65vdsNmCv2OI7rQK7ZX9JSD/hCROzSsRFQUaC7O+QU0hVL4QZY
-         wQIB7GRy+wO+rJtPN51lbNYYJEdakpzrbU4OvgYFGldiUVk/iAeNZgsmjCZwc1VPk5lk
-         pIoMozHfl1jl5vsjN692aHuikKXxGIjMQ186F0edr5CNeG/+t8unq5AiT/SfZKsL50XK
-         TTQL884ClYfkCm3mDoN4Ay8FB+LoFF6m1dXhFuM0F9RDik1QW2jI6Bbq2ZodLF1yVOPG
-         TfPg==
-X-Forwarded-Encrypted: i=1; AJvYcCX0BoCSRcxSiw2xluoL/DXMUBfJvjvYmvz/kXCPmM+FmK7x/XshNog9RFHenV4W6ihn7c0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyA+2OkrfZzu1//ATSmYxJXezKlAnDJIzIXv2Oog4G3LcPVxrP+
-	BsIWjflsxHYCDqKxb+czbPGESncqdlEgUCMh12ZmVZCG2S3hFBR2J7nWZrAatZO0JpRdrG8s4pj
-	r1A==
-X-Google-Smtp-Source: AGHT+IH5cSz/o1O5v0jybOuWyQZ2DFWw5DlZufPEuiMUgV19rvAjQSX5gNGvM0NBycvX5iYtLbhVUResHeo=
-X-Received: from pfih11.prod.google.com ([2002:a05:6a00:218b:b0:736:79d0:fd28])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e541:b0:21f:3e2d:7d42
- with SMTP id d9443c01a7336-2292f9773b4mr180796675ad.23.1743525793742; Tue, 01
- Apr 2025 09:43:13 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743525795; x=1744130595;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tjqTIWn86XObYZ0dlBWL1fKISTH8kVDuFqpN5liSeqY=;
+        b=oG9vclUCeRivhTXWswkzzJanjONHapf6vmfCYv14MBnHf+AhlEDf5HZFlX/AVcNf2E
+         lOGu/Q0pehCn05iUEycBUJ19dQ+4V962w2hY31Od3R+IdzrQxOOUJv8gsdwsTdZDEL8I
+         LM0wNooAittXTNNVTbQ9W4mXdTZ3pt5FPeO5gVFA1Bf0ifVonW95w4W3XtXQ+HF8qCcd
+         Y6KOoZVMSCcMBqzP0kvHRdFdXU4Hsmeh9zoer7HHlZ+an2B978mVBhxKy9rz/2K1BBzi
+         98dBgEZjnn4inA2avJ8HqYvDCuinjzOt3158Uu+HTvS88lCugllUpcEDy+flxv2m+/J3
+         O+ug==
+X-Forwarded-Encrypted: i=1; AJvYcCVTG02mqyJJqUITqL+qColtxEzu+IxGZa/XxawIR3w1QDYPoswmUBOOnQS+gpqWllIgXfA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2dXe4aVKF4zJL6DzELtaYz86msenWKB2NE3V95xytRca8VSG1
+	b15T5ZxWFIgg/6l9CXuVjCseYgcLhvLsmsRqNKUjjfev7rYgCKEbC5W3u7EGWrdKbO7PL8UbR/Y
+	nBw==
+X-Google-Smtp-Source: AGHT+IF7k6V4hI9NSmqeQR7Ldpinq9z+9LeYTtWSOW3n7weH2d7MasMbpC1/xTtwiRZrQxL5X02TqjREFfU=
+X-Received: from pfbhw8.prod.google.com ([2002:a05:6a00:8908:b0:730:7e2d:df69])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1309:b0:736:450c:fa54
+ with SMTP id d2e1a72fcca58-7398036acbemr20074041b3a.6.1743525795261; Tue, 01
+ Apr 2025 09:43:15 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  1 Apr 2025 09:34:39 -0700
+Date: Tue,  1 Apr 2025 09:34:40 -0700
+In-Reply-To: <20250401163447.846608-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250401163447.846608-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.472.ge94155a9ec-goog
-Message-ID: <20250401163447.846608-1-seanjc@google.com>
-Subject: [PATCH v2 0/8] x86/irq: KVM: Optimize KVM's PIR harvesting
+Message-ID: <20250401163447.846608-2-seanjc@google.com>
+Subject: [PATCH v2 1/8] x86/irq: Ensure initial PIR loads are performed
+ exactly once
 From: Sean Christopherson <seanjc@google.com>
 To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
 	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
@@ -82,39 +87,31 @@ Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
 	Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Optimizing KVM's PIR harvesting using the same techniques as posted MSIs,
-most notably to use 8-byte accesses on 64-bit kernels (/facepalm).
+Ensure the PIR is read exactly once at the start of handle_pending_pir(),
+to guarantee that checking for an outstanding posted interrupt in a given
+chuck doesn't reload the chunk from the "real" PIR.  Functionally, a reload
+is benign, but it would defeat the purpose of pre-loading into a copy.
 
-Fix a few warts along the way, and finish up by adding a helper to dedup
-the PIR harvesting code between KVM and posted MSIs.
+Fixes: 1b03d82ba15e ("x86/irq: Install posted MSI notification handler")
+Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kernel/irq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-v2:
- - Collect a review. [tglx]
- - Use an "unsigned long" with a bitwise-OR to gather PIR. [tglx]
-
-v1: https://lore.kernel.org/all/20250315030630.2371712-1-seanjc@google.com
-
-Sean Christopherson (8):
-  x86/irq: Ensure initial PIR loads are performed exactly once
-  x86/irq: Track if IRQ was found in PIR during initial loop (to load
-    PIR vals)
-  KVM: VMX: Ensure vIRR isn't reloaded at odd times when sync'ing PIR
-  x86/irq: KVM: Track PIR bitmap as an "unsigned long" array
-  KVM: VMX: Process PIR using 64-bit accesses on 64-bit kernels
-  KVM: VMX: Isolate pure loads from atomic XCHG when processing PIR
-  KVM: VMX: Use arch_xchg() when processing PIR to avoid instrumentation
-  x86/irq: KVM: Add helper for harvesting PIR to deduplicate KVM and
-    posted MSIs
-
- arch/x86/include/asm/posted_intr.h | 78 +++++++++++++++++++++++++++---
- arch/x86/kernel/irq.c              | 63 ++++--------------------
- arch/x86/kvm/lapic.c               | 20 ++++----
- arch/x86/kvm/lapic.h               |  4 +-
- arch/x86/kvm/vmx/posted_intr.h     |  2 +-
- 5 files changed, 95 insertions(+), 72 deletions(-)
-
-
-base-commit: 782f9feaa9517caf33186dcdd6b50a8f770ed29b
+diff --git a/arch/x86/kernel/irq.c b/arch/x86/kernel/irq.c
+index feca4f20b06a..85fa2db38dc4 100644
+--- a/arch/x86/kernel/irq.c
++++ b/arch/x86/kernel/irq.c
+@@ -414,7 +414,7 @@ static __always_inline bool handle_pending_pir(u64 *pir, struct pt_regs *regs)
+ 	bool handled = false;
+ 
+ 	for (i = 0; i < 4; i++)
+-		pir_copy[i] = pir[i];
++		pir_copy[i] = READ_ONCE(pir[i]);
+ 
+ 	for (i = 0; i < 4; i++) {
+ 		if (!pir_copy[i])
 -- 
 2.49.0.472.ge94155a9ec-goog
 
