@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-42322-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42323-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F2BBA77DAB
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 16:27:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09325A77E81
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 17:05:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AD3C3B0D4C
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 14:23:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C450B16CEF7
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 15:05:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6976D205AD6;
-	Tue,  1 Apr 2025 14:22:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6520F2063D5;
+	Tue,  1 Apr 2025 15:05:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I4CVfNX6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HFDrBqtl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AA28204859
-	for <kvm@vger.kernel.org>; Tue,  1 Apr 2025 14:22:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 281B7205E30
+	for <kvm@vger.kernel.org>; Tue,  1 Apr 2025 15:05:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743517363; cv=none; b=MsE4rhoupT8h/tmtvr7BouMnbL21QHikYQQJZzk2TQE5eZIuT16+tYgsUiOENsyFMBovyHD9TaowiEEr9YnA78oH8HeLJwY8dldyLzHEYYDNPslnxa/pG46YuqjtoGgZQ0848UhrL923VHf4xvZgXzZsITsBpgxBGlmBe0zeSPo=
+	t=1743519908; cv=none; b=koLjUxvVp/VxSoK0bpEXnYJkkrpRjqNoFI1S2u40qHgpjpZ47o1gBRjMBVww/hVkcSsVpY3wNPU5qJNCPXc6gBkl5IpfApQ21elm50O30l0oKki/J/4kqWEH2wwei50SYSOK66qqVGkYHKfrKb+OZZQbew7IjlLyoLeQ/TduSvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743517363; c=relaxed/simple;
-	bh=sw+aC5ewjJj5UHGw0yY9U0SXiO6WO4oeB/HY4wRa14o=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=tMNH4x/24aCqsH4PZCVNVCMgrR5s9/8TeAOdt1CLm9D5Yxfaxzzo+opDabLPdifKW8NJeO17IE/6vE8Cg+X6iFtIIF1IVxjjvs6IZWDIdFFCqPc7Ts4CKnhaTWOL1F0XJowqiztNjUa5U4pGWy+BvCi2M8tWVb4KuRufM62tb84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I4CVfNX6; arc=none smtp.client-ip=209.85.214.202
+	s=arc-20240116; t=1743519908; c=relaxed/simple;
+	bh=F/RiXgmrpmTiv2QvtvjdUGI+ud9Yccr9L3aXP3dOP60=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=LUNiuXFqjmqzALOWwRVW4ClHobZQujLodztaoyjsIlEiHgQP/nEwBN88U/gU3hrBzucclBySkfIgfiz7IiHdI4p0ErppAY9tRhFh5JSdnY8SeCxWdYByk1xUA7+o0emyhQxKjsVSwNehQqPKz8x0VAmGZyrMNVeVjoQZSJ6vCr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HFDrBqtl; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-224191d9228so3577485ad.3
-        for <kvm@vger.kernel.org>; Tue, 01 Apr 2025 07:22:41 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-225ab228a37so100486235ad.2
+        for <kvm@vger.kernel.org>; Tue, 01 Apr 2025 08:05:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743517361; x=1744122161; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1743519906; x=1744124706; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GRRQLmB2UHTKWjLPNOKgO+07J02Vyv6Q87GOygHVBSc=;
-        b=I4CVfNX692iIbBsdOeBa+thYY68GzkY0qyOgrjD8DP7/JeYyvNmgXFfReshST3eu8+
-         d50ABGowy1Mdlinu+zbR0BCyBz79x9qFKlm5f/CR1m13CJqT5NoBArwPOmv2HjZyRo5g
-         DiNmI/E/RxDp0i4up87S6gZtVhPSePmEx3lAUhhjGjgAdbUKqHPyEExVVWeBRsCzg2tt
-         l7ug4IZ8fu40FSLy3TdMaA4NOSqm3QfxXPhUhTu7kobjsgiN+XUrn60ssvMTiNNOmaPt
-         5DsfggPVpR2oSjd6G9SvFNbqItAeGj01jTXTDZkUUhWDxBOOE3jqqORpH4PLPNmwn4wd
-         qHdA==
+        bh=+IgyuGHrG6KOz4ioK+lLzhnnHjxowzYSohAuohKgopQ=;
+        b=HFDrBqtlYe/Hd++C1UvM94aVgbuvTyO3XhAOHdRkE71dQIKBO4q41rI7ui0PlON+Jd
+         orEFlOegFTbkr3ndZT5PyDreBR91eIQxfaMJa1F31cE86lSwn5KX+gUIjth9zHMmbG1A
+         7iUg+crEl5xPK81dln8ZWO7RtnMUppbzdZlaJsMzYms8FcPIF+aS8/QouJHTP/N4Lf9j
+         nlEvNHBpvIftGaWwKaiVsoZ2VIorv5tiIKtlcVumxacT31zdyRfyZ5l/3N8VDs8YjNnH
+         5HXLgzjcEWwdsYhMvY3jbiAj3sC5aO42HhEMRkzpjDvYawb7yq5wKeamjw5+8Np4vCK2
+         UPmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743517361; x=1744122161;
+        d=1e100.net; s=20230601; t=1743519906; x=1744124706;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GRRQLmB2UHTKWjLPNOKgO+07J02Vyv6Q87GOygHVBSc=;
-        b=VqtjIqp0ztAlrFIRSVuNs3H2NB4BbhyQyliwpuPy3jUMQFzjBXHS3JywxaSJto8ZBy
-         LjhXFxWYurZboUAEcfs8YDtkEVuPynRVzQKCiIMy7jHUVLsqSYrSlH0B7rtjd0jL11hw
-         x+RnOW0cRRBCrVw2UihW11y88Dq6AhgIcl5n0WDN4zpxyIQLgrka4lHU6j/ilua8F9pI
-         kchEOYJCe/zjJxVqcG2RMeMY+pEUCPZb4PqmTYoHx2yQVLjRNV0JkVCA3eUf9DMjoL2q
-         YAkpKQ/5S0boLyO9YTkq6stL5lFYTMILLNUnFAn83VdcqQ+rBdHtkfiaIqDkPpuQr/Gp
-         mslA==
-X-Gm-Message-State: AOJu0YzKHouvWsnqpVvu6kmbyzn3stNqHmehINtakzcPu8imcqOibmku
-	U7vDzYnjzxgtZ6/jic+KGyrMTNv0WZt9fV+JhXm2rdaIZw/WZrrEv+7PGzBhUf08HbBSdOdVsSx
-	xBw==
-X-Google-Smtp-Source: AGHT+IEj5AB9UPwSuBWy7y5gfFeTD62CFXIYtj8wLb2uV6AxixKP7fkmJtTBIxCecQBTTXeak4Qv5N/DQ9g=
-X-Received: from pfbhx12.prod.google.com ([2002:a05:6a00:898c:b0:732:6425:de9a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d489:b0:220:e9ef:ec98
- with SMTP id d9443c01a7336-2292f9629bemr199164595ad.19.1743517361442; Tue, 01
- Apr 2025 07:22:41 -0700 (PDT)
+        bh=+IgyuGHrG6KOz4ioK+lLzhnnHjxowzYSohAuohKgopQ=;
+        b=bT+9pld8lhUqtFZuYG7hZRJQMJnsZ4boWZe1HMYGx35TcbGy0EAn1fAMBQc4z1Qlu2
+         KRKpMOpWLh+OAfs0tSlYlLK2dZabKhqCsKiCR5LkKGG/ea4eIo7d7X1rPTYaba+eKYxS
+         odeiQM9OhtrdC31IAu8bSugb/ZgM3KpWRp1olHWU2NkcO2KLzU/Xy4vomVCix6tCfpFe
+         HOjsxuG5rNHC/geXrSelE8+L8U+FDwPYQ7Y3AAhPho+nb/6BMjKaXX/Ks0NmXsdD6oon
+         q0TL6N1rSOzdN2BFJzpBMYdNIT3B6heiZJl+HiQJXMaFKRflH3fBOhn/MwzIpLMvwVJp
+         4hxg==
+X-Gm-Message-State: AOJu0YxLhrmOEqUR9mv50ubujdN6QOnq1Y5NdYBYglHmpQ3wnbGGu+5Q
+	F//1NdGxOtpzvQbKPsAyLNA93JHpSZiWvw0akwnz62idjmUx8sOzAM2tk1arC33+KT4R7fkimft
+	aXg==
+X-Google-Smtp-Source: AGHT+IG7JAm6yR31fSBvMf2GU4Ds1vfmbHR0/eLzAEDvkzcrRzepC4l8s3OVsGvLjol1VPLnWhQsYXPcmd8=
+X-Received: from pfbgu25.prod.google.com ([2002:a05:6a00:4e59:b0:736:a320:25bd])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1493:b0:739:4a30:b900
+ with SMTP id d2e1a72fcca58-7398037e24amr18537552b3a.7.1743519906429; Tue, 01
+ Apr 2025 08:05:06 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  1 Apr 2025 07:22:38 -0700
+Date: Tue,  1 Apr 2025 08:05:04 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,110 +71,86 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.49.0.472.ge94155a9ec-goog
-Message-ID: <20250401142238.819487-1-seanjc@google.com>
-Subject: [PATCH] KVM: selftests: Add option to rseq test to override /dev/cpu_dma_latency
+Message-ID: <20250401150504.829812-1-seanjc@google.com>
+Subject: [PATCH] KVM: x86: Acquire SRCU in KVM_GET_MP_STATE to protect guest
+ memory accesses
 From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Dongsheng Zhang <dongsheng.x.zhang@intel.com>, Zide Chen <zide.chen@intel.com>, 
-	Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Add a "-l <latency>" param to the rseq test so that the user can override
-/dev/cpu_dma_latency, as described by the test's suggested workaround for
-not being able to complete enough migrations.
+Acquire a lock on kvm->srcu when userspace is getting MP state to handle a
+rather extreme edge case where "accepting" APIC events, i.e. processing
+pending INIT or SIPI, can trigger accesses to guest memory.  If the vCPU
+is in L2 with INIT *and* a TRIPLE_FAULT request pending, then getting MP
+state will trigger a nested VM-Exit by way of ->check_nested_events(), and
+emuating the nested VM-Exit can access guest memory.
 
-cpu_dma_latency is not a normal file, even as far as procfs files go.
-Writes to cpu_dma_latency only persist so long as the file is open, e.g.
-so that the kernel automatically reverts back to a power-optimized state
-once the sensitive workload completes.  Provide the necessary functionality
-instead of effectively forcing the user to write a non-obvious wrapper.
+The splat was originally hit by syzkaller on a Google-internal kernel, and
+reproduced on an upstream kernel by hacking the triple_fault_event_test
+selftest to stuff a pending INIT, store an MSR on VM-Exit (to generate a
+memory access on VMX), and do vcpu_mp_state_get() to trigger the scenario.
 
-Cc: Dongsheng Zhang <dongsheng.x.zhang@intel.com>
-Cc: Zide Chen <zide.chen@intel.com>
+  =============================
+  WARNING: suspicious RCU usage
+  6.14.0-rc3-b112d356288b-vmx/pi_lockdep_false_pos-lock #3 Not tainted
+  -----------------------------
+  include/linux/kvm_host.h:1058 suspicious rcu_dereference_check() usage!
+
+  other info that might help us debug this:
+
+  rcu_scheduler_active = 2, debug_locks = 1
+  1 lock held by triple_fault_ev/1256:
+   #0: ffff88810df5a330 (&vcpu->mutex){+.+.}-{4:4}, at: kvm_vcpu_ioctl+0x8b/0x9a0 [kvm]
+
+  stack backtrace:
+  CPU: 11 UID: 1000 PID: 1256 Comm: triple_fault_ev Not tainted 6.14.0-rc3-b112d356288b-vmx #3
+  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+  Call Trace:
+   <TASK>
+   dump_stack_lvl+0x7f/0x90
+   lockdep_rcu_suspicious+0x144/0x190
+   kvm_vcpu_gfn_to_memslot+0x156/0x180 [kvm]
+   kvm_vcpu_read_guest+0x3e/0x90 [kvm]
+   read_and_check_msr_entry+0x2e/0x180 [kvm_intel]
+   __nested_vmx_vmexit+0x550/0xde0 [kvm_intel]
+   kvm_check_nested_events+0x1b/0x30 [kvm]
+   kvm_apic_accept_events+0x33/0x100 [kvm]
+   kvm_arch_vcpu_ioctl_get_mpstate+0x30/0x1d0 [kvm]
+   kvm_vcpu_ioctl+0x33e/0x9a0 [kvm]
+   __x64_sys_ioctl+0x8b/0xb0
+   do_syscall_64+0x6c/0x170
+   entry_SYSCALL_64_after_hwframe+0x4b/0x53
+   </TASK>
+
+Cc: stable@vger.kernel.org
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/rseq_test.c | 31 ++++++++++++++++++++-----
- 1 file changed, 25 insertions(+), 6 deletions(-)
+ arch/x86/kvm/x86.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
-index e5898678bfab..1375fca80bcd 100644
---- a/tools/testing/selftests/kvm/rseq_test.c
-+++ b/tools/testing/selftests/kvm/rseq_test.c
-@@ -196,25 +196,27 @@ static void calc_min_max_cpu(void)
- static void help(const char *name)
- {
- 	puts("");
--	printf("usage: %s [-h] [-u]\n", name);
-+	printf("usage: %s [-h] [-u] [-l latency]\n", name);
- 	printf(" -u: Don't sanity check the number of successful KVM_RUNs\n");
-+	printf(" -l: Set /dev/cpu_dma_latency to suppress deep sleep states\n");
- 	puts("");
- 	exit(0);
- }
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c841817a914a..3712dde0bf9d 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11786,6 +11786,8 @@ int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+ 	if (kvm_mpx_supported())
+ 		kvm_load_guest_fpu(vcpu);
  
- int main(int argc, char *argv[])
- {
-+	int r, i, snapshot, opt, fd = -1, latency = -1;
- 	bool skip_sanity_check = false;
--	int r, i, snapshot;
- 	struct kvm_vm *vm;
- 	struct kvm_vcpu *vcpu;
- 	u32 cpu, rseq_cpu;
--	int opt;
- 
--	while ((opt = getopt(argc, argv, "hu")) != -1) {
-+	while ((opt = getopt(argc, argv, "hl:u")) != -1) {
- 		switch (opt) {
- 		case 'u':
- 			skip_sanity_check = true;
-+		case 'l':
-+			latency = atoi_paranoid(optarg);
- 			break;
- 		case 'h':
- 		default:
-@@ -243,6 +245,20 @@ int main(int argc, char *argv[])
- 	pthread_create(&migration_thread, NULL, migration_worker,
- 		       (void *)(unsigned long)syscall(SYS_gettid));
- 
-+	if (latency >= 0) {
-+		/*
-+		 * Writes to cpu_dma_latency persist only while the file is
-+		 * open, i.e. it allows userspace to provide guaranteed latency
-+		 * while running a workload.  Keep the file open until the test
-+		 * completes, otherwise writing cpu_dma_latency is meaningless.
-+		 */
-+		fd = open("/dev/cpu_dma_latency", O_RDWR);
-+		TEST_ASSERT(fd >= 0, __KVM_SYSCALL_ERROR("open() /dev/cpu_dma_latency", fd));
++	kvm_vcpu_srcu_read_lock(vcpu);
 +
-+		r = write(fd, &latency, 4);
-+		TEST_ASSERT(r >= 1, "Error setting /dev/cpu_dma_latency");
-+	}
+ 	r = kvm_apic_accept_events(vcpu);
+ 	if (r < 0)
+ 		goto out;
+@@ -11799,6 +11801,8 @@ int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+ 		mp_state->mp_state = vcpu->arch.mp_state;
+ 
+ out:
++	kvm_vcpu_srcu_read_unlock(vcpu);
 +
- 	for (i = 0; !done; i++) {
- 		vcpu_run(vcpu);
- 		TEST_ASSERT(get_ucall(vcpu, NULL) == UCALL_SYNC,
-@@ -278,6 +294,9 @@ int main(int argc, char *argv[])
- 			    "rseq CPU = %d, sched CPU = %d", rseq_cpu, cpu);
- 	}
- 
-+	if (fd > 0)
-+		close(fd);
-+
- 	/*
- 	 * Sanity check that the test was able to enter the guest a reasonable
- 	 * number of times, e.g. didn't get stalled too often/long waiting for
-@@ -293,8 +312,8 @@ int main(int argc, char *argv[])
- 	TEST_ASSERT(skip_sanity_check || i > (NR_TASK_MIGRATIONS / 2),
- 		    "Only performed %d KVM_RUNs, task stalled too much?\n\n"
- 		    "  Try disabling deep sleep states to reduce CPU wakeup latency,\n"
--		    "  e.g. via cpuidle.off=1 or setting /dev/cpu_dma_latency to '0',\n"
--		    "  or run with -u to disable this sanity check.", i);
-+		    "  e.g. via cpuidle.off=1 or via -l <latency>, or run with -u to\n"
-+		    "  disable this sanity check.", i);
- 
- 	pthread_join(migration_thread, NULL);
- 
+ 	if (kvm_mpx_supported())
+ 		kvm_put_guest_fpu(vcpu);
+ 	vcpu_put(vcpu);
 
 base-commit: 782f9feaa9517caf33186dcdd6b50a8f770ed29b
 -- 
