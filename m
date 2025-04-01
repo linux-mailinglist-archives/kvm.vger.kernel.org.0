@@ -1,84 +1,84 @@
-Return-Path: <kvm+bounces-42337-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42339-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A6A1A77FE2
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 18:12:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB581A77FE7
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 18:13:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 568D91890923
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 16:12:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F5851890E26
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 16:13:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0469C20F078;
-	Tue,  1 Apr 2025 16:11:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFF3A210F45;
+	Tue,  1 Apr 2025 16:11:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YPQdvFYH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IhUmYcxt"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7422620E336
-	for <kvm@vger.kernel.org>; Tue,  1 Apr 2025 16:11:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C46520D4E4
+	for <kvm@vger.kernel.org>; Tue,  1 Apr 2025 16:11:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743523885; cv=none; b=J/npKTQVJx2I7Fset4+mpFC7kC9lfG6riZ3DfJdVPWVfqpXekaAo7lOjvX8Py7Mfk/MGtKE6+I3JiPHmSLWAPzEfGNS2MEkHFHgJyceSsFVXXOaA9Mz+RE3N6ke6Q2isOiw+7ny9H1V8qVYBbOH6HpNFvgT+j9USvCOYJrlRus8=
+	t=1743523891; cv=none; b=gSlT/H1o6WYQiYJ7BTHbm/J1ygo0crR45sZYq4JPDZg03PUIUIrs0oB9T4/fSsYyh94XMi+mhnaFXM4uL9qypdjQUqRcL6QZynxS/JqcIwQ3WvZKkYuDpE/FvvxhCYciZp2DIGVyudcvHQOjTIOz60smu7DKjYiIvAjwrTYQfiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743523885; c=relaxed/simple;
-	bh=v8jKs9c/aSFeCCmvqZ/YRl3Cj78RpyaLQZNO8QjAPqo=;
+	s=arc-20240116; t=1743523891; c=relaxed/simple;
+	bh=rxM4+r5oKn3FrtYxyoYERVyr2vDI5fg2rK7DFIuTtwg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BkzKrxNVKeaAJfuajJt5bMksPkq0YGaYGAtp3tPcE/BsjsNZDjfKYQDji4w875WB3wZe69kyPiKFWAyAGQj7WA+uWB1Q+Y9CTMEix3vWykJfkIqY79ekjMoWT9z2aFCsPGBwIwFM+VC9Fp93u4W0rcVSqbdpRchTShn3pwNPcn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YPQdvFYH; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=gJd4oiJxylthshM6yl5TL3AgpueKMafVf5vRrj2xEYDg2vfeztJ6GOCTApGw6fG+46eAA7fn/xJNaweDpy/niQbgS7p4pPZHiCbL53rOJttBxquBUDIqSliiv1BPyuhPhpyVhnorCErBwTl2RhIlWaAsrK/gF0OYwd/+rD2oP4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IhUmYcxt; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743523882;
+	s=mimecast20190719; t=1743523889;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ZVj8LxmRYtpLGVaJMpm0cMjRCHl/hUqQsU3rCt2if/8=;
-	b=YPQdvFYHfxG9svK8nZBOzQaxW7Ki7nZO+zprBz4EBZhvLMYwV/ooUTY5BRP9j8uekGQKg5
-	xGPPwKClHoRCkFyKR08i80fGGD1mAQokOqSCc3r3EabubCPyQRDw5WFU1KZBGebDA8i/00
-	WujLoztQMUiOPaeqOS1JSqEWKRK9DA4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=QaUbfvoP8aPmiGrV9eVE67gclsfaX3jw4nCiV/n0Ni4=;
+	b=IhUmYcxtic8Q9if2rKECo1cInoFfMkAL0cg/T0W35PE+Gnu5EbnostFWRbyHWlOlGEygoN
+	PCVECvikEWwOXA/AMxqn59MDg86W7UWJz9k6HP2pXnFdyzP6zZLHKqFgagyybrzRmWaEpE
+	TAMOiiGL++EPmVCL8vbFrTFKWav0DYY=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-54-OG99hOJdMwq7WJ1Ikqo8vQ-1; Tue, 01 Apr 2025 12:11:21 -0400
-X-MC-Unique: OG99hOJdMwq7WJ1Ikqo8vQ-1
-X-Mimecast-MFC-AGG-ID: OG99hOJdMwq7WJ1Ikqo8vQ_1743523880
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43cf327e9a2so48729695e9.3
-        for <kvm@vger.kernel.org>; Tue, 01 Apr 2025 09:11:21 -0700 (PDT)
+ us-mta-20-bJp1DRXIMIK20Z9sgXlYkw-1; Tue, 01 Apr 2025 12:11:25 -0400
+X-MC-Unique: bJp1DRXIMIK20Z9sgXlYkw-1
+X-Mimecast-MFC-AGG-ID: bJp1DRXIMIK20Z9sgXlYkw_1743523883
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43cec217977so33423885e9.0
+        for <kvm@vger.kernel.org>; Tue, 01 Apr 2025 09:11:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743523880; x=1744128680;
+        d=1e100.net; s=20230601; t=1743523883; x=1744128683;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZVj8LxmRYtpLGVaJMpm0cMjRCHl/hUqQsU3rCt2if/8=;
-        b=bD2EEsOUgsJwUMt0mLuYIgVvEHTrd+Skuhm5ALagjfprAA0Y5A4pJSMtAOEV/i2naK
-         O+UVDLxrWFLf6QPlKt76N1hUeQwfWeRiyAsl+k3S3MqYVqFB7UBXVLwuMXXlP7GAKr6s
-         tWrupRW8EuoHfFlyJYsTU6zii5/gTu7N0ZrxNSpvy5uVs0H4U5y6gJgvqwqT171lzM2v
-         LUQlilwcsMonwm6tbpa03dxtMBTActD9U2AEuYOuvYp4+FMbeCITOlXMLkZSqOFTllhx
-         Yqm4ODBRtH+I/cShUbR+h8Hp66NLvEW8Id0SRXBROxzK3QQhITXRaNMDyX0FwTaFtFAF
-         3WIg==
-X-Forwarded-Encrypted: i=1; AJvYcCXGjjXW1VH9KMFmW2jLt3xxRzb9tH5jNaHsZQNd0kiwplFlxWIwHIHPSCWzu7ceq5IhTqs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGtEUPiHP+CKcPN82EGqJ8oRE56NOQV4ulUK3k2XZRDXDUeyhQ
-	HCxoQvyVJGLdhd3JwucIoOqolQWbF+V/dwIwx87oxpETZ+SIOdFCgZu68vZkP9oKFKvX9bCKg0H
-	P8uD16beXMf87C1g7Zn0FZLGzCdzZRCq5k/Eii7zkpRCAd02cSg==
-X-Gm-Gg: ASbGncvau+8GVINevMSAGsd2mmmBbXVi5Dv2zkff/2VEg5PLrdZK7ug/rCQVgIdsSk8
-	LEfdr1ARBPVqPK6cIeAQe5o5nSJKuG3gu3JYiDgVau+tFmJ7sSSLvCzzKCYPW2TYyrAVgfyv4y3
-	q92z8DN24VLersyOHbsjIBEeAzv0jNU5ZdTgzDrjUp8VOBWwqyG6uDZIFd608/pL5BSxbHLRawx
-	MdDCxK4L2d2uMx303NG4s3OfJZaG9azDrp8Q/xQKOb+C3vnSYl4IIwK7sDtNjzsjFQ5lxdpQoQe
-	0cnAlmravTST4qZueStxoQ==
-X-Received: by 2002:a05:600c:3d06:b0:43c:f184:2e16 with SMTP id 5b1f17b1804b1-43eaa03e0b9mr29476055e9.5.1743523879940;
-        Tue, 01 Apr 2025 09:11:19 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF+E1xmwedldRJqmLtJk3EgwSLiKjTaPQFsZDp0oRIihpMjpWkbFC2kwYxD4KB/4aSNm+zhoQ==
-X-Received: by 2002:a05:600c:3d06:b0:43c:f184:2e16 with SMTP id 5b1f17b1804b1-43eaa03e0b9mr29475595e9.5.1743523879524;
-        Tue, 01 Apr 2025 09:11:19 -0700 (PDT)
+        bh=QaUbfvoP8aPmiGrV9eVE67gclsfaX3jw4nCiV/n0Ni4=;
+        b=dMVsxyXKBLhUeTXsmjQk8OrTkIbNhU3uy65pVzB3dBmHauOiQd0TSzd/vb2WYy/e3n
+         MmJCWWyXzLRFuqDbpFSY+g0+bWlaAMIpGCerM9xryV5Q0ecyGzL14bTDpgQxSPx5TjIG
+         0a+TUZ59hF++hHHm+l3WQrIh49H5flrASSmQCr2cQk9RcWBW4SZkFBUl9n9bS7PuSsKJ
+         Kl/hAt5bP17ia02Iw/I0w9Vqfn5N+EVY4LaNhR/NUTW1ix0iOxZg+reIZ1iJYhvzR0vS
+         4bDcWvmj2Ix7MZb+i0SVmAReribh8zqT7L05jQ+0dVW7n7gr9KO3nqQN0rNgBnnB3NLh
+         Zt/A==
+X-Forwarded-Encrypted: i=1; AJvYcCVQap0v+1scgOYcMTQCks2Dk4X80KxlawUjYgKSHgUxLe/Ilo18OCtdaGL7jJT7a0aFQI8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWWQAG5e9q95g78iNxO46yUFSTIdnH10+3TMzlW5rjVLn91Cgd
+	1LOJSEBPFsew7gE2wGeUrEnrp8mEa7f0BHVGVpxXewqVPbBjhhFFqJfYr4xLBJWBCWomgTd3CHk
+	MNedkD+P5jwDRRJoEALOI9Zj0HC4PWMlxJLn+dPxTZ3NzcNlgTA==
+X-Gm-Gg: ASbGncuGTbrELLqRFmtAm/P0/13Uc1ln4ZcnBeuUIpJxY1c/8B8nSyMGwdv5hVT2gZl
+	E0M378wJwt4/txHIhdqoXZV73S0QitpAwKgZajCh0rzmwN8WnZnVSIthH1voBdBbdVGOnP8OeyG
+	O+j3CPhItRB/cuLjmVocMfIB/X2jYLLOw/Ik0qGnQdNGf9qlkV+dLuJkbRoo+HEE1EM0XZu6DT5
+	CbKPAK1NNQkVbAS0HmxTzy065Pj5/E5dJn3KOA6bo2qDzifKPVA5H88KLNTpMgObeRSV1yCOTU+
+	qDlW1D0qCjmF2VIwlye+WA==
+X-Received: by 2002:a05:600c:cc8:b0:43d:b3:fb1 with SMTP id 5b1f17b1804b1-43ea5f001b7mr45448985e9.27.1743523883239;
+        Tue, 01 Apr 2025 09:11:23 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHZdEWzHsg0YswCSXrdzj6ch9i3n9G2iz9TWc1mNERKBxpVsH1+e/xNG+caFFDjVEabapAovQ==
+X-Received: by 2002:a05:600c:cc8:b0:43d:b3:fb1 with SMTP id 5b1f17b1804b1-43ea5f001b7mr45447655e9.27.1743523881889;
+        Tue, 01 Apr 2025 09:11:21 -0700 (PDT)
 Received: from [192.168.10.48] ([176.206.111.201])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0b79e3b0sm14455968f8f.74.2025.04.01.09.11.17
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0b66ab86sm14896816f8f.51.2025.04.01.09.11.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Apr 2025 09:11:18 -0700 (PDT)
+        Tue, 01 Apr 2025 09:11:20 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
@@ -91,9 +91,9 @@ Cc: roy.hopkins@suse.com,
 	nsaenz@amazon.com,
 	anelkz@amazon.de,
 	James.Bottomley@HansenPartnership.com
-Subject: [PATCH 04/29] KVM: introduce struct kvm_arch_plane
-Date: Tue,  1 Apr 2025 18:10:41 +0200
-Message-ID: <20250401161106.790710-5-pbonzini@redhat.com>
+Subject: [PATCH 05/29] KVM: add plane support to KVM_SIGNAL_MSI
+Date: Tue,  1 Apr 2025 18:10:42 +0200
+Message-ID: <20250401161106.790710-6-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250401161106.790710-1-pbonzini@redhat.com>
 References: <20250401161106.790710-1-pbonzini@redhat.com>
@@ -105,215 +105,76 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
+struct kvm_kernel_irq_routing_entry is the main tool for sending
+cross-plane IPIs.  Make kvm_send_userspace_msi the first function to
+accept a struct kvm_plane pointer, in preparation for making it available
+from plane file descriptors.
+
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/arm64/include/asm/kvm_host.h     | 5 +++++
- arch/loongarch/include/asm/kvm_host.h | 5 +++++
- arch/mips/include/asm/kvm_host.h      | 5 +++++
- arch/powerpc/include/asm/kvm_host.h   | 5 +++++
- arch/riscv/include/asm/kvm_host.h     | 5 +++++
- arch/s390/include/asm/kvm_host.h      | 5 +++++
- arch/x86/include/asm/kvm_host.h       | 6 ++++++
- include/linux/kvm_host.h              | 2 ++
- virt/kvm/kvm_main.c                   | 3 +++
- 9 files changed, 41 insertions(+)
+ include/linux/kvm_host.h | 3 ++-
+ virt/kvm/irqchip.c       | 5 ++++-
+ virt/kvm/kvm_main.c      | 2 +-
+ 3 files changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index d919557af5e5..b742275cda4d 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -227,6 +227,9 @@ struct kvm_s2_mmu {
- struct kvm_arch_memory_slot {
- };
- 
-+struct kvm_arch_plane {
-+};
-+
- /**
-  * struct kvm_smccc_features: Descriptor of the hypercall services exposed to the guests
-  *
-@@ -1334,6 +1337,8 @@ static inline bool kvm_system_needs_idmapped_vectors(void)
- 	return cpus_have_final_cap(ARM64_SPECTRE_V3A);
- }
- 
-+static inline void kvm_arch_init_plane(struct kvm_plane *plane) {}
-+static inline void kvm_arch_free_plane(struct kvm_plane *plane) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- 
- void kvm_init_host_debug_data(void);
-diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
-index 2281293a5f59..24c1dafac855 100644
---- a/arch/loongarch/include/asm/kvm_host.h
-+++ b/arch/loongarch/include/asm/kvm_host.h
-@@ -73,6 +73,9 @@ struct kvm_arch_memory_slot {
- 	unsigned long flags;
- };
- 
-+struct kvm_arch_plane {
-+};
-+
- #define HOST_MAX_PMNUM			16
- struct kvm_context {
- 	unsigned long vpid_cache;
-@@ -325,6 +328,8 @@ static inline bool kvm_is_ifetch_fault(struct kvm_vcpu_arch *arch)
- }
- 
- /* Misc */
-+static inline void kvm_arch_init_plane(struct kvm_plane *plane) {}
-+static inline void kvm_arch_free_plane(struct kvm_plane *plane) {}
- static inline void kvm_arch_hardware_unsetup(void) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
-diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-index f7222eb594ea..d7be72c529b3 100644
---- a/arch/mips/include/asm/kvm_host.h
-+++ b/arch/mips/include/asm/kvm_host.h
-@@ -147,6 +147,9 @@ struct kvm_vcpu_stat {
- struct kvm_arch_memory_slot {
- };
- 
-+struct kvm_arch_plane {
-+};
-+
- #ifdef CONFIG_CPU_LOONGSON64
- struct ipi_state {
- 	uint32_t status;
-@@ -886,6 +889,8 @@ extern unsigned long kvm_mips_get_ramsize(struct kvm *kvm);
- extern int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu,
- 			     struct kvm_mips_interrupt *irq);
- 
-+static inline void kvm_arch_init_plane(struct kvm_plane *plane) {}
-+static inline void kvm_arch_free_plane(struct kvm_plane *plane) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- static inline void kvm_arch_free_memslot(struct kvm *kvm,
- 					 struct kvm_memory_slot *slot) {}
-diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-index 6e1108f8fce6..6023f0fd637b 100644
---- a/arch/powerpc/include/asm/kvm_host.h
-+++ b/arch/powerpc/include/asm/kvm_host.h
-@@ -256,6 +256,9 @@ struct kvm_arch_memory_slot {
- #endif /* CONFIG_KVM_BOOK3S_HV_POSSIBLE */
- };
- 
-+struct kvm_arch_plane {
-+};
-+
- struct kvm_hpt_info {
- 	/* Host virtual (linear mapping) address of guest HPT */
- 	unsigned long virt;
-@@ -902,6 +905,8 @@ struct kvm_vcpu_arch {
- #define __KVM_HAVE_ARCH_WQP
- #define __KVM_HAVE_CREATE_DEVICE
- 
-+static inline void kvm_arch_init_plane(struct kvm_plane *plane) {}
-+static inline void kvm_arch_free_plane(struct kvm_plane *plane) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
- static inline void kvm_arch_flush_shadow_all(struct kvm *kvm) {}
-diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-index cc33e35cd628..72f862194a0c 100644
---- a/arch/riscv/include/asm/kvm_host.h
-+++ b/arch/riscv/include/asm/kvm_host.h
-@@ -97,6 +97,9 @@ struct kvm_vcpu_stat {
- struct kvm_arch_memory_slot {
- };
- 
-+struct kvm_arch_plane {
-+};
-+
- struct kvm_vmid {
- 	/*
- 	 * Writes to vmid_version and vmid happen with vmid_lock held
-@@ -301,6 +304,8 @@ static inline bool kvm_arch_pmi_in_guest(struct kvm_vcpu *vcpu)
- 	return IS_ENABLED(CONFIG_GUEST_PERF_EVENTS) && !!vcpu;
- }
- 
-+static inline void kvm_arch_init_plane(struct kvm_plane *plane) {}
-+static inline void kvm_arch_free_plane(struct kvm_plane *plane) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- 
- #define KVM_RISCV_GSTAGE_TLB_MIN_ORDER		12
-diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-index 9a367866cab0..63b79ce5c8ac 100644
---- a/arch/s390/include/asm/kvm_host.h
-+++ b/arch/s390/include/asm/kvm_host.h
-@@ -799,6 +799,9 @@ struct kvm_vm_stat {
- struct kvm_arch_memory_slot {
- };
- 
-+struct kvm_arch_plane {
-+};
-+
- struct s390_map_info {
- 	struct list_head list;
- 	__u64 guest_addr;
-@@ -1056,6 +1059,8 @@ bool kvm_s390_pv_cpu_is_protected(struct kvm_vcpu *vcpu);
- extern int kvm_s390_gisc_register(struct kvm *kvm, u32 gisc);
- extern int kvm_s390_gisc_unregister(struct kvm *kvm, u32 gisc);
- 
-+static inline void kvm_arch_init_plane(struct kvm_plane *plane) {}
-+static inline void kvm_arch_free_plane(struct kvm_plane *plane) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- static inline void kvm_arch_free_memslot(struct kvm *kvm,
- 					 struct kvm_memory_slot *slot) {}
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 383b736cc6f1..8240f565a764 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1086,6 +1086,9 @@ struct kvm_arch_memory_slot {
- 	unsigned short *gfn_write_track;
- };
- 
-+struct kvm_arch_plane {
-+};
-+
- /*
-  * Track the mode of the optimized logical map, as the rules for decoding the
-  * destination vary per mode.  Enabling the optimized logical map requires all
-@@ -2357,6 +2360,9 @@ void kvm_make_scan_ioapic_request(struct kvm *kvm);
- void kvm_make_scan_ioapic_request_mask(struct kvm *kvm,
- 				       unsigned long *vcpu_bitmap);
- 
-+static inline void kvm_arch_init_plane(struct kvm_plane *plane) {}
-+static inline void kvm_arch_free_plane(struct kvm_plane *plane) {}
-+
- bool kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
- 				     struct kvm_async_pf *work);
- void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 0e16c34080ef..6bd9b0b3cbee 100644
+index 6bd9b0b3cbee..98bae5dc3515 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -763,6 +763,8 @@ struct kvm_memslots {
- struct kvm_plane {
- 	struct kvm *kvm;
- 	int plane;
-+
-+	struct kvm_arch_plane arch;
- };
+@@ -684,6 +684,7 @@ struct kvm_kernel_irq_routing_entry {
+ 			u32 data;
+ 			u32 flags;
+ 			u32 devid;
++			u32 plane;
+ 		} msi;
+ 		struct kvm_s390_adapter_int adapter;
+ 		struct kvm_hv_sint hv_sint;
+@@ -2218,7 +2219,7 @@ static inline int kvm_init_irq_routing(struct kvm *kvm)
  
- struct kvm {
+ #endif
+ 
+-int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi);
++int kvm_send_userspace_msi(struct kvm_plane *plane, struct kvm_msi *msi);
+ 
+ void kvm_eventfd_init(struct kvm *kvm);
+ int kvm_ioeventfd(struct kvm *kvm, struct kvm_ioeventfd *args);
+diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
+index 162d8ed889f2..84952345e3c2 100644
+--- a/virt/kvm/irqchip.c
++++ b/virt/kvm/irqchip.c
+@@ -45,8 +45,10 @@ int kvm_irq_map_chip_pin(struct kvm *kvm, unsigned irqchip, unsigned pin)
+ 	return irq_rt->chip[irqchip][pin];
+ }
+ 
+-int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi)
++int kvm_send_userspace_msi(struct kvm_plane *plane, struct kvm_msi *msi)
+ {
++	struct kvm *kvm = plane->kvm;
++	unsigned plane_id = plane->plane;
+ 	struct kvm_kernel_irq_routing_entry route;
+ 
+ 	if (!kvm_arch_irqchip_in_kernel(kvm) || (msi->flags & ~KVM_MSI_VALID_DEVID))
+@@ -57,6 +59,7 @@ int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi)
+ 	route.msi.data = msi->data;
+ 	route.msi.flags = msi->flags;
+ 	route.msi.devid = msi->devid;
++	route.msi.plane = plane_id;
+ 
+ 	return kvm_set_msi(&route, kvm, KVM_USERSPACE_IRQ_SOURCE_ID, 1, false);
+ }
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 67773b6b9576..e83db27580da 100644
+index e83db27580da..5b44a7f9e52e 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -1104,6 +1104,8 @@ static struct kvm_plane *kvm_create_vm_plane(struct kvm *kvm, unsigned plane_id)
- 
- 	plane->kvm = kvm;
- 	plane->plane = plane_id;
-+
-+	kvm_arch_init_plane(plane);
- 	return plane;
- }
- 
-@@ -1277,6 +1279,7 @@ static void kvm_destroy_devices(struct kvm *kvm)
- 
- static void kvm_destroy_plane(struct kvm_plane *plane)
- {
-+	kvm_arch_free_plane(plane);
- }
- 
- static void kvm_destroy_vm(struct kvm *kvm)
+@@ -5207,7 +5207,7 @@ static long kvm_vm_ioctl(struct file *filp,
+ 		r = -EFAULT;
+ 		if (copy_from_user(&msi, argp, sizeof(msi)))
+ 			goto out;
+-		r = kvm_send_userspace_msi(kvm, &msi);
++		r = kvm_send_userspace_msi(kvm->planes[0], &msi);
+ 		break;
+ 	}
+ #endif
 -- 
 2.49.0
 
