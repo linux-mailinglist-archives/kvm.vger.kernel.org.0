@@ -1,82 +1,82 @@
-Return-Path: <kvm+bounces-42391-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42392-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B229EA78152
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 19:20:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB2ACA78154
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 19:20:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D8093AD9CE
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 17:17:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 196AE3B0507
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 17:18:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7D1C20F081;
-	Tue,  1 Apr 2025 17:17:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B66AE20E6E1;
+	Tue,  1 Apr 2025 17:18:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hedWqD8D"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Hqt8Uk/r"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BAB9203710;
-	Tue,  1 Apr 2025 17:17:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52379203710;
+	Tue,  1 Apr 2025 17:18:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743527866; cv=fail; b=O6UGvL4AwJz1HuU7OX5QalPKeFHFC4lSgqxqbCioKTT1pJ54RfcOGgjQqFmZFh74pMDp2O4vWGjSP0YaDwKKrTSYmMDas4y0IsrfUE8FjLjNtd71BxBVjiMfrV2P54b5OMrYbmaoou3bx+/7X/vQ76Ugul6rSe2gL0tpq+Si0zY=
+	t=1743527917; cv=fail; b=gwITENmzfuT4n2x2Iei5tkzneD6pbSqGYRFZcXPRL83vo6j9ZkPjay8daqriu0a8kmBxRzuynuu0CImun2bfn75dZpmor79IX+QBOqIHqEVZ7Ab/pZwtC5OgARmsWeZnUGT/nAcoEZfLbYRgb/F8sgsQD0s3TVFTKJa0VjSCvS4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743527866; c=relaxed/simple;
-	bh=aOfCUGpgqEGWGdedHkQS4Qoe3l9IV5LrO0xweXEz92A=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=uLzCfbofqjxxAAdzAvQVp/xa4ju/IzZdZdh8lVe02zwXCaLZYMFEDPECWIHvU3xSpk233WFBK0d+lLs2WGNQ3BYBmJCe/n5uy1ISq2i/3vgR7XkISaoRIFxqEHzpTwxjzBRGcyereqW2NyhZ8VuGvmEgbpnVdvYkumiH87HoP7Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hedWqD8D; arc=fail smtp.client-ip=198.175.65.14
+	s=arc-20240116; t=1743527917; c=relaxed/simple;
+	bh=lPqlZhQp4YIzb0ha4H60CNDivybSvdwRM2eMR//xNgQ=;
+	h=Content-Type:Message-ID:Date:Subject:To:CC:References:From:
+	 In-Reply-To:MIME-Version; b=uW5WmPejhpNR2KbrrcxMvpd4HxCW6X7ar7N5BjViDDuBuw5Vq0/imONm0ICEykDOvlI2g88zRMmsFDj6ws50HBkjXt8/OxazkdaI6nKOuS6fYbc3zgYt8blShSW/SNjJ/ggAx9hEDy7IlKG0PClLtALOleWLbC7fBj0rJyeuf14=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Hqt8Uk/r; arc=fail smtp.client-ip=192.198.163.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1743527865; x=1775063865;
+  t=1743527917; x=1775063917;
   h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=aOfCUGpgqEGWGdedHkQS4Qoe3l9IV5LrO0xweXEz92A=;
-  b=hedWqD8DF0gu/hNxAsLUkOMnFJGgY3gBm05p/N8fmJymVtPBgfBsjpJg
-   6f4IagfWpYV8MVUBuqW7iRU2kl+rtVAMeS2iWy/vTpYPGRVy6KO6F1I7j
-   guf5LQbNChI7pNN+v2saXmrRzZrQ3w9+r3UAjfpXqBvATCUZBjxaxTtwO
-   VB/9AmfnyRd1GtMhEa4RVkbKAyrgMWt2WOHOQauhvZ4/O99cU4WzE//BS
-   HhggqbTIO9W1NpvJdb0vLuY9V0F6Oso4t9cPInLzHf6gWFNita/9sgUWH
-   EHUKSWaML77XDe+qhF4fkSilvPFGQvDxCLjUW1kOYx4sIokNdcDk/RcZh
-   g==;
-X-CSE-ConnectionGUID: vSQbURcPSJyJdc10Vk7buQ==
-X-CSE-MsgGUID: f7Y6d+1tSt25vkCek22B9w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11391"; a="48656053"
+   in-reply-to:mime-version;
+  bh=lPqlZhQp4YIzb0ha4H60CNDivybSvdwRM2eMR//xNgQ=;
+  b=Hqt8Uk/rvyaG1yY1bSJW/IxP0OGZwHSH+TSr0OZgHhRrgSVUsanVyVtg
+   uugbLO33jN71kEakNajhq7g5F3tXakd58H23v39XDEbDrBJMU0kXvqM6x
+   k6ygazogdBHqA2LVcae8aC6aeNGk/pwR/yUrFscU+cjR0ie5Mwo6qKLtK
+   sm7GC0ahU2cAQEGR3c52l/LDzADUyNhfzDUeRCp+S9UicPiuO/+nvMFf6
+   WKwiiHD2muQJxHUZlcB7beKhc3mICokmPQiNYCli+rPpekCAyn4/tuRdV
+   O+pDZ6KsWlIdKxb9+jrbf0y7VmwxSHiW4LYmgtYWvXCNVQkK/v8x5Btfp
+   A==;
+X-CSE-ConnectionGUID: wYd/OyRpQWCeOrCG4r1YYQ==
+X-CSE-MsgGUID: fZfp7bi9RXeEwkv2l9H0Dg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11391"; a="55523994"
 X-IronPort-AV: E=Sophos;i="6.14,293,1736841600"; 
-   d="scan'208";a="48656053"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2025 10:17:44 -0700
-X-CSE-ConnectionGUID: O/ahzw0WRGmMDHWCUulpvA==
-X-CSE-MsgGUID: 8ADd9FoDTM2KquPFwj4pVg==
+   d="scan'208";a="55523994"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2025 10:18:18 -0700
+X-CSE-ConnectionGUID: bA8bXCYPTpm/fhQHllT8rA==
+X-CSE-MsgGUID: hIomK/C7R6mVhByS+C5ZLw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.14,293,1736841600"; 
-   d="scan'208";a="126432938"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2025 10:17:44 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+   d="scan'208";a="126206072"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 01 Apr 2025 10:18:16 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Tue, 1 Apr 2025 10:18:15 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Tue, 1 Apr 2025 10:17:43 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ 15.2.1544.14 via Frontend Transport; Tue, 1 Apr 2025 10:18:15 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.42) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Tue, 1 Apr 2025 10:17:43 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.40) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Tue, 1 Apr 2025 10:17:43 -0700
+ 15.1.2507.44; Tue, 1 Apr 2025 10:18:14 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wroXgn5nlveWhrfUZUuFErbUpPnrAxjSMQlGeVCsXvY4u1Ep8t6L0t+CVjTLctfx0fD1EBEKtLoDfNfTSyeBIRysOL/j5ACKXWHHddYJyDYVJGKoNSOA63eIm9FuHh9gt0eNycVyQLoSVPVBP+h+0I9oKkvbVEzEUrg8T/QvW0Ba4oUQJIPOZahLTEN53oRq5wtwMWXIHENYtgBC7I3FZpzIEdp0h8+ucIwTAR6jeyKV0YTf2ckNEKXJ6O1cbSSbet70eJOabDQnpJReP7jdfjQGScRFKTgQH5nAYkGCtvC/yhjJOH/LJEuEMTyophGTAsfsTrhvV1+kRky4n5uTkw==
+ b=fVjt/Yz8uFwl/PcdwvkJkNvzp02xYqUUEW9utkFGZ90LYy2UBVVPqUe8HpwKi3Q8dy6qiviLJaMl+tQFvtvfcrLsp634evYehdO5T3qD/MZd1WLWUbamUoZ7ejUlhpPun2R0WRX4i573so7oKNhQJGu+KU0JDPgoeV8pg1UhS7qXoFSDhjipGtR4Q1lFrfjXSVCu5rhVAfOFYtomZGvXhqRJTf3fXc+Dkx5p6vtxiv1I2NEEOsV0O3xfrGXo6R/EePmqJmht/oA8X37x+iIbNO2izQ38ZUEK7FVYEsqc1zeJOE3kYC5I0PTfumNlF6jwBCRcpOnt9Tn2qJGkvAIIjw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=m3CWGA0Z0OMrPBv2J/ywny4CicMW3TqstWDnSKm+hFs=;
- b=k27qc4TCjryki+yR67ha6oYbvZQtbVwVdWpGVwJVW9UyrONtB8vgnu0uBjtcUzDeFNEavK7CxIGmPWruZHK85fBNH4WiXebcOr10ckgDxKS+Wcm6A1nx0Zz2PUCP1bQU2KaqGP2SDcST7AGkIovFwuvMl8d2Z2TuWK0Qq6elX419bCl92r7oXGaku/IXIgna/SHKqeIqnnODb15rbOipcMzGT8sOrE7SQrBhVEtKpccWfnkG1bXjr9ea+nPUOshQiPzd7AuH4o6yZnapLaLHvsorHpCcGLU+abYhvtMqUk+OKLEszs9fPW44p33MLFY1iT1biT1qJkoLM3Rc0A86tA==
+ bh=zp4eB1EFa10Z7MZIkzlKtfzwmb78YOzHWqbDUi2Xpog=;
+ b=Bl3ra1/9UVj1kxPLOl2ur4K4CASLiRRspnTjAYPiTHJ2Iicu0TYwLwQUhlw9AiAotFl8rwVhPUgVUcFDgj107omZfbWjY6p9+kROC6eZCllGgL+2XZRH2hOJM5V+efsAKPlt3SbTTXtviqxNRT6JpSJ3AStVJTMiXC8Smoxm+y7pHG3NHpj2Y9dG7Io9bJREwlxLW+eYD+RJ81uZzBxExwixaCjWaqOQH2knJIC3K1+xve41uO+m0G3N3KQ3jhUwTezd+mohhUfMhHTC0rMW2Xe9aGugnhs487CRjmkX7rbmsVYyBrIN4OsHL7Y4FU0P8/37IkL7UXkCuAJW7+udFw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
@@ -86,36 +86,35 @@ Received: from DS0PR11MB7925.namprd11.prod.outlook.com (2603:10b6:8:f8::18) by
  PH8PR11MB6926.namprd11.prod.outlook.com (2603:10b6:510:226::15) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.44; Tue, 1 Apr
- 2025 17:17:28 +0000
+ 2025 17:18:12 +0000
 Received: from DS0PR11MB7925.namprd11.prod.outlook.com
  ([fe80::b1ef:c95b:554d:19c9]) by DS0PR11MB7925.namprd11.prod.outlook.com
  ([fe80::b1ef:c95b:554d:19c9%6]) with mapi id 15.20.8534.043; Tue, 1 Apr 2025
- 17:17:28 +0000
-Message-ID: <37b9903a-e8fc-4d57-a1ae-2bd2f26a9974@intel.com>
-Date: Tue, 1 Apr 2025 10:17:24 -0700
+ 17:18:12 +0000
+Content-Type: multipart/mixed;
+	boundary="------------g6ZXVC3UdYt61i0Rd2WYehf5"
+Message-ID: <aaac7044-5c65-4d96-9e00-815b90be56e6@intel.com>
+Date: Tue, 1 Apr 2025 10:18:07 -0700
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/8] x86/fpu/xstate: Always preserve non-user
- xfeatures/flags in __state_perm
+Subject: Re: [PATCH v4 4/8] x86/fpu/xstate: Differentiate default features for
+ host and guest FPUs
 To: Chao Gao <chao.gao@intel.com>, <x86@kernel.org>,
 	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, <tglx@linutronix.de>,
 	<dave.hansen@intel.com>, <seanjc@google.com>, <pbonzini@redhat.com>
 CC: <peterz@infradead.org>, <rick.p.edgecombe@intel.com>,
 	<weijiang.yang@intel.com>, <john.allen@amd.com>, <bp@alien8.de>,
-	<xin3.li@intel.com>, Maxim Levitsky <mlevitsk@redhat.com>, Ingo Molnar
-	<mingo@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter
- Anvin" <hpa@zytor.com>, Mitchell Levy <levymitchell0@gmail.com>, "Samuel
- Holland" <samuel.holland@sifive.com>, Li RongQing <lirongqing@baidu.com>,
-	Adamos Ttofari <attofari@amazon.de>, Vignesh Balasubramanian
+	<xin3.li@intel.com>, Ingo Molnar <mingo@redhat.com>, Dave Hansen
+	<dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, "Maxim
+ Levitsky" <mlevitsk@redhat.com>, Mitchell Levy <levymitchell0@gmail.com>,
+	Samuel Holland <samuel.holland@sifive.com>, Vignesh Balasubramanian
 	<vigbalas@amd.com>, Aruna Ramakrishna <aruna.ramakrishna@oracle.com>
 References: <20250318153316.1970147-1-chao.gao@intel.com>
- <20250318153316.1970147-2-chao.gao@intel.com>
+ <20250318153316.1970147-5-chao.gao@intel.com>
 Content-Language: en-US
 From: "Chang S. Bae" <chang.seok.bae@intel.com>
-In-Reply-To: <20250318153316.1970147-2-chao.gao@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: BY3PR10CA0019.namprd10.prod.outlook.com
- (2603:10b6:a03:255::24) To DS0PR11MB7925.namprd11.prod.outlook.com
+In-Reply-To: <20250318153316.1970147-5-chao.gao@intel.com>
+X-ClientProxiedBy: BY5PR17CA0009.namprd17.prod.outlook.com
+ (2603:10b6:a03:1b8::22) To DS0PR11MB7925.namprd11.prod.outlook.com
  (2603:10b6:8:f8::18)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -125,220 +124,218 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DS0PR11MB7925:EE_|PH8PR11MB6926:EE_
-X-MS-Office365-Filtering-Correlation-Id: a7d22ba3-2cee-47a2-8598-08dd714113f0
+X-MS-Office365-Filtering-Correlation-Id: 4efdde7b-d3ad-4ac1-c71d-08dd71412e23
 X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?MmtkdEpVMTFGTUN0amM2NUJVUkhFNGd4SmlxODFOR1I3VENoRVAvNU1IQ2lZ?=
- =?utf-8?B?RUR4MDNpb3JmeW1mb2diT015Y2F4YXRxNmpaclZ0YnA5cXNRRzdaY2xZUkxr?=
- =?utf-8?B?aUxXaGRWc1lLdXNyNVZNa3Rlb2xxOC96cXVLamRIamtUWkZKczA3VHkrc3lj?=
- =?utf-8?B?QWNYNjl4NTVDZmdmZGxhb3lUZTRFMUM4VUhGNi9jOHgvNlRUZmpuSnBJNGtB?=
- =?utf-8?B?Sk5Xa2l4Z1VHNUZ3RkxORnNqNFBGdS9xbE5icVBNYzFvL1J0RVNqRnBJOEx5?=
- =?utf-8?B?RUFpd0ZobHhzNXZyS2F5bWVjdm1QQUNqTjQ4aDRmMUNLamtaSjRoelpnTUt5?=
- =?utf-8?B?ZnJWbG5mdlVUVERqTElxRmp1VFhheG9ZdUMwSjRxSEpCUElSMjdDV1p2aC9j?=
- =?utf-8?B?VVpEeE85cmwyQmFjYjkvK2JZNFZ2ajZybTZmbXN6RWRRZmhITVJOTFBGRVVC?=
- =?utf-8?B?Ukx6c1RjS3RoOEZucVBuS0ZvS1ZkbkNtdHkzZUJhVU1Dd01iTUpjRUdRaWxV?=
- =?utf-8?B?cTRjUFdCbExaNmdYSjNqWVBrN2U0UWdoQXJEL25kNE9nUEZld0QxMS93aThI?=
- =?utf-8?B?OUVnTzAyVWRUQVdaeVN4NUIvN0k5Q0UvYzkwZG1hTENEaUZ3d1JzTmhnYUFS?=
- =?utf-8?B?OFVoN3RPL2dZVDJlbmpoOU5uaWx0MjhGNnQ2TnAxUXI0YXBzN1prbTNnTVZt?=
- =?utf-8?B?NHhoRk0rbUNkeXdyL3plTlpES1hMWkdtaGFpY2NYNGQvc280UkpnQXEvZi9h?=
- =?utf-8?B?ZVFQMUxjalcxYm94SjhRUDk4ZTV5T2ZBeU5Qcksra1piNHk2K29rcGpVZWFV?=
- =?utf-8?B?UnI5YVB5cU9vNW5GTU4wc0lMWE82ZFNRaUVzU0xoYmlDaGRmeEtXYmhrVVQ0?=
- =?utf-8?B?VnkvTmtCUDlMOGh4T3V3LzVwZkpMYmozUkcwcDdpeE5mMDNCMG5LVW81OHcz?=
- =?utf-8?B?NWxVdThiRjZHa3daaU5LWFViMytmWG8wbjZyenk1Zk9heXBmZ3hDc05ZMW45?=
- =?utf-8?B?d00vc3Z1KzdqZTNtWlBWUm5NQ05IRkNHOUl5SzJacmxNdEtRRVNjTEp1R1Bu?=
- =?utf-8?B?WDRqd2tLeUhTWGJLY2dvdlpBMHpZR0ZoMVNtL3ltUUNsdkhIUTVxdC94YklR?=
- =?utf-8?B?WGIwbWFMRERacnhGOUFnVGNacEVMcWVNZ29scVVQRk9rRHpjNXp5TTkxMjhH?=
- =?utf-8?B?TFZVOTdxODl5NG0zZVJLWFcxeUdDS2UwN29IYWgvMTlnb1g4RDNVYlVlVTFJ?=
- =?utf-8?B?eDJkNm1yOXlrY3prS3dpSnJmemhPcFVlQVBsZlhXN2ZwZTZ1djNrRHFyQjNC?=
- =?utf-8?B?VlVneDM4b2cwOU55QllVc29xUE1RM1M3ZjB6LzNoU3FIYlcvejRBTlJsRFVa?=
- =?utf-8?B?WWtDUzlBTkIzNVR4RWxtTGdjTVcrd2IxQ2M5SE9yb0pwMzQ3TFN1YzJsSzBO?=
- =?utf-8?B?OTJkMlU2SklHTmpqd2dUSGZCZk1XK2ZkaW0wbDFyMW5zdHF2TUlUR21QYUtF?=
- =?utf-8?B?RkRrQkhNWHprYjhXSUNVZ3NnbCtmUTIvWGFqQUtHNUczSzduMXlRQXlndmZQ?=
- =?utf-8?B?clI5YXo0RDNXTGs2am45bGwvek91ZnFBRWtjUXRiNDB3VytOWitXS0lEcHhB?=
- =?utf-8?B?MGRob01Yb3NtYm9jbmt2RmIrV3ZaQTZGREhUMkVheE00eld2cTdCbmVha0JP?=
- =?utf-8?B?Z1VsQ1RBbUREaE5DOUJPNnA1OFFCRm56ejcxYjl6c01WNE93V0tnL1NHVWto?=
- =?utf-8?B?Sy85ZTYvUENTbXE0amJlUkNCM2pNMkEvdS83OG5BSUs4ZDFRci9leGR4VmxX?=
- =?utf-8?B?d0U5QkN6UHdWK29KL0VlMTlOOGUrK2lFNlZVTy9UeFB2ekYvS1gzbXdhc1ls?=
- =?utf-8?Q?p4pfDWAMvH1ad?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7925.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024|4053099003;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?SFh6M0hoU21GUHdsL0t5a1F4TlllVlN1ak5LSnlLc3MvR1JYOGFHbklmSlFu?=
+ =?utf-8?B?VDMyR2ZjYzBLRWRZZDBLcWFmVmFIV3F2WU16RGpvRWVRUXlzdUlMUEN4b2hh?=
+ =?utf-8?B?QUE1V3cxQmQzZWtNVUpldlN3VnNnS3VSRWxtN3g2blZhUzRkZ0ltbVZ2UVh6?=
+ =?utf-8?B?VnZVc0tmaloyK2hNb3VNeTZJb3ZwRzdza3ZzWmlYd0xRdGVCR2doL3BiTGRu?=
+ =?utf-8?B?aHpIdEJQeTJNcnlVMlRhYWJ3QmtVdGlDbkh1REtzLzBkOTlhZmxtWU83YUgy?=
+ =?utf-8?B?by9iTmluYVJndGNsRWJ6dlRrRVVickdCKzkwNit6aDdiNVBUZmZ4YnAxdHdz?=
+ =?utf-8?B?d01MT1J6VlJlQ2pLOG5VUE56b0dMVWZxaGpwY2xlYkFJR0d4MHc0NzlDSnMz?=
+ =?utf-8?B?WWV6NzY3eXNDQXYxOUd3SXhxQ0ppcGJsaFgrWk5iRmdEQlMrY2pRYUs1VDJz?=
+ =?utf-8?B?ZGQvYS9QQzhtNGZpUlJ2b3p1RDlwKzN3VjdNaVBIdHVVOXA5UmpIWXprTDVT?=
+ =?utf-8?B?L0xGR0toeW5iUDNLZDhWeFVaT3JySWpIb3NzYjZxbkNkakVacXUyZzZDUlhQ?=
+ =?utf-8?B?d1pWQzhyeXJIWU9OSnJvVFMrUnFlL242UDJiSjlGNGpLVjJtbVYxSjhsclJo?=
+ =?utf-8?B?dUF0T0RlUHg1ekN0bXlrOGw4eDlFL3NxQzFyT2ZSaWVIUlZKNkMxQ2t2eWRr?=
+ =?utf-8?B?REhzWnhRWTVMRi9HUXBHVGc1dVhObmd5eG1ldzJUdnFPc2wvUkVzQmdOQW84?=
+ =?utf-8?B?R3hTQTY3QW5FM3BTczJHSVFaMmt1TVFZRWJYc20xT3U5TEZDODVsUmZ2SXY3?=
+ =?utf-8?B?ZGxjV1VHREIxdXlnaDFLR0gvWmV5QVE3SEJKZnYzZ1hzNEFwVmlQY0NWMHRG?=
+ =?utf-8?B?SCtCTTRFL2pQVkFrRkJrbmpyWEVwdkdOR0RhWjFKbUEzdlBVQ0haUDFETTNO?=
+ =?utf-8?B?bHNxMWViNGxsaURMRnFMTDBzdHBOVTQ1c0FpUVRveC9JMC8rbUhZYTRqWkRn?=
+ =?utf-8?B?ckpBMFAzazVESkt5YWJmQUxBUU5nUWh0YlB3WXU5Nlk2TnVtVWdLVDRuQU5p?=
+ =?utf-8?B?eUhlU2ZJVit6bFBWMlBaTnZqN244bUFWTkRMaGVydjY1SDZnUnBpUGIwRnJ5?=
+ =?utf-8?B?Y1Zoc3VkRkNvbDYyZGxER25zOHY3cmxYeTJNZzl4SEJORVJvNVdGMzBXM3pQ?=
+ =?utf-8?B?UzcwMzFOWVRpKy94ZjE0NnN0QjhkcWp4WnpYVFQ3czZEM1dyUmgxQTFRbG9Z?=
+ =?utf-8?B?cDhEKzljMFBJZjM2VDljWStXK2ErNzJJOGlhWUM0MlAwNGY2R1NGYzhTaFl4?=
+ =?utf-8?B?bmVzQ0NHZmNpSGpENHl3MXI5UllCQ0pWMkkzN3BkMitQRUh4WTRXeTcrRTZ5?=
+ =?utf-8?B?ZUtkbHYzWHlBS2o2ZEM4a2NuMXRTTG1idGgyOFMyMzF3cjU2em5ZdzBOcDZa?=
+ =?utf-8?B?amdFMW1lUmtrVDZvZmN4bFlzbFBqeVoxbzZDQ3lYenR4NSt4Z1NYZWwrUnhY?=
+ =?utf-8?B?cnhUTVFZOEptWkhVVGJNeHNvRzVuVUYvdVVkWU8ramNyZ2w4dTluWVNjdmFF?=
+ =?utf-8?B?RzNUNkJOLzNPS0w2Vk1GMEJaMVNlYm1lMUovdHJacndhWk54dTZxWk54akRk?=
+ =?utf-8?B?dktxRm16dSthTDdnd29PN2tOd2d4YkptZXpTZlpMaEM4ODFXMkVNMWVFVStY?=
+ =?utf-8?B?T2V1S3NoZjhMd2w0Z2RsS043TVdmYitDbXJXM1VUM0hNSlZUYzI2cGxaclVy?=
+ =?utf-8?B?YWF5Z0JwUDJkdkdpOWNWejk3VjdqTnJxZklkMm8xWFFMWDVka0s5cVdReEli?=
+ =?utf-8?B?RDJZNHkxb3BBVUh5S2FNZXB1QXBwelpvTmtWRmlHR0JtZzZ6clVlNjZYK09X?=
+ =?utf-8?Q?OmzDRNNg0bnv5?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7925.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(4053099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RG9yZWJWYlEyM1NFaDhxcEtZU2NRRUo0OE90VWpUa2JCTmNyeHl6ZTNpUEls?=
- =?utf-8?B?RFB0UUgvRExiZzM2R1JZYzh5NEU0ektWOWNndnFxeXViTkZNTENtM1gwZ1Bu?=
- =?utf-8?B?UjZEYXdXb1RCcVNxNG41aStrZ3NGQ2MrdzhmOTl6Zk1Bd0htUXVkRDFZbXNO?=
- =?utf-8?B?MHNTL2NUQkw0YlJQVU1ZejlrWFA2dnNudlFwQXpEU3N1OW5yb0twc2IyR1JX?=
- =?utf-8?B?dFBycytvbTBIWFg2cFJKbHdXeEoyS0xpTDZCcWRSS2daTjdvT0xFNUwxa1Jr?=
- =?utf-8?B?UjZ0ckhSTmhvc1NiRWZ6UzdoUHdqRUZOSmlhaWtCVGhqbGJndFJuY0MvZll4?=
- =?utf-8?B?eDZpbnZvbWQ5RjlxWFdWOGxUdldoWjlzWDNKSzVEWG5zTmxuemFZY1dSa2pX?=
- =?utf-8?B?b1NRbUlmU3hoWUtETFBFS3pLTmkyM1B4bkVmVHRQQVhrWWIvcmhrUStVUmN6?=
- =?utf-8?B?Q1E5SUdLaDZ4ajhINWEra0lHWkNmOXdsUVlJOGYvMUxKQWhVZVg1R0MxYm1V?=
- =?utf-8?B?SkNzME1LMUZWMDZsT214WUhnZmJDTHY5OTZsWUNFRlBTZU1DZW00Sm9ZbGJ3?=
- =?utf-8?B?RnVyNnB0NjVROStZdDhBZGJ1Nnl3OUpDNWZKU0pxdzF4eFR4YVNrcDYxRHdN?=
- =?utf-8?B?SjV4V3BLdjhWSEpSVXVoWDI2WDRCUitXWnNjU2dtdEhMazV5K0pnZTJZK0R3?=
- =?utf-8?B?b0N1M1pFRTduWlgveEVldVhydGhhVm1reFJoaElxWDZIMDBvazRJQXpIaCts?=
- =?utf-8?B?Y3NtR2RXckxpV2JCY0hJU2k0OC9LejBOWUFmN0NqZ3IwNmVHUWFPMkRBcVkx?=
- =?utf-8?B?YzYxd1RUaTZjS3RPZlhxUkx3aFhtS0xjbDdCZW4xL2ZMcmtIRkFXN1ppVjFi?=
- =?utf-8?B?MGMrM2VuSitnVVhybHRvUktYVmhsZXdrcW81MGN0b1NtakczRGxzdE5iUlpL?=
- =?utf-8?B?OUxZdzErT015V21GS1ZXT3didkZva0xLbStTOFdlM2pTMnd6TXVQRW1ZVzlh?=
- =?utf-8?B?ZGtyWHZBQXQ3MUxhenlrdW1xM25QVGN6Y3R4NE5kbGFnWTdMMUgyVW9tcWUw?=
- =?utf-8?B?dVpFdjZYWVNDS1RPV0RBaE1GeWZkYVVleFVGNXp2b1F2cDBCaUFmSHoyWTBI?=
- =?utf-8?B?ZmI5c3FZNDVwTE5hWndKb0dLOXVVNjhselNZUEk0dk96ZldyVjA5TU1jTkVx?=
- =?utf-8?B?bWV5TkNBRVYrWENyMUdNN1VLMllKMWJNRjNFeTQ2WGREYm9mdHRpQlVQOU5k?=
- =?utf-8?B?L2p2OCttVWhrdlBMRXUrRUYzb0hZQmpmTnV2R2hRMlhNTFNMd3N4NjcyUktZ?=
- =?utf-8?B?S1ZmdWVjUmt6UEI5YjJpN2lSR1FzZTRydVJPNnN4Qm9ibEtzUVhGK250Q3Jv?=
- =?utf-8?B?Smg5RnZ5UzJJQkh3VVMybE1ZMW9YRVJWcEdpT25LaVBUTGt3Q3ljdXBSRVlH?=
- =?utf-8?B?dzRmbkt5VUkwMHZra3pKRG90MjZGM09kb3JEODZ4a2pYcDFKS0w2T3JJQUFB?=
- =?utf-8?B?enZqMll6WmJHOE1LU0puSjhiNFZpUE9IQ2dqa3ZNdis2VE0vWFJlQ1VPc00y?=
- =?utf-8?B?eS8vQ1ZQak5pc2E4OE9lUzUvUWhKeHFadmR6cUFZN29oTEpKQ2tnZG9DTmJ4?=
- =?utf-8?B?K0FBRTZ2R3ppTWg2TXk1Z0s1SEc0S0NrREtEczdXVjdiYlMyaEkvN3FtMTgr?=
- =?utf-8?B?cThCb1F3ekFRdCtxZFM4cG11NVY0QXlpKzhmbEcrOGlIS1J4bXZsYkFjUzNK?=
- =?utf-8?B?aVQ3VTNYbHo4ME9Qd0pPclBHby9YRTRMdjJnMGZtdjR2TFloaFo2YmExTStT?=
- =?utf-8?B?T0RFNE11KzllalVhTXU1OC9IeTU1SXkrVFNEcG9IK2lMYzd4VER5a2JKemFw?=
- =?utf-8?B?UUtScEFxNDZsOUV4bG9HcUpZYTdzQ3loa01DZUR3VFd5RDhMaksvcVNJbjJT?=
- =?utf-8?B?Wm11S1R3cUVWb2UyNVRtSEs2QXdiSW04anB4STM3SGErckphNC91ZE4yZzJE?=
- =?utf-8?B?TzBuU1RpQnFDWkdqTkNKR1FOYXIyMjZhbUZYa2N5YWxyZ0RUV1JKKzhSS0Qy?=
- =?utf-8?B?MDhVUjJXYWR6VTFENU1uaTdCSzNqYURMWGhnZmFnK1d5K3RkR2dzeCthUkRl?=
- =?utf-8?B?cEhjQjZja1pmdkNrb3ZLaVJVSU5ZSnZuQjRaZUdyd1R4YnYrT1lGV25HNEFV?=
- =?utf-8?B?OHc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a7d22ba3-2cee-47a2-8598-08dd714113f0
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aXZRWGpJbE9uNnIrRFZKS3lUc2t4TW5yTG5FRkJ2aEpWclpBc2Q4L3lOMXZK?=
+ =?utf-8?B?SUV4ZlVOWGY5UkdhK0Z4cmFuV3BwdXRHSFRBcEhwWHhPdkRXU2FxVXZBU1p2?=
+ =?utf-8?B?UmVLRHBOQk1sOGV1aWNoUENoSXFOdUNsOERBcmFDdy9RQkFlaUZsVHdRNmZK?=
+ =?utf-8?B?b0I3QmdYdTYzNFpTdWNPclB6K1lxUXQ3SktlT1FXRStQUEVhNkMwa1RJazlq?=
+ =?utf-8?B?QXBzbjFrMkgvaVlDa05BMlBLWlFubXNxZ2lveXgrdW9ncHdqS2lYQVNFeS9j?=
+ =?utf-8?B?OEh6cmx0aVJzTi9NdDU3dm1JUFgvVzF4a0l4MkU2M1Q0aTZLL2M3Um1HK1JI?=
+ =?utf-8?B?VVFUMllCSzM5V2hKTGdEUEh2ZVJjRlZPczhLeFVmdkpFTnVvTlpVQmtjbGow?=
+ =?utf-8?B?ZTJOczBiVWlzMi92TCtCWnNxMlNUcDhxYy8yN0ZhT1VlWUFvRGFvdXEvNVcx?=
+ =?utf-8?B?c1ZQaHJOZXpSUGNGU1NHYld0d0dXMHdOekdUaGtjdVN2QWptTUpZMFBnUm91?=
+ =?utf-8?B?aFcyTkt1d2M1aWxJSjFkR0NnNXk0SkF2aGJiMmhTQnZkd1F1UWU0elVERmx6?=
+ =?utf-8?B?MVlOR3JZT1VQM21xditFQXQ2RjRkTklIUDQwc3dyUk54Q3F1Z1JXR0QxS1pn?=
+ =?utf-8?B?aEpoNHJxWlBYZmFTbTJvQi8vL2FhRS8zQm55dEU3eGhSM0Z4ekpncXhvd25N?=
+ =?utf-8?B?ejlMdmtNS1pMenRSRjR5dFdNd1hjQjU3Q2k4VU1qK3R5ck5lQ05KVjdmb0w1?=
+ =?utf-8?B?bVUrOTRRMXdzbjJqRXh2RzkxVnh6RWJjMWJ4OC9yYjh6SS8wYUNITmRaZ3B6?=
+ =?utf-8?B?cFBTL0FOMDdKekZzY3NubmtPeFhlSmJYaVBvcWNHUzA5SXROWjhSYUpxWmlH?=
+ =?utf-8?B?RGxZSi8xME5XY2xEOEQxOHlTTjRTeHBHaG1BYWUzeVBBc2lYV28rSmtubHFa?=
+ =?utf-8?B?YXRZVXE2azdBeGE0SC9TdFJIUU9MNlRWL0hCTDF6TlU1azNpTVlWbHE5cm1Z?=
+ =?utf-8?B?dURvOVQ2dk44cENpa29ORWsxQmJVQVAwQi9XRTUvZlJWaGlhV3JNWkxLSnFR?=
+ =?utf-8?B?a0FKdi84SUR6MWoyMlZQMGFDUG9NVkJCZThnYXg1MUw3dHVLalNVd2Jib3E4?=
+ =?utf-8?B?T20yNTlqOERQVzRFTnRmeGNqcE1wU1R2VmR3cXlsUUtJeXFpUmpkSEJSM0Zu?=
+ =?utf-8?B?bTNhK1RUZTJuTHNEMlFrK2tnejhPR01iNi9MenVFOXpVU2svd2FzYUxYd1dr?=
+ =?utf-8?B?VUNTc0hWU2kzRGlsNERPbUJqN0dHQjIzb3IxbW8vdHhHd2FpcUVHTCtBL2Uz?=
+ =?utf-8?B?c25hWkhLeWhMbUFncDlEbk5ERWNvRGYrazJwRGMyNlVrWnNXTTl6QWN4Z1I1?=
+ =?utf-8?B?MEVTdHF1TWgrZmgzbVRkRVBJSysxSnFiQU1IRWpoNjQxYkYzWkxQc3NDanc4?=
+ =?utf-8?B?Z25kbGxCVEJROXkwaTZnZW93WnRvS2NWdkJCRG5jQ3QxQXd4WXBwWHU2OW82?=
+ =?utf-8?B?T0ZNV0N3c3p6K3VObHh1MGE2T000cnJrNnR6Y3lpWVdoTUpOWmZ0dFFtMFVU?=
+ =?utf-8?B?QlYySkpkY0pmY3BTSC9tQnB4Nm5CQ2ZpOUlpZVhYMnd5NmUzcU9VM3Aza3dz?=
+ =?utf-8?B?Nlc2b1Z4ZGowYlNDTFIwbVNaTnpZUDNmR0NhRDVzdFRCNEZ5dDBjSkJ6MXVJ?=
+ =?utf-8?B?ellDVk1jK002OGRMbjFPYld4ek5qbzhmMFdDSXU3TDQwUkFvRi9Kc05VSU9V?=
+ =?utf-8?B?K3NiMVlHZC9ObWlhNEhCU0tBOEJLa2s1blNRemd6LzRlaDJjaE5lRmFTWVdO?=
+ =?utf-8?B?TUFvZXpQY0xXcmFKcUFweGFlYXlVMzB2WGp0ak1GSGtHTGxacUdZUmJuaE9o?=
+ =?utf-8?B?MmF4ODhJcklPTnhtbmxDMityUy9mUU8vNDRrdmRmeEcwWVp5eGZmdjNtMG9a?=
+ =?utf-8?B?a0F5dFlja0p3NXpaVFRjRWYyRG5UMWZzbzNHSmRSY1FObVFxaG9wQytEaC9J?=
+ =?utf-8?B?K21qbVdpVVZYTkl5NFJxUnYxNlYvZWxDRFFyMklOYzNrVVdQSW9qbjJDUGZv?=
+ =?utf-8?B?K1ozUGFPZkIxSGxFdGkyamorbzZYQU10TThnekNmTXBQd3FMU2xsbElST2E0?=
+ =?utf-8?B?QTd4UXRrVllQdDNiMkhBTTZ1N1VCbHB6MHlra0JEUTUzN05mYjUxUCtXTXRw?=
+ =?utf-8?B?cVE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4efdde7b-d3ad-4ac1-c71d-08dd71412e23
 X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7925.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2025 17:17:27.9374
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2025 17:18:11.9521
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jTxwrVknbzrBZP+7uSv4s5XfhlhBJmWQ7GAMsfd45IwmK8oFZV4GXp0mPbfqNw7f8lUEwTJS5LZs6E7xHNBtbnOm9h8sP/l+Mzmt2FUHPGY=
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1VV4ZRGDVq295u+X5rOyf27Q8UY7ihEyh2GCWqKlBUOiOcaT7IMRRugVDLlbBTz+oapuKDn0RSmFg+ZzewFfJiRPgDTAQuMGzOYXmcwGwQA=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6926
 X-OriginatorOrg: intel.com
 
+--------------g6ZXVC3UdYt61i0Rd2WYehf5
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+
 On 3/18/2025 8:31 AM, Chao Gao wrote:
 > 
-> When granting userspace or a KVM guest access to an xfeature, preserve the
-> entity's existing supervisor and software-defined permissions as tracked
-> by __state_perm, i.e. use __state_perm to track *all* permissions even
-> though all supported supervisor xfeatures are granted to all FPUs and
-> FPU_GUEST_PERM_LOCKED disallows changing permissions.
-> 
-> Effectively clobbering supervisor permissions results in inconsistent
-> behavior, as xstate_get_group_perm() will report supervisor features for
-> process that do NOT request access to dynamic user xfeatures, whereas any
-> and all supervisor features will be absent from the set of permissions for
-> any process that is granted access to one or more dynamic xfeatures (which
-> right now means AMX).
-> 
-> The inconsistency isn't problematic because fpu_xstate_prctl() already
-> strips out everything except user xfeatures:
-> 
->          case ARCH_GET_XCOMP_PERM:
->                  /*
->                   * Lockless snapshot as it can also change right after the
->                   * dropping the lock.
->                   */
->                  permitted = xstate_get_host_group_perm();
->                  permitted &= XFEATURE_MASK_USER_SUPPORTED;
->                  return put_user(permitted, uptr);
-> 
->          case ARCH_GET_XCOMP_GUEST_PERM:
->                  permitted = xstate_get_guest_group_perm();
->                  permitted &= XFEATURE_MASK_USER_SUPPORTED;
->                  return put_user(permitted, uptr);
-> 
-> and similarly KVM doesn't apply the __state_perm to supervisor states
-> (kvm_get_filtered_xcr0() incorporates xstate_get_guest_group_perm()):
-> 
->          case 0xd: {
->                  u64 permitted_xcr0 = kvm_get_filtered_xcr0();
->                  u64 permitted_xss = kvm_caps.supported_xss;
-> 
-> But if KVM in particular were to ever change, dropping supervisor
-> permissions would result in subtle bugs in KVM's reporting of supported
-> CPUID settings.  And the above behavior also means that having supervisor
-> xfeatures in __state_perm is correctly handled by all users.
-> 
-> Dropping supervisor permissions also creates another landmine for KVM.  If
-> more dynamic user xfeatures are ever added, requesting access to multiple
-> xfeatures in separate ARCH_REQ_XCOMP_GUEST_PERM calls will result in the
-> second invocation of __xstate_request_perm() computing the wrong ksize, as
-> as the mask passed to xstate_calculate_size() would not contain *any*
-> supervisor features.
-> 
-> Commit 781c64bfcb73 ("x86/fpu/xstate: Handle supervisor states in XSTATE
-> permissions") fudged around the size issue for userspace FPUs, but for
-> reasons unknown skipped guest FPUs.  Lack of a fix for KVM "works" only
-> because KVM doesn't yet support virtualizing features that have supervisor
-> xfeatures, i.e. as of today, KVM guest FPUs will never need the relevant
-> xfeatures.
-> 
-> Simply extending the hack-a-fix for guests would temporarily solve the
-> ksize issue, but wouldn't address the inconsistency issue and would leave
-> another lurking pitfall for KVM.  KVM support for virtualizing CET will
-> likely add CET_KERNEL as a guest-only xfeature, i.e. CET_KERNEL will not
-> be set in xfeatures_mask_supervisor() and would again be dropped when
-> granting access to dynamic xfeatures.
-> 
-> Note, the existing clobbering behavior is rather subtle.  The @permitted
-> parameter to __xstate_request_perm() comes from:
-> 
-> 	permitted = xstate_get_group_perm(guest);
-> 
-> which is either fpu->guest_perm.__state_perm or fpu->perm.__state_perm,
-> where __state_perm is initialized to:
-> 
->          fpu->perm.__state_perm          = fpu_kernel_cfg.default_features;
-> 
-> and copied to the guest side of things:
-> 
-> 	/* Same defaults for guests */
-> 	fpu->guest_perm = fpu->perm;
-> 
-> fpu_kernel_cfg.default_features contains everything except the dynamic
-> xfeatures, i.e. everything except XFEATURE_MASK_XTILE_DATA:
-> 
->          fpu_kernel_cfg.default_features = fpu_kernel_cfg.max_features;
->          fpu_kernel_cfg.default_features &= ~XFEATURE_MASK_USER_DYNAMIC;
-> 
-> When __xstate_request_perm() restricts the local "mask" variable to
-> compute the user state size:
-> 
-> 	mask &= XFEATURE_MASK_USER_SUPPORTED;
-> 	usize = xstate_calculate_size(mask, false);
-> 
-> it subtly overwrites the target __state_perm with "mask" containing only
-> user xfeatures:
-> 
-> 	perm = guest ? &fpu->guest_perm : &fpu->perm;
-> 	/* Pairs with the READ_ONCE() in xstate_get_group_perm() */
-> 	WRITE_ONCE(perm->__state_perm, mask);
+> @@ -807,9 +811,11 @@ void __init fpu__init_system_xstate(unsigned int legacy_size)
+>   	/* Clean out dynamic features from default */
+>   	fpu_kernel_cfg.default_features = fpu_kernel_cfg.max_features;
+>   	fpu_kernel_cfg.default_features &= ~XFEATURE_MASK_USER_DYNAMIC;
+> +	fpu_kernel_cfg.guest_default_features = fpu_kernel_cfg.default_features;
+>   
+>   	fpu_user_cfg.default_features = fpu_user_cfg.max_features;
+>   	fpu_user_cfg.default_features &= ~XFEATURE_MASK_USER_DYNAMIC;
+> +	fpu_user_cfg.guest_default_features = fpu_user_cfg.default_features;
 
-This changelog appears to be largely derived from Sean’s previous email. 
-I think it can be significantly shortened to focus on the key
-points, such as:
+And you'll add up this on patch7:
 
-x86/fpu/xstate: Preserve non-user bits in permission handling
+   + /* Clean out guest-only features from default */
+   + fpu_kernel_cfg.default_features &= ~XFEATURE_MASK_SUPERVISOR_GUEST;
 
-When granting userspace or a KVM guest access to an xfeature, the task
-leader’s perm->__state_perm (host or guest) is overwritten, 
-unintentionally discarding non-user bits. Additionally, supervisor state 
-permissions are always granted.
 
-The current behavior presents the following issues:
+I'm not sure this overall hunk is entirely clear.
 
-  *  Inconsistencies in permission handling – Supervisor permissions are
-     universally granted, and the FPU_GUEST_PERM_LOCKED bit is explicitly
-     set to prevent permission changes.
 
-  *  Redundant permission setting – Since supervisor state permissions
-     are always granted, the permitted mask already includes them, making
-     it unnecessary to set them again.
+Taking a step back, we currently define three types of xfeature sets:
 
-Ensure that __xstate_request_perm() does not inadvertently drop
-supervisor and software-defined permissions. Also, avoid redundantly
-granting supervisor state permissions, and document this behavior in the
-code comments.
+   1. 'default_features'     in a task-inlined buffer
+   2. 'max_features'         in an extended buffer
+   3. 'independent_features' in a separate buffer (only for LBR)
 
-Clarify the presence of non-user feature and flag bits in the field
-description.
+The VCPU fpstate has so far followed (1) and (2). Now, since we're 
+introducing divergence at (1), you've named it guest_default_features:
 
+   'default_features' < 'guest_default_features' < 'max_features'
+
+I don’t see a strong reason against introducing this new field, as 
+'guest' already implies the VCPU state. However, rather than directly 
+modifying or extending struct fpu_state_config — which may not align 
+well with VCPU FPU properties — a dedicated struct could provide a 
+cleaner and more structured alternative:
+
+   struct vcpu_fpu_config {
+     unsigned int size;
+     unsigned int user_size;
+     u64 features;
+     u64 user_features;
+   } guest_default_cfg;
+
+This struct would make VCPU-specific state handling clearer:
+
+   (1) Guest permission setup:
+
+        /* Set the guest default permission */
+        fpu->guest_perm.__state_perm      = guest_default_cfg.features;
+        fpu->guest_perm.__state_size      = guest_default_cfg.size;
+        fpu->guest_perm.__user_state_size = guest_default_cfg.user_size;
+
+   (2) VCPU allocation time:
+
+        fpstate->size           = guest_default_cfg.size;
+        fpstate->user_size      = guest_default_cfg.user_size;
+        fpstate->xfeatures      = guest_default_cfg.features;
+        fpstate->user_xfeatures = guest_default_cfg.user_features;
+
+These assignments considerably make the code more readable.
+
+With that, going back to the default settings, perhaps refactoring it 
+could be an option to improve clarity in distinguishing guest vs. host 
+settings.
+
+See the attached diff file. I thought this restructuring could make the 
+logic more explicit and highlight the differences between guest and host 
+settings.
+
+Thanks,
+Chang
+--------------g6ZXVC3UdYt61i0Rd2WYehf5
+Content-Type: text/plain; charset="UTF-8"; name="guest_default.patch"
+Content-Disposition: attachment; filename="guest_default.patch"
+Content-Transfer-Encoding: base64
+
+ZGlmZiAtLWdpdCBhL2FyY2gveDg2L2tlcm5lbC9mcHUveHN0YXRlLmMgYi9hcmNoL3g4Ni9rZXJu
+ZWwvZnB1L3hzdGF0ZS5jCmluZGV4IDQwNjIxZWU0ZDY1Yi4uZDJmN2NlNDVkNGRlIDEwMDY0NAot
+LS0gYS9hcmNoL3g4Ni9rZXJuZWwvZnB1L3hzdGF0ZS5jCisrKyBiL2FyY2gveDg2L2tlcm5lbC9m
+cHUveHN0YXRlLmMKQEAgLTcwMiw2ICs3MDIsMTEgQEAgc3RhdGljIGludCBfX2luaXQgaW5pdF94
+c3RhdGVfc2l6ZSh2b2lkKQogCWZwdV91c2VyX2NmZy5kZWZhdWx0X3NpemUgPQogCQl4c3RhdGVf
+Y2FsY3VsYXRlX3NpemUoZnB1X3VzZXJfY2ZnLmRlZmF1bHRfZmVhdHVyZXMsIGZhbHNlKTsKIAor
+CWd1ZXN0X2RlZmF1bHRfY2ZnLnNpemUgPQorCQl4c3RhdGVfY2FsY3VsYXRlX3NpemUoZ3Vlc3Rf
+ZGVmYXVsdF9jZmcuZmVhdHVyZXMsIGNvbXBhY3RlZCk7CisJZ3Vlc3RfZGVmYXVsdF9jZmcudXNl
+cl9zaXplID0KKwkJeHN0YXRlX2NhbGN1bGF0ZV9zaXplKGd1ZXN0X2RlZmF1bHRfY2ZnLnVzZXJf
+ZmVhdHVyZXMsIGZhbHNlKTsKKwogCXJldHVybiAwOwogfQogCkBAIC03MzAsNiArNzM1LDMwIEBA
+IHN0YXRpYyB2b2lkIF9faW5pdCBmcHVfX2luaXRfZGlzYWJsZV9zeXN0ZW1feHN0YXRlKHVuc2ln
+bmVkIGludCBsZWdhY3lfc2l6ZSkKIAlmcHN0YXRlX3Jlc2V0KCZjdXJyZW50LT50aHJlYWQuZnB1
+KTsKIH0KIAorc3RhdGljIHZvaWQgX19pbml0IGluaXRfZGVmYXVsdF9mZWF0dXJlcyh1NjQga2Vy
+bmVsX21heF9mZWF0dXJlcywgdTY0IHVzZXJfbWF4X2ZlYXR1cmVzKQoreworCXU2NCBrZmVhdHVy
+ZXMgPSBrZXJuZWxfbWF4X2ZlYXR1cmVzOworCXU2NCB1ZmVhdHVyZXMgPSB1c2VyX21heF9mZWF0
+dXJlczsKKworCS8qCisJICogRGVmYXVsdCBmZWF0dXJlIHNldHMgc2hvdWxkIG5vdCBpbmNsdWRl
+IGR5bmFtaWMgYW5kIGd1ZXN0LW9ubHkKKwkgKiB4ZmVhdHVyZXMgYXQgYWxsOgorCSAqLworCWtm
+ZWF0dXJlcyAmPSB+KFhGRUFUVVJFX01BU0tfVVNFUl9EWU5BTUlDIHwgWEZFQVRVUkVfTUFTS19H
+VUVTVF9TVVBFUlZJU09SKTsKKwl1ZmVhdHVyZXMgJj0gflhGRUFUVVJFX01BU0tfVVNFUl9EWU5B
+TUlDOworCisJZnB1X2tlcm5lbF9jZmcuZGVmYXVsdF9mZWF0dXJlcyA9IGtmZWF0dXJlczsKKwlm
+cHVfdXNlcl9jZmcuZGVmYXVsdF9mZWF0dXJlcyAgID0gdWZlYXR1cmVzOworCisJLyoKKwkgKiBF
+bnN1cmUgVkNQVSBGUFUgY29udGFpbmVyIG9ubHkgcmVzZXJ2ZXMgYSBzcGFjZSBmb3IKKwkgKiBn
+dWVzdC1leGNsdXNpdmUgeGZlYXR1cmVzLiBUaGlzIGRpc3RpbmN0aW9uIGNhbiBzYXZlIGtlcm5l
+bAorCSAqIG1lbW9yeSBieSBtYWludGFpbmluZyBhIG5lY2Vzc2FyeSBhbW91bnQgb2YgWFNBVkUg
+YnVmZmVyLgorCSAqLworCWd1ZXN0X2RlZmF1bHRfY2ZnLmZlYXR1cmVzICAgICAgPSBrZmVhdHVy
+ZXMgfCB4ZmVhdHVyZXNfbWFza19ndWVzdF9zdXBlcnZpc29yKCk7CisJZ3Vlc3RfZGVmYXVsdF9j
+ZmcudXNlcl9mZWF0dXJlcyA9IHVmZWF0dXJlczsKK30KKwogLyoKICAqIEVuYWJsZSBhbmQgaW5p
+dGlhbGl6ZSB0aGUgeHNhdmUgZmVhdHVyZS4KICAqIENhbGxlZCBvbmNlIHBlciBzeXN0ZW0gYm9v
+dHVwLgpAQCAtODAxLDEyICs4MzAsOCBAQCB2b2lkIF9faW5pdCBmcHVfX2luaXRfc3lzdGVtX3hz
+dGF0ZSh1bnNpZ25lZCBpbnQgbGVnYWN5X3NpemUpCiAJZnB1X3VzZXJfY2ZnLm1heF9mZWF0dXJl
+cyA9IGZwdV9rZXJuZWxfY2ZnLm1heF9mZWF0dXJlczsKIAlmcHVfdXNlcl9jZmcubWF4X2ZlYXR1
+cmVzICY9IFhGRUFUVVJFX01BU0tfVVNFUl9TVVBQT1JURUQ7CiAKLQkvKiBDbGVhbiBvdXQgZHlu
+YW1pYyBmZWF0dXJlcyBmcm9tIGRlZmF1bHQgKi8KLQlmcHVfa2VybmVsX2NmZy5kZWZhdWx0X2Zl
+YXR1cmVzID0gZnB1X2tlcm5lbF9jZmcubWF4X2ZlYXR1cmVzOwotCWZwdV9rZXJuZWxfY2ZnLmRl
+ZmF1bHRfZmVhdHVyZXMgJj0gflhGRUFUVVJFX01BU0tfVVNFUl9EWU5BTUlDOwotCi0JZnB1X3Vz
+ZXJfY2ZnLmRlZmF1bHRfZmVhdHVyZXMgPSBmcHVfdXNlcl9jZmcubWF4X2ZlYXR1cmVzOwotCWZw
+dV91c2VyX2NmZy5kZWZhdWx0X2ZlYXR1cmVzICY9IH5YRkVBVFVSRV9NQVNLX1VTRVJfRFlOQU1J
+QzsKKwkvKiBOb3csIGdpdmVuIG1heGltdW0gZmVhdHVyZSBzZXQsIGRldGVybWluIGRlZmF1bHQg
+dmFsdWVzOiAqLworCWluaXRfZGVmYXVsdF9mZWF0dXJlcyhmcHVfa2VybmVsX2NmZy5tYXhfZmVh
+dHVyZXMsIGZwdV91c2VyX2NmZy5tYXhfZmVhdHVyZXMpOwogCiAJLyogU3RvcmUgaXQgZm9yIHBh
+cmFub2lhIGNoZWNrIGF0IHRoZSBlbmQgKi8KIAl4ZmVhdHVyZXMgPSBmcHVfa2VybmVsX2NmZy5t
+YXhfZmVhdHVyZXM7Cg==
+
+--------------g6ZXVC3UdYt61i0Rd2WYehf5--
 
