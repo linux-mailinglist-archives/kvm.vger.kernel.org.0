@@ -1,84 +1,84 @@
-Return-Path: <kvm+bounces-42346-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42347-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2601A77FF3
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 18:15:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CBEBA77FF7
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 18:15:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D29D0188EF4B
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 16:14:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B964F1890B74
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 16:15:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C68221CC74;
-	Tue,  1 Apr 2025 16:11:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FD4921D3ED;
+	Tue,  1 Apr 2025 16:11:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zwy0hkxt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gbDXab7h"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8F5121CA1D
-	for <kvm@vger.kernel.org>; Tue,  1 Apr 2025 16:11:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53DFD21CC7B
+	for <kvm@vger.kernel.org>; Tue,  1 Apr 2025 16:11:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743523908; cv=none; b=dbITcHlBoqXtXcgPsArIMVzGkjHkKK2amolB+Biqd5gE5VyFVgVUoQ1Z6BduSjyhmisCIjkY3FnKs9+5tj8Q0cHjZ3MXeiH0ng1eGqgfrHEv1elwWtc7bwtEwR/G7aIe/WpFuv+Sm9o6Kcuer08/hqUktcnwXsFTaTxdgS8M6FI=
+	t=1743523911; cv=none; b=LJfkBxTu2cHX30cTuKImZi3pMH8Ckmhrl5yj3bk4er4oP2R8NHGWIScCJ1F8pLjhvpJ6zQarH1sFJgkP6qEoApf3w1WJMDYp9l4IXSp6C2kc1F9nCEb2uv77B0/gI5ZLqYEeNzoX45fDh8jw+URds+/OqaWZtnVMj/v+7jv7UvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743523908; c=relaxed/simple;
-	bh=xknqBKrnf/cRf6MzXxubS95UH7TntUJgejhgAFT3r9g=;
+	s=arc-20240116; t=1743523911; c=relaxed/simple;
+	bh=qcCJMIEB/YYA+Wr5VMPjm8ILdoDyBhZd0vKvkLuJklw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=W+NyrXLysbHJae7mP0VwT6m+bhYflgQMH038DQY0irRKwViRgaHBgq7830A3iq8/nY/bqpkGte/Gk79kumYQv4VTJAnWpvlclFfhFVggmrxfJbrCfhvHlPNgNulcA6c983HXW9GmkTaL2+c5t+q/KpHil/vz12QYckkkKvWXq1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zwy0hkxt; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=u0WEijIw/QCNiRrlt1k8Rt7ckr0FSJ+Cdw6OaaUL6xxA3+uBiO9NwTuvn1JgLym30Rs3qysNBk2QLQY2v9+FeIXDG3rByheMhKsvEEIs6/ANDhEW2MmmpbvcBuCGprAvzQNLZ2iKyEoJviNhYRaRi9bX5/pdl46OzJgj8+m/xsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gbDXab7h; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743523905;
+	s=mimecast20190719; t=1743523908;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=cF+qO0yatMZdwcKNEFIrHdbvxZj7acs2e7VdEaArYVg=;
-	b=Zwy0hkxtD75drwzkHy2TaRKFWKetkWDm8EGfDgA2ZSNyP5I5wzzIVq0XklZTp/4MRFACbH
-	5om0Nlyzr4XgaYaElVcaGQW3mEzZyMbs1unyrUk3Cs+IXInxoXJcNeltEtO+lGsAfhgLez
-	77VZwosGEetwm5sxgBQokYRrNIOw+k4=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=V4ffDXlDC4IXD1cfMgUEPRkug63IDolKcU/ffLWZ1l4=;
+	b=gbDXab7hacLGYq6YLHYNbY+e22eW8fIzyP0VtJ2JdjXtmrMyEwdCSH/6qbd/j0eM1/78kV
+	YDkA2L6XJABwE0UKBmirKGBJUevILzQbG31/TCfvLusWNfI2YvVzkFLQrZ2oe+ntAcWYKF
+	8YtrcJVRG4Gb91n40NK+7kdV8NzAUTY=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-523-jzk_pm-NMj67O6_v1PZMQA-1; Tue, 01 Apr 2025 12:11:44 -0400
-X-MC-Unique: jzk_pm-NMj67O6_v1PZMQA-1
-X-Mimecast-MFC-AGG-ID: jzk_pm-NMj67O6_v1PZMQA_1743523903
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3978ef9a284so2694307f8f.3
-        for <kvm@vger.kernel.org>; Tue, 01 Apr 2025 09:11:44 -0700 (PDT)
+ us-mta-657-5hAsmAaKML6WRW0Fvh4PBw-1; Tue, 01 Apr 2025 12:11:47 -0400
+X-MC-Unique: 5hAsmAaKML6WRW0Fvh4PBw-1
+X-Mimecast-MFC-AGG-ID: 5hAsmAaKML6WRW0Fvh4PBw_1743523906
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43d00017e9dso39784795e9.0
+        for <kvm@vger.kernel.org>; Tue, 01 Apr 2025 09:11:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743523903; x=1744128703;
+        d=1e100.net; s=20230601; t=1743523906; x=1744128706;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=cF+qO0yatMZdwcKNEFIrHdbvxZj7acs2e7VdEaArYVg=;
-        b=r1G9hDigNYDSxZVpLi6sPrIaeO3/9q57/a4B6/shegX0QeKqYb5Zc/eYTK9ep0q96u
-         F7uEdj1QMeZEEv5fHyXWsoUB7Dfl+bA1a3/ZpTTNcoI4J2J9AocuHCU5hMLPgBRcNzks
-         8fIiCXtaNSRRMZXhuRHBoJUUJE5HQYIZ/4Cfmu9IgsYDJJS7j+/zW6SbN57ENdD1wsZG
-         C5SYaA26jbGBs1nnL+mPCZ1O9PytBmFz71NpvekKqWq1Y6+scSVJ4HfDuZGq+KLeLJvN
-         Ajo94+IzJxPysCumaSr8EtH+kNQ11C4DSQ0ZcnJTdOAh+v4TfQswSW4AMLrop/hVRcjU
-         erqw==
-X-Forwarded-Encrypted: i=1; AJvYcCXY/IrnXV4lIyfSh2zwLKihHMSI1CvdwklcM9VuWZ5ncjrOxPJCkiEXqNWJcSIwtXK6y+w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YykPnY28geVgLcUDMfENxPjjbFL8JunYgIR6nLF5yuDqMxkZ0SZ
-	nnhzCL6ga9R/kqWL7ILIsXYuY+8Mz9oVbirAoLdnDMPc2uwxUhrD66iyHC5htEK8qKXhin9BCZZ
-	gXtcpyCCBA1Nz2M9BGimHMV86vK4FTBEbXHExGQG08kHZE6w6QamGoTs5rg==
-X-Gm-Gg: ASbGncs+3jPb/9eW3ACyCwGTXUfrD2p0un84VAZisW9mVTLBxvXidQ9SEKqnXsUm/Uw
-	MI2DEPKhqP3PY6b0tEdp0CVjgHIyYK0+zrKxe5/71byAHhodyBYp7BBKFv1lsYiTWCbO6AF0Sn/
-	3PPzaXSvtoPs10QkpeTB6WMCg95dVJkhckODbrMnf5pZNLpVMeaFNs6x1pnlaVnjox3lgpeixTx
-	ilbQyLy6L0d6eK7WTl0Nm8NaRrVa+094GNccHKle26W454PXOctyHOSz8LojjtNQGDM9WMvI4pA
-	sYfDOEeV/4i4GNqnkX+WTw==
-X-Received: by 2002:a05:6000:2b03:b0:391:4674:b10f with SMTP id ffacd0b85a97d-39c121188demr8496015f8f.36.1743523902840;
-        Tue, 01 Apr 2025 09:11:42 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGqJ3rJ6+IP5QCotzUgeA4XjgsMo38RrmP0uvZCP5poVx+NlUkpMpatJ7KifS+nAPHv2myHRg==
-X-Received: by 2002:a05:6000:2b03:b0:391:4674:b10f with SMTP id ffacd0b85a97d-39c121188demr8495987f8f.36.1743523902498;
-        Tue, 01 Apr 2025 09:11:42 -0700 (PDT)
+        bh=V4ffDXlDC4IXD1cfMgUEPRkug63IDolKcU/ffLWZ1l4=;
+        b=HHVnqsJfGJFqfjt2y6vWmmHJAQ27DFkFy5NHLHLEldeWwrcHI2vyWP8p9wV3sw9Gt4
+         zyz12H8Bz8MyXAONnhSVjupzCvvlp6+CzjBTEXIu83fMi40tj7YCVLIeCA4VFj4rKPzV
+         w2PBDp1cRugcn5C3KprkNVI9p1TzOwm8mazvQHsvzWFkcpU6bi6ijtXa/Sur1F8r/ULE
+         wcQTYddsUVpLakN10J/2BYKDMGlbfYjcsxWcN/R6vTRuB2pOeoPdtWtN1s4DDfHP+QZE
+         S/CKCN4E4y+TRwf2G5m6mKr1XzrooDyBbvWcudZrzDUWpLbnnb0AQzrPcMdm3UhnpFjm
+         dhIA==
+X-Forwarded-Encrypted: i=1; AJvYcCUVT5RvL5QKpraWGwAkKVDB3VlkfSQK26ztRTwflO48pVl/McP0pdy82lrEf8nKpVtJZJ8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXCUfqVBak8JFVfDU0KMvrjEcOVbmjqNsUmt1BLNmKo7+N48Ye
+	X/RkCP+16wHeJ7TT+b26Xsj/cAHpP1mIxoBYPlCKprsD7gMcxSQzROK6HLJFYSPn1xhlx7K/ogh
+	DbWo2sEr1eh+aRTSY65O+vAbS6gaNududEnNa0GI9ivAfWy7LOQ==
+X-Gm-Gg: ASbGncvUW7JYPld+/OYw7Gh4RCB7RIXGok4Yg0bKz6l63Tg0dZUt6hPP8IdJMZNLQM/
+	ZQOvoxDDcQ/GP2Flc2WRtl0OJhyQQaqTD+tDfQYVWgUX2wjzwPMIAQEHwKdshlvOljwz8JM0lLY
+	wzkcWf8GJ6ODRS96mFVzrYdvKBW8CzBCxUTQ0Vd75rcsKDzwj2A30Wj/RBXowQb9fKBmQwXUZKJ
+	6s4N0y3w3+h9zMVawHweKjKHAzX6YwFqhgyrlyYV1h+6wVtz0e/dM89aJBvyfMrLuRkzhRPXp1M
+	67JyhnmNQNlGPE7j1ArlXQ==
+X-Received: by 2002:a05:600c:4e87:b0:43c:f8fc:f686 with SMTP id 5b1f17b1804b1-43db61d6c2fmr101787135e9.3.1743523905650;
+        Tue, 01 Apr 2025 09:11:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGSQ1wvUh2eHOLlh8NcVQtz5xS01dfxv4KX3HPNNarZ4kwVszorKHWEoxoNvdgXqk1Sv1qazA==
+X-Received: by 2002:a05:600c:4e87:b0:43c:f8fc:f686 with SMTP id 5b1f17b1804b1-43db61d6c2fmr101786685e9.3.1743523905112;
+        Tue, 01 Apr 2025 09:11:45 -0700 (PDT)
 Received: from [192.168.10.48] ([176.206.111.201])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0b79e0dcsm14597487f8f.64.2025.04.01.09.11.37
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d82e83482sm207502195e9.14.2025.04.01.09.11.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Apr 2025 09:11:38 -0700 (PDT)
+        Tue, 01 Apr 2025 09:11:43 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
@@ -91,9 +91,9 @@ Cc: roy.hopkins@suse.com,
 	nsaenz@amazon.com,
 	anelkz@amazon.de,
 	James.Bottomley@HansenPartnership.com
-Subject: [PATCH 12/29] KVM: share dirty ring for same vCPU id on different planes
-Date: Tue,  1 Apr 2025 18:10:49 +0200
-Message-ID: <20250401161106.790710-13-pbonzini@redhat.com>
+Subject: [PATCH 13/29] KVM: implement vCPU creation for extra planes
+Date: Tue,  1 Apr 2025 18:10:50 +0200
+Message-ID: <20250401161106.790710-14-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250401161106.790710-1-pbonzini@redhat.com>
 References: <20250401161106.790710-1-pbonzini@redhat.com>
@@ -105,113 +105,385 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The dirty page ring is read by mmap()-ing the vCPU file descriptor,
-which is only possible for plane 0.  This is not a problem because it
-is only filled by KVM_RUN which takes the plane-0 vCPU mutex, and it is
-therefore possible to share it for vCPUs that have the same id but are
-on different planes.  (TODO: double check).
+For userspace to have fun with planes it is probably useful to let them
+create vCPUs on the non-zero planes as well.  Since such vCPUs are backed
+by the same struct kvm_vcpu, these are regular vCPU file descriptors except
+that they only allow a small subset of ioctls (mostly get/set) and they
+share some of the backing resources, notably vcpu->run.
+
+TODO: prefault might be useful on non-default planes as well?
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/linux/kvm_host.h |  6 ++++--
- virt/kvm/dirty_ring.c    |  5 +++--
- virt/kvm/kvm_main.c      | 10 +++++-----
- 3 files changed, 12 insertions(+), 9 deletions(-)
+ Documentation/virt/kvm/locking.rst |   3 +
+ include/linux/kvm_host.h           |   4 +-
+ include/uapi/linux/kvm.h           |   1 +
+ virt/kvm/kvm_main.c                | 167 +++++++++++++++++++++++------
+ 4 files changed, 142 insertions(+), 33 deletions(-)
 
+diff --git a/Documentation/virt/kvm/locking.rst b/Documentation/virt/kvm/locking.rst
+index ae8bce7fecbe..ad22344deb28 100644
+--- a/Documentation/virt/kvm/locking.rst
++++ b/Documentation/virt/kvm/locking.rst
+@@ -26,6 +26,9 @@ The acquisition orders for mutexes are as follows:
+   are taken on the waiting side when modifying memslots, so MMU notifiers
+   must not take either kvm->slots_lock or kvm->slots_arch_lock.
+ 
++- when VMs have multiple planes, vcpu->mutex for plane 0 can taken
++  outside vcpu->mutex for the same id and another plane
++
+ cpus_read_lock() vs kvm_lock:
+ 
+ - Taking cpus_read_lock() outside of kvm_lock is problematic, despite that
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index d2e0c0e8ff17..b511aed2de8e 100644
+index b511aed2de8e..99fd90c5d71b 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -394,9 +394,11 @@ struct kvm_vcpu {
- 	bool scheduled_out;
- 	struct kvm_vcpu_arch arch;
- 	struct kvm_vcpu_stat *stat;
--	struct kvm_vcpu_stat __stat;
- 	char stats_id[KVM_STATS_NAME_SIZE];
--	struct kvm_dirty_ring dirty_ring;
-+	struct kvm_dirty_ring *dirty_ring;
+@@ -343,6 +343,9 @@ struct kvm_vcpu {
+ 
+ 	struct mutex mutex;
+ 
++	/* Only valid on plane 0 */
++	bool wants_to_run;
 +
-+	struct kvm_vcpu_stat __stat;
-+	struct kvm_dirty_ring __dirty_ring;
+ 	/* Shared for all planes */
+ 	struct kvm_run *run;
  
- 	/*
- 	 * The most recently used memslot by this vCPU and the slots generation
-diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
-index d14ffc7513ee..66e6a6a67d13 100644
---- a/virt/kvm/dirty_ring.c
-+++ b/virt/kvm/dirty_ring.c
-@@ -172,11 +172,12 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring)
+@@ -388,7 +391,6 @@ struct kvm_vcpu {
+ 		bool dy_eligible;
+ 	} spin_loop;
+ #endif
+-	bool wants_to_run;
+ 	bool preempted;
+ 	bool ready;
+ 	bool scheduled_out;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 96d25c7fa18f..24fa002cd7c1 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1691,5 +1691,6 @@ struct kvm_pre_fault_memory {
+ };
  
- void kvm_dirty_ring_push(struct kvm_vcpu *vcpu, u32 slot, u64 offset)
- {
--	struct kvm_dirty_ring *ring = &vcpu->dirty_ring;
-+	struct kvm_dirty_ring *ring = vcpu->dirty_ring;
- 	struct kvm_dirty_gfn *entry;
+ #define KVM_CREATE_PLANE	_IO(KVMIO, 0xd6)
++#define KVM_CREATE_VCPU_PLANE	_IO(KVMIO, 0xd7)
  
- 	/* It should never get full */
- 	WARN_ON_ONCE(kvm_dirty_ring_full(ring));
-+	lockdep_assert_held(&vcpu->plane0->mutex);
- 
- 	entry = &ring->dirty_gfns[ring->dirty_index & (ring->size - 1)];
- 
-@@ -204,7 +205,7 @@ bool kvm_dirty_ring_check_request(struct kvm_vcpu *vcpu)
- 	 * the dirty ring is reset by userspace.
- 	 */
- 	if (kvm_check_request(KVM_REQ_DIRTY_RING_SOFT_FULL, vcpu) &&
--	    kvm_dirty_ring_soft_full(&vcpu->dirty_ring)) {
-+	    kvm_dirty_ring_soft_full(vcpu->dirty_ring)) {
- 		kvm_make_request(KVM_REQ_DIRTY_RING_SOFT_FULL, vcpu);
- 		vcpu->run->exit_reason = KVM_EXIT_DIRTY_RING_FULL;
- 		trace_kvm_dirty_ring_exit(vcpu);
+ #endif /* __LINUX_KVM_H */
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 4c7e379fbf7d..863fd80ddfbe 100644
+index 863fd80ddfbe..06fa2a6ad96f 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -466,7 +466,7 @@ static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
- static void kvm_vcpu_destroy(struct kvm_vcpu *vcpu)
+@@ -438,11 +438,11 @@ void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
+ }
+ #endif
+ 
+-static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
++static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm_plane *plane, unsigned id)
  {
- 	kvm_arch_vcpu_destroy(vcpu);
--	kvm_dirty_ring_free(&vcpu->dirty_ring);
-+	kvm_dirty_ring_free(vcpu->dirty_ring);
+ 	mutex_init(&vcpu->mutex);
+ 	vcpu->cpu = -1;
+-	vcpu->kvm = kvm;
++	vcpu->kvm = plane->kvm;
+ 	vcpu->vcpu_id = id;
+ 	vcpu->pid = NULL;
+ 	rwlock_init(&vcpu->pid_lock);
+@@ -459,8 +459,13 @@ static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
+ 	vcpu->last_used_slot = NULL;
+ 
+ 	/* Fill the stats id string for the vcpu */
+-	snprintf(vcpu->stats_id, sizeof(vcpu->stats_id), "kvm-%d/vcpu-%d",
+-		 task_pid_nr(current), id);
++	if (plane->plane) {
++		snprintf(vcpu->stats_id, sizeof(vcpu->stats_id), "kvm-%d/vcpu-%d:%d",
++			 task_pid_nr(current), id, plane->plane);
++	} else {
++		snprintf(vcpu->stats_id, sizeof(vcpu->stats_id), "kvm-%d/vcpu-%d",
++			 task_pid_nr(current), id);
++	}
+ }
+ 
+ static void kvm_vcpu_destroy(struct kvm_vcpu *vcpu)
+@@ -475,7 +480,9 @@ static void kvm_vcpu_destroy(struct kvm_vcpu *vcpu)
+ 	 */
+ 	put_pid(vcpu->pid);
+ 
+-	free_page((unsigned long)vcpu->run);
++	if (!vcpu->plane)
++		free_page((unsigned long)vcpu->run);
++
+ 	kmem_cache_free(kvm_vcpu_cache, vcpu);
+ }
+ 
+@@ -4026,6 +4033,9 @@ static vm_fault_t kvm_vcpu_fault(struct vm_fault *vmf)
+ 	struct kvm_vcpu *vcpu = vmf->vma->vm_file->private_data;
+ 	struct page *page;
+ 
++	if (vcpu->plane)
++		return VM_FAULT_SIGBUS;
++
+ 	if (vmf->pgoff == 0)
+ 		page = virt_to_page(vcpu->run);
+ #ifdef CONFIG_X86
+@@ -4113,7 +4123,10 @@ static void kvm_create_vcpu_debugfs(struct kvm_vcpu *vcpu)
+ 	if (!debugfs_initialized())
+ 		return;
+ 
+-	snprintf(dir_name, sizeof(dir_name), "vcpu%d", vcpu->vcpu_id);
++	if (vcpu->plane)
++		snprintf(dir_name, sizeof(dir_name), "vcpu%d:%d", vcpu->vcpu_id, vcpu->plane);
++	else
++		snprintf(dir_name, sizeof(dir_name), "vcpu%d", vcpu->vcpu_id);
+ 	debugfs_dentry = debugfs_create_dir(dir_name,
+ 					    vcpu->kvm->debugfs_dentry);
+ 	debugfs_create_file("pid", 0444, debugfs_dentry, vcpu,
+@@ -4126,9 +4139,10 @@ static void kvm_create_vcpu_debugfs(struct kvm_vcpu *vcpu)
+ /*
+  * Creates some virtual cpus.  Good luck creating more than one.
+  */
+-static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
++static int kvm_vm_ioctl_create_vcpu(struct kvm_plane *plane, struct kvm_vcpu *plane0_vcpu, unsigned long id)
+ {
+ 	int r;
++	struct kvm *kvm = plane->kvm;
+ 	struct kvm_vcpu *vcpu;
+ 	struct page *page;
+ 
+@@ -4165,24 +4179,33 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+ 		goto vcpu_decrement;
+ 	}
+ 
+-	BUILD_BUG_ON(sizeof(struct kvm_run) > PAGE_SIZE);
+-	page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+-	if (!page) {
+-		r = -ENOMEM;
+-		goto vcpu_free;
+-	}
+-	vcpu->run = page_address(page);
++	if (plane->plane) {
++		page = NULL;
++		vcpu->run = plane0_vcpu->run;
++	} else {
++		WARN_ON(plane0_vcpu != NULL);
++		plane0_vcpu = vcpu;
+ 
+-	if (kvm->dirty_ring_size) {
+-		r = kvm_dirty_ring_alloc(kvm, &vcpu->__dirty_ring,
+-					 id, kvm->dirty_ring_size);
+-		if (r)
+-			goto vcpu_free_run_page;
++		BUILD_BUG_ON(sizeof(struct kvm_run) > PAGE_SIZE);
++		page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
++		if (!page) {
++			r = -ENOMEM;
++			goto vcpu_free;
++		}
++		vcpu->run = page_address(page);
++
++		if (kvm->dirty_ring_size) {
++			r = kvm_dirty_ring_alloc(kvm, &vcpu->__dirty_ring,
++						 id, kvm->dirty_ring_size);
++			if (r)
++				goto vcpu_free_run_page;
++		}
+ 	}
+ 
+-	vcpu->plane0 = vcpu;
+-	vcpu->stat = &vcpu->__stat;
+-	kvm_vcpu_init(vcpu, kvm, id);
++	vcpu->plane0 = plane0_vcpu;
++	vcpu->stat = &plane0_vcpu->__stat;
++	vcpu->dirty_ring = &plane0_vcpu->__dirty_ring;
++	kvm_vcpu_init(vcpu, plane, id);
+ 
+ 	r = kvm_arch_vcpu_create(vcpu);
+ 	if (r)
+@@ -4190,7 +4213,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+ 
+ 	mutex_lock(&kvm->lock);
+ 
+-	if (kvm_get_vcpu_by_id(kvm, id)) {
++	if (kvm_get_plane_vcpu_by_id(plane, id)) {
+ 		r = -EEXIST;
+ 		goto unlock_vcpu_destroy;
+ 	}
+@@ -4200,8 +4223,13 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+ 	 * release semantics, which ensures the write is visible to kvm_get_vcpu().
+ 	 */
+ 	vcpu->plane = -1;
+-	vcpu->vcpu_idx = atomic_read(&kvm->online_vcpus);
+-	r = xa_insert(&kvm->planes[0]->vcpu_array, vcpu->vcpu_idx, vcpu, GFP_KERNEL_ACCOUNT);
++	if (plane->plane)
++		vcpu->vcpu_idx = atomic_read(&kvm->online_vcpus);
++	else
++		vcpu->vcpu_idx = plane0_vcpu->vcpu_idx;
++
++	r = xa_insert(&plane->vcpu_array, vcpu->vcpu_idx,
++		      vcpu, GFP_KERNEL_ACCOUNT);
+ 	WARN_ON_ONCE(r == -EBUSY);
+ 	if (r)
+ 		goto unlock_vcpu_destroy;
+@@ -4220,13 +4248,14 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+ 	if (r < 0)
+ 		goto kvm_put_xa_erase;
+ 
+-	atomic_inc(&kvm->online_vcpus);
++	if (!plane0_vcpu)
++		atomic_inc(&kvm->online_vcpus);
  
  	/*
- 	 * No need for rcu_read_lock as VCPU_RUN is the only place that changes
-@@ -4038,7 +4038,7 @@ static vm_fault_t kvm_vcpu_fault(struct vm_fault *vmf)
- #endif
- 	else if (kvm_page_in_dirty_ring(vcpu->kvm, vmf->pgoff))
- 		page = kvm_dirty_ring_get_page(
--		    &vcpu->dirty_ring,
-+		    vcpu->dirty_ring,
- 		    vmf->pgoff - KVM_DIRTY_LOG_PAGE_OFFSET);
- 	else
- 		return kvm_arch_vcpu_fault(vcpu, vmf);
-@@ -4174,7 +4174,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
- 	vcpu->run = page_address(page);
+ 	 * Pairs with xa_load() in kvm_get_vcpu, ensuring that online_vcpus
+ 	 * is updated before vcpu->plane.
+ 	 */
+-	smp_store_release(&vcpu->plane, 0);
++	smp_store_release(&vcpu->plane, plane->plane);
+ 	mutex_unlock(&vcpu->mutex);
  
- 	if (kvm->dirty_ring_size) {
--		r = kvm_dirty_ring_alloc(kvm, &vcpu->dirty_ring,
-+		r = kvm_dirty_ring_alloc(kvm, &vcpu->__dirty_ring,
- 					 id, kvm->dirty_ring_size);
- 		if (r)
- 			goto vcpu_free_run_page;
-@@ -4242,7 +4242,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+ 	mutex_unlock(&kvm->lock);
+@@ -4237,14 +4266,15 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+ kvm_put_xa_erase:
+ 	mutex_unlock(&vcpu->mutex);
+ 	kvm_put_kvm_no_destroy(kvm);
+-	xa_erase(&kvm->planes[0]->vcpu_array, vcpu->vcpu_idx);
++	xa_erase(&plane->vcpu_array, vcpu->vcpu_idx);
+ unlock_vcpu_destroy:
  	mutex_unlock(&kvm->lock);
  	kvm_arch_vcpu_destroy(vcpu);
  vcpu_free_dirty_ring:
--	kvm_dirty_ring_free(&vcpu->dirty_ring);
-+	kvm_dirty_ring_free(&vcpu->__dirty_ring);
+ 	kvm_dirty_ring_free(&vcpu->__dirty_ring);
  vcpu_free_run_page:
- 	free_page((unsigned long)vcpu->run);
+-	free_page((unsigned long)vcpu->run);
++	if (page)
++		__free_page(page);
  vcpu_free:
-@@ -5047,7 +5047,7 @@ static int kvm_vm_ioctl_reset_dirty_pages(struct kvm *kvm)
- 	mutex_lock(&kvm->slots_lock);
+ 	kmem_cache_free(kvm_vcpu_cache, vcpu);
+ vcpu_decrement:
+@@ -4406,6 +4436,35 @@ static int kvm_plane_ioctl_check_extension(struct kvm_plane *plane, long arg)
+ 	}
+ }
  
- 	kvm_for_each_vcpu(i, vcpu, kvm)
--		cleared += kvm_dirty_ring_reset(vcpu->kvm, &vcpu->dirty_ring);
-+		cleared += kvm_dirty_ring_reset(vcpu->kvm, vcpu->dirty_ring);
++static int kvm_plane_ioctl_create_vcpu(struct kvm_plane *plane, long arg)
++{
++	int r = -EINVAL;
++	struct file *file;
++	struct kvm_vcpu *vcpu;
++	int fd;
++
++	if (arg != (int)arg)
++		return -EBADF;
++
++	fd = arg;
++	file = fget(fd);
++	if (!file)
++		return -EBADF;
++
++	if (file->f_op != &kvm_vcpu_fops)
++		goto err;
++
++	vcpu = file->private_data;
++	if (vcpu->kvm != plane->kvm)
++		goto err;
++
++	r = kvm_vm_ioctl_create_vcpu(plane, vcpu, vcpu->vcpu_id);
++
++err:
++	fput(file);
++	return r;
++}
++
+ static long __kvm_plane_ioctl(struct kvm_plane *plane, unsigned int ioctl,
+ 			      unsigned long arg)
+ {
+@@ -4432,6 +4491,8 @@ static long __kvm_plane_ioctl(struct kvm_plane *plane, unsigned int ioctl,
+ #endif
+ 	case KVM_CHECK_EXTENSION:
+ 		return kvm_plane_ioctl_check_extension(plane, arg);
++	case KVM_CREATE_VCPU_PLANE:
++		return kvm_plane_ioctl_create_vcpu(plane, arg);
+ 	default:
+ 		return -ENOTTY;
+ 	}
+@@ -4463,6 +4524,44 @@ static struct file_operations kvm_plane_fops = {
+ };
  
- 	mutex_unlock(&kvm->slots_lock);
  
++static inline bool kvm_arch_is_vcpu_plane_ioctl(unsigned ioctl)
++{
++	switch (ioctl) {
++	case KVM_GET_DEBUGREGS:
++	case KVM_SET_DEBUGREGS:
++	case KVM_GET_FPU:
++	case KVM_SET_FPU:
++	case KVM_GET_LAPIC:
++	case KVM_SET_LAPIC:
++	case KVM_GET_MSRS:
++	case KVM_SET_MSRS:
++	case KVM_GET_NESTED_STATE:
++	case KVM_SET_NESTED_STATE:
++	case KVM_GET_ONE_REG:
++	case KVM_SET_ONE_REG:
++	case KVM_GET_REGS:
++	case KVM_SET_REGS:
++	case KVM_GET_SREGS:
++	case KVM_SET_SREGS:
++	case KVM_GET_SREGS2:
++	case KVM_SET_SREGS2:
++	case KVM_GET_VCPU_EVENTS:
++	case KVM_SET_VCPU_EVENTS:
++	case KVM_GET_XCRS:
++	case KVM_SET_XCRS:
++	case KVM_GET_XSAVE:
++	case KVM_GET_XSAVE2:
++	case KVM_SET_XSAVE:
++
++	case KVM_GET_REG_LIST:
++	case KVM_TRANSLATE:
++		return true;
++
++	default:
++		return false;
++	}
++}
++
+ static long kvm_vcpu_ioctl(struct file *filp,
+ 			   unsigned int ioctl, unsigned long arg)
+ {
+@@ -4475,6 +4574,9 @@ static long kvm_vcpu_ioctl(struct file *filp,
+ 	if (vcpu->kvm->mm != current->mm || vcpu->kvm->vm_dead)
+ 		return -EIO;
+ 
++	if (vcpu->plane && !kvm_arch_is_vcpu_plane_ioctl(ioctl))
++		return -EINVAL;
++
+ 	if (unlikely(_IOC_TYPE(ioctl) != KVMIO))
+ 		return -EINVAL;
+ 
+@@ -4958,7 +5060,7 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+ 	case KVM_CAP_PLANES:
+ 		if (kvm)
+ 			return kvm_arch_nr_vcpu_planes(kvm);
+-		return KVM_MAX_PLANES;
++		return KVM_MAX_VCPU_PLANES;
+ 	case KVM_CAP_PLANES_FPU:
+ 		return kvm_arch_planes_share_fpu(kvm);
+ #endif
+@@ -5201,7 +5303,8 @@ static int kvm_vm_ioctl_create_plane(struct kvm *kvm, unsigned id)
+ 	struct file *file;
+ 	int r, fd;
+ 
+-	if (id >= KVM_MAX_VCPU_PLANES)
++	if (id >= kvm_arch_nr_vcpu_planes(kvm)
++	    || WARN_ON_ONCE(id >= KVM_MAX_VCPU_PLANES))
+ 		return -EINVAL;
+ 
+ 	guard(mutex)(&kvm->lock);
+@@ -5259,7 +5362,7 @@ static long kvm_vm_ioctl(struct file *filp,
+ 		r = kvm_vm_ioctl_create_plane(kvm, arg);
+ 		break;
+ 	case KVM_CREATE_VCPU:
+-		r = kvm_vm_ioctl_create_vcpu(kvm, arg);
++		r = kvm_vm_ioctl_create_vcpu(kvm->planes[0], NULL, arg);
+ 		break;
+ 	case KVM_ENABLE_CAP: {
+ 		struct kvm_enable_cap cap;
 -- 
 2.49.0
 
