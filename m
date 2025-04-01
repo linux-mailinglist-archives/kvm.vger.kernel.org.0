@@ -1,87 +1,74 @@
-Return-Path: <kvm+bounces-42293-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42295-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 008BEA77532
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 09:27:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DEBAA775A9
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 09:53:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34197188A70F
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 07:27:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5ECE87A367D
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 07:52:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73E741E7C2F;
-	Tue,  1 Apr 2025 07:27:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A6871E9B21;
+	Tue,  1 Apr 2025 07:53:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UQ7aXQG2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z8qHtNBy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F25721E2606
-	for <kvm@vger.kernel.org>; Tue,  1 Apr 2025 07:27:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 298E22D05E;
+	Tue,  1 Apr 2025 07:53:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743492443; cv=none; b=sxNKUv3u5b6ij17SN79Szerf2yK+sf3a3/xJABdkNDOksL1DGW6VgU1ZX2LG/VSA31F+ZUq6sxFg7Jyi0pyHj1SZszUWsZY/v/GJl5jeto/GEVplcmjZXigPZXMqzEoTtCodm3fhTq7pdKzVNUq7JCDoFbB52Yv2fiEpr3TNINo=
+	t=1743493985; cv=none; b=s2cwuoC1DQdr0fDqLdwPhcph8j2huTX4C5FOWBRilnSKXURNMsng9uaIukZvWdcAyzKgoeK20MnCO6UB5PvJbRwQuYDn5FQ++jN5WPs0OelYaPl0lKPaLJ9eigIQYLRpY6rPzziL3fgy0IKfLGdl3zu+REkBJic1Spuvle9jhkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743492443; c=relaxed/simple;
-	bh=P00DF62q0qLd/W0aUFm42eTHI3bD77qudmwGeRB8KZY=;
+	s=arc-20240116; t=1743493985; c=relaxed/simple;
+	bh=85J+UQqrPmkLGjgTDn4/gMvG0FvRmMphb7RZrr3I10Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RCYAwZGeuj2vrDKpE6XGii+qflS021EKIyTRNPdM5ND3aAvHBWcxq2CgyYMwChHvBOwSNrvd5o4w0vY1Up7OBOz8uR3s5KjgcmeyLP1D92L5DGuljs9nkK3nmW3jAV06NNFNFkMvsjDd4aiScNp9Er13/0NpzOfBTHK1P9/ae9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UQ7aXQG2; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1743492442; x=1775028442;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=P00DF62q0qLd/W0aUFm42eTHI3bD77qudmwGeRB8KZY=;
-  b=UQ7aXQG2ZF4nO1QIA2azl7W0wnLDkHlz9rWzcQbTmkCVmDjyL5aXHGz6
-   rH6cRbE8NMVpAsrEYF1qj5CsnhbeeU6uAFw32Pu/2iOnXwqxWAqgbJuzg
-   dWVOlzxVpk/EqJo8ywodckqR5shDQVlOmhdovAilWf6B41Thi/0eBwyYu
-   4c0bkJtsF3vfBxVoaT3UJKr73toCwtYhn4RDuyTjORq8SSWvwUJJ/loha
-   fLDJcMt7JMlVlhJWH4JKWWGDP+1mCHHqhqvz37Xf6yZ8SA3x8yVyM6lnE
-   oO8WpuQbujR9g35BJP+ex26wHkLFHKL8L5u6yK5AJiLj21sSvu9v2zCpF
-   w==;
-X-CSE-ConnectionGUID: pzIo7aScStuXQJUB92UHcA==
-X-CSE-MsgGUID: DMzyuFbqQvOdqdw/rzfA6g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11390"; a="67275281"
-X-IronPort-AV: E=Sophos;i="6.14,292,1736841600"; 
-   d="scan'208";a="67275281"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2025 00:27:21 -0700
-X-CSE-ConnectionGUID: ZccWOwgLShqWgOHWvps2NA==
-X-CSE-MsgGUID: 4EAw6vdBS0yfQ4s3rR4bKQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,292,1736841600"; 
-   d="scan'208";a="131308361"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
-  by orviesa004.jf.intel.com with ESMTP; 01 Apr 2025 00:27:17 -0700
-Date: Tue, 1 Apr 2025 15:47:36 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>,
-	Michael Roth <michael.roth@amd.com>,
-	Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Shaoqin Huang <shahuang@redhat.com>, Eric Auger <eauger@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	Sebastian Ott <sebott@redhat.com>, Gavin Shan <gshan@redhat.com>,
-	qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-arm@nongnu.org,
-	Dapeng Mi <dapeng1.mi@intel.com>, Yi Lai <yi1.lai@intel.com>,
-	Zhao Liu <zhao1.liu@intel.com>
-Subject: Re: [RFC v2 1/5] qapi/qom: Introduce kvm-pmu-filter object
-Message-ID: <Z+uaGHiOkFJd6TAO@intel.com>
-References: <20250122090517.294083-1-zhao1.liu@intel.com>
- <20250122090517.294083-2-zhao1.liu@intel.com>
- <871pwc3dyw.fsf@pond.sub.org>
- <Z6SMxlWhHgronott@intel.com>
- <87h657p8z0.fsf@pond.sub.org>
- <Z6TH+ZyLg/6pgKId@intel.com>
- <87v7tlhpqj.fsf@pond.sub.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=fgD6lMShP06lDpiasqqI1bW24Ev94JGYn/Dolq37LeZoGTrSPcTEE0+paZuNCxdVgiNQrXXtRd4E2T9a4vPXIwakGX0LhFmps/hELa6ZJXJLhqE6OUPSNyD15cO8IJu3xYMuD3yIlMK59H/g6aJya0sPouOHnBqGMWDHxvYVWZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z8qHtNBy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8963EC4CEE4;
+	Tue,  1 Apr 2025 07:52:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743493984;
+	bh=85J+UQqrPmkLGjgTDn4/gMvG0FvRmMphb7RZrr3I10Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Z8qHtNByIm8E5p7AbYs018QH17/ls1OzKBt8dHzcgbJ67+A1/wTK+6rA4JlB/4Ps/
+	 WHwSgnuRMBluhXVJsMV2uImUjVoCl7ZOUajOXz8Hy2N7kW37JJREgvN1MLwtK8P16B
+	 30z2+YLa787+Wp3jqgsF4EZ1g26n27iQ91Ma0VqyTWbEZNW+g4X5Pr7B5VytBQpKSn
+	 gU5tO4JDdcbGvmbLt948CbvNiXSCFGtMI8xYuqH8g75jwnqDwYAt1tbX3G/fZ2xGxQ
+	 vbNOC92UT5Zbj1+851IKPt/uEZp+yF68D+7pSayPTk33ws4MtrWg9ytAxtDP4ARZWZ
+	 93xpSccuufhrg==
+Date: Tue, 1 Apr 2025 09:52:52 +0200
+From: Ingo Molnar <mingo@kernel.org>
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: "Xin Li (Intel)" <xin@zytor.com>, linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	virtualization@lists.linux.dev, linux-edac@vger.kernel.org,
+	kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+	linux-ide@vger.kernel.org, linux-pm@vger.kernel.org,
+	bpf@vger.kernel.org, llvm@lists.linux.dev, tglx@linutronix.de,
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+	x86@kernel.org, jgross@suse.com, andrew.cooper3@citrix.com,
+	peterz@infradead.org, acme@kernel.org, namhyung@kernel.org,
+	mark.rutland@arm.com, alexander.shishkin@linux.intel.com,
+	jolsa@kernel.org, irogers@google.com, adrian.hunter@intel.com,
+	kan.liang@linux.intel.com, wei.liu@kernel.org,
+	ajay.kaher@broadcom.com, alexey.amakhalov@broadcom.com,
+	bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
+	pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
+	luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
+	haiyangz@microsoft.com, decui@microsoft.com,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [RFC PATCH v1 01/15] x86/msr: Replace __wrmsr() with
+ native_wrmsrl()
+Message-ID: <Z-ubVFyoOzwKhI53@gmail.com>
+References: <20250331082251.3171276-1-xin@zytor.com>
+ <20250331082251.3171276-2-xin@zytor.com>
+ <Z-pruogreCuU66wm@gmail.com>
+ <9D15DE81-2E68-4FCD-A133-4963602E18C9@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,163 +77,229 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87v7tlhpqj.fsf@pond.sub.org>
+In-Reply-To: <9D15DE81-2E68-4FCD-A133-4963602E18C9@zytor.com>
 
-Hi Mrkus,
 
-I'm really sorry I completely missed your reply (and your patient
-advice). It wasn't until I looked back at the lore archives that I
-realized my mistake. Thinking it over again, I see that your reply,
-which I missed, really helped clear up my confusion:
+* H. Peter Anvin <hpa@zytor.com> wrote:
 
-On Fri, Feb 07, 2025 at 02:02:44PM +0100, Markus Armbruster wrote:
-> Date: Fri, 07 Feb 2025 14:02:44 +0100
-> From: Markus Armbruster <armbru@redhat.com>
-> Subject: Re: [RFC v2 1/5] qapi/qom: Introduce kvm-pmu-filter object
-> 
-> Zhao Liu <zhao1.liu@intel.com> writes:
-> 
-> >> Let's ignore how to place it for now, and focus on where we would *like*
-> >> to place it.
-> >> 
-> >> Is it related to anything other than ObjectType / ObjectOptions in the
-> >> QMP reference manual?
+> On March 31, 2025 3:17:30 AM PDT, Ingo Molnar <mingo@kernel.org> wrote:
 > >
-> > Yes!
-> 
-> Now I'm confused :)
-> 
-> It is related to ObjectType / ObjectType.
-> 
-> Is it related to anything else in the QMP reference manual, and if yes,
-> to what exactly is it related?
-
-I misunderstood your point. The PMU stuff and the QAPI definitions for
-ObjectType/ObjectOptions are not related. They should belong to separate
-categories or sections.
-
-> >> I guess qapi/kvm.json is for KVM-specific stuff in general, not just the
-> >> KVM PMU filter.  Should we have a section for accelerator-specific
-> >> stuff, with subsections for the various accelerators?
-> >> 
-> >> [...]
+> >* Xin Li (Intel) <xin@zytor.com> wrote:
 > >
-> > If we consider the accelerator from a top-down perspective, I understand
-> > that we need to add accelerator.json, kvm.json, and kvm-pmu-filter.json.
+> >> -	__wrmsr      (MSR_AMD_DBG_EXTN_CFG, val | 3ULL << 3, val >> 32);
+> >> +	native_wrmsrl(MSR_AMD_DBG_EXTN_CFG, val | 3ULL << 3);
 > >
-> > The first two files are just to include subsections without any additional
-> > content. Is this overkill? Could we just add a single kvm-pmu-filter.json
-> > (I also considered this name, thinking that kvm might need to add more
-> > things in the future)?
+> >This is an improvement.
 > >
-> > Of course, I lack experience with the file organization here. If you think
-> > the three-level sections (accelerator.json, kvm.json, and kvm-pmu-filter.json)
-> > is necessary, I am happy to try this way. :-)
+> >> -	__wrmsr      (MSR_IA32_PQR_ASSOC, rmid_p, plr->closid);
+> >> +	native_wrmsrl(MSR_IA32_PQR_ASSOC, (u64)plr->closid << 32 | rmid_p);
+> >
+> >> -	__wrmsr      (MSR_IA32_PQR_ASSOC, rmid_p, closid_p);
+> >> +	native_wrmsrl(MSR_IA32_PQR_ASSOC, (u64)closid_p << 32 | rmid_p);
+> >
+> >This is not an improvement.
+> >
+> >Please provide a native_wrmsrl() API variant where natural [rmid_p, closid_p]
+> >high/lo parameters can be used, without the shift-uglification...
+> >
+> >Thanks,
+> >
+> >	Ingo
 > 
-> We don't have to create files just to get a desired section structure.
+> Directing this question primarily to Ingo, who is more than anyone 
+> else the namespace consistency guardian:
 > 
-> I'll show you how in a jiffie, but before I do that, let me stress: we
-> should figure out what we want *first*, and only then how to get it.
-> So, what section structure would make the most sense for the QMP
-> reference manual?
+> On the subject of msr function naming ... *msrl() has always been 
+> misleading. The -l suffix usually means 32 bits; sometimes it means 
+> the C type "long" (which in the kernel is used instead of 
+> size_t/uintptr_t, which might end up being "fun" when 128-bit 
+> architectures appear some time this century), but for a fixed 64-but 
+> type we normally use -q.
 
-Thank you for your patience. I have revisited and carefully considered
-the "QEMU QMP Reference Manual," especially from a reader's perspective.
-Indeed, I agree that, as you mentioned, a three-level directory
-(accelerator - kvm - kvm stuff) is more readable and easier to maintain.
+Yeah, agreed - that's been bothering me for a while too. :-)
 
-For this question "what we want *first*, and only then how to get it", I
-think my thought is:
+> Should we rename the *msrl() functions to *msrq() as part of this 
+> overhaul?
 
-First, the structure should be considered, and then the specific content
-can be added. Once the structure is clearly defined, categorizing items
-into their appropriate places becomes a natural process...
+Yeah, that's a good idea, and because talk is cheap I just implemented 
+this in the tip:WIP.x86/msr branch with a couple of other cleanups in 
+this area (see the shortlog & diffstat below), but the churn is high:
 
-Then for this question "what section structure would make the most sense
-for the QMP reference manual?", I understand that a top-down, clearly
-defined hierarchical directory makes the most sense, allowing readers to
-follow the structure to find what they want. Directly adding
-kvm-pmu-filter.json or kvm.json would disrupt the entire structure, because
-KVM is just one of the accelerators supported by QEMU. Using "accelerator"
-as the entry point for the documentation, similar to the "accel" directory
-in QEMU's source code, would make indexing more convenient.
+  144 files changed, 1034 insertions(+), 1034 deletions(-)
 
-> A few hints on how...
-> 
-> Consider how qapi/block.json includes qapi/block-core.json:
-> 
->     ##
->     # = Block devices
->     ##
-> 
->     { 'include': 'block-core.json' }
-> 
->     ##
->     # == Additional block stuff (VM related)
->     ##
-> 
-> block-core.json starts with
-> 
->     ##
->     # == Block core (VM unrelated)
->     ##
-> 
-> Together, this produces this section structure
-> 
->     = Block devices
->     == 
->     ##
-> 
-> Together, this produces this section structure
-> 
->     = Block devices
->     == Block core (VM unrelated)
->     == Additional block stuff (VM related)
-> 
-> Note that qapi/block-core.json isn't included anywhere else.
-> qapi/qapi-schema.json advises:
-> 
->     # Documentation generated with qapi-gen.py is in source order, with
->     # included sub-schemas inserted at the first include directive
->     # (subsequent include directives have no effect).  To get a sane and
->     # stable order, it's best to include each sub-schema just once, or
->     # include it first right here.
+So this can only be done if regenerated and sent to Linus right before 
+an -rc1 I think:
 
-Thank you very much!!
+  git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip WIP.x86/msr
 
-Based on your inspiration, I think the ideal section structure for my
-issue could be:
+Thanks,
 
-    = accelerator
-    == KVM
-    === PMU
+	Ingo
 
-Firstly, I should have a new accelerator.json () to include KVM stuff:
+=======================>
+Ingo Molnar (18):
+      x86/msr: Standardize on u64 in <asm/msr.h>
+      x86/msr: Standardize on u64 in <asm/msr-index.h>
+      x86/msr: Use u64 in rdmsrl_amd_safe() and wrmsrl_amd_safe()
+      x86/msr: Use u64 in rdmsrl_safe() and paravirt_read_pmc()
+      x86/msr: Rename 'rdmsrl()' to 'rdmsrq()'
+      x86/msr: Rename 'wrmsrl()' to 'wrmsrq()'
+      x86/msr: Rename 'rdmsrl_safe()' to 'rdmsrq_safe()'
+      x86/msr: Rename 'wrmsrl_safe()' to 'wrmsrq_safe()'
+      x86/msr: Rename 'rdmsrl_safe_on_cpu()' to 'rdmsrq_safe_on_cpu()'
+      x86/msr: Rename 'wrmsrl_safe_on_cpu()' to 'wrmsrq_safe_on_cpu()'
+      x86/msr: Rename 'rdmsrl_on_cpu()' to 'rdmsrq_on_cpu()'
+      x86/msr: Rename 'wrmsrl_on_cpu()' to 'wrmsrq_on_cpu()'
+      x86/msr: Rename 'mce_rdmsrl()' to 'mce_rdmsrq()'
+      x86/msr: Rename 'mce_wrmsrl()' to 'mce_wrmsrq()'
+      x86/msr: Rename 'rdmsrl_amd_safe()' to 'rdmsrq_amd_safe()'
+      x86/msr: Rename 'wrmsrl_amd_safe()' to 'wrmsrq_amd_safe()'
+      x86/msr: Rename 'native_wrmsrl()' to 'native_wrmsrq()'
+      x86/msr: Rename 'wrmsrl_cstar()' to 'wrmsrq_cstar()'
 
-    ##
-    # = Accelerator
-    ##
-
-    { 'include': 'kvm.json' }
-
-Next, in kvm.json, I could organize stuffs like:
-
-    ##
-    # == KVM
-    ##
-
-    ##
-    # === PMU stuff
-    ##
-
-    ... (the below are my current QPAI definitions.)
-
-Is such a structure reasonable?
-
-Thank you again for your guidance!
-
-Regards,
-Zhao
-
-
+ arch/x86/coco/sev/core.c                           |   2 +-
+ arch/x86/events/amd/brs.c                          |   8 +-
+ arch/x86/events/amd/core.c                         |  12 +--
+ arch/x86/events/amd/ibs.c                          |  26 ++---
+ arch/x86/events/amd/lbr.c                          |  20 ++--
+ arch/x86/events/amd/power.c                        |  10 +-
+ arch/x86/events/amd/uncore.c                       |  12 +--
+ arch/x86/events/core.c                             |  42 ++++----
+ arch/x86/events/intel/core.c                       |  66 ++++++-------
+ arch/x86/events/intel/cstate.c                     |   2 +-
+ arch/x86/events/intel/ds.c                         |  10 +-
+ arch/x86/events/intel/knc.c                        |  16 +--
+ arch/x86/events/intel/lbr.c                        |  44 ++++-----
+ arch/x86/events/intel/p4.c                         |  24 ++---
+ arch/x86/events/intel/p6.c                         |  12 +--
+ arch/x86/events/intel/pt.c                         |  32 +++---
+ arch/x86/events/intel/uncore.c                     |   2 +-
+ arch/x86/events/intel/uncore_discovery.c           |  10 +-
+ arch/x86/events/intel/uncore_nhmex.c               |  70 ++++++-------
+ arch/x86/events/intel/uncore_snb.c                 |  42 ++++----
+ arch/x86/events/intel/uncore_snbep.c               |  50 +++++-----
+ arch/x86/events/msr.c                              |   2 +-
+ arch/x86/events/perf_event.h                       |  26 ++---
+ arch/x86/events/probe.c                            |   2 +-
+ arch/x86/events/rapl.c                             |   8 +-
+ arch/x86/events/zhaoxin/core.c                     |  16 +--
+ arch/x86/hyperv/hv_apic.c                          |   4 +-
+ arch/x86/hyperv/hv_init.c                          |  66 ++++++-------
+ arch/x86/hyperv/hv_spinlock.c                      |   6 +-
+ arch/x86/hyperv/ivm.c                              |   2 +-
+ arch/x86/include/asm/apic.h                        |   8 +-
+ arch/x86/include/asm/debugreg.h                    |   4 +-
+ arch/x86/include/asm/fsgsbase.h                    |   4 +-
+ arch/x86/include/asm/kvm_host.h                    |   2 +-
+ arch/x86/include/asm/microcode.h                   |   2 +-
+ arch/x86/include/asm/msr-index.h                   |  12 +--
+ arch/x86/include/asm/msr.h                         |  50 +++++-----
+ arch/x86/include/asm/paravirt.h                    |   8 +-
+ arch/x86/include/asm/spec-ctrl.h                   |   2 +-
+ arch/x86/kernel/acpi/cppc.c                        |   8 +-
+ arch/x86/kernel/amd_nb.c                           |   2 +-
+ arch/x86/kernel/apic/apic.c                        |  16 +--
+ arch/x86/kernel/apic/apic_numachip.c               |   6 +-
+ arch/x86/kernel/cet.c                              |   2 +-
+ arch/x86/kernel/cpu/amd.c                          |  28 +++---
+ arch/x86/kernel/cpu/aperfmperf.c                   |  28 +++---
+ arch/x86/kernel/cpu/bugs.c                         |  24 ++---
+ arch/x86/kernel/cpu/bus_lock.c                     |  18 ++--
+ arch/x86/kernel/cpu/common.c                       |  68 ++++++-------
+ arch/x86/kernel/cpu/feat_ctl.c                     |   4 +-
+ arch/x86/kernel/cpu/hygon.c                        |   6 +-
+ arch/x86/kernel/cpu/intel.c                        |  10 +-
+ arch/x86/kernel/cpu/intel_epb.c                    |  12 +--
+ arch/x86/kernel/cpu/mce/amd.c                      |  22 ++---
+ arch/x86/kernel/cpu/mce/core.c                     |  58 +++++------
+ arch/x86/kernel/cpu/mce/inject.c                   |  32 +++---
+ arch/x86/kernel/cpu/mce/intel.c                    |  32 +++---
+ arch/x86/kernel/cpu/mce/internal.h                 |   2 +-
+ arch/x86/kernel/cpu/microcode/amd.c                |   2 +-
+ arch/x86/kernel/cpu/microcode/intel.c              |   2 +-
+ arch/x86/kernel/cpu/mshyperv.c                     |  12 +--
+ arch/x86/kernel/cpu/resctrl/core.c                 |  10 +-
+ arch/x86/kernel/cpu/resctrl/monitor.c              |   2 +-
+ arch/x86/kernel/cpu/resctrl/pseudo_lock.c          |   2 +-
+ arch/x86/kernel/cpu/resctrl/rdtgroup.c             |   6 +-
+ arch/x86/kernel/cpu/sgx/main.c                     |   2 +-
+ arch/x86/kernel/cpu/topology.c                     |   2 +-
+ arch/x86/kernel/cpu/topology_amd.c                 |   4 +-
+ arch/x86/kernel/cpu/tsx.c                          |  20 ++--
+ arch/x86/kernel/cpu/umwait.c                       |   2 +-
+ arch/x86/kernel/fpu/core.c                         |   2 +-
+ arch/x86/kernel/fpu/xstate.c                       |  10 +-
+ arch/x86/kernel/fpu/xstate.h                       |   2 +-
+ arch/x86/kernel/fred.c                             |  20 ++--
+ arch/x86/kernel/hpet.c                             |   2 +-
+ arch/x86/kernel/kvm.c                              |  28 +++---
+ arch/x86/kernel/kvmclock.c                         |   4 +-
+ arch/x86/kernel/mmconf-fam10h_64.c                 |   8 +-
+ arch/x86/kernel/process.c                          |  16 +--
+ arch/x86/kernel/process_64.c                       |  20 ++--
+ arch/x86/kernel/reboot_fixups_32.c                 |   2 +-
+ arch/x86/kernel/shstk.c                            |  18 ++--
+ arch/x86/kernel/traps.c                            |  10 +-
+ arch/x86/kernel/tsc.c                              |   2 +-
+ arch/x86/kernel/tsc_sync.c                         |  14 +--
+ arch/x86/kvm/svm/avic.c                            |   2 +-
+ arch/x86/kvm/svm/sev.c                             |   2 +-
+ arch/x86/kvm/svm/svm.c                             |  16 +--
+ arch/x86/kvm/vmx/nested.c                          |   4 +-
+ arch/x86/kvm/vmx/pmu_intel.c                       |   4 +-
+ arch/x86/kvm/vmx/sgx.c                             |   8 +-
+ arch/x86/kvm/vmx/vmx.c                             |  66 ++++++-------
+ arch/x86/kvm/x86.c                                 |  38 ++++----
+ arch/x86/lib/insn-eval.c                           |   6 +-
+ arch/x86/lib/msr-smp.c                             |  16 +--
+ arch/x86/lib/msr.c                                 |   4 +-
+ arch/x86/mm/pat/memtype.c                          |   4 +-
+ arch/x86/mm/tlb.c                                  |   2 +-
+ arch/x86/pci/amd_bus.c                             |  10 +-
+ arch/x86/platform/olpc/olpc-xo1-rtc.c              |   6 +-
+ arch/x86/platform/olpc/olpc-xo1-sci.c              |   2 +-
+ arch/x86/power/cpu.c                               |  26 ++---
+ arch/x86/realmode/init.c                           |   2 +-
+ arch/x86/virt/svm/sev.c                            |  20 ++--
+ arch/x86/xen/suspend.c                             |   6 +-
+ drivers/acpi/acpi_extlog.c                         |   2 +-
+ drivers/acpi/acpi_lpit.c                           |   2 +-
+ drivers/cpufreq/acpi-cpufreq.c                     |   8 +-
+ drivers/cpufreq/amd-pstate-ut.c                    |   6 +-
+ drivers/cpufreq/amd-pstate.c                       |  22 ++---
+ drivers/cpufreq/amd_freq_sensitivity.c             |   2 +-
+ drivers/cpufreq/e_powersaver.c                     |   6 +-
+ drivers/cpufreq/intel_pstate.c                     | 108 ++++++++++-----------
+ drivers/cpufreq/longhaul.c                         |  24 ++---
+ drivers/cpufreq/powernow-k7.c                      |  14 +--
+ drivers/crypto/ccp/sev-dev.c                       |   2 +-
+ drivers/edac/amd64_edac.c                          |   6 +-
+ drivers/gpu/drm/i915/selftests/librapl.c           |   4 +-
+ drivers/hwmon/fam15h_power.c                       |   6 +-
+ drivers/idle/intel_idle.c                          |  34 +++----
+ drivers/mtd/nand/raw/cs553x_nand.c                 |   6 +-
+ drivers/platform/x86/intel/ifs/core.c              |   4 +-
+ drivers/platform/x86/intel/ifs/load.c              |  20 ++--
+ drivers/platform/x86/intel/ifs/runtest.c           |  16 +--
+ drivers/platform/x86/intel/pmc/cnp.c               |   6 +-
+ drivers/platform/x86/intel/pmc/core.c              |   8 +-
+ .../x86/intel/speed_select_if/isst_if_common.c     |  18 ++--
+ .../x86/intel/speed_select_if/isst_if_mbox_msr.c   |  14 +--
+ .../x86/intel/speed_select_if/isst_tpmi_core.c     |   2 +-
+ drivers/platform/x86/intel/tpmi_power_domains.c    |   4 +-
+ drivers/platform/x86/intel/turbo_max_3.c           |   4 +-
+ .../x86/intel/uncore-frequency/uncore-frequency.c  |  10 +-
+ drivers/platform/x86/intel_ips.c                   |  36 +++----
+ drivers/powercap/intel_rapl_msr.c                  |   6 +-
+ .../int340x_thermal/processor_thermal_device.c     |   2 +-
+ drivers/thermal/intel/intel_hfi.c                  |  14 +--
+ drivers/thermal/intel/intel_powerclamp.c           |   4 +-
+ drivers/thermal/intel/intel_tcc_cooling.c          |   4 +-
+ drivers/thermal/intel/therm_throt.c                |  10 +-
+ drivers/video/fbdev/geode/gxfb_core.c              |   2 +-
+ drivers/video/fbdev/geode/lxfb_ops.c               |  22 ++---
+ drivers/video/fbdev/geode/suspend_gx.c             |  10 +-
+ drivers/video/fbdev/geode/video_gx.c               |  16 +--
+ include/hyperv/hvgdk_mini.h                        |   2 +-
+ 144 files changed, 1034 insertions(+), 1034 deletions(-)
 
