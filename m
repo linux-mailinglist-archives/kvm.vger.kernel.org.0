@@ -1,281 +1,164 @@
-Return-Path: <kvm+bounces-42415-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42416-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C502A7838B
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 22:50:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 900AEA783AE
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 22:55:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85EB1165491
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 20:50:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF775188B4A1
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 20:55:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 796B2214810;
-	Tue,  1 Apr 2025 20:47:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6D2021420A;
+	Tue,  1 Apr 2025 20:55:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zxwvX8bz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CRWpJg6b"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AAA6221733
-	for <kvm@vger.kernel.org>; Tue,  1 Apr 2025 20:47:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D7E4209F31
+	for <kvm@vger.kernel.org>; Tue,  1 Apr 2025 20:55:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743540430; cv=none; b=T68wWrscc00VWWevWH2U4uRh4pWGYYs8TGbPs5k/QDLLrKagMJ2jPFXBIKSo6N6Lq9zH+02dDl+R0AJ+j4or1zEHSIC4Ry5iMMZxA6a34gpmtTi+Sh7HiRCcfGbTkynh0M5ZX0c6Mmktt3frI5ZEXz+kxZuXE7sBNFQMFiiBKo4=
+	t=1743540929; cv=none; b=Nhdv5gKPnB4Tmfj4pT6tjTtqFk19y0gCuTUdauvUKUss4ySq89ZbdDedOiyTh8/R5NzjLaPkTubC0VhCwnBY6QBvE2up1Yfa2BHupDdRVqFQtF6Xv55cthfUvrNaKnkYfqcZS+lpNua8WVzSY4/fTHNGl5O3NHJ2okSzpHROD3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743540430; c=relaxed/simple;
-	bh=fUs07VOggshpPVb5iKIZY5UPq/g/qmxhlixbhOP2Vg0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=G41/rc+EdTUk8npKFN3Jx2EUG9KxttysCUm3OuIqu7o+0V1tYIRzlP3K6tcDGFr3abXYgebbXrsfYN4QRxsEElMg1psH6Ky2dqCykU2tuqXKi36fu1InAs+7IGYtCo+FImYtnpaq+WhJgKUFkWbr6dEhOOvkYI+6omSYgCoeL0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zxwvX8bz; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2240a960f9cso101992635ad.0
-        for <kvm@vger.kernel.org>; Tue, 01 Apr 2025 13:47:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743540428; x=1744145228; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=m2Nlc70kYoEVZE2tPVykbAae+uvb1zAI7sPIwdhW1oA=;
-        b=zxwvX8bztPmDuoJqe4yW5FSqwAy9wE9NIkV0IBRBTYRj3mXSPpN72m7XO+rZjRM0Ip
-         VgDy2sU1rY2dQhjr8U4ceO8oNxI2Zrd5bBOV5X9WTLZdt+mDiTeG/Mom2LvB2MWFBsa3
-         RYyK883pPqu8JnYKz5FsZ5XdhRlK1rkZVYNI2gxfyZfvZscnEYmNK9lGoqiuMzI3qZxs
-         xWHY/jnAhcdOffGVkaQ4LGaBMtccO3tl9USqg/Mof83IXsSJsf/4oO5mDSQmJDLODlp/
-         UnYQbX87FI5+PSthUuYtipU8KDYm3rwJiDqr2HsoAqzqnJkvQKe+Psp0lhbryfR4t6rQ
-         CICw==
+	s=arc-20240116; t=1743540929; c=relaxed/simple;
+	bh=wO5tHIDlxst7r697iR4bshoY56C5LbRa0jXC0tZViGM=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
+	 In-Reply-To:Content-Type; b=lllu5por2vEHRFYynhQUEnONzBdftS627vBYoQ7cOA0TI/4gcJC5R7xjGDn/gP8X2P1p6vPRvv10EHmbnByPVm46EqbSkzI+VHfnoGIJdvCh1CgRxjFofc8NfdbEhjYxPK4RQ6WTexlif5o7P7jIEvknMrUT4H9kjAzBrzM+uDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CRWpJg6b; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743540927;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=7QpsIRYDdD+NL12KBYzmELgBny35dGaEVH3KooFWSIs=;
+	b=CRWpJg6boK5lXUMhCcSNYQ1aPLJdPKX2P/XsHOaclbO18OlZxdHqISvWQstwO8ZAs5tnYd
+	bk4M5WHRK4UoRc1JP70Y8Zmcxq0sYL6AllVqawt3YHm3dIViVOYq/15CSpDE1qZUTRqUvA
+	bBY3dst/kLgdn7XYpCURyzdcUClV2Ng=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-84-jw5dYR51Nb64VXyjKDM1Tw-1; Tue, 01 Apr 2025 16:55:26 -0400
+X-MC-Unique: jw5dYR51Nb64VXyjKDM1Tw-1
+X-Mimecast-MFC-AGG-ID: jw5dYR51Nb64VXyjKDM1Tw_1743540925
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-39135d31ca4so101089f8f.1
+        for <kvm@vger.kernel.org>; Tue, 01 Apr 2025 13:55:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743540428; x=1744145228;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=m2Nlc70kYoEVZE2tPVykbAae+uvb1zAI7sPIwdhW1oA=;
-        b=G5LBUl0OtlKrqppojYKdKPak7dYy2wfiXUP2RkiyOighKS+KGHZ88EUYBKgJsKUjql
-         KIFCv8Wa9KTh2kkHQh3/Vu6UXewQTz7HGpwNb2byTjyr5AyyxGlrN2ToLYc8ojknnpR3
-         z829O+MaNUvN+eqnZLyzASzKSZvQ/zlTUKPAFnQbt6S4+A3FMuXjIyYKOYHJdfy8avwq
-         l8Zm8Z2jg+z3/ECoD9YEgVibThd+IhdzsxO+0JHGnVBzzEjj5ghgFX7ejlp3uIgrhchK
-         peH9GJtGdwmYZbfxyej8ARlaIa2/GIxHDervvYoSeyT3wb68WgVVMy9AcypUB1UEpH1N
-         4Odw==
-X-Gm-Message-State: AOJu0YynoiaV3S7wBOWPTN3NynqqHr8W9rlWXNAmXUPBe4kX8cvg7ahi
-	oWaoc1bxjPv5MhcLkxTJt0NnjD4R0CXa6iSIkRaCEZmKUnyL3J5Nh2pl1ogmfsLclwETGPUdmiw
-	8HA==
-X-Google-Smtp-Source: AGHT+IGsvgxu0cKjG5RuKP235RGuqLz8GTYqfRRM08+3tGkeZ2vVqfJM8i9w8mVMsttD6aUmHocD7/45nSY=
-X-Received: from pfbdh1.prod.google.com ([2002:a05:6a00:4781:b0:730:8e17:ed13])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1410:b0:725:96f2:9e63
- with SMTP id d2e1a72fcca58-73980477740mr24146728b3a.24.1743540428601; Tue, 01
- Apr 2025 13:47:08 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  1 Apr 2025 13:44:24 -0700
-In-Reply-To: <20250401204425.904001-1-seanjc@google.com>
+        d=1e100.net; s=20230601; t=1743540925; x=1744145725;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:references:to:from:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7QpsIRYDdD+NL12KBYzmELgBny35dGaEVH3KooFWSIs=;
+        b=vVfGB2MABczWlQbe4WltICdMe3t7F8fzIe94UGLbGTPzmkJpO4cKdaLvYn7pFoC39J
+         iKexBu7RkG/U3wvyW368zdwqJeJ1bzhzF7RwUJT6sClvibHAZIvuKk1sEVZ8m15cXCFG
+         EYwB4zv6uZBqjZxnOl0qZik6zEZo7iInrZ89jjSzpNrDcbKglhQ72ykbsDdH3LOiMJ1j
+         9yGtDL9PbXhX47X2bJXzZ/4bnz+bl0rNUE0yweP9lW6aaHaPt+/D1PaBObh1oWvw7Nkl
+         hv709r5hl7wZUwHmtZmL69N1qIT1xwZq+/juadhsQPgARFNc5vtiNvE0G+9Ui3ELD2Fd
+         A4BA==
+X-Forwarded-Encrypted: i=1; AJvYcCWdwCzPAu+TrTisb3ceXiGYgf8HDQTVKpb1aGC3G1BeUlrade4NZ7bnL8e9zfc2cW2plQE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyL9QAfZaZt1GVN8kEo0+AOlAwkgQGfBYZYdbe859XsHXvGzYDU
+	9TR/ch0NiIhBRAzuHIpf62RIUf3273PS8Sf0Nhg/HURkErrEYOSZVcHwYVEXwZNhhsN2QSu5RqV
+	10xv9P7CkPdV5NGjYLx3iFHpmJ2A0Q42/ZKV+a9ggzUbac9/PQA==
+X-Gm-Gg: ASbGncvIEvhqiwNr7ZuyKglKm9EI8KJdxWc6/StVT9vONOtTUdrYwMSszPk0Wkbpjyj
+	yIOaTq13bj9nKQqQVppsYePBoIxKyyhqQOT4u6hQZ/FNkWzCJVa9aa0BXiceuQ/tMqfPadMYAW4
+	KehRbyq7DPB6XOI5mgZ6OUTZJsH7jHsxqdjjzc7AHH00utHQaCJ+xX4NkvLotW14cmaWCSJN7f/
+	rZOKQiG9yr+tEneqHspsAkfBMw6kovSfMU2zW5T3SQgK7QBVrBeFFw1nCR5xjyuPYP6vWpyrbDZ
+	5lmwypd9BDLrPLjTdmxpmfX1UNRmDS632c4YCagSmuQKzg==
+X-Received: by 2002:a05:6000:4283:b0:391:952:c74a with SMTP id ffacd0b85a97d-39c27ee60b5mr1307684f8f.8.1743540925147;
+        Tue, 01 Apr 2025 13:55:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEY9ekMJ4Nar5uiVtoOHkCFgzdpp/cgUqXG8VhQGEL+yuCge44cRIeUThbv+Mn70edoSI8jmg==
+X-Received: by 2002:a05:6000:4283:b0:391:952:c74a with SMTP id ffacd0b85a97d-39c27ee60b5mr1307647f8f.8.1743540924756;
+        Tue, 01 Apr 2025 13:55:24 -0700 (PDT)
+Received: from [192.168.3.141] (p4ff236cf.dip0.t-ipconnect.de. [79.242.54.207])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ea8d16049sm22202225e9.0.2025.04.01.13.55.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Apr 2025 13:55:23 -0700 (PDT)
+Message-ID: <6c9362f3-0eb8-4526-a7d3-3d483a40dd84@redhat.com>
+Date: Tue, 1 Apr 2025 22:55:21 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250401204425.904001-1-seanjc@google.com>
-X-Mailer: git-send-email 2.49.0.504.g3bcea36a83-goog
-Message-ID: <20250401204425.904001-13-seanjc@google.com>
-Subject: [PATCH 12/12] KVM: selftests: Add a KVM_IRQFD test to verify
- uniqueness requirements
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Sean Christopherson <seanjc@google.com>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-riscv@lists.infradead.org, David Matlack <dmatlack@google.com>, 
-	Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, 
-	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Invitation] bi-weekly guest_memfd upstream call on 2025-04-03
+From: David Hildenbrand <david@redhat.com>
+To: "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+ "linux-mm@kvack.org" <linux-mm@kvack.org>, KVM <kvm@vger.kernel.org>
+References: <7b3090fb-1816-4761-a7a5-17d49a050645@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <7b3090fb-1816-4761-a7a5-17d49a050645@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Add a selftest to verify that eventfd+irqfd bindings are globally unique,
-i.e. that KVM doesn't allow multiple irqfds to bind to a single eventfd,
-even across VMs.
+On 01.04.25 20:46, David Hildenbrand wrote:
+> Hi everybody,
+> 
+> our next guest_memfd upstream call is scheduled for Thursday,
+> 2025-04-03 at 8:00 - 9:00am (GMT-08:00) Pacific Time - Vancouver.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- tools/testing/selftests/kvm/Makefile.kvm |   4 +
- tools/testing/selftests/kvm/irqfd_test.c | 130 +++++++++++++++++++++++
- 2 files changed, 134 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/irqfd_test.c
+Correction (thanks James!)
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index f773f8f99249..9e5128d9f22c 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -125,6 +125,7 @@ TEST_GEN_PROGS_x86 += dirty_log_perf_test
- TEST_GEN_PROGS_x86 += guest_memfd_test
- TEST_GEN_PROGS_x86 += guest_print_test
- TEST_GEN_PROGS_x86 += hardware_disable_test
-+TEST_GEN_PROGS_x86 += irqfd_test
- TEST_GEN_PROGS_x86 += kvm_create_max_vcpus
- TEST_GEN_PROGS_x86 += kvm_page_table_test
- TEST_GEN_PROGS_x86 += memslot_modification_stress_test
-@@ -163,6 +164,7 @@ TEST_GEN_PROGS_arm64 += dirty_log_test
- TEST_GEN_PROGS_arm64 += dirty_log_perf_test
- TEST_GEN_PROGS_arm64 += guest_print_test
- TEST_GEN_PROGS_arm64 += get-reg-list
-+TEST_GEN_PROGS_arm64 += irqfd_test
- TEST_GEN_PROGS_arm64 += kvm_create_max_vcpus
- TEST_GEN_PROGS_arm64 += kvm_page_table_test
- TEST_GEN_PROGS_arm64 += memslot_modification_stress_test
-@@ -185,6 +187,7 @@ TEST_GEN_PROGS_s390 += s390/ucontrol_test
- TEST_GEN_PROGS_s390 += demand_paging_test
- TEST_GEN_PROGS_s390 += dirty_log_test
- TEST_GEN_PROGS_s390 += guest_print_test
-+TEST_GEN_PROGS_s390 += irqfd_test
- TEST_GEN_PROGS_s390 += kvm_create_max_vcpus
- TEST_GEN_PROGS_s390 += kvm_page_table_test
- TEST_GEN_PROGS_s390 += rseq_test
-@@ -199,6 +202,7 @@ TEST_GEN_PROGS_riscv += demand_paging_test
- TEST_GEN_PROGS_riscv += dirty_log_test
- TEST_GEN_PROGS_riscv += get-reg-list
- TEST_GEN_PROGS_riscv += guest_print_test
-+TEST_GEN_PROGS_riscv += irqfd_test
- TEST_GEN_PROGS_riscv += kvm_binary_stats_test
- TEST_GEN_PROGS_riscv += kvm_create_max_vcpus
- TEST_GEN_PROGS_riscv += kvm_page_table_test
-diff --git a/tools/testing/selftests/kvm/irqfd_test.c b/tools/testing/selftests/kvm/irqfd_test.c
-new file mode 100644
-index 000000000000..286f2b15fde6
---- /dev/null
-+++ b/tools/testing/selftests/kvm/irqfd_test.c
-@@ -0,0 +1,130 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+#include <errno.h>
-+#include <pthread.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <signal.h>
-+#include <stdint.h>
-+#include <sys/sysinfo.h>
-+
-+#include "kvm_util.h"
-+
-+static struct kvm_vm *vm1;
-+static struct kvm_vm *vm2;
-+static int __eventfd;
-+static bool done;
-+
-+/*
-+ * KVM de-assigns based on eventfd *and* GSI, but requires unique eventfds when
-+ * assigning (the API isn't symmetrical).  Abuse the oddity and use a per-task
-+ * GSI base to avoid false failures due to cross-task de-assign, i.e. so that
-+ * the secondary doesn't de-assign the primary's eventfd and cause assign to
-+ * unexpectedly succeed on the primary.
-+ */
-+#define GSI_BASE_PRIMARY	0x20
-+#define GSI_BASE_SECONDARY	0x30
-+
-+static void juggle_eventfd_secondary(struct kvm_vm *vm, int eventfd)
-+{
-+	int r, i;
-+
-+	/*
-+	 * The secondary task can encounter EBADF since the primary can close
-+	 * the eventfd at any time.  And because the primary can recreate the
-+	 * eventfd, at the safe fd in the file table, the secondary can also
-+	 * encounter "unexpected" success, e.g. if the close+recreate happens
-+	 * between the first and second assignments.  The secondary's role is
-+	 * mostly to antagonize KVM, not to detect bugs.
-+	 */
-+	for (i = 0; i < 2; i++) {
-+		r = __kvm_irqfd(vm, GSI_BASE_SECONDARY, eventfd, 0);
-+		TEST_ASSERT(!r || errno == EBUSY || errno == EBADF,
-+			    "Wanted success, EBUSY, or EBADF, r = %d, errno = %d",
-+			    r, errno);
-+
-+		/* De-assign should succeed unless the eventfd was closed. */
-+		r = __kvm_irqfd(vm, GSI_BASE_SECONDARY + i, eventfd, KVM_IRQFD_FLAG_DEASSIGN);
-+		TEST_ASSERT(!r || errno == EBADF,
-+			    "De-assign should succeed unless the fd was closed");
-+	}
-+}
-+
-+static void *secondary_irqfd_juggler(void *ign)
-+{
-+	while (!READ_ONCE(done)) {
-+		juggle_eventfd_secondary(vm1, READ_ONCE(__eventfd));
-+		juggle_eventfd_secondary(vm2, READ_ONCE(__eventfd));
-+	}
-+
-+	return NULL;
-+}
-+
-+static void juggle_eventfd_primary(struct kvm_vm *vm, int eventfd)
-+{
-+	int r1, r2;
-+
-+	/*
-+	 * At least one of the assigns should fail.  KVM disallows assigning a
-+	 * single eventfd to multiple GSIs (or VMs), so it's possible that both
-+	 * assignments can fail, too.
-+	 */
-+	r1 = __kvm_irqfd(vm, GSI_BASE_PRIMARY, eventfd, 0);
-+	TEST_ASSERT(!r1 || errno == EBUSY,
-+		    "Wanted success or EBUSY, r = %d, errno = %d", r1, errno);
-+
-+	r2 = __kvm_irqfd(vm, GSI_BASE_PRIMARY + 1, eventfd, 0);
-+	TEST_ASSERT(r1 || (r2 && errno == EBUSY),
-+		    "Wanted failure (EBUSY), r1 = %d, r2 = %d, errno = %d",
-+		    r1, r2, errno);
-+
-+	/*
-+	 * De-assign should always succeed, even if the corresponding assign
-+	 * failed.
-+	 */
-+	kvm_irqfd(vm, GSI_BASE_PRIMARY, eventfd, KVM_IRQFD_FLAG_DEASSIGN);
-+	kvm_irqfd(vm, GSI_BASE_PRIMARY + 1, eventfd, KVM_IRQFD_FLAG_DEASSIGN);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	pthread_t racing_thread;
-+	int r, i;
-+
-+	/* Create "full" VMs, as KVM_IRQFD requires an in-kernel IRQ chip. */
-+	vm1 = vm_create(1);
-+	vm2 = vm_create(1);
-+
-+	WRITE_ONCE(__eventfd, kvm_new_eventfd());
-+
-+	kvm_irqfd(vm1, 10, __eventfd, 0);
-+
-+	r = __kvm_irqfd(vm1, 11, __eventfd, 0);
-+	TEST_ASSERT(r && errno == EBUSY,
-+		    "Wanted EBUSY, r = %d, errno = %d", r, errno);
-+
-+	r = __kvm_irqfd(vm2, 12, __eventfd, 0);
-+	TEST_ASSERT(r && errno == EBUSY,
-+		    "Wanted EBUSY, r = %d, errno = %d", r, errno);
-+
-+	kvm_irqfd(vm1, 11, READ_ONCE(__eventfd), KVM_IRQFD_FLAG_DEASSIGN);
-+	kvm_irqfd(vm1, 12, READ_ONCE(__eventfd), KVM_IRQFD_FLAG_DEASSIGN);
-+	kvm_irqfd(vm1, 13, READ_ONCE(__eventfd), KVM_IRQFD_FLAG_DEASSIGN);
-+	kvm_irqfd(vm1, 14, READ_ONCE(__eventfd), KVM_IRQFD_FLAG_DEASSIGN);
-+	kvm_irqfd(vm1, 10, READ_ONCE(__eventfd), KVM_IRQFD_FLAG_DEASSIGN);
-+
-+	close(__eventfd);
-+
-+	pthread_create(&racing_thread, NULL, secondary_irqfd_juggler, vm2);
-+
-+	for (i = 0; i < 10000; i++) {
-+		WRITE_ONCE(__eventfd, kvm_new_eventfd());
-+
-+		juggle_eventfd_primary(vm1, __eventfd);
-+		juggle_eventfd_primary(vm2, __eventfd);
-+		close(__eventfd);
-+	}
-+
-+	WRITE_ONCE(done, true);
-+	pthread_join(racing_thread, NULL);
-+}
+	8:00 - 9:00am (GMT-07:00) Pacific Time - Vancouver.
+
+is the real deal according to google calendar.
+
 -- 
-2.49.0.504.g3bcea36a83-goog
+Cheers,
+
+David / dhildenb
 
 
