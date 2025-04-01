@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-42383-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42384-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 739C1A7811F
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 19:09:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94D3DA78121
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 19:09:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A072188F4D3
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 17:08:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0BC9F188E528
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 17:08:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79565212FA7;
-	Tue,  1 Apr 2025 17:06:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51427213240;
+	Tue,  1 Apr 2025 17:06:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S6xiP5HE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dYNLkqgL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A98720DD63
-	for <kvm@vger.kernel.org>; Tue,  1 Apr 2025 17:06:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE9D20E005
+	for <kvm@vger.kernel.org>; Tue,  1 Apr 2025 17:06:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743527175; cv=none; b=OTEBrlkmWFaFRa79qLUnyLW54D2i+qfxytoebhio4Bi7GOoHp8DafGlcabTLU0NDe+hDD1O1V0jaX4+xwQoY8FjVNrGxH4/Mev/QN11GEBDXNBVx8446zPCmkfJc/T8YVb1ZqIB1bWiOFYEVvwiyS+DjchMENeiB54//F5Kjc1A=
+	t=1743527182; cv=none; b=IOOPMIvui9K1jaePrOZRcKvMBqFLin14HPophRLfUGRu/L/CV42H48L0B5AnHH5NdjXRJrKDlOsZK7Ulm4U+78/de3mlMkXlIZ4Gz35quDJeqagpV8X+JI4DXavAv5xiZ07yTqlJBrbadQHd7ZezKkL+zb7Zrw+NTPFLVim6Xas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743527175; c=relaxed/simple;
-	bh=/ojOGjSENscu9Pb3+EYr5PYhSwGXxXZJjaejcHeP+sw=;
+	s=arc-20240116; t=1743527182; c=relaxed/simple;
+	bh=oa79efjOKM9SRXURi1BaVT0pmfHaFaEt9V3KsZ4Q6nM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=J9PjM+lNQRv+XlXO0HJbYVR2SMlhySl51AI25wGYytHnhzdUVNhi2j3T1ir/ubQfVeEM0W8Tvt/hiWYj+OV9cY5MIw0108LRHSKIZzETmq1IzSMIPwU/KkYtMRsYOdAXBnh6PbsynoxKyy+/eZOVzBljB5ATxiLDsUvAVsI4zIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S6xiP5HE; arc=none smtp.client-ip=209.85.214.172
+	 MIME-Version; b=A5rLFYq2c1GAFL5f8xUXHx0EGZd5bXuDsqq2nCFFZR/qKZFoajAWyWTqSMfxPg6ueH1wwXOw2KWv/j6gPXGxIyDeRFBDRLCFXxovQgxfyNCYwcwlKo3dwidnvU1jjLqeG1GNmJbAcC/ok2gLqIkG1EmvPwjzY93dr6rvCaIDHY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dYNLkqgL; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-227aaa82fafso113042265ad.2
-        for <kvm@vger.kernel.org>; Tue, 01 Apr 2025 10:06:14 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-22548a28d0cso156830345ad.3
+        for <kvm@vger.kernel.org>; Tue, 01 Apr 2025 10:06:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743527173; x=1744131973; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1743527180; x=1744131980; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KDtkvMqdi74R/fuGRWaxI6Vx86s77IjYzoT0QepjNQ0=;
-        b=S6xiP5HEq8apTva9FNYjO9i7twUf7S/Kvzpc0PE2T+IvpJPtj/7cTUBMoh53vimGfR
-         kQWPId2cBItBLrtXblAUkA6odn+QkexcgRWdMWIarS1HpX/118mq4A+H3lPPaDZU2xVM
-         L9jXbkscZLo4OJzq+FOFO1hp+G3B1lWzndyznvgl7VW8hHaM44X7CAs7x00nEAuGE9D7
-         A1PzxbQ4Qdd5kQq843ryfsBLnn5ErEeyWmjTIBKILPnpT7CUFecr1zUIOXwNVBUWp4Xh
-         4UOhInsGeqD+9Qz2pLXv1iCT/I1as6pAdYbHbvbYwMvD8A70RlBmmgC+jQodpKP21KxH
-         oCTQ==
+        bh=FqoSwIUEkmAFZzDF1jp7biKBQ9RqCAjci7v8QaNjgL0=;
+        b=dYNLkqgLxq6iyQGBDVRkVtH11w/to2SlOE4LjkFa9YMY9w/Q+7u4mdfgUurxElZg24
+         C+bHTIBXupOpRBsuJbRN+JrkjJKdpYQR3oUrMXyIoFBfjMSJ31POn3UYBrS0pvMZmy3/
+         keuAky+yxse1HhUyhwkQ6OSr2kNkxRP++ezZ/yyHb2VU2HovF+0n65gNUDwfoC2KBs12
+         VZOihX5hrVMJQi6ZLxU33VbXc3DFeHTz2jzFUy2ZHhO3X65vYxZOu7Ut4TxJQIjOvwMm
+         h2YqPDKUsbQEKwfFZV2r7aFU3SjTfhRvjgBBHF9MuEYWn9Jb5VR2iddntlyTmyz5WR/G
+         1YtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743527173; x=1744131973;
+        d=1e100.net; s=20230601; t=1743527180; x=1744131980;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KDtkvMqdi74R/fuGRWaxI6Vx86s77IjYzoT0QepjNQ0=;
-        b=IHKfC4p/tzcY+TUP2iY+PPyKq2cf9ZHY9ywzLbDL+5bEHl25YsA0mUuJKAWeJdymTn
-         C/S5xl3KrXmnXy1qCQQx5r0rE/9Buvm1toQMRJSyIOFpNsffPZ1c8HhTjGV7aU2B5YiM
-         4ZMs3pB7oYqShRMntMZz1Shqa4nn3s6LG1hadOqA7ZaZvT+j47sAVDgxFjhPZCPx2X9A
-         XqfCf/KbtYdfd9cBCHE5Zu3iJslLY6KYoSLGH7zInh41WKU0qv5uzXG3uCUvKUF8fpHO
-         OPyvx9XfzEjP/1rBjZfpwq3FifoJLwgcaEGSt7N5xUPpe6zuMnOdvG9D15eVqf7a7NBo
-         xsUg==
-X-Forwarded-Encrypted: i=1; AJvYcCUrDpDLIuYJxKHSU2XVnY3OndUmzOxCI6bTYvbi1IQwBq9zN4J159MfV6him68PkiLCXJI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKq7kZYlwjblCxp2/240pnCKttGoGIml2EE6WHtSuLpPGvI8qa
-	F85HCATMCUaJ0aSXZ57SIrNsM+mR6+QDA52krKdkUxQtSe931PMm
-X-Gm-Gg: ASbGncspSxjd2EL5+B76XddGJu+jSjhXESTi3N8A13ZHepA8YDGJQO3Pxna0NZWCBH9
-	3zNOzuEwkdZYNvHmm9vLRNvnmQ+3OWLAARzCCVWball+OYDDAItsiAUEz0xb6PXF9mBw+GD760G
-	LWCiHodUiXn5VO0Ft3hGy26MU2mXRQxzkD+BJVVxK44UTenPlS35jKer+Cp/68RxHNJ/4DjVQgl
-	OB0vtFeMnGGq9XnPZ/4M5mpt/e5XqWCSOD4kLScuPVa6GmvOgLpfG2jYi8OJzv2KJipsCQ2Hz90
-	xjXIIpiqqUR35SCKL2V1Z9val0SncuJopzgzGY+r
-X-Google-Smtp-Source: AGHT+IGVQaPozKtnYFtEaxGdcDkcmfSHjENYsZlMxOjS55uxLWGM2YiQ/vVbzslmIBGst/k5j79maA==
-X-Received: by 2002:a05:6a00:3a13:b0:736:491b:536d with SMTP id d2e1a72fcca58-7398046fe65mr22142417b3a.20.1743527173462;
-        Tue, 01 Apr 2025 10:06:13 -0700 (PDT)
+        bh=FqoSwIUEkmAFZzDF1jp7biKBQ9RqCAjci7v8QaNjgL0=;
+        b=at0mhmDVAsV6yknoDoVKOZpwherOK4loC+JveGgJ5r6SC4Kea8hP2qNR58sr8QIlV0
+         MGeJnHvqKJjoo3B+urBOem7VhZ2DKW/8HcCsNpYivAc6vaAi7qIo2xoSeM/O4PosTckp
+         htfWjti7/AFBXV37VX3JyeQQmUxFEQ1ighJr/7CQNYmHe+o341qtki0wM//dhfbaObUo
+         OGoJvvq6Ix1b4/S20bNmqGXqj35E0JIqu96VMDieYR9v/+YdliGfThb74/s96alg4sNK
+         yreqdUrEsrwqCiMA/wM0hthPDkWvuDngUf1b7kXEpdoNilca4p5mn9NspU2wnQBY97IC
+         /iyA==
+X-Forwarded-Encrypted: i=1; AJvYcCUu3R4JGUJjWU0mYvkyEIOUKW+PSqqGcf69FRUvuJiBVw0bH81KiUssp5m1kHqz9MCchzc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyApdnX/5AiyABK3KFcow20Y8Q1vrUWStYAln2gvl65oziau7+5
+	kCC2bAb3n5jocJHk8CfSs0vywND72NcQRxlpOcf/RLrf6WoO0nXwB3t5AA==
+X-Gm-Gg: ASbGncuFFtBFZT5Z7/MhJU6aVX9vBywAxsbpmyHf2OlA+L+0VTBLCNmyVAnIlVNNW6o
+	gX26MVoL2o7Y/soiV5zmdF4uBBcPMG6a/Aj0/oDWCny/uEpfIPdVc2OR0b6/qoRwZeT6VWsY2HH
+	YA/mnTG5wOKe+S3ZEyyleL8fmzSH6tl3LpH2SpDMWcJFhkDKmEYLoX3QXylf1iCaU9G93JCdm62
+	Cd/1yl18cjnZWDZHR0Z+oR8I+qrdjtRjMCxCp1FOcKN2BK9oyfaYuvcK6+XPWzhP0j8DLVbnp6e
+	bnUR1mvyUW7pLYx2bYzj5yO0Ms3Nrc6mT6CM97W8
+X-Google-Smtp-Source: AGHT+IHMLcW/UgSU+B9QLYjzegvhSUSQLiYd7WdSUYNTNPJYM4iVdsXCx+9AUOlAl0q1OhIHYB2AXw==
+X-Received: by 2002:a17:902:f544:b0:21f:6bda:e492 with SMTP id d9443c01a7336-2292f9ee9e8mr226767855ad.35.1743527180233;
+        Tue, 01 Apr 2025 10:06:20 -0700 (PDT)
 Received: from raj.. ([103.48.69.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7398cd1cc3dsm5902926b3a.80.2025.04.01.10.06.08
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7398cd1cc3dsm5902926b3a.80.2025.04.01.10.06.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Apr 2025 10:06:13 -0700 (PDT)
+        Tue, 01 Apr 2025 10:06:19 -0700 (PDT)
 From: Yuvraj Sakshith <yuvraj.kernel@gmail.com>
 To: kvmarm@lists.linux.dev,
 	op-tee@lists.trustedfirmware.org,
@@ -91,9 +91,9 @@ Cc: maz@kernel.org,
 	pbonzini@redhat.com,
 	praan@google.com,
 	Yuvraj Sakshith <yuvraj.kernel@gmail.com>
-Subject: [RFC PATCH 4/7] KVM: arm64: Forward guest CPU state to TEE mediator on SMC trap
-Date: Tue,  1 Apr 2025 22:35:24 +0530
-Message-ID: <20250401170527.344092-5-yuvraj.kernel@gmail.com>
+Subject: [RFC PATCH 5/7] tee: optee: Add OPTEE_SMC_VM_CREATED and OPTEE_SMC_VM_DESTROYED
+Date: Tue,  1 Apr 2025 22:35:25 +0530
+Message-ID: <20250401170527.344092-6-yuvraj.kernel@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250401170527.344092-1-yuvraj.kernel@gmail.com>
 References: <20250401170527.344092-1-yuvraj.kernel@gmail.com>
@@ -105,56 +105,80 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When guest makes an SMC, the call is denied by the hypervisor
-and not handled (ignored). In the presence of the TEE Mediator
-module, the SMC from guest is forwarded with it's vCPU register
-state through tee_mediator_forward_request().
+OP-TEE when compiled with NS-Virtualization support expects NS-Hypervisor
+to notify events such as guest creation and destruction through SMCs.
+
+This change adds two macros OPTEE_SMC_VM_CREATED and OPTEE_SMC_VM_DESTROYED.
 
 Signed-off-by: Yuvraj Sakshith <yuvraj.kernel@gmail.com>
 ---
- arch/arm64/kvm/hypercalls.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+ drivers/tee/optee/optee_smc.h | 53 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 53 insertions(+)
 
-diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index 569941eeb3fe..cb34bb87188c 100644
---- a/arch/arm64/kvm/hypercalls.c
-+++ b/arch/arm64/kvm/hypercalls.c
-@@ -3,6 +3,7 @@
+diff --git a/drivers/tee/optee/optee_smc.h b/drivers/tee/optee/optee_smc.h
+index 879426300821..988539b2407b 100644
+--- a/drivers/tee/optee/optee_smc.h
++++ b/drivers/tee/optee/optee_smc.h
+@@ -452,6 +452,59 @@ struct optee_smc_disable_shm_cache_result {
+ /* See OPTEE_SMC_CALL_WITH_REGD_ARG above */
+ #define OPTEE_SMC_FUNCID_CALL_WITH_REGD_ARG	19
  
- #include <linux/arm-smccc.h>
- #include <linux/kvm_host.h>
-+#include <linux/tee_mediator.h>
- 
- #include <asm/kvm_emulate.h>
- 
-@@ -90,7 +91,10 @@ static bool kvm_smccc_default_allowed(u32 func_id)
- 		 */
- 		if (func_id >= KVM_PSCI_FN(0) && func_id <= KVM_PSCI_FN(3))
- 			return true;
--
-+#ifdef CONFIG_TEE_MEDIATOR
-+		if (ARM_SMCCC_IS_OWNER_TRUSTED_APP(func_id) || ARM_SMCCC_IS_OWNER_TRUSTED_OS(func_id))
-+			return true;
-+#endif
- 		return false;
- 	}
- }
-@@ -284,7 +288,14 @@ int kvm_smccc_call_handler(struct kvm_vcpu *vcpu)
- 		WARN_RATELIMIT(1, "Unhandled SMCCC filter action: %d\n", action);
- 		goto out;
- 	}
--
-+#ifdef CONFIG_TEE_MEDIATOR
-+	if (ARM_SMCCC_IS_OWNER_TRUSTED_APP(func_id) || ARM_SMCCC_IS_OWNER_TRUSTED_OS(func_id)) {
-+		if (tee_mediator_is_active()) {
-+			tee_mediator_forward_request(vcpu);
-+			return 1;
-+		}
-+	}
-+#endif
- 	switch (func_id) {
- 	case ARM_SMCCC_VERSION_FUNC_ID:
- 		val[0] = ARM_SMCCC_VERSION_1_1;
++/*
++ * Inform OP-TEE about a new virtual machine
++ *
++ * Hypervisor issues this call during virtual machine (guest) creation.
++ * OP-TEE records client id of new virtual machine and prepares
++ * to receive requests from it. This call is available only if OP-TEE
++ * was built with virtualization support.
++ *
++ * Call requests usage:
++ * a0	SMC Function ID, OPTEE_SMC_VM_CREATED
++ * a1	Hypervisor Client ID of newly created virtual machine
++ * a2-6 Not used
++ * a7	Hypervisor Client ID register. Must be 0, because only hypervisor
++ *      can issue this call
++ *
++ * Normal return register usage:
++ * a0	OPTEE_SMC_RETURN_OK
++ * a1-7	Preserved
++ *
++ * Error return:
++ * a0	OPTEE_SMC_RETURN_ENOTAVAIL	OP-TEE have no resources for
++ *					another VM
++ * a1-7	Preserved
++ *
++ */
++#define OPTEE_SMC_FUNCID_VM_CREATED		13
++#define OPTEE_SMC_VM_CREATED \
++	OPTEE_SMC_FAST_CALL_VAL(OPTEE_SMC_FUNCID_VM_CREATED)
++
++/*
++ * Inform OP-TEE about shutdown of a virtual machine
++ *
++ * Hypervisor issues this call during virtual machine (guest) destruction.
++ * OP-TEE will clean up all resources associated with this VM. This call is
++ * available only if OP-TEE was built with virtualization support.
++ *
++ * Call requests usage:
++ * a0	SMC Function ID, OPTEE_SMC_VM_DESTROYED
++ * a1	Hypervisor Client ID of virtual machine being shut down
++ * a2-6 Not used
++ * a7	Hypervisor Client ID register. Must be 0, because only hypervisor
++ *      can issue this call
++ *
++ * Normal return register usage:
++ * a0	OPTEE_SMC_RETURN_OK
++ * a1-7	Preserved
++ *
++ */
++
++#define OPTEE_SMC_FUNCID_VM_DESTROYED	14
++#define OPTEE_SMC_VM_DESTROYED \
++	OPTEE_SMC_FAST_CALL_VAL(OPTEE_SMC_FUNCID_VM_DESTROYED)
++
+ /*
+  * Resume from RPC (for example after processing a foreign interrupt)
+  *
 -- 
 2.43.0
 
