@@ -1,84 +1,87 @@
-Return-Path: <kvm+bounces-42292-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42293-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CBE6A77526
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 09:24:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 008BEA77532
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 09:27:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4C027A332F
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 07:23:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34197188A70F
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 07:27:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A387D1E7C32;
-	Tue,  1 Apr 2025 07:24:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73E741E7C2F;
+	Tue,  1 Apr 2025 07:27:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nuEwIoFy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UQ7aXQG2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96FA31E2606
-	for <kvm@vger.kernel.org>; Tue,  1 Apr 2025 07:24:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F25721E2606
+	for <kvm@vger.kernel.org>; Tue,  1 Apr 2025 07:27:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743492246; cv=none; b=nUg1QYOwi7AzdIXsm1gmFhK2UgNL1okGZyP1MJro7cvYymwcMTRFCSYkpR7Hb222q+4SjnjMPUs63fsVBTeKzxOBcmRroREv78k1W6KNRbiKXR3G/96AoPv/ooqMVptlDCyMIwEO3G4iU+BxJc9zZX2qvZk03zTkxqBHrflPrKY=
+	t=1743492443; cv=none; b=sxNKUv3u5b6ij17SN79Szerf2yK+sf3a3/xJABdkNDOksL1DGW6VgU1ZX2LG/VSA31F+ZUq6sxFg7Jyi0pyHj1SZszUWsZY/v/GJl5jeto/GEVplcmjZXigPZXMqzEoTtCodm3fhTq7pdKzVNUq7JCDoFbB52Yv2fiEpr3TNINo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743492246; c=relaxed/simple;
-	bh=wteELlvUiRIh8tg8HmF0Q/OW9f+kbkAeNZjA+BLMH2c=;
+	s=arc-20240116; t=1743492443; c=relaxed/simple;
+	bh=P00DF62q0qLd/W0aUFm42eTHI3bD77qudmwGeRB8KZY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NeysY89mlQCkkOaadXpZeC1Jy/yekQ5vcgA8otjc1CXtNgpd6zlSvJUgp7SsZV95Ile5PAXlQfwlHjEWVnkXl/Izzsi2HQSBKQ9dtAl0f0S887HvDa+OnJOJXiIc61yOOXUToWIvnYKMOuO1oXx2EMrrlnC1pM3TghI3PY0J/S4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nuEwIoFy; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2242ac37caeso86965ad.1
-        for <kvm@vger.kernel.org>; Tue, 01 Apr 2025 00:24:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743492245; x=1744097045; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TsyIOn8ZLgt3JXXRxvHc1//6+0zk6fYjlwYFayAxlEM=;
-        b=nuEwIoFyQvP3z74ZZXjZM+8TZ0FanuEjPnuu7xs3VdU2U8AIAabe3wxtpcX7ACwNg0
-         zWuuvy2n/kwKnkv4u7Tk8wsHTi0QLaeVjS94uyc1X5oeYOXUNYzE1hItPaqqWOZ98DfC
-         xrSoBmQw3rZX4igFYm5TrMaAXRYcFj6LfLuwX9QLkeqePUyXNv3dw7EXbUSNqgu98U/J
-         DYOIJfBTBt+6F/ueqp3Ii644m04XdqQBIRwV3gKlPAhBwFMbEauHfkvT5pGsi4mwoVVz
-         pav/ZKVsPTugMN+OXuD0QeTZUM8Ge37IqxJGYOLxXXDwIjZmJwL1X2pBz8CJuikOwfYX
-         aNQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743492245; x=1744097045;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TsyIOn8ZLgt3JXXRxvHc1//6+0zk6fYjlwYFayAxlEM=;
-        b=T6dcu4pAiVBbotax1akyVf2n/CsNcuDLPWly37laltRHySbjco3BjzK3pCwVmYmTbe
-         d9zSrQI8gjtzPWU26bg8mWispCxqgJyKj+wqqzxMxCv2R6Owx3t3A8V1ezpn5mrcYVqT
-         C1oigEKC8aDjONIKnUwdvAi6BUAdFmkzo4WhhfficSoA5uBaDQrZG5BDKEH33Lc/d5f2
-         GQrA3QbM7MY9qNNm6UkFhPLxK2Thwuyv/wiV4/NLG2vVd9GucrToAFmynTAjQH70uO8R
-         PILTiN1x0EQ+LInl/Xr1ZfZIpP3GIN+S8KjdsFBgNZ6d7RYYjO2ycYabcKq8lMDwhn4v
-         bN9Q==
-X-Gm-Message-State: AOJu0YxC37kIO5XY8pQCalfqpWaM3YVMop1lON3b9ZhtjuKIjbBn+sTW
-	38g92btDg+bd8TN2Ug4exh8lKDZFOblXYcsPQneDWM17sqjmNo0Yz/SN16Sft5hTmpjxdBs8Gko
-	X1Q==
-X-Gm-Gg: ASbGncs1PemmAS2wYFIQX1ElGkWz0PDkrkedFhuI/fHnZpvpB1IeSNCpU/klqfUVYdz
-	SO7bnBgOCPVPvKgay8MaZ4m3r4WcoDyY4pzgzS3SJ32EFALEkOZ+LhlHYYwNlTq7+uuFkBeqOKF
-	XrPr4WXW+0Q1azKs4TkAgQOJooXDEPI8K02+XNNSfG77wNMjXhiOWdqUvuvEpxczdglPgwi9y/N
-	LFTN+nPWmDHczGTaZGICMFxxVvlfudJnwFJnVE0SCMpHjRUZinM8gHiiZDefgpY0NB2F8NdYOo8
-	9CshATyIhcuzOJOccWGfT0EnaXr77zmPUGgNhr1n8cPY9cQZAOD7eTId9EVDNRQjo2rP7C7rfhb
-	KRaY=
-X-Google-Smtp-Source: AGHT+IGJUEKyE5W7uWNFNe9WdghG5jnj3vvDLqSpVFfWIy2PMup4kXI+QCDA+dqN041nSrqdQE1iNQ==
-X-Received: by 2002:a17:902:c1d1:b0:216:21cb:2e14 with SMTP id d9443c01a7336-2295d0d88ccmr1285405ad.21.1743492244521;
-        Tue, 01 Apr 2025 00:24:04 -0700 (PDT)
-Received: from google.com (188.152.87.34.bc.googleusercontent.com. [34.87.152.188])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2291eedcedesm81725755ad.67.2025.04.01.00.24.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Apr 2025 00:24:03 -0700 (PDT)
-Date: Tue, 1 Apr 2025 07:23:56 +0000
-From: Pranjal Shrivastava <praan@google.com>
-To: geyifei <geyifei@linux.alibaba.com>
-Cc: kvm@vger.kernel.org
-Subject: Re: subscribe kvm
-Message-ID: <Z-uUjDiOi4hELSEP@google.com>
-References: <5e2893f1-41cf-4d1e-9a04-26d984ff46dd@linux.alibaba.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=RCYAwZGeuj2vrDKpE6XGii+qflS021EKIyTRNPdM5ND3aAvHBWcxq2CgyYMwChHvBOwSNrvd5o4w0vY1Up7OBOz8uR3s5KjgcmeyLP1D92L5DGuljs9nkK3nmW3jAV06NNFNFkMvsjDd4aiScNp9Er13/0NpzOfBTHK1P9/ae9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UQ7aXQG2; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1743492442; x=1775028442;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=P00DF62q0qLd/W0aUFm42eTHI3bD77qudmwGeRB8KZY=;
+  b=UQ7aXQG2ZF4nO1QIA2azl7W0wnLDkHlz9rWzcQbTmkCVmDjyL5aXHGz6
+   rH6cRbE8NMVpAsrEYF1qj5CsnhbeeU6uAFw32Pu/2iOnXwqxWAqgbJuzg
+   dWVOlzxVpk/EqJo8ywodckqR5shDQVlOmhdovAilWf6B41Thi/0eBwyYu
+   4c0bkJtsF3vfBxVoaT3UJKr73toCwtYhn4RDuyTjORq8SSWvwUJJ/loha
+   fLDJcMt7JMlVlhJWH4JKWWGDP+1mCHHqhqvz37Xf6yZ8SA3x8yVyM6lnE
+   oO8WpuQbujR9g35BJP+ex26wHkLFHKL8L5u6yK5AJiLj21sSvu9v2zCpF
+   w==;
+X-CSE-ConnectionGUID: pzIo7aScStuXQJUB92UHcA==
+X-CSE-MsgGUID: DMzyuFbqQvOdqdw/rzfA6g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11390"; a="67275281"
+X-IronPort-AV: E=Sophos;i="6.14,292,1736841600"; 
+   d="scan'208";a="67275281"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2025 00:27:21 -0700
+X-CSE-ConnectionGUID: ZccWOwgLShqWgOHWvps2NA==
+X-CSE-MsgGUID: 4EAw6vdBS0yfQ4s3rR4bKQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,292,1736841600"; 
+   d="scan'208";a="131308361"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
+  by orviesa004.jf.intel.com with ESMTP; 01 Apr 2025 00:27:17 -0700
+Date: Tue, 1 Apr 2025 15:47:36 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Shaoqin Huang <shahuang@redhat.com>, Eric Auger <eauger@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	Sebastian Ott <sebott@redhat.com>, Gavin Shan <gshan@redhat.com>,
+	qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-arm@nongnu.org,
+	Dapeng Mi <dapeng1.mi@intel.com>, Yi Lai <yi1.lai@intel.com>,
+	Zhao Liu <zhao1.liu@intel.com>
+Subject: Re: [RFC v2 1/5] qapi/qom: Introduce kvm-pmu-filter object
+Message-ID: <Z+uaGHiOkFJd6TAO@intel.com>
+References: <20250122090517.294083-1-zhao1.liu@intel.com>
+ <20250122090517.294083-2-zhao1.liu@intel.com>
+ <871pwc3dyw.fsf@pond.sub.org>
+ <Z6SMxlWhHgronott@intel.com>
+ <87h657p8z0.fsf@pond.sub.org>
+ <Z6TH+ZyLg/6pgKId@intel.com>
+ <87v7tlhpqj.fsf@pond.sub.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -87,18 +90,163 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5e2893f1-41cf-4d1e-9a04-26d984ff46dd@linux.alibaba.com>
+In-Reply-To: <87v7tlhpqj.fsf@pond.sub.org>
 
-Hey geyifeim,
-On Tue, Apr 01, 2025 at 03:19:49PM +0800, geyifei wrote:
-> subscribe kvm
+Hi Mrkus,
+
+I'm really sorry I completely missed your reply (and your patient
+advice). It wasn't until I looked back at the lore archives that I
+realized my mistake. Thinking it over again, I see that your reply,
+which I missed, really helped clear up my confusion:
+
+On Fri, Feb 07, 2025 at 02:02:44PM +0100, Markus Armbruster wrote:
+> Date: Fri, 07 Feb 2025 14:02:44 +0100
+> From: Markus Armbruster <armbru@redhat.com>
+> Subject: Re: [RFC v2 1/5] qapi/qom: Introduce kvm-pmu-filter object
 > 
+> Zhao Liu <zhao1.liu@intel.com> writes:
+> 
+> >> Let's ignore how to place it for now, and focus on where we would *like*
+> >> to place it.
+> >> 
+> >> Is it related to anything other than ObjectType / ObjectOptions in the
+> >> QMP reference manual?
+> >
+> > Yes!
+> 
+> Now I'm confused :)
+> 
+> It is related to ObjectType / ObjectType.
+> 
+> Is it related to anything else in the QMP reference manual, and if yes,
+> to what exactly is it related?
 
-I think you're supposed to send an email to:
-kvm+subscribe@vger.kernel.org
+I misunderstood your point. The PMU stuff and the QAPI definitions for
+ObjectType/ObjectOptions are not related. They should belong to separate
+categories or sections.
 
-for subscribing :)
+> >> I guess qapi/kvm.json is for KVM-specific stuff in general, not just the
+> >> KVM PMU filter.  Should we have a section for accelerator-specific
+> >> stuff, with subsections for the various accelerators?
+> >> 
+> >> [...]
+> >
+> > If we consider the accelerator from a top-down perspective, I understand
+> > that we need to add accelerator.json, kvm.json, and kvm-pmu-filter.json.
+> >
+> > The first two files are just to include subsections without any additional
+> > content. Is this overkill? Could we just add a single kvm-pmu-filter.json
+> > (I also considered this name, thinking that kvm might need to add more
+> > things in the future)?
+> >
+> > Of course, I lack experience with the file organization here. If you think
+> > the three-level sections (accelerator.json, kvm.json, and kvm-pmu-filter.json)
+> > is necessary, I am happy to try this way. :-)
+> 
+> We don't have to create files just to get a desired section structure.
+> 
+> I'll show you how in a jiffie, but before I do that, let me stress: we
+> should figure out what we want *first*, and only then how to get it.
+> So, what section structure would make the most sense for the QMP
+> reference manual?
 
-Best,
-Praan
+Thank you for your patience. I have revisited and carefully considered
+the "QEMU QMP Reference Manual," especially from a reader's perspective.
+Indeed, I agree that, as you mentioned, a three-level directory
+(accelerator - kvm - kvm stuff) is more readable and easier to maintain.
+
+For this question "what we want *first*, and only then how to get it", I
+think my thought is:
+
+First, the structure should be considered, and then the specific content
+can be added. Once the structure is clearly defined, categorizing items
+into their appropriate places becomes a natural process...
+
+Then for this question "what section structure would make the most sense
+for the QMP reference manual?", I understand that a top-down, clearly
+defined hierarchical directory makes the most sense, allowing readers to
+follow the structure to find what they want. Directly adding
+kvm-pmu-filter.json or kvm.json would disrupt the entire structure, because
+KVM is just one of the accelerators supported by QEMU. Using "accelerator"
+as the entry point for the documentation, similar to the "accel" directory
+in QEMU's source code, would make indexing more convenient.
+
+> A few hints on how...
+> 
+> Consider how qapi/block.json includes qapi/block-core.json:
+> 
+>     ##
+>     # = Block devices
+>     ##
+> 
+>     { 'include': 'block-core.json' }
+> 
+>     ##
+>     # == Additional block stuff (VM related)
+>     ##
+> 
+> block-core.json starts with
+> 
+>     ##
+>     # == Block core (VM unrelated)
+>     ##
+> 
+> Together, this produces this section structure
+> 
+>     = Block devices
+>     == 
+>     ##
+> 
+> Together, this produces this section structure
+> 
+>     = Block devices
+>     == Block core (VM unrelated)
+>     == Additional block stuff (VM related)
+> 
+> Note that qapi/block-core.json isn't included anywhere else.
+> qapi/qapi-schema.json advises:
+> 
+>     # Documentation generated with qapi-gen.py is in source order, with
+>     # included sub-schemas inserted at the first include directive
+>     # (subsequent include directives have no effect).  To get a sane and
+>     # stable order, it's best to include each sub-schema just once, or
+>     # include it first right here.
+
+Thank you very much!!
+
+Based on your inspiration, I think the ideal section structure for my
+issue could be:
+
+    = accelerator
+    == KVM
+    === PMU
+
+Firstly, I should have a new accelerator.json () to include KVM stuff:
+
+    ##
+    # = Accelerator
+    ##
+
+    { 'include': 'kvm.json' }
+
+Next, in kvm.json, I could organize stuffs like:
+
+    ##
+    # == KVM
+    ##
+
+    ##
+    # === PMU stuff
+    ##
+
+    ... (the below are my current QPAI definitions.)
+
+Is such a structure reasonable?
+
+Thank you again for your guidance!
+
+Regards,
+Zhao
+
+
 
