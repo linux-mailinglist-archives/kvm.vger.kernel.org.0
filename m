@@ -1,190 +1,164 @@
-Return-Path: <kvm+bounces-42331-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42332-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB331A77FA6
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 17:58:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76064A77FC8
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 18:04:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F30DA16D5C2
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 15:58:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1ED1F16A788
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 16:03:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F54820C482;
-	Tue,  1 Apr 2025 15:57:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03B33205512;
+	Tue,  1 Apr 2025 16:03:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VeqA0S6S"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="VAWPmv2v"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CEAC20DD47
-	for <kvm@vger.kernel.org>; Tue,  1 Apr 2025 15:57:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FF53207E17
+	for <kvm@vger.kernel.org>; Tue,  1 Apr 2025 16:03:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743523043; cv=none; b=bAIpH3Tgms7TI1Ii2IhzF790cy2PoiGJuZkrWewVnu8LZZrVQwAibk0gKc8ApRj65ILNWZTsl131cErB6Q6rPCYdEZu0DSXirWeHP/ge4mJDR7l6H4WWDOY8ZXV5SQ93kCa7ZqDQ5HT++hitPNpg5OilRM+MDhI0sAC76XMPi1E=
+	t=1743523425; cv=none; b=AGgWRhG4H6vVMlHXdD7wi3bzGBrRr9/x92DAULMOssKhf/F5lrj7IYNQXNhcrUVnt+sO1VbWDPL2FGOxLiot8WB1H0NOzxat0niEq5uQKcmTSYQUjyvSAwgs2jPUe+9nrh7FeFIl8ohTE9Ii29gfP6QDQPmrq2RoUED14FDzVrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743523043; c=relaxed/simple;
-	bh=9xW9GrSKCT/xwLFYa59X9SWljYJetUhynN30KptsTI4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ArqPyeb9eW/Q5TnnGcj7kyvbQI8Hw8fsNrmXbEFOiVv0QREPMpZBltGYi5/z2oKi6rP6xPcE5oucigoLTSvs+BLB0fJBVqAaZjmNpsMrJVf2ta1Hot0sRSMArgICzdr/sPbKwjIBFHiJ+rSN+SricrrDsSKn1t+BBqRO84MMpcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VeqA0S6S; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-225ab228a37so101340285ad.2
-        for <kvm@vger.kernel.org>; Tue, 01 Apr 2025 08:57:22 -0700 (PDT)
+	s=arc-20240116; t=1743523425; c=relaxed/simple;
+	bh=xnUsRAnCTM6iow/f/UCejEdDYoiWEl5F6w3kOCDrBoU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cFt/JWTEJrqCLR9eXwqAklRaNQzo37WsWPGfBwNuv7gBemRuLmHK/gCtVUltCeUA2XMB639ESvrSTk206+b0s5xSwSlY+EA2qIVRbYlXxTET3unutR2F6DfLPBsS+Q5ECdZifwcLAC97VYqlVXt7nTAzn97ZVhwgfTmkk0ryPh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=VAWPmv2v; arc=none smtp.client-ip=209.85.222.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7c5b8d13f73so604308385a.0
+        for <kvm@vger.kernel.org>; Tue, 01 Apr 2025 09:03:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743523041; x=1744127841; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=OcWZ8FomvSCbpj1QhcSsf3iHQ4ToTVlAqE/iZm3XJpQ=;
-        b=VeqA0S6SCrWkkrdcdFt3WlTvC+rz5BGjdUxqJfeRjoOkC/0FG6k6UZ2n30Ebu8wa0V
-         N5iyLrEK4DpyIVTKRXNt9mnI1sr06sZGUcPBgoyjZvXcyks+WT0LTgNoS15vgB7vIX8z
-         2lVtuvxvEVnBVvVQo+vUk+cF+OaC2MbvnQNsd1Tkt3goB2BoWLwBtMvKWxc47G+GmXTd
-         sZofK4erYCdQ86CvkiWraHHE34rAYC8x7RUxSj/dmCIOg3yC0PM/B8yvexVixzao9VAh
-         HguZfbRGrFpSBeiPT+3FfzEItHvJ5Umx9rqHwmEREuavj9pW0dzYOwuVY24Cn03uXfmL
-         He9w==
+        d=ziepe.ca; s=google; t=1743523422; x=1744128222; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HUIWAEN6Qyb8+Hz58OV+4wJouq5dad93BnZ8Do0foZI=;
+        b=VAWPmv2vgdrgIZYQ+IyU5bPlsVeKFD8gZ1OyyuWhpXZg+GVLGzCoZV+rpDPC9KYwsj
+         eG8Hkgj+vKSC4Efpo6oLrgBcs06tFYEYGMYoGFzyiVCyuYJAZzloRsYqtWUFAVRoiu5p
+         UvBkkCsBPfX2zfz0UdP+0+h/GaNkbPSupRBY3gFWf1/dnmVx28rTHPb9+l4KcuKiyxab
+         s5amtKNg8muf/FpVkWwJifWQa4cpZybl1Z6l/mZih1fZ8eX2h5O/le7dfsytwOl3IVBN
+         Zl4WI5kg/nStRH9f9pPMlPtUiLi6IhA5iuHYC+49a3UlL/gervngmrw2l00kT77FmqYP
+         MbeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743523041; x=1744127841;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OcWZ8FomvSCbpj1QhcSsf3iHQ4ToTVlAqE/iZm3XJpQ=;
-        b=Q0/L7xa0lfL8UlcRV6enfxcVhFElcWbhkP+L/vW+HU5u1oJuqVEDLBkf4kIME9dXWi
-         h40gMg1Vtpv3bbiXYhLUzvwJ+sjhW/3TmLRzFKv0R1cuadBO+6YI4VlSeoAv53OXvvYh
-         bgavAtSad+XpbC6466f4kcnTtKi9bLh36g5h9+WegyM2HmBgbz3eNzF/vxk/GK4YSWnH
-         hFwTdpgSCabNcAko4wg4DWQz7H1x9+XXF2EYyGwmRJPvz+jwOkenPiBKIgPrls0R/kcU
-         z4UdFg9zEAy0aaixAAQ6hvhlfNMVjnCJn7r2g9VomAwWZpDdRL+jaiARUpbWoYXDS2Zi
-         s5PQ==
-X-Gm-Message-State: AOJu0YylNWY4R/mdFEESQqObMC/cLFOl/+4xHNaHQbo8leeKnPBwFfmt
-	jqpQ8LxndZI+/JTpHUam6SL8x2hUHqz4kdMx8yXdVpDI8gGE35MjOMXxxURM+LcpqDvveAhpCKl
-	uwA==
-X-Google-Smtp-Source: AGHT+IHu9Zv08nz2HYgQrk1iOQEUOZWiNQiFOu+C1kdTrpqwaD1bTf9yPuSC+oGjaWR9wby7kt+YZPyycSE=
-X-Received: from pfbli7.prod.google.com ([2002:a05:6a00:7187:b0:736:a983:dc43])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:aa7:88c9:0:b0:736:34ff:be7
- with SMTP id d2e1a72fcca58-7398044e159mr16761821b3a.15.1743523041623; Tue, 01
- Apr 2025 08:57:21 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  1 Apr 2025 08:57:14 -0700
-In-Reply-To: <20250401155714.838398-1-seanjc@google.com>
+        d=1e100.net; s=20230601; t=1743523422; x=1744128222;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HUIWAEN6Qyb8+Hz58OV+4wJouq5dad93BnZ8Do0foZI=;
+        b=Cq/l3kH7aX/ObduW1Eevaze4Ve9Otjkn7KAIgdlflyJActaSypiNxWFXbD9hvCR3rb
+         sSGryDat0f5dzrDm6a2tNd6tAhu/QHTl/njwZTx13qbKktX/d0DvPmzfhpoc+K/+zjF4
+         7J/Q+3onR075Bdm22/fqsgpBc3jj7N0s1/3q60zE77EQU7x2oPQslpaMZZaVSNghu+fN
+         TqXqv9f90xyWLbCoo2m6+s+dlDg4ilSpnTcp7kMSbuJxyjLk6nxvKozrnE9+q/bs0uJA
+         MNFoZ+4XSMYNzE9yG/JGuiISo4LWLW25t08Qi0CkT5TyAYunCbkjIwVdVtZsnb2/cwVi
+         X3fg==
+X-Forwarded-Encrypted: i=1; AJvYcCU7jr2Uzfj+h02O6li5RsQ+GmLdjC3R216HTylU7wUWMzzDKSPGnAytZWm3rIkXFqQ8hQ0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9tqw1nn7t0wcewNb4WL2hcLpb7eJ8H6Mt3W3LE35mGA4OI57Z
+	BOmUK5F1lDcKZr5AN01Hsj7OftAN1BPjRdf8UrgsPS2Yl2yxer9wWrA2Rpf0SLw=
+X-Gm-Gg: ASbGncsLWjdWla1XWCiyJV1Iw8dYoTRuCgvnq6t2bFC6jN56uOkzhH3fF6Xft8X/niM
+	ts7ec+xrVqtEvPFKrfYxHqjH8tF1ucPzYIQOyyytEqF5wNG7CaICnbJbJDb3O2LQp0oyMtdSloG
+	z1SfLce7Gv+klgmp/1WkYOjp16hfbPABLrqLFQpgZHbxeM4keI9Fc0Feyr9fY7gqF2IqUTq/Uwc
+	lm/evIyj4JhWnXxNM5vFUyiUmvujvlsVri7Nnfnx7WsblEB/8mQhuNxalXxWg/XFl/lUVaiIiaH
+	ugOFE14J/hbQv9c0UmpF2SD3gnpcpuK9VQqWziQ8Cw0uRwSc3rSv8mbNpIvy8I2/WlFGLzornXd
+	fhNvmp5GFGH+mIoV8+hgJEX7GFevuhTSmRQ==
+X-Google-Smtp-Source: AGHT+IEK38CnaMLkGKnp6wFhyTba4uVPU2YkYY6SqmlutfADek1SIeamjKZM91laT+FptTnOqcHgWw==
+X-Received: by 2002:a05:620a:2551:b0:7c5:6045:beb7 with SMTP id af79cd13be357-7c69072c8b5mr2068616685a.32.1743523422038;
+        Tue, 01 Apr 2025 09:03:42 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-167-219-86.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.219.86])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c5f77802c0sm673482385a.104.2025.04.01.09.03.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Apr 2025 09:03:41 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1tze5U-00000001MIe-3oUm;
+	Tue, 01 Apr 2025 13:03:40 -0300
+Date: Tue, 1 Apr 2025 13:03:40 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
+Cc: Alexey Kardashevskiy <aik@amd.com>, x86@kernel.org, kvm@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-arch@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>,
+	Joao Martins <joao.m.martins@oracle.com>,
+	Nicolin Chen <nicolinc@nvidia.com>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Steve Sistare <steven.sistare@oracle.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
+	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
+	Zhi Wang <zhiw@nvidia.com>, AXu Yilun <yilun.xu@linux.intel.com>
+Subject: Re: [RFC PATCH v2 14/22] iommufd: Add TIO calls
+Message-ID: <20250401160340.GK186258@ziepe.ca>
+References: <20250218111017.491719-1-aik@amd.com>
+ <20250218111017.491719-15-aik@amd.com>
+ <yq5av7rt7mix.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250401155714.838398-1-seanjc@google.com>
-X-Mailer: git-send-email 2.49.0.472.ge94155a9ec-goog
-Message-ID: <20250401155714.838398-4-seanjc@google.com>
-Subject: [PATCH v2 3/3] KVM: x86/mmu: Defer allocation of shadow MMU's hashed
- page list
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Vipin Sharma <vipinsh@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <yq5av7rt7mix.fsf@kernel.org>
 
-When the TDP MMU is enabled, i.e. when the shadow MMU isn't used until a
-nested TDP VM is run, defer allocation of the array of hashed lists used
-to track shadow MMU pages until the first shadow root is allocated.
+On Fri, Mar 28, 2025 at 10:57:18AM +0530, Aneesh Kumar K.V wrote:
+> > +int iommufd_vdevice_tsm_bind_ioctl(struct iommufd_ucmd *ucmd)
+> > +{
+> > +	struct iommu_vdevice_tsm_bind *cmd = ucmd->cmd;
+> > +	struct iommufd_viommu *viommu;
+> > +	struct iommufd_vdevice *vdev;
+> > +	struct iommufd_device *idev;
+> > +	struct tsm_tdi *tdi;
+> > +	int rc = 0;
+> > +
+> > +	viommu = iommufd_get_viommu(ucmd, cmd->viommu_id);
+> > +	if (IS_ERR(viommu))
+> > +		return PTR_ERR(viommu);
+> >
+> 
+> Would this require an IOMMU_HWPT_ALLOC_NEST_PARENT page table
+> allocation?
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu/mmu.c | 40 ++++++++++++++++++++++++++++++----------
- 1 file changed, 30 insertions(+), 10 deletions(-)
+Probably. That flag is what forces a S2 page table.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 6b9c72405860..213009cdba15 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1982,14 +1982,25 @@ static bool sp_has_gptes(struct kvm_mmu_page *sp)
- 	return true;
- }
- 
-+static __ro_after_init HLIST_HEAD(empty_page_hash);
-+
-+static struct hlist_head *kvm_get_mmu_page_hash(struct kvm *kvm, gfn_t gfn)
-+{
-+	struct hlist_head *page_hash = READ_ONCE(kvm->arch.mmu_page_hash);
-+
-+	if (!page_hash)
-+		return &empty_page_hash;
-+
-+	return &page_hash[kvm_page_table_hashfn(gfn)];
-+}
-+
- #define for_each_valid_sp(_kvm, _sp, _list)				\
- 	hlist_for_each_entry(_sp, _list, hash_link)			\
- 		if (is_obsolete_sp((_kvm), (_sp))) {			\
- 		} else
- 
- #define for_each_gfn_valid_sp_with_gptes(_kvm, _sp, _gfn)		\
--	for_each_valid_sp(_kvm, _sp,					\
--	  &(_kvm)->arch.mmu_page_hash[kvm_page_table_hashfn(_gfn)])	\
-+	for_each_valid_sp(_kvm, _sp, kvm_get_mmu_page_hash(_kvm, _gfn))	\
- 		if ((_sp)->gfn != (_gfn) || !sp_has_gptes(_sp)) {} else
- 
- static bool kvm_sync_page_check(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
-@@ -2357,6 +2368,7 @@ static struct kvm_mmu_page *__kvm_mmu_get_shadow_page(struct kvm *kvm,
- 	struct kvm_mmu_page *sp;
- 	bool created = false;
- 
-+	BUG_ON(!kvm->arch.mmu_page_hash);
- 	sp_list = &kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
- 
- 	sp = kvm_mmu_find_shadow_page(kvm, vcpu, gfn, sp_list, role);
-@@ -3884,11 +3896,14 @@ static int kvm_mmu_alloc_page_hash(struct kvm *kvm)
- {
- 	typeof(kvm->arch.mmu_page_hash) h;
- 
-+	if (kvm->arch.mmu_page_hash)
-+		return 0;
-+
- 	h = kcalloc(KVM_NUM_MMU_PAGES, sizeof(*h), GFP_KERNEL_ACCOUNT);
- 	if (!h)
- 		return -ENOMEM;
- 
--	kvm->arch.mmu_page_hash = h;
-+	WRITE_ONCE(kvm->arch.mmu_page_hash, h);
- 	return 0;
- }
- 
-@@ -3911,9 +3926,13 @@ static int mmu_first_shadow_root_alloc(struct kvm *kvm)
- 	if (kvm_shadow_root_allocated(kvm))
- 		goto out_unlock;
- 
-+	r = kvm_mmu_alloc_page_hash(kvm);
-+	if (r)
-+		goto out_unlock;
-+
- 	/*
--	 * Check if anything actually needs to be allocated, e.g. all metadata
--	 * will be allocated upfront if TDP is disabled.
-+	 * Check if memslot metadata actually needs to be allocated, e.g. all
-+	 * metadata will be allocated upfront if TDP is disabled.
- 	 */
- 	if (kvm_memslots_have_rmaps(kvm) &&
- 	    kvm_page_track_write_tracking_enabled(kvm))
-@@ -6694,12 +6713,13 @@ int kvm_mmu_init_vm(struct kvm *kvm)
- 	INIT_LIST_HEAD(&kvm->arch.possible_nx_huge_pages);
- 	spin_lock_init(&kvm->arch.mmu_unsync_pages_lock);
- 
--	r = kvm_mmu_alloc_page_hash(kvm);
--	if (r)
--		return r;
--
--	if (tdp_mmu_enabled)
-+	if (tdp_mmu_enabled) {
- 		kvm_mmu_init_tdp_mmu(kvm);
-+	} else {
-+		r = kvm_mmu_alloc_page_hash(kvm);
-+		if (r)
-+			return r;
-+	}
- 
- 	kvm->arch.split_page_header_cache.kmem_cache = mmu_page_header_cache;
- 	kvm->arch.split_page_header_cache.gfp_zero = __GFP_ZERO;
--- 
-2.49.0.472.ge94155a9ec-goog
+> How would this work in cases where there's no need to set up Stage 1
+> IOMMU tables?
 
+Either attach the raw HWPT of the IOMMU_HWPT_ALLOC_NEST_PARENT or:
+
+> Alternatively, should we allocate an IOMMU_HWPT_ALLOC_NEST_PARENT with a
+> Stage 1 disabled translation config? (In the ARM case, this could mean
+> marking STE entries as Stage 1 bypass and Stage 2 translate.)
+
+For arm you mean IOMMU_HWPT_DATA_ARM_SMMUV3.. But yes, this can work
+too and is mandatory if you want the various viommu linked features to
+work.
+
+> Also, if a particular setup doesn't require creating IOMMU
+> entries because the entire guest RAM is identity-mapped in the IOMMU, do
+> we still need to make tsm_tdi_bind use this abstraction in iommufd?
+
+Even if the viommu will not be exposed to the guest I'm expecting that
+iommufd will have a viommu object, just not use various features. We
+are using viommu as the handle for the KVM, vmid and other things that
+are likely important here.
+
+Jason
 
