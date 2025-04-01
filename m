@@ -1,119 +1,187 @@
-Return-Path: <kvm+bounces-42282-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42288-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3172DA7723A
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 03:09:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFD06A77426
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 07:52:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 68B511886D2F
-	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 01:10:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D9D1165567
+	for <lists+kvm@lfdr.de>; Tue,  1 Apr 2025 05:52:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9C4415B135;
-	Tue,  1 Apr 2025 01:09:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ce0nhRfs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D51D192598;
+	Tue,  1 Apr 2025 05:52:31 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [61.152.208.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F23FD3595D;
-	Tue,  1 Apr 2025 01:09:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89D3742052
+	for <kvm@vger.kernel.org>; Tue,  1 Apr 2025 05:52:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.152.208.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743469771; cv=none; b=uK4+O16uJDGrjLCVE4zwPpu1nSVSSs8vP+vAI/wDg7G0lnSzXJXHo+6wxBMhcIU7E+fn7aFmbRitH6Tl0b6rpO56GG8t9LoQE1RD3aTsw7b5i6xdnNYfonZVkbJjoQD5EK/tNsBYnAdYEucrG8pYG3HMHl2j+5J740VswEIE0s0=
+	t=1743486750; cv=none; b=tJx+iRHC1BUo0QtlOKlnvp5cKaZeUeNosqnVe1hj8GTkbXV+U/lwo0Gfln7CELhJZs35pvz/Arvob7ak23ENSfChrZ63x8hsMcbwRMaXBNfCj7z9OGUtC8G1qapR5d6w4S++bX7PEWqmCtObnYEJfSU5JJyRByhC4WdKsLQn0mA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743469771; c=relaxed/simple;
-	bh=xnDKz4hdm/kkZqcWSzvYO96l5CqeHbCretys4W9iu2o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JGihU/Z7m0/tO7rJ8ZFFvjo3RML6cRJoR/drLSBkZ6Jj2bq1t8exDUHY17iPyUswYt/u8kgmRo/Ikz76bOzsa7uarfjfNTDHyFGUnom8Li/N3u3FBEi4HQ2jg15tLIyy2wyCskXJxQiU2axPpwOBctliM38vveLhxG5RieF/WNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ce0nhRfs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 978F4C4CEE3;
-	Tue,  1 Apr 2025 01:09:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743469769;
-	bh=xnDKz4hdm/kkZqcWSzvYO96l5CqeHbCretys4W9iu2o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ce0nhRfsh4foP8kliSiSC0eCyy1P530wNZv1yXlz0fhnntdzc2pHj8ehJ73sKloVM
-	 C0cw7cUj+BIc9kmwIU3OVnx2X/5KZolUkXS2nrcBmOD80XEOnwWEu+qaNld4IC1Lbz
-	 ktTwM4BKKx5FIv7O9NfsPq2v7mz23KDqI6mFjPh6003pPohStRGfOcfyHzqdAMOVmD
-	 1gOusmiwUbvZzBP/fZDRftY7IT+SckUkPyIVGM5JFjlw/2fk+9/Ns880REt1nFz5Or
-	 pRuSFvVxXKUnth/AX3auD+qu9VK2N7OyoDzrtCOl5aOlD0WNxZyXTU1dmfK4K2DInq
-	 5BLO5MT41pJgw==
-Date: Mon, 31 Mar 2025 18:09:27 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>, Daniel Gomez <da.gomez@samsung.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>,
-	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH v7 00/17] Provide a new two step DMA mapping API
-Message-ID: <Z-s8x_YyGEYTz8BJ@bombadil.infradead.org>
-References: <cover.1738765879.git.leonro@nvidia.com>
- <20250220124827.GR53094@unreal>
- <1166a5f5-23cc-4cce-ba40-5e10ad2606de@arm.com>
- <20250302085717.GO53094@unreal>
- <e024fe3d-bddf-4006-8535-656fd0a3fada@arm.com>
- <Z+KjVVpPttE3Ci62@ziepe.ca>
- <20250325144158.GA4558@unreal>
+	s=arc-20240116; t=1743486750; c=relaxed/simple;
+	bh=Adtk5Egb+ncfwAKhW4k5FRqk/wZBry6VEy4VKXX/P4o=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
+	 In-Reply-To:Content-Type; b=ZlrIsd9WB+6MRmGi4WAfhvdqoQ6J6Q86yZoLIJJyapO1YbmVgNpbWTDCmx7pD2bsbZsDe2ZjoO1z2An0e1ftgZKCDLXogV4fNl/HiljIgCFpieSz+sOKnrQRBZprD2pYoA2Ds1UgkQt1EcAQLYfCUEri3VhRar+w2LknD3AOVPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=61.152.208.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
+X-ASG-Debug-ID: 1743486736-1eb14e18d900240001-HEqcsx
+Received: from ZXSHMBX1.zhaoxin.com (ZXSHMBX1.zhaoxin.com [10.28.252.163]) by mx2.zhaoxin.com with ESMTP id gP0W5X89XsjhBRGA (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Tue, 01 Apr 2025 13:52:16 +0800 (CST)
+X-Barracuda-Envelope-From: EwanHai-oc@zhaoxin.com
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.163
+Received: from ZXSHMBX3.zhaoxin.com (10.28.252.165) by ZXSHMBX1.zhaoxin.com
+ (10.28.252.163) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.44; Tue, 1 Apr
+ 2025 13:52:16 +0800
+Received: from ZXSHMBX3.zhaoxin.com ([fe80::8cc5:5bc6:24ec:65f2]) by
+ ZXSHMBX3.zhaoxin.com ([fe80::8cc5:5bc6:24ec:65f2%6]) with mapi id
+ 15.01.2507.044; Tue, 1 Apr 2025 13:52:16 +0800
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.163
+Received: from [192.168.31.91] (10.28.66.62) by zxbjmbx1.zhaoxin.com
+ (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.44; Tue, 1 Apr
+ 2025 11:35:50 +0800
+Message-ID: <65a6e617-8dd8-46ee-b867-931148985e79@zhaoxin.com>
+Date: Tue, 1 Apr 2025 11:35:49 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250325144158.GA4558@unreal>
+User-Agent: Mozilla Thunderbird
+From: Ewan Hai <ewanhai-oc@zhaoxin.com>
+Subject: Re: [PATCH v2 08/10] target/i386/kvm: reset AMD PMU registers during
+ VM reset
+To: Dongli Zhang <dongli.zhang@oracle.com>, <qemu-devel@nongnu.org>,
+	<kvm@vger.kernel.org>
+X-ASG-Orig-Subj: Re: [PATCH v2 08/10] target/i386/kvm: reset AMD PMU registers during
+ VM reset
+CC: <pbonzini@redhat.com>, <mtosatti@redhat.com>, <sandipan.das@amd.com>,
+	<babu.moger@amd.com>, <likexu@tencent.com>, <like.xu.linux@gmail.com>,
+	<zhenyuw@linux.intel.com>, <groug@kaod.org>, <khorenko@virtuozzo.com>,
+	<alexander.ivanov@virtuozzo.com>, <den@virtuozzo.com>,
+	<davydov-max@yandex-team.ru>, <xiaoyao.li@intel.com>,
+	<dapeng1.mi@linux.intel.com>, <joe.jin@oracle.com>, <ewanhai@zhaoxin.com>,
+	<cobechen@zhaoxin.com>, <louisqi@zhaoxin.com>, <liamni@zhaoxin.com>,
+	<frankzhu@zhaoxin.com>, <silviazhao@zhaoxin.com>, <zhao1.liu@intel.com>
+References: <20250302220112.17653-1-dongli.zhang@oracle.com>
+ <20250302220112.17653-9-dongli.zhang@oracle.com>
+ <8a547bf5-bdd4-4a49-883a-02b4aa0cc92c@zhaoxin.com>
+ <84653627-3a20-44fd-8955-a19264bd2348@oracle.com>
+ <e3a64575-ab1f-4b6f-a91d-37a862715742@zhaoxin.com>
+ <a94487ab-b06d-4df4-92d8-feceeeaf5ec3@oracle.com>
+In-Reply-To: <a94487ab-b06d-4df4-92d8-feceeeaf5ec3@oracle.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
+ zxbjmbx1.zhaoxin.com (10.29.252.163)
+X-Moderation-Data: 4/1/2025 1:52:15 PM
+X-Barracuda-Connect: ZXSHMBX1.zhaoxin.com[10.28.252.163]
+X-Barracuda-Start-Time: 1743486736
+X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
+X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at zhaoxin.com
+X-Barracuda-Scan-Msg-Size: 3842
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
+X-Barracuda-Spam-Score: -2.01
+X-Barracuda-Spam-Status: No, SCORE=-2.01 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=TRACK_DBX_001
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.139319
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------------------------
+	0.01 TRACK_DBX_001          Custom rule TRACK_DBX_001
 
-On Tue, Mar 25, 2025 at 04:41:58PM +0200, Leon Romanovsky wrote:
-> On Tue, Mar 25, 2025 at 09:36:37AM -0300, Jason Gunthorpe wrote:
-> > On Fri, Mar 21, 2025 at 04:05:22PM +0000, Robin Murphy wrote:
+>> [2] As mentioned in [1], QEMU always sets the vCPU's vendor to match the host's
+>> vendor
+>> when acceleration (KVM or HVF) is enabled. Therefore, if users want to emulate a
+>> Zhaoxin CPU on an Intel host, the vendor must be set manually.Furthermore,
+>> should we display a warning to users who enable both vPMU and KVM acceleration
+>> but do not manually set the guest vendor when it differs from the host vendor?
 > 
-> <...>
-> 
-> > > So what is it now, a layering violation in a hat with still no clear path to
-> > > support SWIOTLB?
-> > 
-> > I was under the impression Leon had been testing SWIOTLB?
-> 
-> Yes, SWIOTLB works
+> Maybe not? Sometimes I emulate AMD on Intel host, while vendor is still the
+> default :)
 
-We will double check too.
+Okay, handling this situation can be rather complex, so let's keep it simple. I 
+have added a dedicated function to capture the intended behavior for potential 
+future reference.
 
-> and Christoph said it more than once that he tested
-> NVMe conversion patches and they worked.
+Anyway, Thanks for taking Zhaoxin's situation into account, regardless.
 
-We've taken this entire series and the NVMe patches and have built on
-top of them. The nvme-pci driver does not have scatter list chaining
-support, and we don't want to support that because it is backwards.
-Instead, the two step DMA API lets us actually remove all that scatter
-list cruft and provide a single solution for direct IO and io-uring
-command passthrough to support large IOs [0] [1] and logical block sizes
-up to 2 MiB.
 
-We continue to plan to work on this and are happy to test this further.
-
-Clearly, we don't want any regressions on NVMe.
-
-[0] https://lore.kernel.org/all/20250320111328.2841690-1-mcgrof@kernel.org/
-[1] https://lore.kernel.org/all/Z9v-1xjl7dD7Tr-H@bombadil.infradead.org/
-
-  Luis
++/*
++ * check_vendor_compatibility_and_warn() returns true if the host and
++ * guest vendors are compatible for vPMU virtualization. In addition, if
++ * the guest vendor is not explicitly set in a cross-vendor emulation
++ * scenario (e.g., a Zhaoxin host emulating an Intel guest or vice versa),
++ * it issues a warning.
++ */
++static bool check_vendor_compatibility_and_warn(CPUX86State *env)
++{
++    char host_vendor[CPUID_VENDOR_SZ + 1];
++    uint32_t host_cpuid_vendor1, host_cpuid_vendor2, host_cpuid_vendor3;
++
++    /* Retrieve host vendor info */
++    host_cpuid(0x0, 0, NULL, &host_cpuid_vendor1, &host_cpuid_vendor3,
++               &host_cpuid_vendor2);
++    x86_cpu_vendor_words2str(host_vendor, host_cpuid_vendor1,
++                             host_cpuid_vendor2, host_cpuid_vendor3);
++
++    /*
++     * Case A:
++     * If the host vendor is Intel or Zhaoxin and the guest CPU type is
++     * either Intel or Zhaoxin, consider them compatible. However, if a
++     * cross-vendor scenario is detected (e.g., host is Zhaoxin but guest is
++     * Intel, or vice versa) and the guest vendor fields have not been
++     * overridden (i.e., they still match the host), then warn the user.
++     */
++    if ((g_str_equal(host_vendor, CPUID_VENDOR_INTEL) ||
++         g_str_equal(host_vendor, CPUID_VENDOR_ZHAOXIN1) ||
++         g_str_equal(host_vendor, CPUID_VENDOR_ZHAOXIN2)) &&
++        (IS_INTEL_CPU(env) || IS_ZHAOXIN_CPU(env)))
++    {
++        if ((g_str_equal(host_vendor, CPUID_VENDOR_ZHAOXIN1) ||
++             g_str_equal(host_vendor, CPUID_VENDOR_ZHAOXIN2)) &&
++            IS_INTEL_CPU(env) &&
++            (env->cpuid_vendor1 == host_cpuid_vendor1 &&
++             env->cpuid_vendor2 == host_cpuid_vendor2 &&
++             env->cpuid_vendor3 == host_cpuid_vendor3))
++        {
++            warning_report("vPMU emulation will fail because the guest vendor "
++                            "is not explicitly set. Use '-cpu,vendor=Intel' to "
++                            "emulate Intel vPMU on a Zhaoxin host.");
++        }
++        else if (g_str_equal(host_vendor, CPUID_VENDOR_INTEL) &&
++                 IS_ZHAOXIN_CPU(env) &&
++                 (env->cpuid_vendor1 == host_cpuid_vendor1 &&
++                  env->cpuid_vendor2 == host_cpuid_vendor2 &&
++                  env->cpuid_vendor3 == host_cpuid_vendor3))
++        {
++            warning_report("vPMU emulation will fail because the guest vendor"
++                            "is not explicitly set. Use '-cpu,vendor=Zhaoxin' "
++                            "to emulate Zhaoxin vPMU on an Intel host.");
++        }
++        return true;
++    }
++
++    /*
++     * Case B:
++     * For other CPU types, if the guest vendor fields exactly match the host,
++     * consider them compatible.
++     */
++    if (env->cpuid_vendor1 == host_cpuid_vendor1 &&
++        env->cpuid_vendor2 == host_cpuid_vendor2 &&
++        env->cpuid_vendor3 == host_cpuid_vendor3)
++    {
++        return true;
++    }
++
++    return false;
++}
++
 
