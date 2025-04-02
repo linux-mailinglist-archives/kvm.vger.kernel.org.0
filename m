@@ -1,76 +1,75 @@
-Return-Path: <kvm+bounces-42446-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42447-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B952EA7871C
-	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 06:10:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A7DDA7873D
+	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 06:25:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 325E116DCEB
-	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 04:10:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1DB387A50AD
+	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 04:23:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76C3D230D1E;
-	Wed,  2 Apr 2025 04:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C73ED230D3D;
+	Wed,  2 Apr 2025 04:23:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TnGYyG5P"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S39IRO3A"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C0820AF87;
-	Wed,  2 Apr 2025 04:10:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36191230BF9
+	for <kvm@vger.kernel.org>; Wed,  2 Apr 2025 04:23:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743567024; cv=none; b=mPGvbG1lylVBiZrfFVVNRhvvxXvy4KiBr3xmtvCBXzxy8QFPkfe6b1MWOMcYE4GEYWYt2OSpm1ezyA1Fr0jEzyUUSxUWXWRceRBTtzKlg75ajJHGitQ7MRJij+5AA6urMUll6gIZfgN7vrP4+Vu0q/6mDuBU4O78y56yBOnB4yU=
+	t=1743567826; cv=none; b=PGyqivmrqWQnypbqe0CqbYJNSdLpawrc6htDLvHu72rinfLCQCo4iatuFZkTVF34qksVa+czGfZYYPSBcSAyc1KWfff0iPxKPNH8D+M4K8O9uHBdC93Vnapb6Szogh4ZPeUOFW/4RqJPMrmeb1CwlEz5VYcWNbnyX8/nVJXB2GY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743567024; c=relaxed/simple;
-	bh=I0s5Gv1mQHqnKIzWxsoxCEERoVHvYzeckwE8nOas3VU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jIAkqr2yjXXvz9b41k+FqQcRpJTSK1Hk68oNqIbZ4USFppSpp8alP5JmcVFq8WuRGUlF6a1K+zqZyjTjw73/vgmWISi4ripyT+6ylz13JpCWo4ess2kWdzbQvYZGsAIYDMFHLmVKVmKRPYczTc0cW9Kas8ysHIR4KefXc4G6DPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TnGYyG5P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BD29C4CEE9;
-	Wed,  2 Apr 2025 04:10:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743567024;
-	bh=I0s5Gv1mQHqnKIzWxsoxCEERoVHvYzeckwE8nOas3VU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TnGYyG5PegnZexH78EkVEZhjl67pWL7sXIuankw0lLUoS6l525yDJb1k2Y991Swzi
-	 Y/BQdn5EKeOPY4iCMiCsl/wcs58dUo6w4xmkNpQPl13ChnxQG34bUHyTmZ9oI5i9zj
-	 GXNesFcifbImdVA7Krak7NrblCx3xnxnf0NZrjadpmZUOlSF3sDsu4Wqsh/OKamc5N
-	 +/zpZVi9YHfAGYahd4Ce8z4sLXldFsNZWZ5Nqw2T1fjxJ8DAvB6m9Rtz/uEQMlDmh/
-	 IRy6AIGMdjxGih5ykPwxvU4bKYE7f4SM5B+pULQxCAmH41LRub4Yb6OVvdI2LbooM3
-	 g8DLjexGSgPew==
-Date: Wed, 2 Apr 2025 06:10:12 +0200
-From: Ingo Molnar <mingo@kernel.org>
-To: Xin Li <xin@zytor.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-edac@vger.kernel.org,
-	kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
-	linux-ide@vger.kernel.org, linux-pm@vger.kernel.org,
-	bpf@vger.kernel.org, llvm@lists.linux.dev, tglx@linutronix.de,
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-	x86@kernel.org, jgross@suse.com, andrew.cooper3@citrix.com,
-	peterz@infradead.org, acme@kernel.org, namhyung@kernel.org,
-	mark.rutland@arm.com, alexander.shishkin@linux.intel.com,
-	jolsa@kernel.org, irogers@google.com, adrian.hunter@intel.com,
-	kan.liang@linux.intel.com, wei.liu@kernel.org,
-	ajay.kaher@broadcom.com, alexey.amakhalov@broadcom.com,
-	bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
-	pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
-	luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
-	haiyangz@microsoft.com, decui@microsoft.com,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [RFC PATCH v1 01/15] x86/msr: Replace __wrmsr() with
- native_wrmsrl()
-Message-ID: <Z-y4pGxgiP55lpOj@gmail.com>
-References: <20250331082251.3171276-1-xin@zytor.com>
- <20250331082251.3171276-2-xin@zytor.com>
- <Z-pruogreCuU66wm@gmail.com>
- <9D15DE81-2E68-4FCD-A133-4963602E18C9@zytor.com>
- <Z-ubVFyoOzwKhI53@gmail.com>
- <7a503d55-db41-42da-8133-4a3dbbd36c7e@zytor.com>
+	s=arc-20240116; t=1743567826; c=relaxed/simple;
+	bh=uk+jCp/FuYXV7XyCCDRWAs858M7p/r7TeKVlBYXv6ZQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Fsz6Q1nJKFcz6NsZu9ZUA2i86aV3jJjw4QuH1Sq35F5MZdw1K98n1St4siTEfR58v3EgAFWAskAHSUt5RI2+CD90wZsHuIrLnhn9o+veBic1n9dRsH9hu7o+MDtCHCPqSevEvykVZyos1fxD4cx3zT1cCw4fS6uz8bUcZ4q1i9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S39IRO3A; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1743567824; x=1775103824;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=uk+jCp/FuYXV7XyCCDRWAs858M7p/r7TeKVlBYXv6ZQ=;
+  b=S39IRO3A9ESB3vwMxGBpG2PiEGUHyyJCxkmHBlEVAkF0KguQWbiRYPYq
+   SY63kz27lRE+gV/+42O763wF2ke2Um/wQVk7FLbU+sWk90jJa94TEFEK2
+   yDDnPBtFVc5j3+h+33zrzWINadY/pULp/SFVtUNChUGFAgj4v6x8HVaM0
+   AAEeSBR7iaBT5an6iqDed1AHPOrVs8dkCk2A03eydeV8uexTmpAsLlsFp
+   jYQZqC0vzVVtTsdtMJakz4frpF2thVSW7bagGA3F9Zzii7H2Xkpwyrng2
+   ODTC7WtDqe/RwfA04yQr/8RY2QCvGZkFlO31kmkqo1oLhe315jPq/lGGe
+   w==;
+X-CSE-ConnectionGUID: Ic9ZjyX3QsyOREql3ih1ew==
+X-CSE-MsgGUID: Pn+KTSJ/TUm0CaBVV/zYUA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11391"; a="56280097"
+X-IronPort-AV: E=Sophos;i="6.14,295,1736841600"; 
+   d="scan'208";a="56280097"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2025 21:23:43 -0700
+X-CSE-ConnectionGUID: wAbpNMTFTPWsb+vc4b+HPg==
+X-CSE-MsgGUID: cy35nKcVTMe3J5HTUsyGZQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,295,1736841600"; 
+   d="scan'208";a="126828673"
+Received: from lkp-server02.sh.intel.com (HELO e98e3655d6d2) ([10.239.97.151])
+  by fmviesa008.fm.intel.com with ESMTP; 01 Apr 2025 21:23:42 -0700
+Received: from kbuild by e98e3655d6d2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tzpdc-000AT8-0A;
+	Wed, 02 Apr 2025 04:23:40 +0000
+Date: Wed, 2 Apr 2025 12:23:16 +0800
+From: kernel test robot <lkp@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	kvm@vger.kernel.org, Farrah Chen <farrah.chen@intel.com>
+Subject: [kvm:planes-20250401 58/62] arch/x86/kvm/lapic.c:1327:37: error:
+ incompatible pointer types passing 'atomic_t *' to parameter of type
+ 'volatile unsigned long *'
+Message-ID: <202504021219.U3GWMel8-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -79,23 +78,76 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7a503d55-db41-42da-8133-4a3dbbd36c7e@zytor.com>
+
+tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git planes-20250401
+head:   73685d9c23b7122b44f07d59244416f8b56ed48e
+commit: 08db55297a7b060909a0121cb4ce6abbc3e6b2ea [58/62] KVM: x86: handle interrupt priorities for planes
+config: i386-buildonly-randconfig-006-20250402 (https://download.01.org/0day-ci/archive/20250402/202504021219.U3GWMel8-lkp@intel.com/config)
+compiler: clang version 20.1.1 (https://github.com/llvm/llvm-project 424c2d9b7e4de40d0804dd374721e6411c27d1d1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250402/202504021219.U3GWMel8-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202504021219.U3GWMel8-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> arch/x86/kvm/lapic.c:1327:37: error: incompatible pointer types passing 'atomic_t *' to parameter of type 'volatile unsigned long *' [-Werror,-Wincompatible-pointer-types]
+    1327 |         if (!test_and_set_bit(vcpu->plane, &plane0_vcpu->arch.irr_pending_planes)) {
+         |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/asm-generic/bitops/instrumented-atomic.h:68:79: note: passing argument to parameter 'addr' here
+      68 | static __always_inline bool test_and_set_bit(long nr, volatile unsigned long *addr)
+         |                                                                               ^
+   1 error generated.
+--
+>> arch/x86/kvm/x86.c:11745:23: error: incompatible pointer types passing 'atomic_t *' to parameter of type 'volatile unsigned long *' [-Werror,-Wincompatible-pointer-types]
+    11745 |                 clear_bit(plane_id, &plane0_vcpu->arch.irr_pending_planes);
+          |                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/asm-generic/bitops/instrumented-atomic.h:39:72: note: passing argument to parameter 'addr' here
+      39 | static __always_inline void clear_bit(long nr, volatile unsigned long *addr)
+         |                                                                        ^
+   1 error generated.
 
 
-* Xin Li <xin@zytor.com> wrote:
+vim +1327 arch/x86/kvm/lapic.c
 
-> Hi Ingo,
-> 
-> Is this branch public?
-> 
-> I wanted to rebase on it and then incooperate your review comments, but
-> couldn't find the branch.
+  1313	
+  1314	static void kvm_lapic_deliver_interrupt(struct kvm_vcpu *vcpu, struct kvm_lapic *apic,
+  1315						int delivery_mode, int trig_mode, int vector)
+  1316	{
+  1317		struct kvm_vcpu *plane0_vcpu = vcpu->plane0;
+  1318		struct kvm_plane *running_plane;
+  1319		u16 req_exit_planes;
+  1320	
+  1321		kvm_x86_call(deliver_interrupt)(apic, delivery_mode, trig_mode, vector);
+  1322	
+  1323		/*
+  1324		 * test_and_set_bit implies a memory barrier, so IRR is written before
+  1325		 * reading irr_pending_planes below...
+  1326		 */
+> 1327		if (!test_and_set_bit(vcpu->plane, &plane0_vcpu->arch.irr_pending_planes)) {
+  1328			/*
+  1329			 * ... and also running_plane and req_exit_planes are read after writing
+  1330			 * irr_pending_planes.  Both barriers pair with kvm_arch_vcpu_ioctl_run().
+  1331			 */
+  1332			smp_mb__after_atomic();
+  1333	
+  1334			running_plane = READ_ONCE(plane0_vcpu->running_plane);
+  1335			if (!running_plane)
+  1336				return;
+  1337	
+  1338			req_exit_planes = READ_ONCE(plane0_vcpu->req_exit_planes);
+  1339			if (!(req_exit_planes & BIT(vcpu->plane)))
+  1340				return;
+  1341	
+  1342			kvm_make_request(KVM_REQ_PLANE_INTERRUPT,
+  1343					 kvm_get_plane_vcpu(running_plane, vcpu->vcpu_id));
+  1344		}
+  1345	}
+  1346	
 
-Yeah, I moved it over to:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/mingo/tip.git WIP.x86/msr
-
-Thanks,
-
-	Ingo
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
