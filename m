@@ -1,229 +1,291 @@
-Return-Path: <kvm+bounces-42524-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42525-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F2BDA79820
-	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 00:19:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BB87A79834
+	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 00:25:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 278F41700DC
-	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 22:19:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0B5E188FB08
+	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 22:25:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FB881F55EB;
-	Wed,  2 Apr 2025 22:19:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B251D1F582A;
+	Wed,  2 Apr 2025 22:25:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AZXVWmUe"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J2H73Lmw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C490126F0A;
-	Wed,  2 Apr 2025 22:19:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743632377; cv=fail; b=Hn9WrGsVQHnKbQx7td44gCNJJzLUM5MdhTGUWTgt3KLjnmJZ4D+o8XJODfGiUOAVSYvZSWrwVO2deDOR4+XFNcyrhx9SLJW+cYXJfn1wd/CiHZSM+ovT9ITNCujRqqpy13g+HORE7Wi7ldMpEX3V8rePJ40JFu/zEVmwK/EpDkE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743632377; c=relaxed/simple;
-	bh=+oGVpcGdODpsku0GDXSAkWUYM3Ml0b7SggQ92tzjTy8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=r78zCi5SaK9/JDnFeoJho+3/AStGruTxaY6ekuEXD57bDsSCL/uxEL38Ay6uU71+9vV7331gpyWcLA++njEBL1XtZIoPCFq6KfAkO+4pOmtbEOCbGFWRJY7/f618LMYztNLRKJqPTyjxVUGRAwTSKy+tt/mJtaaB+AekG3tAfBs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AZXVWmUe; arc=fail smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1743632376; x=1775168376;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=+oGVpcGdODpsku0GDXSAkWUYM3Ml0b7SggQ92tzjTy8=;
-  b=AZXVWmUe6JpzMDydy8ip0DQeOakl7rFIs2fRUmlNWalcXC0kNBPH5W2C
-   JIDywAtgknNaUSgltyfXsGaeJ2JyOBT52dmrL0d5BDf+sJvFG9RChBBvr
-   PGhlB06CB99NNn3epVPvFBAOzAe/6ZHNq5rTgA2Be3IAJ6giIDFAy7Ed9
-   rQa4fb7XB2jm6kNHrZV9U92c6nDfjhn3F45oT9qCtJGdBNrF4mDXENADH
-   2NNOZGy1Kcij4M6zVKHOTwlgjXeTRLtPhUmjMiljSo9JfyttKDFFIAgsp
-   pUfQ7NCjnEoP4DpmYkDFQ5iw5o8k4Yyw76iZEjg4E5W3oJF2rxgklO3lU
-   Q==;
-X-CSE-ConnectionGUID: 9EXjsDQ9QjSpBFnLiP2cTw==
-X-CSE-MsgGUID: 6KjhSDazRryT3Okqj9/D9A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11392"; a="55216506"
-X-IronPort-AV: E=Sophos;i="6.15,183,1739865600"; 
-   d="scan'208";a="55216506"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2025 15:19:35 -0700
-X-CSE-ConnectionGUID: i1R2Qt1mQwO/gNS0/dDThA==
-X-CSE-MsgGUID: j2KRI2RmR8mGshb6DoME+g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,183,1739865600"; 
-   d="scan'208";a="150032218"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2025 15:19:34 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Wed, 2 Apr 2025 15:19:33 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Wed, 2 Apr 2025 15:19:33 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.172)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Wed, 2 Apr 2025 15:19:33 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hfACJnM5Yyn04j+WIcOO3GXtGhG35hvKWiWNJGY8u4P5KSCpvm1xi9r9K/QA1VeXGNX98PGQrzQoeWdt3PgyeN2tUakME+NplqOth9KXw5xopu3wYobOPWl91Q+ZkMWscCukDjHbdovABpTFR77hhNWvIU9xnzGLmJ+kPqCEKJydrI0729j1OeltlWefv/JKGgtHPaeHqGgT7FeU5HOelF6EjQgWfCO0q0ix1r6xK80TMeb/2tdFebJLP5/yKDYtLKzM4lmp00+AXxVZ47WnILJO4kkP4xZg8UWBG6la5z5UTlrGfsgP0YGeA3TbZVCyWuuDEZa1jKYz2sAFUkAwlA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+oGVpcGdODpsku0GDXSAkWUYM3Ml0b7SggQ92tzjTy8=;
- b=FHY6V9UPosjj79X20k9JA3XGdNQP4P0fp2PC2iMZ2nwY0tYYXegH1l5iHxQWUgmAinXarXTAmPOKTh7DXckwzG6kh3v+H/Td4FM2mluER1ZP9nd6FGNi7mPLRN9nNaQrgOls9aexqJ0UahQXtMNjDXjw89RCfOHX0MGA1MRCEi64+AwMvCeES/o0/OFLS5xI0aQCKhNNQ70akzffBA6prBcA6XvIFYldx7ChJoEQSmvVUJg0XqmvOPVbmSMSU0dj6+5B1NCIo65JdQLk4trLHCKLYrUykm4w8Ej89gBEfq8pbYbTbIT02M1SJL08bDv5WQxTPePuuy+KqyFJztp5Qw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by IA1PR11MB6195.namprd11.prod.outlook.com (2603:10b6:208:3e9::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.44; Wed, 2 Apr
- 2025 22:19:28 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::fdb:309:3df9:a06b]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::fdb:309:3df9:a06b%6]) with mapi id 15.20.8534.045; Wed, 2 Apr 2025
- 22:19:28 +0000
-From: "Huang, Kai" <kai.huang@intel.com>
-To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "seanjc@google.com" <seanjc@google.com>,
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>
-CC: "Gao, Chao" <chao.gao@intel.com>, "Edgecombe, Rick P"
-	<rick.p.edgecombe@intel.com>, "mikko.ylinen@linux.intel.com"
-	<mikko.ylinen@linux.intel.com>, "Li, Xiaoyao" <xiaoyao.li@intel.com>,
-	"Lindgren, Tony" <tony.lindgren@intel.com>, "Hunter, Adrian"
-	<adrian.hunter@intel.com>, "Chatre, Reinette" <reinette.chatre@intel.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Zhao, Yan Y"
-	<yan.y.zhao@intel.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>
-Subject: Re: [PATCH 1/2] KVM: TDX: Handle TDG.VP.VMCALL<GetQuote>
-Thread-Topic: [PATCH 1/2] KVM: TDX: Handle TDG.VP.VMCALL<GetQuote>
-Thread-Index: AQHbo2Q+reE/k3eiXkm8HRe31hfG0LOQ88sA
-Date: Wed, 2 Apr 2025 22:19:28 +0000
-Message-ID: <2047f2964fa713f70823b9293bf1ffd65ac44fa8.camel@intel.com>
-References: <20250402001557.173586-1-binbin.wu@linux.intel.com>
-	 <20250402001557.173586-2-binbin.wu@linux.intel.com>
-In-Reply-To: <20250402001557.173586-2-binbin.wu@linux.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.54.3 (3.54.3-1.fc41) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|IA1PR11MB6195:EE_
-x-ms-office365-filtering-correlation-id: 7cfc09ea-ad3c-4a6d-e7f7-08dd72346f1e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018;
-x-microsoft-antispam-message-info: =?utf-8?B?K2thNFhheHgzcnpXTjlsV3ZsQUZTTjR5aUZzWjA5blJIYzJzcjRoVFdCMTBB?=
- =?utf-8?B?VmZvckZOZFQ2NUx3WDRwRisvd3pVSFJhaDVZYUFqbnMzTFpPOWNJWmw0WnQ0?=
- =?utf-8?B?UVM4SFlsc2pMWTlMb085dUkvTUoxNGU1ZFc0a0ZqRUx1aC9tMEdwZFZWN0Rv?=
- =?utf-8?B?bWg5NW1FdUhLZzNZSkM3cERDS0VKVU05aTIxbmhTKzBEbDlXLzM3T2kyblRv?=
- =?utf-8?B?VDdSWk5GdWd3eHNqaytaVXg0MzlTbkxpQ01NaGtVUXR3WS9udEpqejl5TFRO?=
- =?utf-8?B?dHBiMzZSdHQxQWxBRWNaV29iQk5SRHZudUJLbjlSMFpESUpQUTkvemhEWEN5?=
- =?utf-8?B?K1FzR2lLOFRGUHlJTG1IakcvODM3Zjg4cXBSY0k0VmtvTGxISFhWOFE0cnVZ?=
- =?utf-8?B?VTYraVZRQk0rMDJwaUNDUVV0T0ZORDF5c2NicDdPZ3FxcGEyd1dDWVg2d2NF?=
- =?utf-8?B?QjM4QU1hU3hLbHpuWVU5MUlCTHcyakpxbWl5ZEZSK1JXUUFpOXNsYkhqNXJr?=
- =?utf-8?B?aEx6UTZCRkhtdEI2aVJFemNLRDRkTWg5RVV2K3NlVW9NSnppVTBXUDBOdTRM?=
- =?utf-8?B?c1hyVGZHaFBKSG1hK0J2cURNMVhyT2dwTVYyZlpZVFVINERmeEZrNVBpemxj?=
- =?utf-8?B?czJsaEVtZm85NnpEOWU1MEtSSHlpVEZXT2U0c250Z1hiZTZtYWtydCtOeFFh?=
- =?utf-8?B?QnFoaHJHR0VsVDczR1REaVp4b1NWZ1RtQWxydDdLc25GYVBraUdUWUMwWHE3?=
- =?utf-8?B?NnJ3OWowWDFvRTRpMVo1UnliTnRTY3hUU3c2L3FScVdPRUtQRDlyUmVETitG?=
- =?utf-8?B?UjVFOEVUOHBYWHJhbXpKcVNJeWR0SHBYR2MzbFh0eEVZUnpYWWEwQVZrc3Fy?=
- =?utf-8?B?N0Znbm1oVCtEeHllS3pVQ0F3UmZaa080bS9GVW5ldlNHMTV0dktTT3dpTFNS?=
- =?utf-8?B?c2xQMDlTNkxzYTYwSHUxeW5JeUw2cExFd090S093WG9WVW81L2lWczVCTThj?=
- =?utf-8?B?eG1IcGhVcitEcXdyc3JJUndsajlxbFBIck1NUExOeThQeFlWME1DbklMWW1q?=
- =?utf-8?B?N2tiTVNFMTlXRU1ENGpNaXJRMXZlUkljSmU2cDMvd2prbHhXZ2tuZjl6aHdF?=
- =?utf-8?B?Z0E3UVBqNTZRUGdJaXdURkV2blpDbVJBWURzL3VhRnVFZzlGYVpsK2srdk1F?=
- =?utf-8?B?ekQyQ2g4WEZKTStxQjJ3WHdSRDA2ZkVWaGhpdWwvMnNMdGZQdlhZdmpoZGlm?=
- =?utf-8?B?ak5HMDNhb05uc3ZnK3RIaXY3MnNoTzBGbnJvNlFZekg5VGY3RXNkZzJ0M2s5?=
- =?utf-8?B?U3VrcFJILzRWdXhkaWI5T3pNZ2VvZE9zNmRwSFZYbXRRZFpSeWQyUWQrSkx0?=
- =?utf-8?B?dzBFME5WRUxZTGcxaU1uZk5TWTZ3cHkyekNnRGJSN2tRdVU2MFpKYzRDM2c4?=
- =?utf-8?B?Z3VEVjgxaE1GUVVkU3ZtbElCTVpjYVI0Ui9KbmNOcW8xWGpHRVZJSElLL1JP?=
- =?utf-8?B?WFUxNjVHdzY1ak5Oc1p6TldPVDRmRzJ6YnNoMGVqaXFJVEphcGJ4aysrOXNa?=
- =?utf-8?B?WU84OTMrdWRLTlpvVE5BUGMycGQwZDJPa1kwOTQwOG5tVzZwN3hMcE5vdlhr?=
- =?utf-8?B?T1c2bkJkbUFZbzU1bE9LZi9nZWdHMUppRkZRQ1EveEJNSllPMDkvbzZOL1hS?=
- =?utf-8?B?Qkwrb2Q2bE94bHN5R3gwS29XTFVzb1FlRFJzdVdTQjlZaXNWYjRGM0pod0Fj?=
- =?utf-8?B?YlgzeUl6MHBEeG1KcjdqblFtMHRMV0RjTEdVL1ROOVVyU0dvYndmejFvRXBP?=
- =?utf-8?B?dW9UZlIyVzZJT0p3U3VSb2V3VGNBMnlSdFc3cURmVnE4b2xSNGZNb2FFSWY0?=
- =?utf-8?B?WURLbkg1dGlTekRoSklFeWNBT0FIdm84bisvbm5hSmxBL1hoUkJKejNnRGM2?=
- =?utf-8?B?S2RDNmtTbDFiMmpGellQaWNxMExiczFCNHBPOG5LTEMyWElTeE5uVzlObFpw?=
- =?utf-8?B?RW94a3IxUTVnPT0=?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?K25mR204TGhJbUpQblpzZWk0bUVkQTBrZXRUQ0t2NklaN09zamg1blA4NFMz?=
- =?utf-8?B?aGxRY3ZhTXphcVk4ek9tQzdKVDhQUkhkK3cyclBzbDZwRXJ6QkI2eklNLzhT?=
- =?utf-8?B?dnZMczhQNGZ6Nm9JUDY3OTIya2R1VW53UkxQMHFGSWZXK3VJN2NDZE5nU0Fk?=
- =?utf-8?B?bWl1ZnBIdjdsbXMwWTl3WDBuMFRrVExNaWpLWGE5MDJqb3VIeXFKMXVyL0Zy?=
- =?utf-8?B?NzNkVWxNMHBSVHdWQitiYzZLM1RHRVNZRzVFNHFFZnVRT042N25yTU9jVUxP?=
- =?utf-8?B?VUZGdGwzN2FieDFyQVhUSnBuclU5cXE0Q21XeldkVUtET2FZK1ZHTW4rV0Qv?=
- =?utf-8?B?MjNwc2pFbmw0dUx3bFB0L0xxUThUSzJwVjl1eUVrYXh3WnJURUo4R05uVzFW?=
- =?utf-8?B?OUtlRzdIeEo0OE5zdERjZzZhRWVmNi93dm5FcEhVOFRlMXlYMDZPZ1ZIQVh2?=
- =?utf-8?B?M0dwU3NxcXhMM0UxaHJrbG1nNHZJZGE5d3Fka1IyY2x6L3pXWlExWlpha3dV?=
- =?utf-8?B?cDF2SkF6NW4vSHEzZ1pBM2ZGM1JsL2VYOVhCZ0Q5RHJzZTdScGRlbVNUYTd3?=
- =?utf-8?B?WXdWUkIyaHYybytvaVFhVVhBZmQrRnA3V3RIYUg1ZzBIanl4S0VEamFHdWJ4?=
- =?utf-8?B?cXRsamRBQ3l0c2NTdDdsK0h3WU83TkNHNHZUb2loSHl3M2twQTVOR1hHY05M?=
- =?utf-8?B?MWtsNER4UkhTclJONDg1K09sY2Y2RStENnlDbWl3eGRtOFA1b2I1d2p6aGhj?=
- =?utf-8?B?SnNyOUpwYXJ6QkJjbkRaWTNFbEZNdi9LMUJTUE5MZUZVSlRNcU1LeU9RdjJu?=
- =?utf-8?B?UVljQzRaMk5jdjJ1bzZKQ0F4VDdBVUJrYkdVRXVpL0ZGNVBDbmJVdXl6eHMy?=
- =?utf-8?B?OWo1T285QW1jQmVUd1NPOHFMSXFrTjk1QXNEQzV6aW9oMC9NeW1mZDZpdHV3?=
- =?utf-8?B?R1dnWGFpU1VSMzhYRlRyUjJBaStDR0dkcEVyVjNlbnNhei84dXlzdGVWYWxT?=
- =?utf-8?B?cGovdEU4Tnd2Z3kwNU5GYkhoWmxkUStqZjIyYTVYNVpOdlQ0dTU5Smt0RHhO?=
- =?utf-8?B?cWNWNWVmTUE1cFZOSVBBd1NXemxDQVlnS2FMcTlYamlZU2FPWkdPRE5Zd2JE?=
- =?utf-8?B?cHJ0VmVRNzlNZVFUSWJvdzROdzR3RWk1L3RERmNackMyU2xjcDhidE05RzFH?=
- =?utf-8?B?TE00UVJCMnUreDVvaHdsVXdxcnNXUTNWSFVtaCt0aGVNMDdwWFRTQkxIZHVO?=
- =?utf-8?B?SmNXeXZNNE1xMDJ6VXkwdFBoaFBSNjJSRkcwdTNKR3Q4MHRUZlUzWVdRVm1t?=
- =?utf-8?B?TXU5VWdPMXJiWUNxdUgxZGRpMThjRDFxNWdNMGtMeEVGd1BhQ3pRcDAzUzhm?=
- =?utf-8?B?RzRRZEVxR29TNFJTUHpUOUVodnlRbUpURm9IRHhMeC9vNHIxdEhFbmF6TVBZ?=
- =?utf-8?B?akZwWEgvaEpEVmgvR3JmalpVcDdLb09KQUFuR2QyN045VDNSU3E3ZkZlanlJ?=
- =?utf-8?B?NlV5Yk1xQ2hnUFAxc0UyTzhRSTEwVVoxc2dzeXM0bjFlc244VFUxY1dNWXdh?=
- =?utf-8?B?cDUvSnVtWW95dGlGQnduWXJQL3BxZzFMdVhtZUQxOVl3RTVHbyt5a3lPSVpw?=
- =?utf-8?B?YjBHeE5ZWWdObm9ZRzNNTHFZRUZ1aVFQbTBlSE9mRGh4VWNUemV4SmRuMExs?=
- =?utf-8?B?RHl4NVJkNDgwN1J2WkpwdXl5d2FTUXYzYkVaRHk1TXBjMVdoSHdKS3QxNUpx?=
- =?utf-8?B?WlhrVzcxcmJzVWtsTWhIUnZLT2xrOXBER1ZNc1JFSi9mcXRFWGNBZHFGN3Ji?=
- =?utf-8?B?dzkvamR6QXB5bnVlb0NCVG1zdUUzcVlzY2piUGdyZVFLOTJFTXNnd3RsUXdJ?=
- =?utf-8?B?S1YxUTl1aGF1TjZwZGhYWjBtbHpMQzZsY1U3K3FhTWIvNnpyWFB3Mk5Kb2h0?=
- =?utf-8?B?UDhPNzZSb2IvMlkxRFhhSWU5TS91ekxnVEdZSVh0R2NnVDlSemlsSkVqcXQw?=
- =?utf-8?B?UXNwOWlxRWU0ckhuZklTcU9UdU4wS2xXeDg2MWJuMmxra2FSNHFhTG1ScjYw?=
- =?utf-8?B?VjJJbitmZzMwSEhxQy95NGQ0QkczUHgxSlVtODkrZE93Q3NwVmVSdE93dnE5?=
- =?utf-8?Q?1gjsGeM4eUy/oUj79XZjMhpS2?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <234A09943A87E14582AB1ECDB7ECD4E0@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484DC1F4CAB
+	for <kvm@vger.kernel.org>; Wed,  2 Apr 2025 22:25:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743632730; cv=none; b=MNThMvDYQmKAxh36IeAlzH9cOtG5IgvF9YXeI+mFUsPkhHObiEuwMuzP3Pcau33K4nmo7PHMNTAeXhPQPop3hvjT4uUN4vG9oSeJnFEcgLpj7bn1KV9Gz5LBJNXNxMk78yBBEDqc6WBdCwZUAE1GlfuTZ3pqotCETLfFdgkd1t0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743632730; c=relaxed/simple;
+	bh=HQPFBCaJ5Qm9FY7mTC8LOnkYNfXTCoz5Iw7Mb6idx6g=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=ZqSFPbh7tAoPwfZu2VrlznLADqgD+RemhEX5E7Je5YlAbtSc2a/7ldCpvsgN2ChShl+DWOB/EWLGwdo3+b6eioKAwszTmPDrqZdL57KUNM8sKFWOcmEUxCxx7XCKAgcoGunHZ7qLSRdRPol8fvONHip6aKbOuy6Fcjc5G6edoqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J2H73Lmw; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-736d30d2570so216799b3a.1
+        for <kvm@vger.kernel.org>; Wed, 02 Apr 2025 15:25:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1743632728; x=1744237528; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=A6WcvdR6WqAMHzvGxAbwSacD4Wb/rLMAXYVnrZz6qbg=;
+        b=J2H73LmwW4Z4PvkUTqjry7rUQn3y/bmK3VDCDsvTWdONnDBJcmrCyCLUThRjTdisWX
+         2BVZ4hQKs6Nx5Znp//QizKi1pZJdO57HrKVqAnJJjuqw8owBlX5mAaXiYCod4LHxt81Z
+         fii6i/HzvQnBa73d3Cui9usJ5B/gGF69W0/RugxdpGQVCOf5KN2BlvBzSJEcxBvXE2ot
+         DpPJGdV1tIaGhpZcp5O9f4Sso3GU/obzuF55TgX2NI61EgyC2sy6DCSdBLZ+6dG8QZlM
+         y/QgUOs8g7Uch+U6MZt9cFre2jdcADs31oDIPC0QuO0xvzqbAD95bBzKECBLIUzLs5t9
+         UKJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743632728; x=1744237528;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=A6WcvdR6WqAMHzvGxAbwSacD4Wb/rLMAXYVnrZz6qbg=;
+        b=CrPUjpZ7WCUNB26Fip3f4qjQa9mYXP9tE8lcqXhHQgWisqasFaBpbTTwI20BzceFt2
+         Py73004fgacOGqyEZBh8vJhn+mlJV1GOnEYgBg1Qn+Bt7D5BsUaYNuS5mtDpPwzqkqKD
+         eLOR82NxZgfvZs5Qq3fTCjN1gXEgZ5lGqccK9DD5Q1W5nmYHEJTTrZvoJwH6ffgfJPyw
+         cxVriIqalWj3/z0EGkzaCLDtpbFbsIK/XgLTNptfh1tN8M9zwJUbKLmYsutHAW8t66ga
+         Sl+baQ1Vx+Qhhs30IAIUEx1BT1txCwE2Hq6MV0dmV0mLQZ7uvQlcnVsPT0InIFM8pzlI
+         9W/g==
+X-Gm-Message-State: AOJu0Yz3joKNF5uZxe+iChjy2UMWeUDGhNJtqS9TST9CuWGRqhA9LI9x
+	e1jf0LrtfHBf/s9iR7XGaSS6u6H+Ad43R8Ykb/7+iZ+Txh5OgbgkKjQEwVqexE8eSjajNEMh5Su
+	iT0/TKvPyw+HDZ1XEcFhX5A==
+X-Google-Smtp-Source: AGHT+IGMP1M5dr+i5RR5wshPuL6my2/PghcE1DIyVKMYQME2SB4PdP1R+1Hd6RdA1YQ7XI2HJR0mJC1nwnB0LvRPjA==
+X-Received: from pfbci14.prod.google.com ([2002:a05:6a00:28ce:b0:736:a055:1ce3])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:80d:b0:736:d6da:8f9e with SMTP id d2e1a72fcca58-739c7511323mr5458330b3a.0.1743632728406;
+ Wed, 02 Apr 2025 15:25:28 -0700 (PDT)
+Date: Wed, 02 Apr 2025 15:25:26 -0700
+In-Reply-To: <20250328153133.3504118-4-tabba@google.com> (message from Fuad
+ Tabba on Fri, 28 Mar 2025 15:31:29 +0000)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7cfc09ea-ad3c-4a6d-e7f7-08dd72346f1e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Apr 2025 22:19:28.4520
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: QbdtAAP6qQ5FAYaDow44NUWYx7YdiNoTsCySsSKY2shH58iZDGhcgEDTAxioaeZxI2GnFhu/7iwhjNFciWg09Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6195
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+Message-ID: <diqz1puanquh.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [PATCH v7 3/7] KVM: guest_memfd: Track folio sharing within a
+ struct kvm_gmem_private
+From: Ackerley Tng <ackerleytng@google.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, mail@maciej.szmigiero.name, david@redhat.com, 
+	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
+	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
+	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
+	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
+	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
+	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
+	hughd@google.com, jthoughton@google.com, peterx@redhat.com, 
+	pankaj.gupta@amd.com, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-T24gV2VkLCAyMDI1LTA0LTAyIGF0IDA4OjE1ICswODAwLCBCaW5iaW4gV3Ugd3JvdGU6DQo+ICs6
-Og0KPiArDQo+ICsJCS8qIEtWTV9FWElUX1REWF9HRVRfUVVPVEUgKi8NCj4gKwkJc3RydWN0IHRk
-eF9nZXRfcXVvdGUgew0KPiArCQkJX191NjQgcmV0Ow0KPiArCQkJX191NjQgZ3BhOw0KPiArCQkJ
-X191NjQgc2l6ZTsNCj4gKwkJfTsNCj4gKw0KDQpUaGUgc2hhcmVkIGJ1ZmZlciBwb2ludGVkIGJ5
-IHRoZSBAZ3BhIGFsc28gaGFzIGEgZm9ybWF0IGRlZmluZWQgaW4gdGhlIEdIQ0kNCnNwZWMuICBF
-LmcuLCBpdCBoYXMgYSAnc3RhdHVzIGNvZGUnIGZpZWxkLiAgRG9lcyB1c2Vyc3BhY2UgVk1NIG5l
-ZWQgdG8gc2V0dXANCnRoaXMgJ3N0YXR1cyBjb2RlJyBhcyB3ZWxsPw0KDQpJIHJlY2FsbCB0aGF0
-IHdlIHVzZWQgdG8gc2V0IHRoZSBHRVRfUVVPVEVfSU5fRkxJR0hUIGZsYWcgaW4gUWVtdSBidXQg
-bm90IHN1cmUNCndoZXRoZXIgaXQgaXMgc3RpbGwgdHJ1ZT8NCg0KSSBhbSB0aGlua2luZyBpZiBR
-ZW11IG5lZWRzIHRvIHNldCBpdCwgdGhlbiB3ZSBuZWVkIHRvIGV4cG9zZSB0aGUgc3RydWN0dXJl
-IG9mDQp0aGUgc2hhcmVkIGJ1ZmZlciB0byB1c2Vyc3BhY2UgdG9vLg0K
+Fuad Tabba <tabba@google.com> writes:
+
+> From: Ackerley Tng <ackerleytng@google.com>
+>
+> Track guest_memfd folio sharing state within the inode, since it is a
+> property of the guest_memfd's memory contents.
+>
+> The guest_memfd PRIVATE memory attribute is not used for two reasons. It
+> reflects the userspace expectation for the memory state, and therefore
+> can be toggled by userspace. Also, although each guest_memfd file has a
+> 1:1 binding with a KVM instance, the plan is to allow multiple files per
+> inode, e.g. to allow intra-host migration to a new KVM instance, without
+> destroying guest_memfd.
+>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Co-developed-by: Vishal Annapurve <vannapurve@google.com>
+> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
+> Co-developed-by: Fuad Tabba <tabba@google.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  virt/kvm/guest_memfd.c | 58 ++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 53 insertions(+), 5 deletions(-)
+>
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index ac6b8853699d..cde16ed3b230 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -17,6 +17,18 @@ struct kvm_gmem {
+>  	struct list_head entry;
+>  };
+>  
+> +struct kvm_gmem_inode_private {
+> +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> +	struct xarray shared_offsets;
+> +	rwlock_t offsets_lock;
+
+This lock doesn't work, either that or this lock can't be held while
+faulting, because holding this lock means we can't sleep, and we need to
+sleep to allocate.
+
+One of these config options must have helped throw a BUG
+
+CONFIG_DEBUG_ATOMIC_SLEEP=y
+CONFIG_DEBUG_IRQFLAGS=y
+CONFIG_DEBUG_LOCK_ALLOC=y
+CONFIG_DEBUG_LOCKDEP=y
+CONFIG_DEBUG_MUTEXES=y
+CONFIG_DEBUG_RT_MUTEXES=y
+CONFIG_DEBUG_RWSEMS=y
+CONFIG_DEBUG_SPINLOCK=y
+CONFIG_DEBUG_WW_MUTEX_SLOWPATH=y
+CONFIG_LOCKDEP=y
+CONFIG_LOCK_STAT=y
+CONFIG_PREEMPT_COUNT=y
+CONFIG_PREEMPTIRQ_TRACEPOINTS=y
+CONFIG_PROVE_LOCKING=y
+CONFIG_PROVE_RAW_LOCK_NESTING=y
+CONFIG_PROVE_RCU=y
+CONFIG_RCU_CPU_STALL_CPUTIME=y
+CONFIG_TRACE_IRQFLAGS_NMI=y
+CONFIG_TRACE_IRQFLAGS=y
+CONFIG_UNINLINE_SPIN_UNLOCK=y
+
+with ./guest_memfd_test
+
+[  161.255012] BUG: sleeping function called from invalid context at ./include/linux/sched/mm.h:321
+[  161.257350] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 254, name: guest_memfd_tes
+[  161.259662] preempt_count: 1, expected: 0
+[  161.260884] RCU nest depth: 0, expected: 0
+[  161.262119] 3 locks held by guest_memfd_tes/254:
+[  161.263470]  #0: ffff8883064c3c80 (&mm->mmap_lock){++++}-{4:4}, at: lock_mm_and_find_vma+0x29/0x140
+[  161.265932]  #1: ffff88830dedbc10 (mapping.invalidate_lock#4){++++}-{4:4}, at: kvm_gmem_fault+0x3d/0x1f0
+[  161.268507]  #2: ffff88830d510d30 (&private->offsets_lock){.+.+}-{3:3}, at: kvm_gmem_fault+0x45/0x1f0
+[  161.270992] CPU: 2 UID: 0 PID: 254 Comm: guest_memfd_tes Tainted: G        W          6.14.0-rc7-00016-g174a15c15f96 #1
+[  161.270995] Tainted: [W]=WARN
+[  161.270996] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+[  161.270997] Call Trace:
+[  161.270998]  <TASK>
+[  161.271000]  dump_stack_lvl+0xa7/0x100
+[  161.271005]  __might_resched+0x261/0x280
+[  161.271009]  prepare_alloc_pages+0xe5/0x1e0
+[  161.271013]  __alloc_frozen_pages_noprof+0xbc/0x2a0
+[  161.271019]  alloc_pages_mpol+0x111/0x1d0
+[  161.271025]  alloc_pages_noprof+0x7e/0x120
+[  161.271028]  folio_alloc_noprof+0x14/0x30
+[  161.271030]  __filemap_get_folio+0x189/0x380
+[  161.271036]  kvm_gmem_fault+0x5e/0x1f0
+[  161.271041]  __do_fault+0x42/0xc0
+[  161.271045]  handle_mm_fault+0xf37/0x1c90
+[  161.271047]  ? handle_mm_fault+0x3c/0x1c90
+[  161.271053]  ? mt_find+0x208/0x2a0
+[  161.271088]  do_user_addr_fault+0x3c0/0x740
+[  161.271095]  exc_page_fault+0x69/0x110
+[  161.271099]  asm_exc_page_fault+0x26/0x30
+[  161.271102] RIP: 0033:0x419fb0
+[  161.271104] Code: 48 8d 3c 17 48 89 c1 48 85 d2 74 2e 48 89 fa 48 29 c2 83 e2 01 74 13 48 8d 48 01 40 88 71 ff 48 39 cf 74 17 66 0f 1f 44 00 00 <44> 88 01 48 83 c1 02 44 88 41 ff 48 39 cf[  161.271105] RSP: 002b:00007fffd695b568 EFLAGS: 00010246
+[  161.271107] RAX: 00007f4f395a0000 RBX: 00007fffd695b590 RCX: 00007f4f395a0000
+[  161.271108] RDX: 0000000000000000 RSI: 00000000ffffffaa RDI: 00007f4f395a4000
+[  161.271109] RBP: 0000000000000005 R08: 00000000ffffffaa R09: 0000000000000000
+[  161.271109] R10: 0000000000000001 R11: 0000000000000246 R12: 0000000000001000
+[  161.271110] R13: 000000002e03ab40 R14: 00007f4f395a0000 R15: 0000000000004000
+[  161.271119]  </TASK>
+
+> +#endif
+> +};
+> +
+> +static struct kvm_gmem_inode_private *kvm_gmem_private(struct inode *inode)
+> +{
+> +	return inode->i_mapping->i_private_data;
+> +}
+> +
+>  #ifdef CONFIG_KVM_GMEM_SHARED_MEM
+>  void kvm_gmem_handle_folio_put(struct folio *folio)
+>  {
+> @@ -324,8 +336,28 @@ static pgoff_t kvm_gmem_get_index(struct kvm_memory_slot *slot, gfn_t gfn)
+>  	return gfn - slot->base_gfn + slot->gmem.pgoff;
+>  }
+>  
+> +static void kvm_gmem_evict_inode(struct inode *inode)
+> +{
+> +	struct kvm_gmem_inode_private *private = kvm_gmem_private(inode);
+> +
+> +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> +	/*
+> +	 * .evict_inode can be called before private data is set up if there are
+> +	 * issues during inode creation.
+> +	 */
+> +	if (private)
+> +		xa_destroy(&private->shared_offsets);
+> +#endif
+> +
+> +	truncate_inode_pages_final(inode->i_mapping);
+> +
+> +	kfree(private);
+> +	clear_inode(inode);
+> +}
+> +
+>  static const struct super_operations kvm_gmem_super_operations = {
+> -	.statfs		= simple_statfs,
+> +	.statfs         = simple_statfs,
+> +	.evict_inode	= kvm_gmem_evict_inode,
+>  };
+>  
+>  static int kvm_gmem_init_fs_context(struct fs_context *fc)
+> @@ -553,6 +585,7 @@ static struct inode *kvm_gmem_inode_make_secure_inode(const char *name,
+>  						      loff_t size, u64 flags)
+>  {
+>  	const struct qstr qname = QSTR_INIT(name, strlen(name));
+> +	struct kvm_gmem_inode_private *private;
+>  	struct inode *inode;
+>  	int err;
+>  
+> @@ -561,10 +594,20 @@ static struct inode *kvm_gmem_inode_make_secure_inode(const char *name,
+>  		return inode;
+>  
+>  	err = security_inode_init_security_anon(inode, &qname, NULL);
+> -	if (err) {
+> -		iput(inode);
+> -		return ERR_PTR(err);
+> -	}
+> +	if (err)
+> +		goto out;
+> +
+> +	err = -ENOMEM;
+> +	private = kzalloc(sizeof(*private), GFP_KERNEL);
+> +	if (!private)
+> +		goto out;
+> +
+> +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> +	xa_init(&private->shared_offsets);
+> +	rwlock_init(&private->offsets_lock);
+> +#endif
+> +
+> +	inode->i_mapping->i_private_data = private;
+>  
+>  	inode->i_private = (void *)(unsigned long)flags;
+>  	inode->i_op = &kvm_gmem_iops;
+> @@ -577,6 +620,11 @@ static struct inode *kvm_gmem_inode_make_secure_inode(const char *name,
+>  	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
+>  
+>  	return inode;
+> +
+> +out:
+> +	iput(inode);
+> +
+> +	return ERR_PTR(err);
+>  }
+>  
+>  static struct file *kvm_gmem_inode_create_getfile(void *priv, loff_t size,
 
