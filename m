@@ -1,235 +1,158 @@
-Return-Path: <kvm+bounces-42470-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42471-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F0FDA78FAB
-	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 15:26:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F8A0A79001
+	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 15:37:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 967C916CEDA
-	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 13:26:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F210170160
+	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 13:36:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EF1A23A9B0;
-	Wed,  2 Apr 2025 13:26:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E1D323BCE4;
+	Wed,  2 Apr 2025 13:36:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TTB1G5Sp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jnakGx+s"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE18623959B
-	for <kvm@vger.kernel.org>; Wed,  2 Apr 2025 13:26:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FFC32376EA
+	for <kvm@vger.kernel.org>; Wed,  2 Apr 2025 13:36:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743600388; cv=none; b=eRl+o54GdfznF5zuIJg3HYNkUuN9O1cb/hxxpKJ0lPNPVnCH1jcQ4C5w1G2tFBQkJrBva0TXHLdRYQkt+QY3e0gu6ZaUY5susHHXy6xYXJV0YI/svbf7h/LyzMSzprdyjK5dfEMyYjS6vKF2/18Ky+JR3eLziWFr1pKFktHLx00=
+	t=1743600976; cv=none; b=tVvo6B6285TA+QTFyxQf40UwsbAul7JglttQ+YFciHdX31665CV0TAenW3GrxPTYDtd3Pq67k3g3CAPD3DM4LLzOjwgtdg+86TgTMlrN+3JQcUGaVb9wAL+mfE2Ey304HvNxH9GhPWO/djTnp4pe0us9TE5eSHMdatB7s3vluys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743600388; c=relaxed/simple;
-	bh=y7aDu52OtjP82L/t8qz2xzSOvpOmNkeVv0GRqHlG5Og=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hSnX2KVbKBdJ71wz5ztemN0TSlEU1JQ4WEI73hRDJJnCXBX/KnO63d+jwmv6Ghy9XJtJWuyeXVzlqfyiYGmdL3yGkgPcUZEH5/JxdF8wuk18amqEbZqjWcJlit0QT9w6dVNARtZoHGvYyc6A75MsqcVuxVovhBejB51IjpziKIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TTB1G5Sp; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743600385;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6110eyhDOYjIRZ5MJbmf8dHwQ9jqIHg+d8375Mf4B3A=;
-	b=TTB1G5Sp3cB3vlh9ypJem9K8UQo87FAAB5GPc4ePAXktUQsRoRkiE+DP3j0DzGaJaaLv9T
-	gvyeII1M4LSB42NF/tmJaH+lqaIOnOVf7KJnhQuuPll2Tlv0CO84kf9Eq6XyjoU2H6l2cV
-	fLiCco0pHdOVtFIAGg2eGqqio2dBsmQ=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-220-qOwdTR3mMO20HOBiTr9yBA-1; Wed, 02 Apr 2025 09:26:24 -0400
-X-MC-Unique: qOwdTR3mMO20HOBiTr9yBA-1
-X-Mimecast-MFC-AGG-ID: qOwdTR3mMO20HOBiTr9yBA_1743600383
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3912539665cso474626f8f.1
-        for <kvm@vger.kernel.org>; Wed, 02 Apr 2025 06:26:24 -0700 (PDT)
+	s=arc-20240116; t=1743600976; c=relaxed/simple;
+	bh=MqBOTDc9GRqer6IcN1CWf28Fjo98+zBzhr/8RRY4has=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=dpy/K7I7JLA1OAhe/G4tfMjsceuQKceEDtRL/PIx40KnAXf5dZ+0B+z5B7WzAG0sLqg1aKbSY4cDd5Clcz8nUiQ1yzrWM1qUFlgl1zzTnfkzA7ZS1CUxDc8YSW/KMYXBzZYHruPTvQN84BzAW+/jqT8unO8E6+sa9wK6P0G2APg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jnakGx+s; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff7aecba07so11434264a91.2
+        for <kvm@vger.kernel.org>; Wed, 02 Apr 2025 06:36:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1743600974; x=1744205774; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mk+AHGtNwwzbB9JrzbmHG5xhTZS1h9alfQA3RqPYHQQ=;
+        b=jnakGx+sq4IcYFe97Jh95q4lWQnA7I+SUsN+n9j5SVMcMQw2uJ4H2JG8j4Pd/yQFym
+         qlNGSlG+vFt7lIXZusa5kBGuexBxQG0xb2WbSbAyReNgAlzOHdVDhNQrVLKLxr114pPK
+         Mzrz+ELwB/AvaZB8kdFlc0fmd1Fm6XmiGaxbMwF9nzV4+4Hu2WIRANrM1bddW9wYeFUI
+         oX2YFRJPZZj9/T043ub9v4sP3uEiZcig7nbGbvCfjARfLYO0nEokJZsd7lumnLgxk7S1
+         V1xKjD42uFQHQxaHDQjeYNPT/Tnl1TSxG4hU0ncSpAPTHBRsIML9bvIzLW7HdDWLJYuN
+         GhZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743600383; x=1744205183;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6110eyhDOYjIRZ5MJbmf8dHwQ9jqIHg+d8375Mf4B3A=;
-        b=mzEhHnHR7LKDrz4uvCsI7B4jcJ1OdgYtJpT3awDJ6/OX1I9rm/Vso42VCfZi5fflKR
-         Ev12dMz8mdG8K9hf/hY1yWYKmhjgzCal/xOUCYYrbn6HxekfN+RXSQvs7Zze+KXe7SAT
-         G919Snzj1W9ow1vkUqFDHKPwG5FWFK6H5j4G57E/6fOWupnDzjNPs/dGE/Gq4o+Qjryt
-         Fe9ba07+Nvoq2B9j9m2L90ktwqjm/OdWsSa4wkICLHaW92/fJ7u4myeNZC8AEOBeg4OO
-         FA7of2y1cOp1h5kdfk+d4US/bDUHK4wz9eYFsX1NksMAfbIP3dpuemPCutpOvyYv1eo2
-         6ZnA==
-X-Forwarded-Encrypted: i=1; AJvYcCVjq9AyMF5LiH6/tAlQt7rojT/exoFJZUjVo5f7HBysWncgyY4+QHLSDXDt6m18OO/RjCI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFDJGnGDnhh0tNHRYyNOCfnUd9307uZN+O1BVArroyv2vHgzgI
-	zC5YGnon2EUyaa27Lms7VrTvM9GIxUWPYZjXyH4cZHux68Lwr6U86BifCX0H3APJHwQI3fMz37J
-	PLkpXgjkXlUuA9NlR8b8jwbv3J6r6ZMfDbrzRnt+X56OtrKF4YQ==
-X-Gm-Gg: ASbGncvupAnhn/uaBHyZVwzyVc7NeIzA6DC/WJa+IrOQTlw5PQvvgSNJ7mkJqIy9FkH
-	05NXXw1+k7OnbIXO8lwDLrx92NiR2agE6QpFllIEBQ76zA8Kxt+1arwGPn/QinYNvugbhP2nZYA
-	GSz9aALKlqp7Hc/8rWrGPQ9Q53HFkeGZPnYq4kOFx9h+s/dwcNlR/UMwdXwb8tlOF0t3PwStDTs
-	8m3OwrKck3+X1kM8FqixWudreOfr6oWoAnlrbwWPxdDBqibbjeMsZfeOkT7owB32HEp/2T6Cqs0
-	F1AR/dvdtCH++IfxtPegDWa+5Me6hGzFnIiB4RPKNWShRSFeb3i3irQC23s=
-X-Received: by 2002:a05:6000:22c6:b0:38d:b52d:e11c with SMTP id ffacd0b85a97d-39c2a677e96mr1839700f8f.15.1743600383057;
-        Wed, 02 Apr 2025 06:26:23 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHW+mpa2QDuIfLk4f0y2/+06+UXRGWFHMhO1XRJbckZ1MK2jGpB/+Qi23vZe6cIC+p2ME0POw==
-X-Received: by 2002:a05:6000:22c6:b0:38d:b52d:e11c with SMTP id ffacd0b85a97d-39c2a677e96mr1839679f8f.15.1743600382569;
-        Wed, 02 Apr 2025 06:26:22 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-11-6-59.retail.telecomitalia.it. [87.11.6.59])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0b658c87sm17171730f8f.9.2025.04.02.06.26.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Apr 2025 06:26:21 -0700 (PDT)
-Date: Wed, 2 Apr 2025 15:26:17 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Simon Horman <horms@kernel.org>, Alexander Graf <graf@amazon.com>
-Cc: netdev@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, kvm@vger.kernel.org, 
-	Asias He <asias@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	nh-open-source@amazon.com
-Subject: Re: [PATCH v2] vsock/virtio: Remove queued_replies pushback logic
-Message-ID: <cumaux64rfyptgzo2ccvp55l5ha2g75z3kptdwbgwgjek6654x@dbavqjiinal3>
-References: <20250401201349.23867-1-graf@amazon.com>
- <20250402092605.GJ214849@horms.kernel.org>
+        d=1e100.net; s=20230601; t=1743600974; x=1744205774;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mk+AHGtNwwzbB9JrzbmHG5xhTZS1h9alfQA3RqPYHQQ=;
+        b=I5Vgh6ZEXX6qiBZ9jw/x3BE/q7feaMo8iMu0V5B83LYbrYrrUYLA0SEHpjuxPYHCO6
+         6zcW2lHUUUU+qpgTSTql2Ia5x/sZvzq+AifyOe09bpuTJEnKMIRvZpWXgOzHn88Cqqer
+         rs5VnzFae/TLjiTIaHrWCZhyAhS59CPFFFWDwF25ReGWKbrMqR8Jw0aNQG4O5mMEitcC
+         lnBqUvmikN1rOalurtNUvJywzWJiADg3Via0ixxxl1e8z2NerTXQtv7nFKb6p7+eXq+2
+         Jkgs/gLldC2oZVqXRD8hkxJyOBbajuyEvE5QFViPugMQuMr9RA2ASV7FUfWsRmVRJIf9
+         0cvg==
+X-Forwarded-Encrypted: i=1; AJvYcCVW7d3kZlKLFseMQNyZNLVnG4VDFVfn3NZxdA33nA+t2ORH94JdxYylSDn8USHJK8cWo5c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhXM77kL+591GMmBaZbFAl0/j8a6UwNKSV46JVxCh1uH8KP42r
+	RimyvA/IIcWGxCvJoMgMdhPKQw/5vBXq5GOsc/O6SOb4TyyP3RLhW4MhJOaAijn0Ggyv/5NyIF+
+	QtQ==
+X-Google-Smtp-Source: AGHT+IEg80yE/5EQOyTbP8oPtkkE6VHG4R4N8JI2Kg9VJlrk7/RNDAbsRVFXgGcpSHsz8luqfesoSLLT04M=
+X-Received: from pjbso5.prod.google.com ([2002:a17:90b:1f85:b0:2ff:6e58:8a0a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2c8e:b0:2fe:a545:4c84
+ with SMTP id 98e67ed59e1d1-305321634dcmr21618691a91.34.1743600974287; Wed, 02
+ Apr 2025 06:36:14 -0700 (PDT)
+Date: Wed, 2 Apr 2025 06:36:12 -0700
+In-Reply-To: <20250401044931.793203-1-jon@nutanix.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250402092605.GJ214849@horms.kernel.org>
+Mime-Version: 1.0
+References: <20250401044931.793203-1-jon@nutanix.com>
+Message-ID: <Z-09TLXNWv-msJ4O@google.com>
+Subject: Re: [PATCH] KVM: x86: Expose ARCH_CAP_FB_CLEAR when invulnerable to MDS
+From: Sean Christopherson <seanjc@google.com>
+To: Jon Kohler <jon@nutanix.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Emanuele Giuseppe Esposito <eesposit@redhat.com>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Apr 02, 2025 at 10:26:05AM +0100, Simon Horman wrote:
->On Tue, Apr 01, 2025 at 08:13:49PM +0000, Alexander Graf wrote:
->> Ever since the introduction of the virtio vsock driver, it included
->> pushback logic that blocks it from taking any new RX packets until the
->> TX queue backlog becomes shallower than the virtqueue size.
->>
->> This logic works fine when you connect a user space application on the
->> hypervisor with a virtio-vsock target, because the guest will stop
->> receiving data until the host pulled all outstanding data from the VM.
->>
->> With Nitro Enclaves however, we connect 2 VMs directly via vsock:
->>
->>   Parent      Enclave
->>
->>     RX -------- TX
->>     TX -------- RX
->>
->> This means we now have 2 virtio-vsock backends that both have the pushback
->> logic. If the parent's TX queue runs full at the same time as the
->> Enclave's, both virtio-vsock drivers fall into the pushback path and
->> no longer accept RX traffic. However, that RX traffic is TX traffic on
->> the other side which blocks that driver from making any forward
->> progress. We're now in a deadlock.
->>
->> To resolve this, let's remove that pushback logic altogether and rely on
->> higher levels (like credits) to ensure we do not consume unbounded
->> memory.
->>
->> RX and TX queues share the same work queue. To prevent starvation of TX
->> by an RX flood and vice versa now that the pushback logic is gone, let's
->> deliberately reschedule RX and TX work after a fixed threshold (256) of
->> packets to process.
->>
->> Fixes: 0ea9e1d3a9e3 ("VSOCK: Introduce virtio_transport.ko")
->> Signed-off-by: Alexander Graf <graf@amazon.com>
->> ---
->>  net/vmw_vsock/virtio_transport.c | 70 +++++++++-----------------------
->>  1 file changed, 19 insertions(+), 51 deletions(-)
->>
->> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->
->...
->
->> @@ -158,7 +162,7 @@ virtio_transport_send_pkt_work(struct work_struct *work)
->>  		container_of(work, struct virtio_vsock, send_pkt_work);
->>  	struct virtqueue *vq;
->>  	bool added = false;
->> -	bool restart_rx = false;
->> +	int pkts = 0;
->>
->>  	mutex_lock(&vsock->tx_lock);
->>
->> @@ -172,6 +176,12 @@ virtio_transport_send_pkt_work(struct work_struct *work)
->>  		bool reply;
->>  		int ret;
->>
->> +		if (++pkts > VSOCK_MAX_PKTS_PER_WORK) {
->> +			/* Allow other works on the same queue to run */
->> +			queue_work(virtio_vsock_workqueue, work);
->> +			break;
->> +		}
->> +
->>  		skb = virtio_vsock_skb_dequeue(&vsock->send_pkt_queue);
->>  		if (!skb)
->>  			break;
->
->Hi Alexander,
->
->The next non-blank line of code looks like this:
->
->		reply = virtio_vsock_skb_reply(skb);
->
->But with this patch reply is assigned but otherwise unused.
+On Mon, Mar 31, 2025, Jon Kohler wrote:
+> Expose FB_CLEAR in arch_capabilities for certain MDS-invulnerable cases 
+> to support live migration from older hardware (e.g., Cascade Lake, Ice 
+> Lake) to newer hardware (e.g., Sapphire Rapids or higher). This ensures 
+> compatibility when user space has previously configured vCPUs to see 
+> FB_CLEAR (ARCH_CAPABILITIES Bit 17).
+> 
+> Newer hardware sets the following bits but does not set FB_CLEAR, which 
+> can prevent user space from configuring a matching setup:
 
-Thanks for the report!
+I looked at this again right after PUCK, and KVM does NOT actually prevent
+userspace from matching the original, pre-SPR configuration.  KVM effectively
+treats ARCH_CAPABILITIES like a CPUID leaf, and lets userspace shove in any
+value.  I.e. userspace can still migrate+stuff FB_CLEAR irrespective of hardware
+support, and thus there is no need for KVM to lie to userspace.
 
->So perhaps the line above, and the declaration of reply, can be removed?
+So in effect, this is a userspace problem where it's being too aggressive in its
+sanity checks.
 
-@Alex: yes, please remove it.
+FWIW, even if KVM did reject unsupported ARCH_CAPABILITIES bits, I would still
+say this is userspace's problem to solve.  E.g. by using MSR filtering to
+intercept and emulate RDMSR(ARCH_CAPABILITIES) in userspace.
 
-A part of that the rest LGTM!
-
-I've been running some tests for a while and everything seems okay.
-
-I guess we can do something similar also in vhost-vsock, where we 
-already have "vhost weight" support. IIUC it was added later by commit 
-e79b431fb901 ("vhost: vsock: add weight support"), but we never removed 
-"queued_replies" stuff, that IMO after that commit is pretty much 
-useless.
-
-I'm not asking to that in this series, if you don't have time I can do 
-it separately ;-)
-
-Thanks,
-Stefano
-
->
->Flagged by W=1 builds.
->
->> @@ -184,17 +194,6 @@ virtio_transport_send_pkt_work(struct work_struct *work)
->>  			break;
->>  		}
->>
->> -		if (reply) {
->> -			struct virtqueue *rx_vq = vsock->vqs[VSOCK_VQ_RX];
->> -			int val;
->> -
->> -			val = atomic_dec_return(&vsock->queued_replies);
->> -
->> -			/* Do we now have resources to resume rx processing? */
->> -			if (val + 1 == virtqueue_get_vring_size(rx_vq))
->> -				restart_rx = true;
->> -		}
->> -
->>  		added = true;
->>  	}
->>
->> @@ -203,9 +202,6 @@ virtio_transport_send_pkt_work(struct work_struct *work)
->>
->>  out:
->>  	mutex_unlock(&vsock->tx_lock);
->> -
->> -	if (restart_rx)
->> -		queue_work(virtio_vsock_workqueue, &vsock->rx_work);
->>  }
->>
->>  /* Caller need to hold RCU for vsock.
->
->...
->
-
+>     ARCH_CAP_MDS_NO
+>     ARCH_CAP_TAA_NO
+>     ARCH_CAP_PSDP_NO
+>     ARCH_CAP_FBSDP_NO
+>     ARCH_CAP_SBDR_SSDP_NO
+> 
+> This change has minimal impact, as these bit combinations already mark 
+> the host as MMIO immune (via arch_cap_mmio_immune()) and set 
+> disable_fb_clear in vmx_update_fb_clear_dis(), resulting in no 
+> additional overhead.
+> 
+> Cc: Emanuele Giuseppe Esposito <eesposit@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> Signed-off-by: Jon Kohler <jon@nutanix.com>
+> 
+> ---
+>  arch/x86/kvm/x86.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index c841817a914a..2a4337aa78cd 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1641,6 +1641,20 @@ static u64 kvm_get_arch_capabilities(void)
+>  	if (!boot_cpu_has_bug(X86_BUG_GDS) || gds_ucode_mitigated())
+>  		data |= ARCH_CAP_GDS_NO;
+>  
+> +	/*
+> +	 * User space might set FB_CLEAR when starting a vCPU on a system
+> +	 * that does not enumerate FB_CLEAR but is also invulnerable to
+> +	 * other various MDS related bugs. To allow live migration from
+> +	 * hosts that do implement FB_CLEAR, leave it enabled.
+> +	 */
+> +	if ((data & ARCH_CAP_MDS_NO) &&
+> +	    (data & ARCH_CAP_TAA_NO) &&
+> +	    (data & ARCH_CAP_PSDP_NO) &&
+> +	    (data & ARCH_CAP_FBSDP_NO) &&
+> +	    (data & ARCH_CAP_SBDR_SSDP_NO)) {
+> +		data |= ARCH_CAP_FB_CLEAR;
+> +	}
+> +
+>  	return data;
+>  }
+>  
+> -- 
+> 2.43.0
+> 
 
