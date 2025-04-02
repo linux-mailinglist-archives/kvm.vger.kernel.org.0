@@ -1,178 +1,132 @@
-Return-Path: <kvm+bounces-42450-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42451-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC2F4A78769
-	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 06:50:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE670A78774
+	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 06:58:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F15493AEF41
-	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 04:50:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA7927A40F4
+	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 04:57:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88384230BE5;
-	Wed,  2 Apr 2025 04:50:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25C11231A24;
+	Wed,  2 Apr 2025 04:58:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LyCORa9z"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="KgWEvIDk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018862629F
-	for <kvm@vger.kernel.org>; Wed,  2 Apr 2025 04:50:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD598185B73;
+	Wed,  2 Apr 2025 04:58:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743569447; cv=none; b=qnbP/W7nEzrZyRrqR4RtYI/FNTG6e9m9C/SlfZmqiIJCUfTBsFdyTy9gf6329PQCifS55CADX2G9mQlT564XQyDpiXvkSg3TwcH7ECtbl132KbiYzkVgRkm8i4H0hFvVMcq6Uqm04yBoO4i3y19XyTQOX/JpZsjJ2+E5S4cZlMI=
+	t=1743569908; cv=none; b=pxarmtwpg6VsLc7JafixOp24g6CjIojKLd/wiwH9EEtnRmRQA5FCG/Mv5xPpiZLM6D0x8ML0iEURun9srktiVgJ+VoCoco8+YNETgWvGctJOKbphkHXVSSsburO8gjKFOcqBXe5zpcUk3p9sO2mzC5/j/xtigeMEF5uFhNKvPC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743569447; c=relaxed/simple;
-	bh=AdStfRI/7w1N48Sb8+2mWETLSWysBQ+Mw32djqVWfh0=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=fXj5qBDWV8MHrQq/BQSiLNiQQpT15Irv6Y720hrQyrnmtUOhIuA2ekSBco+FP+F2yr0CLi5Ld00tQop/CPkIwfmgX3RwMTebcgkq5nHaJ9ayc8XoaD26YpbIgjUPVlr7wqgFjhuUXl9vTFcuWp6RQCEXKbH/xS76LW2Dn1mjxF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LyCORa9z; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1743569446; x=1775105446;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=AdStfRI/7w1N48Sb8+2mWETLSWysBQ+Mw32djqVWfh0=;
-  b=LyCORa9zDL18IyVQlz+unoU7YjOKAWeecpcGohJ4KaeqvMAudNRAegZ5
-   8UKQ4aL9OJyFowfth1C4MML7F+Q0fnPf+iLo7vaW045oWPna1xOrVrgR8
-   g5oeJmu9jnaPkv41O20tDJmQUmqPc4L4o/4zVYwk2Ntb/YKASFtU/4oXB
-   buyy59RmExqvCNadCfVaDx2Vdn+fUD2cuqtXVJaStId9/mih82DjkZKbk
-   dmJFUWLxXMqbDZcJWGTwVkhzCCuCnSue28zA2qf4Vhc7D28QgeD9c3K5Q
-   GHx3Gq29oGjtkZhyuRf3aya/YcPtK4YaadyZ9gHb2CiCYk/Vlfp31DY5M
-   Q==;
-X-CSE-ConnectionGUID: E6nPyhTQQLyJH9Gitu/xBA==
-X-CSE-MsgGUID: 4N8V3LhhQvuq9rrWzMwpsg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11391"; a="44799436"
-X-IronPort-AV: E=Sophos;i="6.14,295,1736841600"; 
-   d="scan'208";a="44799436"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2025 21:50:46 -0700
-X-CSE-ConnectionGUID: 7+yPPRYQTaGVtTvGAu6g/A==
-X-CSE-MsgGUID: U07Hu7waTdGhCv+dwkQSag==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,295,1736841600"; 
-   d="scan'208";a="131306722"
-Received: from lkp-server02.sh.intel.com (HELO e98e3655d6d2) ([10.239.97.151])
-  by fmviesa005.fm.intel.com with ESMTP; 01 Apr 2025 21:50:44 -0700
-Received: from kbuild by e98e3655d6d2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tzq3m-000ATo-01;
-	Wed, 02 Apr 2025 04:50:42 +0000
-Date: Wed, 2 Apr 2025 12:50:04 +0800
-From: kernel test robot <lkp@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
-	Farrah Chen <farrah.chen@intel.com>
-Subject: [kvm:planes-20250401 58/62] arch/x86/kvm/lapic.c:1327:44: error:
- passing argument 2 of 'test_and_set_bit' from incompatible pointer type
-Message-ID: <202504021204.ViYQdiHr-lkp@intel.com>
+	s=arc-20240116; t=1743569908; c=relaxed/simple;
+	bh=5UiAmTnqltfwvRyVzGRX8Q7LYriFM9zM4G8+bmQFFPc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=W2tML5QAONtNVbCDZTY/WZ0/kFgGOy2HddtTWsrFIcn3GweeKIkoQH6WYL6pOacY9ZFMgRccyUEbheXIb8FDd8j047t/8SjTp5B4b66p/351/ciLpra6pz2yAqQcdKpejhZLh/ZiZbd4KeS5G5rKQwIPqf2+Y0MCFR3vNwNyMeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=KgWEvIDk; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.202] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 5324vV334074560
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Tue, 1 Apr 2025 21:57:32 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 5324vV334074560
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025032001; t=1743569855;
+	bh=dP9zemrGBwQsO7PTwDde7OdOBV5enCnih/h0UjXSaBY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=KgWEvIDk0ptJ+2Le7Mljabnd1tBAvTAd/OvynSGx3lkb8s5fLKNxnDaj/u6UOdm7W
+	 +vrd3NNd0O6rV4BrlX3+iTxEb+jQH1rTuOJUcJicRl6Z5aajvTac/lcdNUGieGqjjX
+	 JSlO+qiJtqShYTz1ktaVl5/AEupYKCdX1Vrjn9eBhZPMm+kj1KbCioask+G0OE5dak
+	 XkwL1uVpPyRsdjk5rXoZkjb1lPz4F5EDEJvOXCJXyv6CyddNA3AKO8tKk5NZ4l3PNj
+	 cc4XoBuOZEJzMmYpZNWg/T2fgE69DPZZ1BoWAegBH6U0jZ4x2DVCYEdvlHUn9gNB5t
+	 CzEyh2X4dfeiA==
+Message-ID: <7f76e23e-45a9-4e9d-b792-02da9e6deee5@zytor.com>
+Date: Tue, 1 Apr 2025 21:57:31 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 01/15] x86/msr: Replace __wrmsr() with
+ native_wrmsrl()
+To: Ingo Molnar <mingo@kernel.org>
+Cc: "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        virtualization@lists.linux.dev, linux-edac@vger.kernel.org,
+        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+        linux-ide@vger.kernel.org, linux-pm@vger.kernel.org,
+        bpf@vger.kernel.org, llvm@lists.linux.dev, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, jgross@suse.com, andrew.cooper3@citrix.com,
+        peterz@infradead.org, acme@kernel.org, namhyung@kernel.org,
+        mark.rutland@arm.com, alexander.shishkin@linux.intel.com,
+        jolsa@kernel.org, irogers@google.com, adrian.hunter@intel.com,
+        kan.liang@linux.intel.com, wei.liu@kernel.org, ajay.kaher@broadcom.com,
+        alexey.amakhalov@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
+        tony.luck@intel.com, pbonzini@redhat.com, vkuznets@redhat.com,
+        seanjc@google.com, luto@kernel.org, boris.ostrovsky@oracle.com,
+        kys@microsoft.com, haiyangz@microsoft.com, decui@microsoft.com,
+        Linus Torvalds <torvalds@linux-foundation.org>
+References: <20250331082251.3171276-1-xin@zytor.com>
+ <20250331082251.3171276-2-xin@zytor.com> <Z-pruogreCuU66wm@gmail.com>
+ <9D15DE81-2E68-4FCD-A133-4963602E18C9@zytor.com> <Z-ubVFyoOzwKhI53@gmail.com>
+ <7a503d55-db41-42da-8133-4a3dbbd36c7e@zytor.com> <Z-y4pGxgiP55lpOj@gmail.com>
+Content-Language: en-US
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <Z-y4pGxgiP55lpOj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git planes-20250401
-head:   73685d9c23b7122b44f07d59244416f8b56ed48e
-commit: 08db55297a7b060909a0121cb4ce6abbc3e6b2ea [58/62] KVM: x86: handle interrupt priorities for planes
-config: i386-buildonly-randconfig-001-20250402 (https://download.01.org/0day-ci/archive/20250402/202504021204.ViYQdiHr-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250402/202504021204.ViYQdiHr-lkp@intel.com/reproduce)
+On 4/1/2025 9:10 PM, Ingo Molnar wrote:
+> Yeah, I moved it over to:
+> 
+>    git://git.kernel.org/pub/scm/linux/kernel/git/mingo/tip.git WIP.x86/msr
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202504021204.ViYQdiHr-lkp@intel.com/
+On it now.
 
-All errors (new ones prefixed by >>):
-
-   arch/x86/kvm/lapic.c: In function 'kvm_lapic_deliver_interrupt':
->> arch/x86/kvm/lapic.c:1327:44: error: passing argument 2 of 'test_and_set_bit' from incompatible pointer type [-Werror=incompatible-pointer-types]
-    1327 |         if (!test_and_set_bit(vcpu->plane, &plane0_vcpu->arch.irr_pending_planes)) {
-         |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         |                                            |
-         |                                            atomic_t *
-   In file included from arch/x86/include/asm/bitops.h:432,
-                    from include/linux/bitops.h:68,
-                    from include/linux/kernel.h:23,
-                    from include/linux/cpumask.h:11,
-                    from include/linux/alloc_tag.h:13,
-                    from include/linux/percpu.h:5,
-                    from include/linux/context_tracking_state.h:5,
-                    from include/linux/hardirq.h:5,
-                    from include/linux/kvm_host.h:7,
-                    from arch/x86/kvm/lapic.c:20:
-   include/asm-generic/bitops/instrumented-atomic.h:68:79: note: expected 'volatile long unsigned int *' but argument is of type 'atomic_t *'
-      68 | static __always_inline bool test_and_set_bit(long nr, volatile unsigned long *addr)
-         |                                                       ~~~~~~~~~~~~~~~~~~~~~~~~^~~~
-   cc1: some warnings being treated as errors
---
-   arch/x86/kvm/x86.c: In function 'kvm_arch_vcpu_ioctl_run':
->> arch/x86/kvm/x86.c:11745:37: error: passing argument 2 of 'clear_bit' from incompatible pointer type [-Werror=incompatible-pointer-types]
-   11745 |                 clear_bit(plane_id, &plane0_vcpu->arch.irr_pending_planes);
-         |                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         |                                     |
-         |                                     atomic_t *
-   In file included from arch/x86/include/asm/bitops.h:432,
-                    from include/linux/bitops.h:68,
-                    from include/linux/kernel.h:23,
-                    from include/linux/cpumask.h:11,
-                    from include/linux/alloc_tag.h:13,
-                    from include/linux/percpu.h:5,
-                    from include/linux/context_tracking_state.h:5,
-                    from include/linux/hardirq.h:5,
-                    from include/linux/kvm_host.h:7,
-                    from arch/x86/kvm/x86.c:20:
-   include/asm-generic/bitops/instrumented-atomic.h:39:72: note: expected 'volatile long unsigned int *' but argument is of type 'atomic_t *'
-      39 | static __always_inline void clear_bit(long nr, volatile unsigned long *addr)
-         |                                                ~~~~~~~~~~~~~~~~~~~~~~~~^~~~
-   cc1: some warnings being treated as errors
-
-
-vim +/test_and_set_bit +1327 arch/x86/kvm/lapic.c
-
-  1313	
-  1314	static void kvm_lapic_deliver_interrupt(struct kvm_vcpu *vcpu, struct kvm_lapic *apic,
-  1315						int delivery_mode, int trig_mode, int vector)
-  1316	{
-  1317		struct kvm_vcpu *plane0_vcpu = vcpu->plane0;
-  1318		struct kvm_plane *running_plane;
-  1319		u16 req_exit_planes;
-  1320	
-  1321		kvm_x86_call(deliver_interrupt)(apic, delivery_mode, trig_mode, vector);
-  1322	
-  1323		/*
-  1324		 * test_and_set_bit implies a memory barrier, so IRR is written before
-  1325		 * reading irr_pending_planes below...
-  1326		 */
-> 1327		if (!test_and_set_bit(vcpu->plane, &plane0_vcpu->arch.irr_pending_planes)) {
-  1328			/*
-  1329			 * ... and also running_plane and req_exit_planes are read after writing
-  1330			 * irr_pending_planes.  Both barriers pair with kvm_arch_vcpu_ioctl_run().
-  1331			 */
-  1332			smp_mb__after_atomic();
-  1333	
-  1334			running_plane = READ_ONCE(plane0_vcpu->running_plane);
-  1335			if (!running_plane)
-  1336				return;
-  1337	
-  1338			req_exit_planes = READ_ONCE(plane0_vcpu->req_exit_planes);
-  1339			if (!(req_exit_planes & BIT(vcpu->plane)))
-  1340				return;
-  1341	
-  1342			kvm_make_request(KVM_REQ_PLANE_INTERRUPT,
-  1343					 kvm_get_plane_vcpu(running_plane, vcpu->vcpu_id));
-  1344		}
-  1345	}
-  1346	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks!
+     Xin
 
