@@ -1,108 +1,270 @@
-Return-Path: <kvm+bounces-42513-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42514-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81E78A79711
-	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 23:05:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FADBA7974E
+	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 23:11:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5BFF3B4CFA
-	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 21:04:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81CD61894750
+	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 21:11:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E22F51F3D54;
-	Wed,  2 Apr 2025 21:04:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECFE71F3FF4;
+	Wed,  2 Apr 2025 21:11:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fsykVB+f"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AZWQK9Vr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C0191F3B82
-	for <kvm@vger.kernel.org>; Wed,  2 Apr 2025 21:04:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 696AB42A87
+	for <kvm@vger.kernel.org>; Wed,  2 Apr 2025 21:11:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743627861; cv=none; b=nmK63Fi6HWHkgN2HZjnC6bxLVv2xN7rURo2+QH4gEV3UbdKeSEAvcb+dz26OcYHqxi5VTe0bmTFQoVyGV9tiGpePiRWhS6vnLWfg3XQuGWJhkrBUpOuAAgB2w71V1ZoZRbBVLAsLeeZVnsov7pyy7oxJG45LPJz+9fY3zEHydP4=
+	t=1743628263; cv=none; b=dsWmDHXMTJ7jsDpTe8bKuHPdS+1w0aMt15GyICSxKlKmkUY6Yvt8VJbC7xzS0KGeP4hXqRNNulaebVeNRJWDE5qGwUkZNiQWN2RvvPEmFjMObl3vUHSKcO2dHK5/QxNNwIS3yk7i3EbogJLi+5dAZQ5l6f8gClD0pLxWjmytezI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743627861; c=relaxed/simple;
-	bh=Vfw9nQys8I+huPyRWSgdNMgCg49GbaslzRnU36FYbkw=;
+	s=arc-20240116; t=1743628263; c=relaxed/simple;
+	bh=ETyIlupNzGiV9Nk5VRviQjoACogh2cw1bNs1XxsoM3U=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l9OmpcnUAaBRZ2I0Ljx4vSHXvwIoTaH21oKmQRw4tnrJBKt81JboMd8l2XN+vLeQzdcBOWhvWQwJTk7OaylxiPiJXOatntczamMMd72EZ9XmRwZN/RkxnsJ4M7DbuqaVuzVxkaJa7TdooCMVtKqiQRO7aKGQ0ZjcA8awenKonnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fsykVB+f; arc=none smtp.client-ip=209.85.160.171
+	 To:Cc:Content-Type; b=XZRpPEIfjUjKK2kRT35RAyzgUmyQXpu7e3GWL372uVf2YegCRsTV5JcHQuj+nAGiTfge6TsyYMUgD7X7CLDsUQbgijdaekEhYkvVRhj4AlJ3vmr2nbaMfWlE4ZR6+QMEe/SUTAEb6pbozyOKxUnw687wDElUlGFO9RnfaEYhOZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AZWQK9Vr; arc=none smtp.client-ip=209.85.219.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-47681dba807so321921cf.1
-        for <kvm@vger.kernel.org>; Wed, 02 Apr 2025 14:04:18 -0700 (PDT)
+Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-e63504bedd0so207548276.0
+        for <kvm@vger.kernel.org>; Wed, 02 Apr 2025 14:11:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743627857; x=1744232657; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1743628259; x=1744233059; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Noe3DDy0z2CTvHPr8zx/kBmGMiLW3dq2T/XCyIhCd/c=;
-        b=fsykVB+fQQrVodOyZCmAMTbw6SxFQVFNRow6Qqbl+H9vBkT5ljnj4TkudcTQZcPlCr
-         gggOGHPXkzNaYqqP++KvSPQySuU8XTlCAgmS+oqcvoNriMYlX3OiCo6OwdQI2KBSwK4i
-         YyjgOEMOQ/yUT/wVKmpK5WvFY886M+Fr4aoJ3dWtxbpVh4vTbg5t9PEKNSgw3pppBNAW
-         dG4DbRC7H+XWxc0aP5I0WtyhLLehLnwunK+Gua6sYQ+GSmkEdVfzuZZU74qqPLSq3c4c
-         yjfC5sYVUBRGum4YVPPOCOSxJtXuCR71pvFJTfu91qQhCtyo7tEpJhGpRkgNFl9YVzSQ
-         3GEQ==
+        bh=ZHlEMV0U9vFR86q2j1+99Qrtz2VZz1COboeDVfMSzm4=;
+        b=AZWQK9Vr8cHjaZjBVv6z/Neunk0VsvAerRNka10/JCgvrvVGYMWqESegqKGePOV/DG
+         U5ZfAu5O+NfgNI1cLOoMIcZEKpklsS9dsg0Q0X87v30BBNsrOrE/JfmfsNQzkCV2a4eQ
+         9GNEY7GRrkNzG/zugB7D/iJA049WiaPDesf8WS6lFdlAWGZ6/JF/bxM4PGtOKDF0rveS
+         rK8oIYG6WFSQSO7JiQ7w/flj+xRoBJOZVymi9tNtlZAagNis86ZjgFC3OSFIBJ+h5z/y
+         Hnll7VU7nMofC5VBvdIAfHICO7a4v1znP5PH+ycwEsIkOCeNsVR/i+ByHRU+G5Mz0M3C
+         QqlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743627857; x=1744232657;
+        d=1e100.net; s=20230601; t=1743628259; x=1744233059;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Noe3DDy0z2CTvHPr8zx/kBmGMiLW3dq2T/XCyIhCd/c=;
-        b=wac0e1rlpilWoflBdusGik2IcAui4Bjpbe2gqX5SNkuwPi9vf7V77+WJQvndyE8zVP
-         fumN8N+6kbyXO2BU+QoKy6AO+OYPn6ew+aMQ4yk5gCMK5Y3JrfjLK6d3qCgIXWtm/TI8
-         sGiJUIyIoXAxh7VFfpJkF/mD+mzNrlg634NzDBEsrxF/8Cnh15KoHHN7j2+5rdEMSeX3
-         kgFHa0lBM9l5MXQnFqnJTc22hX4s/90LjlHF5PlpAJk6iYvbkRrjUcFx7MIxJXcfPk52
-         lNH1sp8Biicm3DH2CStReJqOg/SQRXByeKFFbCSz1ft/Y+2oyxXSrdlwIeCavoZcQ+1v
-         CXJw==
-X-Forwarded-Encrypted: i=1; AJvYcCWJeCMzazfVs9Yx072Xnp+GoyaHeJaOrDo2q0Ww2oNpFjSRNC/joRMD4vCUdJUOgngxjHo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDxyqES3XyBqVn8D0MXifcljAcKRD/5jAoNO3Lc0F2g7+T9Oz5
-	6sgS+jLPebc8rIIMTGVReqbspa33Y66VjyS+v9kafGK3em4552x/vedJFPkyJAhUQMxgzL1LyGJ
-	jpxB0/VCtWK/9Bp1NCO6A6R51LDbXdsSQQ3ZR
-X-Gm-Gg: ASbGncsWmk504Uc5EH6d3msVoHHH4D/nz3MmsJ+drYhv35USNjmNQLVxkSDc/r36iFY
-	NQ/0u1lzwmcdNGQnEb7tI6PIn3Y1AmC7vDWj/DzC85O+T2UAJ1gJqv1pk0cHaslSVZKk6MXQCN1
-	1EdBIBNt1t/2ZUQYGdxBYaIh7AFg==
-X-Google-Smtp-Source: AGHT+IGYW45ozRLi9bL9GSKrmNMLBs0q1+I1SgbQECqY7JZ9X9Pt9sehBj/WRt88DS5jI5cwU1IS+pidai2+KcquPAs=
-X-Received: by 2002:a05:622a:d3:b0:475:1410:2ca3 with SMTP id
- d75a77b69052e-47919304cd6mr262671cf.15.1743627856822; Wed, 02 Apr 2025
- 14:04:16 -0700 (PDT)
+        bh=ZHlEMV0U9vFR86q2j1+99Qrtz2VZz1COboeDVfMSzm4=;
+        b=LNImFU5hv9gdWkE/YiG18fTVIotaxbR3qDFo4kBYdxv4k7Z5LQ3zMicmB5qiUVchat
+         gPjeplevgoRWEOZ6sLrDiwQmoVpGcmz1sQNlgW+6BB5BARx0nHwwd1wzPHELto9J4MWo
+         h4JrsEFBSV6ZmFgWWYunt11qEayqv1piTY7z0JfmXsJdVHLPRNGFefGeFFqrybldPSW4
+         MIRFPvofZbPZ3jpwRB1Jvb5Ac4Bn1hmZgyqbY8qacrPu6/1NWrr7Fc41FzRoH25Sdl0F
+         q+bD8vd0obFGNozjW5dgYau/NP36MwMUUuO2A74+KLOmFADez/yTYneOhnKCfWeKg253
+         kcbw==
+X-Forwarded-Encrypted: i=1; AJvYcCV+9Agz1anW/AZOmPtRxQ4V3wCjCgtz27cuCmu9c9EtNLf/tX37vbxWUGfr2beF7pDfq3o=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyvnl4TjVNwmpgQJ6VOdbDMLbw+gbtySEm1XjxCEC3xqXGDhJzI
+	v237uMqZwY/Cv2+v8wWq5la2ZEubSdsLf/LZv9RFl16K8ZQ4lwVT92FsNed1AHi27KoFLP9Tbe1
+	WjAjj6Ah37Ai0OiZXWvlAYHVtPrGlZZ7Ia7fz
+X-Gm-Gg: ASbGncsTHc7viS+kXw3B9LIS9C/YFRIDDsuABQetWkc/HXEB100dPABD62LU1UGh1Mq
+	MjiT1Yd/pFMdMImP0U0jNXrT5Xb59Nkd8yFbmo3QEls45Hg+rDhWmj8gyD9POWIR8PZfYpCqrIo
+	vJ2atAhVLmOOKlfYkSSEbu82Ej8qYLG0Zq2Y3MFC2Db2ZeOCm6haX0wu6V8ZpSUJdrRg==
+X-Google-Smtp-Source: AGHT+IErG7MiwhU3qRRn1slMSsE9CshkjX1Paa6gShbPemf8jIhSuKCfwVzgM+xEObkQjSGtzZ8Yb+0m8SB916dMXqc=
+X-Received: by 2002:a05:690c:6a07:b0:702:591a:6958 with SMTP id
+ 00721157ae682-703a3ef8605mr132532867b3.22.1743628259110; Wed, 02 Apr 2025
+ 14:10:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1743617897.git.jpoimboe@kernel.org> <df47d38d252b5825bc86afaf0d021b016286bf06.1743617897.git.jpoimboe@kernel.org>
-In-Reply-To: <df47d38d252b5825bc86afaf0d021b016286bf06.1743617897.git.jpoimboe@kernel.org>
-From: Jim Mattson <jmattson@google.com>
-Date: Wed, 2 Apr 2025 14:04:04 -0700
-X-Gm-Features: AQ5f1JqI2l-_CwD-vrjqsPSf1FBNCueZti99jXQWfPKo6ikElesqHD9eVL752cA
-Message-ID: <CALMp9eTGU5edP8JsV59Sktc1_pE+MSyCXw7jFxPs6+kDKBW6iQ@mail.gmail.com>
-Subject: Re: [PATCH v3 2/6] x86/bugs: Use SBPB in __write_ibpb() if applicable
-To: Josh Poimboeuf <jpoimboe@kernel.org>
-Cc: x86@kernel.org, linux-kernel@vger.kernel.org, amit@kernel.org, 
-	kvm@vger.kernel.org, amit.shah@amd.com, thomas.lendacky@amd.com, bp@alien8.de, 
-	tglx@linutronix.de, peterz@infradead.org, pawan.kumar.gupta@linux.intel.com, 
-	corbet@lwn.net, mingo@redhat.com, dave.hansen@linux.intel.com, hpa@zytor.com, 
-	seanjc@google.com, pbonzini@redhat.com, daniel.sneddon@linux.intel.com, 
-	kai.huang@intel.com, sandipan.das@amd.com, boris.ostrovsky@oracle.com, 
-	Babu.Moger@amd.com, david.kaplan@amd.com, dwmw@amazon.co.uk, 
-	andrew.cooper3@citrix.com
+References: <20250402160721.97596-1-kalyazin@amazon.com> <20250402160721.97596-6-kalyazin@amazon.com>
+In-Reply-To: <20250402160721.97596-6-kalyazin@amazon.com>
+From: James Houghton <jthoughton@google.com>
+Date: Wed, 2 Apr 2025 14:10:23 -0700
+X-Gm-Features: AQ5f1Jo-fVQJh8iuxBPV3y8brIkvlN4bXw45TOiqX1XQbY00SvkGkBQRYA970fY
+Message-ID: <CADrL8HXm_UDKvrsNe6Guvo_pPvCN9ZJBKe=p0HM-iYZWufbEfA@mail.gmail.com>
+Subject: Re: [PATCH v2 5/5] KVM: selftests: test userfaultfd minor for guest_memfd
+To: Nikita Kalyazin <kalyazin@amazon.com>
+Cc: akpm@linux-foundation.org, pbonzini@redhat.com, shuah@kernel.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, lorenzo.stoakes@oracle.com, 
+	david@redhat.com, ryan.roberts@arm.com, quic_eberman@quicinc.com, 
+	peterx@redhat.com, graf@amazon.de, jgowans@amazon.com, roypat@amazon.co.uk, 
+	derekmn@amazon.com, nsaenz@amazon.es, xmarcalx@amazon.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 2, 2025 at 11:20=E2=80=AFAM Josh Poimboeuf <jpoimboe@kernel.org=
+On Wed, Apr 2, 2025 at 9:08=E2=80=AFAM Nikita Kalyazin <kalyazin@amazon.com=
 > wrote:
 >
-> __write_ibpb() does IBPB, which (among other things) flushes branch type
-> predictions on AMD.  If the CPU has SRSO_NO, or if the SRSO mitigation
-> has been disabled, branch type flushing isn't needed, in which case the
-> lighter-weight SBPB can be used.
+> The test demonstrates that a minor userfaultfd event in guest_memfd can
+> be resolved via a memcpy followed by a UFFDIO_CONTINUE ioctl.
+>
+> Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>
+> ---
+>  .../testing/selftests/kvm/guest_memfd_test.c  | 94 +++++++++++++++++++
+>  1 file changed, 94 insertions(+)
+>
+> diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testi=
+ng/selftests/kvm/guest_memfd_test.c
+> index 38c501e49e0e..9b47b796f3aa 100644
+> --- a/tools/testing/selftests/kvm/guest_memfd_test.c
+> +++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+> @@ -10,12 +10,16 @@
+>  #include <errno.h>
+>  #include <stdio.h>
+>  #include <fcntl.h>
+> +#include <pthread.h>
+>
+>  #include <linux/bitmap.h>
+>  #include <linux/falloc.h>
+> +#include <linux/userfaultfd.h>
+>  #include <sys/mman.h>
+>  #include <sys/types.h>
+>  #include <sys/stat.h>
+> +#include <sys/syscall.h>
+> +#include <sys/ioctl.h>
+>
+>  #include "kvm_util.h"
+>  #include "test_util.h"
+> @@ -206,6 +210,93 @@ static void test_create_guest_memfd_multiple(struct =
+kvm_vm *vm)
+>         close(fd1);
+>  }
+>
+> +struct fault_args {
+> +       char *addr;
+> +       volatile char value;
 
-When nested SVM is not supported, should KVM "promote"
-SRSO_USER_KERNEL_NO on the host to SRSO_NO in KVM_GET_SUPPORTED_CPUID?
-Or is a Linux guest clever enough to do the promotion itself if
-CPUID.80000001H:ECX.SVM[bit 2] is clear?
+I think you should/must put volatile on `addr` and not on `value`.
+
+> +};
+> +
+> +static void *fault_thread_fn(void *arg)
+> +{
+> +       struct fault_args *args =3D arg;
+> +
+> +       /* Trigger page fault */
+> +       args->value =3D *args->addr;
+> +       return NULL;
+> +}
+> +
+> +static void test_uffd_missing(int fd, size_t page_size, size_t total_siz=
+e)
+
+test_uffd_minor? :)
+
+> +{
+> +       struct uffdio_register uffd_reg;
+> +       struct uffdio_continue uffd_cont;
+> +       struct uffd_msg msg;
+> +       struct fault_args args;
+> +       pthread_t fault_thread;
+> +       void *mem, *mem_nofault, *buf =3D NULL;
+> +       int uffd, ret;
+> +       off_t offset =3D page_size;
+> +       void *fault_addr;
+> +
+> +       ret =3D posix_memalign(&buf, page_size, total_size);
+> +       TEST_ASSERT_EQ(ret, 0);
+> +
+> +       uffd =3D syscall(__NR_userfaultfd, O_CLOEXEC);
+> +       TEST_ASSERT(uffd !=3D -1, "userfaultfd creation should succeed");
+> +
+> +       struct uffdio_api uffdio_api =3D {
+> +               .api =3D UFFD_API,
+> +               .features =3D UFFD_FEATURE_MISSING_SHMEM,
+
+I think you mean UFFD_FEATURE_MINOR_SHMEM...?
+
+And I'm trying to think through what feature we should expose for
+guest_memfd; UFFD_FEATURE_MINOR_SHMEM already indicates support for
+shmem.
+
+We could have UFFD_FEATURE_MINOR_GUESTMEMFD, perhaps that's enough.
+
+Or we could have UFFD_FEATURE_MINOR_GENERIC (or nothing at all!). Some
+VMAs might not support the minor mode, and the user will figure that
+out when UFFDIO_REGISTER fails.
+
+> +       };
+> +       ret =3D ioctl(uffd, UFFDIO_API, &uffdio_api);
+> +       TEST_ASSERT(ret !=3D -1, "ioctl(UFFDIO_API) should succeed");
+> +
+> +       mem =3D mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED=
+, fd, 0);
+> +       TEST_ASSERT(mem !=3D MAP_FAILED, "mmap should succeed");
+> +
+> +       mem_nofault =3D mmap(NULL, total_size, PROT_READ | PROT_WRITE, MA=
+P_SHARED, fd, 0);
+> +       TEST_ASSERT(mem_nofault !=3D MAP_FAILED, "mmap should succeed");
+> +
+> +       uffd_reg.range.start =3D (unsigned long)mem;
+> +       uffd_reg.range.len =3D total_size;
+> +       uffd_reg.mode =3D UFFDIO_REGISTER_MODE_MINOR;
+> +       ret =3D ioctl(uffd, UFFDIO_REGISTER, &uffd_reg);
+> +       TEST_ASSERT(ret !=3D -1, "ioctl(UFFDIO_REGISTER) should succeed")=
+;
+> +
+> +       ret =3D fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
+> +                       offset, page_size);
+> +       TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) should succeed");
+> +
+> +       fault_addr =3D mem + offset;
+> +       args.addr =3D fault_addr;
+> +
+> +       ret =3D pthread_create(&fault_thread, NULL, fault_thread_fn, &arg=
+s);
+> +       TEST_ASSERT(ret =3D=3D 0, "pthread_create should succeed");
+> +
+> +       ret =3D read(uffd, &msg, sizeof(msg));
+> +       TEST_ASSERT(ret !=3D -1, "read from userfaultfd should succeed");
+> +       TEST_ASSERT(msg.event =3D=3D UFFD_EVENT_PAGEFAULT, "event type sh=
+ould be pagefault");
+> +       TEST_ASSERT((void *)(msg.arg.pagefault.address & ~(page_size - 1)=
+) =3D=3D fault_addr,
+> +                   "pagefault should occur at expected address");
+> +
+> +       memcpy(mem_nofault + offset, buf + offset, page_size);
+> +
+> +       uffd_cont.range.start =3D (unsigned long)fault_addr;
+> +       uffd_cont.range.len =3D page_size;
+> +       uffd_cont.mode =3D 0;
+> +       ret =3D ioctl(uffd, UFFDIO_CONTINUE, &uffd_cont);
+> +       TEST_ASSERT(ret !=3D -1, "ioctl(UFFDIO_CONTINUE) should succeed")=
+;
+> +
+> +       ret =3D pthread_join(fault_thread, NULL);
+> +       TEST_ASSERT(ret =3D=3D 0, "pthread_join should succeed");
+
+And maybe also:
+
+/* Right value? */
+TEST_ASSERT(args.value =3D=3D *(char *)mem_nofault));
+/* No second fault? */
+TEST_ASSERT(args.value =3D=3D *(char *)mem);
+
+> +
+> +       ret =3D munmap(mem_nofault, total_size);
+> +       TEST_ASSERT(!ret, "munmap should succeed");
+> +
+> +       ret =3D munmap(mem, total_size);
+> +       TEST_ASSERT(!ret, "munmap should succeed");
+> +       free(buf);
+> +       close(uffd);
+> +}
+> +
+>  unsigned long get_shared_type(void)
+>  {
+>  #ifdef __x86_64__
+> @@ -244,6 +335,9 @@ void test_vm_type(unsigned long type, bool is_shared)
+>         test_fallocate(fd, page_size, total_size);
+>         test_invalid_punch_hole(fd, page_size, total_size);
+>
+> +       if (is_shared)
+> +               test_uffd_missing(fd, page_size, total_size);
+> +
+>         close(fd);
+>         kvm_vm_release(vm);
+>  }
+> --
+> 2.47.1
+>
 
