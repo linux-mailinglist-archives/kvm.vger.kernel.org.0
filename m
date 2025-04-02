@@ -1,150 +1,214 @@
-Return-Path: <kvm+bounces-42457-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42458-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 466FDA789DD
-	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 10:29:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89EFBA78A36
+	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 10:42:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 043937A53E8
-	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 08:28:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39D8C162D90
+	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 08:42:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE0B72356DA;
-	Wed,  2 Apr 2025 08:29:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EA7723536E;
+	Wed,  2 Apr 2025 08:42:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JVzo88t1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Okmqtgzi"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAAEE23534D;
-	Wed,  2 Apr 2025 08:29:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62E1C231A51;
+	Wed,  2 Apr 2025 08:42:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743582546; cv=none; b=BHN/4hxqwnZKU7BCuxPidOoX0rS66DAWfUFLcbIaFVKoQae+DKGRFVz5xkDXtq+bMdW/AdX/NFl4r+G1NYBL87dPKIUsfN2xRTK41B8KZzBxP41JRYhpuyVpRCpzkuQ8EIe0pPl9ENuxdtGKWG24msfMBPhVEgTHkHZKklp2MDo=
+	t=1743583361; cv=none; b=VCLQt/YaUG1qffUstjZP1QSV2uoQ9peW6iTOb/9D7uZZbjOdL3qDW2m6+Hr0nPa54lZHjTqPZA9Bf1gAF6i+EQPd5ThZsnD8q/VkAIZ6yURE/aJQ418AL+b21mSMYQni+ZvwFyDzh8n0LRf0euMM2QHeWz/lNkeNc1VJjBmqpdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743582546; c=relaxed/simple;
-	bh=iwE9zHuYFYjBKqHaIW4VF+tXUhWkWm+PMEJkvYVBaXU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K3qAeflPJ52AwDKzhkNiZlhCGoF4oH0NDUmcMWbkcK5P+g8s1eMQGCk+k0Yl8fXcitxQCmd5/f72r35PSjRZEKoHWzrxBpvr5JX/AaAQncbWYTBOW50piXY+aHgKHiisxURka4GUbZF9+OFdrFUmMxiWr25CGcmlVVEt8dToc0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JVzo88t1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5493CC4CEDD;
-	Wed,  2 Apr 2025 08:29:01 +0000 (UTC)
+	s=arc-20240116; t=1743583361; c=relaxed/simple;
+	bh=Uo5tWPaSgDRTx7F552j2kIj1bSvzWWjtFFj2KsZNdQQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eMchmsMdRl+fsvdX9zxiEw+Qe5Co9Q9aIKq1W4mLMXG1mNCKfBdxvc2sfjqx2vOWuQkVQA57q+1aq8RDr2YSFyeXBmQx1fVwdBkkziMLLNZWlOl+BiYnoUSFJqvStD1F3ruyahDYyPxnLASuNPWmr5DR+18A/53q0HIVpbbebCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Okmqtgzi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2C28C4CEE5;
+	Wed,  2 Apr 2025 08:42:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743582546;
-	bh=iwE9zHuYFYjBKqHaIW4VF+tXUhWkWm+PMEJkvYVBaXU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JVzo88t16ZjM8MszTZXtKtDlN21lEeGH7kxXO88WaaFLSaH94epzLs+irDfyHttl+
-	 TtvAIejtRAU8Y0h6FTTUNekKciN+8Ftd25ra8Q/Z7+sqez+WV5fB0TQJpDZcQIRM6Y
-	 q0dytxHMLbvhKZuyo+P/nNR0saaZqd2N0X6chj0QOqOkoOwtviL7snBO9+bgxSTFLM
-	 L7eRtSDvSjuDd8tR4d1D0egE0J6563NNMhGjbXavkgWLtffE6HbPGPwzM1JCw6R3OR
-	 QdT4VWB8xPwMOy3qKUMDy6kuD+rabltEby0LqtEw2jRnGO2cnTr7iFawd3hfEbrFWs
-	 qFn7m+Yt66s4g==
-From: Amit Shah <amit@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	x86@kernel.org,
-	linux-doc@vger.kernel.org
-Cc: amit.shah@amd.com,
-	thomas.lendacky@amd.com,
-	bp@alien8.de,
-	tglx@linutronix.de,
-	peterz@infradead.org,
-	jpoimboe@kernel.org,
-	pawan.kumar.gupta@linux.intel.com,
-	corbet@lwn.net,
-	mingo@redhat.com,
-	dave.hansen@linux.intel.com,
-	hpa@zytor.com,
-	seanjc@google.com,
+	s=k20201202; t=1743583360;
+	bh=Uo5tWPaSgDRTx7F552j2kIj1bSvzWWjtFFj2KsZNdQQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Okmqtgzi83HLdrxct+VcJpccdT6Krt73HA/mINKX9cBz65YZbsra0puVJVnlqQzZV
+	 d+67ToicWDUgdl1DGLPycge7Ok08zNVY+odxNBnPkmoLvWA2QBORJi53bTrjcxj1s1
+	 I3tIeGlJ/qm08cJH9HRDqJUFOZPzuvkWh+TlZoskFyDwZPHyUHTjMJtyRzVDvBFueA
+	 WXiMOM7m9o7N25TGY2xataChsCwNwXdDfMkibGY8CoKIj3PvTdXzM9GwbPTjJ5/Bcn
+	 O4MZUuTxfKFtIvNott0YmIke5cc0stKWbfs8Nk+rWdlQIcPWhcOErHo9tqfU1ToKS+
+	 Yhz1zlxbv8CDw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tztgE-001b9e-DJ;
+	Wed, 02 Apr 2025 09:42:38 +0100
+Date: Wed, 02 Apr 2025 09:42:39 +0100
+Message-ID: <87jz83ymww.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Yuvraj Sakshith <yuvraj.kernel@gmail.com>
+Cc: oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	jens.wiklander@linaro.org,
+	sumit.garg@kernel.org,
+	mark.rutland@arm.com,
+	lpieralisi@kernel.org,
+	sudeep.holla@arm.com,
 	pbonzini@redhat.com,
-	daniel.sneddon@linux.intel.com,
-	kai.huang@intel.com,
-	sandipan.das@amd.com,
-	boris.ostrovsky@oracle.com,
-	Babu.Moger@amd.com,
-	david.kaplan@amd.com,
-	dwmw@amazon.co.uk,
-	andrew.cooper3@citrix.com
-Subject: [RFC PATCH v4 2/2] debug: add tracepoint for flush_rap_on_vmrun
-Date: Wed,  2 Apr 2025 10:28:33 +0200
-Message-ID: <20250402082833.9835-3-amit@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250402082833.9835-1-amit@kernel.org>
-References: <20250402082833.9835-1-amit@kernel.org>
+	kvmarm@lists.linux.dev,
+	op-tee@lists.trustedfirmware.org,
+	kvm@vger.kernel.org
+Subject: Re: [RFC PATCH 0/7] KVM: optee: Introduce OP-TEE Mediator for exposing secure world to KVM guests
+In-Reply-To: <Z-yn6BdPcuM_aDBX@raj>
+References: <20250401170527.344092-1-yuvraj.kernel@gmail.com>
+	<87ldsjzr5l.wl-maz@kernel.org>
+	<Z-yn6BdPcuM_aDBX@raj>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: yuvraj.kernel@gmail.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, jens.wiklander@linaro.org, sumit.garg@kernel.org, mark.rutland@arm.com, lpieralisi@kernel.org, sudeep.holla@arm.com, pbonzini@redhat.com, kvmarm@lists.linux.dev, op-tee@lists.trustedfirmware.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Amit Shah <amit.shah@amd.com>
+On Wed, 02 Apr 2025 03:58:48 +0100,
+Yuvraj Sakshith <yuvraj.kernel@gmail.com> wrote:
+> 
+> On Tue, Apr 01, 2025 at 07:13:26PM +0100, Marc Zyngier wrote:
+> > On Tue, 01 Apr 2025 18:05:20 +0100,
+> > Yuvraj Sakshith <yuvraj.kernel@gmail.com> wrote:
+> > >
 
----
- arch/x86/kvm/svm/svm.c |  4 +++-
- arch/x86/kvm/trace.h   | 16 ++++++++++++++++
- arch/x86/kvm/x86.c     |  1 +
- 3 files changed, 20 insertions(+), 1 deletion(-)
+[...]
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index b5de6341080b..c47d4dfcc1d4 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3607,8 +3607,10 @@ static int svm_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
- 
- 		trace_kvm_nested_vmexit(vcpu, KVM_ISA_SVM);
- 
--		if (vmcb_is_extended_rap(svm->vmcb01.ptr))
-+		if (vmcb_is_extended_rap(svm->vmcb01.ptr)) {
- 			vmcb_flush_guest_rap(svm->vmcb01.ptr);
-+			trace_kvm_svm_eraps_flush_rap(svm->vmcb01.ptr);
-+		}
- 
- 		vmexit = nested_svm_exit_special(svm);
- 
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index ccda95e53f62..059dfc744a22 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -346,6 +346,22 @@ TRACE_EVENT(name,							     \
-  */
- TRACE_EVENT_KVM_EXIT(kvm_exit);
- 
-+TRACE_EVENT(kvm_svm_eraps_flush_rap,					     \
-+	TP_PROTO(struct vmcb *vmcb),					     \
-+	TP_ARGS(vmcb),							     \
-+									     \
-+	TP_STRUCT__entry(						     \
-+		__field( struct vmcb *,		vmcb		)	     \
-+	),								     \
-+									     \
-+	TP_fast_assign(							     \
-+		__entry->vmcb	= vmcb; 				     \
-+	),								     \
-+									     \
-+	TP_printk("vmcb: 0x%p",						     \
-+		  __entry->vmcb)					     \
-+)
-+
- /*
-  * Tracepoint for kvm interrupt injection:
-  */
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index c841817a914a..414a0e6c9c4b 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -14024,6 +14024,7 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_exit);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_msr_protocol_enter);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_msr_protocol_exit);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_rmp_fault);
-+EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_svm_eraps_flush_rap);
- 
- static int __init kvm_x86_init(void)
- {
+> > > This implementation has been heavily inspired by Xen's OP-TEE
+> > > mediator.
+> > 
+> > [...]
+> > 
+> > And I think this inspiration is the source of most of the problems in
+> > this series.
+> > 
+> > Routing Secure Calls from the guest to whatever is on the secure side
+> > should not be the kernel's job at all. It should be the VMM's job. All
+> > you need to do is to route the SMCs from the guest to userspace, and
+> > we already have all the required infrastructure for that.
+> >
+> Yes, this was an argument at the time of designing this solution.
+>
+> > It is the VMM that should:
+> > 
+> > - signal the TEE of VM creation/teardown
+> > 
+> > - translate between IPAs and host VAs without involving KVM
+> > 
+> > - let the host TEE driver translate between VAs and PAs and deal with
+> >   the pinning as required, just like it would do for any userspace
+> >   (without ever using the KVM memslot interface)
+> > 
+> > - proxy requests from the guest to the TEE
+> > 
+> > - in general, bear the complexity of anything related to the TEE
+> >
+> 
+> Major reason why I went with placing the implementation inside the kernel is,
+> 	- OP-TEE userspace lib (client) does not support sending SMCs for VM events
+> 	  and needs modification.
+> 	- QEMU (or every other VMM)  will have to be modified.
+
+Sure. And what? New feature, new API, new code. And what will happen
+once someone wants to use something other than OP-TEE? Or one of the
+many forks of OP-TEE that have a completely different ABI (cue the
+Android forks -- yes, plural)?
+
+> 	- OP-TEE driver is anyways in the kernel. A mediator will just be an addition
+> 		and not a completely new entity.
+
+Of course not. The TEE can be anywhere I want. On another machine if I
+decide so. Just because OP-TEE has a very simplistic model doesn't
+mean we have to be constrained by it.
+
+> 	- (Potential) issues if we would want to mediate requests from VM which has
+> 	  private mem.
+
+Private memory means that not even the host has access to it, as it is
+the case with pKVM. How would that be an issue?
+
+> 	- Heavy VM exits if guest makes frequent TOS calls.
+
+Sorry, I have to completely dismiss the argument here. I'm not even
+remotely considering performance for something that is essentially a
+full context switch of the whole machine. By definition, calling into
+EL3, and then S-EL1/S-EL2 is going to be as fast as a dying snail, and
+an additional exit to userspace will hardly register for anything
+other than a pointless latency benchmark.
+
+> 
+> Hence, the thought of making changes to too many entities (libteec,
+> VMM, etc.) was a strong reason, although arguable.
+
+It is a *terrible* reason. By this reasoning, we would have subsumed
+the whole VMM into the kernel (just like Xen), because "we don't want
+to change userspace".
+
+Furthermore, you are not even considering basic things such as
+permissions. Your approach completely circumvents any form of access
+control, meaning that if any user that can create a VM can talk to the
+TEE, even if they don't have access to the TEE driver.
+
+Yes, you could replicate access permission, SE-Linux, seccomp (and the
+rest of the security theater) at the KVM/TEE boundary, making the
+whole thing even more of a twisted mess.
+
+Or you could simply do the right thing and let the kernel do its job
+the way it was intended by using the syscall interface from userspace.
+
+> 
+> > In short, the VMM is just another piece of userspace using the TEE to
+> > do whatever it wants. The TEE driver on the host must obviously know
+> > about VMs, but that's about it.
+> > 
+> > Crucially, KVM should:
+> > 
+> > - be completely TEE agnostic and never call into something that is
+> >   TEE-specific
+> > 
+> > - allow a TEE implementation entirely in userspace, specially for the
+> >   machines that do not have EL3
+> >
+> 
+> Yes, you're right. Although I believe there still are some changes
+> that need to be made to KVM for facilitating this. For example,
+> kvm_smccc_get_action() would deny TOS call.
+
+If something is missing in KVM to allow routing of SMCs to userspace,
+I'm more than happy to entertain the change.
+
+> So, having an implementation completely in VMM without any change in
+> KVM might be challenging, any potential solutions are welcome.
+
+I've said what I have to say already, and pointed you in a direction
+that I see as both correct and maintainable.
+
+Thanks,
+
+	M.
+
 -- 
-2.49.0
-
+Jazz isn't dead. It just smells funny.
 
