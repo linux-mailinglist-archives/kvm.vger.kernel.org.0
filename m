@@ -1,158 +1,142 @@
-Return-Path: <kvm+bounces-42471-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42472-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F8A0A79001
-	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 15:37:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8D30A7900D
+	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 15:41:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F210170160
-	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 13:36:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2BC1189252A
+	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 13:37:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E1D323BCE4;
-	Wed,  2 Apr 2025 13:36:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7542B23771C;
+	Wed,  2 Apr 2025 13:36:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jnakGx+s"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UuAIHe0y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FFC32376EA
-	for <kvm@vger.kernel.org>; Wed,  2 Apr 2025 13:36:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE09620E328
+	for <kvm@vger.kernel.org>; Wed,  2 Apr 2025 13:36:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743600976; cv=none; b=tVvo6B6285TA+QTFyxQf40UwsbAul7JglttQ+YFciHdX31665CV0TAenW3GrxPTYDtd3Pq67k3g3CAPD3DM4LLzOjwgtdg+86TgTMlrN+3JQcUGaVb9wAL+mfE2Ey304HvNxH9GhPWO/djTnp4pe0us9TE5eSHMdatB7s3vluys=
+	t=1743601004; cv=none; b=h5ZC1ytnCxzRPuKUSTRU4eC3Ayc+cj5+OoV1/F0V9RDdyQO1qh5+N7TlPfIRGfsxcY9xXdz0jmSvoO+ur3l/fMIFr1SEDu9FbmXSAjWST8kNlNB4xgm6ytDDd/i/uZ0O6onGyvf57JBEFlXBonseNHQW4YjBq7DxRj3//GqhlcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743600976; c=relaxed/simple;
-	bh=MqBOTDc9GRqer6IcN1CWf28Fjo98+zBzhr/8RRY4has=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dpy/K7I7JLA1OAhe/G4tfMjsceuQKceEDtRL/PIx40KnAXf5dZ+0B+z5B7WzAG0sLqg1aKbSY4cDd5Clcz8nUiQ1yzrWM1qUFlgl1zzTnfkzA7ZS1CUxDc8YSW/KMYXBzZYHruPTvQN84BzAW+/jqT8unO8E6+sa9wK6P0G2APg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jnakGx+s; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff7aecba07so11434264a91.2
-        for <kvm@vger.kernel.org>; Wed, 02 Apr 2025 06:36:14 -0700 (PDT)
+	s=arc-20240116; t=1743601004; c=relaxed/simple;
+	bh=4jNJ/I1jTSx3GyL4Ifg55JsEj1Dz52ZQASnFkVJ9VJk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ffdq8Brz8qqFyHz9GIgWORolGYBbhskZALpYIsjQ1aHinLvVL1e3WmnDs/rtx1Tban+Ty8d1+SvutHyooq2b5ymvHI0lD06m5FKDjuChGqXoxLfKeX7hXV2XV0m3cztYnc4ZyNxjdrw4p8Kr6GZwPtrGzeZWEzM3nwcDGhFDfaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=UuAIHe0y; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43948f77f1aso48209015e9.0
+        for <kvm@vger.kernel.org>; Wed, 02 Apr 2025 06:36:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743600974; x=1744205774; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mk+AHGtNwwzbB9JrzbmHG5xhTZS1h9alfQA3RqPYHQQ=;
-        b=jnakGx+sq4IcYFe97Jh95q4lWQnA7I+SUsN+n9j5SVMcMQw2uJ4H2JG8j4Pd/yQFym
-         qlNGSlG+vFt7lIXZusa5kBGuexBxQG0xb2WbSbAyReNgAlzOHdVDhNQrVLKLxr114pPK
-         Mzrz+ELwB/AvaZB8kdFlc0fmd1Fm6XmiGaxbMwF9nzV4+4Hu2WIRANrM1bddW9wYeFUI
-         oX2YFRJPZZj9/T043ub9v4sP3uEiZcig7nbGbvCfjARfLYO0nEokJZsd7lumnLgxk7S1
-         V1xKjD42uFQHQxaHDQjeYNPT/Tnl1TSxG4hU0ncSpAPTHBRsIML9bvIzLW7HdDWLJYuN
-         GhZg==
+        d=linaro.org; s=google; t=1743601001; x=1744205801; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lJfVCNOyKlIn5SjHIiikLpbH+IBtLpw1jWMX+o/dVSU=;
+        b=UuAIHe0yCxFUlq1NS6JzDcvpel1Zyn3K7KHD+SccVELBPYPRuPK7U8BMxJJYmMQK3u
+         Kxn9OdoNRmccvWBtABrEqrVNscXLYcFYXSaDOX7rNWd7bdWQeNYGyDdCHJBrAV/JNFku
+         EZynunq9Jqi9w0HGTf5deNK6d+DEPv3STur9K2c5sUs4yYQ4nXLxuM9MKcEnS2rXWNpu
+         rgl2VSG9YQX+TEijx3O73J5taA6LurjXhs0Or4udE1ortOddRFXdKKwk+u7Jjorle6Gx
+         atbqW2DfPgtaDB0EP0Mop8Lp3bUqZZ1IndOOD8wBp4+9qUNHj7DuM8Aqj/aWrJSDbbyr
+         a2ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743600974; x=1744205774;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mk+AHGtNwwzbB9JrzbmHG5xhTZS1h9alfQA3RqPYHQQ=;
-        b=I5Vgh6ZEXX6qiBZ9jw/x3BE/q7feaMo8iMu0V5B83LYbrYrrUYLA0SEHpjuxPYHCO6
-         6zcW2lHUUUU+qpgTSTql2Ia5x/sZvzq+AifyOe09bpuTJEnKMIRvZpWXgOzHn88Cqqer
-         rs5VnzFae/TLjiTIaHrWCZhyAhS59CPFFFWDwF25ReGWKbrMqR8Jw0aNQG4O5mMEitcC
-         lnBqUvmikN1rOalurtNUvJywzWJiADg3Via0ixxxl1e8z2NerTXQtv7nFKb6p7+eXq+2
-         Jkgs/gLldC2oZVqXRD8hkxJyOBbajuyEvE5QFViPugMQuMr9RA2ASV7FUfWsRmVRJIf9
-         0cvg==
-X-Forwarded-Encrypted: i=1; AJvYcCVW7d3kZlKLFseMQNyZNLVnG4VDFVfn3NZxdA33nA+t2ORH94JdxYylSDn8USHJK8cWo5c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhXM77kL+591GMmBaZbFAl0/j8a6UwNKSV46JVxCh1uH8KP42r
-	RimyvA/IIcWGxCvJoMgMdhPKQw/5vBXq5GOsc/O6SOb4TyyP3RLhW4MhJOaAijn0Ggyv/5NyIF+
-	QtQ==
-X-Google-Smtp-Source: AGHT+IEg80yE/5EQOyTbP8oPtkkE6VHG4R4N8JI2Kg9VJlrk7/RNDAbsRVFXgGcpSHsz8luqfesoSLLT04M=
-X-Received: from pjbso5.prod.google.com ([2002:a17:90b:1f85:b0:2ff:6e58:8a0a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2c8e:b0:2fe:a545:4c84
- with SMTP id 98e67ed59e1d1-305321634dcmr21618691a91.34.1743600974287; Wed, 02
- Apr 2025 06:36:14 -0700 (PDT)
-Date: Wed, 2 Apr 2025 06:36:12 -0700
-In-Reply-To: <20250401044931.793203-1-jon@nutanix.com>
+        d=1e100.net; s=20230601; t=1743601001; x=1744205801;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lJfVCNOyKlIn5SjHIiikLpbH+IBtLpw1jWMX+o/dVSU=;
+        b=BzraVfLj/661oMMUU8sFJBhoDo87qDJFUs4vrZ+VBgi4TqwTO2naoNS6RH6Q0LRhIA
+         znFbubYgAOWEyq9AHbtbBRnrpEiL9SUeoxTJur1rl57uL+zuPGUYFO4eIwtmHw/2S5NR
+         tQQiTvX7mvBfHyOtvXS/seMNOErV5kgn9amUg4WwW1WXpLBDj8MZmvvofNltJPxEACxB
+         D8z5MQyE2VEBZTGvR/ZiCXi7RyFumGaubm8Ol+NwSdG9eTZfu2HRuSi0DTvUydmmZDJK
+         ZF6NyYLo6LKs4GCNYKKXuQFz3gSRp5y8agGZTwyEu7E+2TwBIEx8Uh6DAdWtlOjAbZ+o
+         8LiQ==
+X-Gm-Message-State: AOJu0YxjEZ2mErAE7hF+o/F/pQOkrl7I0Hn0KPs5I0zZHncegFyYr2VV
+	oJzlQubD8xXjG881IPQswykegEt8MvIVCSLtTzQ6yC0NyCIJsE4mLqZ0VfO468k=
+X-Gm-Gg: ASbGncsSbbiwg7rz/bs/E7rPI2xBa0NrlfkLbj4WY/VuMuaYLKer4DiY9qzKkW0LnFj
+	X+hIvPBBm8gWan4fO8cni4QSJ38eaMdeY1hTfYrPmpRnbfOFWcLRU7v8B0YgHglPIaAZbgqAbNQ
+	wQB7uQj2I3JiZk6cXPqUt5CBIHzJWl78nP+QEgB6W8UknW3IOa1oAPwV0Fz36/xnIwGlv/WqLtW
+	9gwxBGTV5svEVVthua2LLSbH5wfT87Hygr8gF07UEthc1qmnmvfNoyAZHmdedCb+0VM+81Vb7TO
+	I5GrFhOIiMj7Ty02y1L4bD7aOD1SvJm/uObwmF9iJm+oX1UJJBxnEiw/WIc1mld8AleyH1tfZEk
+	GJBmPxHsdQzfW
+X-Google-Smtp-Source: AGHT+IHoyscVn8p5jxvX72Ru3UvDJ2OXxx0IAldkyjAZ5Adle9QLCIrr4AZ9ithEY6/SyYpc+bvqUQ==
+X-Received: by 2002:a05:600c:1e22:b0:43b:d0fe:b8ac with SMTP id 5b1f17b1804b1-43db8526564mr178633115e9.30.1743601000940;
+        Wed, 02 Apr 2025 06:36:40 -0700 (PDT)
+Received: from [192.168.69.235] (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0b6588e9sm17432591f8f.14.2025.04.02.06.36.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Apr 2025 06:36:40 -0700 (PDT)
+Message-ID: <ca52ecb4-6c1d-4299-9764-5839db2d013e@linaro.org>
+Date: Wed, 2 Apr 2025 15:36:39 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250401044931.793203-1-jon@nutanix.com>
-Message-ID: <Z-09TLXNWv-msJ4O@google.com>
-Subject: Re: [PATCH] KVM: x86: Expose ARCH_CAP_FB_CLEAR when invulnerable to MDS
-From: Sean Christopherson <seanjc@google.com>
-To: Jon Kohler <jon@nutanix.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Emanuele Giuseppe Esposito <eesposit@redhat.com>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 20/30] target/arm/cpu: always define kvm related
+ registers
+To: Richard Henderson <richard.henderson@linaro.org>,
+ Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org,
+ Thomas Huth <thuth@redhat.com>
+Cc: kvm@vger.kernel.org, qemu-arm@nongnu.org,
+ Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
+ <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+References: <20250320223002.2915728-1-pierrick.bouvier@linaro.org>
+ <20250320223002.2915728-21-pierrick.bouvier@linaro.org>
+ <1109fe22-9008-47c6-b14d-7323f9888822@linaro.org>
+ <11b5441f-c7c0-4b4c-8061-471a49e8465a@linaro.org>
+ <428e6fdb-24b9-47a2-9d3f-4ef5c2e1a0ae@linaro.org>
+Content-Language: en-US
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <428e6fdb-24b9-47a2-9d3f-4ef5c2e1a0ae@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 31, 2025, Jon Kohler wrote:
-> Expose FB_CLEAR in arch_capabilities for certain MDS-invulnerable cases 
-> to support live migration from older hardware (e.g., Cascade Lake, Ice 
-> Lake) to newer hardware (e.g., Sapphire Rapids or higher). This ensures 
-> compatibility when user space has previously configured vCPUs to see 
-> FB_CLEAR (ARCH_CAPABILITIES Bit 17).
+On 25/3/25 02:24, Richard Henderson wrote:
+> On 3/24/25 14:11, Pierrick Bouvier wrote:
+>> On 3/23/25 12:37, Richard Henderson wrote:
+>>> On 3/20/25 15:29, Pierrick Bouvier wrote:
+>>>> This does not hurt, even if they are not used.
+>>>>
+>>>> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+>>>> ---
+>>>>    target/arm/cpu.h | 2 --
+>>>>    1 file changed, 2 deletions(-)
+>>>>
+>>>> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+>>>> index a8a1a8faf6b..ab7412772bc 100644
+>>>> --- a/target/arm/cpu.h
+>>>> +++ b/target/arm/cpu.h
+>>>> @@ -971,7 +971,6 @@ struct ArchCPU {
+>>>>         */
+>>>>        uint32_t kvm_target;
+>>>> -#ifdef CONFIG_KVM
+>>>>        /* KVM init features for this CPU */
+>>>>        uint32_t kvm_init_features[7];
+>>>> @@ -984,7 +983,6 @@ struct ArchCPU {
+>>>>        /* KVM steal time */
+>>>>        OnOffAuto kvm_steal_time;
+>>>> -#endif /* CONFIG_KVM */
+>>>>        /* Uniprocessor system with MP extensions */
+>>>>        bool mp_is_up;
+>>>
+>>> I'm not sure what this achieves?   CONFIG_KVM is a configure-time 
+>>> selection.
+>>>
+>>
+>> CONFIG_KVM is a poisoned identifier.
+>> It's included via config-target.h, and not config-host.h.
 > 
-> Newer hardware sets the following bits but does not set FB_CLEAR, which 
-> can prevent user space from configuring a matching setup:
+> Whoops, yes.
 
-I looked at this again right after PUCK, and KVM does NOT actually prevent
-userspace from matching the original, pre-SPR configuration.  KVM effectively
-treats ARCH_CAPABILITIES like a CPUID leaf, and lets userspace shove in any
-value.  I.e. userspace can still migrate+stuff FB_CLEAR irrespective of hardware
-support, and thus there is no need for KVM to lie to userspace.
-
-So in effect, this is a userspace problem where it's being too aggressive in its
-sanity checks.
-
-FWIW, even if KVM did reject unsupported ARCH_CAPABILITIES bits, I would still
-say this is userspace's problem to solve.  E.g. by using MSR filtering to
-intercept and emulate RDMSR(ARCH_CAPABILITIES) in userspace.
-
->     ARCH_CAP_MDS_NO
->     ARCH_CAP_TAA_NO
->     ARCH_CAP_PSDP_NO
->     ARCH_CAP_FBSDP_NO
->     ARCH_CAP_SBDR_SSDP_NO
-> 
-> This change has minimal impact, as these bit combinations already mark 
-> the host as MMIO immune (via arch_cap_mmio_immune()) and set 
-> disable_fb_clear in vmx_update_fb_clear_dis(), resulting in no 
-> additional overhead.
-> 
-> Cc: Emanuele Giuseppe Esposito <eesposit@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-> Signed-off-by: Jon Kohler <jon@nutanix.com>
-> 
-> ---
->  arch/x86/kvm/x86.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index c841817a914a..2a4337aa78cd 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1641,6 +1641,20 @@ static u64 kvm_get_arch_capabilities(void)
->  	if (!boot_cpu_has_bug(X86_BUG_GDS) || gds_ucode_mitigated())
->  		data |= ARCH_CAP_GDS_NO;
->  
-> +	/*
-> +	 * User space might set FB_CLEAR when starting a vCPU on a system
-> +	 * that does not enumerate FB_CLEAR but is also invulnerable to
-> +	 * other various MDS related bugs. To allow live migration from
-> +	 * hosts that do implement FB_CLEAR, leave it enabled.
-> +	 */
-> +	if ((data & ARCH_CAP_MDS_NO) &&
-> +	    (data & ARCH_CAP_TAA_NO) &&
-> +	    (data & ARCH_CAP_PSDP_NO) &&
-> +	    (data & ARCH_CAP_FBSDP_NO) &&
-> +	    (data & ARCH_CAP_SBDR_SSDP_NO)) {
-> +		data |= ARCH_CAP_FB_CLEAR;
-> +	}
-> +
->  	return data;
->  }
->  
-> -- 
-> 2.43.0
-> 
+If we go this way, can we consistently allow CONFIG_${HW_ACCEL}
+(read "remove poisoned defs in config-poison.h)?
 
