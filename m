@@ -1,152 +1,146 @@
-Return-Path: <kvm+bounces-42440-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42441-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B06EA786D3
-	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 05:31:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8A34A786DE
+	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 05:45:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5CB817A3D63
-	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 03:30:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91AE516DD6F
+	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 03:45:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33536230268;
-	Wed,  2 Apr 2025 03:31:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4130D22B8A6;
+	Wed,  2 Apr 2025 03:45:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F+4+DJCH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T7fMvxXq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 404F518FC89
-	for <kvm@vger.kernel.org>; Wed,  2 Apr 2025 03:31:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E87318052
+	for <kvm@vger.kernel.org>; Wed,  2 Apr 2025 03:45:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743564694; cv=none; b=VrTrNNLftAsflXSHRkcoi+ltDZZadJha8NYi6fDMOGXTygA5/uQcSnJNx8SCKHOLc4YAXo50V6j7nYemvLsfbRLd6dQfGP8lesWPHwUT0PZ9HZLRLk4U93YMricwRQoveOLUZAp0KG7dsmQDjwVjp5+LKGzbelBDEVfVvfXCpwA=
+	t=1743565543; cv=none; b=sSdd0/HqQ47viOBlrUXyWbHU74bzIseM4l0LQnctddJ6FS/oZXBs/cX29IuaexhF51BNsLNGga7oYKTURO30ynap72hnfsY3F7Rr5LN59oQEWEDxDBYmT931yakhwq2+abdiOY28TRnN3zwFiuHOhnpFtVjF2F38Zm7Sy6+pON0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743564694; c=relaxed/simple;
-	bh=rV7Wm0eFwooPGT2XsKT4XFsWUJQlX3kStQPLbVavzms=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=flKbLMeuWFbhY5Oy4yvVYk825VelxpOX6+ncoFuwy7Icnv2cteYYA3KMzacnWgygNE8wtMyLW92SRXv1uug8bYjI8+c6S1xNqrYBF3sIx/c9DjI4atJ3w0sp8Cy7q731f8ZgI0TVzO54XBB26LcjRbqSwdsDyJbaggOvq28GDBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=F+4+DJCH; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43cfe574976so43055265e9.1
-        for <kvm@vger.kernel.org>; Tue, 01 Apr 2025 20:31:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1743564690; x=1744169490; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CujPIjkhOlnkWqCu+Rfx8WsNvtOQeLj1Mtett7H+ZGg=;
-        b=F+4+DJCHuhSCz03YizaH/Yi8On9bWcZF53zHDyI2D+JR2skHLicfvd+/u/6KwFc3Bg
-         f8lE/vsg+fIUUwGaxDXWkeSvL64lo3yNNDO3p3Q6M4kSgQQelUyo0wp1lKcseQ9JAHwH
-         pRRP2v4n+caNdSvSHmE3ADbHLqBuuz550+gExBgh+t8tVYrM6Bnx+lNS222xZTgNUVQ7
-         EdG4clRNmVVIRLTUendbqLd37ykZfSZLnHqC4uC6HEjUfMBw850cJYN/JZdYPpxW0Nk/
-         mM20ge3KQcoAT4+nTp1C2WENm/iK9SlxSbfbOmImrzxTYhHVoJvRti+rU1OC1PpXGxEa
-         gASA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743564690; x=1744169490;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CujPIjkhOlnkWqCu+Rfx8WsNvtOQeLj1Mtett7H+ZGg=;
-        b=jCqyUD4PzMI0uhJdFOlWhpFnFyFDbqCfesr+KRhd+nu7n9jwCPIrL6nZhOSghb4kcF
-         /Tl7UY/1BBUVnm4E2JDJMFLkzaSxD4k7FTBd3SE4BDNL5AuQfzvr892w3fLxXxh9Jzp/
-         xVGWErhP2b+FVBelFZFMRX9WHIwNr4sYaA8LCI0mMefFE9lH5UXibCOIhWd+gQ1HoLiP
-         jJAIq7rSsHREYSEWktiXmxsxvAED2PGumopMMiCIows3G5A+3KTF5gvIRIR7/P8b+CY1
-         eGHiCm8UiaUO2ZCCdTEWYZLTF+UDdAP3BUKWY76Qdk4twsJdfyqaFuahdJE4wOJ38+IR
-         S4Hw==
-X-Forwarded-Encrypted: i=1; AJvYcCUs+qUiJmhkLk5zUbo5V0x7UBXWDTgA9yiEGvQHxpOL7PoFQFgf4XwUJlkChSjrmRYCoxo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+Cq8Fo6YhelW7C2ZO0FGGdrwBlY/dGRCoD8PEd5GiyaN57qXW
-	WoLc+36pinFDZRAqpN5i+vIVFs0ZSOFkBYZyofmHazCWFAOo5bheeOvdGZRhxJY=
-X-Gm-Gg: ASbGncvDc0QnEL9A8LdfonhDZ7OjM11d1gI3GokP4TZNxjghbBxhEU9/p8obAJioY3a
-	lQBmPJTjYZo/WCqBt4qbi1ej2/vKYWr6c9wPfhCYvW1M5erZovReiLj7qqxFXHTvRJck+7UOXl5
-	0JFA9bDWAjnjWruwL3JviEZHI1mKsHp6065fYB1Nt/44xGW66+nzR6NIaOgLAGfIPGCVUp3cEvo
-	aRhK6pKjvazDqVVa2jUCgWrZpLqrZ9wN6K43vDFcH2a7T40ydWMRugyzgQxz+qnYaeWeFLrLZn2
-	+/ywICUNy8odVuxxSzsPpbIfmapP1i0eKHmQN/L0IyhfFcqmzMmALoQNgx5ckz+CeI+g1LhFUU1
-	kLL5PThFDy7vo
-X-Google-Smtp-Source: AGHT+IGgC8MDVGkRqw2vbt917abdXWZ3MG1OlSLGeOEkxOX+DZ8OMBXDOpAWTPmY0jfwqNvKSOTMnQ==
-X-Received: by 2002:a05:600c:1554:b0:43c:fa24:8721 with SMTP id 5b1f17b1804b1-43ea7c965ebmr56831035e9.17.1743564690488;
-        Tue, 01 Apr 2025 20:31:30 -0700 (PDT)
-Received: from [192.168.69.235] (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43eb613a283sm7175535e9.37.2025.04.01.20.31.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Apr 2025 20:31:29 -0700 (PDT)
-Message-ID: <e11f5f2e-0838-4f28-88c1-a7241504d28a@linaro.org>
-Date: Wed, 2 Apr 2025 05:31:28 +0200
+	s=arc-20240116; t=1743565543; c=relaxed/simple;
+	bh=2zhVIWkat110d7g7O9J+eA6yuWB/+nKLJnBuuMDzt68=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=rtvdyXKOKK1fyf29+/x5MXRMvjc6qdIEgVEc6j2nAuUGIorcUVr7YdKFNHVSrLKYf4VKathqRaW6eYzlfX3FnGBiO8qeWaoGBmd3+Dc5Q1lHkdJ2/f54ZUVLuNhXpDSv0l+EJ2xwuHRjFu8Iu/HzqFGbvpGA/kTRIjtPdQiLrDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T7fMvxXq; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1743565540; x=1775101540;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=2zhVIWkat110d7g7O9J+eA6yuWB/+nKLJnBuuMDzt68=;
+  b=T7fMvxXqf6EleHayBQIg1hWP5gHdsBqtLtdxV9NALyvuqdriPnIHUxoj
+   zsiUijJ7nJdE2+JJ2z2sNpK9LTi29ea42B95a92dO/w3DDibmBneyIn7U
+   u0gcLK0zj3JQH5BL5p6qGsa3XqwPy7CvvIngo8MHLyBuP0yDQqnBDUFjK
+   d1n6GojiZVImpw27ZXO+9b2JU+XVNA+is+741Jfvz6gjY7w6QvcS25i/O
+   1PKsbIO6s90Rf+e12aVCSO73uX+/kwwVp4vQR8W99B0AL2EQbFJjNHK4s
+   0zn2febNhZJsF2AZJQ27vrSWUKwp7Vja0cXZvJoFMODBHAAVps5NidcIR
+   A==;
+X-CSE-ConnectionGUID: BW9+Nf/cRuW3sjVm7RTYGA==
+X-CSE-MsgGUID: 35DQp/1fQWydISCjEAo1hw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11391"; a="56277757"
+X-IronPort-AV: E=Sophos;i="6.14,295,1736841600"; 
+   d="scan'208";a="56277757"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2025 20:45:40 -0700
+X-CSE-ConnectionGUID: wXOS7kT2R7Krvn7J65KEPA==
+X-CSE-MsgGUID: 5mi0Uy4FSEWHk9UPm1YfXg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,295,1736841600"; 
+   d="scan'208";a="126823265"
+Received: from lkp-server02.sh.intel.com (HELO e98e3655d6d2) ([10.239.97.151])
+  by fmviesa008.fm.intel.com with ESMTP; 01 Apr 2025 20:45:38 -0700
+Received: from kbuild by e98e3655d6d2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tzp2m-000AS1-0l;
+	Wed, 02 Apr 2025 03:45:36 +0000
+Date: Wed, 2 Apr 2025 11:45:29 +0800
+From: kernel test robot <lkp@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
+	Farrah Chen <farrah.chen@intel.com>
+Subject: [kvm:planes-20250401 51/62] arch/x86/kvm/svm/svm.c:3255:37: error:
+ passing argument 1 of 'kvm_clear_apicv_inhibit' from incompatible pointer
+ type
+Message-ID: <202504021134.VxUA9YrF-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 03/29] include/exec/cpu-all: move compile time check
- for CPUArchState to cpu-target.c
-To: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-References: <20250325045915.994760-1-pierrick.bouvier@linaro.org>
- <20250325045915.994760-4-pierrick.bouvier@linaro.org>
-Content-Language: en-US
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <20250325045915.994760-4-pierrick.bouvier@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 25/3/25 05:58, Pierrick Bouvier wrote:
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-> ---
->   include/exec/cpu-all.h | 4 ----
->   cpu-target.c           | 4 ++++
->   2 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-> index 74017a5ce7c..b1067259e6b 100644
-> --- a/include/exec/cpu-all.h
-> +++ b/include/exec/cpu-all.h
-> @@ -34,8 +34,4 @@
->   
->   #include "cpu.h"
+tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git planes-20250401
+head:   73685d9c23b7122b44f07d59244416f8b56ed48e
+commit: 94b5e48b64ab5ab55aac3636dfc9284b78b7b911 [51/62] KVM: x86: track APICv inhibits per plane
+config: i386-buildonly-randconfig-001-20250402 (https://download.01.org/0day-ci/archive/20250402/202504021134.VxUA9YrF-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250402/202504021134.VxUA9YrF-lkp@intel.com/reproduce)
 
-This include ^^^^^^ ...
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202504021134.VxUA9YrF-lkp@intel.com/
 
->   
-> -/* Validate correct placement of CPUArchState. */
-> -QEMU_BUILD_BUG_ON(offsetof(ArchCPU, parent_obj) != 0);
-> -QEMU_BUILD_BUG_ON(offsetof(ArchCPU, env) != sizeof(CPUState));
-> -
->   #endif /* CPU_ALL_H */
-> diff --git a/cpu-target.c b/cpu-target.c
-> index 519b0f89005..587f24b34e5 100644
-> --- a/cpu-target.c
-> +++ b/cpu-target.c
-> @@ -29,6 +29,10 @@
->   #include "accel/accel-cpu-target.h"
->   #include "trace/trace-root.h"
+All errors (new ones prefixed by >>):
 
-... is also needed here, otherwise we get:
+   arch/x86/kvm/svm/svm.c: In function 'interrupt_window_interception':
+>> arch/x86/kvm/svm/svm.c:3255:37: error: passing argument 1 of 'kvm_clear_apicv_inhibit' from incompatible pointer type [-Werror=incompatible-pointer-types]
+    3255 |         kvm_clear_apicv_inhibit(vcpu->kvm, APICV_INHIBIT_REASON_IRQWIN);
+         |                                 ~~~~^~~~~
+         |                                     |
+         |                                     struct kvm *
+   In file included from include/linux/kvm_host.h:45,
+                    from arch/x86/kvm/svm/svm.c:3:
+   arch/x86/include/asm/kvm_host.h:2249:62: note: expected 'struct kvm_plane *' but argument is of type 'struct kvm *'
+    2249 | static inline void kvm_clear_apicv_inhibit(struct kvm_plane *plane,
+         |                                            ~~~~~~~~~~~~~~~~~~^~~~~
+   cc1: some warnings being treated as errors
 
-../../cpu-target.c:30:19: error: offsetof of incomplete type 'ArchCPU' 
-(aka 'struct ArchCPU')
-    30 | QEMU_BUILD_BUG_ON(offsetof(ArchCPU, parent_obj) != 0);
-       |                   ^
 
->   
- > +/* Validate correct placement of CPUArchState. */> 
-+QEMU_BUILD_BUG_ON(offsetof(ArchCPU, parent_obj) != 0);
-> +QEMU_BUILD_BUG_ON(offsetof(ArchCPU, env) != sizeof(CPUState));
-> +
->   char *cpu_model_from_type(const char *typename)
->   {
->       const char *suffix = "-" CPU_RESOLVING_TYPE;
+vim +/kvm_clear_apicv_inhibit +3255 arch/x86/kvm/svm/svm.c
 
-With "cpu.h" include:
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Tested-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+6aa8b732ca01c3 drivers/kvm/svm.c      Avi Kivity            2006-12-10  3237  
+63129754178c55 arch/x86/kvm/svm/svm.c Paolo Bonzini         2021-03-02  3238  static int interrupt_window_interception(struct kvm_vcpu *vcpu)
+c1150d8cf9e9d2 drivers/kvm/svm.c      Dor Laor              2007-01-05  3239  {
+63129754178c55 arch/x86/kvm/svm/svm.c Paolo Bonzini         2021-03-02  3240  	kvm_make_request(KVM_REQ_EVENT, vcpu);
+63129754178c55 arch/x86/kvm/svm/svm.c Paolo Bonzini         2021-03-02  3241  	svm_clear_vintr(to_svm(vcpu));
+f3515dc3bef81e arch/x86/kvm/svm.c     Suravee Suthikulpanit 2019-11-14  3242  
+f3515dc3bef81e arch/x86/kvm/svm.c     Suravee Suthikulpanit 2019-11-14  3243  	/*
+f44509f849fe55 arch/x86/kvm/svm/svm.c Maxim Levitsky        2022-03-22  3244  	 * If not running nested, for AVIC, the only reason to end up here is ExtINTs.
+f3515dc3bef81e arch/x86/kvm/svm.c     Suravee Suthikulpanit 2019-11-14  3245  	 * In this case AVIC was temporarily disabled for
+f3515dc3bef81e arch/x86/kvm/svm.c     Suravee Suthikulpanit 2019-11-14  3246  	 * requesting the IRQ window and we have to re-enable it.
+f44509f849fe55 arch/x86/kvm/svm/svm.c Maxim Levitsky        2022-03-22  3247  	 *
+f44509f849fe55 arch/x86/kvm/svm/svm.c Maxim Levitsky        2022-03-22  3248  	 * If running nested, still remove the VM wide AVIC inhibit to
+f44509f849fe55 arch/x86/kvm/svm/svm.c Maxim Levitsky        2022-03-22  3249  	 * support case in which the interrupt window was requested when the
+f44509f849fe55 arch/x86/kvm/svm/svm.c Maxim Levitsky        2022-03-22  3250  	 * vCPU was not running nested.
+f44509f849fe55 arch/x86/kvm/svm/svm.c Maxim Levitsky        2022-03-22  3251  
+f44509f849fe55 arch/x86/kvm/svm/svm.c Maxim Levitsky        2022-03-22  3252  	 * All vCPUs which run still run nested, will remain to have their
+f44509f849fe55 arch/x86/kvm/svm/svm.c Maxim Levitsky        2022-03-22  3253  	 * AVIC still inhibited due to per-cpu AVIC inhibition.
+f3515dc3bef81e arch/x86/kvm/svm.c     Suravee Suthikulpanit 2019-11-14  3254  	 */
+320af55a930f30 arch/x86/kvm/svm/svm.c Sean Christopherson   2022-03-11 @3255  	kvm_clear_apicv_inhibit(vcpu->kvm, APICV_INHIBIT_REASON_IRQWIN);
+f3515dc3bef81e arch/x86/kvm/svm.c     Suravee Suthikulpanit 2019-11-14  3256  
+6249af46321662 arch/x86/kvm/svm/svm.c Paolo Bonzini         2025-03-31  3257  	++vcpu->stat->irq_window_exits;
+c1150d8cf9e9d2 drivers/kvm/svm.c      Dor Laor              2007-01-05  3258  	return 1;
+c1150d8cf9e9d2 drivers/kvm/svm.c      Dor Laor              2007-01-05  3259  }
+c1150d8cf9e9d2 drivers/kvm/svm.c      Dor Laor              2007-01-05  3260  
 
+:::::: The code at line 3255 was first introduced by commit
+:::::: 320af55a930f30ba49d7cd663280d46705e11383 KVM: x86: Add wrappers for setting/clearing APICv inhibits
+
+:::::: TO: Sean Christopherson <seanjc@google.com>
+:::::: CC: Paolo Bonzini <pbonzini@redhat.com>
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
