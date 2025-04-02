@@ -1,214 +1,260 @@
-Return-Path: <kvm+bounces-42458-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42459-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89EFBA78A36
-	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 10:42:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96D16A78A67
+	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 10:57:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39D8C162D90
-	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 08:42:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22DF31890D2E
+	for <lists+kvm@lfdr.de>; Wed,  2 Apr 2025 08:57:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EA7723536E;
-	Wed,  2 Apr 2025 08:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 836AA19E99C;
+	Wed,  2 Apr 2025 08:57:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Okmqtgzi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GpY8s5eM"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62E1C231A51;
-	Wed,  2 Apr 2025 08:42:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E09C1E570D
+	for <kvm@vger.kernel.org>; Wed,  2 Apr 2025 08:57:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743583361; cv=none; b=VCLQt/YaUG1qffUstjZP1QSV2uoQ9peW6iTOb/9D7uZZbjOdL3qDW2m6+Hr0nPa54lZHjTqPZA9Bf1gAF6i+EQPd5ThZsnD8q/VkAIZ6yURE/aJQ418AL+b21mSMYQni+ZvwFyDzh8n0LRf0euMM2QHeWz/lNkeNc1VJjBmqpdU=
+	t=1743584225; cv=none; b=hUOcx8Ed/AwE2kDtxyxn3KGRuM4I77iLCsbECTVcJY0H8jRQ+dx43YwXcfmZ74y63wLqBUEzLN6HKC2qhFk0giWd0xWRoyLHFayOoAJxQsPeoqx3lW8LkHNq0fK0b43rl60myq4i/vK6NOtNYYdpq+j2ZxhXl3ysGKqzP6Rb5KI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743583361; c=relaxed/simple;
-	bh=Uo5tWPaSgDRTx7F552j2kIj1bSvzWWjtFFj2KsZNdQQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eMchmsMdRl+fsvdX9zxiEw+Qe5Co9Q9aIKq1W4mLMXG1mNCKfBdxvc2sfjqx2vOWuQkVQA57q+1aq8RDr2YSFyeXBmQx1fVwdBkkziMLLNZWlOl+BiYnoUSFJqvStD1F3ruyahDYyPxnLASuNPWmr5DR+18A/53q0HIVpbbebCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Okmqtgzi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2C28C4CEE5;
-	Wed,  2 Apr 2025 08:42:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743583360;
-	bh=Uo5tWPaSgDRTx7F552j2kIj1bSvzWWjtFFj2KsZNdQQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Okmqtgzi83HLdrxct+VcJpccdT6Krt73HA/mINKX9cBz65YZbsra0puVJVnlqQzZV
-	 d+67ToicWDUgdl1DGLPycge7Ok08zNVY+odxNBnPkmoLvWA2QBORJi53bTrjcxj1s1
-	 I3tIeGlJ/qm08cJH9HRDqJUFOZPzuvkWh+TlZoskFyDwZPHyUHTjMJtyRzVDvBFueA
-	 WXiMOM7m9o7N25TGY2xataChsCwNwXdDfMkibGY8CoKIj3PvTdXzM9GwbPTjJ5/Bcn
-	 O4MZUuTxfKFtIvNott0YmIke5cc0stKWbfs8Nk+rWdlQIcPWhcOErHo9tqfU1ToKS+
-	 Yhz1zlxbv8CDw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tztgE-001b9e-DJ;
-	Wed, 02 Apr 2025 09:42:38 +0100
-Date: Wed, 02 Apr 2025 09:42:39 +0100
-Message-ID: <87jz83ymww.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Yuvraj Sakshith <yuvraj.kernel@gmail.com>
-Cc: oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	jens.wiklander@linaro.org,
-	sumit.garg@kernel.org,
-	mark.rutland@arm.com,
-	lpieralisi@kernel.org,
-	sudeep.holla@arm.com,
-	pbonzini@redhat.com,
-	kvmarm@lists.linux.dev,
-	op-tee@lists.trustedfirmware.org,
-	kvm@vger.kernel.org
-Subject: Re: [RFC PATCH 0/7] KVM: optee: Introduce OP-TEE Mediator for exposing secure world to KVM guests
-In-Reply-To: <Z-yn6BdPcuM_aDBX@raj>
-References: <20250401170527.344092-1-yuvraj.kernel@gmail.com>
-	<87ldsjzr5l.wl-maz@kernel.org>
-	<Z-yn6BdPcuM_aDBX@raj>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1743584225; c=relaxed/simple;
+	bh=eMocZbfwdDxtWsjHiSzzOZSnuSzJrcfLMsT04Ua/5ao=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=c0IxjhVjiiksjLrBFpyYUQqjGsAVQQDNcImJx30BIb1XnFUesyEwrlixiXHs2H/p9cbg7v8FQfyCnebVMlHexQBDkdpHc5z5+MfZDmDuwPLGTD74MF1mdvz1+UIug+rprETmYcbqVqZfMkQqXdJfiT5obwmS1tpLU8OgfTwzLKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GpY8s5eM; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4774611d40bso202461cf.0
+        for <kvm@vger.kernel.org>; Wed, 02 Apr 2025 01:57:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1743584223; x=1744189023; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=m5iA78/yZurmEltRRdW/uf+siD/f5GN0SyOgheLp9+Y=;
+        b=GpY8s5eMBnzbNd7nZYE0clEP0jYG9L0N07idIkv8m8avi5gF2m6fXT8kf3vx6V3dak
+         zlWbDvOpFOuj8aGlRoeZ7+S3ryXNf39V7P4OecSHygWXNL9QjDCpoD/91Gbb9EhWii1s
+         oco03+IYL9fVg3GFVFJ8x8b+3WWa4Vm40BTvK5rLXaGctDcNFSqVgwhGEXODIvQ5ra0a
+         VdvZoQWknGN5CXk5wV+N5g3hBXC6rFw3WyGKXpm2qrN+m1Cg/752uc06jm/P9WmIHyMV
+         QG9+ibR3nMOSQ333T3b3dZhTYsHGM5PGDfAWec7rF8qwfDFWNrNVfTi9+HmiZBWUrqb1
+         GJEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743584223; x=1744189023;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=m5iA78/yZurmEltRRdW/uf+siD/f5GN0SyOgheLp9+Y=;
+        b=DMvUYMLLl+lKZ74gHDjEUmj7USkqqxty4+IKqpLhT27w2BocJCwJzXLQAMLvPWvyAE
+         lFuNFDZmtqoviPNtMdjmMMTtIoMPTvxTFU46inHGeMcJSZYwKpsLcjgDbDABA0vvnQD7
+         HbrYaTgIuhGl/Wh7zXFEIs2AfdlwpsJxjkhsW/93CUtEpnF6dGczo774Tu8D/KDmMAns
+         xlW+ym+aINr2AT7IGAcXw5ZCol2i2GZI3CHID8CFpwJRxQEeTYuYnI4WwaP1tbEdJ7tC
+         UAofGSkinppibUTG7Km26HXg6hnFtVwYQsP6hemh7VR/Od6TWXFsaS8qCgA8/SyMUw6L
+         rRag==
+X-Gm-Message-State: AOJu0YxJSEPeBy6t7CqkeRV9WksqE7bKt0Yew9rLWXLjzMoldYAgYE5Q
+	fnRzL7SwJfo2sERT5iYnk6Bek3kjfW8UAeGxmfNJ24msC28zHyXx9sx0+PaYW61aDeMOAQ+upiJ
+	QaY/ksYNWzcVEOFK5nIi3AjL5VPAVa6lSEqSo
+X-Gm-Gg: ASbGnctoKX3Xl24oaF+DJWYoAyb/QFEX9vFWzkej73yvMwbnH8C/B6u/Wl1vVp8kEJI
+	4jykLDGjUpVqv/YB0o1+3zzg0AeDFaNUuipUOHX/ximfaAG0j1k9x1RCgFfKx36zJOGQYd1T+hi
+	xXZQXDN7w/t6qsvNxpRaNGdHDpueYBpW2rsrmr7BJxOrtkSkEJdWCF1g==
+X-Google-Smtp-Source: AGHT+IFMTKEuvL6e2xcrh8KaPfFrhCp5Vu61ZzX0pTYvrTSHuSwEWdkkapnTZnUw//F3Ru98j861ZY4zhkBOorh2/Jw=
+X-Received: by 2002:ac8:5847:0:b0:476:f4e9:314e with SMTP id
+ d75a77b69052e-4790970660cmr2555471cf.25.1743584222699; Wed, 02 Apr 2025
+ 01:57:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: yuvraj.kernel@gmail.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, jens.wiklander@linaro.org, sumit.garg@kernel.org, mark.rutland@arm.com, lpieralisi@kernel.org, sudeep.holla@arm.com, pbonzini@redhat.com, kvmarm@lists.linux.dev, op-tee@lists.trustedfirmware.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20250318161823.4005529-10-tabba@google.com> <diqz34er23ql.fsf@ackerleytng-ctop.c.googlers.com>
+In-Reply-To: <diqz34er23ql.fsf@ackerleytng-ctop.c.googlers.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Wed, 2 Apr 2025 09:56:26 +0100
+X-Gm-Features: AQ5f1Jr4jnEVAOjFid1RNVBv-AxFH88c8b48xrmOJ-wbYii36QQdgSCZv00f5kw
+Message-ID: <CA+EHjTy7CT0k+m30KfEeV5W6fV-nW1VMXsPYGLhaCmrEaKOf7g@mail.gmail.com>
+Subject: Re: [PATCH v7 9/9] KVM: guest_memfd: selftests: guest_memfd mmap()
+ test when mapping is allowed
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, mail@maciej.szmigiero.name, david@redhat.com, 
+	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
+	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
+	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
+	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
+	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
+	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
+	hughd@google.com, jthoughton@google.com, peterx@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 02 Apr 2025 03:58:48 +0100,
-Yuvraj Sakshith <yuvraj.kernel@gmail.com> wrote:
-> 
-> On Tue, Apr 01, 2025 at 07:13:26PM +0100, Marc Zyngier wrote:
-> > On Tue, 01 Apr 2025 18:05:20 +0100,
-> > Yuvraj Sakshith <yuvraj.kernel@gmail.com> wrote:
-> > >
+Hi Ackerley,
 
-[...]
-
-> > > This implementation has been heavily inspired by Xen's OP-TEE
-> > > mediator.
-> > 
-> > [...]
-> > 
-> > And I think this inspiration is the source of most of the problems in
-> > this series.
-> > 
-> > Routing Secure Calls from the guest to whatever is on the secure side
-> > should not be the kernel's job at all. It should be the VMM's job. All
-> > you need to do is to route the SMCs from the guest to userspace, and
-> > we already have all the required infrastructure for that.
-> >
-> Yes, this was an argument at the time of designing this solution.
+On Tue, 1 Apr 2025 at 18:25, Ackerley Tng <ackerleytng@google.com> wrote:
 >
-> > It is the VMM that should:
-> > 
-> > - signal the TEE of VM creation/teardown
-> > 
-> > - translate between IPAs and host VAs without involving KVM
-> > 
-> > - let the host TEE driver translate between VAs and PAs and deal with
-> >   the pinning as required, just like it would do for any userspace
-> >   (without ever using the KVM memslot interface)
-> > 
-> > - proxy requests from the guest to the TEE
-> > 
-> > - in general, bear the complexity of anything related to the TEE
+> Fuad Tabba <tabba@google.com> writes:
+>
+> > Expand the guest_memfd selftests to include testing mapping guest
+> > memory for VM types that support it.
 > >
-> 
-> Major reason why I went with placing the implementation inside the kernel is,
-> 	- OP-TEE userspace lib (client) does not support sending SMCs for VM events
-> 	  and needs modification.
-> 	- QEMU (or every other VMM)  will have to be modified.
-
-Sure. And what? New feature, new API, new code. And what will happen
-once someone wants to use something other than OP-TEE? Or one of the
-many forks of OP-TEE that have a completely different ABI (cue the
-Android forks -- yes, plural)?
-
-> 	- OP-TEE driver is anyways in the kernel. A mediator will just be an addition
-> 		and not a completely new entity.
-
-Of course not. The TEE can be anywhere I want. On another machine if I
-decide so. Just because OP-TEE has a very simplistic model doesn't
-mean we have to be constrained by it.
-
-> 	- (Potential) issues if we would want to mediate requests from VM which has
-> 	  private mem.
-
-Private memory means that not even the host has access to it, as it is
-the case with pKVM. How would that be an issue?
-
-> 	- Heavy VM exits if guest makes frequent TOS calls.
-
-Sorry, I have to completely dismiss the argument here. I'm not even
-remotely considering performance for something that is essentially a
-full context switch of the whole machine. By definition, calling into
-EL3, and then S-EL1/S-EL2 is going to be as fast as a dying snail, and
-an additional exit to userspace will hardly register for anything
-other than a pointless latency benchmark.
-
-> 
-> Hence, the thought of making changes to too many entities (libteec,
-> VMM, etc.) was a strong reason, although arguable.
-
-It is a *terrible* reason. By this reasoning, we would have subsumed
-the whole VMM into the kernel (just like Xen), because "we don't want
-to change userspace".
-
-Furthermore, you are not even considering basic things such as
-permissions. Your approach completely circumvents any form of access
-control, meaning that if any user that can create a VM can talk to the
-TEE, even if they don't have access to the TEE driver.
-
-Yes, you could replicate access permission, SE-Linux, seccomp (and the
-rest of the security theater) at the KVM/TEE boundary, making the
-whole thing even more of a twisted mess.
-
-Or you could simply do the right thing and let the kernel do its job
-the way it was intended by using the syscall interface from userspace.
-
-> 
-> > In short, the VMM is just another piece of userspace using the TEE to
-> > do whatever it wants. The TEE driver on the host must obviously know
-> > about VMs, but that's about it.
-> > 
-> > Crucially, KVM should:
-> > 
-> > - be completely TEE agnostic and never call into something that is
-> >   TEE-specific
-> > 
-> > - allow a TEE implementation entirely in userspace, specially for the
-> >   machines that do not have EL3
+> > Also, build the guest_memfd selftest for arm64.
 > >
-> 
-> Yes, you're right. Although I believe there still are some changes
-> that need to be made to KVM for facilitating this. For example,
-> kvm_smccc_get_action() would deny TOS call.
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  tools/testing/selftests/kvm/Makefile.kvm      |  1 +
+> >  .../testing/selftests/kvm/guest_memfd_test.c  | 75 +++++++++++++++++--
+> >  2 files changed, 70 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+> > index 4277b983cace..c9a3f30e28dd 100644
+> > --- a/tools/testing/selftests/kvm/Makefile.kvm
+> > +++ b/tools/testing/selftests/kvm/Makefile.kvm
+> > @@ -160,6 +160,7 @@ TEST_GEN_PROGS_arm64 += coalesced_io_test
+> >  TEST_GEN_PROGS_arm64 += demand_paging_test
+> >  TEST_GEN_PROGS_arm64 += dirty_log_test
+> >  TEST_GEN_PROGS_arm64 += dirty_log_perf_test
+> > +TEST_GEN_PROGS_arm64 += guest_memfd_test
+> >  TEST_GEN_PROGS_arm64 += guest_print_test
+> >  TEST_GEN_PROGS_arm64 += get-reg-list
+> >  TEST_GEN_PROGS_arm64 += kvm_create_max_vcpus
+> > diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
+> > index ce687f8d248f..38c501e49e0e 100644
+> > --- a/tools/testing/selftests/kvm/guest_memfd_test.c
+> > +++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+> > @@ -34,12 +34,48 @@ static void test_file_read_write(int fd)
+> >                   "pwrite on a guest_mem fd should fail");
+> >  }
+> >
+> > -static void test_mmap(int fd, size_t page_size)
+> > +static void test_mmap_allowed(int fd, size_t total_size)
+> >  {
+> > +     size_t page_size = getpagesize();
+> > +     const char val = 0xaa;
+> > +     char *mem;
+> > +     int ret;
+> > +     int i;
+>
+> Was using this test with hugetlb patches - int i was overflowing and
+> causing test failures.  Perhaps use size_t i for this instead?
 
-If something is missing in KVM to allow routing of SMCs to userspace,
-I'm more than happy to entertain the change.
+I need to think big, or rather, huge (sorry :)) . Will fix this.
 
-> So, having an implementation completely in VMM without any change in
-> KVM might be challenging, any potential solutions are welcome.
+Cheers,
+/fuad
 
-I've said what I have to say already, and pointed you in a direction
-that I see as both correct and maintainable.
-
-Thanks,
-
-	M.
-
--- 
-Jazz isn't dead. It just smells funny.
+> > +
+> > +     mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+> > +     TEST_ASSERT(mem != MAP_FAILED, "mmaping() guest memory should pass.");
+> > +
+> > +     memset(mem, val, total_size);
+> > +     for (i = 0; i < total_size; i++)
+> > +             TEST_ASSERT_EQ(mem[i], val);
+> > +
+> > +     ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE, 0,
+> > +                     page_size);
+> > +     TEST_ASSERT(!ret, "fallocate the first page should succeed");
+> > +
+> > +     for (i = 0; i < page_size; i++)
+> > +             TEST_ASSERT_EQ(mem[i], 0x00);
+> > +     for (; i < total_size; i++)
+> > +             TEST_ASSERT_EQ(mem[i], val);
+> > +
+> > +     memset(mem, val, total_size);
+> > +     for (i = 0; i < total_size; i++)
+> > +             TEST_ASSERT_EQ(mem[i], val);
+> > +
+> > +     ret = munmap(mem, total_size);
+> > +     TEST_ASSERT(!ret, "munmap should succeed");
+> > +}
+> > +
+> > +static void test_mmap_denied(int fd, size_t total_size)
+> > +{
+> > +     size_t page_size = getpagesize();
+> >       char *mem;
+> >
+> >       mem = mmap(NULL, page_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+> >       TEST_ASSERT_EQ(mem, MAP_FAILED);
+> > +
+> > +     mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+> > +     TEST_ASSERT_EQ(mem, MAP_FAILED);
+> >  }
+> >
+> >  static void test_file_size(int fd, size_t page_size, size_t total_size)
+> > @@ -170,19 +206,27 @@ static void test_create_guest_memfd_multiple(struct kvm_vm *vm)
+> >       close(fd1);
+> >  }
+> >
+> > -int main(int argc, char *argv[])
+> > +unsigned long get_shared_type(void)
+> >  {
+> > -     size_t page_size;
+> > +#ifdef __x86_64__
+> > +     return KVM_X86_SW_PROTECTED_VM;
+> > +#endif
+> > +     return 0;
+> > +}
+> > +
+> > +void test_vm_type(unsigned long type, bool is_shared)
+> > +{
+> > +     struct kvm_vm *vm;
+> >       size_t total_size;
+> > +     size_t page_size;
+> >       int fd;
+> > -     struct kvm_vm *vm;
+> >
+> >       TEST_REQUIRE(kvm_has_cap(KVM_CAP_GUEST_MEMFD));
+> >
+> >       page_size = getpagesize();
+> >       total_size = page_size * 4;
+> >
+> > -     vm = vm_create_barebones();
+> > +     vm = vm_create_barebones_type(type);
+> >
+> >       test_create_guest_memfd_invalid(vm);
+> >       test_create_guest_memfd_multiple(vm);
+> > @@ -190,10 +234,29 @@ int main(int argc, char *argv[])
+> >       fd = vm_create_guest_memfd(vm, total_size, 0);
+> >
+> >       test_file_read_write(fd);
+> > -     test_mmap(fd, page_size);
+> > +
+> > +     if (is_shared)
+> > +             test_mmap_allowed(fd, total_size);
+> > +     else
+> > +             test_mmap_denied(fd, total_size);
+> > +
+> >       test_file_size(fd, page_size, total_size);
+> >       test_fallocate(fd, page_size, total_size);
+> >       test_invalid_punch_hole(fd, page_size, total_size);
+> >
+> >       close(fd);
+> > +     kvm_vm_release(vm);
+> > +}
+> > +
+> > +int main(int argc, char *argv[])
+> > +{
+> > +#ifndef __aarch64__
+> > +     /* For now, arm64 only supports shared guest memory. */
+> > +     test_vm_type(VM_TYPE_DEFAULT, false);
+> > +#endif
+> > +
+> > +     if (kvm_has_cap(KVM_CAP_GMEM_SHARED_MEM))
+> > +             test_vm_type(get_shared_type(), true);
+> > +
+> > +     return 0;
+> >  }
 
