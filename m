@@ -1,114 +1,167 @@
-Return-Path: <kvm+bounces-42538-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42539-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D1B3A79BB7
-	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 08:04:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 81776A79BFE
+	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 08:33:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7BEF188FD4D
-	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 06:02:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26FAD1893863
+	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 06:33:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96CBC1A23A6;
-	Thu,  3 Apr 2025 06:02:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CD211A2C06;
+	Thu,  3 Apr 2025 06:32:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="WPP0bDZK"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Z45EOcJu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B498CA6B;
-	Thu,  3 Apr 2025 06:02:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8328219F416;
+	Thu,  3 Apr 2025 06:32:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743660142; cv=none; b=p4sfFHd9+kJL3f50t1VWdW12YAoWKvGSwO159N27wUsSr0104EF4FLPB5BazBdQyJiYSR+HZXTohbIxVWitIQxwDQgMruTJMzSyvUKohs8zlRCfMpIE+CXNnMA1KDYQ6cZcaZxY1N2h6TGC8Pl8XFUfQVev1GuZFC2hO4x2vjgE=
+	t=1743661958; cv=none; b=bSDaeHAhhvqExBurs9teAkgaHVP85OSSp8Mqs9sKnDtLuHGMFtlv5FTz4PUpT0X9w6TatY6oRSMOLhjUWtdm64rJOoQVUEaNmgrUMYtU6gF3LYO1rH+MpZIvbA7pXyHV2JnxPfoilVbk0hw+pLoO/QtXt9ldFjooibLF4HP6Zgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743660142; c=relaxed/simple;
-	bh=HBSjt3ceb+310hVs/mwgzhbbqG3Jl2AAvf0AdIVfBLA=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=cqLCGjA2TT1uRNQ9h92X4RE/a1m0ws/XvpB5KSy/cK6dfrlCx13MyyAxWq78IG8YKInLGnsVU2Wz9bbZzB44Dlnw/t1sCpV5NgH0r95e3dty9OjBHWEBAEY7NXd6OptmLIb9jvMq8B5YCWTsYz5BAt3lhH7xQHrS9NRZ2B8AE5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=WPP0bDZK; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [127.0.0.1] ([76.133.66.138])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53361TVl369646
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Wed, 2 Apr 2025 23:01:30 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53361TVl369646
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025032001; t=1743660093;
-	bh=dlct/QjME2ZRc2GbrZa4+YEUwLyiwmon1oWoqtApkXY=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=WPP0bDZK1lApqNXdOtF12S5ARISaib9mLKSdGhnx3gf+KvTavErQMB5tHsDboEZaM
-	 dLsgA/Wr4k2VPAKvg4Q/jtE0gFB4ojRvE+oKmyqXmPeIVyoZtruCTjMkDVanwskwS+
-	 jiuGUYw2dmNjKOKZNCiNGXO9zxp8lWX1y5seDxftNeQHvt8RBeGECAiOxqTKUMgh1b
-	 zD9Kyl+NSFQ59y87oScNqVpMXyezROjMwevUzZS+FRy/CxOc3SftPfgsBUCB4x+623
-	 2LcVsu0VnYA1sp4yMqo6TRQHgTa6YRFjMp5wTke1MjTH1hw4LpEw+MZO87TrcY7Ja6
-	 ziwf36ftnA50g==
-Date: Wed, 02 Apr 2025 23:01:27 -0700
-From: "H. Peter Anvin" <hpa@zytor.com>
-To: Xin Li <xin@zytor.com>, Ingo Molnar <mingo@kernel.org>
-CC: linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
-        linux-edac@vger.kernel.org, kvm@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-ide@vger.kernel.org,
-        linux-pm@vger.kernel.org, bpf@vger.kernel.org, llvm@lists.linux.dev,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, jgross@suse.com,
-        andrew.cooper3@citrix.com, peterz@infradead.org, acme@kernel.org,
-        namhyung@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
-        wei.liu@kernel.org, ajay.kaher@broadcom.com,
-        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
-        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
-        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
-        haiyangz@microsoft.com, decui@microsoft.com,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Subject: =?US-ASCII?Q?Re=3A_=5BRFC_PATCH_v1_01/15=5D_x86/msr=3A_Re?=
- =?US-ASCII?Q?place_=5F=5Fwrmsr=28=29_with_native=5Fwrmsrl=28=29?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <c316a6c6-b97c-48b2-9598-d44e2ec72fbc@zytor.com>
-References: <20250331082251.3171276-1-xin@zytor.com> <20250331082251.3171276-2-xin@zytor.com> <Z-pruogreCuU66wm@gmail.com> <9D15DE81-2E68-4FCD-A133-4963602E18C9@zytor.com> <Z-ubVFyoOzwKhI53@gmail.com> <c316a6c6-b97c-48b2-9598-d44e2ec72fbc@zytor.com>
-Message-ID: <580DD4EE-8694-4525-AA73-A6823126FF9F@zytor.com>
+	s=arc-20240116; t=1743661958; c=relaxed/simple;
+	bh=j7Ru8mv8vnhUetnXdIui0NsBTj10RY4l3etu2Ql1sBw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tuYCb335O45tS5UQrSi3rlRUVer+yieXSHo/rp99kNkxPHRcmlsSpqEa9PPIfOYuoY0wP7Fi7nGUTtiK0+6bPhL8KtAoxxJvoRRTzyj2gpyQ5x3hwi3zIkCHv4qJxFBg9AuG56AuWT7xE5Qrza1uo+2RsvE2mR2oGjVH03wtho0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Z45EOcJu; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 532NMpAn032002;
+	Thu, 3 Apr 2025 06:32:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2023-11-20; bh=TdjQnHvAXtYqsVzceeZ1eHE+nHufv
+	Tv/MEQX+acT2uQ=; b=Z45EOcJuDyVW5dcnnjqa0vSdflpHFBJkf4/iWEwd6O015
+	65r71ZjwnGWvql4qP1B6CjxiFhowVMHIzrINIeqW36GGcF14IbuFdfA2M5Lk1k3t
+	edWxamrk9IeaPQ8URk2vtlMACGrOpFH5FDoe8IwA031yM52ug2+CXb4FAJo29xmT
+	PWqy/CXmTxrWItZhrBCoXgoehFKYoVmurl7YcL2CAO7ViOb9WYEGdZ9XTzGU9PwZ
+	5MEeCZ6YUFDx749E6zC025mlAuR4UChICsirHp+UoONSFJiKSy1tweI68H7pkQUr
+	N5YXjROF1p5E8yK/pC86E94ec81SDz8LvpAtJ0TCw==
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 45p8fscgj4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 03 Apr 2025 06:32:31 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5334ocZ4002579;
+	Thu, 3 Apr 2025 06:32:30 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 45pr8stj51-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 03 Apr 2025 06:32:30 +0000
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5336WTx3032092;
+	Thu, 3 Apr 2025 06:32:30 GMT
+Received: from localhost.localdomain (ca-dev80.us.oracle.com [10.211.9.80])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 45pr8stj4h-1;
+	Thu, 03 Apr 2025 06:32:29 +0000
+From: Dongli Zhang <dongli.zhang@oracle.com>
+To: virtualization@lists.linux.dev, kvm@vger.kernel.org,
+        netdev@vger.kernel.org
+Cc: mst@redhat.com, jasowang@redhat.com, michael.christie@oracle.com,
+        pbonzini@redhat.com, stefanha@redhat.com, eperezma@redhat.com,
+        joao.m.martins@oracle.com, joe.jin@oracle.com, si-wei.liu@oracle.com,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v3 0/9] vhost-scsi: log write descriptors for live migration (and three bugfix) 
+Date: Wed,  2 Apr 2025 23:29:45 -0700
+Message-ID: <20250403063028.16045-1-dongli.zhang@oracle.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-04-03_02,2025-04-02_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 adultscore=0
+ mlxlogscore=999 mlxscore=0 phishscore=0 suspectscore=0 spamscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2502280000 definitions=main-2504030033
+X-Proofpoint-ORIG-GUID: t6yg06fUEEFEuMNQhy6DMoBp1QzRoUiE
+X-Proofpoint-GUID: t6yg06fUEEFEuMNQhy6DMoBp1QzRoUiE
 
-On April 2, 2025 10:09:21 PM PDT, Xin Li <xin@zytor=2Ecom> wrote:
->On 4/1/2025 12:52 AM, Ingo Molnar wrote:
->>> Should we rename the *msrl() functions to *msrq() as part of this
->>> overhaul?
->> Yeah, that's a good idea, and because talk is cheap I just implemented
->> this in the tip:WIP=2Ex86/msr branch with a couple of other cleanups in
->> this area (see the shortlog & diffstat below), but the churn is high:
->>=20
->>    144 files changed, 1034 insertions(+), 1034 deletions(-)
->
->Hi Ingo,
->
->I noticed that you keep the type of MSR index in these patches as
->"unsigned int"=2E
->
->I'm thinking would it be better to standardize it as "u32"?
->
->Because:
->1) MSR index is placed in ECX to execute MSR instructions, and the
->   high-order 32 bits of RCX are ignored on 64-bit=2E
->2) MSR index is encoded as a 32-bit immediate in the new immediate form
->   MSR instructions=2E
->
->Thanks!
->    Xin
+The live migration with vhost-scsi has been enabled by QEMU commit
+b3e89c941a85 ("vhost-scsi: Allow user to enable migration"), which
+thoroughly explains the workflow that QEMU collaborates with vhost-scsi on
+the live migration.
 
-"unsigned int" and "u32" are synonymous, but the latter is more explicit a=
-nd would be better=2E
+Although it logs dirty data for the used ring, it doesn't log any write
+descriptor (VRING_DESC_F_WRITE).
+
+In comparison, vhost-net logs write descriptors via vhost_log_write(). The
+SPDK (vhost-user-scsi backend) also logs write descriptors via
+vhost_log_req_desc().
+
+As a result, there is likely data mismatch between memory and vhost-scsi
+disk during the live migration.
+
+1. Suppose there is high workload and high memory usage. Suppose some
+systemd userspace pages are swapped out to the swap disk.
+
+2. Upon request from systemd, the kernel reads some pages from the swap
+disk to the memory via vhost-scsi.
+
+3. Although those userspace pages' data are updated, they are not marked as
+dirty by vhost-scsi (this is the bug). They are not going to migrate to the
+target host during memory transfer iterations.
+
+4. Suppose systemd doesn't write to those pages any longer. Those pages
+never get the chance to be dirty or migrated any longer.
+
+5. Once the guest VM is resumed on the target host, because of the lack of
+those dirty pages' data, the systemd may run into abnormal status, i.e.,
+there may be systemd segfault.
+
+Log all write descriptors to fix the issue.
+
+In addition, the patchset also fixes three bugs in vhost-scsi.
+
+Changed since v1:
+  - Rebase on top of most recent vhost changes.
+  - Don't allocate log buffer during initialization. Allocate only once for
+    each command. Don't free until not used any longer.
+  - Add bugfix for vhost_scsi_send_status().
+Changed since v2:
+  - Document parameters of vhost_log_write().
+  - Use (len == U64_MAX) to indicate whether log all pages, instead of
+    introducing a new parameter.
+  - Merge PATCH 6 and PATCH 7 from v2 as one patch, to Allocate for only
+    once in submission path in runtime. Reclaim int
+    VHOST_SET_FEATURES/VHOST_SCSI_SET_ENDPOINT.
+  - Encapsulate the one-time on-demand per-cmd log buffer alloc/copy in a
+    helper, as suggested by Mike.
+
+Dongli Zhang (vhost-scsi bugfix):
+  vhost-scsi: protect vq->log_used with vq->mutex
+  vhost-scsi: Fix vhost_scsi_send_bad_target()
+  vhost-scsi: Fix vhost_scsi_send_status()
+
+Dongli Zhang (log descriptor, suggested by Joao Martins):
+  vhost: modify vhost_log_write() for broader users
+  vhost-scsi: adjust vhost_scsi_get_desc() to log vring descriptors
+  vhost-scsi: log I/O queue write descriptors
+  vhost-scsi: log control queue write descriptors
+  vhost-scsi: log event queue write descriptors
+  vhost: add WARNING if log_num is more than limit
+
+ drivers/vhost/scsi.c  | 264 ++++++++++++++++++++++++++++++++++++++++-----
+ drivers/vhost/vhost.c |  46 ++++++--
+ 2 files changed, 273 insertions(+), 37 deletions(-)
+
+
+base-commit: ac34bd6a617c03cad0fbb61f189f7c4dafbbddfb
+branch: remotes/origin/linux-next
+tree: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git
+
+Thank you very much!
+
+Dongli Zhang
+
 
