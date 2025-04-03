@@ -1,291 +1,252 @@
-Return-Path: <kvm+bounces-42560-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42561-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB29EA7A01B
-	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 11:34:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE140A7A040
+	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 11:44:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E491E3B6407
-	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 09:33:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5EEFD1895D74
+	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 09:44:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89B85245021;
-	Thu,  3 Apr 2025 09:33:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C47E2459E9;
+	Thu,  3 Apr 2025 09:44:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QmJncrsy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LpnyCEOC"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFBB51F12EF
-	for <kvm@vger.kernel.org>; Thu,  3 Apr 2025 09:33:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFA1C244195
+	for <kvm@vger.kernel.org>; Thu,  3 Apr 2025 09:44:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743672805; cv=none; b=Vbcz7Ftmt4E8RAwAualDVo4LMDC1VDFdA+ycb14MJNlyMS7n5sFWb/VAIOVeK41dhiBmkTwZzJ5RSwAHuU/ThLNPbFWB1vu9EGUaqyckgvIz7xnAzWY+cRwNlZUJmeVLqoir1biQqdVA+LLDrXDA+gekcmsuFfMATwAxtiMgkBc=
+	t=1743673474; cv=none; b=PG6CRY4ASVb3q5DIQ5zSyoICFOFovt7BP+AFY83qZDg/ogWtUHbhg2jbkXGcYDBsj5ABMU3OC2unY3GwiD8Qcqtn33GoKjsRGDhWvhxfyxqsiKBRXnK4cEVov1bPq0bnpZxXYuHsQiTMSdDBGvlIqjsqaINpsjACyhfuaOkpiHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743672805; c=relaxed/simple;
-	bh=LH9g7+QOO+5iyOXAKlu6xac6HnVSx+io/5yzLBo5fnY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WI48EI4T34WcMMtiOqpCUbCi5l+dNLS/r7bJKHXFVEsMkqljIPHdc725QeVjdAulZULXo1XVm8xTbEDME2eRJyE5k/c4OyupjYpZyf9i8vcIFNW/1jtL+WuHIgGOlQsJRPeSjfa3rHpqGXj2WBdDnZtHJLAhndy6JBXjFs3FX+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QmJncrsy; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1743673474; c=relaxed/simple;
+	bh=3RucRNF7f/0e4O35Hd5elBCl4Zt1WkVLOuvSALfHk/0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YSRK6H5m6WZCbFp7zVXHgVLJz6b9kbhLcPyGuGh7Sna653qkYwVlJiw/P0nJUk6RhFd6r7IypuVNGJq69LGsCwrkPiOoZZEx3KVy/4fN4+rQVwHoHdv8q+/z02twpoGnkM+JTAgXlik+sN84rtmmjLyZxX23iZOg3iZwlKYuNSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LpnyCEOC; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743672802;
+	s=mimecast20190719; t=1743673471;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4sThZhr8FIHFH8ocyys2dja74pOa3boFKyAWA+JFfOI=;
-	b=QmJncrsyu8I5xAklFuwWqm+L7MjOQlEUetltPFfO/9xWbT7J6H1tFqPUxgi49+t01E6NtO
-	K9DRtsMOZFyUIk+buRmH6W5V3G2vFZYbtWoK/SdeJjYc3R6biQtHkLO0bhVSOsFALSxTvG
-	6sWLdmUEF1mK7tPlVPfk1epi2EaUy8M=
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=gSdqZyMN/qA57u0AZakL5zHE5rHAQPvR1lJKkRz1QYQ=;
+	b=LpnyCEOCNh5AU+4CEQnDT5rxB+ELD30GViTTolzd1ROE/20ndaT9QFYafOqrMJetkVwKGV
+	Y/1PrZGkNup5ocbtovf/THHfjo62zd8NzJ1CjWgnDAGxEyIhs7vP2c8GSX/MjOJVDGQnVe
+	ur9hbrUSwMMBdonolkD4Kv04+deSUM4=
 Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
  [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-619-S1UFno54NwKW4Ytu7Kc1yg-1; Thu, 03 Apr 2025 05:33:21 -0400
-X-MC-Unique: S1UFno54NwKW4Ytu7Kc1yg-1
-X-Mimecast-MFC-AGG-ID: S1UFno54NwKW4Ytu7Kc1yg_1743672800
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43d08915f61so3234735e9.2
-        for <kvm@vger.kernel.org>; Thu, 03 Apr 2025 02:33:21 -0700 (PDT)
+ us-mta-638-92ykImUhMeKfgNOV8hGfxw-1; Thu, 03 Apr 2025 05:44:30 -0400
+X-MC-Unique: 92ykImUhMeKfgNOV8hGfxw-1
+X-Mimecast-MFC-AGG-ID: 92ykImUhMeKfgNOV8hGfxw_1743673469
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43d51bd9b41so5493955e9.3
+        for <kvm@vger.kernel.org>; Thu, 03 Apr 2025 02:44:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743672800; x=1744277600;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4sThZhr8FIHFH8ocyys2dja74pOa3boFKyAWA+JFfOI=;
-        b=afrXVUmcY1vF4TinGGQv0DL+zLKQHniimP9t7dL1jKJobWMnke+JyKAJiDZH8rtOvT
-         bQV8TUEkspXlaHlX5JmyYTkMgP5cOreNIr8BxvEFKkq/HlJuUUvsXb7SMaxeQr9HdjWh
-         CAQYoVnZUr/Cw/72+kuj6GrpXp/lgmJdkwnuvs5wxEUTodxNB/SsVmQ02QNuXK1VRoDC
-         lSO22UysELLaiyIEAI/Kco7hKPpKwgSPMnXw2FszCF7bGJjlyqR2WqoBnVYMv7AV4taU
-         2oV/ms7mNKAuQbiBJRN2VxWErrPUM4CyyVB4WkB23Pn+2IcQOQzXVlH+OYY5Y35VW5M9
-         IRWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUDrl/Ua32xB/o3NSt1sFukdNzez/8WVG7ptP/xEXX1VeRgIt65lwOAndECB9QMSvXxlBA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLfNB5CeML1SIg0kEn3yUvL5eUATO9Zo9K6NluP8pnw7kn+Spy
-	H4XlBKSsfGedSmib0IFZnxKP/kiQW3MNxtcTAyy5xJPe43LKPas8YKJSOerwUddkMmcHShOoWom
-	XyFEMBNSXhPvEr6lwc36Kd69eIBXjUQomswJo4e5rxdNjozZdKQ==
-X-Gm-Gg: ASbGncsAYxy/+iqoxPTyAheXEMzUC9mXPJOIrhOhu3WedyrtkUU/e/vrgHw59ZM6LRv
-	HcR/q0w26WO+Ysbu4+r4hJEr/a0ngNntTyp3ItZchdJcMhPVPJXCD3CR3hKFr5WoN5KpIw4w8rR
-	YSMVoiYFPEbkjr/Ba1tHiFKuu9NkfcDNA269omwMwjtZrZiVOoJsLuZ27/9F1kwJjOdZfQyU5ym
-	6tZbcylbT3pywPdFSI+wc4obLj8vnfcPZVh3edmV7sAP3QoRZQkAS56KK0sYrnil3kTDx5cj+RQ
-	C7BWyqrduUhAal77T9oW4Fq+dIiwIFBuQrNF/r1bie76SIg9dCPKCt95uFg=
-X-Received: by 2002:a5d:59a9:0:b0:397:8f09:600 with SMTP id ffacd0b85a97d-39c120dc885mr17363640f8f.13.1743672800203;
-        Thu, 03 Apr 2025 02:33:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE4vxZl4LLon5hCph3Xcs7lAFUmmbHfNQzzEHDWPTgxlqRHCfjkIkKq1EFJXLE6RtiycnXaaQ==
-X-Received: by 2002:a5d:59a9:0:b0:397:8f09:600 with SMTP id ffacd0b85a97d-39c120dc885mr17363594f8f.13.1743672799604;
-        Thu, 03 Apr 2025 02:33:19 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-11-6-59.retail.telecomitalia.it. [87.11.6.59])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c301a7586sm1307915f8f.38.2025.04.03.02.33.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Apr 2025 02:33:19 -0700 (PDT)
-Date: Thu, 3 Apr 2025 11:33:14 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "K. Y. Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Bryan Tan <bryan-bt.tan@broadcom.com>, 
-	Vishnu Dasa <vishnu.dasa@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, "David S. Miller" <davem@davemloft.net>, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v2 0/3] vsock: add namespace support to vhost-vsock
-Message-ID: <4c2xz3xhpdjvb6jmdw7ctsebpza5lcs4gevr5wlwwyt64usr2i@o5qt2msfyvvw>
-References: <20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com>
- <r6a6ihjw3etlb5chqsb65u7uhcav6q6pjxu65iqpp76423w2wd@kmctvoaywmbu>
- <Z-w47H3qUXZe4seQ@redhat.com>
- <Z+yDCKt7GpubbTKJ@devvm6277.cco0.facebook.com>
- <CAGxU2F7=64HHaAD+mYKYLqQD8rHg1CiF1YMDUULgSFw0WSY-Aw@mail.gmail.com>
- <Z-0BoF4vkC2IS1W4@redhat.com>
- <Z+23pbK9t5ckSmLl@devvm6277.cco0.facebook.com>
- <Z+26A3sslT+w+wOI@devvm6277.cco0.facebook.com>
+        d=1e100.net; s=20230601; t=1743673469; x=1744278269;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gSdqZyMN/qA57u0AZakL5zHE5rHAQPvR1lJKkRz1QYQ=;
+        b=mu9Lb3iC1KvzxjUJVyWNGaWjJjC8YdruQz7rda9F5+sOPV83ZomAiJO1M89mIL3HOp
+         aMs+RelezRg09fBHi8EaKhHIaV4pzyJ4+OUytw6GV8jozknjr5AGP8HF+oy4xVj6Q3/l
+         c1vbhnFuG5eWwOWMzaKLpOlDPRUuQJDBKI/S/Z8aw7TLI7ZrdfH3iUT0rTAi1rXq1Ym7
+         gLcavxWEmqTzYNANtkwOwJCu5+li2oPL38flINL9hbPF/bxD9YhnN0z0YFT6nW1mjGtG
+         s5SIUyWP6HRQ3uAAULaJodar7Wo2UqXWQTjQxP0ypNfmSAgDxtlF0pSn6rhr9Wx3+CJd
+         Aafg==
+X-Forwarded-Encrypted: i=1; AJvYcCXSJkaJYgdVJ30jZWWSZpO+YLtvEJRC8wEVrkMyqDBn9ZPax3c0HUHU7ECaAmebfh08njg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx83qB71RBFD7ZToLxaGZTMb6YwboIBhp2ngCFLYvZ71EEYy1yD
+	MEgutdwRsh8Cm5w5LF3mJMJ1iHbbGNrAyh7TkBFTT3I2i2jpgMO4b6jYRPUmwgvPpGyswW/+HP3
+	9D2az7rmM/MsKvgPlMdAebGA7NDuRi8a+JEJAKYCDEhkM8eIDhw==
+X-Gm-Gg: ASbGnctw+EjhSLwEzAAITgvzmlUBPSwiUQ8cpc/UDfeOSSu/gXhakkWq9kk5j4lhe6T
+	HfWF3J/7U4TY/SYzWQFT5ps4FOBKNPEf4xxYeBT81a2jcWq1Evt09etbARUNUQqcCNoRLE5EtnC
+	mF1ySjqDBv9+7CP3YS5aUPf4FdvKjz9CuaQF6SgYJ2yAbG9llEgu6kziWrwIg3g+pwvAkTgfROX
+	WJqbEMz+wHf+6nt474/VtFDABrHiwIhmA3ubByZx4nauxFbR+ZZjafY7GwIhnsctKy5vCVGkUui
+	QZzXhs56NNGSXRYk9KtfKwFPNq4sQk7MH2WPUs9CiEsz
+X-Received: by 2002:a5d:6dab:0:b0:391:4889:5045 with SMTP id ffacd0b85a97d-39c12114fccmr17337052f8f.36.1743673468939;
+        Thu, 03 Apr 2025 02:44:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG/7cEdSHfURTDRVGlG5T0lSpAh1Bd8WT5kQ0J3SBrbGbJ5bEbAFPspWelmdDFLWhEf9/DFjg==
+X-Received: by 2002:a5d:6dab:0:b0:391:4889:5045 with SMTP id ffacd0b85a97d-39c12114fccmr17337011f8f.36.1743673468511;
+        Thu, 03 Apr 2025 02:44:28 -0700 (PDT)
+Received: from [192.168.0.7] (ip-109-42-51-76.web.vodafone.de. [109.42.51.76])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c30226e9asm1320216f8f.94.2025.04.03.02.44.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Apr 2025 02:44:28 -0700 (PDT)
+Message-ID: <9daf03e4-4526-428c-b584-ede6cb77cada@redhat.com>
+Date: Thu, 3 Apr 2025 11:44:15 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z+26A3sslT+w+wOI@devvm6277.cco0.facebook.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] s390/virtio_ccw: don't allocate/assign airqs for
+ non-existing queues
+To: David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
+ kvm@vger.kernel.org, Chandra Merla <cmerla@redhat.com>,
+ Stable@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Wei Wang <wei.w.wang@intel.com>
+References: <20250402203621.940090-1-david@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <20250402203621.940090-1-david@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 02, 2025 at 03:28:19PM -0700, Bobby Eshleman wrote:
->On Wed, Apr 02, 2025 at 03:18:13PM -0700, Bobby Eshleman wrote:
->> On Wed, Apr 02, 2025 at 10:21:36AM +0100, Daniel P. Berrangé wrote:
->> > On Wed, Apr 02, 2025 at 10:13:43AM +0200, Stefano Garzarella wrote:
->> > > On Wed, 2 Apr 2025 at 02:21, Bobby Eshleman <bobbyeshleman@gmail.com> wrote:
->> > > >
->> > > > I do like Stefano's suggestion to add a sysctl for a "strict" mode,
->> > > > Since it offers the best of both worlds, and still tends conservative in
->> > > > protecting existing applications... but I agree, the non-strict mode
->> > > > vsock would be unique WRT the usual concept of namespaces.
->> > >
->> > > Maybe we could do the opposite, enable strict mode by default (I think
->> > > it was similar to what I had tried to do with the kernel module in v1, I
->> > > was young I know xD)
->> > > And provide a way to disable it for those use cases where the user wants
->> > > backward compatibility, while paying the cost of less isolation.
->> >
->> > I think backwards compatible has to be the default behaviour, otherwise
->> > the change has too high risk of breaking existing deployments that are
->> > already using netns and relying on VSOCK being global. Breakage has to
->> > be opt in.
->> >
->> > > I was thinking two options (not sure if the second one can be done):
->> > >
->> > >   1. provide a global sysfs/sysctl that disables strict mode, but this
->> > >   then applies to all namespaces
->> > >
->> > >   2. provide something that allows disabling strict mode by namespace.
->> > >   Maybe when it is created there are options, or something that can be
->> > >   set later.
->> > >
->> > > 2 would be ideal, but that might be too much, so 1 might be enough. In
->> > > any case, 2 could also be a next step.
->> > >
->> > > WDYT?
->> >
->> > It occured to me that the problem we face with the CID space usage is
->> > somewhat similar to the UID/GID space usage for user namespaces.
->> >
->> > In the latter case, userns has exposed /proc/$PID/uid_map & gid_map, to
->> > allow IDs in the namespace to be arbitrarily mapped onto IDs in the host.
->> >
->> > At the risk of being overkill, is it worth trying a similar kind of
->> > approach for the vsock CID space ?
->> >
->> > A simple variant would be a /proc/net/vsock_cid_outside specifying a set
->> > of CIDs which are exclusively referencing /dev/vhost-vsock associations
->> > created outside the namespace. Anything not listed would be exclusively
->> > referencing associations created inside the namespace.
->> >
->> > A more complex variant would be to allow a full remapping of CIDs as is
->> > done with userns, via a /proc/net/vsock_cid_map, which the same three
->> > parameters, so that CID=15 association outside the namespace could be
->> > remapped to CID=9015 inside the namespace, allow the inside namespace
->> > to define its out association for CID=15 without clashing.
->> >
->> > IOW, mapped CIDs would be exclusively referencing /dev/vhost-vsock
->> > associations created outside namespace, while unmapped CIDs would be
->> > exclusively referencing /dev/vhost-vsock associations inside the
->> > namespace.
->> >
->> > A likely benefit of relying on a kernel defined mapping/partition of
->> > the CID space is that apps like QEMU don't need changing, as there's
->> > no need to invent a new /dev/vhost-vsock-netns device node.
->> >
->> > Both approaches give the desirable security protection whereby the
->> > inside namespace can be prevented from accessing certain CIDs that
->> > were associated outside the namespace.
->> >
->> > Some rule would need to be defined for updating the /proc/net/vsock_cid_map
->> > file as it is the security control mechanism. If it is write-once then
->> > if the container mgmt app initializes it, nothing later could change
->> > it.
->> >
->> > A key question is do we need the "first come, first served" behaviour
->> > for CIDs where a CID can be arbitrarily used by outside or inside namespace
->> > according to whatever tries to associate a CID first ?
->>
->> I think with /proc/net/vsock_cid_outside, instead of disallowing the CID
->> from being used, this could be solved by disallowing remapping the CID
->> while in use?
->>
->> The thing I like about this is that users can check
->> /proc/net/vsock_cid_outside to figure out what might be going on,
->> instead of trying to check lsof or ps to figure out if the VMM processes
->> have used /dev/vhost-vsock vs /dev/vhost-vsock-netns.
+On 02/04/2025 22.36, David Hildenbrand wrote:
+> If we finds a vq without a name in our input array in
+> virtio_ccw_find_vqs(), we treat it as "non-existing" and set the vq pointer
+> to NULL; we will not call virtio_ccw_setup_vq() to allocate/setup a vq.
+> 
+> Consequently, we create only a queue if it actually exists (name != NULL)
+> and assign an incremental queue index to each such existing queue.
+> 
+> However, in virtio_ccw_register_adapter_ind()->get_airq_indicator() we
+> will not ignore these "non-existing queues", but instead assign an airq
+> indicator to them.
+> 
+> Besides never releasing them in virtio_ccw_drop_indicators() (because
+> there is no virtqueue), the bigger issue seems to be that there will be a
+> disagreement between the device and the Linux guest about the airq
+> indicator to be used for notifying a queue, because the indicator bit
+> for adapter I/O interrupt is derived from the queue index.
+> 
+> The virtio spec states under "Setting Up Two-Stage Queue Indicators":
+> 
+> 	... indicator contains the guest address of an area wherein the
+> 	indicators for the devices are contained, starting at bit_nr, one
+> 	bit per virtqueue of the device.
+> 
+> And further in "Notification via Adapter I/O Interrupts":
+> 
+> 	For notifying the driver of virtqueue buffers, the device sets the
+> 	bit in the guest-provided indicator area at the corresponding
+> 	offset.
+> 
+> For example, QEMU uses in virtio_ccw_notify() the queue index (passed as
+> "vector") to select the relevant indicator bit. If a queue does not exist,
+> it does not have a corresponding indicator bit assigned, because it
+> effectively doesn't have a queue index.
+> 
+> Using a virtio-balloon-ccw device under QEMU with free-page-hinting
+> disabled ("free-page-hint=off") but free-page-reporting enabled
+> ("free-page-reporting=on") will result in free page reporting
+> not working as expected: in the virtio_balloon driver, we'll be stuck
+> forever in virtballoon_free_page_report()->wait_event(), because the
+> waitqueue will not be woken up as the notification from the device is
+> lost: it would use the wrong indicator bit.
+> 
+> Free page reporting stops working and we get splats (when configured to
+> detect hung wqs) like:
+> 
+>   INFO: task kworker/1:3:463 blocked for more than 61 seconds.
+>         Not tainted 6.14.0 #4
+>   "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+>   task:kworker/1:3 [...]
+>   Workqueue: events page_reporting_process
+>   Call Trace:
+>    [<000002f404e6dfb2>] __schedule+0x402/0x1640
+>    [<000002f404e6f22e>] schedule+0x3e/0xe0
+>    [<000002f3846a88fa>] virtballoon_free_page_report+0xaa/0x110 [virtio_balloon]
+>    [<000002f40435c8a4>] page_reporting_process+0x2e4/0x740
+>    [<000002f403fd3ee2>] process_one_work+0x1c2/0x400
+>    [<000002f403fd4b96>] worker_thread+0x296/0x420
+>    [<000002f403fe10b4>] kthread+0x124/0x290
+>    [<000002f403f4e0dc>] __ret_from_fork+0x3c/0x60
+>    [<000002f404e77272>] ret_from_fork+0xa/0x38
+> 
+> There was recently a discussion [1] whether the "holes" should be
+> treated differently again, effectively assigning also non-existing
+> queues a queue index: that should also fix the issue, but requires other
+> workarounds to not break existing setups.
+> 
+> Let's fix it without affecting existing setups for now by properly ignoring
+> the non-existing queues, so the indicator bits will match the queue
+> indexes.
+> 
+> [1] https://lore.kernel.org/all/cover.1720611677.git.mst@redhat.com/
+> 
+> Fixes: a229989d975e ("virtio: don't allocate vqs when names[i] = NULL")
+> Reported-by: Chandra Merla <cmerla@redhat.com>
+> Cc: <Stable@vger.kernel.org>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: Halil Pasic <pasic@linux.ibm.com>
+> Cc: Eric Farman <farman@linux.ibm.com>
+> Cc: Heiko Carstens <hca@linux.ibm.com>
+> Cc: Vasily Gorbik <gor@linux.ibm.com>
+> Cc: Alexander Gordeev <agordeev@linux.ibm.com>
+> Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+> Cc: Sven Schnelle <svens@linux.ibm.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Wei Wang <wei.w.wang@intel.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>   drivers/s390/virtio/virtio_ccw.c | 16 ++++++++++++----
+>   1 file changed, 12 insertions(+), 4 deletions(-)
 
-Yes, although the user in theory should not care about this information,
-right?
-I mean I don't even know if it makes sense to expose the contents of
-/proc/net/vsock_cid_outside in the namespace.
+Thanks for tackling this, David!
 
->>
->> Just to check I am following... I suppose we would have a few typical
->> configurations for /proc/net/vsock_cid_outside. Following uid_map file
->> format of:
->> 	"<local cid start>		<global cid start>		<range size>"
+I tested the patch and the problems are gone now, indeed!
 
-This seems to relate more to /proc/net/vsock_cid_map, for
-/proc/net/vsock_cid_outside I think 2 parameters are enough
-(CID, range), right?
-
->>
->> 	1. Identity mapping, current namespace CID is global CID (default
->> 	setting for new namespaces):
->>
->> 		# empty file
->>
->> 				OR
->>
->> 		0    0    4294967295
->>
->> 	2. Complete isolation from global space (initialized, but no mappings):
->>
->> 		0    0    0
->>
->> 	3. Mapping in ranges of global CIDs
->>
->> 	For example, global CID space starts at 7000, up to 32-bit max:
->>
->> 		7000    0    4294960295
->> 	
->> 	Or for multiple mappings (0-100 map to 7000-7100, 1000-1100 map to
->> 	8000-8100) :
->>
->> 		7000    0       100
->> 		8000    1000    100
->>
->>
->> One thing I don't love is that option 3 seems to not be addressing a
->> known use case. It doesn't necessarily hurt to have, but it will add
->> complexity to CID handling that might never get used?
-
-Yes, as I also mentioned in the previous email, we could also do a
-step-by-step thing.
-
-IMHO we can define /proc/net/vsock_cid_map (with the structure you just
-defined), but for now only support 1-1 mapping (with the ranges of
-course, I mean the first two parameters should always be the same) and
-then add option 3 in the future.
-
->>
->> Since options 1/2 could also be represented by a boolean (yes/no
->> "current ns shares CID with global"), I wonder if we could either A)
->> only support the first two options at first, or B) add just
->> /proc/net/vsock_ns_mode at first, which supports only "global" and
->> "local", and later add a "mapped" mode plus /proc/net/vsock_cid_outside
->> or the full mapping if the need arises?
-
-I think option A is the same as I meant above :-)
-
->>
->> This could also be how we support Option 2 from Stefano's last email of
->> supporting per-namespace opt-in/opt-out.
-
-Hmm, how can we do it by namespace? Isn't that global?
-
->>
->> Any thoughts on this?
->>
->
->Stefano,
->
->Would only supporting 1/2 still support the Kata use case?
-
-I think so, actually I was thinking something similar in the message I 
-just sent.
-
-By default (if the file is empty), nothing should change, so that's fine 
-IMO. As Paolo suggested, we absolutely have to have tests to verify 
-these things.
-
-Thanks,
-Stefano
+Tested-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
