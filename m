@@ -1,338 +1,243 @@
-Return-Path: <kvm+bounces-42554-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42555-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CEFDA79E25
-	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 10:28:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE39DA79E5A
+	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 10:40:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0AEAB1892C36
-	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 08:27:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9250E173637
+	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 08:40:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8683B24291E;
-	Thu,  3 Apr 2025 08:27:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 218A824290B;
+	Thu,  3 Apr 2025 08:40:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I+XA+igo"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="cQWtXnim"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2083.outbound.protection.outlook.com [40.107.93.83])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AF75241672
-	for <kvm@vger.kernel.org>; Thu,  3 Apr 2025 08:27:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743668835; cv=none; b=g2zsPdxyJS2Nb1Ko5DU2bW0lRlyoQSKw7fyWMscAvGpKoMuv1d4+CxZvtyXEHQs0zhiJo1y4Jc9ofITbMQ9EWUsBAy+Svzb57Uv3J5+L7ZA4je3FhnoMMdP0bJtWKDVE3aJxlXdDQk1IRGk3IfqN+PFocA+vQY8LmeHrWdCba1Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743668835; c=relaxed/simple;
-	bh=mBEnZJfbHssNSwDuQ4ZoDefTpQJ0psPNYc+XIeueAiM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MXINlG6BWHwvo+RmOPKgWwfkJ+vWTUhqRT/uSHL3UHmXAIE8T8vW4eIVV7G3MRMeMpLRdrbWJPaqKd74OcSR+ymQczUhu7p+2mp5qGboCnN0hPmcDlPrIv9x0XKdUhdjwredOqdrnj0AykPr/OenHGAiJl58UemAWkL7oCk3nfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I+XA+igo; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743668831;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8H3/cfOpLLMF7vHGtp8a2sFO6dkZAsrx2IPt+e+ewfY=;
-	b=I+XA+igoaZibTp6iKCIujc4ZP5GT5kZLZqcrCop2QpTtXf9aa0j22TvRYFpV+5y7m+1plY
-	GCaeqf0ryCn9fjR2soUX7Y2SeZOz8HtMQ7GylKMGrVMh7Vdn8oeH7VUfn5jPy184GObQyM
-	xCkOYE9H4znKFCPUUzwlYtP3x2sdndk=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-510-jnkbpDRnNCGuLeJ7Mam38w-1; Thu, 03 Apr 2025 04:27:10 -0400
-X-MC-Unique: jnkbpDRnNCGuLeJ7Mam38w-1
-X-Mimecast-MFC-AGG-ID: jnkbpDRnNCGuLeJ7Mam38w_1743668829
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3912fe32b08so390481f8f.3
-        for <kvm@vger.kernel.org>; Thu, 03 Apr 2025 01:27:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743668829; x=1744273629;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8H3/cfOpLLMF7vHGtp8a2sFO6dkZAsrx2IPt+e+ewfY=;
-        b=cA0K37kFcRI6QpZgFX19w2wpfcWCo43kLCFDLcK4Rst/r36uhizmWw6eOfEtsSEXdO
-         W6rvHgrnKdxv1mJblo95xsC0kcPdn8M7EkjkZ2q6QxSqRxqHyMfsG3+2x+ofjHIxtpt5
-         sPOuv+bo9YDWO8fBdpgjr9RGUrbO0wSxb+Z2l/n/9TFzCKt418EDTts3VMhW/MUhYEu7
-         xwgG9TYeUfuEG5ozkSVD8nmeDrAWqfgSxwhVYXWKCPvS30TwyNucbcS0owwFCdSkHgk0
-         x2177AgASki+EBGPuYrhpurhhzSRSY19s8cqRweYyNaT1ryo+PiSaaKLQG0X7B8KnmjT
-         T4Yw==
-X-Forwarded-Encrypted: i=1; AJvYcCUABfyrDWansO9juhyfen+kjrl/BIcfC7niS00/3CJpORxi8WW359DAh0OlVfxovfUfl8w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJlCDF64Z1wVTV3JF2+M3cuzErsKQXAsGYKQVbyRrRhb24s9gP
-	ZpWEPaDEIl/KlBx+aWPY0rPYz/oYIQt+Iu3ZEPGnfIAskJ6B1m8JN1s5MiD91pB8gsyt/QFll7h
-	WIBQjzihPqTp9k90UncWcvhOXP0i0f69zRu0naoR0sR0+YMCBcA==
-X-Gm-Gg: ASbGncujGKjwDit9A8TM3i7ga/U4xbioELj33KGDtxer4NiafYUQUPdKXUcA6QOuGsH
-	2kvyRBa5KRxS1ptdxl2Kxe3ac4A87CyisOJ/TaIKR0okKmFsgtNKts7EOlpwvxL70xm+K2hiav4
-	4ob1LQZlwSplGtSZ9g+KshtUNAMUVDs7PbmkPCqjkV2V3a1HgEvJttrtlyBT+JaOa9/R2XLqos/
-	mVxWdaLreTS9YHj/9ZanvAWmHfLkHIsonhrW7Io3Dp2LwLiTmP9CsulQsXrMvyUWKZv1MgNfyUK
-	4AuNQRSDBnr3UuqHGWZSH1wb7ZDLDkg/UvjHsYY536QSz5ojnhGttvHZLL4=
-X-Received: by 2002:a05:6000:1787:b0:38d:badf:9df5 with SMTP id ffacd0b85a97d-39c2975344dmr5198685f8f.17.1743668829068;
-        Thu, 03 Apr 2025 01:27:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEkJasUVCkOzYkOOW0hF0pl3+LvSOwHmjYa1Gj63xQYPYwtDCufaqDLic/I99b7VKxwX6pLBg==
-X-Received: by 2002:a05:6000:1787:b0:38d:badf:9df5 with SMTP id ffacd0b85a97d-39c2975344dmr5198641f8f.17.1743668828602;
-        Thu, 03 Apr 2025 01:27:08 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-11-6-59.retail.telecomitalia.it. [87.11.6.59])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec364ce6esm11031055e9.30.2025.04.03.01.27.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Apr 2025 01:27:07 -0700 (PDT)
-Date: Thu, 3 Apr 2025 10:27:03 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Alexander Graf <graf@amazon.com>
-Cc: netdev@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, kvm@vger.kernel.org, 
-	Asias He <asias@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	nh-open-source@amazon.com, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH v3] vsock/virtio: Remove queued_replies pushback logic
-Message-ID: <qmhbvdned3ozt366ndshqkrc4p3d22wuo5obpziuaj5oqfwvw7@4cxvxilmt4du>
-References: <20250402150646.42855-1-graf@amazon.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A66732A8D0;
+	Thu,  3 Apr 2025 08:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.83
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743669613; cv=fail; b=i1o+hJX6kOvPainJjOVmAa7dfmHxJWNjcPe6VSuVcqce9si8REWbRPrFXyIKF8d5mlFqC4NNoNPXL62lKEd7g9LKvLNUJBvlZ6KmtXo4l8Tg0+o1Zee1PMCm6TAHeZ7esuBKFwXEyKh4XTQzwMvGWOR706JZEBLhnh1ETVQTX2I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743669613; c=relaxed/simple;
+	bh=i5djiIf3m4BvoO5LmDdoHN2pr06dj5+RrlGQzP28ojo=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ZArJUdmsuRsDN9SDA/77Kr3fvbg13EKFbqODstq62hwCe77V22GXCziGzmtEGtwRBZNXofpOzkpI6YFQ/DqKpuFgXEydKQ9EpkLYO9F5MW9ZqPOEwu4UnpHhEnHUSISPpNw6URpqw5Pi0RfleUi+xk5rJfFmrndu4SbXFBe1mBU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=cQWtXnim; arc=fail smtp.client-ip=40.107.93.83
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=h2Sda6Ili4roGIqAFd6xeNwTe0C1PpSxQXHKtVR0uMBegpkAwS0HJTtAMInHZMMGLCOPQ/40I+ulb7+apIPneTrjW5TkDSQiLBoyKgvbDiTjuORPem6RLKsZvbGsyp53zIR5QmZ7AH/lhHu+2JcDEvtKPjkVuT3wIWZ+yNqkkvY7QDl3dCe1lelHBSHPui3L6TjPe+3vRZ5AqlRo1n5yR7qLlcem1djlZoOVpiy9VfGbwWdOcGoVsROh9EDqQfBWLcaRmRp0hALsSgNd69/p90zuW5sVsCszeIxbk7Epy1uA1YCVCmCxY3TVKFuXhucQjRHqNwZXiwIywMbQHspzWg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GisPSuw7nUXZfdY0yy7px5/wrzgbWFFXWkEsg43Xnz8=;
+ b=MggHciyOCmla1cOyt07W4iBNn2XQQ9IH9dLn1nSLmliZpVacdj2toZ3g07b96v1ab8l0SGpe4PPqxIukvu06SETswiqqaXGxpWMdvuiS54keVP/7zMNQW/9zT3DbELKGVn1JVAYlivRLn6DySsasRBYS29IyypVMDxhjoDmtCFST1pl0u+XkOq/XTr2LLNJHnt3dUTtIfqhfVLmS/qyM3HUXsiFa8typEeFyCvNN8S566e0HRXuApGPPS5oGfiUra6WHiCO0++1evErwEcn5IWK3tW57MsYmVAgJ3Xabl33qvh4WZTiNmc9OQbzX4eujYXhdktiymLSJpAQQE6r2RA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GisPSuw7nUXZfdY0yy7px5/wrzgbWFFXWkEsg43Xnz8=;
+ b=cQWtXnim3PHFWbaYqLdXOTDZlNSgkvFhV4F3DHGRrxHhbXBRy6nA6CNqeKG2PU6/OfSJf5QOwltxCGu6Kxkh+zh0/Q5ssR/cqbljOLLhhDYWKM9EJ0UMOtDEKj2ykwyMfB/cOXonqOLDZEQBI1NoAFfdbZL/gjQbGz4avfn2cR8=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
+ by PH7PR12MB5736.namprd12.prod.outlook.com (2603:10b6:510:1e3::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.44; Thu, 3 Apr
+ 2025 08:40:07 +0000
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::53fb:bf76:727f:d00f]) by CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::53fb:bf76:727f:d00f%4]) with mapi id 15.20.8534.052; Thu, 3 Apr 2025
+ 08:40:07 +0000
+Message-ID: <8986eed9-5a40-472a-a211-9607666b2c49@amd.com>
+Date: Thu, 3 Apr 2025 19:39:54 +1100
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [RFC PATCH v2 14/22] iommufd: Add TIO calls
+Content-Language: en-US
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Tom Lendacky <thomas.lendacky@amd.com>,
+ Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
+ Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+ Robin Murphy <robin.murphy@arm.com>, Kevin Tian <kevin.tian@intel.com>,
+ Bjorn Helgaas <bhelgaas@google.com>, Dan Williams
+ <dan.j.williams@intel.com>, Christoph Hellwig <hch@lst.de>,
+ Nikunj A Dadhania <nikunj@amd.com>, Michael Roth <michael.roth@amd.com>,
+ Vasant Hegde <vasant.hegde@amd.com>, Joao Martins
+ <joao.m.martins@oracle.com>, Nicolin Chen <nicolinc@nvidia.com>,
+ Lu Baolu <baolu.lu@linux.intel.com>,
+ Steve Sistare <steven.sistare@oracle.com>, Lukas Wunner <lukas@wunner.de>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
+ iommu@lists.linux.dev, linux-coco@lists.linux.dev, Zhi Wang
+ <zhiw@nvidia.com>, AXu Yilun <yilun.xu@linux.intel.com>,
+ "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+References: <20250218111017.491719-1-aik@amd.com>
+ <20250218111017.491719-15-aik@amd.com> <20250401161259.GM186258@ziepe.ca>
+From: Alexey Kardashevskiy <aik@amd.com>
+In-Reply-To: <20250401161259.GM186258@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: ME3P282CA0088.AUSP282.PROD.OUTLOOK.COM
+ (2603:10c6:220:f6::21) To CH3PR12MB9194.namprd12.prod.outlook.com
+ (2603:10b6:610:19f::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250402150646.42855-1-graf@amazon.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|PH7PR12MB5736:EE_
+X-MS-Office365-Filtering-Correlation-Id: 62b499bc-d99d-4845-be6e-08dd728b2335
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?SlBseXFzVHczVzliUjYvZXpxUjZidlJNUVVHdWowamxCeVRMQjlrdFNRZm1M?=
+ =?utf-8?B?UkJVbzA1clVkdUl1dDlYNmo0VlhuNEdxOFlBdUlmQmRLUEtuNXFReXFkY01n?=
+ =?utf-8?B?NjAyNzNwempqVkdEaENVVkI5b3pPOGJoMGNDcU1pUEtSRXBpR2pOcWEvdGw0?=
+ =?utf-8?B?S0RIRjU5Z0tkQmFDbU5IYUEyR0R0em9sajlwN3JpVXUwaXZhSXJNWUtrOUxv?=
+ =?utf-8?B?WnRscnRMVkgxK2IzaGFLcFJ2cWxsQWhJNjlvbXhQWHdqdDZ5VkRqdlZNTCtj?=
+ =?utf-8?B?S3l0QWhhU1Y3UmdkZWwwYVV5Si9rZU04VHNrSXo3QVBIL3NVbWJBS0VSa2tz?=
+ =?utf-8?B?UjU4L2g4TS9DUnRlY3NVZDJGQVBGZExGd3BjbGpibE9oT0RZb2Z3cnh4aERD?=
+ =?utf-8?B?YUlPZTVOWnRHa3ZuR3Y5dmpKZysyU3VUMnlLbnlKUDF6aEVJSzJSRlVob254?=
+ =?utf-8?B?M2tXTGgxQzlieHBYZDl4ZGsyd0dpZGpUMThVMnN0TnNhbWM0VzhydVBEZmlS?=
+ =?utf-8?B?dDM2SWJzWHJFR3FPanNsczdtMXJJR3U2aDJpNjdpdVNaVjdjYm5oWkc4cmxl?=
+ =?utf-8?B?MVdHb1FZcituSWY3eXFvOXpseG5KVlYwMzRqem9jUnNlQ1ZoU2N6UGNHd2RG?=
+ =?utf-8?B?ZGQ4TUJLTFNvOS9RVTBaTnVIKzZoTGdUc2pRTTdRTjVxVlFkbDI1cWo3MkxR?=
+ =?utf-8?B?ZVdFSFVRUzI0TVpCcmxvQjlvZ0lxemFmWkVGL2d6NHhTUm5EUDlWY1Z6bjgz?=
+ =?utf-8?B?ZUlndGZkb1JQem5URFk2TUhPbkMwR2xVVkw2S3pTRllObkRnSFE4Vk4yeno1?=
+ =?utf-8?B?UUlXZEs0VzdUR3U5RHR0VG5lSDF4QkFJNExLd1NSZzZXM1dkRWJ6WDNYbC84?=
+ =?utf-8?B?M0xYT2JPQWFTbUYvLzIwSmQvL1VzNHk4TGlSZXZmbjlYMEtjblRjamNuWHJK?=
+ =?utf-8?B?OHU4T2FhNEgzT2JScjR6cUdWOFYzWldNYy9xSjZTMk9XWHlTZDBNUmt5Q0NO?=
+ =?utf-8?B?bkVqZi8xZStZeG1YRm40Y0hLS2pFKzROUzJYV2hENk5TOVUvQUx0TkRCbzRU?=
+ =?utf-8?B?NWs4SHdWbnU4V00rODlrVmJmaFR4R2tiaEhGclBKKzc3Um9PaUhlZlNsTkJp?=
+ =?utf-8?B?TDNJMnRNNzc0QVB4UTV3aTRSdDF4cHN5a0lBbS93NURINkFaRDVoZ25IMndY?=
+ =?utf-8?B?ZDNMREx5YTFEUEgxWjVteHFOUXZPQW83S2NUdS9oL1l5OE1PeWZjNmhVZ2N2?=
+ =?utf-8?B?UWdJTW1jRG42eGNWdFJEeTkrQVRvb0U2bmZRZWdjVk40V0NEWXBSWE1GQ3A4?=
+ =?utf-8?B?VzRFMThaM1o0Rmp5ZlhhTy9ISUNuQ2ZZaWMxMW5zMjhweUZ6NmZLb1NhcXBp?=
+ =?utf-8?B?dkltU3dwbFlaMUh6MXRLZE51OXB1Z1JtSXpGNmpxZEQwOFY0UWtlSUtsUXFn?=
+ =?utf-8?B?dDlOdU5ZSGZzY0d5L0FUcmU1aXZqVm1Vc0lNN0d0RU5TVFFBbUxLdzd5SnBO?=
+ =?utf-8?B?ZldtVWEwQjh1Tm1VUEU5RmN0bDZLQzZqUEI3eTNoTkFhSEQ5Z3J0S3ZIdkM1?=
+ =?utf-8?B?M3cyMDRQM0NYTGV2cStNSEdGNEMyTGlsWk1yckIzN1ducWc2a0xpT1JEQjVv?=
+ =?utf-8?B?M21WNVZQT2l1YVU4S0lsTVh0V1dTeWZzSlU1K21CbXNkVEo0NmVCNk9DUzNy?=
+ =?utf-8?B?Rzl6elc0WG1kRXVkaTh3UzA3Qzd6NVNWeWhDbHQ0aEtyL25WTXpHKyt4YzFz?=
+ =?utf-8?B?MUVsVzd0M0l3NStpNWRRRk9mMXdnR04zRUE3cjJoYlZNVGdNSlZodWpEWE1Y?=
+ =?utf-8?B?QVc1ZC94Y2UxQW1GNyt3Zz09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?WjU0MUptSnNyZ2laVUhtRFQ0bC9pRC9kVjJKOTdCUzB2T3EyVkcySFBscGZw?=
+ =?utf-8?B?OEtUV3hteVIxa2JKdTZDVmNROG0waHJ3aUJsWldoVE55UGcvZXpMMWxQSFpu?=
+ =?utf-8?B?dEpucU5KTzZFM0VVUXpnbUdOa2dxUUhmbjVxOFd0S09BTDVFZ0lmRWZmcDFB?=
+ =?utf-8?B?MmVVUjN4K0VFY1NaOXlhMTJXVERnUll4TkljaTgvQUlMczhGRnRyY2R1REc2?=
+ =?utf-8?B?ZkkxVzdYMDdHMENnMXVmamtJZElrNDhMZUx3V1REeDZhT09QY3FwaFJqRmEy?=
+ =?utf-8?B?MHZqQXBETU9iSGhZT0R3OXdSZzV3WTAwV2h1czdQK0JrNnUzcU5NaVorQm4v?=
+ =?utf-8?B?REpJRXROSk5TcXloSTdlUDVMdnZreSs5anVzT2dSeU9RaVBQL1JjZ2lBM1dI?=
+ =?utf-8?B?ZE4vMTBmZkEvazNhWTNrbnJ2QklSRGdlQlJQZFg0Y2xVQkk3c3A5c3NMNXl1?=
+ =?utf-8?B?QzNkVE1JOVJiYjRwQ1Frcy9UK0VjNE1kcDU0WFNyUVcyd2ZoQllYSDY1NXNl?=
+ =?utf-8?B?YTR2Vk1RVGo1bzZaMnY1M0Zjb3FpMnlyTHYvMEtoWTZ4QWZNbERUeEk0cmla?=
+ =?utf-8?B?VUgyMjhPVWNyRDR2V0hIdzJRYjJrcXVueVp5aWpCYWozU0tNQWJsSk8vTW80?=
+ =?utf-8?B?dkVOS240OTlDaFhZYkI4OEpHSmhUR3h2SnlMZ0hodnBCRitKbCswVldlcCt0?=
+ =?utf-8?B?TU1CWjJ3cXo1Z3N0bVI1N0NRdW12empPSThlUzEvZ2NOVGgxQ3BkV0pIZ3hr?=
+ =?utf-8?B?YnhMYjBZbExoR1NjREFyU3YvcXJQSkRtUW9sd2FNRkpjZVZJcTNIdVh4UW94?=
+ =?utf-8?B?TnVab2pLUG1Qci82dzVoU3dZaE1FYlREZlh4TXZ1cm9VS0tCTmZFR3ZVWFhl?=
+ =?utf-8?B?T0VrckVwWnZBL3BOTGdrb1QvSU54QlJuNzFQRjlVeXhsemdpY2tsQ29mTmhG?=
+ =?utf-8?B?NWJpM1RzOWpsaSttSHJtVitBaEhCQjJvK1oxODUxSUNQamxxUGhYY2Ftc2dm?=
+ =?utf-8?B?WXAxT09YV2ljcEs1YThyVDI5YjVHWTVVc2F1ak5tc21yelJvQ002Q2JBWTl6?=
+ =?utf-8?B?bTR2STVldGgrY3R3dDJDZC8zMlc3dWRVc0lBTGZTNmgvRnJlU2hrQWJoWTBQ?=
+ =?utf-8?B?bmhBOVM5Z3phcVhSb1NWR0dKcnR5N0NuNmg1V2pOcGFWMkh3UC9jZW9pUmZq?=
+ =?utf-8?B?OGlJTjBxZzJKTi9QOWJ2clpjV2ExMlJmSnFyUWQ4Tk1yeEhjeHhaWFdrMkVy?=
+ =?utf-8?B?eWNCV1JRZTc4RnFqY3JjdUdRTGNJRVltQW44aWRUL0pQVG5DbnRKdERJRkpT?=
+ =?utf-8?B?SnhSdGJ2SDNpZ1lTcUdneEJYTGoyaSs1bjJxdlRWUXVtUlAzcjAxaGlUZjBk?=
+ =?utf-8?B?WkFSUkNidXA1TXRPOVg1RjZaTFJOeGtGNy9UTUV6dEJKUEJLTk12WS8rcUEz?=
+ =?utf-8?B?RktJaG5VM0tydjZTWmVlL2VDcHJXN3NSRUZXbUx1UWlEcDlreXBHWHdJMktM?=
+ =?utf-8?B?aUJ5NXJvOVMyYVZoU0c0RmVrQ0tSM2tvaGlzQkVDR3V6U3FyRThJTnJONTJK?=
+ =?utf-8?B?T2NVY3FuNTFTNkxlY1UzY2h6WXJ0RHdYbDZIWWd1UHF4UWx3OEZLaldzSlIw?=
+ =?utf-8?B?cnFiTjhSV3NvbnpyMllYOFdkZEUza0FKeksxWE45SDh6T09ZVkdoS0licWVM?=
+ =?utf-8?B?YTBmbnM0WFhSR0xCVjZTcFhkY2VqVWhnM1NpMXA1ZzRHR2FJd2JieVBqSlY3?=
+ =?utf-8?B?WTdKTEdLYU9DWUk4dTVjSjRxTGdOTTJ5M2xwZE43YTVPVHdDalRmbkh4S3RI?=
+ =?utf-8?B?WXd2Rnd6OHArOER4VlpmWjVod0FETnIwbmNFaC9HSWJrc2Y3bjlVTk9EaXlk?=
+ =?utf-8?B?eFphSEo3VFQ1b0dnTUhnQ3REWHBaU05PaHVlTk5penE4bldMRmtXQXV3Vjlx?=
+ =?utf-8?B?VHZHbzhGNCt2Nlo0TnhjeEVUbGVPbXg2WDFUYnNuZThzVVV5OTNQM2xFUGsv?=
+ =?utf-8?B?VnNQNUtkUklsaExOSU0zaEZ1NEJZYnFjbGZIejJqaXBHVkNCbDVaU0N3Ymk2?=
+ =?utf-8?B?U2JHME9KTzRsdXJFMDFyUGVTMlg0WC83SEV3N05zNHlrTVI4RnJQVDBJRTEy?=
+ =?utf-8?Q?mNyqrQ98YxbpmM5DZSz50x1YC?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 62b499bc-d99d-4845-be6e-08dd728b2335
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Apr 2025 08:40:07.4845
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: bnJE9Sa1CFvy9YHWu4dWIihX5gad6TqRtXC1PXG+x4oU/VCRgafcg0FFoiwLDrFeicgghnx4qu9d+kNWdgbQqw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5736
 
-On Wed, Apr 02, 2025 at 03:06:46PM +0000, Alexander Graf wrote:
->Ever since the introduction of the virtio vsock driver, it included
->pushback logic that blocks it from taking any new RX packets until the
->TX queue backlog becomes shallower than the virtqueue size.
->
->This logic works fine when you connect a user space application on the
->hypervisor with a virtio-vsock target, because the guest will stop
->receiving data until the host pulled all outstanding data from the VM.
->
->With Nitro Enclaves however, we connect 2 VMs directly via vsock:
->
->  Parent      Enclave
->
->    RX -------- TX
->    TX -------- RX
->
->This means we now have 2 virtio-vsock backends that both have the pushback
->logic. If the parent's TX queue runs full at the same time as the
->Enclave's, both virtio-vsock drivers fall into the pushback path and
->no longer accept RX traffic. However, that RX traffic is TX traffic on
->the other side which blocks that driver from making any forward
->progress. We're now in a deadlock.
->
->To resolve this, let's remove that pushback logic altogether and rely on
->higher levels (like credits) to ensure we do not consume unbounded
->memory.
->
->RX and TX queues share the same work queue. To prevent starvation of TX
->by an RX flood and vice versa now that the pushback logic is gone, let's
->deliberately reschedule RX and TX work after a fixed threshold (256) of
->packets to process.
->
->Fixes: 0ea9e1d3a9e3 ("VSOCK: Introduce virtio_transport.ko")
->Signed-off-by: Alexander Graf <graf@amazon.com>
 
-There is a good point from Stefan on v2:
-https://lore.kernel.org/virtualization/20250402161424.GA305204@fedora/
 
-So, I'm not sure we can merge this as it is.
+On 2/4/25 03:12, Jason Gunthorpe wrote:
+> On Tue, Feb 18, 2025 at 10:10:01PM +1100, Alexey Kardashevskiy wrote:
+>> When a TDISP-capable device is passed through, it is configured as
+>> a shared device to begin with. Later on when a VM probes the device,
+>> detects its TDISP capability (reported via the PCIe ExtCap bit
+>> called "TEE-IO"), performs the device attestation and transitions it
+>> to a secure state when the device can run encrypted DMA and respond
+>> to encrypted MMIO accesses.
+>>
+>> Since KVM is out of the TCB, secure enablement is done in the secure
+>> firmware. The API requires PCI host/guest BDFns, a KVM id hence such
+>> calls are routed via IOMMUFD, primarily because allowing secure DMA
+>> is the major performance bottleneck and it is a function of IOMMU.
+>>
+>> Add TDI bind to do the initial binding of a passed through PCI
+>> function to a VM. Add a forwarder for TIO GUEST REQUEST. These two
+>> call into the TSM which forwards the calls to the PSP.
+> 
+> Can you list here what the basic flow of iommufd calls is to create a
+> CC VM, with no vIOMMU, and a CC capable vPCI device?
 
-Thanks,
-Stefano
+I do this in QEMU in additional to the usual VFIO setup:
 
->
->---
->
->v1 -> v2:
->
->  - Rework to use fixed threshold
->
->v2 -> v3:
->
->  - Remove superfluous reply variable
->---
-> net/vmw_vsock/virtio_transport.c | 73 +++++++++-----------------------
-> 1 file changed, 19 insertions(+), 54 deletions(-)
->
->diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->index f0e48e6911fc..6ae30bf8c85c 100644
->--- a/net/vmw_vsock/virtio_transport.c
->+++ b/net/vmw_vsock/virtio_transport.c
->@@ -26,6 +26,12 @@ static struct virtio_vsock __rcu *the_virtio_vsock;
-> static DEFINE_MUTEX(the_virtio_vsock_mutex); /* protects the_virtio_vsock */
-> static struct virtio_transport virtio_transport; /* forward declaration */
->
->+/*
->+ * Max number of RX packets transferred before requeueing so we do
->+ * not starve TX traffic because they share the same work queue.
->+ */
->+#define VSOCK_MAX_PKTS_PER_WORK 256
->+
-> struct virtio_vsock {
-> 	struct virtio_device *vdev;
-> 	struct virtqueue *vqs[VSOCK_VQ_MAX];
->@@ -44,8 +50,6 @@ struct virtio_vsock {
-> 	struct work_struct send_pkt_work;
-> 	struct sk_buff_head send_pkt_queue;
->
->-	atomic_t queued_replies;
->-
-> 	/* The following fields are protected by rx_lock.  vqs[VSOCK_VQ_RX]
-> 	 * must be accessed with rx_lock held.
-> 	 */
->@@ -158,7 +162,7 @@ virtio_transport_send_pkt_work(struct work_struct *work)
-> 		container_of(work, struct virtio_vsock, send_pkt_work);
-> 	struct virtqueue *vq;
-> 	bool added = false;
->-	bool restart_rx = false;
->+	int pkts = 0;
->
-> 	mutex_lock(&vsock->tx_lock);
->
->@@ -169,32 +173,24 @@ virtio_transport_send_pkt_work(struct work_struct *work)
->
-> 	for (;;) {
-> 		struct sk_buff *skb;
->-		bool reply;
-> 		int ret;
->
->+		if (++pkts > VSOCK_MAX_PKTS_PER_WORK) {
->+			/* Allow other works on the same queue to run */
->+			queue_work(virtio_vsock_workqueue, work);
->+			break;
->+		}
->+
-> 		skb = virtio_vsock_skb_dequeue(&vsock->send_pkt_queue);
-> 		if (!skb)
-> 			break;
->
->-		reply = virtio_vsock_skb_reply(skb);
->-
-> 		ret = virtio_transport_send_skb(skb, vq, vsock, GFP_KERNEL);
-> 		if (ret < 0) {
-> 			virtio_vsock_skb_queue_head(&vsock->send_pkt_queue, skb);
-> 			break;
-> 		}
->
->-		if (reply) {
->-			struct virtqueue *rx_vq = vsock->vqs[VSOCK_VQ_RX];
->-			int val;
->-
->-			val = atomic_dec_return(&vsock->queued_replies);
->-
->-			/* Do we now have resources to resume rx processing? */
->-			if (val + 1 == virtqueue_get_vring_size(rx_vq))
->-				restart_rx = true;
->-		}
->-
-> 		added = true;
-> 	}
->
->@@ -203,9 +199,6 @@ virtio_transport_send_pkt_work(struct work_struct *work)
->
-> out:
-> 	mutex_unlock(&vsock->tx_lock);
->-
->-	if (restart_rx)
->-		queue_work(virtio_vsock_workqueue, &vsock->rx_work);
-> }
->
-> /* Caller need to hold RCU for vsock.
->@@ -261,9 +254,6 @@ virtio_transport_send_pkt(struct sk_buff *skb)
-> 	 */
-> 	if (!skb_queue_empty_lockless(&vsock->send_pkt_queue) ||
-> 	    virtio_transport_send_skb_fast_path(vsock, skb)) {
->-		if (virtio_vsock_skb_reply(skb))
->-			atomic_inc(&vsock->queued_replies);
->-
-> 		virtio_vsock_skb_queue_tail(&vsock->send_pkt_queue, skb);
-> 		queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
-> 	}
->@@ -277,7 +267,7 @@ static int
-> virtio_transport_cancel_pkt(struct vsock_sock *vsk)
-> {
-> 	struct virtio_vsock *vsock;
->-	int cnt = 0, ret;
->+	int ret;
->
-> 	rcu_read_lock();
-> 	vsock = rcu_dereference(the_virtio_vsock);
->@@ -286,17 +276,7 @@ virtio_transport_cancel_pkt(struct vsock_sock *vsk)
-> 		goto out_rcu;
-> 	}
->
->-	cnt = virtio_transport_purge_skbs(vsk, &vsock->send_pkt_queue);
->-
->-	if (cnt) {
->-		struct virtqueue *rx_vq = vsock->vqs[VSOCK_VQ_RX];
->-		int new_cnt;
->-
->-		new_cnt = atomic_sub_return(cnt, &vsock->queued_replies);
->-		if (new_cnt + cnt >= virtqueue_get_vring_size(rx_vq) &&
->-		    new_cnt < virtqueue_get_vring_size(rx_vq))
->-			queue_work(virtio_vsock_workqueue, &vsock->rx_work);
->-	}
->+	virtio_transport_purge_skbs(vsk, &vsock->send_pkt_queue);
->
-> 	ret = 0;
->
->@@ -367,18 +347,6 @@ static void virtio_transport_tx_work(struct work_struct *work)
-> 		queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
-> }
->
->-/* Is there space left for replies to rx packets? */
->-static bool virtio_transport_more_replies(struct virtio_vsock *vsock)
->-{
->-	struct virtqueue *vq = vsock->vqs[VSOCK_VQ_RX];
->-	int val;
->-
->-	smp_rmb(); /* paired with atomic_inc() and atomic_dec_return() */
->-	val = atomic_read(&vsock->queued_replies);
->-
->-	return val < virtqueue_get_vring_size(vq);
->-}
->-
-> /* event_lock must be held */
-> static int virtio_vsock_event_fill_one(struct virtio_vsock *vsock,
-> 				       struct virtio_vsock_event *event)
->@@ -613,6 +581,7 @@ static void virtio_transport_rx_work(struct work_struct *work)
-> 	struct virtio_vsock *vsock =
-> 		container_of(work, struct virtio_vsock, rx_work);
-> 	struct virtqueue *vq;
->+	int pkts = 0;
->
-> 	vq = vsock->vqs[VSOCK_VQ_RX];
->
->@@ -627,11 +596,9 @@ static void virtio_transport_rx_work(struct work_struct *work)
-> 			struct sk_buff *skb;
-> 			unsigned int len;
->
->-			if (!virtio_transport_more_replies(vsock)) {
->-				/* Stop rx until the device processes already
->-				 * pending replies.  Leave rx virtqueue
->-				 * callbacks disabled.
->-				 */
->+			if (++pkts > VSOCK_MAX_PKTS_PER_WORK) {
->+				/* Allow other works on the same queue to run */
->+				queue_work(virtio_vsock_workqueue, work);
-> 				goto out;
-> 			}
->
->@@ -675,8 +642,6 @@ static int virtio_vsock_vqs_init(struct virtio_vsock *vsock)
-> 	vsock->rx_buf_max_nr = 0;
-> 	mutex_unlock(&vsock->rx_lock);
->
->-	atomic_set(&vsock->queued_replies, 0);
->-
-> 	ret = virtio_find_vqs(vdev, VSOCK_VQ_MAX, vsock->vqs, vqs_info, NULL);
-> 	if (ret < 0)
-> 		return ret;
->-- 
->2.47.1
->
->
+iommufd_cdev_autodomains_get() [1]:
+
+1. iommufd_backend_alloc_viommu
+2. iommufd_backend_alloc_vdev
+
+
+kvm_handle_vmgexit_tio_req() in KVM [2]:
+
+1. (IOMMUFD) tio_bind(pdev, kvm_vmfd(kvm_state))
+2. (KVM) kvm_set_memory_attributes_private(mmio region)
+3. (SEV) sev_ioctl(/dev/sev, KVM_SEV_SNP_MMIO_RMP_UPDATE)
+4. (IOMMUFD) tio_guest_request() /* enable DMA/MMIO in secure world */
+
+> I'd like the other arches to review this list and see how their arches
+> fit
+
+Well, I have it all here: https://github.com/aik/qemu/tree/tsm
+Raw stuff so I did not post it even as RFC but may be it'd help if I 
+did? Thanks,
+
+[1] 
+https://github.com/aik/qemu/commit/da86ba11e71f10d48dd40a8d71a2ff595f04bb2d
+[2] 
+https://github.com/aik/qemu/commit/f804b65aff5b28f6f0430a5abca07cbac73f70bc
+
+-- 
+Alexey
 
 
