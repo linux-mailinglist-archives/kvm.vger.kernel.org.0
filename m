@@ -1,75 +1,75 @@
-Return-Path: <kvm+bounces-42565-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42567-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE25DA7A1F7
-	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 13:33:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FC32A7A1FB
+	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 13:34:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 768DF1898585
-	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 11:33:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9593A166192
+	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 11:33:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EB5E24E4A6;
-	Thu,  3 Apr 2025 11:32:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9F5424EABF;
+	Thu,  3 Apr 2025 11:32:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="MohUbOon"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="TcrRN4mY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27ABE24C09C
-	for <kvm@vger.kernel.org>; Thu,  3 Apr 2025 11:32:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8828524DFFA
+	for <kvm@vger.kernel.org>; Thu,  3 Apr 2025 11:32:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743679939; cv=none; b=idmMucRqJ+z0ujbYgjO/jfZbyEn7mf4XuNqkZducC1goYV1G98zXnA0ceFlm0uUTO8CkJYSd6KqoBj3hhLzPsGxxL5lkkPZKa3pUH7Uytz9r5rmkpx6BJTHuzJwWiQ7xKG+z9RdubN40h7ouJFsoMG6BYGfWbLJ1+SFD6/8zn1k=
+	t=1743679941; cv=none; b=KMtbarcHeeFD/ttB/suefv2meBv/0qH3FoOhMuxyI25pMwuvZ8Mjc/tnw1GdixVLWVCjJGIip3hupsWu+SR70G2fvkttO8R5yHMJ8qbV++mpcw/BTMKjhMXuuqt6ZNLkGJlWvUAN5VttldaaMcb4S3wikstO2wDPksVwXjXV4NE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743679939; c=relaxed/simple;
-	bh=mPYFlhbqwUJghQgdiJTQpQAylQDiVF48Xvlg8qS+To8=;
+	s=arc-20240116; t=1743679941; c=relaxed/simple;
+	bh=Azh59wZxXw0yOcy654yOp1KBuheFNdxSily/oCO2cqE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AzlxtQEfujfFrGO9r9JF+lo9P1YC2alfu9i7ZaD2UKokOmjZ7p1BS3IDInVUqdOD2wF00uNr8UCdmO9s3J6GUD510WvjRaq0xrI4lGR1fDvplW30A3Nl5WQq1wY37bJOn46nlJLxQwtUKDq8/oXZyveV68gyskpSK5+6DNtCyec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=MohUbOon; arc=none smtp.client-ip=209.85.221.48
+	 MIME-Version:Content-Type; b=gzaE9BacNXRnmvxU5QzXNlrVaMkF5Yj43vwFhaC+fGUVPg3aV8sRMVF/m4B3IqRGiH3ghklUx7fRpUtSSjsiefzcbXPuQ/F70TlKw7bqpXHMSTRF5sOD8bDEd4y22S5gDM8iBAwziicz6STXf84Yau/oARy0Tezhv/b7UnJKd4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=TcrRN4mY; arc=none smtp.client-ip=209.85.221.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-39c2688e2bbso49708f8f.1
-        for <kvm@vger.kernel.org>; Thu, 03 Apr 2025 04:32:15 -0700 (PDT)
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3913290f754so61887f8f.1
+        for <kvm@vger.kernel.org>; Thu, 03 Apr 2025 04:32:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1743679934; x=1744284734; darn=vger.kernel.org;
+        d=ventanamicro.com; s=google; t=1743679936; x=1744284736; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oXWumzDe9cV0GiyZzQ4x/1N6jIE102NsKwOmEpuNc8U=;
-        b=MohUbOonnRMhVtguRhvo6fGiyVM1wu0WKomRTg3SlY0rN+YN8S+LNN4ZaJPIyruPeY
-         n0Yc+LfmHIUFtU+r3DqT2lc6dKEBkUijijUNZ43wa2sqxPRpKdkFlf1g75ihR9dqs3cL
-         ZBoqn1HR9t5M1OrusqUz7MBYyKta8t8PGYS9p6yrHG4jRAMCnesr9UTPsRaIP73Ewr+e
-         quTOE6TBVWmL9RqvirmYqJQsj68o7rFXgs1r0R6TvJUbb7S9lhHY0/E1F4HYXl2MuKqp
-         63kVCScGfSnqGFHYM0cqJoH4bmPk7MYFlRwNvuc2o/P+fY334ZzIosh4nFpUGSx7vMW3
-         7P9A==
+        bh=v4I41IipITScJpjVRL6TprMAJ/XjTheyblDpzSa8c88=;
+        b=TcrRN4mYeUgNsDn/+x9gXg2oR+Oz5B25LI6av3I7R6/E8fY28yeVrv3Xg9pjJZtaO8
+         FFQp6GdInoGSj4kqFMpdCXae9zqQuy+P+e5Ru8kGg+oFCq1pb30IpYYTD2L3DJsNvzO0
+         Y5Ph69Q7IGlu0dqmx4FZtWQUesRBJoGMDFeVXhVTWyeXGvooTvimCAmDY9vbLQEbBaKL
+         mnb0WjJEN/ag9xoP4/jS8FH9SqIYXIC1A44D6mku0LA8EwHLTvDovvx6a4jR3FO5Q4IK
+         3iGvWaU5so2DofrVXZT186ByU9IrsI5GO+sstW/qjly4WdSOukdkh6+q1PEBmHPGT7J+
+         f7aQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743679934; x=1744284734;
+        d=1e100.net; s=20230601; t=1743679936; x=1744284736;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=oXWumzDe9cV0GiyZzQ4x/1N6jIE102NsKwOmEpuNc8U=;
-        b=pri21stpstmIvLtEcqIufP2k5vO/W0kcCGkmePItREBh0YApRh9dZ+V7O/ckUX6F8N
-         zvvudneqmXB0XAL2YYAiaITvQHhz3VNgkbel1/dqek0GRHe3oL+qIaQi4yYVKhEbFIdS
-         15QmS7suaJYxXJNPSmQUnh/gznXo0WdNRBBdIBZcwgzyxuEevGCgTZeWzfBegeVEJfFQ
-         kUujXM30QGNeYSJsbxTzZ/OAJITLOCyt3qh5I6nnxmHj+0AGVvx769u+ScWwgOB7cC8+
-         fnoDDN2vp6wN1tNzASM9VySB8TKFmuitzE2zd8uKMtHireDQ2uHE78mSD9jA96LNjGCS
-         9aGw==
-X-Gm-Message-State: AOJu0YxYkPcubMf/jO9f9bQ+c+mLT3RJkM1phnityZmTKY1uL9N0VTjG
-	NB9XssClDg8PEbvQw5YDnFcc5pjnMFZLj7AFsecxolol7xOxDkQ+uyEcjuLBwhY=
-X-Gm-Gg: ASbGncsSHX36Bz5y/cFW1JZTYkXx59ZLzYuOLCYWkdDSLpgpTb8fSxBn/iZBzndEuc6
-	YGpnwK4+3/jpnA8E6m1JCQzdnm8TXQ7/FlzPW9E6RsmYFmqLgqaUze56m+O6874ijesSYNh7LKS
-	bdDSGQqZa1vNy4KPMGSnIvZ8m/a9YILSjfgAmsHBf4s/01SZ+gDFYLBd5+RYXW5aM5YzEesWVXG
-	2RfF0uC5bJfgsbIpYSVY9Q0LxySBOochqw72mVrqnobbVa3RFA6m3XgL8BdsZ/FW95mhhRBqODY
-	ODxVxiB7EcNnEsxOSzgRqjLPRAChbmDesiMGfr4OaprF5n5vD19HECPeqgdZLlDN7pDt4rgSfc0
-	3xw==
-X-Google-Smtp-Source: AGHT+IGYZA79TpGdD3IyE6RBBx1HPlO32wDC9YCrigfm8LcUPmDgc+MGuI/dN03f02oGXug0YpJyDw==
-X-Received: by 2002:a5d:5f8d:0:b0:386:3a50:8c52 with SMTP id ffacd0b85a97d-39c2470a9a8mr3130677f8f.7.1743679934361;
-        Thu, 03 Apr 2025 04:32:14 -0700 (PDT)
+        bh=v4I41IipITScJpjVRL6TprMAJ/XjTheyblDpzSa8c88=;
+        b=gPOT9Jefm4ItP4jS/Y4OGxVGWx5PAR8vQIiVuKzm7Sbblct2+0+JStrG3Nitul+km2
+         nGi5f+8JLcdPkxiOJ9wP0Lw+X2W7CQlYSCFsYSsX8NrojDRK7fFVMquMjeF8jiqLKqNM
+         pmBSxhCigasGg4kSeoySj2IkqMSdp0dbXCzLbCT87PNjYAb4WQSLSsa0dreuILg6bau6
+         UfSkdngYqI5QBlp+Zl2EVg2K6NRn5SgYhhKwaA8JoLWj7potM8mzx1TuOewOII+y8u6D
+         VRuOQcIoWKA3T9pBCiV90WTGga2C1iaXQfytJRUpGt2eD5a2s3BK9KKjxa68aB7lflKJ
+         OIxQ==
+X-Gm-Message-State: AOJu0YwWFl9SepRt5h7ehvY2Sijbp6DAhntZuLII1D5TBYakg3TgCzOz
+	mU6U5ptBPI5s8zsTzbn4dxwvl/9otFEofbKpMbvmSnpUIl3TE9obz0Pd61gHjQA=
+X-Gm-Gg: ASbGncuAF0li4zSF6LMfcefDWxe1Yreh/vfoJ3jVLCsdluUFI3Kv7S4il4OVqyQ7edJ
+	WeFLaTeL9l4njYz7f45Sa8dwEjL4Jz6C2zQ/glxFvNrWt1Iv26/zpiLAvf0aYW6MU/4U4D74zog
+	hTfA7BwGxfiGjCCqo7jXJ4xfzkN3xsd/uLv9ggimoLPVRDnKolXB0Ot9BxkU3U8K8Fo4aLXQMNb
+	za5epclPJHzs3/a/YiAVCjnQhcNE0qXh2J+2kPIvD3Yes8yzKeoE9o5jWWcDQN4GmD3FEXESD9M
+	TwDRVDBDMym0v9jyH4h+I3C3qeZRUC7dqH4S1zFQ1H2GGSuF9jXFpk/4yLuDTlZqXL0oYYkDLZs
+	vcQ==
+X-Google-Smtp-Source: AGHT+IG37Xf9B62VUcljGsX2nc8emFPUfOIiPgop6kaEA0XU1nktX/EDvfLlLGCqE6Qni7LwKqU1Ng==
+X-Received: by 2002:a5d:59ad:0:b0:39c:1258:17d5 with SMTP id ffacd0b85a97d-39c2483abcfmr3137958f8f.14.1743679935688;
+        Thu, 03 Apr 2025 04:32:15 -0700 (PDT)
 Received: from localhost (cst2-173-141.cust.vodafone.cz. [31.30.173.141])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c301a7045sm1584106f8f.39.2025.04.03.04.32.13
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c3020d6b1sm1575928f8f.62.2025.04.03.04.32.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 03 Apr 2025 04:32:14 -0700 (PDT)
 From: =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@ventanamicro.com>
@@ -85,9 +85,9 @@ Cc: kvm@vger.kernel.org,
 	Alexandre Ghiti <alex@ghiti.fr>,
 	Andrew Jones <ajones@ventanamicro.com>,
 	Mayuresh Chitale <mchitale@ventanamicro.com>
-Subject: [PATCH 3/5] KVM: RISC-V: remove unnecessary SBI reset state
-Date: Thu,  3 Apr 2025 13:25:22 +0200
-Message-ID: <20250403112522.1566629-6-rkrcmar@ventanamicro.com>
+Subject: [PATCH 4/5] KVM: RISC-V: reset VCPU state when becoming runnable
+Date: Thu,  3 Apr 2025 13:25:23 +0200
+Message-ID: <20250403112522.1566629-7-rkrcmar@ventanamicro.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250403112522.1566629-3-rkrcmar@ventanamicro.com>
 References: <20250403112522.1566629-3-rkrcmar@ventanamicro.com>
@@ -100,207 +100,140 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The SBI reset state has only two variables -- pc and a1.
-The rest is known, so keep only the necessary information.
+Beware, this patch is "breaking" the userspace interface, because it
+fixes a KVM/QEMU bug where the boot VCPU is not being reset by KVM.
 
-The reset structures make sense if we want userspace to control the
-reset state (which we do), but I'd still remove them now and reintroduce
-with the userspace interface later -- we could probably have just a
-single reset state per VM, instead of a reset state for each VCPU.
+The VCPU reset paths are inconsistent right now.  KVM resets VCPUs that
+are brought up by KVM-accelerated SBI calls, but does nothing for VCPUs
+brought up through ioctls.
+
+We need to perform a KVM reset even when the VCPU is started through an
+ioctl.  This patch is one of the ways we can achieve it.
+
+Assume that userspace has no business setting the post-reset state.
+KVM is de-facto the SBI implementation, as the SBI HSM acceleration
+cannot be disabled and userspace cannot control the reset state, so KVM
+should be in full control of the post-reset state.
+
+Do not reset the pc and a1 registers, because SBI reset is expected to
+provide them and KVM has no idea what these registers should be -- only
+the userspace knows where it put the data.
+
+An important consideration is resume.  Userspace might want to start
+with non-reset state.  Check ran_atleast_once to allow this, because
+KVM-SBI HSM creates some VCPUs as STOPPED.
+
+The drawback is that userspace can still start the boot VCPU with an
+incorrect reset state, because there is no way to distinguish a freshly
+reset new VCPU on the KVM side (userspace might set some values by
+mistake) from a restored VCPU (userspace must set all values).
+
+The advantage of this solution is that it fixes current QEMU and makes
+some sense with the assumption that KVM implements SBI HSM.
+I do not like it too much, so I'd be in favor of a different solution if
+we can still afford to drop support for current userspaces.
+
+For a cleaner solution, we should add interfaces to perform the KVM-SBI
+reset request on userspace demand.  I think it would also be much better
+if userspace was in control of the post-reset state.
 
 Signed-off-by: Radim Krčmář <rkrcmar@ventanamicro.com>
 ---
- arch/riscv/include/asm/kvm_aia.h  |  3 --
- arch/riscv/include/asm/kvm_host.h | 12 ++++---
- arch/riscv/kvm/aia_device.c       |  4 +--
- arch/riscv/kvm/vcpu.c             | 58 +++++++++++++++++--------------
- arch/riscv/kvm/vcpu_sbi.c         |  9 +++--
- 5 files changed, 44 insertions(+), 42 deletions(-)
+ arch/riscv/include/asm/kvm_host.h     |  1 +
+ arch/riscv/include/asm/kvm_vcpu_sbi.h |  3 +++
+ arch/riscv/kvm/vcpu.c                 |  9 +++++++++
+ arch/riscv/kvm/vcpu_sbi.c             | 21 +++++++++++++++++++--
+ 4 files changed, 32 insertions(+), 2 deletions(-)
 
-diff --git a/arch/riscv/include/asm/kvm_aia.h b/arch/riscv/include/asm/kvm_aia.h
-index 1f37b600ca47..3b643b9efc07 100644
---- a/arch/riscv/include/asm/kvm_aia.h
-+++ b/arch/riscv/include/asm/kvm_aia.h
-@@ -63,9 +63,6 @@ struct kvm_vcpu_aia {
- 	/* CPU AIA CSR context of Guest VCPU */
- 	struct kvm_vcpu_aia_csr guest_csr;
- 
--	/* CPU AIA CSR context upon Guest VCPU reset */
--	struct kvm_vcpu_aia_csr guest_reset_csr;
--
- 	/* Guest physical address of IMSIC for this VCPU */
- 	gpa_t		imsic_addr;
- 
 diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-index 0e9c2fab6378..0c8c9c05af91 100644
+index 0c8c9c05af91..9bbf8c4a286b 100644
 --- a/arch/riscv/include/asm/kvm_host.h
 +++ b/arch/riscv/include/asm/kvm_host.h
-@@ -193,6 +193,12 @@ struct kvm_vcpu_smstateen_csr {
- 	unsigned long sstateen0;
+@@ -195,6 +195,7 @@ struct kvm_vcpu_smstateen_csr {
+ 
+ struct kvm_vcpu_reset_state {
+ 	spinlock_t lock;
++	bool active;
+ 	unsigned long pc;
+ 	unsigned long a1;
  };
- 
-+struct kvm_vcpu_reset_state {
-+	spinlock_t lock;
-+	unsigned long pc;
-+	unsigned long a1;
-+};
-+
- struct kvm_vcpu_arch {
- 	/* VCPU ran at least once */
- 	bool ran_atleast_once;
-@@ -227,12 +233,8 @@ struct kvm_vcpu_arch {
- 	/* CPU Smstateen CSR context of Guest VCPU */
- 	struct kvm_vcpu_smstateen_csr smstateen_csr;
- 
--	/* CPU context upon Guest VCPU reset */
--	struct kvm_cpu_context guest_reset_context;
--	spinlock_t reset_cntx_lock;
-+	struct kvm_vcpu_reset_state reset_state;
- 
--	/* CPU CSR context upon Guest VCPU reset */
--	struct kvm_vcpu_csr guest_reset_csr;
- 
- 	/*
- 	 * VCPU interrupts
-diff --git a/arch/riscv/kvm/aia_device.c b/arch/riscv/kvm/aia_device.c
-index 39cd26af5a69..43e472ff3e1a 100644
---- a/arch/riscv/kvm/aia_device.c
-+++ b/arch/riscv/kvm/aia_device.c
-@@ -526,12 +526,10 @@ int kvm_riscv_vcpu_aia_update(struct kvm_vcpu *vcpu)
- void kvm_riscv_vcpu_aia_reset(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_vcpu_aia_csr *csr = &vcpu->arch.aia_context.guest_csr;
--	struct kvm_vcpu_aia_csr *reset_csr =
--				&vcpu->arch.aia_context.guest_reset_csr;
- 
- 	if (!kvm_riscv_aia_available())
- 		return;
--	memcpy(csr, reset_csr, sizeof(*csr));
-+	memset(csr, 0, sizeof(*csr));
- 
- 	/* Proceed only if AIA was initialized successfully */
- 	if (!kvm_riscv_aia_initialized(vcpu->kvm))
+diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/include/asm/kvm_vcpu_sbi.h
+index aaaa81355276..2c334a87e02a 100644
+--- a/arch/riscv/include/asm/kvm_vcpu_sbi.h
++++ b/arch/riscv/include/asm/kvm_vcpu_sbi.h
+@@ -57,6 +57,9 @@ void kvm_riscv_vcpu_sbi_system_reset(struct kvm_vcpu *vcpu,
+ 				     u32 type, u64 flags);
+ void kvm_riscv_vcpu_sbi_request_reset(struct kvm_vcpu *vcpu,
+                                       unsigned long pc, unsigned long a1);
++void __kvm_riscv_vcpu_set_reset_state(struct kvm_vcpu *vcpu,
++                                      unsigned long pc, unsigned long a1);
++void kvm_riscv_vcpu_sbi_request_reset_from_userspace(struct kvm_vcpu *vcpu);
+ int kvm_riscv_vcpu_sbi_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ int kvm_riscv_vcpu_set_reg_sbi_ext(struct kvm_vcpu *vcpu,
+ 				   const struct kvm_one_reg *reg);
 diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index 2fb75288ecfe..b8485c1c1ce4 100644
+index b8485c1c1ce4..4578863a39e3 100644
 --- a/arch/riscv/kvm/vcpu.c
 +++ b/arch/riscv/kvm/vcpu.c
-@@ -51,13 +51,40 @@ const struct kvm_stats_header kvm_vcpu_stats_header = {
- 		       sizeof(kvm_vcpu_stats_desc),
- };
- 
--static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
-+static void kvm_riscv_vcpu_context_reset(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
--	struct kvm_vcpu_csr *reset_csr = &vcpu->arch.guest_reset_csr;
- 	struct kvm_cpu_context *cntx = &vcpu->arch.guest_context;
--	struct kvm_cpu_context *reset_cntx = &vcpu->arch.guest_reset_context;
-+	struct kvm_vcpu_reset_state *reset_state = &vcpu->arch.reset_state;
+@@ -58,6 +58,11 @@ static void kvm_riscv_vcpu_context_reset(struct kvm_vcpu *vcpu)
+ 	struct kvm_vcpu_reset_state *reset_state = &vcpu->arch.reset_state;
  	void *vector_datap = cntx->vector.datap;
-+
-+	memset(cntx, 0, sizeof(*cntx));
-+	memset(csr, 0, sizeof(*csr));
-+
-+	/* Restore datap as it's not a part of the guest context. */
-+	cntx->vector.datap = vector_datap;
-+
-+	/* Load SBI reset values */
-+	cntx->a0 = vcpu->vcpu_id;
-+
+ 
 +	spin_lock(&reset_state->lock);
-+	cntx->sepc = reset_state->pc;
-+	cntx->a1 = reset_state->a1;
++	if (!reset_state->active)
++		__kvm_riscv_vcpu_set_reset_state(vcpu, cntx->sepc, cntx->a1);
 +	spin_unlock(&reset_state->lock);
 +
-+	/* Setup reset state of shadow SSTATUS and HSTATUS CSRs */
-+	cntx->sstatus = SR_SPP | SR_SPIE;
-+
-+	cntx->hstatus |= HSTATUS_VTW;
-+	cntx->hstatus |= HSTATUS_SPVP;
-+	cntx->hstatus |= HSTATUS_SPV;
-+
-+	/* By default, make CY, TM, and IR counters accessible in VU mode */
-+	csr->scounteren = 0x7;
-+}
-+
-+static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
-+{
- 	bool loaded;
+ 	memset(cntx, 0, sizeof(*cntx));
+ 	memset(csr, 0, sizeof(*csr));
  
- 	/**
-@@ -72,16 +99,10 @@ static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
+@@ -520,6 +525,10 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
  
- 	vcpu->arch.last_exit_cpu = -1;
- 
--	memcpy(csr, reset_csr, sizeof(*csr));
--
--	spin_lock(&vcpu->arch.reset_cntx_lock);
--	memcpy(cntx, reset_cntx, sizeof(*cntx));
--	spin_unlock(&vcpu->arch.reset_cntx_lock);
-+	kvm_riscv_vcpu_context_reset(vcpu);
- 
- 	kvm_riscv_vcpu_fp_reset(vcpu);
- 
--	/* Restore datap as it's not a part of the guest context. */
--	cntx->vector.datap = vector_datap;
- 	kvm_riscv_vcpu_vector_reset(vcpu);
- 
- 	kvm_riscv_vcpu_timer_reset(vcpu);
-@@ -113,8 +134,6 @@ int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
- int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- {
- 	int rc;
--	struct kvm_cpu_context *cntx;
--	struct kvm_vcpu_csr *reset_csr = &vcpu->arch.guest_reset_csr;
- 
- 	spin_lock_init(&vcpu->arch.mp_state_lock);
- 
-@@ -134,24 +153,11 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	/* Setup VCPU hfence queue */
- 	spin_lock_init(&vcpu->arch.hfence_lock);
- 
--	/* Setup reset state of shadow SSTATUS and HSTATUS CSRs */
--	spin_lock_init(&vcpu->arch.reset_cntx_lock);
--
--	spin_lock(&vcpu->arch.reset_cntx_lock);
--	cntx = &vcpu->arch.guest_reset_context;
--	cntx->sstatus = SR_SPP | SR_SPIE;
--	cntx->hstatus = 0;
--	cntx->hstatus |= HSTATUS_VTW;
--	cntx->hstatus |= HSTATUS_SPVP;
--	cntx->hstatus |= HSTATUS_SPV;
--	spin_unlock(&vcpu->arch.reset_cntx_lock);
-+	spin_lock_init(&vcpu->arch.reset_state.lock);
- 
- 	if (kvm_riscv_vcpu_alloc_vector_context(vcpu))
- 		return -ENOMEM;
- 
--	/* By default, make CY, TM, and IR counters accessible in VU mode */
--	reset_csr->scounteren = 0x7;
--
- 	/* Setup VCPU timer */
- 	kvm_riscv_vcpu_timer_init(vcpu);
- 
+ 	switch (mp_state->mp_state) {
+ 	case KVM_MP_STATE_RUNNABLE:
++		if (riscv_vcpu_supports_sbi_ext(vcpu, KVM_RISCV_SBI_EXT_HSM) &&
++				vcpu->arch.ran_atleast_once &&
++				kvm_riscv_vcpu_stopped(vcpu))
++			kvm_riscv_vcpu_sbi_request_reset_from_userspace(vcpu);
+ 		WRITE_ONCE(vcpu->arch.mp_state, *mp_state);
+ 		break;
+ 	case KVM_MP_STATE_STOPPED:
 diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
-index f58368f7df1d..3d7955e05cc3 100644
+index 3d7955e05cc3..77f9f0bd3842 100644
 --- a/arch/riscv/kvm/vcpu_sbi.c
 +++ b/arch/riscv/kvm/vcpu_sbi.c
-@@ -159,11 +159,10 @@ void kvm_riscv_vcpu_sbi_system_reset(struct kvm_vcpu *vcpu,
+@@ -156,12 +156,29 @@ void kvm_riscv_vcpu_sbi_system_reset(struct kvm_vcpu *vcpu,
+ 	run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+ }
+ 
++/* must be called with held vcpu->arch.reset_state.lock */
++void __kvm_riscv_vcpu_set_reset_state(struct kvm_vcpu *vcpu,
++                                      unsigned long pc, unsigned long a1)
++{
++	vcpu->arch.reset_state.active = true;
++	vcpu->arch.reset_state.pc = pc;
++	vcpu->arch.reset_state.a1 = a1;
++}
++
  void kvm_riscv_vcpu_sbi_request_reset(struct kvm_vcpu *vcpu,
                                        unsigned long pc, unsigned long a1)
  {
--	spin_lock(&vcpu->arch.reset_cntx_lock);
--	vcpu->arch.guest_reset_context.sepc = pc;
--	vcpu->arch.guest_reset_context.a0 = vcpu->vcpu_id;
--	vcpu->arch.guest_reset_context.a1 = a1;
--	spin_unlock(&vcpu->arch.reset_cntx_lock);
-+	spin_lock(&vcpu->arch.reset_state.lock);
-+	vcpu->arch.reset_state.pc = pc;
-+	vcpu->arch.reset_state.a1 = a1;
+ 	spin_lock(&vcpu->arch.reset_state.lock);
+-	vcpu->arch.reset_state.pc = pc;
+-	vcpu->arch.reset_state.a1 = a1;
++	__kvm_riscv_vcpu_set_reset_state(vcpu, pc, a1);
 +	spin_unlock(&vcpu->arch.reset_state.lock);
++
++	kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
++}
++
++void kvm_riscv_vcpu_sbi_request_reset_from_userspace(struct kvm_vcpu *vcpu)
++{
++	spin_lock(&vcpu->arch.reset_state.lock);
++	vcpu->arch.reset_state.active = false;
+ 	spin_unlock(&vcpu->arch.reset_state.lock);
  
  	kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
- }
 -- 
 2.48.1
 
