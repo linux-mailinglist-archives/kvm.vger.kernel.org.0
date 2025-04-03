@@ -1,228 +1,325 @@
-Return-Path: <kvm+bounces-42585-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42586-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31525A7A500
-	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 16:25:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3A89A7A519
+	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 16:28:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E5721888CFB
-	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 14:19:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FEA13B4070
+	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 14:24:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6522224EAB2;
-	Thu,  3 Apr 2025 14:18:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3402024EAAC;
+	Thu,  3 Apr 2025 14:24:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GQ6VNzh8"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="E4MXQzaZ";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="0j5P8dCE";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="E4MXQzaZ";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="0j5P8dCE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09FB424E016;
-	Thu,  3 Apr 2025 14:18:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64DD424BCF9
+	for <kvm@vger.kernel.org>; Thu,  3 Apr 2025 14:24:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743689930; cv=none; b=GUxl68F9FLktwqmBCHxDlduo7QNCqIo9DDect2wdiT2cp1c/artmr38o/pEQKmXUQcUOvFkqxB9BmLzDZNsvojZ71U1EIXXRLhrCt6uZiKDG7IkVDwP3nYC2Az4qg61Ospi5B9pNl/ZrkZE2Z+0FEPxwjqaLlMNut5tqRPZVPPE=
+	t=1743690275; cv=none; b=GwsAPWKUK8mf7lCEnkAa+e4i75cl/AeMMjqUMuGtxaXEUcbidYPS3XVxL3mNsWEPYC6QQO8wBFqgyOParsnEg5SwoRd5zN9ZANmkmOJgwe3jrmczp+C00JjQ8LgoHku/Wpyi19EAklvLiRzYbj42WzZFedWSpBJ78o4KBiCTVXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743689930; c=relaxed/simple;
-	bh=Iswj5llC+bCivl9I7vNMk/SGqfO4NmXyJ7I05pVoD6Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LlxRgnouuB0sQZBUNm7YFs9H0Irp2SJPb6DF9drdBlvSdPsB3CpT21GOn9vGk4SvILAsU6C2xH3YewrOw722OnaxJeR+URHDY+l4TpZLxtNEDhlpwCI7KkA1aUrTFkAiZiPSlYp5qwuAaN1iUnfvjRgASWoJn7c3U7SQi7As+kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=GQ6VNzh8; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 533E5HpB007071;
-	Thu, 3 Apr 2025 14:18:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=UdVFC3
-	gMmR8A8vEKwuLjQ+oaRxh3zvSCFaxNtJgaW1o=; b=GQ6VNzh8vfeTp9lu0x6ShU
-	whpfSP3lf6++B7Am22Epr/po/qLnx/RGoRcZb85QG9JKHoXGUoTIfGrUbi2bQnHF
-	eXcjFeznSUYWvEZjhMJt9JQMCmzicDsA/84DrwtQHEq0/KwOT79gAWTR0Y//oxmB
-	/gbFSUDsSNom/L92YX44ofu2RA232NpdOzyhdfjO+FqwlnJDiU3/KdBaeTd+y5ft
-	WoO8cwTmgn9FXbhfX1w3eQCu01dhV0Se6DywqeWJGxp31tX/rPeaw8X9novgYNLq
-	Bg2sdzM4U+3N9EcPkTC8pUU9EQwr6vst0GthStulX0+a3WsC6oF4uC4zqe/IosMg
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45sjq9ts8x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 03 Apr 2025 14:18:43 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 533AOe9H009999;
-	Thu, 3 Apr 2025 14:18:41 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 45pv6p55p4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 03 Apr 2025 14:18:41 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 533EIbkq53149986
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 3 Apr 2025 14:18:37 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8EB0B20074;
-	Thu,  3 Apr 2025 14:18:37 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5C6662006C;
-	Thu,  3 Apr 2025 14:18:37 +0000 (GMT)
-Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.152.224.212])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  3 Apr 2025 14:18:37 +0000 (GMT)
-Date: Thu, 3 Apr 2025 16:18:36 +0200
-From: Halil Pasic <pasic@linux.ibm.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        virtualization@lists.linux.dev, kvm@vger.kernel.org,
-        Chandra Merla
- <cmerla@redhat.com>, Stable@vger.kernel.org,
-        Cornelia Huck
- <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>,
-        Eric Farman
- <farman@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik
- <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian
- Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle
- <svens@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Wei Wang
- <wei.w.wang@intel.com>, Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH v1] s390/virtio_ccw: don't allocate/assign airqs for
- non-existing queues
-Message-ID: <20250403161836.7fe9fea5.pasic@linux.ibm.com>
-In-Reply-To: <20250402203621.940090-1-david@redhat.com>
-References: <20250402203621.940090-1-david@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1743690275; c=relaxed/simple;
+	bh=XTSK2/KK7abmhg3od/EDYC1PEUq5iHlyndAsSYz9IX4=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=OtclO96Fzt+tH7+zxGa321NrafCQQKP0GKWSlSpqxhCVIQfkynNvcOSeQzPeXBEtO//Gy5SldND8st3OTNWaTmCQno/wzOHusrm1KRHHkRLVe4/E6SP+RbNUqK/Qq+072uFM43WJ7i8+6YLnn4AqIjxu9Uib1LvncgAubjPCvNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=E4MXQzaZ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=0j5P8dCE; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=E4MXQzaZ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=0j5P8dCE; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 92CF121171;
+	Thu,  3 Apr 2025 14:24:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1743690271; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hWyyizaHx1Koa0jiDzMmVUAXdC21yt2g/ujbxcUhfj8=;
+	b=E4MXQzaZp/3KxWKVHwHg6llVVLy9/OrZO9WNipQDKPYRWfszRTIPY04B1kHqSZzmkLm9ME
+	LRZm9aS7C+X4Eh69+Hr/jn5Vt+39chjgFm7mcP3SvHDqbOr8qfSCi0uIYa2B05KyxSxdLr
+	A+YJAineWVN3Lod/FvF2exToKfhEQXw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1743690271;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hWyyizaHx1Koa0jiDzMmVUAXdC21yt2g/ujbxcUhfj8=;
+	b=0j5P8dCEqUV7uxtdeV2+tSnEJT6v0CqsOls+/NgpZnl8JiDPlHDO3YAaiM1qCRTs77WfkA
+	dYGZBv6TJeDktxBA==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1743690271; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hWyyizaHx1Koa0jiDzMmVUAXdC21yt2g/ujbxcUhfj8=;
+	b=E4MXQzaZp/3KxWKVHwHg6llVVLy9/OrZO9WNipQDKPYRWfszRTIPY04B1kHqSZzmkLm9ME
+	LRZm9aS7C+X4Eh69+Hr/jn5Vt+39chjgFm7mcP3SvHDqbOr8qfSCi0uIYa2B05KyxSxdLr
+	A+YJAineWVN3Lod/FvF2exToKfhEQXw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1743690271;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hWyyizaHx1Koa0jiDzMmVUAXdC21yt2g/ujbxcUhfj8=;
+	b=0j5P8dCEqUV7uxtdeV2+tSnEJT6v0CqsOls+/NgpZnl8JiDPlHDO3YAaiM1qCRTs77WfkA
+	dYGZBv6TJeDktxBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 345341392A;
+	Thu,  3 Apr 2025 14:24:31 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 1yWSCR+a7mfsVAAAD6G6ig
+	(envelope-from <cfontana@suse.de>); Thu, 03 Apr 2025 14:24:31 +0000
+Message-ID: <f9118414-2153-497a-8804-5bd67e14180f@suse.de>
+Date: Thu, 3 Apr 2025 16:24:30 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: XIIU7-lVPLDDOvh_qH_h0D0LfjkTeoHj
-X-Proofpoint-ORIG-GUID: XIIU7-lVPLDDOvh_qH_h0D0LfjkTeoHj
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-04-03_06,2025-04-02_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 mlxlogscore=999 clxscore=1011 impostorscore=0 mlxscore=0
- suspectscore=0 phishscore=0 spamscore=0 bulkscore=0 adultscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502280000 definitions=main-2504030064
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] tools/kvm_stat: fix termination behavior when not on a
+ terminal
+From: Claudio Fontana <cfontana@suse.de>
+To: Juergen Gross <jgross@suse.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ Dario Faggioli <dfaggioli@suse.com>, Fabiano Rosas <farosas@suse.de>
+References: <20240807172334.1006-1-cfontana@suse.de>
+ <e6461e14-ca65-4322-a818-88b66b58c5c1@suse.com>
+ <634dd49d-94cb-4892-856d-15e83c44c805@suse.de>
+ <e7e94ff8-d7d9-4807-9e53-8d5406ba39ab@suse.de>
+Content-Language: en-US
+In-Reply-To: <e7e94ff8-d7d9-4807-9e53-8d5406ba39ab@suse.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_TWO(0.00)[2];
+	URIBL_BLOCKED(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:mid,suse.com:email];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Score: -4.30
+X-Spam-Flag: NO
 
-On Wed,  2 Apr 2025 22:36:21 +0200
-David Hildenbrand <david@redhat.com> wrote:
+(and my offer to maintain this script remains) - Thanks. C
 
-> If we finds a vq without a name in our input array in
-> virtio_ccw_find_vqs(), we treat it as "non-existing" and set the vq pointer
-> to NULL; we will not call virtio_ccw_setup_vq() to allocate/setup a vq.
+On 4/3/25 16:01, Claudio Fontana wrote:
+> Gentle ping,
 > 
-> Consequently, we create only a queue if it actually exists (name != NULL)
-> and assign an incremental queue index to each such existing queue.
-
-First and foremost: thank you for addressing this! I have to admit, I'm
-still plagued by some cognitive dissonance here. Please bear with me.
-
-For starters the commit message of a229989d975e ("virtio: don't
-allocate vqs when names[i] = NULL") goes like this:
-"""
-    virtio: don't allocate vqs when names[i] = NULL
-    
-    Some vqs may not need to be allocated when their related feature bits
-    are disabled. So callers may pass in such vqs with "names = NULL".
-    Then we skip such vq allocations.
-"""
-
-In my reading it does not talk about "non-existent" queues, but queues
-that do not need to be allocated. This could make sense for something
-like virtio-net where controlq 2N is with N being max_virtqueue_pairs.
-
-I guess for the guest it could make sense to not set up some of the
-queues initially, but those, I guess would be perfectly existent queues
-spec-wise and we would expect the index of controlq being 2N. And the
-queues that don't get set up initially can get set up later. At least
-this is my naive understanding at the moment.
-
-Now apparently there is a different case where queues may or may not
-exist, but we would, for some reason like to have the non-existent
-queues in the array, because for an other set of features negotiated
-those queues would actually exist and occupy and index. Frankly
-I don't fully comprehend it at the moment, but I will have another look
-at the code and at the spec.
-
-So lookign at the spec for virtio-ballon I see:
-
-
-
-5.5.2 Virtqueues
-
-0
-    inflateq 
-1
-    deflateq 
-2
-    statsq 
-3
-    free_page_vq 
-4
-    reporting_vq
-
-statsq only exists if VIRTIO_BALLOON_F_STATS_VQ is set.
-
-free_page_vq only exists if VIRTIO_BALLOON_F_FREE_PAGE_HINT is set.
-
-reporting_vq only exists if VIRTIO_BALLOON_F_PAGE_REPORTING is set. 
-
-Which is IMHO weird.  I used to think about the number in front of the
-name as the virtqueue index. But based on this patch I'm wondering if
-that is compatible with the approach of this patch.
-
-What does for example mean if we have VIRTIO_BALLOON_F_STATS_VQ not
-offered, VIRTIO_BALLOON_F_FREE_PAGE_HINT offered but not negotiated
-and VIRTIO_BALLOON_F_PAGE_REPORTING negotiated.
-
-One reading of the things is that statq is does not exist for sure,
-free_page_vq is a little tricky because "is set" is not precise enough,
-and reporting_vq exists for sure. And in your reading of the spec, if
-I understood you correctly and we assume that free_page_vq does not
-exist, it has index 2. But I from the top of my head, I don't know why
-interpreting the spec like it reporting_vq has index 4 and indexes 2
-and 3 are not mapped to existing-queues would be considered wrong.
-
-And even if we do want reportig_vq to have index 2, the virtio-balloon
-code could still give us an array where reportig_vq is at index 2. Why
-not?
-
-Sorry this ended up being a very long rant. the bottom line is that, I
-lack conceptual clarity on where the problem exactly is and how it needs
-to be addressed. I would like to understand this properly before moving
-forward.
-
-[..]
+> we currently need to carry this downstream, could you include this fix?
 > 
-> There was recently a discussion [1] whether the "holes" should be
-> treated differently again, effectively assigning also non-existing
-> queues a queue index: that should also fix the issue, but requires other
-> workarounds to not break existing setups.
+> Thanks,
+> 
+> CLaudio
+> 
+> On 11/27/24 17:30, Claudio Fontana wrote:
+>> Hi, according to MAINTAINERS file:
+>>
+>> M:  Paolo Bonzini <pbonzini@redhat.com>
+>> L:  kvm@vger.kernel.org
+>> F:  tools/kvm/
+>>
+>> Paolo, is kvm_stat something you still care about, or should it be set to unmaintained?
+>> In this case I think someone at SUSE could pick it up.
+>>
+>> Ciao,
+>>
+>> Claudio
+>>
+>>
+>> On 10/21/24 15:26, Juergen Gross wrote:
+>>> Any reason not to commit this patch? It has got a Reviewed-by: tag from
+>>> Stefan more than 2 months ago...
+>>>
+>>> On 07.08.24 19:23, Claudio Fontana wrote:
+>>>> For the -l and -L options (logging mode), replace the use of the
+>>>> KeyboardInterrupt exception to gracefully terminate in favor
+>>>> of handling the SIGINT and SIGTERM signals.
+>>>>
+>>>> This allows the program to be run from scripts and still be
+>>>> signaled to gracefully terminate without an interactive terminal.
+>>>>
+>>>> Before this change, something like this script:
+>>>>
+>>>> kvm_stat -p 85896 -d -t -s 1 -c -L kvm_stat_85896.csv &
+>>>> sleep 10
+>>>> pkill -TERM -P $$
+>>>>
+>>>> would yield an empty log:
+>>>> -rw-r--r-- 1 root root     0 Aug  7 16:17 kvm_stat_85896.csv
+>>>>
+>>>> after this commit:
+>>>> -rw-r--r-- 1 root root 13466 Aug  7 16:57 kvm_stat_85896.csv
+>>>>
+>>>> Signed-off-by: Claudio Fontana <cfontana@suse.de>
+>>>> Cc: Dario Faggioli <dfaggioli@suse.com>
+>>>> Cc: Fabiano Rosas <farosas@suse.de>
+>>>> ---
+>>>>   tools/kvm/kvm_stat/kvm_stat     | 64 ++++++++++++++++-----------------
+>>>>   tools/kvm/kvm_stat/kvm_stat.txt | 12 +++++++
+>>>>   2 files changed, 44 insertions(+), 32 deletions(-)
+>>>>
+>>>> diff --git a/tools/kvm/kvm_stat/kvm_stat b/tools/kvm/kvm_stat/kvm_stat
+>>>> index 15bf00e79e3f..2cf2da3ed002 100755
+>>>> --- a/tools/kvm/kvm_stat/kvm_stat
+>>>> +++ b/tools/kvm/kvm_stat/kvm_stat
+>>>> @@ -297,8 +297,6 @@ IOCTL_NUMBERS = {
+>>>>       'RESET':       0x00002403,
+>>>>   }
+>>>>   
+>>>> -signal_received = False
+>>>> -
+>>>>   ENCODING = locale.getpreferredencoding(False)
+>>>>   TRACE_FILTER = re.compile(r'^[^\(]*$')
+>>>>   
+>>>> @@ -1598,7 +1596,19 @@ class CSVFormat(object):
+>>>>   
+>>>>   def log(stats, opts, frmt, keys):
+>>>>       """Prints statistics as reiterating key block, multiple value blocks."""
+>>>> -    global signal_received
+>>>> +    signal_received = defaultdict(bool)
+>>>> +
+>>>> +    def handle_signal(sig, frame):
+>>>> +        nonlocal signal_received
+>>>> +        signal_received[sig] = True
+>>>> +        return
+>>>> +
+>>>> +
+>>>> +    signal.signal(signal.SIGINT, handle_signal)
+>>>> +    signal.signal(signal.SIGTERM, handle_signal)
+>>>> +    if opts.log_to_file:
+>>>> +        signal.signal(signal.SIGHUP, handle_signal)
+>>>> +
+>>>>       line = 0
+>>>>       banner_repeat = 20
+>>>>       f = None
+>>>> @@ -1624,39 +1634,31 @@ def log(stats, opts, frmt, keys):
+>>>>       do_banner(opts)
+>>>>       banner_printed = True
+>>>>       while True:
+>>>> -        try:
+>>>> -            time.sleep(opts.set_delay)
+>>>> -            if signal_received:
+>>>> -                banner_printed = True
+>>>> -                line = 0
+>>>> -                f.close()
+>>>> -                do_banner(opts)
+>>>> -                signal_received = False
+>>>> -            if (line % banner_repeat == 0 and not banner_printed and
+>>>> -                not (opts.log_to_file and isinstance(frmt, CSVFormat))):
+>>>> -                do_banner(opts)
+>>>> -                banner_printed = True
+>>>> -            values = stats.get()
+>>>> -            if (not opts.skip_zero_records or
+>>>> -                any(values[k].delta != 0 for k in keys)):
+>>>> -                do_statline(opts, values)
+>>>> -                line += 1
+>>>> -                banner_printed = False
+>>>> -        except KeyboardInterrupt:
+>>>> +        time.sleep(opts.set_delay)
+>>>> +        # Do not use the KeyboardInterrupt exception, because we may be running without a terminal
+>>>> +        if (signal_received[signal.SIGINT] or signal_received[signal.SIGTERM]):
+>>>>               break
+>>>> +        if signal_received[signal.SIGHUP]:
+>>>> +            banner_printed = True
+>>>> +            line = 0
+>>>> +            f.close()
+>>>> +            do_banner(opts)
+>>>> +            signal_received[signal.SIGHUP] = False
+>>>> +        if (line % banner_repeat == 0 and not banner_printed and
+>>>> +            not (opts.log_to_file and isinstance(frmt, CSVFormat))):
+>>>> +            do_banner(opts)
+>>>> +            banner_printed = True
+>>>> +        values = stats.get()
+>>>> +        if (not opts.skip_zero_records or
+>>>> +            any(values[k].delta != 0 for k in keys)):
+>>>> +            do_statline(opts, values)
+>>>> +            line += 1
+>>>> +            banner_printed = False
+>>>>   
+>>>>       if opts.log_to_file:
+>>>>           f.close()
+>>>>   
+>>>>   
+>>>> -def handle_signal(sig, frame):
+>>>> -    global signal_received
+>>>> -
+>>>> -    signal_received = True
+>>>> -
+>>>> -    return
+>>>> -
+>>>> -
+>>>>   def is_delay_valid(delay):
+>>>>       """Verify delay is in valid value range."""
+>>>>       msg = None
+>>>> @@ -1869,8 +1871,6 @@ def main():
+>>>>           sys.exit(0)
+>>>>   
+>>>>       if options.log or options.log_to_file:
+>>>> -        if options.log_to_file:
+>>>> -            signal.signal(signal.SIGHUP, handle_signal)
+>>>>           keys = sorted(stats.get().keys())
+>>>>           if options.csv:
+>>>>               frmt = CSVFormat(keys)
+>>>> diff --git a/tools/kvm/kvm_stat/kvm_stat.txt b/tools/kvm/kvm_stat/kvm_stat.txt
+>>>> index 3a9f2037bd23..4a99a111a93c 100644
+>>>> --- a/tools/kvm/kvm_stat/kvm_stat.txt
+>>>> +++ b/tools/kvm/kvm_stat/kvm_stat.txt
+>>>> @@ -115,6 +115,18 @@ OPTIONS
+>>>>   --skip-zero-records::
+>>>>           omit records with all zeros in logging mode
+>>>>   
+>>>> +
+>>>> +SIGNALS
+>>>> +-------
+>>>> +when kvm_stat is running in logging mode (either with -l or with -L),
+>>>> +it handles the following signals:
+>>>> +
+>>>> +SIGHUP - closes and reopens the log file (-L only), then continues.
+>>>> +
+>>>> +SIGINT - closes the log file and terminates.
+>>>> +SIGTERM - closes the log file and terminates.
+>>>> +
+>>>> +
+>>>>   SEE ALSO
+>>>>   --------
+>>>>   'perf'(1), 'trace-cmd'(1)
+>>>
+>>
 > 
 
-Sorry I have to have a look at that discussion. Maybe it will answer
-some my questions.
-
-> Let's fix it without affecting existing setups for now by properly ignoring
-> the non-existing queues, so the indicator bits will match the queue
-> indexes.
-
-Just one question. My understanding is that the crux is that Linux
-and QEMU (or the driver and the device) disagree at which index
-reporting_vq is actually sitting. Is that right?
-
-Regards,
-Halil
 
