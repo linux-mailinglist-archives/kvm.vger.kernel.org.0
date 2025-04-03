@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-42532-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42533-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF769A79973
-	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 02:35:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C56BCA79975
+	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 02:38:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0809E3B4CE7
-	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 00:34:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAA553B0FAA
+	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 00:38:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19A1B28DB3;
-	Thu,  3 Apr 2025 00:34:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EC5C1804A;
+	Thu,  3 Apr 2025 00:38:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y5d/PuAP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NvaxnSPz"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CD3118024;
-	Thu,  3 Apr 2025 00:34:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B16497FD;
+	Thu,  3 Apr 2025 00:38:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743640486; cv=none; b=rsU5+bfb7fEh2tJackYgjPEQzpMxlBOvdzVIbDkPIoScoN1SAlRkyoH2wjZMcegKHroOtnKtWWB9D9BkKXhD8/Ilhs73ZiEwUJdi05maljyb1+7AiDtrfQlS+fzy05inh0KLTczXzQTFQLI8AR4SboBYHKPgtbLOxFljBA53oz0=
+	t=1743640703; cv=none; b=Vyvsjv/jItS/ruQbsxLpBtQlBGQrKEuFGqDVFKq4krRaNvnIH9i+z1N8/oVDV7loWUea1lpZfjbe0AfejkFnMHLD8cyvU/CW7Kqg8tEeopw2NxjfOO5V7PeHpUhR+uDeM4g+4wsdnwU3bUxs2uxirzbScRzCOfcZxtjuWAJfk1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743640486; c=relaxed/simple;
-	bh=5eika8kEa66iF+FLfC46ntBQt4ql8lkAtwKFpeEJYFE=;
+	s=arc-20240116; t=1743640703; c=relaxed/simple;
+	bh=vWs8tqrKwyvurhpVZnuHY4P/5tovdte/s4ejHVXlkFU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qJrjkuUy8WZx41Hgb0yTf3dIbYAM1Rw+K3Q1TO9XPvPBMINn+QE2D+V7khaDejbaDqS9zBbSDwx//WjPfqKYS3hzEYAovRJl7LScxzm2sTpuywc/J5uYvqLKygkbfKLysiYVZt+nIhZoNf95j6ktukH6i1fLWv8iT+HyAGL8s9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y5d/PuAP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22612C4CEDD;
-	Thu,  3 Apr 2025 00:34:44 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=l4FBRCUtDUXvoJfRZnA8r3+1Ih73h50HM9+O3PSXrt7sJgQrlbIm3DALvKerV+kCRgoQc6dusH/A0UuCs7tsWeHYmpaANPa06q+WLRnVcJJokao0tV8ru3OgehhZB+YochZAw5vtVx9e6bzatH6ILn34rehrnXA9fQtXR+mKa+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NvaxnSPz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46964C4CEDD;
+	Thu,  3 Apr 2025 00:38:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743640485;
-	bh=5eika8kEa66iF+FLfC46ntBQt4ql8lkAtwKFpeEJYFE=;
+	s=k20201202; t=1743640703;
+	bh=vWs8tqrKwyvurhpVZnuHY4P/5tovdte/s4ejHVXlkFU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Y5d/PuAP0zRPCrAvZv0YqbK7kN26FnfAkCaDdFm+hWY+ELH+8NXvmbu5/Lj4qxFMo
-	 gax04m4bAtZ5Af2GdpooV69Hd5gyDbYEl+9R4vd5W/nZ7IHK0aM4G+TtHO8vNHSZO2
-	 n05wvIPKRRuKAa2NfUlmTHYAgqSV6kZDedlBHkDaRRhOEAuuXw3Bv4JZE6vCAT0mVD
-	 W+Kb2rD2fLT5aKNzwN1FLHhi2L/ZG3MCB4F/dvXsInn249GpXZHiXB4gzXJBPdxzIF
-	 KmoBISvH0QqduLU14aHn7EdKpmP36kwjf5Vuhg8gtYz0gwpHbktSHabBblxLyXG3q/
-	 27Jf+gd34njLw==
-Date: Wed, 2 Apr 2025 17:34:42 -0700
+	b=NvaxnSPz/Jo/d+UCtcDhljsQPceYz5kO0Ln7aejdTsFEJVUr+eeISvN8vAIbPDAq6
+	 eASHuNWXMJcaEesm/ZhfxLHIvW2dzwbHocghh8Fts52p8IdGjZakrN07mm5XcGYChu
+	 vQe0Td4d7qb2Sg3BWCxFxybPWfz5AaT3zNKyPEG++ZIGB10CC4hjAtCOw/W/4CdHQl
+	 lzltbiW33gtLSp1gw+/zLvCamlUtfi0Xp7NAKr7CNQqjSVNf1u8zFBDxqnl/pBysUW
+	 iafS/ZHvSoQks4firwIULMMSyKh7aTAkuuBd9R4esodoAkgcsiQPL2feugd9hzj/6J
+	 jJ21WJYQSl7+A==
+Date: Wed, 2 Apr 2025 17:38:20 -0700
 From: Josh Poimboeuf <jpoimboe@kernel.org>
 To: Ingo Molnar <mingo@kernel.org>
 Cc: x86@kernel.org, linux-kernel@vger.kernel.org, amit@kernel.org, 
@@ -52,11 +52,11 @@ Cc: x86@kernel.org, linux-kernel@vger.kernel.org, amit@kernel.org,
 	kai.huang@intel.com, sandipan.das@amd.com, boris.ostrovsky@oracle.com, 
 	Babu.Moger@amd.com, david.kaplan@amd.com, dwmw@amazon.co.uk, 
 	andrew.cooper3@citrix.com
-Subject: Re: [PATCH v3 1/6] x86/bugs: Rename entry_ibpb()
-Message-ID: <ynp7rzrlqj26pgimogurymwmn2tpeg5knofowant2g3dvagows@5r3n4sy4buf2>
+Subject: Re: [PATCH v3 6/6] x86/bugs: Add RSB mitigation document
+Message-ID: <7oz656x65pmwcnrm7msk5os53o7ipizimelq6n6tjot6zpj2r2@dkfjcgizhv66>
 References: <cover.1743617897.git.jpoimboe@kernel.org>
- <a3ce1558b68a64f52ea56000f2bbdfd6e7799258.1743617897.git.jpoimboe@kernel.org>
- <Z-2R4_xF8H_DlEqm@gmail.com>
+ <d6c07c8ae337525cbb5d926d692e8969c2cf698d.1743617897.git.jpoimboe@kernel.org>
+ <Z-2XAx9u8l-73aXM@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -65,32 +65,19 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Z-2R4_xF8H_DlEqm@gmail.com>
+In-Reply-To: <Z-2XAx9u8l-73aXM@gmail.com>
 
-On Wed, Apr 02, 2025 at 09:37:07PM +0200, Ingo Molnar wrote:
+On Wed, Apr 02, 2025 at 09:58:59PM +0200, Ingo Molnar wrote:
 > 
 > * Josh Poimboeuf <jpoimboe@kernel.org> wrote:
 > 
-> > There's nothing entry-specific about entry_ibpb().  In preparation for
-> > calling it from elsewhere, rename it to __write_ibpb().
+> > Create a document to summarize hard-earned knowledge about RSB-related
+> > mitigations, with references, and replace the overly verbose yet
+> > incomplete comments with a reference to the document.
 > 
-> Minor Git-log hygienic request, could you please mention in such 
-> patches what the *new* name is?
-> 
-> This title is annoyingly passive-aggressive:
+> Just a few nits:
 
-LOL
-
->   x86/bugs: Rename entry_ibpb()
-> 
-> Let's make it:
-> 
->   x86/bugs: Rename entry_ibpb() to write_ibpb()
-> 
-> ... or so. Because the new name is infinitely more important going 
-> forward than the old name is ever going to be. :-)
-
-Indeed, thanks.
+Ack, thanks!
 
 -- 
 Josh
