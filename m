@@ -1,86 +1,87 @@
-Return-Path: <kvm+bounces-42604-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42605-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E221A7B01E
-	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 23:09:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99464A7AFDB
+	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 23:03:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06EDE173618
-	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 21:02:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 54B8D7A1FB5
+	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 21:01:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A97C625BACE;
-	Thu,  3 Apr 2025 20:04:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 361EF25C704;
+	Thu,  3 Apr 2025 20:05:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YYxHoMER"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aTYDD8iR"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FD7F25BAC5
-	for <kvm@vger.kernel.org>; Thu,  3 Apr 2025 20:04:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9869E25C6F0
+	for <kvm@vger.kernel.org>; Thu,  3 Apr 2025 20:05:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743710683; cv=none; b=kGdNgVqpFcfXHcYnIOBDX2RKUPoJbwHbUBxsdouo+X+oEIjQ1VPltlW4RA3TySGxfpE1oAdpXF4VFUy9Oe/MIFdry9EPAFCdr4dIDGY/8SEZeDtKw6vTLgtK/uCx77M6IwBe3W3YC4c5XvIqh+ruKExhgiRBYQwFK65dN2ydB4Q=
+	t=1743710723; cv=none; b=h0zrK1OBFVlbmU3Ob1xg2/MF1xa+7/M47hvqyzxtwnWCGBhNX91zDuikQ6VygMQUSIAQxb0hSzwT7Ejlhg97tBpOXgZfucsukQbIXzV7VLM6IQvVgcMxpWzeJnCTf8yVAl4XtnEIE6vCUDdzLhnNsgFQ/Lpru52yImYNQgVlKZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743710683; c=relaxed/simple;
-	bh=NkB3n0ul+MfMxizFwXwyx3phcNv722wiU11cVISsZts=;
+	s=arc-20240116; t=1743710723; c=relaxed/simple;
+	bh=2z7gpOBopP6mzRwdH/71QvjcZ+Il4PwlmeVS1h9BDc0=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ejt9jc0L2yc+7Mik+CBE3ATak1UO8YdlJ0EGgONYdR/7XBqrvVZ2M3I7QujmB9AXA2MiotNY6IAQ64oOD5aM+EJR79bDic6XPYtKAzD1oa++Nn3QHDYlYhoYBoYTeFJuK8pNGY/JD9BtqfpqgNps8N9HykIqIdOQzYH6WUBDet8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YYxHoMER; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:MIME-Version; b=pBO/Xpl4a8sCtFDHLV8crMhgoSeL36VR//nIjALB1jHYZeL3ofLQvpYOnV/o+XJaQSwqr9aBxAJhCnY2+rVGeCNzSfKAbdsSLVumY37dab/KR3cxOyx6rD4mRrP4l+niVn/7jV7Uhj2EM71VjA4v/WFZ2XfG3T/Xcgp2y1hyPW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aTYDD8iR; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743710679;
+	s=mimecast20190719; t=1743710719;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kga9aNRHkzQOD82yZTsoFxnFwsipXqt6fxru+FOVT4s=;
-	b=YYxHoMERdvnL35XXOmeuw1MJNgyUgjHiqd2qgavfRJCzKf6BflGBMn7TNUT1d70lImF+hg
-	Mh7bFqqXHrHTpGUOdqQSyEXwcRFgCUm8zT6EwLUcyj9zEPP8ix0ugTb7OulmUucWXKxHlJ
-	BIfd1oyu4KyCIHPTGRNBZ4utbVpp3aI=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=pqWz8jc0Cqe1OSwpvbPHtdUwNBBKx4zhxiSnmOOprDA=;
+	b=aTYDD8iR3v2xhP0ZZfUyp2L4Md0fYgv7isNshGdtV1kie4je3WWMKr81jAetFmNhEUW3MN
+	+NP/6u4P7F1Fw/OdHS1uz8eL0DwLLJjPBh8ImC8qBCP9L2EXMkvccvtzee2fb1CfBbRfCO
+	GSXl4hrtL4d7qrSp03BOrJ1qBLZcY5Q=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-556-Zi2Q83sqMo20TxK4TTaQXw-1; Thu, 03 Apr 2025 16:04:37 -0400
-X-MC-Unique: Zi2Q83sqMo20TxK4TTaQXw-1
-X-Mimecast-MFC-AGG-ID: Zi2Q83sqMo20TxK4TTaQXw_1743710677
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7c5f3b94827so240249185a.0
-        for <kvm@vger.kernel.org>; Thu, 03 Apr 2025 13:04:37 -0700 (PDT)
+ us-mta-446-Wj1_wZUFNyOEpvmSdHF9Kw-1; Thu, 03 Apr 2025 16:05:14 -0400
+X-MC-Unique: Wj1_wZUFNyOEpvmSdHF9Kw-1
+X-Mimecast-MFC-AGG-ID: Wj1_wZUFNyOEpvmSdHF9Kw_1743710714
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-6ecfbdaaee3so21867986d6.3
+        for <kvm@vger.kernel.org>; Thu, 03 Apr 2025 13:05:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743710677; x=1744315477;
+        d=1e100.net; s=20230601; t=1743710714; x=1744315514;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=kga9aNRHkzQOD82yZTsoFxnFwsipXqt6fxru+FOVT4s=;
-        b=FVEKlh2vcSv7MTLjI31XklUhno4J445rTLX5998ualng0bJ4dV4qSxZL9Y1AKq8q0u
-         PRLdP4i/JeLXwlDZ23L4nsyYTqRRJf+x6zQRsc0TJtLgizhsPmey+TmU8vwjhC1eidVD
-         xZC2FZ8Am4SZze6Z7NiEOYgmzIuHn9KINiOjJX3J+50ZKiyj0hiV4FY0LUaoTmXX3S98
-         j4cS6BRCbh6G8wOkSO4TI/42srwPxIa9YNBS8wlE/RPwjEEKKp8T+gtRLjAZMHSpw/yo
-         R/DuKcTHZd0xpyjrzRs46pXJFr0bv4/vKFe5u0fsRzpFrO/Pq8ldvMwsIdlrT8ISrvHl
-         XC4g==
-X-Forwarded-Encrypted: i=1; AJvYcCVhqxfyBxvD2KC+HgvHjww5fK4gXNs0O5oK5077F/uBL5pGNIOyMHgaE72FCKDB8BXv1IY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8JaANFJocgCM0dwWn86A7sblhdjc7t/PcbeWDrg27MCABbRAR
-	PiT6Ji3CB5juDCXreXH0pddEfcKr6Hcn4QQfgVjRzGbbxVYbdRvm1nK31cfP065xttwigKnUAVA
-	DAeoWLoPG9UOIRTMjFyhWgdHut7UaCqj6p90nNRhnOTbjVnmQbA==
-X-Gm-Gg: ASbGncuexjOTkHTp8BwCZ/wxmomOYW5ABgqwlm4nH0LwTWY5eFBuFGQnczhffSjsDY6
-	svtHKxWd1u1HnQ0k7sv+PhgI/4Lk53VnwbC9ASGhqx3pHqYXbP6aKe/Lsd4DTf74GlUjtd+prNy
-	Mzo6VqzX78mo7vu0pdHW457eSIbJYlG0hzDCszLav+VINvZdzJCrIhtyIhSkamV/ZDao9+4HIOl
-	p6SKxqZi8feEXK2O5Zhv/DFCfcjWWydETv0ElObrjnrLtQPhFU/JJToWNrg40A2MDk2fZh+U1nA
-	Bl2xV0wCoNBc1UE=
-X-Received: by 2002:a05:620a:25c8:b0:7c7:5c0b:fdc8 with SMTP id af79cd13be357-7c774d5128cmr87078885a.17.1743710677406;
-        Thu, 03 Apr 2025 13:04:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHZCLnm4HCvgrp1JG+ONjQils839nHMO7PI4qjxrAX6OLhscKo4reCAsfz0+t2ZEZw/qV/d3A==
-X-Received: by 2002:a05:620a:25c8:b0:7c7:5c0b:fdc8 with SMTP id af79cd13be357-7c774d5128cmr87074385a.17.1743710677052;
-        Thu, 03 Apr 2025 13:04:37 -0700 (PDT)
+        bh=pqWz8jc0Cqe1OSwpvbPHtdUwNBBKx4zhxiSnmOOprDA=;
+        b=eOGZ7rxbdK/JH7so30sYoNnVbsBPya2X1FyHmO2Fcq0SWbIipbnYGvMmD4Nn9f4f2y
+         edXwUUoHKTxkP/7jcx6jRJopvOKz9utb3fZwUwGvPps3nuGF9gQFs/a/tvI0P6tzzvmF
+         TxQjdzPMox0BUw6Stngu4mOdJvFtXMMBNvM53ADIkieoyLJ0VPlfW110AbZ7yUcYoS8a
+         vTrV9MWIULFtthmpdbpHTb6CLb7ULcoMKLJKvKa1mWCa6oaVoN1+dlLj/SavQNPVy492
+         efWnhNQ6x9OM29o1Q1G3T1Ge1m93aUdZRy91R+k3mp/511fvmzySCgwAvExWWQeWbFUW
+         0t3A==
+X-Forwarded-Encrypted: i=1; AJvYcCUpiGBPMk3M7++aB8eBukls29ZNypSy51qxgBH89j3bBM/Z3Wk10OcPYwT0Y8wOJi5QA+0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAervlzWTI0lOYe3x4Mg0B52RNOY2Uy3G70Xwqk1I2ahe7HIeG
+	R0jQWg4naWDTjsyPH+YHqrijQZ5aqnZN7i2fQClGDpo23izCju9ATOOyhomZgpj234Cb7ns72fH
+	QIdjirWcj2qQpTO3LjmlhyXSETkCmlGY93rzyAv9UOjEtkMDPQw==
+X-Gm-Gg: ASbGncsGWH7cOFZm6Ai2PC44SvrIGgaxiPRaARpAVKZjjMuPWV0eSXDLl+qiU7S5eh7
+	zCee0GBTAOHL1WvU6QMN1219JU0zEfQbhFY3L0xDN5vKOd+Ns0Vo/7rqmqQziWWt5hpmduu+dfy
+	ozbU15ufY1bnjkj7Hb/6pC+Afkk4KJ1eO/BvEiWRPIgCBkUPitEvCqK3Jk+k3ivB6uhB4JYsoNP
+	z+n/dUtRmunVefBTxQri4eGjYBMfmeNu8r9NahlvecXxetDn/U0v4BTb2aZ5Wte0cBx+BH/g56N
+	cZ4EBstkKHtQB8c=
+X-Received: by 2002:a05:6214:5003:b0:6e8:e828:820d with SMTP id 6a1803df08f44-6f01e770a99mr12634746d6.36.1743710713962;
+        Thu, 03 Apr 2025 13:05:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHI0uNwzM0Zr9e35g9LBvdZ4c5VLY88VwkoSIVcvFfwX4IuCidMY0KeMWE7XWbiyje9oA7n8A==
+X-Received: by 2002:a05:6214:5003:b0:6e8:e828:820d with SMTP id 6a1803df08f44-6f01e770a99mr12634106d6.36.1743710713605;
+        Thu, 03 Apr 2025 13:05:13 -0700 (PDT)
 Received: from starship ([2607:fea8:fc01:8d8d:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c76e75b5dfsm115867385a.35.2025.04.03.13.04.36
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ef0f047a77sm11414696d6.53.2025.04.03.13.05.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Apr 2025 13:04:36 -0700 (PDT)
-Message-ID: <83942b9b464c9ab69ca9059f879eb0539380e2a3.camel@redhat.com>
-Subject: Re: [RFC PATCH 08/24] KVM: SEV: Drop pre_sev_run()
+        Thu, 03 Apr 2025 13:05:13 -0700 (PDT)
+Message-ID: <de73e879d6775a9900789a64fcea0f90e557681f.camel@redhat.com>
+Subject: Re: [RFC PATCH 09/24] KVM: SEV: Generalize tracking ASID->vCPU with
+ xarrays
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Yosry Ahmed <yosry.ahmed@linux.dev>, Sean Christopherson
  <seanjc@google.com>
@@ -88,10 +89,10 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>,
  Vitaly Kuznetsov <vkuznets@redhat.com>, Rik van Riel <riel@surriel.com>,
  Tom Lendacky <thomas.lendacky@amd.com>,  x86@kernel.org,
  kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Thu, 03 Apr 2025 16:04:35 -0400
-In-Reply-To: <20250326193619.3714986-9-yosry.ahmed@linux.dev>
+Date: Thu, 03 Apr 2025 16:05:12 -0400
+In-Reply-To: <20250326193619.3714986-10-yosry.ahmed@linux.dev>
 References: <20250326193619.3714986-1-yosry.ahmed@linux.dev>
-	 <20250326193619.3714986-9-yosry.ahmed@linux.dev>
+	 <20250326193619.3714986-10-yosry.ahmed@linux.dev>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
@@ -103,102 +104,241 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
 On Wed, 2025-03-26 at 19:36 +0000, Yosry Ahmed wrote:
-> Now that the ASID to vCPU/VMCB tracking was moved out of pre_sev_run(),
-> the only remaining pieces are:
-> (a) Checking for valid VMSA.
-> (b) Assigning svm->asid.
-> (c) Flush the ASID if the VMCB is run on a different physical CPU.
+> Following changes will track ASID to vCPU mappings for all ASIDs, not
+> just SEV ASIDs. Using per-CPU arrays with the maximum possible number of
+> ASIDs would be too expensive.
+
+Maybe add a word or two to explain that currently # of SEV ASIDS is small
+but # of all ASIDS is relatively large (like 16 bit number or so)?
+
+>  Use xarrays to generalize tracking the
+> mappings instead. The logic is also mostly moved outside the SEV code to
+> allow future changes to reuse it for normal SVM VMs.
 > 
-> The check in (c) is already being done in pre_svm_run(), and so is
-> redundant. (a) and (b) are small enough and probably do not warrant a
-> separate helper (and (b) will be going way soon), so open-code the
-> function into pre_svm_run() and remove it.
+> Storing into an xarray is more expensive than reading/writing to an
+> array, but is only done on vCPU load and should be mostly uncontended.
+> Also, the size of the xarray should be O(# of VMs), so it is not
+> expected to be huge. In fact, the xarray will probably use less memory
+> than the normal array even for SEV on machines that only run a few VMs.
+> 
+> When a new ASID is allocated, reserve an entry for it on all xarrays on
+> all CPUs. This allows the memory allocations to happen in a more relaxed
+> context (allowing reclaim and accounting), and failures to be handled at
+> VM creation time. However, entries will be allocated even on CPUs that
+> never run the VM.
+> 
+> The alternative is relying on on-demand GFP_ATOMIC allocations with
+> xa_store() on vCPU load.  These allocations are more likely to fail and
+> more difficult to handle since vCPU load cannot fail. Flushing the TLB
+> if the xa_store() fails is probably sufficient handling, but
+> preallocations are easier to reason about.
 > 
 > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 > ---
->  arch/x86/kvm/svm/sev.c | 28 ----------------------------
->  arch/x86/kvm/svm/svm.c | 16 ++++++++++++++--
->  arch/x86/kvm/svm/svm.h |  1 -
->  3 files changed, 14 insertions(+), 31 deletions(-)
+>  arch/x86/kvm/svm/sev.c | 25 ++++-----------------
+>  arch/x86/kvm/svm/svm.c | 50 +++++++++++++++++++++++++++++++-----------
+>  arch/x86/kvm/svm/svm.h |  7 +++---
+>  3 files changed, 44 insertions(+), 38 deletions(-)
 > 
 > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 3ef0dfdbb34d2..1742f51d4c194 100644
+> index 1742f51d4c194..c11da3259c089 100644
 > --- a/arch/x86/kvm/svm/sev.c
 > +++ b/arch/x86/kvm/svm/sev.c
-> @@ -3451,34 +3451,6 @@ void sev_es_unmap_ghcb(struct vcpu_svm *svm)
->  	svm->sev_es.ghcb = NULL;
+> @@ -211,6 +211,9 @@ static int sev_asid_new(struct kvm_sev_info *sev)
+>  		goto e_uncharge;
+>  	}
+>  
+> +	if (!svm_register_asid(asid))
+> +		goto e_uncharge;
+> +
+>  	__set_bit(asid, sev_asid_bitmap);
+>  
+>  	mutex_unlock(&sev_bitmap_lock);
+> @@ -231,18 +234,10 @@ unsigned int sev_get_asid(struct kvm *kvm)
+>  
+>  static void sev_asid_free(struct kvm_sev_info *sev)
+>  {
+> -	struct svm_cpu_data *sd;
+> -	int cpu;
+> +	svm_unregister_asid(sev->asid);
+>  
+>  	mutex_lock(&sev_bitmap_lock);
+> -
+>  	__set_bit(sev->asid, sev_reclaim_asid_bitmap);
+> -
+> -	for_each_possible_cpu(cpu) {
+> -		sd = per_cpu_ptr(&svm_data, cpu);
+> -		sd->sev_vcpus[sev->asid] = NULL;
+> -	}
+> -
+>  	mutex_unlock(&sev_bitmap_lock);
+>  
+>  	sev_misc_cg_uncharge(sev);
+> @@ -3076,18 +3071,6 @@ void sev_hardware_unsetup(void)
+>  	misc_cg_set_capacity(MISC_CG_RES_SEV_ES, 0);
 >  }
 >  
-> -int pre_sev_run(struct vcpu_svm *svm, int cpu)
+> -int sev_cpu_init(struct svm_cpu_data *sd)
 > -{
-> -	struct kvm *kvm = svm->vcpu.kvm;
-> -	unsigned int asid = sev_get_asid(kvm);
-> -
-> -	/*
-> -	 * Reject KVM_RUN if userspace attempts to run the vCPU with an invalid
-> -	 * VMSA, e.g. if userspace forces the vCPU to be RUNNABLE after an SNP
-> -	 * AP Destroy event.
-> -	 */
-> -	if (sev_es_guest(kvm) && !VALID_PAGE(svm->vmcb->control.vmsa_pa))
-> -		return -EINVAL;
-> -
-> -	/* Assign the asid allocated with this SEV guest */
-> -	svm->asid = asid;
-> -
-> -	/*
-> -	 * Flush guest TLB if the VMCB was executed on a differet host CPU in
-> -	 * previous VMRUNs.
-> -	 */
-> -	if (svm->vcpu.arch.last_vmentry_cpu == cpu)
+> -	if (!sev_enabled)
 > -		return 0;
 > -
-> -	vmcb_set_flush_asid(svm->vmcb);
-> -	vmcb_mark_dirty(svm->vmcb, VMCB_ASID);
+> -	sd->sev_vcpus = kcalloc(nr_asids, sizeof(void *), GFP_KERNEL);
+> -	if (!sd->sev_vcpus)
+> -		return -ENOMEM;
+> -
 > -	return 0;
 > -}
 > -
->  #define GHCB_SCRATCH_AREA_LIMIT		(16ULL * PAGE_SIZE)
->  static int setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
->  {
+>  /*
+>   * Pages used by hardware to hold guest encrypted state must be flushed before
+>   * returning them to the system.
 > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index e6e380411fbec..ce67112732e8c 100644
+> index ce67112732e8c..b740114a9d9bc 100644
 > --- a/arch/x86/kvm/svm/svm.c
 > +++ b/arch/x86/kvm/svm/svm.c
-> @@ -3649,8 +3649,20 @@ static int pre_svm_run(struct kvm_vcpu *vcpu)
->  		svm->current_vmcb->cpu = vcpu->cpu;
->          }
+> @@ -694,7 +694,7 @@ static void svm_cpu_uninit(int cpu)
+>  	if (!sd->save_area)
+>  		return;
 >  
-> -	if (sev_guest(vcpu->kvm))
-> -		return pre_sev_run(svm, vcpu->cpu);
-> +	if (sev_guest(vcpu->kvm)) {
-> +		/* Assign the asid allocated with this SEV guest */
-> +		svm->asid = sev_get_asid(vcpu->kvm);
+> -	kfree(sd->sev_vcpus);
+> +	xa_destroy(&sd->asid_vcpu);
+>  	__free_page(__sme_pa_to_page(sd->save_area_pa));
+>  	sd->save_area_pa = 0;
+>  	sd->save_area = NULL;
+> @@ -711,18 +711,11 @@ static int svm_cpu_init(int cpu)
+>  	if (!save_area_page)
+>  		return ret;
+>  
+> -	ret = sev_cpu_init(sd);
+> -	if (ret)
+> -		goto free_save_area;
+> +	xa_init(&sd->asid_vcpu);
+>  
+>  	sd->save_area = page_address(save_area_page);
+>  	sd->save_area_pa = __sme_page_pa(save_area_page);
+>  	return 0;
+> -
+> -free_save_area:
+> -	__free_page(save_area_page);
+> -	return ret;
+> -
+>  }
+>  
+>  static void set_dr_intercepts(struct vcpu_svm *svm)
+> @@ -1557,6 +1550,7 @@ static void svm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  	unsigned int asid;
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+>  	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, cpu);
+> +	struct kvm_vcpu *prev;
+>  
+>  	if (vcpu->scheduled_out && !kvm_pause_in_guest(vcpu->kvm))
+>  		shrink_ple_window(vcpu);
+> @@ -1573,13 +1567,13 @@ static void svm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  	if (sev_guest(vcpu->kvm)) {
+>  		/*
+>  		 * Flush the TLB when a different vCPU using the same ASID is
+> -		 * run on the same CPU.
+> +		 * run on the same CPU. xa_store() should always succeed because
+> +		 * the entry is reserved when the ASID is allocated.
+>  		 */
+>  		asid = sev_get_asid(vcpu->kvm);
+> -		if (sd->sev_vcpus[asid] != vcpu) {
+> -			sd->sev_vcpus[asid] = vcpu;
+> +		prev = xa_store(&sd->asid_vcpu, asid, vcpu, GFP_ATOMIC);
+> +		if (prev != vcpu || WARN_ON_ONCE(xa_err(prev)))
+
+Tiny nitpick: I would have prefered to have WARN_ON_ONCE(xa_err(prev) first in the above condition,
+because in theory we shouldn't use a value before we know its not an error,
+but in practice this doesn't really matter.
+
+
+>  			kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
+> -		}
+>  	}
+>  }
+>  
+> @@ -5047,6 +5041,36 @@ static void svm_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
+>  	sev_vcpu_deliver_sipi_vector(vcpu, vector);
+>  }
+>  
+> +void svm_unregister_asid(unsigned int asid)
+> +{
+> +	struct svm_cpu_data *sd;
+> +	int cpu;
 > +
-> +		/*
-> +		 * Reject KVM_RUN if userspace attempts to run the vCPU with an invalid
-> +		 * VMSA, e.g. if userspace forces the vCPU to be RUNNABLE after an SNP
-> +		 * AP Destroy event.
-> +		 */
-> +		if (sev_es_guest(vcpu->kvm) &&
-> +		    !VALID_PAGE(svm->vmcb->control.vmsa_pa))
-> +			return -EINVAL;
-> +		return 0;
+> +	for_each_possible_cpu(cpu) {
+> +		sd = per_cpu_ptr(&svm_data, cpu);
+> +		xa_erase(&sd->asid_vcpu, asid);
 > +	}
->  
->  	/* FIXME: handle wraparound of asid_generation */
->  	if (svm->current_vmcb->asid_generation != sd->asid_generation)
+> +}
+> +
+> +bool svm_register_asid(unsigned int asid)
+> +{
+> +	struct svm_cpu_data *sd;
+> +	int cpu;
+> +
+> +	/*
+> +	 * Preallocate entries on all CPUs for the ASID to avoid memory
+> +	 * allocations in the vCPU load path.
+> +	 */
+> +	for_each_possible_cpu(cpu) {
+> +		sd = per_cpu_ptr(&svm_data, cpu);
+> +		if (xa_reserve(&sd->asid_vcpu, asid, GFP_KERNEL_ACCOUNT)) {
+> +			svm_unregister_asid(asid);
+> +			return false;
+> +		}
+> +	}
+> +	return true;
+> +}
+> +
+>  static void svm_vm_destroy(struct kvm *kvm)
+>  {
+>  	avic_vm_destroy(kvm);
 > diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index ca38a233fa24c..3ab2a424992c1 100644
+> index 3ab2a424992c1..4929b96d3d700 100644
 > --- a/arch/x86/kvm/svm/svm.h
 > +++ b/arch/x86/kvm/svm/svm.h
-> @@ -760,7 +760,6 @@ void avic_refresh_virtual_apic_mode(struct kvm_vcpu *vcpu);
+> @@ -340,8 +340,7 @@ struct svm_cpu_data {
 >  
->  /* sev.c */
+>  	struct vmcb *current_vmcb;
 >  
-> -int pre_sev_run(struct vcpu_svm *svm, int cpu);
->  void sev_init_vmcb(struct vcpu_svm *svm);
->  void sev_vcpu_after_set_cpuid(struct vcpu_svm *svm);
->  int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in);
+> -	/* index = sev_asid, value = vcpu pointer */
+Maybe keep the above comment?
+
+> -	struct kvm_vcpu **sev_vcpus;
+> +	struct xarray asid_vcpu;
+>  };
+>  
+>  DECLARE_PER_CPU(struct svm_cpu_data, svm_data);
+> @@ -655,6 +654,8 @@ void set_msr_interception(struct kvm_vcpu *vcpu, u32 *msrpm, u32 msr,
+>  void svm_set_x2apic_msr_interception(struct vcpu_svm *svm, bool disable);
+>  void svm_complete_interrupt_delivery(struct kvm_vcpu *vcpu, int delivery_mode,
+>  				     int trig_mode, int vec);
+> +bool svm_register_asid(unsigned int asid);
+> +void svm_unregister_asid(unsigned int asid);
+>  
+>  /* nested.c */
+>  
+> @@ -793,7 +794,6 @@ void sev_vm_destroy(struct kvm *kvm);
+>  void __init sev_set_cpu_caps(void);
+>  void __init sev_hardware_setup(void);
+>  void sev_hardware_unsetup(void);
+> -int sev_cpu_init(struct svm_cpu_data *sd);
+>  int sev_dev_get_attr(u32 group, u64 attr, u64 *val);
+>  extern unsigned int max_sev_asid;
+>  void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code);
+> @@ -817,7 +817,6 @@ static inline void sev_vm_destroy(struct kvm *kvm) {}
+>  static inline void __init sev_set_cpu_caps(void) {}
+>  static inline void __init sev_hardware_setup(void) {}
+>  static inline void sev_hardware_unsetup(void) {}
+> -static inline int sev_cpu_init(struct svm_cpu_data *sd) { return 0; }
+>  static inline int sev_dev_get_attr(u32 group, u64 attr, u64 *val) { return -ENXIO; }
+>  #define max_sev_asid 0
+>  static inline void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code) {}
+
+
+Overall looks good to me.
 
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
