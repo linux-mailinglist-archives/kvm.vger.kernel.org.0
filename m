@@ -1,302 +1,314 @@
-Return-Path: <kvm+bounces-42596-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42597-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09C9CA7A98B
-	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 20:36:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7F32A7AF96
+	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 22:55:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00F8E3A79FB
-	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 18:35:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C04927A78B5
+	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 20:53:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38E53253342;
-	Thu,  3 Apr 2025 18:35:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CA712580F7;
+	Thu,  3 Apr 2025 19:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="05EG+6AX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dp1adRtd"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2046.outbound.protection.outlook.com [40.107.94.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE0472528F9;
-	Thu,  3 Apr 2025 18:35:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743705353; cv=fail; b=RnGmLCDR6FrJx02EPSCN4wh1eY29JPig6cNN1jzvPB1Wmpccez1bSdbjMucucWEc7vnVEwZI/3zA+DHx7zPNp70EnbnDJvsGrrBxuowPwkI0ri/R3gtodSScpKlDvus+7wTlFsqpxpK8ECaMjZIxf3gBAC053/BXj+UYX6p1OHE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743705353; c=relaxed/simple;
-	bh=VkSPRfyh3whShKxnvrSJG/p+LPnBrwcBkHRnv0/1eRo=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=elHOyWOkawp97T7axxmfmKs10hhonVDmb3IkQizuFI9TQouqWOoapOcm7eJjJX63Y1Wo0v2y3xZn44P3lGGJJIYEVlVPzZXEAmR/y5biSuQEitYi99fOWTCppo/+SSe53qPlAwk6PVj9gtY2ihnDmG3xwfyGQqxRJSEChbWphfk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=05EG+6AX; arc=fail smtp.client-ip=40.107.94.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FacAVpK1b/BD0ci2AArup90QqeUTF5J+Wed4gSvcw0e8SVysd5F8OY+nzRwy8t2MwUgafs4i1sSlJzGV8iPATUeanQIa0GH7++czMeBvC4liOJwHxubaESbWVvm089CJZ6fBSUjqzQakkrQE1vSr+SNewvEtlbxK4mogV3GpZWgY31V2X1vqvlwEpumHyZznyo5Jxymu2xIO9geM45CUf28VSOS5eg7jv1a5L/Jxqo9DXepQE91olnV12CObd74I0+JaBNqxr/Q6CK10hFaJOEybpPUcTqWR8KgCEnN+70wPURx3UwmKyZoMG7DvZaxyfG08L5FkWRk4i63IEfSs+A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vLtg1WMpwwMozs54nCdZRfAW0MctDwEi1jvEceT/Efw=;
- b=EbZE6ryipmVS2nIpEnCJ/IPCYf99WWxLQ+plFOomCzUq1PqBflQi5NbF07xvHx0EyQTnLBILXxMbmB4HYNM62z4npSRdSy9wThrMvHwKGYl2BoY6AkVRZjF25Baf/7RsKcIfQh7Oj3D9IPCIGZGjMXTvM2mWjMSVOC6QEhC59Y6EN8HFHGZbfqslY+FjexSTb9afEWf7p01lv+AAzZsUacwwDtpeNuLfu5LKvkIRI+OxhAp465YdyIvbTU+3nMTDDLgfPSJ5cCduocEP5LvM54zfMr702SCpuuWCL4HDyVNrLXgh65bwD9oOlbTKbNkdT9QcuMAK+M9gJ3Wxa+nJpQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vLtg1WMpwwMozs54nCdZRfAW0MctDwEi1jvEceT/Efw=;
- b=05EG+6AXLE/ZXMEnCOkExIc7csIl9HeMdGs+9NV0SDg4DOHj6AzwPpYf6hCbEbCzkkBbOt4LyZDTYF2K2JlclXgp/03QT6tmp41Z2jkSE5gJvT4pEZnL7YycdMySrEwLbxiRkTnSd/aGwG0It1W+lDWSNTRE9wDSWeioHz4J5gk=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from MW6PR12MB7087.namprd12.prod.outlook.com (2603:10b6:303:238::14)
- by CY5PR12MB6033.namprd12.prod.outlook.com (2603:10b6:930:2f::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.52; Thu, 3 Apr
- 2025 18:35:50 +0000
-Received: from MW6PR12MB7087.namprd12.prod.outlook.com
- ([fe80::41ae:52ce:aaf4:eda]) by MW6PR12MB7087.namprd12.prod.outlook.com
- ([fe80::41ae:52ce:aaf4:eda%4]) with mapi id 15.20.8534.043; Thu, 3 Apr 2025
- 18:35:49 +0000
-Message-ID: <d61bac99-a0d9-459a-994d-20a5cfa6dd52@amd.com>
-Date: Thu, 3 Apr 2025 13:35:46 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 00/10] Basic SEV-SNP Selftests
-To: linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Cc: seanjc@google.com, pbonzini@redhat.com, thomas.lendacky@amd.com,
- tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, shuah@kernel.org, pgonda@google.com,
- ashish.kalra@amd.com, nikunj@amd.com, pankaj.gupta@amd.com,
- michael.roth@amd.com, sraithal@amd.com
-References: <20250305230000.231025-1-prsampat@amd.com>
-Content-Language: en-US
-From: "Pratik R. Sampat" <prsampat@amd.com>
-In-Reply-To: <20250305230000.231025-1-prsampat@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA1P222CA0149.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:806:3c2::26) To MW6PR12MB7087.namprd12.prod.outlook.com
- (2603:10b6:303:238::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92A771F5825;
+	Thu,  3 Apr 2025 19:42:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743709378; cv=none; b=FNTJo2Z6FnljTqOu2UWu822dSi2IJBByxVFdnmpysoUaoHEUAGmH0cZPbMU7rX3MgpHGz527EZvVQJCAc3JgHw08iXeZfeaBexpWZdmuvOLNCQqSrBRRSG3/jDPTUuuAlV0+s5Mwh6dulDxWiOQkOIqF2+e3jPUlVt+4S+3WmEI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743709378; c=relaxed/simple;
+	bh=OxFQkTUUwkX1q6k8xQRbHlDEFB1zaVhWsRAl9W5U5hU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M68zz6J3nmXvrHmte6dGWc6pFepvmWkRjWmImhQVBZyehJ2MnW74JURkO18ibXjwdknpyJ4fsURk3UYjJ4cE6wQ5xSQRfGYtwm6ICFYRjWA3rkZWumP2wPbJWrRE3ACMX5/5YCXmu/8ocxnYMVYziU+hvL36luOpb8B2y1IGY2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dp1adRtd; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7398d65476eso1009320b3a.1;
+        Thu, 03 Apr 2025 12:42:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743709376; x=1744314176; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Dw5EaN/FeaV+PKwcwp5SEhnuatGIwWCjLsFP+3LpIU0=;
+        b=dp1adRtdYE2eSA9xWfdxtKi6OXD7ZBjeEGOr1P5GGbfUFePWgUc7mpXhdHBE/g9BEY
+         OqKz/eRTI5HTtYKq3+mGekG1KgB0KNSvz4aAw03O4PPj5OeX3Ql1T3dWyVsTb7/e5O8C
+         og8LVoi2AKsEkprcZfSiqXr3MyizIKrXM14ZPyHMaYm7mLEpV+TILCsdyj4KOo8ei0t/
+         f+qk9/Rf7Ql+1Ed//051SDYNOeUHhaVOcQguWDatBh0SNxDyEwjfl68ABLVb+hSB6nDH
+         svUerJXJ3KOqbIIVHehZdyhqRnzFq18miNN89cU84rwSI1ZzEb6zEVO83Bizm5ljLdWj
+         GhIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743709376; x=1744314176;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dw5EaN/FeaV+PKwcwp5SEhnuatGIwWCjLsFP+3LpIU0=;
+        b=ayD5iaCjP/9ZemTrA4pAOBbZCxbEdyVm8OHbGfMNJntRDSsFxXgeJ7HzUq3TqdO0Te
+         scerTvTgtpCnejA0WazWnVVFDlozGXkEhdlQ4QuaWAXAlSHPXqHNtpCA/gC3Uo/fEnDD
+         626EKCTovlzjwSzwJ/Fk93Jh2KV+1/ynzLEBk3MaWAJX9gQD5MhqhF6vOTkJw57HMEfL
+         7hDm7sONq1YxoShtaufLIaDHmBtMbSsF6Udpd5xzbw2EEVT3/QB7RmUIMralpWovi2Hw
+         YtDnhcLuFEr+9qv/3I+6u61mgsGxum7AVDoIh+LvpRQ8nwo7RA87mUc2IpaJm+4zF4Su
+         WvGA==
+X-Forwarded-Encrypted: i=1; AJvYcCWaByS+UbiVukchjdKnBSwWYbYEP/98Ha6v7HdD71vZmkc0HrjbAlRfOoy3uCacbfpItHw6Yk+q@vger.kernel.org, AJvYcCXAT/UivivEib9LAEQ5PCgb+18GZEC3CNhgqDNeU8mNndgXIgo0ObeUUUuOAYWvgafni4PrghULytPooFya@vger.kernel.org, AJvYcCXChZPoiQd+jG775VJe/Ee/2/+leFLz3k3H1XTJfZn74AG6ek6d84Jg8eM5GEB3An69Gz3M7ZXbnxcJwMQl@vger.kernel.org, AJvYcCXzb3fi2EOC6BQhp4J4DEPqFq7fy3+mqVG6/ReqLFz1iD5L8JsBltWH5x1kS1/mEDy1NfM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKuhHP4oyEEbcADzax+nnA4IP/eRcACfI2auKihbXj+Bjxy9qv
+	dz9mOtbkNCNUfyp6KlqbPnWfYjScUU6j7wMZtRjOrGt0XNNEloqv
+X-Gm-Gg: ASbGnctrjuuXGiO2oWUFb0DTyT0AZgC4q2It3VDdKug2ymmBmUqiAi/3GkkwTekrF/D
+	WOlgHnzRF/myCw5EMPcm8ZavwIwChLFg3Al4J8Rgywd6Og3iwzgTzVGnGUBgOHKFT/x3a9kh22v
+	T+d15auYxX6og7xKrzkZTa+rD6vi8juO5BmBRPg/JElwpLv4Bg9dt9jdBdwrmB+QyCOKybnsR58
+	AVXvTrPLPAph23rIu+1saa+z4jzwPbIh4vJvj2x4znCtC2YPr8YOSZG43ZJnLxdRkkDWRq1h+kW
+	ID2IW38ToGP+j+Lf64mdPvs1JA0JM1sQyxsDo3pK8hJqzinnsIpOnsH5vRuH4MhywAs1JsmkgHI
+	8
+X-Google-Smtp-Source: AGHT+IGTqm5ICR8EBlvvydBUIxaddn+H75GcdEQ/shNDpVkFY10lp50cz3ahcnw+0GlRzFfpgJP+zQ==
+X-Received: by 2002:a05:6a00:2e0f:b0:732:706c:c4ff with SMTP id d2e1a72fcca58-739d6457e97mr7220468b3a.7.1743709375559;
+        Thu, 03 Apr 2025 12:42:55 -0700 (PDT)
+Received: from devvm6277.cco0.facebook.com ([2a03:2880:2ff:3::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-739d98064fdsm1897473b3a.84.2025.04.03.12.42.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Apr 2025 12:42:54 -0700 (PDT)
+Date: Thu, 3 Apr 2025 12:42:46 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v2 0/3] vsock: add namespace support to vhost-vsock
+Message-ID: <Z+7ktkvIeNbf39D3@devvm6277.cco0.facebook.com>
+References: <20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com>
+ <r6a6ihjw3etlb5chqsb65u7uhcav6q6pjxu65iqpp76423w2wd@kmctvoaywmbu>
+ <Z-w47H3qUXZe4seQ@redhat.com>
+ <Z+yDCKt7GpubbTKJ@devvm6277.cco0.facebook.com>
+ <CAGxU2F7=64HHaAD+mYKYLqQD8rHg1CiF1YMDUULgSFw0WSY-Aw@mail.gmail.com>
+ <Z-0BoF4vkC2IS1W4@redhat.com>
+ <Z+23pbK9t5ckSmLl@devvm6277.cco0.facebook.com>
+ <Z+26A3sslT+w+wOI@devvm6277.cco0.facebook.com>
+ <4c2xz3xhpdjvb6jmdw7ctsebpza5lcs4gevr5wlwwyt64usr2i@o5qt2msfyvvw>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW6PR12MB7087:EE_|CY5PR12MB6033:EE_
-X-MS-Office365-Filtering-Correlation-Id: f8652e9d-8e16-46d8-806b-08dd72de5b31
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?aVB6TW12UmJkclhlWjkrZzBLWUttTHBQVHBRb0kxazcrYjd6b2RwcjlGZ01J?=
- =?utf-8?B?VVRWanZRdGlSNlRYY1JtZ3czME1FNFlpMUVpYVc3d1UrR3FmMjhXWE5IZ2Fh?=
- =?utf-8?B?T2VMbi9rT1JzTEU1MFlDQ0tGNmtTRlBYRVd5bW1yVGNMT09jRWhoVC9xQXdP?=
- =?utf-8?B?TnNpSGRvU0FVR1hOL1I1cUdBSDkxbEwxUTJEUjQ4STYxRjRCcm85SzRRM3Jx?=
- =?utf-8?B?L3hqSzkrNWRnTDN6U1gxdGhTeXZYbjUzNmVDYlBlNEQ0bWw1ZjcxMjc0djFs?=
- =?utf-8?B?V0FKakdwNXBoYXM1clNzMWNIUldZRjZiNnBwZCtSYjREV0I3ZGx2emhtdERW?=
- =?utf-8?B?RFBsSmpLRFNrUTJ1aHhkZWlhVnVmdDZxanlEelU3YStzVFkySzI2Q3dqYmE1?=
- =?utf-8?B?UC9Dcm80ZEhHVTNxa0FKS2dJM2tybXRnQzZFcDlhY0M5QkhybDcwTWxUWTkx?=
- =?utf-8?B?cGY5aXJFcXVlaVhZZ3ZSTXpnZmk5WlZXWGhRWUpPWDhKUmRmYWE4U0RyaTNv?=
- =?utf-8?B?R3ZFYUdCL0Q2MmR3M015bld6bGJpR2doOEpEL1hXdmNESTJHOUkyYUMrMGVl?=
- =?utf-8?B?OU1nRDVrSzJLQUJsYmw4Mlk4NmNoRWprNmNEYkx1ZGI2aFdFakJnanYvNFFQ?=
- =?utf-8?B?UlFqT2ZUOXlFeVd6cFNoaEdkNTN2bUdzM3pWdGZZREk2aHVFb3o0dVB0Vlpl?=
- =?utf-8?B?bHhlM0Y0K0VsVGRMQzdDelRyY0E5RUE2Q3BtV2lsWlR3UWNudm00eWFEZm5X?=
- =?utf-8?B?ckdrLy85RWZFbHhYRExQdTRRVmpZNUhJOFpOQmxJT2lFNTFvZVJCL1hMdWxL?=
- =?utf-8?B?bXBLVkpDS2R1ZVZaVk1uRTdaWDlpTldlaHF0U1c1a2QrQnBjdVMxdVRRU05N?=
- =?utf-8?B?ZjUzSDlMNkpwbmdBOUlmN3hMMk95bVorK1MzVHdoQkQ5bFlmTTJzaTNvVHRC?=
- =?utf-8?B?b2VzNjhXV2hTUVVnRkFiTndSYzVQR3lHcnMxSmJBWmh2a3UyR0Y3VXdlWEV3?=
- =?utf-8?B?QkZZTUNIRS9iL1hSb3Exc0tXNTJGN2dNWW5jTXp1clB1SVpxK2NZRTVhelFG?=
- =?utf-8?B?SE1ZN2xoUkpyRVNFc1JGUzNVdHNqL1YzZ1VmeEVCTy9sZ1BHMFJDSU52WU1L?=
- =?utf-8?B?SGJTOEJUcFovWmVIQXBzNHJWOUI0c1o5S0pLT2xSdDN3NGdHZUZEUG5iNHgz?=
- =?utf-8?B?OFJQajlYclZ2ZjhBOWIrZnByWENIdjhGVHNEYjJGU2p1Y1Y4MDdwMUR6K0lE?=
- =?utf-8?B?emNJZmgrQmVjZEtHM3pkNEhWM25lano3U1VGV2daTGFYUVMyb05Pb2ErQ3Rz?=
- =?utf-8?B?WWFkQzl1RGdrUjdBRUpMRjFTbG5PVzRldmpqdDNPQ2VLWnBSVVhqSHdGVHEx?=
- =?utf-8?B?Tk5JNmQ2N3Q2ZHhHWm1vdzVBWGNVZUxrYVdZenh2Q3c4RDFaTUg1cTlKZ1Av?=
- =?utf-8?B?SzZDRVZBZ0FmM1FWdXZsQkI2ZldoTC92WWIrb1BaV1lVUkNVSkFnWGZGaUMz?=
- =?utf-8?B?WTYxRlhKWFRpamRQcVZBS05QVEZWeG1jNWkyek0yQlR3b0d2TnY4RmNDM3Bu?=
- =?utf-8?B?VlhoUG9XRUtzdFhOQzZmTHI2S2tTK2pxcXYvd0hrSm9nTVRXN2xRbE9lMWxU?=
- =?utf-8?B?R2p6K1BYMmRyRjBJUnZNMU5hSkJFYzQxNmZrR0hWNnovSWJjWUtwVklUZFF5?=
- =?utf-8?B?V1JtRWZwQzN1ZTI2RnZ3M3NrYVhScnppOFFtL05LOWhpczQ0R0Q0NVhUZE5a?=
- =?utf-8?B?U3hIcTkrWGE4cE5rQkUxMW5jSmxzNStIc1JwalZLSGRmN2ZqOWtYV1dMSmEy?=
- =?utf-8?B?bnQzeFdQbllPYk1wc1lkdz09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW6PR12MB7087.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cUlTSUltTk11QVdkbHlrZStMMlIrV0RCSkJIU00yRC93MEpSMk02UnE2VXBt?=
- =?utf-8?B?blR4dDJYM3dqRFBaL3kzRXJUd1F1REZHYUNUMlpERWpwdVVjM3l2Nmo4Rkto?=
- =?utf-8?B?am1YY0NNSEQ3ZjhwZFMyTjNJbGs0R2lKQlUzNEFiT0tmTUYxV3ZiS0dpN3NU?=
- =?utf-8?B?K09UQkVyV2haeG9LdGoyb2lhc05LK0luRk5uOTQvZGFpYVhpc01xY3hHc1M4?=
- =?utf-8?B?b29kNk9OejgzSFdSTngzcGFESEFVSDZuYW15OU0zMGRRU3lrS1JGZTM0RTNK?=
- =?utf-8?B?V0dEWm1PN0hOQndXV0NjWEw2OXRKSG11a3RwVXd0T0doZlJoTGNmSHhEOUJK?=
- =?utf-8?B?ZzM4YnlhVGZabi9wU042SlBpc2RvdnlhWm5lTHBkV0JCdTVsNU9LZVpBb3Z6?=
- =?utf-8?B?UGxTcXFEMjFhUGZ6ZmRqaklmNXdjNzZhS1padlFRREozaUxYZWprS2Nnei94?=
- =?utf-8?B?TFF0WFh5bXYwVHBEUSs5Q2J1TEZQa3UybnhEZ0J2bk9COVZPL1Q0MkdOMHVB?=
- =?utf-8?B?Ym9qSHdLb0FtM0Y3TGY5TUhNdVFqWjhpcUZPR1N1UkxiRDRNbm9DSmFiVWln?=
- =?utf-8?B?S0xYRWJlSVpwTjZlMTdJM2E3T3diSWNpQXdSeW9xUDZYcXVlMC9idkp0N09k?=
- =?utf-8?B?aVE2RW1hNG80N0E3SmpaT2YvQlo0NG9xb3pPcHUyL2s3RGt6WUdJbC9pVUJx?=
- =?utf-8?B?Q0RndlV0TEI4eDY1TXNIdkMxc1ZrUm1rVXRuRitmeE5JWlpxb215TXN6V0pS?=
- =?utf-8?B?SWhUWURXUnZuRUFzL0s3YzNybjJ0RTNXdHJ4ekxuWEYzalkwbFM0T2hRaWNH?=
- =?utf-8?B?UDd6amdpd3c3UW5QM2ZmOW5LN3pSS25qSnJpUXJFZ3ZpQm5jWm9WM1VPYi9O?=
- =?utf-8?B?QUxQOWlTRHdPU0hGNEhMT0M0VGR1OCtkSTJQR0tUci9VdXBMSFNDaXQ1UEJQ?=
- =?utf-8?B?TlJYTlMwakJoL3UyK2JyVHRvYkdKaWtIQVJpNktoRXk3Qm1NWEo0eHpORGJB?=
- =?utf-8?B?QUFNazNzNy9XdEs2blU2M2ZHZmU4a3BaaU84RjhmUjJBUURxQkJIbFpKL3Ez?=
- =?utf-8?B?WlBSWDFpTEREbkNuRE1OaHlUR2RkSW9ib0xvaFNVd20yYUZveHRLSjlmeWdn?=
- =?utf-8?B?SldzSWRQYjJLSDJzcjFDRWtjU0NyVHBrcXRNa1RTbEhHUWZLMzlMdU82Vk1u?=
- =?utf-8?B?azJhUGVpNXFmUjhFb0s0dHROWklJVFFyTERmOXdmRDUycWJlUHV6bmF4Ui9K?=
- =?utf-8?B?ODJaZ3B1eUNEaDM1TUVQWEZHUHdnKzFIMFpGeUtVSysyejRMVVkvVFNDeTh6?=
- =?utf-8?B?YWRHVmI1Nk5GcFllZGtXK3ZFZGtGdVJBbHFGMnZlZW0wRzNRQ0RKL3hWa2Nl?=
- =?utf-8?B?dFYxKzVtSWhzN2U3STF3d3p6c0JRd1ByczJiajZET3h3ckFXUEhIQ3dzdy9D?=
- =?utf-8?B?Wi9DL2tJWFRCNzU4QWFTZ2lkckZ4dVhWbENBU2hwLzdCa2wvY1ZBUW91Z29P?=
- =?utf-8?B?T3BHOEZBdjVDN2tWRUJHVXdDWU1FbHRrbHY3RjJ1RXFUMHY2UTJoSTl2STNP?=
- =?utf-8?B?ZkE0TE1wbHFmNkFhbHZFeVg1VWJGSUZ3ZE15RkJyay9kZWVmL2l2NnBMQk9V?=
- =?utf-8?B?OXNHRGp1NmR4bDdmTW0xclNIa29oMWNGZnJIVmIvSjcvZTlod2F1WG8vb1FH?=
- =?utf-8?B?YzN1akRkRnp2WTI4Nzc2WHlNcHVyemxleEhxR1h6MUdZMFFWa0dvQ0dKb3Fk?=
- =?utf-8?B?emREcXZ2eWRlVkRzQnkzQytCRVJDeThUT0t2SEs0NU9NTXRmYkJEVFM3SHNp?=
- =?utf-8?B?VnZpTkhPbTk1b0dBTHJIdzdaaUtxLzZCYkQ4WDhid2cwQ1ozUk82Tkhjdzlj?=
- =?utf-8?B?bVNTdXhUdW5GaU84dzA4Sm04RDlTZHd0V0FUZ1B5S1NGdEhmS0xPZG85UDQy?=
- =?utf-8?B?VTVoZEZPTjB5Y3MxdFFLckpuRWhYdjhjcmtjYTQ1dlgzdGlaTlpXSmhIRDJX?=
- =?utf-8?B?MGNSWjQ3NHpIU2dJYVFDS2VnanV4NFJPQUMxbUpoOWt0Nlo3aDg5ckdwcXZn?=
- =?utf-8?B?V2xKM1BTOHNDb0RYSXRUUWc0UkM2eW41TDBtNi82QlZuQzNvKyt4VTFZemYw?=
- =?utf-8?Q?yhbZ1HYaSUeUE9wDvwC84gwrh?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f8652e9d-8e16-46d8-806b-08dd72de5b31
-X-MS-Exchange-CrossTenant-AuthSource: MW6PR12MB7087.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Apr 2025 18:35:49.6555
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: iwHLxGGKpZpD+71vCwl9UtcyTPg1E9G1BT7uNouks3qZEX/stWSf1FsqgoIKMhphyQBy+Xm5VGBCpOjCSH1SHQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6033
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <4c2xz3xhpdjvb6jmdw7ctsebpza5lcs4gevr5wlwwyt64usr2i@o5qt2msfyvvw>
 
-A very gentle ping on this series.
+On Thu, Apr 03, 2025 at 11:33:14AM +0200, Stefano Garzarella wrote:
+> On Wed, Apr 02, 2025 at 03:28:19PM -0700, Bobby Eshleman wrote:
+> > On Wed, Apr 02, 2025 at 03:18:13PM -0700, Bobby Eshleman wrote:
+> > > On Wed, Apr 02, 2025 at 10:21:36AM +0100, Daniel P. Berrangé wrote:
+> > > > On Wed, Apr 02, 2025 at 10:13:43AM +0200, Stefano Garzarella wrote:
+> > > > > On Wed, 2 Apr 2025 at 02:21, Bobby Eshleman <bobbyeshleman@gmail.com> wrote:
+> > > > > >
+> > > > > > I do like Stefano's suggestion to add a sysctl for a "strict" mode,
+> > > > > > Since it offers the best of both worlds, and still tends conservative in
+> > > > > > protecting existing applications... but I agree, the non-strict mode
+> > > > > > vsock would be unique WRT the usual concept of namespaces.
+> > > > >
+> > > > > Maybe we could do the opposite, enable strict mode by default (I think
+> > > > > it was similar to what I had tried to do with the kernel module in v1, I
+> > > > > was young I know xD)
+> > > > > And provide a way to disable it for those use cases where the user wants
+> > > > > backward compatibility, while paying the cost of less isolation.
+> > > >
+> > > > I think backwards compatible has to be the default behaviour, otherwise
+> > > > the change has too high risk of breaking existing deployments that are
+> > > > already using netns and relying on VSOCK being global. Breakage has to
+> > > > be opt in.
+> > > >
+> > > > > I was thinking two options (not sure if the second one can be done):
+> > > > >
+> > > > >   1. provide a global sysfs/sysctl that disables strict mode, but this
+> > > > >   then applies to all namespaces
+> > > > >
+> > > > >   2. provide something that allows disabling strict mode by namespace.
+> > > > >   Maybe when it is created there are options, or something that can be
+> > > > >   set later.
+> > > > >
+> > > > > 2 would be ideal, but that might be too much, so 1 might be enough. In
+> > > > > any case, 2 could also be a next step.
+> > > > >
+> > > > > WDYT?
+> > > >
+> > > > It occured to me that the problem we face with the CID space usage is
+> > > > somewhat similar to the UID/GID space usage for user namespaces.
+> > > >
+> > > > In the latter case, userns has exposed /proc/$PID/uid_map & gid_map, to
+> > > > allow IDs in the namespace to be arbitrarily mapped onto IDs in the host.
+> > > >
+> > > > At the risk of being overkill, is it worth trying a similar kind of
+> > > > approach for the vsock CID space ?
+> > > >
+> > > > A simple variant would be a /proc/net/vsock_cid_outside specifying a set
+> > > > of CIDs which are exclusively referencing /dev/vhost-vsock associations
+> > > > created outside the namespace. Anything not listed would be exclusively
+> > > > referencing associations created inside the namespace.
+> > > >
+> > > > A more complex variant would be to allow a full remapping of CIDs as is
+> > > > done with userns, via a /proc/net/vsock_cid_map, which the same three
+> > > > parameters, so that CID=15 association outside the namespace could be
+> > > > remapped to CID=9015 inside the namespace, allow the inside namespace
+> > > > to define its out association for CID=15 without clashing.
+> > > >
+> > > > IOW, mapped CIDs would be exclusively referencing /dev/vhost-vsock
+> > > > associations created outside namespace, while unmapped CIDs would be
+> > > > exclusively referencing /dev/vhost-vsock associations inside the
+> > > > namespace.
+> > > >
+> > > > A likely benefit of relying on a kernel defined mapping/partition of
+> > > > the CID space is that apps like QEMU don't need changing, as there's
+> > > > no need to invent a new /dev/vhost-vsock-netns device node.
+> > > >
+> > > > Both approaches give the desirable security protection whereby the
+> > > > inside namespace can be prevented from accessing certain CIDs that
+> > > > were associated outside the namespace.
+> > > >
+> > > > Some rule would need to be defined for updating the /proc/net/vsock_cid_map
+> > > > file as it is the security control mechanism. If it is write-once then
+> > > > if the container mgmt app initializes it, nothing later could change
+> > > > it.
+> > > >
+> > > > A key question is do we need the "first come, first served" behaviour
+> > > > for CIDs where a CID can be arbitrarily used by outside or inside namespace
+> > > > according to whatever tries to associate a CID first ?
+> > > 
+> > > I think with /proc/net/vsock_cid_outside, instead of disallowing the CID
+> > > from being used, this could be solved by disallowing remapping the CID
+> > > while in use?
+> > > 
+> > > The thing I like about this is that users can check
+> > > /proc/net/vsock_cid_outside to figure out what might be going on,
+> > > instead of trying to check lsof or ps to figure out if the VMM processes
+> > > have used /dev/vhost-vsock vs /dev/vhost-vsock-netns.
+> 
+> Yes, although the user in theory should not care about this information,
+> right?
+> I mean I don't even know if it makes sense to expose the contents of
+> /proc/net/vsock_cid_outside in the namespace.
+> 
+> > > 
+> > > Just to check I am following... I suppose we would have a few typical
+> > > configurations for /proc/net/vsock_cid_outside. Following uid_map file
+> > > format of:
+> > > 	"<local cid start>		<global cid start>		<range size>"
+> 
+> This seems to relate more to /proc/net/vsock_cid_map, for
+> /proc/net/vsock_cid_outside I think 2 parameters are enough
+> (CID, range), right?
+> 
 
-Thanks
-Pratik
+True, yes vsock_cid_map.
 
-On 3/5/25 4:59 PM, Pratik R. Sampat wrote:
-> This patch series extends the sev_init2 and the sev_smoke test to
-> exercise the SEV-SNP VM launch workflow.
->
-> Primarily, it introduces the architectural defines, its support in the
-> SEV library and extends the tests to interact with the SEV-SNP ioctl()
-> wrappers.
->
-> Patch 1  - Do not advertise SNP on initialization failure
-> Patch 2  - SNP test for KVM_SEV_INIT2
-> Patch 3  - Add vmgexit helper
-> Patch 4  - Add SMT control interface helper
-> Patch 5  - Replace assert() with TEST_ASSERT_EQ()
-> Patch 6  - Introduce SEV+ VM type check
-> Patch 7  - SNP iotcl() plumbing for the SEV library
-> Patch 8  - Force set GUEST_MEMFD for SNP
-> Patch 9  - Cleanups of smoke test - Decouple policy from type
-> Patch 10 - SNP smoke test
->
-> The series is based on
->          git.kernel.org/pub/scm/virt/kvm/kvm.git next
->
-> v7..v8:
-> * Dropped exporting the SNP initialized API from ccp to KVM. Instead
->    call SNP_PLATFORM_STATUS within KVM to query the initialization. (Tom)
->    
->    While it may be cheaper to query sev->snp_initialized from ccp, making
->    the SNP platform call within KVM does away with any dependencies.
->
-> v6..v7:
-> https://lore.kernel.org/kvm/20250221210200.244405-7-prsampat@amd.com/
-> Based on comments from Sean -
-> * Replaced FW check with sev->snp_initialized
-> * Dropped the patch which removes SEV+ KVM advertisement if INIT fails.
->    This should be now be resolved by the combination of the patches [1,2]
->    from Ashish.
-> * Change vmgexit to an inline function
-> * Export SMT control parsing interface to kvm_util
->    Note: hyperv_cpuid KST only compile tested
-> * Replace assert() with TEST_ASSERT_EQ() within SEV library
-> * Define KVM_SEV_PAGE_TYPE_INVALID for SEV call of encrypt_region()
-> * Parameterize encrypt_region() to include privatize_region()
-> * Deduplication of sev test calls between SEV,SEV-ES and SNP
-> * Removed FW version tests for SNP
-> * Included testing of SNP_POLICY_DBG
-> * Dropped most tags from patches that have been changed or indirectly
->    affected
->
-> [1] https://lore.kernel.org/all/d6d08c6b-9602-4f3d-92c2-8db6d50a1b92@amd.com
-> [2] https://lore.kernel.org/all/f78ddb64087df27e7bcb1ae0ab53f55aa0804fab.1739226950.git.ashish.kalra@amd.com
->
-> v5..v6:
-> https://lore.kernel.org/kvm/ab433246-e97c-495b-ab67-b0cb1721fb99@amd.com/
-> * Rename is_sev_platform_init to sev_fw_initialized (Nikunj)
-> * Rename KVM CPU feature X86_FEATURE_SNP to X86_FEATURE_SEV_SNP (Nikunj)
-> * Collected Tags from Nikunj, Pankaj, Srikanth.
->
-> v4..v5:
-> https://lore.kernel.org/kvm/8e7d8172-879e-4a28-8438-343b1c386ec9@amd.com/
-> * Introduced a check to disable advertising support for SEV, SEV-ES
->    and SNP when platform initialization fails (Nikunj)
-> * Remove the redundant SNP check within is_sev_vm() (Nikunj)
-> * Cleanup of the encrypt_region flow for better readability (Nikunj)
-> * Refactor paths to use the canonical $(ARCH) to rebase for kvm/next
->
-> v3..v4:
-> https://lore.kernel.org/kvm/20241114234104.128532-1-pratikrajesh.sampat@amd.com/
-> * Remove SNP FW API version check in the test and ensure the KVM
->    capability advertises the presence of the feature. Retain the minimum
->    version definitions to exercise these API versions in the smoke test
-> * Retained only the SNP smoke test and SNP_INIT2 test
-> * The SNP architectural defined merged with SNP_INIT2 test patch
-> * SNP shutdown merged with SNP smoke test patch
-> * Add SEV VM type check to abstract comparisons and reduce clutter
-> * Define a SNP default policy which sets bits based on the presence of
->    SMT
-> * Decouple privatization and encryption for it to be SNP agnostic
-> * Assert for only positive tests using vm_ioctl()
-> * Dropped tested-by tags
->
-> In summary - based on comments from Sean, I have primarily reduced the
-> scope of this patch series to focus on breaking down the SNP smoke test
-> patch (v3 - patch2) to first introduce SEV-SNP support and use this
-> interface to extend the sev_init2 and the sev_smoke test.
->
-> The rest of the v3 patchset that introduces ioctl, pre fault, fallocate
-> and negative tests, will be re-worked and re-introduced subsequently in
-> future patch series post addressing the issues discussed.
->
-> v2..v3:
-> https://lore.kernel.org/kvm/20240905124107.6954-1-pratikrajesh.sampat@amd.com/
-> * Remove the assignments for the prefault and fallocate test type
->    enums.
-> * Fix error message for sev launch measure and finish.
-> * Collect tested-by tags [Peter, Srikanth]
->
-> Pratik R. Sampat (10):
->    KVM: SEV: Disable SEV-SNP support on initialization failure
->    KVM: selftests: SEV-SNP test for KVM_SEV_INIT2
->    KVM: selftests: Add vmgexit helper
->    KVM: selftests: Add SMT control state helper
->    KVM: selftests: Replace assert() with TEST_ASSERT_EQ()
->    KVM: selftests: Introduce SEV VM type check
->    KVM: selftests: Add library support for interacting with SNP
->    KVM: selftests: Force GUEST_MEMFD flag for SNP VM type
->    KVM: selftests: Abstractions for SEV to decouple policy from type
->    KVM: selftests: Add a basic SEV-SNP smoke test
->
->   arch/x86/include/uapi/asm/kvm.h               |  1 +
->   arch/x86/kvm/svm/sev.c                        | 30 +++++-
->   tools/arch/x86/include/uapi/asm/kvm.h         |  1 +
->   .../testing/selftests/kvm/include/kvm_util.h  | 35 +++++++
->   .../selftests/kvm/include/x86/processor.h     |  1 +
->   tools/testing/selftests/kvm/include/x86/sev.h | 42 ++++++++-
->   tools/testing/selftests/kvm/lib/kvm_util.c    |  7 +-
->   .../testing/selftests/kvm/lib/x86/processor.c |  4 +-
->   tools/testing/selftests/kvm/lib/x86/sev.c     | 93 +++++++++++++++++--
->   .../testing/selftests/kvm/x86/hyperv_cpuid.c  | 19 ----
->   .../selftests/kvm/x86/sev_init2_tests.c       | 13 +++
->   .../selftests/kvm/x86/sev_smoke_test.c        | 75 +++++++++------
->   12 files changed, 261 insertions(+), 60 deletions(-)
->
+> > > 
+> > > 	1. Identity mapping, current namespace CID is global CID (default
+> > > 	setting for new namespaces):
+> > > 
+> > > 		# empty file
+> > > 
+> > > 				OR
+> > > 
+> > > 		0    0    4294967295
+> > > 
+> > > 	2. Complete isolation from global space (initialized, but no mappings):
+> > > 
+> > > 		0    0    0
+> > > 
+> > > 	3. Mapping in ranges of global CIDs
+> > > 
+> > > 	For example, global CID space starts at 7000, up to 32-bit max:
+> > > 
+> > > 		7000    0    4294960295
+> > > 	
+> > > 	Or for multiple mappings (0-100 map to 7000-7100, 1000-1100 map to
+> > > 	8000-8100) :
+> > > 
+> > > 		7000    0       100
+> > > 		8000    1000    100
+> > > 
+> > > 
+> > > One thing I don't love is that option 3 seems to not be addressing a
+> > > known use case. It doesn't necessarily hurt to have, but it will add
+> > > complexity to CID handling that might never get used?
+> 
+> Yes, as I also mentioned in the previous email, we could also do a
+> step-by-step thing.
+> 
+> IMHO we can define /proc/net/vsock_cid_map (with the structure you just
+> defined), but for now only support 1-1 mapping (with the ranges of
+> course, I mean the first two parameters should always be the same) and
+> then add option 3 in the future.
+> 
+
+makes sense, sgtm!
+
+> > > 
+> > > Since options 1/2 could also be represented by a boolean (yes/no
+> > > "current ns shares CID with global"), I wonder if we could either A)
+> > > only support the first two options at first, or B) add just
+> > > /proc/net/vsock_ns_mode at first, which supports only "global" and
+> > > "local", and later add a "mapped" mode plus /proc/net/vsock_cid_outside
+> > > or the full mapping if the need arises?
+> 
+> I think option A is the same as I meant above :-)
+> 
+
+Indeed.
+
+> > > 
+> > > This could also be how we support Option 2 from Stefano's last email of
+> > > supporting per-namespace opt-in/opt-out.
+> 
+> Hmm, how can we do it by namespace? Isn't that global?
+> 
+
+I think the file path is global but the contents are tied per-namespace,
+according to the namespace of the process that called open() on it.
+This way the container mgr can write-once lock it, and the namespace
+processes can read it?
+
+> > > 
+> > > Any thoughts on this?
+> > > 
+> > 
+> > Stefano,
+> > 
+> > Would only supporting 1/2 still support the Kata use case?
+> 
+> I think so, actually I was thinking something similar in the message I just
+> sent.
+> 
+> By default (if the file is empty), nothing should change, so that's fine
+> IMO. As Paolo suggested, we absolutely have to have tests to verify these
+> things.
+> 
+
+Sounds like a plan! I'm working on the new vsock vmtest now and will
+include the new tests in the next rev.
+
+Also, I'm thinking we should protect vsock_cid_map behind a capability,
+but I'm not sure which one is correct (CAP_NET_ADMIN?). WDYT?
+
+Thanks!
 
