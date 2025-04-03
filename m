@@ -1,87 +1,87 @@
-Return-Path: <kvm+bounces-42599-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42600-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FB06A7AFFC
-	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 23:05:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 027B6A7AFF6
+	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 23:05:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EB9C17EFE8
-	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 21:00:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4AFD118949BE
+	for <lists+kvm@lfdr.de>; Thu,  3 Apr 2025 21:00:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 848A71C84AB;
-	Thu,  3 Apr 2025 20:00:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 464B025484C;
+	Thu,  3 Apr 2025 20:00:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BFTpMUnR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fupkTVY+"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2DB91D7E26
-	for <kvm@vger.kernel.org>; Thu,  3 Apr 2025 20:00:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B92632550D5
+	for <kvm@vger.kernel.org>; Thu,  3 Apr 2025 20:00:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743710442; cv=none; b=kC3BjA57PKw6QlVwh0xGSH2wJwO8Gth7UDTfBbJnEuH68safgFxJXJoV3ylsHenwNiWxP8jYRQPDYZGLzKVCx8Kho3LcBFyVcThMOMrL78/skui8IU4HA6msyC1etG7xeBYriGpWXYIh9HAY+jKmEcIYCaFeVUYGTfEORRu0Mj0=
+	t=1743710454; cv=none; b=bxSa10rccS84daJdHXRt33zfyofsKnQEKl4QuCgL/lF2OKXJtf+DMPgFHERls4wAunts5fzYc6eOih0C4X0/zIQV/QLGwCQSw1pR4lyFtGh9LdcVe15RAW2BUzXUgtSk5dtSqeyjKQuoei3AjIuDJ3030onvbvEvKkVjrhHvPR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743710442; c=relaxed/simple;
-	bh=/myFRG/nsVfvxlwyn4haCTUVlcewocEJodVCFIfmHas=;
+	s=arc-20240116; t=1743710454; c=relaxed/simple;
+	bh=ryx0wKASwy0uhjPxQ442PdmmlD6H1YH4TXONa9Q+FyE=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=nVu1ibYW28m0i6rVwlk4iAIpbAXhoGOGxaGPAbgjT038wGdXAMu9SGAkTgY/Ek9qC01V4JcgzBro/TD0MtNUL3xjEE/MNJX1oZuLpzIgc5L9TBi0oq15RGGb6VmJyzrJ+z0uR+b3bVMxYdHvGQQSZKAMNpg/OPNpRC6IGC0SR/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BFTpMUnR; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:MIME-Version; b=qUzjjb8aNRH5EII9LLe9MxzCy8iesplXHvM8tN6qt6+BwvC4ZfI85XAjKm6aG/BaC1n/w2va0XwDeakH+Q29OC0rSSWleDcT6yQe+e/KR1ljucRJjKtNiqV36zxYh2e7rP9X3C83ESLFUXi3BNdYkYql031HBvZPotzWPf78qAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fupkTVY+; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743710439;
+	s=mimecast20190719; t=1743710452;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=D3jepgq6mpSu+t7xHDXlZ7+DEihAAmM7cFMk5sO7ptU=;
-	b=BFTpMUnRg4J8mXgrIFojwbz3Yy5stjgMIZRmXn2oIqKqRAUOxvUfF63oJe6wDEeJNFX5Jd
-	77V7fWeZZXIuT8LKAfs1d3sBN2ufbP4Fv0qljkhyjY7lfipTQMrcANwPm4AVTx5hCVXmXj
-	Az62YxD+OKnNQZvrSb3jFUa+mON+PWo=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=GLNI9VGp1Wm5rLYd57L0Xp4ipMewoWDjGcDvpy893AU=;
+	b=fupkTVY+XtVNmeq9hmrxSK583UQKbjMfXged14o2Nx4aFzrIhuO0T9eG28IAEWWWVqByV2
+	KSFT1SVVwQXes1xYuWASNhD8+MKZyAHyM3RjgHWPELxo9YiEXG7PECJ8uMCfs2iCIaR83a
+	6aQUi6rzTFgauoIHdUJCxXeWiGaKznA=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-33-PqzxomUsPHuBwWXP9B8bKw-1; Thu, 03 Apr 2025 16:00:37 -0400
-X-MC-Unique: PqzxomUsPHuBwWXP9B8bKw-1
-X-Mimecast-MFC-AGG-ID: PqzxomUsPHuBwWXP9B8bKw_1743710437
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6e8feea216aso45920026d6.0
-        for <kvm@vger.kernel.org>; Thu, 03 Apr 2025 13:00:37 -0700 (PDT)
+ us-mta-607-i9oIFfYnPQKA6RWDkl8Sbg-1; Thu, 03 Apr 2025 16:00:50 -0400
+X-MC-Unique: i9oIFfYnPQKA6RWDkl8Sbg-1
+X-Mimecast-MFC-AGG-ID: i9oIFfYnPQKA6RWDkl8Sbg_1743710450
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6e8ffb630ffso19992976d6.1
+        for <kvm@vger.kernel.org>; Thu, 03 Apr 2025 13:00:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743710437; x=1744315237;
+        d=1e100.net; s=20230601; t=1743710450; x=1744315250;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=D3jepgq6mpSu+t7xHDXlZ7+DEihAAmM7cFMk5sO7ptU=;
-        b=AsaBHk4uyLTUstuNaEqRFsvpBUzUcSpI+sKRfOO6wX8JadQZLwpDPbN/HizHkKgqa8
-         TnjlD9QKsd+WBmh4BlptVufRSuElTz6biNqxmoYBpEJOwZ62NXhuSFPDlbnc23XOjM9f
-         VOTdA9qaI+CP+mBDRScvDNbsR/DAjAGUsgYO65ArEwgU84Qexi0RBJDChdYPcD9rjJii
-         cMwmzhRy6lCzEi/uG1epjG+lx9BYinaJMuNnPM3HjAWFdoU4LaREixaNCH+1jpvwS1zX
-         sVtk1OSMkV5urThlH8p+Md9uIHInWR6cD0R4t8XtPaxArXhveKp9jdKlxRgXnNpPjVII
-         h+AA==
-X-Forwarded-Encrypted: i=1; AJvYcCXMJ9ZaKY+ZpUAAIVLFSy57bf++/PFmhrvSkdiWJeHi68HU84XdMSZ3026ymlHd+XU8u+Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxj/AQYw1NfmWtwjVGJBm4Yy0/gVxzlwVoSam6FHO74coaz0Sue
-	IkDf7WGGHSmzlGIqxu9HF/M2hzjV8GBcFgGB3nCxB3UP62Esemuxouq9jyORS2clFJGDOMKf+Dg
-	nEUv7lYjBeE4v5+TFT4peSJz8l7kMijzXTFRSCJPC6iNKObZoCLMDVvRT4A==
-X-Gm-Gg: ASbGncs5rIrKEKNX1RWMHFpBxeuaT6GVUUMPlPLy50rsQTIwISwqkHJD9FRMScx9b/J
-	O66201JFL+KCCJfqSFKLOxwbF6H14Ym5chjmMdqnecj+kd2W15SaKyO5Rn2RY2DT4P+W1FhDRZ7
-	OqRksR64rRihHq9/NXv66EqrPGL2rhbSMEB4cofo3yLvCs3d+58wsqKh4/mer3RcrsUOMa4L4AN
-	7HXcUrmSt04HT4OrKuIiY0tMvtgA4EFMfXWrQizt0vjD+uDNSe1QAquTD7+K78FEUN/Nz0wZKAv
-	DOssCiPw2nYSnxA=
-X-Received: by 2002:ad4:5946:0:b0:6e4:3478:8ea7 with SMTP id 6a1803df08f44-6efec7c5883mr9360986d6.4.1743710436955;
-        Thu, 03 Apr 2025 13:00:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHhxVlTI5ZtwILKtPmNpkeVHykTY5ZSMDq9uRW77B59bcLV+ibcnF+bnMcoEIze83EEiT0Hmg==
-X-Received: by 2002:ad4:5946:0:b0:6e4:3478:8ea7 with SMTP id 6a1803df08f44-6efec7c5883mr9360516d6.4.1743710436562;
-        Thu, 03 Apr 2025 13:00:36 -0700 (PDT)
+        bh=GLNI9VGp1Wm5rLYd57L0Xp4ipMewoWDjGcDvpy893AU=;
+        b=cSF1Ne2Lk12fMEiZm8ah6xC4uUTQrBrJYLRne8JZGHKLK4GQQvKwaJqjT04lzvN9Et
+         ngeNjG9jPtEv9SjHonF1zjF9lNgG7twsnh1t7ClYP3IkERIin2H10IfMubBTt7mYPMyD
+         S24whJY6Wr7aKW9sZQbpgIo7TBwZV2PFD0WEalzhLb4Fg+ShQu9LdnCPrdeHbFJ/tGRi
+         GJwMDRooXkclq+gBvfQTo+RS1ptpSW7UvAt09j6ZaHChXS6ZnIYE7nnehz3Lx6Xl34Gx
+         Z9Sp30LEsYLnnUwa9jJcevwhPqJ593PfjlXL2PCEJKZ5Jt5o3jq3tX98qyoxg9gVmWP8
+         4XYg==
+X-Forwarded-Encrypted: i=1; AJvYcCXWP+Lumo6YUIKSCfKAkk32xDmK9eyztH1V+f1nwRGee58WIhbGAD7tP96jaVrk12bjWMg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyk6kiXjqWAWkUcS6oOSYTw13rXXqeRGo0OUNhs/mOcXywbJunT
+	TZ4CRIalG2sYFP/ARuwRPP6X1YsVMpnfNFz6tULER+F3A+DnEyUFICj0rWSFP5pNUxJly8VdanP
+	mms56FmmKraB4auP+42i7YbjQjtbPDOd5QHZdSTwhxGHVFdFTLD6ESjZyXw==
+X-Gm-Gg: ASbGnctBHb/+3jyy5ZAow4zF4xUqa5jYkaFP2CHZyPJWajtfIxhM62iMCZHcLVm+trH
+	gnjX3VQK2xllGifgFRpgh3vVquXHCgtU3ADwziCXYw3BhPxSsDv+gwINUfk0LJ+3ZFjRU3nPJIV
+	dUwiD5FMn3sYHkA2sV3Lwg0NK9IpXKl7fhNBe91LLWyDzpPq6Keg4H5Mjd22Bw0Ktda2mxgQSj/
+	7+JOXOnYBbYunNely2MgYryuzuQ4CZ2BWqxUFLJHC5mzv+ZT+SDtn1fUPIeBbvVSMb52lfYy1vM
+	0UsnLuZuQpQlfHI=
+X-Received: by 2002:a05:6214:248f:b0:6ed:df6:cdcd with SMTP id 6a1803df08f44-6f00df1f687mr7864256d6.21.1743710450193;
+        Thu, 03 Apr 2025 13:00:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEH3RbFcRIn58HCTEBNM31yCVKIBXI1JJ0q3Y51iA0rFaC8CQitL64IgDIZqaz1u52zOEzV7w==
+X-Received: by 2002:a05:6214:248f:b0:6ed:df6:cdcd with SMTP id 6a1803df08f44-6f00df1f687mr7863656d6.21.1743710449849;
+        Thu, 03 Apr 2025 13:00:49 -0700 (PDT)
 Received: from starship ([2607:fea8:fc01:8d8d:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ef0f150213sm11211296d6.116.2025.04.03.13.00.35
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ef0f00ec2esm11313456d6.47.2025.04.03.13.00.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Apr 2025 13:00:36 -0700 (PDT)
-Message-ID: <2b040c2922dae99b42db7cc0bf5cc070607c3464.camel@redhat.com>
-Subject: Re: [RFC PATCH 03/24] KVM: SVM: Add helpers to set/clear ASID flush
- in VMCB
+        Thu, 03 Apr 2025 13:00:49 -0700 (PDT)
+Message-ID: <9db2d6e6124227fcda51bce5ac3169c3450685fb.camel@redhat.com>
+Subject: Re: [RFC PATCH 04/24] KVM: SVM: Flush everything if FLUSHBYASID is
+ not available
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Yosry Ahmed <yosry.ahmed@linux.dev>, Sean Christopherson
  <seanjc@google.com>
@@ -89,10 +89,10 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>,
  Vitaly Kuznetsov <vkuznets@redhat.com>, Rik van Riel <riel@surriel.com>,
  Tom Lendacky <thomas.lendacky@amd.com>,  x86@kernel.org,
  kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Thu, 03 Apr 2025 16:00:35 -0400
-In-Reply-To: <20250326193619.3714986-4-yosry.ahmed@linux.dev>
+Date: Thu, 03 Apr 2025 16:00:48 -0400
+In-Reply-To: <20250326193619.3714986-5-yosry.ahmed@linux.dev>
 References: <20250326193619.3714986-1-yosry.ahmed@linux.dev>
-	 <20250326193619.3714986-4-yosry.ahmed@linux.dev>
+	 <20250326193619.3714986-5-yosry.ahmed@linux.dev>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
@@ -104,117 +104,55 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
 On Wed, 2025-03-26 at 19:35 +0000, Yosry Ahmed wrote:
-> Incoming changes will add more code paths that set tlb_ctl to
-> TLB_CONTROL_FLUSH_ASID, and will eliminate the use of
-> TLB_CONTROL_FLUSH_ALL_ASID except as fallback when FLUSHBYASID is not
-> available. Introduce set/clear helpers to set tlb_ctl to
-> TLB_CONTROL_FLUSH_ASID or TLB_CONTROL_DO_NOTHING.
+> Currently, if FLUSHBYASID is not available when performing a TLB flush,
+> the fallback is decrementing the ASID generation to trigger allocating a
+> new ASID. In preparation for using a static ASID per VM, just fallback
+> to flushing everything if FLUSHBYASID is not available. This is probably
+> worse from a performance perspective, but FLUSHBYASID has been around
+> for ~15 years and it's not worth carrying the complexity.
 > 
-> Opportunistically move the TLB_CONTROL_* definitions to
-> arch/x86/kvm/svm/svm.h as they are not used outside of arch/x86/kvm/svm/.
-
-Same microscopic nitpick as in previous patch :) 
+> The fallback logic is moved within vmcb_set_flush_asid(), as more
+> callers will be added and will need the fallback as well.
 > 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
 > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 > ---
->  arch/x86/include/asm/svm.h |  5 -----
->  arch/x86/kvm/svm/nested.c  |  2 +-
->  arch/x86/kvm/svm/sev.c     |  2 +-
->  arch/x86/kvm/svm/svm.c     |  4 ++--
->  arch/x86/kvm/svm/svm.h     | 15 +++++++++++++++
->  5 files changed, 19 insertions(+), 9 deletions(-)
+>  arch/x86/kvm/svm/svm.c | 5 +----
+>  arch/x86/kvm/svm/svm.h | 5 ++++-
+>  2 files changed, 5 insertions(+), 5 deletions(-)
 > 
-> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-> index 9b7fa99ae9513..a97da63562eb3 100644
-> --- a/arch/x86/include/asm/svm.h
-> +++ b/arch/x86/include/asm/svm.h
-> @@ -171,11 +171,6 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
->  };
->  
->  
-> -#define TLB_CONTROL_DO_NOTHING 0
-> -#define TLB_CONTROL_FLUSH_ALL_ASID 1
-> -#define TLB_CONTROL_FLUSH_ASID 3
-> -#define TLB_CONTROL_FLUSH_ASID_LOCAL 7
-> -
->  #define V_TPR_MASK 0x0f
->  
->  #define V_IRQ_SHIFT 8
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index 834b67672d50f..11b02a0340d9e 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -681,7 +681,7 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
->  	/* Done at vmrun: asid.  */
->  
->  	/* Also overwritten later if necessary.  */
-> -	vmcb02->control.tlb_ctl = TLB_CONTROL_DO_NOTHING;
-> +	vmcb_clr_flush_asid(vmcb02);
->  
->  	/* nested_cr3.  */
->  	if (nested_npt_enabled(svm))
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 0bc708ee27887..d613f81addf1c 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -3479,7 +3479,7 @@ int pre_sev_run(struct vcpu_svm *svm, int cpu)
->  		return 0;
->  
->  	sd->sev_vmcbs[asid] = svm->vmcb;
-> -	svm->vmcb->control.tlb_ctl = TLB_CONTROL_FLUSH_ASID;
-> +	vmcb_set_flush_asid(svm->vmcb);
->  	vmcb_mark_dirty(svm->vmcb, VMCB_ASID);
->  	return 0;
->  }
 > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 28a6d2c0f250f..0e302ae9a8435 100644
+> index 0e302ae9a8435..5f71b125010d9 100644
 > --- a/arch/x86/kvm/svm/svm.c
 > +++ b/arch/x86/kvm/svm/svm.c
-> @@ -4006,7 +4006,7 @@ static void svm_flush_tlb_asid(struct kvm_vcpu *vcpu)
+> @@ -4005,10 +4005,7 @@ static void svm_flush_tlb_asid(struct kvm_vcpu *vcpu)
+>  	 * unconditionally does a TLB flush on both nested VM-Enter and nested
 >  	 * VM-Exit (via kvm_mmu_reset_context()).
 >  	 */
->  	if (static_cpu_has(X86_FEATURE_FLUSHBYASID))
-> -		svm->vmcb->control.tlb_ctl = TLB_CONTROL_FLUSH_ASID;
-> +		vmcb_set_flush_asid(svm->vmcb);
->  	else
->  		svm->current_vmcb->asid_generation--;
+> -	if (static_cpu_has(X86_FEATURE_FLUSHBYASID))
+> -		vmcb_set_flush_asid(svm->vmcb);
+> -	else
+> -		svm->current_vmcb->asid_generation--;
+> +	vmcb_set_flush_asid(svm->vmcb);
 >  }
-> @@ -4373,7 +4373,7 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu,
->  		svm->nested.nested_run_pending = 0;
->  	}
 >  
-> -	svm->vmcb->control.tlb_ctl = TLB_CONTROL_DO_NOTHING;
-> +	vmcb_clr_flush_asid(svm->vmcb);
->  	vmcb_mark_all_clean(svm->vmcb);
->  
->  	/* if exit due to PF check for async PF */
+>  static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
 > diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index d4490eaed55dd..d2c49cbfbf1ca 100644
+> index d2c49cbfbf1ca..843a29a6d150e 100644
 > --- a/arch/x86/kvm/svm/svm.h
 > +++ b/arch/x86/kvm/svm/svm.h
-> @@ -409,6 +409,21 @@ static inline bool vmcb_is_dirty(struct vmcb *vmcb, int bit)
->          return !test_bit(bit, (unsigned long *)&vmcb->control.clean);
+> @@ -416,7 +416,10 @@ static inline bool vmcb_is_dirty(struct vmcb *vmcb, int bit)
+>  
+>  static inline void vmcb_set_flush_asid(struct vmcb *vmcb)
+>  {
+> -	vmcb->control.tlb_ctl = TLB_CONTROL_FLUSH_ASID;
+> +	if (static_cpu_has(X86_FEATURE_FLUSHBYASID))
+> +		vmcb->control.tlb_ctl = TLB_CONTROL_FLUSH_ASID;
+> +	else
+> +		vmcb->control.tlb_ctl = TLB_CONTROL_FLUSH_ALL_ASID;
 >  }
 >  
-> +#define TLB_CONTROL_DO_NOTHING 0
-> +#define TLB_CONTROL_FLUSH_ALL_ASID 1
-> +#define TLB_CONTROL_FLUSH_ASID 3
-> +#define TLB_CONTROL_FLUSH_ASID_LOCAL 7
-> +
-> +static inline void vmcb_set_flush_asid(struct vmcb *vmcb)
-> +{
-> +	vmcb->control.tlb_ctl = TLB_CONTROL_FLUSH_ASID;
-> +}
-> +
-> +static inline void vmcb_clr_flush_asid(struct vmcb *vmcb)
-> +{
-> +	vmcb->control.tlb_ctl = TLB_CONTROL_DO_NOTHING;
-> +}
-> +
->  static __always_inline struct vcpu_svm *to_svm(struct kvm_vcpu *vcpu)
->  {
->  	return container_of(vcpu, struct vcpu_svm, vcpu);
-
+>  static inline void vmcb_clr_flush_asid(struct vmcb *vmcb)
 
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
