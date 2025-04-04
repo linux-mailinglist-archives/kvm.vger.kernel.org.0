@@ -1,90 +1,90 @@
-Return-Path: <kvm+bounces-42636-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42637-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34CF9A7BACA
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 12:30:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 329DAA7BACC
+	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 12:30:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E120B3B922D
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 10:29:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67DC37A9AE6
+	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 10:29:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CB7A1BEF87;
-	Fri,  4 Apr 2025 10:29:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E7441DE2CC;
+	Fri,  4 Apr 2025 10:29:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VvpTsL7X"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fC/G40EX"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F311D5CDD
-	for <kvm@vger.kernel.org>; Fri,  4 Apr 2025 10:29:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EC4D1D8DE0
+	for <kvm@vger.kernel.org>; Fri,  4 Apr 2025 10:29:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743762573; cv=none; b=Z6shsLp+JL1cxpH/EWA3NykqnFTyAwQXhQwruPsACLx6rx8KAmDw4jHnpFWrTRBUx9hvs4Q1GCqh+4KW69X14bhSiSHEF0W6K8qHCuJ/bBlEggH6C6W7frWfqDhHduxHUZMpASBAgzBXyqzCj6kxbcYrwar7POtsH9valyb1VyI=
+	t=1743762574; cv=none; b=f3VXu+pvMEHDAyC3fH2oqEkv+kXgfEqA72EsKjmRvbMG27GxQpUUgbDXZOPFvc8HufyPgq0X8buII3vbIp3rnbelB+YSXQDHRUKnrTFr83rY56GXodU98RbnBt9lST13vqWQA6AwBvnXfF6hP5s9jPnP5p05mawynCg3UM3d2bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743762573; c=relaxed/simple;
-	bh=pIzQK1XQVUOehm2a0IDXKr9Yx+FlZ4I6aBSO5ZnRFr4=;
+	s=arc-20240116; t=1743762574; c=relaxed/simple;
+	bh=ZXP9PdtNz5G4gmYwe9qut0Sxd9Ty7phi4XqNd27CsSM=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tmAG5OR1PwceJ/Odx+9FJYZ93EJLBja/2mh5gMPMSXuyPNdYuf2800aEfyDeTUOOxhZKI0TqJrIQ4ekh75Y8gtOFjlMTnIqRo0qRar3vwYHXRizzvWkf0aQPApThXkH8cXSBNsDHAHtJxDriovMZ0YfVRUnPZcC6lsDW3Fpjoaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VvpTsL7X; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=TXv7WyneGIyNwAMIs6Y5M4x+W4npdgG63L5sx0xCRIXD1CFiy7pFWIITineZCX/Z4mNMC3WiyLQO8bQwCaVLVWD0xTotEKkbDVf4QlN2AlAQZjG5YzjD3tBxuZKNIs2tPD1AyQUloF5v2XWt0r4HbqcQmA21w9K518lWau0/1vU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fC/G40EX; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743762571;
+	s=mimecast20190719; t=1743762572;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=mhILDOeGcZxr2T6k437hnDwGzh6WW1hiZTYtqJGkNJ8=;
-	b=VvpTsL7X6POBppb8dd3pnEdSuxZJ1A5Pe6swSCmG3aL+glpQPWJ1C6Y7/p/OKK176D5Tc6
-	T1M0+yELpwjZCiEo2q+ITECIATTy61Q94eRq0DYgEtALjwZaxulebT6+/ZTtY+RrGP6Y1Z
-	TZ+eU5N3r6Dc+loR/vl53U3q+RbPZ3o=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Fh7eVIHVK7DZbml0KKr5DVpGA1dcsH/iEq7JogkgDmY=;
+	b=fC/G40EXrH3amn5X0kRTDKnfgse98NnxzYRpAVu7V2yUa2v4MIBxzPVYno8WohkmAX7xoA
+	yp97eUdDjDCCUJsAsA4nHAkH1mb7kqCMirkcdqxB+xoX+KPPxo+GSYmZOnhiI3R9clp8VK
+	ZW6aHTr25NqfvCNygswfdEVNiF+76HI=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-410-A1RDUENJMESqUwWq2eJIPg-1; Fri, 04 Apr 2025 06:29:29 -0400
-X-MC-Unique: A1RDUENJMESqUwWq2eJIPg-1
-X-Mimecast-MFC-AGG-ID: A1RDUENJMESqUwWq2eJIPg_1743762568
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5e5c808e777so1769298a12.0
-        for <kvm@vger.kernel.org>; Fri, 04 Apr 2025 03:29:28 -0700 (PDT)
+ us-mta-466-XdKHzxY5P6-tVBRzbfOOxg-1; Fri, 04 Apr 2025 06:29:30 -0400
+X-MC-Unique: XdKHzxY5P6-tVBRzbfOOxg-1
+X-Mimecast-MFC-AGG-ID: XdKHzxY5P6-tVBRzbfOOxg_1743762570
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5e6c14c0a95so1616118a12.0
+        for <kvm@vger.kernel.org>; Fri, 04 Apr 2025 03:29:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743762567; x=1744367367;
+        d=1e100.net; s=20230601; t=1743762569; x=1744367369;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mhILDOeGcZxr2T6k437hnDwGzh6WW1hiZTYtqJGkNJ8=;
-        b=HRt19rD42gJPUaDBNC17K30yn9J4B1qNvp8bV5ZE/xIVGgszOSBYLzHbPRoxIKuBAJ
-         WQIy3IAfXmc10wN8pPqnySA10/iTHhgzlh6MUIxb9g3KPTOCcNgJFUtCxNp0VtfmNtJ7
-         0XSSqDyiEiX3VDc4voZzQnSN7y7Yr9fyXUirYgvvPJjzoeFY49RYVG7yo1wkn7chqYg3
-         lg2WialoSTqCCBXfV9XDggurX8wz5TpW0bilHDhDuDZuttdiO36GFAdprla1dtZSU5S0
-         zbM91JATI7ENtZML3D3PxpVL5pPsNFMhj+vWUarjmw4io9iDydH+lyYookOdl0TqZE16
-         rG9w==
-X-Forwarded-Encrypted: i=1; AJvYcCURkobeacF9nVt0g6ntNTmVoNIUsNClT18Re9BnGVEDbAQyRuxQfxImd389mk4ZPdPtzuQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUNsp7iipoKssNnAGAC2mEO2r669HB7igq8clS6vjs+Xce37OE
-	Th9qBzgJSF/AdbHnp8C++skmv+UzMjED2IB3Lt8JKNkyWn/5V3VFPWd+96JjOApmEmHiMAONoJY
-	U62xHwGW7yR9AFdb4C0P12+EHmNPkSCVIA9nTNGIpE1S0DQnZkoghNgc5Kw==
-X-Gm-Gg: ASbGncvPYGzWMEcCL0ROr5GfGoYDa/j+I9+yhkQqpCMWTbv8qybW3oikx4PfrvZ6fSR
-	5MCuu+FHYEM4p3z8aRaQ5bG1F4ZlfBghq0nxRXxfZkIM31LaugnJvdB9ZQ4+ajS5EX9lwxkIK5c
-	zPGhFUJNDUk3SJat+Pl/Yh1/KDennMQD2ZVN2/B9Ywx6kigDah82mfkLk0+vgyARx4Yx4ZTRAx4
-	eapi93UVbZwr7jxhm/kFwzO+fWiwNrJ6qz45mqEhUGd3+l0yNwS4XyhWmGa9zE97G4maddgjqnU
-	dySHT81rBZqzYDZveZrU
-X-Received: by 2002:a05:6402:3593:b0:5e4:c532:d69d with SMTP id 4fb4d7f45d1cf-5f0b309b682mr2148143a12.0.1743762567336;
-        Fri, 04 Apr 2025 03:29:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEmoV1MYcdwLtpfSGoF+5ukGiKvJOsY+H/bN0znAVOJPtTTDi9a2JwSVODl/Bxo9X77PYGQTQ==
-X-Received: by 2002:a05:6402:3593:b0:5e4:c532:d69d with SMTP id 4fb4d7f45d1cf-5f0b309b682mr2148129a12.0.1743762566946;
-        Fri, 04 Apr 2025 03:29:26 -0700 (PDT)
+        bh=Fh7eVIHVK7DZbml0KKr5DVpGA1dcsH/iEq7JogkgDmY=;
+        b=FnoDlN9UdCE04XEjMGcD+e/t9+WTTA2B7us9UmLdC82ToOYE+ETLoc5zfiY/UaMJeL
+         L6CSRC+xL6zvQ1gvmoUkjmrx8Dm7DeU7/8Lla8lQbyhdv1SRUeTfBzTl5DEJah96bh7G
+         0CJSqnx1HCi56bVNYaiLJeYeYEALa8PJ9rqCaBBrUvJXas3ELGOvLrun7rlXV9Fjqz8Y
+         24DyIIR2bYv/t+CgWlCJ3FQnwmRPviaRVtz3G7rczRADQteuQx2v4KsGHiqQNKXtFCJ6
+         Lfiurzqt731VQXWYa+BJjTlUJcJNu4/FZWu6ccilXlUwxQWl4zJmSaLHe7GpiKmWfDaU
+         GYaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWn7hsn6gkVhsShnq0wtUHc8fxuyfuapS8v2lkCSLVyIPhZY1QD3hwYT6dEb4I+QBrLjAE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFc8dr8MAeZXamFPHIyuOdtTHa92OoK9S3sjNtcbXXEI/tDgc6
+	oe49cHHxaER2iQCOgGYvVHLYnExrnUcuK/RGACS72pj96OBoo4tYHFLlkj6UFL3HnUBkp3lozBt
+	qy1b8sZTqmMnU9q+OKJ/dlXR2rkuZT0luTEh2oDUx0EwIObFkbWeStFK8oQ==
+X-Gm-Gg: ASbGncsvWfDHH4/6qA61/91Wo+ZP1TzIxTKIxEEkTLAAuoGWoOkrdMwX1fgdth6GE/Z
+	zjEprJQEKQbJKZZJxLBPevWZiHvxpYUc1e7O4QFMhSBcsOkP5bAZ6zjSNEKWpKG0A1yDmbdPEfg
+	TqrxA2JqhVUKizYQgSGreyEVGDElsZgTpSmNGWHnv172dusmzYT702HYM1eORpQBwIBKKvXokiz
+	VOD8K2gn+EpiZmAIVhxExNVKYhPQSRS4tD8FVsn5mmVXFSKX4fONcd4Gba8VnTDR05v3mRbaF0W
+	N2OanCuW+x+UDGq9Z7X/
+X-Received: by 2002:a05:6402:51d2:b0:5e4:92ca:34d0 with SMTP id 4fb4d7f45d1cf-5f0b3bce08cmr1901631a12.20.1743762569370;
+        Fri, 04 Apr 2025 03:29:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF8YM5bc59qwjlQ36hgK1HFf0sMPpa9wPrpfputnw4Z5kCzZUI7+et+MKVBd0PZ6GNYMaCHiQ==
+X-Received: by 2002:a05:6402:51d2:b0:5e4:92ca:34d0 with SMTP id 4fb4d7f45d1cf-5f0b3bce08cmr1901617a12.20.1743762569036;
+        Fri, 04 Apr 2025 03:29:29 -0700 (PDT)
 Received: from [192.168.122.1] ([151.49.230.224])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5f087ed1c68sm2047151a12.17.2025.04.04.03.29.25
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5f088084f17sm2174115a12.61.2025.04.04.03.29.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Apr 2025 03:29:26 -0700 (PDT)
+        Fri, 04 Apr 2025 03:29:28 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
-Subject: [PATCH 2/5] Documentation: kvm: drop "Capability" heading from capabilities
-Date: Fri,  4 Apr 2025 12:29:16 +0200
-Message-ID: <20250404102919.171952-3-pbonzini@redhat.com>
+Subject: [PATCH 3/5] Documentation: kvm: fix some definition lists
+Date: Fri,  4 Apr 2025 12:29:17 +0200
+Message-ID: <20250404102919.171952-4-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250404102919.171952-1-pbonzini@redhat.com>
 References: <20250404102919.171952-1-pbonzini@redhat.com>
@@ -96,105 +96,50 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-It is redundant, and sometimes wrong.
+Ensure that they have a ":" in front of the defined item.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Documentation/virt/kvm/api.rst | 11 -----------
- 1 file changed, 11 deletions(-)
+ Documentation/virt/kvm/api.rst | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 49a604154564..efca6cc32dd5 100644
+index efca6cc32dd5..e5e7fd42b47c 100644
 --- a/Documentation/virt/kvm/api.rst
 +++ b/Documentation/virt/kvm/api.rst
-@@ -7977,7 +7977,6 @@ See Documentation/arch/x86/sgx.rst for more details.
- 7.26 KVM_CAP_PPC_RPT_INVALIDATE
- -------------------------------
- 
--:Capability: KVM_CAP_PPC_RPT_INVALIDATE
- :Architectures: ppc
- :Type: vm
- 
-@@ -8052,7 +8051,6 @@ upgrading the VMM process without interrupting the guest.
- 7.30 KVM_CAP_PPC_AIL_MODE_3
- -------------------------------
- 
--:Capability: KVM_CAP_PPC_AIL_MODE_3
- :Architectures: ppc
- :Type: vm
- 
-@@ -8066,7 +8064,6 @@ handling interrupts and system calls.
- 7.31 KVM_CAP_DISABLE_QUIRKS2
- ----------------------------
- 
--:Capability: KVM_CAP_DISABLE_QUIRKS2
- :Parameters: args[0] - set of KVM quirks to disable
- :Architectures: x86
- :Type: vm
-@@ -8910,7 +8907,6 @@ leaf.
- 8.34 KVM_CAP_EXIT_HYPERCALL
- ---------------------------
- 
--:Capability: KVM_CAP_EXIT_HYPERCALL
- :Architectures: x86
- :Type: vm
- 
-@@ -8929,7 +8925,6 @@ ENOSYS for the others.
- 8.35 KVM_CAP_PMU_CAPABILITY
- ---------------------------
- 
--:Capability: KVM_CAP_PMU_CAPABILITY
- :Architectures: x86
- :Type: vm
- :Parameters: arg[0] is bitmask of PMU virtualization capabilities.
-@@ -8951,7 +8946,6 @@ should adjust CPUID leaf 0xA to reflect that the PMU is disabled.
- 8.36 KVM_CAP_ARM_SYSTEM_SUSPEND
- -------------------------------
- 
--:Capability: KVM_CAP_ARM_SYSTEM_SUSPEND
- :Architectures: arm64
- :Type: vm
- 
-@@ -8961,7 +8955,6 @@ type KVM_SYSTEM_EVENT_SUSPEND to process the guest suspend request.
- 8.37 KVM_CAP_S390_PROTECTED_DUMP
- --------------------------------
- 
--:Capability: KVM_CAP_S390_PROTECTED_DUMP
- :Architectures: s390
- :Type: vm
- 
-@@ -8974,7 +8967,6 @@ available and supports the `KVM_PV_DUMP_CPU` subcommand.
- 8.38 KVM_CAP_VM_DISABLE_NX_HUGE_PAGES
+@@ -7938,10 +7938,10 @@ by POWER10 processor.
+ 7.24 KVM_CAP_VM_COPY_ENC_CONTEXT_FROM
  -------------------------------------
  
--:Capability: KVM_CAP_VM_DISABLE_NX_HUGE_PAGES
- :Architectures: x86
- :Type: vm
- :Parameters: arg[0] must be 0.
-@@ -8991,7 +8983,6 @@ This capability may only be set before any vCPUs are created.
- 8.39 KVM_CAP_S390_CPU_TOPOLOGY
- ------------------------------
+-Architectures: x86 SEV enabled
+-Type: vm
+-Parameters: args[0] is the fd of the source vm
+-Returns: 0 on success; ENOTTY on error
++:Architectures: x86 SEV enabled
++:Type: vm
++:Parameters: args[0] is the fd of the source vm
++:Returns: 0 on success; ENOTTY on error
  
--:Capability: KVM_CAP_S390_CPU_TOPOLOGY
- :Architectures: s390
- :Type: vm
+ This capability enables userspace to copy encryption context from the vm
+ indicated by the fd to the vm this is called on.
+@@ -8662,7 +8662,7 @@ limit the attack surface on KVM's MSR emulation code.
+ 8.28 KVM_CAP_ENFORCE_PV_FEATURE_CPUID
+ -------------------------------------
  
-@@ -9016,7 +9007,6 @@ must point to a byte where the value will be stored or retrieved from.
- 8.40 KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
- ---------------------------------------
+-Architectures: x86
++:Architectures: x86
  
--:Capability: KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
- :Architectures: arm64
- :Type: vm
- :Parameters: arg[0] is the new split chunk size.
-@@ -9043,7 +9033,6 @@ block sizes is exposed in KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES as a
- 8.41 KVM_CAP_VM_TYPES
- ---------------------
+ When enabled, KVM will disable paravirtual features provided to the
+ guest according to the bits in the KVM_CPUID_FEATURES CPUID leaf
+@@ -8896,7 +8896,7 @@ available to the guest on migration.
+ 8.33 KVM_CAP_HYPERV_ENFORCE_CPUID
+ ---------------------------------
  
--:Capability: KVM_CAP_MEMORY_ATTRIBUTES
- :Architectures: x86
- :Type: system ioctl
+-Architectures: x86
++:Architectures: x86
  
+ When enabled, KVM will disable emulated Hyper-V features provided to the
+ guest according to the bits Hyper-V CPUID feature leaves. Otherwise, all
 -- 
 2.49.0
 
