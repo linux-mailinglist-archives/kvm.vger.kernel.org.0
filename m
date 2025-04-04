@@ -1,141 +1,150 @@
-Return-Path: <kvm+bounces-42767-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42768-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9AA8A7C630
-	for <lists+kvm@lfdr.de>; Sat,  5 Apr 2025 00:07:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98579A7C66F
+	for <lists+kvm@lfdr.de>; Sat,  5 Apr 2025 00:46:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 060B7189CCD2
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 22:07:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 735023B8329
+	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 22:46:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D7FA221563;
-	Fri,  4 Apr 2025 22:07:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B571D7E47;
+	Fri,  4 Apr 2025 22:46:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aq1YiAFl"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QRFDrlVX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FE0F21A455
-	for <kvm@vger.kernel.org>; Fri,  4 Apr 2025 22:07:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 601D4AD58
+	for <kvm@vger.kernel.org>; Fri,  4 Apr 2025 22:46:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743804427; cv=none; b=PmkC2ktek9TNeqgbFeUcatZfSs2Kg84AXBCgrwjIRy+rwPTWuQxeVfoOfgcpcZY5xFs/CYePb/fcVMPUdEQd3qAwwtXes50X8cMWHQQcy0y54OiZg2iTvltSflhw+WDeMJaaxXa7o+OkdlnLCcy0s1OAKw6zzp1s2QP32sXetGo=
+	t=1743806777; cv=none; b=MAYKBrDoPmbdRn+5vM+QjruNygML+aaGKw4h76aUTkFeF7EDWt7aNZlOuSGTJ/FueOwo6AQfS7EFOX2pTsQn83WY6K20zXhQDb/Jwk46nihRSj1R4LNkJ7NYkpSNdnKYvIri0wJlDFr1DMEM7ppu6GgyOSICr7EE076iTLfASLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743804427; c=relaxed/simple;
-	bh=E4YqHNQ4gPeYFwy7PnyB6caqFhd7nH8+voL1clFcF6Y=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Trqt3gG8noP3qBoP7WH5NEtUDnO3NRB2EgU6MMinxMJ7dkOMgkS9p8sb0GnNskXjM66qakcdq8X0zfEOA9SH2/4DlPWd/nCf4sWLf+5RpkukBcK67BEEX2/zg1QMBUZkVA5NiLjaTNQxoxfuS9X+/lLVpppxwnTJH8B2DPa4o4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aq1YiAFl; arc=none smtp.client-ip=209.85.166.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com
-Received: by mail-io1-f74.google.com with SMTP id ca18e2360f4ac-85dad593342so250249839f.1
-        for <kvm@vger.kernel.org>; Fri, 04 Apr 2025 15:07:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743804425; x=1744409225; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pc9BIslmRtbzEaqCHxhWv7mDukpJW925YKmou2T40Cs=;
-        b=aq1YiAFlmibEtVeZZBDr8pdL2qcgat0oDjxJXpDnXihM9beKgVDPCA4Jxvt5mjzD1X
-         wlDP7tcZML7RBUOmlvyV2Rz00tc5OH4/985re28sekle1vXGtpKkkJdLb6uPI6l6iHV3
-         70nWp6K2gKJIVTn6fWsZw8SrsGUlE1XT0nFtgIlaER20F+phlfL+XRSUQYQ6fVTsi3yj
-         zmLEy7emz1O7CYHugbWhWvqgNdp+58ZXR5IxgW0ZRcNWGeQ/9igflAwkwvGjIphhdBKI
-         zy3qWWW0VOQ6xuVCEm8buQ1HPEEvs6W/DwL66a6UfByBJfhliBaR08XRa1Efj+hkaDmG
-         KZIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743804425; x=1744409225;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pc9BIslmRtbzEaqCHxhWv7mDukpJW925YKmou2T40Cs=;
-        b=ITpHeQ78PiZR90RB80qlWJmQQrDthTXa6mFkAkDLp9lqGTm1LEEkHlKxcgHT21CMec
-         FXrT8wyls/TlA8m7CJzzOdLHn247k7d94PuhPFMlQTWlHbJshC6sM1L0TEHGnYs5Ne1x
-         sny3vQ0TQxbg+GlXLnZUVdzgyNynMgOKontqVC2N9X5LT6bRlEHfhyuqIPAbAzCuefga
-         c7XpYWs6AdDCWoaorhuOOyetpXpH0LDlAEvy0doT19IRT4OCVVWSesMN0rzsuZy5Lj3t
-         XavwVOLk2RNcbsk2KGpH27Jt647cnc2yGZqJorHIVKDa6vYd8K2MSOecA3eIaKazPHIn
-         /1YA==
-X-Forwarded-Encrypted: i=1; AJvYcCWYcSYCptlLsRuSldChk6yeBb4IzYvFEZEGlG3hpxjk8Vq2/WRx2AhFteEBWiqm10JvG7c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwokZ0gG080NMW3YzV/VxLhlXHiX2Vgnz+/d0TEiR0p2d8vYiuD
-	JUCI0/MWgBuyjXzxg3zwZmMnrZ/faunbqxMeLxLOks5H1YFNzP8S4JV6dMC/mp7TeOX1N5ppBHf
-	OIx0O0w==
-X-Google-Smtp-Source: AGHT+IHdes02xNhbHRa4hrCg2N+VywWvzx8Vq2+IoHciYVBDcUnJpNkQ4rg+6l0nOZiDn4tZhimhX6EbrE0g
-X-Received: from iobbf5.prod.google.com ([2002:a05:6602:3685:b0:85e:9686:d0f0])
- (user=rananta job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6602:6a46:b0:85b:46d7:1886
- with SMTP id ca18e2360f4ac-8611b49b398mr539039139f.7.1743804425293; Fri, 04
- Apr 2025 15:07:05 -0700 (PDT)
-Date: Fri,  4 Apr 2025 22:06:59 +0000
-In-Reply-To: <20250404220659.1312465-1-rananta@google.com>
+	s=arc-20240116; t=1743806777; c=relaxed/simple;
+	bh=Q9/i3wbmROUc1yAY0nI7uO6WaZml7TPX/9qDKuqEQtg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ayHqQrTYx5rqj/zhqkFGpC5bPuF0OCXUA8aj0MluqfNAtOfc3Rh7P//RdehWKR+RyUOUD9HfhqD31gbD/hDdicGUowUxv7suMQR9hFn0W2qV8bSoR8nFS1c9olQzSqwvOntyeBYV5q3DYrcSelypboOE/EGBad5XWy2Wif8UmzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QRFDrlVX; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Fri, 4 Apr 2025 15:46:01 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1743806772;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=icbPkrkUd1De4/wRlfQxCHPa3ucnmbOW4BGuGjTGkgM=;
+	b=QRFDrlVXyeKYm2auWsnzd21S31ggUiVTESz37sca/elBzIWiLNknM2FIh5SUSNnCRe54b0
+	sjQO6yUYmITskjDTi/PpqBwTl26+n2loNJ8I11WPulIigWcmGzePbbUy9Cyk3amqBVg/6I
+	BLVUr6+FIXMOnJxuxpCWz5b68q7rF50=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Mingwei Zhang <mizhang@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH 1/2] KVM: selftests: arm64: Introduce and use
+ hardware-definition macros
+Message-ID: <Z_BhKUAgkLCdeWDB@linux.dev>
+References: <20250404220659.1312465-1-rananta@google.com>
+ <20250404220659.1312465-2-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250404220659.1312465-1-rananta@google.com>
-X-Mailer: git-send-email 2.49.0.504.g3bcea36a83-goog
-Message-ID: <20250404220659.1312465-3-rananta@google.com>
-Subject: [PATCH 2/2] KVM: selftests: arm64: Explicitly set the page attrs to Inner-Shareable
-From: Raghavendra Rao Ananta <rananta@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
-Cc: Raghavendra Rao Anata <rananta@google.com>, Mingwei Zhang <mizhang@google.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250404220659.1312465-2-rananta@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-Atomic instructions such as 'ldset' over (global) variables in the guest
-is observed to cause an EL1 data abort with FSC 0x35 (IMPLEMENTATION
-DEFINED fault (Unsupported Exclusive or Atomic access)). The observation
-was particularly apparent on Neoverse-N3.
+Hi Raghu,
 
-According to DDI0487L.a C3.2.6 (Single-copy atomic 64-byte load/store),
-it is implementation defined that a data abort with the mentioned FSC
-is reported for the first stage of translation that provides an
-inappropriate memory type. It's likely that the same rule also applies
-to memory attribute mismatch. When the guest loads the memory location of
-the variable that was already cached during the host userspace's copying
-of the ELF into the memory, the core is likely running into a mismatch
-of memory attrs that's checked in stage-1 itself, and thus causing the
-abort in EL1.
+On Fri, Apr 04, 2025 at 10:06:58PM +0000, Raghavendra Rao Ananta wrote:
+> The kvm selftest library for arm64 currently configures the hardware
+> fields, such as shift and mask in the page-table entries and registers,
+> directly with numbers. While it add comments at places, it's better to
+> rewrite them with appropriate macros to improve the readability and
+> reduce the risk of errors. Hence, introduce macros to define the
+> hardware fields and use them in the arm64 processor library.
+> 
+> Most of the definitions are primary copied from the Linux's header,
+> arch/arm64/include/asm/pgtable-hwdef.h.
 
-Fix this by explicitly setting the memory attribute to Inner-Shareable
-to avoid the mismatch, and by extension, the data abort.
+Thank you for doing this. Having magic numbers all around the shop was a
+complete mess. Just a single comment:
 
-Suggested-by: Oliver Upton <oupton@google.com>
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
----
- tools/testing/selftests/kvm/include/arm64/processor.h | 1 +
- tools/testing/selftests/kvm/lib/arm64/processor.c     | 3 +++
- 2 files changed, 4 insertions(+)
+> No functional change intended.
+> 
+> Suggested-by: Oliver Upton <oupton@google.com>
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  tools/arch/arm64/include/asm/sysreg.h         | 38 +++++++++++++
+>  .../selftests/kvm/arm64/page_fault_test.c     |  2 +-
+>  .../selftests/kvm/include/arm64/processor.h   | 28 +++++++--
+>  .../selftests/kvm/lib/arm64/processor.c       | 57 ++++++++++---------
+>  4 files changed, 92 insertions(+), 33 deletions(-)
+> 
+> diff --git a/tools/arch/arm64/include/asm/sysreg.h b/tools/arch/arm64/include/asm/sysreg.h
+> index 150416682e2c..6fcde168f3a6 100644
+> --- a/tools/arch/arm64/include/asm/sysreg.h
+> +++ b/tools/arch/arm64/include/asm/sysreg.h
+> @@ -884,6 +884,44 @@
+>  	 SCTLR_EL1_LSMAOE | SCTLR_EL1_nTLSMD | SCTLR_EL1_EIS   | \
+>  	 SCTLR_EL1_TSCXT  | SCTLR_EL1_EOS)
+>  
+> +/* TCR_EL1 specific flags */
+> +#define TCR_T0SZ_OFFSET	0
+> +#define TCR_T0SZ(x)		((UL(64) - (x)) << TCR_T0SZ_OFFSET)
+> +
+> +#define TCR_IRGN0_SHIFT	8
+> +#define TCR_IRGN0_MASK		(UL(3) << TCR_IRGN0_SHIFT)
+> +#define TCR_IRGN0_NC		(UL(0) << TCR_IRGN0_SHIFT)
+> +#define TCR_IRGN0_WBWA		(UL(1) << TCR_IRGN0_SHIFT)
+> +#define TCR_IRGN0_WT		(UL(2) << TCR_IRGN0_SHIFT)
+> +#define TCR_IRGN0_WBnWA	(UL(3) << TCR_IRGN0_SHIFT)
+> +
+> +#define TCR_ORGN0_SHIFT	10
+> +#define TCR_ORGN0_MASK		(UL(3) << TCR_ORGN0_SHIFT)
+> +#define TCR_ORGN0_NC		(UL(0) << TCR_ORGN0_SHIFT)
+> +#define TCR_ORGN0_WBWA		(UL(1) << TCR_ORGN0_SHIFT)
+> +#define TCR_ORGN0_WT		(UL(2) << TCR_ORGN0_SHIFT)
+> +#define TCR_ORGN0_WBnWA	(UL(3) << TCR_ORGN0_SHIFT)
+> +
+> +#define TCR_SH0_SHIFT		12
+> +#define TCR_SH0_MASK		(UL(3) << TCR_SH0_SHIFT)
+> +#define TCR_SH0_INNER		(UL(3) << TCR_SH0_SHIFT)
+> +
+> +#define TCR_TG0_SHIFT		14
+> +#define TCR_TG0_MASK		(UL(3) << TCR_TG0_SHIFT)
+> +#define TCR_TG0_4K		(UL(0) << TCR_TG0_SHIFT)
+> +#define TCR_TG0_64K		(UL(1) << TCR_TG0_SHIFT)
+> +#define TCR_TG0_16K		(UL(2) << TCR_TG0_SHIFT)
+> +
+> +#define TCR_IPS_SHIFT		32
+> +#define TCR_IPS_MASK		(UL(7) << TCR_IPS_SHIFT)
+> +#define TCR_IPS_52_BITS	(UL(6) << TCR_IPS_SHIFT)
+> +#define TCR_IPS_48_BITS	(UL(5) << TCR_IPS_SHIFT)
+> +#define TCR_IPS_40_BITS	(UL(2) << TCR_IPS_SHIFT)
+> +#define TCR_IPS_36_BITS	(UL(1) << TCR_IPS_SHIFT)
+> +
+> +#define TCR_HA			(UL(1) << 39)
+> +#define TCR_DS			(UL(1) << 59)
+> +
 
-diff --git a/tools/testing/selftests/kvm/include/arm64/processor.h b/tools/testing/selftests/kvm/include/arm64/processor.h
-index 691670bbe226..b337a606aac4 100644
---- a/tools/testing/selftests/kvm/include/arm64/processor.h
-+++ b/tools/testing/selftests/kvm/include/arm64/processor.h
-@@ -75,6 +75,7 @@
- #define PMD_TYPE_TABLE		BIT(1)
- #define PTE_TYPE_PAGE		BIT(1)
- 
-+#define PTE_SHARED		(UL(3) << 8) /* SH[1:0], inner shareable */
- #define PTE_AF			BIT(10)
- 
- #define PTE_ADDR_MASK(page_shift)	GENMASK(47, (page_shift))
-diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/testing/selftests/kvm/lib/arm64/processor.c
-index da5802c8a59c..9d69904cb608 100644
---- a/tools/testing/selftests/kvm/lib/arm64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
-@@ -172,6 +172,9 @@ static void _virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
- 	}
- 
- 	pg_attr = PTE_AF | PTE_ATTRINDX(attr_idx) | PTE_TYPE_PAGE | PTE_VALID;
-+	if (!use_lpa2_pte_format(vm))
-+		pg_attr |= PTE_SHARED;
-+
- 	*ptep = addr_pte(vm, paddr, pg_attr);
- }
- 
--- 
-2.49.0.504.g3bcea36a83-goog
+sysreg.h isn't the right home for these definitions since it is meant to
+be a copy of the corresponding kernel header.
 
+Since KVM selftests are likely the only thing in tools to care about
+setting up page tables, adding this to processor.h seems like a better
+place.
+
+Thanks,
+Oliver
 
