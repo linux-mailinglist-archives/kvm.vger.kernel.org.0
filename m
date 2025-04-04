@@ -1,238 +1,313 @@
-Return-Path: <kvm+bounces-42628-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42629-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 567FCA7B90A
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 10:38:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 170DAA7BA52
+	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 12:01:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5E4F1897E8C
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 08:38:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF5A73B6F9C
+	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 10:01:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D884D19EEBD;
-	Fri,  4 Apr 2025 08:37:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1D3B1ACEA5;
+	Fri,  4 Apr 2025 10:01:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SmLy0KwM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bAbBN5YO"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E7417A305
-	for <kvm@vger.kernel.org>; Fri,  4 Apr 2025 08:37:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA80B2E62C7
+	for <kvm@vger.kernel.org>; Fri,  4 Apr 2025 10:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743755866; cv=none; b=eVpzOogTHH2ws9kLp1NZHbvcxKUQz/XFswFyxjY1USeA7Ef+o/ypbzUuNvnpDE1YY5vmJiO86YQ1LU5S03HyBQM3cAVKccwpuHxPJBy+NZkZD14L7aKL6iN7w4uKAjrazmjxRyLJmgx3JJo6BWSJYCNg1eh/nhAriDlp9vD20Q0=
+	t=1743760872; cv=none; b=E4OhsXLRIGOeH6Cy5K7Jccd5xGG92cA8/IgtRjfNtl6srJr7H5xB9pHCKEVBJUql8vP9WHiQ+Ewl3b0rwtV4u1jtnlzR6Ma9QlS2e1S+p/0QSZ7EOkKx3dRUN10GGYuxbgAUS5I/pXfyWgbbXU0swXueRLdUPoAGfDmwlOqZGmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743755866; c=relaxed/simple;
-	bh=QAhyu4E7HQ19zzaz86rUGI9nPrmZDX3iMt2qJViTveA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KXrqctbXOqDJr1wEeO7o3K8CedISjcP8QypVY3jwMo6TapBYqIDFpuSLJ4iGpYifs1IOx3lKNx9Rv/4/AeP4DkgUXA0evqBbqmUhOt1OR0qwcW/Dm4yNUsCMl4mxGCiU6ux3qRsJYu+UdsiSYd9xkQLwYgFnAgBWpo4roPr1JCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SmLy0KwM; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1743760872; c=relaxed/simple;
+	bh=QmUDUM55vLT0DayUEsba5JbgkzgXg382aWG+kNxQGrc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TaTMx6xf02lQI4mcYHe3IyaQP+WigONkFhIe4QECpznhUpo0qfxlPex4TciCRM//bKNmlLaw94qiToy8urAEGELrOoR8iCuydgAfR1CkOUI4qrM6p+OPZ+ysJTjr1XExICUrY6TPYh7NGtzwd4PUXAXlOJ+NZmlShqT8KJaK0e4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bAbBN5YO; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743755862;
+	s=mimecast20190719; t=1743760868;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OI1Zt3NFcFi/P6TNraRk0oZkTYZ+LV6TSig6Xx970e4=;
-	b=SmLy0KwMGtpSJy3Zp2nMTXpLKt5kEq8ONzPIx2aJoIPWGKZFFgxFidypDXVoU0q0IYyBdv
-	BGtIsC7xD3l1V63+rkPJHB0sO8Poz47wliDaFLWWacJtKHqNl+hH/GvZL17rU64u0SiNdg
-	2qbs2c6ZJuzcPUHCBmHO5HD8mD2E7Ec=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=jdjD8nNlZJ/VQ3nJOvJ9Bm6sUbIwUoYlGR93J0fu2S0=;
+	b=bAbBN5YOU6GQVon0byJtPvSx619pnM1I9LNrby2JlmJQ8csdSTNxR3MBXLv/PcPK9RZjKr
+	n9aI81ryOcnSKmthXrrGOsF5VKueui2+MYAIn+2fEoysza/4sLZEir/J2gM/xzmmcoStIN
+	xcD1mxTwsV9GZK6slnuNzMgfnzr4vnc=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-135-dkIxukdKMRKpXnucG3h_sw-1; Fri, 04 Apr 2025 04:37:41 -0400
-X-MC-Unique: dkIxukdKMRKpXnucG3h_sw-1
-X-Mimecast-MFC-AGG-ID: dkIxukdKMRKpXnucG3h_sw_1743755861
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-39c2da64df9so1203925f8f.0
-        for <kvm@vger.kernel.org>; Fri, 04 Apr 2025 01:37:41 -0700 (PDT)
+ us-mta-52-6E81cgb5OgC7LBgwUP__Pg-1; Fri, 04 Apr 2025 06:01:00 -0400
+X-MC-Unique: 6E81cgb5OgC7LBgwUP__Pg-1
+X-Mimecast-MFC-AGG-ID: 6E81cgb5OgC7LBgwUP__Pg_1743760859
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43bc97e6360so10716175e9.3
+        for <kvm@vger.kernel.org>; Fri, 04 Apr 2025 03:01:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743755860; x=1744360660;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OI1Zt3NFcFi/P6TNraRk0oZkTYZ+LV6TSig6Xx970e4=;
-        b=t7fx1BeFgiaU37w/PGDgXbcR8Vsayah9MnrecTnIFNAkdF4/SJQcjJyEzyOA7L8LHr
-         LptITM+qz/Zim/1NHj7yogN8AYVjXGKFdhd1Gl4ud7/QRAryZMKsuVQnLK35k2Zmyylr
-         8xCuB3nSGH/ZVNxrYFaaIw9p0/N4D6RhnYppEmYqmtf9p+YmjPuxpBo226ORFMO2XDjf
-         jx3dojfI7vrnpL+kCIEz9km6q+OYNz+M1S9MUatoAmb3L+EZDEmdCMZgAq70eYJP/uqu
-         8DN1G13d4KMXDEnxXFyMh+/mkAOh/g24yfhTRtS27+Y+tEhaTv+1xFt+KtdBhfhsoMNa
-         L/OA==
-X-Forwarded-Encrypted: i=1; AJvYcCWpQEL4pMjiH1/FcRjDD/ZOi7J/tsVFzXfYYOXAKLFi/OUk9t+vlcAIH2ML4ojyWwhjygc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZGrAngTNNEx0SwseRBJj37+kBaVA5D7ZG9XcXmeBxePUz/Sht
-	6OwKIMDeoR/lkRjpY6QbqcoPtywv++HNNkNtD8VNjfdH7WrMMErb2ow3coCgJ2taKYFk/KB6cvE
-	toMW1cEOn1WSy6mKRTSR9FcCWtguP0nCu9nHtBnnXLmNfku+zNw==
-X-Gm-Gg: ASbGnctEjTI9Xpe9vkmBuV1iaJ5UTU56LYupqHvu6wZ/zbDlWF23RTVlIBTZsrnMAXM
-	+3uSmD50Hzl4vOz5ZUh/Xy/dGd8AZNGXiqJms2RMV6CgN+c2OPfU/dVog5MpSS7nVSH95+fF79C
-	46J1K6E2f0NZmmVvb94PWh4Tb79Pq5izAJhn6JEHxNPHsqvNGFvQs2ejblVhLwAA3ZPVbF1Iy7p
-	mDwYnDUxyqVKefXBiuoLircEoa3NZUbNeq/o0lOb4UNc6vxnW8G7xpEqca4RzMesjCrkS/CxpOd
-	66PlGtdz4w==
-X-Received: by 2002:a05:6000:430c:b0:391:2e31:c7e5 with SMTP id ffacd0b85a97d-39cb36b2ab2mr2013765f8f.6.1743755860541;
-        Fri, 04 Apr 2025 01:37:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEeh87271OU/aKTaskLblwGps7bO+cJZTClXWXzF8apC0wBecu3MvRM0wP/QWFDltqL8vhYdA==
-X-Received: by 2002:a05:6000:430c:b0:391:2e31:c7e5 with SMTP id ffacd0b85a97d-39cb36b2ab2mr2013743f8f.6.1743755860159;
-        Fri, 04 Apr 2025 01:37:40 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c301a7225sm3768866f8f.26.2025.04.04.01.37.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Apr 2025 01:37:39 -0700 (PDT)
-Date: Fri, 4 Apr 2025 04:37:36 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Alexander Graf <graf@amazon.com>, Stefan Hajnoczi <stefanha@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, kvm@vger.kernel.org,
-	Asias He <asias@redhat.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>, nh-open-source@amazon.com
-Subject: Re: [PATCH v2] vsock/virtio: Remove queued_replies pushback logic
-Message-ID: <20250404043326-mutt-send-email-mst@kernel.org>
-References: <20250401201349.23867-1-graf@amazon.com>
- <20250402161424.GA305204@fedora>
- <20250403073111-mutt-send-email-mst@kernel.org>
- <32ca5221-5b25-4bfd-acd7-9eebae8c3635@amazon.com>
- <20250404041050-mutt-send-email-mst@kernel.org>
- <fiyxlnv7gglcfkr7ue4tiaktqjptdkr5or6skrr6f7dof26d56@wmg3zhhqlcoj>
+        d=1e100.net; s=20230601; t=1743760859; x=1744365659;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=jdjD8nNlZJ/VQ3nJOvJ9Bm6sUbIwUoYlGR93J0fu2S0=;
+        b=GmbfEPlfA54AGrDcOxYplAN8xTO0TUXijDOFHNYlXTc10vgiz6/jO/M6Zx5ivUSgnx
+         3MXtmktViuw28rT3SWHlOyRgLIM+4ls5+BvX+ifs0JwU+PfEvZ2sLXbKOpD6hWsImywW
+         bT3xNREtSs2IdxPjQCa+ubyBx5DdEfzH598T89qDUIaRPE0a9Xl4FB1XEZX3ec7ZwPpV
+         w8biaaCrE6C3OcvJFZ+r8mYEuSczxz51wRmjHiO8Fb7zGlALWyKLp0EvWcoHKHFyu3qI
+         45w0U2mfEbd4kqL1VOjexOOMnKwgfld60YfF5eqq/JWxnVHLa9IkbUNcKEOvjc+Lc0XE
+         tieg==
+X-Forwarded-Encrypted: i=1; AJvYcCUfCIbX7rEPKtkrmCThdYEset2Y0yh4TyFFs/BeEqumKm0qwiBNi9Z5KWwiYB3pqZ2k+Bw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMLOnTaFkbFQ2kjig+qP/UI2BYPMQ4dc9fiiPH4oPWl6PgX/1W
+	OOzvd0TTrUGVgLyx0SpPs76mEN0LNGS4uPTV7SRJAwdeGej2aTaIaiCht5I54Kr36IEOkxSi3kI
+	MZXx4MNVv7jWKz8fWUpqV29LRo8oRq2pWZe2KIJSpQAxoca2hpw==
+X-Gm-Gg: ASbGncv5WXio5ONfyeRHI0urBCcMeMWXTOm60jfd0Q94LParYUrVt11C3z0YhV8y/HZ
+	CNywfh4GOA2IBMnafmI3Oe2d7F6PZ2vti1rn3GHBlZ579TFeaK5x+9wTGUM56Pyh3fGyNrwdAbj
+	1lPNdJLxaI/Xas+k5K0vQmiRv4Wk+3mVSkyGSBoiAeILNM516J+6DNwzgSX1hpahLOS7Q72rQ8y
+	c61X+ox7c37XDIHXdlz8fgfgkkmBufxNBoxw3gSglHSpx21OmSNQwMkNvXLh8aT2ps1uh52uUDp
+	P95RgEQTp35F0jAzGeP/xYGJye0FgaZ1WwHefWk6sVGp3PnWCzYAT5svB89KgelNKAeRoOOsHdB
+	vcm/0KCeSf1DTF4acHO1P6FU5eaQNFvc5+BzK15VJ03U=
+X-Received: by 2002:a05:600c:1382:b0:43c:f8fc:f69a with SMTP id 5b1f17b1804b1-43ecf8231a8mr22533775e9.4.1743760859294;
+        Fri, 04 Apr 2025 03:00:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGifz3HIGWQgKUammrvfPkPZxVrPSFShnbthNQnbAXFOUWVRfHdSi2jwRp3iKKOg8pUTCfB1w==
+X-Received: by 2002:a05:600c:1382:b0:43c:f8fc:f69a with SMTP id 5b1f17b1804b1-43ecf8231a8mr22533275e9.4.1743760858803;
+        Fri, 04 Apr 2025 03:00:58 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c71b:7900:8752:fae3:f9c9:a07e? (p200300cbc71b79008752fae3f9c9a07e.dip0.t-ipconnect.de. [2003:cb:c71b:7900:8752:fae3:f9c9:a07e])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec1795630sm46181045e9.29.2025.04.04.03.00.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Apr 2025 03:00:56 -0700 (PDT)
+Message-ID: <4a33daa3-7415-411e-a491-07635e3cfdc4@redhat.com>
+Date: Fri, 4 Apr 2025 12:00:55 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fiyxlnv7gglcfkr7ue4tiaktqjptdkr5or6skrr6f7dof26d56@wmg3zhhqlcoj>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] s390/virtio_ccw: don't allocate/assign airqs for
+ non-existing queues
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+ virtualization@lists.linux.dev, kvm@vger.kernel.org,
+ Chandra Merla <cmerla@redhat.com>, Stable@vger.kernel.org,
+ Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Eric Farman <farman@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Wei Wang <wei.w.wang@intel.com>
+References: <20250402203621.940090-1-david@redhat.com>
+ <20250403161836.7fe9fea5.pasic@linux.ibm.com>
+ <e2936e2f-022c-44ee-bb04-f07045ee2114@redhat.com>
+ <20250404063619.0fa60a41.pasic@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20250404063619.0fa60a41.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 04, 2025 at 10:30:43AM +0200, Stefano Garzarella wrote:
-> On Fri, Apr 04, 2025 at 04:14:51AM -0400, Michael S. Tsirkin wrote:
-> > On Fri, Apr 04, 2025 at 10:04:38AM +0200, Alexander Graf wrote:
-> > > 
-> > > On 03.04.25 14:21, Michael S. Tsirkin wrote:
-> > > > On Wed, Apr 02, 2025 at 12:14:24PM -0400, Stefan Hajnoczi wrote:
-> > > > > On Tue, Apr 01, 2025 at 08:13:49PM +0000, Alexander Graf wrote:
-> > > > > > Ever since the introduction of the virtio vsock driver, it included
-> > > > > > pushback logic that blocks it from taking any new RX packets until the
-> > > > > > TX queue backlog becomes shallower than the virtqueue size.
-> > > > > >
-> > > > > > This logic works fine when you connect a user space application on the
-> > > > > > hypervisor with a virtio-vsock target, because the guest will stop
-> > > > > > receiving data until the host pulled all outstanding data from the VM.
-> > > > > >
-> > > > > > With Nitro Enclaves however, we connect 2 VMs directly via vsock:
-> > > > > >
-> > > > > >    Parent      Enclave
-> > > > > >
-> > > > > >      RX -------- TX
-> > > > > >      TX -------- RX
-> > > > > >
-> > > > > > This means we now have 2 virtio-vsock backends that both have the pushback
-> > > > > > logic. If the parent's TX queue runs full at the same time as the
-> > > > > > Enclave's, both virtio-vsock drivers fall into the pushback path and
-> > > > > > no longer accept RX traffic. However, that RX traffic is TX traffic on
-> > > > > > the other side which blocks that driver from making any forward
-> > > > > > progress. We're now in a deadlock.
-> > > > > >
-> > > > > > To resolve this, let's remove that pushback logic altogether and rely on
-> > > > > > higher levels (like credits) to ensure we do not consume unbounded
-> > > > > > memory.
-> > > > > The reason for queued_replies is that rx packet processing may emit tx
-> > > > > packets. Therefore tx virtqueue space is required in order to process
-> > > > > the rx virtqueue.
-> > > > >
-> > > > > queued_replies puts a bound on the amount of tx packets that can be
-> > > > > queued in memory so the other side cannot consume unlimited memory. Once
-> > > > > that bound has been reached, rx processing stops until the other side
-> > > > > frees up tx virtqueue space.
-> > > > >
-> > > > > It's been a while since I looked at this problem, so I don't have a
-> > > > > solution ready. In fact, last time I thought about it I wondered if the
-> > > > > design of virtio-vsock fundamentally suffers from deadlocks.
-> > > > >
-> > > > > I don't think removing queued_replies is possible without a replacement
-> > > > > for the bounded memory and virtqueue exhaustion issue though. Credits
-> > > > > are not a solution - they are about socket buffer space, not about
-> > > > > virtqueue space, which includes control packets that are not accounted
-> > > > > by socket buffer space.
-> > > >
-> > > > Hmm.
-> > > > Actually, let's think which packets require a response.
-> > > >
-> > > > VIRTIO_VSOCK_OP_REQUEST
-> > > > VIRTIO_VSOCK_OP_SHUTDOWN
-> > > > VIRTIO_VSOCK_OP_CREDIT_REQUEST
-> > > >
-> > > >
-> > > > the response to these always reports a state of an existing socket.
-> > > > and, only one type of response is relevant for each socket.
-> > > >
-> > > > So here's my suggestion:
-> > > > stop queueing replies on the vsock device, instead,
-> > > > simply store the response on the socket, and create a list of sockets
-> > > > that have replies to be transmitted
-> > > >
-> > > >
-> > > > WDYT?
-> > > 
-> > > 
-> > > Wouldn't that create the same problem again? The socket will eventually push
-> > > back any new data that it can take because its FIFO is full. At that point,
-> > > the "other side" could still have a queue full of requests on exactly that
-> > > socket that need to get processed. We can now not pull those packets off the
-> > > virtio queue, because we can not enqueue responses.
-> > 
-> > Either I don't understand what you wrote or I did not explain myself
-> > clearly.
+On 04.04.25 06:36, Halil Pasic wrote:
+> On Thu, 3 Apr 2025 16:28:31 +0200
+> David Hildenbrand <david@redhat.com> wrote:
 > 
-> I didn't fully understand either, but with this last message of yours it's
-> clear to me and I like the idea!
+>>> Sorry I have to have a look at that discussion. Maybe it will answer
+>>> some my questions.
+>>
+>> Yes, I think so.
+>>
+>>>    
+>>>> Let's fix it without affecting existing setups for now by properly
+>>>> ignoring the non-existing queues, so the indicator bits will match
+>>>> the queue indexes.
+>>>
+>>> Just one question. My understanding is that the crux is that Linux
+>>> and QEMU (or the driver and the device) disagree at which index
+>>> reporting_vq is actually sitting. Is that right?
+>>
+>> I thought I made it clear: this is only about the airq indicator bit.
+>> That's where both disagree.
+>>
+>> Not the actual queue index (see above).
 > 
-> > 
-> > In this idea there needs to be a single response enqueued
-> > like this in the socket, because, no more than one ever needs to
-> > be outstanding per socket.
-> > 
-> > For example, until VIRTIO_VSOCK_OP_REQUEST
-> > is responded to, the socket is not active and does not need to
-> > send anything.
-> 
-> One case I see is responding when we don't have the socket listening (e.g.
-> the port is not open), so if before the user had a message that the port was
-> not open, now instead connect() will timeout. So we could respond if we have
-> space in the virtqueue, otherwise discard it without losing any important
-> information or guarantee of a lossless channel.
-> 
-> So in summary:
-> 
-> - if we have an associated socket, then always respond (possibly
->   allocating memory in the intermediate queue if the virtqueue is full
->   as we already do). We need to figure out if a flood of
->   VIRTIO_VSOCK_OP_CREDIT_REQUEST would cause problems, but we can always
->   decide not to respond if we have sent this identical information
->   before.
+> I did some more research including having a look at that discussion. Let
+> me try to sum up how did we end up here.
 
-If taking this path, need to consider not responding is within spec or not.
-But again, credit update needed is just a single flag we need to set
-on a socket. If we have anything we need to send, it can also update
-the credits.
+Let me add some more details after digging as well:
+
+> 
+> Before commit a229989d975e ("virtio: don't allocate vqs when names[i] =
+> NULL") the kernel behavior used to be in spec, but QEMU and possibly
+> other hypervisor were out of spec and things did not work.
+
+It all started with VIRTIO_BALLOON_F_FREE_PAGE_HINT. Before that,
+we only had the single optional VIRTIO_BALLOON_F_STATS_VQ queue at the very
+end. So there was no possibility for holes "in-between".
+
+In the Linux driver, we created the stats queue only if the feature bit
+VIRTIO_BALLOON_F_STATS_VQ was actually around:
+
+	nvqs = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ) ? 3 : 2;
+	err = virtio_find_vqs(vb->vdev, nvqs, vqs, callbacks, names, NULL);
+
+That changed with VIRTIO_BALLOON_F_FREE_PAGE_HINT, because we would
+unconditionally create 4 queues. QEMU always supported the first 3 queues
+unconditionally, but old QEMU did obviously not support the (new)
+VIRTIO_BALLOON_F_FREE_PAGE_HINT queue.
+
+390x didn't particularly like getting queried for non-existing
+queues. [1] So the fix was not for a hypervisor that was out of spec, but
+because quering non-existing queues didn't work.
+
+The fix implied that if VIRTIO_BALLOON_F_STATS_VQ is missing, suddenly the queue
+index of VIRTIO_BALLOON_F_FREE_PAGE_HINT changed as well.
+
+Again, as QEMU always implemented the 3 first queues unconditionally, this was
+not a problem.
+
+[1] https://lore.kernel.org/all/c6746307-fae5-7652-af8d-19f560fc31d9@de.ibm.com/#t
+
+> 
+> Possibly because of the complexity of fixing the hypervisor(s) commit
+> a229989d975e ("virtio: don't allocate vqs when names[i] = NULL") opted
+> for changing the guest side so that it does not fit the spec but fits
+> the hypervisor(s). It unfortunately also broke notifiers (for the with
+> holes) scenario for virtio-ccw only.
+
+Yes, it broke the notifiers.
+
+But note that everything was in spec at that point, because we only documented
+"free_page_vq == 3" in the spec *2 years later*, in 2020:
+
+commit 38448268eba0c105200d131c3f7f660129a4d673
+Author: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+Date:   Tue Aug 25 07:45:02 2020 -0700
+
+     content: Document balloon feature free page hints
+     
+     Free page hints allow the balloon driver to provide information on what
+     pages are not currently in use so that we can avoid the cost of copying
+     them in migration scenarios. Add a feature description for free page hints
+     describing basic functioning and requirements.
+     
+At that point, what we documented in the spec *did not match reality* in
+Linux. QEMU was fully compatible, because VIRTIO_BALLOON_F_STATS_VQ is
+unconditionally set.
 
 
-> - if there is no associated socket, we only respond if virtqueue has
->   space.
-> 
-> I like it and it seems feasible without changing anything in the
-> specification.
-> 
-> Did I get it right?
-> 
-> Thanks,
-> Stefano
+QEMU and Linux kept using that queue index assignment model, and the spec
+was wrong (out of sync?) at that point. The spec got more wrong with
 
-That was the idea, yes.
+commit d917d4a8d552c003e046b0e3b1b529d98f7e695b
+Author: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+Date:   Tue Aug 25 07:45:17 2020 -0700
+
+     content: Document balloon feature free page reporting
+     
+     Free page reporting is a feature that allows the guest to proactively
+     report unused pages to the host. By making use of this feature is is
+     possible to reduce the overall memory footprint of the guest in cases where
+     some significant portion of the memory is idle. Add documentation for the
+     free page reporting feature describing the functionality and requirements.
+
+Where we documented VIRTIO_BALLOON_F_REPORTING after the changes were added to
+QEMU+Linux implementation, so the spec did not reflect reality.
+
+I'll note also cloud-hypervisor [2] today follows that model.
+
+In particular, it *only* supports VIRTIO_BALLOON_F_REPORTING, turning
+the queue index of VIRTIO_BALLOON_F_REPORTING into *2* instead of documented
+in the spec to be *4*.
+
+So in reality, we can see VIRTIO_BALLOON_F_REPORTING to be either 2/3/4, depending
+on the availability of the other two features/queues.
+
+[2] https://github.com/cloud-hypervisor/cloud-hypervisor/blob/main/virtio-devices/src/balloon.rs
+
+
+> 
+> Now we had another look at this, and have concluded that fixing the
+> hypervisor(s) and fixing the kernel, and making sure that the fixed
+> kernel can tolerate the old broken hypervisor(s) is way to complicated
+> if possible at all. So we decided to give the spec a reality check and
+> fix the notifier bit assignment for virtio-ccw which is broken beyond
+> doubt if we accept that the correct virtqueue index is the one that the
+> hypervisor(s) use and not the one that the spec says they should use.
+
+In case of virtio-balloon, it's unfortunate that it went that way, but the
+spec simply did not / does not reflect reality when it was added to the spec.
+
+> 
+> With the spec fixed, the whole notion of "holes" will be something that
+> does not make sense any more. With that the merit of the kernel interface
+> virtio_find_vqs() supporting "holes" is quite questionable. Now we need
+> it because the drivers within the Linux kernel still think of the queues
+> in terms of the current spec, i.e. they try to have the "holes" as
+> mandated by the spec, and the duty of making it work with the broken
+> device implementations falls to the transports.
+> 
+
+Right, the "holes" only exist in the input array.
+
+> Under the assumption that the spec is indeed going to be fixed:
+> 
+> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+
+Thanks!
 
 -- 
-MST
+Cheers,
+
+David / dhildenb
 
 
