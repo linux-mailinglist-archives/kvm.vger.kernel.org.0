@@ -1,88 +1,87 @@
-Return-Path: <kvm+bounces-42629-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42630-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 170DAA7BA52
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 12:01:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA415A7BA91
+	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 12:19:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF5A73B6F9C
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 10:01:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E51F189BB9C
+	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 10:19:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1D3B1ACEA5;
-	Fri,  4 Apr 2025 10:01:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 040061B0439;
+	Fri,  4 Apr 2025 10:19:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bAbBN5YO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GnFiT1sw"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA80B2E62C7
-	for <kvm@vger.kernel.org>; Fri,  4 Apr 2025 10:01:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90470186295
+	for <kvm@vger.kernel.org>; Fri,  4 Apr 2025 10:19:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743760872; cv=none; b=E4OhsXLRIGOeH6Cy5K7Jccd5xGG92cA8/IgtRjfNtl6srJr7H5xB9pHCKEVBJUql8vP9WHiQ+Ewl3b0rwtV4u1jtnlzR6Ma9QlS2e1S+p/0QSZ7EOkKx3dRUN10GGYuxbgAUS5I/pXfyWgbbXU0swXueRLdUPoAGfDmwlOqZGmk=
+	t=1743761953; cv=none; b=DnHfVj+4F/L3wXWb/XQbaj0fabUgW+dMQC5iz3WU9SDkoLR0Cyg1T3/tIPGL6i2GnMGgRjvXiV8dTUikAwpifqL4Qv4prdA8brlUAthRrfEy5S2Vft6iEORackGg3ZAiL9Zy2nV9sgW/4PNTUzwU6RFVL79xR2cUESJK18tMtVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743760872; c=relaxed/simple;
-	bh=QmUDUM55vLT0DayUEsba5JbgkzgXg382aWG+kNxQGrc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TaTMx6xf02lQI4mcYHe3IyaQP+WigONkFhIe4QECpznhUpo0qfxlPex4TciCRM//bKNmlLaw94qiToy8urAEGELrOoR8iCuydgAfR1CkOUI4qrM6p+OPZ+ysJTjr1XExICUrY6TPYh7NGtzwd4PUXAXlOJ+NZmlShqT8KJaK0e4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bAbBN5YO; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1743761953; c=relaxed/simple;
+	bh=DjanWa9dOaDgsh8G7LbaIX5NtQ8DUhKP5nXFfr/Smmo=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=AF7PFgAllHLnZFiDyYUKled39qyjazG7hfOGaNnbdqdkqH3xGvEgScsdY8CaVm54/EgrjRa6fQZqAIcLKiTg1y2P38rPeMdi5lWUCfGBoayBXKLkTMGR+TY68HVLQUowDYtGlFMYBAKaiXpvdvMTl/xlBn7D55gFheU8GHNurqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GnFiT1sw; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743760868;
+	s=mimecast20190719; t=1743761950;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=jdjD8nNlZJ/VQ3nJOvJ9Bm6sUbIwUoYlGR93J0fu2S0=;
-	b=bAbBN5YOU6GQVon0byJtPvSx619pnM1I9LNrby2JlmJQ8csdSTNxR3MBXLv/PcPK9RZjKr
-	n9aI81ryOcnSKmthXrrGOsF5VKueui2+MYAIn+2fEoysza/4sLZEir/J2gM/xzmmcoStIN
-	xcD1mxTwsV9GZK6slnuNzMgfnzr4vnc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=1h31gPbZBLLsuTR5n1snPscX7w6OFOorG4D3qCNodmc=;
+	b=GnFiT1swGNdsy6eXHHDKCSBAGR0MbB9Os4LhlzSt3y2/wpkdm5qjA5Sz85Get/grTm5mOi
+	TE0FPZgUgmPPhCd+SHC7utnwQRz4sbVoXF2/regsheFemq3yNSsQsUisajRXt/Eldq7rJz
+	+LpGz999eHQsS1XlWoppVceUaAo1+lU=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-52-6E81cgb5OgC7LBgwUP__Pg-1; Fri, 04 Apr 2025 06:01:00 -0400
-X-MC-Unique: 6E81cgb5OgC7LBgwUP__Pg-1
-X-Mimecast-MFC-AGG-ID: 6E81cgb5OgC7LBgwUP__Pg_1743760859
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43bc97e6360so10716175e9.3
-        for <kvm@vger.kernel.org>; Fri, 04 Apr 2025 03:01:00 -0700 (PDT)
+ us-mta-553-wYKMRPgTNHOPar3pdD1uyQ-1; Fri, 04 Apr 2025 06:19:09 -0400
+X-MC-Unique: wYKMRPgTNHOPar3pdD1uyQ-1
+X-Mimecast-MFC-AGG-ID: wYKMRPgTNHOPar3pdD1uyQ_1743761948
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5e82390b87fso1686100a12.3
+        for <kvm@vger.kernel.org>; Fri, 04 Apr 2025 03:19:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743760859; x=1744365659;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=jdjD8nNlZJ/VQ3nJOvJ9Bm6sUbIwUoYlGR93J0fu2S0=;
-        b=GmbfEPlfA54AGrDcOxYplAN8xTO0TUXijDOFHNYlXTc10vgiz6/jO/M6Zx5ivUSgnx
-         3MXtmktViuw28rT3SWHlOyRgLIM+4ls5+BvX+ifs0JwU+PfEvZ2sLXbKOpD6hWsImywW
-         bT3xNREtSs2IdxPjQCa+ubyBx5DdEfzH598T89qDUIaRPE0a9Xl4FB1XEZX3ec7ZwPpV
-         w8biaaCrE6C3OcvJFZ+r8mYEuSczxz51wRmjHiO8Fb7zGlALWyKLp0EvWcoHKHFyu3qI
-         45w0U2mfEbd4kqL1VOjexOOMnKwgfld60YfF5eqq/JWxnVHLa9IkbUNcKEOvjc+Lc0XE
-         tieg==
-X-Forwarded-Encrypted: i=1; AJvYcCUfCIbX7rEPKtkrmCThdYEset2Y0yh4TyFFs/BeEqumKm0qwiBNi9Z5KWwiYB3pqZ2k+Bw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyMLOnTaFkbFQ2kjig+qP/UI2BYPMQ4dc9fiiPH4oPWl6PgX/1W
-	OOzvd0TTrUGVgLyx0SpPs76mEN0LNGS4uPTV7SRJAwdeGej2aTaIaiCht5I54Kr36IEOkxSi3kI
-	MZXx4MNVv7jWKz8fWUpqV29LRo8oRq2pWZe2KIJSpQAxoca2hpw==
-X-Gm-Gg: ASbGncv5WXio5ONfyeRHI0urBCcMeMWXTOm60jfd0Q94LParYUrVt11C3z0YhV8y/HZ
-	CNywfh4GOA2IBMnafmI3Oe2d7F6PZ2vti1rn3GHBlZ579TFeaK5x+9wTGUM56Pyh3fGyNrwdAbj
-	1lPNdJLxaI/Xas+k5K0vQmiRv4Wk+3mVSkyGSBoiAeILNM516J+6DNwzgSX1hpahLOS7Q72rQ8y
-	c61X+ox7c37XDIHXdlz8fgfgkkmBufxNBoxw3gSglHSpx21OmSNQwMkNvXLh8aT2ps1uh52uUDp
-	P95RgEQTp35F0jAzGeP/xYGJye0FgaZ1WwHefWk6sVGp3PnWCzYAT5svB89KgelNKAeRoOOsHdB
-	vcm/0KCeSf1DTF4acHO1P6FU5eaQNFvc5+BzK15VJ03U=
-X-Received: by 2002:a05:600c:1382:b0:43c:f8fc:f69a with SMTP id 5b1f17b1804b1-43ecf8231a8mr22533775e9.4.1743760859294;
-        Fri, 04 Apr 2025 03:00:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGifz3HIGWQgKUammrvfPkPZxVrPSFShnbthNQnbAXFOUWVRfHdSi2jwRp3iKKOg8pUTCfB1w==
-X-Received: by 2002:a05:600c:1382:b0:43c:f8fc:f69a with SMTP id 5b1f17b1804b1-43ecf8231a8mr22533275e9.4.1743760858803;
-        Fri, 04 Apr 2025 03:00:58 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c71b:7900:8752:fae3:f9c9:a07e? (p200300cbc71b79008752fae3f9c9a07e.dip0.t-ipconnect.de. [2003:cb:c71b:7900:8752:fae3:f9c9:a07e])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec1795630sm46181045e9.29.2025.04.04.03.00.55
+        d=1e100.net; s=20230601; t=1743761948; x=1744366748;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1h31gPbZBLLsuTR5n1snPscX7w6OFOorG4D3qCNodmc=;
+        b=O/ebUgokImf98dUx05oHmyKDyHBHMK3+4mQxGzntt5bL5skDVKzem45bC1SjAU5HGA
+         NTf4fi/EgCSBIQjjajMosi5j01awMx+yTxWZcP7DczwSGHo3xwGtGQnHZklste0ZoVYl
+         NS/q95M3kt3E9tJy923/wyvqweuYKm97oyli2cBxx/p5Lo2TX1plbdhRFuVurh83ON36
+         16jsGV3up1CPhH4MUF9ZyHNP2y6FJAo6n+f7cUV198BzVi6KOs901BLiZic3UMNYLKNq
+         c1El0nb1ROsnAXJswA5I8yu1Xm+rW+Osh5pT6Xs9zZdhoaGpEklRgbltm3G/rF2wAe2V
+         kbIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV7MDlQpDgKN9I8jXux0a1rkiWDQukAas9qlr+mDNVsD1X9ywoORHjukmDN+fGHxlfx3XM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFyJNtaPd9xazA9ydGjDW+FGH5qFyGYksTbR1WmR647YItO7bQ
+	3GaWRMlNVMrrGL4HBkIvfYMq0EOHMuePELHb//MZhlaXUc/j2WerFQFqFiiuzTIxC0UJ7g5j3Um
+	8u2V1vcHGsg9lDJinF0t3M+GwC0RWGgsjEzxCmENPHNjHhtY7Cw==
+X-Gm-Gg: ASbGncsUHnCi11j7e1Eg+UCTXE+w2t7gVaLyzY8K4WxoptxMw5N31OoQmHSlKBduqhU
+	Ql3DLNAKG+43nnTk9Nd8PXo9eHgJftxCrUZbCjz1skUgR4CqnkRCgwPNZsGzkmn7UzuBY5B4g9u
+	bLE8xZ6qTFqSrsuyVDcBfrC+OdCBV65qZDi1fY62ZupkeKgFpOVxeUJKFvOGul0J0BSjNBr/Db4
+	kmKbf+ZdCAUslrOTFv/ZzlnxT1dm/+a3Hxi7qpGoGtoKnp98Xb/bm3srZXix09SAiptV3aJiQLO
+	lxifMEttZwYtYcGXoAn4
+X-Received: by 2002:a17:907:7290:b0:ac7:81b5:7724 with SMTP id a640c23a62f3a-ac7d1776fdfmr271651166b.19.1743761948042;
+        Fri, 04 Apr 2025 03:19:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGrTRWP+6K5kxfZ4+YFYFIue1ZMYy6QaIsh1VgjubCYm9AMB6wPqUXbqRLuGZE+MJfrmIwlZQ==
+X-Received: by 2002:a17:907:7290:b0:ac7:81b5:7724 with SMTP id a640c23a62f3a-ac7d1776fdfmr271650066b.19.1743761947643;
+        Fri, 04 Apr 2025 03:19:07 -0700 (PDT)
+Received: from [192.168.10.48] ([151.49.230.224])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-ac7bfe9be51sm232805666b.50.2025.04.04.03.19.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Apr 2025 03:00:56 -0700 (PDT)
-Message-ID: <4a33daa3-7415-411e-a491-07635e3cfdc4@redhat.com>
-Date: Fri, 4 Apr 2025 12:00:55 +0200
+        Fri, 04 Apr 2025 03:19:06 -0700 (PDT)
+Message-ID: <c8573ad2-2865-4e67-afd2-3c4d272ac548@redhat.com>
+Date: Fri, 4 Apr 2025 12:19:05 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,224 +89,229 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] s390/virtio_ccw: don't allocate/assign airqs for
- non-existing queues
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
- virtualization@lists.linux.dev, kvm@vger.kernel.org,
- Chandra Merla <cmerla@redhat.com>, Stable@vger.kernel.org,
- Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Eric Farman <farman@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Wei Wang <wei.w.wang@intel.com>
-References: <20250402203621.940090-1-david@redhat.com>
- <20250403161836.7fe9fea5.pasic@linux.ibm.com>
- <e2936e2f-022c-44ee-bb04-f07045ee2114@redhat.com>
- <20250404063619.0fa60a41.pasic@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH] selftests: kvm: revamp MONITOR/MWAIT tests
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc: seanjc@google.com
+References: <20250320165224.144373-1-pbonzini@redhat.com>
 Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20250404063619.0fa60a41.pasic@linux.ibm.com>
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <20250320165224.144373-1-pbonzini@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 04.04.25 06:36, Halil Pasic wrote:
-> On Thu, 3 Apr 2025 16:28:31 +0200
-> David Hildenbrand <david@redhat.com> wrote:
+On 3/20/25 17:52, Paolo Bonzini wrote:
+> Run each testcase in a separate VMs to cover more possibilities;
+> move WRMSR close to MONITOR/MWAIT to test updating CPUID bits
+> while in the VM.
 > 
->>> Sorry I have to have a look at that discussion. Maybe it will answer
->>> some my questions.
->>
->> Yes, I think so.
->>
->>>    
->>>> Let's fix it without affecting existing setups for now by properly
->>>> ignoring the non-existing queues, so the indicator bits will match
->>>> the queue indexes.
->>>
->>> Just one question. My understanding is that the crux is that Linux
->>> and QEMU (or the driver and the device) disagree at which index
->>> reporting_vq is actually sitting. Is that right?
->>
->> I thought I made it clear: this is only about the airq indicator bit.
->> That's where both disagree.
->>
->> Not the actual queue index (see above).
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Queued now.
+
+Paolo
+
+> ---
+>   .../selftests/kvm/x86/monitor_mwait_test.c    | 108 +++++++++---------
+>   1 file changed, 57 insertions(+), 51 deletions(-)
 > 
-> I did some more research including having a look at that discussion. Let
-> me try to sum up how did we end up here.
-
-Let me add some more details after digging as well:
-
-> 
-> Before commit a229989d975e ("virtio: don't allocate vqs when names[i] =
-> NULL") the kernel behavior used to be in spec, but QEMU and possibly
-> other hypervisor were out of spec and things did not work.
-
-It all started with VIRTIO_BALLOON_F_FREE_PAGE_HINT. Before that,
-we only had the single optional VIRTIO_BALLOON_F_STATS_VQ queue at the very
-end. So there was no possibility for holes "in-between".
-
-In the Linux driver, we created the stats queue only if the feature bit
-VIRTIO_BALLOON_F_STATS_VQ was actually around:
-
-	nvqs = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ) ? 3 : 2;
-	err = virtio_find_vqs(vb->vdev, nvqs, vqs, callbacks, names, NULL);
-
-That changed with VIRTIO_BALLOON_F_FREE_PAGE_HINT, because we would
-unconditionally create 4 queues. QEMU always supported the first 3 queues
-unconditionally, but old QEMU did obviously not support the (new)
-VIRTIO_BALLOON_F_FREE_PAGE_HINT queue.
-
-390x didn't particularly like getting queried for non-existing
-queues. [1] So the fix was not for a hypervisor that was out of spec, but
-because quering non-existing queues didn't work.
-
-The fix implied that if VIRTIO_BALLOON_F_STATS_VQ is missing, suddenly the queue
-index of VIRTIO_BALLOON_F_FREE_PAGE_HINT changed as well.
-
-Again, as QEMU always implemented the 3 first queues unconditionally, this was
-not a problem.
-
-[1] https://lore.kernel.org/all/c6746307-fae5-7652-af8d-19f560fc31d9@de.ibm.com/#t
-
-> 
-> Possibly because of the complexity of fixing the hypervisor(s) commit
-> a229989d975e ("virtio: don't allocate vqs when names[i] = NULL") opted
-> for changing the guest side so that it does not fit the spec but fits
-> the hypervisor(s). It unfortunately also broke notifiers (for the with
-> holes) scenario for virtio-ccw only.
-
-Yes, it broke the notifiers.
-
-But note that everything was in spec at that point, because we only documented
-"free_page_vq == 3" in the spec *2 years later*, in 2020:
-
-commit 38448268eba0c105200d131c3f7f660129a4d673
-Author: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-Date:   Tue Aug 25 07:45:02 2020 -0700
-
-     content: Document balloon feature free page hints
-     
-     Free page hints allow the balloon driver to provide information on what
-     pages are not currently in use so that we can avoid the cost of copying
-     them in migration scenarios. Add a feature description for free page hints
-     describing basic functioning and requirements.
-     
-At that point, what we documented in the spec *did not match reality* in
-Linux. QEMU was fully compatible, because VIRTIO_BALLOON_F_STATS_VQ is
-unconditionally set.
-
-
-QEMU and Linux kept using that queue index assignment model, and the spec
-was wrong (out of sync?) at that point. The spec got more wrong with
-
-commit d917d4a8d552c003e046b0e3b1b529d98f7e695b
-Author: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-Date:   Tue Aug 25 07:45:17 2020 -0700
-
-     content: Document balloon feature free page reporting
-     
-     Free page reporting is a feature that allows the guest to proactively
-     report unused pages to the host. By making use of this feature is is
-     possible to reduce the overall memory footprint of the guest in cases where
-     some significant portion of the memory is idle. Add documentation for the
-     free page reporting feature describing the functionality and requirements.
-
-Where we documented VIRTIO_BALLOON_F_REPORTING after the changes were added to
-QEMU+Linux implementation, so the spec did not reflect reality.
-
-I'll note also cloud-hypervisor [2] today follows that model.
-
-In particular, it *only* supports VIRTIO_BALLOON_F_REPORTING, turning
-the queue index of VIRTIO_BALLOON_F_REPORTING into *2* instead of documented
-in the spec to be *4*.
-
-So in reality, we can see VIRTIO_BALLOON_F_REPORTING to be either 2/3/4, depending
-on the availability of the other two features/queues.
-
-[2] https://github.com/cloud-hypervisor/cloud-hypervisor/blob/main/virtio-devices/src/balloon.rs
-
-
-> 
-> Now we had another look at this, and have concluded that fixing the
-> hypervisor(s) and fixing the kernel, and making sure that the fixed
-> kernel can tolerate the old broken hypervisor(s) is way to complicated
-> if possible at all. So we decided to give the spec a reality check and
-> fix the notifier bit assignment for virtio-ccw which is broken beyond
-> doubt if we accept that the correct virtqueue index is the one that the
-> hypervisor(s) use and not the one that the spec says they should use.
-
-In case of virtio-balloon, it's unfortunate that it went that way, but the
-spec simply did not / does not reflect reality when it was added to the spec.
-
-> 
-> With the spec fixed, the whole notion of "holes" will be something that
-> does not make sense any more. With that the merit of the kernel interface
-> virtio_find_vqs() supporting "holes" is quite questionable. Now we need
-> it because the drivers within the Linux kernel still think of the queues
-> in terms of the current spec, i.e. they try to have the "holes" as
-> mandated by the spec, and the duty of making it work with the broken
-> device implementations falls to the transports.
-> 
-
-Right, the "holes" only exist in the input array.
-
-> Under the assumption that the spec is indeed going to be fixed:
-> 
-> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
-
-Thanks!
-
--- 
-Cheers,
-
-David / dhildenb
+> diff --git a/tools/testing/selftests/kvm/x86/monitor_mwait_test.c b/tools/testing/selftests/kvm/x86/monitor_mwait_test.c
+> index 2b550eff35f1..390ae2d87493 100644
+> --- a/tools/testing/selftests/kvm/x86/monitor_mwait_test.c
+> +++ b/tools/testing/selftests/kvm/x86/monitor_mwait_test.c
+> @@ -7,6 +7,7 @@
+>   
+>   #include "kvm_util.h"
+>   #include "processor.h"
+> +#include "kselftest.h"
+>   
+>   #define CPUID_MWAIT (1u << 3)
+>   
+> @@ -14,6 +15,8 @@ enum monitor_mwait_testcases {
+>   	MWAIT_QUIRK_DISABLED = BIT(0),
+>   	MISC_ENABLES_QUIRK_DISABLED = BIT(1),
+>   	MWAIT_DISABLED = BIT(2),
+> +	CPUID_DISABLED = BIT(3),
+> +	TEST_MAX = CPUID_DISABLED * 2 - 1,
+>   };
+>   
+>   /*
+> @@ -35,11 +38,19 @@ do {									\
+>   			       testcase, vector);			\
+>   } while (0)
+>   
+> -static void guest_monitor_wait(int testcase)
+> +static void guest_monitor_wait(void *arg)
+>   {
+> +	int testcase = (int) (long) arg;
+>   	u8 vector;
+>   
+> -	GUEST_SYNC(testcase);
+> +	u64 val = rdmsr(MSR_IA32_MISC_ENABLE) & ~MSR_IA32_MISC_ENABLE_MWAIT;
+> +	if (!(testcase & MWAIT_DISABLED))
+> +		val |= MSR_IA32_MISC_ENABLE_MWAIT;
+> +	wrmsr(MSR_IA32_MISC_ENABLE, val);
+> +
+> +	__GUEST_ASSERT(this_cpu_has(X86_FEATURE_MWAIT) == !(testcase & MWAIT_DISABLED),
+> +		       "Expected CPUID.MWAIT %s\n",
+> +		       (testcase & MWAIT_DISABLED) ? "cleared" : "set");
+>   
+>   	/*
+>   	 * Arbitrarily MONITOR this function, SVM performs fault checks before
+> @@ -50,19 +61,6 @@ static void guest_monitor_wait(int testcase)
+>   
+>   	vector = kvm_asm_safe("mwait", "a"(guest_monitor_wait), "c"(0), "d"(0));
+>   	GUEST_ASSERT_MONITOR_MWAIT("MWAIT", testcase, vector);
+> -}
+> -
+> -static void guest_code(void)
+> -{
+> -	guest_monitor_wait(MWAIT_DISABLED);
+> -
+> -	guest_monitor_wait(MWAIT_QUIRK_DISABLED | MWAIT_DISABLED);
+> -
+> -	guest_monitor_wait(MISC_ENABLES_QUIRK_DISABLED | MWAIT_DISABLED);
+> -	guest_monitor_wait(MISC_ENABLES_QUIRK_DISABLED);
+> -
+> -	guest_monitor_wait(MISC_ENABLES_QUIRK_DISABLED | MWAIT_QUIRK_DISABLED | MWAIT_DISABLED);
+> -	guest_monitor_wait(MISC_ENABLES_QUIRK_DISABLED | MWAIT_QUIRK_DISABLED);
+>   
+>   	GUEST_DONE();
+>   }
+> @@ -74,56 +72,64 @@ int main(int argc, char *argv[])
+>   	struct kvm_vm *vm;
+>   	struct ucall uc;
+>   	int testcase;
+> +	char test[80];
+>   
+> -	TEST_REQUIRE(this_cpu_has(X86_FEATURE_MWAIT));
+>   	TEST_REQUIRE(kvm_has_cap(KVM_CAP_DISABLE_QUIRKS2));
+>   
+> -	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+> -	vcpu_clear_cpuid_feature(vcpu, X86_FEATURE_MWAIT);
+> +	ksft_print_header();
+> +	ksft_set_plan(12);
+> +	for (testcase = 0; testcase <= TEST_MAX; testcase++) {
+> +		vm = vm_create_with_one_vcpu(&vcpu, guest_monitor_wait);
+> +		vcpu_args_set(vcpu, 1, (void *)(long)testcase);
+> +
+> +		disabled_quirks = 0;
+> +		if (testcase & MWAIT_QUIRK_DISABLED) {
+> +			disabled_quirks |= KVM_X86_QUIRK_MWAIT_NEVER_UD_FAULTS;
+> +			strcpy(test, "MWAIT can fault");
+> +		} else {
+> +			strcpy(test, "MWAIT never faults");
+> +		}
+> +		if (testcase & MISC_ENABLES_QUIRK_DISABLED) {
+> +			disabled_quirks |= KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT;
+> +			strcat(test, ", MISC_ENABLE updates CPUID");
+> +		} else {
+> +			strcat(test, ", no CPUID updates");
+> +		}
+> +
+> +		vm_enable_cap(vm, KVM_CAP_DISABLE_QUIRKS2, disabled_quirks);
+> +
+> +		if (!(testcase & MISC_ENABLES_QUIRK_DISABLED) &&
+> +		    (!!(testcase & CPUID_DISABLED) ^ !!(testcase & MWAIT_DISABLED)))
+> +			continue;
+> +
+> +		if (testcase & CPUID_DISABLED) {
+> +			strcat(test, ", CPUID clear");
+> +			vcpu_clear_cpuid_feature(vcpu, X86_FEATURE_MWAIT);
+> +		} else {
+> +			strcat(test, ", CPUID set");
+> +			vcpu_set_cpuid_feature(vcpu, X86_FEATURE_MWAIT);
+> +		}
+> +
+> +		if (testcase & MWAIT_DISABLED)
+> +			strcat(test, ", MWAIT disabled");
+>   
+> -	while (1) {
+>   		vcpu_run(vcpu);
+>   		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
+>   
+>   		switch (get_ucall(vcpu, &uc)) {
+> -		case UCALL_SYNC:
+> -			testcase = uc.args[1];
+> -			break;
+>   		case UCALL_ABORT:
+> -			REPORT_GUEST_ASSERT(uc);
+> -			goto done;
+> +			/* Detected in vcpu_run */
+> +			break;
+>   		case UCALL_DONE:
+> -			goto done;
+> +			ksft_test_result_pass("%s\n", test);
+> +			break;
+>   		default:
+>   			TEST_FAIL("Unknown ucall %lu", uc.cmd);
+> -			goto done;
+> +			break;
+>   		}
+> -
+> -		disabled_quirks = 0;
+> -		if (testcase & MWAIT_QUIRK_DISABLED)
+> -			disabled_quirks |= KVM_X86_QUIRK_MWAIT_NEVER_UD_FAULTS;
+> -		if (testcase & MISC_ENABLES_QUIRK_DISABLED)
+> -			disabled_quirks |= KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT;
+> -		vm_enable_cap(vm, KVM_CAP_DISABLE_QUIRKS2, disabled_quirks);
+> -
+> -		/*
+> -		 * If the MISC_ENABLES quirk (KVM neglects to update CPUID to
+> -		 * enable/disable MWAIT) is disabled, toggle the ENABLE_MWAIT
+> -		 * bit in MISC_ENABLES accordingly.  If the quirk is enabled,
+> -		 * the only valid configuration is MWAIT disabled, as CPUID
+> -		 * can't be manually changed after running the vCPU.
+> -		 */
+> -		if (!(testcase & MISC_ENABLES_QUIRK_DISABLED)) {
+> -			TEST_ASSERT(testcase & MWAIT_DISABLED,
+> -				    "Can't toggle CPUID features after running vCPU");
+> -			continue;
+> -		}
+> -
+> -		vcpu_set_msr(vcpu, MSR_IA32_MISC_ENABLE,
+> -			     (testcase & MWAIT_DISABLED) ? 0 : MSR_IA32_MISC_ENABLE_MWAIT);
+> +		kvm_vm_free(vm);
+>   	}
+> +	ksft_finished();
+>   
+> -done:
+> -	kvm_vm_free(vm);
+>   	return 0;
+>   }
 
 
