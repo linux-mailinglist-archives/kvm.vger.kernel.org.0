@@ -1,111 +1,170 @@
-Return-Path: <kvm+bounces-42651-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42652-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25938A7BE4A
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 15:50:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC3DCA7BE9C
+	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 16:02:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A7281898F06
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 13:50:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4C98189BE9C
+	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 14:01:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F7461F12E8;
-	Fri,  4 Apr 2025 13:49:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7FAF1F2C5B;
+	Fri,  4 Apr 2025 14:00:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="USi10D+n"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GhGmXufM"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 885101EE7B1;
-	Fri,  4 Apr 2025 13:49:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A73BCD27E;
+	Fri,  4 Apr 2025 14:00:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743774587; cv=none; b=YnIbFiUWRnno4nUWaeuQARUTk5BUiP6bTUqQjSs8UYSoCFl8HND+QIEsIXEzMcICjgyj/FUGEV6of1EYfoBKh5SH8QE8rsulBPcsl1Ejy56Dn3K7iioccT6yS9ouwtwslVDM8ZIpqV/Hpsxss/75onMkZQtnfNiOzfnH7zemdpA=
+	t=1743775241; cv=none; b=AnxiqdVHYDHdKfEDFBcSy2cnzxIf5eeqr/oAyRxMCYHpMNZDa8J6zApZkgXb25iHYSYEK8ZWlG4I3mNdkozOmhiVzb5TxT4lKeHlNM4GoKcMKqhPaMpNSFnqgYZR7nzcBZXfWh9NU7UpdM0I+UZ0QZYC/Sj0f7NwEwQEaa1dP/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743774587; c=relaxed/simple;
-	bh=InZ0uos7yT9Kf1hkWBsUYLcrp43412OOZl/bw7DO4Uw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s96M4KrC64Vco9R1GnQka/0yUFW4lJcJRJ7l9XubQCQGHC0s1xlC/bG4ktNYOBb/LogqNTfYRvWcmSegS04rFbO12+3V/6fTg9uCqwGt8Ht/gLnCXoe93+Yz8gZZwHnf9ddTRlT+7DKN4q9V82Mfw4+i3huUJdYxSF5ZVbLlztU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=USi10D+n; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86E89C4CEDD;
-	Fri,  4 Apr 2025 13:49:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743774586;
-	bh=InZ0uos7yT9Kf1hkWBsUYLcrp43412OOZl/bw7DO4Uw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=USi10D+naSHmsOpLEbclvvoUV8OCZArB3n9xpGD99on1UMZaLkaUh+brOpqRUHjUM
-	 z0XibKT/P/RSxfymt/L40cXSF8H9LKoNMf1OFTMr2U3NQCMAR2Ux6Hm3enCUZmWiNX
-	 3VMeGo/FM5zIrC468kOaLBCkZyOEsCxCJ1pPuSBWPFOVfilk0ZeJkRltCqUO5YRa0R
-	 4uhZNjLKNaCACgVmbORjBmkJlsqgdEBlTEA1QHIUiVg/sY8PhuaW1352AymUDAS/jD
-	 TIwikh2QEHHjedoxXiB3TpY2lpVaofO50dMmp1j9XakRekMytpGDUvOeLbL8RA9l7S
-	 F9qLsRuerEHMw==
-Date: Fri, 4 Apr 2025 14:49:38 +0100
-From: Will Deacon <will@kernel.org>
-To: Atish Patra <atishp@rivosinc.com>
-Cc: Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>, weilin.wang@intel.com,
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Conor Dooley <conor@kernel.org>, devicetree@vger.kernel.org,
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-perf-users@vger.kernel.org,
-	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <cleger@rivosinc.com>
-Subject: Re: [PATCH v5 11/21] RISC-V: perf: Restructure the SBI PMU code
-Message-ID: <20250404134937.GA29394@willie-the-truck>
-References: <20250327-counter_delegation-v5-0-1ee538468d1b@rivosinc.com>
- <20250327-counter_delegation-v5-11-1ee538468d1b@rivosinc.com>
+	s=arc-20240116; t=1743775241; c=relaxed/simple;
+	bh=9/SEMBOZxsAvotN2MKqo8m8V8upKHV9GlI2jswR+Q0E=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Y7WKPod6FvmRK2gQR3RcCkpr2Zhk4O/qFHkOis6sUHr2QEyIzVeF/pyMmTDZS1dvbwU376hOTMl6wFdvtNyazbiCWZbXqXWmUvh1RNrtdznL+3BdH1ZW3MtMYGqs4cdEKFxAc8W4UEuHybbR8IkfBQlekwYGQJG+cSETlzVhjQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=GhGmXufM; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 534Coit4007039;
+	Fri, 4 Apr 2025 14:00:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=wAawdn
+	WjwVjA4C1L7fy+HM31JjiouPF2X2FNhOABGsY=; b=GhGmXufMH0t8f5D/1QUoDe
+	ggEuNiqKYizEBy4qbM0kE07lf2JBR87rZ003uNt0JIaTPlqJJzwuILHGMpNmkl+n
+	mbKm3ycTDuIIS5UGZEY4EqQr9xLZs1aVjrsWbZsvcpsOUg8hRGYfsAQfEwIaGDm7
+	9fN3A4QgavDdTuSg7de3wgogQjeT0bbTWc6Tbma+G+8oEJpo4dtXxsA4HtwpVyz9
+	Zcv0KsxdzJvEvDdsa5OFluSLnnedU7n/4+i9EVf90K73HSSqanJRKNo3LUUoD0+y
+	iETaJp8exhIYbNCjk6XSXIO9HMvP7EHJ4bC4hvqS7VAQxrltkIKybSyXGZsPwnoA
+	==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45t356bmfa-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 04 Apr 2025 14:00:32 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 534B7vTo021240;
+	Fri, 4 Apr 2025 14:00:31 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 45t2e7b82j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 04 Apr 2025 14:00:31 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 534E0RtN25690792
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 4 Apr 2025 14:00:27 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5E4CD20040;
+	Fri,  4 Apr 2025 14:00:27 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C91892004B;
+	Fri,  4 Apr 2025 14:00:26 +0000 (GMT)
+Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.152.224.212])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  4 Apr 2025 14:00:26 +0000 (GMT)
+Date: Fri, 4 Apr 2025 16:00:25 +0200
+From: Halil Pasic <pasic@linux.ibm.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        virtualization@lists.linux.dev, kvm@vger.kernel.org,
+        Chandra Merla
+ <cmerla@redhat.com>, Stable@vger.kernel.org,
+        Cornelia Huck
+ <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>,
+        Eric Farman
+ <farman@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik
+ <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian
+ Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle
+ <svens@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Wei Wang
+ <wei.w.wang@intel.com>, Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH v1] s390/virtio_ccw: don't allocate/assign airqs for
+ non-existing queues
+Message-ID: <20250404160025.3ab56f60.pasic@linux.ibm.com>
+In-Reply-To: <d6f5f854-1294-4afa-b02a-657713435435@redhat.com>
+References: <20250402203621.940090-1-david@redhat.com>
+	<20250403161836.7fe9fea5.pasic@linux.ibm.com>
+	<e2936e2f-022c-44ee-bb04-f07045ee2114@redhat.com>
+	<20250404063619.0fa60a41.pasic@linux.ibm.com>
+	<4a33daa3-7415-411e-a491-07635e3cfdc4@redhat.com>
+	<d54fbf56-b462-4eea-a86e-3a0defb6298b@redhat.com>
+	<20250404153620.04d2df05.pasic@linux.ibm.com>
+	<d6f5f854-1294-4afa-b02a-657713435435@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250327-counter_delegation-v5-11-1ee538468d1b@rivosinc.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: JnDzwSSKtyNvcNoZEbvl6f2JDRGMxQ4D
+X-Proofpoint-ORIG-GUID: JnDzwSSKtyNvcNoZEbvl6f2JDRGMxQ4D
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-04-04_06,2025-04-03_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ malwarescore=0 priorityscore=1501 adultscore=0 mlxscore=0 spamscore=0
+ clxscore=1015 suspectscore=0 lowpriorityscore=0 impostorscore=0
+ phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502280000 definitions=main-2504040097
 
-On Thu, Mar 27, 2025 at 12:35:52PM -0700, Atish Patra wrote:
-> With Ssccfg/Smcdeleg, we no longer need SBI PMU extension to program/
-> access hpmcounter/events. However, we do need it for firmware counters.
-> Rename the driver and its related code to represent generic name
-> that will handle both sbi and ISA mechanism for hpmcounter related
-> operations. Take this opportunity to update the Kconfig names to
-> match the new driver name closely.
+On Fri, 4 Apr 2025 15:48:49 +0200
+David Hildenbrand <david@redhat.com> wrote:
+
+> > Sounds good to me! But I'm still a little confused by the "holes".
+> > What confuses me is that i can think of at least 2 distinct types of
+> > "holes": 1) Holes that can be filled later. The queue conceptually
+> > exists, but there is no need to back it with any resources for now
+> > because it is dormant (it can be seen a hole in comparison to queues
+> > that need to materialize -- vring, notifiers, ...)
+> > 2) Holes that can not be filled without resetting the device: i.e. if
+> >     certain features are not negotiated, then a queue X does not
+> > exist, but subsequent queues retain their index.  
 > 
-> No functional change intended.
+> I think it is not about "negotiated", that might be the wrong
+> terminology.
 > 
-> Reviewed-by: Clément Léger <cleger@rivosinc.com>
-> Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> ---
->  MAINTAINERS                                       |   4 +-
->  arch/riscv/include/asm/kvm_vcpu_pmu.h             |   4 +-
->  arch/riscv/include/asm/kvm_vcpu_sbi.h             |   2 +-
->  arch/riscv/kvm/Makefile                           |   4 +-
->  arch/riscv/kvm/vcpu_sbi.c                         |   2 +-
->  drivers/perf/Kconfig                              |  16 +-
->  drivers/perf/Makefile                             |   4 +-
->  drivers/perf/{riscv_pmu.c => riscv_pmu_common.c}  |   0
->  drivers/perf/{riscv_pmu_sbi.c => riscv_pmu_dev.c} | 214 +++++++++++++---------
+> E.g., in QEMU virtio_balloon_device_realize() we define the virtqueues 
+> (virtio_add_queue()) if virtio_has_feature(s->host_features).
+> 
+> That is, it's independent of a feature negotiation (IIUC), it's static 
+> for the device --  "host_features"
+> 
+> 
+> Is that really "negotiated" or is it "the device offers the feature X"
+> ?
 
-I'm still against this renaming churn. It sucks for backporting and
-you're also changing the name of the driver, which could be used by
-scripts in userspace (e.g. module listings, udev rules, cmdline options)
+It is offered. And this is precisely why I'm so keen on having a precise
+wording here.
 
-Will
+Usually for compatibility one needs negotiated. Because the feature
+negotiation is mostly about compatibility. I.e. the driver should be
+able to say, hey I don't know about that feature, and get compatible
+behavior. If for example VIRTIO_BALLOON_F_FREE_PAGE_HINT and
+VIRTIO_BALLOON_F_PAGE_REPORTING are both offered but only
+VIRTIO_BALLOON_F_PAGE_REPORTING is negotiated. That would make reporting_vq
+jump to +1 compared to the case where VIRTIO_BALLOON_F_FREE_PAGE_HINT is
+not offered. Which is IMHO no good, because for the features that the
+driver is going to reject in most of the cases it should not matter if
+it was offered or not.
+
+@MST: Please correct me if I'm wrong!
+
+Regards,
+Halil
 
