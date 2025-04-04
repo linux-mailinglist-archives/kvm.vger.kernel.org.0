@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-42720-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42727-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89EE4A7C4A3
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 22:09:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07629A7C48A
+	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 22:06:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C2393AF477
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 20:04:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F26E71B620F4
+	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 20:02:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7784822F145;
-	Fri,  4 Apr 2025 19:40:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3042A2376F4;
+	Fri,  4 Apr 2025 19:41:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CiJ/bJcR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qO70dyr8"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F84122172A
-	for <kvm@vger.kernel.org>; Fri,  4 Apr 2025 19:40:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD2DF2343B6
+	for <kvm@vger.kernel.org>; Fri,  4 Apr 2025 19:40:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743795648; cv=none; b=KNTHhAGvPd7YNW5X9ie9/mcF71nZh2usjlz9gRTkbchNIa6v5EbdYewrXqzEstzNOqtaeEqDYfyItMj+iIawK1Mvuh0S7euCAdgGNDsUboiszbxrpptmcZQRFvelPG6Ey8uRZgjAk1o4FoclCHin2kZPQo4wHPP3DgSP1RFO78c=
+	t=1743795659; cv=none; b=rhBmscZ1yplGYG+tQXg84JWI56Px+gXxXdD+tUrvy/M47l9OctMcmY7zUjpjnzmqqZp2gqHCP3U97cYEzeHbWxAo+p/0N3Scv98lB6x2ZGbYPcBqtqa//SB/4dcYmbK+QFSgXNw92r/4h0Z9t2HZNQcQ0S15I4sLjEdbD6Q4tGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743795648; c=relaxed/simple;
-	bh=S1IQCpBa9erCP4/lm9a+T/slv15e6a/B9F7tRfkzXTs=;
+	s=arc-20240116; t=1743795659; c=relaxed/simple;
+	bh=qRJSMg/wJdVt+yvoikFVSNe2Xy3I3T24yQmnIrUC1yE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pip+PwwKMjZRsV3LiF33y3sdZDXY4XEdR7UGuIhrMvKnwlywwFZQctJl6ehzydiGMmvAyHRjcNo+kuDohcWC/wupPZ6glbwnsHFFF7DLQ2wkeV8wASHE0pxVG8+nIQ5w9CGMaLgJY6s2yL1Zf2PwP3LTgVgQW5YIYcy7HHHpo4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CiJ/bJcR; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=C8yC4pZXIDF6tCXwI9iS2299oWDT4r+P7r/glJIn6BfQ6GYjcUbQg5MkpAurn/THEYHHwCukWtsCA2cI40uUz4fw5t055OTmz1RhxsVuH7esxpQv2h9mPvwf6lbeZ0Tkbt3yJQ934vimxDQJdJ/OocowoB/PDiBt+WAV0dEYIy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qO70dyr8; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-739071bdf2eso1813657b3a.2
-        for <kvm@vger.kernel.org>; Fri, 04 Apr 2025 12:40:46 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-736cb72efd5so2196528b3a.3
+        for <kvm@vger.kernel.org>; Fri, 04 Apr 2025 12:40:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743795646; x=1744400446; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1743795657; x=1744400457; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=uaVpxlbnDgtNQ9eArDqZS6RnH4UAPqkG1v5XnP6kRe0=;
-        b=CiJ/bJcRDGfhiMp8nRs17hBZl77Hnzs9FB3jdyAVsfJmhIodgAfvt+b1dg53t2DOux
-         SQ7Dp4OXeVssclGWIDlz9gAec09GWcDzw+/LRgXMT3bVf0MNy5JkuQY/UrdwcBqRgYRz
-         z2SWr5rZBzoVoWObigTimfkpDTM47u33SzasjmwkMyeicwvjwmiUVKhEdX96g97ikPMg
-         Tbwx0v16Z1KSLFg2EEvm7YZB7+ov2UbHJvqV3iPJ+yXMOyvmtdsOTPLRxgpn+c6zDC0O
-         MqyfGCaIZR9wdw035d10GY/+WD25cjIqcQlJ3evh7Mmak6FGbz6lyIoZ30/ujBZaTgbA
-         pchA==
+        bh=kz4x5Upf+TkOuVEZrNth6TOEjNFtX/45/lAAaTZzYMc=;
+        b=qO70dyr8qbrEFudkBQBPW17woNOmd46w9P+8oZE/ZjbgtA/9eD+bHDZFkkIgvwS8ay
+         myWnqd8sUBjAdiJHcd9b489jk8qYStgsm72dOwrbI3E6jE2XxPDPLO8KgNJk8pyi/gkU
+         MkP1zBkWZv6SNN61T0hqE+Eew09xWRrn1I1B0DzuweN/ehWf6QYdkD5H0a+X4tMBS3Mj
+         8olPNb4B2NOx5hmDG94Elaf9rSzbiVYHwyEN9cSrOG41SZFae/XTPcc4dHoupVaHJt0g
+         sEgWIb3ZyYuSLn1cOBnAn3zsE72GgUdL7SfEYTo3U0FlhLfQgWYxFeLNmD+3ro+75sTh
+         l97A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743795646; x=1744400446;
+        d=1e100.net; s=20230601; t=1743795657; x=1744400457;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=uaVpxlbnDgtNQ9eArDqZS6RnH4UAPqkG1v5XnP6kRe0=;
-        b=hiSrj5pePqteDuLdWNqQgl9eVSoqg+jEQbULVCcmaiSMVbah/pg3DrOAXolWIDhVoF
-         S3eOmeJo/moQclg3dddm04ow/dO+NMOFVQhELxhS7nGHdJUJcjHVEXIzWVnZZwWqvsm+
-         4gsZwLVgv3xM1rZ9xmK4IWMes0ApDhUsCTNy/1D0PgVjuLIORR9Or3KEgmfXORUU2L8u
-         AiUxxQxdTCjGrIvPDfCfRwEPKhEiY8EkmY34F5bnj07NxOLCx+ZQTI6jS1YrmpxPIQO7
-         xDyUCYKj4/ZYwXgE+luNhiYnqq7rQCD58thnZ2Dvc0SPpNDe+AF9zjKJOYZdT2KUpd5s
-         Lj5Q==
-X-Gm-Message-State: AOJu0YzTFPdkBML4kfKXsa0O0Lx+ITbPyDwOsyuIAb2T4Ap1QmyMugjZ
-	F2Dw9T3eRmkUQsxoMB3IQLoCA6sc1zb98FotlbGN223zJKpJLIJFRGyLBKVEJSc6QHLfsTW/V6w
-	Emg==
-X-Google-Smtp-Source: AGHT+IEaPgjswzlO8HHW+mHK05gIj6Syjqlu81aOJEReqz978dEgQfNJanfgf5aiklETS63POvgyQk3Fmxw=
-X-Received: from pfhh19.prod.google.com ([2002:a05:6a00:2313:b0:736:ab5f:21f4])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2289:b0:736:755b:8317
- with SMTP id d2e1a72fcca58-73b6b8f8f45mr861882b3a.21.1743795645870; Fri, 04
- Apr 2025 12:40:45 -0700 (PDT)
+        bh=kz4x5Upf+TkOuVEZrNth6TOEjNFtX/45/lAAaTZzYMc=;
+        b=EXkxvJ6kvgztPrFZQNolUCfMVZh8jE9JOm8WPGz1lYmJViLTM4meJ3qOcniIjOUpl+
+         mZwYmosk2iR5+Gay5Gu07AFdrca8AH0Rqt439KxR0yaaO9X2mz38CP0fGSYxRfZUhy3p
+         SBXuJcaP2nNFZA13hou3PgeXZw8Yq7zgHQlmykvXSp/NTlnsHnrqeDzsdOEwQHsA/Uee
+         qflut4GYZx5/LWsL4igfQvsTOJcqGgrkZQ/iDNdki1qW8mAc7/E2SufoJVGu4naHl+KC
+         Cx//8nw2CQyL+v+MlgN37CYH9wgtFrU09POknCU+TW/VfFbm3QXMx0W+0cGoa6MGQGhh
+         wC3A==
+X-Gm-Message-State: AOJu0YxL1lP9dWgu3tCt3kyP/9Ir6OczTKPIqG11VJ7gFN7a+K2yudHC
+	+qP6B8InvadDTKpr6QDx0xktnzkpCmK1TGcuCJF3l/gr1ATqOClv5byq8GfdYbbK8ep20Re/5AO
+	viQ==
+X-Google-Smtp-Source: AGHT+IHkLFUYrRFyJCAgYTx0bID7tXQUTRqySewXCzFOP3XCxELB+3z+iKZV1p70EJLDf5uCBKxj0CFwan0=
+X-Received: from pfxa13.prod.google.com ([2002:a05:6a00:1d0d:b0:736:a68b:88f8])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:3d8d:b0:1f5:93b1:6a58
+ with SMTP id adf61e73a8af0-20107eacc49mr5032422637.8.1743795657302; Fri, 04
+ Apr 2025 12:40:57 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  4 Apr 2025 12:38:49 -0700
+Date: Fri,  4 Apr 2025 12:38:56 -0700
 In-Reply-To: <20250404193923.1413163-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250404193923.1413163-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.504.g3bcea36a83-goog
-Message-ID: <20250404193923.1413163-35-seanjc@google.com>
-Subject: [PATCH 34/67] KVM: x86: Move posted interrupt tracepoint to common code
+Message-ID: <20250404193923.1413163-42-seanjc@google.com>
+Subject: [PATCH 41/67] KVM: x86: Don't update IRTE entries when old and new
+ routes were !MSI
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Joerg Roedel <joro@8bytes.org>, David Woodhouse <dwmw2@infradead.org>, 
@@ -86,149 +87,31 @@ Cc: kvm@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
 	David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Move the pi_irte_update tracepoint to common x86, and call it whenever the
-IRTE is modified.  Tracing only the modifications that result in an IRQ
-being posted to a vCPU makes the tracepoint useless for debugging.
-
-Drop the vendor specific address; plumbing that into common code isn't
-worth the trouble, as the address is meaningless without a whole pile of
-other information that isn't provided in any tracepoint.
+Skip the entirety of IRTE updates on a GSI routing change if neither the
+old nor the new routing is for an MSI, i.e. if the neither routing setup
+allows for posting to a vCPU.  If the IRTE isn't already host controlled,
+KVM has bigger problems.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/avic.c        |  6 ------
- arch/x86/kvm/trace.h           | 19 +++++++------------
- arch/x86/kvm/vmx/posted_intr.c |  3 ---
- arch/x86/kvm/x86.c             | 12 +++++++++---
- 4 files changed, 16 insertions(+), 24 deletions(-)
+ arch/x86/kvm/x86.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 666f518340a7..dcfe908f5b98 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -825,9 +825,6 @@ int avic_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
- 	 */
- 	svm_ir_list_del(irqfd);
- 
--	pr_debug("SVM: %s: host_irq=%#x, guest_irq=%#x, set=%#x\n",
--		 __func__, host_irq, guest_irq, !!vcpu);
--
- 	/**
- 	 * Here, we setup with legacy mode in the following cases:
- 	 * 1. When cannot target interrupt to a specific vcpu.
-@@ -863,9 +860,6 @@ int avic_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
- 		 */
- 		if (!ret)
- 			ret = svm_ir_list_add(to_svm(vcpu), irqfd, &pi);
--
--		trace_kvm_pi_irte_update(host_irq, vcpu->vcpu_id, guest_irq,
--					 vector, vcpu_info.pi_desc_addr, true);
- 	} else {
- 		ret = irq_set_vcpu_affinity(host_irq, NULL);
- 	}
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index ccda95e53f62..be4f55c23ec7 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -1089,37 +1089,32 @@ TRACE_EVENT(kvm_smm_transition,
-  * Tracepoint for VT-d posted-interrupts and AMD-Vi Guest Virtual APIC.
-  */
- TRACE_EVENT(kvm_pi_irte_update,
--	TP_PROTO(unsigned int host_irq, unsigned int vcpu_id,
--		 unsigned int gsi, unsigned int gvec,
--		 u64 pi_desc_addr, bool set),
--	TP_ARGS(host_irq, vcpu_id, gsi, gvec, pi_desc_addr, set),
-+	TP_PROTO(unsigned int host_irq, struct kvm_vcpu *vcpu,
-+		 unsigned int gsi, unsigned int gvec, bool set),
-+	TP_ARGS(host_irq, vcpu, gsi, gvec, set),
- 
- 	TP_STRUCT__entry(
- 		__field(	unsigned int,	host_irq	)
--		__field(	unsigned int,	vcpu_id		)
-+		__field(	int,		vcpu_id		)
- 		__field(	unsigned int,	gsi		)
- 		__field(	unsigned int,	gvec		)
--		__field(	u64,		pi_desc_addr	)
- 		__field(	bool,		set		)
- 	),
- 
- 	TP_fast_assign(
- 		__entry->host_irq	= host_irq;
--		__entry->vcpu_id	= vcpu_id;
-+		__entry->vcpu_id	= vcpu ? vcpu->vcpu_id : -1;
- 		__entry->gsi		= gsi;
- 		__entry->gvec		= gvec;
--		__entry->pi_desc_addr	= pi_desc_addr;
- 		__entry->set		= set;
- 	),
- 
--	TP_printk("PI is %s for irq %u, vcpu %u, gsi: 0x%x, "
--		  "gvec: 0x%x, pi_desc_addr: 0x%llx",
-+	TP_printk("PI is %s for irq %u, vcpu %d, gsi: 0x%x, gvec: 0x%x",
- 		  __entry->set ? "enabled and being updated" : "disabled",
- 		  __entry->host_irq,
- 		  __entry->vcpu_id,
- 		  __entry->gsi,
--		  __entry->gvec,
--		  __entry->pi_desc_addr)
-+		  __entry->gvec)
- );
- 
- /*
-diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-index fd5f6a125614..baf627839498 100644
---- a/arch/x86/kvm/vmx/posted_intr.c
-+++ b/arch/x86/kvm/vmx/posted_intr.c
-@@ -275,9 +275,6 @@ int vmx_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
- 			.vector = vector,
- 		};
- 
--		trace_kvm_pi_irte_update(host_irq, vcpu->vcpu_id, guest_irq,
--					 vcpu_info.vector, vcpu_info.pi_desc_addr, true);
--
- 		return irq_set_vcpu_affinity(host_irq, &vcpu_info);
- 	} else {
- 		return irq_set_vcpu_affinity(host_irq, NULL);
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 0ab818bba743..a20d461718cc 100644
+index 8325a908fa25..0dc3b45cb664 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -13571,9 +13571,11 @@ static int kvm_pi_update_irte(struct kvm_kernel_irqfd *irqfd,
- 			      struct kvm_kernel_irq_routing_entry *old,
- 			      struct kvm_kernel_irq_routing_entry *new)
+@@ -13678,6 +13678,10 @@ void kvm_arch_update_irqfd_routing(struct kvm_kernel_irqfd *irqfd,
+ 				   struct kvm_kernel_irq_routing_entry *old,
+ 				   struct kvm_kernel_irq_routing_entry *new)
  {
-+	unsigned int host_irq = irqfd->producer->irq;
- 	struct kvm *kvm = irqfd->kvm;
- 	struct kvm_vcpu *vcpu = NULL;
- 	struct kvm_lapic_irq irq;
-+	int r;
- 
- 	if (!irqchip_in_kernel(kvm) ||
- 	    !kvm_arch_has_irq_bypass() ||
-@@ -13600,8 +13602,13 @@ static int kvm_pi_update_irte(struct kvm_kernel_irqfd *irqfd,
- 			vcpu = NULL;
- 	}
- 
--	return kvm_x86_call(pi_update_irte)(irqfd, irqfd->kvm, irqfd->producer->irq,
--					    irqfd->gsi, new, vcpu, irq.vector);
-+	r = kvm_x86_call(pi_update_irte)(irqfd, irqfd->kvm, host_irq, irqfd->gsi,
-+					 new, vcpu, irq.vector);
-+	if (r)
-+		return r;
++	if (new->type != KVM_IRQ_ROUTING_MSI &&
++	    old->type != KVM_IRQ_ROUTING_MSI)
++		return;
 +
-+	trace_kvm_pi_irte_update(host_irq, vcpu, irqfd->gsi, irq.vector, !!vcpu);
-+	return 0;
- }
- 
- int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
-@@ -14074,7 +14081,6 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_intercepts);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_write_tsc_offset);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_ple_window_update);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_pml_full);
--EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_pi_irte_update);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_avic_unaccelerated_access);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_avic_incomplete_ipi);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_avic_ga_log);
+ 	if (old->type == KVM_IRQ_ROUTING_MSI &&
+ 	    new->type == KVM_IRQ_ROUTING_MSI &&
+ 	    !memcmp(&old->msi, &new->msi, sizeof(new->msi)))
 -- 
 2.49.0.504.g3bcea36a83-goog
 
