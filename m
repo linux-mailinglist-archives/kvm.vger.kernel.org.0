@@ -1,138 +1,112 @@
-Return-Path: <kvm+bounces-42764-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42765-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BEE9A7C5BE
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 23:48:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65403A7C62D
+	for <lists+kvm@lfdr.de>; Sat,  5 Apr 2025 00:07:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4ABE9177650
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 21:48:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E8B5189B62B
+	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 22:07:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 911951A83E7;
-	Fri,  4 Apr 2025 21:48:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C658121D3C7;
+	Fri,  4 Apr 2025 22:07:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FBvfhNrM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uDY4wntj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66CE02E62A3
-	for <kvm@vger.kernel.org>; Fri,  4 Apr 2025 21:48:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C2704689
+	for <kvm@vger.kernel.org>; Fri,  4 Apr 2025 22:07:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743803314; cv=none; b=HPPuOk5hwJ6gEvth1MOcr9pVtJgPgeLKrlalk9z9l7iH25kkl1W6EKI6jIN3JnPHzqrR0+n9AP4rgbJD5k8G9VsH/kvSW0za+tGCYlYbIJsr3ZMkzoIl0MBh8cy9LjirL4hJHi0Gp9AVTHiO2miZa3yb7BDqQGHmsj9orSf6dK8=
+	t=1743804425; cv=none; b=YHPrIpmqiuLksOR/s+nsBoCxxx4QIWEQHq0Nj2RI68MKsMSKQDCMf6mNA+K3rTpQlY6RKhNSWSMvwUnUtT55qlO5ogXHQyydUUyESEGZyyzXOw32KG41m66u78fTbvongTlsl25Z0AdwtPN8IbQDczOx5BcI/gzGopRdvEB0wxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743803314; c=relaxed/simple;
-	bh=0dmKkwKNseqfD2qXy02Zh4cyweoIQw5GpiuHXslkeaQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=I8gkFQ97KxE7YMfrp/FbqToaPOWi5LsYQnP7bu7PlzdhxtIidqWaynHjb9h0ZlxjQqgJCnq6drDxPKaNzAoVxXT8dG52IXYGOpmV5mhEg3/Xk0wKoFkF9XJ3D/syho32H2SW04dpAieiO/BYvt07nCgtBuGNKxRva2zpXANpyYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FBvfhNrM; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1743804425; c=relaxed/simple;
+	bh=lic10qncMW0Yuj7ay3ptqbrzclOlFz0Wcn9Xa6mjD1M=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=E7b84t4NZ5qeW//NL8HioSY8byiLWKTfzZ2IWLfZ7nLTHinIsvMvy6It6gU2I3aS8ve+KMBV1LubAyxpAgIjJAtAuJuh2YGjzpizq8+Mo4qWS8izaWTX5wI8U/v5hMyGgkx6JZQUMdCLzRxWUP+YJMn729tluN0q5RZd9+l5uLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uDY4wntj; arc=none smtp.client-ip=209.85.166.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-30364fc706fso2387496a91.3
-        for <kvm@vger.kernel.org>; Fri, 04 Apr 2025 14:48:33 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com
+Received: by mail-io1-f74.google.com with SMTP id ca18e2360f4ac-84cdae60616so306000739f.3
+        for <kvm@vger.kernel.org>; Fri, 04 Apr 2025 15:07:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743803313; x=1744408113; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3cf9fSAlA9wA6PdkDcxtivqGkWoshv2pw9Tz3F/yjKA=;
-        b=FBvfhNrMGEji1IVT03oAumisn1NUQow9p8lwSFBadfxEktIHNI2cKgnHpPEW482yNr
-         XV05QTYGS3btx6ffLRRvwD5RTWB3D/GJ8ld1lpbALQJGfXscBQPvb4rGvhdDUVkKE3hL
-         xDTqKThSEHh5Poxq47f0wm44/Rkn+vykwEabhR53qco0JtgI/nN/vdKOxlbCw98+QQlR
-         8w1TB5FntQ8x0haz5MEBP/MyTDPOkfSpyKldaZegpYPn3XwJyQNzK7baH1UWSzDvLBW3
-         1DJIU+1VKnDLrByZhi7AEbb2ct98qTJ0wiJgQSCeoHNOFSYp43jxTjvHZOERYKUsRUvy
-         qscw==
+        d=google.com; s=20230601; t=1743804423; x=1744409223; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=+ABQvf2myBmBVu0tO5Zf2gufLBIF2IPE6tPBCISSnfw=;
+        b=uDY4wntjiC3Etm0xwfkeWyKS/0qZzSPjfQBloukXG7kN7Ut1JXzLEhrTUbKJyPZ4Pq
+         fT9EpJhmnJF9fr0pCS+okHAI3GmmokWvux6V2lwFYEvT17FBEkvIwIhx8RcZS6eMFjqe
+         0Sd3Yd0qR/+LejAx0qXQqED57aaz7XBLv3Ni6gE/cuGrEx9TM9flZpPVHXTGaZSg7eLf
+         QdJJrv6BnidaBhQoM0d0ZU/I7SnY+tZK3bK+bh2BkgPVKGwFQkzGn0/L8BjiB6SNQCEn
+         67vgP3kIe3wvpsIZlxEeCCOSX+L0GqREPenZtRbKCArdNA+fMN2pSK/rjCTylKCvypd6
+         pNbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743803313; x=1744408113;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3cf9fSAlA9wA6PdkDcxtivqGkWoshv2pw9Tz3F/yjKA=;
-        b=X3yyhXOaZo52d3dj8r7BbEcD2i56w2Eyf0ENugWDQMyraX+OL/VdcAibFHP65VbC5i
-         opwZEs4LiGqwEgFWU/KxsfYQAlctYQMjPSN9EeG7yJCLgV0PIl6JpBatXnfTdDK69F6T
-         Y1mRwIc8Kd0nf5f8+RKT+uC8gDkgi0N5+flKTtq3HrVwQyNXTaXumXAOOd3JJOGQypwE
-         36zhpS4BOs9Rm/crPZAiI8/mGADkA4+mk9eJAkmydGJA9ZZVEH2ROUtn5tnhJKIIZ3V8
-         Y00hs2xzoZ7ISzMyFQ7rKBVW+RHbRIGwwykiN01BLnu0/vZuxvxw6d2pkLPcK/GEAz1R
-         DXcg==
-X-Forwarded-Encrypted: i=1; AJvYcCXyM0yBjOj6O5wjxo8Yxvf52QI/++x5Sl33tfU9k9Ntd0VdReh4iED1pm7t5xYz6fxGw/c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBTALNzTPBuDhLU9VfNXKy/noB+zL7ZyrvqXf8Pi357znMIR8n
-	KdlEQ6G7Wd5hVBHwkiAP6gu3+ySqCdl4pzwX2UnwUxqijE970BNDmeZb4ah9ZfzZMUgjHP9HRac
-	uqw==
-X-Google-Smtp-Source: AGHT+IGnpdNYuWzpbuLbwm0d2ujiOyaHHb+qDWV50749XtRBO5rwC9BebHoC4cuO0ouBPGpi5P4M3hT5gBU=
-X-Received: from pjbsw8.prod.google.com ([2002:a17:90b:2c88:b0:2ff:4be0:c675])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5150:b0:2fe:afa7:eaf8
- with SMTP id 98e67ed59e1d1-306a4860a8amr6236253a91.13.1743803312668; Fri, 04
- Apr 2025 14:48:32 -0700 (PDT)
-Date: Fri, 4 Apr 2025 14:48:31 -0700
-In-Reply-To: <894eb67c-a9e4-4ae4-af32-51d8a71ddfc4@redhat.com>
+        d=1e100.net; s=20230601; t=1743804423; x=1744409223;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+ABQvf2myBmBVu0tO5Zf2gufLBIF2IPE6tPBCISSnfw=;
+        b=FSrtfHhNapEa93HqT/qXdAMZI/sEg7klkhG+aShMuMFNUzPGp4E7Hty9Px+EX3rWzg
+         9OHFI7lQdW0y+VaKxpSX/luPXLoyroCUGOlD2sdIX29T0EYIRjZQnXmw5VLXe2MyJBbD
+         TR/At/o4m5GkdRBHpljcnyv6s4EsBTad0FNytFbmBcK2JP5UBCvDPzVYlW869Of7i4vW
+         2PtFhSozIa6COFhxHys5vrvf/1Kh8PMzWeiy7hVzWr6WGIpJvdnC+G4HPP/3SCVyiXIz
+         NASTtP3Dl66230ihu22ahMBVeujy9fTrbm9J4/C/uZlLTyrHb1StCxX1HmcR90LFI3M6
+         gTZg==
+X-Forwarded-Encrypted: i=1; AJvYcCUjZkAgHtL29FArMLaDN1Fw8GGv1b+Wk+GmLpuqWmZg3MZGwpQyIF3t1dfncOeEGdm2Th8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvRtGNoJaYglTBu7nysBWUcrI3XKMo0jRM2O5yrjlpu5kJjCwW
+	/2I7V1CGzRwGskWyvXQQE5FJ/3+QTHYG3a73cryiGq0IRuPZFFl3rJIv0DGFE9vamX0d3mNwiIV
+	pTP3dxQ==
+X-Google-Smtp-Source: AGHT+IFV9Isc4fgBFHlpxTPEvIA2IWM9thB5QLOG0FR0uQ2WcHEpEv2w8WbCsDqt+JLpu7IkXXi3TGByiQPr
+X-Received: from iobjk27.prod.google.com ([2002:a05:6602:721b:b0:855:9384:bf3d])
+ (user=rananta job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6602:3a82:b0:85d:b054:6eb9
+ with SMTP id ca18e2360f4ac-8612ab4b028mr139258039f.14.1743804423530; Fri, 04
+ Apr 2025 15:07:03 -0700 (PDT)
+Date: Fri,  4 Apr 2025 22:06:57 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250328153133.3504118-1-tabba@google.com> <egk7ltxtgzngmet3dzygvcskvvo34wu333na4dsstvkcezwcjh@6klyi5bjwkwa>
- <894eb67c-a9e4-4ae4-af32-51d8a71ddfc4@redhat.com>
-Message-ID: <Z_BTr9EbC0Vz1uo7@google.com>
-Subject: Re: [PATCH v7 0/7] KVM: Restricted mapping of guest_memfd at the host
- and arm64 support
-From: Sean Christopherson <seanjc@google.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: "Liam R. Howlett" <Liam.Howlett@oracle.com>, Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, pbonzini@redhat.com, 
-	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
-	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
-	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
-	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
-	mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com
-Content-Type: text/plain; charset="us-ascii"
+X-Mailer: git-send-email 2.49.0.504.g3bcea36a83-goog
+Message-ID: <20250404220659.1312465-1-rananta@google.com>
+Subject: [PATCH 0/2] KVM : selftests: arm64: Explicitly set the page attrs to Inner-Shareable
+From: Raghavendra Rao Ananta <rananta@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
+Cc: Raghavendra Rao Anata <rananta@google.com>, Mingwei Zhang <mizhang@google.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Apr 04, 2025, David Hildenbrand wrote:
-> On 04.04.25 20:05, Liam R. Howlett wrote:
-> > But then again, maybe are are not going through linux-mm for upstream?
-> 
-> [replying to some bits]
-> 
-> As all patches and this subject is "KVM:" I would assume this goes through
-> the kvm tree once ready.
+The series fixes a conflict in memory attributes in some implementations,
+such as Neoverse-N3, that causes a data abort in guest EL1 with FSC
+0x35 (IMPLEMENTATION DEFINED fault (Unsupported Exclusive or Atomic
+access)).
 
-Yeah, that's a safe assumption.
+Patch-1 is a cleanup patch that replaces numbers (and comments) to
+using proper macros for hardware configuration, such as registers and
+page-table entries.
 
-> > It looks like a small team across companies are collaborating on this,
-> > and that's awesome.  I think you need to change how you are doing things
-> > and let the rest of us in on the code earlier.
-> 
-> I think the approach taken to share the different pieces early makes sense,
-> it just has to be clearer what the dependencies are and what is actually the
-> first thing that should go in so people can focus review on that.
+Patch-2 fixes the actual bug and sets the page attrs to Inner-Shareable
+by default for the VMs created in the selftests. More details are
+presented in the commit text.
 
-100% agreed that sharing early makes sense, but I also 100% agree with Liam that
-having multiple series flying around with multiple dependencies makes them all
-unreviewable.  I simply don't have the bandwidth to track down who's doing what
-and where.
+Raghavendra Rao Ananta (2):
+  KVM: selftests: arm64: Introduce and use hardware-definition macros
+  KVM: selftests: arm64: Explicitly set the page attrs to
+    Inner-Shareable
 
-I don't see those two sides as conflicting.  Someone "just" needs to take point
-on collecting, squashing, and posting the various inter-related works as a single
-cohesive series.
+ tools/arch/arm64/include/asm/sysreg.h         | 38 ++++++++++++
+ .../selftests/kvm/arm64/page_fault_test.c     |  2 +-
+ .../selftests/kvm/include/arm64/processor.h   | 29 +++++++--
+ .../selftests/kvm/lib/arm64/processor.c       | 60 +++++++++++--------
+ 4 files changed, 96 insertions(+), 33 deletions(-)
 
-As you said, things are getting there, but I recommend prioritizing that above
-the actual code, otherwise reviewers are going to continue ignoring the individual
-series.
 
-FWIW, if necessary, I would much prefer a single massive series over a bunch of
-smaller series all pointing at each other, at least for the initial review.
+base-commit: 38fec10eb60d687e30c8c6b5420d86e8149f7557
+-- 
+2.49.0.504.g3bcea36a83-goog
+
 
