@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-42731-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42732-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB08CA7C43D
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 21:55:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D68D4A7C489
+	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 22:05:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96EE61B61BA9
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 19:54:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBC341B602B9
+	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 20:01:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5967D23BFBC;
-	Fri,  4 Apr 2025 19:41:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8544123A98A;
+	Fri,  4 Apr 2025 19:41:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GDNv8tyl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RHIN6lgr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2201221DA2
-	for <kvm@vger.kernel.org>; Fri,  4 Apr 2025 19:41:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D55C423BD1C
+	for <kvm@vger.kernel.org>; Fri,  4 Apr 2025 19:41:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743795666; cv=none; b=KXreNwVLGq5HPfM+1hkbaM4FyuKyzJIEVm9kV7VgWjig2Xkdo4quzfL+8oZXrGoNpTir9W+8rgKP1oXh40CwN5P9JoUTp+TjTEP0+PL5g1Nxr0wQzuI4gGjN8N0BkXxxUT6YbaB9f69biGEKM1xfk3Z8FTyoTNkp5n94HchT6k4=
+	t=1743795668; cv=none; b=tPggezw+jGN8AdzYsH8U+NFFWNm58hwuOmXvQBP7Vp7MLAgumJqLOWadOAVMsPf90/rgVCPczf2Up1mNI0f0Pvry8BF2DJqh40b6yoykcI6Uy6obbjsJvn8Ze9saZX/7B6cCQFfwgBGdtS2XlElalL5fu/+ucySL+AoI4W8xPrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743795666; c=relaxed/simple;
-	bh=l9/TMQHoV8daxs6LkFNlEupntQ06coEMa2x+aKyzlWY=;
+	s=arc-20240116; t=1743795668; c=relaxed/simple;
+	bh=vEYwD1yOWLfk/95pT3cNRoQCpvLsFYMJf/mNwwjdg6w=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=l3OyfxdR2/L+z569gsGjgq1becsGSexmGfwbgY83lhDE04U+S5d+2kFuQRHPxrOcS1IQRQbxWSEdFNNtFi+EjdhVefvl2vHMPzwX0kW5eIzWoOvs0AyQ3h8h/VQCJSt1AoypiVofNFsVHfm9ZQsZUsp7nAQKQ8qCrgC06fARtqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GDNv8tyl; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=gaDUQt6j6E6trvYpmyxsJssYM9SaPfzCjifpZZfaUMgi5/qq3fyS1cSeMUCRtUtVAFofZLb4CdH5fN6brT6FtWkF4rNjiGb1MsML+qMoi/hfgfwKPudUmpc2qyfIsvYPpd4+JmNg6FrpJcmYvETryc80uBfVoiwCTShKR83yxeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RHIN6lgr; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-736c0306242so3286580b3a.1
-        for <kvm@vger.kernel.org>; Fri, 04 Apr 2025 12:41:04 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-736b2a25d9fso1983611b3a.0
+        for <kvm@vger.kernel.org>; Fri, 04 Apr 2025 12:41:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743795664; x=1744400464; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1743795666; x=1744400466; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=l67GfpOlJHxEJdXm0d3y4sV8FlCkfwhTj3jmH6dDpac=;
-        b=GDNv8tylaFqQpdGTp7C+N42x09fGsCELW7nUl/z2BsNVn3hv4yMiwzq+5GIqy2L5dX
-         AzL9ATqXTGbjWKKp2qSN6mNdS+L9kQ1jApCcPKJDAzxv8DP42hapRIQNK2LFjPv/ja9f
-         OEhYzcYKFgyKBlVBikVLBjZxOA2n6CTBMwPkDz6glvz4yQp6JieI0Hh7Mm/7bmNVg3H8
-         iDBHnweBRMq6e+9ZMkUykJ6rS2MBdKr87MbxJ4Jhh5kAuxpBgmfAl8LahzvLZIXIgt8v
-         wZxUR1ZMNJnm1mYkFgnEqxMDtBDoZtEBh2kBKvEoUPaYKn4/73UkexFrQgPcX9qLNCVs
-         rm0w==
+        bh=fCu4znq/izmNOP+TGp2LQJl6nRBB96ndlJ2G/FSp1oU=;
+        b=RHIN6lgrIfeFHt2loEhTGwv5J4IOocqS1BmpajAT2NECGOQJECqTISX1590E8yip8y
+         Q7FJBWXqk+Klh4YbzjW0ifdmcbVy/jAoAAtNySD//zHoG7mEkNMi65zgaYwc5q/0nwOg
+         M+atOXn7V3czvZVSCZKJu0m7LRYkC1JISB1iup9xal/w7D17iTvrKZxAsWHqyD726DBp
+         3q0uqpkaoLjCH+l0BoupCJNdR64mnZ+q1qxDK7GAmgIR1tM69uVYpBqUULD1OL/06QZr
+         ycez5fCeCpZhklAlcI85JAhsINKtMIx5zqikI14fzXysh6yznuVY9Vk3UYSL2JFs5lqI
+         wCnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743795664; x=1744400464;
+        d=1e100.net; s=20230601; t=1743795666; x=1744400466;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=l67GfpOlJHxEJdXm0d3y4sV8FlCkfwhTj3jmH6dDpac=;
-        b=uIKasnjhhVlXkxSFVtQ0rncjXMK1Ip6m+OpndGJ0H+Zq24sDGvrRuhWiNFe+VZzHi0
-         9pcQCCCdGTzX4fyiiUA9obA00ufiyoLBe3LKA1ctiav3eGJZtrn9tystJrU5GC/CjPBz
-         DccC9F4Op+za/ZwkmqqFnYyNC6nTnLIbEG3OTGDPLJdotln8OTlC+MMmEvfrBgU2IWTt
-         urSRnRRDH43ghjD+IPkIQW5Qu5953Smx4zTpwOqzI64nLiwpHhpHLpuQnPan1EBsJX29
-         /9YNQRp5pLRqzt6eVSLlbl32RbY2kiWgTQ6wWlNJ0NA+K0TVXb1HlYBp/RYNHzUUbbqY
-         BpgA==
-X-Gm-Message-State: AOJu0Yw38mGeJFyX6k9gb9HekzzqTZR0fwVUmUOOuHV8TyR7V1xjwgU2
-	qCuIU35sMgpFWOUsQ203iBGkgtdOACt9ia+Y19fqIM3KfSntdNcIilSXftfA6eaE3+xV9fL5+fp
-	/xA==
-X-Google-Smtp-Source: AGHT+IEsFzK6cRrJ4WqDr7v3u7M9JaAhLsSDAqEgoXQfJ0GjLsWP9yEnMTwux+uXm8Wz38v+7YUWG83LmH0=
-X-Received: from pfgs23.prod.google.com ([2002:a05:6a00:1797:b0:732:6425:de9a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:398f:b0:730:9752:d02a
- with SMTP id d2e1a72fcca58-739e48cefc2mr6715054b3a.4.1743795664464; Fri, 04
- Apr 2025 12:41:04 -0700 (PDT)
+        bh=fCu4znq/izmNOP+TGp2LQJl6nRBB96ndlJ2G/FSp1oU=;
+        b=e8Qm4hac6uCqMkl9/FLEQ8wqUDCei5bIfNqs216au9GVX0TuR56f90YKGkH7nCk9mJ
+         /03D0Ez9Y6xUaUsJqP88HfjxgRZFW665SfcTHc2UBuXtmOOqgV4VrXbj2cWF+QgoL+km
+         V4EcHNeduvOE8myC1G762/Q+p7JgAXKq8tYnyUEOp50ahXCqaPGP78yOXB/keRSi7BwG
+         beiW7lNXkAHYjWbGtBtPllTT7NfzBHKJ8YXJptRv5W+/y+z3zOnzQxOX/U58MjVW0sav
+         RRD49uLCSst8xxZbRJUHnw3bvpqf2razDw/mvO3pwjq5O1OZ85TF8MlYqQQMa1eJWMF8
+         C2uw==
+X-Gm-Message-State: AOJu0Yw1HMEGlVa7Z6MP4+QKYzWSzXwa7qCe4HEetGJ7of+VRiaOdjYe
+	3nEndkY5sXdzkNgu7wrOkVk4fakk2TE/sWlGmuuuCSz+ky2kC927ot4afokVMJVJRr1RdYDs+JW
+	DrQ==
+X-Google-Smtp-Source: AGHT+IGPj22UXTH/Zcy5qZIqn9/BjQASYjiq8B8h2ade9XrhvSEXkbVGkfxvkxUFnqdy7NHyCw+NgEfc9co=
+X-Received: from pfch7.prod.google.com ([2002:a05:6a00:1707:b0:736:aaee:120e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:3cc2:b0:730:75b1:7219
+ with SMTP id d2e1a72fcca58-739e70575e6mr4840675b3a.12.1743795666219; Fri, 04
+ Apr 2025 12:41:06 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  4 Apr 2025 12:39:00 -0700
+Date: Fri,  4 Apr 2025 12:39:01 -0700
 In-Reply-To: <20250404193923.1413163-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250404193923.1413163-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.504.g3bcea36a83-goog
-Message-ID: <20250404193923.1413163-46-seanjc@google.com>
-Subject: [PATCH 45/67] iommu/amd: Factor out helper for manipulating IRTE
- GA/CPU info
+Message-ID: <20250404193923.1413163-47-seanjc@google.com>
+Subject: [PATCH 46/67] iommu/amd: KVM: SVM: Set pCPU info in IRTE when setting
+ vCPU affinity
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Joerg Roedel <joro@8bytes.org>, David Woodhouse <dwmw2@infradead.org>, 
@@ -87,92 +87,147 @@ Cc: kvm@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
 	David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Split the guts of amd_iommu_update_ga() to a dedicated helper so that the
-logic can be shared with flows that put the IRTE into posted mode.
+Now that setting vCPU affinity is guarded with ir_list_lock, i.e. now that
+avic_physical_id_entry can be safely accessed, set the pCPU info
+straight-away when setting vCPU affinity.  Putting the IRTE into posted
+mode, and then immediately updating the IRTE a second time if the target
+vCPU is running is wasteful and confusing.
 
-Opportunistically move amd_iommu_update_ga() and its new helper above
-amd_iommu_activate_guest_mode() so that it's all co-located.
+This also fixes a flaw where a posted IRQ that arrives between putting
+the IRTE into guest_mode and setting the correct destination could cause
+the IOMMU to ring the doorbell on the wrong pCPU.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- drivers/iommu/amd/iommu.c | 59 +++++++++++++++++++++------------------
- 1 file changed, 32 insertions(+), 27 deletions(-)
+ arch/x86/include/asm/irq_remapping.h |  1 +
+ arch/x86/kvm/svm/avic.c              | 26 ++++++++++++++------------
+ drivers/iommu/amd/iommu.c            |  6 ++++--
+ include/linux/amd-iommu.h            |  4 ++--
+ 4 files changed, 21 insertions(+), 16 deletions(-)
 
+diff --git a/arch/x86/include/asm/irq_remapping.h b/arch/x86/include/asm/irq_remapping.h
+index 2dbc9cb61c2f..4c75a17632f6 100644
+--- a/arch/x86/include/asm/irq_remapping.h
++++ b/arch/x86/include/asm/irq_remapping.h
+@@ -35,6 +35,7 @@ struct amd_iommu_pi_data {
+ 	u64 vapic_addr;		/* Physical address of the vCPU's vAPIC. */
+ 	u32 ga_tag;
+ 	u32 vector;		/* Guest vector of the interrupt */
++	int cpu;
+ 	bool is_guest_mode;
+ 	void *ir_data;
+ };
+diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+index 3fcec297e3e3..086139e85242 100644
+--- a/arch/x86/kvm/svm/avic.c
++++ b/arch/x86/kvm/svm/avic.c
+@@ -735,6 +735,7 @@ void avic_apicv_post_state_restore(struct kvm_vcpu *vcpu)
+ 
+ static int avic_set_pi_irte_mode(struct kvm_vcpu *vcpu, bool activate)
+ {
++	int apic_id = kvm_cpu_get_apicid(vcpu->cpu);
+ 	int ret = 0;
+ 	unsigned long flags;
+ 	struct amd_svm_iommu_ir *ir;
+@@ -754,7 +755,7 @@ static int avic_set_pi_irte_mode(struct kvm_vcpu *vcpu, bool activate)
+ 
+ 	list_for_each_entry(ir, &svm->ir_list, node) {
+ 		if (activate)
+-			ret = amd_iommu_activate_guest_mode(ir->data);
++			ret = amd_iommu_activate_guest_mode(ir->data, apic_id);
+ 		else
+ 			ret = amd_iommu_deactivate_guest_mode(ir->data);
+ 		if (ret)
+@@ -819,6 +820,18 @@ int avic_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
+ 		 */
+ 		guard(spinlock_irqsave)(&svm->ir_list_lock);
+ 
++		/*
++		 * Update the target pCPU for IOMMU doorbells if the vCPU is
++		 * running.  If the vCPU is NOT running, i.e. is blocking or
++		 * scheduled out, KVM will update the pCPU info when the vCPU
++		 * is awakened and/or scheduled in.  See also avic_vcpu_load().
++		 */
++		entry = svm->avic_physical_id_entry;
++		if (entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK)
++			pi_data.cpu = entry & AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK;
++		else
++			pi_data.cpu = -1;
++
+ 		ret = irq_set_vcpu_affinity(host_irq, &pi_data);
+ 		if (ret)
+ 			return ret;
+@@ -833,17 +846,6 @@ int avic_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
+ 			return -EIO;
+ 		}
+ 
+-		/*
+-		 * Update the target pCPU for IOMMU doorbells if the vCPU is
+-		 * running.  If the vCPU is NOT running, i.e. is blocking or
+-		 * scheduled out, KVM will update the pCPU info when the vCPU
+-		 * is awakened and/or scheduled in.  See also avic_vcpu_load().
+-		 */
+-		entry = svm->avic_physical_id_entry;
+-		if (entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK)
+-			amd_iommu_update_ga(entry & AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK,
+-					    pi_data.ir_data);
+-
+ 		irqfd->irq_bypass_data = pi_data.ir_data;
+ 		list_add(&irqfd->vcpu_list, &svm->ir_list);
+ 		return 0;
 diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
-index ba3a1a403cb2..4fdf1502be69 100644
+index 4fdf1502be69..b0b4c5ca16a8 100644
 --- a/drivers/iommu/amd/iommu.c
 +++ b/drivers/iommu/amd/iommu.c
-@@ -3775,6 +3775,38 @@ static const struct irq_domain_ops amd_ir_domain_ops = {
- 	.deactivate = irq_remapping_deactivate,
- };
+@@ -3807,7 +3807,7 @@ int amd_iommu_update_ga(int cpu, void *data)
+ }
+ EXPORT_SYMBOL(amd_iommu_update_ga);
  
-+static void __amd_iommu_update_ga(struct irte_ga *entry, int cpu)
-+{
-+	if (cpu >= 0) {
-+		entry->lo.fields_vapic.destination =
-+					APICID_TO_IRTE_DEST_LO(cpu);
-+		entry->hi.fields.destination =
-+					APICID_TO_IRTE_DEST_HI(cpu);
-+		entry->lo.fields_vapic.is_run = true;
-+	} else {
-+		entry->lo.fields_vapic.is_run = false;
-+	}
-+}
-+
-+int amd_iommu_update_ga(int cpu, void *data)
-+{
-+	struct amd_ir_data *ir_data = (struct amd_ir_data *)data;
-+	struct irte_ga *entry = (struct irte_ga *) ir_data->entry;
-+
-+	if (!AMD_IOMMU_GUEST_IR_VAPIC(amd_iommu_guest_ir) ||
-+	    !entry || !entry->lo.fields_vapic.guest_mode)
-+		return 0;
-+
-+	if (!ir_data->iommu)
-+		return -ENODEV;
-+
-+	__amd_iommu_update_ga(entry, cpu);
-+
-+	return __modify_irte_ga(ir_data->iommu, ir_data->irq_2_irte.devid,
-+				ir_data->irq_2_irte.index, entry);
-+}
-+EXPORT_SYMBOL(amd_iommu_update_ga);
-+
- int amd_iommu_activate_guest_mode(void *data)
+-int amd_iommu_activate_guest_mode(void *data)
++int amd_iommu_activate_guest_mode(void *data, int cpu)
  {
  	struct amd_ir_data *ir_data = (struct amd_ir_data *)data;
-@@ -3956,31 +3988,4 @@ int amd_iommu_create_irq_domain(struct amd_iommu *iommu)
+ 	struct irte_ga *entry = (struct irte_ga *) ir_data->entry;
+@@ -3828,6 +3828,8 @@ int amd_iommu_activate_guest_mode(void *data)
+ 	entry->hi.fields.vector            = ir_data->ga_vector;
+ 	entry->lo.fields_vapic.ga_tag      = ir_data->ga_tag;
  
++	__amd_iommu_update_ga(entry, cpu);
++
+ 	return modify_irte_ga(ir_data->iommu, ir_data->irq_2_irte.devid,
+ 			      ir_data->irq_2_irte.index, entry);
+ }
+@@ -3894,7 +3896,7 @@ static int amd_ir_set_vcpu_affinity(struct irq_data *data, void *info)
+ 		ir_data->ga_root_ptr = (pi_data->vapic_addr >> 12);
+ 		ir_data->ga_vector = pi_data->vector;
+ 		ir_data->ga_tag = pi_data->ga_tag;
+-		ret = amd_iommu_activate_guest_mode(ir_data);
++		ret = amd_iommu_activate_guest_mode(ir_data, pi_data->cpu);
+ 	} else {
+ 		ret = amd_iommu_deactivate_guest_mode(ir_data);
+ 	}
+diff --git a/include/linux/amd-iommu.h b/include/linux/amd-iommu.h
+index fe0e16ffe0e5..c9f2df0c4596 100644
+--- a/include/linux/amd-iommu.h
++++ b/include/linux/amd-iommu.h
+@@ -32,7 +32,7 @@ extern int amd_iommu_register_ga_log_notifier(int (*notifier)(u32));
+ 
+ extern int amd_iommu_update_ga(int cpu, void *data);
+ 
+-extern int amd_iommu_activate_guest_mode(void *data);
++extern int amd_iommu_activate_guest_mode(void *data, int cpu);
+ extern int amd_iommu_deactivate_guest_mode(void *data);
+ 
+ #else /* defined(CONFIG_AMD_IOMMU) && defined(CONFIG_IRQ_REMAP) */
+@@ -48,7 +48,7 @@ static inline int amd_iommu_update_ga(int cpu, void *data)
  	return 0;
  }
--
--int amd_iommu_update_ga(int cpu, void *data)
--{
--	struct amd_ir_data *ir_data = (struct amd_ir_data *)data;
--	struct irte_ga *entry = (struct irte_ga *) ir_data->entry;
--
--	if (!AMD_IOMMU_GUEST_IR_VAPIC(amd_iommu_guest_ir) ||
--	    !entry || !entry->lo.fields_vapic.guest_mode)
--		return 0;
--
--	if (!ir_data->iommu)
--		return -ENODEV;
--
--	if (cpu >= 0) {
--		entry->lo.fields_vapic.destination =
--					APICID_TO_IRTE_DEST_LO(cpu);
--		entry->hi.fields.destination =
--					APICID_TO_IRTE_DEST_HI(cpu);
--		entry->lo.fields_vapic.is_run = true;
--	} else {
--		entry->lo.fields_vapic.is_run = false;
--	}
--
--	return __modify_irte_ga(ir_data->iommu, ir_data->irq_2_irte.devid,
--				ir_data->irq_2_irte.index, entry);
--}
--EXPORT_SYMBOL(amd_iommu_update_ga);
- #endif
+ 
+-static inline int amd_iommu_activate_guest_mode(void *data)
++static inline int amd_iommu_activate_guest_mode(void *data, int cpu)
+ {
+ 	return 0;
+ }
 -- 
 2.49.0.504.g3bcea36a83-goog
 
