@@ -1,181 +1,197 @@
-Return-Path: <kvm+bounces-42621-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42622-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14D7DA7B760
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 07:33:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 525ECA7B7EE
+	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 08:44:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6645E189CC6F
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 05:33:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 505373B70B2
+	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 06:44:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0D2A16A95B;
-	Fri,  4 Apr 2025 05:33:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69C1218B47D;
+	Fri,  4 Apr 2025 06:44:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RWgGmVDV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="f0TXJWSF"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E0F62940B
-	for <kvm@vger.kernel.org>; Fri,  4 Apr 2025 05:33:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C1214D283
+	for <kvm@vger.kernel.org>; Fri,  4 Apr 2025 06:44:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743744818; cv=none; b=knfXccJLcgszfG/tvmXPoQ8IOgNIDlE98M7odL8ThF6BDqsdn0XVevkICc1sp6vtPNB1tXJHnlTDy2GDvfa2P29v03ZYqCEmpubnnfXyEZ6JtJrr2zvOFBgrLqsWYYu9Ixrvrp2mrIS0Hoe2NsDlyF2jWOivo1iCQ8UVe3oD8C8=
+	t=1743749052; cv=none; b=o6daqdujkxDnZr4jSI+3fiQmvQawo02NFNf3HkRZN9egjNAOLiPzTESoClx1VG/mhBMwm7e7WpUFsNg3EEHc88VIpaIdGg+0sSuqQmRkLrYzc6vttHi3qfYo/M7bZYKfFHk3UaBVG7UNuKm3DB9RWDArWAbScxRcgy62jPzqy3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743744818; c=relaxed/simple;
-	bh=t5YrEvo1Qv7V/OOCE0jzPDPPWuEcHK5DHyugrkXD3oU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=liuJrITCdcCfzozlR3Aho4T2ZxSVQ5YiJCrA2Kh7c2a3jnRnAQoGXiMMVpsDHV/h8RvRC1l0w9CS/gQjQScJ61MjPMZu+wfBvAF3P/+bOv+DLx4JLr4COonoQTW/cSVFdGc9nP/J1JRAzqJOzENZ4JSG7svtADgIRHByU4hbfS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RWgGmVDV; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743744815;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=W8DadzuBkB0b+TswMeRC57LXNTfY/qY6jGCVQ+lHwe0=;
-	b=RWgGmVDVEz2mbKbGB/sZ/+MSuhg3xTGQWDw5nXp1ATy/WmNtcLDQkdVaWKBnWso3QUMmQe
-	V22vKxkcmsBVGkq4R0nja3WP7cCbQqrFmIr/FOh6/CpV+kqqKQjytir+cbxT1aok1rW0bq
-	nZE4tjtqjfmHpnRfwFF+Zxhcc/ybTlQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-319-D-_eFbYYO16Kz-D80YvghQ-1; Fri, 04 Apr 2025 01:33:33 -0400
-X-MC-Unique: D-_eFbYYO16Kz-D80YvghQ-1
-X-Mimecast-MFC-AGG-ID: D-_eFbYYO16Kz-D80YvghQ_1743744812
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4394c489babso8248795e9.1
-        for <kvm@vger.kernel.org>; Thu, 03 Apr 2025 22:33:33 -0700 (PDT)
+	s=arc-20240116; t=1743749052; c=relaxed/simple;
+	bh=6tboxHh39lsWBhL0q6KdQRyoD4CPiWoAevrPN4IVEBM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Wu/1W3tnJSabYLA897Xc23ZQqqoa20hbXmKEHus7LSQt7xirQW8xxq0FRIRdgsv51dZIS92wSSj+LnXXQQ509YU82BgQGXEFKEuXPa5Vea3ygn4nQd3mIv4NvGp9uZu1JK2dANiJbJeiLE9Xl6+WSzK6dByVmcAKjHgGEe7sv+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=f0TXJWSF; arc=none smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4769e30af66so163091cf.1
+        for <kvm@vger.kernel.org>; Thu, 03 Apr 2025 23:44:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1743749049; x=1744353849; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=QRp7k+A1pFrQ49ZEN8qzXLBlpSlTBAeehOkWfvELJA8=;
+        b=f0TXJWSFvJuDyiUvltCyGdcfsFtZVImr7UawgnwcLt7IgXtGZvcpUa7n8DHgt5QzD6
+         8ItV0erSurMjFhoVugBDKEPpRw1clsPWW8kmc6qe8TbFYy6jbcTnUkOTBgEMRtLqcqUO
+         Mg9YcpxtYKuCvMzT/4Pmoz67hspNu0EbArTicuyuqAOBzf2DQa3CR/EW/cVBedjSPtcV
+         HrtrNSWJhFM4nEvZrnr+EeNQhjHUnOrgS0kwv1YwuuwYxhcp5a20eMNeIEVkV2EFWSTf
+         BrCBx+SrtSmOSVErRvQBYGApXPNxIvYDHZEiqJn9MCiHXFZa1a8/T9+bMDQTU6WLOkLr
+         IQfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743744812; x=1744349612;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W8DadzuBkB0b+TswMeRC57LXNTfY/qY6jGCVQ+lHwe0=;
-        b=WWiANLC5YO7SIlYzxFaZxGPeoYC/BWCuSgYVPGoHxZlA/fZZG9AHWfFxGLwrtuRydt
-         8lgvI4RYC/8mx0XtbSKbP14TzK+3Lb4+Huuw12MkW5f3/Lzjiv6yOtLXMT43hUsuqCJV
-         DXpQ1FE3EKDYaH7ltxdGNZYseNpvT+sDsnTYIXw0UY9fn5wLwjqpg+Xf3aab+aWi8v7w
-         jhXk/Gl167hGIj9staGjhEeL+cZ0j6VR9tlhwT0CGwCaMzTLefH9YUX+O7bvFvy2s+pe
-         CMqIBqC9fC6VvbG18rhM9qPYS8ImGyafzGZqDRHu96soZBAjm9uQHDLteiKo3/v9PiOp
-         ARuw==
-X-Forwarded-Encrypted: i=1; AJvYcCWTlJQDGxF4PDmf9JpsjQiZlfWtUNQiuvVyhTsXttKitc9raXa7MftpB/xHsveZtLfl4VE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx9PsyJ31o/ugf2tXYLrq1GpN3vne98DyaWWAOE56EQJ24X9cbi
-	WK8fg1oOylaEnCd+6uwVuyG38Xka1TwNDUwpqKh8aCBbvqsBErvVi8enzSQ+yJYW9QHbnX7sdcj
-	TU6cL4qcj1D5zP0Fka/E/+2UcDZY4EmdfRinOxTD2vFJ0oDEgNg==
-X-Gm-Gg: ASbGncsirP5/KQX4b7qrEiqIJC3pRJ113JaKFM0bfgYPuVApozxXyYH9BxRXrX3pwQ8
-	kw0UoupkW4AgzWJ2xxYbT91HDMSJ5MsvPV3Y9KUnMDqAvI9mTgzu5PN2Xt4DQLT3AUAhMHnmYoT
-	VegsCH3IL2pl1W0OD4dNow0nzpn8NQyBJl//ubc8qDrjUoM7Dh2jq7Vn8wn0hyV8XVAqco5hYZQ
-	XElztknBPI8nuX7cj8enracj0hsnKsClEeiPHMDsJJn5z3C0iYJeBqE5iRQ0plFgXYvq1jBf9aQ
-	fKiiGu5A4g==
-X-Received: by 2002:a05:600c:6986:b0:43d:a90:9f1 with SMTP id 5b1f17b1804b1-43ecf822cf4mr12380215e9.6.1743744812317;
-        Thu, 03 Apr 2025 22:33:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFOWcVoqDuuU1EzwnYMSgwjMR/a8JCeY7bzgZQlbtecRuO04aJY8fG8iABZRmySxq9rz0/+0A==
-X-Received: by 2002:a05:600c:6986:b0:43d:a90:9f1 with SMTP id 5b1f17b1804b1-43ecf822cf4mr12380055e9.6.1743744811973;
-        Thu, 03 Apr 2025 22:33:31 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec342a3dfsm36561555e9.4.2025.04.03.22.33.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Apr 2025 22:33:31 -0700 (PDT)
-Date: Fri, 4 Apr 2025 01:33:28 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
-	kvm@vger.kernel.org, Chandra Merla <cmerla@redhat.com>,
-	Stable@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
-	Thomas Huth <thuth@redhat.com>, Eric Farman <farman@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Wei Wang <wei.w.wang@intel.com>
-Subject: Re: [PATCH v1] s390/virtio_ccw: don't allocate/assign airqs for
- non-existing queues
-Message-ID: <20250404013208-mutt-send-email-mst@kernel.org>
-References: <20250402203621.940090-1-david@redhat.com>
- <20250403161836.7fe9fea5.pasic@linux.ibm.com>
- <20250403103127-mutt-send-email-mst@kernel.org>
- <20250404060204.04db301d.pasic@linux.ibm.com>
+        d=1e100.net; s=20230601; t=1743749049; x=1744353849;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QRp7k+A1pFrQ49ZEN8qzXLBlpSlTBAeehOkWfvELJA8=;
+        b=BXhqIhROOQJwHEEnEKkUKDpsh+JKGFR8cZAaCAgqcGt0pOxo6MUVF0ZUg+zB0EncMa
+         y+fyjAkE0hd7w4y9WHUKMTLDsriPaLV4Fxd7RrSCZ6/vk9KdWespTTNsdccIigjCoSTj
+         Zs6o7+v/vx8jJ/G1upYjJPXLBsJQaOKdZBElXy2u7KMuI4R2Wo4VbjZSl9fy3GGwboj/
+         VUThEQBN556xZ8iO95gAlIZlpXHW/RaHAa/OlPnQ7ymD8tjhgGmX9aAmYSzb5BQaxy+d
+         6vx7P3Pg1HKOKNIXBwqWGcwxQDL11CTc00ok1KZNtyItSCqkW4jDtb6X/xmSN8yPuChC
+         D9VA==
+X-Forwarded-Encrypted: i=1; AJvYcCVWPKOh3EBShRRt5eqPocyZKpV8FC4T+FbapouiZ6DRY+CHhq4jVWSrs7M3J2BEwyBclN8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2Y3xqxrUvYCQMNPyv9ulNhFjmYFtBKDOjaOQqK3fD2PLNr5HH
+	NW6J/J03GW9XyxcouQKOvz2f8zwyKk1DIoigoIx4SLNmAcW2JNv+ot33LSzAJA9FvNuvea+zc4G
+	xXzplBZsckq+htuIYEc08NX4PGhZQznAjaOq9
+X-Gm-Gg: ASbGncuqZKZ4/PZANlS2VsQ95hNJI+PRcVPHxuAgjioVtty0+u6AD7YZ5MJ9EA+TSQp
+	3MPcSpn7l14YXP9Z3GY0rzrEnq+Kq4d9eTJfiMVgSoCA6OdE2DLlaEPsDMAVyQNewKPn3oZl9Mh
+	249Y7X39IQo1x0oWUVjAVrsBPcAw==
+X-Google-Smtp-Source: AGHT+IG09thUi2Cg5lfaR7AITr07s/waMELK/8mVmq0xXQpugyCN1C8fMQdmgtAODVMkq1XoS/cFYvIp5rTrjTIV7Wc=
+X-Received: by 2002:ac8:5790:0:b0:477:871c:5e80 with SMTP id
+ d75a77b69052e-4792654b0f3mr2010081cf.5.1743749049397; Thu, 03 Apr 2025
+ 23:44:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250404060204.04db301d.pasic@linux.ibm.com>
+References: <20250328153133.3504118-4-tabba@google.com> <diqz1puanquh.fsf@ackerleytng-ctop.c.googlers.com>
+ <Z-3OtjCJYyMXuUX7@google.com> <CA+EHjTwEFm1=pS6hBJ++zujkHCDQtCq548OKZirobPbzCzTqSA@mail.gmail.com>
+ <Z-6gZGSbOvfrTPjV@google.com>
+In-Reply-To: <Z-6gZGSbOvfrTPjV@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Fri, 4 Apr 2025 07:43:32 +0100
+X-Gm-Features: ATxdqUFnj4_SKvrYDsdE58wYUCji883bNG1U9QIzdDfMDlyNRgNZNbRwG-gZp1U
+Message-ID: <CA+EHjTzpd4BW3RfCRK=S9oNnjAYj_1k2xwxku+msgVwVLwd4Fg@mail.gmail.com>
+Subject: Re: [PATCH v7 3/7] KVM: guest_memfd: Track folio sharing within a
+ struct kvm_gmem_private
+To: Sean Christopherson <seanjc@google.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Apr 04, 2025 at 06:02:04AM +0200, Halil Pasic wrote:
-> On Thu, 3 Apr 2025 10:35:33 -0400
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
-> > On Thu, Apr 03, 2025 at 04:18:36PM +0200, Halil Pasic wrote:
-> > > On Wed,  2 Apr 2025 22:36:21 +0200
-> [..]
-> > > 
-> > > 5.5.2 Virtqueues
-> > > 
-> > > 0
-> > >     inflateq 
-> > > 1
-> > >     deflateq 
-> > > 2
-> > >     statsq 
-> > > 3
-> > >     free_page_vq 
-> > > 4
-> > >     reporting_vq  
-> > 
-> > Indeed. Unfortunately, no one at all implemented this properly as
-> > per spec :(.
-> > 
-> > Balloon is the worst offender here but other devices are broken
-> > too in some configurations.
-> > 
-> > 
-> > Given it has been like this for many years I'm inclined in this
-> > instance to fix the spec not the implementations.
-> > 
-> 
-> I understand! For me at least knowing if we are going to change the
-> spec or the implementations is pretty important. It would probably
-> make sense to spin a patch for the spec, just for the unlikely case that
-> somebody did end up implementing this by the spec and wants to protest.
-> 
-> I think, a consequence of this design is that all queues need to be
-> created and allocated at initialization time.
+Hi Sean,
 
-Why? after feature negotiation.
+On Thu, 3 Apr 2025 at 15:51, Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Thu, Apr 03, 2025, Fuad Tabba wrote:
+> > On Thu, 3 Apr 2025 at 00:56, Sean Christopherson <seanjc@google.com> wrote:
+> > > On Wed, Apr 02, 2025, Ackerley Tng wrote:
+> > > > > diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> > > > > index ac6b8853699d..cde16ed3b230 100644
+> > > > > --- a/virt/kvm/guest_memfd.c
+> > > > > +++ b/virt/kvm/guest_memfd.c
+> > > > > @@ -17,6 +17,18 @@ struct kvm_gmem {
+> > > > >     struct list_head entry;
+> > > > >  };
+> > > > >
+> > > > > +struct kvm_gmem_inode_private {
+> > > > > +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> > > > > +   struct xarray shared_offsets;
+> > > > > +   rwlock_t offsets_lock;
+> > > >
+> > > > This lock doesn't work, either that or this lock can't be held while
+> > > > faulting, because holding this lock means we can't sleep, and we need to
+> > > > sleep to allocate.
+> > >
+> > > rwlock_t is a variant of a spinlock, which can't be held when sleeping.
+> > >
+> > > What exactly does offsets_lock protect, and what are the rules for holding it?
+> > > At a glance, it's flawed.  Something needs to prevent KVM from installing a mapping
+> > > for a private gfn that is being converted to shared.  KVM doesn't hold references
+> > > to PFNs while they're mapped into the guest, and kvm_gmem_get_pfn() doesn't check
+> > > shared_offsets let alone take offsets_lock.
+> >
+> > You're right about the rwlock_t. The goal of the offsets_lock is to
+> > protect the shared offsets -- i.e., it's just meant to protect the
+> > SHARED/PRIVATE status of a folio, not more, hence why it's not checked
+> > in kvm_gmem_get_pfn(). It used to be protected by the
+> > filemap_invalidate_lock, but the problem is that it would be called
+> > from an interrupt context.
+> >
+> > However, this is wrong, as you've pointed out. The purpose of locking
+> > is to ensure  that no two conversions of the same folio happen at the
+> > same time. An alternative I had written up is to rely on having
+> > exclusive access to the folio to ensure that, since this is tied to
+> > the folio. That could be either by acquiring the folio lock, or
+> > ensuring that the folio doesn't have any outstanding references,
+> > indicating that we have exclusive access to it. This would avoid the
+> > whole locking issue.
+> >
+> > > ... Something needs to prevent KVM from installing a mapping
+> > > for a private gfn that is being converted to shared.  ...
+> >
+> > > guest_memfd currently handles races between kvm_gmem_fault() and PUNCH_HOLE via
+> > > kvm_gmem_invalidate_{begin,end}().  I don't see any equivalent functionality in
+> > > the shared/private conversion code.
+> >
+> > For in-place sharing, KVM can install a mapping for a SHARED gfn. What
+> > it cannot do is install a mapping for a transient (i.e., NONE) gfn. We
+> > don't rely on kvm_gmem_get_pfn() for that, but on the individual KVM
+> > mmu fault handlers, but that said...
+>
+> Consumption of shared/private physical pages _must_ be enforced by guest_memfd.
+> The private vs. shared state in the MMU handlers is that VM's view of the world
+> and desired state.  The guest_memfd inode is the single source of true for the
+> state of the _physical_ page.
+>
+> E.g. on TDX, if KVM installs a private SPTE for a PFN that is in actuality shared,
+> there will be machine checks and the host will likely crash.
 
-> I mean in the spec we have something like 
-> """
-> 5.1.6.5.6.1 Driver Requirements: Automatic receive steering in multiqueue mode
-> The driver MUST configure the virtqueues before enabling them with the VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET command. 
-> """
-> 
-> For example one could want to hotplug 2 more vCPUs and still have a
-> queue-pair per cpu (and a controlq). Those 2 extra queue-pairs could
-> in theory be allocated on-demand instead of having to allocate memory
-> for the rings for all the queues corresponding to the maxed out setup.
-> I've had a look at the Linux virtio-net and it does allocate all the
-> queues up front.
-> 
-> Also with this design, I believe we would effectively prohibit "holes".
+I agree. As a plus, I've made that change and it actually simplifies the logic .
 
-For existing devices at least.
+> > > I would much, much prefer one large series that shows the full picture than a
+> > > mish mash of partial series that I can't actually review, even if the big series
+> > > is 100+ patches (hopefully not).
+> >
+> > Dropping the RFC from the second series was not intentional, the first
+> > series is the one where I intended to drop the RFC. I apologize for
+> > that.  Especially since I obviously don't know how to handle modules
+> > and wanted some input on how to do that :)
+>
+> In this case, the rules for modules are pretty simple.  Code in mm/ can't call
+> into KVM.  Either avoid callbacks entirely, or implement via a layer of
+> indirection, e.g. function pointer or ops table, so that KVM can provide its
+> implementation at runtime.
 
-> Now if holes are prohibited, IMHO it does not make a whole lot of
-> sense for the virtio_find_vqs() to support holes. Because the holes
-> and a fair amount of complexity. Of course that would make sense as a
-> cleanup on top.
-> 
-> Regards,
-> Halil
+Ack.
 
-
-
+Thanks again!
+/fuad
 
