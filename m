@@ -1,86 +1,86 @@
-Return-Path: <kvm+bounces-42631-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42632-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B697FA7BA9F
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 12:23:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53859A7BAA6
+	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 12:24:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76142174912
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 10:23:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39A0F189FFC8
+	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 10:24:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20B6A1B0434;
-	Fri,  4 Apr 2025 10:22:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7452F1A23BA;
+	Fri,  4 Apr 2025 10:23:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EGCXKKJC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IAiWFTci"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C606219D8B7
-	for <kvm@vger.kernel.org>; Fri,  4 Apr 2025 10:22:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FAAA1C84DC
+	for <kvm@vger.kernel.org>; Fri,  4 Apr 2025 10:23:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743762176; cv=none; b=Lffhq513jrVK5KiY7xEB4Fc6a4JgrrntKgREcqIzL8J9wUxFTcQA7aSe/kTDsdUE9AvA1R8Sqrf6idlswfB1NlxRW6tbEuBxobbaYqV4K2JOMMwQhLiwOvYskeyyz3F7CWdSRKEp4ZnY727dw6BRKjKLiU2osJKNZMf0WAzo2mI=
+	t=1743762233; cv=none; b=bgUqBmBZa3jxrsmutv/+KOSuWUv7dv2YiZWvWuoWrWsaXbInimdMDLfS6jsaFlTdTKn4QuMAfvK9d77EgAmlYPoAr7s2z/JkbNBhqFGtyNHvmcLCMts4opEacG0oYboM9Sl7A7FIIHkc3ThpP0WKwBFWIHwyyqyVQICbMfA8M54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743762176; c=relaxed/simple;
-	bh=JtreWaK1HxThyWsdFhRvKmWImSDOAWofMIBdnx78l+o=;
+	s=arc-20240116; t=1743762233; c=relaxed/simple;
+	bh=gWphGMPeONRtVjLHXMNxQdsgAA1YrbCokB3soMFVFWA=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
-	 In-Reply-To:Content-Type; b=pMQAElZzITSv48m7GKsjCqM4kaLMK2EJrHW3jwWmaprFRQ/PpJKnatLC/ty8t+B6IwOA1ohf1ZAyTat4AV6tywXCxAb55OLqIYoy3qxhDTze0txePNwLGHtOR2H72Fz6Kzf+FDXvWJbthdR33seZd/vMHs0ZwJgRfM3q1/pBRfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EGCXKKJC; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=J7hCTJ+B6i4Kx7lCGVNZ3fVJge84COUbx7mcuV4rHj3h9/O2IallIeWO3XAPxcVZslDJGpFFzTzvZ/xBj5z/z2T/AAcsqpL9fj1JOSGMQe4fY7DYotV0eG3Ysfwxsx4Xv1DHJE8/CIzJOF3VxwPvnsDlbv3il4HL0OQFQVJjU3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IAiWFTci; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743762173;
+	s=mimecast20190719; t=1743762230;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=DNVoYJhFq7cXruMh9BbCFB9GyK713s6YFzIH0vw/1ok=;
-	b=EGCXKKJCmFT+puB0IXuwKa61ttfk9u2a+ZCbR0H4vTKWxwlrdOHqBv6xYZ5Z2erUrgGvsE
-	FFhVyTNcFDhTKDJkIuJ4Lp2QO/Me6NHVCKqg7o9jw4ic4Ty2ptA6k+gUtXYj88ei2k1wWS
-	CACs89epl6S/7L398Eb1bpho8eLSU9s=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=An4YjWIIqwBPDKwmWWV8XK1pBrP+qzzs+GxOsTRdiuQ=;
+	b=IAiWFTciOmwaZejK8eN9g0J7PsttzQtAJot1+dK7/zUQE2vXRYMBdxIhJuYP9EmqgZCe8Q
+	FmCGpkLhjt+q8FKcj933RXTCpRt5mPxb7tAmSQ01WFKEiXE7hUagn5rCNil5afcVQdDifl
+	+k0qfRfDngLo+QSztQEzKdSS/NsmUpc=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-10-SQpHuL6xOROnC0se4O4dFw-1; Fri, 04 Apr 2025 06:22:52 -0400
-X-MC-Unique: SQpHuL6xOROnC0se4O4dFw-1
-X-Mimecast-MFC-AGG-ID: SQpHuL6xOROnC0se4O4dFw_1743762171
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5e6caac1488so2047198a12.0
-        for <kvm@vger.kernel.org>; Fri, 04 Apr 2025 03:22:52 -0700 (PDT)
+ us-mta-610-0dRd61afN16LrTq-jdKX8w-1; Fri, 04 Apr 2025 06:23:49 -0400
+X-MC-Unique: 0dRd61afN16LrTq-jdKX8w-1
+X-Mimecast-MFC-AGG-ID: 0dRd61afN16LrTq-jdKX8w_1743762228
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5e68e9d9270so1724472a12.0
+        for <kvm@vger.kernel.org>; Fri, 04 Apr 2025 03:23:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743762171; x=1744366971;
+        d=1e100.net; s=20230601; t=1743762228; x=1744367028;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:to:from:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DNVoYJhFq7cXruMh9BbCFB9GyK713s6YFzIH0vw/1ok=;
-        b=B4LojrKFIFlg6achJdY4GYQByEYPYo++VsgI4cQVxVkkGvvsPDpaHQiaKUUjZW+jTr
-         zG3uJ6TFbg6XCxSZbgJ+h+PFx3g0vWs4HzQc/LqJ38WVdkuRdiOaOHAdTzohCX9kEWOh
-         ubJFpI5fvXz1yC8XoXgKP4Sv7nt2ydCA4L8g0GJeLlO1svIeReg1EqsWlHTDemjKLeFY
-         6NO1BufQUeG6v3c1l6fRXhLg1tCnpqyRdeRTok/XQd8GxOmbtUtstkJsAJlkGR57FYDM
-         7s90oK/di8IZQiRkmvpDltgs3SaeewZJdgCgpTUXby2YdpIQswGrahVYJVnQfTPbhapM
-         0LRw==
-X-Forwarded-Encrypted: i=1; AJvYcCXbQ6127n2owQy+ZFIH4WYyYZitAtAvS9WaU2JNp7yo2RxzbYSjSiK+A3srIQjJus2EsO0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgsqlsNbHEx8ZIwRayJREO5yzgGtyiDVVRuX4C/WgoS5V1q0Wr
-	Un8AVUONdhZfp61NiVrhGoN0fUG2k4a8czCKv3m7y0k9DDpaKaFY5fFWz3dWHMAQv6Ra0vEER87
-	apb+jFwdzQayWHCJsXV0mm/ayDdIEagbAOOQCedmjDqOiFanuVRsHy0qXyg==
-X-Gm-Gg: ASbGncvzVHpqWl+CH9EvZpmOiAJwewmh8GbsT31oOV6tMD49ECwrMIIscLQoqEc0pY/
-	k/uH58wiT/9DId83nfTcfgVVZ41gF1L906WpSMab2g/n5WTEDmv0JpYQtN47mfjPUiT4nqpvwDh
-	sgTnCAS7VkJosb2OrpNWdXq1hI1xLfuR/E5I9CAwR5KuuM3/AVhR/4pe2ABoGRrUV6ZAQGVWFKf
-	IslQk/lsBYgiiC7k3TfIH4V96e0jPtYJsPVuVoVJWisEEp9kd2zo7OHRu/t4ODcgj1w5HTDEy5z
-	Y9OeGVq3gda8reK+EYI2
-X-Received: by 2002:a05:6402:2714:b0:5e7:87cd:2479 with SMTP id 4fb4d7f45d1cf-5f0b28821dbmr2250723a12.8.1743762170820;
-        Fri, 04 Apr 2025 03:22:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFHM+zZOy5sRewTG5wad0dtUfjY+Jh0Y6kbMGiejkGMj5j7Z6poTz19CfMKHeKcGq5Wo1d3wQ==
-X-Received: by 2002:a05:6402:2714:b0:5e7:87cd:2479 with SMTP id 4fb4d7f45d1cf-5f0b28821dbmr2250708a12.8.1743762170453;
-        Fri, 04 Apr 2025 03:22:50 -0700 (PDT)
+        bh=An4YjWIIqwBPDKwmWWV8XK1pBrP+qzzs+GxOsTRdiuQ=;
+        b=Bs0HFyYnhT3yGrgqm7M9+unQzcX4fJnF883zpmdhS2f5oL7lq93KprNN53+Jydyzu4
+         CINewY34I4kY4q5t+dX31GXvTznOwuUW4Pr4bz9FDkwOoQ7MO348M2j3Ibt7hspcrlxu
+         gyVDkdaFzz/eSl5/JYZ3h/G6aIBDHMy6Sxhn5tvDeHOgKqgdqpTm50bMA0x21rrMaBuG
+         mtLXDsQ46xarhKSkN4LWG+QggKdSQBmc/E+LR+3w74qADMVByc1e+zp3SmPzBra6SgyK
+         QeKYNYm4tcDHwMg7BP5D8wEucHxCEOHyHnak/VEiAXqIlxvcr7s1VG3BIXr7cnkieA5G
+         l8+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU9Wqi6C1HCWfGrRxEPwcm9Jqmgyk9eKo2yZkTxxlv08oIBvI0tyHBGsvFaTYQ11TTzzbo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZ8m8oVYoLjsRCd84L0NVGGTMyvFJTtLCaKTeXN3ZBU0Yq6ks7
+	Q7xPuJLhOt9shGCCNH4rtVrSsOD4mliTFJd4S8j76c+cORjnv+swrBO/d/MEU9DDRepM//3IfCq
+	4pK72coNLiXFTb9mPQX67MJJDFytsBwgZo2BPSiJ67rDgpL+fNjhCpiIRIQ==
+X-Gm-Gg: ASbGncsXYQU7Sy/t7EZnd4w5e02pu3WmANzgaqcTjYY3BAP1qt9lU1Cvz7rYZfAOEjM
+	mbMxNNJkatmn31lx7PIC7aJjwvBgCUuqFpzfIAvOvjn37YT4Zm5G6qJDifJQHcBjkqAvtvEQwse
+	T/AyttSRPNR35H43xaNgdOR5sOTo6EqFV9sOyEdvMO0OpkJ+HYwIGRNMvjOhG6QYTBk8R+s4OIW
+	qldaXuNgqhFcWEg02ORquTvlB/YepWd+55LPe1Au6XFo/gBXw2HO/+Rjfl2XLyHaYIYHIT8T6hn
+	SnnXewEKRRVd6QaHeZL1
+X-Received: by 2002:a05:6402:84d:b0:5e7:73ad:60a2 with SMTP id 4fb4d7f45d1cf-5f0b663162amr1722936a12.30.1743762227666;
+        Fri, 04 Apr 2025 03:23:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHNEMsh2OHwerzBadXVfPUgWo3cu9lJw3Sv5S/um+CSfwYPELsN+T0XYt3uiiRnIG7a3CwquQ==
+X-Received: by 2002:a05:6402:84d:b0:5e7:73ad:60a2 with SMTP id 4fb4d7f45d1cf-5f0b663162amr1722920a12.30.1743762227300;
+        Fri, 04 Apr 2025 03:23:47 -0700 (PDT)
 Received: from [192.168.10.48] ([151.49.230.224])
-        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5f087f0d6bbsm2224445a12.46.2025.04.04.03.22.49
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5f0880b9ff1sm2094295a12.81.2025.04.04.03.23.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Apr 2025 03:22:49 -0700 (PDT)
-Message-ID: <68d3aed1-2afc-43ba-9b84-c28e01637d45@redhat.com>
-Date: Fri, 4 Apr 2025 12:22:48 +0200
+        Fri, 04 Apr 2025 03:23:46 -0700 (PDT)
+Message-ID: <93f75341-a194-46e3-8b01-8d75a55fbe69@redhat.com>
+Date: Fri, 4 Apr 2025 12:23:45 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,10 +88,11 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] selftests: kvm: bring list of exit reasons up to date
+Subject: Re: [PATCH] selftests: kvm: list once tests that are valid on all
+ architectures
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20250331221851.614582-1-pbonzini@redhat.com>
+References: <20250401141327.785520-1-pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
  xsEhBFRCcBIBDqDGsz4K0zZun3jh+U6Z9wNGLKQ0kSFyjN38gMqU1SfP+TUNQepFHb/Gc0E2
@@ -128,35 +129,133 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20250331221851.614582-1-pbonzini@redhat.com>
+In-Reply-To: <20250401141327.785520-1-pbonzini@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 4/1/25 00:18, Paolo Bonzini wrote:
+On 4/1/25 16:13, Paolo Bonzini wrote:
+> Several tests cover infrastructure from virt/kvm/ and userspace APIs that have
+> only minimal requirements from architecture-specific code.  As such, they are
+> available on all architectures that have libkvm support, and this presumably
+> will apply also in the future (for example if loongarch gets selftests support).
+> Put them in a separate variable and list them only once.
+> 
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->   tools/testing/selftests/kvm/lib/kvm_util.c | 5 ++---
->   1 file changed, 2 insertions(+), 3 deletions(-)
 
 Applied now.
 
 Paolo
 
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 279ad8946040..815bc45dd8dc 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -2019,9 +2019,8 @@ static struct exit_reason {
->   	KVM_EXIT_STRING(RISCV_SBI),
->   	KVM_EXIT_STRING(RISCV_CSR),
->   	KVM_EXIT_STRING(NOTIFY),
-> -#ifdef KVM_EXIT_MEMORY_NOT_PRESENT
-> -	KVM_EXIT_STRING(MEMORY_NOT_PRESENT),
-> -#endif
-> +	KVM_EXIT_STRING(LOONGARCH_IOCSR),
-> +	KVM_EXIT_STRING(MEMORY_FAULT),
->   };
+> ---
+>   tools/testing/selftests/kvm/Makefile.kvm | 45 ++++++++----------------
+>   1 file changed, 15 insertions(+), 30 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+> index f773f8f99249..f62b0a5aba35 100644
+> --- a/tools/testing/selftests/kvm/Makefile.kvm
+> +++ b/tools/testing/selftests/kvm/Makefile.kvm
+> @@ -50,8 +50,18 @@ LIBKVM_riscv += lib/riscv/ucall.c
+>   # Non-compiled test targets
+>   TEST_PROGS_x86 += x86/nx_huge_pages_test.sh
 >   
->   /*
+> +# Compiled test targets valid on all architectures with libkvm support
+> +TEST_GEN_PROGS_COMMON = demand_paging_test
+> +TEST_GEN_PROGS_COMMON += dirty_log_test
+> +TEST_GEN_PROGS_COMMON += guest_print_test
+> +TEST_GEN_PROGS_COMMON += kvm_binary_stats_test
+> +TEST_GEN_PROGS_COMMON += kvm_create_max_vcpus
+> +TEST_GEN_PROGS_COMMON += kvm_page_table_test
+> +TEST_GEN_PROGS_COMMON += set_memory_region_test
+> +
+>   # Compiled test targets
+> -TEST_GEN_PROGS_x86 = x86/cpuid_test
+> +TEST_GEN_PROGS_x86 = $(TEST_GEN_PROGS_COMMON)
+> +TEST_GEN_PROGS_x86 += x86/cpuid_test
+>   TEST_GEN_PROGS_x86 += x86/cr4_cpuid_sync_test
+>   TEST_GEN_PROGS_x86 += x86/dirty_log_page_splitting_test
+>   TEST_GEN_PROGS_x86 += x86/feature_msrs_test
+> @@ -119,27 +129,21 @@ TEST_GEN_PROGS_x86 += x86/triple_fault_event_test
+>   TEST_GEN_PROGS_x86 += x86/recalc_apic_map_test
+>   TEST_GEN_PROGS_x86 += access_tracking_perf_test
+>   TEST_GEN_PROGS_x86 += coalesced_io_test
+> -TEST_GEN_PROGS_x86 += demand_paging_test
+> -TEST_GEN_PROGS_x86 += dirty_log_test
+>   TEST_GEN_PROGS_x86 += dirty_log_perf_test
+>   TEST_GEN_PROGS_x86 += guest_memfd_test
+> -TEST_GEN_PROGS_x86 += guest_print_test
+>   TEST_GEN_PROGS_x86 += hardware_disable_test
+> -TEST_GEN_PROGS_x86 += kvm_create_max_vcpus
+> -TEST_GEN_PROGS_x86 += kvm_page_table_test
+>   TEST_GEN_PROGS_x86 += memslot_modification_stress_test
+>   TEST_GEN_PROGS_x86 += memslot_perf_test
+>   TEST_GEN_PROGS_x86 += mmu_stress_test
+>   TEST_GEN_PROGS_x86 += rseq_test
+> -TEST_GEN_PROGS_x86 += set_memory_region_test
+>   TEST_GEN_PROGS_x86 += steal_time
+> -TEST_GEN_PROGS_x86 += kvm_binary_stats_test
+>   TEST_GEN_PROGS_x86 += system_counter_offset_test
+>   TEST_GEN_PROGS_x86 += pre_fault_memory_test
+>   
+>   # Compiled outputs used by test targets
+>   TEST_GEN_PROGS_EXTENDED_x86 += x86/nx_huge_pages_test
+>   
+> +TEST_GEN_PROGS_arm64 = $(TEST_GEN_PROGS_COMMON)
+>   TEST_GEN_PROGS_arm64 += arm64/aarch32_id_regs
+>   TEST_GEN_PROGS_arm64 += arm64/arch_timer_edge_cases
+>   TEST_GEN_PROGS_arm64 += arm64/debug-exceptions
+> @@ -158,22 +162,16 @@ TEST_GEN_PROGS_arm64 += arm64/no-vgic-v3
+>   TEST_GEN_PROGS_arm64 += access_tracking_perf_test
+>   TEST_GEN_PROGS_arm64 += arch_timer
+>   TEST_GEN_PROGS_arm64 += coalesced_io_test
+> -TEST_GEN_PROGS_arm64 += demand_paging_test
+> -TEST_GEN_PROGS_arm64 += dirty_log_test
+>   TEST_GEN_PROGS_arm64 += dirty_log_perf_test
+> -TEST_GEN_PROGS_arm64 += guest_print_test
+>   TEST_GEN_PROGS_arm64 += get-reg-list
+> -TEST_GEN_PROGS_arm64 += kvm_create_max_vcpus
+> -TEST_GEN_PROGS_arm64 += kvm_page_table_test
+>   TEST_GEN_PROGS_arm64 += memslot_modification_stress_test
+>   TEST_GEN_PROGS_arm64 += memslot_perf_test
+>   TEST_GEN_PROGS_arm64 += mmu_stress_test
+>   TEST_GEN_PROGS_arm64 += rseq_test
+> -TEST_GEN_PROGS_arm64 += set_memory_region_test
+>   TEST_GEN_PROGS_arm64 += steal_time
+> -TEST_GEN_PROGS_arm64 += kvm_binary_stats_test
+>   
+> -TEST_GEN_PROGS_s390 = s390/memop
+> +TEST_GEN_PROGS_s390 = $(TEST_GEN_PROGS_COMMON)
+> +TEST_GEN_PROGS_s390 += s390/memop
+>   TEST_GEN_PROGS_s390 += s390/resets
+>   TEST_GEN_PROGS_s390 += s390/sync_regs_test
+>   TEST_GEN_PROGS_s390 += s390/tprot
+> @@ -182,27 +180,14 @@ TEST_GEN_PROGS_s390 += s390/debug_test
+>   TEST_GEN_PROGS_s390 += s390/cpumodel_subfuncs_test
+>   TEST_GEN_PROGS_s390 += s390/shared_zeropage_test
+>   TEST_GEN_PROGS_s390 += s390/ucontrol_test
+> -TEST_GEN_PROGS_s390 += demand_paging_test
+> -TEST_GEN_PROGS_s390 += dirty_log_test
+> -TEST_GEN_PROGS_s390 += guest_print_test
+> -TEST_GEN_PROGS_s390 += kvm_create_max_vcpus
+> -TEST_GEN_PROGS_s390 += kvm_page_table_test
+>   TEST_GEN_PROGS_s390 += rseq_test
+> -TEST_GEN_PROGS_s390 += set_memory_region_test
+> -TEST_GEN_PROGS_s390 += kvm_binary_stats_test
+>   
+> +TEST_GEN_PROGS_riscv = $(TEST_GEN_PROGS_COMMON)
+>   TEST_GEN_PROGS_riscv += riscv/sbi_pmu_test
+>   TEST_GEN_PROGS_riscv += riscv/ebreak_test
+>   TEST_GEN_PROGS_riscv += arch_timer
+>   TEST_GEN_PROGS_riscv += coalesced_io_test
+> -TEST_GEN_PROGS_riscv += demand_paging_test
+> -TEST_GEN_PROGS_riscv += dirty_log_test
+>   TEST_GEN_PROGS_riscv += get-reg-list
+> -TEST_GEN_PROGS_riscv += guest_print_test
+> -TEST_GEN_PROGS_riscv += kvm_binary_stats_test
+> -TEST_GEN_PROGS_riscv += kvm_create_max_vcpus
+> -TEST_GEN_PROGS_riscv += kvm_page_table_test
+> -TEST_GEN_PROGS_riscv += set_memory_region_test
+>   TEST_GEN_PROGS_riscv += steal_time
+>   
+>   SPLIT_TESTS += arch_timer
 
 
