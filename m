@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-42669-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42671-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19F06A7C1D1
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 18:54:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3380BA7C1D2
+	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 18:54:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F0951B61D0B
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 16:53:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F8AC189F01A
+	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 16:53:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87CC1212B3F;
-	Fri,  4 Apr 2025 16:52:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0EDA20E30F;
+	Fri,  4 Apr 2025 16:52:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nJl8mgmI"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cGcmExW6"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FA99211282
-	for <kvm@vger.kernel.org>; Fri,  4 Apr 2025 16:52:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FBF120E328
+	for <kvm@vger.kernel.org>; Fri,  4 Apr 2025 16:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743785576; cv=none; b=GE5HD3l4jAMQFjIg+dq/QJN/6pWtg6QTPkre6X0R2VJ1a/cyFX1xstXp9p0vbyzD9ISP9IKGDEvz+zR0xle59nUDWTVpVjrbAMLrcMTn4VcxFkY77i1zapv3EP3641vRwN+XAkyii/bxqizWvniMzr2celtEb/cstTa6XqCQJ8c=
+	t=1743785578; cv=none; b=cG/m3TQIeAMaxtsIY57SLxEoOe5PuIGSB+dOl5rt9vXBSX0UYJS8u5MmLXzmlAMVeQ6sOdWanF/mR/Yzn/Y86SbiOqoUIJvJu+DGTYeVjZH7N7VJiJ8Q0YrAUlGbqRy6FNp4UkGeauNQjpfrerbTzfD4uK4QX3OFjvLukCmvG+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743785576; c=relaxed/simple;
-	bh=Gm9mtGB73akp1FsZiauxeffEIgKi4vJg1t1cCuDSbUw=;
+	s=arc-20240116; t=1743785578; c=relaxed/simple;
+	bh=6yZ1F+9UGeMGtRl1P0+gOXPovnSWIcL/jJ+f/r3Gilg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=WHG0UAMFkW4sBeKhGOCXUHy5EyTBXHVsH6cghOdE146K9CgGZiijOCOIedJsF8tQXQuNEOenOMRTH2UNmQPSR8TLFskbj7Nqi7daOH6fPUJrzU9q+3w7BhL+TGRR0d4tyVY83GBRTOSlG3ctey7cSzNEH+bZqd+W91U2PLO5zQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nJl8mgmI; arc=none smtp.client-ip=95.215.58.187
+	 MIME-Version; b=apfFtVGnElppu1YYM7LOPj1P9QPt5LT8ks3SspBm4AT4ia3706iHr/UXKyYJcU/roao6fdtOaXl+uxHVCl0JwrFsBsbm6m+r3BZ1UW9a/o2jeSBfgTl72+zTjKw+KRh7IJHB2YwiFHRUs+bhjCUCbqjFlvR3IlAMNw7a1gqA/Qo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cGcmExW6; arc=none smtp.client-ip=95.215.58.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1743785572;
+	t=1743785574;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=k9vyQDUGcuKmvoqdSOB7BgeIFfCZWbPczoYiN/3IZ+w=;
-	b=nJl8mgmInqvkb37/PTzGu0qEGagS13cPdgclFbFmwOtwIXuMK/Id1b7ouil6U610jgx5AC
-	Jt3lDqdh3SFiHZ6+Qxur0/PfBlk+i79Lf1vBO0BFFJ+pNAy/aV7rGfmPzHRedRj9u3UY9l
-	yUfhhHG3YQyXLELjcV1vBA3ql6zILAQ=
+	bh=4Yrc9FbwHc3gTAYXaj+GXsg4kMSnGqBPFyBttAvTWOU=;
+	b=cGcmExW6TeeUyjo9m5BotLauNVoIJfHEotPBDA1mlMAYuxl7n4xrGNqtoRJ6KWiEYJc7U4
+	EiHlyhXSNh4KIp1eDOhoAkPGx30VeStewE50FIcrpKOJlqVGvqcMJocdKQvkZ5qZguUA6p
+	pq/90o66BGNB1+LXp/zStICfcGLuye0=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
@@ -51,9 +51,9 @@ Cc: kvm@vger.kernel.org,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Andre Przywara <andre.przywara@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH kvmtool v2 2/9] arm64: Move arm64-only features into main directory
-Date: Fri,  4 Apr 2025 09:52:25 -0700
-Message-Id: <20250404165233.3205127-3-oliver.upton@linux.dev>
+Subject: [PATCH kvmtool v2 3/9] arm64: Combine kvm.c
+Date: Fri,  4 Apr 2025 09:52:26 -0700
+Message-Id: <20250404165233.3205127-4-oliver.upton@linux.dev>
 In-Reply-To: <20250404165233.3205127-1-oliver.upton@linux.dev>
 References: <20250404165233.3205127-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -65,53 +65,541 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Start the backing out the 32/64-bit split by moving arm64-only features
-up a level into the main arch directory.
+Glue together the ARM common and previously arm64-specific bits into one
+source file.
 
 Acked-by: Marc Zyngier <maz@kernel.org>
 Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- Makefile                    | 6 +++---
- arm/{aarch64 => }/arm-cpu.c | 0
- arm/{aarch64 => }/pmu.c     | 0
- arm/{aarch64 => }/pvtime.c  | 0
- 4 files changed, 3 insertions(+), 3 deletions(-)
- rename arm/{aarch64 => }/arm-cpu.c (100%)
- rename arm/{aarch64 => }/pmu.c (100%)
- rename arm/{aarch64 => }/pvtime.c (100%)
+ Makefile                                   |   1 -
+ arm/aarch64/include/kvm/kvm-arch.h         |  22 ---
+ arm/aarch64/kvm.c                          | 212 ---------------------
+ arm/include/{arm-common => kvm}/kvm-arch.h |   6 +-
+ arm/kvm.c                                  | 207 ++++++++++++++++++++
+ 5 files changed, 212 insertions(+), 236 deletions(-)
+ delete mode 100644 arm/aarch64/include/kvm/kvm-arch.h
+ delete mode 100644 arm/aarch64/kvm.c
+ rename arm/include/{arm-common => kvm}/kvm-arch.h (97%)
 
 diff --git a/Makefile b/Makefile
-index 462659b..cf50cf7 100644
+index cf50cf7..72027e0 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -178,11 +178,11 @@ ifeq ($(ARCH), arm64)
- 	OBJS		+= arm/pci.o
- 	OBJS		+= arm/timer.o
+@@ -180,7 +180,6 @@ ifeq ($(ARCH), arm64)
  	OBJS		+= hw/serial.o
--	OBJS		+= arm/aarch64/arm-cpu.o
-+	OBJS		+= arm/arm-cpu.o
+ 	OBJS		+= arm/arm-cpu.o
  	OBJS		+= arm/aarch64/kvm-cpu.o
- 	OBJS		+= arm/aarch64/kvm.o
--	OBJS		+= arm/aarch64/pvtime.o
--	OBJS		+= arm/aarch64/pmu.o
-+	OBJS		+= arm/pvtime.o
-+	OBJS		+= arm/pmu.o
+-	OBJS		+= arm/aarch64/kvm.o
+ 	OBJS		+= arm/pvtime.o
+ 	OBJS		+= arm/pmu.o
  	ARCH_INCLUDE	:= arm/include
- 	ARCH_INCLUDE	+= -Iarm/aarch64/include
+diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
+deleted file mode 100644
+index 2d1a4ed..0000000
+--- a/arm/aarch64/include/kvm/kvm-arch.h
++++ /dev/null
+@@ -1,22 +0,0 @@
+-#ifndef KVM__KVM_ARCH_H
+-#define KVM__KVM_ARCH_H
+-
+-#include <linux/sizes.h>
+-
+-struct kvm;
+-void kvm__arch_read_kernel_header(struct kvm *kvm, int fd);
+-unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm);
+-u64 kvm__arch_get_kernel_size(struct kvm *kvm);
+-
+-u64 kvm__arch_get_payload_region_size(struct kvm *kvm);
+-
+-int kvm__arch_get_ipa_limit(struct kvm *kvm);
+-void kvm__arch_enable_mte(struct kvm *kvm);
+-
+-#define MAX_PAGE_SIZE	SZ_64K
+-
+-#define ARCH_HAS_CFG_RAM_ADDRESS	1
+-
+-#include "arm-common/kvm-arch.h"
+-
+-#endif /* KVM__KVM_ARCH_H */
+diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
+deleted file mode 100644
+index 98b2437..0000000
+--- a/arm/aarch64/kvm.c
++++ /dev/null
+@@ -1,212 +0,0 @@
+-#include "kvm/kvm.h"
+-
+-#include <asm/image.h>
+-
+-#include <linux/byteorder.h>
+-#include <linux/cpumask.h>
+-#include <linux/sizes.h>
+-
+-#include <kvm/util.h>
+-
+-static struct arm64_image_header *kernel_header;
+-
+-int vcpu_affinity_parser(const struct option *opt, const char *arg, int unset)
+-{
+-	struct kvm *kvm = opt->ptr;
+-	const char *cpulist = arg;
+-	cpumask_t *cpumask;
+-	int cpu, ret;
+-
+-	kvm->cfg.arch.vcpu_affinity = cpulist;
+-
+-	cpumask = calloc(1, cpumask_size());
+-	if (!cpumask)
+-		die_perror("calloc");
+-
+-	ret = cpulist_parse(cpulist, cpumask);
+-	if (ret) {
+-		free(cpumask);
+-		return ret;
+-	}
+-
+-	kvm->arch.vcpu_affinity_cpuset = CPU_ALLOC(NR_CPUS);
+-	if (!kvm->arch.vcpu_affinity_cpuset)
+-		die_perror("CPU_ALLOC");
+-	CPU_ZERO_S(CPU_ALLOC_SIZE(NR_CPUS), kvm->arch.vcpu_affinity_cpuset);
+-
+-	for_each_cpu(cpu, cpumask)
+-		CPU_SET(cpu, kvm->arch.vcpu_affinity_cpuset);
+-
+-	return 0;
+-}
+-
+-void kvm__arch_validate_cfg(struct kvm *kvm)
+-{
+-
+-	if (kvm->cfg.ram_addr < ARM_MEMORY_AREA) {
+-		die("RAM address is below the I/O region ending at %luGB",
+-		    ARM_MEMORY_AREA >> 30);
+-	}
+-
+-	if (kvm->cfg.arch.aarch32_guest &&
+-	    kvm->cfg.ram_addr + kvm->cfg.ram_size > SZ_4G) {
+-		die("RAM extends above 4GB");
+-	}
+-}
+-
+-u64 kvm__arch_default_ram_address(void)
+-{
+-	return ARM_MEMORY_AREA;
+-}
+-
+-void kvm__arch_read_kernel_header(struct kvm *kvm, int fd)
+-{
+-	const char *debug_str;
+-	off_t cur_offset;
+-	ssize_t size;
+-
+-	if (kvm->cfg.arch.aarch32_guest)
+-		return;
+-
+-	kernel_header = malloc(sizeof(*kernel_header));
+-	if (!kernel_header)
+-		return;
+-
+-	cur_offset = lseek(fd, 0, SEEK_CUR);
+-	if (cur_offset == (off_t)-1 || lseek(fd, 0, SEEK_SET) == (off_t)-1) {
+-		debug_str = "Failed to seek in kernel image file";
+-		goto fail;
+-	}
+-
+-	size = xread(fd, kernel_header, sizeof(*kernel_header));
+-	if (size < 0 || (size_t)size < sizeof(*kernel_header))
+-		die("Failed to read kernel image header");
+-
+-	lseek(fd, cur_offset, SEEK_SET);
+-
+-	if (memcmp(&kernel_header->magic, ARM64_IMAGE_MAGIC, sizeof(kernel_header->magic))) {
+-		debug_str = "Kernel image magic not matching";
+-		kernel_header = NULL;
+-		goto fail;
+-	}
+-
+-	return;
+-
+-fail:
+-	pr_debug("%s, using defaults", debug_str);
+-}
+-
+-/*
+- * Return the TEXT_OFFSET value that the guest kernel expects. Note
+- * that pre-3.17 kernels expose this value using the native endianness
+- * instead of Little-Endian. BE kernels of this vintage may fail to
+- * boot. See Documentation/arm64/booting.rst in your local kernel tree.
+- */
+-unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm)
+-{
+-	const char *debug_str;
+-
+-	/* the 32bit kernel offset is a well known value */
+-	if (kvm->cfg.arch.aarch32_guest)
+-		return 0x8000;
+-
+-	if (!kernel_header) {
+-		debug_str = "Kernel header is missing";
+-		goto default_offset;
+-	}
+-
+-	if (!le64_to_cpu(kernel_header->image_size)) {
+-		debug_str = "Image size is 0";
+-		goto default_offset;
+-	}
+-
+-	return le64_to_cpu(kernel_header->text_offset);
+-
+-default_offset:
+-	pr_debug("%s, assuming TEXT_OFFSET to be 0x80000", debug_str);
+-	return 0x80000;
+-}
+-
+-u64 kvm__arch_get_kernel_size(struct kvm *kvm)
+-{
+-	if (kvm->cfg.arch.aarch32_guest || !kernel_header)
+-		return 0;
+-
+-	return le64_to_cpu(kernel_header->image_size);
+-}
+-
+-u64 kvm__arch_get_payload_region_size(struct kvm *kvm)
+-{
+-	if (kvm->cfg.arch.aarch32_guest)
+-		return SZ_256M;
+-
+-	return SZ_512M;
+-}
+-
+-int kvm__arch_get_ipa_limit(struct kvm *kvm)
+-{
+-	int ret;
+-
+-	ret = ioctl(kvm->sys_fd, KVM_CHECK_EXTENSION, KVM_CAP_ARM_VM_IPA_SIZE);
+-	if (ret <= 0)
+-		ret = 0;
+-
+-	return ret;
+-}
+-
+-int kvm__get_vm_type(struct kvm *kvm)
+-{
+-	unsigned int ipa_bits, max_ipa_bits;
+-	unsigned long max_ipa;
+-
+-	/* If we're running on an old kernel, use 0 as the VM type */
+-	max_ipa_bits = kvm__arch_get_ipa_limit(kvm);
+-	if (!max_ipa_bits)
+-		return 0;
+-
+-	/* Otherwise, compute the minimal required IPA size */
+-	max_ipa = kvm->cfg.ram_addr + kvm->cfg.ram_size - 1;
+-	ipa_bits = max(32, fls_long(max_ipa));
+-	pr_debug("max_ipa %lx ipa_bits %d max_ipa_bits %d",
+-		 max_ipa, ipa_bits, max_ipa_bits);
+-
+-	if (ipa_bits > max_ipa_bits)
+-		die("Memory too large for this system (needs %d bits, %d available)", ipa_bits, max_ipa_bits);
+-
+-	return KVM_VM_TYPE_ARM_IPA_SIZE(ipa_bits);
+-}
+-
+-void kvm__arch_enable_mte(struct kvm *kvm)
+-{
+-	struct kvm_enable_cap cap = {
+-		.cap = KVM_CAP_ARM_MTE,
+-	};
+-
+-	if (kvm->cfg.arch.aarch32_guest) {
+-		pr_debug("MTE is incompatible with AArch32");
+-		return;
+-	}
+-
+-	if (kvm->cfg.arch.mte_disabled) {
+-		pr_debug("MTE disabled by user");
+-		return;
+-	}
+-
+-	if (!kvm__supports_extension(kvm, KVM_CAP_ARM_MTE)) {
+-		pr_debug("MTE capability not available");
+-		return;
+-	}
+-
+-	if (ioctl(kvm->vm_fd, KVM_ENABLE_CAP, &cap))
+-		die_perror("KVM_ENABLE_CAP(KVM_CAP_ARM_MTE)");
+-
+-	pr_debug("MTE capability enabled");
+-}
+-
+-static int kvm__arch_free_kernel_header(struct kvm *kvm)
+-{
+-	free(kernel_header);
+-
+-	return 0;
+-}
+-late_exit(kvm__arch_free_kernel_header);
+diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/kvm/kvm-arch.h
+similarity index 97%
+rename from arm/include/arm-common/kvm-arch.h
+rename to arm/include/kvm/kvm-arch.h
+index 60eec02..b097186 100644
+--- a/arm/include/arm-common/kvm-arch.h
++++ b/arm/include/kvm/kvm-arch.h
+@@ -82,7 +82,11 @@
  
-diff --git a/arm/aarch64/arm-cpu.c b/arm/arm-cpu.c
-similarity index 100%
-rename from arm/aarch64/arm-cpu.c
-rename to arm/arm-cpu.c
-diff --git a/arm/aarch64/pmu.c b/arm/pmu.c
-similarity index 100%
-rename from arm/aarch64/pmu.c
-rename to arm/pmu.c
-diff --git a/arm/aarch64/pvtime.c b/arm/pvtime.c
-similarity index 100%
-rename from arm/aarch64/pvtime.c
-rename to arm/pvtime.c
+ #define VIRTIO_RING_ENDIAN	(VIRTIO_ENDIAN_LE | VIRTIO_ENDIAN_BE)
+ 
+-#define ARCH_HAS_PCI_EXP	1
++#define ARCH_HAS_PCI_EXP		1
++#define ARCH_HAS_CFG_RAM_ADDRESS	1
++
++#define MAX_PAGE_SIZE	SZ_64K
++
+ 
+ static inline bool arm_addr_in_ioport_region(u64 phys_addr)
+ {
+diff --git a/arm/kvm.c b/arm/kvm.c
+index cc0cc4f..11c7a16 100644
+--- a/arm/kvm.c
++++ b/arm/kvm.c
+@@ -7,10 +7,16 @@
+ 
+ #include "arm-common/gic.h"
+ 
++#include <linux/byteorder.h>
++#include <linux/cpumask.h>
+ #include <linux/kernel.h>
+ #include <linux/kvm.h>
+ #include <linux/sizes.h>
+ 
++#include <asm/image.h>
++
++static struct arm64_image_header *kernel_header;
++
+ struct kvm_ext kvm_req_ext[] = {
+ 	{ DEFINE_KVM_EXT(KVM_CAP_IRQCHIP) },
+ 	{ DEFINE_KVM_EXT(KVM_CAP_ONE_REG) },
+@@ -87,6 +93,33 @@ void kvm__arch_set_cmdline(char *cmdline, bool video)
+ {
+ }
+ 
++static void kvm__arch_enable_mte(struct kvm *kvm)
++{
++	struct kvm_enable_cap cap = {
++		.cap = KVM_CAP_ARM_MTE,
++	};
++
++	if (kvm->cfg.arch.aarch32_guest) {
++		pr_debug("MTE is incompatible with AArch32");
++		return;
++	}
++
++	if (kvm->cfg.arch.mte_disabled) {
++		pr_debug("MTE disabled by user");
++		return;
++	}
++
++	if (!kvm__supports_extension(kvm, KVM_CAP_ARM_MTE)) {
++		pr_debug("MTE capability not available");
++		return;
++	}
++
++	if (ioctl(kvm->vm_fd, KVM_ENABLE_CAP, &cap))
++		die_perror("KVM_ENABLE_CAP(KVM_CAP_ARM_MTE)");
++
++	pr_debug("MTE capability enabled");
++}
++
+ void kvm__arch_init(struct kvm *kvm)
+ {
+ 	/* Create the virtual GIC. */
+@@ -96,6 +129,90 @@ void kvm__arch_init(struct kvm *kvm)
+ 	kvm__arch_enable_mte(kvm);
+ }
+ 
++static u64 kvm__arch_get_payload_region_size(struct kvm *kvm)
++{
++	if (kvm->cfg.arch.aarch32_guest)
++		return SZ_256M;
++
++	return SZ_512M;
++}
++
++/*
++ * Return the TEXT_OFFSET value that the guest kernel expects. Note
++ * that pre-3.17 kernels expose this value using the native endianness
++ * instead of Little-Endian. BE kernels of this vintage may fail to
++ * boot. See Documentation/arm64/booting.rst in your local kernel tree.
++ */
++static u64 kvm__arch_get_kern_offset(struct kvm *kvm)
++{
++	const char *debug_str;
++
++	/* the 32bit kernel offset is a well known value */
++	if (kvm->cfg.arch.aarch32_guest)
++		return 0x8000;
++
++	if (!kernel_header) {
++		debug_str = "Kernel header is missing";
++		goto default_offset;
++	}
++
++	if (!le64_to_cpu(kernel_header->image_size)) {
++		debug_str = "Image size is 0";
++		goto default_offset;
++	}
++
++	return le64_to_cpu(kernel_header->text_offset);
++
++default_offset:
++	pr_debug("%s, assuming TEXT_OFFSET to be 0x80000", debug_str);
++	return 0x80000;
++}
++
++static void kvm__arch_read_kernel_header(struct kvm *kvm, int fd)
++{
++	const char *debug_str;
++	off_t cur_offset;
++	ssize_t size;
++
++	if (kvm->cfg.arch.aarch32_guest)
++		return;
++
++	kernel_header = malloc(sizeof(*kernel_header));
++	if (!kernel_header)
++		return;
++
++	cur_offset = lseek(fd, 0, SEEK_CUR);
++	if (cur_offset == (off_t)-1 || lseek(fd, 0, SEEK_SET) == (off_t)-1) {
++		debug_str = "Failed to seek in kernel image file";
++		goto fail;
++	}
++
++	size = xread(fd, kernel_header, sizeof(*kernel_header));
++	if (size < 0 || (size_t)size < sizeof(*kernel_header))
++		die("Failed to read kernel image header");
++
++	lseek(fd, cur_offset, SEEK_SET);
++
++	if (memcmp(&kernel_header->magic, ARM64_IMAGE_MAGIC, sizeof(kernel_header->magic))) {
++		debug_str = "Kernel image magic not matching";
++		kernel_header = NULL;
++		goto fail;
++	}
++
++	return;
++
++fail:
++	pr_debug("%s, using defaults", debug_str);
++}
++
++static u64 kvm__arch_get_kernel_size(struct kvm *kvm)
++{
++	if (kvm->cfg.arch.aarch32_guest || !kernel_header)
++		return 0;
++
++	return le64_to_cpu(kernel_header->image_size);
++}
++
+ #define FDT_ALIGN	SZ_2M
+ #define INITRD_ALIGN	4
+ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
+@@ -264,3 +381,93 @@ int kvm__arch_setup_firmware(struct kvm *kvm)
+ {
+ 	return 0;
+ }
++
++int vcpu_affinity_parser(const struct option *opt, const char *arg, int unset)
++{
++	struct kvm *kvm = opt->ptr;
++	const char *cpulist = arg;
++	cpumask_t *cpumask;
++	int cpu, ret;
++
++	kvm->cfg.arch.vcpu_affinity = cpulist;
++
++	cpumask = calloc(1, cpumask_size());
++	if (!cpumask)
++		die_perror("calloc");
++
++	ret = cpulist_parse(cpulist, cpumask);
++	if (ret) {
++		free(cpumask);
++		return ret;
++	}
++
++	kvm->arch.vcpu_affinity_cpuset = CPU_ALLOC(NR_CPUS);
++	if (!kvm->arch.vcpu_affinity_cpuset)
++		die_perror("CPU_ALLOC");
++	CPU_ZERO_S(CPU_ALLOC_SIZE(NR_CPUS), kvm->arch.vcpu_affinity_cpuset);
++
++	for_each_cpu(cpu, cpumask)
++		CPU_SET(cpu, kvm->arch.vcpu_affinity_cpuset);
++
++	return 0;
++}
++
++void kvm__arch_validate_cfg(struct kvm *kvm)
++{
++
++	if (kvm->cfg.ram_addr < ARM_MEMORY_AREA) {
++		die("RAM address is below the I/O region ending at %luGB",
++		    ARM_MEMORY_AREA >> 30);
++	}
++
++	if (kvm->cfg.arch.aarch32_guest &&
++	    kvm->cfg.ram_addr + kvm->cfg.ram_size > SZ_4G) {
++		die("RAM extends above 4GB");
++	}
++}
++
++u64 kvm__arch_default_ram_address(void)
++{
++	return ARM_MEMORY_AREA;
++}
++
++static int kvm__arch_get_ipa_limit(struct kvm *kvm)
++{
++	int ret;
++
++	ret = ioctl(kvm->sys_fd, KVM_CHECK_EXTENSION, KVM_CAP_ARM_VM_IPA_SIZE);
++	if (ret <= 0)
++		ret = 0;
++
++	return ret;
++}
++
++int kvm__get_vm_type(struct kvm *kvm)
++{
++	unsigned int ipa_bits, max_ipa_bits;
++	unsigned long max_ipa;
++
++	/* If we're running on an old kernel, use 0 as the VM type */
++	max_ipa_bits = kvm__arch_get_ipa_limit(kvm);
++	if (!max_ipa_bits)
++		return 0;
++
++	/* Otherwise, compute the minimal required IPA size */
++	max_ipa = kvm->cfg.ram_addr + kvm->cfg.ram_size - 1;
++	ipa_bits = max(32, fls_long(max_ipa));
++	pr_debug("max_ipa %lx ipa_bits %d max_ipa_bits %d",
++		 max_ipa, ipa_bits, max_ipa_bits);
++
++	if (ipa_bits > max_ipa_bits)
++		die("Memory too large for this system (needs %d bits, %d available)", ipa_bits, max_ipa_bits);
++
++	return KVM_VM_TYPE_ARM_IPA_SIZE(ipa_bits);
++}
++
++static int kvm__arch_free_kernel_header(struct kvm *kvm)
++{
++	free(kernel_header);
++
++	return 0;
++}
++late_exit(kvm__arch_free_kernel_header);
 -- 
 2.39.5
 
