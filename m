@@ -1,258 +1,306 @@
-Return-Path: <kvm+bounces-42666-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42667-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71DC4A7C19A
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 18:35:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7475EA7C1C5
+	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 18:50:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AEBB3B9CD6
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 16:33:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC5747A8AED
+	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 16:49:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5700B20E6E0;
-	Fri,  4 Apr 2025 16:33:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA1F720D4E4;
+	Fri,  4 Apr 2025 16:50:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="e0EXyb0+";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="o9SV8t/A"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CcTRRQSE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9A611E1DE5;
-	Fri,  4 Apr 2025 16:33:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743784432; cv=fail; b=IN9weKV4e3f88NYGo7jFKmPDdt5i3Mgb3SdTTDN2RhhVcG9srnqctdoXinstOEKiq3QGvZzehkO7mEg7XtNbK9/gJuffaonIscXQDtfLmq/Jy9J1J44E0Xt5n4LjFqC88xqelfvh4fK17/KfMLxOa5xtnS6RmPEY2hXM1OeuWIw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743784432; c=relaxed/simple;
-	bh=POevaldR6+2h0/K/T9cSIKqDOZduEvzs62aBJxyC+OU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=RouvAUFSkG9KyvmC9Nwt3P2f+wTuHoO27l8W9OArjjNGbLV4hVsVrK5YKlOIn2JFcOKTBAaWYYhAA57AOXno4vOmjMFSz8xk4MmVV1hDtZvzTpzlU1acyVzhof6+c7pumYMkGL4pkBEZbmSWvAU/Cg2U+a0K/PuDz9bgsM6LVeQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=e0EXyb0+; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=o9SV8t/A; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 534Du6Wq031552;
-	Fri, 4 Apr 2025 16:33:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=corp-2023-11-20; bh=IzwoxIB6kiAOfS+kq5
-	xdlkogOqcO9j48MWdneLUb/qs=; b=e0EXyb0+jJmXz/hTTWCO/cqkh2keWepeLR
-	thQJ8NwiFiZ1JjFPdVti2eYFRbKAwXbt73IY4txeiJ4ENd+RHt3ytMVW+/CijCJ0
-	WAsdpmhGjiqBpEThnv0lzCZk15MZpnwswivhwDVWD1HSQPyHldVzW2yPEJRwECUv
-	c/BXdd0pbZ3teLd+UW5/92iTxqL0npdc+PcdVBHTKpqzDyXwPmNc6EysFxp5PlaF
-	0X2avj03OBYaF8/otraaTE6/ZXv0r5MDPlpS5nJEmQzs5g3AWMOw3J0mCRPCt+dg
-	vHpWPW1Ay6Hf+s8X9px9xCjy3QrxgCk141CQn6u2pLs/cG7jvfrQ==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 45p8r9q3sd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 04 Apr 2025 16:33:30 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 534GK1qo036197;
-	Fri, 4 Apr 2025 16:33:29 GMT
-Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2044.outbound.protection.outlook.com [104.47.55.44])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 45t2nu9d66-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 04 Apr 2025 16:33:29 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GfN6uhzKOBNbnUx3rcE65DniTV96/UHEeW+nUhlQMLrgLWrC1GPMz7psWc0Zsx311HkfRkMjhKEaDyV1L2wc9r2P4y3eTqHfIO8je7R/fbw9tes5IKg+/RTTxoRA12ui9D3pU5o4veGeEihuGYVmINVmubWDJAonh2l4kf9l6UcU7SB4QozAc2K6Y7sF8iRsRiFUhQvwFg7AG+P+DfV3/Z28UnrY86p44QvcrNyuBIZTD1c+sUJrEevmTi7c7DVi86ZhERhHUK2KDeycTbmmGZ7U8Wh3WQO/eBDWGwZzqKIzzjAC5HTRsahEHRUNuHsn6qrVXYifN2II9WYOOGjlTw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IzwoxIB6kiAOfS+kq5xdlkogOqcO9j48MWdneLUb/qs=;
- b=bbrwWmV9FI1XyBhrD7flI5z5v7PypmFWq1924MNjUM1kXBntqaLSMhe8IvnwccvkNrV0/lEQkWM4ICef8UZmfFAi1noA3itbO0XVfKl9uMaqfgGngp8mIbVQgJ/mlbDxPzbn+qkXQq20DUDNmE/bky32L59onT0hc38FYXRri/PIIs1Xx1M6GyVLDs7mzXcL3bjhUNUJ6Ya3mOBuH39wZlynkK6kT6+4cjrq1QwTv5i9FtbcyhfcP3oZ6OivlCneg2FGy2VHlYhFxnjd2RdF2aIoHD6vDt/TdBdkiNHfvuzshvW9h2LoWB8+ncQv1WmFpOEvaIk6s0w23NPahmaEFw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IzwoxIB6kiAOfS+kq5xdlkogOqcO9j48MWdneLUb/qs=;
- b=o9SV8t/AD2ACWAtcKLyLhjG6IUTG5IJGfoYKa3bJthLgix7WAXX5OKuW2Qc+/TrkOP8GMT8n/LZQ1XlAWCZz1vI248tBf3+Kk9sH/e7j8rIyJPvDFg9xA5Cat6+fnc+GDhkyl1IrtLb9O2KEyAK3uN2Y5Dyq5K4mfRDwkqCv7Tg=
-Received: from BL4PR10MB8229.namprd10.prod.outlook.com (2603:10b6:208:4e6::14)
- by PH7PR10MB5697.namprd10.prod.outlook.com (2603:10b6:510:130::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.27; Fri, 4 Apr
- 2025 16:33:21 +0000
-Received: from BL4PR10MB8229.namprd10.prod.outlook.com
- ([fe80::552b:16d2:af:c582]) by BL4PR10MB8229.namprd10.prod.outlook.com
- ([fe80::552b:16d2:af:c582%3]) with mapi id 15.20.8583.041; Fri, 4 Apr 2025
- 16:33:21 +0000
-Date: Fri, 4 Apr 2025 17:33:19 +0100
-From: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-To: Nikita Kalyazin <kalyazin@amazon.com>
-Cc: akpm@linux-foundation.org, pbonzini@redhat.com, shuah@kernel.org,
-        viro@zeniv.linux.org.uk, brauner@kernel.org, muchun.song@linux.dev,
-        hughd@google.com, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, jack@suse.cz, Liam.Howlett@oracle.com,
-        jannh@google.com, ryan.roberts@arm.com, david@redhat.com,
-        jthoughton@google.com, peterx@redhat.com, graf@amazon.de,
-        jgowans@amazon.com, roypat@amazon.co.uk, derekmn@amazon.com,
-        nsaenz@amazon.es, xmarcalx@amazon.com
-Subject: Re: [PATCH v3 0/6] KVM: guest_memfd: support for uffd minor
-Message-ID: <dc4c72a2-41c1-4548-a6ee-5a17895e4940@lucifer.local>
-References: <20250404154352.23078-1-kalyazin@amazon.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250404154352.23078-1-kalyazin@amazon.com>
-X-ClientProxiedBy: LO6P123CA0003.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:338::8) To BL4PR10MB8229.namprd10.prod.outlook.com
- (2603:10b6:208:4e6::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2706C1DA53
+	for <kvm@vger.kernel.org>; Fri,  4 Apr 2025 16:50:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743785409; cv=none; b=Xje1u/7ytqb9v8vacLJuhXHxcuqXi3ez/3hlE7pkKoz0mD6jQw3Aey3atNTsHXM8m6vSFcZIvIrR1D2lFRoWQDMTRx82LPVPNJwwWfUTd4w9a4zc8MdW6mW9e165DP0Hf81AHOBpXb/Mz53i60JXCcS4IU6dA2KDMl6uWTSLjuU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743785409; c=relaxed/simple;
+	bh=PYNaU9lNwh0QL80kukIz0Ezcn5YI0WJC/oBVbZDs7CM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qwEv6o2noSmGiMqZYdi9W4An7vtBeoWDskdePmzow9lTQb9bWAT6PUd9r2z8iDX57fi1Qa3b01fTy2lPZAqVmpqol51/xEi+Tt8EloDznBN0ko6BjCfnNzUYt1Bh5JJbTM0GH/151cIJSl/F7WRXhAsyEnWG9En90+0SJ6PiI24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CcTRRQSE; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743785406;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=UOZ43bBKMC//JtK0X3dZk7WsbqEz50U4BfU4WlfUSoc=;
+	b=CcTRRQSErJNwNpD9b0eIIuF4NCdrWT22AeFVMiVakGGAiudShxp33QYKz0//339MfZMZYU
+	kOcm5RS2MG+y0D/wATaTdUFFRsr/kOiIkgeBvlOXoiy2ddgqUEnF5KOoNfRq5xaF+Tk0wS
+	sUItlYFERQi8D4Cdc6NMwZvGse+yuYQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-582-1iknF_KUNWKAHUaJMqf34g-1; Fri, 04 Apr 2025 12:49:10 -0400
+X-MC-Unique: 1iknF_KUNWKAHUaJMqf34g-1
+X-Mimecast-MFC-AGG-ID: 1iknF_KUNWKAHUaJMqf34g_1743785349
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43cf327e9a2so18994165e9.3
+        for <kvm@vger.kernel.org>; Fri, 04 Apr 2025 09:49:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743785349; x=1744390149;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UOZ43bBKMC//JtK0X3dZk7WsbqEz50U4BfU4WlfUSoc=;
+        b=wQH++4KsEeD4W4LdatFdhT7EMrGZQMks2s0303curQG3ejQSyCBUjWKfAEeNim6aY6
+         TW2QlKO2KcsATR8tYbMkDkRXmvjYqbREa55e9AhD4elJfTfEjJcfI/TNKyEPuF2rzP+7
+         4K33Xm2d0MqQnW3UP4EM+IMETzeJKjyJYQ8ZhaNeTXTpPL7khZYWaqgrvh+w2HEyG3qV
+         SxSJaWzjgUn48FaUp8zJ4LLMBNnDZscfSWD6VmE7SBUSwF+NaeonVCuUK4ZKSVJeY4Dj
+         +9lKhWgOsVeX3cFj3cE2v+CSTBVbOKjcPeYCvPPuTJDONSaKVM+zdGCChSGpaoysJ+5M
+         YCqg==
+X-Forwarded-Encrypted: i=1; AJvYcCW3h5swdJB+IAaesvadgJpW4T42nAnRZYSC3HqWuqwCeY9m7yLOXQlg3H6plP2K1Xdhy7U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzsj8Em/Ds/xCA+Mts42hF3sx5yJ08e2FwA6r6hOhcyL8WzonGZ
+	gT1Q6HshPSLq2bfl7UPXeuI7qguwKqXeXMvqHhyK8Vx/jcoR9R/bvD3aEMJwSXGC4RlrdkVPvWS
+	yTLlkN4yrtcswaPvE9DSd58xdgtm6xxHeeYDGFmToIUivHhGdxg==
+X-Gm-Gg: ASbGncsO0dqx+BhjhlkbW1t2E+VfSYDiqvORunkiXqycEvmzYPd8BnSgurYJZ3nkS+F
+	bPGyMQ0I4uKucW5vUbefWlQWybGw/0KarHUPD8d4q4VDtCsF/7P9bB1CylBho3n6Tspz+Ow5zGv
+	NzxA8O/xOrVaUiY2PLVUErw/oqAKSwanf4jVTusF22QcoY9jj1dSvlZmchX86XUoqLoUBwCsHW4
+	IEYZV2K3s+0c+07RztgaeYvhBd4V7AtKIvYfufXgf82b5NX4ogaGvZJv9vzAzHMRLktYes9JfYQ
+	MgZyu3A5ncA6BlG08x+5ImTfzAjr0Z4lJMBeTHJHLwslXlUrOAg2rFgt+pDeieGeNbOpKdTAlAJ
+	/IN0CX18bD5qCmPkvXgCN1q/852t8TJr+mWVWFRct7Wc=
+X-Received: by 2002:a05:600c:5117:b0:43d:40b0:5b with SMTP id 5b1f17b1804b1-43ee076924bmr1492275e9.25.1743785349439;
+        Fri, 04 Apr 2025 09:49:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE1GRfHkFTJWrFhSjeHpBspaUl1rM/3LxWWUNyF4GOrAnX6k7onjQMMhVScWt01nnZ/ucUY1Q==
+X-Received: by 2002:a05:600c:5117:b0:43d:40b0:5b with SMTP id 5b1f17b1804b1-43ee076924bmr1491965e9.25.1743785349001;
+        Fri, 04 Apr 2025 09:49:09 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c71b:7900:8752:fae3:f9c9:a07e? (p200300cbc71b79008752fae3f9c9a07e.dip0.t-ipconnect.de. [2003:cb:c71b:7900:8752:fae3:f9c9:a07e])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec1794e94sm54808185e9.31.2025.04.04.09.49.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Apr 2025 09:49:08 -0700 (PDT)
+Message-ID: <b30a0ff7-e885-462d-92d4-53f15accd1c0@redhat.com>
+Date: Fri, 4 Apr 2025 18:49:07 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL4PR10MB8229:EE_|PH7PR10MB5697:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0cc8ee23-92b7-4591-a6ea-08dd739669f8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|7416014|366016|7053199007|13003099007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?CvnUC9iCMjU+kAr3FNTQlifAN/eYnSGEQW7pUDGujp9w1499bHmm+FRcE09P?=
- =?us-ascii?Q?Q/pMMCzDkt6iyNqY5ksGHrkzXobhqTi0oWLZMJ7Xw3Hfv22saKgQBZH5sKIy?=
- =?us-ascii?Q?kuSbsMmXqu98oUfyAfY4ib71WkKW6S6RmOo17as7pnMaksK5FuFEsPiT40NG?=
- =?us-ascii?Q?okF4BJ//vT74gzwRXL9VLM1LmKt3rHoLLjq3t0fsTGAS/aqbGodyJrCQmihA?=
- =?us-ascii?Q?OQ8iqgFDLFtAQmWU8fA+smLSdyCQ40jls4uUKG6lz4N4DyyW4sdRBPldJl80?=
- =?us-ascii?Q?9xN9invfMHgM3a0lH/NOXsD0NtdIPFKtR7NLwEg2qPtaASqcwTQHmZBQcAFF?=
- =?us-ascii?Q?L/SoEchJPlF3DrEcbWww7JyYEC9HQGclMik/MGPf0whCzkAYlUnS7O1nracf?=
- =?us-ascii?Q?h+xntbN2/nG3SiNyk8GgJDoWJEjfl07DLHNMEbUaKtY5jOnhevSr5em0fLzZ?=
- =?us-ascii?Q?QGcf+m71lIzkuGozgL819UpNsAq8BC1wd1df+1q2WgulFaAPtlEPP+++7/N0?=
- =?us-ascii?Q?qEDRzndc34lwhmPtOeWfw7qbfQYGUu9CVVeelibEl45f/Kemq1NEQLJqGkMQ?=
- =?us-ascii?Q?LMx6hEHb2xo/q5BnOEIIX9kF+VLruqYPwbc+dl8YlcSnHz1d1bLRtS1dlLlA?=
- =?us-ascii?Q?XobYPpstxV0O+CBZL/rAz7ig8DDNmzSka6c77B6599kr51KlSkmRhYYNH4Bw?=
- =?us-ascii?Q?T8MRACQ81dx46YbLM0hyclgIisEZqPj/7yxq6SjxtgJkgv2cyUtSMbJvcaj6?=
- =?us-ascii?Q?IXoBC3uxsFj65/BjHiMYncLeEw8VfsIdrD6mnd42UvPqbPQkwLDrgnfgu6VD?=
- =?us-ascii?Q?1R+1Wqh7JvjfcLrUb8Zicsc82KMRBhxer4nTwVZiKY3hUNyKlXo8xk0JTTYC?=
- =?us-ascii?Q?iukvlB25T6+Pn2iSV4SqkYSTGZuRFI3MOpwlp0a/o4VAHVFjYEVHzL0hpaFu?=
- =?us-ascii?Q?Wa52W1xFIooRme1czW1rrHKv5JlHh5H7SRM1GIYFuypu+6j6xPviSV2jZazl?=
- =?us-ascii?Q?rsnjGFbRL6l36o70y+A/XyL0yhQNtLX7Zgj7Iatxt9ewEqAHzs7BzhmNHae7?=
- =?us-ascii?Q?hCAUskUBupxzi00y29fuFdFOrD6G2U+KLBhhm2bdNImBNRU1Mb+IYcTNahQp?=
- =?us-ascii?Q?FvSwiXkWPdqUxCPpk4LQz+72IEBdIuM1Zu4k0eZ9EVnaLGY5skcB/EHby/5w?=
- =?us-ascii?Q?z6AC3XwaFLq/9ZFrZvYSj+geuRPJJfM8Qej2gnIsMvXPoNh1J8DrVfhG66H9?=
- =?us-ascii?Q?TuD3bt9txSWbN+kQdvqtjtofxrXWjsIg1Au9KKgjpy7SykQ8nTwrzoL5alX6?=
- =?us-ascii?Q?gNQ7a64gohD3A/jKgWI+tnbB69I1dnxDioE4PiZw8ID7Kw=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL4PR10MB8229.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(7053199007)(13003099007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?JqsomAZH7/6YPwH6Xs1EkV6YWypPU3vnwblC88SNcB2U6OqLNFgkydmUo0ak?=
- =?us-ascii?Q?DuQW+l8mKf55IwjRrr0xLiU/erVAqm/nsQq1T5lzdCuKUd22wgZH/QPlYwn8?=
- =?us-ascii?Q?zRuHVKVvJcGJJhn98bh8cSvjCIYyqFU5UNVz4m+wpwwOedDfttmc4d+ySM7m?=
- =?us-ascii?Q?xNGi6J0FprVHJiyUgIcs2kHd5GjC7eiRo0sxrEAzoVztR+vy+xhweWrnVQ7z?=
- =?us-ascii?Q?Po+TqEJauVF9hZ/VAbz9hezw/woBnXr5YSlj3qj+Bol/tb4UHnZW5A3es30z?=
- =?us-ascii?Q?gP4DLILRt1hNrckABkmapMFTPFCeccRBiTIqmkEGenFD2mWMOONVaHijuEph?=
- =?us-ascii?Q?m6Vm+C2Ach0BRkiWLIc3I6X0kiNb2c/o/QtnyeUj38VfkfYHPDrBvgQyUhgd?=
- =?us-ascii?Q?8rS8NZfPukeoILagi9N8Kl2dk5hJMWa1UlQsWTj9geoAx3yqrpedvFW5Gohj?=
- =?us-ascii?Q?hGiF1SKcJAbnj67jTjNkJ81KnVPruJhvGSLIQTdKYxanDJBmjeAQeSmK0k7c?=
- =?us-ascii?Q?RcCAnXR6ZfbcbZSVh+6AXJN4Y7sp29UDulLVj4AUJYHRTNnx8syoNHJvNHJe?=
- =?us-ascii?Q?qibT9ymXalSJnTPVYzpRXrbLEKo2vG/5oRima6JbnzYOgz5ftq4vHpIuB6tt?=
- =?us-ascii?Q?rrS0MMvCk8kTTtztMSGov2an7CaVeMpdUNQ/H1lWaBF0uCnWoxAWhLAV4iwD?=
- =?us-ascii?Q?XxXYrpLlqhXauJuQuFxM6dJ5sTlL9I5NSTIW9+7DTrAYBF3AzgZUdD826qYx?=
- =?us-ascii?Q?SQRMSQyqUw28FPNkzek7hZAXCZ2D33IfUXNyj6VMzFXvFnWJgp5WVy0HsV4h?=
- =?us-ascii?Q?QVTtvkH/f9152eOlsP3lwYmsYrnQjNkLCrGdDhYWRu0+9sGWcv4d9Zsmmxea?=
- =?us-ascii?Q?H9OvUoXr8Lnfc0EPaoqJ6zr0gE3YD8A/UDxQpyKd1i/41CKB0EnsdiMRRSsb?=
- =?us-ascii?Q?sfqeqOPMKzz62ZAu/5+2Xx28qH0QlAXlWoK/TrBQAwcoZLG/qTb4pZiUiZ1Q?=
- =?us-ascii?Q?2qhOYK8a7p9gycsOhcUOwlAdH6ncgX1olyclYxrwPfscOK/TwaI6LmPOdCLs?=
- =?us-ascii?Q?PejbTeCQ3utpNeJJ4SVuGXFyI8nF9TxsPqSudYe5y2hvBXtvmxg4PgEzFYj/?=
- =?us-ascii?Q?yyypXaOxWQompgadiemfznAlOYCXUw0wXWzy/GC0IuXuPocdxZMF7ZHDMc7U?=
- =?us-ascii?Q?WGXpsShN5GetVbgYfupaMtSUm9OQ7Vvtyky+F8TyRo+FBQMwrgKEbuToSqfw?=
- =?us-ascii?Q?nrQeZ6scVIiuP33idbqW407GrzxjVIibQQzxwiuaV+BjcDOekABHa1TxNmPc?=
- =?us-ascii?Q?kYb+297ZkXfTaEORNOuI2Mjb83g7b16pk/FWSoBot6OBP0qsugHX04jFVHps?=
- =?us-ascii?Q?SMrW75cLsZudyGXWIhduLpP7TCWI9l/BStUdjEirqPE5hbRsit+S9KFKCQX0?=
- =?us-ascii?Q?uHgfArHsWs3Vw6QGkUJnUAgCQZDwkrmli7PlnaJiKh/9LGu/VG+lc3qt53WX?=
- =?us-ascii?Q?XXAAvtaOEP9iLsSAF10jTejBSk6MHCIKRqFh58wGbSEVNzgUBdu606/qUb7I?=
- =?us-ascii?Q?1JMTuNAgwB2OFxX1It2CRDNi2sjHkuGe28Jvv/lbsGXIc8172DYjJD4o6mn7?=
- =?us-ascii?Q?sA=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	mInQr7tLStLmUuDx2tEnJ9fKuviC8udnv2WtY0901jNLDWw4PJJMPKirSW+u2bJCZWWJEDP4gRuJTw/UD6oNNY2NFEfcxBd5sstONx/s8a4hmHiNFWDv1KaT+WmmwcjobgLDZuRyBcLGqZ+kdbkLpXX+v1j9h+HKPPtDQipgZ/7Jbe1dW4Nzod4RK9c4y1vtvdJ6vrq05IbOjhcTQ2qYgunb5zNOm2vHVdw9vh1l44CGfbEy98VzVBARDM4EQfXhZR/m6kgRnJWjODCFSfGPX589RCPsy/hoJPFejwvVlzZ2Vvm5UlfIJYxA0rZCj28xh81324WgKtUoAgEBdy9jjRHi9LegAGuT3Db0uF9BkZbEJsuASf2mOX3CHh4H1FjmNwSinieLe5mNqmhueoG3AxShP87Z8TBiO0jVgffjTCM9XJ/uuwf9d+UWuF5dsobrS8yGCw5ma1F+wYZqPeBryIA+qb7c9GXY2msz716DykaiOSceUMQXmfnYaoyYJRbq7m+JDGEdFt8VYf1BY7UALYgheI9bQfecjNnLfdfbLduMZ1nu+DVy9hSxb2UgPR5y3CWMkg+U0xCAiW6DfyMVO+1he61/aYesESuASvIr5Po=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0cc8ee23-92b7-4591-a6ea-08dd739669f8
-X-MS-Exchange-CrossTenant-AuthSource: BL4PR10MB8229.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Apr 2025 16:33:21.7557
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: E6Nh+bkqYmzDfASbHVc7luj8HtP70uslNgqRaob1wNQhQK42Ty8U+IUvHBjAXSOhk6kp/fUochg9uaFqMc+VWb0m9vp4S3F2h4IiKH+IPF0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR10MB5697
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-04-04_07,2025-04-03_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 mlxscore=0 adultscore=0
- suspectscore=0 spamscore=0 phishscore=0 bulkscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2502280000
- definitions=main-2504040114
-X-Proofpoint-GUID: ODwv6ZFnEZfxyHSDH1r8ZkI8wmgAPx9t
-X-Proofpoint-ORIG-GUID: ODwv6ZFnEZfxyHSDH1r8ZkI8wmgAPx9t
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] s390/virtio_ccw: don't allocate/assign airqs for
+ non-existing queues
+Content-Language: en-US
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+ virtualization@lists.linux.dev, kvm@vger.kernel.org,
+ Chandra Merla <cmerla@redhat.com>, Stable@vger.kernel.org,
+ Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Eric Farman <farman@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Wei Wang <wei.w.wang@intel.com>
+References: <20250402203621.940090-1-david@redhat.com>
+ <20250403161836.7fe9fea5.pasic@linux.ibm.com>
+ <e2936e2f-022c-44ee-bb04-f07045ee2114@redhat.com>
+ <20250404063619.0fa60a41.pasic@linux.ibm.com>
+ <4a33daa3-7415-411e-a491-07635e3cfdc4@redhat.com>
+ <d54fbf56-b462-4eea-a86e-3a0defb6298b@redhat.com>
+ <20250404153620.04d2df05.pasic@linux.ibm.com>
+ <d6f5f854-1294-4afa-b02a-657713435435@redhat.com>
+ <20250404160025.3ab56f60.pasic@linux.ibm.com>
+ <6f548b8b-8c6e-4221-a5d5-8e7a9013f9c3@redhat.com>
+ <20250404173910.6581706a.pasic@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20250404173910.6581706a.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 04, 2025 at 03:43:46PM +0000, Nikita Kalyazin wrote:
-> This series is built on top of the Fuad's v7 "mapping guest_memfd backed
-> memory at the host" [1].
+On 04.04.25 17:39, Halil Pasic wrote:
+> On Fri, 4 Apr 2025 16:17:14 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>>> It is offered. And this is precisely why I'm so keen on having a
+>>> precise wording here.
+>>
+>> Yes, me too. The current phrasing in the spec is not clear.
+>>
+>> Linux similarly checks
+>> virtio_has_feature()->virtio_check_driver_offered_feature().
+> 
+> Careful, that is a *driver* offered and not a *device* offered!
 
-Hm if this is based on an unmerged series this seems quite speculative and
-should maybe be an RFC? I mean that series at least still seems quite under
-discussion/experiencing issues?
+Right, I was pointing at the usage of the term "offered". 
+virtio_check_driver_offered_feature(). (but was also confused about that 
+function)
 
-Maybe worth RFC'ing until that one settles down first to avoid complexity
-in review/application to tree?
+virtio_has_feature() is clearer: "helper to determine if this device has 
+this feature."
 
-Thanks!
+The way it's currently implemented is that it's essentially "device has 
+this feature and we know about it (->feature_table)"
 
->
-> With James's KVM userfault [2], it is possible to handle stage-2 faults
-> in guest_memfd in userspace.  However, KVM itself also triggers faults
-> in guest_memfd in some cases, for example: PV interfaces like kvmclock,
-> PV EOI and page table walking code when fetching the MMIO instruction on
-> x86.  It was agreed in the guest_memfd upstream call on 23 Jan 2025 [3]
-> that KVM would be accessing those pages via userspace page tables.  In
-> order for such faults to be handled in userspace, guest_memfd needs to
-> support userfaultfd.
->
-> Changes since v2 [4]:
->  - James: Fix sgp type when calling shmem_get_folio_gfp
->  - James: Improved vm_ops->fault() error handling
->  - James: Add and make use of the can_userfault() VMA operation
->  - James: Add UFFD_FEATURE_MINOR_GUEST_MEMFD feature flag
->  - James: Fix typos and add more checks in the test
->
-> Nikita
->
-> [1] https://lore.kernel.org/kvm/20250318161823.4005529-1-tabba@google.com/T/
-> [2] https://lore.kernel.org/kvm/20250109204929.1106563-1-jthoughton@google.com/T/
-> [3] https://docs.google.com/document/d/1M6766BzdY1Lhk7LiR5IqVR8B8mG3cr-cxTxOrAosPOk/edit?tab=t.0#heading=h.w1126rgli5e3
-> [4] https://lore.kernel.org/kvm/20250402160721.97596-1-kalyazin@amazon.com/T/
->
-> Nikita Kalyazin (6):
->   mm: userfaultfd: generic continue for non hugetlbfs
->   mm: provide can_userfault vma operation
->   mm: userfaultfd: use can_userfault vma operation
->   KVM: guest_memfd: add support for userfaultfd minor
->   mm: userfaultfd: add UFFD_FEATURE_MINOR_GUEST_MEMFD
->   KVM: selftests: test userfaultfd minor for guest_memfd
->
->  fs/userfaultfd.c                              |  3 +-
->  include/linux/mm.h                            |  5 +
->  include/linux/mm_types.h                      |  4 +
->  include/linux/userfaultfd_k.h                 | 10 +-
->  include/uapi/linux/userfaultfd.h              |  8 +-
->  mm/hugetlb.c                                  |  9 +-
->  mm/shmem.c                                    | 17 +++-
->  mm/userfaultfd.c                              | 47 ++++++---
->  .../testing/selftests/kvm/guest_memfd_test.c  | 99 +++++++++++++++++++
->  virt/kvm/guest_memfd.c                        | 10 ++
->  10 files changed, 188 insertions(+), 24 deletions(-)
->
->
-> base-commit: 3cc51efc17a2c41a480eed36b31c1773936717e0
-> --
-> 2.47.1
->
+> 
+> We basically mandate that one can only check for a feature F with
+> virtio_has_feature() such that it is either in drv->feature_table or in
+> drv->feature_table_legacy.
+> 
+> AFAICT *device_features* obtained via dev->config->get_features(dev)
+> isn't even saved but is only used for binary and-ing it with the
+> driver_features to obtain the negotiated features.
+> 
+> That basically means that if I was, for the sake of fun do
+> 
+> --- a/drivers/virtio/virtio_balloon.c
+> +++ b/drivers/virtio/virtio_balloon.c
+> @@ -1197,7 +1197,6 @@ static unsigned int features[] = {
+>          VIRTIO_BALLOON_F_MUST_TELL_HOST,
+>          VIRTIO_BALLOON_F_STATS_VQ,
+>          VIRTIO_BALLOON_F_DEFLATE_ON_OOM,
+> -       VIRTIO_BALLOON_F_FREE_PAGE_HINT,
+>          VIRTIO_BALLOON_F_PAGE_POISON,
+>          VIRTIO_BALLOON_F_REPORTING,
+>   };
+> 
+> I would end up with virtio_check_driver_offered_feature() calling
+> BUG().
+> 
+
+Right.
+
+> That basically means that Linux mandates implementing all previous
+> features regardless whether does are supposed to be optional ones or
+> not. Namely if you put the feature into drv->feature_table it will
+> get negotiated.
+> 
+> Which is not nice IMHO.
+
+I think the validate() callbacks allows for fixing that up.
+
+Like us unconditionally clearing VIRTIO_F_ACCESS_PLATFORM (I know, 
+that's a transport feature and a bit different for this reason).
+
+... not that I think the current way of achieving that is nice :)
+
+> 
+>>
+>>>
+>>> Usually for compatibility one needs negotiated. Because the feature
+>>> negotiation is mostly about compatibility. I.e. the driver should be
+>>> able to say, hey I don't know about that feature, and get compatible
+>>> behavior. If for example VIRTIO_BALLOON_F_FREE_PAGE_HINT and
+>>> VIRTIO_BALLOON_F_PAGE_REPORTING are both offered but only
+>>> VIRTIO_BALLOON_F_PAGE_REPORTING is negotiated. That would make
+>>> reporting_vq jump to +1 compared to the case where
+>>> VIRTIO_BALLOON_F_FREE_PAGE_HINT is not offered. Which is IMHO no
+>>> good, because for the features that the driver is going to reject in
+>>> most of the cases it should not matter if it was offered or not.
+>>
+>> Yes. The key part is that we may only add new features to the tail of
+>> our feature list; maybe we should document that as well.
+>>
+>> I agree that a driver that implements VIRTIO_BALLOON_F_PAGE_REPORTING
+>> *must* be aware that VIRTIO_BALLOON_F_FREE_PAGE_HINT exists. So queue
+>> existence is not about feature negotiation but about features being
+>> offered from the device.
+>>
+>> ... which is a bit the same behavior as with fixed-assigned numbers a
+>> bit. VIRTIO_BALLOON_F_PAGE_REPORTING was documented as "4" because
+>> VIRTIO_BALLOON_F_FREE_PAGE_HINT was documented to be "3" -- IOW, it
+>> already existed in the spec.
+> 
+> I don't agree with the comparison.  One obviously needs to avoid fatal
+> collisions when extending the spec, and has to consider prior art.
+
+Agreed. But IMHO it's similar to two out-of-spec driver starting to use 
+"queue index 5" in a fix-assigned world. It cannot work.
+
+> 
+> But ideally not implemented  or fenced optional features A should have no
+> impact to implemented optional or not optional features B -- unless the
+> features are actually interdependent, but then the spec would prohibit
+> the combo of having B but not A. And IMHO exactly this would have been
+> the advantage of fixed-assigned numbers: you may not care if the other
+> queueues exist or not.
+> 
+> Also like cloud-hypervisor has decided that they are going only to
+> support VIRTIO_BALLOON_F_REPORTING some weird OS could in theory
+> decide that they only care about VIRTIO_BALLOON_F_REPORTING. In that
+> setting having to look at VIRTIO_BALLOON_F_STATS_VQ and
+> VIRTIO_BALLOON_F_FREE_PAGE_HINT are offered is weird. But that is all water
+> under the bridge. We have to respect what is out there in the field.
+
+Yes, they would have to do the math based on offered features. 
+Definitely not nice, but as you say, that ship has sailed.
+
+[...]
+
+>>
+>> (as Linux supports all these features, it's easy. A driver that only
+>> supports some features has to calculate the queue index manually based
+>> on the offered features)
+> 
+> As I've tried to explain above, not implementing/accepting optional
+> features and then implementing/accepting a newer feature is problematic
+> with the current code. Supporting some features would work only as
+> supporting all features up to X.
+
+See above regarding validate().
+
+Again, doesn't win a beauty contest ... I'll send an improved 
+virtio-spec update next week, thanks!
+
+-- 
+Cheers,
+
+David / dhildenb
+
 
