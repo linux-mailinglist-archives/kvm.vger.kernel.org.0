@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-42691-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42692-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 053C5A7C402
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 21:41:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 834D6A7C435
+	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 21:53:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C900C1B615C4
-	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 19:41:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 244D91B61D26
+	for <lists+kvm@lfdr.de>; Fri,  4 Apr 2025 19:52:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03D8E221F1C;
-	Fri,  4 Apr 2025 19:39:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6301E2222B0;
+	Fri,  4 Apr 2025 19:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pGmF37eA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="N1DGtcBz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E6B221D90
-	for <kvm@vger.kernel.org>; Fri,  4 Apr 2025 19:39:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18A6022171D
+	for <kvm@vger.kernel.org>; Fri,  4 Apr 2025 19:39:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743795598; cv=none; b=lVpiNIK+QaOyG3YrpOGRSoRwFtlUt0F/ld2EWROVmvGVk++r7jBwXwlXbodHBN3Jc90AhjrL7JYkFdU5XJCbeaSJ+ntdcOxnngoJI62MvlPJivriFfictyLoE00EK3hkzPhqbomvz8oKGQYE+QagMU+JsRRxXX8K/BW7h+hR+8I=
+	t=1743795599; cv=none; b=OrWUYTg6v3XVwX9WIHJZVGcYaxK3TTyVH0++Hv157RsRwOBebgE2ordXmWqQNoYlcYISwsuJQbYwokynq4MmnEIDx14Uis5n27EAjRZ2AsTlaNyqcAqnlgXxVyuuG8jOtMBL+UsIroO6zbE++aAOtbDYOYVkculOgMA+PV1v8EU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743795598; c=relaxed/simple;
-	bh=El/LUiSqQ2qSjpNZ7D93xQ4xLdhReczWf1b9uZIPSLc=;
+	s=arc-20240116; t=1743795599; c=relaxed/simple;
+	bh=GCCtnDomY+lLuf5+xII3/z6zqPIPK391FSHfxII0HaA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Fmr7cVdRpxSNqt6NU1r29eXUYsTj6gVdrvEEZNf4cK7ILO26oN2LV7b8VdxhfaqTagmddPrCkPDJkCJTY4l14OHEPhEu8xSSq7DKXE7gwxVxMBU24PgUoJfqj75Zs40P3nqKY1g1pIrbsqRRccKCBNAlQU5SZY8rOaa333HhdJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pGmF37eA; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=YOVolOtGNY7jsENa8vh5EVTJfAezLIF+MudJsCzn3JOeXKSWryl0RWA3Cv2dOZj3sIJ5krIRh8ghaL8mlL2C/zocdQMWYvjaB9afP1j9hFeTUQtshRMqsNMDlAAGhKdRLgNk/WCa8MNsvdgXZm9qE1ivAm0OOIDyL85kkuZqAjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=N1DGtcBz; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-73009f59215so2923265b3a.1
-        for <kvm@vger.kernel.org>; Fri, 04 Apr 2025 12:39:56 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3032f4eacd8so2299813a91.3
+        for <kvm@vger.kernel.org>; Fri, 04 Apr 2025 12:39:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743795596; x=1744400396; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1743795597; x=1744400397; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=9j6UAaWlpuGUtNDZ5PloVVAXeMJcTkL+Ix626QW6lmA=;
-        b=pGmF37eAJErsv3HhD+5YGlLgbZ7LcAF50/Pd3TKXyyEnyNvMEp62EDn17SrXXb5q0z
-         RnhDFFYMko5LRt+BSGhW0yoaAIqm9spsVdxHuWuiUN9ZPG3tRTJm8v0yywuJU5p62Bpq
-         dPiy8/QfqLrETxyrTuFaOSB+XEE5et3TQCDPax6UZ9z9MZrjikC2v2drLWV/WkJdYh5B
-         U0Yd1IejSnIQmgmrkW96XbU9sQqKp2P5PI5Xi9fb6c7VM40w57i0EuoJX+l8njSmTR2O
-         MkHhIfltgQ1Le6o70CLOx5Ed+xD+80s0QhuFgtiIp5CIXr0nPjSkznROBHcJcTmt1wN1
-         aoGA==
+        bh=wBBmYaZBofsgLugSeNOxbYqcOo/hzEiN1pKLRJ98ixQ=;
+        b=N1DGtcBzZpRbm+lZ0QBi87cktItxx/yY+eVgQPV/2zdsZyiBi3pQXbtMmL893VEvgv
+         1WHxRO1iz+HWjdO7FzktI1e0R8wvlSShLC2vmqJPR8nDhqcSgUaW6zFS8xEPOV3XrVjo
+         Bve36Qe+CYyWqklDuUwQv3IN3lRldrVcc4smuuX+JrOfoEGbl74d/nqP9V13r/toaZsX
+         Yqvs2dseKjCRXSOFUgXP4xI11CeORwGS/Nu0YTBDKQVWeNSskqZzr6ZxxNmSLYAuBXFI
+         xUB9gVzpA989cbUTt7agWcqxsjR6aB7fDLWGfI1VogbUeUitgJAbKv3RLImHTMUdoImm
+         35ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743795596; x=1744400396;
+        d=1e100.net; s=20230601; t=1743795597; x=1744400397;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=9j6UAaWlpuGUtNDZ5PloVVAXeMJcTkL+Ix626QW6lmA=;
-        b=AevqUc/HRxPNHtr5NOeNhe7iltRVnofNl6UpxRlk1DfSmax9psKegbtdV56JyIOzgi
-         nZGmzRV+zukC3MMLV/qfPRbL/Si5oyGGCOox3sqQ9MgwT/j1X5XsVoAiTJsJ6S/dnbRx
-         USD/l9ijv5E9ISbDTvOmJlfcj8K5F7JsxUzTlhK9N3JUyuIM6qFbhKluJdR97J7eNpiw
-         HsRxFJziN4i/xaWscg/EpJgygzZ6XHWVvuFEnowXrnYD4ru4umvhbEfYBRMkSNJjeX7I
-         H0CC3JFApUpHKSRoH1JeEGu1vDz6WXkg5HjbpDyVvj6X3u1ICOhnWhyKSVOg5ACk7uHb
-         zWnA==
-X-Gm-Message-State: AOJu0YxFbuVqYTbeLs1VbS552TSsqViBAlHJ/KnYF/SncLYdaudPZbGO
-	ywZRCTuNOCnx5MBINpjlLw9w53qEPMqlQFq1srZFAF5rAa5aL3J+EPUgOLpjq9QQriE1k1Sm+Lw
-	9EQ==
-X-Google-Smtp-Source: AGHT+IHxE6ieJP/dqM4OtZ03l/OzhOac1l4SZVj083VbfNgDZX7xJqOUlyT5SF6DOaOv2f4SNNau/XxOkn4=
-X-Received: from pfbjo41.prod.google.com ([2002:a05:6a00:90a9:b0:736:3cd5:ba36])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:3a0f:b0:736:4e0a:7e82
- with SMTP id d2e1a72fcca58-739e6ff6b10mr4756745b3a.10.1743795595718; Fri, 04
- Apr 2025 12:39:55 -0700 (PDT)
+        bh=wBBmYaZBofsgLugSeNOxbYqcOo/hzEiN1pKLRJ98ixQ=;
+        b=jT0B0DmDTOIzCXf1QgnW48e9Xy7ByvbStBobrzw5zX1qG8oq8rwddikRsXDUEa0+Du
+         PmZxk07wMsuC5/PmYTS6pczgt6U3BZKUsqzmdJb9g2ZTch1Z4uCCrunQR68UC+Cl1grp
+         7tA1pfD86aD//hXHPxbpy+DDt429l1A60fBHFDltgXPeb0okPANghL0Bn/mYgoQsrchH
+         0TmoYYnbo7jYhDahseHPB0JU5jDbS3Bjo2rva4uN/CUZ6sVHR2dhxKCSu5V/Y9p8JHyE
+         DL/B0gv3H6EgI1zMYSaxZpKq8RLUBEXyvElQuj2Sp7MlSDI18qSoN4CBYgbKb8fkY1O2
+         1aXQ==
+X-Gm-Message-State: AOJu0YwowkoqbAXI1hyywo0WxfwFUsMvDyUqSGIl3HJiuRtWtf58HhYN
+	MdyZRnmymjenAmdxWsoC0HM3HvCeD5LAfCs/elLZZtIADHctdDTe6KUWmjTrWE83hpqBER+fM7b
+	/Iw==
+X-Google-Smtp-Source: AGHT+IEBvDLqiwZ4BM4ogV2kWH9PVQzEHSq6D51X+1Q81b5CZqFohRw+cIfM1ejZIuAlzQtHAHcZOhjh9GM=
+X-Received: from pjbhl5.prod.google.com ([2002:a17:90b:1345:b0:2ff:8471:8e53])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:540f:b0:2ee:ab29:1a63
+ with SMTP id 98e67ed59e1d1-306a611253fmr5033572a91.3.1743795597468; Fri, 04
+ Apr 2025 12:39:57 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  4 Apr 2025 12:38:20 -0700
+Date: Fri,  4 Apr 2025 12:38:21 -0700
 In-Reply-To: <20250404193923.1413163-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250404193923.1413163-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.504.g3bcea36a83-goog
-Message-ID: <20250404193923.1413163-6-seanjc@google.com>
-Subject: [PATCH 05/67] iommu/amd: Return an error if vCPU affinity is set for
- non-vCPU IRTE
+Message-ID: <20250404193923.1413163-7-seanjc@google.com>
+Subject: [PATCH 06/67] iommu/amd: WARN if KVM attempts to set vCPU affinity
+ without posted intrrupts
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Joerg Roedel <joro@8bytes.org>, David Woodhouse <dwmw2@infradead.org>, 
@@ -87,29 +87,45 @@ Cc: kvm@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
 	David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Return -EINVAL instead of success if amd_ir_set_vcpu_affinity() is
-invoked without use_vapic; lying to KVM about whether or not the IRTE was
-configured to post IRQs is all kinds of bad.
+WARN if KVM attempts to set vCPU affinity when posted interrupts aren't
+enabled, as KVM shouldn't try to enable posting when they're unsupported,
+and the IOMMU driver darn well should only advertise posting support when
+AMD_IOMMU_GUEST_IR_VAPIC() is true.
 
-Fixes: d98de49a53e4 ("iommu/amd: Enable vAPIC interrupt remapping mode by default")
+Note, KVM consumes is_guest_mode only on success.
+
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- drivers/iommu/amd/iommu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/iommu/amd/iommu.c | 13 +++----------
+ 1 file changed, 3 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
-index cd5116d8c3b2..b3a01b7757ee 100644
+index b3a01b7757ee..4f69a37cf143 100644
 --- a/drivers/iommu/amd/iommu.c
 +++ b/drivers/iommu/amd/iommu.c
-@@ -3850,7 +3850,7 @@ static int amd_ir_set_vcpu_affinity(struct irq_data *data, void *vcpu_info)
- 	 * we should not modify the IRTE
- 	 */
+@@ -3852,19 +3852,12 @@ static int amd_ir_set_vcpu_affinity(struct irq_data *data, void *vcpu_info)
  	if (!dev_data || !dev_data->use_vapic)
--		return 0;
-+		return -EINVAL;
+ 		return -EINVAL;
  
++	if (WARN_ON_ONCE(!AMD_IOMMU_GUEST_IR_VAPIC(amd_iommu_guest_ir)))
++		return -EINVAL;
++
  	ir_data->cfg = irqd_cfg(data);
  	pi_data->ir_data = ir_data;
+ 
+-	/* Note:
+-	 * SVM tries to set up for VAPIC mode, but we are in
+-	 * legacy mode. So, we force legacy mode instead.
+-	 */
+-	if (!AMD_IOMMU_GUEST_IR_VAPIC(amd_iommu_guest_ir)) {
+-		pr_debug("%s: Fall back to using intr legacy remap\n",
+-			 __func__);
+-		pi_data->is_guest_mode = false;
+-	}
+-
+ 	pi_data->prev_ga_tag = ir_data->cached_ga_tag;
+ 	if (pi_data->is_guest_mode) {
+ 		ir_data->ga_root_ptr = (pi_data->base >> 12);
 -- 
 2.49.0.504.g3bcea36a83-goog
 
