@@ -1,40 +1,40 @@
-Return-Path: <kvm+bounces-42857-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42858-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E67C5A7E6F4
-	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 18:41:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75A8CA7E6F7
+	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 18:42:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CEDF3A47EF
-	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 16:34:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B843F1723B2
+	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 16:35:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7828620C499;
-	Mon,  7 Apr 2025 16:34:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D24A8211294;
+	Mon,  7 Apr 2025 16:34:35 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CBDB209F59;
-	Mon,  7 Apr 2025 16:34:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E07720C49B;
+	Mon,  7 Apr 2025 16:34:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744043665; cv=none; b=Pxg2Zktc5ay9sO/xVAnkT5TMPTH+Ie6+3i3ImvcHeFucYQ//+Y+DdRMv6RYJoRKOGIpYO3r4CxukMXq94Xiz6r7JLZ/4wmqmtf54ola9qRQm7UfA1+MJAuUoe8WCwTBZNqbnIi8ollXJTGivp5S5mAJzkTJ+2mes7b8Tm1S14yg=
+	t=1744043675; cv=none; b=IRv1ilaUysd1IwbUBylfXlA1csYTJ78nVhBDkyD0h8JECls4SSTuDbQ6gI78SmObWkG0nmGWGo+3zVh2ffSaEB0uIIdDXx8yAeCEugzcJpFwl+19PRTSZZD+BlyKccRu26l/y/KzzOoBji0kc0sVwIsTr/isnoSxtIDj+B+tBhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744043665; c=relaxed/simple;
-	bh=mQLvDq/c/f6VeVn9jAgvnWRwlfEnoMdYJpZMSAGn4EY=;
+	s=arc-20240116; t=1744043675; c=relaxed/simple;
+	bh=/9tOmKDQthqbCNmPjw1HNHmnkDLompcRjnGXwn80w4E=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JiuoIbV8BrUNIwQjVx9IKLwfRScLa2O8unk/dnBff5p638x591OP+2TeKQ5z6+vM/5fQ+wK7/FFjd5Jok3jlQtE5bmaGLgCXLxPWRe8UeA7UUGqipgM3bOVkCxS+7QdSU42bCfHxjOG+UnpgjUXnRjNBGZllacC/y3CMhtvH5w0=
+	 In-Reply-To:Content-Type; b=s9Pa6z0FS2LQXQAoXkEOqycY89xb6dr6F7PT/zLowMAiPp2cFq13ArbpWeRepXRVOhOs3G/kOdQtMPTTDCCJKKK83jWBqBn7elCRaB+tlHrCJUcH3Ptb841gY/Ac+NOKgfuGs14KMYDfvPhnFgsQ2U2NsZ+aJt30cTAAxDdFFlU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9D9F3106F;
-	Mon,  7 Apr 2025 09:34:24 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EB54B106F;
+	Mon,  7 Apr 2025 09:34:33 -0700 (PDT)
 Received: from [10.57.17.31] (unknown [10.57.17.31])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 231A03F694;
-	Mon,  7 Apr 2025 09:34:18 -0700 (PDT)
-Message-ID: <95c06abf-591f-4dd0-b1fd-296b0d5ae924@arm.com>
-Date: Mon, 7 Apr 2025 17:34:16 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B6B343F694;
+	Mon,  7 Apr 2025 09:34:28 -0700 (PDT)
+Message-ID: <3b563b01-5090-4c9d-a47c-a0aaa13c474b@arm.com>
+Date: Mon, 7 Apr 2025 17:34:28 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -42,7 +42,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 17/45] arm64: RME: Handle realm enter/exit
+Subject: Re: [PATCH v7 18/45] arm64: RME: Handle RMI_EXIT_RIPAS_CHANGE
 To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
@@ -57,158 +57,209 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
  <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
 References: <20250213161426.102987-1-steven.price@arm.com>
- <20250213161426.102987-18-steven.price@arm.com>
- <80983793-5df7-4828-96e8-90540e7d9183@redhat.com>
+ <20250213161426.102987-19-steven.price@arm.com>
+ <b89caaaf-3d26-4ca4-b395-08bf3f90dd1f@redhat.com>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <80983793-5df7-4828-96e8-90540e7d9183@redhat.com>
+In-Reply-To: <b89caaaf-3d26-4ca4-b395-08bf3f90dd1f@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 04/03/2025 01:03, Gavin Shan wrote:
+On 04/03/2025 04:35, Gavin Shan wrote:
 > On 2/14/25 2:13 AM, Steven Price wrote:
->> Entering a realm is done using a SMC call to the RMM. On exit the
->> exit-codes need to be handled slightly differently to the normal KVM
->> path so define our own functions for realm enter/exit and hook them
->> in if the guest is a realm guest.
+>> The guest can request that a region of it's protected address space is
+>> switched between RIPAS_RAM and RIPAS_EMPTY (and back) using
+>> RSI_IPA_STATE_SET. This causes a guest exit with the
+>> RMI_EXIT_RIPAS_CHANGE code. We treat this as a request to convert a
+>> protected region to unprotected (or back), exiting to the VMM to make
+>> the necessary changes to the guest_memfd and memslot mappings. On the
+>> next entry the RIPAS changes are committed by making RMI_RTT_SET_RIPAS
+>> calls.
+>>
+>> The VMM may wish to reject the RIPAS change requested by the guest. For
+>> now it can only do with by no longer scheduling the VCPU as we don't
+>> currently have a usecase for returning that rejection to the guest, but
+>> by postponing the RMI_RTT_SET_RIPAS changes to entry we leave the door
+>> open for adding a new ioctl in the future for this purpose.
 >>
 >> Signed-off-by: Steven Price <steven.price@arm.com>
 >> ---
->> Changes since v6:
->>   * Use vcpu_err() rather than pr_err/kvm_err when there is an associated
->>     vcpu to the error.
->>   * Return -EFAULT for KVM_EXIT_MEMORY_FAULT as per the documentation for
->>     this exit type.
->>   * Split code handling a RIPAS change triggered by the guest to the
->>     following patch.
->> Changes since v5:
->>   * For a RIPAS_CHANGE request from the guest perform the actual RIPAS
->>     change on next entry rather than immediately on the exit. This allows
->>     the VMM to 'reject' a RIPAS change by refusing to continue
->>     scheduling.
->> Changes since v4:
->>   * Rename handle_rme_exit() to handle_rec_exit()
->>   * Move the loop to copy registers into the REC enter structure from the
->>     to rec_exit_handlers callbacks to kvm_rec_enter(). This fixes a bug
->>     where the handler exits to user space and user space wants to modify
->>     the GPRS.
->>   * Some code rearrangement in rec_exit_ripas_change().
->> Changes since v2:
->>   * realm_set_ipa_state() now provides an output parameter for the
->>     top_iap that was changed. Use this to signal the VMM with the correct
->>     range that has been transitioned.
->>   * Adapt to previous patch changes.
+>> New patch for v7: The code was previously split awkwardly between two
+>> other patches.
 >> ---
->>   arch/arm64/include/asm/kvm_rme.h |   3 +
->>   arch/arm64/kvm/Makefile          |   2 +-
->>   arch/arm64/kvm/arm.c             |  19 +++-
->>   arch/arm64/kvm/rme-exit.c        | 171 +++++++++++++++++++++++++++++++
->>   arch/arm64/kvm/rme.c             |  19 ++++
->>   5 files changed, 208 insertions(+), 6 deletions(-)
->>   create mode 100644 arch/arm64/kvm/rme-exit.c
+>>   arch/arm64/kvm/rme.c | 87 ++++++++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 87 insertions(+)
 >>
 > 
-> With below nitpicks addressed:
+> With the following comments addressed:
 > 
 > Reviewed-by: Gavin Shan <gshan@redhat.com>
 > 
-> [...]
-> 
->> diff --git a/arch/arm64/kvm/rme-exit.c b/arch/arm64/kvm/rme-exit.c
->> new file mode 100644
->> index 000000000000..aae1adefe1a3
->> --- /dev/null
->> +++ b/arch/arm64/kvm/rme-exit.c
->> @@ -0,0 +1,171 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +/*
->> + * Copyright (C) 2023 ARM Ltd.
->> + */
->> +
->> +#include <linux/kvm_host.h>
->> +#include <kvm/arm_hypercalls.h>
->> +#include <kvm/arm_psci.h>
->> +
->> +#include <asm/rmi_smc.h>
->> +#include <asm/kvm_emulate.h>
->> +#include <asm/kvm_rme.h>
->> +#include <asm/kvm_mmu.h>
->> +
->> +typedef int (*exit_handler_fn)(struct kvm_vcpu *vcpu);
->> +
-> 
-> Duplicated to exit_handler_fn, defined in handle_exit.c, need move the
-> definition to header file.
-
-While I get this is duplication, I'm a little reluctant to move it to a
-header file because this is completely internal to each C file (the
-xxx_exit_handler[] arrays are both static). If either side wants to e.g.
-add an extra argument there shouldn't be a requirement to reflect that
-change in the other.
-
-Specifically I'm wondering if we're going to ever need to pass an RMI
-return status into the rme-exit callbacks at some point.
-
->> +static int rec_exit_reason_notimpl(struct kvm_vcpu *vcpu)
+>> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+>> index 507eb4b71bb7..f965869e9ef7 100644
+>> --- a/arch/arm64/kvm/rme.c
+>> +++ b/arch/arm64/kvm/rme.c
+>> @@ -624,6 +624,64 @@ void kvm_realm_unmap_range(struct kvm *kvm,
+>> unsigned long start, u64 size,
+>>           realm_unmap_private_range(kvm, start, end);
+>>   }
+>>   +static int realm_set_ipa_state(struct kvm_vcpu *vcpu,
+>> +                   unsigned long start,
+>> +                   unsigned long end,
+>> +                   unsigned long ripas,
+>> +                   unsigned long *top_ipa)
 >> +{
+>> +    struct kvm *kvm = vcpu->kvm;
+>> +    struct realm *realm = &kvm->arch.realm;
 >> +    struct realm_rec *rec = &vcpu->arch.rec;
+>> +    phys_addr_t rd_phys = virt_to_phys(realm->rd);
+>> +    phys_addr_t rec_phys = virt_to_phys(rec->rec_page);
+>> +    struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
+>> +    unsigned long ipa = start;
+>> +    int ret = 0;
 >> +
->> +    vcpu_err(vcpu, "Unhandled exit reason from realm (ESR: %#llx)\n",
->> +         rec->run->exit.esr);
->> +    return -ENXIO;
->> +}
+>> +    while (ipa < end) {
+>> +        unsigned long next;
 >> +
->> +static int rec_exit_sync_dabt(struct kvm_vcpu *vcpu)
->> +{
->> +    return kvm_handle_guest_abort(vcpu);
->> +}
->> +
->> +static int rec_exit_sync_iabt(struct kvm_vcpu *vcpu)
->> +{
->> +    struct realm_rec *rec = &vcpu->arch.rec;
->> +
->> +    vcpu_err(vcpu, "Unhandled instruction abort (ESR: %#llx).\n",
->> +         rec->run->exit.esr);
->> +    return -ENXIO;
->> +}
->> +
->> +static int rec_exit_sys_reg(struct kvm_vcpu *vcpu)
->> +{
->> +    struct realm_rec *rec = &vcpu->arch.rec;
->> +    unsigned long esr = kvm_vcpu_get_esr(vcpu);
->> +    int rt = kvm_vcpu_sys_get_rt(vcpu);
->> +    bool is_write = !(esr & 1);
->> +    int ret;
->> +
->> +    if (is_write)
->> +        vcpu_set_reg(vcpu, rt, rec->run->exit.gprs[0]);
->> +
->> +    ret = kvm_handle_sys_reg(vcpu);
->> +
->> +    if (ret >= 0 && !is_write)
->> +        rec->run->enter.gprs[0] = vcpu_get_reg(vcpu, rt);
+>> +        ret = rmi_rtt_set_ripas(rd_phys, rec_phys, ipa, end, &next);
 >> +
 > 
-> Unncessary blank line and the conditon isn't completely correct:
-> kvm_handle_sys_reg()
-> should return 0 if the requested emulation fails, even it always returns
-> 1 for now.
-
-It shouldn't matter, but like you say it's not technically the correct
-condition so I'll fix this up.
-
-Thanks,
-Steve
-
->     ret = kvm_handle_sys_reg(vcpu);
->     if (ret > 0 && !is_write)
->         rec->run->enter.gprs[0] = vcpu_get_reg(vcpu, rt);
+> This doesn't look correct to me. Looking at RMM::smc_rtt_set_ripas(),
+> it's possible
+> the SMC call is returned without updating 'next' to a valid address. In
+> this case,
+> the garbage content resident in 'next' can be used to updated to 'ipa'
+> in next
+> iternation. So we need to initialize it in advance, like below.
 > 
+>     unsigned long ipa = start;
+>     unsigned long next = start;
+> 
+>     while (ipa < end) {
+>         ret = rmi_rtt_set_ripas(rd_phys, rec_phys, ipa, end, &next);
+
+I agree this might not be the clearest code, but 'next' should be set if
+the return state is RMI_SUCCESS, and we don't actually get to the "ipa =
+next" line unless that is the case. But I'll rejig things because it's
+not clear.
+
+>> +        if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
+>> +            int walk_level = RMI_RETURN_INDEX(ret);
+>> +            int level = find_map_level(realm, ipa, end);
+>> +
+>> +            /*
+>> +             * If the RMM walk ended early then more tables are
+>> +             * needed to reach the required depth to set the RIPAS.
+>> +             */
+>> +            if (walk_level < level) {
+>> +                ret = realm_create_rtt_levels(realm, ipa,
+>> +                                  walk_level,
+>> +                                  level,
+>> +                                  memcache);
+>> +                /* Retry with RTTs created */
+>> +                if (!ret)
+>> +                    continue;
+>> +            } else {
+>> +                ret = -EINVAL;
+>> +            }
+>> +
+>> +            break;
+>> +        } else if (RMI_RETURN_STATUS(ret) != RMI_SUCCESS) {
+>> +            WARN(1, "Unexpected error in %s: %#x\n", __func__,
+>> +                 ret);
+>> +            ret = -EINVAL;
+> 
+>             ret = -ENXIO;
+
+Ack
+
+>> +            break;
+>> +        }
+>> +        ipa = next;
+>> +    }
+>> +
+>> +    *top_ipa = ipa;
+>> +
+>> +    if (ripas == RMI_EMPTY && ipa != start)
+>> +        realm_unmap_private_range(kvm, start, ipa);
+>> +
 >> +    return ret;
 >> +}
 >> +
+>>   static int realm_init_ipa_state(struct realm *realm,
+>>                   unsigned long ipa,
+>>                   unsigned long end)
+>> @@ -863,6 +921,32 @@ void kvm_destroy_realm(struct kvm *kvm)
+>>       kvm_free_stage2_pgd(&kvm->arch.mmu);
+>>   }
+>>   +static void kvm_complete_ripas_change(struct kvm_vcpu *vcpu)
+>> +{
+>> +    struct kvm *kvm = vcpu->kvm;
+>> +    struct realm_rec *rec = &vcpu->arch.rec;
+>> +    unsigned long base = rec->run->exit.ripas_base;
+>> +    unsigned long top = rec->run->exit.ripas_top;
+>> +    unsigned long ripas = rec->run->exit.ripas_value;
+>> +    unsigned long top_ipa;
+>> +    int ret;
+>> +
 > 
-> [...]
+> Some checks are needed here to ensure the addresses (@base and @top)
+> falls inside
+> the protected (private) space for two facts: (1) Those parameters
+> originates from
+> the guest, which can be misbehaving. (2) RMM::smc_rtt_set_ripas() isn't
+> limited to
+> the private space, meaning it also can change RIPAS for the ranges in
+> the shared
+> space.
+
+I might be missing something, but AFAICT this is safe:
+
+ 1. The RMM doesn't permit RIPAS changes within the shared space:
+    RSI_IPA_STATE_SET has a precondition [rgn_bound]:
+    AddrRangeIsProtected(base, top, realm)
+    So a malicious guest shouldn't get passed the RMM.
+
+ 2. The RMM validates that the range passed here is (a subset of) the
+    one provided to the NS-world [base_bound / top_bound].
+
+And even if somehow a malicious guest managed to bypass these checks I
+don't see how it would cause harm to the host operating on the wrong region.
+
+I'm happy to be corrected though! What am I missing?
+
+Thank,
+Steve
+
+>> +    do {
+>> +        kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_page_cache,
+>> +                       kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu));
+>> +        write_lock(&kvm->mmu_lock);
+>> +        ret = realm_set_ipa_state(vcpu, base, top, ripas, &top_ipa);
+>> +        write_unlock(&kvm->mmu_lock);
+>> +
+>> +        if (WARN_RATELIMIT(ret && ret != -ENOMEM,
+>> +                   "Unable to satisfy RIPAS_CHANGE for %#lx - %#lx,
+>> ripas: %#lx\n",
+>> +                   base, top, ripas))
+>> +            break;
+>> +
+>> +        base = top_ipa;
+>> +    } while (top_ipa < top);
+>> +}
+>> +
+>>   int kvm_rec_enter(struct kvm_vcpu *vcpu)
+>>   {
+>>       struct realm_rec *rec = &vcpu->arch.rec;
+>> @@ -873,6 +957,9 @@ int kvm_rec_enter(struct kvm_vcpu *vcpu)
+>>           for (int i = 0; i < REC_RUN_GPRS; i++)
+>>               rec->run->enter.gprs[i] = vcpu_get_reg(vcpu, i);
+>>           break;
+>> +    case RMI_EXIT_RIPAS_CHANGE:
+>> +        kvm_complete_ripas_change(vcpu);
+>> +        break;
+>>       }
+>>         if (kvm_realm_state(vcpu->kvm) != REALM_STATE_ACTIVE)
 > 
 > Thanks,
 > Gavin
