@@ -1,143 +1,138 @@
-Return-Path: <kvm+bounces-42812-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42813-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD524A7D6B7
-	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 09:51:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C2E11A7D6D2
+	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 09:52:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF1977A76C3
-	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 07:50:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 86BAA7A2020
+	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 07:51:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81925227E9B;
-	Mon,  7 Apr 2025 07:50:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91525225A29;
+	Mon,  7 Apr 2025 07:52:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mEj+anw7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dEfPSiMi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D3F2226170
-	for <kvm@vger.kernel.org>; Mon,  7 Apr 2025 07:50:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13A054C6D
+	for <kvm@vger.kernel.org>; Mon,  7 Apr 2025 07:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744012238; cv=none; b=T77vfcGMlV6dsfQL+UCV68ktiX5OHwuhPJUuI3jpYMhlHbo6PPIlCNbnfVyzciUTKtblXfiOrs3TT252KnxlrnjXOnjepwmqlmspMFU4CQSPR6ryKIubfL6WryyP9RA4lnkkDTyx2vS11WZpFNPGo3sthcEKuzNt2k4zRU4tUyc=
+	t=1744012366; cv=none; b=NT/N6znA7QJlJJ67hpDPdvYWdYQzfYlYDQHmp6JQqDHkJlmrjAXD3ggnbUufaLG9gvFymAodCqxb4fRriM+qfi03tPwME8fIaA/BcsPGpw9l/G/9ZLykp6GPP2e3yGiecde1MAqzlRu2zJNo1ZAqv+6proQi7NmKHeK0rjlo3iw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744012238; c=relaxed/simple;
-	bh=72seqPwiqtTTIfhrsv8Di6UixdAaQLoSv7f9LbSTVdM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mXCImQYLcE+zSkgpH5wVQWYv4xq2qufz5O1+doBaga5f9uDbwF8KdLviHrKieA1HaY36H3QVbNf08uovS3ad2g/hH6xiR+boqX3izNDtzjwTE23BJ+qSZwWACIPHf4dVc7C0LeDFGrYFnPvlL6e8CPwSEa+8MfD4Ut6AmWdEjUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mEj+anw7; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744012237; x=1775548237;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=72seqPwiqtTTIfhrsv8Di6UixdAaQLoSv7f9LbSTVdM=;
-  b=mEj+anw78jFm7aVouiq/iipDPYnaqpnqgDawI11g7kPKQ5RiOd8IE1fQ
-   BIZomayg5JA2hz3L01H9i9ifSiItS3A/elvKl2+DQQl55Czpjqds0lxuC
-   xdrXXk/biI/NkhZ4hA9KYmBr3cAHW4SoliMeS966DiHGedvzUFH6xnRdB
-   UQhKMtmeyRDsGC6cbaDstH+rHzBDPT7rg3wBTNgQ964oqv13szGkkAkWJ
-   +eS4VPGznz6CCtuejQVAyKdW4FTZLMvIYqJlX0pBJ6Fc8j0UGKp3jQ8rn
-   RWUpIVVuJxxpSsbdtjNdzlSot+I8qJvy5WRrxQ2wGMCQXr59QmziVNKCF
-   w==;
-X-CSE-ConnectionGUID: zJ+UYIC8TKO6Z9N21k5VSg==
-X-CSE-MsgGUID: ar1ul16xSnCfHopYDBPA5Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11396"; a="67857619"
-X-IronPort-AV: E=Sophos;i="6.15,193,1739865600"; 
-   d="scan'208";a="67857619"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2025 00:50:37 -0700
-X-CSE-ConnectionGUID: uVjmCoGaRRmRYXxjCVAOLw==
-X-CSE-MsgGUID: 4g4q8ObRQZijpc802CGgiA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,193,1739865600"; 
-   d="scan'208";a="128405709"
-Received: from emr-bkc.sh.intel.com ([10.112.230.82])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2025 00:50:34 -0700
-From: Chenyi Qiang <chenyi.qiang@intel.com>
-To: David Hildenbrand <david@redhat.com>,
-	Alexey Kardashevskiy <aik@amd.com>,
-	Peter Xu <peterx@redhat.com>,
-	Gupta Pankaj <pankaj.gupta@amd.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Michael Roth <michael.roth@amd.com>
-Cc: Chenyi Qiang <chenyi.qiang@intel.com>,
-	qemu-devel@nongnu.org,
-	kvm@vger.kernel.org,
-	Williams Dan J <dan.j.williams@intel.com>,
-	Peng Chao P <chao.p.peng@intel.com>,
-	Gao Chao <chao.gao@intel.com>,
-	Xu Yilun <yilun.xu@intel.com>,
-	Li Xiaoyao <xiaoyao.li@intel.com>
-Subject: [PATCH v4 13/13] RAMBlock: Make guest_memfd require coordinate discard
-Date: Mon,  7 Apr 2025 15:49:33 +0800
-Message-ID: <20250407074939.18657-14-chenyi.qiang@intel.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20250407074939.18657-1-chenyi.qiang@intel.com>
-References: <20250407074939.18657-1-chenyi.qiang@intel.com>
+	s=arc-20240116; t=1744012366; c=relaxed/simple;
+	bh=rUX6kwf2jcF8ugrawlFPTy7xjQXkwZR1IvpwRwX1AmQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mqw+ARvJNB8IonqtWJvFZzHHAuB4MJe4Fz+aJGLHKm5h7Pocm5xLvGhhMenXTlHLSq1zmFSx1YFvsgNLQJhEQLQ0S1ttbbkoYBxCPVIQ5gRenrwJEXGlJZY1Jt1tyXJU/xQqHKcfwEz16zg5HbK398AxR3HBFaGwpGMlrIrT8Kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dEfPSiMi; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744012364;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SWeyxgVRp5P7mOHz2eAUtnv3gFTxLpkuE25ons4rBo4=;
+	b=dEfPSiMiA2EKUviZFjwC6pQ1BjlCBHkoWLN0QiZiLBRDBtu8ODJRfqK+S0mvSzKnkkMxye
+	lhMHEuU3h1i1mzRWq4vawDJUwJd/GBPdP+eMDSafijSrO/Nx7pyi9xtZB8NIcUqTNcSUFE
+	vUCZv4FCoZT0NvfMVvkrvb7/Yzzj7wo=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-190-pq4vyaziMTaiWX-UOHMJHA-1; Mon, 07 Apr 2025 03:52:43 -0400
+X-MC-Unique: pq4vyaziMTaiWX-UOHMJHA-1
+X-Mimecast-MFC-AGG-ID: pq4vyaziMTaiWX-UOHMJHA_1744012362
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3913f546dfdso2367513f8f.1
+        for <kvm@vger.kernel.org>; Mon, 07 Apr 2025 00:52:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744012362; x=1744617162;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SWeyxgVRp5P7mOHz2eAUtnv3gFTxLpkuE25ons4rBo4=;
+        b=hYg7ydHtIcVe5zfIfx65Z1Dl21OoBN4/4VYH1ZNiRF7HEZxz0lnS8RoUVga+1jeoHy
+         iAX8BflH1drVb3hOxxfED81lGpWIj1OtitAVpLISrIaZVH2lj8O9Y6oa3Vw3BkSMbreb
+         nziBUqRV5AdnesAx3pNfk1VvynxsUXAQWg9Bnjkcsmu81sIf2AsbNIuxelEjGVu1AU2z
+         VYkw6y9OyYtY9J/BP7jdfOuFu1CW8TstogWZjSD7x3U61gs6QnYTzKG6qBLj4mUwX3jq
+         HrlXvUPulkT2Uv2YkyGvPjPJN6BlwzrTAB/KaUq9libYapwaUTB5R8eScy/qLuPLxENq
+         kHxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUb6c1bW/SCsaVpLK2PxGVwFQ3BLj9j6alIzrpYBDwkfPYcZAUYwiaEoxI1MtCGIJBXwcM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4tUMHK18iY/AndJUW1vNSkD8BbcyO01wq8bb4WvsLXwFPNVMs
+	n5zHbYmCb4Q2lCfSNHlwSBF8OI+OipvzT3S9iJCNxr9ixfcX6naCF3I/qcpK3tn5AXRo7rczmuW
+	ySdz2gTIZix9xYzaj7zL0zAF7ijbjEPgxKriANNTv4WKrs1licA==
+X-Gm-Gg: ASbGncvHI+ofGWGYfhohFXMlRuoGXfywgPcLxGmzFwiF/JyLGaj1rd32q+u5lltUsV2
+	/51ksIhJK4rckMTkRsiQvRNtUTJ8TQN7Hr2pXH2nWY2QTRm/pApu/k4kpDw1nIIYPNoTPKqsPOL
+	/qRr35X81MbZSELZp9tx2S4E+tR+4a/lanXbMSwzVyNfeZrla0+KL3aIGVOLE/WYVWGpHulbOSX
+	/IXpsWh0wm8YRlqyJXLxYrPIfiME3bLa+xRVzoT2RUr7sjwWqjaRNcBARLEwW41OLPWA5I4KTFu
+	NSZrpwlxFw==
+X-Received: by 2002:a05:6000:2ca:b0:39c:30fd:ca7 with SMTP id ffacd0b85a97d-39d6fc0c02emr6572083f8f.7.1744012361837;
+        Mon, 07 Apr 2025 00:52:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFJsYAXUaNdpV/VhhZQQ5RxLgg/gr/bn4kaQg3vnQsXyz4+tvGKcyIi12k0f6ULNipYdQ/RcQ==
+X-Received: by 2002:a05:6000:2ca:b0:39c:30fd:ca7 with SMTP id ffacd0b85a97d-39d6fc0c02emr6572064f8f.7.1744012361448;
+        Mon, 07 Apr 2025 00:52:41 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39d75ac6d66sm4958408f8f.14.2025.04.07.00.52.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Apr 2025 00:52:40 -0700 (PDT)
+Date: Mon, 7 Apr 2025 03:52:37 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
+	linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
+	kvm@vger.kernel.org, Chandra Merla <cmerla@redhat.com>,
+	Stable@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
+	Thomas Huth <thuth@redhat.com>, Eric Farman <farman@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Wei Wang <wei.w.wang@intel.com>
+Subject: Re: [PATCH v1] s390/virtio_ccw: don't allocate/assign airqs for
+ non-existing queues
+Message-ID: <20250407034901-mutt-send-email-mst@kernel.org>
+References: <20250403161836.7fe9fea5.pasic@linux.ibm.com>
+ <e2936e2f-022c-44ee-bb04-f07045ee2114@redhat.com>
+ <20250404063619.0fa60a41.pasic@linux.ibm.com>
+ <4a33daa3-7415-411e-a491-07635e3cfdc4@redhat.com>
+ <d54fbf56-b462-4eea-a86e-3a0defb6298b@redhat.com>
+ <20250404153620.04d2df05.pasic@linux.ibm.com>
+ <d6f5f854-1294-4afa-b02a-657713435435@redhat.com>
+ <20250404160025.3ab56f60.pasic@linux.ibm.com>
+ <6f548b8b-8c6e-4221-a5d5-8e7a9013f9c3@redhat.com>
+ <20250404173910.6581706a.pasic@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250404173910.6581706a.pasic@linux.ibm.com>
 
-As guest_memfd is now managed by ram_block_attribute with
-PrivateSharedManager, only block uncoordinated discard.
+On Fri, Apr 04, 2025 at 05:39:10PM +0200, Halil Pasic wrote:
+> > 
+> > Not perfect, but AFAIKS, not horrible.
+> 
+> It is like it is. QEMU does queue exist if the corresponding feature
+> is offered by the device, and that is what we have to live with.
 
-Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
----
-Changes in v4:
-    - Modify commit message (RamDiscardManager->PrivateSharedManager).
+I don't think we can live with this properly though.
+It means a guest that does not know about some features
+does not know where to find things.
 
-Changes in v3:
-    - No change.
+So now, I am inclined to add linux code to work with current qemu and
+with spec compliant one, and add qemu code to work with current linux
+and spec compliant one.
 
-Changes in v2:
-    - Change the ram_block_discard_require(false) to
-      ram_block_coordinated_discard_require(false).
----
- system/physmem.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Document the bug in the spec, maybe, in a non conformance section.
 
-diff --git a/system/physmem.c b/system/physmem.c
-index fb74321e10..5e72d2a544 100644
---- a/system/physmem.c
-+++ b/system/physmem.c
-@@ -1871,7 +1871,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp)
-         assert(kvm_enabled());
-         assert(new_block->guest_memfd < 0);
- 
--        ret = ram_block_discard_require(true);
-+        ret = ram_block_coordinated_discard_require(true);
-         if (ret < 0) {
-             error_setg_errno(errp, -ret,
-                              "cannot set up private guest memory: discard currently blocked");
-@@ -1895,7 +1895,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp)
-              */
-             object_unref(OBJECT(new_block->ram_block_attribute));
-             close(new_block->guest_memfd);
--            ram_block_discard_require(false);
-+            ram_block_coordinated_discard_require(false);
-             qemu_mutex_unlock_ramlist();
-             goto out_free;
-         }
-@@ -2155,7 +2155,7 @@ static void reclaim_ramblock(RAMBlock *block)
-         ram_block_attribute_unrealize(block->ram_block_attribute);
-         object_unref(OBJECT(block->ram_block_attribute));
-         close(block->guest_memfd);
--        ram_block_discard_require(false);
-+        ram_block_coordinated_discard_require(false);
-     }
- 
-     g_free(block);
 -- 
-2.43.5
+MST
 
 
