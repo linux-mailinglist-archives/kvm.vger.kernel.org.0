@@ -1,232 +1,523 @@
-Return-Path: <kvm+bounces-42849-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42850-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF80EA7E2E2
-	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 17:00:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CB9EA7E39D
+	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 17:12:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0FA1420475
-	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 14:47:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3299164665
+	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 15:06:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E94F81DEFEA;
-	Mon,  7 Apr 2025 14:46:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E89991F8922;
+	Mon,  7 Apr 2025 15:04:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TpkZD/fF"
+	dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b="e+bTi3Li"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 695C61DE3C5
-	for <kvm@vger.kernel.org>; Mon,  7 Apr 2025 14:46:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA3C1EF369
+	for <kvm@vger.kernel.org>; Mon,  7 Apr 2025 15:04:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744037217; cv=none; b=UpQ3ty+zcRaK+K6r37Cy6uYUvU/SY4vTPVe99x3qBbeR/7absT7eMbwPU0DyRHwWypMAqfBf0NEz0ywZGnd96J8NPf1Ok/Vn+welPFXaOzG0DIgEJbZoeSMJ9uwGrQ6DdkDJE6d80B6xwuFRNnbnm2/l+emY7QXxF2Gzab7fC1I=
+	t=1744038288; cv=none; b=MLMGlRZmMQjeG5NCuBEyFB3tP8I6cKz0Ki/WzLiUYFTGUabA6e3WYNfwsY6/7izBe3EbUDrT3qOw073LDgLjg4koIrNqpY1K0Ye4LRzjoIz+eaEprb97YlOdEdSokDzh02hbu9uexLtWfZDoQKHXXcGq5h/+fW6qI488SN3VBxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744037217; c=relaxed/simple;
-	bh=W2t77E0tmbGgfvb+IN2IWQmKxzIvGnpJmucLEFBRxzQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=XVE2VmkKVMADuzGtTZMIIIfPGr7TSRNal2xadeVgIzYyi1+kYC08+LEQhybT3TV45xdPbeKrldwEfdWw3GGJnf5m2NUMjrjYG8CH8S3UDpX4D+96j3Qf33dTTsk6qZEAvSDCCxEOr06FnRejGu0mxIE5NaYhS7kD6KE1fgjz3Q8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TpkZD/fF; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744037214;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=+JBzs/lfPTMTyDZad0L+1TztRElX/AUHjw0pErz4yOQ=;
-	b=TpkZD/fF0i2LmfdIxJ6SGjNS4Cpp/7glW7mF9WOWCHah6i4Y9hKTwiJcR2aktga9UjM1xJ
-	qeZ/vjpppbSP4Fy1fDgh8oBN/3AghJDkfGMAfBh+hy1RIXGySypJvAlBQWjY/7pxrnMo6J
-	rWedqHIUWLBLrCNG3B2nn1t1xCjIZPk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-80-EZXgHrhxNZWlXEjeJjFz1g-1; Mon, 07 Apr 2025 10:46:53 -0400
-X-MC-Unique: EZXgHrhxNZWlXEjeJjFz1g-1
-X-Mimecast-MFC-AGG-ID: EZXgHrhxNZWlXEjeJjFz1g_1744037212
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43cf5196c25so25919845e9.0
-        for <kvm@vger.kernel.org>; Mon, 07 Apr 2025 07:46:53 -0700 (PDT)
+	s=arc-20240116; t=1744038288; c=relaxed/simple;
+	bh=si/HAeASKMwVMe4jysDMPvylshFfyJJu+MA6s1Nfta0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mwCymZvFZ5Tk5a0RoS92zSEbpCqKxAB1cS1p3rNWCnU+CZrA9CsaB7bfVNggQtIeaekCz8nKHRlsfus11RBY2bMR01nt0ouzOY4u3U0M2V7KehIbtu4uxcl23vExThPXvRQZu6FBj0lg92m4ZLL45EFtRqiY9QC1K4OTCNZuZLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw; spf=pass smtp.mailfrom=csie.ntu.edu.tw; dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b=e+bTi3Li; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csie.ntu.edu.tw
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-227b650504fso39543145ad.0
+        for <kvm@vger.kernel.org>; Mon, 07 Apr 2025 08:04:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=csie.ntu.edu.tw; s=google; t=1744038283; x=1744643083; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=I9kdmTO4tcqMNv0b+m3Ev3puZ8xn/klk3TOQNZ1xzZQ=;
+        b=e+bTi3LiI++yrkUGWoXou4HD52hEOpCUk79WSkBHmDCR26MazPYyt1Wx39w6KHNaql
+         g/VKKxAe5y8RsP3oVncN1GFNc2wASHcSKKRlSlQ0vQPiPQ2G7O2dkm5d1Ple877eFAUY
+         NlajDHGYJ5Ok2bem6rO670T9NIHvoJF66RFbFsTSzhjXdBw/OJVpylcWKFq4YBBGbxWA
+         m2L+gDOGINIKZ7V8V8Z6JepyGs9vjzepS5k6NYVtBGl7pO5JdIKpIPTdj78Hp/hyzipn
+         kxCj3FHOas0t7sO+I9SbE7L3WrKARqkjIyPRUrmhm5bW2D0phhUi0z3ALubY2bptBucL
+         +x1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744037212; x=1744642012;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1744038283; x=1744643083;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+JBzs/lfPTMTyDZad0L+1TztRElX/AUHjw0pErz4yOQ=;
-        b=OgN1csA5VnliQB29QDLGIi88XcMcnLh8LvNUucFFjO4zq0Jvv3QVBHK1iLPHcr60CC
-         gJl3NtvCNWVyHcvenxWDrqv543hrkQku2+X/fAP21vvu+DI5gggiZ7P3LYPU3ch2iHgb
-         jKQHeRqq7pFVrLfjQPUEpGccGyTp5HzyraKiTK1eQjVNjf1bX59Ad+Fs51il1WXHCga9
-         At3WvwUYCuuYFQK3k7nVTffi76zSO8HLiamFIhq/4MaoWkj/RMSQvr53ESypELy1Ip5w
-         +Qc90Zc33qoC9igrIRwHCpCVgZqsU+qxgwwo1Uqoxepb7KL50esozD7Gu0IZgBqWE7pk
-         qGVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU6VAVvLaEL03G3v3WVQFxsMB+u3T33Zd1FzjNwPCn01Oq6AJTP4CgzrZTPBtCQk8i14Xg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/9uouGqXU+hxej44sozvkhP8fP3Oejlf+bx4X9ILU48yv+B2Q
-	LuqbE1XBzOdWIc1B/tKDruye6Fo6p9CrAhok1ALX9bWiuxpLvwcwZIZah6W1/jMLZxyiZJ4joqF
-	uDiHhTc1gGvxDlh/38ElGO4pRJfZyEvjFRme6kkuwmbSsOm+MLg==
-X-Gm-Gg: ASbGncuOTDyZEzyNgrNB9UMDSgU+z6C2x9salxFnk6tMsTbK9hpFr0YZADLOfneGC40
-	Secjx+KWAsI5NOehSo0Cx0AwwJzXV9rdVwgGYj0KaNurO7iYA+520igkSu31qSyxHHXr4cQGK5Q
-	ItQg8Lm30qBy2y7I2JXLTdTSIevAULezqrYmEYfdGG24VghO4k3WCKszXg4l3njQYDeir21ehp0
-	5tCxj+zm6Gr9nruJawhhnUYZ3ZR3Gn3Q0wgTMbOuWawlosFKq6T1VdRmpBKFG4hukOD3y65ouxO
-	Mb3IyNZEUspih+ygQ7Ncwkn8uX62pQOCKCkyakxZXvazXoLE3GZQ9TC5kH6ci5m8f0yLGxYP8u0
-	sZOm9wViB6SH03Shh8A6sQbDG6cT7lwT+Ctz9Zi6yQLk=
-X-Received: by 2002:a05:600c:4fcd:b0:43d:abd:ad1c with SMTP id 5b1f17b1804b1-43eda5d4356mr89961765e9.6.1744037211684;
-        Mon, 07 Apr 2025 07:46:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGkMDYiysHhg4FAH45/4sqicxO4DSMEK914rVRpEQcqCPyzF4nOkGiqDPxNFvJdev5DmLnpWQ==
-X-Received: by 2002:a05:600c:4fcd:b0:43d:abd:ad1c with SMTP id 5b1f17b1804b1-43eda5d4356mr89961405e9.6.1744037211224;
-        Mon, 07 Apr 2025 07:46:51 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c738:3c00:8b01:4fd9:b833:e1e9? (p200300cbc7383c008b014fd9b833e1e9.dip0.t-ipconnect.de. [2003:cb:c738:3c00:8b01:4fd9:b833:e1e9])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec36699e0sm132802575e9.35.2025.04.07.07.46.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Apr 2025 07:46:50 -0700 (PDT)
-Message-ID: <9326367c-977d-4d55-80bd-f1ad3673f375@redhat.com>
-Date: Mon, 7 Apr 2025 16:46:48 +0200
+        bh=I9kdmTO4tcqMNv0b+m3Ev3puZ8xn/klk3TOQNZ1xzZQ=;
+        b=mKnfNLLF6sjAX6+rydO/AUcqcYyJ+kDlzdLO971InZKiSe8rnwpnSo14kbMRWCNqPT
+         jiP8o0Ft438RuTOWuZRv87Ub40GBTSvmdgk09sxS3fTD/sqYdg2Vgi02F26wpmdEr0ak
+         TqqPZprBIj9T9qB+G20AK+xHzAgmauOIArHIyJohzCDvt3Y7B6HA1dhQtQA6XlE25iFm
+         +Fg+m3tlfcPzA8RtyivPPzaUtQ6ZCiN3ikLBao8pfP4hryjnSbDdMn/wmATpLGdtXRxy
+         fL93yVHG0LOW6o2CX2BFkl5qse8/ChgLqB6mneHfdTF2KusxZOlWoQAVS9m8qP8K0kfB
+         9UCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUa0SH45jNDZH5dHWk/L4DDKTKm9JBLR5kpzrdufoPJX3QHrQ9m3d6LHCZf3MDaoAR76qk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMALa3kgmETGLpEsM97kFQ1kY/JnOnq3R9JxVku90ag1Y/3FFl
+	FHx+0pRynVBSgyx+xQ2cyIAJP+KuiZkywygxvbPvYro+oBzMbUVlEKvn6UNyTr3+1Sx5pGzk7m/
+	3L3Luok+jDUZq0YEKTs36Vu+bZudBg7pCVPZ2hga57OU=
+X-Gm-Gg: ASbGncvTGjoMMUbPuQ7M0v2XTrTxWdDzQ+BqPLlg4qeqDumJk1KMuZ/vy2oYYb0ez8h
+	VTCDrVjwXBOzfD4IRSWcjDWm8TFl8YnoiDQK9B6Y6VIz801qJU26G7fd5CEvXjwjYGleEiLOJaD
+	tOz/gFpq+sxBEUMoiZWWCH9bHil+kB/CjX464YD03srZURq/D0s9spTVTD4pojZtfsO9+Hg56Y4
+	mPA1lzVZ548TBUeh30+cbB+QM3XhV5ci0pKoecdS00hcnHNMWeyd/w/3MnbuC7GuzvDEcYqg/Ca
+	+rL/Vfm7sShoH1GorVvGod7uHytoKIRJTRTzyClvAwuUMKQLDkyL+uGLXWt/4L1911xw9sXhMKY
+	1JclV
+X-Google-Smtp-Source: AGHT+IH2oVXyQ3zs/hUIZ8h7pbZlqmcCBM70vrTswgR9PuCbdJMakAfyi957MMSEaZ9tPm8qDM8Oug==
+X-Received: by 2002:a17:902:ef10:b0:216:53fa:634f with SMTP id d9443c01a7336-22a8a1d4617mr200860295ad.48.1744038282789;
+        Mon, 07 Apr 2025 08:04:42 -0700 (PDT)
+Received: from zenbook (1-162-87-224.dynamic-ip.hinet.net. [1.162.87.224])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-229787778efsm81770435ad.259.2025.04.07.08.04.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Apr 2025 08:04:42 -0700 (PDT)
+Date: Mon, 7 Apr 2025 23:06:23 +0800
+From: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, 
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, 
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev, 
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, 
+	Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>, 
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, r09922117@csie.ntu.edu.tw
+Subject: Re: [PATCH v7 12/45] arm64: RME: Allocate/free RECs to match vCPUs
+Message-ID: <omfhugkuqmbvijitmlq2tluspjhsh43d32ecvr5uubnnhukapk@up6i7g4nbovb>
+References: <20250213161426.102987-1-steven.price@arm.com>
+ <20250213161426.102987-13-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 0/6] KVM: guest_memfd: support for uffd minor
-To: "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Nikita Kalyazin <kalyazin@amazon.com>, Ackerley Tng
- <ackerleytng@google.com>, Vishal Annapurve <vannapurve@google.com>,
- Fuad Tabba <tabba@google.com>, akpm@linux-foundation.org,
- pbonzini@redhat.com, shuah@kernel.org, viro@zeniv.linux.org.uk,
- brauner@kernel.org, muchun.song@linux.dev, hughd@google.com,
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- linux-fsdevel@vger.kernel.org, jack@suse.cz, lorenzo.stoakes@oracle.com,
- jannh@google.com, ryan.roberts@arm.com, jthoughton@google.com,
- peterx@redhat.com, graf@amazon.de, jgowans@amazon.com, roypat@amazon.co.uk,
- derekmn@amazon.com, nsaenz@amazon.es, xmarcalx@amazon.com
-References: <20250404154352.23078-1-kalyazin@amazon.com>
- <2iggdfimgfke5saxs74zmfrswgrxmmsyxzphq4mdfpj54wu4pl@5uiia4pzkxem>
- <e8abe599-f48f-4203-8c60-9ee776aa4a24@amazon.com>
- <63j2cdjh6oxzb5ehtetiaolobp6zzev7emgqvvfkf5tuwlnspx@7h5u4nrqwvsc>
- <ba93b9c1-cb2b-442f-a4c4-b5530e94f88a@amazon.com>
- <2bohfxnbthvf3w4kz5u72wj5uxh5sb5s3mbhdk5eg2ingkpkqg@ylykphugpydy>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
- dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
- QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
- XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
- Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
- PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
- WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
- UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
- jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
- B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
- ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZgEEwEIAEICGwMGCwkIBwMCBhUIAgkKCwQW
- AgMBAh4BAheAAhkBFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl8Ox4kFCRKpKXgACgkQTd4Q
- 9wD/g1oHcA//a6Tj7SBNjFNM1iNhWUo1lxAja0lpSodSnB2g4FCZ4R61SBR4l/psBL73xktp
- rDHrx4aSpwkRP6Epu6mLvhlfjmkRG4OynJ5HG1gfv7RJJfnUdUM1z5kdS8JBrOhMJS2c/gPf
- wv1TGRq2XdMPnfY2o0CxRqpcLkx4vBODvJGl2mQyJF/gPepdDfcT8/PY9BJ7FL6Hrq1gnAo4
- 3Iv9qV0JiT2wmZciNyYQhmA1V6dyTRiQ4YAc31zOo2IM+xisPzeSHgw3ONY/XhYvfZ9r7W1l
- pNQdc2G+o4Di9NPFHQQhDw3YTRR1opJaTlRDzxYxzU6ZnUUBghxt9cwUWTpfCktkMZiPSDGd
- KgQBjnweV2jw9UOTxjb4LXqDjmSNkjDdQUOU69jGMUXgihvo4zhYcMX8F5gWdRtMR7DzW/YE
- BgVcyxNkMIXoY1aYj6npHYiNQesQlqjU6azjbH70/SXKM5tNRplgW8TNprMDuntdvV9wNkFs
- 9TyM02V5aWxFfI42+aivc4KEw69SE9KXwC7FSf5wXzuTot97N9Phj/Z3+jx443jo2NR34XgF
- 89cct7wJMjOF7bBefo0fPPZQuIma0Zym71cP61OP/i11ahNye6HGKfxGCOcs5wW9kRQEk8P9
- M/k2wt3mt/fCQnuP/mWutNPt95w9wSsUyATLmtNrwccz63XOwU0EVcufkQEQAOfX3n0g0fZz
- Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
- T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
- 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
- CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
- NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
- 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
- 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
- lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
- AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
- N7eop7uh+6bezi+rugUI+w6DABEBAAHCwXwEGAEIACYCGwwWIQQb2cqtc1xMOkYN/MpN3hD3
- AP+DWgUCXw7HsgUJEqkpoQAKCRBN3hD3AP+DWrrpD/4qS3dyVRxDcDHIlmguXjC1Q5tZTwNB
- boaBTPHSy/Nksu0eY7x6HfQJ3xajVH32Ms6t1trDQmPx2iP5+7iDsb7OKAb5eOS8h+BEBDeq
- 3ecsQDv0fFJOA9ag5O3LLNk+3x3q7e0uo06XMaY7UHS341ozXUUI7wC7iKfoUTv03iO9El5f
- XpNMx/YrIMduZ2+nd9Di7o5+KIwlb2mAB9sTNHdMrXesX8eBL6T9b+MZJk+mZuPxKNVfEQMQ
- a5SxUEADIPQTPNvBewdeI80yeOCrN+Zzwy/Mrx9EPeu59Y5vSJOx/z6OUImD/GhX7Xvkt3kq
- Er5KTrJz3++B6SH9pum9PuoE/k+nntJkNMmQpR4MCBaV/J9gIOPGodDKnjdng+mXliF3Ptu6
- 3oxc2RCyGzTlxyMwuc2U5Q7KtUNTdDe8T0uE+9b8BLMVQDDfJjqY0VVqSUwImzTDLX9S4g/8
- kC4HRcclk8hpyhY2jKGluZO0awwTIMgVEzmTyBphDg/Gx7dZU1Xf8HFuE+UZ5UDHDTnwgv7E
- th6RC9+WrhDNspZ9fJjKWRbveQgUFCpe1sa77LAw+XFrKmBHXp9ZVIe90RMe2tRL06BGiRZr
- jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <2bohfxnbthvf3w4kz5u72wj5uxh5sb5s3mbhdk5eg2ingkpkqg@ylykphugpydy>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250213161426.102987-13-steven.price@arm.com>
+X-Gm-Spam: 0
+X-Gm-Phishy: 0
 
-On 07.04.25 16:24, Liam R. Howlett wrote:
-> * Nikita Kalyazin <kalyazin@amazon.com> [250407 10:05]:
->>
+Hi Steven,
+
+On Thu, Feb 13, 2025 at 04:13:52PM +0000, Steven Price wrote:
+> The RMM maintains a data structure known as the Realm Execution Context
+> (or REC). It is similar to struct kvm_vcpu and tracks the state of the
+> virtual CPUs. KVM must delegate memory and request the structures are
+> created when vCPUs are created, and suitably tear down on destruction.
 > 
-> ...
+> RECs must also be supplied with addition pages - auxiliary (or AUX)
+> granules - for storing the larger registers state (e.g. for SVE). The
+> number of AUX granules for a REC depends on the parameters with which
+> the Realm was created - the RMM makes this information available via the
+> RMI_REC_AUX_COUNT call performed after creating the Realm Descriptor (RD).
 > 
->>>
->>> All of this is extremely confusing because the onus of figuring out what
->>> the final code will look like is put on the reviewer.  As it is, we have
->>> issues with people not doing enough review of the code (due to limited
->>> time).  One way to get reviews is to make the barrier of entry as low as
->>> possible.
->>>
->>> I spent Friday going down a rabbit hole of patches referring to each
->>> other as dependencies and I gave up.  It looks like I mistook one set of
->>> patches as required vs them requiring the same in-flight ones as your
->>> patches.
->>>
->>> I am struggling to see how we can adequately support all of you given
->>> the way the patches are sent out in batches with dependencies - it is
->>> just too time consuming to sort out.
->>
->> I'm happy to do whatever I can to make the review easier.  I suppose the
->> extreme case is to wait for the dependencies to get accepted, effectively
->> serialising submissions, but that slows the process down significantly.  For
->> example, I received very good feedback on v1 and v2 of this series and was
->> able to address it instead of waiting for the dependency.  Would including
->> the required patches directly in the series help?  My only concern is in
->> that case the same patch will be submitted multiple times (as a part of
->> every depending series), but if it's better, I'll be doing that instead.
+> Note that only some of register state for the REC can be set by KVM, the
+> rest is defined by the RMM (zeroed). The register state then cannot be
+> changed by KVM after the REC is created (except when the guest
+> explicitly requests this e.g. by performing a PSCI call). The RMM also
+> requires that the VMM creates RECs in ascending order of the MPIDR.
 > 
-> Don't resend patches that someone else is upstreaming, that'll cause
-> other problems.
+> See Realm Management Monitor specification (DEN0137) for more information:
+> https://developer.arm.com/documentation/den0137/
 > 
-> Three methods come to mind:
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes since v6:
+>  * Avoid reporting the KVM_ARM_VCPU_REC feature if the guest isn't a
+>    realm guest.
+>  * Support host page size being larger than RMM's granule size when
+>    allocating/freeing aux granules.
+> Changes since v5:
+>  * Separate the concept of vcpu_is_rec() and
+>    kvm_arm_vcpu_rec_finalized() by using the KVM_ARM_VCPU_REC feature as
+>    the indication that the VCPU is a REC.
+> Changes since v2:
+>  * Free rec->run earlier in kvm_destroy_realm() and adapt to previous patches.
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h |   7 ++
+>  arch/arm64/include/asm/kvm_host.h    |   3 +
+>  arch/arm64/include/asm/kvm_rme.h     |  18 +++
+>  arch/arm64/kvm/arm.c                 |  13 +-
+>  arch/arm64/kvm/reset.c               |  11 ++
+>  arch/arm64/kvm/rme.c                 | 179 +++++++++++++++++++++++++++
+>  6 files changed, 229 insertions(+), 2 deletions(-)
 > 
-> 1. As you stated, wait for the dependencies to land.  This is will mean
-> what you are working against is well tested and won't change (and you
-> won't have to re-spin due to an unstable base).
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 909c5c3b7632..f7b5a78f2e91 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -711,7 +711,14 @@ static inline bool kvm_realm_is_created(struct kvm *kvm)
+>  
+>  static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
+>  {
+> +	if (static_branch_unlikely(&kvm_rme_is_available))
+> +		return vcpu_has_feature(vcpu, KVM_ARM_VCPU_REC);
+>  	return false;
+>  }
+>  
+> +static inline bool kvm_arm_rec_finalized(struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu->arch.rec.mpidr != INVALID_HWID;
+> +}
+> +
+>  #endif /* __ARM64_KVM_EMULATE_H__ */
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 992eb2a6f56f..016d0685958d 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -803,6 +803,9 @@ struct kvm_vcpu_arch {
+>  
+>  	/* Per-vcpu CCSIDR override or NULL */
+>  	u32 *ccsidr;
+> +
+> +	/* Realm meta data */
+> +	struct realm_rec rec;
+>  };
+>  
+>  /*
+> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
+> index 698bb48a8ae1..5db377943db4 100644
+> --- a/arch/arm64/include/asm/kvm_rme.h
+> +++ b/arch/arm64/include/asm/kvm_rme.h
+> @@ -6,6 +6,7 @@
+>  #ifndef __ASM_KVM_RME_H
+>  #define __ASM_KVM_RME_H
+>  
+> +#include <asm/rmi_smc.h>
+>  #include <uapi/linux/kvm.h>
+>  
+>  /**
+> @@ -65,6 +66,21 @@ struct realm {
+>  	unsigned int ia_bits;
+>  };
+>  
+> +/**
+> + * struct realm_rec - Additional per VCPU data for a Realm
+> + *
+> + * @mpidr: MPIDR (Multiprocessor Affinity Register) value to identify this VCPU
+> + * @rec_page: Kernel VA of the RMM's private page for this REC
+> + * @aux_pages: Additional pages private to the RMM for this REC
+> + * @run: Kernel VA of the RmiRecRun structure shared with the RMM
+> + */
+> +struct realm_rec {
+> +	unsigned long mpidr;
+> +	void *rec_page;
+> +	struct page *aux_pages[REC_PARAMS_AUX_GRANULES];
+> +	struct rec_run *run;
+> +};
+> +
+>  void kvm_init_rme(void);
+>  u32 kvm_realm_ipa_limit(void);
+>  
+> @@ -72,6 +88,8 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
+>  int kvm_init_realm_vm(struct kvm *kvm);
+>  void kvm_destroy_realm(struct kvm *kvm);
+>  void kvm_realm_destroy_rtts(struct kvm *kvm, u32 ia_bits);
+> +int kvm_create_rec(struct kvm_vcpu *vcpu);
+> +void kvm_destroy_rec(struct kvm_vcpu *vcpu);
+>  
+>  static inline bool kvm_realm_is_private_address(struct realm *realm,
+>  						unsigned long addr)
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 917ee7c674f5..a6a3034a2f50 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -496,6 +496,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>  	/* Force users to call KVM_ARM_VCPU_INIT */
+>  	vcpu_clear_flag(vcpu, VCPU_INITIALIZED);
+>  
+> +	vcpu->arch.rec.mpidr = INVALID_HWID;
+> +
+>  	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
+>  
+>  	/* Set up the timer */
+> @@ -1433,7 +1435,7 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
+>  	return -EINVAL;
+>  }
+>  
+> -static unsigned long system_supported_vcpu_features(void)
+> +static unsigned long system_supported_vcpu_features(struct kvm *kvm)
+>  {
+>  	unsigned long features = KVM_VCPU_VALID_FEATURES;
+>  
+> @@ -1454,6 +1456,9 @@ static unsigned long system_supported_vcpu_features(void)
+>  	if (!cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
+>  		clear_bit(KVM_ARM_VCPU_HAS_EL2, &features);
+>  
+> +	if (!kvm_is_realm(kvm))
+> +		clear_bit(KVM_ARM_VCPU_REC, &features);
+> +
+>  	return features;
+>  }
+>  
+> @@ -1471,7 +1476,7 @@ static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
+>  			return -ENOENT;
+>  	}
+>  
+> -	if (features & ~system_supported_vcpu_features())
+> +	if (features & ~system_supported_vcpu_features(vcpu->kvm))
+>  		return -EINVAL;
+>  
+>  	/*
+> @@ -1493,6 +1498,10 @@ static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
+>  	if (test_bit(KVM_ARM_VCPU_HAS_EL2, &features))
+>  		return -EINVAL;
+>  
+> +	/* RME is incompatible with AArch32 */
+> +	if (test_bit(KVM_ARM_VCPU_REC, &features))
+> +		return -EINVAL;
+> +
+>  	return 0;
+>  }
+>  
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index 803e11b0dc8f..a6423ef20144 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -137,6 +137,11 @@ int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature)
+>  			return -EPERM;
+>  
+>  		return kvm_vcpu_finalize_sve(vcpu);
+> +	case KVM_ARM_VCPU_REC:
+> +		if (!kvm_is_realm(vcpu->kvm) || !vcpu_is_rec(vcpu))
+> +			return -EINVAL;
+> +
+> +		return kvm_create_rec(vcpu);
+>  	}
+>  
+>  	return -EINVAL;
+> @@ -147,6 +152,11 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu)
+>  	if (vcpu_has_sve(vcpu) && !kvm_arm_vcpu_sve_finalized(vcpu))
+>  		return false;
+>  
+> +	if (kvm_is_realm(vcpu->kvm) &&
+> +	    !(vcpu_is_rec(vcpu) && kvm_arm_rec_finalized(vcpu) &&
+> +	      READ_ONCE(vcpu->kvm->arch.realm.state) == REALM_STATE_ACTIVE))
+> +		return false;
+> +
+>  	return true;
+>  }
+>  
+> @@ -159,6 +169,7 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
+>  		kvm_unshare_hyp(sve_state, sve_state + vcpu_sve_state_size(vcpu));
+>  	kfree(sve_state);
+>  	kfree(vcpu->arch.ccsidr);
+> +	kvm_destroy_rec(vcpu);
+>  }
+>  
+>  static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
+> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+> index f5d79efee454..0aa1f29b0610 100644
+> --- a/arch/arm64/kvm/rme.c
+> +++ b/arch/arm64/kvm/rme.c
+> @@ -474,6 +474,185 @@ void kvm_destroy_realm(struct kvm *kvm)
+>  	kvm_free_stage2_pgd(&kvm->arch.mmu);
+>  }
+>  
+> +static void free_rec_aux(struct page **aux_pages,
+> +			 unsigned int num_aux)
+> +{
+> +	unsigned int i, j;
+> +	unsigned int page_count = 0;
+> +
+> +	for (i = 0; i < num_aux;) {
+> +		struct page *aux_page = aux_pages[page_count++];
+> +		phys_addr_t aux_page_phys = page_to_phys(aux_page);
+> +		bool undelegate_failed = false;
+> +
+> +		for (j = 0; j < PAGE_SIZE && i < num_aux; j += RMM_PAGE_SIZE) {
+> +			if (WARN_ON(rmi_granule_undelegate(aux_page_phys)))
+> +				undelegate_failed = true;
+> +			aux_page_phys += RMM_PAGE_SIZE;
+> +			i++;
+> +		}
+> +		if (!undelegate_failed)
+> +			__free_page(aux_page);
+> +	}
+> +}
+> +
+
+Just a small stylistic comment:
+I feel it can be slightly clearer if the double negative
+
+bool undelegate_failed = false;
+
+can be just:
+bool undelegate_succeeded = true;
+
+with the other true/false flipped, the if condition also won't need to be
+negated.
+
+Thanks,
+Wei-Lin Chang
+
+> +static int alloc_rec_aux(struct page **aux_pages,
+> +			 u64 *aux_phys_pages,
+> +			 unsigned int num_aux)
+> +{
+> +	struct page *aux_page;
+> +	int page_count = 0;
+> +	unsigned int i, j;
+> +	int ret;
+> +
+> +	for (i = 0; i < num_aux;) {
+> +		phys_addr_t aux_page_phys;
+> +
+> +		aux_page = alloc_page(GFP_KERNEL);
+> +		if (!aux_page) {
+> +			ret = -ENOMEM;
+> +			goto out_err;
+> +		}
+> +
+> +		aux_page_phys = page_to_phys(aux_page);
+> +		for (j = 0; j < PAGE_SIZE && i < num_aux; j += RMM_PAGE_SIZE) {
+> +			if (rmi_granule_delegate(aux_page_phys)) {
+> +				ret = -ENXIO;
+> +				goto err_undelegate;
+> +			}
+> +			aux_phys_pages[i++] = aux_page_phys;
+> +			aux_page_phys += RMM_PAGE_SIZE;
+> +		}
+> +		aux_pages[page_count++] = aux_page;
+> +	}
+> +
+> +	return 0;
+> +err_undelegate:
+> +	while (j > 0) {
+> +		j -= RMM_PAGE_SIZE;
+> +		i--;
+> +		if (WARN_ON(rmi_granule_undelegate(aux_phys_pages[i]))) {
+> +			/* Leak the page if the undelegate fails */
+> +			goto out_err;
+> +		}
+> +	}
+> +	__free_page(aux_page);
+> +out_err:
+> +	free_rec_aux(aux_pages, i);
+> +	return ret;
+> +}
+> +
+> +int kvm_create_rec(struct kvm_vcpu *vcpu)
+> +{
+> +	struct user_pt_regs *vcpu_regs = vcpu_gp_regs(vcpu);
+> +	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
+> +	struct realm *realm = &vcpu->kvm->arch.realm;
+> +	struct realm_rec *rec = &vcpu->arch.rec;
+> +	unsigned long rec_page_phys;
+> +	struct rec_params *params;
+> +	int r, i;
+> +
+> +	if (kvm_realm_state(vcpu->kvm) != REALM_STATE_NEW)
+> +		return -ENOENT;
+> +
+> +	if (rec->run)
+> +		return -EBUSY;
+> +
+> +	/*
+> +	 * The RMM will report PSCI v1.0 to Realms and the KVM_ARM_VCPU_PSCI_0_2
+> +	 * flag covers v0.2 and onwards.
+> +	 */
+> +	if (!vcpu_has_feature(vcpu, KVM_ARM_VCPU_PSCI_0_2))
+> +		return -EINVAL;
+> +
+> +	BUILD_BUG_ON(sizeof(*params) > PAGE_SIZE);
+> +	BUILD_BUG_ON(sizeof(*rec->run) > PAGE_SIZE);
+> +
+> +	params = (struct rec_params *)get_zeroed_page(GFP_KERNEL);
+> +	rec->rec_page = (void *)__get_free_page(GFP_KERNEL);
+> +	rec->run = (void *)get_zeroed_page(GFP_KERNEL);
+> +	if (!params || !rec->rec_page || !rec->run) {
+> +		r = -ENOMEM;
+> +		goto out_free_pages;
+> +	}
+> +
+> +	for (i = 0; i < ARRAY_SIZE(params->gprs); i++)
+> +		params->gprs[i] = vcpu_regs->regs[i];
+> +
+> +	params->pc = vcpu_regs->pc;
+> +
+> +	if (vcpu->vcpu_id == 0)
+> +		params->flags |= REC_PARAMS_FLAG_RUNNABLE;
+> +
+> +	rec_page_phys = virt_to_phys(rec->rec_page);
+> +
+> +	if (rmi_granule_delegate(rec_page_phys)) {
+> +		r = -ENXIO;
+> +		goto out_free_pages;
+> +	}
+> +
+> +	r = alloc_rec_aux(rec->aux_pages, params->aux, realm->num_aux);
+> +	if (r)
+> +		goto out_undelegate_rmm_rec;
+> +
+> +	params->num_rec_aux = realm->num_aux;
+> +	params->mpidr = mpidr;
+> +
+> +	if (rmi_rec_create(virt_to_phys(realm->rd),
+> +			   rec_page_phys,
+> +			   virt_to_phys(params))) {
+> +		r = -ENXIO;
+> +		goto out_free_rec_aux;
+> +	}
+> +
+> +	rec->mpidr = mpidr;
+> +
+> +	free_page((unsigned long)params);
+> +	return 0;
+> +
+> +out_free_rec_aux:
+> +	free_rec_aux(rec->aux_pages, realm->num_aux);
+> +out_undelegate_rmm_rec:
+> +	if (WARN_ON(rmi_granule_undelegate(rec_page_phys)))
+> +		rec->rec_page = NULL;
+> +out_free_pages:
+> +	free_page((unsigned long)rec->run);
+> +	free_page((unsigned long)rec->rec_page);
+> +	free_page((unsigned long)params);
+> +	return r;
+> +}
+> +
+> +void kvm_destroy_rec(struct kvm_vcpu *vcpu)
+> +{
+> +	struct realm *realm = &vcpu->kvm->arch.realm;
+> +	struct realm_rec *rec = &vcpu->arch.rec;
+> +	unsigned long rec_page_phys;
+> +
+> +	if (!vcpu_is_rec(vcpu))
+> +		return;
+> +
+> +	if (!rec->run) {
+> +		/* Nothing to do if the VCPU hasn't been finalized */
+> +		return;
+> +	}
+> +
+> +	free_page((unsigned long)rec->run);
+> +
+> +	rec_page_phys = virt_to_phys(rec->rec_page);
+> +
+> +	/*
+> +	 * The REC and any AUX pages cannot be reclaimed until the REC is
+> +	 * destroyed. So if the REC destroy fails then the REC page and any AUX
+> +	 * pages will be leaked.
+> +	 */
+> +	if (WARN_ON(rmi_rec_destroy(rec_page_phys)))
+> +		return;
+> +
+> +	free_rec_aux(rec->aux_pages, realm->num_aux);
+> +
+> +	free_delegated_granule(rec_page_phys);
+> +}
+> +
+>  int kvm_init_realm_vm(struct kvm *kvm)
+>  {
+>  	struct realm_params *params;
+> -- 
+> 2.43.0
 > 
-> 2. Combine them into a bigger patch set.  I can then pull one patch set
-> and look at the parts of interest to the mm side.
-> 
-> 3. Provide a git repo with the necessary changes together.
-> 
-> I think 2 and 3 together should be used for the guest_memfd patches.
-> Someone needs to be managing these to send upstream.  See the discussion
-> in another patch set on guest_memfd here [1].
-
-The issue is that most extensions are fairly independent from each 
-other, except that they built up on Fuad's mmap support,
-
-Sending all together as one thing might not be the best option.
-
-Once basic mmap support is upstream, some of the extensions (e.g., 
-directmap removal) can go in next.
-
-So until that is upstream, I agree that tagging the stuff that builds up 
-on that is the right thing to do, and providing git trees is another 
-very good idea.
-
-I'll prioritize getting Fuad's mmap stuff reviewed. (I keep saying that, 
-I know)
-
--- 
-Cheers,
-
-David / dhildenb
-
 
