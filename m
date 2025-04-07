@@ -1,167 +1,204 @@
-Return-Path: <kvm+bounces-42798-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42796-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 195CBA7D673
-	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 09:44:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E09C4A7D405
+	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 08:29:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F623425461
-	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 07:39:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AB8D16C6B6
+	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 06:29:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A259E226CE0;
-	Mon,  7 Apr 2025 07:38:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15ED2224B1E;
+	Mon,  7 Apr 2025 06:29:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k6uOubLa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx1.zhaoxin.com (MX1.ZHAOXIN.COM [210.0.225.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF68E2253A7
-	for <kvm@vger.kernel.org>; Mon,  7 Apr 2025 07:38:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.0.225.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98BF1224AFE
+	for <kvm@vger.kernel.org>; Mon,  7 Apr 2025 06:29:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744011501; cv=none; b=sI4u7UTs8EkPDe/2jTd5KF4bhveT0zpxQxZz9PZcnYVUO7zy4polsLLPCc19ow/ks/RaxxwRiq3/ysyP/4D/VLI2dB3cuIE1bXvmzSMSfSifWa6PMdN0JbKmzes0GI+9paH1S+lCt6um9TFukc07EtC4GnCa1IIZsqCerAd8jGI=
+	t=1744007364; cv=none; b=QQLuDOWLQU6ERTeUl5l9qWe9IsUkCcXyeNyWI4bCO84igGYAwc3zuf7mtL5vty8k242zRAhwwXXVdHdr99r3HfSd+bViMdbDxpd45edsau6SxnjCEdCa2glyugyCRoe46NLpBfXxTJSVMAqSkoR9OHT5uxl4D7dLfbJMVdlKMmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744011501; c=relaxed/simple;
-	bh=DuK3bifKObUj/1hjDahLrFJvEo4z68yicijyl+kid9k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=TIiCESfWmPjY4CxQvqLREMNg4Vh7epb+7NJ6HqPvtL+QIdz8Fm9nxB4s5y76tEdut5h/y4x4KRj2yBTIYh2XUXwr7FnqDYxuvStHgfrKXqPbpbt5x97RpbbGQK75rYWHX4bsVEV9QBG7Oq289GxuHg3IZBoX/dy0zO6h7zgKqSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=210.0.225.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
-X-ASG-Debug-ID: 1744011490-086e2365b944450001-HEqcsx
-Received: from ZXSHMBX1.zhaoxin.com (ZXSHMBX1.zhaoxin.com [10.28.252.163]) by mx1.zhaoxin.com with ESMTP id kLJek5uXD4GYIZIg (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Mon, 07 Apr 2025 15:38:10 +0800 (CST)
-X-Barracuda-Envelope-From: LiamNi-oc@zhaoxin.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.163
-Received: from ZXSHMBX3.zhaoxin.com (10.28.252.165) by ZXSHMBX1.zhaoxin.com
- (10.28.252.163) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.44; Mon, 7 Apr
- 2025 15:38:10 +0800
-Received: from ZXSHMBX3.zhaoxin.com ([fe80::8cc5:5bc6:24ec:65f2]) by
- ZXSHMBX3.zhaoxin.com ([fe80::8cc5:5bc6:24ec:65f2%6]) with mapi id
- 15.01.2507.044; Mon, 7 Apr 2025 15:38:09 +0800
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.163
-Received: from [10.28.66.46] (10.28.66.46) by ZXBJMBX02.zhaoxin.com
- (10.29.252.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.44; Mon, 7 Apr
- 2025 10:19:32 +0800
-Message-ID: <fb523153-5185-4ec3-941c-3abf1a6eeac8@zhaoxin.com>
-Date: Mon, 7 Apr 2025 10:19:31 +0800
+	s=arc-20240116; t=1744007364; c=relaxed/simple;
+	bh=w20mvU+13MNa0HE5XLYY9XiXVSEFLUspHPL2upbK7aU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=BNmj0C7aFuwGWEczdReChy0O6zXEIlg2EdJT1I+umGStABo4/47AXfqqusOnWUELrxaR7zG5m0lsf7nKfxLUjoeiw/lXJOCE/9Rfu5NTi26dhUujbAwiQRgbQkGPb3RnbCW3GqrTa7s4gdKriZ+/585MsgsWJ2bwRgIjdeiLgU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k6uOubLa; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-47681dba807so408631cf.1
+        for <kvm@vger.kernel.org>; Sun, 06 Apr 2025 23:29:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1744007361; x=1744612161; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KNvNM1/p+e2DdNVPpvcS2yeyJQA+eXSwCZpqrERwuiE=;
+        b=k6uOubLaxjJTW/1rrc6DlXD6WEuDcMVmFwN9w7xucFgCfLSrQIo5BnfYIw6uW65raZ
+         +lLFM0UCqqis5cEg4LdzmPou0N4xg5a+KdIQ54cl78A8CgqitK9um/O+zlg9K0mHKFkR
+         /5Rpu8V7PQGm63M/n3Jg/5HYveEgZL661bRGAmtFBVH/tBXdHu5H8PzsvGK57kQIVHZg
+         +2trQjgGefG50bg2m53snZC2cyY36yPP9YP0qWLW7bVJa/157qt7T1V3L8ZlQWYr7Cux
+         lcsDL1Ff2MuV4BZuLoBHJFk7reWSCN3EO27n4hR/ebikYDDrRU14uycqrmLUNAdF22y+
+         uNtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744007361; x=1744612161;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KNvNM1/p+e2DdNVPpvcS2yeyJQA+eXSwCZpqrERwuiE=;
+        b=n+TdI+1WRx4onY9EU3wP2hPPrcI2ebgpj4QaCxEAHpkkS4wIIsxL/C/2D5vGYTrSLy
+         evTucD/9tCVfFJ4Ms51jl3gqC55/LcfxoK3ppWRMK4ChDJkpdez/tSFFFP7Wkz54MKjV
+         qQckdVHr7HPRRj7a4AANAUO2MTaS8YRaFtJgOnlmoP8DSXVw5+6Q139ljHkwkqsY1uJd
+         +ofUBqEsQPNDjZcQXuw4h2mY4RKaFxfUjn3MD2BsOjI/yVnd0K3QdoMmRJkWwMGiQmAH
+         6pH9Nqz99uzSkQfpLGGmFbBZdmmokjPnkfhVp1MvPuhh9iZRoujDNTHQu+U0ibwn/uZ1
+         fEOw==
+X-Forwarded-Encrypted: i=1; AJvYcCUPdrnvrWz6JiZAQATDeImGYL6337q5SkKAwLqii1sCDn7649g9ou6nC0mqhFtwr1twx5M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzz4kpvHVtEKTcw65vt3aSiiJ6fn/7aaYIl1EuE+POyw4XHhc03
+	gE4LbekZ87otAb4VOjMffC5LIC/Dcrlf1HX6pVAf7+Gm1VXKHG9KfJe4cZ3djkhCTdekIWmROa2
+	eA/7vmWyaVu6RI+1nHw/BdHB/dnPrZ5tamIvckB/Znk0BYH2Opg==
+X-Gm-Gg: ASbGncu60Rga3tEEppjWIHlje0rrK8sVDMA7Mb38lGmGzE7ggqVnGOanXaCloc0Ky8Y
+	frB1OG3SIVvjQEgMkgP6tUanCm7v5jeISPbf81oHv2I8l2fxBkzB3+JbTuP0qWnhyz0H8Saop4c
+	qh8CfGVOmY7f5N6Qo0c+zrBME2fMVyhbBUfY5n
+X-Google-Smtp-Source: AGHT+IENsC5jGsPnB8CmIHsaqNJl1ydsIYWgIdbVjFWo2tYe9QGGIM0fU+yrpn2AGdWi97/1qTE+g+eYnH6qOkjep28=
+X-Received: by 2002:a05:622a:1491:b0:477:871c:2db4 with SMTP id
+ d75a77b69052e-479332e3014mr6057831cf.5.1744007361239; Sun, 06 Apr 2025
+ 23:29:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: x86:Cancel hrtimer in the process of saving PIT
- state to reduce the performance overhead caused by hrtimer during guest stop.
-To: Sean Christopherson <seanjc@google.com>
-X-ASG-Orig-Subj: Re: [PATCH] KVM: x86:Cancel hrtimer in the process of saving PIT
- state to reduce the performance overhead caused by hrtimer during guest stop.
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
-	<pbonzini@redhat.com>, <tglx@linutronix.de>, <mingo@redhat.com>,
-	<bp@alien8.de>, <dave.hansen@linux.intel.com>, <hpa@zytor.com>,
-	<LiamNi@zhaoxin.com>, <CobeChen@zhaoxin.com>, <LouisQi@zhaoxin.com>,
-	<EwanHai@zhaoxin.com>, <FrankZhu@zhaoxin.com>
-References: <20250317091917.72477-1-liamni-oc@zhaoxin.com>
- <Z9gl5dbTfZsUCJy-@google.com>
- <676ed22f-9c3f-4013-99d8-37c4c73bb9ac@zhaoxin.com>
- <Z-_xNpgsYDW0_4Jn@google.com>
-From: LiamNioc <LiamNi-oc@zhaoxin.com>
-In-Reply-To: <Z-_xNpgsYDW0_4Jn@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
- ZXBJMBX02.zhaoxin.com (10.29.252.6)
-X-Moderation-Data: 4/7/2025 3:38:08 PM
-X-Barracuda-Connect: ZXSHMBX1.zhaoxin.com[10.28.252.163]
-X-Barracuda-Start-Time: 1744011490
-X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
-X-Barracuda-URL: https://10.28.252.35:4443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at zhaoxin.com
-X-Barracuda-Scan-Msg-Size: 2798
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
-X-Barracuda-Spam-Score: -2.02
-X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.139610
-	Rule breakdown below
-	 pts rule name              description
-	---- ---------------------- --------------------------------------------------
+References: <20250328153133.3504118-1-tabba@google.com> <egk7ltxtgzngmet3dzygvcskvvo34wu333na4dsstvkcezwcjh@6klyi5bjwkwa>
+ <894eb67c-a9e4-4ae4-af32-51d8a71ddfc4@redhat.com> <Z_BTr9EbC0Vz1uo7@google.com>
+ <aizia2elwspxcmfrjote5h7k5wdw2stp42slytkl5visrjvzwi@jj3lwuudiyjk>
+In-Reply-To: <aizia2elwspxcmfrjote5h7k5wdw2stp42slytkl5visrjvzwi@jj3lwuudiyjk>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 7 Apr 2025 07:28:44 +0100
+X-Gm-Features: ATxdqUGIvqi7yupl0S6E-dravwacnxsOIqGqv-ufIIOSzVLf9oEd58mckgm4bP8
+Message-ID: <CA+EHjTyDNhyPdCXS+cmdKotcgRa6bmc+bROzNDVksrV_-YLzBA@mail.gmail.com>
+Subject: Re: [PATCH v7 0/7] KVM: Restricted mapping of guest_memfd at the host
+ and arm64 support
+To: "Liam R. Howlett" <Liam.Howlett@oracle.com>, Sean Christopherson <seanjc@google.com>, 
+	David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
+	mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com
+Content-Type: text/plain; charset="UTF-8"
 
+Hi,
 
+On Sat, 5 Apr 2025 at 03:46, Liam R. Howlett <Liam.Howlett@oracle.com> wrote:
+>
+> * Sean Christopherson <seanjc@google.com> [250404 17:48]:
+> > On Fri, Apr 04, 2025, David Hildenbrand wrote:
+> > > On 04.04.25 20:05, Liam R. Howlett wrote:
+> > > > But then again, maybe are are not going through linux-mm for upstream?
+> > >
+> > > [replying to some bits]
+> > >
+> > > As all patches and this subject is "KVM:" I would assume this goes through
+> > > the kvm tree once ready.
+> >
+> > Yeah, that's a safe assumption.
+>
+> Okay, thanks.
+>
+> It still seems strange to have such vast differences in the cover letter
+> between versions and require others to hunt down the information vs an
+> updated cover letter with revision history and links.
+>
+> I did get lost on where the changes since v6 stopped vs new comments
+> started in the update.
+>
+> But maybe it's that I'm set in my grumpy old ways.
+>
+> I really like the cover letter information in the first patch (this
+> patch 1 of 7..) to have the information in the git log.
+>
+> >
+> > > > It looks like a small team across companies are collaborating on this,
+> > > > and that's awesome.  I think you need to change how you are doing things
+> > > > and let the rest of us in on the code earlier.
+> > >
+> > > I think the approach taken to share the different pieces early makes sense,
+> > > it just has to be clearer what the dependencies are and what is actually the
+> > > first thing that should go in so people can focus review on that.
+> >
+> > 100% agreed that sharing early makes sense, but I also 100% agree with Liam that
+> > having multiple series flying around with multiple dependencies makes them all
+> > unreviewable.  I simply don't have the bandwidth to track down who's doing what
+> > and where.
+>
+> Yes, sharing early is crucial, but we lack the quilt file to stitch them
+> together in the proper sequence so we can do a proper review.
+>
+> My main issue is barrier of entry, I have no idea how I can help this
+> effort as it is today.
+>
+> >
+> > I don't see those two sides as conflicting.  Someone "just" needs to take point
+> > on collecting, squashing, and posting the various inter-related works as a single
+> > cohesive series.
+>
+> It *looks* like all these patches need to go in now (no RFC tags, for
+> instance), but when you start reading through the cover letters it has
+> many levels and the effort quickly grows; which branch do I need, what
+> order, and which of these landed?  This is like SMR, but with code.
+>
+> >
+> > As you said, things are getting there, but I recommend prioritizing that above
+> > the actual code, otherwise reviewers are going to continue ignoring the individual
+> > series.
+> >
+> > FWIW, if necessary, I would much prefer a single massive series over a bunch of
+> > smaller series all pointing at each other, at least for the initial review.
+> >
+>
+> Yes, at least then the dependency order and versions would not be such
+> an effort to get correct.  If it's really big maybe a git repo would be
+> a good idea along with the large patch set?  You'd probably be using
+> that repo to combine/squash and generate the patches anyways.  I still
+> don't know what patch I need to start with and which ones have landed.
+>
+> If each part is worth doing on its own, then send one at a time and wait
+> for them to land.  This might result in wasted time on a plan that needs
+> to be changed for upstreaming, so I think the big patch bomb/git branch
+> is the way to go.
+>
+> Both of these methods will provide better end-to-end testing and code
+> review than the individual parts being sent out in short succession with
+> references to each other.
 
-On 2025/4/4 22:48, Sean Christopherson wrote:
->=20
->=20
-> [=E8=BF=99=E5=B0=81=E9=82=AE=E4=BB=B6=E6=9D=A5=E8=87=AA=E5=A4=96=E9=83=A8=
-=E5=8F=91=E4=BB=B6=E4=BA=BA =E8=B0=A8=E9=98=B2=E9=A3=8E=E9=99=A9]
->=20
-> On Tue, Mar 25, 2025, LiamNioc wrote:
->> On 2025/3/17 21:38, Sean Christopherson wrote:
->>> On Mon, Mar 17, 2025, Liam Ni wrote:
->>>> When using the dump-guest-memory command in QEMU to dump
->>>> the virtual machine's memory,the virtual machine will be
->>>> paused for a period of time.If the guest (i.e., UEFI) uses
->>>> the PIT as the system clock,it will be observed that the
->>>> HRTIMER used by the PIT continues to run during the guest
->>>> stop process, imposing an additional burden on the system.
->>>> Moreover, during the guest restart process,the previously
->>>> established HRTIMER will be canceled,and the accumulated
->>>> timer events will be flushed.However, before the old
->>>> HRTIMER is canceled,the accumulated timer events
->>>> will "surreptitiously" inject interrupts into the guest.
->>>>
->>>> SO during the process of saving the KVM PIT state,
->>>> the HRTIMER need to be canceled to reduce the performance overhead
->>>> caused by HRTIMER during the guest stop process.
->>>>
->>>> i.e. if guest
->>>>
->>>> Signed-off-by: Liam Ni <liamni-oc@zhaoxin.com>
->>>> ---
->>>>    arch/x86/kvm/x86.c | 4 ++++
->>>>    1 file changed, 4 insertions(+)
->>>>
->>>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->>>> index 045c61cc7e54..75355b315aca 100644
->>>> --- a/arch/x86/kvm/x86.c
->>>> +++ b/arch/x86/kvm/x86.c
->>>> @@ -6405,6 +6405,8 @@ static int kvm_vm_ioctl_get_pit(struct kvm *kvm,=
- struct kvm_pit_state *ps)
->>>>
->>>>         mutex_lock(&kps->lock);
->>>>         memcpy(ps, &kps->channels, sizeof(*ps));
->>>> +     hrtimer_cancel(&kvm->arch.vpit->pit_state.timer);
->>>> +     kthread_flush_work(&kvm->arch.vpit->expired);
->>>
->>> KVM cannot assume userspace wants to stop the PIT when grabbing a snaps=
-hot.  It's
->>> a significant ABI change, and not desirable in all cases.
->>
->> When VM Pause, all devices of the virtual machine are frozen, so the PIT
->> freeze only saves the PIT device status, but does not cancel HRTIMER, bu=
-t
->> chooses to cancel HRTIMER when VM resumes and refresh the pending task.
->> According to my observation, before refreshing the pending task, these
->> pending tasks will secretly inject interrupts into the guest.
->>
->> So do we need to cancel the HRTIMER when VM pause=EF=BC=9F
->=20
-> The problem is that KVM has no real concept of pausing a VM.  There are a=
- variety
-> of hacky hooks here and there, but no KVM-wide notion of "pause".
->=20
-> For this case, after getting PIT state, you should be able to use KVM_SET=
-_PIT2 to
-> set the mode of channel[0] to 0xff, which call destroy_pit_timer() via
-> pit_load_count().
+The idea was that it would be easier to review the two series
+separately, with the second one being tagged as RFC (which I
+accidentally dropped). That ended up making this more confusing and
+difficult to review. The next series will just be one series.
 
-Got it.
-so i need to modify the behavior of QEMU's code.
+Thanks for your feedback and sorry for the noise.
 
+Cheers,
+/fuad
 
-
-
+> Thanks,
+> Liam
 
