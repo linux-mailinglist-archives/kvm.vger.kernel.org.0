@@ -1,450 +1,371 @@
-Return-Path: <kvm+bounces-42834-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42836-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2B9FA7DB5A
-	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 12:41:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 62A60A7DBCB
+	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 13:04:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7E54168432
-	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 10:40:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E6D416CE52
+	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 11:04:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6512237705;
-	Mon,  7 Apr 2025 10:40:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D6B2235347;
+	Mon,  7 Apr 2025 11:03:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LKRetri4"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="Lcf1HckV";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="Lcf1HckV"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A749A7DA7F;
-	Mon,  7 Apr 2025 10:40:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB3D237A3C
+	for <kvm@vger.kernel.org>; Mon,  7 Apr 2025 11:03:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744022443; cv=none; b=nrzP2h5REaXG32zD6x+ehClP4zTHudcTEY0q7UjsnI52Kq3wDgQdB0CmsqEJyrUEsHaiZPEA4OZLayMnH4s2jhvq4OZ3aQonmRysjKIEvc2u61hROkXYT4vRhOI3FJZf0GCL//nUJ5+wOwV/M4leiufoGnxehsXlF5nBiX55XBE=
+	t=1744023833; cv=none; b=CQ39FRll1ptH+ZCvuOr+nLne19zd2D9/gFVGX3VQ6ssTLwruJJsjIXcTOAZdFm+pDfWfC0DWHnWOlOI+4PiHakRTKKPPjDt/8F4DnhdTi7us3KFNQYyrE1UMci20YSTYS4ouLQxGPHhKEtUNCqfirtEkPmkruQopq/QdGnQPPwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744022443; c=relaxed/simple;
-	bh=BYjYcWf1Fwu1NDLwGvJl+jn1B5UgPV0rzCyGrbDLcAE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qIK/z1U1JtH94mZJ0clUVbCuu9h3Mcj/ceeAgEF7ZtYhpKMgpA2SNy4LO1ydwB312Oe9HpWckNpbcbVPEpvqjIDpPgzO8peuh/D4lKlRG95QfOiItRsKEGuyynXTDSxkFfsF9sZsEZ/lwTfVnBgLELwccm6iqXqSGB+uDKFVaDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LKRetri4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DD93C4CEDD;
-	Mon,  7 Apr 2025 10:40:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744022442;
-	bh=BYjYcWf1Fwu1NDLwGvJl+jn1B5UgPV0rzCyGrbDLcAE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=LKRetri4hSGmLUKA5I/tzu/0D6DE5Bm3a1NKfGfMR4fPbE/VTcfsHpe430PssNYts
-	 JYQkPZxBkthyxX2QC5ccS4qlP9CSzaZWBbIJ1PS/GcT1gRvG2FKSw9DxntCGXnV95J
-	 R0Da3pX6hgIh8VgHVsNRZVc4QVTHzMZV8YGmhUbv0LjOENBn6yhDifkeib7twfqdca
-	 F/EKN5aTk3UmM1iEEVZTkJYTkDJkCdYTvzel7wSJnobx4vNFlE4WhGFOXoM1Gmdeqw
-	 KW81ah3yRxSjcA1idP4S8FhW4UhMZ921U6ET3Rn1BsTZUODghOHDijZ4PAxhQE1YoY
-	 iCyi2FI+cj4zQ==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Bjorn Helgaas <bhelgaas@google.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Jeff Hugo <jeff.hugo@oss.qualcomm.com>,
-	Carl Vanderlip <quic_carlv@quicinc.com>,
-	Oded Gabbay <ogabbay@kernel.org>,
-	Takashi Sakamoto <o-takashi@sakamocchi.jp>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>,
-	Simona Vetter <simona@ffwll.ch>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-	Dave Airlie <airlied@redhat.com>,
-	Jocelyn Falempe <jfalempe@redhat.com>,
-	Patrik Jakobsson <patrik.r.jakobsson@gmail.com>,
-	Xinliang Liu <xinliang.liu@linaro.org>,
-	Tian Tao <tiantao6@hisilicon.com>,
-	Xinwei Kong <kong.kongxinwei@hisilicon.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Yongqin Liu <yongqin.liu@linaro.org>,
-	John Stultz <jstultz@google.com>,
-	Sui Jingfeng <suijingfeng@loongson.cn>,
-	Lyude Paul <lyude@redhat.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Zack Rusin <zack.rusin@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	=?UTF-8?q?Thomas=20Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Saurav Kashyap <skashyap@marvell.com>,
-	Javed Hasan <jhasan@marvell.com>,
-	GR-QLogic-Storage-Upstream@marvell.com,
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Nilesh Javali <njavali@marvell.com>,
-	Manish Rangankar <mrangankar@marvell.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Javier Martinez Canillas <javierm@redhat.com>,
-	Jani Nikula <jani.nikula@intel.com>,
-	Mario Limonciello <mario.limonciello@amd.com>,
-	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>,
-	Lijo Lazar <lijo.lazar@amd.com>,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Dmitry Baryshkov <lumag@kernel.org>,
-	linux-arm-msm@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	linux-kernel@vger.kernel.org,
-	linux1394-devel@lists.sourceforge.net,
-	amd-gfx@lists.freedesktop.org,
-	nouveau@lists.freedesktop.org,
-	virtualization@lists.linux.dev,
-	spice-devel@lists.freedesktop.org,
-	intel-xe@lists.freedesktop.org,
-	netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: [RFC] PCI: add CONFIG_MMU dependency
-Date: Mon,  7 Apr 2025 12:38:14 +0200
-Message-Id: <20250407104025.3421624-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1744023833; c=relaxed/simple;
+	bh=nL/ZeCV1shSmAfX309aBT9cdakbwHuwGDQsRkHmiogs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aruVcRR5ajrZn/NnV8GJldo49L21vD8kSufDVX92Ewmk5aJVCGxhD0Mhse0HtR9ayIVSoOvipLhiNf1vg6RXij8BDg5kHo2qz9JGkGbdP4B9m5q0vDs6DJ9aUyK/L4YANd/JPVyKLsmGCQyoWkAPiEJockkDlHvWV0Ngf8FrRJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=Lcf1HckV; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=Lcf1HckV; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 6F21021174;
+	Mon,  7 Apr 2025 11:03:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1744023829; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=nL/ZeCV1shSmAfX309aBT9cdakbwHuwGDQsRkHmiogs=;
+	b=Lcf1HckVbLcT4mnv1AB2HAgtagSsOEAghzSL9iDqYIBum6BFEKDiWyAWJsw718EQH2V0xa
+	ZLHk6kZ111MxtARdXizuLjKHMBNxJkssQQDfH+kX7kSSKXvKJPJIJys+5l65IIzhXZiuK9
+	IlVXuTJa9rwIyJiSrxO/DPFoi+SS+no=
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.com header.s=susede1 header.b=Lcf1HckV
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1744023829; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=nL/ZeCV1shSmAfX309aBT9cdakbwHuwGDQsRkHmiogs=;
+	b=Lcf1HckVbLcT4mnv1AB2HAgtagSsOEAghzSL9iDqYIBum6BFEKDiWyAWJsw718EQH2V0xa
+	ZLHk6kZ111MxtARdXizuLjKHMBNxJkssQQDfH+kX7kSSKXvKJPJIJys+5l65IIzhXZiuK9
+	IlVXuTJa9rwIyJiSrxO/DPFoi+SS+no=
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 23B8613691;
+	Mon,  7 Apr 2025 11:03:49 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 4rtsBhWx82cPYwAAD6G6ig
+	(envelope-from <jgross@suse.com>); Mon, 07 Apr 2025 11:03:49 +0000
+Message-ID: <2759dd5a-8612-4c7b-9282-c5a2aaa96e26@suse.com>
+Date: Mon, 7 Apr 2025 13:03:48 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] tools/kvm_stat: fix termination behavior when not on a
+ terminal
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ Dario Faggioli <dfaggioli@suse.com>, Fabiano Rosas <farosas@suse.de>,
+ lkml <linux-kernel@vger.kernel.org>, Claudio Fontana <cfontana@suse.de>
+References: <20240807172334.1006-1-cfontana@suse.de>
+Content-Language: en-US
+From: Juergen Gross <jgross@suse.com>
+Autocrypt: addr=jgross@suse.com; keydata=
+ xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOB
+ ycWxw3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJve
+ dYm8Of8Zd621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJ
+ NwQpd369y9bfIhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvx
+ XP3FAp2pkW0xqG7/377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEB
+ AAHNH0p1ZXJnZW4gR3Jvc3MgPGpncm9zc0BzdXNlLmNvbT7CwHkEEwECACMFAlOMcK8CGwMH
+ CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRCw3p3WKL8TL8eZB/9G0juS/kDY9LhEXseh
+ mE9U+iA1VsLhgDqVbsOtZ/S14LRFHczNd/Lqkn7souCSoyWsBs3/wO+OjPvxf7m+Ef+sMtr0
+ G5lCWEWa9wa0IXx5HRPW/ScL+e4AVUbL7rurYMfwCzco+7TfjhMEOkC+va5gzi1KrErgNRHH
+ kg3PhlnRY0Udyqx++UYkAsN4TQuEhNN32MvN0Np3WlBJOgKcuXpIElmMM5f1BBzJSKBkW0Jc
+ Wy3h2Wy912vHKpPV/Xv7ZwVJ27v7KcuZcErtptDevAljxJtE7aJG6WiBzm+v9EswyWxwMCIO
+ RoVBYuiocc51872tRGywc03xaQydB+9R7BHPzsBNBFOMcBYBCADLMfoA44MwGOB9YT1V4KCy
+ vAfd7E0BTfaAurbG+Olacciz3yd09QOmejFZC6AnoykydyvTFLAWYcSCdISMr88COmmCbJzn
+ sHAogjexXiif6ANUUlHpjxlHCCcELmZUzomNDnEOTxZFeWMTFF9Rf2k2F0Tl4E5kmsNGgtSa
+ aMO0rNZoOEiD/7UfPP3dfh8JCQ1VtUUsQtT1sxos8Eb/HmriJhnaTZ7Hp3jtgTVkV0ybpgFg
+ w6WMaRkrBh17mV0z2ajjmabB7SJxcouSkR0hcpNl4oM74d2/VqoW4BxxxOD1FcNCObCELfIS
+ auZx+XT6s+CE7Qi/c44ibBMR7hyjdzWbABEBAAHCwF8EGAECAAkFAlOMcBYCGwwACgkQsN6d
+ 1ii/Ey9D+Af/WFr3q+bg/8v5tCknCtn92d5lyYTBNt7xgWzDZX8G6/pngzKyWfedArllp0Pn
+ fgIXtMNV+3t8Li1Tg843EXkP7+2+CQ98MB8XvvPLYAfW8nNDV85TyVgWlldNcgdv7nn1Sq8g
+ HwB2BHdIAkYce3hEoDQXt/mKlgEGsLpzJcnLKimtPXQQy9TxUaLBe9PInPd+Ohix0XOlY+Uk
+ QFEx50Ki3rSDl2Zt2tnkNYKUCvTJq7jvOlaPd6d/W0tZqpyy7KVay+K4aMobDsodB3dvEAs6
+ ScCnh03dDAFgIq5nsB11j3KPKdVoPlfucX2c7kGNH+LUMbzqV6beIENfNexkOfxHfw==
+In-Reply-To: <20240807172334.1006-1-cfontana@suse.de>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------YMejfMLM0cY9eGg0vDB0LoQ5"
+X-Rspamd-Queue-Id: 6F21021174
+X-Spam-Score: -4.38
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-4.38 / 50.00];
+	SIGNED_PGP(-2.00)[];
+	BAYES_HAM(-1.97)[94.85%];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MIME_GOOD(-0.20)[multipart/signed,multipart/mixed,text/plain];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_BASE64_TEXT(0.10)[];
+	MIME_UNKNOWN(0.10)[application/pgp-keys];
+	MX_GOOD(-0.01)[];
+	URIBL_BLOCKED(0.00)[suse.de:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.com:dkim,suse.com:mid,suse.com:email];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+,1:+,2:+,3:+,4:~,5:~];
+	ARC_NA(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	HAS_ATTACHMENT(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DKIM_TRACE(0.00)[suse.com:+];
+	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.com:dkim,suse.com:mid,suse.com:email]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-From: Arnd Bergmann <arnd@arndb.de>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------YMejfMLM0cY9eGg0vDB0LoQ5
+Content-Type: multipart/mixed; boundary="------------4NDTpmfm0ICQyRA0xNqHCxe4";
+ protected-headers="v1"
+From: Juergen Gross <jgross@suse.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ Dario Faggioli <dfaggioli@suse.com>, Fabiano Rosas <farosas@suse.de>,
+ lkml <linux-kernel@vger.kernel.org>, Claudio Fontana <cfontana@suse.de>
+Message-ID: <2759dd5a-8612-4c7b-9282-c5a2aaa96e26@suse.com>
+Subject: Re: [PATCH] tools/kvm_stat: fix termination behavior when not on a
+ terminal
+References: <20240807172334.1006-1-cfontana@suse.de>
+In-Reply-To: <20240807172334.1006-1-cfontana@suse.de>
 
-It turns out that there are no platforms that have PCI but don't have an MMU,
-so adding a Kconfig dependency on CONFIG_PCI simplifies build testing kernels
-for those platforms a lot, and avoids a lot of inadvertent build regressions.
+--------------4NDTpmfm0ICQyRA0xNqHCxe4
+Content-Type: multipart/mixed; boundary="------------LSBkf0ayfCbxcL0Z33JLzym3"
 
-Add a dependency for CONFIG_PCI and remove all the ones for PCI specific
-device drivers that are currently marked not having it.
+--------------LSBkf0ayfCbxcL0Z33JLzym3
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-Link: https://lore.kernel.org/lkml/a41f1b20-a76c-43d8-8c36-f12744327a54@app.fastmail.com/
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/accel/qaic/Kconfig              | 1 -
- drivers/firewire/Kconfig                | 2 +-
- drivers/gpu/drm/Kconfig                 | 2 +-
- drivers/gpu/drm/amd/amdgpu/Kconfig      | 3 +--
- drivers/gpu/drm/ast/Kconfig             | 2 +-
- drivers/gpu/drm/gma500/Kconfig          | 2 +-
- drivers/gpu/drm/hisilicon/hibmc/Kconfig | 1 -
- drivers/gpu/drm/loongson/Kconfig        | 2 +-
- drivers/gpu/drm/mgag200/Kconfig         | 2 +-
- drivers/gpu/drm/nouveau/Kconfig         | 3 +--
- drivers/gpu/drm/qxl/Kconfig             | 2 +-
- drivers/gpu/drm/radeon/Kconfig          | 2 +-
- drivers/gpu/drm/tiny/Kconfig            | 2 +-
- drivers/gpu/drm/vmwgfx/Kconfig          | 2 +-
- drivers/gpu/drm/xe/Kconfig              | 2 +-
- drivers/net/ethernet/broadcom/Kconfig   | 1 -
- drivers/pci/Kconfig                     | 1 +
- drivers/pci/pci.c                       | 4 ++--
- drivers/scsi/bnx2fc/Kconfig             | 1 -
- drivers/scsi/bnx2i/Kconfig              | 1 -
- drivers/vfio/pci/Kconfig                | 2 +-
- 21 files changed, 17 insertions(+), 23 deletions(-)
+QmVsb3cgcGF0Y2ggd2FzIEFja2VkIGluIEF1Z3VzdCBsYXN0IHllYXIsIGFuZCBkZXNwaXRl
+IGEgcGluZyBieSBtZQ0KaW4gT2N0b2JlciBpdCB3YXNuJ3QgY29tbWl0dGVkIHlldC4NCg0K
+UGFibG8sIGRvIHlvdSBoYXZlIGFueSBjb25jZXJucyB3aXRoIHRoaXMgcGF0Y2g/IE9yIGFy
+ZSB5b3UganVzdA0Kbm8gbG9uZ2VyIGludGVyZXN0ZWQgaW4gbWFpbnRhaW5pbmcga3ZtX3N0
+YXQ/DQoNCkFzIHRoaXMgcGF0Y2ggaXMgZml4aW5nIGEgcmVhbCBidWcgd2hpY2ggd2UgYXQg
+U1VTRSB3b3VsZCBsaWtlIHRvDQpzZWUgZml4ZWQsIHBsZWFzZSB0YWtlIHRoZSBwYXRjaCBv
+ciB0ZWxsIHVzIHdoYXQgdG8gZG8gdG8gZ2V0IGl0DQp1cHN0cmVhbS4NCg0KSW4gY2FzZSB5
+b3UganVzdCBkb24ndCBtaW5kLCBJIGNvdWxkIG9mZmVyIHRvIG1lcmdlIGl0IHZpYSB0aGUg
+WGVuDQp0cmVlLCBldmVuIGlmIHRoaXMgcGF0Y2ggZG9lc24ndCByZWFsbHkgYmVsb25nIHRo
+ZXJlLg0KDQoNCkp1ZXJnZW4NCg0KT24gMDcuMDguMjQgMTk6MjMsIENsYXVkaW8gRm9udGFu
+YSB3cm90ZToNCj4gRm9yIHRoZSAtbCBhbmQgLUwgb3B0aW9ucyAobG9nZ2luZyBtb2RlKSwg
+cmVwbGFjZSB0aGUgdXNlIG9mIHRoZQ0KPiBLZXlib2FyZEludGVycnVwdCBleGNlcHRpb24g
+dG8gZ3JhY2VmdWxseSB0ZXJtaW5hdGUgaW4gZmF2b3INCj4gb2YgaGFuZGxpbmcgdGhlIFNJ
+R0lOVCBhbmQgU0lHVEVSTSBzaWduYWxzLg0KPiANCj4gVGhpcyBhbGxvd3MgdGhlIHByb2dy
+YW0gdG8gYmUgcnVuIGZyb20gc2NyaXB0cyBhbmQgc3RpbGwgYmUNCj4gc2lnbmFsZWQgdG8g
+Z3JhY2VmdWxseSB0ZXJtaW5hdGUgd2l0aG91dCBhbiBpbnRlcmFjdGl2ZSB0ZXJtaW5hbC4N
+Cj4gDQo+IEJlZm9yZSB0aGlzIGNoYW5nZSwgc29tZXRoaW5nIGxpa2UgdGhpcyBzY3JpcHQ6
+DQo+IA0KPiBrdm1fc3RhdCAtcCA4NTg5NiAtZCAtdCAtcyAxIC1jIC1MIGt2bV9zdGF0Xzg1
+ODk2LmNzdiAmDQo+IHNsZWVwIDEwDQo+IHBraWxsIC1URVJNIC1QICQkDQo+IA0KPiB3b3Vs
+ZCB5aWVsZCBhbiBlbXB0eSBsb2c6DQo+IC1ydy1yLS1yLS0gMSByb290IHJvb3QgICAgIDAg
+QXVnICA3IDE2OjE3IGt2bV9zdGF0Xzg1ODk2LmNzdg0KPiANCj4gYWZ0ZXIgdGhpcyBjb21t
+aXQ6DQo+IC1ydy1yLS1yLS0gMSByb290IHJvb3QgMTM0NjYgQXVnICA3IDE2OjU3IGt2bV9z
+dGF0Xzg1ODk2LmNzdg0KPiANCj4gU2lnbmVkLW9mZi1ieTogQ2xhdWRpbyBGb250YW5hIDxj
+Zm9udGFuYUBzdXNlLmRlPg0KPiBDYzogRGFyaW8gRmFnZ2lvbGkgPGRmYWdnaW9saUBzdXNl
+LmNvbT4NCj4gQ2M6IEZhYmlhbm8gUm9zYXMgPGZhcm9zYXNAc3VzZS5kZT4NCj4gLS0tDQo+
+ICAgdG9vbHMva3ZtL2t2bV9zdGF0L2t2bV9zdGF0ICAgICB8IDY0ICsrKysrKysrKysrKysr
+KystLS0tLS0tLS0tLS0tLS0tLQ0KPiAgIHRvb2xzL2t2bS9rdm1fc3RhdC9rdm1fc3RhdC50
+eHQgfCAxMiArKysrKysrDQo+ICAgMiBmaWxlcyBjaGFuZ2VkLCA0NCBpbnNlcnRpb25zKCsp
+LCAzMiBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS90b29scy9rdm0va3ZtX3N0
+YXQva3ZtX3N0YXQgYi90b29scy9rdm0va3ZtX3N0YXQva3ZtX3N0YXQNCj4gaW5kZXggMTVi
+ZjAwZTc5ZTNmLi4yY2YyZGEzZWQwMDIgMTAwNzU1DQo+IC0tLSBhL3Rvb2xzL2t2bS9rdm1f
+c3RhdC9rdm1fc3RhdA0KPiArKysgYi90b29scy9rdm0va3ZtX3N0YXQva3ZtX3N0YXQNCj4g
+QEAgLTI5Nyw4ICsyOTcsNiBAQCBJT0NUTF9OVU1CRVJTID0gew0KPiAgICAgICAnUkVTRVQn
+OiAgICAgICAweDAwMDAyNDAzLA0KPiAgIH0NCj4gICANCj4gLXNpZ25hbF9yZWNlaXZlZCA9
+IEZhbHNlDQo+IC0NCj4gICBFTkNPRElORyA9IGxvY2FsZS5nZXRwcmVmZXJyZWRlbmNvZGlu
+ZyhGYWxzZSkNCj4gICBUUkFDRV9GSUxURVIgPSByZS5jb21waWxlKHInXlteXChdKiQnKQ0K
+PiAgIA0KPiBAQCAtMTU5OCw3ICsxNTk2LDE5IEBAIGNsYXNzIENTVkZvcm1hdChvYmplY3Qp
+Og0KPiAgIA0KPiAgIGRlZiBsb2coc3RhdHMsIG9wdHMsIGZybXQsIGtleXMpOg0KPiAgICAg
+ICAiIiJQcmludHMgc3RhdGlzdGljcyBhcyByZWl0ZXJhdGluZyBrZXkgYmxvY2ssIG11bHRp
+cGxlIHZhbHVlIGJsb2Nrcy4iIiINCj4gLSAgICBnbG9iYWwgc2lnbmFsX3JlY2VpdmVkDQo+
+ICsgICAgc2lnbmFsX3JlY2VpdmVkID0gZGVmYXVsdGRpY3QoYm9vbCkNCj4gKw0KPiArICAg
+IGRlZiBoYW5kbGVfc2lnbmFsKHNpZywgZnJhbWUpOg0KPiArICAgICAgICBub25sb2NhbCBz
+aWduYWxfcmVjZWl2ZWQNCj4gKyAgICAgICAgc2lnbmFsX3JlY2VpdmVkW3NpZ10gPSBUcnVl
+DQo+ICsgICAgICAgIHJldHVybg0KPiArDQo+ICsNCj4gKyAgICBzaWduYWwuc2lnbmFsKHNp
+Z25hbC5TSUdJTlQsIGhhbmRsZV9zaWduYWwpDQo+ICsgICAgc2lnbmFsLnNpZ25hbChzaWdu
+YWwuU0lHVEVSTSwgaGFuZGxlX3NpZ25hbCkNCj4gKyAgICBpZiBvcHRzLmxvZ190b19maWxl
+Og0KPiArICAgICAgICBzaWduYWwuc2lnbmFsKHNpZ25hbC5TSUdIVVAsIGhhbmRsZV9zaWdu
+YWwpDQo+ICsNCj4gICAgICAgbGluZSA9IDANCj4gICAgICAgYmFubmVyX3JlcGVhdCA9IDIw
+DQo+ICAgICAgIGYgPSBOb25lDQo+IEBAIC0xNjI0LDM5ICsxNjM0LDMxIEBAIGRlZiBsb2co
+c3RhdHMsIG9wdHMsIGZybXQsIGtleXMpOg0KPiAgICAgICBkb19iYW5uZXIob3B0cykNCj4g
+ICAgICAgYmFubmVyX3ByaW50ZWQgPSBUcnVlDQo+ICAgICAgIHdoaWxlIFRydWU6DQo+IC0g
+ICAgICAgIHRyeToNCj4gLSAgICAgICAgICAgIHRpbWUuc2xlZXAob3B0cy5zZXRfZGVsYXkp
+DQo+IC0gICAgICAgICAgICBpZiBzaWduYWxfcmVjZWl2ZWQ6DQo+IC0gICAgICAgICAgICAg
+ICAgYmFubmVyX3ByaW50ZWQgPSBUcnVlDQo+IC0gICAgICAgICAgICAgICAgbGluZSA9IDAN
+Cj4gLSAgICAgICAgICAgICAgICBmLmNsb3NlKCkNCj4gLSAgICAgICAgICAgICAgICBkb19i
+YW5uZXIob3B0cykNCj4gLSAgICAgICAgICAgICAgICBzaWduYWxfcmVjZWl2ZWQgPSBGYWxz
+ZQ0KPiAtICAgICAgICAgICAgaWYgKGxpbmUgJSBiYW5uZXJfcmVwZWF0ID09IDAgYW5kIG5v
+dCBiYW5uZXJfcHJpbnRlZCBhbmQNCj4gLSAgICAgICAgICAgICAgICBub3QgKG9wdHMubG9n
+X3RvX2ZpbGUgYW5kIGlzaW5zdGFuY2UoZnJtdCwgQ1NWRm9ybWF0KSkpOg0KPiAtICAgICAg
+ICAgICAgICAgIGRvX2Jhbm5lcihvcHRzKQ0KPiAtICAgICAgICAgICAgICAgIGJhbm5lcl9w
+cmludGVkID0gVHJ1ZQ0KPiAtICAgICAgICAgICAgdmFsdWVzID0gc3RhdHMuZ2V0KCkNCj4g
+LSAgICAgICAgICAgIGlmIChub3Qgb3B0cy5za2lwX3plcm9fcmVjb3JkcyBvcg0KPiAtICAg
+ICAgICAgICAgICAgIGFueSh2YWx1ZXNba10uZGVsdGEgIT0gMCBmb3IgayBpbiBrZXlzKSk6
+DQo+IC0gICAgICAgICAgICAgICAgZG9fc3RhdGxpbmUob3B0cywgdmFsdWVzKQ0KPiAtICAg
+ICAgICAgICAgICAgIGxpbmUgKz0gMQ0KPiAtICAgICAgICAgICAgICAgIGJhbm5lcl9wcmlu
+dGVkID0gRmFsc2UNCj4gLSAgICAgICAgZXhjZXB0IEtleWJvYXJkSW50ZXJydXB0Og0KPiAr
+ICAgICAgICB0aW1lLnNsZWVwKG9wdHMuc2V0X2RlbGF5KQ0KPiArICAgICAgICAjIERvIG5v
+dCB1c2UgdGhlIEtleWJvYXJkSW50ZXJydXB0IGV4Y2VwdGlvbiwgYmVjYXVzZSB3ZSBtYXkg
+YmUgcnVubmluZyB3aXRob3V0IGEgdGVybWluYWwNCj4gKyAgICAgICAgaWYgKHNpZ25hbF9y
+ZWNlaXZlZFtzaWduYWwuU0lHSU5UXSBvciBzaWduYWxfcmVjZWl2ZWRbc2lnbmFsLlNJR1RF
+Uk1dKToNCj4gICAgICAgICAgICAgICBicmVhaw0KPiArICAgICAgICBpZiBzaWduYWxfcmVj
+ZWl2ZWRbc2lnbmFsLlNJR0hVUF06DQo+ICsgICAgICAgICAgICBiYW5uZXJfcHJpbnRlZCA9
+IFRydWUNCj4gKyAgICAgICAgICAgIGxpbmUgPSAwDQo+ICsgICAgICAgICAgICBmLmNsb3Nl
+KCkNCj4gKyAgICAgICAgICAgIGRvX2Jhbm5lcihvcHRzKQ0KPiArICAgICAgICAgICAgc2ln
+bmFsX3JlY2VpdmVkW3NpZ25hbC5TSUdIVVBdID0gRmFsc2UNCj4gKyAgICAgICAgaWYgKGxp
+bmUgJSBiYW5uZXJfcmVwZWF0ID09IDAgYW5kIG5vdCBiYW5uZXJfcHJpbnRlZCBhbmQNCj4g
+KyAgICAgICAgICAgIG5vdCAob3B0cy5sb2dfdG9fZmlsZSBhbmQgaXNpbnN0YW5jZShmcm10
+LCBDU1ZGb3JtYXQpKSk6DQo+ICsgICAgICAgICAgICBkb19iYW5uZXIob3B0cykNCj4gKyAg
+ICAgICAgICAgIGJhbm5lcl9wcmludGVkID0gVHJ1ZQ0KPiArICAgICAgICB2YWx1ZXMgPSBz
+dGF0cy5nZXQoKQ0KPiArICAgICAgICBpZiAobm90IG9wdHMuc2tpcF96ZXJvX3JlY29yZHMg
+b3INCj4gKyAgICAgICAgICAgIGFueSh2YWx1ZXNba10uZGVsdGEgIT0gMCBmb3IgayBpbiBr
+ZXlzKSk6DQo+ICsgICAgICAgICAgICBkb19zdGF0bGluZShvcHRzLCB2YWx1ZXMpDQo+ICsg
+ICAgICAgICAgICBsaW5lICs9IDENCj4gKyAgICAgICAgICAgIGJhbm5lcl9wcmludGVkID0g
+RmFsc2UNCj4gICANCj4gICAgICAgaWYgb3B0cy5sb2dfdG9fZmlsZToNCj4gICAgICAgICAg
+IGYuY2xvc2UoKQ0KPiAgIA0KPiAgIA0KPiAtZGVmIGhhbmRsZV9zaWduYWwoc2lnLCBmcmFt
+ZSk6DQo+IC0gICAgZ2xvYmFsIHNpZ25hbF9yZWNlaXZlZA0KPiAtDQo+IC0gICAgc2lnbmFs
+X3JlY2VpdmVkID0gVHJ1ZQ0KPiAtDQo+IC0gICAgcmV0dXJuDQo+IC0NCj4gLQ0KPiAgIGRl
+ZiBpc19kZWxheV92YWxpZChkZWxheSk6DQo+ICAgICAgICIiIlZlcmlmeSBkZWxheSBpcyBp
+biB2YWxpZCB2YWx1ZSByYW5nZS4iIiINCj4gICAgICAgbXNnID0gTm9uZQ0KPiBAQCAtMTg2
+OSw4ICsxODcxLDYgQEAgZGVmIG1haW4oKToNCj4gICAgICAgICAgIHN5cy5leGl0KDApDQo+
+ICAgDQo+ICAgICAgIGlmIG9wdGlvbnMubG9nIG9yIG9wdGlvbnMubG9nX3RvX2ZpbGU6DQo+
+IC0gICAgICAgIGlmIG9wdGlvbnMubG9nX3RvX2ZpbGU6DQo+IC0gICAgICAgICAgICBzaWdu
+YWwuc2lnbmFsKHNpZ25hbC5TSUdIVVAsIGhhbmRsZV9zaWduYWwpDQo+ICAgICAgICAgICBr
+ZXlzID0gc29ydGVkKHN0YXRzLmdldCgpLmtleXMoKSkNCj4gICAgICAgICAgIGlmIG9wdGlv
+bnMuY3N2Og0KPiAgICAgICAgICAgICAgIGZybXQgPSBDU1ZGb3JtYXQoa2V5cykNCj4gZGlm
+ZiAtLWdpdCBhL3Rvb2xzL2t2bS9rdm1fc3RhdC9rdm1fc3RhdC50eHQgYi90b29scy9rdm0v
+a3ZtX3N0YXQva3ZtX3N0YXQudHh0DQo+IGluZGV4IDNhOWYyMDM3YmQyMy4uNGE5OWExMTFh
+OTNjIDEwMDY0NA0KPiAtLS0gYS90b29scy9rdm0va3ZtX3N0YXQva3ZtX3N0YXQudHh0DQo+
+ICsrKyBiL3Rvb2xzL2t2bS9rdm1fc3RhdC9rdm1fc3RhdC50eHQNCj4gQEAgLTExNSw2ICsx
+MTUsMTggQEAgT1BUSU9OUw0KPiAgIC0tc2tpcC16ZXJvLXJlY29yZHM6Og0KPiAgICAgICAg
+ICAgb21pdCByZWNvcmRzIHdpdGggYWxsIHplcm9zIGluIGxvZ2dpbmcgbW9kZQ0KPiAgIA0K
+PiArDQo+ICtTSUdOQUxTDQo+ICstLS0tLS0tDQo+ICt3aGVuIGt2bV9zdGF0IGlzIHJ1bm5p
+bmcgaW4gbG9nZ2luZyBtb2RlIChlaXRoZXIgd2l0aCAtbCBvciB3aXRoIC1MKSwNCj4gK2l0
+IGhhbmRsZXMgdGhlIGZvbGxvd2luZyBzaWduYWxzOg0KPiArDQo+ICtTSUdIVVAgLSBjbG9z
+ZXMgYW5kIHJlb3BlbnMgdGhlIGxvZyBmaWxlICgtTCBvbmx5KSwgdGhlbiBjb250aW51ZXMu
+DQo+ICsNCj4gK1NJR0lOVCAtIGNsb3NlcyB0aGUgbG9nIGZpbGUgYW5kIHRlcm1pbmF0ZXMu
+DQo+ICtTSUdURVJNIC0gY2xvc2VzIHRoZSBsb2cgZmlsZSBhbmQgdGVybWluYXRlcy4NCj4g
+Kw0KPiArDQo+ICAgU0VFIEFMU08NCj4gICAtLS0tLS0tLQ0KPiAgICdwZXJmJygxKSwgJ3Ry
+YWNlLWNtZCcoMSkNCg0K
+--------------LSBkf0ayfCbxcL0Z33JLzym3
+Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/drivers/accel/qaic/Kconfig b/drivers/accel/qaic/Kconfig
-index a9f866230058..5e405a19c157 100644
---- a/drivers/accel/qaic/Kconfig
-+++ b/drivers/accel/qaic/Kconfig
-@@ -8,7 +8,6 @@ config DRM_ACCEL_QAIC
- 	depends on DRM_ACCEL
- 	depends on PCI && HAS_IOMEM
- 	depends on MHI_BUS
--	depends on MMU
- 	select CRC32
- 	help
- 	  Enables driver for Qualcomm's Cloud AI accelerator PCIe cards that are
-diff --git a/drivers/firewire/Kconfig b/drivers/firewire/Kconfig
-index 905c82e26ce7..a5f5e250223a 100644
---- a/drivers/firewire/Kconfig
-+++ b/drivers/firewire/Kconfig
-@@ -83,7 +83,7 @@ config FIREWIRE_KUNIT_SELF_ID_SEQUENCE_HELPER_TEST
- 
- config FIREWIRE_OHCI
- 	tristate "OHCI-1394 controllers"
--	depends on PCI && FIREWIRE && MMU
-+	depends on PCI && FIREWIRE
- 	help
- 	  Enable this driver if you have a FireWire controller based
- 	  on the OHCI specification.  For all practical purposes, this
-diff --git a/drivers/gpu/drm/Kconfig b/drivers/gpu/drm/Kconfig
-index 2cba2b6ebe1c..6e95d204597e 100644
---- a/drivers/gpu/drm/Kconfig
-+++ b/drivers/gpu/drm/Kconfig
-@@ -462,7 +462,7 @@ source "drivers/gpu/drm/imagination/Kconfig"
- 
- config DRM_HYPERV
- 	tristate "DRM Support for Hyper-V synthetic video device"
--	depends on DRM && PCI && MMU && HYPERV
-+	depends on DRM && PCI && HYPERV
- 	select DRM_CLIENT_SELECTION
- 	select DRM_KMS_HELPER
- 	select DRM_GEM_SHMEM_HELPER
-diff --git a/drivers/gpu/drm/amd/amdgpu/Kconfig b/drivers/gpu/drm/amd/amdgpu/Kconfig
-index 1a11cab741ac..058e3b3ad520 100644
---- a/drivers/gpu/drm/amd/amdgpu/Kconfig
-+++ b/drivers/gpu/drm/amd/amdgpu/Kconfig
-@@ -2,7 +2,7 @@
- 
- config DRM_AMDGPU
- 	tristate "AMD GPU"
--	depends on DRM && PCI && MMU
-+	depends on DRM && PCI
- 	depends on !UML
- 	select FW_LOADER
- 	select DRM_CLIENT
-@@ -68,7 +68,6 @@ config DRM_AMDGPU_CIK
- config DRM_AMDGPU_USERPTR
- 	bool "Always enable userptr write support"
- 	depends on DRM_AMDGPU
--	depends on MMU
- 	select HMM_MIRROR
- 	select MMU_NOTIFIER
- 	help
-diff --git a/drivers/gpu/drm/ast/Kconfig b/drivers/gpu/drm/ast/Kconfig
-index da0663542e8a..242fbccdf844 100644
---- a/drivers/gpu/drm/ast/Kconfig
-+++ b/drivers/gpu/drm/ast/Kconfig
-@@ -1,7 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config DRM_AST
- 	tristate "AST server chips"
--	depends on DRM && PCI && MMU
-+	depends on DRM && PCI
- 	select DRM_CLIENT_SELECTION
- 	select DRM_GEM_SHMEM_HELPER
- 	select DRM_KMS_HELPER
-diff --git a/drivers/gpu/drm/gma500/Kconfig b/drivers/gpu/drm/gma500/Kconfig
-index aa2ea128aa2f..a2acaa699dd5 100644
---- a/drivers/gpu/drm/gma500/Kconfig
-+++ b/drivers/gpu/drm/gma500/Kconfig
-@@ -1,7 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config DRM_GMA500
- 	tristate "Intel GMA500/600/3600/3650 KMS Framebuffer"
--	depends on DRM && PCI && X86 && MMU && HAS_IOPORT
-+	depends on DRM && PCI && X86 && HAS_IOPORT
- 	select DRM_CLIENT_SELECTION
- 	select DRM_KMS_HELPER
- 	select FB_IOMEM_HELPERS if DRM_FBDEV_EMULATION
-diff --git a/drivers/gpu/drm/hisilicon/hibmc/Kconfig b/drivers/gpu/drm/hisilicon/hibmc/Kconfig
-index 98d77d74999d..d1f3f5793f34 100644
---- a/drivers/gpu/drm/hisilicon/hibmc/Kconfig
-+++ b/drivers/gpu/drm/hisilicon/hibmc/Kconfig
-@@ -2,7 +2,6 @@
- config DRM_HISI_HIBMC
- 	tristate "DRM Support for Hisilicon Hibmc"
- 	depends on DRM && PCI
--	depends on MMU
- 	select DRM_CLIENT_SELECTION
- 	select DRM_DISPLAY_HELPER
- 	select DRM_DISPLAY_DP_HELPER
-diff --git a/drivers/gpu/drm/loongson/Kconfig b/drivers/gpu/drm/loongson/Kconfig
-index 552edfec7afb..d739d51cf54c 100644
---- a/drivers/gpu/drm/loongson/Kconfig
-+++ b/drivers/gpu/drm/loongson/Kconfig
-@@ -2,7 +2,7 @@
- 
- config DRM_LOONGSON
- 	tristate "DRM support for Loongson Graphics"
--	depends on DRM && PCI && MMU
-+	depends on DRM && PCI
- 	depends on LOONGARCH || MIPS || COMPILE_TEST
- 	select DRM_CLIENT_SELECTION
- 	select DRM_KMS_HELPER
-diff --git a/drivers/gpu/drm/mgag200/Kconfig b/drivers/gpu/drm/mgag200/Kconfig
-index 412dcbea0e2d..a962ae564a75 100644
---- a/drivers/gpu/drm/mgag200/Kconfig
-+++ b/drivers/gpu/drm/mgag200/Kconfig
-@@ -1,7 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config DRM_MGAG200
- 	tristate "Matrox G200"
--	depends on DRM && PCI && MMU
-+	depends on DRM && PCI
- 	select DRM_CLIENT_SELECTION
- 	select DRM_GEM_SHMEM_HELPER
- 	select DRM_KMS_HELPER
-diff --git a/drivers/gpu/drm/nouveau/Kconfig b/drivers/gpu/drm/nouveau/Kconfig
-index 7b3e979c51ec..d1587639ebb0 100644
---- a/drivers/gpu/drm/nouveau/Kconfig
-+++ b/drivers/gpu/drm/nouveau/Kconfig
-@@ -1,7 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config DRM_NOUVEAU
- 	tristate "Nouveau (NVIDIA) cards"
--	depends on DRM && PCI && MMU
-+	depends on DRM && PCI
- 	select IOMMU_API
- 	select FW_LOADER
- 	select FW_CACHE if PM_SLEEP
-@@ -94,7 +94,6 @@ config DRM_NOUVEAU_SVM
- 	bool "(EXPERIMENTAL) Enable SVM (Shared Virtual Memory) support"
- 	depends on DEVICE_PRIVATE
- 	depends on DRM_NOUVEAU
--	depends on MMU
- 	depends on STAGING
- 	select HMM_MIRROR
- 	select MMU_NOTIFIER
-diff --git a/drivers/gpu/drm/qxl/Kconfig b/drivers/gpu/drm/qxl/Kconfig
-index 69427eb8bed2..d8f24bcae34b 100644
---- a/drivers/gpu/drm/qxl/Kconfig
-+++ b/drivers/gpu/drm/qxl/Kconfig
-@@ -1,7 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config DRM_QXL
- 	tristate "QXL virtual GPU"
--	depends on DRM && PCI && MMU && HAS_IOPORT
-+	depends on DRM && PCI && HAS_IOPORT
- 	select DRM_CLIENT_SELECTION
- 	select DRM_KMS_HELPER
- 	select DRM_TTM
-diff --git a/drivers/gpu/drm/radeon/Kconfig b/drivers/gpu/drm/radeon/Kconfig
-index f51bace9555d..c479f0c0dd5c 100644
---- a/drivers/gpu/drm/radeon/Kconfig
-+++ b/drivers/gpu/drm/radeon/Kconfig
-@@ -2,7 +2,7 @@
- 
- config DRM_RADEON
- 	tristate "ATI Radeon"
--	depends on DRM && PCI && MMU
-+	depends on DRM && PCI
- 	depends on AGP || !AGP
- 	select FW_LOADER
- 	select DRM_CLIENT_SELECTION
-diff --git a/drivers/gpu/drm/tiny/Kconfig b/drivers/gpu/drm/tiny/Kconfig
-index 54c84c9801c1..6ca12fe7f57a 100644
---- a/drivers/gpu/drm/tiny/Kconfig
-+++ b/drivers/gpu/drm/tiny/Kconfig
-@@ -37,7 +37,7 @@ config DRM_BOCHS
- 
- config DRM_CIRRUS_QEMU
- 	tristate "Cirrus driver for QEMU emulated device"
--	depends on DRM && PCI && MMU
-+	depends on DRM && PCI
- 	select DRM_CLIENT_SELECTION
- 	select DRM_KMS_HELPER
- 	select DRM_GEM_SHMEM_HELPER
-diff --git a/drivers/gpu/drm/vmwgfx/Kconfig b/drivers/gpu/drm/vmwgfx/Kconfig
-index 6c3c2922ae8b..aab646b91ca9 100644
---- a/drivers/gpu/drm/vmwgfx/Kconfig
-+++ b/drivers/gpu/drm/vmwgfx/Kconfig
-@@ -1,7 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0
- config DRM_VMWGFX
- 	tristate "DRM driver for VMware Virtual GPU"
--	depends on DRM && PCI && MMU
-+	depends on DRM && PCI
- 	depends on (X86 && HYPERVISOR_GUEST) || ARM64
- 	select DRM_CLIENT_SELECTION
- 	select DRM_TTM
-diff --git a/drivers/gpu/drm/xe/Kconfig b/drivers/gpu/drm/xe/Kconfig
-index 5c2f459a2925..2dec62737ff6 100644
---- a/drivers/gpu/drm/xe/Kconfig
-+++ b/drivers/gpu/drm/xe/Kconfig
-@@ -1,7 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config DRM_XE
- 	tristate "Intel Xe Graphics"
--	depends on DRM && PCI && MMU && (m || (y && KUNIT=y))
-+	depends on DRM && PCI && (m || (y && KUNIT=y))
- 	select INTERVAL_TREE
- 	# we need shmfs for the swappable backing store, and in particular
- 	# the shmem_readpage() which depends upon tmpfs
-diff --git a/drivers/net/ethernet/broadcom/Kconfig b/drivers/net/ethernet/broadcom/Kconfig
-index eeec8bf17cf4..aa43984a05cf 100644
---- a/drivers/net/ethernet/broadcom/Kconfig
-+++ b/drivers/net/ethernet/broadcom/Kconfig
-@@ -96,7 +96,6 @@ config BNX2
- config CNIC
- 	tristate "QLogic CNIC support"
- 	depends on PCI && (IPV6 || IPV6=n)
--	depends on MMU
- 	select BNX2
- 	select UIO
- 	help
-diff --git a/drivers/pci/Kconfig b/drivers/pci/Kconfig
-index da28295b4aac..9c0e4aaf4e8c 100644
---- a/drivers/pci/Kconfig
-+++ b/drivers/pci/Kconfig
-@@ -21,6 +21,7 @@ config GENERIC_PCI_IOMAP
- menuconfig PCI
- 	bool "PCI support"
- 	depends on HAVE_PCI
-+	depends on MMU
- 	help
- 	  This option enables support for the PCI local bus, including
- 	  support for PCI-X and the foundations for PCI Express support.
-diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
-index 4d7c9f64ea24..60a20a0ac41f 100644
---- a/drivers/pci/pci.c
-+++ b/drivers/pci/pci.c
-@@ -4257,7 +4257,7 @@ unsigned long __weak pci_address_to_pio(phys_addr_t address)
- #ifndef pci_remap_iospace
- int pci_remap_iospace(const struct resource *res, phys_addr_t phys_addr)
- {
--#if defined(PCI_IOBASE) && defined(CONFIG_MMU)
-+#if defined(PCI_IOBASE)
- 	unsigned long vaddr = (unsigned long)PCI_IOBASE + res->start;
- 
- 	if (!(res->flags & IORESOURCE_IO))
-@@ -4290,7 +4290,7 @@ EXPORT_SYMBOL(pci_remap_iospace);
-  */
- void pci_unmap_iospace(struct resource *res)
- {
--#if defined(PCI_IOBASE) && defined(CONFIG_MMU)
-+#if defined(PCI_IOBASE)
- 	unsigned long vaddr = (unsigned long)PCI_IOBASE + res->start;
- 
- 	vunmap_range(vaddr, vaddr + resource_size(res));
-diff --git a/drivers/scsi/bnx2fc/Kconfig b/drivers/scsi/bnx2fc/Kconfig
-index ecdc0f0f4f4e..3cf7e08df809 100644
---- a/drivers/scsi/bnx2fc/Kconfig
-+++ b/drivers/scsi/bnx2fc/Kconfig
-@@ -5,7 +5,6 @@ config SCSI_BNX2X_FCOE
- 	depends on (IPV6 || IPV6=n)
- 	depends on LIBFC
- 	depends on LIBFCOE
--	depends on MMU
- 	select NETDEVICES
- 	select ETHERNET
- 	select NET_VENDOR_BROADCOM
-diff --git a/drivers/scsi/bnx2i/Kconfig b/drivers/scsi/bnx2i/Kconfig
-index 0cc06c2ce0b8..75ace2302fed 100644
---- a/drivers/scsi/bnx2i/Kconfig
-+++ b/drivers/scsi/bnx2i/Kconfig
-@@ -4,7 +4,6 @@ config SCSI_BNX2_ISCSI
- 	depends on NET
- 	depends on PCI
- 	depends on (IPV6 || IPV6=n)
--	depends on MMU
- 	select SCSI_ISCSI_ATTRS
- 	select NETDEVICES
- 	select ETHERNET
-diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-index c3bcb6911c53..2b0172f54665 100644
---- a/drivers/vfio/pci/Kconfig
-+++ b/drivers/vfio/pci/Kconfig
-@@ -1,6 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0-only
- menu "VFIO support for PCI devices"
--	depends on PCI && MMU
-+	depends on PCI
- 
- config VFIO_PCI_CORE
- 	tristate
--- 
-2.39.5
+-----BEGIN PGP PUBLIC KEY BLOCK-----
 
+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
+kt+z4drzFUyEjLM1vVvIMjkUoJs=3D
+=3DeeAB
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------LSBkf0ayfCbxcL0Z33JLzym3--
+
+--------------4NDTpmfm0ICQyRA0xNqHCxe4--
+
+--------------YMejfMLM0cY9eGg0vDB0LoQ5
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmfzsRQFAwAAAAAACgkQsN6d1ii/Ey+v
+Iwf9GW9szXuqwr8m0uN2jv5DCVe74DLQgP+mbQbQAFUzTEonmP8HptcSSYDzQ0S4UG2DjujnrULE
+eV5flxMiLZMP/3KwsKdYyCe5wIKeBtoVjOE3Ogky+hWSXMzESJ8eMQiCZwvw+1GihUPhcvLUukqd
+AqQLiY5nKBZgCyXoA+7lfcRDDn52e21jp7N0wcelp65OHGkLt2cK4uHzeDHFTOFPr2M7aLmE7dzH
+2VUQhyJdOOTXTmtqWCJWtAbqEpQS1uHooEC4v8mORcEwsMjGAz6EVcpwBEpvMiy2j4hbsQnD5xe0
+xfa62j6vHir0z5pP9BbBAEI4hNxfOJ9+YqJb4UT2ug==
+=fCna
+-----END PGP SIGNATURE-----
+
+--------------YMejfMLM0cY9eGg0vDB0LoQ5--
 
