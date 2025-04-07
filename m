@@ -1,292 +1,275 @@
-Return-Path: <kvm+bounces-42797-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42799-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13465A7D5AC
-	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 09:26:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 988C3A7D6E1
+	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 09:55:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78AE41892413
-	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 07:23:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E20513AE781
+	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 07:49:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D980C22A7F2;
-	Mon,  7 Apr 2025 07:18:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DBA0225776;
+	Mon,  7 Apr 2025 07:49:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JR+zVPCn"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hDTAKCDz"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F84B22F3BD
-	for <kvm@vger.kernel.org>; Mon,  7 Apr 2025 07:18:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0A091A315F
+	for <kvm@vger.kernel.org>; Mon,  7 Apr 2025 07:49:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744010310; cv=none; b=EJws1fDfuQ/HU2IPrjWJmrGQW5Ru4QDNvv8GQvzyQR41nRSUtRsyplnbSeSP1q/h5Xoa4nUu6rCxVV1GTUdfvLJDWjJZpvRHIUNRmImonvyEIGn70l71/7QWoUmDwgJEuDn1DkQNREFGxuPwijSyVGpDR3FQwjNQ24BlXrgyCNE=
+	t=1744012191; cv=none; b=A14sHJ10o2tQbbDLOPMa1R8lW3+y1QxTpslfcsNY0MBx+R4VU9ggAEs1makf20vQavo7Vn4mAFAI1cazgXZMU0ps5fh2xSxKbCGXhuMsn2buDX26FPcRO5UgVyZDDnvCVXreeFdUxZiIQH6t8+8m9+KD8bqjYPZo0+9sJ6tsu8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744010310; c=relaxed/simple;
-	bh=mYjOcwQPXCEo3PAx43/TpsYRavbohMhCu6cggyetg2M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=usvUa34KD8+MQNSbUqOr36Tmx+4UP61Xz5dZYKTjwfja0Wi9OSJRe/rPpVehRIl+cm9CsvsU6SdV7+vS2Qijz/rvZwo+hq3/TB/tBlyNXvbQBJdtO0gXQHEXUKDszYXhXD285qzCnGYnFLs3JeovIJ84Q9W5SIrZG0GW54OMo18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JR+zVPCn; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744010306;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=ksYnepkSTzEXZ8AtLLerRetDOK5boPEguFAzQ11Hx88=;
-	b=JR+zVPCnjdArxONaZ3CThTE/vbswvabCpkcFSjIV0Wh9gK5MSo+wgR32M4Vva3/1flQiTa
-	CMBLTRl6EzmC2O2ew7++Ye3zXsbnGhjubwEid3DJx6d+tXlgo9xSAsFKp9SrdCOIer7Top
-	7urgjIhp9ZAT0fDamclMCDizvn+SoVw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-629-LQXeMFNyOKCi3qA3CHj5iQ-1; Mon, 07 Apr 2025 03:18:24 -0400
-X-MC-Unique: LQXeMFNyOKCi3qA3CHj5iQ-1
-X-Mimecast-MFC-AGG-ID: LQXeMFNyOKCi3qA3CHj5iQ_1744010304
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-39135d31ca4so2094837f8f.1
-        for <kvm@vger.kernel.org>; Mon, 07 Apr 2025 00:18:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744010303; x=1744615103;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ksYnepkSTzEXZ8AtLLerRetDOK5boPEguFAzQ11Hx88=;
-        b=O1crZBFCJxIV1vL8ooDBBADOPCmRv/XyYCnMub6XHQ5nd2UpdToMx+0jxcAlgI2SKQ
-         tiLHeQyyCVDH3cg5aXdjwakffhN5dqLHtQwNn37IBA2i/aIaZ18Wwe5bj8yVuYX+tzvz
-         c60z7uevBzmGzKKUAB1gnE036zHOfeI4FD/fF6L4XKZ2omTIGEc6PlzUmK5Q2M/E4chs
-         dx6uzYeODjQWCAb0O9M1QR1xGNy6wbtdJHyfoEMnFik99ujj69dofgMeqAJhmqhidXCM
-         GmQkCKlNmjdyNTb8FsgNQEQqGM5nf/BaAk5YE2XKwX3CWMCM6g50J4QfLjAVJI/FoTzG
-         JA7w==
-X-Forwarded-Encrypted: i=1; AJvYcCXnNwCaMMCJKfjxBCDU5m27hvotZVFkaARAzMhc7nIDYLwrsAAE/7lgSDdGFSCEd9gGXlM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhEYDH/d/VZpUtYJAx20FA+XatrhoAb47LTDZAUoqTjjmu0TXh
-	PHY8JP3zGI+9D+s8GyTrx9tr0jhL/Q1hQD2AlUxq8bZDXHUFCd+ZoPqO38Am5oUJiBMYWbP0Hjy
-	E/HeoKyguup79lamfizLIvmH5tsgHWks4x9txT0nq7t1sprYf+w==
-X-Gm-Gg: ASbGncvtoGqxKLUpVr+tLxNhRjh3wn9bv+9FUF1TwBQU+7oxPfZLZJVcNCg1RZUnXJw
-	62zuL48QL7j9qEvvYVxX0cVeNAhscYIR3YVxWuv8L9rnok3JMxffJ9DefO4jfWvAzVRPMJm7iCZ
-	8WEVZySX+hhLZxHqNoZpSVAGJ/f2fUyPTpdBlTUK59gD7IAx4Zqgt6+0+aknqov4CRlHoqhr5rG
-	9er9n3jHyMO/6mADrL9cLebO/f7SuVcL0HEngJr6RplZn9vxLkNmymfwyf+mm5SG8fn/D5I2DRK
-	PPwRxqxUGCSBQlcXdnXTk9sOLOvxtFV0VC5WhecRwp5l
-X-Received: by 2002:a5d:64e5:0:b0:38d:df15:2770 with SMTP id ffacd0b85a97d-39c2e4819a9mr14959488f8f.0.1744010303576;
-        Mon, 07 Apr 2025 00:18:23 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFCewS4OYeFc4l1AEVvAmgrTnvuewlFO6ZFzx0aFkXbHOPgtLMJqitW5fI/xaiiqBRFAZWr9Q==
-X-Received: by 2002:a5d:64e5:0:b0:38d:df15:2770 with SMTP id ffacd0b85a97d-39c2e4819a9mr14959456f8f.0.1744010303214;
-        Mon, 07 Apr 2025 00:18:23 -0700 (PDT)
-Received: from [192.168.3.141] (p5b0c6a16.dip0.t-ipconnect.de. [91.12.106.22])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c30226acfsm11018796f8f.88.2025.04.07.00.18.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Apr 2025 00:18:22 -0700 (PDT)
-Message-ID: <4450ec71-8a8f-478c-a66e-b53d858beb02@redhat.com>
-Date: Mon, 7 Apr 2025 09:18:21 +0200
+	s=arc-20240116; t=1744012191; c=relaxed/simple;
+	bh=mSAezktNG8dVzVhMCB8PZG527ESENfq5hxoLu+AvQFY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=N4T6e1iJYFxhoBco+zQE4ALlG82l5h0bFNobQZNyn7nO9pnm4AfPKBZ/Epje/9Q7ynWtF+eQvNPfxa3CsFXbRliWzeM1jUIjduFt8uF2yof+syfFhjo/DrBl/yKXgFwKVLlHhLzcAhZCcF7aTwwWWtwc0gDxVflaUrZEB/FgIk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hDTAKCDz; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744012189; x=1775548189;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=mSAezktNG8dVzVhMCB8PZG527ESENfq5hxoLu+AvQFY=;
+  b=hDTAKCDzEdKm2NRxcQxooCSU1p2aC3PrL+oxsDaUO1qoKSk9AaQxnVFu
+   uJVJBZailWkzN3vMt7qesERi6VQvHQCYFTb7LdFnj71DzOH9zOJ3ZN9hQ
+   tFdYsmcqy/qHhW/aBcmwsgXg5CwSpQ72gakUApwAu5IeHTh3m6OJzUbku
+   1FHkU8OvPdMGq9rgrQclnQHXC2DYobaeh2X5EsuQ4P2km476flBLsH95J
+   3nGZU9IngPgXngvC14ardxXJO5+ww+ff6QFsfi/9rBr24LNuwH68Z1NMS
+   aVSW4z3i+z9pV/7ZXWzrq2h+tFdxmOCiZbDSDWAf3oX6tLRy4/cj1aUa6
+   A==;
+X-CSE-ConnectionGUID: AXH+k2NrRmCjjTSVCJBysA==
+X-CSE-MsgGUID: SYnzH7zxQimkXgRsiC0f1g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11396"; a="67857494"
+X-IronPort-AV: E=Sophos;i="6.15,193,1739865600"; 
+   d="scan'208";a="67857494"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2025 00:49:48 -0700
+X-CSE-ConnectionGUID: UzeJQF2cTKO9kHzxBF8TBA==
+X-CSE-MsgGUID: lxvyyHAzR66S88l7ynURxg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,193,1739865600"; 
+   d="scan'208";a="128405457"
+Received: from emr-bkc.sh.intel.com ([10.112.230.82])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2025 00:49:45 -0700
+From: Chenyi Qiang <chenyi.qiang@intel.com>
+To: David Hildenbrand <david@redhat.com>,
+	Alexey Kardashevskiy <aik@amd.com>,
+	Peter Xu <peterx@redhat.com>,
+	Gupta Pankaj <pankaj.gupta@amd.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Michael Roth <michael.roth@amd.com>
+Cc: Chenyi Qiang <chenyi.qiang@intel.com>,
+	qemu-devel@nongnu.org,
+	kvm@vger.kernel.org,
+	Williams Dan J <dan.j.williams@intel.com>,
+	Peng Chao P <chao.p.peng@intel.com>,
+	Gao Chao <chao.gao@intel.com>,
+	Xu Yilun <yilun.xu@intel.com>,
+	Li Xiaoyao <xiaoyao.li@intel.com>
+Subject: [PATCH v4 00/13] Enable shared device assignment
+Date: Mon,  7 Apr 2025 15:49:20 +0800
+Message-ID: <20250407074939.18657-1-chenyi.qiang@intel.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] s390/virtio_ccw: don't allocate/assign airqs for
- non-existing queues
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>, linux-kernel@vger.kernel.org,
- linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
- kvm@vger.kernel.org, Chandra Merla <cmerla@redhat.com>,
- Stable@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eric Farman <farman@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Wei Wang <wei.w.wang@intel.com>
-References: <20250402203621.940090-1-david@redhat.com>
- <20250403161836.7fe9fea5.pasic@linux.ibm.com>
- <e2936e2f-022c-44ee-bb04-f07045ee2114@redhat.com>
- <20250404063619.0fa60a41.pasic@linux.ibm.com>
- <4a33daa3-7415-411e-a491-07635e3cfdc4@redhat.com>
- <d54fbf56-b462-4eea-a86e-3a0defb6298b@redhat.com>
- <20250404153620.04d2df05.pasic@linux.ibm.com>
- <d6f5f854-1294-4afa-b02a-657713435435@redhat.com>
- <20250406144025-mutt-send-email-mst@kernel.org>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20250406144025-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 06.04.25 20:42, Michael S. Tsirkin wrote:
-> On Fri, Apr 04, 2025 at 03:48:49PM +0200, David Hildenbrand wrote:
->> On 04.04.25 15:36, Halil Pasic wrote:
->>> On Fri, 4 Apr 2025 12:55:09 +0200
->>> David Hildenbrand <david@redhat.com> wrote:
->>>
->>>> For virito-balloon, we should probably do the following:
->>>>
->>>>    From 38e340c2bb53c2a7cc7c675f5dfdd44ecf7701d9 Mon Sep 17 00:00:00 2001
->>>> From: David Hildenbrand <david@redhat.com>
->>>> Date: Fri, 4 Apr 2025 12:53:16 +0200
->>>> Subject: [PATCH] virtio-balloon: Fix queue index assignment for
->>>>     non-existing queues
->>>>
->>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>> ---
->>>>     device-types/balloon/description.tex | 22 ++++++++++++++++------
->>>>     1 file changed, 16 insertions(+), 6 deletions(-)
->>>>
->>>> diff --git a/device-types/balloon/description.tex b/device-types/balloon/description.tex
->>>> index a1d9603..a7396ff 100644
->>>> --- a/device-types/balloon/description.tex
->>>> +++ b/device-types/balloon/description.tex
->>>> @@ -16,6 +16,21 @@ \subsection{Device ID}\label{sec:Device Types / Memory Balloon Device / Device I
->>>>       5
->>>>     \subsection{Virtqueues}\label{sec:Device Types / Memory Balloon Device / Virtqueues}
->>>> +
->>>> +\begin{description}
->>>> +\item[inflateq] Exists unconditionally.
->>>> +\item[deflateq] Exists unconditionally.
->>>> +\item[statsq] Only exists if VIRTIO_BALLOON_F_STATS_VQ is set.
->>>> +\item[free_page_vq] Only exists if VIRTIO_BALLOON_F_FREE_PAGE_HINT is set.
->>>> +\item[reporting_vq] Only exists if VIRTIO_BALLOON_F_PAGE_REPORTING is set.
->>>
->>> s/is set/is negotiated/?
->>>
->>> I think we should stick to "feature is offered" and "feature is
->>> negotiated".
->>>
->>>> +\end{description}
->>>> +
->>>> +\begin{note}
->>>> +Virtqueue indexes are assigned sequentially for existing queues, starting
->>>> +with index 0; consequently, if a virtqueue does not exist, it does not get
->>>> +an index assigned. Assuming all virtqueues exist for a device, the indexes
->>>> +are:
->>>> +
->>>>     \begin{description}
->>>>     \item[0] inflateq
->>>>     \item[1] deflateq
->>>> @@ -23,12 +38,7 @@ \subsection{Virtqueues}\label{sec:Device Types / Memory Balloon Device / Virtque
->>>>     \item[3] free_page_vq
->>>>     \item[4] reporting_vq
->>>>     \end{description}
->>>> -
->>>> -  statsq only exists if VIRTIO_BALLOON_F_STATS_VQ is set.
->>>> -
->>>> -  free_page_vq only exists if VIRTIO_BALLOON_F_FREE_PAGE_HINT is set.
->>>> -
->>>> -  reporting_vq only exists if VIRTIO_BALLOON_F_PAGE_REPORTING is set.
->>>> +\end{note}
->>>>     \subsection{Feature bits}\label{sec:Device Types / Memory Balloon Device / Feature bits}
->>>>     \begin{description}
->>>
->>> Sounds good to me! But I'm still a little confused by the "holes". What
->>> confuses me is that i can think of at least 2 distinct types of "holes":
->>> 1) Holes that can be filled later. The queue conceptually exists, but
->>>      there is no need to back it with any resources for now because it is
->>>      dormant (it can be seen a hole in comparison to queues that need to
->>>     materialize -- vring, notifiers, ...)
->>> 2) Holes that can not be filled without resetting the device: i.e. if
->>>      certain features are not negotiated, then a queue X does not exist,
->>>      but subsequent queues retain their index.
->>
->> I think it is not about "negotiated", that might be the wrong terminology.
->>
->> E.g., in QEMU virtio_balloon_device_realize() we define the virtqueues
->> (virtio_add_queue()) if virtio_has_feature(s->host_features).
->>
->> That is, it's independent of a feature negotiation (IIUC), it's static for
->> the device --  "host_features"
-> 
-> 
-> No no that is a bad idea. Breaks forward compatibility.
-> 
-> Oh my. I did not realize. It is really broken hopelessly.
-> 
-> Because, note, the guest looks at the guest features :)
+This is the v4 series of the shared device assignment support.
 
-Can you elaborate why?
+Compared with v3 series, the main changes are:
 
-statsq = 2
+- Introduced a new GenericStateManager parent class, so that the existing
+  RamDiscardManager and new PrivateSharedManager can be its child class
+  and manage different states.
+- Changed the name of MemoryAttributeManager to RamBlockAttribute to
+  distinguish from the XXXManager interface and still use it to manage
+  guest_memfd information. Meanwhile, Use it to implement
+  PrivateSharedManager instead of RamDiscardManager to distinguish the
+  states of populate/discard and shared/private.
+- Moved the attribute change operations into a listener so that both the
+  attribute change and IOMMU pins can be invoked in listener callbacks.
+- Added priority listener support in PrivateSharedListener so that the
+  attribute change listener and VFIO listener can be triggered in
+  expected order to comply with in-place conversin requirement.
+- v3: https://lore.kernel.org/qemu-devel/20250310081837.13123-1-chenyi.qiang@intel.com/
 
-free_page_vq = statsq + host_offered_feat(VIRTIO_BALLOON_F_STATS_VQ)
+The overview of this series:
+- Patch 1-3: preparation patches. These include function exposure and
+  some definition changes to return values.
+- Patch 4: Introduce a generic state change parent class with
+  RamDiscardManager as its child class. This paves the way to introduce
+  new child classes to manage other memory states.
+- Patch 5-6: Introduce a new child class, PrivateSharedManager, to
+  manage the private and shared states. Also adds VFIO support for this
+  new interface to coordinate RAM discard support. 
+- Patch 7-9: Introduce a new object to implement the
+  PrivateSharedManager interface and a callback to notify the
+  shared/private state change. Stores it in RAMBlocks and register it in
+  the target MemoryRegion so that the object can notify page conversion
+  events to other systems.
+- Patch 10-11: Moves the state change handling into a
+  PrivateSharedListener so that it can be invoked together with the VFIO
+  listener by the state_change() call.
+- Patch 12: To comply with in-place conversion, introduces the priority
+  listener support so that the attribute change and IOMMU pin can follow
+  the expected order.
+- Patch 13: Unlocks the coordinate discard so that the shared device
+  assignment (VFIO) can work with guest_memfd.
 
-reporting_vq = free_page_vq + 
-host_offered_feat(VIRTIO_BALLOON_F_FREE_PAGE_HINT)
+More small changes or details can be found in the individual patches.
 
+---
+Original cover letter with minor changes related to new parent class:
 
-Independent of any upcoming features. And if a new feature defines a new 
-virtqueue
+Background
+==========
+Confidential VMs have two classes of memory: shared and private memory.
+Shared memory is accessible from the host/VMM while private memory is
+not. Confidential VMs can decide which memory is shared/private and
+convert memory between shared/private at runtime.
 
-new_vq = reporting_vq +  host_offered_feat(VIRTIO_BALLOON_F_PAGE_REPORTING)
+"guest_memfd" is a new kind of fd whose primary goal is to serve guest
+private memory. In current implementation, shared memory is allocated
+with normal methods (e.g. mmap or fallocate) while private memory is
+allocated from guest_memfd. When a VM performs memory conversions, QEMU
+frees pages via madvise or via PUNCH_HOLE on memfd or guest_memfd from
+one side, and allocates new pages from the other side. This will cause a
+stale IOMMU mapping issue mentioned in [1] when we try to enable shared
+device assignment in confidential VMs.
 
-We only have to make sure in the spec that these calculations always hold.
+Solution
+========
+The key to enable shared device assignment is to update the IOMMU mappings
+on page conversion. RamDiscardManager, an existing interface currently
+utilized by virtio-mem, offers a means to modify IOMMU mappings in
+accordance with VM page assignment. Although the required operations in
+VFIO for page conversion are similar to memory plug/unplug, the states of
+private/shared are different from discard/populated. We want a similar
+mechanism with RamDiscardManager but used to manage the state of private
+and shared.
 
-Querying of the host offered features already happens as part of 
-determining the actual guest usable feature (driver_offered & host_offered).
+This series introduce a new parent abstract class to manage a pair of
+opposite states with RamDiscardManager as its child to manage
+populate/discard states, and introduce a new child class,
+PrivateSharedManager, which can also utilize the same infrastructure to
+notify VFIO of page conversions.
 
+Relationship with in-place page conversion
+==========================================
+To support 1G page support for guest_memfd [2], the current direction is to
+allow mmap() of guest_memfd to userspace so that both private and shared
+memory can use the same physical pages as the backend. This in-place page
+conversion design eliminates the need to discard pages during shared/private
+conversions. However, device assignment will still be blocked because the
+in-place page conversion will reject the conversion when the page is pinned
+by VFIO.
 
-> Now I am beginning to think we should leave the spec alone
-> and fix the drivers ... Ugh ....
+To address this, the key difference lies in the sequence of VFIO map/unmap
+operations and the page conversion. It can be adjusted to achieve
+unmap-before-conversion-to-private and map-after-conversion-to-shared,
+ensuring compatibility with guest_memfd.
 
-We could always say that starting with feature X, queue indexes are 
-fixed again. E.g., VIRTIO_BALLOON_F_X would have it's virtqueue fixed at 
-index 5, independent of the other (older) features where the virtqueue 
-indexes are determined like today.
+Limitation
+==========
+One limitation is that VFIO expects the DMA mapping for a specific IOVA
+to be mapped and unmapped with the same granularity. The guest may
+perform partial conversions, such as converting a small region within a
+larger region. To prevent such invalid cases, all operations are
+performed with 4K granularity. This could be optimized after the
+cut_mapping operation [3] is introduced in future. We can alway perform a
+split-before-unmap if partial conversions happen. If the split succeeds,
+the unmap will succeed and be atomic. If the split fails, the unmap
+process fails.
 
-Won't make the implementation easier, though, I'm afraid.
+Testing
+=======
+This patch series is tested based on TDX patches available at:
+KVM: https://github.com/intel/tdx/tree/kvm-coco-queue-snapshot/kvm-coco-queue-snapshot-20250322
+     (With the revert of HEAD commit)
+QEMU: https://github.com/intel-staging/qemu-tdx/tree/tdx-upstream-snapshot-2025-04-07
 
-(I also thought about a way to query the virtqueue index for a feature, 
-but that's probably overengineering)
+To facilitate shared device assignment with the NIC, employ the legacy
+type1 VFIO with the QEMU command:
+
+qemu-system-x86_64 [...]
+    -device vfio-pci,host=XX:XX.X
+
+The parameter of dma_entry_limit needs to be adjusted. For example, a
+16GB guest needs to adjust the parameter like
+vfio_iommu_type1.dma_entry_limit=4194304.
+
+If use the iommufd-backed VFIO with the qemu command:
+
+qemu-system-x86_64 [...]
+    -object iommufd,id=iommufd0 \
+    -device vfio-pci,host=XX:XX.X,iommufd=iommufd0
+
+No additional adjustment required.
+
+Following the bootup of the TD guest, the guest's IP address becomes
+visible, and iperf is able to successfully send and receive data.
+
+Related link
+============
+[1] https://lore.kernel.org/qemu-devel/20240423150951.41600-54-pbonzini@redhat.com/
+[2] https://lore.kernel.org/lkml/cover.1726009989.git.ackerleytng@google.com/
+[3] https://lore.kernel.org/linux-iommu/7-v1-01fa10580981+1d-iommu_pt_jgg@nvidia.com/
+
+Chenyi Qiang (13):
+  memory: Export a helper to get intersection of a MemoryRegionSection
+    with a given range
+  memory: Change memory_region_set_ram_discard_manager() to return the
+    result
+  memory: Unify the definiton of ReplayRamPopulate() and
+    ReplayRamDiscard()
+  memory: Introduce generic state change parent class for
+    RamDiscardManager
+  memory: Introduce PrivateSharedManager Interface as child of
+    GenericStateManager
+  vfio: Add the support for PrivateSharedManager Interface
+  ram-block-attribute: Introduce RamBlockAttribute to manage RAMBLock
+    with guest_memfd
+  ram-block-attribute: Introduce a callback to notify shared/private
+    state changes
+  memory: Attach RamBlockAttribute to guest_memfd-backed RAMBlocks
+  memory: Change NotifyStateClear() definition to return the result
+  KVM: Introduce CVMPrivateSharedListener for attribute changes during
+    page conversions
+  ram-block-attribute: Add priority listener support for
+    PrivateSharedListener
+  RAMBlock: Make guest_memfd require coordinate discard
+
+ accel/kvm/kvm-all.c                         |  81 +++-
+ hw/vfio/common.c                            | 131 +++++-
+ hw/vfio/container-base.c                    |   1 +
+ hw/virtio/virtio-mem.c                      | 168 +++----
+ include/exec/memory.h                       | 407 ++++++++++------
+ include/exec/ramblock.h                     |  25 +
+ include/hw/vfio/vfio-container-base.h       |  10 +
+ include/system/confidential-guest-support.h |  10 +
+ migration/ram.c                             |  21 +-
+ system/memory.c                             | 137 ++++--
+ system/memory_mapping.c                     |   6 +-
+ system/meson.build                          |   1 +
+ system/physmem.c                            |  20 +-
+ system/ram-block-attribute.c                | 495 ++++++++++++++++++++
+ target/i386/kvm/tdx.c                       |   1 +
+ target/i386/sev.c                           |   1 +
+ 16 files changed, 1192 insertions(+), 323 deletions(-)
+ create mode 100644 system/ram-block-attribute.c
 
 -- 
-Cheers,
-
-David / dhildenb
+2.43.5
 
 
