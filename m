@@ -1,523 +1,279 @@
-Return-Path: <kvm+bounces-42850-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42851-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CB9EA7E39D
-	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 17:12:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A3BAA7E427
+	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 17:25:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3299164665
-	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 15:06:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A97A91671BD
+	for <lists+kvm@lfdr.de>; Mon,  7 Apr 2025 15:16:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E89991F8922;
-	Mon,  7 Apr 2025 15:04:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C604F1FC7C5;
+	Mon,  7 Apr 2025 15:15:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b="e+bTi3Li"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="JYkImPgY";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="a1mnBLnn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA3C1EF369
-	for <kvm@vger.kernel.org>; Mon,  7 Apr 2025 15:04:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744038288; cv=none; b=MLMGlRZmMQjeG5NCuBEyFB3tP8I6cKz0Ki/WzLiUYFTGUabA6e3WYNfwsY6/7izBe3EbUDrT3qOw073LDgLjg4koIrNqpY1K0Ye4LRzjoIz+eaEprb97YlOdEdSokDzh02hbu9uexLtWfZDoQKHXXcGq5h/+fW6qI488SN3VBxI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744038288; c=relaxed/simple;
-	bh=si/HAeASKMwVMe4jysDMPvylshFfyJJu+MA6s1Nfta0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mwCymZvFZ5Tk5a0RoS92zSEbpCqKxAB1cS1p3rNWCnU+CZrA9CsaB7bfVNggQtIeaekCz8nKHRlsfus11RBY2bMR01nt0ouzOY4u3U0M2V7KehIbtu4uxcl23vExThPXvRQZu6FBj0lg92m4ZLL45EFtRqiY9QC1K4OTCNZuZLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw; spf=pass smtp.mailfrom=csie.ntu.edu.tw; dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b=e+bTi3Li; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csie.ntu.edu.tw
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-227b650504fso39543145ad.0
-        for <kvm@vger.kernel.org>; Mon, 07 Apr 2025 08:04:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 319361F76B9;
+	Mon,  7 Apr 2025 15:15:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744038931; cv=fail; b=ovjn/eJWM/jJM3O1g9BcNZRQHdLHK+SyH6DAHWOQiyggr/EREKpUqwp9kcIJcZJFnEEW77KcST8qhTWFUalYsWIZOe9yXh3G74+nQrQjM/UJ4uVZ7qgw7vmER/0nI+xTJoVMiUzKSoU9n0BKc8iqEXGnPhd5Qb1OACPt37WyDak=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744038931; c=relaxed/simple;
+	bh=2AGzF0ffBnv9NHAhUGvROeW6Z6qRYE78KevcYcbo3W0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=oK5H3heO1HsxhYK+5cejOSC1Dnx2JFciXDv9lnxhXPGqqi2vbsol43INXe9vnTYNbQ7NBrPcBvv/EH6wgQpcAF2ez3BvpLPSFNk4dmcSqDM/wCS7qPMVAqN/8BZKoLYE1Lzubsipece43rT8MTH9m39o6wBrYGbUV9eEccpvPuQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=JYkImPgY; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=a1mnBLnn; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 537DH0jf000842;
+	Mon, 7 Apr 2025 15:14:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=corp-2023-11-20; bh=Jb9vfMzix//eEOtnBN
+	itd4BMUj1MvoaMMX2PXa9KG2U=; b=JYkImPgYfapicUlKeOa4CtBF4x2aRDive/
+	CYnAlAdG7UhOwopeNb+ycCnBevyLdFSBsdfwUwd7AqPyaQQjl6iOQWbv0BZC6YUv
+	8yr/X+4pTh7ELxcxxgjJb3pgAjCprVnoF1u1IeTior8VCJJzF1dLDZEYT0bXDavJ
+	hOcUqSHEwnRu59XTo+XiiU4Lm++/9YmT9UmdMy1mdT1EE6Spc/FT31oOpS5S5P6J
+	uk457EdeIdeBaauhLM3dpLh1R44gqYDt9Zf2qxGgpbg6N9iUpV2EEsEIZ6J/dFlg
+	0aBKGx5RcklX45LwkOahQZjozl8E+tz/QBKadIVK6jIZUpb+gdXQ==
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 45tu41avd6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 07 Apr 2025 15:14:39 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 537F95HM020931;
+	Mon, 7 Apr 2025 15:14:37 GMT
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2175.outbound.protection.outlook.com [104.47.59.175])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 45ttye78nw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 07 Apr 2025 15:14:37 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=fm4nXUJjNBWwYgPe17UimcX/9gr8R1xod55JFN6UvQoKjEyznr4/D6PCDB5SMjJAvhvQpUD+k75AWHc1Hq8IlpMT2wKsBbqLiezoPivybuUxqSdi43i3gv8xqKfri+AVBlg76DPg+7C7SEoAllLry8drS/EHg4+aaCyT6y4TTFpVpxJdnVL4AsRfJsnY5w+SZNq6UmJxKsNWqwQBmSeIuVOrnNs/wNZau+D8Y4zK274vDOlSGEkLY+mvYCFRajmQ15VskYVk9jiVDdGIaakSnStUhDmv22d+wsLys7QoipsAUCw30AAHmXfu0+CHGPj4cFrtbZ1m53EXoYz45F+iiw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Jb9vfMzix//eEOtnBNitd4BMUj1MvoaMMX2PXa9KG2U=;
+ b=JXdTRZ3blKE3mgwKxPBw9vT/hQdtUlXQP0UCqdH5ELUGP31bHBj4qvRnc/0yKy6VcoFeYNtTU4TpiggstTY2T+VyYB2Z6OQEvOE72luedRNn9EpvI4kfMBQ8WO/NBXtiFTFit58gYe0TUGruQSv00y8BXYsyh9Gwg+d65/Ao7lY65k04Q39vWgA1aXPOQwvfhYU15mns+jfmQdGUeJUo45hD1V4lMFQMixwlqwkakoXzlm8ftbQYGarfZzUlcMrlYYHtZM++Quj37L5snaQCuTVdk+OF7o+muTwKMw6rGpM34LnHRiSySIwj5GkixzPIr5YE/W7utGtHLSfd5IUzqw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=csie.ntu.edu.tw; s=google; t=1744038283; x=1744643083; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=I9kdmTO4tcqMNv0b+m3Ev3puZ8xn/klk3TOQNZ1xzZQ=;
-        b=e+bTi3LiI++yrkUGWoXou4HD52hEOpCUk79WSkBHmDCR26MazPYyt1Wx39w6KHNaql
-         g/VKKxAe5y8RsP3oVncN1GFNc2wASHcSKKRlSlQ0vQPiPQ2G7O2dkm5d1Ple877eFAUY
-         NlajDHGYJ5Ok2bem6rO670T9NIHvoJF66RFbFsTSzhjXdBw/OJVpylcWKFq4YBBGbxWA
-         m2L+gDOGINIKZ7V8V8Z6JepyGs9vjzepS5k6NYVtBGl7pO5JdIKpIPTdj78Hp/hyzipn
-         kxCj3FHOas0t7sO+I9SbE7L3WrKARqkjIyPRUrmhm5bW2D0phhUi0z3ALubY2bptBucL
-         +x1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744038283; x=1744643083;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=I9kdmTO4tcqMNv0b+m3Ev3puZ8xn/klk3TOQNZ1xzZQ=;
-        b=mKnfNLLF6sjAX6+rydO/AUcqcYyJ+kDlzdLO971InZKiSe8rnwpnSo14kbMRWCNqPT
-         jiP8o0Ft438RuTOWuZRv87Ub40GBTSvmdgk09sxS3fTD/sqYdg2Vgi02F26wpmdEr0ak
-         TqqPZprBIj9T9qB+G20AK+xHzAgmauOIArHIyJohzCDvt3Y7B6HA1dhQtQA6XlE25iFm
-         +Fg+m3tlfcPzA8RtyivPPzaUtQ6ZCiN3ikLBao8pfP4hryjnSbDdMn/wmATpLGdtXRxy
-         fL93yVHG0LOW6o2CX2BFkl5qse8/ChgLqB6mneHfdTF2KusxZOlWoQAVS9m8qP8K0kfB
-         9UCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUa0SH45jNDZH5dHWk/L4DDKTKm9JBLR5kpzrdufoPJX3QHrQ9m3d6LHCZf3MDaoAR76qk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMALa3kgmETGLpEsM97kFQ1kY/JnOnq3R9JxVku90ag1Y/3FFl
-	FHx+0pRynVBSgyx+xQ2cyIAJP+KuiZkywygxvbPvYro+oBzMbUVlEKvn6UNyTr3+1Sx5pGzk7m/
-	3L3Luok+jDUZq0YEKTs36Vu+bZudBg7pCVPZ2hga57OU=
-X-Gm-Gg: ASbGncvTGjoMMUbPuQ7M0v2XTrTxWdDzQ+BqPLlg4qeqDumJk1KMuZ/vy2oYYb0ez8h
-	VTCDrVjwXBOzfD4IRSWcjDWm8TFl8YnoiDQK9B6Y6VIz801qJU26G7fd5CEvXjwjYGleEiLOJaD
-	tOz/gFpq+sxBEUMoiZWWCH9bHil+kB/CjX464YD03srZURq/D0s9spTVTD4pojZtfsO9+Hg56Y4
-	mPA1lzVZ548TBUeh30+cbB+QM3XhV5ci0pKoecdS00hcnHNMWeyd/w/3MnbuC7GuzvDEcYqg/Ca
-	+rL/Vfm7sShoH1GorVvGod7uHytoKIRJTRTzyClvAwuUMKQLDkyL+uGLXWt/4L1911xw9sXhMKY
-	1JclV
-X-Google-Smtp-Source: AGHT+IH2oVXyQ3zs/hUIZ8h7pbZlqmcCBM70vrTswgR9PuCbdJMakAfyi957MMSEaZ9tPm8qDM8Oug==
-X-Received: by 2002:a17:902:ef10:b0:216:53fa:634f with SMTP id d9443c01a7336-22a8a1d4617mr200860295ad.48.1744038282789;
-        Mon, 07 Apr 2025 08:04:42 -0700 (PDT)
-Received: from zenbook (1-162-87-224.dynamic-ip.hinet.net. [1.162.87.224])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-229787778efsm81770435ad.259.2025.04.07.08.04.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 08:04:42 -0700 (PDT)
-Date: Mon, 7 Apr 2025 23:06:23 +0800
-From: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, 
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, 
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev, 
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, 
-	Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>, 
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, r09922117@csie.ntu.edu.tw
-Subject: Re: [PATCH v7 12/45] arm64: RME: Allocate/free RECs to match vCPUs
-Message-ID: <omfhugkuqmbvijitmlq2tluspjhsh43d32ecvr5uubnnhukapk@up6i7g4nbovb>
-References: <20250213161426.102987-1-steven.price@arm.com>
- <20250213161426.102987-13-steven.price@arm.com>
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Jb9vfMzix//eEOtnBNitd4BMUj1MvoaMMX2PXa9KG2U=;
+ b=a1mnBLnnTy2zfEdfrSnt9KtFE9u8c4QPk9xouia0b0YaS13TJocIyNkNdImsN5+FH9mP4T6gCgRqNxliYad4HJRWmQYYRPiI1u+0txTHhhkphZScwLP2oth1TD7GC6Z/OtTslga2Ize6fbIuMjuwDyLe8yY2qNDzswdU4Wo02nA=
+Received: from DM4PR10MB8218.namprd10.prod.outlook.com (2603:10b6:8:1cc::16)
+ by DS0PR10MB6248.namprd10.prod.outlook.com (2603:10b6:8:d0::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.35; Mon, 7 Apr
+ 2025 15:14:35 +0000
+Received: from DM4PR10MB8218.namprd10.prod.outlook.com
+ ([fe80::2650:55cf:2816:5f2]) by DM4PR10MB8218.namprd10.prod.outlook.com
+ ([fe80::2650:55cf:2816:5f2%7]) with mapi id 15.20.8606.033; Mon, 7 Apr 2025
+ 15:14:34 +0000
+Date: Mon, 7 Apr 2025 16:14:28 +0100
+From: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+        Nikita Kalyazin <kalyazin@amazon.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Fuad Tabba <tabba@google.com>, akpm@linux-foundation.org,
+        pbonzini@redhat.com, shuah@kernel.org, viro@zeniv.linux.org.uk,
+        brauner@kernel.org, muchun.song@linux.dev, hughd@google.com,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, jack@suse.cz, jannh@google.com,
+        ryan.roberts@arm.com, jthoughton@google.com, peterx@redhat.com,
+        graf@amazon.de, jgowans@amazon.com, roypat@amazon.co.uk,
+        derekmn@amazon.com, nsaenz@amazon.es, xmarcalx@amazon.com
+Subject: Re: [PATCH v3 0/6] KVM: guest_memfd: support for uffd minor
+Message-ID: <4a32724c-0891-4ce5-81b1-dfce9cfb91f2@lucifer.local>
+References: <20250404154352.23078-1-kalyazin@amazon.com>
+ <2iggdfimgfke5saxs74zmfrswgrxmmsyxzphq4mdfpj54wu4pl@5uiia4pzkxem>
+ <e8abe599-f48f-4203-8c60-9ee776aa4a24@amazon.com>
+ <63j2cdjh6oxzb5ehtetiaolobp6zzev7emgqvvfkf5tuwlnspx@7h5u4nrqwvsc>
+ <ba93b9c1-cb2b-442f-a4c4-b5530e94f88a@amazon.com>
+ <2bohfxnbthvf3w4kz5u72wj5uxh5sb5s3mbhdk5eg2ingkpkqg@ylykphugpydy>
+ <9326367c-977d-4d55-80bd-f1ad3673f375@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9326367c-977d-4d55-80bd-f1ad3673f375@redhat.com>
+X-ClientProxiedBy: LO4P123CA0513.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:272::23) To DM4PR10MB8218.namprd10.prod.outlook.com
+ (2603:10b6:8:1cc::16)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250213161426.102987-13-steven.price@arm.com>
-X-Gm-Spam: 0
-X-Gm-Phishy: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR10MB8218:EE_|DS0PR10MB6248:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5e63e45d-4358-4756-8c31-08dd75e6e786
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?K/RboZbU7CJijmCS6KIXggbukKA/Y3cTDNz6Md3eI+AZ4YWlKFQeDiurmsvr?=
+ =?us-ascii?Q?ZQT5odO/GKCvjfhsgdTlEfQs8VGm9aeT0wlNJ7IVJNVZ+OD2JmIyP9+5nXIk?=
+ =?us-ascii?Q?YJWyUbmvZzn8GWrY+Aao16YJ3vE6LovBIJTF74+nOXSRRY51kep2SvJza7op?=
+ =?us-ascii?Q?LCNVIdoTKaaUmyFBX1sd5y/2I1t+ZlSGAAe63XxZDAQBwCro3oohYFU6qAD4?=
+ =?us-ascii?Q?Tl9tOSmHGoy9mY4hd9UcyGuHrQLwM7W/SQgW1paia0MY5kdP/WpvmrOLjxE3?=
+ =?us-ascii?Q?Qi+WH+Iygj+ikRFmXMEtIL0UpNJgbbxBNLkFoYqF4FdNHBsbursZcMIiKxKd?=
+ =?us-ascii?Q?gqriSlozycYa1+8DLOyxxevzyeYuR1F3e9OYYh5AxuW/cWLIowhtmf4TIm6i?=
+ =?us-ascii?Q?LyzhFUHNVcBQW0A//UZLY3bfJaxFEt7r0OaVu0n0qZ94Xh+HKKJxMjY6FuTJ?=
+ =?us-ascii?Q?pVhalx6qMkZViuVnvLDf1f8o0stP2u0a8VA38QHjjtwxgpFW9n/GEvTJVRQr?=
+ =?us-ascii?Q?6wvwwk5B2ID1u2RUXzHq5/iW3KvMe+b+8Vs8jWsSGevf0OTVgPZ+KcELEmS/?=
+ =?us-ascii?Q?3CM0fXzp335Ilc9Bc4hrwrdlLpYM9sHgws9sy/RAd2bFnXreL+l0VI6jgQ5V?=
+ =?us-ascii?Q?GDnWILvOVfwgqNOB1ivOtAtAuK+vfS6Lk9OyKKlPJMlobV8ayqdih2aOMKIS?=
+ =?us-ascii?Q?lL8g6mDwzSgGd8DO9h4CDvrL+5meo8X9XXaksseS7YUtdDRSWlyDITrKGbLC?=
+ =?us-ascii?Q?tsrILE7NNHJL/U5xEX2u5Q0FJB11GCYs5PmcW6gGc4CyDzS+gNu+6WUDlmzg?=
+ =?us-ascii?Q?lirB+RWzygDwXWrIBVP88ttrBZtW/c9WfuG/VOnxUvbEkX+AdCwz5+maZq4w?=
+ =?us-ascii?Q?9JmRx3rT4dewX6XHiMbZgfHcMoT1w26kBumhwdJ/MwG1PzBhcHzTVyMmwkja?=
+ =?us-ascii?Q?8I8wOErCAw73MHV2FZWr8gohlg5eiJHmWIPi1IrlhEPMKi5NtOHs00ncCcXc?=
+ =?us-ascii?Q?iGI92wTs9L1AVsekNj3pv9AuTZMiwjYcFfQFkydAxtTar2eKzR++N2E9jbri?=
+ =?us-ascii?Q?7yJ2cHrU4Yb5Psa/a4eP8VO5uNGvoMQg5RWFnmXMsSc+i88+xTIGaBHjblZN?=
+ =?us-ascii?Q?kgUWMlJid8OcByY9cDVhCvBIA6OlLB9xeSgdD1OUcr8w/bnTiUw8DXGx/6Rg?=
+ =?us-ascii?Q?+jbMjv6TMb5oESI5evcy6OZ+qogQ0Vv/UTBZB40AsMcARQy9PfnOeGz/v62n?=
+ =?us-ascii?Q?s3l20sFauA31vZSOPVaRmPZLY2qlFFQaMPBigQAmCuJI4wMv2fQSdZUwivQp?=
+ =?us-ascii?Q?+YFgRqeiZMVQEUkSRD18vZ4b+9gEWGH0iVz9H950DK3jt7m7Z3y65DQappod?=
+ =?us-ascii?Q?8AIBqVCXRde4gGyFxKAkqnVVt42n?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR10MB8218.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?QsV3Achm51duLaBfqdlM7/8/LBz0+694e5ux84ByfreSTNS3yfqqpjhFFFDQ?=
+ =?us-ascii?Q?xXo3A9Zu1dszwmq5uj1F/aIAjpD9bNcfjQv9wU0bl4aDTkq80u49pt+4OALp?=
+ =?us-ascii?Q?rYfb2JdccroDLwTBzhcRPDz4nLxin7LUBUhc1LZBen9PJdKoyiVhS0GVACGL?=
+ =?us-ascii?Q?Pv5FXQNM1gq25XEaTafGMOG5g2m+zFyFGnnq/5bmdcypI9401wlaEPlDj+Rk?=
+ =?us-ascii?Q?9jyhHhoGBrMMOLvQfXKL0BTn1gqseYa+85qhTPSxpoqKplAuXJfiuGR4865+?=
+ =?us-ascii?Q?QffNCXmr05dMpvB3cIRDiz7xOhZfPxdEQrso9oSIQ04WC6iJLiCUO270i86Y?=
+ =?us-ascii?Q?TTsxMNx+V05FNSHyq+B7fDus8PFvUm2d7Lyo/GwYRssnuPJGE+8T0BR15SCf?=
+ =?us-ascii?Q?l0QsniiLx1xDt1OzXxaEFpiOqx3RtUwiCDwhtbWtRLYR6JNphauqK3iWWaGf?=
+ =?us-ascii?Q?sI5EewEbqCqmpTgAWTyMhmh0JNpDAefg2xGV4mayxmFreti5UnXDkgkCMK2s?=
+ =?us-ascii?Q?mwM36B1bFiHwUembo62bx0DgxZ60RnF2X/MWOJfHhj9hDBFrhyKuPrnlSa0a?=
+ =?us-ascii?Q?TyUIw8t3BygitS6QFMawAQBC2E4k+V5HRg9mmi281kP8MIL15u2KqSO//CJN?=
+ =?us-ascii?Q?96XN1xc7KqoyqTAOuJivmWEjOMK3Yijevrj0IIUO6dmOk5EXTiqMWoa3o4bg?=
+ =?us-ascii?Q?VI1vnzK7wVUbBD7pALvcpTF/ntHb1LRCvY80dMg9D2EWzwqGKoDFc9ttBKdg?=
+ =?us-ascii?Q?5UkXDx0THYqSdQUje2qVuZ6XNbxd0Fp0XZqIo+j8r7iqn/YFkugCMzVZO1JO?=
+ =?us-ascii?Q?7h0oSVzzAsjqPYPAx511rTEwbTvh6HUtGif/MH1LF/GsB4G0WliEhgw170b5?=
+ =?us-ascii?Q?CjIqviM4ABLR5aOox0xZA2BJ3grrY6upgoHxNQHfH/EWWMWCH+z9/nqPnO0m?=
+ =?us-ascii?Q?aW6qYJzHvfF2gGyvTGUH6NvRx2aanQvqnlwkYYnQTgum2zYLwu6ODRY9ejCm?=
+ =?us-ascii?Q?9UhTTeBCOpedLAnCwKffa/jNB/vhT/L8dSzw435AjH8e6yPp5hnMHGoEvaUU?=
+ =?us-ascii?Q?kXeK53TsIPkrzlLnTIMZDSpT1mH6MZcQCrPbfXerCzMQgSS/64Bt2x/v8tb/?=
+ =?us-ascii?Q?/AgFEwEvQvcLs7aJM1gZMgtfNkAfk55QjMPk3db1mB6FrylbKCBogvv5KlqV?=
+ =?us-ascii?Q?oALqObb2+DixyJl5hEgRVvK0ShkJiozQ86OqlCWFCxhyrav3SOHzmbK5Tugl?=
+ =?us-ascii?Q?3ABeMEwJpxEo+taf8dX2vc6KJzFb9Me9FsWgFso1qwcgkdkL6Gj/3dke05rr?=
+ =?us-ascii?Q?slyFkUHIbNtNY1IlKFMq5Lmu4JOERcqPwW/idTqshvVny5QlEuXwCiMih3qE?=
+ =?us-ascii?Q?Lv3ClWeXvDHfgpQKuUNdUHW7yFJI9gWH0HBTTLuwkctOsCc3nlPi7fqsTIc7?=
+ =?us-ascii?Q?MpP8Iw3wJJrAD81/jtH7LrnLs+aAbA3ZYztMOqDjIT8yzUrOhp6FKCXGm7Vo?=
+ =?us-ascii?Q?oiyuHHFyzDLUBRV7CPDuB2+kE0Zll5DkMnvkXFraSgmQSlaOHT54q4jXbYJk?=
+ =?us-ascii?Q?atm4D0Zg9sWHhEgP/yETytBuo2TV6N5RyAj6zqqhqcy/itxdToi+vzI7HB8k?=
+ =?us-ascii?Q?hQ=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	rr8yEqMLrBo6OPuDBq4moPj4jCQLp/07EPTNTGYfAWjkbwNU6Bvy0EFxRwNB8y3uIFQ61/yq3mQXEH7pZEhee5X4OeRgG1ra+mQBAlqERCv1xrfQ3dtGB88FAmxiRpFDw8cKv7AkL1vGDYUA3TJsFc/twTC1ctmUFEQNTuv+tGLk7SlpI+IXMTjmlFMKnQUgDBtMoH0IV+LqpFyJWShQMVOJreMQdv3Vp3IWh57qxqeHCRE6CRDr6WGznX2exy07uN0FoaxiL+oZ5YyTbpFsoaLODmKZC0k8hyjKkKFL6ipan40Sman3iu+nI7AGKRm3RwD/RydYTfEzYupqWMXnDbUfNMd+G4fODwKj267vGYEZYiV8TLRo2+Zprwy6obbWgIf4AKkjf0kIWZrxjiooi06eUaRHqjrRH9Hd/hFnDtPtYsMTSHGOITbjvaecem+Y1S7qoRlcgFQseHfPqBQq3v5PHsDKvECeYXtDGKGsm74yrdCcu5Sw5GFdLNW41XlV2DBdHluOvWHlmcCU7g93FnFaxsWgIEG6wubUvMyK8nLpFbyHsB5I8EC1KBSMnfZyMrRoxTil0Gf/WlTAo+6Bz6ztrXnyUaMWqlZcpbpZnTE=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5e63e45d-4358-4756-8c31-08dd75e6e786
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR10MB8218.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Apr 2025 15:14:34.6005
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: pVzdUprJQV0S+EZCzmlj1Ti86Okeazb7ce4x4RyDGbvmWxD6t5KL6z8wsU/HiqF7XgAIad8Z6kUqw0Sw7OcnD+hG5BlXU3MiDkhUB8hWOUg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB6248
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-04-07_04,2025-04-03_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 spamscore=0
+ mlxlogscore=999 phishscore=0 bulkscore=0 adultscore=0 malwarescore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2502280000 definitions=main-2504070106
+X-Proofpoint-ORIG-GUID: UVN_UlojEaQQ8Ex5st0MFMwyTcKwUcSv
+X-Proofpoint-GUID: UVN_UlojEaQQ8Ex5st0MFMwyTcKwUcSv
 
-Hi Steven,
+On Mon, Apr 07, 2025 at 04:46:48PM +0200, David Hildenbrand wrote:
+> On 07.04.25 16:24, Liam R. Howlett wrote:
+> > * Nikita Kalyazin <kalyazin@amazon.com> [250407 10:05]:
+> > >
+> >
+> > ...
+> >
+> > > >
+> > > > All of this is extremely confusing because the onus of figuring out what
+> > > > the final code will look like is put on the reviewer.  As it is, we have
+> > > > issues with people not doing enough review of the code (due to limited
+> > > > time).  One way to get reviews is to make the barrier of entry as low as
+> > > > possible.
+> > > >
+> > > > I spent Friday going down a rabbit hole of patches referring to each
+> > > > other as dependencies and I gave up.  It looks like I mistook one set of
+> > > > patches as required vs them requiring the same in-flight ones as your
+> > > > patches.
+> > > >
+> > > > I am struggling to see how we can adequately support all of you given
+> > > > the way the patches are sent out in batches with dependencies - it is
+> > > > just too time consuming to sort out.
+> > >
+> > > I'm happy to do whatever I can to make the review easier.  I suppose the
+> > > extreme case is to wait for the dependencies to get accepted, effectively
+> > > serialising submissions, but that slows the process down significantly.  For
+> > > example, I received very good feedback on v1 and v2 of this series and was
+> > > able to address it instead of waiting for the dependency.  Would including
+> > > the required patches directly in the series help?  My only concern is in
+> > > that case the same patch will be submitted multiple times (as a part of
+> > > every depending series), but if it's better, I'll be doing that instead.
+> >
+> > Don't resend patches that someone else is upstreaming, that'll cause
+> > other problems.
+> >
+> > Three methods come to mind:
+> >
+> > 1. As you stated, wait for the dependencies to land.  This is will mean
+> > what you are working against is well tested and won't change (and you
+> > won't have to re-spin due to an unstable base).
+> >
+> > 2. Combine them into a bigger patch set.  I can then pull one patch set
+> > and look at the parts of interest to the mm side.
+> >
+> > 3. Provide a git repo with the necessary changes together.
+> >
+> > I think 2 and 3 together should be used for the guest_memfd patches.
+> > Someone needs to be managing these to send upstream.  See the discussion
+> > in another patch set on guest_memfd here [1].
+>
+> The issue is that most extensions are fairly independent from each other,
+> except that they built up on Fuad's mmap support,
+>
+> Sending all together as one thing might not be the best option.
+>
+> Once basic mmap support is upstream, some of the extensions (e.g., directmap
+> removal) can go in next.
+>
+> So until that is upstream, I agree that tagging the stuff that builds up on
+> that is the right thing to do, and providing git trees is another very good
+> idea.
+>
+> I'll prioritize getting Fuad's mmap stuff reviewed. (I keep saying that, I
+> know)
 
-On Thu, Feb 13, 2025 at 04:13:52PM +0000, Steven Price wrote:
-> The RMM maintains a data structure known as the Realm Execution Context
-> (or REC). It is similar to struct kvm_vcpu and tracks the state of the
-> virtual CPUs. KVM must delegate memory and request the structures are
-> created when vCPUs are created, and suitably tear down on destruction.
-> 
-> RECs must also be supplied with addition pages - auxiliary (or AUX)
-> granules - for storing the larger registers state (e.g. for SVE). The
-> number of AUX granules for a REC depends on the parameters with which
-> the Realm was created - the RMM makes this information available via the
-> RMI_REC_AUX_COUNT call performed after creating the Realm Descriptor (RD).
-> 
-> Note that only some of register state for the REC can be set by KVM, the
-> rest is defined by the RMM (zeroed). The register state then cannot be
-> changed by KVM after the REC is created (except when the guest
-> explicitly requests this e.g. by performing a PSCI call). The RMM also
-> requires that the VMM creates RECs in ascending order of the MPIDR.
-> 
-> See Realm Management Monitor specification (DEN0137) for more information:
-> https://developer.arm.com/documentation/den0137/
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v6:
->  * Avoid reporting the KVM_ARM_VCPU_REC feature if the guest isn't a
->    realm guest.
->  * Support host page size being larger than RMM's granule size when
->    allocating/freeing aux granules.
-> Changes since v5:
->  * Separate the concept of vcpu_is_rec() and
->    kvm_arm_vcpu_rec_finalized() by using the KVM_ARM_VCPU_REC feature as
->    the indication that the VCPU is a REC.
-> Changes since v2:
->  * Free rec->run earlier in kvm_destroy_realm() and adapt to previous patches.
-> ---
->  arch/arm64/include/asm/kvm_emulate.h |   7 ++
->  arch/arm64/include/asm/kvm_host.h    |   3 +
->  arch/arm64/include/asm/kvm_rme.h     |  18 +++
->  arch/arm64/kvm/arm.c                 |  13 +-
->  arch/arm64/kvm/reset.c               |  11 ++
->  arch/arm64/kvm/rme.c                 | 179 +++++++++++++++++++++++++++
->  6 files changed, 229 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 909c5c3b7632..f7b5a78f2e91 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -711,7 +711,14 @@ static inline bool kvm_realm_is_created(struct kvm *kvm)
->  
->  static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
->  {
-> +	if (static_branch_unlikely(&kvm_rme_is_available))
-> +		return vcpu_has_feature(vcpu, KVM_ARM_VCPU_REC);
->  	return false;
->  }
->  
-> +static inline bool kvm_arm_rec_finalized(struct kvm_vcpu *vcpu)
-> +{
-> +	return vcpu->arch.rec.mpidr != INVALID_HWID;
-> +}
-> +
->  #endif /* __ARM64_KVM_EMULATE_H__ */
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 992eb2a6f56f..016d0685958d 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -803,6 +803,9 @@ struct kvm_vcpu_arch {
->  
->  	/* Per-vcpu CCSIDR override or NULL */
->  	u32 *ccsidr;
-> +
-> +	/* Realm meta data */
-> +	struct realm_rec rec;
->  };
->  
->  /*
-> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
-> index 698bb48a8ae1..5db377943db4 100644
-> --- a/arch/arm64/include/asm/kvm_rme.h
-> +++ b/arch/arm64/include/asm/kvm_rme.h
-> @@ -6,6 +6,7 @@
->  #ifndef __ASM_KVM_RME_H
->  #define __ASM_KVM_RME_H
->  
-> +#include <asm/rmi_smc.h>
->  #include <uapi/linux/kvm.h>
->  
->  /**
-> @@ -65,6 +66,21 @@ struct realm {
->  	unsigned int ia_bits;
->  };
->  
-> +/**
-> + * struct realm_rec - Additional per VCPU data for a Realm
-> + *
-> + * @mpidr: MPIDR (Multiprocessor Affinity Register) value to identify this VCPU
-> + * @rec_page: Kernel VA of the RMM's private page for this REC
-> + * @aux_pages: Additional pages private to the RMM for this REC
-> + * @run: Kernel VA of the RmiRecRun structure shared with the RMM
-> + */
-> +struct realm_rec {
-> +	unsigned long mpidr;
-> +	void *rec_page;
-> +	struct page *aux_pages[REC_PARAMS_AUX_GRANULES];
-> +	struct rec_run *run;
-> +};
-> +
->  void kvm_init_rme(void);
->  u32 kvm_realm_ipa_limit(void);
->  
-> @@ -72,6 +88,8 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
->  int kvm_init_realm_vm(struct kvm *kvm);
->  void kvm_destroy_realm(struct kvm *kvm);
->  void kvm_realm_destroy_rtts(struct kvm *kvm, u32 ia_bits);
-> +int kvm_create_rec(struct kvm_vcpu *vcpu);
-> +void kvm_destroy_rec(struct kvm_vcpu *vcpu);
->  
->  static inline bool kvm_realm_is_private_address(struct realm *realm,
->  						unsigned long addr)
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 917ee7c674f5..a6a3034a2f50 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -496,6 +496,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  	/* Force users to call KVM_ARM_VCPU_INIT */
->  	vcpu_clear_flag(vcpu, VCPU_INITIALIZED);
->  
-> +	vcpu->arch.rec.mpidr = INVALID_HWID;
-> +
->  	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
->  
->  	/* Set up the timer */
-> @@ -1433,7 +1435,7 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
->  	return -EINVAL;
->  }
->  
-> -static unsigned long system_supported_vcpu_features(void)
-> +static unsigned long system_supported_vcpu_features(struct kvm *kvm)
->  {
->  	unsigned long features = KVM_VCPU_VALID_FEATURES;
->  
-> @@ -1454,6 +1456,9 @@ static unsigned long system_supported_vcpu_features(void)
->  	if (!cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
->  		clear_bit(KVM_ARM_VCPU_HAS_EL2, &features);
->  
-> +	if (!kvm_is_realm(kvm))
-> +		clear_bit(KVM_ARM_VCPU_REC, &features);
-> +
->  	return features;
->  }
->  
-> @@ -1471,7 +1476,7 @@ static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
->  			return -ENOENT;
->  	}
->  
-> -	if (features & ~system_supported_vcpu_features())
-> +	if (features & ~system_supported_vcpu_features(vcpu->kvm))
->  		return -EINVAL;
->  
->  	/*
-> @@ -1493,6 +1498,10 @@ static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
->  	if (test_bit(KVM_ARM_VCPU_HAS_EL2, &features))
->  		return -EINVAL;
->  
-> +	/* RME is incompatible with AArch32 */
-> +	if (test_bit(KVM_ARM_VCPU_REC, &features))
-> +		return -EINVAL;
-> +
->  	return 0;
->  }
->  
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index 803e11b0dc8f..a6423ef20144 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -137,6 +137,11 @@ int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature)
->  			return -EPERM;
->  
->  		return kvm_vcpu_finalize_sve(vcpu);
-> +	case KVM_ARM_VCPU_REC:
-> +		if (!kvm_is_realm(vcpu->kvm) || !vcpu_is_rec(vcpu))
-> +			return -EINVAL;
-> +
-> +		return kvm_create_rec(vcpu);
->  	}
->  
->  	return -EINVAL;
-> @@ -147,6 +152,11 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu)
->  	if (vcpu_has_sve(vcpu) && !kvm_arm_vcpu_sve_finalized(vcpu))
->  		return false;
->  
-> +	if (kvm_is_realm(vcpu->kvm) &&
-> +	    !(vcpu_is_rec(vcpu) && kvm_arm_rec_finalized(vcpu) &&
-> +	      READ_ONCE(vcpu->kvm->arch.realm.state) == REALM_STATE_ACTIVE))
-> +		return false;
-> +
->  	return true;
->  }
->  
-> @@ -159,6 +169,7 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
->  		kvm_unshare_hyp(sve_state, sve_state + vcpu_sve_state_size(vcpu));
->  	kfree(sve_state);
->  	kfree(vcpu->arch.ccsidr);
-> +	kvm_destroy_rec(vcpu);
->  }
->  
->  static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
-> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> index f5d79efee454..0aa1f29b0610 100644
-> --- a/arch/arm64/kvm/rme.c
-> +++ b/arch/arm64/kvm/rme.c
-> @@ -474,6 +474,185 @@ void kvm_destroy_realm(struct kvm *kvm)
->  	kvm_free_stage2_pgd(&kvm->arch.mmu);
->  }
->  
-> +static void free_rec_aux(struct page **aux_pages,
-> +			 unsigned int num_aux)
-> +{
-> +	unsigned int i, j;
-> +	unsigned int page_count = 0;
-> +
-> +	for (i = 0; i < num_aux;) {
-> +		struct page *aux_page = aux_pages[page_count++];
-> +		phys_addr_t aux_page_phys = page_to_phys(aux_page);
-> +		bool undelegate_failed = false;
-> +
-> +		for (j = 0; j < PAGE_SIZE && i < num_aux; j += RMM_PAGE_SIZE) {
-> +			if (WARN_ON(rmi_granule_undelegate(aux_page_phys)))
-> +				undelegate_failed = true;
-> +			aux_page_phys += RMM_PAGE_SIZE;
-> +			i++;
-> +		}
-> +		if (!undelegate_failed)
-> +			__free_page(aux_page);
-> +	}
-> +}
-> +
+Which series is this? Sorry maybe lost track of this one.
 
-Just a small stylistic comment:
-I feel it can be slightly clearer if the double negative
-
-bool undelegate_failed = false;
-
-can be just:
-bool undelegate_succeeded = true;
-
-with the other true/false flipped, the if condition also won't need to be
-negated.
-
-Thanks,
-Wei-Lin Chang
-
-> +static int alloc_rec_aux(struct page **aux_pages,
-> +			 u64 *aux_phys_pages,
-> +			 unsigned int num_aux)
-> +{
-> +	struct page *aux_page;
-> +	int page_count = 0;
-> +	unsigned int i, j;
-> +	int ret;
-> +
-> +	for (i = 0; i < num_aux;) {
-> +		phys_addr_t aux_page_phys;
-> +
-> +		aux_page = alloc_page(GFP_KERNEL);
-> +		if (!aux_page) {
-> +			ret = -ENOMEM;
-> +			goto out_err;
-> +		}
-> +
-> +		aux_page_phys = page_to_phys(aux_page);
-> +		for (j = 0; j < PAGE_SIZE && i < num_aux; j += RMM_PAGE_SIZE) {
-> +			if (rmi_granule_delegate(aux_page_phys)) {
-> +				ret = -ENXIO;
-> +				goto err_undelegate;
-> +			}
-> +			aux_phys_pages[i++] = aux_page_phys;
-> +			aux_page_phys += RMM_PAGE_SIZE;
-> +		}
-> +		aux_pages[page_count++] = aux_page;
-> +	}
-> +
-> +	return 0;
-> +err_undelegate:
-> +	while (j > 0) {
-> +		j -= RMM_PAGE_SIZE;
-> +		i--;
-> +		if (WARN_ON(rmi_granule_undelegate(aux_phys_pages[i]))) {
-> +			/* Leak the page if the undelegate fails */
-> +			goto out_err;
-> +		}
-> +	}
-> +	__free_page(aux_page);
-> +out_err:
-> +	free_rec_aux(aux_pages, i);
-> +	return ret;
-> +}
-> +
-> +int kvm_create_rec(struct kvm_vcpu *vcpu)
-> +{
-> +	struct user_pt_regs *vcpu_regs = vcpu_gp_regs(vcpu);
-> +	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
-> +	struct realm *realm = &vcpu->kvm->arch.realm;
-> +	struct realm_rec *rec = &vcpu->arch.rec;
-> +	unsigned long rec_page_phys;
-> +	struct rec_params *params;
-> +	int r, i;
-> +
-> +	if (kvm_realm_state(vcpu->kvm) != REALM_STATE_NEW)
-> +		return -ENOENT;
-> +
-> +	if (rec->run)
-> +		return -EBUSY;
-> +
-> +	/*
-> +	 * The RMM will report PSCI v1.0 to Realms and the KVM_ARM_VCPU_PSCI_0_2
-> +	 * flag covers v0.2 and onwards.
-> +	 */
-> +	if (!vcpu_has_feature(vcpu, KVM_ARM_VCPU_PSCI_0_2))
-> +		return -EINVAL;
-> +
-> +	BUILD_BUG_ON(sizeof(*params) > PAGE_SIZE);
-> +	BUILD_BUG_ON(sizeof(*rec->run) > PAGE_SIZE);
-> +
-> +	params = (struct rec_params *)get_zeroed_page(GFP_KERNEL);
-> +	rec->rec_page = (void *)__get_free_page(GFP_KERNEL);
-> +	rec->run = (void *)get_zeroed_page(GFP_KERNEL);
-> +	if (!params || !rec->rec_page || !rec->run) {
-> +		r = -ENOMEM;
-> +		goto out_free_pages;
-> +	}
-> +
-> +	for (i = 0; i < ARRAY_SIZE(params->gprs); i++)
-> +		params->gprs[i] = vcpu_regs->regs[i];
-> +
-> +	params->pc = vcpu_regs->pc;
-> +
-> +	if (vcpu->vcpu_id == 0)
-> +		params->flags |= REC_PARAMS_FLAG_RUNNABLE;
-> +
-> +	rec_page_phys = virt_to_phys(rec->rec_page);
-> +
-> +	if (rmi_granule_delegate(rec_page_phys)) {
-> +		r = -ENXIO;
-> +		goto out_free_pages;
-> +	}
-> +
-> +	r = alloc_rec_aux(rec->aux_pages, params->aux, realm->num_aux);
-> +	if (r)
-> +		goto out_undelegate_rmm_rec;
-> +
-> +	params->num_rec_aux = realm->num_aux;
-> +	params->mpidr = mpidr;
-> +
-> +	if (rmi_rec_create(virt_to_phys(realm->rd),
-> +			   rec_page_phys,
-> +			   virt_to_phys(params))) {
-> +		r = -ENXIO;
-> +		goto out_free_rec_aux;
-> +	}
-> +
-> +	rec->mpidr = mpidr;
-> +
-> +	free_page((unsigned long)params);
-> +	return 0;
-> +
-> +out_free_rec_aux:
-> +	free_rec_aux(rec->aux_pages, realm->num_aux);
-> +out_undelegate_rmm_rec:
-> +	if (WARN_ON(rmi_granule_undelegate(rec_page_phys)))
-> +		rec->rec_page = NULL;
-> +out_free_pages:
-> +	free_page((unsigned long)rec->run);
-> +	free_page((unsigned long)rec->rec_page);
-> +	free_page((unsigned long)params);
-> +	return r;
-> +}
-> +
-> +void kvm_destroy_rec(struct kvm_vcpu *vcpu)
-> +{
-> +	struct realm *realm = &vcpu->kvm->arch.realm;
-> +	struct realm_rec *rec = &vcpu->arch.rec;
-> +	unsigned long rec_page_phys;
-> +
-> +	if (!vcpu_is_rec(vcpu))
-> +		return;
-> +
-> +	if (!rec->run) {
-> +		/* Nothing to do if the VCPU hasn't been finalized */
-> +		return;
-> +	}
-> +
-> +	free_page((unsigned long)rec->run);
-> +
-> +	rec_page_phys = virt_to_phys(rec->rec_page);
-> +
-> +	/*
-> +	 * The REC and any AUX pages cannot be reclaimed until the REC is
-> +	 * destroyed. So if the REC destroy fails then the REC page and any AUX
-> +	 * pages will be leaked.
-> +	 */
-> +	if (WARN_ON(rmi_rec_destroy(rec_page_phys)))
-> +		return;
-> +
-> +	free_rec_aux(rec->aux_pages, realm->num_aux);
-> +
-> +	free_delegated_granule(rec_page_phys);
-> +}
-> +
->  int kvm_init_realm_vm(struct kvm *kvm)
->  {
->  	struct realm_params *params;
-> -- 
-> 2.43.0
-> 
+>
+> --
+> Cheers,
+>
+> David / dhildenb
+>
 
