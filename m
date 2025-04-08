@@ -1,305 +1,281 @@
-Return-Path: <kvm+bounces-42957-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42958-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E585A813D6
-	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 19:40:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 510D2A8141A
+	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 19:54:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E9392189B39C
-	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 17:40:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 093303B27DD
+	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 17:51:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C464723C8C8;
-	Tue,  8 Apr 2025 17:40:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3C8623ED74;
+	Tue,  8 Apr 2025 17:51:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="DvaE8+zZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PQac4EFn"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2083.outbound.protection.outlook.com [40.107.93.83])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3791622DFA4
-	for <kvm@vger.kernel.org>; Tue,  8 Apr 2025 17:39:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.83
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744134000; cv=fail; b=oLh3c7ClAD1mgalLPCa/2hmwj4ohuTbjAzUSMsJiGqR7l26R7dSZgHt10rGUjHnRxndhquVaPPcz/gS3JwuCY36jGbeP603LR3ZA+zxhf7WuQuXaL00+zzlwXhqlF3RiYriYPa+/aSisIYP4UrnGO6eUNZ3cDTGtmxgfeD+rQJY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744134000; c=relaxed/simple;
-	bh=c7FBrr6tRJPjEgmNrRlM+GelfsvTx3ddvWWt4c826Jc=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=dsLJGpohEhHvXtSgHL/+qdWdWk8f9Lp1ipnm7zC23DDEgNZtLAWWZznNVxChiqql9TkBAKTYoXMCFT9ez2vAZ3dtFNLRmSdd3hAPGPqafWqFtuJGCilH1evacnoVXVTPsMmfD5q/SYGy/QOmEb8AQbfnUOT9NzZjurzEPhtgtzY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=DvaE8+zZ; arc=fail smtp.client-ip=40.107.93.83
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gFJ2/9eu3iOTTjJGS06kTxYz20n7yedoJbvEqfNQNmWS95al/kpLGCQAtC3E1vr2puzy/2Xt+t39Bp61+5TIwkpVe8uPdZjLV8MquQ3uMJD4U9t51JYbp+D1uBTuIJDAd7XsLBuyQYj799rFVom4AQY8G4HiUSN72lvdRXmCgVeYBH5qynJJC5l4Vm8325ZXu5n7Hm3E8GKFUId2nlEiGddItw7bDSYHkUwMGVMSP67TqAXQZJp5PCqGPmmLooJur3Nl7e7DGwMyJrlxVK/L9i4WYnDFuwAW5VSZMPfsgXKGxCWDljgkR6S4P6KqIDX3wqgWdYBdoZbV6THlXJ1BUg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Qeto7JpwEfgNdhwIGSEFwtOCpY34nqf9PbPp49AWhXc=;
- b=CJLaDb+saYhSetGghdp8Sy41r7wuyXCB+IipEaKD4vyVIfpgm0JNswIY7YIoOQIZpS236vMO4hXWlzBf5JdoGXKe+aKcJppxFmsEi8e23r8qoH47rzbcjcGWgLVlZGRoNp+piZ9q0eL2tiqZMHgm+UMod1J399uQeQ7vNfbNcdFo/s2B7N6WDqPQtyxlXLGy8SF44cmaH+wqS1QINi7JexKSPrXkn17B06tPne9JSFXVWMqxzydRG6qp4vKG1cBy0JHFjFl30rVGQlSSDrf4C5Z5VA3bLoSthMRnwdo9mtMuX+cq/NhDowmX5MsFZ+lXovzA00maceNgvru9KSN36Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Qeto7JpwEfgNdhwIGSEFwtOCpY34nqf9PbPp49AWhXc=;
- b=DvaE8+zZ9IauA+Thv8C9O50t3h9AXajwMEvRTC/gCYQmRQvMkbuE/R6S2Fk610ksIFqNy0h2FFrylm2ZVrsapCmz1ho1oYMfx7PNy9weNFNeQyH11WeT7biHxPqARiCYYWdXWFeNqSUrurKBq8K8ntVf09nMBA+OFhBFLd3hQ9a3OUWYc5DCMznfpnc6P/wdk8zcDQ4SSME30ILc21nauJr0mUxMNLzYSKAqr/XO0IrP8VPWFL8HPXqWwGRwLIWoc+5s1aJT8zhGCY8ttvbSKHari5M3GVH3hRosZ4JIy7WxcVy5oOCAV9KZcWcU9V5uEPtamkVThuVTXAjGjgx7mw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by MW4PR12MB6803.namprd12.prod.outlook.com (2603:10b6:303:20e::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.31; Tue, 8 Apr
- 2025 17:39:53 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.8606.028; Tue, 8 Apr 2025
- 17:39:53 +0000
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Alex Williamson <alex.williamson@redhat.com>,
-	iommu@lists.linux.dev,
-	kvm@vger.kernel.org
-Cc: patches@lists.linux.dev
-Subject: [PATCH] vfio/type1: Remove Fine Grained Superpages detection
-Date: Tue,  8 Apr 2025 14:39:52 -0300
-Message-ID: <0-v1-0eed68063e59+93d-vfio_fgsp_jgg@nvidia.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BLAPR05CA0018.namprd05.prod.outlook.com
- (2603:10b6:208:36e::13) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1980B23E34B
+	for <kvm@vger.kernel.org>; Tue,  8 Apr 2025 17:51:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744134692; cv=none; b=NVgMIegkzDVA4YeqIrwnye1hXYb3RdLtBQOBAM3wYsn2qGVPcgoIFjiWat7MVgyVx6LSMgejLGA4vhtNGBHnK54hTHK4cebZKRWvDnXrJ2c/JW+SE+OyY3tIItvTSys4LA3R92pI9gFwxpIzoERTLZn16fbPMqWG6vPLXwjjaXg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744134692; c=relaxed/simple;
+	bh=O9yVBnVA0VV37RgA5y4nQzjG05tKLNm5p8JUvBWBnOU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=j5rVZDecATcoO+UHMRpTSubewMf7CwdD7vsecxrGFmCTflY8fErMhvfgJfvq8RR7O81THRP27ppfu5zp6WERGP2HB3Xi6TOJdHHHqYTRf5VK4f9BCXSjRRlfyg0SQGKqZMlQiiM/xuaEybQAmOaFdZ40+aIJZ41jSGNjJsNIic0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PQac4EFn; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744134689;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=jVmRUiQDLWJ203tqLnD/OuMwczvhDUm4XHoxY85XOIs=;
+	b=PQac4EFnCGphPfQxnflW2uO0RsuTanvFT+Sq0DWMQv5kBCRkHzJCOoK8Wrenu7tduSPk3I
+	34GyKMNlQUGVCHPq71kRXAd9/Hk6TmPzelVS89SYy3NL9RSndJrXRPkjsWwT3VCdHgy6p7
+	PPIri5LX4hWjsYKg6opoH6qBxskse28=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-642-rbOwR_orMxCz1oKTqlrl9g-1; Tue, 08 Apr 2025 13:51:28 -0400
+X-MC-Unique: rbOwR_orMxCz1oKTqlrl9g-1
+X-Mimecast-MFC-AGG-ID: rbOwR_orMxCz1oKTqlrl9g_1744134687
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-ac3d175fe71so394895766b.0
+        for <kvm@vger.kernel.org>; Tue, 08 Apr 2025 10:51:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744134687; x=1744739487;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jVmRUiQDLWJ203tqLnD/OuMwczvhDUm4XHoxY85XOIs=;
+        b=Hi4aNCP2onimMYKuFsczM8i5EyiokSMdC36TGDH0WK0pbXy9wXYNZVekcHiwibL4Zr
+         nJW9Vlo2ydV8LYUYBwxv+OQs7BoEUmCJoqUY+aVwo66UtYHSMIEad76Q5f+4dnMBwURr
+         IgZ0QDKXfkP14t92PTgd3cSt8/Ce6jqQkMQlxghN8PkhD41fSqpuklsR38jRMX00iDHe
+         sKIFJHPsh4jtmH6gl8R8ITxR5FuBjpvZ4/iEpez5Dnr3PZjESYzmGthMX74xv/LpRpKf
+         gWMQ3ZfJNWe5o/HxcnP7r8+etOdZTxslHtXKfxWm84Qon3jOf5makPuhg7gks1ODhu3s
+         7NQg==
+X-Gm-Message-State: AOJu0YxTLeY4Jf/bhzY/RlnvgbvVkM6lhCYfxQxRoEQECohQw7QMWCWj
+	gmyU0yLNRxDgfu+a9YEqY/SYWkq5dIG5NIyfoCRSiEfCNBUH5jbS61K0x5UWWauZ/dzZ/Jzk+3D
+	SbULwPmK+PUXBzYcJj1rwiTieLieUvfHkSaaViKr6jzbqJIOm9g==
+X-Gm-Gg: ASbGncvc3kGMnrpTm68yKzLIXUSSHJVABnrNQ0W0MjYTdnC3XFBiL6iGdzuyYLJKT06
+	932gCKciJYzsz91DcGRX5vEDzyh+vDKcolZuM0692HKlAjeHdbVBppF0pFClxvFDfpK4Y4laXSX
+	nofffPhgghc0zuIbnqIGJj/d+m7PKdLsr55eAHxfaXrqxKyHqXaLw89mw88shM+UKmYGz1ztMlC
+	ANCoVG9U+F9twhYCDIpIQUOidrvlGZbnhTHmaMdgw89f+9dAVQlQKuHirf/Xi50cL4LgIZUVvS3
+	zQRNTRFTEkjTvDyGpXSI
+X-Received: by 2002:a17:907:3f26:b0:ac7:3817:d8da with SMTP id a640c23a62f3a-aca9b7718b1mr8156266b.52.1744134687060;
+        Tue, 08 Apr 2025 10:51:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGEAzVZ7/qwQFMPt/QXOHxFTFozQku5BHeCETp2tWjKJ3IsbjhXd6GGXO545EnliOM3B7HwGA==
+X-Received: by 2002:a17:907:3f26:b0:ac7:3817:d8da with SMTP id a640c23a62f3a-aca9b7718b1mr8153966b.52.1744134686436;
+        Tue, 08 Apr 2025 10:51:26 -0700 (PDT)
+Received: from [192.168.10.48] ([151.49.197.100])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-ac7bfea10f6sm945030566b.71.2025.04.08.10.51.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Apr 2025 10:51:25 -0700 (PDT)
+Message-ID: <d3bdaa2e-c268-4828-8f85-75fd0f859887@redhat.com>
+Date: Tue, 8 Apr 2025 19:51:24 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|MW4PR12MB6803:EE_
-X-MS-Office365-Filtering-Correlation-Id: f04b4605-487b-4fa3-012a-08dd76c45ee9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?zT2TyPiMtUSlM3Tzvwj096hIVXOuKUKsxP78HAzvfI0ubhr0ni5Mn2JXNGI3?=
- =?us-ascii?Q?2qcsE7dePAHxrmR17RhEpnyNTtVhcMRs04KkIpv3iowed8P7ghC6wO25mnXN?=
- =?us-ascii?Q?a0tVM+bmassA6Yv52kBNEqwSoHQXntKp4fnP9vRjsNVm4Rs0Qiu2Go80fvlF?=
- =?us-ascii?Q?DLeEpAyiNTYWJCvQ65w1jGcigwkg+WoeWAZSLBqgcMn4L88r4ohx50T5+CVS?=
- =?us-ascii?Q?Q4I5YCUanvjGa77HZgWp2tbtlhkz2wuLVYmQUqd55tt23p+LTBAydfYBPpK9?=
- =?us-ascii?Q?s2DBXAziGejvAjiDU5+eqQGx60RZC6flW1Ya1anJgS+XhRTqS5Pp2AmiUBpc?=
- =?us-ascii?Q?UGFXW4zK4Cb1jstwlsb+e4kPhPyts6+v8jY2WZcWdZ1xYsQv481cZjL04/Zi?=
- =?us-ascii?Q?XWoVsAy6AmjOlZwh9HwgurnZpm2mkjKPeHaLQdkiIlZLCwCKm8wk7pCCRBSV?=
- =?us-ascii?Q?JiRLyXlYLQygIge9ifyvoFTIuA5bHKY0UVkM96RRIjF+xIjCEhQhV9c3q9zc?=
- =?us-ascii?Q?fJcxZ5uMsIN1HgN2A1RbnvS2j3PtSBI8K+gJhgOH7encwgC0dRWjF98dglk7?=
- =?us-ascii?Q?sjVrIWB53kr2C9eGKlQTgOwQL+AkfasjEGcRA7z1Wpyr4IGZJ4uPKrqnmshC?=
- =?us-ascii?Q?AnUbmDg70bX6n50bYnLiaTlQrPqm2edsEN+ydzUQqQOq7QXS7axa9OTdbw0m?=
- =?us-ascii?Q?hmYXpMmuI66+6hsplEA22qSFouisGoiUzAH1xCxJw1riby/nZkjYx1qjOzvf?=
- =?us-ascii?Q?ss/or7UlAtKzPkJi2zA6ftwwmf3T5jQWK+wi22B+wUlXB+ezQMY8jQisIIR7?=
- =?us-ascii?Q?kIJBFVzPgE6R/fRiNYkTgd/rCFFwVdN7b/bdyErzwppWkFmeMnOG9FrfxOUi?=
- =?us-ascii?Q?ZCgURKEJ23sbdZe9WoyQNyPq8Vtjvi5VIRDwq6nrGSfDINvSQwQIWnxHw8AT?=
- =?us-ascii?Q?I1nLoK+6/Fz7lUhVsoVmwYvv0yQAcaAppv5rTL6hxcWCeQhdnv4YorSFKaNM?=
- =?us-ascii?Q?p0QAAMbDus8OYNcqUV1RCjeD7HRu6PQIqE0qgPqgylg8CHV4rbgz1eoFrcSW?=
- =?us-ascii?Q?eTTrkdDxC1UVs7XzeYskU56WJSIaw1ATSYoo1RH74td9h4OFmf6akh2A8N8t?=
- =?us-ascii?Q?fmv33TYkZKzFyCqUeLn/r6x2NC941JPqysHuiaI7W4XTyrRtYyIOsrp43+9L?=
- =?us-ascii?Q?l5xMmwcocMt/ZQGGgO6K5BJgG0Z3SIpVkmp6mIpCEOnF0ORth+09r00r36My?=
- =?us-ascii?Q?M7hmu3tgYjT+B3ClOAv6ipe8AnV5qkUKhG5IUvLPYQy+h1d3dHThVwUbYQ9G?=
- =?us-ascii?Q?JEp6/mZqMNgESPHJcEk4q07nO7wUT/mXQC3yWQQav6iANqDwnG5tFjXp8ato?=
- =?us-ascii?Q?YwUv9/++PBzLWW/CRPwlA1nht0CS?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?mSYkisQxZ9i/L5K1cdk3xPS8XjQEvvh2pdNluyjJAyHBBJM6qadlEgZlWPob?=
- =?us-ascii?Q?Zhs92U1w3XB5/jB78iI8JEeU+laoGyxkTexE4P5ivB2Ft4QMPec8I59EAyVe?=
- =?us-ascii?Q?ZI9KEYgWelw2BMA/oLCnoLY8abkgxb666i5XMHBP0XTe+VB/nI8sN7tlwes6?=
- =?us-ascii?Q?mTSZvQkOvg7i2s0nwjKXchjUQA/jzutyWdbtUWNx1ffLVMWzd7VCM5gvKsyQ?=
- =?us-ascii?Q?frFIZmPRVDYGlZm2FHEu6+28yhA6FjRpCWx+14U+CaZFPhtzDDmLxueflU84?=
- =?us-ascii?Q?q8XQf8x5zHY+bV0cAAjnA8jHttwunpzf5WsYCVmTDcXFE3jsrEWsmLbLevW4?=
- =?us-ascii?Q?6GCbUBuP5wi2Jw+HVlHDwNRKHnI8GzeSPhJ3MiEtDPJ/Jj+bqinBUUHNJ3cH?=
- =?us-ascii?Q?C6d/+tIitsAHCmLham57rl1vnsxFhZEVs8utNjX3c7A2OMLVD32xBzWP62nl?=
- =?us-ascii?Q?kIhBwLdtI6u7LQW8dbXbYnq1lMf3oZqwTq+DiKbvXtRi9IJgVWMi25Wzxi7w?=
- =?us-ascii?Q?Y5SKTf70tLvnmXbhfbb98PYaL+nbYNK6Ved9QUXEjI/PU+hQljlj2Ul+0dzp?=
- =?us-ascii?Q?6HwQKcsgFwUR5yq46+5cdE8e9gqklF8Cw2mKEqKt0sngD3Huqnu0A2v1uh7Q?=
- =?us-ascii?Q?ei1hJ42Yz0Hxdoq/om/jyGjYVbI6nIMzvd2FgiWcI/8GZsnI1R4XltyM6ibi?=
- =?us-ascii?Q?pOVF9/BM7mAFmMtSsU2Q/ZeyIGiXgsF5Zs6dBSuEJ5pjqWBrV7ryxyQM4k4L?=
- =?us-ascii?Q?mRTnHs8WUdwsONZS8pkOr9SMfsDAa4pUuVGX4msqNsezLdgywdOHqY5IK82c?=
- =?us-ascii?Q?54EiAvCYZfFfdKDSlUOmy7ogZQ7skHHIQhdZlUvfRD3ZP8TKPrDbwmBy5MNE?=
- =?us-ascii?Q?z/MjBpuTw9KpeB5vSs6TaTIFKjUQw6onUwHJ4SNJTkeeARB2USC4EH8lE6yk?=
- =?us-ascii?Q?GGZAWi3bCLrQboLd8JycJAmfeUgLppLsnka46zKd9cc5pEvOKZwIvZhsP0dR?=
- =?us-ascii?Q?wCmigqL+5uNHt0E8aVmBBiZPtTPrmuL7BHEiW+KmojYGkNVGGYD+Fc/aNxs+?=
- =?us-ascii?Q?qtj7eba51IsFBANL0PilMGrrb8toP+O2IJawvLuyVSj7w1owkdlttO7l0TUJ?=
- =?us-ascii?Q?ezD0hrKPxZSPCJB3GtS/RmR07cTFJ7T9rRyLcVX8B+8x7OqItRtaADIuazPj?=
- =?us-ascii?Q?u4MHreFY8cHoEDNvFu+OUFJaUHyNzJbXwNnMYuQLrYa85nxlaLsOQGgpY31B?=
- =?us-ascii?Q?IqjgkILxMdZPoN15RJH3nRKVGPnSXCByLrVuR3yQ6i9D43KG/FiOwvqPo/wS?=
- =?us-ascii?Q?qlROQZ2ubOt47XVhQ/XYzG/4u3lpe0yy+UItoayG4ugIc8topObruzfSm6qJ?=
- =?us-ascii?Q?6EuFd7Cczm8lvSeUVs6XaD+F+rPtHh8rXbyaMRPhgDbk5QczO30CPxojhHqO?=
- =?us-ascii?Q?F6LMMNx+HhqxxoclwQ5BYPYQM4iIZGZvNTk98bqAj4Ggi5imA19u2er1c/xv?=
- =?us-ascii?Q?n5fIN6xmSgRsPtCQa0h17uIjU9fuKi+VPWm+9Edg+kD4Lr1LuV8KSC8aykb7?=
- =?us-ascii?Q?o72JQ8p0odCqmdR6Pg1LXPiHzw675/QjCS5pDrkW?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f04b4605-487b-4fa3-012a-08dd76c45ee9
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Apr 2025 17:39:53.6390
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: neNXmNWzxcUTEQE9CqjPRem08PpzLPf+zASuArKBdKZf2nDEpVM3KwIHAKq0AsOS
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6803
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 62/67] KVM: SVM: Don't check vCPU's blocking status when
+ toggling AVIC on/off
+To: Sean Christopherson <seanjc@google.com>, Joerg Roedel <joro@8bytes.org>,
+ David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>
+Cc: kvm@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
+ Maxim Levitsky <mlevitsk@redhat.com>,
+ Joao Martins <joao.m.martins@oracle.com>, David Matlack <dmatlack@google.com>
+References: <20250404193923.1413163-1-seanjc@google.com>
+ <20250404193923.1413163-63-seanjc@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <20250404193923.1413163-63-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-VFIO is looking to enable an optimization where it can rely on the
-unmap operation not splitting and returning the size of a larger IOPTE.
+On 4/4/25 21:39, Sean Christopherson wrote:
+> Don't query a vCPU's blocking status when toggling AVIC on/off; barring
+> KVM bugs, the vCPU can't be blocking when refrecing AVIC controls.  And if
 
-However since commits:
-  d50651636fb ("iommu/io-pgtable-arm-v7s: Remove split on unmap behavior")
-  33729a5fc0ca ("iommu/io-pgtable-arm: Remove split on unmap behavior")
+refrecing -> refreshing
 
-There are no iommu drivers that do split on unmap anymore. Instead all
-iommu drivers are expected to unmap the whole contiguous page and return
-its size.
+Paolo
 
-Thus, there is no purpose in vfio_test_domain_fgsp() as it is only
-checking if the iommu supports 2*PAGE_SIZE as a contiguous page or not.
-
-Currently only AMD v1 supports such a page size so all this logic only
-activates on AMD v1.
-
-Remove vfio_test_domain_fgsp() and just rely on a direct 2*PAGE_SIZE check
-instead so there is no behavior change.
-
-Maybe it should always activate the iommu_iova_to_phys(), it shouldn't
-have a performance downside since split is gone.
-
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
----
- drivers/vfio/vfio_iommu_type1.c | 71 +++++++++------------------------
- 1 file changed, 19 insertions(+), 52 deletions(-)
-
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 0ac56072af9f23..529561bbbef98a 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -80,7 +80,6 @@ struct vfio_domain {
- 	struct iommu_domain	*domain;
- 	struct list_head	next;
- 	struct list_head	group_list;
--	bool			fgsp : 1;	/* Fine-grained super pages */
- 	bool			enforce_cache_coherency : 1;
- };
- 
-@@ -1056,6 +1055,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 	LIST_HEAD(unmapped_region_list);
- 	struct iommu_iotlb_gather iotlb_gather;
- 	int unmapped_region_cnt = 0;
-+	bool scan_for_contig;
- 	long unlocked = 0;
- 
- 	if (!dma->size)
-@@ -1079,9 +1079,15 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 		cond_resched();
- 	}
- 
-+	/*
-+	 * For historical reasons this has only triggered on AMDv1 page tables,
-+	 * though these days it should work everywhere.
-+	 */
-+	scan_for_contig = !(domain->domain->pgsize_bitmap & (2 * PAGE_SIZE));
- 	iommu_iotlb_gather_init(&iotlb_gather);
- 	while (iova < end) {
--		size_t unmapped, len;
-+		size_t len = PAGE_SIZE;
-+		size_t unmapped;
- 		phys_addr_t phys, next;
- 
- 		phys = iommu_iova_to_phys(domain->domain, iova);
-@@ -1094,12 +1100,18 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 		 * To optimize for fewer iommu_unmap() calls, each of which
- 		 * may require hardware cache flushing, try to find the
- 		 * largest contiguous physical memory chunk to unmap.
-+		 *
-+		 * If the iova is part of a contiguous page > PAGE_SIZE then
-+		 * unmap will unmap the whole contiguous page and return its
-+		 * size.
- 		 */
--		for (len = PAGE_SIZE;
--		     !domain->fgsp && iova + len < end; len += PAGE_SIZE) {
--			next = iommu_iova_to_phys(domain->domain, iova + len);
--			if (next != phys + len)
--				break;
-+		if (scan_for_contig) {
-+			for (; iova + len < end; len += PAGE_SIZE) {
-+				next = iommu_iova_to_phys(domain->domain,
-+							  iova + len);
-+				if (next != phys + len)
-+					break;
-+			}
- 		}
- 
- 		/*
-@@ -1833,49 +1845,6 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
- 	return ret;
- }
- 
--/*
-- * We change our unmap behavior slightly depending on whether the IOMMU
-- * supports fine-grained superpages.  IOMMUs like AMD-Vi will use a superpage
-- * for practically any contiguous power-of-two mapping we give it.  This means
-- * we don't need to look for contiguous chunks ourselves to make unmapping
-- * more efficient.  On IOMMUs with coarse-grained super pages, like Intel VT-d
-- * with discrete 2M/1G/512G/1T superpages, identifying contiguous chunks
-- * significantly boosts non-hugetlbfs mappings and doesn't seem to hurt when
-- * hugetlbfs is in use.
-- */
--static void vfio_test_domain_fgsp(struct vfio_domain *domain, struct list_head *regions)
--{
--	int ret, order = get_order(PAGE_SIZE * 2);
--	struct vfio_iova *region;
--	struct page *pages;
--	dma_addr_t start;
--
--	pages = alloc_pages(GFP_KERNEL | __GFP_ZERO, order);
--	if (!pages)
--		return;
--
--	list_for_each_entry(region, regions, list) {
--		start = ALIGN(region->start, PAGE_SIZE * 2);
--		if (start >= region->end || (region->end - start < PAGE_SIZE * 2))
--			continue;
--
--		ret = iommu_map(domain->domain, start, page_to_phys(pages), PAGE_SIZE * 2,
--				IOMMU_READ | IOMMU_WRITE | IOMMU_CACHE,
--				GFP_KERNEL_ACCOUNT);
--		if (!ret) {
--			size_t unmapped = iommu_unmap(domain->domain, start, PAGE_SIZE);
--
--			if (unmapped == PAGE_SIZE)
--				iommu_unmap(domain->domain, start + PAGE_SIZE, PAGE_SIZE);
--			else
--				domain->fgsp = true;
--		}
--		break;
--	}
--
--	__free_pages(pages, order);
--}
--
- static struct vfio_iommu_group *find_iommu_group(struct vfio_domain *domain,
- 						 struct iommu_group *iommu_group)
- {
-@@ -2314,8 +2283,6 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 		}
- 	}
- 
--	vfio_test_domain_fgsp(domain, &iova_copy);
--
- 	/* replay mappings on new domains */
- 	ret = vfio_iommu_replay(iommu, domain);
- 	if (ret)
-
-base-commit: 5a7ff05a5717e2ac4f4f83bcdd9033f246e9946b
--- 
-2.43.0
+> there are KVM bugs, ensuring the vCPU and its associated IRTEs are in the
+> correct state is desirable, i.e. well worth any overhead in a buggy
+> scenario.
+> 
+> Isolating the "real" load/put flows will allow moving the IOMMU IRTE
+> (de)activation logic from avic_refresh_apicv_exec_ctrl() to
+> avic_update_iommu_vcpu_affinity(), i.e. will allow updating the vCPU's
+> physical ID entry and its IRTEs in a common path, under a single critical
+> section of ir_list_lock.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/kvm/svm/avic.c | 65 +++++++++++++++++++++++------------------
+>   1 file changed, 37 insertions(+), 28 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index 0425cc374a79..d5fa915d0827 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -838,7 +838,7 @@ static void avic_update_iommu_vcpu_affinity(struct kvm_vcpu *vcpu, int cpu)
+>   		WARN_ON_ONCE(amd_iommu_update_ga(cpu, ir->data));
+>   }
+>   
+> -void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+> +static void __avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>   {
+>   	struct kvm_svm *kvm_svm = to_kvm_svm(vcpu->kvm);
+>   	int h_physical_id = kvm_cpu_get_apicid(cpu);
+> @@ -854,16 +854,6 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>   	if (WARN_ON_ONCE(vcpu->vcpu_id * sizeof(entry) >= PAGE_SIZE))
+>   		return;
+>   
+> -	/*
+> -	 * No need to update anything if the vCPU is blocking, i.e. if the vCPU
+> -	 * is being scheduled in after being preempted.  The CPU entries in the
+> -	 * Physical APIC table and IRTE are consumed iff IsRun{ning} is '1'.
+> -	 * If the vCPU was migrated, its new CPU value will be stuffed when the
+> -	 * vCPU unblocks.
+> -	 */
+> -	if (kvm_vcpu_is_blocking(vcpu))
+> -		return;
+> -
+>   	/*
+>   	 * Grab the per-vCPU interrupt remapping lock even if the VM doesn't
+>   	 * _currently_ have assigned devices, as that can change.  Holding
+> @@ -898,31 +888,33 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>   	spin_unlock_irqrestore(&svm->ir_list_lock, flags);
+>   }
+>   
+> -void avic_vcpu_put(struct kvm_vcpu *vcpu)
+> +void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+> +{
+> +	/*
+> +	 * No need to update anything if the vCPU is blocking, i.e. if the vCPU
+> +	 * is being scheduled in after being preempted.  The CPU entries in the
+> +	 * Physical APIC table and IRTE are consumed iff IsRun{ning} is '1'.
+> +	 * If the vCPU was migrated, its new CPU value will be stuffed when the
+> +	 * vCPU unblocks.
+> +	 */
+> +	if (kvm_vcpu_is_blocking(vcpu))
+> +		return;
+> +
+> +	__avic_vcpu_load(vcpu, cpu);
+> +}
+> +
+> +static void __avic_vcpu_put(struct kvm_vcpu *vcpu)
+>   {
+>   	struct kvm_svm *kvm_svm = to_kvm_svm(vcpu->kvm);
+>   	struct vcpu_svm *svm = to_svm(vcpu);
+>   	unsigned long flags;
+> -	u64 entry;
+> +	u64 entry = svm->avic_physical_id_entry;
+>   
+>   	lockdep_assert_preemption_disabled();
+>   
+>   	if (WARN_ON_ONCE(vcpu->vcpu_id * sizeof(entry) >= PAGE_SIZE))
+>   		return;
+>   
+> -	/*
+> -	 * Note, reading the Physical ID entry outside of ir_list_lock is safe
+> -	 * as only the pCPU that has loaded (or is loading) the vCPU is allowed
+> -	 * to modify the entry, and preemption is disabled.  I.e. the vCPU
+> -	 * can't be scheduled out and thus avic_vcpu_{put,load}() can't run
+> -	 * recursively.
+> -	 */
+> -	entry = svm->avic_physical_id_entry;
+> -
+> -	/* Nothing to do if IsRunning == '0' due to vCPU blocking. */
+> -	if (!(entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK))
+> -		return;
+> -
+>   	/*
+>   	 * Take and hold the per-vCPU interrupt remapping lock while updating
+>   	 * the Physical ID entry even though the lock doesn't protect against
+> @@ -942,7 +934,24 @@ void avic_vcpu_put(struct kvm_vcpu *vcpu)
+>   		WRITE_ONCE(kvm_svm->avic_physical_id_table[vcpu->vcpu_id], entry);
+>   
+>   	spin_unlock_irqrestore(&svm->ir_list_lock, flags);
+> +}
+>   
+> +void avic_vcpu_put(struct kvm_vcpu *vcpu)
+> +{
+> +	/*
+> +	 * Note, reading the Physical ID entry outside of ir_list_lock is safe
+> +	 * as only the pCPU that has loaded (or is loading) the vCPU is allowed
+> +	 * to modify the entry, and preemption is disabled.  I.e. the vCPU
+> +	 * can't be scheduled out and thus avic_vcpu_{put,load}() can't run
+> +	 * recursively.
+> +	 */
+> +	u64 entry = to_svm(vcpu)->avic_physical_id_entry;
+> +
+> +	/* Nothing to do if IsRunning == '0' due to vCPU blocking. */
+> +	if (!(entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK))
+> +		return;
+> +
+> +	__avic_vcpu_put(vcpu);
+>   }
+>   
+>   void avic_refresh_virtual_apic_mode(struct kvm_vcpu *vcpu)
+> @@ -983,9 +992,9 @@ void avic_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
+>   	avic_refresh_virtual_apic_mode(vcpu);
+>   
+>   	if (activated)
+> -		avic_vcpu_load(vcpu, vcpu->cpu);
+> +		__avic_vcpu_load(vcpu, vcpu->cpu);
+>   	else
+> -		avic_vcpu_put(vcpu);
+> +		__avic_vcpu_put(vcpu);
+>   
+>   	/*
+>   	 * Here, we go through the per-vcpu ir_list to update all existing
 
 
