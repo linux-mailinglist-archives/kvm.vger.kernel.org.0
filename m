@@ -1,86 +1,96 @@
-Return-Path: <kvm+bounces-42888-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42889-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A0BBA7F51B
-	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 08:39:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1545A7F5B0
+	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 09:09:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B4E6172FA4
-	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 06:39:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 535B11897911
+	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 07:09:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A90E25F998;
-	Tue,  8 Apr 2025 06:39:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EB1A26136E;
+	Tue,  8 Apr 2025 07:09:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cAvhgW3N"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="E9nqgCVi";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="fc+rOtNR";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="EbOOEp/X";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="9XvxjXgw"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBAF31FC0FC
-	for <kvm@vger.kernel.org>; Tue,  8 Apr 2025 06:39:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3FD25FA2D
+	for <kvm@vger.kernel.org>; Tue,  8 Apr 2025 07:09:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744094358; cv=none; b=LuFu1PSXdj1IiuIiciNUDMZkxDp/CYdnHRE4W2+sDoP12g0cAhMyRlsJXv3axJwT+bdnDN0G++prKxYBxRk6UjpdqXXRMxuw+Qs/v/9xspZvkFk+92yp6JgmgiEEqRu08oRuHRD+IqHxVcFzA7Nkg7CMmkpq5mnCJTVIQr3JNk8=
+	t=1744096164; cv=none; b=ILqj617Ki6cOny5Isw46Dku4Ytf+fwjGuYpkqRrRJzyXpOc6yADGal3KWJwTQGNIiDCYCTblnia9R8upXE9mQXaK5CF6eBTmjnpP1Y9tP9SZsXEvEpuuzuHtd/V9FwHBeJ8W/VjFeXlMZ07h5ReIkwTfaeYPSVC+5rfA7FFknmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744094358; c=relaxed/simple;
-	bh=QImjOwZmHFIglPjEksFrg4C+14Ff/Y7CUPgguEl5tWI=;
+	s=arc-20240116; t=1744096164; c=relaxed/simple;
+	bh=FQ8VVXmfyl7IhTGexsLt0ikARhDwK/vlh1UvWUpK304=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RvXuNkvOjcD6MjA53thRTUBe1+OqOstrU4yQUOs2gUOkLsVySnNNjLc8mAzw3wAzo1qIZrFH6vQZYqCWoCilJWU82vY+Di6EfHuiJ7FtwrBGcexqhM7B0tUeDTP9pE5txkCv/apQnLQpsZQKoVLFhuDDUUF3lKCJy4dCfWMipgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cAvhgW3N; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744094354;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 In-Reply-To:Content-Type; b=Fn+6xl1/IDRDzVLmgxlhXvk5EikPYW9CAAQljy/Ld6Xm2AvH+puDNSDkNy3zxylBJoCgtARQleCmLdZ5WqilxALwF+7HegfTtwDQHOVGb6pRh0mw044abCJq2tos/eG3Cb7wiLmN9JKtRFMqIa00Pwb0npHy14/2Gb7KsYxQ08Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=E9nqgCVi; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=fc+rOtNR; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=EbOOEp/X; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=9XvxjXgw; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id DA81821170;
+	Tue,  8 Apr 2025 07:09:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1744096160; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oo+vNBz6jEsiKjb63zXVQ6UhZa9LQg13RIyxKH2Wp2U=;
-	b=cAvhgW3NPcK+I51CEnAIUQVzMhXbsaTT1HL5TIZHT3lFcHSdY1Vg5sdpfZ04/CgydnVZRL
-	oMTY0dZAT8sJP5BmDhikpCzVlJ0qF2fk0ne3WfFjSQinyrnrYfwEcXwWCdls8wTk4YyQVs
-	fye4YUetTUOOIm1ISkygo/MAOKFBL1c=
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
- [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-36-aWJ5JKBYNzKYuBsIhOMg5g-1; Tue, 08 Apr 2025 02:39:13 -0400
-X-MC-Unique: aWJ5JKBYNzKYuBsIhOMg5g-1
-X-Mimecast-MFC-AGG-ID: aWJ5JKBYNzKYuBsIhOMg5g_1744094352
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-72f3b4c0305so6459314b3a.0
-        for <kvm@vger.kernel.org>; Mon, 07 Apr 2025 23:39:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744094352; x=1744699152;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oo+vNBz6jEsiKjb63zXVQ6UhZa9LQg13RIyxKH2Wp2U=;
-        b=XealvqKoDbYCIQk0N8XtPjq3wgMdTNIa3RuGdRaLdrnuo7JGoeU5/SXKkidzZrijq/
-         g6bnsprNe+w2xuuyRlRVap33yxXkwoeAZokwYVjOjDUSxgLnqmaamu5oUKuWFP7ecYkS
-         M7ZXdVwCrV+wwwtU+Fs09KMYiGcOWfvYvutrNa/H91BkVgT10z34mnZFrTI5Nz0ThVFf
-         LXwmKuIMQy/cubj64oz9x2Vlcrr8fYKqBVAEAVTgFkOtabl3YB2R2UbNv58qXxMt4N61
-         2lHr6pGil3SaC1t+7SlDYG6SYP9wp6Sl2zvmzzfD0Hcns/lyco+WZyIbzTRSoxjuaGpx
-         fRVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUh0/a+z9WKRulD6O1mMOVsHLle4fXRihFt7OhjrHuXzDrrzWgmOg9ibdobwXfwCmR7FY8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2W3J7TA3DS1UtdlmAT5fMQQ1BdKtgGkkcw0wXz+lEF9JNDHvs
-	tWBi5x6Lax+Xe1n5o+2JvTG1FdOOippPBccOLezWGSanDdlVL/qVGXcW9VKimBSnaJXQis6JfEg
-	9BLcMMvZ79F9qvIU+2hj+yiLZnPPgj+VcgBmr0OY14wqD8Humwg==
-X-Gm-Gg: ASbGncsJ9fVRIgFnQuvKj5mMxiDaN3br7Lzrux6yQ2Ldk4trEG6VFltPnfTItNRGePa
-	8y46VW+cxWJBIcI10Vaa1cVDVU8kAOLNMNee4H/k2sJGX2HeCydPJNrS34hJ659X0aRceZxekIy
-	zNFNCKP90hgqd8ObpZV1jGyx2HfNjVrALYTLE0xmTfsYDAQZ3GEQT3qruWwu5RkDnvvDKZzDCJH
-	SciAL87XstSVC6q/59RtGBh1KPYVEVtjAqJc14x+hxT3zU4q2Hq/aE1fAC33o2VKKN3raRHyS8y
-	PqjcnEB3ewet/7z4
-X-Received: by 2002:a05:6a00:2393:b0:736:52d7:daca with SMTP id d2e1a72fcca58-73b6b8c3084mr14619991b3a.18.1744094352239;
-        Mon, 07 Apr 2025 23:39:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHCluDWzP6aX2PyZk9at9nI1CqMZ/cLW37DfwKCDqyszydjKUwNSMY0//3epUtYWIjDAxF0tw==
-X-Received: by 2002:a05:6a00:2393:b0:736:52d7:daca with SMTP id d2e1a72fcca58-73b6b8c3084mr14619954b3a.18.1744094351805;
-        Mon, 07 Apr 2025 23:39:11 -0700 (PDT)
-Received: from [192.168.68.55] ([180.233.125.65])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-739d9ea15d6sm9712319b3a.89.2025.04.07.23.39.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Apr 2025 23:39:11 -0700 (PDT)
-Message-ID: <cda1db80-4b4d-471f-87f0-d978278a4b6c@redhat.com>
-Date: Tue, 8 Apr 2025 16:39:02 +1000
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=qcYfPtObY4jh9a6cHQvRsmyN2GB/2/EyepTsdOdigSY=;
+	b=E9nqgCVizC8D11EpAMrOUIfRJ8t+u/yoovk3BP4qSGLMC15KXEENlT6en2S7N5QDIV+5Xq
+	+xg1r3Wymxp46FydsIgToYQU1i3oBzaYOdmX0iFWr5xvjBB196TD9pTYBXqIXFcsPFKsPu
+	sEstyUkZJ/CkpgwoDY+GJ1s9WTU/Rjs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1744096160;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=qcYfPtObY4jh9a6cHQvRsmyN2GB/2/EyepTsdOdigSY=;
+	b=fc+rOtNRwgYFY/LzFrV25eAZg26XHGnT9A11NebaUsPV0JcgPA1AS8BBC6zD8y2BPASJW1
+	c+uWDppVac8RMIAw==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="EbOOEp/X";
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=9XvxjXgw
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1744096159; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=qcYfPtObY4jh9a6cHQvRsmyN2GB/2/EyepTsdOdigSY=;
+	b=EbOOEp/XIStnfEp1OpfGOzY1tiNTR7eVjZMYawRezrTvjYzvUlT+1ZZ8LLyn0Y7CUS6z0V
+	jVmL0Pxu3TuEKMe5FHsYZ9Anh9Pxd0D3tqAOAjLBdWFsN1SBRduBvh6jKsPopGsg2/CZY9
+	bQcKrZrvM5YVhcsZEW/iU9FCcz05IFY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1744096159;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=qcYfPtObY4jh9a6cHQvRsmyN2GB/2/EyepTsdOdigSY=;
+	b=9XvxjXgw2A23RHPCpw1ZCEd6KYbRF0yeo8/+DsOVeKZFfcU1sUeOKwwFgXJvcV+xvr9fXN
+	L1DdxePbVHpWAmAg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4B98B13691;
+	Tue,  8 Apr 2025 07:09:18 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id e4XMEJ7L9GeCNgAAD6G6ig
+	(envelope-from <tzimmermann@suse.de>); Tue, 08 Apr 2025 07:09:18 +0000
+Message-ID: <cb61c4e3-3f23-4b36-8128-5fca46405e61@suse.de>
+Date: Tue, 8 Apr 2025 09:09:17 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,138 +98,456 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 35/45] arm64: RME: Propagate number of breakpoints and
- watchpoints to userspace
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20250213161426.102987-1-steven.price@arm.com>
- <20250213161426.102987-36-steven.price@arm.com>
- <c8af8a7f-5ee4-460b-aec4-959f688db628@redhat.com>
- <adbca476-7d0f-473d-a2a2-0a29a497dbca@arm.com>
+Subject: Re: [RFC] PCI: add CONFIG_MMU dependency
+To: Arnd Bergmann <arnd@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Jeff Hugo <jeff.hugo@oss.qualcomm.com>,
+ Carl Vanderlip <quic_carlv@quicinc.com>, Oded Gabbay <ogabbay@kernel.org>,
+ Takashi Sakamoto <o-takashi@sakamocchi.jp>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Alex Deucher <alexander.deucher@amd.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Dave Airlie <airlied@redhat.com>, Jocelyn Falempe <jfalempe@redhat.com>,
+ Patrik Jakobsson <patrik.r.jakobsson@gmail.com>,
+ Xinliang Liu <xinliang.liu@linaro.org>, Tian Tao <tiantao6@hisilicon.com>,
+ Xinwei Kong <kong.kongxinwei@hisilicon.com>,
+ Sumit Semwal <sumit.semwal@linaro.org>, Yongqin Liu
+ <yongqin.liu@linaro.org>, John Stultz <jstultz@google.com>,
+ Sui Jingfeng <suijingfeng@loongson.cn>, Lyude Paul <lyude@redhat.com>,
+ Danilo Krummrich <dakr@kernel.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Zack Rusin <zack.rusin@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>,
+ Lucas De Marchi <lucas.demarchi@intel.com>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Saurav Kashyap <skashyap@marvell.com>, Javed Hasan <jhasan@marvell.com>,
+ GR-QLogic-Storage-Upstream@marvell.com,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Nilesh Javali <njavali@marvell.com>,
+ Manish Rangankar <mrangankar@marvell.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Javier Martinez Canillas <javierm@redhat.com>,
+ Jani Nikula <jani.nikula@intel.com>,
+ Mario Limonciello <mario.limonciello@amd.com>,
+ =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+ Lijo Lazar <lijo.lazar@amd.com>, Niklas Schnelle <schnelle@linux.ibm.com>,
+ Dmitry Baryshkov <lumag@kernel.org>, linux-arm-msm@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+ linux1394-devel@lists.sourceforge.net, amd-gfx@lists.freedesktop.org,
+ nouveau@lists.freedesktop.org, virtualization@lists.linux.dev,
+ spice-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
+ netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-scsi@vger.kernel.org, kvm@vger.kernel.org
+References: <20250407104025.3421624-1-arnd@kernel.org>
 Content-Language: en-US
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <adbca476-7d0f-473d-a2a2-0a29a497dbca@arm.com>
+From: Thomas Zimmermann <tzimmermann@suse.de>
+Autocrypt: addr=tzimmermann@suse.de; keydata=
+ xsBNBFs50uABCADEHPidWt974CaxBVbrIBwqcq/WURinJ3+2WlIrKWspiP83vfZKaXhFYsdg
+ XH47fDVbPPj+d6tQrw5lPQCyqjwrCPYnq3WlIBnGPJ4/jreTL6V+qfKRDlGLWFjZcsrPJGE0
+ BeB5BbqP5erN1qylK9i3gPoQjXGhpBpQYwRrEyQyjuvk+Ev0K1Jc5tVDeJAuau3TGNgah4Yc
+ hdHm3bkPjz9EErV85RwvImQ1dptvx6s7xzwXTgGAsaYZsL8WCwDaTuqFa1d1jjlaxg6+tZsB
+ 9GluwvIhSezPgnEmimZDkGnZRRSFiGP8yjqTjjWuf0bSj5rUnTGiyLyRZRNGcXmu6hjlABEB
+ AAHNJ1Rob21hcyBaaW1tZXJtYW5uIDx0emltbWVybWFubkBzdXNlLmRlPsLAjgQTAQgAOAIb
+ AwULCQgHAgYVCgkICwIEFgIDAQIeAQIXgBYhBHIX+6yM6c9jRKFo5WgNwR1TC3ojBQJftODH
+ AAoJEGgNwR1TC3ojx1wH/0hKGWugiqDgLNXLRD/4TfHBEKmxIrmfu9Z5t7vwUKfwhFL6hqvo
+ lXPJJKQpQ2z8+X2vZm/slsLn7J1yjrOsoJhKABDi+3QWWSGkaGwRJAdPVVyJMfJRNNNIKwVb
+ U6B1BkX2XDKDGffF4TxlOpSQzdtNI/9gleOoUA8+jy8knnDYzjBNOZqLG2FuTdicBXblz0Mf
+ vg41gd9kCwYXDnD91rJU8tzylXv03E75NCaTxTM+FBXPmsAVYQ4GYhhgFt8S2UWMoaaABLDe
+ 7l5FdnLdDEcbmd8uLU2CaG4W2cLrUaI4jz2XbkcPQkqTQ3EB67hYkjiEE6Zy3ggOitiQGcqp
+ j//OwE0EWznS4AEIAMYmP4M/V+T5RY5at/g7rUdNsLhWv1APYrh9RQefODYHrNRHUE9eosYb
+ T6XMryR9hT8XlGOYRwKWwiQBoWSDiTMo/Xi29jUnn4BXfI2px2DTXwc22LKtLAgTRjP+qbU6
+ 3Y0xnQN29UGDbYgyyK51DW3H0If2a3JNsheAAK+Xc9baj0LGIc8T9uiEWHBnCH+RdhgATnWW
+ GKdDegUR5BkDfDg5O/FISymJBHx2Dyoklv5g4BzkgqTqwmaYzsl8UxZKvbaxq0zbehDda8lv
+ hFXodNFMAgTLJlLuDYOGLK2AwbrS3Sp0AEbkpdJBb44qVlGm5bApZouHeJ/+n+7r12+lqdsA
+ EQEAAcLAdgQYAQgAIAIbDBYhBHIX+6yM6c9jRKFo5WgNwR1TC3ojBQJftOH6AAoJEGgNwR1T
+ C3ojVSkIALpAPkIJPQoURPb1VWjh34l0HlglmYHvZszJWTXYwavHR8+k6Baa6H7ufXNQtThR
+ yIxJrQLW6rV5lm7TjhffEhxVCn37+cg0zZ3j7zIsSS0rx/aMwi6VhFJA5hfn3T0TtrijKP4A
+ SAQO9xD1Zk9/61JWk8OysuIh7MXkl0fxbRKWE93XeQBhIJHQfnc+YBLprdnxR446Sh8Wn/2D
+ Ya8cavuWf2zrB6cZurs048xe0UbSW5AOSo4V9M0jzYI4nZqTmPxYyXbm30Kvmz0rYVRaitYJ
+ 4kyYYMhuULvrJDMjZRvaNe52tkKAvMevcGdt38H4KSVXAylqyQOW5zvPc4/sq9c=
+In-Reply-To: <20250407104025.3421624-1-arnd@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: DA81821170
+X-Spam-Level: 
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	ARC_NA(0.00)[];
+	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
+	RCVD_TLS_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[arndb.de,oss.qualcomm.com,quicinc.com,kernel.org,sakamocchi.jp,linux.intel.com,gmail.com,ffwll.ch,amd.com,redhat.com,linaro.org,hisilicon.com,google.com,loongson.cn,broadcom.com,intel.com,lunn.ch,davemloft.net,marvell.com,HansenPartnership.com,oracle.com,glider.be,weissschuh.net,linux.ibm.com,vger.kernel.org,lists.freedesktop.org,lists.sourceforge.net,lists.linux.dev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_MATCH_ENVRCPT_SOME(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[65];
+	RCVD_COUNT_TWO(0.00)[2];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -3.01
+X-Spam-Flag: NO
 
-On 4/8/25 2:35 AM, Steven Price wrote:
-> On 04/03/2025 23:45, Gavin Shan wrote:
->> On 2/14/25 2:14 AM, Steven Price wrote:
->>> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
->>>
->>> The RMM describes the maximum number of BPs/WPs available to the guest
->>> in the Feature Register 0. Propagate those numbers into ID_AA64DFR0_EL1,
->>> which is visible to userspace. A VMM needs this information in order to
->>> set up realm parameters.
->>>
->>> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
->>> Signed-off-by: Steven Price <steven.price@arm.com>
->>> ---
->>>    arch/arm64/include/asm/kvm_rme.h |  2 ++
->>>    arch/arm64/kvm/rme.c             | 22 ++++++++++++++++++++++
->>>    arch/arm64/kvm/sys_regs.c        |  2 +-
->>>    3 files changed, 25 insertions(+), 1 deletion(-)
->>>
->>
->> With the following one nitpick addressed:
->>
->> Reviewed-by: Gavin Shan <gshan@redhat.com>
->>
->>> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/
->>> asm/kvm_rme.h
->>> index d684b30493f5..67ee38541a82 100644
->>> --- a/arch/arm64/include/asm/kvm_rme.h
->>> +++ b/arch/arm64/include/asm/kvm_rme.h
->>> @@ -85,6 +85,8 @@ void kvm_init_rme(void);
->>>    u32 kvm_realm_ipa_limit(void);
->>>    u32 kvm_realm_vgic_nr_lr(void);
->>>    +u64 kvm_realm_reset_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu,
->>> u64 val);
->>> +
->>>    bool kvm_rme_supports_sve(void);
->>>      int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap
->>> *cap);
->>> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
->>> index f83f34358832..8c426f575728 100644
->>> --- a/arch/arm64/kvm/rme.c
->>> +++ b/arch/arm64/kvm/rme.c
->>> @@ -87,6 +87,28 @@ u32 kvm_realm_vgic_nr_lr(void)
->>>        return u64_get_bits(rmm_feat_reg0,
->>> RMI_FEATURE_REGISTER_0_GICV3_NUM_LRS);
->>>    }
->>>    +u64 kvm_realm_reset_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu,
->>> u64 val)
->>> +{
->>> +    u32 bps = u64_get_bits(rmm_feat_reg0,
->>> RMI_FEATURE_REGISTER_0_NUM_BPS);
->>> +    u32 wps = u64_get_bits(rmm_feat_reg0,
->>> RMI_FEATURE_REGISTER_0_NUM_WPS);
->>> +    u32 ctx_cmps;
->>> +
->>> +    if (!kvm_is_realm(vcpu->kvm))
->>> +        return val;
->>> +
->>> +    /* Ensure CTX_CMPs is still valid */
->>> +    ctx_cmps = FIELD_GET(ID_AA64DFR0_EL1_CTX_CMPs, val);
->>> +    ctx_cmps = min(bps, ctx_cmps);
->>> +
->>> +    val &= ~(ID_AA64DFR0_EL1_BRPs_MASK | ID_AA64DFR0_EL1_WRPs_MASK |
->>> +         ID_AA64DFR0_EL1_CTX_CMPs);
->>> +    val |= FIELD_PREP(ID_AA64DFR0_EL1_BRPs_MASK, bps) |
->>> +           FIELD_PREP(ID_AA64DFR0_EL1_WRPs_MASK, wps) |
->>> +           FIELD_PREP(ID_AA64DFR0_EL1_CTX_CMPs, ctx_cmps);
->>> +
->>> +    return val;
->>> +}
->>> +
->>
->> The chunk of code can be squeezed to
->> sys_reg.c::sanitise_id_aa64dfr0_el1() since
->> sys_reg.c has been plumbed for realm, no reason to keep a separate
->> helper in rme.c
->> because it's only called by sys_reg.c::sanitise_id_aa64dfr0_el1()
-> 
-> The issue here is the rmm_feat_reg0 variable - it's currently static in
-> rme.c - so I can't just shift the code over. I could obviously provide
-> helpers to get the necessary information but this seemed cleaner.
-> 
 
-Ack.
 
-Thanks,
-Gavin
+Am 07.04.25 um 12:38 schrieb Arnd Bergmann:
+> From: Arnd Bergmann <arnd@arndb.de>
+>
+> It turns out that there are no platforms that have PCI but don't have an MMU,
+> so adding a Kconfig dependency on CONFIG_PCI simplifies build testing kernels
+> for those platforms a lot, and avoids a lot of inadvertent build regressions.
+>
+> Add a dependency for CONFIG_PCI and remove all the ones for PCI specific
+> device drivers that are currently marked not having it.
+>
+> Link: https://lore.kernel.org/lkml/a41f1b20-a76c-43d8-8c36-f12744327a54@app.fastmail.com/
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-> Thanks,
-> Steve
-> 
->>>    static int get_start_level(struct realm *realm)
->>>    {
->>>        return 4 - ((realm->ia_bits - 8) / (RMM_PAGE_SHIFT - 3));
->>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->>> index ed881725eb64..5618eff33155 100644
->>> --- a/arch/arm64/kvm/sys_regs.c
->>> +++ b/arch/arm64/kvm/sys_regs.c
->>> @@ -1820,7 +1820,7 @@ static u64 sanitise_id_aa64dfr0_el1(const struct
->>> kvm_vcpu *vcpu, u64 val)
->>>        /* Hide BRBE from guests */
->>>        val &= ~ID_AA64DFR0_EL1_BRBE_MASK;
->>>    -    return val;
->>> +    return kvm_realm_reset_id_aa64dfr0_el1(vcpu, val);
->>>    }
->>>      static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+For gpu/drm/
 
+Reviewed-by: Thomas Zimmermann <tzimmermann@suse.de>
+
+> ---
+>   drivers/accel/qaic/Kconfig              | 1 -
+>   drivers/firewire/Kconfig                | 2 +-
+>   drivers/gpu/drm/Kconfig                 | 2 +-
+>   drivers/gpu/drm/amd/amdgpu/Kconfig      | 3 +--
+>   drivers/gpu/drm/ast/Kconfig             | 2 +-
+>   drivers/gpu/drm/gma500/Kconfig          | 2 +-
+>   drivers/gpu/drm/hisilicon/hibmc/Kconfig | 1 -
+>   drivers/gpu/drm/loongson/Kconfig        | 2 +-
+>   drivers/gpu/drm/mgag200/Kconfig         | 2 +-
+>   drivers/gpu/drm/nouveau/Kconfig         | 3 +--
+>   drivers/gpu/drm/qxl/Kconfig             | 2 +-
+>   drivers/gpu/drm/radeon/Kconfig          | 2 +-
+>   drivers/gpu/drm/tiny/Kconfig            | 2 +-
+>   drivers/gpu/drm/vmwgfx/Kconfig          | 2 +-
+>   drivers/gpu/drm/xe/Kconfig              | 2 +-
+>   drivers/net/ethernet/broadcom/Kconfig   | 1 -
+>   drivers/pci/Kconfig                     | 1 +
+>   drivers/pci/pci.c                       | 4 ++--
+>   drivers/scsi/bnx2fc/Kconfig             | 1 -
+>   drivers/scsi/bnx2i/Kconfig              | 1 -
+>   drivers/vfio/pci/Kconfig                | 2 +-
+>   21 files changed, 17 insertions(+), 23 deletions(-)
+>
+> diff --git a/drivers/accel/qaic/Kconfig b/drivers/accel/qaic/Kconfig
+> index a9f866230058..5e405a19c157 100644
+> --- a/drivers/accel/qaic/Kconfig
+> +++ b/drivers/accel/qaic/Kconfig
+> @@ -8,7 +8,6 @@ config DRM_ACCEL_QAIC
+>   	depends on DRM_ACCEL
+>   	depends on PCI && HAS_IOMEM
+>   	depends on MHI_BUS
+> -	depends on MMU
+>   	select CRC32
+>   	help
+>   	  Enables driver for Qualcomm's Cloud AI accelerator PCIe cards that are
+> diff --git a/drivers/firewire/Kconfig b/drivers/firewire/Kconfig
+> index 905c82e26ce7..a5f5e250223a 100644
+> --- a/drivers/firewire/Kconfig
+> +++ b/drivers/firewire/Kconfig
+> @@ -83,7 +83,7 @@ config FIREWIRE_KUNIT_SELF_ID_SEQUENCE_HELPER_TEST
+>   
+>   config FIREWIRE_OHCI
+>   	tristate "OHCI-1394 controllers"
+> -	depends on PCI && FIREWIRE && MMU
+> +	depends on PCI && FIREWIRE
+>   	help
+>   	  Enable this driver if you have a FireWire controller based
+>   	  on the OHCI specification.  For all practical purposes, this
+> diff --git a/drivers/gpu/drm/Kconfig b/drivers/gpu/drm/Kconfig
+> index 2cba2b6ebe1c..6e95d204597e 100644
+> --- a/drivers/gpu/drm/Kconfig
+> +++ b/drivers/gpu/drm/Kconfig
+> @@ -462,7 +462,7 @@ source "drivers/gpu/drm/imagination/Kconfig"
+>   
+>   config DRM_HYPERV
+>   	tristate "DRM Support for Hyper-V synthetic video device"
+> -	depends on DRM && PCI && MMU && HYPERV
+> +	depends on DRM && PCI && HYPERV
+>   	select DRM_CLIENT_SELECTION
+>   	select DRM_KMS_HELPER
+>   	select DRM_GEM_SHMEM_HELPER
+> diff --git a/drivers/gpu/drm/amd/amdgpu/Kconfig b/drivers/gpu/drm/amd/amdgpu/Kconfig
+> index 1a11cab741ac..058e3b3ad520 100644
+> --- a/drivers/gpu/drm/amd/amdgpu/Kconfig
+> +++ b/drivers/gpu/drm/amd/amdgpu/Kconfig
+> @@ -2,7 +2,7 @@
+>   
+>   config DRM_AMDGPU
+>   	tristate "AMD GPU"
+> -	depends on DRM && PCI && MMU
+> +	depends on DRM && PCI
+>   	depends on !UML
+>   	select FW_LOADER
+>   	select DRM_CLIENT
+> @@ -68,7 +68,6 @@ config DRM_AMDGPU_CIK
+>   config DRM_AMDGPU_USERPTR
+>   	bool "Always enable userptr write support"
+>   	depends on DRM_AMDGPU
+> -	depends on MMU
+>   	select HMM_MIRROR
+>   	select MMU_NOTIFIER
+>   	help
+> diff --git a/drivers/gpu/drm/ast/Kconfig b/drivers/gpu/drm/ast/Kconfig
+> index da0663542e8a..242fbccdf844 100644
+> --- a/drivers/gpu/drm/ast/Kconfig
+> +++ b/drivers/gpu/drm/ast/Kconfig
+> @@ -1,7 +1,7 @@
+>   # SPDX-License-Identifier: GPL-2.0-only
+>   config DRM_AST
+>   	tristate "AST server chips"
+> -	depends on DRM && PCI && MMU
+> +	depends on DRM && PCI
+>   	select DRM_CLIENT_SELECTION
+>   	select DRM_GEM_SHMEM_HELPER
+>   	select DRM_KMS_HELPER
+> diff --git a/drivers/gpu/drm/gma500/Kconfig b/drivers/gpu/drm/gma500/Kconfig
+> index aa2ea128aa2f..a2acaa699dd5 100644
+> --- a/drivers/gpu/drm/gma500/Kconfig
+> +++ b/drivers/gpu/drm/gma500/Kconfig
+> @@ -1,7 +1,7 @@
+>   # SPDX-License-Identifier: GPL-2.0-only
+>   config DRM_GMA500
+>   	tristate "Intel GMA500/600/3600/3650 KMS Framebuffer"
+> -	depends on DRM && PCI && X86 && MMU && HAS_IOPORT
+> +	depends on DRM && PCI && X86 && HAS_IOPORT
+>   	select DRM_CLIENT_SELECTION
+>   	select DRM_KMS_HELPER
+>   	select FB_IOMEM_HELPERS if DRM_FBDEV_EMULATION
+> diff --git a/drivers/gpu/drm/hisilicon/hibmc/Kconfig b/drivers/gpu/drm/hisilicon/hibmc/Kconfig
+> index 98d77d74999d..d1f3f5793f34 100644
+> --- a/drivers/gpu/drm/hisilicon/hibmc/Kconfig
+> +++ b/drivers/gpu/drm/hisilicon/hibmc/Kconfig
+> @@ -2,7 +2,6 @@
+>   config DRM_HISI_HIBMC
+>   	tristate "DRM Support for Hisilicon Hibmc"
+>   	depends on DRM && PCI
+> -	depends on MMU
+>   	select DRM_CLIENT_SELECTION
+>   	select DRM_DISPLAY_HELPER
+>   	select DRM_DISPLAY_DP_HELPER
+> diff --git a/drivers/gpu/drm/loongson/Kconfig b/drivers/gpu/drm/loongson/Kconfig
+> index 552edfec7afb..d739d51cf54c 100644
+> --- a/drivers/gpu/drm/loongson/Kconfig
+> +++ b/drivers/gpu/drm/loongson/Kconfig
+> @@ -2,7 +2,7 @@
+>   
+>   config DRM_LOONGSON
+>   	tristate "DRM support for Loongson Graphics"
+> -	depends on DRM && PCI && MMU
+> +	depends on DRM && PCI
+>   	depends on LOONGARCH || MIPS || COMPILE_TEST
+>   	select DRM_CLIENT_SELECTION
+>   	select DRM_KMS_HELPER
+> diff --git a/drivers/gpu/drm/mgag200/Kconfig b/drivers/gpu/drm/mgag200/Kconfig
+> index 412dcbea0e2d..a962ae564a75 100644
+> --- a/drivers/gpu/drm/mgag200/Kconfig
+> +++ b/drivers/gpu/drm/mgag200/Kconfig
+> @@ -1,7 +1,7 @@
+>   # SPDX-License-Identifier: GPL-2.0-only
+>   config DRM_MGAG200
+>   	tristate "Matrox G200"
+> -	depends on DRM && PCI && MMU
+> +	depends on DRM && PCI
+>   	select DRM_CLIENT_SELECTION
+>   	select DRM_GEM_SHMEM_HELPER
+>   	select DRM_KMS_HELPER
+> diff --git a/drivers/gpu/drm/nouveau/Kconfig b/drivers/gpu/drm/nouveau/Kconfig
+> index 7b3e979c51ec..d1587639ebb0 100644
+> --- a/drivers/gpu/drm/nouveau/Kconfig
+> +++ b/drivers/gpu/drm/nouveau/Kconfig
+> @@ -1,7 +1,7 @@
+>   # SPDX-License-Identifier: GPL-2.0-only
+>   config DRM_NOUVEAU
+>   	tristate "Nouveau (NVIDIA) cards"
+> -	depends on DRM && PCI && MMU
+> +	depends on DRM && PCI
+>   	select IOMMU_API
+>   	select FW_LOADER
+>   	select FW_CACHE if PM_SLEEP
+> @@ -94,7 +94,6 @@ config DRM_NOUVEAU_SVM
+>   	bool "(EXPERIMENTAL) Enable SVM (Shared Virtual Memory) support"
+>   	depends on DEVICE_PRIVATE
+>   	depends on DRM_NOUVEAU
+> -	depends on MMU
+>   	depends on STAGING
+>   	select HMM_MIRROR
+>   	select MMU_NOTIFIER
+> diff --git a/drivers/gpu/drm/qxl/Kconfig b/drivers/gpu/drm/qxl/Kconfig
+> index 69427eb8bed2..d8f24bcae34b 100644
+> --- a/drivers/gpu/drm/qxl/Kconfig
+> +++ b/drivers/gpu/drm/qxl/Kconfig
+> @@ -1,7 +1,7 @@
+>   # SPDX-License-Identifier: GPL-2.0-only
+>   config DRM_QXL
+>   	tristate "QXL virtual GPU"
+> -	depends on DRM && PCI && MMU && HAS_IOPORT
+> +	depends on DRM && PCI && HAS_IOPORT
+>   	select DRM_CLIENT_SELECTION
+>   	select DRM_KMS_HELPER
+>   	select DRM_TTM
+> diff --git a/drivers/gpu/drm/radeon/Kconfig b/drivers/gpu/drm/radeon/Kconfig
+> index f51bace9555d..c479f0c0dd5c 100644
+> --- a/drivers/gpu/drm/radeon/Kconfig
+> +++ b/drivers/gpu/drm/radeon/Kconfig
+> @@ -2,7 +2,7 @@
+>   
+>   config DRM_RADEON
+>   	tristate "ATI Radeon"
+> -	depends on DRM && PCI && MMU
+> +	depends on DRM && PCI
+>   	depends on AGP || !AGP
+>   	select FW_LOADER
+>   	select DRM_CLIENT_SELECTION
+> diff --git a/drivers/gpu/drm/tiny/Kconfig b/drivers/gpu/drm/tiny/Kconfig
+> index 54c84c9801c1..6ca12fe7f57a 100644
+> --- a/drivers/gpu/drm/tiny/Kconfig
+> +++ b/drivers/gpu/drm/tiny/Kconfig
+> @@ -37,7 +37,7 @@ config DRM_BOCHS
+>   
+>   config DRM_CIRRUS_QEMU
+>   	tristate "Cirrus driver for QEMU emulated device"
+> -	depends on DRM && PCI && MMU
+> +	depends on DRM && PCI
+>   	select DRM_CLIENT_SELECTION
+>   	select DRM_KMS_HELPER
+>   	select DRM_GEM_SHMEM_HELPER
+> diff --git a/drivers/gpu/drm/vmwgfx/Kconfig b/drivers/gpu/drm/vmwgfx/Kconfig
+> index 6c3c2922ae8b..aab646b91ca9 100644
+> --- a/drivers/gpu/drm/vmwgfx/Kconfig
+> +++ b/drivers/gpu/drm/vmwgfx/Kconfig
+> @@ -1,7 +1,7 @@
+>   # SPDX-License-Identifier: GPL-2.0
+>   config DRM_VMWGFX
+>   	tristate "DRM driver for VMware Virtual GPU"
+> -	depends on DRM && PCI && MMU
+> +	depends on DRM && PCI
+>   	depends on (X86 && HYPERVISOR_GUEST) || ARM64
+>   	select DRM_CLIENT_SELECTION
+>   	select DRM_TTM
+> diff --git a/drivers/gpu/drm/xe/Kconfig b/drivers/gpu/drm/xe/Kconfig
+> index 5c2f459a2925..2dec62737ff6 100644
+> --- a/drivers/gpu/drm/xe/Kconfig
+> +++ b/drivers/gpu/drm/xe/Kconfig
+> @@ -1,7 +1,7 @@
+>   # SPDX-License-Identifier: GPL-2.0-only
+>   config DRM_XE
+>   	tristate "Intel Xe Graphics"
+> -	depends on DRM && PCI && MMU && (m || (y && KUNIT=y))
+> +	depends on DRM && PCI && (m || (y && KUNIT=y))
+>   	select INTERVAL_TREE
+>   	# we need shmfs for the swappable backing store, and in particular
+>   	# the shmem_readpage() which depends upon tmpfs
+> diff --git a/drivers/net/ethernet/broadcom/Kconfig b/drivers/net/ethernet/broadcom/Kconfig
+> index eeec8bf17cf4..aa43984a05cf 100644
+> --- a/drivers/net/ethernet/broadcom/Kconfig
+> +++ b/drivers/net/ethernet/broadcom/Kconfig
+> @@ -96,7 +96,6 @@ config BNX2
+>   config CNIC
+>   	tristate "QLogic CNIC support"
+>   	depends on PCI && (IPV6 || IPV6=n)
+> -	depends on MMU
+>   	select BNX2
+>   	select UIO
+>   	help
+> diff --git a/drivers/pci/Kconfig b/drivers/pci/Kconfig
+> index da28295b4aac..9c0e4aaf4e8c 100644
+> --- a/drivers/pci/Kconfig
+> +++ b/drivers/pci/Kconfig
+> @@ -21,6 +21,7 @@ config GENERIC_PCI_IOMAP
+>   menuconfig PCI
+>   	bool "PCI support"
+>   	depends on HAVE_PCI
+> +	depends on MMU
+>   	help
+>   	  This option enables support for the PCI local bus, including
+>   	  support for PCI-X and the foundations for PCI Express support.
+> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
+> index 4d7c9f64ea24..60a20a0ac41f 100644
+> --- a/drivers/pci/pci.c
+> +++ b/drivers/pci/pci.c
+> @@ -4257,7 +4257,7 @@ unsigned long __weak pci_address_to_pio(phys_addr_t address)
+>   #ifndef pci_remap_iospace
+>   int pci_remap_iospace(const struct resource *res, phys_addr_t phys_addr)
+>   {
+> -#if defined(PCI_IOBASE) && defined(CONFIG_MMU)
+> +#if defined(PCI_IOBASE)
+>   	unsigned long vaddr = (unsigned long)PCI_IOBASE + res->start;
+>   
+>   	if (!(res->flags & IORESOURCE_IO))
+> @@ -4290,7 +4290,7 @@ EXPORT_SYMBOL(pci_remap_iospace);
+>    */
+>   void pci_unmap_iospace(struct resource *res)
+>   {
+> -#if defined(PCI_IOBASE) && defined(CONFIG_MMU)
+> +#if defined(PCI_IOBASE)
+>   	unsigned long vaddr = (unsigned long)PCI_IOBASE + res->start;
+>   
+>   	vunmap_range(vaddr, vaddr + resource_size(res));
+> diff --git a/drivers/scsi/bnx2fc/Kconfig b/drivers/scsi/bnx2fc/Kconfig
+> index ecdc0f0f4f4e..3cf7e08df809 100644
+> --- a/drivers/scsi/bnx2fc/Kconfig
+> +++ b/drivers/scsi/bnx2fc/Kconfig
+> @@ -5,7 +5,6 @@ config SCSI_BNX2X_FCOE
+>   	depends on (IPV6 || IPV6=n)
+>   	depends on LIBFC
+>   	depends on LIBFCOE
+> -	depends on MMU
+>   	select NETDEVICES
+>   	select ETHERNET
+>   	select NET_VENDOR_BROADCOM
+> diff --git a/drivers/scsi/bnx2i/Kconfig b/drivers/scsi/bnx2i/Kconfig
+> index 0cc06c2ce0b8..75ace2302fed 100644
+> --- a/drivers/scsi/bnx2i/Kconfig
+> +++ b/drivers/scsi/bnx2i/Kconfig
+> @@ -4,7 +4,6 @@ config SCSI_BNX2_ISCSI
+>   	depends on NET
+>   	depends on PCI
+>   	depends on (IPV6 || IPV6=n)
+> -	depends on MMU
+>   	select SCSI_ISCSI_ATTRS
+>   	select NETDEVICES
+>   	select ETHERNET
+> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+> index c3bcb6911c53..2b0172f54665 100644
+> --- a/drivers/vfio/pci/Kconfig
+> +++ b/drivers/vfio/pci/Kconfig
+> @@ -1,6 +1,6 @@
+>   # SPDX-License-Identifier: GPL-2.0-only
+>   menu "VFIO support for PCI devices"
+> -	depends on PCI && MMU
+> +	depends on PCI
+>   
+>   config VFIO_PCI_CORE
+>   	tristate
+
+-- 
+--
+Thomas Zimmermann
+Graphics Driver Developer
+SUSE Software Solutions Germany GmbH
+Frankenstrasse 146, 90461 Nuernberg, Germany
+GF: Ivo Totev, Andrew Myers, Andrew McDonald, Boudien Moerman
+HRB 36809 (AG Nuernberg)
 
 
