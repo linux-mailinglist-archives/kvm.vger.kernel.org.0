@@ -1,223 +1,166 @@
-Return-Path: <kvm+bounces-42899-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42900-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04D7BA7FB18
-	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 12:09:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 794BEA7FBDB
+	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 12:29:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F18117FC1E
-	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 10:06:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 85F967A4D54
+	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 10:27:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CEF526460A;
-	Tue,  8 Apr 2025 10:06:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FB2q/Y+V"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 241EE26E159;
+	Tue,  8 Apr 2025 10:22:42 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF60D8488
-	for <kvm@vger.kernel.org>; Tue,  8 Apr 2025 10:06:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DD9126773D;
+	Tue,  8 Apr 2025 10:22:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744106805; cv=none; b=epw3z+dX+sfuxvd10a3uhTIdzfM2iTmEvO7TtB6UYYvkWVXRL7OnkJhtuD2mryJIqavV2tPS/5kwjNGnNNA50UxgkV1k2wA7idQ5lA8CijVQECCdHCT5+QuFTzu6dnZBzHjJPLI5H4/0rQXFjbN9m2xwTRrizcECCIkPRSr7uwk=
+	t=1744107761; cv=none; b=HK2iIvXsSKjV3MOIxxIExOo5NOOZgj80yfVxy5sTIxsg9uUGUMdinyy340eqaEgfdbrsRJPfrPOsVpLvkYlI/m7kttEQx7MU9jCtZt8HIrG0vbQBarEjPYORFqdg+XQsNZd5Bulj6iA/qgZo7kmLJUQXcVH6VuYirHAdyiBkh5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744106805; c=relaxed/simple;
-	bh=HIyFphJUM9jy+iUZFnRsHxLdlZSwSRVPaSAJF+efhzk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rV4RbsZFnSqJX3ccartfswhVSpf2yT8O6SaohkM2fLLrbROHvgYAMXbNRxzWp7BQGLeP4ru/IExRiIWqaRWYIfpCWhkF+dtf0OouemH/+NcmrYhxtNzujhMelj0O+uSqmjp0Ydl8bdzduk7frVsmtUEiWhow0dhQotTwFBgrmmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FB2q/Y+V; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744106802;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=MW9+6v6k+evGNRMDRy26B9obQdgiWj36fdWvVuxMzGI=;
-	b=FB2q/Y+VzrETZjbJ3QtJNZ10Y9Hn2N5flXY6bqL8M6ucYZEAkWx1PIp2ERHmMZNYgKAXt0
-	cqtb/OOGNN4pMKtEnNJfdHyUFJS5Fa+W9ZZt2i3inlqX6O6Ngx0/WqOXgjTmqUy6s0O1q9
-	gP7JbnnNrGBqElKnP3Pc50g1RaSgZ3Y=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-386-DPOX-k0rNHGDLbO_tbD06A-1; Tue,
- 08 Apr 2025 06:06:41 -0400
-X-MC-Unique: DPOX-k0rNHGDLbO_tbD06A-1
-X-Mimecast-MFC-AGG-ID: DPOX-k0rNHGDLbO_tbD06A_1744106800
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 23CE7195608F;
-	Tue,  8 Apr 2025 10:06:40 +0000 (UTC)
-Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8442F1956094;
-	Tue,  8 Apr 2025 10:06:39 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM fixes for Linux 6.15-rc2
-Date: Tue,  8 Apr 2025 06:06:37 -0400
-Message-ID: <20250408100638.202531-1-pbonzini@redhat.com>
+	s=arc-20240116; t=1744107761; c=relaxed/simple;
+	bh=/m6+Ua66NFMhg2vNP8D7cOPQD3B82lw7pQYHz/7iMJ8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HSiD01YNpH6X2SE1D/G+Y3Q9bcIQ5r/ZTouGz0OcCaDdw5o7UXL2iHJD91nnZMUQBO+uZLdUxfqOrt0/MSKNPl5+TDlDEp9z07KBe55yF0fhfq5ijsjjw6lW2/HJ5/+tIXIHz7+L3pU/IpggU5OrL3JEN0BQSw/wUV9lkbaLRyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-5262475372eso2472016e0c.2;
+        Tue, 08 Apr 2025 03:22:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744107756; x=1744712556;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SsrLZDcWMMgz5qw73ZarBN4RUT9hrtTKFIK6rblk8+Q=;
+        b=tNPbBNVTJmxqGy0jBa5sryPPvZLd0AjZOY0EW6x4j9gRJqFYclTVMaO8LW8gQVB/bM
+         bCdh58TuAH+1hrn/ISO5odB4hHO61djPWuWoWENQIC0LIXX6BlqjygiitdYA1EDMOZUR
+         9RpFqxi415LWTHGgFYyDB3NP1jF0Y8izKd/2K6fiEnQzspzY4mNvlLUgDvaVJHxpBiKZ
+         nI+EDZ4LdXMQh3WuHBxZcABhkbCWON8e9oIm32B3Qwgw8A0QjfQ4WojfovjD1VkpP1PU
+         pV2hvo680JDC9QbJGvzj8k9U0qS3J4+gOZtAdR3/b91yjqgzdVcBh2GhA448a+TF04Lk
+         BKmw==
+X-Forwarded-Encrypted: i=1; AJvYcCVEA7qZAB3B0+kezkpOZpgk0SjQS40gZIxIESzH6D96qXVuMsUdgj6PHG88X971uVF5Rt8=@vger.kernel.org, AJvYcCVRBPWT8uBLQ2pIieSkrrdi36CASGl8wCATxc6NI5iOk2qS/IYbUIGn6hDRHxEmnKi2ocaf5/3VC2zk@vger.kernel.org, AJvYcCW4xIx1cdV944/IAeq2vpuEttUCkcpuBoBB5o+t0Xew1hIBPH/HlPJtcDjT76BPj1/KlmjTrYHP@vger.kernel.org, AJvYcCXOCCN05UNs0iOndHkTYX+x4JXPpo2PLSCzgfTpwcOi3bL/S8S5j0kF0nPxO5zDKvu87YQsDDCNLBr1TI5g/A==@vger.kernel.org, AJvYcCXPev8CqdRxG+Xu7jPmhtJRUOXcaZgCQ0a0mYGFYyaw/3tkMlw1a1lqY2iL/mCg1YX8AQMxnK5oqfvudA==@vger.kernel.org, AJvYcCXt+8xciHm8SAu+5DzuIYLk8qwPUHogEMjh6Ttay/FPrxE5evCGYor+AchUy94/KXPgc8YyRGu7YqZynbui@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBAB2zPTiiZS6jqcTOuZf7APe9hr8vImIqU+EMuNMm2hkugeCU
+	gd4x1r+J7db561RAyE3/W/Rbq4rrTlC0IVrh6YJ2KBfWyMmEtVER10rWdlBG
+X-Gm-Gg: ASbGncvjQ73/IidO/NQ91NS5qtSO59m6IlrsKIyjjtFcRJibIbPVoiENieSRxpNp+lh
+	uRbwUG1185gFeP3POHRwcsvZ7d0q+f0rUUCtbU0ljkiA5HO78C4ESWTSmjCtOBRt0bVlGd+f/7V
+	RQbRr4aHtdzeEUozREP4Gft8OiAZMjfQd0Y3eQ3eqbyQY+TslQQ0NiaZEW+RgY/HOyalBydLZ16
+	ps38/LX6b2C4E0oFLy6APwz8Z+K5nV6qebkIUY2J2wCnvusCGUuwpz2anup3cSnE6//DzZMHfc/
+	KWX33HFL457WVh4Dw2K292QuOQvAMbO8pB8LMJ8Eiw5R2q21IROSNRkyq0sgcyLrh3Rl9xTbOuS
+	92F89+JU=
+X-Google-Smtp-Source: AGHT+IFDb9okRj1xGl+mVbJRxzLLI3huCAhu6Vj0/hapZGGpzzktInrb/NA1bjOvWmUDk4T9v4AhDg==
+X-Received: by 2002:a05:6122:30a0:b0:520:64ea:c479 with SMTP id 71dfb90a1353d-52765db445cmr10786694e0c.10.1744107756603;
+        Tue, 08 Apr 2025 03:22:36 -0700 (PDT)
+Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com. [209.85.222.43])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5279b58aa78sm312255e0c.14.2025.04.08.03.22.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Apr 2025 03:22:35 -0700 (PDT)
+Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-86fbb48fc7fso2206333241.2;
+        Tue, 08 Apr 2025 03:22:35 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU26zpE9mOwfcgFM6aU88kNEV5kwikJtj5z06kE2m/+57CVUHgY2V3uGPlYiGvtoyaVg7Jdo2WN+xQ2AHxK@vger.kernel.org, AJvYcCULmQuRAkXtLcIQO9HqD147pHXbhjEapTsJJUzpHy/kQYYr2Qm9Gh+sVVwAhgGmrSQ3EKBbjB3Y@vger.kernel.org, AJvYcCUM6Ee5Vc6o+EkKdsHAYGqA/Kefeyg55IhkJDIDmmb9iZtTa2z9F2cnfZBjzIyb30NlpMY=@vger.kernel.org, AJvYcCVpbCYx6DzQfXfmR1XhJxQBheurbgqdyuVMGzAyeoePydwz5AIwmy9UX7arvVrPnzEq2XLxiqX1VTlz//9HIA==@vger.kernel.org, AJvYcCXIHfyUViYpbZ0KEhCmcG0S90hiMl8oL/txVZ/G+HRfdTa3+OZR/DqYCL6f79RwtUA6uGTNIpIg43d0aA==@vger.kernel.org, AJvYcCXqgXc0+D7YC4+PSbm+1wmQWFqVWmNbZ0Ics+DQRTK5MNh2TQaDeZdzv0NUneaO61AzUF59TMa0xrCZ@vger.kernel.org
+X-Received: by 2002:a05:6102:2b91:b0:4c4:e415:6737 with SMTP id
+ ada2fe7eead31-4c856a8cf46mr12241766137.23.1744107755579; Tue, 08 Apr 2025
+ 03:22:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+References: <20250407104025.3421624-1-arnd@kernel.org>
+In-Reply-To: <20250407104025.3421624-1-arnd@kernel.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 8 Apr 2025 12:22:23 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdWN=wurw7qz0t2ovMkUNu0BJRAMv_0U63Lqs2MGxkVnHw@mail.gmail.com>
+X-Gm-Features: ATxdqUE9l7FjkqlZMDiGBpUM7CUSkyfcARh2bgkw-zOenNlQ3qLl0OOY1x_PRRI
+Message-ID: <CAMuHMdWN=wurw7qz0t2ovMkUNu0BJRAMv_0U63Lqs2MGxkVnHw@mail.gmail.com>
+Subject: Re: [RFC] PCI: add CONFIG_MMU dependency
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: Bjorn Helgaas <bhelgaas@google.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Jeff Hugo <jeff.hugo@oss.qualcomm.com>, Carl Vanderlip <quic_carlv@quicinc.com>, 
+	Oded Gabbay <ogabbay@kernel.org>, Takashi Sakamoto <o-takashi@sakamocchi.jp>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Alex Deucher <alexander.deucher@amd.com>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Dave Airlie <airlied@redhat.com>, Jocelyn Falempe <jfalempe@redhat.com>, 
+	Patrik Jakobsson <patrik.r.jakobsson@gmail.com>, Xinliang Liu <xinliang.liu@linaro.org>, 
+	Tian Tao <tiantao6@hisilicon.com>, Xinwei Kong <kong.kongxinwei@hisilicon.com>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, Yongqin Liu <yongqin.liu@linaro.org>, 
+	John Stultz <jstultz@google.com>, Sui Jingfeng <suijingfeng@loongson.cn>, 
+	Lyude Paul <lyude@redhat.com>, Danilo Krummrich <dakr@kernel.org>, Gerd Hoffmann <kraxel@redhat.com>, 
+	Zack Rusin <zack.rusin@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+	Lucas De Marchi <lucas.demarchi@intel.com>, 
+	=?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
+	Rodrigo Vivi <rodrigo.vivi@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Saurav Kashyap <skashyap@marvell.com>, Javed Hasan <jhasan@marvell.com>, 
+	GR-QLogic-Storage-Upstream@marvell.com, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Nilesh Javali <njavali@marvell.com>, 
+	Manish Rangankar <mrangankar@marvell.com>, Alex Williamson <alex.williamson@redhat.com>, 
+	Geert Uytterhoeven <geert+renesas@glider.be>, Javier Martinez Canillas <javierm@redhat.com>, 
+	Jani Nikula <jani.nikula@intel.com>, Mario Limonciello <mario.limonciello@amd.com>, 
+	=?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>, 
+	Lijo Lazar <lijo.lazar@amd.com>, Niklas Schnelle <schnelle@linux.ibm.com>, 
+	Dmitry Baryshkov <lumag@kernel.org>, linux-arm-msm@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org, 
+	linux1394-devel@lists.sourceforge.net, amd-gfx@lists.freedesktop.org, 
+	nouveau@lists.freedesktop.org, virtualization@lists.linux.dev, 
+	spice-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org, 
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	kvm@vger.kernel.org, Greg Ungerer <gerg@linux-m68k.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Linus,
+Hi Arnd,
 
-The following changes since commit 782f9feaa9517caf33186dcdd6b50a8f770ed29b:
+CC Gerg
 
-  Merge branch 'kvm-pre-tdx' into HEAD (2025-03-20 13:13:13 -0400)
+On Mon, 7 Apr 2025 at 12:40, Arnd Bergmann <arnd@kernel.org> wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+>
+> It turns out that there are no platforms that have PCI but don't have an MMU,
+> so adding a Kconfig dependency on CONFIG_PCI simplifies build testing kernels
+> for those platforms a lot, and avoids a lot of inadvertent build regressions.
+>
+> Add a dependency for CONFIG_PCI and remove all the ones for PCI specific
+> device drivers that are currently marked not having it.
+>
+> Link: https://lore.kernel.org/lkml/a41f1b20-a76c-43d8-8c36-f12744327a54@app.fastmail.com/
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-are available in the Git repository at:
+Thanks for your patch!
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+> --- a/drivers/pci/Kconfig
+> +++ b/drivers/pci/Kconfig
+> @@ -21,6 +21,7 @@ config GENERIC_PCI_IOMAP
+>  menuconfig PCI
+>         bool "PCI support"
+>         depends on HAVE_PCI
+> +       depends on MMU
+>         help
+>           This option enables support for the PCI local bus, including
+>           support for PCI-X and the foundations for PCI Express support.
 
-for you to fetch changes up to c478032df0789250afe861bff5306d0dc4a8f9e5:
+While having an MMU is a hardware feature, I consider disabling MMU
+support software configuration.  So this change prevents people from
+disabling MMU support on a system that has both a PCI bus and an MMU.
+But other people may not agree, or care?
 
-  Merge tag 'kvmarm-fixes-6.15-1' of https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD (2025-04-08 05:49:31 -0400)
+Gr{oetje,eeting}s,
 
-The diffstat is dominated by moving around some docs that were in the wrong
-section ("Documentation: kvm: organize capabilities in the right section").
+                        Geert
 
-----------------------------------------------------------------
-ARM:
 
-* Rework heuristics for resolving the fault IPA (HPFAR_EL2 v. re-walk
-  stage-1 page tables) to align with the architecture. This avoids
-  possibly taking an SEA at EL2 on the page table walk or using an
-  architecturally UNKNOWN fault IPA.
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-* Use acquire/release semantics in the KVM FF-A proxy to avoid reading
-  a stale value for the FF-A version.
-
-* Fix KVM guest driver to match PV CPUID hypercall ABI.
-
-* Use Inner Shareable Normal Write-Back mappings at stage-1 in KVM
-  selftests, which is the only memory type for which atomic
-  instructions are architecturally guaranteed to work.
-
-s390:
-
-* Don't use %pK for debug printing and tracepoints.
-
-x86:
-
-* Use a separate subclass when acquiring KVM's per-CPU posted interrupts
-  wakeup lock in the scheduled out path, i.e. when adding a vCPU on
-  the list of vCPUs to wake, to workaround a false positive deadlock.
-  The schedule out code runs with a scheduler lock that the wakeup
-  handler takes in the opposite order; but it does so with IRQs disabled
-  and cannot run concurrently with a wakeup.
-
-* Explicitly zero-initialize on-stack CPUID unions
-
-* Allow building irqbypass.ko as as module when kvm.ko is a module
-
-* Wrap relatively expensive sanity check with KVM_PROVE_MMU
-
-* Acquire SRCU in KVM_GET_MP_STATE to protect guest memory accesses
-
-selftests:
-
-* Add more scenarios to the MONITOR/MWAIT test.
-
-* Add option to rseq test to override /dev/cpu_dma_latency
-
-* Bring list of exit reasons up to date
-
-* Cleanup Makefile to list once tests that are valid on all architectures
-
-Other:
-
-* Documentation fixes
-
-----------------------------------------------------------------
-Chen Ni (1):
-      smccc: kvm_guest: Remove unneeded semicolon
-
-Oliver Upton (4):
-      smccc: kvm_guest: Align with DISCOVER_IMPL_CPUS ABI
-      KVM: arm64: Only read HPFAR_EL2 when value is architecturally valid
-      arm64: Convert HPFAR_EL2 to sysreg table
-      KVM: arm64: Don't translate FAR if invalid/unsafe
-
-Paolo Bonzini (14):
-      Merge tag 'kvm-s390-next-6.15-1' of https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into HEAD
-      selftests: kvm: revamp MONITOR/MWAIT tests
-      selftests: kvm: bring list of exit reasons up to date
-      selftests: kvm: list once tests that are valid on all architectures
-      Documentation: KVM: KVM_GET_SUPPORTED_CPUID now exposes TSC_DEADLINE
-      Documentation: kvm: give correct name for KVM_CAP_SPAPR_MULTITCE
-      Documentation: kvm: drop "Capability" heading from capabilities
-      Documentation: kvm: fix some definition lists
-      Documentation: kvm: organize capabilities in the right section
-      Documentation: kvm: remove KVM_CAP_MIPS_TE
-      Merge branch 'kvm-6.15-rc2-cleanups' into HEAD
-      Merge branch 'kvm-6.15-rc2-fixes' into HEAD
-      Merge branch 'kvm-pi-fix-lockdep' into HEAD
-      Merge tag 'kvmarm-fixes-6.15-1' of https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
-
-Raghavendra Rao Ananta (2):
-      KVM: arm64: selftests: Introduce and use hardware-definition macros
-      KVM: arm64: selftests: Explicitly set the page attrs to Inner-Shareable
-
-Sean Christopherson (6):
-      KVM: x86: Acquire SRCU in KVM_GET_MP_STATE to protect guest memory accesses
-      KVM: selftests: Add option to rseq test to override /dev/cpu_dma_latency
-      KVM: x86/mmu: Wrap sanity check on number of TDP MMU pages with KVM_PROVE_MMU
-      KVM: Allow building irqbypass.ko as as module when kvm.ko is a module
-      KVM: x86: Explicitly zero-initialize on-stack CPUID unions
-      KVM: VMX: Assert that IRQs are disabled when putting vCPU on PI wakeup list
-
-Thomas Weißschuh (2):
-      KVM: s390: Don't use %pK through tracepoints
-      KVM: s390: Don't use %pK through debug printing
-
-Will Deacon (1):
-      KVM: arm64: Use acquire/release to communicate FF-A version negotiation
-
-Yan Zhao (1):
-      KVM: VMX: Use separate subclasses for PI wakeup lock to squash false positive
-
- Documentation/virt/kvm/api.rst                     | 1147 ++++++++++----------
- arch/arm64/include/asm/esr.h                       |   44 +-
- arch/arm64/include/asm/kvm_emulate.h               |    7 +-
- arch/arm64/include/asm/kvm_ras.h                   |    2 +-
- arch/arm64/kvm/hyp/include/hyp/fault.h             |   70 +-
- arch/arm64/kvm/hyp/nvhe/ffa.c                      |    9 +-
- arch/arm64/kvm/hyp/nvhe/mem_protect.c              |    9 +-
- arch/arm64/kvm/mmu.c                               |   31 +-
- arch/arm64/tools/sysreg                            |    7 +
- arch/s390/kvm/intercept.c                          |    2 +-
- arch/s390/kvm/interrupt.c                          |    8 +-
- arch/s390/kvm/kvm-s390.c                           |   10 +-
- arch/s390/kvm/trace-s390.h                         |    4 +-
- arch/x86/include/asm/kvm_host.h                    |    7 +-
- arch/x86/kvm/cpuid.c                               |    8 +-
- arch/x86/kvm/mmu/tdp_mmu.c                         |    8 +-
- arch/x86/kvm/vmx/posted_intr.c                     |   37 +-
- arch/x86/kvm/x86.c                                 |    4 +
- drivers/firmware/smccc/kvm_guest.c                 |    4 +-
- include/linux/kvm_host.h                           |    2 +-
- tools/testing/selftests/kvm/Makefile.kvm           |   45 +-
- .../testing/selftests/kvm/arm64/page_fault_test.c  |    2 +-
- .../selftests/kvm/include/arm64/processor.h        |   67 +-
- tools/testing/selftests/kvm/lib/arm64/processor.c  |   60 +-
- tools/testing/selftests/kvm/lib/kvm_util.c         |    5 +-
- tools/testing/selftests/kvm/rseq_test.c            |   31 +-
- .../testing/selftests/kvm/x86/monitor_mwait_test.c |  108 +-
- virt/kvm/Kconfig                                   |    2 +-
- virt/kvm/eventfd.c                                 |   10 +-
- 29 files changed, 964 insertions(+), 786 deletions(-)
-
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
