@@ -1,157 +1,181 @@
-Return-Path: <kvm+bounces-42878-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42879-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A358A7F246
-	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 03:38:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03EF8A7F282
+	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 04:00:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 149F0188C27B
-	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 01:36:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70E343AD106
+	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 02:00:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DB01250C16;
-	Tue,  8 Apr 2025 01:36:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6CC78F5E;
+	Tue,  8 Apr 2025 02:00:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pq4K+Nv3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YR5yWsvi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F488223715
-	for <kvm@vger.kernel.org>; Tue,  8 Apr 2025 01:36:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C00679C4
+	for <kvm@vger.kernel.org>; Tue,  8 Apr 2025 02:00:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744076188; cv=none; b=ju8Lo0FBYxjneoI/m+HWMVBobfp9hOeBNWldBqxkR7CLJB0vhUm4mtA6cHdAXk3L6gBeWLLZyJO5vCR8S3iCTTbDVmHp6H+i0K+TDpDiu8PrnptEGyYspigKlHONpjNrDpYvuBUOZLBd7jRFTmsQL2kk5sR8Bvj8r1Yg4ef5qtI=
+	t=1744077640; cv=none; b=cGi0z3p8mNgo/KCqrWBu5KIyeQgUpi5OokdkyIDVQjlSnUWIXDMp0A9jXZL/drpRFb5A+RY6lHY62vLHxNr/oHHe2806bSPI4A4STBhhmXz1cQPe6HW3IjmkqaWF3iKU656ZJNNmGWY5irI2vP2VdYCvgKiZEoXm2BEZOJEIi6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744076188; c=relaxed/simple;
-	bh=nEJ7IeMB1pLQPS7HDVGT39wEVuaOk/TR/+LKE0Wu/Pg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uuq3eicfFlhVdjUh2/61Ux9eBKkZEyuwZX8DdEUNvgySilJtr6bnqYVnbxG13Ha23T6QHnFr8DsIMQwia7nEPwuo0i+kmTLAZifSt6dIEiG6FAKz6M6vQifkpzDgpxmqyIWABC0B2nGBfHZ1jKuA+jFeIDNtlR6ZlKf85xf6KaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pq4K+Nv3; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-47691d82bfbso102612761cf.0
-        for <kvm@vger.kernel.org>; Mon, 07 Apr 2025 18:36:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744076182; x=1744680982; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VmYGxUgrQ82dA8PHdV+90FiDG0aLpfmprlVUbx46r7Y=;
-        b=pq4K+Nv3Rk+X39a+riUgoIErOqbJEPZVNrbFLRZz9W/p8r8CWWctQdYvv/7Kj4LKuL
-         s331/PwsG+S1r+gR55mIu4FNAXGxbdd07DH6wx245Av1XsBqEG5XbaFM5/eOqqStRaEm
-         9Jg7WOPZSqaROchKFIoGFaUJz6jlLT8UTwSPenDUsK3XLpoP2cERzJ6XeaKhdFEkPDyP
-         zO0ZqEzuPxPjva91p4yllAJEUCU3RueOMcEeCE2ZC2jxay5xezpjnV2ktzitcy5jNJmx
-         p/99qP5Hy3w48uZkhAx2EvBWBEt5j9mSiBDBLvfr4Y9pEpwl1cdScsN7GhiwhpVnH6eN
-         lQZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744076182; x=1744680982;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VmYGxUgrQ82dA8PHdV+90FiDG0aLpfmprlVUbx46r7Y=;
-        b=asdYAJ37Oa83A09ek0XUxrUvysj9sN4BSyOZZbqQjAaSGvQEXMMML7hI9+HM8+Sf8n
-         yDj0Jh6PNVSTzYPNeOeMNWBKwpc/s0DCnk7XfAopiy33v5rD9832tbcTP/6XHuX2G7E3
-         4laGj3sBBL+PqSFI+WjP2y6ER9vLtEwFBqFqMXhV9rQUkVSWOsdF8GCmsddo1GSgt8/4
-         F0qnCPojpxDodsrfwqjwSPDVbyf3mVEaTyVKhyEqrpgdrTyEyH8ZwVOOhjrMdnmWEp3Z
-         cj8/MTOAwTBoDdTLofl4leJFunAGAdXvBvYin/s7Wvn9wmuRCkrFOjsRQ8pl0TekSD3h
-         6G2A==
-X-Forwarded-Encrypted: i=1; AJvYcCXl84A4rWL2xEVwKpDzhyC+sW0Yiev8DenVNIEzRQeVjodbT/aSzelu4vcMGPWVVn0HnNw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBRcbyYNkBLEB/rl6XF+SsycrIf0Gxyp5HqhEAmIQTcpRR7WNg
-	43u8yPoOR9NmzUMVNTc6nm6J25Lgz3IAN3PLQ2pguL7zPy501lirntmq19JefRNbKu3DijGV8qx
-	VPA+tSJq/6S7sl0F4jSIYX30wXNc7nmdPv4qY
-X-Gm-Gg: ASbGnctZ0MD6OWXsLEDOj5LYwxxZ1NUaoNtW/7faU7gl6bwKhuCXpZUR5+JKWS0Gv2B
-	YZSrlgFO85tWHGNqwjJTEA23PcyXfGonon4UrVBCdmG0D812Lmz4GRdSkjQ9VsWxKHnyZegxuof
-	0h6d3iDhzbRSYAtY5tpdfZa54Kwco=
-X-Google-Smtp-Source: AGHT+IGE7L6K2QMo24UqIr1fpMgrGODBEyetBl1Bfu2uk/MMku4VhABQhxdcMPcqYNET2tb3hCHiMzuMHgQDS2/xYL0=
-X-Received: by 2002:ac8:7d92:0:b0:476:8df3:640 with SMTP id
- d75a77b69052e-47924902cd5mr197638761cf.7.1744076181898; Mon, 07 Apr 2025
- 18:36:21 -0700 (PDT)
+	s=arc-20240116; t=1744077640; c=relaxed/simple;
+	bh=OCilHNMl6KOjdWUU2fEWt3Z/3p/1AspDT7e6OPB1xro=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Bx90Q4aWPnbENP8tyIM2uOM5GguydPpn927hPUkiOeFNIILGGr7J4PvmteJyMZp5Ru7Y6GzThPLbhBmjPf8uRGYdPtSNNAkgtamtlilQOdhuTtKFMr9Wem0OJ+qRwi5XrN6SNRJIMAgvewFn8whkrwRKqHzr3YonlMDCVIQVF90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YR5yWsvi; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744077638; x=1775613638;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=OCilHNMl6KOjdWUU2fEWt3Z/3p/1AspDT7e6OPB1xro=;
+  b=YR5yWsviDCxtpY8zcoYLvHkFUC1GtmZdfwxwPKGQv1rKJor4i+fD/csl
+   62//gJTcADvq1afjS+JykaYoiNGTUsdzXcgNe8x+iyhsbbeFVfTQcO8xe
+   eabplTrqr5Qqn/03EMVugS5jO+fwmxp6PMTX5OMBZO6SuxEQLNlXGx7rA
+   Lade8Jd7MYQPvEWiqVEbVBDXftwhLTdRObbyR6lc9lwV1IDXcwL3jJ/rQ
+   lsuB1XE8ARVVtPKgXqaUlJlSzs522fAL5LeFdLrJvuSCgAOfFiQ16c5iP
+   Dto474LmxRlRKS2h9hxAXQmRc+9X4gCz6eYPEhQEg1UK0gGwWgi+3ihof
+   Q==;
+X-CSE-ConnectionGUID: wcXEgFXYRbuYc1HYN1MOZA==
+X-CSE-MsgGUID: lzB9BwxVQMe1gP/AZ7pW/g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11397"; a="45390912"
+X-IronPort-AV: E=Sophos;i="6.15,196,1739865600"; 
+   d="scan'208";a="45390912"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2025 19:00:38 -0700
+X-CSE-ConnectionGUID: W5SHVA7bTiCl3k268kurqw==
+X-CSE-MsgGUID: Bv9tb3WlSt2LIuUOAZ6+9w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,196,1739865600"; 
+   d="scan'208";a="128455440"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2025 19:00:31 -0700
+Message-ID: <f1b0c905-3804-4c34-bc17-e437a8ae86d6@intel.com>
+Date: Tue, 8 Apr 2025 10:00:29 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250325041350.1728373-1-suleiman@google.com>
-In-Reply-To: <20250325041350.1728373-1-suleiman@google.com>
-From: Suleiman Souhlal <suleiman@google.com>
-Date: Tue, 8 Apr 2025 10:36:10 +0900
-X-Gm-Features: ATxdqUHfO2onlsArzyfW1NxAljhVfz4BWtBD_kvxEBCJNEXEDMCEMYaVJWzrz_w
-Message-ID: <CABCjUKBfCe_iAU-9THb=OENFuEE5JMkSN0yPpHQsVo-S6WYViw@mail.gmail.com>
-Subject: Re: [PATCH v5 0/2] KVM: x86: Include host suspended time in steal time
-To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Chao Gao <chao.gao@intel.com>, 
-	David Woodhouse <dwmw2@infradead.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	ssouhlal@freebsd.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 49/65] i386/tdx: handle TDG.VP.VMCALL<GetQuote>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand
+ <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Eduardo Habkost <eduardo@habkost.net>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Yanan Wang <wangyanan55@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Ani Sinha <anisinha@redhat.com>, Peter Xu <peterx@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, Eric Blake <eblake@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Marcelo Tosatti
+ <mtosatti@redhat.com>, kvm@vger.kernel.org, qemu-devel@nongnu.org,
+ Michael Roth <michael.roth@amd.com>, Claudio Fontana <cfontana@suse.de>,
+ Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
+ <isaku.yamahata@gmail.com>, Chenyi Qiang <chenyi.qiang@intel.com>
+References: <20240229063726.610065-1-xiaoyao.li@intel.com>
+ <20240229063726.610065-50-xiaoyao.li@intel.com> <Zv7dtghi20DZ9ozz@redhat.com>
+ <0e15f14b-cd63-4ec4-8232-a5c0a96ba31d@intel.com>
+ <Z-1cm6cEwNGs9NEu@redhat.com>
+ <a3a8ed8d-9994-42c9-ba3b-ef59d6977ce6@intel.com>
+ <Z-5Ces2kGrB67aPw@redhat.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <Z-5Ces2kGrB67aPw@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Mar 25, 2025 at 1:13=E2=80=AFPM Suleiman Souhlal <suleiman@google.c=
-om> wrote:
->
-> This series makes it so that the time that the host is suspended is
-> included in guests' steal time.
+On 4/3/2025 4:10 PM, Daniel P. Berrangé wrote:
+> On Thu, Apr 03, 2025 at 03:28:43PM +0800, Xiaoyao Li wrote:
+>> On 4/2/2025 11:49 PM, Daniel P. Berrangé wrote:
+>>> On Wed, Apr 02, 2025 at 11:26:11PM +0800, Xiaoyao Li wrote:
+>>>>
+>>>> I guess the raw mode was introduced due to the design was changed to let
+>>>> guest kernel to forward to TD report to host QGS via TDVMCALL instead of
+>>>> guest application communicates with host QGS via vsock, and Linux TD guest
+>>>> driver doesn't integrate any QGS protocol but just forward the raw TD report
+>>>> data to KVM.
+>>>>
+>>>>> IMHO, QEMU should be made to pack & unpack the TDX report from
+>>>>> the guest into the GET_QUOTE_REQ / GET_QUOTE_RESP messages, and
+>>>>> this "raw" mode should be removed to QGS as it is inherantly
+>>>>> dangerous to have this magic protocol overloading.
+>>>>
+>>>> There is no enforcement that the input data of TDVMCALL.GetQuote is the raw
+>>>> data of TD report. It is just the current Linux tdx-guest driver of tsm
+>>>> implementation send the raw data. For other TDX OS, or third-party driver,
+>>>> they might encapsulate the raw TD report data with QGS message header. For
+>>>> such cases, if QEMU adds another layer of package, it leads to the wrong
+>>>> result.
+>>>
+>>> If I look at the GHCI spec
+>>>
+>>>     https://cdrdv2-public.intel.com/726790/TDX%20Guest-Hypervisor%20Communication%20Interface_1.0_344426_006%20-%2020230311.pdf
+>>>
+>>> In "3.3 TDG.VP.VMCALL<GetQuote>", it indicates the parameter is a
+>>> "TDREPORT_STRUCT". IOW, it doesn't look valid to allow the guest to
+>>> send arbitrary other data as QGS protocol messages.
+>>
+>> In table 3-7, the description of R12 is
+>>
+>>    Shared GPA as input - the memory contains a TDREPORT_STRUCT.
+>>    The same buffer is used as output - the memory contains a TD Quote.
+>>
+>> table 3-10, describes the detailed format of the shared GPA:
+>>
+>> starting from offset 24 bytes, it is the "Data"
+>>
+>>    On input, the data filled by TD with input length. The data should
+>>    include TDREPORT_STRUCT. TD should zeroize the remaining buffer to
+>>    avoid information leak if size of shared GPA (R13) > Input Length.
+>>
+>> It uses the word "contains" and "include", but without "only". So it is not
+>> clear to me.
+>>
+>> I will work with internal attestation folks to make it clearer that who (TD
+>> guest or host VMM) is responsible to encapsulate the raw TDERPORT_STRCUT
+>> with QGS MSG protocol, and update the spec accordingly.
+> 
+> To be clear, my strong preference is that the spec be updated to only
+> permit the raw TDREPORT_STRUCT.
+> 
+> IMHO allowing arbitrary QGS MSGs would be a significant host security
+> weakness, as it exposes a huge amount of the QGS codebase to direct
+> attack from the guest.
 
-Friendly ping.
+If I remember correctly, the QGS instance keeps the vsock interface so 
+that TD guest can communicate with QGS directly without going through 
+host VMM. (I'm not sure if latest QGS implementation still keeps it.)
+So QGS should know how to protect itself.
 
--- Suleiman
+Regarding QEMU avoids from being exploited to forward arbitrary data 
+from malicious TDX guest to QGS, QEMU can check the beginning of the 
+data to be a valid QGS MSG header before handing it over to QGS socket.
 
->
-> When the host resumes from a suspend, the guest thinks any task
-> that was running during the suspend ran for a long time, even though
-> the effective run time was much shorter, which can end up having
-> negative effects with scheduling.
->
-> To mitigate this issue, we include the time that the host was
-> suspended in steal time, which lets the guest can subtract the
-> duration from the tasks' runtime.
->
-> In addition, we make the guest TSC behavior consistent whether the
-> host TSC went backwards or not.
->
-> v5:
-> - Fix grammar mistakes in commit message.
->
-> v4: https://lore.kernel.org/kvm/20250221053927.486476-1-suleiman@google.c=
-om/T/
-> - Advance guest TSC on suspends where host TSC goes backwards.
-> - Block vCPUs from running until resume notifier.
-> - Move suspend duration accounting out of machine-independent kvm to
->   x86.
-> - Merge code and documentation patches.
-> - Reworded documentation.
->
-> v3: https://lore.kernel.org/kvm/Z5AB-6bLRNLle27G@google.com/T/
-> - Use PM notifier instead of syscore ops (kvm_suspend()/kvm_resume()),
->   because the latter doesn't get called on shallow suspend.
-> - Don't call function under UACCESS.
-> - Whitespace.
->
-> v2: https://lore.kernel.org/lkml/20241118043745.1857272-1-suleiman@google=
-.com/
-> - Accumulate suspend time at machine-independent kvm layer and track per-=
-VCPU
->   instead of per-VM.
-> - Document changes.
->
-> v1: https://lore.kernel.org/kvm/20240710074410.770409-1-suleiman@google.c=
-om/
->
-> Suleiman Souhlal (2):
->   KVM: x86: Advance guest TSC after deep suspend.
->   KVM: x86: Include host suspended time in steal time
->
->  Documentation/virt/kvm/x86/msr.rst | 10 +++-
->  arch/x86/include/asm/kvm_host.h    |  7 +++
->  arch/x86/kvm/x86.c                 | 84 +++++++++++++++++++++++++++++-
->  3 files changed, 98 insertions(+), 3 deletions(-)
->
-> --
-> 2.49.0.395.g12beb8f557-goog
->
+> QEMU needs to be able to block that attack
+> vector. Without that, the benefit/value of shuffling of TDREPORTs via
+> the GetQuote hypercall is largely eliminated, and might as well have
+> just exposed QGS over VSOCK.
+
+If I remember correctly, one of the reason we changed from TD guest 
+communicates with QGS directly with vsock to current TDVMCALL(GETQUOTE), 
+is some of the TD guest environment might not have network stack for 
+vsock to work.
+
+Anyway, I don't have preference. Either is OK to me. Let's see what 
+decision the attestation folks will make.
+
+> With regards,
+> Daniel
+
 
