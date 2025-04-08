@@ -1,224 +1,229 @@
-Return-Path: <kvm+bounces-42886-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42887-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF203A7F4F6
-	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 08:28:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38143A7F516
+	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 08:38:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F28816BEEF
-	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 06:28:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A49171893E7D
+	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 06:38:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 336D525F96D;
-	Tue,  8 Apr 2025 06:28:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BF8F25F98E;
+	Tue,  8 Apr 2025 06:37:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CxfGi3XB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TgxQmS2r"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DBDF226170
-	for <kvm@vger.kernel.org>; Tue,  8 Apr 2025 06:28:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C99519D882
+	for <kvm@vger.kernel.org>; Tue,  8 Apr 2025 06:37:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744093685; cv=none; b=HrjIv/aN8BZcKu5KZY4HNcsZQBZGfWwxxmC7nwoOuUk/Gs3P8x9RZ+rjnK9dxQQa6rX/CnNdHU+iy2iBwFjulScHHcG2Q7YQPlIODymwT3TY69hB1jVS6KDDEM86cS6HsJJkkkUoUKL9Q5/HeOZ/GCaxkzvucj5yh6/8APMS53E=
+	t=1744094272; cv=none; b=QKtBY+HWkyLWkCuIs9tUUU7eHgE/EfCC38O5WYY36qc/Sa1pjxRxVAM2u7f0fwB2Bupf1QWnDhuNZV1Eo06y3nPDkeMzMt9hZ+KK8Pwzn6H8cX7W3Zh4lfvKheG9Elp42cMyRdobdBS/Ya/U3gbq8a/QDl9zW23z5PmvElhSReM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744093685; c=relaxed/simple;
-	bh=y8O4HBajyfWwVy+Bq+XgIOZedoREl2poIYNvV6UwCcU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eCl5dYqNwvFAvv+l2QXTEYRnuxqSROL5AGHfFKth1slvRxhIZ76UbcI6HWTz8TWxDzD3fKidSPNv1tbDTqS16Q3o6YQ3LS1DOFNF1foqdYFP4jZRwlSnql+sA8OYjXtzrp2XvEteru4lXSBYN3wE/p9i06t2Ce2d2BfXvXXRkh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CxfGi3XB; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1744094272; c=relaxed/simple;
+	bh=Oz3GUpFJ10kwqmVTG/QRdcwv51pw9nvmSjTO6MPD85c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XgE6fJ+9eE2AveotwKmHpd3N0VzNaHfFe4QHZzSuE+e0SjzK79lcjJRN7NSldi/jrjGaB6Luj4RlvWBHlI82PcBaAWQc1TYLpIvAh8kMW9MKoRE5D5V3dNrpiynKVexR33N5hkXYtYmiIHLmAb9SMqJHllGs9U8z8I+6UBxdX4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TgxQmS2r; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744093682;
+	s=mimecast20190719; t=1744094268;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OFEAHfNF2upt4iBW1CVn1hW5AhNTxhgDogV7FrnTJvk=;
-	b=CxfGi3XB9dDQ/CEXQCxl+uQzkckQSzi4ipVcEbqAotuIP7C/y275IiNp+wxP/eS/MDux2U
-	yTzy6gx4tagpj9fGQt4EeAcMv/NATOKQk4kS99fahdwiL2MCbpNZW4jWvZoCJoUSNZvCY0
-	S1pLJHzL53l9ZIeS+3oYSBoGVtwRREA=
-Received: from mail-vk1-f199.google.com (mail-vk1-f199.google.com
- [209.85.221.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=0v20FJ701EIe028OJtt1tD17tf+Uzfk0Oz819ryH+Ys=;
+	b=TgxQmS2ra57x1fXgH/vCC75U4u169CtHn4kNWnTTxFj3KVnmFcpaIOI/VInD0hheBmk6aq
+	HgyJwPI8XDEFqs0Tl6JNt2cJOsj7nmlOBeR0J82HBlm3CD0TUIe1drEx7qkhauw9nA4z+w
+	maR9gx1cR7Jybeu7NLuNrSfe3qMEXO0=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-425-b3u9yZBLMWmApsJONdfirQ-1; Tue, 08 Apr 2025 02:28:01 -0400
-X-MC-Unique: b3u9yZBLMWmApsJONdfirQ-1
-X-Mimecast-MFC-AGG-ID: b3u9yZBLMWmApsJONdfirQ_1744093680
-Received: by mail-vk1-f199.google.com with SMTP id 71dfb90a1353d-523fd94a77cso1163446e0c.0
-        for <kvm@vger.kernel.org>; Mon, 07 Apr 2025 23:28:01 -0700 (PDT)
+ us-mta-251-Hwi0e_WlPU6Ctj2hiItWJg-1; Tue, 08 Apr 2025 02:37:47 -0400
+X-MC-Unique: Hwi0e_WlPU6Ctj2hiItWJg-1
+X-Mimecast-MFC-AGG-ID: Hwi0e_WlPU6Ctj2hiItWJg_1744094267
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2ff854a2541so4726628a91.0
+        for <kvm@vger.kernel.org>; Mon, 07 Apr 2025 23:37:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744093680; x=1744698480;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OFEAHfNF2upt4iBW1CVn1hW5AhNTxhgDogV7FrnTJvk=;
-        b=MGaw2ZeNc/cGc4VXw5yUl/sqzTMqHyhoU2eQ7Lh0ZYTGI5UMovJxUm8ydnVhu2ft7i
-         UOxpMRYI054HclRGAcznAkxiIOI3JJoJ7Zje8jyWQbHEkqPhb/lgoW4nWu6HNso9WeuW
-         tGgeo1nCBhv8TcgQUOVjZQWChPG3Muoe+xM6M6Cr00sLqAZN/y1XX460v2sQWB2XRXl/
-         IuWv03Mqx/nPrBrYyQW+LtMXX8AYabVUj5VseSi91u/uScV5/YLkkkgAkYY1avIzcohg
-         SDR0j0aO+8CPtZT/Xlu35fZz+XDsJOP0j5y77XWD9e3cUl1DFs6riHcsxWvKD7bBwwWf
-         iIrA==
-X-Forwarded-Encrypted: i=1; AJvYcCViVuXr1uugVshYBZYF1wHTpJx5BEg3Wx2j9UFKOzH6SeETxDNj7c4i083UzN1u+IUUZAg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxilnEKIC3oBinrS1hXdbO6PPnJR4BtCNdtOMKxg9lEJl3EGMJ
-	elZvlXKDc03UvT0JqHN2MZDZN02EmpT1HZVO541nttkJSAOFRGS6weyqIZa1N7FxHXOtjBVIdkW
-	ugiHwtp5NJWrVx+LpRuP/ovER4Wpj48cAgTf3rrrui7Z3Mq3y+Y8vXNOUw1T67DOKrsOYLF7gG5
-	inAzTs9v7Df9pOhudvHqVNsUWk
-X-Gm-Gg: ASbGncskEz74GzJo/kVw5YtF29wltdGNUlW9Y581XjubAJzMgrXG2afY/JjB9NC6ucG
-	YTvDmbL9+XYE73jiht+FlM/8t91ypoRLpnHtble3s3g7kynJn09USeFsHdTfcdMptIzFent1P
-X-Received: by 2002:a05:6102:2b8d:b0:4c4:e414:b4eb with SMTP id ada2fe7eead31-4c8553ddbd7mr13452805137.12.1744093680464;
-        Mon, 07 Apr 2025 23:28:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFeRUBOqMK5hyNx0Viqtj2BdChVeCwFqQAKfIszSRcQ8GXs6TF7Lz3t65QjInAuYEEWZxiV0+j7wcTUD0tEPS8=
-X-Received: by 2002:a05:6102:2b8d:b0:4c4:e414:b4eb with SMTP id
- ada2fe7eead31-4c8553ddbd7mr13452795137.12.1744093680116; Mon, 07 Apr 2025
- 23:28:00 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1744094267; x=1744699067;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0v20FJ701EIe028OJtt1tD17tf+Uzfk0Oz819ryH+Ys=;
+        b=c8M6yU3uouAEWcg+ebYt1hG/cWN297y253RPw9FnMG3Ysb9YWQTk71l0nl3q9YJIaL
+         1bZf6+M/IbZLS01YYLCWUse5ou9NRxN/loQgFOmHBjWahP8adpz7BwuZbagBL1cXqfQY
+         MIU3N0X7BGZG5UbKO6iUZ55pAvEq7EU3kWNeNhFTu0RIvks3cf8i4tue9RzrVatdHxDw
+         GCgCWsp2Bj6QJM6p5j1UZeoAYudp5Tqwbn+KAm4RcYeU6H1G5weAdtI3CPIRWE9nhW5/
+         oo63ymKVvyk///xP9tYBGyUdrfq8sKGX+s6w6EmAix5vW0azoeftXjGBetwMn7/YCTAH
+         nggw==
+X-Forwarded-Encrypted: i=1; AJvYcCV4HY0TB710DGqCtk2k4+Lh1pu+sx7NXgpldg4zoXYnOsWqM1JYpLvm+dToCghgQqzmXjQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6BgJF39/t8gvieM6SM+KI/qdurlS+Ee7YbLm+MY1yPFfglNEX
+	nggMIcLMl4N3p6PsC9eq+I2oxwa5G22mcYys0S3GG6P400dyh70Co8qEBudEoLJt+MjLbRjsubm
+	9yXckSUrlBq7pMn079yD74QLlZJaSk2VB5yZ/3fnuwkNOYpTmIg==
+X-Gm-Gg: ASbGncvzziPairWmgbZRCue7UPdRlsEAstA6/z2siI5XQK1YLk2wmHcgKR7W27ZePU4
+	hZQUG+f8Xjcaj+CiMdRFUYcJBGauQINDi/I1MLtp+KjjOnl6rYeq3MPFwtSk4yb6POCXgvZxDkJ
+	QPjq2lf7B5o4GQtciu25sjU2u7wS7uG0BWBta3BpvwTqwZ+lbHd0rIYhZsfAKTs7pUp+7OW4utS
+	N7WLnrxvHSr81PhAsHg0dX6sYlCmghhJkBy75SKEavmHnZYn5q188OXYhg5Ua7nMnRMxpvdGDXI
+	dT4SElRLh4X7G7ce
+X-Received: by 2002:a17:90b:514e:b0:304:ec28:4437 with SMTP id 98e67ed59e1d1-306a4b70e72mr18510600a91.22.1744094266485;
+        Mon, 07 Apr 2025 23:37:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHnqBBqwWUYhtFhCnTMpC42RqocSQyCJuLXXFnIrjI7SQP3rPRugb4tcWmMuJB3JDe5p/oXtw==
+X-Received: by 2002:a17:90b:514e:b0:304:ec28:4437 with SMTP id 98e67ed59e1d1-306a4b70e72mr18510574a91.22.1744094266139;
+        Mon, 07 Apr 2025 23:37:46 -0700 (PDT)
+Received: from [192.168.68.55] ([180.233.125.65])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-305983bce79sm10080504a91.37.2025.04.07.23.37.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Apr 2025 23:37:45 -0700 (PDT)
+Message-ID: <7fa4269b-a20c-4cfc-b6e7-e70214ec6366@redhat.com>
+Date: Tue, 8 Apr 2025 16:37:36 +1000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250404145241.1125078-1-jon@nutanix.com> <CACGkMEsFc-URhXBCGZ1=CTMZKcWPf57pYy1TcyKLL=N65u+F0Q@mail.gmail.com>
- <B32E2C5D-25FB-427F-8567-701C152DFDE6@nutanix.com>
-In-Reply-To: <B32E2C5D-25FB-427F-8567-701C152DFDE6@nutanix.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 8 Apr 2025 14:27:48 +0800
-X-Gm-Features: ATxdqUHPgD0AF9QYRz_3XemrYCxKbVxtWo52WcdpgKy0DwPXI7mtOhUMNAmsIo0
-Message-ID: <CACGkMEucg5mduA-xoyrTRK5nOkdHvUAkG9fH6KpO=HxMVPYONA@mail.gmail.com>
-Subject: Re: [PATCH] vhost/net: remove zerocopy support
-To: Jon Kohler <jon@nutanix.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 34/45] kvm: rme: Hide KVM_CAP_READONLY_MEM for realm
+ guests
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+References: <20250213161426.102987-1-steven.price@arm.com>
+ <20250213161426.102987-35-steven.price@arm.com>
+ <32a09a27-f131-44dd-8959-abb63b2089a8@redhat.com>
+ <d254a8ea-0f02-4826-9af3-4a288efcc90c@arm.com>
+Content-Language: en-US
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <d254a8ea-0f02-4826-9af3-4a288efcc90c@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 8, 2025 at 9:18=E2=80=AFAM Jon Kohler <jon@nutanix.com> wrote:
->
->
->
-> > On Apr 6, 2025, at 7:14=E2=80=AFPM, Jason Wang <jasowang@redhat.com> wr=
-ote:
-> >
-> > !-------------------------------------------------------------------|
-> >  CAUTION: External Email
-> >
-> > |-------------------------------------------------------------------!
-> >
-> > On Fri, Apr 4, 2025 at 10:24=E2=80=AFPM Jon Kohler <jon@nutanix.com> wr=
-ote:
-> >>
-> >> Commit 098eadce3c62 ("vhost_net: disable zerocopy by default") disable=
-d
-> >> the module parameter for the handle_tx_zerocopy path back in 2019,
-> >> nothing that many downstream distributions (e.g., RHEL7 and later) had
-> >> already done the same.
-> >>
-> >> Both upstream and downstream disablement suggest this path is rarely
-> >> used.
-> >>
-> >> Testing the module parameter shows that while the path allows packet
-> >> forwarding, the zerocopy functionality itself is broken. On outbound
-> >> traffic (guest TX -> external), zerocopy SKBs are orphaned by either
-> >> skb_orphan_frags_rx() (used with the tun driver via tun_net_xmit())
-> >
-> > This is by design to avoid DOS.
->
-> I understand that, but it makes ZC non-functional in general, as ZC fails
-> and immediately increments the error counters.
+On 4/8/25 2:34 AM, Steven Price wrote:
+> On 04/03/2025 11:51, Gavin Shan wrote:
+>> On 2/14/25 2:14 AM, Steven Price wrote:
+>>> For protected memory read only isn't supported. While it may be possible
+>>> to support read only for unprotected memory, this isn't supported at the
+>>> present time.
+>>>
+>>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>> ---
+>>>    arch/arm64/kvm/arm.c | 2 +-
+>>>    1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>
+>> It's worthy to explain why KVM_CAP_READONLY_MEM isn't supported and its
+>> negative impact. It's something to be done in the future if I'm correct.
+> 
+> I'll add to the commit message:
+> 
+>      Note that this does mean that e.g. ROM (or flash) data cannot be
+>      emulated correctly by the VMM.
+> 
 
-The main issue is HOL, but zerocopy may still work in some setups that
-don't need to care about HOL. One example the macvtap passthrough
-mode.
+Please also to mention this if you agree: At present, there is no exposed
+APIs from RMM allowing to specifying stage-2 page-table entry's permission.
+read-only regions for ROM and flash have to be backed up by read-write stage-2
+page-table entries. It's going to rely on the stage-1 page-table to have the
+proper permissions for those read-only regions.
 
->
-> >
-> >> or
-> >> skb_orphan_frags() elsewhere in the stack,
-> >
-> > Basically zerocopy is expected to work for guest -> remote case, so
-> > could we still hit skb_orphan_frags() in this case?
->
-> Yes, you=E2=80=99d hit that in tun_net_xmit().
+>>  From QEMU's perspective, all ROM data, which is populated by it, can
+>> be written. It conflicts to the natural limit: all ROM data should be
+>> read-only.
+> 
+> Yes this is my understanding of the main impact. I'm not sure how useful
+> (shared) ROM/flash emulation is. It can certainly be added in the future
+> if needed. Protected read-only memory I don't believe is useful - the
+> only sane response I can see from a write fault in that case is killing
+> the guest.
+> 
 
-Only for local VM to local VM communication.
+Yes, VMM is still able to write to those regions even they're read-only
+since they're emulated. For misbehaving guest where those regions are also
+mapped as read-write, the data resident in those regions can be corrupted
+by guest. It's not the expected output.
 
-> If you punch a hole in that *and* in the
-> zc error counter (such that failed ZC doesn=E2=80=99t disable ZC in vhost=
-), you get ZC
-> from vhost; however, the network interrupt handler under net_tx_action an=
-d
-> eventually incurs the memcpy under dev_queue_xmit_nit().
+Since RMM doesn't have exposed APIs allowing to specify page-table entry's
+permissions, meaning all entries have read-write permissions, we have to
+give read-write permission to those read-only regions for now. In long run,
+it's something to be fixed, starting from RMM.
 
-Well, yes, we need a copy if there's a packet socket. But if there's
-no network interface taps, we don't need to do the copy here.
+Thanks,
+Gavin
 
->
-> This is no more performant, and in fact is actually worse since the time =
-spent
-> waiting on that memcpy to resolve is longer.
->
-> >
-> >> as vhost_net does not set
-> >> SKBFL_DONT_ORPHAN.
-
-Maybe we can try to set this as vhost-net can hornor ulimit now.
-
-> >>
-> >> Orphaning enforces a memcpy and triggers the completion callback, whic=
-h
-> >> increments the failed TX counter, effectively disabling zerocopy again=
-.
-> >>
-> >> Even after addressing these issues to prevent SKB orphaning and error
-> >> counter increments, performance remains poor. By default, only 64
-> >> messages can be zerocopied, which is immediately exhausted by workload=
-s
-> >> like iperf, resulting in most messages being memcpy'd anyhow.
-> >>
-> >> Additionally, memcpy'd messages do not benefit from the XDP batching
-> >> optimizations present in the handle_tx_copy path.
-> >>
-> >> Given these limitations and the lack of any tangible benefits, remove
-> >> zerocopy entirely to simplify the code base.
-> >>
-> >> Signed-off-by: Jon Kohler <jon@nutanix.com>
-> >
-> > Any chance we can fix those issues? Actually, we had a plan to make
-> > use of vhost-net and its tx zerocopy (or even implement the rx
-> > zerocopy) in pasta.
->
-> Happy to take direction and ideas here, but I don=E2=80=99t see a clear w=
-ay to fix these
-> issues, without dealing with the assertions that skb_orphan_frags_rx call=
-s out.
->
-> Said another way, I=E2=80=99d be interested in hearing if there is a conf=
-ig where ZC in
-> current host-net implementation works, as I was driving myself crazy tryi=
-ng to
-> reverse engineer.
-
-See above.
-
->
-> Happy to collaborate if there is something we could do here.
-
-Great, we can start here by seeking a way to fix the known issues of
-the vhost-net zerocopy code.
-
-Thanks
-
->
-> >
-> > Eugenio may explain more here.
-> >
-> > Thanks
-> >
->
+> Thanks,
+> Steve
+> 
+>> QEMU
+>> ====
+>> rom_add_blob
+>>    rom_set_mr
+>>      memory_region_set_readonly
+>>        memory_region_transaction_commit
+>>          kvm_region_commit
+>>            kvm_set_phys_mem
+>>              kvm_mem_flags                                    // flag
+>> KVM_MEM_READONLY is missed
+>>              kvm_set_user_memory_region
+>>                kvm_vm_ioctl(KVM_SET_USER_MEMORY_REGION2)
+>>
+>> non-secure host
+>> ===============
+>> rec_exit_sync_dabt
+>>    kvm_handle_guest_abort
+>>      user_mem_abort
+>>        __kvm_faultin_pfn                       // writable == true
+>>          realm_map_ipa
+>>            WARN_ON(!(prot & KVM_PGTABLE_PROT_W)
+>>
+>> non-secure host
+>> ===============
+>> kvm_realm_enable_cap(KVM_CAP_ARM_RME_POPULATE_REALM)
+>>    kvm_populate_realm
+>>      __kvm_faultin_pfn                      // writable == true
+>>        realm_create_protected_data_page
+>>
+>>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>>> index 1f3674e95f03..0f1d65f87e2b 100644
+>>> --- a/arch/arm64/kvm/arm.c
+>>> +++ b/arch/arm64/kvm/arm.c
+>>> @@ -348,7 +348,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm,
+>>> long ext)
+>>>        case KVM_CAP_ONE_REG:
+>>>        case KVM_CAP_ARM_PSCI:
+>>>        case KVM_CAP_ARM_PSCI_0_2:
+>>> -    case KVM_CAP_READONLY_MEM:
+>>>        case KVM_CAP_MP_STATE:
+>>>        case KVM_CAP_IMMEDIATE_EXIT:
+>>>        case KVM_CAP_VCPU_EVENTS:
+>>> @@ -362,6 +361,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm,
+>>> long ext)
+>>>        case KVM_CAP_COUNTER_OFFSET:
+>>>            r = 1;
+>>>            break;
+>>> +    case KVM_CAP_READONLY_MEM:
+>>>        case KVM_CAP_SET_GUEST_DEBUG:
+>>>            r = !kvm_is_realm(kvm);
+>>>            break;
+>>
+>> Thanks,
+>> Gavin
+>>
+> 
 
 
