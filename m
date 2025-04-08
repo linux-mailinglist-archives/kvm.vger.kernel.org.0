@@ -1,90 +1,204 @@
-Return-Path: <kvm+bounces-42931-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42932-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8574EA8073D
-	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 14:35:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5209BA80938
+	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 14:52:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4991B1B86E98
-	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 12:30:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B19BF4C846D
+	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 12:42:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B949B26A0D3;
-	Tue,  8 Apr 2025 12:27:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B23E26E17B;
+	Tue,  8 Apr 2025 12:37:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=8bytes.org header.i=@8bytes.org header.b="lAnoHnFD"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="Qf0297N0";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Fgq0RluA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.8bytes.org (mail.8bytes.org [85.214.250.239])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 186F02676CF;
-	Tue,  8 Apr 2025 12:27:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.250.239
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744115224; cv=none; b=u+sPWr80FVgFT68vKFGBXbSYFIJuFBdI6iF4j8G7zIAdlIGPna+BFlhp25CpjeysiYuWuac3yWy+oKefyi0t6n8QHk4DOABT2eKgNr+9WVn7sXspAoPYI/HfDoU8BeRonuTQaQEAW0wJhe+6/fTjZ3cwJKIRkU2kutvdFQhK2IA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744115224; c=relaxed/simple;
-	bh=nq2Kr9V0iRKj4KAgVfWgH5mjKDMUAxCo9QldS2g1xLs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HTaDQJTZ4ZC3DiwOLbgFEM7IE/ULe3g+tU3a+SjeOSQXkAQbIbHgax76aeMJMuhUj/9ppFPFMYwy0+n1P6lCfFB3oEoiDwx9cmJ4hpAkbUOn23hrBjChd/Qw/gXmY27xpd9dfgWjn9mILSqnA+0+duXH6vSclA5zdZ2jZh9eFn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=8bytes.org; spf=pass smtp.mailfrom=8bytes.org; dkim=pass (2048-bit key) header.d=8bytes.org header.i=@8bytes.org header.b=lAnoHnFD; arc=none smtp.client-ip=85.214.250.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=8bytes.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=8bytes.org
-Received: from 8bytes.org (p4ffe03ae.dip0.t-ipconnect.de [79.254.3.174])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+Received: from fhigh-a3-smtp.messagingengine.com (fhigh-a3-smtp.messagingengine.com [103.168.172.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.8bytes.org (Postfix) with ESMTPSA id A184C452D5;
-	Tue,  8 Apr 2025 14:26:54 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=8bytes.org;
-	s=default; t=1744115214;
-	bh=nq2Kr9V0iRKj4KAgVfWgH5mjKDMUAxCo9QldS2g1xLs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lAnoHnFDMj1Xo4jTbJ3bcWpbl3kw57G1fnM6YnNMYGyjf4YScp4Yc6xlbARlSgMUM
-	 isjECItBxqvB4kZDevA18/O6noZMBtFBSNZVuEfeST8SoDY3+tNo0mCAFAuKBJDTxZ
-	 Ru4CnVZsXz8sOPeiQxx9+5Y1L/KQTfdT/Y2Hqne+ooYsxUMIYB3xvfnYPrIKpfZYaH
-	 Ff0IWVpGwf65fsIP7wCTdek2SHu4gUdC8UuZpBEoTKbZdxKN/Xp3MVWkPy/nWlaDMZ
-	 DLWG7HyT6OT2uMoKzl1wciRlPLk862ceQlBAdxDGKPkOcuFjsw2WewgJo5SlsOpaWh
-	 IAJeHw8N07MMg==
-Date: Tue, 8 Apr 2025 14:26:53 +0200
-From: Joerg Roedel <joro@8bytes.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Lu Baolu <baolu.lu@linux.intel.com>, kvm@vger.kernel.org,
-	iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
-	Maxim Levitsky <mlevitsk@redhat.com>,
-	Joao Martins <joao.m.martins@oracle.com>,
-	David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH 44/67] iommu/amd: KVM: SVM: Infer IsRun from validity of
- pCPU destination
-Message-ID: <Z_UWDSQuD7ZCfhr6@8bytes.org>
-References: <20250404193923.1413163-1-seanjc@google.com>
- <20250404193923.1413163-45-seanjc@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 686E726E141;
+	Tue,  8 Apr 2025 12:37:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744115865; cv=none; b=R3J54HUaTKpGBIkFdYC2sB1xcjzxdTcJ4Qe8zpg/HjhKmEoGBmRjRWfkn7vVrZIOp9lT1HOxbIWjSN+0nBL7irWzILyfNev0IcMPrid4xW1pyfMIvUqoLbppb/teJsape3nJ6mC9793pkNOmB3VGCh4p6o/R+M7u/4zV+H5BZJo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744115865; c=relaxed/simple;
+	bh=E2AZipTTbQZtglps7EODNhvVECKl6pYX9kBVNiP95fY=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=K8yLQx+zsBzTRf+QhsfWvBVctEuWXTssi0JpX1thB2UJJ54K4gQbf9gyI142uvo1j9KH7qN+EkvCD/hpRy2yoozkPErlYgW/dv0khog6LhDQ2+rzHgxV5zdMt0Xv/m0hOb9b0oqcaTMs7WZpVwNxoBn2WW2SIFrEDsO4yZuELSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=Qf0297N0; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Fgq0RluA; arc=none smtp.client-ip=103.168.172.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 510181140201;
+	Tue,  8 Apr 2025 08:37:41 -0400 (EDT)
+Received: from phl-imap-11 ([10.202.2.101])
+  by phl-compute-12.internal (MEProxy); Tue, 08 Apr 2025 08:37:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1744115861;
+	 x=1744202261; bh=zFcPiZ2dymYdvLOyrug0agUR+Yq1LwHn6b82n9khMg4=; b=
+	Qf0297N0imeQiL7hyJIuBesDFq/a+BHRV6/LEPWur/YXXuKI/6r3PZt9rS5Y0vc0
+	PnrfpQMzPxPhF4961sVkO7xjPeQP39wn8HSFAXbcgogfLaS7H2GLrIrFY2t89a0J
+	h6YXCDdsGtqDNu1c4E1t3zgLp32Ob5TI9Rv6cwYq7MxCkMws5xqtmCPegxELSPa6
+	hCxzq6Meypd0fj2IQH5EPo0oQoFwHLbV34hAkeMbLQGNKhNcAM+VLjggfg8TQNlI
+	clz49C20jEPQiHBwww6qH1vohrL5KUnacV8CNFCMTHPB01glDLpHAeHBTJoC7xHg
+	1NJ8WNzoxP2EflxT9fvZsQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1744115861; x=
+	1744202261; bh=zFcPiZ2dymYdvLOyrug0agUR+Yq1LwHn6b82n9khMg4=; b=F
+	gq0RluApzIi0bNAlHRstGMer9QdcAWtQ6SV/MDdmeTKcdBMRJIZaQ529ANUP1tc4
+	R7Jzx04bkT0R27M1RWyxyujNcIN2/FjVJ9vP7QT3RNeQdZaUZVA8GHJOwQq0Q+wd
+	rKoh8YG/4wrNoitQvUilGZ0Ndo2EdfNcBJDY2KSfOkwgQxe8iB81BbqOp8C6plYw
+	59U1k+/iA8gVJiTepKCDQnddfkSy2AqLAk7du1BY2aLq9KuhjQWEe0XNSJsI+V3B
+	EWoCq2Fxso6z5at6aYRrSuI9DzaIzuePo5gvvt85ffAAK44wdSXoHynKhDQBNvd4
+	G69R0b4EWpOWJWTbaEfLA==
+X-ME-Sender: <xms:lBj1Z7hgX3cFpkW0LV58_NIF7J5rMr2Efj0rTurIfQ8OGNnb_NedUg>
+    <xme:lBj1Z4CaF4bPuugFG8HjCAB-QCzxWR1xaFwwvo4eHRED9-2-SEzrg9yNlDBfPcski
+    gKdJB8bqBI0u6ZITDE>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvtdefuddtucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtjeertder
+    tddtnecuhfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnug
+    gsrdguvgeqnecuggftrfgrthhtvghrnhephfdthfdvtdefhedukeetgefggffhjeeggeet
+    fefggfevudegudevledvkefhvdeinecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
+    hmpehmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohep
+    udejpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehquhhitggptggrrhhlvhesqh
+    huihgtihhntgdrtghomhdprhgtphhtthhopegrihhrlhhivggusehrvgguhhgrthdrtgho
+    mhdprhgtphhtthhopegrlhgvgidrfihilhhlihgrmhhsohhnsehrvgguhhgrthdrtghomh
+    dprhgtphhtthhopehjrghvihgvrhhmsehrvgguhhgrthdrtghomhdprhgtphhtthhopehj
+    fhgrlhgvmhhpvgesrhgvughhrghtrdgtohhmpdhrtghpthhtohepkhhrrgigvghlsehrvg
+    guhhgrthdrtghomhdprhgtphhtthhopehlhihuuggvsehrvgguhhgrthdrtghomhdprhgt
+    phhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepohdqthgrkh
+    grshhhihesshgrkhgrmhhotggthhhirdhjph
+X-ME-Proxy: <xmx:lBj1Z7EgPLJ8zqV-BwhJaDn18yuAs0d7R3sLR16DH_Ujae8xM6RFaQ>
+    <xmx:lBj1Z4RdCM9qLlXZjKC4b3kh5UwXozUBVxSTSgDAg5pu5B1c4PP_DQ>
+    <xmx:lBj1Z4wtiJS2jP2YWaO4qJ13ldJJXRcH53SDbNAiSnVH7QSr_PivGg>
+    <xmx:lBj1Z-7I3XyQYtYrnodmPe8P6I-m2aivla5dqixH9iL5aQYh-lhXyg>
+    <xmx:lRj1Z7XKsbjtdCEd4qgEFEpKQ8t36YicC1s4kOLkwF3pr3f7A4b3PpMs>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 5F2962220073; Tue,  8 Apr 2025 08:37:40 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250404193923.1413163-45-seanjc@google.com>
+X-ThreadId: T702257fbe5397c0b
+Date: Tue, 08 Apr 2025 14:37:07 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Geert Uytterhoeven" <geert@linux-m68k.org>,
+ "Arnd Bergmann" <arnd@kernel.org>
+Cc: "Bjorn Helgaas" <bhelgaas@google.com>,
+ "Jeff Hugo" <jeff.hugo@oss.qualcomm.com>,
+ "Carl Vanderlip" <quic_carlv@quicinc.com>,
+ "Oded Gabbay" <ogabbay@kernel.org>,
+ "Takashi Sakamoto" <o-takashi@sakamocchi.jp>,
+ "Maarten Lankhorst" <maarten.lankhorst@linux.intel.com>,
+ "Maxime Ripard" <mripard@kernel.org>,
+ "Thomas Zimmermann" <tzimmermann@suse.de>,
+ "Dave Airlie" <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>,
+ "Alex Deucher" <alexander.deucher@amd.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ "Dave Airlie" <airlied@redhat.com>,
+ "Jocelyn Falempe" <jfalempe@redhat.com>,
+ "Patrik Jakobsson" <patrik.r.jakobsson@gmail.com>,
+ "Xinliang Liu" <xinliang.liu@linaro.org>,
+ "Tian Tao" <tiantao6@hisilicon.com>,
+ "Xinwei Kong" <kong.kongxinwei@hisilicon.com>,
+ "Sumit Semwal" <sumit.semwal@linaro.org>,
+ "Yongqin Liu" <yongqin.liu@linaro.org>,
+ "John Stultz" <jstultz@google.com>,
+ "Sui Jingfeng" <suijingfeng@loongson.cn>,
+ "Lyude Paul" <lyude@redhat.com>, "Danilo Krummrich" <dakr@kernel.org>,
+ "Gerd Hoffmann" <kraxel@redhat.com>,
+ "Zack Rusin" <zack.rusin@broadcom.com>,
+ "Broadcom internal kernel review list"
+ <bcm-kernel-feedback-list@broadcom.com>,
+ "Lucas De Marchi" <lucas.demarchi@intel.com>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ "Rodrigo Vivi" <rodrigo.vivi@intel.com>,
+ "Andrew Lunn" <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>,
+ "Saurav Kashyap" <skashyap@marvell.com>,
+ "Javed Hasan" <jhasan@marvell.com>,
+ GR-QLogic-Storage-Upstream@marvell.com,
+ "James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ "Nilesh Javali" <njavali@marvell.com>,
+ "Manish Rangankar" <mrangankar@marvell.com>,
+ "Alex Williamson" <alex.williamson@redhat.com>,
+ "Geert Uytterhoeven" <geert+renesas@glider.be>,
+ "Javier Martinez Canillas" <javierm@redhat.com>,
+ "Jani Nikula" <jani.nikula@intel.com>,
+ "Mario Limonciello" <mario.limonciello@amd.com>,
+ =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+ "Lijo Lazar" <lijo.lazar@amd.com>,
+ "Niklas Schnelle" <schnelle@linux.ibm.com>,
+ "Dmitry Baryshkov" <lumag@kernel.org>, linux-arm-msm@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+ linux1394-devel@lists.sourceforge.net, amd-gfx@lists.freedesktop.org,
+ "nouveau@lists.freedesktop.org" <nouveau@lists.freedesktop.org>,
+ virtualization@lists.linux.dev, spice-devel@lists.freedesktop.org,
+ intel-xe@lists.freedesktop.org, Netdev <netdev@vger.kernel.org>,
+ linux-pci@vger.kernel.org, linux-scsi@vger.kernel.org,
+ kvm@vger.kernel.org, "Greg Ungerer" <gerg@linux-m68k.org>
+Message-Id: <9abf582c-ea8e-42ca-a6d5-34c1e1932f95@app.fastmail.com>
+In-Reply-To: 
+ <CAMuHMdWN=wurw7qz0t2ovMkUNu0BJRAMv_0U63Lqs2MGxkVnHw@mail.gmail.com>
+References: <20250407104025.3421624-1-arnd@kernel.org>
+ <CAMuHMdWN=wurw7qz0t2ovMkUNu0BJRAMv_0U63Lqs2MGxkVnHw@mail.gmail.com>
+Subject: Re: [RFC] PCI: add CONFIG_MMU dependency
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 04, 2025 at 12:38:59PM -0700, Sean Christopherson wrote:
-> @@ -3974,8 +3974,10 @@ int amd_iommu_update_ga(int cpu, bool is_run, void *data)
->  					APICID_TO_IRTE_DEST_LO(cpu);
->  		entry->hi.fields.destination =
->  					APICID_TO_IRTE_DEST_HI(cpu);
-> +		entry->lo.fields_vapic.is_run = true;
-> +	} else {
-> +		entry->lo.fields_vapic.is_run = false;
->  	}
-> -	entry->lo.fields_vapic.is_run = is_run;
+On Tue, Apr 8, 2025, at 12:22, Geert Uytterhoeven wrote:
+> On Mon, 7 Apr 2025 at 12:40, Arnd Bergmann <arnd@kernel.org> wrote:
+>
+>> --- a/drivers/pci/Kconfig
+>> +++ b/drivers/pci/Kconfig
+>> @@ -21,6 +21,7 @@ config GENERIC_PCI_IOMAP
+>>  menuconfig PCI
+>>         bool "PCI support"
+>>         depends on HAVE_PCI
+>> +       depends on MMU
+>>         help
+>>           This option enables support for the PCI local bus, including
+>>           support for PCI-X and the foundations for PCI Express support.
+>
+> While having an MMU is a hardware feature, I consider disabling MMU
+> support software configuration.  So this change prevents people from
+> disabling MMU support on a system that has both a PCI bus and an MMU.
+> But other people may not agree, or care?
 
-This change in the calling convention deserves a comment above the
-function, describing that cpu < 0 marks the CPU as not running.
+I created this patch after Greg said that the coldfire-v4 chips
+that have an MMU are not really used without it any more, and
+I had accidentally only build tested a patch without CONFIG_MMU.
 
-Regards,
+On ARM, CONFIG_MMU can no longer be disabled on CPUs that have
+one, this was a side-effect of the ARCH_MULTIPLATFORM conversion.
 
-	Joerg
+I just tried building an SH7751 kernel with MMU disabled but PCI
+enable. This produces build errors in several files, clearly nobody
+has tried this in a long time.
+
+I'm not entirely sure about xtensa, but it seems that PCI is
+only supported on the "virt" platform, which in turn cannot
+turn off MMU, even if there are other platforms that can build
+with out without MMU enabled.
+
+     Arnd
 
