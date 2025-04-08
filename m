@@ -1,266 +1,109 @@
-Return-Path: <kvm+bounces-42962-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42963-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8936FA817AB
-	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 23:32:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDA54A817D5
+	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 23:48:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF3631B6335D
-	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 21:31:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9177E4678ED
+	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 21:48:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D63402550DB;
-	Tue,  8 Apr 2025 21:31:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E02F92550D5;
+	Tue,  8 Apr 2025 21:48:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="epboGODE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tJJWuO/y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E57752405EB
-	for <kvm@vger.kernel.org>; Tue,  8 Apr 2025 21:31:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E07824A075;
+	Tue,  8 Apr 2025 21:48:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744147894; cv=none; b=SOaEhrRCVv4bgFGv/g4dA0g4uVjzLGY7KCuKzF4YlTCeWMZ5wr8vbTZE0AyBM5w485QKsjqAQESgkI2OntXeun7thqbNwpDO7++SYjijrSQGS0iJQZbfLn6QTBVK8OeSG2Om4DBAxvle5ct6MmiyQaOBeFk0NAOEZMdK4UWiuUw=
+	t=1744148882; cv=none; b=Z+bG03W7xwyEVQf1e4KH1/+yjNVCLXGYwAYkNJrfmtnlnnR/p/hTJUaWu3IxqwMxMGgvLa6JwVK0yJzxxDjRsuwueiNdjIqeNYPxCiO0VYoittMMK3dYX60HK6XMYzVBHO4OeVH4AYzH4yqP/dRf9WtVb2x2Z3kzX8JqiOhRLUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744147894; c=relaxed/simple;
-	bh=AGINcubrwDHhNZhMG/5qRMWHfMGWmK7tdHB0j9/zR7Y=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ozMBgIsPu7jNmLWE6KfkQ0imwFEqcOx7nYssMEBJSKgdyJ3nT+CU4ja0iHk2uGvXyQafCxXaEFlPX8fWEpIgjkG6UWjnW4aSF6yse3j1rRapnmvVa5uH7FwV9NaimkNVd0P0HDknXF7Vbfgqto6SuFLdZQWPrAZ9PgqXA9CKtYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=epboGODE; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2240a960f9cso59954135ad.0
-        for <kvm@vger.kernel.org>; Tue, 08 Apr 2025 14:31:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744147891; x=1744752691; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Uam7GnobKmUw9hclFkCECYy0gTHPZztonbEuBIMruls=;
-        b=epboGODEtejbTq808AoYZkSeJOmKndRR55CtUpMKYvSuAV1uwuuhKJgEu7y0BZpQrm
-         qKFGAGlMmcecP7SWcsZzgBhgEhIOmE7L/mwSEQ2E5rrHPGiBN6gN4TiXEtStbvW+aFnG
-         uKHKs0ydVBtWePN8yLGfnhq1/6i08jy9qD4YL9dUv7gOUS21txxqv4mvqar7adl6xqr9
-         AG92WdjANekKLYwmw31w1Wv8MGbu9n2mS2GyeeCHMXgHj1y82VJtFpYf52uPLMZRqVxG
-         fVBnDY7Wap//42gwbZ1TnNqao26iEjTvknAbNLGvbHxnwJxmtgo9j8YDDDQHFD/thwOF
-         FaAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744147891; x=1744752691;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Uam7GnobKmUw9hclFkCECYy0gTHPZztonbEuBIMruls=;
-        b=XhVmhQ3mDVzB3fC5b8EzhsvcuJpEojsg05cDzJLz0ZQJ2gbje6PTkW8LbkDRgeUywx
-         fOcYbyNIAbLf8m/FsNjRkos/g+Q1SPfWaRa7MOGh0tC9tknpKP2+23xhuVcZytPCIQE8
-         5aH78BCdqZIDByarGBho+7z69FPq6rD7rSQg5pIhyeT32RxWJsRtNmc3VjLQ7J4ymxvc
-         is/RoVZU89VdYTw9zG/rBPLLyuRVGnAzsVz+Gfx4EaH4Gg3gj3jd2+MP+9MngLsAfcSZ
-         5zaw7eZkqIfiLjdbsyZ6hKQoZhC0O7zW/2shGVXRpTRbQCaNKtS4TvtvECUVGX+wZcCs
-         K4ww==
-X-Forwarded-Encrypted: i=1; AJvYcCUhrdqLp1jMM+iLsCx1tnLd9UotfqVm0p0JhBucsr3Uf+4StoiR9oEkjaqfTt8cLIgiblc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywwn04UKrDejTdjVJInLRahNdwMpXgiUPvTlUdOw5Nnh+SshN4S
-	jpCWnAbWLX5aY2/zWJeXZrbLV1zJ4FwPxNOm1ccGYt6FG8+GfeJT/5ZVdKgQW7D15QKTOCRYYq5
-	4Vw==
-X-Google-Smtp-Source: AGHT+IEKRdfCo7P0dOM9nLMdnn/wJxKiZkQkp2kalAXi+Af3MMzb50Othlo0RizKEkwtKlr8YY3PKqUJQ1s=
-X-Received: from pfbfc24.prod.google.com ([2002:a05:6a00:2e18:b0:730:7e2d:df69])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ccc8:b0:227:e7c7:d451
- with SMTP id d9443c01a7336-22ac3f9a8fcmr4363085ad.29.1744147891223; Tue, 08
- Apr 2025 14:31:31 -0700 (PDT)
-Date: Tue, 8 Apr 2025 14:31:29 -0700
-In-Reply-To: <4c396e79-845a-481a-8a3e-4a7f458371b8@redhat.com>
+	s=arc-20240116; t=1744148882; c=relaxed/simple;
+	bh=6COeFnaQgN3qls/u+Yq5ZtwKJF9Vw4Z42v5LKtiDZzk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PwUUhya6HAcjaZATDMPOUB1H23hzirG3g4UQFOnJqKKj7WZE9wnSpiAXoumYZaM7xumxPwWtq7ya1OnOxHy3DOs0lkj0en8EOSEJSm+SEWeuuLfOTmlTucVWrHgOcmbIcRSu6eg/RGUA4pmQPH5UycoQMPqlkJSgd0WH3aIpKTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tJJWuO/y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A91CEC4CEE5;
+	Tue,  8 Apr 2025 21:48:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744148881;
+	bh=6COeFnaQgN3qls/u+Yq5ZtwKJF9Vw4Z42v5LKtiDZzk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=tJJWuO/yEomXExrdB/E8GR2veu7Li5zKPfZ561v3TzNYrIrXjkBDgHGBONCoCCIXh
+	 tKkqxCuMgSyWsUWItNFLbhffFGpdwNOSiyKSPiK3rmuAse3fE/uTaAtpyZ40a5wdkG
+	 ILvoOT9SSoWc4pdCu2ZBDfKB38X/27ISo7lJY7N1sXRvJos3yTVlnT7h2ILv8Q1/Yw
+	 YovlEJMFAuyjNrYRVYCK4X6HvFR7HyAxqHiCX3zBCPIQh6DFVIfv+Sy23ZN/DY41iQ
+	 bVvZr5T73h2oCTHTxJAvKsd8rzD3W7+YpEaNpZku69VJD57LcHtDdv3a9T1U9FNk5y
+	 mZ4VyqhuiBEew==
+From: Josh Poimboeuf <jpoimboe@kernel.org>
+To: x86@kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	amit@kernel.org,
+	kvm@vger.kernel.org,
+	amit.shah@amd.com,
+	thomas.lendacky@amd.com,
+	bp@alien8.de,
+	tglx@linutronix.de,
+	peterz@infradead.org,
+	pawan.kumar.gupta@linux.intel.com,
+	corbet@lwn.net,
+	mingo@redhat.com,
+	dave.hansen@linux.intel.com,
+	hpa@zytor.com,
+	seanjc@google.com,
+	pbonzini@redhat.com,
+	daniel.sneddon@linux.intel.com,
+	kai.huang@intel.com,
+	sandipan.das@amd.com,
+	boris.ostrovsky@oracle.com,
+	Babu.Moger@amd.com,
+	david.kaplan@amd.com,
+	dwmw@amazon.co.uk,
+	andrew.cooper3@citrix.comm,
+	nik.borisov@suse.com
+Subject: [PATCH v4 0/6] x86/bugs: RSB mitigation fixes and documentation
+Date: Tue,  8 Apr 2025 14:47:29 -0700
+Message-ID: <cover.1744148254.git.jpoimboe@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250404193923.1413163-1-seanjc@google.com> <20250404193923.1413163-66-seanjc@google.com>
- <4c396e79-845a-481a-8a3e-4a7f458371b8@redhat.com>
-Message-ID: <Z_WVsZQbY23XrhAG@google.com>
-Subject: Re: [PATCH 65/67] KVM: SVM: Generate GA log IRQs only if the
- associated vCPUs is blocking
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Joerg Roedel <joro@8bytes.org>, David Woodhouse <dwmw2@infradead.org>, 
-	Lu Baolu <baolu.lu@linux.intel.com>, kvm@vger.kernel.org, iommu@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>, 
-	Joao Martins <joao.m.martins@oracle.com>, David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 08, 2025, Paolo Bonzini wrote:
-> On 4/4/25 21:39, Sean Christopherson wrote:
-> > @@ -892,7 +893,7 @@ static void __avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu, bool toggle_avic)
-> >   	WRITE_ONCE(kvm_svm->avic_physical_id_table[vcpu->vcpu_id], entry);
-> > -	avic_update_iommu_vcpu_affinity(vcpu, h_physical_id, toggle_avic);
-> > +	avic_update_iommu_vcpu_affinity(vcpu, h_physical_id, toggle_avic, false);
-> >   	spin_unlock_irqrestore(&svm->ir_list_lock, flags);
-> >   }
-> > @@ -912,7 +913,8 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-> >   	__avic_vcpu_load(vcpu, cpu, false);
-> >   }
-> > -static void __avic_vcpu_put(struct kvm_vcpu *vcpu, bool toggle_avic)
-> > +static void __avic_vcpu_put(struct kvm_vcpu *vcpu, bool toggle_avic,
-> > +			    bool is_blocking)
-> 
-> What would it look like to use an enum { SCHED_OUT, SCHED_IN, ENABLE_AVIC,
-> DISABLE_AVIC, START_BLOCKING } for both __avic_vcpu_put and
-> __avic_vcpu_load's second argument?
+v4:
+- improve document
+- remove C++ comment
+- "__write_ibpb" -> "write-ibpb"
+- improve commit logs
 
-There's gotta be a way to make it look better than this code.  I gave a half-
-hearted attempt at using an enum before posting, but wasn't able to come up with
-anything decent.
+v3: https://lore.kernel.org/cover.1743617897.git.jpoimboe@kernel.org
 
-Coming back to it with fresh eyes, what about this (full on-top diff below)?
+Josh Poimboeuf (6):
+  x86/bugs: Rename entry_ibpb() to write_ibpb()
+  x86/bugs: Use SBPB in write_ibpb() if applicable
+  x86/bugs: Fix RSB clearing in indirect_branch_prediction_barrier()
+  x86/bugs: Don't fill RSB on VMEXIT with eIBRS+retpoline
+  x86/bugs: Don't fill RSB on context switch with eIBRS
+  x86/bugs: Add RSB mitigation document
 
-enum avic_vcpu_action {
-	AVIC_SCHED_IN		= 0,
-	AVIC_SCHED_OUT		= 0,
-	AVIC_START_BLOCKING	= BIT(0),
+ Documentation/admin-guide/hw-vuln/index.rst |   1 +
+ Documentation/admin-guide/hw-vuln/rsb.rst   | 268 ++++++++++++++++++++
+ arch/x86/entry/entry.S                      |   9 +-
+ arch/x86/include/asm/nospec-branch.h        |  12 +-
+ arch/x86/kernel/cpu/bugs.c                  | 107 +++-----
+ arch/x86/mm/tlb.c                           |   6 +-
+ 6 files changed, 317 insertions(+), 86 deletions(-)
+ create mode 100644 Documentation/admin-guide/hw-vuln/rsb.rst
 
-	AVIC_TOGGLE_ON_OFF	= BIT(1),
-	AVIC_ACTIVATE		= AVIC_TOGGLE_ON_OFF,
-	AVIC_DEACTIVATE		= AVIC_TOGGLE_ON_OFF,
-};
-
-AVIC_SCHED_IN and AVIC_SCHED_OUT are essentially syntactic sugar, as are
-AVIC_ACTIVATE and AVIC_DEACTIVATE to a certain extent.  But it's much better than
-booleans, and using a bitmask makes avic_update_iommu_vcpu_affinity() slightly
-prettier.
-
-> Consecutive bools are ugly...
-
-Yeah, I hated it when I wrote it, and still hate it now.
-
-And more error prone, e.g. the __avic_vcpu_put() call from avic_refresh_apicv_exec_ctrl()
-should specify is_blocking=false, not true, as kvm_x86_ops.refresh_apicv_exec_ctrl()
-should never be called while the vCPU is blocking.
-
----
- arch/x86/kvm/svm/avic.c | 41 ++++++++++++++++++++++++++++-------------
- 1 file changed, 28 insertions(+), 13 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 425674e1a04c..1752420c68aa 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -833,9 +833,20 @@ int avic_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
- 	return irq_set_vcpu_affinity(host_irq, NULL);
- }
- 
-+enum avic_vcpu_action {
-+	AVIC_SCHED_IN		= 0,
-+	AVIC_SCHED_OUT		= 0,
-+	AVIC_START_BLOCKING	= BIT(0),
-+
-+	AVIC_TOGGLE_ON_OFF	= BIT(1),
-+	AVIC_ACTIVATE		= AVIC_TOGGLE_ON_OFF,
-+	AVIC_DEACTIVATE		= AVIC_TOGGLE_ON_OFF,
-+};
-+
- static void avic_update_iommu_vcpu_affinity(struct kvm_vcpu *vcpu, int cpu,
--					    bool toggle_avic, bool ga_log_intr)
-+					    enum avic_vcpu_action action)
- {
-+	bool ga_log_intr = (action & AVIC_START_BLOCKING);
- 	struct amd_svm_iommu_ir *ir;
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
-@@ -849,7 +860,7 @@ static void avic_update_iommu_vcpu_affinity(struct kvm_vcpu *vcpu, int cpu,
- 		return;
- 
- 	list_for_each_entry(ir, &svm->ir_list, node) {
--		if (!toggle_avic)
-+		if (!(action & AVIC_TOGGLE_ON_OFF))
- 			WARN_ON_ONCE(amd_iommu_update_ga(ir->data, cpu, ga_log_intr));
- 		else if (cpu >= 0)
- 			WARN_ON_ONCE(amd_iommu_activate_guest_mode(ir->data, cpu, ga_log_intr));
-@@ -858,7 +869,8 @@ static void avic_update_iommu_vcpu_affinity(struct kvm_vcpu *vcpu, int cpu,
- 	}
- }
- 
--static void __avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu, bool toggle_avic)
-+static void __avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu,
-+			     enum avic_vcpu_action action)
- {
- 	struct kvm_svm *kvm_svm = to_kvm_svm(vcpu->kvm);
- 	int h_physical_id = kvm_cpu_get_apicid(cpu);
-@@ -904,7 +916,7 @@ static void __avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu, bool toggle_avic)
- 
- 	WRITE_ONCE(kvm_svm->avic_physical_id_table[vcpu->vcpu_id], entry);
- 
--	avic_update_iommu_vcpu_affinity(vcpu, h_physical_id, toggle_avic, false);
-+	avic_update_iommu_vcpu_affinity(vcpu, h_physical_id, action);
- 
- 	spin_unlock_irqrestore(&svm->ir_list_lock, flags);
- }
-@@ -921,11 +933,10 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	if (kvm_vcpu_is_blocking(vcpu))
- 		return;
- 
--	__avic_vcpu_load(vcpu, cpu, false);
-+	__avic_vcpu_load(vcpu, cpu, AVIC_SCHED_IN);
- }
- 
--static void __avic_vcpu_put(struct kvm_vcpu *vcpu, bool toggle_avic,
--			    bool is_blocking)
-+static void __avic_vcpu_put(struct kvm_vcpu *vcpu, enum avic_vcpu_action action)
- {
- 	struct kvm_svm *kvm_svm = to_kvm_svm(vcpu->kvm);
- 	struct vcpu_svm *svm = to_svm(vcpu);
-@@ -947,7 +958,7 @@ static void __avic_vcpu_put(struct kvm_vcpu *vcpu, bool toggle_avic,
- 	 */
- 	spin_lock_irqsave(&svm->ir_list_lock, flags);
- 
--	avic_update_iommu_vcpu_affinity(vcpu, -1, toggle_avic, is_blocking);
-+	avic_update_iommu_vcpu_affinity(vcpu, -1, action);
- 
- 	WARN_ON_ONCE(entry & AVIC_PHYSICAL_ID_ENTRY_GA_LOG_INTR);
- 
-@@ -964,7 +975,7 @@ static void __avic_vcpu_put(struct kvm_vcpu *vcpu, bool toggle_avic,
- 	 * Note!  Don't set AVIC_PHYSICAL_ID_ENTRY_GA_LOG_INTR in the table as
- 	 * it's a synthetic flag that usurps an unused a should-be-zero bit.
- 	 */
--	if (is_blocking)
-+	if (action & AVIC_START_BLOCKING)
- 		entry |= AVIC_PHYSICAL_ID_ENTRY_GA_LOG_INTR;
- 
- 	svm->avic_physical_id_entry = entry;
-@@ -992,7 +1003,8 @@ void avic_vcpu_put(struct kvm_vcpu *vcpu)
- 			return;
- 	}
- 
--	__avic_vcpu_put(vcpu, false, kvm_vcpu_is_blocking(vcpu));
-+	__avic_vcpu_put(vcpu, kvm_vcpu_is_blocking(vcpu) ? AVIC_START_BLOCKING :
-+							   AVIC_SCHED_OUT);
- }
- 
- void avic_refresh_virtual_apic_mode(struct kvm_vcpu *vcpu)
-@@ -1024,12 +1036,15 @@ void avic_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
- 	if (!enable_apicv)
- 		return;
- 
-+	/* APICv should only be toggled on/off while the vCPU is running. */
-+	WARN_ON_ONCE(kvm_vcpu_is_blocking(vcpu));
-+
- 	avic_refresh_virtual_apic_mode(vcpu);
- 
- 	if (kvm_vcpu_apicv_active(vcpu))
--		__avic_vcpu_load(vcpu, vcpu->cpu, true);
-+		__avic_vcpu_load(vcpu, vcpu->cpu, AVIC_ACTIVATE);
- 	else
--		__avic_vcpu_put(vcpu, true, true);
-+		__avic_vcpu_put(vcpu, AVIC_DEACTIVATE);
- }
- 
- void avic_vcpu_blocking(struct kvm_vcpu *vcpu)
-@@ -1055,7 +1070,7 @@ void avic_vcpu_blocking(struct kvm_vcpu *vcpu)
- 	 * CPU and cause noisy neighbor problems if the VM is sending interrupts
- 	 * to the vCPU while it's scheduled out.
- 	 */
--	__avic_vcpu_put(vcpu, false, true);
-+	__avic_vcpu_put(vcpu, AVIC_START_BLOCKING);
- }
- 
- void avic_vcpu_unblocking(struct kvm_vcpu *vcpu)
-
-base-commit: fe5b44cf46d5444ff071bc2373fbe7b109a3f60b
 -- 
+2.49.0
+
 
