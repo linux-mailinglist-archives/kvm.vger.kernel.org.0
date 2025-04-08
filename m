@@ -1,221 +1,263 @@
-Return-Path: <kvm+bounces-42883-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42884-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDC98A7F415
-	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 07:20:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3DACA7F46B
+	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 07:51:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F65F3B4CC2
-	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 05:19:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FF6B3A9191
+	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 05:51:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACA14253F22;
-	Tue,  8 Apr 2025 05:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00D1D253F22;
+	Tue,  8 Apr 2025 05:51:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PJcAnn2I"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EjFi+V9E"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486381F94A
-	for <kvm@vger.kernel.org>; Tue,  8 Apr 2025 05:19:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 131622063FA
+	for <kvm@vger.kernel.org>; Tue,  8 Apr 2025 05:51:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744089589; cv=none; b=Ac8tm3TrUwpHnmi/oSzfB0dvtc4adRHuOHhz/xLYcV4qPyGwnJXZORCZvUohTlG0JPfZAZQrpPLtVmsuEf1Z6oF2/c8yRF1aqhA6SZ/h77vKq24DqyYpQvFjvPbWumm7nQhg0DKN9nDy+SLcivf1GD8aBvYwZotgmO7IATKgmbY=
+	t=1744091486; cv=none; b=cEA2M7T2wpCXHPfqShrtTNMiQCmqJalaebc0nSL18gtPQv+4ckCxeWh98dF8KP7ipWu8gTguRPQf1d83mhVLOV+KBCe1eVAzCgHFA3NrDBY6V18sITQHLDV3tIP1tiRnwsmLRIp14H/PtYxuU9FFw1SVgXg3dkUsueDT7Ijixgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744089589; c=relaxed/simple;
-	bh=es+SNh0P9NtPGWcq5WsV3Y8WBvXwDiLbdcGTXKuwMv8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DThxfR53CrSQ/okxlcddrfS6lE2B61J07FUPC9305CSKBwOJwK8yCd73X0fGNcO6JeFVQ8slmAm7VGSEIt926VFyTOS8IyTu60mbxL/84hvjNVE94t5BQ2jCCfs/VnQReLcIh3OPvcrkNOkVUYOuYlESWy5H6iL4Nnpp+t8CXYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PJcAnn2I; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1744091486; c=relaxed/simple;
+	bh=QmKDDyvPn3/AguTsFLoMiM1SUj6+bz1bvBXyyohwfuY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=JXqU0GxMusY+NUyzSVz6UGdsepmf9/RDF5UQ1jM9J7iu2Jn04qGMCwEWwXw/TvLBR4iAGT3TZ+gp0wTYrs+wiwSdon1nKlbAojhLPiGUSkQ0s1wSvfFxh8QUEzqnKPRGpXhFOCviDHjjVBuRzepnBOrqHfuZCirD1OzuPZZHSL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EjFi+V9E; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744089587;
+	s=mimecast20190719; t=1744091482;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=SZYs4PdDssFQWEmrDvKTFbTZUVJpYWm3vSQBh2J9Vlg=;
-	b=PJcAnn2I9JSphS+ClhMhBRdQtsoQ6Kmt+00dJ26NXsDDu/CjZAFS+XJ0k7W5O4fOI5HKfq
-	fiZmFFe6X2qKyrcdERZqlcNq8h7dAJycVDf/Sj1Zuj1sHBortiVLdQqLbmmtDO1KcuNZar
-	16AfTvmP5/NJ0fX4/7jVk5NnXgfmcLc=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-479-SSxnIlAHNyuNUKjWoO2qcA-1; Tue, 08 Apr 2025 01:19:44 -0400
-X-MC-Unique: SSxnIlAHNyuNUKjWoO2qcA-1
-X-Mimecast-MFC-AGG-ID: SSxnIlAHNyuNUKjWoO2qcA_1744089583
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2241e7e3addso42780605ad.1
-        for <kvm@vger.kernel.org>; Mon, 07 Apr 2025 22:19:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744089582; x=1744694382;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SZYs4PdDssFQWEmrDvKTFbTZUVJpYWm3vSQBh2J9Vlg=;
-        b=qrNjOt3mmtgaZlt5Urak7e4L4laqqyjqjGRc4uUhdwrvsfGYoOWrwvXBuSAsOoczTg
-         kqBpEWfIGrUxVHV0Ky+mMNHwPm36NJobX6lL3wExY54aXe9J7nj4Zop40uOxKzz+z1Ly
-         AcNOz4F2kIVZegxcou4oC5mEwqeHBU2fEp65dzXatM6ScCUtr+tPLVHqx8uYoSyRSRtX
-         CI1qpHtOf0DC6XtOmh86iKTPSjcFHAUQrKyIPlQtDJv8HtAv46JvwjKZA5rxGHohrpU5
-         EHZ/OdHjzA/Qt4d0N548I1DS4QRi+5gBe0e+/zgVhFj26W1HRcNOg57cAzrVdrFD6a64
-         jqZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXpGq6XRKBispuCIngVt0GknAUsMv85elUJ6ZghwdqA1gFlRCv2ic4iQe/+YFAuo0HHV1k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/FjWu75OP5cSj2EzJQ/IkeNeydpB6hspZ9J7mYWnCemzuSf7F
-	JNAk/7dCBBK83RZ9E3uhik4xVNz6Jl2Ihj4K21xNasjn7UecVejDrc7xf0jjTiQ1IT5urOMcokK
-	UBK8PPzUTvhVco4KL8kx22yFg7hMVo8BPuefKQzyVIianxW5tM/bY/+95Ag==
-X-Gm-Gg: ASbGncsucCGjbQYB06V+I7lpc269aPCW65zpUDlgisdUtqmf+NEOQw4XMXafZjXo/Nx
-	lDGJJX+jpo+JcaPcMV9vjIjf2GIghLJyp1qJnkn1PbHu57Wgm6j1ffmn3H/8RfSy9/k5ZAg5SHy
-	3i0eOONwpP/kqNQOQV62t7SGmy8CrLzEAoDhu2V5DaPHbcr+QyrkzfIuFc/SuMBwLuGCLHVYdv7
-	464Ish5iWjH5fceyIdZ7sS5YMpkSqtw8wQgNsapOj/UWFp3/AArzN4B3iP5xL2U721JKNG1ElSB
-	8XIE5i7uWZzD+BGo
-X-Received: by 2002:a17:902:f610:b0:220:fce7:d3a6 with SMTP id d9443c01a7336-22a8a06b429mr204562335ad.23.1744089582298;
-        Mon, 07 Apr 2025 22:19:42 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHON1uwm7bR+2w9kanWBPOGcZHKNZxG2Wp+hjgiN2PniqOi1+L2J3B1ic75+U0mQ/IeetE7VA==
-X-Received: by 2002:a17:902:f610:b0:220:fce7:d3a6 with SMTP id d9443c01a7336-22a8a06b429mr204562115ad.23.1744089581919;
-        Mon, 07 Apr 2025 22:19:41 -0700 (PDT)
-Received: from [192.168.68.55] ([180.233.125.65])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-229786608d1sm91213655ad.120.2025.04.07.22.19.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Apr 2025 22:19:41 -0700 (PDT)
-Message-ID: <b76ffc1c-32e1-4bf6-916a-41af9378fb4b@redhat.com>
-Date: Tue, 8 Apr 2025 15:19:32 +1000
+	bh=KsGOnFovtOzMtwHN1EPch6+uuIN1gHUnqKOr7Ubv4J8=;
+	b=EjFi+V9EjXTJJpZgYPyTv9Yipe9YDvUW33Z4aSThRgjNzf+zcwsR09gthxfcW3DzMdMH2w
+	+LWjS4WCbBSd25SAJMCWjwGDxNBgqAlQ0PkoCx+y4+rOiSuPX7Cn5KV7+1HOElOlXA2XlC
+	1W6KywBPAEf2ONA8PU8j3Q77YyZO/CE=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-354-PMoa9VyhMEafLbhCzvRMtA-1; Tue,
+ 08 Apr 2025 01:51:18 -0400
+X-MC-Unique: PMoa9VyhMEafLbhCzvRMtA-1
+X-Mimecast-MFC-AGG-ID: PMoa9VyhMEafLbhCzvRMtA_1744091477
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 08F811956080;
+	Tue,  8 Apr 2025 05:51:17 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.44.22.7])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E1B3919560AD;
+	Tue,  8 Apr 2025 05:51:15 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 981EB21E6757; Tue, 08 Apr 2025 07:51:13 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Zhao Liu <zhao1.liu@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,  Eric Blake <eblake@redhat.com>,
+  Michael Roth <michael.roth@amd.com>,  Daniel P . =?utf-8?Q?Berrang=C3=A9?=
+ <berrange@redhat.com>,  Eduardo Habkost <eduardo@habkost.net>,  Marcelo
+ Tosatti <mtosatti@redhat.com>,  Shaoqin Huang <shahuang@redhat.com>,  Eric
+ Auger <eauger@redhat.com>,  Peter Maydell <peter.maydell@linaro.org>,
+  Laurent Vivier <lvivier@redhat.com>,  Thomas Huth <thuth@redhat.com>,
+  Sebastian Ott <sebott@redhat.com>,  Gavin Shan <gshan@redhat.com>,
+  qemu-devel@nongnu.org,  kvm@vger.kernel.org,  qemu-arm@nongnu.org,
+  Dapeng Mi <dapeng1.mi@intel.com>,  Yi Lai <yi1.lai@intel.com>
+Subject: Re: [RFC v2 1/5] qapi/qom: Introduce kvm-pmu-filter object
+In-Reply-To: <Z+uaGHiOkFJd6TAO@intel.com> (Zhao Liu's message of "Tue, 1 Apr
+	2025 15:47:36 +0800")
+References: <20250122090517.294083-1-zhao1.liu@intel.com>
+	<20250122090517.294083-2-zhao1.liu@intel.com>
+	<871pwc3dyw.fsf@pond.sub.org> <Z6SMxlWhHgronott@intel.com>
+	<87h657p8z0.fsf@pond.sub.org> <Z6TH+ZyLg/6pgKId@intel.com>
+	<87v7tlhpqj.fsf@pond.sub.org> <Z+uaGHiOkFJd6TAO@intel.com>
+Date: Tue, 08 Apr 2025 07:51:13 +0200
+Message-ID: <878qobqjzi.fsf@pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 28/45] arm64: rme: support RSI_HOST_CALL
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Joey Gouly <joey.gouly@arm.com>, Catalin Marinas
- <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20250213161426.102987-1-steven.price@arm.com>
- <20250213161426.102987-29-steven.price@arm.com>
- <12b5ba41-4b1e-4876-9796-d1d6bb344015@redhat.com>
- <54f1fbb1-4fa1-4b09-bbac-3afcbb7ec478@arm.com>
-Content-Language: en-US
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <54f1fbb1-4fa1-4b09-bbac-3afcbb7ec478@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On 4/8/25 2:34 AM, Steven Price wrote:
-> On 04/03/2025 06:01, Gavin Shan wrote:
->> On 2/14/25 2:14 AM, Steven Price wrote:
->>> From: Joey Gouly <joey.gouly@arm.com>
->>>
->>> Forward RSI_HOST_CALLS to KVM's HVC handler.
->>>
->>> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
->>> Signed-off-by: Steven Price <steven.price@arm.com>
->>> ---
->>> Changes since v4:
->>>    * Setting GPRS is now done by kvm_rec_enter() rather than
->>>      rec_exit_host_call() (see previous patch - arm64: RME: Handle realm
->>>      enter/exit). This fixes a bug where the registers set by user space
->>>      were being ignored.
->>> ---
->>>    arch/arm64/kvm/rme-exit.c | 22 ++++++++++++++++++++++
->>>    1 file changed, 22 insertions(+)
->>>
->>> diff --git a/arch/arm64/kvm/rme-exit.c b/arch/arm64/kvm/rme-exit.c
->>> index c785005f821f..4f7602aa3c6c 100644
->>> --- a/arch/arm64/kvm/rme-exit.c
->>> +++ b/arch/arm64/kvm/rme-exit.c
->>> @@ -107,6 +107,26 @@ static int rec_exit_ripas_change(struct kvm_vcpu
->>> *vcpu)
->>>        return -EFAULT;
->>>    }
->>>    +static int rec_exit_host_call(struct kvm_vcpu *vcpu)
->>> +{
->>> +    int ret, i;
->>> +    struct realm_rec *rec = &vcpu->arch.rec;
->>> +
->>> +    vcpu->stat.hvc_exit_stat++;
->>> +
->>> +    for (i = 0; i < REC_RUN_GPRS; i++)
->>> +        vcpu_set_reg(vcpu, i, rec->run->exit.gprs[i]);
->>> +
->>> +    ret = kvm_smccc_call_handler(vcpu);
->>> +
->>> +    if (ret < 0) {
->>> +        vcpu_set_reg(vcpu, 0, ~0UL);
->>> +        ret = 1;
->>> +    }
->>> +
->>> +    return ret;
->>> +}
->>> +
->>
->> I don't understand how a negative error can be returned from
->> kvm_smccc_call_handler().
-> 
-> I don't believe it really can. However kvm_smccc_call_handler() calls
-> kvm_psci_call() and that has a documentation block which states:
-> 
->   * This function returns: > 0 (success), 0 (success but exit to user
->   * space), and < 0 (errors)
->   *
->   * Errors:
->   * -EINVAL: Unrecognized PSCI function
-> 
-> But I can't actually see code which returns the negative value...
-> 
+Zhao Liu <zhao1.liu@intel.com> writes:
 
-I think the comments for kvm_psci_call() aren't correct since its return value
-can't be negative after 7e484d2785e2 ("KVM: arm64: Return NOT_SUPPORTED to guest
-for unknown PSCI version"). The comments should have been adjusted in that commit.
+> Hi Mrkus,
+>
+> I'm really sorry I completely missed your reply (and your patient
+> advice). It wasn't until I looked back at the lore archives that I
+> realized my mistake. Thinking it over again, I see that your reply,
+> which I missed, really helped clear up my confusion:
 
-Please take a look on 37c8e4947947 ("KVM: arm64: Let errors from SMCCC emulation
-to reach userspace"). Similarly, the block of code to set GPR0 to ~0ULL when negative
-error is returned from kvm_smccc_call_handler() in this patch needs to be dropped.
+I'm glad I was able to help some!
 
->> Besides, SMCCC_RET_NOT_SUPPORTED has been set to GPR[0 - 3] if the
->> request can't be
->> supported. Why we need to set GPR[0] to ~0UL, which corresponds to
->> SMCCC_RET_NOT_SUPPORTED
->> if I'm correct. I guess change log or a comment to explain the questions
->> would be
->> nice.
-> 
-> I'll add a comment explaining we don't expect negative codes. And I'll
-> expand ~0UL to SMCCC_RET_NOT_SUPPORTED which is what it should be.
-> 
+> On Fri, Feb 07, 2025 at 02:02:44PM +0100, Markus Armbruster wrote:
+>> Date: Fri, 07 Feb 2025 14:02:44 +0100
+>> From: Markus Armbruster <armbru@redhat.com>
+>> Subject: Re: [RFC v2 1/5] qapi/qom: Introduce kvm-pmu-filter object
+>> 
+>> Zhao Liu <zhao1.liu@intel.com> writes:
+>> 
+>> >> Let's ignore how to place it for now, and focus on where we would *like*
+>> >> to place it.
+>> >> 
+>> >> Is it related to anything other than ObjectType / ObjectOptions in the
+>> >> QMP reference manual?
+>> >
+>> > Yes!
+>> 
+>> Now I'm confused :)
+>> 
+>> It is related to ObjectType / ObjectType.
+>> 
+>> Is it related to anything else in the QMP reference manual, and if yes,
+>> to what exactly is it related?
+>
+> I misunderstood your point. The PMU stuff and the QAPI definitions for
+> ObjectType/ObjectOptions are not related. They should belong to separate
+> categories or sections.
+>
+>> >> I guess qapi/kvm.json is for KVM-specific stuff in general, not just the
+>> >> KVM PMU filter.  Should we have a section for accelerator-specific
+>> >> stuff, with subsections for the various accelerators?
+>> >> 
+>> >> [...]
+>> >
+>> > If we consider the accelerator from a top-down perspective, I understand
+>> > that we need to add accelerator.json, kvm.json, and kvm-pmu-filter.json.
+>> >
+>> > The first two files are just to include subsections without any additional
+>> > content. Is this overkill? Could we just add a single kvm-pmu-filter.json
+>> > (I also considered this name, thinking that kvm might need to add more
+>> > things in the future)?
+>> >
+>> > Of course, I lack experience with the file organization here. If you think
+>> > the three-level sections (accelerator.json, kvm.json, and kvm-pmu-filter.json)
+>> > is necessary, I am happy to try this way. :-)
+>> 
+>> We don't have to create files just to get a desired section structure.
+>> 
+>> I'll show you how in a jiffie, but before I do that, let me stress: we
+>> should figure out what we want *first*, and only then how to get it.
+>> So, what section structure would make the most sense for the QMP
+>> reference manual?
+>
+> Thank you for your patience. I have revisited and carefully considered
+> the "QEMU QMP Reference Manual," especially from a reader's perspective.
+> Indeed, I agree that, as you mentioned, a three-level directory
+> (accelerator - kvm - kvm stuff) is more readable and easier to maintain.
 
-Please refer to the above reply. The block of code needs to be dropped.
+Sounds good to me.
 
-> Thanks,
-> Steve
-> 
->>>    static void update_arch_timer_irq_lines(struct kvm_vcpu *vcpu)
->>>    {
->>>        struct realm_rec *rec = &vcpu->arch.rec;
->>> @@ -168,6 +188,8 @@ int handle_rec_exit(struct kvm_vcpu *vcpu, int
->>> rec_run_ret)
->>>            return rec_exit_psci(vcpu);
->>>        case RMI_EXIT_RIPAS_CHANGE:
->>>            return rec_exit_ripas_change(vcpu);
->>> +    case RMI_EXIT_HOST_CALL:
->>> +        return rec_exit_host_call(vcpu);
->>>        }
->>>          kvm_pr_unimpl("Unsupported exit reason: %u\n",
->>
+> For this question "what we want *first*, and only then how to get it", I
+> think my thought is:
+>
+> First, the structure should be considered, and then the specific content
+> can be added. Once the structure is clearly defined, categorizing items
+> into their appropriate places becomes a natural process...
+>
+> Then for this question "what section structure would make the most sense
+> for the QMP reference manual?", I understand that a top-down, clearly
+> defined hierarchical directory makes the most sense, allowing readers to
+> follow the structure to find what they want. Directly adding
+> kvm-pmu-filter.json or kvm.json would disrupt the entire structure, because
+> KVM is just one of the accelerators supported by QEMU. Using "accelerator"
+> as the entry point for the documentation, similar to the "accel" directory
+> in QEMU's source code, would make indexing more convenient.
 
-Thanks,
-Gavin
+I think so, too.
+
+>> A few hints on how...
+>> 
+>> Consider how qapi/block.json includes qapi/block-core.json:
+>> 
+>>     ##
+>>     # = Block devices
+>>     ##
+>> 
+>>     { 'include': 'block-core.json' }
+>> 
+>>     ##
+>>     # == Additional block stuff (VM related)
+>>     ##
+>> 
+>> block-core.json starts with
+>> 
+>>     ##
+>>     # == Block core (VM unrelated)
+>>     ##
+>> 
+>> Together, this produces this section structure
+>> 
+>>     = Block devices
+>>     == 
+>>     ##
+>> 
+>> Together, this produces this section structure
+>> 
+>>     = Block devices
+>>     == Block core (VM unrelated)
+>>     == Additional block stuff (VM related)
+>> 
+>> Note that qapi/block-core.json isn't included anywhere else.
+>> qapi/qapi-schema.json advises:
+>> 
+>>     # Documentation generated with qapi-gen.py is in source order, with
+>>     # included sub-schemas inserted at the first include directive
+>>     # (subsequent include directives have no effect).  To get a sane and
+>>     # stable order, it's best to include each sub-schema just once, or
+>>     # include it first right here.
+>
+> Thank you very much!!
+>
+> Based on your inspiration, I think the ideal section structure for my
+> issue could be:
+>
+>     = accelerator
+>     == KVM
+>     === PMU
+>
+> Firstly, I should have a new accelerator.json () to include KVM stuff:
+>
+>     ##
+>     # = Accelerator
+>     ##
+>
+>     { 'include': 'kvm.json' }
+>
+> Next, in kvm.json, I could organize stuffs like:
+>
+>     ##
+>     # == KVM
+>     ##
+>
+>     ##
+>     # === PMU stuff
+>     ##
+>
+>     ... (the below are my current QPAI definitions.)
+>
+> Is such a structure reasonable?
+
+Yes.
+
+I'm not a fan of schema files with nothing but includes, like
+accelerator.json.  But the alternative here would be putting its
+contents into qapi-schema.json, which I really don't like, or keeping
+the KVM contents there instead of in a separate kvm.json, which would
+interfere with tracking maintainers in the MAINTAINERS file.
+
+> Thank you again for your guidance!
+
+You're welcome!
 
 
