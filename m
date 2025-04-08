@@ -1,288 +1,167 @@
-Return-Path: <kvm+bounces-42927-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42928-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 883FCA8009B
-	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 13:33:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33CDDA80361
+	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 13:57:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 766071881416
-	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 11:29:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 248B13A52F7
+	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 11:49:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F43526B2CA;
-	Tue,  8 Apr 2025 11:25:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59800267B89;
+	Tue,  8 Apr 2025 11:49:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="1nGzQi0K"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VgOuMwfE"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2060.outbound.protection.outlook.com [40.107.92.60])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07783269830;
-	Tue,  8 Apr 2025 11:25:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.60
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744111550; cv=fail; b=g+woaMcE7tcfpxAHniUOdXhCd0fZeIUMz+LgcYwCcuL2TICp6iWfRf5VhQ2QVuxUkJZI+DXGeRDOAw/QSyzRzYbqgqksH7du/VV4YpuG9JKdRZscFaRMIcL1fjLhL57Tlip9GYfhLTjZlu0ONH6TsBU349X92mBqtC02NpNA5EM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744111550; c=relaxed/simple;
-	bh=Kz+P/RTCAV+IHH6jfCxgAC+39TqHYY/n/RIXpSndehc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KgPDz2kA49x/ziv1g0HjFB7d6n6AdMJrxVMRtQh2v96uRFP6SX6khVX5XSq8ScRQWnlRqNjieyJHEgh3l8+6osUL95gISpUdrdiHxz5o1Kj5EFPA2yx9/smZvA9Wfej/oxv+h6OPJJ3tam1LdvQKs2hypyhDCp5zBFzetle3mYo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=1nGzQi0K; arc=fail smtp.client-ip=40.107.92.60
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UArTsph1PsEiFHUjDMC9vtoI7cOmg7RE7d+VPhwzuKHOf4FLoyj6Ajjc9tAWkub2QUJZIQst4P5h6HryZDEDY+qzWDDtRPQ9zftnZUwd9kMxVnDIeUxBP/+D+Oc4kvD6GuhZcNptZKcjBl3ZtyszI1/KeAGcptemx/s/RGlC4QC0BFNiW+bEJ6ujtFCrnRu1P6FC/bkJ5MZzgSOo6+yKEaLFgp8yoWhhohVmfTzx4qp2E5NG7dMLBc8VDPOFlPWls03YUpFZhcykHnYa/PCpARpFgjIx3ioHoT9jVdtVoBJXQZdA8l858MwMJ8A11KEGY6hhGVtyK+V/wZKIi34lCw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AqM4P2Fn56kQQ99zKTO6kLMZqx/0D3d8nce8i2TLu+8=;
- b=FZlSdZWkdj60FrCNW16FUIwSZMhgpz7NPQVGliQTw8HSWz5FSQKu8HlKlWBniACMMiyZjXsDD61GlM8lizYPhvdYtxaodk12pMp8qLxlpbb71eRGOGIAsIh82Bs1oVtjJdZ4PwpddTm6f22yfsvc0PH/cKmw2v+WqLNuFLN8SdSWWG5PEMGtT/qG3ecP3aTs5L//PdNI+x2gWm5xun5rn5R1teqInz/G+YXa/x4kxnOxvWOwk42VxnR0+lr4HvHpLsJuGKaP7PXS9Wj1V0JQfXXvJH4hAnsqEcqlmlhl22fJb+qJyph0iXG+30sKG+rlGlJol/TCjAhzs8Ao6zG9EQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AqM4P2Fn56kQQ99zKTO6kLMZqx/0D3d8nce8i2TLu+8=;
- b=1nGzQi0KAXZsNOf9UuQTsndpC1vMq4naevXca07Ba1jUe/tffoGAu2P6UkekJB1Bsv79c9nfSt35ok7d0dhjo5xsDHYFCxBq0FPHkf/+2z2c2RCLklNIsTFL5FInE9+8Wjw0yA8Nf0dbwF6XiByEs2qVAzUUBopE1N9aPWNVUlE=
-Received: from PH7PR17CA0007.namprd17.prod.outlook.com (2603:10b6:510:324::18)
- by CY8PR12MB7220.namprd12.prod.outlook.com (2603:10b6:930:58::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8583.46; Tue, 8 Apr
- 2025 11:25:44 +0000
-Received: from SN1PEPF000397B1.namprd05.prod.outlook.com
- (2603:10b6:510:324:cafe::4d) by PH7PR17CA0007.outlook.office365.com
- (2603:10b6:510:324::18) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8606.35 via Frontend Transport; Tue,
- 8 Apr 2025 11:25:44 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SN1PEPF000397B1.mail.protection.outlook.com (10.167.248.55) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8632.13 via Frontend Transport; Tue, 8 Apr 2025 11:25:44 +0000
-Received: from kaveri.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 8 Apr
- 2025 06:25:35 -0500
-From: Shivank Garg <shivankg@amd.com>
-To: <seanjc@google.com>, <david@redhat.com>, <vbabka@suse.cz>,
-	<willy@infradead.org>, <akpm@linux-foundation.org>, <shuah@kernel.org>,
-	<pbonzini@redhat.com>
-CC: <ackerleytng@google.com>, <paul@paul-moore.com>, <jmorris@namei.org>,
-	<serge@hallyn.com>, <pvorel@suse.cz>, <bfoster@redhat.com>,
-	<tabba@google.com>, <vannapurve@google.com>, <chao.gao@intel.com>,
-	<bharata@amd.com>, <nikunj@amd.com>, <michael.day@amd.com>,
-	<yan.y.zhao@intel.com>, <Neeraj.Upadhyay@amd.com>, <thomas.lendacky@amd.com>,
-	<michael.roth@amd.com>, <aik@amd.com>, <jgg@nvidia.com>,
-	<kalyazin@amazon.com>, <peterx@redhat.com>, <shivankg@amd.com>,
-	<linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
-	<linux-kernel@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
-	<kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<linux-coco@lists.linux.dev>
-Subject: [PATCH RFC v7 8/8] KVM: guest_memfd: selftests: Add tests for mmap and NUMA policy support
-Date: Tue, 8 Apr 2025 11:24:02 +0000
-Message-ID: <20250408112402.181574-9-shivankg@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250408112402.181574-1-shivankg@amd.com>
-References: <20250408112402.181574-1-shivankg@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486EC227BA4
+	for <kvm@vger.kernel.org>; Tue,  8 Apr 2025 11:49:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744112989; cv=none; b=BEINt4tjYVHDp9MYybUZIFXOOGBx6VxeMII/Nq2xkP0IiQei7pE6JHO/UTmlyx8VN0n09PC0um/zAOqd0aF7TX2FL7e35d9ZAGpWct6GuEzKjqQmYrKMZvRzJilh9zeDLeFq6wxHKkykGZPHhsOM5yakzT2pzrx7X/Ia1r++g48=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744112989; c=relaxed/simple;
+	bh=juga/NFhbOp5HXMYDZ5mhk5mcegQzBe3II+n7ob2+yY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GNG7phjhogLwRUn4p+8wO+8ggbBp2gALuXWttClJ/ljdmWyAHfHH5Q71Zxk04ELCHOYoflsJHS5HX8Xqk0Wa1qqQ5L9oBr4lhnH8ohF8sI77K50iAEum7sNRjGfc4vyoNoWlxjNTAC9E5qJp66tAffyc2pkSnmJbIO3OhaxKwvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VgOuMwfE; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744112986;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Y007czW7nolro/BBbr+wWrRJwbjuQk2oO7pcjblsRYQ=;
+	b=VgOuMwfE5w6Ft2eRlrtDqgN0SazOWA2GPNZwwsbJoXuoLlLQMB/IOiMKs/JVpsUFIe9uu+
+	uZmzOJUM8mTY4dhjq8b8HOUhjuzogKFoKqYdxqH1Zbpf84uhCZ0oh01CuTdtN4Lub/fAIF
+	UT++38Dgr7yoerc6c2+I5LjCaB3M0MA=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-66-_Vl9pOyZNa24GCj6DNC9Kg-1; Tue, 08 Apr 2025 07:49:44 -0400
+X-MC-Unique: _Vl9pOyZNa24GCj6DNC9Kg-1
+X-Mimecast-MFC-AGG-ID: _Vl9pOyZNa24GCj6DNC9Kg_1744112984
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43eed325461so15169725e9.3
+        for <kvm@vger.kernel.org>; Tue, 08 Apr 2025 04:49:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744112983; x=1744717783;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Y007czW7nolro/BBbr+wWrRJwbjuQk2oO7pcjblsRYQ=;
+        b=BfERB67K7LP6RprYFTHQXSQ6NS8lSJSA0upvRaY0TiOow/eqH3hRJATRDLA7mVbj2p
+         0NR1g4TMSN+aJbFCOf3IvP/+kaKVBO5r3PKYq0XkL0d3QmZZ7G8ojnSFumJZF3Nvz376
+         /pf9gGNGlS7g9hU2Mc1YoydmtkKcCyaqIbE40fmai8PL+i6fXDJvRsUf5EYvAVuj7xKy
+         Uhly/3ShsgL6sSHfKYNhJRq1vvBPkShq0AuPJDc/0HJmUnjrZ5F7h8EKfrNKlsw61BRc
+         EFfLDWgpRo//HWwvn8kdo3P1QNQw2EN6/MFqnx54HED/kyPsJ+2Q1j0RgEBRWTXphVRy
+         hhgw==
+X-Forwarded-Encrypted: i=1; AJvYcCX20GYFLfDJ+Mw5HGwBGtil7YyY1S2Qf+fMCnVfZwuLhi5S4bwJEVRzRjv3+GuOzA3fyow=@vger.kernel.org
+X-Gm-Message-State: AOJu0YydFbIgBXRJXUbhra3RPXOaoloNTkBkHzJN9MWncuP3/w/NGGpS
+	D7wXwziMUjZ0im8lEjoWffzFINX2lO4+VBoLAW9BXUpV1656iIJZE6a0R8ofjLraDCsVFs7W6cK
+	ufJWJOf5yRD3eQY5hQu4u+vhIhEUh34ZuHZj2l1CUZ58bXIlp0Q==
+X-Gm-Gg: ASbGncvBUc7Ug1a/NSDnBKVp6pvt4v/ieRwPk8qRvGKZ0pkOG0WWz5Z04kK1nnNu6E7
+	Kof4Sz2dEDJ65PAUy4dyHGNBSSAK5+ST8Btcg7vKvEhlER2ymIYnIkoqS1JFkvnPHDqfEMA6dWz
+	nGU0bcm+lyswDZ+gEnGbr0phPetL//UYTONsjMT3bd1sf/d5u+u7lLE61ZBfUHJzUSyXYh3rihK
+	d+zxX8Rm/e4IpnLQhy8fyKf8KqwNsmAZHfxhiKHHhSVbCSJJHfSPanUv8DkOk+UUGUj7QuBnzsT
+	jzH6zcs8cQ==
+X-Received: by 2002:a05:6000:1a8d:b0:397:8f09:5f6 with SMTP id ffacd0b85a97d-39cba93cd39mr15652806f8f.47.1744112983550;
+        Tue, 08 Apr 2025 04:49:43 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH+o1zR3VRcPlBcclW24I6ljtmxJ4Chpl0YFxpgvpmk6R76rTIbQ1hLofb7K+neh4PaWzsX0g==
+X-Received: by 2002:a05:6000:1a8d:b0:397:8f09:5f6 with SMTP id ffacd0b85a97d-39cba93cd39mr15652780f8f.47.1744112983180;
+        Tue, 08 Apr 2025 04:49:43 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c301b69c4sm14561074f8f.43.2025.04.08.04.49.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Apr 2025 04:49:42 -0700 (PDT)
+Date: Tue, 8 Apr 2025 07:49:39 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
+	David Matlack <dmatlack@google.com>,
+	Like Xu <like.xu.linux@gmail.com>, Yong He <alexyonghe@tencent.com>
+Subject: Re: [PATCH 0/7] irqbypass: Cleanups and a perf improvement
+Message-ID: <20250408074907-mutt-send-email-mst@kernel.org>
+References: <20250404211449.1443336-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF000397B1:EE_|CY8PR12MB7220:EE_
-X-MS-Office365-Filtering-Correlation-Id: 90159200-b307-4202-552b-08dd76901a12
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|7416014|376014|1800799024|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?44SCRYxL9gRlx7xh3pkZTbvLTebxamSVUDncf6nm0aytM2Ntvrtb9373TGIR?=
- =?us-ascii?Q?evym4zNAuN19Sdkh/xTgZVREV2uXobK2nu62HUWmtkwg7/brbsjztqz7mvdn?=
- =?us-ascii?Q?T1obQdETrpbAtbG/j1m8wKtOO4EhCY8Uitz+vQIKrDPuBbEmKTx5ZqzqOvEy?=
- =?us-ascii?Q?0YRetvAzqcEMDGxUFFyygOsfl6EI/nUNgEUzLxQipWQVmuRwq6OQXgmgwpOx?=
- =?us-ascii?Q?Qupqi4GlAdnLVEAJtw9D7lSQGLHgZ8D/GbGqcHPujcbNdCJ0uFWDmpg4FbIW?=
- =?us-ascii?Q?Ss+K/ETYJEN8vGiuUcJRb8xVt/qKYDLBgEo+GFiirmOXyLLf2fJ14z54DGPG?=
- =?us-ascii?Q?DjLiafsaBkk6tL8VKcMBbjAjBxvydzIYVF1wwT5rarb3Hs6s7p26ZqLZUhYf?=
- =?us-ascii?Q?ci+7A0e26oNwNVKwd/L0u2U4qy728yPi3gJrpRfw2e/BiC3K9S219DGlelkD?=
- =?us-ascii?Q?8cKttBAx+t1dKi1UG4dwIsIo7q6UEH5LAdBH3IOQ8Y12mtiuLaW7pUXwuCbk?=
- =?us-ascii?Q?i3A2b4qqhVH6+ytcdrzI0X9zRYDjvvxEw0uTFIRl/QOOr/z0xixNqZq5/ZUA?=
- =?us-ascii?Q?XDvzTSRDMdcitqCkGr8Y31FVS7+9quQvkDRoGIrneMjKyRpchcFrRnH1h2Nm?=
- =?us-ascii?Q?JnJ9x6bgyHAY06akg79XnikyWPAyEM1m+HMvPLArFeSLW4oYbVqq8fFXr5qR?=
- =?us-ascii?Q?dkWorSaqNdktpBcJagqjEewQ1SwE4uoHMuLZGie28v0rCdlV9QSLfTs1O9Kw?=
- =?us-ascii?Q?vKoW+5UdA1ACrA0zAuDCDlZqt8T7YR2x53OzP7Sm00qlS120hDv1IuLKK6jE?=
- =?us-ascii?Q?HWr4owKO2yGvZfOIEBqlEaznlxCGyQspzL2HvMLKMdaG3tV8gROndOYX/cxB?=
- =?us-ascii?Q?zcoKGIsbF7/0JybQcOWkLF2jBXcgiWdcGV4vzgZHLsPt40WQq7VCo/YpBdK7?=
- =?us-ascii?Q?vF3xBmdRsaJzQJG6yk+aVTWMTQRLwfBo0bKmZsir5jwi0/6EwaAdyXO7iHRg?=
- =?us-ascii?Q?kAbj9gMjwsUubW3kQRXPJ92UYyyCy0IkXRO5OtOeDtPKSROsdFO5xnVPemBO?=
- =?us-ascii?Q?NesYMlrd8JfLmJclFTM+6X6mvJFrAf6nw7TH/uEMVPTkKffsx8KtRLFlz8wH?=
- =?us-ascii?Q?FBeObNT8QLHbOAoMAlDQ/FKZjXw2erYQMqtgMEmN8V+4aSIaya/Ic/1HQjJa?=
- =?us-ascii?Q?NLiNB4kNz55d0BmBaSvzrGotOV6KVuVQ7Ur4clYWRNa7d4kwj4JXcInPBW/q?=
- =?us-ascii?Q?EliASzr8cvtgJJf7lirmidI59gqpC1NNOE6RExt+2cd+klvmOXqLoSJYvV+Z?=
- =?us-ascii?Q?T2aCVozE/49iGLxrIVnhRGl4EVNURPA5PuwSFIhCmlJbMP3OVCKNaZRY2yPb?=
- =?us-ascii?Q?AkPrCMe2wmegTNsTD3DdjVMsRKpME4YBBGN/YYFlzVH2lwlRR8q+RPSFwIlw?=
- =?us-ascii?Q?/fEBtBbijrAWodolq8P5cq9g9IwLp1VSfo8iGbpa24tN528BEMpQeDPCXHr3?=
- =?us-ascii?Q?GHSpLVmypScd4Z1yW7usowTxzZwqshLHyOFg?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(7416014)(376014)(1800799024)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Apr 2025 11:25:44.0630
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 90159200-b307-4202-552b-08dd76901a12
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF000397B1.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7220
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250404211449.1443336-1-seanjc@google.com>
 
-Add tests for memory mapping and NUMA memory policy binding in
-guest_memfd. This extends the existing selftests by adding proper
-validation for:
-- Basic mmap() functionality
-- KVM GMEM set_policy and get_policy() vm_ops functionality using
-  mbind() and get_mempolicy()
-- NUMA policy application before and after memory allocation
+On Fri, Apr 04, 2025 at 02:14:42PM -0700, Sean Christopherson wrote:
+> The two primary goals of this series are to make the irqbypass concept
+> easier to understand, and to address the terrible performance that can
+> result from using a list to track connections.
+> 
+> For the first goal, track the producer/consumer "tokens" as eventfd context
+> pointers instead of opaque "void *".  Supporting arbitrary token types was
+> dead infrastructure when it was added 10 years ago, and nothing has changed
+> since.  Taking an opaque token makes a *very* simple concept (device signals
+> eventfd; KVM listens to eventfd) unnecessarily difficult to understand.
+> 
+> Burying that simple behind a layer of obfuscation also makes the overall
+> code more brittle, as callers can pass in literally anything. I.e. passing
+> in a token that will never be paired would go unnoticed.
+> 
+> For the performance issue, use an xarray.  I'm definitely not wedded to an
+> xarray, but IMO it doesn't add meaningful complexity (even requires less
+> code), and pretty much Just Works.  Like tried this a while back[1], but
+> the implementation had undesirable behavior changes and stalled out.
+> 
+> To address the use case where huge numbers of VMs are being created without
+> _any_ possibility for irqbypass, KVM should probably add a
+> KVM_IRQFD_FLAG_NO_IRQBYPASS flag so that userspace can opt-out on a per-IRQ
+> basis.  I already proposed a KVM module param[2] to let userspace disable
+> IRQ bypass, but that obviously affects all IRQs in all VMs.  It might
+> suffice for most use cases, but I can imagine scenarios where the VMM wants
+> to be more selective, e.g. when it *knows* a KVM_IRQFD isn't eligible for
+> bypass.  And both of those require userspace changes.
+> 
+> Note, I want to do more aggressive cleanups of irqbypass at some point,
+> e.g. not reporting an error to userspace if connect() fails is *awful*
+> behavior for environments that want/need irqbypass to always work.  But
+> that's a future problem.
+> 
+> [1] https://lore.kernel.org/all/20230801115646.33990-1-likexu@tencent.com
+> [2] https://lore.kernel.org/all/20250401161804.842968-1-seanjc@google.com
 
-These tests help ensure NUMA support for guest_memfd works correctly.
+vdpa changes seem minor, so
 
-Signed-off-by: Shivank Garg <shivankg@amd.com>
----
- .../testing/selftests/kvm/guest_memfd_test.c  | 86 ++++++++++++++++++-
- 1 file changed, 82 insertions(+), 4 deletions(-)
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-index ce687f8d248f..2af6d0d8f091 100644
---- a/tools/testing/selftests/kvm/guest_memfd_test.c
-+++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-@@ -13,9 +13,11 @@
- 
- #include <linux/bitmap.h>
- #include <linux/falloc.h>
-+#include <linux/mempolicy.h>
- #include <sys/mman.h>
- #include <sys/types.h>
- #include <sys/stat.h>
-+#include <sys/syscall.h>
- 
- #include "kvm_util.h"
- #include "test_util.h"
-@@ -34,12 +36,86 @@ static void test_file_read_write(int fd)
- 		    "pwrite on a guest_mem fd should fail");
- }
- 
--static void test_mmap(int fd, size_t page_size)
-+static void test_mmap(int fd, size_t page_size, size_t total_size)
- {
- 	char *mem;
- 
--	mem = mmap(NULL, page_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
--	TEST_ASSERT_EQ(mem, MAP_FAILED);
-+	mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-+	TEST_ASSERT(mem != MAP_FAILED, "mmap should succeed");
-+	TEST_ASSERT(munmap(mem, total_size) == 0, "munmap should succeed");
-+}
-+
-+static void test_mbind(int fd, size_t page_size, size_t total_size)
-+{
-+	unsigned long nodemask = 1; /* nid: 0 */
-+	unsigned long maxnode = 8;
-+	unsigned long get_nodemask;
-+	int get_policy;
-+	void *mem;
-+	int ret;
-+
-+	mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-+	TEST_ASSERT(mem != MAP_FAILED, "mmap for mbind test should succeed");
-+
-+	/* Test MPOL_INTERLEAVE policy */
-+	ret = syscall(__NR_mbind, mem, page_size * 2, MPOL_INTERLEAVE,
-+		      &nodemask, maxnode, 0);
-+	TEST_ASSERT(!ret, "mbind with INTERLEAVE to node 0 should succeed");
-+	ret = syscall(__NR_get_mempolicy, &get_policy, &get_nodemask,
-+		      maxnode, mem, MPOL_F_ADDR);
-+	TEST_ASSERT(!ret && get_policy == MPOL_INTERLEAVE && get_nodemask == nodemask,
-+		    "Policy should be MPOL_INTERLEAVE and nodes match");
-+
-+	/* Test basic MPOL_BIND policy */
-+	ret = syscall(__NR_mbind, mem + page_size * 2, page_size * 2, MPOL_BIND,
-+		      &nodemask, maxnode, 0);
-+	TEST_ASSERT(!ret, "mbind with MPOL_BIND to node 0 should succeed");
-+	ret = syscall(__NR_get_mempolicy, &get_policy, &get_nodemask,
-+		      maxnode, mem + page_size * 2, MPOL_F_ADDR);
-+	TEST_ASSERT(!ret && get_policy == MPOL_BIND && get_nodemask == nodemask,
-+		    "Policy should be MPOL_BIND and nodes match");
-+
-+	/* Test MPOL_DEFAULT policy */
-+	ret = syscall(__NR_mbind, mem, total_size, MPOL_DEFAULT, NULL, 0, 0);
-+	TEST_ASSERT(!ret, "mbind with MPOL_DEFAULT should succeed");
-+	ret = syscall(__NR_get_mempolicy, &get_policy, &get_nodemask,
-+		      maxnode, mem, MPOL_F_ADDR);
-+	TEST_ASSERT(!ret && get_policy == MPOL_DEFAULT && get_nodemask == 0,
-+		    "Policy should be MPOL_DEFAULT and nodes zero");
-+
-+	/* Test with invalid policy */
-+	ret = syscall(__NR_mbind, mem, page_size, 999, &nodemask, maxnode, 0);
-+	TEST_ASSERT(ret == -1 && errno == EINVAL,
-+		    "mbind with invalid policy should fail with EINVAL");
-+
-+	TEST_ASSERT(munmap(mem, total_size) == 0, "munmap should succeed");
-+}
-+
-+static void test_numa_allocation(int fd, size_t page_size, size_t total_size)
-+{
-+	unsigned long nodemask = 1;  /* Node 0 */
-+	unsigned long maxnode = 8;
-+	void *mem;
-+	int ret;
-+
-+	mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-+	TEST_ASSERT(mem != MAP_FAILED, "mmap should succeed");
-+
-+	/* Set NUMA policy after allocation */
-+	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE, 0, page_size * 2);
-+	TEST_ASSERT(!ret, "fallocate with aligned offset and size should succeed");
-+	ret = syscall(__NR_mbind, mem, page_size * 2, MPOL_BIND, &nodemask,
-+		      maxnode, 0);
-+	TEST_ASSERT(!ret, "mbind should succeed");
-+
-+	/* Set NUMA policy before allocation */
-+	ret = syscall(__NR_mbind, mem + page_size * 2, page_size, MPOL_BIND,
-+		      &nodemask, maxnode, 0);
-+	TEST_ASSERT(!ret, "mbind should succeed");
-+	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE, page_size * 2, page_size * 2);
-+	TEST_ASSERT(!ret, "fallocate with aligned offset and size should succeed");
-+
-+	TEST_ASSERT(munmap(mem, total_size) == 0, "munmap should succeed");
- }
- 
- static void test_file_size(int fd, size_t page_size, size_t total_size)
-@@ -190,7 +266,9 @@ int main(int argc, char *argv[])
- 	fd = vm_create_guest_memfd(vm, total_size, 0);
- 
- 	test_file_read_write(fd);
--	test_mmap(fd, page_size);
-+	test_mmap(fd, page_size, total_size);
-+	test_mbind(fd, page_size, total_size);
-+	test_numa_allocation(fd, page_size, total_size);
- 	test_file_size(fd, page_size, total_size);
- 	test_fallocate(fd, page_size, total_size);
- 	test_invalid_punch_hole(fd, page_size, total_size);
--- 
-2.34.1
+
+> Sean Christopherson (7):
+>   irqbypass: Drop pointless and misleading THIS_MODULE get/put
+>   irqbypass: Drop superfluous might_sleep() annotations
+>   irqbypass: Take ownership of producer/consumer token tracking
+>   irqbypass: Explicitly track producer and consumer bindings
+>   irqbypass: Use paired consumer/producer to disconnect during
+>     unregister
+>   irqbypass: Use guard(mutex) in lieu of manual lock+unlock
+>   irqbypass: Use xarray to track producers and consumers
+> 
+>  drivers/vfio/pci/vfio_pci_intrs.c |   5 +-
+>  drivers/vhost/vdpa.c              |   4 +-
+>  include/linux/irqbypass.h         |  38 +++---
+>  virt/kvm/eventfd.c                |   3 +-
+>  virt/lib/irqbypass.c              | 185 ++++++++++--------------------
+>  5 files changed, 88 insertions(+), 147 deletions(-)
+> 
+> 
+> base-commit: 782f9feaa9517caf33186dcdd6b50a8f770ed29b
+> -- 
+> 2.49.0.504.g3bcea36a83-goog
 
 
