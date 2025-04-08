@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-42907-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42905-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6238A7FD5C
-	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 13:01:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FFFEA7FD63
+	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 13:02:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D72218959E7
-	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 10:57:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07C2E424E04
+	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 10:56:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF62D26FA44;
-	Tue,  8 Apr 2025 10:52:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0DF426F445;
+	Tue,  8 Apr 2025 10:52:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IyKeCj3Z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="prWNdZwG"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 192B6269891;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1916D26983B;
 	Tue,  8 Apr 2025 10:52:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744109560; cv=none; b=ucsRvPdDMgl7XMJHc4pbGMDeGexxi8dXmP8L1p+Febr87UZrQeGYXb/+VeAcFZ/XABxzByRUwYAwisHqE+gzaQlZVRUHJ5gOqCHjl+BfQsXaPi808BBAMgRmaRPs4dny1iQUzkVr2pvIjCLhOu9C+7bQvoNTdjoc6ygBP9M5TSU=
+	t=1744109560; cv=none; b=jN0t2JVxE8BrdCklgaHDNiLGZSnOMuMPIL5mwPJZpTX3m0O8mg90ZR8O0KV26iKdE7MrVoV7XmNzuJMm01Xa5Qyq4aXvqlofIluwXtxy/2fXV9gWIFW40C7WpA/BOqZjFOrC9J+KdNKwk5oAQ2705W07FZPbUDq5O4YcalulvtE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1744109560; c=relaxed/simple;
-	bh=IeQC/lrUj5/ZKIjhYrlGNAklBGcZvseS+XBP2CTkcNs=;
+	bh=8+XdFyrg3jdFCFbcepfTStu3SnK+HZn4Io5Q3v/8QsQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PvgLKY2AO8Wec1q/zIPCnPwm7lWaLWwJ8tpKTiiU9dsFOTEd5AZisJ7oe8RMPc3gHw5p6rJALao2nl17bxHe/3Q3EnNhWsKJtSUYvX0FmW/MXN84Ss6hjN2N25Gi+3dezjd6EYoP3Di4/+FOgDFNUP9tl/DSiA7wecYR2ZR96wM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IyKeCj3Z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDBC5C4CEEC;
+	 MIME-Version; b=UZ6sKhB2rOW1DxycUri5nEni5KumZ3TBB4WzcRv+JTgTIEFLHk4bV/lB/P7WG9ZnC4k7ZVEBh5jKSYSxw4VcOAMDV8oaJh3+5VwCsA8ghTdujC0e3Em4ntOp9DQxN7yXyZrbm/IXXrg5b/SQHKCp5cyM3wphOeZTQmDptzK1gTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=prWNdZwG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1F77C4CEEE;
 	Tue,  8 Apr 2025 10:52:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1744109559;
-	bh=IeQC/lrUj5/ZKIjhYrlGNAklBGcZvseS+XBP2CTkcNs=;
+	bh=8+XdFyrg3jdFCFbcepfTStu3SnK+HZn4Io5Q3v/8QsQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IyKeCj3ZxButsIc9aejzQM9G/e+iTrNqeV0aI5Rad0p/n/I0tMCgB+lZ8qAPt7Lal
-	 KoKdQtcbU5Y/8NGidzmofQvy+jEvcAZEVOBHdTpeFmN/ZX2oJ3qsuCPpS1TE5Lmp+h
-	 DIynf9+nytK8xy3nqOyjSPR05+2IGqWudu9tUqRfd1QzQ4ybpuk3ZZy9lkXy/Iyjci
-	 As+gcNOWWf2l9sByx6vSJSCopzdeOUQVR1+yw2zFgFoj0j+iCRRG7Z9I+7Dx2BcQdx
-	 6y2R2Rw0EXcS8kUAoGdoKj5AdXOAZaFV1PYnafXSFSbxcoCEPTjbf91yA1MgDwgg2s
-	 68pOI5JfyyuvA==
+	b=prWNdZwGLMmLoaEiVn3nCmRUDVoQH2jUYhlgxpkx/pNHurzvqlCdOHgSHrTNvuyCj
+	 qbqjUtz6WTO/+xZOcR6P0Zor83uDJdVR9GAZ17dOHKAaYNEbM4fKJgB0f8ve8dumrA
+	 b51T9n7HpYXcNQEysPoBLvx6ulhBkEtCCn34VJdr0uFkt4V9biYfXA52EFcFfrw5Rb
+	 49i9Pkjc+BDCt8DhAdE+oHBjkxZxYFofyQ2UJ+UmJoBT8uu7AjYuEQxq9By+yaxn2U
+	 gk+LpHdw80PLpxVeUlx5o6ThirvBvIdJao0qs9Hpjj8b07+thJNPGvqfggOI7Sr2e6
+	 YFkfuk+esB3AQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1u26ZJ-003QX2-RY;
-	Tue, 08 Apr 2025 11:52:37 +0100
+	id 1u26ZK-003QX2-0c;
+	Tue, 08 Apr 2025 11:52:38 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -56,9 +56,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v2 04/17] KVM: arm64: nv: Snapshot S1 ASID tagging information during walk
-Date: Tue,  8 Apr 2025 11:52:12 +0100
-Message-Id: <20250408105225.4002637-5-maz@kernel.org>
+Subject: [PATCH v2 05/17] KVM: arm64: nv: Move TLBI range decoding to a helper
+Date: Tue,  8 Apr 2025 11:52:13 +0100
+Message-Id: <20250408105225.4002637-6-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250408105225.4002637-1-maz@kernel.org>
 References: <20250408105225.4002637-1-maz@kernel.org>
@@ -74,72 +74,101 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We currently completely ignore any sort of ASID tagging during a S1
-walk, as AT doesn't care about it.
-
-However, such information is required if we are going to create
-anything that looks like a TLB from this walk.
-
-Let's capture it both the nG and ASID information while walking
-the page tables.
+As we are about to expand out TLB invalidation capabilities to support
+recursive virtualisation, move the decoding of a TLBI by range into
+a helper that returns the base, the range and the ASID.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h |  2 ++
- arch/arm64/kvm/at.c                 | 27 +++++++++++++++++++++++++++
- 2 files changed, 29 insertions(+)
+ arch/arm64/include/asm/kvm_nested.h | 32 +++++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c           | 24 ++--------------------
+ 2 files changed, 34 insertions(+), 22 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index c8a779b393c28..4ba3780cb7806 100644
+index 4ba3780cb7806..9d56fd946e5ef 100644
 --- a/arch/arm64/include/asm/kvm_nested.h
 +++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -274,6 +274,8 @@ struct s1_walk_result {
- 			u64	pa;
- 			s8	level;
- 			u8	APTable;
-+			bool	nG;
-+			u16	asid;
- 			bool	UXNTable;
- 			bool	PXNTable;
- 			bool	uwxn;
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index 6e6a8fa054e15..ff0651b829d07 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -410,6 +410,33 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 	wr->pa = desc & GENMASK(47, va_bottom);
- 	wr->pa |= va & GENMASK_ULL(va_bottom - 1, 0);
+@@ -231,6 +231,38 @@ static inline u64 kvm_encode_nested_level(struct kvm_s2_trans *trans)
+ 		shift;							\
+ 	})
  
-+	wr->nG = (wi->regime != TR_EL2) && (desc & PTE_NG);
-+	if (wr->nG) {
-+		u64 asid_ttbr, tcr;
++static inline u64 decode_range_tlbi(u64 val, u64 *range, u16 *asid)
++{
++	u64 base, tg, num, scale;
++	int shift;
 +
-+		switch (wi->regime) {
-+		case TR_EL10:
-+			tcr = vcpu_read_sys_reg(vcpu, TCR_EL1);
-+			asid_ttbr = ((tcr & TCR_A1) ?
-+				     vcpu_read_sys_reg(vcpu, TTBR1_EL1) :
-+				     vcpu_read_sys_reg(vcpu, TTBR0_EL1));
-+			break;
-+		case TR_EL20:
-+			tcr = vcpu_read_sys_reg(vcpu, TCR_EL2);
-+			asid_ttbr = ((tcr & TCR_A1) ?
-+				     vcpu_read_sys_reg(vcpu, TTBR1_EL2) :
-+				     vcpu_read_sys_reg(vcpu, TTBR0_EL2));
-+			break;
-+		default:
-+			BUG();
-+		}
++	tg	= FIELD_GET(GENMASK(47, 46), val);
 +
-+		wr->asid = FIELD_GET(TTBR_ASID_MASK, asid_ttbr);
-+		if (!kvm_has_feat_enum(vcpu->kvm, ID_AA64MMFR0_EL1, ASIDBITS, 16) ||
-+		    !(tcr & TCR_ASID16))
-+			wr->asid &= GENMASK(7, 0);
++	switch(tg) {
++	case 1:
++		shift = 12;
++		break;
++	case 2:
++		shift = 14;
++		break;
++	case 3:
++	default:		/* IMPDEF: handle tg==0 as 64k */
++		shift = 16;
++		break;
 +	}
 +
- 	return 0;
++	base	= (val & GENMASK(36, 0)) << shift;
++
++	if (asid)
++		*asid = FIELD_GET(TLBIR_ASID_MASK, val);
++
++	scale	= FIELD_GET(GENMASK(45, 44), val);
++	num	= FIELD_GET(GENMASK(43, 39), val);
++	*range	= __TLBI_RANGE_PAGES(num, scale) << shift;
++
++	return base;
++}
++
+ static inline unsigned int ps_to_output_size(unsigned int ps)
+ {
+ 	switch (ps) {
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 005ad28f73068..26e02e1723911 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3546,8 +3546,7 @@ static bool handle_ripas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ {
+ 	u32 sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
+ 	u64 vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
+-	u64 base, range, tg, num, scale;
+-	int shift;
++	u64 base, range;
  
- addrsz:
+ 	if (!kvm_supported_tlbi_ipas2_op(vcpu, sys_encoding))
+ 		return undef_access(vcpu, p, r);
+@@ -3557,26 +3556,7 @@ static bool handle_ripas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	 * of the guest's S2 (different base granule size, for example), we
+ 	 * decide to ignore TTL and only use the described range.
+ 	 */
+-	tg	= FIELD_GET(GENMASK(47, 46), p->regval);
+-	scale	= FIELD_GET(GENMASK(45, 44), p->regval);
+-	num	= FIELD_GET(GENMASK(43, 39), p->regval);
+-	base	= p->regval & GENMASK(36, 0);
+-
+-	switch(tg) {
+-	case 1:
+-		shift = 12;
+-		break;
+-	case 2:
+-		shift = 14;
+-		break;
+-	case 3:
+-	default:		/* IMPDEF: handle tg==0 as 64k */
+-		shift = 16;
+-		break;
+-	}
+-
+-	base <<= shift;
+-	range = __TLBI_RANGE_PAGES(num, scale) << shift;
++	base = decode_range_tlbi(p->regval, &range, NULL);
+ 
+ 	kvm_s2_mmu_iterate_by_vmid(vcpu->kvm, get_vmid(vttbr),
+ 				   &(union tlbi_info) {
 -- 
 2.39.2
 
