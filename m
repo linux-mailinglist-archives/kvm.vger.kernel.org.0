@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-42910-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42912-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6745DA7FD2A
-	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 12:58:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7531A7FDA9
+	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 13:05:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CE6417E8B0
-	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 10:57:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFF9D3B5FB6
+	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 10:57:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BF4426FA72;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 745B226FA78;
 	Tue,  8 Apr 2025 10:52:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X3KUjK56"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CBNlM/Ni"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 339F126F450;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A9326F44A;
 	Tue,  8 Apr 2025 10:52:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744109561; cv=none; b=Ngd8VQ7FmXwXpULUSNDOefvMyfSTLV+hO7aPK/hbNFfcoayXwC0fzGKLiiz9JjjLOgc9ro7wBX/fWWl3KmFYmGxShyasczV4JjIQhgK3WTzwMEK2yAwoelC1BaxGL5SR5B0bITofuQI4BVlOBlS5GagTCniAn/TTnetjcSoEcRI=
+	t=1744109561; cv=none; b=sfs1SJDxcvRLcX4K7qi14g5u4tQb5EE7I/oizOGTI1R3ez/HDWbPMhEEpyrp3blRn8cEi4QKDzuGZNb3dQI3oxrqLq2F6l+HE3Lt9/qRUMnsDQvfVFKhKQ/HL+LSJL2s0+gT1Q8iOzrL9hgAxZ8qEaDlw4+FBN0FhyMvx47uJ04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1744109561; c=relaxed/simple;
-	bh=aZ/Aqt4Bvcj9h30EsK0azOyOc2uBEcHwK3yHMQ61QwU=;
+	bh=GZFvuOp7F5b/p4wbdhkNUZbcbM062HzxRDlGZgd/He8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qMZJ2Bei6rxrSnY0O95e900l1n7CxBMnPVt+SWC4MYG+6Kd0zg35H15hT3dyRuP0gf1HEeelCNnEKtt4qN/4Cosem5N8AGLRsmyyh4Q4iCAhuQ6JywWg4Vb/L9CSUPuLzNeKwDQuHnNuDZoyrMWTXZVPJlNZN7lt8M6QkQo5zu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X3KUjK56; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7094C4CEEA;
+	 MIME-Version; b=OtQKgogJDbLgdQjymBPpFAW9X5EuaVLVNGq8+rii5fZw8wRcjKlRn51Xd4tOiguhieebo6ihYaFQHD0uf4qIdRvMYQARU05OB/TW8FrJ3GSH//3mxk6oMU+chI5TB5ncvwXrS49IP0PnIsY4HirW/C7l/tRlqcIw1wpNLH6t3c0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CBNlM/Ni; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECCB8C4CEEC;
 	Tue,  8 Apr 2025 10:52:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1744109561;
-	bh=aZ/Aqt4Bvcj9h30EsK0azOyOc2uBEcHwK3yHMQ61QwU=;
+	bh=GZFvuOp7F5b/p4wbdhkNUZbcbM062HzxRDlGZgd/He8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=X3KUjK56B0taZR6QY114ygB8/KIe9wKfVLSLvx+Xj6qwl09lb8SwSov/8j71VYEfy
-	 ttHvHWprZ9QVUTD35sszCIAKJwrNhYzUmubA8U/o5pjy3tXWzN+kTtfORs/Bu9WBJE
-	 lSMwV/ddahYtX5ohu9F+tDv5aBBbJbdfbMvbADRHkffMVh2nH9E43sGPGrsKsIhkuz
-	 M/ieLwQVczUa8L6oCX+dTpZ3CNrcUb3BU75l1ZQ0SnqOp42qnRwH99DUstgqe2NvZn
-	 6tqO06nL+5gJLjs9hyBq/0cKrmXn2+TiRJKuUtMi2SEuZubqI8SrAo3Ralmsdg41aH
-	 DcNb/avaPLSbg==
+	b=CBNlM/NiOZ5oFyi+8pn1ivPQmUIiqH8A9CyiabubLSfl6a/lXiYlNh9YTjG3NyGgi
+	 4RMuHObQeevvfvJ0VulOrNlCoqmh32ocbTPywJBF97cII0jnh9ncLuXItnQjVAbTjU
+	 5Nt6S3D1j0hV6Qty6vhcIFJxfNnjCGBjrxZRwElO1lj4an9qF8UqoVW3YUYSzLL2HG
+	 kz9TmNS/k7Hbk9N3MiUp+sDr5y2hFomESWuFmMaKG3QBhpAnqcaqohrKF48KZOqKKL
+	 tm/8qYelGM5gVBvT+4pwc20OypPLduRb7ise0YXNIYQ6gC+x2adXpo1feA8tqVAEhR
+	 tq9eA0Xl8XxMw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1u26ZK-003QX2-W4;
+	id 1u26ZL-003QX2-5S;
 	Tue, 08 Apr 2025 11:52:39 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -56,9 +56,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v2 10/17] KVM: arm64: nv: Handle mapping of VNCR_EL2 at EL2
-Date: Tue,  8 Apr 2025 11:52:18 +0100
-Message-Id: <20250408105225.4002637-11-maz@kernel.org>
+Subject: [PATCH v2 11/17] KVM: arm64: nv: Handle VNCR_EL2 invalidation from MMU notifiers
+Date: Tue,  8 Apr 2025 11:52:19 +0100
+Message-Id: <20250408105225.4002637-12-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250408105225.4002637-1-maz@kernel.org>
 References: <20250408105225.4002637-1-maz@kernel.org>
@@ -74,212 +74,128 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Now that we can handle faults triggered through VNCR_EL2, we need
-to map the corresponding page at EL2. But where, you'll ask?
+During an invalidation triggered by an MMU notifier, we need to
+make sure we can drop the *host* mapping that would have been
+translated by the stage-2 mapping being invalidated.
 
-Since each CPU in the system can run a vcpu, we need a per-CPU
-mapping. For that, we carve a NR_CPUS range in the fixmap, giving
-us a per-CPU va at which to map the guest's VNCR's page.
+For the moment, the invalidation is pretty brutal, as we nuke
+the full IPA range, and therefore any VNCR_EL2 mapping.
 
-The mapping occurs both on vcpu load and on the back of a fault,
-both generating a request that will take care of the mapping.
-That mapping will also get dropped on vcpu put.
-
-Yes, this is a bit heavy handed, but it is simple. Eventually,
-we may want to have a per-VM, per-CPU mapping, which would avoid
-all the TLBI overhead.
+At some point, we'll be more light-weight, and the code is able
+to deal with something more targetted.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/fixmap.h     |  6 ++
- arch/arm64/include/asm/kvm_host.h   |  1 +
- arch/arm64/include/asm/kvm_nested.h |  7 +++
- arch/arm64/kvm/nested.c             | 98 ++++++++++++++++++++++++++---
- 4 files changed, 103 insertions(+), 9 deletions(-)
+ arch/arm64/kvm/nested.c | 75 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 75 insertions(+)
 
-diff --git a/arch/arm64/include/asm/fixmap.h b/arch/arm64/include/asm/fixmap.h
-index 87e307804b99c..635a43c4ec85b 100644
---- a/arch/arm64/include/asm/fixmap.h
-+++ b/arch/arm64/include/asm/fixmap.h
-@@ -48,6 +48,12 @@ enum fixed_addresses {
- 	FIX_EARLYCON_MEM_BASE,
- 	FIX_TEXT_POKE0,
- 
-+#ifdef CONFIG_KVM
-+	/* One slot per CPU, mapping the guest's VNCR page at EL2. */
-+	FIX_VNCR_END,
-+	FIX_VNCR = FIX_VNCR_END + NR_CPUS,
-+#endif
-+
- #ifdef CONFIG_ACPI_APEI_GHES
- 	/* Used for GHES mapping from assorted contexts */
- 	FIX_APEI_GHES_IRQ,
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 8fb1c8d5fd142..d87fed0b48331 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -658,6 +658,7 @@ struct kvm_host_data {
- #define KVM_HOST_DATA_FLAG_TRBE_ENABLED			4
- #define KVM_HOST_DATA_FLAG_EL1_TRACING_CONFIGURED	5
- #define KVM_HOST_DATA_FLAG_VCPU_IN_HYP_CONTEXT		6
-+#define KVM_HOST_DATA_FLAG_L1_VNCR_MAPPED		7
- 	unsigned long flags;
- 
- 	struct kvm_cpu_context host_ctxt;
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index be4be8ec49d9e..ea50cad1a6a29 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -337,4 +337,11 @@ int __kvm_translate_va(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- int kvm_vcpu_allocate_vncr_tlb(struct kvm_vcpu *vcpu);
- int kvm_handle_vncr_abort(struct kvm_vcpu *vcpu);
- 
-+#define vncr_fixmap(c)						\
-+	({							\
-+		u32 __c = (c);					\
-+		BUG_ON(__c >= NR_CPUS);				\
-+		(FIX_VNCR - __c);				\
-+	})
-+
- #endif /* __ARM64_KVM_NESTED_H */
 diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index a7b3770baa8d2..06db2097eae58 100644
+index 06db2097eae58..c1572fe60555f 100644
 --- a/arch/arm64/kvm/nested.c
 +++ b/arch/arm64/kvm/nested.c
-@@ -8,6 +8,7 @@
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
- 
-+#include <asm/fixmap.h>
- #include <asm/kvm_arm.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_mmu.h>
-@@ -703,23 +704,35 @@ void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu)
- void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
- {
- 	/*
--	 * The vCPU kept its reference on the MMU after the last put, keep
--	 * rolling with it.
-+	 * If the vCPU kept its reference on the MMU after the last put,
-+	 * keep rolling with it.
- 	 */
--	if (vcpu->arch.hw_mmu)
--		return;
--
- 	if (is_hyp_ctxt(vcpu)) {
--		vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
-+		if (!vcpu->arch.hw_mmu)
-+			vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
- 	} else {
--		write_lock(&vcpu->kvm->mmu_lock);
--		vcpu->arch.hw_mmu = get_s2_mmu_nested(vcpu);
--		write_unlock(&vcpu->kvm->mmu_lock);
-+		if (!vcpu->arch.hw_mmu) {
-+			scoped_guard(write_lock, &vcpu->kvm->mmu_lock)
-+				vcpu->arch.hw_mmu = get_s2_mmu_nested(vcpu);
-+		}
-+
-+		if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV)
-+			kvm_make_request(KVM_REQ_MAP_L1_VNCR_EL2, vcpu);
- 	}
+@@ -433,6 +433,30 @@ static unsigned int ttl_to_size(u8 ttl)
+ 	return max_size;
  }
  
- void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu)
- {
-+	/* Unconditionally drop the VNCR mapping if we have one */
-+	if (host_data_test_flag(L1_VNCR_MAPPED)) {
-+		BUG_ON(vcpu->arch.vncr_tlb->cpu != smp_processor_id());
-+		BUG_ON(is_hyp_ctxt(vcpu));
-+
-+		clear_fixmap(vncr_fixmap(vcpu->arch.vncr_tlb->cpu));
-+		vcpu->arch.vncr_tlb->cpu = -1;
-+		host_data_clear_flag(L1_VNCR_MAPPED);
-+	}
-+
- 	/*
- 	 * Keep a reference on the associated stage-2 MMU if the vCPU is
- 	 * scheduling out and not in WFI emulation, suggesting it is likely to
-@@ -1040,6 +1053,70 @@ int kvm_handle_vncr_abort(struct kvm_vcpu *vcpu)
- 	return 1;
- }
- 
-+static void kvm_map_l1_vncr(struct kvm_vcpu *vcpu)
++static u8 pgshift_level_to_ttl(u16 shift, u8 level)
 +{
-+	struct vncr_tlb *vt = vcpu->arch.vncr_tlb;
-+	pgprot_t prot;
++	u8 ttl;
 +
-+	guard(preempt)();
-+	guard(read_lock)(&vcpu->kvm->mmu_lock);
-+
-+	/*
-+	 * The request to map VNCR may have raced against some other
-+	 * event, such as an interrupt, and may not be valid anymore.
-+	 */
-+	if (is_hyp_ctxt(vcpu))
-+		return;
-+
-+	/*
-+	 * Check that the pseudo-TLB is valid and that VNCR_EL2 still
-+	 * contains the expected value. If it doesn't, we simply bail out
-+	 * without a mapping -- a transformed MSR/MRS will generate the
-+	 * fault and allows us to populate the pseudo-TLB.
-+	 */
-+	if (!vt->valid)
-+		return;
-+
-+	if (read_vncr_el2(vcpu) != vt->gva)
-+		return;
-+
-+	if (vt->wr.nG) {
-+		u64 tcr = vcpu_read_sys_reg(vcpu, TCR_EL2);
-+		u64 ttbr = ((tcr & TCR_A1) ?
-+			    vcpu_read_sys_reg(vcpu, TTBR1_EL2) :
-+			    vcpu_read_sys_reg(vcpu, TTBR0_EL2));
-+		u16 asid;
-+
-+		asid = FIELD_GET(TTBR_ASID_MASK, ttbr);
-+		if (!kvm_has_feat_enum(vcpu->kvm, ID_AA64MMFR0_EL1, ASIDBITS, 16) ||
-+		    !(tcr & TCR_ASID16))
-+			asid &= GENMASK(7, 0);
-+
-+		if (asid != vt->wr.asid)
-+			return;
++	switch(shift) {
++	case 12:
++		ttl = TLBI_TTL_TG_4K;
++		break;
++	case 14:
++		ttl = TLBI_TTL_TG_16K;
++		break;
++	case 16:
++		ttl = TLBI_TTL_TG_64K;
++		break;
++	default:
++		BUG();
 +	}
 +
-+	vt->cpu = smp_processor_id();
++	ttl <<= 2;
++	ttl |= level & 3;
 +
-+	if (vt->wr.pw && vt->wr.pr)
-+		prot = PAGE_KERNEL;
-+	else if (vt->wr.pr)
-+		prot = PAGE_KERNEL_RO;
-+	else
-+		prot = PAGE_NONE;
-+
-+	/*
-+	 * We can't map write-only (or no permission at all) in the kernel,
-+	 * but the guest can do it if using POE, so we'll have to turn a
-+	 * translation fault into a permission fault at runtime.
-+	 * FIXME: WO doesn't work at all, need POE support in the kernel.
-+	 */
-+	if (pgprot_val(prot) != pgprot_val(PAGE_NONE)) {
-+		__set_fixmap(vncr_fixmap(vt->cpu), vt->hpa, prot);
-+		host_data_set_flag(L1_VNCR_MAPPED);
-+	}
++	return ttl;
 +}
 +
  /*
-  * Our emulated CPU doesn't support all the possible features. For the
-  * sake of simplicity (and probably mental sanity), wipe out a number
-@@ -1580,6 +1657,9 @@ void check_nested_vcpu_requests(struct kvm_vcpu *vcpu)
- 		write_unlock(&vcpu->kvm->mmu_lock);
- 	}
+  * Compute the equivalent of the TTL field by parsing the shadow PT.  The
+  * granule size is extracted from the cached VTCR_EL2.TG0 while the level is
+@@ -783,6 +807,53 @@ int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2)
+ 	return kvm_inject_nested_sync(vcpu, esr_el2);
+ }
  
-+	if (kvm_check_request(KVM_REQ_MAP_L1_VNCR_EL2, vcpu))
-+		kvm_map_l1_vncr(vcpu);
++static void invalidate_vncr(struct vncr_tlb *vt)
++{
++	vt->valid = false;
++	if (vt->cpu != -1)
++		clear_fixmap(vncr_fixmap(vt->cpu));
++}
 +
- 	/* Must be last, as may switch context! */
- 	if (kvm_check_request(KVM_REQ_GUEST_HYP_IRQ_PENDING, vcpu))
- 		kvm_inject_nested_irq(vcpu);
++static void kvm_invalidate_vncr_ipa(struct kvm *kvm, u64 start, u64 end)
++{
++	struct kvm_vcpu *vcpu;
++	unsigned long i;
++
++	lockdep_assert_held_write(&kvm->mmu_lock);
++
++	if (!kvm_has_feat(kvm, ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY))
++		return;
++
++	kvm_for_each_vcpu(i, vcpu, kvm) {
++		struct vncr_tlb *vt = vcpu->arch.vncr_tlb;
++		u64 ipa_start, ipa_end, ipa_size;
++
++		/*
++		 * Careful here: We end-up here from an MMU notifier,
++		 * and this can race against a vcpu not being onlined
++		 * yet, without the pseudo-TLB being allocated.
++		 *
++		 * Skip those, as they obviously don't participate in
++		 * the invalidation at this stage.
++		 */
++		if (!vt)
++			continue;
++
++		if (!vt->valid)
++			continue;
++
++		ipa_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift,
++							    vt->wr.level));
++		ipa_start = vt->wr.pa & (ipa_size - 1);
++		ipa_end = ipa_start + ipa_size;
++
++		if (ipa_end <= start || ipa_start >= end)
++			continue;
++
++		invalidate_vncr(vt);
++	}
++}
++
+ void kvm_nested_s2_wp(struct kvm *kvm)
+ {
+ 	int i;
+@@ -795,6 +866,8 @@ void kvm_nested_s2_wp(struct kvm *kvm)
+ 		if (kvm_s2_mmu_valid(mmu))
+ 			kvm_stage2_wp_range(mmu, 0, kvm_phys_size(mmu));
+ 	}
++
++	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
+ }
+ 
+ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
+@@ -809,6 +882,8 @@ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
+ 		if (kvm_s2_mmu_valid(mmu))
+ 			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
+ 	}
++
++	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
+ }
+ 
+ void kvm_nested_s2_flush(struct kvm *kvm)
 -- 
 2.39.2
 
