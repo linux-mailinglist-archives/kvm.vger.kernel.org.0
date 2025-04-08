@@ -1,170 +1,194 @@
-Return-Path: <kvm+bounces-42952-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42953-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74414A8131E
-	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 18:59:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4326DA81328
+	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 19:01:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64E264C34D6
-	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 16:58:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 826407ABC0E
+	for <lists+kvm@lfdr.de>; Tue,  8 Apr 2025 16:59:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88FAEB676;
-	Tue,  8 Apr 2025 16:58:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A885D236434;
+	Tue,  8 Apr 2025 17:00:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cSIZjP3M"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eTda9ZpM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 443E122FAD4
-	for <kvm@vger.kernel.org>; Tue,  8 Apr 2025 16:58:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1198621766A
+	for <kvm@vger.kernel.org>; Tue,  8 Apr 2025 17:00:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744131507; cv=none; b=iVL2N7OfJFBuOCLbWEeNRHUpWtkqmw9pV1YZ3xaPQo7uhnJdZdaqnOdtsS39bK3gZV1Jfm6uzQBPn2UBGoJWfGxYldQAkvqul4YjkzfHZ6XUc9CT89ZRI3hfMj0gHnW+Ow8Xt8/GosEdQvajSmWLb2vnHScVUSs9iwsSNNCDu9I=
+	t=1744131634; cv=none; b=ZWrffGbZksZGXlUKuUysvnvTFTyf03UqweLWeBvF8m1VY/JHEzL1VDX0721PVYZDaQ2gujWdy4fuFtMbzez55CiIM4i9VCcw9rjHx/+K5g9kfXL2e6nZnd34/Bs06R4tC52EM7KAzdQfBmOov+7YNBdZ8pBbgbAllKaVNz5t/Kk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744131507; c=relaxed/simple;
-	bh=1yHW+WngQPDcxfP4JH1rGuORo3S8ePfGj/4p30/ZjG4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=F0uOOfyjzKbuutZHzTgVJWUwd6A9o++cTTyK//08QqIk09p/U+qadMi9CkOl1mABoeQU80Z0cLHKrOK2LXeWUQD0PhAUqo//53aB1UHhrKOF6E9+I9sMEUCOhoAY3T01/uD9wjTtNAzfBHLeQPOzFlym7Gz99Yny/25LQW3oUEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cSIZjP3M; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff7cf599beso5602397a91.0
-        for <kvm@vger.kernel.org>; Tue, 08 Apr 2025 09:58:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744131505; x=1744736305; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4/cspsRoH7mgvJKsLmS0oN+FfcvZOZE3BpLLUKAvOl4=;
-        b=cSIZjP3MUj4KMRKAjqY8bK7uPsYJjmCWLFKRW/eL+E7CAWrMR1ZKFk6lN8t0C/U+me
-         Bxt1hgpMSuhkUagbBUboxx1uZhBpIcUPohct1hoLr/WwTBB6cyppIjJuSuDn9SrXFcku
-         a7Zo4+6RdebbLVhNdCBQFNMYoSu7tHuOpe/ZOfSoCisg6bkuqvqE7rD0AUhmqtDGSHRZ
-         6FEugAZM45JSH+XC5ji92fcUeKqtdinSNnxfUNixUQ+ObhP8jyDol2Zg1rYjranjhB5z
-         a2KAPxPxzO/+CKAm+NTFVUvgeh9kusjOIYhz/qMxxK5vFnPT5+7rT2RpA/eTkGBXnGBv
-         Q24A==
+	s=arc-20240116; t=1744131634; c=relaxed/simple;
+	bh=8opHdR+ZhPf/pDhP5CUJEW+6bhJpr6eKU3OX78G4zYo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RU0A7f+o0cqt+aVThaWEF499HQufcdjk7OvV0oh7g/Up6tvL0AYyhlwLQzXAYiwmVh2kct2eyQ0GMCHugqz6xbUfhKRKil9HPPFKbqLKd43cL3kS6ucFNCBfucPcMZ5MZZSMQPVPPWttWAmOhgFDWcaMwnr8ZBHIodwYgkTEYQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eTda9ZpM; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744131632;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=GK08jeM4D/oPy2IEdVDpdXD3DlKeA5qJPrv3gDqseh8=;
+	b=eTda9ZpMW7vjk+W95z+ubmdTkddRwL6TRQnxUlsiQ17v+PmKZkfM72xzhkJLosv8YEF3Ys
+	LIQry8S3rG1D2kWQp1o0XofiaiIR2Fn0gDYts5RzNaLkeYu3J41EbzLcWmDknpifJGbOTp
+	tVyf66M4cjbc9e9eKSDIXCO3lZrklas=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-333-7wjnEkelPhW_99uOUSz4fQ-1; Tue, 08 Apr 2025 13:00:29 -0400
+X-MC-Unique: 7wjnEkelPhW_99uOUSz4fQ-1
+X-Mimecast-MFC-AGG-ID: 7wjnEkelPhW_99uOUSz4fQ_1744131628
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5e82390b87fso5167080a12.3
+        for <kvm@vger.kernel.org>; Tue, 08 Apr 2025 10:00:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744131505; x=1744736305;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4/cspsRoH7mgvJKsLmS0oN+FfcvZOZE3BpLLUKAvOl4=;
-        b=pInqVLRBLaTj+yEA5LarbkZepb8NctI6a8GolnBlEy7BJBWNxZZiaAZXWTl9FnCYTU
-         H7CsbjxGoJjO0FnGiATxlPIKRJBbblrAwx9AYJj2wULEYMIHC2MiSLJWbV8CAwdApihl
-         T+Gg62Rj2PRtnG8UPGwELrv7HcNYqwlEubkMahjIQdPnIvn973Yd2kFc4mIGONZkHsjx
-         sStWCCn9qUZI8tm4DIiQMDozPkIssQmPUFg75+43YVZIv1hDZvBOuIuaWRR9tZH9efvo
-         RX+7yOOxDlkkPGF7jCwV/GKtsCC9m+yF6m382gaOuPdOPQlTN0eXyoX+RMneXGo20lud
-         DOKA==
-X-Forwarded-Encrypted: i=1; AJvYcCX9AqerMqV7gD5I1whsry5AHO13YO9Q38a4Dm7TAZRNHruZ/ScWoXOmagwM+Hfxkc3rtes=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzk4DGLTO+/seSNxMRwwy62o2SxjzDrWmsaGpIgJYxZYipxaHyl
-	4Rkx0rVdqeJki0C8ecZ5+PTcN0nTbDWBLoP4DJhYBcwj4qiDHBemikTdhXl/x3pggHocXVqlgTx
-	zPiAeUBo9I2wpGA/oJ2yjiw==
-X-Google-Smtp-Source: AGHT+IHhG5hSB3aOnKu/HHrAmMFRLsHAG6Yf/NLT6GaoqAr+8hqPxs0sYHiqY17BjjeR0rXHNDk0o7C4Y+BsIOeodw==
-X-Received: from pjbse3.prod.google.com ([2002:a17:90b:5183:b0:2ee:3128:390f])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:51cb:b0:2fe:861b:1ae3 with SMTP id 98e67ed59e1d1-306af7178cemr18710322a91.8.1744131505344;
- Tue, 08 Apr 2025 09:58:25 -0700 (PDT)
-Date: Tue, 08 Apr 2025 09:58:23 -0700
-In-Reply-To: <aeed695d-043d-45f6-99f3-e41f4a698963@amd.com>
+        d=1e100.net; s=20230601; t=1744131628; x=1744736428;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GK08jeM4D/oPy2IEdVDpdXD3DlKeA5qJPrv3gDqseh8=;
+        b=AZVb8/jUZOROSYcyyIxsPzQgu7/tWgJXqg/+nfVZ+TWy/hNviV+Pvq0fM9PiSxiwsS
+         WVqTsrzHhy5wNrs8d8tj3wE7beu6ia8NRSw+3hnfgIzV6b2S6d+OC3P3vZqQeKLYMHfo
+         LgBQzCe2TjHo15giGwgesVdVC/wiZYBoRdESZlclW18v+PtBocVm5WMKDuyDrtwD5Tm7
+         3kSMCiMH0SI6Q54o7zW/Y1TU5ZfkAIAOsHgIqDRL8rDMelbmKYUNxbXGCGybQ9Nes3o6
+         I9IofvJwSQJJjch6iOHL9J+YohnjhO53KTQG/dsR3wbuJBzMimA4bQc889XkYXMZo90d
+         llLg==
+X-Gm-Message-State: AOJu0YyierrAsS2fKqLVAgzK3AqytO9yBgcZPSPjL1MQQI99OwK9lQkM
+	7zLWjny/efa7CwgrgxfW0oaQWqPuYWlZZzvcMs09FbrM3BvFcQQEqLS0CsMEGN7S46NaOuEjPdx
+	S8yNodPtC1IPmAzdsyi57KTnVBGABcUDE8Sx94YUqU23Mlu9NBA==
+X-Gm-Gg: ASbGnctzIw0kkTnRQ3zy+JjHHqB+fClBqB6kUELDC0qVtcLLlFhfF9n27BgW0wH9Qh9
+	n1An8Ef/+5+NjEEiaPtLGTH+gdCLSA4s0GfFSVMe+oOQXZhKZv+TvIb8ZnjVRtOlDz3gj0dns5e
+	VzKqDA/TE4oS9WoNCs5mnk8RYBkDzFFnPDlFVLu6ZFtoq26AWvxnaWWE7JMVeKz1aB0dTMllkiy
+	rqAZFJ7S4M3DTM2jf+B7cc3SPZYUX+S9puRjVJlQbce7RK3mLWh+KzVZzdNmyqHHTkGk3t81TUo
+	/6/QJq14z/KGT2YowxP+
+X-Received: by 2002:a05:6402:5205:b0:5d0:bf5e:eb8 with SMTP id 4fb4d7f45d1cf-5f0b4311322mr14406473a12.23.1744131628384;
+        Tue, 08 Apr 2025 10:00:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGK6vErHby9HMTnCSSHqaiUuBbgGb4cEfNQbWDSQtJjqb2mU3HLBP3xcUiEN9weMs9qFPHtIA==
+X-Received: by 2002:a05:6402:5205:b0:5d0:bf5e:eb8 with SMTP id 4fb4d7f45d1cf-5f0b4311322mr14406449a12.23.1744131628031;
+        Tue, 08 Apr 2025 10:00:28 -0700 (PDT)
+Received: from [192.168.10.48] ([151.49.197.100])
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5f0880a535fsm8573392a12.80.2025.04.08.10.00.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Apr 2025 10:00:27 -0700 (PDT)
+Message-ID: <d270ff32-7763-40d5-a4dc-3970383571dc@redhat.com>
+Date: Tue, 8 Apr 2025 19:00:25 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250318161823.4005529-1-tabba@google.com> <20250318161823.4005529-4-tabba@google.com>
- <aeed695d-043d-45f6-99f3-e41f4a698963@amd.com>
-Message-ID: <diqzr022twsw.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [PATCH v7 3/9] KVM: guest_memfd: Allow host to map guest_memfd() pages
-From: Ackerley Tng <ackerleytng@google.com>
-To: Shivank Garg <shivankg@amd.com>, Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
-Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, mail@maciej.szmigiero.name, david@redhat.com, 
-	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
-	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
-	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
-	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
-	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
-	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
-	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
-	hughd@google.com, jthoughton@google.com, peterx@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 30/67] KVM: VMX: Stop walking list of routing table
+ entries when updating IRTE
+To: Sean Christopherson <seanjc@google.com>, Joerg Roedel <joro@8bytes.org>,
+ David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>
+Cc: kvm@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
+ Maxim Levitsky <mlevitsk@redhat.com>,
+ Joao Martins <joao.m.martins@oracle.com>, David Matlack <dmatlack@google.com>
+References: <20250404193923.1413163-1-seanjc@google.com>
+ <20250404193923.1413163-31-seanjc@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <20250404193923.1413163-31-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Shivank Garg <shivankg@amd.com> writes:
+On 4/4/25 21:38, Sean Christopherson wrote:
+> Now that KVM provides the to-be-updated routing entry, stop walking the
+> routing table to find that entry.  KVM, via setup_routing_entry() and
+> sanity checked by kvm_get_msi_route(), disallows having a GSI configured
+> to trigger multiple MSIs, i.e. the for-loop can only process one entry.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/kvm/vmx/posted_intr.c | 100 +++++++++++----------------------
+>   1 file changed, 33 insertions(+), 67 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
+> index 00818ca30ee0..786912cee3f8 100644
+> --- a/arch/x86/kvm/vmx/posted_intr.c
+> +++ b/arch/x86/kvm/vmx/posted_intr.c
+> @@ -268,78 +268,44 @@ int vmx_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
+>   		       unsigned int host_irq, uint32_t guest_irq,
+>   		       struct kvm_kernel_irq_routing_entry *new)
+>   {
+> -	struct kvm_kernel_irq_routing_entry *e;
+> -	struct kvm_irq_routing_table *irq_rt;
+> -	bool enable_remapped_mode = true;
+>   	struct kvm_lapic_irq irq;
+>   	struct kvm_vcpu *vcpu;
+>   	struct vcpu_data vcpu_info;
+> -	bool set = !!new;
+> -	int idx, ret = 0;
+>   
+>   	if (!vmx_can_use_vtd_pi(kvm))
+>   		return 0;
+>   
+> -	idx = srcu_read_lock(&kvm->irq_srcu);
+> -	irq_rt = srcu_dereference(kvm->irq_routing, &kvm->irq_srcu);
+> -	if (guest_irq >= irq_rt->nr_rt_entries ||
+> -	    hlist_empty(&irq_rt->map[guest_irq])) {
+> -		pr_warn_once("no route for guest_irq %u/%u (broken user space?)\n",
+> -			     guest_irq, irq_rt->nr_rt_entries);
+> -		goto out;
+> -	}
+> -
+> -	hlist_for_each_entry(e, &irq_rt->map[guest_irq], link) {
+> -		if (e->type != KVM_IRQ_ROUTING_MSI)
+> -			continue;
+> -
+> -		WARN_ON_ONCE(new && memcmp(e, new, sizeof(*new)));
 
-> Hi Fuad,
->
-> On 3/18/2025 9:48 PM, Fuad Tabba wrote:
->> Add support for mmap() and fault() for guest_memfd backed memory
->> in the host for VMs that support in-place conversion between
->> shared and private. To that end, this patch adds the ability to
->> check whether the VM type supports in-place conversion, and only
->> allows mapping its memory if that's the case.
->> 
->> Also add the KVM capability KVM_CAP_GMEM_SHARED_MEM, which
->> indicates that the VM supports shared memory in guest_memfd, or
->> that the host can create VMs that support shared memory.
->> Supporting shared memory implies that memory can be mapped when
->> shared with the host.
->> 
->> This is controlled by the KVM_GMEM_SHARED_MEM configuration
->> option.
->> 
->> Signed-off-by: Fuad Tabba <tabba@google.com>
->
-> ...
-> ...
->> +
->> +static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
->> +{
->> +	struct kvm_gmem *gmem = file->private_data;
->> +
->> +	if (!kvm_arch_gmem_supports_shared_mem(gmem->kvm))
->> +		return -ENODEV;
->> +
->> +	if ((vma->vm_flags & (VM_SHARED | VM_MAYSHARE)) !=
->> +	    (VM_SHARED | VM_MAYSHARE)) {
->> +		return -EINVAL;
->> +	}
->> +
->> +	file_accessed(file);
->
-> As it is not directly visible to userspace, do we need to update the
-> file's access time via file_accessed()?
->
+Alternatively, if you want to keep patches 28/29 separate, you could add 
+this WARN_ON_ONCE to avic.c in the exact same place after checking 
+e->type -- not so much for asserting purposes, but more to document 
+what's going on for the reviewer.
 
-Could you explain a little more about this being directly visible to
-userspace?
+Paolo
 
-IIUC generic_fillattr(), which guest_memfd uses, will fill stat->atime
-from the inode's atime. file_accessed() will update atime and so this
-should be userspace accessible. (Unless I missed something along the way
-that blocks the update)
-
->> +	vm_flags_set(vma, VM_DONTDUMP);
->> +	vma->vm_ops = &kvm_gmem_vm_ops;
->> +
->> +	return 0;
->> +}
->> +#else
->> +#define kvm_gmem_mmap NULL
->> +#endif /* CONFIG_KVM_GMEM_SHARED_MEM */
->> +
->>  static struct file_operations kvm_gmem_fops = {
->> +	.mmap		= kvm_gmem_mmap,
->>  	.open		= generic_file_open,
->>  	.release	= kvm_gmem_release,
->>  	.fallocate	= kvm_gmem_fallocate,
->
-> Thanks,
-> Shivank
 
