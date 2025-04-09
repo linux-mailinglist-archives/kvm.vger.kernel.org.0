@@ -1,120 +1,80 @@
-Return-Path: <kvm+bounces-42984-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42985-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4580A81C66
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 07:53:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FCE7A81C92
+	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 08:05:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63FB41BA0311
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 05:53:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08457885B64
+	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 06:03:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 065D81DC98C;
-	Wed,  9 Apr 2025 05:53:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC3531DF72E;
+	Wed,  9 Apr 2025 06:01:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D6hKidbM"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="xKSpLSH3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2044.outbound.protection.outlook.com [40.107.237.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8267E152E02
-	for <kvm@vger.kernel.org>; Wed,  9 Apr 2025 05:53:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC56F1DDA0E;
+	Wed,  9 Apr 2025 06:01:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.44
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744177988; cv=fail; b=LU8xKAfQDg8X09Jlg4an1GzEdQZkRY8FGjIulmHqtuRkb3uR/m2sp9MV6wVIDzVUM70wocD5L/6sJcn3JTMscuwnEl7iUE2IxvRUrenNNCTefl9rrH8UGwI1uw1+45ryqgp55wVsmYipU+nhPmXyByswkj0YMqL1YD5mpoeP1Ms=
+	t=1744178469; cv=fail; b=iAGQO/W0TK9GlSf/DiuaizhPsUUIvz+MyaruJfPm+7xz8YZggsk4tYUgCKpTaF0cS8R56hYqOmK2mGxJTaKZXcO/vKXs5PINxcGQEwU9XSG+p0xUA95nVzi+tE+O0KKOvwo3qLzaULADa01D/m9Obm+/qAGFkGecpCMETXZf8Q0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744177988; c=relaxed/simple;
-	bh=r3CCOLT+n20IQnZQDz4WUEB278A0pp3DRGg7rEmsLLw=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=qbvEkwMjJWYvRT3OFZq/zayJpboMsK+FSn8c2Bn0RFKHUAsiauWAaaRZu5hQRSQrjRrwtvgkW2jb/bAr97zQZsf0ta4m3g/HxyjB9ND07NpxW3o3Cv9bDY0F1fUgd8eRkTQAEKcyUAhK6iWSQmj4FBCIK6Jiiuzvo1ACqYfVmao=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=D6hKidbM; arc=fail smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744177985; x=1775713985;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=r3CCOLT+n20IQnZQDz4WUEB278A0pp3DRGg7rEmsLLw=;
-  b=D6hKidbMHfFJYWwErduRcWEu4io1aD4v0DnpuNnaN7PwFgah761/a/gx
-   vSqNXDDmkBKhfFLfKBRprH5zg01AwQ8GMjI10NOAZb5LPLVin6YNzf5i/
-   1JJW3tUtBRq7cz5H5cZJ6ltaEbubmSzPB4Fo7QQWwemIa9s56VuZXl6iy
-   T2b6ghNB6+Zv4X9Gs39mUfR+oluATEHjCUw+8cZpQP6HTrjIES2SRYQGD
-   KlZwDTFl0XNqb9PKcf6mPYwYpfYEwWtKWUvDqzqBwbRpoeHDB+SxsKOdZ
-   qNzEx8uzCUzI2dhHgRPVP0Iw2URMejolBkKfGEvrp7tcaCUhxBFsXWWyN
-   w==;
-X-CSE-ConnectionGUID: lNh05R+fQCad+bLEh3qkPA==
-X-CSE-MsgGUID: Jc581rRuT7O3kmx2hw/WgQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11397"; a="71009801"
-X-IronPort-AV: E=Sophos;i="6.15,199,1739865600"; 
-   d="scan'208";a="71009801"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2025 22:53:04 -0700
-X-CSE-ConnectionGUID: 58Z1LcP7TP+pvYKQzOzftg==
-X-CSE-MsgGUID: gQhF2N9DThmLDLswGbOchQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,199,1739865600"; 
-   d="scan'208";a="128990865"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 08 Apr 2025 22:53:04 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Tue, 8 Apr 2025 22:53:03 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Tue, 8 Apr 2025 22:53:03 -0700
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.48) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Tue, 8 Apr 2025 22:53:03 -0700
+	s=arc-20240116; t=1744178469; c=relaxed/simple;
+	bh=SJzuHIGx2vcQp4Fao5iu2eNg9mHIc1ETZ4JOu/TcOWo=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=jFZtatyHdLd0L9u9y4clY2IvPJCA2CCKQ8YEeDXQW/9bHBUQbm7UnEq8ylNCnmWJELkEdf6aUWf+b4/y1sSJbsLzgKA5aY+ZXGP3xxUuIo1LHcXC/xsYaRDPMh0XHfERblWdcizr3ROcexsHPPctlP/VUNRHiZGTz5ECvF3HQPQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=xKSpLSH3; arc=fail smtp.client-ip=40.107.237.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Doqz/51I+Q2hQN7xCu2HeTFnqZ6dqFse9WPxHYTxTXEUCaXxL9ArHMsiffLJmg/dYT60rjmsBlruFV1JSaoHlrbufzG/vtSYaFGItOzcZCagUdz17qHcupHBpHJBClA0AGZfHW8TA4ixFyZH+niYMB4FMNDbUorm0PhCqh1a3l7RTFic1FEaqg8Zya3STzfQabscK4MiLSCJz7RAU2PgtD2Ijmy/ERc5wTaHvUX6X9QoEbrCN5pcUne28uKmuUMeApOdmociFochJPdfIvDMTo9MZPsfd2prM5q/zPWZXadn66qyI0EkR2ZTttz1E4me1+d0ARuSZPO9cf/kOy9VOg==
+ b=T+giOyRybKgL8X6ODDnT0MPigX7jgHHwaTbgsaVa3kLflXv/BsTugNrNCVlXgbG3gmEMpmmk9mKtxLaGgkQbiuFfBZXeBRWlE8JEHhDE5muH4hQ3kzbrxScy+VUht2E4HBicLRGqU9DN1+O4Ge0HuytOqzaj2LR3l8plv1U6dJ29aL1BIiO9R7KfxD7Vq0dkkG8vroZ4zHl2eGs6L28QhAX6Qn4Vdah/yjUOXYHMDOfB+RRgeorPQdmSIwsz6h2quiYCiiSMdv6wX9kBCMOtbTqSzOlfOY1NmeZfi9fyOsjpqWsC4jzMF9NTtnOQcs8n7mU/GLA31GwqI9hlbH6eXQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SSJm+HyosYeKyo4s55kD83kPI8VDlCH9liA8gUvCXRE=;
- b=KC4L/BH6yhG4jYtGtCEh1OQokLq6PmIBHXhYS4aRSNXYIVRuMcxCYJlCnRLtjYbWIg4YJJ1DiFKgQ225p366/XjSya3dKT2JTtzqzodcvx0V9GfBi8RaY18XJhiW6Db6R6NK2mpVzZAzKggnw3G7rT71Ug8akCSzpTZ15cGixHwvCYPMR2lhR+4XBh91on1biDXqbl1Xlyya/D5YHede4idMcK93aoRp4T/b6jhyqr3AZszrEpP3luYaTx3ce/mbI9J8MEQxGlCb4jWl3JLxp6GPNFo5+uB9k80MtapbNWYUAvVQK0uMD1ixjEay9pk7+YW7251wrqd3qgaFxiS2QA==
+ bh=elMNPYefKQUyrJO8yp702ClACDRdPrndx0n5yRREdTk=;
+ b=jAgh+2nIn3E187HLnVFEAQKMAftusDV0Y93n2ClgbIUneJnl9ZW1sggdrcI8vHEgNbJ85hhhDwugtihxGP+9GkiasQ77PYbLAzcWTEUKV2sxuIpglVM7vUzMj1vrPgDAMOzdPC7qF/MWtOpiadgV7p1Q+oomvGURW7EvxxIpPYexijVZDXo67Y51x6JaQUc6MCFkNTwHfSHvWWGNMRE0mnI3rxWzEAA7ZdeSta3HdI+JKwRzcX0GXdqL/UszRKaE+ed/scUVjK+E+seZY3+jzm9ptSJ6m3dibkWBGVIvITfu8xGqlhuFcUib9xUbx7yCQ79jLc1K9rY8ANwP9eLZ9g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=elMNPYefKQUyrJO8yp702ClACDRdPrndx0n5yRREdTk=;
+ b=xKSpLSH3PHsjRzb+lxNGz9p/8PpFRbhxcHF1Zj7JlJdRUZJbldFv7EWgrr4Wb5L7/raTTnQTT8d5d9k8Sogbt96AebhuuvYYJ+jmgX2GWs5Gxc1lPkMFzygalxAjoaXtEdnkW2OAoyaJRwYzZRqLaFesJO41tKeJ7J9vUXFeHN8=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM3PR11MB8735.namprd11.prod.outlook.com (2603:10b6:0:4b::20) by
- PH7PR11MB6402.namprd11.prod.outlook.com (2603:10b6:510:1fa::15) with
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS7PR12MB6214.namprd12.prod.outlook.com (2603:10b6:8:96::13) by
+ IA0PR12MB8301.namprd12.prod.outlook.com (2603:10b6:208:40b::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.34; Wed, 9 Apr
- 2025 05:53:01 +0000
-Received: from DM3PR11MB8735.namprd11.prod.outlook.com
- ([fe80::3225:d39b:ca64:ab95]) by DM3PR11MB8735.namprd11.prod.outlook.com
- ([fe80::3225:d39b:ca64:ab95%7]) with mapi id 15.20.8606.033; Wed, 9 Apr 2025
- 05:53:01 +0000
-Message-ID: <7436cdd9-513c-483a-a994-8602142c7551@intel.com>
-Date: Wed, 9 Apr 2025 13:52:52 +0800
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.23; Wed, 9 Apr
+ 2025 06:01:03 +0000
+Received: from DS7PR12MB6214.namprd12.prod.outlook.com
+ ([fe80::17e6:16c7:6bc1:26fb]) by DS7PR12MB6214.namprd12.prod.outlook.com
+ ([fe80::17e6:16c7:6bc1:26fb%3]) with mapi id 15.20.8632.017; Wed, 9 Apr 2025
+ 06:01:03 +0000
+Message-ID: <55986a72-1be4-4e96-809c-dd004291df2e@amd.com>
+Date: Wed, 9 Apr 2025 11:30:56 +0530
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 02/13] memory: Change
- memory_region_set_ram_discard_manager() to return the result
-To: Alexey Kardashevskiy <aik@amd.com>, David Hildenbrand <david@redhat.com>,
-	Peter Xu <peterx@redhat.com>, Gupta Pankaj <pankaj.gupta@amd.com>, "Paolo
- Bonzini" <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
-	<philmd@linaro.org>, Michael Roth <michael.roth@amd.com>
-CC: <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, Williams Dan J
-	<dan.j.williams@intel.com>, Peng Chao P <chao.p.peng@intel.com>, Gao Chao
-	<chao.gao@intel.com>, Xu Yilun <yilun.xu@intel.com>, Li Xiaoyao
-	<xiaoyao.li@intel.com>
-References: <20250407074939.18657-1-chenyi.qiang@intel.com>
- <20250407074939.18657-3-chenyi.qiang@intel.com>
- <d4b44d77-3522-42bd-b02f-fe2e9be65857@amd.com>
+Subject: Re: [PATCH v4 2/5] x86/cpufeatures: Add CPUID feature bit for the Bus
+ Lock Threshold
+To: Borislav Petkov <bp@alien8.de>
+Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, seanjc@google.com,
+ pbonzini@redhat.com, nikunj@amd.com, thomas.lendacky@amd.com
+References: <20250324130248.126036-1-manali.shukla@amd.com>
+ <20250324130248.126036-3-manali.shukla@amd.com>
+ <20250324215627.GBZ-HVC-KmZiTMxPr3@fat_crate.local>
 Content-Language: en-US
-From: Chenyi Qiang <chenyi.qiang@intel.com>
-In-Reply-To: <d4b44d77-3522-42bd-b02f-fe2e9be65857@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SI2PR02CA0041.apcprd02.prod.outlook.com
- (2603:1096:4:196::20) To DM3PR11MB8735.namprd11.prod.outlook.com
- (2603:10b6:0:4b::20)
+From: Manali Shukla <manali.shukla@amd.com>
+In-Reply-To: <20250324215627.GBZ-HVC-KmZiTMxPr3@fat_crate.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN2PR01CA0019.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:25::24) To DS7PR12MB6214.namprd12.prod.outlook.com
+ (2603:10b6:8:96::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -122,260 +82,150 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM3PR11MB8735:EE_|PH7PR11MB6402:EE_
-X-MS-Office365-Filtering-Correlation-Id: d7d3020a-d850-45a0-6bee-08dd772ac97d
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6214:EE_|IA0PR12MB8301:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3ad83ffb-16b0-4874-fe9e-08dd772be885
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?b0F3NXZCbHBwOUVhczc2MnBWWm5NVWxLd0w0Tm02cGNEQlFQeGc2dzd6Y3VB?=
- =?utf-8?B?UEVNaDk4YVBJZVJWL3kzSWhEQWpTSUxQcTdDeDJ6ZnN6S3UzNlBoYU5qS2Ev?=
- =?utf-8?B?L09EV0VXSWcwOXQyZTE4SXpXejV2a2JUUlBWeXk0NDVZYlUxWlh5Q01YWFZ1?=
- =?utf-8?B?ZVh1U0VuWWJjWlVuSzBZcHNvdENKalNpbTQyTk5zeUFEZW9VY2JUUTg0bENF?=
- =?utf-8?B?QkJtZk85NXgzdjcwbnRXMnNMek55aUJ6bVRXbXh4WDNqV2c3MENBNmx1TWJV?=
- =?utf-8?B?RlZ1TmIyaHIxN2NOVkV5UmlSMVlyc256VzFDR2NIcHVoTWRlei9rWDVtVGtz?=
- =?utf-8?B?OFVjL2xKMUpFOFcyZG9vQmlNK256bU4wN094eUE5Q0tUL0FlSjV2NkdrbWZz?=
- =?utf-8?B?aWEzbldVWGErN3NIWDFXTmFQQW5RRk80dEVFWE9lMUlndTRsRTd6ZVByNlVh?=
- =?utf-8?B?YXlwVjdkckxFSnpaL0J6Wk9POUswazhOSExnSSt3TUYyZC9uMVp0NnA4ZnRU?=
- =?utf-8?B?VFpIVUF0QS9STkNJTk5NMktweFVXdFc1NzdwUEZvZEhEZHF0RGljVmZ1UG5y?=
- =?utf-8?B?T3lrUnVDeTVyTVNCN3ZkS0lsZkNVTkdMM2dObndJcjZSbENqRnhTUGpTMy8w?=
- =?utf-8?B?a0tmOFZISU12R1ZBeUxhbUZzNVZDQ3VkTnl1d1pzNGtka2s1cWRIOHpuWGxp?=
- =?utf-8?B?V0Y1TjAyZEdpaHZGeWRQbVJoSjZQTi8xdHcwVklUZFNodytvTGpuVU5ibFN1?=
- =?utf-8?B?R2JUVjd2ZFdpZHZTdlVpVGhJVTd6b3YzSTZDcFR0c2dPcFpucWozTTVmcVZz?=
- =?utf-8?B?bjFmeDJ6Rm5iV1NqTnl3VzlhbUE4SFpiQnIrSE9Fc2lZeURRQkdTWGwzUWVp?=
- =?utf-8?B?dEhNSWFBUkJUQlA4Z2h2dm0yRHlOT0JRQlhRTGhYcEU2UjYzSmNtdG93UnpE?=
- =?utf-8?B?WVBiOE8xTVdKKzBYOWdQbFNkOTVtMTliMkZNS3JHbldlV2tJRGJHa0pjRXdJ?=
- =?utf-8?B?dnFHT0U2L2RvWUVIZTk3U29XZnd5SThmYlRONWNlRWFKbk45V3RvakJSMWhn?=
- =?utf-8?B?RjdNZzB2QThoZUxLMEY3WFoyYlZqUG1yVGRHbFNEc3NXTXlUbURwUm5vTFl3?=
- =?utf-8?B?QTVMaFphZ3U4bTZEbENPYUZXSVpQcFVOZjVIcTB0RVp3Q0ZNZ1pZS2daeXVK?=
- =?utf-8?B?OTJ6T2duMUQyNXVRSmlDNVdKQ0VneEFSTDdvWkZnM2o1NmpDNFNRMEtCSXFl?=
- =?utf-8?B?b3JXU2p3ZE9BMW9rbzlpVGpHbmhUOENFQmU5SGdkNzRwVlVieHpmU0l6UHBO?=
- =?utf-8?B?WjJnQzJqTmdvVUdySkNZZVRHVUdQTXRBWU5zOXk0ZFFuMmF6SlVhM2U0NCtU?=
- =?utf-8?B?SnpOVmZ2cG0vU0kydk9hWCsyOGhHS1dld3pqK1hOekFYdGlLNk8zY3NFVzl2?=
- =?utf-8?B?eC9udGlaTDBhbFBLRDdRY0I4N201NkNIeHVaT1dWdFVQYUZKTkFCbjVZR0ty?=
- =?utf-8?B?blpTVGFTOUtGZG1sWm91Y29qNXJQb3NBWURmNEIvQ2xVRlNnaWpEYzB3TlVq?=
- =?utf-8?B?M0MyYTVhZ2hjUjJEWnpXdEVwSGdnKzREa2VIZE9PMGlBN1dRRmhqRVN1SHFF?=
- =?utf-8?B?K1hDeVAyQTg5bmZPWjVBL2t4Qy9lNksrbE8rRERyZlc3RlEzTDRoa28rT2tT?=
- =?utf-8?B?NXREQWFERUZjcDkxQjRDMUxGRDRERml1eE5QNGRhMVFIZGJLSS8zS1NFV3Bu?=
- =?utf-8?B?ZjBwYjdDcnVSSXl3Sk5wS1ZOelowZXZ6SUZ5UDVmc0xXRUZnTGIwU2FXMkls?=
- =?utf-8?B?eWFidTZJclRLRDdTUk5EaTlJM044WFlXUUtGa0RqbGdSemZqdHdyM3R2eWIv?=
- =?utf-8?Q?n52TVkTz0YCQw?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM3PR11MB8735.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?b2w3OENDOGY3cjlYZUp6YzVQaUJYV3FmNktxVG9lQWhPVDRxaVg2aXhGUGEw?=
+ =?utf-8?B?SzQ1czVBVHdSVjZjdTB4djN6RkxDSUpxZWtkVmluaFk0MDNZRWxFRGRKS1JC?=
+ =?utf-8?B?TTE5dTlCOE95czlqUUNWVHJ1V0Y4NzdJWUNkbEVSb2p3SFJTRjBGUjh1THJH?=
+ =?utf-8?B?Zmo3ZXArLzExc3ljeVViSm1ORjQ3OWVXalcyUXY0RVNGalVWQUd2bDFVRkZK?=
+ =?utf-8?B?elQ5T3UwN1pFVlFlZUY3cmlWUmRZZ215ZUxKVHU4d1hWOVpFb2xLTzE4a2Fp?=
+ =?utf-8?B?UjFUT2N1MkRWdElLdE54anBLb0hhbTAzMEhTZUFNMTlVMFVYTlYwSy9rN2k5?=
+ =?utf-8?B?ckUwZVpUMHRSVXlPRHcyUGtGbzllYXMxY2dOYjkvL2F1akZzcXkraUlTS2h2?=
+ =?utf-8?B?M1F4YW05aWxlYm9UM3M2OTkyUi9yTWVKaDk3ejVDWWNWQ1g0VlRLUUhuTldP?=
+ =?utf-8?B?S0pxRjRmVEFJMG9HWHI5ZHp1blpvM2M0V2tZeWpyeTJBL0liSXc0T2pyVHEv?=
+ =?utf-8?B?NnFXbWlWL1hxVU8vUDNnK1F6VDBzTmRSSzBiTjNTRjB5cmsyb1Bpc3lBMEVW?=
+ =?utf-8?B?dFd1TmtidHpqaDlQSnc3TklOcVFVazZqcVcyK2hNL2xDbE0zNlg3dVlnclBM?=
+ =?utf-8?B?QVBUSzlmdldweXFTeGhRbXVEVlNVYTN2MG1pWU9MODNwL1NmTmZ2WDEvTlVm?=
+ =?utf-8?B?czZhZTFwd29kOVM4R2FqREo2K21xNVlDaVpnR3h2c3ZhRmpWb0ZhMFlsN0Jo?=
+ =?utf-8?B?bnNqSmNKNVNNZ2VvNVhETDdjUFlMd0xNSWo3WWNGa3VQcWREVG1zbkhFSnZ2?=
+ =?utf-8?B?RytVb0kvOWpkS0g1dnlpMHhCWU5xbThjaW9DSGRZQnVySEN4NC9VOXk2Y0dX?=
+ =?utf-8?B?dWRUSk80RkNNNWtMZ2tMR1hwR204Z21udVVyZ09meXp0QWt5L0w0bU1MMkZP?=
+ =?utf-8?B?QzBUempLWDU2UXR3WVI5K3FONHdOOE9RQTBwOGd1T2dDY3VQdTBLaDR2ZE1J?=
+ =?utf-8?B?ZWZTU1lKc2JnRWV6ZStraU9RRnVwcUs3cUorZGxBSnozM1VRTnVKMEp2SFI2?=
+ =?utf-8?B?ejNycHFtbmUwMFUvQU40d0NIUXNUYlFvSndwa2JpeWRRdzUzUVRNYnJkOVdB?=
+ =?utf-8?B?U2FPN2E0NUo5ckNZaGxmc1VSbG1qVS9KUGROdG41WGJ6OWozRUVMcXVjUGN3?=
+ =?utf-8?B?Z01LWnJiU3pPU1ZTcGppeHlFOGlkYUFWdkFJTThJc2JpZjVZZTRrN2h6Unk5?=
+ =?utf-8?B?TStGWC9iMkFYNWR3MzZzaS96ZWZNNmVsVVhCY1c2WUFaanUwZmREK2krbXlQ?=
+ =?utf-8?B?ODN1UFNEMTVwVTZqZS9ZelVkdmF0Qzd2THB2bjFwSkJIREtnb1ZnNnhCTEpi?=
+ =?utf-8?B?bm9zUGJpTjlvZG9pTHNxRy9iZmg1d0JiSmg0VlZHUWdyVGpzNGFnZFVyeEN3?=
+ =?utf-8?B?M3phcWhjd2VUYVlGVUVPTGc3QmRndW9kOEpTN3g4c3Z6R3VObW42MHRpVzgy?=
+ =?utf-8?B?c0VVTjdUb1RIOGVlVjJNWHNBU01yYjl6aEhhT1BlUUp0clJ2R0c2ZDJhTHFx?=
+ =?utf-8?B?WGQwSVB6QnJyeGFiTXBkUFRpa2dwK1R0MnJKbjUyTG1RR3M2S1Z4NXlHVDlP?=
+ =?utf-8?B?T2hycThSNXkrME54S0tKdkxIeWtkR2VkVXBqcWx6bWtuRmVWK1RrYy9MNWM3?=
+ =?utf-8?B?aWsza3M3KzQ1WHdaRE8xcnpUS0c0N2JzMXNKR285UW5jRDZ2MGorM1d3bE84?=
+ =?utf-8?B?MlRoTWZjeGkvMkUwUE9INUJ3ZHFpVHVRUC9JMG5BZVFPNnhxb1hWVVpaeFJG?=
+ =?utf-8?B?UGVCcnFMb2dQVWVENExvUXM4elNVamxZYm4zQ2xQNGJDS1habi9YNlJwMzEx?=
+ =?utf-8?Q?NLTYsOAqHxe5V?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6214.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?L2pxdGZmRUFHaEUrS21rMUZDSVZFY3lJcWRIVkxVNStxWm0vWkFUYUMrcFRE?=
- =?utf-8?B?blhBU0NucmdoMlU2dEhJd01LczZGRVU5R3ZwcUhiNFlzVG9JZTNTT25pcVk0?=
- =?utf-8?B?a3VvWlRNbThndnFkdGxROHA3NlFZTzgvMnYxd1JnYVZMWkNXaldjaWdzUmM1?=
- =?utf-8?B?MjlRWkpiR05kTmQ1cVNCNFYyV21IaTVzSHhrMmYvdURWL1JSWXRFdk5MOVQ0?=
- =?utf-8?B?M243WmZuU2pabEVFUldJaEU2QU5QaDRGVlQrUEdKdG52cXppanhVdHpUbmVG?=
- =?utf-8?B?NVUxSmsxTFJDNjgrR1pPL3VuRTNta2hSNXU3WCtIN1JGdU85YmR1c3NraVRJ?=
- =?utf-8?B?aTRtcGI5NjFFdDdGY0Y4R21VcUVWSWhvcEFoZTV1S2ExTi8zcUdEdUtsdkhi?=
- =?utf-8?B?dktIQ09XZWRFdFZwcHFkSUx4NitJMVJka3VTNUVqYmV5ckZZMkI1U0xNNXh3?=
- =?utf-8?B?Nnlma3N3Tkh3bFFPZTV0dldZbHI4WDZQdWJWM2kvdnVJWjYwdjdSM245eC9T?=
- =?utf-8?B?Yy9rM2ZsMzJrMlNwM2xNN0toUVgxNGVkRHFFL0tscUFBR1BCRHZibjM2TW5R?=
- =?utf-8?B?cnZsNmlHWnJ2MUJZT0hHb2RxWHJxb2hnSlhaRklhMFpFb3ltRldkN2RzbTJB?=
- =?utf-8?B?NkhUZkJrMGg0N0tnT2lnTUFqSGNZTVBORkxvK3d6anhJQ2hRUGZzbTAyYmNa?=
- =?utf-8?B?VGRoQUo0dEF5NGJqTUxVaXRsYmNJWnVzQUo0LytmK1c2RDNiV2Q3TDNncXM0?=
- =?utf-8?B?ZVB0TCtvOG5uMURDMHUxNHdQaW1mUU9pYnlaREZPejM3TGc4NFhzU1FPaVJy?=
- =?utf-8?B?MXh4NlI0SVV2S0NMNkdvVTQrMXJYWmhHcVNmalJVK3ZCUEQ5VTFSUVQwYy9z?=
- =?utf-8?B?a3E3Q2l6cWNEVHVHYjVDU21UVVlISmx5SWQ5ZE5mbTRpMjYyVXBCR0MweVZm?=
- =?utf-8?B?Ry9pSHJESmJzWkVFYlFuNVNQS3FSOFFiN0VXTlZ3Y2NrdVF1N0N2WUVVZDVh?=
- =?utf-8?B?S05KUHFtRnBQZ0ZXbnpFM21MMTI4eHBKankraXRwa2lvSGw5R0ozb0w0cnYx?=
- =?utf-8?B?OEZmN01Dd0hnMDdiRW1JMDBzZ01oU3lIVmRRR210cG54K1grNnk1Y0VDa2l4?=
- =?utf-8?B?WjRyOGJGZi9udnZ3ZG5iOW0rRDZmV2lONXR0ZCtKREpIRGsyMlQ0Y3NqeVBq?=
- =?utf-8?B?OFllNEFuRkQzNWVYNEJWY01pNDY0Y2tFaEQ2M0JtcTZoclVEcW5uODZzQ0Iy?=
- =?utf-8?B?Y29pM0Jra0dwL2cxajFjMDUza3RMQUxaZVRWTlRzL3VkVVNyYy9RVGdaZ3lI?=
- =?utf-8?B?Uk95U2NUYkdZYlZEWTNQZkFUNUNLSExBUkJGcllaSDA0Z3Z3OVdXMDgxN0s1?=
- =?utf-8?B?L2RvN3dGc1V5Zk5mTEZQQUgvMEJRM1VOOWNrNm9FaUU5Tjg4eC9uYy9CZjgy?=
- =?utf-8?B?dXBsbjVQY2R0L3JLMDAwQVllQndsdlJtTXNxMEdJdzZTTDdNemhGdWZZVUww?=
- =?utf-8?B?YTZGK3JUL1VNOEkzUnhreXkrK2JhaWlpb1dUMVJqVUk5NEs1S2twUjFCOUd6?=
- =?utf-8?B?TzdsU2lUbWFlbFZBV3h2dWdUelJkSmh5NkxHQ0s1M01pVUhyUStVSnhpcGtP?=
- =?utf-8?B?V3g3cmwrOE5CYTMxTStRR05vczVFbEg5MDVQQ3VQQmZuWDM4M2ZiUDF5VVFo?=
- =?utf-8?B?MXlhckl2WU5DSW5LUGVHa2dXWXNEYzZGVzhWQVJqZjRLb0RNVHpIMnFaSEJQ?=
- =?utf-8?B?YWx6azVaRjRnS3hITFZxVWpBbWVOVWg1NWlBZTNEalJ2UmtUQVZQdTlMby96?=
- =?utf-8?B?QzAyQ1lsNy93MTJMbHg5SHE5d2RJT0pjdTVTd2E3SEl5dDlwZzV1UW12QTBw?=
- =?utf-8?B?VWxtaWczaTBMSnIxSEw0dGNBVU94U1Jod05jcktBRzh3dEVaTjRVdkxEa1R5?=
- =?utf-8?B?U0pPejIycEVzZjY3VHUrU1JaWFg3bFVmUHVuOGxVWktUSUVJNS8vSHE4OGtL?=
- =?utf-8?B?OWlJbHRnSDZvaXd2RlEvWml3cHM0NG1CejdVNGhieTBOcjBlZFJFRGV6YkRm?=
- =?utf-8?B?aDNqSWcweVBVMlVIdEl3TVdobVA3NFJuaTQyQ3RvRXdZRFAyTGhuYkZ4b3d2?=
- =?utf-8?B?ZmMvdjYwMW9WTU15eHVzVWk4VHZ5VDR6ZzVtWi9icGpxL3h0Wm5TblFtQktj?=
- =?utf-8?B?N1E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: d7d3020a-d850-45a0-6bee-08dd772ac97d
-X-MS-Exchange-CrossTenant-AuthSource: DM3PR11MB8735.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?dExOSkN2d0tUYzlEOTdkU0l0czBpeC9weVpGK29WQjFKWkl1N0JwN0xBSUYy?=
+ =?utf-8?B?d3BYK1F4bU1tTWZId1pudklURjVrN09mZG5YemRsOE9kQ1pzVnRZNUpsTzYv?=
+ =?utf-8?B?R2w3R0Y4YktHeFpkMmVhbmlNTVRKOHlPSkJaOXZQNmNDaEZUcy9iWVRJeTVG?=
+ =?utf-8?B?Yzc4T3BsYmJjQnBuWmpFUFFuS0JEN3M3RkplSlJDRFZFenl6OEREYU1GV0hG?=
+ =?utf-8?B?dXd0aElTNjBLaTA2MnRWQ2Rtdm90L3NlcWswZnhEY3lEbWtURXhvQ3ZYWUFK?=
+ =?utf-8?B?MTBlcU9VM0cxT21aQUl4Tkppc1ZIWk9VaHE5YjgrRy9VNEV3MVR3WTRjc1Ry?=
+ =?utf-8?B?UTF2YUNQTUcrVjFSV3hmSXIza09JdHprK0FnSE1qWCs4SWJHaUtCYTB5UHAv?=
+ =?utf-8?B?L3hZQVQwcUg3SjYxQnZhQTVMdEZnV3VKWUNWaXV3TzFlVStBWU01WDdOT1Bn?=
+ =?utf-8?B?THJ5MU5ZZmZiUXNPT3N6cVZzWVMyVUVWMDNUUzlTNGRNTll5REdmZlZFM0Vq?=
+ =?utf-8?B?aU1sWDNwbGNvcUlSQnlYWSt0TENWdTVWSW50aXR4VG9Ca1EvdVlzQW0rUU1x?=
+ =?utf-8?B?OUFMd2NDQU9VV2N5N1QwTG0yemJZSlBxM0J0dzNSbTBTVnIxY1kvamt6M3FZ?=
+ =?utf-8?B?U3UzZ3lJclBRT3VDaGFNQXhhNGg2ZFpxallPOVhWLytLcmNYN01weDZSZUt3?=
+ =?utf-8?B?L2RpWjU0WFBvQVVmYkZrL2xYN1YyZktwbFk0NWFSdysxcDBSWXRxdGRVVERR?=
+ =?utf-8?B?MmpNREN4K0dEODROM3JubGJ3c2p4WkJkdllHUmthTDA3dml2V3hGLzhPTEc0?=
+ =?utf-8?B?UzVJa3RBR294SlYxL2d2RzI1N1hiRmtHSTlxOVYxS2lyWXVtTlNMQWwzNTRy?=
+ =?utf-8?B?ZXVyd0hVNC90ZGR2WVZyc0xEY2FZY3FJSFpESlNPdy82UmVqZ1duajQwVkpS?=
+ =?utf-8?B?T3BsN3QvQWNkcnhYYWR3eStvMWhBVUhaQ2R5T2hJdzB1Uisxc0o5OFd4V1hB?=
+ =?utf-8?B?Q0l3UEFKLzB3QmQ4WC83OWEzV1BHREtLdlZiZ2gvOVJzcUoyT0FyWnR1RklP?=
+ =?utf-8?B?Y0NZS1BLZWI0VjVwVXJzWEplRmZCdkcyYTI5OHJkQnl2WHVRZGZlR3VmdWpK?=
+ =?utf-8?B?WituRlF6VWtNU3c3ODY1dWhtOVo4QzRDS0xvZ1ZKeGxXU1lPZ2oyclI3MHZx?=
+ =?utf-8?B?bVQ2K0R5TzRSYlNVOEV4T2ozNGdzalk2RnIreURGeit5Q3V4NFZibkYxSkhj?=
+ =?utf-8?B?a0pTbXdKNThFbkpyeVY4NmZaOGhUQ1JYbU5EYXF1TmtpUlJ6bUYySGVuc1F0?=
+ =?utf-8?B?Y3pKSE5uNXA1c3pWbHNPSXUwQkRZVTVENTErSmdraVdiSG5qb3VlNzJha3Bm?=
+ =?utf-8?B?bVZqdjY2cCtNWjgrcEpsUElUSnd6TzVsQXlZWlAyOGUwYjBzQmJXVTJJNHJU?=
+ =?utf-8?B?M0pxYUJ1Z3RVZmszNEdleTE2ZVl3bCtlck1NdEhXbHRVUk1obktvQXlWYy93?=
+ =?utf-8?B?ZHNDL2pTYyt5WjF2eHlpZTlvYnpsV1lTWXFRa3B6SzBnbDBaS0g1M2dBTXkr?=
+ =?utf-8?B?NXNLcWxxK2lzenlqZ1lJaUQ5NHg5MDBGYThjVSsxdXM2b0JlOTdQbXpZSGVI?=
+ =?utf-8?B?QXA3Qzc4aXJMSWk2cWp1TExHQlBlYmtBbW1TTS9IVDMxMVZoK1NoNi9XL0lR?=
+ =?utf-8?B?YnBXTVRXMGIxSlQ4aTBYQXR6NlhqZEl3NjZhbjVQRUFHYVJrRGF1a0E4c25x?=
+ =?utf-8?B?cmFFeTBGTUFQcUN0USt3bHdMTm16NjZDeXhRRHgwTnpUeVowdFUrOC95Z3c4?=
+ =?utf-8?B?REUxQ0NsbUFFRmFWcDVVMGxzQitxSEZkSGlSSGFMSmYrUHJITjVFMzhIWjhN?=
+ =?utf-8?B?cFkwczBwQlQxVUhQVmEzTkRuMzl0R2YyNytlTk95S3VyaTd0NTZhK2dGZHZM?=
+ =?utf-8?B?V2RPL21VeUp0Wnh5WEpUc01qUUp2R0EwcE9HVVAzdjBjNGdBQ2pSMGY4aCtq?=
+ =?utf-8?B?VzU3WjBGa0ErRTlFOTRqTlIxMmhRRzRaS1NEcGF0WkcxRERTditVdkF1WHBu?=
+ =?utf-8?B?S0ZMUHNxYlhlcFRqMUZuT05mRmdWMnFJTmxleHJUbmc0aGNNR2lUeWFUdUFP?=
+ =?utf-8?Q?03dlTjP1PcZTLB4zSgFocr68N?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3ad83ffb-16b0-4874-fe9e-08dd772be885
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6214.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2025 05:53:01.2637
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2025 06:01:02.8937
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: XjZE4ogWS6qvUZGYhayYeNZhIPWcK1srNN/c1aFFbtM+7pHXM5SD3oLDj+E24Cgv4nA+nG+oRc68vavL5PtuUw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6402
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-UserPrincipalName: xXZTXhlaD2phj5AVMH16ozAovGE0YdT40jCVmvz+CWPqaE8ZDiNk2tmlRrrByH8KnspCmgKjrUZr+v8fD8UsIQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8301
 
+Hi Boris,
 
-
-On 4/9/2025 1:35 PM, Alexey Kardashevskiy wrote:
-> 
-> 
-> On 7/4/25 17:49, Chenyi Qiang wrote:
->> Modify memory_region_set_ram_discard_manager() to return false if a
->> RamDiscardManager is already set in the MemoryRegion. The caller must
->> handle this failure, such as having virtio-mem undo its actions and fail
->> the realize() process. Opportunistically move the call earlier to avoid
->> complex error handling.
+On 3/25/2025 3:26 AM, Borislav Petkov wrote:
+> On Mon, Mar 24, 2025 at 01:02:45PM +0000, Manali Shukla wrote:
+>> Misbehaving guests can cause bus locks to degrade the performance of
+>> the system. The Bus Lock Threshold feature can be used to address this
+>> issue by providing capability to the hypervisor to limit guest's
+>> ability to generate bus lock, thereby preventing system slowdown due
+>> to performance penalities.
 >>
->> This change is beneficial when introducing a new RamDiscardManager
->> instance besides virtio-mem. After
->> ram_block_coordinated_discard_require(true) unlocks all
->> RamDiscardManager instances, only one instance is allowed to be set for
->> a MemoryRegion at present.
+>> When the Bus Lock Threshold feature is enabled, the processor checks
+>> the bus lock threshold count before executing the buslock and decides
+>> whether to trigger bus lock exit or not.
 >>
->> Suggested-by: David Hildenbrand <david@redhat.com>
->> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+>> The value of the bus lock threshold count '0' generates bus lock
+>> exits, and if the value is greater than '0', the bus lock is executed
+>> successfully and the bus lock threshold count is decremented.
+>>
+>> Presence of the Bus Lock threshold feature is indicated via CPUID
+>> function 0x8000000A_EDX[29].
+>>
+>> Signed-off-by: Manali Shukla <manali.shukla@amd.com>
 >> ---
->> Changes in v4:
->>      - No change.
+>>  arch/x86/include/asm/cpufeatures.h | 1 +
+>>  1 file changed, 1 insertion(+)
 >>
->> Changes in v3:
->>      - Move set_ram_discard_manager() up to avoid a g_free()
->>      - Clean up set_ram_discard_manager() definition
->>
->> Changes in v2:
->>      - newly added.
->> ---
->>   hw/virtio/virtio-mem.c | 29 ++++++++++++++++-------------
->>   include/exec/memory.h  |  6 +++---
->>   system/memory.c        | 10 +++++++---
->>   3 files changed, 26 insertions(+), 19 deletions(-)
->>
->> diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
->> index 21f16e4912..d0d3a0240f 100644
->> --- a/hw/virtio/virtio-mem.c
->> +++ b/hw/virtio/virtio-mem.c
->> @@ -1049,6 +1049,17 @@ static void
->> virtio_mem_device_realize(DeviceState *dev, Error **errp)
->>           return;
->>       }
->>   +    /*
->> +     * Set ourselves as RamDiscardManager before the plug handler
->> maps the
->> +     * memory region and exposes it via an address space.
->> +     */
->> +    if (memory_region_set_ram_discard_manager(&vmem->memdev->mr,
->> +                                             
->> RAM_DISCARD_MANAGER(vmem))) {
->> +        error_setg(errp, "Failed to set RamDiscardManager");
->> +        ram_block_coordinated_discard_require(false);
->> +        return;
->> +    }
->> +
->>       /*
->>        * We don't know at this point whether shared RAM is migrated using
->>        * QEMU or migrated using the file content. "x-ignore-shared"
->> will be
+>> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+>> index 8f8aaf94dc00..a3ab8d1f5c17 100644
+>> --- a/arch/x86/include/asm/cpufeatures.h
+>> +++ b/arch/x86/include/asm/cpufeatures.h
+>> @@ -386,6 +386,7 @@
+>>  #define X86_FEATURE_V_SPEC_CTRL		(15*32+20) /* "v_spec_ctrl" Virtual SPEC_CTRL */
+>>  #define X86_FEATURE_VNMI		(15*32+25) /* "vnmi" Virtual NMI */
+>>  #define X86_FEATURE_SVME_ADDR_CHK	(15*32+28) /* SVME addr check */
+>> +#define X86_FEATURE_BUS_LOCK_THRESHOLD	(15*32+29) /* "buslock" Bus lock threshold */
+> 							      ^^^^^^^^^
 > 
-> Right after the end of this comment block, do not you want
-> memory_region_set_generic_state_manager(..., NULL)?
-
-Nice catch! Miss to add memory_region_set_generic_state_manager(NULL)
-for the ram_block_discard_range() failure case.
-
+> Please read this before you do stuff like that:
 > 
+> Documentation/arch/x86/cpuinfo.rst
 > 
->> @@ -1124,13 +1135,6 @@ static void
->> virtio_mem_device_realize(DeviceState *dev, Error **errp)
->>       vmem->system_reset = VIRTIO_MEM_SYSTEM_RESET(obj);
->>       vmem->system_reset->vmem = vmem;
->>       qemu_register_resettable(obj);
->> -
->> -    /*
->> -     * Set ourselves as RamDiscardManager before the plug handler
->> maps the
->> -     * memory region and exposes it via an address space.
->> -     */
->> -    memory_region_set_ram_discard_manager(&vmem->memdev->mr,
->> -                                          RAM_DISCARD_MANAGER(vmem));
->>   }
->>     static void virtio_mem_device_unrealize(DeviceState *dev)
->> @@ -1138,12 +1142,6 @@ static void
->> virtio_mem_device_unrealize(DeviceState *dev)
->>       VirtIODevice *vdev = VIRTIO_DEVICE(dev);
->>       VirtIOMEM *vmem = VIRTIO_MEM(dev);
->>   -    /*
->> -     * The unplug handler unmapped the memory region, it cannot be
->> -     * found via an address space anymore. Unset ourselves.
->> -     */
->> -    memory_region_set_ram_discard_manager(&vmem->memdev->mr, NULL);
->> -
->>       qemu_unregister_resettable(OBJECT(vmem->system_reset));
->>       object_unref(OBJECT(vmem->system_reset));
->>   @@ -1156,6 +1154,11 @@ static void
->> virtio_mem_device_unrealize(DeviceState *dev)
->>       virtio_del_queue(vdev, 0);
->>       virtio_cleanup(vdev);
->>       g_free(vmem->bitmap);
->> +    /*
->> +     * The unplug handler unmapped the memory region, it cannot be
->> +     * found via an address space anymore. Unset ourselves.
->> +     */
->> +    memory_region_set_ram_discard_manager(&vmem->memdev->mr, NULL);
->>       ram_block_coordinated_discard_require(false);
->>   }
->>   diff --git a/include/exec/memory.h b/include/exec/memory.h
->> index 3bebc43d59..390477b588 100644
->> --- a/include/exec/memory.h
->> +++ b/include/exec/memory.h
->> @@ -2487,13 +2487,13 @@ static inline bool
->> memory_region_has_ram_discard_manager(MemoryRegion *mr)
->>    *
->>    * This function must not be called for a mapped #MemoryRegion, a
->> #MemoryRegion
->>    * that does not cover RAM, or a #MemoryRegion that already has a
->> - * #RamDiscardManager assigned.
->> + * #RamDiscardManager assigned. Return 0 if the rdm is set successfully.
->>    *
->>    * @mr: the #MemoryRegion
->>    * @rdm: #RamDiscardManager to set
->>    */
->> -void memory_region_set_ram_discard_manager(MemoryRegion *mr,
->> -                                           RamDiscardManager *rdm);
->> +int memory_region_set_ram_discard_manager(MemoryRegion *mr,
->> +                                          RamDiscardManager *rdm);
->>     /**
->>    * memory_region_find: translate an address/size relative to a
->> diff --git a/system/memory.c b/system/memory.c
->> index b17b5538ff..62d6b410f0 100644
->> --- a/system/memory.c
->> +++ b/system/memory.c
->> @@ -2115,12 +2115,16 @@ RamDiscardManager
->> *memory_region_get_ram_discard_manager(MemoryRegion *mr)
->>       return mr->rdm;
->>   }
->>   -void memory_region_set_ram_discard_manager(MemoryRegion *mr,
->> -                                           RamDiscardManager *rdm)
->> +int memory_region_set_ram_discard_manager(MemoryRegion *mr,
->> +                                          RamDiscardManager *rdm)
->>   {
->>       g_assert(memory_region_is_ram(mr));
->> -    g_assert(!rdm || !mr->rdm);
->> +    if (mr->rdm && rdm) {
->> +        return -EBUSY;
->> +    }
->> +
->>       mr->rdm = rdm;
->> +    return 0;
-> 
-> This is a change which can potentially break something, or currently
-> there is no way to trigger -EBUSY? Thanks,
-
-Before this series, virtio-mem is the only user to
-set_ram_discard_manager(), there's no way to trigger -EBUSY. With this
-series, guest_memfd-backed RAMBlocks become the second user. It can be
-triggered if we try to use virtio-mem in confidential VMs.
-
-> 
-> 
->>   }
->>     uint64_t ram_discard_manager_get_min_granularity(const
->> RamDiscardManager *rdm,
+> Thx.
 > 
 
+Do you have concern with the decision to expose the flag to /proc/cpuinfo?
+
+The decision to expose the flag to /proc/cpuinfo was already discussed in 
+[v1]. As suggested in the discussion [v1], I have added "buslock" to be
+enumerated in /proc/cpuinfo.
+
+However, if your concern is with the name, I can change the exposed name from
+"buslock" to "bus_lock_threshold".
+
+- Manali
+
+ 
 
