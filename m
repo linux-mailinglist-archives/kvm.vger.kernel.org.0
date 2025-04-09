@@ -1,313 +1,198 @@
-Return-Path: <kvm+bounces-42998-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42999-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BA75A81F67
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 10:11:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EBEBA82008
+	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 10:32:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7827519E3BDE
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 08:07:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCDA41B6678E
+	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 08:31:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9704825B683;
-	Wed,  9 Apr 2025 08:06:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4830925D214;
+	Wed,  9 Apr 2025 08:30:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q7sgayTs"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="dsKznonU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2081.outbound.protection.outlook.com [40.107.220.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F37525A65E
-	for <kvm@vger.kernel.org>; Wed,  9 Apr 2025 08:06:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744186005; cv=none; b=jZ5UQzvYVRl1ghx0/RMwBWf9ieqzybDaw2vPl6Gp5KL7o7qzoDgiSec6bkjMctJerSb7V7JdLBbNC9y2YaFUXcK5LL6UYPZBFbdverikP2a1E0FNkmbO6fNkS22t53EjLnX3Tm5J2WQ8xT4Tn706tD/tOQjSTn9sKYMdINedCAw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744186005; c=relaxed/simple;
-	bh=y/Ah2gIgHbe+sK/IOChNaZznI5EZIF+55b+SG00yUgU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Li06zBnLkqwQVF3Xq6uf8i9zsFMGFpqCj44I5zw6MAEOalaptj/xRbJM+rc992n+5RogcJaRXmhkjf8hCjjoYbvnPBEWFb6XJ0Tc+6j2BazisFjdUB/P8PZQobDtA5uhMHydXzEhiVQqlMA1brfCYhVwhJ26pLSfPy83UZd+3Uk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q7sgayTs; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744186004; x=1775722004;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=y/Ah2gIgHbe+sK/IOChNaZznI5EZIF+55b+SG00yUgU=;
-  b=Q7sgayTs31vVSE7e35pJ5/cQg0jAl9uih689PT5qLYXlxwm7m/Rdc2/n
-   gIvQv23tfk1KG8BD3vzaARlk86rX1fkSXYlZ7mdU1g2g01ZKDNtqvgd3s
-   m510FGlkKE4H400Z282W3S2voPRnWlAlMZjHqJENliYxXYGRLQ5HR0Jqi
-   VbTth91bJKgr7UXz0dPfuJ2++lZppK4ifU0N7EvRWHyhEeLdA3KOazjVW
-   mPyTswqNeGTwifxgjOn/AQyKmDp4Fp3+8NnkWC5C2Jt7yIhEJSLHmp+UW
-   Zq/r220sJ/GKEW8Q4wP6XGpoHW7t5IIGVaZZzKyoH6K8Kj05tErMJpNHH
-   g==;
-X-CSE-ConnectionGUID: KzfK3yPTTYO2Escts37gcQ==
-X-CSE-MsgGUID: 4CF4RmjGSIeqrXXfI/DAGQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11397"; a="45810063"
-X-IronPort-AV: E=Sophos;i="6.15,200,1739865600"; 
-   d="scan'208";a="45810063"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2025 01:06:43 -0700
-X-CSE-ConnectionGUID: I97O+6i8RBm4yuoI5EFM2Q==
-X-CSE-MsgGUID: eesw//O1SlG3FcXwB6y7cg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,200,1739865600"; 
-   d="scan'208";a="151702674"
-Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
-  by fmviesa002.fm.intel.com with ESMTP; 09 Apr 2025 01:06:38 -0700
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	Eric Blake <eblake@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Michael Roth <michael.roth@amd.com>,
-	=?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Shaoqin Huang <shahuang@redhat.com>,
-	Eric Auger <eauger@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Laurent Vivier <lvivier@redhat.com>,
-	Thomas Huth <thuth@redhat.com>,
-	Sebastian Ott <sebott@redhat.com>,
-	Gavin Shan <gshan@redhat.com>
-Cc: qemu-devel@nongnu.org,
-	kvm@vger.kernel.org,
-	qemu-arm@nongnu.org,
-	Dapeng Mi <dapeng1.mi@intel.com>,
-	Yi Lai <yi1.lai@intel.com>,
-	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH 5/5] i386/kvm: Support fixed counter in KVM PMU filter
-Date: Wed,  9 Apr 2025 16:26:49 +0800
-Message-Id: <20250409082649.14733-6-zhao1.liu@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250409082649.14733-1-zhao1.liu@intel.com>
-References: <20250409082649.14733-1-zhao1.liu@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF2A4BE49;
+	Wed,  9 Apr 2025 08:30:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.81
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744187436; cv=fail; b=Poccjij2ddyM+iK0zvU4yvLdfpksCYPPOwO+Db4rZCw3Ja0R6BqKnRC9J86cSfGvxK2j4T+kioYXsR1x4cXeyMbvfIZDcAguhrJ9VMJXdMWlUyP2x2vE4RyGZJiIljqPGHLIv6f6uWqZ4qhOmnP7igG3MeBJDzM7u2jDfbc7zAs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744187436; c=relaxed/simple;
+	bh=v+PH/cvizEgNFAyK2g7ObTqsFLe9IFF7sb0ARGyP9Nc=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=K/gF0Oj33o9hg36i6tQ718wt54UA08rUJV2rVeAIPWCiQDaNLTKzsaA7AAaxS6H6Khv75+Ml1oGDP9M7Au/NeF5fj52Kd04IuYiuIsMHrw9b8F7LNfa+jPLuzjK4EDVebEb2rp3S5QZrEOSkxRQOxqpu50w9cWuHDnN6Mo/gV3o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=dsKznonU; arc=fail smtp.client-ip=40.107.220.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=VDSlud1BByqk3ht0j1Yal8/EePRMZraadkKXEWg8s6/sDTxHhxvJ0BHhxuGd34h0zOFhjCBeV0MAkpw03gsJqznDBh1q5Nc47FKHCmJDdGvWLdaLBNvh260i6ugQCQN6x6nlzXwlbk4MjdOrudhLPvbKSSqeqBJH8E4xfKYFYr+mUQTuJPSLmZ5imn+tYh07C9LS+u1v1JKb59AEko488Iz6Y5YO3tVntpKMC7xxKZ2NZJKVgJCi2OLG5c+9PslBfcPoCl/ThOAiU2MzIkiGRx4Krv4eC3uHkopSBj7sSs05KmfjiTxhBpUiL29mVEdUvH/Y4AofIXc8oSsRnNB9XQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WXj8DNmHRMDWH13SqX8pobhox1lmTbho4vZxoYr43DE=;
+ b=xByHbljLQ7zOm9TWpNUwYm2FOAk2Y0g/DrQdqLqK5mW9KQliXLXxRLv3DBVmgW0A+z9V6R5bXd6BQDB3VSwm2OPiAPN0kfnUfN33bwgEaIh4nRgLCWFBECerVhQ1zSFS8tm+3NEt2TKeHGa7yE+Mv9LoSEGFcQA+L6EOvbZ2+vn41A+xVVnSqD0AisDle/lgJlIZ9IyDWZq+RP/GOzv6edqwGNRp/QN6QDlGzYy6eLCUVG24KuRG0waLIHcMfkAay796YkjBwHN7all1wEs/0xAcAgHPPmBGY45ZpsWZRQDVurmGzVW/hA/MYSYnt82F6K8zHD5mxD1n//AwJZUppw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WXj8DNmHRMDWH13SqX8pobhox1lmTbho4vZxoYr43DE=;
+ b=dsKznonUlRBFAEQKqQfIj6PFt5UPMklarsgheMGWIfYPI+bc7bNLPmp3amxgwCvJc3NUqSI6CnWED7ewfCAsiL9oVTMhEZP+uQyk+Y7d0zVpgJdARhuDCOjaKink3b5RUKFqw3dAFLsetQiibrnd/xzKaDlOaLnvqu0LNgFn/xE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS7PR12MB6048.namprd12.prod.outlook.com (2603:10b6:8:9f::5) by
+ PH7PR12MB5620.namprd12.prod.outlook.com (2603:10b6:510:137::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8606.31; Wed, 9 Apr 2025 08:30:32 +0000
+Received: from DS7PR12MB6048.namprd12.prod.outlook.com
+ ([fe80::6318:26e5:357a:74a5]) by DS7PR12MB6048.namprd12.prod.outlook.com
+ ([fe80::6318:26e5:357a:74a5%5]) with mapi id 15.20.8606.033; Wed, 9 Apr 2025
+ 08:30:32 +0000
+Message-ID: <805ef636-99c2-4d77-9e2d-e4b6ec257e20@amd.com>
+Date: Wed, 9 Apr 2025 14:00:24 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/67] KVM: iommu: Overhaul device posted IRQs support
+To: Joerg Roedel <joro@8bytes.org>, Sean Christopherson <seanjc@google.com>,
+ suravee.suthikulpanit@amd.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, David Woodhouse
+ <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>,
+ kvm@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
+ Maxim Levitsky <mlevitsk@redhat.com>,
+ Joao Martins <joao.m.martins@oracle.com>, David Matlack <dmatlack@google.com>
+References: <20250404193923.1413163-1-seanjc@google.com>
+ <Z_UaJzhtmIv4rAox@8bytes.org>
+Content-Language: en-US
+From: Vasant Hegde <vasant.hegde@amd.com>
+In-Reply-To: <Z_UaJzhtmIv4rAox@8bytes.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN2PR01CA0148.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:6::33) To DS7PR12MB6048.namprd12.prod.outlook.com
+ (2603:10b6:8:9f::5)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6048:EE_|PH7PR12MB5620:EE_
+X-MS-Office365-Filtering-Correlation-Id: 873b753a-15fc-4c61-dac5-08dd7740ca9e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Rk9NZWM3Rjl0L2lkaE1kaVpwcGdrZUgyNVdkZlZiK21hV2pWNkYrNXlKK0N5?=
+ =?utf-8?B?SW9FYitBekJMOEVGSmdPL3FqUWZBL0Jkc0ErY3o1Q09zT1gyWHBsT2ZmTFYx?=
+ =?utf-8?B?YklrVTRscC9qUmZPU2xKMngzVklyVFB0Q2lmWDdoaHl6R0plT2QxeVFpdnF3?=
+ =?utf-8?B?SkFHQXY1T0I0Y1RnMUpqKzRSdm8wM3FQNHNGWWJWU21IWS85OUgvaUNsbzI4?=
+ =?utf-8?B?c1N3SER5cTF1ajlDUk5hR01tZHd5bGt4RXR2L05KL1lnWWl0Q01CVjlYdnNG?=
+ =?utf-8?B?TDVsUEl5azlLaS9BLzVmNHAyd0RmRzQ3MGw2a01CZXdzOXJQMjhpNW9Xbk9U?=
+ =?utf-8?B?KzBtS1dRaHBZU0IyeDhPck9PZ0NwQ09wakR6MWo0eTBYY2ZOSXFaNHIwbDE4?=
+ =?utf-8?B?eWxDU0VRVzdWbEw1TEJ4L0ZrNm5RMDVtQy8ranJJOU8zbXVYRTh5Qk0wZm1W?=
+ =?utf-8?B?OEFsaG1aMnkvNzJ0eFo3clpZbGp4cDFCWnVHdmdhTnJQNlh4T29xaTJDdmJX?=
+ =?utf-8?B?bkh6dkxpN01ZYnYwQjZtMytMNEN1UXphbC9ncWU2Y0Y4Tk5nZEV6WnJpYnhn?=
+ =?utf-8?B?T0lMVkJaWTFrVmpuVW5IVEdvWTBTa1lPdHZCN240bzkzWWRMQ1p2bFFmUXFS?=
+ =?utf-8?B?UU5qS1lhalAvRWIwdTBaWi9Bb0YxZVlvMTBkL252cnpuaXJ0bnI0SjN4cnY2?=
+ =?utf-8?B?STcrRVBnT1Z5RW1OOVZ4dFFtcU91YzdZSDZSSXIxcDBLQ3BKL00wVVNpeUVT?=
+ =?utf-8?B?Ly9aTnpxYWpvRkNxSFFLeXo5SVBYeXpZVFlSQkFibmpGNjkxZVorckFVL25X?=
+ =?utf-8?B?aUVZb3FQN0Z0RExNQXVZM09KelltemRYZGptUlFVQkpOR0R2OXB6M1doNU9P?=
+ =?utf-8?B?QlN4YWswcUVFTlhIL1BhRzBMOUc4anpMdzEzdXFmMmlmcmhIMCtyUzVUR1Nr?=
+ =?utf-8?B?VmY1VzRPYzVFUnRVa2Y1cXlpL2xNYTdpWmFiZEVJRjJxanNaSm1BU2RMaEFn?=
+ =?utf-8?B?ZjNGTWNCcVlFVHVOYmRNZ29YWWJmRWZ3U1B3djBuMGw4cjZFMkVxN1hRcS9G?=
+ =?utf-8?B?OW1Hand5RkkyT3VlQk9SMGFwQzFpRkpjSVRsMGJTM3FhZnFraG41NkptTitX?=
+ =?utf-8?B?ekMyV0xZZmY2THQ4RHhCZkZaUjQyc1lBZ2RIalVIWHVOa2Q3Q2dZQS9YdGcx?=
+ =?utf-8?B?MHJVZW9FdGFDeFRlNFRQVHRZd3NWVnVmQWxlWU9waSsyM3ZSWW1pL2w5aEZF?=
+ =?utf-8?B?MGNmcktqdHhEQTh4ZVBMY0kzYno0eFZxMTE0dDJzZ1daQnBqWmc1MVVkK0d3?=
+ =?utf-8?B?QUxVaGVQcWM0M1JCR0xvWG80czc1bGQwUzJpeUZJbFZMNnZZejJGQzBDYmZa?=
+ =?utf-8?B?cEIwci9ablg1dFhUOVN0Y3k4NmlvVm9xK1JtR0w1UjQzSk9pYVhNSkxzYUdG?=
+ =?utf-8?B?SGhwckhHL1A4cFZveUhtQU9VT0pneFFkSm5CTENxeUo3d215aFBhVVR1azYw?=
+ =?utf-8?B?cGkwSEppeW84eEJlNDRBQkdIeTByOCtiRlZHaXYrRE56M05tWFVvcTR5VlUv?=
+ =?utf-8?B?TEJycDJZREU3ZmFoTURNczdZOWVOb0pZdUJpZEszOVNoZDRwZ1YxT29TMEs0?=
+ =?utf-8?B?V1E4MmtSdUVJM0hERFcySW1YTHdtQjFHSVZ1QnhYU0hLUmFaUFRRbnpWSlF5?=
+ =?utf-8?B?NC9Cd214QzJXUWpCdGtWRlk3b0dyZyt3Zkl4a0R2ZHVhSjJ1YUM1U2NwVjJP?=
+ =?utf-8?B?c2taNlpsNUlQaFB4YkxvUTNHdm4zZlRTMkFQajdQN2padGtLeGl4OUxYZ1Z5?=
+ =?utf-8?B?K1ZYbTd1L0l4L09ITGlEVW5FQmNTeVZIWXJDa0dOVjBKYWRweDNpemZndjFT?=
+ =?utf-8?B?eVUvT1Q5eDlOM0RMYlZpYVlCcmZYdnA1SVoyNm1jay92SUg4bmJKcTdYR2c4?=
+ =?utf-8?Q?yN/TYoePghA=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6048.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Q0VpbVNZUmYzbzFsNXJacGVHbXllaE83dEFmbGw3VWwwamVHdjFqVVNXeTFa?=
+ =?utf-8?B?YXRRdjJtWWZ1b2c4YzBvYm90NS9pK0FQNk43YjZHUFRUSnVSQkVSVFJvSkJF?=
+ =?utf-8?B?NjIvUUFEYXJuYVh2MWhwZUNFUjNKYmJoeHlSN1dtSnNVaVZLcGhBSXVTYjBp?=
+ =?utf-8?B?cTBWUGhrWFNlZzMxZ1RLRVIwZHpRVDF1NnFRYlplL3dSb0Z3TTI2dDlXemVl?=
+ =?utf-8?B?SmlQS0FBa3EyT1h3NCtydHhBZ29GM3A0eDBTNm9jZGlDWktYczRkSXJtME8x?=
+ =?utf-8?B?NnNtVGx0aXFBWlptZFMxQnprcUtPOEQxTUlxTlpkcUJvTkdBc0E1d09Uc2tJ?=
+ =?utf-8?B?RVNxaUptVmVRKzJMcSsrR1JxZDFXcmhOQzk5cmpyUWtVSFlNZCsxbUh1RTlL?=
+ =?utf-8?B?ZUF5cXR2a25PNHVMTjE2Q0g5N1hXZ05wSCtSV1BBZ09FSVhRRlVlTnpMamVC?=
+ =?utf-8?B?SG9lRGRwYVBaUGZqRmdwS0tuK1hQcFdzaGdkSkZyWGI1N3d3V0krWS9BQUVn?=
+ =?utf-8?B?RUdHRlV3c1Myb1ZQTEZTcm00NEhMZ05RdENxMUR0WVhyTTJnZ1lFZmM1NHlD?=
+ =?utf-8?B?QzZhdmsrRnJ6cjE3bTAwRzhqZlhQeThlR1FVc1F6aTFydStBQWxuaFkyamFX?=
+ =?utf-8?B?Q0xUdjdVQ25kS092TmNzQ3hSRW5UVmNiS3RBMnE0MFgrZ2hScENlU0plN0Iw?=
+ =?utf-8?B?NlpWNFZUeGFIMDlBblZNSE1kRUdqdDZUN3lhczllcldGVjIydEJuay9vVHlm?=
+ =?utf-8?B?N0g4bTNOSTJwcFBlUVYwRHU3aXVBWFpvL1Q3WXFoc0pYQmRSZ2Fvbk4wM3cz?=
+ =?utf-8?B?d3FEQSt3M2pkTThFSmxWZHhCTlRTcXlma0wyOS9vdHFIY1MxSXdqSXZTakI4?=
+ =?utf-8?B?RUNJaHM4MGROeVpOQ0ZYMlpjWHA2S0R0TFUxeFVtdGJGaUZjVXBRNVo5dWFn?=
+ =?utf-8?B?MEFoTTdwTUJqS0YrSWNYZ2JVenFYQ2dGTkJaalA1elMyc3cyTFFEcnFET3B1?=
+ =?utf-8?B?TEF4cjZjZ2JIZGJhVC9VSUpxU0FuclJwQ0RnV2NPMzdxaGdRNnpyNk4yY1pX?=
+ =?utf-8?B?K3pyOEZWcUdaZElXUlFheXIydmJTVTFNaVdmMkZaakRUWGNRazBkOWZsalk5?=
+ =?utf-8?B?VWJtVFNnVUxub0NPRm5tczAvdXdMUUNOM0YrVjFoUmI1VVNxa2ZIUitCV0dQ?=
+ =?utf-8?B?QXd4QmdZTDB2cC9MK1VXaktSeWNqSlR0YWsrWVVjREpmUnB2eGVDYTA1NERz?=
+ =?utf-8?B?Um1SYmUybThpUnZidU5FV1l0K3ZHRXArVVUyN0w4TDBNeXhCd3ZlR0VFTkJv?=
+ =?utf-8?B?N0sxUWNISEtzRDlJam5HU29PazJRRkdnM1ZBQ090OVQrMG9sRHNSSVlKOERI?=
+ =?utf-8?B?UzFMa3FlRFpyV0JPWm9UZ0JzMVpBM1Z0RVNOUmkzaEl6OTlwTHFmdHNYYjQ0?=
+ =?utf-8?B?VHA2UHJSK3hCRnZQZEVMeGRKcmhUdW9CdnQ0SU9vTTE4bnF5dlNCaHlqc2py?=
+ =?utf-8?B?a0Rxc2tZUVoyaTg3MHp4QTIvOG8yUXJCd0FoQnY1SjlpaXRDamVCVnVuTWtK?=
+ =?utf-8?B?TnVtd3g0czY2czBNRS81SXIyOFlBSGxYTzhSYnI5Z3ZXamgxRkJta2h5M2xv?=
+ =?utf-8?B?NWc3Q1N5Z1MxdXlvSEV2VzhpbnY0c0I0cStHNjNnNkE0RHJvc1Y4ell6M2tk?=
+ =?utf-8?B?aUhxYkJKbFhVYWpFSnNFamNkay9GdGMrN3ZLY3NOODhjeDMrMWRQSzd6bkY0?=
+ =?utf-8?B?R0FFbkdTSTR5bmIyWVVzVTBua1Z1ZG5PbXYyTVlCbDh4UUtSOUE0Y1RwMnlF?=
+ =?utf-8?B?NEppQlZSZm5JSUlocElYc2FnckM5OW9EQUUzeVJMeFRRWGpsU2xwMFU5aVRm?=
+ =?utf-8?B?YUVpdmQ5SjdsMGdodkRzQmhtbmZ2QzFra0R1V2llK1hyMXdXK1pvSkx6bDM1?=
+ =?utf-8?B?dFNYYWZ6N3huVkpuaHMrd3VxYXpnNGhpc2VRcFpqY0IwNENXWEJlZkUvREt6?=
+ =?utf-8?B?RW9YWFgxU3RCRnBmUVNlbEpVV3d5dUpIVU9vMldYdU1sSDN4aWFaK0pWY0xN?=
+ =?utf-8?B?UUVDMTFITWtRVUlBMlAwNVNxbVVQcHplTUE2NlpHL2JMdVp6dU9VdFMxRWNa?=
+ =?utf-8?Q?GZQjuCJwy7GR3YFPs1ywhe+4Y?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 873b753a-15fc-4c61-dac5-08dd7740ca9e
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6048.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2025 08:30:32.1250
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zmJ23o3bYCce0D/db5IK7XrU9KzqszM3DxCJiYY3Y0MF6oogrbz6NBGuytD8d2Ak70wUX7J5mGuilqet8tQEAg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5620
 
-KVM_SET_PMU_EVENT_FILTER of x86 KVM allows user to configure x86 fixed
-function counters by a bitmap.
+Joerg,
 
-Add the support of x86-fixed-counter in kvm-pmu-filter object and handle
-this in i386 kvm codes.
 
-Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-Tested-by: Yi Lai <yi1.lai@intel.com>
----
-Changes since RFC v2:
- * Drop KVMPMUX86FixedCounter structure and use uint32_t to represent
-   bitmap in QAPI directly.
- * Add Tested-by from Yi.
- * Add documentation in qemu-options.hx.
- * Bump up the supported QAPI version to v10.1.
+On 4/8/2025 6:14 PM, Joerg Roedel wrote:
+> Hey Sean,
+> 
+> On Fri, Apr 04, 2025 at 12:38:15PM -0700, Sean Christopherson wrote:
+>> TL;DR: Overhaul device posted interrupts in KVM and IOMMU, and AVIC in
+>>        general.  This needs more testing on AMD with device posted IRQs.
+> 
+> Thanks for posting this, it fixes quite some issues in the posted IRQ
+> implemention. I skimmed through the AMD IOMMU changes and besides some
+> small things didn't spot anything worrisome.
+> 
+> Adding Suravee and Vasant from AMD to this thread for deeper review
+> (also of the KVM parts) and testing.
 
-Changes since RFC v1:
- * Make "action" as a global (per filter object) item, not a per-counter
-   parameter. (Dapeng)
- * Bump up the supported QAPI version to v10.0.
----
- accel/kvm/kvm-pmu.c      | 31 +++++++++++++++++++++++++++++++
- include/system/kvm-pmu.h |  5 ++++-
- qapi/kvm.json            |  6 +++++-
- qemu-options.hx          |  6 +++++-
- target/i386/kvm/kvm.c    | 39 ++++++++++++++++++++++++---------------
- 5 files changed, 69 insertions(+), 18 deletions(-)
+Sure. We will try to review it soon and will run some tests.
 
-diff --git a/accel/kvm/kvm-pmu.c b/accel/kvm/kvm-pmu.c
-index 9205907d1779..509d69d9c515 100644
---- a/accel/kvm/kvm-pmu.c
-+++ b/accel/kvm/kvm-pmu.c
-@@ -101,6 +101,29 @@ fail:
-     qapi_free_KvmPmuFilterEventList(head);
- }
- 
-+static void kvm_pmu_filter_get_fixed_counter(Object *obj, Visitor *v,
-+                                             const char *name, void *opaque,
-+                                             Error **errp)
-+{
-+    KVMPMUFilter *filter = KVM_PMU_FILTER(obj);
-+
-+    visit_type_uint32(v, name, &filter->x86_fixed_counter, errp);
-+}
-+
-+static void kvm_pmu_filter_set_fixed_counter(Object *obj, Visitor *v,
-+                                             const char *name, void *opaque,
-+                                             Error **errp)
-+{
-+    KVMPMUFilter *filter = KVM_PMU_FILTER(obj);
-+    uint32_t counter;
-+
-+    if (!visit_type_uint32(v, name, &counter, errp)) {
-+        return;
-+    }
-+
-+    filter->x86_fixed_counter = counter;
-+}
-+
- static void kvm_pmu_filter_class_init(ObjectClass *oc, void *data)
- {
-     object_class_property_add_enum(oc, "action", "KvmPmuFilterAction",
-@@ -116,6 +139,14 @@ static void kvm_pmu_filter_class_init(ObjectClass *oc, void *data)
-                               NULL, NULL);
-     object_class_property_set_description(oc, "events",
-                                           "KVM PMU event list");
-+
-+    object_class_property_add(oc, "x86-fixed-counter", "uint32_t",
-+                              kvm_pmu_filter_get_fixed_counter,
-+                              kvm_pmu_filter_set_fixed_counter,
-+                              NULL, NULL);
-+    object_class_property_set_description(oc, "x86-fixed-counter",
-+                                          "Enablement bitmap of "
-+                                          "x86 PMU fixed counter");
- }
- 
- static void kvm_pmu_filter_instance_init(Object *obj)
-diff --git a/include/system/kvm-pmu.h b/include/system/kvm-pmu.h
-index 6abc0d037aee..5238b2b4dcc7 100644
---- a/include/system/kvm-pmu.h
-+++ b/include/system/kvm-pmu.h
-@@ -19,10 +19,12 @@ OBJECT_DECLARE_SIMPLE_TYPE(KVMPMUFilter, KVM_PMU_FILTER)
- 
- /**
-  * KVMPMUFilter:
-- * @action: action that KVM PMU filter will take for selected PMU events.
-+ * @action: action that KVM PMU filter will take for selected PMU events
-+ *    and counters.
-  * @nevents: number of PMU event entries listed in @events
-  * @events: list of PMU event entries.  A PMU event entry may represent one
-  *    event or multiple events due to its format.
-+ * @x86_fixed_counter: bitmap of x86 fixed counter.
-  */
- struct KVMPMUFilter {
-     Object parent_obj;
-@@ -30,6 +32,7 @@ struct KVMPMUFilter {
-     KvmPmuFilterAction action;
-     uint32_t nevents;
-     KvmPmuFilterEventList *events;
-+    uint32_t x86_fixed_counter;
- };
- 
- /*
-diff --git a/qapi/kvm.json b/qapi/kvm.json
-index 1b523e058731..5374c8340e5a 100644
---- a/qapi/kvm.json
-+++ b/qapi/kvm.json
-@@ -115,7 +115,10 @@
- #
- # Properties of KVM PMU Filter.
- #
--# @action: action that KVM PMU filter will take for selected PMU events.
-+# @action: action that KVM PMU filter will take for selected PMU events
-+#     and counters.
-+#
-+# @x86-fixed-counter: enablement bitmap of x86 fixed counters.
- #
- # @events: list of selected PMU events.
- #
-@@ -123,4 +126,5 @@
- ##
- { 'struct': 'KvmPmuFilterProperties',
-   'data': { 'action': 'KvmPmuFilterAction',
-+            '*x86-fixed-counter': 'uint32',
-             '*events': ['KvmPmuFilterEvent'] } }
-diff --git a/qemu-options.hx b/qemu-options.hx
-index bb89198971e0..eadfb69c8876 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -6150,7 +6150,7 @@ SRST
- 
-             (qemu) qom-set /objects/iothread1 poll-max-ns 100000
- 
--    ``-object '{"qom-type":"kvm-pmu-filter","id":id,"action":action,"events":[entry_list]}'``
-+    ``-object '{"qom-type":"kvm-pmu-filter","id":id,"x86-fixed-counter":bitmap,"action":action,"events":[entry_list]}'``
-         Create a kvm-pmu-filter object that configures KVM to filter
-         selected PMU events for Guest.
- 
-@@ -6165,6 +6165,10 @@ SRST
-         will be denied, while all other events can be accessed normally
-         in the Guest.
- 
-+        The ``x86-fixed-counter`` parameter sets a bitmap of x86 fixed
-+        counters, and ``action`` will also take effect on the selected
-+        fixed counters.
-+
-         The ``events`` parameter accepts a list of PMU event entries in
-         JSON format. Event entries, based on different encoding formats,
-         have the following types:
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 8786501e9c7e..8b916dbb5d6f 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -6016,19 +6016,25 @@ static int kvm_install_pmu_event_filter(KVMState *s)
-         g_assert_not_reached();
-     }
- 
--    kvm_filter->flags = filter->events->value->format ==
--                        KVM_PMU_EVENT_FORMAT_X86_MASKED_ENTRY ?
--                        KVM_PMU_EVENT_FLAG_MASKED_EVENTS : 0;
--
--    if (kvm_filter->flags == KVM_PMU_EVENT_FLAG_MASKED_EVENTS &&
--        !kvm_vm_check_extension(s, KVM_CAP_PMU_EVENT_MASKED_EVENTS)) {
--        error_report("Masked entry format of PMU event "
--                     "is not supported by Host.");
--        goto fail;
-+    if (filter->x86_fixed_counter) {
-+        kvm_filter->fixed_counter_bitmap = filter->x86_fixed_counter;
-     }
- 
--    if (!kvm_config_pmu_event(filter, kvm_filter)) {
--        goto fail;
-+    if (filter->nevents) {
-+        kvm_filter->flags = filter->events->value->format ==
-+                            KVM_PMU_EVENT_FORMAT_X86_MASKED_ENTRY ?
-+                            KVM_PMU_EVENT_FLAG_MASKED_EVENTS : 0;
-+
-+        if (kvm_filter->flags == KVM_PMU_EVENT_FLAG_MASKED_EVENTS &&
-+            !kvm_vm_check_extension(s, KVM_CAP_PMU_EVENT_MASKED_EVENTS)) {
-+            error_report("Masked entry format of PMU event "
-+                         "is not supported by Host.");
-+            goto fail;
-+        }
-+
-+        if (!kvm_config_pmu_event(filter, kvm_filter)) {
-+            goto fail;
-+        }
-     }
- 
-     ret = kvm_vm_ioctl(s, KVM_SET_PMU_EVENT_FILTER, kvm_filter);
-@@ -6656,16 +6662,19 @@ static void kvm_arch_check_pmu_filter(const Object *obj, const char *name,
-     KvmPmuFilterEventList *events = filter->events;
-     uint32_t base_flag;
- 
--    if (!filter->nevents) {
-+    if (!filter->x86_fixed_counter && !filter->nevents) {
-         error_setg(errp,
-                    "Empty KVM PMU filter.");
-         return;
-     }
- 
-     /* Pick the first event's flag as the base one. */
--    base_flag = events->value->format ==
--                KVM_PMU_EVENT_FORMAT_X86_MASKED_ENTRY ?
--                KVM_PMU_EVENT_FLAG_MASKED_EVENTS : 0;
-+    base_flag = 0;
-+    if (filter->nevents &&
-+        events->value->format == KVM_PMU_EVENT_FORMAT_X86_MASKED_ENTRY) {
-+        base_flag = KVM_PMU_EVENT_FLAG_MASKED_EVENTS;
-+    }
-+
-     while (events) {
-         KvmPmuFilterEvent *event = events->value;
-         uint32_t flag;
--- 
-2.34.1
+-Vasant
 
 
