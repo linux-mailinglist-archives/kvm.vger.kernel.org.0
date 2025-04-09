@@ -1,259 +1,147 @@
-Return-Path: <kvm+bounces-43025-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43026-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1969A8303B
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 21:17:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EADCA8317E
+	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 22:01:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1DEDD7B107B
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 19:16:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00BEC1885B34
+	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 19:59:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0C591E47AD;
-	Wed,  9 Apr 2025 19:17:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0D7C2144BC;
+	Wed,  9 Apr 2025 19:53:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qJI2/Xoi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aI9teiPp"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C5891C6BE;
-	Wed,  9 Apr 2025 19:17:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F894213E90
+	for <kvm@vger.kernel.org>; Wed,  9 Apr 2025 19:53:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744226234; cv=none; b=WlclO+1eE9cJsdyU3MIJTMniEy+CzW/vgTZBz8bsHSqAHwT08dsKofOj9whlC72tmHSy/+p9IKEoRC/q9JZuTSvvNvcKfMzHJ3XPGj/wMw3yXslCIeqgfQDjBuHGBwOqG/JjETXsT5T7/3/lW9B+MWk2Tq+zmb0zS3Uov/66R+o=
+	t=1744228431; cv=none; b=K6w610fR584Oa+GBJkkHVzJ6FNuOBy+Vmg5KowUhxdUpcdHVGpLWCc8z8he0avWFhvQEP6rg1Hcsna4EoFD9X1HtepYtxV7abTFkjwQ+KRjB2Pks1oZnkk6mMmOJT3pc5Hkj4RncGFQhJrkfrqKTrNuRM6AytFMXs3ua8zzJW84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744226234; c=relaxed/simple;
-	bh=bF03VxvTsU+BqmHsQq0q+S9ppRrCc1/KlnD8PJitqk8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ROzE8dUwHA2d2YtFV8hBxnZ3kqekwy9ziKop/gM1fL8/EsljRzVzABCUuiCVmBV+Bfo2Kwc6mJNZCq4ZtEG7mJhVw+Hgvhu+b2vP4XPb4r5YVxNrxKcDmevQRYWMpt4i8Oim0xoCwqnlfcJwUIxyuOiYY0oxGQ5nXnJY5ilBBhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qJI2/Xoi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE2B7C4CEE2;
-	Wed,  9 Apr 2025 19:17:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744226234;
-	bh=bF03VxvTsU+BqmHsQq0q+S9ppRrCc1/KlnD8PJitqk8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qJI2/XoironzsJaz+i80e/WQ5Qp9VcugyrJtl/YBj3oj0+B7CR2sHsGtWpizK6yO4
-	 VBHn2aUCKN25vPTBjtUJ5ErBpW2uZ0Nr7njrQYPiJXVIm5JOFP/Aa8E5gmKRCoJxm0
-	 2vFvQqbHpIzkDxqkRul6nNrkQNGD3XqtCFeaHlXiWlZ71xy8f9NAVNkpTbM33mpsn2
-	 gk6Zv+IScY5WaKqKDsrRvA4EyHwyJNofhELmFBXXaSUa90cRftnriGKZcCivNb5MT/
-	 7CNvC3GIEekiFTO9pLOuthuuJFylF+HSeUIxKp18BpylKcbyjrBpuCpkk/cUVDn0Ei
-	 6TKBITTbXPjew==
-Date: Wed, 9 Apr 2025 21:17:02 +0200
-From: Ingo Molnar <mingo@kernel.org>
-To: Xin Li <xin@zytor.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-edac@vger.kernel.org,
-	kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
-	linux-ide@vger.kernel.org, linux-pm@vger.kernel.org,
-	bpf@vger.kernel.org, llvm@lists.linux.dev, tglx@linutronix.de,
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-	x86@kernel.org, jgross@suse.com, andrew.cooper3@citrix.com,
-	peterz@infradead.org, acme@kernel.org, namhyung@kernel.org,
-	mark.rutland@arm.com, alexander.shishkin@linux.intel.com,
-	jolsa@kernel.org, irogers@google.com, adrian.hunter@intel.com,
-	kan.liang@linux.intel.com, wei.liu@kernel.org,
-	ajay.kaher@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
-	tony.luck@intel.com, pbonzini@redhat.com, vkuznets@redhat.com,
-	seanjc@google.com, luto@kernel.org, boris.ostrovsky@oracle.com,
-	kys@microsoft.com, haiyangz@microsoft.com, decui@microsoft.com,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: [PATCH] x86/msr: Standardize on 'u32' MSR indices in <asm/msr.h>
-Message-ID: <Z_bHrjUKKWN28TX9@gmail.com>
-References: <20250331082251.3171276-1-xin@zytor.com>
- <20250331082251.3171276-2-xin@zytor.com>
- <Z-pruogreCuU66wm@gmail.com>
- <9D15DE81-2E68-4FCD-A133-4963602E18C9@zytor.com>
- <Z-ubVFyoOzwKhI53@gmail.com>
- <c316a6c6-b97c-48b2-9598-d44e2ec72fbc@zytor.com>
+	s=arc-20240116; t=1744228431; c=relaxed/simple;
+	bh=rv4mMwuG4jkn773xC8sA0ToKXoLaQgRn7SHaoclVUrY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=bLxqrI1vdlQ6rZNLaUgLW8r6NlUfD92DtL+7FEaeSnVOztB9Mwu5ivjgdRO3scMf2jorFovFnbE5mgYVtV8XekzD2CMwO76XRfhV2CNI4mD14Z0PA/RzS60ntXZUTSrnxrzR1U75j/I0yj7mlrKajBnp1Hnf5HPMDh/WqVyy70k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aI9teiPp; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-72f3b4c0305so16825b3a.0
+        for <kvm@vger.kernel.org>; Wed, 09 Apr 2025 12:53:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1744228429; x=1744833229; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=B/LBm3aV4zfAmxi92/BK6RmsqnpaBnCdXpzKq52/Foc=;
+        b=aI9teiPp4IOAdU9GBsw2c5UUNtJjfzYDo5oOlVpoK02KZbfJDi4/BUpMOgjUTDDP77
+         Zo1cFX/mi1CVaa7zifjJZefTiSM4bKVOBRbxcHWDsR4ra5zIy6Q8gxph2QBBXdTfWPR0
+         5OQe5GpPbqiVQys+My9WQ6FIq3wGpo5XZ/aX/6wj+SeZn0pkfDwDGx1345vl3dMMVxH9
+         XNN9BcliriZjlo6Nu9bsZMO7F7TC8FUiDzYlGA2mNiW7XM6g2jB0KjlK3q1zQA8WX7QA
+         IvmRm67Z5XfxmOWM6F9ibvqDxN6Uam9M7Va/UcIZ8+KdMP9uVdgncS5xeXVLnTkaWbTL
+         dP/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744228429; x=1744833229;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=B/LBm3aV4zfAmxi92/BK6RmsqnpaBnCdXpzKq52/Foc=;
+        b=eDoUqgu64B6RUdkQrPhBs5YQEe+/x41554yPwEgNnBgtloWJ2ehLZMnLVZXAuxM407
+         h6j9cgBcPgobNN5joZ1jBr11wmDBwdoDSkCnTtMXv65QlFt0djbhvvelwBEm63w6hT6g
+         6ElvRqz8Knrsv/tBZIZq1q1mtVflfY4oSqVGtFXMz1OR+et+A+u481uFwHwqCBqMpfEK
+         iFUM1ON6SdGOgQQeEVElDEzeMnOadYkk76HwrTXFYJk7sqVEi9Sq11d6cMQ1FubdyOM8
+         LYpSj3az/6ULX0wnZOFP/Ipy2+Hhx+XEKerB/pOckLhL9mdbtp6cpkJH0URXbR6M9zyo
+         VtvA==
+X-Gm-Message-State: AOJu0YylNxiNmXNOYY2kRpqWs+z9ggiqV3flH/KGLTjAyOIzyRacOiW2
+	c/qVOX6nr1gWcCaj7eeb17WOqmsNMVRJ12OKZ7JhEjTk0Gd0kimEWZgshR/iktvwTCbVQOIeSo9
+	Ycw==
+X-Google-Smtp-Source: AGHT+IEeESm/upruWypiAiAFjj3gqiD2FWPZpn5Oi58JT7YjI+D2LtDvdvxhwdzcKYcXLoDvWUFBt/R8XtU=
+X-Received: from pfkq6.prod.google.com ([2002:a05:6a00:846:b0:737:6e43:8e34])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:130c:b0:736:bfc4:ef2c
+ with SMTP id d2e1a72fcca58-73bbec49ac8mr221785b3a.0.1744228428902; Wed, 09
+ Apr 2025 12:53:48 -0700 (PDT)
+Date: Wed, 9 Apr 2025 12:53:47 -0700
+In-Reply-To: <20250409014136.2816971-1-mlevitsk@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c316a6c6-b97c-48b2-9598-d44e2ec72fbc@zytor.com>
+Mime-Version: 1.0
+References: <20250409014136.2816971-1-mlevitsk@redhat.com>
+Message-ID: <Z_bQS63A2bd-LzgQ@google.com>
+Subject: Re: [PATCH v2 0/4] KVM: extract lock_all_vcpus/unlock_all_vcpus
+From: Sean Christopherson <seanjc@google.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: kvm@vger.kernel.org, Alexander Potapenko <glider@google.com>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, kvm-riscv@lists.infradead.org, 
+	Oliver Upton <oliver.upton@linux.dev>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Jing Zhang <jingzhangos@google.com>, Waiman Long <longman@redhat.com>, x86@kernel.org, 
+	Kunkun Jiang <jiangkunkun@huawei.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Anup Patel <anup@brainfault.org>, Albert Ou <aou@eecs.berkeley.edu>, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Zenghui Yu <yuzenghui@huawei.com>, 
+	Borislav Petkov <bp@alien8.de>, Alexandre Ghiti <alex@ghiti.fr>, 
+	Keisuke Nishimura <keisuke.nishimura@inria.fr>, Sebastian Ott <sebott@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Atish Patra <atishp@atishpatra.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Randy Dunlap <rdunlap@infradead.org>, 
+	Will Deacon <will@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, linux-riscv@lists.infradead.org, 
+	Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	Joey Gouly <joey.gouly@arm.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Ingo Molnar <mingo@redhat.com>, Andre Przywara <andre.przywara@arm.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Adrian Hunter <adrian.hunter@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
++Adrian
 
-* Xin Li <xin@zytor.com> wrote:
+On Tue, Apr 08, 2025, Maxim Levitsky wrote:
+> Implement Paolo's suggestion of reusing
 
-> On 4/1/2025 12:52 AM, Ingo Molnar wrote:
-> > > Should we rename the *msrl() functions to *msrq() as part of this
-> > > overhaul?
-> > Yeah, that's a good idea, and because talk is cheap I just implemented
-> > this in the tip:WIP.x86/msr branch with a couple of other cleanups in
-> > this area (see the shortlog & diffstat below), but the churn is high:
-> > 
-> >    144 files changed, 1034 insertions(+), 1034 deletions(-)
+Ha!  I *knew* this felt familiar when I suggested extracting (un)lock_all_vcpus()
+to common code in the context of the TDX series.
+
+https://lore.kernel.org/all/Z-V0qyTn2bXdrPF7@google.com
+
+> sev_lock/unlock_vcpus_for_migration in arm and riscv code
+> for the purpose of taking vcpu->mutex of all vcpus of a VM.
 > 
-> Hi Ingo,
+> Because sev_lock/unlock_vcpus_for_migration already have a workaround
+> for lockdep max lock depth, this fixes the lockdep warnings on arm
+> which were the inspiration for this refactoring.
 > 
-> I noticed that you keep the type of MSR index in these patches as
-> "unsigned int".
+> This patch series was only compile tested on all 3 architectures.
 > 
-> I'm thinking would it be better to standardize it as "u32"?
+> V2: added trylock option to kvm_lock_all_vcpus to be better compatible
+> with the orginal code.
 > 
-> Because:
-> 1) MSR index is placed in ECX to execute MSR instructions, and the
->    high-order 32 bits of RCX are ignored on 64-bit.
-> 2) MSR index is encoded as a 32-bit immediate in the new immediate form
->    MSR instructions.
-
-Makes sense - something like the attached patch?
-
-Thanks,
-
-	Ingo
-
-=====================>
-From: Ingo Molnar <mingo@kernel.org>
-Date: Wed, 9 Apr 2025 21:12:39 +0200
-Subject: [PATCH] x86/msr: Standardize on 'u32' MSR indices in <asm/msr.h>
-
-This is the customary type used for hardware ABIs.
-
-Suggested-by: Xin Li <xin@zytor.com>
-Suggested-by: "H. Peter Anvin" <hpa@zytor.com>
-Signed-off-by: Ingo Molnar <mingo@kernel.org>
----
- arch/x86/include/asm/msr.h | 29 ++++++++++++++---------------
- arch/x86/lib/msr.c         |  4 ++--
- 2 files changed, 16 insertions(+), 17 deletions(-)
-
-diff --git a/arch/x86/include/asm/msr.h b/arch/x86/include/asm/msr.h
-index 4ee9ae734c08..20deb58308e5 100644
---- a/arch/x86/include/asm/msr.h
-+++ b/arch/x86/include/asm/msr.h
-@@ -63,12 +63,12 @@ struct saved_msrs {
- DECLARE_TRACEPOINT(read_msr);
- DECLARE_TRACEPOINT(write_msr);
- DECLARE_TRACEPOINT(rdpmc);
--extern void do_trace_write_msr(unsigned int msr, u64 val, int failed);
--extern void do_trace_read_msr(unsigned int msr, u64 val, int failed);
-+extern void do_trace_write_msr(u32 msr, u64 val, int failed);
-+extern void do_trace_read_msr(u32 msr, u64 val, int failed);
- extern void do_trace_rdpmc(u32 msr, u64 val, int failed);
- #else
--static inline void do_trace_write_msr(unsigned int msr, u64 val, int failed) {}
--static inline void do_trace_read_msr(unsigned int msr, u64 val, int failed) {}
-+static inline void do_trace_write_msr(u32 msr, u64 val, int failed) {}
-+static inline void do_trace_read_msr(u32 msr, u64 val, int failed) {}
- static inline void do_trace_rdpmc(u32 msr, u64 val, int failed) {}
- #endif
- 
-@@ -79,7 +79,7 @@ static inline void do_trace_rdpmc(u32 msr, u64 val, int failed) {}
-  * think of extending them - you will be slapped with a stinking trout or a frozen
-  * shark will reach you, wherever you are! You've been warned.
-  */
--static __always_inline u64 __rdmsr(unsigned int msr)
-+static __always_inline u64 __rdmsr(u32 msr)
- {
- 	DECLARE_ARGS(val, low, high);
- 
-@@ -91,7 +91,7 @@ static __always_inline u64 __rdmsr(unsigned int msr)
- 	return EAX_EDX_VAL(val, low, high);
- }
- 
--static __always_inline void __wrmsr(unsigned int msr, u32 low, u32 high)
-+static __always_inline void __wrmsr(u32 msr, u32 low, u32 high)
- {
- 	asm volatile("1: wrmsr\n"
- 		     "2:\n"
-@@ -113,7 +113,7 @@ do {							\
- 	__wrmsr((msr), (u32)((u64)(val)),		\
- 		       (u32)((u64)(val) >> 32))
- 
--static inline u64 native_read_msr(unsigned int msr)
-+static inline u64 native_read_msr(u32 msr)
- {
- 	u64 val;
- 
-@@ -125,8 +125,7 @@ static inline u64 native_read_msr(unsigned int msr)
- 	return val;
- }
- 
--static inline u64 native_read_msr_safe(unsigned int msr,
--						      int *err)
-+static inline u64 native_read_msr_safe(u32 msr, int *err)
- {
- 	DECLARE_ARGS(val, low, high);
- 
-@@ -142,7 +141,7 @@ static inline u64 native_read_msr_safe(unsigned int msr,
- 
- /* Can be uninlined because referenced by paravirt */
- static inline void notrace
--native_write_msr(unsigned int msr, u32 low, u32 high)
-+native_write_msr(u32 msr, u32 low, u32 high)
- {
- 	__wrmsr(msr, low, high);
- 
-@@ -152,7 +151,7 @@ native_write_msr(unsigned int msr, u32 low, u32 high)
- 
- /* Can be uninlined because referenced by paravirt */
- static inline int notrace
--native_write_msr_safe(unsigned int msr, u32 low, u32 high)
-+native_write_msr_safe(u32 msr, u32 low, u32 high)
- {
- 	int err;
- 
-@@ -251,7 +250,7 @@ do {								\
- 	(void)((high) = (u32)(__val >> 32));			\
- } while (0)
- 
--static inline void wrmsr(unsigned int msr, u32 low, u32 high)
-+static inline void wrmsr(u32 msr, u32 low, u32 high)
- {
- 	native_write_msr(msr, low, high);
- }
-@@ -259,13 +258,13 @@ static inline void wrmsr(unsigned int msr, u32 low, u32 high)
- #define rdmsrq(msr, val)			\
- 	((val) = native_read_msr((msr)))
- 
--static inline void wrmsrq(unsigned int msr, u64 val)
-+static inline void wrmsrq(u32 msr, u64 val)
- {
- 	native_write_msr(msr, (u32)(val & 0xffffffffULL), (u32)(val >> 32));
- }
- 
- /* wrmsr with exception handling */
--static inline int wrmsr_safe(unsigned int msr, u32 low, u32 high)
-+static inline int wrmsr_safe(u32 msr, u32 low, u32 high)
- {
- 	return native_write_msr_safe(msr, low, high);
- }
-@@ -280,7 +279,7 @@ static inline int wrmsr_safe(unsigned int msr, u32 low, u32 high)
- 	__err;							\
- })
- 
--static inline int rdmsrq_safe(unsigned int msr, u64 *p)
-+static inline int rdmsrq_safe(u32 msr, u64 *p)
- {
- 	int err;
- 
-diff --git a/arch/x86/lib/msr.c b/arch/x86/lib/msr.c
-index e18925899f13..4ef7c6dcbea6 100644
---- a/arch/x86/lib/msr.c
-+++ b/arch/x86/lib/msr.c
-@@ -122,14 +122,14 @@ int msr_clear_bit(u32 msr, u8 bit)
- EXPORT_SYMBOL_GPL(msr_clear_bit);
- 
- #ifdef CONFIG_TRACEPOINTS
--void do_trace_write_msr(unsigned int msr, u64 val, int failed)
-+void do_trace_write_msr(u32 msr, u64 val, int failed)
- {
- 	trace_write_msr(msr, val, failed);
- }
- EXPORT_SYMBOL(do_trace_write_msr);
- EXPORT_TRACEPOINT_SYMBOL(write_msr);
- 
--void do_trace_read_msr(unsigned int msr, u64 val, int failed)
-+void do_trace_read_msr(u32 msr, u64 val, int failed)
- {
- 	trace_read_msr(msr, val, failed);
- }
+> Best regards,
+> 	Maxim Levitsky
+> 
+> Maxim Levitsky (4):
+>   locking/mutex: implement mutex_trylock_nested
+>   KVM: x86: move sev_lock/unlock_vcpus_for_migration to kvm_main.c
+>   KVM: arm64: switch to using kvm_lock/unlock_all_vcpus
+>   RISC-V: KVM: switch to kvm_lock/unlock_all_vcpus
+> 
+>  arch/arm64/include/asm/kvm_host.h     |  3 --
+>  arch/arm64/kvm/arch_timer.c           |  4 +-
+>  arch/arm64/kvm/arm.c                  | 43 ----------------
+>  arch/arm64/kvm/vgic/vgic-init.c       |  4 +-
+>  arch/arm64/kvm/vgic/vgic-its.c        |  8 +--
+>  arch/arm64/kvm/vgic/vgic-kvm-device.c | 12 ++---
+>  arch/riscv/kvm/aia_device.c           | 34 +------------
+>  arch/x86/kvm/svm/sev.c                | 65 ++----------------------
+>  include/linux/kvm_host.h              |  6 +++
+>  include/linux/mutex.h                 |  8 +++
+>  kernel/locking/mutex.c                | 14 ++++--
+>  virt/kvm/kvm_main.c                   | 71 +++++++++++++++++++++++++++
+>  12 files changed, 116 insertions(+), 156 deletions(-)
+> 
+> -- 
+> 2.26.3
+> 
+> 
 
