@@ -1,85 +1,120 @@
-Return-Path: <kvm+bounces-42983-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-42984-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECA13A81C48
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 07:44:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4580A81C66
+	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 07:53:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57033881402
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 05:43:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63FB41BA0311
+	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 05:53:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9679D1DDC3F;
-	Wed,  9 Apr 2025 05:43:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 065D81DC98C;
+	Wed,  9 Apr 2025 05:53:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Y/v1OlGP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D6hKidbM"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2046.outbound.protection.outlook.com [40.107.101.46])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE9D282FA
-	for <kvm@vger.kernel.org>; Wed,  9 Apr 2025 05:43:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8267E152E02
+	for <kvm@vger.kernel.org>; Wed,  9 Apr 2025 05:53:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744177422; cv=fail; b=O4kYfK/qK1CY04aw5ErEC/1VJvknqEBF8L8rIoI7/AriQxsXBVNVUagvTQ5llDR0uHbKAZVmrjMlObYegPQdnNFkpnQdSPkbIwBPUOQP4tT1ZSM1eoqtg9BC2QnkGW9o/K2e80hYnSsU8LcZtyhEgmymQAP3P4zyAdKNeuSz6lQ=
+	t=1744177988; cv=fail; b=LU8xKAfQDg8X09Jlg4an1GzEdQZkRY8FGjIulmHqtuRkb3uR/m2sp9MV6wVIDzVUM70wocD5L/6sJcn3JTMscuwnEl7iUE2IxvRUrenNNCTefl9rrH8UGwI1uw1+45ryqgp55wVsmYipU+nhPmXyByswkj0YMqL1YD5mpoeP1Ms=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744177422; c=relaxed/simple;
-	bh=GO5s6byNdX5AxynlQCNOfTBBy8eVfg04eGlrz6KOhpY=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=bmwE3/2OBtAU+bQLcyFonRHhEC+8QRWLbY/EDnaFujdOtoIGFTxauNmBNLyXu9dSe8tqOu8Nw2JpNOJIfk8Zje3bZHf0uzOzdK2gfU9eB37eOKpuXkhCHVIMEDEj16z8Bg+fezBl2Z5Ksvjp6nQjmyQyuX8r3rzlPXaINcO1RE0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Y/v1OlGP; arc=fail smtp.client-ip=40.107.101.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1744177988; c=relaxed/simple;
+	bh=r3CCOLT+n20IQnZQDz4WUEB278A0pp3DRGg7rEmsLLw=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=qbvEkwMjJWYvRT3OFZq/zayJpboMsK+FSn8c2Bn0RFKHUAsiauWAaaRZu5hQRSQrjRrwtvgkW2jb/bAr97zQZsf0ta4m3g/HxyjB9ND07NpxW3o3Cv9bDY0F1fUgd8eRkTQAEKcyUAhK6iWSQmj4FBCIK6Jiiuzvo1ACqYfVmao=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=D6hKidbM; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744177985; x=1775713985;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=r3CCOLT+n20IQnZQDz4WUEB278A0pp3DRGg7rEmsLLw=;
+  b=D6hKidbMHfFJYWwErduRcWEu4io1aD4v0DnpuNnaN7PwFgah761/a/gx
+   vSqNXDDmkBKhfFLfKBRprH5zg01AwQ8GMjI10NOAZb5LPLVin6YNzf5i/
+   1JJW3tUtBRq7cz5H5cZJ6ltaEbubmSzPB4Fo7QQWwemIa9s56VuZXl6iy
+   T2b6ghNB6+Zv4X9Gs39mUfR+oluATEHjCUw+8cZpQP6HTrjIES2SRYQGD
+   KlZwDTFl0XNqb9PKcf6mPYwYpfYEwWtKWUvDqzqBwbRpoeHDB+SxsKOdZ
+   qNzEx8uzCUzI2dhHgRPVP0Iw2URMejolBkKfGEvrp7tcaCUhxBFsXWWyN
+   w==;
+X-CSE-ConnectionGUID: lNh05R+fQCad+bLEh3qkPA==
+X-CSE-MsgGUID: Jc581rRuT7O3kmx2hw/WgQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11397"; a="71009801"
+X-IronPort-AV: E=Sophos;i="6.15,199,1739865600"; 
+   d="scan'208";a="71009801"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2025 22:53:04 -0700
+X-CSE-ConnectionGUID: 58Z1LcP7TP+pvYKQzOzftg==
+X-CSE-MsgGUID: gQhF2N9DThmLDLswGbOchQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,199,1739865600"; 
+   d="scan'208";a="128990865"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 08 Apr 2025 22:53:04 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Tue, 8 Apr 2025 22:53:03 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Tue, 8 Apr 2025 22:53:03 -0700
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.48) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Tue, 8 Apr 2025 22:53:03 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Pre8mJPT85/CM95P4eadh7MgqI8BiWgCajxsGhNz8GmLQlaHUMdwarfyeyK0gSPmh8eXuYPTcXudWyeeducJrYh5DjIvvvvdeaAWCrQgaCKM5QoEZvNgMcEKL5mzd7QNZO9XnPF7Ecgo8Ap5DxGM2/8YOr1BGuirs2K7+Dj8n3gBzNqYANnADh8AZ66mPJ8lp/1kfTsleFlCRc15HE2MEOqHMFF+3z/4An63p4HAM5Df269lxoBSiJ3ar2sEXrhoYIW9PmznTIZ+JSJ1s4PA3BkDt1uEPXTpQWjP87Er9PutJgApJ3TBpsr/ltDwmOG5Si4knPw+nZDySq+czhTkOQ==
+ b=Doqz/51I+Q2hQN7xCu2HeTFnqZ6dqFse9WPxHYTxTXEUCaXxL9ArHMsiffLJmg/dYT60rjmsBlruFV1JSaoHlrbufzG/vtSYaFGItOzcZCagUdz17qHcupHBpHJBClA0AGZfHW8TA4ixFyZH+niYMB4FMNDbUorm0PhCqh1a3l7RTFic1FEaqg8Zya3STzfQabscK4MiLSCJz7RAU2PgtD2Ijmy/ERc5wTaHvUX6X9QoEbrCN5pcUne28uKmuUMeApOdmociFochJPdfIvDMTo9MZPsfd2prM5q/zPWZXadn66qyI0EkR2ZTttz1E4me1+d0ARuSZPO9cf/kOy9VOg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SZW8UQL00zIs6eP3DMYzZyKfS4GuomXLz+2N5yaOuf8=;
- b=Y7JaZyD/sLT2Zym0Q0Q9sbIpzn39S3634rJgagqjW/WvWjVHIMzLQkjYKdGnNwR3/Djk1Kgp8K1Rbgh1MMupTLr1i6wdIc8yTQgTkeCLAcR+n3m1LJ9vm+Rae8Yr2IYDUoA+/EQ9dT9Up7VRu0aSC894X5Exp0EU2KoWju1UcImdmfJYH8ezc9WayW3F3KgZWt9C1c/QV4GpQF7066XtkBlVAltp3/v41cyUUIgUFjxPMSvpoXKGOgM6kRgQ9XO+vLACiAwp1++PZmugjyokKcSuuYfz3deqfrnZTHz3vn/Vi1OdLgP5LBUK6yO8lcC7+gZoQFzioboWIMgjTZtXRQ==
+ bh=SSJm+HyosYeKyo4s55kD83kPI8VDlCH9liA8gUvCXRE=;
+ b=KC4L/BH6yhG4jYtGtCEh1OQokLq6PmIBHXhYS4aRSNXYIVRuMcxCYJlCnRLtjYbWIg4YJJ1DiFKgQ225p366/XjSya3dKT2JTtzqzodcvx0V9GfBi8RaY18XJhiW6Db6R6NK2mpVzZAzKggnw3G7rT71Ug8akCSzpTZ15cGixHwvCYPMR2lhR+4XBh91on1biDXqbl1Xlyya/D5YHede4idMcK93aoRp4T/b6jhyqr3AZszrEpP3luYaTx3ce/mbI9J8MEQxGlCb4jWl3JLxp6GPNFo5+uB9k80MtapbNWYUAvVQK0uMD1ixjEay9pk7+YW7251wrqd3qgaFxiS2QA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SZW8UQL00zIs6eP3DMYzZyKfS4GuomXLz+2N5yaOuf8=;
- b=Y/v1OlGPXBuv78/0rqRXpydLcccUDIvV9TLWVModp1cwvos7U/wSHzn2v+VflK6T06PiC2a5egOmQDjGIc6aFN4ikN39s0AsAqSNmjUEkF3rDzkV4HpDRVLRgULqt81g3T0ylqnvfMBwUJvR4hh+igc1ZLZSaig0RmVjkl1Oe3U=
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
- by PH7PR12MB6695.namprd12.prod.outlook.com (2603:10b6:510:1b2::6) with
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM3PR11MB8735.namprd11.prod.outlook.com (2603:10b6:0:4b::20) by
+ PH7PR11MB6402.namprd11.prod.outlook.com (2603:10b6:510:1fa::15) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.34; Wed, 9 Apr
- 2025 05:43:38 +0000
-Received: from CH3PR12MB9194.namprd12.prod.outlook.com
- ([fe80::53fb:bf76:727f:d00f]) by CH3PR12MB9194.namprd12.prod.outlook.com
- ([fe80::53fb:bf76:727f:d00f%4]) with mapi id 15.20.8606.029; Wed, 9 Apr 2025
- 05:43:38 +0000
-Message-ID: <20936115-1d56-4504-9305-e023eaac081d@amd.com>
-Date: Wed, 9 Apr 2025 15:43:30 +1000
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH v4 03/13] memory: Unify the definiton of
- ReplayRamPopulate() and ReplayRamDiscard()
-Content-Language: en-US
-To: Chenyi Qiang <chenyi.qiang@intel.com>,
- David Hildenbrand <david@redhat.com>, Peter Xu <peterx@redhat.com>,
- Gupta Pankaj <pankaj.gupta@amd.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- Michael Roth <michael.roth@amd.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
- Williams Dan J <dan.j.williams@intel.com>,
- Peng Chao P <chao.p.peng@intel.com>, Gao Chao <chao.gao@intel.com>,
- Xu Yilun <yilun.xu@intel.com>, Li Xiaoyao <xiaoyao.li@intel.com>
+ 2025 05:53:01 +0000
+Received: from DM3PR11MB8735.namprd11.prod.outlook.com
+ ([fe80::3225:d39b:ca64:ab95]) by DM3PR11MB8735.namprd11.prod.outlook.com
+ ([fe80::3225:d39b:ca64:ab95%7]) with mapi id 15.20.8606.033; Wed, 9 Apr 2025
+ 05:53:01 +0000
+Message-ID: <7436cdd9-513c-483a-a994-8602142c7551@intel.com>
+Date: Wed, 9 Apr 2025 13:52:52 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 02/13] memory: Change
+ memory_region_set_ram_discard_manager() to return the result
+To: Alexey Kardashevskiy <aik@amd.com>, David Hildenbrand <david@redhat.com>,
+	Peter Xu <peterx@redhat.com>, Gupta Pankaj <pankaj.gupta@amd.com>, "Paolo
+ Bonzini" <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
+	<philmd@linaro.org>, Michael Roth <michael.roth@amd.com>
+CC: <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, Williams Dan J
+	<dan.j.williams@intel.com>, Peng Chao P <chao.p.peng@intel.com>, Gao Chao
+	<chao.gao@intel.com>, Xu Yilun <yilun.xu@intel.com>, Li Xiaoyao
+	<xiaoyao.li@intel.com>
 References: <20250407074939.18657-1-chenyi.qiang@intel.com>
- <20250407074939.18657-4-chenyi.qiang@intel.com>
-From: Alexey Kardashevskiy <aik@amd.com>
-In-Reply-To: <20250407074939.18657-4-chenyi.qiang@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MEVPR01CA0012.ausprd01.prod.outlook.com
- (2603:10c6:220:204::17) To CH3PR12MB9194.namprd12.prod.outlook.com
- (2603:10b6:610:19f::7)
+ <20250407074939.18657-3-chenyi.qiang@intel.com>
+ <d4b44d77-3522-42bd-b02f-fe2e9be65857@amd.com>
+Content-Language: en-US
+From: Chenyi Qiang <chenyi.qiang@intel.com>
+In-Reply-To: <d4b44d77-3522-42bd-b02f-fe2e9be65857@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SI2PR02CA0041.apcprd02.prod.outlook.com
+ (2603:1096:4:196::20) To DM3PR11MB8735.namprd11.prod.outlook.com
+ (2603:10b6:0:4b::20)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -87,338 +122,260 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|PH7PR12MB6695:EE_
-X-MS-Office365-Filtering-Correlation-Id: ce149b23-f52d-4f97-72de-08dd77297a43
+X-MS-TrafficTypeDiagnostic: DM3PR11MB8735:EE_|PH7PR11MB6402:EE_
+X-MS-Office365-Filtering-Correlation-Id: d7d3020a-d850-45a0-6bee-08dd772ac97d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Y1dYSHI2QmFBdFVMQ0d6TXZFZjlyVnBQRFNaU0dmRjNwVFg5V0RnKzRSTzJU?=
- =?utf-8?B?d0tnRXNtWEg3REhhQ3d6QmM4V0RwWnZjZThVVm1VZkl5SkNSeGtMVndEWUgw?=
- =?utf-8?B?YmIzckVtRkZuNGFsVEg2NmswU1kxNGVUdVFFMmNzbUNzdVlIcjR4UndmSzll?=
- =?utf-8?B?Y01LYldoS1N0ZjlqdmpVSGpkZHlIbjVXWTBOa01TTCtVeGEwd3lpTHQxdzNo?=
- =?utf-8?B?cHdWY3hadkMzRlMydGhjZUdHd0xKV3loWG44cnBndU55eEQ5aTI2NFFodGZy?=
- =?utf-8?B?TE4wejhVeHN2UVZLZlhHenlYY0xncGF0VlVCMVRid1FhMEZTbEthbExBRHZE?=
- =?utf-8?B?KzVlTE1oZEw3d05KZnZ4SWpGVXYwcXdWcXlFMTdBNjl0ckN4UTBqaHA5eUFy?=
- =?utf-8?B?OTZTb3lqa0hHc014RlFLSmwrdTZUNGlNQkgvY2k1a0J1RFV3aGE0QTR4L3F5?=
- =?utf-8?B?ejVCTGxIaS9GQ291c2ltT3ZrSjhhaVNzeXMzWmRGZnBEckVKSVdsYUJ0OGJC?=
- =?utf-8?B?R0NXcUtUWFBOdjRNbzc3OTlsdGlIVExxOGlQR2VIaytPUWw0c3lLNndJeXp5?=
- =?utf-8?B?NGxseHR4UUpJcEl4ZFl5dE8wRGw2THZjallKdmpWNVR1MkVQRGhRN25neXRR?=
- =?utf-8?B?UVRJWVB2ckFHaXF4dkppa2dtS1ppT1VSNnpVQ3Q3NE9xRncrMjNFN3hRYVVB?=
- =?utf-8?B?MzJUcVp0TzF1d054Q0crMDZOaFVPT1FTRk1FbkZOWnN0d1NTTVp1OUdFMnJE?=
- =?utf-8?B?SzdKeTE2TVI1MWdzbzNUd25uMUdtS1lIY0dPQXVYdnAxQ2JHRkh6WGNBWnky?=
- =?utf-8?B?b2lES095NERxU1lCdGdJNWNHWlNteVNZeFVQWC9sMUlWRkRhdXk1R3hpQU5j?=
- =?utf-8?B?TjBxaVlaSXRNbTN6UCtPb2xaVTJPajVGYzBSWTBPaGlGSVNWSndiT3ZmU2FC?=
- =?utf-8?B?aUtRNVkxSDdKY1NVSzI0d3RFa2RmdDVjSklXRlJTK2lXOEdZd1JyR3NldEhQ?=
- =?utf-8?B?Vjhwck1paE82aEVYVnd1dGo3N0FjMDFibE44bm9pUElDMDFKUmFkb1JObStS?=
- =?utf-8?B?c0E1TkpQQlJzbGpKTVpkOVFvbk5jLzJwbGVGa1V3WWRkTXl1R0hSUGFHRkl5?=
- =?utf-8?B?RXM0dTlxU0plcnJZRG82V2orUE1TazBDVmNpMlVwMVNwa05VTHBKQ2lJMm1J?=
- =?utf-8?B?eEMyejFNczkyUmtOeXdwSUdhcXdrbFpkOVNrUTNkMXpMOUNJNkdGaksvdjdv?=
- =?utf-8?B?QkFlamJpa3pyT0FzQVlHWWg4WFBuZ1NScjRQZEtzQU04c2FyRWFPakJjRFFm?=
- =?utf-8?B?TWJWQ21iaTdoNUx1TGZYcW9QbTFaekdhbVVrMlFyL0c1ck9MbmZkR1BvRnlh?=
- =?utf-8?B?SExtZ3FPeGxoQUlsTk9jcU9UQlJsVXpNZVVnVHNaZE9qc3Vsd0tMa0IvbEZL?=
- =?utf-8?B?RVcva0hESDNJVE1XNGozYTNhS0VSMml1cjBjeXRZR05JcGNCb0Vqb0YzZlZy?=
- =?utf-8?B?aHU0SnZINDEwaFVzSEJQZXNjRjVsa0YrL3BsMGlHK0w4Y0lDd2tNWlhrdkdB?=
- =?utf-8?B?WHRvS1Z5MEVGOHRPMVZ3SlZpWXVFSWZWamdzNkZNNnhqSXRxZnl4ZnRkT1U4?=
- =?utf-8?B?QmNhOVVnVWEvdUYrbll1NkNyRkJSTElqSUYzaXc4OFJFaEN2Tm9DVWZ3Umxi?=
- =?utf-8?B?QTIwY21CZnNTTDM0K0UrZFJaWkkzTlhIS3NEdmd2d3VUOGF1SkJsK2Q2b0hB?=
- =?utf-8?B?d3JrNWpTSDIxbEIvbHBaUUFuaWI5MUZrcFczeS9lUmRaVEtUT2JyeWlYSkw1?=
- =?utf-8?B?dnRESHlIOEt6RitibEpoRU1QQ1BzL3JwSzd6MU00Sm9LSlQ1VjExUENrd2dO?=
- =?utf-8?Q?0KqUfzvGBIFr3?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(7053199007);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?b0F3NXZCbHBwOUVhczc2MnBWWm5NVWxLd0w0Tm02cGNEQlFQeGc2dzd6Y3VB?=
+ =?utf-8?B?UEVNaDk4YVBJZVJWL3kzSWhEQWpTSUxQcTdDeDJ6ZnN6S3UzNlBoYU5qS2Ev?=
+ =?utf-8?B?L09EV0VXSWcwOXQyZTE4SXpXejV2a2JUUlBWeXk0NDVZYlUxWlh5Q01YWFZ1?=
+ =?utf-8?B?ZVh1U0VuWWJjWlVuSzBZcHNvdENKalNpbTQyTk5zeUFEZW9VY2JUUTg0bENF?=
+ =?utf-8?B?QkJtZk85NXgzdjcwbnRXMnNMek55aUJ6bVRXbXh4WDNqV2c3MENBNmx1TWJV?=
+ =?utf-8?B?RlZ1TmIyaHIxN2NOVkV5UmlSMVlyc256VzFDR2NIcHVoTWRlei9rWDVtVGtz?=
+ =?utf-8?B?OFVjL2xKMUpFOFcyZG9vQmlNK256bU4wN094eUE5Q0tUL0FlSjV2NkdrbWZz?=
+ =?utf-8?B?aWEzbldVWGErN3NIWDFXTmFQQW5RRk80dEVFWE9lMUlndTRsRTd6ZVByNlVh?=
+ =?utf-8?B?YXlwVjdkckxFSnpaL0J6Wk9POUswazhOSExnSSt3TUYyZC9uMVp0NnA4ZnRU?=
+ =?utf-8?B?VFpIVUF0QS9STkNJTk5NMktweFVXdFc1NzdwUEZvZEhEZHF0RGljVmZ1UG5y?=
+ =?utf-8?B?T3lrUnVDeTVyTVNCN3ZkS0lsZkNVTkdMM2dObndJcjZSbENqRnhTUGpTMy8w?=
+ =?utf-8?B?a0tmOFZISU12R1ZBeUxhbUZzNVZDQ3VkTnl1d1pzNGtka2s1cWRIOHpuWGxp?=
+ =?utf-8?B?V0Y1TjAyZEdpaHZGeWRQbVJoSjZQTi8xdHcwVklUZFNodytvTGpuVU5ibFN1?=
+ =?utf-8?B?R2JUVjd2ZFdpZHZTdlVpVGhJVTd6b3YzSTZDcFR0c2dPcFpucWozTTVmcVZz?=
+ =?utf-8?B?bjFmeDJ6Rm5iV1NqTnl3VzlhbUE4SFpiQnIrSE9Fc2lZeURRQkdTWGwzUWVp?=
+ =?utf-8?B?dEhNSWFBUkJUQlA4Z2h2dm0yRHlOT0JRQlhRTGhYcEU2UjYzSmNtdG93UnpE?=
+ =?utf-8?B?WVBiOE8xTVdKKzBYOWdQbFNkOTVtMTliMkZNS3JHbldlV2tJRGJHa0pjRXdJ?=
+ =?utf-8?B?dnFHT0U2L2RvWUVIZTk3U29XZnd5SThmYlRONWNlRWFKbk45V3RvakJSMWhn?=
+ =?utf-8?B?RjdNZzB2QThoZUxLMEY3WFoyYlZqUG1yVGRHbFNEc3NXTXlUbURwUm5vTFl3?=
+ =?utf-8?B?QTVMaFphZ3U4bTZEbENPYUZXSVpQcFVOZjVIcTB0RVp3Q0ZNZ1pZS2daeXVK?=
+ =?utf-8?B?OTJ6T2duMUQyNXVRSmlDNVdKQ0VneEFSTDdvWkZnM2o1NmpDNFNRMEtCSXFl?=
+ =?utf-8?B?b3JXU2p3ZE9BMW9rbzlpVGpHbmhUOENFQmU5SGdkNzRwVlVieHpmU0l6UHBO?=
+ =?utf-8?B?WjJnQzJqTmdvVUdySkNZZVRHVUdQTXRBWU5zOXk0ZFFuMmF6SlVhM2U0NCtU?=
+ =?utf-8?B?SnpOVmZ2cG0vU0kydk9hWCsyOGhHS1dld3pqK1hOekFYdGlLNk8zY3NFVzl2?=
+ =?utf-8?B?eC9udGlaTDBhbFBLRDdRY0I4N201NkNIeHVaT1dWdFVQYUZKTkFCbjVZR0ty?=
+ =?utf-8?B?blpTVGFTOUtGZG1sWm91Y29qNXJQb3NBWURmNEIvQ2xVRlNnaWpEYzB3TlVq?=
+ =?utf-8?B?M0MyYTVhZ2hjUjJEWnpXdEVwSGdnKzREa2VIZE9PMGlBN1dRRmhqRVN1SHFF?=
+ =?utf-8?B?K1hDeVAyQTg5bmZPWjVBL2t4Qy9lNksrbE8rRERyZlc3RlEzTDRoa28rT2tT?=
+ =?utf-8?B?NXREQWFERUZjcDkxQjRDMUxGRDRERml1eE5QNGRhMVFIZGJLSS8zS1NFV3Bu?=
+ =?utf-8?B?ZjBwYjdDcnVSSXl3Sk5wS1ZOelowZXZ6SUZ5UDVmc0xXRUZnTGIwU2FXMkls?=
+ =?utf-8?B?eWFidTZJclRLRDdTUk5EaTlJM044WFlXUUtGa0RqbGdSemZqdHdyM3R2eWIv?=
+ =?utf-8?Q?n52TVkTz0YCQw?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM3PR11MB8735.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?dFB6RUxvRmVGTmxoM0U2bGZxSVBJR2pxaFJaWmpMWDUwWm04aFdmUExsdU5w?=
- =?utf-8?B?QWIyclhOMUR3cTBiZmR4UFk1L1ZtMCtZU1ZPZlRpWGtkN0RWTHFPcEdKNGtX?=
- =?utf-8?B?Y3RqOHpEbFZhcm1vZk5WVkFSd0JuaXIvZi9LVDFJdnhCNjZxNG1jQ1dnZnV4?=
- =?utf-8?B?S1Yvc1huU2hja3hidzhiWTJ0d1JsOVNSeVc3TzVjdXVJZElNYTNOUm8zeG9Z?=
- =?utf-8?B?b3JVWEI1bXdQL3NsRjljNVVuZk5Tb0RzdVA1YkZ5Z3N0UUJTdGhpejFRampH?=
- =?utf-8?B?YlJSWXhCa3dkdHN6dGdhSnl1WjE4SFVZdTBFc1dxT3J1U29YekJmWHlLOThs?=
- =?utf-8?B?SU94ckpSeHp3NldYcG16bEZkRlJGaElwb21OUFMwajM1M05aOU1ZYU1DeWZy?=
- =?utf-8?B?RXNzNWovYUxYcGJqejlQd0pkN21IdkRiTEd2Y2dUZHFRYlZ3VkJ0clF4MDhx?=
- =?utf-8?B?WWtEMjFqYTZtaXVHbDRqeGJOMWlNcGtSakZJYnVEdWMzbUdjUHRZdVlqbkVO?=
- =?utf-8?B?NnlJb3ZBTWZWelZ3eVAybHVLTHZjMnp0VFQxaWVTUVFaeWxKemtDU2VpSHo4?=
- =?utf-8?B?M0FMdWNUeHZ2VjNFVEZ6R1VrNkVPcnI5OGJiVlBLdUpDUjRJcmZwMjd6T29o?=
- =?utf-8?B?enFJblBLKyt6WkhUNm5zc1B1cWcwYWhyQm94YUNUUEJKaHV5OElvcEJhUks5?=
- =?utf-8?B?d2xucDJXNWV3TVhBYjIrLzJXendRb3ZiSXBIcmF2aDJ6Ty9pYUZiWFJuTkhG?=
- =?utf-8?B?bko0R2ZNUklhb3R3NWtnRzR1MHV3OHJ6TUhRVHRGeXVBWlVhYjEzT0ozTEVC?=
- =?utf-8?B?cnpJbGJJYWV1RENrWEJDWm9wMEpNNzhhSWlhSlVYSk1pNkFEdGF1S01ZMy9J?=
- =?utf-8?B?aWVPaVFBV1V4ZDJqejVsSFJCUjJob1E1VUp2RW9HSi9nUmwvelI5OUFTNTE3?=
- =?utf-8?B?allzYStBcHorNVYveW9QWXNjUEh5UDlieG1Oc2RBSWM4WVNsUStWTEo5bUht?=
- =?utf-8?B?Vy81L1lXdlJwRXRQQk5ycU5IQ1J5b0RVYzVUUzFNd0VpcFNrQzNvWVhIclVQ?=
- =?utf-8?B?ZTEvMEVDaEIrdkUzeFpaMFpPVFRCaHNiNndxNjRYbmRwWmQwNWxscEdWVnlG?=
- =?utf-8?B?SDJFSStWaDg3blEyWVZNYVprU2FBZHR0RXZyTjBKSUtIWlR3UDhaWlgxU0Jl?=
- =?utf-8?B?aUdDeElUblBjVitHUHFJWmJxdkFTcnJ3Q3Jtdk13VlVibE4zcVc4UDJUMkpI?=
- =?utf-8?B?YTdnRnN1NXpmaDlMdGUyMUVQdGx1U0NtNUF5RnI3QTltYmRjek9yblhIVHMv?=
- =?utf-8?B?eW5hOTRZWnoxb0VETGh1Z21TVnJMZmFnR25Uc090ODdYdit1N0lOekM4S2pB?=
- =?utf-8?B?ZDI3Z1pWNUlLMzdCVlVVN0ZZM0Q4MFl3TW8rQ09nUDNnSXY2WU5HWi8wa044?=
- =?utf-8?B?d01kNEpGUDhFUVJrdldEL2dsRWdKKzU5OE9teVRxS3hkSkZvSkdMV1NhTVVP?=
- =?utf-8?B?QlJJYTdHeXpQVUxqRkNidTdLUmRTRHJpY1lxa1dHY3F6MCtnc2Y3bFp6K3Fy?=
- =?utf-8?B?dlBoUTlENmZJNUc2alY0NUdQR002WlBiTmZ5UkliZEh1K1lEY1VtWWVzWSt6?=
- =?utf-8?B?bSsvUHFLV0NVa3VsZXAraDJmWEdjc0cvcDRjZXdIaDV3VkdOOU11c2xQYXFw?=
- =?utf-8?B?RUtXdkYrMzFqd2FCQ2tTR1ZCMHlCK0o0YzJJWSt4QXpRQUF4SmN0QXpZSEZ4?=
- =?utf-8?B?djBhQzF0eUNvbWVzME9udEVWNGZDb0ZIbTc1WHVaTFhyRVpXZkI3cHp4UHVy?=
- =?utf-8?B?MS9NUmY2UU9xUTl0cGQxdEdjVXV5MTNrOUQ2SkNIZUFMQ0txT05tb0NhdjE1?=
- =?utf-8?B?QVBmUnpZcnRvY1dyWkZGaTIyaDgrd0xxYzZEcFFGWGFudUpiaVpTMWRGdVVj?=
- =?utf-8?B?T0lDb1JqNjVFRTM2Q2ZOOVhDOTJiK2xyeWh6QW1YRzN6RU9UaWYvV2lMNE1W?=
- =?utf-8?B?am5sRkVzL1Q3U0ExRVRhYW9rWVNtOGtzSEIxUDdBVHdpQ1lpbW9yRmpTcy9p?=
- =?utf-8?B?ajBHUlBOeWpLTXJiQXcwc2dMRGo0TkdTbXFpZjFqWElHUzFFVUY2eDVVZTJ2?=
- =?utf-8?Q?eODHtraqcklQrwNlhjRDTywuH?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ce149b23-f52d-4f97-72de-08dd77297a43
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?L2pxdGZmRUFHaEUrS21rMUZDSVZFY3lJcWRIVkxVNStxWm0vWkFUYUMrcFRE?=
+ =?utf-8?B?blhBU0NucmdoMlU2dEhJd01LczZGRVU5R3ZwcUhiNFlzVG9JZTNTT25pcVk0?=
+ =?utf-8?B?a3VvWlRNbThndnFkdGxROHA3NlFZTzgvMnYxd1JnYVZMWkNXaldjaWdzUmM1?=
+ =?utf-8?B?MjlRWkpiR05kTmQ1cVNCNFYyV21IaTVzSHhrMmYvdURWL1JSWXRFdk5MOVQ0?=
+ =?utf-8?B?M243WmZuU2pabEVFUldJaEU2QU5QaDRGVlQrUEdKdG52cXppanhVdHpUbmVG?=
+ =?utf-8?B?NVUxSmsxTFJDNjgrR1pPL3VuRTNta2hSNXU3WCtIN1JGdU85YmR1c3NraVRJ?=
+ =?utf-8?B?aTRtcGI5NjFFdDdGY0Y4R21VcUVWSWhvcEFoZTV1S2ExTi8zcUdEdUtsdkhi?=
+ =?utf-8?B?dktIQ09XZWRFdFZwcHFkSUx4NitJMVJka3VTNUVqYmV5ckZZMkI1U0xNNXh3?=
+ =?utf-8?B?Nnlma3N3Tkh3bFFPZTV0dldZbHI4WDZQdWJWM2kvdnVJWjYwdjdSM245eC9T?=
+ =?utf-8?B?Yy9rM2ZsMzJrMlNwM2xNN0toUVgxNGVkRHFFL0tscUFBR1BCRHZibjM2TW5R?=
+ =?utf-8?B?cnZsNmlHWnJ2MUJZT0hHb2RxWHJxb2hnSlhaRklhMFpFb3ltRldkN2RzbTJB?=
+ =?utf-8?B?NkhUZkJrMGg0N0tnT2lnTUFqSGNZTVBORkxvK3d6anhJQ2hRUGZzbTAyYmNa?=
+ =?utf-8?B?VGRoQUo0dEF5NGJqTUxVaXRsYmNJWnVzQUo0LytmK1c2RDNiV2Q3TDNncXM0?=
+ =?utf-8?B?ZVB0TCtvOG5uMURDMHUxNHdQaW1mUU9pYnlaREZPejM3TGc4NFhzU1FPaVJy?=
+ =?utf-8?B?MXh4NlI0SVV2S0NMNkdvVTQrMXJYWmhHcVNmalJVK3ZCUEQ5VTFSUVQwYy9z?=
+ =?utf-8?B?a3E3Q2l6cWNEVHVHYjVDU21UVVlISmx5SWQ5ZE5mbTRpMjYyVXBCR0MweVZm?=
+ =?utf-8?B?Ry9pSHJESmJzWkVFYlFuNVNQS3FSOFFiN0VXTlZ3Y2NrdVF1N0N2WUVVZDVh?=
+ =?utf-8?B?S05KUHFtRnBQZ0ZXbnpFM21MMTI4eHBKankraXRwa2lvSGw5R0ozb0w0cnYx?=
+ =?utf-8?B?OEZmN01Dd0hnMDdiRW1JMDBzZ01oU3lIVmRRR210cG54K1grNnk1Y0VDa2l4?=
+ =?utf-8?B?WjRyOGJGZi9udnZ3ZG5iOW0rRDZmV2lONXR0ZCtKREpIRGsyMlQ0Y3NqeVBq?=
+ =?utf-8?B?OFllNEFuRkQzNWVYNEJWY01pNDY0Y2tFaEQ2M0JtcTZoclVEcW5uODZzQ0Iy?=
+ =?utf-8?B?Y29pM0Jra0dwL2cxajFjMDUza3RMQUxaZVRWTlRzL3VkVVNyYy9RVGdaZ3lI?=
+ =?utf-8?B?Uk95U2NUYkdZYlZEWTNQZkFUNUNLSExBUkJGcllaSDA0Z3Z3OVdXMDgxN0s1?=
+ =?utf-8?B?L2RvN3dGc1V5Zk5mTEZQQUgvMEJRM1VOOWNrNm9FaUU5Tjg4eC9uYy9CZjgy?=
+ =?utf-8?B?dXBsbjVQY2R0L3JLMDAwQVllQndsdlJtTXNxMEdJdzZTTDdNemhGdWZZVUww?=
+ =?utf-8?B?YTZGK3JUL1VNOEkzUnhreXkrK2JhaWlpb1dUMVJqVUk5NEs1S2twUjFCOUd6?=
+ =?utf-8?B?TzdsU2lUbWFlbFZBV3h2dWdUelJkSmh5NkxHQ0s1M01pVUhyUStVSnhpcGtP?=
+ =?utf-8?B?V3g3cmwrOE5CYTMxTStRR05vczVFbEg5MDVQQ3VQQmZuWDM4M2ZiUDF5VVFo?=
+ =?utf-8?B?MXlhckl2WU5DSW5LUGVHa2dXWXNEYzZGVzhWQVJqZjRLb0RNVHpIMnFaSEJQ?=
+ =?utf-8?B?YWx6azVaRjRnS3hITFZxVWpBbWVOVWg1NWlBZTNEalJ2UmtUQVZQdTlMby96?=
+ =?utf-8?B?QzAyQ1lsNy93MTJMbHg5SHE5d2RJT0pjdTVTd2E3SEl5dDlwZzV1UW12QTBw?=
+ =?utf-8?B?VWxtaWczaTBMSnIxSEw0dGNBVU94U1Jod05jcktBRzh3dEVaTjRVdkxEa1R5?=
+ =?utf-8?B?U0pPejIycEVzZjY3VHUrU1JaWFg3bFVmUHVuOGxVWktUSUVJNS8vSHE4OGtL?=
+ =?utf-8?B?OWlJbHRnSDZvaXd2RlEvWml3cHM0NG1CejdVNGhieTBOcjBlZFJFRGV6YkRm?=
+ =?utf-8?B?aDNqSWcweVBVMlVIdEl3TVdobVA3NFJuaTQyQ3RvRXdZRFAyTGhuYkZ4b3d2?=
+ =?utf-8?B?ZmMvdjYwMW9WTU15eHVzVWk4VHZ5VDR6ZzVtWi9icGpxL3h0Wm5TblFtQktj?=
+ =?utf-8?B?N1E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: d7d3020a-d850-45a0-6bee-08dd772ac97d
+X-MS-Exchange-CrossTenant-AuthSource: DM3PR11MB8735.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2025 05:43:38.6223
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2025 05:53:01.2637
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: a/jNMuFcNQtkpgYNPJSgJS/R7UCHSu2L11I2BDF6/9NQQNFp/JY2h5MakWanTvBVniKWNZbGix3WxL4JlkSZTw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6695
+X-MS-Exchange-CrossTenant-UserPrincipalName: XjZE4ogWS6qvUZGYhayYeNZhIPWcK1srNN/c1aFFbtM+7pHXM5SD3oLDj+E24Cgv4nA+nG+oRc68vavL5PtuUw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6402
+X-OriginatorOrg: intel.com
 
 
 
-On 7/4/25 17:49, Chenyi Qiang wrote:
-> Update ReplayRamDiscard() function to return the result and unify the
-> ReplayRamPopulate() and ReplayRamDiscard() to ReplayStateChange() at
-> the same time due to their identical definitions. This unification
-> simplifies related structures, such as VirtIOMEMReplayData, which makes
-> it more cleaner and maintainable.
+On 4/9/2025 1:35 PM, Alexey Kardashevskiy wrote:
 > 
-> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
-> ---
-> Changes in v4:
->      - Modify the commit message. We won't use Replay() operation when
->        doing the attribute change like v3.
 > 
-> Changes in v3:
->      - Newly added.
-> ---
->   hw/virtio/virtio-mem.c | 20 ++++++++++----------
->   include/exec/memory.h  | 31 ++++++++++++++++---------------
->   migration/ram.c        |  5 +++--
->   system/memory.c        | 12 ++++++------
->   4 files changed, 35 insertions(+), 33 deletions(-)
+> On 7/4/25 17:49, Chenyi Qiang wrote:
+>> Modify memory_region_set_ram_discard_manager() to return false if a
+>> RamDiscardManager is already set in the MemoryRegion. The caller must
+>> handle this failure, such as having virtio-mem undo its actions and fail
+>> the realize() process. Opportunistically move the call earlier to avoid
+>> complex error handling.
+>>
+>> This change is beneficial when introducing a new RamDiscardManager
+>> instance besides virtio-mem. After
+>> ram_block_coordinated_discard_require(true) unlocks all
+>> RamDiscardManager instances, only one instance is allowed to be set for
+>> a MemoryRegion at present.
+>>
+>> Suggested-by: David Hildenbrand <david@redhat.com>
+>> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+>> ---
+>> Changes in v4:
+>>      - No change.
+>>
+>> Changes in v3:
+>>      - Move set_ram_discard_manager() up to avoid a g_free()
+>>      - Clean up set_ram_discard_manager() definition
+>>
+>> Changes in v2:
+>>      - newly added.
+>> ---
+>>   hw/virtio/virtio-mem.c | 29 ++++++++++++++++-------------
+>>   include/exec/memory.h  |  6 +++---
+>>   system/memory.c        | 10 +++++++---
+>>   3 files changed, 26 insertions(+), 19 deletions(-)
+>>
+>> diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
+>> index 21f16e4912..d0d3a0240f 100644
+>> --- a/hw/virtio/virtio-mem.c
+>> +++ b/hw/virtio/virtio-mem.c
+>> @@ -1049,6 +1049,17 @@ static void
+>> virtio_mem_device_realize(DeviceState *dev, Error **errp)
+>>           return;
+>>       }
+>>   +    /*
+>> +     * Set ourselves as RamDiscardManager before the plug handler
+>> maps the
+>> +     * memory region and exposes it via an address space.
+>> +     */
+>> +    if (memory_region_set_ram_discard_manager(&vmem->memdev->mr,
+>> +                                             
+>> RAM_DISCARD_MANAGER(vmem))) {
+>> +        error_setg(errp, "Failed to set RamDiscardManager");
+>> +        ram_block_coordinated_discard_require(false);
+>> +        return;
+>> +    }
+>> +
+>>       /*
+>>        * We don't know at this point whether shared RAM is migrated using
+>>        * QEMU or migrated using the file content. "x-ignore-shared"
+>> will be
 > 
-> diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
-> index d0d3a0240f..1a88d649cb 100644
-> --- a/hw/virtio/virtio-mem.c
-> +++ b/hw/virtio/virtio-mem.c
-> @@ -1733,7 +1733,7 @@ static bool virtio_mem_rdm_is_populated(const RamDiscardManager *rdm,
->   }
->   
->   struct VirtIOMEMReplayData {
-> -    void *fn;
-> +    ReplayStateChange fn;
+> Right after the end of this comment block, do not you want
+> memory_region_set_generic_state_manager(..., NULL)?
 
+Nice catch! Miss to add memory_region_set_generic_state_manager(NULL)
+for the ram_block_discard_range() failure case.
 
-s/ReplayStateChange/ReplayRamStateChange/
+> 
+> 
+>> @@ -1124,13 +1135,6 @@ static void
+>> virtio_mem_device_realize(DeviceState *dev, Error **errp)
+>>       vmem->system_reset = VIRTIO_MEM_SYSTEM_RESET(obj);
+>>       vmem->system_reset->vmem = vmem;
+>>       qemu_register_resettable(obj);
+>> -
+>> -    /*
+>> -     * Set ourselves as RamDiscardManager before the plug handler
+>> maps the
+>> -     * memory region and exposes it via an address space.
+>> -     */
+>> -    memory_region_set_ram_discard_manager(&vmem->memdev->mr,
+>> -                                          RAM_DISCARD_MANAGER(vmem));
+>>   }
+>>     static void virtio_mem_device_unrealize(DeviceState *dev)
+>> @@ -1138,12 +1142,6 @@ static void
+>> virtio_mem_device_unrealize(DeviceState *dev)
+>>       VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+>>       VirtIOMEM *vmem = VIRTIO_MEM(dev);
+>>   -    /*
+>> -     * The unplug handler unmapped the memory region, it cannot be
+>> -     * found via an address space anymore. Unset ourselves.
+>> -     */
+>> -    memory_region_set_ram_discard_manager(&vmem->memdev->mr, NULL);
+>> -
+>>       qemu_unregister_resettable(OBJECT(vmem->system_reset));
+>>       object_unref(OBJECT(vmem->system_reset));
+>>   @@ -1156,6 +1154,11 @@ static void
+>> virtio_mem_device_unrealize(DeviceState *dev)
+>>       virtio_del_queue(vdev, 0);
+>>       virtio_cleanup(vdev);
+>>       g_free(vmem->bitmap);
+>> +    /*
+>> +     * The unplug handler unmapped the memory region, it cannot be
+>> +     * found via an address space anymore. Unset ourselves.
+>> +     */
+>> +    memory_region_set_ram_discard_manager(&vmem->memdev->mr, NULL);
+>>       ram_block_coordinated_discard_require(false);
+>>   }
+>>   diff --git a/include/exec/memory.h b/include/exec/memory.h
+>> index 3bebc43d59..390477b588 100644
+>> --- a/include/exec/memory.h
+>> +++ b/include/exec/memory.h
+>> @@ -2487,13 +2487,13 @@ static inline bool
+>> memory_region_has_ram_discard_manager(MemoryRegion *mr)
+>>    *
+>>    * This function must not be called for a mapped #MemoryRegion, a
+>> #MemoryRegion
+>>    * that does not cover RAM, or a #MemoryRegion that already has a
+>> - * #RamDiscardManager assigned.
+>> + * #RamDiscardManager assigned. Return 0 if the rdm is set successfully.
+>>    *
+>>    * @mr: the #MemoryRegion
+>>    * @rdm: #RamDiscardManager to set
+>>    */
+>> -void memory_region_set_ram_discard_manager(MemoryRegion *mr,
+>> -                                           RamDiscardManager *rdm);
+>> +int memory_region_set_ram_discard_manager(MemoryRegion *mr,
+>> +                                          RamDiscardManager *rdm);
+>>     /**
+>>    * memory_region_find: translate an address/size relative to a
+>> diff --git a/system/memory.c b/system/memory.c
+>> index b17b5538ff..62d6b410f0 100644
+>> --- a/system/memory.c
+>> +++ b/system/memory.c
+>> @@ -2115,12 +2115,16 @@ RamDiscardManager
+>> *memory_region_get_ram_discard_manager(MemoryRegion *mr)
+>>       return mr->rdm;
+>>   }
+>>   -void memory_region_set_ram_discard_manager(MemoryRegion *mr,
+>> -                                           RamDiscardManager *rdm)
+>> +int memory_region_set_ram_discard_manager(MemoryRegion *mr,
+>> +                                          RamDiscardManager *rdm)
+>>   {
+>>       g_assert(memory_region_is_ram(mr));
+>> -    g_assert(!rdm || !mr->rdm);
+>> +    if (mr->rdm && rdm) {
+>> +        return -EBUSY;
+>> +    }
+>> +
+>>       mr->rdm = rdm;
+>> +    return 0;
+> 
+> This is a change which can potentially break something, or currently
+> there is no way to trigger -EBUSY? Thanks,
 
-Just "State" is way too generic imho.
+Before this series, virtio-mem is the only user to
+set_ram_discard_manager(), there's no way to trigger -EBUSY. With this
+series, guest_memfd-backed RAMBlocks become the second user. It can be
+triggered if we try to use virtio-mem in confidential VMs.
 
-
->       void *opaque;
->   };
->   
-> @@ -1741,12 +1741,12 @@ static int virtio_mem_rdm_replay_populated_cb(MemoryRegionSection *s, void *arg)
->   {
->       struct VirtIOMEMReplayData *data = arg;
->   
-> -    return ((ReplayRamPopulate)data->fn)(s, data->opaque);
-> +    return data->fn(s, data->opaque);
->   }
->   
->   static int virtio_mem_rdm_replay_populated(const RamDiscardManager *rdm,
->                                              MemoryRegionSection *s,
-> -                                           ReplayRamPopulate replay_fn,
-> +                                           ReplayStateChange replay_fn,
->                                              void *opaque)
->   {
->       const VirtIOMEM *vmem = VIRTIO_MEM(rdm);
-> @@ -1765,14 +1765,14 @@ static int virtio_mem_rdm_replay_discarded_cb(MemoryRegionSection *s,
->   {
->       struct VirtIOMEMReplayData *data = arg;
->   
-> -    ((ReplayRamDiscard)data->fn)(s, data->opaque);
-> +    data->fn(s, data->opaque);
->       return 0;
-
-return data->fn(s, data->opaque); ?
-
-Or a comment why we ignore the return result? Thanks,
-
->   }
->   
-> -static void virtio_mem_rdm_replay_discarded(const RamDiscardManager *rdm,
-> -                                            MemoryRegionSection *s,
-> -                                            ReplayRamDiscard replay_fn,
-> -                                            void *opaque)
-> +static int virtio_mem_rdm_replay_discarded(const RamDiscardManager *rdm,
-> +                                           MemoryRegionSection *s,
-> +                                           ReplayStateChange replay_fn,
-> +                                           void *opaque)
->   {
->       const VirtIOMEM *vmem = VIRTIO_MEM(rdm);
->       struct VirtIOMEMReplayData data = {
-> @@ -1781,8 +1781,8 @@ static void virtio_mem_rdm_replay_discarded(const RamDiscardManager *rdm,
->       };
->   
->       g_assert(s->mr == &vmem->memdev->mr);
-> -    virtio_mem_for_each_unplugged_section(vmem, s, &data,
-> -                                          virtio_mem_rdm_replay_discarded_cb);
-> +    return virtio_mem_for_each_unplugged_section(vmem, s, &data,
-> +                                                 virtio_mem_rdm_replay_discarded_cb);
-
-
-a nit: "WARNING: line over 80 characters" - I have no idea what is the 
-best thing to do here though.
-
-
-
->   }
->   
->   static void virtio_mem_rdm_register_listener(RamDiscardManager *rdm,
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index 390477b588..3b1d25a403 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -566,8 +566,7 @@ static inline void ram_discard_listener_init(RamDiscardListener *rdl,
->       rdl->double_discard_supported = double_discard_supported;
->   }
->   
-> -typedef int (*ReplayRamPopulate)(MemoryRegionSection *section, void *opaque);
-> -typedef void (*ReplayRamDiscard)(MemoryRegionSection *section, void *opaque);
-> +typedef int (*ReplayStateChange)(MemoryRegionSection *section, void *opaque);
->   
->   /*
->    * RamDiscardManagerClass:
-> @@ -641,36 +640,38 @@ struct RamDiscardManagerClass {
->       /**
->        * @replay_populated:
->        *
-> -     * Call the #ReplayRamPopulate callback for all populated parts within the
-> +     * Call the #ReplayStateChange callback for all populated parts within the
->        * #MemoryRegionSection via the #RamDiscardManager.
->        *
->        * In case any call fails, no further calls are made.
->        *
->        * @rdm: the #RamDiscardManager
->        * @section: the #MemoryRegionSection
-> -     * @replay_fn: the #ReplayRamPopulate callback
-> +     * @replay_fn: the #ReplayStateChange callback
->        * @opaque: pointer to forward to the callback
->        *
->        * Returns 0 on success, or a negative error if any notification failed.
->        */
->       int (*replay_populated)(const RamDiscardManager *rdm,
->                               MemoryRegionSection *section,
-> -                            ReplayRamPopulate replay_fn, void *opaque);
-> +                            ReplayStateChange replay_fn, void *opaque);
->   
->       /**
->        * @replay_discarded:
->        *
-> -     * Call the #ReplayRamDiscard callback for all discarded parts within the
-> +     * Call the #ReplayStateChange callback for all discarded parts within the
->        * #MemoryRegionSection via the #RamDiscardManager.
->        *
->        * @rdm: the #RamDiscardManager
->        * @section: the #MemoryRegionSection
-> -     * @replay_fn: the #ReplayRamDiscard callback
-> +     * @replay_fn: the #ReplayStateChange callback
->        * @opaque: pointer to forward to the callback
-> +     *
-> +     * Returns 0 on success, or a negative error if any notification failed.
->        */
-> -    void (*replay_discarded)(const RamDiscardManager *rdm,
-> -                             MemoryRegionSection *section,
-> -                             ReplayRamDiscard replay_fn, void *opaque);
-> +    int (*replay_discarded)(const RamDiscardManager *rdm,
-> +                            MemoryRegionSection *section,
-> +                            ReplayStateChange replay_fn, void *opaque);
->   
->       /**
->        * @register_listener:
-> @@ -713,13 +714,13 @@ bool ram_discard_manager_is_populated(const RamDiscardManager *rdm,
->   
->   int ram_discard_manager_replay_populated(const RamDiscardManager *rdm,
->                                            MemoryRegionSection *section,
-> -                                         ReplayRamPopulate replay_fn,
-> +                                         ReplayStateChange replay_fn,
->                                            void *opaque);
->   
-> -void ram_discard_manager_replay_discarded(const RamDiscardManager *rdm,
-> -                                          MemoryRegionSection *section,
-> -                                          ReplayRamDiscard replay_fn,
-> -                                          void *opaque);
-> +int ram_discard_manager_replay_discarded(const RamDiscardManager *rdm,
-> +                                         MemoryRegionSection *section,
-> +                                         ReplayStateChange replay_fn,
-> +                                         void *opaque);
->   
->   void ram_discard_manager_register_listener(RamDiscardManager *rdm,
->                                              RamDiscardListener *rdl,
-> diff --git a/migration/ram.c b/migration/ram.c
-> index ce28328141..053730367b 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -816,8 +816,8 @@ static inline bool migration_bitmap_clear_dirty(RAMState *rs,
->       return ret;
->   }
->   
-> -static void dirty_bitmap_clear_section(MemoryRegionSection *section,
-> -                                       void *opaque)
-> +static int dirty_bitmap_clear_section(MemoryRegionSection *section,
-> +                                      void *opaque)
->   {
->       const hwaddr offset = section->offset_within_region;
->       const hwaddr size = int128_get64(section->size);
-> @@ -836,6 +836,7 @@ static void dirty_bitmap_clear_section(MemoryRegionSection *section,
->       }
->       *cleared_bits += bitmap_count_one_with_offset(rb->bmap, start, npages);
->       bitmap_clear(rb->bmap, start, npages);
-> +    return 0;
->   }
->   
->   /*
-> diff --git a/system/memory.c b/system/memory.c
-> index 62d6b410f0..b5ab729e13 100644
-> --- a/system/memory.c
-> +++ b/system/memory.c
-> @@ -2147,7 +2147,7 @@ bool ram_discard_manager_is_populated(const RamDiscardManager *rdm,
->   
->   int ram_discard_manager_replay_populated(const RamDiscardManager *rdm,
->                                            MemoryRegionSection *section,
-> -                                         ReplayRamPopulate replay_fn,
-> +                                         ReplayStateChange replay_fn,
->                                            void *opaque)
->   {
->       RamDiscardManagerClass *rdmc = RAM_DISCARD_MANAGER_GET_CLASS(rdm);
-> @@ -2156,15 +2156,15 @@ int ram_discard_manager_replay_populated(const RamDiscardManager *rdm,
->       return rdmc->replay_populated(rdm, section, replay_fn, opaque);
->   }
->   
-> -void ram_discard_manager_replay_discarded(const RamDiscardManager *rdm,
-> -                                          MemoryRegionSection *section,
-> -                                          ReplayRamDiscard replay_fn,
-> -                                          void *opaque)
-> +int ram_discard_manager_replay_discarded(const RamDiscardManager *rdm,
-> +                                         MemoryRegionSection *section,
-> +                                         ReplayStateChange replay_fn,
-> +                                         void *opaque)
->   {
->       RamDiscardManagerClass *rdmc = RAM_DISCARD_MANAGER_GET_CLASS(rdm);
->   
->       g_assert(rdmc->replay_discarded);
-> -    rdmc->replay_discarded(rdm, section, replay_fn, opaque);
-> +    return rdmc->replay_discarded(rdm, section, replay_fn, opaque);
->   }
->   
->   void ram_discard_manager_register_listener(RamDiscardManager *rdm,
-
--- 
-Alexey
+> 
+> 
+>>   }
+>>     uint64_t ram_discard_manager_get_min_granularity(const
+>> RamDiscardManager *rdm,
+> 
 
 
