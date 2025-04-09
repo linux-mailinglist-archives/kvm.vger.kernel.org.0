@@ -1,147 +1,156 @@
-Return-Path: <kvm+bounces-43026-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43028-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EADCA8317E
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 22:01:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 318ACA83183
+	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 22:03:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00BEC1885B34
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 19:59:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DF8F1B836F7
+	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 20:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0D7C2144BC;
-	Wed,  9 Apr 2025 19:53:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D54721A459;
+	Wed,  9 Apr 2025 19:56:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aI9teiPp"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LGXHTrN0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F894213E90
-	for <kvm@vger.kernel.org>; Wed,  9 Apr 2025 19:53:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDF80202C44;
+	Wed,  9 Apr 2025 19:56:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744228431; cv=none; b=K6w610fR584Oa+GBJkkHVzJ6FNuOBy+Vmg5KowUhxdUpcdHVGpLWCc8z8he0avWFhvQEP6rg1Hcsna4EoFD9X1HtepYtxV7abTFkjwQ+KRjB2Pks1oZnkk6mMmOJT3pc5Hkj4RncGFQhJrkfrqKTrNuRM6AytFMXs3ua8zzJW84=
+	t=1744228572; cv=none; b=dyZ3Wd2HbqzgmKMAwSw/kbpuXPRRfdaOA18lomxG9aiEsurrbgtnJXM3zXMfV4w+aakSefHSeH0Diks7saeKoVLdi4WrDKScOQxKwP/YZxqgADi925Ltvl+hzkx4wcjQWe3R9fwhYzyzOorWOwJsEfwLcsVLcOogFrk2OoM8TXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744228431; c=relaxed/simple;
-	bh=rv4mMwuG4jkn773xC8sA0ToKXoLaQgRn7SHaoclVUrY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bLxqrI1vdlQ6rZNLaUgLW8r6NlUfD92DtL+7FEaeSnVOztB9Mwu5ivjgdRO3scMf2jorFovFnbE5mgYVtV8XekzD2CMwO76XRfhV2CNI4mD14Z0PA/RzS60ntXZUTSrnxrzR1U75j/I0yj7mlrKajBnp1Hnf5HPMDh/WqVyy70k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aI9teiPp; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-72f3b4c0305so16825b3a.0
-        for <kvm@vger.kernel.org>; Wed, 09 Apr 2025 12:53:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744228429; x=1744833229; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=B/LBm3aV4zfAmxi92/BK6RmsqnpaBnCdXpzKq52/Foc=;
-        b=aI9teiPp4IOAdU9GBsw2c5UUNtJjfzYDo5oOlVpoK02KZbfJDi4/BUpMOgjUTDDP77
-         Zo1cFX/mi1CVaa7zifjJZefTiSM4bKVOBRbxcHWDsR4ra5zIy6Q8gxph2QBBXdTfWPR0
-         5OQe5GpPbqiVQys+My9WQ6FIq3wGpo5XZ/aX/6wj+SeZn0pkfDwDGx1345vl3dMMVxH9
-         XNN9BcliriZjlo6Nu9bsZMO7F7TC8FUiDzYlGA2mNiW7XM6g2jB0KjlK3q1zQA8WX7QA
-         IvmRm67Z5XfxmOWM6F9ibvqDxN6Uam9M7Va/UcIZ8+KdMP9uVdgncS5xeXVLnTkaWbTL
-         dP/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744228429; x=1744833229;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B/LBm3aV4zfAmxi92/BK6RmsqnpaBnCdXpzKq52/Foc=;
-        b=eDoUqgu64B6RUdkQrPhBs5YQEe+/x41554yPwEgNnBgtloWJ2ehLZMnLVZXAuxM407
-         h6j9cgBcPgobNN5joZ1jBr11wmDBwdoDSkCnTtMXv65QlFt0djbhvvelwBEm63w6hT6g
-         6ElvRqz8Knrsv/tBZIZq1q1mtVflfY4oSqVGtFXMz1OR+et+A+u481uFwHwqCBqMpfEK
-         iFUM1ON6SdGOgQQeEVElDEzeMnOadYkk76HwrTXFYJk7sqVEi9Sq11d6cMQ1FubdyOM8
-         LYpSj3az/6ULX0wnZOFP/Ipy2+Hhx+XEKerB/pOckLhL9mdbtp6cpkJH0URXbR6M9zyo
-         VtvA==
-X-Gm-Message-State: AOJu0YylNxiNmXNOYY2kRpqWs+z9ggiqV3flH/KGLTjAyOIzyRacOiW2
-	c/qVOX6nr1gWcCaj7eeb17WOqmsNMVRJ12OKZ7JhEjTk0Gd0kimEWZgshR/iktvwTCbVQOIeSo9
-	Ycw==
-X-Google-Smtp-Source: AGHT+IEeESm/upruWypiAiAFjj3gqiD2FWPZpn5Oi58JT7YjI+D2LtDvdvxhwdzcKYcXLoDvWUFBt/R8XtU=
-X-Received: from pfkq6.prod.google.com ([2002:a05:6a00:846:b0:737:6e43:8e34])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:130c:b0:736:bfc4:ef2c
- with SMTP id d2e1a72fcca58-73bbec49ac8mr221785b3a.0.1744228428902; Wed, 09
- Apr 2025 12:53:48 -0700 (PDT)
-Date: Wed, 9 Apr 2025 12:53:47 -0700
-In-Reply-To: <20250409014136.2816971-1-mlevitsk@redhat.com>
+	s=arc-20240116; t=1744228572; c=relaxed/simple;
+	bh=3grsrl9RZSBBBvFXyMe95JHInK+q/SBFqiK5jQb49GU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=naQejA2ZBoFbDPcru6CU8peJsbkPkd4or++L3VM9AFsjgIBLOd2fvekuoRqnNr25XgZ40feuuotuo9FkmDADoDK398yIKSP2KfM2+bbcb0wxO1nUG+GZoOnfX9QkhDSgY+AHrB4KZ3BA4Pecg/ohfm8LneI6sHPLlsNnAUVl5L8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LGXHTrN0; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744228570; x=1775764570;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=3grsrl9RZSBBBvFXyMe95JHInK+q/SBFqiK5jQb49GU=;
+  b=LGXHTrN0SwXCRdQI6jNo/XBB69a69KPtMWkGacKBA7XGoqrUSKQ2a+mI
+   kyGFPtPj7ksCSiAKg6g/dKe5BxF5Rh25kGKi9/XcETsbWy7KR7PWlSdLs
+   0ZnF3dTNyfcBRwdsP5M9lGSODcQzsOgTm2tUBaWC0MtqexSK00mBpHiHu
+   V0aCWGigZ4K8MuyTMooyi9l17vOX26A6xvjn1skcDKCfnF99iy+uXY0TI
+   897HDoLNn1cFliQQCEjKDfVyKtAxi+agLEs2AEeDBwSSOfJwWW4OjG2oS
+   uLpsTpmVd4rPEtmk3D9zXytAEk8MWqkCeZgYpBMYfxhAQdkj9fwgsZ0ew
+   A==;
+X-CSE-ConnectionGUID: zvYW/ZoGQAy/CeaIbyiZAA==
+X-CSE-MsgGUID: X8DiXHWGQfiyEmcOLHFgcg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11399"; a="49566739"
+X-IronPort-AV: E=Sophos;i="6.15,201,1739865600"; 
+   d="scan'208";a="49566739"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2025 12:56:09 -0700
+X-CSE-ConnectionGUID: nHikWXMBThOMkcTjRkRv+A==
+X-CSE-MsgGUID: MXkjaIXHS0SCTiVGQFjm6g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,201,1739865600"; 
+   d="scan'208";a="128651763"
+Received: from sramkris-mobl1.amr.corp.intel.com (HELO [10.124.220.195]) ([10.124.220.195])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2025 12:56:07 -0700
+Message-ID: <29ad84a6-b40c-456a-9eed-9887c87dfb38@intel.com>
+Date: Wed, 9 Apr 2025 12:56:04 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250409014136.2816971-1-mlevitsk@redhat.com>
-Message-ID: <Z_bQS63A2bd-LzgQ@google.com>
-Subject: Re: [PATCH v2 0/4] KVM: extract lock_all_vcpus/unlock_all_vcpus
-From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: kvm@vger.kernel.org, Alexander Potapenko <glider@google.com>, 
-	"H. Peter Anvin" <hpa@zytor.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, kvm-riscv@lists.infradead.org, 
-	Oliver Upton <oliver.upton@linux.dev>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	Jing Zhang <jingzhangos@google.com>, Waiman Long <longman@redhat.com>, x86@kernel.org, 
-	Kunkun Jiang <jiangkunkun@huawei.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Anup Patel <anup@brainfault.org>, Albert Ou <aou@eecs.berkeley.edu>, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Zenghui Yu <yuzenghui@huawei.com>, 
-	Borislav Petkov <bp@alien8.de>, Alexandre Ghiti <alex@ghiti.fr>, 
-	Keisuke Nishimura <keisuke.nishimura@inria.fr>, Sebastian Ott <sebott@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Atish Patra <atishp@atishpatra.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Randy Dunlap <rdunlap@infradead.org>, 
-	Will Deacon <will@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, linux-riscv@lists.infradead.org, 
-	Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	Joey Gouly <joey.gouly@arm.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Ingo Molnar <mingo@redhat.com>, Andre Przywara <andre.przywara@arm.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Adrian Hunter <adrian.hunter@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 01/15] x86/msr: Replace __wrmsr() with
+ native_wrmsrl()
+To: Ingo Molnar <mingo@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>
+Cc: Xin Li <xin@zytor.com>, linux-kernel@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
+ virtualization@lists.linux.dev, linux-edac@vger.kernel.org,
+ kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-ide@vger.kernel.org, linux-pm@vger.kernel.org, bpf@vger.kernel.org,
+ llvm@lists.linux.dev, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, jgross@suse.com,
+ andrew.cooper3@citrix.com, peterz@infradead.org, acme@kernel.org,
+ namhyung@kernel.org, mark.rutland@arm.com,
+ alexander.shishkin@linux.intel.com, jolsa@kernel.org, irogers@google.com,
+ adrian.hunter@intel.com, kan.liang@linux.intel.com, wei.liu@kernel.org,
+ ajay.kaher@broadcom.com, alexey.amakhalov@broadcom.com,
+ bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
+ pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
+ luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
+ haiyangz@microsoft.com, decui@microsoft.com
+References: <20250331082251.3171276-1-xin@zytor.com>
+ <20250331082251.3171276-2-xin@zytor.com> <Z-pruogreCuU66wm@gmail.com>
+ <9D15DE81-2E68-4FCD-A133-4963602E18C9@zytor.com>
+ <a0254e73-bf7c-4876-b64e-b08e96044666@zytor.com>
+ <e5770add-9d18-40e1-929d-df7c40f3c7d1@intel.com>
+ <ADCFB190-A89A-460D-81A6-80E20AEFBFBC@zytor.com> <Z_bQV2oOnJlwbxnk@gmail.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <Z_bQV2oOnJlwbxnk@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-+Adrian
+On 4/9/25 12:53, Ingo Molnar wrote:
+>>> What would folks think about "wrmsr64()"? It's writing a 64-bit 
+>>> value to an MSR and there are a lot of functions in the kernel that 
+>>> are named with the argument width in bits.
+>> Personally, I hate the extra verbosity, mostly visual, since numerals 
+>> are nearly as prominent as capital letters they tend to attract the 
+>> eye. There is a reason why they aren't used this way in assembly 
+>> languages.
+> So what's the consensus here? Both work for me, but I have to pick one. 🙂
 
-On Tue, Apr 08, 2025, Maxim Levitsky wrote:
-> Implement Paolo's suggestion of reusing
-
-Ha!  I *knew* this felt familiar when I suggested extracting (un)lock_all_vcpus()
-to common code in the context of the TDX series.
-
-https://lore.kernel.org/all/Z-V0qyTn2bXdrPF7@google.com
-
-> sev_lock/unlock_vcpus_for_migration in arm and riscv code
-> for the purpose of taking vcpu->mutex of all vcpus of a VM.
-> 
-> Because sev_lock/unlock_vcpus_for_migration already have a workaround
-> for lockdep max lock depth, this fixes the lockdep warnings on arm
-> which were the inspiration for this refactoring.
-> 
-> This patch series was only compile tested on all 3 architectures.
-> 
-> V2: added trylock option to kvm_lock_all_vcpus to be better compatible
-> with the orginal code.
-> 
-> Best regards,
-> 	Maxim Levitsky
-> 
-> Maxim Levitsky (4):
->   locking/mutex: implement mutex_trylock_nested
->   KVM: x86: move sev_lock/unlock_vcpus_for_migration to kvm_main.c
->   KVM: arm64: switch to using kvm_lock/unlock_all_vcpus
->   RISC-V: KVM: switch to kvm_lock/unlock_all_vcpus
-> 
->  arch/arm64/include/asm/kvm_host.h     |  3 --
->  arch/arm64/kvm/arch_timer.c           |  4 +-
->  arch/arm64/kvm/arm.c                  | 43 ----------------
->  arch/arm64/kvm/vgic/vgic-init.c       |  4 +-
->  arch/arm64/kvm/vgic/vgic-its.c        |  8 +--
->  arch/arm64/kvm/vgic/vgic-kvm-device.c | 12 ++---
->  arch/riscv/kvm/aia_device.c           | 34 +------------
->  arch/x86/kvm/svm/sev.c                | 65 ++----------------------
->  include/linux/kvm_host.h              |  6 +++
->  include/linux/mutex.h                 |  8 +++
->  kernel/locking/mutex.c                | 14 ++++--
->  virt/kvm/kvm_main.c                   | 71 +++++++++++++++++++++++++++
->  12 files changed, 116 insertions(+), 156 deletions(-)
-> 
-> -- 
-> 2.26.3
-> 
-> 
+I don't feel strongly about it. You're not going to hurt my feelings if
+you pick the "q" one, so go for "q" unless you have a real preference.
 
