@@ -1,50 +1,50 @@
-Return-Path: <kvm+bounces-43027-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43029-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0A00A8318D
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 22:05:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34303A831AD
+	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 22:11:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 786321797C0
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 19:59:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 865D87AC60E
+	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 20:10:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 768A9215781;
-	Wed,  9 Apr 2025 19:54:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29D3F213E76;
+	Wed,  9 Apr 2025 20:11:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VulSS1Yw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D24yujy4"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62CA7214A7F;
-	Wed,  9 Apr 2025 19:54:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15DAB1D5175;
+	Wed,  9 Apr 2025 20:11:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744228451; cv=none; b=WYahd8HijWGGgljQZwVoZI2y9iN7Yu25MdRJayLwzDJ0xXYr3kOsrgEFcbp0MEAI9L7VB/hPe03dIH33eeTOFrVLd7+KKMfihkmPm+KNMgUfyHh7OTG6mrgAfzL9H0JbKZhyMRsUyt6UdfJtcNbIv1IDNz2JS+no33SQ5YUsoyY=
+	t=1744229484; cv=none; b=XKYHXbjmW0wTpoIne58sUZ7hZIsHXXpV1TaL2jNlaELv85V1rUdB/CIuJb8KIRA3PaIrQjW1a6i1yOeJ8/MImn7U4K1tM6SDzGdzgqzrbqU0XX3/vWHelEivhEBKuKiTSCSMRxmZTGLxv2tnqNkc8W7Ja4nqzzy6bPjRSMZWcq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744228451; c=relaxed/simple;
-	bh=q7KvwDfQqFDNGgQf6PyiHomLFAW6NL2n557EpD26id8=;
+	s=arc-20240116; t=1744229484; c=relaxed/simple;
+	bh=FJm/izdFNTfA1jwBlsdk1jJoTUGHKfakmjnarpokATA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oy1/Yaw991znhwp5goXstaqIx3MSAul68EdkULkv06fub7A452cZfm2d1VFeXm8c1Ih6pxf3fij9Zu0Nk0uXQ8nrabO2A8y3aAJxh0RDq+tamaRNUbCt20kGjzAfweWC6OTatmjxnItm2Iu7FiAA/Sp0NrSMhPH5/3GAfhyiNfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VulSS1Yw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 260C8C4CEE2;
-	Wed,  9 Apr 2025 19:54:01 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=PkqwHzSitwgHzAg3RdmX5I0ZpoWLnFGpQdMWs3whkZFM2BjVFHUqKqB6NW6ohlmjucpxOVACfn2iodx5X6y9onAYOQU+3MGcXFquEFjotmfgGT9grYa458Js4Y7xYNahsW0gGaD9ZyD2lVR/YFzeWKreGPJ4OfM73QBNOt5l2lY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D24yujy4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71925C4CEE2;
+	Wed,  9 Apr 2025 20:11:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744228450;
-	bh=q7KvwDfQqFDNGgQf6PyiHomLFAW6NL2n557EpD26id8=;
+	s=k20201202; t=1744229483;
+	bh=FJm/izdFNTfA1jwBlsdk1jJoTUGHKfakmjnarpokATA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VulSS1YwlnFjfym00iwjm8nZpYCyp06C0ojMIpSCSHZR4u0kCve/HPOLSpwGvY8u5
-	 pBTjBb/9vduXt1yHmPU9a+E8F7KAYhYpWKQEBBPX+/hfy20lXzFqyHyY8B+HK6sZUf
-	 xN3fYMEJoURP0ouK4XLhP558hxwDPdlv3j55wiCtlhRPkFu/TgXbgsw4c31dujDZWx
-	 WI68CmIsMMEvM72xxyr1xE96ssKn4YT5iCMXcjHWRmRp8UzErdBvMQgGb+caLf69ln
-	 4GvtnHjQrXPK2u6hCjNy/AUsgKBW8iPDB+syZsrtkVGFcuJdzKsEe35yQuSR5M6flU
-	 mNFGcP/z9LOpg==
-Date: Wed, 9 Apr 2025 21:53:59 +0200
+	b=D24yujy42QUc8MzaoYIOhqsAt7S0/2X6yekc52w0gwdRwZBMwmU2nUGsZoW5Ns7GD
+	 j85elSFL53Wuzj6UvF8uMMGWEYy3lD+JT9cZ0aqP7gtAES0C3utL694NSMXdxOrKJc
+	 9kIP4IKosSndbxn+SFfqxSrLVm9pBipvXXrP6J8VxMshOu3nGVg5Xag10MUwIq3jdK
+	 Ebzxt4FaeSUl2kGyVYg1LltfzCxBxoV7FKWUvjuBBSV/RcEjM/nammCpLTt/GmU9n5
+	 qWMtWEi+RRMn/FMGZcmAdYRRPyz1BTp+SNboYM41JDtFNJnwUWqDkFxGYl1tX5Mz6M
+	 qlUYtZ4y1dU2Q==
+Date: Wed, 9 Apr 2025 22:11:11 +0200
 From: Ingo Molnar <mingo@kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Dave Hansen <dave.hansen@intel.com>, Xin Li <xin@zytor.com>,
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>, Xin Li <xin@zytor.com>,
 	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
 	linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
 	linux-edac@vger.kernel.org, kvm@vger.kernel.org,
@@ -64,7 +64,7 @@ Cc: Dave Hansen <dave.hansen@intel.com>, Xin Li <xin@zytor.com>,
 	haiyangz@microsoft.com, decui@microsoft.com
 Subject: Re: [RFC PATCH v1 01/15] x86/msr: Replace __wrmsr() with
  native_wrmsrl()
-Message-ID: <Z_bQV2oOnJlwbxnk@gmail.com>
+Message-ID: <Z_bUX06aq6thJ4Uu@gmail.com>
 References: <20250331082251.3171276-1-xin@zytor.com>
  <20250331082251.3171276-2-xin@zytor.com>
  <Z-pruogreCuU66wm@gmail.com>
@@ -72,48 +72,40 @@ References: <20250331082251.3171276-1-xin@zytor.com>
  <a0254e73-bf7c-4876-b64e-b08e96044666@zytor.com>
  <e5770add-9d18-40e1-929d-df7c40f3c7d1@intel.com>
  <ADCFB190-A89A-460D-81A6-80E20AEFBFBC@zytor.com>
+ <Z_bQV2oOnJlwbxnk@gmail.com>
+ <29ad84a6-b40c-456a-9eed-9887c87dfb38@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <ADCFB190-A89A-460D-81A6-80E20AEFBFBC@zytor.com>
+In-Reply-To: <29ad84a6-b40c-456a-9eed-9887c87dfb38@intel.com>
 
 
-* H. Peter Anvin <hpa@zytor.com> wrote:
+* Dave Hansen <dave.hansen@intel.com> wrote:
 
-> On April 2, 2025 8:41:07 AM PDT, Dave Hansen <dave.hansen@intel.com> wrote:
-> >On 3/31/25 22:53, Xin Li wrote:
-> >> Per "struct msr" defined in arch/x86/include/asm/shared/msr.h:
-> >> 
-> >> struct msr {
-> >>         union {
-> >>                 struct {
-> >>                         u32 l;
-> >>                         u32 h;
-> >>                 };
-> >>                 u64 q;
-> >>         };
-> >> };
-> >> 
-> >> Probably *msrq() is what we want?
-> >
-> > What would folks think about "wrmsr64()"? It's writing a 64-bit 
-> > value to an MSR and there are a lot of functions in the kernel that 
-> > are named with the argument width in bits.
+> On 4/9/25 12:53, Ingo Molnar wrote:
+> >>> What would folks think about "wrmsr64()"? It's writing a 64-bit 
+> >>> value to an MSR and there are a lot of functions in the kernel that 
+> >>> are named with the argument width in bits.
+> >> Personally, I hate the extra verbosity, mostly visual, since numerals 
+> >> are nearly as prominent as capital letters they tend to attract the 
+> >> eye. There is a reason why they aren't used this way in assembly 
+> >> languages.
+> > So what's the consensus here? Both work for me, but I have to pick one. ðŸ™‚
 > 
-> Personally, I hate the extra verbosity, mostly visual, since numerals 
-> are nearly as prominent as capital letters they tend to attract the 
-> eye. There is a reason why they aren't used this way in assembly 
-> languages.
+> I don't feel strongly about it. You're not going to hurt my feelings if
+> you pick the "q" one, so go for "q" unless you have a real preference.
 
-So what's the consensus here? Both work for me, but I have to pick one. :-)
+Ok, since hpa seems to hate the wrmsr64()/rdmsr64() names due to the 
+numeric verbosity, I'll go with wrmsrq()/rdmsrq().
 
 Thanks,
 
 	Ingo
+
 
