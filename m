@@ -1,301 +1,146 @@
-Return-Path: <kvm+bounces-43016-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43017-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA53AA826A4
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 15:47:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71647A826A9
+	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 15:49:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 859E77B892C
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 13:46:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D25A94403B1
+	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 13:49:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82C2B2638A9;
-	Wed,  9 Apr 2025 13:47:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9E7B263C71;
+	Wed,  9 Apr 2025 13:49:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LY//Wrsd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a/ieZLP2"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05F592459D6
-	for <kvm@vger.kernel.org>; Wed,  9 Apr 2025 13:47:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C715248888
+	for <kvm@vger.kernel.org>; Wed,  9 Apr 2025 13:49:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744206442; cv=none; b=XXQVf3w0RPF7jzObljRix7JzTqqVpvf4OQL5FLpXSj4iA0xjlDkCAavKfdQ5Y3mTsX+oTQDLI2UkAzc+mWi6OXVV9HzalM6ag/cuMViLRwDc8+NmqhIWq2g1sc26mhMoYwvGKkTjaARv6thuA6v177Ijpc8k1pu5Uq8EBA/t8ck=
+	t=1744206553; cv=none; b=eZbxU9PP3ar/7nqOhAsmipgecpSr2CAinchl6bEGLfAHrw/zAq8FqiYsveh5Lszsi/RyIF4vUsC5Uqkz92Qf52pJjXi38Tgb9o3iH2B55n7xx1GmW5HfFyoGKEsSj4jiwHWzfZLHMoCwRvMahjqPOft4P0gWzBIGYMUAgL9XksA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744206442; c=relaxed/simple;
-	bh=qoxX74MayVQT3lo4VHMo/vX7lWgGYrnFT4wmOWYfSqQ=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=pRuJX3Z8rOO+7MulI8V7vglzRP2RB+MG8Z6rbMGDBAT02kizebOUev2TbYctw6cDAXby8MQhkmekjwJtQoGIxNl/mh8pHV/H1wJMg99iH12lJhFcazB9fEUl7z0t+GgQ6XTfTCt81xGU2FVCLa8nJv0GI6sF5lMchjVFeXDvdR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LY//Wrsd; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744206439;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=C8sFG62uIhWcCDnsK+TitF7g9YvTTNhbdnhc8bS11xU=;
-	b=LY//WrsdjkdAzh9bMRwAeHZLEMxSvcoVBH5cXHb4MxEG1nSkmU65yz+F8ilWqnaVeAkn4Z
-	r5GiHwULexAwq5aKp2ef374g8ZQDUb389ULmaULZJLwC1lxw8JY75Prj8AUXsmdTrr/xCv
-	3NQfso6odaq1sE/PQZ9BviM37LFRTjw=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-172-umPcNNyzNHO2KgCLoTFEWA-1; Wed, 09 Apr 2025 09:47:17 -0400
-X-MC-Unique: umPcNNyzNHO2KgCLoTFEWA-1
-X-Mimecast-MFC-AGG-ID: umPcNNyzNHO2KgCLoTFEWA_1744206436
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3ce8dadfb67so80944095ab.1
-        for <kvm@vger.kernel.org>; Wed, 09 Apr 2025 06:47:17 -0700 (PDT)
+	s=arc-20240116; t=1744206553; c=relaxed/simple;
+	bh=qazo7pIcfpNl+Sm7ZFsywYC/dbBgkDLaEHB4F2bqny4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=fgoqtgaP5pa7ZjDc//M3fYRP6uLdWae8Dngx9mtJy1b9yTySq6+Wl3WzaIDxYFF7WR9kElxQNiaunq6Oa8f/7gcdk8RtebxuV16gLjZB4pcBeeBwWGk0RajT4zPiXdF9UUBYRRYpuzgndtqO75L645SAITHPzernTEtQBWFp2jw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a/ieZLP2; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-af9564001cbso4494075a12.3
+        for <kvm@vger.kernel.org>; Wed, 09 Apr 2025 06:49:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1744206551; x=1744811351; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y73w31igBWLsQE77UitAErwv5VKNvNqUriamUlq9OdQ=;
+        b=a/ieZLP2/K6W4o7MTqPaF+hqcXd4oLA3832BPpOXzGOcMueFmDqB3o9rqLb3UaTJYC
+         A7BL6PaHdAcRSyYivawISoVPVAkrMV+UYYy4mkMu9jL+5wPap+Id+wqE/cpIGRPIU5Ax
+         vSFM5uO22wVEkcKugzKDzNRn/PC5B/TqswbSiBiCT1ztzs1TV5HDMJCxvwcdbrejyEDl
+         kbZViogaFxV1a4QgW1XSzl3rpj2sXO9Dai7tW1S6JJA35EORBvrKBzqYIcwoNiLp3f0m
+         yHpg0MoFh1j0ehtRwDjoWhHQntehn+FdkWZnmbpu2YpbqFGf2Lp079QS4VuW1X4kCE8n
+         TdKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744206436; x=1744811236;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C8sFG62uIhWcCDnsK+TitF7g9YvTTNhbdnhc8bS11xU=;
-        b=HjP22kedk74bZzxoGHko7iUw3R2w3c1Ku7WI/HkWoUaums1Lfw1IW6rLVrqjVDVs7m
-         WiVGeEslNINeaUVK+3Cae6KubfkhFWHZVtjfjRAC2hFieVqKEYwe3Q2b+8vEO6Xfp3iJ
-         WiWqlKHb3UrupyEV71ioAEPe4K4ZbvAq/c4/WWdxLLIAx+HtcWFvtLf7ETzGB3HYq1FR
-         ycjDrx+Xdyu7t3iVbjJnP5vTi6gezoRuSwK8iJZBdgh7Bj9GRoBXgYEfffjU9Qbkx5d7
-         kK7SfQcBEcez2Bc0YIKyq3FqaO2w1U02kPU/DqJlPjCzbAWT0JdD/nNz6eHC7BBUKoLC
-         k9tw==
-X-Forwarded-Encrypted: i=1; AJvYcCXJH9T5RMX5bZ++RervmgghibiqYgDmltgHLEv3GPbM+0F0FEl4T/Lpi5/G5IgwtBY39Gg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+o8djPZYmcN7CgdyY6pAHzT0LZLNXXbFURNyMJZfPqlbsrVfp
-	gqOtza/pVnBphRQGSbC4SENid2JV2iR86+m+BuTjBwviAkpyor+zUN0UnYlhoIuLA5iffB8MrKP
-	TYYeyfRK5pa3zc7NU2QQ1cW+Qod5kkZ3yX3VOgBLvrVoaqpec9w==
-X-Gm-Gg: ASbGncusvpgDiFrIzuNiKvNu0t9eBQVNCVPPZZWACOaVxoLzvx61Np3RDlOnpyS9wqE
-	9X+lRZCZFrA5xRk0XBo6o063RiAgp8rA971enZHl3SKRLjOmPT2CTPHxgyUlED1SK5I2tl/xUOo
-	BWnvYkiKm9cbI9Bsqd8zKlnuS06XhNZwVM2ywdRxyY8Vsc+eoUo+CJlfUHa9PKjff+4+nZJrMuK
-	doVlCAkWxSytIPnX5N1FHB7UuMTVp8RDnlCJzLzBaNf87kQPivhPvkg+11hSCrBiyfvfkqHp+lu
-	02cTj3+5zqrt/MENhzFg/I8s0Rqgf7lkyJqVRzW3JZOnS6fcGwSGuDCrmA==
-X-Received: by 2002:a05:6e02:1c0e:b0:3d5:dec0:7c03 with SMTP id e9e14a558f8ab-3d77c27fb00mr27400725ab.12.1744206436352;
-        Wed, 09 Apr 2025 06:47:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGY11cU0INBe/qnf4e7hQqyG5TAgNSTBjToXX6S3PDZH7tI5Cb3FdlfnkGTFvFeZrlBBTdq0A==
-X-Received: by 2002:a05:6e02:1c0e:b0:3d5:dec0:7c03 with SMTP id e9e14a558f8ab-3d77c27fb00mr27400065ab.12.1744206435834;
-        Wed, 09 Apr 2025 06:47:15 -0700 (PDT)
-Received: from ?IPV6:2601:188:c100:5710:315f:57b3:b997:5fca? ([2601:188:c100:5710:315f:57b3:b997:5fca])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d7dba85487sm2698105ab.23.2025.04.09.06.47.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Apr 2025 06:47:15 -0700 (PDT)
-From: Waiman Long <llong@redhat.com>
-X-Google-Original-From: Waiman Long <longman@redhat.com>
-Message-ID: <b0fe0707-faae-4e0b-b873-9a80e39471fc@redhat.com>
-Date: Wed, 9 Apr 2025 09:47:11 -0400
+        d=1e100.net; s=20230601; t=1744206551; x=1744811351;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y73w31igBWLsQE77UitAErwv5VKNvNqUriamUlq9OdQ=;
+        b=bEwlydNsRG5/yDYTZa1KozPqe60un9fkgWEJYZYh2rw0LHkCibFNBSHmmJGMBpGP86
+         61KrROHIBH1Dv1Mde25urKntZ/9rvAypGY74A05jHQyIyXDHfVELtByPPd9qneVd6vJx
+         Z6xNQweWZR7BvP+vRqnFuetTh8pH5FtSffme97+qy0CChzA6CJRendQwXBNJUnplW7y5
+         QHVY6UyRu5axZLRi1SPk1Y8Jjg7UXhJjGu5JEYSYOIC9ZIPI8+4OFU9S/FGv6nCyIer3
+         rGduUs+wEy23celI4yVYZ2m38d/ZJSga9UT9sgQYk2sjQmEOlkP8XWj+Jnbqst9e2T+X
+         oPUg==
+X-Forwarded-Encrypted: i=1; AJvYcCUhO1FDNsmZdfs0iZ0kBSyTlEqcF/k5eRVZWzt0vr/3ZzE32oLvoKiw35I3V48dnneBkSI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyL1D7+lZK5KWlXdhxJbwjNteZxxzeILjeBz0iy0ZkObf6iOdOd
+	KjzaL5LQhEjCXdVKhqYIVugl17xQlYyOh1ndbdqkFk/VlgJo1/AEin7eS6LJ3EwRYtn2l5u2J0h
+	Xdg==
+X-Google-Smtp-Source: AGHT+IE1olvuaLq50nGKQrjOpbHUBUDesPetDQk8Ddyx/FU4wlnq3LPxsqnE/CiEUPfY3sWR2RK3WNzBKwk=
+X-Received: from plbkx11.prod.google.com ([2002:a17:902:f94b:b0:21f:56e1:c515])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ccc8:b0:224:c46:d162
+ with SMTP id d9443c01a7336-22ac2992075mr42310655ad.20.1744206550496; Wed, 09
+ Apr 2025 06:49:10 -0700 (PDT)
+Date: Wed, 9 Apr 2025 06:49:09 -0700
+In-Reply-To: <112c4cdb-4757-4625-ad18-9402340cd47e@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/4] KVM: x86: move sev_lock/unlock_vcpus_for_migration
- to kvm_main.c
-To: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc: Alexander Potapenko <glider@google.com>, "H. Peter Anvin"
- <hpa@zytor.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- kvm-riscv@lists.infradead.org, Oliver Upton <oliver.upton@linux.dev>,
- Dave Hansen <dave.hansen@linux.intel.com>,
- Jing Zhang <jingzhangos@google.com>, x86@kernel.org,
- Kunkun Jiang <jiangkunkun@huawei.com>, Boqun Feng <boqun.feng@gmail.com>,
- Anup Patel <anup@brainfault.org>, Albert Ou <aou@eecs.berkeley.edu>,
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
- Zenghui Yu <yuzenghui@huawei.com>, Borislav Petkov <bp@alien8.de>,
- Alexandre Ghiti <alex@ghiti.fr>,
- Keisuke Nishimura <keisuke.nishimura@inria.fr>,
- Sebastian Ott <sebott@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Atish Patra <atishp@atishpatra.org>, Paul Walmsley
- <paul.walmsley@sifive.com>, Randy Dunlap <rdunlap@infradead.org>,
- Will Deacon <will@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
- linux-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>,
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Andre Przywara <andre.przywara@arm.com>, Thomas Gleixner
- <tglx@linutronix.de>, Sean Christopherson <seanjc@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Bjorn Helgaas <bhelgaas@google.com>
-References: <20250409014136.2816971-1-mlevitsk@redhat.com>
- <20250409014136.2816971-3-mlevitsk@redhat.com>
-Content-Language: en-US
-In-Reply-To: <20250409014136.2816971-3-mlevitsk@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250402001557.173586-1-binbin.wu@linux.intel.com>
+ <20250402001557.173586-2-binbin.wu@linux.intel.com> <40f3dcc964bfb5d922cf09ddf080d53c97d82273.camel@intel.com>
+ <112c4cdb-4757-4625-ad18-9402340cd47e@linux.intel.com>
+Message-ID: <Z_Z61UlNM1vlEdW1@google.com>
+Subject: Re: [PATCH 1/2] KVM: TDX: Handle TDG.VP.VMCALL<GetQuote>
+From: Sean Christopherson <seanjc@google.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: Kai Huang <kai.huang@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, Chao Gao <chao.gao@intel.com>, 
+	Rick P Edgecombe <rick.p.edgecombe@intel.com>, 
+	"mikko.ylinen@linux.intel.com" <mikko.ylinen@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Tony Lindgren <tony.lindgren@intel.com>, Adrian Hunter <adrian.hunter@intel.com>, 
+	Reinette Chatre <reinette.chatre@intel.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Yan Y Zhao <yan.y.zhao@intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
+On Wed, Apr 02, 2025, Binbin Wu wrote:
+> On 4/2/2025 8:53 AM, Huang, Kai wrote:
+> > > +static int tdx_get_quote(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +	struct vcpu_tdx *tdx = to_tdx(vcpu);
+> > > +
+> > > +	u64 gpa = tdx->vp_enter_args.r12;
+> > > +	u64 size = tdx->vp_enter_args.r13;
+> > > +
+> > > +	/* The buffer must be shared memory. */
+> > > +	if (vt_is_tdx_private_gpa(vcpu->kvm, gpa) || size == 0) {
+> > > +		tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_INVALID_OPERAND);
+> > > +		return 1;
+> > > +	}
+> > It is a little bit confusing about the shared buffer check here.  There are two
+> > perspectives here:
+> > 
+> > 1) the buffer has already been converted to shared, i.e., the attributes are
+> > stored in the Xarray.
+> > 2) the GPA passed in the GetQuote must have the shared bit set.
+> > 
+> > The key is we need 1) here.  From the spec, we need the 2) as well because it
+> > *seems* that the spec requires GetQuote to provide the GPA with shared bit set,
+> > as it says "Shared GPA as input".
+> > 
+> > The above check only does 2).  I think we need to check 1) as well, because once
+> > you forward this GetQuote to userspace, userspace is able to access it freely.
 
-On 4/8/25 9:41 PM, Maxim Levitsky wrote:
-> Move sev_lock/unlock_vcpus_for_migration to kvm_main and call the
-> new functions the kvm_lock_all_vcpus/kvm_unlock_all_vcpus
-> and kvm_lock_all_vcpus_nested.
->
-> This code allows to lock all vCPUs without triggering lockdep warning
-> about reaching MAX_LOCK_DEPTH depth by coercing the lockdep into
-> thinking that we release all the locks other than vcpu'0 lock
-> immediately after we take them.
->
-> No functional change intended.
->
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->   arch/x86/kvm/svm/sev.c   | 65 +++---------------------------------
->   include/linux/kvm_host.h |  6 ++++
->   virt/kvm/kvm_main.c      | 71 ++++++++++++++++++++++++++++++++++++++++
->   3 files changed, 81 insertions(+), 61 deletions(-)
->
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 0bc708ee2788..7adc54b1f741 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -1889,63 +1889,6 @@ enum sev_migration_role {
->   	SEV_NR_MIGRATION_ROLES,
->   };
->   
-> -static int sev_lock_vcpus_for_migration(struct kvm *kvm,
-> -					enum sev_migration_role role)
-> -{
-> -	struct kvm_vcpu *vcpu;
-> -	unsigned long i, j;
-> -
-> -	kvm_for_each_vcpu(i, vcpu, kvm) {
-> -		if (mutex_lock_killable_nested(&vcpu->mutex, role))
-> -			goto out_unlock;
-> -
-> -#ifdef CONFIG_PROVE_LOCKING
-> -		if (!i)
-> -			/*
-> -			 * Reset the role to one that avoids colliding with
-> -			 * the role used for the first vcpu mutex.
-> -			 */
-> -			role = SEV_NR_MIGRATION_ROLES;
-> -		else
-> -			mutex_release(&vcpu->mutex.dep_map, _THIS_IP_);
-> -#endif
-> -	}
-> -
-> -	return 0;
-> -
-> -out_unlock:
-> -
-> -	kvm_for_each_vcpu(j, vcpu, kvm) {
-> -		if (i == j)
-> -			break;
-> -
-> -#ifdef CONFIG_PROVE_LOCKING
-> -		if (j)
-> -			mutex_acquire(&vcpu->mutex.dep_map, role, 0, _THIS_IP_);
-> -#endif
-> -
-> -		mutex_unlock(&vcpu->mutex);
-> -	}
-> -	return -EINTR;
-> -}
-> -
-> -static void sev_unlock_vcpus_for_migration(struct kvm *kvm)
-> -{
-> -	struct kvm_vcpu *vcpu;
-> -	unsigned long i;
-> -	bool first = true;
-> -
-> -	kvm_for_each_vcpu(i, vcpu, kvm) {
-> -		if (first)
-> -			first = false;
-> -		else
-> -			mutex_acquire(&vcpu->mutex.dep_map,
-> -				      SEV_NR_MIGRATION_ROLES, 0, _THIS_IP_);
-> -
-> -		mutex_unlock(&vcpu->mutex);
-> -	}
-> -}
-> -
->   static void sev_migrate_from(struct kvm *dst_kvm, struct kvm *src_kvm)
->   {
->   	struct kvm_sev_info *dst = to_kvm_sev_info(dst_kvm);
-> @@ -2083,10 +2026,10 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
->   		charged = true;
->   	}
->   
-> -	ret = sev_lock_vcpus_for_migration(kvm, SEV_MIGRATION_SOURCE);
-> +	ret = kvm_lock_all_vcpus_nested(kvm, false, SEV_MIGRATION_SOURCE);
->   	if (ret)
->   		goto out_dst_cgroup;
-> -	ret = sev_lock_vcpus_for_migration(source_kvm, SEV_MIGRATION_TARGET);
-> +	ret = kvm_lock_all_vcpus_nested(source_kvm, false, SEV_MIGRATION_TARGET);
->   	if (ret)
->   		goto out_dst_vcpu;
->   
-> @@ -2100,9 +2043,9 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
->   	ret = 0;
->   
->   out_source_vcpu:
-> -	sev_unlock_vcpus_for_migration(source_kvm);
-> +	kvm_unlock_all_vcpus(source_kvm);
->   out_dst_vcpu:
-> -	sev_unlock_vcpus_for_migration(kvm);
-> +	kvm_unlock_all_vcpus(kvm);
->   out_dst_cgroup:
->   	/* Operates on the source on success, on the destination on failure.  */
->   	if (charged)
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 1dedc421b3e3..30cf28bf5c80 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1015,6 +1015,12 @@ static inline struct kvm_vcpu *kvm_get_vcpu_by_id(struct kvm *kvm, int id)
->   
->   void kvm_destroy_vcpus(struct kvm *kvm);
->   
-> +int kvm_lock_all_vcpus_nested(struct kvm *kvm, bool trylock, unsigned int role);
-> +void kvm_unlock_all_vcpus(struct kvm *kvm);
-> +
-> +#define kvm_lock_all_vcpus(kvm, trylock) \
-> +	kvm_lock_all_vcpus_nested(kvm, trylock, 0)
-> +
->   void vcpu_load(struct kvm_vcpu *vcpu);
->   void vcpu_put(struct kvm_vcpu *vcpu);
->   
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 69782df3617f..71c0d8c35b4b 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1368,6 +1368,77 @@ static int kvm_vm_release(struct inode *inode, struct file *filp)
->   	return 0;
->   }
->   
-> +
-> +/*
-> + * Lock all VM vCPUs.
-> + * Can be used nested (to lock vCPUS of two VMs for example)
-> + */
-> +int kvm_lock_all_vcpus_nested(struct kvm *kvm, bool trylock, unsigned int role)
-> +{
-> +	struct kvm_vcpu *vcpu;
-> +	unsigned long i, j;
-> +
-> +	lockdep_assert_held(&kvm->lock);
-> +
-> +	kvm_for_each_vcpu(i, vcpu, kvm) {
-> +
-> +		if (trylock && !mutex_trylock_nested(&vcpu->mutex, role))
-> +			goto out_unlock;
-> +		else if (!trylock && mutex_lock_killable_nested(&vcpu->mutex, role))
-> +			goto out_unlock;
-> +
-> +#ifdef CONFIG_PROVE_LOCKING
-> +		if (!i)
-> +			/*
-> +			 * Reset the role to one that avoids colliding with
-> +			 * the role used for the first vcpu mutex.
-> +			 */
-> +			role = MAX_LOCK_DEPTH - 1;
-> +		else
-> +			mutex_release(&vcpu->mutex.dep_map, _THIS_IP_);
-> +#endif
+(1) is inherently racy.  By the time KVM exits to userspace, the page could have
+already been converted to private in the memory attributes.  KVM doesn't control
+shared<=>private conversions, so ultimately it's userspace's responsibility to
+handle this check.  E.g. userspace needs to take its lock on conversions across
+the check+access on the buffer.  Or if userpsace unmaps its shared mappings when
+a gfn is private, userspace could blindly access the region and handle the
+resulting SIGBUS (or whatever error manifests).
 
-Lockdep supports up to 8 subclasses, but MAX_LOCK_DEPTH is 48. I believe 
-it is OK to add a mutex_trylock_nested(), but can you just use 0 and 1 
-for the subclasses?
+For (2), the driving motiviation for doing the checks (or not) is KVM's ABI.
+I.e. whether nor KVM should handle the check depends on what KVM does for
+similar exits to userspace.  Helping userspace is nice-to-have, but not mandatory
+(and helping userspace can also create undesirable ABI).
 
-Cheers,
-Longman
+My preference would be that KVM doesn't bleed the SHARED bit into its exit ABI.
+And at a glance, that's exactly what KVM does for KVM_HC_MAP_GPA_RANGE.  In
+__tdx_map_gpa(), the so called "direct" bits are dropped (OMG, who's brilliant
+idea was it to add more use of "direct" in the MMU code):
 
+	tdx->vcpu.run->hypercall.args[0] = gpa & ~gfn_to_gpa(kvm_gfn_direct_bits(tdx->vcpu.kvm));
+	tdx->vcpu.run->hypercall.args[1] = size / PAGE_SIZE;
+	tdx->vcpu.run->hypercall.args[2] = vt_is_tdx_private_gpa(tdx->vcpu.kvm, gpa) ?
+					   KVM_MAP_GPA_RANGE_ENCRYPTED :
+					   KVM_MAP_GPA_RANGE_DECRYPTED;
+
+So, KVM should keep the vt_is_tdx_private_gpa(), but KVM also needs to strip the
+SHARED bit from the GPA reported to userspace.
 
