@@ -1,191 +1,130 @@
-Return-Path: <kvm+bounces-43021-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43022-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97383A82DAE
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 19:32:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78E36A82E2A
+	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 20:07:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 877F54678F8
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 17:31:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1BE07AC2E7
+	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 18:06:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 006102777F0;
-	Wed,  9 Apr 2025 17:31:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03717276057;
+	Wed,  9 Apr 2025 18:07:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a/qu9XU6"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18FC627702F;
-	Wed,  9 Apr 2025 17:31:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89DF11C5D7D
+	for <kvm@vger.kernel.org>; Wed,  9 Apr 2025 18:07:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744219876; cv=none; b=AHOsOgApmDUMNnrJUz6qsQ0j/TR2zKV7siB540zEEsFAMafXmwJYLEmKV8PVlaSsfEwcpT+Br8I//tJc93AnJzGaD0CQjDEJZxMqyBNfLCyG6D2hcCRVEx+3lXf8CPBPmll1yCaqOPqehjG3Q7vsrr6kYC4RkjLcrhKgQ0k/J08=
+	t=1744222044; cv=none; b=upypbpDBhqAiZOz9jviHgBCscv/UdV6mzJ7Ic8lf3bCgbTk8RQMYgCVQaDqWDbgxJY6eNmcEuWqocXg5Y1XMQmg7N2F1gYtRx/XJJ8AAvzoCCjd3gwra2OrIbdwelGLEM9nclPAJCxztud2DVah7c/e7GvXzxxuZZN+Xy4Rc2dI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744219876; c=relaxed/simple;
-	bh=N85pMNik+GwCAx2RSBW629DEr8NxuF243qnxQBAdB1U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YMtN6/b81j8WlyD95xI6//a/vWLqCmRmIHHKWDeuPIQF2xblk0VZzLOp58bIJ2OsT/WGlvEXJYpLPFrPM+jhYoxy379PCSBgkgczstvVeqnRbvJMELcLFr5KFnbR+4nb3E3F2NV7DjiG4oxb0URZLK2LN+PjdkWBr261hTaE0BA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A626E15A1;
-	Wed,  9 Apr 2025 10:31:13 -0700 (PDT)
-Received: from [10.57.89.24] (unknown [10.57.89.24])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 79A673F694;
-	Wed,  9 Apr 2025 10:31:08 -0700 (PDT)
-Message-ID: <6ccce610-62ba-484a-a8a0-d63b9081b037@arm.com>
-Date: Wed, 9 Apr 2025 18:31:08 +0100
+	s=arc-20240116; t=1744222044; c=relaxed/simple;
+	bh=oWsq7pSP/6klRvXAToImCF1XB9i+hJ0svmrgcQBJezw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QRXxAfI+UpA7BXKyRitwcTA6tqbEJ5OagTZNgbDR8FqnhDDSKILYvxkgs489isSrnY300/op93cBCEuyjpXhhQCZ50Go9FBWBMfjfXiVouIhU9+q/S1Ho2WfZ1xNi4mG/7aBibDgLnRcznSMecGiOVwCFWd/E8HrpT67trBsVh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a/qu9XU6; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5e5cbd8b19bso1219a12.1
+        for <kvm@vger.kernel.org>; Wed, 09 Apr 2025 11:07:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1744222041; x=1744826841; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QtbTi3Z46uGTzgxo/COziy1stCKj2J4tTz5eDTS8Rvw=;
+        b=a/qu9XU6868hI1YO61OgMX2qKNDsZU9HJNYLECcvCm54vTPl3roFu1dPG3o4j8KOrz
+         VtzYZBxJcTTDkAj1U14hHJX4oT7s5B391ND8ZW81473m/7Ez4cQcZNTkFCw1nPVomvKB
+         4M05bebJKjFAJugsa5KxiOaxHNUFJicEudPvK73usg+KZN6j1xocXhKuJwTVl0brvYaQ
+         cDev1bGoyHKrfgapYi9kKmW+z0k+mSGRqc0UcvnFIH0D1XBv7p4N1Gm4y8mkIK2dnkkG
+         nqD1ZYLJp+rOYNQKccSgeQV0GO+OVKhD2lmg8ayU/qnVUg3FqeMWMvaZkT/9oO4uARTP
+         oj2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744222041; x=1744826841;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QtbTi3Z46uGTzgxo/COziy1stCKj2J4tTz5eDTS8Rvw=;
+        b=QqRgRb/79cSWE95u+/teJGmd5rwGDC3Vj498pgF1QObqY1BnRnnL0KGYAxPLeDJoFi
+         v2xklr8g3RoKTbPSYJj15NSPoeYEXXnwczO3tq4NiU63lrxV5D+02qh19YoCNUybd+l1
+         Z013vgDzqRXAECF9xqnzy+PelXMrrZc+n493BZg49e+ulXMYDmV29POpCblueYNrkvss
+         +aBFad32ezVTFEL+64B5FaCi/U4d/12z/aFEmhrLTed+5Eh8KsKG9qIAN3ZLYelQEYoZ
+         +wQEL0WQh6OobQ6Vn1wY2N/TtvyHZZOheKbU+M7BJyytYclu2uIGBcsYMsy4BencifW6
+         f91A==
+X-Forwarded-Encrypted: i=1; AJvYcCUmhZuz+3bRYy7LaU7iY91/w07O9NgRA7zjRiuBQU/2d8BV1UZSSJJoNNyUA/fJjcFsCHk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywb4wP674j9grj80CLn1I5Eg+BGkn73aow9gSDkUbl2Znt2+lMd
+	MSx/0lXtUS3swrHIAwD+i0gmEg37UJ9lWgHiktzVmH42ljdZUE4KwxJfFZCCTiJmcZlt2MgghgK
+	Xc1t1WEkaWSRusQFfdeG8Vw3H7ED8z62tpIPA
+X-Gm-Gg: ASbGncv0fwFcoscqUuX3+Zjb9T0I9QJrFyC7vxPbUSBRXt6ByvUmJpx04fYRaTVAgDn
+	txrQgMxxLEfddFGo0cwg/40a7o3CV2PjwTEU6VwiDufGpaeN+PwvDH/RdEEtJRjxvriEDORVq3l
+	WmDHtPR8EMXQYFR50fJxCEUA==
+X-Google-Smtp-Source: AGHT+IFLXILkPvsN66UMgMow3edhrqHffiqmmr67EN0Hm4/JeFXIX+Q8tnRQcY8mh3z+oIpJxQXTe80KNTFeP5kc6FM=
+X-Received: by 2002:a05:6402:691:b0:5e5:c024:ec29 with SMTP id
+ 4fb4d7f45d1cf-5f328aa7669mr2385a12.0.1744222040672; Wed, 09 Apr 2025 11:07:20
+ -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 28/45] arm64: rme: support RSI_HOST_CALL
-To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Joey Gouly <joey.gouly@arm.com>, Catalin Marinas
- <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20250213161426.102987-1-steven.price@arm.com>
- <20250213161426.102987-29-steven.price@arm.com>
- <12b5ba41-4b1e-4876-9796-d1d6bb344015@redhat.com>
- <54f1fbb1-4fa1-4b09-bbac-3afcbb7ec478@arm.com>
- <b76ffc1c-32e1-4bf6-916a-41af9378fb4b@redhat.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <b76ffc1c-32e1-4bf6-916a-41af9378fb4b@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <cover.1743617897.git.jpoimboe@kernel.org> <df47d38d252b5825bc86afaf0d021b016286bf06.1743617897.git.jpoimboe@kernel.org>
+ <CALMp9eTGU5edP8JsV59Sktc1_pE+MSyCXw7jFxPs6+kDKBW6iQ@mail.gmail.com> <fqkt676ogwaagsdcscpdw3p5i3nkp2ka5vf4hlkxtd6qq7j35y@vsnt3nrgmmo5>
+In-Reply-To: <fqkt676ogwaagsdcscpdw3p5i3nkp2ka5vf4hlkxtd6qq7j35y@vsnt3nrgmmo5>
+From: Jim Mattson <jmattson@google.com>
+Date: Wed, 9 Apr 2025 11:07:08 -0700
+X-Gm-Features: ATxdqUFkqaXdDHS_kQwtSnvOSFLjU2LBylVO7-mb8tueLlp0v7jRT7H5Uwt09HY
+Message-ID: <CALMp9eTHsPeYi7wLaWtp-NuxE8Hz_LZUFYKUfzcx1+j+4-ZjmQ@mail.gmail.com>
+Subject: Re: [PATCH v3 2/6] x86/bugs: Use SBPB in __write_ibpb() if applicable
+To: Josh Poimboeuf <jpoimboe@kernel.org>
+Cc: x86@kernel.org, linux-kernel@vger.kernel.org, amit@kernel.org, 
+	kvm@vger.kernel.org, amit.shah@amd.com, thomas.lendacky@amd.com, bp@alien8.de, 
+	tglx@linutronix.de, peterz@infradead.org, pawan.kumar.gupta@linux.intel.com, 
+	corbet@lwn.net, mingo@redhat.com, dave.hansen@linux.intel.com, hpa@zytor.com, 
+	seanjc@google.com, pbonzini@redhat.com, daniel.sneddon@linux.intel.com, 
+	kai.huang@intel.com, sandipan.das@amd.com, boris.ostrovsky@oracle.com, 
+	Babu.Moger@amd.com, david.kaplan@amd.com, dwmw@amazon.co.uk, 
+	andrew.cooper3@citrix.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 08/04/2025 06:19, Gavin Shan wrote:
-> On 4/8/25 2:34 AM, Steven Price wrote:
->> On 04/03/2025 06:01, Gavin Shan wrote:
->>> On 2/14/25 2:14 AM, Steven Price wrote:
->>>> From: Joey Gouly <joey.gouly@arm.com>
->>>>
->>>> Forward RSI_HOST_CALLS to KVM's HVC handler.
->>>>
->>>> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
->>>> Signed-off-by: Steven Price <steven.price@arm.com>
->>>> ---
->>>> Changes since v4:
->>>>    * Setting GPRS is now done by kvm_rec_enter() rather than
->>>>      rec_exit_host_call() (see previous patch - arm64: RME: Handle
->>>> realm
->>>>      enter/exit). This fixes a bug where the registers set by user
->>>> space
->>>>      were being ignored.
->>>> ---
->>>>    arch/arm64/kvm/rme-exit.c | 22 ++++++++++++++++++++++
->>>>    1 file changed, 22 insertions(+)
->>>>
->>>> diff --git a/arch/arm64/kvm/rme-exit.c b/arch/arm64/kvm/rme-exit.c
->>>> index c785005f821f..4f7602aa3c6c 100644
->>>> --- a/arch/arm64/kvm/rme-exit.c
->>>> +++ b/arch/arm64/kvm/rme-exit.c
->>>> @@ -107,6 +107,26 @@ static int rec_exit_ripas_change(struct kvm_vcpu
->>>> *vcpu)
->>>>        return -EFAULT;
->>>>    }
->>>>    +static int rec_exit_host_call(struct kvm_vcpu *vcpu)
->>>> +{
->>>> +    int ret, i;
->>>> +    struct realm_rec *rec = &vcpu->arch.rec;
->>>> +
->>>> +    vcpu->stat.hvc_exit_stat++;
->>>> +
->>>> +    for (i = 0; i < REC_RUN_GPRS; i++)
->>>> +        vcpu_set_reg(vcpu, i, rec->run->exit.gprs[i]);
->>>> +
->>>> +    ret = kvm_smccc_call_handler(vcpu);
->>>> +
->>>> +    if (ret < 0) {
->>>> +        vcpu_set_reg(vcpu, 0, ~0UL);
->>>> +        ret = 1;
->>>> +    }
->>>> +
->>>> +    return ret;
->>>> +}
->>>> +
->>>
->>> I don't understand how a negative error can be returned from
->>> kvm_smccc_call_handler().
->>
->> I don't believe it really can. However kvm_smccc_call_handler() calls
->> kvm_psci_call() and that has a documentation block which states:
->>
->>   * This function returns: > 0 (success), 0 (success but exit to user
->>   * space), and < 0 (errors)
->>   *
->>   * Errors:
->>   * -EINVAL: Unrecognized PSCI function
->>
->> But I can't actually see code which returns the negative value...
->>
-> 
-> I think the comments for kvm_psci_call() aren't correct since its return
-> value
-> can't be negative after 7e484d2785e2 ("KVM: arm64: Return NOT_SUPPORTED
-> to guest
-> for unknown PSCI version"). The comments should have been adjusted in
-> that commit.
-> 
-> Please take a look on 37c8e4947947 ("KVM: arm64: Let errors from SMCCC
-> emulation
-> to reach userspace"). Similarly, the block of code to set GPR0 to ~0ULL
-> when negative
-> error is returned from kvm_smccc_call_handler() in this patch needs to
-> be dropped.
-> 
->>> Besides, SMCCC_RET_NOT_SUPPORTED has been set to GPR[0 - 3] if the
->>> request can't be
->>> supported. Why we need to set GPR[0] to ~0UL, which corresponds to
->>> SMCCC_RET_NOT_SUPPORTED
->>> if I'm correct. I guess change log or a comment to explain the questions
->>> would be
->>> nice.
->>
->> I'll add a comment explaining we don't expect negative codes. And I'll
->> expand ~0UL to SMCCC_RET_NOT_SUPPORTED which is what it should be.
->>
-> 
-> Please refer to the above reply. The block of code needs to be dropped.
+On Wed, Apr 2, 2025 at 7:18=E2=80=AFPM Josh Poimboeuf <jpoimboe@kernel.org>=
+ wrote:
+>
+> On Wed, Apr 02, 2025 at 02:04:04PM -0700, Jim Mattson wrote:
+> > On Wed, Apr 2, 2025 at 11:20=E2=80=AFAM Josh Poimboeuf <jpoimboe@kernel=
+.org> wrote:
+> > >
+> > > __write_ibpb() does IBPB, which (among other things) flushes branch t=
+ype
+> > > predictions on AMD.  If the CPU has SRSO_NO, or if the SRSO mitigatio=
+n
+> > > has been disabled, branch type flushing isn't needed, in which case t=
+he
+> > > lighter-weight SBPB can be used.
+> >
+> > When nested SVM is not supported, should KVM "promote"
+> > SRSO_USER_KERNEL_NO on the host to SRSO_NO in KVM_GET_SUPPORTED_CPUID?
+> > Or is a Linux guest clever enough to do the promotion itself if
+> > CPUID.80000001H:ECX.SVM[bit 2] is clear?
+>
+> I'm afraid that question is beyond my pay grade, maybe some AMD or virt
+> folks can chime in.
 
-Thanks for the pointers, I had not been aware of that change. Yes this
-code should be updated to match.
+That question aside, I'm not sure that this series is safe with
+respect to nested virtualization.
 
-Thanks,
-Steve
-
->> Thanks,
->> Steve
->>
->>>>    static void update_arch_timer_irq_lines(struct kvm_vcpu *vcpu)
->>>>    {
->>>>        struct realm_rec *rec = &vcpu->arch.rec;
->>>> @@ -168,6 +188,8 @@ int handle_rec_exit(struct kvm_vcpu *vcpu, int
->>>> rec_run_ret)
->>>>            return rec_exit_psci(vcpu);
->>>>        case RMI_EXIT_RIPAS_CHANGE:
->>>>            return rec_exit_ripas_change(vcpu);
->>>> +    case RMI_EXIT_HOST_CALL:
->>>> +        return rec_exit_host_call(vcpu);
->>>>        }
->>>>          kvm_pr_unimpl("Unsupported exit reason: %u\n",
->>>
-> 
-> Thanks,
-> Gavin
-> 
-
+If the CPU has SRSO_NO, then KVM will report SRSO_NO in
+KVM_GET_SUPPORTED_CPUID. However, in nested virtualization, the L1
+guest and the L2 guest share a prediction domain. KVM currently
+ensures isolation between L1 and L2 with a call to
+indirect_branch_prediction_barrier() in svm_vcpu_load(). I think that
+particular barrier should *always* be a full IBPB--even if the host
+has SRSO_NO.
 
