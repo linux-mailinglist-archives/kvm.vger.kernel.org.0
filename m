@@ -1,192 +1,259 @@
-Return-Path: <kvm+bounces-43024-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43025-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF164A82F3C
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 20:49:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1969A8303B
+	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 21:17:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE6D2189850E
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 18:47:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1DEDD7B107B
+	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 19:16:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EE4327815A;
-	Wed,  9 Apr 2025 18:46:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0C591E47AD;
+	Wed,  9 Apr 2025 19:17:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a0v7yDk8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qJI2/Xoi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BE89269B1E
-	for <kvm@vger.kernel.org>; Wed,  9 Apr 2025 18:46:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C5891C6BE;
+	Wed,  9 Apr 2025 19:17:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744224418; cv=none; b=HFbGdo4Etpx05/Hz/Bo9zEPh1oj3cCy2yEsfTykW+Uo+K4Xger53rLIKSCxZrA0dG4pX1jbE8xiyy6zRgIt6v1UMGYvmuDr/sLYqPSuPmlYBCIXnxz5ZLYtH8KeGHll2y/HPGMMTub8LGrhLdNJgwn+uN4p22nAnfalABG3Z3Ac=
+	t=1744226234; cv=none; b=WlclO+1eE9cJsdyU3MIJTMniEy+CzW/vgTZBz8bsHSqAHwT08dsKofOj9whlC72tmHSy/+p9IKEoRC/q9JZuTSvvNvcKfMzHJ3XPGj/wMw3yXslCIeqgfQDjBuHGBwOqG/JjETXsT5T7/3/lW9B+MWk2Tq+zmb0zS3Uov/66R+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744224418; c=relaxed/simple;
-	bh=CoanTTMT0CbufX4KvUSMVSuYCLAneonzZauwp79/Uz4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oqI+nsFMp0wPzeYMw7owaqnlaWahOPnvZrGQpFGHlPe5x5ZvFGA5mTvtU+u2BinkOlntlo4w/fr/7+rtRuImKbAzbTgLjje9/O7okddGWV2DMn5VZ8f3NvB3E4PXqhvHyXkG55n9uAj/U9LPqoXrQlUtE1zBkR0v27K8+SrC3iI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a0v7yDk8; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5e789411187so2113a12.1
-        for <kvm@vger.kernel.org>; Wed, 09 Apr 2025 11:46:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744224415; x=1744829215; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nL64O1VAHEysyhdQpgZlOywhE8fp5eAQ0KtkfehCFRM=;
-        b=a0v7yDk8PiLs8fYzjzWqEg2YPe6/gOk3372SMlsf3TdQ3cQhYUR2fF5gPH6RvXdD28
-         J/MCCxm4Hoa3Sl9WtYcxEr1/Njayo9QarBsE7YT5ohgNSPko54DhEF44BbkUvi/HsYzH
-         z6YKE5s4dmHKZQXyUZFmyOkwz85UgusC0l9eH8Vzz6wpZYinJ6629DYDPKKJhKHcItxM
-         9lleq62sGWNsKzzeGkQNbgQjegNgV9qMZm/7NHFnzdCQ0Nz7aMrPbw3JgVmIwvbdmfZ3
-         eoLZFoPgEUP3I5CH9fF0ktgqrudSQJzp/ZB/Y/1dA0ppURBFboKLr4p5vG57t13yNQmD
-         bjNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744224415; x=1744829215;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nL64O1VAHEysyhdQpgZlOywhE8fp5eAQ0KtkfehCFRM=;
-        b=Fi2UtMQdfyrPckHzUVVsG9dxhYuSmQVVTVTkJWUEkZQZr9QD8eaZ2+TQN+zMdgZsbW
-         JTmYLoBuqj/ZpCq727JKWpOejEPDLDfoKc5HdMEDThznly5fLB/9FpNLe4NAatXYF6WL
-         qLs+eEfXFqOJhT+Xzj3Ynow7GoWMpRsuWqWyAwBFa29d7OZbvRSDECKJpH7qoE3w24br
-         2MtTLN03xkf/rZNsbkH0I0gdq4MjEc4J4BrnJfohjUUx2xBIhW+ijypTHsaAiM1L6L4n
-         UgsY98Wl7wNG0wqF5Eh1O4NfYy9CmiWi0QpqLW6wu6XsOmSnanass3O1Y7DCq5+zakF8
-         5oeg==
-X-Forwarded-Encrypted: i=1; AJvYcCWMIk4JJswNe7nhjggB2Ddv35iDrDI0eygDb736y2NuG3iZywJut5dTRXBcQWRRK7c7JF8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwXK5yx4ip4JDZCYVRbtdeN2RlvJEm2UxBLPAGYvJKVn1Rty/s
-	9ODZkdI4Uo6UhMbInd1rOGuIyXQgJDmz5QnkJzGcRRa0+id+m5BngZf7OUwj5mesD/WQI4G17CM
-	WRYwN0jUBQPjsppsjQAyhEeleRl2o68VboVVE
-X-Gm-Gg: ASbGncsK6BtiYaDkGKgCO3K6Onwd1emWQFfrvEjXZYGUbXKWjjblHaxalKdLtlbR7uQ
-	cMNXEmMo9b853CxqcRtHjg0qd+wUMlxccwWcdjvwU2TYrgJW9wOZrgsmwYhfoh5Cj/DfY8DWKLH
-	PF8UwTffFXbGT4Yzrm2n3WQw==
-X-Google-Smtp-Source: AGHT+IEA0hCFNGoOpzSxPL1RWxfu+gtod9jSAlUasewta6jPrr465b7oOTz4uOLf2/FJuHgEEGA//dmDeNFMK5xxuOo=
-X-Received: by 2002:aa7:dbce:0:b0:5eb:5d50:4fec with SMTP id
- 4fb4d7f45d1cf-5f328d1f297mr872a12.0.1744224414454; Wed, 09 Apr 2025 11:46:54
- -0700 (PDT)
+	s=arc-20240116; t=1744226234; c=relaxed/simple;
+	bh=bF03VxvTsU+BqmHsQq0q+S9ppRrCc1/KlnD8PJitqk8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ROzE8dUwHA2d2YtFV8hBxnZ3kqekwy9ziKop/gM1fL8/EsljRzVzABCUuiCVmBV+Bfo2Kwc6mJNZCq4ZtEG7mJhVw+Hgvhu+b2vP4XPb4r5YVxNrxKcDmevQRYWMpt4i8Oim0xoCwqnlfcJwUIxyuOiYY0oxGQ5nXnJY5ilBBhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qJI2/Xoi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE2B7C4CEE2;
+	Wed,  9 Apr 2025 19:17:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744226234;
+	bh=bF03VxvTsU+BqmHsQq0q+S9ppRrCc1/KlnD8PJitqk8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qJI2/XoironzsJaz+i80e/WQ5Qp9VcugyrJtl/YBj3oj0+B7CR2sHsGtWpizK6yO4
+	 VBHn2aUCKN25vPTBjtUJ5ErBpW2uZ0Nr7njrQYPiJXVIm5JOFP/Aa8E5gmKRCoJxm0
+	 2vFvQqbHpIzkDxqkRul6nNrkQNGD3XqtCFeaHlXiWlZ71xy8f9NAVNkpTbM33mpsn2
+	 gk6Zv+IScY5WaKqKDsrRvA4EyHwyJNofhELmFBXXaSUa90cRftnriGKZcCivNb5MT/
+	 7CNvC3GIEekiFTO9pLOuthuuJFylF+HSeUIxKp18BpylKcbyjrBpuCpkk/cUVDn0Ei
+	 6TKBITTbXPjew==
+Date: Wed, 9 Apr 2025 21:17:02 +0200
+From: Ingo Molnar <mingo@kernel.org>
+To: Xin Li <xin@zytor.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	virtualization@lists.linux.dev, linux-edac@vger.kernel.org,
+	kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+	linux-ide@vger.kernel.org, linux-pm@vger.kernel.org,
+	bpf@vger.kernel.org, llvm@lists.linux.dev, tglx@linutronix.de,
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+	x86@kernel.org, jgross@suse.com, andrew.cooper3@citrix.com,
+	peterz@infradead.org, acme@kernel.org, namhyung@kernel.org,
+	mark.rutland@arm.com, alexander.shishkin@linux.intel.com,
+	jolsa@kernel.org, irogers@google.com, adrian.hunter@intel.com,
+	kan.liang@linux.intel.com, wei.liu@kernel.org,
+	ajay.kaher@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
+	tony.luck@intel.com, pbonzini@redhat.com, vkuznets@redhat.com,
+	seanjc@google.com, luto@kernel.org, boris.ostrovsky@oracle.com,
+	kys@microsoft.com, haiyangz@microsoft.com, decui@microsoft.com,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: [PATCH] x86/msr: Standardize on 'u32' MSR indices in <asm/msr.h>
+Message-ID: <Z_bHrjUKKWN28TX9@gmail.com>
+References: <20250331082251.3171276-1-xin@zytor.com>
+ <20250331082251.3171276-2-xin@zytor.com>
+ <Z-pruogreCuU66wm@gmail.com>
+ <9D15DE81-2E68-4FCD-A133-4963602E18C9@zytor.com>
+ <Z-ubVFyoOzwKhI53@gmail.com>
+ <c316a6c6-b97c-48b2-9598-d44e2ec72fbc@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1743617897.git.jpoimboe@kernel.org> <df47d38d252b5825bc86afaf0d021b016286bf06.1743617897.git.jpoimboe@kernel.org>
- <CALMp9eTGU5edP8JsV59Sktc1_pE+MSyCXw7jFxPs6+kDKBW6iQ@mail.gmail.com>
- <fqkt676ogwaagsdcscpdw3p5i3nkp2ka5vf4hlkxtd6qq7j35y@vsnt3nrgmmo5>
- <CALMp9eTHsPeYi7wLaWtp-NuxE8Hz_LZUFYKUfzcx1+j+4-ZjmQ@mail.gmail.com> <LV3PR12MB92658D9E1EBD4C38C035B19594B42@LV3PR12MB9265.namprd12.prod.outlook.com>
-In-Reply-To: <LV3PR12MB92658D9E1EBD4C38C035B19594B42@LV3PR12MB9265.namprd12.prod.outlook.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Wed, 9 Apr 2025 11:46:42 -0700
-X-Gm-Features: ATxdqUFKbYO0YhG-LPKyugRZVoyXQkxn_BhcPUkID_Chig4x_vZU89LqrTfo_hA
-Message-ID: <CALMp9eRwEJ7GcbgtRw5arT+zmtCkOqB5n3qw25EyhdcbDuqthg@mail.gmail.com>
-Subject: Re: [PATCH v3 2/6] x86/bugs: Use SBPB in __write_ibpb() if applicable
-To: "Kaplan, David" <David.Kaplan@amd.com>
-Cc: Josh Poimboeuf <jpoimboe@kernel.org>, "x86@kernel.org" <x86@kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "amit@kernel.org" <amit@kernel.org>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Shah, Amit" <Amit.Shah@amd.com>, 
-	"Lendacky, Thomas" <Thomas.Lendacky@amd.com>, "bp@alien8.de" <bp@alien8.de>, 
-	"tglx@linutronix.de" <tglx@linutronix.de>, "peterz@infradead.org" <peterz@infradead.org>, 
-	"pawan.kumar.gupta@linux.intel.com" <pawan.kumar.gupta@linux.intel.com>, "corbet@lwn.net" <corbet@lwn.net>, 
-	"mingo@redhat.com" <mingo@redhat.com>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "hpa@zytor.com" <hpa@zytor.com>, 
-	"seanjc@google.com" <seanjc@google.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"daniel.sneddon@linux.intel.com" <daniel.sneddon@linux.intel.com>, 
-	"kai.huang@intel.com" <kai.huang@intel.com>, "Das1, Sandipan" <Sandipan.Das@amd.com>, 
-	"boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>, "Moger, Babu" <Babu.Moger@amd.com>, 
-	"dwmw@amazon.co.uk" <dwmw@amazon.co.uk>, "andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c316a6c6-b97c-48b2-9598-d44e2ec72fbc@zytor.com>
 
-On Wed, Apr 9, 2025 at 11:29=E2=80=AFAM Kaplan, David <David.Kaplan@amd.com=
-> wrote:
->
-> [AMD Official Use Only - AMD Internal Distribution Only]
->
-> > -----Original Message-----
-> > From: Jim Mattson <jmattson@google.com>
-> > Sent: Wednesday, April 9, 2025 11:07 AM
-> > To: Josh Poimboeuf <jpoimboe@kernel.org>
-> > Cc: x86@kernel.org; linux-kernel@vger.kernel.org; amit@kernel.org;
-> > kvm@vger.kernel.org; Shah, Amit <Amit.Shah@amd.com>; Lendacky, Thomas
-> > <Thomas.Lendacky@amd.com>; bp@alien8.de; tglx@linutronix.de;
-> > peterz@infradead.org; pawan.kumar.gupta@linux.intel.com; corbet@lwn.net=
-;
-> > mingo@redhat.com; dave.hansen@linux.intel.com; hpa@zytor.com;
-> > seanjc@google.com; pbonzini@redhat.com; daniel.sneddon@linux.intel.com;
-> > kai.huang@intel.com; Das1, Sandipan <Sandipan.Das@amd.com>;
-> > boris.ostrovsky@oracle.com; Moger, Babu <Babu.Moger@amd.com>; Kaplan,
-> > David <David.Kaplan@amd.com>; dwmw@amazon.co.uk;
-> > andrew.cooper3@citrix.com
-> > Subject: Re: [PATCH v3 2/6] x86/bugs: Use SBPB in __write_ibpb() if app=
-licable
-> >
-> > Caution: This message originated from an External Source. Use proper ca=
-ution
-> > when opening attachments, clicking links, or responding.
-> >
-> >
-> > On Wed, Apr 2, 2025 at 7:18=E2=80=AFPM Josh Poimboeuf <jpoimboe@kernel.=
-org> wrote:
-> > >
-> > > On Wed, Apr 02, 2025 at 02:04:04PM -0700, Jim Mattson wrote:
-> > > > On Wed, Apr 2, 2025 at 11:20=E2=80=AFAM Josh Poimboeuf <jpoimboe@ke=
-rnel.org>
-> > wrote:
-> > > > >
-> > > > > __write_ibpb() does IBPB, which (among other things) flushes
-> > > > > branch type predictions on AMD.  If the CPU has SRSO_NO, or if th=
-e
-> > > > > SRSO mitigation has been disabled, branch type flushing isn't
-> > > > > needed, in which case the lighter-weight SBPB can be used.
-> > > >
-> > > > When nested SVM is not supported, should KVM "promote"
-> > > > SRSO_USER_KERNEL_NO on the host to SRSO_NO in
-> > KVM_GET_SUPPORTED_CPUID?
-> > > > Or is a Linux guest clever enough to do the promotion itself if
-> > > > CPUID.80000001H:ECX.SVM[bit 2] is clear?
-> > >
-> > > I'm afraid that question is beyond my pay grade, maybe some AMD or
-> > > virt folks can chime in.
-> >
-> > That question aside, I'm not sure that this series is safe with respect=
- to nested
-> > virtualization.
-> >
-> > If the CPU has SRSO_NO, then KVM will report SRSO_NO in
-> > KVM_GET_SUPPORTED_CPUID. However, in nested virtualization, the L1 gues=
-t
-> > and the L2 guest share a prediction domain. KVM currently ensures isola=
-tion
-> > between L1 and L2 with a call to
-> > indirect_branch_prediction_barrier() in svm_vcpu_load(). I think that p=
-articular
-> > barrier should *always* be a full IBPB--even if the host has SRSO_NO.
->
-> I don't think that's true.
->
-> If SRSO_NO=3D1, the indirect_branch_prediction_barrier() in svm_vcpu_load=
-() I believe only needs to prevent indirect predictions from leaking from o=
-ne VM to another, which is what SBPB provides.  Keep in mind that before SR=
-SO came out, IBPB on these parts was only flushing indirect predictions.  S=
-BPB become the 'legacy' IBPB functionality while IBPB turned into a full fl=
-ush (on certain parts).  If the CPU is immune to SRSO, you don't need the f=
-ull flush.
->
-> I also don't think promoting SRSO_USER_KERNEL_NO to SRSO_NO should ever b=
-e done.  When SRSO_NO=3D1, it tells the OS that it can use SBPB on context =
-switches because the only process->process BTB concern is with indirect pre=
-dictions.  The OS has to use IBPB if SRSO_NO=3D0 (regardless of SRSO_USER_K=
-ERNEL_NO) to prevent SRSO attacks from process->process.
 
-Thanks, David!
+* Xin Li <xin@zytor.com> wrote:
 
-Conceptually, it sounds like SRSO_NO =3D (SRSO_USER_KERNEL_NO +
-SRSO_SAME_MODE_NO). You don't need an IBPB between L1 and L2 on
-SRSO_NO parts, because SRSO_SAME_MODE_NO is implied. Similarly, you
-can't "promote" SRSO_USER_KERNEL_NO to SRSO_NO, even absent SVM,
-because SRSO_SAME_MODE_NO is missing.
+> On 4/1/2025 12:52 AM, Ingo Molnar wrote:
+> > > Should we rename the *msrl() functions to *msrq() as part of this
+> > > overhaul?
+> > Yeah, that's a good idea, and because talk is cheap I just implemented
+> > this in the tip:WIP.x86/msr branch with a couple of other cleanups in
+> > this area (see the shortlog & diffstat below), but the churn is high:
+> > 
+> >    144 files changed, 1034 insertions(+), 1034 deletions(-)
+> 
+> Hi Ingo,
+> 
+> I noticed that you keep the type of MSR index in these patches as
+> "unsigned int".
+> 
+> I'm thinking would it be better to standardize it as "u32"?
+> 
+> Because:
+> 1) MSR index is placed in ECX to execute MSR instructions, and the
+>    high-order 32 bits of RCX are ignored on 64-bit.
+> 2) MSR index is encoded as a 32-bit immediate in the new immediate form
+>    MSR instructions.
+
+Makes sense - something like the attached patch?
+
+Thanks,
+
+	Ingo
+
+=====================>
+From: Ingo Molnar <mingo@kernel.org>
+Date: Wed, 9 Apr 2025 21:12:39 +0200
+Subject: [PATCH] x86/msr: Standardize on 'u32' MSR indices in <asm/msr.h>
+
+This is the customary type used for hardware ABIs.
+
+Suggested-by: Xin Li <xin@zytor.com>
+Suggested-by: "H. Peter Anvin" <hpa@zytor.com>
+Signed-off-by: Ingo Molnar <mingo@kernel.org>
+---
+ arch/x86/include/asm/msr.h | 29 ++++++++++++++---------------
+ arch/x86/lib/msr.c         |  4 ++--
+ 2 files changed, 16 insertions(+), 17 deletions(-)
+
+diff --git a/arch/x86/include/asm/msr.h b/arch/x86/include/asm/msr.h
+index 4ee9ae734c08..20deb58308e5 100644
+--- a/arch/x86/include/asm/msr.h
++++ b/arch/x86/include/asm/msr.h
+@@ -63,12 +63,12 @@ struct saved_msrs {
+ DECLARE_TRACEPOINT(read_msr);
+ DECLARE_TRACEPOINT(write_msr);
+ DECLARE_TRACEPOINT(rdpmc);
+-extern void do_trace_write_msr(unsigned int msr, u64 val, int failed);
+-extern void do_trace_read_msr(unsigned int msr, u64 val, int failed);
++extern void do_trace_write_msr(u32 msr, u64 val, int failed);
++extern void do_trace_read_msr(u32 msr, u64 val, int failed);
+ extern void do_trace_rdpmc(u32 msr, u64 val, int failed);
+ #else
+-static inline void do_trace_write_msr(unsigned int msr, u64 val, int failed) {}
+-static inline void do_trace_read_msr(unsigned int msr, u64 val, int failed) {}
++static inline void do_trace_write_msr(u32 msr, u64 val, int failed) {}
++static inline void do_trace_read_msr(u32 msr, u64 val, int failed) {}
+ static inline void do_trace_rdpmc(u32 msr, u64 val, int failed) {}
+ #endif
+ 
+@@ -79,7 +79,7 @@ static inline void do_trace_rdpmc(u32 msr, u64 val, int failed) {}
+  * think of extending them - you will be slapped with a stinking trout or a frozen
+  * shark will reach you, wherever you are! You've been warned.
+  */
+-static __always_inline u64 __rdmsr(unsigned int msr)
++static __always_inline u64 __rdmsr(u32 msr)
+ {
+ 	DECLARE_ARGS(val, low, high);
+ 
+@@ -91,7 +91,7 @@ static __always_inline u64 __rdmsr(unsigned int msr)
+ 	return EAX_EDX_VAL(val, low, high);
+ }
+ 
+-static __always_inline void __wrmsr(unsigned int msr, u32 low, u32 high)
++static __always_inline void __wrmsr(u32 msr, u32 low, u32 high)
+ {
+ 	asm volatile("1: wrmsr\n"
+ 		     "2:\n"
+@@ -113,7 +113,7 @@ do {							\
+ 	__wrmsr((msr), (u32)((u64)(val)),		\
+ 		       (u32)((u64)(val) >> 32))
+ 
+-static inline u64 native_read_msr(unsigned int msr)
++static inline u64 native_read_msr(u32 msr)
+ {
+ 	u64 val;
+ 
+@@ -125,8 +125,7 @@ static inline u64 native_read_msr(unsigned int msr)
+ 	return val;
+ }
+ 
+-static inline u64 native_read_msr_safe(unsigned int msr,
+-						      int *err)
++static inline u64 native_read_msr_safe(u32 msr, int *err)
+ {
+ 	DECLARE_ARGS(val, low, high);
+ 
+@@ -142,7 +141,7 @@ static inline u64 native_read_msr_safe(unsigned int msr,
+ 
+ /* Can be uninlined because referenced by paravirt */
+ static inline void notrace
+-native_write_msr(unsigned int msr, u32 low, u32 high)
++native_write_msr(u32 msr, u32 low, u32 high)
+ {
+ 	__wrmsr(msr, low, high);
+ 
+@@ -152,7 +151,7 @@ native_write_msr(unsigned int msr, u32 low, u32 high)
+ 
+ /* Can be uninlined because referenced by paravirt */
+ static inline int notrace
+-native_write_msr_safe(unsigned int msr, u32 low, u32 high)
++native_write_msr_safe(u32 msr, u32 low, u32 high)
+ {
+ 	int err;
+ 
+@@ -251,7 +250,7 @@ do {								\
+ 	(void)((high) = (u32)(__val >> 32));			\
+ } while (0)
+ 
+-static inline void wrmsr(unsigned int msr, u32 low, u32 high)
++static inline void wrmsr(u32 msr, u32 low, u32 high)
+ {
+ 	native_write_msr(msr, low, high);
+ }
+@@ -259,13 +258,13 @@ static inline void wrmsr(unsigned int msr, u32 low, u32 high)
+ #define rdmsrq(msr, val)			\
+ 	((val) = native_read_msr((msr)))
+ 
+-static inline void wrmsrq(unsigned int msr, u64 val)
++static inline void wrmsrq(u32 msr, u64 val)
+ {
+ 	native_write_msr(msr, (u32)(val & 0xffffffffULL), (u32)(val >> 32));
+ }
+ 
+ /* wrmsr with exception handling */
+-static inline int wrmsr_safe(unsigned int msr, u32 low, u32 high)
++static inline int wrmsr_safe(u32 msr, u32 low, u32 high)
+ {
+ 	return native_write_msr_safe(msr, low, high);
+ }
+@@ -280,7 +279,7 @@ static inline int wrmsr_safe(unsigned int msr, u32 low, u32 high)
+ 	__err;							\
+ })
+ 
+-static inline int rdmsrq_safe(unsigned int msr, u64 *p)
++static inline int rdmsrq_safe(u32 msr, u64 *p)
+ {
+ 	int err;
+ 
+diff --git a/arch/x86/lib/msr.c b/arch/x86/lib/msr.c
+index e18925899f13..4ef7c6dcbea6 100644
+--- a/arch/x86/lib/msr.c
++++ b/arch/x86/lib/msr.c
+@@ -122,14 +122,14 @@ int msr_clear_bit(u32 msr, u8 bit)
+ EXPORT_SYMBOL_GPL(msr_clear_bit);
+ 
+ #ifdef CONFIG_TRACEPOINTS
+-void do_trace_write_msr(unsigned int msr, u64 val, int failed)
++void do_trace_write_msr(u32 msr, u64 val, int failed)
+ {
+ 	trace_write_msr(msr, val, failed);
+ }
+ EXPORT_SYMBOL(do_trace_write_msr);
+ EXPORT_TRACEPOINT_SYMBOL(write_msr);
+ 
+-void do_trace_read_msr(unsigned int msr, u64 val, int failed)
++void do_trace_read_msr(u32 msr, u64 val, int failed)
+ {
+ 	trace_read_msr(msr, val, failed);
+ }
 
