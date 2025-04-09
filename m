@@ -1,142 +1,163 @@
-Return-Path: <kvm+bounces-43030-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43031-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F19B3A831C5
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 22:20:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AFA7A831DC
+	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 22:24:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C0A619E6BE1
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 20:20:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6896119E7D00
+	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 20:25:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A798E212FAC;
-	Wed,  9 Apr 2025 20:19:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F07D212B3D;
+	Wed,  9 Apr 2025 20:24:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="Wn+nA0JZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B6XZa/F7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F081E1E570B
-	for <kvm@vger.kernel.org>; Wed,  9 Apr 2025 20:19:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62DFD101C8;
+	Wed,  9 Apr 2025 20:24:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744229985; cv=none; b=CH9UFNTrj/5NoYqAPj0XNbm6D6nJt430aZ5VT7vgbCG1h7Sxy33Ef88sGVQMPoSsQ4JiDB7Eu2IlgC0cDg+GS/mqutvQjj9kAt+d51QoaQLrJYyEZhZ+jocCiBSNA9OXzgfXNF8FUNwqfNYVP0DLlhxPHMrsWCjr0Ds1cXpCz5Y=
+	t=1744230283; cv=none; b=tb1+qW/43rEYGECqPFtylexoukJD7qx9KyYk8upFTEAIhxeiC0LW+dv3icX4eA/zk2AEgmZKQXm1wVt+njmGbsOYKrUMw8eQqexTiu27zKeKzlknuXZLDa7+qLxqngWz9eA1ShVA3/FG9LUP+oeX6tDgaZg15ynLvv+ao2I+qVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744229985; c=relaxed/simple;
-	bh=vFYL2A2m4BVqGIUPwG+SJe8Wi/rBo/+xMXvF158DHXI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HVBLrl0hXqXuzh+jIaZKlRX1BXWcoXJ1FS2hn1O7VuhYUO92y1aF3sXRbJW27AhkYrmbayY4h1jztBdPL9+NQnKFSyOYMgiNVVvhUtzhxjY2qWLdwsqq2ZWaQ1IcDsfjT3EyL+dP6NrnbvetxkQtRvmRtbUDHh0k7slFAnGTnck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=Wn+nA0JZ; arc=none smtp.client-ip=209.85.219.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e60b75f87aaso49273276.2
-        for <kvm@vger.kernel.org>; Wed, 09 Apr 2025 13:19:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1744229982; x=1744834782; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VsHh17W+bDIV1e4xVUO/JwjeRPH7cOalB9Js2vjnhrU=;
-        b=Wn+nA0JZQAGWXBbLIKOsOUEp6QNQFXHFfl8D9NHSUQH82ABaXlAr50iV+7HSk/LZ5q
-         qx83eELju83YbCI2XWoyLlB3SZVZaRWjw7YEbQZvdLPyWG9MCMlD6X6v+VCg+pKiPCte
-         kUtBSXZZ2Qo+odi9Y5zgSmAy3ErlpXgwOmQ9U3Q5ixc9brwQnG+lulMQO98V0WBFWMsJ
-         +fGiXrx641WxrozoR1GTYX+VQbUBJPGqYtgyHbMIDVOcR/PIYFLtUkmWwz/UvLzO1AA7
-         WV+ouudBXgaa3eo00UmsD2TVEcyoT8t+QffxgHPg06ODRAFr2u/5dz69btPw7PUcr7gY
-         Q3NQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744229982; x=1744834782;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VsHh17W+bDIV1e4xVUO/JwjeRPH7cOalB9Js2vjnhrU=;
-        b=jMbBkcBWEygUeKeUm8O/qHKwWdZXmc+hLKqApckPdHu9cOyfpGpT5Y7UIYVGMpqjlT
-         tR0mmc8LUHbu2ELOMw+k1OX0plrTLhBoABRWaJ3XcvBdJkZbmH6Bpm680zdB2AhHcEmF
-         vopIpuKq1c27gAu5pcF5PcENIPS9g6KrICYHEMRFtSPcvT1oJd4xl22s3PXUogCC5WJt
-         gaHTsPwAGqOVrfCJsKiOyt++EKNBUTwXSZLdq/N+8HF3Pm9JjJAULMqtGFKaxGccDqRH
-         SniJ8J4SzJEdF9bvTpKEAUWeyMLbUYfQ2w8pIXdqTWIJg2jX3Mk2tLiCsXLMbyc9i+kz
-         2a4A==
-X-Forwarded-Encrypted: i=1; AJvYcCXAqr/+s79v+eTqgkwmIA43vztFjWhRyUDWRKBjez71ncLheOCI7U0GZuT+UkC/mHKWMMc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWcziIv2erinhM92ESxXBtIvV6uSgux8wNGEd/KpAomyx5YLwh
-	0Xr6iAF4wONnvskwFIuS5Af1B0N81M7uJKdwT22THYggQ7B+d/mKvswdDldq09YUvKz/Gw9BrQw
-	3asiSIuL7E0Vju1XrNuXTN1CeVDdMpV+bgdHf
-X-Gm-Gg: ASbGncvptgmncaYWUPfwCEz0sRsALAKGSpuNC1N2iWryGLfDB8PKBSAPnOssaJu4Lyi
-	cva9pdasTdUir6XKQP3RRQdume58mQTzXc1ogqWrgIZqwUWOnkl9aKFlnZll5Ih7wnyhfREwhCF
-	hRiRxcruhcwEkLPTUi5VFOwA==
-X-Google-Smtp-Source: AGHT+IEGCJR9IA5jDMT2Of/TaTFQ6Kl+jhMbbHqtWzPYG+QuFj2lKMDW1yD44Tl3NdNB6jTiuM59Ql0Ux2XWfYO9+PU=
-X-Received: by 2002:a05:6902:1b90:b0:e6d:f3ca:3e15 with SMTP id
- 3f1490d57ef6-e703e0ecf38mr658467276.3.1744229981817; Wed, 09 Apr 2025
- 13:19:41 -0700 (PDT)
+	s=arc-20240116; t=1744230283; c=relaxed/simple;
+	bh=2DGaCu81+mksOe/jz5U+Y2o/ljB3IPRpgOi+JK/6erc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BiwtE2jutrHv+H2ou2Ashaciy2E77f3VS3lhTJ3OlPJ2qhET4xxP4OKM8QFHotSiHwGmSFsAkr24HhHzCXaFlDacJED0wnrebr/IFxoLD8fRRukZhTuXaT+QMV9P8S7tewNox4j57E8pxn2xoukJSN4TouCUR+8eSZI7ZrAN5m0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B6XZa/F7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1060C4CEE2;
+	Wed,  9 Apr 2025 20:24:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744230282;
+	bh=2DGaCu81+mksOe/jz5U+Y2o/ljB3IPRpgOi+JK/6erc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=B6XZa/F7bZNIT8bFQUNQw7qdEYMx6HCmSFYrqtarQ74rcJGE0P/JsYc2we3j0MloJ
+	 wtNHECbv2AWikVRq6G1sKqvGmgGu47UEF2VV4kuJLzY6ti2upbs5lvbEg1Q6H3rEuu
+	 fbi7nEhCharrBfRLUpOkz1IwLLY85rYADnqOanmEvX/rDKCltBZ69WPBgsPAAP+7m5
+	 g4fzf1FY1Qmu8GGA5eB5n/yrZBGdOvt4p6oQTzFK3UCCJTcMNedqS3gcIk+95RAAXM
+	 3zF7pFljDC3TRMwbGXX3CcAakSDXiHxxMywQz4/Eu88Mp0tzMBcl4yfynH2dSKvXGf
+	 SJI2Sqg8orrww==
+Date: Wed, 9 Apr 2025 15:24:41 -0500
+From: Seth Forshee <sforshee@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
+	linux-perf-users@vger.kernel.org, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: kvm guests crash when running "perf kvm top"
+Message-ID: <Z_bXiVb8prqRbqh3@do-x1carbon>
+References: <Z_VUswFkWiTYI0eD@do-x1carbon>
+ <Z_aovIbwdKIIBMuq@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250408112402.181574-1-shivankg@amd.com> <20250408112402.181574-4-shivankg@amd.com>
-In-Reply-To: <20250408112402.181574-4-shivankg@amd.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Wed, 9 Apr 2025 16:19:31 -0400
-X-Gm-Features: ATxdqUEUOdbJE1FR-JWrcEMUFKxoL7rqK5e8WWf2cXUgc2Yd72xDgueuEkSahFw
-Message-ID: <CAHC9VhRFBOC=cZB+Dm00cshwBSBaK6amv+=XFLPF0Bub0gHN+Q@mail.gmail.com>
-Subject: Re: [PATCH RFC v7 3/8] security: Export security_inode_init_security_anon
- for KVM guest_memfd
-To: Shivank Garg <shivankg@amd.com>
-Cc: seanjc@google.com, david@redhat.com, vbabka@suse.cz, willy@infradead.org, 
-	akpm@linux-foundation.org, shuah@kernel.org, pbonzini@redhat.com, 
-	ackerleytng@google.com, jmorris@namei.org, serge@hallyn.com, pvorel@suse.cz, 
-	bfoster@redhat.com, tabba@google.com, vannapurve@google.com, 
-	chao.gao@intel.com, bharata@amd.com, nikunj@amd.com, michael.day@amd.com, 
-	yan.y.zhao@intel.com, Neeraj.Upadhyay@amd.com, thomas.lendacky@amd.com, 
-	michael.roth@amd.com, aik@amd.com, jgg@nvidia.com, kalyazin@amazon.com, 
-	peterx@redhat.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-coco@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z_aovIbwdKIIBMuq@google.com>
 
-On Tue, Apr 8, 2025 at 7:25=E2=80=AFAM Shivank Garg <shivankg@amd.com> wrot=
-e:
->
-> KVM guest_memfd is implementing its own inodes to store metadata for
-> backing memory using a custom filesystem. This requires the ability to
-> initialize anonymous inode using security_inode_init_security_anon().
->
-> As guest_memfd currently resides in the KVM module, we need to export thi=
-s
-> symbol for use outside the core kernel. In the future, guest_memfd might =
-be
-> moved to core-mm, at which point the symbols no longer would have to be
-> exported. When/if that happens is still unclear.
-
-Can you help me understand the timing just a bit more ... do you
-expect the move to the core MM code to happen during the lifetime of
-this patchset, or is it just some hand-wavy "future date"?  No worries
-either way, just trying to understand things a bit better.
-
-> Signed-off-by: Shivank Garg <shivankg@amd.com>
-> ---
->  security/security.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/security/security.c b/security/security.c
-> index fb57e8fddd91..097283bb06a5 100644
-> --- a/security/security.c
-> +++ b/security/security.c
-> @@ -1877,6 +1877,7 @@ int security_inode_init_security_anon(struct inode =
-*inode,
->         return call_int_hook(inode_init_security_anon, inode, name,
->                              context_inode);
->  }
-> +EXPORT_SYMBOL(security_inode_init_security_anon);
->
->  #ifdef CONFIG_SECURITY_PATH
->  /**
+On Wed, Apr 09, 2025 at 10:05:00AM -0700, Sean Christopherson wrote:
+> On Tue, Apr 08, 2025, Seth Forshee wrote:
+> > A colleague of mine reported kvm guest hangs when running "perf kvm top"
+> > with a 6.1 kernel. Initially it looked like the problem might be fixed
+> > in newer kernels, but it turned out to be perf changes which must avoid
+> > triggering the issue. I was able to reproduce the guest crashes with
+> > 6.15-rc1 in both the host and the guest when using an older version of
+> > perf. A bisect of perf landed on 7b100989b4f6 "perf evlist: Remove
+> > __evlist__add_default", but this doesn't look to be fixing any kind of
+> > issue like this.
+> > 
+> > This box has an Ice Lake CPU, and we can reproduce on other Ice Lakes
+> > but could not reproduce on another box with Broadwell. On Broadwell
+> > guests would crash with older kernels in the host, but this was fixed by
+> > 971079464001 "KVM: x86/pmu: fix masking logic for
+> > MSR_CORE_PERF_GLOBAL_CTRL". That does not fix the issues we see on Ice
+> > Lake.
+> > 
+> > When the guests crash we aren't getting any output on the serial
+> > console, but I got this from a memory dump:
+> 
+> ...
+> 
+> > Oops: 0000 [#1] PREEMPT SMP NOPTI
+> > BUG: kernel NULL pointer dereference, address: 000000000000002828
+> 
+> FWIW, this is probably slightly corrupted.  When I run with EPT disabled, to force
+> KVM to intercept #PFs, the reported CR2 is 0x28.  Which is consistent with the
+> guest having DS_AREA=0.  I.e. the CPU is attempting to store into the DS/PEBS
+> buffer.
+> 
+> As suspected, the issue is PEBS.  After adding a tracepoint to capture the MSRs
+> that KVM loads as part of the perf transition, it's easy to see that PEBS_ENABLE
+> gets loaded with a non-zero value immediate before death, doom, and destruction.
+> 
+>   CPU 0: kvm_entry: vcpu 0, rip 0xffffffff81000aa0 intr_info 0x80000b0e error_code 0x00000000
+>   CPU 0: kvm_perf_msr: MSR 38f: host 1000f000000fe guest 1000f000000ff
+>   CPU 0: kvm_perf_msr: MSR 600: host fffffe57186af000 guest 0
+>   CPU 0: kvm_perf_msr: MSR 3f2: host 0 guest 0
+>   CPU 0: kvm_perf_msr: MSR 3f1: host 0 guest 1
+>   CPU 0: kvm_exit: vcpu 0 reason EXCEPTION_NMI rip 0xffffffff81000aa0 info1 0x0000000000000028 intr_info 0x80000b0e error_code 0x00000000
+> 
+> The underlying issue is that KVM's current PMU virtualization uses perf_events
+> to proxy guest events, i.e. piggybacks intel_ctrl_guest_mask, which is also used
+> by host userspace to communicate exclude_host/exclude_guest.  And so perf's
+> intel_guest_get_msrs() allows using PEBS for guest events, but only if perf isn't
+> using PEBS for host events.
+> 
+> I didn't actually verify that "perf kvm top" generates for events, but I assuming
+> it's creating a precise, a.k.a. PEBS, event that measures _only_ guest, i.e.
+> excludes host.  That causes a false positive of sorts in intel_guest_get_msrs(),
+> and ultimately results in KVM running the guest with a PEBS event enabled, even
+> though the guest isn't using the (virtual) PMU.
+> 
+> Pre-ICX CPUs don't isolate PEBS events across the guest/host boundary, and so
+> perf/KVM hard disable PEBS on VM-Enter.  And a simple (well, simple for perf)
+> precise event doesn't cause problems, because perf/KVM will disable PEBS events
+> that are counting the host.  I.e. if a PEBS event counts host *and* guest, it's
+> "fine".
+> 
+> Long story short, masking PEBS_ENABLE with the guest's value (in addition to
+> what perf allows) fixes the issue on my end.  Assuming testing goes well, I'll
+> post this as a proper patch.
+> 
 > --
-> 2.34.1
+> diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
+> index cdb19e3ba3aa..1d01fb43a337 100644
+> --- a/arch/x86/events/intel/core.c
+> +++ b/arch/x86/events/intel/core.c
+> @@ -4336,7 +4336,7 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr, void *data)
+>         arr[pebs_enable] = (struct perf_guest_switch_msr){
+>                 .msr = MSR_IA32_PEBS_ENABLE,
+>                 .host = cpuc->pebs_enabled & ~cpuc->intel_ctrl_guest_mask,
+> -               .guest = pebs_mask & ~cpuc->intel_ctrl_host_mask,
+> +               .guest = pebs_mask & ~cpuc->intel_ctrl_host_mask & kvm_pmu->pebs_enable,
+>         };
+>  
+>         if (arr[pebs_enable].host) {
 
---=20
-paul-moore.com
+This fixes the issue for me, thanks!
+
+> --
+> 
+> 
+> > Let me know if I can provide any additional information or testing.
+> 
+> Uber nit: in the future, explicitly state whether a command is being run in the
+> guest or host.  I had a brain fart and it took me an embarrasingly long time to
+> grok that running "perf kvm top" in the guest would be nonsensical.
+
+Apologies, I tried to make sure I differentiated between host vs guest
+in my description since I know it gets confusing, but I missed that one.
+I'll triple check for that in the future.
 
