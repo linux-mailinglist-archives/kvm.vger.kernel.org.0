@@ -1,111 +1,142 @@
-Return-Path: <kvm+bounces-43029-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43030-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34303A831AD
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 22:11:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F19B3A831C5
+	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 22:20:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 865D87AC60E
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 20:10:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C0A619E6BE1
+	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 20:20:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29D3F213E76;
-	Wed,  9 Apr 2025 20:11:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A798E212FAC;
+	Wed,  9 Apr 2025 20:19:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D24yujy4"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="Wn+nA0JZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15DAB1D5175;
-	Wed,  9 Apr 2025 20:11:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F081E1E570B
+	for <kvm@vger.kernel.org>; Wed,  9 Apr 2025 20:19:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744229484; cv=none; b=XKYHXbjmW0wTpoIne58sUZ7hZIsHXXpV1TaL2jNlaELv85V1rUdB/CIuJb8KIRA3PaIrQjW1a6i1yOeJ8/MImn7U4K1tM6SDzGdzgqzrbqU0XX3/vWHelEivhEBKuKiTSCSMRxmZTGLxv2tnqNkc8W7Ja4nqzzy6bPjRSMZWcq0=
+	t=1744229985; cv=none; b=CH9UFNTrj/5NoYqAPj0XNbm6D6nJt430aZ5VT7vgbCG1h7Sxy33Ef88sGVQMPoSsQ4JiDB7Eu2IlgC0cDg+GS/mqutvQjj9kAt+d51QoaQLrJYyEZhZ+jocCiBSNA9OXzgfXNF8FUNwqfNYVP0DLlhxPHMrsWCjr0Ds1cXpCz5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744229484; c=relaxed/simple;
-	bh=FJm/izdFNTfA1jwBlsdk1jJoTUGHKfakmjnarpokATA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PkqwHzSitwgHzAg3RdmX5I0ZpoWLnFGpQdMWs3whkZFM2BjVFHUqKqB6NW6ohlmjucpxOVACfn2iodx5X6y9onAYOQU+3MGcXFquEFjotmfgGT9grYa458Js4Y7xYNahsW0gGaD9ZyD2lVR/YFzeWKreGPJ4OfM73QBNOt5l2lY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D24yujy4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71925C4CEE2;
-	Wed,  9 Apr 2025 20:11:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744229483;
-	bh=FJm/izdFNTfA1jwBlsdk1jJoTUGHKfakmjnarpokATA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=D24yujy42QUc8MzaoYIOhqsAt7S0/2X6yekc52w0gwdRwZBMwmU2nUGsZoW5Ns7GD
-	 j85elSFL53Wuzj6UvF8uMMGWEYy3lD+JT9cZ0aqP7gtAES0C3utL694NSMXdxOrKJc
-	 9kIP4IKosSndbxn+SFfqxSrLVm9pBipvXXrP6J8VxMshOu3nGVg5Xag10MUwIq3jdK
-	 Ebzxt4FaeSUl2kGyVYg1LltfzCxBxoV7FKWUvjuBBSV/RcEjM/nammCpLTt/GmU9n5
-	 qWMtWEi+RRMn/FMGZcmAdYRRPyz1BTp+SNboYM41JDtFNJnwUWqDkFxGYl1tX5Mz6M
-	 qlUYtZ4y1dU2Q==
-Date: Wed, 9 Apr 2025 22:11:11 +0200
-From: Ingo Molnar <mingo@kernel.org>
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, Xin Li <xin@zytor.com>,
-	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
-	linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
-	linux-edac@vger.kernel.org, kvm@vger.kernel.org,
-	xen-devel@lists.xenproject.org, linux-ide@vger.kernel.org,
-	linux-pm@vger.kernel.org, bpf@vger.kernel.org, llvm@lists.linux.dev,
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-	dave.hansen@linux.intel.com, x86@kernel.org, jgross@suse.com,
-	andrew.cooper3@citrix.com, peterz@infradead.org, acme@kernel.org,
-	namhyung@kernel.org, mark.rutland@arm.com,
-	alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-	irogers@google.com, adrian.hunter@intel.com,
-	kan.liang@linux.intel.com, wei.liu@kernel.org,
-	ajay.kaher@broadcom.com, alexey.amakhalov@broadcom.com,
-	bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
-	pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
-	luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
-	haiyangz@microsoft.com, decui@microsoft.com
-Subject: Re: [RFC PATCH v1 01/15] x86/msr: Replace __wrmsr() with
- native_wrmsrl()
-Message-ID: <Z_bUX06aq6thJ4Uu@gmail.com>
-References: <20250331082251.3171276-1-xin@zytor.com>
- <20250331082251.3171276-2-xin@zytor.com>
- <Z-pruogreCuU66wm@gmail.com>
- <9D15DE81-2E68-4FCD-A133-4963602E18C9@zytor.com>
- <a0254e73-bf7c-4876-b64e-b08e96044666@zytor.com>
- <e5770add-9d18-40e1-929d-df7c40f3c7d1@intel.com>
- <ADCFB190-A89A-460D-81A6-80E20AEFBFBC@zytor.com>
- <Z_bQV2oOnJlwbxnk@gmail.com>
- <29ad84a6-b40c-456a-9eed-9887c87dfb38@intel.com>
+	s=arc-20240116; t=1744229985; c=relaxed/simple;
+	bh=vFYL2A2m4BVqGIUPwG+SJe8Wi/rBo/+xMXvF158DHXI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HVBLrl0hXqXuzh+jIaZKlRX1BXWcoXJ1FS2hn1O7VuhYUO92y1aF3sXRbJW27AhkYrmbayY4h1jztBdPL9+NQnKFSyOYMgiNVVvhUtzhxjY2qWLdwsqq2ZWaQ1IcDsfjT3EyL+dP6NrnbvetxkQtRvmRtbUDHh0k7slFAnGTnck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=Wn+nA0JZ; arc=none smtp.client-ip=209.85.219.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e60b75f87aaso49273276.2
+        for <kvm@vger.kernel.org>; Wed, 09 Apr 2025 13:19:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1744229982; x=1744834782; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VsHh17W+bDIV1e4xVUO/JwjeRPH7cOalB9Js2vjnhrU=;
+        b=Wn+nA0JZQAGWXBbLIKOsOUEp6QNQFXHFfl8D9NHSUQH82ABaXlAr50iV+7HSk/LZ5q
+         qx83eELju83YbCI2XWoyLlB3SZVZaRWjw7YEbQZvdLPyWG9MCMlD6X6v+VCg+pKiPCte
+         kUtBSXZZ2Qo+odi9Y5zgSmAy3ErlpXgwOmQ9U3Q5ixc9brwQnG+lulMQO98V0WBFWMsJ
+         +fGiXrx641WxrozoR1GTYX+VQbUBJPGqYtgyHbMIDVOcR/PIYFLtUkmWwz/UvLzO1AA7
+         WV+ouudBXgaa3eo00UmsD2TVEcyoT8t+QffxgHPg06ODRAFr2u/5dz69btPw7PUcr7gY
+         Q3NQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744229982; x=1744834782;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VsHh17W+bDIV1e4xVUO/JwjeRPH7cOalB9Js2vjnhrU=;
+        b=jMbBkcBWEygUeKeUm8O/qHKwWdZXmc+hLKqApckPdHu9cOyfpGpT5Y7UIYVGMpqjlT
+         tR0mmc8LUHbu2ELOMw+k1OX0plrTLhBoABRWaJ3XcvBdJkZbmH6Bpm680zdB2AhHcEmF
+         vopIpuKq1c27gAu5pcF5PcENIPS9g6KrICYHEMRFtSPcvT1oJd4xl22s3PXUogCC5WJt
+         gaHTsPwAGqOVrfCJsKiOyt++EKNBUTwXSZLdq/N+8HF3Pm9JjJAULMqtGFKaxGccDqRH
+         SniJ8J4SzJEdF9bvTpKEAUWeyMLbUYfQ2w8pIXdqTWIJg2jX3Mk2tLiCsXLMbyc9i+kz
+         2a4A==
+X-Forwarded-Encrypted: i=1; AJvYcCXAqr/+s79v+eTqgkwmIA43vztFjWhRyUDWRKBjez71ncLheOCI7U0GZuT+UkC/mHKWMMc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWcziIv2erinhM92ESxXBtIvV6uSgux8wNGEd/KpAomyx5YLwh
+	0Xr6iAF4wONnvskwFIuS5Af1B0N81M7uJKdwT22THYggQ7B+d/mKvswdDldq09YUvKz/Gw9BrQw
+	3asiSIuL7E0Vju1XrNuXTN1CeVDdMpV+bgdHf
+X-Gm-Gg: ASbGncvptgmncaYWUPfwCEz0sRsALAKGSpuNC1N2iWryGLfDB8PKBSAPnOssaJu4Lyi
+	cva9pdasTdUir6XKQP3RRQdume58mQTzXc1ogqWrgIZqwUWOnkl9aKFlnZll5Ih7wnyhfREwhCF
+	hRiRxcruhcwEkLPTUi5VFOwA==
+X-Google-Smtp-Source: AGHT+IEGCJR9IA5jDMT2Of/TaTFQ6Kl+jhMbbHqtWzPYG+QuFj2lKMDW1yD44Tl3NdNB6jTiuM59Ql0Ux2XWfYO9+PU=
+X-Received: by 2002:a05:6902:1b90:b0:e6d:f3ca:3e15 with SMTP id
+ 3f1490d57ef6-e703e0ecf38mr658467276.3.1744229981817; Wed, 09 Apr 2025
+ 13:19:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <29ad84a6-b40c-456a-9eed-9887c87dfb38@intel.com>
+References: <20250408112402.181574-1-shivankg@amd.com> <20250408112402.181574-4-shivankg@amd.com>
+In-Reply-To: <20250408112402.181574-4-shivankg@amd.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Wed, 9 Apr 2025 16:19:31 -0400
+X-Gm-Features: ATxdqUEUOdbJE1FR-JWrcEMUFKxoL7rqK5e8WWf2cXUgc2Yd72xDgueuEkSahFw
+Message-ID: <CAHC9VhRFBOC=cZB+Dm00cshwBSBaK6amv+=XFLPF0Bub0gHN+Q@mail.gmail.com>
+Subject: Re: [PATCH RFC v7 3/8] security: Export security_inode_init_security_anon
+ for KVM guest_memfd
+To: Shivank Garg <shivankg@amd.com>
+Cc: seanjc@google.com, david@redhat.com, vbabka@suse.cz, willy@infradead.org, 
+	akpm@linux-foundation.org, shuah@kernel.org, pbonzini@redhat.com, 
+	ackerleytng@google.com, jmorris@namei.org, serge@hallyn.com, pvorel@suse.cz, 
+	bfoster@redhat.com, tabba@google.com, vannapurve@google.com, 
+	chao.gao@intel.com, bharata@amd.com, nikunj@amd.com, michael.day@amd.com, 
+	yan.y.zhao@intel.com, Neeraj.Upadhyay@amd.com, thomas.lendacky@amd.com, 
+	michael.roth@amd.com, aik@amd.com, jgg@nvidia.com, kalyazin@amazon.com, 
+	peterx@redhat.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-coco@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Apr 8, 2025 at 7:25=E2=80=AFAM Shivank Garg <shivankg@amd.com> wrot=
+e:
+>
+> KVM guest_memfd is implementing its own inodes to store metadata for
+> backing memory using a custom filesystem. This requires the ability to
+> initialize anonymous inode using security_inode_init_security_anon().
+>
+> As guest_memfd currently resides in the KVM module, we need to export thi=
+s
+> symbol for use outside the core kernel. In the future, guest_memfd might =
+be
+> moved to core-mm, at which point the symbols no longer would have to be
+> exported. When/if that happens is still unclear.
 
-* Dave Hansen <dave.hansen@intel.com> wrote:
+Can you help me understand the timing just a bit more ... do you
+expect the move to the core MM code to happen during the lifetime of
+this patchset, or is it just some hand-wavy "future date"?  No worries
+either way, just trying to understand things a bit better.
 
-> On 4/9/25 12:53, Ingo Molnar wrote:
-> >>> What would folks think about "wrmsr64()"? It's writing a 64-bit 
-> >>> value to an MSR and there are a lot of functions in the kernel that 
-> >>> are named with the argument width in bits.
-> >> Personally, I hate the extra verbosity, mostly visual, since numerals 
-> >> are nearly as prominent as capital letters they tend to attract the 
-> >> eye. There is a reason why they aren't used this way in assembly 
-> >> languages.
-> > So what's the consensus here? Both work for me, but I have to pick one. 🙂
-> 
-> I don't feel strongly about it. You're not going to hurt my feelings if
-> you pick the "q" one, so go for "q" unless you have a real preference.
+> Signed-off-by: Shivank Garg <shivankg@amd.com>
+> ---
+>  security/security.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/security/security.c b/security/security.c
+> index fb57e8fddd91..097283bb06a5 100644
+> --- a/security/security.c
+> +++ b/security/security.c
+> @@ -1877,6 +1877,7 @@ int security_inode_init_security_anon(struct inode =
+*inode,
+>         return call_int_hook(inode_init_security_anon, inode, name,
+>                              context_inode);
+>  }
+> +EXPORT_SYMBOL(security_inode_init_security_anon);
+>
+>  #ifdef CONFIG_SECURITY_PATH
+>  /**
+> --
+> 2.34.1
 
-Ok, since hpa seems to hate the wrmsr64()/rdmsr64() names due to the 
-numeric verbosity, I'll go with wrmsrq()/rdmsrq().
-
-Thanks,
-
-	Ingo
-
+--=20
+paul-moore.com
 
