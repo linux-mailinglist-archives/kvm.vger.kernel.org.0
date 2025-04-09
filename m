@@ -1,236 +1,173 @@
-Return-Path: <kvm+bounces-43019-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43020-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C9AEA82BFC
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 18:12:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 329AFA82D34
+	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 19:07:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9A9F176009
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 16:08:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C29C94651ED
+	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 17:05:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 456601D5173;
-	Wed,  9 Apr 2025 16:08:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52E9D276028;
+	Wed,  9 Apr 2025 17:05:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UQoXkSEf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0IsSIN+f"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB7B71CEEB2
-	for <kvm@vger.kernel.org>; Wed,  9 Apr 2025 16:08:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B8F270EA2
+	for <kvm@vger.kernel.org>; Wed,  9 Apr 2025 17:05:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744214900; cv=none; b=AqObGtC3tLsgNfdZpPtF9u86lzNfm9pIQxI/4/T9SSAKXHs8Nerftgh/ttSjU/RPVfbKnMVblQv+3KbmsdDYOQcHCbYjuFCkEDESgc0CX0QgnkOnBsBB0QKzTsl4IPoq7XaLGL04+ABTfE/lGFxVN1dqc01ONC+IrDiPl+UQ5g4=
+	t=1744218305; cv=none; b=pdv5/MKZrzWPcd9Ov6AA00a7Ngh8MV9twPfM0r5fLNpJgbeLMZNe30Pv/1we3jTlwOdiVnRNWg0Rc8Apd9oLnMIyF9hluTbmSOQzhEWNNJBAoMeCe/5CNWb9qRW2JvxCYm1bZm2wSXXSBJ01YWniIA/IPjfSPAu6W82+ikUFPx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744214900; c=relaxed/simple;
-	bh=u88iK1Z2yhXsjmCslV466RjH4vgWiCfX1hsXNmpELU4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TbXAEKSBokH5top8sFlD4w3d5rZ+rA4+sJYCs6WCmSSzqY2G7RY5tFxznaA9RhkbpTLwEF8FWRy5ITLJYz0myKbQYVhTH0KbTobJCojeWz2SkRiydcGyfx6FK/BVsQztWKbrCeCrQFJUzwCyAL07oha4pNmp83KMx7uF8ZBhjZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UQoXkSEf; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744214897;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=78AmE8RpcE4a72lQ1mWWnyl8tSqgeIRIaFNrpROmMX8=;
-	b=UQoXkSEf65vbljUlHRvM1NaZHh3RS0VA8DtvxLYuz0YTbBXA7kZilNzuJxBIvgxIe7GOdN
-	l1wtqngCI67WrPrcxuMJQmkTeg1wi/gXduocM1OO7Fi6SIn25FKpoO61CVYpoHkswoIFGQ
-	8Icw6BAOHfjEbPB/LS0v4dvlq/fMNB8=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-195-6LfgIuGxMI6if5iNuiG78Q-1; Wed, 09 Apr 2025 12:08:16 -0400
-X-MC-Unique: 6LfgIuGxMI6if5iNuiG78Q-1
-X-Mimecast-MFC-AGG-ID: 6LfgIuGxMI6if5iNuiG78Q_1744214895
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43cf446681cso48724355e9.1
-        for <kvm@vger.kernel.org>; Wed, 09 Apr 2025 09:08:16 -0700 (PDT)
+	s=arc-20240116; t=1744218305; c=relaxed/simple;
+	bh=i8Zg1guA//+lhxQK2uTFZZPpwn6JYVZCVdGXPvWgvFc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=iuH3cGbEvcLDqLq2ZMVqgmOBfgwvMiDbZnBVfrd3mlVbZJWZpw6dbNllaNii+RYYYP6vlH2t1HkfkECqBjZipgh5PZbqzT5dWe83ElUqlV+HfEWBdq7bKMuwTVBfiYmdjfllnfLTzE0e0ipPU8TH38JFhOARhgH6GYrzmUDtgaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0IsSIN+f; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff854a2541so6352607a91.0
+        for <kvm@vger.kernel.org>; Wed, 09 Apr 2025 10:05:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1744218302; x=1744823102; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oX5AQF1CWc875K1riqzQPEOYHtRRRjW13afP6TGJ4O4=;
+        b=0IsSIN+foHLBkITJENDX/YJAi9MUPbipmO/Erfw8eJc3MdYMcX20am2zMClvksq+80
+         rNRDHrt8qHn3dOoufQWyxQBngufLqPPfW12kMCpl4P0av6ZFt+94srxwEvhmSyXv2tdI
+         xxsjvACiF6u8sAiT6twwjG1RwpplCq2WdIAHtN6onRsr9OCpQDisYqWyrGe08/Vt7qBn
+         C39Y0NXcjziMYmb7icAszXryAihzbHS3RMaAwxmIHGnA/LjFQjP/0CTlBHgTKxDDhsiN
+         Dbs1x2XD5KLxDs41GGeCk9424ssbLjg7DCxe8gJAHhAAxpB44nHu4qrPrY1zKr/ogSiB
+         UdKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744214895; x=1744819695;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=78AmE8RpcE4a72lQ1mWWnyl8tSqgeIRIaFNrpROmMX8=;
-        b=wc3JtK7rWsU/rUeqKmp9z0ORm4zRZ7WxlgGC8y+aSY1bFKUv+Sg8DcV+AlGUiX9JmA
-         M9RHlb0cHzzSH/m5dCOQgGm4wrHj0PpxlmMow7G13vlpGVcaccpdB2z//dnUAisQdZRo
-         8iDET7gUbyvAuBMM9SKfJNbnsR8kn885V0LNo6HTedIEX7+Yon6VdpzgbIoCcZqjdCVP
-         35OQusv3NGjYwtNp3SeDg9RKPSd6c41kxrT4dY0i+cEWvo/vHAX3W8e8DtaL1j5vhg7C
-         mEVkCvrTvRLQ1i6zxgB1rnd+3uOpSYHYVGic0Qo3kYa05iun10m2rCn63FEC88ZT19YJ
-         cXkg==
-X-Forwarded-Encrypted: i=1; AJvYcCWFxbTIsnGBGB3h9jpER2ko8igQn47a2J7ss4GK1xiv67zs4JMAqP/xRon6/JjaB78o1OE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwwDhiKJWwpQ68MBJiJ2qNwacBhyjnxd7AQMsYl5HpQhTXd36b
-	3q0FXmqLEByhbR9/jvHC853QcO5HwVOD6NG33Uhdr71eL3NFPjYZsV2x61Sto3VOyIPjof9o4A3
-	O0OGRE8DhWAsHXrseI8+tz6DIO0qfeOAXjjCBHp7UmnA2uAxKaw==
-X-Gm-Gg: ASbGnctqLZ/NoN0Lh8xI2zUQs8V/MveMzk8ll2E9TQVbhGnZq+SSeYPz3WRxo32AMVS
-	oOnhtcPKz4Qmk9T67RLSAJjzNJkpjXl3MBFyAs+4r6aStRbaeJGK6JUR4c5RRVD9hgRJAwJg686
-	F1By10qe4Do4NKb8YkvSEhNM9Yx9chhV+iUpiEUPCx+OUkXyA7TRiyNsYL+xKLoEexUCdPd2RLP
-	bk5AL5s3PbGP4vCKs3jeVsKCr4t7+W3yiT5Xo9f3x/9Vu80/o6NpqQsSlL2t4G57XCsp1BzpHg7
-	pUi8rg==
-X-Received: by 2002:a05:600c:8518:b0:439:86fb:7340 with SMTP id 5b1f17b1804b1-43f1ed693ebmr44247785e9.30.1744214895071;
-        Wed, 09 Apr 2025 09:08:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHa8WvXPvdR9mW4X+Ki70qXHwL+hlbwdViRmCYAc7xQXDBe/sMhsY1YIaOF1Gj1cQgn8/YTXA==
-X-Received: by 2002:a05:600c:8518:b0:439:86fb:7340 with SMTP id 5b1f17b1804b1-43f1ed693ebmr44247295e9.30.1744214894624;
-        Wed, 09 Apr 2025 09:08:14 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39d893774aasm2066312f8f.30.2025.04.09.09.08.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Apr 2025 09:08:13 -0700 (PDT)
-Date: Wed, 9 Apr 2025 12:08:10 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: Daniel Verkamp <dverkamp@chromium.org>,
-	Halil Pasic <pasic@linux.ibm.com>, linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
-	kvm@vger.kernel.org, Chandra Merla <cmerla@redhat.com>,
-	Stable@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
-	Thomas Huth <thuth@redhat.com>, Eric Farman <farman@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Wei Wang <wei.w.wang@intel.com>,
-	"stefanha@redhat.com" <stefanha@redhat.com>,
-	Vivek Goyal <vgoyal@redhat.com>
-Subject: Re: [PATCH v1] s390/virtio_ccw: don't allocate/assign airqs for
- non-existing queues
-Message-ID: <20250409120320-mutt-send-email-mst@kernel.org>
-References: <33def1b0-d9d5-46f1-9b61-b0269753ecce@redhat.com>
- <88d8f2d2-7b8a-458f-8fc4-c31964996817@redhat.com>
- <CABVzXAmMEsw70Tftg4ZNi0G4d8j9pGTyrNqOFMjzHwEpy0JqyA@mail.gmail.com>
- <3bbad51d-d7d8-46f7-a28c-11cc3af6ef76@redhat.com>
- <20250407170239-mutt-send-email-mst@kernel.org>
- <440de313-e470-4afa-9f8a-59598fe8dc21@redhat.com>
- <20250409065216-mutt-send-email-mst@kernel.org>
- <4ad4b12e-b474-48bb-a665-6c1dc843cd51@redhat.com>
- <20250409073652-mutt-send-email-mst@kernel.org>
- <5cd8463e-21ed-4c99-a9b2-9af45c6eb7af@redhat.com>
+        d=1e100.net; s=20230601; t=1744218302; x=1744823102;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oX5AQF1CWc875K1riqzQPEOYHtRRRjW13afP6TGJ4O4=;
+        b=jyknCNADK4MMnidIboTMXTwoMXXWSvr3xWWluoF+GQU+KafjlHYK7qVT2Ts2v5e3XK
+         tdJWP298gVTRIykw2Lww+/+jiITmcKRqx7RReO1ZTp2RCKH37L+Cbc118vYuNNYRLc+r
+         oastSOU5GIBdS07xFU5bR9ub+M9K7lvuRj4MjME/UDHXolD/QC4HeiOTYKgldfS+dEKx
+         b8WcgpP3p19MS9pdWZqittHnqpmEI/DWJ9Yo+gonRA5fFLcsKynumTJVB5avbGE6edaZ
+         26nqJQCwu9D1iIdc2aSBaTGV21ITu63nRMSLwEFYcLZYqoEFMl1zboRS6H/honqQGK2K
+         z/mw==
+X-Forwarded-Encrypted: i=1; AJvYcCXiePdJlOBPPzAQXP6LCEop9ps3OFA3TDhJgKmPMUPCHG1BYMM7calXuDaC+U1p0tZRcDA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLnFDQjH+2BOyMgtlYaPheH1rJPKSBmBA5812HISYIo6i0FybB
+	Cdl5oskl6RZkyGXPleZRS8Vk89k8clImK7U9usvMoOgnsjMBkteZcfIQ9dfvuoYkawYbOk3PBaZ
+	BgQ==
+X-Google-Smtp-Source: AGHT+IEem0Cj1DZoksj+te/q+i7fjk/ApWH/IZlQdD3zb/NnN621mHgFseqow65YuvbIXi3Fri1358Ay9cM=
+X-Received: from pjbqn13.prod.google.com ([2002:a17:90b:3d4d:b0:2ff:5752:a78f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2704:b0:2ff:52e1:c4b4
+ with SMTP id 98e67ed59e1d1-306dd5789d1mr3720511a91.32.1744218302030; Wed, 09
+ Apr 2025 10:05:02 -0700 (PDT)
+Date: Wed, 9 Apr 2025 10:05:00 -0700
+In-Reply-To: <Z_VUswFkWiTYI0eD@do-x1carbon>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5cd8463e-21ed-4c99-a9b2-9af45c6eb7af@redhat.com>
+Mime-Version: 1.0
+References: <Z_VUswFkWiTYI0eD@do-x1carbon>
+Message-ID: <Z_aovIbwdKIIBMuq@google.com>
+Subject: Re: kvm guests crash when running "perf kvm top"
+From: Sean Christopherson <seanjc@google.com>
+To: Seth Forshee <sforshee@kernel.org>
+Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org, 
+	linux-perf-users@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Apr 09, 2025 at 02:24:32PM +0200, David Hildenbrand wrote:
-> On 09.04.25 14:07, Michael S. Tsirkin wrote:
-> > On Wed, Apr 09, 2025 at 01:12:19PM +0200, David Hildenbrand wrote:
-> > > On 09.04.25 12:56, Michael S. Tsirkin wrote:
-> > > > On Wed, Apr 09, 2025 at 12:46:41PM +0200, David Hildenbrand wrote:
-> > > > > On 07.04.25 23:20, Michael S. Tsirkin wrote:
-> > > > > > On Mon, Apr 07, 2025 at 08:47:05PM +0200, David Hildenbrand wrote:
-> > > > > > > > In my opinion, it makes the most sense to keep the spec as it is and
-> > > > > > > > change QEMU and the kernel to match, but obviously that's not trivial
-> > > > > > > > to do in a way that doesn't break existing devices and drivers.
-> > > > > > > 
-> > > > > > > If only it would be limited to QEMU and Linux ... :)
-> > > > > > > 
-> > > > > > > Out of curiosity, assuming we'd make the spec match the current QEMU/Linux
-> > > > > > > implementation at least for the 3 involved features only, would there be a
-> > > > > > > way to adjust crossvm without any disruption?
-> > > > > > > 
-> > > > > > > I still have the feeling that it will be rather hard to get that all
-> > > > > > > implementations match the spec ... For new features+queues it will be easy
-> > > > > > > to force the usage of fixed virtqueue numbers, but for free-page-hinting and
-> > > > > > > reporting, it's a mess :(
-> > > > > > 
-> > > > > > 
-> > > > > > Still thinking about a way to fix drivers... We can discuss this
-> > > > > > theoretically, maybe?
-> > > > > 
-> > > > > Yes, absolutely. I took the time to do some more digging; regarding drivers
-> > > > > only Linux seems to be problematic.
-> > > > > 
-> > > > > virtio-win, FreeBSD, NetBSD and OpenBSD and don't seem to support
-> > > > > problematic features (free page hinting, free page reporting) in their
-> > > > > virtio-balloon implementations.
-> > > > > 
-> > > > > So from the known drivers, only Linux is applicable.
-> > > > > 
-> > > > > reporting_vq is either at idx 4/3/2
-> > > > > free_page_vq is either at idx 3/2
-> > > > > statsq is at idx2 (only relevant if the feature is offered)
-> > > > > 
-> > > > > So if we could test for the existence of a virtqueue at an idx easily, we
-> > > > > could test from highest-to-smallest idx.
-> > > > > 
-> > > > > But I recall that testing for the existance of a virtqueue on s390x resulted
-> > > > > in the problem/deadlock in the first place ...
-> > > > > 
-> > > > > -- 
-> > > > > Cheers,
-> > > > > 
-> > > > > David / dhildenb
-> > > > 
-> > > > So let's talk about a new feature bit?
-> > > 
-> > > Are you thinking about a new feature that switches between "fixed queue
-> > > indices" and "compressed queue indices", whereby the latter would be the
-> > > legacy default and we would expect all devices to switch to the new
-> > > fixed-queue-indices layout?
-> > > 
-> > > We could make all new features require "fixed-queue-indices".
-> > 
-> > I see two ways:
-> > 1. we make driver behave correctly with in spec and out of spec devices
-> >     and we make qemu behave correctly with in spec and out of spec devices
-> > 2. a new feature bit
-> > 
-> > I prefer 1, and when we add a new feature we can also
-> > document that it should be in spec if negotiated.
-> > 
-> > My question is if 1 is practical.
+On Tue, Apr 08, 2025, Seth Forshee wrote:
+> A colleague of mine reported kvm guest hangs when running "perf kvm top"
+> with a 6.1 kernel. Initially it looked like the problem might be fixed
+> in newer kernels, but it turned out to be perf changes which must avoid
+> triggering the issue. I was able to reproduce the guest crashes with
+> 6.15-rc1 in both the host and the guest when using an older version of
+> perf. A bisect of perf landed on 7b100989b4f6 "perf evlist: Remove
+> __evlist__add_default", but this doesn't look to be fixing any kind of
+> issue like this.
 > 
-> AFAIKT, 1) implies:
+> This box has an Ice Lake CPU, and we can reproduce on other Ice Lakes
+> but could not reproduce on another box with Broadwell. On Broadwell
+> guests would crash with older kernels in the host, but this was fixed by
+> 971079464001 "KVM: x86/pmu: fix masking logic for
+> MSR_CORE_PERF_GLOBAL_CTRL". That does not fix the issues we see on Ice
+> Lake.
 > 
-> virtio-balloon:
-> 
-> a) Driver
-> 
-> As mentioned above, we'd need a reliable way to test for the existence of a
-> virtqueue, so we can e.g., test for reporting_vq idx 4 -> 3 -> 2
-> 
-> With that we'd be able to support compressed+fixed at the same time.
-> 
-> Q: Is it possible/feasible?
-> 
-> b) Device: virtio-balloon: we can fake existence of STAT and
-> FREE_PAGE_HINTING easily, such that the compressed layout corresponds to the
-> fixed layout easily.
-> 
-> Q: alternatives? We could try creating multiple queues for the same feature,
-> but it's going to be a mess I'm afraid ...
-> 
-> 
-> virtio-fs:
-> 
-> a) Driver
-> 
-> Linux does not even implement VIRTIO_FS_F_NOTIFICATION or respect
-> VIRTIO_FS_F_NOTIFICATION when calculating queue indices, ...
-> 
-> b) Device
-> 
-> Same applies to virtiofsd ...
-> 
-> Q: Did anybody actually implement VIRTIO_FS_F_NOTIFICATION ever? If not, can
-> we just remove it from the spec completely and resolve the issue that way?
+> When the guests crash we aren't getting any output on the serial
+> console, but I got this from a memory dump:
 
-Donnu. Vivek?
+...
 
-Or we can check for queue number 1+num_request_queues maybe?
-If that exists then it is spec compliant?
+> Oops: 0000 [#1] PREEMPT SMP NOPTI
+> BUG: kernel NULL pointer dereference, address: 000000000000002828
+
+FWIW, this is probably slightly corrupted.  When I run with EPT disabled, to force
+KVM to intercept #PFs, the reported CR2 is 0x28.  Which is consistent with the
+guest having DS_AREA=0.  I.e. the CPU is attempting to store into the DS/PEBS
+buffer.
+
+As suspected, the issue is PEBS.  After adding a tracepoint to capture the MSRs
+that KVM loads as part of the perf transition, it's easy to see that PEBS_ENABLE
+gets loaded with a non-zero value immediate before death, doom, and destruction.
+
+  CPU 0: kvm_entry: vcpu 0, rip 0xffffffff81000aa0 intr_info 0x80000b0e error_code 0x00000000
+  CPU 0: kvm_perf_msr: MSR 38f: host 1000f000000fe guest 1000f000000ff
+  CPU 0: kvm_perf_msr: MSR 600: host fffffe57186af000 guest 0
+  CPU 0: kvm_perf_msr: MSR 3f2: host 0 guest 0
+  CPU 0: kvm_perf_msr: MSR 3f1: host 0 guest 1
+  CPU 0: kvm_exit: vcpu 0 reason EXCEPTION_NMI rip 0xffffffff81000aa0 info1 0x0000000000000028 intr_info 0x80000b0e error_code 0x00000000
+
+The underlying issue is that KVM's current PMU virtualization uses perf_events
+to proxy guest events, i.e. piggybacks intel_ctrl_guest_mask, which is also used
+by host userspace to communicate exclude_host/exclude_guest.  And so perf's
+intel_guest_get_msrs() allows using PEBS for guest events, but only if perf isn't
+using PEBS for host events.
+
+I didn't actually verify that "perf kvm top" generates for events, but I assuming
+it's creating a precise, a.k.a. PEBS, event that measures _only_ guest, i.e.
+excludes host.  That causes a false positive of sorts in intel_guest_get_msrs(),
+and ultimately results in KVM running the guest with a PEBS event enabled, even
+though the guest isn't using the (virtual) PMU.
+
+Pre-ICX CPUs don't isolate PEBS events across the guest/host boundary, and so
+perf/KVM hard disable PEBS on VM-Enter.  And a simple (well, simple for perf)
+precise event doesn't cause problems, because perf/KVM will disable PEBS events
+that are counting the host.  I.e. if a PEBS event counts host *and* guest, it's
+"fine".
+
+Long story short, masking PEBS_ENABLE with the guest's value (in addition to
+what perf allows) fixes the issue on my end.  Assuming testing goes well, I'll
+post this as a proper patch.
+
+--
+diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
+index cdb19e3ba3aa..1d01fb43a337 100644
+--- a/arch/x86/events/intel/core.c
++++ b/arch/x86/events/intel/core.c
+@@ -4336,7 +4336,7 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr, void *data)
+        arr[pebs_enable] = (struct perf_guest_switch_msr){
+                .msr = MSR_IA32_PEBS_ENABLE,
+                .host = cpuc->pebs_enabled & ~cpuc->intel_ctrl_guest_mask,
+-               .guest = pebs_mask & ~cpuc->intel_ctrl_host_mask,
++               .guest = pebs_mask & ~cpuc->intel_ctrl_host_mask & kvm_pmu->pebs_enable,
+        };
+ 
+        if (arr[pebs_enable].host) {
+--
 
 
-> -- 
-> Cheers,
-> 
-> David / dhildenb
+> Let me know if I can provide any additional information or testing.
 
+Uber nit: in the future, explicitly state whether a command is being run in the
+guest or host.  I had a brain fart and it took me an embarrasingly long time to
+grok that running "perf kvm top" in the guest would be nonsensical.
 
