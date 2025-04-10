@@ -1,187 +1,125 @@
-Return-Path: <kvm+bounces-43082-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43083-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C664A8410C
-	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 12:44:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 196B1A84135
+	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 12:52:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D4F4176372
-	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 10:44:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6ABE1B666B1
+	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 10:52:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 393B228134D;
-	Thu, 10 Apr 2025 10:44:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2575B281355;
+	Thu, 10 Apr 2025 10:51:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fvmXeU0z"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZO5qvvk6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DFE521C170
-	for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 10:44:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75F8D26B972
+	for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 10:51:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744281861; cv=none; b=g6X7taPp9ZfcPhhPeyRO7gPj01XMVRCVk/UrVJY5qa5A5GKVzzwWxhWeT/7nrC/0qWyRl1eC4hQl4zLSkX83Ci26dkBuLidi6jXl7gzvjl1siIJsyaNzam22QVRwN2YExTr5Vuhx6NwzeAt5TU2mioU2DV4mKZ4mX5w0kzf6Hos=
+	t=1744282316; cv=none; b=d8InQNbXmTb/UNrp5KIblKYJCEh1NJVC6uEfgPWBGrkX5CMU0kjQ3naQtXLeBVpYCyJpSAaK0Ek2rf573IftS/k5hF5o8w5pwwoQYrgyoD6twhB6yniIMSdFDkXoFrYBEeDk/rIFpPptBjhHuniVje9WwKZMWfzFKccEiIqDPYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744281861; c=relaxed/simple;
-	bh=E01+iQA94cvXi0qgpJr8aB1sxoNSlv+odisgnLSKWIQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hCgfwmJ3oeckFrpYnDr7yFc4i06EQizdrshB6mrw/7OQM7KEFVPNM9ynJEAFt78cIPXtXkXPmKluJZCI9fOCOl9fVZ93qnfCF/faKu5iP34c3M2Z/JRBLvjkZx/u6k3eKlmheRayyGw3PWYcPFR9gk1bpxXRVNUyjDr3LCDwURk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fvmXeU0z; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53A6FWlR005759;
-	Thu, 10 Apr 2025 10:44:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=W6Pp1nN0u9VE3yPMozkRTu3XvxoLdIIkl0GkyuAcR
-	cs=; b=fvmXeU0ztvg5yviGcshgccyWho8bwAHEoULBMUiQ8jSE3YFoe6AYcLub+
-	ZjUXjFEE+4pbmrE36+xxcgyuwRcn1KjlRAVMoe7Wvp5JI6C7aXqMGWcEHcWpf2QB
-	NwT/HNSdwR7Isc0oolrGiwktK43BbjxZ3QIjONbEPmBI9HNgjGi8Qs3jfqvgdWKk
-	qSPr+ZR1cgoIYFRdvVFEHQO5E26XDya166+wwDBZX4c0nRtTygek6pIoJ7R6UVaH
-	OLRDkaf9fNN9QZZcSSCDgdRptxXkT4kDPVgmFQ9FGiLX0+pVIKmi+877lI708/78
-	oAik5kK7TFK24mqdP3QQZBJ5zCy1A==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45x04044b5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 10 Apr 2025 10:44:09 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 53AAf3O5017516;
-	Thu, 10 Apr 2025 10:44:08 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45x04044b3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 10 Apr 2025 10:44:08 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 53A8eTiI011069;
-	Thu, 10 Apr 2025 10:44:08 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 45uf7ywsbg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 10 Apr 2025 10:44:08 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 53AAi3V049152284
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 10 Apr 2025 10:44:04 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9FCB82004B;
-	Thu, 10 Apr 2025 10:44:03 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D73EF20040;
-	Thu, 10 Apr 2025 10:44:01 +0000 (GMT)
-Received: from li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.in.ibm.com (unknown [9.204.206.66])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 10 Apr 2025 10:44:01 +0000 (GMT)
-From: Gautam Menghani <gautam@linux.ibm.com>
-To: npiggin@gmail.com, danielhb413@gmail.com, harshpb@linux.ibm.com,
-        pbonzini@redhat.com, vaibhav@linux.ibm.com
-Cc: Gautam Menghani <gautam@linux.ibm.com>, qemu-ppc@nongnu.org,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: [PATCH] hw/ppc/spapr_hcall: Return host mitigation characteristics in KVM mode
-Date: Thu, 10 Apr 2025 16:13:53 +0530
-Message-ID: <20250410104354.308714-1-gautam@linux.ibm.com>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1744282316; c=relaxed/simple;
+	bh=Hu/dyNyMQiMt3jY/azDePScdyJcDtyMqgmW7s3RlZB4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=S0fbstVD4Bz7gpgJZ7KlC6jeN9CoB+Ptr6UpuGM9CKAx1kTcr5kT3UUGm6o08lx/oJY6cr/HBuXLRhl7AN98Y5/B6gTYpGihsrlzEX2AZXRvDP7ZjtGEUStspNt7BBgz9HawIs7F4TDCNX8ZNq7/XShFQqcMgIBe5JTtFXXpXt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZO5qvvk6; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744282313;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Hu/dyNyMQiMt3jY/azDePScdyJcDtyMqgmW7s3RlZB4=;
+	b=ZO5qvvk6YRpbS3miMHoM7UKOBe6NWBMDmykWsYHmuy4//i5/UfkhhOfVG9BdJzRP3Iw+39
+	kmulXg56GL+8GU5Vjqoq8oEOltZrkg1fltHuDIM1RDXylMNxSF/+2lVMJcfIDm8UX5fyKO
+	70Ot91iJSu4a8ogPGTs6+mIoLT15ssI=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-56-VLORekxhOtKUGRaYtg23og-1; Thu, 10 Apr 2025 06:51:52 -0400
+X-MC-Unique: VLORekxhOtKUGRaYtg23og-1
+X-Mimecast-MFC-AGG-ID: VLORekxhOtKUGRaYtg23og_1744282311
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3912539665cso986016f8f.1
+        for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 03:51:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744282311; x=1744887111;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Hu/dyNyMQiMt3jY/azDePScdyJcDtyMqgmW7s3RlZB4=;
+        b=IRUiN3nz84N5ykPqDDUHJagH3OZ2QYqrslh3QFk3ILNoiVvZ5vDrMN86qjdkvt28ck
+         VWJxnf2Z4byveLFQLOrORYRoAztP9NRhzLMHy0f7lTtlu1UQ7QeBZRP06K6WpJaDYtDr
+         UZcPesX1hAoWdi7r4upUEb5E6i7byKtQ7tBQhypJFZon+/pT3iAykW02UQsiW51YqA1l
+         yyFVLy+4rYrkPM7TqnpyNQeZ9QStbnCHzqYqutj/fOfmnCZHPKrcl2DWBAyAprrD8wtz
+         zf/3gr1ui+ra7pDdRMxWljMM8YOWcREIq8PUGDMoHexIwKk1Rp5UHwLaTu7Vi0hYX+nR
+         fvvA==
+X-Forwarded-Encrypted: i=1; AJvYcCVQCHj0Jq1xiKNGQ26qc+ZdtRya9zwi1kTJjQ0zzgV6QBtAnXddXkJpKuol/5Me6IaFFk0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyKUwmkzUZYug2YI9PgVWZq3NtMWq3kHJwEUzEElS6kEfGpv84
+	UPZBvtvAMlPdK/PhUbOJkOcwTVyeAJB5B8uv4ZA1hRy8oc6p5sddKIYeu9kJcb33QcqBj+QPyVe
+	cUJ9GmIbwyAubtREfHPyiXViU4B3N4++SaTbjGLYqX71BwOvHKg==
+X-Gm-Gg: ASbGncuvdy2fd0n0lFmanLd2KRKamjqh0VBPNBXXaU1sTlajJCoM5zuOEkXLHweioda
+	Mu0FH8IgcTOIv1JHAZEQz1Nv1ZeJGpAeKNcWj1U0pt1R4lptx/GRTeeHoPFYUizIpq6soN+goVD
+	sDSDlF9/I/FGSONxMMLA53ci3BXjqzn6iEsvamy7vhyK28TMPFlGL1y+YaPhmaDO+D0mQW2MPHc
+	dNSsXvcBxs6fU7qsff5Nsu2f8ELuPvZjd+tMnzzmZMg36CgaA3U6SvZMhD0sd6jJ6cHibdqfIa1
+	R35/WyHOlarzu3IzwxaITqSc86I157ieFotpwIk=
+X-Received: by 2002:a5d:648c:0:b0:39c:2c0b:8db4 with SMTP id ffacd0b85a97d-39d8f275fbamr1595323f8f.10.1744282310742;
+        Thu, 10 Apr 2025 03:51:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG/0IeDpLk+TZuwsPB4YIsabynndJrajxwaMO5dLlq7dbzR+E2v8IMog4+FmRDVWpawIdK9Kw==
+X-Received: by 2002:a5d:648c:0:b0:39c:2c0b:8db4 with SMTP id ffacd0b85a97d-39d8f275fbamr1595300f8f.10.1744282310374;
+        Thu, 10 Apr 2025 03:51:50 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-84-24.dyn.eolo.it. [146.241.84.24])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39d893fdf8fsm4359327f8f.91.2025.04.10.03.51.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Apr 2025 03:51:49 -0700 (PDT)
+Message-ID: <22ad09e7-f2b3-48c3-9a6b-8a7b9fd935fe@redhat.com>
+Date: Thu, 10 Apr 2025 12:51:48 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: CgcgQ5YApJANyeB-7xQW7X-XT38F0tWN
-X-Proofpoint-GUID: fwPwKQWeCdSrbVJnezC8KjNSbrYNL1zd
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-04-10_02,2025-04-08_04,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- lowpriorityscore=0 clxscore=1011 malwarescore=0 spamscore=0 bulkscore=0
- impostorscore=0 priorityscore=1501 suspectscore=0 mlxlogscore=999
- phishscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502280000 definitions=main-2504100078
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/2] vsock: Linger on unsent data
+To: Michal Luczaj <mhal@rbox.co>, Stefano Garzarella <sgarzare@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20250407-vsock-linger-v1-0-1458038e3492@rbox.co>
+ <20250407-vsock-linger-v1-1-1458038e3492@rbox.co>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250407-vsock-linger-v1-1-1458038e3492@rbox.co>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Currently, on a P10 KVM guest, the mitigations seen in the output of
-"lscpu" command are different from the host. The reason for this
-behaviour is that when the KVM guest makes the "h_get_cpu_characteristics"
-hcall, QEMU does not consider the data it received from the host via the
-KVM_PPC_GET_CPU_CHAR ioctl, and just uses the values present in
-spapr->eff.caps[], which in turn just contain the default values set in
-spapr_machine_class_init().
+On 4/7/25 8:41 PM, Michal Luczaj wrote:
+> Change the behaviour of a lingering close(): instead of waiting for all
+> data to be consumed, block until data is considered sent, i.e. until worker
+> picks the packets and decrements virtio_vsock_sock::bytes_unsent down to 0.
 
-Fix this behaviour by making sure that h_get_cpu_characteristics()
-returns the data received from the KVM ioctl for a KVM guest.
+I think it should be better to expand the commit message explaining the
+rationale.
 
-Perf impact:
-With null syscall benchmark[1], ~45% improvement is observed.
+> Do linger on shutdown() just as well.
 
-1. Vanilla QEMU
-$ ./null_syscall
-132.19 ns     456.54 cycles
+Why? Generally speaking shutdown() is not supposed to block. I think you
+should omit this part.
 
-2. With this patch
-$ ./null_syscall
-91.18 ns     314.57 cycles
+Thanks,
 
-[1]: https://ozlabs.org/~anton/junkcode/null_syscall.c
-
-Signed-off-by: Gautam Menghani <gautam@linux.ibm.com>
----
- hw/ppc/spapr_hcall.c   | 6 ++++++
- include/hw/ppc/spapr.h | 1 +
- target/ppc/kvm.c       | 2 ++
- 3 files changed, 9 insertions(+)
-
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 406aea4ecb..6aec4e22fc 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1415,6 +1415,12 @@ static target_ulong h_get_cpu_characteristics(PowerPCCPU *cpu,
-     uint8_t count_cache_flush_assist = spapr_get_cap(spapr,
-                                                      SPAPR_CAP_CCF_ASSIST);
- 
-+    if (kvm_enabled()) {
-+        args[0] = spapr->chars.character;
-+        args[1] = spapr->chars.behaviour;
-+        return H_SUCCESS;
-+    }
-+
-     switch (safe_cache) {
-     case SPAPR_CAP_WORKAROUND:
-         characteristics |= H_CPU_CHAR_L1D_FLUSH_ORI30;
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 39bd5bd5ed..b1e3ee1ae2 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -283,6 +283,7 @@ struct SpaprMachineState {
-     Error *fwnmi_migration_blocker;
- 
-     SpaprWatchdog wds[WDT_MAX_WATCHDOGS];
-+    struct kvm_ppc_cpu_char chars;
- };
- 
- #define H_SUCCESS         0
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 992356cb75..fee6c5d131 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2511,6 +2511,7 @@ bool kvmppc_has_cap_xive(void)
- 
- static void kvmppc_get_cpu_characteristics(KVMState *s)
- {
-+    SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-     struct kvm_ppc_cpu_char c;
-     int ret;
- 
-@@ -2528,6 +2529,7 @@ static void kvmppc_get_cpu_characteristics(KVMState *s)
-         return;
-     }
- 
-+    spapr->chars = c;
-     cap_ppc_safe_cache = parse_cap_ppc_safe_cache(c);
-     cap_ppc_safe_bounds_check = parse_cap_ppc_safe_bounds_check(c);
-     cap_ppc_safe_indirect_branch = parse_cap_ppc_safe_indirect_branch(c);
--- 
-2.49.0
+Paolo
 
 
