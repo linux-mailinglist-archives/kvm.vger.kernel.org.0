@@ -1,88 +1,88 @@
-Return-Path: <kvm+bounces-43075-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43073-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 520EFA83C99
-	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 10:22:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3114DA83C09
+	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 10:06:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FB84174E04
-	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 08:21:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45AB98A4FC3
+	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 08:00:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ED7920F088;
-	Thu, 10 Apr 2025 08:16:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4AD11E5729;
+	Thu, 10 Apr 2025 08:00:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Wjg+PVCt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RYvYr9Uq"
 X-Original-To: kvm@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC68F20B7F1;
-	Thu, 10 Apr 2025 08:16:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B98601C5D7B
+	for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 08:00:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744273018; cv=none; b=gsLZIWzxFuaZa5V+myDMqBYTla8XPbijFtWJZ0KSw5ykx377kKMf4WASHY4fbHqo7DtwcoYWIyqPlKCuToG9hHWu+TXkAxvMeRU1yWkMtZne+/v3spiezsDE6zxINrwo0vFe9UtC0xW8bwkPcF3cZlugEZTDi98Mvd3UJfbtrJA=
+	t=1744272050; cv=none; b=G7q3TInqF3WuJ7980rakj3ur9xeD6sH8noawok+1SVDKnEUHve98wkb7gFhEIcPUz9rI9mNJxQ2oSzBUPGFQgCOqhx/Te03ls7vQPDA/GVzXoKeySkq3Ebejd8kGKSMv/9qrS71sCTQKpdRQQ1n05Xm4WiPBI18dVEb3x2XPKXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744273018; c=relaxed/simple;
-	bh=RZTUHPBAWgXx1IJUnSAS0VY9DQxUo9jpKkYHvxOb8NM=;
+	s=arc-20240116; t=1744272050; c=relaxed/simple;
+	bh=Fog4B6Qbd8u1Pqc/gI0bDG41NJadwivsKQhqgMevtPQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pooNQ3ZY1tVMWVa3xMHxUzD1MmRxXKadU5ZUPTmnJ9II2vIYiF1FCTZ6wVjrlgDWsrvK8vPbErtHgR2HSdRu4RR++mEoef2XSMchX0PU1ysvrlLB/BVaS5Nsu5xu5ADRl7kmW7RkapQly4HaZNuH+deVKLVoSgT7lFAXc9db7LE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Wjg+PVCt; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=uB+Z6x+VWnGWGieZgYK9ruFVlK20QbBkiLXO+vDsz2w=; b=Wjg+PVCtrtNOWu7AUd4A4kKRMN
-	X7AvVDzvlWDxtYHCg+MYT4kRUd6r2iTn2US6oojoVMcGh033UfN5FIGcAqYYUqP+NBDE3tDrnS7TF
-	GV7+w43k6VmvfmY1+6cyqopPdH79oktWgRSTQJ4DlWPHTvguEb/+HIMC1S+uKwsyYOXfar3VoqMvw
-	/XMzNCdlye6wHEotel1CYkCZqH7xq/UZcXylgBuU52T2nKLvLUZmnlUb5gqOnHRsatb5ENs37fUYE
-	Mg2RdH/RUY2KrIjBO0Epbebx1Nw6eTo1iSv1bvWXCpfrONOKn5leUL4JR+WJaWfpiQ+YtZqzJznDa
-	XzdpvzRg==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.1 #2 (Red Hat Linux))
-	id 1u2n5V-00000008mN2-1kUp;
-	Thu, 10 Apr 2025 08:16:41 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 00A143003C4; Thu, 10 Apr 2025 10:16:40 +0200 (CEST)
-Date: Thu, 10 Apr 2025 10:16:40 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: kvm@vger.kernel.org, Alexander Potapenko <glider@google.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	kvm-riscv@lists.infradead.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Waiman Long <longman@redhat.com>, x86@kernel.org,
-	Kunkun Jiang <jiangkunkun@huawei.com>,
-	Boqun Feng <boqun.feng@gmail.com>, Anup Patel <anup@brainfault.org>,
-	Albert Ou <aou@eecs.berkeley.edu>, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Zenghui Yu <yuzenghui@huawei.com>,
-	Borislav Petkov <bp@alien8.de>, Alexandre Ghiti <alex@ghiti.fr>,
-	Keisuke Nishimura <keisuke.nishimura@inria.fr>,
-	Sebastian Ott <sebott@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Atish Patra <atishp@atishpatra.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Randy Dunlap <rdunlap@infradead.org>, Will Deacon <will@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	linux-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>, Ingo Molnar <mingo@redhat.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Sean Christopherson <seanjc@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Bjorn Helgaas <bhelgaas@google.com>
-Subject: Re: [PATCH v2 2/4] KVM: x86: move
- sev_lock/unlock_vcpus_for_migration to kvm_main.c
-Message-ID: <20250410081640.GX9833@noisy.programming.kicks-ass.net>
-References: <20250409014136.2816971-1-mlevitsk@redhat.com>
- <20250409014136.2816971-3-mlevitsk@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q8FketRZ6u4NFHE4k+1klEZwPrj95wefdOPvr8isn9iSP8vt/0iKhIXEyY4pRNUicSMslcmKyIXcqfFRBGSXjgplMIUesYSa41FYkcMojkBvWhXMDw8M64u1MmrkNepyyrDYCq0AfTqNUlghYAwnNF3l3N7VbYXLX8xKvb925uc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RYvYr9Uq; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744272048; x=1775808048;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Fog4B6Qbd8u1Pqc/gI0bDG41NJadwivsKQhqgMevtPQ=;
+  b=RYvYr9Uqn5Vwi7u7h6cdQ92ip18EVe0jZNFF9edORHK4Ro49C7QU1mjx
+   j6Pa900Oy91kRA0CzFQTuUZ0B2WnXbqqgvKZCjaCse+OXkUaWSHBDHnSm
+   aH79QzOBlXdyziNBLEi8sg4RLrR23S1Ela3ZfsdPUv+SIO/v1ijYvy/cM
+   x2HVI2KYtLHgfqePbVXfFrxBCXpGHqJoiZC6VGh01RG+h3xSgy3p2c4Ki
+   vzjaenmQui7Todu9srXdgIzBvhQQEOkdhq2Iuq/JbbWb3qrW0R+2zDOIs
+   dCb/6Co3f1nWlElWyyca0le8No9/uDzo3EwxP/VuEbFTEgDI1cNx+c/v9
+   w==;
+X-CSE-ConnectionGUID: m9FeLZ7eSoCF8j7JshBW7A==
+X-CSE-MsgGUID: amlo5lW9TzK2IrCOoEJGpQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11399"; a="45668198"
+X-IronPort-AV: E=Sophos;i="6.15,202,1739865600"; 
+   d="scan'208";a="45668198"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 01:00:39 -0700
+X-CSE-ConnectionGUID: GCO21CPgQjmbraiccL1yeA==
+X-CSE-MsgGUID: CwIZbOfJSLOTUfZSSHQyug==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,202,1739865600"; 
+   d="scan'208";a="134019949"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
+  by orviesa005.jf.intel.com with ESMTP; 10 Apr 2025 01:00:28 -0700
+Date: Thu, 10 Apr 2025 16:21:18 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Dongli Zhang <dongli.zhang@oracle.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-arm@nongnu.org,
+	qemu-ppc@nongnu.org, qemu-riscv@nongnu.org, qemu-s390x@nongnu.org,
+	pbonzini@redhat.com, mtosatti@redhat.com, sandipan.das@amd.com,
+	babu.moger@amd.com, likexu@tencent.com, like.xu.linux@gmail.com,
+	groug@kaod.org, khorenko@virtuozzo.com,
+	alexander.ivanov@virtuozzo.com, den@virtuozzo.com,
+	davydov-max@yandex-team.ru, xiaoyao.li@intel.com,
+	dapeng1.mi@linux.intel.com, joe.jin@oracle.com,
+	peter.maydell@linaro.org, gaosong@loongson.cn,
+	chenhuacai@kernel.org, philmd@linaro.org, aurelien@aurel32.net,
+	jiaxun.yang@flygoat.com, arikalo@gmail.com, npiggin@gmail.com,
+	danielhb413@gmail.com, palmer@dabbelt.com, alistair.francis@wdc.com,
+	liwei1518@gmail.com, zhiwei_liu@linux.alibaba.com,
+	pasic@linux.ibm.com, borntraeger@linux.ibm.com,
+	richard.henderson@linaro.org, david@redhat.com, iii@linux.ibm.com,
+	thuth@redhat.com, flavra@baylibre.com, ewanhai-oc@zhaoxin.com,
+	ewanhai@zhaoxin.com, cobechen@zhaoxin.com, louisqi@zhaoxin.com,
+	liamni@zhaoxin.com, frankzhu@zhaoxin.com, silviazhao@zhaoxin.com
+Subject: Re: [PATCH v3 09/10] target/i386/kvm: support perfmon-v2 for reset
+Message-ID: <Z/d/ft0CufA8prwl@intel.com>
+References: <20250331013307.11937-1-dongli.zhang@oracle.com>
+ <20250331013307.11937-10-dongli.zhang@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -91,77 +91,59 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250409014136.2816971-3-mlevitsk@redhat.com>
+In-Reply-To: <20250331013307.11937-10-dongli.zhang@oracle.com>
 
-On Tue, Apr 08, 2025 at 09:41:34PM -0400, Maxim Levitsky wrote:
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 69782df3617f..71c0d8c35b4b 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1368,6 +1368,77 @@ static int kvm_vm_release(struct inode *inode, struct file *filp)
->  	return 0;
->  }
+On Sun, Mar 30, 2025 at 06:32:28PM -0700, Dongli Zhang wrote:
+> Date: Sun, 30 Mar 2025 18:32:28 -0700
+> From: Dongli Zhang <dongli.zhang@oracle.com>
+> Subject: [PATCH v3 09/10] target/i386/kvm: support perfmon-v2 for reset
+> X-Mailer: git-send-email 2.43.5
+> 
+> Since perfmon-v2, the AMD PMU supports additional registers. This update
+> includes get/put functionality for these extra registers.
+> 
+> Similar to the implementation in KVM:
+> 
+> - MSR_CORE_PERF_GLOBAL_STATUS and MSR_AMD64_PERF_CNTR_GLOBAL_STATUS both
+> use env->msr_global_status.
+> - MSR_CORE_PERF_GLOBAL_CTRL and MSR_AMD64_PERF_CNTR_GLOBAL_CTL both use
+> env->msr_global_ctrl.
+> - MSR_CORE_PERF_GLOBAL_OVF_CTRL and MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR
+> both use env->msr_global_ovf_ctrl.
+> 
+> No changes are needed for vmstate_msr_architectural_pmu or
+> pmu_enable_needed().
+> 
+> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+> ---
+
+...
+
+> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+> index 3a35fd741d..f4532e6f2a 100644
+> --- a/target/i386/kvm/kvm.c
+> +++ b/target/i386/kvm/kvm.c
+> @@ -2149,6 +2149,16 @@ static void kvm_init_pmu_info_amd(struct kvm_cpuid2 *cpuid, X86CPU *cpu)
+>      }
 >  
+>      num_pmu_gp_counters = AMD64_NUM_COUNTERS_CORE;
 > +
-> +/*
-> + * Lock all VM vCPUs.
-> + * Can be used nested (to lock vCPUS of two VMs for example)
-> + */
-> +int kvm_lock_all_vcpus_nested(struct kvm *kvm, bool trylock, unsigned int role)
-> +{
-> +	struct kvm_vcpu *vcpu;
-> +	unsigned long i, j;
+> +    c = cpuid_find_entry(cpuid, 0x80000022, 0);
+> +    if (c && (c->eax & CPUID_8000_0022_EAX_PERFMON_V2)) {
+> +        pmu_version = 2;
+> +        num_pmu_gp_counters = c->ebx & 0xf;
 > +
-> +	lockdep_assert_held(&kvm->lock);
-> +
-> +	kvm_for_each_vcpu(i, vcpu, kvm) {
-> +
-> +		if (trylock && !mutex_trylock_nested(&vcpu->mutex, role))
-> +			goto out_unlock;
-> +		else if (!trylock && mutex_lock_killable_nested(&vcpu->mutex, role))
-> +			goto out_unlock;
-> +
-> +#ifdef CONFIG_PROVE_LOCKING
-> +		if (!i)
-> +			/*
-> +			 * Reset the role to one that avoids colliding with
-> +			 * the role used for the first vcpu mutex.
-> +			 */
-> +			role = MAX_LOCK_DEPTH - 1;
-> +		else
-> +			mutex_release(&vcpu->mutex.dep_map, _THIS_IP_);
-> +#endif
-> +	}
+> +        if (num_pmu_gp_counters > MAX_GP_COUNTERS) {
+> +            num_pmu_gp_counters = MAX_GP_COUNTERS;
 
-This code is all sorts of terrible.
+OK! KVM now supports 6 GP counters (KVM_MAX_NR_AMD_GP_COUNTERS).
 
-Per the lockdep_assert_held() above, you serialize all these locks by
-holding that lock, this means you can be using the _nest_lock()
-annotation.
+> +        }
+> +    }
+>  }
 
-Also, the original code didn't have this trylock nonsense, and the
-Changelog doesn't mention this -- in fact the Changelog claims no
-change, which is patently false.
+Fine for me,
 
-Anyway, please write like:
+Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
 
-	kvm_for_each_vcpu(i, vcpu, kvm) {
-		if (mutex_lock_killable_nest_lock(&vcpu->mutex, &kvm->lock))
-			goto unlock;
-	}
-
-	return 0;
-
-unlock:
-
-	kvm_for_each_vcpu(j, vcpu, kvm) {
-		if (j == i)
-			break;
-
-		mutex_unlock(&vcpu->mutex);
-	}
-	return -EINTR;
-
-And yes, you'll have to add mutex_lock_killable_nest_lock(), but that
-should be trivial.
 
