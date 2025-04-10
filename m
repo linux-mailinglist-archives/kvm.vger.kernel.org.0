@@ -1,124 +1,168 @@
-Return-Path: <kvm+bounces-43099-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43100-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61ED1A84B02
-	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 19:30:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9127DA84B9D
+	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 19:50:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 548811B874AB
-	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 17:30:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E90FD1BA4D86
+	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 17:50:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28F0628C5D0;
-	Thu, 10 Apr 2025 17:29:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0AE8285416;
+	Thu, 10 Apr 2025 17:49:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wj4aK967"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AVvUzMUD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D60741EF397
-	for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 17:29:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6323C1EDA29;
+	Thu, 10 Apr 2025 17:49:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744306191; cv=none; b=kjJt96A9aZcyxLstanUPsLHlDNU8jFMEN8fTwEEgkolrK4NhNbBaIZ/ESJwgO4+K1DHsrgHYun4+qCecsQ2P2dZAoO/KFQssLKA+g8j916FUB82ke7dlR699xna4VFm7OYVHY10hBMTNMEYKj1Z4nAVjDjQQf+TDQMeiQ0B/7dQ=
+	t=1744307395; cv=none; b=ioTcpIqHIqqydZMD2AUrtBteOjYOj6NzVGNQ7pki6ASleWGDZZq3bxKHUfqtqLOPmU2GomjcQn84y5eFcatYefs4W8VzwjEV8Lej40KPBDjavshBfnbxnSH2RRqmaTcnOyLwXFEgk94geLhMHGRksJXdrH+0nM+VRDP80wT+tzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744306191; c=relaxed/simple;
-	bh=8RGWQcgCimLPvpiAlk+5F2R9ep2gNgiJpKOuy3wGtDc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pX2MAPFzqZVDlVVhw3cJ6i8Th3rOl/Iwuy8/Hklh7C80NMPwqSeN2I2WOGnZJeMuLnmiwjJ8jsBHVRjcgCFnHY7QHIoP0r1PQXLvFylLotm83SxLfV1JvyLiSz83+DHjTSL4txEUBJJwoRvCbDpi0wgWzecYBPEILm6SB+7uKcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wj4aK967; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-73009f59215so1187729b3a.1
-        for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 10:29:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744306189; x=1744910989; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=THh7USP0TMmHVXYAIYVxQL6srWNoxeq+S60T+Iuc4Go=;
-        b=wj4aK9678it8BCAa+8f0A9aZxmuyaW+GbO0T1Giv+DEkRSTVTVxNzEXrCwT640/8hH
-         dM2nCDYpTjZjCCzsbkqnCBV7NLqTqwXUIhIqomh3I71Ha1b74Gw47UVlFdZje0Dy5CxU
-         PMzh+2+Y3Z4O34luUXJcqWfczc+9hl+7Dr98Z0dq2sWkES6qXPAPNdfAxJ/upufOUcSZ
-         sPEgwsd3A9r2U9dE1BcI7wLiiPlLIFUgNfd2MxIsBTzBlhvp/OWeiHLI/g6hxjvJUEV2
-         0CGPn9i0LC4UtIZe1JX060cbCWqsjZdRuFIQ9dVirjD7AsmxFhtwfFupMgVAa+fzrYY7
-         Uf5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744306189; x=1744910989;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=THh7USP0TMmHVXYAIYVxQL6srWNoxeq+S60T+Iuc4Go=;
-        b=keDZ99/gdtZqvFdTNzblRyF8gXXGaO/AL0+qpStFSTMVL7ENowrgMkZUOsdimI8ZW0
-         dcm9GNb0X8kWZhn6GjGq81swO5V+o1DJeVIuDnDRAS4UMAFQzvLUF2I/xLM6tklVgYEI
-         I/4TtwVQsnH8pbWdjNjiUpwFaPJXrz6M7vtl7BgbQX585RI+A1iozh0bVLAYoGpIKhTY
-         gRAcoITcsLvbvVempm+B6xBw1Cmkm/IO6lEIweo01cf30ryOWT8resa0BAjuzYzFmvnX
-         srVKnbFa3wMGLFdmNCwuWmmlztQRI9p8Ii38RsDzpMuN6rH8eG8281l6VnCrw9wRajsD
-         DWfA==
-X-Gm-Message-State: AOJu0YzC0cO8sw9SgbkaH/TM6EREhGOG/P62PtmhCZJSvA3qvSq/MBLz
-	DbG319wSQgHgb7mG02UlirmjiKfa0DnE2XS7AAzBDtBrSOjm3HZ5WQYXcsFtd+2SltceKQmO9EH
-	CUQ==
-X-Google-Smtp-Source: AGHT+IEzEm4pFNJ9RE2IrAYwwiomzZvMX+btxSqy0ddwSL3trJyRQq2fiWUm5uHQQn8B4/4qgmhNau+bVpY=
-X-Received: from pfbcw22.prod.google.com ([2002:a05:6a00:4516:b0:736:79d0:fd28])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:891:b0:736:34ca:dee2
- with SMTP id d2e1a72fcca58-73bc0a15157mr4684403b3a.4.1744306189171; Thu, 10
- Apr 2025 10:29:49 -0700 (PDT)
-Date: Thu, 10 Apr 2025 10:29:47 -0700
-In-Reply-To: <bba773d0-1ef9-4c9f-8728-9cf0888033ad@oracle.com>
+	s=arc-20240116; t=1744307395; c=relaxed/simple;
+	bh=BSlBou70rdYI1WqIexajKvsgOgYusvRJvdttvr8R6Ww=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=XCxj03/rWK7nQhpSNwrhMAMb/fhMboFwZrOX7wRm/NPXnl54WJQRDiSkqU6dMEKCe/Vh1em6Ya/iy92Kvdp/ryh0DpC0JjbTyZlB2oSPms+C+zSZFUFccX504VmH6WN4F1dhAPDqaCQs0gp0hmLZtUVOEK8RjD5PeWL4IT+BmKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AVvUzMUD; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744307393; x=1775843393;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=BSlBou70rdYI1WqIexajKvsgOgYusvRJvdttvr8R6Ww=;
+  b=AVvUzMUDKuTZH0rMeX8DH2296p3CT72YaWUmiOD01cUHbnSor27Zb1Ux
+   +Qo0p5seohrKtJ2Z9sijYSXfb9JoT03wnLxrWxgpRZVkGV+BgW4Gk3ix2
+   qN9Uy2faRrZZa+Wq4Mcd3uNQeYHyrD1cTt/yg4bmgYQPAT+yMGpbouCk6
+   8IpYjvuP/C4Z7JbBvkitNZNI4F1quaNMX73H3rQmnhRKcry4VHutNGhpH
+   CMMc5XR0c9B4wufzEJoCsTsXhUGKguQPuuCPgIhjRlytIFNWaQRo5b6mc
+   j+J81k1trfUMs2XeLU9WIxi9cr97in3my70bXXrBujw7aqeojTHvl1Ewk
+   Q==;
+X-CSE-ConnectionGUID: Q2Gkit4/Ty+TfHN7maqbOQ==
+X-CSE-MsgGUID: WGg0Y+1QTd2mpZvYlRinLA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11400"; a="56024157"
+X-IronPort-AV: E=Sophos;i="6.15,202,1739865600"; 
+   d="scan'208";a="56024157"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 10:49:52 -0700
+X-CSE-ConnectionGUID: m1Un4WLvSqCJYAUpy7G3EA==
+X-CSE-MsgGUID: 4pja72TtQjScDM94snD2/g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,202,1739865600"; 
+   d="scan'208";a="129507250"
+Received: from dstill-mobl.amr.corp.intel.com (HELO desk) ([10.125.145.218])
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 10:49:52 -0700
+Date: Thu, 10 Apr 2025 10:49:51 -0700
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Josh Poimboeuf <jpoimboe@kernel.org>, x86@kernel.org,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [PATCH] x86/bugs/mmio: Rename mmio_stale_data_clear to
+ cpu_buf_vm_clear
+Message-ID: <20250410-mmio-rename-v1-1-fd4b2e7fc04e@linux.intel.com>
+X-B4-Tracking: v=1; b=H4sIAE8C+GcC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI1MDE0MD3dzczHzdotS8xNxU3eQ0i8Tk1OQkUzPjVCWgjoKi1LTMCrBp0bG
+ 1tQA9ZqbYXQAAAA==
+X-Change-ID: 20250410-mmio-rename-cf8acecb563e
+X-Mailer: b4 0.14.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250404193923.1413163-1-seanjc@google.com> <20250404193923.1413163-65-seanjc@google.com>
- <9b7ceea3-8c47-4383-ad9c-1a9bbdc9044a@oracle.com> <Z_fnrP4e77mKjdX9@google.com>
- <bba773d0-1ef9-4c9f-8728-9cf0888033ad@oracle.com>
-Message-ID: <Z_gAC9DLG-q9poGV@google.com>
-Subject: Re: [PATCH 64/67] iommu/amd: KVM: SVM: Allow KVM to control need for
- GA log interrupts
-From: Sean Christopherson <seanjc@google.com>
-To: Joao Martins <joao.m.martins@oracle.com>
-Cc: kvm@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	Maxim Levitsky <mlevitsk@redhat.com>, David Matlack <dmatlack@google.com>, 
-	Alejandro Jimenez <alejandro.j.jimenez@oracle.com>, 
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>, Vasant Hegde <vasant.hegde@amd.com>, 
-	Joerg Roedel <joro@8bytes.org>, David Woodhouse <dwmw2@infradead.org>, 
-	Lu Baolu <baolu.lu@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Thu, Apr 10, 2025, Joao Martins wrote:
-> On 10/04/2025 16:45, Sean Christopherson wrote:
-> > On Wed, Apr 09, 2025, Joao Martins wrote:
-> >> On 04/04/2025 20:39, Sean Christopherson wrote:
-> >> I would suggest holding off on this and the next one, while progressing with
-> >> the rest of the series.
-> > 
-> > Agreed, though I think there's a "pure win" alternative that can be safely
-> > implemented (but it definitely should be done separately).
-> > 
-> > If HLT-exiting is disabled for the VM, and the VM doesn't have access to the
-> > various paravirtual features that can put it into a synthetic HLT state (PV async
-> > #PF and/or Xen support), then I'm pretty sure GALogIntr can be disabled entirely,
-> > i.e. disabled during the initial irq_set_vcpu_affinity() and never enabled.  KVM
-> > doesn't emulate HLT via its full emulator for AMD (just non-unrestricted Intel
-> > guests), so I'm pretty sure there would be no need for KVM to ever wake a vCPU in
-> > response to a device interrupt.
-> > 
-> 
-> Done via IRQ affinity changes already a significant portion of the IRTE and it's
-> already on a slowpath that performs an invalidation, so via
-> irq_set_vcpu_affinity is definitely safe.
-> 
-> But even with HLT exits disabled; there's still preemption though?
+The static key mmio_stale_data_clear controls the KVM-only mitigation for
+MMIO Stale Data vulnerability. Rename it to reflect its purpose.
 
-Even with involuntary preemption (which would be nonsensical to pair with HLT
-passthrough), KVM doesn't rely on the GALogIntr to schedule in the vCPU task.
+No functional change.
 
-The _only_ use of the notification is to wake the task and make it runnable.  If
-the vCPU task is already runnable, when and where the task is run is fully
-controlled by the scheduler (and/or userspace).
+Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+---
+ arch/x86/include/asm/nospec-branch.h |  2 +-
+ arch/x86/kernel/cpu/bugs.c           | 16 ++++++++++------
+ arch/x86/kvm/vmx/vmx.c               |  2 +-
+ 3 files changed, 12 insertions(+), 8 deletions(-)
 
-> But I guess that's a bit more rare if it's conditional to HLT exiting being
-> enabled or not, and whether there's only a single task running.
+diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
+index 8a5cc8e70439e10aab4eeb5b0f5e116cf635b43d..c0474e2b741737dad129159adf3b5fc056b6097c 100644
+--- a/arch/x86/include/asm/nospec-branch.h
++++ b/arch/x86/include/asm/nospec-branch.h
+@@ -561,7 +561,7 @@ DECLARE_STATIC_KEY_FALSE(mds_idle_clear);
+ 
+ DECLARE_STATIC_KEY_FALSE(switch_mm_cond_l1d_flush);
+ 
+-DECLARE_STATIC_KEY_FALSE(mmio_stale_data_clear);
++DECLARE_STATIC_KEY_FALSE(cpu_buf_vm_clear);
+ 
+ extern u16 mds_verw_sel;
+ 
+diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+index 4386aa6c69e12c9a8d66758e9f7cfff816ccbbe3..dcf029fed3beec38a2e8b6292ec7d0660f3ec678 100644
+--- a/arch/x86/kernel/cpu/bugs.c
++++ b/arch/x86/kernel/cpu/bugs.c
+@@ -128,9 +128,13 @@ EXPORT_SYMBOL_GPL(mds_idle_clear);
+  */
+ DEFINE_STATIC_KEY_FALSE(switch_mm_cond_l1d_flush);
+ 
+-/* Controls CPU Fill buffer clear before KVM guest MMIO accesses */
+-DEFINE_STATIC_KEY_FALSE(mmio_stale_data_clear);
+-EXPORT_SYMBOL_GPL(mmio_stale_data_clear);
++/*
++ * Controls CPU Fill buffer clear before VMenter. This is a subset of
++ * X86_FEATURE_CLEAR_CPU_BUF, and should only be enabled when KVM-only
++ * mitigation is required
++ */
++DEFINE_STATIC_KEY_FALSE(cpu_buf_vm_clear);
++EXPORT_SYMBOL_GPL(cpu_buf_vm_clear);
+ 
+ void __init cpu_select_mitigations(void)
+ {
+@@ -450,9 +454,9 @@ static void __init mmio_select_mitigation(void)
+ 	 * mitigations, disable KVM-only mitigation in that case.
+ 	 */
+ 	if (boot_cpu_has(X86_FEATURE_CLEAR_CPU_BUF))
+-		static_branch_disable(&mmio_stale_data_clear);
++		static_branch_disable(&cpu_buf_vm_clear);
+ 	else
+-		static_branch_enable(&mmio_stale_data_clear);
++		static_branch_enable(&cpu_buf_vm_clear);
+ 
+ 	/*
+ 	 * If Processor-MMIO-Stale-Data bug is present and Fill Buffer data can
+@@ -572,7 +576,7 @@ static void __init md_clear_update_mitigation(void)
+ 		taa_select_mitigation();
+ 	}
+ 	/*
+-	 * MMIO_MITIGATION_OFF is not checked here so that mmio_stale_data_clear
++	 * MMIO_MITIGATION_OFF is not checked here so that cpu_buf_vm_clear
+ 	 * gets updated correctly as per X86_FEATURE_CLEAR_CPU_BUF state.
+ 	 */
+ 	if (boot_cpu_has_bug(X86_BUG_MMIO_STALE_DATA)) {
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 5c5766467a61d434ba2baa79a5faba99bcbd9997..c79720aad3df265ec8060dfe754bc816104f8c7b 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7361,7 +7361,7 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
+ 	 */
+ 	if (static_branch_unlikely(&vmx_l1d_should_flush))
+ 		vmx_l1d_flush(vcpu);
+-	else if (static_branch_unlikely(&mmio_stale_data_clear) &&
++	else if (static_branch_unlikely(&cpu_buf_vm_clear) &&
+ 		 kvm_arch_has_assigned_device(vcpu->kvm))
+ 		mds_clear_cpu_buffers();
+ 
+
+---
+base-commit: 0af2f6be1b4281385b618cb86ad946eded089ac8
+change-id: 20250410-mmio-rename-cf8acecb563e
+
 
