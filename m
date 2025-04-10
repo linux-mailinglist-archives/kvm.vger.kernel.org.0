@@ -1,153 +1,156 @@
-Return-Path: <kvm+bounces-43036-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43037-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28E8DA834DC
-	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 01:56:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F116A834ED
+	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 02:06:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 008D7447827
-	for <lists+kvm@lfdr.de>; Wed,  9 Apr 2025 23:56:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7300F8C154C
+	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 00:06:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B559E21D3E1;
-	Wed,  9 Apr 2025 23:56:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FF31BA33;
+	Thu, 10 Apr 2025 00:06:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1KtXU583"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XN+Ogr+n"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E5819004A
-	for <kvm@vger.kernel.org>; Wed,  9 Apr 2025 23:56:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACFD44685;
+	Thu, 10 Apr 2025 00:06:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744242982; cv=none; b=b0Th87SCVS01HOsEaAorXbBRud+qLcYrpzuergNh/4zJqQKniWxZ6E7VckDXTZcWJ9dEBj162zf9+rg8eIUcGcTi3JJWW8FJQghkxxpZdXTwqlVmYsAc3A0P7uoaPrkwHtkcpNVqE+asbRjBzxSVhFa2Y+s2lkvuUsEND5Izrr0=
+	t=1744243605; cv=none; b=C2Yhr3GDaDpf5nl5eM6WPve54o+J2lXH+LgF4R+W16nNP4lMDj9sekamvROEnL0jHz61NN3YxO/wU2CPFSgAefQLlFdeCyONVABWG3nHmt0fpy2KijymOQVS472GRh0vu06/iZV9s3qo79PdK2IdDokQrX8qKPKuisfaiC1HHEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744242982; c=relaxed/simple;
-	bh=y+yyXocDaiOTuOzMi+TszJ7pL3PGPglAn/e/y7Ue3mU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=fL1rTaRUCDcoPnAI/p1coufesVstRdHgP4oPlOgE5MpWSpXomvfh7TVxp4kw9LmtQaaiUY23+Mx05WkMFaHF2CvNfQHunPhgD1Zkb565Z4zV9FggP0UjG8WK46zoui1xLOzTmYDVeE7hHxjpgEoyGkKglNpVZcb120B635sxyOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1KtXU583; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-306e5d9c9a6so348044a91.1
-        for <kvm@vger.kernel.org>; Wed, 09 Apr 2025 16:56:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744242979; x=1744847779; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VkeFSOiqw/7aJ+qIzL1zuWuYp4ehBX48C6LDBcHbjyg=;
-        b=1KtXU583140dgJOFtVeI/cuY/STbyJdNyZvCppOgc/pgaXTPFVzyz6tjR/U6Z1WNKK
-         f41OogcgyuHWlOAchHTZ+q1bNC3TmT3VaV0i2c4C+eNmJ6WGj1Fg6a++5yEw4kYJ1/25
-         koRxe0lcobiAyCjGuVHWpA95/S0HGQiU46aMuuMyzZAeA2cMHgmP+jE5joMGjJl0IK4f
-         cTU8OnNceHIzP1FuWs7zNiK88u5mzib/k7xK3xJDRMrp92MsQBnRAIiB1VYEzNix/5X5
-         T9SNF8RfNk9Q8cODVZdow2LoSVCmUoO5X3ySXPbsDCKsCePK2sbmK5bRZixNYQsIzq3M
-         2waw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744242979; x=1744847779;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VkeFSOiqw/7aJ+qIzL1zuWuYp4ehBX48C6LDBcHbjyg=;
-        b=KdeOVrdGs8BC//g37FGdNp88fXs1IUM1YeLmgUMr5hd4QNK729pt01Bl7iER56r2IJ
-         cJEuJrwdH4dNEAmRFv0kqMHrTAs7d8J/0Z/V5f71ILw8v/ZoAY+5shyAaX73QULX5Utq
-         paJoC8fyU4y9Wk9CNMhiuIn3V5MtUhx7OR70G0W751nDPR9tvn2KcIDeMcbdd6VrHhhU
-         a/TuAT54pCdY/tAHsrl4+svcMkHkRmncLRRHFT3KvTXWQURBpWf7a79+fBD5k5MTKnwR
-         GGoTJ2HjcN2zFTTo2ygevVQZRh9h+74IJTcvpVbsxJoGpu8MtyoOqNXNnGgazalYKU9x
-         BueQ==
-X-Gm-Message-State: AOJu0YyRAstd8aDzQTAbjfWYR/1TOje84bI/CCq5cinOpJgqTnv1GgvR
-	xoZ4IECHatrMQguYQcxtcnaQc+pegcAAPKDW7+tuRFbBEi4ZuoJzTCa6zuNYYtytQo6Sa4wkutx
-	aig==
-X-Google-Smtp-Source: AGHT+IE7pFFxWKbmw/ifnFn5nYk/wffS3ge6lPDEDyB58ryciTbA2xXTBjU+nX2ZeZWzTTZF17pWYulO/JI=
-X-Received: from pjbqb7.prod.google.com ([2002:a17:90b:2807:b0:2fc:201d:6026])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1dc1:b0:2ea:7cd5:4ad6
- with SMTP id 98e67ed59e1d1-3072ba2324amr1085676a91.32.1744242979679; Wed, 09
- Apr 2025 16:56:19 -0700 (PDT)
-Date: Wed, 9 Apr 2025 16:56:18 -0700
-In-Reply-To: <20250314062620.1169174-1-zoudongjie@huawei.com>
+	s=arc-20240116; t=1744243605; c=relaxed/simple;
+	bh=OLodTnTgJkofh6jLGFZarJ/OW/GdDgxrc1bqoT8ziB4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SkcGnzgdsUpbFmMqU1kP9zZPBnRAC2d2hTtExwpGnYq9dAG95EJQNjoep0EBl7ljGIXmYHQJnS2J9Vz++PciQtvgYWTvJaZ5UNWd9YKf/RhZTxHFOS2/AzEc8vVinbQwwthLNZ8NZCcyyEgPpDny7mDXE8e1Y16k7MP/5ny0vs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XN+Ogr+n; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744243604; x=1775779604;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=OLodTnTgJkofh6jLGFZarJ/OW/GdDgxrc1bqoT8ziB4=;
+  b=XN+Ogr+nRbfGYJQFqePKZqUsz5l15/OWUaC3MD0v7gnSTvqjgnUCYmxf
+   V2trdK5AJ7jSs1cm3hPWfBOzxx4cmvOQgofDiVv6aGPeeVpDfD27S2JBS
+   7A03m/ehSHVaJ1rmO0cj534jkoMJkTVo8I13gJZcQpdakNBmGj2WLn/72
+   iD1loKXd8kRhr3LeYZ5wZHU07OaFnEyvt+i+2jLLX7zHaAVoXfQXsooZq
+   147iQ9jFSjlBfwqD62s2rYBgNf++zY+1Su8IiVrk32H46hA7LkruCwkEq
+   6jUqOmUQTob/dTaBWWCcf0YZJShE4oEtslKe5e+xRLKxqGLKZe2xZCFE+
+   g==;
+X-CSE-ConnectionGUID: MGsBwlHrQ42YoirePA1AqQ==
+X-CSE-MsgGUID: D1I67MXNR8+P0u/Ff0jr2Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11399"; a="33350022"
+X-IronPort-AV: E=Sophos;i="6.15,201,1739865600"; 
+   d="scan'208";a="33350022"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2025 17:06:43 -0700
+X-CSE-ConnectionGUID: e8jag2BrTN2cTH1GFXRBZw==
+X-CSE-MsgGUID: /ESmiYJiRQ+AbIVbpGK40A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,201,1739865600"; 
+   d="scan'208";a="159718665"
+Received: from yuntin1x-mobl1.ccr.corp.intel.com (HELO [10.238.11.203]) ([10.238.11.203])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2025 17:06:40 -0700
+Message-ID: <dc825cf8-eb78-47ad-8e3e-509183624368@linux.intel.com>
+Date: Thu, 10 Apr 2025 08:06:37 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250314062620.1169174-1-zoudongjie@huawei.com>
-Message-ID: <Z_cJIqEQEtEO9B8Y@google.com>
-Subject: Re: [bug report] KVM: x86: Syzkaller has discovered an use-after-free
- issue in complete_emulated_mmio of kernel 5.10
-From: Sean Christopherson <seanjc@google.com>
-To: zoudongjie <zoudongjie@huawei.com>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, kai.huang@intel.com, 
-	yuan.yao@intel.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	luolongmin@huawei.com, suxiaodong1@huawei.com, jiangkunkun@huawei.com, 
-	wangjian161@huawei.com, tangzhongwei2@huawei.com, mujinsheng@huawei.com, 
-	alex.chen@huawei.com, eric.fangyi@huawei.com, chenjianfei3@huawei.com, 
-	renxuming@huawei.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] KVM: TDX: Handle TDG.VP.VMCALL<GetQuote>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Kai Huang <kai.huang@intel.com>, "kvm@vger.kernel.org"
+ <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ Chao Gao <chao.gao@intel.com>, Rick P Edgecombe
+ <rick.p.edgecombe@intel.com>,
+ "mikko.ylinen@linux.intel.com" <mikko.ylinen@linux.intel.com>,
+ Xiaoyao Li <xiaoyao.li@intel.com>, Tony Lindgren <tony.lindgren@intel.com>,
+ Adrian Hunter <adrian.hunter@intel.com>,
+ Reinette Chatre <reinette.chatre@intel.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Yan Y Zhao <yan.y.zhao@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>
+References: <20250402001557.173586-1-binbin.wu@linux.intel.com>
+ <20250402001557.173586-2-binbin.wu@linux.intel.com>
+ <40f3dcc964bfb5d922cf09ddf080d53c97d82273.camel@intel.com>
+ <112c4cdb-4757-4625-ad18-9402340cd47e@linux.intel.com>
+ <Z_Z61UlNM1vlEdW1@google.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <Z_Z61UlNM1vlEdW1@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Mar 14, 2025, zoudongjie wrote:
-> Hi all,
-> 
-> I have discovered a use-after-free issue in complete_emulated_mmio during kernel fuzz testing
-> with Syzkaller, the Call Trace is as follows:
-> 
-> Call Trace:
->  dump_stack+0xbe/0xfd
->  print_address_description.constprop.0+0x19/0x170
->  __kasan_report.cold+0x6c/0x84
->  kasan_report+0x3a/0x50
->  check_memory_region+0xfd/0x1f0
->  memcpy+0x20/0x60
->  complete_emulated_mmio+0x305/0x420
->  kvm_arch_vcpu_ioctl_run+0x63f/0x6d0
->  kvm_vcpu_ioctl+0x413/0xb20
->  __se_sys_ioctl+0x111/0x160
->  do_syscall_64+0x30/0x40
->  entry_SYSCALL_64_after_hwframe+0x67/0xd1
-> 
-> RIP: 0033:0x45570d
-> Code: 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007f93213e9048 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-> RAX: ffffffffffffffda RBX: 000000000058c1f0 RCX: 000000000045570d
-> RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000005
-> RBP: 000000000058c1f0 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-> R13: 000000000000000b R14: 0000000000425750 R15: 00007fff27f167f0
 
-Do you have the kernel Code + register state?  This is from the userspace ioctl().
 
-> The buggy address belongs to the page:
-> page:000000005de3ae57 refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x111bff
-> flags: 0x17ffffc0000000(node=0|zone=2|lastcpupid=0x1fffff)
-> raw: 0017ffffc0000000 0000000000000000 dead000000000122 0000000000000000
-> raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
-> page dumped because: kasan: bad access detected
-> 
-> Memory state around the buggy address:
->  ffff888111bff780: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
->  ffff888111bff800: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-> >ffff888111bff880: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
->                                                  ^
->  ffff888111bff900: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
->  ffff888111bff980: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-> 
-> ==================================================================
-> 
-> Do you have any suggestions regarding this issue?
+On 4/9/2025 9:49 PM, Sean Christopherson wrote:
+> On Wed, Apr 02, 2025, Binbin Wu wrote:
+>> On 4/2/2025 8:53 AM, Huang, Kai wrote:
+>>>> +static int tdx_get_quote(struct kvm_vcpu *vcpu)
+>>>> +{
+>>>> +	struct vcpu_tdx *tdx = to_tdx(vcpu);
+>>>> +
+>>>> +	u64 gpa = tdx->vp_enter_args.r12;
+>>>> +	u64 size = tdx->vp_enter_args.r13;
+>>>> +
+>>>> +	/* The buffer must be shared memory. */
+>>>> +	if (vt_is_tdx_private_gpa(vcpu->kvm, gpa) || size == 0) {
+>>>> +		tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_INVALID_OPERAND);
+>>>> +		return 1;
+>>>> +	}
+>>> It is a little bit confusing about the shared buffer check here.  There are two
+>>> perspectives here:
+>>>
+>>> 1) the buffer has already been converted to shared, i.e., the attributes are
+>>> stored in the Xarray.
+>>> 2) the GPA passed in the GetQuote must have the shared bit set.
+>>>
+>>> The key is we need 1) here.  From the spec, we need the 2) as well because it
+>>> *seems* that the spec requires GetQuote to provide the GPA with shared bit set,
+>>> as it says "Shared GPA as input".
+>>>
+>>> The above check only does 2).  I think we need to check 1) as well, because once
+>>> you forward this GetQuote to userspace, userspace is able to access it freely.
+> (1) is inherently racy.  By the time KVM exits to userspace, the page could have
+> already been converted to private in the memory attributes.  KVM doesn't control
+> shared<=>private conversions, so ultimately it's userspace's responsibility to
+> handle this check.  E.g. userspace needs to take its lock on conversions across
+> the check+access on the buffer.  Or if userpsace unmaps its shared mappings when
+> a gfn is private, userspace could blindly access the region and handle the
+> resulting SIGBUS (or whatever error manifests).
+>
+> For (2), the driving motiviation for doing the checks (or not) is KVM's ABI.
+> I.e. whether nor KVM should handle the check depends on what KVM does for
+> similar exits to userspace.  Helping userspace is nice-to-have, but not mandatory
+> (and helping userspace can also create undesirable ABI).
+>
+> My preference would be that KVM doesn't bleed the SHARED bit into its exit ABI.
+> And at a glance, that's exactly what KVM does for KVM_HC_MAP_GPA_RANGE.  In
+> __tdx_map_gpa(), the so called "direct" bits are dropped (OMG, who's brilliant
+> idea was it to add more use of "direct" in the MMU code):
+>
+> 	tdx->vcpu.run->hypercall.args[0] = gpa & ~gfn_to_gpa(kvm_gfn_direct_bits(tdx->vcpu.kvm));
+> 	tdx->vcpu.run->hypercall.args[1] = size / PAGE_SIZE;
+> 	tdx->vcpu.run->hypercall.args[2] = vt_is_tdx_private_gpa(tdx->vcpu.kvm, gpa) ?
+> 					   KVM_MAP_GPA_RANGE_ENCRYPTED :
+> 					   KVM_MAP_GPA_RANGE_DECRYPTED;
+GetQuote is the first TDX specific KVM exit reason, previous TDVMCALLs that
+exit to userspace are converted to exist KVM exit ABIs, e.g., TDVMCALL_MAP_GPA
+is converted to KVM_EXIT_HYPERCALL with KVM_HC_MAP_GPA_RANGE, so the GPA passed
+to userspace must have the shared bit dropped.
 
-Do you have a reproducer?  A C reproducer in particular would be helpful.
-
-And does this repro on the latest and great upstream?  It's possible the underlying
-bug has been fixed, but not backported to v5.15 for whatever reason.
-
-> Any insights or debugging strategies would be greatly appreciated.
-
-Assuming the memcpy() is towards the end of complete_emulated_mmio() based on
-the offsets, that would correspond to:
-
-   memcpy(run->mmio.data, frag->data, min(8u, frag->len));
-
-My guess would be that frag->data is bad/stale; run->mmio.data is a static offset
-into the vCPU's run page, and I would expect far bigger explosions if the run
-page is freed while the vCPU is still reachable.
+>
+> So, KVM should keep the vt_is_tdx_private_gpa(), but KVM also needs to strip the
+> SHARED bit from the GPA reported to userspace.
+It makes sense to make the GPA format consistent to userspace.
+Thanks for the suggestion!
 
