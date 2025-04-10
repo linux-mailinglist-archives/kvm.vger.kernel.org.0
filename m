@@ -1,264 +1,366 @@
-Return-Path: <kvm+bounces-43102-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43103-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44E6DA84C55
-	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 20:45:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C038A84E03
+	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 22:17:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 658BD1BA6125
-	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 18:44:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DB9E19E7A89
+	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 20:17:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66B6528F92A;
-	Thu, 10 Apr 2025 18:44:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B36CE2900B7;
+	Thu, 10 Apr 2025 20:17:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dVNN++vn"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Jw5sUJ1b";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="ZbnZOhyU"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9BD128EA4C
-	for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 18:44:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744310653; cv=none; b=csAmwAGd1fxAFITL56yc0kI0BN6Ra2PpfnZHNvYhc34L1jAnUlfZFa2Ue+b2Dx1Raftv2IMGfvjgX6VyWcWYaZF7gbYKv7pPx/nnHIdL0pVl/JHUlHA0ifLZBq0plVFPOl+jsgxGrN5GW8BaUouRXscVMoiiBt+n/sDuqbPkrEE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744310653; c=relaxed/simple;
-	bh=sKywq7H/4Et9741fqSvhin/moVoNQTVDF+h4YhYybJw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VViaKbFsTXdchbUKkUdGPVRZ8Ogd3M4L3LwrIh/kM72Uso67nstGGut2KpdsQ3k1+3xUp6YHEnjwOKaaOa+6sx3bfDYWWxAxpJAZFYCncd8mdFBiZv2sUB6a85rxjivCqRBe4J/I6GjwleUbW1UA2VtNoxKf0aYNmrDR8h7KG1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dVNN++vn; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744310650;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Jxve4+H/G8iIVYp4eWG2z8bp0IS92tto2aBEElfrg50=;
-	b=dVNN++vnDW4mxjyu86EieWNBeB0dw/sAvYVmHGg8atvVIQy7w3wN/ZzfbOwch3ZvuFbHln
-	nHkh+HiELXuWILa3MXs2rAOKqAG2mr/QJuEwxlcgX684eAjw0yZ2EwXA3sqf3JfZ5wDYAE
-	kiO/iAY9M+uCkzYwPQyOgvUMjiTjX7U=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-691-ECG_T0YOOxyTxUBgKqgsyA-1; Thu, 10 Apr 2025 14:44:09 -0400
-X-MC-Unique: ECG_T0YOOxyTxUBgKqgsyA-1
-X-Mimecast-MFC-AGG-ID: ECG_T0YOOxyTxUBgKqgsyA_1744310648
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3912d9848a7so1179010f8f.0
-        for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 11:44:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744310648; x=1744915448;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Jxve4+H/G8iIVYp4eWG2z8bp0IS92tto2aBEElfrg50=;
-        b=gWBOM/Q6CM+FO0tVjV0b1jRCtJNWTFwysh/WpxmUihO7jDtf/PnA/OE4idIK4Cr4qx
-         ffQT+DFqgNclGKp8BPJ4sTRFWXMQ1fFa6Ww5kPO5peuCnqJMQ+mjbln78A/7Wb3DNwtH
-         bLu2ZobaCaN+bngjj/JZY5UlSLjSadOdjVP51XXgj/OFEtYL9d27fP8OpTkuDGS4kM94
-         /XyqhJMo+lSQs9iChN44vvgcf6/93Nfx0myU0fLB2IH9tUDJywfUjvjj/il5HMK4Qh5Z
-         xzqN9ytOkY+AlULUVD/dyjytqnYtn7gaKTrkPfy/tzcaydnJ72bJtoIvJKKfIRBjuyJA
-         hITA==
-X-Forwarded-Encrypted: i=1; AJvYcCV1RUL1BXHK36soyDhXd8a44g9EATuBCaVa1krJ1/HyejXEioHpsR1AwjCYbAyc3NYU//g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmPolxMkQ9APPc9sL818iMFvzscIUBxkC+j3EMEDqusGSLSTWz
-	2zVAaceFU0LkaCG2Zwl1miY9Akvr7HMBrAbGxAkFJDcetyLeUISHH6JdasHE22S+1kWGWLCDAeZ
-	cMpfdPebEnuyk+NNMYBp716Zt9sVUjY7l8V0p6cO0Enkm5L8Z9g==
-X-Gm-Gg: ASbGncvXm8MJfZIMe7YAc7Eb2e7wBK1W0QJg6APM0hDC7jkX83ZdDqLyYdAqsghTJHO
-	SGBc5GzrvXtn9WH31CP7o6UHnLRpsRvkrjeWjPd75kFlLEhaY746kJhYIxXSN7aqt88Q+0i1mnO
-	iyUsKV9nrBrKVY/WecKHORxZaE/0fK1I6L1RXzMpmZXAfymk8D0w2QRtGm0GEPgj/VXeNFfeF0H
-	E0uBKKQvifcatww9/porZCo2Q1P4dHzm5+Xfwsr3m4wchQMExiEH2CyZJAUUvjz9HkjXVmSdf69
-	MICWMflpX+n4Oofi3M4EeXKKThcaWvXbE/RCd1PhCw3+NARbW0cS4x+td7HXI+IJS+iTcY6MVDb
-	fLvcn1yF9MAGog5dspMKXoGHwwjgCxEjoCRwMW34=
-X-Received: by 2002:a05:6000:2910:b0:39c:1efb:eec9 with SMTP id ffacd0b85a97d-39e6e49f471mr38105f8f.13.1744310648179;
-        Thu, 10 Apr 2025 11:44:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEEvQUNgBzNubFZ9s+T+LLIrqym+NXcc1LkzcRdHUvQ0wzpouOUTK9qcrtz+IuiYAIXOqtXDw==
-X-Received: by 2002:a05:6000:2910:b0:39c:1efb:eec9 with SMTP id ffacd0b85a97d-39e6e49f471mr38093f8f.13.1744310647685;
-        Thu, 10 Apr 2025 11:44:07 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c71a:5900:d106:4706:528a:7cd5? (p200300cbc71a5900d1064706528a7cd5.dip0.t-ipconnect.de. [2003:cb:c71a:5900:d106:4706:528a:7cd5])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39d893773b6sm5555224f8f.27.2025.04.10.11.44.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Apr 2025 11:44:06 -0700 (PDT)
-Message-ID: <065d46ba-83c1-473a-9cbe-d5388237d1ea@redhat.com>
-Date: Thu, 10 Apr 2025 20:44:04 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03CEE20C038
+	for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 20:17:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744316250; cv=fail; b=KUWMsGW5YObk+SFIixwvkb+iQ/L4xF+9QxhWbXt0tLYhDLLrXGELdC6ruVBbqzhBHFxaB90pGY2CNsNUqXWouIZ3LWuSaXzX8z/hUzRR5aOzdq25jiXKKpoFE1c0IgZPy0BqAYV45NFkVlIHNc/3SfssuBIO96NHsF9o4Ms0Fng=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744316250; c=relaxed/simple;
+	bh=/zb8M3fM7lK5BQPeywnw+1wi10Li15nUzOKinwZmq7A=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Mqf5Av8t4ffAiQw/Zlf4dA2840CU29+h9PJbByAP7LRkrLmxRH8aGQWbYNWF62IMXxgRxnMzajXBSMDgxXD4cn1InjbVZJov7QoV6FYdaqmkxuXdcIjEUnPjc9LyVf7xPy1racVwmflxWq3D2APymsdxDA18oiM0w92xNSntUnw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Jw5sUJ1b; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=ZbnZOhyU; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53AJmv1f021239;
+	Thu, 10 Apr 2025 20:16:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2023-11-20; bh=z+PrqAdKoXJiQn4F1DO+YaXY33sNfpMpLEjidVOfoPY=; b=
+	Jw5sUJ1bweS9nxMxXiWkn8bfp8CyogfFYlnSBBPGanbYlN5MMMmHwhqtin9GMO8m
+	/DikTlwwO9lmP0OJeIpVmpIXJgSlehFfKMgq29iRsvRSPmkdAbtB//P+BPbl+HK8
+	zxAC2Zx/69/r4QT+AUH2Adj8PpSzBc8Eh+rCDO+WMr1MScEXbmOd4/o8py6LG6qd
+	HhkKMbKAOrhCjJPGhPLOnRcT+2Cj+BPJcl1u2HMBrZwzWRuEil/2D5tnufEGv19X
+	JXKxnnnq+FNhKtPcvavXovPrxfbVW23txV+sgNCZMmHjSeSRIsb/U9/33UvThCbD
+	p2LNg19n0cUby7M42N69GA==
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 45xmf3r2ec-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 10 Apr 2025 20:16:25 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 53AIjZsZ001330;
+	Thu, 10 Apr 2025 20:16:23 GMT
+Received: from cy3pr05cu001.outbound.protection.outlook.com (mail-westcentralusazlp17013077.outbound.protection.outlook.com [40.93.6.77])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 45ttycr6yv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 10 Apr 2025 20:16:23 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=aI90oceWYj3bLv17YmGNJprookkbOCnkQATkRDak5ZOck1nfhSD/tLKnYpf4vkNa8qNN+nVl1mg4ocuWb9XTptVADAfMGxPHBROCYELWmon5+cf7h6rqfYkeZR1JDqqvZm9lxXp8fn6SKLc2hO0Gl0HhYm68L0SKuLzLvBsw1GQHYhPyrmlJUayf8Ul0tu8dmuSLBjUAmrQry7JuOSgrW4ebu84zfVKpj6O2oes6L/tjGUchJwrV06eBFOLRjwZYEE/+bHWjJebqD7paKv/nKEGhgFyNKLXdSdwMMJsMko3wdi1YJHB+7aWfd3PxkJgkVi/XSpqqjNjxjKyI/3ns8g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=z+PrqAdKoXJiQn4F1DO+YaXY33sNfpMpLEjidVOfoPY=;
+ b=aCTlneC5m47Hzy36h+Q3Z8Sbr3Fp4g1JERKK/x9Z1yvjts8/VN4NYPFIzCOeyhLQ9j8zyHcmgh3ItjNAF2gntLN/Ml/nFrshcYBU031shGdiTz+7biDwK4SbRhCGgagCeGM0R7JJl/Y0FxwYorMdSGPXd7SjEKgvl2ExOTuG25OIl9AXZfGL7evWUIaxmeRUW4+Pjo+Pl2QzWMemsXZBcIOHgimoVP8Nx3uoseLiR5CThV6F3NBpFe6HytxTB4kg56/m1P4ArVjeaUo0VNHWYrZcpEAh6W2ZjzkzQICyiiaOft+imDVKq5wIgxdEqw3ejjxr+mA+k4a8HXWLHlkBOw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=z+PrqAdKoXJiQn4F1DO+YaXY33sNfpMpLEjidVOfoPY=;
+ b=ZbnZOhyUbcrqilQJRIncsDueI4ma1TB9XXOcmvcyVGtcf7BHDlmrXefo1kzlEiXpp7xzOmIqOLTIPSWqBvEl10f9gTa03A7mjXeucgYkD6CWPSKMxOpEvOaSL49QzKRmrSzcZAghODbTCWBdbozXThT0nntEceTnzynSnqBjuuc=
+Received: from DS7PR10MB7129.namprd10.prod.outlook.com (2603:10b6:8:e6::5) by
+ IA1PR10MB6685.namprd10.prod.outlook.com (2603:10b6:208:41b::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.34; Thu, 10 Apr
+ 2025 20:16:20 +0000
+Received: from DS7PR10MB7129.namprd10.prod.outlook.com
+ ([fe80::721c:7e49:d8c5:799c]) by DS7PR10MB7129.namprd10.prod.outlook.com
+ ([fe80::721c:7e49:d8c5:799c%5]) with mapi id 15.20.8632.021; Thu, 10 Apr 2025
+ 20:16:20 +0000
+Message-ID: <9427cf24-cf16-427c-99a0-90f5fb9c09b2@oracle.com>
+Date: Thu, 10 Apr 2025 13:16:14 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 07/10] target/i386/kvm: query kvm.enable_pmu parameter
+To: Zhao Liu <zhao1.liu@intel.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-arm@nongnu.org,
+        qemu-ppc@nongnu.org, qemu-riscv@nongnu.org, qemu-s390x@nongnu.org,
+        pbonzini@redhat.com, mtosatti@redhat.com, sandipan.das@amd.com,
+        babu.moger@amd.com, likexu@tencent.com, like.xu.linux@gmail.com,
+        groug@kaod.org, khorenko@virtuozzo.com, alexander.ivanov@virtuozzo.com,
+        den@virtuozzo.com, davydov-max@yandex-team.ru, xiaoyao.li@intel.com,
+        dapeng1.mi@linux.intel.com, joe.jin@oracle.com,
+        peter.maydell@linaro.org, gaosong@loongson.cn, chenhuacai@kernel.org,
+        philmd@linaro.org, aurelien@aurel32.net, jiaxun.yang@flygoat.com,
+        arikalo@gmail.com, npiggin@gmail.com, danielhb413@gmail.com,
+        palmer@dabbelt.com, alistair.francis@wdc.com, liwei1518@gmail.com,
+        zhiwei_liu@linux.alibaba.com, pasic@linux.ibm.com,
+        borntraeger@linux.ibm.com, richard.henderson@linaro.org,
+        david@redhat.com, iii@linux.ibm.com, thuth@redhat.com,
+        flavra@baylibre.com, ewanhai-oc@zhaoxin.com, ewanhai@zhaoxin.com,
+        cobechen@zhaoxin.com, louisqi@zhaoxin.com, liamni@zhaoxin.com,
+        frankzhu@zhaoxin.com, silviazhao@zhaoxin.com
+References: <20250331013307.11937-1-dongli.zhang@oracle.com>
+ <20250331013307.11937-8-dongli.zhang@oracle.com> <Z/dRiyGTxb8JBE8v@intel.com>
+Content-Language: en-US
+From: Dongli Zhang <dongli.zhang@oracle.com>
+In-Reply-To: <Z/dRiyGTxb8JBE8v@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR03CA0239.namprd03.prod.outlook.com
+ (2603:10b6:a03:39f::34) To DS7PR10MB7129.namprd10.prod.outlook.com
+ (2603:10b6:8:e6::5)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] s390/virtio_ccw: don't allocate/assign airqs for
- non-existing queues
-To: linux-kernel@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
- kvm@vger.kernel.org, Chandra Merla <cmerla@redhat.com>,
- Stable@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Eric Farman <farman@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Wei Wang <wei.w.wang@intel.com>
-References: <20250402203621.940090-1-david@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
- dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
- QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
- XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
- Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
- PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
- WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
- UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
- jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
- B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
- ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZgEEwEIAEICGwMGCwkIBwMCBhUIAgkKCwQW
- AgMBAh4BAheAAhkBFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl8Ox4kFCRKpKXgACgkQTd4Q
- 9wD/g1oHcA//a6Tj7SBNjFNM1iNhWUo1lxAja0lpSodSnB2g4FCZ4R61SBR4l/psBL73xktp
- rDHrx4aSpwkRP6Epu6mLvhlfjmkRG4OynJ5HG1gfv7RJJfnUdUM1z5kdS8JBrOhMJS2c/gPf
- wv1TGRq2XdMPnfY2o0CxRqpcLkx4vBODvJGl2mQyJF/gPepdDfcT8/PY9BJ7FL6Hrq1gnAo4
- 3Iv9qV0JiT2wmZciNyYQhmA1V6dyTRiQ4YAc31zOo2IM+xisPzeSHgw3ONY/XhYvfZ9r7W1l
- pNQdc2G+o4Di9NPFHQQhDw3YTRR1opJaTlRDzxYxzU6ZnUUBghxt9cwUWTpfCktkMZiPSDGd
- KgQBjnweV2jw9UOTxjb4LXqDjmSNkjDdQUOU69jGMUXgihvo4zhYcMX8F5gWdRtMR7DzW/YE
- BgVcyxNkMIXoY1aYj6npHYiNQesQlqjU6azjbH70/SXKM5tNRplgW8TNprMDuntdvV9wNkFs
- 9TyM02V5aWxFfI42+aivc4KEw69SE9KXwC7FSf5wXzuTot97N9Phj/Z3+jx443jo2NR34XgF
- 89cct7wJMjOF7bBefo0fPPZQuIma0Zym71cP61OP/i11ahNye6HGKfxGCOcs5wW9kRQEk8P9
- M/k2wt3mt/fCQnuP/mWutNPt95w9wSsUyATLmtNrwccz63XOwU0EVcufkQEQAOfX3n0g0fZz
- Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
- T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
- 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
- CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
- NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
- 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
- 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
- lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
- AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
- N7eop7uh+6bezi+rugUI+w6DABEBAAHCwXwEGAEIACYCGwwWIQQb2cqtc1xMOkYN/MpN3hD3
- AP+DWgUCXw7HsgUJEqkpoQAKCRBN3hD3AP+DWrrpD/4qS3dyVRxDcDHIlmguXjC1Q5tZTwNB
- boaBTPHSy/Nksu0eY7x6HfQJ3xajVH32Ms6t1trDQmPx2iP5+7iDsb7OKAb5eOS8h+BEBDeq
- 3ecsQDv0fFJOA9ag5O3LLNk+3x3q7e0uo06XMaY7UHS341ozXUUI7wC7iKfoUTv03iO9El5f
- XpNMx/YrIMduZ2+nd9Di7o5+KIwlb2mAB9sTNHdMrXesX8eBL6T9b+MZJk+mZuPxKNVfEQMQ
- a5SxUEADIPQTPNvBewdeI80yeOCrN+Zzwy/Mrx9EPeu59Y5vSJOx/z6OUImD/GhX7Xvkt3kq
- Er5KTrJz3++B6SH9pum9PuoE/k+nntJkNMmQpR4MCBaV/J9gIOPGodDKnjdng+mXliF3Ptu6
- 3oxc2RCyGzTlxyMwuc2U5Q7KtUNTdDe8T0uE+9b8BLMVQDDfJjqY0VVqSUwImzTDLX9S4g/8
- kC4HRcclk8hpyhY2jKGluZO0awwTIMgVEzmTyBphDg/Gx7dZU1Xf8HFuE+UZ5UDHDTnwgv7E
- th6RC9+WrhDNspZ9fJjKWRbveQgUFCpe1sa77LAw+XFrKmBHXp9ZVIe90RMe2tRL06BGiRZr
- jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20250402203621.940090-1-david@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR10MB7129:EE_|IA1PR10MB6685:EE_
+X-MS-Office365-Filtering-Correlation-Id: 173527ff-9aef-40fe-e343-08dd786c8e5e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?MmNoTVNLcS9renRINmEvNzVhR2swMTZwNVVlRllqV3JHaUVJVmtwT0FEQTQ3?=
+ =?utf-8?B?NDlRejJmM1BlRWZTZ0lwYzZEazBUSkt2ZkhmK3gzQXJoVlAyNWQwaUJmM3Bu?=
+ =?utf-8?B?V2cxNVRWVnE1Vlg4WEh3Sjh5SXk0TDB4WTFVMzZ0enlDMyt4T3FjaGVlT1VQ?=
+ =?utf-8?B?M3dQcjdBN2lSZHFuTXpWWTN0T0RGMEl2b2RYdlVtVGJLdm1mRThMMHh3ejFR?=
+ =?utf-8?B?ZHlXVE11MnpaYWdNNGY2U0hDcXZMWmFveUlMQUpqNnFUWU4zUnF0dGJYSEUr?=
+ =?utf-8?B?bHY5Q1hBT0pMTTl6SW96SU5mQ1dQdEdLT3BQbHFKOW55dkdwM1YrUjF4TGpm?=
+ =?utf-8?B?c2w5MWFHRnB4TDdXNUhNNTVHbE1tLyt5b2gwZ2JTZUJkemsvbUxIaGpYdmtD?=
+ =?utf-8?B?Wk9QNjZuWmRaN0Z0UStYVWkvU05GbUZvZUc4TmNFdlZaZUgxSkk0MnIxM1h4?=
+ =?utf-8?B?cFVMTEhlaHNxeGxTSk5rcEpZWFF6ZmlNOWQyVVlnRk1PTnZwUG1MNi9UNW52?=
+ =?utf-8?B?Z1ltNURvVkh6SjlZTFFNdFh2YWpXQmZGbmxWUUdROFU4bHRKQzgxc1dLWEJ4?=
+ =?utf-8?B?NmxTa2VwOWlqTXNJYmxhajRXdXZSbk5hd0JPcFVhbUZoRVdOSFRsVkVNKzNM?=
+ =?utf-8?B?Tm5ST09CdGIzTmxMZkFiRTYwZTFCb1VzbDliV3hLbno1VGtVeU1FdUo2T3A0?=
+ =?utf-8?B?akN1YkRHSUorZ0ovVnBraWNrb2NqSmV1SlYzb3pLRFFGc3ZKdGNHd1ZJRmRF?=
+ =?utf-8?B?VVVjMXNCK0ZKa01mRVpLWUpmSVZiSzVjRWN3K0JrYkxtWkhYUWw1cWM3L3Nr?=
+ =?utf-8?B?TWtybFJxZzd0T3N4UWVUR0h1eG5oei9LRXpFcjZYRkRzUWRxUVdwMExEekxC?=
+ =?utf-8?B?eEdhMlJ4dm1XYW9WTXU2ZmJuaXRVMTFDSzc0YUFLa3JNRXAremlhTWs4YWVL?=
+ =?utf-8?B?WU4rYkdjVDhCSGFBVUF0UW1YdEJnSWRGSUV6WXNhc3hxN1N2MnFBTFVVZW9H?=
+ =?utf-8?B?YnhGK2xpMjNEeDFwSWJxKytyOVpXeWgrMlF6WDU3Skliajg1V2lyRFJiL2Jq?=
+ =?utf-8?B?N1JXRGFjUHl5dmhqZWJJOUdvN1AwaDhHVmhtQU8rSkxnRWhHaDJQT0dXYzJM?=
+ =?utf-8?B?U0hCSnFnNXAxb3NmVW5nSS96cWYveEx5RFB6Rk1hTVBvUHA5SWNHOEorUlpM?=
+ =?utf-8?B?eHVRN1IrZ1dHc04xQUt1bmpxZWZxNGhNUlhha2hKWnNBMnJ3bGRnZ0NUTUlv?=
+ =?utf-8?B?bDZ2VTlXQzRVK0tJb2plS0FiNmM4ZmJIWlhKQkpQT1J3MEZvcXNNTXlWZmt6?=
+ =?utf-8?B?c056WmZ4RktRTmF4Yi8yYmQzYUc4UzBzRjBrZExrN1puNkszYm9hL2lCcUM5?=
+ =?utf-8?B?c0RFbWNiODdabzV1S1JXaFYwRCtDMnhyUWcvSmRaNTVsTVJ5MUR3R3dkblcw?=
+ =?utf-8?B?ZlpnanVMSFkzNW0xS2ZvTkU4VkZwYUdwN3Z1RFo5dWJOYi9lL2JjbFRzM0dJ?=
+ =?utf-8?B?aG9qUjZVeURZcmJJNVZrK2RqeTBOVFhobG5NSVZBMm8yMEVQc0tyUml2aHND?=
+ =?utf-8?B?VklkRlhPNXVaQ1pZc0dRVEh0TTdKTlMxNjdQVmMzbkZMMlExSWJvQ21XeDIw?=
+ =?utf-8?B?c29ManJCZFI3YmhyelY3YVFERmZMM1hCZ2M3azNZL05KZ2hySlBKVEJxcFRW?=
+ =?utf-8?B?TlRxOXdMS0RGbkxNQVQxeWpvNXBFZTc1bUlpVSsvVHVSL1FtQW41WnRURHQ4?=
+ =?utf-8?B?NllFckdHT1o0QlY4bUR3dEtwWjZYTG1aNTNoZThjWnNPUlhTRDdTNVdoSUtQ?=
+ =?utf-8?B?NFUvN2piK0UvZ1Noa3dMUmJtc0NXQ1JwYi9xL2czWGtlYTNTLzREV3F6STFW?=
+ =?utf-8?B?cERkV3htbEN3L0ZFRloweGVSbzdBRitpS1hnS0N5b24yZ3lwOTA5WTV0SHhG?=
+ =?utf-8?Q?60xh4dObrAw=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR10MB7129.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MVhtSlY1S1dyNEl0QmlQcjhWeVdzS0xpRlZwR3VmdDRkK3F4d1liWWdpREdm?=
+ =?utf-8?B?SHNyY3BVRkFYQ1BPK2JmYWdXdzBkWG1Pa3gvYmdtUHlPS1hnQ3VweHpJZ3h6?=
+ =?utf-8?B?emlJYlMxMkNPZkNmRVlzSFArVk9LVHZoVW9lTDZFSkx5b01CdlZ6dmtXUGlv?=
+ =?utf-8?B?YTRWTDdKSlI5dVBNb1ZUNU9lc2ptc1ZqZjFmbWtrOFFaWUo1NUxRVno3TWdI?=
+ =?utf-8?B?b3NjZ2dJM3UvclJUYkJRUk5OUVJQOWJZWThWSG84QmFwV1ZDMDVoZndqSUpB?=
+ =?utf-8?B?SnEybzE2SFhyekxjTnhGYkZ5QlVhZXZTNHQyTi9pdE5CekFYRE5IQjZKSEtj?=
+ =?utf-8?B?eVMxRGlOcXRaaGVpUlg3Wm1laW5HeThrcm1zQUtadnpUQXh2aVdyWTMyb2ZL?=
+ =?utf-8?B?MWpvN01zVkdNMjR3UVNLV2Qwazk3SGZXUHVaNm4xTzBhR2x4L0xtM0VtdmlR?=
+ =?utf-8?B?SGZNL2JCZ0xyRFF0RWhJZmdUZ0hITFI4eC9DUXUweFM0NzJlc2FCVm42Ty9F?=
+ =?utf-8?B?RWdFaWJJaU5FYjNlL3QwU0pCRlNtbW1kcEJjQmlLdHZxaStuMk9ab3JjRUZq?=
+ =?utf-8?B?UFZRNU5wVVJJZDJqdjVJZlNYZ1dMWXhkRlM0d08vcXpDVGZBSjNuVmpwWk9l?=
+ =?utf-8?B?b1ZqM0FsN3Boa3ViVFlNZXZ3czd4MkRxMVlTQUJDRWhHT0h6NVpMOGhyZW1s?=
+ =?utf-8?B?ck1zTUpMdUwwMkFLd3BwaCtrY0JFYURTS1l0L1FkYW41ZWR0RkU3Tm5xRVNk?=
+ =?utf-8?B?dWdEMitQcFdsTEl0RHNIRXJINjIwcVMrK05sZVh6cUNBQm5KcExabkt3K1BL?=
+ =?utf-8?B?QjFMbDF5YjBBaitPUnNscDNYYlpVbEdRQWg5SVUwaGZ2cW9aT2hVRnYvUEh1?=
+ =?utf-8?B?ZFBKQjI1WVRMRDJ3T3hEcE9SMnI2UjIxZTVNaFJGcTNvQUcrcnl3eFpiNE1n?=
+ =?utf-8?B?b25Ya1JWdE1IZ0FQUTYvcnBZa0lHdmVVL0wvV1NUREE5WVJrRFYrc3kwaEpY?=
+ =?utf-8?B?VnpwMUNoM0QzaFJScFpXbzhZN0ZVemxoaVhvTFVJK2pRYk4wOS9rb0tUWnA0?=
+ =?utf-8?B?aTVCNzdLTGxaODRuOFg0UVJmb0pGM09BYlVDcXV6QUZIM3VubmZOdzRBRUUv?=
+ =?utf-8?B?a0YvTnR3eWZ3aVd0b0V5NVVWTUp1dHlOSTJoa0ZWaDVGV0dzT1VMbW5NTzZo?=
+ =?utf-8?B?RzAzOXg3L1Y3TUpYdjdBREZKZlJXbElTbU5MUE11RnJDOGdwZEsxcEpBZC8y?=
+ =?utf-8?B?M2Q2aHU3MDQ3bkFzY1IrbWhwdE1RdWl4WWw3QlBZT2EyNGIrazAzeUxqTzgx?=
+ =?utf-8?B?QWgwTzZqNHZTOGQ2WTQ0cy93MjUzK0hCQXlSV25ldnJRVVZzczVQeHVIQ2Na?=
+ =?utf-8?B?eGNQRG4wRkk4akdkWXBabkg5bHZlbkJaZGZ0clZ3a1ZDMkNZaGViTWtDaTYx?=
+ =?utf-8?B?VkhyRWppSjJ1VXlRc21RMm9sUHVVN0pvSmthandTSEdqd0Y2U0taY0pBVkpx?=
+ =?utf-8?B?NHc3U3BoVzRKVjB0OWh1TFVLLzV5REZJUnpUZ0o2andGWU1SU3IrL05MVUdz?=
+ =?utf-8?B?cWEvMzdYV2VzaWlseW5NZzhSOWhNMGFNZzRpdDJxQ0xwbWIxSTBkcS96MVJq?=
+ =?utf-8?B?UUhMZkdVckhiS1VYVW1NV2JITmx2dCtoQWhsVEFtYlcyaFFvbVdhSmpBWnNG?=
+ =?utf-8?B?NHRYRW5zZWg0dlQ3bWxkZVkwMFhLelVaMHlSVjJmTm14VlJmeklQZ1pFcGFu?=
+ =?utf-8?B?Mm9hcWtGVGtzOWVkOHh2UHBoclZUaTU5c1Z5MzNHeTAreDdqUXF2K0hEQUVY?=
+ =?utf-8?B?bEdYRFlVSkdRMWZqcGxmSW16MDBWT2gyQ0tYZVJ6MFluNkRlYmQ3elNXcGI0?=
+ =?utf-8?B?RVd5TVN3QURuczhtVnN5cGxCWHgrNXdaVmVKVVFZL0RWYlZRaCtMRVNSeWtH?=
+ =?utf-8?B?VC9xTGU0T0RNY0VVeVlZdGx6UzhBVWlwYTZoaFhsck9sMWpJeFBsNmJMcUF0?=
+ =?utf-8?B?bzBoUXlXeEhPTWVBQ2JRbTJlL1V4ZHhQczJ0Rkd0U0NnUkxVVWFPZk9Lc3NB?=
+ =?utf-8?B?U21xWkNzVWFZYnRZQVhvSkVBRU5IWTFzVDFQeVFPYmFjcXcyQVorYTZaelRL?=
+ =?utf-8?B?NWViMWhXRndFcEIxbWtIL0EwWmdRc2xJb2V5eWYvMkFkK0x2VnB6R2hBZzZj?=
+ =?utf-8?B?bXc9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	GPrY/JAUjHj5UFnhGR4jk9qlRHRi22exROwW4VsS6vOhB78C4p26VMlTiTG58f+MvmM58EbJiU8U2kj9ggh+VJTx1iqHxdn26t/Y/d8MBnuxGcZ67nu1BKOd6DoZPP45t5fzIoHXNQmIG/x9qca2IqrG5O6EQftZgXPbDNjA3c+PHymWKFI6plecTUG6aN0qhoM4jHT4noUojiaXZuA63wAmaEMwcl6GoLyG92DZ95YuYrOumsIuqSZ4+aBAWljIQH/XEiabRPBuNU7pxgKXbuRyjmqrElXU7miaAZJKsRFbRf1YDoij00P+izGaRt6dg6KQ0287oUWlZleKI6+fcBLpvDzIMUS7pLHHCFNY9xUCgavp1BsHiaInJXTKcrhFhLiFAzgIuqyQC68HRZHFY0Ux1/WaR8xLNjZhv6v9fWmYfTq7FuIAUQ0IYaE2fhX3dfNgsqelpt6rM+JUobKTiFM1L3nRkr9+1pnKR9XzjRFj1soe16/WsS0McF58Vno4XAkhJeXVUO7oOkjjPYhnSNM9mTKeldDHfEOCEiT9l26uJkt/hehSyR650cAhsDVUtQoG+5qW1BjirTBb7fKdQBPYhlsdoAJgBtoLeKpIA0E=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 173527ff-9aef-40fe-e343-08dd786c8e5e
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR10MB7129.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2025 20:16:19.8899
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rYjf2LCg9msQF4IYkqzqMVtMFi6UPqmHpxnOs4kaGmKZMj1ciWmzPNpStWcAsn7MpK5Ncc+RRJT8ausXaeVVuQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR10MB6685
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-04-10_06,2025-04-10_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999
+ suspectscore=0 adultscore=0 bulkscore=0 mlxscore=0 phishscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2502280000 definitions=main-2504100147
+X-Proofpoint-ORIG-GUID: CEVgf8MnlrqL8PdkzIslkPiUVvNheA6u
+X-Proofpoint-GUID: CEVgf8MnlrqL8PdkzIslkPiUVvNheA6u
 
-On 02.04.25 22:36, David Hildenbrand wrote:
-> If we finds a vq without a name in our input array in
-> virtio_ccw_find_vqs(), we treat it as "non-existing" and set the vq pointer
-> to NULL; we will not call virtio_ccw_setup_vq() to allocate/setup a vq.
-> 
-> Consequently, we create only a queue if it actually exists (name != NULL)
-> and assign an incremental queue index to each such existing queue.
-> 
-> However, in virtio_ccw_register_adapter_ind()->get_airq_indicator() we
-> will not ignore these "non-existing queues", but instead assign an airq
-> indicator to them.
-> 
-> Besides never releasing them in virtio_ccw_drop_indicators() (because
-> there is no virtqueue), the bigger issue seems to be that there will be a
-> disagreement between the device and the Linux guest about the airq
-> indicator to be used for notifying a queue, because the indicator bit
-> for adapter I/O interrupt is derived from the queue index.
-> 
-> The virtio spec states under "Setting Up Two-Stage Queue Indicators":
-> 
-> 	... indicator contains the guest address of an area wherein the
-> 	indicators for the devices are contained, starting at bit_nr, one
-> 	bit per virtqueue of the device.
-> 
-> And further in "Notification via Adapter I/O Interrupts":
-> 
-> 	For notifying the driver of virtqueue buffers, the device sets the
-> 	bit in the guest-provided indicator area at the corresponding
-> 	offset.
-> 
-> For example, QEMU uses in virtio_ccw_notify() the queue index (passed as
-> "vector") to select the relevant indicator bit. If a queue does not exist,
-> it does not have a corresponding indicator bit assigned, because it
-> effectively doesn't have a queue index.
-> 
-> Using a virtio-balloon-ccw device under QEMU with free-page-hinting
-> disabled ("free-page-hint=off") but free-page-reporting enabled
-> ("free-page-reporting=on") will result in free page reporting
-> not working as expected: in the virtio_balloon driver, we'll be stuck
-> forever in virtballoon_free_page_report()->wait_event(), because the
-> waitqueue will not be woken up as the notification from the device is
-> lost: it would use the wrong indicator bit.
-> 
-> Free page reporting stops working and we get splats (when configured to
-> detect hung wqs) like:
-> 
->   INFO: task kworker/1:3:463 blocked for more than 61 seconds.
->         Not tainted 6.14.0 #4
->   "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
->   task:kworker/1:3 [...]
->   Workqueue: events page_reporting_process
->   Call Trace:
->    [<000002f404e6dfb2>] __schedule+0x402/0x1640
->    [<000002f404e6f22e>] schedule+0x3e/0xe0
->    [<000002f3846a88fa>] virtballoon_free_page_report+0xaa/0x110 [virtio_balloon]
->    [<000002f40435c8a4>] page_reporting_process+0x2e4/0x740
->    [<000002f403fd3ee2>] process_one_work+0x1c2/0x400
->    [<000002f403fd4b96>] worker_thread+0x296/0x420
->    [<000002f403fe10b4>] kthread+0x124/0x290
->    [<000002f403f4e0dc>] __ret_from_fork+0x3c/0x60
->    [<000002f404e77272>] ret_from_fork+0xa/0x38
-> 
-> There was recently a discussion [1] whether the "holes" should be
-> treated differently again, effectively assigning also non-existing
-> queues a queue index: that should also fix the issue, but requires other
-> workarounds to not break existing setups.
-> 
-> Let's fix it without affecting existing setups for now by properly ignoring
-> the non-existing queues, so the indicator bits will match the queue
-> indexes.
-> 
-> [1] https://lore.kernel.org/all/cover.1720611677.git.mst@redhat.com/
-> 
-> Fixes: a229989d975e ("virtio: don't allocate vqs when names[i] = NULL")
-> Reported-by: Chandra Merla <cmerla@redhat.com>
-> Cc: <Stable@vger.kernel.org>
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: Thomas Huth <thuth@redhat.com>
-> Cc: Halil Pasic <pasic@linux.ibm.com>
-> Cc: Eric Farman <farman@linux.ibm.com>
-> Cc: Heiko Carstens <hca@linux.ibm.com>
-> Cc: Vasily Gorbik <gor@linux.ibm.com>
-> Cc: Alexander Gordeev <agordeev@linux.ibm.com>
-> Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
-> Cc: Sven Schnelle <svens@linux.ibm.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Wei Wang <wei.w.wang@intel.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
+Hi Zhao,
 
-So, given that
+On 4/9/25 10:05 PM, Zhao Liu wrote:
+> Hi Dongli,
+> 
+> The logic is fine for me :-) And thank you to take my previous
+> suggestion. When I revisit here after these few weeks, I have some
+> thoughts:
+> 
+>> +        if (pmu_cap) {
+>> +            if ((pmu_cap & KVM_PMU_CAP_DISABLE) &&
+>> +                !X86_CPU(cpu)->enable_pmu) {
+>> +                ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PMU_CAPABILITY, 0,
+>> +                                        KVM_PMU_CAP_DISABLE);
+>> +                if (ret < 0) {
+>> +                    error_setg_errno(errp, -ret,
+>> +                                     "Failed to set KVM_PMU_CAP_DISABLE");
+>> +                    return ret;
+>> +                }
+>> +            }
+> 
+> This case enhances vPMU disablement.
+> 
+>> +        } else {
+>> +            /*
+>> +             * KVM_CAP_PMU_CAPABILITY is introduced in Linux v5.18. For old
+>> +             * linux, we have to check enable_pmu parameter for vPMU support.
+>> +             */
+>> +            g_autofree char *kvm_enable_pmu;
+>> +
+>> +            /*
+>> +             * The kvm.enable_pmu's permission is 0444. It does not change until
+>> +             * a reload of the KVM module.
+>> +             */
+>> +            if (g_file_get_contents("/sys/module/kvm/parameters/enable_pmu",
+>> +                                    &kvm_enable_pmu, NULL, NULL)) {
+>> +                if (*kvm_enable_pmu == 'N' && X86_CPU(cpu)->enable_pmu) {
+>> +                    error_setg(errp, "Failed to enable PMU since "
+>> +                               "KVM's enable_pmu parameter is disabled");
+>> +                    return -EPERM;
+>> +                }
+> 
+> And this case checks if vPMU could enable.
+> 
+>>              }
+>>          }
+>>      }
+> 
+> So I feel it's not good enough to check based on pmu_cap, we can
+> re-split it into these two cases: enable_pmu and !enable_pmu. Then we
+> can make the code path more clear!
+> 
+> Just like:
+> 
+> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+> index f68d5a057882..d728fb5eaec6 100644
+> --- a/target/i386/kvm/kvm.c
+> +++ b/target/i386/kvm/kvm.c
+> @@ -2041,44 +2041,42 @@ int kvm_arch_pre_create_vcpu(CPUState *cpu, Error **errp)
+>      if (first) {
+>          first = false;
+> 
+> -        /*
+> -         * Since Linux v5.18, KVM provides a VM-level capability to easily
+> -         * disable PMUs; however, QEMU has been providing PMU property per
+> -         * CPU since v1.6. In order to accommodate both, have to configure
+> -         * the VM-level capability here.
+> -         *
+> -         * KVM_PMU_CAP_DISABLE doesn't change the PMU
+> -         * behavior on Intel platform because current "pmu" property works
+> -         * as expected.
+> -         */
+> -        if (pmu_cap) {
+> -            if ((pmu_cap & KVM_PMU_CAP_DISABLE) &&
+> -                !X86_CPU(cpu)->enable_pmu) {
+> -                ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PMU_CAPABILITY, 0,
+> -                                        KVM_PMU_CAP_DISABLE);
+> -                if (ret < 0) {
+> -                    error_setg_errno(errp, -ret,
+> -                                     "Failed to set KVM_PMU_CAP_DISABLE");
+> -                    return ret;
+> -                }
+> -            }
+> -        } else {
+> -            /*
+> -             * KVM_CAP_PMU_CAPABILITY is introduced in Linux v5.18. For old
+> -             * linux, we have to check enable_pmu parameter for vPMU support.
+> -             */
+> +        if (X86_CPU(cpu)->enable_pmu) {
+>              g_autofree char *kvm_enable_pmu;
+> 
+>              /*
+> -             * The kvm.enable_pmu's permission is 0444. It does not change until
+> -             * a reload of the KVM module.
+> +             * The enable_pmu parameter is introduced since Linux v5.17,
+> +             * give a chance to provide more information about vPMU
+> +             * enablement.
+> +             *
+> +             * The kvm.enable_pmu's permission is 0444. It does not change
+> +             * until a reload of the KVM module.
+>               */
+>              if (g_file_get_contents("/sys/module/kvm/parameters/enable_pmu",
+>                                      &kvm_enable_pmu, NULL, NULL)) {
+> -                if (*kvm_enable_pmu == 'N' && X86_CPU(cpu)->enable_pmu) {
+> -                    error_setg(errp, "Failed to enable PMU since "
+> +                if (*kvm_enable_pmu == 'N') {
+> +                    warn_report("Failed to enable PMU since "
+>                                 "KVM's enable_pmu parameter is disabled");
+> -                    return -EPERM;
+> +                }
+> +            }
+> +        } else {
+> +            /*
+> +             * Since Linux v5.18, KVM provides a VM-level capability to easily
+> +             * disable PMUs; however, QEMU has been providing PMU property per
+> +             * CPU since v1.6. In order to accommodate both, have to configure
+> +             * the VM-level capability here.
+> +             *
+> +             * KVM_PMU_CAP_DISABLE doesn't change the PMU
+> +             * behavior on Intel platform because current "pmu" property works
+> +             * as expected.
+> +             */
+> +            if ((pmu_cap & KVM_PMU_CAP_DISABLE)) {
+> +                ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PMU_CAPABILITY, 0,
+> +                                        KVM_PMU_CAP_DISABLE);
+> +                if (ret < 0) {
+> +                    error_setg_errno(errp, -ret,
+> +                                     "Failed to set KVM_PMU_CAP_DISABLE");
+> +                    return ret;
+>                  }
+>              }
+>          }
+> 
 
-(a) people are actively running into this
-(b) we'll have to backport this quite a lot
-(c) the spec issue is not a s390x-only issue
-(d) it's still unclear how to best deal with the spec issue
 
-I suggest getting this fix here upstream asap. It will neither making 
-sorting out the spec issue easier nor harder :)
+Thank you very much! I will split based on (enable_pmu) and (!enable_pmu)
+following your suggestion.
 
-I can spot it in the s390 fixes tree already.
-
--- 
-Cheers,
-
-David / dhildenb
+Dongli Zhang
 
 
