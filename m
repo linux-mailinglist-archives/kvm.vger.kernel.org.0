@@ -1,124 +1,144 @@
-Return-Path: <kvm+bounces-43095-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43096-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7090BA848E3
-	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 17:57:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 033F7A84970
+	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 18:21:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA5FA3BECA8
-	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 15:53:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB52F189160F
+	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 16:21:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D221E1EF0B0;
-	Thu, 10 Apr 2025 15:51:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IkZFaSgD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D8501EDA2F;
+	Thu, 10 Apr 2025 16:21:02 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps-ovh.mhejs.net (vps-ovh.mhejs.net [145.239.82.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DC231E9B2F
-	for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 15:51:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE241D5CE8
+	for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 16:20:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.239.82.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744300281; cv=none; b=ADKC/LQsC7IpZqvkTzYGI+KUdrBIr7t6RnfU4pslEDMkzt28dS1VeC2D9r2KlVypR+Xwi4jZvRnZdiZNSxn+Yux9JjAEiU1jM2r/vFYYLCCvr1OonKUPNYaqrUytTZ2FBrJ+0eLHJdT218X+7A2TorOFUJHhbzzWB9cAKcsj5cw=
+	t=1744302061; cv=none; b=O4F2Mf3f2hPjVFQ90QKmrCoCnGJsaiyQy3FS50MXiP0KHtLwFHcHaEi8rOGLrqDVEekfCPzO/eND8CKNMZ+kKvKos4DtYTASz8GY7M7vwfNXPtqCxASS51Xiblawy0hi7Ikr/AUDEThVI2khAxZYAmhZx+fkIa1wRuRcDyX+7IM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744300281; c=relaxed/simple;
-	bh=I1HL4EhttE881MicAtF32b66FddNBn0rz1b+bJ5vSpI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=q9D/lVgd5G0rbkxcKvUSzgTxvjY0+y2DmvoMmD7BuRdisCToW3rEC32qsCpeIgkzpsXWg2wHcpSjiaRMbduSuH+KJdh3wsqRtflvLIqHun2DwfXO1kTR8Mg/mqFjeuGNHak8NR5ppIfNd/u5Gm7wzLcuXdAt6opyv3Y4HZTGuoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IkZFaSgD; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-22403329f9eso8455015ad.3
-        for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 08:51:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744300280; x=1744905080; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WI+w75MsGfdj1Z+7uV4Y8gvQFBHXDpFpnvwgAEL/2AQ=;
-        b=IkZFaSgDMxVLDJYiztqhLWeJ9BKaBmCbT7F4CFXTzXGHk78dhVZw31jouCnNDop6qG
-         LyvJ2AGGW9B/NjGJES68OuKAKaLBwFvD2KGUWdvUlsG1f0aD8K6C+rGbK5ysE6vJ1dDv
-         +K+JpZcy29v0dUf1sfGwTYaAYrUFfG7GrYAzIQi7CH+jkldW1WG3aBanwL1UNOUAXBRV
-         bHMPWtECNA0qzJQhzQzy4ceyGFHvF2uUxZwwYnkpxqCNMe6h/tq8OFE5STxYBiSEa0NU
-         lfHoRRzZvrm0R3beELu0HF0TwdJm5QdJx8sDTJg7rPPsfd5OuFieaYBGI8NvdpPXr494
-         9s4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744300280; x=1744905080;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WI+w75MsGfdj1Z+7uV4Y8gvQFBHXDpFpnvwgAEL/2AQ=;
-        b=aycQTpUvJVn/stzRk4SmDdVDPdL51xTn84VsLFmhMx57pLusE4PQmCNn8Apc1n3hEa
-         wrrD61A7jv1nDMK8ZDWEJIbk42cbjMr5i8x5Ry9urVEYejxSndHKYXVe6wfSYYhtpKRq
-         9D9yZiM72kC2zKUfxNDIkrCNC+OabazEV8WptqK+OXxBDsKsFMrqq2OE/GWeX5/Pw12K
-         pE6Xcikse5rkDqi8FAk7AvE0avqAkyB6+BQIZamW3dE7QXssxZezg4tGq+IJDRBO+t4M
-         vmYnMUIDFXqVQrmVm4yklNUQJJK/ZK65IwlZ2EHN/YYIiQFo8Zi8AP6zJhZ7bs0UV57L
-         cUFA==
-X-Forwarded-Encrypted: i=1; AJvYcCXaCj6btajPVIdzrpqhxJ4E3hPAa6urLdTVbyFWwtCuGN04oNq3FLLdHEHREM+ck8dvRl4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzELfJ7SQxF3ySpa7lxXzuN7tZ5NuYVJLVNrNOTYmeNyJYN6bcE
-	RBZlNCko4LoaJYC3tEEOuVY9f36MTiI9modbNCLjPoK1NRJsdtPPcRL2cl/gJAmrOV36gWYeD3Z
-	tgQ==
-X-Google-Smtp-Source: AGHT+IHHdPvjX46b6rya58AVmth99Sr4qyG2wQ8QULk3PUwKRfJK74c4z91IfDSthvFsL0y+9dnZ4azBoYg=
-X-Received: from plsb7.prod.google.com ([2002:a17:902:b607:b0:229:2f8a:d4ba])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d4cf:b0:220:d601:a704
- with SMTP id d9443c01a7336-22be0302063mr29493945ad.18.1744300279479; Thu, 10
- Apr 2025 08:51:19 -0700 (PDT)
-Date: Thu, 10 Apr 2025 08:51:18 -0700
-In-Reply-To: <BN9PR11MB5276385B4F4DB1919D4908CF8CB72@BN9PR11MB5276.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1744302061; c=relaxed/simple;
+	bh=ZCKCouVhwjqi3FZM7WanzUUsJmCNPH92/1uR1q7di4Y=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=M/NRB15VzgbUJlyjrOSeL5xfk5p8r2BNfd9fnSDCXjksKvBalOLFxsgWgr8cTFIuXX4LmZgVr+38LcyqQ7R5bzNnL5w1sVanGfaHIINlsFviFhqNT5u8QeFJLlvwWyZe/2UZfMTFnz/Tmnri2/xomLEMXbDRUFdz+8vXNpFoVJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name; spf=pass smtp.mailfrom=vps-ovh.mhejs.net; arc=none smtp.client-ip=145.239.82.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vps-ovh.mhejs.net
+Received: from MUA
+	by vps-ovh.mhejs.net with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
+	(Exim 4.98.1)
+	(envelope-from <mhej@vps-ovh.mhejs.net>)
+	id 1u2uHG-00000001OzE-2qfY;
+	Thu, 10 Apr 2025 17:57:18 +0200
+Message-ID: <afff3782-08ab-42cd-a32d-33c307c5d9b7@maciej.szmigiero.name>
+Date: Thu, 10 Apr 2025 17:57:13 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250404211449.1443336-1-seanjc@google.com> <20250404211449.1443336-4-seanjc@google.com>
- <BN9PR11MB5276385B4F4DB1919D4908CF8CB72@BN9PR11MB5276.namprd11.prod.outlook.com>
-Message-ID: <Z_fo9hPpSfpwi5Jn@google.com>
-Subject: Re: [PATCH 3/7] irqbypass: Take ownership of producer/consumer token tracking
-From: Sean Christopherson <seanjc@google.com>
-To: Kevin Tian <kevin.tian@intel.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	David Matlack <dmatlack@google.com>, Like Xu <like.xu.linux@gmail.com>, 
-	Yong He <alexyonghe@tencent.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] target/i386: Reset parked vCPUs together with the online
+ ones
+From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org
+References: <e8b85a5915f79aa177ca49eccf0e9b534470c1cd.1743099810.git.maciej.szmigiero@oracle.com>
+Content-Language: en-US, pl-PL
+Autocrypt: addr=mail@maciej.szmigiero.name; keydata=
+ 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
+Disposition-Notification-To: "Maciej S. Szmigiero"
+ <mail@maciej.szmigiero.name>
+In-Reply-To: <e8b85a5915f79aa177ca49eccf0e9b534470c1cd.1743099810.git.maciej.szmigiero@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Sender: mhej@vps-ovh.mhejs.net
 
-On Thu, Apr 10, 2025, Kevin Tian wrote:
-> > From: Sean Christopherson <seanjc@google.com>
-> > +int irq_bypass_register_consumer(struct irq_bypass_consumer *consumer,
-> > +				 struct eventfd_ctx *eventfd)
-> >  {
-> >  	struct irq_bypass_consumer *tmp;
-> >  	struct irq_bypass_producer *producer;
-> >  	int ret;
-> > 
-> > -	if (!consumer->token ||
-> > -	    !consumer->add_producer || !consumer->del_producer)
-> > +	if (WARN_ON_ONCE(consumer->token))
-> > +		return -EINVAL;
-> > +
-> > +	if (!consumer->add_producer || !consumer->del_producer)
-> >  		return -EINVAL;
-> > 
-> >  	mutex_lock(&lock);
-> > 
-> >  	list_for_each_entry(tmp, &consumers, node) {
-> > -		if (tmp->token == consumer->token || tmp == consumer) {
-> > +		if (tmp->token == eventfd || tmp == consumer) {
-> >  			ret = -EBUSY;
-> >  			goto out_err;
-> >  		}
-> >  	}
+On 27.03.2025 19:24, Maciej S. Szmigiero wrote:
+> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 > 
-> the 2nd check 'tmp == consumer' is redundant. If they are equal 
-> consumer->token is not NULL then the earlier WARN_ON will be
-> triggered already.
+> Commit 3f2a05b31ee9 ("target/i386: Reset TSCs of parked vCPUs too on VM
+> reset") introduced a way to reset TSCs of parked vCPUs during VM reset to
+> prevent them getting desynchronized with the online vCPUs and therefore
+> causing the KVM PV clock to lose PVCLOCK_TSC_STABLE_BIT.
+> 
+> The way this was done was by registering a parked vCPU-specific QEMU reset
+> callback via qemu_register_reset().
+> 
+> However, it turns out that on particularly device-rich VMs QEMU reset
+> callbacks can take a long time to execute (which isn't surprising,
+> considering that they involve resetting all of VM devices).
+> 
+> In particular, their total runtime can exceed the 1-second TSC
+> synchronization window introduced in KVM commit 5d3cb0f6a8e3 ("KVM:
+> Improve TSC offset matching").
+> Since the TSCs of online vCPUs are only reset from "synchronize_post_reset"
+> AccelOps handler (which runs after all qemu_register_reset() handlers) this
+> essentially makes that fix ineffective on these VMs.
+> 
+> The easiest way to guarantee that these parked vCPUs are reset at the same
+> time as the online ones (regardless how long it takes for VM devices to
+> reset) is to piggyback on post-reset vCPU synchronization handler for one
+> of online vCPUs - as there is no generic post-reset AccelOps handler that
+> isn't per-vCPU.
+> 
+> The first online vCPU was selected for that since it is easily available
+> under "first_cpu" define.
+> This does not create an ordering issue since the order of vCPU TSC resets
+> does not matter.
+> 
+> Fixes: 3f2a05b31ee9 ("target/i386: Reset TSCs of parked vCPUs too on VM reset")
+> Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> ---
 
-Oh, nice.  Good catch!  That check subtly gets dropped on the conversion to
-xarray, so it definitely makes sense to remove it in this patch.
+Friendly ping?
+
+Thanks,
+Maciej
+
 
