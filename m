@@ -1,176 +1,117 @@
-Return-Path: <kvm+bounces-43119-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43120-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 044E9A8500E
-	for <lists+kvm@lfdr.de>; Fri, 11 Apr 2025 01:24:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D2FFA8501B
+	for <lists+kvm@lfdr.de>; Fri, 11 Apr 2025 01:25:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9A901B8006B
-	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 23:24:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 332894A808A
+	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 23:25:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EE3E214815;
-	Thu, 10 Apr 2025 23:24:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB50C21423E;
+	Thu, 10 Apr 2025 23:25:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3u7Ky+9f"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hxAOJadv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E0A320E334
-	for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 23:24:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D92211713
+	for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 23:25:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744327463; cv=none; b=HIKw1Oe9o0Xuk7wT0BOua9Fu3IOkpUjux3/ks5wacxX5sNL9SXetyzHwzrVJi82EJwGnm2DsWYYNZA+6gGkUQC/NRYaW6OQkTSsRt7e9ZS4xTtozL6nu7CJ3aEyAUeZORj/hH9Zp3FJPDkL/6OJrNo9+k/cp5p+1OlL+MS5c6t0=
+	t=1744327552; cv=none; b=MtTR3R9uGlICIoSD+Bg9W4c4Nclq/fi2f1hNpSd7QLqSiiluj9ZS9IEcUC1LUWmjJWAJ7JjyA6fLoOH6NZY3gAtqgjar89Aww6AnWWfxGbaS4YgTi02D6Xyl6yEmJ/Iycf83Mm0e4TrkCBlEJAxkI28Bz9wycisE2TH5wJFzyQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744327463; c=relaxed/simple;
-	bh=fRu1wIpBkqC/PAC+6Z3ide0GL77+kwaEESC4lKY2HQM=;
+	s=arc-20240116; t=1744327552; c=relaxed/simple;
+	bh=H3TsOvV/0/nhWyZg2M7TYMQ+w/e4B+1Zkq90CxwF9W4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PQU6pZsWA+CPsfvlwZ5Fus+6LFJEsk5ixy5S05G4JC89m+OLE1jh0LM4GMvbgb3xCapr52LFkqICg4zCdPch39euEu+MdGFbcHda8GwvBlgH5Tuq8xdYhGYHbyfdAVAUaHhm1Tu7kLksxLqdfTH2Oqkd9E44vcQ68rceaed57/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3u7Ky+9f; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=nqK/KCEvF8Zc45M8VdzMQzBI3smE7YN8s6/xbg4IgTzAPb+HBAslUOLjqDxQdoOOyBK2FfflMrpD5X0NDZdpt8EwT1hmfJlhCTv1aWL8CLQLFMezEXilobyVmdh4JqBXLI92xzde+9nXZq5h1hyOKx6blkplHcNl7yaTsgos6BQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hxAOJadv; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-736c7df9b6cso1623319b3a.3
-        for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 16:24:21 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff5296726fso1907570a91.0
+        for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 16:25:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744327461; x=1744932261; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1744327550; x=1744932350; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+8Hj0FhxYq298MEgk+A50ezX9To9apyasGONCk8/EIY=;
-        b=3u7Ky+9frkNfCSvunj3hgyXaCVhwQWpsJbi1kvWmQtcGe+GsRD598bauPycpTprcD6
-         XGD+aPRexvyp8B8N5R+Y40IN+xBJMgfvd2vo8wEWcDIFLVunLWkQCGQTP1OF8+5Of5tY
-         h4gTalndOQUdDo50dGBtpP9O9VAPvw2fFnSmo1ySO1fzEWNakHbU3PYx2wpMv1Ig9YW5
-         v06Qe7baAARVR3deBAk9aM2bEqc2ROzGrDzz6/tvmsLuBFYWsfqD3K2l1WKJX3SnbqDD
-         H7Sxc+25sn/E2kpmCWLuUQi/Iq7M8NHLMtgELvTYk+iLGHNJbb+0cw3ePrc8PkUVEz8J
-         Ij7Q==
+        bh=45GeH+UPAzqkTZWqY2D6RQOKWswLealJ3SJB/kaSl38=;
+        b=hxAOJadvxY/o6qSJUrY3SgYg1u0rSD8gZ35fL/bINs3GQ3oJg19xhQdXxwhbzzEKXy
+         Xuaol3ricT1ucLF8LwpHkksv4iY4awJ1fxlrXGAOtxRgyRbIQg8f1RYx5lJWHfOfUgjb
+         SayB365bU2paywK395MkdqZTDpIbtr8f494ropcnS8aS+mFYMipvUcjV/MdLbrF5uVOr
+         RhbtFatq/zf55Czy7Q/oyckcyPRTOOsOfntl0h7ZK3FJrB5AQ7nS4Z+K1hCeg6GvvmUv
+         EMwiqLZne1ArWayDpPeKtK9LJfe6Q42doPQue09fO8C/gbz7eK6e1+9Ncq+D6BSd7Kqs
+         U4sQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744327461; x=1744932261;
+        d=1e100.net; s=20230601; t=1744327550; x=1744932350;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+8Hj0FhxYq298MEgk+A50ezX9To9apyasGONCk8/EIY=;
-        b=FqjGOShR8r+wsKebql09Q8YFP50ONUMXAdeKNochVNeMLUlm8KyRuUlSq2iahuhDhl
-         2RXBDYL5wissojcJTtBCi2TOLjf0z8PfsLST4OL7Ti3k7TRTwgXbn7+sjVTE1LC0DekQ
-         OAbCKSVax2BntmQmj94j1Jtn9+5W/DDho5TquBH1BjCCcFDCsJRvc7FfCxKq8/5X+Dxi
-         Fd7sJsCeIfKci0+HYhG9/UV+9WDMyb8M0m8SICPOftaKQzIk4J+3mBVu8OSutPOFe3cv
-         yJeEtoH7QrW2Ii80KwWiO3jSCbcibKVfgVPY1j8tWF0vCGr8NCrpxTZ6c2Tw8qH1R2Dr
-         nFsA==
-X-Forwarded-Encrypted: i=1; AJvYcCWDUDZ2IoS7ryBfxb3S+d0jGysIiHWk/gcPLJDmFKpTo38UyyAGQbGvjPnqo6kZNn8gIS8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+KGKASJd3olyNzaJdzjVINZ+aB9BPqC14m9RRnf8BhFjpUBID
-	Kt2VNmgD5wMh8Buucr/NxTtDIC2LAGVxcS75aGe6XAwgGsB5Fs/6ffcydNv3VX7LZmUd0SYgFx2
-	QPA==
-X-Google-Smtp-Source: AGHT+IHWYnK2BwFW7Mr5VmhaaxwX1jXjykj9i9MFxC3vV2mlnL+NePMyv0dJBUjVtFSac3MvKiuBJyLqfxA=
-X-Received: from pfbfj37.prod.google.com ([2002:a05:6a00:3a25:b0:730:8b4c:546c])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:21c7:b0:736:5c8e:baaa
- with SMTP id d2e1a72fcca58-73bd119427emr706022b3a.2.1744327460939; Thu, 10
- Apr 2025 16:24:20 -0700 (PDT)
-Date: Thu, 10 Apr 2025 16:24:19 -0700
-In-Reply-To: <20250331082251.3171276-11-xin@zytor.com>
+        bh=45GeH+UPAzqkTZWqY2D6RQOKWswLealJ3SJB/kaSl38=;
+        b=Yb8/ZGO+eSF6lz98BPqCpT9SJ8UtpvxMOmIIuttOK+Zgixu7BCohNuTBYrqT8qxM7M
+         2PryNwuE5hn8OeZaISqk86EDkMh/0NYIpHLJl/ncuuSIH48Ykesiw7SMIZEARmZA4/o5
+         nSQVwc3lsVdx36KFW38ZMygbO1Dag4e6kHJ+DgMf20bwS03Z/hIMnwzJKCBVth+su+S9
+         u48wgc0sIwMLQlta7TgtPk1rJCi1ashd5+xh44OM5oTz/Xutju8iuE0bvZWYhVjXnz29
+         1Xmc86pthOJzl4ro6gzwdIa5oNC9cRR7JK7BRgWv31f/hACDhNTcHc8CIDs8N+pOvxif
+         kfEg==
+X-Forwarded-Encrypted: i=1; AJvYcCWP9YxAsUad/GqAnajfuoBajs8TiEc75aC8belSAwrpexTR4tWdJekiyD/X2PzdzeY8qFg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvOO+0FmZGrbC/1u+6+Eir3Yjx5pcLLSVMgCsOR+f8WocMdQKO
+	jn1goI7cxRALYEJB/0HDvIYOphE3g7Mk5Ab6XXLlTpkkdNdu0WgeVq97+cqE8zkITxpqxo4LY9A
+	dJg==
+X-Google-Smtp-Source: AGHT+IEZ5sbPrSHp5oZ7gTc+BwY7HnP33HbH3PjY0vlVaCfeHGvod6/yAfGEhOKi6txlF/yqz03B5IxKNWI=
+X-Received: from pjbsh4.prod.google.com ([2002:a17:90b:5244:b0:2fa:2661:76ac])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2543:b0:2ea:bf1c:1e3a
+ with SMTP id 98e67ed59e1d1-308236343e4mr1425746a91.12.1744327549848; Thu, 10
+ Apr 2025 16:25:49 -0700 (PDT)
+Date: Thu, 10 Apr 2025 16:25:48 -0700
+In-Reply-To: <20250409092147.GAZ_Y8K52Opcw2X-tg@fat_crate.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250331082251.3171276-1-xin@zytor.com> <20250331082251.3171276-11-xin@zytor.com>
-Message-ID: <Z_hTI8ywa3rTxFaz@google.com>
-Subject: Re: [RFC PATCH v1 10/15] KVM: VMX: Use WRMSRNS or its immediate form
- when available
+References: <20250324130248.126036-1-manali.shukla@amd.com>
+ <20250324130248.126036-3-manali.shukla@amd.com> <20250324215627.GBZ-HVC-KmZiTMxPr3@fat_crate.local>
+ <55986a72-1be4-4e96-809c-dd004291df2e@amd.com> <20250409092147.GAZ_Y8K52Opcw2X-tg@fat_crate.local>
+Message-ID: <Z_hTfFupiBFPHwVe@google.com>
+Subject: Re: [PATCH v4 2/5] x86/cpufeatures: Add CPUID feature bit for the Bus
+ Lock Threshold
 From: Sean Christopherson <seanjc@google.com>
-To: "Xin Li (Intel)" <xin@zytor.com>
-Cc: linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev, 
-	linux-edac@vger.kernel.org, kvm@vger.kernel.org, 
-	xen-devel@lists.xenproject.org, linux-ide@vger.kernel.org, 
-	linux-pm@vger.kernel.org, bpf@vger.kernel.org, llvm@lists.linux.dev, 
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, jgross@suse.com, 
-	andrew.cooper3@citrix.com, peterz@infradead.org, acme@kernel.org, 
-	namhyung@kernel.org, mark.rutland@arm.com, alexander.shishkin@linux.intel.com, 
-	jolsa@kernel.org, irogers@google.com, adrian.hunter@intel.com, 
-	kan.liang@linux.intel.com, wei.liu@kernel.org, ajay.kaher@broadcom.com, 
-	alexey.amakhalov@broadcom.com, bcm-kernel-feedback-list@broadcom.com, 
-	tony.luck@intel.com, pbonzini@redhat.com, vkuznets@redhat.com, 
-	luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com, 
-	haiyangz@microsoft.com, decui@microsoft.com
+To: Borislav Petkov <bp@alien8.de>
+Cc: Manali Shukla <manali.shukla@amd.com>, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, pbonzini@redhat.com, nikunj@amd.com, 
+	thomas.lendacky@amd.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Mar 31, 2025, Xin Li (Intel) wrote:
-> Signed-off-by: Xin Li (Intel) <xin@zytor.com>
-> ---
->  arch/x86/include/asm/msr-index.h |  6 ++++++
->  arch/x86/kvm/vmx/vmenter.S       | 28 ++++++++++++++++++++++++----
->  2 files changed, 30 insertions(+), 4 deletions(-)
+On Wed, Apr 09, 2025, Borislav Petkov wrote:
+> On Wed, Apr 09, 2025 at 11:30:56AM +0530, Manali Shukla wrote:
+> > Do you have concern with the decision to expose the flag to /proc/cpuinfo?
+> > 
+> > The decision to expose the flag to /proc/cpuinfo was already discussed in 
+> > [v1]. As suggested in the discussion [v1], I have added "buslock" to be
+> > enumerated in /proc/cpuinfo.
 > 
-> diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-> index e6134ef2263d..04244c3ba374 100644
-> --- a/arch/x86/include/asm/msr-index.h
-> +++ b/arch/x86/include/asm/msr-index.h
-> @@ -1226,4 +1226,10 @@
->  						* a #GP
->  						*/
->  
-> +/* Instruction opcode for WRMSRNS supported in binutils >= 2.40 */
-> +#define ASM_WRMSRNS		_ASM_BYTES(0x0f,0x01,0xc6)
-> +
-> +/* Instruction opcode for the immediate form RDMSR/WRMSRNS */
-> +#define ASM_WRMSRNS_RAX		_ASM_BYTES(0xc4,0xe7,0x7a,0xf6,0xc0)
-> +
->  #endif /* _ASM_X86_MSR_INDEX_H */
-> diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
-> index f6986dee6f8c..9fae43723c44 100644
-> --- a/arch/x86/kvm/vmx/vmenter.S
-> +++ b/arch/x86/kvm/vmx/vmenter.S
-> @@ -64,6 +64,29 @@
->  	RET
->  .endm
->  
-> +/*
-> + * Write EAX to MSR_IA32_SPEC_CTRL.
-> + *
-> + * Choose the best WRMSR instruction based on availability.
-> + *
-> + * Replace with 'wrmsrns' and 'wrmsrns %rax, $MSR_IA32_SPEC_CTRL' once binutils support them.
-> + */
-> +.macro WRITE_EAX_TO_MSR_IA32_SPEC_CTRL
-> +	ALTERNATIVE_2 __stringify(mov $MSR_IA32_SPEC_CTRL, %ecx;		\
-> +				  xor %edx, %edx;				\
-> +				  mov %edi, %eax;				\
-> +				  ds wrmsr),					\
-> +		      __stringify(mov $MSR_IA32_SPEC_CTRL, %ecx;		\
-> +				  xor %edx, %edx;				\
-> +				  mov %edi, %eax;				\
-> +				  ASM_WRMSRNS),					\
-> +		      X86_FEATURE_WRMSRNS,					\
-> +		      __stringify(xor %_ASM_AX, %_ASM_AX;			\
-> +				  mov %edi, %eax;				\
-> +				  ASM_WRMSRNS_RAX; .long MSR_IA32_SPEC_CTRL),	\
-> +		      X86_FEATURE_MSR_IMM
-> +.endm
-
-This is quite hideous.  I have no objection to optimizing __vmx_vcpu_run(), but
-I would much prefer that a macro like this live in generic code, and that it be
-generic.  It should be easy enough to provide an assembly friendly equivalent to
-__native_wrmsr_constant().
-
-
-> +
->  .section .noinstr.text, "ax"
->  
->  /**
-> @@ -123,10 +146,7 @@ SYM_FUNC_START(__vmx_vcpu_run)
->  	movl PER_CPU_VAR(x86_spec_ctrl_current), %esi
->  	cmp %edi, %esi
->  	je .Lspec_ctrl_done
-> -	mov $MSR_IA32_SPEC_CTRL, %ecx
-> -	xor %edx, %edx
-> -	mov %edi, %eax
-> -	wrmsr
-> +	WRITE_EAX_TO_MSR_IA32_SPEC_CTRL
->  
->  .Lspec_ctrl_done:
->  
-> -- 
-> 2.49.0
+> If you mean this:
 > 
+> https://lore.kernel.org/kvm/20240709175145.9986-4-manali.shukla@amd.com/T/#m1dc7e08c54dd91d53a6bc5b1ed0a6721b356a756
+> 
+> I don't see any conclusion there.
+> 
+> I see Sean wanting to export information out of KVM to say what it supports
+> without adding user ABI and I don't know how far that has come
+
+Not very far :-(
+
+> but what you're
+> doing here ain't it.
+> 
+> Just do:
+> 
+> #define X86_FEATURE_BUS_LOCK_THRESHOLD    (15*32+29) /* Bus lock threshold */
+> 
+> and then later KVM can export this however it prefers.
+
++1
 
