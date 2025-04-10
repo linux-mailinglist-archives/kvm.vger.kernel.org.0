@@ -1,188 +1,170 @@
-Return-Path: <kvm+bounces-43084-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43085-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7795BA843A3
-	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 14:49:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8CA8A84412
+	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 15:07:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27AE99A080F
-	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 12:46:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 484E11B642FF
+	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 13:06:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46A6828540E;
-	Thu, 10 Apr 2025 12:46:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 299FF28CF41;
+	Thu, 10 Apr 2025 13:05:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uWyi68ix"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="aJy//rsA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 805ED2853F8
-	for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 12:46:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21E1928C5BD
+	for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 13:05:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744289212; cv=none; b=as5U/wzxa1F46n+xLpMt9BG78g1XI+QcF3APPbZqYTZImCNPuKu8u3zWzZyhS+D7EUZKbpf1vMszBRAQuawU/ajAhzQrt2DZAt8+Gad97IeAcgZtyVfE/mw6brKgEZ/ir4rXOftPeBnMZS4Xhoajl4wxvlhXlgVr12G4ShOdjjs=
+	t=1744290335; cv=none; b=r+DDIRdOLCkIbhZz/ODCtV9smS4FB3Ff+Xvo2rjdg4TGu312wgEtByhG3deWF6XsU/Xg5vHzJFevfCx1qAKhBw9C9/EQLpRJKg5+Ojo80PlnlCBbHPAQvkKIVo2wBX0xhFl4/HPUMznrElOMbhSgz3nI6gvmDfPeFhJThEW2wl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744289212; c=relaxed/simple;
-	bh=3gSCwmtO2wNBppWSqNgk4w3LORvD7rp3e1g45ggnjPc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=R6+0cmDuQ9n0kEm59DFg82VlGNALDUrHiAyb+i4SUrzTIfVNWKlw0L9dkFHez7VRcIqjOEoeveOPOzQN9I+/w7mMvUnLI2/+IY36Mh3lYl1WkAeck/ejkTH6AfshYf7P0fBjNREG3G5SThmM5NnIuoSe/vHD+5Pv1HutB2crUo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=uWyi68ix; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43edecbfb94so8523975e9.1
-        for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 05:46:50 -0700 (PDT)
+	s=arc-20240116; t=1744290335; c=relaxed/simple;
+	bh=HMR9MCdcSh4ghNXN2PNjr8BtDW52Pk7L9AMhE1YOGEg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NywDmE+0S4s0XRN92ZTLgZtgeplrJk4FMCHGtBms/jDxgxdPshEq1mjp6RmP3Rgh4oSEhDsgZN6m3Uy+l3nXbu0BJqYhMuGjeS5ZX6FGlx98g2yc/EVIikojB68mpmaFx4bXVWiQrsEQeAJqtEVTLoXCQj4RpqaQ4h1iKKm9h/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=aJy//rsA; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7c5e39d1e0eso73904985a.1
+        for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 06:05:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1744289209; x=1744894009; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zZXIo1fhTP6w3XfC9tv2GhzcTe3ZMQskxjXxbZzFahQ=;
-        b=uWyi68ixALHouGOgGArprlsya390GAmMvT3gFf5CrJmWatWEazm/cl9mAKtniOzEb1
-         GuO3seIEUj/6urjrgACTAm88KPaPMEHYx6QqaBDjzZZ8ERW9wKdReJO0EX3JO7Vku27X
-         u4rU6DfHoL77pSHQ2wEIoJAWzYS7jz61zfbJc/8uFl+Jwkj0SOjNdUscrvyUYIz43PBm
-         ItN0Qzred7INbBeuN54a95d3O9JGxl/Sdsk2A5E0uimWqC7APXyIOt5NFZlnrRf7CaPU
-         zIvi2WD3EIZ5lx/CRMpdR7UCkqohvo+hJL2UgjQC40QrLISeHUnBb5DTT/Nlkfh9ERXl
-         hMRA==
+        d=ziepe.ca; s=google; t=1744290331; x=1744895131; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZHIQ/++9W1bwFwjTR3scNHhBiiv2Oa9aNs8dRl0dl1I=;
+        b=aJy//rsAtoRy5775PerRLX3+D2+pCuJyxisg7ZyE9JJYLwFmuXzWh0uOWqiuh4ieIh
+         uF5/hijBp+w2Y69y4cKHvmmmNzsPrnf3ptfKescWhZy0OfRE4Mau09mf9U3DVcpknaBd
+         scqtSn3UUbhYu5NqdefT+UxoQa6wSdPB88sdqekGPVsVMFf5sbx/ZB89Q2bnHThaL6VV
+         meWCWqJJo1/EjSpF2Y3O3bQtNzBnbDoUz5Oe/PFWFf4974ejvqMaUWXFntUJsJ9wdVew
+         Xrw4/IXqVIYGBd1hzY6ahSYkD8Z4CI9AYBK1xEyXhR+ImVHL5+sJiNL9uUl6xy129ULv
+         jiQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744289209; x=1744894009;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zZXIo1fhTP6w3XfC9tv2GhzcTe3ZMQskxjXxbZzFahQ=;
-        b=PZwk+F3TRA3vFAdZXC6qiURxcxF7XB+dH/xLc2VZeqgVsAdFLzHTuXjOBfSReZEgNQ
-         x5xBlp5j7ixX9TCHxLMBtchzTbtidcFR3B0qTVMKwxAcR/RQFYjdfr3xoJi4M8XY+EIU
-         DL/u1AhGMQiciikedS6F4fTXev07V2E4aCmlp72fQRBlDS4s8eLkzHg0fBNOxF431x/q
-         PvAdgJH80mZeyU9BICTYQsNQyJAY6xE4kkndSkKp5kShV5N25HUjgmZDFTweMkOUTRSl
-         j8WweTMJX0Vx2F5L3hdvLRaTmDDEqf5JXQ9VSIvdq/H/4ncscEpzeoKwvrtLtcA/drTd
-         tZRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXxHbyGgVEmYy6icN1v1fTVD1LXjBlcOLK5lMsS4sJWJVP9BUfH6RyX8FD2m8novgu29XQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWzw+jXuRD/Zg6cUuiC/Xq1opbtlyRwTImcVjSbidtaFWGrVYL
-	++aqPBwIPVdPv2mOidoqZwEiffKEBaCwzHJNOTZCK5hin2IqFUSKvhR7wZWyVgc=
-X-Gm-Gg: ASbGncs/x6vw6eM7FkDSwDANlnk++CNXUxS3D2lUHs83vfdeohSIrpznW4gLMrsfwtL
-	+TZNuHYOW/1hHPhhzpejqh5kQTGoh/BC9h5Yi+IwaBla+BHTjO2uEspqkwJAW++cxpeZGliADdD
-	IihCKoHw6K53u/1HKn1WwpTQGukagvB6Foed39bcp+lCHJOVp5QckKUE+tusaooehQtv0nA7FEY
-	K838K5c9D5GmojJAA3FW0Fv3ARNGPbbLrbeHD63OxYuZrOTFEsNoFEm8g3KLn9//1kgdFlRQuja
-	E7b9XygmPYDHOsLR78nQ7JXSPn1gkSYOHkNHamzmMz+JbyaEo9Zrc6VQ42iV/K3OfMMEOJuyGDw
-	8tN1hFc7c14wvtg==
-X-Google-Smtp-Source: AGHT+IFYkPxS+JwgVWraoLI7bmEmqc5FQIN4eQ5rt5c/GcOIXBPGzwbqDNoNGdpm/+fgPK1Kb+38eA==
-X-Received: by 2002:a05:600c:258:b0:43d:fa59:bced with SMTP id 5b1f17b1804b1-43f3611175fmr2845515e9.32.1744289208772;
-        Thu, 10 Apr 2025 05:46:48 -0700 (PDT)
-Received: from [192.168.69.238] (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43f2075fc83sm55219905e9.26.2025.04.10.05.46.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Apr 2025 05:46:48 -0700 (PDT)
-Message-ID: <5393ff40-0e1f-4f3e-8379-8b2208301c70@linaro.org>
-Date: Thu, 10 Apr 2025 14:46:47 +0200
+        d=1e100.net; s=20230601; t=1744290331; x=1744895131;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZHIQ/++9W1bwFwjTR3scNHhBiiv2Oa9aNs8dRl0dl1I=;
+        b=QKZynTdpI2sC3b7PtW4TU+iNeZISa2SJAv1zIL8vfY/npc32szRl0ZqhLfruucbNFj
+         X3SdG8rUvo1oyeSrQQQj8E88f7Alf9w1t3tfG5L3XDTBLc0AAcDG2Ya7KPSHiXgY7qVc
+         5O+xJODj03xlBOog6UZq3B+hDodT3MBB2WCqvwktEqPU8hwV63NG2S0czp9HMQGPkBIk
+         ujDlvEi1QgYtRg+J+GpLy0gzQZ2FSz0LoVgocHecxby/DcZAZXhUAFFSTQQY/etPgsCD
+         ZIlvWC1FfyVGLSfwaRMKOJ+I9vbcwok0rMQVfc7NX0MXUsT7gwTIeWPogXN6Nc8vSByK
+         0tmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXIO5MZE/7098MzPmvSnzHMMJTsAkgK/Q6V36E3kWbt1h5vzNpuIkU1wnsf/UJHqrny5Bw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWxSurbRZRlM4NDcG3AKTaL0ml1kYou2Cd1AIIZpBOc3Px77Ko
+	ZdmYrqhIqhcszOH9h3TA3YyYKvd6kDxtdXKstAwYEWdaY/0/I5+MRIxbpNrzo+A=
+X-Gm-Gg: ASbGncuwLrHqQ75nIE4QwDuasHkfQiRZgB2X1bn29bnlou5GKuvybZqC1RQNOPZFUI0
+	5FsmFHF0y1XxNy+K+Wf0QZXhrryrY3kHIg9ZeFFBEYPKJ4CAdjDSL20g746JMH0jgX73kTB0LYw
+	4xoyV0rFiWukxopkHKkW1IDvRRoth0aBm+Sk1FrGOv9W+M/CW3jP+LO7fLvq12rZpf8gvcORs2O
+	+xHjdVy4QAdKywvkJqyUj+hQB5acSlSnssAeiFrByWlHGr5/gmiUh5P+KnB/ghnvSwDCFGrcsZi
+	ZkBlEx08g2UPtGX3fWPkj9N+zzFUpC167hmIV91qoD99aN9hmpIXrnwLvi5Hu2MYc5oaf58Lq10
+	jxTdnPWEWy/e6lqky7Fk=
+X-Google-Smtp-Source: AGHT+IG4IzEnrtMNm0AmTZUaqXGTX04b5UW6VZBKQK8VGv14pbPLZJgnECNrc0NUhMe5YZKTD9kaag==
+X-Received: by 2002:a05:620a:2445:b0:7c5:99f9:6ada with SMTP id af79cd13be357-7c7a76d3503mr365847885a.50.1744290330960;
+        Thu, 10 Apr 2025 06:05:30 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-167-219-86.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.219.86])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c7a8969f1asm82420785a.59.2025.04.10.06.05.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Apr 2025 06:05:29 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1u2raz-00000009aH7-1871;
+	Thu, 10 Apr 2025 10:05:29 -0300
+Date: Thu, 10 Apr 2025 10:05:29 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Alexey Kardashevskiy <aik@amd.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>,
+	Joao Martins <joao.m.martins@oracle.com>,
+	Nicolin Chen <nicolinc@nvidia.com>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Steve Sistare <steven.sistare@oracle.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
+	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
+	Zhi Wang <zhiw@nvidia.com>, AXu Yilun <yilun.xu@linux.intel.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: Re: [RFC PATCH v2 13/22] iommufd: amd-iommu: Add vdevice support
+Message-ID: <20250410130529.GE1727154@ziepe.ca>
+References: <20250218111017.491719-1-aik@amd.com>
+ <20250218111017.491719-14-aik@amd.com>
+ <20250401161138.GL186258@ziepe.ca>
+ <b051dcc8-58a5-4f24-8b06-e817e9762952@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] hw/ppc/spapr_hcall: Return host mitigation
- characteristics in KVM mode
-To: Gautam Menghani <gautam@linux.ibm.com>, npiggin@gmail.com,
- danielhb413@gmail.com, harshpb@linux.ibm.com, pbonzini@redhat.com,
- vaibhav@linux.ibm.com
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <20250410104354.308714-1-gautam@linux.ibm.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <20250410104354.308714-1-gautam@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b051dcc8-58a5-4f24-8b06-e817e9762952@amd.com>
 
-Hi Gautam,
+On Thu, Apr 10, 2025 at 04:39:39PM +1000, Alexey Kardashevskiy wrote:
+> > > @@ -2549,12 +2561,15 @@ amd_iommu_domain_alloc_paging_flags(struct device *dev, u32 flags,
+> > >   {
+> > >   	struct amd_iommu *iommu = get_amd_iommu_from_dev(dev);
+> > >   	const u32 supported_flags = IOMMU_HWPT_ALLOC_DIRTY_TRACKING |
+> > > +						IOMMU_HWPT_ALLOC_PASID |
+> > > +						IOMMU_HWPT_ALLOC_NEST_PARENT;
+> > > +	const u32 supported_flags2 = IOMMU_HWPT_ALLOC_DIRTY_TRACKING |
+> > >   						IOMMU_HWPT_ALLOC_PASID;
+> > 
+> > Just ignore NEST_PARENT? That seems wrong, it should force a V1 page
+> > table??
+> 
+> 
+> Ahhh... This is because I still have troubles with what IOMMU_DOMAIN_NESTED
+> means (and iommufd.rst does not help me). There is one device, one IOMMU
+> table buuut 2 domains? Uh.
 
-On 10/4/25 12:43, Gautam Menghani wrote:
-> Currently, on a P10 KVM guest, the mitigations seen in the output of
-> "lscpu" command are different from the host. The reason for this
-> behaviour is that when the KVM guest makes the "h_get_cpu_characteristics"
-> hcall, QEMU does not consider the data it received from the host via the
-> KVM_PPC_GET_CPU_CHAR ioctl, and just uses the values present in
-> spapr->eff.caps[], which in turn just contain the default values set in
-> spapr_machine_class_init().
-> 
-> Fix this behaviour by making sure that h_get_cpu_characteristics()
-> returns the data received from the KVM ioctl for a KVM guest.
-> 
-> Perf impact:
-> With null syscall benchmark[1], ~45% improvement is observed.
-> 
-> 1. Vanilla QEMU
-> $ ./null_syscall
-> 132.19 ns     456.54 cycles
-> 
-> 2. With this patch
-> $ ./null_syscall
-> 91.18 ns     314.57 cycles
-> 
-> [1]: https://ozlabs.org/~anton/junkcode/null_syscall.c
-> 
-> Signed-off-by: Gautam Menghani <gautam@linux.ibm.com>
-> ---
->   hw/ppc/spapr_hcall.c   | 6 ++++++
->   include/hw/ppc/spapr.h | 1 +
->   target/ppc/kvm.c       | 2 ++
->   3 files changed, 9 insertions(+)
-> 
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 406aea4ecb..6aec4e22fc 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1415,6 +1415,12 @@ static target_ulong h_get_cpu_characteristics(PowerPCCPU *cpu,
->       uint8_t count_cache_flush_assist = spapr_get_cap(spapr,
->                                                        SPAPR_CAP_CCF_ASSIST);
->   
-> +    if (kvm_enabled()) {
-> +        args[0] = spapr->chars.character;
-> +        args[1] = spapr->chars.behaviour;
+It means whatever you want it to mean, so long as it holds a reference
+to a NEST_PARENT :)
 
-If kvmppc_get_cpu_characteristics() call fails, we return random data.
+> > You can get 1:1 domain objects linked to the viommu by creating the
+> > 'S1' type domains, maybe that is what you want here. A special domain
+> > type that is TSM that has a special DTE.
+> 
+> Should not IOMMU_DOMAIN_NESTED be that "S1" domain?
 
-Can't we just call kvm_vm_check_extension(s, KVM_CAP_PPC_GET_CPU_CHAR)
-and kvm_vm_ioctl(s, KVM_PPC_GET_CPU_CHAR, &c) here?
+Yes that is how ARM is doing it.
 
-> +        return H_SUCCESS;
-> +    }
-> +
->       switch (safe_cache) {
->       case SPAPR_CAP_WORKAROUND:
->           characteristics |= H_CPU_CHAR_L1D_FLUSH_ORI30;
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 39bd5bd5ed..b1e3ee1ae2 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -283,6 +283,7 @@ struct SpaprMachineState {
->       Error *fwnmi_migration_blocker;
->   
->       SpaprWatchdog wds[WDT_MAX_WATCHDOGS];
-> +    struct kvm_ppc_cpu_char chars;
->   };
->   
->   #define H_SUCCESS         0
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 992356cb75..fee6c5d131 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -2511,6 +2511,7 @@ bool kvmppc_has_cap_xive(void)
->   
->   static void kvmppc_get_cpu_characteristics(KVMState *s)
->   {
-> +    SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
->       struct kvm_ppc_cpu_char c;
->       int ret;
->   
-> @@ -2528,6 +2529,7 @@ static void kvmppc_get_cpu_characteristics(KVMState *s)
->           return;
->       }
->   
-> +    spapr->chars = c;
->       cap_ppc_safe_cache = parse_cap_ppc_safe_cache(c);
->       cap_ppc_safe_bounds_check = parse_cap_ppc_safe_bounds_check(c);
->       cap_ppc_safe_indirect_branch = parse_cap_ppc_safe_indirect_branch(c);
+Minimally IOMMU_DOMAIN_NESTED on AMD should refere to a partial DTE
+fragment that sets the GCR3 information and other guest controlled
+bits from the vDTE. It should hold a reference to the viommu and the
+S2 NEST_PARENT.
 
+From that basis then you'd try to fit in the CC stuff.
+
+> > Though I'd really rather see the domain attach logic and DTE formation
+> > in the AMD driver be fixed up before we made it more complex :\
+> > 
+> > It would be nice to see normal nesting and viommu support first too :\
+> 
+> It is in the works too. Thanks,
+
+I think your work will be easier to understand when viewed on top of
+working basic nesting support as it is just a special case of that
+
+Jason
 
