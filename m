@@ -1,118 +1,136 @@
-Return-Path: <kvm+bounces-43091-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43092-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A591A84704
-	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 16:56:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29DB1A84775
+	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 17:13:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6658719E1761
-	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 14:52:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E2D69A01BB
+	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 15:10:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E175728D823;
-	Thu, 10 Apr 2025 14:52:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2FDE1624D0;
+	Thu, 10 Apr 2025 15:10:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="izl1nAj3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KTN4dxpn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A601221CC6A
-	for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 14:52:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA80F16FF44
+	for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 15:10:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744296730; cv=none; b=pF+zRUfodXG5YV52FEUb6A5FM0gz4WgWueDLP/lEfRlrn23tgCoRYPYUc3Pez9bxD24bZVq7EpUN7XXVOkVKiJYRYa6bPEtYtbSQ24sX93L/i06+SzynTIhEEHtytbFIRDvGQ4v7+5AFu981GCl/WabcWUdTaxNJmG3aooRPEwM=
+	t=1744297851; cv=none; b=qi3mKwy/3fRMf8USplaE83A6mBX4HIOtetntC9sToUOtsR0rmMpllXte1SA8kzen8KUA1QIHVzh4TN27d6dLAbNvKDRdFMXjuxwixEn8c2hTHIkmydtpmIbwoEurw/95VrFj9+EhwoXBo0u2ZD0oaTYCysCaJnM26C60Z4gwdFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744296730; c=relaxed/simple;
-	bh=ZIicm+KVsGD+UXLKJQ6xU43zvhsJHugkh0vLpA6ilxk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nPa32BZaodGJvyL7yylLITGGWbNe87uteB/g9zMEU2R9x5HQASt7IBMqPwDiVn9u3MBWGFklieqUHqpzWVjUeSy5bOTOtN8Z91uU/NClWvlm0MIIAbCMnD41ixbzxrK+Y0u7s3BpnfCPhP4Z9vw7MmVcHoCqX0MjLa5LZXM4D6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=izl1nAj3; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff4b130bb2so1039358a91.0
-        for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 07:52:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744296728; x=1744901528; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1Z2Z/UC7GMxO7YogACXn6KcfTpVXYjk8lDSafrd3aGw=;
-        b=izl1nAj3UVTkithmtbXKWdZ3RPoDf6Cu2DSf5BRMbhaGXsQGkJt8XoSuU3F+6bP4Bf
-         8wKrWXUFRTx90ueNEW+ZZAU0UxU1P34dio7x/Gc80M6t6zdbPdT2DFE4XJRz7GGmFtgt
-         /UdSJxIsEVis0kvs2ZYnlKLHeSJl7PQ2hYJtDgda6xLip96ccKMglzQmoV/FdQM6WGE0
-         NecIFr2TC5yQaUaKN4TzyRTFDeB3WvR0pN8XxKdHikr0/Il7jt6JtuNQ0J8ymnLwOG2w
-         MudSavFIC8ba4t6X7Z35VKt3G2dsiCteELzBCktXpC9xi61GhECom2/wqVnFAoLhcTRm
-         EU7g==
+	s=arc-20240116; t=1744297851; c=relaxed/simple;
+	bh=ng9xh/PG1LUIBqUCqRBp1J3efi6ls83MH75OfUbQ4+4=;
+	h=Date:From:To:cc:Subject:Message-ID:MIME-Version:Content-Type; b=s8FUhNo4PBy8WenuU09LcYPIrTYBfSQ2EcRM+M9+fjRxHifeed+VMGl0O+oQTUjkJJxKJIPQlCzWW3+3YNDBfx5OptDMcPW4HlTwlW4XDueVaFL9ODXHDpimvBk3hwX4AhvtBXPt6I1ecZR7CbD50umwEzSL+7egnyOkhZ1y0Hk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KTN4dxpn; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744297848;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=EXKgyYog58kyfqHQcoNTtvL08JiFX/6XLrBhO7Ve8ts=;
+	b=KTN4dxpndtc7uw1Xg1FlmFSV/ktvhDpf2DIA4bzaoO/KR41oG+PQgVBhNkHlgCBDHNXZY9
+	Bnv73xEEm+MUojQ+ww3yqEmqdfsa9xo/1aHiEP2zL3NyQsZuTh+jIYFw6q2C80OdKfI4n1
+	doqubiTOdjGwAjSJCOnUCCo3X9xstiA=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-386-QQ1ygJI6Oy23v3xUz2MERg-1; Thu, 10 Apr 2025 11:10:47 -0400
+X-MC-Unique: QQ1ygJI6Oy23v3xUz2MERg-1
+X-Mimecast-MFC-AGG-ID: QQ1ygJI6Oy23v3xUz2MERg_1744297846
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43d51bd9b45so6427185e9.1
+        for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 08:10:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744296728; x=1744901528;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1Z2Z/UC7GMxO7YogACXn6KcfTpVXYjk8lDSafrd3aGw=;
-        b=M4usS/vpc7eUMWYotqa4HxT+E+4E6MlqjMcyQ5mhklEGEErX+JtQ1qk1Rj5JcGXrt9
-         j+93s6LDbYYY6nuLToiJ4DcfkVxLUrQM5NNl3KpKd3XFaaY6n91RfSoVr2Lj8QnOkmxA
-         0kTHUon6sDDABi0tpjv2MaekLcLI6K3Ricbsjsa4Dxs5qr4mgiSZ+LG+XmMQb3/lxegL
-         ALtXY1r7QeJxjw8yIqv7atN6P5k4nD7nRgaPHsBj8w8fs5/mfC982tv7Ypw3cg46cdIW
-         ZKhPyylFyftKKG7cjGgy/8fnG26RSOFhDIEl8OsQqH2iBVYFJYi+Yr/idCoYk85lUhGt
-         HShw==
-X-Forwarded-Encrypted: i=1; AJvYcCWo3K3TkC9c/dNt5qzRspJeushTDMV+81ylLljm0hdk6FNIxQjpQAsnVO7h+fQudFBr3E0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+Vj3Z9sR1YBmC7snmWRv5EaMijvMqYfxmGS2p+MtskjA35rZC
-	v+GxQRAPXpY1EVHk0qXxMLbzdLdzrXuZ2HRdBM/TvJhJ/dIdPKxx6VBUsHgHxfAE7by2OhXgX+a
-	MPQ==
-X-Google-Smtp-Source: AGHT+IGZay7VOQfADYHvwp0kpNoQEUaWaWhAXxEPULjNq/g/UaMADWvkJQ5d2IT2MEsdoUp5QTqBbaB3uao=
-X-Received: from pjvf15.prod.google.com ([2002:a17:90a:da8f:b0:2fc:2c9c:880])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5844:b0:2ee:db8a:2a01
- with SMTP id 98e67ed59e1d1-307e9b43a9dmr3689922a91.30.1744296727781; Thu, 10
- Apr 2025 07:52:07 -0700 (PDT)
-Date: Thu, 10 Apr 2025 07:52:05 -0700
-In-Reply-To: <BN9PR11MB52769DDEE406798D028BC17D8CB72@BN9PR11MB5276.namprd11.prod.outlook.com>
+        d=1e100.net; s=20230601; t=1744297846; x=1744902646;
+        h=mime-version:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EXKgyYog58kyfqHQcoNTtvL08JiFX/6XLrBhO7Ve8ts=;
+        b=V81pukm5nG2tE9zT8ZsddSq7yVm9sH05Rd6Zegw5x21wFUTZRFFsaKP+6+Hgds98bd
+         X7NL3fzbkKM40ylD6swmlnuDi1cw+rKt4VXXmS+uMan6UiBFQOvK9obc1XnCUnqF8/Jz
+         NyTyXianLwKpZKYNiGWWK+atPlKSYkB1pfWnvn9NxzGXANsouT6cSxutLxWS4nZzKIyB
+         aY56PtrZ+ZKPlbOFfU+qOdnmXZr6FOjpjTSS/yn9nNB8gvpnQeZt5xEFBRUv4r8wGH80
+         VaSrr+GTdOfBrcBJbzo8QSX51Fi6JWXuB8TgdoJQIb6vfaY6PwSwDATHsrO/BGcKlv2E
+         fySA==
+X-Forwarded-Encrypted: i=1; AJvYcCUrJtZIT4NsG60DSebWBFtzkjNyjC77w/VzVc78UWKLRGji3h7uiU4SGUjh7UtO8T/Pnd4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPIbCz8b3bJZlV6yVCpIvYJpviSspDJZ18xb7NJtygJC3Kwdbg
+	CvHIc3dBu+9dEYj629QlEXwJGHu5JKxqeQ5twSknON55VOfDTCMqy0X8EZANH1avyz4b4akBm8Z
+	AuzSLQY5pE9d5ptXQKjprNxSl0Lj3Xrggy9RWG15HQKedP4Lk8A==
+X-Gm-Gg: ASbGncvXDUYzkVVhdnmZ0RyjGbxMo1tN9zvoMiJ9TyAqXzSqMq02QzeDGwfkkm7O/Lk
+	deJeMFvg6nGZZ+R1JdwL/zwIt6FNXiqriAsR5I+muPgWuCYyU07CuFTz+M4M1NXjQeJ/9VstB5L
+	Ic40o4gU6v/ZONnqefsux9zSqp/TM4Kcc0VfKK59mwNFCY0HARF37GlabraMplcn9GIfXnhXe26
+	yyKG07iEMOcSgq5+7SodgylVuBJiKBUPKy+7+SmzpFliIVU7Wrf08Mbum+ewdzdH/fsg++mIDHP
+	etisBilPVjMML939DMw8LiESH5KmrfozQQKM8kKOmGOkdOT77UmNDBzgxavI
+X-Received: by 2002:a05:600c:c19:b0:43c:f050:fee8 with SMTP id 5b1f17b1804b1-43f2d96d12bmr27394525e9.20.1744297846042;
+        Thu, 10 Apr 2025 08:10:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFxwdlqvMr0+eJqJHcy2sApkT2sXjxRivRro1I+Xe8jUjWmS3HlK9o9rH1isaEbTm3IHTMmxg==
+X-Received: by 2002:a05:600c:c19:b0:43c:f050:fee8 with SMTP id 5b1f17b1804b1-43f2d96d12bmr27394165e9.20.1744297845618;
+        Thu, 10 Apr 2025 08:10:45 -0700 (PDT)
+Received: from rh (p200300f6af1bce00e6fe5f11c0a7f4a1.dip0.t-ipconnect.de. [2003:f6:af1b:ce00:e6fe:5f11:c0a7:f4a1])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39d8938a860sm5156906f8f.54.2025.04.10.08.10.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Apr 2025 08:10:45 -0700 (PDT)
+Date: Thu, 10 Apr 2025 17:10:43 +0200 (CEST)
+From: Sebastian Ott <sebott@redhat.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+    Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+    Zenghui Yu <yuzenghui@huawei.com>, 
+    Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+    kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: arch_timer_edge_cases failures on ampere-one
+Message-ID: <ac1de1d2-ef2b-d439-dc48-8615e121b07b@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250404211449.1443336-1-seanjc@google.com> <20250404211449.1443336-8-seanjc@google.com>
- <BN9PR11MB52769DDEE406798D028BC17D8CB72@BN9PR11MB5276.namprd11.prod.outlook.com>
-Message-ID: <Z_fbFcT3gxNK_dWr@google.com>
-Subject: Re: [PATCH 7/7] irqbypass: Use xarray to track producers and consumers
-From: Sean Christopherson <seanjc@google.com>
-To: Kevin Tian <kevin.tian@intel.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	David Matlack <dmatlack@google.com>, Like Xu <like.xu.linux@gmail.com>, 
-	Yong He <alexyonghe@tencent.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; format=flowed; charset=US-ASCII
 
-On Thu, Apr 10, 2025, Kevin Tian wrote:
-> > From: Sean Christopherson <seanjc@google.com>
-> > Sent: Saturday, April 5, 2025 5:15 AM
-> > 
-> > Track IRQ bypass produsers and consumers using an xarray to avoid the
-> > O(2n)
-> > insertion time associated with walking a list to check for duplicate
-> > entries, and to search for an partner.
-> > 
-> > At low (tens or few hundreds) total producer/consumer counts, using a list
-> > is faster due to the need to allocate backing storage for xarray.  But as
-> > count creeps into the thousands, xarray wins easily, and can provide
-> > several orders of magnitude better latency at high counts.  E.g. hundreds
-> > of nanoseconds vs. hundreds of milliseconds.
-> 
-> add a link to the original data collected by Like.
-> 
-> > 
-> > Cc: Oliver Upton <oliver.upton@linux.dev>
-> > Cc: David Matlack <dmatlack@google.com>
-> > Cc: Like Xu <like.xu.linux@gmail.com>
-> > Reported-by: Yong He <alexyonghe@tencent.com>
-> > Closes: https://bugzilla.kernel.org/show_bug.cgi?id=217379
-> > Link: https://lore.kernel.org/all/20230801115646.33990-1-likexu@tencent.com
+Hey,
 
-I linked Like's submission here, which has his numbers.  Would it be helpful to
-explictly call this out in the meat of the changelog?
+I'm seeing consistent failures for the arch_timer_edge_cases
+selftest one ampere-one(x):
+==== Test Assertion Failure ====
+   arm64/arch_timer_edge_cases.c:170: timer_condition == istatus
+   pid=6277 tid=6277 errno=4 - Interrupted system call
+      1  0x0000000000403bcf: test_run at arch_timer_edge_cases.c:962
+      2  0x0000000000401f1f: main at arch_timer_edge_cases.c:1083
+      3  0x0000ffffa8b2625b: ?? ??:0
+      4  0x0000ffffa8b2633b: ?? ??:0
+      5  0x000000000040202f: _start at ??:?
+   0x1 != 0x0 (timer_condition != istatus)
+
+The (first) test that's failing is from test_timers_in_the_past():
+     /* Set a timer to counter=0 (in the past) */
+     test_timer_cval(timer, 0, wm, true, DEF_CNT);
+
+If I understand this correctly then the timer condition is met, an
+irq should be raised with the istatus bit from SYS_CNTV_CTL_EL0 set.
+
+What the guest gets for SYS_CNTV_CTL_EL0 is 1 (only the enable bit
+set). KVM also reads 1 in timer_save_state() via
+read_sysreg_el0(SYS_CNTV_CTL). Is this a HW/FW issue?
+
+These machines have FEAT_ECV (as a test I disabled that in the kernel
+but with the same result).
+
+As a hack I set ARCH_TIMER_CTRL_IT_STAT in timer_save_state() when
+the timer condition is met and set up traps for the register - this
+lets the testcase succeed.
+
+All with the current upstream kernel - but this is not new, I saw
+this a couple of months ago but lost access to the machine before
+I could debug..
+
+Any hints what to do here?
+
+Sebastian
+
 
