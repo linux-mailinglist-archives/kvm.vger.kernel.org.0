@@ -1,141 +1,141 @@
-Return-Path: <kvm+bounces-43110-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43111-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DDABA84F7A
-	for <lists+kvm@lfdr.de>; Fri, 11 Apr 2025 00:05:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD1C9A84F89
+	for <lists+kvm@lfdr.de>; Fri, 11 Apr 2025 00:14:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4AFE19C2D5A
-	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 22:04:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D67A17AC03A
+	for <lists+kvm@lfdr.de>; Thu, 10 Apr 2025 22:12:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2519720F063;
-	Thu, 10 Apr 2025 22:04:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44B8B20E711;
+	Thu, 10 Apr 2025 22:13:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="buw4eI0E"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="klVA0IxL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E1051E47B7
-	for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 22:04:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C906620C48A;
+	Thu, 10 Apr 2025 22:13:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744322679; cv=none; b=S1Gn+sMIQrd6Wa7NZX3dSNQZoNj7AZIAfjgszf3VCZvY3Qid0z3uf6D5lRO6Buwa6arz0FoNdEbawlZu8vsz7VAn1000Z1Vd11xicxtN91SBRR2KCZAPj11pQERBdLw2LzhPmw26udiWLHteY9OUGF0xwXJeReeRSnusE6C7r04=
+	t=1744323233; cv=none; b=W5mZCSFhF986sK+7KqJOoZI4oWFZEwdAgfYyGS+N6zSPD0tQXGbyw+SlmH/fvdBI9YBipG55/91TNmV+XM5kAk3Q5+lOhXQSsCF0PNEJHSNi8iWghcQfN6/pxQfFfes8EAqg8AkgDhKCovlOmGAQpN7MTMiqAedvK4v5Qahir5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744322679; c=relaxed/simple;
-	bh=3uMBL4NPv3raozz5zKjQqEnw2j9SO97i6WwFa10I4Pg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tu1reDUJvHR9PvDlClEVx5h0aAF5sfrA85o/IzJ6UlSyWZ4YBoJGHRGO9S/5FirvZuBLGCJX+vnBLUE1Qm+KAgb5pefYOMRzvd5RrkBW+GWxmTtguUmWQUesfuzypCUryuHDysRdOqvTUCf290CzsqKPCOeefxPpXZveiGgFYco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=buw4eI0E; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2265a09dbfcso20089835ad.0
-        for <kvm@vger.kernel.org>; Thu, 10 Apr 2025 15:04:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744322676; x=1744927476; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7eShhCni2AeN9U5Jc2b4WOHTyOiv0aqWO9tX2xSw/mU=;
-        b=buw4eI0Ew8YyxYMlNAw2MV0sDnSI9Jt4cME7hQ7K6ri8ObB78VB2nPmP8AEUifrX5Q
-         y8I3j/isiLBhVq0GGAfoozJQ8fyS+o87LIV3f5g0AUSu9X/rSBh8ax2cqoSz+kXECdvB
-         skYi+omBcOZKf+gAC3CsA1XlURcw3wCxBb67HMZGL67kZgWI6wg2WyZPVsYXHUZupmej
-         D2lRthryU/drznbrggBKdcmCj+q8pCgkmKiH8h+BaQ+1mP3renvwzQszGk9YEoho4Kwj
-         bF8Zx/EMcZ2IaPRoG/PBvYbIuKs2aZpnVwMFdtd1tXcEQ1W7DKiDPPYT4wfENJLAd/Qd
-         nnSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744322676; x=1744927476;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7eShhCni2AeN9U5Jc2b4WOHTyOiv0aqWO9tX2xSw/mU=;
-        b=YrKzsqZe3uk05YdCyHBS20ev+ikqKyfRGd3y6vE/fG2b3lePCIc2whM3eKt2HKfYfw
-         MnhhoUNkK93onE5MkFtd8DTmh45B6nZKCzbZG9bYywQFXrNzfVeDd7JwpNfc55bzceXr
-         aS/yCOG262DZ5N/GU3wlCtGgxcsrqO4p2Bkxa1tHb4oiSpDiMCDcov4bm8BFj6dqyGoj
-         BhP/QkXZ8tweATc1ujKuGsR0XIzCSBf/cntw8bUkp+Ep9eP88Bp53VkUv/ft/Rz1DZ92
-         RMkg+f/v8XuH8NkyskfqXhP80coD2ETz6lCBXF5Plt4/HqMSGh36Xcv5b5/gSJNXDHRV
-         5FuA==
-X-Forwarded-Encrypted: i=1; AJvYcCVaoDO8bKvyye0QGX3jmg72Oi4mHr0c29hjiqUmLoip7x5Wk+j3LmenGODuA4wSgmF/CZM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwicGL+5x8pQ4MKc8OiCxcZYgv1Gl5oQ73NQmRg3TbamBOLp01t
-	92TT6JwjC783vjc8lhU6m00lSjqZ1HmyQE93YYLwULqwh3fowZIXdfbHtQdJPvhLvD+DqJJr/3K
-	+1Q==
-X-Google-Smtp-Source: AGHT+IE/nhiyEmsRhP2rb2VCXmUB28XKf+JD6SxynR/MURcWw+q3szzXjCCZ52+kyzlA5ipAqMNlMQqrrE8=
-X-Received: from pltj8.prod.google.com ([2002:a17:902:76c8:b0:223:3f96:a29c])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d481:b0:220:f59b:6e6
- with SMTP id d9443c01a7336-22bea495687mr4890535ad.8.1744322676625; Thu, 10
- Apr 2025 15:04:36 -0700 (PDT)
-Date: Thu, 10 Apr 2025 15:04:35 -0700
-In-Reply-To: <20250410152846.184e174f.alex.williamson@redhat.com>
+	s=arc-20240116; t=1744323233; c=relaxed/simple;
+	bh=IBo89qHKQdv1YlyiUpkbXqVARTQ+YsXgrEGUhF/Pl7Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PQQmGC3LqQMdHIEFIqj4o1lvXg+A4u/fifPOla/mlDotjoCpQrvCEwR19p35SNueV7CyvZ2MH3jK3MMgrjzVbbAXSKlyRlGnswmoyEjt0vfOC9/oOj+yxVx/SBiHAUHnOzGASgtm0DvPVYatboNpadQFbygVZh0aIsDGgQHlHrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=klVA0IxL; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744323232; x=1775859232;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=IBo89qHKQdv1YlyiUpkbXqVARTQ+YsXgrEGUhF/Pl7Q=;
+  b=klVA0IxL1DtkCE45TnhIXALGOzUSR1KZG5VU5nNXfO/fv4n1sGGyzx3j
+   WmR9pWff6s134VLz8V50921FuYFyT1s87+lqsYF3v+9Ibzf6OOEIn5n9/
+   sxrqAMbzDrmMa+mC7RjDeg/AoOuKI4rxcetHnf5rU9Yjodx3fw1slUAN9
+   M2NCyiK9jzvxFOCE3efqToVFb2eRs2GqkXLjOuS2ex18uS2oJEOHYHiLC
+   x5jvhobGh89qILkVyNFX0GjxYCQOeFFtykvFHrENPzZOpaZKSBl2TQyL9
+   r0VxN0X5g9N405M05gDOMH1wP9SZvO2k1K72zlp6+PinYy+ym/knzqPQ0
+   A==;
+X-CSE-ConnectionGUID: ftmE/BIlRS2/esHW/+rUHA==
+X-CSE-MsgGUID: 4k6b17HvST6CRuNNzpVSyw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11400"; a="45105407"
+X-IronPort-AV: E=Sophos;i="6.15,203,1739865600"; 
+   d="scan'208";a="45105407"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 15:13:51 -0700
+X-CSE-ConnectionGUID: SDQvF7IAR3ujJGgrwS0qDQ==
+X-CSE-MsgGUID: 8/JxH8PtSo2nCyqO5LulaQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,203,1739865600"; 
+   d="scan'208";a="129577555"
+Received: from dstill-mobl.amr.corp.intel.com (HELO desk) ([10.125.145.218])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 15:13:50 -0700
+Date: Thu, 10 Apr 2025 15:13:45 -0700
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Josh Poimboeuf <jpoimboe@kernel.org>, x86@kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH] x86/bugs/mmio: Rename mmio_stale_data_clear to
+ cpu_buf_vm_clear
+Message-ID: <20250410221345.ewyagu7coscpr3l7@desk>
+References: <20250410-mmio-rename-v1-1-fd4b2e7fc04e@linux.intel.com>
+ <Z_gsgHzgGWqnNwKv@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250404211449.1443336-1-seanjc@google.com> <20250404211449.1443336-4-seanjc@google.com>
- <20250410152846.184e174f.alex.williamson@redhat.com>
-Message-ID: <Z_hAc3rfMhlyQ9zd@google.com>
-Subject: Re: [PATCH 3/7] irqbypass: Take ownership of producer/consumer token tracking
-From: Sean Christopherson <seanjc@google.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Oliver Upton <oliver.upton@linux.dev>, David Matlack <dmatlack@google.com>, 
-	Like Xu <like.xu.linux@gmail.com>, Yong He <alexyonghe@tencent.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z_gsgHzgGWqnNwKv@google.com>
 
-On Thu, Apr 10, 2025, Alex Williamson wrote:
-> On Fri,  4 Apr 2025 14:14:45 -0700
-> Sean Christopherson <seanjc@google.com> wrote:
-> > diff --git a/include/linux/irqbypass.h b/include/linux/irqbypass.h
-> > index 9bdb2a781841..379725b9a003 100644
-> > --- a/include/linux/irqbypass.h
-> > +++ b/include/linux/irqbypass.h
-> > @@ -10,6 +10,7 @@
+On Thu, Apr 10, 2025 at 01:39:28PM -0700, Sean Christopherson wrote:
+> On Thu, Apr 10, 2025, Pawan Gupta wrote:
+> > The static key mmio_stale_data_clear controls the KVM-only mitigation for
+> > MMIO Stale Data vulnerability. Rename it to reflect its purpose.
+> > 
+> > No functional change.
+> > 
+> > Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> > ---
+> >  arch/x86/include/asm/nospec-branch.h |  2 +-
+> >  arch/x86/kernel/cpu/bugs.c           | 16 ++++++++++------
+> >  arch/x86/kvm/vmx/vmx.c               |  2 +-
+> >  3 files changed, 12 insertions(+), 8 deletions(-)
+> > 
+> > diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
+> > index 8a5cc8e70439e10aab4eeb5b0f5e116cf635b43d..c0474e2b741737dad129159adf3b5fc056b6097c 100644
+> > --- a/arch/x86/include/asm/nospec-branch.h
+> > +++ b/arch/x86/include/asm/nospec-branch.h
+> > @@ -561,7 +561,7 @@ DECLARE_STATIC_KEY_FALSE(mds_idle_clear);
 > >  
-> >  #include <linux/list.h>
+> >  DECLARE_STATIC_KEY_FALSE(switch_mm_cond_l1d_flush);
 > >  
-> > +struct eventfd_ctx;
-> >  struct irq_bypass_consumer;
-> >  
-> >  /*
-> > @@ -18,20 +19,20 @@ struct irq_bypass_consumer;
-> >   * The IRQ bypass manager is a simple set of lists and callbacks that allows
-> >   * IRQ producers (ex. physical interrupt sources) to be matched to IRQ
-> >   * consumers (ex. virtualization hardware that allows IRQ bypass or offload)
-> > - * via a shared token (ex. eventfd_ctx).  Producers and consumers register
-> > - * independently.  When a token match is found, the optional @stop callback
-> > - * will be called for each participant.  The pair will then be connected via
-> > - * the @add_* callbacks, and finally the optional @start callback will allow
-> > - * any final coordination.  When either participant is unregistered, the
-> > - * process is repeated using the @del_* callbacks in place of the @add_*
-> > - * callbacks.  Match tokens must be unique per producer/consumer, 1:N pairings
-> > - * are not supported.
-> > + * via a shared eventfd_ctx).  Producers and consumers register independently.
-> > + * When a producer and consumer are paired, i.e. a token match is found, the
-> > + * optional @stop callback will be called for each participant.  The pair will
-> > + * then be connected via the @add_* callbacks, and finally the optional @start
-> > + * callback will allow any final coordination.  When either participant is
-> > + * unregistered, the process is repeated using the @del_* callbacks in place of
-> > + * the @add_* callbacks.  Match tokens must be unique per producer/consumer,
-> > + * 1:N pairings are not supported.
-> >   */
-> >  
-> >  /**
-> >   * struct irq_bypass_producer - IRQ bypass producer definition
-> >   * @node: IRQ bypass manager private list management
-> > - * @token: opaque token to match between producer and consumer (non-NULL)
-> > + * @token: IRQ bypass manage private token to match producers and consumers
+> > -DECLARE_STATIC_KEY_FALSE(mmio_stale_data_clear);
+> > +DECLARE_STATIC_KEY_FALSE(cpu_buf_vm_clear);
 > 
-> The "token" terminology seems a little out of place after all is said
-> and done in this series.  
+> Could we tack on "if_mmio" or something?  E.g. cpu_buf_vm_clear_if_mmio.  FWIW,
+> I don't love that name, so if anyone can come up with something better...
 
-Ugh, yeah, good point.  I don't know why I left it as "token".
+Keeping it generic has an advantage that it plays nicely with "Attack vector
+controls" series:
 
-> Should it just be an "index" in anticipation of the usage with xarray and
-> changed to an unsigned long?  Or at least s/token/eventfd/ and changed to an
-> eventfd_ctx pointer?
+  https://lore.kernel.org/lkml/20250310164023.779191-1-david.kaplan@amd.com/
 
-My strong vote is for "struct eventfd_ctx *eventfd;"
+The idea being to allow mitigations to be enabled/disabled based on
+user-defined threat model. MDS/TAA mitigations may be able to take
+advantage this KVM-only control.
+
+> I like the idea of tying the static key back to X86_FEATURE_CLEAR_CPU_BUF, but
+> when looking at just the usage in KVM, "cpu_buf_vm_clear" doesn't provide any
+> hints as to when/why KVM needs to clear buffers.
+
+Thats fair, can we cover that with a comment like below:
+
+---
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index c79720aad3df..cddad4a6eb46 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7358,6 +7358,10 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
+ 	 * mitigation for MDS is done late in VMentry and is still
+ 	 * executed in spite of L1D Flush. This is because an extra VERW
+ 	 * should not matter much after the big hammer L1D Flush.
++	 *
++	 * cpu_buf_vm_clear is used when system is not vulnerable to MDS/TAA,
++	 * but is affected by MMIO Stale Data that only needs mitigation
++	 * against a rogue guest.
+ 	 */
+ 	if (static_branch_unlikely(&vmx_l1d_should_flush))
+ 		vmx_l1d_flush(vcpu);
 
