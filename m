@@ -1,161 +1,142 @@
-Return-Path: <kvm+bounces-43172-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43173-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43745A863E1
-	for <lists+kvm@lfdr.de>; Fri, 11 Apr 2025 19:02:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 46106A8640D
+	for <lists+kvm@lfdr.de>; Fri, 11 Apr 2025 19:08:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A91D8C1B5D
-	for <lists+kvm@lfdr.de>; Fri, 11 Apr 2025 16:58:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0209C9C36E0
+	for <lists+kvm@lfdr.de>; Fri, 11 Apr 2025 17:03:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E983221FB2;
-	Fri, 11 Apr 2025 16:57:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7805221FD4;
+	Fri, 11 Apr 2025 17:01:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X4mxsts/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y1VrOb+0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4588022068A
-	for <kvm@vger.kernel.org>; Fri, 11 Apr 2025 16:57:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43668221713;
+	Fri, 11 Apr 2025 17:01:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744390678; cv=none; b=ZwYeBSrZ/K/i4f8pcoRHQbXspbPKaYTZOyOfKgRzu4yFgD0n/od6PbCQlFM3n7pa9x9F/k8HnaUAY/e3A7tyDHFwfYSlwiUPbW5GceEYGOQ6yc0c5arJFK344BBI3tJsbFVg4Qpz3FRbp7DR8Mn1uGRhysgFpr2hvIWs5KxQfHI=
+	t=1744390912; cv=none; b=kNrPNVoPvpuWPte44JFLVN2H6jqSdBB3eMwlQ6rnHQWQXzXJaq/1Y6b8SXfVtof+tic9/1wKY/YSuR4YBoP+ChR+aD2OviO1HETQFP+32CCxbEYfVow1qlFNXM+jp4qm0s7e6Ff3+tK+h/y7Sowd44ZgVOudFxbeZnVnUR0Np/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744390678; c=relaxed/simple;
-	bh=Wq5KqapYo4ta0Kf3SzH8rl9nvBIyxMOu1jOx/ourByQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uQioAaFiemjRLegL3f8Iib8k1ds0S1Zv3mbDFlnP993DQun/vUpf9ezJwdHh3oC+fZu3Rh3GiYTYZCvtvMO9I6fmmnU0qh7z10BXNDzO0neLd1Df+7o3bj/DL92tGxHvrUaC7gfj5vQtrTSrlHFD5fj9O8QurUN6KIgW5NdVf5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X4mxsts/; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff6aaa18e8so2037470a91.1
-        for <kvm@vger.kernel.org>; Fri, 11 Apr 2025 09:57:57 -0700 (PDT)
+	s=arc-20240116; t=1744390912; c=relaxed/simple;
+	bh=/KN5H4z7CroAIRt2BKniUi5Cpcgz5JCQepcfrafxVZM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=e07KnRjxqqkLzOD5Y5sL8LmTLsxaArYrfaVjvVWI6lMAY9rz/BgqBMgw/a7yOnNtHoUkzM1T/OEg3yOuKZ3yIkms7FLy7L1GQntQFPttyZP3kldaowDsAA8gcEFpDgMZc6KSF9DBHheGyxJ/JaVp/jceKwkea+ddY4ywkYlI7yY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y1VrOb+0; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43cec5cd73bso16546265e9.3;
+        Fri, 11 Apr 2025 10:01:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744390676; x=1744995476; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZY/jMeoynkulV9w2VO4rS3YKDi7eh13ppuhNm2nxw78=;
-        b=X4mxsts/z6aVObQStd6HXjbJJSrjaMI9+HotGWlK3DwRM6aSyskBfdSjSN2CsfxyRr
-         dEMikZ/TFhNT1bKGtUvle4TfMMNNwf8W/Xd6QSXN3HCSmW9yiblKm3Hfqg/LW6euO9Lb
-         7vDmZvLqAvltxci25WkagkK9HPu4DvY7Q+hYFdVZy58SzEPCekXldTuW+G1Ryh0RBtwq
-         laX/tvEnevPKX/ooJd2AJ9KeJT+YhgZ4zFPuR0emxMX7WjFpw9MuwIgGiYZFR/b2+nao
-         L26Pk29RaZsao2kezZiEnV5W8CPp+E0GzvP96QQ0cMAlluRU0a6qlbHx1oYUzGIwNj0X
-         U3mQ==
+        d=gmail.com; s=20230601; t=1744390908; x=1744995708; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/KN5H4z7CroAIRt2BKniUi5Cpcgz5JCQepcfrafxVZM=;
+        b=Y1VrOb+0jNob7afsv68GcEOPVOMIR5vc715FL9ad3izc99uJSf5j1RlM/qhCRlIqMj
+         G3sfr5c0y9AXJt06q+JdQt4kDpBBv0XqKjNFTAg7bLwXIEGvmtYvyP+aGkqiAwjkryc4
+         XtLBUscPINx81m0DvmSM8aUYNeRB36h7IQJbUKNGO9EJs5fCjodcmSHZvmUwRocBPQSU
+         V1XLUnKiim12zlsGHoLYzHFq0/+Z4PIbX6Ryxgl24q2Xy/NXMojxzWWWWykZl3RajhFh
+         3umKhvoAY3WlLrqBmAUBMxOInQg1Y3J96wYGrk1HT4ncILLrmvpu0tGsbc+CGcxuYyvY
+         CA4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744390676; x=1744995476;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZY/jMeoynkulV9w2VO4rS3YKDi7eh13ppuhNm2nxw78=;
-        b=ZrM1vCDBrLqlq4SdKHg87LwgEIrm4GcAhAvWOVDMGHboRxq/zOKYibtLTaB0E2qAzs
-         sZAVq2uSB0wcKPTomx7l4Bxg9m/Tvk+ra6iH6cEwJrY8g7WF9/9oKQhuA81XgFidCTMz
-         G03aNH/5VXEMDOKhCvx78KF/sVcq8NnBcJxKLfvKoAEN0hrhtVN45XiSikTDFWJi4W2x
-         50YxEszJIBpcX/YRbTCMEIgQ9zQ8D/851lnKn2nGP99h7shQ4qY771W/ZyU6TLXLsyt+
-         hL3U44B0xHeeMS0NVvESFhy1e2ye+yQQW0UjdEWqpDPflEtz+k15sBzcGTuftghDJ6Ex
-         8duw==
-X-Gm-Message-State: AOJu0YzvHfGkW2hz0XBcNsiP4jfjZ4czXYN18kzVed7d4hpGYvn7aAwR
-	b67svvIbgmjZ1eRpf7/12cSy5KUjRqlfgSE4qYfq9/BETUPYGfaJ72OzLZtEWl0reFtHdztrVwF
-	bmA==
-X-Google-Smtp-Source: AGHT+IH7xZv5EhQslB3sVvC8MHBA+ksc9N0ZAT4JjBSUIcaU8OkwCFM8Neynlk483kpgONrQjY94qfhmJPE=
-X-Received: from pjbsp7.prod.google.com ([2002:a17:90b:52c7:b0:2fa:210c:d068])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:274e:b0:2f9:c139:b61f
- with SMTP id 98e67ed59e1d1-30823670d71mr5839681a91.14.1744390676557; Fri, 11
- Apr 2025 09:57:56 -0700 (PDT)
-Date: Fri, 11 Apr 2025 09:57:55 -0700
-In-Reply-To: <Z/jWytoXdiGdCeXz@intel.com>
+        d=1e100.net; s=20230601; t=1744390908; x=1744995708;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/KN5H4z7CroAIRt2BKniUi5Cpcgz5JCQepcfrafxVZM=;
+        b=BXmSQmP1VtWsgM4L5iN3e7rPBmZo5+Fyp6/B9e7P5TdgCEQQuBqWF8m2qxA69ANw4M
+         p8/8wR95rkP+uIloznxJnmDAgVhgeCjGpbacdE5SOnrrLiECD6FkxtHbo7XecmSqk6jM
+         IGUm+8UUH1LtoLUqq+iBu0/MnRfO1VnSOKqnQPXsX2Sf+COZnkGeM6U+D8M/Pl6RXr+p
+         9B39HCP5+cHCiprIFlu/E15/Id35MKKm3GSPnGOVczfuT3+TT7XIc2AMdkJ+t2f5obUj
+         LI63S6d4rbfu7UvX/AHAt7JUX2FxS7n8+ER0JOU/1xVhzjZN6HZqTLlCnFgr+HNB2oiF
+         bdQA==
+X-Forwarded-Encrypted: i=1; AJvYcCWD2s9culBTnTnDpDjkbVI9bKccfzKL4ibH8Zmlzzcz3X7Vg3ZNIm+eF1GBqMvBp0Zj4lTZJdT2D/F8sKk6@vger.kernel.org, AJvYcCXQahWfplq6S218srZFG6h1Eo2Xzkj+6h6/KFNDf49A2A/oRzNECwoE0S2epCXQ99vJu44=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxP6GYmtf3F/WaxPvfxKMsYZapfr+IbCftNYF1iDPSMreVpVIF5
+	uEII8Pq0ecyOebrwUNTrLsCEKQ+q3EV+ZBIjswL9+3G6LeNZV82Z
+X-Gm-Gg: ASbGncuagb61R5/8IPoBs+SMMnGx9Kqp4+6rOvDg4guBJn0kB84Em1oZISS+FNt5nF0
+	Y4NMM/eapgu4cgWs7EUUrET0bbpGfiIQHPEaSEYqLbPKAu4amwmsNh4mzn+E8k3zRwR7bz17NCN
+	Q10CwABpBPVDQmlMR8eGU5ZD0TLIIM6D9G2BDhJpqpPfGmPeRYiazdpkH/Ga3TMPhSKXAFn4DwJ
+	PzbnCDTj6dSawoeQcIAeAth+MerStG4R6QrEG0aB7mgwkCHJ8mm5UaV2oEbfMxzPkbYq6K1jykX
+	XPppIdPeILJ0/Y2LVdN3/nEzNUyCYupYDy1l7kWNpQnACyJiKTAAd8NpbiLcHVW/nDzkqMdcGGk
+	gqtRMhOzfl9YVqm9yGexWWQ==
+X-Google-Smtp-Source: AGHT+IFJSlr3fMFwLRozrYI4EVe3jtIuZE4RPCKujDG2hAxxfr6+yYavPIctDfrr4CDrTirY2dtkBA==
+X-Received: by 2002:a05:600c:34ca:b0:43c:f5e4:895e with SMTP id 5b1f17b1804b1-43f3a928afamr31127085e9.1.1744390906560;
+        Fri, 11 Apr 2025 10:01:46 -0700 (PDT)
+Received: from ?IPv6:2001:b07:5d29:f42d:be33:c0f9:503a:236d? ([2001:b07:5d29:f42d:be33:c0f9:503a:236d])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43f2075fc6dsm93524705e9.28.2025.04.11.10.01.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Apr 2025 10:01:46 -0700 (PDT)
+Message-ID: <521b5214803d404766cb576af2b90fe3ec8326f2.camel@gmail.com>
+Subject: Re: [PATCH v3 14/17] x86/apic: Add kexec support for Secure AVIC
+From: Francesco Lavra <francescolavra.fl@gmail.com>
+To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>, linux-kernel@vger.kernel.org
+Cc: bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, 
+ dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com, nikunj@amd.com, 
+ Santosh.Shukla@amd.com, Vasant.Hegde@amd.com,
+ Suravee.Suthikulpanit@amd.com,  David.Kaplan@amd.com, x86@kernel.org,
+ hpa@zytor.com, peterz@infradead.org,  seanjc@google.com,
+ pbonzini@redhat.com, kvm@vger.kernel.org,  kirill.shutemov@linux.intel.com,
+ huibo.wang@amd.com, naveen.rao@amd.com
+Date: Fri, 11 Apr 2025 19:01:44 +0200
+In-Reply-To: <20250401113616.204203-15-Neeraj.Upadhyay@amd.com>
+References: <20250401113616.204203-1-Neeraj.Upadhyay@amd.com>
+	 <20250401113616.204203-15-Neeraj.Upadhyay@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250324140849.2099723-1-chao.gao@intel.com> <Z_g-UQoZ8fQhVD_2@google.com>
- <Z/jWytoXdiGdCeXz@intel.com>
-Message-ID: <Z_lKE-GjP3WQrdkR@google.com>
-Subject: Re: [PATCH] KVM: VMX: Flush shadow VMCS on emergency reboot
-From: Sean Christopherson <seanjc@google.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 
-On Fri, Apr 11, 2025, Chao Gao wrote:
-> On Thu, Apr 10, 2025 at 02:55:29PM -0700, Sean Christopherson wrote:
-> >On Mon, Mar 24, 2025, Chao Gao wrote:
-> >> Ensure the shadow VMCS cache is evicted during an emergency reboot to
-> >> prevent potential memory corruption if the cache is evicted after reboot.
-> >
-> >I don't suppose Intel would want to go on record and state what CPUs would actually
-> >be affected by this bug.  My understanding is that Intel has never shipped a CPU
-> >that caches shadow VMCS state.
-> 
-> I am not sure. Would you like me to check internally?
+T24gVHVlLCAyMDI1LTA0LTAxIGF0IDE3OjA2ICswNTMwLCBOZWVyYWogVXBhZGh5YXkgd3JvdGU6
+Cj4gQWRkIGEgYXBpYy0+dGVhcmRvd24oKSBjYWxsYmFjayB0byBkaXNhYmxlIFNlY3VyZSBBVklD
+IGJlZm9yZQo+IHJlYm9vdGluZyBpbnRvIHRoZSBuZXcga2VybmVsLiBUaGlzIGVuc3VyZXMgdGhh
+dCB0aGUgbmV3Cj4ga2VybmVsIGRvZXMgbm90IGFjY2VzcyB0aGUgb2xkIEFQSUMgYmFja2luZyBw
+YWdlIHdoaWNoIHdhcwo+IGFsbG9jYXRlZCBieSB0aGUgcHJldmlvdXMga2VybmVsLiBTdWNoIGFj
+Y2Vzc2VzIGNhbiBoYXBwZW4KPiBpZiB0aGVyZSBhcmUgYW55IEFQSUMgYWNjZXNzZXMgZG9uZSBk
+dXJpbmcgZ3Vlc3QgYm9vdCBiZWZvcmUKPiBTZWN1cmUgQVZJQyBkcml2ZXIgcHJvYmUgaXMgZG9u
+ZSBieSB0aGUgbmV3IGtlcm5lbCAoYXMgU2VjdXJlCj4gQVZJQyB3b3VsZCBoYXZlIHJlbWFpbmVk
+IGVuYWJsZWQgaW4gdGhlIFNlY3VyZSBBVklDIGNvbnRyb2wKPiBtc3IpLgo+IAo+IFNpZ25lZC1v
+ZmYtYnk6IE5lZXJhaiBVcGFkaHlheSA8TmVlcmFqLlVwYWRoeWF5QGFtZC5jb20+Cj4gLS0tCj4g
+Q2hhbmdlcyBzaW5jZSB2MjoKPiDCoC0gQ2hhbmdlIHNhdmljX3VucmVnaXN0ZXJfZ3BhKCkgaW50
+ZXJmYWNlIHRvIGFsbG93IEdQQQo+IHVucmVnaXN0cmF0aW9uCj4gwqDCoCBvbmx5IGZvciBsb2Nh
+bCBDUFUuCj4gCj4gwqBhcmNoL3g4Ni9jb2NvL3Nldi9jb3JlLmPCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgIHwgMjUgKysrKysrKysrKysrKysrKysrKysrKysrKwo+IMKgYXJjaC94ODYvaW5jbHVkZS9h
+c20vYXBpYy5owqDCoMKgwqDCoMKgwqDCoCB8wqAgMSArCj4gwqBhcmNoL3g4Ni9pbmNsdWRlL2Fz
+bS9zZXYuaMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAgMiArKwo+IMKgYXJjaC94ODYva2VybmVsL2Fw
+aWMvYXBpYy5jwqDCoMKgwqDCoMKgwqDCoCB8wqAgMyArKysKPiDCoGFyY2gveDg2L2tlcm5lbC9h
+cGljL3gyYXBpY19zYXZpYy5jIHzCoCA4ICsrKysrKysrCj4gwqA1IGZpbGVzIGNoYW5nZWQsIDM5
+IGluc2VydGlvbnMoKykKPiAKPiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYvY29jby9zZXYvY29yZS5j
+IGIvYXJjaC94ODYvY29jby9zZXYvY29yZS5jCj4gaW5kZXggOWFkZTJiMTk5M2FkLi4yMzgxODU5
+NDkxZGIgMTAwNjQ0Cj4gLS0tIGEvYXJjaC94ODYvY29jby9zZXYvY29yZS5jCj4gKysrIGIvYXJj
+aC94ODYvY29jby9zZXYvY29yZS5jCj4gQEAgLTE1ODgsNiArMTU4OCwzMSBAQCBlbnVtIGVzX3Jl
+c3VsdCBzYXZpY19yZWdpc3Rlcl9ncGEodTY0IGdwYSkKPiDCoMKgwqDCoMKgwqDCoMKgcmV0dXJu
+IHJlczsKPiDCoH0KPiDCoAo+ICtlbnVtIGVzX3Jlc3VsdCBzYXZpY191bnJlZ2lzdGVyX2dwYSh1
+NjQgKmdwYSkKPiArewo+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCBnaGNiX3N0YXRlIHN0YXRlOwo+
+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCBlc19lbV9jdHh0IGN0eHQ7Cj4gK8KgwqDCoMKgwqDCoMKg
+dW5zaWduZWQgbG9uZyBmbGFnczsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgZ2hjYiAqZ2hjYjsK
+PiArwqDCoMKgwqDCoMKgwqBpbnQgcmV0ID0gMDsKClRoaXMgc2hvdWxkIGJlIGFuIGVudW0gZXNf
+cmVzdWx0LCBhbmQgdGhlcmUgaXMgbm8gbmVlZCB0byB6ZXJvLQppbml0aWFsaXplIGl0LgoKPiAr
+Cj4gK8KgwqDCoMKgwqDCoMKgbG9jYWxfaXJxX3NhdmUoZmxhZ3MpOwoKZ3VhcmQoaXJxc2F2ZSko
+KTsKCj4gKwo+ICvCoMKgwqDCoMKgwqDCoGdoY2IgPSBfX3Nldl9nZXRfZ2hjYigmc3RhdGUpOwo+
+ICsKPiArwqDCoMKgwqDCoMKgwqB2Y19naGNiX2ludmFsaWRhdGUoZ2hjYik7Cj4gKwo+ICvCoMKg
+wqDCoMKgwqDCoGdoY2Jfc2V0X3JheChnaGNiLCAtMVVMTCk7Cj4gK8KgwqDCoMKgwqDCoMKgcmV0
+ID0gc2V2X2VzX2doY2JfaHZfY2FsbChnaGNiLCAmY3R4dCwKPiBTVk1fVk1HRVhJVF9TRUNVUkVf
+QVZJQywKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoFNW
+TV9WTUdFWElUX1NFQ1VSRV9BVklDX1VOUkVHSVNURVJfR1BBLCAwKTsKPiArwqDCoMKgwqDCoMKg
+wqBpZiAoZ3BhICYmIHJldCA9PSBFU19PSykKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgKmdwYSA9IGdoY2ItPnNhdmUucmJ4Owo+ICvCoMKgwqDCoMKgwqDCoF9fc2V2X3B1dF9naGNi
+KCZzdGF0ZSk7Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoGxvY2FsX2lycV9yZXN0b3JlKGZsYWdzKTsK
+PiArwqDCoMKgwqDCoMKgwqByZXR1cm4gcmV0Owo+ICt9Cg==
 
-Eh, if it's easy, it'd be nice to have, but don't put much effort into it.  I'm
-probably being too cute in hesitating about sending this to stable@.  The risk
-really shouldn't be high.
-
-> However, SDM Chapter 26.11 includes a footnote stating:
-> "
-> As noted in Section 26.1, execution of the VMPTRLD instruction makes a VMCS is
-> active. In addition, VM entry makes active any shadow VMCS referenced by the
-> VMCS link pointer in the current VMCS. If a shadow VMCS is made active by VM
-> entry, it is necessary to execute VMCLEAR for that VMCS before allowing that
-> VMCS to become active on another logical processor.
-> "
-> 
-> To me, this suggests that shadow VMCS may be cached, and software shouldn't
-> assume the CPU won't cache it. But, I don't know if this is the reality or
-> if the statement is merely for hardware implementation flexibility.
-> 
-> >
-> >On a very related topic, doesn't SPR+ now flush the VMCS caches on VMXOFF?  If
-> 
-> Actually this behavior is not publicly documented.
-
-Well shoot.  That should probably be remedied.  Even if the behavior is guaranteed
-only on CPUs that support SEAM, _that_ detail should be documented.  I'm not
-holding my breath on Intel allowing third party code in SEAM, but the mode _is_
-documented in the SDM, and so IMO, the SDM should also document how things like
-clearing the VMCS cache are supposed to work when there are VMCSes that "untrusted"
-software may not be able to access.
-
-> >that's going to be the architectural behavior going forward, will that behavior
-> >be enumerated to software?  Regardless of whether there's software enumeration,
-> >I would like to have the emergency disable path depend on that behavior.  In part
-> >to gain confidence that SEAM VMCSes won't screw over kdump, but also in light of
-> >this bug.
-> 
-> I don't understand how we can gain confidence that SEAM VMCSes won't screw
-> over kdump.
-
-If KVM relies on VMXOFF to purge the VMCS cache, then it gives a measure of
-confidence that running TDX VMs won't leave behind SEAM VMCSes in the cache.  KVM
-can't easily clear SEAM VMCSs, but IIRC, the memory can be "forcefully" reclaimed
-by paving over it with MOVDIR64B, at which point having VMCS cache entries for
-the memory would be problematic.
-
-> If a VMM wants to leverage the VMXOFF behavior, software enumeration
-> might be needed for nested virtualization. Using CPU F/M/S (SPR+) to
-> enumerate a behavior could be problematic for virtualization. Right?
-
-Yeah, F/M/S is a bad idea.  Architecturally, I think the behavior needs to be
-tied to support for SEAM.  Is there a safe-ish way to probe for SEAM support,
-without having to glean it from MSR_IA32_MKTME_KEYID_PARTITIONING?
-
-> >If all past CPUs never cache shadow VMCS state, and all future CPUs flush the
-> >caches on VMXOFF, then this is a glorified NOP, and thus probably shouldn't be
-> >tagged for stable.
-> 
-> Agreed.
-> 
-> Sean, I am not clear whether you intend to fix this issue and, if so, how.
-> Could you clarify?
-
-Oh, I definitely plan on taking this patch, I'm just undecided on whether or not
-to tag it for stable@.
 
