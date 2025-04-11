@@ -1,77 +1,75 @@
-Return-Path: <kvm+bounces-43149-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43150-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A40A3A85847
-	for <lists+kvm@lfdr.de>; Fri, 11 Apr 2025 11:44:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6086A8584D
+	for <lists+kvm@lfdr.de>; Fri, 11 Apr 2025 11:48:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDB06179FEE
-	for <lists+kvm@lfdr.de>; Fri, 11 Apr 2025 09:44:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6E4837AD5D3
+	for <lists+kvm@lfdr.de>; Fri, 11 Apr 2025 09:45:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 655E32989AA;
-	Fri, 11 Apr 2025 09:44:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A4EF29899B;
+	Fri, 11 Apr 2025 09:46:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="MRJ2N1ai"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="H6Bl+6Yn"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E24202F70;
-	Fri, 11 Apr 2025 09:44:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 968076125;
+	Fri, 11 Apr 2025 09:46:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744364665; cv=none; b=IPyDcYN9mIAjUdYYUpgfxxiXtwZ2mjmgBnEFn03WHP1o0XmVweV00BUB1L/tZ286+x5P2P1H5cdyVOty4Bcrfc6XCc4LoTjR9FYIPf12lnMaHyUciJe/q5DQ87MzjQg7401sX8xBg8OCWjRAJBfH40veRu0S8OUATLUl/MZAFR4=
+	t=1744364768; cv=none; b=uCi6dYrUjgygyK7j3rC8fBv4nJQflQZS32yu8Q2oh8thJMG1rbIgiBEoNUjzfLvlP8uk4MOiRqe5lydVAjf11ogt2onDtOvNEnsq11DBiH2lYLJCktqTsebrtRkvJOayrYO0h25sl/NlJ32VWBH1RXk4d961fuNlV3THnaxup8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744364665; c=relaxed/simple;
-	bh=nwfoy+wcc2jrProhIgYowMYQYDLcJ48PHbWTmbYJJiU=;
+	s=arc-20240116; t=1744364768; c=relaxed/simple;
+	bh=1RVik0NlfQSByh+MVGU2m8fVn3PKpjEfUQ8PK51vI3E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H2xlLgXGx6JwU4JHJv1id7OpuU7wM9AJBLjVnWboVlnuB7Z5cd4Z1mpaxzJ15KAQCLXtFb178GvsIGkhh6gU5WiTy+ke3x0YQ7tSDHRBI3uHqoPIaDHMBOA5MOqc8BU4TOIyqwmE+K+5HNjsFtuX3x2LGEtlCIcUq9uwDsLDWt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=MRJ2N1ai; arc=none smtp.client-ip=65.109.113.108
+	 Content-Type:Content-Disposition:In-Reply-To; b=F5OXgwUaLqtZj6vlEYDO1l1jOMLAunFGGs6CzMRMdKqW0eGCeuXsLRDIoSsIjjZyVTmJacAMSb+nHpHcdjotq/MAbrnVLSymL57p19Il353ZJYPxw6IsY5zhzkId7cGtLfwW4omsMZjDxtADl/caFc7tcCJhfMrsSpduXC38LXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=H6Bl+6Yn; arc=none smtp.client-ip=65.109.113.108
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 8E05B40E0244;
-	Fri, 11 Apr 2025 09:44:21 +0000 (UTC)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 7961640E0244;
+	Fri, 11 Apr 2025 09:46:04 +0000 (UTC)
 X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
 Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
 	header.d=alien8.de
 Received: from mail.alien8.de ([127.0.0.1])
 	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id g3nw8nuVPm7K; Fri, 11 Apr 2025 09:44:18 +0000 (UTC)
+	with ESMTP id r5D8zoiJXQKE; Fri, 11 Apr 2025 09:46:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1744364658; bh=VULtdd9pZjePUejEED6I4TSMMzip10qR9GA/3/AO+Nw=;
+	t=1744364759; bh=ayElILbyVh8//B/ihafKwcK06o8pVHIZiL8+eeH1q1c=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MRJ2N1aiUHVg3/bdpiKvNyxM9mhPW8YLhWtAYjzx7t0wjRXBv/F1pqxRTfkDQCR/i
-	 Hs+j0twRCPZy6k2MNubYSEr+PxLhuGtJfuq7G/dF2/ZlugGeLq8qoa15UQJDqPqsMZ
-	 +OXr8EjsMnH3AWENM1UUhp6hAL4BbTNs8fkS5s3tqBnAp2SLkmDJoRKt6w8KORTlkm
-	 hGBMJWw1j1cHD/i29b7PoCYnp0YUjJCZhq8BtzA/yWy69r95kpeP1fxwgNaiFX0eI5
-	 DtsZlZbuFdRD4V7svceDNyYCvhRV0EdfQ4YjytG3gkOijZrKCYZmQaLMdNLuU1Nu0d
-	 vbIcgT2k5t4jbRjCqTyvKrWcof3UlB4t4Cp6BcFzapngAbDchBtMiqWxEgMSI3FFOx
-	 QUoW8kQDObVnhgPB7xk4lkmHO39HOtoH1V6aquUcs02jCBa63suo+2jcaQLsBexbJs
-	 5l9xGc7KuUz9SQbNx2DJBnp+7nWxdwEUbmiZgXN+YLYaYJq9oP7rNg24EHfcP+bHK0
-	 6g5YG2zPObXC/04CgIDctkgpfv5tTZRTMuqlC3Q4uUghIyT4OMRMUb9vOkehGLv1M+
-	 iAMaXEyNjBmiaTP9/aAMG98xqow2nZKiPfNamip/bS9iFKkZdTIi5biOQGO9bkQY6y
-	 WymD5XrCBZ8avvbqVbaCWyEc=
+	b=H6Bl+6YnOZ7oHDpjjH9I6xLEYfdi7fyVTrPlZPxWTGM6We8DXdvABPJ71+M4Xk+9u
+	 LK12I1A+ZP3QAjFQyil6tFEAc66x8kQAUCjyu6oL/5RUftjBtwEHYoivaJL10bp988
+	 IztDKABslaY3i4hus+2chG486EgFJZ0ZCXxmVNO42hTVLwcH7TYuw27k5awsJDeq+h
+	 stbhRxUi95giNWd47hdlW6jb/uGjxrpnsxV+N4r0L6mrhRoKndPK6d65EB88EB9tR7
+	 nGgAhZNWS9iMqEtaLWX2MxB4PwrVd60yrbPUTUIehnwehfVY27zGHfBLxcagamqEhQ
+	 c2zJsH7zr/JEJRJ+lhhRaCkNOqhy24v0ynlDDs6LRWnEYkb5jlJ54By2/kkTxPkyar
+	 CRFbY79Bht/75kb4b/+dTepW/hA0S8ZXy/ThOjFClww6Pv6f5UuMlzzvupc5VbU+3E
+	 DSUlXUFvw+UvOdwbUG4eT8ZraAZ07WSvJc9kM9+zehjh6BjF1Zwu4XZ8oKwwGALFYj
+	 6deRmuW1kK49j3AAiI0/+GaP727CCXwBYlVwzAKrN6Rcu74Wq9rJ4tXQRg2nrkxreo
+	 a8d7Ag9MjzTdUCbnNn7NUm6UXxJekhUKhltJur3GPaHvpzlxwpAZKKpjgrcsetgfYk
+	 Rqy2mYyfCmJOq7PtjVYBuWQM=
 Received: from zn.tnic (p579690ee.dip0.t-ipconnect.de [87.150.144.238])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 0DDFF40E0245;
-	Fri, 11 Apr 2025 09:44:05 +0000 (UTC)
-Date: Fri, 11 Apr 2025 11:44:04 +0200
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1258740E0243;
+	Fri, 11 Apr 2025 09:45:53 +0000 (UTC)
+Date: Fri, 11 Apr 2025 11:45:51 +0200
 From: Borislav Petkov <bp@alien8.de>
-To: Maksim Davydov <davydov-max@yandex-team.ru>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-	babu.moger@amd.com, seanjc@google.com, mingo@redhat.com,
-	tglx@linutronix.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-	jmattson@google.com, pbonzini@redhat.com
-Subject: Re: [PATCH v3 2/2] x86: KVM: Advertise AMD's speculation control
- features
-Message-ID: <20250411094404.GKZ_jkZC9Zb0Lc_zU-@fat_crate.local>
-References: <20241204134345.189041-1-davydov-max@yandex-team.ru>
- <20241204134345.189041-3-davydov-max@yandex-team.ru>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Borislav Petkov <bp@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	X86 ML <x86@kernel.org>, KVM <kvm@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] KVM: x86: Sort CPUID_8000_0021_EAX leaf bits properly
+Message-ID: <20250411094551.GAZ_jkz8N2zDkkPbTt@fat_crate.local>
+References: <20250324160617.15379-1-bp@kernel.org>
+ <Z_g8Py8Ow85Uj6RT@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -80,24 +78,38 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241204134345.189041-3-davydov-max@yandex-team.ru>
+In-Reply-To: <Z_g8Py8Ow85Uj6RT@google.com>
 
-On Wed, Dec 04, 2024 at 04:43:45PM +0300, Maksim Davydov wrote:
-> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> index 45f87a026bba..0a709d03ee5c 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -343,7 +343,10 @@
->  #define X86_FEATURE_AMD_IBPB		(13*32+12) /* Indirect Branch Prediction Barrier */
->  #define X86_FEATURE_AMD_IBRS		(13*32+14) /* Indirect Branch Restricted Speculation */
->  #define X86_FEATURE_AMD_STIBP		(13*32+15) /* Single Thread Indirect Branch Predictors */
-> +#define X86_FEATURE_AMD_IBRS_ALWAYS_ON	(13*32+16) /* Indirect Branch Restricted Speculation always-on preferred */
->  #define X86_FEATURE_AMD_STIBP_ALWAYS_ON	(13*32+17) /* Single Thread Indirect Branch Predictors always-on preferred */
-> +#define X86_FEATURE_AMD_IBRS_PREFERRED	(13*32+18) /* Indirect Branch Restricted Speculation is preferred over SW solution */
-> +#define X86_FEATURE_AMD_IBRS_SAME_MODE	(13*32+19) /* Indirect Branch Restricted Speculation provides Same Mode protection */
+On Thu, Apr 10, 2025 at 02:46:39PM -0700, Sean Christopherson wrote:
+> I'm going to skip these, as they aren't yet publicly documented,
 
-This is an AMD-specific leaf - you don't need to put "AMD_" in front of every
-bit.
+https://www.amd.com/content/dam/amd/en/documents/epyc-technical-docs/programmer-references/57238.zip
+
+> and there are patches proposed to add actual support.  I wouldn't care all
+> that much if these didn't collide with Intel's version (the proposed patches
+> name them AMD_FSxx).
+>
+> https://lore.kernel.org/all/20241204134345.189041-2-davydov-max@yandex-team.ru
+
+Pff, I think the right thing to do is to detect those and when set, set the
+Intel flags because they're basically the same.
+
+Lemme go reply there.
+
+... goes and replies...
+
+> 
+> >  		/* PrefetchCtlMsr */
+> > -		F(WRMSR_XX_BASE_NS),
+> > +		/* GpOnUserCpuid */
+> > +		/* EPSF */
+> 
+> FWIW, this one's also not in the APM (though the only APM I can find is a year old),
+> though it's in tools/x86/kcpuid.
+
+See above. Yeah, the PPRs have them earlier than the APM.
+
+Thx.
 
 -- 
 Regards/Gruss,
