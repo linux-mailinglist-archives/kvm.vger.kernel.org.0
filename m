@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-43140-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43141-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF735A855CE
-	for <lists+kvm@lfdr.de>; Fri, 11 Apr 2025 09:48:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81553A85634
+	for <lists+kvm@lfdr.de>; Fri, 11 Apr 2025 10:09:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7522D7A6A47
-	for <lists+kvm@lfdr.de>; Fri, 11 Apr 2025 07:47:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7304B1BA3B9E
+	for <lists+kvm@lfdr.de>; Fri, 11 Apr 2025 08:09:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EDB228F931;
-	Fri, 11 Apr 2025 07:48:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17B3727E1CB;
+	Fri, 11 Apr 2025 08:08:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="NDwuxaWp"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="zYpf7eoN"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2048.outbound.protection.outlook.com [40.107.220.48])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2086.outbound.protection.outlook.com [40.107.94.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA44F1CEACB;
-	Fri, 11 Apr 2025 07:48:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA6B27D762;
+	Fri, 11 Apr 2025 08:08:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.86
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744357693; cv=fail; b=A0t/XRalXUQjjCRx1OYV+qB/1nTH3Mh1lwjld/RZI+vXWbkOolQqdgvyAslnM4mrBvLHjS7DiKKFOWptLgQSdL8Hc/WV3Jrafd+pJsrQV173FZA+SylihH+eP5wOjvrDhz/GNABJQR0DGknjzr8gsYJGpFyErsLOXnopxcelUrg=
+	t=1744358937; cv=fail; b=A1iwpqoMZTvLEysHvavSmtBefP/H8kuClRsO7krhOAu6WbLjBzccoMASHkwktXb3zt+uVKRn48iHkZZkw8lxb7U2dEiCM5Rw7xmrsv7yQhfPNxZeFmZ3E3avjktq0dou+mJh66zbUijr26NIPMrLrbB2WyAf9HVc/ya7J/I/Ii4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744357693; c=relaxed/simple;
-	bh=dxxwTqZ0pmoA55d3YDPX0Z8GV1YM16E4aAa074wyacs=;
+	s=arc-20240116; t=1744358937; c=relaxed/simple;
+	bh=MHlit6uVYXuh/xLFO2jgCee6PY9ySUZ/ShZHf32uRmo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=WC7xPregKoZV3oy6PD6aUXuAQxMFNi4MjD4/nmn1ErbkUvWuVJYToMdg71ld80UXjhUuUWlecBuOmx+2YL7brfPTd3TV4xg/e2lR4fSy7zLiw9VlR1EsoMMKo58mH/67taoHS99t1Zc5OTZyTaQ0GPIomPcAVhvt+uO0XZPME/g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=NDwuxaWp; arc=fail smtp.client-ip=40.107.220.48
+	 In-Reply-To:Content-Type; b=uRDqEVFDY2TwquGCNXJ7VQkH6vd+XQWntPsoRJnJdqRXJoRxwj7PGA0jknml7Z1Bu4olYRbqGL6+GZtxp3Xh04LsF4isHH9AIC37XHVsrDChlAXYq0jvJ8ucmcacNTIKKIOaYtF74mX4t8PN92Z6VtYQQJfPR0NVcmU+KE44dmU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=zYpf7eoN; arc=fail smtp.client-ip=40.107.94.86
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=uAHAFvqaUN9e44EMhkDr6QqHTq92bo7I0yFytDd+C1gr3jwplrB0tDt4s8f4NgzorTZpRQRKfE8d9LVjJ4X71BTVny0GyJnobqC+uY6GTF8caNT1cID9UClikPgMZoot/XaMbG5XTZt1uVCdRL6s+Vd5fJQqbTJ5AZqF+z+kE27VbkBPku/gLAqKmQjlmP6oC4Qo3xhQmSwMxNqJh674/QnvAq6swV+Q4b+YMmiGvdGMM7Hc4zEvfaZUAohNzLmF5B1F6+9S6iIEhXwJmccWKCoYufpuMH0oI1Paprvruw68GnSThR9tcI7NQTFMk4BWIcwAN6krVndPwf4tZkX6bA==
+ b=Y0+7ru82KkkKbdfb8vNbehhpnegCKn8l7DANpM7WSS150qcFRD2j9mlxDI5jlZw+D0o/rmLyaRlbZ8pOk7afaNd2VGB8a9rrp7bqvCthJlfn3weqKLWzbImvNSm6mBU1VfzpRy8nsjvRAc48NTxS2pxKq92WGKrgTEhRH5YAFHz5b21FtdRVIqJ7ypex56H79n55W000Qv6kmkJRdZYXoIVLBfmm1sNIIfvRYMSddyCbJV7KuFW2jTiGJ++W/wau7YGBO85lCcts0uB64iO4oa2AWcknC9Ul0UO5yCHzv7D8CwgRVvWKdjoMRYi8nQLdDUNUp+cZMllpdQbHaCi3HQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9oqrF0dTSsULB44KUI7GFe0malehQY0HMNPfTYLPDNI=;
- b=lOSHyKryZkSvz7J2/rxJ7zJiEYAYLSloSZsTPgSTy4VDEXOh208gKO0AgH/yM0GfYok0EexNTf/XZENSR96Ystpdllw2wpYtEA4keLbIr8shtCV+djTQEiKCr1Lcr0toQ4rQnW+cKnUArHAeL2/Jfn2ikuTu6GPMAUrhohir4a95j3o8PF+Hd+WAZzDTibTeX54ggStyQkljySHHDlfqr7geX9Y8w+hRnlMiVXBM6rJYAQbiWWQ5BznhEHPY924T+uRDo62LJ/D2ZVuxMqYxkPMz0jThGJvlKICjUsfn6rrGMxA5vk51KoGLJn9hgV6nMTUxkTlHF8nGmqPocx3z0A==
+ bh=3T5MjzJg1ncnmHupWCyref0AgOeLhoUEoXH/cQ+QymQ=;
+ b=EH1F9juyRgjVmscuQhpfRmjEwvLUic2iWMEXE1Kp9DsiEuPaF7tjc8jgiWXkKndH43CZjZCHNC0C1RiRuR5XCr/EtR7thiBXtaj01Jtrn08cr423IzcmdCxBkjO2R3Ze+gcANFOPygawNZPSljJObjVD6/zwgOWK3lOgdOPmG92OzPVRCu4jl9LNGZXoNezu4Kuc/B8muSA99siSau/lBdkiMWgixGAqtbBmxkBZIETA/6ay+DSDaS91SclwVz/TEO6VgT7HrNmHXb3ELg08AsELMeC+wZ3UkI/A3OhNoD5czKz1fNhrbO40Y6vB0adZ2W+PdHgZNyEPTff2dBQbyg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9oqrF0dTSsULB44KUI7GFe0malehQY0HMNPfTYLPDNI=;
- b=NDwuxaWp7uOx+F1opW4jMvjscRHNLSreY/c2LxUHKyxk3p4Or71qOgpf7VQ5gL1JsQawjnPaak+lhZ53167JBSDLw5JqO9jBeAFX9g+AVvpW10UJrWFrsPtzJbagyGtjzWePhm2wVSFEu8U+pkr5T9Zblh52WI0Yq96LJ13q7fM=
-Received: from BY3PR05CA0049.namprd05.prod.outlook.com (2603:10b6:a03:39b::24)
- by DS7PR12MB5981.namprd12.prod.outlook.com (2603:10b6:8:7c::18) with
+ bh=3T5MjzJg1ncnmHupWCyref0AgOeLhoUEoXH/cQ+QymQ=;
+ b=zYpf7eoNnmfRpLtlzEPMM3Il7r4i0VJuGn5kQlcwdusIk+2YU3zIMKhmCQpeCLU6G1S/HgJwR133kxM0jsuZxcuXc/w14RcX0fqjP4Q6gApnaHl83P1q8wN5IVDcBbp8oy04JscgLR2TbsvrLM99ui64WS5eKP3NeGDCaF05MLc=
+Received: from BN9PR03CA0792.namprd03.prod.outlook.com (2603:10b6:408:13f::17)
+ by CY8PR12MB7124.namprd12.prod.outlook.com (2603:10b6:930:5f::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.23; Fri, 11 Apr
- 2025 07:48:07 +0000
-Received: from SJ5PEPF000001CF.namprd05.prod.outlook.com
- (2603:10b6:a03:39b:cafe::fb) by BY3PR05CA0049.outlook.office365.com
- (2603:10b6:a03:39b::24) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8632.19 via Frontend Transport; Fri,
- 11 Apr 2025 07:48:07 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.31; Fri, 11 Apr
+ 2025 08:08:51 +0000
+Received: from BN3PEPF0000B073.namprd04.prod.outlook.com
+ (2603:10b6:408:13f:cafe::ad) by BN9PR03CA0792.outlook.office365.com
+ (2603:10b6:408:13f::17) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8632.26 via Frontend Transport; Fri,
+ 11 Apr 2025 08:08:50 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,15 +63,15 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ5PEPF000001CF.mail.protection.outlook.com (10.167.242.43) with Microsoft
+ BN3PEPF0000B073.mail.protection.outlook.com (10.167.243.118) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8632.13 via Frontend Transport; Fri, 11 Apr 2025 07:48:07 +0000
+ 15.20.8655.12 via Frontend Transport; Fri, 11 Apr 2025 08:08:50 +0000
 Received: from [10.136.43.133] (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 11 Apr
- 2025 02:48:03 -0500
-Message-ID: <d6ccf531-2ed0-4e38-97a5-2b747497fadb@amd.com>
-Date: Fri, 11 Apr 2025 13:17:53 +0530
+ 2025 03:08:47 -0500
+Message-ID: <ad53c9fe-a874-4554-bce5-a5bcfefe627a@amd.com>
+Date: Fri, 11 Apr 2025 13:38:39 +0530
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -79,216 +79,198 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 09/67] KVM: SVM: Track per-vCPU IRTEs using
- kvm_kernel_irqfd structure
+Subject: Re: [PATCH 02/67] KVM: x86: Reset IRTE to host control if *new* route
+ isn't postable
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
 	<pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>, David Woodhouse
 	<dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>
 CC: <kvm@vger.kernel.org>, <iommu@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, Maxim Levitsky <mlevitsk@redhat.com>, Joao
- Martins <joao.m.martins@oracle.com>, David Matlack <dmatlack@google.com>
+	<linux-kernel@vger.kernel.org>, Maxim Levitsky <mlevitsk@redhat.com>, "Joao
+ Martins" <joao.m.martins@oracle.com>, David Matlack <dmatlack@google.com>,
+	Vasant Hegde <vasant.hegde@amd.com>, Naveen N Rao <naveen.rao@amd.com>
 References: <20250404193923.1413163-1-seanjc@google.com>
- <20250404193923.1413163-10-seanjc@google.com>
+ <20250404193923.1413163-3-seanjc@google.com>
 Content-Language: en-US
-From: "Arun Kodilkar, Sairaj" <sarunkod@amd.com>
-In-Reply-To: <20250404193923.1413163-10-seanjc@google.com>
+From: Sairaj Kodilkar <sarunkod@amd.com>
+In-Reply-To: <20250404193923.1413163-3-seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
 X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001CF:EE_|DS7PR12MB5981:EE_
-X-MS-Office365-Filtering-Correlation-Id: f535272b-858a-4683-327b-08dd78cd32c0
+X-MS-TrafficTypeDiagnostic: BN3PEPF0000B073:EE_|CY8PR12MB7124:EE_
+X-MS-Office365-Filtering-Correlation-Id: 792463d3-ee49-4e5d-12eb-08dd78d01828
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|376014|7416014|1800799024|7053199007;
+	BCL:0;ARA:13230040|376014|7416014|36860700013|1800799024|82310400026|7053199007;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?UTM4RVlLamtoaUZpVFArRWR4WGxCS2lSUlgvZ0tvTERWL0JUa3kzMWlGblpK?=
- =?utf-8?B?VzcxWGRIMWlSNkdZMy9aaHR5UWduSTRSM3pEdm1oMFQweGFsTGlkcUovZzI3?=
- =?utf-8?B?dGVHZGZLM3VIZnZVRUl5NkRiN1pvN3FMV2JlQWJCREluSktSeFRnMk9RNzlV?=
- =?utf-8?B?cVk5SVk1a0xsWERlV0JIOXM5TzFvV1FFSVhhcVByUHpzQk90YmQyeG01ck92?=
- =?utf-8?B?MDVWbkMrcVl4YlErUGFpRm03SDN4V2tJTUdycytzRUZ5SGgxeTA5SmJyVmdw?=
- =?utf-8?B?Mk1ydlBuVk5qdWVMMHNuV29TMFRzT0R2MkFldm9SM2xPOXdDSE5GMVBITTUr?=
- =?utf-8?B?eWx4Ky9DZUZoVHdxc0ZMRDVzMllpWU1mWDEzd2hBRTBNY2UydFMyUEZud1c4?=
- =?utf-8?B?WFNTc20vTFY5MVRDMVFhUzQ4dEtRZC9GNHhiMDgyN3Fjdk5YT1FSK1I5OVRu?=
- =?utf-8?B?RndSZndOaVg1bG4ydUlrMEIyRDBnVzdjb0FwK3lpc3dLZE9Va1hmL0JFV1lx?=
- =?utf-8?B?ZzE4aSszYXc5RXZ1eUVyaDBsd3VnaWErUDhWRkl0bTh3SDRkOFBLUVc0U2ly?=
- =?utf-8?B?cDZybTJZNDEyempVWHNYamc4TkE5UGhNQnhENWtHNDU3Ukp0cGFjRW9YR1R2?=
- =?utf-8?B?MlN3YW5JMC9IQjFQbTV0c1U3aW5EeFBBNXJ6aXFWRGVSeURwUThyUjJDQ0Zn?=
- =?utf-8?B?a1cwdUhVa0FGZncyT09jQVRiRVFwV2lWVXdRb0Q1enBxejhnZ0p1T0ZUTmNB?=
- =?utf-8?B?QlJQanU2aEY3SHZ0Z0JYdjE5UmJzWFg4cGNhTVh1aUxiUVh1WEoydkd5Nk9Y?=
- =?utf-8?B?VE1sczMwQ0hKdURGaG9UUGZlbkRXUkMrcGJCS1hxdGdMTjh3eDRMeElTY3N2?=
- =?utf-8?B?WDJOcHJhUHcwbHlPTE5QZVFrSGhkZitFWUFGYlNQZE9odmMxczBxMVRmOWsv?=
- =?utf-8?B?dC8rc2R4TE1XMCtSYXpnVzlyZVVvSVlMZVZ5R2RJWFM4RGZDR3c5c3pTcVhQ?=
- =?utf-8?B?NThOUU04RTVsRjZkV3hablFNZDRZc1lmT29QTGFiU0REaUtBb1pRS2s5TWkr?=
- =?utf-8?B?YzNrQUVTSGM4L0ppbUdGR05wQjB6bGhQNUdodVArUEJDVm5leFg0akx6M05o?=
- =?utf-8?B?NFRmUk02SmZoZUZybWJBNU1OeXQxU2Vndy9oeUxVV0pxWmlTd1djMFN4czNm?=
- =?utf-8?B?K00wSCtjOW9LNjQrU3B1SDBHL2p6TDRyTEJxcThqYUhScHRZWnBzaHJRYnJw?=
- =?utf-8?B?Q2w0dUwrSWFNS2ZKZ2R5RXBENTlwMU52TC96cU9OT2RjaDl1Tkx6ZWUxeFhB?=
- =?utf-8?B?WnlKQlFnODV6S0NMQ0pjcGpNMDZZaGFCT2hxcWlnYi94REdZWXowUUpjdzlk?=
- =?utf-8?B?c3g4NVRCMDliZU1hbjBhb21ha1pJZklxTFFTdmQ4aGRqMGxUSXZYcUVjTVMr?=
- =?utf-8?B?eTJsWmNnem1pUmZaQ2cvU2Q0MHhDVVBRQmlueVgvdG90cFdOcGlESWZGL1VS?=
- =?utf-8?B?L1Y1dXJMejhOMVpGM0RWNGtuejg1b2o1eUlBVkovVm9nSmJZbWtKdFlGNW9O?=
- =?utf-8?B?UG55dWFIeUJNMGVxUXlHcVZtTVM4aklma1htcTVZaFhMeUN4VHBHODBDNVd4?=
- =?utf-8?B?WDhQc0Jzd2E3aXkxM0UyV1lYU013V3h2RDhicWtZWlRtRFlDaFlJRlp3cmFo?=
- =?utf-8?B?cC80Ui9kdGxQNU9penI0NmwzOTJma0crU2l0TmZzNW5YMmxPS0xVa3UyTHVV?=
- =?utf-8?B?cVIxZFBpSXBmQWpUcFJoUkJtTzZqc1REV0o3cXE1a2s1ZTBuTmk4dnJTUC94?=
- =?utf-8?B?NjVqYm5wYWFDMi9vL0RIVEJCSlZMTnFvSmVUMWdFUkVyS3pPNXdhUGsyUkkw?=
- =?utf-8?B?V3JrQjI5VHdmakFOQ2RFR2FIeFRSeURGbkthT20rNnFOcHFIYzZlVWwybjA5?=
- =?utf-8?B?K29oLzNwblVxaGk5angvQnRmVkhTRVkvdVF3b2QyYWM2OEgrbTBXTzdXSFpP?=
- =?utf-8?B?akJ6TnRSZzB5eXJPVHQ1TWR2ZEk4bkEvMUlVNGJtSDJoSkNNU0xSWk9yTFVQ?=
- =?utf-8?Q?AEXANV?=
+	=?utf-8?B?WjREajFpMmpJdmtzUlpQNEJseCtPcXVFV1k1VHNobWN4RmphampOYWtwYVg1?=
+ =?utf-8?B?SkZHOGpCc3l1VVl2REozTkJwUmZZWjhqdFpqNlVjWHRRME93QU1BWDA0eUhW?=
+ =?utf-8?B?OXpsYU9UWlNLLzJkOEZJQnFMVWxQMFhVS1JKRDE5b3YwR1BHWHJSVGhUUGNu?=
+ =?utf-8?B?UHNzN2ZYakY4VXpzV1lLVitGdVl4ZTFBOEVJUFE1YTJpQUNvSGdOOUgxWWdh?=
+ =?utf-8?B?ZFpjSGpwbC9QcGtVUXVSLzFQVjdUSGo3SjZ2RmVLRG53ZWZSWVRRMVBMTzY2?=
+ =?utf-8?B?SFJrRTZNcXZJZkJqWkhMR1B3a2luYk4yNEpKRXNIUlB6bytCU1BIRkQ5bk4z?=
+ =?utf-8?B?N1U4TmxwTmY2d01RS0dZOHZieUMvV0FhK2dTMW41emhITVplcm9iTlJWck9m?=
+ =?utf-8?B?NHQweWFmYXdGODI4ZWdBK0sxUXFUdEw4ZmZHcng4Slo5Q2N1N2ZtUkM0SUZw?=
+ =?utf-8?B?aThYUlhxNTQyMjJXVG5UV3JIM1hlTTJ2SitLb2I5eDNmU2Jmckx5emU1VDln?=
+ =?utf-8?B?WjB2V0NPT25ucHJObkIwV2lTOE1FWUdlOGlIMk9zanYxR2FqR2tKVjRzQzZj?=
+ =?utf-8?B?QzFBdWRjcFlnZ1dab3dUOWhqUUpwQWVGYUM3dFlNOSticGVjc2w0ci82ZDhP?=
+ =?utf-8?B?d05Ib2NEOCtqY2YwWTBQN2lQbjhMME5VUlBJWlJHd2J0c1hhNk1MNkg3L0Nx?=
+ =?utf-8?B?b0MyMmF1aHFCaisrTnorckVkSzByRnBEazhCSW82TFpuSisvQWJZRXo5Qld0?=
+ =?utf-8?B?Zml6N2xKSHZFLzJicHQwSmZKK0NuYWFPaHFKNnhueFFETWpIWFU1QnVybWxK?=
+ =?utf-8?B?QkRLbWZiekkrOEQ3cVNUSlRET0Q1N01jVncyd2ROOGhTcGFFRlVoR1BncWRa?=
+ =?utf-8?B?SjVZd25IQXRtaW1OeUZOYUcvRGx1K2dya2hTSVdobDFyMzRuMDRwbEUzMVpR?=
+ =?utf-8?B?MzNnMkFJRFpkN0hMR1hLMXFWYmtQaXZIdXByTnhnQ0JSVG1NWDlaVXdyYWhC?=
+ =?utf-8?B?MnUrb1NRWHNOK0xzckkwZUZOTExGakVLWVNtVWJsR3NEd0g3VkIyODFKK2hX?=
+ =?utf-8?B?d0RUMGF1MlV2cmxBV1lIYWJIbTNudFBwaVZ6R2ROTUxnUkNCK0Q2cTBQZkhY?=
+ =?utf-8?B?MzhGaENPVkwwN21qNXNwV1A4b1dtWTVMbUwwb0gvdE16WnVtT1RvTHRQQTA4?=
+ =?utf-8?B?bFpaSWpJdEt4cVZlc0dIM2tZelZZamFNMThQNVZ6UnladDZSWVlYOVFmR29t?=
+ =?utf-8?B?Y25CckJvM2tkcTN0L0QyMURQMnZGaGdFLzVseTFBR3JWK0NCTGZQRWUyelE2?=
+ =?utf-8?B?aHhZTndNS01XdTV5MUNJb1YyakdIL0ZuclFtcVNwMDNQM0ZzYzR4aGRiMW5H?=
+ =?utf-8?B?UFpxWFJuMUZibUI2RVZwU2FNOHcxb2tKNGtoUGpoTHgzYUhWTUtIS01qaVdX?=
+ =?utf-8?B?dFhFWjBmNDA1WFIxblZZbWZVdXd5QnFLd2swRFZWcWV1dWpSYUVTMHEyWGF3?=
+ =?utf-8?B?c0dtUGg5M3dkS1Z6UHp6Q2xRM2ZUbVMzU2R3NjlnV2o5QUNMNWMrY01COEZx?=
+ =?utf-8?B?eTFSam13aTYzbCsrWWp0QlVlU2dpeFBHdmE5bzVvU21VcXNseW03SzVUc1ds?=
+ =?utf-8?B?eXJVU2k3MDR0VExPQ1RJbkNHK2haRFBYM3BIMTFqWVZ2T3FQUWIxUTRqRStC?=
+ =?utf-8?B?SmpheVpmTG9SOUxoSkYvQWRJaXYrNUo3cnRENExHMU8veXJoOXpodnRVRGhx?=
+ =?utf-8?B?UjBHYjl1RjN6TmZSdWRZK1JWeXI2bUdtemxpVGRzUkpXbGdyOWJ5dHdsRHY4?=
+ =?utf-8?B?QUk4dU5kRnBQaURXeWdVL29veThGSUhGYjhMeUN2cVhtKzJDeHNKYnI2VjN5?=
+ =?utf-8?B?anFiOVRKbTZTZkRvTGlqSzZOK2F6ME5GMnBweVBzOTRTdFpxNTExNmdPOHha?=
+ =?utf-8?B?clFybDhBMXQxdTh5cGdFWDQxSXFTc1ZrdSt3ZXAzNEpXN1paU0p4R21WTGwr?=
+ =?utf-8?B?NnlVaU1TTEVwTFpJbjhid1VPUHdNT2RsTzE1UE5XZ055bkw5aFpURTZIZENm?=
+ =?utf-8?Q?ZVUjw2?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(7416014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(36860700013)(1800799024)(82310400026)(7053199007);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Apr 2025 07:48:07.0157
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Apr 2025 08:08:50.9819
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f535272b-858a-4683-327b-08dd78cd32c0
+X-MS-Exchange-CrossTenant-Network-Message-Id: 792463d3-ee49-4e5d-12eb-08dd78d01828
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001CF.namprd05.prod.outlook.com
+	BN3PEPF0000B073.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5981
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7124
 
 On 4/5/2025 1:08 AM, Sean Christopherson wrote:
-> Track the IRTEs that are posting to an SVM vCPU via the associated irqfd
-> structure and GSI routing instead of dynamically allocating a separate
-> data structure.  In addition to eliminating an atomic allocation, this
-> will allow hoisting much of the IRTE update logic to common x86.
+> Restore an IRTE back to host control (remapped or posted MSI mode) if the
+> *new* GSI route prevents posting the IRQ directly to a vCPU, regardless of
+> the GSI routing type.  Updating the IRTE if and only if the new GSI is an
+> MSI results in KVM leaving an IRTE posting to a vCPU.
 > 
+> The dangling IRTE can result in interrupts being incorrectly delivered to
+> the guest, and in the worst case scenario can result in use-after-free,
+> e.g. if the VM is torn down, but the underlying host IRQ isn't freed.
+> 
+> Fixes: efc644048ecd ("KVM: x86: Update IRTE for posted-interrupts")
+> Fixes: 411b44ba80ab ("svm: Implements update_pi_irte hook to setup posted interrupt")
+> Cc: stable@vger.kernel.org
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->   arch/x86/kvm/svm/avic.c   | 49 ++++++++++++++++-----------------------
->   include/linux/kvm_irqfd.h |  3 +++
->   2 files changed, 23 insertions(+), 29 deletions(-)
+>   arch/x86/kvm/svm/avic.c        | 61 ++++++++++++++++++----------------
+>   arch/x86/kvm/vmx/posted_intr.c | 28 ++++++----------
+>   2 files changed, 43 insertions(+), 46 deletions(-)
 > 
 > diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index 04dfd898ea8d..967618ba743a 100644
+> index a961e6e67050..ef08356fdb1c 100644
 > --- a/arch/x86/kvm/svm/avic.c
 > +++ b/arch/x86/kvm/svm/avic.c
-> @@ -774,27 +774,30 @@ static int avic_set_pi_irte_mode(struct kvm_vcpu *vcpu, bool activate)
->   	return ret;
->   }
->   
-> -static void svm_ir_list_del(struct vcpu_svm *svm, struct amd_iommu_pi_data *pi)
-> +static void svm_ir_list_del(struct vcpu_svm *svm,
-> +			    struct kvm_kernel_irqfd *irqfd,
-> +			    struct amd_iommu_pi_data *pi)
+> @@ -896,6 +896,7 @@ int avic_pi_update_irte(struct kvm *kvm, unsigned int host_irq,
 >   {
->   	unsigned long flags;
-> -	struct amd_svm_iommu_ir *cur;
-> +	struct kvm_kernel_irqfd *cur;
+>   	struct kvm_kernel_irq_routing_entry *e;
+>   	struct kvm_irq_routing_table *irq_rt;
+> +	bool enable_remapped_mode = true;
+>   	int idx, ret = 0;
 >   
->   	spin_lock_irqsave(&svm->ir_list_lock, flags);
-> -	list_for_each_entry(cur, &svm->ir_list, node) {
-> -		if (cur->data != pi->ir_data)
-> +	list_for_each_entry(cur, &svm->ir_list, vcpu_list) {
-> +		if (cur->irq_bypass_data != pi->ir_data)
->   			continue;
-> -		list_del(&cur->node);
-> -		kfree(cur);
-> +		if (WARN_ON_ONCE(cur != irqfd))
-> +			continue;
-> +		list_del(&irqfd->vcpu_list);
->   		break;
->   	}
->   	spin_unlock_irqrestore(&svm->ir_list_lock, flags);
->   }
+>   	if (!kvm_arch_has_assigned_device(kvm) || !kvm_arch_has_irq_bypass())
+> @@ -932,6 +933,8 @@ int avic_pi_update_irte(struct kvm *kvm, unsigned int host_irq,
+>   		    kvm_vcpu_apicv_active(&svm->vcpu)) {
+>   			struct amd_iommu_pi_data pi;
 >   
-> -static int svm_ir_list_add(struct vcpu_svm *svm, struct amd_iommu_pi_data *pi)
-> +static int svm_ir_list_add(struct vcpu_svm *svm,
-> +			   struct kvm_kernel_irqfd *irqfd,
-> +			   struct amd_iommu_pi_data *pi)
->   {
-> -	int ret = 0;
->   	unsigned long flags;
-> -	struct amd_svm_iommu_ir *ir;
->   	u64 entry;
->   
->   	if (WARN_ON_ONCE(!pi->ir_data))
-> @@ -811,25 +814,14 @@ static int svm_ir_list_add(struct vcpu_svm *svm, struct amd_iommu_pi_data *pi)
->   		struct kvm_vcpu *prev_vcpu = kvm_get_vcpu_by_id(kvm, vcpu_id);
->   		struct vcpu_svm *prev_svm;
->   
-> -		if (!prev_vcpu) {
-> -			ret = -EINVAL;
-> -			goto out;
-> -		}
-> +		if (!prev_vcpu)
-> +			return -EINVAL;
->   
->   		prev_svm = to_svm(prev_vcpu);
-> -		svm_ir_list_del(prev_svm, pi);
-> +		svm_ir_list_del(prev_svm, irqfd, pi);
->   	}
->   
-> -	/**
-> -	 * Allocating new amd_iommu_pi_data, which will get
-> -	 * add to the per-vcpu ir_list.
-> -	 */
-> -	ir = kzalloc(sizeof(struct amd_svm_iommu_ir), GFP_ATOMIC | __GFP_ACCOUNT);
-> -	if (!ir) {
-> -		ret = -ENOMEM;
-> -		goto out;
-> -	}
-> -	ir->data = pi->ir_data;
-> +	irqfd->irq_bypass_data = pi->ir_data;
->   
->   	spin_lock_irqsave(&svm->ir_list_lock, flags);
->   
-> @@ -844,10 +836,9 @@ static int svm_ir_list_add(struct vcpu_svm *svm, struct amd_iommu_pi_data *pi)
->   		amd_iommu_update_ga(entry & AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK,
->   				    true, pi->ir_data);
->   
-> -	list_add(&ir->node, &svm->ir_list);
-> +	list_add(&irqfd->vcpu_list, &svm->ir_list);
->   	spin_unlock_irqrestore(&svm->ir_list_lock, flags);
-> -out:
-> -	return ret;
-> +	return 0;
->   }
->   
->   /*
-> @@ -951,7 +942,7 @@ int avic_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
->   			 * scheduling information in IOMMU irte.
+> +			enable_remapped_mode = false;
+> +
+>   			/* Try to enable guest_mode in IRTE */
+>   			pi.base = __sme_set(page_to_phys(svm->avic_backing_page) &
+>   					    AVIC_HPA_MASK);
+> @@ -950,33 +953,6 @@ int avic_pi_update_irte(struct kvm *kvm, unsigned int host_irq,
 >   			 */
 >   			if (!ret && pi.is_guest_mode)
-> -				svm_ir_list_add(svm, &pi);
-> +				svm_ir_list_add(svm, irqfd, &pi);
+>   				svm_ir_list_add(svm, &pi);
+> -		} else {
+> -			/* Use legacy mode in IRTE */
+> -			struct amd_iommu_pi_data pi;
+> -
+> -			/**
+> -			 * Here, pi is used to:
+> -			 * - Tell IOMMU to use legacy mode for this interrupt.
+> -			 * - Retrieve ga_tag of prior interrupt remapping data.
+> -			 */
+> -			pi.prev_ga_tag = 0;
+> -			pi.is_guest_mode = false;
+> -			ret = irq_set_vcpu_affinity(host_irq, &pi);
+> -
+> -			/**
+> -			 * Check if the posted interrupt was previously
+> -			 * setup with the guest_mode by checking if the ga_tag
+> -			 * was cached. If so, we need to clean up the per-vcpu
+> -			 * ir_list.
+> -			 */
+> -			if (!ret && pi.prev_ga_tag) {
+> -				int id = AVIC_GATAG_TO_VCPUID(pi.prev_ga_tag);
+> -				struct kvm_vcpu *vcpu;
+> -
+> -				vcpu = kvm_get_vcpu_by_id(kvm, id);
+> -				if (vcpu)
+> -					svm_ir_list_del(to_svm(vcpu), &pi);
+> -			}
 >   		}
 >   
 >   		if (!ret && svm) {
-> @@ -991,7 +982,7 @@ int avic_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
->   
->   			vcpu = kvm_get_vcpu_by_id(kvm, id);
->   			if (vcpu)
-> -				svm_ir_list_del(to_svm(vcpu), &pi);
-> +				svm_ir_list_del(to_svm(vcpu), irqfd, &pi);
+> @@ -991,7 +967,36 @@ int avic_pi_update_irte(struct kvm *kvm, unsigned int host_irq,
 >   		}
->   	} else {
->   		ret = 0;
-> diff --git a/include/linux/kvm_irqfd.h b/include/linux/kvm_irqfd.h
-> index 8ad43692e3bb..6510a48e62aa 100644
-> --- a/include/linux/kvm_irqfd.h
-> +++ b/include/linux/kvm_irqfd.h
-> @@ -59,6 +59,9 @@ struct kvm_kernel_irqfd {
->   	struct work_struct shutdown;
->   	struct irq_bypass_consumer consumer;
->   	struct irq_bypass_producer *producer;
-> +
-> +	struct list_head vcpu_list;
-> +	void *irq_bypass_data;
->   };
+>   	}
 >   
->   #endif /* __LINUX_KVM_IRQFD_H */
+> -	ret = 0;
+> +	if (enable_remapped_mode) {
+> +		/* Use legacy mode in IRTE */
+> +		struct amd_iommu_pi_data pi;
+> +
+> +		/**
+> +		 * Here, pi is used to:
+> +		 * - Tell IOMMU to use legacy mode for this interrupt.
+> +		 * - Retrieve ga_tag of prior interrupt remapping data.
+> +		 */
+> +		pi.prev_ga_tag = 0;
+> +		pi.is_guest_mode = false;
+> +		ret = irq_set_vcpu_affinity(host_irq, &pi);
+> +
+> +		/**
+> +		 * Check if the posted interrupt was previously
+> +		 * setup with the guest_mode by checking if the ga_tag
+> +		 * was cached. If so, we need to clean up the per-vcpu
+> +		 * ir_list.
+> +		 */
+> +		if (!ret && pi.prev_ga_tag) {
+> +			int id = AVIC_GATAG_TO_VCPUID(pi.prev_ga_tag);
+> +			struct kvm_vcpu *vcpu;
+> +
+> +			vcpu = kvm_get_vcpu_by_id(kvm, id);
+> +			if (vcpu)
+> +				svm_ir_list_del(to_svm(vcpu), &pi);
+> +		}
+> +	} else {
+> +		ret = 0;
+> +	}
 
 Hi Sean,
-You missed to update the functions avic_set_pi_irte_mode and
-avic_update_iommu_vcpu_affinity, which iterate over the ir_list.
+I think you can remove this else and "ret = 0". Because Code will come 
+to this point when irq_set_vcpu_affinity() is successful, ensuring that 
+ret is 0.
+
+.../...
 
 Regards
 Sairaj Kodilkar
