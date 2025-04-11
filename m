@@ -1,119 +1,147 @@
-Return-Path: <kvm+bounces-43168-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43169-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FA65A860F2
-	for <lists+kvm@lfdr.de>; Fri, 11 Apr 2025 16:45:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFD19A861A4
+	for <lists+kvm@lfdr.de>; Fri, 11 Apr 2025 17:21:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C5DD4C40FF
-	for <lists+kvm@lfdr.de>; Fri, 11 Apr 2025 14:44:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D64F1BC2750
+	for <lists+kvm@lfdr.de>; Fri, 11 Apr 2025 15:20:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D898B1F8BBD;
-	Fri, 11 Apr 2025 14:44:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6810620F07D;
+	Fri, 11 Apr 2025 15:19:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Kh985gsF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lmRQTAMy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A79631F3FC8;
-	Fri, 11 Apr 2025 14:44:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A6C1F4C96
+	for <kvm@vger.kernel.org>; Fri, 11 Apr 2025 15:19:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744382689; cv=none; b=j0MvYDfP/+hZ8xlB8RNCIpN/JnnLuTVRJx5Atev7doAd0ByvTBWWd/t/XRJzIb336auX9DWEovWE2eSG2CGBpLzOhrNKUFApW1nia/amF0vM7MTfNpMgAJAbs+mBcoDUQ5bZHSkrWdIzrQ2KKqy44T/igekt3iyblzcogB8uhJg=
+	t=1744384792; cv=none; b=r3BTibATGZgqH6UnoCgeCR6+jJ9ehq4DBD34l4kYleRUEZ17Y7V5HpX6vqmmf+OkiKIv0K3EhqN3eXWOpyhTnNwxIlBFOipNqJx6GOLFo4jigFa30+HkYDUVNcdYnalH+GtAvm9FI5PBsD4gbLvqJV3q4/bTrwIAjMTkTWSqyEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744382689; c=relaxed/simple;
-	bh=moJkFvxmDLSlg7bE86nF/UtfRBSbMAU4i1sEVO7w/tU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qlK6iVlVp4ef5+JzZWcDZtrlmQLxbG4EQKq6YPrU2lqwNnEEfRWuQ8npDaUQX6E9Kd8YciHGVOmQMiF/Ao4Fhl36UxMGuJGAIM/fYMbeMZhv6z0FFl4Yd+dUqNDFynVT8divyBp8fVBUUj5ouSm9/TALUWmyvbFRjYyZKTDDYs0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Kh985gsF; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 5825440E0243;
-	Fri, 11 Apr 2025 14:44:45 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id BysSy3cu9pay; Fri, 11 Apr 2025 14:44:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1744382681; bh=mFNh+LpoNmxlu8MowZwGxWARUs4p/TjL0rA9QBfgh70=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Kh985gsFNZX2InNFg03tb5lj7pmSlu4tSbx2awWMZBYoVQ7HEpy3Lxepu6u76jheG
-	 lDriAoiagjDaIHe6uiq0sJSyR1BYOoGB5ApbN+2pev00WzV4PSCdnM6vIt0veE8Zm1
-	 9aPc32NnEKsR0wJnXsYAwgBr2Rxq/KUaXVjzZyFrdaxKwXtg02OLSZfHX+7u92shKz
-	 JMvlwZszSF6l3DI7N+B0aQgP8O/0JSmxPuGZAGGkDfpZV39QedIAxoqUaRxvMYkmhs
-	 DEFjfSDBdkPwEd8iCJb3gB7fhxx5uYZj3SJPFzh4kCZbVTd725z68+vE2hWiIM2fjG
-	 +Jq8bO7FfJcoF30250Kk7T60oEBlslFWjROyzhy6PoHzhCmFP/tO7uOVFuvJzEfVSy
-	 yF21b8Zm0Rq7uUQXWm92AyKuztSvwl3jTLvcfcWvPQarqjVzmdfH5K7U3hcGjaLA/y
-	 RtH7BafFvhCvMfK7Bc8X3S7WTNCn7YDz6RcgKvNAtRg7X+Nl2sPyqWWz9quJjGuz26
-	 tHjtgaZ5uOa03xiNAupUDbXqZruvUkv2OyhlSMggRw53Rd/8IZ/jcfFTDjkp8KgoGM
-	 kY2RAb3OUmoGZd+UQiz15ppw3uuISzPmJNl7L5Ksml4Dzrg25HsyulB+proY57ieCc
-	 tkw3nBMhfStN9fRqf8Wqq3/c=
-Received: from zn.tnic (p579690ee.dip0.t-ipconnect.de [87.150.144.238])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 240B140E0242;
-	Fri, 11 Apr 2025 14:44:29 +0000 (UTC)
-Date: Fri, 11 Apr 2025 16:44:22 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Maksim Davydov <davydov-max@yandex-team.ru>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, x86@kernel.org, babu.moger@amd.com,
-	mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
-	hpa@zytor.com, jmattson@google.com, pbonzini@redhat.com
-Subject: Re: [PATCH v3 1/2] x86: KVM: Advertise FSRS and FSRC on AMD to
- userspace
-Message-ID: <20250411144422.GFZ_kqxnqO65es2xPs@fat_crate.local>
-References: <20241204134345.189041-1-davydov-max@yandex-team.ru>
- <20241204134345.189041-2-davydov-max@yandex-team.ru>
- <20250411094059.GIZ_jjq0DxLhJOEQ9B@fat_crate.local>
- <Z_keAsy09KU0kDFj@google.com>
+	s=arc-20240116; t=1744384792; c=relaxed/simple;
+	bh=+LVrTuu2BoV4qsYUdZJEg1X0y6bt0GaG1o3i23mBjR8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=K60uMxEdx9I09kds01y5xeNuI+c7hUNVSIpdr0iFY29Yjfrp7o9Xak5mbeD8cPNIJNLDv2izpH495ZfMb9W1KlE2TX78S0ZM2CRrK8OWfdKIim4DuE16Vr/3y4uQJKxBBhla1/IrKmIW0PsOGGY/2KdZJkB9UEQbzT+Y9jGNMqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lmRQTAMy; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-af9070a5311so1312856a12.0
+        for <kvm@vger.kernel.org>; Fri, 11 Apr 2025 08:19:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1744384790; x=1744989590; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9xuF6Haal74K5Z0mLjpEBCXt1AT7vXGXP6LiOoiIU8s=;
+        b=lmRQTAMyXD3Efkadqckwg8r4x6pHK0eAHJ0iolwT2ZX/CDzetB81Gh7xNODWhHcgmn
+         fPujr06cnO9nvD/avnZ5nZ/HyHN2rsAL1jxWyKIppH5268+zqaMMA9PbbVwLpF2NH5HG
+         VMLjGX+FoUllgR0LWYen1Op9f8R+G1ieBFG84PL+Z9++zoFtRqczWzYHkscrXqjPkvHW
+         D/RbSSXVkMzPh4M5P22DpXoZC1WEztOuw7/ajAfteTRoSnwDyRy9goPmkaS334Jq7Mp4
+         zYWp8FMkrsZOXwlICt9QtRP7gT2GwxYpehEowrcO1PfEmTXCEvJ5Y70Wk3YBv2cNRgnV
+         JhbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744384790; x=1744989590;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9xuF6Haal74K5Z0mLjpEBCXt1AT7vXGXP6LiOoiIU8s=;
+        b=ZbmkV69Utj4Osev+oYmzMa9qdADRCPMW6kmSRlNz6h7GMmDcj/qERgt4qaTUgUMepN
+         s+i5A0OYV8KqGH8BBe0TElWzkXNGyVDFRAQK8p//oN2fVe39dZephWa0CSAFaoMUaOfn
+         ZVtZO9xhN7hWwKcRKnHpMDHiTs646hzSiHLL6E64iXOFyWIYmYipDOLu/uvtq+UQdaA2
+         PbpMKgdNiVu8KzRNxhYDElpArLafcOn3h9ji/hfK2di1C8Lm6nv80pXtxgnQigaGrqOk
+         D07P+eiLSLstnMysP10knztGLvtFo2xo8aS242dERSgLrFYoapsX0SBTuLNGF5cyMGLT
+         C65g==
+X-Forwarded-Encrypted: i=1; AJvYcCUwWIYAMA3IodMD3y/y99Td/P96uBQ8Xm5hETj3sMYxdsTqYYDlNUTz216PeAV9HPBJxso=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3mWTnNoFtAc5Vn3jaCO+gc06T6BdNLErIzlrdqGzTSrOWnzy2
+	aA0lPJ/1R4FpZQnmVOfJ2NTzx6HqqB6hJ9UEqYYQSwp/TZwGcmkemEncpm4qFCTwKYFw9FLBrqK
+	I2g==
+X-Google-Smtp-Source: AGHT+IEZLyIIJW2mCRYN66gUJVCR+EODdfxL3Vh7qjvrgh+Wr4kM0O7nB4eHO+R/i867XHGoDe/zX7Vl4UM=
+X-Received: from pfbfq2.prod.google.com ([2002:a05:6a00:60c2:b0:739:45ba:a49a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f688:b0:215:b473:1dc9
+ with SMTP id d9443c01a7336-22bea502637mr42960875ad.46.1744384790359; Fri, 11
+ Apr 2025 08:19:50 -0700 (PDT)
+Date: Fri, 11 Apr 2025 08:19:48 -0700
+In-Reply-To: <20250411144422.GFZ_kqxnqO65es2xPs@fat_crate.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Z_keAsy09KU0kDFj@google.com>
+Mime-Version: 1.0
+References: <20241204134345.189041-1-davydov-max@yandex-team.ru>
+ <20241204134345.189041-2-davydov-max@yandex-team.ru> <20250411094059.GIZ_jjq0DxLhJOEQ9B@fat_crate.local>
+ <Z_keAsy09KU0kDFj@google.com> <20250411144422.GFZ_kqxnqO65es2xPs@fat_crate.local>
+Message-ID: <Z_kzFLUwN714lqk1@google.com>
+Subject: Re: [PATCH v3 1/2] x86: KVM: Advertise FSRS and FSRC on AMD to userspace
+From: Sean Christopherson <seanjc@google.com>
+To: Borislav Petkov <bp@alien8.de>
+Cc: Maksim Davydov <davydov-max@yandex-team.ru>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, x86@kernel.org, babu.moger@amd.com, 
+	mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com, 
+	hpa@zytor.com, jmattson@google.com, pbonzini@redhat.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Apr 11, 2025 at 06:49:54AM -0700, Sean Christopherson wrote:
-> KVM should still explicitly advertise support for AMD's flavor.  There are KVM
-> use cases where KVM's advertised CPUID support is used almost verbatim, in which
+On Fri, Apr 11, 2025, Borislav Petkov wrote:
+> On Fri, Apr 11, 2025 at 06:49:54AM -0700, Sean Christopherson wrote:
+> > KVM should still explicitly advertise support for AMD's flavor.  There are KVM
+> > use cases where KVM's advertised CPUID support is used almost verbatim, in which
+> 
+> So that means the vendor differentiation is done by the user
 
-So that means the vendor differentiation is done by the user and KVM shouldn't
-even try to unify things...?
+Yes.
 
-> case not advertising AMD_FSRC would result it the features not be enumerated to
-> the guest.  Linux might cross-pollinate, but KVM can't rely on all software to do
-> so.
+> and KVM shouldn't even try to unify things...?
 
-Sure.
+Yeah, more or less.  KVM doesn't ever unify CPUID features, in the sense of giving
+userspace one way to query support.
 
-The AMD feature flags are called the same:
+For better or worse, KVM does stuff feature bits for various mitigations, e.g. so
+that kernels looking for just one or the other will get the desired behavior.
 
-  CPUID_Fn80000021_EAX [Extended Feature 2 EAX] (Core::X86::Cpuid::FeatureExt2Eax)
-  
-  11 FSRC. Read-only. Reset: Fixed,1. Fast Short Repe Cmpsb supported.
-  10 FSRS. Read-only. Reset: Fixed,1. Fast Short Rep Stosb supported.
+	if (boot_cpu_has(X86_FEATURE_AMD_IBPB_RET) &&
+	    boot_cpu_has(X86_FEATURE_AMD_IBPB) &&
+	    boot_cpu_has(X86_FEATURE_AMD_IBRS))
+		kvm_cpu_cap_set(X86_FEATURE_SPEC_CTRL);
+	if (boot_cpu_has(X86_FEATURE_STIBP))
+		kvm_cpu_cap_set(X86_FEATURE_INTEL_STIBP);
+	if (boot_cpu_has(X86_FEATURE_AMD_SSBD))
+		kvm_cpu_cap_set(X86_FEATURE_SPEC_CTRL_SSBD);
 
-just the CPUID leaf is different.
+	...
 
-But I guess KVM isn't exporting CPUID *names* but CPUID *leafs* so the
-internal naming doesn't matter.
+	if (boot_cpu_has(X86_FEATURE_IBPB)) {
+		kvm_cpu_cap_set(X86_FEATURE_AMD_IBPB);
+		if (boot_cpu_has(X86_FEATURE_SPEC_CTRL) &&
+		    !boot_cpu_has_bug(X86_BUG_EIBRS_PBRSB))
+			kvm_cpu_cap_set(X86_FEATURE_AMD_IBPB_RET);
+	}
+	if (boot_cpu_has(X86_FEATURE_IBRS))
+		kvm_cpu_cap_set(X86_FEATURE_AMD_IBRS);
+	if (boot_cpu_has(X86_FEATURE_STIBP))
+		kvm_cpu_cap_set(X86_FEATURE_AMD_STIBP);
+	if (boot_cpu_has(X86_FEATURE_SPEC_CTRL_SSBD))
+		kvm_cpu_cap_set(X86_FEATURE_AMD_SSBD);
+	if (!boot_cpu_has_bug(X86_BUG_SPEC_STORE_BYPASS))
+		kvm_cpu_cap_set(X86_FEATURE_AMD_SSB_NO);
+	/*
+	 * The preference is to use SPEC CTRL MSR instead of the
+	 * VIRT_SPEC MSR.
+	 */
+	if (boot_cpu_has(X86_FEATURE_LS_CFG_SSBD) &&
+	    !boot_cpu_has(X86_FEATURE_AMD_SSBD))
+		kvm_cpu_cap_set(X86_FEATURE_VIRT_SSBD);
 
-Thx.
+But we've generally agreed that KVM shouldn't do that going forward, because many
+of the mitigations don't have strict 1:1 mappings between Intel and AMD, i.e.
+deciding which bits to stuff gets dangerously close to defining policy, which KVM
+definitely wants to stay away from.
 
--- 
-Regards/Gruss,
-    Boris.
+> But I guess KVM isn't exporting CPUID *names* but CPUID *leafs* so the
+> internal naming doesn't matter.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+Yep, exactly.
 
