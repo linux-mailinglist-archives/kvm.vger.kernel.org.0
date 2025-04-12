@@ -1,145 +1,294 @@
-Return-Path: <kvm+bounces-43190-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43191-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B001A86C97
-	for <lists+kvm@lfdr.de>; Sat, 12 Apr 2025 12:45:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB89AA86CEC
+	for <lists+kvm@lfdr.de>; Sat, 12 Apr 2025 14:37:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D9331B66C3D
-	for <lists+kvm@lfdr.de>; Sat, 12 Apr 2025 10:45:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C11998A8537
+	for <lists+kvm@lfdr.de>; Sat, 12 Apr 2025 12:36:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 536151D7995;
-	Sat, 12 Apr 2025 10:45:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56FE01DE4EC;
+	Sat, 12 Apr 2025 12:37:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="McFtSU2O";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="PLMIUvIr"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="Twp87jkd"
 X-Original-To: kvm@vger.kernel.org
-Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61A3018A6AB;
-	Sat, 12 Apr 2025 10:45:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FA7213AD1C
+	for <kvm@vger.kernel.org>; Sat, 12 Apr 2025 12:36:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744454709; cv=none; b=RZ7737N12qElNe0e7u2A2BQUqAcJBg8rl+S6paenwi/Y0E2vHI33DkSHcz89+JdP4um8hzyo56zelIiZGsqDmWLmt+FzQabrLR5W8M03i1ClwwcxI60Vd5Hc/BFrcfzLHFJ6+aGMdBF01t3bRwrT+xYXLCinPxtr8MwVb4mYLKM=
+	t=1744461421; cv=none; b=icIou/Fn1lxgGCb7L/OU++XyFhu1Fijv4do3sTakSbohX0+oifktkQY1Iot6m0xv29j/qc19ygxUJ3LuhiipjmwXR0s0aMS5j2CD9b0PxNknriRSzsVypHXPkpsCPwNNt1fM0XahR1SBsGCHzMybeujLXOG4iYlEPpVRIIzh3Uo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744454709; c=relaxed/simple;
-	bh=FrZpGgFmCBdS3NdARYiimpGnDi2QEYs8YJOvqKwY1tU=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=Dh9Vgouvh4K146cSQRgcu7XTDyI8arjVpr6R5diZ5TjSlElw/FNbM0VrJJzASk6BLaCqpqRpRlQmueUbPicXgatH6iKYjvzQLkHMf/Zb4fQlQ8AIr0rsjT5oc/gC1aBNZzS8Hq0vDD3t1yFZjCiNLKgwg0+1eCZ60BhtzvbLKmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=McFtSU2O; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=PLMIUvIr; arc=none smtp.client-ip=202.12.124.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 15C3525401C4;
-	Sat, 12 Apr 2025 06:45:06 -0400 (EDT)
-Received: from phl-imap-11 ([10.202.2.101])
-  by phl-compute-05.internal (MEProxy); Sat, 12 Apr 2025 06:45:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1744454705;
-	 x=1744541105; bh=kmyaGiukhBQ84frNIkSXQYkdJMrCRvN9saF+IdoGolw=; b=
-	McFtSU2O/RqT/UjvqSkjQJDtCPRSD1SZoySx2Z/1dkwKTHSa/8qDdiyLRYwKVe8X
-	LltppI835pFAs3Ep2YU4TgrpVfYcaKVG2DllSQFSa5jnuhDFeYCATwgXQurjKjPO
-	XlH09a7JGANj0FRamRxpj28hJJo4EGNHNCW2pwKIguZQS+5SpgG0/b+aTb/7AJJ9
-	ZiCzKOogOw5/C/rt9xFh0/ZEMAMziyYwa5yopDEWfzfSxfYSyPu9Aj+pht7QLPUM
-	v3k8/LXov2dFpQcYWhPn481E155Jw2MUwUHAA+1VZMKVKmf3dOsw3tbpI0gmZXyp
-	y/fDQsa0lRrpl9XLoru2Ew==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1744454705; x=
-	1744541105; bh=kmyaGiukhBQ84frNIkSXQYkdJMrCRvN9saF+IdoGolw=; b=P
-	LMIUvIrQ7acjRyUNm4LblRDYmNP5hN6KoibRG/HW1c6J+OYeWBv6cmzO7nqzmLix
-	nrXaFWnifZym/vBtgNSJGa4x5YwEOENKtOvCPBX6T8lqQJvh3YDopFKNnuXg2rcG
-	We8s3/sFeArS1/2/NyRypI/4yW1XGExViDUQDXiDiL842amMw0cQ0jEqeZleLstg
-	/kZOkr5pUm6Q5ywQks1ShwNLM6KeeiwapyhXQ6DxqdgWNEDtbU0mzdTEEM4StIWq
-	KpGp9tiUhiY6gLAMGMl2ThAZNVXWgGo+4E1Nl1OjkHHfN9sTkezlNJIT+WyayY0Z
-	f6dFUiLB+nrxQgLagBiYQ==
-X-ME-Sender: <xms:MET6Z_diDxBf45Q4FT9Yc-FfdoDWLNKg87fTBYq_dVknQ10oYgSaeg>
-    <xme:MET6Z1MpIV8PW5hw8sZilbHr9PPOZ6Or80WBYu4mU9vRYj6X3dYM9VIOSgi12YcDT
-    4gUT3b5osphWq_zaXQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvudegheefucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtjeertder
-    tddtnecuhfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnug
-    gsrdguvgeqnecuggftrfgrthhtvghrnhephfdthfdvtdefhedukeetgefggffhjeeggeet
-    fefggfevudegudevledvkefhvdeinecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
-    hmpehmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohep
-    udejpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegsphesrghlihgvnhekrdguvg
-    dprhgtphhtthhopegtihhmihhnrghghhhisehgnhhuuggurdgtohhmpdhrtghpthhtohep
-    shgvrghnjhgtsehgohhoghhlvgdrtghomhdprhgtphhtthhopeifihhllhihsehinhhfrh
-    gruggvrggurdhorhhgpdhrtghpthhtohepuggrvhgvrdhhrghnshgvnhesihhnthgvlhdr
-    tghomhdprhgtphhtthhopegrnhguhieskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprg
-    hrnhgusehkvghrnhgvlhdrohhrghdprhgtphhtthhopehrphhptheskhgvrhhnvghlrdho
-    rhhgpdhrtghpthhtohepgiekieeskhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:MET6Z4iCI1Z1UjtxHKIclRx7AcbRXECDfBWxH5tTFHqr27KgKHikWg>
-    <xmx:MET6Zw8wqB7vGkncjjXjDNU3ee2ushCEl3nMTnD9r4gtNE3D2zM_xA>
-    <xmx:MET6Z7u04bQLDsNMyvj8owoi66BMJSGFy_sG8x4iZO28WLzUG3jCoQ>
-    <xmx:MET6Z_GRxBPFmPnQey9UJy2lxW5nNOxPpOX_m_7pB5-HF7jAB6VQ5Q>
-    <xmx:MUT6Z486sWR7ZefEk3LvUKJJ273YHrbFdOVmFnXmykwn8hRFL41LNb-f>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 7DFE32220073; Sat, 12 Apr 2025 06:45:04 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1744461421; c=relaxed/simple;
+	bh=0LAueQaBDKSWIRcDEzuEMT6tJ7UKMu6JeVDIHdjFXzg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JSUUZX5NmwB5UgFmpCLq2m3bk+PYkSQEclPXZBxkxcTr3o5ex6opsRvKK9XECC1/aqjZaAjav2IileglK/YHMS3Nexr+PzJYbyr5SGfT9W50GUpVsza/Yzabk/JKfeuGKBGFrfds1MYOKZQ3rYAbtsA950AKM3tcaqU/aCwKLQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=Twp87jkd; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43d04ea9d9aso13859165e9.3
+        for <kvm@vger.kernel.org>; Sat, 12 Apr 2025 05:36:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1744461418; x=1745066218; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/1tdUSTul8z3uG62hCB/hUKnbhFABs23IMaLfOAkzGc=;
+        b=Twp87jkdjttDvwr8FphT0UChAXm43kUC18MSEGGqegBfPEjx5zN7ZGjhSCjh9RDE41
+         Xhh7jH39vr95U9nrkKDchRtFwTWYxve+uJfe1WNbZ3tJOaVHAx3fgJHgLrfnUUHSZV7z
+         yoqnYJgtxEXOziO+IPh+e6mTIuzbUOLmiJ0MbA9ze7IKz8obb7aVN7qI4LygXBi5EVbY
+         uZ892e6/Xo6+R5IRAH6OSZ/QjJz7kJxdhsY/NUQibZ6IAF3mrZEpCr61JgHlqnxauWEB
+         Ug1prkFRAoa4eKOcuGPAo+NlYWDCw0EeNP+BXcrUB4XWD6p9Q1/vl4Y8diuj1K0tMqc5
+         YwyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744461418; x=1745066218;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/1tdUSTul8z3uG62hCB/hUKnbhFABs23IMaLfOAkzGc=;
+        b=liNosCVVLBHj5BmakE8rv6v7Iz1A6md5Js9xDCNjJNR3Wx1pckw3bQw61j4T1y/Uk9
+         TQUTNS3+MipvZ5aPtznKYpPhhuTJxCQP4OGLcf3rn1MHdrFoT32i3zOFFDrhytZEfvGX
+         mW/4NChsTSwWplT8WWNKotUY1J8A/I9A1G+y0rR4QyzWYWs1yAcwtH9n84tGR2dmbB3V
+         6sJmyAJljTnW8NgGvsBukLnos7XCAbBvBs4sLXYSFO04tCY70tKG084sL+yZ6kziasmA
+         3pw9sBtk7E0kjutlYLZuWUgu6h3de9fh+lm+45z9j0aIk/oXacFLLLp9HCKiaa6l9YA5
+         CR4w==
+X-Forwarded-Encrypted: i=1; AJvYcCWNr8BYrw07PjXHu4QECByCkhYh41Nd2P+YO2fnO05WW32/0izBoCvzW2EVC6jSY7D5wE0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YysiUdaoDiIYryP+4rHFNxpGZSF14dsW4/sv7jE/EF8YhqvNdXH
+	syDp30b5FPH/fmxFV7wc8ynC422SxmVv0i75PaGjGE5THUur6CbgE9XK2CBGang=
+X-Gm-Gg: ASbGncuy7UktI+WTqtgaK0xHBDA2L6tikeLil7uTtiyLtRYcYcZb87kcsUyXeG0jEyJ
+	EngAcH+bRARXHBHuVzQAkh75JDKR2UznaBXxTjN8Qov84gE6FAQCFNr1LpRLY1zDvQAe5R3S6oQ
+	wxoWFwKELppk8FJfqeGIhReR+iqy9yBCMqMxn0p8BG57/iUqzA3tZm9QTwtvXNhC2sYseyFu4Rp
+	de19vu2aUr5Cq6BzgoywxXQq4YUJHAnWPV4S59VBdXCUk0PMcJMpGwZYBrXvAUthgBDGREG44dQ
+	qyxeDs3G4Ic3mJi4HJHZjx9PPtl3GLCqwyJZ5d5qNRjAQa7gFmzh9KZeTqyapMRHJ2pYpg==
+X-Google-Smtp-Source: AGHT+IFWJhMIxLAuhZFAH4iIc1JQxXlXQ42GIrirxlIB2AWxuYEwvVobTKAyVC9cwelW41i1/PuHVA==
+X-Received: by 2002:a05:600c:4f90:b0:43c:f689:dd with SMTP id 5b1f17b1804b1-43f3a95aeb3mr16009775e9.19.1744461417526;
+        Sat, 12 Apr 2025 05:36:57 -0700 (PDT)
+Received: from localhost (cst2-173-28.cust.vodafone.cz. [31.30.173.28])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43f2338d6ebsm119063895e9.2.2025.04.12.05.36.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 12 Apr 2025 05:36:57 -0700 (PDT)
+Date: Sat, 12 Apr 2025 14:36:56 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Anup Patel <apatel@ventanamicro.com>
+Cc: Will Deacon <will@kernel.org>, julien.thierry.kdev@gmail.com, 
+	maz@kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Atish Patra <atishp@atishpatra.org>, Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org
+Subject: Re: [kvmtool PATCH 08/10] riscv: Include single-letter extensions in
+ isa_info_arr[]
+Message-ID: <20250412-bafd9ea6c4e3314f8da06a26@orel>
+References: <20250326065644.73765-1-apatel@ventanamicro.com>
+ <20250326065644.73765-9-apatel@ventanamicro.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: Teb9e062682a72887
-Date: Sat, 12 Apr 2025 12:44:44 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Mike Rapoport" <rppt@kernel.org>, "Dave Hansen" <dave.hansen@intel.com>
-Cc: "Arnd Bergmann" <arnd@kernel.org>, linux-kernel@vger.kernel.org,
- x86@kernel.org, "Thomas Gleixner" <tglx@linutronix.de>,
- "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
- "Dave Hansen" <dave.hansen@linux.intel.com>,
- "H. Peter Anvin" <hpa@zytor.com>,
- "Linus Torvalds" <torvalds@linux-foundation.org>,
- "Andy Shevchenko" <andy@kernel.org>, "Matthew Wilcox" <willy@infradead.org>,
- "Sean Christopherson" <seanjc@google.com>,
- "Davide Ciminaghi" <ciminaghi@gnudd.com>,
- "Paolo Bonzini" <pbonzini@redhat.com>, kvm@vger.kernel.org
-Message-Id: <4a75978a-2368-4aab-bed6-ce44b6d3c323@app.fastmail.com>
-In-Reply-To: <Z_o7B_vDPRL03iSN@kernel.org>
-References: <20241204103042.1904639-1-arnd@kernel.org>
- <20241204103042.1904639-6-arnd@kernel.org>
- <08b63835-121d-4adc-8f03-e68f0b0cabdf@intel.com>
- <Z_o7B_vDPRL03iSN@kernel.org>
-Subject: Re: [PATCH 05/11] x86: remove HIGHMEM64G support
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250326065644.73765-9-apatel@ventanamicro.com>
 
-On Sat, Apr 12, 2025, at 12:05, Mike Rapoport wrote:
-> On Fri, Apr 11, 2025 at 04:44:13PM -0700, Dave Hansen wrote:
->> Has anyone run into any problems on 6.15-rc1 with this stuff?
->> 
->> 0xf75fe000 is the mem_map[] entry for the first page >4GB. It obviously
->> wasn't allocated, thus the oops. Looks like the memblock for the >4GB
->> memory didn't get removed although the pgdats seem correct.
+On Wed, Mar 26, 2025 at 12:26:42PM +0530, Anup Patel wrote:
+> Currently, the isa_info_arr[] only include multi-letter extensions but
+> the KVM ONE_REG interface covers both single-letter and multi-letter
+> extensions so extend isa_info_arr[] to include single-letter extensions.
+> 
+> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> ---
+>  riscv/fdt.c | 138 +++++++++++++++++++++++++++++-----------------------
+>  1 file changed, 76 insertions(+), 62 deletions(-)
+> 
+> diff --git a/riscv/fdt.c b/riscv/fdt.c
+> index 251821e..46efb47 100644
+> --- a/riscv/fdt.c
+> +++ b/riscv/fdt.c
+> @@ -12,71 +12,81 @@
+>  struct isa_ext_info {
+>  	const char *name;
+>  	unsigned long ext_id;
+> +	bool multi_letter;
+>  };
+>  
+>  struct isa_ext_info isa_info_arr[] = {
+> -	/* sorted alphabetically */
+> -	{"smnpm", KVM_RISCV_ISA_EXT_SMNPM},
+> -	{"smstateen", KVM_RISCV_ISA_EXT_SMSTATEEN},
+> -	{"ssaia", KVM_RISCV_ISA_EXT_SSAIA},
+> -	{"sscofpmf", KVM_RISCV_ISA_EXT_SSCOFPMF},
+> -	{"ssnpm", KVM_RISCV_ISA_EXT_SSNPM},
+> -	{"sstc", KVM_RISCV_ISA_EXT_SSTC},
+> -	{"svade", KVM_RISCV_ISA_EXT_SVADE},
+> -	{"svadu", KVM_RISCV_ISA_EXT_SVADU},
+> -	{"svinval", KVM_RISCV_ISA_EXT_SVINVAL},
+> -	{"svnapot", KVM_RISCV_ISA_EXT_SVNAPOT},
+> -	{"svpbmt", KVM_RISCV_ISA_EXT_SVPBMT},
+> -	{"svvptc", KVM_RISCV_ISA_EXT_SVVPTC},
+> -	{"zabha", KVM_RISCV_ISA_EXT_ZABHA},
+> -	{"zacas", KVM_RISCV_ISA_EXT_ZACAS},
+> -	{"zawrs", KVM_RISCV_ISA_EXT_ZAWRS},
+> -	{"zba", KVM_RISCV_ISA_EXT_ZBA},
+> -	{"zbb", KVM_RISCV_ISA_EXT_ZBB},
+> -	{"zbc", KVM_RISCV_ISA_EXT_ZBC},
+> -	{"zbkb", KVM_RISCV_ISA_EXT_ZBKB},
+> -	{"zbkc", KVM_RISCV_ISA_EXT_ZBKC},
+> -	{"zbkx", KVM_RISCV_ISA_EXT_ZBKX},
+> -	{"zbs", KVM_RISCV_ISA_EXT_ZBS},
+> -	{"zca", KVM_RISCV_ISA_EXT_ZCA},
+> -	{"zcb", KVM_RISCV_ISA_EXT_ZCB},
+> -	{"zcd", KVM_RISCV_ISA_EXT_ZCD},
+> -	{"zcf", KVM_RISCV_ISA_EXT_ZCF},
+> -	{"zcmop", KVM_RISCV_ISA_EXT_ZCMOP},
+> -	{"zfa", KVM_RISCV_ISA_EXT_ZFA},
+> -	{"zfh", KVM_RISCV_ISA_EXT_ZFH},
+> -	{"zfhmin", KVM_RISCV_ISA_EXT_ZFHMIN},
+> -	{"zicbom", KVM_RISCV_ISA_EXT_ZICBOM},
+> -	{"zicboz", KVM_RISCV_ISA_EXT_ZICBOZ},
+> -	{"ziccrse", KVM_RISCV_ISA_EXT_ZICCRSE},
+> -	{"zicntr", KVM_RISCV_ISA_EXT_ZICNTR},
+> -	{"zicond", KVM_RISCV_ISA_EXT_ZICOND},
+> -	{"zicsr", KVM_RISCV_ISA_EXT_ZICSR},
+> -	{"zifencei", KVM_RISCV_ISA_EXT_ZIFENCEI},
+> -	{"zihintntl", KVM_RISCV_ISA_EXT_ZIHINTNTL},
+> -	{"zihintpause", KVM_RISCV_ISA_EXT_ZIHINTPAUSE},
+> -	{"zihpm", KVM_RISCV_ISA_EXT_ZIHPM},
+> -	{"zimop", KVM_RISCV_ISA_EXT_ZIMOP},
+> -	{"zknd", KVM_RISCV_ISA_EXT_ZKND},
+> -	{"zkne", KVM_RISCV_ISA_EXT_ZKNE},
+> -	{"zknh", KVM_RISCV_ISA_EXT_ZKNH},
+> -	{"zkr", KVM_RISCV_ISA_EXT_ZKR},
+> -	{"zksed", KVM_RISCV_ISA_EXT_ZKSED},
+> -	{"zksh", KVM_RISCV_ISA_EXT_ZKSH},
+> -	{"zkt", KVM_RISCV_ISA_EXT_ZKT},
+> -	{"ztso", KVM_RISCV_ISA_EXT_ZTSO},
+> -	{"zvbb", KVM_RISCV_ISA_EXT_ZVBB},
+> -	{"zvbc", KVM_RISCV_ISA_EXT_ZVBC},
+> -	{"zvfh", KVM_RISCV_ISA_EXT_ZVFH},
+> -	{"zvfhmin", KVM_RISCV_ISA_EXT_ZVFHMIN},
+> -	{"zvkb", KVM_RISCV_ISA_EXT_ZVKB},
+> -	{"zvkg", KVM_RISCV_ISA_EXT_ZVKG},
+> -	{"zvkned", KVM_RISCV_ISA_EXT_ZVKNED},
+> -	{"zvknha", KVM_RISCV_ISA_EXT_ZVKNHA},
+> -	{"zvknhb", KVM_RISCV_ISA_EXT_ZVKNHB},
+> -	{"zvksed", KVM_RISCV_ISA_EXT_ZVKSED},
+> -	{"zvksh", KVM_RISCV_ISA_EXT_ZVKSH},
+> -	{"zvkt", KVM_RISCV_ISA_EXT_ZVKT},
+> +	/* single-letter */
+> +	{"a", KVM_RISCV_ISA_EXT_A, false},
+> +	{"c", KVM_RISCV_ISA_EXT_C, false},
+> +	{"d", KVM_RISCV_ISA_EXT_D, false},
+> +	{"f", KVM_RISCV_ISA_EXT_F, false},
+> +	{"h", KVM_RISCV_ISA_EXT_H, false},
+> +	{"i", KVM_RISCV_ISA_EXT_I, false},
+> +	{"m", KVM_RISCV_ISA_EXT_M, false},
+> +	{"v", KVM_RISCV_ISA_EXT_V, false},
+> +	/* multi-letter sorted alphabetically */
+> +	{"smnpm", KVM_RISCV_ISA_EXT_SMNPM, true},
+> +	{"smstateen", KVM_RISCV_ISA_EXT_SMSTATEEN, true},
+> +	{"ssaia", KVM_RISCV_ISA_EXT_SSAIA, true},
+> +	{"sscofpmf", KVM_RISCV_ISA_EXT_SSCOFPMF, true},
+> +	{"ssnpm", KVM_RISCV_ISA_EXT_SSNPM, true},
+> +	{"sstc", KVM_RISCV_ISA_EXT_SSTC, true},
+> +	{"svade", KVM_RISCV_ISA_EXT_SVADE, true},
+> +	{"svadu", KVM_RISCV_ISA_EXT_SVADU, true},
+> +	{"svinval", KVM_RISCV_ISA_EXT_SVINVAL, true},
+> +	{"svnapot", KVM_RISCV_ISA_EXT_SVNAPOT, true},
+> +	{"svpbmt", KVM_RISCV_ISA_EXT_SVPBMT, true},
+> +	{"svvptc", KVM_RISCV_ISA_EXT_SVVPTC, true},
+> +	{"zabha", KVM_RISCV_ISA_EXT_ZABHA, true},
+> +	{"zacas", KVM_RISCV_ISA_EXT_ZACAS, true},
+> +	{"zawrs", KVM_RISCV_ISA_EXT_ZAWRS, true},
+> +	{"zba", KVM_RISCV_ISA_EXT_ZBA, true},
+> +	{"zbb", KVM_RISCV_ISA_EXT_ZBB, true},
+> +	{"zbc", KVM_RISCV_ISA_EXT_ZBC, true},
+> +	{"zbkb", KVM_RISCV_ISA_EXT_ZBKB, true},
+> +	{"zbkc", KVM_RISCV_ISA_EXT_ZBKC, true},
+> +	{"zbkx", KVM_RISCV_ISA_EXT_ZBKX, true},
+> +	{"zbs", KVM_RISCV_ISA_EXT_ZBS, true},
+> +	{"zca", KVM_RISCV_ISA_EXT_ZCA, true},
+> +	{"zcb", KVM_RISCV_ISA_EXT_ZCB, true},
+> +	{"zcd", KVM_RISCV_ISA_EXT_ZCD, true},
+> +	{"zcf", KVM_RISCV_ISA_EXT_ZCF, true},
+> +	{"zcmop", KVM_RISCV_ISA_EXT_ZCMOP, true},
+> +	{"zfa", KVM_RISCV_ISA_EXT_ZFA, true},
+> +	{"zfh", KVM_RISCV_ISA_EXT_ZFH, true},
+> +	{"zfhmin", KVM_RISCV_ISA_EXT_ZFHMIN, true},
+> +	{"zicbom", KVM_RISCV_ISA_EXT_ZICBOM, true},
+> +	{"zicboz", KVM_RISCV_ISA_EXT_ZICBOZ, true},
+> +	{"ziccrse", KVM_RISCV_ISA_EXT_ZICCRSE, true},
+> +	{"zicntr", KVM_RISCV_ISA_EXT_ZICNTR, true},
+> +	{"zicond", KVM_RISCV_ISA_EXT_ZICOND, true},
+> +	{"zicsr", KVM_RISCV_ISA_EXT_ZICSR, true},
+> +	{"zifencei", KVM_RISCV_ISA_EXT_ZIFENCEI, true},
+> +	{"zihintntl", KVM_RISCV_ISA_EXT_ZIHINTNTL, true},
+> +	{"zihintpause", KVM_RISCV_ISA_EXT_ZIHINTPAUSE, true},
+> +	{"zihpm", KVM_RISCV_ISA_EXT_ZIHPM, true},
+> +	{"zimop", KVM_RISCV_ISA_EXT_ZIMOP, true},
+> +	{"zknd", KVM_RISCV_ISA_EXT_ZKND, true},
+> +	{"zkne", KVM_RISCV_ISA_EXT_ZKNE, true},
+> +	{"zknh", KVM_RISCV_ISA_EXT_ZKNH, true},
+> +	{"zkr", KVM_RISCV_ISA_EXT_ZKR, true},
+> +	{"zksed", KVM_RISCV_ISA_EXT_ZKSED, true},
+> +	{"zksh", KVM_RISCV_ISA_EXT_ZKSH, true},
+> +	{"zkt", KVM_RISCV_ISA_EXT_ZKT, true},
+> +	{"ztso", KVM_RISCV_ISA_EXT_ZTSO, true},
+> +	{"zvbb", KVM_RISCV_ISA_EXT_ZVBB, true},
+> +	{"zvbc", KVM_RISCV_ISA_EXT_ZVBC, true},
+> +	{"zvfh", KVM_RISCV_ISA_EXT_ZVFH, true},
+> +	{"zvfhmin", KVM_RISCV_ISA_EXT_ZVFHMIN, true},
+> +	{"zvkb", KVM_RISCV_ISA_EXT_ZVKB, true},
+> +	{"zvkg", KVM_RISCV_ISA_EXT_ZVKG, true},
+> +	{"zvkned", KVM_RISCV_ISA_EXT_ZVKNED, true},
+> +	{"zvknha", KVM_RISCV_ISA_EXT_ZVKNHA, true},
+> +	{"zvknhb", KVM_RISCV_ISA_EXT_ZVKNHB, true},
+> +	{"zvksed", KVM_RISCV_ISA_EXT_ZVKSED, true},
+> +	{"zvksh", KVM_RISCV_ISA_EXT_ZVKSH, true},
+> +	{"zvkt", KVM_RISCV_ISA_EXT_ZVKT, true},
+
+nit: I think I would add a 'misa' boolean member instead of 'multi_letter'
+and then rework this table to look like this
+
+	{"a",		KVM_RISCV_ISA_EXT_A, .misa = true	},
+	{"c",		KVM_RISCV_ISA_EXT_C, .misa = true	},
+	{"d",		KVM_RISCV_ISA_EXT_D, .misa = true	},
+	{"f",		KVM_RISCV_ISA_EXT_F, .misa = true	},
+	{"h",		KVM_RISCV_ISA_EXT_H, .misa = true	},
+	{"i",		KVM_RISCV_ISA_EXT_I, .misa = true	},
+	{"m",		KVM_RISCV_ISA_EXT_M, .misa = true	},
+	{"v",		KVM_RISCV_ISA_EXT_V, .misa = true	},
+
+	/* multi-letter sorted alphabetically */
+	{"smnpm",	KVM_RISCV_ISA_EXT_SMNPM,		},
+	{"smstateen",	KVM_RISCV_ISA_EXT_SMSTATEEN,		},
+	...
+
+The benefit is that only the misa extensions need another field.
+
+>  };
+>  
+>  static void dump_fdt(const char *dtb_file, void *fdt)
+> @@ -129,6 +139,10 @@ static void generate_cpu_nodes(void *fdt, struct kvm *kvm)
+>  		}
+>  
+>  		for (i = 0; i < arr_sz; i++) {
+> +			/* Skip single-letter extensions since these are taken care */
+
+We should finish the comment with 'of by "whatever takes care of them"'
+
+> +			if (!isa_info_arr[i].multi_letter)
+> +				continue;
+> +
+>  			reg.id = RISCV_ISA_EXT_REG(isa_info_arr[i].ext_id);
+>  			reg.addr = (unsigned long)&isa_ext_out;
+>  			if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
+> -- 
+> 2.43.0
 >
-> That's apparently because of 6faea3422e3b ("arch, mm: streamline HIGHMEM
-> freeing"). 
-> Freeing of high memory was clamped to the end of ZONE_HIGHMEM which is 4G
-> and after 6faea3422e3b there's no more clamping, so memblock_free_all()
-> tries to free memory >4G as well.
 
-Ah, I should have waited with my bisection, you found it first...
-
->> I'll dig into it some more. Just wanted to make sure there wasn't a fix
->> out there already.
->
-> This should fix it.
-
-Confirmed on 6.15-rc1.
-
-     Arnd
+Thanks,
+drew
 
