@@ -1,115 +1,96 @@
-Return-Path: <kvm+bounces-43197-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43198-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49BE7A86F33
-	for <lists+kvm@lfdr.de>; Sat, 12 Apr 2025 21:48:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52540A87036
+	for <lists+kvm@lfdr.de>; Sun, 13 Apr 2025 01:11:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DA20189EE60
-	for <lists+kvm@lfdr.de>; Sat, 12 Apr 2025 19:48:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 228BD8A121D
+	for <lists+kvm@lfdr.de>; Sat, 12 Apr 2025 23:11:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EAF0221725;
-	Sat, 12 Apr 2025 19:48:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21E82230BF9;
+	Sat, 12 Apr 2025 23:11:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c1GpG0Zg"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="lMBig7n3"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34BC926AE4;
-	Sat, 12 Apr 2025 19:48:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B68B38385;
+	Sat, 12 Apr 2025 23:11:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744487293; cv=none; b=TPKz7KiIqNj9xPjuf0YiFL74MBe9vskl4rf3lTmVic41K9MEHU7mtTjFKhiXf6q9nxoqxRj7cZ9xSPMEGKJ9qqQa7MMPRTWKgZq7izfBEt4UNomSyWGOXOBQOAtOV+ycdxA3QCoKaLczwkfLqqlDmCdc/NUSBtx4cXwaaqUJl/U=
+	t=1744499495; cv=none; b=TXPgZ9muWRN+Mm+EKUEy1M+jnFzLdHI3EB1Px7usmziRebLEL1dDI6T+THRhPMgiOiF/BIooaWVVxVMtV8pZZAJieC6FWYe0SzfvnZZPV9qccjCXidEePrYMTc3bdTtmoDloaKqDBuBqRm+3s352k7fTr9HSGjZQFSvBZ33NLrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744487293; c=relaxed/simple;
-	bh=tidewq6Pm9Tm8u2xZt8A3sCPNevnitgMH0YXOfmz+Rc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NzfEHI0HXdm0PMEMuZ67xX38lXnRy79d5q8/WnXwZrEdywc0+EL203pBkwt3yTpe5rrcmN3TadTuUZfSJsOEMTEZDUS3AFpnzVfdVhtVmtVW3lnGX2WhgGe/GkztxZx2hao4oK5tsFcw11njo7Pt8D0ryoH8ib/b5kRAo9frKEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c1GpG0Zg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C12FC4CEE3;
-	Sat, 12 Apr 2025 19:48:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744487293;
-	bh=tidewq6Pm9Tm8u2xZt8A3sCPNevnitgMH0YXOfmz+Rc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=c1GpG0Zg9V+Y4P+40FpJSt176TFdO7YjmltC/KE8CeoAUUgQE7ZJG+83m2bAfHSX3
-	 hjxOYWh8TQ/vYlJkPEtW2iQfIm1Z+3TqQ2SZ4sLofGhVGCFyNYoLU5h4+8sNHc9GbU
-	 cNT8GanKEgaOz1wb5Bhbu3KT+H0i8Q6JWXQ7URE6RLUoSddcoGL94TlA32uYpFsqYE
-	 dBBSF6QlJ8dCk0b2c0OTCmsSKd+Pz+gLCcxl7G9ILiN6KgVcMMqSf9CVig+4OlkZ9u
-	 0MYKTWPRCjXq7Sss5628hIqC3GoxbhguC2ApdLKi5TBd3CHdjtdRuYzUF5Zy0ZhdpH
-	 IiPBU4Pl/zWUQ==
-Date: Sat, 12 Apr 2025 21:48:06 +0200
-From: Ingo Molnar <mingo@kernel.org>
-To: Mike Rapoport <rppt@kernel.org>
-Cc: Dave Hansen <dave.hansen@intel.com>, Arnd Bergmann <arnd@kernel.org>,
-	linux-kernel@vger.kernel.org, x86@kernel.org,
-	Arnd Bergmann <arnd@arndb.de>, Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Andy Shevchenko <andy@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Davide Ciminaghi <ciminaghi@gnudd.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH 05/11] x86: remove HIGHMEM64G support
-Message-ID: <Z_rDdnlSs0rts3b9@gmail.com>
-References: <20241204103042.1904639-1-arnd@kernel.org>
- <20241204103042.1904639-6-arnd@kernel.org>
- <08b63835-121d-4adc-8f03-e68f0b0cabdf@intel.com>
- <Z_o7B_vDPRL03iSN@kernel.org>
+	s=arc-20240116; t=1744499495; c=relaxed/simple;
+	bh=Z8ANyn5BO+4YSxFMj2ZIePI2Es9dy8Hv6toZ4ucWxdY=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=oxV3o//yquRg90stwy5WFdPY7nwqVebyJ0TO1q6PLe9ttFBhflg9Q37Jt3dB3ncPBAf/hm/OFIloiJoRHVmgCPgzFaB0fW07aWiRXGUJe9zPyegDrzbOTFNqPn19lndi212o1n2vrj5VzKYurEs20ZOBOwcMV3q246un7E1N5/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=lMBig7n3; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [127.0.0.1] ([76.133.66.138])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53CNA8tE1265382
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Sat, 12 Apr 2025 16:10:09 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53CNA8tE1265382
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025032001; t=1744499412;
+	bh=Z8ANyn5BO+4YSxFMj2ZIePI2Es9dy8Hv6toZ4ucWxdY=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=lMBig7n3wyGQ77xYpn5pnxKVN4QM3Vkq6hDZcLvPaFwS2PWF/n09rzmm4i6ZIrSlX
+	 ldJKqqxh7XGdq6n0fK1xSbkbF0eDIoNvUz2LhiGL+7mwgnCfFlBgBbxU3imjGP8GwY
+	 zTU8dvf1jWNkf6+mSxkledPR0XPGAcZA1I9f+5+YiIA5YgCTj3M0isuBNWaO1BHck1
+	 A5Uh/ZdjOxEnzIwdlikBQnfr1jA4LYpMjCETWZHP0OeiOO0PyexivLyItY7m/buoB1
+	 Qlv5YTi1XbrFcCf8wBQrrImS7wL6ntMIDtBYRTjjMB9jzG1ZKHtxezcpa9pVk9CqYV
+	 YnyFnuF53LDCw==
+Date: Sat, 12 Apr 2025 16:10:06 -0700
+From: "H. Peter Anvin" <hpa@zytor.com>
+To: Xin Li <xin@zytor.com>, Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>
+CC: linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
+        linux-edac@vger.kernel.org, kvm@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-ide@vger.kernel.org,
+        linux-pm@vger.kernel.org, bpf@vger.kernel.org, llvm@lists.linux.dev,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, jgross@suse.com,
+        andrew.cooper3@citrix.com, peterz@infradead.org, acme@kernel.org,
+        namhyung@kernel.org, mark.rutland@arm.com,
+        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
+        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
+        wei.liu@kernel.org, ajay.kaher@broadcom.com,
+        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
+        pbonzini@redhat.com, vkuznets@redhat.com, luto@kernel.org,
+        boris.ostrovsky@oracle.com, kys@microsoft.com, haiyangz@microsoft.com,
+        decui@microsoft.com
+Subject: =?US-ASCII?Q?Re=3A_=5BRFC_PATCH_v1_10/15=5D_KVM=3A_VMX=3A_Use_WR?=
+ =?US-ASCII?Q?MSRNS_or_its_immediate_form_when_available?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <fa16949e-7842-45f7-9715-1bdda13b762a@zytor.com>
+References: <20250331082251.3171276-1-xin@zytor.com> <20250331082251.3171276-11-xin@zytor.com> <Z_hTI8ywa3rTxFaz@google.com> <CALMp9eRJkzA2YXf1Dfxt3ONP+P9aTA=WPraOPJPJ6C6j677+6Q@mail.gmail.com> <fa16949e-7842-45f7-9715-1bdda13b762a@zytor.com>
+Message-ID: <EAB44BB2-99BB-4D4A-8306-0235D2931E72@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z_o7B_vDPRL03iSN@kernel.org>
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+On April 11, 2025 9:32:32 PM PDT, Xin Li <xin@zytor=2Ecom> wrote:
+>On 4/11/2025 2:12 PM, Jim Mattson wrote:
+>> Surely, any CPU that has WRMSRNS also supports "Virtualize
+>> IA32_SPEC_CTRL," right? Shouldn't we be using that feature rather than
+>> swapping host and guest values with some form of WRMSR?
+>
+>Good question, the simple answer is that they are irrelevant=2E
 
-* Mike Rapoport <rppt@kernel.org> wrote:
-
-> On Fri, Apr 11, 2025 at 04:44:13PM -0700, Dave Hansen wrote:
-> > Has anyone run into any problems on 6.15-rc1 with this stuff?
-> > 
-> > 0xf75fe000 is the mem_map[] entry for the first page >4GB. It obviously
-> > wasn't allocated, thus the oops. Looks like the memblock for the >4GB
-> > memory didn't get removed although the pgdats seem correct.
-> 
-> That's apparently because of 6faea3422e3b ("arch, mm: streamline HIGHMEM
-> freeing"). 
-> Freeing of high memory was clamped to the end of ZONE_HIGHMEM which is 4G
-> and after 6faea3422e3b there's no more clamping, so memblock_free_all()
-> tries to free memory >4G as well.
->  
-> > I'll dig into it some more. Just wanted to make sure there wasn't a fix
-> > out there already.
-> 
-> This should fix it.
-> 
-> diff --git a/arch/x86/kernel/e820.c b/arch/x86/kernel/e820.c
-> index 57120f0749cc..4b24c0ccade4 100644
-> --- a/arch/x86/kernel/e820.c
-> +++ b/arch/x86/kernel/e820.c
-> @@ -1300,6 +1300,8 @@ void __init e820__memblock_setup(void)
->  		memblock_add(entry->addr, entry->size);
->  	}
->  
-> +	memblock_remove(PFN_PHYS(max_pfn), -1);
-> +
->  	/* Throw away partial pages: */
->  	memblock_trim_memory(PAGE_SIZE);
-
-Mind sending a full patch with changelog, SOB, Ard's Tested-by, Dave's 
-Reported-by, etc.?
-
-Thanks,
-
-	Ingo
+Also, *in this specific case* IA32_SPEC_CTRL is architecturally nonseriali=
+zing, i=2Ee=2E WRMSR executes as WRMSRNS anyway=2E
 
