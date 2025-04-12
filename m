@@ -1,87 +1,67 @@
-Return-Path: <kvm+bounces-43196-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43197-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F32CA86D58
-	for <lists+kvm@lfdr.de>; Sat, 12 Apr 2025 15:47:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 49BE7A86F33
+	for <lists+kvm@lfdr.de>; Sat, 12 Apr 2025 21:48:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C6EC189034D
-	for <lists+kvm@lfdr.de>; Sat, 12 Apr 2025 13:46:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DA20189EE60
+	for <lists+kvm@lfdr.de>; Sat, 12 Apr 2025 19:48:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFD4978C91;
-	Sat, 12 Apr 2025 13:46:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EAF0221725;
+	Sat, 12 Apr 2025 19:48:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="OxtYueHu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c1GpG0Zg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88A0B2B9BF
-	for <kvm@vger.kernel.org>; Sat, 12 Apr 2025 13:46:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34BC926AE4;
+	Sat, 12 Apr 2025 19:48:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744465586; cv=none; b=aRXGqdwS7gy8yuOVbB9cWflt2j+ncobfXk7xqCyysHvgzKoJbaiVW0XGfv0hKuerJY5PGRVOpj7wwvN1X/AKiaxS7QUSO42JwdlmO1BqKvHfSSC1cuxWV7h3ClzNeY7okiCuFK3dgZp/+351GA2C/zi3mpkdj5EztTMAKUnhl3I=
+	t=1744487293; cv=none; b=TPKz7KiIqNj9xPjuf0YiFL74MBe9vskl4rf3lTmVic41K9MEHU7mtTjFKhiXf6q9nxoqxRj7cZ9xSPMEGKJ9qqQa7MMPRTWKgZq7izfBEt4UNomSyWGOXOBQOAtOV+ycdxA3QCoKaLczwkfLqqlDmCdc/NUSBtx4cXwaaqUJl/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744465586; c=relaxed/simple;
-	bh=cgctAH7hjHjJ+Mjbyiw3Ga2JKg8UcnJE8B56BNVUpHc=;
+	s=arc-20240116; t=1744487293; c=relaxed/simple;
+	bh=tidewq6Pm9Tm8u2xZt8A3sCPNevnitgMH0YXOfmz+Rc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WQM/O/fIpq/0qbaMqUpqIViBcJvGMm72tQuxP+K5d3GA6hIc/WDLa238sBBDD+Ll7anpXMXeEWcCSNPh7oFUwOVbv1w1p5FoClR1I/7JNQTB+GQARcsZNb11y5WNv0T7rcM6utUCiNwqjdtj8VIv2PgoBVCA1MyP7UfItGWmZXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=OxtYueHu; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43d04dc73b7so31274125e9.3
-        for <kvm@vger.kernel.org>; Sat, 12 Apr 2025 06:46:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1744465583; x=1745070383; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3ItMj6JnKUsr/qeQhHS3wPbqAcg3n4FcqCoPgQhbG4k=;
-        b=OxtYueHuDkJMI8xe3ajRp8fy0DgFdWG2zjYhAqv/pSfwHXotpbJ0QSiCtLSYJzMUEG
-         PMVKF0xJlsFRkQGWGcCHzo87SG1dDFICzpUai65c6g35ILg3oyUDZkuHlSAHpqVVaUl+
-         6vzh8/K6f3XUSR43zpcB66JTgiENdXzXFdOeHQ9gqSWlCTUxyRaquo+PCJJ8JEuQlm6k
-         5hfYs9yw/4bZ34pxQc1KzWud8lrNoE5OOEoldYmxsaBD+JfUZvlRmMYEYMe8ZtDwLhyM
-         Ke0ZtiSqOZYxU1Kq2Gh1qEeO+jpjwmy4uW3AB94Gf8fHp5x/Q3e1SKRzHvHnQw6BuYSJ
-         lSJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744465583; x=1745070383;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3ItMj6JnKUsr/qeQhHS3wPbqAcg3n4FcqCoPgQhbG4k=;
-        b=ZZm9OvgTs8U+nMR15W5Lb+gs6tXACr3x8tupL6vmI8O7XxmkaUnbGJFPXpmrQcEcxc
-         pg+MWCiJoOVy3s1GvQWjD7Ms5fp39KVftcsWSD4veZmxOpPoKuzjU7Fbz+CB3nDHFBSS
-         MDkXbhIkij8bO/ZECj3x1Bzst8PhAUqO3k7TmajdTTaUZAs2YOiFhcPsi1LUEvpiuTG7
-         ABZ0+sd5L1rrhXuR3raJKKT4RK9zDz2tQIhr9UU9F9/qeWWivavL1FYvscz5Qb88OApg
-         n5yyyoYDNZAans6SLskhu7sWNoogGHelLXq53sZ2fJowvHnrOeLDO0cUmpEpEeGEfHzL
-         VrNA==
-X-Forwarded-Encrypted: i=1; AJvYcCVke4n7N54krRz6nApPR76cG8GGDcCC2qpVWAMWykje3jdUAcGB6mtE1vNbMDXDUll4qfw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7yiGnVUijq+0GIy3Wh72yjsAgN4R2hY5OM0GjT3ymUPyNUOuu
-	X3AttJZ8DxnADq1cN8ck7xXYr2Uwlavpr8rC2MUPJc7C+hcfKqUSc5lfWnzsDUc=
-X-Gm-Gg: ASbGncsdCKwa1sfvfKiEQ2w6OSLnIJAVigepp6h/1dyMqLmpWCfWxl3D3uxc6GL1CRH
-	8y8AoAAkPy8K1Zg2MX6dK6NnUgq9JwtAdf87/eQizqnEa5VtA+1zy0oY8DEq2+st84vq2uj98f6
-	yuA+A7g8BaWxP2ypYU0ZOjC7D5CDUenZLRfHzrOggchfTduyR1JukYVu6zJYSx+ZUhHpbB01n44
-	CaRzJ9u6FKlxXP82UaDg03Fih/xxswS8bndpVAhVqlNwfBx7eZ//2IsCIe6WMzRR8FyhoOJBwIC
-	Pk3ik46aenJrLx9ReOxCuEr5HXk020f+/t41tIPFvGMuuYMWQs8krmpIPPzJ0Vi++9lkAQ==
-X-Google-Smtp-Source: AGHT+IGhIj51K0rBZGmzAELools4onnOSFFF+wLV9YmwrbiQoYSzdN6+y8+uscQg379NDDj7DXmFoQ==
-X-Received: by 2002:a05:600c:354f:b0:43d:2230:300f with SMTP id 5b1f17b1804b1-43f3a7db98bmr54874755e9.0.1744465582816;
-        Sat, 12 Apr 2025 06:46:22 -0700 (PDT)
-Received: from localhost (cst2-173-28.cust.vodafone.cz. [31.30.173.28])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39eaf447777sm5016740f8f.100.2025.04.12.06.46.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 12 Apr 2025 06:46:22 -0700 (PDT)
-Date: Sat, 12 Apr 2025 15:46:21 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Anup Patel <apatel@ventanamicro.com>
-Cc: Will Deacon <will@kernel.org>, julien.thierry.kdev@gmail.com, 
-	maz@kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Atish Patra <atishp@atishpatra.org>, Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org
-Subject: Re: [kvmtool PATCH 04/10] riscv: Add Ziccrse extension support
-Message-ID: <20250412-85ac68d1bc912d739c511ccf@orel>
-References: <20250326065644.73765-1-apatel@ventanamicro.com>
- <20250326065644.73765-5-apatel@ventanamicro.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=NzfEHI0HXdm0PMEMuZ67xX38lXnRy79d5q8/WnXwZrEdywc0+EL203pBkwt3yTpe5rrcmN3TadTuUZfSJsOEMTEZDUS3AFpnzVfdVhtVmtVW3lnGX2WhgGe/GkztxZx2hao4oK5tsFcw11njo7Pt8D0ryoH8ib/b5kRAo9frKEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c1GpG0Zg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C12FC4CEE3;
+	Sat, 12 Apr 2025 19:48:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744487293;
+	bh=tidewq6Pm9Tm8u2xZt8A3sCPNevnitgMH0YXOfmz+Rc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=c1GpG0Zg9V+Y4P+40FpJSt176TFdO7YjmltC/KE8CeoAUUgQE7ZJG+83m2bAfHSX3
+	 hjxOYWh8TQ/vYlJkPEtW2iQfIm1Z+3TqQ2SZ4sLofGhVGCFyNYoLU5h4+8sNHc9GbU
+	 cNT8GanKEgaOz1wb5Bhbu3KT+H0i8Q6JWXQ7URE6RLUoSddcoGL94TlA32uYpFsqYE
+	 dBBSF6QlJ8dCk0b2c0OTCmsSKd+Pz+gLCcxl7G9ILiN6KgVcMMqSf9CVig+4OlkZ9u
+	 0MYKTWPRCjXq7Sss5628hIqC3GoxbhguC2ApdLKi5TBd3CHdjtdRuYzUF5Zy0ZhdpH
+	 IiPBU4Pl/zWUQ==
+Date: Sat, 12 Apr 2025 21:48:06 +0200
+From: Ingo Molnar <mingo@kernel.org>
+To: Mike Rapoport <rppt@kernel.org>
+Cc: Dave Hansen <dave.hansen@intel.com>, Arnd Bergmann <arnd@kernel.org>,
+	linux-kernel@vger.kernel.org, x86@kernel.org,
+	Arnd Bergmann <arnd@arndb.de>, Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Andy Shevchenko <andy@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Davide Ciminaghi <ciminaghi@gnudd.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH 05/11] x86: remove HIGHMEM64G support
+Message-ID: <Z_rDdnlSs0rts3b9@gmail.com>
+References: <20241204103042.1904639-1-arnd@kernel.org>
+ <20241204103042.1904639-6-arnd@kernel.org>
+ <08b63835-121d-4adc-8f03-e68f0b0cabdf@intel.com>
+ <Z_o7B_vDPRL03iSN@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,47 +70,46 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250326065644.73765-5-apatel@ventanamicro.com>
+In-Reply-To: <Z_o7B_vDPRL03iSN@kernel.org>
 
-On Wed, Mar 26, 2025 at 12:26:38PM +0530, Anup Patel wrote:
-> When the Ziccrse extension is available expose it to the guest
-> via device tree so that guest can use it.
-> 
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> ---
->  riscv/fdt.c                         | 1 +
->  riscv/include/kvm/kvm-config-arch.h | 3 +++
->  2 files changed, 4 insertions(+)
-> 
-> diff --git a/riscv/fdt.c b/riscv/fdt.c
-> index ddd0b28..3ee20a9 100644
-> --- a/riscv/fdt.c
-> +++ b/riscv/fdt.c
-> @@ -48,6 +48,7 @@ struct isa_ext_info isa_info_arr[] = {
->  	{"zfhmin", KVM_RISCV_ISA_EXT_ZFHMIN},
->  	{"zicbom", KVM_RISCV_ISA_EXT_ZICBOM},
->  	{"zicboz", KVM_RISCV_ISA_EXT_ZICBOZ},
-> +	{"ziccrse", KVM_RISCV_ISA_EXT_ZICCRSE},
->  	{"zicntr", KVM_RISCV_ISA_EXT_ZICNTR},
->  	{"zicond", KVM_RISCV_ISA_EXT_ZICOND},
->  	{"zicsr", KVM_RISCV_ISA_EXT_ZICSR},
-> diff --git a/riscv/include/kvm/kvm-config-arch.h b/riscv/include/kvm/kvm-config-arch.h
-> index d86158d..5badb74 100644
-> --- a/riscv/include/kvm/kvm-config-arch.h
-> +++ b/riscv/include/kvm/kvm-config-arch.h
-> @@ -121,6 +121,9 @@ struct kvm_config_arch {
->  	OPT_BOOLEAN('\0', "disable-zicboz",				\
->  		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZICBOZ],	\
->  		    "Disable Zicboz Extension"),			\
-> +	OPT_BOOLEAN('\0', "disable-ziccrse",				\
-> +		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZICCRSE],	\
-> +		    "Disable Ziccrse Extension"),			\
->  	OPT_BOOLEAN('\0', "disable-zicntr",				\
->  		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZICNTR],	\
->  		    "Disable Zicntr Extension"),			\
-> -- 
-> 2.43.0
->
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+* Mike Rapoport <rppt@kernel.org> wrote:
+
+> On Fri, Apr 11, 2025 at 04:44:13PM -0700, Dave Hansen wrote:
+> > Has anyone run into any problems on 6.15-rc1 with this stuff?
+> > 
+> > 0xf75fe000 is the mem_map[] entry for the first page >4GB. It obviously
+> > wasn't allocated, thus the oops. Looks like the memblock for the >4GB
+> > memory didn't get removed although the pgdats seem correct.
+> 
+> That's apparently because of 6faea3422e3b ("arch, mm: streamline HIGHMEM
+> freeing"). 
+> Freeing of high memory was clamped to the end of ZONE_HIGHMEM which is 4G
+> and after 6faea3422e3b there's no more clamping, so memblock_free_all()
+> tries to free memory >4G as well.
+>  
+> > I'll dig into it some more. Just wanted to make sure there wasn't a fix
+> > out there already.
+> 
+> This should fix it.
+> 
+> diff --git a/arch/x86/kernel/e820.c b/arch/x86/kernel/e820.c
+> index 57120f0749cc..4b24c0ccade4 100644
+> --- a/arch/x86/kernel/e820.c
+> +++ b/arch/x86/kernel/e820.c
+> @@ -1300,6 +1300,8 @@ void __init e820__memblock_setup(void)
+>  		memblock_add(entry->addr, entry->size);
+>  	}
+>  
+> +	memblock_remove(PFN_PHYS(max_pfn), -1);
+> +
+>  	/* Throw away partial pages: */
+>  	memblock_trim_memory(PAGE_SIZE);
+
+Mind sending a full patch with changelog, SOB, Ard's Tested-by, Dave's 
+Reported-by, etc.?
+
+Thanks,
+
+	Ingo
 
