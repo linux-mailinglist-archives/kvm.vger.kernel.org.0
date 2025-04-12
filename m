@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-43185-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43186-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E8A5A86ADC
-	for <lists+kvm@lfdr.de>; Sat, 12 Apr 2025 06:30:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5553AA86AEC
+	for <lists+kvm@lfdr.de>; Sat, 12 Apr 2025 06:35:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C7DCD7B3D60
-	for <lists+kvm@lfdr.de>; Sat, 12 Apr 2025 04:29:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE1CF9A0E62
+	for <lists+kvm@lfdr.de>; Sat, 12 Apr 2025 04:33:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 133EF189F3F;
-	Sat, 12 Apr 2025 04:29:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53B2318B475;
+	Sat, 12 Apr 2025 04:34:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="VRPOWZvb"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="UmkMzcYF"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 365495339D;
-	Sat, 12 Apr 2025 04:29:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFB4E10F9;
+	Sat, 12 Apr 2025 04:33:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744432195; cv=none; b=B2anQPaqk4qTzVmXzCTgB3GhYjsMjOf/7GljBer7kDfxt8dKFuD2fz9assgnVuvSM9b1uQ9SsC9Wg6hh+jw962FB98hwh1mR+ooCVe3qHXJj7yjKWDov6oHpdpWuyKDxP17jbkG7UMNTUD/2dDU0X3rA8whuURPKmrhFgI+6Rjs=
+	t=1744432439; cv=none; b=oivn5F+26FwVaqujP5514cXQN/5pFxX2OmJVAQnvSZTnafh/UWBWPmACVm1vraFVvIaXdKeLZZq9Uasyc+4elXoVyEgVkoPOoyqSjh/aX5pMlBH6JIZxWDV9uYdYHyDrJTk4HD5h4LCLN+n0B3HSvRJMLOfPiIN3a18APxxgpjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744432195; c=relaxed/simple;
-	bh=JBvQZYwHTuoyXs0QWuD2OUgJ6Jszv9WuY2iXMXSDM9A=;
+	s=arc-20240116; t=1744432439; c=relaxed/simple;
+	bh=8HY4pXq4/0sgSGqWKzYB0xMabci34z/M8SocsQbtjIc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PnglfBUsUGd9vbZOreAFb1xTe52HIHWreZF3pdFzeCTuumMABLuavrb+ue1iaKHrxbmWPfbTe9o7FZei7WgRYXUzAI9YlJYsIJI4j6+YGgkm+TRsubjbk+XhmTZ7A3h2L49azrsKjXYjVhcK6egWjIFC9yUWbwm6QwyKgQnNSQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=VRPOWZvb; arc=none smtp.client-ip=198.137.202.136
+	 In-Reply-To:Content-Type; b=ekxaLymYCU/zZ+VlpFWKIGNsmIpbV/pbVq5ajS8N84BxahxtBr1lYtTN2JsDxEdNsQfgB/Znp0N0lo73rwWwTok6vv2o4/G0PRt/UCgghhp39ISYS66w6wr5jpOrvyHHgvElv290+3iJ7fVcVVa4MxzvmnASrs0wa6/GxAduHw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=UmkMzcYF; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from [192.168.7.202] ([71.202.166.45])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53C4Slu6870108
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53C4WWUM871113
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Fri, 11 Apr 2025 21:28:47 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53C4Slu6870108
+	Fri, 11 Apr 2025 21:32:32 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53C4WWUM871113
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025032001; t=1744432131;
-	bh=FXvWlC8cZ0c5rZvfhCZWv2G6gDWGLrU6c2dfFP+ocqY=;
+	s=2025032001; t=1744432355;
+	bh=8HY4pXq4/0sgSGqWKzYB0xMabci34z/M8SocsQbtjIc=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=VRPOWZvbRcqn1EMY2mNRL9aN3N/c3MyZF0mdY259h4YB1tWna+5wI8moYEe13BQrV
-	 Y7VxgVfWa/tVrQnCfTeJI+jR+mXuFWbKp1foVl/RfgDxEvVEcU1OReNbo3FKsyzDsS
-	 IUz1Bg6FQJOpybPqDAwkpjirXvLuxVP/OGIHZ7SyeJM7r5PCYnsymYO0HJ236p08Kn
-	 dkuauEUlLLatvA9E1RQNU6sG1uL18fyy/377y0CpobGu/GgaJRIVx9ZcbEtirZuNa+
-	 r+lDqtaYkKQKAbzpZ2JxRaUoFWbSSsykVtmXOfUWdDZWzwmhNWRAo/oRdIU4DO6UVF
-	 EXRIghMJiBfug==
-Message-ID: <46f17b70-bdbb-4d6c-bf49-2384364e7fc5@zytor.com>
-Date: Fri, 11 Apr 2025 21:28:46 -0700
+	b=UmkMzcYFMOohEYDvst/+wSrvJqxBWNM3y8pTlydtS9u0Vr7uRFr3Z3pCuQCca14kO
+	 ACsIUaW4DWSFZQk6os5w5N7c+E5hX8uOXvMG58Zw1ACWcaqL0evKoHrKsjwK2mCmbu
+	 3fbVO1XRm3rPuvtxsvqFa40+ZJdSrPdyFPMsAPCRm9EzVpscdqiU1jHIOYNpql0/Q+
+	 A4rJGWpOKXJ4rM8Ry7S9QSfW5JMyxnLBqri634s7bqAxLMEVGyTj2wxY2EKLJiAwY7
+	 7S3D+HGa8zlLeI3TPeDpXLNu9OHcHMD6lAYjW/h+oxH9TUSCd3g/AuG8/qoXjh0Ibr
+	 awatBQNumv6Tw==
+Message-ID: <fa16949e-7842-45f7-9715-1bdda13b762a@zytor.com>
+Date: Fri, 11 Apr 2025 21:32:32 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -58,26 +58,26 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [RFC PATCH v1 10/15] KVM: VMX: Use WRMSRNS or its immediate form
  when available
-To: "H. Peter Anvin" <hpa@zytor.com>, Sean Christopherson <seanjc@google.com>
+To: Jim Mattson <jmattson@google.com>, Sean Christopherson <seanjc@google.com>
 Cc: linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
         linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
         linux-edac@vger.kernel.org, kvm@vger.kernel.org,
         xen-devel@lists.xenproject.org, linux-ide@vger.kernel.org,
         linux-pm@vger.kernel.org, bpf@vger.kernel.org, llvm@lists.linux.dev,
         tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, jgross@suse.com,
-        andrew.cooper3@citrix.com, peterz@infradead.org, acme@kernel.org,
-        namhyung@kernel.org, mark.rutland@arm.com,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        jgross@suse.com, andrew.cooper3@citrix.com, peterz@infradead.org,
+        acme@kernel.org, namhyung@kernel.org, mark.rutland@arm.com,
         alexander.shishkin@linux.intel.com, jolsa@kernel.org,
         irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
-        wei.liu@kernel.org, bcm-kernel-feedback-list@broadcom.com,
-        tony.luck@intel.com, pbonzini@redhat.com, vkuznets@redhat.com,
-        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
-        haiyangz@microsoft.com, decui@microsoft.com
+        wei.liu@kernel.org, ajay.kaher@broadcom.com,
+        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
+        pbonzini@redhat.com, vkuznets@redhat.com, luto@kernel.org,
+        boris.ostrovsky@oracle.com, kys@microsoft.com, haiyangz@microsoft.com,
+        decui@microsoft.com
 References: <20250331082251.3171276-1-xin@zytor.com>
  <20250331082251.3171276-11-xin@zytor.com> <Z_hTI8ywa3rTxFaz@google.com>
- <41eb2d08-1b2d-4ca8-bcb7-f5f4611f91a9@zytor.com>
- <39ECA4CA-9CBC-4F72-B52E-9BD06DBF9B6D@zytor.com>
+ <CALMp9eRJkzA2YXf1Dfxt3ONP+P9aTA=WPraOPJPJ6C6j677+6Q@mail.gmail.com>
 Content-Language: en-US
 From: Xin Li <xin@zytor.com>
 Autocrypt: addr=xin@zytor.com; keydata=
@@ -114,20 +114,14 @@ Autocrypt: addr=xin@zytor.com; keydata=
  PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
  gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
  l75w1xInsg==
-In-Reply-To: <39ECA4CA-9CBC-4F72-B52E-9BD06DBF9B6D@zytor.com>
+In-Reply-To: <CALMp9eRJkzA2YXf1Dfxt3ONP+P9aTA=WPraOPJPJ6C6j677+6Q@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 4/11/2025 1:50 PM, H. Peter Anvin wrote:
->>> This is quite hideous.  I have no objection to optimizing __vmx_vcpu_run(), but
->>> I would much prefer that a macro like this live in generic code, and that it be
->>> generic.  It should be easy enough to provide an assembly friendly equivalent to
->>> __native_wrmsr_constant().
->> Will do.
-> This should be coming anyway, right?
+On 4/11/2025 2:12 PM, Jim Mattson wrote:
+> Surely, any CPU that has WRMSRNS also supports "Virtualize
+> IA32_SPEC_CTRL," right? Shouldn't we be using that feature rather than
+> swapping host and guest values with some form of WRMSR?
 
-Absolutely.
-
-Totally stupid me: we have it ready to use here, but ...
-
+Good question, the simple answer is that they are irrelevant.
 
