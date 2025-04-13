@@ -1,177 +1,158 @@
-Return-Path: <kvm+bounces-43200-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43201-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 438A6A87137
-	for <lists+kvm@lfdr.de>; Sun, 13 Apr 2025 11:23:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B8083A871EF
+	for <lists+kvm@lfdr.de>; Sun, 13 Apr 2025 14:06:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12F78178E59
-	for <lists+kvm@lfdr.de>; Sun, 13 Apr 2025 09:23:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A973017057B
+	for <lists+kvm@lfdr.de>; Sun, 13 Apr 2025 12:06:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 487CF19ABC3;
-	Sun, 13 Apr 2025 09:23:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E131ACEDF;
+	Sun, 13 Apr 2025 12:06:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="3TkzMdtu";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="zg7jf2gk"
+	dkim=pass (1024-bit key) header.d=rosa.ru header.i=@rosa.ru header.b="JMxs2YZz"
 X-Original-To: kvm@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from forward203a.mail.yandex.net (forward203a.mail.yandex.net [178.154.239.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 471C5AD51;
-	Sun, 13 Apr 2025 09:23:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD341188CB1;
+	Sun, 13 Apr 2025 12:06:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744536213; cv=none; b=GlvI7JKdb15aoAQ3AC8/ygIKQo8yze1YM40dRgB+c5gJ0MWzMtY+BpwYiu88S86ouTQ5JZLLxZYlAsRmkIcAAwmAWbX10/0AItc2JEM1CtwecmpjBI5ojY78pUUTJlZmgebvg5maChnN9yCfl1BiUAFg00fBCCouT8fiLEJ5/rE=
+	t=1744545970; cv=none; b=PDevbUT6Wepfo5Dz6lb9zhg354ztn6LxlWrbXCKrQ/z1ylQPvKC/+GTiTu8qAtttTLIStDgzOy/Kh+dSpOvjvIvnpERf3dJS5c47vfvUZ4aZqIo1Q6mxdZjJHjWncYnknWhVzOy2iXH1pnwNt7JVE5O2WoRlWnMLw+2kjoVOuZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744536213; c=relaxed/simple;
-	bh=yf676E/gQZ3toPal9eBfEKUBovP3MaSTUqSQmtVon30=;
-	h=Date:From:To:Subject:Cc:In-Reply-To:References:MIME-Version:
-	 Message-ID:Content-Type; b=GRrfeYIVA//VA5TwdX7UMC/buqPVkv/EgIesvRHeCCV2bnp0KL9HSi91P53MbjQ4ux7vVICcIkkcj0cfaN3We8NWCBlk8Dlkl6Q2CquP7WS0xpPrpcBgI8NmI5qW9fNvLtmDlVAkeQsCt2oEUgYVE8jJkFxhJv8DwsklIhBBM70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=3TkzMdtu; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=zg7jf2gk; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Sun, 13 Apr 2025 09:23:24 -0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1744536209;
-	h=from:from:sender:sender:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ucnrpy2NvzE8s629t63JajaFbp5wyeNnqldVUdd1vzg=;
-	b=3TkzMdtuD97PL8jAK+5YHdpwQM883nL8ZTMJK4cQLz833JpNOk7+gyzUCGidHPeaMhClEN
-	ZbuECKMUCFEN2tpucR6LpBHMtGXJiliBVNaoRVCKrPtE7O+T1HHkaMZi+MZfoYL0KEsPmb
-	KfmYMs2PsbRk19eHZcnoXXUbfamiviNbmY2CcR/Ex2mmD6QzmocR+KJuvPSztja0iO1vpN
-	U/35rD2mM3nQmskr7PiAS3NWr/Wj7CkwCjTV+0XDxYt52C5+qlwNOcAXwfxN39np567tS5
-	EoXANhKZ+ZILmmIADtAtv9/ojv0Mn/Y1sBPDNz4lOzHiMfowZ4rx9T86QvGOSA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1744536209;
-	h=from:from:sender:sender:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ucnrpy2NvzE8s629t63JajaFbp5wyeNnqldVUdd1vzg=;
-	b=zg7jf2gkbUWm6Ffn91qiqqw9fp+6/GPHXahLHDCOmoaIWRR2qA0TyAA95D2Syh9iT1zumE
-	zV9vdNB3+6TkXaBQ==
-From: "tip-bot2 for Mike Rapoport (Microsoft)" <tip-bot2@linutronix.de>
-Sender: tip-bot2@linutronix.de
-Reply-to: linux-kernel@vger.kernel.org
-To: linux-tip-commits@vger.kernel.org
-Subject: [tip: x86/urgent] x86/e820: Discard high memory that can't be
- addressed by 32-bit systems
-Cc: Dave Hansen <dave.hansen@intel.com>, Arnd Bergmann <arnd@kernel.org>,
- "Mike Rapoport (Microsoft)" <rppt@kernel.org>, Ingo Molnar <mingo@kernel.org>,
- Andy Shevchenko <andy@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
- Davide Ciminaghi <ciminaghi@gnudd.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- Matthew Wilcox <willy@infradead.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, x86@kernel.org,
- linux-kernel@vger.kernel.org
-In-Reply-To: <20250413080858.743221-1-rppt@kernel.org>
-References: <20250413080858.743221-1-rppt@kernel.org>
+	s=arc-20240116; t=1744545970; c=relaxed/simple;
+	bh=u8PsHxYe+9KzQH5gysD3d12LwzebU7kL6mpp/V6CGG0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R9B221al9q95RUGfMRwR/Cva/UtOY55NPnY+lsOph3sPvv0QSVnrsQBsaqAXYkF6fkj/ehPepKNrmXPuxQf8a4MKWUO+KEE2EGZx8oreKigQB2Z/gecRrBrX77yt+JAsxAGZa7Qwm0TU5dd9P3agx81ljLxAQeTETGmA1xunzxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosa.ru; spf=pass smtp.mailfrom=rosa.ru; dkim=pass (1024-bit key) header.d=rosa.ru header.i=@rosa.ru header.b=JMxs2YZz; arc=none smtp.client-ip=178.154.239.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosa.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rosa.ru
+Received: from forward100a.mail.yandex.net (forward100a.mail.yandex.net [IPv6:2a02:6b8:c0e:500:1:45:d181:d100])
+	by forward203a.mail.yandex.net (Yandex) with ESMTPS id 05CA9633FB;
+	Sun, 13 Apr 2025 14:58:02 +0300 (MSK)
+Received: from mail-nwsmtp-smtp-production-main-60.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-60.vla.yp-c.yandex.net [IPv6:2a02:6b8:c1d:5b1c:0:640:ee42:0])
+	by forward100a.mail.yandex.net (Yandex) with ESMTPS id 9B35246CD6;
+	Sun, 13 Apr 2025 14:57:53 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-60.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id ovD0tuQLiqM0-ZoqV47jK;
+	Sun, 13 Apr 2025 14:57:52 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rosa.ru; s=mail;
+	t=1744545472; bh=smL9B/mF681y0YybnUJX7iCKktwM5bsed7obNcAJQGg=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=JMxs2YZz/9wfsNp9/jxHMikrH0gZx2sbSYeNIGryALsD04r6e3204apT4298+8nEJ
+	 e711a5WRG517HW5Ailr7GyDZVzPEbxm53kP4OzZeCjak3JJtKzWdyyVvDXtA+SAOEo
+	 4HTqVBfxdsjPDTKtdytoSwHWj8G4gjUHW5r71iEA=
+Authentication-Results: mail-nwsmtp-smtp-production-main-60.vla.yp-c.yandex.net; dkim=pass header.i=@rosa.ru
+From: Mikhail Lobanov <m.lobanov@rosa.ru>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Mikhail Lobanov <m.lobanov@rosa.ru>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	stable@vger.kernel.org
+Subject: [PATCH v2] KVM: SVM: forcibly leave SMM mode on vCPU reset
+Date: Sun, 13 Apr 2025 14:57:27 +0300
+Message-ID: <20250413115729.64712-1-m.lobanov@rosa.ru>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <174453620439.31282.5525507256376485910.tip-bot2@tip-bot2>
-Robot-ID: <tip-bot2@linutronix.de>
-Robot-Unsubscribe:
- Contact <mailto:tglx@linutronix.de> to get blacklisted from these emails
-Precedence: bulk
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-The following commit has been merged into the x86/urgent branch of tip:
+Previously, commit ed129ec9057f ("KVM: x86: forcibly leave nested mode
+on vCPU reset") addressed an issue where a triple fault occurring in
+nested mode could lead to use-after-free scenarios. However, the commit
+did not handle the analogous situation for System Management Mode (SMM).
 
-Commit-ID:     3f0036c0b5f850d1200dbfa7365ed24197a0f157
-Gitweb:        https://git.kernel.org/tip/3f0036c0b5f850d1200dbfa7365ed24197a0f157
-Author:        Mike Rapoport (Microsoft) <rppt@kernel.org>
-AuthorDate:    Sun, 13 Apr 2025 11:08:58 +03:00
-Committer:     Ingo Molnar <mingo@kernel.org>
-CommitterDate: Sun, 13 Apr 2025 11:09:39 +02:00
+This omission results in triggering a WARN when a vCPU reset occurs
+while still in SMM mode, due to the check in kvm_vcpu_reset(). This
+situation was reprodused using Syzkaller by:
+1) Creating a KVM VM and vCPU
+2) Sending a KVM_SMI ioctl to explicitly enter SMM
+3) Executing invalid instructions causing consecutive exceptions and
+eventually a triple fault
 
-x86/e820: Discard high memory that can't be addressed by 32-bit systems
+The issue manifests as follows:
 
-Dave Hansen reports the following crash on a 32-bit system with
-CONFIG_HIGHMEM=y and CONFIG_X86_PAE=y:
+WARNING: CPU: 0 PID: 25506 at arch/x86/kvm/x86.c:12112
+kvm_vcpu_reset+0x1d2/0x1530 arch/x86/kvm/x86.c:12112
+Modules linked in:
+CPU: 0 PID: 25506 Comm: syz-executor.0 Not tainted
+6.1.130-syzkaller-00157-g164fe5dde9b6 #0
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
+BIOS 1.12.0-1 04/01/2014
+RIP: 0010:kvm_vcpu_reset+0x1d2/0x1530 arch/x86/kvm/x86.c:12112
+Call Trace:
+ <TASK>
+ shutdown_interception+0x66/0xb0 arch/x86/kvm/svm/svm.c:2136
+ svm_invoke_exit_handler+0x110/0x530 arch/x86/kvm/svm/svm.c:3395
+ svm_handle_exit+0x424/0x920 arch/x86/kvm/svm/svm.c:3457
+ vcpu_enter_guest arch/x86/kvm/x86.c:10959 [inline]
+ vcpu_run+0x2c43/0x5a90 arch/x86/kvm/x86.c:11062
+ kvm_arch_vcpu_ioctl_run+0x50f/0x1cf0 arch/x86/kvm/x86.c:11283
+ kvm_vcpu_ioctl+0x570/0xf00 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4122
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x19a/0x210 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x35/0x80 arch/x86/entry/common.c:81
+ entry_SYSCALL_64_after_hwframe+0x6e/0xd8
 
-  > 0xf75fe000 is the mem_map[] entry for the first page >4GB. It
-  > obviously wasn't allocated, thus the oops.
+Architecturally, hardware CPUs exit SMM upon receiving a triple
+fault as part of a hardware reset. To reflect this behavior and
+avoid triggering the WARN, this patch explicitly calls
+kvm_smm_changed(vcpu, false) in the SVM-specific shutdown_interception()
+handler prior to resetting the vCPU.
 
-  BUG: unable to handle page fault for address: f75fe000
-  #PF: supervisor write access in kernel mode
-  #PF: error_code(0x0002) - not-present page
-  *pdpt = 0000000002da2001 *pde = 000000000300c067 *pte = 0000000000000000
-  Oops: Oops: 0002 [#1] SMP NOPTI
-  CPU: 0 UID: 0 PID: 0 Comm: swapper Not tainted 6.15.0-rc1-00288-ge618ee89561b-dirty #311 PREEMPT(undef)
-  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
-  EIP: __free_pages_core+0x3c/0x74
-  ...
-  Call Trace:
-   memblock_free_pages+0x11/0x2c
-   memblock_free_all+0x2ce/0x3a0
-   mm_core_init+0xf5/0x320
-   start_kernel+0x296/0x79c
-   i386_start_kernel+0xad/0xb0
-   startup_32_smp+0x151/0x154
+The initial version of this patch attempted to address the issue by calling
+kvm_smm_changed() inside kvm_vcpu_reset(). However, this approach was not
+architecturally accurate, as INIT is blocked during SMM and SMM should not
+be exited implicitly during a generic vCPU reset. This version moves the
+fix into shutdown_interception() for SVM, where the triple fault is
+actually handled, and where exiting SMM explicitly is appropriate.
 
-The mem_map[] is allocated up to the end of ZONE_HIGHMEM which is defined
-by max_pfn.
+Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
 
-The bug was introduced by this recent commit:
-
-  6faea3422e3b ("arch, mm: streamline HIGHMEM freeing")
-
-Previously, freeing of high memory was also clamped to the end of
-ZONE_HIGHMEM but after this change, memblock_free_all() tries to
-free memory above the of ZONE_HIGHMEM as well and that causes
-access to mem_map[] entries beyond the end of the memory map.
-
-To fix this, discard the memory after max_pfn from memblock on
-32-bit systems so that core MM would be aware only of actually
-usable memory.
-
-Fixes: 6faea3422e3b ("arch, mm: streamline HIGHMEM freeing")
-Reported-by: Dave Hansen <dave.hansen@intel.com>
-Tested-by: Arnd Bergmann <arnd@kernel.org>
-Signed-off-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
-Signed-off-by: Ingo Molnar <mingo@kernel.org>
-Cc: Andy Shevchenko <andy@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Davide Ciminaghi <ciminaghi@gnudd.com>
-Cc: H. Peter Anvin <hpa@zytor.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Matthew Wilcox <willy@infradead.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org
-Link: https://lore.kernel.org/r/20250413080858.743221-1-rppt@kernel.org
+Fixes: ed129ec9057f ("KVM: x86: forcibly leave nested mode on vCPU reset")
+Cc: stable@vger.kernel.org
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Mikhail Lobanov <m.lobanov@rosa.ru>
 ---
- arch/x86/kernel/e820.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+v2: Move SMM exit from kvm_vcpu_reset() to SVM's shutdown_interception(), 
+per suggestion from Sean Christopherson <seanjc@google.com>.
 
-diff --git a/arch/x86/kernel/e820.c b/arch/x86/kernel/e820.c
-index 9d8dd8d..9920122 100644
---- a/arch/x86/kernel/e820.c
-+++ b/arch/x86/kernel/e820.c
-@@ -1299,6 +1299,14 @@ void __init e820__memblock_setup(void)
- 		memblock_add(entry->addr, entry->size);
+ arch/x86/kvm/svm/svm.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index d5d0c5c3300b..34a002a87c28 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -2231,6 +2231,8 @@ static int shutdown_interception(struct kvm_vcpu *vcpu)
+ 	 */
+ 	if (!sev_es_guest(vcpu->kvm)) {
+ 		clear_page(svm->vmcb);
++		if (is_smm(vcpu))
++			kvm_smm_changed(vcpu, false);
+ 		kvm_vcpu_reset(vcpu, true);
  	}
  
-+	/*
-+	 * 32-bit systems are limited to 4BG of memory even with HIGHMEM and
-+	 * to even less without it.
-+	 * Discard memory after max_pfn - the actual limit detected at runtime.
-+	 */
-+	if (IS_ENABLED(CONFIG_X86_32))
-+		memblock_remove(PFN_PHYS(max_pfn), -1);
-+
- 	/* Throw away partial pages: */
- 	memblock_trim_memory(PAGE_SIZE);
- 
+-- 
+2.47.2
+
 
