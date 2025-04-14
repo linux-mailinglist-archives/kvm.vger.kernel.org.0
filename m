@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-43298-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43299-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6BD6A88E5A
-	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 23:53:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E385CA88E5C
+	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 23:53:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E54EF7A2CEA
-	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 21:52:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9C3C17D09A
+	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 21:53:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C61E9221290;
-	Mon, 14 Apr 2025 21:49:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66CF622068D;
+	Mon, 14 Apr 2025 21:49:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BhUm5raR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D+4/ilLz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2172221D3C7
-	for <kvm@vger.kernel.org>; Mon, 14 Apr 2025 21:49:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB8B721E0BB
+	for <kvm@vger.kernel.org>; Mon, 14 Apr 2025 21:49:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744667342; cv=none; b=oGnXSbzWsaJdAbP1cGn+dLm/3/xknXoVMFPptAFvvOkQlTG84gCIY9PUML/Kc2rt/YZfxRDoP7OpeN7jsPGunAIkMvD1DBircMrm7Or3E0uNLmyyb4oMmPNXBuQC/k99ZXaqTNC5CVl/bk5Cn8reUmcln+2Qp6P5Flau3ivDBAs=
+	t=1744667344; cv=none; b=HzkzqyIAWsYqtJNPeygIhR6LQ7VhN5Uipgk0kVY+SwVbiUAzNGtN96Xh0GCcU7DWcx3KsIxbKtQJeOvFFBwA+XxAH/kFn9drNualOzTZCZ5+42trGYjUIK0/3YH0khs2RcBGBljkkLzwyOhyNToRW3XBuPrq0ugQssUw8kHEja4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744667342; c=relaxed/simple;
-	bh=m6XZAFr9d7k1sePSC8lrRT9WZsZlOgeaGPEDDsdQtiY=;
+	s=arc-20240116; t=1744667344; c=relaxed/simple;
+	bh=bloYu7yWKG/RoRQCqnIADXdWVS+9eixtYsX0/60A/7Q=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kOzpvqPHf14FobbBVHWbLANe9CUNWvX+8dKWFFurnxjYIKNwQn7lHPcs3CDAAXPXEzJT65t9jWRh0AiIg9iUoci8PaGiI0PIYyYEJYVLmHL4YZWhIfQX7kDnnkGviPcU3ydxT41RBE6rbzJPU21sL/Q8tBSexiDrufwb82SXTPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BhUm5raR; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=GuHKQLrtTtSd5IQEbVHNPL71Sid+pl7h83S0cl/QgWm6etW8q7aqEZoxJhZSPf2U2VBC0OqNonoP4jSdEVD+n8Eopgpcce246gUgCkDOnryTwzYfcaPuScvnCKATbYO2JK9F1YiefuBcyYp0yoCZTyq5qF4elT5HCgBry3leUb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D+4/ilLz; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-225505d1ca5so42384525ad.2
-        for <kvm@vger.kernel.org>; Mon, 14 Apr 2025 14:49:00 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7395095a505so3708324b3a.1
+        for <kvm@vger.kernel.org>; Mon, 14 Apr 2025 14:49:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744667340; x=1745272140; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1744667342; x=1745272142; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pSkGn0jO8D7u6Mzmo2Skc2pJxtV9/HYvntZJQxqwflU=;
-        b=BhUm5raRcFe1Gb+Ok+pXJnlCIL6Ub9hqnkBFUR8G6DqRwL6SQnfDcaL0HGLxOFJksz
-         Ux5fjCoPhlFUfoQJ2+m8jMJLJHuE3Wx+CLBDYW/yXkJYnVLn+nDbQ0N41aa3NDC1hjrI
-         zLNxSMg7kAGjJAtvm2las05pE+rBDG0yUlIkvpDXhPYFoFVHuRqa96O8xMVP0UabcdaR
-         43zi+O60RPVob89vKqMREKaN/xj0HmqsJ1E0BvvPeyTPVE3a6f03H20RITL7UZo/e5iG
-         2fj2QTaNQZgBLTRws5wtTt8UAzy8Bef4d5AFtz/it3DhbPLI5wW/V+XL4fHlbmMXU90k
-         09dg==
+        bh=ndE2kkPs2bCP8NMS/P4f1C/hPinkE036THKJ89mj2ig=;
+        b=D+4/ilLzC4LXnp6XLCJz61oVb2PUZuN6UgKpljXH3Z5tmPCLXB98jfHRlJb6VvW4ym
+         ecgUcTcAr0dmRvwVKMn1FKJlDtGg2wy7zGYu2UAWZzlDHsanbqdQHKuVeskhUUgXNWxs
+         UiPK1cv57vLN9upYPUXFTAAaa49CLLArUt4BY6knd9YT0HTZ1kP6Aipa3t7CNxsYZ5X3
+         FDPaY7bdKuawtvbUKy60ebs97j6S5RKFrcCZvZer5y5A1EzzD9gumQieOzev8zNg+pXh
+         NzV/etN3EOuBirTLaQW/8O6BLpWdX1ji1HPKlQoLwlZB8AZQO4KslfZqLN8TOXCFM14b
+         buEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744667340; x=1745272140;
+        d=1e100.net; s=20230601; t=1744667342; x=1745272142;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pSkGn0jO8D7u6Mzmo2Skc2pJxtV9/HYvntZJQxqwflU=;
-        b=krip7c0mqz4B4FEJBRzaCW5ALONCuPQiqXY6KumyL1Z8mU5sOAuENoYYZuRcTS1eKR
-         aN5/bfRcewND37nmaobDDGxPBpIMsvX1lBZvQ34dflLQn/X0/KQ5bH3owP1MZWjNvoz6
-         Sehgu8ho9udFmVb0gdLu4JGhMUcimvrKe0CHg045xKJ8gbQDhR7dBj9v2TEpo1zEz4tg
-         nPEcwT6/jD4nwqnet/GkZz+syOiUmxcTDszkKAdv5TudrQuOrRwPoiuy48zR3wUfjPF+
-         sOcbexVtOfbpeJMkUJ69KjwMTVRLYjXLmVPit0dE6k16e9kiQtDLoQXzv7sT8VwlHVUw
-         sOwA==
-X-Forwarded-Encrypted: i=1; AJvYcCV3p6vf8L4n5jtKjJE+mj0vC9cQ54mcDvwjRq76E3O8NSB+xGni2ICJnFpLIoWpD03u/fw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8Poxu2rT+uqod8YIlcEseCAwUPgzxzimjd1TFo41J+YUOc1KS
-	jzWO5S3FfE0CLlcSakOpvHRkNRNAgNK/BCQm8L4iHWEM7jq5DypQeXRjk1wsk7Ee0uGCV8CqaA=
+        bh=ndE2kkPs2bCP8NMS/P4f1C/hPinkE036THKJ89mj2ig=;
+        b=RkKwzaBLYc6kqhLOMkk1gI8wsUsyLCWsqBmCPyTpgc/+Luxbbv7/6gUlWYmoqZuOs9
+         1rYaOBnLMzn3ZkgojKKqpEwTh6MCoMteMJYXB5+tecRmPzOqxxC0RMdMpi7WxxELevs5
+         FFYiR9VyXM5WszZaFRTn4WSQKTN+pypq1ZMPkj+GNYwaY9/4zOfSlGm4ZTRJm1yavg41
+         hrZ2yb93Xm4ICS4K524oIGH9yDFEdfHYgecLnysXKqQAV3NOnuI8sjixiEpLL5lDGNDR
+         O20pl2xlY0CHERehNbnbwUhYnabUJWed9z4EXwb8z1vUhwuhEqF8lRhgJQss8GLh4wk4
+         6Nqg==
+X-Forwarded-Encrypted: i=1; AJvYcCWMz7q0ZIwsju29m9TCo4viB+gRc3t8d1ITs+dHbSdQ5TcSDFlfyELk+K5eralIHU7COt4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy03cxQIBgekdQO4U0pkcSFQiFTQZgpRnQ970Mh5pkB96aQUQny
+	CzhonzluRMyQf5/hXHdpEee5Jd0QiSBYnMjtd71WPwNCD2SfRykts1vFEDfoWq612z6v06bA6w=
 	=
-X-Google-Smtp-Source: AGHT+IE63zYFHniLEiomnIcid+bNx1GXO6+bLTGlcZ1tDQ3qmoI0tt9VtY+yKOzizresPhzJaGwy4CulQg==
-X-Received: from pfgt32.prod.google.com ([2002:a05:6a00:13a0:b0:736:b37b:f363])
- (user=sagis job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1a03:b0:220:fce7:d3a6
- with SMTP id d9443c01a7336-22bea4bca1cmr186211395ad.23.1744667340531; Mon, 14
- Apr 2025 14:49:00 -0700 (PDT)
-Date: Mon, 14 Apr 2025 14:47:44 -0700
+X-Google-Smtp-Source: AGHT+IGMGK+/PA7ngbs+zF0Fk5eugmdjYN65OhZkDlQZjk9ZGgXv208tlpoCkRhe/gaW6NkShckG+QkxHQ==
+X-Received: from pfbcn5.prod.google.com ([2002:a05:6a00:3405:b0:736:3cd5:ba36])
+ (user=sagis job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:3a0e:b0:737:5edd:9805
+ with SMTP id d2e1a72fcca58-73bd129b3a6mr18411051b3a.19.1744667342234; Mon, 14
+ Apr 2025 14:49:02 -0700 (PDT)
+Date: Mon, 14 Apr 2025 14:47:45 -0700
 In-Reply-To: <20250414214801.2693294-1-sagis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250414214801.2693294-1-sagis@google.com>
 X-Mailer: git-send-email 2.49.0.777.g153de2bbd5-goog
-Message-ID: <20250414214801.2693294-16-sagis@google.com>
-Subject: [PATCH v6 15/30] KVM: selftests: TDX: Add TDX IO reads test
+Message-ID: <20250414214801.2693294-17-sagis@google.com>
+Subject: [PATCH v6 16/30] KVM: selftests: TDX: Add TDX MSR read/write tests
 From: Sagi Shahar <sagis@google.com>
 To: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
 	Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>, 
@@ -88,85 +88,181 @@ To: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-The test verifies IO reads of various sizes from the host to the guest.
+The test verifies reads and writes for MSR registers with different access
+level.
 
 Signed-off-by: Sagi Shahar <sagis@google.com>
 ---
- tools/testing/selftests/kvm/x86/tdx_vm_test.c | 76 ++++++++++++++++++-
- 1 file changed, 75 insertions(+), 1 deletion(-)
+ .../selftests/kvm/include/x86/tdx/tdx.h       |   4 +
+ tools/testing/selftests/kvm/lib/x86/tdx/tdx.c |  27 +++
+ tools/testing/selftests/kvm/x86/tdx_vm_test.c | 193 +++++++++++++++++-
+ 3 files changed, 223 insertions(+), 1 deletion(-)
 
+diff --git a/tools/testing/selftests/kvm/include/x86/tdx/tdx.h b/tools/testing/selftests/kvm/include/x86/tdx/tdx.h
+index 97ceb90c8792..56359a8c4c19 100644
+--- a/tools/testing/selftests/kvm/include/x86/tdx/tdx.h
++++ b/tools/testing/selftests/kvm/include/x86/tdx/tdx.h
+@@ -10,10 +10,14 @@
+ #define TDG_VP_VMCALL_REPORT_FATAL_ERROR 0x10003
+ 
+ #define TDG_VP_VMCALL_INSTRUCTION_IO 30
++#define TDG_VP_VMCALL_INSTRUCTION_RDMSR 31
++#define TDG_VP_VMCALL_INSTRUCTION_WRMSR 32
+ 
+ uint64_t tdg_vp_vmcall_instruction_io(uint64_t port, uint64_t size,
+ 				      uint64_t write, uint64_t *data);
+ void tdg_vp_vmcall_report_fatal_error(uint64_t error_code, uint64_t data_gpa);
+ uint64_t tdg_vp_vmcall_get_td_vmcall_info(uint64_t *r11, uint64_t *r12,
+ 					  uint64_t *r13, uint64_t *r14);
++uint64_t tdg_vp_vmcall_instruction_rdmsr(uint64_t index, uint64_t *ret_value);
++uint64_t tdg_vp_vmcall_instruction_wrmsr(uint64_t index, uint64_t value);
+ #endif // SELFTEST_TDX_TDX_H
+diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/tdx.c b/tools/testing/selftests/kvm/lib/x86/tdx/tdx.c
+index 5105dfae0e9e..99ec45a5a657 100644
+--- a/tools/testing/selftests/kvm/lib/x86/tdx/tdx.c
++++ b/tools/testing/selftests/kvm/lib/x86/tdx/tdx.c
+@@ -66,3 +66,30 @@ uint64_t tdg_vp_vmcall_get_td_vmcall_info(uint64_t *r11, uint64_t *r12,
+ 
+ 	return ret;
+ }
++
++uint64_t tdg_vp_vmcall_instruction_rdmsr(uint64_t index, uint64_t *ret_value)
++{
++	struct tdx_hypercall_args args = {
++		.r11 = TDG_VP_VMCALL_INSTRUCTION_RDMSR,
++		.r12 = index,
++	};
++	uint64_t ret;
++
++	ret = __tdx_hypercall(&args, TDX_HCALL_HAS_OUTPUT);
++
++	if (ret_value)
++		*ret_value = args.r11;
++
++	return ret;
++}
++
++uint64_t tdg_vp_vmcall_instruction_wrmsr(uint64_t index, uint64_t value)
++{
++	struct tdx_hypercall_args args = {
++		.r11 = TDG_VP_VMCALL_INSTRUCTION_WRMSR,
++		.r12 = index,
++		.r13 = value,
++	};
++
++	return __tdx_hypercall(&args, 0);
++}
 diff --git a/tools/testing/selftests/kvm/x86/tdx_vm_test.c b/tools/testing/selftests/kvm/x86/tdx_vm_test.c
-index f646da032004..ae5749e5c605 100644
+index ae5749e5c605..079ac266a44e 100644
 --- a/tools/testing/selftests/kvm/x86/tdx_vm_test.c
 +++ b/tools/testing/selftests/kvm/x86/tdx_vm_test.c
-@@ -383,6 +383,78 @@ void verify_guest_writes(void)
+@@ -455,6 +455,193 @@ void verify_guest_reads(void)
  	printf("\t ... PASSED\n");
  }
  
-+#define TDX_IO_READS_TEST_PORT 0x52
++/*
++ * Define a filter which denies all MSR access except the following:
++ * MSR_X2APIC_APIC_ICR: Allow read/write access (allowed by default)
++ * MSR_IA32_MISC_ENABLE: Allow read access
++ * MSR_IA32_POWER_CTL: Allow write access
++ */
++#define MSR_X2APIC_APIC_ICR 0x830
++static u64 tdx_msr_test_allow_bits = ~0ULL;
++struct kvm_msr_filter tdx_msr_test_filter = {
++	.flags = KVM_MSR_FILTER_DEFAULT_DENY,
++	.ranges = {
++		{
++			.flags = KVM_MSR_FILTER_READ,
++			.nmsrs = 1,
++			.base = MSR_IA32_MISC_ENABLE,
++			.bitmap = (uint8_t *)&tdx_msr_test_allow_bits,
++		}, {
++			.flags = KVM_MSR_FILTER_WRITE,
++			.nmsrs = 1,
++			.base = MSR_IA32_POWER_CTL,
++			.bitmap = (uint8_t *)&tdx_msr_test_allow_bits,
++		},
++	},
++};
 +
 +/*
-+ * Verifies IO functionality by reading values of different sizes
-+ * from the host.
++ * Verifies MSR read functionality.
 + */
-+void guest_io_reads(void)
++void guest_msr_read(void)
 +{
 +	uint64_t data;
 +	uint64_t ret;
 +
-+	ret = tdg_vp_vmcall_instruction_io(TDX_IO_READS_TEST_PORT, 1,
-+					   PORT_READ, &data);
++	ret = tdg_vp_vmcall_instruction_rdmsr(MSR_X2APIC_APIC_ICR, &data);
 +	tdx_assert_error(ret);
-+	if (data != 0xAB)
-+		tdx_test_fatal(1);
 +
-+	ret = tdg_vp_vmcall_instruction_io(TDX_IO_READS_TEST_PORT, 2,
-+					   PORT_READ, &data);
++	ret = tdx_test_report_64bit_to_user_space(data);
 +	tdx_assert_error(ret);
-+	if (data != 0xABCD)
-+		tdx_test_fatal(2);
 +
-+	ret = tdg_vp_vmcall_instruction_io(TDX_IO_READS_TEST_PORT, 4,
-+					   PORT_READ, &data);
++	ret = tdg_vp_vmcall_instruction_rdmsr(MSR_IA32_MISC_ENABLE, &data);
 +	tdx_assert_error(ret);
-+	if (data != 0xFFABCDEF)
-+		tdx_test_fatal(4);
 +
-+	/* Read an invalid number of bytes. */
-+	ret = tdg_vp_vmcall_instruction_io(TDX_IO_READS_TEST_PORT, 5,
-+					   PORT_READ, &data);
++	ret = tdx_test_report_64bit_to_user_space(data);
 +	tdx_assert_error(ret);
++
++	/* Expect this call to fail since MSR_IA32_POWER_CTL is write only */
++	ret = tdg_vp_vmcall_instruction_rdmsr(MSR_IA32_POWER_CTL, &data);
++	if (ret) {
++		ret = tdx_test_report_64bit_to_user_space(ret);
++		tdx_assert_error(ret);
++	} else {
++		tdx_test_fatal(-99);
++	}
 +
 +	tdx_test_success();
 +}
 +
-+void verify_guest_reads(void)
++void verify_guest_msr_reads(void)
 +{
 +	struct kvm_vcpu *vcpu;
 +	struct kvm_vm *vm;
++	uint64_t data;
++	int ret;
 +
 +	vm = td_create();
 +	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, 0);
-+	vcpu = td_vcpu_add(vm, 0, guest_io_reads);
++
++	/*
++	 * Set explicit MSR filter map to control access to the MSR registers
++	 * used in the test.
++	 */
++	printf("\t ... Setting test MSR filter\n");
++	ret = kvm_check_cap(KVM_CAP_X86_MSR_FILTER);
++	TEST_ASSERT(ret, "KVM_CAP_X86_MSR_FILTER is unavailable");
++
++	ret = ioctl(vm->fd, KVM_X86_SET_MSR_FILTER, &tdx_msr_test_filter);
++	TEST_ASSERT(ret == 0,
++		    "KVM_X86_SET_MSR_FILTER failed, ret: %i errno: %i (%s)",
++		    ret, errno, strerror(errno));
++
++	vcpu = td_vcpu_add(vm, 0, guest_msr_read);
 +	td_finalize(vm);
 +
-+	printf("Verifying guest reads:\n");
++	printf("Verifying guest msr reads:\n");
++
++	printf("\t ... Setting test MSR values\n");
++	/* Write arbitrary to the MSRs. */
++	vcpu_set_msr(vcpu, MSR_X2APIC_APIC_ICR, 4);
++	vcpu_set_msr(vcpu, MSR_IA32_MISC_ENABLE, 5);
++	vcpu_set_msr(vcpu, MSR_IA32_POWER_CTL, 6);
++
++	printf("\t ... Running guest\n");
++	tdx_run(vcpu);
++	data = tdx_test_read_64bit_report_from_guest(vcpu);
++	TEST_ASSERT_EQ(data, 4);
 +
 +	tdx_run(vcpu);
-+	tdx_test_assert_io(vcpu, TDX_IO_READS_TEST_PORT, 1, PORT_READ);
-+	*(uint8_t *)((void *)vcpu->run + vcpu->run->io.data_offset) = 0xAB;
++	data = tdx_test_read_64bit_report_from_guest(vcpu);
++	TEST_ASSERT_EQ(data, 5);
 +
 +	tdx_run(vcpu);
-+	tdx_test_assert_io(vcpu, TDX_IO_READS_TEST_PORT, 2, PORT_READ);
-+	*(uint16_t *)((void *)vcpu->run + vcpu->run->io.data_offset) = 0xABCD;
-+
-+	tdx_run(vcpu);
-+	tdx_test_assert_io(vcpu, TDX_IO_READS_TEST_PORT, 4, PORT_READ);
-+	*(uint32_t *)((void *)vcpu->run + vcpu->run->io.data_offset) = 0xFFABCDEF;
-+
-+	td_vcpu_run(vcpu);
-+	TEST_ASSERT_EQ(vcpu->run->exit_reason, KVM_EXIT_SYSTEM_EVENT);
-+	TEST_ASSERT_EQ(vcpu->run->system_event.data[12], TDG_VP_VMCALL_INVALID_OPERAND);
++	data = tdx_test_read_64bit_report_from_guest(vcpu);
++	TEST_ASSERT_EQ(data, TDG_VP_VMCALL_INVALID_OPERAND);
 +
 +	tdx_run(vcpu);
 +	tdx_test_assert_success(vcpu);
@@ -175,24 +271,102 @@ index f646da032004..ae5749e5c605 100644
 +	printf("\t ... PASSED\n");
 +}
 +
++/*
++ * Verifies MSR write functionality.
++ */
++void guest_msr_write(void)
++{
++	uint64_t ret;
++
++	ret = tdg_vp_vmcall_instruction_wrmsr(MSR_X2APIC_APIC_ICR, 4);
++	tdx_assert_error(ret);
++
++	/* Expect this call to fail since MSR_IA32_MISC_ENABLE is read only */
++	ret = tdg_vp_vmcall_instruction_wrmsr(MSR_IA32_MISC_ENABLE, 5);
++	if (ret) {
++		ret = tdx_test_report_64bit_to_user_space(ret);
++		tdx_assert_error(ret);
++	} else {
++		tdx_test_fatal(-99);
++	}
++
++	ret = tdg_vp_vmcall_instruction_wrmsr(MSR_IA32_POWER_CTL, 6);
++	tdx_assert_error(ret);
++
++	tdx_test_success();
++}
++
++void verify_guest_msr_writes(void)
++{
++	uint64_t ia32_misc_enable_val;
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++	uint64_t data;
++	int ret;
++
++	vm = td_create();
++	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, 0);
++
++	/*
++	 * Set explicit MSR filter map to control access to the MSR registers
++	 * used in the test.
++	 */
++	printf("\t ... Setting test MSR filter\n");
++	ret = kvm_check_cap(KVM_CAP_X86_MSR_FILTER);
++	TEST_ASSERT(ret, "KVM_CAP_X86_MSR_FILTER is unavailable");
++
++	ret = ioctl(vm->fd, KVM_X86_SET_MSR_FILTER, &tdx_msr_test_filter);
++	TEST_ASSERT(ret == 0,
++		    "KVM_X86_SET_MSR_FILTER failed, ret: %i errno: %i (%s)",
++		    ret, errno, strerror(errno));
++
++	vcpu = td_vcpu_add(vm, 0, guest_msr_write);
++	td_finalize(vm);
++
++	ia32_misc_enable_val = vcpu_get_msr(vcpu, MSR_IA32_MISC_ENABLE);
++
++	printf("Verifying guest msr writes:\n");
++
++	printf("\t ... Running guest\n");
++	/* Only the write to MSR_IA32_MISC_ENABLE should trigger an exit */
++	tdx_run(vcpu);
++	data = tdx_test_read_64bit_report_from_guest(vcpu);
++	TEST_ASSERT_EQ(data, TDG_VP_VMCALL_INVALID_OPERAND);
++
++	tdx_run(vcpu);
++	tdx_test_assert_success(vcpu);
++
++	printf("\t ... Verifying MSR values written by guest\n");
++
++	TEST_ASSERT_EQ(vcpu_get_msr(vcpu, MSR_X2APIC_APIC_ICR), 4);
++	TEST_ASSERT_EQ(vcpu_get_msr(vcpu, MSR_IA32_MISC_ENABLE),
++		       ia32_misc_enable_val);
++	TEST_ASSERT_EQ(vcpu_get_msr(vcpu, MSR_IA32_POWER_CTL), 6);
++
++	kvm_vm_free(vm);
++	printf("\t ... PASSED\n");
++}
++
  int main(int argc, char **argv)
  {
  	ksft_print_header();
-@@ -390,7 +462,7 @@ int main(int argc, char **argv)
+@@ -462,7 +649,7 @@ int main(int argc, char **argv)
  	if (!is_tdx_enabled())
  		ksft_exit_skip("TDX is not supported by the KVM. Exiting.\n");
  
--	ksft_set_plan(6);
-+	ksft_set_plan(7);
+-	ksft_set_plan(7);
++	ksft_set_plan(9);
  	ksft_test_result(!run_in_new_process(&verify_td_lifecycle),
  			 "verify_td_lifecycle\n");
  	ksft_test_result(!run_in_new_process(&verify_report_fatal_error),
-@@ -403,6 +475,8 @@ int main(int argc, char **argv)
- 			 "verify_get_td_vmcall_info\n");
- 	ksft_test_result(!run_in_new_process(&verify_guest_writes),
+@@ -477,6 +664,10 @@ int main(int argc, char **argv)
  			 "verify_guest_writes\n");
-+	ksft_test_result(!run_in_new_process(&verify_guest_reads),
-+			 "verify_guest_reads\n");
+ 	ksft_test_result(!run_in_new_process(&verify_guest_reads),
+ 			 "verify_guest_reads\n");
++	ksft_test_result(!run_in_new_process(&verify_guest_msr_writes),
++			 "verify_guest_msr_writes\n");
++	ksft_test_result(!run_in_new_process(&verify_guest_msr_reads),
++			 "verify_guest_msr_reads\n");
  
  	ksft_finished();
  	return 0;
