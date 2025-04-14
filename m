@@ -1,284 +1,192 @@
-Return-Path: <kvm+bounces-43246-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43247-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01F1FA884D0
-	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 16:28:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CCC5A88556
+	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 16:41:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66AAF175B2C
-	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 14:23:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D64619018C3
+	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 14:30:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 244FA25D1E0;
-	Mon, 14 Apr 2025 14:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B62232DFA25;
+	Mon, 14 Apr 2025 14:06:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P0cTqYE0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mD3zl81e"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4850B289377;
-	Mon, 14 Apr 2025 14:00:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D1882DFA21;
+	Mon, 14 Apr 2025 14:06:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744639203; cv=none; b=JLiktMU8SAnVrz2mC6MSROyZxdb8I2dTF2s8/2Hzw/FuC9L4z+kOGjTGEu9IwRTVYT7R6bEE8gq03BBjDMYQH89t50pm6wMlPvQ6EM1Z1CpFdmlA4nSwn4zMYp4M0v2NrlRAtr92FrD/9rpXsw5T7uw6pNMcMS3iVOgBF46V1Y8=
+	t=1744639606; cv=none; b=EAxGtU2lc83LxDg8pmilPTxlooTnqoCGD6wUqaEU/kkygmvH/VSDWI6DnavzBJEvAQ+hsumKk03qKbUbZtLBEL/ISlTImmbUMfxwCSN477fZMESdl+ITA6THTtCB79i94L6jjtnhZ7BytH0xrZq2yXbh8JhLdje4WbhDVUOeyfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744639203; c=relaxed/simple;
-	bh=nY2jtEZRHlv9V/RIKzrxyGRKCAifwpg4RNap/n4sscE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Tmtq6bxXJrGodkpAQaBzE1ooACuRzimD8/vcUqCc4sQp9Ess66qyl873hAmK8tzzKnxCmDyws+EPf+cWGNgtnrO0pxxn8x99N0P8tnHpR02oUdQlbr4ouVhz6KgTYASFvTKuchVHFHnLJP7JgFKAk2sRNhhwvAY7kB4OWGJvPoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P0cTqYE0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF91DC4CEED;
-	Mon, 14 Apr 2025 14:00:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744639202;
-	bh=nY2jtEZRHlv9V/RIKzrxyGRKCAifwpg4RNap/n4sscE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=P0cTqYE0WtuJeWZA6MbCkmNThUzBl8wjlhvoRicd3ljOFI0BUChk48ntXs7gVUzvN
-	 Nd0fX0EOgLnFBb5Lmco9IShXsL3N06viCcyom8hamxY0ICXtdpCHfEfzSFm0bHZIjb
-	 hZm8wVE5DtWTnue/gyLpwCXhphLSs+onecgQHWyrpQUonqxl+UzPZi5HTONg1da8jc
-	 42LvNXvzOyV+qRtJtIIDw7uZ8Zs3DdmXIzegZjNRmWByKOxYRG7BIg2Yiprc9OSLmJ
-	 4UhSAswXDevFNcnb4RykD6yKcK+GNgM5Sa8jh+UuGDZkFybCBjJ8bZkG89IelDZAtZ
-	 C5z5B4t25/4hw==
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5e8be1bdb7bso7216714a12.0;
-        Mon, 14 Apr 2025 07:00:02 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUtNNR8ZCwIA7DrGUkSRUvASvTmJvNNgbNj8RBtvES4+nyzM9+mTWnqr0q7JzHejVewNtDNZ9IDawEz1rvo@vger.kernel.org, AJvYcCVe9xCAHqhYq8mvCGSUOmiRDwwPhsZMbetLvm85InJOmiFjuu5NedCraIz1qOt1oCwMFIUlLJ9ozFkGsQPKxFgR@vger.kernel.org, AJvYcCXcw+YIbjQ5kA/ZULbpri6AB60TTKmPUFbjAhO7+hIyiCK/rC6SaWLPcag6Dw/HXJBfw3w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxSy2wKCNjm75a7q/2f6JL2PNMUaDtvecZKdY/0C+5/ZbSPkhP
-	yflJVrk+7Ne+z61JKDEU1EUKy7VJ0hSINAGmS0uzVvS2LP/uXP4FOEN5Z/9reTu3btKPyiyHNqG
-	FE41SUMOcdYwOAbXZAtgkXtc6/Mk=
-X-Google-Smtp-Source: AGHT+IHTrFhMlY0mu/G+RXpZnyeIw7i/v2ZmgjUtm3x60VmXOAXRT4o1706xtyGtGLxxknXCe3hb49bt+W6ImpCZYYk=
-X-Received: by 2002:a17:907:608c:b0:ac4:3cd:2cb2 with SMTP id
- a640c23a62f3a-acad3446924mr983552166b.1.1744639201346; Mon, 14 Apr 2025
- 07:00:01 -0700 (PDT)
+	s=arc-20240116; t=1744639606; c=relaxed/simple;
+	bh=sq85iaZePSBodnWG8dw4mchGLQuXkq+ro1j3ch5BREc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uBVn4RjittJqxIaEhb+4wC1jg6piKiC6QjmPC16VriW22QtBiyjHIkMNCFy5S5CEqTrE7F9NCSnsLc4bj6lNtBzCncS9BapjPUVARb/+O99qZi/aZh2ahjugCxF8DXq5xWw1o5vVRxZu3zGU03TK0kzwtuXvVbzEnoEQYChwbdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mD3zl81e; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-ac297cbe017so978466166b.0;
+        Mon, 14 Apr 2025 07:06:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744639603; x=1745244403; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MqJHataDJN13GWdlaeETKdRNTar6wX0Omb0Dui9smng=;
+        b=mD3zl81emCLRpvfHaC5XjAZpfh7XkJirP0y4izQZnpi8SnCKqfdP+d7UkR9+kBXuiN
+         8+kxRUGepxEKAsH1VkuiGf8sakNH5KFYAwHpg0loNCwFm1YJYmiaZEFz8/8fMI7YEXNi
+         I2jGIQlDX3njmTpuHlMXaik/WLHWjX1QENHHtFBGa2G3wZrMYYwJLVxHo7IH3NT+4kC0
+         8ydOdiPotVZO/1LEv6w4zBXTieshVg8lwZSFzRE1KmZr8fjoJ56iw8Xqos+ZvRrgcPpU
+         KpqPNDccjn3IXNBk4Q8GRTkF1WH3BmOvTKHvwRAFp/8l6oUeZhSIzCvFkjAc8bcTtQGS
+         vBGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744639603; x=1745244403;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MqJHataDJN13GWdlaeETKdRNTar6wX0Omb0Dui9smng=;
+        b=DYtMCvfnamlZXhLHBrdYVuJFHAqhQVbgCCJlSyeoQJziMbXafXrr7q7RwzL4yVMtMh
+         bGxpDtv+AbOVLClR0xw/irgznY0u27xYAOfSn/I3Eusrmp/rufJd7vmT2HKfnA6L3ZMH
+         BXrbOKkLGGcX18B0J7Q7p7jabIGbDpkLHz1o9kd6G8xbhPpd7iRV9TO8eZJp/612w1w2
+         krgC2eL1trJRQJeRZ/H5oQhNVtm1ay5ZX9DtGoaVPHqRu5rqVGeN7kH11jdxwXFkn6sr
+         J4XAPNx989lRXI5skGd4FB8i8FeBzBNlovpcxkeMvbd8Ig7kFq37l1LDH0nrWuCrEEg+
+         AOjA==
+X-Forwarded-Encrypted: i=1; AJvYcCU7MY0ut8U7Ksr8ZMcaJMp6qfeO0Ad60eCEIV9x2tZOkTsP0aLggW6wh3Ep9zFE9/F7RzLM5bs7Te9i4AIM@vger.kernel.org, AJvYcCVpq+hbkvOYyt1d0JByREbpKDmvxrbbSkbQbRdqNlzbXrn/komBDroeHPgJ3fDYGRStLkA=@vger.kernel.org, AJvYcCWm5h+qqtNJ1NZid4jq3Ro0hzH5cFxIOqhn5Po3ZZ8cjiP0CT6PvcqR7bMsc6XGBbemzlUVj86aZ5zf/dwf@vger.kernel.org, AJvYcCXYQFJvfS3hg+Dw5hMFOWEGJm5JDlcY3SZbAzI2broQ8mkxQmQ7HW9rNpl67DFKp00a8lCKbGKGsWrQ@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/AecL3RbXkTFk52E/Ft+cgVVALFW07mKUNPKLP5A+lTR+mw0m
+	Ekj4+zH37m4XDSVf15FsY4DsK4Avnuf9FXVh9WHV7t3gI3tIKrb8
+X-Gm-Gg: ASbGncstJ70KHtG8nmq56t/DLh/fMjt/BMNjgdoG3wvHtJCkx6BDrnqfrIArbdW1Vl/
+	DJRfSfMIWJL/LQXcHquWpHcNp8Q1ho8fxmaoRffjuX+J7qZGPlOnxQ1fav2lhzt0olt9xG+gW/e
+	AlbWAnsbitEF2hY1eC7wx6qWW5hq48IQw02QQEyZQrlsYqtoRNa56GodhG+HLjjVICa6OfIvE4E
+	+uvY4ETekCgAzwFxvVy7CkgRfelOyKx0sUGRiY85o1m40R9Lv8rSldsK6+bRjmrTS6iZapebRkT
+	j1zEHZ6BtqBvYnJ5OXd5+OV1kOjiCOeUhOk3Zg+Xig==
+X-Google-Smtp-Source: AGHT+IGv7I7mfcP3SkB2yL+BqA/SYvY6RgaRIDLCbA6d3KCPxX8mr0qnv7srH/JCsek7/hDZZbZ5NA==
+X-Received: by 2002:a17:907:1b10:b0:ac2:7ce7:cd2b with SMTP id a640c23a62f3a-acad1622b9emr958079466b.2.1744639603046;
+        Mon, 14 Apr 2025 07:06:43 -0700 (PDT)
+Received: from [192.168.1.100] ([46.248.82.114])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acaa1ccd1cfsm916454566b.138.2025.04.14.07.06.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Apr 2025 07:06:42 -0700 (PDT)
+Message-ID: <01c65464-8535-28d8-a9b5-eb4f90114e2d@gmail.com>
+Date: Mon, 14 Apr 2025 16:06:41 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250410035647.3501139-1-maobibo@loongson.cn> <20250410035647.3501139-2-maobibo@loongson.cn>
-In-Reply-To: <20250410035647.3501139-2-maobibo@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Mon, 14 Apr 2025 21:59:57 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H5-RXzHP8L2Hv6Drvaakwv4v=NYcDQhQUkzOEcgPTMm1Q@mail.gmail.com>
-X-Gm-Features: ATxdqUFqgrZzEtN3FqqqG0wrYHfkvjREitGDfkEtzooKC0jRIO4R0yaVZNfMm3U
-Message-ID: <CAAhV-H5-RXzHP8L2Hv6Drvaakwv4v=NYcDQhQUkzOEcgPTMm1Q@mail.gmail.com>
-Subject: Re: [PATCH v8 1/4] KVM: selftests: Add KVM selftests header files for LoongArch
-To: Bibo Mao <maobibo@loongson.cn>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Sean Christopherson <seanjc@google.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH 4/6] x86,hyperv: Clean up hv_do_hypercall()
+To: Peter Zijlstra <peterz@infradead.org>, x86@kernel.org
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, hpa@zytor.com, jpoimboe@kernel.org,
+ pawan.kumar.gupta@linux.intel.com, seanjc@google.com, pbonzini@redhat.com,
+ ardb@kernel.org, kees@kernel.org, Arnd Bergmann <arnd@arndb.de>,
+ gregkh@linuxfoundation.org, linux-hyperv@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-efi@vger.kernel.org, samitolvanen@google.com, ojeda@kernel.org
+References: <20250414111140.586315004@infradead.org>
+ <20250414113754.285564821@infradead.org>
+Content-Language: en-US
+From: Uros Bizjak <ubizjak@gmail.com>
+In-Reply-To: <20250414113754.285564821@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi, Bibo,
 
-On Thu, Apr 10, 2025 at 11:57=E2=80=AFAM Bibo Mao <maobibo@loongson.cn> wro=
-te:
->
-> Add KVM selftests header files for LoongArch, including processor.h
-> and kvm_util_base.h. It mainly contains LoongArch CSR register
-> definition and page table entry definition.
->
-> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+
+On 14. 04. 25 13:11, Peter Zijlstra wrote:
+> What used to be a simple few instructions has turned into a giant mess
+> (for x86_64). Not only does it use static_branch wrong, it mixes it
+> with dynamic branches for no apparent reason.
+> 
+> Notably it uses static_branch through an out-of-line function call,
+> which completely defeats the purpose, since instead of a simple
+> JMP/NOP site, you get a CALL+RET+TEST+Jcc sequence in return, which is
+> absolutely idiotic.
+> 
+> Add to that a dynamic test of hyperv_paravisor_present, something
+> which is set once and never changed.
+> 
+> Replace all this idiocy with a single direct function call to the
+> right hypercall variant.
+> 
+> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 > ---
->  .../testing/selftests/kvm/include/kvm_util.h  |   5 +
->  .../kvm/include/loongarch/kvm_util_arch.h     |   7 +
->  .../kvm/include/loongarch/processor.h         | 138 ++++++++++++++++++
->  3 files changed, 150 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/include/loongarch/kvm_uti=
-l_arch.h
->  create mode 100644 tools/testing/selftests/kvm/include/loongarch/process=
-or.h
->
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testi=
-ng/selftests/kvm/include/kvm_util.h
-> index 373912464fb4..d9cb62207c57 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -232,6 +232,11 @@ extern enum vm_guest_mode vm_mode_default;
->  #define MIN_PAGE_SHIFT                 12U
->  #define ptes_per_page(page_size)       ((page_size) / 8)
->
-> +#elif defined(__loongarch__)
-> +#define VM_MODE_DEFAULT                        VM_MODE_P36V47_16K
-Maybe we can add VM_MODE_P40V47_16K and VM_MODE_P48V47_16K? That is
-more suitable for LoongArch in my opinion.
+>   arch/x86/hyperv/hv_init.c       |   21 ++++++
+>   arch/x86/hyperv/ivm.c           |   14 ++++
+>   arch/x86/include/asm/mshyperv.h |  137 +++++++++++-----------------------------
+>   arch/x86/kernel/cpu/mshyperv.c  |   18 +++--
+>   4 files changed, 88 insertions(+), 102 deletions(-)
+> 
+> --- a/arch/x86/hyperv/hv_init.c
+> +++ b/arch/x86/hyperv/hv_init.c
+> @@ -35,7 +35,28 @@
+>   #include <linux/highmem.h>
+>   
+>   void *hv_hypercall_pg;
+> +
+> +#ifdef CONFIG_X86_64
+> +u64 hv_pg_hypercall(u64 control, u64 param1, u64 param2)
+> +{
+> +	u64 hv_status;
+> +
+> +	if (!hv_hypercall_pg)
+> +		return U64_MAX;
+> +
+> +	register u64 __r8 asm("r8") = param2;
+> +	asm volatile (CALL_NOSPEC
+> +		      : "=a" (hv_status), ASM_CALL_CONSTRAINT,
+> +		        "+c" (control), "+d" (param1)
+> +		      : "r" (__r8),
 
-> +#define MIN_PAGE_SHIFT                 12U
-> +#define ptes_per_page(page_size)       ((page_size) / 8)
+r8 is call-clobbered register, so you should use "+r" (__r8) to properly 
+clobber it:
+
+		        "+c" (control), "+d" (param1), "+r" (__r8)
+		      : THUNK_TARGET(hv_hypercall_pg)
+
+> +		      : "cc", "memory", "r9", "r10", "r11");
 > +
->  #endif
->
->  #define VM_SHAPE_DEFAULT       VM_SHAPE(VM_MODE_DEFAULT)
-> diff --git a/tools/testing/selftests/kvm/include/loongarch/kvm_util_arch.=
-h b/tools/testing/selftests/kvm/include/loongarch/kvm_util_arch.h
-> new file mode 100644
-> index 000000000000..e43a57d99b56
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/include/loongarch/kvm_util_arch.h
-> @@ -0,0 +1,7 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +#ifndef SELFTEST_KVM_UTIL_ARCH_H
-> +#define SELFTEST_KVM_UTIL_ARCH_H
-> +
-> +struct kvm_vm_arch {};
-> +
-> +#endif  // SELFTEST_KVM_UTIL_ARCH_H
-> diff --git a/tools/testing/selftests/kvm/include/loongarch/processor.h b/=
-tools/testing/selftests/kvm/include/loongarch/processor.h
-> new file mode 100644
-> index 000000000000..e95dd2059605
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/include/loongarch/processor.h
-> @@ -0,0 +1,138 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +
-> +#ifndef SELFTEST_KVM_PROCESSOR_H
-> +#define SELFTEST_KVM_PROCESSOR_H
-> +
-> +#ifndef __ASSEMBLER__
-> +#include "ucall_common.h"
-> +
+> +	return hv_status;
+> +}
 > +#else
-> +/* general registers */
-> +#define zero                           $r0
-> +#define ra                             $r1
-> +#define tp                             $r2
-> +#define sp                             $r3
-> +#define a0                             $r4
-> +#define a1                             $r5
-> +#define a2                             $r6
-> +#define a3                             $r7
-> +#define a4                             $r8
-> +#define a5                             $r9
-> +#define a6                             $r10
-> +#define a7                             $r11
-> +#define t0                             $r12
-> +#define t1                             $r13
-> +#define t2                             $r14
-> +#define t3                             $r15
-> +#define t4                             $r16
-> +#define t5                             $r17
-> +#define t6                             $r18
-> +#define t7                             $r19
-> +#define t8                             $r20
-> +#define u0                             $r21
-> +#define fp                             $r22
-> +#define s0                             $r23
-> +#define s1                             $r24
-> +#define s2                             $r25
-> +#define s3                             $r26
-> +#define s4                             $r27
-> +#define s5                             $r28
-> +#define s6                             $r29
-> +#define s7                             $r30
-> +#define s8                             $r31
+>   EXPORT_SYMBOL_GPL(hv_hypercall_pg);
 > +#endif
+>   
+>   union hv_ghcb * __percpu *hv_ghcb_pg;
+>   
+> --- a/arch/x86/hyperv/ivm.c
+> +++ b/arch/x86/hyperv/ivm.c
+> @@ -376,6 +376,20 @@ int hv_snp_boot_ap(u32 cpu, unsigned lon
+>   	return ret;
+>   }
+>   
+> +u64 hv_snp_hypercall(u64 control, u64 param1, u64 param2)
+> +{
+> +	u64 hv_status;
 > +
-> +/* LoongArch page table entry definition */
-> +#define _PAGE_VALID_SHIFT              0
-> +#define _PAGE_DIRTY_SHIFT              1
-> +#define _PAGE_PLV_SHIFT                        2  /* 2~3, two bits */
-> +#define  PLV_KERN                      0
-> +#define  PLV_USER                      3
-> +#define  PLV_MASK                      0x3
-> +#define _CACHE_SHIFT                   4  /* 4~5, two bits */
-> +#define _PAGE_PRESENT_SHIFT            7
-> +#define _PAGE_WRITE_SHIFT              8
-> +
-> +#define _PAGE_VALID                    BIT_ULL(_PAGE_VALID_SHIFT)
-> +#define _PAGE_PRESENT                  BIT_ULL(_PAGE_PRESENT_SHIFT)
-> +#define _PAGE_WRITE                    BIT_ULL(_PAGE_WRITE_SHIFT)
-> +#define _PAGE_DIRTY                    BIT_ULL(_PAGE_DIRTY_SHIFT)
-> +#define _PAGE_USER                     (PLV_USER << _PAGE_PLV_SHIFT)
-> +#define   __READABLE                   (_PAGE_VALID)
-> +#define   __WRITEABLE                  (_PAGE_DIRTY | _PAGE_WRITE)
-> +/* Coherent Cached */
-> +#define _CACHE_CC                      BIT_ULL(_CACHE_SHIFT)
-> +#define PS_4K                          0x0000000c
-> +#define PS_8K                          0x0000000d
-> +#define PS_16K                         0x0000000e
-The page size supported by kernel is 4K, 16K and 64K, so remove 8K and add =
-64K?
+> +	register u64 __r8 asm("r8") = param2;
+> +	asm volatile("vmmcall"
+> +		     : "=a" (hv_status), ASM_CALL_CONSTRAINT,
+> +		       "+c" (control), "+d" (param1)
+> +		     : "r" (__r8)
 
-Huacai
+Also here:
+		        "+c" (control), "+d" (param1), "+r" (__r8)
+		      :
 
-> +#define PS_DEFAULT_SIZE                        PS_16K
+> +		     : "cc", "memory", "r9", "r10", "r11");
 > +
-> +/* LoongArch Basic CSR registers */
-> +#define LOONGARCH_CSR_CRMD             0x0 /* Current mode info */
-> +#define  CSR_CRMD_PG_SHIFT             4
-> +#define  CSR_CRMD_PG                   BIT_ULL(CSR_CRMD_PG_SHIFT)
-> +#define  CSR_CRMD_IE_SHIFT             2
-> +#define  CSR_CRMD_IE                   BIT_ULL(CSR_CRMD_IE_SHIFT)
-> +#define  CSR_CRMD_PLV_SHIFT            0
-> +#define  CSR_CRMD_PLV_WIDTH            2
-> +#define  CSR_CRMD_PLV                  (0x3UL << CSR_CRMD_PLV_SHIFT)
-> +#define  PLV_MASK                      0x3
-> +#define LOONGARCH_CSR_PRMD             0x1
-> +#define LOONGARCH_CSR_EUEN             0x2
-> +#define LOONGARCH_CSR_ECFG             0x4
-> +#define LOONGARCH_CSR_ESTAT            0x5  /* Exception status */
-> +#define LOONGARCH_CSR_ERA              0x6  /* ERA */
-> +#define LOONGARCH_CSR_BADV             0x7  /* Bad virtual address */
-> +#define LOONGARCH_CSR_EENTRY           0xc
-> +#define LOONGARCH_CSR_TLBIDX           0x10 /* TLB Index, EHINV, PageSiz=
-e */
-> +#define  CSR_TLBIDX_PS_SHIFT           24
-> +#define  CSR_TLBIDX_PS_WIDTH           6
-> +#define  CSR_TLBIDX_PS                 (0x3fUL << CSR_TLBIDX_PS_SHIFT)
-> +#define  CSR_TLBIDX_SIZEM              0x3f000000
-> +#define  CSR_TLBIDX_SIZE               CSR_TLBIDX_PS_SHIFT
-> +#define LOONGARCH_CSR_ASID             0x18 /* ASID */
-> +#define LOONGARCH_CSR_PGDL             0x19
-> +#define LOONGARCH_CSR_PGDH             0x1a
-> +/* Page table base */
-> +#define LOONGARCH_CSR_PGD              0x1b
-> +#define LOONGARCH_CSR_PWCTL0           0x1c
-> +#define LOONGARCH_CSR_PWCTL1           0x1d
-> +#define LOONGARCH_CSR_STLBPGSIZE       0x1e
-> +#define LOONGARCH_CSR_CPUID            0x20
-> +#define LOONGARCH_CSR_KS0              0x30
-> +#define LOONGARCH_CSR_KS1              0x31
-> +#define LOONGARCH_CSR_TMID             0x40
-> +#define LOONGARCH_CSR_TCFG             0x41
-> +/* TLB refill exception entry */
-> +#define LOONGARCH_CSR_TLBRENTRY                0x88
-> +#define LOONGARCH_CSR_TLBRSAVE         0x8b
-> +#define LOONGARCH_CSR_TLBREHI          0x8e
-> +#define  CSR_TLBREHI_PS_SHIFT          0
-> +#define  CSR_TLBREHI_PS                        (0x3fUL << CSR_TLBREHI_PS=
-_SHIFT)
-> +
-> +#define EXREGS_GPRS                    (32)
-> +
-> +#ifndef __ASSEMBLER__
-> +void handle_tlb_refill(void);
-> +void handle_exception(void);
-> +
-> +struct ex_regs {
-> +       unsigned long regs[EXREGS_GPRS];
-> +       unsigned long pc;
-> +       unsigned long estat;
-> +       unsigned long badv;
-> +};
-> +
-> +#define PC_OFFSET_EXREGS               offsetof(struct ex_regs, pc)
-> +#define ESTAT_OFFSET_EXREGS            offsetof(struct ex_regs, estat)
-> +#define BADV_OFFSET_EXREGS             offsetof(struct ex_regs, badv)
-> +#define EXREGS_SIZE                    sizeof(struct ex_regs)
-> +
-> +#else
-> +#define PC_OFFSET_EXREGS               ((EXREGS_GPRS + 0) * 8)
-> +#define ESTAT_OFFSET_EXREGS            ((EXREGS_GPRS + 1) * 8)
-> +#define BADV_OFFSET_EXREGS             ((EXREGS_GPRS + 2) * 8)
-> +#define EXREGS_SIZE                    ((EXREGS_GPRS + 3) * 8)
-> +#endif
-> +
-> +#endif /* SELFTEST_KVM_PROCESSOR_H */
-> --
-> 2.39.3
->
+> +	return hv_status;
+> +}
+
+Uros.
 
