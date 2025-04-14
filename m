@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-43308-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43309-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B48BA88E77
-	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 23:55:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C600AA88E7B
+	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 23:56:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 870BF3B458D
-	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 21:55:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C84017D65C
+	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 21:56:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB3102343AE;
-	Mon, 14 Apr 2025 21:49:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30378235361;
+	Mon, 14 Apr 2025 21:49:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1GhSnsF7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="awhRlCt+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C4722B8CB
-	for <kvm@vger.kernel.org>; Mon, 14 Apr 2025 21:49:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B1F423372A
+	for <kvm@vger.kernel.org>; Mon, 14 Apr 2025 21:49:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744667358; cv=none; b=Q5PFmNppeU69uZCx89LvtPqueEx1huObjOwcr2S2G1RHkfe4R2u072aqtHHy9dVNUxJrRfqM+jFi3PFM1toh/KWwVdBBQgDJbZ6C8IrX2RlLPesQecoa+zKHfs+gHW4siaP59IlSATyWCXinZw4iTC0hSAYxGA46ZoZk6XxmQFc=
+	t=1744667360; cv=none; b=SqbBwQ3PbA3fwXNF9PmchyQDiCLplBoCecgcZR6wo7GAaMZLcrGezXHofQhMQvyyUcWhuJVqPj3mvGdys/1CIfzC7uQzwlyHvoTx+5A6/o6nNOVkueoQKH9/T2+LMMtOccrWq+8DW9M9v/XrntblwkmPSJQNBrGffxdoxdtKgps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744667358; c=relaxed/simple;
-	bh=RUYEkYTMaq/3BlLYohoirll+7ThOc3FAQ0S52ejBi18=;
+	s=arc-20240116; t=1744667360; c=relaxed/simple;
+	bh=hLajejGITcuhaXBIRXTQrFTsOjzlzEWxNRGtAI1RMps=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kYXxvQCH3wPUGYoB6goBX6LClTpSXrHRxTKgN6pNhPqfhHoQygLPwReEaO4ZCk6V91BGVvppORzNApPU0vsnT+1BCY1I01gHtbVLGnlI/BZSB7jk4VunPYrPpwtdxWCjOSFGCq26diOpJAnbERtr1g1doH1cMoJjqNuT4yxOMkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1GhSnsF7; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=OBwwutkiQZQ9bAtUQtbfG7hGbPSE2rgcw2CTZCnzqgWy2g6s85OhV6CTE4rHTAR/sE5cGofy/apx7WcxbnIJ+qgiU47HLisPl/+TScmE4yU+c/At/K4CLD2CFXiuOrfDge+5jqub3s3CROeEM6bYvVdTdiONvUb+wSWGvNoCd4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=awhRlCt+; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff798e8c3bso4518747a91.2
-        for <kvm@vger.kernel.org>; Mon, 14 Apr 2025 14:49:17 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-af91804dd0bso2881401a12.2
+        for <kvm@vger.kernel.org>; Mon, 14 Apr 2025 14:49:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744667356; x=1745272156; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1744667358; x=1745272158; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nMPet3QDUUSXb/aMjIhmKZ7iY71MK1Il6Y5uwK/4fYE=;
-        b=1GhSnsF7pP4ccVmf0VOKlcSA8LYxznW0+e5EKlCOcF12WNcSeiIByjIwnnGsmoMegI
-         YiSmAVwLKTdRilAx0xUoRP/czjD2zu/yXEJRA5NutKZUhls9HC14TOQmpzIJoOYE78q8
-         cZbcwQp9FTw2aeQK/C+1lWZYmclGvOuIrLhG/Ao35v4SZHZUo4BXlrlx23skX52D9y28
-         TdDWfyFq+klOjT/knXy9m3+aRjw9vvC9IJi2Ql11/tx6m3p+UCv/VPBXzT+sdj5lMHmf
-         It/N5qf+R+RhcigF795IWprTFs92AuDK0PTpLCMyXf6sRV7uj+b7/unYFa0NQ3ahRr5E
-         u4ig==
+        bh=oo1IP0uWcijK66QdAGH5hRccKPpzDDEL85AFTPGHKFQ=;
+        b=awhRlCt+RSvO839lFmcim4Hri8mSx9euu6V1570ZRb4f532wBTUNIHpZm6GJr7ydid
+         mrYznaVjnKJcwASEq6fYamgdqwRuDDhyWgMUkv6yoX0N2MIjX6l93O2xnL9p2BCdFGId
+         nLsZlym6x6oj4E4RLXY4wz46mbeJ89bgqiYb4UoCaH1qe1OfTW8tHi7wgQVL5MLIxne7
+         5YYhPZzSdLWbakNs6wxXb8BXtBJOFS2bpDqGR90y0re4kpMiIg1RN3jfKkl+XHUm4Kzw
+         MULEfvak8KJzEvGNibSWVxgQ9utksUBWlMcvZ0pHTVYq2TgEIvHZVJ9lkw6Fbv0DWVwg
+         M6uA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744667356; x=1745272156;
+        d=1e100.net; s=20230601; t=1744667358; x=1745272158;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nMPet3QDUUSXb/aMjIhmKZ7iY71MK1Il6Y5uwK/4fYE=;
-        b=OFEUO0jp0kY+brPMqE2EKumLBclPYnxfRYmvN9erC9UQWPxPV8QA1bw2nByDCkA6K6
-         tz8Pd5SDN6EMDp24C7ryo73Ti0EeXRqxUTooIsmjrBeqm2gSOlGD+hLG/cFx9HSTeHxy
-         SvGowRKUt/YGmw3zLHI7JfasHnzCksWgBpOlF94ZLQ7BD1JobknhA70Jx+fjuwigEOfs
-         j7HF4V95pq6GfexSYFGqNPbbAM4xuscYClB9zdt5h4O/GWH/2F4eaz7oZ/zFKoKP+Cg4
-         7FqN4z0oI+YdnIG93L6qD01w3K+5Ddd/I3nR78CeBeDoOhoQT8zFVMRZVn9Ucm7l+Vt6
-         Oi9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVTeBv1v6ibV7ZZqzv2nsX5Ob2dLtPNLDoR/g6Ju/pix97Ub0xpus0XjZP6im1d7Bnxzpg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyq7LmKZ1wFYXRT+iNF9fVuPPqCyRfBvzeebcCELDugTJlwV49K
-	t1GEYhLwahET2ox2AVXNOsVMNvsdIMaqh69khnd3gHCz4afnPTRW9j7qmt8CH8Aq/qzaXzAdpg=
+        bh=oo1IP0uWcijK66QdAGH5hRccKPpzDDEL85AFTPGHKFQ=;
+        b=Ta3f578s/Bw+u3ubIkzIkpQgGmsTIU+mLdPA+DfijvMQ0qcxHNpPL0o+DyIp4D43Yn
+         0MkqF3A5P2hU7zUva53ccz005rPfxNAQY6V5tKzxPYob5QMqHKARAjkD4P+iRW2DN6Ge
+         Fy6idyYa9ICmMSGspcZxKRQ5P4TBr74ECQmWnQVNcWPH0wBX7aGimhRsUlyxzssNZB1g
+         8RwlrsQH1EaR5OZJNzSnkp1GK4sVzKh3sbF3+0tVkPk0UXmAjCdEpHjmjRdBeRRn8UXE
+         UytmYrsW1mctanxYwpm3tA2yhZara4ZjcKO3XxZUF347MHfYkjxNLfZtyQnhjig5csx1
+         Mz5A==
+X-Forwarded-Encrypted: i=1; AJvYcCXkM8MhRnwGtOfUIVsDkDCaKb+9VYs+v4vMh1QvUlfvufRePYNaIJrCGvej1yawW3+mS8g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy79EhoYYXxNYIXrmA2hAZBFX/VS4JuRgDw3QzyuF1O1JsArua9
+	lcXkFly85XzFxKYwgy6kRTMJm6ZwBftVawdzDdEXVOXkmIjlYFK7O5Uls1JOT97+2rtQuH5cbw=
 	=
-X-Google-Smtp-Source: AGHT+IF6DTwMtcpY+dm9XhXfMkBL/aQSNoT9zozLSWGA40+RquY/Obe0DR00PEcuF3BMTI6cgXnFJZGzFw==
-X-Received: from pjbtc15.prod.google.com ([2002:a17:90b:540f:b0:2fa:1fac:2695])
- (user=sagis job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:534d:b0:2ee:863e:9ffc
- with SMTP id 98e67ed59e1d1-30823646e88mr17299676a91.21.1744667356611; Mon, 14
- Apr 2025 14:49:16 -0700 (PDT)
-Date: Mon, 14 Apr 2025 14:47:54 -0700
+X-Google-Smtp-Source: AGHT+IHAofPIGSKzrHScymrPJdqDpM5RU2HCackGHmvSKi1y01zbyqaKV2rM505+l4lypM3CcWok4IqT7w==
+X-Received: from pgpk1.prod.google.com ([2002:a63:ab41:0:b0:b05:1101:88f])
+ (user=sagis job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:4581:b0:1ee:e46d:58a2
+ with SMTP id adf61e73a8af0-2017978b1f2mr20956324637.3.1744667357888; Mon, 14
+ Apr 2025 14:49:17 -0700 (PDT)
+Date: Mon, 14 Apr 2025 14:47:55 -0700
 In-Reply-To: <20250414214801.2693294-1-sagis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250414214801.2693294-1-sagis@google.com>
 X-Mailer: git-send-email 2.49.0.777.g153de2bbd5-goog
-Message-ID: <20250414214801.2693294-26-sagis@google.com>
-Subject: [PATCH v6 25/30] KVM: selftests: KVM: selftests: Expose new vm_vaddr_alloc_private()
+Message-ID: <20250414214801.2693294-27-sagis@google.com>
+Subject: [PATCH v6 26/30] KVM: selftests: TDX: Add support for TDG.MEM.PAGE.ACCEPT
 From: Sagi Shahar <sagis@google.com>
 To: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
 	Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>, 
@@ -90,48 +90,58 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Ackerley Tng <ackerleytng@google.com>
 
-vm_vaddr_alloc_private allow specifying both the virtual and physical
-addresses for the allocation.
+Add support for TDG.MEM.PAGE.ACCEPT that the guest uses to accept
+a pending private page, previously added by TDH.MEM.PAGE.AUG or after
+conversion using the KVM_SET_MEMORY_ATTRIBUTES ioctl().
 
 Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 Signed-off-by: Sagi Shahar <sagis@google.com>
 ---
- tools/testing/selftests/kvm/include/kvm_util.h | 3 +++
- tools/testing/selftests/kvm/lib/kvm_util.c     | 7 +++++++
- 2 files changed, 10 insertions(+)
+ tools/testing/selftests/kvm/include/x86/tdx/tdx.h | 2 ++
+ tools/testing/selftests/kvm/lib/x86/tdx/tdx.c     | 7 +++++++
+ 2 files changed, 9 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index 442e34c6ed84..690aef6f887c 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -611,6 +611,9 @@ vm_vaddr_t __vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min,
- vm_vaddr_t vm_vaddr_alloc_shared(struct kvm_vm *vm, size_t sz,
- 				 vm_vaddr_t vaddr_min,
- 				 enum kvm_mem_region_type type);
-+vm_vaddr_t vm_vaddr_alloc_private(struct kvm_vm *vm, size_t sz,
-+				  vm_vaddr_t vaddr_min, vm_paddr_t paddr_min,
-+				  enum kvm_mem_region_type type);
- vm_vaddr_t vm_vaddr_identity_alloc(struct kvm_vm *vm, size_t sz,
- 				   vm_vaddr_t vaddr_min,
- 				   enum kvm_mem_region_type type);
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 008f01831036..9e0e28b6e9dd 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -1486,6 +1486,13 @@ vm_vaddr_t vm_vaddr_alloc_shared(struct kvm_vm *vm, size_t sz,
- 	return ____vm_vaddr_alloc(vm, sz, vaddr_min, KVM_UTIL_MIN_PFN * vm->page_size, type, false);
- }
+diff --git a/tools/testing/selftests/kvm/include/x86/tdx/tdx.h b/tools/testing/selftests/kvm/include/x86/tdx/tdx.h
+index 88f3571df16f..53637159fa12 100644
+--- a/tools/testing/selftests/kvm/include/x86/tdx/tdx.h
++++ b/tools/testing/selftests/kvm/include/x86/tdx/tdx.h
+@@ -7,6 +7,7 @@
+ #include "kvm_util.h"
  
-+vm_vaddr_t vm_vaddr_alloc_private(struct kvm_vm *vm, size_t sz,
-+				  vm_vaddr_t vaddr_min, vm_paddr_t paddr_min,
-+				  enum kvm_mem_region_type type)
-+{
-+	return ____vm_vaddr_alloc(vm, sz, vaddr_min, paddr_min, type, true);
-+}
+ #define TDG_VP_INFO 1
++#define TDG_MEM_PAGE_ACCEPT 6
+ 
+ #define TDG_VP_VMCALL_GET_TD_VM_CALL_INFO 0x10000
+ #define TDG_VP_VMCALL_MAP_GPA 0x10001
+@@ -40,5 +41,6 @@ uint64_t tdg_vp_info(uint64_t *rcx, uint64_t *rdx,
+ 		     uint64_t *r8, uint64_t *r9,
+ 		     uint64_t *r10, uint64_t *r11);
+ uint64_t tdg_vp_vmcall_map_gpa(uint64_t address, uint64_t size, uint64_t *data_out);
++uint64_t tdg_mem_page_accept(uint64_t gpa, uint8_t level);
+ 
+ #endif // SELFTEST_TDX_TDX_H
+diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/tdx.c b/tools/testing/selftests/kvm/lib/x86/tdx/tdx.c
+index bae84c34c19e..a51ab7511936 100644
+--- a/tools/testing/selftests/kvm/lib/x86/tdx/tdx.c
++++ b/tools/testing/selftests/kvm/lib/x86/tdx/tdx.c
+@@ -3,6 +3,7 @@
+ #include <linux/kvm_para.h>
+ #include <string.h>
+ 
++#include "processor.h"
+ #include "tdx/tdcall.h"
+ #include "tdx/tdx.h"
+ #include "tdx/tdx_util.h"
+@@ -215,3 +216,9 @@ uint64_t tdg_vp_vmcall_map_gpa(uint64_t address, uint64_t size, uint64_t *data_o
+ 		*data_out = args.r11;
+ 	return ret;
+ }
 +
- /*
-  * Allocate memory in @vm of size @sz beginning with the desired virtual address
-  * of @vaddr_min and backed by physical address equal to returned virtual
++uint64_t tdg_mem_page_accept(uint64_t gpa, uint8_t level)
++{
++	return __tdx_module_call(TDG_MEM_PAGE_ACCEPT, (gpa & PAGE_MASK) | level,
++				 0, 0, 0, NULL);
++}
 -- 
 2.49.0.504.g3bcea36a83-goog
 
