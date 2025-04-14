@@ -1,129 +1,122 @@
-Return-Path: <kvm+bounces-43220-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43226-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2505FA87D4D
-	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 12:16:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B886A87F60
+	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 13:41:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCAC93B6F30
-	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 10:16:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 317D23B8BD5
+	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 11:40:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7957F2676D2;
-	Mon, 14 Apr 2025 10:16:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C34142BF3D6;
+	Mon, 14 Apr 2025 11:39:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OtevI2R7"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bG92G56O"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34BCD2620FA
-	for <kvm@vger.kernel.org>; Mon, 14 Apr 2025 10:16:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEBF529CB4E;
+	Mon, 14 Apr 2025 11:39:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744625779; cv=none; b=nevhn12M0LjVVwC+ZhvJeFqA5fYtuFU0MXp4G5VMZlzJmT+qXCMTvSXRjqkBuL1u+TLvUx6kXRHS7FxrRTBZfSEXvb9I1kBCLu4cJ1/wVVAC2arJY8Rsx1S+sKQxdTpiY68yMlGY92gF+GD83cmfjUvzgzAlg7/iqi9DWhJuoZU=
+	t=1744630782; cv=none; b=oD99ta3U7E14nJO+xUMNES1ar5NAkTjaWbly10rTFbaZfaHyr68k83rSU05i5DHZ6U+3jWXHWbXOm+NBbPZ0jt6SVRgDg9RlqHLOzYpN4WpoiwKsyPJOMfDWkqyqgrV1kGwwaNcr7dC2p1n+3/SrJvYmyis/7/xDzXsX7LyIos4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744625779; c=relaxed/simple;
-	bh=xSIJ0vFFb2+XHasdF5PAsBtux4dzXFv+jYFSL30pvgA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gCYrP3a1K+lHn5lEvXsbv8WnFrdAwTdE8vonSSoycsDhna0fa+mj5JlycCgjtkjCp8eA4G8r896j5Zxm9yZVdOSrzgKXRdZeIk4md2bq0yYlM0loeNix3/TiLvWXIpmWS7UStDsDAfmx/0+OKFyOgKETHBkmvQ+frnON3bAX/II=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OtevI2R7; arc=none smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4774611d40bso561401cf.0
-        for <kvm@vger.kernel.org>; Mon, 14 Apr 2025 03:16:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744625777; x=1745230577; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=m1CFhU+Us34qKNcUetLtx8bVGJXglYvmORKZst7qknM=;
-        b=OtevI2R7itWmdlsrUxGnakazuHZw5UzMq+22CMPxh1eoI5dUrcx3gSZA4j34QGjRIe
-         IsNsg1LUcPHopKs96MfNqJ8EuLBDZijLjrmRNNibmsJ88XWkhN9USmRb1l9TBChlvxqp
-         35zQxh947RlNHJp/SS3b2KzWKYslpuD8kC2AW3AzeXF2bCseu0hU9zlho3pEMEnOuy17
-         xtZJxvSPCAzQV3wtjhaUlQjmyJm6bZXTprRyMzgUfGmw1b6jdKpAzXN3Vc2UgFF4XgcR
-         8Qfqtt6ZW362T/PAyBtKeQM81jqptwcrdZST/RRORess3bdGRsN0ANqnxj8VpjvYyFey
-         UzNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744625777; x=1745230577;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=m1CFhU+Us34qKNcUetLtx8bVGJXglYvmORKZst7qknM=;
-        b=B0NwPg/1CmUUkD05MrehJdaZJ02QB48KkVEbWh2EPW8ccEY6jUZwdyoqjVyrOl90C+
-         BDxdW/3VcVCls/C/7XAUi8GkpQXafoE2ch4V4S8fy8gfdIjmrEuune+XFdkRZ9lin+7v
-         5fges+n3lrHrodtar+K6+n4+mVzTl9vH+Vymg/q2v9EoxaxUJYzkv7PRyDN5KaDkZq3u
-         5rMD5lyxAz/wjLfWbF75j+A8WgSWQquQWfLL+4VDV/rMdiP5ITzYh9EoZfLXXMQBTQpW
-         FQFT+KF4peqRUKidbfTzOlSMUbUzRaCtznpb4FQuqecj7XVSxVslzcGOGWhWdC8MWtDH
-         mKbg==
-X-Gm-Message-State: AOJu0YxiWLPUvOFHYAQ/4jZyI6a5QrVjQx9X1dScDCuEGcaNYbt/oEmH
-	deMftWR1XzOTrDOHI57/XeWnRX8jdNUTJ2Aw4TZ+F5KEcdXl2HFOha+RUJGBbr0d3dCqo3OUwMS
-	YfxzpHWvWhVZwdMPuBqea3qJ5pPuWq+Ri+vZs
-X-Gm-Gg: ASbGnct58TYk4yUISPXxFBCRfyLUaRKzrxw8yV2180pWQxasbBwZNKuUOqBdD0u9QgQ
-	FMvYtSDHvE13/JXAs280sml/S/R4ifTvOXq0MSW00UHX3WI5JZVpwL+nKrXXstUHtt54YRzEQZh
-	d9PWYborYpOPO+M4O+UYErVA==
-X-Google-Smtp-Source: AGHT+IE7N7CQyu6cJnoqxB5sCy6LSjPZ11zuPXGLhynUeIQf8hFCrB+6p/8yJNraIeugxZleuOsQPHl+eTNzV+QZxtk=
-X-Received: by 2002:a05:622a:181f:b0:477:871c:5e80 with SMTP id
- d75a77b69052e-479824864a1mr6442931cf.5.1744625776707; Mon, 14 Apr 2025
- 03:16:16 -0700 (PDT)
+	s=arc-20240116; t=1744630782; c=relaxed/simple;
+	bh=6J3jpg6mZS1i6MwpK5znANzetPA7TPZoqiKkCd+kiGs=;
+	h=Message-ID:Date:From:To:Cc:Subject; b=Z0HUCFi9UgLQ7CUltVcGTaeR3HtiAigvQeN03a7dleTZOua1VDl94xAesKoNy1YOA9aFhHScg34RftnVgSzfTXAchfEUqDelf0m/1V8cdU7BVazrq9B2rrgU7tCZXrs11D1x889h/9u1sT0gucNRGQfh49a2rAVJh1QeKy9oMyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=bG92G56O; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=Subject:Cc:To:From:Date:Message-ID:
+	Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=6J3jpg6mZS1i6MwpK5znANzetPA7TPZoqiKkCd+kiGs=; b=bG92G56OhWUV0ZKtc5qpU+fvvw
+	hkUgSGIXatqQm4Oguw2ZlsCnzCRrNU4q0WRuBWdxEqxrgt2cQcag8yPkAhzNbU+f6rHfAmtKdIM0H
+	BViuvEFjm+ZkIVYkYydg5RbgUaRQZaoHzkMJxfptl+gL2A+U34EW36N7kto23WaM76f9b/yYcB2RU
+	zsXQgG5XcpNzVetyPLw9JN1uvb2zyk/8rvs/msRzAbkhny2t8Z9rC0P08VBEkRDTzUuTzvGdwNWpP
+	oc2x5IM5697z1dGNlZ5ye6BJlTKwSfPBANNfZKJY1aLhCkyE7igOctawyqGzYVcb5nCkAF7o9RZ16
+	LQHcbSrQ==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1u4I9u-000000084Gt-0pkr;
+	Mon, 14 Apr 2025 11:39:26 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 0)
+	id 226A8300619; Mon, 14 Apr 2025 13:39:26 +0200 (CEST)
+Message-ID: <20250414111140.586315004@infradead.org>
+User-Agent: quilt/0.66
+Date: Mon, 14 Apr 2025 13:11:40 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: x86@kernel.org
+Cc: kys@microsoft.com,
+ haiyangz@microsoft.com,
+ wei.liu@kernel.org,
+ decui@microsoft.com,
+ tglx@linutronix.de,
+ mingo@redhat.com,
+ bp@alien8.de,
+ dave.hansen@linux.intel.com,
+ hpa@zytor.com,
+ peterz@infradead.org,
+ jpoimboe@kernel.org,
+ pawan.kumar.gupta@linux.intel.com,
+ seanjc@google.com,
+ pbonzini@redhat.com,
+ ardb@kernel.org,
+ kees@kernel.org,
+ Arnd Bergmann <arnd@arndb.de>,
+ gregkh@linuxfoundation.org,
+ linux-hyperv@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org,
+ linux-efi@vger.kernel.org,
+ samitolvanen@google.com,
+ ojeda@kernel.org
+Subject: [PATCH 0/6] objtool: Detect and warn about indirect calls in __nocfi functions
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250318161823.4005529-1-tabba@google.com> <20250318161823.4005529-4-tabba@google.com>
- <e3c26b84-5388-43f8-87ed-bee034f327b8@redhat.com>
-In-Reply-To: <e3c26b84-5388-43f8-87ed-bee034f327b8@redhat.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 14 Apr 2025 11:15:40 +0100
-X-Gm-Features: ATxdqUFTBJlpnwSmrV77Tym0H8Hp9RCIeXMAAODOU2G7ZtkMx-Y5jKinNbiiJow
-Message-ID: <CA+EHjTzpboCX7xseY5R1r0GHnea=mkMPi7h=vQp6ZCs7aKaXWQ@mail.gmail.com>
-Subject: Re: [PATCH v7 3/9] KVM: guest_memfd: Allow host to map guest_memfd() pages
-To: David Hildenbrand <david@redhat.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
-	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
-	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
-	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
-	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
-	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
-	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
-	hughd@google.com, jthoughton@google.com, peterx@redhat.com
-Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 14 Apr 2025 at 11:06, David Hildenbrand <david@redhat.com> wrote:
->
->
-> > +     /*
-> > +      * Shared folios would not be marked as "guestmem" so far, and we only
-> > +      * expect shared folios at this point.
-> > +      */
-> > +     if (WARN_ON_ONCE(folio_test_guestmem(folio)))  {
-> > +             ret = VM_FAULT_SIGBUS;
-> > +             goto out_folio;
-> > +     }
->
-> With that dropped for now
->
-> Acked-by: David Hildenbrand <david@redhat.com>
+Hi!
 
-Thanks!
-/fuad
+On kCFI (CONFIG_CFI_CLANG=y) builds all indirect calls should have the CFI
+check on (with very few exceptions). Not having the CFI checks undermines the
+protection provided by CFI and will make these sites candidates for people
+wanting to steal your cookies.
 
-> --
-> Cheers,
->
-> David / dhildenb
->
+Specifically the ABI changes are so that doing indirect calls without the CFI
+magic, to a CFI adorned function is not compatible (although it happens to work
+for some setups, it very much does not for FineIBT).
+
+Rust people tripped over this the other day, since their 'core' happened to
+have some no_sanitize(kcfi) bits in, which promptly exploded when ran with
+FineIBT on.
+
+Since this is very much not a supported model -- on purpose, have objtool
+detect and warn about such constructs.
+
+This effort [1] found all existins [2] non-cfi indirect calls in the kernel.
+
+Notably the KVM fastop emulation stuff -- which reminded me I still had pending
+patches there. Included here since they reduce the amount of fastop call sites,
+and the final patch includes an annotation for that. Although ideally we should
+look at means of doing fastops differently.
+
+KVM has another; the interrupt injection stuff calls the IDT handler directly.
+Is there an alternative? Can we keep a table of Linux functions slighly higher
+up the call stack (asm_\cfunc ?) and add CFI to those?
+
+HyperV hypercall page stuff, which I've previously suggested use direct calls,
+and which I've now converted (after getting properly annoyed with that code).
+
+
+[1] https://lkml.kernel.org/r/20250410154556.GB9003@noisy.programming.kicks-ass.net
+[2] https://lkml.kernel.org/r/20250410194334.GA3248459@google.com
+
+
 
