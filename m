@@ -1,45 +1,46 @@
-Return-Path: <kvm+bounces-43239-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43240-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A48F6A88342
-	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 15:53:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97641A8836F
+	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 15:57:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57C371888760
-	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 13:50:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC0A43AF4B3
+	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 13:50:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2DBB2C0AED;
-	Mon, 14 Apr 2025 13:30:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27ECE14B945;
+	Mon, 14 Apr 2025 13:30:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X+ZA/MO/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mHfytNwL"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CECE82C0319;
-	Mon, 14 Apr 2025 13:30:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AF4E2C0B0C;
+	Mon, 14 Apr 2025 13:30:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744637400; cv=none; b=pbi0TKzSUZar7qEiOOPjXjaAYuBuDmw1Py9l24r0uOvPBAIvw3vHr+nz2Eoa4gC3NTnNi2GJyBM3UB45XdK450PyQwRpifjum6cPaCM7unrQQnSOJ3YC4tmHfnE2sHTu09BI7W50nXyYh/Tt4cpm+Tx+/XHoOin16CnyDZtSWzU=
+	t=1744637403; cv=none; b=riSAnmnox4n7XddNzS9xh++yBRs5xRmCk74YnQqPt2q3dutByNPuSiRJxhnP3dVWDb6l/8gSe6DkFLlEsOheNNr1reO9HsU5sda8JXsGT7uIjzVbIoTib6A4ip+Odv80w7vhixEkBkiHFl2CWOkv55pj0ixKfK5htdP9Ct0j9cI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744637400; c=relaxed/simple;
-	bh=9J/z5T0JY/xcwsk6SXFTA+zsyiZ/gs3asCJyO6IhBN4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=ud4aZTe4dPpbEE7gClS22r0kBzTpiRiIs7b9yAzcGTEyjWlDU/KHk02TGcti2RRmXemWkchpSmNs+JaAjFfFEM6Oo0bzNXQGizlmyM9EP36oo+xb2KbNtoMVD+iA3Mi07EM+8Jm1B46GYjOc+zE7cTRMbDbMN+gg9EK6uLFPxUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X+ZA/MO/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 005E1C4CEE2;
-	Mon, 14 Apr 2025 13:29:58 +0000 (UTC)
+	s=arc-20240116; t=1744637403; c=relaxed/simple;
+	bh=sMkduK/YXjKvq1aPbA9/Llx/+HZMXBNCtqSkBxErUJQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=evF4M/6gOIhr1KfY/v13BPyuZEs6/3i8lxp0yEANl9x1MOPXAjWkXAA2LODiGFCCpUqeC3KBesw+BL1ZYA6uNt+VKVkcKHaSgPYwZffi0+V/RyNKVNcp5/5c64ap7YAWEU9P6YGcsKyNcGJ033lAaEkVTtJ+fUN/CNJl9O/Gcjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mHfytNwL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D389C4CEE9;
+	Mon, 14 Apr 2025 13:30:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744637400;
-	bh=9J/z5T0JY/xcwsk6SXFTA+zsyiZ/gs3asCJyO6IhBN4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=X+ZA/MO/6pO3VZKIoY/rjL1w0VrNTYq6gu+NjqK8kpc8XxPr3dkU5Owgguif21Egj
-	 48P3QvjBe/3ZNnBnc4KT55VFpn2PhseKas70t5kD8ul0l7WBVjbJ1TUYWpp2nGho+D
-	 /pD/kIN3FlHoI1cL9uFHRzjQ1ejPLtb4e9GP4MeuTlakcDDb4hJmIyHw+2ijdNUNZA
-	 xwpi8M8jIG11FP/OVTVuqQlDeYXdNZjqORRcmbZOiuFkKE+K8DHdG/Nnq49JdCxmY1
-	 dqwAwIG9GQs26j3cEvO4XJSgYic1xBibwxSbQvOmHjiYzQq38Ud7Pm/xoSMsjAzgnr
-	 36UX7cj/gQDpA==
+	s=k20201202; t=1744637403;
+	bh=sMkduK/YXjKvq1aPbA9/Llx/+HZMXBNCtqSkBxErUJQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=mHfytNwL2xHzz1w9ksUs6DhcVAJdmNMkXFqscBhIxZIuEUgXC2RlTZ3PCPvF6d/fH
+	 +3GOC1pfLvVXJoR5MvIy7X3cIkWWMhI8kKRgacjwkzzHj7JtXMsPrN7TsjkOEL1NfH
+	 mY2O0p2A5PuaN0PP2GpCftPTOCG9aDeFXP7sRMmJOX6zQNjm1L9LnJMGO0KmasG8gi
+	 CrxfKIZAL2m86eQFFM7IVzpOSdFo1moEynFwotBFOEDI7jw0HIeLsxrn0NJ+F4cGo0
+	 ZKnXIAw3oZgYyKCjQkcK2Jc91kdWlNLHYM3GL8JL33REg/HSPv8v/T6NOz0rrVdT5J
+	 IBmTMqjK5IXmA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -54,10 +55,12 @@ Cc: =?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
 	agordeev@linux.ibm.com,
 	kvm@vger.kernel.org,
 	linux-s390@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 01/24] KVM: s390: Don't use %pK through tracepoints
-Date: Mon, 14 Apr 2025 09:29:34 -0400
-Message-Id: <20250414132957.680250-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 02/24] KVM: s390: Don't use %pK through debug printing
+Date: Mon, 14 Apr 2025 09:29:35 -0400
+Message-Id: <20250414132957.680250-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250414132957.680250-1-sashal@kernel.org>
+References: <20250414132957.680250-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -72,45 +75,130 @@ Content-Transfer-Encoding: 8bit
 
 From: Thomas Weißschuh <thomas.weissschuh@linutronix.de>
 
-[ Upstream commit 6c9567e0850be2f0f94ab64fa6512413fd1a1eb1 ]
+[ Upstream commit 0c7fbae5bc782429c97d68dc40fb126748d7e352 ]
 
-Restricted pointers ("%pK") are not meant to be used through TP_format().
-It can unintentionally expose security sensitive, raw pointer values.
+Restricted pointers ("%pK") are only meant to be used when directly
+printing to a file from task context.
+Otherwise it can unintentionally expose security sensitive,
+raw pointer values.
 
 Use regular pointer formatting instead.
 
 Link: https://lore.kernel.org/lkml/20250113171731-dc10e3c1-da64-4af0-b767-7c7070468023@linutronix.de/
 Signed-off-by: Thomas Weißschuh <thomas.weissschuh@linutronix.de>
 Reviewed-by: Michael Mueller <mimu@linux.ibm.com>
-Link: https://lore.kernel.org/r/20250217-restricted-pointers-s390-v1-1-0e4ace75d8aa@linutronix.de
+Tested-by: Michael Mueller <mimu@linux.ibm.com>
+Link: https://lore.kernel.org/r/20250217-restricted-pointers-s390-v1-2-0e4ace75d8aa@linutronix.de
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Message-ID: <20250217-restricted-pointers-s390-v1-1-0e4ace75d8aa@linutronix.de>
+Message-ID: <20250217-restricted-pointers-s390-v1-2-0e4ace75d8aa@linutronix.de>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/s390/kvm/trace-s390.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/s390/kvm/intercept.c |  2 +-
+ arch/s390/kvm/interrupt.c |  8 ++++----
+ arch/s390/kvm/kvm-s390.c  | 10 +++++-----
+ 3 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/arch/s390/kvm/trace-s390.h b/arch/s390/kvm/trace-s390.h
-index 6f0209d45164f..9c5f546a2e1a3 100644
---- a/arch/s390/kvm/trace-s390.h
-+++ b/arch/s390/kvm/trace-s390.h
-@@ -56,7 +56,7 @@ TRACE_EVENT(kvm_s390_create_vcpu,
- 		    __entry->sie_block = sie_block;
- 		    ),
+diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
+index b16352083ff98..f0be263b334ce 100644
+--- a/arch/s390/kvm/intercept.c
++++ b/arch/s390/kvm/intercept.c
+@@ -94,7 +94,7 @@ static int handle_validity(struct kvm_vcpu *vcpu)
  
--	    TP_printk("create cpu %d at 0x%pK, sie block at 0x%pK",
-+	    TP_printk("create cpu %d at 0x%p, sie block at 0x%p",
- 		      __entry->id, __entry->vcpu, __entry->sie_block)
- 	);
+ 	vcpu->stat.exit_validity++;
+ 	trace_kvm_s390_intercept_validity(vcpu, viwhy);
+-	KVM_EVENT(3, "validity intercept 0x%x for pid %u (kvm 0x%pK)", viwhy,
++	KVM_EVENT(3, "validity intercept 0x%x for pid %u (kvm 0x%p)", viwhy,
+ 		  current->pid, vcpu->kvm);
  
-@@ -255,7 +255,7 @@ TRACE_EVENT(kvm_s390_enable_css,
- 		    __entry->kvm = kvm;
- 		    ),
+ 	/* do not warn on invalid runtime instrumentation mode */
+diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+index efaebba5ee19c..fe4841104ed92 100644
+--- a/arch/s390/kvm/interrupt.c
++++ b/arch/s390/kvm/interrupt.c
+@@ -3161,7 +3161,7 @@ void kvm_s390_gisa_clear(struct kvm *kvm)
+ 	if (!gi->origin)
+ 		return;
+ 	gisa_clear_ipm(gi->origin);
+-	VM_EVENT(kvm, 3, "gisa 0x%pK cleared", gi->origin);
++	VM_EVENT(kvm, 3, "gisa 0x%p cleared", gi->origin);
+ }
  
--	    TP_printk("enabling channel I/O support (kvm @ %pK)\n",
-+	    TP_printk("enabling channel I/O support (kvm @ %p)\n",
- 		      __entry->kvm)
- 	);
+ void kvm_s390_gisa_init(struct kvm *kvm)
+@@ -3178,7 +3178,7 @@ void kvm_s390_gisa_init(struct kvm *kvm)
+ 	gi->timer.function = gisa_vcpu_kicker;
+ 	memset(gi->origin, 0, sizeof(struct kvm_s390_gisa));
+ 	gi->origin->next_alert = (u32)virt_to_phys(gi->origin);
+-	VM_EVENT(kvm, 3, "gisa 0x%pK initialized", gi->origin);
++	VM_EVENT(kvm, 3, "gisa 0x%p initialized", gi->origin);
+ }
+ 
+ void kvm_s390_gisa_enable(struct kvm *kvm)
+@@ -3219,7 +3219,7 @@ void kvm_s390_gisa_destroy(struct kvm *kvm)
+ 		process_gib_alert_list();
+ 	hrtimer_cancel(&gi->timer);
+ 	gi->origin = NULL;
+-	VM_EVENT(kvm, 3, "gisa 0x%pK destroyed", gisa);
++	VM_EVENT(kvm, 3, "gisa 0x%p destroyed", gisa);
+ }
+ 
+ void kvm_s390_gisa_disable(struct kvm *kvm)
+@@ -3468,7 +3468,7 @@ int __init kvm_s390_gib_init(u8 nisc)
+ 		}
+ 	}
+ 
+-	KVM_EVENT(3, "gib 0x%pK (nisc=%d) initialized", gib, gib->nisc);
++	KVM_EVENT(3, "gib 0x%p (nisc=%d) initialized", gib, gib->nisc);
+ 	goto out;
+ 
+ out_unreg_gal:
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 348d030d2660c..890d850f51f07 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -990,7 +990,7 @@ static int kvm_s390_set_mem_control(struct kvm *kvm, struct kvm_device_attr *att
+ 		}
+ 		mutex_unlock(&kvm->lock);
+ 		VM_EVENT(kvm, 3, "SET: max guest address: %lu", new_limit);
+-		VM_EVENT(kvm, 3, "New guest asce: 0x%pK",
++		VM_EVENT(kvm, 3, "New guest asce: 0x%p",
+ 			 (void *) kvm->arch.gmap->asce);
+ 		break;
+ 	}
+@@ -3418,7 +3418,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 		kvm_s390_gisa_init(kvm);
+ 	INIT_LIST_HEAD(&kvm->arch.pv.need_cleanup);
+ 	kvm->arch.pv.set_aside = NULL;
+-	KVM_EVENT(3, "vm 0x%pK created by pid %u", kvm, current->pid);
++	KVM_EVENT(3, "vm 0x%p created by pid %u", kvm, current->pid);
+ 
+ 	return 0;
+ out_err:
+@@ -3481,7 +3481,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ 	kvm_s390_destroy_adapters(kvm);
+ 	kvm_s390_clear_float_irqs(kvm);
+ 	kvm_s390_vsie_destroy(kvm);
+-	KVM_EVENT(3, "vm 0x%pK destroyed", kvm);
++	KVM_EVENT(3, "vm 0x%p destroyed", kvm);
+ }
+ 
+ /* Section: vcpu related */
+@@ -3602,7 +3602,7 @@ static int sca_switch_to_extended(struct kvm *kvm)
+ 
+ 	free_page((unsigned long)old_sca);
+ 
+-	VM_EVENT(kvm, 2, "Switched to ESCA (0x%pK -> 0x%pK)",
++	VM_EVENT(kvm, 2, "Switched to ESCA (0x%p -> 0x%p)",
+ 		 old_sca, kvm->arch.sca);
+ 	return 0;
+ }
+@@ -3974,7 +3974,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 			goto out_free_sie_block;
+ 	}
+ 
+-	VM_EVENT(vcpu->kvm, 3, "create cpu %d at 0x%pK, sie block at 0x%pK",
++	VM_EVENT(vcpu->kvm, 3, "create cpu %d at 0x%p, sie block at 0x%p",
+ 		 vcpu->vcpu_id, vcpu, vcpu->arch.sie_block);
+ 	trace_kvm_s390_create_vcpu(vcpu->vcpu_id, vcpu, vcpu->arch.sie_block);
  
 -- 
 2.39.5
