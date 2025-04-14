@@ -1,177 +1,92 @@
-Return-Path: <kvm+bounces-43313-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43314-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3CFCA88E88
-	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 23:57:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86408A88F2F
+	for <lists+kvm@lfdr.de>; Tue, 15 Apr 2025 00:37:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4C34189A40B
-	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 21:57:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35E6A1896AAE
+	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 22:37:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16FD223817A;
-	Mon, 14 Apr 2025 21:49:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC8861F4184;
+	Mon, 14 Apr 2025 22:36:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RLxdKTY8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o9RjfTUT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AA9B237709
-	for <kvm@vger.kernel.org>; Mon, 14 Apr 2025 21:49:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4821191493;
+	Mon, 14 Apr 2025 22:36:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744667367; cv=none; b=F4DarduT/MdkLn9t5x4gfd7HsdLkHIal6y4KHs1YZWA7p3GKIutnLMYaulNWeFGPikrB0Q59D9/f8QtWO3cWdIVmvPi+9E5zaraREDlXtplPGLTZ+Napq5O8nSKW5WSmcv7s6U/CZDvBLREcQO2LLeidQYwY62CI3j2bd7OynTk=
+	t=1744670214; cv=none; b=IkdL1eOJ9XP7n/kTmmQyt0WpIx5amg9QXgMoUjcEq+ILzYmf61HqUUBt+TXkGqHjOvAZw4lniPdUSecnLe+1FpIEZ+zlM0YM2hA3rs0ss78TllVUe+0IX6STdM1IWQ0+JTsJVcBMUf+zWyqVBsVReIL2cbzoquIxo3veLhDg964=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744667367; c=relaxed/simple;
-	bh=0s0eRAzp79ZyqJlag/s9T0KZQwLlfgI5CTpQtvOBf1o=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Gr01X9bq2xqLkENlk86WRbaon21t3N5RxxFUxIlxjelFb0knQpR+2g2BVcxv+IDpqU50W+G5WHK/p6wgwJs1/Z9joWuROZVqBtvlc//ZVSAHLnd4y5ijoCy5hkFHHGYT3l11B21S55gtAQ6585oGhzZ2Ya9Z1aWX1rWq5AlEdoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RLxdKTY8; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7377139d8b1so3536977b3a.0
-        for <kvm@vger.kernel.org>; Mon, 14 Apr 2025 14:49:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744667364; x=1745272164; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PBSumKkK0GopQQbf4kIGENs+zTxb+YbX4N+rBsmVgUU=;
-        b=RLxdKTY8Kax25vuWCeEG7w9NP835NfPOog24dW4r0CUYdEQ8k8HYWsp9mj2Wulb1Xy
-         UfOu8nDE1BRZCvc8rTRVNlHoRrhIzxu3S619npXswMfnDVfK/2woTnLBT7qJdShxYP0s
-         hwD9PkN4IsgJLoB6MpoE1gm+hqd5Z75SZf1msf7UdjQdly4VPyRKJpnTwC5dUXaeExG8
-         IqA+/KLQBR7Rq0O0ZlESYtAJHgAhJtgfrIsXBBO0xxu/uedkYKdyROJDhxHtuAjyW4Uc
-         oY5gDtBiXk4H+IIyjPrj8UawxI1nyptQCSnLhsLoGTo8S+TNS8+IDRUkjIF9NN3BzYNX
-         s94w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744667364; x=1745272164;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PBSumKkK0GopQQbf4kIGENs+zTxb+YbX4N+rBsmVgUU=;
-        b=B1Dl7YEIdj3C5xTC4xcDWJOabU7HPPQ95Z6uB13av+I9n8BQFFqsPKx4rIGJQ7jV6G
-         7uZiQ+hHWuzt2PhaMEsGArXn7OlSkTcfJhSYS0LOnEP4nK1nFaJyW+VsVpH9gm1q8STr
-         Gw0PmxYEBQdMXOjl6Aqy8e/cpQXiicncJ0FxcZVoS9km3HgkQM9wBdbU0KXM5txSGqqU
-         V3pzg+ILi7/G5Aj2Ca4tPcjYhbpETX/+4SypPWw/S+oCU+gm8QA9b6J1uQp2sdAsiTCF
-         SlB8YAqBtVFLrf11pUvTut1OanNV/PfO0kHoE5EZg1UsaMmn26VZDpm4Dk9EXjF9y7+4
-         lj3w==
-X-Forwarded-Encrypted: i=1; AJvYcCX3i7EZonBxb0+2MV/+cpNyN1I8q+xBBPJxJNNnqJDTqRmF4T0yr76VcsVf9+m2OZ2c96Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yywb3rfO7r9BUqOW8HJhd6EY1RsAuidnVSPSOnu/wdx1XDq99wB
-	enkwPdDZmKuM7k6iBB00YUt6RzLKOIcmftVGGoPa4ju7CWmw98040hSqaf6szTOX1L58rkIdSg=
-	=
-X-Google-Smtp-Source: AGHT+IGAf9r8FGSlKp+K/4EeU8L9n+YGVWZYWn0f4xUb+jtnHNJ+DjWrf/1g8NbljgvPb7hNXCk6l26e0g==
-X-Received: from pfbha18.prod.google.com ([2002:a05:6a00:8512:b0:736:59f0:d272])
- (user=sagis job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2286:b0:736:4110:5579
- with SMTP id d2e1a72fcca58-73bd119d755mr17279180b3a.2.1744667364222; Mon, 14
- Apr 2025 14:49:24 -0700 (PDT)
-Date: Mon, 14 Apr 2025 14:47:59 -0700
-In-Reply-To: <20250414214801.2693294-1-sagis@google.com>
+	s=arc-20240116; t=1744670214; c=relaxed/simple;
+	bh=YI4gqpOXRht4Cg1ORHRbMQLHyWPe/MRi++SWYuhqzck=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TDT7AKvDq9FHvOp3YbUL8Ym+mSSuTrNSOgf67sDl39wk+tHCNjSVFM4fENOmzyWI4kSdUgHPJHBqo/1MLArUqaxnqMZZIvluVZ06g6EsiZ1u22V3fe1eT6S8wKL4QfkATyVggAG9rTIywsWTut24Srn8UVDJ/bjTuSMw4KwDkMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o9RjfTUT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D486DC4CEE2;
+	Mon, 14 Apr 2025 22:36:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744670213;
+	bh=YI4gqpOXRht4Cg1ORHRbMQLHyWPe/MRi++SWYuhqzck=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=o9RjfTUTiXXVjS0IFU+Gy0LB3y3jx89MLqcVzHsGaPowMUNRzdm3s6lCTlAVucOfj
+	 W4h3flf9nLrRDm5nFoCiA2yQPDS+HhscUpKKiiP6BPPf4nkcCvpLf6yp1OjEIvUF0e
+	 lJWJ8VQ+eIs/8tSsBNJ1UTLBxfmMbiJZz9hAYVn0BaLUnZno34xUOBnwJ5yfhjJ3OO
+	 0k5gX5ZjBCpYowOkoqhYJ+UaI6cDUlvzqvsqj7EiEn1xbN7YIF4zFPFu6tdYUvXHya
+	 uNxMK3jYD2aPwh6vtEzt0EIt9/LtpUVNSwJSFGt5r/qLjAbaFYwYReT4eBzUE+rtpZ
+	 fasOEhkz7IGyw==
+Date: Mon, 14 Apr 2025 15:36:50 -0700
+From: Josh Poimboeuf <jpoimboe@kernel.org>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: x86@kernel.org, kys@microsoft.com, haiyangz@microsoft.com, 
+	wei.liu@kernel.org, decui@microsoft.com, tglx@linutronix.de, mingo@redhat.com, 
+	bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
+	pawan.kumar.gupta@linux.intel.com, seanjc@google.com, pbonzini@redhat.com, ardb@kernel.org, 
+	kees@kernel.org, Arnd Bergmann <arnd@arndb.de>, gregkh@linuxfoundation.org, 
+	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-efi@vger.kernel.org, samitolvanen@google.com, ojeda@kernel.org
+Subject: Re: [PATCH 3/6] x86/kvm/emulate: Avoid RET for fastops
+Message-ID: <7vfbchsyhlsvdl4hszdtmapdghw32nrj2qd652f3pjzg3yb6vn@po3bsa54b6ta>
+References: <20250414111140.586315004@infradead.org>
+ <20250414113754.172767741@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250414214801.2693294-1-sagis@google.com>
-X-Mailer: git-send-email 2.49.0.777.g153de2bbd5-goog
-Message-ID: <20250414214801.2693294-31-sagis@google.com>
-Subject: [PATCH v6 30/30] KVM: selftests: TDX: Test LOG_DIRTY_PAGES flag to a
- non-GUEST_MEMFD memslot
-From: Sagi Shahar <sagis@google.com>
-To: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Erdem Aktas <erdemaktas@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Sagi Shahar <sagis@google.com>, Roger Wang <runanwang@google.com>, 
-	Binbin Wu <binbin.wu@linux.intel.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	"Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, Reinette Chatre <reinette.chatre@intel.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Yan Zhao <yan.y.zhao@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250414113754.172767741@infradead.org>
 
-From: Yan Zhao <yan.y.zhao@intel.com>
+On Mon, Apr 14, 2025 at 01:11:43PM +0200, Peter Zijlstra wrote:
+> Since there is only a single fastop() function, convert the FASTOP
+> stuff from CALL_NOSPEC+RET to JMP_NOSPEC+JMP, avoiding the return
+> thunks and all that jazz.
+> 
+> Specifically FASTOPs rely on the return thunk to preserve EFLAGS,
+> which not all of them can trivially do (call depth tracing suffers
+> here).
+> 
+> Objtool strenuously complains about things, therefore fix up the
+> various problems:
+> 
+>  - indirect call without a .rodata, fails to determine JUMP_TABLE,
+>    add an annotation for this.
+>  - fastop functions fall through, create an exception for this case
+>  - unreachable instruction after fastop_return, save/restore
 
-Add a selftest to verify that adding flag KVM_MEM_LOG_DIRTY_PAGES to a
-!KVM_MEM_GUEST_MEMFD memslot does not produce host errors in TDX.
+I think this breaks unwinding.  Each of the individual fastops inherits
+fastop()'s stack but the ORC doesn't reflect that.
 
-Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-Signed-off-by: Sagi Shahar <sagis@google.com>
----
- tools/testing/selftests/kvm/x86/tdx_vm_test.c | 45 ++++++++++++++++++-
- 1 file changed, 44 insertions(+), 1 deletion(-)
+Should they just be moved to a proper .S file?
 
-diff --git a/tools/testing/selftests/kvm/x86/tdx_vm_test.c b/tools/testing/selftests/kvm/x86/tdx_vm_test.c
-index 82acc17a66ab..410d814dd39a 100644
---- a/tools/testing/selftests/kvm/x86/tdx_vm_test.c
-+++ b/tools/testing/selftests/kvm/x86/tdx_vm_test.c
-@@ -1167,6 +1167,47 @@ void verify_tdcall_vp_info(void)
- 	printf("\t ... PASSED\n");
- }
- 
-+#define TDX_LOG_DIRTY_PAGES_FLAG_TEST_GPA (0xc0000000)
-+#define TDX_LOG_DIRTY_PAGES_FLAG_TEST_GVA_SHARED (0x90000000)
-+#define TDX_LOG_DIRTY_PAGES_FLAG_REGION_SLOT 10
-+#define TDX_LOG_DIRTY_PAGES_FLAG_REGION_NR_PAGES (0x1000 / getpagesize())
-+
-+void guest_code_log_dirty_flag(void)
-+{
-+	memset((void *)TDX_LOG_DIRTY_PAGES_FLAG_TEST_GVA_SHARED, 1, 8);
-+	tdx_test_success();
-+}
-+
-+/*
-+ * Verify adding flag KVM_MEM_LOG_DIRTY_PAGES to a !KVM_MEM_GUEST_MEMFD memslot
-+ * in a TD does not produce host errors.
-+ */
-+void verify_log_dirty_pages_flag_on_non_gmemfd_slot(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	vm = td_create();
-+	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, 0);
-+	vcpu = td_vcpu_add(vm, 0, guest_code_log_dirty_flag);
-+
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-+				    TDX_LOG_DIRTY_PAGES_FLAG_TEST_GPA,
-+				    TDX_LOG_DIRTY_PAGES_FLAG_REGION_SLOT,
-+				    TDX_LOG_DIRTY_PAGES_FLAG_REGION_NR_PAGES,
-+				    KVM_MEM_LOG_DIRTY_PAGES);
-+	virt_map_shared(vm, TDX_LOG_DIRTY_PAGES_FLAG_TEST_GVA_SHARED,
-+			(uint64_t)TDX_LOG_DIRTY_PAGES_FLAG_TEST_GPA,
-+			TDX_LOG_DIRTY_PAGES_FLAG_REGION_NR_PAGES);
-+	td_finalize(vm);
-+
-+	printf("Verifying Log dirty flag:\n");
-+	vcpu_run(vcpu);
-+	tdx_test_assert_success(vcpu);
-+	kvm_vm_free(vm);
-+	printf("\t ... PASSED\n");
-+}
-+
- int main(int argc, char **argv)
- {
- 	ksft_print_header();
-@@ -1174,7 +1215,7 @@ int main(int argc, char **argv)
- 	if (!is_tdx_enabled())
- 		ksft_exit_skip("TDX is not supported by the KVM. Exiting.\n");
- 
--	ksft_set_plan(15);
-+	ksft_set_plan(16);
- 	ksft_test_result(!run_in_new_process(&verify_td_lifecycle),
- 			 "verify_td_lifecycle\n");
- 	ksft_test_result(!run_in_new_process(&verify_report_fatal_error),
-@@ -1205,6 +1246,8 @@ int main(int argc, char **argv)
- 			 "verify_host_reading_private_mem\n");
- 	ksft_test_result(!run_in_new_process(&verify_tdcall_vp_info),
- 			 "verify_tdcall_vp_info\n");
-+	ksft_test_result(!run_in_new_process(&verify_log_dirty_pages_flag_on_non_gmemfd_slot),
-+			 "verify_log_dirty_pages_flag_on_non_gmemfd_slot\n");
- 
- 	ksft_finished();
- 	return 0;
 -- 
-2.49.0.504.g3bcea36a83-goog
-
+Josh
 
