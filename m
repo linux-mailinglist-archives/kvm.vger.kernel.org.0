@@ -1,205 +1,232 @@
-Return-Path: <kvm+bounces-43250-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43251-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EEBEA885DB
-	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 16:54:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5A1EA887EF
+	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 18:04:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 433701769EE
-	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 14:50:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4D0A1898356
+	for <lists+kvm@lfdr.de>; Mon, 14 Apr 2025 16:04:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE37627FD70;
-	Mon, 14 Apr 2025 14:44:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 116E82749EE;
+	Mon, 14 Apr 2025 16:03:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IjtG/CAn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O1jAWWta"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FA4427584E
-	for <kvm@vger.kernel.org>; Mon, 14 Apr 2025 14:43:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FDD53FC2
+	for <kvm@vger.kernel.org>; Mon, 14 Apr 2025 16:03:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744641841; cv=none; b=BYGSNQMcO63ehW3nIzr6SeVREBdM0UOyJC0QlXgUz4LHZMzHHd9eo9Y5lMFuZsRUuVdCJK8C9Ah5+7m+hhBVobcA08pvXo7QG1zEcIcxj8n3u47od/0dZx6vQQPdq/zUKccnrCnp7IPGFi1sgwEMTr3xFyrJJenIlXb19JlSRX8=
+	t=1744646636; cv=none; b=uz/xwS9823rq0FVqzVFJBAbI8A+PG2SyQJnOzEe91y9596xMnMGfUbVUmAH/SlELGMixpUybvakEZ/ZKimJeJtSXoF7E9ksEn79NJN3NynkTPyfxxV+hlCox8BoHa5S6v9Bminpsb06JrZYywuKB3XhQVvmssPPEkPfkSzfGIfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744641841; c=relaxed/simple;
-	bh=uMNdskFvWxs/ZeJV24VQb2bK2kwD4jcq/9MRREdZl7I=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=XtHms7iChjHyJM9tzpI3bO9JdWTaix0mBhjvM87OTPyv8661ckdZ2v7TC+b8xpg5s0t8hsXSj2vtsZWcfOj9rMlH15kOkXQmcpczU27St+DBi4zHm8MEH98RrqpFUoTQmyQ5PYwsCyB0Npb69usf8SRCzJb+3P9sZ+aj+ufFNiI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IjtG/CAn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744641838;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kjqVtifpWkKj0b4Ug0nm9RhQbFWSBSXQpQ4bYLNf9BA=;
-	b=IjtG/CAnQJAXusTwOhQS+xBO01DqJFMNSYLQ6FSgESfrn+fQymVqgR9OfIjg9IS62ubTzX
-	/Y7MqD+/54KJVOMhLx1LII6Hfn2hh7CN2KbIVFPnQcDv7V7EMyFiEVfG5PQR2ks2Clw1Iz
-	t6HKiccuREkJGabakRSJDJ9ByTt7WKE=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-428-7b8nn3xhMnS9ULKMMP5nrg-1; Mon, 14 Apr 2025 10:43:56 -0400
-X-MC-Unique: 7b8nn3xhMnS9ULKMMP5nrg-1
-X-Mimecast-MFC-AGG-ID: 7b8nn3xhMnS9ULKMMP5nrg_1744641836
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6e91d8a7183so79449696d6.0
-        for <kvm@vger.kernel.org>; Mon, 14 Apr 2025 07:43:56 -0700 (PDT)
+	s=arc-20240116; t=1744646636; c=relaxed/simple;
+	bh=gaI2o+IcMMRpu9zga35PMrGvI2/8TmKmZh7u0FxdbQo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AsqO+y/1/B2Wvp4HgMyy51QR/dTTg8QiV9+DdERLoAAjVt25ZIYHZFLlJa49RdboQJViXuT3zfeSL5hJ0fJ7LAivrlnKvxD1re+wXm3r+3ZjyEUqd0NffXuaMcwRoszotCDeNylz7UGEiInnxvO0VIaIjSTgsxoMuXoSIc8LsOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O1jAWWta; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4769e30af66so730151cf.1
+        for <kvm@vger.kernel.org>; Mon, 14 Apr 2025 09:03:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1744646633; x=1745251433; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=VzyFZIEP6M1ohDkNBbb+oGqFZk64nQZeVuUKR+ZBZTs=;
+        b=O1jAWWtaUdQ1+yEvvr+EIw78yiYTBRcEcv7E0jIuE1w5gLtVPIkCmbKMdTVi3Kvfcj
+         9odHQqWejBvXffjsYDMzsdi8LiEag3DwpJIJH6a8X+wLHUop+LHNxxmSI1m4uuMjvY9q
+         w79VsAzLYmug5Ht3rw/yOQXi1/7wrRp4oPJJnWEKOrHmackqZBThMd9Y7HEL9d3yPL5v
+         +rF/kSKcg36X/+HBphNfgl2rxkNFdt+XU0fMrfJSIvcCaUCP2UIzBLQqCcd1I/w1IN46
+         D21yJ8XD1hMjb5z5sBlPUIeBTcv2AXDGWuzn9hBgrwYj+TBW7PxDQ3in0gfdhONZqd7I
+         0vsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744641836; x=1745246636;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kjqVtifpWkKj0b4Ug0nm9RhQbFWSBSXQpQ4bYLNf9BA=;
-        b=AXzciK5UIDyVGXbncYrQgXdiEO3KfZpNb4P09cs6TtLPyG//2RMKpuGMHrznx2y9uu
-         aGUcCDXuHcD2y4SshphBLamiwWAk79a6eb4C/Lc4bSOLiQoXuTVF1XASqbEOFNTb+JQ4
-         3/878M8PbNFpumTSUKOCFKvVXNUiu0sFqIRUaANl+h16SnpP5kO2vlaOplSctiB1viJY
-         HyVGYTBboUpIjoK74kqCyD3/KjP8IhFtCN1bF6d753YBoLReAnnGLZreQ1+0prV9phRR
-         8YT0/9eyc2lgwq/OW+ULcCUZm/vWvny9vbLr+RTz7ZDb7jvjDWopHyRJpx2WwGLD0oNi
-         XlXg==
-X-Forwarded-Encrypted: i=1; AJvYcCWvlZgfU/2SKtjyeAo0eFnYn80rvALFr7ATYwYQaRqluAHABQnoRPp/4yyvAMiefIAg9Mg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZvgmExq+J20z/2oMw5viMCMdjaC9nAEORG6KQDQ1/Svg2PQTg
-	YSjwlsvDBTPQ8n6NMn/dx65zum9v5xjccwWzyuIi7Cun+oONEBHqPdd2YOyxlEz//lYAnLh2+Z3
-	qOI9TpQ/C3PBTrHKOB5HNAzOOBswr83kSTEsz8gcg4dJnOGPjIg==
-X-Gm-Gg: ASbGncuIfB3PRGatPPgS3wgB7u+4FkFShNwOUsbeoKPDjaKLM/yQH7AU8i/xsfoOiui
-	s6eBub94PZlGBPec0Xgjqa4h6ztKtV8XyxRJ7g6RZnoarsD8DYnTWG+J69i3/xtCDrlMz/oHr16
-	V2Lgb9qdejIB6gH2TgIdYlr6V8EYly25Ui4bnuT1AIyYi1uCW3U4yRDSj3Qn8qk1BISpFkDofC1
-	uISV8rry6fEYuRck7OipmkutDXYrevQdHBOrca8ospG547eahNFXe2Mw8IN+H2/Fal/K94FQOs6
-	zg+4oAkDXbk=
-X-Received: by 2002:a05:6214:501d:b0:6d8:ada3:26c9 with SMTP id 6a1803df08f44-6f230d7ad92mr185320646d6.10.1744641836158;
-        Mon, 14 Apr 2025 07:43:56 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGel5tH1Eww8AUnNw43KwiocL2hPNlXM4/YDX3le/rvzrhbUb9fxhhQvoE2YODqL1n6WcfW1g==
-X-Received: by 2002:a05:6214:501d:b0:6d8:ada3:26c9 with SMTP id 6a1803df08f44-6f230d7ad92mr185320156d6.10.1744641835603;
-        Mon, 14 Apr 2025 07:43:55 -0700 (PDT)
-Received: from starship ([2607:fea8:fc01:8d8d:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f0de970badsm84997516d6.26.2025.04.14.07.43.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Apr 2025 07:43:55 -0700 (PDT)
-Message-ID: <6af77fa765ecee9cf1368d0715b65a383d67bc7e.camel@redhat.com>
-Subject: Re: [PATCH v3 0/6] KVM: SVM: Fix DEBUGCTL bugs
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Sandipan Das <sandipan.das@amd.com>, Sean Christopherson
- <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Ravi Bangoria <ravi.bangoria@amd.com>,
- Xiaoyao Li <xiaoyao.li@intel.com>, rangemachine@gmail.com,
- whanos@sergal.fun,  nikunj.dadhania@amd.com
-Date: Mon, 14 Apr 2025 10:43:54 -0400
-In-Reply-To: <3bb22f41-9218-47c1-8a0f-c484bdaeb9eb@amd.com>
-References: <20250227222411.3490595-1-seanjc@google.com>
-	 <1b0fbad5b2be164da13034fe486c207d8a19f5e7.camel@redhat.com>
-	 <Z_WmdAZ9E2dxHpBE@google.com>
-	 <3bb22f41-9218-47c1-8a0f-c484bdaeb9eb@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        d=1e100.net; s=20230601; t=1744646633; x=1745251433;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VzyFZIEP6M1ohDkNBbb+oGqFZk64nQZeVuUKR+ZBZTs=;
+        b=rT2rT3MSztezAN88bKfn43MYmHMy6L5yAjpYPwWyU7denHPLQzF7top7ujVPASy4OR
+         ofMIDQGy1TBxncbYjrmVVVTzTxg2skVrAhfFXMubmxZiJt3GbSNsYrfyV7N9hPCHjv4w
+         WVQewcoE/8/+s8krFUa24JJ07Xp624QLtn5zM33ZYJ/Xr087t0mB1//h9dV6m82xIlJJ
+         FJHYbpdMJx2ibo1FG8DSKWwWLdV/So6WFz3IMoH30qhnffg8EwliaaxxR9i3u2Yte+w8
+         nz+C795pIUQsfdFQO1EquBhQUjQ9ADebI3tknaC7QmmVLnDb3HLQtVJs0Zyb5GUYD2RG
+         dklA==
+X-Gm-Message-State: AOJu0YxhsjXeLlm+qiCw9Sa3F4PVoM1beLKnM8doFzCs41j+YSlAZS9S
+	7Jrg2hju2I5G4GeuL43l37S0L17JuRJ7QwgFto/o71BM+b6hpYcxDj6DMAJB0VgH49idF1Tzosf
+	s2kQd6jdkiszZ+1ts8+dhTBgmF5fHm0f4kYCY
+X-Gm-Gg: ASbGncuCm6tVAYWyhKbfwrKvax5u5waoNeaJKSVtWl7llFKFfmupUhMHZE6oCmEy51F
+	HgobojaSiiUZAIIaQxcp/cdGu5K8cE/Te2cx6RUA1mfnCs8zNCOzdoWQIlfcEbe6irk4z2kO+qr
+	lhn8ccSz37YwHYrbldE0q59w==
+X-Google-Smtp-Source: AGHT+IFJg8GPXWq1lSCl703rekQ9oedGzVrCfZbbes1E5yG1RkGoWHSg6Y0BmhLSzHoUCX0vCwJ/tUA/5BAi0+XC2Rk=
+X-Received: by 2002:a05:622a:1a22:b0:477:2c1e:d252 with SMTP id
+ d75a77b69052e-479815f5b60mr8970641cf.20.1744646632877; Mon, 14 Apr 2025
+ 09:03:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+References: <20250318161823.4005529-1-tabba@google.com> <20250318161823.4005529-5-tabba@google.com>
+ <8ebc66ae-5f37-44c0-884b-564a65467fe4@redhat.com>
+In-Reply-To: <8ebc66ae-5f37-44c0-884b-564a65467fe4@redhat.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 14 Apr 2025 17:03:15 +0100
+X-Gm-Features: ATxdqUGPHkmIlJ3xSXP2tJdh8AVRtpSMsm_dfz2QSKTlfggMkikmgGbgteWcNbQ
+Message-ID: <CA+EHjTwjShH8vw-YsSmPk0yNY3akLFT3R9COtWLVgLozT_G7nA@mail.gmail.com>
+Subject: Re: [PATCH v7 4/9] KVM: guest_memfd: Handle in-place shared memory as
+ guest_memfd backed memory
+To: David Hildenbrand <david@redhat.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
+	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
+	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
+	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
+	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
+	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
+	hughd@google.com, jthoughton@google.com, peterx@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 2025-04-14 at 12:02 +0530, Sandipan Das wrote:
-> On 4/9/2025 4:13 AM, Sean Christopherson wrote:
-> > On Tue, Apr 01, 2025, Maxim Levitsky wrote:
-> > > On Thu, 2025-02-27 at 14:24 -0800, Sean Christopherson wrote:
-> > > > Fix a long-lurking bug in SVM where KVM runs the guest with the host's
-> > > > DEBUGCTL if LBR virtualization is disabled.  AMD CPUs rather stupidly
-> > > > context switch DEBUGCTL if and only if LBR virtualization is enabled (not
-> > > > just supported, but fully enabled).
-> > > > 
-> > > > The bug has gone unnoticed because until recently, the only bits that
-> > > > KVM would leave set were things like BTF, which are guest visible but
-> > > > won't cause functional problems unless guest software is being especially
-> > > > particular about #DBs.
-> > > > 
-> > > > The bug was exposed by the addition of BusLockTrap ("Detect" in the kernel),
-> > > > as the resulting #DBs due to split-lock accesses in guest userspace (lol
-> > > > Steam) get reflected into the guest by KVM.
-> > > > 
-> > > > Note, I don't love suppressing DEBUGCTL.BTF, but practically speaking that's
-> > > > likely the behavior that SVM guests have gotten the vast, vast majority of
-> > > > the time, and given that it's the behavior on Intel, it's (hopefully) a safe
-> > > > option for a fix, e.g. versus trying to add proper BTF virtualization on the
-> > > > fly.
-> > > > 
-> > > > v3:
-> > > >  - Suppress BTF, as KVM doesn't actually support it. [Ravi]
-> > > >  - Actually load the guest's DEBUGCTL (though amusingly, with BTF squashed,
-> > > >    it's guaranteed to be '0' in this scenario). [Ravi]
-> > > > 
-> > > > v2:
-> > > >  - Load the guest's DEBUGCTL instead of simply zeroing it on VMRUN.
-> > > >  - Drop bits 5:3 from guest DEBUGCTL so that KVM doesn't let the guest
-> > > >    unintentionally enable BusLockTrap (AMD repurposed bits). [Ravi]
-> > > >  - Collect a review. [Xiaoyao]
-> > > >  - Make bits 5:3 fully reserved, in a separate not-for-stable patch.
-> > > > 
-> > > > v1: https://lore.kernel.org/all/20250224181315.2376869-1-seanjc@google.com
-> > > > 
-> > > 
-> > > Hi,
-> > > 
-> > > Amusingly there is another DEBUGCTL issue, which I just got to the bottom of.
-> > > (if I am not mistaken of course).
-> > > 
-> > > We currently don't let the guest set DEBUGCTL.FREEZE_WHILE_SMM and neither
-> > > set it ourselves in GUEST_IA32_DEBUGCTL vmcs field, even when supported by the host
-> > > (If I read the code correctly, I didn't verify this in runtime)
-> > 
-> > Ugh, SMM.  Yeah, KVM doesn't propagate DEBUGCTLMSR_FREEZE_IN_SMM to the guest
-> > value.  KVM intercepts reads and writes to DEBUGCTL, so it should be easy enough
-> > to shove the bit in on writes, and drop it on reads.
-> > 
-> > > This means that the host #SMIs will interfere with the guest PMU.  In
-> > > particular this causes the 'pmu' kvm-unit-test to fail, which is something
-> > > that our CI caught.
-> > > 
-> > > I think that kvm should just set this bit, or even better, use the host value
-> > > of this bit, and hide it from the guest, because the guest shouldn't know
-> > > about host's smm, and we AFAIK don't really support freezing perfmon when the
-> > > guest enters its own emulated SMM.
-> > 
-> > Agreed.  Easy thing is to use the host's value, so that KVM doesn't need to check
-> > for its existence.  I can't think of anything that would go sideways by freezing
-> > perfmon if the host happens to take an SMI.
-> > 
-> > > What do you think? I'll post patches if you think that this is a good idea.
-> > > (A temp hack to set this bit always in GUEST_IA32_DEBUGCTL fixed the problem for me)
-> > > 
-> > > I also need to check if AMD also has this feature, or if this is Intel specific.
-> > 
-> > Intel only.  I assume/think/hope AMD's Host/Guest Only field in the event selector
-> > effectively hides SMM from the guest.
-> 
-> Just using the GuestOnly bit does not hide SMM activity from guests. SMIs are
-> generally intercepted (kvm_amd.intercept_smi defaults to true)
+Hi David,
 
-Hi,
+On Mon, 14 Apr 2025 at 12:51, David Hildenbrand <david@redhat.com> wrote:
+>
+> On 18.03.25 17:18, Fuad Tabba wrote:
+> > For VMs that allow sharing guest_memfd backed memory in-place,
+> > handle that memory the same as "private" guest_memfd memory. This
+> > means that faulting that memory in the host or in the guest will
+> > go through the guest_memfd subsystem.
+> >
+> > Note that the word "private" in the name of the function
+> > kvm_mem_is_private() doesn't necessarily indicate that the memory
+> > isn't shared, but is due to the history and evolution of
+> > guest_memfd and the various names it has received. In effect,
+> > this function is used to multiplex between the path of a normal
+> > page fault and the path of a guest_memfd backed page fault.
+> >
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >   include/linux/kvm_host.h | 3 ++-
+> >   1 file changed, 2 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 601bbcaa5e41..3d5595a71a2a 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -2521,7 +2521,8 @@ static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+> >   #else
+> >   static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+> >   {
+> > -     return false;
+> > +     return kvm_arch_gmem_supports_shared_mem(kvm) &&
+> > +            kvm_slot_can_be_private(gfn_to_memslot(kvm, gfn));
+> >   }
+> >   #endif /* CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES */
+> >
+>
+> I've been thinking long about this, and was wondering if we should instead
+> clean up the code to decouple the "private" from gmem handling first.
+>
+> I know, this was already discussed a couple of times, but faking that
+> shared memory is private looks odd.
 
-Actually this setting doesn't really work these days, at lesat not on my Zen2 machine (3070x).
+I agree. I've been wanting to do that as part of a separate series,
+since renaming discussions sometimes tend to take a disproportionate
+amount of time. But the confusion the current naming (and overloading
+of terms) is causing is probably worse.
 
-Long ago I tested it, and despite loading the system with SMIs either via APIC or via 0xB2 ioport write, 
-where in both cases I noticed significant slowdown of a VM, pinned on the receiving CPU I got no SMI VM exits.
+>
+> I played with the code to star cleaning this up. I ended up with the following
+> gmem-terminology  cleanup patches (not even compile tested)
+>
+> KVM: rename CONFIG_KVM_GENERIC_PRIVATE_MEM to CONFIG_KVM_GENERIC_GMEM_POPULATE
+> KVM: rename CONFIG_KVM_PRIVATE_MEM to CONFIG_KVM_GMEM
+> KVM: rename kvm_arch_has_private_mem() to kvm_arch_supports_gmem()
+> KVM: x86: rename kvm->arch.has_private_mem to kvm->arch.supports_gmem
+> KVM: rename kvm_slot_can_be_private() to kvm_slot_has_gmem()
+> KVM: x86: generalize private fault lookups to "gmem" fault lookups
+>
+> https://github.com/davidhildenbrand/linux/tree/gmem_shared_prep
+>
+> On top of that, I was wondering if we could look into doing something like
+> the following. It would also allow for pulling pages out of gmem for
+> existing SW-protected VMs once they enable shared memory for GMEM IIUC.
+>
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 08eebd24a0e18..6f878cab0f466 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4495,11 +4495,6 @@ static int kvm_mmu_faultin_pfn_gmem(struct kvm_vcpu *vcpu,
+>   {
+>          int max_order, r;
+>
+> -       if (!kvm_slot_has_gmem(fault->slot)) {
+> -               kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
+> -               return -EFAULT;
+> -       }
+> -
+>          r = kvm_gmem_get_pfn(vcpu->kvm, fault->slot, fault->gfn, &fault->pfn,
+>                               &fault->refcounted_page, &max_order);
+>          if (r) {
+> @@ -4518,8 +4513,19 @@ static int __kvm_mmu_faultin_pfn(struct kvm_vcpu *vcpu,
+>                                   struct kvm_page_fault *fault)
+>   {
+>          unsigned int foll = fault->write ? FOLL_WRITE : 0;
+> +       bool use_gmem = false;
+> +
+> +       if (fault->is_private) {
+> +               if (!kvm_slot_has_gmem(fault->slot)) {
+> +                       kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
+> +                       return -EFAULT;
+> +               }
+> +               use_gmem = true;
+> +       } else if (kvm_slot_has_gmem_with_shared(fault->slot)) {
+> +               use_gmem = true;
+> +       }
+>
+> -       if (fault->is_private)
+> +       if (use_gmem)
+>                  return kvm_mmu_faultin_pfn_gmem(vcpu, fault);
+>
+>          foll |= FOLL_NOWAIT;
+>
+>
+> That is, we'd not claim that things are private when they are not, but instead
+> teach the code about shared memory coming from gmem.
+>
+> There might be some more missing, just throwing it out there if I am completely off.
 
-BIOS likely has an option to override this setting. 
+For me these changes seem to be reasonable all in all. I might want to
+suggest a couple of modifications, but I guess the bigger question is
+what the KVM maintainers and guest_memfd's main contributors think.
 
-I guess the reason is security, because with SVM,
-one can effectively block the SMIs from being processed on the host.
+Also, how do you suggest we go about this? Send out a separate series
+first, before continuing with the mapping series? Or have it all as
+one big series? It could be something to add to the agenda for
+Thursday.
 
-Best regards,
-	Maxim Levitsky
-
-
->  and handled in the
-> host context. So guest PMCs are isolated by a combination of having the GuestOnly
-> bit set and the #VMEXITs resulting from SMI interception.
-> 
-
-
+Thanks,
+/fuad
+> --
+> Cheers,
+>
+> David / dhildenb
+>
 
