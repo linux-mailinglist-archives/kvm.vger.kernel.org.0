@@ -1,87 +1,46 @@
-Return-Path: <kvm+bounces-43346-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43347-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68092A89CC2
-	for <lists+kvm@lfdr.de>; Tue, 15 Apr 2025 13:44:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A1FBA89E7B
+	for <lists+kvm@lfdr.de>; Tue, 15 Apr 2025 14:45:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FF7E1885D96
-	for <lists+kvm@lfdr.de>; Tue, 15 Apr 2025 11:43:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98C5F3B048F
+	for <lists+kvm@lfdr.de>; Tue, 15 Apr 2025 12:45:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78299293B62;
-	Tue, 15 Apr 2025 11:42:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CuF3JQhw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46EC9296D39;
+	Tue, 15 Apr 2025 12:45:36 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAA7628E614
-	for <kvm@vger.kernel.org>; Tue, 15 Apr 2025 11:42:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20BBE22F01;
+	Tue, 15 Apr 2025 12:45:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744717360; cv=none; b=KcF0sFihYNpk23q57KjLQPZsuS0HfN5NsqJrwCEH+q6NgjZV0PGn9/lP9Tw7WUv5GSnOUIn4KJT/715Pr/XiY3rVnu5Y9G8sM4XtHCcvmIT15oBerMMa0dEyX29IIh4s6bWYwWp30M7071ETncUxSFSRb+4L0fdkjWIAW7ArMsQ=
+	t=1744721135; cv=none; b=k6Jv4qJlj/MS2pLlC5OXiy3zxpZ/GMsVEbCYaIFlHPkVembEYIh3k2JYKL+uS3lzfNFWa6gjdRTCtdKPITKePTrTPaHxd8OoDi8NUgmLiLD24I/GPa4rh6dCj8hFhYDnPCRAtaRNos26ItgJghFgxF2fSRYrIr1MboICrGe5LcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744717360; c=relaxed/simple;
-	bh=kGHt4Afde1omI4nmqg2jcNzajV+HMy/TkkjZtuU0bQI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t03YrnHU041+rvc33zLLAVeaJ+rKd6k5GJuJTwvrXBnhpwljZY+Cr2p14VW6rCOsKKT4wIh+l6QKEiaPx9Rrz4bK2GcgP2Zqfk8+oOMkRHhaQuayOENA2AGFujxnwrKsQbIC1siEiHSs7kSWbEFzzoHTsBCVo9KBzgGIBt6CxSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CuF3JQhw; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744717357;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=21sufny1Dz2xylrlxmH87I6QNpgSN7tCAQpjobld9eE=;
-	b=CuF3JQhwMvIZo5BuobeuzPoS3NUudthjsSwytSvv7xNHR22X6ga0/n/+9UJTVa2CMFQByT
-	iWgWfdaGt2Zs1k0wmWKZC0Y4ZcV19+/jbM0KzbgpTt4hBlBYvbdjWM4wwse7MWExeIX7BU
-	72FDlOXpB492oMu0VYg08Xj0THj8j2Q=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-452-q2cU-62PO5uWfbvyf8geMA-1; Tue, 15 Apr 2025 07:42:36 -0400
-X-MC-Unique: q2cU-62PO5uWfbvyf8geMA-1
-X-Mimecast-MFC-AGG-ID: q2cU-62PO5uWfbvyf8geMA_1744717355
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-39131f2bbe5so2056094f8f.3
-        for <kvm@vger.kernel.org>; Tue, 15 Apr 2025 04:42:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744717355; x=1745322155;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=21sufny1Dz2xylrlxmH87I6QNpgSN7tCAQpjobld9eE=;
-        b=R1MeJ/+jbRQJq11PSZM+YIQoKDPIevikWOIiG7j+qo3FvjqCh++UREirfxPNP7EgbA
-         NvG/CkVnWJnTZRMK4l0oLQBGVLuaESK5oI0jqFcelWI/WJu3vaEn/YxyDEOOWpQbbZud
-         bb4IkqoyxW5K5xdTUQOy1MI7MiPOMEYhzXMulq6mKisCPvdp8n6UpurfjeO1hNMmGa8m
-         trJbQgv7soq0K7YIlhXZYQiA7s8uX0otj7/sUNKEEpbJCEmM0WsAC+L1ydG0ff3bbv8l
-         X7Gletrw6cXmckZqMItmjCYYCvhOTC67C7zTmpv7pb0TnbMTGPxouopdKrB8aV5VRI9r
-         FZ8w==
-X-Forwarded-Encrypted: i=1; AJvYcCVSqbRpH3WwUtMAg077kXK2lG+jnntI+vidl34DWbJTZDHva+xTZvmHFRXOqVOQO6yEDCE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCa3fC8LutevKnJE5UIuaI+SlNN/dUaQ3NrtEBazZmnP7SmYgG
-	rffbRd5zLSi2fgkg0EnPqZajWH7qDfXRf7w7UhTvVEbjWE8t0r/ULVUP9VsMq9nNqjvEgVYTRjC
-	Q70IHF0zlfgsxg+o1UCKKPxaLFdwKjTIYV9q01/BRFSXA0AHnQQ==
-X-Gm-Gg: ASbGncuq/yNy7kES86Q9ROLG8qbDyveJvtD3Xc0g4DA0m1wp0boyk/DXHsEXoN/SsI/
-	deAqMVtPJ+itVDQTn+ekYL2lzwuE2hfW4qFeYOsuCHNzOrUbXvCMBeaNHJ063DRJ5EJd/kBUWJ3
-	ed/BilqSMdpMVI4UR3oH8p5ZQomijip1De/i5yI3U+oXpAkS8M/34slIGAMOdr+bXeQX49k2DGS
-	RYJ6lmBJRgYR0Ehs45GSnQBDx9G/H0L4vwSB8dADWvVd1j31c57zRZhV4f88HbAZmaX1QSLPk1o
-	O42UbYaZSC+2zw/o
-X-Received: by 2002:a05:6000:430b:b0:39c:c64e:cf58 with SMTP id ffacd0b85a97d-39eaaed2d29mr12784966f8f.55.1744717355472;
-        Tue, 15 Apr 2025 04:42:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFOEK9OlZm2HlwrtOSS4aaebl8dVeZW7yEvXuCXhTSQfqaHyUlXVO19zQoEuFcqOOz4aNSlrw==
-X-Received: by 2002:a05:6000:430b:b0:39c:c64e:cf58 with SMTP id ffacd0b85a97d-39eaaed2d29mr12784946f8f.55.1744717355136;
-        Tue, 15 Apr 2025 04:42:35 -0700 (PDT)
-Received: from [192.168.10.48] ([176.206.109.83])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-43f2338db88sm208832245e9.6.2025.04.15.04.42.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Apr 2025 04:42:34 -0700 (PDT)
-Message-ID: <1b29eed0-fafc-427b-bd70-5dd087f2c0dd@redhat.com>
-Date: Tue, 15 Apr 2025 13:42:33 +0200
+	s=arc-20240116; t=1744721135; c=relaxed/simple;
+	bh=E5XQcw4IEaB0LKYRVD7ZDLH2kh1PfwrDrSF+4CKaanw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=DGsijTsC2fBPEP2QGzcylRWKtPJpNFCAVqonJXR2YlUvg0iTmktJBv7Xbqd8VEPvs8J7fgbu9zyBv8XyNcbq+no5o0lOeD5OrYjfI6id9B1KE/ZTveWWkbarE3kFYPkHzRZg1aj0XpIJdURkCcDZWCk/MkL+clG8YUEc9OwMbKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4ZcP374bdHz1R7gs;
+	Tue, 15 Apr 2025 20:43:31 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id D4EBE1A016C;
+	Tue, 15 Apr 2025 20:45:27 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 15 Apr 2025 20:45:27 +0800
+Message-ID: <28772dbe-1ae9-4ff7-91ef-c45d174b88d6@huawei.com>
+Date: Tue, 15 Apr 2025 20:45:22 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,116 +48,189 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 06/67] iommu/amd: WARN if KVM attempts to set vCPU
- affinity without posted intrrupts
-To: Sean Christopherson <seanjc@google.com>,
- Sairaj Kodilkar <sarunkod@amd.com>
-Cc: Joerg Roedel <joro@8bytes.org>, David Woodhouse <dwmw2@infradead.org>,
- Lu Baolu <baolu.lu@linux.intel.com>, kvm@vger.kernel.org,
- iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
- Maxim Levitsky <mlevitsk@redhat.com>,
- Joao Martins <joao.m.martins@oracle.com>, David Matlack
- <dmatlack@google.com>, Naveen N Rao <naveen.rao@amd.com>,
- Vasant Hegde <vasant.hegde@amd.com>
-References: <20250404193923.1413163-1-seanjc@google.com>
- <20250404193923.1413163-7-seanjc@google.com>
- <0895007e-95d9-410e-8b24-d17172b0b908@amd.com> <Z_ki0uZ9Rp3Fkrh1@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3] mm: alloc_pages_bulk: support both simple and
+ full-featured API
+To: Chuck Lever <chuck.lever@oracle.com>, Andrew Morton
+	<akpm@linux-foundation.org>, Yishai Hadas <yishaih@nvidia.com>, Jason
+ Gunthorpe <jgg@ziepe.ca>, Shameer Kolothum
+	<shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>, Chris Mason <clm@fb.com>, Josef
+ Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>, Gao Xiang
+	<xiang@kernel.org>, Chao Yu <chao@kernel.org>, Yue Hu <zbestahu@gmail.com>,
+	Jeffle Xu <jefflexu@linux.alibaba.com>, Sandeep Dhavale <dhavale@google.com>,
+	Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, Olga
+ Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
+	<tom@talpey.com>, Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+	<mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong
+ Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, KP
+ Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo
+	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Jesper Dangaard Brouer
+	<hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker
+	<anna@kernel.org>
+CC: Luiz Capitulino <luizcap@redhat.com>, Mel Gorman
+	<mgorman@techsingularity.net>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <virtualization@lists.linux.dev>,
+	<linux-btrfs@vger.kernel.org>, <linux-erofs@lists.ozlabs.org>,
+	<linux-mm@kvack.org>, <linux-nfs@vger.kernel.org>,
+	<linux-trace-kernel@vger.kernel.org>, <bpf@vger.kernel.org>,
+	<netdev@vger.kernel.org>
+References: <20250414120819.3053967-1-linyunsheng@huawei.com>
+ <18713073-342e-48b2-9864-24004445e234@oracle.com>
 Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- xsEhBFRCcBIBDqDGsz4K0zZun3jh+U6Z9wNGLKQ0kSFyjN38gMqU1SfP+TUNQepFHb/Gc0E2
- CxXPkIBTvYY+ZPkoTh5xF9oS1jqI8iRLzouzF8yXs3QjQIZ2SfuCxSVwlV65jotcjD2FTN04
- hVopm9llFijNZpVIOGUTqzM4U55sdsCcZUluWM6x4HSOdw5F5Utxfp1wOjD/v92Lrax0hjiX
- DResHSt48q+8FrZzY+AUbkUS+Jm34qjswdrgsC5uxeVcLkBgWLmov2kMaMROT0YmFY6A3m1S
- P/kXmHDXxhe23gKb3dgwxUTpENDBGcfEzrzilWueOeUWiOcWuFOed/C3SyijBx3Av/lbCsHU
- Vx6pMycNTdzU1BuAroB+Y3mNEuW56Yd44jlInzG2UOwt9XjjdKkJZ1g0P9dwptwLEgTEd3Fo
- UdhAQyRXGYO8oROiuh+RZ1lXp6AQ4ZjoyH8WLfTLf5g1EKCTc4C1sy1vQSdzIRu3rBIjAvnC
- tGZADei1IExLqB3uzXKzZ1BZ+Z8hnt2og9hb7H0y8diYfEk2w3R7wEr+Ehk5NQsT2MPI2QBd
- wEv1/Aj1DgUHZAHzG1QN9S8wNWQ6K9DqHZTBnI1hUlkp22zCSHK/6FwUCuYp1zcAEQEAAc0j
- UGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT7CwU0EEwECACMFAlRCcBICGwMH
- CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRB+FRAMzTZpsbceDp9IIN6BIA0Ol7MoB15E
- 11kRz/ewzryFY54tQlMnd4xxfH8MTQ/mm9I482YoSwPMdcWFAKnUX6Yo30tbLiNB8hzaHeRj
- jx12K+ptqYbg+cevgOtbLAlL9kNgLLcsGqC2829jBCUTVeMSZDrzS97ole/YEez2qFpPnTV0
- VrRWClWVfYh+JfzpXmgyhbkuwUxNFk421s4Ajp3d8nPPFUGgBG5HOxzkAm7xb1cjAuJ+oi/K
- CHfkuN+fLZl/u3E/fw7vvOESApLU5o0icVXeakfSz0LsygEnekDbxPnE5af/9FEkXJD5EoYG
- SEahaEtgNrR4qsyxyAGYgZlS70vkSSYJ+iT2rrwEiDlo31MzRo6Ba2FfHBSJ7lcYdPT7bbk9
- AO3hlNMhNdUhoQv7M5HsnqZ6unvSHOKmReNaS9egAGdRN0/GPDWr9wroyJ65ZNQsHl9nXBqE
- AukZNr5oJO5vxrYiAuuTSd6UI/xFkjtkzltG3mw5ao2bBpk/V/YuePrJsnPFHG7NhizrxttB
- nTuOSCMo45pfHQ+XYd5K1+Cv/NzZFNWscm5htJ0HznY+oOsZvHTyGz3v91pn51dkRYN0otqr
- bQ4tlFFuVjArBZcapSIe6NV8C4cEiSTOwE0EVEJx7gEIAMeHcVzuv2bp9HlWDp6+RkZe+vtl
- KwAHplb/WH59j2wyG8V6i33+6MlSSJMOFnYUCCL77bucx9uImI5nX24PIlqT+zasVEEVGSRF
- m8dgkcJDB7Tps0IkNrUi4yof3B3shR+vMY3i3Ip0e41zKx0CvlAhMOo6otaHmcxr35sWq1Jk
- tLkbn3wG+fPQCVudJJECvVQ//UAthSSEklA50QtD2sBkmQ14ZryEyTHQ+E42K3j2IUmOLriF
- dNr9NvE1QGmGyIcbw2NIVEBOK/GWxkS5+dmxM2iD4Jdaf2nSn3jlHjEXoPwpMs0KZsgdU0pP
- JQzMUMwmB1wM8JxovFlPYrhNT9MAEQEAAcLBMwQYAQIACQUCVEJx7gIbDAAKCRB+FRAMzTZp
- sadRDqCctLmYICZu4GSnie4lKXl+HqlLanpVMOoFNnWs9oRP47MbE2wv8OaYh5pNR9VVgyhD
- OG0AU7oidG36OeUlrFDTfnPYYSF/mPCxHttosyt8O5kabxnIPv2URuAxDByz+iVbL+RjKaGM
- GDph56ZTswlx75nZVtIukqzLAQ5fa8OALSGum0cFi4ptZUOhDNz1onz61klD6z3MODi0sBZN
- Aj6guB2L/+2ZwElZEeRBERRd/uommlYuToAXfNRdUwrwl9gRMiA0WSyTb190zneRRDfpSK5d
- usXnM/O+kr3Dm+Ui+UioPf6wgbn3T0o6I5BhVhs4h4hWmIW7iNhPjX1iybXfmb1gAFfjtHfL
- xRUr64svXpyfJMScIQtBAm0ihWPltXkyITA92ngCmPdHa6M1hMh4RDX+Jf1fiWubzp1voAg0
- JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
- dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
- b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <Z_ki0uZ9Rp3Fkrh1@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <18713073-342e-48b2-9864-24004445e234@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-On 4/11/25 16:10, Sean Christopherson wrote:
-> On Fri, Apr 11, 2025, Sairaj Kodilkar wrote:
->> On 4/5/2025 1:08 AM, Sean Christopherson wrote:
->>> WARN if KVM attempts to set vCPU affinity when posted interrupts aren't
->>> enabled, as KVM shouldn't try to enable posting when they're unsupported,
->>> and the IOMMU driver darn well should only advertise posting support when
->>> AMD_IOMMU_GUEST_IR_VAPIC() is true.
->>>
->>> Note, KVM consumes is_guest_mode only on success.
->>>
->>> Signed-off-by: Sean Christopherson <seanjc@google.com>
->>> ---
->>>    drivers/iommu/amd/iommu.c | 13 +++----------
->>>    1 file changed, 3 insertions(+), 10 deletions(-)
->>>
->>> diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
->>> index b3a01b7757ee..4f69a37cf143 100644
->>> --- a/drivers/iommu/amd/iommu.c
->>> +++ b/drivers/iommu/amd/iommu.c
->>> @@ -3852,19 +3852,12 @@ static int amd_ir_set_vcpu_affinity(struct irq_data *data, void *vcpu_info)
->>>    	if (!dev_data || !dev_data->use_vapic)
->>>    		return -EINVAL;
->>> +	if (WARN_ON_ONCE(!AMD_IOMMU_GUEST_IR_VAPIC(amd_iommu_guest_ir)))
->>> +		return -EINVAL;
->>> +
+On 2025/4/15 1:39, Chuck Lever wrote:
+> On 4/14/25 8:08 AM, Yunsheng Lin wrote:
+>> As mentioned in [1], it seems odd to check NULL elements in
+>> the middle of page bulk allocating, and it seems caller can
+>> do a better job of bulk allocating pages into a whole array
+>> sequentially without checking NULL elements first before
+>> doing the page bulk allocation for most of existing users
+>> by passing 'page_array + allocated' and 'nr_pages - allocated'
+>> when calling subsequent page bulk alloc API so that NULL
+>> checking can be avoided, see the pattern in mm/mempolicy.c.
 >>
->> Hi Sean,
->> 'dev_data->use_vapic' is always zero when AMD IOMMU uses legacy
->> interrupts i.e. when AMD_IOMMU_GUEST_IR_VAPIC(amd_iommu_guest_ir) is 0.
->> Hence you can remove this additional check.
+>> Through analyzing of existing bulk allocation API users, it
+>> seems only the fs users are depending on the assumption of
+>> populating only NULL elements, see:
+>> commit 91d6ac1d62c3 ("btrfs: allocate page arrays using bulk page allocator")
+>> commit d6db47e571dc ("erofs: do not use pagepool in z_erofs_gbuf_growsize()")
+>> commit f6e70aab9dfe ("SUNRPC: refresh rq_pages using a bulk page allocator")
+>> commit 88e4d41a264d ("SUNRPC: Use __alloc_bulk_pages() in svc_init_buffer()")
+>>
+>> The current API adds a mental burden for most users. For most
+>> users, their code would be much cleaner if the interface accepts
+>> an uninitialised array with length, and were told how many pages
+>> had been stored in that array, so support one simple and one
+>> full-featured to meet the above different use cases as below:
+>> - alloc_pages_bulk() would be given an uninitialised array of page
+>>   pointers and a required count and would return the number of
+>>   pages that were allocated.
+>> - alloc_pages_bulk_refill() would be given an initialised array
+>>   of page pointers some of which might be NULL. It would attempt
+>>   to allocate pages for the non-NULL pointers, return 0 if all
+>>   pages are allocated, -EAGAIN if at least one page allocated,
+>>   ok to try again immediately or -ENOMEM if don't bother trying
+>>   again soon, which provides a more consistent semantics than the
+>>   current API as mentioned in [2], at the cost of the pages might
+>>   be getting re-ordered to make the implementation simpler.
+>>
+>> Change the existing fs users to use the full-featured API, except
+>> for the one for svc_init_buffer() in net/sunrpc/svc.c. Other
+>> existing callers can use the simple API as they seems to be passing
+>> all NULL elements via memset, kzalloc, etc, only remove unnecessary
+>> memset for existing users calling the simple API in this patch.
+>>
+>> The test result for xfstests full test:
+>> Before this patch:
+>> btrfs/default: 1061 tests, 3 failures, 290 skipped, 13152 seconds
+>>   Failures: btrfs/012 btrfs/226
+>>   Flaky: generic/301: 60% (3/5)
+>> Totals: 1073 tests, 290 skipped, 13 failures, 0 errors, 12540s
+>>
+>> nfs/loopback: 530 tests, 3 failures, 392 skipped, 3942 seconds
+>>   Failures: generic/464 generic/551
+>>   Flaky: generic/650: 40% (2/5)
+>> Totals: 542 tests, 392 skipped, 12 failures, 0 errors, 3799s
+>>
+>> After this patch:
+>> btrfs/default: 1061 tests, 2 failures, 290 skipped, 13446 seconds
+>>   Failures: btrfs/012 btrfs/226
+>> Totals: 1069 tests, 290 skipped, 10 failures, 0 errors, 12853s
+>>
+>> nfs/loopback: 530 tests, 3 failures, 392 skipped, 4103 seconds
+>>   Failures: generic/464 generic/551
+>>   Flaky: generic/650: 60% (3/5)
+>> Totals: 542 tests, 392 skipped, 13 failures, 0 errors, 3933s
 > 
-> Hmm, or move it above?  KVM should never call amd_ir_set_vcpu_affinity() if
-> IRQ posting is unsupported, and that would make this consistent with the end
-> behavior of amd_iommu_update_ga() and amd_iommu_{de,}activate_guest_mode().
+> Hi -
 > 
-> 	if (WARN_ON_ONCE(!AMD_IOMMU_GUEST_IR_VAPIC(amd_iommu_guest_ir)))
-> 		return -EINVAL;
-> 
-> 	if (ir_data->iommu == NULL)
-> 		return -EINVAL;
-> 
-> 	dev_data = search_dev_data(ir_data->iommu, irte_info->devid);
-> 
-> 	/* Note:
-> 	 * This device has never been set up for guest mode.
-> 	 * we should not modify the IRTE
-> 	 */
-> 	if (!dev_data || !dev_data->use_vapic)
-> 		return -EINVAL;
-> 
-> I'd like to keep the WARN so that someone will notice if KVM screws up.
+> The "after" run for NFS took longer, and not by a little bit. Can you
+> explain the difference?
 
-Makes sense, avic_pi_update_irte() returns way before it has the 
-occasion to call irq_set_vcpu_affinity().
+Ah, I overlooked the difference as I was not looking to have a performance
+comparasion using xfstest full test due to possible noise, so the above test
+might be done with other job like kernel compiling behind the scenes as it
+was tested with the same machine where I was doing some kernel compiling.
 
-Paolo
+And I used a temporary patch to enable the using of full-featured API in
+page_pool to test if the full-featured API will cause performance regression
+for the existing users in fs as mentioned at the end of commit log.
 
+> 
+> You can expunge the flakey test (generic/650) to help make the results
+> more directly comparable. 650 is a CPU hot-plugging test.
+
+I retested in a newer and more powerful machine without obvious heavy job
+behind the scenes based on linux-next-20250411, and the flakey test seems
+gone too.
+
+before:
+-------------------- Summary report
+KERNEL:    kernel 6.15.0-rc1-next-20250411-xfstests #369 SMP PREEMPT_DYNAMIC Tue Apr 15 16:17:08 CST 2025 x86_64
+CMDLINE:   full
+CPUS:      2
+MEM:       1972.54
+
+nfs/loopback: 539 tests, 4 failures, 400 skipped, 2364 seconds
+  Failures: generic/169 generic/363 generic/464 generic/551
+Totals: 555 tests, 400 skipped, 20 failures, 0 errors, 2205s
+
+after:
+-------------------- Summary report
+KERNEL:    kernel 6.15.0-rc1-next-20250411-xfstests-00001-g316d17a7f7bb #370 SMP PREEMPT_DYNAMIC Tue Apr 15 19:57:48 CST 2025 x86_64
+CMDLINE:   full
+CPUS:      2
+MEM:       1972.54
+
+nfs/loopback: 539 tests, 4 failures, 400 skipped, 2327 seconds
+  Failures: generic/169 generic/363 generic/464 generic/551
+Totals: 555 tests, 400 skipped, 20 failures, 0 errors, 2148s
+
+> 
+> 
+>> The stress test also suggest there is no regression for the erofs
+>> too.
+>>
+>> Using the simple API also enable the caller to not zero the array
+>> before calling the page bulk allocating API, which has about 1~2 ns
+>> performance improvement for time_bench_page_pool03_slow() test case
+>> of page_pool in a x86 vm system, this reduces some performance impact
+>> of fixing the DMA API misuse problem in [3], performance improves
+>> from 87.886 ns to 86.429 ns.
+>>
+>> Also a temporary patch to enable the using of full-featured API in
+>> page_pool suggests that the new full-featured API doesn't seem to have
+>> noticeable performance impact for the existing users, like SUNRPC, btrfs
+>> and erofs.
+>>
+>> 1. https://lore.kernel.org/all/bd8c2f5c-464d-44ab-b607-390a87ea4cd5@huawei.com/
+>> 2. https://lore.kernel.org/all/180818a1-b906-4a0b-89d3-34cb71cc26c9@huawei.com/
+>> 3. https://lore.kernel.org/all/20250212092552.1779679-1-linyunsheng@huawei.com/
+>> CC: Jesper Dangaard Brouer <hawk@kernel.org>
+>> CC: Luiz Capitulino <luizcap@redhat.com>
+>> CC: Mel Gorman <mgorman@techsingularity.net>
+>> Suggested-by: Neil Brown <neilb@suse.de>
+>> Acked-by: Jeff Layton <jlayton@kernel.org>
+>> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+>> ---
+>> V3:
+>> 1. Provide both simple and full-featured API as suggested by NeilBrown.
+>> 2. Do the fs testing as suggested in V2.
+>>
+>> V2:
+>> 1. Drop RFC tag.
+>> 2. Fix a compile error for xfs.
+>> 3. Defragmemt the page_array for SUNRPC and btrfs.
 
