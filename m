@@ -1,193 +1,224 @@
-Return-Path: <kvm+bounces-43334-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43336-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CD05A897D4
-	for <lists+kvm@lfdr.de>; Tue, 15 Apr 2025 11:25:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5ADF6A89888
+	for <lists+kvm@lfdr.de>; Tue, 15 Apr 2025 11:46:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E318168FFD
-	for <lists+kvm@lfdr.de>; Tue, 15 Apr 2025 09:25:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D29916AC45
+	for <lists+kvm@lfdr.de>; Tue, 15 Apr 2025 09:46:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0787D2820CE;
-	Tue, 15 Apr 2025 09:25:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28E11289377;
+	Tue, 15 Apr 2025 09:45:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="CReVAz9Q"
 X-Original-To: kvm@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp-bc08.mail.infomaniak.ch (smtp-bc08.mail.infomaniak.ch [45.157.188.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B40205AA3;
-	Tue, 15 Apr 2025 09:25:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E77A828DF14
+	for <kvm@vger.kernel.org>; Tue, 15 Apr 2025 09:45:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744709115; cv=none; b=N5chTOBx/wCV+hPQpyXcciG+zUSYYEZ+YbC2oRoYVSThYpqBd7JKhhu7NMxc4qpKoIDCu2TTUr3OwSB0BJra+gyHKSl9ClA1Dykiq92CylUojQh1GKXBV5Iq4wEMLVggbY1Qk4JwGVQVxbEVXegQGkdjfteiyn4NDQgKvjWnroE=
+	t=1744710324; cv=none; b=eO/vR9xD7TMI6sEDrk9b5eV+OcKDzND4yS/5qnY0N4RujOe5gK2+V9cqs1JvoWEoE6j3dCKDvvq8st84WkJkFq6zi/qR6ZOA/XweayAkB69/9994sEcKmeIAYYuJhzEv2qLyrxjmodpjNriqvqDdIngQxDHZls5uBPfA4mVh/pg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744709115; c=relaxed/simple;
-	bh=STTgkUZueXTcQfp5TF055dGrFMr6LZZxoaECsIO7+w8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=l940ufOKh9pf8ziE+lgf6oGyeE2P4HiXpp/vKgo5btww+oB6hyEtwFeYjoal4Z9ezg5z6nF65+ajvdVVY9zTyUhuf7MvN22fPCZ/vL8ERTFwq42Vcz+sO7XZ9c4SMGUjn8LIaDpGr5aGsF5ZMq1QJy8I7NO0VPfv1DcKY8XOhC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ZcJcl5Vhqz6L58S;
-	Tue, 15 Apr 2025 17:23:51 +0800 (CST)
-Received: from frapeml500007.china.huawei.com (unknown [7.182.85.172])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4098F1407DB;
-	Tue, 15 Apr 2025 17:25:09 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (7.182.85.71) by
- frapeml500007.china.huawei.com (7.182.85.172) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 15 Apr 2025 11:25:08 +0200
-Received: from frapeml500008.china.huawei.com ([7.182.85.71]) by
- frapeml500008.china.huawei.com ([7.182.85.71]) with mapi id 15.01.2507.039;
- Tue, 15 Apr 2025 11:25:08 +0200
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: liulongfang <liulongfang@huawei.com>, "alex.williamson@redhat.com"
-	<alex.williamson@redhat.com>, "jgg@nvidia.com" <jgg@nvidia.com>, "Jonathan
- Cameron" <jonathan.cameron@huawei.com>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linuxarm@openeuler.org" <linuxarm@openeuler.org>
-Subject: RE: [PATCH v7 6/6] hisi_acc_vfio_pci: update function return values.
-Thread-Topic: [PATCH v7 6/6] hisi_acc_vfio_pci: update function return values.
-Thread-Index: AQHbqpZ//2t0kcEhp0OCOF/DXXF6prOkeeyQ
-Date: Tue, 15 Apr 2025 09:25:08 +0000
-Message-ID: <ed4f09039ffb45f3a3d5b418c92ae6ad@huawei.com>
-References: <20250411035907.57488-1-liulongfang@huawei.com>
- <20250411035907.57488-7-liulongfang@huawei.com>
-In-Reply-To: <20250411035907.57488-7-liulongfang@huawei.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1744710324; c=relaxed/simple;
+	bh=28UsXXE8f6JRjCoy1GJYsta2nK9fbaJ05h8GUvK8dSA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DmpvHCcIsBOVUlCe6RDKPdW1FuiKp1NjZbOqfn2Q3W9Vj7j3g5qMzOqhFl27+mVqcZdrzxn9eS4M1/eX2WZA1q1eB6xWWaTgTP8NWxLuFpUyPdIpVKEbgvcfLYd9CNMASCa/sCC0d9I+HB29uviv3Vl+jcmsCalSBc4hTgpCvn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=CReVAz9Q; arc=none smtp.client-ip=45.157.188.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-3-0000.mail.infomaniak.ch (smtp-3-0000.mail.infomaniak.ch [10.4.36.107])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4ZcJlS14QNzF0Y;
+	Tue, 15 Apr 2025 11:29:40 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1744709380;
+	bh=w122IkwKpIFchvBGmJYVkBlhuud7xib14rHOWPuOBeU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CReVAz9QmeMt6VWs6yrVjd11gGpMGlnPk5sxckRYh+Es6+AAi4jlw7z5eZ2M6EFjj
+	 aJz+crKM5FfCBX/J5BMBUehYfOeNwFWzcaa9LD9K4HluhHfG8df+K0LXj4ZkZrIlH4
+	 Qgxf5RcqPcllnq+RMaFeIcXEHrDWJAy8wWwyEfVk=
+Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4ZcJlQ5hXSzJSG;
+	Tue, 15 Apr 2025 11:29:38 +0200 (CEST)
+Date: Tue, 15 Apr 2025 11:29:38 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Jon Kohler <jon@nutanix.com>, Sean Christopherson <seanjc@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Alexander Grest <Alexander.Grest@microsoft.com>, 
+	Nicolas Saenz Julienne <nsaenz@amazon.es>, "Madhavan T . Venkataraman" <madvenka@linux.microsoft.com>, 
+	Tao Su <tao1.su@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Zhao Liu <zhao1.liu@intel.com>
+Subject: Re: [RFC PATCH 00/18] KVM: VMX: Introduce Intel Mode-Based Execute
+ Control (MBEC)
+Message-ID: <20250415.AegioKi3ioda@digikod.net>
+References: <20250313203702.575156-1-jon@nutanix.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250313203702.575156-1-jon@nutanix.com>
+X-Infomaniak-Routing: alpha
 
+Hi,
 
+This series looks good, just some inlined questions.
 
-> -----Original Message-----
-> From: liulongfang <liulongfang@huawei.com>
-> Sent: Friday, April 11, 2025 4:59 AM
-> To: alex.williamson@redhat.com; jgg@nvidia.com; Shameerali Kolothum
-> Thodi <shameerali.kolothum.thodi@huawei.com>; Jonathan Cameron
-> <jonathan.cameron@huawei.com>
-> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> linuxarm@openeuler.org; liulongfang <liulongfang@huawei.com>
-> Subject: [PATCH v7 6/6] hisi_acc_vfio_pci: update function return values.
->=20
-> In this driver file, many functions call sub-functions and use ret
-> to store the error code of the sub-functions.
-> However, instead of directly returning ret to the caller, they use a
-> converted error code, which prevents the end-user from clearly
-> understanding the root cause of the error.
-> Therefore, the code needs to be modified to directly return the error
-> code from the sub-functions.
->=20
-> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
-> ---
->  drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
->=20
-> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> index d12a350440d3..c63e302ac092 100644
-> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> @@ -392,7 +392,7 @@ static int vf_qm_check_match(struct
-> hisi_acc_vf_core_device *hisi_acc_vdev,
->  	ret =3D vf_qm_version_check(vf_data, dev);
->  	if (ret) {
->  		dev_err(dev, "failed to match ACC_DEV_MAGIC\n");
-> -		return -EINVAL;
-> +		return ret;
->  	}
->=20
->  	if (vf_data->dev_id !=3D hisi_acc_vdev->vf_dev->device) {
-> @@ -404,7 +404,7 @@ static int vf_qm_check_match(struct
-> hisi_acc_vf_core_device *hisi_acc_vdev,
->  	ret =3D qm_get_vft(vf_qm, &vf_qm->qp_base);
->  	if (ret <=3D 0) {
->  		dev_err(dev, "failed to get vft qp nums\n");
-> -		return -EINVAL;
-> +		return ret;
->  	}
->=20
->  	if (ret !=3D vf_data->qp_num) {
-> @@ -501,7 +501,7 @@ static int vf_qm_load_data(struct
-> hisi_acc_vf_core_device *hisi_acc_vdev,
->  	ret =3D qm_write_regs(qm, QM_VF_STATE, &vf_data->vf_qm_state, 1);
->  	if (ret) {
->  		dev_err(dev, "failed to write QM_VF_STATE\n");
-> -		return -EINVAL;
-> +		return ret;
->  	}
->  	hisi_acc_vdev->vf_qm_state =3D vf_data->vf_qm_state;
->=20
-> @@ -542,7 +542,7 @@ static int vf_qm_read_data(struct hisi_qm *vf_qm,
-> struct acc_vf_data *vf_data)
->=20
->  	ret =3D qm_get_regs(vf_qm, vf_data);
->  	if (ret)
-> -		return -EINVAL;
-> +		return ret;
->=20
->  	/* Every reg is 32 bit, the dma address is 64 bit. */
->  	vf_data->eqe_dma =3D vf_data->qm_eqc_dw[QM_XQC_ADDR_HIGH];
-> @@ -556,13 +556,13 @@ static int vf_qm_read_data(struct hisi_qm
-> *vf_qm, struct acc_vf_data *vf_data)
->  	ret =3D qm_get_sqc(vf_qm, &vf_data->sqc_dma);
->  	if (ret) {
->  		dev_err(dev, "failed to read SQC addr!\n");
-> -		return -EINVAL;
-> +		return ret;
->  	}
->=20
->  	ret =3D qm_get_cqc(vf_qm, &vf_data->cqc_dma);
->  	if (ret) {
->  		dev_err(dev, "failed to read CQC addr!\n");
-> -		return -EINVAL;
-> +		return ret;
->  	}
->=20
->  	return 0;
-> @@ -588,7 +588,7 @@ static int vf_qm_state_save(struct
-> hisi_acc_vf_core_device *hisi_acc_vdev,
->=20
->  	ret =3D vf_qm_read_data(vf_qm, vf_data);
->  	if (ret)
-> -		return -EINVAL;
-> +		return ret;
->=20
->  	migf->total_length =3D sizeof(struct acc_vf_data);
->  	/* Save eqc and aeqc interrupt information */
-> @@ -1379,7 +1379,7 @@ static int hisi_acc_vf_debug_check(struct seq_file
-> *seq, struct vfio_device *vde
->  	ret =3D qm_wait_dev_not_ready(vf_qm);
->  	if (ret) {
->  		seq_puts(seq, "VF device not ready!\n");
-> -		return -EBUSY;
-> +		return ret;
->  	}
->=20
->  	return 0;
+Sean, Paolo, what do you think?
 
-Any reason you avoided few other instances here?
+Jon, what is the status of the QEMU patches?
 
-1. qemu_set_regs() --> hisi_qm_wait_mb_ready() -->ret -EBUSY;
-2. vf_qm_cache_wb() ret -EINVAL on -ETIMEOUT.
+Regards,
+ Mickaël
 
-With the above addressed,
-
-Reviewed-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-
-Thanks,
-Shameer
-
+On Thu, Mar 13, 2025 at 01:36:39PM -0700, Jon Kohler wrote:
+> ## Summary
+> This series introduces support for Intel Mode-Based Execute Control
+> (MBEC) to KVM and nested VMX virtualization, aiming to significantly
+> reduce VMexits and improve performance for Windows guests running with
+> Hypervisor-Protected Code Integrity (HVCI).
+> 
+> ## What?
+> Intel MBEC is a hardware feature, introduced in the Kabylake
+> generation, that allows for more granular control over execution
+> permissions. MBEC enables the separation and tracking of execution
+> permissions for supervisor (kernel) and user-mode code. It is used as
+> an accelerator for Microsoft's Memory Integrity [1] (also known as
+> hypervisor-protected code integrity or HVCI).
+> 
+> ## Why?
+> The primary reason for this feature is performance.
+> 
+> Without hardware-level MBEC, enabling Windows HVCI runs a 'software
+> MBEC' known as Restricted User Mode, which imposes a runtime overhead
+> due to increased state transitions between the guest's L2 root
+> partition and the L2 secure partition for running kernel mode code
+> integrity operations.
+> 
+> In practice, this results in a significant number of exits. For
+> example, playing a YouTube video within the Edge Browser produces
+> roughly 1.2 million VMexits/second across an 8 vCPU Windows 11 guest.
+> 
+> Most of these exits are VMREAD/VMWRITE operations, which can be
+> emulated with Enlightened VMCS (eVMCS). However, even with eVMCS, this
+> configuration still produces around 200,000 VMexits/second.
+> 
+> With MBEC exposed to the L1 Windows Hypervisor, the same scenario
+> results in approximately 50,000 VMexits/second, a *24x* reduction from
+> the baseline.
+> 
+> Not a typo, 24x reduction in VMexits.
+> 
+> ## How?
+> This series implements core KVM support for exposing the MBEC bit in
+> secondary execution controls (bit 22) to L1 and L2, based on
+> configuration from user space and a module parameter
+> 'enable_pt_guest_exec_control'. The inspiration for this series
+> started with Mickaël's series for Heki [3], where we've extracted,
+> refactored, and extended the MBEC-specific use case to be
+> general-purpose.
+> 
+> MBEC, which appears in Linux /proc/cpuinfo as ept_mode_based_exec,
+> splits the EPT exec bit (bit 2 in PTE) into two bits. When secondary
+> execution control bit 22 is set, PTE bit 2 reflects supervisor mode
+> executable, and PTE bit 10 reflects user mode executable.
+> 
+> The semantics for EPT violation qualifications also change when MBEC
+> is enabled, with bit 5 reflecting supervisor/kernel mode execute
+> permissions and bit 6 reflecting user mode execute permissions.
+> This ultimately serves to expose this feature to the L1 hypervisor,
+> which consumes MBEC and informs the L2 partitions not to use the
+> software MBEC by removing bit 14 in 0x40000004 EAX [4].
+> 
+> ## Where?
+> Enablement spans both VMX code and MMU code to teach the shadow MMU
+> about the different execution modes, as well as user space VMM to pass
+> secondary execution control bit 22. A patch for QEMU enablement is
+> available [5].
+> 
+> ## Testing
+> Initial testing has been on done on 6.12-based code with:
+>   Guests
+>     - Windows 11 24H2 26100.2894
+>     - Windows Server 2025 24H2 26100.2894
+>     - Windows Server 2022 W1H2 20348.825
+>   Processors:
+>     - Intel Skylake 6154
+>     - Intel Sapphire Rapids 6444Y
+> 
+> ## Acknowledgements
+> Special thanks to all contributors and reviewers who have provided
+> valuable feedback and support for this patch series.
+> 
+> [1] https://learn.microsoft.com/en-us/windows/security/hardware-security/enable-virtualization-based-protection-of-code-integrity
+> [2] https://learn.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/nested-virtualization#enlightened-vmcs-intel
+> [3] https://patchwork.kernel.org/project/kvm/patch/20231113022326.24388-6-mic@digikod.net/
+> [4] https://learn.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/feature-discovery#implementation-recommendations---0x40000004
+> [5] https://github.com/JonKohler/qemu/tree/mbec-rfc-v1
+> 
+> Cc: Alexander Grest <Alexander.Grest@microsoft.com>
+> Cc: Nicolas Saenz Julienne <nsaenz@amazon.es>
+> Cc: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+> Cc: Mickaël Salaün <mic@digikod.net>
+> Cc: Tao Su <tao1.su@linux.intel.com>
+> Cc: Xiaoyao Li <xiaoyao.li@intel.com>
+> Cc: Zhao Liu <zhao1.liu@intel.com>
+> 
+> Jon Kohler (11):
+>   KVM: x86: Add module parameter for Intel MBEC
+>   KVM: x86: Add pt_guest_exec_control to kvm_vcpu_arch
+>   KVM: VMX: Wire up Intel MBEC enable/disable logic
+>   KVM: x86/mmu: Remove SPTE_PERM_MASK
+>   KVM: VMX: Extend EPT Violation protection bits
+>   KVM: x86/mmu: Introduce shadow_ux_mask
+>   KVM: x86/mmu: Adjust SPTE_MMIO_ALLOWED_MASK to understand MBEC
+>   KVM: x86/mmu: Extend make_spte to understand MBEC
+>   KVM: nVMX: Setup Intel MBEC in nested secondary controls
+>   KVM: VMX: Allow MBEC with EVMCS
+>   KVM: x86: Enable module parameter for MBEC
+> 
+> Mickaël Salaün (5):
+>   KVM: VMX: add cpu_has_vmx_mbec helper
+>   KVM: VMX: Define VMX_EPT_USER_EXECUTABLE_MASK
+>   KVM: x86/mmu: Extend access bitfield in kvm_mmu_page_role
+>   KVM: VMX: Enhance EPT violation handler for PROT_USER_EXEC
+>   KVM: x86/mmu: Extend is_executable_pte to understand MBEC
+> 
+> Nikolay Borisov (1):
+>   KVM: VMX: Remove EPT_VIOLATIONS_ACC_*_BIT defines
+> 
+> Sean Christopherson (1):
+>   KVM: nVMX: Decouple EPT RWX bits from EPT Violation protection bits
+> 
+>  arch/x86/include/asm/kvm_host.h | 13 +++++----
+>  arch/x86/include/asm/vmx.h      | 45 ++++++++++++++++++++---------
+>  arch/x86/kvm/mmu.h              |  3 +-
+>  arch/x86/kvm/mmu/mmu.c          | 13 +++++----
+>  arch/x86/kvm/mmu/mmutrace.h     | 23 ++++++++++-----
+>  arch/x86/kvm/mmu/paging_tmpl.h  | 19 +++++++++---
+>  arch/x86/kvm/mmu/spte.c         | 51 ++++++++++++++++++++++++++++-----
+>  arch/x86/kvm/mmu/spte.h         | 36 +++++++++++++++--------
+>  arch/x86/kvm/mmu/tdp_mmu.c      |  2 +-
+>  arch/x86/kvm/vmx/capabilities.h |  6 ++++
+>  arch/x86/kvm/vmx/hyperv.c       |  5 +++-
+>  arch/x86/kvm/vmx/hyperv_evmcs.h |  1 +
+>  arch/x86/kvm/vmx/nested.c       |  4 +++
+>  arch/x86/kvm/vmx/vmx.c          | 21 ++++++++++++--
+>  arch/x86/kvm/vmx/vmx.h          |  7 +++++
+>  arch/x86/kvm/x86.c              |  4 +++
+>  16 files changed, 192 insertions(+), 61 deletions(-)
+> 
+> -- 
+> 2.43.0
+> 
+> 
 
