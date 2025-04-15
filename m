@@ -1,134 +1,100 @@
-Return-Path: <kvm+bounces-43330-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43331-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1097FA89567
-	for <lists+kvm@lfdr.de>; Tue, 15 Apr 2025 09:43:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 678E5A89573
+	for <lists+kvm@lfdr.de>; Tue, 15 Apr 2025 09:44:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D05F0177A75
-	for <lists+kvm@lfdr.de>; Tue, 15 Apr 2025 07:43:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06E2E17779F
+	for <lists+kvm@lfdr.de>; Tue, 15 Apr 2025 07:44:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAB1427F727;
-	Tue, 15 Apr 2025 07:42:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3561E27A914;
+	Tue, 15 Apr 2025 07:44:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q4JPAz/b"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="al98KKN1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 634F72741D2;
-	Tue, 15 Apr 2025 07:42:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F58EA48;
+	Tue, 15 Apr 2025 07:44:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744702940; cv=none; b=OyCoGr5Q0VvlK5CLXdWnIsGvgOgNiBTJI0TEVzd/agtmR/fAtS3Q2zwkahWyk2+HJaJRHId9l8Yl0UDL1psofKILup7qmlYAezeUfh3d7FzefwwKd0J59aAAQviKj7ghwVYktrugubnBXuGsASsQHZDfyjg/cVa565XfknhVWCs=
+	t=1744703079; cv=none; b=be2JvUN1eRO/CApE4cfQa6o1yajLlZouLNA380uYQNh+CELiSwBWUPLat9sCG711I1szPq5n9ZpccXQWGHV/z956o8glzpOQg2Qj/Yz15nih6RoITtwrOE6SRFdXTEod00XPCSpGM+CY9VsrJD+KtRHlwuhYYJV5id+3+SZJjj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744702940; c=relaxed/simple;
-	bh=2ghFJ/WoNNJtx50ePbwntOjD68huaKDwuNVZLJOMKkE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B4fcqVGJEpDzbBnAQh0ESVxI1ZQaPGRH/AXfS+s8aKzo8ZG0pdvcGaNiddZCSeU2hlUpdROyzFdUqrNS01hn2Hrdn11wnVsJ/nSmrmuv9AF+/7ryoYJQ3XcejB4vynDt70xWIn8v0sk49OAa2qRzW1naSRq0euhHRf1WwJprzok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q4JPAz/b; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-30c416cdcc0so46690411fa.2;
-        Tue, 15 Apr 2025 00:42:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744702936; x=1745307736; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=58EGUTXtUxIy6cjRPhm4Aku8724XI9vW76TExXikKn0=;
-        b=Q4JPAz/b+0iSs7uRpEigR5sV+xhPAcJ3XKQxwcJf3AM1SmTU9D1qCQvEpxkQSd4GrN
-         ehnYQScs8xv28ONpr9+iOU+WNkVOJ8G4Wf9U/XdCkmU9EyVfKsweAJUAcwRh/OuSiaKj
-         XSIKyeS1/Zgv9psRSUmYkWj8Sg4Qfv1xWc4OtZCGCdmd0bQW0CaiqkR6BR5nYNnPnYSg
-         zX0DulEJuznod0lZsG6Yz5n50E8he/N0PeIkEYGw2PFF4oItRZrzSpiXtGcmbdGT/to3
-         r4Hm/fkApd+RkDdDG8GOLmgsxTTTFGwGZCjzCKYzIp1Lqm5Sox2Fn+NooeaJQV0ssQuP
-         K/hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744702936; x=1745307736;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=58EGUTXtUxIy6cjRPhm4Aku8724XI9vW76TExXikKn0=;
-        b=tUW5LXfSVx5AWOxBoWamsVAfCI0cN5BCgP+OXw1k5s7/Lmf4q9knphBj2xJ1Kp5tx9
-         s7P5GtfFdOTDepdtauSACnnJSKfhhrfssuLEgK+7C7BAq0v9C3oCKSEzhAESjzsQ12PG
-         WQD8SN8F7QGB3jwtlRB/oeP1hGquLaRbLxRmDKqKDm3ffe2n0V0HjM8X7MaB83+FyvUh
-         CZAn0Xt+mHnaTl6qT+wzf2kh3GEHs/UtUv4oD0/vupc++P+ftBnVpP/VxQ5cnoAXMUoE
-         cSaJ3map51HdVkvH9yqOys2R0bV1e4cOQPVUGDc8Hun9zsnpRmCMO1svlWfK4P6qvbHC
-         aoKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWATbN9hadiG+7wBLXUXXJ1HN9E8yIZCkEZRLeX3epIB0xNblDtrJDLpYG2+rNj/M4iNf14gv4B7Be27qk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiVTfxkCENzzuvJn4kfzntwifCxoLXRnjmv+Tv9hFee0TbAGr1
-	6jKvcowMye+oRa39Ou4uy6WowPp6BYGQT0gw+kw066HUav1TOJr1fjkMUHvDrmOAKCKeb9NKuaW
-	neVtEh/luoWP0F3aOM2sECxlHEXU=
-X-Gm-Gg: ASbGnctKqdyEPwB/O6o5s73JEWmad1d2v/lvoiCSIrtchp9kFiME2eWy+rUMpNzuvOE
-	KiSa2W1RFNDyWY/BdJmXuqfWOK2VNfLBKYlJ2EDaE6Wt/Kc9nyryAmEhDG0yNX8fyeqC24IeZpo
-	ySctwzdYPKEsZvdTKnQJ178g==
-X-Google-Smtp-Source: AGHT+IFqY2Ai6W20JnTL0J8N86I8549zpNUihb226F0nRPPDMlA56u8QLiP98AvL2JxttrEV2EWptz6FoxXQQSG+a78=
-X-Received: by 2002:a2e:a908:0:b0:30c:3099:13db with SMTP id
- 38308e7fff4ca-310499f92e8mr40275881fa.14.1744702936159; Tue, 15 Apr 2025
- 00:42:16 -0700 (PDT)
+	s=arc-20240116; t=1744703079; c=relaxed/simple;
+	bh=XQ+wSzbBzV1R2+z1+etTemlYiACEzkYHtN75V2w3GOM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mtsid/h02mXdNK5+eYgNyS0Q/evO90URM2SiG1lnZ2PxFLx7e/LDQl8gpBaradcv5ffGCAZgXhyjQ+bPb+G0Bqb7G+swniQqK95UX2ILtoGq+whw//m4PpwFbZwPzr+HIb++eQNauFo/k6KPTvsWg4oXiyeA+UpNb/C62AeATnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=al98KKN1; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=LG6Ch7+K8r0h5qLUo1lCgwElhe9Hhjrd5BJuDVcLf8Y=; b=al98KKN1dlJhUN70DpyIOuHAA9
+	NU8CqWAuT/kR4j/1JMvvQmNbpLcKBUSzti6lJZhm+pKMQ9mxf95rP5Q7wcXgkJNvaszQ0s4sa0l+O
+	bUOovl77RQBp2cNaN7e/TU4Rc1e90zxuEneGW5Sk0i3NjbjPahtvWSzFVl4A6n48cIe5B62XMURiX
+	HNPyHmuIHlEDYsv/VARRwRFCXGlRgqpO8tRpuc5tUD68y7gKIrnp5AoT62Tvv12uUV0xid7DcWAaN
+	zADqhZTgF+OnxBKndnpeSfIN7nkrEykEPAKSKcN6lf0jKJcsKf4h22JtY0g6539jQyV2YoCoVklyn
+	0SwhlfoA==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98.1 #2 (Red Hat Linux))
+	id 1u4axy-00000009pdl-2Gjx;
+	Tue, 15 Apr 2025 07:44:22 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 9F4F0300619; Tue, 15 Apr 2025 09:44:21 +0200 (CEST)
+Date: Tue, 15 Apr 2025 09:44:21 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Josh Poimboeuf <jpoimboe@kernel.org>
+Cc: x86@kernel.org, kys@microsoft.com, haiyangz@microsoft.com,
+	wei.liu@kernel.org, decui@microsoft.com, tglx@linutronix.de,
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+	hpa@zytor.com, pawan.kumar.gupta@linux.intel.com, seanjc@google.com,
+	pbonzini@redhat.com, ardb@kernel.org, kees@kernel.org,
+	Arnd Bergmann <arnd@arndb.de>, gregkh@linuxfoundation.org,
+	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-efi@vger.kernel.org,
+	samitolvanen@google.com, ojeda@kernel.org
+Subject: Re: [PATCH 3/6] x86/kvm/emulate: Avoid RET for fastops
+Message-ID: <20250415074421.GI5600@noisy.programming.kicks-ass.net>
+References: <20250414111140.586315004@infradead.org>
+ <20250414113754.172767741@infradead.org>
+ <7vfbchsyhlsvdl4hszdtmapdghw32nrj2qd652f3pjzg3yb6vn@po3bsa54b6ta>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250414081131.97374-1-ubizjak@gmail.com> <20250414081131.97374-2-ubizjak@gmail.com>
- <Z_2w7XJ0LI65qo0i@google.com>
-In-Reply-To: <Z_2w7XJ0LI65qo0i@google.com>
-From: Uros Bizjak <ubizjak@gmail.com>
-Date: Tue, 15 Apr 2025 09:42:03 +0200
-X-Gm-Features: ATxdqUGEjkAZMYpBZa78JeCKlM_WaZfMUf7VqCOpDC_-0YmnSnUCybmBVKcILT0
-Message-ID: <CAFULd4argBdTBM7m7U1Q-RMJdyYtAfOD08ukGn+JsT-v4Z6NrA@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: VMX: Use LEAVE in vmx_do_interrupt_irqoff()
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7vfbchsyhlsvdl4hszdtmapdghw32nrj2qd652f3pjzg3yb6vn@po3bsa54b6ta>
 
-On Tue, Apr 15, 2025 at 3:05=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Mon, Apr 14, 2025, Uros Bizjak wrote:
-> > Micro-optimize vmx_do_interrupt_irqoff() by substituting
-> > MOV %RBP,%RSP; POP %RBP instruction sequence with equivalent
-> > LEAVE instruction. GCC compiler does this by default for
-> > a generic tuning and for all modern processors:
->
-> Out of curisoity, is LEAVE actually a performance win, or is the benefit =
-essentially
-> just the few code bytes saves?
+On Mon, Apr 14, 2025 at 03:36:50PM -0700, Josh Poimboeuf wrote:
+> On Mon, Apr 14, 2025 at 01:11:43PM +0200, Peter Zijlstra wrote:
+> > Since there is only a single fastop() function, convert the FASTOP
+> > stuff from CALL_NOSPEC+RET to JMP_NOSPEC+JMP, avoiding the return
+> > thunks and all that jazz.
+> > 
+> > Specifically FASTOPs rely on the return thunk to preserve EFLAGS,
+> > which not all of them can trivially do (call depth tracing suffers
+> > here).
+> > 
+> > Objtool strenuously complains about things, therefore fix up the
+> > various problems:
+> > 
+> >  - indirect call without a .rodata, fails to determine JUMP_TABLE,
+> >    add an annotation for this.
+> >  - fastop functions fall through, create an exception for this case
+> >  - unreachable instruction after fastop_return, save/restore
+> 
+> I think this breaks unwinding.  Each of the individual fastops inherits
+> fastop()'s stack but the ORC doesn't reflect that.
 
-It is hard to say for out-of-order execution cores, especially when
-the stack engine is thrown to the mix (these two instructions, plus
-following RET, all update %rsp).
-
-The pragmatic solution was to do what the compiler does and use the
-compiler's choice, based on the tuning below.
-
-> > DEF_TUNE (X86_TUNE_USE_LEAVE, "use_leave",
-> >         m_386 | m_CORE_ALL | m_K6_GEODE | m_AMD_MULTIPLE | m_ZHAOXIN
-> >         | m_TREMONT | m_CORE_HYBRID | m_CORE_ATOM | m_GENERIC)
-
-The tuning is updated when a new target is introduced to the compiler
-and is based on various measurements by the processor manufacturer.
-The above covers the majority of recent processors (plus generic
-tuning), so I guess we won't fail by following the suit. OTOH, any
-performance difference will be negligible.
-
-> > The new code also saves a couple of bytes, from:
-> >
-> >   27: 48 89 ec                mov    %rbp,%rsp
-> >   2a: 5d                      pop    %rbp
-> >
-> > to:
-> >
-> >   27: c9                      leave
-
-Thanks,
-Uros.
+I'm not sure I understand. There is only the one location, and we
+simply save/restore the state around the one 'call'.
 
