@@ -1,131 +1,132 @@
-Return-Path: <kvm+bounces-43354-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43355-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1175A8A23F
-	for <lists+kvm@lfdr.de>; Tue, 15 Apr 2025 17:00:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 53859A8A4F6
+	for <lists+kvm@lfdr.de>; Tue, 15 Apr 2025 19:07:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF0A61901118
-	for <lists+kvm@lfdr.de>; Tue, 15 Apr 2025 15:00:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFA481887651
+	for <lists+kvm@lfdr.de>; Tue, 15 Apr 2025 17:07:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93C5729DB6C;
-	Tue, 15 Apr 2025 14:57:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D413E218AD2;
+	Tue, 15 Apr 2025 17:07:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SyuNHZeD"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="Oez1Mv79"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3667A29B776
-	for <kvm@vger.kernel.org>; Tue, 15 Apr 2025 14:57:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83A812DFA4F;
+	Tue, 15 Apr 2025 17:07:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744729045; cv=none; b=OnuqD3FN/B6G1s0ZGBtCqXG+EPtfOssOmpKrxCMAkSkbgiK4nlF1LFZK3MJfLa6JOGEXz4WBwDxyw2b1OOyrRegzm5jBanP097z6SOeGZcb840MmNYgWLjJ2sHo6eHZs8q9unQcVfXKpdQl4rtgIXHhw03l+85Tu8FFNBGDXRTA=
+	t=1744736831; cv=none; b=Ne1k8EA//ceRYj7RxfVItwqvifZzXET6kaZL1f3NJ0jQopx2lLYRQ5gPRwMaGYWKkREPM+hsXqDuGVtJl0wHJibueJNiuyKZ48ZaF18A3dKOFpLrNfWy+ia3onPi1BMkPYV+BHbrt2vGP/JzW1SsU/xYFqGM9XQ4MoP0/Q2UFLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744729045; c=relaxed/simple;
-	bh=TmbQCAQuL850VcC8mWpbyBi0guSCzKnednL7iUfUBi4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LpN3dbiN09FBauHYnYW9SArgHmvyZ8p/SIWJfaAKSLnJO+dy9EVvWFpq9c5KZmIht1mNrasNO8Qs1P/z4J1D8Iuyirl26KbUBHH8Ueh6xW5wB0i+zP8n2UoI6FCaZ3Cg2dwFRXlGBVXfyM2vc48P1CD5EPOS0SQHNBoBd8co2aE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SyuNHZeD; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-229170fbe74so47021695ad.2
-        for <kvm@vger.kernel.org>; Tue, 15 Apr 2025 07:57:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744729043; x=1745333843; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=z3cubAcR5buc4RrtmjyrGPOPaYzbW+tbw+H7cOkEDn8=;
-        b=SyuNHZeD/735HiymHu0kVG4RFxW8Fo9o8OLcB+v2kx8JqwIxCojQZijto4Q3USH+SZ
-         R1J9JGpc53/4Co9G+25dbvX0pGHCSBNYdjg4VBnx1OIH9rBInyTSZNrZujvW3CrhXVCe
-         NoY3UNX0kM64N508pGOsPgVIgPTB/GKsiS5g8F1B/b58h+nQ3mttbLppUqvlrCx2fPKs
-         n6VVP6EbMnYmLiRb9Fe8zHWTBipECa4BkumAVvkpX0vXZsVB0jPNJFA31DsM8WoUlddH
-         +UzhOXKhN8+mcYHmVxv1/nXiE5Dz6HOHOrABKh9W7M+iRhvc/khsoeJQirtXqgdR6mpH
-         D8XQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744729043; x=1745333843;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=z3cubAcR5buc4RrtmjyrGPOPaYzbW+tbw+H7cOkEDn8=;
-        b=Cp20Lf5BpfWCAicCdzRQkmu0lg1s/zIPBdvG3XoZGLIRLpBGEoxVRW1BT6oe2D3Brt
-         hUWIHtxloJoVgJgjSQn2Q3JvJfial5mm5eopQDsMMnSJyOxqaZGlku+e1YxuhrsOaJca
-         shbv9eVjhRhsSSEhgaC/vx7zJ2BSRUVhunGE+K0s1skw4JYpyyFoCdYwv9Gh4S5L7lj2
-         70PTxwgQBYLC30NaEy2UqxlGrsGAZgnTcIh2up/oGZhVPd+7TPbR3/hqGgA9GNWAPhnX
-         JgtFJ8crvUyP6QiwmpFwpKVK10xMw4Fy2g723vawuPCg7fTmO0UXLsRMXjUhqbXiNGp5
-         YK0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWS8TuMRPWivnlyB+cipVZiqWvZkH9GUVXn7DicYm9c7oEEoedIuVLPtf+YqekYeDMGxGo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwH4pxmvmWu2W9pYApLw0Oq4zDrKPPwn7k5lwTCThbLpB4TUGCw
-	VbdzaR3wm6F/VTqdnqi/CeeGHMzHQ5+HoCrdG7EpC88XeO6v1dPDmMO0hxihLCxfcybzmChZEid
-	lIg==
-X-Google-Smtp-Source: AGHT+IFaFxQFXBxv1LVPQSIMqbDfDKQXIvk2koBUD5c6YTcCNKoR1Psp7St8pkylyftGChHPBfIrP+rfE64=
-X-Received: from plri17.prod.google.com ([2002:a17:903:32d1:b0:21f:14cc:68b0])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1b08:b0:21f:85af:4bbf
- with SMTP id d9443c01a7336-22bea4b70d6mr235612035ad.20.1744729043268; Tue, 15
- Apr 2025 07:57:23 -0700 (PDT)
-Date: Tue, 15 Apr 2025 07:57:21 -0700
-In-Reply-To: <2cc31ce5-0f1a-41d6-a169-491f9712ffdc@amd.com>
+	s=arc-20240116; t=1744736831; c=relaxed/simple;
+	bh=EI47d3gLk6JDxnelrUCIkAxqsrSEus0fpZccWjnVwFQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=llI9lHERNMboiK7Taekz7UAm51/efkiGBI61Bham3ZVzSBfO1LfJWOl9O/yX9j2vn2AZcyio7ttOCzC4ZCVpV+QnpRb6JPq+Kk/Og+68c4SqioegNmnvfjQ/4I/owcB1GIXFZnTPjnL9aE13QG6nLjH/JORE6Tnj+rxx+DZLq8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=Oez1Mv79; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.202] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53FH62kZ2924897
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Tue, 15 Apr 2025 10:06:03 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53FH62kZ2924897
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025032001; t=1744736765;
+	bh=sYVoLqxhxOeFaKrerdeOEPvZqIzHi1P++Hlli5LIh8I=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Oez1Mv79N+ydfKx6xAF2IhxGVRPH744Tz9xe/ds8eZLye00UTUDRQr+nmsg6htH8Z
+	 dJIuHKFrlBSaQRmppmSoydyVEHWAjfH1LRFJ0tPi++p4djXQ9kM7L/FSKvPnLORy9O
+	 uUA0vHWVGCFl199JsokZ7L10iZbM7X7Ji7p2HTVg+spStWMWLpkz8cGsabxNnk/v71
+	 mi+bbMfyHnLXhRZT4cXYqQeTfaoVE0YRSX4FhgS+LxkUsGHFcsok+rlQcFZRI9JGGJ
+	 rQO2cnYPosLU/30b5tFrYvNIfW1NsM6vvi8POkxKCS7u6Kww+QXA4xUcdjCMvTtfrj
+	 HGOfFWfg60zNQ==
+Message-ID: <c4fcb208-ee5d-4781-85ce-3b75e651d047@zytor.com>
+Date: Tue, 15 Apr 2025 10:06:01 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250404193923.1413163-1-seanjc@google.com> <20250404193923.1413163-15-seanjc@google.com>
- <2cc31ce5-0f1a-41d6-a169-491f9712ffdc@amd.com>
-Message-ID: <Z_5z0an7-BJ1bTzF@google.com>
-Subject: Re: [PATCH 14/67] KVM: SVM: Add helper to deduplicate code for
- getting AVIC backing page
-From: Sean Christopherson <seanjc@google.com>
-To: Sairaj Kodilkar <sarunkod@amd.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>, 
-	David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, kvm@vger.kernel.org, 
-	iommu@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	Maxim Levitsky <mlevitsk@redhat.com>, Joao Martins <joao.m.martins@oracle.com>, 
-	David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 10/15] KVM: VMX: Use WRMSRNS or its immediate form
+ when available
+To: "H. Peter Anvin" <hpa@zytor.com>, Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
+        linux-edac@vger.kernel.org, kvm@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-ide@vger.kernel.org,
+        linux-pm@vger.kernel.org, bpf@vger.kernel.org, llvm@lists.linux.dev,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, jgross@suse.com,
+        andrew.cooper3@citrix.com, peterz@infradead.org, acme@kernel.org,
+        namhyung@kernel.org, mark.rutland@arm.com,
+        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
+        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
+        wei.liu@kernel.org, ajay.kaher@broadcom.com,
+        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
+        pbonzini@redhat.com, vkuznets@redhat.com, luto@kernel.org,
+        boris.ostrovsky@oracle.com, kys@microsoft.com, haiyangz@microsoft.com,
+        decui@microsoft.com
+References: <20250331082251.3171276-1-xin@zytor.com>
+ <20250331082251.3171276-11-xin@zytor.com> <Z_hTI8ywa3rTxFaz@google.com>
+ <CALMp9eRJkzA2YXf1Dfxt3ONP+P9aTA=WPraOPJPJ6C6j677+6Q@mail.gmail.com>
+ <fa16949e-7842-45f7-9715-1bdda13b762a@zytor.com>
+ <EAB44BB2-99BB-4D4A-8306-0235D2931E72@zytor.com>
+ <0cad1e0b-2bfd-4258-90cd-8d319bf0e74a@zytor.com>
+ <D212FABE-38FE-45D3-A082-CA819CCFFF95@zytor.com>
+Content-Language: en-US
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <D212FABE-38FE-45D3-A082-CA819CCFFF95@zytor.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Apr 15, 2025, Sairaj Kodilkar wrote:
-> On 4/5/2025 1:08 AM, Sean Christopherson wrote:
-> Hi Sean,
+On 4/14/2025 11:56 PM, H. Peter Anvin wrote:
+>> arlier in the pipeline, right?
+> Yes, but then it would be redundant with the virtualization support.
 > 
-> > Add a helper to get the physical address of the AVIC backing page, both
-> > to deduplicate code and to prepare for getting the address directly from
-> > apic->regs, at which point it won't be all that obvious that the address
-> > in question is what SVM calls the AVIC backing page.
-> > 
-> > No functional change intended.
-> > 
-> > Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >   arch/x86/kvm/svm/avic.c | 14 +++++++++-----
-> >   1 file changed, 9 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> > index f04010f66595..a1f4a08d35f5 100644
-> > --- a/arch/x86/kvm/svm/avic.c
-> > +++ b/arch/x86/kvm/svm/avic.c
-> > @@ -243,14 +243,18 @@ int avic_vm_init(struct kvm *kvm)
-> >   	return err;
-> >   }
-> > +static phys_addr_t avic_get_backing_page_address(struct vcpu_svm *svm)
-> > +{
-> > +	return __sme_set(page_to_phys(svm->avic_backing_page));
-> > +}
-> > +
-> 
-> Maybe why not introduce a generic function like...
-> 
-> static phsys_addr_t page_to_phys_sme_set(struct page *page)
-> {
-> 	return __sme_set(page_to_phys(page));
-> }
-> 
-> and use it for avic_logical_id_table_page and
-> avic_physical_id_table_page as well.
 
-Because subsequent commits remove the "struct page" tracking (it's suboptimal
-and confusing), and I don't want to encourage that bad pattern in the future.
+So better to drop this patch then.
 
