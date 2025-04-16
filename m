@@ -1,62 +1,63 @@
-Return-Path: <kvm+bounces-43393-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43394-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66682A8AFDE
-	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 07:53:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81F30A8AFE0
+	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 07:53:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6AEF189F154
-	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 05:53:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CA8616217A
+	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 05:53:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 887E622B8BC;
-	Wed, 16 Apr 2025 05:53:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BB6522D4E6;
+	Wed, 16 Apr 2025 05:53:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nVbutvkW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AV1eE/J/"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2DF5229B29;
-	Wed, 16 Apr 2025 05:53:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC37822B8D7;
+	Wed, 16 Apr 2025 05:53:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744782801; cv=none; b=E/BTXC2dKB2QGfIC2tjP+Edsi+N8JwsgEeSb5hYzxtdqajROwzXVpYgYfwwpJyqOQsKXZLbUx6sO9/sD9LKiBfYNynLiVaVCYaZUJz56CEF2sd/XtcQI0OiEmyypc/wwOnj54YSgJusbZeZoAe7BoMRmya7nSj+1KCmBPCjsyUY=
+	t=1744782804; cv=none; b=r6a6zNHwOldDQKMvPyxpdffwNgROfIT7Vn+vrHUYaBiwRj0H5p2DnOXW1D5fnOjsiKxoUMp+hCyvxcGBhXq6Vo2kTdt/2wTqpEgLMaIvADAOWjgDfkxAZ6gRGQiKXNw51iPfMABaOzTvbl+6v7vxXJ0GFv+j4RaY9hNXahZI2V4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744782801; c=relaxed/simple;
-	bh=rHpycp+BtAtplH1umX1V2eYN0pjW7kOMVKZxOx2x8wE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=utJ1wSWSv8E+pRDF20czmu05ULL70aQEL9WqiN39t0qWDQL8HLIH6KWC8cZIPIQQE1nrw+9VyuAy2a81RoPEI0ljYFXpl90S1dvgnyNQdSA7PBY8HfLWfGMdImYK0X5JXx+d/C1S0eN3XneTMe3E8eIDqkKUGrndPyuDbJfZzYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nVbutvkW; arc=none smtp.client-ip=192.198.163.19
+	s=arc-20240116; t=1744782804; c=relaxed/simple;
+	bh=ejt+nS1wSG4vWxoe/PG5+T8CTmyW86TLrKcEjqB3uCs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=fijVkrQGD4KnFLhZ8Ng+zWE8oVD/V+pxMWbVmI6qqUfCt/4craTOTa3gOaUzrRQ1Qa7adlAM/dS3+BS+aD6Coj2nsc3xdONznVT1UW6p8uNMhZmPOdlLuqW1qJWAzLPyJIw+RsusKgNYl5jDFOorTN3P6KHF+mfXLX35Tdv9Spk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AV1eE/J/; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744782800; x=1776318800;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=rHpycp+BtAtplH1umX1V2eYN0pjW7kOMVKZxOx2x8wE=;
-  b=nVbutvkW7qNrLIru900/t4dK00byuicXykPa0OOlS2fmP2Fy7VNaLK+D
-   vb+7oR1SzPlAPJAdOvOG20g9mkvbopzy+wa9VJ317rARQOzVkMKF4/8N0
-   1wZDkXEa8WorSzI7nd8bgQVKNC//kv/ccx6p3Keek5ygeIiytHF9kTVvY
-   KccrcGMfNCHATG7rJVFy+Y3pyYoRmCDyPij4s8vMKst9kH5g+fkb8FrvQ
-   PAqywdoN+MV9BQRsDkvhX0/WoaQI7Pi3UfDCKZwcq8tG9WW3z9WWkUbvT
-   fMqhlIVR/L2vVEnafnX0NThVxAC1qZ8P23rpSuYHPl4HaIc0TmOcukXnw
-   w==;
-X-CSE-ConnectionGUID: gEfxioPqRqGXfaq1OAQavw==
-X-CSE-MsgGUID: 1nkRNc5LS1CHw/Qd7IzjSQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11404"; a="45449738"
+  t=1744782803; x=1776318803;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=ejt+nS1wSG4vWxoe/PG5+T8CTmyW86TLrKcEjqB3uCs=;
+  b=AV1eE/J/O4Ulw4M0zlC/CfkEoQNvJ1QINWMC2OtIKtoB58Db7Tg1NGqr
+   Q7fUX9HMN8YgSapuplvA3yYjAX9e318O9akkJiqnUArGjQDk2OvKFCfKT
+   LeNNac5rsTer6W6+/OWMX0Y8IGYa7X1KlkBrCKBLfEn5eTW+BagfIi9YP
+   wpTEFTouQartR+yuOO5RdikU1Fp+HrQdBROZVFelXYTDnphsCuyk9VfK9
+   0w0THYoTc6/YdTQmsxyL0VENpxmE32hGx+D8tCPEC9KTQW3TwYlYzdfCE
+   mYv6xO7L9DzN8MyQS0tk+QwmuZRIM1+U5a7kQLn8Dz9g+ZEcPkN96GiW/
+   Q==;
+X-CSE-ConnectionGUID: E6fdQzEMQpWHfHLPn33XHg==
+X-CSE-MsgGUID: U4U78e6WQsi50j091u9xpw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11404"; a="45449743"
 X-IronPort-AV: E=Sophos;i="6.15,215,1739865600"; 
-   d="scan'208";a="45449738"
+   d="scan'208";a="45449743"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 22:53:19 -0700
-X-CSE-ConnectionGUID: 1E2YpoKbR1+8cdWGnVbmPA==
-X-CSE-MsgGUID: RrSvcdAXTl6aE07Sz9aI4A==
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 22:53:23 -0700
+X-CSE-ConnectionGUID: izGk+V++QI6znKZzvNN9DQ==
+X-CSE-MsgGUID: 971l92/lS0y5I68wKU73eg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,215,1739865600"; 
-   d="scan'208";a="130874814"
+   d="scan'208";a="130874828"
 Received: from litbin-desktop.sh.intel.com ([10.239.156.93])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 22:53:15 -0700
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 22:53:19 -0700
 From: Binbin Wu <binbin.wu@linux.intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com,
@@ -73,10 +74,12 @@ Cc: rick.p.edgecombe@intel.com,
 	mikko.ylinen@linux.intel.com,
 	linux-kernel@vger.kernel.org,
 	binbin.wu@linux.intel.com
-Subject: [PATCH v2 0/1] TDX attestation support
-Date: Wed, 16 Apr 2025 13:54:31 +0800
-Message-ID: <20250416055433.2980510-1-binbin.wu@linux.intel.com>
+Subject: [PATCH v2 1/1] KVM: TDX: Handle TDG.VP.VMCALL<GetQuote>
+Date: Wed, 16 Apr 2025 13:54:32 +0800
+Message-ID: <20250416055433.2980510-2-binbin.wu@linux.intel.com>
 X-Mailer: git-send-email 2.46.0
+In-Reply-To: <20250416055433.2980510-1-binbin.wu@linux.intel.com>
+References: <20250416055433.2980510-1-binbin.wu@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -85,103 +88,153 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi,
+Handle TDVMCALL for GetQuote to generate a TD-Quote.
 
-Paolo mentioned possibly wanting to include attestation in the initial TDX
-support. Please consider it with that as the tentative plan. If it is not
-included in the initial support, it would require an opt-in when the
-support is added.
+GetQuote is a doorbell-like interface used by TDX guests to request VMM
+to generate a TD-Quote signed by a service hosting TD-Quoting Enclave
+operating on the host.  A TDX guest passes a TD Report (TDREPORT_STRUCT) in
+a shared-memory area as parameter.  Host VMM can access it and queue the
+operation for a service hosting TD-Quoting enclave.  When completed, the
+Quote is returned via the same shared-memory area.
 
-Notable changes since v1 [0]
-============================
-- KVM only checks the SHARED bit of the GPA from TDX guests and drops it
-  before exiting to userspace to avoid bleeding the SHARED bit into its
-  exit ABI [1].  Other sanity checks are skipped.
-- Dropped the patch for TDG.VP.VMCALL<SetupEventNotifyInterrupt>, which has
-  no users.
-- Use number 40 for KVM_EXIT_TDX_GET_QUOTE since this could probably win the
-  race upstream with AMD's SNP certificate-fetching patch [2].
+KVM only checks the GPA from the TDX guest has the shared-bit set and drops
+the shared-bit before exiting to userspace to avoid bleeding the shared-bit
+into KVM's exit ABI.  KVM forwards the request to userspace VMM (e.g. QEMU)
+and userspace VMM queues the operation asynchronously.  KVM sets the return
+code according to the 'ret' field set by userspace to notify the TDX guest
+whether the request has been queued successfully or not.  When the request
+has been queued successfully, the TDX guest can poll the status field in
+the shared-memory area to check whether the Quote generation is completed
+or not.  When completed, the generated Quote is returned via the same
+buffer.
 
-Overview
-========
-TDX Guest-Host Communication Interface (GHCI) [3] spec defines two
-TDVMCALLs for TDX attestation mechanism.
+Add KVM_EXIT_TDX_GET_QUOTE as a new exit reason to userspace.
 
-- TDG.VP.VMCALL<GetQuote>
-  GetQuote is a doorbell-like interface used by TDX guests to request VMM
-  to generate a TD-Quote signed by a service hosting TD-Quoting Enclave
-  operating on the host.
-- TDG.VP.VMCALL<SetupEventNotifyInterrupt>
-  SetupEventNotifyInterrupt can be used by TDX guests to specify an
-  interrupt vector as an event-notify vector for GetQuote operation, which
-  may take several seconds. If a TDX guest has setup the event-notify
-  vector, the host VMM injects an interrupt with the specified vector to
-  the TDX guest on completion of the operation.
-
-TDG.VP.VMCALL<SetupEventNotifyInterrupt> is optional and is not used by TDX
-guests, this patch series adds only the support for TDG.VP.VMCALL<GetQuote>
-to enable TDX attestation on KVM side. KVM forwards the requests to
-userspace VMM.  Instead of using a single KVM_EXIT_TDX, it's preferred that
-each TDVMCALL that KVM wants to forward needs a dedicated KVM_EXIT_<reason>
-and associated struct in the exit union [4].  The TDVMCALLs supported in [5]
-reuse the existing KVM exit reasons.  For TDX attestation support, add a TDX
-specific KVM exit reasons based on the discussion in the PUCK meeting on
-2025.02.19 [6].  After returning from userspace, KVM sets the return code
-specified by userspace before resuming the vCPU.
-
-
-Base of this series
-===================
-This series is based on kvm/next or kvm-coco-queue with the commit:
-- 'fd02aa45bda6' ("Merge branch 'kvm-tdx-initial' into HEAD").
-
-Repos
-=====
-The full KVM branch is here:
-https://github.com/intel/tdx/tree/tdx_kvm_dev-2025-04-15
-
-A matching QEMU is here:
-https://github.com/intel-staging/qemu-tdx/tree/tdx-qemu-wip-2025-04-15
-
-It requires TDX module 1.5.06.00.0744 [7], or later.
-A working edk2 commit is 95d8a1c ("UnitTestFrameworkPkg: Use TianoCore
-mirror of subhook submodule").
-
-
-Testing
-=======
-This patch series has been tested as part of the development branch for the
-TDX base series.  The testing consisted of TDX kvm-unit-tests and booting a
-Linux TD, and TDX enhanced KVM selftests.  It also passed the TDX related
-test cases defined in the LKVS test suite as described in:
-https://github.com/intel/lkvs/blob/main/KVM/docs/lkvs_on_avocado.md
-
-The functionality of GetQuote has been tested with the Quote Generation
-Service deployed on the host, thanks to Mikko Ylinen.
-
-KVM selftests patch below, which is based on the latest TDX KVM selftests
-patch series [8], was used to test the flows of GetQuote as well:
-https://github.com/intel/tdx/commit/12b51b65b88ee95c3b0ce8ebc623408ecd8eea49
-
-
-[0] https://lore.kernel.org/kvm/20250402001557.173586-1-binbin.wu@linux.intel.com
-[1] https://lore.kernel.org/kvm/Z_Z61UlNM1vlEdW1@google.com
-[2] https://lore.kernel.org/kvm/20250219151505.3538323-2-michael.roth@amd.com
-[3] https://cdrdv2.intel.com/v1/dl/getContent/726792
-[4] https://lore.kernel.org/kvm/Zg18ul8Q4PGQMWam@google.com
-[5] https://lore.kernel.org/kvm/20250222014225.897298-1-binbin.wu@linux.intel.com
-[6] https://drive.google.com/file/d/1fk957DWsyqWk-K-FqhBxdUtgrQYcZrqH/view?usp=drive_link&resourcekey=0-JFJuzmaZIux6_D6lhcxT7Q
-[7] https://github.com/intel/tdx-module/releases/tag/TDX_1.5.06
-[8] https://lore.kernel.org/kvm/20250414214801.2693294-1-sagis@google.com
-
-Binbin Wu (1):
-  KVM: TDX: Handle TDG.VP.VMCALL<GetQuote>
-
+Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
+Tested-by: Mikko Ylinen <mikko.ylinen@linux.intel.com>
+---
+v2:
+- Skip sanity checks except for the check of the shared-bit. (Rick, Sean)
+- Drop the shared-bit of the GPA before exiting to userspace. (Sean)
+- Improve the description of 'ret' field in the document. (Kai)
+- Use number 40 for KVM_EXIT_TDX_GET_QUOTE. (Xiaoyao, Rick)
+- Update the changelog and the description of KVM_EXIT_TDX_GET_QUOTE in the
+  document according to the code changes.
+---
  Documentation/virt/kvm/api.rst | 25 +++++++++++++++++++++++++
  arch/x86/kvm/vmx/tdx.c         | 30 ++++++++++++++++++++++++++++++
  include/uapi/linux/kvm.h       |  7 +++++++
  3 files changed, 62 insertions(+)
 
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index ad1859f4699e..b2192d2983fe 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -7162,6 +7162,31 @@ The valid value for 'flags' is:
+   - KVM_NOTIFY_CONTEXT_INVALID -- the VM context is corrupted and not valid
+     in VMCS. It would run into unknown result if resume the target VM.
+ 
++::
++
++		/* KVM_EXIT_TDX_GET_QUOTE */
++		struct tdx_get_quote {
++			__u64 ret;
++			__u64 gpa;
++			__u64 size;
++		};
++
++If the exit reason is KVM_EXIT_TDX_GET_QUOTE, then it indicates that a TDX
++guest has requested to generate a TD-Quote signed by a service hosting
++TD-Quoting Enclave operating on the host. The 'gpa' field and 'size' specify
++the guest physical address and size of a shared-memory buffer, in which the
++TDX guest passes a TD Report. KVM checks the GPA from the TDX guest has the
++shared-bit set and drops the shared-bit in 'gpa' field before exiting to
++userspace. KVM doesn't do other sanity checks. The 'ret' field represents the
++return value of the GetQuote request. KVM only bridges the request to the
++userspace VMM, and the userspace VMM is responsible for setting up the return
++value since only userspace knows whether the request has been queued
++successfully or not. KVM sets the return code according to the 'ret' field
++before returning back to the TDX guest. When the request has been queued
++successfully, the TDX guest can poll the status field in the shared-memory area
++to check whether the Quote generation is completed or not. When completed, the
++generated Quote is returned via the same buffer.
++
+ ::
+ 
+ 		/* Fix the size of the union. */
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index b952bc673271..cd1e9a1c040e 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -1463,6 +1463,34 @@ static int tdx_get_td_vm_call_info(struct kvm_vcpu *vcpu)
+ 	return 1;
+ }
+ 
++static int tdx_complete_get_quote(struct kvm_vcpu *vcpu)
++{
++	tdvmcall_set_return_code(vcpu, vcpu->run->tdx_get_quote.ret);
++	return 1;
++}
++
++static int tdx_get_quote(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_tdx *tdx = to_tdx(vcpu);
++
++	u64 gpa = tdx->vp_enter_args.r12;
++	u64 size = tdx->vp_enter_args.r13;
++
++	/* The gpa of buffer must have shared bit set. */
++	if (vt_is_tdx_private_gpa(vcpu->kvm, gpa)) {
++		tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_INVALID_OPERAND);
++		return 1;
++	}
++
++	vcpu->run->exit_reason = KVM_EXIT_TDX_GET_QUOTE;
++	vcpu->run->tdx_get_quote.gpa = gpa & ~gfn_to_gpa(kvm_gfn_direct_bits(tdx->vcpu.kvm));
++	vcpu->run->tdx_get_quote.size = size;
++
++	vcpu->arch.complete_userspace_io = tdx_complete_get_quote;
++
++	return 0;
++}
++
+ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
+ {
+ 	switch (tdvmcall_leaf(vcpu)) {
+@@ -1472,6 +1500,8 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
+ 		return tdx_report_fatal_error(vcpu);
+ 	case TDVMCALL_GET_TD_VM_CALL_INFO:
+ 		return tdx_get_td_vm_call_info(vcpu);
++	case TDVMCALL_GET_QUOTE:
++		return tdx_get_quote(vcpu);
+ 	default:
+ 		break;
+ 	}
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index c6988e2c68d5..4d7e8e88bcc3 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -178,6 +178,7 @@ struct kvm_xen_exit {
+ #define KVM_EXIT_NOTIFY           37
+ #define KVM_EXIT_LOONGARCH_IOCSR  38
+ #define KVM_EXIT_MEMORY_FAULT     39
++#define KVM_EXIT_TDX_GET_QUOTE    40
+ 
+ /* For KVM_EXIT_INTERNAL_ERROR */
+ /* Emulate instruction failed. */
+@@ -447,6 +448,12 @@ struct kvm_run {
+ 			__u64 gpa;
+ 			__u64 size;
+ 		} memory_fault;
++		/* KVM_EXIT_TDX_GET_QUOTE */
++		struct {
++			__u64 ret;
++			__u64 gpa;
++			__u64 size;
++		} tdx_get_quote;
+ 		/* Fix the size of the union. */
+ 		char padding[256];
+ 	};
 -- 
 2.46.0
 
