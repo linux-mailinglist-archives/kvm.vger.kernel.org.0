@@ -1,85 +1,71 @@
-Return-Path: <kvm+bounces-43418-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43419-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6744A8B7F8
-	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 13:58:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1EC5A8B911
+	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 14:30:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF3CA444D6A
-	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 11:58:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42F0018975C5
+	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 12:30:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A4FC241698;
-	Wed, 16 Apr 2025 11:58:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A011E2914;
+	Wed, 16 Apr 2025 12:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PkPTGzZu"
+	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="YCjA7j7W"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ED752222AC
-	for <kvm@vger.kernel.org>; Wed, 16 Apr 2025 11:58:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2278136B;
+	Wed, 16 Apr 2025 12:30:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744804709; cv=none; b=mFB3yCjV//nXpaOHsFkH8E5I2CSdQ3VPT9NC9FlndELcpgBWnAf+2lN2LWtcWnbQtYV1lboJ2pMp/YojuxNCtE5hjmpgcOSS0c9R31g0LZuNnlk69tOmq1AHIZSh9t7TiMTSCZhQsxifYg9vT96m1M1WtJBDqjGRN7rJfouAEK8=
+	t=1744806627; cv=none; b=Z07Drukxd8jy+nfFOOmRm64b8pcyagKDBUZJb8Dua5uGWku7yGwLrU7hS0zppdSF+JsT9xCEE63r8U2vWQCAc1NtRYaazwYF2nrzIGVn2aSQQIR1LO8i/ZZFivCWrOMuNyelNRAEO1ZU3AhVu1Wi2MyeYqrMIuFbCZCBvnR7dQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744804709; c=relaxed/simple;
-	bh=BH87NPQLzR0N2uAe5RTo9VAQCm7an0kuORRyAO5WWwE=;
-	h=Message-ID:Date:MIME-Version:From:To:Subject:Content-Type; b=K9R6/mzQoqw71MumFXkkEbEEaLbbIM7n87pLmu9JQxK9/rFrfo9Vbn592Vkthpd2jlOlfqBGm9SsvB/+p8t0Jmj9Waf9MJLAAuRnA4oJi6G9MEXXFUJdfpRWvcDfCPWk2+H+tlwBhkIFgGMEKI9PyozjYxd/PfyvpEsXw7pzjac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PkPTGzZu; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744804706;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:autocrypt:autocrypt;
-	bh=Mp4NY5gTa5O8rModMIUVQJDbbAvIOmyixeqrBhfXZgQ=;
-	b=PkPTGzZuYUvVk2c29DkY1WKrMnn0k5WMZRDLlN0DTizVBixYwxR20XmAjQq4WXMpVuDALA
-	+rhvQtzOA4Mn7Br6VrNuLZGLD5YUZat6ezO4E0C8sHUvv6TkHGQGTf6wb8MDdFsnZxZaDB
-	lJlg+GQs2pZooN6jehtyGhzCvDkEzls=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-651-t2zprXO9P1y1jERssXnL8g-1; Wed, 16 Apr 2025 07:58:25 -0400
-X-MC-Unique: t2zprXO9P1y1jERssXnL8g-1
-X-Mimecast-MFC-AGG-ID: t2zprXO9P1y1jERssXnL8g_1744804704
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43e9a3d2977so51948865e9.1
-        for <kvm@vger.kernel.org>; Wed, 16 Apr 2025 04:58:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744804704; x=1745409504;
-        h=content-transfer-encoding:organization:autocrypt:subject:to
-         :content-language:from:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mp4NY5gTa5O8rModMIUVQJDbbAvIOmyixeqrBhfXZgQ=;
-        b=b0aZw7k2Iidbj+gchTtpk9JEhJQ3gcCJoFEggxhex4F9e0KK3IPUdKg3TdCjq8GlSg
-         KtgEI4yt32Ni5VYNKnszH1/27J/4z0T9XIT9euiVcFE+zicCu2/YeesrDDD+WRAihm+s
-         4/sQGGhdW52v4+GAEi+Uynb7jpwyKyosTtNYmfditT0OkAEi6wpVP9AKToF4dUdrqhgO
-         bRT9cmMycu1s2m77oi57CN/YnqQiAil1DDJ4XMJqQcycXRD082OuM/F/U4Tuel5jwsYF
-         fqEf+2Y833wY5YNQyGwb9KmV7h2EMqQvUsgWu14uAfc8bsiiuGF8IrYvcuMEBKB0H0QI
-         4VLw==
-X-Forwarded-Encrypted: i=1; AJvYcCWyXe0NwsahYCMZUFF8FL3dlHNMoKDT8Lmcgf8Ev6sMJl76ubBRnoG7HBY+M00btn26iZ4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDbR3+5w+VXSuFVweuakdIbubJQlUkVIypq3zuts3/wjAetyg5
-	RbKKZtVfy9q3a8ClCKSmFY041+5RNd3/Ufvojy0/zV8LrbKTLB+4MMCrnrhpUqDa8qaw5X8oAhL
-	Y+HgN5OMfdmXx8dyCJdBrhIqq/aL7m8EuhtGW4RIrJfGSrht8zQ==
-X-Gm-Gg: ASbGnct1ocVmVjo/PVMzk0JMQoYiPniCnvhA5FMSwIj+L3jMyvvf1OtkXTPU9IDGIlr
-	OzUQV9gPLtA0tBT3P5fmrK2+ZmKuwM3XfvSM1HTtAFFvy/h99AelKOzCRLgadnmVI09e7pX6n/J
-	Ax4KUvRkKPSaLsBgW0UnizDhzKTL/nS8XsOxx3G2A1HbjwaDCX2FMfKzJXL01pjKpkbvXgD+/0/
-	ZY3g/U2tf+AoWl3NMnqMgbSzI8h3Vw93NM623K0WKkfMjbL3WEQZ5VKRdDNU23GN6RTbKfOQhxp
-	L86j7d8lIsg7pGe3GGjGAwWt2XV8DyeOj9o/9Ue7JiTGQeyzwyFj9+7UyHiP7sygO1ZjcYswdIP
-	2pl9oiomY+0BZf0jfx5Iu4nSpSFMPjNezTtNHJQ==
-X-Received: by 2002:a05:600c:198b:b0:43d:45a:8fbb with SMTP id 5b1f17b1804b1-4405d6ad1acmr11673985e9.22.1744804703816;
-        Wed, 16 Apr 2025 04:58:23 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF42Ew67th6BgNrQ3pNAl8Tem0TA/2gNSdCc2h3rozeMrLIbvkPdcxVAaqMMafRphJ7MSrRjg==
-X-Received: by 2002:a05:600c:198b:b0:43d:45a:8fbb with SMTP id 5b1f17b1804b1-4405d6ad1acmr11673695e9.22.1744804703304;
-        Wed, 16 Apr 2025 04:58:23 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f02:2900:f54f:bad7:c5f4:9404? (p200300d82f022900f54fbad7c5f49404.dip0.t-ipconnect.de. [2003:d8:2f02:2900:f54f:bad7:c5f4:9404])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4405b4d11ddsm19208935e9.9.2025.04.16.04.58.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Apr 2025 04:58:22 -0700 (PDT)
-Message-ID: <971a3797-5fc4-4c7f-a856-dca05f9a874e@redhat.com>
-Date: Wed, 16 Apr 2025 13:58:20 +0200
+	s=arc-20240116; t=1744806627; c=relaxed/simple;
+	bh=w4TAR/yH3VcS9OoJH0esVNtvvSK6jM0c6R3XkuFx4Xo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=jd8cASZZndqIeQE8BUAIGl9g5O4Fca0/OntDd2xOAFoU0A/yFqKeXuOanHQK01rYYEFy/MjKpyOboWC0xTSfw8XToFaaBIMQIOgjIpOHxVFLYg0H3ze4U6lzdv6OY9POgF52vdbVrbTBtGCrz965rQ6Mg+MOaGn6bV4WwBmtHmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=YCjA7j7W; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazon201209; t=1744806626; x=1776342626;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=sFqE0U8biMo7h/rFvupA/Vgek3MDfQSR208Nzfq3VY8=;
+  b=YCjA7j7Wq8NXJLPYeNndv7vJtO0lp+Q+GXU74rlVzxmNgral1IEiQ/Xe
+   FKzCQWoGuttB6WJoBr5M0iTN6EUzJxnv+It4NsHybYUFSECFOpDNl7Y9M
+   OZCdmhvwPZCGLWpUOgERo5eVh3BcD6AOKRSoZrWmUxyld7dGoyxQfPEz9
+   4=;
+X-IronPort-AV: E=Sophos;i="6.15,216,1739836800"; 
+   d="scan'208";a="396347607"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2025 12:30:23 +0000
+Received: from EX19MTAUEA001.ant.amazon.com [10.0.44.209:64083]
+ by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.62.158:2525] with esmtp (Farcaster)
+ id 5cd90893-39c7-408c-bd64-a8f3f4ff1016; Wed, 16 Apr 2025 12:30:23 +0000 (UTC)
+X-Farcaster-Flow-ID: 5cd90893-39c7-408c-bd64-a8f3f4ff1016
+Received: from EX19EXOUEB002.ant.amazon.com (10.252.135.74) by
+ EX19MTAUEA001.ant.amazon.com (10.252.134.203) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 16 Apr 2025 12:30:17 +0000
+Received: from EX19MTAUEB001.ant.amazon.com (10.252.135.108) by
+ EX19EXOUEB002.ant.amazon.com (10.252.135.74) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 16 Apr 2025 12:30:17 +0000
+Received: from email-imr-corp-prod-iad-all-1a-f1af3bd3.us-east-1.amazon.com
+ (10.43.8.2) by mail-relay.amazon.com (10.252.135.35) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
+ 15.2.1544.14 via Frontend Transport; Wed, 16 Apr 2025 12:30:17 +0000
+Received: from [127.0.0.1] (dev-dsk-roypat-1c-dbe2a224.eu-west-1.amazon.com [172.19.88.180])
+	by email-imr-corp-prod-iad-all-1a-f1af3bd3.us-east-1.amazon.com (Postfix) with ESMTPS id E8E47413B0;
+	Wed, 16 Apr 2025 12:30:10 +0000 (UTC)
+Message-ID: <392fc76a-5d2a-441d-99c8-532c0bbb052b@amazon.co.uk>
+Date: Wed, 16 Apr 2025 13:30:10 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -87,99 +73,134 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v7 4/9] KVM: guest_memfd: Handle in-place shared memory as
+ guest_memfd backed memory
+To: David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>,
+	<kvm@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>, <linux-mm@kvack.org>
+CC: <pbonzini@redhat.com>, <chenhuacai@kernel.org>, <mpe@ellerman.id.au>,
+	<anup@brainfault.org>, <paul.walmsley@sifive.com>, <palmer@dabbelt.com>,
+	<aou@eecs.berkeley.edu>, <seanjc@google.com>, <viro@zeniv.linux.org.uk>,
+	<brauner@kernel.org>, <willy@infradead.org>, <akpm@linux-foundation.org>,
+	<xiaoyao.li@intel.com>, <yilun.xu@intel.com>, <chao.p.peng@linux.intel.com>,
+	<jarkko@kernel.org>, <amoorthy@google.com>, <dmatlack@google.com>,
+	<isaku.yamahata@intel.com>, <mic@digikod.net>, <vbabka@suse.cz>,
+	<vannapurve@google.com>, <ackerleytng@google.com>,
+	<mail@maciej.szmigiero.name>, <michael.roth@amd.com>, <wei.w.wang@intel.com>,
+	<liam.merwick@oracle.com>, <isaku.yamahata@gmail.com>,
+	<kirill.shutemov@linux.intel.com>, <suzuki.poulose@arm.com>,
+	<steven.price@arm.com>, <quic_eberman@quicinc.com>,
+	<quic_mnalajal@quicinc.com>, <quic_tsoni@quicinc.com>,
+	<quic_svaddagi@quicinc.com>, <quic_cvanscha@quicinc.com>,
+	<quic_pderrin@quicinc.com>, <quic_pheragu@quicinc.com>,
+	<catalin.marinas@arm.com>, <james.morse@arm.com>, <yuzenghui@huawei.com>,
+	<oliver.upton@linux.dev>, <maz@kernel.org>, <will@kernel.org>,
+	<qperret@google.com>, <keirf@google.com>, <shuah@kernel.org>,
+	<hch@infradead.org>, <jgg@nvidia.com>, <rientjes@google.com>,
+	<jhubbard@nvidia.com>, <fvdl@google.com>, <hughd@google.com>,
+	<jthoughton@google.com>, <peterx@redhat.com>
+References: <20250318161823.4005529-1-tabba@google.com>
+ <20250318161823.4005529-5-tabba@google.com>
+ <8ebc66ae-5f37-44c0-884b-564a65467fe4@redhat.com>
+From: Patrick Roy <roypat@amazon.co.uk>
 Content-Language: en-US
-To: "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>, KVM <kvm@vger.kernel.org>
-Subject: [Invitation] bi-weekly guest_memfd upstream call on 2025-04-17
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Autocrypt: addr=roypat@amazon.co.uk; keydata=
+ xjMEY0UgYhYJKwYBBAHaRw8BAQdA7lj+ADr5b96qBcdINFVJSOg8RGtKthL5x77F2ABMh4PN
+ NVBhdHJpY2sgUm95IChHaXRodWIga2V5IGFtYXpvbikgPHJveXBhdEBhbWF6b24uY28udWs+
+ wpMEExYKADsWIQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbAwULCQgHAgIiAgYVCgkI
+ CwIEFgIDAQIeBwIXgAAKCRBVg4tqeAbEAmQKAQC1jMl/KT9pQHEdALF7SA1iJ9tpA5ppl1J9
+ AOIP7Nr9SwD/fvIWkq0QDnq69eK7HqW14CA7AToCF6NBqZ8r7ksi+QLOOARjRSBiEgorBgEE
+ AZdVAQUBAQdAqoMhGmiXJ3DMGeXrlaDA+v/aF/ah7ARbFV4ukHyz+CkDAQgHwngEGBYKACAW
+ IQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbDAAKCRBVg4tqeAbEAtjHAQDkh5jZRIsZ
+ 7JMNkPMSCd5PuSy0/Gdx8LGgsxxPMZwePgEAn5Tnh4fVbf00esnoK588bYQgJBioXtuXhtom
+ 8hlxFQM=
+In-Reply-To: <8ebc66ae-5f37-44c0-884b-564a65467fe4@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 
-Hi everybody,
+Hi!
 
-our next guest_memfd upstream call is scheduled for Thursday,
-2025-04-17 at 8:00 - 9:00am (GMT-07:00) Pacific Time - Vancouver.
+On Mon, 2025-04-14 at 12:51 +0100, David Hildenbrand wrote:
+>
 
-We'll be using the following Google meet:
-http://meet.google.com/wxp-wtju-jzw
+[...]
 
-The meeting notes can be found at [1], where we also link recordings and
-collect current guest_memfd upstream proposals. If you want an google
-calendar invitation that also covers all future meetings, just write me
-a mail.
+> On top of that, I was wondering if we could look into doing something like
+> the following. It would also allow for pulling pages out of gmem for
+> existing SW-protected VMs once they enable shared memory for GMEM IIUC.
+> 
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 08eebd24a0e18..6f878cab0f466 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4495,11 +4495,6 @@ static int kvm_mmu_faultin_pfn_gmem(struct kvm_vcpu *vcpu,
+>  {
+>         int max_order, r;
+> 
+> -       if (!kvm_slot_has_gmem(fault->slot)) {
+> -               kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
+> -               return -EFAULT;
+> -       }
+> -
+>         r = kvm_gmem_get_pfn(vcpu->kvm, fault->slot, fault->gfn, &fault->pfn,
+>                              &fault->refcounted_page, &max_order);
+>         if (r) {
+> @@ -4518,8 +4513,19 @@ static int __kvm_mmu_faultin_pfn(struct kvm_vcpu *vcpu,
+>                                  struct kvm_page_fault *fault)
+>  {
+>         unsigned int foll = fault->write ? FOLL_WRITE : 0;
+> +       bool use_gmem = false;
+> +
+> +       if (fault->is_private) {
+> +               if (!kvm_slot_has_gmem(fault->slot)) {
+> +                       kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
+> +                       return -EFAULT;
+> +               }
+> +               use_gmem = true;
+> +       } else if (kvm_slot_has_gmem_with_shared(fault->slot)) {
+> +               use_gmem = true;
+> +       }
+> 
+> -       if (fault->is_private)
+> +       if (use_gmem)
+>                 return kvm_mmu_faultin_pfn_gmem(vcpu, fault);
+> 
+>         foll |= FOLL_NOWAIT;
+> 
+> 
+> That is, we'd not claim that things are private when they are not, but instead
+> teach the code about shared memory coming from gmem.
+> 
+> There might be some more missing, just throwing it out there if I am completely off.
 
+I think I arrived at the need for this as well while experimenting with
+building a Firecracker version that works with my direct map removal
+patches.
 
-If nothing else comes up, let's talk about the next steps to get basic 
-mmap support [2] ready for upstream, to prepare for actual in-place 
-conversion, direct-map removal and much more.
+With this patch series, on ARM, as soon as a memslot has a guest_memfd
+associated with it, all guest faults go through kvm_gmem_get_pfn, but on
+x86, they go through slot->userspace_addr by default, as
+CONFIG_KVM_SW_PROTECTED_VM selects CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES.
+There's no real difference between these if slot->userspace_addr can be
+GUP'd, but if its a VMA of a guest_memfd without direct map entries,
+faulting through slot->userspace_addr wont work. So on x86 Firecracker
+has to formally set the memory attributes to private, while on ARM it
+doesn't [1], which is a bit awkward.
 
-In particular, let's talk about what "basic mmap support" is, and what 
-we can use it for without actual in-place conversion: IIUC "only shared 
-memory in guest_memfd" use cases and some cases of software-protected 
-VMs can use it.
+David, I couldn't find an implementation of
+kvm_slot_has_gmem_with_shared() in the branch you shared, but would it
+be something like "slot->userspace_addr points to a gmem VMA,
+particularly to a VMA of the gmem that's associated with this memslot,
+mapped at the same offset"?
 
-Also, let's talk about the relationship/expectations between guest_memfd 
-and the user (mmap) address when it comes to KVM memory slots that have 
-a guest_memfd that supports "shared" memory.
+Best, 
+Patrick
 
+[1]: https://github.com/firecracker-microvm/firecracker/blob/feature/secret-hiding/src/vmm/src/builder.rs#L268
 
-To put something to discuss onto the agenda, reply to this mail or add
-them to the "Topics/questions for next meeting(s)" section in the
-meeting notes as a comment.
-
-[1]
-https://docs.google.com/document/d/1M6766BzdY1Lhk7LiR5IqVR8B8mG3cr-cxTxOrAosPOk/edit?usp=sharing
-[2] 
-https://lore.kernel.org/all/20250318161823.4005529-1-tabba@google.com/T/#u
-
--- 
-Cheers,
-
-David / dhildenb
-
+> -- 
+> Cheers,
+> 
+> David / dhildenb
+> 
 
