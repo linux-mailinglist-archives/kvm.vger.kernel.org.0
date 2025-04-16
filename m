@@ -1,53 +1,53 @@
-Return-Path: <kvm+bounces-43411-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43413-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89536A8B5F6
-	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 11:46:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E501A8B5F7
+	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 11:46:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6EC157AE6C0
-	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 09:44:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E8B01890C4F
+	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 09:46:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F218238D28;
-	Wed, 16 Apr 2025 09:45:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADF0723AE79;
+	Wed, 16 Apr 2025 09:45:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ekqj+Gu/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HH1A403b"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55142236441;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96B2D2376EF;
 	Wed, 16 Apr 2025 09:45:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744796701; cv=none; b=nx3RUg73RehQFrl3TlPSXoj1GsLYuHk34ISAUrUBaw6Hr0jgxmzd/kmXE1xRkc2yoXyLolC2jcKE/a98AsSgZAivjeb3xHBkmaH3zUmA58n8oAcD9zAPiTsrrnbc6HDjIPtHWM5+y6RB1GWNn9Mw3F3EI+A0OayZQsbQ1guJIcI=
+	t=1744796701; cv=none; b=skXX7rICUQDQMn8RTC06fCbrmgB6JmMmJNPL2HZcIQkeNRp+eQU0H9lf2Xqd5AiGOZnn4DNIkUY49ZnXv+wl2fuPbcA1FlBmjbx+smgJcwX+UnRQQOgAyDSwBnmvee19mOInXecc/E/U4ITkdWyAYvUAtiTXu5sS9dS3YFGIUfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1744796701; c=relaxed/simple;
-	bh=pRU6wLgxXnLL1nq6ekG3r0pNLgbdqaE3J4O9xny8g9g=;
+	bh=y6sNLqLklzVcWeo9kuxbWWkQNColAUNOTv6uOnth8tc=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=u1BGpr8kGLvNxhgHeEvxIWZY2YL740+jmQfknJzaBVEWTARjSXKbgKkQn3DgDZn0pCegSZDJbbJLdAyObn9sJPNKft2Y+p+q882yESNWBDs/vM5P9VSkREkvx+5Wy8U+eaR4C2kbIW9nadLNjnp+qHgu4cN3aOKYrrN5EQvaCkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ekqj+Gu/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C2A3BC4CEF3;
+	 In-Reply-To:To:Cc; b=CMKoR5IQXVvvhnLqlzRBzelAuYVUqbkyQKjIHlc3IVaSChpZg8fkvAGeu83BYI7KusZAjyLZ4xF5Zt/sbXxLdy/oJppMGaC8Co9mZKFpdClQZp75wV33IBmZ3AtY0noWxqJaZlBQG7qYRvIRS7DGryeuWR9rmI9J2ju1pZnlsZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HH1A403b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CF0A4C4CEF6;
 	Wed, 16 Apr 2025 09:45:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1744796700;
-	bh=pRU6wLgxXnLL1nq6ekG3r0pNLgbdqaE3J4O9xny8g9g=;
+	bh=y6sNLqLklzVcWeo9kuxbWWkQNColAUNOTv6uOnth8tc=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=ekqj+Gu/0hKmxeU3sm6q1f2ryuXtUFna6ArZ7i8VRK8suIQwaNNKThLw6ImaKsr5K
-	 t0mZIWV5XLpX6VHLck+gcTnsQVTrinH9PM7QVd9oguTIrn7SNyEEyk6GhQt2eCE+Xq
-	 58clWQAoWoEdCiRa24pVL33ZaWLNOUUCVE8PHQl6gKwS4H+pAlXWIgRnzBmqWeoxZ+
-	 STzsWCztCoWIdguL6ckBQtCF9551uC+sBRoMfvnJNK5FFrkWClkz563175vEhlF9nU
-	 B+hfAzBO8AkYTDIbAad2roMX8GONH0N9cvXRru8OFUGmGo3obvCkayvcukwGaF4p/D
-	 zk8QiATZhVaGQ==
+	b=HH1A403b+hjSeYH0fFnCcyVe3XGHSUQPNkSJexeBqDpRrGhcBviUoIMSx55nUSPHc
+	 7E2bOgl3XRblTUkvQiIH3j+Oe8tYXl5itG/R260Ckf+vjYlbDGm9wnykwHav/jGvKd
+	 HKOmMs2makfVltunNUFav5U7lB3/aGHP2iQg+tG8XV9j8NVptMijlodBYp274h10Cm
+	 BUhJ8Awo0UtY3JBapaSwGpz7v9nob885b8E6Z8m8POQmCnCiNWmTs7kYV44HgkQ8DK
+	 rSelb4535t5KDJhZldmuN2v5BTflT4lwrpvUUjKvvz/eihiQ1oVQQkCbAeza8o1QKM
+	 AvZp8tmlNMiLA==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B12E6C369C1;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFE19C369C7;
 	Wed, 16 Apr 2025 09:45:00 +0000 (UTC)
 From: Chen Linxuan via B4 Relay <devnull+chenlinxuan.uniontech.com@kernel.org>
-Date: Wed, 16 Apr 2025 17:44:50 +0800
-Subject: [PATCH RFC v2 4/5] tpm: add __always_inline for
- tpm_is_hwrng_enabled
+Date: Wed, 16 Apr 2025 17:44:51 +0800
+Subject: [PATCH RFC v2 5/5] lib/Kconfig.debug: introduce
+ CONFIG_NO_AUTO_INLINE
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,7 +56,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250416-noautoinline-v2-4-e69a2717530f@uniontech.com>
+Message-Id: <20250416-noautoinline-v2-5-e69a2717530f@uniontech.com>
 References: <20250416-noautoinline-v2-0-e69a2717530f@uniontech.com>
 In-Reply-To: <20250416-noautoinline-v2-0-e69a2717530f@uniontech.com>
 To: Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
@@ -79,21 +79,21 @@ Cc: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
  Chen Linxuan <chenlinxuan@uniontech.com>, 
  Changbin Du <changbin.du@intel.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3892;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3064;
  i=chenlinxuan@uniontech.com; h=from:subject:message-id;
- bh=eVMGMErwkSKVlhFsRXd5VgFhkcLZ6sQRGgY0l5PVv8Q=;
- b=owEBbQKS/ZANAwAKAXYe5hQ5ma6LAcsmYgBn/3wYTeAxxXYaBDNq6MoKT5/qwja5tvQJEZiWQ
- VjsA0MmYHeJAjMEAAEKAB0WIQTO1VElAk6xdvy0ZVp2HuYUOZmuiwUCZ/98GAAKCRB2HuYUOZmu
- i72UEAD2OIFAhd0YqHWxRgTYgam80CB7jU1JXtFVmnHuEVb2fZKwu3HLJvvNPTdU488rihW29Gv
- a7Mp25dYGsmpP7Y94+fu8UZ4WFHadCc8hD/JMAHf9TYKA/QHF305zxqKfWDFsh45+9l/9GyxUGx
- pn9FPSvodZ2un0zqttouu2KSsIVrqiSaWsJ/CJMWPUymTUQtgjhjTQYRpNgPD1Hgzy1NLg7qFn2
- xXZ8H66IWPbH/UYx8FYT4u1nexNR8phuoDm1tbZgVG2reCPwbE7aqnvbp4nvOni6Ry75bTal19f
- 1ph+O4sFDpacQ3l/zIvqqWbja+D5nbtDyeljbPTOLtO9BiUunxTtWzxx1jP9pZ+AfthSYLHtP6i
- Fw0i6kS/FCH2vL86HtHiWMVhZLa2TB0sXTxz8IG1a5F+Ws6KUU8ATsuG7kYv/CVgO4uMR3caLvt
- 9ZmjawH5WNd8M6YqYA9gX4OzOGn9BJL5MYTQQNg6vbx6UpzwWXxG1m/96VBePk+auO80b2gyVcW
- kLoKOHVePJDYSgmqibXWCc2BQIEjkqDF1/bZgB/tuqmreGPUjrxR2RtT0xRLlh2K1fSFHUjMV26
- wpWwKRlygPJbqNOMeoSfRl7qf5jn3XSxZvex19Soc7LaN/0iI+vfTTCYk/j6PbihEFAmhkJ92r1
- +J10jZUB46Z8qgg==
+ bh=F+1qLaqiauypU+BRTQYkrjZEyIF0AG4hvaXQhsgJYk8=;
+ b=owEBbQKS/ZANAwAKAXYe5hQ5ma6LAcsmYgBn/3wZT3NWiI2S8hRz1pjrEUmLoC/gt8RZUtPaC
+ lubpf4A4hyJAjMEAAEKAB0WIQTO1VElAk6xdvy0ZVp2HuYUOZmuiwUCZ/98GQAKCRB2HuYUOZmu
+ izAIEACY38ESmIVOjDr7Iwh8UUrW7TzIcDjdsV2Gz25pzxNRYt2UN7F1ih++IU0mVKuCRE8VqsZ
+ COqv1koPLnaC5FnVtv40PZwIiMbk1JDsa2ErGt5FBgb7ada1ai8OVfO05xZmtLjDLu0LBYqJs20
+ 54Nx0HAjECSeFJB7FsRxoyck9coB80nqWw4d6BRS0UG3/nsZJYJ5zvs3iEpL5BtNePBanOqbBao
+ ey+EM2gyLwiAvD/x7pkIaPnvF9Y35X4eRaTm8+SYc48zK0Q/+9L5Vg2bmyyF9Up8vdoPVfNYD49
+ zE1q9RpL992v3uSn4Uh+/XGggbgTV+nw1SXRZH1NcwML9S5Tk7czniyVD1h4KFXKUZpvkZvhQi/
+ eU5K9FTQedxVsK+gma+7I3bWAbm0Yn5SZ9gUzZHGIHWSMNM6aByhX3QVbVGcrvz9uBgzJLA6G2v
+ blyyctLKffNf5k3i4oGfEufOigeC2JeVcreJ8YcvZos9m3zQ9f+SWCKtvtlFdNpgcm8q7SgYEOi
+ Vs4lmIBCBb2MgxZbCKfiz5qnt49ANDdBLL+6jGfnsSCdSR9yiHKDzItW4XHG62rQaZ/UgtnvTqP
+ guR1IhGM9mQRv0qGS8ujapIi7oqfU995Jy3XGAG6t4uHwd0t7yItMqwthqHQwNxtgOzeuuclW/d
+ ThVxVEEuZANNvYg==
 X-Developer-Key: i=chenlinxuan@uniontech.com; a=openpgp;
  fpr=D818ACDD385CAE92D4BAC01A6269794D24791D21
 X-Endpoint-Received: by B4 Relay for chenlinxuan@uniontech.com/default with
@@ -103,111 +103,90 @@ Reply-To: chenlinxuan@uniontech.com
 
 From: Winston Wen <wentao@uniontech.com>
 
-Presume that kernel is compiled for x86_64 with gcc version 13.3.0:
+Add a new kernel hacking option CONFIG_NO_AUTO_INLINE that prevents the
+compiler from auto-inlining functions not explicitly marked with the
+'inline' keyword.
 
-  make defconfig
-  ./scripts/kconfig/merge_config.sh .config <(
-    echo CONFIG_TCG_TPM=y
-    echo CONFIG_HW_RANDOM=m
-  )
-  make KCFLAGS="-fno-inline-small-functions -fno-inline-functions-called-once"
+This enhancement improves function tracer capabilities as it can only
+trace functions that haven't been inlined by the compiler.
 
-This results a link error:
+Previous discussions:
 
-  ld: vmlinux.o: in function `tpm_add_hwrng':
-  tpm-chip.c:(.text+0x6c5924): undefined reference to `hwrng_register'
-  ld: vmlinux.o: in function `tpm_chip_unregister':
-  (.text+0x6c5bc9): undefined reference to `hwrng_unregister'
-  ld: vmlinux.o: in function `tpm_chip_register':
-  (.text+0x6c5c9b): undefined reference to `hwrng_unregister'
+Link: https://lore.kernel.org/all/20181028130945.23581-3-changbin.du@gmail.com/
 
-With `CONFIG_TCG_TPM=y` and `CONFIG_HW_RANDOM=m`,
-the functions `tpm_add_hwrng`, `tpm_chip_unregister`, and
-`tpm_chip_register` are compiled into `vmlinux.o`
-and reference the symbols `hwrng_register` and `hwrng_unregister`.
-These symbols, however, are compiled into `rng-core.ko`, which results
-in the linking error.
+This patch is modified from commit 917fad29febd ("kernel hacking: add a
+config option to disable compiler auto-inlining") which can be founded
+in linux-next-history:
 
-I am not sure but I think this weird linking error only arises when
-auto inlining is disabled because of some dead code elimination.
+Link: https://web.git.kernel.org/pub/scm/linux/kernel/git/next/linux-next-history.git/commit/?id=917fad29febd
 
-`CONFIG_TCG_TPM=y` and `CONFIG_HW_RANDOM=m` set `CONFIG_HW_RANDOM_TPM=n`.
-This causes the function `tpm_is_hwrng_enabled` to always return
-`false`, as shown below:
+Unlike the original implementation, this patch:
 
-  static bool tpm_is_hwrng_enabled(struct tpm_chip *chip)
-  {
-      if (!IS_ENABLED(CONFIG_HW_RANDOM_TPM))
-          return false;
-      if (tpm_is_firmware_upgrade(chip))
-          return false;
-      if (chip->flags & TPM_CHIP_FLAG_HWRNG_DISABLED)
-          return false;
-      return true;
-  }
+1. Make it depends on CC_IS_GCC,
+   as Clang 18.1.3 break test_bitmap_const_eval() in lib/test_bitmap.c
 
-When `tpm_is_hwrng_enabled` is inlined, dead code elimination
-optimizations are applied and the reference to the `hwrng_*` functions
-will been removed.
-For instance, in the `tpm_chip_unregister` function:
+2. Make it depends on X86 and LOONGARCH,
+   as I haven't test other architectures
 
-  void tpm_chip_unregister(struct tpm_chip *chip)
-  {
-  #ifdef CONFIG_TCG_TPM2_HMAC
-      int rc;
+3. Removes unnecessary cc-option checks per commit 7d73c3e9c514
+   ("Makefile: remove stale cc-option checks").
 
-      rc = tpm_try_get_ops(chip);
-      if (!rc) {
-          tpm2_end_auth_session(chip);
-          tpm_put_ops(chip);
-      }
-  #endif
+4. Update help information.
 
-      tpm_del_legacy_sysfs(chip);
-      if (tpm_is_hwrng_enabled(chip))
-          hwrng_unregister(&chip->hwrng);
-      tpm_bios_log_teardown(chip);
-      if (chip->flags & TPM_CHIP_FLAG_TPM2 && !tpm_is_firmware_upgrade(chip))
-          tpm_devs_remove(chip);
-      tpm_del_char_device(chip);
-  }
-
-When `tpm_is_hwrng_enabled` is inlined and always returns `false`,
-the call to `hwrng_unregister` is effectively part of a `if (false)`
-block, which I guess that will be then optimized out.
-
-However, when the `-fno-inline-small-functions` and
-`-fno-inline-functions-called-once` flags are used,
-tpm_is_hwrng_enabled is not inline.
-
-And this optimization some how cannot occur,
-leading to the undefined reference errors during linking.
-
-Adding the `__always_inline` attribute ensures that
-`tpm_is_hwrng_enabled` is inlined regardless of the compiler flags.
-This allows the dead code elimination to proceed as expected,
-resolving the linking issue.
-
+Cc: Changbin Du <changbin.du@gmail.com>
 Co-developed-by: Chen Linxuan <chenlinxuan@uniontech.com>
 Signed-off-by: Chen Linxuan <chenlinxuan@uniontech.com>
 Signed-off-by: Winston Wen <wentao@uniontech.com>
 ---
- drivers/char/tpm/tpm-chip.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Makefile          |  6 ++++++
+ lib/Kconfig.debug | 15 +++++++++++++++
+ 2 files changed, 21 insertions(+)
 
-diff --git a/drivers/char/tpm/tpm-chip.c b/drivers/char/tpm/tpm-chip.c
-index e25daf2396d37bcaeae8a96267764df0861ad1be..48cc74d84247e258a39f2118e03aa10d0cbb066a 100644
---- a/drivers/char/tpm/tpm-chip.c
-+++ b/drivers/char/tpm/tpm-chip.c
-@@ -534,7 +534,7 @@ static int tpm_hwrng_read(struct hwrng *rng, void *data, size_t max, bool wait)
- 	return tpm_get_random(chip, data, max);
- }
+diff --git a/Makefile b/Makefile
+index c91afd55099ea6bc7ed89bc3ef9cf58a498596d4..52da2c27f94167d2d2892a67c065e5df15efbde0 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1071,6 +1071,12 @@ endif
+ # Ensure compilers do not transform certain loops into calls to wcslen()
+ KBUILD_CFLAGS += -fno-builtin-wcslen
  
--static bool tpm_is_hwrng_enabled(struct tpm_chip *chip)
-+static __always_inline bool tpm_is_hwrng_enabled(struct tpm_chip *chip)
- {
- 	if (!IS_ENABLED(CONFIG_HW_RANDOM_TPM))
- 		return false;
++ifdef CONFIG_NO_AUTO_INLINE
++KBUILD_CFLAGS   += -fno-inline-functions \
++		   -fno-inline-small-functions \
++		   -fno-inline-functions-called-once
++endif
++
+ # change __FILE__ to the relative path to the source directory
+ ifdef building_out_of_srctree
+ KBUILD_CPPFLAGS += $(call cc-option,-ffile-prefix-map=$(srcroot)/=)
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index 9fe4d8dfe5782981cc0b2b6614106aac570bd229..2ebb4802886ab4a48841dbdd8973b7d9883548b9 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -436,8 +436,23 @@ config GDB_SCRIPTS
+ 	  instance. See Documentation/process/debugging/gdb-kernel-debugging.rst
+ 	  for further details.
+ 
++
+ endif # DEBUG_INFO
+ 
++config NO_AUTO_INLINE
++	bool "Disable compiler auto-inline optimizations (EXPERIMENTAL)"
++	default n
++	depends on CC_IS_GCC && (X86 || LOONGARCH)
++	help
++	  This will prevent the compiler from optimizing the kernel by
++	  auto-inlining functions not marked with the inline keyword.
++	  With this option, only functions explicitly marked with
++	  "inline" will be inlined. This will allow the function tracer
++	  to trace more functions because it only traces functions that
++	  the compiler has not inlined.
++
++	  If unsure, select N.
++
+ config FRAME_WARN
+ 	int "Warn for stack frames larger than"
+ 	range 0 8192
 
 -- 
 2.48.1
