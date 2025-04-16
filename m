@@ -1,123 +1,97 @@
-Return-Path: <kvm+bounces-43396-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43397-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75F28A8B01A
-	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 08:14:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53AB4A8B1CB
+	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 09:17:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6DE977A76FA
-	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 06:13:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 403937A8816
+	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 07:16:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B18322AE7E;
-	Wed, 16 Apr 2025 06:14:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0530C219A7E;
+	Wed, 16 Apr 2025 07:17:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eujBp9rq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pmu527nS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24DE13597A;
-	Wed, 16 Apr 2025 06:14:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 268C22DFA4E;
+	Wed, 16 Apr 2025 07:17:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744784086; cv=none; b=WUgm4vYB8llqNU4EQjdYbHfNkti2aBcqh37D/lGeqprfo4G+W72jH/gwhA6dftKlHn+XXpd3wQa9oquJvydl2cDlI3+l7DpLzA1m6frEqh4f3YPFQklRfxWeCUeie8fKvldnp3nZ/ZiVm5xtMcSqBJWbgKWbBSs8fEUSyB3pq9Y=
+	t=1744787829; cv=none; b=JE8c5V5Ik4pCo90z3naI56yAIILdPpLFmSCRmNDl2Hi+cTeW7HJuiVRGC+kgAW44tkbGznr5QEEt5XRnII9zS0e2GBJPlZCztdsjY5hmelpH1djRiX2ZqX6SKRqIwOad1k+ivN3dBVxtDtbMEM5MrjBnzopn937dTg5iTqLuNQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744784086; c=relaxed/simple;
-	bh=ahgfbY/XFvutx4yIjSm3pu32rAZiF6vDzwoBmJnFFDI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AVmBLO/f98aSinds0eUEQv6B89T5AIJ4WlIC37sZkwG7xzWTrvcPmuRtuCqAQUUXicG7U/GiPP+mtDs6lK8mWHLHPMav8UXGOpGE/4c0uVXu8b+PqC54mJG/iyPR3va/R3tge/wRK6+1AE+kH5roMQBz8NxHZvwu1SIxn0km9kA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eujBp9rq; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744784084; x=1776320084;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=ahgfbY/XFvutx4yIjSm3pu32rAZiF6vDzwoBmJnFFDI=;
-  b=eujBp9rqhHt12JSu+WAcHGxGngFZcbFBdYPa02BSovBsCr6HB3m6NWYM
-   A14ABfbM9T4EHxIZXTg403z2+6jLBrn/bfpGrK3xy4GhiW865W6LHmqpS
-   wEHmu5Xm6UdQangT80o1A1IVXAR5FCwSJ0o1GJwutN53AZ3UQyHmKgURL
-   5OGEUYxm4uJ+9/8lKUXGys4DtQcUhxJBoxyk9C4zdXppbNrJMOqOL7nuf
-   Nf4aNUJG7qcUghnJ+XAsr0cu2v4LdNw8DA10/+dxn9PLF0rNsEeffUFn7
-   AkyfBDTlSSf3VRg/65WzObqtPKELuM/bllfIN1Exa+SbmsVrGWtoURfOx
-   Q==;
-X-CSE-ConnectionGUID: IYk4oho4QTyfHl40HQjVXg==
-X-CSE-MsgGUID: 7H8n75R6TmWetlxLciHq0A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11404"; a="68806460"
-X-IronPort-AV: E=Sophos;i="6.15,215,1739865600"; 
-   d="scan'208";a="68806460"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 23:14:43 -0700
-X-CSE-ConnectionGUID: NoEJcen6RLSOvwa5s4NA+A==
-X-CSE-MsgGUID: +IFZaShjRzmPyStPcZ1M5Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,215,1739865600"; 
-   d="scan'208";a="130108682"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 23:14:38 -0700
-Message-ID: <5fb4f5f8-55d2-44a7-808e-76c8a452cd2f@intel.com>
-Date: Wed, 16 Apr 2025 14:14:34 +0800
+	s=arc-20240116; t=1744787829; c=relaxed/simple;
+	bh=IXKK0ukmF5Kl3ZgJ0mpuP+p8YAvc36j9OaE+6Fhbanc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UeTmahMzwJh69B5k1YoYA38/1CWzcB2jjPGP/AKfOfyNhfTeg4qENDp6D88AEoXqMBD4/SUEj4HLkgmQ+n8WsKUoedTeaKStEdaa16vqrQ1ybzpNMYtz4XpHv3Sa3JH74j1CkAjCcVCfJ6lClrbR9HeQ9BQNGujhTv3WP0TWp6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pmu527nS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43281C4CEE2;
+	Wed, 16 Apr 2025 07:17:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744787828;
+	bh=IXKK0ukmF5Kl3ZgJ0mpuP+p8YAvc36j9OaE+6Fhbanc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Pmu527nSj2R/zaECfDGMj10rRpLGoZ49rLUtUtO3KUf6xe0/p8aji3foCcXuNYWgR
+	 QzKlJV905qmPXea7H1/D9N8NCQmecIvaN2mQa94u+hpF08UHtnn4azXzf2URRV0Sh8
+	 xxA4ThQvfq/h3GKIIVH5W7+UEhi77mctcPDHNHbRSs+frAFrKvadYN9t2AL7YiRAs9
+	 A03zv2/S0gh3vHXZ0M/ybLsNr2ZQHlfypgdrjBM+Te1/pWDxAhrw1XYGf4lbDvBccq
+	 wFXndvz/XRx7N73UzTVxwrHY0URRvCx4kFi9GJ2dV5vBD8R0MGtqVoxirSVvvi6uNR
+	 XAuEgz38mQShw==
+Date: Wed, 16 Apr 2025 09:17:02 +0200
+From: Ingo Molnar <mingo@kernel.org>
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: Mike Rapoport <rppt@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-tip-commits@vger.kernel.org, Arnd Bergmann <arnd@kernel.org>,
+	Andy Shevchenko <andy@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Davide Ciminaghi <ciminaghi@gnudd.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+	x86@kernel.org
+Subject: Re: [tip: x86/urgent] x86/e820: Discard high memory that can't be
+ addressed by 32-bit systems
+Message-ID: <Z_9ZblhCgEeTgGQ8@gmail.com>
+References: <20250413080858.743221-1-rppt@kernel.org>
+ <174453620439.31282.5525507256376485910.tip-bot2@tip-bot2>
+ <a641e123-be70-41ab-b0ce-6710d7fd0c2d@intel.com>
+ <Z_4ISTuGo8VmZt9X@kernel.org>
+ <c811f662-79fd-4db1-b4e1-74a869d9a4f1@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 4/5] KVM: SVM: Add support for
- KVM_CAP_X86_BUS_LOCK_EXIT on SVM CPUs
-To: Manali Shukla <manali.shukla@amd.com>, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Cc: seanjc@google.com, pbonzini@redhat.com, nikunj@amd.com,
- thomas.lendacky@amd.com, bp@alien8.de
-References: <20250324130248.126036-1-manali.shukla@amd.com>
- <20250324130248.126036-5-manali.shukla@amd.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250324130248.126036-5-manali.shukla@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-
-On 3/24/2025 9:02 PM, Manali Shukla wrote:
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 5fe84f2427b5..f7c925aa0c4f 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -7909,6 +7909,25 @@ apply some other policy-based mitigation. When exiting to userspace, KVM sets
->   KVM_RUN_X86_BUS_LOCK in vcpu-run->flags, and conditionally sets the exit_reason
->   to KVM_EXIT_X86_BUS_LOCK.
->   
-> +Note! KVM_CAP_X86_BUS_LOCK_EXIT on AMD CPUs with the Bus Lock Threshold is close
-> +enough  to INTEL's Bus Lock Detection VM-Exit to allow using
-> +KVM_CAP_X86_BUS_LOCK_EXIT for AMD CPUs.
-> +
-> +The biggest difference between the two features is that Threshold (AMD CPUs) is
-> +fault-like i.e. the bus lock exit to user space occurs with RIP pointing at the
-> +offending instruction, whereas Detection (Intel CPUs) is trap-like i.e. the bus
-> +lock exit to user space occurs with RIP pointing at the instruction right after
-> +the guilty one.
->
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c811f662-79fd-4db1-b4e1-74a869d9a4f1@intel.com>
 
 
-> +The bus lock threshold on AMD CPUs provides a per-VMCB counter which is
-> +decremented every time a bus lock occurs, and a VM-Exit is triggered if and only
-> +if the bus lock counter is '0'.
-> +
-> +To provide Detection-like semantics for AMD CPUs, the bus lock counter has been
-> +initialized to '0', i.e. exit on every bus lock, and when re-executing the
-> +guilty instruction, the bus lock counter has been set to '1' to effectively step
-> +past the instruction.
+* Dave Hansen <dave.hansen@intel.com> wrote:
 
- From the perspective of API, I don't think the last two paragraphs 
-matter much to userspace.
+> On 4/15/25 00:18, Mike Rapoport wrote:
+> >> How about we reuse 'MAX_NONPAE_PFN' like this:
+> >>
+> >> 	if (IS_ENABLED(CONFIG_X86_32))
+> >> 		memblock_remove(PFN_PHYS(MAX_NONPAE_PFN), -1);
+> >>
+> >> Would that make the connection more obvious?
+> > Yes, that's better. Here's the updated patch:
+> 
+> Looks, great. Thanks for the update and the quick turnaround on the
+> first one after the bug report!
+> 
+> Tested-by: Dave Hansen <dave.hansen@intel.com>
+> Acked-by: Dave Hansen <dave.hansen@intel.com>
 
-It should describe what userspace can/should do. E.g., when exit to 
-userspace due to bus lock on AMD platform, the RIP points at the 
-instruction which causes the bus lock. Userspace can advance the RIP 
-itself before re-enter the guest to make progress. If userspace doesn't 
-change the RIP, KVM internal can handle it by making the re-execution of 
-the instruction doesn't trigger bus lock VM exit to allow progress.
+I've amended the fix in tip:x86/urgent accordingly and added your tags, 
+thanks!
+
+	Ingo
 
