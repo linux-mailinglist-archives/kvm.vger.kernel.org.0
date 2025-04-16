@@ -1,156 +1,155 @@
-Return-Path: <kvm+bounces-43404-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43405-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C94F4A8B330
-	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 10:17:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A46CA8B33F
+	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 10:19:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF0D2444991
-	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 08:17:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99BB51905DEB
+	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 08:19:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A631230BE7;
-	Wed, 16 Apr 2025 08:17:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE1CA22FF2D;
+	Wed, 16 Apr 2025 08:17:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DeW0GEcx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HOi4r1D9"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE6C022D7BC
-	for <kvm@vger.kernel.org>; Wed, 16 Apr 2025 08:17:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D00012CD96
+	for <kvm@vger.kernel.org>; Wed, 16 Apr 2025 08:17:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744791441; cv=none; b=sfC+3xjmDikyBzqBeVfqGv9Zwl5P3zTZConfHg84t4xFPiYJa85sqtglJmQFoiPoKuAuQBzE66MlsCvNeyWwNwqJ7BG4duAYCoaNJRXqqPpGTagTLVIUficMk/rxBqDaLl3Eq+WfaZe2x5CWKR/FhBzblHLjib/kB2KneT6ZKrI=
+	t=1744791460; cv=none; b=I8adnVKoWxu9DFCd2Q71gdP8w+nUMtY1t6tsfJ4CtN5K6t2J9yP8zqm4P70jU12EzYuSjySDjthFgFizTkAahkeigvFytIJ69a5MjQJW05jaf2+mNMUxZxVyXLRwIvYbrld2JnmC+eV+NZyY77St6Ojlpw0PsoIanqubPIDU2xM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744791441; c=relaxed/simple;
-	bh=hGK36dqVuYa9Hoa5jNnlWPUMMV2VDbIGZcqBMN6kn7I=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=PY08hSCex48hynx25ek8FAr/9vHnjtO2hz/Z65iQocM35EZqh245ZSDEqsMWC1r6V570MkaZg2CIbeLRh3LTzmVeH2Ex/QN+5Me0kZuyPCxND2zdi/71fzLBibhF3DKur6NssWsZXLJMRGiOOXqol4bryuwYMzugJ3dE7J1w0Fg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DeW0GEcx; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744791438;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+prEyTRWGZcBrE/AIyoW4nEtdjv1GtfBf5zu6/qquhE=;
-	b=DeW0GEcxO0ZckpkcDt8GSKEZvxqm5iz4ClCcyAiby76nR3OGQehj8VpJ6F7J1jtfVcvbPe
-	CX5rKfq9jjjIr08UU+85MTNXcx8WKs0u3DDXGxVoktUFB7sfGcw7yfxXmTTm1qE92JCUGa
-	mNnfLylfH/EuAjpQ5C40fwj1d7+L6uM=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-249-QmzrYM3kNo6d5vwj2mc6gQ-1; Wed,
- 16 Apr 2025 04:17:14 -0400
-X-MC-Unique: QmzrYM3kNo6d5vwj2mc6gQ-1
-X-Mimecast-MFC-AGG-ID: QmzrYM3kNo6d5vwj2mc6gQ_1744791433
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2AD2A1800570;
-	Wed, 16 Apr 2025 08:17:12 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.45.242.3])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4E5141800367;
-	Wed, 16 Apr 2025 08:17:11 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id D569121E66C3; Wed, 16 Apr 2025 10:17:08 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Zhao Liu <zhao1.liu@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,  Eric Blake <eblake@redhat.com>,
-  Michael Roth <michael.roth@amd.com>,  Daniel P . =?utf-8?Q?Berrang=C3=A9?=
- <berrange@redhat.com>,  Eduardo Habkost <eduardo@habkost.net>,  Marcelo
- Tosatti <mtosatti@redhat.com>,  Shaoqin Huang <shahuang@redhat.com>,  Eric
- Auger <eauger@redhat.com>,  Peter Maydell <peter.maydell@linaro.org>,
-  Laurent Vivier <lvivier@redhat.com>,  Thomas Huth <thuth@redhat.com>,
-  Sebastian Ott <sebott@redhat.com>,  Gavin Shan <gshan@redhat.com>,
-  qemu-devel@nongnu.org,  kvm@vger.kernel.org,  qemu-arm@nongnu.org,
-  Dapeng Mi <dapeng1.mi@intel.com>,  Yi Lai <yi1.lai@intel.com>
-Subject: Re: [PATCH 1/5] qapi/qom: Introduce kvm-pmu-filter object
-In-Reply-To: <Z/i3+l3uQ3dTjnHT@intel.com> (Zhao Liu's message of "Fri, 11 Apr
-	2025 14:34:34 +0800")
-References: <20250409082649.14733-1-zhao1.liu@intel.com>
-	<20250409082649.14733-2-zhao1.liu@intel.com>
-	<878qo8yu5u.fsf@pond.sub.org> <Z/iUiEXZj52CbduB@intel.com>
-	<87frifxqgk.fsf@pond.sub.org> <Z/i3+l3uQ3dTjnHT@intel.com>
-Date: Wed, 16 Apr 2025 10:17:08 +0200
-Message-ID: <87fri8o70b.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1744791460; c=relaxed/simple;
+	bh=L8NvFQCdlJUp/6uJoWj6yMFzx+igvTzyuYbhBvkmkrQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iXysN4y58CNu/SVGDo9KErhmXFFLC58VNHPR5/OeiX//CuEAn+J+nNTXbLL4I3ewXaoh1QA8zGqyZEHWC0/r1mZhpgkIFjkl7xTxIdnAHUOq0y7U4uVmsHRvMd0O9mt62aSBk6LMjZD3C5QpPGwpgPkcYvxfnMv6PIgc7rgBF9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HOi4r1D9; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744791458; x=1776327458;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=L8NvFQCdlJUp/6uJoWj6yMFzx+igvTzyuYbhBvkmkrQ=;
+  b=HOi4r1D9W4LPtomYIyJRyyre/ZeJOLWdplDEjdiBdg1kSHnUy2rmp0To
+   3Zfyw+kTvtmLnr7VrjJMFB3GJ2V1Zkpxb3mjHOgX32s3Xi9pzmSfgODTQ
+   N7g+eBRWjFBQ+4uuUvdkoQABjrLy56WdDvBoLBzFrH3ekHmojidlzdPh4
+   LDjZ3kpOpcBbhmQP5dsEGYz1IBsoKfXm3k6Xw0xgBXSiXErt/wtIlZGfd
+   pA6JgGOCGfyeANQWgjqP614G4YN9s5iiB5sGdwFRS2xnb+mTMxk+l9L+N
+   U6f5xgeF4NhOGg3bVoXp0Q1SD+jUdRxWK8q3EC7ouFPU6GoN1B1I6h7Ku
+   A==;
+X-CSE-ConnectionGUID: z1bp/DITQzCzIpNJAVKkDQ==
+X-CSE-MsgGUID: yc44QXRSRNitYWG5QOq4NA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11404"; a="46416913"
+X-IronPort-AV: E=Sophos;i="6.15,215,1739865600"; 
+   d="scan'208";a="46416913"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2025 01:17:37 -0700
+X-CSE-ConnectionGUID: sqQIBIPXSgCFn0oht0TD8A==
+X-CSE-MsgGUID: Y+Vs40CMRmWbXe4IspPIGw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,215,1739865600"; 
+   d="scan'208";a="130897585"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2025 01:17:31 -0700
+Message-ID: <42f59e7f-8353-461b-9c7a-d333083ba791@linux.intel.com>
+Date: Wed, 16 Apr 2025 16:17:28 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 08/10] target/i386/kvm: reset AMD PMU registers during
+ VM reset
+To: Ewan Hai <ewanhai-oc@zhaoxin.com>, Zhao Liu <zhao1.liu@intel.com>
+Cc: Dongli Zhang <dongli.zhang@oracle.com>, qemu-devel@nongnu.org,
+ kvm@vger.kernel.org, pbonzini@redhat.com, mtosatti@redhat.com,
+ sandipan.das@amd.com, babu.moger@amd.com, likexu@tencent.com,
+ like.xu.linux@gmail.com, zhenyuw@linux.intel.com, groug@kaod.org,
+ khorenko@virtuozzo.com, alexander.ivanov@virtuozzo.com, den@virtuozzo.com,
+ davydov-max@yandex-team.ru, xiaoyao.li@intel.com, joe.jin@oracle.com,
+ ewanhai@zhaoxin.com, cobechen@zhaoxin.com, louisqi@zhaoxin.com,
+ liamni@zhaoxin.com, frankzhu@zhaoxin.com, silviazhao@zhaoxin.com,
+ yeeli@zhaoxin.com
+References: <20250302220112.17653-1-dongli.zhang@oracle.com>
+ <20250302220112.17653-9-dongli.zhang@oracle.com>
+ <8a547bf5-bdd4-4a49-883a-02b4aa0cc92c@zhaoxin.com>
+ <84653627-3a20-44fd-8955-a19264bd2348@oracle.com>
+ <e3a64575-ab1f-4b6f-a91d-37a862715742@zhaoxin.com>
+ <a94487ab-b06d-4df4-92d8-feceeeaf5ec3@oracle.com>
+ <65a6e617-8dd8-46ee-b867-931148985e79@zhaoxin.com>
+ <Z/OSEw+yJkN89aDG@intel.com>
+ <94e8451f-1b44-4e22-8e3f-378c8490cf00@zhaoxin.com>
+Content-Language: en-US
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <94e8451f-1b44-4e22-8e3f-378c8490cf00@zhaoxin.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Zhao Liu <zhao1.liu@intel.com> writes:
 
-> On Fri, Apr 11, 2025 at 06:38:35AM +0200, Markus Armbruster wrote:
->> Date: Fri, 11 Apr 2025 06:38:35 +0200
->> From: Markus Armbruster <armbru@redhat.com>
->> Subject: Re: [PATCH 1/5] qapi/qom: Introduce kvm-pmu-filter object
->>=20
->> Zhao Liu <zhao1.liu@intel.com> writes:
->>=20
->> > Hi Markus
->> >
->> > On Thu, Apr 10, 2025 at 04:21:01PM +0200, Markus Armbruster wrote:
->> >> Date: Thu, 10 Apr 2025 16:21:01 +0200
->> >> From: Markus Armbruster <armbru@redhat.com>
->> >> Subject: Re: [PATCH 1/5] qapi/qom: Introduce kvm-pmu-filter object
->> >>=20
->> >> Zhao Liu <zhao1.liu@intel.com> writes:
->> >>=20
->> >> > Introduce the kvm-pmu-filter object and support the PMU event with =
-raw
->> >> > format.
->> >>=20
->> >> Remind me, what does the kvm-pmu-filter object do, and why would we
->> >> want to use it?
->> >
->> > KVM PMU filter allows user space to set PMU event whitelist / blacklist
->> > for Guest. Both ARM and x86's KVMs accept a list of PMU events, and x86
->> > also accpets other formats & fixed counter field.
->>=20
->> But what does the system *do* with these event lists?
+On 4/7/2025 5:33 PM, Ewan Hai wrote:
 >
-> This is for security purposes, and can restrict Guest users from
-> accessing certain sensitive hardware information on the Host via perf or
-> PMU counter.
+> On 4/7/25 4:51 PM, Zhao Liu wrote:
 >
-> When a PMU event is blocked by KVM, Guest users can't get the
-> corresponding event count via perf/PMU counter.
+>> On Tue, Apr 01, 2025 at 11:35:49AM +0800, Ewan Hai wrote:
+>>> Date: Tue, 1 Apr 2025 11:35:49 +0800
+>>> From: Ewan Hai <ewanhai-oc@zhaoxin.com>
+>>> Subject: Re: [PATCH v2 08/10] target/i386/kvm: reset AMD PMU registers
+>>>   during VM reset
+>>>
+>>>>> [2] As mentioned in [1], QEMU always sets the vCPU's vendor to match the host's
+>>>>> vendor
+>>>>> when acceleration (KVM or HVF) is enabled. Therefore, if users want to emulate a
+>>>>> Zhaoxin CPU on an Intel host, the vendor must be set manually.Furthermore,
+>>>>> should we display a warning to users who enable both vPMU and KVM acceleration
+>>>>> but do not manually set the guest vendor when it differs from the host vendor?
+>>>> Maybe not? Sometimes I emulate AMD on Intel host, while vendor is still the
+>>>> default :)
+>>> Okay, handling this situation can be rather complex, so let's keep it
+>>> simple. I have added a dedicated function to capture the intended behavior
+>>> for potential future reference.
+>>>
+>>> Anyway, Thanks for taking Zhaoxin's situation into account, regardless.
+>>>
+>> Thanks for your code example!!
+>>
+>> Zhaoxin implements perfmon v2, so I think checking the vendor might be
+>> overly complicated. If a check is needed, it seems more reasonable to
+>> check the perfmon version rather than the vendor, similar to how avx10
+>> version is checked in x86_cpu_filter_features().
+>>
+>> I understand Ewan's concern is that if an Intel guest requires a higher
+>> perfmon version that the Zhaoxin host doesn't support, there could be
+>> issues (although I think this situation doesn't currently exist in KVM-QEMU,
+>> one reason is QEMU uses the pmu_version in 0xa queried from KVM directly,
+>> which means QEMU currently doesn't support custom pmu_version).
+> Yeah, that's exactly what I was concerned about.
+> Thanks for clearing that up!
 >
-> EMM, if =E2=80=98system=E2=80=99 refers to the QEMU part, then QEMU is re=
-sponsible
-> for checking the format and passing the list to KVM.
->
-> Thanks,
-> Zhao
+> perfmon_version is a great idea --- I might add it as a property to the QEMU 
+> vCPU template in the future, so it can adjust based on user input and host support.
+> Can't promise a timeline yet, but it's definitely something I'll keep in mind.
 
-This helped some, thanks.  To make sure I got it:
+I'm wondering if there are real user cases that sets a lower PMU version
+than host PMU version (live migration on different HW platforms?). In
+theory, the higher PMU version should fully back compatible with lower PMU
+version, but it's not always true in reality. One example is that the
+Anythread bit introduced in v3 is dropped in PMU v5 on Intel processors.
+This causes some difficulties to support PMU version 3/4 on host with PMU
+version 5+. Different PMU versions between host and guest could cause
+similar issues on other platforms.
 
-KVM can restrict the guest's access to the PMU.  This is either a
-whitelist (guest can access exactly what's on this list), or a blacklist
-(guest can access exactly what's not this list).
-
-QEMU's kvm-pmu-filter object provides an interface to this KVM feature.
-
-KVM takes "raw" list entries: an entry is a number, and the number's
-meaning depends on the architecture.  The kvm-pmu-filter object can take
-such entries, and passes them to straight to KVM.
-
-On x86, we commonly use two slightly higher level formats: select &
-umask, and masked.  The kvm-pmu-filter object can take entries in either
-format, and maps them to "raw".
-
-Correct?
+Currently KVM supported highest PMU version is v2. We plan to support
+higher PMU version for Intel processors on top of mediated vPMU. If guest
+sets pmu version to 3/4 on host with PMU version 5+, the Anythread bit
+would be marked as reserved,
 
 
