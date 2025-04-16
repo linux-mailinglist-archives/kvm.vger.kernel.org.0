@@ -1,241 +1,218 @@
-Return-Path: <kvm+bounces-43394-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43395-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81F30A8AFE0
-	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 07:53:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B763A8AFF1
+	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 08:00:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CA8616217A
-	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 05:53:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 130EA441835
+	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 06:00:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BB6522D4E6;
-	Wed, 16 Apr 2025 05:53:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E2D3220685;
+	Wed, 16 Apr 2025 06:00:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AV1eE/J/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YSECGaIu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC37822B8D7;
-	Wed, 16 Apr 2025 05:53:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C45017BBF;
+	Wed, 16 Apr 2025 06:00:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744782804; cv=none; b=r6a6zNHwOldDQKMvPyxpdffwNgROfIT7Vn+vrHUYaBiwRj0H5p2DnOXW1D5fnOjsiKxoUMp+hCyvxcGBhXq6Vo2kTdt/2wTqpEgLMaIvADAOWjgDfkxAZ6gRGQiKXNw51iPfMABaOzTvbl+6v7vxXJ0GFv+j4RaY9hNXahZI2V4=
+	t=1744783218; cv=none; b=urNJCWYjD7O1DH9hdZ4sCaQx4qmQ0VMEBSYKWqtPOdfhbJ97oSNEXCl5MA0tL6pyAteexOj58cA0HVdYwl8HBNYu8IEiMqUmSveAL5It0R9hj6Bny5K93baZJdE96FsU7hLFtBr+8iQa7ZNUPHqV5mz9t9e7M6JT9Z7EdZYYfa4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744782804; c=relaxed/simple;
-	bh=ejt+nS1wSG4vWxoe/PG5+T8CTmyW86TLrKcEjqB3uCs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fijVkrQGD4KnFLhZ8Ng+zWE8oVD/V+pxMWbVmI6qqUfCt/4craTOTa3gOaUzrRQ1Qa7adlAM/dS3+BS+aD6Coj2nsc3xdONznVT1UW6p8uNMhZmPOdlLuqW1qJWAzLPyJIw+RsusKgNYl5jDFOorTN3P6KHF+mfXLX35Tdv9Spk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AV1eE/J/; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1744783218; c=relaxed/simple;
+	bh=s4UxyDETQsKRK+xGxxKZTuy1nqHiAyGquO+dfcf6cko=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=o1+ARkzh/az7vtXYnXpbufIWLBroYLnPNfx6W3ENHPAcMpLH8EF8dxW8BObOGOV2THL7CRcAHSSyi2DNO3O2tMedWxL2ATajbS7nHaTbxqMc/90WVzZMgn7qvQhzNiy5Hj9pRjzo6xKl05xRrrHujfhuYAjUgC27qrFgJ07WcQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YSECGaIu; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744782803; x=1776318803;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ejt+nS1wSG4vWxoe/PG5+T8CTmyW86TLrKcEjqB3uCs=;
-  b=AV1eE/J/O4Ulw4M0zlC/CfkEoQNvJ1QINWMC2OtIKtoB58Db7Tg1NGqr
-   Q7fUX9HMN8YgSapuplvA3yYjAX9e318O9akkJiqnUArGjQDk2OvKFCfKT
-   LeNNac5rsTer6W6+/OWMX0Y8IGYa7X1KlkBrCKBLfEn5eTW+BagfIi9YP
-   wpTEFTouQartR+yuOO5RdikU1Fp+HrQdBROZVFelXYTDnphsCuyk9VfK9
-   0w0THYoTc6/YdTQmsxyL0VENpxmE32hGx+D8tCPEC9KTQW3TwYlYzdfCE
-   mYv6xO7L9DzN8MyQS0tk+QwmuZRIM1+U5a7kQLn8Dz9g+ZEcPkN96GiW/
-   Q==;
-X-CSE-ConnectionGUID: E6fdQzEMQpWHfHLPn33XHg==
-X-CSE-MsgGUID: U4U78e6WQsi50j091u9xpw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11404"; a="45449743"
+  t=1744783216; x=1776319216;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=s4UxyDETQsKRK+xGxxKZTuy1nqHiAyGquO+dfcf6cko=;
+  b=YSECGaIufwYJdOaF2wj/FwEX4mPhB473kVQ+OcoiNldcwi3ktL8sKYz8
+   sGhJnexsHjLJqbM1455KnuJJNh8c5OZTaYH32E4DIAyXd6dbhrh/S03ET
+   E1I4Q2uacQNPl0E1ygTg/1svCaRPTEpl7chRvOcgcNkthMZNFlSTMbqpA
+   fGdqpCnEEsI5rsQts6wCEjBG3sRtBbHiVxjqVML+vgivhSMkscrq/+4K3
+   1AFzm9p9pXmQjwJTFiC40OHR870fl1/LxvRLqChyaoO3O0cLX29iHrJr1
+   6ExyPjCni/T+h2zoeuV3uSt/AXnADFO5vC6zOY6pxH2zJ1pwBDJ3FQHSr
+   A==;
+X-CSE-ConnectionGUID: gmy9baRwQ3qsMpp5qSBPTA==
+X-CSE-MsgGUID: p8iW/pk4TH66Nlu3MoB6Yg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11404"; a="63720966"
 X-IronPort-AV: E=Sophos;i="6.15,215,1739865600"; 
-   d="scan'208";a="45449743"
+   d="scan'208";a="63720966"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 22:53:23 -0700
-X-CSE-ConnectionGUID: izGk+V++QI6znKZzvNN9DQ==
-X-CSE-MsgGUID: 971l92/lS0y5I68wKU73eg==
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 23:00:15 -0700
+X-CSE-ConnectionGUID: lY2MXMNaR22xDGLjFpRpQw==
+X-CSE-MsgGUID: nrdZXgwFSlOtbpH+qdYmaA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,215,1739865600"; 
-   d="scan'208";a="130874828"
-Received: from litbin-desktop.sh.intel.com ([10.239.156.93])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 22:53:19 -0700
-From: Binbin Wu <binbin.wu@linux.intel.com>
-To: pbonzini@redhat.com,
-	seanjc@google.com,
-	kvm@vger.kernel.org
-Cc: rick.p.edgecombe@intel.com,
-	kai.huang@intel.com,
-	adrian.hunter@intel.com,
-	reinette.chatre@intel.com,
-	xiaoyao.li@intel.com,
-	tony.lindgren@intel.com,
-	isaku.yamahata@intel.com,
-	yan.y.zhao@intel.com,
-	chao.gao@intel.com,
-	mikko.ylinen@linux.intel.com,
-	linux-kernel@vger.kernel.org,
-	binbin.wu@linux.intel.com
-Subject: [PATCH v2 1/1] KVM: TDX: Handle TDG.VP.VMCALL<GetQuote>
-Date: Wed, 16 Apr 2025 13:54:32 +0800
-Message-ID: <20250416055433.2980510-2-binbin.wu@linux.intel.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20250416055433.2980510-1-binbin.wu@linux.intel.com>
-References: <20250416055433.2980510-1-binbin.wu@linux.intel.com>
+   d="scan'208";a="130875799"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 23:00:13 -0700
+Message-ID: <b03f3593-e56b-4a98-8ddd-e54fe7885c81@intel.com>
+Date: Wed, 16 Apr 2025 14:00:09 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 3/5] KVM: SVM: Enable Bus lock threshold exit
+To: Manali Shukla <manali.shukla@amd.com>, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+Cc: seanjc@google.com, pbonzini@redhat.com, nikunj@amd.com,
+ thomas.lendacky@amd.com, bp@alien8.de
+References: <20250324130248.126036-1-manali.shukla@amd.com>
+ <20250324130248.126036-4-manali.shukla@amd.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20250324130248.126036-4-manali.shukla@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Handle TDVMCALL for GetQuote to generate a TD-Quote.
+On 3/24/2025 9:02 PM, Manali Shukla wrote:
+> From: Nikunj A Dadhania <nikunj@amd.com>
+> 
+> Virtual machines can exploit bus locks to degrade the performance of
+> the system. Bus locks can be caused by Non-WB(Write back) and
+> misaligned locked RMW (Read-modify-Write) instructions and require
+> systemwide synchronization among all processors which can result into
+> significant performance penalties.
+> 
+> To address this issue, the Bus Lock Threshold feature is introduced to
+> provide ability to hypervisor to restrict guests' capability of
+> initiating mulitple buslocks, thereby preventing system slowdowns.
+> 
+> Support for the buslock threshold is indicated via CPUID function
+> 0x8000000A_EDX[29].
+> 
+> On the processors that support the Bus Lock Threshold feature, the
+> VMCB provides a Bus Lock Threshold enable bit and an unsigned 16-bit
+> Bus Lock threshold count.
+> 
+> VMCB intercept bit
+> VMCB Offset     Bits    Function
+> 14h             5       Intercept bus lock operations
+> 
+> Bus lock threshold count
+> VMCB Offset     Bits    Function
+> 120h            15:0    Bus lock counter
+> 
+> When a VMRUN instruction is executed, the bus lock threshold count is
+> loaded into an internal count register. Before the processor executes
+> a bus lock in the guest, it checks the value of this register:
+> 
+>   - If the value is greater than '0', the processor successfully
+>     executes the bus lock and decrements the count.
+> 
+>   - If the value is '0', the bus lock is not executed, and a #VMEXIT to
+>     the VMM is taken.
+> 
+> The bus lock threshold #VMEXIT is reported to the VMM with the VMEXIT
+> code A5h, SVM_EXIT_BUS_LOCK.
+> 
+> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+> Co-developed-by: Manali Shukla <manali.shukla@amd.com>
+> Signed-off-by: Manali Shukla <manali.shukla@amd.com>
+> ---
+>   arch/x86/include/asm/svm.h      | 5 ++++-
+>   arch/x86/include/uapi/asm/svm.h | 2 ++
+>   arch/x86/kvm/svm/svm.c          | 8 ++++++++
+>   3 files changed, 14 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+> index 9b7fa99ae951..9dc54da1835a 100644
+> --- a/arch/x86/include/asm/svm.h
+> +++ b/arch/x86/include/asm/svm.h
+> @@ -116,6 +116,7 @@ enum {
+>   	INTERCEPT_INVPCID,
+>   	INTERCEPT_MCOMMIT,
+>   	INTERCEPT_TLBSYNC,
+> +	INTERCEPT_BUSLOCK,
+>   	INTERCEPT_IDLE_HLT = 166,
+>   };
+>   
+> @@ -159,7 +160,9 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+>   	u64 avic_physical_id;	/* Offset 0xf8 */
+>   	u8 reserved_7[8];
+>   	u64 vmsa_pa;		/* Used for an SEV-ES guest */
+> -	u8 reserved_8[720];
+> +	u8 reserved_8[16];
+> +	u16 bus_lock_counter;	/* Offset 0x120 */
+> +	u8 reserved_9[702];
+>   	/*
+>   	 * Offset 0x3e0, 32 bytes reserved
+>   	 * for use by hypervisor/software.
+> diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/svm.h
+> index ec1321248dac..9c640a521a67 100644
+> --- a/arch/x86/include/uapi/asm/svm.h
+> +++ b/arch/x86/include/uapi/asm/svm.h
+> @@ -95,6 +95,7 @@
+>   #define SVM_EXIT_CR14_WRITE_TRAP		0x09e
+>   #define SVM_EXIT_CR15_WRITE_TRAP		0x09f
+>   #define SVM_EXIT_INVPCID       0x0a2
+> +#define SVM_EXIT_BUS_LOCK			0x0a5
+>   #define SVM_EXIT_IDLE_HLT      0x0a6
+>   #define SVM_EXIT_NPF           0x400
+>   #define SVM_EXIT_AVIC_INCOMPLETE_IPI		0x401
+> @@ -225,6 +226,7 @@
+>   	{ SVM_EXIT_CR4_WRITE_TRAP,	"write_cr4_trap" }, \
+>   	{ SVM_EXIT_CR8_WRITE_TRAP,	"write_cr8_trap" }, \
+>   	{ SVM_EXIT_INVPCID,     "invpcid" }, \
+> +	{ SVM_EXIT_BUS_LOCK,     "buslock" }, \
+>   	{ SVM_EXIT_IDLE_HLT,     "idle-halt" }, \
+>   	{ SVM_EXIT_NPF,         "npf" }, \
+>   	{ SVM_EXIT_AVIC_INCOMPLETE_IPI,		"avic_incomplete_ipi" }, \
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 8abeab91d329..244e099e7262 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -1375,6 +1375,9 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
+>   		svm->vmcb->control.int_ctl |= V_GIF_ENABLE_MASK;
+>   	}
+>   
+> +	if (vcpu->kvm->arch.bus_lock_detection_enabled)
+> +		svm_set_intercept(svm, INTERCEPT_BUSLOCK);
+> +
+>   	if (sev_guest(vcpu->kvm))
+>   		sev_init_vmcb(svm);
+>   
+> @@ -5299,6 +5302,11 @@ static __init void svm_set_cpu_caps(void)
+>   		kvm_cpu_cap_set(X86_FEATURE_SVME_ADDR_CHK);
+>   	}
+>   
+> +	if (cpu_feature_enabled(X86_FEATURE_BUS_LOCK_THRESHOLD)) {
+> +		pr_info("Bus Lock Threshold supported\n");
 
-GetQuote is a doorbell-like interface used by TDX guests to request VMM
-to generate a TD-Quote signed by a service hosting TD-Quoting Enclave
-operating on the host.  A TDX guest passes a TD Report (TDREPORT_STRUCT) in
-a shared-memory area as parameter.  Host VMM can access it and queue the
-operation for a service hosting TD-Quoting enclave.  When completed, the
-Quote is returned via the same shared-memory area.
+It will be printed every time kvm-amd.ko module gets loaded.
 
-KVM only checks the GPA from the TDX guest has the shared-bit set and drops
-the shared-bit before exiting to userspace to avoid bleeding the shared-bit
-into KVM's exit ABI.  KVM forwards the request to userspace VMM (e.g. QEMU)
-and userspace VMM queues the operation asynchronously.  KVM sets the return
-code according to the 'ret' field set by userspace to notify the TDX guest
-whether the request has been queued successfully or not.  When the request
-has been queued successfully, the TDX guest can poll the status field in
-the shared-memory area to check whether the Quote generation is completed
-or not.  When completed, the generated Quote is returned via the same
-buffer.
+I think it's for your development and debug purpose. Comparing to the 
+existing features in svm_set_cpu_caps(), nothing makes it special for 
+BUS_LOCK_THRESHOLD to require a kernel message. So I think we can just 
+remove it.
 
-Add KVM_EXIT_TDX_GET_QUOTE as a new exit reason to userspace.
+> +		kvm_caps.has_bus_lock_exit = true;
 
-Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
-Tested-by: Mikko Ylinen <mikko.ylinen@linux.intel.com>
----
-v2:
-- Skip sanity checks except for the check of the shared-bit. (Rick, Sean)
-- Drop the shared-bit of the GPA before exiting to userspace. (Sean)
-- Improve the description of 'ret' field in the document. (Kai)
-- Use number 40 for KVM_EXIT_TDX_GET_QUOTE. (Xiaoyao, Rick)
-- Update the changelog and the description of KVM_EXIT_TDX_GET_QUOTE in the
-  document according to the code changes.
----
- Documentation/virt/kvm/api.rst | 25 +++++++++++++++++++++++++
- arch/x86/kvm/vmx/tdx.c         | 30 ++++++++++++++++++++++++++++++
- include/uapi/linux/kvm.h       |  7 +++++++
- 3 files changed, 62 insertions(+)
+Besides, this patch doesn't ensure the bisectability. It allows 
+userspace to enable KVM_BUS_LOCK_DETECTION_EXIT and set intercept of 
+INTERCEPT_BUSLOCK but without providing the handler.
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index ad1859f4699e..b2192d2983fe 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -7162,6 +7162,31 @@ The valid value for 'flags' is:
-   - KVM_NOTIFY_CONTEXT_INVALID -- the VM context is corrupted and not valid
-     in VMCS. It would run into unknown result if resume the target VM.
- 
-+::
-+
-+		/* KVM_EXIT_TDX_GET_QUOTE */
-+		struct tdx_get_quote {
-+			__u64 ret;
-+			__u64 gpa;
-+			__u64 size;
-+		};
-+
-+If the exit reason is KVM_EXIT_TDX_GET_QUOTE, then it indicates that a TDX
-+guest has requested to generate a TD-Quote signed by a service hosting
-+TD-Quoting Enclave operating on the host. The 'gpa' field and 'size' specify
-+the guest physical address and size of a shared-memory buffer, in which the
-+TDX guest passes a TD Report. KVM checks the GPA from the TDX guest has the
-+shared-bit set and drops the shared-bit in 'gpa' field before exiting to
-+userspace. KVM doesn't do other sanity checks. The 'ret' field represents the
-+return value of the GetQuote request. KVM only bridges the request to the
-+userspace VMM, and the userspace VMM is responsible for setting up the return
-+value since only userspace knows whether the request has been queued
-+successfully or not. KVM sets the return code according to the 'ret' field
-+before returning back to the TDX guest. When the request has been queued
-+successfully, the TDX guest can poll the status field in the shared-memory area
-+to check whether the Quote generation is completed or not. When completed, the
-+generated Quote is returned via the same buffer.
-+
- ::
- 
- 		/* Fix the size of the union. */
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index b952bc673271..cd1e9a1c040e 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1463,6 +1463,34 @@ static int tdx_get_td_vm_call_info(struct kvm_vcpu *vcpu)
- 	return 1;
- }
- 
-+static int tdx_complete_get_quote(struct kvm_vcpu *vcpu)
-+{
-+	tdvmcall_set_return_code(vcpu, vcpu->run->tdx_get_quote.ret);
-+	return 1;
-+}
-+
-+static int tdx_get_quote(struct kvm_vcpu *vcpu)
-+{
-+	struct vcpu_tdx *tdx = to_tdx(vcpu);
-+
-+	u64 gpa = tdx->vp_enter_args.r12;
-+	u64 size = tdx->vp_enter_args.r13;
-+
-+	/* The gpa of buffer must have shared bit set. */
-+	if (vt_is_tdx_private_gpa(vcpu->kvm, gpa)) {
-+		tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_INVALID_OPERAND);
-+		return 1;
-+	}
-+
-+	vcpu->run->exit_reason = KVM_EXIT_TDX_GET_QUOTE;
-+	vcpu->run->tdx_get_quote.gpa = gpa & ~gfn_to_gpa(kvm_gfn_direct_bits(tdx->vcpu.kvm));
-+	vcpu->run->tdx_get_quote.size = size;
-+
-+	vcpu->arch.complete_userspace_io = tdx_complete_get_quote;
-+
-+	return 0;
-+}
-+
- static int handle_tdvmcall(struct kvm_vcpu *vcpu)
- {
- 	switch (tdvmcall_leaf(vcpu)) {
-@@ -1472,6 +1500,8 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
- 		return tdx_report_fatal_error(vcpu);
- 	case TDVMCALL_GET_TD_VM_CALL_INFO:
- 		return tdx_get_td_vm_call_info(vcpu);
-+	case TDVMCALL_GET_QUOTE:
-+		return tdx_get_quote(vcpu);
- 	default:
- 		break;
- 	}
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index c6988e2c68d5..4d7e8e88bcc3 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -178,6 +178,7 @@ struct kvm_xen_exit {
- #define KVM_EXIT_NOTIFY           37
- #define KVM_EXIT_LOONGARCH_IOCSR  38
- #define KVM_EXIT_MEMORY_FAULT     39
-+#define KVM_EXIT_TDX_GET_QUOTE    40
- 
- /* For KVM_EXIT_INTERNAL_ERROR */
- /* Emulate instruction failed. */
-@@ -447,6 +448,12 @@ struct kvm_run {
- 			__u64 gpa;
- 			__u64 size;
- 		} memory_fault;
-+		/* KVM_EXIT_TDX_GET_QUOTE */
-+		struct {
-+			__u64 ret;
-+			__u64 gpa;
-+			__u64 size;
-+		} tdx_get_quote;
- 		/* Fix the size of the union. */
- 		char padding[256];
- 	};
--- 
-2.46.0
+So either move next patch before it or just merge them.
+
+> +	}
+> +
+>   	/* CPUID 0x80000008 */
+>   	if (boot_cpu_has(X86_FEATURE_LS_CFG_SSBD) ||
+>   	    boot_cpu_has(X86_FEATURE_AMD_SSBD))
 
 
