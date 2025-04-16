@@ -1,47 +1,48 @@
-Return-Path: <kvm+bounces-43453-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43454-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA584A9051D
-	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 15:58:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0657A90526
+	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 15:59:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6183461868
-	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 13:56:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A169D8A6DE1
+	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 13:56:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F65A21A434;
-	Wed, 16 Apr 2025 13:45:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9261F21ADA2;
+	Wed, 16 Apr 2025 13:45:48 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65E251B6D06;
-	Wed, 16 Apr 2025 13:45:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A65D11B6D06;
+	Wed, 16 Apr 2025 13:45:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744811142; cv=none; b=XyPC4RnvBZXVehq7K2qxXnmltoaBLU2S0djh+DjRO4hNGW3oArWHIbIWviQYbvLWDdU8+mBsxjLysSMzo7mqxbuQTVrtS+NnQeJlP/5+JwBbqnzsHb24+VpTMmkg7kNcv+JHn2L5aShdYmMHPB5eXegkbESJwKB5xGxfphntvp0=
+	t=1744811148; cv=none; b=HaKUkpVO96AEthhlQZMOsQcHbozm9Cb5L8DFDIft6lWJJF/0GqYwpSKjE3G1vg7bMTVNilFJiwmY/f2sYsUC5WgT71aNKwFwpmjCkKDixERKnvEO4mlipJiL/Q+4Hs9LaDletorUPn4aHLb/v2wjckTp1G1be1AXyq31GhLGzQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744811142; c=relaxed/simple;
-	bh=aqmECmQ+wrTHucABMXsLYQiinczJIfkG3f+r7EzrpTU=;
+	s=arc-20240116; t=1744811148; c=relaxed/simple;
+	bh=Xc1sIUIaQGPhy2VxNvrp0IR5BRya28/oRCQU9Jpw3oE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=b01Gl9pDMT9MFUoKfBeI1G5WpW0LOWd3GEflLt2cXvf0+837J8HTPF//kYHXQpNTecSEkGczU4x3NtnW78skaDy+rrZmPxw/WzzpuMwDoRsuU243d1dM9EMvGt/hlkk2Fv7qV1M3yjM3fYafX2PXL99EioeWkW6yR/yyTYPjIVU=
+	 MIME-Version; b=lPlPNlSFn/yvl1w3P1/k8HoYXmBJGurh5GMZoB2V+ukNsDSkQlfHdK0VRc4SxqZ+aKlqG82Pa2zOi/rgc3ZGsZoG8ckvGRGQZkBgG4DGXOnZTvuRSJxgsbiI+9YN1qwuZ6uXy4ZPrQcGoDRgdaGDgF0nZa7VXcZgZrSCXBSNMlI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DA4DF1E7D;
-	Wed, 16 Apr 2025 06:45:38 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1B6631E8D;
+	Wed, 16 Apr 2025 06:45:44 -0700 (PDT)
 Received: from e122027.arm.com (unknown [10.57.90.52])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4FC2D3F59E;
-	Wed, 16 Apr 2025 06:45:36 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6D9ED3F59E;
+	Wed, 16 Apr 2025 06:45:41 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+Cc: Steven Price <steven.price@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Marc Zyngier <maz@kernel.org>,
 	Will Deacon <will@kernel.org>,
 	James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
@@ -54,11 +55,10 @@ Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Gavin Shan <gshan@redhat.com>,
 	Shanker Donthineni <sdonthineni@nvidia.com>,
 	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Steven Price <steven.price@arm.com>
-Subject: [PATCH v8 28/43] arm64: RME: Allow checking SVE on VM instance
-Date: Wed, 16 Apr 2025 14:41:50 +0100
-Message-ID: <20250416134208.383984-29-steven.price@arm.com>
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: [PATCH v8 29/43] arm64: RME: Always use 4k pages for realms
+Date: Wed, 16 Apr 2025 14:41:51 +0100
+Message-ID: <20250416134208.383984-30-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250416134208.383984-1-steven.price@arm.com>
 References: <20250416134208.383984-1-steven.price@arm.com>
@@ -70,66 +70,51 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Guest_memfd doesn't yet natively support huge pages, and there are
+currently difficulties for a VMM to manage huge pages efficiently so for
+now always split up mappings to PTE (4k).
 
-Given we have different types of VMs supported, check the
-support for SVE for the given instance of the VM to accurately
-report the status.
+The two issues that need progressing before supporting huge pages for
+realms are:
 
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+ 1. guest_memfd needs to be able to allocate from an appropriate
+    allocator which can provide huge pages.
+
+ 2. The VMM needs to be able to repurpose private memory for a shared
+    mapping when the guest VM requests memory is transitioned. Because
+    this can happen at a 4k granularity it isn't possible to
+    free/reallocate while huge pages are in use. Allowing the VMM to
+    mmap() the shared portion of a huge page would allow the huge page
+    to be recreated when the memory is unshared and made protected again.
+
+These two issues are not specific to realms and don't affect the realm
+API, so for now just break everything down to 4k pages in the RMM
+controlled stage 2. Future work can add huge page support without
+changing the uAPI.
+
 Signed-off-by: Steven Price <steven.price@arm.com>
-Reviewed-by: Gavin Shan <gshan@redhat.com>
 ---
- arch/arm64/include/asm/kvm_rme.h | 2 ++
- arch/arm64/kvm/arm.c             | 5 ++++-
- arch/arm64/kvm/rme.c             | 5 +++++
- 3 files changed, 11 insertions(+), 1 deletion(-)
+Changes since v7:
+ * Rewritten commit message
+---
+ arch/arm64/kvm/mmu.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
-index 7000fa1227d0..f786fd978cf6 100644
---- a/arch/arm64/include/asm/kvm_rme.h
-+++ b/arch/arm64/include/asm/kvm_rme.h
-@@ -94,6 +94,8 @@ void kvm_init_rme(void);
- u32 kvm_realm_ipa_limit(void);
- u32 kvm_realm_vgic_nr_lr(void);
- 
-+bool kvm_rme_supports_sve(void);
-+
- int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
- int kvm_init_realm_vm(struct kvm *kvm);
- void kvm_destroy_realm(struct kvm *kvm);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 97c5efbe47a6..850708db660e 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -420,7 +420,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		r = get_kvm_ipa_limit();
- 		break;
- 	case KVM_CAP_ARM_SVE:
--		r = system_supports_sve();
-+		if (kvm_is_realm(kvm))
-+			r = kvm_rme_supports_sve();
-+		else
-+			r = system_supports_sve();
- 		break;
- 	case KVM_CAP_ARM_PTRAUTH_ADDRESS:
- 	case KVM_CAP_ARM_PTRAUTH_GENERIC:
-diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-index 70244e01c161..a89bd1c29e99 100644
---- a/arch/arm64/kvm/rme.c
-+++ b/arch/arm64/kvm/rme.c
-@@ -38,6 +38,11 @@ static bool rme_has_feature(unsigned long feature)
- 	return !!u64_get_bits(rmm_feat_reg0, feature);
- }
- 
-+bool kvm_rme_supports_sve(void)
-+{
-+	return rme_has_feature(RMI_FEATURE_REGISTER_0_SVE_EN);
-+}
-+
- static int rmi_check_version(void)
- {
- 	struct arm_smccc_res res;
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 02b66ee35426..29bab7a46033 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1653,6 +1653,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	if (logging_active || is_protected_kvm_enabled()) {
+ 		force_pte = true;
+ 		vma_shift = PAGE_SHIFT;
++	} else if (vcpu_is_rec(vcpu)) {
++		// Force PTE level mappings for realms
++		force_pte = true;
++		vma_shift = PAGE_SHIFT;
+ 	} else {
+ 		vma_shift = get_vma_page_shift(vma, hva);
+ 	}
 -- 
 2.43.0
 
