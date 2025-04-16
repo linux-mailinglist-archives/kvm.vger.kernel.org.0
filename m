@@ -1,120 +1,240 @@
-Return-Path: <kvm+bounces-43415-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43416-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93A2CA8B673
-	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 12:10:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADAC8A8B68C
+	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 12:16:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DE313BEDB1
-	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 10:09:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34A693A7EC9
+	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 10:16:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64A4D2459F2;
-	Wed, 16 Apr 2025 10:09:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1484D2459DF;
+	Wed, 16 Apr 2025 10:16:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="WZm3GADV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="btdDQsaM"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 023FE2356C3;
-	Wed, 16 Apr 2025 10:09:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BF37238177
+	for <kvm@vger.kernel.org>; Wed, 16 Apr 2025 10:16:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744798194; cv=none; b=mBZBKxZ90Htgly/BWlOJyNbkxd22ZAzNX3WsD7nZF5ZHHKz0aN6Qc6DXoFAp8WtjkrRLNwLlje1Lk2KYuNSQ9Hd7qdAVp/fCe9UaRAhUjqAZkHkYmSQ4sm/uN2W00JRQoftR3iF4UR33lqlenEbZ9Mx/xxDxRp32qmXXxp+qqZo=
+	t=1744798589; cv=none; b=EkfJLEDVctirTINQzUzKkwYCwPYjZ5JYHBzLn7rlaQS82KCrtMRPzG0/XiZqZ0s/DIBTiYJgaA13h2/uCXcxLlC2Pdvo/F6NwiF8ubL/n/V3dMAsIVGb6fjoGFgIKCm6sz1JH8HHaB8EcZI6MfJKWiDEQkd18Tvm1PhV/OyqoHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744798194; c=relaxed/simple;
-	bh=K5EIWptPNf+bD6TCzDb13Bmy9OoJJigove2+9RXxBVM=;
+	s=arc-20240116; t=1744798589; c=relaxed/simple;
+	bh=LR5XHJIsv4KSkncTHnzjZxFzOCeJ57mh3HG+NkOwuJg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pc9MTVycW1JqBQKQqdcw//aLpNM6wY6Gl+O5ReRCSFcJoFh0PeFEsSIRXzsA8BsHGw5Wux2NYdnmriK6KkOjlNkit169QJ8TT2AmLWpzxts/OV0+Mfs+ama19es8WY40XZqqDRM0KXR8Oo02si5wEaXx+u+1001pSGweI48usDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=WZm3GADV; arc=none smtp.client-ip=54.207.22.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1744798183;
-	bh=K5EIWptPNf+bD6TCzDb13Bmy9OoJJigove2+9RXxBVM=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To;
-	b=WZm3GADVESCnAroIeYZi/nahlkQFax41qiE4mcZ6xMLfvyr4jmGCEpWkn78ok6u/j
-	 rhZC/DKRCmqUfZMC4Pxuuyeg/WJnpzzkJHPwyLtkPNzhTRit7JXcH/hW+vGCd0tHbI
-	 sC2fHwcLZa0B1SeoTmN41ZOwlqUiJhW0G7fmvV8U=
-X-QQ-mid: izesmtp89t1744798177tddffd40c
-X-QQ-Originating-IP: IAw1cIU82zcANWNqP9cwnXdyjXOMwHhFQGwmSZFWUH4=
-Received: from mail-yb1-f178.google.com ( [209.85.219.178])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 16 Apr 2025 18:09:35 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 11619989835513742780
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-e455bf1f4d3so5004404276.2;
-        Wed, 16 Apr 2025 03:09:36 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUDssVnHXTmTKE76dF+ycPeT2C1n0lWYyuKMsJ6Zopu6JMmx3lEZu4qgY/Gvr1BxP1MtIO2iEF1/b7eUg==@vger.kernel.org, AJvYcCUVYiDE+f7EJohP0Cr50H2psJzqaa9zecSa1UCOmqsOOcBJn5rl4jrtvve67YVTbUyxHftXQ4BZI4/WSNGG0RRw@vger.kernel.org, AJvYcCUzTGDRBIeJgEfn4EWlehaJ9uaorx9uEj+qe+hTsxMrhP/O7nEctjFR3JoLHMk/1qsf4rA=@vger.kernel.org, AJvYcCVX3wYdV/83TDnW3npDxdAlvKd9cNTo88QrUWLqnk7fvkBWVK2pf4VAna+2zy78+BMzANTdxjt6KX23G3IR@vger.kernel.org, AJvYcCW6vuKnAIf4hcUPxARsn5Wfdhoj41HNYr65MOKTgKEuGeq5WM3WjuxiLMczTrqk6Woh21Jdp0fH4XEMhWoR@vger.kernel.org
-X-Gm-Message-State: AOJu0YzcvIREjmhYSjoUfAdhYHLxezMnlg1QXV8BTY7NUBtV3Wl9Je+c
-	+r+bFR8azXex1PkElhhJYQH8j70n2wITtFk6b1bloX7XTFHs6BdUpOU+C0Rr1AfN92Vzhjv1wT7
-	asVrgHTDHyvL9cx0QMXbjscx0tSg=
-X-Google-Smtp-Source: AGHT+IFxOQerwyXR4s01cKj1FQCmW5mZBGS8EUkxg2eBy2yn8PQm4fMpJOhxMxu+WrXOTx3w5ulHOeUcX04b8xnFFTA=
-X-Received: by 2002:a05:6902:2b8a:b0:e6d:eb74:272 with SMTP id
- 3f1490d57ef6-e7275967af8mr1257382276.22.1744798174393; Wed, 16 Apr 2025
- 03:09:34 -0700 (PDT)
+	 To:Cc:Content-Type; b=WR4/d+juPVQ/uBPIlx66FUgIwbAdrQYn2vRpHNdPbnwK3EOlETgUCDFgqwfbqTaOtofNuo7Wj8iHZS0STDDCYHzX2v7KdjkBcawaPdr6wK5JWaHlMmQb+XZcj8ePIMwvWKTVy4uvp0ffG3aM8PE6SphliUKmzS6rs5COTWPZyc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=btdDQsaM; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744798586;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DyNtBtrm5YLzS/2qKU4Cviogs091o5wq6s+fDtuLR4s=;
+	b=btdDQsaM47XOm7K32M/toCA9tZQCddngDcst1e5ecPMNjFOWY+ia1Yd1za/hLO+EApINu7
+	+18Qznz1TKXQKvo2vGMsS/Li8D8e+4Mz7OyeqISSVFwWeNXXZ4X8c0FRXebp/6I/jZsOpi
+	eck3LFK/G/e8nvRKMBxuAuKedCRTd8Y=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-197-CV0uFXklMdaQFd0jrxGGfA-1; Wed, 16 Apr 2025 06:16:24 -0400
+X-MC-Unique: CV0uFXklMdaQFd0jrxGGfA-1
+X-Mimecast-MFC-AGG-ID: CV0uFXklMdaQFd0jrxGGfA_1744798584
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-306b51e30ffso5699704a91.1
+        for <kvm@vger.kernel.org>; Wed, 16 Apr 2025 03:16:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744798584; x=1745403384;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DyNtBtrm5YLzS/2qKU4Cviogs091o5wq6s+fDtuLR4s=;
+        b=Gb/wE0VG1ENJ5eLIiSophNeX73Wh24/WfoXszqcWr+O76GztfBeQJJTSIvQ4aveZyg
+         TF+oVwTu0bqaYKSRSiLBQR5xs27Xroy2Sr356wfWRNnGxhudFqjYfrSvnDc1BzJyaOjg
+         KG89+bwqHNdlb/QA+SFIV8R5SLuHfsQy2m39mMRLZ6JwfUJBNoXN7XObTY9muGpRf7x/
+         vBVLRpo7W6RU6eMxESOifqMTg5JQiZouWV4B5RUpvGG13KuRTETiYOTHg5jVA9uKYATu
+         I1ZOHPJwKQD22phv39LYfIA36Al1ctChyYLghuP89waTN6nZFFbRuzOM9bJa5G4AxTpl
+         XX9A==
+X-Forwarded-Encrypted: i=1; AJvYcCVryXIQZKReECOolsKixwu75Cb0Mm+rJ31kynp+GTvozhSY4Aj71cDpD5Q8sHUlERneO1Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/5r6dh0N3SKbNFdImfX1ZFnK1axezraejjCxGjX2Tr5VLQyu2
+	DMJEL6S7dDFWGlDUp3SI5+8JfnuPaedtyxfzoB08Uo8UGQ8TzGI4m7pkxBU491CergE+aiJa/qk
+	0ck8eBkv8zNuF7nd991Npp+92KGqCp8unlbnv5dJt1FaiLVQWC4moQFfKsk42kjMOfEQK8H7tol
+	3K0pN9N2RhBwuEp9LF2Y33dbhM
+X-Gm-Gg: ASbGnctiYzDJ0VQFulJq/QESZroLkcCgzinZBQvFBOtzibOZESjGB2fBsWv2qfYXT3M
+	Azb02YljmzoHpAOmipPzIxmt2UCYnYoDNLXaHn2QkIW8d5cbMoqBlkENy37nUU9j3xc8=
+X-Received: by 2002:a17:90b:548d:b0:2ff:6488:e01c with SMTP id 98e67ed59e1d1-3086416ec3emr2001432a91.29.1744798583594;
+        Wed, 16 Apr 2025 03:16:23 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG5B8+MIOMuQKL/Q5Vh62fe3WjdrGJl1cNAbpCB38cbA9+YtL9G5ILgxGaQgBlKd18KrUdkzh0QkQQPJug9YUo=
+X-Received: by 2002:a17:90b:548d:b0:2ff:6488:e01c with SMTP id
+ 98e67ed59e1d1-3086416ec3emr2001387a91.29.1744798583226; Wed, 16 Apr 2025
+ 03:16:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <E9B8B40E39453E89+20250411105306.89756-1-chenlinxuan@uniontech.com>
- <20250416044827.GA24153@lst.de>
-In-Reply-To: <20250416044827.GA24153@lst.de>
-From: Chen Linxuan <chenlinxuan@uniontech.com>
-Date: Wed, 16 Apr 2025 18:09:22 +0800
-X-Gmail-Original-Message-ID: <45D187D71349584D+CAC1kPDPYiUKqRmqW=hzOyGudvUXcwxo0kgDU_j40+t7rYHsU-g@mail.gmail.com>
-X-Gm-Features: ATxdqUHphIIrq227AoMvNzUOdxFn7upg3kfvytoiynDmEPipLLJsDaFiQeVe_To
-Message-ID: <CAC1kPDPYiUKqRmqW=hzOyGudvUXcwxo0kgDU_j40+t7rYHsU-g@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/7] kernel-hacking: introduce CONFIG_NO_AUTO_INLINE
-To: Christoph Hellwig <hch@lst.de>
-Cc: Chen Linxuan <chenlinxuan@uniontech.com>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, 
-	Peter Huewe <peterhuewe@gmx.de>, Jarkko Sakkinen <jarkko@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Jani Nikula <jani.nikula@linux.intel.com>, 
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
-	Tvrtko Ursulin <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>, 
-	Simona Vetter <simona@ffwll.ch>, Chengchang Tang <tangchengchang@huawei.com>, 
-	Junxian Huang <huangjunxian6@hisilicon.com>, Leon Romanovsky <leon@kernel.org>, 
-	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>, 
-	Yishai Hadas <yishaih@nvidia.com>, 
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>, 
-	Alex Williamson <alex.williamson@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org, 
-	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
-	linux-rdma@vger.kernel.org, linux-nvme@lists.infradead.org, 
-	kvm@vger.kernel.org, virtualization@lists.linux.dev, linux-mm@kvack.org, 
-	llvm@lists.linux.dev
+References: <20250404145241.1125078-1-jon@nutanix.com> <CACGkMEsFc-URhXBCGZ1=CTMZKcWPf57pYy1TcyKLL=N65u+F0Q@mail.gmail.com>
+ <B32E2C5D-25FB-427F-8567-701C152DFDE6@nutanix.com> <CACGkMEucg5mduA-xoyrTRK5nOkdHvUAkG9fH6KpO=HxMVPYONA@mail.gmail.com>
+In-Reply-To: <CACGkMEucg5mduA-xoyrTRK5nOkdHvUAkG9fH6KpO=HxMVPYONA@mail.gmail.com>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Wed, 16 Apr 2025 12:15:46 +0200
+X-Gm-Features: ATxdqUHCH-V7i7CU2wT16iuVXDT1SGacdB6YBRKLTHXg-jyKPzbjSDLkTwgL2pg
+Message-ID: <CAJaqyWdhLCNs_B0gcxXHut7xufw23HMR6PaO11mqAQFoGkdfXQ@mail.gmail.com>
+Subject: Re: [PATCH] vhost/net: remove zerocopy support
+To: Jason Wang <jasowang@redhat.com>
+Cc: Jon Kohler <jon@nutanix.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Stefano Brivio <sbrivio@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-QQ-SENDSIZE: 520
-Feedback-ID: izesmtp:uniontech.com:qybglogicsvrgz:qybglogicsvrgz5a-1
-X-QQ-XMAILINFO: MMkVjSP788VvLbybX6NpprCLcQm8mjDJIS8k878BicYIRvKMIDe/VTDc
-	iEpiPOOa9xcLEBj1SJPG4bYpWVQZTHk7cjwvvv6SVEjicZmBxG/GBdPXd4u3SoTRip0JWp/
-	KU3tZwSmB4IwQDD8AZYBnOnzDQO8vljy62RTQqhgK2Btl/Nh7BambwRS7VrjWgnGrAIXFrw
-	cM9pRcUXaChbxDJO6XBkHeZ4xM84nGdVfLN6GB/DhryioTZZHqg67s0n/TvZsAZaljDcUbL
-	ZmNj6MUqS33rBTuIATwMGt0+lJQEko4QRqwWbcf5YzMj5o+wR1vDK2vY3WauKzsEI58GhR/
-	b2mIYcBhyVZouv0rcCJuslQ5IpPZLNCYwPZdsfkfCRPjyfCTNdUbseu6WFnJXXI2dxcn+UC
-	hsQZTPPKX0hIynPouR+pm9or537nHmII9ROVtnAxOYSG4tNVn4UtFJVdXxVcFhHuHJ/JITM
-	SmPA4yrg4oroBQK9ZmX8FlV+Jo85y2BVJbTVnqRQkzRK+OOb7/oYcF3yy1AR2NYFVPaP2Ta
-	FRcrzcnXWockyTCPUjT1dqDZPK/UIFGwq04BH8G2lT3G5066Ma0577TCfn2qKX/2hGJPAIZ
-	HmaXejIa1N1hQ+LVlbCT6DssUCiMtl3SHe5v4h7zB44OiS/+Wk7j/EPF9QULWBGcAB87/Sq
-	QsyrREB1zNhZH65anAy+3H3Q6x1NGUVl3q9kHN8/cdv/BbQ51CfpNc5c75Pyx+2LYthN5hg
-	mlxog3tIeBXrERIwi1t2AaZTtmFVUQDGDRkzbu8zUmJWNU5gSO/THHhjzicEL+i0bYMk2uO
-	EHQ5K4lFW5iSLVr1M9ilwwYu7tSDLX7myE5gL56l4HY7BM5Y9sOfJDuJjCTofHhdm6kKDAl
-	xdwUuC3XD/PG1/iOn5ok+BqdN/BMS3aYCQ4PS2rUSVHD93ft22OYVeQkcELHT6UqBW4ZNn7
-	VIIPt9LNuhNxBlHqGWTcrHDWHsyGtWBZXCX3vfsVG6Y7a1MIiEqm0LrXUfEtByfeLLJYak0
-	RrPnoTzPYnablhrE+87u7mquNIvo3f0lT8pW8yoLNPgVhDkYxnHYtHo67zob0tTnEOijS4n
-	LgWvsHPuaj1
-X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
-X-QQ-RECHKSPAM: 0
+Content-Transfer-Encoding: quoted-printable
 
-Sorry for the mistake, v2 has been send:
+On Tue, Apr 8, 2025 at 8:28=E2=80=AFAM Jason Wang <jasowang@redhat.com> wro=
+te:
+>
+> On Tue, Apr 8, 2025 at 9:18=E2=80=AFAM Jon Kohler <jon@nutanix.com> wrote=
+:
+> >
+> >
+> >
+> > > On Apr 6, 2025, at 7:14=E2=80=AFPM, Jason Wang <jasowang@redhat.com> =
+wrote:
+> > >
+> > > !-------------------------------------------------------------------|
+> > >  CAUTION: External Email
+> > >
+> > > |-------------------------------------------------------------------!
+> > >
+> > > On Fri, Apr 4, 2025 at 10:24=E2=80=AFPM Jon Kohler <jon@nutanix.com> =
+wrote:
+> > >>
+> > >> Commit 098eadce3c62 ("vhost_net: disable zerocopy by default") disab=
+led
+> > >> the module parameter for the handle_tx_zerocopy path back in 2019,
+> > >> nothing that many downstream distributions (e.g., RHEL7 and later) h=
+ad
+> > >> already done the same.
+> > >>
+> > >> Both upstream and downstream disablement suggest this path is rarely
+> > >> used.
+> > >>
+> > >> Testing the module parameter shows that while the path allows packet
+> > >> forwarding, the zerocopy functionality itself is broken. On outbound
+> > >> traffic (guest TX -> external), zerocopy SKBs are orphaned by either
+> > >> skb_orphan_frags_rx() (used with the tun driver via tun_net_xmit())
+> > >
+> > > This is by design to avoid DOS.
+> >
+> > I understand that, but it makes ZC non-functional in general, as ZC fai=
+ls
+> > and immediately increments the error counters.
+>
+> The main issue is HOL, but zerocopy may still work in some setups that
+> don't need to care about HOL. One example the macvtap passthrough
+> mode.
+>
+> >
+> > >
+> > >> or
+> > >> skb_orphan_frags() elsewhere in the stack,
+> > >
+> > > Basically zerocopy is expected to work for guest -> remote case, so
+> > > could we still hit skb_orphan_frags() in this case?
+> >
+> > Yes, you=E2=80=99d hit that in tun_net_xmit().
+>
+> Only for local VM to local VM communication.
+>
+> > If you punch a hole in that *and* in the
+> > zc error counter (such that failed ZC doesn=E2=80=99t disable ZC in vho=
+st), you get ZC
+> > from vhost; however, the network interrupt handler under net_tx_action =
+and
+> > eventually incurs the memcpy under dev_queue_xmit_nit().
+>
+> Well, yes, we need a copy if there's a packet socket. But if there's
+> no network interface taps, we don't need to do the copy here.
+>
 
-https://lore.kernel.org/all/20250416-noautoinline-v2-0-e69a2717530f@uniontech.com/
+Hi!
+
+I need more time diving into the issues. As Jon mentioned, vhost ZC is
+so little used I didn't have the chance to experiment with this until
+now :). But yes, I expect to be able to overcome these for pasta, by
+adapting buffer sizes or modifying code etc.
+
+> >
+> > This is no more performant, and in fact is actually worse since the tim=
+e spent
+> > waiting on that memcpy to resolve is longer.
+> >
+> > >
+> > >> as vhost_net does not set
+> > >> SKBFL_DONT_ORPHAN.
+>
+> Maybe we can try to set this as vhost-net can hornor ulimit now.
+>
+> > >>
+> > >> Orphaning enforces a memcpy and triggers the completion callback, wh=
+ich
+> > >> increments the failed TX counter, effectively disabling zerocopy aga=
+in.
+> > >>
+> > >> Even after addressing these issues to prevent SKB orphaning and erro=
+r
+> > >> counter increments, performance remains poor. By default, only 64
+> > >> messages can be zerocopied, which is immediately exhausted by worklo=
+ads
+> > >> like iperf, resulting in most messages being memcpy'd anyhow.
+> > >>
+> > >> Additionally, memcpy'd messages do not benefit from the XDP batching
+> > >> optimizations present in the handle_tx_copy path.
+> > >>
+> > >> Given these limitations and the lack of any tangible benefits, remov=
+e
+> > >> zerocopy entirely to simplify the code base.
+> > >>
+> > >> Signed-off-by: Jon Kohler <jon@nutanix.com>
+> > >
+> > > Any chance we can fix those issues? Actually, we had a plan to make
+> > > use of vhost-net and its tx zerocopy (or even implement the rx
+> > > zerocopy) in pasta.
+> >
+> > Happy to take direction and ideas here, but I don=E2=80=99t see a clear=
+ way to fix these
+> > issues, without dealing with the assertions that skb_orphan_frags_rx ca=
+lls out.
+> >
+> > Said another way, I=E2=80=99d be interested in hearing if there is a co=
+nfig where ZC in
+> > current host-net implementation works, as I was driving myself crazy tr=
+ying to
+> > reverse engineer.
+>
+> See above.
+>
+> >
+> > Happy to collaborate if there is something we could do here.
+>
+> Great, we can start here by seeking a way to fix the known issues of
+> the vhost-net zerocopy code.
+>
+
+Happy to help here :).
+
+Jon, could you share more details about the orphan problem so I can
+speed up the help? For example, can you describe the code changes and
+the code path that would lead to that assertion of
+skb_orphan_frags_rx?
+
+Thanks!
+
 
