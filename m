@@ -1,88 +1,74 @@
-Return-Path: <kvm+bounces-43488-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43489-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BA52A90BEE
-	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 21:06:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEC31A90C6A
+	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 21:34:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABB1E4607C8
-	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 19:06:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 298673B4A11
+	for <lists+kvm@lfdr.de>; Wed, 16 Apr 2025 19:34:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 582AE2248A1;
-	Wed, 16 Apr 2025 19:06:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A3992253F2;
+	Wed, 16 Apr 2025 19:34:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vvDC6X4C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T+A0oHTS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29DBB21B905
-	for <kvm@vger.kernel.org>; Wed, 16 Apr 2025 19:06:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27E2121146F;
+	Wed, 16 Apr 2025 19:34:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744830397; cv=none; b=Itnp64MVASe2w7plMdTBJRWGJ9DYGGrnayqktfZK4+6yCKqoNLz1UmD73LnsU0MD4tW5MskmYgR2Vuwlh+odnWfiVZelSlKhbrwT6RXZMaKbdLGCIDsodMI/JarsvrRbrKv5TVMECUrrm0G8aFT2DiKMIE7pokgpx/Po/ZOzXYA=
+	t=1744832061; cv=none; b=g/EU9kR9cxKz8UEWbZP8AcluyV37kk73JbLtlhw4Bpqtug9xCkSExDlqDU5Ga/T8BRYNrb4LyrPgYhQ5bLrrA2mw5Mrl8uLil16alG8ejJqRBkxW45s/dlbE8oKOQLWSwMT97BO77cu+MjG6yCJQjRCVsQPI3LmE0zJder1tuSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744830397; c=relaxed/simple;
-	bh=8z47v0y/RBpvELhTNkc41DID8InWw4fwZBbvVfaGcgQ=;
+	s=arc-20240116; t=1744832061; c=relaxed/simple;
+	bh=geLExcJtOAjXjEY3nYZsjfpMc2TX5ES0OBy8m9gKC/k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eCm2ZCU2NG7Z5wwk9VjLZMaLMXAwX+SBsCXrROGn2ymvcwLkDIu9odkUIJaAKfnsGsKUN/TDd0dUO+mzEIs48ULOiqgcGxdD/WE+UJVTZXsV2usSS6izbWUPM/MMvb65yZ07NmuiVmRW6sycs9gaPCCLdTAcLq3X6qm7c0kF2Hw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vvDC6X4C; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2263428c8baso40895ad.1
-        for <kvm@vger.kernel.org>; Wed, 16 Apr 2025 12:06:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744830395; x=1745435195; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kWuAzoWjXRQKcdL3H3i479C55svElbJ5pMQd8TVZ4Ts=;
-        b=vvDC6X4CppuiMiOVfBry7XxFH6TTNFzYCDH+VkUJ/I6kv3YZecU8RFUplfXdUZkUBS
-         aENIWc4LGOxr9hW9qxjpQnu3ToKCf+IirJ2cITCyRYxuXWNbnLlPAadMwL/b+d1zGfW3
-         3iDPhsjaIwVJe5G0Jxg+hDmckXeUFQB2zFu2Tj1paF3Ij+3nuNH0HfQU16tpMdEURYO7
-         g1aBYfv/MnNtcREhcRac51iVZfD7FQ+EacEx9GM1FBhs7jfhNxGUvaxhako1MjTeJ0Z7
-         QplF7gG3JJJg48Cz6FIPmBTkmqDHG25fXHGmTtVsSxl9coRD7I143V+S/W7TAtI3zlLm
-         gJ1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744830395; x=1745435195;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kWuAzoWjXRQKcdL3H3i479C55svElbJ5pMQd8TVZ4Ts=;
-        b=bkgSIJzlsPa4mAnzSYT/XtO/hVC3iXpw3wgwZ5zf6n7PZh5nzDYPgYsP/Bm9Odnf9V
-         r9BvNRCcDI+X7/cp3HD+q845xLQ1Oy65MU8KC3M4O2NwmYtZmZ4ID4v7vDl/A0zXr8Xs
-         +P9xtQqGi683ulei1cimv3JkvrrBQO8g7OiB5G0jM+JA9bi5eRQbXCXbSbtmRjt11SBd
-         1+owMYCNP9m+beb5oBfZDacQ3oGd8/9aPGLL2EVfCl2hDQjuUKfwCfupgXQEGFr6uZgw
-         A25piQSM7I1Q/FjW6J9bfjfF7HqmP8B/9ubwznhyZoB9CGH+EvlAW6C6asg+n1qRLlAF
-         3eMA==
-X-Forwarded-Encrypted: i=1; AJvYcCXPM/B7fh9Ctnz85u98JQ+PVDwz0FWXuRnydFcnbUZq0hv3oja8NUoHfgfPFTUGzcluY9o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0oh3y/BV9JaB8iajNQHa69lxPtN9EYsT4Rv0sqZ55dCSrMMPf
-	EmvxzmxDyHZPrjjsBB+5Me/2VcyZTVHypeTtFBGEhrVKRnmmPBYuGGHUpsTQBQ==
-X-Gm-Gg: ASbGncsYItZ+20IRtOH/OV/nj87zNKBag9k8vNsEmzBzUtZ5gjTIBszknfaGzY15jp2
-	+PzEs5rIjINj04c1/DVfs6+LQzaAlgI8INebf+J3CJNFR0uxFGe5z8Kw+ejqMdo1wYVuU130/Qv
-	Kp++6bYgEV9ur9vC/lcuGzKYEPplsho0pS/llwlAsC9Pdoqo7k58Mm+RmugJ7NiAb6oay+k64l3
-	2xNQQASiC58Tja80+77MmwsBUkWufOL/Ric4Y76Xqv/MNK9VnvtGF80IvqOl0Z1gUGVwtjvZFSu
-	B3rFjlcOqKYq2v0bW1Z9ua/nFXxk60JZtQftIZ0nKiklK8+CYYiaNIBsEhIv7nKuAjd8Ilz7Gwv
-	06w==
-X-Google-Smtp-Source: AGHT+IGi66f8+mN6aN8KhzRjjcF3CHZ0D2PJue18obrWmtFxD66ZzfNgY2fZUJNbR+nxkfakJTeGhw==
-X-Received: by 2002:a17:903:240d:b0:21f:3f5c:d24c with SMTP id d9443c01a7336-22c40e7ff19mr616215ad.0.1744830395119;
-        Wed, 16 Apr 2025 12:06:35 -0700 (PDT)
-Received: from google.com (176.13.105.34.bc.googleusercontent.com. [34.105.13.176])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73bd21c65c9sm11192998b3a.61.2025.04.16.12.06.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Apr 2025 12:06:34 -0700 (PDT)
-Date: Wed, 16 Apr 2025 12:06:30 -0700
-From: Vipin Sharma <vipinsh@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/3] KVM: x86: Allocate kvm_vmx/kvm_svm structures
- using kzalloc()
-Message-ID: <20250416190630.GA1037529.vipinsh@google.com>
-References: <20250401155714.838398-1-seanjc@google.com>
- <20250401155714.838398-3-seanjc@google.com>
- <20250416182437.GA963080.vipinsh@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Yy005nBXdkAaHF1EwwQ8c0y9rp28Uo/T6FLQCmdaPAixt0MRl71W9muINEfO3tWan1DW7GfofxbeyYqcEsSTfbWbt0YFNf9c3yJCLJ5VZT1AiUPYf61FB/TDFjmvxDXOSIsXPCMIE1x1BYLlxFxn1W61cJz6FYTFwRbxKOi/doY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T+A0oHTS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E34AC4CEE2;
+	Wed, 16 Apr 2025 19:34:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744832059;
+	bh=geLExcJtOAjXjEY3nYZsjfpMc2TX5ES0OBy8m9gKC/k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=T+A0oHTSymTtL9IlRxP2X49sZVIM+qKZykeUc2U1jckOh7Fab2nVwAlbNWbp/XYXH
+	 72yCmdRJgMazizkaUaoxG0Wn7KFWs6aHcG6OfFWYy+IW8oFbj4GScY3vpMq0460m83
+	 znneUQQNp70DChBAFipuLJMTCbl0QPbJuB9t45gg34S2XEtV2Xy7YIWXsmuR4MnGoB
+	 ONm30k/EW8IhlQTZhxZ/RMNIYfZyo3oG6WmJH2ox1m2hZrI+VEcIhKMAYk9WTZNjB/
+	 RizhkamT1QOnRjMZK46AjXuFi1Hwlokh2lbPLIBWcjDTJ5LJe25/TXY4xyWLb6lIOf
+	 LWfCobji2UGcQ==
+Date: Wed, 16 Apr 2025 22:34:16 +0300
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: chenlinxuan@uniontech.com
+Cc: Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Yishai Hadas <yishaih@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Peter Huewe <peterhuewe@gmx.de>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, linux-integrity@vger.kernel.org,
+	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev,
+	Winston Wen <wentao@uniontech.com>,
+	Changbin Du <changbin.du@intel.com>
+Subject: Re: [PATCH RFC v2 4/5] tpm: add __always_inline for
+ tpm_is_hwrng_enabled
+Message-ID: <aAAGOIN-IsnTK2gm@kernel.org>
+References: <20250416-noautoinline-v2-0-e69a2717530f@uniontech.com>
+ <20250416-noautoinline-v2-4-e69a2717530f@uniontech.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -91,42 +77,127 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250416182437.GA963080.vipinsh@google.com>
+In-Reply-To: <20250416-noautoinline-v2-4-e69a2717530f@uniontech.com>
 
-On 2025-04-16 11:24:37, Vipin Sharma wrote:
-> On 2025-04-01 08:57:13, Sean Christopherson wrote:
-> >  
-> > +	BUILD_BUG_ON(get_order(sizeof(struct kvm_svm) != 0));
+On Wed, Apr 16, 2025 at 05:44:50PM +0800, Chen Linxuan via B4 Relay wrote:
+> From: Winston Wen <wentao@uniontech.com>
 > 
-> There is a typo here. It is checking sizeof(struct kvm_svm) != 0, instead
-> of checking get_order(...) != 0.
+> Presume that kernel is compiled for x86_64 with gcc version 13.3.0:
 > 
-> >  	return 0;
-> >  
-> >  err_kvm_init:
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index b70ed72c1783..01264842bf45 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -8755,6 +8755,7 @@ static int __init vmx_init(void)
-> >  	if (r)
-> >  		goto err_kvm_init;
-> >  
-> > +	BUILD_BUG_ON(get_order(sizeof(struct kvm_vmx) != 0));
+>   make defconfig
+>   ./scripts/kconfig/merge_config.sh .config <(
+>     echo CONFIG_TCG_TPM=y
+>     echo CONFIG_HW_RANDOM=m
+>   )
+>   make KCFLAGS="-fno-inline-small-functions -fno-inline-functions-called-once"
 > 
-> Same as above.
+> This results a link error:
+> 
+>   ld: vmlinux.o: in function `tpm_add_hwrng':
+>   tpm-chip.c:(.text+0x6c5924): undefined reference to `hwrng_register'
+>   ld: vmlinux.o: in function `tpm_chip_unregister':
+>   (.text+0x6c5bc9): undefined reference to `hwrng_unregister'
+>   ld: vmlinux.o: in function `tpm_chip_register':
+>   (.text+0x6c5c9b): undefined reference to `hwrng_unregister'
+> 
+> With `CONFIG_TCG_TPM=y` and `CONFIG_HW_RANDOM=m`,
+> the functions `tpm_add_hwrng`, `tpm_chip_unregister`, and
+> `tpm_chip_register` are compiled into `vmlinux.o`
+> and reference the symbols `hwrng_register` and `hwrng_unregister`.
+> These symbols, however, are compiled into `rng-core.ko`, which results
+> in the linking error.
+> 
+> I am not sure but I think this weird linking error only arises when
+> auto inlining is disabled because of some dead code elimination.
+> 
+> `CONFIG_TCG_TPM=y` and `CONFIG_HW_RANDOM=m` set `CONFIG_HW_RANDOM_TPM=n`.
+> This causes the function `tpm_is_hwrng_enabled` to always return
+> `false`, as shown below:
+> 
+>   static bool tpm_is_hwrng_enabled(struct tpm_chip *chip)
+>   {
+>       if (!IS_ENABLED(CONFIG_HW_RANDOM_TPM))
+>           return false;
+>       if (tpm_is_firmware_upgrade(chip))
+>           return false;
+>       if (chip->flags & TPM_CHIP_FLAG_HWRNG_DISABLED)
+>           return false;
+>       return true;
+>   }
+> 
+> When `tpm_is_hwrng_enabled` is inlined, dead code elimination
+> optimizations are applied and the reference to the `hwrng_*` functions
+> will been removed.
+> For instance, in the `tpm_chip_unregister` function:
+> 
+>   void tpm_chip_unregister(struct tpm_chip *chip)
+>   {
+>   #ifdef CONFIG_TCG_TPM2_HMAC
+>       int rc;
+> 
+>       rc = tpm_try_get_ops(chip);
+>       if (!rc) {
+>           tpm2_end_auth_session(chip);
+>           tpm_put_ops(chip);
+>       }
+>   #endif
+> 
+>       tpm_del_legacy_sysfs(chip);
+>       if (tpm_is_hwrng_enabled(chip))
+>           hwrng_unregister(&chip->hwrng);
+>       tpm_bios_log_teardown(chip);
+>       if (chip->flags & TPM_CHIP_FLAG_TPM2 && !tpm_is_firmware_upgrade(chip))
+>           tpm_devs_remove(chip);
+>       tpm_del_char_device(chip);
+>   }
+> 
+> When `tpm_is_hwrng_enabled` is inlined and always returns `false`,
+> the call to `hwrng_unregister` is effectively part of a `if (false)`
+> block, which I guess that will be then optimized out.
+> 
+> However, when the `-fno-inline-small-functions` and
+> `-fno-inline-functions-called-once` flags are used,
+> tpm_is_hwrng_enabled is not inline.
+> 
+> And this optimization some how cannot occur,
+> leading to the undefined reference errors during linking.
+> 
+> Adding the `__always_inline` attribute ensures that
+> `tpm_is_hwrng_enabled` is inlined regardless of the compiler flags.
+> This allows the dead code elimination to proceed as expected,
+> resolving the linking issue.
+> 
+> Co-developed-by: Chen Linxuan <chenlinxuan@uniontech.com>
+> Signed-off-by: Chen Linxuan <chenlinxuan@uniontech.com>
+> Signed-off-by: Winston Wen <wentao@uniontech.com>
+> ---
+>  drivers/char/tpm/tpm-chip.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/char/tpm/tpm-chip.c b/drivers/char/tpm/tpm-chip.c
+> index e25daf2396d37bcaeae8a96267764df0861ad1be..48cc74d84247e258a39f2118e03aa10d0cbb066a 100644
+> --- a/drivers/char/tpm/tpm-chip.c
+> +++ b/drivers/char/tpm/tpm-chip.c
+> @@ -534,7 +534,7 @@ static int tpm_hwrng_read(struct hwrng *rng, void *data, size_t max, bool wait)
+>  	return tpm_get_random(chip, data, max);
+>  }
+>  
+> -static bool tpm_is_hwrng_enabled(struct tpm_chip *chip)
+> +static __always_inline bool tpm_is_hwrng_enabled(struct tpm_chip *chip)
+>  {
+>  	if (!IS_ENABLED(CONFIG_HW_RANDOM_TPM))
+>  		return false;
+> 
+> -- 
+> 2.48.1
+> 
+> 
 > 
 
-After fixing the typo build is failing.
+Thank you.
 
-Checked via pahole, sizes of struct have reduced but still not under 4k.
-After applying the patch:
+Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
 
-struct kvm{} - 4104
-struct kvm_svm{} - 4320
-struct kvm_vmx{} - 4128
 
-Also, this BUILD_BUG_ON() might not be reliable unless all of the ifdefs
-under kvm_[vmx|svm] and its children are enabled. Won't that be an
-issue?
+BR, Jarkko
 
