@@ -1,143 +1,257 @@
-Return-Path: <kvm+bounces-43557-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43558-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CDD0A91862
-	for <lists+kvm@lfdr.de>; Thu, 17 Apr 2025 11:54:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B946A919CD
+	for <lists+kvm@lfdr.de>; Thu, 17 Apr 2025 12:51:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1FBD19E1D0A
-	for <lists+kvm@lfdr.de>; Thu, 17 Apr 2025 09:54:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C595C5A6FDE
+	for <lists+kvm@lfdr.de>; Thu, 17 Apr 2025 10:50:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A525022A1D5;
-	Thu, 17 Apr 2025 09:54:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7836E22AE74;
+	Thu, 17 Apr 2025 10:50:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ID35VpLh"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="kYGADsBq";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="hYZ1aIn3"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4972F22576A
-	for <kvm@vger.kernel.org>; Thu, 17 Apr 2025 09:54:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D43102356AE;
+	Thu, 17 Apr 2025 10:50:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744883651; cv=none; b=lOQ3NeFqVCCshmKC/zynaNSyE2nozQAnMjqCu0EGE52OSKxdpo6a2tksTN/b2Fx6558LRclA9C8r04BgJLTmMefIObnWZNd+LTxQjlj2HxuztRKgJ/Togzool2sB50flmfyUD1znm2xxRR2VmKJ8tdwv9KnAdx/BgMW+HMs3NfE=
+	t=1744887008; cv=none; b=fJ9CS2/pAaxFSG9H9j4NrLFv2RvrcOldDVqQsxCTJhIRODWNwcwteK7hNPEZjdvVnIiTSLnz5fcU51qcGUR4qurcH65FCQx6Lo2128if7vj6wQpobPk9Pwv40HdfklqySGcFSZPzLwsPl879n6oHmsnPdk8bIjFr0ciA9AZHHWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744883651; c=relaxed/simple;
-	bh=3BhkDRy9UEw8pUROqk03rHaQpLsP1EoR2Hnqbktpafc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KweVVwWF1O2ErTp/9NXWi7XVyZwoijAeJpHQv47uiOVwZ2ssWzT8EWRzZvjuzoiUIDKPN59my180wsLzXUlvIf7ktRLhprKi6og+2vMIAw/O9G5g5/y2s+vLxcUPAu+Mw6qi1gmDFZx7hGTUolaiP8qpHWRHfxAnGY8kiZGscrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ID35VpLh; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744883649;
+	s=arc-20240116; t=1744887008; c=relaxed/simple;
+	bh=fHt9v11xJay+tpSZs3Zlbur4bEkB+EmQhHNI8b/cImA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=cnbYetyVIzbgAyhI+32/EHYo4gI5xXlls7FuP3uv9rkF7Xv495wf/Gc0aASst+gPWWmgBGvCN3+YBm9K/1+5EB9rkNKR342nMYZoFzk38BLuiFEXgNcn6mC7BEc1KIgGdRcCG7iP8zh7/2O01KJnQTLuY7JNPYpH7cWHA4vvg/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=kYGADsBq; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=hYZ1aIn3; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1744887004;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8frcNR3d7ivP4NC+vlhr7MJ2cYU39BpSTQEOAw1o4aU=;
-	b=ID35VpLhWpwaVM1r4/KrdZ43hdh212IgE1YbxcUtmx7YmqAS2Hk0S9ZqtAC8KIV9B5D0eC
-	4+5tdUXWAh0nWhidC4SFkNTfTMoiBp0o5CYeOIe+03Sw1eoFDwjFvEMVoq2q7+SBgkuCmy
-	8pUtK3bpXUtZBqmNB5cpvBvp1NLmtBU=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-447-NCdJ3OloPEqJMO27GnKHmg-1; Thu, 17 Apr 2025 05:54:07 -0400
-X-MC-Unique: NCdJ3OloPEqJMO27GnKHmg-1
-X-Mimecast-MFC-AGG-ID: NCdJ3OloPEqJMO27GnKHmg_1744883646
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43e9a3d2977so4413615e9.1
-        for <kvm@vger.kernel.org>; Thu, 17 Apr 2025 02:54:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744883646; x=1745488446;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8frcNR3d7ivP4NC+vlhr7MJ2cYU39BpSTQEOAw1o4aU=;
-        b=RgOSZF+Jxk4/0RLkyZOAxbQfo3BNbJ0Ad3mHnLDS8JBONsjh4hFrFSwMvR1fne2C3y
-         qiYG5dzovf2tF5Xjwq8M120Oy/BqWMuNusPbLaQz7pi+n2m8/iWoheDZU3I1CTF2zEU+
-         JT7+mQh+HGosyoCAa1ISSo/kNjhSi1MrA/HSHCcRPa3VU2MM+phF00cHnhMofs9z/MDQ
-         VBF00guckP7RnWaJyR3CKb1W+4JJWqgVjCmRaTT6YkiTrrKdgjxXRVEMCQuO+V/dIhPd
-         NXeRpqE84on+wvANA+prCT5+ceDGc72VJSYNijNUDLsFye8rk3hwJZIYPWdYmG1uu5XZ
-         twZA==
-X-Forwarded-Encrypted: i=1; AJvYcCVhmfpSAzOnZ7+vPstpJyk7EjeeB5Eqrn/PuWZBmGon9SsR9IPo+nib3jkuvJRTxrdK7/4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLoVUVAGkjqqp1+MJTShZAglkU70WAlQ1aBsvwZ6MwR4MHWX1P
-	TEDaB9hSNMarxCaJcBMy3Uo+PNDjyIZlAXcxVBSgAj8XKeYRepYv67ELZ7dCHoA+WmFecL6UEnU
-	rdQaSkPXNU6y9V/7gT6sCk+4UWVSaoEnyRrjaqomDu43s2LNE7l5vQoisShPFdP9jSOZ+bWo+Pq
-	6vLnfmACxp4Ii3MSZ5ozV+BEC6
-X-Gm-Gg: ASbGncuffo4LfMJRlGRmaBj4cyguXCM2laU1IkSi2rdNXifUUzuAvVAseOw21ODH4S9
-	afOEB1piJK+ac1nBJ1rji3DMlB4ohXSLdtitlwWvamhpsgQCj2Zm4E1tn229fEf8cnA9gWg==
-X-Received: by 2002:a05:6000:40c7:b0:398:fd9b:b935 with SMTP id ffacd0b85a97d-39ee5b9ff8fmr4783277f8f.53.1744883646445;
-        Thu, 17 Apr 2025 02:54:06 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGaUAX5A8zAgw7el/T3YwRV3GZLvfWnuHeaTHfLO1ACdU3siatVem4dbx0XtRNKUnrmhQD+B5DLQ7edX2knUB0=
-X-Received: by 2002:a05:6000:40c7:b0:398:fd9b:b935 with SMTP id
- ffacd0b85a97d-39ee5b9ff8fmr4783241f8f.53.1744883646039; Thu, 17 Apr 2025
- 02:54:06 -0700 (PDT)
+	bh=jUgP7QIAkoCQuc95oiAM2VFsr+DSEvrjzzdDoEmLzAk=;
+	b=kYGADsBqFf8IlDrezSa3zIJ+BT4RNlAnd3iH+5GTw+BKrObB1f8EluY48Qe6s+cltv3JhD
+	VaLaR3a+Qc/Zj8dJr8s55MAZ9Fel6sMPkivRYKWJrKkwiSJewORSL9Oq/FTTCeHsLDSz6i
+	Zz85DqgV10It7a0zjffVTw/VtF/HW7yXOopczfeIcgep0k5QQBocltWnY4vzwXJ8GeeWJy
+	b6QgY7Vuic0JTDuSgFF9Z+CUiHR7luoEWOdlswpDjIeUZ+gvk8U7/mKI9yYTixDnMJYDZl
+	OvscdGLXiqmWIMHUqUXqscOY5XarNuycFUeStTBrvo9F3e0qXNj9IHoMboNyWA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1744887004;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jUgP7QIAkoCQuc95oiAM2VFsr+DSEvrjzzdDoEmLzAk=;
+	b=hYZ1aIn3APfPnc9HM9Z3FojJjQszJXZ2FgdFK4s/By++uUr+h0rARMU8MfKbv3ceJRtiEr
+	LFejf3luJhdMG3Ag==
+To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>, linux-kernel@vger.kernel.org
+Cc: bp@alien8.de, mingo@redhat.com, dave.hansen@linux.intel.com,
+ Thomas.Lendacky@amd.com, nikunj@amd.com, Santosh.Shukla@amd.com,
+ Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com,
+ x86@kernel.org, hpa@zytor.com, peterz@infradead.org, seanjc@google.com,
+ pbonzini@redhat.com, kvm@vger.kernel.org, kirill.shutemov@linux.intel.com,
+ huibo.wang@amd.com, naveen.rao@amd.com, francescolavra.fl@gmail.com
+Subject: Re: [PATCH v4 06/18] x86/apic: Add update_vector callback for
+ Secure AVIC
+In-Reply-To: <20250417091708.215826-7-Neeraj.Upadhyay@amd.com>
+References: <20250417091708.215826-1-Neeraj.Upadhyay@amd.com>
+ <20250417091708.215826-7-Neeraj.Upadhyay@amd.com>
+Date: Thu, 17 Apr 2025 12:50:04 +0200
+Message-ID: <87a58frrj7.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250409014136.2816971-1-mlevitsk@redhat.com> <20250409014136.2816971-3-mlevitsk@redhat.com>
- <20250410081640.GX9833@noisy.programming.kicks-ass.net> <60b7607b-8ada-447d-9dcb-034d93b9abe8@redhat.com>
- <20250416185001.GA38216@noisy.programming.kicks-ass.net>
-In-Reply-To: <20250416185001.GA38216@noisy.programming.kicks-ass.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 17 Apr 2025 11:53:54 +0200
-X-Gm-Features: ATxdqUE3EOhyuH0suu9pJLVTpoJVqiaHW5bjmzNK_nqhnV7Z7kL2fl3XehvCGu8
-Message-ID: <CABgObfbH6JAh0Puu6gTKfkLd+e5uqSyHHP5i86W-=G6x5zr1wg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/4] KVM: x86: move sev_lock/unlock_vcpus_for_migration
- to kvm_main.c
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, 
-	Alexander Potapenko <glider@google.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, kvm-riscv@lists.infradead.org, 
-	Oliver Upton <oliver.upton@linux.dev>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	Jing Zhang <jingzhangos@google.com>, Waiman Long <longman@redhat.com>, x86@kernel.org, 
-	Kunkun Jiang <jiangkunkun@huawei.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Anup Patel <anup@brainfault.org>, Albert Ou <aou@eecs.berkeley.edu>, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Zenghui Yu <yuzenghui@huawei.com>, 
-	Borislav Petkov <bp@alien8.de>, Alexandre Ghiti <alex@ghiti.fr>, 
-	Keisuke Nishimura <keisuke.nishimura@inria.fr>, Sebastian Ott <sebott@redhat.com>, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Randy Dunlap <rdunlap@infradead.org>, Will Deacon <will@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, linux-riscv@lists.infradead.org, 
-	Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	Joey Gouly <joey.gouly@arm.com>, Ingo Molnar <mingo@redhat.com>, 
-	Andre Przywara <andre.przywara@arm.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Sean Christopherson <seanjc@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Wed, Apr 16, 2025 at 8:50=E2=80=AFPM Peter Zijlstra <peterz@infradead.or=
-g> wrote:
-> > For the ARM case, which is the actual buggy one (it was complaining
-> > about too high a depth) it still needs mutex_trylock_nest_lock();
-> > the nest_lock is needed to avoid bumping the depth on every
-> > mutex_trylock().
->
-> Got a link to the ARM code in question ?
+On Thu, Apr 17 2025 at 14:46, Neeraj Upadhyay wrote:
+> Add update_vector callback to set/clear ALLOWED_IRR field in
+> a vCPU's APIC backing page for external vectors. The ALLOWED_IRR
+> field indicates the interrupt vectors which the guest allows the
+> hypervisor to send (typically for emulated devices). Interrupt
+> vectors used exclusively by the guest itself and the vectors which
+> are not emulated by the hypervisor, such as IPI vectors, are part
+> of system vectors and are not set in the ALLOWED_IRR.
 
-lock_all_vcpus() in arch/arm64/kvm/arm.c:
+Please structure changelogs properly in paragraphs:
 
-        lockdep_assert_held(&kvm->lock);
-        kvm_for_each_vcpu(c, tmp_vcpu, kvm) {
-                if (!mutex_trylock(&tmp_vcpu->mutex)) {
-                        unlock_vcpus(kvm, c - 1);
-                        return false;
-                }
-        }
+  https://www.kernel.org/doc/html/latest/process/maintainer-tip.html#changelog
 
-> And I'm assuming you're talking about task_struct::lockdep_depth ?
-> The nest lock annotation does not in fact increment depth beyond
-> one of each type. It does a refcount like thing.
+>  arch/x86/include/asm/apic.h         |  9 +++++
+>  arch/x86/kernel/apic/vector.c       | 53 ++++++++++++++++++++++-------
+>  arch/x86/kernel/apic/x2apic_savic.c | 35 +++++++++++++++++++
 
-Yes, exactly - mutex_trylock_nest_lock() is needed so that the
-code above counts per-lock instead of using the per-task depth.
+And split this patch up into two:
 
-Paolo
+  1) Do the modifications in vector.c which is what the $Subject line
+     says
 
+  2) Add the SAVIC specific bits
+
+> @@ -471,6 +473,12 @@ static __always_inline bool apic_id_valid(u32 apic_id)
+>  	return apic_id <= apic->max_apic_id;
+>  }
+>  
+> +static __always_inline void apic_update_vector(unsigned int cpu, unsigned int vector, bool set)
+> +{
+> +	if (apic->update_vector)
+> +		apic->update_vector(cpu, vector, set);
+> +}
+
+This is in the public header because it can?
+  
+> -static void apic_update_vector(struct irq_data *irqd, unsigned int newvec,
+> -			       unsigned int newcpu)
+> +static int irq_alloc_vector(const struct cpumask *dest, bool resvd, unsigned int *cpu)
+> +{
+> +	int vector;
+> +
+> +	vector = irq_matrix_alloc(vector_matrix, dest, resvd, cpu);
+
+        int vector = irq_matrix_alloc(...);
+
+> +
+> +	if (vector >= 0)
+> +		apic_update_vector(*cpu, vector, true);
+> +
+> +	return vector;
+> +}
+> +
+> +static int irq_alloc_managed_vector(unsigned int *cpu)
+> +{
+> +	int vector;
+> +
+> +	vector = irq_matrix_alloc_managed(vector_matrix, vector_searchmask, cpu);
+> +
+> +	if (vector >= 0)
+> +		apic_update_vector(*cpu, vector, true);
+> +
+> +	return vector;
+> +}
+
+I completely fail to see the value of these two functions. Each of them
+has exactly _ONE_ call site and both sites invoke apic_update_vector()
+when the allocation succeeded. Why can't you just do the obvious and
+leave the existing code alone and add
+
+      if (apic->update_vector)
+      		apic->update_vector();
+
+into apic_update_vector()? But then you have another place where you
+need the update, which does not invoke apic_update_vector().
+
+Now if you look deeper, then you notice that all places which invoke
+apic_update_vector() invoke apic_update_irq_cfg(), which is also called
+at this other place, no?
+
+> +static void irq_free_vector(unsigned int cpu, unsigned int vector, bool managed)
+> +{
+> +	apic_update_vector(cpu, vector, false);
+> +	irq_matrix_free(vector_matrix, cpu, vector, managed);
+> +}
+
+This one makes sense, but please name it: apic_free_vector()
+
+Something like the uncompiled below, no?
+
+Thanks,
+
+        tglx
+---
+--- a/arch/x86/kernel/apic/vector.c
++++ b/arch/x86/kernel/apic/vector.c
+@@ -134,9 +134,19 @@ static void apic_update_irq_cfg(struct i
+ 
+ 	apicd->hw_irq_cfg.vector = vector;
+ 	apicd->hw_irq_cfg.dest_apicid = apic->calc_dest_apicid(cpu);
++
++	if (apic->update_vector)
++		apic->update_vector(cpu, vector, true);
++
+ 	irq_data_update_effective_affinity(irqd, cpumask_of(cpu));
+-	trace_vector_config(irqd->irq, vector, cpu,
+-			    apicd->hw_irq_cfg.dest_apicid);
++	trace_vector_config(irqd->irq, vector, cpu, apicd->hw_irq_cfg.dest_apicid);
++}
++
++static void apic_free_vector(unsigned int cpu, unsigned int vector, bool managed)
++{
++	if (apic->update_vector)
++		apic->update_vector(cpu, vector, false);
++	irq_matrix_free(vector_matrix, cpu, vector, managed);
+ }
+ 
+ static void apic_update_vector(struct irq_data *irqd, unsigned int newvec,
+@@ -174,8 +184,7 @@ static void apic_update_vector(struct ir
+ 		apicd->prev_cpu = apicd->cpu;
+ 		WARN_ON_ONCE(apicd->cpu == newcpu);
+ 	} else {
+-		irq_matrix_free(vector_matrix, apicd->cpu, apicd->vector,
+-				managed);
++		apic_free_vector(apicd->cpu, apicd->vector, managed);
+ 	}
+ 
+ setnew:
+@@ -183,6 +192,7 @@ static void apic_update_vector(struct ir
+ 	apicd->cpu = newcpu;
+ 	BUG_ON(!IS_ERR_OR_NULL(per_cpu(vector_irq, newcpu)[newvec]));
+ 	per_cpu(vector_irq, newcpu)[newvec] = desc;
++	apic_update_irq_cfg(irqd, newvec, newcpu);
+ }
+ 
+ static void vector_assign_managed_shutdown(struct irq_data *irqd)
+@@ -261,8 +271,6 @@ assign_vector_locked(struct irq_data *ir
+ 	if (vector < 0)
+ 		return vector;
+ 	apic_update_vector(irqd, vector, cpu);
+-	apic_update_irq_cfg(irqd, vector, cpu);
+-
+ 	return 0;
+ }
+ 
+@@ -338,7 +346,6 @@ assign_managed_vector(struct irq_data *i
+ 	if (vector < 0)
+ 		return vector;
+ 	apic_update_vector(irqd, vector, cpu);
+-	apic_update_irq_cfg(irqd, vector, cpu);
+ 	return 0;
+ }
+ 
+@@ -357,7 +364,7 @@ static void clear_irq_vector(struct irq_
+ 			   apicd->prev_cpu);
+ 
+ 	per_cpu(vector_irq, apicd->cpu)[vector] = VECTOR_SHUTDOWN;
+-	irq_matrix_free(vector_matrix, apicd->cpu, vector, managed);
++	apic_free_vector(apicd->cpu, vector, managed);
+ 	apicd->vector = 0;
+ 
+ 	/* Clean up move in progress */
+@@ -366,7 +373,7 @@ static void clear_irq_vector(struct irq_
+ 		return;
+ 
+ 	per_cpu(vector_irq, apicd->prev_cpu)[vector] = VECTOR_SHUTDOWN;
+-	irq_matrix_free(vector_matrix, apicd->prev_cpu, vector, managed);
++	apic_free_vector(apicd->prev_cpu, vector, managed);
+ 	apicd->prev_vector = 0;
+ 	apicd->move_in_progress = 0;
+ 	hlist_del_init(&apicd->clist);
+@@ -905,7 +912,7 @@ static void free_moved_vector(struct api
+ 	 *    affinity mask comes online.
+ 	 */
+ 	trace_vector_free_moved(apicd->irq, cpu, vector, managed);
+-	irq_matrix_free(vector_matrix, cpu, vector, managed);
++	apic_free_vector(cpu, vector, managed);
+ 	per_cpu(vector_irq, cpu)[vector] = VECTOR_UNUSED;
+ 	hlist_del_init(&apicd->clist);
+ 	apicd->prev_vector = 0;
 
