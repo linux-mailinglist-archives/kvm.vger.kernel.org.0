@@ -1,320 +1,415 @@
-Return-Path: <kvm+bounces-43562-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43563-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFF50A91B45
-	for <lists+kvm@lfdr.de>; Thu, 17 Apr 2025 13:52:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D18DFA91B52
+	for <lists+kvm@lfdr.de>; Thu, 17 Apr 2025 14:00:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C60883AE4A5
-	for <lists+kvm@lfdr.de>; Thu, 17 Apr 2025 11:52:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 43AC219E39E0
+	for <lists+kvm@lfdr.de>; Thu, 17 Apr 2025 12:00:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF89424167C;
-	Thu, 17 Apr 2025 11:52:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B76223F419;
+	Thu, 17 Apr 2025 12:00:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="KHcoseQH"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="IRNvrTBb"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2073.outbound.protection.outlook.com [40.107.93.73])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2042.outbound.protection.outlook.com [40.107.237.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EB23215061;
-	Thu, 17 Apr 2025 11:52:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7F6A18787A;
+	Thu, 17 Apr 2025 12:00:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.42
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744890744; cv=fail; b=RQiAh3266TZnxlHhpfs2NWd6HeSmUkMOZAYLk9cEe8SiDsDOwBaHhmQBZxfyqR281bXkKlfxqsQFpr0dZhFxeHuNaUS27OR2iqN5v7qnTP896/POqSfG7j/ZJruCj3qjWo0t+GJBggcp+ZekeCs+e9caavuEerOX2X6gwISXD9s=
+	t=1744891231; cv=fail; b=aZxSWVvnL47y9ZvU1+FD7mvQelXRbiTeSjZig2jgE/b2X+zT4mbce35SbZzkMWl0bS4sHIaT843KJhz2NOXsSiZad5Cx0SbZ1TSu8uUvrEmLq8zRyO+jbSJrCVyF7SP4b3vMOynvPGVL30r0EtQ8TQAET25aWEyQsEEmSGPVysk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744890744; c=relaxed/simple;
-	bh=7BvjIM8YTLzNad0Z6XUYgh15my305bb2uL3N3vFBQxU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nYSuECXaaFyFdIy8Dxzi7QQ2yA0JbpMFDiO3ywx1Sm3VJQ05KRBfqtjE/HchbqDW4yaNldguI+eS5EVrH6cUj7r45ltVLbXJUGPW3j11DZ72FDXFhjuZe3CWCD7RN6UrXLA/zYRfZA+bQc0gqvDwZbRbKwRPYzggbj4fNueArLM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=KHcoseQH; arc=fail smtp.client-ip=40.107.93.73
+	s=arc-20240116; t=1744891231; c=relaxed/simple;
+	bh=H97AZeKk8aMPsvMg2d1Owz3W6Qmc2ON4dYSaiNOAJVg=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=oNHAy8sIvRv1raeaJLHWrkSdX8P/o4yUgW2WAuLI3fXFpiI+trCsqdSqXtg4h+5xAUcPq9HW4TcNtXAyCxPbRzHUa/rWfU/exguj0+bKnobIwIW5iEsz3UiI70gBaias+fwhjs+E9YyK1gb1QnWyT6BSPEtZ9rXUoyNSR48bxa8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=IRNvrTBb; arc=fail smtp.client-ip=40.107.237.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gSghRZhL0VRAKVCa5YyPw0AxqLkq5slyywSMpArlsXBsx144G6QqoB7OgY5+yQgV1htxxKII5iXJbe+k1dghHmVPixz3lgxMEsYOGYbF7y6ZuET26h9rEWnuSGWR67B9GgOZXI7YtQZUSzF4izW18/6l/T0xBRSWy5/6uVDnugAjAYFDaRDrWeQInYVSMaOcz5H80oi1LimgpPfhZMwffExpfZkHLB9Z4JBuwNm1XqL+6JGsXctTbIeBGQclbJCCDc7YMtrr2ncZdmDbV8YR6UCZBBDjIKBadzQeb+qcS7k+mk3fyrHRs5Wyg982mEFfuNdMNTxjFEdVIUhUnPFKmQ==
+ b=IUnZ4RUYOigF1FvYPkBP7pPe6HXQ03u5ifXrwiIA5x+EOja1dCbY9cgYMq4ZTbx7Cc/bJU0WDUTPSDr6lL1ftBoTXV2+lJn6sBGRMLe6SkB5Ni2NVvP8WNlu8Cgz3jFzLAb9+kQ0nVONVoprsizflDkVDEPu4heEKwgSjxzQ2ODhOke0gxtzUZL4NVjRoNzT9G+yx5i8XIsaqCTct4Otz/9OYWCxQIqG/HoAfrXunC7iQogfAqINQIFVkrN1jSDD9IgcFF2uszUFrKTCX5g6X+iujMrymP3Be2rxl/EsyNM+FNU6/C5ydcK4K/RveiK7IvWXAZcaS3o7nxoKFHT0ow==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=86nrFg5IAsKA82WN6P7e0QjPJ0mjfBowiYZ1NiPOrfg=;
- b=CZB7hgxs1Lc99ZkpAh5YX3RFKkZtKtkEvKC0e2yAAMV0d4Dyh7MkpDEtLl4UekBzJxunO8GgYrsgGcei7GR18aCdtmPkauyHO1U24QPzWREcjbnPpYkS4tuOeEcYLJRgomYag3QU3LyIVSgQyXsDC0cDHFbOrhi5VJmoh33rxKiFL+mb/3h8EACMct1P88QpoWcA5OzKsRMpA3IGgPTB/l4AaI1zIryVKvk6DCRSlW/vX+EWcb/M4901DsiCxuZ1fkGoRZPFhGXtRIhHRyKxnt080QmWHulkCgvBRas68ktalhuRrVTwONCvCYlezrX1MRgvYbX8lmCs+s+gqy2H1w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
+ bh=J7hoZT4BxKvYWIgLPR1t8iQ2sfHMKaHcnvCWPkBurJM=;
+ b=Z5becw/y8BtVFmKkdYlYM9pBUPZ0WOvQaQmFFOUGLw5myyMQ4Dc62sSz3qe+VIynVt0oOEXzXhjY3ocsta+k12esYY65Tpnsfb7jOTRW+6ux2acUHbFJcqRTMwY9/UdDzfJrT0zj6RPYLPSgQZ57WyUCGX58UYCkjlUt85+D1VEafxBlSr7pmvwZF43ASXzwlSKAbyCajgoGMI2mKxnfK7Alb3YQnW1XFdMvhElrMK0uIpAmnTlPKQL0MgtZiQfta08K2fUOpAj2v+uHH2sTwIFeVRy0jOyhVDBeH908vv7j5LQxgoHqLfWfU227MhV/0E4TXLYJNWftVAxz2Sqjhw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=86nrFg5IAsKA82WN6P7e0QjPJ0mjfBowiYZ1NiPOrfg=;
- b=KHcoseQHeVcTTuIDhSh34KNErec3hBSAsVb9bctJua+HVw1LgqvP7I6VQyrafk5Egs4Mw4K7K5HvUc3d3xfbkXhPbgO5E9/UnYyXDtp6ruIyHessCucXKN9ZpaCAfzD21QyyZd2HDY080w2BK51eQYdWK3Cybeac+gLn2JtNlO8=
-Received: from MW3PR06CA0028.namprd06.prod.outlook.com (2603:10b6:303:2a::33)
- by SN7PR12MB7452.namprd12.prod.outlook.com (2603:10b6:806:299::12) with
+ bh=J7hoZT4BxKvYWIgLPR1t8iQ2sfHMKaHcnvCWPkBurJM=;
+ b=IRNvrTBbmrrdYvkTvi6OkTuHQzDCEZcxh5oQYgZVEJt5ISjOgCl0JrP7Gc6cQgmWqqfJEvG4Qy9Q54MWekBPoIQusNnyWjG2yzk8owBAlaPectYBMhB9v3Bi7+5iTjlvKijBGD+MXIWq0ihulGSC/uOkaZ5u2skt0BTb2P/pn74=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CY5PR12MB6599.namprd12.prod.outlook.com (2603:10b6:930:41::11)
+ by SA0PR12MB4448.namprd12.prod.outlook.com (2603:10b6:806:94::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.32; Thu, 17 Apr
- 2025 11:52:17 +0000
-Received: from MWH0EPF000A6730.namprd04.prod.outlook.com
- (2603:10b6:303:2a:cafe::c0) by MW3PR06CA0028.outlook.office365.com
- (2603:10b6:303:2a::33) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8632.34 via Frontend Transport; Thu,
- 17 Apr 2025 11:52:17 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- MWH0EPF000A6730.mail.protection.outlook.com (10.167.249.22) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8655.12 via Frontend Transport; Thu, 17 Apr 2025 11:52:17 +0000
-Received: from BLR-L1-SARUNKOD.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 17 Apr
- 2025 06:52:13 -0500
-From: Sairaj Kodilkar <sarunkod@amd.com>
-To: <alex.williamson@redhat.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: <bhelgaas@google.com>, <will@kernel.org>, <joro@8bytes.org>,
-	<robin.murphy@arm.com>, <iommu@lists.linux.dev>, <linux-pci@vger.kernel.org>,
-	<sarunkod@amd.com>, <vasant.hegde@amd.com>, <suravee.suthikulpanit@amd.com>
-Subject: [bug report] Potential DEADLOCK due to vfio_pci_mmap_huge_fault()
-Date: Thu, 17 Apr 2025 17:22:00 +0530
-Message-ID: <20250417115200.31275-1-sarunkod@amd.com>
-X-Mailer: git-send-email 2.34.1
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8655.22; Thu, 17 Apr
+ 2025 12:00:27 +0000
+Received: from CY5PR12MB6599.namprd12.prod.outlook.com
+ ([fe80::e369:4d69:ab4:1ba0]) by CY5PR12MB6599.namprd12.prod.outlook.com
+ ([fe80::e369:4d69:ab4:1ba0%5]) with mapi id 15.20.8632.035; Thu, 17 Apr 2025
+ 12:00:27 +0000
+Message-ID: <be31db14-9545-4d11-9392-458782e10b48@amd.com>
+Date: Thu, 17 Apr 2025 17:30:13 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 06/18] x86/apic: Add update_vector callback for Secure
+ AVIC
+To: Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org
+Cc: bp@alien8.de, mingo@redhat.com, dave.hansen@linux.intel.com,
+ Thomas.Lendacky@amd.com, nikunj@amd.com, Santosh.Shukla@amd.com,
+ Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com,
+ x86@kernel.org, hpa@zytor.com, peterz@infradead.org, seanjc@google.com,
+ pbonzini@redhat.com, kvm@vger.kernel.org, kirill.shutemov@linux.intel.com,
+ huibo.wang@amd.com, naveen.rao@amd.com, francescolavra.fl@gmail.com
+References: <20250417091708.215826-1-Neeraj.Upadhyay@amd.com>
+ <20250417091708.215826-7-Neeraj.Upadhyay@amd.com> <87a58frrj7.ffs@tglx>
+Content-Language: en-US
+From: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+In-Reply-To: <87a58frrj7.ffs@tglx>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN4P287CA0105.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:c01:276::8) To CY5PR12MB6599.namprd12.prod.outlook.com
+ (2603:10b6:930:41::11)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000A6730:EE_|SN7PR12MB7452:EE_
-X-MS-Office365-Filtering-Correlation-Id: 60f32a41-3a95-41c8-e7c0-08dd7da64d71
+X-MS-TrafficTypeDiagnostic: CY5PR12MB6599:EE_|SA0PR12MB4448:EE_
+X-MS-Office365-Filtering-Correlation-Id: 767106db-157e-4e43-97d7-08dd7da770c5
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|36860700013|376014;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?7hRPYyyCBhmOAX0qVwkyPNZb0bKJRovbkEqXB4soQsBervnUIKRVSEUWKJGA?=
- =?us-ascii?Q?27RxIAzL6AwefzbPZJf3pwgxe1zwVXn55jEgKOYlDgrIinYzQLo1JHDWuyAu?=
- =?us-ascii?Q?xEEwbIZeb92IXaFZ83XFMgFlhflMIKxeKFtnklrCL9/ZzvWwvJBVogjUo+Mj?=
- =?us-ascii?Q?+AkDs0uMVbq+s9eaD2zQk0yK2h7lJfwKJToDZTcj7/7rj3FkN+9ZiVOTnSLa?=
- =?us-ascii?Q?fBBnussxQ+qOcK8PZRlFAI4GDkR4VsJBGTr3AOtmYpbDRakh3k/d4sJ19LEg?=
- =?us-ascii?Q?T6QRBtoOXW06JmttTPlfFlMi3TsX/YGbrJRSfapeWMEAw5ai6LIZ1we5tsUn?=
- =?us-ascii?Q?FTpwCWKG+nP9M2Uxky8U5n6l4hPtErrwAJCnyaRQZaqFKGik9ebQX32l74VO?=
- =?us-ascii?Q?lNulQfm7Twgfe1QYpVayPYlMD9t91eCuwbaEqiEP8iw/iKdB4KkThatJWi/r?=
- =?us-ascii?Q?crqtwLYTb0hT0kghVFmK4sJTWcwXlWrMSM9qDrEoYhGUNz/7hU6gnk1gZgUV?=
- =?us-ascii?Q?mlBQjaCF+T8+XChvkoIvaODQxcrroo7XepTTaB1Uia3IN222cyr9eeI5xsdH?=
- =?us-ascii?Q?/MSf7gOtaD6F2frXVcVGeYELtDiBFnUGaJVAYt7VvSWMYUVRhxDR3TdI87R0?=
- =?us-ascii?Q?tLBPzvPx5dA0o7VR/KfMtQFLPVjzf5K1Voh3ywkoJD6HeokrMXsq5SUBgryk?=
- =?us-ascii?Q?utUGlf6U+UlV9Y4ywGY7yr80quUJmApjzKLvEPF73ALZEfDP9V6kbkO3aBnV?=
- =?us-ascii?Q?Vkfykzlqqkb23PMhQ/SLcyVZpxweENMEYatmGFsy1WsuXZcFtEWxK0n3uv6A?=
- =?us-ascii?Q?SMzsMCPiO/4g6ygY4D/yZKwfk7CJZ28T499+VG51b+qXIF9oISy3ybtPzbyG?=
- =?us-ascii?Q?ekWSBvhmfrPDgQ80a7GJGF+cIIJ1a7QtB5hmpW8FbjE7zz3oa4HFNYsVnUGf?=
- =?us-ascii?Q?l/3tnMDOyfKVd9EnbTcB9/sLY00e5/SivfSCxgsrSDksa2RLdmEAXPhCLqE3?=
- =?us-ascii?Q?WAcldaiJ5CnIvqYvOiTUXAj1jYYi2DhSef9fwHUJcArcYFYZvMCPiGmyt+bx?=
- =?us-ascii?Q?GhpzN6WU0T6s/JyTc7Ppoim0yWwANzi/U+fcnb4iMUquyhl6bFDOVJB+4y2c?=
- =?us-ascii?Q?WTRQxpwn1tPyDO/FIJeO0ncmaaXxCNUIC8hL49S/f9PXg0qcz8Wc73k0j0H6?=
- =?us-ascii?Q?IUTtnAiGUa5CHpPTWXXABFSafRLc5nEGiFJL5l7cnNUsJAXDfIOGXWqiUQLP?=
- =?us-ascii?Q?84ubunnY+X3yJYhOmcGfmalHKN+dstzjQjjuOy3Buqlpf3RjodXA/9JObGa4?=
- =?us-ascii?Q?ThFrMj5XFiqksd+5aGe2AjCxtM7bRnhN9/cfrwbrtnp97jw3+PQK8w3mOJFL?=
- =?us-ascii?Q?Jm6wv5k/Geiwl5YBmlBMEV4d0UmJJiXN0veV3jQyN9sltC8mycejMD3yac+O?=
- =?us-ascii?Q?vaiHNYD4rsC4f75p5KcFpQP5UfTLz8u6XcpVjwe584OgTUSD2wXLN+B2i7LD?=
- =?us-ascii?Q?6QpKlRB7D//fiq2BZrkImZlB06o+slZnq5bp?=
+	=?utf-8?B?U3kzQkNVMmN4NzlMbEtmeE43Nk5OM1N0d1IyU2lzMWRwek9wWjltWi95Z2N0?=
+ =?utf-8?B?bTliSFk5MERodXh0VE0xdENCTG5qMVhXakZhU0FIampLVTYwcjRwdkZJTVQ4?=
+ =?utf-8?B?SjVJWlVtTmdya1VQaC9NRms3aXFkY0tieWFWVlRBUGp5NG80ME0yazB1NUo1?=
+ =?utf-8?B?cGg5MnVZYUN4YXpLN0ZaSkl1OGkzeElyZ1Z2ZGxaZ1dNWmVpMjM4VUxXM0kr?=
+ =?utf-8?B?ZGUxMUlvTlkvd1dSbWYxMU4zQWNTRWxDbHVjRlZ2L29WWGprN2M0N0F4NjAv?=
+ =?utf-8?B?V2l6c3Q1UVNzQWJua0pyWEs2dFY2S2xFWnhXc09HRmExUDJwUzE3bUpDMnZP?=
+ =?utf-8?B?L3VXb3VCdkFqUytjdFpqWXNBd05RZnQzTUxlNXFSdkl4VWN5SklJbVhVcU1w?=
+ =?utf-8?B?cGVGN1oyT2d5VVlJUUFhZ2U4OGMrWXFodDJ0QUpYSTk3M0R2dHVNQ01ocnkv?=
+ =?utf-8?B?b2hpY21RL3V4TUNweURJbCtRRHpLTDY4K1BhVGRYaHBUbFZ0d2xEVU0wcUZU?=
+ =?utf-8?B?SWNZeHJCVmE4d2dFMGJUOElodXpBeGgxYnBUVmFSM1VOdFh1bVFRYldBVWN3?=
+ =?utf-8?B?ZXBHUWI1UXQvQmtWelY4akd6YnIwSWZnRi9ZZU90ck8wYU9wemtJekMxaGRN?=
+ =?utf-8?B?ZGlkSmhibEVDZ24zTzVDV3lrNVdjTVpOUWZOMEZBU0JkK1l0TnM0SFJHSzdV?=
+ =?utf-8?B?MDI2RFZrcmNqU0xGbXFKYStJTXBlYW90VERDZmhxa2JxdENYamUrUks4QWJ3?=
+ =?utf-8?B?OXpQY29mVGg1Z3hwMnluRzFsV3NHbnk4UDZHSjBCblJNSHVMY0ZLNFBUNjBK?=
+ =?utf-8?B?OXVadWNoVDB6aDNmOG9FQzllUjQ0eTMwY3hENFpIazJVakg5bWhVeENYVVV4?=
+ =?utf-8?B?aHNNNU14Zmkvd0lEZnc4clZWUWpNWS9ZOHJ5ZllJaUV5eWpTQlJzd2JSbHFy?=
+ =?utf-8?B?RlNNVTUxdUJBZGFZdHAzZmo1dEdvbFMrR0loSDErZTF4bW9VZWpPQllYRnQz?=
+ =?utf-8?B?YU92VDcxWnpYRGJtZGVjZVRCYlA4Y3ZsU1hSZU9zWm02bFpOVEk2d1kzKzd2?=
+ =?utf-8?B?dFR4WXI3ZUR6Nlo0L2p0TFQyZEljUWo3YXF0Nk9KU0duU0FCL2toMERPSHdQ?=
+ =?utf-8?B?U01VbW1Tcmk1bHdhald6WmNEWDlvN0FyVFl2OFkvYlJPY3IvY0YyRGFrWVlQ?=
+ =?utf-8?B?SmE4Vk94b3hlNVRISk1qVFpoNEpyRjJVUFIybVEvZVJpaC9NUW5vaFN3emlw?=
+ =?utf-8?B?MFJ1UUpJRzNteHBCZjgvOTBCODFNMGVXU0FlakdjUklQOTM4dFhIRVgyVmtV?=
+ =?utf-8?B?dXF5UXVBUGZSR0ozR0JjNkYyQzVybG5NUkxHSTlOMUFaZEZ2V3Y0N21oNGJy?=
+ =?utf-8?B?Ny9sVktpUzExYWpkeE9hdHQxQ3grSlVOd1pWSmRseU9DZ0tyWTZjdVU5UW5B?=
+ =?utf-8?B?UVBKSUxxdjl0Ri9JcHYyeXorOEZuZkRLSHprakkrMUU5ZjRwMXJuYkY0TXll?=
+ =?utf-8?B?dG9LU01IMVNDbjV6bUhuTk1VaHJTMENmTlczNnFJZjk0WHg2TWhDVENISmVk?=
+ =?utf-8?B?cW1hTEFPeTFjZEdhNkFhZnR1UUcvdUlLdnoyTzFpR0NNTXlaQ1NaSFRlSmlE?=
+ =?utf-8?B?WW1yR3NIcmV5UkQ2bzllNFc1MjFRRjJLYkdVNlJLR1hCRkwyN2ZhVlVXT1Ns?=
+ =?utf-8?B?d3cwUk5tc1ROTUo4RFp5Y0FPZkNOU0J1N1Ezc3ZrYjUzcDNDZTRULzVydytq?=
+ =?utf-8?B?V0puS2Q0UllqcnNEL3B4bStEczhjSEpoQWVUL3ZwQjNiUjhlaWdOWEphUnI3?=
+ =?utf-8?B?UFl4VXFNQUw2ODFjWUFUUmJ6OUtRYk9HbTZEbTJja2htSnpRYm8xZUdjd0Rs?=
+ =?utf-8?Q?kM0EW3QPH3vDe?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700013)(376014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6599.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?RjdScEhQS1BpSnBTR0sxWlJvTVVlbHJ4OUVtSm03NUJoSTFwVHozQndOWG9N?=
+ =?utf-8?B?UWdzazl1SlcwNGdNZGs2MHpibDJNVUw0aVNIRG1mZ3lrOXJKZWFoNjJlTjFS?=
+ =?utf-8?B?SnY4aTEzR2xZUytPblhqTm81ZU5BZytpRE1QNkQvbGtMMVNxak5MSHp0YlF3?=
+ =?utf-8?B?UVQ2c1lQdndFcHlEL3pCeU0zZ0JzR0lkRUo4UEJTZGdTbkRVTXZrZHFwY0Rt?=
+ =?utf-8?B?R0pvTEdQbDhiN2oxUGJrNFIva29qMmZjdnVEcEg2cVJMWUFKOFhXaERTODQ4?=
+ =?utf-8?B?ZmpOSEFiZlBrQ0tweVU4VThXYXRSbWhrR004M2NYMThnSFZKaUtYcEIyQWN6?=
+ =?utf-8?B?UlFNYm04YWxySE1CVUdrL0Fack05dHFGaXVab3MvM1Y5bVlzeDBIN0FhZVlv?=
+ =?utf-8?B?VCtnUG9kTDErOXBLaWFsRS82ZVRDS2dpOTVNTllsQlZSUFByZWFSYXZMbzgx?=
+ =?utf-8?B?bk45MlRkVTFqVDJJTTlncFpBZSsvZjFxTjFNb1JYeG1lMnV3OFNRL05CamVp?=
+ =?utf-8?B?TjF1ak9WMlUyaDRUNUpDN21weC9nYlVlWHFBdC8yaTZnN201SjNmTlZMK2pG?=
+ =?utf-8?B?Smt1RzdUSFlEenVYTGRodDJackNjVnRUR2ExZk04MjNGVTR2OVJaVjkvd3M4?=
+ =?utf-8?B?MldEUEtaWEt5bVJVa0lscXZoTjhmUE9UTm5xeTVid2puOEVKVlZrTHdGRHRT?=
+ =?utf-8?B?bUYrbEpLcndJTFlianpXWittWFA0QjZ3WmVVT3dWNEtvR1ozUFA0cmllMHE2?=
+ =?utf-8?B?NTUzRThxRmM5aEJIa2VMblVDTUFNcnQ3eE1TQS9qbGZLT294Q2x3VVZ4b1R6?=
+ =?utf-8?B?OEsxaVdjUmdNaXZ3UVZDRzlGMU04S3pYRW5rUmxZTWwrV1hXNlkyeHpPZkR0?=
+ =?utf-8?B?MUF3YlRKV3RkZENKVWJrQWdyclNwU3lTSDhuc3V0SVNYUG42Yk92K1BVcWdl?=
+ =?utf-8?B?dzlhVXQ0MVozN293L3QrangrRDVVSisvMmU5aHF6MEV1MFNQNUhoUzcwNktU?=
+ =?utf-8?B?MGhrd3gyc2taWE50ZUZQaE9JSEVLaFBmeFE4eTczTHYxYWFWNU1oYnViRkty?=
+ =?utf-8?B?K214eUd1M3ZtWXNQWUZaUldCcjF6aS9VbjhVanhjMENNZk8rY3FDZi9HODFB?=
+ =?utf-8?B?NjZNdUxlYS9QSk15aG00N05uN3pIQzZQbXRwdmN0czVnSjZzcTdpZTJRVmRs?=
+ =?utf-8?B?RmdLMCtZb3oyV1ZFWnlrcXBFQkx5bWJ5MVJXZFNjaHV5L1dxWnVpQ0dVMDhW?=
+ =?utf-8?B?MjlNQXVSWTJjRVh1aEwybGVsY2xTQnVxcFllMkE0MGJVQjFra1p6TlgwbWhC?=
+ =?utf-8?B?bHQvYWtEdkcvL3V5RHRyL1U0b00zN2gxbnR1TFpGckcxVGJBRmxock5TL3Zw?=
+ =?utf-8?B?dGJ2YS84Q1NlQW13NFkyNnB3Nk5zZUduaVVDcW43eUdOZGhzeW1oUE5Na0s4?=
+ =?utf-8?B?cnlqcCtSaWJlOUtJeHhEOFFvTzZUQmJCdDRvR0R2bnNBK2UvYkFOKzlKTVp3?=
+ =?utf-8?B?K3BvOVhhSGVSYVM3SXFsSUxIM212K0FSeExVeHVINVVUM2xneW5TV0ZCMVc3?=
+ =?utf-8?B?Vkk3UXZEU0xDcllTWmdweVNsK003eEtGQ2dmRzM0bTZSdmVlRlpmZ1hiUUdB?=
+ =?utf-8?B?d1ZmRWR0aEdob3JjdE1GVEJadjM1WmhvSFNqeFpoVmhsM1U4eElGbDQxTlpJ?=
+ =?utf-8?B?RXg2b1BkazBSQUlSRHBKbFRpTVF3amN0MS9TQmRjcFhQWjlTeXJCSFZZc0ZF?=
+ =?utf-8?B?TS9jVmJTK0NGOGlZQVAvaEpyYXhKQk15T1FWdDBoekIxeEMyKzhIQ09jeS9U?=
+ =?utf-8?B?VWF6K043L2JSM1FwQnhwYytqT0l6RzJzNDlUT05LYTQyY2VVblFqalFIUVlT?=
+ =?utf-8?B?anUva3hFT3Z4QkRhWGVoTEF0WmJtSDltVnVQcXB2SVoxaGhPTHlkNU16a1Ar?=
+ =?utf-8?B?NkVBZUd5aXR4T3FXV2NxN3NZNytCMkNacnBDYitKanVLZGlQS0tDOFdvVE5B?=
+ =?utf-8?B?L3Zya2FOSnFHZ0FvN0dPY01xNkFYY0liaExBL0ZGSWdjLzlOcVpTZFFJV1NG?=
+ =?utf-8?B?NVR1dm42dDBWWjFJd3c1VVRtMWdJZkNRMVMzSlpEK1Z1Q25OYlpkR29ZY0du?=
+ =?utf-8?Q?jxhcdhtqsaqheBukud2QuRU0h?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Apr 2025 11:52:17.2269
+X-MS-Exchange-CrossTenant-Network-Message-Id: 767106db-157e-4e43-97d7-08dd7da770c5
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6599.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Apr 2025 12:00:26.7107
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 60f32a41-3a95-41c8-e7c0-08dd7da64d71
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000A6730.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7452
-
-Hi everyone,
-I am seeing following errors on the host when I run FIO tests inside the
-guest on the latest upstream kernel. This causes guest to hang. Can anyone help with this ? 
-
-I have done some cursory analysis of the trace and it seems the reason is
-`vfio_pci_mmap_huge_fault`. I think following scenario is causing the
-deadlock.
-
-     CPU0                     CPU1                                    CPU2
-(Trying do                      (Trying to perform                  (Receives fault
-`vfio_pci_set_msi_trigger())     operation with sysfs               during vfio_pin_pages_remote())
-                                 /sys/bus/pci/devices/<devid>) 
-                            
-===================================================================================================
-(A) vdev->memory_lock
-    (vfio_msi_enable())
-                                (C) root->kernfs_rwsem
-                                    (kernfs_fop_readdir())
-(B) root->kernfs_rwsem
-    (kernfs_add_one())
-                                                                    (E) mm->mmap_lock
-                                                                        (do_user_addr_fault())
-                                (D) mm->mmap_lock
-                                   (do_user_addr_fault())
-                                                                    (F) vdev->memory_lock
-                                                                        (vfio_pci_mmap_huge_fault())
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: XCsxZk8NYbXOTFAOyGGvuuQUJsF9NLapnOln9oeIBA2AgrZ6c0iZXiyu3l91hrVlbScFyByvudE1qViyVedVWQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4448
 
 
-Here, there is circular dependency of A->B->C->D->E->F->A.
-Please let me know if anyone encountered this. I will be happy to help!
----------------------------------------------------------------------------------
 
-[ 1457.982233] ======================================================
-[ 1457.989494] WARNING: possible circular locking dependency detected
-[ 1457.996764] 6.15.0-rc1-0af2f6be1b42-1744803490343 #1 Not tainted
-[ 1458.003842] ------------------------------------------------------
-[ 1458.011105] CPU 0/KVM/8259 is trying to acquire lock:
-[ 1458.017107] ff27171d80a8e960 (&root->kernfs_rwsem){++++}-{4:4}, at: kernfs_add_one+0x34/0x380
-[ 1458.027027]
-[ 1458.027027] but task is already holding lock:
-[ 1458.034273] ff27171e19663918 (&vdev->memory_lock){++++}-{4:4}, at: vfio_pci_memory_lock_and_enable+0x2c/0x90 [vfio_pci_core]
-[ 1458.047221]
-[ 1458.047221] which lock already depends on the new lock.
-[ 1458.047221]
-[ 1458.057506]
-[ 1458.057506] the existing dependency chain (in reverse order) is:
-[ 1458.066629]
-[ 1458.066629] -> #2 (&vdev->memory_lock){++++}-{4:4}:
-[ 1458.074509]        __lock_acquire+0x52e/0xbe0
-[ 1458.079778]        lock_acquire+0xc7/0x2e0
-[ 1458.084764]        down_read+0x35/0x270
-[ 1458.089437]        vfio_pci_mmap_huge_fault+0xac/0x1c0 [vfio_pci_core]
-[ 1458.097135]        __do_fault+0x30/0x180
-[ 1458.101918]        do_shared_fault+0x2d/0x1b0
-[ 1458.107189]        do_fault+0x41/0x390
-[ 1458.111779]        __handle_mm_fault+0x2f6/0x730
-[ 1458.117339]        handle_mm_fault+0xd8/0x2a0
-[ 1458.122606]        fixup_user_fault+0x7f/0x1d0
-[ 1458.127963]        vaddr_get_pfns+0x129/0x2b0 [vfio_iommu_type1]
-[ 1458.135073]        vfio_pin_pages_remote+0xd4/0x430 [vfio_iommu_type1]
-[ 1458.142771]        vfio_pin_map_dma+0xd4/0x350 [vfio_iommu_type1]
-[ 1458.149979]        vfio_dma_do_map+0x2dd/0x450 [vfio_iommu_type1]
-[ 1458.157183]        vfio_iommu_type1_ioctl+0x126/0x1c0 [vfio_iommu_type1]
-[ 1458.165076]        __x64_sys_ioctl+0x94/0xc0
-[ 1458.170250]        do_syscall_64+0x72/0x180
-[ 1458.175320]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[ 1458.181944]
-[ 1458.181944] -> #1 (&mm->mmap_lock){++++}-{4:4}:
-[ 1458.189446]        __lock_acquire+0x52e/0xbe0
-[ 1458.194703]        lock_acquire+0xc7/0x2e0
-[ 1458.199676]        down_read_killable+0x35/0x280
-[ 1458.205229]        lock_mm_and_find_vma+0x96/0x280
-[ 1458.210979]        do_user_addr_fault+0x1da/0x710
-[ 1458.216638]        exc_page_fault+0x6d/0x200
-[ 1458.221814]        asm_exc_page_fault+0x26/0x30
-[ 1458.227274]        filldir64+0xee/0x170
-[ 1458.231963]        kernfs_fop_readdir+0x102/0x2e0
-[ 1458.237620]        iterate_dir+0xb1/0x2a0
-[ 1458.242509]        __x64_sys_getdents64+0x88/0x130
-[ 1458.248282]        do_syscall_64+0x72/0x180
-[ 1458.253371]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[ 1458.260006]
-[ 1458.260006] -> #0 (&root->kernfs_rwsem){++++}-{4:4}:
-[ 1458.268012]        check_prev_add+0xf1/0xca0
-[ 1458.273187]        validate_chain+0x610/0x6f0
-[ 1458.278452]        __lock_acquire+0x52e/0xbe0
-[ 1458.283711]        lock_acquire+0xc7/0x2e0
-[ 1458.288678]        down_write+0x32/0x1d0
-[ 1458.293442]        kernfs_add_one+0x34/0x380
-[ 1458.298588]        kernfs_create_dir_ns+0x5a/0x90
-[ 1458.304214]        internal_create_group+0x11e/0x2f0
-[ 1458.310131]        devm_device_add_group+0x4a/0x90
-[ 1458.315860]        msi_setup_device_data+0x60/0x110
-[ 1458.321679]        pci_setup_msi_context+0x19/0x60
-[ 1458.327398]        __pci_enable_msix_range+0x19d/0x640
-[ 1458.333513]        pci_alloc_irq_vectors_affinity+0xab/0x110
-[ 1458.340211]        vfio_pci_set_msi_trigger+0x8c/0x230 [vfio_pci_core]
-[ 1458.347883]        vfio_pci_core_ioctl+0x2a6/0x420 [vfio_pci_core]
-[ 1458.355164]        vfio_device_fops_unl_ioctl+0x81/0x140 [vfio]
-[ 1458.362155]        __x64_sys_ioctl+0x93/0xc0
-[ 1458.367295]        do_syscall_64+0x72/0x180
-[ 1458.372336]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[ 1458.378932]
-[ 1458.378932] other info that might help us debug this:
-[ 1458.378932]
-[ 1458.388965] Chain exists of:
-[ 1458.388965]   &root->kernfs_rwsem --> &mm->mmap_lock --> &vdev->memory_lock
-[ 1458.388965]
-[ 1458.402717]  Possible unsafe locking scenario:
-[ 1458.402717]
-[ 1458.410064]        CPU0                    CPU1
-[ 1458.415495]        ----                    ----
-[ 1458.420939]   lock(&vdev->memory_lock);
-[ 1458.425597]                                lock(&mm->mmap_lock);
-[ 1458.432683]                                lock(&vdev->memory_lock);
-[ 1458.440153]   lock(&root->kernfs_rwsem);
-[ 1458.444905]
-[ 1458.444905]  *** DEADLOCK ***
-[ 1458.444905]
-[ 1458.452589] 2 locks held by CPU 0/KVM/8259:
-[ 1458.457627]  #0: ff27171e196636b8 (&vdev->igate){+.+.}-{4:4}, at: vfio_pci_core_ioctl+0x28a/0x420 [vfio_pci_core]
-[ 1458.469499]  #1: ff27171e19663918 (&vdev->memory_lock){++++}-{4:4}, at: vfio_pci_memory_lock_and_enable+0x2c/0x90 [vfio_pci_core]
-[ 1458.483306]
-[ 1458.483306] stack backtrace:
-[ 1458.488927] CPU: 169 UID: 0 PID: 8259 Comm: CPU 0/KVM Not tainted 6.15.0-rc1-0af2f6be1b42-1744803490343 #1 PREEMPT(voluntary)
-[ 1458.488933] Hardware name: AMD Corporation RUBY/RUBY, BIOS RRR100EB 12/05/2024
-[ 1458.488936] Call Trace:
-[ 1458.488940]  <TASK>
-[ 1458.488944]  dump_stack_lvl+0x78/0xe0
-[ 1458.488954]  print_circular_bug+0xd5/0xf0
-[ 1458.488965]  check_noncircular+0x14c/0x170
-[ 1458.488970]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 1458.488976]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 1458.488980]  ? find_held_lock+0x32/0x90
-[ 1458.488986]  ? local_clock_noinstr+0xd/0xc0
-[ 1458.489001]  check_prev_add+0xf1/0xca0
-[ 1458.489006]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 1458.489015]  validate_chain+0x610/0x6f0
-[ 1458.489027]  __lock_acquire+0x52e/0xbe0
-[ 1458.489032]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 1458.489035]  ? __lock_release+0x15d/0x2a0
-[ 1458.489046]  lock_acquire+0xc7/0x2e0
-[ 1458.489051]  ? kernfs_add_one+0x34/0x380
-[ 1458.489060]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 1458.489063]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 1458.489067]  ? __lock_release+0x15d/0x2a0
-[ 1458.489080]  down_write+0x32/0x1d0
-[ 1458.489085]  ? kernfs_add_one+0x34/0x380
-[ 1458.489090]  kernfs_add_one+0x34/0x380
-[ 1458.489100]  kernfs_create_dir_ns+0x5a/0x90
-[ 1458.489107]  internal_create_group+0x11e/0x2f0
-[ 1458.489118]  devm_device_add_group+0x4a/0x90
-[ 1458.489128]  msi_setup_device_data+0x60/0x110
-[ 1458.489136]  pci_setup_msi_context+0x19/0x60
-[ 1458.489144]  __pci_enable_msix_range+0x19d/0x640
-[ 1458.489150]  ? pci_conf1_read+0x4e/0xf0
-[ 1458.489154]  ? find_held_lock+0x32/0x90
-[ 1458.489162]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 1458.489165]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 1458.489172]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 1458.489176]  ? mark_held_locks+0x40/0x70
-[ 1458.489182]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 1458.489191]  pci_alloc_irq_vectors_affinity+0xab/0x110
-[ 1458.489206]  vfio_pci_set_msi_trigger+0x8c/0x230 [vfio_pci_core]
-[ 1458.489222]  vfio_pci_core_ioctl+0x2a6/0x420 [vfio_pci_core]
-[ 1458.489231]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 1458.489241]  vfio_device_fops_unl_ioctl+0x81/0x140 [vfio]
-[ 1458.489252]  __x64_sys_ioctl+0x94/0xc0
-[ 1458.489262]  do_syscall_64+0x72/0x180
-[ 1458.489269]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[ 1458.489273] RIP: 0033:0x7f0898724ded
-[ 1458.489279] Code: 04 25 28 00 00 00 48 89 45 c8 31 c0 48 8d 45 10 c7 45 b0 10 00 00 00 48 89 45 b8 48 8d 45 d0 48 89 45 c0 b8 10 00 00 00 0f 05 <89> c2 3d 00 f0 ff ff 77 1a 48 8b 45 c8 64 48 2b 04 25 28 00 00 00
-[ 1458.489282] RSP: 002b:00007f08965622a0 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-[ 1458.489286] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f0898724ded
-[ 1458.489289] RDX: 00007f07800f6d00 RSI: 0000000000003b6e RDI: 000000000000001e
-[ 1458.489291] RBP: 00007f08965622f0 R08: 00007f07800008e0 R09: 0000000000000001
-[ 1458.489293] R10: 0000000000000007 R11: 0000000000000246 R12: 0000000000000000
-[ 1458.489295] R13: fffffffffffffb28 R14: 0000000000000007 R15: 00007ffd0ef83ae0
-[ 1458.489315]  </TASK>
+On 4/17/2025 4:20 PM, Thomas Gleixner wrote:
+> On Thu, Apr 17 2025 at 14:46, Neeraj Upadhyay wrote:
+>> Add update_vector callback to set/clear ALLOWED_IRR field in
+>> a vCPU's APIC backing page for external vectors. The ALLOWED_IRR
+>> field indicates the interrupt vectors which the guest allows the
+>> hypervisor to send (typically for emulated devices). Interrupt
+>> vectors used exclusively by the guest itself and the vectors which
+>> are not emulated by the hypervisor, such as IPI vectors, are part
+>> of system vectors and are not set in the ALLOWED_IRR.
+> 
+> Please structure changelogs properly in paragraphs:
+> 
+>   https://www.kernel.org/doc/html/latest/process/maintainer-tip.html#changelog
+> 
+
+Ok
+
+>>  arch/x86/include/asm/apic.h         |  9 +++++
+>>  arch/x86/kernel/apic/vector.c       | 53 ++++++++++++++++++++++-------
+>>  arch/x86/kernel/apic/x2apic_savic.c | 35 +++++++++++++++++++
+> 
+> And split this patch up into two:
+> 
+>   1) Do the modifications in vector.c which is what the $Subject line
+>      says
+> 
+>   2) Add the SAVIC specific bits
+> 
+
+Ok
+
+>> @@ -471,6 +473,12 @@ static __always_inline bool apic_id_valid(u32 apic_id)
+>>  	return apic_id <= apic->max_apic_id;
+>>  }
+>>  
+>> +static __always_inline void apic_update_vector(unsigned int cpu, unsigned int vector, bool set)
+>> +{
+>> +	if (apic->update_vector)
+>> +		apic->update_vector(cpu, vector, set);
+>> +}
+> 
+> This is in the public header because it can?
+>
+
+apic_update_vector() is needed for some system vectors which are emulated/injected
+by Hypervisor. Patch 8 calls it for lapic timer. HYPERVISOR_CALLBACK_VECTOR would need
+it for hyperv. This patch series does not call apic_update_vector() for
+HYPERVISOR_CALLBACK_VECTOR though.
+
+Given that currently this callback is not used outside of apic code,
+do I need to add it to arch/x86/kernel/apic/local.h or just remove it and use
+conditional call in current callsites?
+ 
+   
+>> -static void apic_update_vector(struct irq_data *irqd, unsigned int newvec,
+>> -			       unsigned int newcpu)
+>> +static int irq_alloc_vector(const struct cpumask *dest, bool resvd, unsigned int *cpu)
+>> +{
+>> +	int vector;
+>> +
+>> +	vector = irq_matrix_alloc(vector_matrix, dest, resvd, cpu);
+> 
+>         int vector = irq_matrix_alloc(...);
+> 
+
+Ok
+
+>> +
+>> +	if (vector >= 0)
+>> +		apic_update_vector(*cpu, vector, true);
+>> +
+>> +	return vector;
+>> +}
+>> +
+>> +static int irq_alloc_managed_vector(unsigned int *cpu)
+>> +{
+>> +	int vector;
+>> +
+>> +	vector = irq_matrix_alloc_managed(vector_matrix, vector_searchmask, cpu);
+>> +
+>> +	if (vector >= 0)
+>> +		apic_update_vector(*cpu, vector, true);
+>> +
+>> +	return vector;
+>> +}
+> 
+> I completely fail to see the value of these two functions. Each of them
+> has exactly _ONE_ call site and both sites invoke apic_update_vector()
+
+Ok, this was done to associate apic->update_vector() calls with the
+setup (irq_matrix_alloc()) and teardown (irq_matrix_free()) of vector,
+which was my understanding from your suggestion here: 
+https://lore.kernel.org/lkml/87jz8i31dv.ffs@tglx/ . Given that there
+is single callsite for each and vector_configure_legacy() calls
+apic->update_vector() outside of alloc path, adding it to apic_update_irq_cfg(),
+as you suggest handles all callers.
+
+
+> when the allocation succeeded. Why can't you just do the obvious and
+> leave the existing code alone and add
+> 
+>       if (apic->update_vector)
+>       		apic->update_vector();
+> 
+> into apic_update_vector()? But then you have another place where you
+> need the update, which does not invoke apic_update_vector().
+> 
+> Now if you look deeper, then you notice that all places which invoke
+> apic_update_vector() invoke apic_update_irq_cfg(), which is also called
+> at this other place, no?
+> 
+
+Yes, makes sense. apic_update_irq_cfg() is called for MANAGED_IRQ_SHUTDOWN_VECTOR
+also. I am not aware of the use case of that vector. Whethere it is an interrupt
+which is injected by Hypervisor.
+
+
+static void vector_assign_managed_shutdown(struct irq_data *irqd)
+{
+        unsigned int cpu = cpumask_first(cpu_online_mask);
+
+        apic_update_irq_cfg(irqd, MANAGED_IRQ_SHUTDOWN_VECTOR, cpu);
+}
+
+
+>> +static void irq_free_vector(unsigned int cpu, unsigned int vector, bool managed)
+>> +{
+>> +	apic_update_vector(cpu, vector, false);
+>> +	irq_matrix_free(vector_matrix, cpu, vector, managed);
+>> +}
+> 
+> This one makes sense, but please name it: apic_free_vector()
+> 
+
+Ok
+
+> Something like the uncompiled below, no?
+> 
+
+Ok, makes sense. Looks good.
+
+
+- Neeraj
+
+> Thanks,
+> 
+>         tglx
+> ---
+> --- a/arch/x86/kernel/apic/vector.c
+> +++ b/arch/x86/kernel/apic/vector.c
+> @@ -134,9 +134,19 @@ static void apic_update_irq_cfg(struct i
+>  
+>  	apicd->hw_irq_cfg.vector = vector;
+>  	apicd->hw_irq_cfg.dest_apicid = apic->calc_dest_apicid(cpu);
+> +
+> +	if (apic->update_vector)
+> +		apic->update_vector(cpu, vector, true);
+> +
+>  	irq_data_update_effective_affinity(irqd, cpumask_of(cpu));
+> -	trace_vector_config(irqd->irq, vector, cpu,
+> -			    apicd->hw_irq_cfg.dest_apicid);
+> +	trace_vector_config(irqd->irq, vector, cpu, apicd->hw_irq_cfg.dest_apicid);
+> +}
+> +
+> +static void apic_free_vector(unsigned int cpu, unsigned int vector, bool managed)
+> +{
+> +	if (apic->update_vector)
+> +		apic->update_vector(cpu, vector, false);
+> +	irq_matrix_free(vector_matrix, cpu, vector, managed);
+>  }
+>  
+>  static void apic_update_vector(struct irq_data *irqd, unsigned int newvec,
+> @@ -174,8 +184,7 @@ static void apic_update_vector(struct ir
+>  		apicd->prev_cpu = apicd->cpu;
+>  		WARN_ON_ONCE(apicd->cpu == newcpu);
+>  	} else {
+> -		irq_matrix_free(vector_matrix, apicd->cpu, apicd->vector,
+> -				managed);
+> +		apic_free_vector(apicd->cpu, apicd->vector, managed);
+>  	}
+>  
+>  setnew:
+> @@ -183,6 +192,7 @@ static void apic_update_vector(struct ir
+>  	apicd->cpu = newcpu;
+>  	BUG_ON(!IS_ERR_OR_NULL(per_cpu(vector_irq, newcpu)[newvec]));
+>  	per_cpu(vector_irq, newcpu)[newvec] = desc;
+> +	apic_update_irq_cfg(irqd, newvec, newcpu);
+>  }
+>  
+>  static void vector_assign_managed_shutdown(struct irq_data *irqd)
+> @@ -261,8 +271,6 @@ assign_vector_locked(struct irq_data *ir
+>  	if (vector < 0)
+>  		return vector;
+>  	apic_update_vector(irqd, vector, cpu);
+> -	apic_update_irq_cfg(irqd, vector, cpu);
+> -
+>  	return 0;
+>  }
+>  
+> @@ -338,7 +346,6 @@ assign_managed_vector(struct irq_data *i
+>  	if (vector < 0)
+>  		return vector;
+>  	apic_update_vector(irqd, vector, cpu);
+> -	apic_update_irq_cfg(irqd, vector, cpu);
+>  	return 0;
+>  }
+>  
+> @@ -357,7 +364,7 @@ static void clear_irq_vector(struct irq_
+>  			   apicd->prev_cpu);
+>  
+>  	per_cpu(vector_irq, apicd->cpu)[vector] = VECTOR_SHUTDOWN;
+> -	irq_matrix_free(vector_matrix, apicd->cpu, vector, managed);
+> +	apic_free_vector(apicd->cpu, vector, managed);
+>  	apicd->vector = 0;
+>  
+>  	/* Clean up move in progress */
+> @@ -366,7 +373,7 @@ static void clear_irq_vector(struct irq_
+>  		return;
+>  
+>  	per_cpu(vector_irq, apicd->prev_cpu)[vector] = VECTOR_SHUTDOWN;
+> -	irq_matrix_free(vector_matrix, apicd->prev_cpu, vector, managed);
+> +	apic_free_vector(apicd->prev_cpu, vector, managed);
+>  	apicd->prev_vector = 0;
+>  	apicd->move_in_progress = 0;
+>  	hlist_del_init(&apicd->clist);
+> @@ -905,7 +912,7 @@ static void free_moved_vector(struct api
+>  	 *    affinity mask comes online.
+>  	 */
+>  	trace_vector_free_moved(apicd->irq, cpu, vector, managed);
+> -	irq_matrix_free(vector_matrix, cpu, vector, managed);
+> +	apic_free_vector(cpu, vector, managed);
+>  	per_cpu(vector_irq, cpu)[vector] = VECTOR_UNUSED;
+>  	hlist_del_init(&apicd->clist);
+>  	apicd->prev_vector = 0;
+
 
