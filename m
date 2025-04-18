@@ -1,133 +1,119 @@
-Return-Path: <kvm+bounces-43608-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43609-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7023DA931A7
-	for <lists+kvm@lfdr.de>; Fri, 18 Apr 2025 07:50:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4513A93224
+	for <lists+kvm@lfdr.de>; Fri, 18 Apr 2025 08:35:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E9D4C1B62E48
-	for <lists+kvm@lfdr.de>; Fri, 18 Apr 2025 05:50:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6FC18E5B6B
+	for <lists+kvm@lfdr.de>; Fri, 18 Apr 2025 06:34:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4493253358;
-	Fri, 18 Apr 2025 05:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AFB0269AFA;
+	Fri, 18 Apr 2025 06:33:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="NiRpihx+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fDB6cTas"
 X-Original-To: kvm@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DF601CF8B
-	for <kvm@vger.kernel.org>; Fri, 18 Apr 2025 05:50:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4B6255E23;
+	Fri, 18 Apr 2025 06:33:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744955427; cv=none; b=hymZ+QL2t88zCPnnPLOP0N6lTYmyOjEVQ5jd+VTEOmMFrgID+DPF9HeGuhvAuOyfi8MMkXOojzKfkbdqkqNzreNaNHOECD7BZ//xKOJGDsnScbfcdIR8J1snr1HPQye5W9IAAogF2csnoHuL7HJCMzFFyTwOaVd8e100F0iW3bY=
+	t=1744957989; cv=none; b=cAe+q1tMvg1GCWUWhWHPDVHEOb5ifFx9BeD25Uw9DIEu4H9qXNWL5W8Egjhknky5j9zHRWP7S3YjIQj88IoNq37eJ14lhIqu/OzzdCz0hlAo2kWJF5XkcLEbqlrygEY4kFXH2zJlnGOJRq8BvfJVve/ZQfUQTtLgUxxOrdwGnaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744955427; c=relaxed/simple;
-	bh=YM57sx3wBPpN8+B1hZwcTaa3eagLLxnA1JjSjGC+ro8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fXdG5bCpbajwUz4leUJnKKLxqmgWFcvxL9iAeH5DdLX10ZLhZqzdQ+Oa3qr86BuLxxlyTqFjm94X3AxMxsnRVbdBynp+cmG6QJH0Q7lfUY+VRFmujP7eU9NmbSguT5/RMwOAOPOZyO5NHA04u7hf01DhZkykZpsn0nIK7wfQbSY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=NiRpihx+; arc=none smtp.client-ip=220.197.31.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-ID:MIME-Version; bh=K4adI
-	7ccpTdRfN3HSGkuNWOP+075nSqil0uuYEAUuVI=; b=NiRpihx+WrSnQ0gVx8mQU
-	6xaRUwEJSZnsh0r36jVLpU5RCqE6uhJ52PWJU5s8wzCWpJsFQpbKMVXNIDbLdMED
-	qsgSsJWHX6CmCKY50dnRNicHCkHdlH1tm96KbocDbUOyJnXTuG83UGY0gWuZWDF9
-	PP96lrO+51LNYD7SCKD5H4=
-Received: from node-1.domain.tld (unknown [])
-	by gzga-smtp-mtada-g0-0 (Coremail) with SMTP id _____wBHS2cE6AFodXCPAw--.34969S2;
-	Fri, 18 Apr 2025 13:49:57 +0800 (CST)
-From: Jiayuan <ljykernel@163.com>
-To: kvm@vger.kernel.org
-Cc: linux-arm-kernel@lists.infradead.org,
-	marc.zyngier@arm.com
-Subject: [Question] arm64: KVM: Optimizing cache flush during MMU enable to single vCPU
-Date: Fri, 18 Apr 2025 13:49:55 +0800
-Message-ID: <20250418054955.1883037-1-ljykernel@163.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1744957989; c=relaxed/simple;
+	bh=/Hsg/wIAip3bXNiSNJ1fUrWPjc6vdLW/C5QDVAAVH/o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eVmamcO1K5+mZDtz1tBCwaG8NsYB/gJj48oU5stzf73XApCe9MrkVENC0OltgIKcKm1vJ7HTTm5JbK206NfWAdx2YNrZcObm/Kf31XIXxxB226oc0vAse8OA0A2kN2tyWj4zrPt+SaviOdyUTvF3PJ428hjlOUAW53IWq73SsWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fDB6cTas; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79D54C4CEE7;
+	Fri, 18 Apr 2025 06:33:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744957988;
+	bh=/Hsg/wIAip3bXNiSNJ1fUrWPjc6vdLW/C5QDVAAVH/o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fDB6cTas7MpmIUNXLReHxeCEJW+YiHQTxAb5KF0YomPXB6llTHu3OYGfLNBwFtTO8
+	 VLM1Xw6sNHca2y8L6v0LacS1bElaZ9WIE9VDVnapTvj3jt77NUrdL8Vj4FlMFKmb9Y
+	 pZEHl49jmyV6sAQnGoRNTljnBydFEZoAND0ezMLGODN7VjCOB8sby0db6wnGbH8Q8A
+	 yiCJMaOhVCov3l4+uLPrKufVLGcyx4yoL2OlhdSSn3AIip5gpjYwFnLpn9gYPCq4aK
+	 +ao7+U39Gfozhoigyybw3yK/5IqeAw/TzeEV23bmkzx8Khis6QjxYRsa+VTfX7s8YG
+	 jwGYJYnVkbd0Q==
+Date: Fri, 18 Apr 2025 08:33:02 +0200
+From: Ingo Molnar <mingo@kernel.org>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Mike Rapoport <rppt@kernel.org>, Andy Shevchenko <andy@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>, Arnd Bergmann <arnd@kernel.org>,
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@intel.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Davide Ciminaghi <ciminaghi@gnudd.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH] x86/e820: discard high memory that can't be addressed by
+ 32-bit systems
+Message-ID: <aAHyHuwbmhjWmDqc@gmail.com>
+References: <Z_rDdnlSs0rts3b9@gmail.com>
+ <20250413080858.743221-1-rppt@kernel.org>
+ <20250417162206.GA104424@ax162>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wBHS2cE6AFodXCPAw--.34969S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7WFy7JF1DXFW8tFW8uFyfJFb_yoW5Jr4fpF
-	Z7CF15tw4vgryIkanrtw48tr1FqrWkJF12q3s8Gw1Fvw15ZFn7WrykCrW8XFyDurs5Aa13
-	Ga129FyDZr4DX3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UpuWJUUUUU=
-X-CM-SenderInfo: 5om1yvhuqhzqqrwthudrp/1tbiSg8zbmgB5iM5+QAAs0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250417162206.GA104424@ax162>
 
-Hi,
 
-I'm investigating the cache flush behavior in the ARM64 KVM implementation, 
-specifically regarding the commit 9d218a1fcf4c6b759d442ef702842fae92e1ea61 by 
-Marc Zyngier that addresses cache flushing when guests enable caches.
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/arch/arm/kvm/mmu.c?id=9d218a1fcf4c6b759d442ef702842fae92e1ea61
+* Nathan Chancellor <nathan@kernel.org> wrote:
 
-In the current implementation, the function kvm_toggle_cache() in arch/arm/kvm/mmu.c 
-flushes the entire VM's stage2 page tables when any vCPU toggles its cache state:
+> Hi Mike,
+> 
+> On Sun, Apr 13, 2025 at 11:08:58AM +0300, Mike Rapoport wrote:
+> ...
+> >  arch/x86/kernel/e820.c | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> > 
+> > diff --git a/arch/x86/kernel/e820.c b/arch/x86/kernel/e820.c
+> > index 57120f0749cc..5f673bd6c7d7 100644
+> > --- a/arch/x86/kernel/e820.c
+> > +++ b/arch/x86/kernel/e820.c
+> > @@ -1300,6 +1300,14 @@ void __init e820__memblock_setup(void)
+> >  		memblock_add(entry->addr, entry->size);
+> >  	}
+> >  
+> > +	/*
+> > +	 * 32-bit systems are limited to 4BG of memory even with HIGHMEM and
+> > +	 * to even less without it.
+> > +	 * Discard memory after max_pfn - the actual limit detected at runtime.
+> > +	 */
+> > +	if (IS_ENABLED(CONFIG_X86_32))
+> > +		memblock_remove(PFN_PHYS(max_pfn), -1);
+> > +
+> >  	/* Throw away partial pages: */
+> >  	memblock_trim_memory(PAGE_SIZE);
+> 
+> Our CI noticed a boot failure after this change as commit 1e07b9fad022
+> ("x86/e820: Discard high memory that can't be addressed by 32-bit
+> systems") in -tip when booting i386_defconfig with a simple buildroot
+> initrd.
 
-void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
-{
-	bool now_enabled = vcpu_has_cache_enabled(vcpu);
+I've zapped this commit from tip:x86/urgent for the time being:
 
-	/*
-	 * If switching the MMU+caches on, need to invalidate the caches.
-	 * If switching it off, need to clean the caches.
-	 * Clean + invalidate does the trick always.
-	 */
-	if (now_enabled != was_enabled)
-		stage2_flush_vm(vcpu->kvm);
+  1e07b9fad022 ("x86/e820: Discard high memory that can't be addressed by 32-bit systems")
 
-	/* Caches are now on, stop trapping VM ops (until a S/W op) */
-	if (now_enabled)
-		*vcpu_hcr(vcpu) &= ~HCR_TVM;
+until these bugs are better understood.
 
-	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled, now_enabled);
-}
+Thanks,
 
-I'm wondering if it would be feasible to optimize this by only performing the 
-flush on the first vCPU (vcpu0) that enables caches? My reasoning is:
-
-1. During guest boot, typically vcpu0 is the first to enable caches
-2. Other vCPUs would follow after vcpu0 has already flushed the caches
-3. This could potentially reduce redundant cache flushes in multi-vCPU guests
-
-Specifically, I'm considering a change like this:
-
-void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
-{
-	bool now_enabled = vcpu_has_cache_enabled(vcpu);
-
-	/*
-	 * If switching the MMU+caches on, need to invalidate the caches.
-	 * If switching it off, need to clean the caches.
-	 * Clean + invalidate does the trick always.
-	 */
-	if (now_enabled != was_enabled) {
-		if (vcpu->vcpu_id == 0)
-			stage2_flush_vm(vcpu->kvm);
-	}
-
-	/* Caches are now on, stop trapping VM ops (until a S/W op) */
-	if (now_enabled)
-		*vcpu_hcr(vcpu) &= ~HCR_TVM;
-
-	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled, now_enabled);
-}
-
-Would such an optimization be correct from a cache coherency perspective? 
-Are there scenarios where each vCPU needs to perform its own flush when 
-enabling caches?
-
-I'm working on optimizing KVM performance for ARM64 systems and noticed this 
-potential area for improvement.
-
-Thank you for your insights.
-
-Best regards,
-Jiayuan Liang
-
+	Ingo
 
