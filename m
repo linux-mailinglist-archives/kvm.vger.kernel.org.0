@@ -1,189 +1,105 @@
-Return-Path: <kvm+bounces-43662-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43663-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F132A937DF
-	for <lists+kvm@lfdr.de>; Fri, 18 Apr 2025 15:24:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B005A93813
+	for <lists+kvm@lfdr.de>; Fri, 18 Apr 2025 15:45:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E2CC3A9CDB
-	for <lists+kvm@lfdr.de>; Fri, 18 Apr 2025 13:24:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B77919E5350
+	for <lists+kvm@lfdr.de>; Fri, 18 Apr 2025 13:45:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B00277023;
-	Fri, 18 Apr 2025 13:24:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DRbDZO5E"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF51441C64;
+	Fri, 18 Apr 2025 13:45:15 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F212750E3
-	for <kvm@vger.kernel.org>; Fri, 18 Apr 2025 13:24:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E77DF29A0
+	for <kvm@vger.kernel.org>; Fri, 18 Apr 2025 13:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744982656; cv=none; b=AQ19JC17iEFgsrxvm+7PWPGeO+wQ39XZZs3b+BpXjvzaPL/SAkdHU0wlOT2l7OSDmOZxpa9SR+YbC2h3/DVS9oepV9RRRK4IOADGOQM3kHVDYF0QjAJU5taOxHl8nfXMSC8t4Lvh35iI9SJoq01kp5hQmXqpARAL6TO7kDNUbZo=
+	t=1744983915; cv=none; b=H+q+S9VxesgT5ybgDNqaHgtOcBR2blpGvEOSt1/06ydUMrbjkaml+3DB5tk/go810X7biBIdgYM+agKRC5kvxb/bRz3r0nXLYIyAysNJ3G3hedFcuBvqV5HxSz9jvh2BHqFO+y8pMNugt0Hs5Q+vr/tao3NMuwlPPpOllZnsJDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744982656; c=relaxed/simple;
-	bh=RlPhNx/nNmStltXGWAwNHiXuJoj2D8quI0BhAJ6OxJ0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cP0sbiOBMIXrhHgN5Fx1hL1dABDAD42x4b1ReZFomsP/vDpekpo9k8tU3Z0MIQHCd0gYg4ioZ1JjmnEsIjKYsg+xLB3a8Xl0lkYOc2DJlUqTauUCGg5By2CqqRZNm+V22y15vitHZWJxe0P3kULKfBmZ6gl9ggUR3cfXpZ5dGCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DRbDZO5E; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744982653;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=5UQ6/+3oQb1tjzN9cWkNoxYdcLnK3LxRUjzM5Oau87k=;
-	b=DRbDZO5EZI8XHvz8Wwh/k5jEvu7zfNlre0/KdzfJJA8TaE0izTCCkE/P535lCVYu4GXI+6
-	9lAJsdJSAn33BJFkKqo22rRINArXjxlUxvw3tObUYyzIWavn7selfOaPzUJHaGGUc6a6Ew
-	PenDoKDiQliP9BlPcBf7bcgCYyqEBvQ=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-594-cn3i7PB6PYqDz7cNFredJQ-1; Fri, 18 Apr 2025 09:24:12 -0400
-X-MC-Unique: cn3i7PB6PYqDz7cNFredJQ-1
-X-Mimecast-MFC-AGG-ID: cn3i7PB6PYqDz7cNFredJQ_1744982651
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43cf5196c25so9972105e9.0
-        for <kvm@vger.kernel.org>; Fri, 18 Apr 2025 06:24:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744982651; x=1745587451;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5UQ6/+3oQb1tjzN9cWkNoxYdcLnK3LxRUjzM5Oau87k=;
-        b=aUnWNRO/KJW3bkEbtMafITIjGCQXqi5TgwexIBQeA+aKSGjKf6soCaXh572tRPMx8i
-         uyA0AeSvth6HODyzCBS3MNtpeoOCKjdMZUx5TUGjgcMCM7RyolkBOUK4rkoOk7Inkka3
-         9UIHEO0oIfaHgx6XpFwXkhADeOHgi/qD5hQSwRfDTrLXKe+KRJuwyJAroKfZJ5BOJOQc
-         RTnzQ9MD17m/JDgGo4to0kUq11D1BC0Kh5DzC96Q0sNdgPUj+HF4BKUL/QnzJk0tULV/
-         1ZOdQZgY/7fy4TCdugJQED3xEfW4zxFdcaMdN8okY/ErYTmG3NO+Fg3Gy2Bsq4CtZf5M
-         /xiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUXBsoo3tLDeaWX3e+1pi5ac76Ox2GE9lVc3Z+lC6M59ryzIZzsh5hSxL1lfIrOzNGeAqE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHZ9fib3RdH0z0BuUAHfl9PB8YQxKEgxKllvdWoTjXpH5/jb9t
-	8TwoEdizatvn0R0H1EwxddO/Z7m++QCQtQ5n8CQXe6hBViYzkoo6VuAViKO71bJxedT53aHp0Of
-	gzIFre8nXr4nlU/PHFbpdtIS/V55F5laFUbKHEBfI+7+XRZxo3A==
-X-Gm-Gg: ASbGncvNAB06L2w9N5eKiBmf3DceyLFzyEGsZxoXOSf+wc6ywqHqioNHb1JmFChVQ45
-	7YJFvhT1FTjqHXhMem0PT9+wJPdkje6fIoEZbIi1BogwWChfjDNFJ/TVICiDyBmYM6Sm+9KWhlZ
-	5SsT1oFBDkEcWFOI178HUq+uzUW96m/Jt0qENeWzTnK3atq7bpSJCTj82kxc4eVbLYQE5/S48oi
-	oHWsCTrU/TqFonURtfVJH5Kgt77YLSylKjH+eCvM8302qeug+q3c8eLSVxugT5WZWcPVR/yT5Tz
-	83jzjt8jr4Rx6jLx
-X-Received: by 2002:a05:600c:b8c:b0:43c:fc04:6d48 with SMTP id 5b1f17b1804b1-4406aa8955bmr27911065e9.0.1744982651046;
-        Fri, 18 Apr 2025 06:24:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGfOv8iP8QHLv6XekfBLzXqa/9oYoz4nDuo1TpO+AGtOSinMyHlY+ittfoBromOe3HGl1XlEw==
-X-Received: by 2002:a05:600c:b8c:b0:43c:fc04:6d48 with SMTP id 5b1f17b1804b1-4406aa8955bmr27910855e9.0.1744982650667;
-        Fri, 18 Apr 2025 06:24:10 -0700 (PDT)
-Received: from [192.168.10.81] ([176.206.109.83])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4406d5bbc07sm22711245e9.17.2025.04.18.06.24.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Apr 2025 06:24:10 -0700 (PDT)
-Message-ID: <5e7e8cb7-27b2-416d-9262-e585034327be@redhat.com>
-Date: Fri, 18 Apr 2025 15:24:09 +0200
+	s=arc-20240116; t=1744983915; c=relaxed/simple;
+	bh=eaYdj/zAC6YB0prFHSJ3DGQmAAMOIdtBvlc2Vneh/Ck=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g+FFIlNADirCOOcoe4HM/gXTu3nmivghl3NgyMLej35mAOWK6eWYMsBV0BXVLogMEsB/VdJcPlvQd20RTps70NTo5F/0GYfs6n9l2Cc4OmWcjNnsuP1NvuJ0s26fI+bPvfZHLqWDLO/CW0aesJUq67DF9XnOuYyX9ZuRYt4qdPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iie.ac.cn; spf=pass smtp.mailfrom=iie.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iie.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iie.ac.cn
+Received: from localhost.localdomain (unknown [159.226.95.28])
+	by APP-03 (Coremail) with SMTP id rQCowAD3mzhWVwJoQDHdCQ--.24362S2;
+	Fri, 18 Apr 2025 21:44:56 +0800 (CST)
+From: Chen Yufeng <chenyufeng@iie.ac.cn>
+To: pbonzini@redhat.com
+Cc: chenyufeng@iie.ac.cn,
+	kvm@vger.kernel.org
+Subject: [PATCH v2] kvm: potential NULL pointer dereference in kvm_vm_ioctl_create_vcpu()
+Date: Fri, 18 Apr 2025 21:44:39 +0800
+Message-ID: <20250418134440.379-1-chenyufeng@iie.ac.cn>
+X-Mailer: git-send-email 2.43.0.windows.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Drop "KVM: TDX: Handle TDG.VP.VMCALL<GetTdVmCallInfo> hypercall"
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
- "seanjc@google.com" <seanjc@google.com>
-Cc: "Li, Xiaoyao" <xiaoyao.li@intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Wu, Binbin"
- <binbin.wu@intel.com>
-References: <da3e2f6bdc67b1b02d99a6b57ffc9df48a0f4743.camel@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <da3e2f6bdc67b1b02d99a6b57ffc9df48a0f4743.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:rQCowAD3mzhWVwJoQDHdCQ--.24362S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Wry7CFWxGF47tF13WryDWrg_yoW8Xr15pF
+	43Gw10qr45Jw1jy3y3G3s5ZryjganIgas7CFyjvws8ZF12yFn5ZF1Skr909r17urW8Xayf
+	try5X3WUu3WUCw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUyq14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r1I6r4UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxAIw28IcxkI7VAKI48J
+	MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUXVWUAwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
+	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AK
+	xVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfU5WlkUUUUU
+X-CM-SenderInfo: xfkh05xxih0wo6llvhldfou0/1tbiBwkQEmgCI3mOVQAAsn
 
-On 4/16/25 05:12, Edgecombe, Rick P wrote:
-> Hi,
-> 
-> We should consider dropping/reverting "KVM: TDX: Handle
-> TDG.VP.VMCALL<GetTdVmCallInfo> hypercall" from the base TDX merge. The reason is
-> because Xiaoyao noticed that the GHCI spec[0] implies that KVM should only
-> return success for that TDVMCALL if *all* TDVMCALLs are supported, but KVM does
-> that despite skipping implementing a few. On investigation there are also no
-> users except its selftest[1], and the spec is ambiguous on the right way to
-> handle the case in question.
-> 
-> The spec talks about VMMs not supporting all TDVMCALLs, but doesn't say how to
-> enumerate this (i.e. it doesn't says what the GetTdVmCallInfo VMMs should do
-> instead of succeed). It actually doesn't cover how to handle if the guest calls
-> an unsupported TDVMCALL either. Historically, KVM patches have returned
-> TDVMCALL_STATUS_INVALID_OPERAND for any unknown TDVMCALL, as a reasonable
-> interpretation of the ambiguous spec. So the spec needs to get clarified in this
-> whole area.
+A patch similar to commit 5593473a1e6c ("KVM: avoid NULL pointer
+ dereference in kvm_dirty_ring_push").
 
-It does, but I think we should just implement the remaining TDVMCALLs 
-before 6.16 is out, which is in a while.  All that is left is really the 
-userspace TDVMCALLs GetQuote, ReportFatalError and 
-SetupEventNotifyInterrupt.
+If kvm_get_vcpu_by_id() or xa_insert() failed, kvm_vm_ioctl_create_vcpu() 
+will call kvm_dirty_ring_free(), freeing ring->dirty_gfns and setting it 
+to NULL. Then, it calls kvm_arch_vcpu_destroy(), which may call 
+kvm_dirty_ring_push() in specific call stack under the same conditions as 
+previous commit said. Finally, kvm_dirty_ring_push() will use 
+ring->dirty_gfns, leading to a NULL pointer dereference.
 
-For Instruction.PCONFIG and for VE.RequestMMIO a dummy implementation is 
-valid and returning success is probably even better than invalid-operand.
+v2:
+ - fixed in better way by just moving the position of kvm_dirty_ring_free
 
-Paolo
+v1: https://lore.kernel.org/kvm/596ce9b2-aa00-4bc5-ae20-451f3176d904@redhat.com
 
-> Since there are no real callers let's just drop GetTdVmCallInfo for now. We can
-> add it back when the GHCI folks amend the spec to close the ambiguities. As a
-> bonus we can save some code for the merge.
-> 
-> We dropped the patch internally and did some testing. Also, Binbin and I
-> searched the guest code for any rare callers. Everything seems fine to drop it.
-> 
-> If we want to leave it in, it's probably not a disaster. We'll just slightly
-> diverge from the spec. It may not be a problem depending on how the ambiguity
-> resolves in future spec updates.
-> 
-> Thanks,
-> 
-> Rick
-> 
-> [0]
-> https://www.intel.com/content/www/us/en/content-details/726790/guest-host-communication-interface-ghci-for-intel-trust-domain-extensions-intel-tdx.html
-> [1]
-> https://lore.kernel.org/kvm/20250414214801.2693294-14-sagis@google.com/
+Signed-off-by: Chen Yufeng <chenyufeng@iie.ac.cn>
+---
+ virt/kvm/kvm_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index e85b33a92624..089efc4d01c6 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4178,9 +4178,9 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+ 	xa_erase(&kvm->vcpu_array, vcpu->vcpu_idx);
+ unlock_vcpu_destroy:
+ 	mutex_unlock(&kvm->lock);
+-	kvm_dirty_ring_free(&vcpu->dirty_ring);
+ arch_vcpu_destroy:
+ 	kvm_arch_vcpu_destroy(vcpu);
++	kvm_dirty_ring_free(&vcpu->dirty_ring);
+ vcpu_free_run_page:
+ 	free_page((unsigned long)vcpu->run);
+ vcpu_free:
+-- 
+2.34.1
 
 
