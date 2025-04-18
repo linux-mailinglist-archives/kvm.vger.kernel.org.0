@@ -1,192 +1,122 @@
-Return-Path: <kvm+bounces-43656-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43657-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6FD0A93707
-	for <lists+kvm@lfdr.de>; Fri, 18 Apr 2025 14:26:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9826A93723
+	for <lists+kvm@lfdr.de>; Fri, 18 Apr 2025 14:33:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FD8A1B66189
-	for <lists+kvm@lfdr.de>; Fri, 18 Apr 2025 12:26:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CDB63A9EE6
+	for <lists+kvm@lfdr.de>; Fri, 18 Apr 2025 12:32:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB5C02749F2;
-	Fri, 18 Apr 2025 12:26:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B40FF2749F2;
+	Fri, 18 Apr 2025 12:32:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Zqk47bIW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AG4qW+0i"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2072.outbound.protection.outlook.com [40.107.101.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AF0C2222D9;
-	Fri, 18 Apr 2025 12:26:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.72
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744979166; cv=fail; b=H0prZb/m0kh8j3D64vNi1h/7fEA+HMqMdHtvS1eQMaaqlNJbhgvbY0GFo3I8FFCq8eoD2A3PsJf0inHJTZ0wbC3LaS6dKxUbDTxj1HCzm+LMAAKBo26mfJfdK7gjkPigGqiL4LDamsh68kQx2P7Ewi7ICwUn9kfJ+rUdE8Dqmlw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744979166; c=relaxed/simple;
-	bh=M06WAYVejhu3ZKieXjI2pYkLiHh7ELZvHWVZbYy42mU=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Vech4e7kjVCd+HUKG1lxAwyzCXT56HglmaxC2jpKVHXXvpCTGtAtFFLKj4H6rQNKYzdF4SsbojMoeXWksFySwozGUjw77nMfaroJ8l4OrU6yds8pZen8GAjz+Zka1f2+fnsvAfePbNIslyZ7mMJ8pMAV0Rlz6doBBTBdbAs7wSk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Zqk47bIW; arc=fail smtp.client-ip=40.107.101.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SNbihUAGNtDXZpi9oCR8ffLnbALYaAxxsrjzYqgTXcB6DRSDBDAUMJnOqFE7toP3Qxsywihz6tJLF4gv5JLb3GuSC5ZAJgXuVLyo1mmk05SKO8yqnP8a20lRbovY0e/a4NYgRvDgstWvkT2Pgo4jrCWjc34khcaKTbm1wt0NJobCtEzu9yySshn+2ZnlnAglmJdUZpcf0FFWwqqdi1PIQMOMEEI0fq2EMnJJu1TRvB3dyMouV5v2hzUylBkKmXnCc4MpxK+UCdf8Gfu59DBWofaLwKWnvo05HPCDWZvVmDf0JIpFGM9cv4/Z8I1pLYkCtsJzZuA/K1d3VTFJ8NkeHA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eAA2YkTzNt8npdZ8jPEjvr1/PwKvtMh6jxwld0vbYlQ=;
- b=MqHGE+riE3wTK726jm3EHMlq3rhJXrPF6pJiKNBGBn0Vw1rt/IXBTthdFADggwccffO1ZD751icgFSQSgYOYy46o5Bq6lkTdfwg8P6dLrZ8ea703IsO0Gf8EpEVc8DBD/cQcvw65tra8qdDov/CVMb4osfR8fShdaeUuPcxuECqzhpGy00S9D8/sDWIgD0Q/2NLWBUjs2Xx96f7troNjR1+ypMwmFsVKDlTute+IxdOoveLlDJM54IS4oiCFN/gi1biVtnSoj/+IKquLaxoZVC65BUDQFmzRS9jCRBuNoy4h2TWKrV/ZLVqhY4IqvGIACMqdtVvBxzpafjjTmEANUA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eAA2YkTzNt8npdZ8jPEjvr1/PwKvtMh6jxwld0vbYlQ=;
- b=Zqk47bIWjAuw3AUHceJqAW000GWjUPLxbQXdVCIdQsZPuU07rB4CRHOvwnXLlf7hebLmv3MJEjXN2Uw2QfqExZjA4j0DDbO6VlD881Eqpd7NBkRNdDfSxCQbHk7U7nPLCvXKuL8aEV/bS8IjP0K9Ql2eiTQXuZU486DFgyDCg88=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6048.namprd12.prod.outlook.com (2603:10b6:8:9f::5) by
- IA0PR12MB8422.namprd12.prod.outlook.com (2603:10b6:208:3de::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8632.34; Fri, 18 Apr 2025 12:26:00 +0000
-Received: from DS7PR12MB6048.namprd12.prod.outlook.com
- ([fe80::6318:26e5:357a:74a5]) by DS7PR12MB6048.namprd12.prod.outlook.com
- ([fe80::6318:26e5:357a:74a5%5]) with mapi id 15.20.8632.030; Fri, 18 Apr 2025
- 12:26:00 +0000
-Message-ID: <fa133913-21ab-4d61-beb7-fb2106d5fc5f@amd.com>
-Date: Fri, 18 Apr 2025 17:55:52 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 05/67] iommu/amd: Return an error if vCPU affinity is set
- for non-vCPU IRTE
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>,
- David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>
-Cc: kvm@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
- Maxim Levitsky <mlevitsk@redhat.com>,
- Joao Martins <joao.m.martins@oracle.com>, David Matlack <dmatlack@google.com>
-References: <20250404193923.1413163-1-seanjc@google.com>
- <20250404193923.1413163-6-seanjc@google.com>
-Content-Language: en-US
-From: Vasant Hegde <vasant.hegde@amd.com>
-In-Reply-To: <20250404193923.1413163-6-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN3PR01CA0093.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:9b::21) To DS7PR12MB6048.namprd12.prod.outlook.com
- (2603:10b6:8:9f::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73B6126B2D0;
+	Fri, 18 Apr 2025 12:32:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744979555; cv=none; b=AoC0fHXvX00gmKPTOyrt8LJEbOOtl74nDgr1v2MYCyfi5HLkaLEsP/cQHbJYpzh5THJeE4SN6QwYHuvlTiSpCxrQTl1sG8kAlmiW7o03X3EzTiKIKjL8U3KUrXTsYXxYnfFmzAHWQmHaB5M7i1rWmZCcewXbs/IyI4l5XuuDP0w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744979555; c=relaxed/simple;
+	bh=fi1DbYhlrqF0U7IzqDP/M+/r8vdH95UNS8kWonbjyGg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KIoZhD7Ffg+M/xPJWapzig5LnZlDBmnFwb1A28LzfMaVvQ6WzJsT4ZgDCzZKJCmHEW608XXt0z+40IDuqLLiJIxTdy2AtkTdrYWrK/z1Va8WIBp5RTOaeTugf9+H5DebNpKS6ecAxkEaWqygH7IElXDPE+WemuVbi0I6XqGBb04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AG4qW+0i; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-736a72220edso1749800b3a.3;
+        Fri, 18 Apr 2025 05:32:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744979554; x=1745584354; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=4uxNqOBD/ogCW1O0rrQ2A0HcfFujRPCySOpF/YO01oA=;
+        b=AG4qW+0iMjdDMp9h8+u/8MODMx2ZhRnrNeqNWksxxmnvYLNp1sN4cPNqgxJBWkQHHw
+         6ja9kaz4Q5fz4VjSFoqmUKZeGQbCa5MpqyumvCPwfXpggT9WqPVXrihSm6janzBMx1CX
+         QahHls910enJIkb/u6kPH7kZ9EqesycJDcnqFE0q+OOiA3HMPiOVjVeakoi/lbPr4Cjd
+         OH3ErFFt9pia9G3CJL80MeQHQRPI40Y0lC78IBPn165jnjxBbcTiPNLFYjPB6FrNnIQQ
+         OZEpshOMLzwQFEUo4i4UG9KzJMrFW9AIXX/IL3hoMw5zYNyxzSTxDyk9XU+zwlcGeNY3
+         2rNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744979554; x=1745584354;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4uxNqOBD/ogCW1O0rrQ2A0HcfFujRPCySOpF/YO01oA=;
+        b=vRmpnqsDdwES8Ved1XXA5WUyZ10QGRrfzKC7wL3blLScA8gKL5v/MChN//vVrA58JX
+         PjzAE4lZkddCOZn7MnP3IOQ2LYM/gYYp7Ht06SJCdFHCqweGYynyQ5LcPVk3+LqNBEGI
+         nfVOhDuuv635V/J2tVPFk2JgChEeufkmiafBUro3mG948rWOeWmzVipinSCsOmOaQXU5
+         v8oZ/7P6l3zq4qLXCYRGN06eJp/5AV19PIs4V5ksGZOohlP1xEVY934cbAlRz/oKDS5t
+         fGR7AbxWu9NwDyxLeqga8HbNv3RZ3K9OYBGaksOWM47Mxgf6MD/RvHko6vsJ8cYLNaEy
+         6CzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU20zLeXPB6GHQ2HsaK94sCZjgarLZMO/rUlfvYKDUbvUXJhMceLe2uGCrH1Rrb5m1146TokGcTkJ8vxtQ=@vger.kernel.org, AJvYcCWTnfrUz8cv0ZcTGkQumsnERYk9lbIbL4WUP/5Dr6x49QCDiwTyAEFZ2i+aQBTsGnKTcB/RTnkd+Ht5DA==@vger.kernel.org, AJvYcCWdV06fK+ZAcwDMQvkyDhOH3GBiXD9UptK+gwwd9kbw3U+jFwcnfhckNRfVvzmH4Fj94KY=@vger.kernel.org, AJvYcCWu25HxhOwetbOX2cRRICTSRLul3OhmhQfq8b+6qSBpGOzodaY4rCV6B62MQHS8a9oK3jkn0ZoW1Oqd@vger.kernel.org, AJvYcCXUgGTrkNaeV1NRXsKeQuskAw/PFFcRNiB7ojigcp9xA8oHm9qxjNedjcZBfg1EGI9WeyoFxcVe2af8swZL@vger.kernel.org, AJvYcCXZYDcsUiaWnvJKYozdMCulF7X59X7RJV2i4AUqdK4JEV4vGK2c+4o5AzgJHt4cuqSs6vqZ0XaJ9xEQ@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywwe1rsioiPYtQHWizUlzgI4WF5R0IfOLDoO16JpxiBcx/gR2gE
+	+0tqo2v6GT1CgKTiv1QV8DkQ+fAE5beAuCg8uMfoO5sxpdUuM35UQ4MMXjaWZk0B1PFyeXG8SvN
+	tgEost9lgnBY6YGHrFMONnhDQJ4w=
+X-Gm-Gg: ASbGnctUBpR+gUSetI7U5hzaGXrS3uz79DnUr/DNOUwx3Bf5/joR9nuD2B4BvIjq1Rs
+	O5BCvJUlt9JUUp0K3EF9UlJJFcV7bWGvhPZqT7c0ocqvWAzcfl+KiD4ryHSx318uij79oWZjx+7
+	0c2dFb/ojfP3WnyGglLH6TOtwjh+nMA/px9LL7b6Ro/glkvc6LB+zYPzaC
+X-Google-Smtp-Source: AGHT+IE6KPLtDnTScFEtJJlvCdwmMFGgLV6Sh+PZ7MHmYiMb3jtvP1cSpc1ynbu9LO+7GJYkCunnvOZCbjH4BPDTV0s=
+X-Received: by 2002:a17:90b:2e03:b0:2fc:c262:ef4b with SMTP id
+ 98e67ed59e1d1-3087bb6f117mr4849982a91.18.1744979553652; Fri, 18 Apr 2025
+ 05:32:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6048:EE_|IA0PR12MB8422:EE_
-X-MS-Office365-Filtering-Correlation-Id: 400867d4-c013-4c61-5daa-08dd7e742d4a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|1800799024|376014|366016|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?SGRKWTZ6ajZTVjhXY0dCa1hhR0x2c0ZWUDFzU0treWVMSXd6cWhKVjJxMjU3?=
- =?utf-8?B?RERrSUxOVjVSS2QrcjZXMEhDTy9Ta1k1aWlYWTgwZnFEMVlTcEhzbEV4RzFx?=
- =?utf-8?B?a29qL3lQSENDWmlxcWFianZ1MnIwWVJqREQ0OXI3N1JaWVdMRGNBVmNMd2JS?=
- =?utf-8?B?L1FyNGFSNlE5OGdkVVZabEJCT1JaaDdnNEtOTzVMU1l3S3gzd2s1MjBNWFVU?=
- =?utf-8?B?Zzg3cW1wZTMxRytJK3puNlgxRk5FZHpmUzlQTVRLWmVuaUhFdE9pZitBbXNs?=
- =?utf-8?B?RU50MGI1amxDMEE2T2pwNjYzQ3BKdWV4dVc1d3ZGT1AwRmp2a0hxRENKVlZv?=
- =?utf-8?B?YnBqUUtWY3NZSlZsY0JMVWNEbFE1cERNZE1zck9KWjllclVWWmM5UzJ0azFa?=
- =?utf-8?B?dk81czdCUDJOeU1XOHpMWXFnWHkvd2hNNCtaRWtOMVNhVjJyanRJSm9qREFB?=
- =?utf-8?B?TzcwcDRzMStzeGgzRDJCNE1hMHFud1FKQ0tGOCtWS1prbHJTVFdYRzBzY2Jx?=
- =?utf-8?B?bU15RHg1OU1SZVU0cmpNUm1LK3hoMzdITVVIdFQ4eW9OOHlXaXZsVGwyNzlH?=
- =?utf-8?B?ekJyVzZaU3grWTdWbGp5blB2dmY4alAwcVlsTzdVN2NJRmlyem4xb1V5S2xs?=
- =?utf-8?B?Q3RudFhkNndZQTVVZ1JPa1RkUFo1YlNOZjZ2ekQvb0RtQUZwbGc3aVJjSlha?=
- =?utf-8?B?bWFqV0lWZnB1NStQaWVOSTdXQ2lvOTh0d3ZOYnFDRHBFcWdtdFhFeG8vSDVr?=
- =?utf-8?B?cGViN0ZOV0RVNUN3NVBuSUY5UHVZVGFRVkFMYk1lMTZIdGpMc0l0T1R1WnAy?=
- =?utf-8?B?M2Naa0FiaTBhT2F6ZDZsc1ErTmZ3cWxyQ2lyRTFyTFl4d2xoTEZRK21kU0VG?=
- =?utf-8?B?ZVh0UXRlLytXZjFrdit5eG1XOWxkMkNPcXlGNHJxdVVzdm1rQm4zMDNBWHp5?=
- =?utf-8?B?OWNkM1hMNDg4ekJqMDZhaDBuRFBTK3p2QmQ3V1hnZThiTEFKMXM2YnBzUUhV?=
- =?utf-8?B?bmEzS2g1STF0NHRyNEpBUDRiQllta1JQc2RCY20ydFFNalZ4U2U3Ylg5TFNh?=
- =?utf-8?B?akZYbURBWjJXNEJoclhVMkxvWmxQL04rS3Z1K0VObm5TWGprTVBQSlRXRnFa?=
- =?utf-8?B?N1o3bk9jV3VPYjBvbTh6YzRmYXRWWEdibU9vZU4yT3JzaVRuR3FmenRlK1VJ?=
- =?utf-8?B?MlZRSXlEL3JmSElERUcySlRhRmJ4OHFGYlRrd21ISURVb2h2UG9Lb1hXS3BF?=
- =?utf-8?B?aHZuMk95dktSWnlsek1pQ3FJOUtNT0tIYW1aclQ2ZUZaVnd4TXhsaFVKQjE4?=
- =?utf-8?B?eTVsVnFKdnk5OEdPenlOY00zdmFCUklsUlpVM0pHWjhCa2ZyZXRGODZrZDRN?=
- =?utf-8?B?WUlZMzI2TEdOUVVLUG56SjYvWTY0Qm9XR1BzWkNHeWRtQ29NTTV0TTgwY01F?=
- =?utf-8?B?RjdnU3pEQ2JyV2ZBNGFUN2crb1VUdnZTYXpQYVRMVU5MWlBQLzJxK1lRdUtS?=
- =?utf-8?B?Nm5SblltczRWL1BPQzZ5VkE0M0ZqcHgzdUo4MVo0WW1EVVBna3M5UFBWZ0to?=
- =?utf-8?B?Vk5kaVdzRjNaRkI5dlN2anY0VHNZZkptWEhVenNsaUNBL05rTHdwdUtub3RQ?=
- =?utf-8?B?aHgzTWFGRHhiZFQwOUF1OTM4QUxIQVFjcmlGSXZEQmU4TmZrN2ZPUkhVT3J1?=
- =?utf-8?B?b3hLM0pvYVcvR2JaNlpCTUVwUlRzTlJYaXFTYyszZXpaNlBGbTRsUGZSenBF?=
- =?utf-8?B?MmphYXJnWFAzSFpvU3NNak44elRhL2FjS2J5WXBmRlhWaFZveURwS2llUTZp?=
- =?utf-8?B?S2lLOG0yNVozOTlKYUFPdHdsRFBSUGxvRVFEN1ZIc1IybkJHaERlLzBYVjJY?=
- =?utf-8?B?OE5VMlpLd1FjL3l0UE5yRXB4N2tQMU90M3J3eFZ1WHhOL0E9PQ==?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6048.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cDdhU2MyYWJob01ZWFNUN2tnL0lnaDkrRHplb2g4V0lFUHQxNUJHNjBzTkxH?=
- =?utf-8?B?RnBxellMQW5zamZJdDFsY0FTSDBDOS81VWZDRjhsa053OTliK29ZUmNXd0RS?=
- =?utf-8?B?U2c5bEh3QkxnaVlUajY1SFFpT3E4YkVDS2o3eHc4QUJzd3NGUk0xZHJ2Sk54?=
- =?utf-8?B?OHZaY3pkd0dESmloV2FiSWJCOGlCZ1VSU1FyT3owYmdRRjh0dWpWOVFyNE54?=
- =?utf-8?B?WGtyNmRCQ2plaXlwN1cwaWN1YllzRUZKZ2VraVZCN29Bckd3UmhiTFJSR1RI?=
- =?utf-8?B?UXY4MjU1NVUxNW9EMVhIb3FYWWpGbTVCVjJ2eVNBWGZwLzhuK1pvbHFUeFhl?=
- =?utf-8?B?Yy9PeEJTaTBGK2VjN2F4NndYOFA5eU1OdmkvR2oxNHZOdW5lYlBQa3cxNDVK?=
- =?utf-8?B?bldweTBLM2ZLSm4yT0hIRFBSU3dxQ0ZENGMzNUpsWmdVQXY1NnQzci9kSEhJ?=
- =?utf-8?B?Y1JpdC9FQklyQVJzRzNqQjRrUXhxckJyUDNMcFFTbWs5RTBRd0NGVms2Ri91?=
- =?utf-8?B?MnEvbGlRZ2dzYzQyTUtRYWsrZUlzRVdlek9MS0NoSHduWUNnMXNucEl2OHpq?=
- =?utf-8?B?Z2JMVW52K0VKQUV5R25ra0RDYjhDZWtzSUZSTzh3aXJUZEJEUmRSbkNXSDBx?=
- =?utf-8?B?bEJmdjJpNk1Xck0rTk9PTElmaE8rREdiRit2Q21UTExESGNwbXFBUGJFbWto?=
- =?utf-8?B?Znd6UDI3UHpyYUxSMHd0NXB0Ukh5LzdxZktpbHM3Uzhtd2srRnFZUzBEUWhv?=
- =?utf-8?B?WkQ5TncrYldtZXA4M1A5RjBBUEZOcjFlcGtDMGN0ZXVWNDZsdkVKQnRVMEhF?=
- =?utf-8?B?dnNWUG1MK2ZMdmVPZWZBbXF0WCswWUpqM1pZcnI4eVAxcmJ2cDdqdzlsL1cy?=
- =?utf-8?B?cVl6czhHbkpBKysxeFI1a0Q3RzVzTUJoaWthTisveTRzbnljcFNJYXJtZ1No?=
- =?utf-8?B?ZlRVWFV2Ri9WYnBQMXZZZXFaYm1BTmIyTXVOV2hEWTRJSDdlcEdjb2VMaXcv?=
- =?utf-8?B?TWhZb0xlVjBlUzBDcE9IdENPS09NY1k5MUtaSThoQXNIZGZJZXVIdXIrUTJL?=
- =?utf-8?B?ZVF1cFE4MTVUcHkyeEFuYzV3NGpzZnBMSE0zTzgrTHk5R2JpOWZWbmhNOGVX?=
- =?utf-8?B?Q2dxYWdCZjc3Y3FRYWZ0Z3pYdkdacGJmMUl6bURLWFdkeFFKRm94R2tPQUQ4?=
- =?utf-8?B?dWYxWnQxT2Q1dktCd2kxaUpmbHFhajZKRFZ0STN1bXNnRHRwQjJkK3NqOVpM?=
- =?utf-8?B?K0RVZ0tDOWhYV1ppY3NLWUlEbUFNazhEcXZnYzhwOERuVjlvNkVSSGF4K1NV?=
- =?utf-8?B?Rko5R1UyVGxpcUptRGk2TFBjaithcmNETlJyb1FLYjgzWUdtMkExajZISitL?=
- =?utf-8?B?S0tCTG9TQmREaEtyZXNkSUowVDJjU2w5UkZ6Vjk5cDYzV25xTEFOejd3aDI5?=
- =?utf-8?B?NGRrMUdLbytJOWEwZFBBVlBZMVlXMmdYRVBjQkQ0NDVPZ0JEYnhOczFyeUIz?=
- =?utf-8?B?d25ZblE5NXpCeHBLTzBEczZzRFVacTVFZFZQdXZWVWxSY2dOa0xUY0d3ZmJK?=
- =?utf-8?B?Mlo0M3dqV0VTaVp6NFFrVWJUd2xrbFRndG53aVd0QnpCVkluMkFYZFovalFm?=
- =?utf-8?B?S0ltWUczTklzWDdNSnpVMUZ3NTN1aktPYzd2WEZObXlrVFJWQ3VUZzM0ZjNz?=
- =?utf-8?B?QUFjN0kwanNVQ0FyWDlTbENoTGsrVkdVQXJYbU91YytQeUN3TFFxaTRjZmJi?=
- =?utf-8?B?b3hZMFBEK2Q2UnprYWowb1ZDSEJVczdOQXBVZjVtVGxmY1JVbUdkMloyY3VT?=
- =?utf-8?B?WEk0NkZ4SDRGQ01KVmpuTGJCcjFkWklNNlV4N1ZDMWZkbnVZZGpET0NjOHJW?=
- =?utf-8?B?bzExT290Qzc5ZlgzZmxKZTZzWFlEYU9UeGJxTG9KUmFucWFpY09sekVnK29a?=
- =?utf-8?B?MnVHbk45Y29wWkQwbzZIa0EyS0NUOWNSQVl2NUtEZm02VU4vb25Rc3RCL2Ux?=
- =?utf-8?B?RnhqbUFFRG1uOHBpdkRGV1grR3VIdTd4a1dnQlp6a1BiYk1Db05wVWRXcTNt?=
- =?utf-8?B?elpYL0lkQTdWb1pCTVkycmZsOWllcEdXYktYa2E5SVR2UFVlQTFyRVM1REo1?=
- =?utf-8?Q?4+6w2LybxvzGLso7hynskNNQO?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 400867d4-c013-4c61-5daa-08dd7e742d4a
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6048.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2025 12:26:00.0898
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gdFRuuIaWUZMtiwPxwQfl4WZMrXlGyAj+KOT3Ad4ZORBRgbfa5R1+x1kZD3Rp/+gg7/KoQcZrXgLsWoMq7IWpg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8422
+References: <cover.1744825142.git.leon@kernel.org> <670389227a033bd5b7c5aa55191aac9943244028.1744825142.git.leon@kernel.org>
+ <1284adf3-7e93-4530-9921-408c5eaeb337@kernel.org>
+In-Reply-To: <1284adf3-7e93-4530-9921-408c5eaeb337@kernel.org>
+From: Kanchan Joshi <joshiiitr@gmail.com>
+Date: Fri, 18 Apr 2025 18:02:08 +0530
+X-Gm-Features: ATxdqUGyYBEsfK-IN2nZn9q0XDVh1xSRZINsNgbIk6fSYXOiPXAs6WAhmbL1EUw
+Message-ID: <CA+1E3r+9kEs-fqND-VD+y6FWfiGqr1vN8M0GufD3oHdwLdFcrQ@mail.gmail.com>
+Subject: Re: [PATCH v8 24/24] nvme-pci: optimize single-segment handling
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Leon Romanovsky <leon@kernel.org>, Marek Szyprowski <m.szyprowski@samsung.com>, 
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, 
+	Kanchan Joshi <joshi.k@samsung.com>, Jake Edge <jake@lwn.net>, Jonathan Corbet <corbet@lwn.net>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Zhu Yanjun <zyjzyj2000@gmail.com>, Robin Murphy <robin.murphy@arm.com>, 
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Logan Gunthorpe <logang@deltatee.com>, 
+	Yishai Hadas <yishaih@nvidia.com>, 
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>, 
+	Alex Williamson <alex.williamson@redhat.com>, =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev, 
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-mm@kvack.org, 
+	Niklas Schnelle <schnelle@linux.ibm.com>, Chuck Lever <chuck.lever@oracle.com>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Matthew Wilcox <willy@infradead.org>, 
+	Dan Williams <dan.j.williams@intel.com>, Chaitanya Kulkarni <kch@nvidia.com>, 
+	Nitesh Shetty <nj.shetty@samsung.com>, Leon Romanovsky <leonro@nvidia.com>, vishak.g@samsung.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 4/5/2025 1:08 AM, Sean Christopherson wrote:
-> Return -EINVAL instead of success if amd_ir_set_vcpu_affinity() is
-> invoked without use_vapic; lying to KVM about whether or not the IRTE was
-> configured to post IRQs is all kinds of bad.
-> 
-> Fixes: d98de49a53e4 ("iommu/amd: Enable vAPIC interrupt remapping mode by default")
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > +     if (nr_segments == 1 && (iod->flags & IOD_SINGLE_SEGMENT)) {
+>
+> nvme_pci_setup_prps() calls nvme_try_setup_prp_simple() which sets
+> IOD_SINGLE_SEGMENT if and only if the req has a single phys segment. So why do
+> you need to count the segments again here ? Looking at the flag only should be
+> enough, no ?
 
-Reviewed-by: Vasant Hegde <vasant.hegde@amd.com>
+Yes, the flag will be enough.
+I started with nr_segments first, but felt the need of a flag when I
+reached to handle the unmap part.
 
--Vasant
+This can be changed if the series requires an iteration.
+Or I can do this as part of the cleanup which I anyway need to do to
+replace the "iod->aborted" field with a flag.
 
-
-
-
+-- 
+Kanchan
 
