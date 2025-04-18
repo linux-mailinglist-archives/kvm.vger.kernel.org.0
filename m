@@ -1,180 +1,123 @@
-Return-Path: <kvm+bounces-43672-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43673-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6042FA93C05
-	for <lists+kvm@lfdr.de>; Fri, 18 Apr 2025 19:33:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1276FA93C5A
+	for <lists+kvm@lfdr.de>; Fri, 18 Apr 2025 19:52:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB40B1B67BBE
-	for <lists+kvm@lfdr.de>; Fri, 18 Apr 2025 17:33:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F13E4A1200
+	for <lists+kvm@lfdr.de>; Fri, 18 Apr 2025 17:52:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7FE021A459;
-	Fri, 18 Apr 2025 17:32:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 363E521CC62;
+	Fri, 18 Apr 2025 17:51:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NDEoUxAU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yPnsI8AF"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AF55218EA8
-	for <kvm@vger.kernel.org>; Fri, 18 Apr 2025 17:32:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1166A21A92F
+	for <kvm@vger.kernel.org>; Fri, 18 Apr 2025 17:51:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744997554; cv=none; b=IQNr7Mwa4TxoHcZ8LYMykNithR5IwZh0td2FVhCu4MqWoXkX31Ee73rK+BzmJTMQtYVaQd4ITzeZpJspACCdBkCEXLLCoqFCkGUZUrPlUd+FHTaTkRNJGNXd5IxmZ8xI/n/MtuAcF/QIIi76iuwNeNRb76wGJNfVrtFQ35oSr5A=
+	t=1744998704; cv=none; b=hIblCVglyZdNj1xRjIBCqb5YQU4fnhwfhLMrFmiLsyLArfu9RYiloSxRi4dA8jW3sh1gcbbWQO9idBWTsp8a0s7zFUuXCdGmluVsaeNLb0TqpuPGRzSXh7w+gnsRWP0sPqJanLuqI4SvwvZBmGQfhHF8kXzK3I03X7uJfW/IobI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744997554; c=relaxed/simple;
-	bh=4LbL3yDsXjPBiLx2utEjlwFEsm3elP0XO8E8/Q+LTyw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=snafqd4TfG4Ov+RSgihnYUlLLMsW4dLQ6cveNh88PUiW7Bb06z4Ta4X99ln5/OkvAW20F7EaK4fC7YBDf9rrB1io63BdtiPVW+RBRSf+iWUYwDNGbzbIWuIznjVqSTlqBKpqsimr3W0fc6ktGiBtP4IkFxpDhU+slDziwMSL/Yc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NDEoUxAU; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 18 Apr 2025 10:32:03 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1744997539;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sSB6/HaNSjSfYRrCWVWg3Elkc/lNEbOs/GojnMdDT/4=;
-	b=NDEoUxAUAOh9TMaNz/w8ZJr0ubWoU72AHqz/Zno4ishFwMqaICnLOM/6yq8bRl9UMGomc4
-	2UXzn03AmEyQKggS/9IjUGG6jjqG+Jiid/pgc9/Z6HZYTwpAEeqUVNhvkFjDOfsrx/wyua
-	vrLT3W5RzPwQ9qhP4Aea5r5Irp6uPg4=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH] KVM: arm64, x86: make kvm_arch_has_irq_bypass() inline
-Message-ID: <aAKMk34zbvHUtDON@linux.dev>
-References: <20250418171609.231588-1-pbonzini@redhat.com>
+	s=arc-20240116; t=1744998704; c=relaxed/simple;
+	bh=6W+OGcFxI1DS0aqJG6ibEBuiROo06ExhWAkrujlWANU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=umQlBpdC4McbpxnDV3B0jAnQ0KOVVohjfb+UxQFKB34UWUD2VPB1b1EAjQiHwGmPSsLJwWVC702LQU96YnHe8S05DLgaVmZpj1fztygmL9+jkfEbP/nc85j2ITfPQwOfDtxloFvz6B0Vf7frVBefW4u84S10Bsod5T9rOZ3EqnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yPnsI8AF; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-736d30d2570so1742763b3a.1
+        for <kvm@vger.kernel.org>; Fri, 18 Apr 2025 10:51:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1744998702; x=1745603502; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zYnYOmTALuTZaDDp7zB0k1mzpNniYAqzF9fCSP3qhAw=;
+        b=yPnsI8AFLa1qOl+77HU+Q5eKdDtwiDzGSivmx4766ByjDikV0lPppXlRNfRqE6inbp
+         hzzeCEaPqTY6TXZ2KON5T6Qer7n7JRHTkq2PGvBKAN5aAWNo2L39ZmSbti/s7qbpawOW
+         TbVsDl6RMSFRoalx/uoJzS27rdlIFnAH3awL9weG9FIy1u5XpfEpfnw4aZaaImRG6Dvm
+         mVcdCWS6143Kogv+ENklWj94kSLCtEd3ffpBPf67fehEU+4l960oxCy/G4DOjHw8votE
+         rEcdlr5jFrdGk//g79hMkzIDonS3Eg2U7m4w/dIQblOsWhswolOYkEheDYnZTnGTXhU0
+         o7ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744998702; x=1745603502;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zYnYOmTALuTZaDDp7zB0k1mzpNniYAqzF9fCSP3qhAw=;
+        b=GULnOw2zv2eFvnnzziEJhmxtBfVj0zU8sdAflWkcaV2i0fn+rh/TsMn5uVXg3vyWOY
+         G/obUF3ajZ7VLoHXrSSOFumrlM4a3i+jFL9dSeCcrXlXaV14mQe5z6owfQ+K2ewXYgIf
+         XvOMozoS6R+izMPKpYk/B7q17pJXKegY2RRppziCKilsFyqNUQpzZs9VO63LQrmJsWRs
+         Tgv79Tt24qm99yZudlc3GL+E2zQHVrKxetDVEZRoIBIAQNjdE1lhdk30vGMk62k8+5Kr
+         302f9F9DkXmAv8HcurI7HHOfLkeGyM+Rr2cJHwqCBdIXpkbuVo1+9wUcBkjfPni9Z/Ob
+         orNg==
+X-Forwarded-Encrypted: i=1; AJvYcCVww1GJcPw8c3s3G6Bq/Ujku4Cgl7pmfQP7tk88nsXrwZkT3XFAkgwC6YI7JTtuDtHJ0lc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yybr3eL+qy+hnmZd9kDoZBv1QqxMXE4Ute+qPVuU1w4Y130kIkp
+	7SJFXSnOrSAF8t9l3q9cPdjPekzbr1hlDSLzIU2NJSip34cbz81yWyUchtWoutwXPoTBMgo2kCw
+	FPg==
+X-Google-Smtp-Source: AGHT+IEjytYkIRTk2QN3rHgDKBDCYzzDu9yiVMpU9uRWqwQWvZ1b3SNQlrgoBUpZQvtRiqohVDHw7aYasHE=
+X-Received: from pfbkx23.prod.google.com ([2002:a05:6a00:6f17:b0:730:848d:a5a3])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:4409:b0:732:535d:bb55
+ with SMTP id d2e1a72fcca58-73dc147bd25mr4766073b3a.4.1744998702381; Fri, 18
+ Apr 2025 10:51:42 -0700 (PDT)
+Date: Fri, 18 Apr 2025 10:51:40 -0700
+In-Reply-To: <CABgObfYzbWspmaEsvSZYkBr1UQ7C5rD0NQ+=UsnSU3OG5tkcDQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250418171609.231588-1-pbonzini@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20250418130644.227320-1-pbonzini@redhat.com> <CAHk-=wg8VBjy=yrDUmFnvBKdo6eKNab6C=+FNjNZhX=z25QBpw@mail.gmail.com>
+ <CABgObfYzbWspmaEsvSZYkBr1UQ7C5rD0NQ+=UsnSU3OG5tkcDQ@mail.gmail.com>
+Message-ID: <aAKRLEiiy9pyHcKB@google.com>
+Subject: Re: [GIT PULL] KVM changes for Linux 6.15-rc3
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 18, 2025 at 01:16:09PM -0400, Paolo Bonzini wrote:
-> kvm_arch_has_irq_bypass() is a small function and even though it does
-> not appear in any *really* hot paths, it's also not entirely rare.
-> Make it inline---it also works out nicely in preparation for using it in
-> kvm-intel.ko and kvm-amd.ko, since the function is not currently exported.
-> 
-> Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On Fri, Apr 18, 2025, Paolo Bonzini wrote:
+> On Fri, Apr 18, 2025 at 6:13=E2=80=AFPM Linus Torvalds
+> <torvalds@linux-foundation.org> wrote:
+> > On Fri, 18 Apr 2025 at 06:06, Paolo Bonzini <pbonzini@redhat.com> wrote=
+:
+> > >   https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+> >
+> > I pulled this, but then I unpulled it, because this doesn't work for
+> > me AT ALL. I get
+> >
+> >    ERROR: modpost: "kvm_arch_has_irq_bypass" [arch/x86/kvm/kvm-amd.ko]
+> > undefined!
+> >
+> > when building it. I assume it's due to the change in commit
+> > 73e0c567c24a ("KVM: SVM: Don't update IRTEs if APICv/AVIC is
+> > disabled") but didn't check any closer.
+>=20
+> Yep.
+>=20
+> > I think it's literally just because that symbol isn't exported, but I
+> > also suspect that the *right* fix is to make that function be an
+> > inline function that doesn't *need* to be exported.
+>=20
+> Yes, that's possible since enable_apicv is already exported. Sorry for
+> the screwup.
 
-LOL, surprised this wasn't the case already.
+FWIW, the fixes here came from a big series that was dependent on a much (m=
+uch)
+smaller series that did export kvm_arch_has_irq_bypass(), and that got miss=
+ed
+when these fixes were grabbed early.
 
-Acked-by: Oliver Upton <oliver.upton@linux.dev>
+But I agree that inlining the thing is a better solution.
 
-> ---
->  arch/arm64/include/asm/kvm_host.h   | 5 +++++
->  arch/arm64/kvm/arm.c                | 5 -----
->  arch/powerpc/include/asm/kvm_host.h | 2 ++
->  arch/x86/include/asm/kvm_host.h     | 6 ++++++
->  arch/x86/kvm/x86.c                  | 5 -----
->  include/linux/kvm_host.h            | 1 -
->  6 files changed, 13 insertions(+), 11 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index e98cfe7855a6..08ba91e6fb03 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1588,4 +1588,9 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
->  #define kvm_has_s1poe(k)				\
->  	(kvm_has_feat((k), ID_AA64MMFR3_EL1, S1POE, IMP))
->  
-> +static inline bool kvm_arch_has_irq_bypass(void)
-> +{
-> +	return true;
-> +}
-> +
->  #endif /* __ARM64_KVM_HOST_H__ */
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 68fec8c95fee..19ca57def629 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -2743,11 +2743,6 @@ bool kvm_arch_irqchip_in_kernel(struct kvm *kvm)
->  	return irqchip_in_kernel(kvm);
->  }
->  
-> -bool kvm_arch_has_irq_bypass(void)
-> -{
-> -	return true;
-> -}
-> -
->  int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
->  				      struct irq_bypass_producer *prod)
->  {
-> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-> index 2d139c807577..6f761b77b813 100644
-> --- a/arch/powerpc/include/asm/kvm_host.h
-> +++ b/arch/powerpc/include/asm/kvm_host.h
-> @@ -907,4 +907,6 @@ static inline void kvm_arch_flush_shadow_all(struct kvm *kvm) {}
->  static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
->  static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
->  
-> +bool kvm_arch_has_irq_bypass(void);
-> +
->  #endif /* __POWERPC_KVM_HOST_H__ */
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 3bdae454a959..7bc174a1f1cb 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -35,6 +35,7 @@
->  #include <asm/mtrr.h>
->  #include <asm/msr-index.h>
->  #include <asm/asm.h>
-> +#include <asm/irq_remapping.h>
->  #include <asm/kvm_page_track.h>
->  #include <asm/kvm_vcpu_regs.h>
->  #include <asm/reboot.h>
-> @@ -2423,4 +2424,9 @@ int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages);
->   */
->  #define KVM_EXIT_HYPERCALL_MBZ		GENMASK_ULL(31, 1)
->  
-> +static inline bool kvm_arch_has_irq_bypass(void)
-> +{
-> +	return enable_apicv && irq_remapping_cap(IRQ_POSTING_CAP);
-> +}
-> +
->  #endif /* _ASM_X86_KVM_HOST_H */
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 3712dde0bf9d..c1fdd527044c 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -13556,11 +13556,6 @@ bool kvm_arch_has_noncoherent_dma(struct kvm *kvm)
->  }
->  EXPORT_SYMBOL_GPL(kvm_arch_has_noncoherent_dma);
->  
-> -bool kvm_arch_has_irq_bypass(void)
-> -{
-> -	return enable_apicv && irq_remapping_cap(IRQ_POSTING_CAP);
-> -}
-> -
->  int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
->  				      struct irq_bypass_producer *prod)
->  {
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 291d49b9bf05..82f044e4b3f5 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -2383,7 +2383,6 @@ struct kvm_vcpu *kvm_get_running_vcpu(void);
->  struct kvm_vcpu * __percpu *kvm_get_running_vcpus(void);
->  
->  #if IS_ENABLED(CONFIG_HAVE_KVM_IRQ_BYPASS)
-> -bool kvm_arch_has_irq_bypass(void);
->  int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *,
->  			   struct irq_bypass_producer *);
->  void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *,
-> -- 
-> 2.43.5
-> 
-> 
+https://lore.kernel.org/all/20250401161804.842968-2-seanjc@google.com
 
