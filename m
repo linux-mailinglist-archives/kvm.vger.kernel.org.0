@@ -1,133 +1,125 @@
-Return-Path: <kvm+bounces-43604-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43605-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00455A92F38
-	for <lists+kvm@lfdr.de>; Fri, 18 Apr 2025 03:21:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BBC2A930FD
+	for <lists+kvm@lfdr.de>; Fri, 18 Apr 2025 05:50:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E46491B669C4
-	for <lists+kvm@lfdr.de>; Fri, 18 Apr 2025 01:21:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 75D994A04C7
+	for <lists+kvm@lfdr.de>; Fri, 18 Apr 2025 03:50:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FF2678F54;
-	Fri, 18 Apr 2025 01:20:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AD42253955;
+	Fri, 18 Apr 2025 03:50:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Mwn5Sr0i"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P1plOb2b"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA39B4A2D;
-	Fri, 18 Apr 2025 01:20:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6010F9EC
+	for <kvm@vger.kernel.org>; Fri, 18 Apr 2025 03:50:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744939247; cv=fail; b=Z8RW3zeYPty2sqFTclvfam+5dWMp0/cbzCJWpAdrO25cF24lOaP/EisGj8GXq/K/D6NY9W032gKv4v5xYsxRKRfsp8aPD5AUO5fKFOh7not6IWKo/uaiDhJKii8XO4CRpmrhR/kbcYnpXTErVoEWJxTur9AGBO4pPzjsbSF+uzo=
+	t=1744948210; cv=fail; b=NvFcTtTWv4qXdO7HerQDLiHbTCkknEyX36vLy0VUkUzlg7+6q3ZtRnR0DAeUai4MqT74ThLWoVc9a5oXm9eDSkeF+p44qqRH1EprVnCVvPeDeEKRWvyFTYFa1MkJo+Lb2MNU8l5LBO4Xcw4YxmsMRqEKdgcW3MoswE1u7OXBu/g=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744939247; c=relaxed/simple;
-	bh=dQKtTF45SfbP5UCGJzWO1eJJO8gO0TpUlEfDEH6k1rI=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=XgC3drDHQ6miq49QN1ohXWBjPYKv23JHrOnXgBQOYh16s5lURP4e6k7xIBgXdz58tE1eeR8lXmXMXzBXAkLITKn/efjtdIICyeD7ZfW1z5MrF9/OLlnR5YsID0q+/vHVVsPb8QP5+4HNQsWfJNseKB9nTts6AgyLKxNRvZ4LZWQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Mwn5Sr0i; arc=fail smtp.client-ip=192.198.163.11
+	s=arc-20240116; t=1744948210; c=relaxed/simple;
+	bh=UQ33f/khKI5OpDjCfuzYVQzvb93utOIl1UmeSVM8EfQ=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=o/lwUfAwQsJZEYRai6LKbgPa/FbKelPvUQnNpezMKp+lrKVwn8gbMXm9eI4OmqdwdpHEDeTwLXIiOqNnBjyJDgcwOL9jAgHAhYhdQ5TomepjQaGxh+CWz/bJkpd96mstbXVfLaK0ERRNH6phB2ECBVE/h9FslI7vVQ9q94wAtek=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=P1plOb2b; arc=fail smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744939245; x=1776475245;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=dQKtTF45SfbP5UCGJzWO1eJJO8gO0TpUlEfDEH6k1rI=;
-  b=Mwn5Sr0i6TNelvgGjK1xRB8/muQAIyOpSdIMfI6RTbWeOFZoBMDDFcQf
-   X4yBTfLHs6FSG2EKm9RWi6Hdxj0kKOvMxyuamsVAjY8Nh/2W/Des2qNGd
-   xw6aRtpu5gFXvIjcnidgui5MjVo3PFXkgGn1bUYKFxKs6/dZzN5wcP42H
-   tOZYg7EDE/xJQATn5WqITItYxHX2CuyG9I9P8SazZam4goQNZfhmCDxeJ
-   4FWsl7aFjavfoEOU8pBWYAEg3Qwu2G5WkMONqRKiF48bp4GF7rV3VGxyv
-   60megAG2fj/QP7KL4Xb+wt9zHX3wd86gdy2g/t6x9y6ir8ecWnnRIqTXP
-   A==;
-X-CSE-ConnectionGUID: cKGUWlzDSiGmchlY/N6dMw==
-X-CSE-MsgGUID: 8UnoLEjbQkewuTPAtg7pnw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11406"; a="57228881"
-X-IronPort-AV: E=Sophos;i="6.15,220,1739865600"; 
-   d="scan'208";a="57228881"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2025 18:20:44 -0700
-X-CSE-ConnectionGUID: yKJn7UxmSjO8wYaAdjRrhw==
-X-CSE-MsgGUID: QnGns7S+Q6WSLXy3CUiRUg==
+  t=1744948207; x=1776484207;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=UQ33f/khKI5OpDjCfuzYVQzvb93utOIl1UmeSVM8EfQ=;
+  b=P1plOb2bUHZQCFq+Inpk6uiQsWBnJJGt5HvJ+0jjLIqaA+knKTOWw3Zx
+   fZPHsAOq+WGP5MXVLNTvvBbRsJUxnr8UHr2R4qKb59luizv1jax/bdAqV
+   WSwkHhc4E/sEMtitbikkIrUkFA6rTHGMDK1jjWCvN1WcpQc/AdtTEGd9r
+   /GDL9YViKJBox3wJuKGRxiCcGvZl4O24WPufOe0wk6lcN9LTjWT94PG0h
+   U9BFXCQu4ZZ2/K5Xf6i7eG8AOcg42Fa0aFsXRfepP/TnM2cDanSMMZEeB
+   Ylr0F/Zwk9Par+b18c2cVeMtjub+aDq8M7ZTN8pcyygMWjM1TW/F8skdw
+   Q==;
+X-CSE-ConnectionGUID: Q8DDiECNTI6qSsU83hJing==
+X-CSE-MsgGUID: TvvBKgVpSPK4tRIcJrwbbA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11406"; a="71963008"
+X-IronPort-AV: E=Sophos;i="6.15,221,1739865600"; 
+   d="scan'208";a="71963008"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2025 20:50:05 -0700
+X-CSE-ConnectionGUID: s+iBjtXSS2qDPKuz+1W91A==
+X-CSE-MsgGUID: uus1WTEtQY6YeTHrLiPS3w==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,220,1739865600"; 
-   d="scan'208";a="131534518"
+X-IronPort-AV: E=Sophos;i="6.15,221,1739865600"; 
+   d="scan'208";a="135830669"
 Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2025 18:20:43 -0700
+  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2025 20:50:05 -0700
 Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
  ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Thu, 17 Apr 2025 18:20:42 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ 15.2.1544.14; Thu, 17 Apr 2025 20:50:04 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
  ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Thu, 17 Apr 2025 18:20:42 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.48) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ 15.2.1544.14 via Frontend Transport; Thu, 17 Apr 2025 20:50:04 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Thu, 17 Apr 2025 18:20:42 -0700
+ 15.1.2507.44; Thu, 17 Apr 2025 20:50:04 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kqpKrH28Qk6FOUHO6pb8JIj5+Zctgxt3UJ5cRq/VTSbDKu5LHuRtCQ5cC9N9z9GxlcLAcH5TYM8AAzhTQQy8gsSlTHmvdODQZLSaQN9m4j6rj5acSfw6oY8pahZ7J4PNi4PLoeCUwm8FqWFZ9maRN/LZcLboa/sAKVy5hqQfGWYFQB5cfS4joqoxJUUyBZZbCEv6ExbpjsYb9/okPFEJdkikzfaiC8UokWvt68XU3C7aSILY11lVqUyGlm3n5XodLB21t5lqTiOIPG5OEMaZmRw3SDLfiDzhOaAF4eumAIFF6v42hauSezdvWU4gE3GMklzlwHHb60M/g5UlT5OE4Q==
+ b=GkzyzhSc9+box4yvuEz9ESY/zr4pJ2we9m8c2xRKQWC3lA7VqmGnDzGuZZLfNjmF7t7xnX3oh0lJZD7N54grsYcyXtzFI7nxHxGSUPqktDtz7mZgOTb5hFYYIjQE/YpH4NIvX7VyPKBJb6pDg5FrTyFi3g9Gq6CphOPzf7nMRssXtv4tUpiCBCvqKHiOqM0oa6Vj6HJd/LmkkjagaOB54o+tK7j7EzhB5b/DOGeLCE5zsIQRU4AnSgyXzL4s6l8551ynzwuccZOY67DjwbAj94iSrgImoR9g3JotZ0tnUgzoW40qDJHPzw6x5FRF5L6tiCZY3sIP7jSoLZgfQ7dA0w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=s9jZ07VZUyiZ3rJJa9JKByz/s/uY96ut/66vE6foSA8=;
- b=LAFcX5d7cAYItdgLTXzwD38H4+IdylP+ZizzQqaE7/CQTUrc0AYdCs3iutYrybDvB49U+MErSAeKH25YhCkrTbOLzPt5Oxde73Uz9nE4goQcxez21WYbWUyKc1JorYee+c/n5mmbZo2W+/ItJ89wjho/tq7FVyPoI/y3ZP9w7Oo5zCeHRqMPVCOSI6hlcyDZrla761GP50vx1SphWpYp1f4JwSVioe+/ezGdKkb+c73X+4Vx1Cu0dTjEY2uvaWkBvT//bz3D97z6DLY6v18jsTCJ/U1Rwb9s9BCAW2Qb8k224EjPBfzLw5Uoo+Fpjpg4RWeKTSyphOnZQB9GsaU2QA==
+ bh=5uaZgZV/OVgnFfr0BX8AsWNARpZtYpxWpudUNBszit0=;
+ b=vzId0YQPJpWmEfAvXUlK+0lwS8VKF2EFEpsBL18y2ytkMkJ1fNsgr0dx1YjHagJJnKNEqm4bjyp9eIJq+1zOUy5QsTOxB7/1a7Rz5pW4J+kseiBqdCwfoqtstGZLT0NnXL6vraDcJIzqJzFt594/52DCUtnJuKmhgd2XhRXW14w5v/Dt5Z6j10ER6FLclavSscGSY8SaHyEnygj9Q0L3jvJoG83tRSH3LAFCCE8Yyj3rrmjkSkpQ6vBd58ZeFuQMvqBUmm5t11gR4klyDsTvyl6gSmOfKwzUz0cIACQfR3vQRodlfqYKd3g/LQlogsBPOVz1oo3eqo+u3TLYz9+Zpw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
- by MW3PR11MB4588.namprd11.prod.outlook.com (2603:10b6:303:54::19) with
+Received: from DM3PR11MB8735.namprd11.prod.outlook.com (2603:10b6:0:4b::20) by
+ DM3PPF31D2DA56C.namprd11.prod.outlook.com (2603:10b6:f:fc00::f18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8655.26; Fri, 18 Apr
- 2025 01:20:39 +0000
-Received: from PH8PR11MB8107.namprd11.prod.outlook.com
- ([fe80::6b05:74cf:a304:ecd8]) by PH8PR11MB8107.namprd11.prod.outlook.com
- ([fe80::6b05:74cf:a304:ecd8%4]) with mapi id 15.20.8655.022; Fri, 18 Apr 2025
- 01:20:39 +0000
-Date: Thu, 17 Apr 2025 18:20:35 -0700
-From: Dan Williams <dan.j.williams@intel.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>, Marek Szyprowski
-	<m.szyprowski@samsung.com>
-CC: Leon Romanovsky <leon@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Joerg Roedel
-	<joro@8bytes.org>, Will Deacon <will@kernel.org>, Sagi Grimberg
-	<sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>, Bjorn Helgaas
-	<bhelgaas@google.com>, Logan Gunthorpe <logang@deltatee.com>, Yishai Hadas
-	<yishaih@nvidia.com>, Shameer Kolothum
-	<shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>, "=?iso-8859-1?B?Suly9G1l?=
- Glisse" <jglisse@redhat.com>, Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <iommu@lists.linux.dev>,
-	<linux-nvme@lists.infradead.org>, <linux-pci@vger.kernel.org>,
-	<kvm@vger.kernel.org>, <linux-mm@kvack.org>, Randy Dunlap
-	<rdunlap@infradead.org>
-Subject: Re: [PATCH v7 00/17] Provide a new two step DMA mapping API
-Message-ID: <6801a8e3968da_71fe29411@dwillia2-xfh.jf.intel.com.notmuch>
-References: <cover.1738765879.git.leonro@nvidia.com>
- <20250220124827.GR53094@unreal>
- <CGME20250228195423eucas1p221736d964e9aeb1b055d3ee93a4d2648@eucas1p2.samsung.com>
- <1166a5f5-23cc-4cce-ba40-5e10ad2606de@arm.com>
- <d408b1c7-eabf-4a1e-861c-b2ddf8bf9f0e@samsung.com>
- <20250312193249.GI1322339@unreal>
- <adb63b87-d8f2-4ae6-90c4-125bde41dc29@samsung.com>
- <20250319175840.GG10600@ziepe.ca>
- <1034b694-2b25-4649-a004-19e601061b90@samsung.com>
- <20250322004130.GS126678@ziepe.ca>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250322004130.GS126678@ziepe.ca>
-X-ClientProxiedBy: MW4P220CA0003.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:303:115::8) To PH8PR11MB8107.namprd11.prod.outlook.com
- (2603:10b6:510:256::6)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8655.22; Fri, 18 Apr
+ 2025 03:50:01 +0000
+Received: from DM3PR11MB8735.namprd11.prod.outlook.com
+ ([fe80::3225:d39b:ca64:ab95]) by DM3PR11MB8735.namprd11.prod.outlook.com
+ ([fe80::3225:d39b:ca64:ab95%4]) with mapi id 15.20.8632.030; Fri, 18 Apr 2025
+ 03:50:00 +0000
+Message-ID: <84a35f4e-69d3-40c2-b92e-5c9f0b78ad74@intel.com>
+Date: Fri, 18 Apr 2025 11:49:51 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 04/13] memory: Introduce generic state change parent
+ class for RamDiscardManager
+To: Alexey Kardashevskiy <aik@amd.com>, David Hildenbrand <david@redhat.com>,
+	Peter Xu <peterx@redhat.com>, Gupta Pankaj <pankaj.gupta@amd.com>, "Paolo
+ Bonzini" <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
+	<philmd@linaro.org>, Michael Roth <michael.roth@amd.com>
+CC: <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, Williams Dan J
+	<dan.j.williams@intel.com>, Peng Chao P <chao.p.peng@intel.com>, Gao Chao
+	<chao.gao@intel.com>, Xu Yilun <yilun.xu@intel.com>, Li Xiaoyao
+	<xiaoyao.li@intel.com>
+References: <20250407074939.18657-1-chenyi.qiang@intel.com>
+ <20250407074939.18657-5-chenyi.qiang@intel.com>
+ <402e0db2-b1af-4629-a651-79d71feffeec@amd.com>
+ <04e6ce1f-1159-4bf3-b078-fd338a669647@intel.com>
+ <25f8159e-638d-446f-8f87-a14647b3eb7b@amd.com>
+ <cfffa220-60f8-424c-ab67-e112953109c6@intel.com>
+ <fd658f30-bd28-4155-8889-deda782c56eb@intel.com>
+ <43b949b1-bc8b-4b7d-ab3b-206cb88d4756@amd.com>
+Content-Language: en-US
+From: Chenyi Qiang <chenyi.qiang@intel.com>
+In-Reply-To: <43b949b1-bc8b-4b7d-ab3b-206cb88d4756@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: KL1PR02CA0026.apcprd02.prod.outlook.com
+ (2603:1096:820:d::13) To DM3PR11MB8735.namprd11.prod.outlook.com
+ (2603:10b6:0:4b::20)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -135,140 +127,305 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|MW3PR11MB4588:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5003390b-5f13-47a2-c44d-08dd7e173ad7
+X-MS-TrafficTypeDiagnostic: DM3PR11MB8735:EE_|DM3PPF31D2DA56C:EE_
+X-MS-Office365-Filtering-Correlation-Id: 48066928-d7fc-4e1e-f274-08dd7e2c180e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?B4pWIZ+5hJd2d9Z/0nSDy8ZhCmGR4rFTDJ5oM/gqr4mnFn/7EZhGUidPtOzH?=
- =?us-ascii?Q?VpIVgwz/jYS688V/rLkHZNB/IXUoGuhWCNL8cY4TnZhbUDMSmGknaMTDSkKa?=
- =?us-ascii?Q?IDwWVqbKEsgxQSX+s28k2CHf4te4ReRwt7liCs7YDW4eotbRpuJi9VWG6Pp6?=
- =?us-ascii?Q?8MnIi9KLOc7EmaFof2dav4lGws2IeHoH/9E1HtTlLOQX4ppQZpa6Q/X8piua?=
- =?us-ascii?Q?+BT+BgPbSLgnFF5++zftB433uYhszQN43iLsM5KAacMixllQf1G8lxr7cyeA?=
- =?us-ascii?Q?RUjIzwkT4ScNIdxmfJehXx7qZvvojISqY8f+Ti+J7UMd+M91foXR/xH7/yND?=
- =?us-ascii?Q?wdqunc9yK6qAS/mXBLFhfSNZMP/8Yj7oNili90i4yuLSzGB2fFZJNsMj6fqp?=
- =?us-ascii?Q?DHOR/NB3j8nNyU60PVIzLDhW3cMo+Ba3gCIT/tEPAME9HkRU6NXhRpoV94Bl?=
- =?us-ascii?Q?pF+idnCi0F5P3gZbsj0chIkoF1t2qhTj73ORhJsDOd1Zbs1Qe4FzN5/NpiSA?=
- =?us-ascii?Q?zvoU70cxr5ksi0F5p52xku+cIT1VYoy7G/3A13gk4WmZXSszx9O8xac/OMF0?=
- =?us-ascii?Q?sXa/uj//64rvvIPNKNTrxbDZfxC4kdZw4IuxKONWhs+qx37aVAOIKOmC+Ri0?=
- =?us-ascii?Q?QGqbfpoTI+7p91wFt+bMjSQ//x67mWwHP6pJHRO4sYP4M2o/YbZNmvKzWNdB?=
- =?us-ascii?Q?Ac/2a2ElkOpF6DvV2VA84/fyKWtwJTnxU/PpOWpW/ku9Ddb6DvUVDEtwn+Gh?=
- =?us-ascii?Q?w6esjx/XL+T9rL4Ku2IWCxyjSEuAT+c+6iWqgkjD35NHmnoqznXz0vjkdR8D?=
- =?us-ascii?Q?9O6AmBIqyWPH8o//2FofY21DwZveB9sPb4lkAxa45EWWL5t6wONpd7V/tFnN?=
- =?us-ascii?Q?O6BOgKIpC1EBvx9Z10ixHhpS56Y6qSaeiSQ2Pg9U5hTtRdGp8qgteZuLgbc+?=
- =?us-ascii?Q?J6C+sERmLmUH9ilWoK2DoZgJ7xi4hAvJaU4QgwTy6fyA+thUyrRm4nczcRfj?=
- =?us-ascii?Q?0pTheuznQIlKQayfKzCu9tJFzQzJfPTwbUwMi4P4xFqQFwCiH++a3uImtt65?=
- =?us-ascii?Q?Y7FZTUFhdsKQ/9+tPl6upV5OMxhQFKsnRlDfn/vyPwUGTRwJF7IRzs+kMuD4?=
- =?us-ascii?Q?INqvpLL1siVjmaLCh8oasz12YlIiQ6JCVOvA6JS8RaYa8W59INmqf/QJ0FYq?=
- =?us-ascii?Q?FiQ8F+6nLjPdLaHQhWd3guSBaF4kpQYni0Bt1asalWkom3F6R5qWAfoOfpeb?=
- =?us-ascii?Q?KoKQqhcyKgeBVWm0f3cQzSX2KbMNnJ8LgW54BahFVcm4of6YszjF5lv6SToX?=
- =?us-ascii?Q?N2ETANkr8eg8T+wqsRcqxxSmMjmBovqWc6hs+urGohElN/u1RrtKHNH+mkCk?=
- =?us-ascii?Q?/vOe/xz3d+F+nWgu0nCqc9ePDkVk?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?SzlaUkdLODhKRGFOUGRTMGtnZ1dvQkZFNnYwRm1tTTJxcFdxdlF5TjBZa0VR?=
+ =?utf-8?B?SG1ZZ2o3ZkJ5L2JCK3BpMVo3T0FUV0xkTGYyRnFSZ3ozL3o2ZHM4WE5IK2NQ?=
+ =?utf-8?B?Z1l1Z1ZtT1QyYjBkY2cyaU1XWG5HQWh5dllPMFZkYm82eFFrdW9oTnoweTRi?=
+ =?utf-8?B?T29YVW1qNUlBRjk0eTl2RGYwd3Z5TGw2WjZEYThlT1l3bnBaKy9HQi9ETjBo?=
+ =?utf-8?B?ZGNLbXVSenhCdVBJR1Z5YUN4ekIyZzlpRlV3THR2MHVZbFVKSS83bEFZK2Uz?=
+ =?utf-8?B?UUNHSXpSeUl3ZEc0Uk9sTUE1cVJ2ZGZwRG1KTTYxSzFKNU1ycEc0K3FwdGpP?=
+ =?utf-8?B?Z1htV1FqVUJkQzZMY0NWMG5MeldtbnYra2cvWjRZek13Rko3Q0hDTUVjMFI4?=
+ =?utf-8?B?QmJvdUdUdnE4VzFSNWEzOC9hYmdXVTUrenY5NWpXQWs3Qlc1LzZPMmE0N0JH?=
+ =?utf-8?B?LzFJUWMvTGt4OE1jYWxrTFdpUWVVc3U0ZW9SYTJwS1ZQeC8vS09ZQ2tIai8r?=
+ =?utf-8?B?c2Njd3NFMGhKckRycERhQ1lxMS9KVHBKTGVISFZoYkw4SnQ1MHFDN3pUSmFY?=
+ =?utf-8?B?blVFNlZTRjR5c2QxTE9pOWxndjZUZGlBTjVrVENpd3lIaDZSWURZcUNndnlz?=
+ =?utf-8?B?TGhpN2syZ2RRRTBNNmtWNWh0cEo3UGFOUHpxWmk3Q0hHdGI3cWpuTUZoYXBz?=
+ =?utf-8?B?aDhWWVl6akcyYUJHeGRsdnJZNFVrcGpCTTFnbEZId3MwcytOYklIM09kWnZx?=
+ =?utf-8?B?TmZYdWtMUENwRThQRDlDNkFrbjN2dExKTzdQSkVaeFlHV0ovbXJlZ2UxcjZV?=
+ =?utf-8?B?N3Zwc0dxdG5qM0ZIY0lXY0kvelo1YWtJRGNDV1FNYXRyTGVPZWwzL1JxNTN1?=
+ =?utf-8?B?WnBIczZRSGtjRzdGdUZnUS8rVEdnWTJnelNOVTNUenBRT0ZrY2xlaW5HTHZs?=
+ =?utf-8?B?SkF6RFpaWXBvNm9qdEUwb2ltS3pPZHpGeFRZK0dlUDduemNlUk9PdUFNUGR0?=
+ =?utf-8?B?S01uYzh6ZUZMd240bzIwTzM0Slh3Rlp4M2lQU2M5UFhoNlp6T084cnEyM3Qr?=
+ =?utf-8?B?VUwvRnRNdlNGdERjdWh5VUg3TEZqT0o0c2VHRzdhL0dQa1NVVldkWmJTcVlw?=
+ =?utf-8?B?QnNnTWJBcUhjRFZjR3AxaHRIUUlMTkpoQWs0OHRxUVJEM0pxS09SMDZtWUlI?=
+ =?utf-8?B?M0g2Y3FYU01VSlZ2QzV5bTFWSXBaQ2dFK0NnSG0rVXpkWlRoaFhoSFZXaUJl?=
+ =?utf-8?B?Qmd6MFlzYldkMXZ0U3R6L2JuVmFaTEs4V3NhVnBNclhnMUgwZCtueHZxWEJa?=
+ =?utf-8?B?TWRHSDZFdWJPVTBLalhuWEtxQXh3TTM1R0wva1BHeEJ5aE5JUk4xV0JSQVVi?=
+ =?utf-8?B?Rm9rL0NZSkd2bnAzejZFTkwrWGE4SzdmS2NTSUg5dmZEb0J4eWNKS0VVS0xT?=
+ =?utf-8?B?aTRvUm4weDRrV2o0ckprN0JJKzRyVHJrWXBoTWllaHZDY1Y1U3FWS09lM2lw?=
+ =?utf-8?B?L25wWi95THlTYkpmWW9wbmpFSExIQndXQ3RUcmZFeE90aWloRFo1NG9RSlVs?=
+ =?utf-8?B?dHBLQVNQdlJGaGI0WmJ3YkZNS0xDaU5RdGlWUnhqaWZmaElqYitMT0YxY3Bu?=
+ =?utf-8?B?ZGZOYnJQVkU3K3lkN3RNZjIvemRjaFM2b25pR3owbTkwa2ROOTZFQlkxRjhV?=
+ =?utf-8?B?TUlqWFZMVG9ZN2JVRGtRdCt3R3Z0TFdSSUZHQVAybi9EV014VzYrUER1QjNM?=
+ =?utf-8?B?bHVxd28wZnpVNHF0SDNra2g0SmtJSWw3akhERVVBM1VIaG9iaXZuSUhLQVFB?=
+ =?utf-8?B?LzRFYkZsM0tQVVdCTFREZ3BxbTM0azN1eVFUZzdYcDJuS1JIN0p0dkpNcldl?=
+ =?utf-8?B?WDQweUJ2Tjd0bDNoUzBwWmgvUGtBMTRMTEZiSFk2a3hKcGpCTVlWZGVFK203?=
+ =?utf-8?Q?jU4H02i6moU=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM3PR11MB8735.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?B9pmLmv9kFiXLFo39DFgQO52cR315cVMjFdI3VOdNAWW/gcSFg7sd4KbvXUv?=
- =?us-ascii?Q?WhnbJEPf0xxK8YGbCe5MfSO9+qC5NXIUPLk30UKMOa5Ego9+10K7cVW8E696?=
- =?us-ascii?Q?7xxs6myrkklEj9J9onDs9IlQNuVT6Qh7nfc+S+/jdTkarWGTVW4irOmanGSx?=
- =?us-ascii?Q?UunzwCAysvs3vEGlkP2ujFHXA12bLzreTlz5uZq/RoGGw0C9Qr1p+5R8c0/b?=
- =?us-ascii?Q?gnoIwsPe/ObqOAaQRuO3Op0sLr2Utsl3Z15ahbnFgMq7NT5dcuEVfVkY5JlV?=
- =?us-ascii?Q?m1p4nMMVZEMTcTGGsW2hcG/BOD17qRq3s9qPdoCXEDgnwsG9M3PkvXQTMHGw?=
- =?us-ascii?Q?u9cDwLPDSrWrKRAvG5/tSz0/XaAjtZMeJxNG3dmMwHmjljemMnlQoxZ3caI4?=
- =?us-ascii?Q?N/96L47b1m57ff09t2Q24dEPoBNRKZdxO0ABvvpQKCjlbBzo/Au3sRYex6eu?=
- =?us-ascii?Q?odm5dT7ubVpPRALdkhc/esAhnjjb0LRrbvpuHAc1c5InKzNZ76iwnVRI82AK?=
- =?us-ascii?Q?Hca8IBpvOByiiD1at4ggyp8y9pFZ5UonAyOQdztZOLbXSHsMeOS88dXQ/3eg?=
- =?us-ascii?Q?zNhc1Oe+LAsWD8LICfR9qI8N9Hx13k76S/XAxtxSIMNG77xt2k6ZpDO80nJh?=
- =?us-ascii?Q?eR0sqqyNMbzuzlcLjXyjlAF2fvch4S37RUHHEMILtFBqNzXImexOYVzhsCeI?=
- =?us-ascii?Q?0jHcYT2O6y0WPsURSnP0KoGX2oSsom1eGS2dyTGLRF4R2gqo8jYU446rRHOP?=
- =?us-ascii?Q?rNicvQ4LRcBaKc8NpnQH9agtP1FVdFaT37QYJmjmowtenn8Eh9QAnGITDWXa?=
- =?us-ascii?Q?pJfQ3sXYR871GvQFFJVTkRutqGnCzXKkTBAX2YTEZb7XHvMXwHSk08/sVrkm?=
- =?us-ascii?Q?Tx5rWxeVjvkCWlwvaDq1GiWipSopxDYhkgla5Qr+4+NSu7tBOWHamBrxtkYO?=
- =?us-ascii?Q?lQJscBjaEc8Jj8x2l/9jGRhy1bFm+oKRYxAUnRwwneLG4udJ9HfePViDJL1W?=
- =?us-ascii?Q?YWnKBhHJ8IyNFDv8RMPmo9KNeCv+kf+Kc3ZrmHuqP88jJ9zC4IKn68+o5J+9?=
- =?us-ascii?Q?i4y9hQ2JS9gUC+0CTk7KG0jKIK8cwt3WjVS+qCe2sP4rbbUP34GcLBUzbLvk?=
- =?us-ascii?Q?3LahotAANsdFcswBT/FuwEmoKp5WoRZ6p94cQ6iZ/LjGa+I2WxpcKzib4YOG?=
- =?us-ascii?Q?LYRPMEdbJnSYee3+DGrzd8AZ8rt4cFbYNXLFIxFBVQRY76Nx2+vo5XaMAu/w?=
- =?us-ascii?Q?zkzUsiEUjZbhDlOv17gvOwAJu2CuoKSR/1rac6yCGbNVX6gvSrexs9XsAJ0b?=
- =?us-ascii?Q?/C06xmtetp1sr5GRmDDw0l8wmd2uSrhlkgkkMt+KLUQTm2hLuxAThYUJl/r3?=
- =?us-ascii?Q?H5ueMdoQKFCVMZYz7sd6ZMvCplEgzCZAOlPTpTiDvTSX5oThzemX5MwfG9N9?=
- =?us-ascii?Q?Vh33xmU2FoLeAsZcuIJ6BL+Id9nun+EuBFnVlu6akUNVTJb66hqDGGieocr2?=
- =?us-ascii?Q?EgmGd+P7mOgyor3yMoOkpjdFD1Edv8n7wd5ySU0exddz0Vr8oos4TSoL7jyP?=
- =?us-ascii?Q?ylMDufkTom96slL0+OyGSvH6zG/B0K37Zz8TEVKJnGn5QY4dvaGFCa3FrgAN?=
- =?us-ascii?Q?HQ=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5003390b-5f13-47a2-c44d-08dd7e173ad7
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZnB6MjdTaDI2OGRUVTFKekxlTXlpQjA1ODFhaFE1d1J3Yjl1OXJMbUZMZ1Nv?=
+ =?utf-8?B?Mlk2ZGVwNTVmM3ZuQUF2UmJIK3JYREhDZ0lxckppSmFUUThuWUl6YlVVbnlx?=
+ =?utf-8?B?V0o4YjdlQVZ0ZHU5REJIMnVCSXpLZ3N5NGdXbVRYdUZLWVhQU2IwVlhNUFJt?=
+ =?utf-8?B?N3F2WG1kbW5Lalc4YitaUTJiSGg0YWlHZWV4eFBDbTdlN0YrRzIzeXBuNE16?=
+ =?utf-8?B?SFI4ZGVRTUE1UWlGbW5XbSs4Tm1MOWtPODNDamlSQ3AyYjI5RTNXbk54MUFm?=
+ =?utf-8?B?MnZXQWw3L0lobERySjlTTXZKeEhxR1YzL3FBdEl3Y1BlSlV2ZU02ZkVBWXJ0?=
+ =?utf-8?B?d2wxTC8xWTVJU0lmWTdXaE5rbmxpaEF5eUZ2RUhjOUVvN00xZGtFaWxQTkRV?=
+ =?utf-8?B?MG1UVG9PczlrTnNtcXVobmlxN2RBWWhXSi9GMFNlVTh4aGVwR2VNSTBJZW9u?=
+ =?utf-8?B?ZE5XMk55OEFIajR1MDZJUVhMZGJxR2E4Yy9PNjZpSktRc2pNTEpvMC83aC9U?=
+ =?utf-8?B?cE5GOVNJKzh5OGFnTksvN0JDMkZ4ZDZFeFNzck4xbCtjbDMweDA3c3JGT25j?=
+ =?utf-8?B?eko1aUFpcGhwVVJMWVk4YXZsZmhHbEVKbFhOcDNjT29CZncvRWJnUEpkZjhk?=
+ =?utf-8?B?bDNoeVIwNWxhc3k4aTdpSWt3SGVkcEIyMGdQOW41bGFDdWQzOHp5R2JNOWNq?=
+ =?utf-8?B?U1Bnd3Z1UGpPSytSbHA2OEF1RmduTUVDdXJIZ3YxUndCNkJSWjhtbEo4d0M3?=
+ =?utf-8?B?NzRVQmxvS3haUElneWFGcVFBMVNYUUJ1bWVoYWZ4SHJwb09ZM0FhZWI5RU90?=
+ =?utf-8?B?ZG1kVjFEMHVhajYrc3UyQnlxL3BLZmVEb1pYcWdyclE2TmJsTUp1dnFOR3ha?=
+ =?utf-8?B?bmh4QVZWUSs1QjlTWlZzSUZzUGc5b3RMNVBlc3RwZmFRUTNlRnViSU0zdmE3?=
+ =?utf-8?B?N1hialk5TWprZFBpcEhHcmg4VlVya1E3dkdiaFFvR1orWlVTdThzUDlWajhG?=
+ =?utf-8?B?cDZVTjZKU3dHbS83MXB4T2lqMW5EK2hRbEJmRHlMc05QK2tsTUkwOXY4bEdE?=
+ =?utf-8?B?TUtVTkkzU3FxdzRXQjJUdUdtd2tLSXQyNTZpdzExcjNsSDBtL0VYZnoxYTNK?=
+ =?utf-8?B?Y2hpUUdNRTRET3lDSEFrZm9GdURKd3VDcDUrSzRGalVERTlITit0YXV6MFMw?=
+ =?utf-8?B?c0JRaDk4VFBYeXpEdFZUaFdwbWM2R3JKVFVFOFJOc1J3U2dHQlB0T2R6M1pK?=
+ =?utf-8?B?MmhtTldkRGxjeHZxWCt3Yzh3N3QvNFpYOTVZV1N3QzRHTk56R01jaFQyV2hV?=
+ =?utf-8?B?Z3U1TmJXUytubm56RWp4SlplR3Jwb0Q2UWh2eEg4MGEwdkszR2hVVmFSS2ow?=
+ =?utf-8?B?V3U5U0M2NkcwZEdLMDF2aHVST245V1JZREYwckdSWVUzL2FjQzdUVXNhZGd3?=
+ =?utf-8?B?MzlBU3R2cEJkRGNxcUxOb2ZCY3QrRGxTcThJZ1QwNlJHa3BzOU4yVDIycHF2?=
+ =?utf-8?B?REhuVUY5em1sYlFtbVVzV2NQMkZScUpvdjl2RzJIU2M4bmJHKzVDcFdkVWNo?=
+ =?utf-8?B?V2dnSmZmSldyQ25vbXlVdktSUlNjMlJHU1RhSWJTYmNZK201aWpSQXZCeDhS?=
+ =?utf-8?B?VzJUaE9lWGlVWEhYUDI3MFR1RmppRno5eGNwbHpiajhoVG1Vc2ExZVFudzB2?=
+ =?utf-8?B?NEFtT1RjMlJmcmY0QTl6Mm9oeTdld0NLcm1sTlVkbXNZK2NuL3dFei8vK3Ez?=
+ =?utf-8?B?bW5XcDNaREt5eHFETTF0aXlqK1MwbU54MmdkR1VWdGRIeGV0T0RJb3JLbUt6?=
+ =?utf-8?B?NnRyNTVWYWdNNVJacHIrdWw4aTFLc2IrMkpVL2NzL3RKRTJVWFZFY1lRZWlU?=
+ =?utf-8?B?RnJ2VWV0UEJkcUtPM1lZdWg2ME5GVHkwbFZtV3daQm9FcVc1ZytaaEMwZ2tj?=
+ =?utf-8?B?MzZ0cm9jaDlQQnlaSVJHeFkzQ2Mwd0NPU1J5TUZTN3RRd1lOeXJPWFhlL1Vv?=
+ =?utf-8?B?V1hUZ3BiMDN5VHdiV2xjTkIyNWVGUXhlZUhETmdBbWYwMlppT1lYdFl3aWxR?=
+ =?utf-8?B?MkxPUGVZWGJwRkV0Y1VtOExuNlYvWkw5NDdHczdtL3RsNjRqRHhvd0dNUXps?=
+ =?utf-8?B?SEFod0FuVGVaWXBiNVJCYWpPL2o0dTlkYXM0cjk3Vml4dTUzS1pZNUJ6MHZB?=
+ =?utf-8?B?VFE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 48066928-d7fc-4e1e-f274-08dd7e2c180e
+X-MS-Exchange-CrossTenant-AuthSource: DM3PR11MB8735.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2025 01:20:39.4865
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2025 03:50:00.7347
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SKNzGFSFOpw14PQOCwBhQNNJFb/sGsLfnKM9+5sU+eZtqjey5BdlLXPw5vp+/Q+c8nxUtfJ1d4o/7tMA7wiTAu+7QS6vF0V+rOcOchP4xY0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4588
+X-MS-Exchange-CrossTenant-UserPrincipalName: b4iGRYiWwqOnnMkmbyTb5I/zSWT++Vc+oiH+rdtO/uaYUXOA/+zYv26kvohpMmoSEl0eyEHlFFbWKoqFpvfAtQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PPF31D2DA56C
 X-OriginatorOrg: intel.com
 
-Jason Gunthorpe wrote:
-> On Fri, Mar 21, 2025 at 12:52:30AM +0100, Marek Szyprowski wrote:
-> > > Christoph's vision was to make a performance DMA API path that could
-> > > be used to implement any scatterlist-like data structure very
-> > > efficiently without having to teach the DMA API about all sorts of
-> > > scatterlist-like things.
-> > 
-> > Thanks for explaining one more motivation behind this patchset!
-> 
-> Sure, no problem.
-> 
-> To close the loop on the bigger picture here..
-> 
-> When you put the parts together:
-> 
->  1) dma_map_sg is the only API that is both performant and fully
->     functional
-> 
->  2) scatterlist is a horrible leaky design and badly misued all over
->     the place. When Logan added SG_DMA_BUS_ADDRESS it became quite
->     clear that any significant changes to scatterlist are infeasible,
->     or at least we'd break a huge number of untestable legacy drivers
->     in the process.
-> 
->  3) We really want to do full featured performance DMA *without* a
->     struct page. This requires changing scatterlist, inventing a new
->     scatterlist v2 and DMA map for it, or this idea here of a flexible
->     lower level DMA API entry point.
-> 
->     Matthew has been talking about struct-pageless for a long time now
->     from the block/mm direction using folio & memdesc and this is
->     meeting his work from the other end of the stack by starting to
->     build a way to do DMA on future struct pageless things. This is 
->     going to be huge multi-year project but small parts like this need
->     to be solved and agreed to make progress.
-> 
->  4) In the immediate moment we still have problems in VFIO, RDMA, and
->     DRM managing P2P transfers because dma_map_resource/page() don't
->     properly work, and we don't have struct pages to use
->     dma_map_sg(). Hacks around the DMA API have been in the kernel for
->     a long time now, we want to see a properly architected solution.
 
-So I am late to this party, but after watching a "modest" proposal of a
-DMABUF pfn exporter bounce off the DRM community due to long standing
-pain points with scatterlist abuse [1], it is clear to me that a new DMA
-mapping API is in the critical path for PCI Device Security
-(Confidential Computing: TEE I/O).
 
-Specifically, the confidential computing problem of how to coordinate
-the conversion of assigned devices from shared-world to private-world
-(including private device MMIO and DMA), needs a "non-scatterlist"
-"struct-page-less" mapping contract to describe those resources.
+On 4/18/2025 7:10 AM, Alexey Kardashevskiy wrote:
+> 
+> 
+> On 16/4/25 13:32, Chenyi Qiang wrote:
+>>
+>>
+>> On 4/10/2025 9:44 AM, Chenyi Qiang wrote:
+>>>
+>>>
+>>> On 4/10/2025 8:11 AM, Alexey Kardashevskiy wrote:
+>>>>
+>>>>
+>>>> On 9/4/25 22:57, Chenyi Qiang wrote:
+>>>>>
+>>>>>
+>>>>> On 4/9/2025 5:56 PM, Alexey Kardashevskiy wrote:
+>>>>>>
+>>>>>>
+>>>>>> On 7/4/25 17:49, Chenyi Qiang wrote:
+>>>>>>> RamDiscardManager is an interface used by virtio-mem to adjust VFIO
+>>>>>>> mappings in relation to VM page assignment. It manages the state of
+>>>>>>> populated and discard for the RAM. To accommodate future scnarios
+>>>>>>> for
+>>>>>>> managing RAM states, such as private and shared states in
+>>>>>>> confidential
+>>>>>>> VMs, the existing RamDiscardManager interface needs to be
+>>>>>>> generalized.
+>>>>>>>
+>>>>>>> Introduce a parent class, GenericStateManager, to manage a pair of
+>>>>>>
+>>>>>> "GenericState" is the same as "State" really. Call it
+>>>>>> RamStateManager.
+>>>>>
+>>>>> OK to me.
+>>>>
+>>>> Sorry, nah. "Generic" would mean "machine" in QEMU.
+>>>
+>>> OK, anyway, I can rename to RamStateManager if we follow this direction.
+>>>
+>>>>
+>>>>
+>>>>>>
+>>>>>>
+>>>>>>> opposite states with RamDiscardManager as its child. The changes
+>>>>>>> include
+>>>>>>> - Define a new abstract class GenericStateChange.
+>>>>>>> - Extract six callbacks into GenericStateChangeClass and allow the
+>>>>>>> child
+>>>>>>>      classes to inherit them.
+>>>>>>> - Modify RamDiscardManager-related helpers to use
+>>>>>>> GenericStateManager
+>>>>>>>      ones.
+>>>>>>> - Define a generic StatChangeListener to extract fields from
+>>>>>>
+>>>>>> "e" missing in StateChangeListener.
+>>>>>
+>>>>> Fixed. Thanks.
+>>>>>
+>>>>>>
+>>>>>>>      RamDiscardManager listener which allows future listeners to
+>>>>>>> embed it
+>>>>>>>      and avoid duplication.
+>>>>>>> - Change the users of RamDiscardManager (virtio-mem, migration,
+>>>>>>> etc.) to
+>>>>>>>      switch to use GenericStateChange helpers.
+>>>>>>>
+>>>>>>> It can provide a more flexible and resuable framework for RAM state
+>>>>>>> management, facilitating future enhancements and use cases.
+>>>>>>
+>>>>>> I fail to see how new interface helps with this. RamDiscardManager
+>>>>>> manipulates populated/discarded. It would make sense may be if the
+>>>>>> new
+>>>>>> class had more bits per page, say private/shared/discarded but it
+>>>>>> does
+>>>>>> not. And PrivateSharedManager cannot coexist with RamDiscard. imho
+>>>>>> this
+>>>>>> is going in a wrong direction.
+>>>>>
+>>>>> I think we have two questions here:
+>>>>>
+>>>>> 1. whether we should define an abstract parent class and
+>>>>> distinguish the
+>>>>> RamDiscardManager and PrivateSharedManager?
+>>>>
+>>>> If it is 1 bit per page with the meaning "1 == populated == shared",
+>>>> then no, one class will do.
+>>>
+>>> Not restrict to 1 bit per page. As mentioned in questions 2, the parent
+>>> class can be more generic, e.g. only including
+>>> register/unregister_listener().
+>>>
+>>> Like in this way:
+>>>
+>>> The parent class:
+>>>
+>>> struct StateChangeListener {
+>>>      MemoryRegionSection *section;
+>>> }
+>>>
+>>> struct RamStateManagerClass {
+>>>      void (*register_listener)();
+>>>      void (*unregister_listener)();
+>>> }
+>>>
+>>> The child class:
+>>>
+>>> 1. RamDiscardManager
+>>>
+>>> struct RamDiscardListener {
+>>>      StateChangeListener scl;
+>>>      NotifyPopulate notify_populate;
+>>>      NotifyDiscard notify_discard;
+>>>      bool double_discard_supported;
+>>>
+>>>      QLIST_ENTRY(RamDiscardListener) next;
+>>> }
+>>>
+>>> struct RamDiscardManagerClass {
+>>>      RamStateManagerClass parent_class;
+>>>      uint64_t (*get_min_granularity)();
+>>>      bool (*is_populate)();
+>>>      bool (*replay_populate)();
+>>>      bool (*replay_discard)();
+>>> }
+>>>
+>>> 2. PrivateSharedManager (or other name like ConfidentialRamManager?)
+>>>
+>>> struct PrivateSharedListener {
+>>>      StateChangeListener scl;
+>>>      NotifyShared notify_shared;
+>>>      NotifyPrivate notify_private;
+>>>      int priority;
+>>>
+>>>      QLIST_ENTRY(PrivateSharedListener) next;
+>>> }
+>>>
+>>> struct PrivateSharedManagerClass {
+>>>      RamStateManagerClass parent_class;
+>>>      uint64_t (*get_min_granularity)();
+>>>      bool (*is_shared)();
+>>>      // No need to define replay_private/replay_shared as no use case at
+>>> present.
+>>> }
+>>>
+>>> In the future, if we want to manage three states, we can only extend
+>>> PrivateSharedManagerClass/PrivateSharedListener.
+>>
+>> Hi Alexey & David,
+>>
+>> Any thoughts on this proposal?
+> 
+> 
+> Sorry it is taking a while, I'll comment after the holidays. It is just
+> a bit hard to follow how we started with just 1 patch and ended up with
+> 13 patches with no clear answer why. Thanks,
 
-I concede the point that there are gaps missing between this proposal
-and the end state needed for PCI Device Security. However, it seems to
-be a case of "violent agreement" that some of the benefits of this
-proposal only arrive with future work. So this is a necessary first
-step.
+Have a nice holiday! :)
 
-For my part, I plan to pull this series into a cross-vendor staging tree
-for device-security topics [2] so that the PCI Device Security community
-can get started on everything that needs to build on top of this.
+And sorry for the confusion. I missed to paste the history link for the
+motivation of the change
+(https://lore.kernel.org/qemu-devel/0ed6faf8-f6f4-4050-994b-2722d2726bef@amd.com/)
 
-[1]: http://lore.kernel.org/20250107142719.179636-1-yilun.xu@linux.intel.com
-[2]: https://web.git.kernel.org/pub/scm/linux/kernel/git/devsec/tsm.git/
+I think the original RamDiscardManager solution can just work. This
+framework change is mainly to facilitate future extension.
+
+> 
+> 
+>>
+>>>
+>>>>
+>>>>
+>>>>> I vote for this. First, After making the distinction, the
+>>>>> PrivateSharedManager won't go into the RamDiscardManager path which
+>>>>> PrivateSharedManager may have not supported yet. e.g. the migration
+>>>>> related path. In addtional, we can extend the PrivateSharedManager for
+>>>>> specific handling, e.g. the priority listener, state_change()
+>>>>> callback.
+>>>>>
+>>>>> 2. How we should abstract the parent class?
+>>>>>
+>>>>> I think this is the problem. My current implementation extracts all
+>>>>> the
+>>>>> callbacks in RamDiscardManager into the parent class and call them
+>>>>> state_set and state_clear, which can only manage a pair of opposite
+>>>>> states. As you mentioned, there could be private/shared/discarded
+>>>>> three
+>>>>> states in the future, which is not compatible with current design.
+>>>>> Maybe
+>>>>> we can make the parent class more generic, e.g. only extract the
+>>>>> register/unregister_listener() into it.
+>>>>
+>>>> Or we could rename RamDiscardManager to RamStateManager, implement 2bit
+>>>> per page (0 = discarded, 1 = populated+shared, 2 = populated+private).
+>>>> Eventually we will have to deal with the mix of private and shared
+>>>> mappings for the same device, how 1 bit per page is going to work?
+>>>> Thanks,
+>>>
+>>> Only renaming RamDiscardManager seems not sufficient. Current
+>>> RamDiscardManagerClass can only manage two states. For example, its
+>>> callback functions only have the name of xxx_populate and xxx_discard.
+>>> If we want to extend it to manage three states, we have to modify those
+>>> callbacks, e.g. add some new argument like is_populate(bool is_private),
+>>> or define some new callbacks like is_populate_private(). It will make
+>>> this class more complicated, but actually not necessary in legacy VMs
+>>> without the concept of private/shared.
+>>>
+>>
+>>
+> 
+
 
