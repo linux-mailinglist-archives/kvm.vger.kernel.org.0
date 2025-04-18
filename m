@@ -1,161 +1,207 @@
-Return-Path: <kvm+bounces-43665-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43666-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F38CA9381D
-	for <lists+kvm@lfdr.de>; Fri, 18 Apr 2025 15:51:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6DBCA9393A
+	for <lists+kvm@lfdr.de>; Fri, 18 Apr 2025 17:13:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6EC7B7B3B5F
-	for <lists+kvm@lfdr.de>; Fri, 18 Apr 2025 13:49:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F8C11B630A5
+	for <lists+kvm@lfdr.de>; Fri, 18 Apr 2025 15:13:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF81584A3E;
-	Fri, 18 Apr 2025 13:50:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40B0C210180;
+	Fri, 18 Apr 2025 15:13:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d4Oq+k89"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="osrLzAj7"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14EE541C64
-	for <kvm@vger.kernel.org>; Fri, 18 Apr 2025 13:50:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9A52205AAB
+	for <kvm@vger.kernel.org>; Fri, 18 Apr 2025 15:13:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744984252; cv=none; b=ugVdayKMzEVCA93OkcyoZ1elIlb9iOIJwZNo4MkcXPwOUrIex4unVeQZZ4GzFLViHiBzXPPeIfaMzN/OQFmL5fADhn52GrlxqBMtSzzRvMTWYOoo/bB7bEi52JcmqFoISrAnWgfNLXNowXU89G4jDfVDF0lB67zjI8pkO9gobRA=
+	t=1744989203; cv=none; b=JqUWH4ghlZ3JdH2idRuabg88+EsMJMHE49lGrY/RKTunOWNVwED4WhAgHEwkQ9VV78/o2S/lmIT1NCa1/EZagG7R3RE30JxRrTWaeFNPcmiCKVCX+tR1Z2xRGVHI94z4lio/bI6L0QRqhQBvMOtpJNomu78K64Pw10ZiJDiODvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744984252; c=relaxed/simple;
-	bh=UbjIbGTrPTkKL3gYlzrk9QwGAFAq74FP1w6P/d1XVf0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oSqBgAEmSH5V1Cl8wB03H4ExIy6l/M4JAeJhEgNovoNpjC5i8CTGzLZ/mbhHGYvULYbvqxJX7csEatjHrEzgw0fUEl7zM+iZSUrsXjqLA6eGkseFRcWifJgbWItymaC7/vb6dG15I6Qdj8R/ZXIWKqcwGW5w2X6K/iPPn51Wtbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d4Oq+k89; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744984248;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=tGlQyLIR9+MOfM/w1lJszKf4ODlHsXoTioqS3LmoSkQ=;
-	b=d4Oq+k890zwh6TO8tNj/q5WNK5EZfwS8nch7Pn0kKdp0Z/tuw6TX+Gtby+gEFBVyvs/jLF
-	ErIz+C5Il8PD542eRSigFRazovrHtYWp7iID3uqJmyiDzNuNzwcZXL+HAsSSF99zgO/dhl
-	dvh54e1RIo52vy8MslS0CsV20vslR5s=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-571-W9rlsBy3NmKoCl7FvLleBw-1; Fri, 18 Apr 2025 09:50:47 -0400
-X-MC-Unique: W9rlsBy3NmKoCl7FvLleBw-1
-X-Mimecast-MFC-AGG-ID: W9rlsBy3NmKoCl7FvLleBw_1744984246
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43eea5a5d80so9508355e9.1
-        for <kvm@vger.kernel.org>; Fri, 18 Apr 2025 06:50:47 -0700 (PDT)
+	s=arc-20240116; t=1744989203; c=relaxed/simple;
+	bh=2GJosY4++6FLu2OJtBI5wrnLMJOu/3uGwzB0weChq0s=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Sn1uZmkZhHX2phBREmm+x6uQg1Ibj0V75MLxLZCR1mTZjQ7bw7qIate+9dOdc7vPz5nV9MsaU3u7j4vEGfbBrctFfRvVR/fikbxeL+3rhiNS/+FM2DZIa0UjlyHKKWpPfmdpjiV8/D0KW5jd0vSS4gMC2jcco3gSORrsYziIlxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=osrLzAj7; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3011bee1751so1757026a91.1
+        for <kvm@vger.kernel.org>; Fri, 18 Apr 2025 08:13:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1744989199; x=1745593999; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z6Q9vUMWWn2x7ZhmSrldIht7Msa4XrsX7WVAx7KYTNE=;
+        b=osrLzAj7fVh0acCiMf3ao9VUwTbrFF/vPnUyG06DLHyDFBA0ViC+tpHneiz+WOfOOT
+         Cw33+59hvSGX7dEKg6xAqN1l9zkT2/vyW7oztNtL+nnHSCTrSUktcHB/IALjs/3WMv9O
+         cPyFk1OKgQssCfwZTYBcpA8tNZDNAExUyrX/p24bk86d8RBsud2pEUHsYM+UGzd0W2yo
+         g+1ZfFWLZkbZ/rMwBZHjocgSFHjv+EnlnrHxQMklpqKqLCrrg0L9crYUm4E8oVOxgIcf
+         XbpXB8djC/O0yYMR+HZiAHeN0WE7imzJUpsUms8XQ58RdjLHm/5cCw3gNIYesDhAvCki
+         +wag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744984245; x=1745589045;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tGlQyLIR9+MOfM/w1lJszKf4ODlHsXoTioqS3LmoSkQ=;
-        b=UACq50dQXdwkSEi6DpS+8AreMnhziH+5SCIubVQYLsyyNe60SjR3OfZUFU6l/mBIHE
-         luBKoN0TgQ95EcJnqMMrRy5xU/v+kmHg/A1qWI0JDzUnjEEI66ub9YIDwsV5sIrPSuMJ
-         AS6k9RhwkcnzDGO+CUKjvf2gcEwuIkQW10OzZv/jr/LTShzdOzzpXG9e9UK4Z1sCIE1O
-         mh9q3naHuwBVgYq1bEhrtVOieDy987aLyuQaLrKG88BXUh5xg0CpdAllV0SuzRuTgxKY
-         LCQY+RIxurdVD9q7WidgMXcpuw8OWZQsm9rj4zYNghby274FkpzHmeflQYkUIu4ypDgE
-         yG+Q==
-X-Gm-Message-State: AOJu0YwWMIWwPu3nI0xMQE/IoLNLQOMqXKOsKc89KlnRNDyX3UV4eLVD
-	twAt+fjBiYaYE/lzSTxvt8S2851z9wZueUqNSG9Dyq3nByKGZSPsLttGgzznbb/oqYiyxMR+kGk
-	7JKylYwh7libeKc4GgPJB0LH36QZgCMqD1JfWf8FcozaURbwn2CIFIJQZhA==
-X-Gm-Gg: ASbGncuFXsipH5BOET7/0N6kPU1aLaM6ExNPqBoOBoSu/hjXMLQLwCqGsDgRoVSVD3u
-	+OsTNHRfLywTrdgSOD2pozQtYYEFgljZSPbThOlSxxVaZZBbv89QEWzNW4tGQyY2+J3lssbwyoQ
-	s49gtpMVg1Hxlzb7tWyqtdn9jhtPTXx1xJMVE2UiEF/42Q8DnNtjXjkv+EWWSnsOcZe9bP3Y43W
-	mxXu8KIZeVbeDEx4Y+nCNJjeFEF+vqx9/8yjs6XUIspdrVP3TngksfOEFEFm/WnV5gcq2dZtrZS
-	qa1tg/I75h4XoKtv
-X-Received: by 2002:a05:600c:524f:b0:440:6a1a:d8a0 with SMTP id 5b1f17b1804b1-4406ab81d81mr19482205e9.7.1744984245656;
-        Fri, 18 Apr 2025 06:50:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGeDDSbMUMwprkh8AxY6nw7Ls5/1xN6yPoNeGLQ1cDw4UMfBL0DleLsCe20jeF1qLLUeaG7IA==
-X-Received: by 2002:a05:600c:524f:b0:440:6a1a:d8a0 with SMTP id 5b1f17b1804b1-4406ab81d81mr19482065e9.7.1744984245133;
-        Fri, 18 Apr 2025 06:50:45 -0700 (PDT)
-Received: from [192.168.10.81] ([176.206.109.83])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4406d5acc9esm23697325e9.13.2025.04.18.06.50.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Apr 2025 06:50:44 -0700 (PDT)
-Message-ID: <dc5789b3-79fe-4589-ae40-00ad28a90807@redhat.com>
-Date: Fri, 18 Apr 2025 15:50:44 +0200
+        d=1e100.net; s=20230601; t=1744989199; x=1745593999;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z6Q9vUMWWn2x7ZhmSrldIht7Msa4XrsX7WVAx7KYTNE=;
+        b=ZdJxIZiqb/7hKsfcIBEL0qkRFzOeK9rnh78dPnQf4HC3UW5MgTrLqj9VOFjcJjSGEJ
+         yvZJcqQ5wICT6SNI4rs2oFV8nRZUUG5OWv7yQ8fwwDt5q52yW5q1uxIAwbVwNf3hcGir
+         ycGvewKGzbsuHsiB8bU06lYF/LXVj2PWcXapib24PwsR2WA7xfhvv9/HEyM2nNV5pNjO
+         QHOUz6ZVDlsgXbYA0pKiMX/Sk2ZD812kNQ/BTcpUpprNHO1gjACE6zc5M1beu4CPHDNY
+         EbLYgh2UDJqxCYiDFKp99DGm1ScryFUM5y7IxaOLm91YGJE8bCSXX6F951ynnL5exNWv
+         I8tw==
+X-Gm-Message-State: AOJu0YyXVghQ7T70fBJIGP8EO/3oGgTRcumOkNd+dKCnQWqx7lCpo2py
+	1YsymDXLfgVil4msivbhl6ACckDZ590OOMbEsqh8nZC+jSeBI+U4fEMqVusLfchWM8RU1xFqs1k
+	tWQ==
+X-Google-Smtp-Source: AGHT+IFx4xCyquKRTfdq9Eq5qlCDjjfv+7cohJJwUWjdOUc5pLcG5bTTrpKtJ9MYC4u3/yNkWK0N+tmsBMs=
+X-Received: from pjv12.prod.google.com ([2002:a17:90b:564c:b0:2f4:465d:5c61])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5184:b0:301:1d03:93cd
+ with SMTP id 98e67ed59e1d1-3087bbbcd83mr5332278a91.24.1744989199239; Fri, 18
+ Apr 2025 08:13:19 -0700 (PDT)
+Date: Fri, 18 Apr 2025 08:13:17 -0700
+In-Reply-To: <20250418001237.2b23j5ftoh25vhft@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] kvm: potential NULL pointer dereference in
- kvm_vm_ioctl_create_vcpu()
-To: Chen Yufeng <chenyufeng@iie.ac.cn>
+Mime-Version: 1.0
+References: <Z__AAB_EFxGFEjDR@google.com> <20250418001237.2b23j5ftoh25vhft@amd.com>
+Message-ID: <aAJsDVg5RNfSpiYX@google.com>
+Subject: Re: Untested fix for attributes vs. hugepage race
+From: Sean Christopherson <seanjc@google.com>
+To: Michael Roth <michael.roth@amd.com>
 Cc: kvm@vger.kernel.org
-References: <20250418134440.379-1-chenyufeng@iie.ac.cn>
-Content-Language: en-US
-From: Paolo Bonzini <pbonzini@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20250418134440.379-1-chenyufeng@iie.ac.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
 
-On 4/18/25 15:44, Chen Yufeng wrote:
-> A patch similar to commit 5593473a1e6c ("KVM: avoid NULL pointer
->   dereference in kvm_dirty_ring_push").
+On Thu, Apr 17, 2025, Michael Roth wrote:
+> > +	/*
+> > +	 * If the head and tail pages of the range currently allow a hugepage,
+> > +	 * i.e. reside fully in the slot and don't have mixed attributes, then
+> > +	 * add each corresponding hugepage range to the ongoing invalidation,
+> > +	 * e.g. to prevent KVM from creating a hugepage in response to a fault
+> > +	 * for a gfn whose attributes aren't changing.  Note, only the range
+> > +	 * of gfns whose attributes are being modified needs to be explicitly
+> > +	 * unmapped, as that will unmap any existing hugepages.
+> > +	 */
+> > +	for (level = PG_LEVEL_2M; level <= KVM_MAX_HUGEPAGE_LEVEL; level++) {
+> > +		gfn_t start = gfn_round_for_level(range->start, level);
+> > +		gfn_t nr_pages = KVM_PAGES_PER_HPAGE(level);
+> > +		gfn_t end = gfn_round_for_level(range->end, level);
+> > +
+> > +		if ((start != range->start || start + nr_pages > range->end) &&
+> > +		    start >= slot->base_gfn &&
+> > +		    start + nr_pages <= slot->base_gfn + slot->npages &&
+> > +		    !hugepage_test_mixed(slot, start, level))
+> > +			kvm_mmu_invalidate_range_add(kvm, start, start + nr_pages);
 > 
-> If kvm_get_vcpu_by_id() or xa_insert() failed, kvm_vm_ioctl_create_vcpu()
-> will call kvm_dirty_ring_free(), freeing ring->dirty_gfns and setting it
-> to NULL. Then, it calls kvm_arch_vcpu_destroy(), which may call
-> kvm_dirty_ring_push() in specific call stack under the same conditions as
-> previous commit said. Finally, kvm_dirty_ring_push() will use
-> ring->dirty_gfns, leading to a NULL pointer dereference.
+> For the 'start + nr_pages > range->end' case, that seems to correspond
+> to when the 'start' hugepage covers the end of the range that's being
+> invalidated.
 
-Actually I'm not convinced that this can happen; at least not in the 
-same way as commit 5593473a1e6c, because KVM_RUN can only be invoked 
-after the "point of no return" of create_vcpu_fd().
+It covers the case where range->start is hugepage aligned, but the size of the
+range is less than a hugepage.
 
-The patch is good anyway because it's cleaner to use the same order as 
-in kvm_vcpu_destroy(), but perhaps you can also move 
-kvm_dirty_ring_alloc() before kvm_arch_vcpu_create(), so that the order 
-remains opposite for creation and destruction?
+> But in that case, 'start' and 'end' hugepages are one and the same,
 
-Thanks,
+Yes.
 
-Paolo
+> so the below would also trigger,
 
+Gah, that's a goof in the computation of "end".
+
+> and we end up updating the range twice with the same start/end GFN of the
+> same hugepage.
+>
+> Not a big deal, but maybe we should adjust the above logic to only cover
+> the case where range->start needs to be extended. Then, if 'start' and
+> 'end' hugepages are the same, we are done with that level:
+
+FWIW, this is what I was trying to do.
+
+> 
+>     if (start < range->start &&
+>         start >= slot->base_gfn &&
+>         start + nr_pages <= slot->base_gfn + slot->npages &&
+>         !hugepage_test_mixed(slot, start, level))
+>             kvm_mmu_invalidate_range_add(kvm, start, start + nr_pages);
+> 
+>     if (start == end)
+>         continue;
+> 
+> Then what remains to be determined below is whether or not range->end needs
+> to be additionally extended by 'end' separate hugepage.
+> 
+> > +
+> > +		if (end < range->end &&
+> 
+> This seems a little weird since end is almost by definition going to be
+
+Not almost, it is by definition.  But as above, I botched the computation of end.
+
+> less-than or equal-to range->end, so it's basically skipping the equal-to
+> case. To avoid needing to filter than case, maybe we should change this:
+> 
+>   gfn_t end = gfn_round_for_level(range->end, level);
+> 
+> to
+> 
+>   gfn_t end = gfn_round_for_level(range->end - 1, level);
+> 
+> since range->end is non-inclusive and we only care about hugepages that
+> begin before the end of the range. If we do that, then 'end < range->end'
+> check will always be true and the below:
+> 
+> > +		if (end < range->end &&
+> > +		    (end + nr_pages) <= (slot->base_gfn + slot->npages) &&
+> > +		    !hugepage_test_mixed(slot, end, level))
+> > +			kvm_mmu_invalidate_range_add(kvm, end, end + nr_pages);
+> 
+> can be simplified to:
+> 
+>     if (end + nr_pages <= slot->base_gfn + slot->npages &&
+>         !hugepage_test_mixed(slot, end, level))
+>             kvm_mmu_invalidate_range_add(kvm, end, end + nr_pages);
+
+That all looks good to me.  And to ensure we don't go off the rails due to bad
+inputs (which are supposed to be fully validated by common KVM), we could add a
+WARN to detect a non-exclusive range->end.
+
+So this?
+
+	if (WARN_ON_ONCE(range->end <= range->start))
+		return false;
+
+	/*
+	 * If the head and tail pages of the range currently allow a hugepage,
+	 * i.e. reside fully in the slot and don't have mixed attributes, then
+	 * add each corresponding hugepage range to the ongoing invalidation,
+	 * e.g. to prevent KVM from creating a hugepage in response to a fault
+	 * for a gfn whose attributes aren't changing.  Note, only the range
+	 * of gfns whose attributes are being modified needs to be explicitly
+	 * unmapped, as that will unmap any existing hugepages.
+	 */
+	for (level = PG_LEVEL_2M; level <= KVM_MAX_HUGEPAGE_LEVEL; level++) {
+		gfn_t start = gfn_round_for_level(range->start, level);
+		gfn_t end = gfn_round_for_level(range->end - 1, level);
+		gfn_t nr_pages = KVM_PAGES_PER_HPAGE(level);
+
+		if ((start != range->start || start + nr_pages > range->end) &&
+		    start >= slot->base_gfn &&
+		    start + nr_pages <= slot->base_gfn + slot->npages &&
+		    !hugepage_test_mixed(slot, start, level))
+			kvm_mmu_invalidate_range_add(kvm, start, start + nr_pages);
+
+		if (end == start)
+			continue;
+
+		if ((end + nr_pages) <= (slot->base_gfn + slot->npages) &&
+		    !hugepage_test_mixed(slot, end, level))
+			kvm_mmu_invalidate_range_add(kvm, end, end + nr_pages);
+	}
 
