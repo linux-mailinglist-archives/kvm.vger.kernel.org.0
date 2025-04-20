@@ -1,214 +1,281 @@
-Return-Path: <kvm+bounces-43697-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43698-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C107A94709
-	for <lists+kvm@lfdr.de>; Sun, 20 Apr 2025 09:32:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA044A94713
+	for <lists+kvm@lfdr.de>; Sun, 20 Apr 2025 09:38:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9972B7AA8FC
-	for <lists+kvm@lfdr.de>; Sun, 20 Apr 2025 07:31:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2C4C3B1679
+	for <lists+kvm@lfdr.de>; Sun, 20 Apr 2025 07:38:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C19E81C3BF1;
-	Sun, 20 Apr 2025 07:32:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C423202F9D;
+	Sun, 20 Apr 2025 07:38:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fLG5iPIF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ISKBPsno"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D6A8837
-	for <kvm@vger.kernel.org>; Sun, 20 Apr 2025 07:32:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9932918A6A5;
+	Sun, 20 Apr 2025 07:38:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745134355; cv=none; b=bcZ6MqyxJYhe/aOTxir+m+HPMcq9s8KFdOyYGAn98faPNi2Rj+d9ZzZI4SogmFXK52ZqlfMi5Q6DRVxjGIjjeHWJ32xRy91L/oz7SiByyIK6IN/xwvnB0hHKfs+N1grP+WScNkIfmtLYylP7UmqDD3jHGSujTHa/EWB5BYui3Y4=
+	t=1745134696; cv=none; b=uJqli98yEhtUHJ5r/b3Ue3tMqA8Khgwx6sJkWvU4Ey2ptgPcDoYq6bzECSuW12opj7gaj4EYAUGrCJ5hzG83waFZjSQ+30I5ZV02EiJ6gZKLH/RbYA5rbdAakesFIVQ1riJumXuZJ4ImEqdLDOOR7UEYVx3Q9k7tNoQ99DbRk1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745134355; c=relaxed/simple;
-	bh=esKQyW/mP1LV/UEbhdKK0N8rrzF46fMuyMoO4EiNSPM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fG09JHLjJ4zaDqIlfQm7AmeuSwaXPw7Sen8WTfMctRvYLWhIhB88l3vVxn+CWuVlr17xdjgYxwD3R/h9yn9UB+j4jeAV5g7J8PRhsI02tMom8e3PyE+c0xdbT6Mh3u/ZJI7bXQmljhyxfVYvvyc7QN8O8Cg3SIkSHBjcFszBbqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fLG5iPIF; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745134352;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rPnHwBvdjCpYN+ILr2KbqTtEgmvkuvdxNwRCB+YgauQ=;
-	b=fLG5iPIFMB6O2SB6iLqS8OwCT9UqIVU6qSwGoSgWbMkPBogSS8QSrMOmDAoRmbS9GqOfFJ
-	YH89A6eqqj1HaHdt/XdNQVJV/lEV8c01djTi+I1SEsYZkgtb7P0gWnPJnxMjJnvVAdXqfb
-	z7rJuKt+t1NIyFGV9x7e/elnbUXrzjo=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-612-flz8j1o7PFSG9fzNOdY38w-1; Sun, 20 Apr 2025 03:32:30 -0400
-X-MC-Unique: flz8j1o7PFSG9fzNOdY38w-1
-X-Mimecast-MFC-AGG-ID: flz8j1o7PFSG9fzNOdY38w_1745134349
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-39126c3469fso1061680f8f.3
-        for <kvm@vger.kernel.org>; Sun, 20 Apr 2025 00:32:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745134349; x=1745739149;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rPnHwBvdjCpYN+ILr2KbqTtEgmvkuvdxNwRCB+YgauQ=;
-        b=QE1mzVO9INpVgTY6pqW3yCmhtCPqnGFkuljoLMsvhy/CJaCQX3M+PbpPY7CbEV9PH3
-         +zpTQyB6wnRrCSrgodnmOz1LtvOVi8bd6687yvZmweAay1A7t4mfH/fnSEbKD3MR/dcV
-         ELYhpOVKRzD5SBsbB248t3r5Yvz83f320r6V8f1qtQ+vRiYFM9sxZyQeQW6dNyLDqIfC
-         j4RngHEgwPK/AJOBMOQiSQ9VDrXRQW8Hztv+p1t9OnRvcPLwMYCAnLGA9xVI2pzVoDuc
-         U6GLPX8Xw2wrQ4ma+X5QVbz5pjduQjmLjZetSdl1rZ2TLIKYkCPnnAiT/f4NGVQTjGhz
-         wJBw==
-X-Forwarded-Encrypted: i=1; AJvYcCWE12IfkbWCSoiuXkoZX7S2iV3hAxKLsPdGJvv+NnlS9/srvucTzsnN5Q18w3x5lG6ZwUU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxligqpdK4rSwbHO+vHtZYYg2mkDu51GGUI2Xbj7wdEtbUklrLC
-	nxC13DVrLfnB5KjIwKpkTWUk8VftkNq63skJ3XqLXknwQZmSmjyXAmbumGNZJuX4jRbBw9yxgJ/
-	e9eRD2ckkfkKx/aHCW6F4Fwt5xNr8o/TUP/Abx5QSlYGXRqQTDA==
-X-Gm-Gg: ASbGnct7mSdYrU9tmfLwUkdl68Q2PQVeQtUyKJPA4fGh/iCf3K9qlULGTABxi7Q7hYq
-	iUoFVSWxkBpbh5vcu3dQhHXfeuWJJtrHH08s8IZyiG94MPf3LnbDY28RmfoaodyORjLyKUYIjOc
-	iOUppSQ6iTFy4QvTj+F2R3gzONwzYCt4V9H/bB4tiFkUkl7orShy9f4dQ0DR/bggrhGF20GyBoD
-	JDRkx7rusxVbm6jQN5GsH2GMpVuZuYS1bDsxzs8D41bY8fEL7LxfKaYAbPRS7g2Cavo/CVJpDtw
-	Wn/ewQ==
-X-Received: by 2002:a05:6000:186b:b0:391:13ef:1b1b with SMTP id ffacd0b85a97d-39efba60fa2mr5482625f8f.30.1745134349132;
-        Sun, 20 Apr 2025 00:32:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHrKjCeXR5ka2I9nS9y5bI3Cx9j6H+N6iEOY7I61+u5OZx0tRo6cSozrM/uepXIEFdsuc6J+Q==
-X-Received: by 2002:a05:6000:186b:b0:391:13ef:1b1b with SMTP id ffacd0b85a97d-39efba60fa2mr5482610f8f.30.1745134348687;
-        Sun, 20 Apr 2025 00:32:28 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39efa4331a9sm8243556f8f.36.2025.04.20.00.32.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 20 Apr 2025 00:32:27 -0700 (PDT)
-Date: Sun, 20 Apr 2025 03:32:25 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jon Kohler <jon@nutanix.com>
-Cc: Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] vhost/net: Defer TX queue re-enable until
- after sendmsg
-Message-ID: <20250420033135-mutt-send-email-mst@kernel.org>
-References: <20250420010518.2842335-1-jon@nutanix.com>
+	s=arc-20240116; t=1745134696; c=relaxed/simple;
+	bh=8H2wR04H8flbz5OMYgtYm6o3qdMPcv3utA0LEY5U3SI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kAU893IKfyoi+Mb7XAdwnDIEwdTFW0sOQYG+n4f6c1unDzMnExt51XIfpaKnQTf/KafMSaNu0T3znrpimECKP5YR5Rbl8pWychCXntsfJfynqlZLGbmed1b76nFtg924m0Zr7r9Nq4lAdenLuyL+CC9cHbc+eFPj6/kAyIi1OnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ISKBPsno; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 165CAC4CEED;
+	Sun, 20 Apr 2025 07:38:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745134696;
+	bh=8H2wR04H8flbz5OMYgtYm6o3qdMPcv3utA0LEY5U3SI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=ISKBPsnoeIKDORV/IhljEqs53hZXUeJJkqc7dulc385QQvxZ6VtKvFyFltimGlTBT
+	 A1fSEAjicVQhrBNR4YG/ZkWhkxc+WVjZ92J1qWyFdCi0Hq4MGrHa166myzRwTgZheg
+	 owRnDqWGM7g7XUbK3/C/UwnqvnJlQ6ukzO3Z38RZtmRvECZ1L6xR77m6tS3lOZEvLu
+	 xQ01Z/hKoykU9oX2gHYGnSdLOT6mZfHmhrMHaW1I7CyA40nM9idoRqNXxvIwfCUBXh
+	 1pllZYc5e3yuSD6wRUhNoIJJgoEbaU6/ciJcjHVZaRpX2qey1mptq993MIq5+PEWh4
+	 l+jAMherFfd7A==
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5f62d3ed994so3160622a12.2;
+        Sun, 20 Apr 2025 00:38:15 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVv0Cleg0P2xsKC5766jH3nq++/CDJOZ6K5kfUbfBOfs+MZqRTug8/ht8anWfs7GvYcf3pV9Y4LSo87Cppt0CPD@vger.kernel.org, AJvYcCWBIprZK9WkAwD3//0zToO5zJKvUQCoWq8wibOMJjm24P9MesIIGUpuDNU8YXp6veb6k4Q=@vger.kernel.org, AJvYcCXzGMLsagtA1be5ohoLTv7apvn/wWpGt7nd6igK+HJ5HC+NcUQrbmyhVlESnPs4lMyEW7XjdeLNuBsp6j4a@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8v4TIDtLyVIwIvnXNEOqijc86CPoulSbohp+UsjbKAgnhORHL
+	wQxN4dYhG+epmMrxO7AByySrGsMR6JbDRw2R2qHYM4Z3bYWFdlsf8U3Ck7SWxYYsf/h0nMTY5/b
+	tLeuFI9llBRPKzmCTx+pJske+lrc=
+X-Google-Smtp-Source: AGHT+IEPY3aHqS34i2DS8PF0w5KZNLHi15ueZKKiTRh1EovxvH8x79W7hl/sn7a21s2Xb6lUG42bSOFjpYisBeBdTko=
+X-Received: by 2002:a17:907:728a:b0:ac7:c66a:4702 with SMTP id
+ a640c23a62f3a-acb74df38d6mr696349966b.57.1745134694668; Sun, 20 Apr 2025
+ 00:38:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250420010518.2842335-1-jon@nutanix.com>
+References: <20250416035455.25996-1-maobibo@loongson.cn> <20250416035455.25996-3-maobibo@loongson.cn>
+In-Reply-To: <20250416035455.25996-3-maobibo@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Sun, 20 Apr 2025 15:38:02 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H7p7KM=Qwf8w5qd2JrS0dn+iqZzzWm9xBpFvXA+uG_ALA@mail.gmail.com>
+X-Gm-Features: ATxdqUH_c_klc_h2EcIWJzKU3k_bZ7XCmp5pIX-o9iaC44k5jeeJwU6Cc61KGSo
+Message-ID: <CAAhV-H7p7KM=Qwf8w5qd2JrS0dn+iqZzzWm9xBpFvXA+uG_ALA@mail.gmail.com>
+Subject: Re: [PATCH v9 2/5] KVM: selftests: Add KVM selftests header files for LoongArch
+To: Bibo Mao <maobibo@loongson.cn>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
+	Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Apr 19, 2025 at 06:05:18PM -0700, Jon Kohler wrote:
-> In handle_tx_copy, TX batching processes packets below ~PAGE_SIZE and
-> batches up to 64 messages before calling sock->sendmsg.
-> 
-> Currently, when there are no more messages on the ring to dequeue,
-> handle_tx_copy re-enables kicks on the ring *before* firing off the
-> batch sendmsg. However, sock->sendmsg incurs a non-zero delay,
-> especially if it needs to wake up a thread (e.g., another vhost worker).
-> 
-> If the guest submits additional messages immediately after the last ring
-> check and disablement, it triggers an EPT_MISCONFIG vmexit to attempt to
-> kick the vhost worker. This may happen while the worker is still
-> processing the sendmsg, leading to wasteful exit(s).
-> 
-> This is particularly problematic for single-threaded guest submission
-> threads, as they must exit, wait for the exit to be processed
-> (potentially involving a TTWU), and then resume.
-> 
-> In scenarios like a constant stream of UDP messages, this results in a
-> sawtooth pattern where the submitter frequently vmexits, and the
-> vhost-net worker alternates between sleeping and waking.
-> 
-> A common solution is to configure vhost-net busy polling via userspace
-> (e.g., qemu poll-us). However, treating the sendmsg as the "busy"
-> period by keeping kicks disabled during the final sendmsg and
-> performing one additional ring check afterward provides a significant
-> performance improvement without any excess busy poll cycles.
-> 
-> If messages are found in the ring after the final sendmsg, requeue the
-> TX handler. This ensures fairness for the RX handler and allows
-> vhost_run_work_list to cond_resched() as needed.
-> 
-> Test Case
->     TX VM: taskset -c 2 iperf3  -c rx-ip-here -t 60 -p 5200 -b 0 -u -i 5
->     RX VM: taskset -c 2 iperf3 -s -p 5200 -D
->     6.12.0, each worker backed by tun interface with IFF_NAPI setup.
->     Note: TCP side is largely unchanged as that was copy bound
-> 
-> 6.12.0 unpatched
->     EPT_MISCONFIG/second: 5411
->     Datagrams/second: ~382k
->     Interval         Transfer     Bitrate         Lost/Total Datagrams
->     0.00-30.00  sec  15.5 GBytes  4.43 Gbits/sec  0/11481630 (0%)  sender
-> 
-> 6.12.0 patched
->     EPT_MISCONFIG/second: 58 (~93x reduction)
->     Datagrams/second: ~650k  (~1.7x increase)
->     Interval         Transfer     Bitrate         Lost/Total Datagrams
->     0.00-30.00  sec  26.4 GBytes  7.55 Gbits/sec  0/19554720 (0%)  sender
-> 
-> Acked-by: Jason Wang <jasowang@redhat.com>
-> Signed-off-by: Jon Kohler <jon@nutanix.com>
+Hi, Bibo,
 
-sounds like the right approach.
-
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
-
-
+On Wed, Apr 16, 2025 at 11:55=E2=80=AFAM Bibo Mao <maobibo@loongson.cn> wro=
+te:
+>
+> Add KVM selftests header files for LoongArch, including processor.h
+> and kvm_util_base.h. It mainly contains LoongArch CSR register
+> definition and page table entry definition.
+>
+> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
 > ---
-
-
-in the future, pls put the changelog here as you progress v1->v2->v3.
-Thanks!
-
->  drivers/vhost/net.c | 19 +++++++++++++++----
->  1 file changed, 15 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index b9b9e9d40951..9b04025eea66 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -769,13 +769,17 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
->  			break;
->  		/* Nothing new?  Wait for eventfd to tell us they refilled. */
->  		if (head == vq->num) {
-> +			/* If interrupted while doing busy polling, requeue
-> +			 * the handler to be fair handle_rx as well as other
-> +			 * tasks waiting on cpu
-> +			 */
->  			if (unlikely(busyloop_intr)) {
->  				vhost_poll_queue(&vq->poll);
-> -			} else if (unlikely(vhost_enable_notify(&net->dev,
-> -								vq))) {
-> -				vhost_disable_notify(&net->dev, vq);
-> -				continue;
->  			}
-> +			/* Kicks are disabled at this point, break loop and
-> +			 * process any remaining batched packets. Queue will
-> +			 * be re-enabled afterwards.
-> +			 */
->  			break;
->  		}
->  
-> @@ -825,7 +829,14 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
->  		++nvq->done_idx;
->  	} while (likely(!vhost_exceeds_weight(vq, ++sent_pkts, total_len)));
->  
-> +	/* Kicks are still disabled, dispatch any remaining batched msgs. */
->  	vhost_tx_batch(net, nvq, sock, &msg);
+>  .../testing/selftests/kvm/include/kvm_util.h  |   5 +
+>  .../kvm/include/loongarch/kvm_util_arch.h     |   7 +
+>  .../kvm/include/loongarch/processor.h         | 138 ++++++++++++++++++
+>  3 files changed, 150 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/include/loongarch/kvm_uti=
+l_arch.h
+>  create mode 100644 tools/testing/selftests/kvm/include/loongarch/process=
+or.h
+>
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testi=
+ng/selftests/kvm/include/kvm_util.h
+> index f8faed8c8024..93013564428b 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -233,6 +233,11 @@ extern enum vm_guest_mode vm_mode_default;
+>  #define MIN_PAGE_SHIFT                 12U
+>  #define ptes_per_page(page_size)       ((page_size) / 8)
+>
+> +#elif defined(__loongarch__)
+> +#define VM_MODE_DEFAULT                        VM_MODE_P47V47_16K
+> +#define MIN_PAGE_SHIFT                 12U
+> +#define ptes_per_page(page_size)       ((page_size) / 8)
 > +
-> +	/* All of our work has been completed; however, before leaving the
-> +	 * TX handler, do one last check for work, and requeue handler if
-> +	 * necessary. If there is no work, queue will be reenabled.
-> +	 */
-> +	vhost_net_busy_poll_try_queue(net, vq);
->  }
->  
->  static void handle_tx_zerocopy(struct vhost_net *net, struct socket *sock)
-> -- 
-> 2.43.0
+>  #endif
+>
+>  #define VM_SHAPE_DEFAULT       VM_SHAPE(VM_MODE_DEFAULT)
+> diff --git a/tools/testing/selftests/kvm/include/loongarch/kvm_util_arch.=
+h b/tools/testing/selftests/kvm/include/loongarch/kvm_util_arch.h
+> new file mode 100644
+> index 000000000000..e43a57d99b56
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/include/loongarch/kvm_util_arch.h
+> @@ -0,0 +1,7 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +#ifndef SELFTEST_KVM_UTIL_ARCH_H
+> +#define SELFTEST_KVM_UTIL_ARCH_H
+> +
+> +struct kvm_vm_arch {};
+> +
+> +#endif  // SELFTEST_KVM_UTIL_ARCH_H
+> diff --git a/tools/testing/selftests/kvm/include/loongarch/processor.h b/=
+tools/testing/selftests/kvm/include/loongarch/processor.h
+> new file mode 100644
+> index 000000000000..e95dd2059605
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/include/loongarch/processor.h
+> @@ -0,0 +1,138 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +
+> +#ifndef SELFTEST_KVM_PROCESSOR_H
+> +#define SELFTEST_KVM_PROCESSOR_H
+> +
+> +#ifndef __ASSEMBLER__
+> +#include "ucall_common.h"
+> +
+> +#else
+> +/* general registers */
+> +#define zero                           $r0
+> +#define ra                             $r1
+> +#define tp                             $r2
+> +#define sp                             $r3
+> +#define a0                             $r4
+> +#define a1                             $r5
+> +#define a2                             $r6
+> +#define a3                             $r7
+> +#define a4                             $r8
+> +#define a5                             $r9
+> +#define a6                             $r10
+> +#define a7                             $r11
+> +#define t0                             $r12
+> +#define t1                             $r13
+> +#define t2                             $r14
+> +#define t3                             $r15
+> +#define t4                             $r16
+> +#define t5                             $r17
+> +#define t6                             $r18
+> +#define t7                             $r19
+> +#define t8                             $r20
+> +#define u0                             $r21
+> +#define fp                             $r22
+> +#define s0                             $r23
+> +#define s1                             $r24
+> +#define s2                             $r25
+> +#define s3                             $r26
+> +#define s4                             $r27
+> +#define s5                             $r28
+> +#define s6                             $r29
+> +#define s7                             $r30
+> +#define s8                             $r31
+> +#endif
+> +
+> +/* LoongArch page table entry definition */
+> +#define _PAGE_VALID_SHIFT              0
+> +#define _PAGE_DIRTY_SHIFT              1
+> +#define _PAGE_PLV_SHIFT                        2  /* 2~3, two bits */
+> +#define  PLV_KERN                      0
+> +#define  PLV_USER                      3
+> +#define  PLV_MASK                      0x3
+> +#define _CACHE_SHIFT                   4  /* 4~5, two bits */
+> +#define _PAGE_PRESENT_SHIFT            7
+> +#define _PAGE_WRITE_SHIFT              8
+> +
+> +#define _PAGE_VALID                    BIT_ULL(_PAGE_VALID_SHIFT)
+> +#define _PAGE_PRESENT                  BIT_ULL(_PAGE_PRESENT_SHIFT)
+> +#define _PAGE_WRITE                    BIT_ULL(_PAGE_WRITE_SHIFT)
+> +#define _PAGE_DIRTY                    BIT_ULL(_PAGE_DIRTY_SHIFT)
+> +#define _PAGE_USER                     (PLV_USER << _PAGE_PLV_SHIFT)
+> +#define   __READABLE                   (_PAGE_VALID)
+> +#define   __WRITEABLE                  (_PAGE_DIRTY | _PAGE_WRITE)
+> +/* Coherent Cached */
+> +#define _CACHE_CC                      BIT_ULL(_CACHE_SHIFT)
+> +#define PS_4K                          0x0000000c
+> +#define PS_8K                          0x0000000d
+> +#define PS_16K                         0x0000000e
+As I said in V8, the page size supported by kernel is 4K, 16K and 64K,
+so you can remove 8K and add 64K.
 
+Huacai
+
+> +#define PS_DEFAULT_SIZE                        PS_16K
+> +
+> +/* LoongArch Basic CSR registers */
+> +#define LOONGARCH_CSR_CRMD             0x0 /* Current mode info */
+> +#define  CSR_CRMD_PG_SHIFT             4
+> +#define  CSR_CRMD_PG                   BIT_ULL(CSR_CRMD_PG_SHIFT)
+> +#define  CSR_CRMD_IE_SHIFT             2
+> +#define  CSR_CRMD_IE                   BIT_ULL(CSR_CRMD_IE_SHIFT)
+> +#define  CSR_CRMD_PLV_SHIFT            0
+> +#define  CSR_CRMD_PLV_WIDTH            2
+> +#define  CSR_CRMD_PLV                  (0x3UL << CSR_CRMD_PLV_SHIFT)
+> +#define  PLV_MASK                      0x3
+> +#define LOONGARCH_CSR_PRMD             0x1
+> +#define LOONGARCH_CSR_EUEN             0x2
+> +#define LOONGARCH_CSR_ECFG             0x4
+> +#define LOONGARCH_CSR_ESTAT            0x5  /* Exception status */
+> +#define LOONGARCH_CSR_ERA              0x6  /* ERA */
+> +#define LOONGARCH_CSR_BADV             0x7  /* Bad virtual address */
+> +#define LOONGARCH_CSR_EENTRY           0xc
+> +#define LOONGARCH_CSR_TLBIDX           0x10 /* TLB Index, EHINV, PageSiz=
+e */
+> +#define  CSR_TLBIDX_PS_SHIFT           24
+> +#define  CSR_TLBIDX_PS_WIDTH           6
+> +#define  CSR_TLBIDX_PS                 (0x3fUL << CSR_TLBIDX_PS_SHIFT)
+> +#define  CSR_TLBIDX_SIZEM              0x3f000000
+> +#define  CSR_TLBIDX_SIZE               CSR_TLBIDX_PS_SHIFT
+> +#define LOONGARCH_CSR_ASID             0x18 /* ASID */
+> +#define LOONGARCH_CSR_PGDL             0x19
+> +#define LOONGARCH_CSR_PGDH             0x1a
+> +/* Page table base */
+> +#define LOONGARCH_CSR_PGD              0x1b
+> +#define LOONGARCH_CSR_PWCTL0           0x1c
+> +#define LOONGARCH_CSR_PWCTL1           0x1d
+> +#define LOONGARCH_CSR_STLBPGSIZE       0x1e
+> +#define LOONGARCH_CSR_CPUID            0x20
+> +#define LOONGARCH_CSR_KS0              0x30
+> +#define LOONGARCH_CSR_KS1              0x31
+> +#define LOONGARCH_CSR_TMID             0x40
+> +#define LOONGARCH_CSR_TCFG             0x41
+> +/* TLB refill exception entry */
+> +#define LOONGARCH_CSR_TLBRENTRY                0x88
+> +#define LOONGARCH_CSR_TLBRSAVE         0x8b
+> +#define LOONGARCH_CSR_TLBREHI          0x8e
+> +#define  CSR_TLBREHI_PS_SHIFT          0
+> +#define  CSR_TLBREHI_PS                        (0x3fUL << CSR_TLBREHI_PS=
+_SHIFT)
+> +
+> +#define EXREGS_GPRS                    (32)
+> +
+> +#ifndef __ASSEMBLER__
+> +void handle_tlb_refill(void);
+> +void handle_exception(void);
+> +
+> +struct ex_regs {
+> +       unsigned long regs[EXREGS_GPRS];
+> +       unsigned long pc;
+> +       unsigned long estat;
+> +       unsigned long badv;
+> +};
+> +
+> +#define PC_OFFSET_EXREGS               offsetof(struct ex_regs, pc)
+> +#define ESTAT_OFFSET_EXREGS            offsetof(struct ex_regs, estat)
+> +#define BADV_OFFSET_EXREGS             offsetof(struct ex_regs, badv)
+> +#define EXREGS_SIZE                    sizeof(struct ex_regs)
+> +
+> +#else
+> +#define PC_OFFSET_EXREGS               ((EXREGS_GPRS + 0) * 8)
+> +#define ESTAT_OFFSET_EXREGS            ((EXREGS_GPRS + 1) * 8)
+> +#define BADV_OFFSET_EXREGS             ((EXREGS_GPRS + 2) * 8)
+> +#define EXREGS_SIZE                    ((EXREGS_GPRS + 3) * 8)
+> +#endif
+> +
+> +#endif /* SELFTEST_KVM_PROCESSOR_H */
+> --
+> 2.39.3
+>
 
