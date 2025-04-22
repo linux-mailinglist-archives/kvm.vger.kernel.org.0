@@ -1,146 +1,186 @@
-Return-Path: <kvm+bounces-43831-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43832-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63BF0A97007
-	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 17:10:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19A66A97225
+	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 18:13:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAFC316BF48
-	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 15:09:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB8D47A1F08
+	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 16:12:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1732228F921;
-	Tue, 22 Apr 2025 15:09:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FA39290BCF;
+	Tue, 22 Apr 2025 16:13:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fWMaq0EX"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="astmXMRG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 312C6289356
-	for <kvm@vger.kernel.org>; Tue, 22 Apr 2025 15:09:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 212BD28A3E2
+	for <kvm@vger.kernel.org>; Tue, 22 Apr 2025 16:13:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745334579; cv=none; b=VOvT/KeLv/Bd4d6wOn0nLLPZjQ7qb9tbF4itu6b/obRRd32pVFjsts+KoBnnLdnZaIlOXGIXHaIkoY6WLIleUx3lPLJFtsC6xna9KizXliySlyN1LTlZI6Gw1D+Y6vVV+iZWjEPqm4gvjErRWfQFRhDGs6MnAyhRjOmYFYgeB98=
+	t=1745338400; cv=none; b=WALROC+kd2JVtOspctwhwmBVCts9mRV6D4zOpJQk9j82wtICDBPM7pl7O5Kml0ElFIiJpf5ss9QNKSGk8K+tQMPMzms2mY7N2XzQwUCKkel1WjhsIm7/Cc/Ooi1yT2EQ+O9ZPGyzuxmcfjmWprES/Bs+J0YoBmgC5lo77AhAXik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745334579; c=relaxed/simple;
-	bh=u2pTJx0Ij+runOvsJmA0q5y9Kslc+OcE1AiOs4Q52gA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ULKWlViL6AdEWaerR/Zzsz3O9Q3jOIhQmIAgE3xws8VOJdnNjB8KgZQ7lPdgFV+vhG5bRnjLeOrq/WqpMjECs4a4cyYRSKIkO0Hjz/tfZFlweVed94LmjWuBed9RmV2wclNp5f1c5XTZc5fsfhPSP4uy0FAc+mhu1fbwyE+lI6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fWMaq0EX; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ff7cf599beso4999882a91.0
-        for <kvm@vger.kernel.org>; Tue, 22 Apr 2025 08:09:36 -0700 (PDT)
+	s=arc-20240116; t=1745338400; c=relaxed/simple;
+	bh=pbLKhbB4JL8XJ7YdSiOmPWI9WMEe67/YSYPH4sMBOo0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mmjv+QXQX3IEF4W3JLeOY1qQMusCife8YIEu8Pz3Z1JfZiNBl4tOV2IE8Lpd0To8mRbtDj8VpZ5oD85GX09Cs1U0WnNwQ6x1BWY3SQqr5fgZT/joyNpbdH0dc/3TD+r+6mscWTDXlnMhPV0shwnX0B0BlipqQ47OBPIHylc1HWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=astmXMRG; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-224341bbc1dso52411925ad.3
+        for <kvm@vger.kernel.org>; Tue, 22 Apr 2025 09:13:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745334576; x=1745939376; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rRXArVhux4Bsw70YvwQ+lh5zlccYMqH0xPXNTi9FZ8g=;
-        b=fWMaq0EXfAG3BHE7JfR6uLKMHALt98SwgbMx8tUXl5+HBynuzfsocxXtiedr9Nk8II
-         O2IRJqJLxz5EQQxVg4I5U0EF4K6A9UD9yItB8uDzjYWmdW7pRZE4b+C+d0eDcteWuTpT
-         qRTHOOZw+sLPzWAzpg1e59N/tkjSYjpUO7VmF2LUmUzRaj+9u/iMsNn61MV1QM+0O2cA
-         +jl56znNd4NO2Z/VFmDHQJ6sI8ulRX2TDsOE1N1Jg1pPm2TrAEcdGyJchvr1Z9ky8A4+
-         P6zW13gfUAmeZ/FippT/ZJ8EAHk2QpCPCHOmOphlhJ7oWdZ+X8ixc7Y/q7hVsdfIyuhJ
-         AxbQ==
+        d=broadcom.com; s=google; t=1745338397; x=1745943197; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=600fD9G54NVOaVyktaguhJ2soOvTwp92HG4EGx1g2F4=;
+        b=astmXMRGSN7srM9usmq/Ds8srcQJJ3/04W8BYcEwPba3ePyqZOp146gVM/nLFP3I+W
+         vpRTKWynniIVBF5IrZqEp2VDczoajwyshDdGsldGB5zLOqGPNwOZ0AYCtzrT4OUR9ny2
+         /DpgxjMH54c/bE5PBNuiMDVXYARPJinSFeJzk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745334576; x=1745939376;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rRXArVhux4Bsw70YvwQ+lh5zlccYMqH0xPXNTi9FZ8g=;
-        b=ndbFLx2lLR3byoZEejO0/4kECQhAhwPXEa5j0OCymAVXZTBNSpAPvykiOJZak6fS9W
-         OJipqkkqoShkj5iXdsIgPgb24sCbmQQMjURlc4RqKLd+gYzpeDw7eWq+qV8PHCsLbaM0
-         /LGfImUpWKfWmVzu6xJW7Dia6iJ1nslw2IEqwmv7ymKfzBltrIOokW7PBwECnqvnVzn9
-         kTmAuHQl5qc0MntIxSkal46mo8cqIfk1gJ3ug1hjLRIvx+GM3JIaR+GF88E03OSXrYcu
-         BdvLV96MqiidrgETAhdDkjWorwWjVGtFSApeLV1kl24BFb32QlfXiFSM/XrZoJmioYtG
-         hNlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVONJ9E+g4BJvgzbluIZHTwlU7mkPpCjw1sDf9Z/Ioaudb0AdAAX3Fg/UbEQdhqtEN8egY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIDpJyJw+vEuGoxQ13JPMAQar8f6ZQA2MDsd2IzLilObP1Q4VW
-	L70s1rEmR1F/suT+Hc9EM0Cqyt2+PKkTZpLFDlqscpEuSPL6qeaXn/fmVuATA7G+n2uMqTYqD+s
-	bVw==
-X-Google-Smtp-Source: AGHT+IHGR6YFubcBkAQrqhkjsdDwq21aLEhFyH8uteoXFGo84CYqI3Y4PMerNLsX7Qx/XFlRMipUTrfnrN0=
-X-Received: from pjbrr7.prod.google.com ([2002:a17:90b:2b47:b0:2fc:2c9c:880])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4ecf:b0:2ff:692b:b15
- with SMTP id 98e67ed59e1d1-3087bbca3b0mr26039866a91.33.1745334576501; Tue, 22
- Apr 2025 08:09:36 -0700 (PDT)
-Date: Tue, 22 Apr 2025 08:09:34 -0700
-In-Reply-To: <20250422082216.1954310-11-xin@zytor.com>
+        d=1e100.net; s=20230601; t=1745338397; x=1745943197;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=600fD9G54NVOaVyktaguhJ2soOvTwp92HG4EGx1g2F4=;
+        b=Gdby2duRm0N/2/V9aAuYJJnXW7n2bNYTvYNK/IJVwEv4yFxPCi+M0ZQH5rof96VCxo
+         CAROkmDxHUaHkZJFHmC+B6jLFNHT7bTx30Y3n6krwR5qlE5KcAle+27Vp1X9XvxyddT1
+         ksWa43qC6qRNAHQ/nBnv8uzhnr/yE+TbdO8T62VSG3zlLh1ocCZph98vQ+fPbiNLVvNK
+         YVrYnAOcmIb07WL5u+dBbwL8nUap3ZaRj48iNVGASpiFp+Vt2VTlpE5bBQuNq9MhhC6o
+         yJJPvweUrL1n5PW1Tn5y24rScbXDhwzEVetnnupstqJ1YJlIHasTHW7+mL/W8gnQy0rR
+         wxNg==
+X-Forwarded-Encrypted: i=1; AJvYcCVmB4a7OPVMp0ESQFizx5LXEhnyZSeTYt1KwzEXrEKjheW8ZRHr534jOyd7CohNONJJrto=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPieaD6yoW0qNAD7jMWXYS0HSXuoPSgPc7np5VlXeOwh74smnH
+	ZswMpKvvw62eN+fugOr3Uss6UvYQo5Ay9Ao9hsA1VUgrvOYWMd4V0/LTCipyWg==
+X-Gm-Gg: ASbGncvaS5ZAXF8dLT/81GGXyNTbeY71eHA++fMiygoVNu633V1QDtaGw/7ZZoEg1C5
+	KOeJLbsZgTLNIJerfcoFCpPqgmLuDMqAYIuojA0673lKZCK4lwoCebrZzGf7l8gpRnNmAoQ9OSY
+	ZINTs9g9daxTBDvbnnDKl8XDhCuPGREgsmoBCYpauEblMmphPZ+LQAWSLY0S62q55+OVx401rYK
+	y7K/ZeDRsz+f7jEIH0anO2eN62bZA+GbdPlq/d64sKXj90p9swocLJ1sotjSPLJG3jlsobjjyXD
+	9UryJP4UsMzKE9cJa4fKwA2P2D+6UKHkoQTx95VXVhVYp/3N7K8okV4ZCQ/VlfYy7WszjnnEefI
+	q8Ud+z/SA8aexXV8V2CR99+CkYnfgQRwj
+X-Google-Smtp-Source: AGHT+IG4yc4cb3WLCu0YV3tQuWd6qB+0bI0V9npN8A4vdqCFBhKVqwsTx1FIXsxdSH/WoeELa5WdxQ==
+X-Received: by 2002:a17:903:19ed:b0:223:62f5:fd44 with SMTP id d9443c01a7336-22c53607f99mr272215925ad.40.1745338397363;
+        Tue, 22 Apr 2025 09:13:17 -0700 (PDT)
+Received: from localhost.localdomain (pool-173-49-113-140.phlapa.fios.verizon.net. [173.49.113.140])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22c50eb03d2sm87462375ad.142.2025.04.22.09.13.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Apr 2025 09:13:17 -0700 (PDT)
+From: Zack Rusin <zack.rusin@broadcom.com>
+To: linux-kernel@vger.kernel.org
+Cc: Zack Rusin <zack.rusin@broadcom.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Sean Christopherson <seanjc@google.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Doug Covelli <doug.covelli@broadcom.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Arnaldo Carvalho de Melo <acme@redhat.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Joel Stanley <joel@jms.id.au>,
+	Isaku Yamahata <isaku.yamahata@intel.com>,
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH v2 0/5] KVM: Improve VMware guest support
+Date: Tue, 22 Apr 2025 12:12:19 -0400
+Message-ID: <20250422161304.579394-1-zack.rusin@broadcom.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250422082216.1954310-1-xin@zytor.com> <20250422082216.1954310-11-xin@zytor.com>
-Message-ID: <aAexLqjhKncFyw2V@google.com>
-Subject: Re: [RFC PATCH v2 10/34] x86/msr: Convert __rdmsr() uses to
- native_rdmsrq() uses
-From: Sean Christopherson <seanjc@google.com>
-To: "Xin Li (Intel)" <xin@zytor.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-pm@vger.kernel.org, 
-	linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org, 
-	linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, acme@kernel.org, 
-	jgross@suse.com, andrew.cooper3@citrix.com, peterz@infradead.org, 
-	namhyung@kernel.org, mark.rutland@arm.com, alexander.shishkin@linux.intel.com, 
-	jolsa@kernel.org, irogers@google.com, adrian.hunter@intel.com, 
-	kan.liang@linux.intel.com, wei.liu@kernel.org, ajay.kaher@broadcom.com, 
-	bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com, 
-	pbonzini@redhat.com, vkuznets@redhat.com, luto@kernel.org, 
-	boris.ostrovsky@oracle.com, kys@microsoft.com, haiyangz@microsoft.com, 
-	decui@microsoft.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 22, 2025, Xin Li (Intel) wrote:
-> __rdmsr() is the lowest level primitive MSR read API, and its direct
-> use is NOT preferred.
+This is the second version of a series that lets us run VMware
+Workstation on Linux on top of KVM.
 
-Doesn't mean it's wrong.
+The most significant change in this series is the introduction of
+CONFIG_KVM_VMWARE which is, in general, a nice cleanup for various
+bits of VMware compatibility code that have been scattered around KVM.
+(first patch)
 
-> Use its wrapper function native_rdmsrq() instead.
+The rest of the series builds upon the VMware platform to implement
+features that are needed to run VMware guests without any
+modifications on top of KVM:
+- ability to turn on the VMware backdoor at runtime on a per-vm basis
+(used to be a kernel boot argument only)
+- support for VMware hypercalls - VMware products have a huge
+collection of hypercalls, all of which are handled in userspace,
+- support for handling legacy VMware backdoor in L0 in nested configs
+- in cases where we have WS running a Windows VBS guest, the L0 would
+be KVM, L1 Hyper-V so by default VMware Tools backdoor calls endup in
+Hyper-V which can not handle them, so introduce a cap to let L0 handle
+those.
 
-...
+The final change in the series is a kselftest of the VMware hypercall
+functionality.
 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 1547bfacd40f..e73c1d5ba6c4 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -380,7 +380,7 @@ static __always_inline void vmx_disable_fb_clear(struct vcpu_vmx *vmx)
->  	if (!vmx->disable_fb_clear)
->  		return;
->  
-> -	msr = __rdmsr(MSR_IA32_MCU_OPT_CTRL);
-> +	msr = native_rdmsrq(MSR_IA32_MCU_OPT_CTRL);
->  	msr |= FB_CLEAR_DIS;
->  	native_wrmsrq(MSR_IA32_MCU_OPT_CTRL, msr);
->  	/* Cache the MSR value to avoid reading it later */
-> @@ -7307,7 +7307,7 @@ void noinstr vmx_spec_ctrl_restore_host(struct vcpu_vmx *vmx,
->  		return;
->  
->  	if (flags & VMX_RUN_SAVE_SPEC_CTRL)
-> -		vmx->spec_ctrl = __rdmsr(MSR_IA32_SPEC_CTRL);
-> +		vmx->spec_ctrl = native_rdmsrq(MSR_IA32_SPEC_CTRL);
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: x86@kernel.org
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Zack Rusin <zack.rusin@broadcom.com>
+Cc: Doug Covelli <doug.covelli@broadcom.com>
+Cc: Shuah Khan <shuah@kernel.org>
+Cc: Namhyung Kim <namhyung@kernel.org>
+Cc: Arnaldo Carvalho de Melo <acme@redhat.com>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Joel Stanley <joel@jms.id.au>
+Cc: Isaku Yamahata <isaku.yamahata@intel.com>
+Cc: kvm@vger.kernel.org
+Cc: linux-doc@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org
 
-And what guarantees that native_rdmsrq() won't have tracing?  Ugh, a later patch
-renames native_rdmsrq() => native_rdmsrq_no_trace().
+Zack Rusin (5):
+  KVM: x86: Centralize KVM's VMware code
+  KVM: x86: Allow enabling of the vmware backdoor via a cap
+  KVM: x86: Add support for VMware guest specific hypercalls
+  KVM: x86: Add support for legacy VMware backdoors in nested setups
+  KVM: selftests: x86: Add a test for KVM_CAP_X86_VMWARE_HYPERCALL
 
-I really don't like this.  It makes simple and obvious code:
+ Documentation/virt/kvm/api.rst                |  86 +++++++-
+ MAINTAINERS                                   |   9 +
+ arch/x86/include/asm/kvm_host.h               |  13 ++
+ arch/x86/kvm/Kconfig                          |  16 ++
+ arch/x86/kvm/Makefile                         |   1 +
+ arch/x86/kvm/emulate.c                        |  11 +-
+ arch/x86/kvm/kvm_vmware.c                     |  85 ++++++++
+ arch/x86/kvm/kvm_vmware.h                     | 189 ++++++++++++++++++
+ arch/x86/kvm/pmu.c                            |  39 +---
+ arch/x86/kvm/pmu.h                            |   4 -
+ arch/x86/kvm/svm/nested.c                     |   6 +
+ arch/x86/kvm/svm/svm.c                        |  10 +-
+ arch/x86/kvm/vmx/nested.c                     |   6 +
+ arch/x86/kvm/vmx/vmx.c                        |   5 +-
+ arch/x86/kvm/x86.c                            |  74 +++----
+ arch/x86/kvm/x86.h                            |   2 -
+ include/uapi/linux/kvm.h                      |  27 +++
+ tools/include/uapi/linux/kvm.h                |   3 +
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../selftests/kvm/x86/vmware_hypercall_test.c | 121 +++++++++++
+ 20 files changed, 614 insertions(+), 94 deletions(-)
+ create mode 100644 arch/x86/kvm/kvm_vmware.c
+ create mode 100644 arch/x86/kvm/kvm_vmware.h
+ create mode 100644 tools/testing/selftests/kvm/x86/vmware_hypercall_test.c
 
-	vmx->spec_ctrl = __rdmsr(MSR_IA32_SPEC_CTRL);
+-- 
+2.48.1
 
-so much harder to read:
-
-	vmx->spec_ctrl = native_rdmsrq_no_trace(MSR_IA32_SPEC_CTRL);
-
-and does so in a way that is difficult to review, e.g. I have to peek ahead to
-understand that this is even ok.
-
-I strongly prefer that we find a way to not require such verbose APIs, especially
-if KVM ends up using native variants throughout.  Xen PV is supposed to be the
-odd one out, yet native code is what suffers.  Blech.
 
