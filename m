@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-43776-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43783-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1052A961B6
-	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 10:32:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA710A961DF
+	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 10:35:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3C5417A1BC
-	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 08:30:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5FB11897495
+	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 08:32:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBF79269813;
-	Tue, 22 Apr 2025 08:24:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20DBF27584A;
+	Tue, 22 Apr 2025 08:24:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="aNQDlhh2"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="cbIqq/wL"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EFA2264F87;
-	Tue, 22 Apr 2025 08:23:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2C8266B43;
+	Tue, 22 Apr 2025 08:23:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745310239; cv=none; b=EpocUi1wmSrMIA+N90xjLxtwPSucEjtW6tr7KpiItQLr7WbQO6LfvcsV0VRECkAyvHVT1umwPUMQs2W9wXdpxhnzSjLJgPiF45RL+sEs6Jl/Wi5iSNS4WM5tf6Bnmpvdu1glKOUVJLm3spRGEN9IiAAuA4o+OeAq/qtE/mVUwXs=
+	t=1745310241; cv=none; b=aa4H6tof65msy3n3uC2m2DY/K1hVyTYqs/U8qGPvkm9mCXHCMEBsmCYvL7W22Mki5thQjsxuzuXXoO1SVjLVvzADz7ZzynhGVe7DjKiONbGzZ7R8vFZFCSArTd11Dz1WAoxJlIrm/yb+QN7VxppKyxdLD9Ptso1IDcMPZQzEkyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745310239; c=relaxed/simple;
-	bh=MlzZP2PcWDZrFa9hDnXv30fqYMM04NkLvN5K6Ig/4KA=;
+	s=arc-20240116; t=1745310241; c=relaxed/simple;
+	bh=nCPLLfO0p9R1MrFA/TpMmFLNN/ttdW86mD3Qbzz+eAE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NYhg7QlYZaThwcjjM9sa68nzxWxD1T/qk2vgnlwi5qz/EKu9AEPPe0L1jvdMiWLEr0Y0YQZ1sL9g2lhzC6Y8rkxZFzr0QUitwXA2mPc0jmf9XciYrDOXz4r/u+pfQlR08bTkUULnMqyGjQJ0hVX5kNbXYUvQ/KlJJOs8Hn7p8x0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=aNQDlhh2; arc=none smtp.client-ip=198.137.202.136
+	 MIME-Version; b=W6lfHCI8BX4uobTWxrfZQusKZpI7El5EjxWlk3MndtM3pglG3EnfrzPrqHUtvFSgI1Vd5mq08V8NQf8u30QAgVJgIFGCS58elezhfGimI07EepGKPpNbrUduFENV+DcWCAmekWgSLlmODZCfyPgniZYkVqGIoIMYbEUzOlpAsmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=cbIqq/wL; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from terminus.zytor.com (terminus.zytor.com [IPv6:2607:7c80:54:3:0:0:0:136])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53M8MG9W1954391
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53M8MG9X1954391
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Tue, 22 Apr 2025 01:22:57 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53M8MG9W1954391
+	Tue, 22 Apr 2025 01:22:59 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53M8MG9X1954391
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1745310178;
-	bh=XaAm3SgdeuQpqxiLf3TgiBnvvEMb/sqRjazcaLW8DyU=;
+	s=2025042001; t=1745310181;
+	bh=NNx/bsW0ODtmJpfsi048P3Fj6b4nBpFrrvypKuPXLIg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aNQDlhh2xlWRbyeJukGWTC/vCCeQb6zitL4jNCcMF4/UqfnsnIPrjB234ggYDAm4n
-	 /OAUTUCS6m8svXdcAJEjhiXvD0bvb7pxXmCp56esSiGCgBDU/fm2+V6WjpHdn7ALNZ
-	 dqP/5qRa1S0+Lp3LRQ3WFTfiGwPFPXzUffyVlWhaYmG78Chtndnv8OFzZqmNpS7l6c
-	 ImhtFxmMTaZOLVSxB5DGLhb3HeAISjXz4cKumUDuLcQuWXuj7fm47baKL82vIov6cz
-	 70aPro2cmGmDIDjFIgcRsQs+TcX09RekPiJ/6zWfrES6Aw+7U7SmR69YRnJ8YiJwsn
-	 YbU2jKXeJuZUg==
+	b=cbIqq/wL911bUtP7+WKZQwUp5BP2uQDF0M396c/1wV9SxBhoCkZqNqqK/X5WlcGHr
+	 ashWQDaWODnE6g9w4+IW/hSEyKjNsaVVVc+pObXiea4M3kb3inrzeAuXhSDfHp6Cx+
+	 HfUn2y8wZAC5H0mjajud2hEDrBLl2csSFGl0BMmU/YjJkF1ob54eK/BjPWWd13ikh9
+	 kLIBXoce48SGlAb8V3FWMUzo67hW5FrpbagoXdvt+RFV1FYEkIe1lKQFkOEY7FcA+R
+	 eeiYsX+Bcaf3/8X8V8OUbwLjuG+YkH53wOp7lVVoobhRWAMn1YmRpvzx2zJd94GdB2
+	 hN1HWhqneMGyA==
 From: "Xin Li (Intel)" <xin@zytor.com>
 To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
@@ -65,9 +65,9 @@ Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
         luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
         haiyangz@microsoft.com, decui@microsoft.com
-Subject: [RFC PATCH v2 18/34] x86/opcode: Add immediate form MSR instructions
-Date: Tue, 22 Apr 2025 01:21:59 -0700
-Message-ID: <20250422082216.1954310-19-xin@zytor.com>
+Subject: [RFC PATCH v2 19/34] x86/extable: Add support for immediate form MSR instructions
+Date: Tue, 22 Apr 2025 01:22:00 -0700
+Message-ID: <20250422082216.1954310-20-xin@zytor.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250422082216.1954310-1-xin@zytor.com>
 References: <20250422082216.1954310-1-xin@zytor.com>
@@ -79,75 +79,103 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add the instruction opcodes used by the immediate form WRMSRNS/RDMSR
-to x86-opcode-map.
-
 Signed-off-by: Xin Li (Intel) <xin@zytor.com>
 ---
- arch/x86/lib/x86-opcode-map.txt       | 5 +++--
- tools/arch/x86/lib/x86-opcode-map.txt | 5 +++--
- 2 files changed, 6 insertions(+), 4 deletions(-)
+ arch/x86/include/asm/msr.h | 18 ++++++++++++++++++
+ arch/x86/mm/extable.c      | 39 +++++++++++++++++++++++++++++++++-----
+ 2 files changed, 52 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/lib/x86-opcode-map.txt b/arch/x86/lib/x86-opcode-map.txt
-index caedb3ef6688..e64f52321d6d 100644
---- a/arch/x86/lib/x86-opcode-map.txt
-+++ b/arch/x86/lib/x86-opcode-map.txt
-@@ -839,7 +839,7 @@ f1: MOVBE My,Gy | MOVBE Mw,Gw (66) | CRC32 Gd,Ey (F2) | CRC32 Gd,Ew (66&F2)
- f2: ANDN Gy,By,Ey (v)
- f3: Grp17 (1A)
- f5: BZHI Gy,Ey,By (v) | PEXT Gy,By,Ey (F3),(v) | PDEP Gy,By,Ey (F2),(v) | WRUSSD/Q My,Gy (66)
--f6: ADCX Gy,Ey (66) | ADOX Gy,Ey (F3) | MULX By,Gy,rDX,Ey (F2),(v) | WRSSD/Q My,Gy
-+f6: ADCX Gy,Ey (66) | ADOX Gy,Ey (F3) | MULX By,Gy,rDX,Ey (F2),(v) | WRSSD/Q My,Gy | RDMSR Rq,Gq (F2),(11B) | WRMSRNS Gq,Rq (F3),(11B)
- f7: BEXTR Gy,Ey,By (v) | SHLX Gy,Ey,By (66),(v) | SARX Gy,Ey,By (F3),(v) | SHRX Gy,Ey,By (F2),(v)
- f8: MOVDIR64B Gv,Mdqq (66) | ENQCMD Gv,Mdqq (F2) | ENQCMDS Gv,Mdqq (F3) | URDMSR Rq,Gq (F2),(11B) | UWRMSR Gq,Rq (F3),(11B)
- f9: MOVDIRI My,Gy
-@@ -1014,7 +1014,7 @@ f1: CRC32 Gy,Ey (es) | CRC32 Gy,Ey (66),(es) | INVVPID Gy,Mdq (F3),(ev)
- f2: INVPCID Gy,Mdq (F3),(ev)
- f4: TZCNT Gv,Ev (es) | TZCNT Gv,Ev (66),(es)
- f5: LZCNT Gv,Ev (es) | LZCNT Gv,Ev (66),(es)
--f6: Grp3_1 Eb (1A),(ev)
-+f6: Grp3_1 Eb (1A),(ev) | RDMSR Rq,Gq (F2),(11B),(ev) | WRMSRNS Gq,Rq (F3),(11B),(ev)
- f7: Grp3_2 Ev (1A),(es)
- f8: MOVDIR64B Gv,Mdqq (66),(ev) | ENQCMD Gv,Mdqq (F2),(ev) | ENQCMDS Gv,Mdqq (F3),(ev) | URDMSR Rq,Gq (F2),(11B),(ev) | UWRMSR Gq,Rq (F3),(11B),(ev)
- f9: MOVDIRI My,Gy (ev)
-@@ -1103,6 +1103,7 @@ EndTable
- Table: VEX map 7
- Referrer:
- AVXcode: 7
-+f6: RDMSR Rq,Id (F2),(v1),(11B) | WRMSRNS Id,Rq (F3),(v1),(11B)
- f8: URDMSR Rq,Id (F2),(v1),(11B) | UWRMSR Id,Rq (F3),(v1),(11B)
- EndTable
+diff --git a/arch/x86/include/asm/msr.h b/arch/x86/include/asm/msr.h
+index c955339be9c9..8f7a67b1c61c 100644
+--- a/arch/x86/include/asm/msr.h
++++ b/arch/x86/include/asm/msr.h
+@@ -78,6 +78,24 @@ static inline void do_trace_rdpmc(u32 msr, u64 val, int failed) {}
+ extern u64 xen_read_pmc(int counter);
+ #endif
  
-diff --git a/tools/arch/x86/lib/x86-opcode-map.txt b/tools/arch/x86/lib/x86-opcode-map.txt
-index caedb3ef6688..e64f52321d6d 100644
---- a/tools/arch/x86/lib/x86-opcode-map.txt
-+++ b/tools/arch/x86/lib/x86-opcode-map.txt
-@@ -839,7 +839,7 @@ f1: MOVBE My,Gy | MOVBE Mw,Gw (66) | CRC32 Gd,Ey (F2) | CRC32 Gd,Ew (66&F2)
- f2: ANDN Gy,By,Ey (v)
- f3: Grp17 (1A)
- f5: BZHI Gy,Ey,By (v) | PEXT Gy,By,Ey (F3),(v) | PDEP Gy,By,Ey (F2),(v) | WRUSSD/Q My,Gy (66)
--f6: ADCX Gy,Ey (66) | ADOX Gy,Ey (F3) | MULX By,Gy,rDX,Ey (F2),(v) | WRSSD/Q My,Gy
-+f6: ADCX Gy,Ey (66) | ADOX Gy,Ey (F3) | MULX By,Gy,rDX,Ey (F2),(v) | WRSSD/Q My,Gy | RDMSR Rq,Gq (F2),(11B) | WRMSRNS Gq,Rq (F3),(11B)
- f7: BEXTR Gy,Ey,By (v) | SHLX Gy,Ey,By (66),(v) | SARX Gy,Ey,By (F3),(v) | SHRX Gy,Ey,By (F2),(v)
- f8: MOVDIR64B Gv,Mdqq (66) | ENQCMD Gv,Mdqq (F2) | ENQCMDS Gv,Mdqq (F3) | URDMSR Rq,Gq (F2),(11B) | UWRMSR Gq,Rq (F3),(11B)
- f9: MOVDIRI My,Gy
-@@ -1014,7 +1014,7 @@ f1: CRC32 Gy,Ey (es) | CRC32 Gy,Ey (66),(es) | INVVPID Gy,Mdq (F3),(ev)
- f2: INVPCID Gy,Mdq (F3),(ev)
- f4: TZCNT Gv,Ev (es) | TZCNT Gv,Ev (66),(es)
- f5: LZCNT Gv,Ev (es) | LZCNT Gv,Ev (66),(es)
--f6: Grp3_1 Eb (1A),(ev)
-+f6: Grp3_1 Eb (1A),(ev) | RDMSR Rq,Gq (F2),(11B),(ev) | WRMSRNS Gq,Rq (F3),(11B),(ev)
- f7: Grp3_2 Ev (1A),(es)
- f8: MOVDIR64B Gv,Mdqq (66),(ev) | ENQCMD Gv,Mdqq (F2),(ev) | ENQCMDS Gv,Mdqq (F3),(ev) | URDMSR Rq,Gq (F2),(11B),(ev) | UWRMSR Gq,Rq (F3),(11B),(ev)
- f9: MOVDIRI My,Gy (ev)
-@@ -1103,6 +1103,7 @@ EndTable
- Table: VEX map 7
- Referrer:
- AVXcode: 7
-+f6: RDMSR Rq,Id (F2),(v1),(11B) | WRMSRNS Id,Rq (F3),(v1),(11B)
- f8: URDMSR Rq,Id (F2),(v1),(11B) | UWRMSR Id,Rq (F3),(v1),(11B)
- EndTable
++/*
++ * Called only from an MSR fault handler, the instruction pointer points to
++ * the MSR access instruction that caused the fault.
++ */
++static __always_inline bool is_msr_imm_insn(void *ip)
++{
++	/*
++	 * A full decoder for immediate form MSR instructions appears excessive.
++	 */
++#ifdef CONFIG_X86_64
++	const u8 msr_imm_insn_prefix[] = { 0xc4, 0xe7 };
++
++	return !memcmp(ip, msr_imm_insn_prefix, sizeof(msr_imm_insn_prefix));
++#else
++	return false;
++#endif
++}
++
+ /*
+  * __rdmsr() and __wrmsr() are the two primitives which are the bare minimum MSR
+  * accessors and should not have any tracing or other functionality piggybacking
+diff --git a/arch/x86/mm/extable.c b/arch/x86/mm/extable.c
+index bf8dab18be97..f1743babafc8 100644
+--- a/arch/x86/mm/extable.c
++++ b/arch/x86/mm/extable.c
+@@ -167,23 +167,52 @@ static bool ex_handler_uaccess(const struct exception_table_entry *fixup,
+ static bool ex_handler_msr(const struct exception_table_entry *fixup,
+ 			   struct pt_regs *regs, bool wrmsr, bool safe, int reg)
+ {
++	bool imm_insn = is_msr_imm_insn((void *)regs->ip);
++	u32 msr;
++
++	if (imm_insn)
++		/*
++		 * The 32-bit immediate specifying a MSR is encoded into
++		 * byte 5 ~ 8 of an immediate form MSR instruction.
++		 */
++		msr = *(u32 *)(regs->ip + 5);
++	else
++		msr = (u32)regs->cx;
++
+ 	if (__ONCE_LITE_IF(!safe && wrmsr)) {
+-		pr_warn("unchecked MSR access error: WRMSR to 0x%x (tried to write 0x%08x%08x) at rIP: 0x%lx (%pS)\n",
+-			(unsigned int)regs->cx, (unsigned int)regs->dx,
+-			(unsigned int)regs->ax,  regs->ip, (void *)regs->ip);
++		/*
++		 * To maintain consistency with existing RDMSR and WRMSR(NS) instructions,
++		 * the register operand for immediate form MSR instructions is ALWAYS
++		 * encoded as RAX in <asm/msr.h> for reading or writing the MSR value.
++		 */
++		u64 msr_val = regs->ax;
++
++		if (!imm_insn) {
++			/*
++			 * On processors that support the Intel 64 architecture, the
++			 * high-order 32 bits of each of RAX and RDX are ignored.
++			 */
++			msr_val &= 0xffffffff;
++			msr_val |= (u64)regs->dx << 32;
++		}
++
++		pr_warn("unchecked MSR access error: WRMSR to 0x%x (tried to write 0x%016llx) at rIP: 0x%lx (%pS)\n",
++			msr, msr_val, regs->ip, (void *)regs->ip);
+ 		show_stack_regs(regs);
+ 	}
  
+ 	if (__ONCE_LITE_IF(!safe && !wrmsr)) {
+ 		pr_warn("unchecked MSR access error: RDMSR from 0x%x at rIP: 0x%lx (%pS)\n",
+-			(unsigned int)regs->cx, regs->ip, (void *)regs->ip);
++			msr, regs->ip, (void *)regs->ip);
+ 		show_stack_regs(regs);
+ 	}
+ 
+ 	if (!wrmsr) {
+ 		/* Pretend that the read succeeded and returned 0. */
+ 		regs->ax = 0;
+-		regs->dx = 0;
++
++		if (!imm_insn)
++			regs->dx = 0;
+ 	}
+ 
+ 	if (safe)
 -- 
 2.49.0
 
