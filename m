@@ -1,281 +1,196 @@
-Return-Path: <kvm+bounces-43837-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43838-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C3CDA97239
-	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 18:14:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5DD1A9730B
+	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 18:49:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EDFD401CC3
-	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 16:14:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1C654403E8
+	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 16:49:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BACEF2951BE;
-	Tue, 22 Apr 2025 16:13:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA6612973BD;
+	Tue, 22 Apr 2025 16:49:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FBeqZkH5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WmOnqjPG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ACBD293B5D
-	for <kvm@vger.kernel.org>; Tue, 22 Apr 2025 16:13:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20DB129617F
+	for <kvm@vger.kernel.org>; Tue, 22 Apr 2025 16:49:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745338410; cv=none; b=Ig5ZlxDorDBSdWAMw9dxLMZ93ie0QnnlVYlY0e4b0Ck6yKGDD2j1FdO9mk6ZKUrGk35Cvx85QnsCHMhwLXsez3EqtO6A+HmHOQpY3EnPS2p12DG8LvtEAM2v5IPxn2iFazNVS2IBhJH6Lm1apRMr6dlDy1/JYBnyvcSakwzu9kI=
+	t=1745340563; cv=none; b=a0ymWImSnuR7bn2w2A+Hx20/gshJm0ZzUwVEB6Q/4FLihkwqXWr65FWQ90+47kht1yFZaNUGPxx0twi65XAGRw6WyJwBN9adiwgdXqC12n7iqQMr2CJ4VVrEfDC3yAeRGjbssbYhJMT7Z6OkWVmnWbIvC+hm75jZkKeW3IWJbt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745338410; c=relaxed/simple;
-	bh=hdXOQCwoKTHHfPfG+e4+NzmtyorjjOf+cT947lM8l+Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZNxb2kBcU84UNytZfSVPn4yN5E2YWyVwWouVnH3cR3JrcS1YplyaheIbhgxQ7yMHBjErC4TuDmkhdFoKxd3NE0QpomYcZE16hMRLEUf91VhuZnHHLHHzsQ5oLyu3u7hhldbyxuz2V55QyGWbagii5vGAE1Qqpj0Q9Ysvfrz6Sr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=FBeqZkH5; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-227d6b530d8so55181015ad.3
-        for <kvm@vger.kernel.org>; Tue, 22 Apr 2025 09:13:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1745338408; x=1745943208; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BzcWP7HN4V69BqsvByJTA3za0cdW55UiPl0fqxkwA5Q=;
-        b=FBeqZkH5WdxZKUEZ+MZJsV79S2Tmnrd6xQ9sFDNCnP1Cuh95tdp762hHseY8t+lrcF
-         aUeesZZDmsE686Fs1wTf3Euua6LdE2Glxf5S4VnlDYeRd6OU8o8AC8C+gt8JOUztWv2V
-         JQNyR4aXwnY2wlSQL9vFl1kLEMGj3aQlhPAlw=
+	s=arc-20240116; t=1745340563; c=relaxed/simple;
+	bh=1zm/ifLFoyueirmbO4F+dQ+4rpCflNI54FJ6BvufTFg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PjkMQzpxbku6ZiCEtx3bcCWmCS1/2X+vXuAABG/bfdfV15IFcgWkOSTVgNyU1f+/n79IEc21w/apSLuwhrghEMZxz9VJIW8QuZk4u9hDoxzmawSRaOWCibjGiUKFFCL7OsrQQDskwUb90eM4aXFPNcNIZZnodDmBOWY8TY7gRKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WmOnqjPG; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745340560;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=lHSkROXmhzxaxiTJB2Sts+hoXg6Enh4N97MVVPj8jow=;
+	b=WmOnqjPGVzWbnJPowlkSPUgG6iyBsT77pl4jPU9QSdEHvrX2wSmvfejG11qdxsMvzm9tRL
+	1mSmTcECkPRpQc+nt+84YfnGem+Gdy7KcqR+sDvVZ97mmF8LvzpPhEjQmLrNdg/vkbJmoC
+	FpWbORfBy2vku7/bYfcj5/pnPqyMR0A=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-587-RzxXS0GDNbCgQRsjzW0QWQ-1; Tue, 22 Apr 2025 12:49:18 -0400
+X-MC-Unique: RzxXS0GDNbCgQRsjzW0QWQ-1
+X-Mimecast-MFC-AGG-ID: RzxXS0GDNbCgQRsjzW0QWQ_1745340557
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-39979ad285bso2431360f8f.2
+        for <kvm@vger.kernel.org>; Tue, 22 Apr 2025 09:49:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745338408; x=1745943208;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BzcWP7HN4V69BqsvByJTA3za0cdW55UiPl0fqxkwA5Q=;
-        b=wi//EeZY6q7caPcyrH2BX2ZWrZoje0t6lrkS3muWUQEEfRNx2WwATkCd2+vWHae0gS
-         Rf5jtUX74mwjkpwtzECfXzXXmc3fy6V+luvH8Lo9t81fb5kEt6JqHM6325aLyqxf8qkd
-         nGQeU0M94Wg5ws++zaaqWVKxi7YpwUpjXXqtzHZtnWxr8FapY860WcKMfYOs5Ua5a0IV
-         YDURXDyyZgiPnOdiq0rOTr4aLkce6R+CV3MFIB3ifGRulop2IDraCKCskGU1Vh4fEQDz
-         +hUgoiSSzhrgc5Dcuv7mc3YxhfAwPPfA8Z5KqyXDTTu7VyS3UnkJNfsutXNDX83mE7X3
-         p3vg==
-X-Forwarded-Encrypted: i=1; AJvYcCUKxGa5IxywkQ0Y/6iXc+3sUWu7kK2GPePP/TWKCAtYUGfLySycmaijNRXYwTQ0SIdqd40=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjXPdrZsZThX6NVWm5DwuozGaVbUjVUjqIkjKoRxI8ItihPkZ9
-	fCpdynETjiR0zYXzP0uUDMnFxIg6g7Ram1G/pkaxnwtfMfG9GRBDS2in4Ek4+w==
-X-Gm-Gg: ASbGnctfvEEvK/ZpbPAG0JcY5cZa6pnrCr2iZk0ADbrA/En/iNoEnTCVotndAwrxxvu
-	5m0Ad43+rSgjTpNXpOTk9IKw9ijB8wF+rLB9MrtmypWcXdrQ3vUxDT4JZJtMj6WL7PyApt4Wcyp
-	vBfyz0CsTfvCGbc4T5oIbPDlyJadOygG2jSXeS98TameSfpjZXPUsHsNeH9anXyyuvgPq9FpW1T
-	+Xxko2jrM7BqLLSyTmNjx5M4p2ES5m4JoD5qGdQ1kEuFxJwuTz3sv0v4+xVHq9xIlBjc4EO3mkP
-	gnE4l7vKY7pu3CpZLldkDwtRcyMDQA8j8oNIVCAdV3TMzDSGKLVcpOqHBA749+8rFaA4PV97cnQ
-	mFSw9bsB1VotzhbxNNCta/GmpXHP00Pr2
-X-Google-Smtp-Source: AGHT+IFXPfVNyaIaH5PkNkJJ4dOx7Q32vB/OT615RZ2uxxOhlp0AcB0WNZrcWG6lGBQwvBg4b2r2Vw==
-X-Received: by 2002:a17:903:41ce:b0:224:fa0:36d2 with SMTP id d9443c01a7336-22c535b4960mr208029485ad.26.1745338408384;
-        Tue, 22 Apr 2025 09:13:28 -0700 (PDT)
-Received: from localhost.localdomain (pool-173-49-113-140.phlapa.fios.verizon.net. [173.49.113.140])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22c50eb03d2sm87462375ad.142.2025.04.22.09.13.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Apr 2025 09:13:28 -0700 (PDT)
-From: Zack Rusin <zack.rusin@broadcom.com>
-To: linux-kernel@vger.kernel.org
-Cc: Zack Rusin <zack.rusin@broadcom.com>,
-	Doug Covelli <doug.covelli@broadcom.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Joel Stanley <joel@jms.id.au>,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	Arnaldo Carvalho de Melo <acme@redhat.com>,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH v2 5/5] KVM: selftests: x86: Add a test for KVM_CAP_X86_VMWARE_HYPERCALL
-Date: Tue, 22 Apr 2025 12:12:24 -0400
-Message-ID: <20250422161304.579394-6-zack.rusin@broadcom.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250422161304.579394-1-zack.rusin@broadcom.com>
-References: <20250422161304.579394-1-zack.rusin@broadcom.com>
+        d=1e100.net; s=20230601; t=1745340557; x=1745945357;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=lHSkROXmhzxaxiTJB2Sts+hoXg6Enh4N97MVVPj8jow=;
+        b=rHu3T7u0He9caX5Z7YDcIfDceg4sVULBCEcCPApdTriIsNaGWb5lmtxOGmmomLyqqo
+         agjzdIpJS9SCcwNhKacAKARruvqSy/coYOYtLVvsjuD43UHYZy9wIw94yBt23UZWRIjM
+         YnaxF2ni/VNrzK5QJeE4CXY/zm9w10UiBPJ+qnyTOQpcGJfbm72PJoy6zQjKQWPcHLo8
+         rB1jA2eO71tDL9atQt83qz4kheCYxFHOixjnC975P6LPW72SCiZmg5sFScSJiLDbFd94
+         WxiiQ0+OK6cp3udlu0GS+Sq0uSGjSN2J6QnOt28fxCEqbXc5WHvOyvB6MNLesf7Hznrv
+         Tj2w==
+X-Forwarded-Encrypted: i=1; AJvYcCWmAY31JnqijnOtia5rJC2ujhCQ11PKjvCcIsgvUZCgLTkvxFjiiU4kksXbcZE6tYEu0vc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3eBKjSIQPOzD8DDw3ezkHdcW1Okt6s38+2IHPQ99lJYaueqCi
+	1kDcqGpcSC4H5p+Dk6OAdsiROL+KCrcyhpXve15Qe4PwJG/hjwTUkG2ObFUSjWEmYG9dNezcnxD
+	VfmXeijMN9IjYUm/fPlFTOYXbK5jXhbFgKqZgrM6GaddZgQR4xQ==
+X-Gm-Gg: ASbGncuqDve/Pwd0hs0YveMafpQg+Hn0EnSlymxm1qtVu+Xb7h4x50epU4GT2DLaEfP
+	amUvYbaPWs09f2Nsk9qwIcoG7AE0vxxSvUbeQOpUK6P8PsU6UbUq33MwHn7/Xe25Bwkziy2jXQW
+	JzSipU/k693JlvqoRnRr7JlFXwZ7oLHy+pjJaVXErfbOgn4+SbOXJ6YHxOvHRCWFMT6uIj5GEue
+	yRjhjFRfOdRGxubH02kPEHJJe1qSi9BTTVlRGBVhI9Kb7qMAEHRJdSOtaSHMUNdHNjti/qQilNA
+	u8NPiu0KhMHGPczAzrNZ25+jLPy0BqQ7U2MM5gjW
+X-Received: by 2002:a05:6000:381:b0:38f:2413:2622 with SMTP id ffacd0b85a97d-39efbad7f42mr14397240f8f.47.1745340557506;
+        Tue, 22 Apr 2025 09:49:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGDoEgp+mnqvCe0AHRP0Rn4FhZOt0+ug+zdFUDxNDueLDOx4k3ra4nj9Co+7VRKKBDx5ofTWw==
+X-Received: by 2002:a05:6000:381:b0:38f:2413:2622 with SMTP id ffacd0b85a97d-39efbad7f42mr14397208f8f.47.1745340557066;
+        Tue, 22 Apr 2025 09:49:17 -0700 (PDT)
+Received: from [192.168.3.141] (p5b0c62cd.dip0.t-ipconnect.de. [91.12.98.205])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39efa4330bfsm15769041f8f.23.2025.04.22.09.49.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Apr 2025 09:49:16 -0700 (PDT)
+Message-ID: <1bee5078-5cc4-43b7-993c-f1e57a9bf534@redhat.com>
+Date: Tue, 22 Apr 2025 18:49:14 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v7 3/8] security: Export
+ security_inode_init_security_anon for KVM guest_memfd
+To: Shivank Garg <shivankg@amd.com>, Paul Moore <paul@paul-moore.com>
+Cc: seanjc@google.com, vbabka@suse.cz, willy@infradead.org,
+ akpm@linux-foundation.org, shuah@kernel.org, pbonzini@redhat.com,
+ ackerleytng@google.com, jmorris@namei.org, serge@hallyn.com, pvorel@suse.cz,
+ bfoster@redhat.com, tabba@google.com, vannapurve@google.com,
+ chao.gao@intel.com, bharata@amd.com, nikunj@amd.com, michael.day@amd.com,
+ yan.y.zhao@intel.com, Neeraj.Upadhyay@amd.com, thomas.lendacky@amd.com,
+ michael.roth@amd.com, aik@amd.com, jgg@nvidia.com, kalyazin@amazon.com,
+ peterx@redhat.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org,
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-coco@lists.linux.dev
+References: <20250408112402.181574-1-shivankg@amd.com>
+ <20250408112402.181574-4-shivankg@amd.com>
+ <CAHC9VhRFBOC=cZB+Dm00cshwBSBaK6amv+=XFLPF0Bub0gHN+Q@mail.gmail.com>
+ <b98f7b78-1834-4fa0-b79c-d5ac562e4809@amd.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <b98f7b78-1834-4fa0-b79c-d5ac562e4809@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Add a testcase to exercise KVM_CAP_X86_VMWARE_HYPERCALL and validate
-that KVM exits to userspace on hypercalls and registers are correctly
-preserved.
+On 11.04.25 08:07, Shivank Garg wrote:
+> Hi Paul,
+> 
+> On 4/10/2025 1:49 AM, Paul Moore wrote:
+>> On Tue, Apr 8, 2025 at 7:25 AM Shivank Garg <shivankg@amd.com> wrote:
+>>>
+>>> KVM guest_memfd is implementing its own inodes to store metadata for
+>>> backing memory using a custom filesystem. This requires the ability to
+>>> initialize anonymous inode using security_inode_init_security_anon().
+>>>
+>>> As guest_memfd currently resides in the KVM module, we need to export this
+>>> symbol for use outside the core kernel. In the future, guest_memfd might be
+>>> moved to core-mm, at which point the symbols no longer would have to be
+>>> exported. When/if that happens is still unclear.
+>>
+>> Can you help me understand the timing just a bit more ... do you
+>> expect the move to the core MM code to happen during the lifetime of
+>> this patchset, or is it just some hand-wavy "future date"?  No worries
+>> either way, just trying to understand things a bit better.
+> 
+> I am not sure about it, any ideas David?
 
-Signed-off-by: Zack Rusin <zack.rusin@broadcom.com>
-Cc: Doug Covelli <doug.covelli@broadcom.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Shuah Khan <shuah@kernel.org>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Namhyung Kim <namhyung@kernel.org>
-Cc: Joel Stanley <joel@jms.id.au>
-Cc: Zack Rusin <zack.rusin@broadcom.com>
-Cc: Isaku Yamahata <isaku.yamahata@intel.com>
-Cc: Arnaldo Carvalho de Melo <acme@redhat.com>
-Cc: linux-kernel@vger.kernel.org
-Cc: kvm@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org
----
- tools/include/uapi/linux/kvm.h                |   3 +
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/x86/vmware_hypercall_test.c | 121 ++++++++++++++++++
- 3 files changed, 125 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86/vmware_hypercall_test.c
+Sorry for the late reply.
 
-diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-index 502ea63b5d2e..3b3ad1827245 100644
---- a/tools/include/uapi/linux/kvm.h
-+++ b/tools/include/uapi/linux/kvm.h
-@@ -933,6 +933,9 @@ struct kvm_enable_cap {
- #define KVM_CAP_PRE_FAULT_MEMORY 236
- #define KVM_CAP_X86_APIC_BUS_CYCLES_NS 237
- #define KVM_CAP_X86_GUEST_MODE 238
-+#define KVM_CAP_X86_VMWARE_BACKDOOR 239
-+#define KVM_CAP_X86_VMWARE_HYPERCALL 240
-+#define KVM_CAP_X86_VMWARE_NESTED_BACKDOOR_L0 241
- 
- struct kvm_irq_routing_irqchip {
- 	__u32 irqchip;
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 4277b983cace..9eea93b330e4 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -90,6 +90,7 @@ TEST_GEN_PROGS_x86 += x86/sync_regs_test
- TEST_GEN_PROGS_x86 += x86/ucna_injection_test
- TEST_GEN_PROGS_x86 += x86/userspace_io_test
- TEST_GEN_PROGS_x86 += x86/userspace_msr_exit_test
-+TEST_GEN_PROGS_x86 += x86/vmware_hypercall_test
- TEST_GEN_PROGS_x86 += x86/vmx_apic_access_test
- TEST_GEN_PROGS_x86 += x86/vmx_close_while_nested_test
- TEST_GEN_PROGS_x86 += x86/vmx_dirty_log_test
-diff --git a/tools/testing/selftests/kvm/x86/vmware_hypercall_test.c b/tools/testing/selftests/kvm/x86/vmware_hypercall_test.c
-new file mode 100644
-index 000000000000..8daca272933c
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86/vmware_hypercall_test.c
-@@ -0,0 +1,121 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * vmware_hypercall_test
-+ *
-+ * Copyright (c) 2025 Broadcom. All Rights Reserved. The term
-+ * “Broadcom” refers to Broadcom Inc. and/or its subsidiaries.
-+ *
-+ * Based on:
-+ *    xen_vmcall_test.c
-+ *
-+ *    Copyright © 2020 Amazon.com, Inc. or its affiliates.
-+ *
-+ * VMware hypercall testing
-+ */
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+
-+#define ARGVALUE(x) (0xdeadbeef5a5a0000UL + (x))
-+#define RETVALUE(x) (0xcafef00dfbfbffffUL + (x))
-+
-+static void guest_code(void)
-+{
-+	uint64_t error_code;
-+	uint8_t vector;
-+
-+	unsigned long rax = ARGVALUE(1);
-+	unsigned long rbx = ARGVALUE(2);
-+	unsigned long rcx = ARGVALUE(3);
-+	unsigned long rdx = ARGVALUE(4);
-+	unsigned long rsi = ARGVALUE(5);
-+	unsigned long rdi = ARGVALUE(6);
-+	register unsigned long rbp __asm__("rbp") = ARGVALUE(7);
-+
-+	asm volatile(KVM_ASM_SAFE("vmcall")
-+		     : "=a"(rax),  "=b"(rbx), "=c"(rcx), "=d"(rdx),
-+		       "=S"(rsi), "=D"(rdi),
-+		       KVM_ASM_SAFE_OUTPUTS(vector, error_code)
-+		     : "a"(rax), "b"(rbx), "c"(rcx), "d"(rdx),
-+		       "S"(rsi), "D"(rdi), "r"(rbp)
-+		     : KVM_ASM_SAFE_CLOBBERS);
-+	GUEST_ASSERT_EQ(rax, RETVALUE(11));
-+	GUEST_ASSERT_EQ(rbx, RETVALUE(12));
-+	GUEST_ASSERT_EQ(rcx, RETVALUE(13));
-+	GUEST_ASSERT_EQ(rdx, RETVALUE(14));
-+	GUEST_ASSERT_EQ(rsi, RETVALUE(15));
-+	GUEST_ASSERT_EQ(rdi, RETVALUE(16));
-+	GUEST_ASSERT_EQ(vector, 12);
-+	GUEST_ASSERT_EQ(error_code, 14);
-+	GUEST_DONE();
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	if (!kvm_check_cap(KVM_CAP_X86_VMWARE_HYPERCALL)) {
-+		print_skip("KVM_CAP_X86_VMWARE_HYPERCALL not available");
-+		exit(KSFT_SKIP);
-+	}
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-+
-+	vm_enable_cap(vm, KVM_CAP_X86_VMWARE_HYPERCALL, 1);
-+
-+	for (;;) {
-+		struct kvm_run *run = vcpu->run;
-+		struct ucall uc;
-+
-+		vcpu_run(vcpu);
-+
-+		if (run->exit_reason == KVM_EXIT_VMWARE) {
-+			struct kvm_regs regs;
-+
-+			TEST_ASSERT_EQ(run->vmware.type, KVM_EXIT_VMWARE_HCALL);
-+			TEST_ASSERT_EQ(run->vmware.hcall.longmode, 1);
-+			TEST_ASSERT_EQ(run->vmware.hcall.cpl, 0);
-+			TEST_ASSERT_EQ(run->vmware.hcall.rax, ARGVALUE(1));
-+			TEST_ASSERT_EQ(run->vmware.hcall.rbx, ARGVALUE(2));
-+			TEST_ASSERT_EQ(run->vmware.hcall.rcx, ARGVALUE(3));
-+			TEST_ASSERT_EQ(run->vmware.hcall.rdx, ARGVALUE(4));
-+			TEST_ASSERT_EQ(run->vmware.hcall.rsi, ARGVALUE(5));
-+			TEST_ASSERT_EQ(run->vmware.hcall.rdi, ARGVALUE(6));
-+			TEST_ASSERT_EQ(run->vmware.hcall.rbp, ARGVALUE(7));
-+
-+			run->vmware.hcall.exception.inject = 1;
-+			run->vmware.hcall.exception.vector = 12;
-+			run->vmware.hcall.exception.error_code = 14;
-+			run->vmware.hcall.exception.address = 0;
-+
-+			run->vmware.hcall.result = RETVALUE(11);
-+			vcpu_regs_get(vcpu, &regs);
-+			regs.rbx = RETVALUE(12);
-+			regs.rcx = RETVALUE(13);
-+			regs.rdx = RETVALUE(14);
-+			regs.rsi = RETVALUE(15);
-+			regs.rdi = RETVALUE(16);
-+			vcpu_regs_set(vcpu, &regs);
-+			continue;
-+		}
-+
-+		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			/* NOT REACHED */
-+		case UCALL_SYNC:
-+			break;
-+		case UCALL_DONE:
-+			goto done;
-+		default:
-+			TEST_FAIL("Unknown ucall 0x%lx.", uc.cmd);
-+		}
-+	}
-+done:
-+	kvm_vm_free(vm);
-+	return 0;
-+}
+Hand-wavy future date after this series. Elliot was working on this, but 
+IIRC he now has a new job and might no longer be able to work on this.
+
+Ackerley+Patrick started looking into this, and will likely require it 
+for other guest_memfd features (hugetlb support, directmap removal).
+
 -- 
-2.48.1
+Cheers,
+
+David / dhildenb
 
 
