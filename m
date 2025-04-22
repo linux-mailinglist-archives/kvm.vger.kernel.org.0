@@ -1,105 +1,89 @@
-Return-Path: <kvm+bounces-43740-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43741-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76953A95C47
-	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 04:43:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C22DA95CE5
+	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 06:23:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42B6F189299F
-	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 02:43:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3238D1898EA3
+	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 04:24:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51FBF185955;
-	Tue, 22 Apr 2025 02:43:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="V2sBaJpa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71F501A76DE;
+	Tue, 22 Apr 2025 04:23:40 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F2EA33C9;
-	Tue, 22 Apr 2025 02:43:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7AD18A6AB;
+	Tue, 22 Apr 2025 04:23:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745289798; cv=none; b=c2IuNHlXiEdi8rz49ye6Il9V06vjElV8cjRADDyce81XbSDl8Uyx0OexD0Ku3KmRyCTUufeHzH637M7oX5KI2Dr1Kx8QKQodg3RPPBf/f2Dzv/M4u1Ooy2DKiY4W03z76d06uGZQTvM1BFSEAWTNRjXnO80E0kr4igOmSyhjcjs=
+	t=1745295819; cv=none; b=W8U4DKMbYI7kJPrTrF1DGgg98pnfL4m05E9q3QVfrWeEg9nfOTvFrJ7hXqO39sDZfr/3o9dDIFPbA/4+Cgo7Sjqek6wvv3f5v0mEB5yRpPdP2YG5Syp/XcV0VMprozE9Nu4yF1ou8oDgkB54qa99LAYngFkL9pQWxhIPFM55PRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745289798; c=relaxed/simple;
-	bh=TJfQO+DshFOJkto2hWQcgDo93KVaWTH1PQ+Ax9cD2qg=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=PeNkGH9sHShYfzBFL1juU9L4i47liYTRHTaRMek9e5EsSkzEVYlI6Vi4UbSPff9Wx4owoMpmOjlXOo2EdJ4kV8tKSgPXb7uEqQZ7iZ1KHfZ7AnXKgGaP7y5ETVsxqGBHFm9lymZZvn7DasuxmEC2RYzYb61QJBQdurA1bBY6PiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=V2sBaJpa; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1745289790;
-	bh=DVluLmRCk8ERoH1K+KEao07gB+Gu6l/bbm5Re1+V0vk=;
-	h=Date:From:To:Cc:Subject:From;
-	b=V2sBaJpa/Z367VwJB+LVFBysrES2uWyoK80qt0Tc8skiGt4EC0stXKihlyJrVYSG2
-	 NAYTNXZqvFM1gWzuic1FzbAbvRjkR1Pjl5IU6EeEByw3m/7HZP6zcvSoREUzlNpBXI
-	 QTNLUhodPwQtfjr4vaVL6HGrYRH4mN4sF3gcTomuO2TXOHowbSgiAnG7D5ns8aa/ik
-	 WEtj2UPPl7x6j6CN8awEOfJCg1qeiln9MZg3UG8bl30vBfB6oPo7zst1Fducrgz8lj
-	 tALbxeSgO74wn495NAMyDPXVIeELIL0IQRP5Q6PLEGkYrGirjPWg7FRpWd+/ll9bwh
-	 MMX6O5k+j5tJg==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4ZhRPB5HhYz4wnp;
-	Tue, 22 Apr 2025 12:43:10 +1000 (AEST)
-Date: Tue, 22 Apr 2025 12:43:10 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc: Sean Christopherson <seanjc@google.com>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: build failure after merge of the kvm-fixes tree
-Message-ID: <20250422124310.2e9aee0d@canb.auug.org.au>
+	s=arc-20240116; t=1745295819; c=relaxed/simple;
+	bh=ZsL/pPv9Fie+gQQJKm5n3DFw8zPfnFLMFMmjcCsXAtk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dl540kjUs74H43ype5hpehida0zKhqqhXqzFxW8fsStsQZvnJ9Vdxt2LIub3dRyZRU4ajnlq+eqeZTPf2GK1wGpz6aO+I72QKsoVVkX0tVEeGz0E5enCaXcoIWcbRKClUK0ubrh6WILn3uha+eSMNyZNSCFQN+6LCdQND4YHC9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id A64FD68BFE; Tue, 22 Apr 2025 06:23:30 +0200 (CEST)
+Date: Tue, 22 Apr 2025 06:23:30 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Keith Busch <kbusch@kernel.org>,
+	Leon Romanovsky <leonro@nvidia.com>, Jake Edge <jake@lwn.net>,
+	Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Zhu Yanjun <zyjzyj2000@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH v8 04/24] iommu: add kernel-doc for iommu_unmap and
+ iommu_unmap_fast
+Message-ID: <20250422042330.GA27723@lst.de>
+References: <cover.1744825142.git.leon@kernel.org> <d3ad1e84d896aea97ebbd01c414fb1f07dc791d3.1744825142.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/b+zvbcCTedLmAmzK9u=mk7I";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d3ad1e84d896aea97ebbd01c414fb1f07dc791d3.1744825142.git.leon@kernel.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
---Sig_/b+zvbcCTedLmAmzK9u=mk7I
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Fri, Apr 18, 2025 at 09:47:34AM +0300, Leon Romanovsky wrote:
+> From: Leon Romanovsky <leonro@nvidia.com>
+> 
+> Add kernel-doc section for iommu_unmap and iommu_unmap_fast to document
+> existing limitation of underlying functions which can't split individual
+> ranges.
 
-Hi all,
+This actually only adds kerneldoc to iommu_unmap_fast.
 
-After merging the kvm-fixes tree, today's linux-next build (x86_64
-allmodconfig) failed like this:
-
-ERROR: modpost: "kvm_arch_has_irq_bypass" [arch/x86/kvm/kvm-amd.ko] undefin=
-ed!
-
-Caused by commit
-
-  73e0c567c24a ("KVM: SVM: Don't update IRTEs if APICv/AVIC is disabled")
-
-I have used the kvm-fixes tree from next-20250417 for today.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/b+zvbcCTedLmAmzK9u=mk7I
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmgHAj4ACgkQAVBC80lX
-0Gw7iAf8DDOhycy17JVB2w14DpVbtnmNG/Spy/e0AxaG1Sx3n1ILQh34MKfAmqOh
-eSNNIgwaZ89NYBDdN1DZy2MRpDN1PVkCR9L7KPaM1b2YbnohhLV1+d3eCIpYtm2L
-CZwMwgIpAdjgx7zs/8hte64pGJyoEv6Y7+0fXwsEsTl2Iz8P/4ybuS9LQ+GubDTu
-W9Yd/RCS1XgglC5hgyyVj4kjJub/u9EbzMmdRic74rqOcvkgQoLM8Nbz6oPYQeBP
-sCaeL8qP4wk5E2+sBWgktMl5mHTGVCclkEKTH66JHHyh1k+YfOn9mQIKWgPE3zoi
-K5t2kFmZQfFJ1LazKIWpPNc9Q1WR8Q==
-=B4eX
------END PGP SIGNATURE-----
-
---Sig_/b+zvbcCTedLmAmzK9u=mk7I--
 
