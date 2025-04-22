@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-43789-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43776-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFA03A961E1
-	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 10:35:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1052A961B6
+	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 10:32:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4ED4E3B75D7
-	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 08:33:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3C5417A1BC
+	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 08:30:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AD4727B4EA;
-	Tue, 22 Apr 2025 08:24:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBF79269813;
+	Tue, 22 Apr 2025 08:24:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="Jy0JHc0d"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="aNQDlhh2"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A1F26B0BC;
-	Tue, 22 Apr 2025 08:24:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EFA2264F87;
+	Tue, 22 Apr 2025 08:23:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745310245; cv=none; b=uofMgKtXYbQgNYQGY0PSBDRa7ocbzbG02Z4B6/OPIX/H9zARtqnRuwRcDL2PzlRJlX51tkZcfwhnqVzSucROJfTg6PYvRiw9DtvePUdtDObCrGm1thV/dtu6HzEPVK/uVcYViSaDCipkMzljE/MvZTxIbgzgiNMkJI3vpLrRcos=
+	t=1745310239; cv=none; b=EpocUi1wmSrMIA+N90xjLxtwPSucEjtW6tr7KpiItQLr7WbQO6LfvcsV0VRECkAyvHVT1umwPUMQs2W9wXdpxhnzSjLJgPiF45RL+sEs6Jl/Wi5iSNS4WM5tf6Bnmpvdu1glKOUVJLm3spRGEN9IiAAuA4o+OeAq/qtE/mVUwXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745310245; c=relaxed/simple;
-	bh=rBfOQlwczZmZz/bZo7jau3XZh39bCYgaHzOQMyakGrY=;
+	s=arc-20240116; t=1745310239; c=relaxed/simple;
+	bh=MlzZP2PcWDZrFa9hDnXv30fqYMM04NkLvN5K6Ig/4KA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LgH8GnTXPwuHebQ9ECWhqE4LresHizxAuqtmaCewF5vHmoP9TyObXb+4T8n0NGHobc096R81B4GETh0I5AGP11ppDiMTCQo1wlgWfu+26qmmUFoAnz4nvG5UhnDIK0GDnRD/eIzixyi4KBhyETvRdng7zBuzvRZDYn1Bc8eEkRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=Jy0JHc0d; arc=none smtp.client-ip=198.137.202.136
+	 MIME-Version; b=NYhg7QlYZaThwcjjM9sa68nzxWxD1T/qk2vgnlwi5qz/EKu9AEPPe0L1jvdMiWLEr0Y0YQZ1sL9g2lhzC6Y8rkxZFzr0QUitwXA2mPc0jmf9XciYrDOXz4r/u+pfQlR08bTkUULnMqyGjQJ0hVX5kNbXYUvQ/KlJJOs8Hn7p8x0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=aNQDlhh2; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from terminus.zytor.com (terminus.zytor.com [IPv6:2607:7c80:54:3:0:0:0:136])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53M8MG9V1954391
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53M8MG9W1954391
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Tue, 22 Apr 2025 01:22:55 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53M8MG9V1954391
+	Tue, 22 Apr 2025 01:22:57 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53M8MG9W1954391
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1745310176;
-	bh=vxOJJAeQ3QVhVHFsGY7fwS1GjjJpZ7N17Khlb3T0KJ4=;
+	s=2025042001; t=1745310178;
+	bh=XaAm3SgdeuQpqxiLf3TgiBnvvEMb/sqRjazcaLW8DyU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Jy0JHc0dkXPO6+PoCsc/ghqsBA98GapdHusalbDHv2JvwwmKYBCTsptia25WKTvJ0
-	 DCpTD+oAXTIPBb7rYWih1BxLvxPo48WMKJkz4pfTLESRumk2xbAyq93d1bV+CH+Ghy
-	 4kZiCKbITI8t79BKx4lgQegjLXupqHXLtB9UVMI5Hqy0yqQAIiuEwWktp8HJ4Sok5I
-	 X9gUdMcrA4RUi3L2Nz/snJKwMnjwlvFWMUDDQqbAcUI0GovT4A6cTbBKIrdrGnZwvg
-	 RaaXcFf0yDxPeY+VwJFXb56xtFUYandu9CX0IvawELRbNE0SssJXJp8G8FEpbxN/2x
-	 hmBOaqa2bEMnA==
+	b=aNQDlhh2xlWRbyeJukGWTC/vCCeQb6zitL4jNCcMF4/UqfnsnIPrjB234ggYDAm4n
+	 /OAUTUCS6m8svXdcAJEjhiXvD0bvb7pxXmCp56esSiGCgBDU/fm2+V6WjpHdn7ALNZ
+	 dqP/5qRa1S0+Lp3LRQ3WFTfiGwPFPXzUffyVlWhaYmG78Chtndnv8OFzZqmNpS7l6c
+	 ImhtFxmMTaZOLVSxB5DGLhb3HeAISjXz4cKumUDuLcQuWXuj7fm47baKL82vIov6cz
+	 70aPro2cmGmDIDjFIgcRsQs+TcX09RekPiJ/6zWfrES6Aw+7U7SmR69YRnJ8YiJwsn
+	 YbU2jKXeJuZUg==
 From: "Xin Li (Intel)" <xin@zytor.com>
 To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
@@ -65,9 +65,9 @@ Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
         luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
         haiyangz@microsoft.com, decui@microsoft.com
-Subject: [RFC PATCH v2 17/34] x86/cpufeatures: Add a CPU feature bit for MSR immediate form instructions
-Date: Tue, 22 Apr 2025 01:21:58 -0700
-Message-ID: <20250422082216.1954310-18-xin@zytor.com>
+Subject: [RFC PATCH v2 18/34] x86/opcode: Add immediate form MSR instructions
+Date: Tue, 22 Apr 2025 01:21:59 -0700
+Message-ID: <20250422082216.1954310-19-xin@zytor.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250422082216.1954310-1-xin@zytor.com>
 References: <20250422082216.1954310-1-xin@zytor.com>
@@ -79,44 +79,75 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The immediate form of MSR access instructions are primarily motivated
-by performance, not code size: by having the MSR number in an immediate,
-it is available *much* earlier in the pipeline, which allows the
-hardware much more leeway about how a particular MSR is handled.
+Add the instruction opcodes used by the immediate form WRMSRNS/RDMSR
+to x86-opcode-map.
 
-Use a scattered CPU feature bit for MSR immediate form instructions.
-
-Suggested-by: Borislav Petkov (AMD) <bp@alien8.de>
 Signed-off-by: Xin Li (Intel) <xin@zytor.com>
 ---
- arch/x86/include/asm/cpufeatures.h | 1 +
- arch/x86/kernel/cpu/scattered.c    | 1 +
- 2 files changed, 2 insertions(+)
+ arch/x86/lib/x86-opcode-map.txt       | 5 +++--
+ tools/arch/x86/lib/x86-opcode-map.txt | 5 +++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index 7642310276a8..1dc6dc794018 100644
---- a/arch/x86/include/asm/cpufeatures.h
-+++ b/arch/x86/include/asm/cpufeatures.h
-@@ -482,6 +482,7 @@
- #define X86_FEATURE_AMD_WORKLOAD_CLASS	(21*32+ 7) /* Workload Classification */
- #define X86_FEATURE_PREFER_YMM		(21*32+ 8) /* Avoid ZMM registers due to downclocking */
- #define X86_FEATURE_APX			(21*32+ 9) /* Advanced Performance Extensions */
-+#define X86_FEATURE_MSR_IMM		(21*32+10) /* MSR immediate form instructions */
+diff --git a/arch/x86/lib/x86-opcode-map.txt b/arch/x86/lib/x86-opcode-map.txt
+index caedb3ef6688..e64f52321d6d 100644
+--- a/arch/x86/lib/x86-opcode-map.txt
++++ b/arch/x86/lib/x86-opcode-map.txt
+@@ -839,7 +839,7 @@ f1: MOVBE My,Gy | MOVBE Mw,Gw (66) | CRC32 Gd,Ey (F2) | CRC32 Gd,Ew (66&F2)
+ f2: ANDN Gy,By,Ey (v)
+ f3: Grp17 (1A)
+ f5: BZHI Gy,Ey,By (v) | PEXT Gy,By,Ey (F3),(v) | PDEP Gy,By,Ey (F2),(v) | WRUSSD/Q My,Gy (66)
+-f6: ADCX Gy,Ey (66) | ADOX Gy,Ey (F3) | MULX By,Gy,rDX,Ey (F2),(v) | WRSSD/Q My,Gy
++f6: ADCX Gy,Ey (66) | ADOX Gy,Ey (F3) | MULX By,Gy,rDX,Ey (F2),(v) | WRSSD/Q My,Gy | RDMSR Rq,Gq (F2),(11B) | WRMSRNS Gq,Rq (F3),(11B)
+ f7: BEXTR Gy,Ey,By (v) | SHLX Gy,Ey,By (66),(v) | SARX Gy,Ey,By (F3),(v) | SHRX Gy,Ey,By (F2),(v)
+ f8: MOVDIR64B Gv,Mdqq (66) | ENQCMD Gv,Mdqq (F2) | ENQCMDS Gv,Mdqq (F3) | URDMSR Rq,Gq (F2),(11B) | UWRMSR Gq,Rq (F3),(11B)
+ f9: MOVDIRI My,Gy
+@@ -1014,7 +1014,7 @@ f1: CRC32 Gy,Ey (es) | CRC32 Gy,Ey (66),(es) | INVVPID Gy,Mdq (F3),(ev)
+ f2: INVPCID Gy,Mdq (F3),(ev)
+ f4: TZCNT Gv,Ev (es) | TZCNT Gv,Ev (66),(es)
+ f5: LZCNT Gv,Ev (es) | LZCNT Gv,Ev (66),(es)
+-f6: Grp3_1 Eb (1A),(ev)
++f6: Grp3_1 Eb (1A),(ev) | RDMSR Rq,Gq (F2),(11B),(ev) | WRMSRNS Gq,Rq (F3),(11B),(ev)
+ f7: Grp3_2 Ev (1A),(es)
+ f8: MOVDIR64B Gv,Mdqq (66),(ev) | ENQCMD Gv,Mdqq (F2),(ev) | ENQCMDS Gv,Mdqq (F3),(ev) | URDMSR Rq,Gq (F2),(11B),(ev) | UWRMSR Gq,Rq (F3),(11B),(ev)
+ f9: MOVDIRI My,Gy (ev)
+@@ -1103,6 +1103,7 @@ EndTable
+ Table: VEX map 7
+ Referrer:
+ AVXcode: 7
++f6: RDMSR Rq,Id (F2),(v1),(11B) | WRMSRNS Id,Rq (F3),(v1),(11B)
+ f8: URDMSR Rq,Id (F2),(v1),(11B) | UWRMSR Id,Rq (F3),(v1),(11B)
+ EndTable
  
- /*
-  * BUG word(s)
-diff --git a/arch/x86/kernel/cpu/scattered.c b/arch/x86/kernel/cpu/scattered.c
-index dbf6d71bdf18..c63ddbf35a71 100644
---- a/arch/x86/kernel/cpu/scattered.c
-+++ b/arch/x86/kernel/cpu/scattered.c
-@@ -27,6 +27,7 @@ static const struct cpuid_bit cpuid_bits[] = {
- 	{ X86_FEATURE_APERFMPERF,		CPUID_ECX,  0, 0x00000006, 0 },
- 	{ X86_FEATURE_EPB,			CPUID_ECX,  3, 0x00000006, 0 },
- 	{ X86_FEATURE_INTEL_PPIN,		CPUID_EBX,  0, 0x00000007, 1 },
-+	{ X86_FEATURE_MSR_IMM,			CPUID_ECX,  5, 0x00000007, 1 },
- 	{ X86_FEATURE_APX,			CPUID_EDX, 21, 0x00000007, 1 },
- 	{ X86_FEATURE_RRSBA_CTRL,		CPUID_EDX,  2, 0x00000007, 2 },
- 	{ X86_FEATURE_BHI_CTRL,			CPUID_EDX,  4, 0x00000007, 2 },
+diff --git a/tools/arch/x86/lib/x86-opcode-map.txt b/tools/arch/x86/lib/x86-opcode-map.txt
+index caedb3ef6688..e64f52321d6d 100644
+--- a/tools/arch/x86/lib/x86-opcode-map.txt
++++ b/tools/arch/x86/lib/x86-opcode-map.txt
+@@ -839,7 +839,7 @@ f1: MOVBE My,Gy | MOVBE Mw,Gw (66) | CRC32 Gd,Ey (F2) | CRC32 Gd,Ew (66&F2)
+ f2: ANDN Gy,By,Ey (v)
+ f3: Grp17 (1A)
+ f5: BZHI Gy,Ey,By (v) | PEXT Gy,By,Ey (F3),(v) | PDEP Gy,By,Ey (F2),(v) | WRUSSD/Q My,Gy (66)
+-f6: ADCX Gy,Ey (66) | ADOX Gy,Ey (F3) | MULX By,Gy,rDX,Ey (F2),(v) | WRSSD/Q My,Gy
++f6: ADCX Gy,Ey (66) | ADOX Gy,Ey (F3) | MULX By,Gy,rDX,Ey (F2),(v) | WRSSD/Q My,Gy | RDMSR Rq,Gq (F2),(11B) | WRMSRNS Gq,Rq (F3),(11B)
+ f7: BEXTR Gy,Ey,By (v) | SHLX Gy,Ey,By (66),(v) | SARX Gy,Ey,By (F3),(v) | SHRX Gy,Ey,By (F2),(v)
+ f8: MOVDIR64B Gv,Mdqq (66) | ENQCMD Gv,Mdqq (F2) | ENQCMDS Gv,Mdqq (F3) | URDMSR Rq,Gq (F2),(11B) | UWRMSR Gq,Rq (F3),(11B)
+ f9: MOVDIRI My,Gy
+@@ -1014,7 +1014,7 @@ f1: CRC32 Gy,Ey (es) | CRC32 Gy,Ey (66),(es) | INVVPID Gy,Mdq (F3),(ev)
+ f2: INVPCID Gy,Mdq (F3),(ev)
+ f4: TZCNT Gv,Ev (es) | TZCNT Gv,Ev (66),(es)
+ f5: LZCNT Gv,Ev (es) | LZCNT Gv,Ev (66),(es)
+-f6: Grp3_1 Eb (1A),(ev)
++f6: Grp3_1 Eb (1A),(ev) | RDMSR Rq,Gq (F2),(11B),(ev) | WRMSRNS Gq,Rq (F3),(11B),(ev)
+ f7: Grp3_2 Ev (1A),(es)
+ f8: MOVDIR64B Gv,Mdqq (66),(ev) | ENQCMD Gv,Mdqq (F2),(ev) | ENQCMDS Gv,Mdqq (F3),(ev) | URDMSR Rq,Gq (F2),(11B),(ev) | UWRMSR Gq,Rq (F3),(11B),(ev)
+ f9: MOVDIRI My,Gy (ev)
+@@ -1103,6 +1103,7 @@ EndTable
+ Table: VEX map 7
+ Referrer:
+ AVXcode: 7
++f6: RDMSR Rq,Id (F2),(v1),(11B) | WRMSRNS Id,Rq (F3),(v1),(11B)
+ f8: URDMSR Rq,Id (F2),(v1),(11B) | UWRMSR Id,Rq (F3),(v1),(11B)
+ EndTable
+ 
 -- 
 2.49.0
 
