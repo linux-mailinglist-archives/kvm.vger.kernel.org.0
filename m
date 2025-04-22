@@ -1,93 +1,91 @@
-Return-Path: <kvm+bounces-43836-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43837-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B868A97233
-	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 18:14:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C3CDA97239
+	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 18:14:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41D9E401724
-	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 16:14:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EDFD401CC3
+	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 16:14:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D09D8293B6E;
-	Tue, 22 Apr 2025 16:13:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BACEF2951BE;
+	Tue, 22 Apr 2025 16:13:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="geI162k1"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FBeqZkH5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2033A29346B
-	for <kvm@vger.kernel.org>; Tue, 22 Apr 2025 16:13:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ACBD293B5D
+	for <kvm@vger.kernel.org>; Tue, 22 Apr 2025 16:13:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745338408; cv=none; b=eMuMRymqbfMRfmmYKGRzZXd/RSCIj+NeMl2V6E1gzX7EoBC0G/9eNOHhwMZrpkD9YwhjWjH3UP7UI2sJ2OGtrXrUByGjVjwTIZusE5uFxA0RwWQg8YQmaXUuVCtNSTQ3MAJxABN0HS3EQg1d433yVeVk8uGg19VWNJgR+jGJeJQ=
+	t=1745338410; cv=none; b=Ig5ZlxDorDBSdWAMw9dxLMZ93ie0QnnlVYlY0e4b0Ck6yKGDD2j1FdO9mk6ZKUrGk35Cvx85QnsCHMhwLXsez3EqtO6A+HmHOQpY3EnPS2p12DG8LvtEAM2v5IPxn2iFazNVS2IBhJH6Lm1apRMr6dlDy1/JYBnyvcSakwzu9kI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745338408; c=relaxed/simple;
-	bh=wZyGnaU9VKPQKehMP8wf4K5Z9nGpXchW01UtloVdEQg=;
+	s=arc-20240116; t=1745338410; c=relaxed/simple;
+	bh=hdXOQCwoKTHHfPfG+e4+NzmtyorjjOf+cT947lM8l+Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=O0/Y24qI7nQ/Y2l3qbohMBdu8GMM2X5U22qOk3Erdb5dDHPbpcmbEbzxq607tjnMXBxBR9RcVg8xL9DPsUGngjAxHu4WyjZowRg+6CjVMVU4x7wNYnCU4aJshriaWswuegTNN8REKtAGJyKCeAnJNlVgw/ES9pQs4hSfxNb5pTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=geI162k1; arc=none smtp.client-ip=209.85.214.173
+	 MIME-Version:Content-Type; b=ZNxb2kBcU84UNytZfSVPn4yN5E2YWyVwWouVnH3cR3JrcS1YplyaheIbhgxQ7yMHBjErC4TuDmkhdFoKxd3NE0QpomYcZE16hMRLEUf91VhuZnHHLHHzsQ5oLyu3u7hhldbyxuz2V55QyGWbagii5vGAE1Qqpj0Q9Ysvfrz6Sr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=FBeqZkH5; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-227c7e57da2so47017825ad.0
-        for <kvm@vger.kernel.org>; Tue, 22 Apr 2025 09:13:26 -0700 (PDT)
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-227d6b530d8so55181015ad.3
+        for <kvm@vger.kernel.org>; Tue, 22 Apr 2025 09:13:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1745338406; x=1745943206; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1745338408; x=1745943208; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FYxBieSKIgS6H6yAXjPCIOcA2I5tG+O4lrtR0vcRYlI=;
-        b=geI162k1MVLjh4QDInpGc1f8lQNB+NV/zNJg1HuthT2kp2Cv81LI5eXo9+QdWg7kWD
-         cQymVafcb35itvBk7RCkOOQTCSqL65OYaHBPFea4YB1OQgPBoElIkXw8YTLOiM+qc4rp
-         C894dQFYjWVLvn2KOELaLPlcQ9UFfzgEIxPjo=
+        bh=BzcWP7HN4V69BqsvByJTA3za0cdW55UiPl0fqxkwA5Q=;
+        b=FBeqZkH5WdxZKUEZ+MZJsV79S2Tmnrd6xQ9sFDNCnP1Cuh95tdp762hHseY8t+lrcF
+         aUeesZZDmsE686Fs1wTf3Euua6LdE2Glxf5S4VnlDYeRd6OU8o8AC8C+gt8JOUztWv2V
+         JQNyR4aXwnY2wlSQL9vFl1kLEMGj3aQlhPAlw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745338406; x=1745943206;
+        d=1e100.net; s=20230601; t=1745338408; x=1745943208;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FYxBieSKIgS6H6yAXjPCIOcA2I5tG+O4lrtR0vcRYlI=;
-        b=YfjhD7R1mLsLp6zSwUvI5Hmb6YKRA+MkqR3zfry5CVxqtgqqXES0CQqk6NIMFS7aFN
-         DPb1wnHedpsxMBNVoT2bxHLFBBvPCqWeb1ih9QK2vgZjJowj67JTInFqgt2r4E7JPxod
-         Vc3+9E0OINRelgxy7HLvPlrNhW8NWfKgQtmX6jKZduOG2VD9OhYWo6BFyYQYEjlBvMXM
-         H0ugUxbjrFq6zP6dnJjYrafDPYlIznBIk3nHEHtQwZZTCcj9YI6KXOtsaP9PFTgo1r6H
-         DCuX+welb9kTQV+tk7UCNbQ7ru3y3loub8y3myupJyjE2R+GFOywhbYQFLldt0iBZtoT
-         xvqg==
-X-Forwarded-Encrypted: i=1; AJvYcCVE3xxnjWGei5Nx3sjCyYLt6hGoSvwmbt2tgESnPE8d1OKW+fLvAsrPHZVNYuQ8jKFtc5o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsTtQkEVhpO0BMlItBrfsNbCZu9N/VWaSY70XV0H9wcS36q12H
-	7IF8zY4HGNE5qQxL+AdQgL1ZEjzt6JhZFl254dauSCv7I424SxiA79ntgxlzsQ==
-X-Gm-Gg: ASbGncs9PqdPWyRrDys1iv5qmJXxe84PDNn0MqZrgoI7D/jFUGqz9hGCSi8QGV/xKmu
-	RQUb3WpLsXjGC6nQEujXFKMF0NagrDNgR40ujhTV9+sQ0dAH8tld7pXplwS2He+DiX+D19ZZ8hf
-	/rtOAbbul94KYpS2CAhAIYszwKK7cF2enDX/S1hM8s6JPflw5fUMbqIs3TBMvX2WJ6uxRqVwuCF
-	p9gudCIWJxvAxkGuCRlliEzBEYN6CIXcfn+ehlOTZ/JyNg9Ub/8jmfNpyQ+zIBT35xcLjYuX7N7
-	wG/7r80hixflAzkTmw31RM6OZ3dA9ArGZ3sfWcfqunPIubEUaVkePpe+CpRTuST7yH9hFkAYIr1
-	xV0Jy8PL/0Z5AGySeXwBkT3t2kTAn4h/v
-X-Google-Smtp-Source: AGHT+IFUvWhafII9vCi70h93pyV2tLtAs4kKP+wr0pbhir/6F18FqckDEpBNWILkVgMQ+IyZlIqSWg==
-X-Received: by 2002:a17:902:ce8c:b0:21f:4b01:b978 with SMTP id d9443c01a7336-22c53607c5bmr246637305ad.36.1745338406314;
-        Tue, 22 Apr 2025 09:13:26 -0700 (PDT)
+        bh=BzcWP7HN4V69BqsvByJTA3za0cdW55UiPl0fqxkwA5Q=;
+        b=wi//EeZY6q7caPcyrH2BX2ZWrZoje0t6lrkS3muWUQEEfRNx2WwATkCd2+vWHae0gS
+         Rf5jtUX74mwjkpwtzECfXzXXmc3fy6V+luvH8Lo9t81fb5kEt6JqHM6325aLyqxf8qkd
+         nGQeU0M94Wg5ws++zaaqWVKxi7YpwUpjXXqtzHZtnWxr8FapY860WcKMfYOs5Ua5a0IV
+         YDURXDyyZgiPnOdiq0rOTr4aLkce6R+CV3MFIB3ifGRulop2IDraCKCskGU1Vh4fEQDz
+         +hUgoiSSzhrgc5Dcuv7mc3YxhfAwPPfA8Z5KqyXDTTu7VyS3UnkJNfsutXNDX83mE7X3
+         p3vg==
+X-Forwarded-Encrypted: i=1; AJvYcCUKxGa5IxywkQ0Y/6iXc+3sUWu7kK2GPePP/TWKCAtYUGfLySycmaijNRXYwTQ0SIdqd40=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjXPdrZsZThX6NVWm5DwuozGaVbUjVUjqIkjKoRxI8ItihPkZ9
+	fCpdynETjiR0zYXzP0uUDMnFxIg6g7Ram1G/pkaxnwtfMfG9GRBDS2in4Ek4+w==
+X-Gm-Gg: ASbGnctfvEEvK/ZpbPAG0JcY5cZa6pnrCr2iZk0ADbrA/En/iNoEnTCVotndAwrxxvu
+	5m0Ad43+rSgjTpNXpOTk9IKw9ijB8wF+rLB9MrtmypWcXdrQ3vUxDT4JZJtMj6WL7PyApt4Wcyp
+	vBfyz0CsTfvCGbc4T5oIbPDlyJadOygG2jSXeS98TameSfpjZXPUsHsNeH9anXyyuvgPq9FpW1T
+	+Xxko2jrM7BqLLSyTmNjx5M4p2ES5m4JoD5qGdQ1kEuFxJwuTz3sv0v4+xVHq9xIlBjc4EO3mkP
+	gnE4l7vKY7pu3CpZLldkDwtRcyMDQA8j8oNIVCAdV3TMzDSGKLVcpOqHBA749+8rFaA4PV97cnQ
+	mFSw9bsB1VotzhbxNNCta/GmpXHP00Pr2
+X-Google-Smtp-Source: AGHT+IFXPfVNyaIaH5PkNkJJ4dOx7Q32vB/OT615RZ2uxxOhlp0AcB0WNZrcWG6lGBQwvBg4b2r2Vw==
+X-Received: by 2002:a17:903:41ce:b0:224:fa0:36d2 with SMTP id d9443c01a7336-22c535b4960mr208029485ad.26.1745338408384;
+        Tue, 22 Apr 2025 09:13:28 -0700 (PDT)
 Received: from localhost.localdomain (pool-173-49-113-140.phlapa.fios.verizon.net. [173.49.113.140])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22c50eb03d2sm87462375ad.142.2025.04.22.09.13.24
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22c50eb03d2sm87462375ad.142.2025.04.22.09.13.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Apr 2025 09:13:26 -0700 (PDT)
+        Tue, 22 Apr 2025 09:13:28 -0700 (PDT)
 From: Zack Rusin <zack.rusin@broadcom.com>
 To: linux-kernel@vger.kernel.org
 Cc: Zack Rusin <zack.rusin@broadcom.com>,
 	Doug Covelli <doug.covelli@broadcom.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <shuah@kernel.org>,
 	Sean Christopherson <seanjc@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Joel Stanley <joel@jms.id.au>,
+	Isaku Yamahata <isaku.yamahata@intel.com>,
+	Arnaldo Carvalho de Melo <acme@redhat.com>,
 	kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: [PATCH v2 4/5] KVM: x86: Add support for legacy VMware backdoors in nested setups
-Date: Tue, 22 Apr 2025 12:12:23 -0400
-Message-ID: <20250422161304.579394-5-zack.rusin@broadcom.com>
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH v2 5/5] KVM: selftests: x86: Add a test for KVM_CAP_X86_VMWARE_HYPERCALL
+Date: Tue, 22 Apr 2025 12:12:24 -0400
+Message-ID: <20250422161304.579394-6-zack.rusin@broadcom.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250422161304.579394-1-zack.rusin@broadcom.com>
 References: <20250422161304.579394-1-zack.rusin@broadcom.com>
@@ -97,260 +95,186 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Allow handling VMware backdoors by the L0 monitor. This is required on
-setups running Windows VBS, where the L1 will be running Hyper-V which
-can't handle VMware backdoors. Thus on Windows VBS legacy VMware backdoor
-calls issued by the userspace will end up in Hyper-V (L1) and endup
-throwing an error.
-Add a KVM cap that, in nested setups, allows the legacy VMware backdoor
-to be handled by the L0 monitor. Thanks to this we can make sure that
-VMware backdoor is always handled by the correct monitor.
+Add a testcase to exercise KVM_CAP_X86_VMWARE_HYPERCALL and validate
+that KVM exits to userspace on hypercalls and registers are correctly
+preserved.
 
 Signed-off-by: Zack Rusin <zack.rusin@broadcom.com>
 Cc: Doug Covelli <doug.covelli@broadcom.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Shuah Khan <shuah@kernel.org>
 Cc: Sean Christopherson <seanjc@google.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: x86@kernel.org
-Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Namhyung Kim <namhyung@kernel.org>
+Cc: Joel Stanley <joel@jms.id.au>
 Cc: Zack Rusin <zack.rusin@broadcom.com>
-Cc: kvm@vger.kernel.org
-Cc: linux-doc@vger.kernel.org
+Cc: Isaku Yamahata <isaku.yamahata@intel.com>
+Cc: Arnaldo Carvalho de Melo <acme@redhat.com>
 Cc: linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org
 ---
- Documentation/virt/kvm/api.rst  | 14 +++++++++++
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/Kconfig            |  1 +
- arch/x86/kvm/kvm_vmware.h       | 42 +++++++++++++++++++++++++++++++++
- arch/x86/kvm/svm/nested.c       |  6 +++++
- arch/x86/kvm/svm/svm.c          |  3 ++-
- arch/x86/kvm/vmx/nested.c       |  6 +++++
- arch/x86/kvm/x86.c              |  8 +++++++
- include/uapi/linux/kvm.h        |  1 +
- 9 files changed, 81 insertions(+), 1 deletion(-)
+ tools/include/uapi/linux/kvm.h                |   3 +
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../selftests/kvm/x86/vmware_hypercall_test.c | 121 ++++++++++++++++++
+ 3 files changed, 125 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86/vmware_hypercall_test.c
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 6d3d2a509848..55bd464ebf95 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -8322,6 +8322,20 @@ userspace handling of hypercalls is discouraged. To implement
- such functionality, use KVM_EXIT_IO (x86) or KVM_EXIT_MMIO
- (all except s390).
- 
-+7.39 KVM_CAP_X86_VMWARE_NESTED_BACKDOOR_L0
-+------------------------------------------
-+
-+:Architectures: x86
-+:Parameters: args[0] whether the feature should be enabled or not
-+:Returns: 0 on success.
-+
-+Capability allows VMware backdoors to be handled by L0 when running
-+on nested configurations. This is required when, for example
-+running Windows guest with Hyper-V VBS enabled - in that configuration
-+the VMware backdoor calls issued by VMware tools would endup in Hyper-V
-+(L1) which doesn't handle VMware backdoor. Enable this option to have
-+VMware backdoor sent to L0 monitor.
-+
- 8. Other capabilities.
- ======================
- 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 86bacda2802e..2a806aa93a9e 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1197,6 +1197,7 @@ struct kvm_xen {
- struct kvm_vmware {
- 	bool backdoor_enabled;
- 	bool hypercall_enabled;
-+	bool nested_backdoor_l0_enabled;
- };
- #endif
- 
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index f817601924bd..8fefde6f2e78 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -190,6 +190,7 @@ config KVM_VMWARE
- 	  formatted IN, OUT and RDPMC instructions which need to be
- 	  intercepted.
- 	  - VMware hypercall interface: VMware hypercalls exit to userspace
-+	  - VMware legacy backdoor handling in L0
- 
- 	  If unsure, say "Y".
- 
-diff --git a/arch/x86/kvm/kvm_vmware.h b/arch/x86/kvm/kvm_vmware.h
-index 846b90091a2a..d90bcf73bae4 100644
---- a/arch/x86/kvm/kvm_vmware.h
-+++ b/arch/x86/kvm/kvm_vmware.h
-@@ -9,6 +9,9 @@
- 
- #include <linux/kvm_host.h>
- 
-+#include "asm/vmware.h"
-+#include "x86.h"
-+
- #ifdef CONFIG_KVM_VMWARE
- 
- #define VMWARE_BACKDOOR_PMC_HOST_TSC		0x10000
-@@ -98,6 +101,35 @@ static inline bool kvm_vmware_hypercall_enabled(struct kvm *kvm)
- 	return kvm->arch.vmware.hypercall_enabled;
- }
- 
-+static inline bool kvm_vmware_nested_backdoor_l0_enabled(struct kvm *kvm)
-+{
-+	return kvm->arch.vmware.backdoor_enabled &&
-+		kvm->arch.vmware.nested_backdoor_l0_enabled;
-+}
-+
-+static inline bool kvm_vmware_wants_backdoor_to_l0(struct kvm_vcpu *vcpu, u32 cpl)
-+{
-+	/* We only care about the lower 32 bits */
-+	const unsigned long mask = 0xffffffff;
-+	const unsigned long port_mask = 0xffff;
-+	unsigned long rax, rdx;
-+
-+	if (!kvm_vmware_nested_backdoor_l0_enabled(vcpu->kvm))
-+		return false;
-+
-+	if (cpl != 3)
-+		return false;
-+
-+	rax = kvm_rax_read(vcpu) & mask;
-+	if (rax == VMWARE_HYPERVISOR_MAGIC) {
-+		rdx = kvm_rdx_read(vcpu) & port_mask;
-+		return (rdx == VMWARE_HYPERVISOR_PORT ||
-+			rdx == VMWARE_HYPERVISOR_PORT_HB);
-+	}
-+
-+	return false;
-+}
-+
- void kvm_vmware_init_vm(struct kvm *kvm);
- int kvm_vmware_hypercall(struct kvm_vcpu *vcpu);
- 
-@@ -142,6 +174,16 @@ static inline int kvm_vmware_hypercall(struct kvm_vcpu *vcpu)
- 	return 0;
- }
- 
-+static inline bool kvm_vmware_nested_backdoor_l0_enabled(struct kvm *kvm)
-+{
-+	return false;
-+}
-+
-+static inline bool kvm_vmware_wants_backdoor_to_l0(struct kvm_vcpu *vcpu, u32 cpl)
-+{
-+	return false;
-+}
-+
- #endif /* CONFIG_KVM_VMWARE */
- 
- #endif /* __ARCH_X86_KVM_VMWARE_H__ */
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 04c375bf1ac2..74c472e51479 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -22,6 +22,7 @@
- #include <asm/debugreg.h>
- 
- #include "kvm_emulate.h"
-+#include "kvm_vmware.h"
- #include "trace.h"
- #include "mmu.h"
- #include "x86.h"
-@@ -1517,6 +1518,11 @@ int nested_svm_exit_special(struct vcpu_svm *svm)
- 			 svm->vcpu.arch.apf.host_apf_flags)
- 			/* Trap async PF even if not shadowing */
- 			return NESTED_EXIT_HOST;
-+#ifdef CONFIG_KVM_VMWARE
-+		else if ((exit_code == (SVM_EXIT_EXCP_BASE + GP_VECTOR)) &&
-+			 kvm_vmware_wants_backdoor_to_l0(vcpu, to_svm(vcpu)->vmcb->save.cpl))
-+			return NESTED_EXIT_HOST;
-+#endif
- 		break;
- 	}
- 	case SVM_EXIT_VMMCALL:
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index be106bd60553..96996e7f9de4 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -2407,7 +2407,8 @@ static int gp_interception(struct kvm_vcpu *vcpu)
- 		 * VMware backdoor emulation on #GP interception only handles
- 		 * IN{S}, OUT{S}, and RDPMC.
- 		 */
--		if (!is_guest_mode(vcpu))
-+		if (!is_guest_mode(vcpu)  ||
-+		    kvm_vmware_wants_backdoor_to_l0(vcpu, svm_get_cpl(vcpu)))
- 			return kvm_emulate_instruction(vcpu,
- 				EMULTYPE_VMWARE_GP | EMULTYPE_NO_DECODE);
- 	} else {
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index ed8a3cb53961..ff8a1dbbba01 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -10,6 +10,7 @@
- #include "x86.h"
- #include "cpuid.h"
- #include "hyperv.h"
-+#include "kvm_vmware.h"
- #include "mmu.h"
- #include "nested.h"
- #include "pmu.h"
-@@ -6386,6 +6387,11 @@ static bool nested_vmx_l0_wants_exit(struct kvm_vcpu *vcpu,
- 			return true;
- 		else if (is_ve_fault(intr_info))
- 			return true;
-+#ifdef CONFIG_KVM_VMWARE
-+		else if (is_gp_fault(intr_info) &&
-+			 kvm_vmware_wants_backdoor_to_l0(vcpu, vmx_get_cpl(vcpu)))
-+			return true;
-+#endif
- 		return false;
- 	case EXIT_REASON_EXTERNAL_INTERRUPT:
- 		return true;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 300cef9a37e2..5dc57bc57851 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4653,6 +4653,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- #ifdef CONFIG_KVM_VMWARE
- 	case KVM_CAP_X86_VMWARE_BACKDOOR:
- 	case KVM_CAP_X86_VMWARE_HYPERCALL:
-+	case KVM_CAP_X86_VMWARE_NESTED_BACKDOOR_L0:
- #endif
- 		r = 1;
- 		break;
-@@ -6754,6 +6755,13 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		kvm->arch.vmware.hypercall_enabled = cap->args[0];
- 		r = 0;
- 		break;
-+	case KVM_CAP_X86_VMWARE_NESTED_BACKDOOR_L0:
-+		r = -EINVAL;
-+		if (cap->args[0] & ~1)
-+			break;
-+		kvm->arch.vmware.nested_backdoor_l0_enabled = cap->args[0];
-+		r = 0;
-+		break;
- #endif
- 	default:
- 		r = -EINVAL;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index adf1a1449c06..f5d63c0c79f5 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -955,6 +955,7 @@ struct kvm_enable_cap {
+diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
+index 502ea63b5d2e..3b3ad1827245 100644
+--- a/tools/include/uapi/linux/kvm.h
++++ b/tools/include/uapi/linux/kvm.h
+@@ -933,6 +933,9 @@ struct kvm_enable_cap {
+ #define KVM_CAP_PRE_FAULT_MEMORY 236
+ #define KVM_CAP_X86_APIC_BUS_CYCLES_NS 237
  #define KVM_CAP_X86_GUEST_MODE 238
- #define KVM_CAP_X86_VMWARE_BACKDOOR 239
- #define KVM_CAP_X86_VMWARE_HYPERCALL 240
++#define KVM_CAP_X86_VMWARE_BACKDOOR 239
++#define KVM_CAP_X86_VMWARE_HYPERCALL 240
 +#define KVM_CAP_X86_VMWARE_NESTED_BACKDOOR_L0 241
  
  struct kvm_irq_routing_irqchip {
  	__u32 irqchip;
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+index 4277b983cace..9eea93b330e4 100644
+--- a/tools/testing/selftests/kvm/Makefile.kvm
++++ b/tools/testing/selftests/kvm/Makefile.kvm
+@@ -90,6 +90,7 @@ TEST_GEN_PROGS_x86 += x86/sync_regs_test
+ TEST_GEN_PROGS_x86 += x86/ucna_injection_test
+ TEST_GEN_PROGS_x86 += x86/userspace_io_test
+ TEST_GEN_PROGS_x86 += x86/userspace_msr_exit_test
++TEST_GEN_PROGS_x86 += x86/vmware_hypercall_test
+ TEST_GEN_PROGS_x86 += x86/vmx_apic_access_test
+ TEST_GEN_PROGS_x86 += x86/vmx_close_while_nested_test
+ TEST_GEN_PROGS_x86 += x86/vmx_dirty_log_test
+diff --git a/tools/testing/selftests/kvm/x86/vmware_hypercall_test.c b/tools/testing/selftests/kvm/x86/vmware_hypercall_test.c
+new file mode 100644
+index 000000000000..8daca272933c
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86/vmware_hypercall_test.c
+@@ -0,0 +1,121 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * vmware_hypercall_test
++ *
++ * Copyright (c) 2025 Broadcom. All Rights Reserved. The term
++ * “Broadcom” refers to Broadcom Inc. and/or its subsidiaries.
++ *
++ * Based on:
++ *    xen_vmcall_test.c
++ *
++ *    Copyright © 2020 Amazon.com, Inc. or its affiliates.
++ *
++ * VMware hypercall testing
++ */
++
++#include "test_util.h"
++#include "kvm_util.h"
++#include "processor.h"
++
++#define ARGVALUE(x) (0xdeadbeef5a5a0000UL + (x))
++#define RETVALUE(x) (0xcafef00dfbfbffffUL + (x))
++
++static void guest_code(void)
++{
++	uint64_t error_code;
++	uint8_t vector;
++
++	unsigned long rax = ARGVALUE(1);
++	unsigned long rbx = ARGVALUE(2);
++	unsigned long rcx = ARGVALUE(3);
++	unsigned long rdx = ARGVALUE(4);
++	unsigned long rsi = ARGVALUE(5);
++	unsigned long rdi = ARGVALUE(6);
++	register unsigned long rbp __asm__("rbp") = ARGVALUE(7);
++
++	asm volatile(KVM_ASM_SAFE("vmcall")
++		     : "=a"(rax),  "=b"(rbx), "=c"(rcx), "=d"(rdx),
++		       "=S"(rsi), "=D"(rdi),
++		       KVM_ASM_SAFE_OUTPUTS(vector, error_code)
++		     : "a"(rax), "b"(rbx), "c"(rcx), "d"(rdx),
++		       "S"(rsi), "D"(rdi), "r"(rbp)
++		     : KVM_ASM_SAFE_CLOBBERS);
++	GUEST_ASSERT_EQ(rax, RETVALUE(11));
++	GUEST_ASSERT_EQ(rbx, RETVALUE(12));
++	GUEST_ASSERT_EQ(rcx, RETVALUE(13));
++	GUEST_ASSERT_EQ(rdx, RETVALUE(14));
++	GUEST_ASSERT_EQ(rsi, RETVALUE(15));
++	GUEST_ASSERT_EQ(rdi, RETVALUE(16));
++	GUEST_ASSERT_EQ(vector, 12);
++	GUEST_ASSERT_EQ(error_code, 14);
++	GUEST_DONE();
++}
++
++int main(int argc, char *argv[])
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++
++	if (!kvm_check_cap(KVM_CAP_X86_VMWARE_HYPERCALL)) {
++		print_skip("KVM_CAP_X86_VMWARE_HYPERCALL not available");
++		exit(KSFT_SKIP);
++	}
++
++	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
++
++	vm_enable_cap(vm, KVM_CAP_X86_VMWARE_HYPERCALL, 1);
++
++	for (;;) {
++		struct kvm_run *run = vcpu->run;
++		struct ucall uc;
++
++		vcpu_run(vcpu);
++
++		if (run->exit_reason == KVM_EXIT_VMWARE) {
++			struct kvm_regs regs;
++
++			TEST_ASSERT_EQ(run->vmware.type, KVM_EXIT_VMWARE_HCALL);
++			TEST_ASSERT_EQ(run->vmware.hcall.longmode, 1);
++			TEST_ASSERT_EQ(run->vmware.hcall.cpl, 0);
++			TEST_ASSERT_EQ(run->vmware.hcall.rax, ARGVALUE(1));
++			TEST_ASSERT_EQ(run->vmware.hcall.rbx, ARGVALUE(2));
++			TEST_ASSERT_EQ(run->vmware.hcall.rcx, ARGVALUE(3));
++			TEST_ASSERT_EQ(run->vmware.hcall.rdx, ARGVALUE(4));
++			TEST_ASSERT_EQ(run->vmware.hcall.rsi, ARGVALUE(5));
++			TEST_ASSERT_EQ(run->vmware.hcall.rdi, ARGVALUE(6));
++			TEST_ASSERT_EQ(run->vmware.hcall.rbp, ARGVALUE(7));
++
++			run->vmware.hcall.exception.inject = 1;
++			run->vmware.hcall.exception.vector = 12;
++			run->vmware.hcall.exception.error_code = 14;
++			run->vmware.hcall.exception.address = 0;
++
++			run->vmware.hcall.result = RETVALUE(11);
++			vcpu_regs_get(vcpu, &regs);
++			regs.rbx = RETVALUE(12);
++			regs.rcx = RETVALUE(13);
++			regs.rdx = RETVALUE(14);
++			regs.rsi = RETVALUE(15);
++			regs.rdi = RETVALUE(16);
++			vcpu_regs_set(vcpu, &regs);
++			continue;
++		}
++
++		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
++
++		switch (get_ucall(vcpu, &uc)) {
++		case UCALL_ABORT:
++			REPORT_GUEST_ASSERT(uc);
++			/* NOT REACHED */
++		case UCALL_SYNC:
++			break;
++		case UCALL_DONE:
++			goto done;
++		default:
++			TEST_FAIL("Unknown ucall 0x%lx.", uc.cmd);
++		}
++	}
++done:
++	kvm_vm_free(vm);
++	return 0;
++}
 -- 
 2.48.1
 
