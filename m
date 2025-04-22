@@ -1,152 +1,163 @@
-Return-Path: <kvm+bounces-43848-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43849-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00473A97616
-	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 21:51:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8FB1A9762A
+	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 21:52:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 530367A751C
-	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 19:50:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6C811740D2
+	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 19:52:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A634298CC0;
-	Tue, 22 Apr 2025 19:51:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D0B0298CD2;
+	Tue, 22 Apr 2025 19:52:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sEsuM4T/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZFjJkvh3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76AD328F944
-	for <kvm@vger.kernel.org>; Tue, 22 Apr 2025 19:51:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 905821DEFC8;
+	Tue, 22 Apr 2025 19:52:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745351485; cv=none; b=ZIUDimOp5Mo8T2ukuh/2gPRnvtdHISOTkW3/jOOetkGqmiqrzKLhjIFbq49z9o+/4pasphpBCVFar3H4HMh9Z2IQFg6Q6K5GXYgEWDDcm+QXc0SJT84gD2eeNpXtscjYWJHjTaLqc6QcKwIWFhVbQPrPku2gRojhm0LA+82IBH4=
+	t=1745351552; cv=none; b=njYdQIr1DBzkY+GsaM/PTTz34QmSRAdDL5sF/1F1y909p54WbjyaCQvmniImfqTr8mwtJBGNfNRskRCWBR142cocXgjy1MNRecbbydSujfcrtFwLrx+E5VKohCz5No72fz9NSeL/Apfd9H7Gx5UFhSWwcxC8Ig4Qcj4kxSIPqFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745351485; c=relaxed/simple;
-	bh=G+t2v6BhLb+5vWztzdpssgwdNSlTOk90KThSVmnEfpo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GfRpcQCTG+IG/51UFuI9D/Bl35TgvhUDkshiHRGFms3wNv9UIhWy2sQvyR9BzrLjNGu8NNfQ28r9ptKzqeqfRtFKjagh5FWKwx3C8p51osMzqTPCpbyY+yDu3cJJGBrM5s1qScSqFCszzJO1+6egfvbvz78op1BdPpZTKm78dRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sEsuM4T/; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ff6aaa18e8so4868469a91.1
-        for <kvm@vger.kernel.org>; Tue, 22 Apr 2025 12:51:23 -0700 (PDT)
+	s=arc-20240116; t=1745351552; c=relaxed/simple;
+	bh=TsKpKK9AIx4BTd1yFG2C5c7DbVWMwacOB58VibFxJvM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rDSIfjlI8W4XQYM9WVJgU2Gsph4tfmC6x9y1dI6qXqVrmGKR5QWz/RiSbFpBoJw2Fg27bLrGqOKwJb6IhNKa3DWb18F2ZY6Vjz4XbaiSVP+KnWpfaMSXG3LrCdJde6ZcjOuFxXvuAS802Hs6riwVKkn4ZeP2a23mJyUxBQlxRxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZFjJkvh3; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4394a0c65fcso61428405e9.1;
+        Tue, 22 Apr 2025 12:52:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745351483; x=1745956283; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mH6UGx1+cJUt0+vdtDYj5GNgwh2+pJEonMo7kApLLOI=;
-        b=sEsuM4T/6AiEfbcv6LEBX9nIBDT+43JI3MKdo3iKnkO2YqI70DcND2IDwLROe9Q4D5
-         GArSdE4crjfrbQKmyHy1Els5AUgocKZZBhQ4ePOShvuMia5QfeqWQImCd0ooUy3J7eaq
-         uQ6iKaiB9W6Oab+GGxn3MZLM2zo9IQaI7BW1VoDi98zqEoGP3JMAMBj5PRaUmpBLWtRo
-         mjh4DGwfQSGSsttkwj1ptnNcpnPTSEHYTK8QeWv5i016xI7jxtl9m17cB/A22/f5mrtk
-         Q0lgI2Pwnlfgiq4aj2EbhSZVbFNZn+LTprUdDBVTDrYPrI9CfkqS4laNY2dRY2mAg8i+
-         vevA==
+        d=gmail.com; s=20230601; t=1745351549; x=1745956349; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XaJv2nPBZFqC9cL0CpWH1eeCNJ8QkWT+UyTio/7U2Qc=;
+        b=ZFjJkvh38BHdCipp9eJLyiQNkOzz52MbXV4Sj+9UR5xCQNVEYrEQcyXu9dlvsfTN5R
+         5fGIes2x8vz1xw5wWnGa7TfuDt2GQb6ullNc0sL0mp0qV/N7W/RsrLizK684SlFwnE2H
+         d+RgYK8f0lkj5QhW9Gw67lWKwV6xAHO56DSSFguHkSwF8eC07s33TdujZEV33+aDyOvW
+         wmA1fhuLloA7v5kouwLNKbmina8ORS7BFPcAC4v8eEM+ktfH6OcqZvsQr4gx0ZyVl3Jx
+         neMT0vqGOZIOF5n8XPgBdqhUC8Tb4ouk4xtjAiQaBlVcn5mKH22WQV0t/Rj4T+II903m
+         tSpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745351483; x=1745956283;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mH6UGx1+cJUt0+vdtDYj5GNgwh2+pJEonMo7kApLLOI=;
-        b=CYNWZfA4/eOEKj9myib2dPK7p+9gWlNMb7gaqPYO96Bhx2GQVbhyU+cnXHx7Sh2gmi
-         G7za0ZKFN0/XtICHiiSSJ756YE7FGwY2/IGl6alBJUT/EVq5HUlZ5bPiEI16/aY7KFZi
-         rAO7IUd6IMwVJ0XdJlY3sPC/nCM6RfpBBQiz2PhbuVMWQ9npy82E9Izmmnv4CQ2Y4pQ3
-         c0YJFgF8BbzTWCq2vWcpKcrtW/A1jcM9Zls2F9oKgKxCD1mji1IxD5j8BvCiZVprb4jv
-         HrK52tV+uOtlq5IA9Agl4eGFE9Oab/jucJoueLZ68aOusfar0KD7YR//XDMjz/iq4K2w
-         p5pQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU19AWYaRT7A+5C+bGYyfd3e4wDTpCFk7hZqNFLEDO81EbZE9ztjdRRr5gLkcEbYBELfxI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwTgZ8zXYAGuaCfLXj9FIwzRXWYSTLsnlq1mZ96JDa7WDskM5zh
-	KgokwzfUDVc9Vr+CsHazcmsJEZDAwKh1BaaYBI6bwTr3ZQ6bYcvw3arAPoBoC3ek3mKy/QK6M/Z
-	SMA==
-X-Google-Smtp-Source: AGHT+IGkV0RcloCvNwgssDSlkXsqRo5n8/rzSZ0U6QUVt02K3Nbge8IReH8D+uHUWVsCRD28uFY//07FCPo=
-X-Received: from pjbsr7.prod.google.com ([2002:a17:90b:4e87:b0:301:2679:9d9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4b90:b0:2ee:bc7b:9237
- with SMTP id 98e67ed59e1d1-3087bb9ede2mr21004314a91.27.1745351482796; Tue, 22
- Apr 2025 12:51:22 -0700 (PDT)
-Date: Tue, 22 Apr 2025 12:51:21 -0700
-In-Reply-To: <aAfxuby_0eZZTrj-@gmail.com>
+        d=1e100.net; s=20230601; t=1745351549; x=1745956349;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XaJv2nPBZFqC9cL0CpWH1eeCNJ8QkWT+UyTio/7U2Qc=;
+        b=abeiJzOtap2Rd09jh4Y2+jMxKiMrDeVMR5zwb0cygEtu17b0RhqFoRSNC1NO23aaaT
+         8v6H6hnuXfhnQhY7t8INouXq7vBTxnC9doMEAQCRBiIxXCs0gpxxfR5XZL2EKe/DNljV
+         /bYr5Oxa6HwLRZadGqUEkTz4MfyHul9VQVtOgfZgbFKIp9vLYbNBXE0dNfHokEYkEfdg
+         y6W/82A7LV0mehJwNte0AbHRClIszSCYkkPq0UECbA38FHeIXV3e3ywDtEekVgjYTJBm
+         z6YJzEonEOCGCJEnn673FpoxrN2aqjp4jlD6lVyVqooi9jzE+c48aGJPbGV+q21bSMg8
+         tDzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUERe/KhjSg6zw+AKH1mEygucFHSch1m71efNXt+nZFAqIwwutU/3zrqURxmvOtaAS8g4Dt@vger.kernel.org, AJvYcCVtLvU4l8SBicqo0anIPT1ZUqsB8MTkwlyKRwRkOemJ9U2rLDm0l2r64WTWIXQQRkbIxD2mk/YG6dipIsj9@vger.kernel.org, AJvYcCW4b/NRiGPnRg9smYea1BdYgd/cOgQkGcvKbgU1U0ZlEwPmjyjnar7sjHOfEyH34lJZk5P30M3O1oRv@vger.kernel.org, AJvYcCXezD2/TtrhsA+vtNMEn7JzURDHY/7/ahdmlQqRAheMUG1AsxJx26RCIXInzzYSY66UoA3BG4sDfCL9PPfjTCBs@vger.kernel.org, AJvYcCXo6SaB6zy+sWcZn50yJI3bL0TbR96bNoZKvg2TOQ2vhXQ4DJlrFuFO06eCz+cb9vXv1AUz5n+adQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx42k/vxkqa+DJD6XA2nTCJlKOJCGLy80p9QjCkdgFg/+FWXkT7
+	t9UZoje5n3F1G5/EH0kdvChSqK8/8h1++A6b53deqw9Jtqxn/rb+
+X-Gm-Gg: ASbGncu4qxjryBvPfyTzojRDaFM309MEcqjz8JqHRtb4fqbdPF69H7+gk6ZoIz3YJ3D
+	ThXK+wZkOyJW9l9Nq/cCDq6iy65ThuRSdZ/t+TrIHpYDPSI6O1QdsBazyzaGS2u0Jonu57jk4M+
+	LfuDkHhsBKrAaTLVJ5Hhf4cg6CyRtUFNjMov34lhsfbVsE6Et93IZBXDoVWcmkUSlPtRNHagQ7N
+	nLYnH6qdYeGAfv1dbjrScae4MRnJ+ylaStOoDlPmVwef7rGDsfZKQToaIPRjHjpbHwW0eCuVz+6
+	F9d0JCRV2GhdUe+9QZrYPHQyFrVrPrzextV2ppx+A8eWTT3n
+X-Google-Smtp-Source: AGHT+IEl6pg04k8aqg4kCSPz/epA7Jsgnzijdyhk9uUD8rpuhWFSBuVeC+Gc0wxgNurOByb1LeTItQ==
+X-Received: by 2002:a05:600c:1914:b0:43d:45a:8fc1 with SMTP id 5b1f17b1804b1-4406ab70701mr143149385e9.4.1745351548385;
+        Tue, 22 Apr 2025 12:52:28 -0700 (PDT)
+Received: from [192.168.8.100] ([85.255.235.90])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4406d6e034csm183795355e9.39.2025.04.22.12.52.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Apr 2025 12:52:27 -0700 (PDT)
+Message-ID: <5d2f86ce-e2bb-406a-8d53-58a464958d2d@gmail.com>
+Date: Tue, 22 Apr 2025 20:53:41 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250422082216.1954310-1-xin@zytor.com> <aAevpauKYWwObsB7@google.com>
- <cb4e24a0-fdb7-46d2-9b0e-200f5e3e4c96@zytor.com> <DS7PR11MB6077B4D80EB7020C4D3FCD52FCBB2@DS7PR11MB6077.namprd11.prod.outlook.com>
- <aAfxuby_0eZZTrj-@gmail.com>
-Message-ID: <aAfzOWnYzcPjZDEI@google.com>
-Subject: Re: [RFC PATCH v2 00/34] MSR refactor with new MSR instructions support
-From: Sean Christopherson <seanjc@google.com>
-To: Ingo Molnar <mingo@kernel.org>
-Cc: Tony Luck <tony.luck@intel.com>, Xin Li <xin@zytor.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-perf-users@vger.kernel.org" <linux-perf-users@vger.kernel.org>, 
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>, 
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
-	"linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>, 
-	"linux-edac@vger.kernel.org" <linux-edac@vger.kernel.org>, 
-	"xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, 
-	"linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, 
-	"linux-hwmon@vger.kernel.org" <linux-hwmon@vger.kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"platform-driver-x86@vger.kernel.org" <platform-driver-x86@vger.kernel.org>, 
-	"tglx@linutronix.de" <tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"hpa@zytor.com" <hpa@zytor.com>, "acme@kernel.org" <acme@kernel.org>, "jgross@suse.com" <jgross@suse.com>, 
-	"andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>, "peterz@infradead.org" <peterz@infradead.org>, 
-	"namhyung@kernel.org" <namhyung@kernel.org>, "mark.rutland@arm.com" <mark.rutland@arm.com>, 
-	"alexander.shishkin@linux.intel.com" <alexander.shishkin@linux.intel.com>, "jolsa@kernel.org" <jolsa@kernel.org>, 
-	"irogers@google.com" <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	"kan.liang@linux.intel.com" <kan.liang@linux.intel.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>, 
-	"ajay.kaher@broadcom.com" <ajay.kaher@broadcom.com>, 
-	"bcm-kernel-feedback-list@broadcom.com" <bcm-kernel-feedback-list@broadcom.com>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "vkuznets@redhat.com" <vkuznets@redhat.com>, 
-	"luto@kernel.org" <luto@kernel.org>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
-	"kys@microsoft.com" <kys@microsoft.com>, "haiyangz@microsoft.com" <haiyangz@microsoft.com>, 
-	Dexuan Cui <decui@microsoft.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 1/9] netmem: add niov->type attribute to
+ distinguish different net_iov types
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, io-uring@vger.kernel.org,
+ virtualization@lists.linux.dev, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Jeroen de Borst <jeroendb@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn
+ <willemb@google.com>, Jens Axboe <axboe@kernel.dk>,
+ David Ahern <dsahern@kernel.org>, Neal Cardwell <ncardwell@google.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Victor Nogueira <victor@mojatatu.com>, Pedro Tammela
+ <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
+References: <20250417231540.2780723-1-almasrymina@google.com>
+ <20250417231540.2780723-2-almasrymina@google.com>
+ <f7a96367-1bb0-4ed2-8fbf-af7558fccc20@gmail.com>
+ <CAHS8izMFxDG5E07ZdqnDH_2D_g1fW8X0M7u3gGyV8efzxDNZbg@mail.gmail.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CAHS8izMFxDG5E07ZdqnDH_2D_g1fW8X0M7u3gGyV8efzxDNZbg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 22, 2025, Ingo Molnar wrote:
+On 4/22/25 15:03, Mina Almasry wrote:
+> On Tue, Apr 22, 2025 at 1:16 AM Pavel Begunkov <asml.silence@gmail.com> wrote:
+>>
+>> On 4/18/25 00:15, Mina Almasry wrote:
+>>> Later patches in the series adds TX net_iovs where there is no pp
+>>> associated, so we can't rely on niov->pp->mp_ops to tell what is the
+>>> type of the net_iov.
+>>
+>> That's fine, but that needs a NULL pp check in io_uring as well,
+>> specifically in io_zcrx_recv_frag().
+>>
 > 
-> * Luck, Tony <tony.luck@intel.com> wrote:
+> I think you mean this update in the code:
 > 
-> > > >> base-commit: f30a0c0d2b08b355c01392538de8fc872387cb2b
-> > > >
-> > > > This commit doesn't exist in Linus' tree or the tip tree, and the series doesn't
-> > > > apply cleanly on any of the "obvious" choices.  Reviewing a 34 patches series
-> > > > without being able to apply it is a wee bit difficult...
-> > > >
-> > >
-> > > $ git show f30a0c0d2b08b355c01392538de8fc872387cb2b
-> > > commit f30a0c0d2b08b355c01392538de8fc872387cb2b
-> > > Merge: 49b517e68cf7 e396dd85172c
-> > > Author: Ingo Molnar <mingo@kernel.org>
-> > > Date:   Tue Apr 22 08:37:32 2025 +0200
-> > >
-> > >      Merge branch into tip/master: 'x86/sev'
-> > >
-> > >       # New commits in x86/sev:
-> > >          e396dd85172c ("x86/sev: Register tpm-svsm platform device")
-> > >          93b7c6b3ce91 ("tpm: Add SNP SVSM vTPM driver")
-> > >          b2849b072366 ("svsm: Add header with SVSM_VTPM_CMD helpers")
-> > >          770de678bc28 ("x86/sev: Add SVSM vTPM probe/send_command
-> > > functions")
-> > >
-> > >      Signed-off-by: Ingo Molnar <mingo@kernel.org>
-> > >
-> > >
-> > > You probably need to git pull from the tip tree :-)
-> > 
-> > If possible, you should avoid basing a series on tip/master as it 
-> > gets recreated frequently by merging all the topic branches. The SHA1 
-> > is here today, gone tomorrow.
+> if (!niov->pp || niov->pp->mp_ops != &io_uring_pp_zc_ops ||
+>      io_pp_to_ifq(niov->pp) != ifq)
+> return -EFAULT;
 > 
-> Correct, although for x86 patch submissions via email it's not wrong: 
-> what applies today will likely apply tomorrow as well, regardless of 
-> the SHA1 change. :-)
+> Yes, thanks, will do.
 
-Yeah, but as Tony pointed out, when using base commit that may be ephemeral, then
-the cover letter needs to call out the tree+branch.  This series applies on the
-current tip/master, but there was nothing to clue me into that fact.
+That will work. I'm assuming that those pp-less niovs can
+end up in the rx path. I think it was deemed not impossible,
+right?
+
+>> You can also move it to struct net_iov_area and check niov->owner->type
+>> instead. It's a safer choice than aliasing with struct page, there is
+>> no cost as you're loading ->owner anyway (e.g. for
+>> net_iov_virtual_addr()), and it's better in terms of normalisation /
+>> not unnecessary duplicating it, assuming we'll never have niovs of
+>> different types bound to the same struct net_iov_area.
+>>
+> 
+> Putting it in niov->owner->type is an alternative approach. I don't
+> see a strong reason to go with one over the other. I'm thinking there
+> will be fast code paths that want to know the type of the frag or skb> and don't need the owner, so it will be good to save loading another
+> cacheline. We have more space in struct net_iov than we know what to
+> do with anyway.
+
+That's fine. I wouldn't say it's about space, we can grow net_iov
+private bits beyond the pp fields in sturct page, but it's rather
+about the mess from the aliasing page. The fact that it's net_iov
+makes it better, but I'd rather avoid any additional aliasing
+altogether.
+
+-- 
+Pavel Begunkov
+
 
