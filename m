@@ -1,43 +1,42 @@
-Return-Path: <kvm+bounces-43742-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43743-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2973A95CEC
-	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 06:25:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17467A95CFD
+	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 06:28:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EDD0D16778D
-	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 04:25:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E69F91778B9
+	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 04:28:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B24F81A83E2;
-	Tue, 22 Apr 2025 04:24:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 554C71CEEB2;
+	Tue, 22 Apr 2025 04:27:37 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723DF1362;
-	Tue, 22 Apr 2025 04:24:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 453B018A6AB;
+	Tue, 22 Apr 2025 04:27:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745295899; cv=none; b=ajxw41FJwAwctr03B85dQ/uf4R4tltgwlpRzrR7uq5WpL04W66xiWiwHsIbBJ/t+WQs/gTw7qNgDJ3XV5Fa6+qHvkM/Apl5C0UfOkFonAceGm1eoFg0ds4y3pRRl8HtjWSdmkrCt8uoB9vG/ctxwL7chcUsmXpIUKQA6/ihHSm8=
+	t=1745296056; cv=none; b=NkSp2DNtkljacUuEQ5F/9CqLtLoG3o1I+5ifzwIjzL3R5mRYyNICSfMsscG0eaAo7nAC9yh7S8vUDzzs45+Q8fXCq7/LiOD8zYgV6GF3rbLQgr0Ss9/o0A6lTg9u4Wbi73M7jRSKTrj0VNa2iWMXlQPIEIw4dMRXNYPBTVboPHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745295899; c=relaxed/simple;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
+	s=arc-20240116; t=1745296056; c=relaxed/simple;
+	bh=PLSm/GNxIQKdFcbfEfmuNrKOANZViQEJeLI7/wm2bbM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fHEbw3NgS+G4OaY5MfpsIV4Kgk4uLUY3ajATB7oioGP8rczmgkiRtQ4UgoRwKLbWKK37uzLHu55rwiKD7FZkDBUxjbXgXy8ccM6SFhF7d5STz3nwY4qtomsRnujypSJMmdvxPxuRaFWryW7UObuaQjyzqw/0iMbTRjjiBcZr8e4=
+	 Content-Type:Content-Disposition:In-Reply-To; b=odAZ6vvnoaqMVfJf2pP7VmfXat5tb9WCdjMFCM41gn1pQlIhClAQ8ib4CD3iadnheXobs1QHa2YlqEuxfG++4jTwnyfA95qvNyhqm7td28gSeMdamcbCj0nsjrpU7IVDdKNotvcsppPOwWqKyf5lq8kZEFv+P0DbFsFgsQwWJ1c=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 3B84E68C4E; Tue, 22 Apr 2025 06:24:52 +0200 (CEST)
-Date: Tue, 22 Apr 2025 06:24:51 +0200
+	id 17A2568C4E; Tue, 22 Apr 2025 06:27:28 +0200 (CEST)
+Date: Tue, 22 Apr 2025 06:27:27 +0200
 From: Christoph Hellwig <hch@lst.de>
 To: Leon Romanovsky <leon@kernel.org>
 Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
 	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>,
-	Leon Romanovsky <leonro@nvidia.com>, Jake Edge <jake@lwn.net>,
+	Keith Busch <kbusch@kernel.org>, Jake Edge <jake@lwn.net>,
 	Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
 	Zhu Yanjun <zyjzyj2000@gmail.com>,
 	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
@@ -60,11 +59,12 @@ Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
 	Matthew Wilcox <willy@infradead.org>,
 	Dan Williams <dan.j.williams@intel.com>,
 	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH v8 10/24] mm/hmm: let users to tag specific PFN with
- DMA mapped bit
-Message-ID: <20250422042451.GB27723@lst.de>
-References: <cover.1744825142.git.leon@kernel.org> <4530281aa6f9846a54dd232ce5071f281cf0b570.1744825142.git.leon@kernel.org>
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>
+Subject: Re: [PATCH v8 20/24] blk-mq: add scatterlist-less DMA mapping
+ helpers
+Message-ID: <20250422042727.GC27723@lst.de>
+References: <cover.1744825142.git.leon@kernel.org> <87b151a3791d71e58ec6f1b42bcf5fe06304cf80.1744825142.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -73,11 +73,14 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4530281aa6f9846a54dd232ce5071f281cf0b570.1744825142.git.leon@kernel.org>
+In-Reply-To: <87b151a3791d71e58ec6f1b42bcf5fe06304cf80.1744825142.git.leon@kernel.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-Looks good:
+On Fri, Apr 18, 2025 at 09:47:50AM +0300, Leon Romanovsky wrote:
+> +#define blk_phys_to_page(_paddr) \
+> + 	(pfn_to_page(__phys_to_pfn(_paddr)))
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+The code can use phys_to_page now that that is provided kernel-wide
+instead this temporary helper.
 
 
