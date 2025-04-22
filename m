@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-43792-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43791-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDF5EA9620D
-	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 10:41:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF63DA96203
+	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 10:40:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C17D617D115
-	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 08:36:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FBCF1787AC
+	for <lists+kvm@lfdr.de>; Tue, 22 Apr 2025 08:35:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFAF127F4E6;
-	Tue, 22 Apr 2025 08:24:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5070E27CCD3;
+	Tue, 22 Apr 2025 08:24:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="P7TTfABu"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="XB6Bl9mX"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A788D27CB16;
-	Tue, 22 Apr 2025 08:24:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63B5327602A;
+	Tue, 22 Apr 2025 08:24:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745310250; cv=none; b=R2qzG/2DsJeehUo5bbN9XVEQOkuVsoF9/bY041fxXkXEJxDBve9mBoqWP0AI2hp3lsUtD6s0BNeyOT3LG8CCQrO2rsv0Vx97R0oDNQUPCxZrmxLILeLhHBbWO8KsRn8cQXExA78/zoEBczK9GLMAG4cOZz/YEG5e/GJD5D1gCeM=
+	t=1745310247; cv=none; b=FQL2lOVvKHMpUmych7GkmfU6rFV3834pMdDk/ZM5HAhLwfDT3PVCJbesfnXjX6eaFv/UYZ574FB2iOHWvLIdmv6uDXM7qFLaIIot69xucqTPg9LVseopyuFlVKMA99jx9bkgXQTYqoacWUq7zAsWcLO1m6wc8Lth0KekrWk/2zk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745310250; c=relaxed/simple;
-	bh=XbDXvYcElCcfq+8gEblHBkbqG3o6yF+PbS6zjYXFWPo=;
+	s=arc-20240116; t=1745310247; c=relaxed/simple;
+	bh=5wx8H1tAUABFL0N5zHR+KyW0uy4a3ORxSLie2AmMVUM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ryezTV/9eW9XxJyMlDdG6du+OqshykWLEsTSzcnHnjklevdrxJDjI6YPQjTqc6WcWXp/Pm42Tp0YB84EkB8UDpUsDjbzc2bPEv6g+bOLPyM2g9T3pbMjycyk1d6MW0cEfM5rFoDZO2ql0Eg0t3QvvpJBVAjQEm6yQeQLWH3qW5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=P7TTfABu; arc=none smtp.client-ip=198.137.202.136
+	 MIME-Version; b=ghYx1KlNO/w2XME8CnvEe4ZV4IItxuSeGirv2NcWXwu4Uk+27hqp4FC7C7HWlwGuEGp9XonyBhOot5lYa6CkgibjRQmTFAHQOjUypAOCASCSbOv5rDaJkmgYAR2LBbOr70R9/Osci0dbx8nexQ1DTvC9SW5tNRkOvTtQLjK75uk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=XB6Bl9mX; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from terminus.zytor.com (terminus.zytor.com [IPv6:2607:7c80:54:3:0:0:0:136])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53M8MG9T1954391
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53M8MG9U1954391
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Tue, 22 Apr 2025 01:22:51 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53M8MG9T1954391
+	Tue, 22 Apr 2025 01:22:53 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53M8MG9U1954391
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1745310173;
-	bh=EmAyA4H2zym7MMXbzGaqyeyz7QXZZDV9O+Z4+Oh7wSA=;
+	s=2025042001; t=1745310174;
+	bh=tKwShxS8SnH3+r0XrY4puuThpPUtqn9sxGzBAvLv2qE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=P7TTfABuMHPAhcQRaJGoDAbjaTPcJUAkbZU5kypZHeWS/AMW1L/3K2v2yCDUtHiyF
-	 NSHf1DyvbWITNZpDRj5sbGWdR8CvrQ/XCywXQghInGFqOhC2P6JM/YbpnLVao7rZH6
-	 JOvEZQjD0cdY/iFs0oG7WcdBLLgBjXxfuMVsbznGP+03gLNj6TryaD94VK6pPnRQhw
-	 Joqd+sPZhGyYu1MUzVX21z1/v/K3WlRsT8j6cO6IkXbUOaOBSw4YNml4XxSFGD01Oa
-	 ktEgcbhadMBm/y96Z1Qx2KggyySX9ZJLplswD7wOAepciggZt4HsF7uj0cuZFb4nqI
-	 JWhKcTqnwJerg==
+	b=XB6Bl9mXdDXZ6uItIj7HmLj7+SgdGBr4//8M02L9kJyhIy3nGwHmq06Q+9ILpfIlb
+	 DSW1MBRBqfeODTFbogdeHWzIgmLXyURs0ZW2ugh2lPSGw0OKHOrvNKtbLD+nZ4lrTa
+	 qIuGgzEaupHFGvAC+Tbg8gTVGMhiiY1uK2ST8DoPpunwIb7quo5Cjs7FvMp7lz3q7O
+	 pE6XjV47oI+sHnWs9sPDeMj+IBucjeTvRUtGK5ilXHJsQnNbtPFggDyMZFoo2A4oNo
+	 14+LS6Gf83CPkNWu/aX+A7mTB9LH5hngobXqbCOjg1NK53i/1WPuQwdrG5HQPub9ZJ
+	 /825s1gxrDgXw==
 From: "Xin Li (Intel)" <xin@zytor.com>
 To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
@@ -65,9 +65,9 @@ Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
         luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
         haiyangz@microsoft.com, decui@microsoft.com
-Subject: [RFC PATCH v2 15/34] x86/msr: Replace wrmsr(msr, low, 0) with wrmsrq(msr, low)
-Date: Tue, 22 Apr 2025 01:21:56 -0700
-Message-ID: <20250422082216.1954310-16-xin@zytor.com>
+Subject: [RFC PATCH v2 16/34] x86/msr: Change function type of native_read_msr_safe()
+Date: Tue, 22 Apr 2025 01:21:57 -0700
+Message-ID: <20250422082216.1954310-17-xin@zytor.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250422082216.1954310-1-xin@zytor.com>
 References: <20250422082216.1954310-1-xin@zytor.com>
@@ -79,180 +79,224 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
+Change function type of native_read_msr_safe() to
+
+    int native_read_msr_safe(u32 msr, u64 *val)
+
+to make it the same as the type of native_write_msr_safe().
+
 Signed-off-by: Xin Li (Intel) <xin@zytor.com>
 ---
- arch/x86/hyperv/hv_apic.c                 | 6 +++---
- arch/x86/include/asm/apic.h               | 2 +-
- arch/x86/include/asm/switch_to.h          | 2 +-
- arch/x86/kernel/cpu/amd.c                 | 2 +-
- arch/x86/kernel/cpu/common.c              | 8 ++++----
- arch/x86/kernel/cpu/resctrl/pseudo_lock.c | 4 ++--
- arch/x86/kernel/cpu/resctrl/rdtgroup.c    | 2 +-
- arch/x86/kernel/cpu/umwait.c              | 4 ++--
- arch/x86/kernel/kvm.c                     | 2 +-
- 9 files changed, 16 insertions(+), 16 deletions(-)
+ arch/x86/include/asm/msr.h            | 21 +++++++++++----------
+ arch/x86/include/asm/paravirt_types.h |  4 ++--
+ arch/x86/kvm/svm/svm.c                | 19 +++++++------------
+ arch/x86/xen/enlighten_pv.c           |  9 ++++++---
+ arch/x86/xen/pmu.c                    | 14 ++++++++------
+ 5 files changed, 34 insertions(+), 33 deletions(-)
 
-diff --git a/arch/x86/hyperv/hv_apic.c b/arch/x86/hyperv/hv_apic.c
-index c450e67cb0a4..4d617ee59377 100644
---- a/arch/x86/hyperv/hv_apic.c
-+++ b/arch/x86/hyperv/hv_apic.c
-@@ -75,10 +75,10 @@ static void hv_apic_write(u32 reg, u32 val)
+diff --git a/arch/x86/include/asm/msr.h b/arch/x86/include/asm/msr.h
+index dd1114053173..c955339be9c9 100644
+--- a/arch/x86/include/asm/msr.h
++++ b/arch/x86/include/asm/msr.h
+@@ -135,18 +135,22 @@ static inline u64 native_read_msr(u32 msr)
+ 	return val;
+ }
+ 
+-static inline u64 native_read_msr_safe(u32 msr, int *err)
++static inline int native_read_msr_safe(u32 msr, u64 *p)
  {
- 	switch (reg) {
- 	case APIC_EOI:
--		wrmsr(HV_X64_MSR_EOI, val, 0);
-+		wrmsrq(HV_X64_MSR_EOI, val);
- 		break;
- 	case APIC_TASKPRI:
--		wrmsr(HV_X64_MSR_TPR, val, 0);
-+		wrmsrq(HV_X64_MSR_TPR, val);
- 		break;
- 	default:
- 		native_apic_mem_write(reg, val);
-@@ -92,7 +92,7 @@ static void hv_apic_eoi_write(void)
- 	if (hvp && (xchg(&hvp->apic_assist, 0) & 0x1))
- 		return;
++	int err;
+ 	DECLARE_ARGS(val, low, high);
  
--	wrmsr(HV_X64_MSR_EOI, APIC_EOI_ACK, 0);
-+	wrmsrq(HV_X64_MSR_EOI, APIC_EOI_ACK);
+ 	asm volatile("1: rdmsr ; xor %[err],%[err]\n"
+ 		     "2:\n\t"
+ 		     _ASM_EXTABLE_TYPE_REG(1b, 2b, EX_TYPE_RDMSR_SAFE, %[err])
+-		     : [err] "=r" (*err), EAX_EDX_RET(val, low, high)
++		     : [err] "=r" (err), EAX_EDX_RET(val, low, high)
+ 		     : "c" (msr));
+ 	if (tracepoint_enabled(read_msr))
+-		do_trace_read_msr(msr, EAX_EDX_VAL(val, low, high), *err);
+-	return EAX_EDX_VAL(val, low, high);
++		do_trace_read_msr(msr, EAX_EDX_VAL(val, low, high), err);
++
++	*p = EAX_EDX_VAL(val, low, high);
++
++	return err;
  }
  
- static bool cpu_is_self(int cpu)
-diff --git a/arch/x86/include/asm/apic.h b/arch/x86/include/asm/apic.h
-index 0174dd548327..68e10e30fe9b 100644
---- a/arch/x86/include/asm/apic.h
-+++ b/arch/x86/include/asm/apic.h
-@@ -209,7 +209,7 @@ static inline void native_apic_msr_write(u32 reg, u32 v)
- 	    reg == APIC_LVR)
- 		return;
+ /* Can be uninlined because referenced by paravirt */
+@@ -242,8 +246,8 @@ static inline int wrmsrq_safe(u32 msr, u64 val)
+ /* rdmsr with exception handling */
+ #define rdmsr_safe(msr, low, high)				\
+ ({								\
+-	int __err;						\
+-	u64 __val = native_read_msr_safe((msr), &__err);	\
++	u64 __val;						\
++	int __err = native_read_msr_safe((msr), &__val);	\
+ 	(*low) = (u32)__val;					\
+ 	(*high) = (u32)(__val >> 32);				\
+ 	__err;							\
+@@ -251,10 +255,7 @@ static inline int wrmsrq_safe(u32 msr, u64 val)
  
--	wrmsr(APIC_BASE_MSR + (reg >> 4), v, 0);
-+	wrmsrq(APIC_BASE_MSR + (reg >> 4), v);
+ static inline int rdmsrq_safe(u32 msr, u64 *p)
+ {
+-	int err;
+-
+-	*p = native_read_msr_safe(msr, &err);
+-	return err;
++	return native_read_msr_safe(msr, p);
  }
+ #endif	/* !CONFIG_PARAVIRT_XXL */
  
- static inline void native_apic_msr_eoi(void)
-diff --git a/arch/x86/include/asm/switch_to.h b/arch/x86/include/asm/switch_to.h
-index 4f21df7af715..499b1c15cc8b 100644
---- a/arch/x86/include/asm/switch_to.h
-+++ b/arch/x86/include/asm/switch_to.h
-@@ -61,7 +61,7 @@ static inline void refresh_sysenter_cs(struct thread_struct *thread)
- 		return;
+diff --git a/arch/x86/include/asm/paravirt_types.h b/arch/x86/include/asm/paravirt_types.h
+index 91b3423d36ce..d2db38c32bc5 100644
+--- a/arch/x86/include/asm/paravirt_types.h
++++ b/arch/x86/include/asm/paravirt_types.h
+@@ -96,9 +96,9 @@ struct pv_cpu_ops {
  
- 	this_cpu_write(cpu_tss_rw.x86_tss.ss1, thread->sysenter_cs);
--	wrmsr(MSR_IA32_SYSENTER_CS, thread->sysenter_cs, 0);
-+	wrmsrq(MSR_IA32_SYSENTER_CS, thread->sysenter_cs);
- }
- #endif
- 
-diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
-index 1f7925e45b46..6132a3c529cc 100644
---- a/arch/x86/kernel/cpu/amd.c
-+++ b/arch/x86/kernel/cpu/amd.c
-@@ -1206,7 +1206,7 @@ void amd_set_dr_addr_mask(unsigned long mask, unsigned int dr)
- 	if (per_cpu(amd_dr_addr_mask, cpu)[dr] == mask)
- 		return;
- 
--	wrmsr(amd_msr_dr_addr_masks[dr], mask, 0);
-+	wrmsrq(amd_msr_dr_addr_masks[dr], mask);
- 	per_cpu(amd_dr_addr_mask, cpu)[dr] = mask;
- }
- 
-diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-index 10da3da5b81f..99d8a8c15ba5 100644
---- a/arch/x86/kernel/cpu/common.c
-+++ b/arch/x86/kernel/cpu/common.c
-@@ -2019,9 +2019,9 @@ void enable_sep_cpu(void)
- 	 */
- 
- 	tss->x86_tss.ss1 = __KERNEL_CS;
--	wrmsr(MSR_IA32_SYSENTER_CS, tss->x86_tss.ss1, 0);
--	wrmsr(MSR_IA32_SYSENTER_ESP, (unsigned long)(cpu_entry_stack(cpu) + 1), 0);
--	wrmsr(MSR_IA32_SYSENTER_EIP, (unsigned long)entry_SYSENTER_32, 0);
-+	wrmsrq(MSR_IA32_SYSENTER_CS, tss->x86_tss.ss1);
-+	wrmsrq(MSR_IA32_SYSENTER_ESP, (unsigned long)(cpu_entry_stack(cpu) + 1));
-+	wrmsrq(MSR_IA32_SYSENTER_EIP, (unsigned long)entry_SYSENTER_32);
- 
- 	put_cpu();
- }
-@@ -2235,7 +2235,7 @@ static inline void setup_getcpu(int cpu)
- 	struct desc_struct d = { };
- 
- 	if (boot_cpu_has(X86_FEATURE_RDTSCP) || boot_cpu_has(X86_FEATURE_RDPID))
--		wrmsr(MSR_TSC_AUX, cpudata, 0);
-+		wrmsrq(MSR_TSC_AUX, cpudata);
- 
- 	/* Store CPU and node number in limit. */
- 	d.limit0 = cpudata;
-diff --git a/arch/x86/kernel/cpu/resctrl/pseudo_lock.c b/arch/x86/kernel/cpu/resctrl/pseudo_lock.c
-index 185317c6b509..cc534a83f19d 100644
---- a/arch/x86/kernel/cpu/resctrl/pseudo_lock.c
-+++ b/arch/x86/kernel/cpu/resctrl/pseudo_lock.c
-@@ -905,7 +905,7 @@ int resctrl_arch_measure_cycles_lat_fn(void *_plr)
- 	 * Disable hardware prefetchers.
- 	 */
- 	rdmsr(MSR_MISC_FEATURE_CONTROL, saved_low, saved_high);
--	wrmsr(MSR_MISC_FEATURE_CONTROL, prefetch_disable_bits, 0x0);
-+	wrmsrq(MSR_MISC_FEATURE_CONTROL, prefetch_disable_bits);
- 	mem_r = READ_ONCE(plr->kmem);
  	/*
- 	 * Dummy execute of the time measurement to load the needed
-@@ -1001,7 +1001,7 @@ static int measure_residency_fn(struct perf_event_attr *miss_attr,
- 	 * Disable hardware prefetchers.
+ 	 * Safe MSR operations.
+-	 * read sets err to 0 or -EIO.  write returns 0 or -EIO.
++	 * Returns 0 or -EIO.
  	 */
- 	rdmsr(MSR_MISC_FEATURE_CONTROL, saved_low, saved_high);
--	wrmsr(MSR_MISC_FEATURE_CONTROL, prefetch_disable_bits, 0x0);
-+	wrmsrq(MSR_MISC_FEATURE_CONTROL, prefetch_disable_bits);
+-	u64 (*read_msr_safe)(unsigned int msr, int *err);
++	int (*read_msr_safe)(unsigned int msr, u64 *val);
+ 	int (*write_msr_safe)(u32 msr, u64 val);
  
- 	/* Initialize rest of local variables */
- 	/*
-diff --git a/arch/x86/kernel/cpu/resctrl/rdtgroup.c b/arch/x86/kernel/cpu/resctrl/rdtgroup.c
-index f4a2ee2a6404..73ed83f1dff8 100644
---- a/arch/x86/kernel/cpu/resctrl/rdtgroup.c
-+++ b/arch/x86/kernel/cpu/resctrl/rdtgroup.c
-@@ -1707,7 +1707,7 @@ void resctrl_arch_mon_event_config_write(void *_config_info)
- 		pr_warn_once("Invalid event id %d\n", config_info->evtid);
+ 	void (*start_context_switch)(struct task_struct *prev);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 4ef9978dce70..838606f784c9 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -475,15 +475,13 @@ static void svm_inject_exception(struct kvm_vcpu *vcpu)
+ 
+ static void svm_init_erratum_383(void)
+ {
+-	int err;
+ 	u64 val;
+ 
+ 	if (!static_cpu_has_bug(X86_BUG_AMD_TLB_MMATCH))
  		return;
+ 
+ 	/* Use _safe variants to not break nested virtualization */
+-	val = native_read_msr_safe(MSR_AMD64_DC_CFG, &err);
+-	if (err)
++	if (native_read_msr_safe(MSR_AMD64_DC_CFG, &val))
+ 		return;
+ 
+ 	val |= (1ULL << 47);
+@@ -648,13 +646,12 @@ static int svm_enable_virtualization_cpu(void)
+ 	 * erratum is present everywhere).
+ 	 */
+ 	if (cpu_has(&boot_cpu_data, X86_FEATURE_OSVW)) {
+-		uint64_t len, status = 0;
++		u64 len, status = 0;
+ 		int err;
+ 
+-		len = native_read_msr_safe(MSR_AMD64_OSVW_ID_LENGTH, &err);
++		err = native_read_msr_safe(MSR_AMD64_OSVW_ID_LENGTH, &len);
+ 		if (!err)
+-			status = native_read_msr_safe(MSR_AMD64_OSVW_STATUS,
+-						      &err);
++			err = native_read_msr_safe(MSR_AMD64_OSVW_STATUS, &status);
+ 
+ 		if (err)
+ 			osvw_status = osvw_len = 0;
+@@ -2145,14 +2142,13 @@ static int ac_interception(struct kvm_vcpu *vcpu)
+ 
+ static bool is_erratum_383(void)
+ {
+-	int err, i;
++	int i;
+ 	u64 value;
+ 
+ 	if (!erratum_383_found)
+ 		return false;
+ 
+-	value = native_read_msr_safe(MSR_IA32_MC0_STATUS, &err);
+-	if (err)
++	if (native_read_msr_safe(MSR_IA32_MC0_STATUS, &value))
+ 		return false;
+ 
+ 	/* Bit 62 may or may not be set for this mce */
+@@ -2165,8 +2161,7 @@ static bool is_erratum_383(void)
+ 	for (i = 0; i < 6; ++i)
+ 		native_write_msr_safe(MSR_IA32_MCx_STATUS(i), 0);
+ 
+-	value = native_read_msr_safe(MSR_IA32_MCG_STATUS, &err);
+-	if (!err) {
++	if (!native_read_msr_safe(MSR_IA32_MCG_STATUS, &value)) {
+ 		value &= ~(1ULL << 2);
+ 		native_write_msr_safe(MSR_IA32_MCG_STATUS, value);
  	}
--	wrmsr(MSR_IA32_EVT_CFG_BASE + index, config_info->mon_config, 0);
-+	wrmsrq(MSR_IA32_EVT_CFG_BASE + index, config_info->mon_config);
+diff --git a/arch/x86/xen/enlighten_pv.c b/arch/x86/xen/enlighten_pv.c
+index 052f68c92111..195e6501a000 100644
+--- a/arch/x86/xen/enlighten_pv.c
++++ b/arch/x86/xen/enlighten_pv.c
+@@ -1095,7 +1095,7 @@ static u64 xen_do_read_msr(unsigned int msr, int *err)
+ 		return val;
+ 
+ 	if (err)
+-		val = native_read_msr_safe(msr, err);
++		*err = native_read_msr_safe(msr, &val);
+ 	else
+ 		val = native_read_msr(msr);
+ 
+@@ -1162,9 +1162,12 @@ static void xen_do_write_msr(u32 msr, u64 val, int *err)
+ 	}
  }
  
- static void mbm_config_write_domain(struct rdt_resource *r,
-diff --git a/arch/x86/kernel/cpu/umwait.c b/arch/x86/kernel/cpu/umwait.c
-index 0050eae153bb..933fcd7ff250 100644
---- a/arch/x86/kernel/cpu/umwait.c
-+++ b/arch/x86/kernel/cpu/umwait.c
-@@ -33,7 +33,7 @@ static DEFINE_MUTEX(umwait_lock);
- static void umwait_update_control_msr(void * unused)
+-static u64 xen_read_msr_safe(unsigned int msr, int *err)
++static int xen_read_msr_safe(unsigned int msr, u64 *val)
  {
- 	lockdep_assert_irqs_disabled();
--	wrmsr(MSR_IA32_UMWAIT_CONTROL, READ_ONCE(umwait_control_cached), 0);
-+	wrmsrq(MSR_IA32_UMWAIT_CONTROL, READ_ONCE(umwait_control_cached));
+-	return xen_do_read_msr(msr, err);
++	int err;
++
++	*val = xen_do_read_msr(msr, &err);
++	return err;
  }
  
- /*
-@@ -71,7 +71,7 @@ static int umwait_cpu_offline(unsigned int cpu)
- 	 * the original control MSR value in umwait_init(). So there
- 	 * is no race condition here.
- 	 */
--	wrmsr(MSR_IA32_UMWAIT_CONTROL, orig_umwait_control_cached, 0);
-+	wrmsrq(MSR_IA32_UMWAIT_CONTROL, orig_umwait_control_cached);
+ static int xen_write_msr_safe(u32 msr, u64 val)
+diff --git a/arch/x86/xen/pmu.c b/arch/x86/xen/pmu.c
+index afb02f43ee3f..ee908dfcff48 100644
+--- a/arch/x86/xen/pmu.c
++++ b/arch/x86/xen/pmu.c
+@@ -319,11 +319,12 @@ static u64 xen_amd_read_pmc(int counter)
+ 	uint8_t xenpmu_flags = get_xenpmu_flags();
  
- 	return 0;
- }
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index 44a45df7200a..bc9d21d7395f 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -399,7 +399,7 @@ static void kvm_disable_steal_time(void)
- 	if (!has_steal_clock)
- 		return;
+ 	if (!xenpmu_data || !(xenpmu_flags & XENPMU_IRQ_PROCESSING)) {
+-		uint32_t msr;
+-		int err;
++		u32 msr;
++		u64 val;
  
--	wrmsr(MSR_KVM_STEAL_TIME, 0, 0);
-+	wrmsrq(MSR_KVM_STEAL_TIME, 0);
- }
+ 		msr = amd_counters_base + (counter * amd_msr_step);
+-		return native_read_msr_safe(msr, &err);
++		native_read_msr_safe(msr, &val);
++		return val;
+ 	}
  
- static u64 kvm_steal_clock(int cpu)
+ 	ctxt = &xenpmu_data->pmu.c.amd;
+@@ -340,15 +341,16 @@ static u64 xen_intel_read_pmc(int counter)
+ 	uint8_t xenpmu_flags = get_xenpmu_flags();
+ 
+ 	if (!xenpmu_data || !(xenpmu_flags & XENPMU_IRQ_PROCESSING)) {
+-		uint32_t msr;
+-		int err;
++		u32 msr;
++		u64 val;
+ 
+ 		if (counter & (1 << INTEL_PMC_TYPE_SHIFT))
+ 			msr = MSR_CORE_PERF_FIXED_CTR0 + (counter & 0xffff);
+ 		else
+ 			msr = MSR_IA32_PERFCTR0 + counter;
+ 
+-		return native_read_msr_safe(msr, &err);
++		native_read_msr_safe(msr, &val);
++		return val;
+ 	}
+ 
+ 	ctxt = &xenpmu_data->pmu.c.intel;
 -- 
 2.49.0
 
