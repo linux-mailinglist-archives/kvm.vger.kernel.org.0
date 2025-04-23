@@ -1,146 +1,148 @@
-Return-Path: <kvm+bounces-43982-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43983-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A0CDA995F5
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 19:00:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAD6EA9960D
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 19:08:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4461746544C
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 17:00:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A6534189CCE1
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 17:08:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F79E28B4EC;
-	Wed, 23 Apr 2025 17:00:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0F1228A406;
+	Wed, 23 Apr 2025 17:07:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="UARDqsgx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SaZKBnES"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A8422798E3
-	for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 17:00:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8845BDDAD
+	for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 17:07:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745427624; cv=none; b=GKAUyWz4BRfi/5moHrGnC3flkoiIkrXCQb3qh8deX4/HzGEP8vsBz0EdMbT6H2IRXXt5s6BDIH1nYymDdDtsN7kRsDaafck4gWzlYiad7AfBXKQRPMwhWIb5bZ19HSpLgHEHcJf3rvXP7G9aBqkZef/cnvaAQR9HTCqXv1/zaI0=
+	t=1745428075; cv=none; b=P0aakWZBC9QS9bLgXpK9zBiOSCJuXdHDxuePU7Wav4Bj2bj9BXqnKTKBVgf73rxaFsw2jJAsRX6qFJ7bbxh4gYYhMP3p02sriF8TCgNRRyXdC6mTm2glgHnrx1NcmZVxf3CAxIoaCnpLcB+WVFjKxB2CVzG6ETes2/YJbIbK5Mo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745427624; c=relaxed/simple;
-	bh=Oq+RUVKXoierg4o0zQGaueU+iLWLxzwb7ZA+t/XFi9w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JdDamWCZweHXydtbnwb6gv4yD37n9CiME2nHEziUuhYgFFp+69qz59d2e5sjCfK7Paud/kxXULrcBT4n0ObRigdreKNw7YP5YDlFV5ODOCjTiLHADeETYVMZXpefbyYD/ebOoADGNv1ADIUflbhKX3IhyLmQK0XR2IAxkpZJToI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=UARDqsgx; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4775ccf3e56so14760891cf.0
-        for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 10:00:22 -0700 (PDT)
+	s=arc-20240116; t=1745428075; c=relaxed/simple;
+	bh=wL+0xUq+Wpv5CUzn5J0WCeIN7d1hdB4e5BLKw+HRd64=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=mSAyL0VM5B1qoBjuQizT3WutSIt5y1x+chkPTJgETallQzxGUu87htJbEY1rF8LP9IIAeHb0upaxkCb2lMUbubGcugUJEXu5s3MP5Iz1XZOmEeZjAiYZgNdH0iCXBd1Bvpohqja9lgNWVogRzp0GUQQyTunh2N6xFeADHrmsr24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SaZKBnES; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-309c6e43a9aso125722a91.2
+        for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 10:07:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1745427621; x=1746032421; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wWxVg46eMCFdiWQ6X6K5wh7BwyllE/TFgcnWyILw7vo=;
-        b=UARDqsgxOC+cJtWdyN+NC2FY/WCTVe7z3WFx7smCC0E32+wheWqdAVaqyZuMIN2aMg
-         bYi30GQ5/MbJgUzSusKZHoKpetThYKOQb6prIavNr2Nm8nhyRI5OLVpd03M6nJutlPIQ
-         8X8itz0LgQdwoScBesYqaixgUfPxwTIkwGLN1aIVBGVRnkq8PGzRrPN5ygxBtf6jtGJ5
-         9oD9uONx64IyINlPGGwW6qOrIH8DeRKjy/bUyPoubWzTdYFhG1OSbmgg8Bgs/Rfee3Dt
-         xUQTD9Igf9RC5VSQJ6fdAqzjen7lbn1D0IWGZSegnpLfXYufUFsFYPjfslA9NpLe2QAc
-         jKkw==
+        d=google.com; s=20230601; t=1745428073; x=1746032873; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XlnAkp8cVn0zj/PVrvUqNTjNSTp79edpiLwavMDguXI=;
+        b=SaZKBnESdrd3EhZEvvzI89/cr66r07D7SrbsPu5Pfzbdz1T69hV9PjtryDP/4kM8MM
+         mtY6q66mjKuGsZ/P4uTOZJnXH8CTALCkdmiRq6GwHJfhVanmnGyBei9xBBGkn81sEZ0r
+         z26P0y1G8XZhpheyEdKtpEO8KGFgsYVt2QxnB8bmgAEmxA4LB0QTqBbr8+MfY0MkYP5L
+         xZPih8hpMfsdon5jz6gTp0R0ghVCLGhq2zu5a/pAcatmvPUKT7KG3D1XnBZ5wWXgCsLB
+         Ws+7ssO9ZOHrY5Kf7ENLRwRyDnEQWxf91MDW005wgZ1PETpPgrA7qTEJnp/n4vh59RTW
+         QhVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745427621; x=1746032421;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wWxVg46eMCFdiWQ6X6K5wh7BwyllE/TFgcnWyILw7vo=;
-        b=d5IM0K+3EHh6/U2Sf6CeLBh8GX9N8LFKWjO81gKX52j1JK4I4SlYjdm1WABqJ2zHkf
-         EJoSexUt5XdLP6Jpzp4MwtkTuWJebVXhUkGAScHFh6F1HN15YvgkfXztUzugnB7uwHUu
-         OHZHpngVeyJ8gkkRFIZp3MUzQeMmWvKdVQSnzcfb7FvPZCxFEsJByPCVshl9v6pwCsGN
-         Iwm7BMY6d2ith9cZqlWWUrqsoYQaUFCqRc3mttnDsPmqF3LocKsZqB+ooD7Z3u1qd6/H
-         b/LReZO6VAr1GuHlatPBBfLFLJpESWE/alZx1Wju47tKKpDl24lOYIgg+3oeiYtEwVjr
-         vMfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVtd1DWsL7LpWtHrxvEND8yVngthk6msBJ9tmTp6VNQIMCeNGF/NYEVlK4VVBOapqi0Mxs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxdqf5JCXIo4NCX9Jr45RD5n4AdhfpOIfFsz90xxoWLEAsYkk0y
-	sVMH1Hwduv+OgVv9gfP5mbl6AlUyA/8jB9x86LM9K3qIsYtmlRhPQjldsafVr5Y=
-X-Gm-Gg: ASbGncsNI7ObKbTpIFKMXQMNFBZwikiViMuE9cXtqFZGPtvEiAgkOifpVLALE0gigYt
-	CANKHvMQBSphGZXSumws4ZzFLGrfSOrhsGVBn1VYH2vzdqrUpXYImSIjNSAss+s58LyS9GJv1Wp
-	0tLUbxfFOk7NOIIEhLSZpzgI5oY3ktTeajdnSnWbhLRxZml+UL/unOpUiRjA+3LRIWcn/16jmXz
-	tGW+GXrvfHIbVKn5kQinSJQJV+PeQzCXwCJpsSWVsx4NzYL7jq++ginG+BhNrnRt9cuAK6zIpvU
-	OOPdlXZ6qadeTRlLrjVAubx1Kw9bvaYKt5o2BUMZjp95aSIPRIJLEX4o1uPuaMHWLHwSdyaWRdn
-	AnIXOqki8GgJxkt/WEWCPS8b4/u8xzw==
-X-Google-Smtp-Source: AGHT+IHksHmB8zXVAbJv0K8R7XmlcjQan86yStXGt3YpvcZVpCrvagDTNNdOsaaJ2R0ZGC6sR1O+4g==
-X-Received: by 2002:a05:622a:118f:b0:47e:641:9665 with SMTP id d75a77b69052e-47e0641979dmr20773641cf.5.1745427621264;
-        Wed, 23 Apr 2025 10:00:21 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-167-219-86.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.219.86])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f2c2bfcfd0sm72347416d6.82.2025.04.23.10.00.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 10:00:20 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1u7dSO-00000007LHo-0vIz;
-	Wed, 23 Apr 2025 14:00:20 -0300
-Date: Wed, 23 Apr 2025 14:00:20 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Leon Romanovsky <leon@kernel.org>, Keith Busch <kbusch@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jens Axboe <axboe@kernel.dk>, Jake Edge <jake@lwn.net>,
-	Jonathan Corbet <corbet@lwn.net>, Zhu Yanjun <zyjzyj2000@gmail.com>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Nitesh Shetty <nj.shetty@samsung.com>
-Subject: Re: [PATCH v9 23/24] nvme-pci: convert to blk_rq_dma_map
-Message-ID: <20250423170020.GI1213339@ziepe.ca>
-References: <cover.1745394536.git.leon@kernel.org>
- <7c5c5267cba2c03f6650444d4879ba0d13004584.1745394536.git.leon@kernel.org>
- <20250423092437.GA1895@lst.de>
- <20250423100314.GH48485@unreal>
- <20250423154712.GA32009@lst.de>
+        d=1e100.net; s=20230601; t=1745428073; x=1746032873;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XlnAkp8cVn0zj/PVrvUqNTjNSTp79edpiLwavMDguXI=;
+        b=UsPOD2QDgIpkJc+8PsDVUxT26ezlspCye5T/WweVCmsF2neRLErkiOWf4WRZnyJU/L
+         5dylrRcnKYUjZcpmqJL3uDmxssY2+JnTyIyEOxoG2uDvOowGf50YCM36ErqRXzZnddDz
+         v1GpCOKWb246btgms2jC1k7/OdJgl0DCCvTkvCm4M3X4+/I+Qa+aBjOjTmE02N5Z2eI4
+         wRXqaTkIeHpbxMtwMkTedeDh3gIHlKqr4DczKCXx8YLb8+m4YH/T4kxAf77xN+70/2cj
+         vZIxFkwv+QprFwEwbhvDq2n4b5PQt6a1VEfSyZeZEa1tRWOF2v/F2seCmQpSKoud5ege
+         Vaew==
+X-Forwarded-Encrypted: i=1; AJvYcCV7wv+y8SU8VRnh6py0bPDfp6/Pld7g6s0Yj7k9lUV6MaJpS3AOZDhEm9gvS4DztHgYVhM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxDrjH+hgW48ZwmCoEGzH6pxiKX2lMAipY2dqfALi/4JPGPznH1
+	7azL/2A6uSEWM2auftE2phmrwsCZD+mmSt30Aq4EEZ/EBUJUF0twyuS55jAPesWaJJWvjgXALyj
+	Z4g==
+X-Google-Smtp-Source: AGHT+IGhg62gnwDuvC+PxXSi6CDz4jilJV6tGssP+7fXEQAB/a9SlpJoSZ0TQDPRqFrYifSq2QDRbxu9Uco=
+X-Received: from pjbst14.prod.google.com ([2002:a17:90b:1fce:b0:2ff:852c:ceb8])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:380f:b0:2ee:9d49:3ae6
+ with SMTP id 98e67ed59e1d1-3087bb5336cmr30977016a91.10.1745428072873; Wed, 23
+ Apr 2025 10:07:52 -0700 (PDT)
+Date: Wed, 23 Apr 2025 10:07:51 -0700
+In-Reply-To: <8a58261a0cc5f7927177178d65b0f0b3fa1f173c.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250423154712.GA32009@lst.de>
+Mime-Version: 1.0
+References: <20250401155714.838398-1-seanjc@google.com> <20250401155714.838398-3-seanjc@google.com>
+ <20250416182437.GA963080.vipinsh@google.com> <20250416190630.GA1037529.vipinsh@google.com>
+ <aAALoMbz0IZcKZk4@google.com> <8a58261a0cc5f7927177178d65b0f0b3fa1f173c.camel@intel.com>
+Message-ID: <aAkeZ5-TCx8q6T6y@google.com>
+Subject: Re: [PATCH v2 2/3] KVM: x86: Allocate kvm_vmx/kvm_svm structures
+ using kzalloc()
+From: Sean Christopherson <seanjc@google.com>
+To: Kai Huang <kai.huang@intel.com>
+Cc: "vipinsh@google.com" <vipinsh@google.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Apr 23, 2025 at 05:47:12PM +0200, Christoph Hellwig wrote:
-> On Wed, Apr 23, 2025 at 01:03:14PM +0300, Leon Romanovsky wrote:
-> > On Wed, Apr 23, 2025 at 11:24:37AM +0200, Christoph Hellwig wrote:
-> > > I don't think the meta SGL handling is quite right yet, and the
-> > > single segment data handling also regressed.  Totally untested
-> > > patch below, I'll try to allocate some testing time later today.
+On Tue, Apr 22, 2025, Kai Huang wrote:
+> On Wed, 2025-04-16 at 12:57 -0700, Sean Christopherson wrote:
+> > On Wed, Apr 16, 2025, Vipin Sharma wrote:
+> > > Checked via pahole, sizes of struct have reduced but still not under 4k.
+> > > After applying the patch:
+> > > 
+> > > struct kvm{} - 4104
+> > > struct kvm_svm{} - 4320
+> > > struct kvm_vmx{} - 4128
+> > > 
+> > > Also, this BUILD_BUG_ON() might not be reliable unless all of the ifdefs
+> > > under kvm_[vmx|svm] and its children are enabled. Won't that be an
+> > > issue?
 > > 
-> > Christoph,
+> > That's what build bots (and to a lesser extent, maintainers) are for.  An individual
+> > developer might miss a particular config, but the build bots that run allyesconfig
+> > will very quickly detect the issue, and then we fix it.
 > > 
-> > Can we please progress with the DMA patches and leave NVMe for later?
-> > NVMe is one the users for new DMA API, let's merge API first.
+> > I also build what is effectively an "allkvmconfig" before officially applying
+> > anything, so in general things like this shouldn't even make it to the bots.
+> > 
 > 
-> We'll need to merge the block/nvme patches through the block tree
-> anyway to avoid merges from hell, so yes.
+> Just want to understand the intention here:
+> 
+> What if someday a developer really needs to add some new field(s) to, lets say
+> 'struct kvm_vmx', and that makes the size exceed 4K?
 
-RDMA has been having conflicts on the ODP patches too, so yeah we need
-a shared branch and this thing into each trees. I'd rely on Marek to
-make the shared branch and I'll take the RDMA parts on top.
+If it helps, here's the changelog I plan on posting for v3:
+    
+    Allocate VM structs via kvzalloc(), i.e. try to use a contiguous physical
+    allocation before falling back to __vmalloc(), to avoid the overhead of
+    establishing the virtual mappings.  The SVM and VMX (and TDX) structures
+    are now just above 4096 bytes, i.e. are order-1 allocations, and will
+    likely remain that way for quite some time.
+    
+    Add compile-time assertions in vendor code to ensure the size is an
+    order-0 or order-1 allocation, i.e. to prevent unknowingly letting the
+    size balloon in the future.  There's nothing fundamentally wrong with a
+    larger kvm_{svm,vmx,tdx} size, but given that the size is barely above
+    4096 after 18+ years of existence, exceeding exceed 8192 bytes would be
+    quite notable.
 
-Thanks,
-Jason
+
+> What should the developer do?  Is it a hard requirement that the size should
+> never go beyond 4K?  Or, should the assert of order 0 allocation be changed to
+> the assert of order 1 allocation?
+
+It depends.  Now that Vipin has corrected my math, the assertion will be that the
+VM struct is order-1 or smaller, i.e. <= 8KiB.  That gives us a _lot_ of room to
+grow.  E.g. KVM has existed for ~18 years and is barely about 4KiB, so for organic
+growth (small additions here and there), I don't expect to hit the 8KiB limit in
+the next decade (famous last words).  And the memory landscape will likely be
+quite different 10+ years from now, i.e. the assertion may be completely unnecessary
+by the time it fires.
+
+What I'm most interested in detecting and prevent is things like mmu_page_hash,
+where a massive field is embedded in struct kvm for an *optional* feature.  I.e.
+if a new feature adds a massive field, then it should probably be placed in a
+separate, dynamically allocated structure.  And for those, it should be quite
+obvious that a separate allocation is the way to go.
 
