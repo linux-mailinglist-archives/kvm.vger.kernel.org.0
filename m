@@ -1,119 +1,161 @@
-Return-Path: <kvm+bounces-43929-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43932-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C680A9888B
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 13:27:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87490A98949
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 14:11:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F7A6189A7B2
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 11:27:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82C7C1B61A43
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 12:12:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8121A270574;
-	Wed, 23 Apr 2025 11:26:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2506D218AD1;
+	Wed, 23 Apr 2025 12:11:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K7G/Vykz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RA/IakGU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 280DF26FA46
-	for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 11:26:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A460214238;
+	Wed, 23 Apr 2025 12:11:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745407610; cv=none; b=Tfyd+n2OdE0TfCHfZoiSXXqzpoBTyvezo97fYsMehAUBHfIxkEXbPXmvf4IjaJN4Wn/8gzp1poZiq6Jo/YAgWYjlhxl2/VI+BbYJzo/VfvWxTnW6L8I+LcQdnE6jYOIcigVetvLhtKZU3bTV8z6FQ7iYvtHM9knTFUJalPs2jaQ=
+	t=1745410294; cv=none; b=llFNTFFFxB+rCEjG7eU03FDUcLfenujYoWN2VgK9vTv9YRay/xiSsFZ7+Ansjx38y0olOEsrnu6C4m3cXIUKgF1YOHP2OlPhRMTDICbRdorfQy+6yV4o0j1ZDMkNFWSbhw2mKrqAMJz42+P3Ki/UnqWLFdrEXlMoGdAySuRr2Do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745407610; c=relaxed/simple;
-	bh=dpAgjvFZpHGJGhZZSq1pgwGCVmFSsMCmYasOajOmwzE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PTceBQdMqA3V+oQWmazsM2fOundyTDDrkT/b0PtKPtGd2b943J+zN6Yv8cUFYJ1k4RBx6Y3e7f/j+sWN4FrcRE1CusHYgFMIO8acVYkD9XugrYxK5yESeNMio5rIgxogyw7ZuUNhmxcJe4A2yxl0UsqcnPSnX9rldRIJ+EDQjW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K7G/Vykz; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745407609; x=1776943609;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=dpAgjvFZpHGJGhZZSq1pgwGCVmFSsMCmYasOajOmwzE=;
-  b=K7G/VykzoEseJFEoSEs4aECgUejbVJXL8ROI4Ud+Q+0WmhLy3kRf5ZLu
-   9HnwHxbvC+QCdYHz0TQYPxGLeewaRzhoSV3qdp9YwpUKHxZvsmPLigyKC
-   F84JWRJBzUUQ3q4N5IZPEwo9qXK1mgyvsX8JGUjrfKhCD3FiBkDbdVPM8
-   JvcDCJ4DPHOEPNaU5T7WUHARrsD+fTb73dYILdJe3JTAOdiZmGRwjwspu
-   u4uRbuwGmLaADFIBevEyyPORCHdW5gwi9lM6qvPWaEeFqMpS/VYkcUrUK
-   MdjCuJ7gCo2bjStcgqtimnzBlLse8lhM3eNsfCyAlu+1tpDCYRqbbfE5W
-   A==;
-X-CSE-ConnectionGUID: 40dBtLzXR0uschCrEu6xnw==
-X-CSE-MsgGUID: HSsLGGKrQaSfiVgCeRav+A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11411"; a="50825333"
-X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
-   d="scan'208";a="50825333"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 04:26:49 -0700
-X-CSE-ConnectionGUID: ja6nxVJHQhOL5H5ugAyeqw==
-X-CSE-MsgGUID: +liuPxK7SUe9OSjxja4HXQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
-   d="scan'208";a="137150833"
-Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
-  by orviesa003.jf.intel.com with ESMTP; 23 Apr 2025 04:26:45 -0700
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	=?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>
-Cc: Babu Moger <babu.moger@amd.com>,
-	Ewan Hai <ewanhai-oc@zhaoxin.com>,
-	Xiaoyao Li <xiaoyao.li@intel.com>,
-	Tejus GK <tejus.gk@nutanix.com>,
-	Jason Zeng <jason.zeng@intel.com>,
-	Manish Mishra <manish.mishra@nutanix.com>,
-	Tao Su <tao1.su@intel.com>,
-	qemu-devel@nongnu.org,
-	kvm@vger.kernel.org,
-	Zhao Liu <zhao1.liu@intel.com>
-Subject: [RFC 10/10] i386/cpu: Enable 0x1f leaf for SapphireRapids by default
-Date: Wed, 23 Apr 2025 19:47:02 +0800
-Message-Id: <20250423114702.1529340-11-zhao1.liu@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250423114702.1529340-1-zhao1.liu@intel.com>
-References: <20250423114702.1529340-1-zhao1.liu@intel.com>
+	s=arc-20240116; t=1745410294; c=relaxed/simple;
+	bh=yQ1UlwAJJHcI/OsM/WOjpj6zZr5R1RBZAV3ItX0DC38=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=N+E4GB91T/PomlOsrtzww4SOOq7Zh+32cIITrX7auNyPgx3VWMQd6GYhf88pk66DC7O6KQL2f3BgDMlwtgiWg+iGR/CkcLJouaI3KU0Yr4hwWR7dgUMLUPLAuhJjFwxsn8p8O9KXQx42mCInMnJpPxWF1x1e31l0xGWspatb6CI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RA/IakGU; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-39ee5a5bb66so4518732f8f.3;
+        Wed, 23 Apr 2025 05:11:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745410291; x=1746015091; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=X3ENo7G6TW6MBK7yQ4g9B813KgFySi5deAa4vwegzbo=;
+        b=RA/IakGUAE314HKgCxzSRavMmLjLVqVOywIwiiM6mYBNWaips1FG7WGC4DmitIqk6X
+         +BmqpAeMPYNFpmxVMBalFTt2Ozli1SavYqeyDEuElNPxrkXU5pEXedbD5xZk8yKs5VZw
+         rYUKkc/OA04td/Ok9a/0WapdC98OQkXlRM39KdI3Q+41k1LFCIQPmJNPutQD80WPI/Dw
+         MeQPrRTHh5hbcOWmuGp+ENR0xiq2uQqHiMWVL1Lf0Y67JgXUJU4S/fS1Yr/BQcZ6Vrb3
+         boB+Lia+UztsUdY9kpe/16SWLPk2f9LHD43qNtWko5o3IAoEVzHXjEXr+77RA/LhFnOG
+         /Yug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745410291; x=1746015091;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X3ENo7G6TW6MBK7yQ4g9B813KgFySi5deAa4vwegzbo=;
+        b=i95qrxRgoro0W0QeSGXiFeecNWLObRKTRG0N9wL5fVmRQZafPHD5ke/o3/jRDmFUNU
+         t9+Q/ce3DpclvVedzhL7Y8MHwTWFmZ5jLSnjbyEZKBBO+T/vi6taybTwc+jZZKNJvS/k
+         vXcF7ZuPKPjXeK0t1WjXU9xo6eTHsmGfZdOnTdOLW5zR31U5PKYfcNFT5Zp4JMSWY237
+         VE6XvXDQLIir3YDj1jc4PjADOopvmdNrAw7efJSei6llViQRu/wkbyIK1/e8Aasf4loh
+         tDcWKJaXMmxzfSqo5jBG464clnV8ujfAa7tgScc4ra7ynZntiS2MLc0wK3Da/NMt8v/4
+         1P5A==
+X-Forwarded-Encrypted: i=1; AJvYcCUE340jGHA5GeRGg2oc0Zk281QF4cfMEy8mJn4ngPSH9iW5bpyelbbM8eUR7FJIs1SHRpyW9yY/mt6VSc8vk6gk@vger.kernel.org, AJvYcCVhuygUCvyYhYt/IfW+CFJYhyGEJVftx7feUiqtqdB06kjyDPGTNkTEIIKPYZyeQe5siKXQ45h1Bc5iGWTA@vger.kernel.org, AJvYcCW2fMJOPO3fE+RyxLSpTpgJNylKfsGWbJdWl/sg86ML5gyRkxxFBRZnddLjklpFQ2ipxQSB@vger.kernel.org, AJvYcCXsPhFy+CwsWSs1veMVV5EXOn3CFu34ykI9kMm+DVl7sYMJtb42ZooyTOuGCRPV3nuDl+O/KD2rzw8p@vger.kernel.org, AJvYcCXu9dzhluoAmOl+jAwrRC9w3QBnUbR1J/yMZ6dBh7yVjMdrl47N3N/xKqG6y+sY5jpdC9vDMU9b8A==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1FUndCMvTWT3jAV3mB00v6KyV5sZcL2kG6FkdqcH0501HafHs
+	ooNVW4Ogw3xuaEupW1BacGN187BmufxDj1LBUbF9uHlnqYen1eJC
+X-Gm-Gg: ASbGncswlP4cMEFKAtNyGi4PAp5ecOLypw2x7vwYaOUAW/VsXHr1O2N30HiDI2TUfBQ
+	+mDLE56i6QTBdAdmh2WbFZCyR6/6JnuwGGiExTZj0ji6sFa3NWdTQ11zuw4MutVgk9ksfpAJwLI
+	2iOfeWlzwvK0BORsuITkZ+EZbJKqX9FniT91Pxn+hoAnVkFambsrI2eJ4SFLv7B3cYAf5huFcOM
+	pAFwBNqUAXKjXMMq3SViE+JabCmA26FESnNtZF94EPLs2NnxMwcU/STNebdp9EgVgogoGeFYt2k
+	tPaxrLLbFdUN+jh9ENVlFLTsUairbsxHDyauiOm2EDbzTFJKaCfZHU0v3w==
+X-Google-Smtp-Source: AGHT+IFZ8D9fn99GBdz1k+wnK9Zxq4FNrQ2P/nZKAH6ZFy9CpCQ91xB95fWpKA6Gc9C9vj8lWI9UZw==
+X-Received: by 2002:a5d:6da6:0:b0:391:2f2f:818 with SMTP id ffacd0b85a97d-39efba2619bmr16139209f8f.9.1745410290643;
+        Wed, 23 Apr 2025 05:11:30 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:80e4:de9:c3ea:a346])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39efa4207c5sm18334945f8f.6.2025.04.23.05.11.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Apr 2025 05:11:30 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org,  linux-kernel@vger.kernel.org,
+  linux-doc@vger.kernel.org,  io-uring@vger.kernel.org,
+  virtualization@lists.linux.dev,  kvm@vger.kernel.org,
+  linux-kselftest@vger.kernel.org,  Jakub Kicinski <kuba@kernel.org>,
+  "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
+ <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Simon Horman
+ <horms@kernel.org>,  Jonathan Corbet <corbet@lwn.net>,  Andrew Lunn
+ <andrew+netdev@lunn.ch>,  Jeroen de Borst <jeroendb@google.com>,
+  Harshitha Ramamurthy <hramamurthy@google.com>,  Kuniyuki Iwashima
+ <kuniyu@amazon.com>,  Willem de Bruijn <willemb@google.com>,  Jens Axboe
+ <axboe@kernel.dk>,  Pavel Begunkov <asml.silence@gmail.com>,  David Ahern
+ <dsahern@kernel.org>,  Neal Cardwell <ncardwell@google.com>,  Stefan
+ Hajnoczi <stefanha@redhat.com>,  Stefano Garzarella <sgarzare@redhat.com>,
+  "Michael S. Tsirkin" <mst@redhat.com>,  Jason Wang <jasowang@redhat.com>,
+  Xuan Zhuo <xuanzhuo@linux.alibaba.com>,  =?utf-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>,  Shuah Khan <shuah@kernel.org>,  sdf@fomichev.me,
+  dw@davidwei.uk,  Jamal Hadi Salim <jhs@mojatatu.com>,  Victor Nogueira
+ <victor@mojatatu.com>,  Pedro Tammela <pctammela@mojatatu.com>,  Samiullah
+ Khawaja <skhawaja@google.com>
+Subject: Re: [PATCH net-next v10 3/9] net: devmem: TCP tx netlink api
+In-Reply-To: <20250423031117.907681-4-almasrymina@google.com> (Mina Almasry's
+	message of "Wed, 23 Apr 2025 03:11:10 +0000")
+Date: Wed, 23 Apr 2025 10:55:53 +0100
+Message-ID: <m2y0vrtd5i.fsf@gmail.com>
+References: <20250423031117.907681-1-almasrymina@google.com>
+	<20250423031117.907681-4-almasrymina@google.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Host SapphireRapids CPU has 0x1f leaf by default, so that enable it for
-Guest CPU by default as well.
+Mina Almasry <almasrymina@google.com> writes:
 
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
----
- target/i386/cpu.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+> From: Stanislav Fomichev <sdf@fomichev.me>
+>
+> Add bind-tx netlink call to attach dmabuf for TX; queue is not
+> required, only ifindex and dmabuf fd for attachment.
+>
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+>
+> ---
+>
+> v3:
+> - Fix ynl-regen.sh error (Simon).
+>
+> ---
+>  Documentation/netlink/specs/netdev.yaml | 12 ++++++++++++
+>  include/uapi/linux/netdev.h             |  1 +
+>  net/core/netdev-genl-gen.c              | 13 +++++++++++++
+>  net/core/netdev-genl-gen.h              |  1 +
+>  net/core/netdev-genl.c                  |  6 ++++++
+>  tools/include/uapi/linux/netdev.h       |  1 +
+>  6 files changed, 34 insertions(+)
+>
+> diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
+> index f5e0750ab71db..c0ef6d0d77865 100644
+> --- a/Documentation/netlink/specs/netdev.yaml
+> +++ b/Documentation/netlink/specs/netdev.yaml
+> @@ -743,6 +743,18 @@ operations:
+>              - defer-hard-irqs
+>              - gro-flush-timeout
+>              - irq-suspend-timeout
+> +    -
+> +      name: bind-tx
+> +      doc: Bind dmabuf to netdev for TX
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 38b330aaed4f..5573a9fd6c61 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -4548,8 +4548,11 @@ static const X86CPUDefinition builtin_x86_defs[] = {
-             },
-             {
-                 .version = 4,
--                .note = "with spr-sp cache model",
-+                .note = "with spr-sp cache model and 0x1f leaf",
-                 .cache_info = &xeon_spr_cache_info,
-+                .props = (PropValue[]) {
-+                    { "cpuid-0x1f", "on" },
-+                }
-             },
-             { /* end of list */ }
-         }
--- 
-2.34.1
+nit: maybe add "for RX" to the bind-rx doc.
 
+> +      attribute-set: dmabuf
+
+The bind-rx op has "flags: [ admin-perm ]", should bind-tx also?
+
+> +      do:
+> +        request:
+> +          attributes:
+> +            - ifindex
+> +            - fd
+> +        reply:
+> +          attributes:
+> +            - id
 
