@@ -1,189 +1,170 @@
-Return-Path: <kvm+bounces-44006-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44007-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B537A997E0
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 20:26:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9357EA99808
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 20:37:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 607524A32DA
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 18:26:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7F464A35D8
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 18:37:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 185D728F502;
-	Wed, 23 Apr 2025 18:26:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2192E28F53D;
+	Wed, 23 Apr 2025 18:37:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2gq+VKrr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C9pzWgkH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B260128DEFD
-	for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 18:26:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C986728F518
+	for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 18:37:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745432789; cv=none; b=DhBzdWFSPLL2F8IVy53KqFsVv30tVkl6Lj/eHSTtPJNWH41GeSExx2bLV0f7ZyHh0y/FfWz8FnZsOHkAiszGAFGJYmBKEv3nDtKnnwCHty/VEbueGaEz6xVgFE6p3quWjoHX3e7i6edEi6nmLEbYPD3qFwN2rNk4IerbsmTqIPA=
+	t=1745433457; cv=none; b=rHWQYqVfJ5dLNCQnA+YUDv6bin6gXLP6Rg4MmVS1L2pKNqb3YCGnvM88S0eiN78Bc6QeyFn6SPkz18DBmv+YcK9VDI1dShLbf2UBvcjhKb9wN2aGlQHdZ3p+MCGxdXrINcn9r4D1vVJ4gV8Y6WB5FvclQEf4a7sGKGLhu8siNuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745432789; c=relaxed/simple;
-	bh=PH84kld/sKE+RhISrTjG1cjFnL0yLAXB9xK4PwFZaMY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=vGZUpQDyoNXseNo1IRmc+tDnZrsh6cIOa0pWGRCz4jXpGvbsW3ebjHyd528ql7+LeFSNQX9w6WQhkedBD8pWmSzMDUvTAUbONzm/XKFCi3cqLS65p04S4HVKWMNvxEiKmxqdYHKtzEldFUSPNuRuchHjdE3s9Ge150nokHKwneA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2gq+VKrr; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2263428c8baso21255ad.1
-        for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 11:26:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745432786; x=1746037586; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l0kIM1GyroCk3zmwGLYPwDaNY7xBbvOnwGmlKqF+IzQ=;
-        b=2gq+VKrrvYaucHZKTwwnsDTcguRUJEnVD9Vc+V+V+MMaMRFvued3L8zrmZcBRrQhmM
-         3AQIXkghMRWBlDpmF3Y442RrEa/yOvEGpOXH7jvF2ImyjOhm7ldwlQpVsBBVnrbMBR32
-         oxkxBsygVehWGacZv3UxJmwvCv8bQOs6VYYwjIT31stc15bCYMBoYmLXxFC4CJxX6ijX
-         un5EOHJeYtHksDBCZLviXLlVLbxF+jjTZIB70cLEkBjcWWDUtXCQHSne9rRrpLVlVfXm
-         TvbupkYn09GYXohrSzKoO8ejUQwj+0XW+4JQzbpUFtXTG2WA2y4toln7Vk5BwsR+pHxz
-         m5TQ==
+	s=arc-20240116; t=1745433457; c=relaxed/simple;
+	bh=gh76Cwi537UAiZiZzvQ7qO7K4eMJvXZ5GcYqQsv4qVM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GylJ05ouT8j5GHeP9GZyOXaghmqsHuSvbw6VIxuX7gvYwpdBCi6YebMZR/AAHRJ8iUBNFAttNcc42tl9CDJW7jojuFRb0PaVE8MNoQhFudIrOAxJUw/r8Z/Vwkethp1EXb4MOGaWZW2kpAAvdSmRSxcC6BRz4/QLA3SwUGWTxY8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C9pzWgkH; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745433455;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Y6pwEnRnhkHgazDgVxPbcQpa5mERaCMyYK1dziw6UIo=;
+	b=C9pzWgkH+BVXgbOVKjt7gluBlb6WXN7LQcHEINHIuzgfh9WZRdNRHVJBZoYKkX5BXYQ8Hl
+	jgEkLkpYovCvCb6wsdTJ90DTKxE7C6yV5/Z6zOY+ghQrCz//6YJOm2pcUyygtGQ0A0cr8X
+	8D5PEGPXKt1I1PYi0Qb+q7AIzghR8jA=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-226-BwzRUoVHPnuaQ0qsQIduRA-1; Wed, 23 Apr 2025 14:37:28 -0400
+X-MC-Unique: BwzRUoVHPnuaQ0qsQIduRA-1
+X-Mimecast-MFC-AGG-ID: BwzRUoVHPnuaQ0qsQIduRA_1745433447
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-30bf67adf33so6649351fa.0
+        for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 11:37:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745432786; x=1746037586;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=l0kIM1GyroCk3zmwGLYPwDaNY7xBbvOnwGmlKqF+IzQ=;
-        b=deeOI6z+d2405h8UVhCn9y45i6BRo46XwAWMOg0+41QNtdx9pEHt6YcOA4DsA4ewq2
-         Zw40A68Yc0qIoNMqfstuj4x32uhk8XDWVpjtDwT9rZ1UQ5miU+mxhgtwXH4Q5Gpw6D9V
-         O1GntqvpIIZLOb0PEuR53vo0xDXqWz+/IIPo0K545EeU5JUYDkBpEuKmddeyqe421jFN
-         ICnq86q8Rag76xurKcWJGS4qLawjl9HeJDkSO/4p318EK6wRvOWA/EsKlgwKBpp1h373
-         9WknnmsqXI4zK15PzCbDdglulmazP07dUvH2H8X41XTPnam7DU4iZk36Lo63BkpFppyl
-         7Jew==
-X-Forwarded-Encrypted: i=1; AJvYcCXlzh7BGyEk2Vp02mm6LoGl5JiNZKly5nOArxLRu4okejKRMLHW/sFnbHyGeQF1cw+9JMw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCr3gdztDwYX8yOSe0/8Kxmh+s/N86mMkyJwbB1zHOY2eZL1wo
-	ltp38y7IqJZx9hD1dcehn9pavFJapixTVTRjppGiU40EJfZIbVq1sHWJRwGBj66ZhKIIv5YJfMw
-	CO39/1TYIz+zMm847gSNmFFu9eUN8ydxjH2/e
-X-Gm-Gg: ASbGncss8DA325zJTBxkYZJxeS7mAqVrlnS4y/Q0eepwnLYolP2vhWqiDaxT9/uBYcR
-	OWTCT03f8HxQh1UfTIDGjQWWFUI2z7SRFRmhEe7elCT9AgVY6gem1NZKfjIiA3MFWeKH9GruLK1
-	YgfzuTl+BUOq9QnifRawLlFrDA2hV5+bXzid7mU7z1kMSgleQPn46wqwg=
-X-Google-Smtp-Source: AGHT+IFz1R1LxqWEGYRLYWO5W96XWnv2bqJz15jEINPSBmb87YsKZWzWOfr6fveduQ8KQij52ltnpYxHcWerkniTavs=
-X-Received: by 2002:a17:903:3bce:b0:215:8232:5596 with SMTP id
- d9443c01a7336-22db218a627mr293845ad.16.1745432785574; Wed, 23 Apr 2025
- 11:26:25 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1745433447; x=1746038247;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y6pwEnRnhkHgazDgVxPbcQpa5mERaCMyYK1dziw6UIo=;
+        b=kr9EJBAB03V7mH6+bkcPnpRI534VXxDROloTvKe9KiUCOhy4/wjbQQrcQLql3PrdTr
+         OdY81uep5d2V9U/P9qYJ8c8dj3b61EKEj+KMQFeRes0PZPXjS5zfAlLtvMBG6XPWT6RF
+         1aSYn5sUaCW6FNzGg0EnOT/tLJmVKVhe5i1bqu0UZKoAD20UimxjgV6Tu8KOnwkUI0qT
+         oeelvn7ndvCSCTLp4XRVP7R0zU/v0U5O3nlHzHalOP6me4rE6SP/ISaIIlxS6HB+GG7V
+         mYUEjL+yHcT5YNpnEQIGJqAJt1miAn1R+SOxlRuKU4s9KDib9OU/KJJbtWaWhPAMDLnM
+         ZTWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXZV1rblcdn2QECCxHvwqpMmX8ah+FdnkAbyIa0Vh9DJ0ZOFuQKTBhEI9K5rZHYBKm/xAs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yylpqvvc+hX5zppr8hgdAQKzrQzhA7vRDKvIk5mJHo07FG5+LZv
+	4OCKkPkAXiY8gr2s/s0Rtg2yPiP9FScuz1LgMLFsWkFnhCF05Q4sf+FUQ7EqVoDPzSdcQJUttWd
+	C3XJ4XmGsXqOnIZxFv8yKXCCUSFrRCiQN7VysVbcyOb1nmsJR
+X-Gm-Gg: ASbGncu/359Ih9GLFN2R5uCFMdNVWbWiWhzSiKtD1p7kQGOiYBiNDGcrtqGE0R/xYm0
+	9igSWeULnSkAyyRZh4xOZrdh7F7cZ/96WRLphkQivR7K31I/ysTRi2fWtCtjjUSSOjkj0OrSWnH
+	SBqD8N0guvQhq9OJZEeu8pjt3VeSOC9v86KQrt5mdkeS9SJZwF7GSClkZfdETgpWpLp07tR377b
+	l8Lz93BFTKSaH0qNhKVGGTsSbfMXvt9hStF58GLLpZwAPOdwz1wwQdaBYg1xWiJymvfs5z6U1bG
+	MWfnccWiXK+Lwy4A5TgQpmAG8ktjIYNx2lIuyQ==
+X-Received: by 2002:a2e:8818:0:b0:308:e956:66e with SMTP id 38308e7fff4ca-3179449456amr500191fa.0.1745433446938;
+        Wed, 23 Apr 2025 11:37:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHeLX03zhP8nSlFHqNWBiKFBjf3MShxZQb8tc2EeW+8vLK6+b+87nnEoR+0vFre3XFcDl9w4g==
+X-Received: by 2002:a2e:8818:0:b0:308:e956:66e with SMTP id 38308e7fff4ca-3179449456amr499761fa.0.1745433446435;
+        Wed, 23 Apr 2025 11:37:26 -0700 (PDT)
+Received: from [192.168.1.86] (85-23-48-6.bb.dnainternet.fi. [85.23.48.6])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-3109075e8e9sm19833701fa.12.2025.04.23.11.37.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Apr 2025 11:37:26 -0700 (PDT)
+Message-ID: <36891b0e-d5fa-4cf8-a181-599a20af1da3@redhat.com>
+Date: Wed, 23 Apr 2025 21:37:24 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250423031117.907681-1-almasrymina@google.com> <20250423031117.907681-8-almasrymina@google.com>
-In-Reply-To: <20250423031117.907681-8-almasrymina@google.com>
-From: Harshitha Ramamurthy <hramamurthy@google.com>
-Date: Wed, 23 Apr 2025 11:26:14 -0700
-X-Gm-Features: ATxdqUHnKDzCBYG80n4IAQ6Tqlf6P8u3mDu-47naFBmrHiwPtX2MRzVq-LrB7oQ
-Message-ID: <CAEAWyHdYEzHLbW1Z=nS1yGdnbFA2HU7wb4nFZ1TmqGaUZoq9Tg@mail.gmail.com>
-Subject: Re: [PATCH net-next v10 7/9] gve: add netmem TX support to GVE
- DQO-RDA mode
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, io-uring@vger.kernel.org, 
-	virtualization@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Jeroen de Borst <jeroendb@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Willem de Bruijn <willemb@google.com>, Jens Axboe <axboe@kernel.dk>, 
-	Pavel Begunkov <asml.silence@gmail.com>, David Ahern <dsahern@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, dw@davidwei.uk, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 10/24] mm/hmm: let users to tag specific PFN with DMA
+ mapped bit
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Leon Romanovsky <leon@kernel.org>,
+ Marek Szyprowski <m.szyprowski@samsung.com>, Jens Axboe <axboe@kernel.dk>,
+ Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
+ Leon Romanovsky <leonro@nvidia.com>, Jake Edge <jake@lwn.net>,
+ Jonathan Corbet <corbet@lwn.net>, Zhu Yanjun <zyjzyj2000@gmail.com>,
+ Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+ Bjorn Helgaas <bhelgaas@google.com>, Logan Gunthorpe <logang@deltatee.com>,
+ Yishai Hadas <yishaih@nvidia.com>,
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ Kevin Tian <kevin.tian@intel.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+ Andrew Morton <akpm@linux-foundation.org>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+ linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+ kvm@vger.kernel.org, linux-mm@kvack.org,
+ Niklas Schnelle <schnelle@linux.ibm.com>,
+ Chuck Lever <chuck.lever@oracle.com>, Luis Chamberlain <mcgrof@kernel.org>,
+ Matthew Wilcox <willy@infradead.org>, Dan Williams
+ <dan.j.williams@intel.com>, Kanchan Joshi <joshi.k@samsung.com>,
+ Chaitanya Kulkarni <kch@nvidia.com>
+References: <cover.1745394536.git.leon@kernel.org>
+ <0a7c1e06269eee12ff8912fe0da4b7692081fcde.1745394536.git.leon@kernel.org>
+ <7185c055-fc9e-4510-a9bf-6245673f2f92@redhat.com>
+ <20250423181706.GT1213339@ziepe.ca>
+Content-Language: en-US
+From: =?UTF-8?Q?Mika_Penttil=C3=A4?= <mpenttil@redhat.com>
+In-Reply-To: <20250423181706.GT1213339@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 22, 2025 at 8:11=E2=80=AFPM Mina Almasry <almasrymina@google.co=
-m> wrote:
->
-> Use netmem_dma_*() helpers in gve_tx_dqo.c DQO-RDA paths to
-> enable netmem TX support in that mode.
->
-> Declare support for netmem TX in GVE DQO-RDA mode.
->
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
->
-> ---
->
-> v10:
-> - Move setting dev->netmem_tx to right after priv is initialized
->   (Harshitha)
->
-> v4:
-> - New patch
-> ---
->  drivers/net/ethernet/google/gve/gve_main.c   | 4 ++++
->  drivers/net/ethernet/google/gve/gve_tx_dqo.c | 8 +++++---
->  2 files changed, 9 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/eth=
-ernet/google/gve/gve_main.c
-> index 8aaac91013777..b49c74620799e 100644
-> --- a/drivers/net/ethernet/google/gve/gve_main.c
-> +++ b/drivers/net/ethernet/google/gve/gve_main.c
-> @@ -2659,12 +2659,16 @@ static int gve_probe(struct pci_dev *pdev, const =
-struct pci_device_id *ent)
->         if (err)
->                 goto abort_with_wq;
->
-> +       if (!gve_is_gqi(priv) && !gve_is_qpl(priv))
-> +               dev->netmem_tx =3D true;
-> +
->         err =3D register_netdev(dev);
->         if (err)
->                 goto abort_with_gve_init;
->
->         dev_info(&pdev->dev, "GVE version %s\n", gve_version_str);
->         dev_info(&pdev->dev, "GVE queue format %d\n", (int)priv->queue_fo=
-rmat);
-> +
-nit: accidental extra empty line, but
 
-Acked-by: Harshitha Ramamurthy <hramamurthy@google.com>
+On 4/23/25 21:17, Jason Gunthorpe wrote:
+> On Wed, Apr 23, 2025 at 08:54:05PM +0300, Mika Penttilä wrote:
+>>> @@ -36,6 +38,13 @@ enum hmm_pfn_flags {
+>>>  	HMM_PFN_VALID = 1UL << (BITS_PER_LONG - 1),
+>>>  	HMM_PFN_WRITE = 1UL << (BITS_PER_LONG - 2),
+>>>  	HMM_PFN_ERROR = 1UL << (BITS_PER_LONG - 3),
+>>> +
+>>> +	/*
+>>> +	 * Sticky flags, carried from input to output,
+>>> +	 * don't forget to update HMM_PFN_INOUT_FLAGS
+>>> +	 */
+>>> +	HMM_PFN_DMA_MAPPED = 1UL << (BITS_PER_LONG - 7),
+>>> +
+>> How is this playing together with the mapped order usage?
+> Order shift starts at bit 8, DMA_MAPPED is at bit 7
 
->         gve_clear_probe_in_progress(priv);
->         queue_work(priv->gve_wq, &priv->service_task);
->         return 0;
-> diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net/e=
-thernet/google/gve/gve_tx_dqo.c
-> index 2eba868d80370..a27f1574a7337 100644
-> --- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-> +++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-> @@ -660,7 +660,8 @@ static int gve_tx_add_skb_no_copy_dqo(struct gve_tx_r=
-ing *tx,
->                         goto err;
+hmm bits are the high bits, and order is 5 bits starting from
+(BITS_PER_LONG - 8)
+
+
+> The pfn array is linear and simply indexed. The order is intended for
+> page table like HW to be able to build larger entries from the hmm
+> data without having to scan for contiguity.
 >
->                 dma_unmap_len_set(pkt, len[pkt->num_bufs], len);
-> -               dma_unmap_addr_set(pkt, dma[pkt->num_bufs], addr);
-> +               netmem_dma_unmap_addr_set(skb_frag_netmem(frag), pkt,
-> +                                         dma[pkt->num_bufs], addr);
->                 ++pkt->num_bufs;
+> Even if order is present the entry is still replicated across all the
+> pfns that are inside the order.
 >
->                 gve_tx_fill_pkt_desc_dqo(tx, desc_idx, skb, len, addr,
-> @@ -1038,8 +1039,9 @@ static void gve_unmap_packet(struct device *dev,
->         dma_unmap_single(dev, dma_unmap_addr(pkt, dma[0]),
->                          dma_unmap_len(pkt, len[0]), DMA_TO_DEVICE);
->         for (i =3D 1; i < pkt->num_bufs; i++) {
-> -               dma_unmap_page(dev, dma_unmap_addr(pkt, dma[i]),
-> -                              dma_unmap_len(pkt, len[i]), DMA_TO_DEVICE)=
-;
-> +               netmem_dma_unmap_page_attrs(dev, dma_unmap_addr(pkt, dma[=
-i]),
-> +                                           dma_unmap_len(pkt, len[i]),
-> +                                           DMA_TO_DEVICE, 0);
->         }
->         pkt->num_bufs =3D 0;
->  }
-> --
-> 2.49.0.805.g082f7c87e0-goog
+> At least this series should replicate the dma_mapped flag as well as
+> it doesn't pay attention to order.
 >
+> I suspect a page table implementation may need to make some small
+> changes. Indeed with guarenteed contiguous IOVA there may be a
+> significant optimization available to have the HW page table cover all
+> the contiguous present pages in the iommu, which would be a higher
+> order than the pages themselves. However this would require being able
+> to punch non-present holes into contiguous mappings...
+>
+> Jason
+>
+--Mika
+
+
 
