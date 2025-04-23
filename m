@@ -1,167 +1,199 @@
-Return-Path: <kvm+bounces-43933-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43934-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C816DA98A7A
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 15:07:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5108A98B34
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 15:33:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A15C13AEA4F
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 13:06:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1BCFF1B67BE3
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 13:32:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2B0014F125;
-	Wed, 23 Apr 2025 13:05:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9FFD1891AA;
+	Wed, 23 Apr 2025 13:31:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X8NOLukP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Fxh3WNnX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE5738DF9
-	for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 13:05:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77C402E406
+	for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 13:31:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745413558; cv=none; b=qN77x9biPoT9gMwacewbU2LfJ52NyJbLTnQRCsng9Frn/XV+DjAVB0tvgVFOktVqlCwGiRKuRySEsVopYQEGPUBizxIueEnecMjkaR65Bio0JD9hh9BtwVqw4lc6ugNMdlP4mMhXqsawFoqR/tmf1LyJlg2YE2567akuHkNQS9Q=
+	t=1745415113; cv=none; b=dPgCyMDqdvKCdKclprkwcAGwPsQxaeAvm3BBq4rzltVvfsbFKLthrYXEHfuJHn444RlcCabHecg2hnid1LyWCvjl0XEvyB8FZxkMvOlzlbpaxnXqCtk8v/bAkXDY1Rs29BaLznrKoyWPKBNlxR7lRHk8tr9FVH4ni9vhGuil6Fc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745413558; c=relaxed/simple;
-	bh=Tl+0+y185DgIHpX7ae3+z9ruYdWnjo2wg62la9Udigo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NVPnD5PsljAd5rFugXWDwTD5eHB/w8pM+ui4tWtxD8qP2lA1DzJ/drPWIJ0tAiBmlpjhL0MFwNqHBeABQ4yuNfoSwIbxh0iElAndOFqZDF2eWnmWslGk9BvdJJkfJFXJS14f9nKxUe4cq7hVvLW6/dsNoEqq4QjGS6/IZNVLZc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X8NOLukP; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745413557; x=1776949557;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Tl+0+y185DgIHpX7ae3+z9ruYdWnjo2wg62la9Udigo=;
-  b=X8NOLukP70fgQFLAmghDN552IKm7ipfpozHoid5lC5W12KSYpiMPIXG2
-   MNejRiny6Isv0tPOHrU3pwxXlQwbZSDDuGZHw3fgKsUblqRs/cvjaIQuV
-   gGHz69s0eXTHVpP57knKxlpx9ew7w4jlIXDkB4b1uLFSWo6oPn0K36qQo
-   LeU6lrayl+PlfkgqsRucV2hn0F5a3tR6SMf2/fm32HGWMtYdmggzvpMP4
-   OsqQwtEY2rSWp1G83gBidmlCUcA4iPTrkAwmFEmdRbEflRZaQcKKvhwFd
-   S6AEpKCUFnL7mo56FLMQeNh/PvmYdeanv2oKWSR3vRUCviVEeLG+EnOhY
-   w==;
-X-CSE-ConnectionGUID: QCxCGR5eR+yLELOfVnMckg==
-X-CSE-MsgGUID: VIa0NbGnRxyiJ9ox2O8PNg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11412"; a="46914903"
-X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
-   d="scan'208";a="46914903"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 06:05:51 -0700
-X-CSE-ConnectionGUID: uXSIB91ITSG/dEQvO9r4RQ==
-X-CSE-MsgGUID: HzAHN9adTmaDywAH/ernmA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
-   d="scan'208";a="132061302"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 06:05:46 -0700
-Message-ID: <596c7a44-797b-4a16-bd7e-0f0dc5c2e593@intel.com>
-Date: Wed, 23 Apr 2025 21:05:36 +0800
+	s=arc-20240116; t=1745415113; c=relaxed/simple;
+	bh=ZupkzBPR8cmfKoFIy/Bz3l8bmdRRaSXKHRNT/09jiaA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=f2S1EiRK3T7YjWsIrokLrDauLMEp2kyKhAEQ7d21xNZ0z9/Sg0vPw77CdZs35b6kHneezOuOwKcD0yLbGQkBbv/TUmlWIzIvTO7TbewXB2Y7mMMfJA7ZoaQ8AK5k+TdxErtGGq+tLFilE+8FhkxBltapkBYJO6MUKICIk3gGxEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Fxh3WNnX; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-22aa75e6653so55207315ad.0
+        for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 06:31:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1745415111; x=1746019911; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dh8ZI/jK90MDphrRP37d7PJMUfdcgQ0Lww2MM1+53M0=;
+        b=Fxh3WNnXPqarVhyToqq2/cNU1/cg2xw5HXnl/NZ93K3NB5KE4Btqpx7tM7B+yXCVGV
+         Wo61PRxF/JzS2W48xwzNm7p+c+Hz8jch0HKBBcolCbAQENh33pqBiYm/fFRctjbgm2kl
+         POAiHgoDJeoJZ1SCTtH+9DGbyblxMXeR2E+EECaIwFGFXc5EX64DPapy6f8NmOTyOV19
+         pgUyCICLw5bfg/6Dy3n7X+m+pXvN3VGQsnEQXNtYiSo34G+wHpu4+uktn2VmzWFnh6Oz
+         BK2wEBNMk1jQf2/n7HpW2Tu/PIcgwqKQ6mnj+zjGb+6crGnZoQxlshF0gP3LbfGXXNHz
+         YUNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745415111; x=1746019911;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=dh8ZI/jK90MDphrRP37d7PJMUfdcgQ0Lww2MM1+53M0=;
+        b=KbIn5rY6XaCDaGNwDLzphYsJtOPPT0mn8397f06ECWE+bIic10wAyCOiWs7WwqhonF
+         exPZWXPUxmQb3HtPb9NPtyWa1N3Wndg/zXsK6BNXXMiYG9KQVEHC6HHvu/lNhQ0HNRiP
+         tMSbbWF8G05eYv+XUde/vA0Fhfp2GFsnIi5VmHZ6WMr4ZbEaWErYPiZhETu9IIIV8GFP
+         w2gTmYfizVJaq5Q9I9tzXff0Jbkt6tPIDqfKWP/si87nqDCkLyKb/HLI+7NPKDLhBWy1
+         2IPzkpqyCj0GlH4Q0tDSEuQBTvmEpNqrJeQ2ffck0Q8B2e5DgNYSNSNQic4yelY94Dma
+         aVvw==
+X-Forwarded-Encrypted: i=1; AJvYcCVnrpBHYsmVKQg7rSrg0qLfgEIFoh/Eq8LsUUMTtPh8okY2aEHu0o19r2gkZmE/11WkZvM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzP38d73rd0zMVUEQII4d2+3scVW1Vz7KN7iGx0zdUDWAmNCsAl
+	zkQsc4RQSBYaWR+nU1Nz6eCdCyz/k0xsHHcG011FzQ/2/j4+WuBuw8Wz1emakA+qFRem1N9N976
+	/qQ==
+X-Google-Smtp-Source: AGHT+IGv+vxgd+76joaYvgrFepSB3A2pNuWp+RXvZableO5Alrip9cwuMbT40VIQBgiKgvaBAP7dq9sMMog=
+X-Received: from plsp11.prod.google.com ([2002:a17:902:bd0b:b0:220:c562:ede1])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ce8c:b0:224:160d:3f54
+ with SMTP id d9443c01a7336-22c535ad0f8mr290475345ad.31.1745415110755; Wed, 23
+ Apr 2025 06:31:50 -0700 (PDT)
+Date: Wed, 23 Apr 2025 06:31:49 -0700
+In-Reply-To: <CABQX2QMznYZiVm40Ligq+pFKmEkVpScW+zcKYbPpGgm0=S2Xkg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 01/10] i386/cpu: Mark CPUID[0x80000005] as reserved for
- Intel
-To: Zhao Liu <zhao1.liu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>
-Cc: Babu Moger <babu.moger@amd.com>, Ewan Hai <ewanhai-oc@zhaoxin.com>,
- Tejus GK <tejus.gk@nutanix.com>, Jason Zeng <jason.zeng@intel.com>,
- Manish Mishra <manish.mishra@nutanix.com>, Tao Su <tao1.su@intel.com>,
- qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <20250423114702.1529340-1-zhao1.liu@intel.com>
- <20250423114702.1529340-2-zhao1.liu@intel.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250423114702.1529340-2-zhao1.liu@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20250422161304.579394-1-zack.rusin@broadcom.com>
+ <20250422161304.579394-5-zack.rusin@broadcom.com> <a803c925-b682-490f-8cd9-ca8d4cc599aa@zytor.com>
+ <CABQX2QMznYZiVm40Ligq+pFKmEkVpScW+zcKYbPpGgm0=S2Xkg@mail.gmail.com>
+Message-ID: <aAjrOgsooR4RYIJr@google.com>
+Subject: Re: [PATCH v2 4/5] KVM: x86: Add support for legacy VMware backdoors
+ in nested setups
+From: Sean Christopherson <seanjc@google.com>
+To: Zack Rusin <zack.rusin@broadcom.com>
+Cc: Xin Li <xin@zytor.com>, linux-kernel@vger.kernel.org, 
+	Doug Covelli <doug.covelli@broadcom.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 4/23/2025 7:46 PM, Zhao Liu wrote:
-> Per SDM, 0x80000005 leaf is reserved for Intel CPU, and its current
-> "assert" check blocks adding new cache model for non-AMD CPUs.
-> 
-> Therefore, check the vendor and encode this leaf as all-0 for Intel
-> CPU. And since Zhaoxin mostly follows Intel behavior, apply the vendor
-> check for Zhaoxin as well.
-> 
-> Note, for !vendor_cpuid_only case, non-AMD CPU would get the wrong
-> information, i.e., get AMD's cache model for Intel or Zhaoxin CPUs.
-> For this case, there is no need to tweak for non-AMD CPUs, because
-> vendor_cpuid_only has been turned on by default since PC machine v6.1.
-> 
-> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-> ---
->   target/i386/cpu.c | 16 ++++++++++++++--
->   1 file changed, 14 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 1b64ceaaba46..8fdafa8aedaf 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -7248,11 +7248,23 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->           *edx = env->cpuid_model[(index - 0x80000002) * 4 + 3];
->           break;
->       case 0x80000005:
-> -        /* cache info (L1 cache) */
-> -        if (cpu->cache_info_passthrough) {
-> +        /*
-> +         * cache info (L1 cache)
-> +         *
-> +         * For !vendor_cpuid_only case, non-AMD CPU would get the wrong
-> +         * information, i.e., get AMD's cache model. It doesn't matter,
-> +         * vendor_cpuid_only has been turned on by default since
-> +         * PC machine v6.1.
-> +         */
+On Wed, Apr 23, 2025, Zack Rusin wrote:
+> On Wed, Apr 23, 2025 at 3:56=E2=80=AFAM Xin Li <xin@zytor.com> wrote:
+> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > > index 300cef9a37e2..5dc57bc57851 100644
+> > > --- a/arch/x86/kvm/x86.c
+> > > +++ b/arch/x86/kvm/x86.c
+> > > @@ -4653,6 +4653,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kv=
+m, long ext)
+> > >   #ifdef CONFIG_KVM_VMWARE
+> > >       case KVM_CAP_X86_VMWARE_BACKDOOR:
+> > >       case KVM_CAP_X86_VMWARE_HYPERCALL:
+> > > +     case KVM_CAP_X86_VMWARE_NESTED_BACKDOOR_L0:
 
-We need to define a new compat property for it other than 
-vendor_cpuid_only, for 10.1.
+I would probably omit the L0, because KVM could be running as L1.
 
-I proposed some change to leaf FEAT_8000_0001_EDX[1], and I was told by 
-Paolo (privately) that vendor_cpuid_only doesn't suffice.
+> > >   #endif
+> > >               r =3D 1;
+> > >               break;
+> > > @@ -6754,6 +6755,13 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+> > >               kvm->arch.vmware.hypercall_enabled =3D cap->args[0];
+> > >               r =3D 0;
+> > >               break;
+> > > +     case KVM_CAP_X86_VMWARE_NESTED_BACKDOOR_L0:
+> > > +             r =3D -EINVAL;
+> > > +             if (cap->args[0] & ~1)
+> >
+> > Replace ~1 with a macro for better readability please.
+>=20
+> Are you sure about that? This code is already used elsewhere in the
+> file  (for KVM_CAP_EXIT_ON_EMULATION_FAILURE) so, ignoring the fact
+> that it's arguable whether IS_ZERO_OR_ONE is more readable than & ~1,
+> if we use a macro for the vmware caps and not for
+> KVM_CAP_EXIT_ON_EMULATION_FAILURE then the code would be inconsistent
+> and that decreases the readability.
 
-  On Fri, Oct 11, 2024 at 6:22 PM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
-  >
-  > On 10/11/2024 11:30 PM, Paolo Bonzini wrote:
-  > > On Fri, Oct 11, 2024 at 4:55 PM Xiaoyao Li <xiaoyao.li@intel.com> 
-wrote:
-  > >>
-  > >> I think patch 8 is also a general issue> Without it, the
-  > >> CPUID_EXT2_AMD_ALIASES bits are exposed to Intel VMs which are
-  > >> reserved bits for Intel.
-  > >
-  > > Yes but you'd have to add compat properties for these. If you can do
-  > > it for TDX only, that's easier.
-  >
-  > Does vendor_cpuid_only suffice?
+Heh, KVM_CAP_EXIT_ON_EMULATION_FAILURE is the odd one out.  Even if that we=
+ren't
+the case, this is one of the situations where diverging from the existing c=
+ode is
+desirable, because the existing code is garbage.
 
-  Unfortunately not, because it is turned off only for <=6.0 machine
-  types. Here you'd have to turn it off for <=9.1 machine types.
-
-
-[1] 
-https://lore.kernel.org/qemu-devel/20240814075431.339209-9-xiaoyao.li@intel.com/
+arch/x86/kvm/x86.c:             if (cap->args[0] & ~kvm_caps.supported_quir=
+ks)
+arch/x86/kvm/x86.c:             if (cap->args[0] & ~KVM_X2APIC_API_VALID_FL=
+AGS)
+arch/x86/kvm/x86.c:             if (cap->args[0] & ~kvm_get_allowed_disable=
+_exits())
+arch/x86/kvm/x86.c:                 (cap->args[0] & ~KVM_X86_DISABLE_EXITS_=
+PAUSE))
+arch/x86/kvm/x86.c:             if (cap->args[0] & ~KVM_MSR_EXIT_REASON_VAL=
+ID_MASK)
+arch/x86/kvm/x86.c:             if (cap->args[0] & ~KVM_BUS_LOCK_DETECTION_=
+VALID_MODE)
+arch/x86/kvm/x86.c:             if (cap->args[0] & ~KVM_EXIT_HYPERCALL_VALI=
+D_MASK) {
+arch/x86/kvm/x86.c:             if (cap->args[0] & ~1)
+arch/x86/kvm/x86.c:             if (!enable_pmu || (cap->args[0] & ~KVM_CAP=
+_PMU_VALID_MASK))
+arch/x86/kvm/x86.c:             if ((u32)cap->args[0] & ~KVM_X86_NOTIFY_VME=
+XIT_VALID_BITS)
+virt/kvm/kvm_main.c:            if (cap->flags || (cap->args[0] & ~allowed_=
+options))
 
 
-> +        if (cpu->vendor_cpuid_only &&
-> +            (IS_INTEL_CPU(env) || IS_ZHAOXIN_CPU(env))) {
-> +            *eax = *ebx = *ecx = *edx = 0;
-> +            break;
-> +        } else if (cpu->cache_info_passthrough) {
->               x86_cpu_get_cache_cpuid(index, 0, eax, ebx, ecx, edx);
->               break;
->           }
-> +
->           *eax = (L1_DTLB_2M_ASSOC << 24) | (L1_DTLB_2M_ENTRIES << 16) |
->                  (L1_ITLB_2M_ASSOC <<  8) | (L1_ITLB_2M_ENTRIES);
->           *ebx = (L1_DTLB_4K_ASSOC << 24) | (L1_DTLB_4K_ENTRIES << 16) |
+> Or are you saying that since I'm already there you'd like to see a
+> completely separate patch that defines some kind of IS_ZERO_OR_ONE
+> macro for KVM, use it for KVM_CAP_EXIT_ON_EMULATION_FAILURE and, once
+> that lands then I can make use of it in this series?
 
+Xin is suggesting that you add a macro in arch/x86/include/uapi/asm/kvm.h t=
+o
+#define which bits are valid and which bits are reserved.
+
+At a glance, you can kill multiple birds with one stone.  Rather than add t=
+hree
+separate capabilities, add one capability and then a variety of flags.  E.g=
+.
+
+#define KVM_X86_VMWARE_HYPERCALL	_BITUL(0)
+#define KVM_X86_VMWARE_BACKDOOR		_BITUL(1)
+#define KVM_X86_VMWARE_NESTED_BACKDOOR	_BITUL(2)
+#define KVM_X86_VMWARE_VALID_FLAGS	(KVM_X86_VMWARE_HYPERCALL |
+					 KVM_X86_VMWARE_BACKDOOR |
+					 KVM_X86_VMWARE_NESTED_BACKDOOR)
+
+	case KVM_CAP_X86_VMWARE_EMULATION:
+		r =3D -EINVAL;
+		if (cap->args[0] & ~KVM_X86_VMWARE_VALID_FLAGS)
+			break;
+
+		mutex_lock(&kvm->lock);
+		if (!kvm->created_vcpus) {
+			if (cap->args[0] & KVM_X86_VMWARE_HYPERCALL)
+				kvm->arch.vmware.hypercall_enabled =3D true;
+			if (cap->args[0] & KVM_X86_VMWARE_BACKDOOR)
+				kvm->arch.vmware.backdoor_enabled;
+			if (cap->args[0] & KVM_X86_VMWARE_NESTED_BACKDOOR)
+				kvm->arch.vmware.nested_backdoor_enabled =3D true;
+			r =3D 0;
+		}
+		mutex_unlock(&kvm->lock);
+		break;
+
+That approach wouldn't let userspace disable previously enabled VMware capa=
+bilities,
+but unless there's a use case for doing so, that should be a non-issue.
 
