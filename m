@@ -1,161 +1,167 @@
-Return-Path: <kvm+bounces-43932-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43933-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87490A98949
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 14:11:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C816DA98A7A
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 15:07:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82C7C1B61A43
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 12:12:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A15C13AEA4F
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 13:06:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2506D218AD1;
-	Wed, 23 Apr 2025 12:11:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2B0014F125;
+	Wed, 23 Apr 2025 13:05:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RA/IakGU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X8NOLukP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A460214238;
-	Wed, 23 Apr 2025 12:11:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE5738DF9
+	for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 13:05:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745410294; cv=none; b=llFNTFFFxB+rCEjG7eU03FDUcLfenujYoWN2VgK9vTv9YRay/xiSsFZ7+Ansjx38y0olOEsrnu6C4m3cXIUKgF1YOHP2OlPhRMTDICbRdorfQy+6yV4o0j1ZDMkNFWSbhw2mKrqAMJz42+P3Ki/UnqWLFdrEXlMoGdAySuRr2Do=
+	t=1745413558; cv=none; b=qN77x9biPoT9gMwacewbU2LfJ52NyJbLTnQRCsng9Frn/XV+DjAVB0tvgVFOktVqlCwGiRKuRySEsVopYQEGPUBizxIueEnecMjkaR65Bio0JD9hh9BtwVqw4lc6ugNMdlP4mMhXqsawFoqR/tmf1LyJlg2YE2567akuHkNQS9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745410294; c=relaxed/simple;
-	bh=yQ1UlwAJJHcI/OsM/WOjpj6zZr5R1RBZAV3ItX0DC38=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=N+E4GB91T/PomlOsrtzww4SOOq7Zh+32cIITrX7auNyPgx3VWMQd6GYhf88pk66DC7O6KQL2f3BgDMlwtgiWg+iGR/CkcLJouaI3KU0Yr4hwWR7dgUMLUPLAuhJjFwxsn8p8O9KXQx42mCInMnJpPxWF1x1e31l0xGWspatb6CI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RA/IakGU; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-39ee5a5bb66so4518732f8f.3;
-        Wed, 23 Apr 2025 05:11:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745410291; x=1746015091; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=X3ENo7G6TW6MBK7yQ4g9B813KgFySi5deAa4vwegzbo=;
-        b=RA/IakGUAE314HKgCxzSRavMmLjLVqVOywIwiiM6mYBNWaips1FG7WGC4DmitIqk6X
-         +BmqpAeMPYNFpmxVMBalFTt2Ozli1SavYqeyDEuElNPxrkXU5pEXedbD5xZk8yKs5VZw
-         rYUKkc/OA04td/Ok9a/0WapdC98OQkXlRM39KdI3Q+41k1LFCIQPmJNPutQD80WPI/Dw
-         MeQPrRTHh5hbcOWmuGp+ENR0xiq2uQqHiMWVL1Lf0Y67JgXUJU4S/fS1Yr/BQcZ6Vrb3
-         boB+Lia+UztsUdY9kpe/16SWLPk2f9LHD43qNtWko5o3IAoEVzHXjEXr+77RA/LhFnOG
-         /Yug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745410291; x=1746015091;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X3ENo7G6TW6MBK7yQ4g9B813KgFySi5deAa4vwegzbo=;
-        b=i95qrxRgoro0W0QeSGXiFeecNWLObRKTRG0N9wL5fVmRQZafPHD5ke/o3/jRDmFUNU
-         t9+Q/ce3DpclvVedzhL7Y8MHwTWFmZ5jLSnjbyEZKBBO+T/vi6taybTwc+jZZKNJvS/k
-         vXcF7ZuPKPjXeK0t1WjXU9xo6eTHsmGfZdOnTdOLW5zR31U5PKYfcNFT5Zp4JMSWY237
-         VE6XvXDQLIir3YDj1jc4PjADOopvmdNrAw7efJSei6llViQRu/wkbyIK1/e8Aasf4loh
-         tDcWKJaXMmxzfSqo5jBG464clnV8ujfAa7tgScc4ra7ynZntiS2MLc0wK3Da/NMt8v/4
-         1P5A==
-X-Forwarded-Encrypted: i=1; AJvYcCUE340jGHA5GeRGg2oc0Zk281QF4cfMEy8mJn4ngPSH9iW5bpyelbbM8eUR7FJIs1SHRpyW9yY/mt6VSc8vk6gk@vger.kernel.org, AJvYcCVhuygUCvyYhYt/IfW+CFJYhyGEJVftx7feUiqtqdB06kjyDPGTNkTEIIKPYZyeQe5siKXQ45h1Bc5iGWTA@vger.kernel.org, AJvYcCW2fMJOPO3fE+RyxLSpTpgJNylKfsGWbJdWl/sg86ML5gyRkxxFBRZnddLjklpFQ2ipxQSB@vger.kernel.org, AJvYcCXsPhFy+CwsWSs1veMVV5EXOn3CFu34ykI9kMm+DVl7sYMJtb42ZooyTOuGCRPV3nuDl+O/KD2rzw8p@vger.kernel.org, AJvYcCXu9dzhluoAmOl+jAwrRC9w3QBnUbR1J/yMZ6dBh7yVjMdrl47N3N/xKqG6y+sY5jpdC9vDMU9b8A==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1FUndCMvTWT3jAV3mB00v6KyV5sZcL2kG6FkdqcH0501HafHs
-	ooNVW4Ogw3xuaEupW1BacGN187BmufxDj1LBUbF9uHlnqYen1eJC
-X-Gm-Gg: ASbGncswlP4cMEFKAtNyGi4PAp5ecOLypw2x7vwYaOUAW/VsXHr1O2N30HiDI2TUfBQ
-	+mDLE56i6QTBdAdmh2WbFZCyR6/6JnuwGGiExTZj0ji6sFa3NWdTQ11zuw4MutVgk9ksfpAJwLI
-	2iOfeWlzwvK0BORsuITkZ+EZbJKqX9FniT91Pxn+hoAnVkFambsrI2eJ4SFLv7B3cYAf5huFcOM
-	pAFwBNqUAXKjXMMq3SViE+JabCmA26FESnNtZF94EPLs2NnxMwcU/STNebdp9EgVgogoGeFYt2k
-	tPaxrLLbFdUN+jh9ENVlFLTsUairbsxHDyauiOm2EDbzTFJKaCfZHU0v3w==
-X-Google-Smtp-Source: AGHT+IFZ8D9fn99GBdz1k+wnK9Zxq4FNrQ2P/nZKAH6ZFy9CpCQ91xB95fWpKA6Gc9C9vj8lWI9UZw==
-X-Received: by 2002:a5d:6da6:0:b0:391:2f2f:818 with SMTP id ffacd0b85a97d-39efba2619bmr16139209f8f.9.1745410290643;
-        Wed, 23 Apr 2025 05:11:30 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:80e4:de9:c3ea:a346])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39efa4207c5sm18334945f8f.6.2025.04.23.05.11.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 05:11:30 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org,  linux-kernel@vger.kernel.org,
-  linux-doc@vger.kernel.org,  io-uring@vger.kernel.org,
-  virtualization@lists.linux.dev,  kvm@vger.kernel.org,
-  linux-kselftest@vger.kernel.org,  Jakub Kicinski <kuba@kernel.org>,
-  "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
- <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Simon Horman
- <horms@kernel.org>,  Jonathan Corbet <corbet@lwn.net>,  Andrew Lunn
- <andrew+netdev@lunn.ch>,  Jeroen de Borst <jeroendb@google.com>,
-  Harshitha Ramamurthy <hramamurthy@google.com>,  Kuniyuki Iwashima
- <kuniyu@amazon.com>,  Willem de Bruijn <willemb@google.com>,  Jens Axboe
- <axboe@kernel.dk>,  Pavel Begunkov <asml.silence@gmail.com>,  David Ahern
- <dsahern@kernel.org>,  Neal Cardwell <ncardwell@google.com>,  Stefan
- Hajnoczi <stefanha@redhat.com>,  Stefano Garzarella <sgarzare@redhat.com>,
-  "Michael S. Tsirkin" <mst@redhat.com>,  Jason Wang <jasowang@redhat.com>,
-  Xuan Zhuo <xuanzhuo@linux.alibaba.com>,  =?utf-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>,  Shuah Khan <shuah@kernel.org>,  sdf@fomichev.me,
-  dw@davidwei.uk,  Jamal Hadi Salim <jhs@mojatatu.com>,  Victor Nogueira
- <victor@mojatatu.com>,  Pedro Tammela <pctammela@mojatatu.com>,  Samiullah
- Khawaja <skhawaja@google.com>
-Subject: Re: [PATCH net-next v10 3/9] net: devmem: TCP tx netlink api
-In-Reply-To: <20250423031117.907681-4-almasrymina@google.com> (Mina Almasry's
-	message of "Wed, 23 Apr 2025 03:11:10 +0000")
-Date: Wed, 23 Apr 2025 10:55:53 +0100
-Message-ID: <m2y0vrtd5i.fsf@gmail.com>
-References: <20250423031117.907681-1-almasrymina@google.com>
-	<20250423031117.907681-4-almasrymina@google.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1745413558; c=relaxed/simple;
+	bh=Tl+0+y185DgIHpX7ae3+z9ruYdWnjo2wg62la9Udigo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NVPnD5PsljAd5rFugXWDwTD5eHB/w8pM+ui4tWtxD8qP2lA1DzJ/drPWIJ0tAiBmlpjhL0MFwNqHBeABQ4yuNfoSwIbxh0iElAndOFqZDF2eWnmWslGk9BvdJJkfJFXJS14f9nKxUe4cq7hVvLW6/dsNoEqq4QjGS6/IZNVLZc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X8NOLukP; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1745413557; x=1776949557;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Tl+0+y185DgIHpX7ae3+z9ruYdWnjo2wg62la9Udigo=;
+  b=X8NOLukP70fgQFLAmghDN552IKm7ipfpozHoid5lC5W12KSYpiMPIXG2
+   MNejRiny6Isv0tPOHrU3pwxXlQwbZSDDuGZHw3fgKsUblqRs/cvjaIQuV
+   gGHz69s0eXTHVpP57knKxlpx9ew7w4jlIXDkB4b1uLFSWo6oPn0K36qQo
+   LeU6lrayl+PlfkgqsRucV2hn0F5a3tR6SMf2/fm32HGWMtYdmggzvpMP4
+   OsqQwtEY2rSWp1G83gBidmlCUcA4iPTrkAwmFEmdRbEflRZaQcKKvhwFd
+   S6AEpKCUFnL7mo56FLMQeNh/PvmYdeanv2oKWSR3vRUCviVEeLG+EnOhY
+   w==;
+X-CSE-ConnectionGUID: QCxCGR5eR+yLELOfVnMckg==
+X-CSE-MsgGUID: VIa0NbGnRxyiJ9ox2O8PNg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11412"; a="46914903"
+X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
+   d="scan'208";a="46914903"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 06:05:51 -0700
+X-CSE-ConnectionGUID: uXSIB91ITSG/dEQvO9r4RQ==
+X-CSE-MsgGUID: HzAHN9adTmaDywAH/ernmA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
+   d="scan'208";a="132061302"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 06:05:46 -0700
+Message-ID: <596c7a44-797b-4a16-bd7e-0f0dc5c2e593@intel.com>
+Date: Wed, 23 Apr 2025 21:05:36 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 01/10] i386/cpu: Mark CPUID[0x80000005] as reserved for
+ Intel
+To: Zhao Liu <zhao1.liu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>,
+ =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>
+Cc: Babu Moger <babu.moger@amd.com>, Ewan Hai <ewanhai-oc@zhaoxin.com>,
+ Tejus GK <tejus.gk@nutanix.com>, Jason Zeng <jason.zeng@intel.com>,
+ Manish Mishra <manish.mishra@nutanix.com>, Tao Su <tao1.su@intel.com>,
+ qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20250423114702.1529340-1-zhao1.liu@intel.com>
+ <20250423114702.1529340-2-zhao1.liu@intel.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20250423114702.1529340-2-zhao1.liu@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Mina Almasry <almasrymina@google.com> writes:
-
-> From: Stanislav Fomichev <sdf@fomichev.me>
->
-> Add bind-tx netlink call to attach dmabuf for TX; queue is not
-> required, only ifindex and dmabuf fd for attachment.
->
-> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
->
+On 4/23/2025 7:46 PM, Zhao Liu wrote:
+> Per SDM, 0x80000005 leaf is reserved for Intel CPU, and its current
+> "assert" check blocks adding new cache model for non-AMD CPUs.
+> 
+> Therefore, check the vendor and encode this leaf as all-0 for Intel
+> CPU. And since Zhaoxin mostly follows Intel behavior, apply the vendor
+> check for Zhaoxin as well.
+> 
+> Note, for !vendor_cpuid_only case, non-AMD CPU would get the wrong
+> information, i.e., get AMD's cache model for Intel or Zhaoxin CPUs.
+> For this case, there is no need to tweak for non-AMD CPUs, because
+> vendor_cpuid_only has been turned on by default since PC machine v6.1.
+> 
+> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 > ---
->
-> v3:
-> - Fix ynl-regen.sh error (Simon).
->
-> ---
->  Documentation/netlink/specs/netdev.yaml | 12 ++++++++++++
->  include/uapi/linux/netdev.h             |  1 +
->  net/core/netdev-genl-gen.c              | 13 +++++++++++++
->  net/core/netdev-genl-gen.h              |  1 +
->  net/core/netdev-genl.c                  |  6 ++++++
->  tools/include/uapi/linux/netdev.h       |  1 +
->  6 files changed, 34 insertions(+)
->
-> diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-> index f5e0750ab71db..c0ef6d0d77865 100644
-> --- a/Documentation/netlink/specs/netdev.yaml
-> +++ b/Documentation/netlink/specs/netdev.yaml
-> @@ -743,6 +743,18 @@ operations:
->              - defer-hard-irqs
->              - gro-flush-timeout
->              - irq-suspend-timeout
-> +    -
-> +      name: bind-tx
-> +      doc: Bind dmabuf to netdev for TX
+>   target/i386/cpu.c | 16 ++++++++++++++--
+>   1 file changed, 14 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 1b64ceaaba46..8fdafa8aedaf 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -7248,11 +7248,23 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>           *edx = env->cpuid_model[(index - 0x80000002) * 4 + 3];
+>           break;
+>       case 0x80000005:
+> -        /* cache info (L1 cache) */
+> -        if (cpu->cache_info_passthrough) {
+> +        /*
+> +         * cache info (L1 cache)
+> +         *
+> +         * For !vendor_cpuid_only case, non-AMD CPU would get the wrong
+> +         * information, i.e., get AMD's cache model. It doesn't matter,
+> +         * vendor_cpuid_only has been turned on by default since
+> +         * PC machine v6.1.
+> +         */
 
-nit: maybe add "for RX" to the bind-rx doc.
+We need to define a new compat property for it other than 
+vendor_cpuid_only, for 10.1.
 
-> +      attribute-set: dmabuf
+I proposed some change to leaf FEAT_8000_0001_EDX[1], and I was told by 
+Paolo (privately) that vendor_cpuid_only doesn't suffice.
 
-The bind-rx op has "flags: [ admin-perm ]", should bind-tx also?
+  On Fri, Oct 11, 2024 at 6:22 PM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+  >
+  > On 10/11/2024 11:30 PM, Paolo Bonzini wrote:
+  > > On Fri, Oct 11, 2024 at 4:55 PM Xiaoyao Li <xiaoyao.li@intel.com> 
+wrote:
+  > >>
+  > >> I think patch 8 is also a general issue> Without it, the
+  > >> CPUID_EXT2_AMD_ALIASES bits are exposed to Intel VMs which are
+  > >> reserved bits for Intel.
+  > >
+  > > Yes but you'd have to add compat properties for these. If you can do
+  > > it for TDX only, that's easier.
+  >
+  > Does vendor_cpuid_only suffice?
 
-> +      do:
-> +        request:
-> +          attributes:
-> +            - ifindex
-> +            - fd
-> +        reply:
-> +          attributes:
-> +            - id
+  Unfortunately not, because it is turned off only for <=6.0 machine
+  types. Here you'd have to turn it off for <=9.1 machine types.
+
+
+[1] 
+https://lore.kernel.org/qemu-devel/20240814075431.339209-9-xiaoyao.li@intel.com/
+
+
+> +        if (cpu->vendor_cpuid_only &&
+> +            (IS_INTEL_CPU(env) || IS_ZHAOXIN_CPU(env))) {
+> +            *eax = *ebx = *ecx = *edx = 0;
+> +            break;
+> +        } else if (cpu->cache_info_passthrough) {
+>               x86_cpu_get_cache_cpuid(index, 0, eax, ebx, ecx, edx);
+>               break;
+>           }
+> +
+>           *eax = (L1_DTLB_2M_ASSOC << 24) | (L1_DTLB_2M_ENTRIES << 16) |
+>                  (L1_ITLB_2M_ASSOC <<  8) | (L1_ITLB_2M_ENTRIES);
+>           *ebx = (L1_DTLB_4K_ASSOC << 24) | (L1_DTLB_4K_ENTRIES << 16) |
+
 
