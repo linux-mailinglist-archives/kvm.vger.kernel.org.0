@@ -1,419 +1,154 @@
-Return-Path: <kvm+bounces-44015-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44016-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9393DA99994
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 22:44:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 751BCA999E7
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 23:07:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6507462B54
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 20:43:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 105F31798C7
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 21:07:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DC8427935F;
-	Wed, 23 Apr 2025 20:43:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEB2D1F237A;
+	Wed, 23 Apr 2025 21:07:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X7q0UEC5"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="GNOR0nNI"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E111269AF9;
-	Wed, 23 Apr 2025 20:43:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 653FC82D98;
+	Wed, 23 Apr 2025 21:06:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745441018; cv=none; b=YI4v1u7uxxuCi0O2FGVH8kptSUkWgBqPIQkCuWXtrv5k7gCgEadFr5j9/r2TQuHLjdacnXcaDC8OdSUeAuAzlklBvIAZd97qBeF+PK6atwyxAErkyFePRa4TUqXebBt55b49iS2TtLF1WGhSmrlu7M2cd/O9bSE1W6etjktUz8I=
+	t=1745442422; cv=none; b=cFuEQtoOBiT2woL83zhTJrJLaNPBieH7r3QHlB+3bk2HBpEH3Z+A97qimilHRgjFCV2g3Vg1kHHXJggNjAqLcSk+6v1e9+cSoCivhBoOqdWQUtKS7qTHYxzuedRm2/Qr0jsH5Osb9PJ505t8g0j/56mDYKDZbEPHdvaQdn3ofl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745441018; c=relaxed/simple;
-	bh=HrL/5UsnsNjf51o3+tYUbdc3ePvfKmSpex/M7qcCV0w=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=mYQ+lUNLPOlyO/mrl2q2h/FMOt+CtzKKGjj+mKLk8Hb+Kw4mK7ots6vjSyjxBnukAzRMCDFqczaySnNhPqCJQ9zzALzUAdEjRtCUcipw+9WGQ5xEFZFZ7orNX92zAnAjAclpO04B0sBFc2JiYWlSuM7axusZtmVGTIxXX3nNReE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X7q0UEC5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFDB3C4CEE2;
-	Wed, 23 Apr 2025 20:43:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745441018;
-	bh=HrL/5UsnsNjf51o3+tYUbdc3ePvfKmSpex/M7qcCV0w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=X7q0UEC57iIo8snpOnLNlXN2Q8guqDBQihA1ZEnGi9CsJ1GW4aa5UnCTDVmZZOGnv
-	 HurnvhwOpPkFSXdCCw93hrOwP/VrN5Dl3kaXHqj9XDdpH3Tr5OvrEEON9/DKSqWI3M
-	 0DbDHac6N49q2CLjEYJz6MI01csZCjFN1J34BSQxgS8S6CmtLSfx72rfvVifqlb3xB
-	 37r4x/JIeZkgbEj1ba4pKNQzlgdT8VeUeZHr4KWJPhTIzsU0pfBJhzadEx4WzK5Poc
-	 kCBJJ+rojfIYLjaFV29WLZ9meddmlm5tuazz7CXtrhgRL2IqNWoGD3vljjYDlBhdmC
-	 NHh+5lurYvUyw==
-Date: Wed, 23 Apr 2025 15:43:36 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: Bjorn Helgaas <bhelgaas@google.com>, Arnd Bergmann <arnd@arndb.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-scsi@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] [v2] PCI: add CONFIG_MMU dependency
-Message-ID: <20250423204336.GA452880@bhelgaas>
+	s=arc-20240116; t=1745442422; c=relaxed/simple;
+	bh=zjf+eXgupeic2NaH/eGimc8iMxf81f1qq6U1j6+oTT8=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=TsDpEHzJmTI8YtmLHxiY7z1bYaXKugXj2yc5HWthfvMUoY9PzJNgbw1WtVSDcMPrBtFjA1cuDXz5mQpzHj3v2aj6KmGY8Y3ZTo+Pw6DM2E9HCO/sNNVfpzsFpJAoyikjahRQwD5hQRg22L2xeR6kAk6b0nQ+CEANu1+JsJB+2QA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=GNOR0nNI; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1u7hIm-007XIA-I3; Wed, 23 Apr 2025 23:06:40 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
+	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
+	bh=phjtsSuA7wXOgFfhHsYA1FEf7UdFgY655or67qmY9Pc=; b=GNOR0nNIQ2FiqFC/eDoT+vExNp
+	FsA5Grmx2TCUGJL8W5swIWk3n+rQcFlHyUj+jRkGnPvFlG8SRGUrVWDH7hhmQoSawrRMQUd072214
+	3zXaGoAQLjhFwQPl2Yi09ZjgWRFJ8F3N/FiCeudMXnL8j2xg0ryh0ygxH1BFtXAzLXq33hfAZwvC/
+	Jy6uEwHGYXzHSFZEmeeu2cCjqofuDA/9x755HtfqjaePb8ROXUuNfbf1rvgZUj/3QMJ16cE8sHx//
+	yi5jSHeB9GKveUUATGbvSqrrR+aQnPNiXQ1SIYx6NxBXLZcSS5Af3YMFa6GzVbQhyBu4srwIV9b2y
+	HG/ZA6CQ==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1u7hIl-0006FL-Eq; Wed, 23 Apr 2025 23:06:39 +0200
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1u7hIh-000BZQ-4r; Wed, 23 Apr 2025 23:06:35 +0200
+Message-ID: <ee09df9b-9804-49de-b43b-99ccd4cbe742@rbox.co>
+Date: Wed, 23 Apr 2025 23:06:33 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250423202215.3315550-1-arnd@kernel.org>
+User-Agent: Mozilla Thunderbird
+From: Michal Luczaj <mhal@rbox.co>
+Subject: Re: [PATCH net-next v2 1/3] vsock: Linger on unsent data
+To: Stefano Garzarella <sgarzare@redhat.com>,
+ Luigi Leonardi <leonardi@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20250421-vsock-linger-v2-0-fe9febd64668@rbox.co>
+ <20250421-vsock-linger-v2-1-fe9febd64668@rbox.co>
+ <km2nad6hkdi3ngtho2xexyhhosh4aq37scir2hgxkcfiwes2wd@5dyliiq7cpuh>
+ <k47d2h7dwn26eti2p6nv2fupuybabvbexwinvxv7jnfbn6o3ep@cqtbaqlqyfrq>
+Content-Language: pl-PL, en-GB
+In-Reply-To: <k47d2h7dwn26eti2p6nv2fupuybabvbexwinvxv7jnfbn6o3ep@cqtbaqlqyfrq>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 23, 2025 at 10:16:32PM +0200, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
+On 4/23/25 18:34, Stefano Garzarella wrote:
+> On Wed, Apr 23, 2025 at 05:53:12PM +0200, Luigi Leonardi wrote:
+>> Hi Michal,
+>>
+>> On Mon, Apr 21, 2025 at 11:50:41PM +0200, Michal Luczaj wrote:
+>>> Currently vsock's lingering effectively boils down to waiting (or timing
+>>> out) until packets are consumed or dropped by the peer; be it by receiving
+>>> the data, closing or shutting down the connection.
+>>>
+>>> To align with the semantics described in the SO_LINGER section of man
+>>> socket(7) and to mimic AF_INET's behaviour more closely, change the logic
+>>> of a lingering close(): instead of waiting for all data to be handled,
+>>> block until data is considered sent from the vsock's transport point of
+>>> view. That is until worker picks the packets for processing and decrements
+>>> virtio_vsock_sock::bytes_unsent down to 0.
+>>>
+>>> Note that such lingering is limited to transports that actually implement
+>>> vsock_transport::unsent_bytes() callback. This excludes Hyper-V and VMCI,
+>>> under which no lingering would be observed.
+>>>
+>>> The implementation does not adhere strictly to man page's interpretation of
+>>> SO_LINGER: shutdown() will not trigger the lingering. This follows AF_INET.
+>>>
+>>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>>> ---
+>>> net/vmw_vsock/virtio_transport_common.c | 13 +++++++++++--
+>>> 1 file changed, 11 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>>> index 7f7de6d8809655fe522749fbbc9025df71f071bd..aeb7f3794f7cfc251dde878cb44fdcc54814c89c 100644
+>>> --- a/net/vmw_vsock/virtio_transport_common.c
+>>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>>> @@ -1196,12 +1196,21 @@ static void virtio_transport_wait_close(struct sock *sk, long timeout)
+>>> {
+>>> 	if (timeout) {
+>>> 		DEFINE_WAIT_FUNC(wait, woken_wake_function);
+>>> +		ssize_t (*unsent)(struct vsock_sock *vsk);
+>>> +		struct vsock_sock *vsk = vsock_sk(sk);
+>>> +
+>>> +		/* Some transports (Hyper-V, VMCI) do not implement
+>>> +		 * unsent_bytes. For those, no lingering on close().
+>>> +		 */
+>>> +		unsent = vsk->transport->unsent_bytes;
+>>> +		if (!unsent)
+>>> +			return;
+>>
+>> IIUC if `unsent_bytes` is not implemented, virtio_transport_wait_close 
+>> basically does nothing. My concern is that we are breaking the 
+>> userspace due to a change in the behavior: Before this patch, with a 
+>> vmci/hyper-v transport, this function would wait for SOCK_DONE to be 
+>> set, but not anymore.
 > 
-> It turns out that there are no platforms that have PCI but don't have an MMU,
-> so adding a Kconfig dependency on CONFIG_PCI simplifies build testing kernels
-> for those platforms a lot, and avoids a lot of inadvertent build regressions.
+> Wait, we are in virtio_transport_common.c, why we are talking about 
+> Hyper-V and VMCI?
 > 
-> Add a dependency for CONFIG_PCI and remove all the ones for PCI specific
-> device drivers that are currently marked not having it.
-> 
-> There are a few platforms that have an optional MMU, but they usually cannot
-> have PCI at all. The one exception is Coldfire MCF54xx, but this is mainly
-> for historic reasons, and anyone using those chips should really use the
-> MMU these days.
-> 
-> Link: https://lore.kernel.org/lkml/a41f1b20-a76c-43d8-8c36-f12744327a54@app.fastmail.com/
-> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com> # SCSI
-> Acked-by: Alex Deucher <alexander.deucher@amd.com>
-> Reviewed-by: Thomas Zimmermann <tzimmermann@suse.de>
-> Cc: Bjorn Helgaas <bhelgaas@google.com>
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
-> v2: update changelog text
-> 
-> Bjorn, can you take this through the PCI tree? I thought about splitting
-> it up by subsystem, but it's really one thing that I'm doing here, and
-> doing it in one bit makes more sense to me.
+> I asked to check `vsk->transport->unsent_bytes` in the v1, because this 
+> code was part of af_vsock.c, but now we are back to virtio code, so I'm 
+> confused...
 
-Applied to pci/misc for v6.16, thanks!
+Might your confusion be because of similar names?
+vsock_transport::unsent_bytes != virtio_vsock_sock::bytes_unsent
 
-The PCI tree is based on -rc1, so there were a few minor merge
-conflicts, but they're obvious.
+I agree with Luigi, it is a breaking change for userspace depending on a
+non-standard behaviour. What's the protocol here; do it anyway, then see if
+anyone complains?
 
-> ---
->  drivers/accel/qaic/Kconfig              | 1 -
->  drivers/firewire/Kconfig                | 2 +-
->  drivers/gpu/drm/Kconfig                 | 2 +-
->  drivers/gpu/drm/amd/amdgpu/Kconfig      | 3 +--
->  drivers/gpu/drm/ast/Kconfig             | 2 +-
->  drivers/gpu/drm/gma500/Kconfig          | 2 +-
->  drivers/gpu/drm/hisilicon/hibmc/Kconfig | 1 -
->  drivers/gpu/drm/loongson/Kconfig        | 2 +-
->  drivers/gpu/drm/mgag200/Kconfig         | 2 +-
->  drivers/gpu/drm/nouveau/Kconfig         | 3 +--
->  drivers/gpu/drm/qxl/Kconfig             | 2 +-
->  drivers/gpu/drm/radeon/Kconfig          | 2 +-
->  drivers/gpu/drm/tiny/Kconfig            | 2 +-
->  drivers/gpu/drm/vmwgfx/Kconfig          | 2 +-
->  drivers/gpu/drm/xe/Kconfig              | 2 +-
->  drivers/net/ethernet/broadcom/Kconfig   | 1 -
->  drivers/pci/Kconfig                     | 1 +
->  drivers/pci/pci.c                       | 4 ++--
->  drivers/scsi/bnx2fc/Kconfig             | 1 -
->  drivers/scsi/bnx2i/Kconfig              | 1 -
->  drivers/vfio/pci/Kconfig                | 2 +-
->  21 files changed, 17 insertions(+), 23 deletions(-)
-> 
-> diff --git a/drivers/accel/qaic/Kconfig b/drivers/accel/qaic/Kconfig
-> index a9f866230058..5e405a19c157 100644
-> --- a/drivers/accel/qaic/Kconfig
-> +++ b/drivers/accel/qaic/Kconfig
-> @@ -8,7 +8,6 @@ config DRM_ACCEL_QAIC
->  	depends on DRM_ACCEL
->  	depends on PCI && HAS_IOMEM
->  	depends on MHI_BUS
-> -	depends on MMU
->  	select CRC32
->  	help
->  	  Enables driver for Qualcomm's Cloud AI accelerator PCIe cards that are
-> diff --git a/drivers/firewire/Kconfig b/drivers/firewire/Kconfig
-> index 905c82e26ce7..a5f5e250223a 100644
-> --- a/drivers/firewire/Kconfig
-> +++ b/drivers/firewire/Kconfig
-> @@ -83,7 +83,7 @@ config FIREWIRE_KUNIT_SELF_ID_SEQUENCE_HELPER_TEST
->  
->  config FIREWIRE_OHCI
->  	tristate "OHCI-1394 controllers"
-> -	depends on PCI && FIREWIRE && MMU
-> +	depends on PCI && FIREWIRE
->  	help
->  	  Enable this driver if you have a FireWire controller based
->  	  on the OHCI specification.  For all practical purposes, this
-> diff --git a/drivers/gpu/drm/Kconfig b/drivers/gpu/drm/Kconfig
-> index 89d00265d578..831bd384f1fd 100644
-> --- a/drivers/gpu/drm/Kconfig
-> +++ b/drivers/gpu/drm/Kconfig
-> @@ -393,7 +393,7 @@ source "drivers/gpu/drm/imagination/Kconfig"
->  
->  config DRM_HYPERV
->  	tristate "DRM Support for Hyper-V synthetic video device"
-> -	depends on DRM && PCI && MMU && HYPERV
-> +	depends on DRM && PCI && HYPERV
->  	select DRM_CLIENT_SELECTION
->  	select DRM_KMS_HELPER
->  	select DRM_GEM_SHMEM_HELPER
-> diff --git a/drivers/gpu/drm/amd/amdgpu/Kconfig b/drivers/gpu/drm/amd/amdgpu/Kconfig
-> index 7b95221d2f3d..64e603f971b8 100644
-> --- a/drivers/gpu/drm/amd/amdgpu/Kconfig
-> +++ b/drivers/gpu/drm/amd/amdgpu/Kconfig
-> @@ -2,7 +2,7 @@
->  
->  config DRM_AMDGPU
->  	tristate "AMD GPU"
-> -	depends on DRM && PCI && MMU
-> +	depends on DRM && PCI
->  	depends on !UML
->  	select FW_LOADER
->  	select DRM_CLIENT
-> @@ -68,7 +68,6 @@ config DRM_AMDGPU_CIK
->  config DRM_AMDGPU_USERPTR
->  	bool "Always enable userptr write support"
->  	depends on DRM_AMDGPU
-> -	depends on MMU
->  	select HMM_MIRROR
->  	select MMU_NOTIFIER
->  	help
-> diff --git a/drivers/gpu/drm/ast/Kconfig b/drivers/gpu/drm/ast/Kconfig
-> index da0663542e8a..242fbccdf844 100644
-> --- a/drivers/gpu/drm/ast/Kconfig
-> +++ b/drivers/gpu/drm/ast/Kconfig
-> @@ -1,7 +1,7 @@
->  # SPDX-License-Identifier: GPL-2.0-only
->  config DRM_AST
->  	tristate "AST server chips"
-> -	depends on DRM && PCI && MMU
-> +	depends on DRM && PCI
->  	select DRM_CLIENT_SELECTION
->  	select DRM_GEM_SHMEM_HELPER
->  	select DRM_KMS_HELPER
-> diff --git a/drivers/gpu/drm/gma500/Kconfig b/drivers/gpu/drm/gma500/Kconfig
-> index 1613e51eff2d..e4c80e1a6da5 100644
-> --- a/drivers/gpu/drm/gma500/Kconfig
-> +++ b/drivers/gpu/drm/gma500/Kconfig
-> @@ -1,7 +1,7 @@
->  # SPDX-License-Identifier: GPL-2.0-only
->  config DRM_GMA500
->  	tristate "Intel GMA500/600/3600/3650 KMS Framebuffer"
-> -	depends on DRM && PCI && X86 && MMU && HAS_IOPORT
-> +	depends on DRM && PCI && X86 && HAS_IOPORT
->  	select DRM_CLIENT_SELECTION
->  	depends on ACPI_VIDEO || !ACPI
->  	depends on I2C
-> diff --git a/drivers/gpu/drm/hisilicon/hibmc/Kconfig b/drivers/gpu/drm/hisilicon/hibmc/Kconfig
-> index 98d77d74999d..d1f3f5793f34 100644
-> --- a/drivers/gpu/drm/hisilicon/hibmc/Kconfig
-> +++ b/drivers/gpu/drm/hisilicon/hibmc/Kconfig
-> @@ -2,7 +2,6 @@
->  config DRM_HISI_HIBMC
->  	tristate "DRM Support for Hisilicon Hibmc"
->  	depends on DRM && PCI
-> -	depends on MMU
->  	select DRM_CLIENT_SELECTION
->  	select DRM_DISPLAY_HELPER
->  	select DRM_DISPLAY_DP_HELPER
-> diff --git a/drivers/gpu/drm/loongson/Kconfig b/drivers/gpu/drm/loongson/Kconfig
-> index 552edfec7afb..d739d51cf54c 100644
-> --- a/drivers/gpu/drm/loongson/Kconfig
-> +++ b/drivers/gpu/drm/loongson/Kconfig
-> @@ -2,7 +2,7 @@
->  
->  config DRM_LOONGSON
->  	tristate "DRM support for Loongson Graphics"
-> -	depends on DRM && PCI && MMU
-> +	depends on DRM && PCI
->  	depends on LOONGARCH || MIPS || COMPILE_TEST
->  	select DRM_CLIENT_SELECTION
->  	select DRM_KMS_HELPER
-> diff --git a/drivers/gpu/drm/mgag200/Kconfig b/drivers/gpu/drm/mgag200/Kconfig
-> index 412dcbea0e2d..a962ae564a75 100644
-> --- a/drivers/gpu/drm/mgag200/Kconfig
-> +++ b/drivers/gpu/drm/mgag200/Kconfig
-> @@ -1,7 +1,7 @@
->  # SPDX-License-Identifier: GPL-2.0-only
->  config DRM_MGAG200
->  	tristate "Matrox G200"
-> -	depends on DRM && PCI && MMU
-> +	depends on DRM && PCI
->  	select DRM_CLIENT_SELECTION
->  	select DRM_GEM_SHMEM_HELPER
->  	select DRM_KMS_HELPER
-> diff --git a/drivers/gpu/drm/nouveau/Kconfig b/drivers/gpu/drm/nouveau/Kconfig
-> index 9ba89b35d1a2..4fae780f7d78 100644
-> --- a/drivers/gpu/drm/nouveau/Kconfig
-> +++ b/drivers/gpu/drm/nouveau/Kconfig
-> @@ -1,7 +1,7 @@
->  # SPDX-License-Identifier: GPL-2.0-only
->  config DRM_NOUVEAU
->  	tristate "Nouveau (NVIDIA) cards"
-> -	depends on DRM && PCI && MMU
-> +	depends on DRM && PCI
->  	depends on (ACPI_VIDEO && ACPI_WMI && MXM_WMI) || !(ACPI && X86)
->  	depends on BACKLIGHT_CLASS_DEVICE
->  	select IOMMU_API
-> @@ -86,7 +86,6 @@ config DRM_NOUVEAU_SVM
->  	bool "(EXPERIMENTAL) Enable SVM (Shared Virtual Memory) support"
->  	depends on DEVICE_PRIVATE
->  	depends on DRM_NOUVEAU
-> -	depends on MMU
->  	depends on STAGING
->  	select HMM_MIRROR
->  	select MMU_NOTIFIER
-> diff --git a/drivers/gpu/drm/qxl/Kconfig b/drivers/gpu/drm/qxl/Kconfig
-> index 69427eb8bed2..d8f24bcae34b 100644
-> --- a/drivers/gpu/drm/qxl/Kconfig
-> +++ b/drivers/gpu/drm/qxl/Kconfig
-> @@ -1,7 +1,7 @@
->  # SPDX-License-Identifier: GPL-2.0-only
->  config DRM_QXL
->  	tristate "QXL virtual GPU"
-> -	depends on DRM && PCI && MMU && HAS_IOPORT
-> +	depends on DRM && PCI && HAS_IOPORT
->  	select DRM_CLIENT_SELECTION
->  	select DRM_KMS_HELPER
->  	select DRM_TTM
-> diff --git a/drivers/gpu/drm/radeon/Kconfig b/drivers/gpu/drm/radeon/Kconfig
-> index f51bace9555d..c479f0c0dd5c 100644
-> --- a/drivers/gpu/drm/radeon/Kconfig
-> +++ b/drivers/gpu/drm/radeon/Kconfig
-> @@ -2,7 +2,7 @@
->  
->  config DRM_RADEON
->  	tristate "ATI Radeon"
-> -	depends on DRM && PCI && MMU
-> +	depends on DRM && PCI
->  	depends on AGP || !AGP
->  	select FW_LOADER
->  	select DRM_CLIENT_SELECTION
-> diff --git a/drivers/gpu/drm/tiny/Kconfig b/drivers/gpu/drm/tiny/Kconfig
-> index 95c1457d7730..c50186a65464 100644
-> --- a/drivers/gpu/drm/tiny/Kconfig
-> +++ b/drivers/gpu/drm/tiny/Kconfig
-> @@ -37,7 +37,7 @@ config DRM_BOCHS
->  
->  config DRM_CIRRUS_QEMU
->  	tristate "Cirrus driver for QEMU emulated device"
-> -	depends on DRM && PCI && MMU
-> +	depends on DRM && PCI
->  	select DRM_CLIENT_SELECTION
->  	select DRM_KMS_HELPER
->  	select DRM_GEM_SHMEM_HELPER
-> diff --git a/drivers/gpu/drm/vmwgfx/Kconfig b/drivers/gpu/drm/vmwgfx/Kconfig
-> index 6c3c2922ae8b..aab646b91ca9 100644
-> --- a/drivers/gpu/drm/vmwgfx/Kconfig
-> +++ b/drivers/gpu/drm/vmwgfx/Kconfig
-> @@ -1,7 +1,7 @@
->  # SPDX-License-Identifier: GPL-2.0
->  config DRM_VMWGFX
->  	tristate "DRM driver for VMware Virtual GPU"
-> -	depends on DRM && PCI && MMU
-> +	depends on DRM && PCI
->  	depends on (X86 && HYPERVISOR_GUEST) || ARM64
->  	select DRM_CLIENT_SELECTION
->  	select DRM_TTM
-> diff --git a/drivers/gpu/drm/xe/Kconfig b/drivers/gpu/drm/xe/Kconfig
-> index dd256b355613..bb3f34a29f4e 100644
-> --- a/drivers/gpu/drm/xe/Kconfig
-> +++ b/drivers/gpu/drm/xe/Kconfig
-> @@ -1,7 +1,7 @@
->  # SPDX-License-Identifier: GPL-2.0-only
->  config DRM_XE
->  	tristate "Intel Xe Graphics"
-> -	depends on DRM && PCI && MMU && (m || (y && KUNIT=y))
-> +	depends on DRM && PCI && (m || (y && KUNIT=y))
->  	depends on INTEL_VSEC
->  	select INTERVAL_TREE
->  	# we need shmfs for the swappable backing store, and in particular
-> diff --git a/drivers/net/ethernet/broadcom/Kconfig b/drivers/net/ethernet/broadcom/Kconfig
-> index 46d07b81097f..1bcf406a9e36 100644
-> --- a/drivers/net/ethernet/broadcom/Kconfig
-> +++ b/drivers/net/ethernet/broadcom/Kconfig
-> @@ -98,7 +98,6 @@ config BNX2
->  config CNIC
->  	tristate "QLogic CNIC support"
->  	depends on PCI && (IPV6 || IPV6=n)
-> -	depends on MMU
->  	select BNX2
->  	select UIO
->  	help
-> diff --git a/drivers/pci/Kconfig b/drivers/pci/Kconfig
-> index da28295b4aac..9c0e4aaf4e8c 100644
-> --- a/drivers/pci/Kconfig
-> +++ b/drivers/pci/Kconfig
-> @@ -21,6 +21,7 @@ config GENERIC_PCI_IOMAP
->  menuconfig PCI
->  	bool "PCI support"
->  	depends on HAVE_PCI
-> +	depends on MMU
->  	help
->  	  This option enables support for the PCI local bus, including
->  	  support for PCI-X and the foundations for PCI Express support.
-> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
-> index 186858293df5..206f271e869a 100644
-> --- a/drivers/pci/pci.c
-> +++ b/drivers/pci/pci.c
-> @@ -4257,7 +4257,7 @@ unsigned long __weak pci_address_to_pio(phys_addr_t address)
->  #ifndef pci_remap_iospace
->  int pci_remap_iospace(const struct resource *res, phys_addr_t phys_addr)
->  {
-> -#if defined(PCI_IOBASE) && defined(CONFIG_MMU)
-> +#if defined(PCI_IOBASE)
->  	unsigned long vaddr = (unsigned long)PCI_IOBASE + res->start;
->  
->  	if (!(res->flags & IORESOURCE_IO))
-> @@ -4290,7 +4290,7 @@ EXPORT_SYMBOL(pci_remap_iospace);
->   */
->  void pci_unmap_iospace(struct resource *res)
->  {
-> -#if defined(PCI_IOBASE) && defined(CONFIG_MMU)
-> +#if defined(PCI_IOBASE)
->  	unsigned long vaddr = (unsigned long)PCI_IOBASE + res->start;
->  
->  	vunmap_range(vaddr, vaddr + resource_size(res));
-> diff --git a/drivers/scsi/bnx2fc/Kconfig b/drivers/scsi/bnx2fc/Kconfig
-> index ecdc0f0f4f4e..3cf7e08df809 100644
-> --- a/drivers/scsi/bnx2fc/Kconfig
-> +++ b/drivers/scsi/bnx2fc/Kconfig
-> @@ -5,7 +5,6 @@ config SCSI_BNX2X_FCOE
->  	depends on (IPV6 || IPV6=n)
->  	depends on LIBFC
->  	depends on LIBFCOE
-> -	depends on MMU
->  	select NETDEVICES
->  	select ETHERNET
->  	select NET_VENDOR_BROADCOM
-> diff --git a/drivers/scsi/bnx2i/Kconfig b/drivers/scsi/bnx2i/Kconfig
-> index 0cc06c2ce0b8..75ace2302fed 100644
-> --- a/drivers/scsi/bnx2i/Kconfig
-> +++ b/drivers/scsi/bnx2i/Kconfig
-> @@ -4,7 +4,6 @@ config SCSI_BNX2_ISCSI
->  	depends on NET
->  	depends on PCI
->  	depends on (IPV6 || IPV6=n)
-> -	depends on MMU
->  	select SCSI_ISCSI_ATTRS
->  	select NETDEVICES
->  	select ETHERNET
-> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-> index c3bcb6911c53..2b0172f54665 100644
-> --- a/drivers/vfio/pci/Kconfig
-> +++ b/drivers/vfio/pci/Kconfig
-> @@ -1,6 +1,6 @@
->  # SPDX-License-Identifier: GPL-2.0-only
->  menu "VFIO support for PCI devices"
-> -	depends on PCI && MMU
-> +	depends on PCI
->  
->  config VFIO_PCI_CORE
->  	tristate
-> -- 
-> 2.39.5
-> 
+As for Hyper-V and VMCI losing the "lingering", do we care? And if we do,
+take Hyper-V, is it possible to test any changes without access to
+proprietary host/hypervisor?
 
