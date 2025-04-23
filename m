@@ -1,102 +1,187 @@
-Return-Path: <kvm+bounces-43968-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43969-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBE0AA99244
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 17:42:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B59EBA992C4
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 17:49:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C70B92520F
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 15:33:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A32C4677BD
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 15:42:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3FC82989BA;
-	Wed, 23 Apr 2025 15:22:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 584122820D1;
+	Wed, 23 Apr 2025 15:29:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YMx1v3yl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S7N59Ytr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D2C1298CB7
-	for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 15:22:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B2B62820AE
+	for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 15:29:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745421765; cv=none; b=sAtyphez/yr0XjgypOAE+RCgJpyrqZT9WyU+PSeQK8zoiimeWeXCNW0UlEVyndweaj1JkKOMGWft4EA79tWrZZDkiQ6a2ybuMeShKCQ7inJ2XidpboRm7v31vPHVfO2HsBczG+ReXnyKSynXsVNOkNvkpeYUiSl/mceYTlF1riM=
+	t=1745422168; cv=none; b=tc8Lbe5t/4JOQ/U0pjGjmb/C6HkbpC6w4NRZVx8m8sMX3YIH3kvHUb9/SJ+OZiA8ctCmtpjKQligsOMOTPAuAw2JOeHfgbyL6QtE/bQCm9v70wZ0aOIKyTP95Xq/50WelfWLf0itqdG25mFq+/+AmU6YwhiOg2/9jfqFwaWQiwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745421765; c=relaxed/simple;
-	bh=qGYrbJEGHgU6iYHbwXx1hwhCyrpckM7Rn+2DfIAAWQ0=;
+	s=arc-20240116; t=1745422168; c=relaxed/simple;
+	bh=7tyYd8/WWjtTTKFWw+oD7+lCXM1UFswEbQCLL4JpYK0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=cDMarDLYSesxfhS9z/dJuEwZFWAowBWei8Cz05BYsdhalz/rlSUIuE+o5KqdEqvveCbwBkr3hYoylwvQjMUINYUhV0U2FLmkXwseYRM43u33AL9M26C2NJTEwdM280L5jGoR3vjblEGzdRb7Ot2wKAgnMBbYzTMDguZcdcuOvrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YMx1v3yl; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=PDu5F22BqlDqxN44ShIYfv5lQuQzCi814Vy4o8It7/21e7JHlJDKvnnqgo3NGcZNW+UZezah+c7vwMDX7LWGRFF9+c/X6kVOxuDUXeiJVn0CLHKxlPmPYEdkTlNWRP11hfRn5SQ1k/UdS16/JbQtBg6r9CczYAdwjMM+aJQjAr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=S7N59Ytr; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ff8340d547so5266390a91.2
-        for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 08:22:43 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7395095a505so4675329b3a.1
+        for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 08:29:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745421763; x=1746026563; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=10gxDDjVQ3jQFK/sycvIp1VIp9JSv6VcZlvfZIbEvNk=;
-        b=YMx1v3ylxhmF/6OT1yOaJewhBQWwgrdSNlyGfp/+ApdhAGbtdkoXyoXjaiC/85M4YZ
-         Ah8INXiWtEGsZ10+ft+F71VdCf/iA0L0m/Xfd23vpxHE3BStwZZLZUbjxqNKex144qOR
-         chLWECe3tC2SCACchTLSrxifT9AqzYDQ1Mu9zUXG/cxHO6jUiXaMthylSzXO+gxlv6eh
-         a0vV/1PLG8NHziUbz16DnZ+zAopAvDbclCEze0YdnHLqeHvNm8/Kk2Uut6J/qKpJXhP+
-         cB6GGYL9bPGyTftR61ysf4kyqt5RSeJll/PTJYVYdqKGWfvhE9QmfRyQob+KM+l7x8N/
-         FCpA==
+        d=google.com; s=20230601; t=1745422166; x=1746026966; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=e/ciVbsL9E+/civAz5HmUVHufr3bRpQ65pGuVHW5bCE=;
+        b=S7N59YtrrV2feCtuOZmHnccLusxUXrTckzletlGn9Pw3RdnSKJ5+ss0zjnwj1cgn25
+         yYQmoc5tGP1Z/bATT8LIi1qnfGK3gq+Fqg8m2Wfz5Xk3wnmoD5zimXC9707ZbQytOR+7
+         o18G9mzJ+ExkHaXuwqsrOg+9vo9wWRlECdGOXDFqOtUdm3xNFZL5pwCHli/W3j297bOs
+         wAj7xAsR+bbOFRpVDEVCQRC0Z7kWduN89Fj3PgiKr+SN+BeC1ZO/JQ5lBBQkK/BuM7XF
+         b6J1vRKB9iCfRzP4Rlvh/PZbcGFLuyNszzXDL4xehpErXVfGnQQWyF11py1PzsVkHdEV
+         5jdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745421763; x=1746026563;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=10gxDDjVQ3jQFK/sycvIp1VIp9JSv6VcZlvfZIbEvNk=;
-        b=D+qEOkEg+BGgdEIwNKNe9BYwcLu3k0yaItvQTGWh4Z0/U8lK/IWI+g2kT3wLwTlq0m
-         H0gQKt5pDevNl7T8UTI4lwZ8t8Uei6sZtcbLZq0Dxxo69Puikn9xgYo0CyANjtDRLLbI
-         ndtHjR6qMqYGTusfy/gXLJji2FjmBuXTgHFX5rrGteKyB5huPENQfnu53bQYBmRlJ/Y6
-         CxA+usRggVt53i/UHdFn2WIrmhJnVgs9eYQyPfH6t3RWt6ZbmGP0ICOsgtZYzvOblUKW
-         ZB20zXi/k3v9HkYXpWpu+jxgoGZdfigqiIf0jlMEXvLwk4J09GLHn4klZdxHpOdc3VDu
-         4cwQ==
-X-Gm-Message-State: AOJu0YxsOTJmAY81/Xh/w/UW3RwDP0A26IM/42bsdaFy0BJd5aSc3tho
-	t63+coGTBMRpHQiFvg/GjXkZudw6bRBrRq6jBgZSeavMYMfrYA4JJm6MFt0mQAg3Jwt4oPTGYeZ
-	fPQ==
-X-Google-Smtp-Source: AGHT+IF+ET0GUPEJ/rWe+DxfVSU9qs+SQqsqxY5vnYjMzQzKJPDQ52u2GWTNU8VmERU7wJImRLl0saRKd9A=
-X-Received: from pjbst14.prod.google.com ([2002:a17:90b:1fce:b0:2ff:852c:ceb8])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5443:b0:2fa:13d9:39c
- with SMTP id 98e67ed59e1d1-3087bb53262mr33371151a91.14.1745421762765; Wed, 23
- Apr 2025 08:22:42 -0700 (PDT)
-Date: Wed, 23 Apr 2025 08:22:41 -0700
-In-Reply-To: <20250324130248.126036-2-manali.shukla@amd.com>
+        d=1e100.net; s=20230601; t=1745422166; x=1746026966;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=e/ciVbsL9E+/civAz5HmUVHufr3bRpQ65pGuVHW5bCE=;
+        b=wS2Iyc3ma1nar33qokxzIqh8RovxMXa+2XwiybfAbvnLAPtSihZi/n27k+r3dtQKe+
+         qNn7h3+7ZNy2JEmLyUaQcYOLP++jM33naw/dzXXsP5IB8/pZljNvqM9rXvbFbZjVwHLO
+         Ix4CwA/yl0sx6xvMIjiB7zxaDoHI06R3A/CgJINEYRWt+dV0s9zkDAUhoTnTOzz0ZamM
+         lfRhDbIEFnv2r8fqM0WUIxnsR7pXbp0BetMQ/Z1HwP5ZheyhvgzyWWBr/kRJavMwtmQ6
+         ESlK5y/wqGBgxPm5JFzpBsw9yXK/M+RPRLlNtUFyHnIbXTKyYCmsLLoTNFTgK+Vb2hlF
+         RGTA==
+X-Forwarded-Encrypted: i=1; AJvYcCU/9Bu88G5bvfxFtgB9c5ift5UnBEgt0GB0FpRd0oKEKaQwEV1j4ncaLqJl3VCgTbfbP3A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQ8wKMtk/yxWxz3VkwdWwLWnYXBdnbTzioHEGrslXWIWc2tC4r
+	vcNdiQQwSg7FeryOO+PBl/RlchpoOBk5Kesv0ZUUGIjVmYlhaXQ40QjTfWJCEnMEdds5WKkOTvP
+	UEQ==
+X-Google-Smtp-Source: AGHT+IFvMyzHs0jMD7T18ZwTYJ9lm8AXPz2gW99+UB2nn3KAXaBAX+lpyE8o2K/04Z7bT0N2PiSTsZCjzB8=
+X-Received: from pfbem8.prod.google.com ([2002:a05:6a00:3748:b0:739:9e9:feea])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:3e28:b0:736:4bd3:ffab
+ with SMTP id d2e1a72fcca58-73dc1591d84mr25297228b3a.17.1745422166356; Wed, 23
+ Apr 2025 08:29:26 -0700 (PDT)
+Date: Wed, 23 Apr 2025 08:29:24 -0700
+In-Reply-To: <52276154-79b0-4029-8087-77ca499a12ce@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250324130248.126036-1-manali.shukla@amd.com> <20250324130248.126036-2-manali.shukla@amd.com>
-Message-ID: <aAkFwT-vX4rqC8N4@google.com>
-Subject: Re: [PATCH v4 1/5] KVM: x86: Preparatory patch to move linear_rip out
- of kvm_pio_request
+References: <20250324130248.126036-1-manali.shukla@amd.com>
+ <20250324130248.126036-4-manali.shukla@amd.com> <b03f3593-e56b-4a98-8ddd-e54fe7885c81@intel.com>
+ <52276154-79b0-4029-8087-77ca499a12ce@amd.com>
+Message-ID: <aAkHVFTqybGc-mc8@google.com>
+Subject: Re: [PATCH v4 3/5] KVM: SVM: Enable Bus lock threshold exit
 From: Sean Christopherson <seanjc@google.com>
 To: Manali Shukla <manali.shukla@amd.com>
-Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, pbonzini@redhat.com, 
-	nikunj@amd.com, thomas.lendacky@amd.com, bp@alien8.de
-Content-Type: text/plain; charset="us-ascii"
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, pbonzini@redhat.com, nikunj@amd.com, 
+	thomas.lendacky@amd.com, bp@alien8.de
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 24, 2025, Manali Shukla wrote:
-> Add a refactoring prep patch to move linear_rip out of kvm_pio_request
-> and place it next to complete_userspace_io.  There's nothing port I/O
-> specific about linear_rip field, it just so happens to that port I/O is the
-> only case where KVM's ABI is to let userspace stuff state (to emulate
-> RESET) without first completing the I/O instruction.
+On Wed, Apr 23, 2025, Manali Shukla wrote:
+> On 4/16/2025 11:30 AM, Xiaoyao Li wrote:
+> >> =C2=A0 +=C2=A0=C2=A0=C2=A0 if (cpu_feature_enabled(X86_FEATURE_BUS_LOC=
+K_THRESHOLD)) {
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pr_info("Bus Lock Threshol=
+d supported\n");
+> >=20
+> > It will be printed every time kvm-amd.ko module gets loaded.
+> >=20
+> > I think it's for your development and debug purpose. Comparing to the
+> > existing features in svm_set_cpu_caps(), nothing makes it special for
+> > BUS_LOCK_THRESHOLD to require a kernel message. So I think we can just
+> > remove it.
+>=20
+> I didn't add this for development and debug purpose. I added this pr_info=
+()
+> to make it easy to find whether BUS Lock threshold is supported or not fr=
+om
+> dmesg.  I can remove it if you think it is not required.
 
-The shortlog+changelog needs to state what the change is, not what the human that
-wrote the code is doing.  And the changelog needs to state the motivation.  Yes,
-the behavior of linear_rip isn't PIO specific, but the field is obviously specific
-to PIO, and has been for years, i.e. there's a very good reason why the field is
-in kvm_pio_request.
+Please remove it.  The user typically doesn't care.
 
-  KVM: x86: Make kvm_pio_request.linear_rip a common field for user exits
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kvm_caps.has_bus_lock_exit=
+ =3D true;
+> >=20
+> > Besides, this patch doesn't ensure the bisectability. It allows userspa=
+ce
+> > to enable KVM_BUS_LOCK_DETECTION_EXIT and set intercept of
+> > INTERCEPT_BUSLOCK but without providing the handler.
+> >=20
+> > So either move next patch before it or just merge them.
+> >=20
+>=20
+> Oh.., my bad, I will move the next patch before this one in v5.
 
-  Move and rename kvm_pio_request.linear_rip to kvm_vcpu_arch.cui_linear_rip
-  so that the field can be used by other userspace exit completion flows
-  that need to take action if and only if userspace has not modified RIP.
+No, do exactly as I suggested in v3.
+
+ : I vote to split this into two patches: one to add the architectural coll=
+ateral,
+ : with the above as the changelog, and a second to actually implement supp=
+ort in
+ : KVM.  Having the above background is useful, but it makes it quite hard =
+to find
+ : information on the KVM design and implementation.
+
+I want this (and any other arch collateral I'm missing) in a separate patch=
+ so
+that the background on what the hardware feature does is captured.  But I s=
+ee no
+reason to split KVM's implementation into multiple patches.
+
+diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+index 2b59b9951c90..d1819c564b1c 100644
+--- a/arch/x86/include/asm/svm.h
++++ b/arch/x86/include/asm/svm.h
+@@ -116,6 +116,7 @@ enum {
+        INTERCEPT_INVPCID,
+        INTERCEPT_MCOMMIT,
+        INTERCEPT_TLBSYNC,
++       INTERCEPT_BUSLOCK,
+ };
+
+
+@@ -158,7 +159,9 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+        u64 avic_physical_id;   /* Offset 0xf8 */
+        u8 reserved_7[8];
+        u64 vmsa_pa;            /* Used for an SEV-ES guest */
+-       u8 reserved_8[720];
++       u8 reserved_8[16];
++       u16 bus_lock_counter;   /* Offset 0x120 */
++       u8 reserved_9[702];
+        /*
+         * Offset 0x3e0, 32 bytes reserved
+         * for use by hypervisor/software.
+diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/sv=
+m.h
+index 1814b413fd57..abf6aed88cee 100644
+--- a/arch/x86/include/uapi/asm/svm.h
++++ b/arch/x86/include/uapi/asm/svm.h
+@@ -95,6 +95,7 @@
+ #define SVM_EXIT_CR14_WRITE_TRAP               0x09e
+ #define SVM_EXIT_CR15_WRITE_TRAP               0x09f
+ #define SVM_EXIT_INVPCID       0x0a2
++#define SVM_EXIT_BUS_LOCK                      0x0a5
+ #define SVM_EXIT_NPF           0x400
+ #define SVM_EXIT_AVIC_INCOMPLETE_IPI           0x401
+ #define SVM_EXIT_AVIC_UNACCELERATED_ACCESS     0x402
+@@ -224,6 +225,7 @@
+        { SVM_EXIT_CR4_WRITE_TRAP,      "write_cr4_trap" }, \
+        { SVM_EXIT_CR8_WRITE_TRAP,      "write_cr8_trap" }, \
+        { SVM_EXIT_INVPCID,     "invpcid" }, \
++       { SVM_EXIT_BUS_LOCK,     "buslock" }, \
+        { SVM_EXIT_NPF,         "npf" }, \
+        { SVM_EXIT_AVIC_INCOMPLETE_IPI,         "avic_incomplete_ipi" }, \
+        { SVM_EXIT_AVIC_UNACCELERATED_ACCESS,   "avic_unaccelerated_access"=
+ }, \
+
 
