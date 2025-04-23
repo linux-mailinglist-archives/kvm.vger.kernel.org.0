@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-43942-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43943-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E44B8A98CF0
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 16:25:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D4C2BA98CFC
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 16:26:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CCB33A6663
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 14:24:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA57F3A7436
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 14:25:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24B1D27F72A;
-	Wed, 23 Apr 2025 14:24:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8E672701B6;
+	Wed, 23 Apr 2025 14:25:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k1RX1Wlz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K6v+F0GD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5087415575C;
-	Wed, 23 Apr 2025 14:24:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2622027CCC7;
+	Wed, 23 Apr 2025 14:25:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745418267; cv=none; b=R5gRfsfJ9afEGl2BD+IZ9WAYaUOvBY0Shb0c7IH/YWBnKiMvB6D/k7I3+4OQPwc6L02UEXgCYeAXff/3vfn4yWqnFNEBFg6cmJZ0jKez9WISwNsKns3CumZ52laWSNchwVEi/jvoju/PGb91y9ZqklLihx2XjdSMGYuW76+N5Jo=
+	t=1745418328; cv=none; b=i4TZmWIEe5QWG5eFpaq0F2Wr5zdTZFFaco7HG4QvAshOYVjM4vZKYhrz1UUrjC1TV1lFaMG3LWRi/UBu1AdsusSXHZYwPXhsQ4OBfgDEn/QjsoW9NmcySnArd39jzlhaYShwMzp0/hj2WbOrCxSJ6nfE892UFmrXIGLYYpR8w4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745418267; c=relaxed/simple;
-	bh=5GxHj0Q68iefqoaKTtjndiUuPGnSJtU6UMixn6eM65g=;
+	s=arc-20240116; t=1745418328; c=relaxed/simple;
+	bh=lnoxov44YiijcxAHjS45FDcwQ1bLTT0pk3Dflv1VlkY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qHVfflBMzPtPsh5NKl67sT2YFBOGCwLVcqYKpiu3+VmrLHxwMLGp+nmcLa1r3+wTcfGFtT9TZnpl05GQLQbmlhapuU/m1mIZklAib2VMVu0XJTT2PEG4J/poUZiKZLk0nvMz4BUfoqWf+uO3jiakFos8itBQuYJelrO3VCGA/kQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=k1RX1Wlz; arc=none smtp.client-ip=198.175.65.15
+	 In-Reply-To:Content-Type; b=NkAbrifaaBpkhIuuDZ75t+XW+4vsTBnL1Y7TDMOaCP2sSKzurBTvMuRDPFHDh7YrigeR3ASMksRMXYoGnnLU3CHxuxB9h9l/Boov139gRi0DCdZI6tK19+cVfJMWNkQF1TnYeWJzASvCkPvr+BG7XJNzTqkbHQPHiNqnq7xiOek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K6v+F0GD; arc=none smtp.client-ip=198.175.65.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745418265; x=1776954265;
+  t=1745418328; x=1776954328;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=5GxHj0Q68iefqoaKTtjndiUuPGnSJtU6UMixn6eM65g=;
-  b=k1RX1WlzO9KKH0C52Xq1kh7tFZy6q5gO7/RSPFUnxOMMDfCPoVkdMcuG
-   vflOwiw3wG2HrvHdhWQrUTz7HMfvlsYpqPFzZ+Q6iU5UPaWrGK+ZMNHoE
-   JMYQMAi0RhuNvbdDVZqGQAAKaM+dv/aQ6Dqe4FckKfYdM3AR11iZwi9fG
-   oSwy+j2T0ifIpn8NX/I+ajtti+wmB5rtHubP7BpPfIS03JL5ijGFp5KNW
-   E5fzGoTfaRYYL7H27jFUhVBL6jysyvLhXu82Zwv8Jgw7ewC5wkAPdCfN3
-   P79/KjvuM/v4NTGoqTbO5858neXIVRPpZs/T3d39ct35KbQEuvuZ/wk7C
-   g==;
-X-CSE-ConnectionGUID: XAyOxmrbTVaSyIP8v08n5g==
-X-CSE-MsgGUID: toZ5SheyRM2EhpLR1Y/Nbg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11412"; a="50675870"
+  bh=lnoxov44YiijcxAHjS45FDcwQ1bLTT0pk3Dflv1VlkY=;
+  b=K6v+F0GD8t+DtESZ+/X1b88mea/QjLFKsM4fbYIT57JZGgxl0QQ6c2KW
+   E9ZKnbuPKPxlyCD+j0OmODna2J66K8w1ojFZV/v+d5lb6TWdMJdXcQR14
+   ecOmGNlOSlRrB6Sg7F4v2r1nw9/70vyAPrDX5O8ARgaCmzoQso6QhBtru
+   boxJdwmefyRW44O6Jsh9l2mzsjtTIxNMhYjNc/Etxx8gzGY3Gt6k8o9p/
+   bRHiOdPrBkJ4jfvnOkKnUpvuoy4+olunnClmmdY26ri81epGgZq7pLCGq
+   xVtrL7i9Mnl6hDWbFpb/Ximu+fXC7AZbn3VIAWR1jv1SP5W43C7lHgRcu
+   A==;
+X-CSE-ConnectionGUID: 5VrWcW1ZSy+Dfvixkj0ttg==
+X-CSE-MsgGUID: bo5P0Ji8QbqMMx9QKzf5XA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11412"; a="46717322"
 X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
-   d="scan'208";a="50675870"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 07:24:24 -0700
-X-CSE-ConnectionGUID: 0kLyYCh8Qce7BgC/OxCKGg==
-X-CSE-MsgGUID: W+Y8/vM6RmuS5sj4/hyHjg==
+   d="scan'208";a="46717322"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 07:25:27 -0700
+X-CSE-ConnectionGUID: 5hu8NpZuRYSvcXVBz8M0Ow==
+X-CSE-MsgGUID: tLM2ERpfQ4aMi5ZC9w+9wA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
-   d="scan'208";a="137190903"
+   d="scan'208";a="137404934"
 Received: from tfalcon-desk.amr.corp.intel.com (HELO [10.124.221.81]) ([10.124.221.81])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 07:24:23 -0700
-Message-ID: <0caab744-0107-408a-8df0-861d561fa4b6@intel.com>
-Date: Wed, 23 Apr 2025 07:24:21 -0700
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 07:25:24 -0700
+Message-ID: <61a51aac-4692-4049-85ce-c780c25f6332@intel.com>
+Date: Wed, 23 Apr 2025 07:25:22 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,7 +67,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 03/34] x86/msr: Rename rdpmcl() to rdpmcq()
+Subject: Re: [RFC PATCH v2 04/34] x86/msr: Convert rdpmcq() into a function
 To: "Xin Li (Intel)" <xin@zytor.com>, linux-kernel@vger.kernel.org,
  kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
  linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
@@ -86,7 +86,7 @@ Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
  seanjc@google.com, luto@kernel.org, boris.ostrovsky@oracle.com,
  kys@microsoft.com, haiyangz@microsoft.com, decui@microsoft.com
 References: <20250422082216.1954310-1-xin@zytor.com>
- <20250422082216.1954310-4-xin@zytor.com>
+ <20250422082216.1954310-5-xin@zytor.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -132,17 +132,16 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <20250422082216.1954310-4-xin@zytor.com>
+In-Reply-To: <20250422082216.1954310-5-xin@zytor.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 4/22/25 01:21, Xin Li (Intel) wrote:
 > Signed-off-by: Xin Li (Intel) <xin@zytor.com>
 
-We had a non-trivial discussion about the l=>q renames. Please at least
-include a sentence or two about those discussions.
+Code: good.  No changelog: bad.
 
-For the code:
+Once there's some semblance of a changelog:
 
 Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
 
