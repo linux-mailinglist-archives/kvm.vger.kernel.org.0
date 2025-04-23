@@ -1,156 +1,161 @@
-Return-Path: <kvm+bounces-43985-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43986-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE48AA99629
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 19:14:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8B11A99636
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 19:16:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60B50465472
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 17:14:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CFD85A43C7
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 17:15:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DC1C28A419;
-	Wed, 23 Apr 2025 17:14:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0AAF28BA93;
+	Wed, 23 Apr 2025 17:15:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="IvWYQaPf"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="f3RJOF+9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A554289367;
-	Wed, 23 Apr 2025 17:14:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF12928936B
+	for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 17:15:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745428457; cv=none; b=MxKRslDQEtyPfFb+S9EuI7Ux6Qpsvo3CK+mj01oBLM5BXfxtm6qwRND1I50FUIm65P0gqR7arJ/dDy1IA/mUkHrSBOALyFRiTtEZ+AyPN2uR7NybBZhadBicoZLt5yxPMybg9n7r6AeAEKq0OXaWLu64WomNBu1iUvv2ff10JFI=
+	t=1745428542; cv=none; b=ODsx3bzncTNUN3dDgwRILR94RFlWYaVi6H01s4Tf4M8LBqUh3fb1NoW5QLmQC2FOTqATUmBf74teHvRwdK9+G8fPaaS4Vu0swBM8r66eY3RaGxSskEmE8QrAFH2MZ4uGyA0sS40/sW7XDYSX4fi8FkdUu+3sAlhVvfLSriCXTTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745428457; c=relaxed/simple;
-	bh=q0SsHabUmjj5ZdU0sUyhSgU3OxN3W7D4JCWOS+nAJGU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ogq1kDakyIirld0U5ZpyIoxMu6VLdb0zMDYf/Aknwg5vSuREa6Ya0eBaEcv4g14AXQxokz5Pc0qfYkck4zBqqSs+B5TbNfbbZvgH8vwsKiC2aEW0zDW1yffs7ZrlhTr/SfI26z1VdSX9rbrnXAlJEyeI42BEKBtbACv3qalWw5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=IvWYQaPf; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53NHCvSb3804133
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Wed, 23 Apr 2025 10:12:58 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53NHCvSb3804133
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1745428382;
-	bh=AIJHrckYwFl98orUcLBTt95yPEoWX9oW9903W4hlM3w=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=IvWYQaPfxJvqBiLff3ahLWLm3on+DUaPa1Srpyp5LZs0jmOjsi4vJcD4bjFx1mkw1
-	 kmlinO9+bgIwDEaEPFxhzeh7OV4pJBnWqMwgS7SNusPzCVCr4pLxzCg1y9KDDjfFVk
-	 DyWNlDOln4+yBgIudOkFG4lEG2Lq/WOJhKF9+SXuHgWi4l0RDrbboFRD8k6F5lKkRA
-	 14yiMRrsILUIgyeyHSqLlSqGk6PDPkVte7v13JiaABizSWVFosdv0a/zLQKXJUGorp
-	 W8BYnasPgTuqRiwJsD+umVEKtOLbT7Bc0M6cVA0p6p7RA3scb+WSFcK+vk2X+rNlyz
-	 87hDNwO5mesTw==
-Message-ID: <e01fb578-3523-4f19-8db3-e231d5daa76e@zytor.com>
-Date: Wed, 23 Apr 2025 10:12:56 -0700
+	s=arc-20240116; t=1745428542; c=relaxed/simple;
+	bh=ZSWmIXnoHeqHpg22is4DCb+FQUxyjWQhdchI0xl2uAo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SSyAqLlXouc5qSL7NvSNGwqjv02EeZKhY+rOhFQSk5v2+IoSfqATYdHw8BpTEbGbZ+G1oDqDf7YpGW/30f/e8Y8aaePSdPRBS7/10xloLFAeeWCBIkhhVndZYlI6eeqDpZKLE9TYpQDRaQyJq7Zb5exmL5MZOTU0pOfDOXI8M5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=f3RJOF+9; arc=none smtp.client-ip=209.85.221.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-51eb1823a8eso50149e0c.3
+        for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 10:15:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1745428539; x=1746033339; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=sAA3ahIS+2Nb+9ARKVTXCSjk2uwR/TOFzjA5DEQnqxg=;
+        b=f3RJOF+9I5aUeLfKwhY41cyNNsV/7gzE8mnt0B7y7vbeRVxS8lsyPkRNroBYBI3tAJ
+         LoOcUnWESA/cjHCPlWjRHA3M+53oDTrejya0NpMfeL6ljH+lfqQ/w5WsXx5ptqIdwRDv
+         nsp4EdSeE1qB0xl7OhzzYJKM36aE0m+MI2XLpfk6xpvXrCfNBJoewKHE7+njIVYSVVE9
+         uh237S2zCPLxHmND8hCSoBynFpTclSrt0aPYz/VfLhJATgS9agmNsggyOtAJAI5FOQCt
+         Odf2Xxn7vp+XAbxZin8Yl6xswoHmQ5A7Db9GS23ti5naaSYjMpciujFTq8n0nXWju1+8
+         8EaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745428539; x=1746033339;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sAA3ahIS+2Nb+9ARKVTXCSjk2uwR/TOFzjA5DEQnqxg=;
+        b=f3CY9eRc5noyNWIQnUaQ+KNOY+H1RqPM1BMyRbzapyPDrA7Pw6uDS66aMaP+fgzfng
+         1OZmH27fxBYBVv2spW1XKwIcHng/p5D+93ZqCnoiA7O97fOitxqXFlmBoppSBW9nXDzh
+         HgX+hJtDmB3tFpmhdV4Go2ZpzHh2qmsjfk0VSu1caJ9oXTNYq2esz9IbJNwSlnjskmA/
+         urHqcP6GME9H0rI1CIzzvc/lSKmG/kGbAFXFxQt+sqq8oSVxEc5Qn/bFCrEABixQZyJM
+         tXG6MddF2FXAmysJthC768j4Z4CN5ouCpfjiXgq5qO5dq581ftBjpiJyeJnKI7rVLWEQ
+         sz+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXskCLKJw14oWuryjKZ45asXEivgeK3CyaW+S+Aab4b4+lBbfkil+ozvY2TNsqIssoH1Tg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9bg8b/vFNNfdGHUqCNfTphUJEk1uaX3oLr2uDKa7KowUz1xmK
+	0ACA1IKYc8WdVRn0XHXTWekpLgTDSM+5J1SUYJao39p3O1OdqmbwnKyLHc7hy8g=
+X-Gm-Gg: ASbGncuo96ZladoJg1yGOipKtivlDjWBWjVfneif71SmkfEPJ+vf+yF5ojsera9nH0n
+	jx/l/PPOz4bRlsL29JHaxW4UZfKMDB5LGDwTtSdKn5w1rVSX2q/U0IF2WpfcZDkyrUqIkWMrNgW
+	TMYY6knvkGpnkDw+/qAtVF2v5jjruRMtR7YanKo+CviB2oHQeHbkQizVqZTKh+tAM2d1rPn4DRA
+	sBUfsttZyjvaTtdtTifGSj2jDS66vrNEkoAKVudPahVzsjkKLsi5rdR67ORZAWSrdAgQ34lPaf1
+	WMtxnSGUVPzCfHdjStiDl6WZCtIeQg7QPF7Wf3KI1yv1fsa5okFR/kTPjMQx2dGAjVr6tz5AUpV
+	rT9AysdSKUpzoI63YtiHrb8HWPOaGiA==
+X-Google-Smtp-Source: AGHT+IG91ka296h4XrJ4QPDo73jdYlZoOj1Zkc9PInMILwbVuqXEZMd5w4C/WgEttaatAxBubBvu3Q==
+X-Received: by 2002:a05:6122:3c54:b0:529:24f8:dbdd with SMTP id 71dfb90a1353d-529253da601mr17813854e0c.4.1745428538734;
+        Wed, 23 Apr 2025 10:15:38 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-167-219-86.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.219.86])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-52a74d3a2d0sm79186e0c.40.2025.04.23.10.15.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Apr 2025 10:15:38 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1u7dhB-00000007LQW-2UhV;
+	Wed, 23 Apr 2025 14:15:37 -0300
+Date: Wed, 23 Apr 2025 14:15:37 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Keith Busch <kbusch@kernel.org>, Jake Edge <jake@lwn.net>,
+	Jonathan Corbet <corbet@lwn.net>, Zhu Yanjun <zyjzyj2000@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>
+Subject: Re: [PATCH v9 03/24] iommu: generalize the batched sync after map
+ interface
+Message-ID: <20250423171537.GJ1213339@ziepe.ca>
+References: <cover.1745394536.git.leon@kernel.org>
+ <2ce6a74ddf5e13a7fdb731984aa781a15f17749d.1745394536.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 01/34] x86/msr: Move rdtsc{,_ordered}() to
- <asm/tsc.h>
-To: Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
-        linux-pm@vger.kernel.org, linux-edac@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-acpi@vger.kernel.org,
-        linux-hwmon@vger.kernel.org, netdev@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        acme@kernel.org, jgross@suse.com, andrew.cooper3@citrix.com,
-        peterz@infradead.org, namhyung@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
-        wei.liu@kernel.org, ajay.kaher@broadcom.com,
-        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
-        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
-        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
-        haiyangz@microsoft.com, decui@microsoft.com
-References: <20250422082216.1954310-1-xin@zytor.com>
- <20250422082216.1954310-2-xin@zytor.com>
- <4caedcaf-793a-4371-a8db-50723dcdbad4@intel.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <4caedcaf-793a-4371-a8db-50723dcdbad4@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2ce6a74ddf5e13a7fdb731984aa781a15f17749d.1745394536.git.leon@kernel.org>
 
-On 4/23/2025 7:13 AM, Dave Hansen wrote:
-> On 4/22/25 01:21, Xin Li (Intel) wrote:
->> Relocate rdtsc{,_ordered}() from <asm/msr.h> to <asm/tsc.h>, and
->> subsequently remove the inclusion of <asm/msr.h> in <asm/tsc.h>.
->> Consequently, <asm/msr.h> must be included in several source files
->> that previously did not require it.
+On Wed, Apr 23, 2025 at 11:12:54AM +0300, Leon Romanovsky wrote:
+> From: Christoph Hellwig <hch@lst.de>
 > 
-> I know it's mildly obvious but could you please add a problem statement
-> to these changelogs, even if it's just one little sentence?
+> For the upcoming IOVA-based DMA API we want to use the interface batch the
+> sync after mapping multiple entries from dma-iommu without having a
+> scatterlist.
 
-So "ALWAYS make a changelog a complete story", right?
+Grammer:
 
-And that would be helpful for long term maintainability.
+ For the upcoming IOVA-based DMA API we want to batch the
+ ops->iotlb_sync_map() call after mapping multiple IOVAs from
+ dma-iommu without having a scatterlist. Improve the API.
 
-> 
-> 	For some reason, there are some TSC-related functions in the
-> 	MSR header even though there is a tsc.h header.
-> 
-> 	Relocate rdtsc{,_ordered}() and	subsequently remove the
-> 	inclusion of <asm/msr.h> in <asm/tsc.h>. Consequently,
-> 	<asm/msr.h> must be included in several source files that
-> 	previously did not require it.
-> 
-> But I agree with the concept, so with this fixed:
+ Add a wrapper for the map_sync as iommu_sync_map() so that callers don't
+ need to poke into the methods directly.
 
-TBH, I did hesitate to touch so many files just to include msr.h.
+ Formalize __iommu_map() into iommu_map_nosync() which requires the
+ caller to call iommu_sync_map() after all maps are completed.
 
-But because tsc.h doesn't reference any MSR definitions, it doesn't make 
-sense to include msr.h in tsc.h.  I still did the big changes.
+ Refactor the existing sanity checks from all the different layers
+ into iommu_map_nosync().
 
-> 
-> Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
+>  drivers/iommu/iommu.c | 65 +++++++++++++++++++------------------------
+>  include/linux/iommu.h |  4 +++
+>  2 files changed, 33 insertions(+), 36 deletions(-)
 
-Thank you very much!
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+
+> +	/* Discourage passing strange GFP flags */
+> +	if (WARN_ON_ONCE(gfp & (__GFP_COMP | __GFP_DMA | __GFP_DMA32 |
+> +				__GFP_HIGHMEM)))
+> +		return -EINVAL;
+
+There is some kind of overlap with the new iommu_alloc_pages_node()
+here that does a similar check, nothing that can be addressed in this
+series but maybe a TBD for later..
+
+Jason
 
