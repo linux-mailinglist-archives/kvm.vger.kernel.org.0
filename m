@@ -1,54 +1,65 @@
-Return-Path: <kvm+bounces-43911-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43912-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E1A8A98577
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 11:29:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66783A9866E
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 11:52:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8003617A028
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 09:29:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12B6E3B7427
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 09:52:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B18425CC53;
-	Wed, 23 Apr 2025 09:28:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AA3725EF9C;
+	Wed, 23 Apr 2025 09:52:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="UmIumy9c"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lbI+Y8Mt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDD392701B5;
-	Wed, 23 Apr 2025 09:28:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041BF2701B1;
+	Wed, 23 Apr 2025 09:52:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745400528; cv=none; b=pORcwe7OPLEKwzN0vQimRV/3TAax5zfJC+ISP2m6LhbiW35rlaQ3PRBFlUX9wU5IHR5p9khUKWjyj7tgZh9Bp7i0FmGiwsteZJ77R08U6PQfzEQH9qw0oK43e079VSfUmBi2ZuzEZxGLXUm6FPVdHxMjQxEmOeuXi1G8AdQvjD0=
+	t=1745401926; cv=none; b=jkS9iBNuq+NFfwal9++VYj3GF+HOtyDAG57tlVGRKuYcaXOm3haXRydanx276VU8f4mrpB0TUjDhuyWFDizgS1jcvrc7d8HqpLj+6m9Npbv+yU2cTKK1noAGOPy8Nu/DEx2NiM+SiEXDjm9xSl6FdbVp+LTuCp9PLgQp1pRaPKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745400528; c=relaxed/simple;
-	bh=+EYVuYrtu0aOqe3lbGO7b9PG5zqWh+Kau/58q5Ikx7w=;
+	s=arc-20240116; t=1745401926; c=relaxed/simple;
+	bh=tU3lJnL4oaE5rsF5NfYaXhnHuLYMyza77FG38A11VhI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SiqJAvCjPomS4sFbbZsaZrXnie+44uUS1W9DkZ8drnHCb3FDPGo7J+hd443HMoXUHPKJVrkH/DAxRQyf0/Ke/WIbRIXKIeUS4clA6JXMrzUTfs8mYfzqNsZ2UOFpaf1SSkbhgYBvGDiYKtX0vb5GkPpFu52sFWHbRS4a4fPxQvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=UmIumy9c; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53N9RlMD3219913
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Wed, 23 Apr 2025 02:27:48 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53N9RlMD3219913
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1745400470;
-	bh=ljTCYrwFB4jWmVUKcnZoEtS1ENJ4as2xI12Y2XbkMGU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=UmIumy9ccUWtp5ZpbFY6Ho9GgYRlVSRySL3D0+L6jUnzCuWo+VAXnfIYm+WcNWHcr
-	 3vdBJ+wwDthlqUfiIoaN3DvHPiYn4gb/+Mbw6citZ1Nn3xuBxFNqKSFdRNvSlmfDHg
-	 sgDUE/YJgzJJyaLCEhkxOt4S6E7bN3HrTuYY85xE4DOyVvo6Ap2JfPnfbPyl+GWU88
-	 BCLMSAjhGktSUoCdwdyy/ZS83Z3KwNGZuWXVpY05BNcjcn6RiyoIM0nH70HIaJUZTW
-	 sxPrQvxiLK2+ljs3l/mZq4cz6GbUS+eJfVvDu2BEsKu2EVOjGnH6pzErQiG0qnjLGr
-	 yA9/DCpyDaO8g==
-Message-ID: <7527f09c-7163-4276-b9a4-edac6c8217ae@zytor.com>
-Date: Wed, 23 Apr 2025 02:27:46 -0700
+	 In-Reply-To:Content-Type; b=MxnUd8mXQwf32KSqky/nlayn++B9kv31tuwHUQ0TPNSkSM5+ATFv3onU1x5yRwwZ6xC3ZgfVokYFuLEu6+Pji+5Uua0taMGE5kE3L+MIIK5fIVKdPNjaSCNzxqYS86yDjAxbUkPw3ubyTPVdahMqUELXw/SWvtS0FCov+f0p0Uc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lbI+Y8Mt; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1745401925; x=1776937925;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=tU3lJnL4oaE5rsF5NfYaXhnHuLYMyza77FG38A11VhI=;
+  b=lbI+Y8MtVJHWJ3zxsHZxG7UjuG4bJ7XvLzIbF1xpVzycwO+SlJoQoV1P
+   0xI/Ls81GqEgV/PYVETvfclxmJiI33ki9AQy3xhBqOAznOHy/cSal1YHl
+   boUjBFSWo1A/Izl7ItOCoxHy1+LMv08ko95eygldePJ/wdbL09uyHc2Ll
+   6c6gCXDEKMhS22rA55QhWaF+n63WBgdXoVOs7ee1y2Ph5xqICM76bj7wl
+   aeonsxgB5CDp7YT9jcaXcEK/Qj0l9juOQXzedsypymlhdWfDTUUk4vkNM
+   CflKGgKV0yw+FE8CO+sNwmt/5IXg0qTrjuwRjHyQgqOUVCfFG++iSHqDv
+   Q==;
+X-CSE-ConnectionGUID: aQNlEE87QtW9yEQ7y2eaOw==
+X-CSE-MsgGUID: xY/FFWUiQy+5b5UrPY2cow==
+X-IronPort-AV: E=McAfee;i="6700,10204,11411"; a="46867261"
+X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
+   d="scan'208";a="46867261"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 02:52:03 -0700
+X-CSE-ConnectionGUID: RLchqZxAT4ihay2VizVkYA==
+X-CSE-MsgGUID: Uwly+O9OSe+Em+X1cuzeOA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
+   d="scan'208";a="132156080"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 02:51:59 -0700
+Message-ID: <1a0325af-f264-47de-b9f7-da9721366c20@linux.intel.com>
+Date: Wed, 23 Apr 2025 17:51:40 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,134 +67,272 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 10/34] x86/msr: Convert __rdmsr() uses to
- native_rdmsrq() uses
-To: Sean Christopherson <seanjc@google.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        virtualization@lists.linux.dev, linux-pm@vger.kernel.org,
-        linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        acme@kernel.org, jgross@suse.com, andrew.cooper3@citrix.com,
-        peterz@infradead.org, namhyung@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
-        wei.liu@kernel.org, ajay.kaher@broadcom.com,
-        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
-        pbonzini@redhat.com, vkuznets@redhat.com, luto@kernel.org,
-        boris.ostrovsky@oracle.com, kys@microsoft.com, haiyangz@microsoft.com,
-        decui@microsoft.com
-References: <20250422082216.1954310-1-xin@zytor.com>
- <20250422082216.1954310-11-xin@zytor.com> <aAexLqjhKncFyw2V@google.com>
+Subject: Re: [PATCH 1/3] x86: KVM: VMX: Wrap GUEST_IA32_DEBUGCTL read/write
+ with access functions
+To: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+Cc: Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>,
+ Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
+ Sean Christopherson <seanjc@google.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>, Ingo Molnar <mingo@redhat.com>,
+ linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>
+References: <20250416002546.3300893-1-mlevitsk@redhat.com>
+ <20250416002546.3300893-2-mlevitsk@redhat.com>
 Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <aAexLqjhKncFyw2V@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <20250416002546.3300893-2-mlevitsk@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 4/22/2025 8:09 AM, Sean Christopherson wrote:
-> On Tue, Apr 22, 2025, Xin Li (Intel) wrote:
->> __rdmsr() is the lowest level primitive MSR read API, and its direct
->> use is NOT preferred.
-> 
-> Doesn't mean it's wrong.
+The shortlog "x86: KVM: VMX: Wrap GUEST_IA32_DEBUGCTL read/write with
+access functions" doesn't follow Sean's suggestion
+(https://github.com/kvm-x86/linux/blob/next/Documentation/process/maintainer-kvm-x86.rst#shortlog).
+Please modify. Thanks.
 
-I wouldn't go so far as to claim that it's wrong :-)
 
->> Use its wrapper function native_rdmsrq() instead.
+On 4/16/2025 8:25 AM, Maxim Levitsky wrote:
+> Instead of reading and writing GUEST_IA32_DEBUGCTL vmcs field directly,
+> wrap the logic with get/set functions.
+>
+> Also move the checks that the guest's supplied value is valid to the new
+> 'set' function.
+>
+> In particular, the above change fixes a minor security issue in which L1
+> hypervisor could set the GUEST_IA32_DEBUGCTL, and eventually the host's
+> MSR_IA32_DEBUGCTL to any value by performing a VM entry to L2 with
+> VM_ENTRY_LOAD_DEBUG_CONTROLS set.
+>
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c    | 15 +++++++---
+>  arch/x86/kvm/vmx/pmu_intel.c |  9 +++---
+>  arch/x86/kvm/vmx/vmx.c       | 58 +++++++++++++++++++++++-------------
+>  arch/x86/kvm/vmx/vmx.h       |  3 ++
+>  4 files changed, 57 insertions(+), 28 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index e073e3008b16..b7686569ee09 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -2641,6 +2641,7 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>  	struct hv_enlightened_vmcs *evmcs = nested_vmx_evmcs(vmx);
+>  	bool load_guest_pdptrs_vmcs12 = false;
+> +	u64 new_debugctl;
+>  
+>  	if (vmx->nested.dirty_vmcs12 || nested_vmx_is_evmptr12_valid(vmx)) {
+>  		prepare_vmcs02_rare(vmx, vmcs12);
+> @@ -2653,11 +2654,17 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+>  	if (vmx->nested.nested_run_pending &&
+>  	    (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS)) {
+>  		kvm_set_dr(vcpu, 7, vmcs12->guest_dr7);
+> -		vmcs_write64(GUEST_IA32_DEBUGCTL, vmcs12->guest_ia32_debugctl);
+> +		new_debugctl = vmcs12->guest_ia32_debugctl;
+>  	} else {
+>  		kvm_set_dr(vcpu, 7, vcpu->arch.dr7);
+> -		vmcs_write64(GUEST_IA32_DEBUGCTL, vmx->nested.pre_vmenter_debugctl);
+> +		new_debugctl = vmx->nested.pre_vmenter_debugctl;
+>  	}
+> +
+> +	if (CC(!vmx_set_guest_debugctl(vcpu, new_debugctl, false))) {
+> +		*entry_failure_code = ENTRY_FAIL_DEFAULT;
+> +		return -EINVAL;
+> +	}
+> +
+>  	if (kvm_mpx_supported() && (!vmx->nested.nested_run_pending ||
+>  	    !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS)))
+>  		vmcs_write64(GUEST_BNDCFGS, vmx->nested.pre_vmenter_bndcfgs);
+> @@ -3520,7 +3527,7 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+>  
+>  	if (!vmx->nested.nested_run_pending ||
+>  	    !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS))
+> -		vmx->nested.pre_vmenter_debugctl = vmcs_read64(GUEST_IA32_DEBUGCTL);
+> +		vmx->nested.pre_vmenter_debugctl = vmx_get_guest_debugctl(vcpu);
+>  	if (kvm_mpx_supported() &&
+>  	    (!vmx->nested.nested_run_pending ||
+>  	     !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS)))
+> @@ -4788,7 +4795,7 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
+>  	__vmx_set_segment(vcpu, &seg, VCPU_SREG_LDTR);
+>  
+>  	kvm_set_dr(vcpu, 7, 0x400);
+> -	vmcs_write64(GUEST_IA32_DEBUGCTL, 0);
+> +	vmx_set_guest_debugctl(vcpu, 0, false);
+>  
+>  	if (nested_vmx_load_msr(vcpu, vmcs12->vm_exit_msr_load_addr,
+>  				vmcs12->vm_exit_msr_load_count))
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index 8a94b52c5731..f6f448adfb80 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -19,6 +19,7 @@
+>  #include "lapic.h"
+>  #include "nested.h"
+>  #include "pmu.h"
+> +#include "vmx.h"
+>  #include "tdx.h"
+>  
+>  /*
+> @@ -652,11 +653,11 @@ static void intel_pmu_reset(struct kvm_vcpu *vcpu)
+>   */
+>  static void intel_pmu_legacy_freezing_lbrs_on_pmi(struct kvm_vcpu *vcpu)
+>  {
+> -	u64 data = vmcs_read64(GUEST_IA32_DEBUGCTL);
+> +	u64 data = vmx_get_guest_debugctl(vcpu);
+>  
+>  	if (data & DEBUGCTLMSR_FREEZE_LBRS_ON_PMI) {
+>  		data &= ~DEBUGCTLMSR_LBR;
+> -		vmcs_write64(GUEST_IA32_DEBUGCTL, data);
+> +		vmx_set_guest_debugctl(vcpu, data, true);
 
-The current code exhibits a somewhat haphazard use of MSR APIs, so I
-wanted to clarify which API to employ in specific situations with
-verbose function naming.
+Two questions. 
 
-Here is an example that Boris had to fix the use of MSR APIs:
+1. why to call vmx_set_guest_debugctl() to do the extra check? currently
+IA32_DEBUGCTL MSR is always intercepted and it's already checked at
+vmx_set_msr() and seems unnecessary to check here again.
 
-https://web.git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=f980f9c31a923e9040dee0bc679a5f5b09e61f40
+2. why the argument "host_initiated" is true? It looks the data is not from
+host.
 
-> 
-> ...
-> 
->> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> index 1547bfacd40f..e73c1d5ba6c4 100644
->> --- a/arch/x86/kvm/vmx/vmx.c
->> +++ b/arch/x86/kvm/vmx/vmx.c
->> @@ -380,7 +380,7 @@ static __always_inline void vmx_disable_fb_clear(struct vcpu_vmx *vmx)
->>   	if (!vmx->disable_fb_clear)
->>   		return;
->>   
->> -	msr = __rdmsr(MSR_IA32_MCU_OPT_CTRL);
->> +	msr = native_rdmsrq(MSR_IA32_MCU_OPT_CTRL);
->>   	msr |= FB_CLEAR_DIS;
->>   	native_wrmsrq(MSR_IA32_MCU_OPT_CTRL, msr);
->>   	/* Cache the MSR value to avoid reading it later */
->> @@ -7307,7 +7307,7 @@ void noinstr vmx_spec_ctrl_restore_host(struct vcpu_vmx *vmx,
->>   		return;
->>   
->>   	if (flags & VMX_RUN_SAVE_SPEC_CTRL)
->> -		vmx->spec_ctrl = __rdmsr(MSR_IA32_SPEC_CTRL);
->> +		vmx->spec_ctrl = native_rdmsrq(MSR_IA32_SPEC_CTRL);
-> 
-> And what guarantees that native_rdmsrq() won't have tracing?  Ugh, a later patch
-> renames native_rdmsrq() => native_rdmsrq_no_trace().
-> 
-> I really don't like this.  It makes simple and obvious code:
-> 
-> 	vmx->spec_ctrl = __rdmsr(MSR_IA32_SPEC_CTRL);
-> 
-> so much harder to read:
-> 
-> 	vmx->spec_ctrl = native_rdmsrq_no_trace(MSR_IA32_SPEC_CTRL);
-> 
-> and does so in a way that is difficult to review, e.g. I have to peek ahead to
-> understand that this is even ok.
-> 
-> I strongly prefer that we find a way to not require such verbose APIs, especially
-> if KVM ends up using native variants throughout.  Xen PV is supposed to be the
-> odd one out, yet native code is what suffers.  Blech.
 
-Will try to figure out how to name the APIs.
+>  	}
+>  }
+>  
+> @@ -729,7 +730,7 @@ void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu)
+>  
+>  	if (!lbr_desc->event) {
+>  		vmx_disable_lbr_msrs_passthrough(vcpu);
+> -		if (vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR)
+> +		if (vmx_get_guest_debugctl(vcpu) & DEBUGCTLMSR_LBR)
+>  			goto warn;
+>  		if (test_bit(INTEL_PMC_IDX_FIXED_VLBR, pmu->pmc_in_use))
+>  			goto warn;
+> @@ -751,7 +752,7 @@ void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu)
+>  
+>  static void intel_pmu_cleanup(struct kvm_vcpu *vcpu)
+>  {
+> -	if (!(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR))
+> +	if (!(vmx_get_guest_debugctl(vcpu) & DEBUGCTLMSR_LBR))
+>  		intel_pmu_release_guest_lbr_event(vcpu);
+>  }
+>  
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index ef2d7208dd20..4237422dc4ed 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2154,7 +2154,7 @@ int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  			msr_info->data = vmx->pt_desc.guest.addr_a[index / 2];
+>  		break;
+>  	case MSR_IA32_DEBUGCTLMSR:
+> -		msr_info->data = vmcs_read64(GUEST_IA32_DEBUGCTL);
+> +		msr_info->data = vmx_get_guest_debugctl(vcpu);
+>  		break;
+>  	default:
+>  	find_uret_msr:
+> @@ -2194,6 +2194,41 @@ static u64 vmx_get_supported_debugctl(struct kvm_vcpu *vcpu, bool host_initiated
+>  	return debugctl;
+>  }
+>  
+> +u64 vmx_get_guest_debugctl(struct kvm_vcpu *vcpu)
+> +{
+> +	return vmcs_read64(GUEST_IA32_DEBUGCTL);
+> +}
+> +
+> +static void __vmx_set_guest_debugctl(struct kvm_vcpu *vcpu, u64 data)
+> +{
+> +	vmcs_write64(GUEST_IA32_DEBUGCTL, data);
+> +}
 
-One reason I chose verbose names is that short names are in use and
-renaming needs to touch a lot of files (and not fun at all).
+IMO,  it seems unnecessary to add these 2  wrappers since the original code
+is already intuitive enough and simple. But if you want, please add
+"inline" before these 2 wrappers.
 
-Thanks!
-     Xin
 
+> +
+> +bool vmx_set_guest_debugctl(struct kvm_vcpu *vcpu, u64 data, bool host_initiated)
+
+Since most of code in this function checks guest debugctl, better to rename
+it to "vmx_check_and_set_guest_debugctl".
+
+
+> +{
+> +	u64 invalid = data & ~vmx_get_supported_debugctl(vcpu, host_initiated);
+> +
+> +	if (invalid & (DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR)) {
+> +		kvm_pr_unimpl_wrmsr(vcpu, MSR_IA32_DEBUGCTLMSR, data);
+> +		data &= ~(DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR);
+> +		invalid &= ~(DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR);
+
+Add space around above 3 "|".
+
+
+> +	}
+> +
+> +	if (invalid)
+> +		return false;
+> +
+> +	if (is_guest_mode(vcpu) && (get_vmcs12(vcpu)->vm_exit_controls &
+> +					VM_EXIT_SAVE_DEBUG_CONTROLS))
+> +		get_vmcs12(vcpu)->guest_ia32_debugctl = data;
+> +
+> +	if (intel_pmu_lbr_is_enabled(vcpu) && !to_vmx(vcpu)->lbr_desc.event &&
+> +	    (data & DEBUGCTLMSR_LBR))
+> +		intel_pmu_create_guest_lbr_event(vcpu);
+> +
+> +	__vmx_set_guest_debugctl(vcpu, data);
+> +	return true;
+> +}
+> +
+>  /*
+>   * Writes msr value into the appropriate "register".
+>   * Returns 0 on success, non-0 otherwise.
+> @@ -2263,26 +2298,9 @@ int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		vmcs_writel(GUEST_SYSENTER_ESP, data);
+>  		break;
+>  	case MSR_IA32_DEBUGCTLMSR: {
+> -		u64 invalid;
+> -
+> -		invalid = data & ~vmx_get_supported_debugctl(vcpu, msr_info->host_initiated);
+> -		if (invalid & (DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR)) {
+> -			kvm_pr_unimpl_wrmsr(vcpu, msr_index, data);
+> -			data &= ~(DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR);
+> -			invalid &= ~(DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR);
+> -		}
+> -
+> -		if (invalid)
+> +		if (!vmx_set_guest_debugctl(vcpu, data, msr_info->host_initiated))
+>  			return 1;
+>  
+> -		if (is_guest_mode(vcpu) && get_vmcs12(vcpu)->vm_exit_controls &
+> -						VM_EXIT_SAVE_DEBUG_CONTROLS)
+> -			get_vmcs12(vcpu)->guest_ia32_debugctl = data;
+> -
+> -		vmcs_write64(GUEST_IA32_DEBUGCTL, data);
+> -		if (intel_pmu_lbr_is_enabled(vcpu) && !to_vmx(vcpu)->lbr_desc.event &&
+> -		    (data & DEBUGCTLMSR_LBR))
+> -			intel_pmu_create_guest_lbr_event(vcpu);
+>  		return 0;
+>  	}
+>  	case MSR_IA32_BNDCFGS:
+> @@ -4795,7 +4813,7 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+>  	vmcs_write32(GUEST_SYSENTER_CS, 0);
+>  	vmcs_writel(GUEST_SYSENTER_ESP, 0);
+>  	vmcs_writel(GUEST_SYSENTER_EIP, 0);
+> -	vmcs_write64(GUEST_IA32_DEBUGCTL, 0);
+> +	__vmx_set_guest_debugctl(&vmx->vcpu, 0);
+>  
+>  	if (cpu_has_vmx_tpr_shadow()) {
+>  		vmcs_write64(VIRTUAL_APIC_PAGE_ADDR, 0);
+> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> index 6d1e40ecc024..8ac46fb47abd 100644
+> --- a/arch/x86/kvm/vmx/vmx.h
+> +++ b/arch/x86/kvm/vmx/vmx.h
+> @@ -404,6 +404,9 @@ u64 vmx_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu);
+>  
+>  gva_t vmx_get_untagged_addr(struct kvm_vcpu *vcpu, gva_t gva, unsigned int flags);
+>  
+> +bool vmx_set_guest_debugctl(struct kvm_vcpu *vcpu, u64 value, bool host_initiated);
+> +u64 vmx_get_guest_debugctl(struct kvm_vcpu *vcpu);
+> +
+>  static inline void vmx_set_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr,
+>  					     int type, bool value)
+>  {
 
