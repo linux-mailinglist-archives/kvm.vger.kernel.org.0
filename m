@@ -1,123 +1,109 @@
-Return-Path: <kvm+bounces-43966-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43967-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39361A990CF
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 17:23:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1A03A99200
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 17:38:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD3317A43B2
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 15:22:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1EC6445DEC
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 15:31:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B678829B23F;
-	Wed, 23 Apr 2025 15:15:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69204280CF0;
+	Wed, 23 Apr 2025 15:21:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NuJAOrtk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZfJBUchs"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7DF729B21F;
-	Wed, 23 Apr 2025 15:15:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99D422857C1;
+	Wed, 23 Apr 2025 15:21:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745421319; cv=none; b=e5Q7xAQfgXW6nBeDctE+nbUlgQ8g8cOOYZ99fEa7+sEJcj5snn8U3WlLUdqmfxzxVHkUk2jwBkubJYORzfTnIgw0qYwMqDk6k+D9MeW/WFU7ep0+IDec+lw+aM4G+T5Awkg7euOq3KRHQ6+OMhbHi/tU1lP3lvYwc2vNg986EXc=
+	t=1745421679; cv=none; b=lxlaGjwx7U971h6KXunKixmH86yrLkPxTbX0DNaVSNbZmRMNJ3qCKKuK010bILrC2k5RUlkPs4VcCaXaF0+fC7gDqiKhubzjJLpErqHDSStAtscLVGFaiB2G7z0CfUGBsfdSfbtma8+frIga19R3180v50ybIGQEot4sQgm2HsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745421319; c=relaxed/simple;
-	bh=Dmj4/HJxUQOQdh1ZBw4viqpwCEPGdEuNbQNJlX78JYE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CD4v5gHBthjkmJAOP8Z/G52gcE8HBErg7iY5tJdKmntgOLzHjeYNaKsuFQT4UKEf0x4GhXzkNbWzpf5Nn1AAe1Jh0G2CknqIaVW5Q8KKhmlbA3V5diTa0MyCL2nMiHLWrbqLx8JkkeY86oAyV7g1dTTwbIe3AjqOVmHSwo3ocuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NuJAOrtk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68AAAC4CEEC;
-	Wed, 23 Apr 2025 15:15:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745421319;
-	bh=Dmj4/HJxUQOQdh1ZBw4viqpwCEPGdEuNbQNJlX78JYE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NuJAOrtkZKKjNnOvaNen3Bdi4lrJ7dy91yryb97XFVTugJ+P/GRH/QuR4JxEmop7E
-	 hCy+FvCyz2FnT0wM5Il9MCzDplbu17s05aXbtRhJ+0yaNaGBpNX5lkiY1mqk8tEqqf
-	 /5PuFjIgCnM1EBlUzfWYIUA30mqOW1S2y9hpLsgsssWxBy9lgHOA1kNYk4/4FlRChK
-	 xt2Uwx2RxtASa5IZFXwpE/ZZWQSoMSIJ2B589+HDW3sXRkNSCs9yRMvEygbHcfhNz7
-	 QBy0Ip7sa8cFNZi246cdHmAJThx36JJcmhD/V/dm8W99LkavzUrzbYZojJ5EohBaDD
-	 DWNfI/Bj76s1g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1u7boj-0082xr-IU;
-	Wed, 23 Apr 2025 16:15:17 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: [PATCH v3 17/17] KVM: arm64: Document NV caps and vcpu flags
-Date: Wed, 23 Apr 2025 16:15:08 +0100
-Message-Id: <20250423151508.2961768-18-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250423151508.2961768-1-maz@kernel.org>
-References: <20250423151508.2961768-1-maz@kernel.org>
+	s=arc-20240116; t=1745421679; c=relaxed/simple;
+	bh=ocihTxHKjDV8ZWlIROTSWda+Ts4l5IXkFmD+6cfyN3U=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:Content-Type:
+	 MIME-Version; b=SrkITh4CpzUqYD/gTS8HvdC9fvbjvRvXfRR4nG4HPDErlSsLM260muQD00uel7n3hLwdj7pT54CYkUYW5qE9Kd6INQ8eZAMrvzqTmDO94P9sajIdWJ0cRCgI6CCob6KCBQmhk9TrBW08J06wR1GFES79ECqgrbX9ky22uZhWHx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZfJBUchs; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-43cf034d4abso60913025e9.3;
+        Wed, 23 Apr 2025 08:21:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745421675; x=1746026475; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:in-reply-to:date
+         :cc:to:from:subject:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Li+3GRicRppsnv6S7lrbfl1VCvjPKVNnD9s3Fy6S0jw=;
+        b=ZfJBUchsLmhZSw8kjb5tjqYOoQtgKTmDMPNgbqWdt/klShPIOpIbfS0UKYMEYk/MOA
+         J3Ws5izkymByCIpJC9T13a0Ot+U+5wj4By3fxR96FvXmdgEB+uZavXrNrjgtdTutYIdY
+         FIF3+GowNvaKETZTbML8BwBiZ4oiLjwG6tGZGNVQTr3wN4FrveUPAYY/onAoSpIIFo6D
+         qCdKfmmiifqKrSH99zJY/uWBGfDwf4+50R6TjnSa67X3eNcpTY00W/ry/28lXiKQA0RJ
+         LZMVzGVUd6ay+BllHxps4cBrcD0rMVU6mlk526t67k5SprC9rAf+JGZ0m8GBrA09NPAg
+         kY8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745421675; x=1746026475;
+        h=mime-version:user-agent:content-transfer-encoding:in-reply-to:date
+         :cc:to:from:subject:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Li+3GRicRppsnv6S7lrbfl1VCvjPKVNnD9s3Fy6S0jw=;
+        b=Gxn5iJ2aI8rKo7DW8iPdjZN79uWQbSJYY6qYyJRlxyv1xhBLY0wWCk3VZSBnbBV9eH
+         50tDsvyXFkw/gonLcyH8Nw/IudDb30oLKkIfKjaedDrvDG89dqO1Ju+WBBNc22E34mrL
+         xc0IwSGKwDXGqlqQAz650EVfuM/JZ8wIfuSN8ghFvg2XSBEfTSSm0GHcTsYqGMlFIzgb
+         FW0ewrqQdJGAoCTO7MHkicpzExKwEtRwQ95+w9dnaE0mPwUwxRhKG/7BIpEZo+yQ9Mqx
+         w6iPt8P3NQv1XenmE6qqdpXJ3pwygIURd+fkVNcIGfUQA3Z9x5ODOkAdtqEKzLNHITUH
+         nduA==
+X-Forwarded-Encrypted: i=1; AJvYcCU8JId/rKfrXOAk9usKVwIkyaqTr4440t3QjTo0GWH85Mzf9TzassAypbcSo6CCi6FX6v6XnMGFUEflMv8m@vger.kernel.org, AJvYcCWH7vJ2hnmBJpbW6L0iRw3UIVEzuztQlae3j5S/3M/U5gYZv3vmXMlqsOFp/H/85/lA000=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6CQsVaI4C9UYePm2M41c2wHmAxSv0B+y6OL4MLm3Y9XTjWNk3
+	Z54EaUHiF5Ok4U8V1XQ3OsfFSKH4yIfN4yR3XssSF4GrCEdRj4y7MYUbQ14k
+X-Gm-Gg: ASbGncubF68dsRrA2rsnXZx7XKAnrzZhLVxtcYw+NKB1d0gpXeg/JCun+zSANbby3HF
+	2uFNhsizOJcTingCsxeOfGVzYH9rpzHH/Iy8UxWjUxzKqrHepCQdEaj9BImElfJ0k5LMW2nPM44
+	a7fYTDFFfpKyM2C8MpaL8L7LPFbE2T2XRL5wYV1LTnEXWmBox5npRSj1tptlXpI9sf/OID9STfq
+	pUCJbEXYQwMGRZg3X0F5D4fzoRx0gnihFws3/O5HSaZcOoBM47CSLLOXwLFschqZYsFdccp5TSo
+	TD1FlWkQfDuMUktmRYih7K8JyfqGsimnOfcWUfnVLgxNTnjRzsZleRQ5IPIUMgMNk3m8dq7pyGR
+	kBnX6NV2TmHRBwPG2mXRQvQ==
+X-Google-Smtp-Source: AGHT+IENHJTw1XWaNUx/Z8DhUmtsOHouN2kWNcGXTJkXEi3Tx5xDITR7zmfelv88F8OaG9mu2r1gXw==
+X-Received: by 2002:a05:600c:8716:b0:43d:745a:5a50 with SMTP id 5b1f17b1804b1-4406abb420dmr179538155e9.19.1745421674445;
+        Wed, 23 Apr 2025 08:21:14 -0700 (PDT)
+Received: from ?IPv6:2001:b07:5d29:f42d:c06f:b161:cbfc:6bf0? ([2001:b07:5d29:f42d:c06f:b161:cbfc:6bf0])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-44092d22f69sm28990695e9.10.2025.04.23.08.21.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Apr 2025 08:21:14 -0700 (PDT)
+Message-ID: <15e24c455fb9fca05b5af504251019b905b1bd77.camel@gmail.com>
+Subject: Re: [PATCH 31/67] KVM: SVM: Extract SVM specific code out of
+ get_pi_vcpu_info()
+From: Francesco Lavra <francescolavra.fl@gmail.com>
+To: seanjc@google.com
+Cc: baolu.lu@linux.intel.com, dmatlack@google.com, dwmw2@infradead.org, 
+	iommu@lists.linux.dev, joao.m.martins@oracle.com, joro@8bytes.org, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mlevitsk@redhat.com, 
+	pbonzini@redhat.com
+Date: Wed, 23 Apr 2025 17:21:12 +0200
+In-Reply-To: <20250404193923.1413163-32-seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, eric.auger@redhat.com, gankulkarni@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Describe the two new vcpu flags that control NV, together with
-the capabilities that advertise them.
+On 2025-04-04 at 19:38, Sean Christopherson wrote:
+> @@ -876,20 +874,21 @@ int avic_pi_update_irte(struct kvm_kernel_irqfd
+> *irqfd, struct kvm *kvm,
+>  	 * 3. APIC virtualization is disabled for the vcpu.
+>  	 * 4. IRQ has incompatible delivery mode (SMI, INIT, etc)
+>  	 */
+> -	if (new && new->type =3D=3D KVM_IRQ_ROUTING_MSI &&
+> -	    !get_pi_vcpu_info(kvm, new, &vcpu_info, &svm) &&
+> -	    kvm_vcpu_apicv_active(&svm->vcpu)) {
+> +	if (new && new && new->type =3D=3D KVM_IRQ_ROUTING_MSI &&
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- Documentation/virt/kvm/api.rst | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
-
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 47c7c3f92314e..fe3d6b5d2acca 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -3460,7 +3460,8 @@ The initial values are defined as:
- 	- FPSIMD/NEON registers: set to 0
- 	- SVE registers: set to 0
- 	- System registers: Reset to their architecturally defined
--	  values as for a warm reset to EL1 (resp. SVC)
-+	  values as for a warm reset to EL1 (resp. SVC) or EL2 (in the
-+	  case of EL2 being enabled).
- 
- Note that because some registers reflect machine topology, all vcpus
- should be created before this ioctl is invoked.
-@@ -3527,6 +3528,17 @@ Possible features:
- 	      - the KVM_REG_ARM64_SVE_VLS pseudo-register is immutable, and can
- 	        no longer be written using KVM_SET_ONE_REG.
- 
-+	- KVM_ARM_VCPU_HAS_EL2: Enable Nested Virtualisation support,
-+	  booting the guest from EL2 instead of EL1.
-+	  Depends on KVM_CAP_ARM_EL2.
-+	  The VM is running with HCR_EL2.E2H being RES1 (VHE) unless
-+	  KVM_ARM_VCPU_HAS_EL2_E2H0 is also set.
-+
-+	- KVM_ARM_VCPU_HAS_EL2_E2H0: Restrict Nested Virtualisation
-+	  support to HCR_EL2.E2H being RES0 (non-VHE).
-+	  Depends on KVM_CAP_ARM_EL2_E2H0.
-+	  KVM_ARM_VCPU_HAS_EL2 must also be set.
-+
- 4.83 KVM_ARM_PREFERRED_TARGET
- -----------------------------
- 
--- 
-2.39.2
-
+The `&& new` part is redundant.
 
