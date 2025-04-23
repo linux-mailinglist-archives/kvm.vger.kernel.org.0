@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-43905-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43906-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3BFBA98441
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 10:54:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 44D95A984C8
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 11:07:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC4B1189D0A3
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 08:54:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6AE7D1B66AE1
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 09:07:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D811FCFF3;
-	Wed, 23 Apr 2025 08:53:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DAC025CC77;
+	Wed, 23 Apr 2025 09:04:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="dl3P7bXF"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="jHhglhXv"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F5691F2BAB;
-	Wed, 23 Apr 2025 08:53:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B79625C820;
+	Wed, 23 Apr 2025 09:04:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745398406; cv=none; b=kXatubg/QDNCoEKJV2cDeimGGLnrUlkNid4qNRCsBYloxCirg3knqgaN4wj5hx/hnN6hBoz67Xtird627sAasHZl+nITvGDakxc1nh+ygtcmh2qi5u4Lv2FJ4OtAZlEouENhGUG8PpVG9VrhPU19MO0uNiIdSxffTNQSfoSpC8c=
+	t=1745399078; cv=none; b=HwLVf3HaGt11J3PhKwCbp6j2zTmRbauxg8a7/Rtj14jg8p/v3gc8NCTErPZQ7Q7eWyMcHvpl1Vb8aKptCL4DNlvGBrFSQivwJXmGGWyFXhnvlJOeWBORNLGnWX2OJquhhqUfSG3IOtx5bPfkDsLF50B45X86F6GwtFyU37xScnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745398406; c=relaxed/simple;
-	bh=auPKMW+q1+Qqn2QTB5GXMprPrUP+dPOtU3JF8GSfRa0=;
+	s=arc-20240116; t=1745399078; c=relaxed/simple;
+	bh=Scv61BPn1S5NCIrOFvABukt5YWGju5wHJrpfJQ5MtTs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ndeoyMDsTWU9n0hDDJNI5xWEd7V1cZaqD2nqn3tyEPNwJZYVZAnZPxfjAB5x6lA4DLM9w+4WJUFyvnF4XCd9Z9YEYadQ4DKMMXSFM/H/DFOp7HbiJEYY5U2p17Kf+l5UitundvEY35t/CcUlKHCpIf3WWJFs40NDqwgmGoSfa8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=dl3P7bXF; arc=none smtp.client-ip=198.137.202.136
+	 In-Reply-To:Content-Type; b=FfZwY4Hf/TUqmqdWyWilhnJU3Fr4Lx58f53PHb2zma60mG7XxgaMglMZOxxy3I4TK5fIhbfWRUNSsMQj1PAyBU/YCMbvZaHxjOnyUeGlRk0F/AeuCqWi867qajhuPu18mxwcmWBGYbk7CYw3neaA4gcTq5yjzTSytMcSYp/nGhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=jHhglhXv; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from [192.168.7.202] ([71.202.166.45])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53N8pdPU3180274
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53N93fQA3189218
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Wed, 23 Apr 2025 01:51:39 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53N8pdPU3180274
+	Wed, 23 Apr 2025 02:03:42 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53N93fQA3189218
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1745398303;
-	bh=6kmN/+GrZw4rC3Ys6pLoNaD/Wf1DQKhvLOyIykqio94=;
+	s=2025042001; t=1745399025;
+	bh=u0XOm4Pe1y26VX9KraE8lCfVMIhih5CUvlEon/+N7r8=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=dl3P7bXFsCov3PgD20ymOIC1FG1eSAGxGe1DQbY2LG6O/NrMHMVBlGAk+JDp60Fgf
-	 +Pnv70fyGnLeBBbiUkB5NfR80TUqf9PoUmAU9iHHDMoRGzCfwBcwkKjONfEfh6RU3y
-	 Xd+yt6SiKMOPKs7smA0LIwhSCJBbmEF2pgXMq1hR7ce2lmLZxa2oozrZU5Xx64YBSy
-	 em5fezjfad3PGQcOwdbxM11bSPQVT17+MM/RZhPGMfA5z1Fo8GISFAxn0dAWTxVqKs
-	 NapT16DwTl3Gg6ZXI0V3IlW3sqxII7MOJohN3YgP4fSuVYSwWgYi1N7Og/gNcKFK4d
-	 023Wanxii0hkw==
-Message-ID: <f7198308-e8f8-4cc5-b884-24bc5f408a2a@zytor.com>
-Date: Wed, 23 Apr 2025 01:51:38 -0700
+	b=jHhglhXvhVyTJ9jbGbBEsLpKKKBonwgJfuJebJkfdM2ZVf587fR3O1LmBPaAX8A+7
+	 Y/kQ8sy1SWT03AqNGStd9X6lus78yvsubZ9m4m+1Q78rLFEGgbDfDd5TAdwoyWFOo7
+	 QE2PAqjPMr7Nf9QsR+7zMCqsy41tHPFwJQOXdldXH4Uef0v3MZmMgxjyvQfzSoLRiS
+	 nHnSLuwIeibOtU52hStVUmkHsV08RKi82jG7O+XUZkO1n+JM2syhx8Jp+OwjcGZBEa
+	 gS0TDoUjBiODs26vxsCih9QvNtT077p8SGL+iciRZQ/Xtdur9QA3BHiJOB0btfGNTu
+	 cVHFdG56BYXAQ==
+Message-ID: <7899fcd9-3492-49d3-8097-a3ddefaaeef0@zytor.com>
+Date: Wed, 23 Apr 2025 02:03:41 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,8 +56,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 21/34] x86/msr: Utilize the alternatives mechanism
- to write MSR
+Subject: Re: [RFC PATCH v2 22/34] x86/msr: Utilize the alternatives mechanism
+ to read MSR
 To: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
@@ -77,8 +77,8 @@ Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
         haiyangz@microsoft.com, decui@microsoft.com
 References: <20250422082216.1954310-1-xin@zytor.com>
- <20250422082216.1954310-22-xin@zytor.com>
- <b2624e84-6fab-44a3-affc-ce0847cd3da4@suse.com>
+ <20250422082216.1954310-23-xin@zytor.com>
+ <080351cb-6c3d-4540-953d-6205f1ff0745@suse.com>
 Content-Language: en-US
 From: Xin Li <xin@zytor.com>
 Autocrypt: addr=xin@zytor.com; keydata=
@@ -115,165 +115,38 @@ Autocrypt: addr=xin@zytor.com; keydata=
  PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
  gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
  l75w1xInsg==
-In-Reply-To: <b2624e84-6fab-44a3-affc-ce0847cd3da4@suse.com>
+In-Reply-To: <080351cb-6c3d-4540-953d-6205f1ff0745@suse.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 4/22/2025 2:57 AM, Jürgen Groß wrote:
-> On 22.04.25 10:22, Xin Li (Intel) wrote:
->> The story started from tglx's reply in [1]:
->>
->>    For actual performance relevant code the current PV ops mechanics
->>    are a horrorshow when the op defaults to the native instruction.
->>
->>    look at wrmsrl():
->>
->>    wrmsrl(msr, val
->>     wrmsr(msr, (u32)val, (u32)val >> 32))
->>      paravirt_write_msr(msr, low, high)
->>        PVOP_VCALL3(cpu.write_msr, msr, low, high)
->>
->>    Which results in
->>
->>     mov    $msr, %edi
->>     mov    $val, %rdx
->>     mov    %edx, %esi
->>     shr    $0x20, %rdx
->>     call    native_write_msr
->>
->>    and native_write_msr() does at minimum:
->>
->>     mov    %edi,%ecx
->>     mov    %esi,%eax
->>     wrmsr
->>     ret
->>
->>    In the worst case 'ret' is going through the return thunk. Not to
->>    talk about function prologues and whatever.
->>
->>    This becomes even more silly for trivial instructions like STI/CLI
->>    or in the worst case paravirt_nop().
+On 4/22/2025 4:12 AM, Jürgen Groß wrote:
+>> +
+>> +static __always_inline bool __rdmsrq(u32 msr, u64 *val, int type)
+>> +{
+>> +    bool ret;
+>> +
+>> +#ifdef CONFIG_XEN_PV
+>> +    if (cpu_feature_enabled(X86_FEATURE_XENPV))
+>> +        return __xenpv_rdmsrq(msr, val, type);
 > 
-> This is nonsense.
-> 
-> In the non-Xen case the initial indirect call is directly replaced with
-> STI/CLI via alternative patching, while for Xen it is replaced by a direct
-> call.
-> 
-> The paravirt_nop() case is handled in alt_replace_call() by replacing the
-> indirect call with a nop in case the target of the call was paravirt_nop()
-> (which is in fact no_func()).
-> 
->>
->>    The call makes only sense, when the native default is an actual
->>    function, but for the trivial cases it's a blatant engineering
->>    trainwreck.
-> 
-> The trivial cases are all handled as stated above: a direct replacement
-> instruction is placed at the indirect call position.
+> I don't think this will work for the Xen PV case.
 
-The above comment was given in 2023 IIRC, and you have addressed it.
+Well, I have been testing the code on xen-4.17 coming with Ubuntu
+24.04.2 LTS :)
 
 > 
->> Later a consensus was reached to utilize the alternatives mechanism to
->> eliminate the indirect call overhead introduced by the pv_ops APIs:
->>
->>      1) When built with !CONFIG_XEN_PV, X86_FEATURE_XENPV becomes a
->>         disabled feature, preventing the Xen code from being built
->>         and ensuring the native code is executed unconditionally.
-> 
-> This is the case today already. There is no need for any change to have
-> this in place.
-> 
->>
->>      2) When built with CONFIG_XEN_PV:
->>
->>         2.1) If not running on the Xen hypervisor (!X86_FEATURE_XENPV),
->>              the kernel runtime binary is patched to unconditionally
->>              jump to the native MSR write code.
->>
->>         2.2) If running on the Xen hypervisor (X86_FEATURE_XENPV), the
->>              kernel runtime binary is patched to unconditionally jump
->>              to the Xen MSR write code.
-> 
-> I can't see what is different here compared to today's state.
-> 
->>
->> The alternatives mechanism is also used to choose the new immediate
->> form MSR write instruction when it's available.
-> 
-> Yes, this needs to be added.
-> 
->> Consequently, remove the pv_ops MSR write APIs and the Xen callbacks.
-> 
-> I still don't see a major difference to today's solution.
+> X86_FEATURE_XENPV is set only after the first MSR is being read.
 
-The existing code generates:
-
-     ...
-     bf e0 06 00 00          mov    $0x6e0,%edi
-     89 d6                   mov    %edx,%esi
-     48 c1 ea 20             shr    $0x20,%rdx
-     ff 15 07 48 8c 01       call   *0x18c4807(%rip)  # <pv_ops+0xb8>
-     31 c0                   xor    %eax,%eax
-     ...
-
-And on native, the indirect call instruction is patched to a direct call
-as you mentioned:
-
-     ...
-     bf e0 06 00 00          mov    $0x6e0,%edi
-     89 d6                   mov    %edx,%esi
-     48 c1 ea 20             shr    $0x20,%rdx
-     e8 60 3e 01 00          call   <{native,xen}_write_msr> # direct
-     90                      nop
-     31 c0                   xor    %eax,%eax
-     ...
-
-
-This patch set generates assembly w/o CALL on native:
-
-     ...
-     e9 e6 22 c6 01          jmp    1f   # on native or nop on Xen
-     b9 e0 06 00 00          mov    $0x6e0,%ecx
-     e8 91 d4 fa ff          call   ffffffff8134ee80 <asm_xen_write_msr>
-     e9 a4 9f eb 00          jmp    ffffffff8225b9a0 <__x86_return_thunk>
-         ...
-1:  b9 e0 06 00 00          mov    $0x6e0,%ecx   # immediate form here
-     48 89 c2                mov    %rax,%rdx
-     48 c1 ea 20             shr    $0x20,%rdx
-     3e 0f 30                ds wrmsr
-     ...
-
-It's not a major change, but when it is patched to use the immediate 
-form MSR write instruction, it's straightforwardly streamlined.
+No matter whether the code works or not, good catch!
 
 > 
-> Only the "paravirt" term has been eliminated.
+> This can be fixed by setting the feature earlier, but it shows that the
+> paravirt feature has its benefits in such cases.
 
-Yes.
+See my other reply to let Xen handle all the details.
 
-But a PV guest doesn't operate at the highest privilege level, which
-means MSR instructions typically result in a #GP fault.  I actually 
-think the pv_ops MSR APIs are unnecessary because of this inherent
-limitation.
+Plus the code actually works, I would actually argue the opposite :-P
 
-Looking at the Xen MSR code, except PMU and just a few MSRs, it falls
-back to executes native MSR instructions.  As MSR instructions trigger
-#GP, Xen takes control and handles them in 2 ways:
 
-   1) emulate (or ignore) a MSR operation and skip the guest instruction.
 
-   2) inject the #GP back to guest OS and let its #GP handler handle it.
-      But Linux MSR exception handler just ignores the MSR instruction
-      (MCE MSR exception will panic).
-
-So why not let Xen handle all the details which it already tries to do?
-(Linux w/ such a change may not be able to run on old Xen hypervisors.)
-
-BTW, if performance is a concern, writes to MSR_KERNEL_GS_BASE and
-MSR_GS_BASE anyway are hpyercalls into Xen.
-
-Thanks!
-     Xin
 
