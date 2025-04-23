@@ -1,143 +1,133 @@
-Return-Path: <kvm+bounces-43989-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43990-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45C9DA99656
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 19:18:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07922A99686
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 19:24:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B31D41B859AB
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 17:18:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEDC25A78CF
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 17:24:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57E8A28C5D2;
-	Wed, 23 Apr 2025 17:17:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DC2528C5A5;
+	Wed, 23 Apr 2025 17:24:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="npaeDpuZ"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="Rx4uvcSb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B94528C5B6
-	for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 17:17:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21BEF13B797;
+	Wed, 23 Apr 2025 17:24:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745428644; cv=none; b=ItQ9Nvdp0At9Pz9tLj19xCwNvVlgsREXYyYXp4iV4xfD51sgyHgC6+ilM7fxaeWyOGvGg4ciVNUgyrJjjMMlKJ/SSl+7k5PlEtZGx64WoUb9GdvxizsWGUbuziGruWAyWPVcQikuQLCHsTs0EOi2mq/LActLQVMQahYpqtPFSQo=
+	t=1745429060; cv=none; b=M7QQqxZGyMXUfxtsirOfIj3WG2fbBe9K99f4aV7F5SVLzhm9XcuxQGWP/2PMaTujb63iFqy36kCQ89AuIygozwjn+j+zyQ2Hc4Y9ZTAT6QDFELITyPdJCIWWE3Ms8kWup7aAuXjJwrOos8RlSfML7+kDY+6P1H9x1qjVnLBCYxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745428644; c=relaxed/simple;
-	bh=EiBhyUfzV2Z7UDyJtWT+jDVz3vG5z4pmjKVdd/tf4pw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oNhjfVrKFSeBk/r6bcx6ql+BH44IrWbOJd4UYX2XAk8r4AXmciOfNKPvXMb3+IjbhMNwB8Sib+WVnJO7m/8aJ3lKqVx5EY9fFKQCLFWukgimV1qP9iXiwQ2S8JbifiQ+KEdmP3d00xboGwkJ38vMJVlvMU0xF9H0EmivRL4bfOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=npaeDpuZ; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4766631a6a4so837511cf.2
-        for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 10:17:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1745428641; x=1746033441; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dFsItIzcNoABKT1tTnR+L3KluEl/QW6UiWkd3yuS4gc=;
-        b=npaeDpuZ5VPkOZqrigtgKEO3dCkGR0IX2y98q9Ii9PH6a4ySKU1Jl4WwtNJ6vivJox
-         7hEhKgYIFPYqeHFyrzJiO3d33Z8ckzVE0eaA8fEtLnT8cYn03BrtVZuBiETLqrfiK/nf
-         gFTPKeLi7Cpt7+qx2b+ZjMHPmjzmah7oNakivA1lRSbQMUGY1if5wHCAKmZlpI9uAt6a
-         Zy6Lvyyn98F2uzFdf2FiWobaepLTsF6ukZ61MMk+0nGEE0Blu0FjWpPxnQrpfafrFL4m
-         rX9Cge4tjMFyn+s+tbrBkE7lZCL4t6Rs9j2pRiBe6X2c5Xq9grXs9D9XN/yfjfw31f4z
-         4q3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745428641; x=1746033441;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dFsItIzcNoABKT1tTnR+L3KluEl/QW6UiWkd3yuS4gc=;
-        b=djoeStILOehdMgUUJHwFgVeT1frOs+aY/aKWBei8SpJYkOZr2zqCrhD1DidMsHRBZX
-         PDqM06PERQVXuibEzD2npSDrQXYJwA6RZX0zc/3za1BXNtkOf3xywwLXRaaHrrB3xN5P
-         ZEA4zw1tofrTf3XexuDnlh27HRnFuvpNzhNWYZFSlq+V2Bsi0HKlxvLM6G16gggmwOhE
-         VsU6wNaBFgKjkODJaK/YDc0n5QA8ohOc7sc0T69f8pI5Qp8Ot0NGjxytCfr7imxg8JTX
-         rzbfjLeYfxHrpf+IrEGtjfweo5C6ULv0hXJ/Gc5yvNSOWOzd2Dh4AjjM+dI+YR1YeXPf
-         jCng==
-X-Forwarded-Encrypted: i=1; AJvYcCUexP8RqdNXQkYTiHMM1OjEnQxUaBpEDzasH9DWWIUOocKHf/4Nvm97o95yt3irfAs25C8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQsqMeidxDIz7zpXu9jRSV2FZ12KnNbu5N7iFZQodT9baNnsP+
-	l+p8ujVaDA5KYxEhQMtm9C4xxeF+dvtCaIlCLUejWDzNzm5wAQHyfJfM1cKLiEE=
-X-Gm-Gg: ASbGnctYZjplGwfavKkIyQUnbtm98Eh/YMcdG3hbG+Gy+Zu9Xxjyc/r/RCWFfGMFyi6
-	/Me69iWD41T14Nt42Cfq0eFWC2KV/sxYqtjWw+sj0i6WF3+WCprhPp0D32K78hwzUIeaXx4MS+O
-	N/ScgEPuEbQx8Lht/YBYydNezDSLs7Tpe+PtuWyf85qyHzcmC4PRH161Sh7xyKMQ6wgZdyd/IX7
-	DTcEhBX9m+AowdCKv3QKuMY8pB04IrOJhhWcV9wcXP4T8ojX8oVU+Ibt+OMseFhYIRBuCaUAzZu
-	SFb7AaF+E0eiAD3fLgV+TubTG32RisGzB0kJN/YZ1tODixV7jgX3qaT/dlQ4AmQ5Co25p76AtMW
-	CWfNO6kMNMRtvedh4yjo=
-X-Google-Smtp-Source: AGHT+IFtKlYmuMPWfMKQK8kh2VV5wwxeBA4j6ePEQHIEvAPMlC2NtpfOcLZrcYI7RZQRiXVuJwSHAw==
-X-Received: by 2002:ac8:7f51:0:b0:476:838c:b0ce with SMTP id d75a77b69052e-47e7607d5ddmr844071cf.13.1745428641397;
-        Wed, 23 Apr 2025 10:17:21 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-167-219-86.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.219.86])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-47ae9cf9f29sm70808611cf.71.2025.04.23.10.17.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 10:17:20 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1u7diq-00000007LSZ-1iS9;
-	Wed, 23 Apr 2025 14:17:20 -0300
-Date: Wed, 23 Apr 2025 14:17:20 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>,
-	Leon Romanovsky <leonro@nvidia.com>, Jake Edge <jake@lwn.net>,
-	Jonathan Corbet <corbet@lwn.net>, Zhu Yanjun <zyjzyj2000@gmail.com>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH v9 10/24] mm/hmm: let users to tag specific PFN with DMA
- mapped bit
-Message-ID: <20250423171720.GL1213339@ziepe.ca>
-References: <cover.1745394536.git.leon@kernel.org>
- <0a7c1e06269eee12ff8912fe0da4b7692081fcde.1745394536.git.leon@kernel.org>
+	s=arc-20240116; t=1745429060; c=relaxed/simple;
+	bh=yeOm1bRB3Atij+ZTfp6eaNb/4+mfC36qGQgJzn4E+sk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KmbORZbkUvEH107+x/mo4IPcyRNjD7XNSQcPv7iV7vkOUfU0iDwhwOwQGUYzUKoTOvxew3uhibhzF3/A7KIkaE7c5nS+NBoFEQhrOdo3YrTTRp0dyQmQ4k1tJbr3AQKWSJgaCwSD78Pd7hv0X9YMhgzyH9YTbIaHHOOMAqSWxbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=Rx4uvcSb; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.202] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53NHNUhb3816392
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Wed, 23 Apr 2025 10:23:31 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53NHNUhb3816392
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025042001; t=1745429016;
+	bh=KGV0WbN8TQwHu403QGuVpSGpOVYPp977T4l8EnRBnpo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Rx4uvcSbUxH27ZQufmzp9l6akeq6GAi04sDD2NQ2xWVKfdMclJjO/DcJ9bIJk5ZG1
+	 bscfklmB1ttA3gzakhyLww5MWnvMsItmBlyJjingcwZnTTm1oYYfF7Qpf27ZfId+5F
+	 Ez85JANkyjBmXnLXd+PhV1vM7/AIZ5QfjZDbcghLL9pJ+wAI8EdZGxfPPEI8qELUl9
+	 LC09mduxpQ/6PRNDwNsLr8nEp2KuEP/mRBfORYy9GV2SNxTRqCFfrqSv7eOpU1snyu
+	 NzeDiDDgVnY3Qi3mqxpv4Z7c/1Ea5do28c8gpruH0YApRf8wfcUUDz3ihrvAg2jbjw
+	 wfyCSXMbouIaA==
+Message-ID: <08b7e342-61f7-47fe-bc8a-5ce55e658e84@zytor.com>
+Date: Wed, 23 Apr 2025 10:23:29 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0a7c1e06269eee12ff8912fe0da4b7692081fcde.1745394536.git.leon@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 03/34] x86/msr: Rename rdpmcl() to rdpmcq()
+To: Dave Hansen <dave.hansen@intel.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        virtualization@lists.linux.dev, linux-pm@vger.kernel.org,
+        linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org,
+        linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org,
+        netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        acme@kernel.org, jgross@suse.com, andrew.cooper3@citrix.com,
+        peterz@infradead.org, namhyung@kernel.org, mark.rutland@arm.com,
+        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
+        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
+        wei.liu@kernel.org, ajay.kaher@broadcom.com,
+        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
+        pbonzini@redhat.com, vkuznets@redhat.com, luto@kernel.org,
+        boris.ostrovsky@oracle.com, kys@microsoft.com, haiyangz@microsoft.com,
+        decui@microsoft.com
+References: <20250422082216.1954310-1-xin@zytor.com>
+ <20250422082216.1954310-4-xin@zytor.com> <aAj5F9IZXG7MB0ai@google.com>
+ <6211378e-955b-47f4-8688-ec93728f0087@intel.com>
+Content-Language: en-US
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <6211378e-955b-47f4-8688-ec93728f0087@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 23, 2025 at 11:13:01AM +0300, Leon Romanovsky wrote:
-> From: Leon Romanovsky <leonro@nvidia.com>
+On 4/23/2025 8:06 AM, Dave Hansen wrote:
+> On 4/23/25 07:28, Sean Christopherson wrote:
+>> Now that rdpmc() is gone, i.e. rdpmcl/rdpmcq() is the only helper, why not simply
+>> rename rdpmcl() => rdpmc()?  I see no point in adding a 'q' qualifier; it doesn't
+>> disambiguate anything and IMO is pure noise.
 > 
-> Introduce new sticky flag (HMM_PFN_DMA_MAPPED), which isn't overwritten
-> by HMM range fault. Such flag allows users to tag specific PFNs with
-> information if this specific PFN was already DMA mapped.
+> That makes total sense to me.
 > 
-> Tested-by: Jens Axboe <axboe@kernel.dk>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> ---
->  include/linux/hmm.h | 17 +++++++++++++++
->  mm/hmm.c            | 51 ++++++++++++++++++++++++++++-----------------
->  2 files changed, 49 insertions(+), 19 deletions(-)
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-
-This would be part of the RDMA bits
-
-Jason
+Unable to argue with two maintainers on a simple naming ;), so will make
+the change.
 
