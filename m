@@ -1,62 +1,63 @@
-Return-Path: <kvm+bounces-43919-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-43920-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2A88A9887E
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 13:26:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 10A05A9887F
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 13:26:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E50184440B8
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 11:26:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 514C74440A8
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 11:26:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80CAF26FA59;
-	Wed, 23 Apr 2025 11:26:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7248126FA7E;
+	Wed, 23 Apr 2025 11:26:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k7HOEVB5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dsTdrOYL"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9DE9262FFB
-	for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 11:26:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9C3026FA5D
+	for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 11:26:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745407573; cv=none; b=qT82Ifl1A/7bxW1fkpUxLrkMPdLjm2IWkAqUF3f4NttUVhhRKLh7doXRw3bFeyY8vMfZWpyA8/qvBoG3JaJuJF8DYsC4JM2Hu/hQy89aZHbFd6h6ZHAQmbWw3ZFJnnRJbDc/83JhtTfxSpYx3hW1mqB9+HEapmspe+9X8c1bi6Q=
+	t=1745407576; cv=none; b=eZ2mKpcvJGRV11/x8Wak6zBbPdsibhSXXBxRNjPxkCZLG2Yu29wJscIavhZRNY/97+xDcR00a+SSXrVUcvqrCEux6Q98d6Lnklw3TBg5lX6G4Aghn/gyPSOLl1dt4cvDGvQZsA5oIp16xKlzOSJ4BPBeOstforFF0VlzQ75rKxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745407573; c=relaxed/simple;
-	bh=sWI3DOLRDTWF/zbnA7amIpyitgpG1InAQItEsYRGi6E=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=kLSiRf/hG7eazxSC/+oUXryZvXYwKujzPkps13Z2RRvZStliTjIlAG6wGBXex2tlvSmKfMKlUl/Q9HZ83G++Llt4/2+BssNAPXO7bARw5VKnKU8m6ouTG6mceOhcYegjsHDnruY/JooFQtshP8zuPxvaY1gHungCArnvekO7CdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=k7HOEVB5; arc=none smtp.client-ip=192.198.163.12
+	s=arc-20240116; t=1745407576; c=relaxed/simple;
+	bh=hFmCDh1g6jFUGO8m7NQhmZ+M7gV0kLnTguTu4AQJhYA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=amg4grR2/fVApJ/8AG6tZTXYJhOGqJjgYiVsB+Fd4qre5BqKPXv9hmWFC6w/JUOLrxfxdJ7h46dzi5vhQvaxUXfu2dJW36F0FF5yZckJQHlCKa2UzKCOdpoMM2D9c9AwJ5VBytX6a6oDSBKlKmb0RXYhPEvHdUtmalHcE55Ok/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dsTdrOYL; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745407572; x=1776943572;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=sWI3DOLRDTWF/zbnA7amIpyitgpG1InAQItEsYRGi6E=;
-  b=k7HOEVB5kHRHU96cVLS3dUg4hHSGo98C90VIot1sUCx0H/BN6Pt6wCkL
-   c53BClfB3IK7CF8usaCyJS30EXTetR6QOvsAMCSDwaYODnEb6/YW8k0Z+
-   ujpUdp2d3mgm0mYG7YzN+zhEHCpsGPm/JHaM0ggUw2oaOrftNRoifUZ9f
-   /NCPn/fwMI5EVvqoZgQIQzN3qp1k4qCo0B0PZmDFjDYG/MgqAJqZORZHk
-   4F3TKyLFC8qjqYqpZShTpf8qrGiXmcsaMB3llHvdiVDC41EKLpYrcxwDr
-   VR/5hzyjyoD0VNwSID7rb+Mb/QpOs0tr2hyCYKFyzFEz9/ESoW7akDQ8B
-   A==;
-X-CSE-ConnectionGUID: +/hFHR7MSbKgS234b3sUgg==
-X-CSE-MsgGUID: +vkdHDfqQhSh3kNFZn9bag==
-X-IronPort-AV: E=McAfee;i="6700,10204,11411"; a="50825247"
+  t=1745407575; x=1776943575;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=hFmCDh1g6jFUGO8m7NQhmZ+M7gV0kLnTguTu4AQJhYA=;
+  b=dsTdrOYL6ubJRuyor9fCfirxF2ybd+WskJp6lC9gbU2OQ3o8yIkjSuqi
+   6VaZ9FPHJQr4FcpjcXDzlxSMdWP4l7aw9ECjhAOp53JeK4Crp1rgyjELu
+   B9b+By1G/YUSIqDHIUXXC708ZFcB7OAv4/SFaYKHIHu3qCbmZgV+ACrVR
+   Bxb2FecA5hpoEXT7doy6QvHeEoKWsrceG1FeXns7KMQeABbR/94wCW/wa
+   LexUMLganHjo2xPbI3v6wDXcnY00Abwtahd65DxKY1FYLsiOUQlI9ILO8
+   s1YmZ3h4MCQEFT+YgzwWdQCj5Dy/eYlYpbzjGoWVibM1oY7vfCzQ3nCvk
+   g==;
+X-CSE-ConnectionGUID: oFwGaZ/ERaK8vOvNhhP9fw==
+X-CSE-MsgGUID: dzmWY5x5Si+891iKLWlMTw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11411"; a="50825253"
 X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
-   d="scan'208";a="50825247"
+   d="scan'208";a="50825253"
 Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 04:26:11 -0700
-X-CSE-ConnectionGUID: 7kic6yL5Ry26K8wLOk1jIg==
-X-CSE-MsgGUID: FK6712zITSS+5mtmot+13g==
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 04:26:14 -0700
+X-CSE-ConnectionGUID: tsvDa8cqR0qLIgIGbl3vlA==
+X-CSE-MsgGUID: FVISKOKWSki5mLfx20fGug==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
-   d="scan'208";a="137150718"
+   d="scan'208";a="137150725"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
-  by orviesa003.jf.intel.com with ESMTP; 23 Apr 2025 04:26:07 -0700
+  by orviesa003.jf.intel.com with ESMTP; 23 Apr 2025 04:26:11 -0700
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>,
@@ -72,135 +73,67 @@ Cc: Babu Moger <babu.moger@amd.com>,
 	qemu-devel@nongnu.org,
 	kvm@vger.kernel.org,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [RFC 00/10] i386/cpu: Cache CPUID fixup, Intel cache model & topo CPUID enhencement
-Date: Wed, 23 Apr 2025 19:46:52 +0800
-Message-Id: <20250423114702.1529340-1-zhao1.liu@intel.com>
+Subject: [RFC 01/10] i386/cpu: Mark CPUID[0x80000005] as reserved for Intel
+Date: Wed, 23 Apr 2025 19:46:53 +0800
+Message-Id: <20250423114702.1529340-2-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250423114702.1529340-1-zhao1.liu@intel.com>
+References: <20250423114702.1529340-1-zhao1.liu@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi all,
+Per SDM, 0x80000005 leaf is reserved for Intel CPU, and its current
+"assert" check blocks adding new cache model for non-AMD CPUs.
 
-(Since patches 1 and 2 involve changes to x86 vendors other than Intel,
-I have also cc'd friends from AMD and Zhaoxin.)
+Therefore, check the vendor and encode this leaf as all-0 for Intel
+CPU. And since Zhaoxin mostly follows Intel behavior, apply the vendor
+check for Zhaoxin as well.
 
-These are the ones I was going to clean up a long time ago:
- * Fixup CPUID 0x80000005 & 0x80000006 for Intel (and Zhaoxin now).
- * Add cache model for Intel CPUs.
- * Enable 0x1f CPUID leaf for specific Intel CPUs, which already have
-   this leaf on host by default.
+Note, for !vendor_cpuid_only case, non-AMD CPU would get the wrong
+information, i.e., get AMD's cache model for Intel or Zhaoxin CPUs.
+For this case, there is no need to tweak for non-AMD CPUs, because
+vendor_cpuid_only has been turned on by default since PC machine v6.1.
 
-Overall, the enhancements to the Intel CPU models are still based on
-feedback received over time, for a long time...
-
-I'll introduce my changes one by one in the order of importance as I
-see it. (The doc update is missing in this version.)
-
-
-Intel Cache Model
-=================
-
-AMD has supports cache model for a long time. And this feature strats
-from the Eduardo's idea [1].
-
-Unfortunately, Intel does not support this, and I have received some
-feedback (from Tejus on mail list [2] and kvm forum, and from Jason).
-
-Additionally, after clearly defining the cache topology for QEMU's
-cache model, outdated cache models can easily raise more questions. For
-example, the default legacy cache model's L3 is per die, but SPR's
-real L3 is per socket. Users may question how the L3 topology changes
-when multiple dies are created (discussed with Daniel on [3]).
-
-So, in this series, I have added cache models for SRF, GNR, and SPR
-(because these are the only machines I can find at the moment :-) ).
-
-Note that the cache models are based on the Scalable Performance (SP)
-version, and the Xeon Advanced Performance (AP) version may have
-different cache sizes. However, SP is sufficient as the default cache
-model baseline. In the future, I will consider adding additional
-parameters in "smp-cache" to adjust cache sizes to meet different needs.
-
-[1]: https://lore.kernel.org/qemu-devel/20180320175427.GU3417@localhost.localdomain/
-[2]: https://lore.kernel.org/qemu-devel/6766AC1F-96D1-41F0-AAEB-CE4158662A51@nutanix.com/
-[3]: https://lore.kernel.org/qemu-devel/ZkTrsDdyGRFzVULG@redhat.com/
-
-0x1f CPUID by default (for some CPUs)
-=====================================
-
-Once the cache model can be clearly defined, another issue is the
-topology.
-
-Currently, the cache topology is actually tied to the CPU topology.
-However, in recent Intel CPUs (from cascadelake-AP - 2nd xeon [4]),
-CPU topology information is primarily expressed using the 0x1f leaf.
-
-Due to compatibility issues and historical reasons, the Guest's 0x1f
-is not unconditionally exposed.
-
-The discrepancy between having 0x1f on the Host but not on the Guest
-does indeed cause problems (Manish mentioned in [5]).
-
-Manish and Xiaoyao (for TDX) both attempted to enable 0x1f by default
-for Intel CPUs [6] [7], but following Igor's suggestion, it is more
-appropriate to enable it by default only for certain CPU models [8]. 
-
-So, as I update the CPU model at this time, I think it's time to revisit
-the community's idea (referencing patch 7, where I "took the liberty" to
-merge the property-related work pieces from Manish and Xiaoyao, based on
-a TDX patch from Xiaoyao [9]).
-
-I enable the 0x1f leaf for SRF, GNR and SPR by default for better
-emulation of real silicons.
-
-[4]: https://lore.kernel.org/qemu-devel/ZpoWskY4XE%2F98jss@intel.com/
-[5]: https://lore.kernel.org/qemu-devel/PH0PR02MB738410511BF51B12DB09BE6CF6AC2@PH0PR02MB7384.namprd02.prod.outlook.com/
-[6]: https://lore.kernel.org/qemu-devel/20240722101859.47408-1-manish.mishra@nutanix.com/
-[7]: https://lore.kernel.org/qemu-devel/20240813033145.279307-1-xiaoyao.li@intel.com/
-[8]: https://lore.kernel.org/qemu-devel/20240723170321.0ef780c5@imammedo.users.ipa.redhat.com/
-[9]: https://lore.kernel.org/qemu-devel/20250401130205.2198253-34-xiaoyao.li@intel.com/
-
-
-CPUID 0x80000005 & 0x80000006 Fix
-=================================
-
-CPUID[0x80000005] is reserved for Intel, and Intel only supports
-CPUID[0x80000006].ECX. And becuase AMD requires lines_per_tag to be not
-0, which blocks Intel's new cache model.
-
-Therefore, fix these 2 leaves for Intel (and Zhaoxin - which follows
-Intel's SDM).
-
-Thanks and Best Regards,
-Zhao
+Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
-Manish Mishra (1):
-  i386/cpu: Add a "cpuid-0x1f" property
+ target/i386/cpu.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
-Xiaoyao Li (1):
-  i386/cpu: Introduce enable_cpuid_0x1f to force exposing CPUID 0x1f
-
-Zhao Liu (8):
-  i386/cpu: Mark CPUID[0x80000005] as reserved for Intel
-  i386/cpu: Fix CPUID[0x80000006] for Intel CPU
-  i386/cpu: Introduce cache model for SierraForest
-  i386/cpu: Introduce cache model for GraniteRapids
-  i386/cpu: Introduce cache model for SapphireRapids
-  i386/cpu: Enable 0x1f leaf for SierraForest by default
-  i386/cpu: Enable 0x1f leaf for GraniteRapids by default
-  i386/cpu: Enable 0x1f leaf for SapphireRapids by default
-
- target/i386/cpu.c     | 346 ++++++++++++++++++++++++++++++++++++++++--
- target/i386/cpu.h     |   9 ++
- target/i386/kvm/kvm.c |   2 +-
- 3 files changed, 343 insertions(+), 14 deletions(-)
-
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 1b64ceaaba46..8fdafa8aedaf 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -7248,11 +7248,23 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+         *edx = env->cpuid_model[(index - 0x80000002) * 4 + 3];
+         break;
+     case 0x80000005:
+-        /* cache info (L1 cache) */
+-        if (cpu->cache_info_passthrough) {
++        /*
++         * cache info (L1 cache)
++         *
++         * For !vendor_cpuid_only case, non-AMD CPU would get the wrong
++         * information, i.e., get AMD's cache model. It doesn't matter,
++         * vendor_cpuid_only has been turned on by default since
++         * PC machine v6.1.
++         */
++        if (cpu->vendor_cpuid_only &&
++            (IS_INTEL_CPU(env) || IS_ZHAOXIN_CPU(env))) {
++            *eax = *ebx = *ecx = *edx = 0;
++            break;
++        } else if (cpu->cache_info_passthrough) {
+             x86_cpu_get_cache_cpuid(index, 0, eax, ebx, ecx, edx);
+             break;
+         }
++
+         *eax = (L1_DTLB_2M_ASSOC << 24) | (L1_DTLB_2M_ENTRIES << 16) |
+                (L1_ITLB_2M_ASSOC <<  8) | (L1_ITLB_2M_ENTRIES);
+         *ebx = (L1_DTLB_4K_ASSOC << 24) | (L1_DTLB_4K_ENTRIES << 16) |
 -- 
 2.34.1
 
