@@ -1,311 +1,414 @@
-Return-Path: <kvm+bounces-44009-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44011-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 982E5A9991C
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 22:01:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B74FA9995F
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 22:23:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B05871889FDE
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 20:01:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4AE51B84466
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 20:22:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77A7026983E;
-	Wed, 23 Apr 2025 20:01:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A9F426F44A;
+	Wed, 23 Apr 2025 20:22:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FuiNYCc5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cWYmb3nH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAE55223DFB
-	for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 20:01:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 076FC269816;
+	Wed, 23 Apr 2025 20:22:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745438489; cv=none; b=FYssseB7cYuTHNQSE2l3Yj8hUNsJZnqsx4FdscIMH6nTPo01iySnl6+5iqnae3Ag1/1moyLm4hhXHVmR25TGg4Cq1Gmi4j9ycvaWTnoDpqfdnMhTw4Rc2WUGjNl8YbczZYexxaB6QT7K8ebOLghPSx3OvYT/Sbihu6vthD8/EDM=
+	t=1745439750; cv=none; b=H7pchmWP3/MooLtqjB/1k/yhdlxp+rbcpAog3yMWB2F3dPH1UwKQElAkF/wCOB+8z43LmdYTqjvJaoJ69LO59ODdDA4sURmeFsepgjmRkc4CtWdXY4L9VC90RYwN6fGWrhk7ogXSRNgc1Mwgw1XFgxnGcM9GZ0eCl4swuugiIZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745438489; c=relaxed/simple;
-	bh=DN9iq5vcqahJ1O2gZb8ZWq+HqGd5Lb3ZftTphwqa4II=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Mdw8nYaSvI6/Myl5XZ4DmTbiSyzFkv7KqRxjbKJr/DJe5GlB3naIdgdN9o3QfvV2asy98l3FRbrWfeM8ZGdTeF0zGGpXQKzwxwr7IxDcWuQkdtlN0Eu3mbcruqic6J3dCFnxbVGxhYNc8+ZxZbCFn1GN3HVH3evVq5KDa553c8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=FuiNYCc5; arc=none smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-6ff0c9d1761so3537567b3.1
-        for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 13:01:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1745438486; x=1746043286; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=1AJ2u/BMzae2dxGQPQcuJAWKmCJ+u08r2UbsBZ+UbHs=;
-        b=FuiNYCc5x3ltxiEy4subROCjX3BsTpq+HzbZW6no9ez8NXQAehU+3cQAq6cN1MhZ8q
-         6E1+yYttURMoRUrFwd8/VhVHKR3f3jIWt3WjrjVld8FpFOW6kPgYl9OHPN5W3P4Gr3Sc
-         cPn9OcvDmX3/c7qWGf3xuJwXOelRFQ5zmndKI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745438486; x=1746043286;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1AJ2u/BMzae2dxGQPQcuJAWKmCJ+u08r2UbsBZ+UbHs=;
-        b=fOe3LEAV5Z28i70qfCQFbomxIafNvSyMHzVFU1Ptd2P7K/9lcfA8+HbWr96Zc0I6Kn
-         N/cCptmrz9k0m+xULnglvmoWmEacPRzB//IKOwTxCFU1+jMW4aNuWjbH0McWwEO510eO
-         zyS2EguBWU+dXsxSRKrlJtARfxFdfEGGreeFZxKqUgKTKyeqKrZJfD9MTIcAJ0jlbEu2
-         GEZGMZt2KceBPY+DyOs6w/c1SLUUtpWntGz4RdXnEfFwdLpgU8VrJOObC8phJd3DPXd2
-         GLMrhMSFhfRnXWLcyyUOFbczedfrNi1bPP+7fjcV0O8z/yYoLbYnJavuxrX2LME81KrU
-         N0Qw==
-X-Forwarded-Encrypted: i=1; AJvYcCWhf6R5tprv9kF+oYklOT+Osh00Qd4bB25cua4m0jSnZRTBm3z0mzH2tBleh5c9reyP90E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzL6sUMO1qht1V7vSTjSI1QDjU+DGa8RjiI0nf+HUNvGXZI81Mw
-	wz6CpNUydQGhReRgog73RDP3M+PwP4jIHaBYMDaaePfjXF0/qsd1KsfBbs6NTmIDTr3/zSc+C+x
-	PPhAjjpAHDDMoXM2WMFi8nIf8R9S1LIJvWba6
-X-Gm-Gg: ASbGncuqpl5urn2sRUflm6AYwaPqvzhuetxjkN5yYeRDOJH4bBIioVu9lua3Ud5DcuR
-	y/NebV5gxAMOFsxD8K/R6E7866gpXDdKDx7ZspFI9Si/M59KtXLROPXOawBkdLa4ziZU6EJXmbB
-	Dw4p3Wnbm8xaPTpZIFhIbLof8=
-X-Google-Smtp-Source: AGHT+IFTaaEAFkSk2OUOfnE7prhFjZRcw6Xj+AHO9EacC0CkRVzJP9fCnED1VdKiqWkfHtG88PlRHuVVKfT1uOzaKmk=
-X-Received: by 2002:a05:6902:2745:b0:e6d:fc1f:3c9a with SMTP id
- 3f1490d57ef6-e73035856d3mr278335276.20.1745438486523; Wed, 23 Apr 2025
- 13:01:26 -0700 (PDT)
+	s=arc-20240116; t=1745439750; c=relaxed/simple;
+	bh=FbKFdzMc7poSJtjaoFhYvt74uwRmp6wmCZ2uPQ/zipY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cigOrZGx5lnMjftak4nAdCTzzklBIPbEdhW46pqWngBqfpVO3fJrCu8GLIZIlRvCsRduY1k6hqWQa4YYzOI4PT4fV8die3oZzWaDpagLMwTmCx4UbJhupgC7QEhjt2TXUx+cRon9Gm93nSgufIQJq5pOmCa0jRM5DyKlfo/6MHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cWYmb3nH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50B00C4CEEA;
+	Wed, 23 Apr 2025 20:22:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745439749;
+	bh=FbKFdzMc7poSJtjaoFhYvt74uwRmp6wmCZ2uPQ/zipY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=cWYmb3nHKw51ioF6VALjJb05xNXj8LGnYo03gfXB2dc3YeU51Bv3sb4qUJFwloMI4
+	 PlR2nOrBhA9ulWnyKoOp6nHTlE8RQaZ7S2IAo+u7L94pe6UCLzEqKpjiUI52NNVCuX
+	 7vwa7q5ZHU1EGjs6TnyqP7XGh8y4aGcxgdGAQgolNmB1NWU4zOcV35UIr6IGqL1Wd/
+	 8/20MtrLVeSzsNcWW7MobYkxXGg6NtytXlaB0I2PYUOz1sJWtH/4DxeicQxbS50eP1
+	 bWOI2Vl/K0oUQetBCnNnIj4LgAfl+ipdSc/uVKRla+G5kWWluayuvdN0iSaf6iWNux
+	 JBytuXLN7x1KQ==
+From: Arnd Bergmann <arnd@kernel.org>
+To: Bjorn Helgaas <bhelgaas@google.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>,
+	Simona Vetter <simona@ffwll.ch>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	dri-devel@lists.freedesktop.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: [PATCH] [v2] PCI: add CONFIG_MMU dependency
+Date: Wed, 23 Apr 2025 22:16:32 +0200
+Message-Id: <20250423202215.3315550-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250422161304.579394-1-zack.rusin@broadcom.com>
- <20250422161304.579394-5-zack.rusin@broadcom.com> <a803c925-b682-490f-8cd9-ca8d4cc599aa@zytor.com>
- <CABQX2QMznYZiVm40Ligq+pFKmEkVpScW+zcKYbPpGgm0=S2Xkg@mail.gmail.com>
- <aAjrOgsooR4RYIJr@google.com> <CABQX2QNDmXizUDP_sckvfaM9OBTxHSr0ESgJ_=Z_5RiODfOGsg@mail.gmail.com>
- <aAkNN029DIxYay-j@google.com> <CABQX2QPUsKfkKYKnXG01A-jEu_7dbY7qBnEHyhYJnsSXD-jqng@mail.gmail.com>
- <aAkgV3ja9NbDsrju@google.com> <CABQX2QMtQes5yiG4VBvQgWkuAoSWgcP8R+X7MeuV_xHeLfpznw@mail.gmail.com>
- <aAk4N0wYQeeYPLVM@google.com>
-In-Reply-To: <aAk4N0wYQeeYPLVM@google.com>
-From: Zack Rusin <zack.rusin@broadcom.com>
-Date: Wed, 23 Apr 2025 16:01:14 -0400
-X-Gm-Features: ATxdqUGnvzkIgWeVZ94hh4GEaEXA82IE2WiBQ-hQ1raIy2xwneNhKclMcXIEsQg
-Message-ID: <CABQX2QMusDD09_igqdggs7-Ta=Ozj672wWcSR5k0=LpeuZuGJw@mail.gmail.com>
-Subject: Re: [PATCH v2 4/5] KVM: x86: Add support for legacy VMware backdoors
- in nested setups
-To: Sean Christopherson <seanjc@google.com>
-Cc: Xin Li <xin@zytor.com>, linux-kernel@vger.kernel.org, 
-	Doug Covelli <doug.covelli@broadcom.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-doc@vger.kernel.org
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000fe78ad063377901b"
+Content-Transfer-Encoding: 8bit
 
---000000000000fe78ad063377901b
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: Arnd Bergmann <arnd@arndb.de>
 
-On Wed, Apr 23, 2025 at 2:58=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Wed, Apr 23, 2025, Zack Rusin wrote:
-> > On Wed, Apr 23, 2025 at 1:16=E2=80=AFPM Sean Christopherson <seanjc@goo=
-gle.com> wrote:
-> > >
-> > > On Wed, Apr 23, 2025, Zack Rusin wrote:
-> > > > On Wed, Apr 23, 2025 at 11:54=E2=80=AFAM Sean Christopherson <seanj=
-c@google.com> wrote:
-> > > > > > I'd say that if we desperately want to use a single cap for all=
- of
-> > > > > > these then I'd probably prefer a different approach because thi=
-s would
-> > > > > > make vmware_backdoor_enabled behavior really wacky.
-> > > > >
-> > > > > How so?  If kvm.enable_vmware_backdoor is true, then the backdoor=
- is enabled
-> > > > > for all VMs, else it's disabled by default but can be enabled on =
-a per-VM basis
-> > > > > by the new capability.
-> > > >
-> > > > Like you said if  kvm.enable_vmware_backdoor is true, then it's
-> > > > enabled for all VMs, so it'd make sense to allow disabling it on a
-> > > > per-vm basis on those systems.
-> > > > Just like when the kvm.enable_vmware_backdoor is false, the cap can=
- be
-> > > > used to enable it on a per-vm basis.
-> > >
-> > > Why?  What use case does that serve?
-> >
-> > Testing purposes?
->
-> Heh, testing what?
+It turns out that there are no platforms that have PCI but don't have an MMU,
+so adding a Kconfig dependency on CONFIG_PCI simplifies build testing kernels
+for those platforms a lot, and avoids a lot of inadvertent build regressions.
 
-Running VMware and non-VMware guests on the same system... I'm in a
-weird spot where I'm defending not my own code, so I'd prefer not
-having to do that. We don't use kvm.vmware_backdoor_enabled as a boot
-flag, we haven't written that code, so I don't want to be arguing on
-behalf of it either way. I was just trying to make sure this nicely
-works with the new cap's. In this case having it just work is actually
-less effort than making it not work so it just seemed like a nice and
-proper thing to do.
+Add a dependency for CONFIG_PCI and remove all the ones for PCI specific
+device drivers that are currently marked not having it.
 
-> > > > > > It's the one that currently can only be set via kernel boot fla=
-gs, so having
-> > > > > > systems where the boot flag is on and disabling it on a per-vm =
-basis makes
-> > > > > > sense and breaks with this.
-> > > > >
-> > > > > We could go this route, e.g. KVM does something similar for PMU v=
-irtualization.
-> > > > > But the key difference is that enable_pmu is enabled by default, =
-whereas
-> > > > > enable_vmware_backdoor is disabled by default.  I.e. it makes far=
- more sense for
-> > > > > the capability to let userspace opt-in, as opposed to opt-out.
-> > > > >
-> > > > > > I'd probably still write the code to be able to disable/enable =
-all of them
-> > > > > > because it makes sense for vmware_backdoor_enabled.
-> > > > >
-> > > > > Again, that's not KVM's default, and it will never be KVM's defau=
-lt.
-> > > >
-> > > > All I'm saying is that you can enable it on a whole system via the
-> > > > boot flags and on the systems on which it has been turned on it'd m=
-ake
-> > > > sense to allow disabling it on a per-vm basis.
-> > >
-> > > Again, why would anyone do that?  If you *know* you're going to run s=
-ome VMs
-> > > with VMware emulation and some without, the sane approach is to not t=
-ouch the
-> > > module param and rely entirely on the capability.  Otherwise the VMM =
-must be
-> > > able to opt-out, which means that running an older userspace that doe=
-sn't know
-> > > about the new capability *can't* opt-out.
-> > >
-> > > The only reason to even keep the module param is to not break existin=
-g users,
-> > > e.g. to be able to run VMs that want VMware functionality using an ex=
-isting VMM.
-> > >
-> > > > Anyway, I'm sure I can make it work correctly under any constraints=
-, so let
-> > > > me try to understand the issue because I'm not sure what we're solv=
-ing here.
-> > > > Is the problem the fact that we have three caps and instead want to=
- squeeze
-> > > > all of the functionality under one cap?
-> > >
-> > > The "problem" is that I don't want to add complexity and create ABI f=
-or a use
-> > > case that doesn't exist.
-> >
-> > Would you like to see a v3 where I specifically do not allow disabling
-> > those caps?
->
-> Yes.  Though I recommend waiting to send a v3 until I (and others) have h=
-ad a
-> change to review the rest of the patches, e.g. to avoid wasting your time=
-.
+There are a few platforms that have an optional MMU, but they usually cannot
+have PCI at all. The one exception is Coldfire MCF54xx, but this is mainly
+for historic reasons, and anyone using those chips should really use the
+MMU these days.
 
-Sounds good.
+Link: https://lore.kernel.org/lkml/a41f1b20-a76c-43d8-8c36-f12744327a54@app.fastmail.com/
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com> # SCSI
+Acked-by: Alex Deucher <alexander.deucher@amd.com>
+Reviewed-by: Thomas Zimmermann <tzimmermann@suse.de>
+Cc: Bjorn Helgaas <bhelgaas@google.com>
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+v2: update changelog text
 
-z
+Bjorn, can you take this through the PCI tree? I thought about splitting
+it up by subsystem, but it's really one thing that I'm doing here, and
+doing it in one bit makes more sense to me.
+---
+ drivers/accel/qaic/Kconfig              | 1 -
+ drivers/firewire/Kconfig                | 2 +-
+ drivers/gpu/drm/Kconfig                 | 2 +-
+ drivers/gpu/drm/amd/amdgpu/Kconfig      | 3 +--
+ drivers/gpu/drm/ast/Kconfig             | 2 +-
+ drivers/gpu/drm/gma500/Kconfig          | 2 +-
+ drivers/gpu/drm/hisilicon/hibmc/Kconfig | 1 -
+ drivers/gpu/drm/loongson/Kconfig        | 2 +-
+ drivers/gpu/drm/mgag200/Kconfig         | 2 +-
+ drivers/gpu/drm/nouveau/Kconfig         | 3 +--
+ drivers/gpu/drm/qxl/Kconfig             | 2 +-
+ drivers/gpu/drm/radeon/Kconfig          | 2 +-
+ drivers/gpu/drm/tiny/Kconfig            | 2 +-
+ drivers/gpu/drm/vmwgfx/Kconfig          | 2 +-
+ drivers/gpu/drm/xe/Kconfig              | 2 +-
+ drivers/net/ethernet/broadcom/Kconfig   | 1 -
+ drivers/pci/Kconfig                     | 1 +
+ drivers/pci/pci.c                       | 4 ++--
+ drivers/scsi/bnx2fc/Kconfig             | 1 -
+ drivers/scsi/bnx2i/Kconfig              | 1 -
+ drivers/vfio/pci/Kconfig                | 2 +-
+ 21 files changed, 17 insertions(+), 23 deletions(-)
 
---000000000000fe78ad063377901b
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+diff --git a/drivers/accel/qaic/Kconfig b/drivers/accel/qaic/Kconfig
+index a9f866230058..5e405a19c157 100644
+--- a/drivers/accel/qaic/Kconfig
++++ b/drivers/accel/qaic/Kconfig
+@@ -8,7 +8,6 @@ config DRM_ACCEL_QAIC
+ 	depends on DRM_ACCEL
+ 	depends on PCI && HAS_IOMEM
+ 	depends on MHI_BUS
+-	depends on MMU
+ 	select CRC32
+ 	help
+ 	  Enables driver for Qualcomm's Cloud AI accelerator PCIe cards that are
+diff --git a/drivers/firewire/Kconfig b/drivers/firewire/Kconfig
+index 905c82e26ce7..a5f5e250223a 100644
+--- a/drivers/firewire/Kconfig
++++ b/drivers/firewire/Kconfig
+@@ -83,7 +83,7 @@ config FIREWIRE_KUNIT_SELF_ID_SEQUENCE_HELPER_TEST
+ 
+ config FIREWIRE_OHCI
+ 	tristate "OHCI-1394 controllers"
+-	depends on PCI && FIREWIRE && MMU
++	depends on PCI && FIREWIRE
+ 	help
+ 	  Enable this driver if you have a FireWire controller based
+ 	  on the OHCI specification.  For all practical purposes, this
+diff --git a/drivers/gpu/drm/Kconfig b/drivers/gpu/drm/Kconfig
+index 89d00265d578..831bd384f1fd 100644
+--- a/drivers/gpu/drm/Kconfig
++++ b/drivers/gpu/drm/Kconfig
+@@ -393,7 +393,7 @@ source "drivers/gpu/drm/imagination/Kconfig"
+ 
+ config DRM_HYPERV
+ 	tristate "DRM Support for Hyper-V synthetic video device"
+-	depends on DRM && PCI && MMU && HYPERV
++	depends on DRM && PCI && HYPERV
+ 	select DRM_CLIENT_SELECTION
+ 	select DRM_KMS_HELPER
+ 	select DRM_GEM_SHMEM_HELPER
+diff --git a/drivers/gpu/drm/amd/amdgpu/Kconfig b/drivers/gpu/drm/amd/amdgpu/Kconfig
+index 7b95221d2f3d..64e603f971b8 100644
+--- a/drivers/gpu/drm/amd/amdgpu/Kconfig
++++ b/drivers/gpu/drm/amd/amdgpu/Kconfig
+@@ -2,7 +2,7 @@
+ 
+ config DRM_AMDGPU
+ 	tristate "AMD GPU"
+-	depends on DRM && PCI && MMU
++	depends on DRM && PCI
+ 	depends on !UML
+ 	select FW_LOADER
+ 	select DRM_CLIENT
+@@ -68,7 +68,6 @@ config DRM_AMDGPU_CIK
+ config DRM_AMDGPU_USERPTR
+ 	bool "Always enable userptr write support"
+ 	depends on DRM_AMDGPU
+-	depends on MMU
+ 	select HMM_MIRROR
+ 	select MMU_NOTIFIER
+ 	help
+diff --git a/drivers/gpu/drm/ast/Kconfig b/drivers/gpu/drm/ast/Kconfig
+index da0663542e8a..242fbccdf844 100644
+--- a/drivers/gpu/drm/ast/Kconfig
++++ b/drivers/gpu/drm/ast/Kconfig
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ config DRM_AST
+ 	tristate "AST server chips"
+-	depends on DRM && PCI && MMU
++	depends on DRM && PCI
+ 	select DRM_CLIENT_SELECTION
+ 	select DRM_GEM_SHMEM_HELPER
+ 	select DRM_KMS_HELPER
+diff --git a/drivers/gpu/drm/gma500/Kconfig b/drivers/gpu/drm/gma500/Kconfig
+index 1613e51eff2d..e4c80e1a6da5 100644
+--- a/drivers/gpu/drm/gma500/Kconfig
++++ b/drivers/gpu/drm/gma500/Kconfig
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ config DRM_GMA500
+ 	tristate "Intel GMA500/600/3600/3650 KMS Framebuffer"
+-	depends on DRM && PCI && X86 && MMU && HAS_IOPORT
++	depends on DRM && PCI && X86 && HAS_IOPORT
+ 	select DRM_CLIENT_SELECTION
+ 	depends on ACPI_VIDEO || !ACPI
+ 	depends on I2C
+diff --git a/drivers/gpu/drm/hisilicon/hibmc/Kconfig b/drivers/gpu/drm/hisilicon/hibmc/Kconfig
+index 98d77d74999d..d1f3f5793f34 100644
+--- a/drivers/gpu/drm/hisilicon/hibmc/Kconfig
++++ b/drivers/gpu/drm/hisilicon/hibmc/Kconfig
+@@ -2,7 +2,6 @@
+ config DRM_HISI_HIBMC
+ 	tristate "DRM Support for Hisilicon Hibmc"
+ 	depends on DRM && PCI
+-	depends on MMU
+ 	select DRM_CLIENT_SELECTION
+ 	select DRM_DISPLAY_HELPER
+ 	select DRM_DISPLAY_DP_HELPER
+diff --git a/drivers/gpu/drm/loongson/Kconfig b/drivers/gpu/drm/loongson/Kconfig
+index 552edfec7afb..d739d51cf54c 100644
+--- a/drivers/gpu/drm/loongson/Kconfig
++++ b/drivers/gpu/drm/loongson/Kconfig
+@@ -2,7 +2,7 @@
+ 
+ config DRM_LOONGSON
+ 	tristate "DRM support for Loongson Graphics"
+-	depends on DRM && PCI && MMU
++	depends on DRM && PCI
+ 	depends on LOONGARCH || MIPS || COMPILE_TEST
+ 	select DRM_CLIENT_SELECTION
+ 	select DRM_KMS_HELPER
+diff --git a/drivers/gpu/drm/mgag200/Kconfig b/drivers/gpu/drm/mgag200/Kconfig
+index 412dcbea0e2d..a962ae564a75 100644
+--- a/drivers/gpu/drm/mgag200/Kconfig
++++ b/drivers/gpu/drm/mgag200/Kconfig
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ config DRM_MGAG200
+ 	tristate "Matrox G200"
+-	depends on DRM && PCI && MMU
++	depends on DRM && PCI
+ 	select DRM_CLIENT_SELECTION
+ 	select DRM_GEM_SHMEM_HELPER
+ 	select DRM_KMS_HELPER
+diff --git a/drivers/gpu/drm/nouveau/Kconfig b/drivers/gpu/drm/nouveau/Kconfig
+index 9ba89b35d1a2..4fae780f7d78 100644
+--- a/drivers/gpu/drm/nouveau/Kconfig
++++ b/drivers/gpu/drm/nouveau/Kconfig
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ config DRM_NOUVEAU
+ 	tristate "Nouveau (NVIDIA) cards"
+-	depends on DRM && PCI && MMU
++	depends on DRM && PCI
+ 	depends on (ACPI_VIDEO && ACPI_WMI && MXM_WMI) || !(ACPI && X86)
+ 	depends on BACKLIGHT_CLASS_DEVICE
+ 	select IOMMU_API
+@@ -86,7 +86,6 @@ config DRM_NOUVEAU_SVM
+ 	bool "(EXPERIMENTAL) Enable SVM (Shared Virtual Memory) support"
+ 	depends on DEVICE_PRIVATE
+ 	depends on DRM_NOUVEAU
+-	depends on MMU
+ 	depends on STAGING
+ 	select HMM_MIRROR
+ 	select MMU_NOTIFIER
+diff --git a/drivers/gpu/drm/qxl/Kconfig b/drivers/gpu/drm/qxl/Kconfig
+index 69427eb8bed2..d8f24bcae34b 100644
+--- a/drivers/gpu/drm/qxl/Kconfig
++++ b/drivers/gpu/drm/qxl/Kconfig
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ config DRM_QXL
+ 	tristate "QXL virtual GPU"
+-	depends on DRM && PCI && MMU && HAS_IOPORT
++	depends on DRM && PCI && HAS_IOPORT
+ 	select DRM_CLIENT_SELECTION
+ 	select DRM_KMS_HELPER
+ 	select DRM_TTM
+diff --git a/drivers/gpu/drm/radeon/Kconfig b/drivers/gpu/drm/radeon/Kconfig
+index f51bace9555d..c479f0c0dd5c 100644
+--- a/drivers/gpu/drm/radeon/Kconfig
++++ b/drivers/gpu/drm/radeon/Kconfig
+@@ -2,7 +2,7 @@
+ 
+ config DRM_RADEON
+ 	tristate "ATI Radeon"
+-	depends on DRM && PCI && MMU
++	depends on DRM && PCI
+ 	depends on AGP || !AGP
+ 	select FW_LOADER
+ 	select DRM_CLIENT_SELECTION
+diff --git a/drivers/gpu/drm/tiny/Kconfig b/drivers/gpu/drm/tiny/Kconfig
+index 95c1457d7730..c50186a65464 100644
+--- a/drivers/gpu/drm/tiny/Kconfig
++++ b/drivers/gpu/drm/tiny/Kconfig
+@@ -37,7 +37,7 @@ config DRM_BOCHS
+ 
+ config DRM_CIRRUS_QEMU
+ 	tristate "Cirrus driver for QEMU emulated device"
+-	depends on DRM && PCI && MMU
++	depends on DRM && PCI
+ 	select DRM_CLIENT_SELECTION
+ 	select DRM_KMS_HELPER
+ 	select DRM_GEM_SHMEM_HELPER
+diff --git a/drivers/gpu/drm/vmwgfx/Kconfig b/drivers/gpu/drm/vmwgfx/Kconfig
+index 6c3c2922ae8b..aab646b91ca9 100644
+--- a/drivers/gpu/drm/vmwgfx/Kconfig
++++ b/drivers/gpu/drm/vmwgfx/Kconfig
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0
+ config DRM_VMWGFX
+ 	tristate "DRM driver for VMware Virtual GPU"
+-	depends on DRM && PCI && MMU
++	depends on DRM && PCI
+ 	depends on (X86 && HYPERVISOR_GUEST) || ARM64
+ 	select DRM_CLIENT_SELECTION
+ 	select DRM_TTM
+diff --git a/drivers/gpu/drm/xe/Kconfig b/drivers/gpu/drm/xe/Kconfig
+index dd256b355613..bb3f34a29f4e 100644
+--- a/drivers/gpu/drm/xe/Kconfig
++++ b/drivers/gpu/drm/xe/Kconfig
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ config DRM_XE
+ 	tristate "Intel Xe Graphics"
+-	depends on DRM && PCI && MMU && (m || (y && KUNIT=y))
++	depends on DRM && PCI && (m || (y && KUNIT=y))
+ 	depends on INTEL_VSEC
+ 	select INTERVAL_TREE
+ 	# we need shmfs for the swappable backing store, and in particular
+diff --git a/drivers/net/ethernet/broadcom/Kconfig b/drivers/net/ethernet/broadcom/Kconfig
+index 46d07b81097f..1bcf406a9e36 100644
+--- a/drivers/net/ethernet/broadcom/Kconfig
++++ b/drivers/net/ethernet/broadcom/Kconfig
+@@ -98,7 +98,6 @@ config BNX2
+ config CNIC
+ 	tristate "QLogic CNIC support"
+ 	depends on PCI && (IPV6 || IPV6=n)
+-	depends on MMU
+ 	select BNX2
+ 	select UIO
+ 	help
+diff --git a/drivers/pci/Kconfig b/drivers/pci/Kconfig
+index da28295b4aac..9c0e4aaf4e8c 100644
+--- a/drivers/pci/Kconfig
++++ b/drivers/pci/Kconfig
+@@ -21,6 +21,7 @@ config GENERIC_PCI_IOMAP
+ menuconfig PCI
+ 	bool "PCI support"
+ 	depends on HAVE_PCI
++	depends on MMU
+ 	help
+ 	  This option enables support for the PCI local bus, including
+ 	  support for PCI-X and the foundations for PCI Express support.
+diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
+index 186858293df5..206f271e869a 100644
+--- a/drivers/pci/pci.c
++++ b/drivers/pci/pci.c
+@@ -4257,7 +4257,7 @@ unsigned long __weak pci_address_to_pio(phys_addr_t address)
+ #ifndef pci_remap_iospace
+ int pci_remap_iospace(const struct resource *res, phys_addr_t phys_addr)
+ {
+-#if defined(PCI_IOBASE) && defined(CONFIG_MMU)
++#if defined(PCI_IOBASE)
+ 	unsigned long vaddr = (unsigned long)PCI_IOBASE + res->start;
+ 
+ 	if (!(res->flags & IORESOURCE_IO))
+@@ -4290,7 +4290,7 @@ EXPORT_SYMBOL(pci_remap_iospace);
+  */
+ void pci_unmap_iospace(struct resource *res)
+ {
+-#if defined(PCI_IOBASE) && defined(CONFIG_MMU)
++#if defined(PCI_IOBASE)
+ 	unsigned long vaddr = (unsigned long)PCI_IOBASE + res->start;
+ 
+ 	vunmap_range(vaddr, vaddr + resource_size(res));
+diff --git a/drivers/scsi/bnx2fc/Kconfig b/drivers/scsi/bnx2fc/Kconfig
+index ecdc0f0f4f4e..3cf7e08df809 100644
+--- a/drivers/scsi/bnx2fc/Kconfig
++++ b/drivers/scsi/bnx2fc/Kconfig
+@@ -5,7 +5,6 @@ config SCSI_BNX2X_FCOE
+ 	depends on (IPV6 || IPV6=n)
+ 	depends on LIBFC
+ 	depends on LIBFCOE
+-	depends on MMU
+ 	select NETDEVICES
+ 	select ETHERNET
+ 	select NET_VENDOR_BROADCOM
+diff --git a/drivers/scsi/bnx2i/Kconfig b/drivers/scsi/bnx2i/Kconfig
+index 0cc06c2ce0b8..75ace2302fed 100644
+--- a/drivers/scsi/bnx2i/Kconfig
++++ b/drivers/scsi/bnx2i/Kconfig
+@@ -4,7 +4,6 @@ config SCSI_BNX2_ISCSI
+ 	depends on NET
+ 	depends on PCI
+ 	depends on (IPV6 || IPV6=n)
+-	depends on MMU
+ 	select SCSI_ISCSI_ATTRS
+ 	select NETDEVICES
+ 	select ETHERNET
+diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+index c3bcb6911c53..2b0172f54665 100644
+--- a/drivers/vfio/pci/Kconfig
++++ b/drivers/vfio/pci/Kconfig
+@@ -1,6 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ menu "VFIO support for PCI devices"
+-	depends on PCI && MMU
++	depends on PCI
+ 
+ config VFIO_PCI_CORE
+ 	tristate
+-- 
+2.39.5
 
-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
-6U6qgI8F5eiKsQyE0HgYrQJx/sDs9LLVZlaNiA3U8M8CgEnb8VhuH3BN/yXphhEQdJXb1TyaJA60
-SmHcZdEQZbl4EjwUcs3UIowmI/Mhi7ADQB7VNsO/BaOVBEQk53xH+4djY/cg7jvqTTeliY05j2Yx
-uwwXcDC4mWjGzxAT5DVqC8fKQvon1uc2heorHb555+sLdwYxAgMBAAGjggHYMIIB1DAOBgNVHQ8B
-Af8EBAMCBaAwgZMGCCsGAQUFBwEBBIGGMIGDMEYGCCsGAQUFBzAChjpodHRwOi8vc2VjdXJlLmds
-b2JhbHNpZ24uY29tL2NhY2VydC9nc2djY3I2c21pbWVjYTIwMjMuY3J0MDkGCCsGAQUFBzABhi1o
-dHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3I2c21pbWVjYTIwMjMwZQYDVR0gBF4wXDAJ
-BgdngQwBBQMBMAsGCSsGAQQBoDIBKDBCBgorBgEEAaAyCgMCMDQwMgYIKwYBBQUHAgEWJmh0dHBz
-Oi8vd3d3Lmdsb2JhbHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwQQYDVR0fBDowODA2
-oDSgMoYwaHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3I2c21pbWVjYTIwMjMuY3JsMCIG
-A1UdEQQbMBmBF3phY2sucnVzaW5AYnJvYWRjb20uY29tMBMGA1UdJQQMMAoGCCsGAQUFBwMEMB8G
-A1UdIwQYMBaAFAApNp5ceroPry1QLdugI4UYsKCSMB0GA1UdDgQWBBQNDn2m/OLuDx9YjEqPLCDB
-s/VKNTANBgkqhkiG9w0BAQsFAAOCAgEAF463syOLTQkWZmEyyR60W1sM3J1cbnMRrBFUBt3S2NTY
-SJ2NAvkTAxbPoOhK6IQdaTyrWi8xdg2tftr5FC1bOSUdxudY6dipq2txe7mEoUE6VlpJid/56Mo4
-QJRb6YiykQeIfoJiYMKsyuXWsTB1rhQxlxfnaFxi8Xy3+xKAeX68DcsHG3ZU0h1beBURA44tXcz6
-fFDNPQ2k6rWDFz+XNN2YOPqfse2wEm3DXpqNT79ycU7Uva7e51b8XdbmJ6XVzUFmWzhjXy5hvV8z
-iF+DvP+KT1/bjO6aNL2/3PWiy1u6xjnWvobHuAYVrXxQ5wzk8aPOnED9Q8pt2nqk/UIzw2f67Cn9
-3CxrVqXUKm93J+rupyKVTGgKO9T1ODVPo665aIbM72RxSI9Wsofatm2fo8DWOkrfs29pYfy6eECl
-91qfFMl+IzIVfDgIrEX6gSngJ2ZLaG6L+/iNrUxHxxsaUmyDwBbTfjYwr10H6NKES3JaxVRslnpF
-06HTTciJNx2wowbYF1c+BFY4r/19LHygijIVa+hZEgNuMrVLyAamaAKZ1AWxTdv8Q/eeNN3Myq61
-b1ykTSPCXjBq/03CMF/wT1wly16jYjLDXZ6II/HYyJt34QeqnBENU9zXTc9RopqcuHD2g+ROT7lI
-VLi5ffzC8rVliltTltbYPc7F0lAvGKAxggJXMIICUwIBATBiMFIxCzAJBgNVBAYTAkJFMRkwFwYD
-VQQKExBHbG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9iYWxTaWduIEdDQyBSNiBTTUlNRSBD
-QSAyMDIzAgxhPxw+eieHWB40hPkwDQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEIOAr
-zfuKMuPhnWyvT8hFe6LNAcEhhotwPItY/wA7oXIuMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEw
-HAYJKoZIhvcNAQkFMQ8XDTI1MDQyMzIwMDEyNlowXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQME
-ASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcwCwYJ
-YIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBADbSu33TnDvwl5yNeyU5WCjvbEB6FXh2hO4SuiyK
-ETNvl1iKP1c/s4dt47CLbkOcpZC3xY3ISNyQW20ADLbvEEyT0UB7GzIy5ycXE05JdthlKjgJMdkx
-iZfAwe5YqtJ3VDweHxFyVfsBcevB7um4iKoVLWwwU90ZeL/Dz+JSpwT8b6B4Is74zPLPFZnXv01k
-mw2vmb8ReClkJy1GsvkUwIp5hv+3do8n6Xhudz4bdYColO0S6IMsHoVQk2BHo9blcSYbTJ6ovIiD
-I39ey7VgO95D5LiiPjMv76BG4V64b9EYslZVfgHQz8uOZh/by7WVHKwEP9JPsEKBXmvBGw58ZjY=
---000000000000fe78ad063377901b--
 
