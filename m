@@ -1,414 +1,191 @@
-Return-Path: <kvm+bounces-44011-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44010-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B74FA9995F
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 22:23:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF9FAA9995A
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 22:22:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4AE51B84466
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 20:22:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B0133B3DA0
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 20:21:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A9F426F44A;
-	Wed, 23 Apr 2025 20:22:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 906F226B96A;
+	Wed, 23 Apr 2025 20:22:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cWYmb3nH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hHQqEXr9"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 076FC269816;
-	Wed, 23 Apr 2025 20:22:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65CE552F88
+	for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 20:22:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745439750; cv=none; b=H7pchmWP3/MooLtqjB/1k/yhdlxp+rbcpAog3yMWB2F3dPH1UwKQElAkF/wCOB+8z43LmdYTqjvJaoJ69LO59ODdDA4sURmeFsepgjmRkc4CtWdXY4L9VC90RYwN6fGWrhk7ogXSRNgc1Mwgw1XFgxnGcM9GZ0eCl4swuugiIZE=
+	t=1745439724; cv=none; b=UIJMckWrvopXSJK3yOE/rBfMx6tEkEtH5WqMWw6Ni5yH4ecddH35kImTdiBMtBp+YgZXOLUcLxAhxSE8nEArDy/Zj/M+pGxu28Y/E1VRC+UMDfODNsOWR+W9D4yMCmSxS0cyv37pSKYBH3DLgrWqjKOS45+nzQR3yOjO7eGIME8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745439750; c=relaxed/simple;
-	bh=FbKFdzMc7poSJtjaoFhYvt74uwRmp6wmCZ2uPQ/zipY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cigOrZGx5lnMjftak4nAdCTzzklBIPbEdhW46pqWngBqfpVO3fJrCu8GLIZIlRvCsRduY1k6hqWQa4YYzOI4PT4fV8die3oZzWaDpagLMwTmCx4UbJhupgC7QEhjt2TXUx+cRon9Gm93nSgufIQJq5pOmCa0jRM5DyKlfo/6MHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cWYmb3nH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50B00C4CEEA;
-	Wed, 23 Apr 2025 20:22:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745439749;
-	bh=FbKFdzMc7poSJtjaoFhYvt74uwRmp6wmCZ2uPQ/zipY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=cWYmb3nHKw51ioF6VALjJb05xNXj8LGnYo03gfXB2dc3YeU51Bv3sb4qUJFwloMI4
-	 PlR2nOrBhA9ulWnyKoOp6nHTlE8RQaZ7S2IAo+u7L94pe6UCLzEqKpjiUI52NNVCuX
-	 7vwa7q5ZHU1EGjs6TnyqP7XGh8y4aGcxgdGAQgolNmB1NWU4zOcV35UIr6IGqL1Wd/
-	 8/20MtrLVeSzsNcWW7MobYkxXGg6NtytXlaB0I2PYUOz1sJWtH/4DxeicQxbS50eP1
-	 bWOI2Vl/K0oUQetBCnNnIj4LgAfl+ipdSc/uVKRla+G5kWWluayuvdN0iSaf6iWNux
-	 JBytuXLN7x1KQ==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Bjorn Helgaas <bhelgaas@google.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>,
-	Simona Vetter <simona@ffwll.ch>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	dri-devel@lists.freedesktop.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: [PATCH] [v2] PCI: add CONFIG_MMU dependency
-Date: Wed, 23 Apr 2025 22:16:32 +0200
-Message-Id: <20250423202215.3315550-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1745439724; c=relaxed/simple;
+	bh=IZnu6wdyPtClzTpUQpTWkf4YSITWNNs3ibqRNmz2PFA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=kTzDeqnm8ALCUNlknyCRxfIOLi/VV8x2OJEJyZGOdLXR2kUXPcjArBPpmqtYYCc1E8R/LSgtsi3p8+Cf5gXBr+45w0ypkPwRXrT8TX3sJKh9m5Vk1rhRmq00JmNpmEnaLVBGFg3T/4N0EYo9XH+cuKLnk4FKI70nsyRGoDBYfdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hHQqEXr9; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b048d1abbbfso161175a12.0
+        for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 13:22:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1745439722; x=1746044522; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lb5Hj4079cmmz08gkncfU6HRHYwb2cTW68BpAu1pjpA=;
+        b=hHQqEXr9+PCQ4471VW3+obysjcFBHCpHjIV3G5mc7ikxmkVFgjbFw0kd6heprsAb5E
+         4SpRiAMULhDilLQdu5wJZpoGZrGz14err+IAB+Cg+9YjHzAQWuh9TEBAKM6ScOiGhQiV
+         xyfd123JGEHSExNY+Zc4dNGUwQOlQ/AvV+mkiP0r1CP7Nolv+ugWrJsSmMaN2Zz/mRlt
+         LbN6JuQ9354SJozUlEo3yqvZLR80idSITei1f0wBs3JlL0WOerfdZc1PKIMJrthWDXPY
+         2NY6sRGVQRD9cHHYt2YbAv0vc8qS9wFxAdsZZXsglKMujjAAF9Q2RNrl/UMvPSaTRs0M
+         TvDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745439722; x=1746044522;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lb5Hj4079cmmz08gkncfU6HRHYwb2cTW68BpAu1pjpA=;
+        b=W0a0GBaCY1ZdrOQ7r1+LH9Evg9UfVMYEdj9BhjxoSN44tZEiOD/B45XTWPlx7ZXSb+
+         L5m/FkuuofteaKqJCYRwjrWu9cFdTXXUAmfuf6aEm11FhEMbn7q1PoIcAXnfvhsKi7rx
+         yA9sI9ywhv85FyToV78nPyuyD5iICGCv03E2JEqTrppoqB4ZWxPz58HygIXRet274s6e
+         Az7AoIM8Dgr9dAkFVNhrmDuW3fb1fPpHpqmaY+SAuHNL+wTBov+FpP4dpiVDmFHqSIN8
+         4//KVgszVe3bUB1ypYi+qCF8XsOnynDzZYjocKU1EgdOwSZu8ch280EfGYrr2lYyDlAt
+         /PrA==
+X-Forwarded-Encrypted: i=1; AJvYcCVXJFS07qtr3YG10FX2fveHsV0YlOsq0nyahjtefSUVOmpND+oNx1Dq5/DG8QDYWApO2Fw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz24P+fAqM4eDsBwNdkn5aa17gcNAbw12ZQX2e5NxfJihz5vrHx
+	OJfm4lyKjTvulQMAVeoSYY8E4nXbSVE2YbzJE2Uy/BbQIzfHiEJdPN8RVCny/LxQhqXbzyb9G1V
+	sw5t0JNE9T7utkXCjjCpdGQ==
+X-Google-Smtp-Source: AGHT+IEZQzaRzavelSAVxJna7z3rzv2eWOXWrhC8lNuigMph7H21lihWm3EaY9BgIQuvCBgTk8eHqn8ZKABOoog4TQ==
+X-Received: from pglc21.prod.google.com ([2002:a63:d15:0:b0:b14:9718:f939])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a20:ce48:b0:1f5:709d:e0c6 with SMTP id adf61e73a8af0-203cbd418efmr30504920637.42.1745439722591;
+ Wed, 23 Apr 2025 13:22:02 -0700 (PDT)
+Date: Wed, 23 Apr 2025 13:22:00 -0700
+In-Reply-To: <Z+y2nU7KDmRpuISM@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <cover.1726009989.git.ackerleytng@google.com> <d1940d466fc69472c8b6dda95df2e0522b2d8744.1726009989.git.ackerleytng@google.com>
+ <Z+y2nU7KDmRpuISM@yzhao56-desk.sh.intel.com>
+Message-ID: <diqzselyzl07.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH 13/39] KVM: guest_memfd: Make guest mem use guest mem
+ inodes instead of anonymous inodes
+From: Ackerley Tng <ackerleytng@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: tabba@google.com, quic_eberman@quicinc.com, roypat@amazon.co.uk, 
+	jgg@nvidia.com, peterx@redhat.com, david@redhat.com, rientjes@google.com, 
+	fvdl@google.com, jthoughton@google.com, seanjc@google.com, 
+	pbonzini@redhat.com, zhiquan1.li@intel.com, fan.du@intel.com, 
+	jun.miao@intel.com, isaku.yamahata@intel.com, muchun.song@linux.dev, 
+	mike.kravetz@oracle.com, erdemaktas@google.com, vannapurve@google.com, 
+	qperret@google.com, jhubbard@nvidia.com, willy@infradead.org, 
+	shuah@kernel.org, brauner@kernel.org, bfoster@redhat.com, 
+	kent.overstreet@linux.dev, pvorel@suse.cz, rppt@kernel.org, 
+	richard.weiyang@gmail.com, anup@brainfault.org, haibo1.xu@intel.com, 
+	ajones@ventanamicro.com, vkuznets@redhat.com, maciej.wieczor-retman@intel.com, 
+	pgonda@google.com, oliver.upton@linux.dev, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-fsdevel@kvack.org
+Content-Type: text/plain; charset="UTF-8"
 
-From: Arnd Bergmann <arnd@arndb.de>
+Yan Zhao <yan.y.zhao@intel.com> writes:
 
-It turns out that there are no platforms that have PCI but don't have an MMU,
-so adding a Kconfig dependency on CONFIG_PCI simplifies build testing kernels
-for those platforms a lot, and avoids a lot of inadvertent build regressions.
+> Hi Ackerley,
+>
+> Not sure if below nits have been resolved in your latest code.
+> I came across them and felt it's better to report them anyway.
+>
+> Apologies for any redundancy if you've already addressed them.
 
-Add a dependency for CONFIG_PCI and remove all the ones for PCI specific
-device drivers that are currently marked not having it.
+No worries, thank you so much for your reviews!
 
-There are a few platforms that have an optional MMU, but they usually cannot
-have PCI at all. The one exception is Coldfire MCF54xx, but this is mainly
-for historic reasons, and anyone using those chips should really use the
-MMU these days.
+>
+> On Tue, Sep 10, 2024 at 11:43:44PM +0000, Ackerley Tng wrote:
+>> +static void kvm_gmem_init_mount(void)                                         
+>> +{                                                                             
+>> +     kvm_gmem_mnt = kern_mount(&kvm_gmem_fs);                                 
+>> +     BUG_ON(IS_ERR(kvm_gmem_mnt));                                            
+>> +                                                                              
+>> +     /* For giggles. Userspace can never map this anyways. */                 
+>> +     kvm_gmem_mnt->mnt_flags |= MNT_NOEXEC;                                   
+>> +}                                                                             
+>> +                                                                              
+>>  static struct file_operations kvm_gmem_fops = {                               
+>>       .open           = generic_file_open,                                     
+>>       .release        = kvm_gmem_release,                                      
+>> @@ -311,6 +348,8 @@ static struct file_operations kvm_gmem_fops = {            
+>>  void kvm_gmem_init(struct module *module)                                     
+>>  {                                                                             
+>>       kvm_gmem_fops.owner = module;                                            
+>> +                                                                              
+>> +     kvm_gmem_init_mount();                                                   
+>>  } 
+> When KVM is compiled as a module, looks "kern_unmount(kvm_gmem_mnt)" is
+> missing in the kvm_exit() path.
+>
+> This may lead to kernel oops when executing "sync" after KVM is unloaded or
+> reloaded.
+>
 
-Link: https://lore.kernel.org/lkml/a41f1b20-a76c-43d8-8c36-f12744327a54@app.fastmail.com/
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com> # SCSI
-Acked-by: Alex Deucher <alexander.deucher@amd.com>
-Reviewed-by: Thomas Zimmermann <tzimmermann@suse.de>
-Cc: Bjorn Helgaas <bhelgaas@google.com>
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
-v2: update changelog text
+Thanks, Fuad will be addressing this in a revision of [1].
 
-Bjorn, can you take this through the PCI tree? I thought about splitting
-it up by subsystem, but it's really one thing that I'm doing here, and
-doing it in one bit makes more sense to me.
----
- drivers/accel/qaic/Kconfig              | 1 -
- drivers/firewire/Kconfig                | 2 +-
- drivers/gpu/drm/Kconfig                 | 2 +-
- drivers/gpu/drm/amd/amdgpu/Kconfig      | 3 +--
- drivers/gpu/drm/ast/Kconfig             | 2 +-
- drivers/gpu/drm/gma500/Kconfig          | 2 +-
- drivers/gpu/drm/hisilicon/hibmc/Kconfig | 1 -
- drivers/gpu/drm/loongson/Kconfig        | 2 +-
- drivers/gpu/drm/mgag200/Kconfig         | 2 +-
- drivers/gpu/drm/nouveau/Kconfig         | 3 +--
- drivers/gpu/drm/qxl/Kconfig             | 2 +-
- drivers/gpu/drm/radeon/Kconfig          | 2 +-
- drivers/gpu/drm/tiny/Kconfig            | 2 +-
- drivers/gpu/drm/vmwgfx/Kconfig          | 2 +-
- drivers/gpu/drm/xe/Kconfig              | 2 +-
- drivers/net/ethernet/broadcom/Kconfig   | 1 -
- drivers/pci/Kconfig                     | 1 +
- drivers/pci/pci.c                       | 4 ++--
- drivers/scsi/bnx2fc/Kconfig             | 1 -
- drivers/scsi/bnx2i/Kconfig              | 1 -
- drivers/vfio/pci/Kconfig                | 2 +-
- 21 files changed, 17 insertions(+), 23 deletions(-)
+> BTW, there're lots of symbols not exported under mm.
+>
 
-diff --git a/drivers/accel/qaic/Kconfig b/drivers/accel/qaic/Kconfig
-index a9f866230058..5e405a19c157 100644
---- a/drivers/accel/qaic/Kconfig
-+++ b/drivers/accel/qaic/Kconfig
-@@ -8,7 +8,6 @@ config DRM_ACCEL_QAIC
- 	depends on DRM_ACCEL
- 	depends on PCI && HAS_IOMEM
- 	depends on MHI_BUS
--	depends on MMU
- 	select CRC32
- 	help
- 	  Enables driver for Qualcomm's Cloud AI accelerator PCIe cards that are
-diff --git a/drivers/firewire/Kconfig b/drivers/firewire/Kconfig
-index 905c82e26ce7..a5f5e250223a 100644
---- a/drivers/firewire/Kconfig
-+++ b/drivers/firewire/Kconfig
-@@ -83,7 +83,7 @@ config FIREWIRE_KUNIT_SELF_ID_SEQUENCE_HELPER_TEST
- 
- config FIREWIRE_OHCI
- 	tristate "OHCI-1394 controllers"
--	depends on PCI && FIREWIRE && MMU
-+	depends on PCI && FIREWIRE
- 	help
- 	  Enable this driver if you have a FireWire controller based
- 	  on the OHCI specification.  For all practical purposes, this
-diff --git a/drivers/gpu/drm/Kconfig b/drivers/gpu/drm/Kconfig
-index 89d00265d578..831bd384f1fd 100644
---- a/drivers/gpu/drm/Kconfig
-+++ b/drivers/gpu/drm/Kconfig
-@@ -393,7 +393,7 @@ source "drivers/gpu/drm/imagination/Kconfig"
- 
- config DRM_HYPERV
- 	tristate "DRM Support for Hyper-V synthetic video device"
--	depends on DRM && PCI && MMU && HYPERV
-+	depends on DRM && PCI && HYPERV
- 	select DRM_CLIENT_SELECTION
- 	select DRM_KMS_HELPER
- 	select DRM_GEM_SHMEM_HELPER
-diff --git a/drivers/gpu/drm/amd/amdgpu/Kconfig b/drivers/gpu/drm/amd/amdgpu/Kconfig
-index 7b95221d2f3d..64e603f971b8 100644
---- a/drivers/gpu/drm/amd/amdgpu/Kconfig
-+++ b/drivers/gpu/drm/amd/amdgpu/Kconfig
-@@ -2,7 +2,7 @@
- 
- config DRM_AMDGPU
- 	tristate "AMD GPU"
--	depends on DRM && PCI && MMU
-+	depends on DRM && PCI
- 	depends on !UML
- 	select FW_LOADER
- 	select DRM_CLIENT
-@@ -68,7 +68,6 @@ config DRM_AMDGPU_CIK
- config DRM_AMDGPU_USERPTR
- 	bool "Always enable userptr write support"
- 	depends on DRM_AMDGPU
--	depends on MMU
- 	select HMM_MIRROR
- 	select MMU_NOTIFIER
- 	help
-diff --git a/drivers/gpu/drm/ast/Kconfig b/drivers/gpu/drm/ast/Kconfig
-index da0663542e8a..242fbccdf844 100644
---- a/drivers/gpu/drm/ast/Kconfig
-+++ b/drivers/gpu/drm/ast/Kconfig
-@@ -1,7 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config DRM_AST
- 	tristate "AST server chips"
--	depends on DRM && PCI && MMU
-+	depends on DRM && PCI
- 	select DRM_CLIENT_SELECTION
- 	select DRM_GEM_SHMEM_HELPER
- 	select DRM_KMS_HELPER
-diff --git a/drivers/gpu/drm/gma500/Kconfig b/drivers/gpu/drm/gma500/Kconfig
-index 1613e51eff2d..e4c80e1a6da5 100644
---- a/drivers/gpu/drm/gma500/Kconfig
-+++ b/drivers/gpu/drm/gma500/Kconfig
-@@ -1,7 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config DRM_GMA500
- 	tristate "Intel GMA500/600/3600/3650 KMS Framebuffer"
--	depends on DRM && PCI && X86 && MMU && HAS_IOPORT
-+	depends on DRM && PCI && X86 && HAS_IOPORT
- 	select DRM_CLIENT_SELECTION
- 	depends on ACPI_VIDEO || !ACPI
- 	depends on I2C
-diff --git a/drivers/gpu/drm/hisilicon/hibmc/Kconfig b/drivers/gpu/drm/hisilicon/hibmc/Kconfig
-index 98d77d74999d..d1f3f5793f34 100644
---- a/drivers/gpu/drm/hisilicon/hibmc/Kconfig
-+++ b/drivers/gpu/drm/hisilicon/hibmc/Kconfig
-@@ -2,7 +2,6 @@
- config DRM_HISI_HIBMC
- 	tristate "DRM Support for Hisilicon Hibmc"
- 	depends on DRM && PCI
--	depends on MMU
- 	select DRM_CLIENT_SELECTION
- 	select DRM_DISPLAY_HELPER
- 	select DRM_DISPLAY_DP_HELPER
-diff --git a/drivers/gpu/drm/loongson/Kconfig b/drivers/gpu/drm/loongson/Kconfig
-index 552edfec7afb..d739d51cf54c 100644
---- a/drivers/gpu/drm/loongson/Kconfig
-+++ b/drivers/gpu/drm/loongson/Kconfig
-@@ -2,7 +2,7 @@
- 
- config DRM_LOONGSON
- 	tristate "DRM support for Loongson Graphics"
--	depends on DRM && PCI && MMU
-+	depends on DRM && PCI
- 	depends on LOONGARCH || MIPS || COMPILE_TEST
- 	select DRM_CLIENT_SELECTION
- 	select DRM_KMS_HELPER
-diff --git a/drivers/gpu/drm/mgag200/Kconfig b/drivers/gpu/drm/mgag200/Kconfig
-index 412dcbea0e2d..a962ae564a75 100644
---- a/drivers/gpu/drm/mgag200/Kconfig
-+++ b/drivers/gpu/drm/mgag200/Kconfig
-@@ -1,7 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config DRM_MGAG200
- 	tristate "Matrox G200"
--	depends on DRM && PCI && MMU
-+	depends on DRM && PCI
- 	select DRM_CLIENT_SELECTION
- 	select DRM_GEM_SHMEM_HELPER
- 	select DRM_KMS_HELPER
-diff --git a/drivers/gpu/drm/nouveau/Kconfig b/drivers/gpu/drm/nouveau/Kconfig
-index 9ba89b35d1a2..4fae780f7d78 100644
---- a/drivers/gpu/drm/nouveau/Kconfig
-+++ b/drivers/gpu/drm/nouveau/Kconfig
-@@ -1,7 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config DRM_NOUVEAU
- 	tristate "Nouveau (NVIDIA) cards"
--	depends on DRM && PCI && MMU
-+	depends on DRM && PCI
- 	depends on (ACPI_VIDEO && ACPI_WMI && MXM_WMI) || !(ACPI && X86)
- 	depends on BACKLIGHT_CLASS_DEVICE
- 	select IOMMU_API
-@@ -86,7 +86,6 @@ config DRM_NOUVEAU_SVM
- 	bool "(EXPERIMENTAL) Enable SVM (Shared Virtual Memory) support"
- 	depends on DEVICE_PRIVATE
- 	depends on DRM_NOUVEAU
--	depends on MMU
- 	depends on STAGING
- 	select HMM_MIRROR
- 	select MMU_NOTIFIER
-diff --git a/drivers/gpu/drm/qxl/Kconfig b/drivers/gpu/drm/qxl/Kconfig
-index 69427eb8bed2..d8f24bcae34b 100644
---- a/drivers/gpu/drm/qxl/Kconfig
-+++ b/drivers/gpu/drm/qxl/Kconfig
-@@ -1,7 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config DRM_QXL
- 	tristate "QXL virtual GPU"
--	depends on DRM && PCI && MMU && HAS_IOPORT
-+	depends on DRM && PCI && HAS_IOPORT
- 	select DRM_CLIENT_SELECTION
- 	select DRM_KMS_HELPER
- 	select DRM_TTM
-diff --git a/drivers/gpu/drm/radeon/Kconfig b/drivers/gpu/drm/radeon/Kconfig
-index f51bace9555d..c479f0c0dd5c 100644
---- a/drivers/gpu/drm/radeon/Kconfig
-+++ b/drivers/gpu/drm/radeon/Kconfig
-@@ -2,7 +2,7 @@
- 
- config DRM_RADEON
- 	tristate "ATI Radeon"
--	depends on DRM && PCI && MMU
-+	depends on DRM && PCI
- 	depends on AGP || !AGP
- 	select FW_LOADER
- 	select DRM_CLIENT_SELECTION
-diff --git a/drivers/gpu/drm/tiny/Kconfig b/drivers/gpu/drm/tiny/Kconfig
-index 95c1457d7730..c50186a65464 100644
---- a/drivers/gpu/drm/tiny/Kconfig
-+++ b/drivers/gpu/drm/tiny/Kconfig
-@@ -37,7 +37,7 @@ config DRM_BOCHS
- 
- config DRM_CIRRUS_QEMU
- 	tristate "Cirrus driver for QEMU emulated device"
--	depends on DRM && PCI && MMU
-+	depends on DRM && PCI
- 	select DRM_CLIENT_SELECTION
- 	select DRM_KMS_HELPER
- 	select DRM_GEM_SHMEM_HELPER
-diff --git a/drivers/gpu/drm/vmwgfx/Kconfig b/drivers/gpu/drm/vmwgfx/Kconfig
-index 6c3c2922ae8b..aab646b91ca9 100644
---- a/drivers/gpu/drm/vmwgfx/Kconfig
-+++ b/drivers/gpu/drm/vmwgfx/Kconfig
-@@ -1,7 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0
- config DRM_VMWGFX
- 	tristate "DRM driver for VMware Virtual GPU"
--	depends on DRM && PCI && MMU
-+	depends on DRM && PCI
- 	depends on (X86 && HYPERVISOR_GUEST) || ARM64
- 	select DRM_CLIENT_SELECTION
- 	select DRM_TTM
-diff --git a/drivers/gpu/drm/xe/Kconfig b/drivers/gpu/drm/xe/Kconfig
-index dd256b355613..bb3f34a29f4e 100644
---- a/drivers/gpu/drm/xe/Kconfig
-+++ b/drivers/gpu/drm/xe/Kconfig
-@@ -1,7 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config DRM_XE
- 	tristate "Intel Xe Graphics"
--	depends on DRM && PCI && MMU && (m || (y && KUNIT=y))
-+	depends on DRM && PCI && (m || (y && KUNIT=y))
- 	depends on INTEL_VSEC
- 	select INTERVAL_TREE
- 	# we need shmfs for the swappable backing store, and in particular
-diff --git a/drivers/net/ethernet/broadcom/Kconfig b/drivers/net/ethernet/broadcom/Kconfig
-index 46d07b81097f..1bcf406a9e36 100644
---- a/drivers/net/ethernet/broadcom/Kconfig
-+++ b/drivers/net/ethernet/broadcom/Kconfig
-@@ -98,7 +98,6 @@ config BNX2
- config CNIC
- 	tristate "QLogic CNIC support"
- 	depends on PCI && (IPV6 || IPV6=n)
--	depends on MMU
- 	select BNX2
- 	select UIO
- 	help
-diff --git a/drivers/pci/Kconfig b/drivers/pci/Kconfig
-index da28295b4aac..9c0e4aaf4e8c 100644
---- a/drivers/pci/Kconfig
-+++ b/drivers/pci/Kconfig
-@@ -21,6 +21,7 @@ config GENERIC_PCI_IOMAP
- menuconfig PCI
- 	bool "PCI support"
- 	depends on HAVE_PCI
-+	depends on MMU
- 	help
- 	  This option enables support for the PCI local bus, including
- 	  support for PCI-X and the foundations for PCI Express support.
-diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
-index 186858293df5..206f271e869a 100644
---- a/drivers/pci/pci.c
-+++ b/drivers/pci/pci.c
-@@ -4257,7 +4257,7 @@ unsigned long __weak pci_address_to_pio(phys_addr_t address)
- #ifndef pci_remap_iospace
- int pci_remap_iospace(const struct resource *res, phys_addr_t phys_addr)
- {
--#if defined(PCI_IOBASE) && defined(CONFIG_MMU)
-+#if defined(PCI_IOBASE)
- 	unsigned long vaddr = (unsigned long)PCI_IOBASE + res->start;
- 
- 	if (!(res->flags & IORESOURCE_IO))
-@@ -4290,7 +4290,7 @@ EXPORT_SYMBOL(pci_remap_iospace);
-  */
- void pci_unmap_iospace(struct resource *res)
- {
--#if defined(PCI_IOBASE) && defined(CONFIG_MMU)
-+#if defined(PCI_IOBASE)
- 	unsigned long vaddr = (unsigned long)PCI_IOBASE + res->start;
- 
- 	vunmap_range(vaddr, vaddr + resource_size(res));
-diff --git a/drivers/scsi/bnx2fc/Kconfig b/drivers/scsi/bnx2fc/Kconfig
-index ecdc0f0f4f4e..3cf7e08df809 100644
---- a/drivers/scsi/bnx2fc/Kconfig
-+++ b/drivers/scsi/bnx2fc/Kconfig
-@@ -5,7 +5,6 @@ config SCSI_BNX2X_FCOE
- 	depends on (IPV6 || IPV6=n)
- 	depends on LIBFC
- 	depends on LIBFCOE
--	depends on MMU
- 	select NETDEVICES
- 	select ETHERNET
- 	select NET_VENDOR_BROADCOM
-diff --git a/drivers/scsi/bnx2i/Kconfig b/drivers/scsi/bnx2i/Kconfig
-index 0cc06c2ce0b8..75ace2302fed 100644
---- a/drivers/scsi/bnx2i/Kconfig
-+++ b/drivers/scsi/bnx2i/Kconfig
-@@ -4,7 +4,6 @@ config SCSI_BNX2_ISCSI
- 	depends on NET
- 	depends on PCI
- 	depends on (IPV6 || IPV6=n)
--	depends on MMU
- 	select SCSI_ISCSI_ATTRS
- 	select NETDEVICES
- 	select ETHERNET
-diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-index c3bcb6911c53..2b0172f54665 100644
---- a/drivers/vfio/pci/Kconfig
-+++ b/drivers/vfio/pci/Kconfig
-@@ -1,6 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0-only
- menu "VFIO support for PCI devices"
--	depends on PCI && MMU
-+	depends on PCI
- 
- config VFIO_PCI_CORE
- 	tristate
--- 
-2.39.5
+Thanks again, is there a good way to do a build test for symbols not
+being exported?  What CONFIG flags do you use?
 
+>> +static struct file *kvm_gmem_inode_create_getfile(void *priv, loff_t size,
+>> +						  u64 flags)
+>> +{
+>> +	static const char *name = "[kvm-gmem]";
+>> +	struct inode *inode;
+>> +	struct file *file;
+>> +
+>> +	if (kvm_gmem_fops.owner && !try_module_get(kvm_gmem_fops.owner))
+>> +		return ERR_PTR(-ENOENT);
+>> +
+>> +	inode = kvm_gmem_inode_make_secure_inode(name, size, flags);
+>> +	if (IS_ERR(inode))
+> Missing module_put() here. i.e.,
+>
+> -       if (IS_ERR(inode))
+> +       if (IS_ERR(inode)) {
+> +               if (kvm_gmem_fops.owner)
+> +                       module_put(kvm_gmem_fops.owner);
+> +
+>                 return ERR_CAST(inode);
+> +       }
+>
+
+Thanks, Fuad will be addressing this in a revision of [1].
+
+>> +		return ERR_CAST(inode);
+>> +
+>> +	file = alloc_file_pseudo(inode, kvm_gmem_mnt, name, O_RDWR,
+>> +				 &kvm_gmem_fops);
+>> +	if (IS_ERR(file)) {
+>> +		iput(inode);
+>> +		return file;
+>> +	}
+>> +
+>> +	file->f_mapping = inode->i_mapping;
+>> +	file->f_flags |= O_LARGEFILE;
+>> +	file->private_data = priv;
+>> +
+>> +	return file;
+>> +}
+>> +
+>
+> Thanks
+> Yan
+
+[1] https://lore.kernel.org/all/20250328153133.3504118-2-tabba@google.com/
 
