@@ -1,164 +1,152 @@
-Return-Path: <kvm+bounces-44020-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44021-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CDACA99B2E
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 00:02:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECE10A99B3A
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 00:07:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10756464563
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 22:02:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DDF7E188D1CF
+	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 22:07:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0936821FF38;
-	Wed, 23 Apr 2025 22:02:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E57BB1F4C98;
+	Wed, 23 Apr 2025 22:07:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y4UL2HtJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j7gins0y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE03A1E7C25
-	for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 22:02:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 966291E32D5
+	for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 22:07:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745445727; cv=none; b=joIF/fo6QCajDkp/t8NVZ4ISFSTd6NC2L+ylNPCZysqHK0E/rTeNcajC7kc0TsqmUbSpT1HuGkUITUCmdOHYayl7VXC32xPOIIdWEgy1PJcpJEMeF8zjU2HA90lr83HXq/tQk+4GYsNJDIR6T4mt67vk/yw/340orr2keHRwKDY=
+	t=1745446031; cv=none; b=UHh8EOiHkpaOaK2cETnK4nHvRRPKZ081H16TR29qYE7dyAQvozvdNIKJ016fJd6a7T5c0YNG2u28QZxJgHgWSUIEvlfZk754Vlomi2hSlaFB7Pjal0m4GUbypIMRc3wQ6n6XFBedpOSVz+S4GB9x3KxbZs4o0SE/YYbSjSUDA7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745445727; c=relaxed/simple;
-	bh=/kYvkbcWE+9uoIdgKSwT0wqIwZi66c9Fis9jhsJOymo=;
+	s=arc-20240116; t=1745446031; c=relaxed/simple;
+	bh=bp28noHFXI39rusqUs8gwSpotivluw23XX7A5HKSIyY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=irzF7fIxpIczJY/cIya+Crsnyp0TJqzt2/sEsHcJnoSTuWVCo++Vp+kP1H1nWiLHFFDn6kvocZtuRTIxlZcW2twJKkA5c8tjGcmhyEXVAlHMNuZCKMs2Prf2IRGC5086jI2pCeJ4NKWyWczPCozFWsIgeqhFOO0jtwqn6B6vpN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y4UL2HtJ; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=JujR7tp7AWO1pQKhdhgGv2/soitn6jotss8sCn/9kTC6I+GIzNqBBx3ZvxiKCQEEfkO/AtwZh2aKH6cBzZI51+mUzxzaycnd3yeilqAuR0FEmfKt3RoijZOHfALT3HrE01Fw74ML9P74GdiAiP9DW5y+B4GB/xwe4k3Yc8rTH2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j7gins0y; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-af53a6bc0b6so106960a12.1
-        for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 15:02:05 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7398d70abbfso354872b3a.2
+        for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 15:07:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745445725; x=1746050525; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1745446028; x=1746050828; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZshVHDiSVI1msI3W+ro+KzMPJMPZ2JcnJbSD4cGabVM=;
-        b=Y4UL2HtJZoyj77BivhexhY40IsHjEKRM507qbJBkBhlXUJB5yKC4L7X6WCqFPK4wdP
-         cwqf3xxOgOIlAV8sLcZqycUOI/YVz3n/WZ06IljU2Wu95oO0dwsJXBViT5Fajy3Yyyr3
-         ktW/8b+uRmCWxT/d4rmtw1f+2eOZdg3yWAnZ2V6BrxsJIK83OrAZPvIDmcYmWJhXiuHv
-         JHY891pK1FhMQJMy9GecNLzESLQ7qH4HsIntSKOPrpcUR0clmFj/eN2DfR1OwWCzcfL0
-         /XxBilLdSgpqyp/9uZOxg/yDe4LDUoGqocUHb+ayqbbRZ1ROqDsMeC08PPZXPgTT9aRh
-         wefw==
+        bh=utY/3ZiZMMWfdAOVaunsuvsNTPOFiHttGwR5vylAKHw=;
+        b=j7gins0yjzcNXk2k7aYPdxq5dLq+fcHbYDtm944oh6TIvVs4R5h7S+4qj0XOde7EKx
+         9YqoUoQbUjtp3oc27Lsd0UKN0/WD3hiauZ6GqblzkPZ37dH+jI785SVuAJko0NxyBwSk
+         nU6pG4bPxxZuatrKWE8LLww11QQZpS4jCuYYQ6I32eBafBVQ0Z32jf85Isk6LWbOMOf/
+         BT/jdgH77gxvyJKF6TFv2F6g8MKEzfT2+X2GOOye568qXeUUBGEHOXocpwf1IQmry5I4
+         u4sSrq85/NqcuLCOVDPoegVkeACP1HN1LXVXslqbS5fZ6hghVX/VZiAfM+TsIKA3WS9h
+         VJEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745445725; x=1746050525;
+        d=1e100.net; s=20230601; t=1745446028; x=1746050828;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZshVHDiSVI1msI3W+ro+KzMPJMPZ2JcnJbSD4cGabVM=;
-        b=B7eUMyyRu6iqb5m9d/pwF2bVwCiMbLGwSN+y7uGdooL4zIrEa+IX9awbaLe72R70iL
-         rzVQnCQX1k8gPy1pGD19EajnjanjShaX9tBMPZ318zIvF0HFH0efTQ+iFOKjrZudzNEp
-         acBDpF5iF7/bKPJCEsshM465+Pwm1JTKK21R3PuUS2AuaKbb6tmmPbk1gwvyx+gGWajJ
-         kmEVQbPBmyhcBCehAHaQAppYvYOqCbkKXgDdYLwmyumQ7/1oQhqx82Cf5hUFbf/16mQR
-         6UMwAPwaigaR6K0eG4l9BHkMKdOFXQV0xKiEmjtcrcY1Qp6pUgAkfdsa5ZQFqbjKDeRj
-         ehvA==
-X-Forwarded-Encrypted: i=1; AJvYcCWaPl1SXnc4h5UyMsrHl+U7SPQzjPlwkD7cGnm1eoTDD59fur77UUL/tadSh8o/vLePFhw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywf9pOd00JAmpDIMRPJT+RDfglPVzn1UnVCfiq84iFT/qLFq6br
-	BhdUCiXGpFVFEUtDlou21F7bdKGuvGeQ5QoKb8jnrWBQYBjNDGlrN8jnrxuCvIZzzEPHBi9CjTs
-	QLNXGB1KWLhSsRcK88IIWMA==
-X-Google-Smtp-Source: AGHT+IG47bYyoQqSmgswCKOYeGTrnVac079gXJUVu/1TXbrM7dvGQWThFMm4vyGtqs9cP9ZCw5DfCSc3oxRjiC395w==
-X-Received: from plcx19.prod.google.com ([2002:a17:903:d3:b0:229:1de5:3212])
+        bh=utY/3ZiZMMWfdAOVaunsuvsNTPOFiHttGwR5vylAKHw=;
+        b=pwGCQPvouWRL1496yS0BRimMDdRL7OAXRX6RjNl/MWHob6ot/CVYf0mnNZKzVyKOO3
+         H7VVtF4snG5GIj4MwyJ8DsaSorIoxzgIjsUsiGlUgQDiUg30U61/NJbVFqRh8ETiie4v
+         HlmUQl+Dl3/v0YDf/uIFV+RXe4MVtVXYGbKohJFQLredarjCjj+rAuw9bgA4DKL7oVnG
+         aZIA2Rhxes89JItTkWaMMH4bstwIJuKQx7ajKN3H/3GwSxD7hEKNfxRnGfYyh0aUnPNS
+         1w6JiDAvuu6ZqOrmYO+G/UtrR+Wv+NBLYZdNLjeFWWXnAnWnHm8qXnHmZxQclu9oGx1a
+         ylaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVpK7Y9VMIGMGmhB5k4WGK1LospReTVySA9x59QGCsFFOpSgljCqVtAYDi7+3h47Y1HkWY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVy/1G5sLiWB6YFqJV9xowNctZKE/teN0z58hAt3pMCG3wlmqn
+	NVRQFCNcy7zN3iEgPCl8KJZdAKeWh9QViAB5yxZxhwMMNmGpBb+EdC9Ik74MzEC30xcWTZH0Rqb
+	xqMcjjTOYCjJ+tKQLydJVmQ==
+X-Google-Smtp-Source: AGHT+IGY+pnHq2DQX/HQySosr6MoIfIEbH4ov9YBubqcg0pcHfTCmXDOga+QBFHTjyVSBCstaBHNJFn3Q1wqnKPotg==
+X-Received: from pfx55.prod.google.com ([2002:a05:6a00:a477:b0:736:4ad6:1803])
  (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:902:e551:b0:220:ea90:191e with SMTP id d9443c01a7336-22db3baf262mr2268985ad.4.1745445724608;
- Wed, 23 Apr 2025 15:02:04 -0700 (PDT)
-Date: Wed, 23 Apr 2025 15:02:02 -0700
-In-Reply-To: <Z+6AGxEvBRFkN5mN@yzhao56-desk.sh.intel.com>
+ 2002:a05:6a00:3018:b0:736:4e02:c543 with SMTP id d2e1a72fcca58-73e245e3bc0mr500238b3a.9.1745446027829;
+ Wed, 23 Apr 2025 15:07:07 -0700 (PDT)
+Date: Wed, 23 Apr 2025 15:07:06 -0700
+In-Reply-To: <Z74p8-l6BhOmR1B_@x1.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1726009989.git.ackerleytng@google.com> <38723c5d5e9b530e52f28b9f9f4a6d862ed69bcd.1726009989.git.ackerleytng@google.com>
- <Z+6AGxEvBRFkN5mN@yzhao56-desk.sh.intel.com>
-Message-ID: <diqzh62ezgdh.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [RFC PATCH 39/39] KVM: guest_memfd: Dynamically split/reconstruct
- HugeTLB page
+References: <cover.1726009989.git.ackerleytng@google.com> <bd163de3118b626d1005aa88e71ef2fb72f0be0f.1726009989.git.ackerleytng@google.com>
+ <Z74p8-l6BhOmR1B_@x1.local>
+Message-ID: <diqzecxizg51.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH 26/39] KVM: guest_memfd: Track faultability within a
+ struct kvm_gmem_private
 From: Ackerley Tng <ackerleytng@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
+To: Peter Xu <peterx@redhat.com>
 Cc: tabba@google.com, quic_eberman@quicinc.com, roypat@amazon.co.uk, 
-	jgg@nvidia.com, peterx@redhat.com, david@redhat.com, rientjes@google.com, 
-	fvdl@google.com, jthoughton@google.com, seanjc@google.com, 
-	pbonzini@redhat.com, zhiquan1.li@intel.com, fan.du@intel.com, 
-	jun.miao@intel.com, isaku.yamahata@intel.com, muchun.song@linux.dev, 
-	erdemaktas@google.com, vannapurve@google.com, qperret@google.com, 
-	jhubbard@nvidia.com, willy@infradead.org, shuah@kernel.org, 
-	brauner@kernel.org, bfoster@redhat.com, kent.overstreet@linux.dev, 
-	pvorel@suse.cz, rppt@kernel.org, richard.weiyang@gmail.com, 
-	anup@brainfault.org, haibo1.xu@intel.com, ajones@ventanamicro.com, 
-	vkuznets@redhat.com, maciej.wieczor-retman@intel.com, pgonda@google.com, 
-	oliver.upton@linux.dev, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+	jgg@nvidia.com, david@redhat.com, rientjes@google.com, fvdl@google.com, 
+	jthoughton@google.com, seanjc@google.com, pbonzini@redhat.com, 
+	zhiquan1.li@intel.com, fan.du@intel.com, jun.miao@intel.com, 
+	isaku.yamahata@intel.com, muchun.song@linux.dev, erdemaktas@google.com, 
+	vannapurve@google.com, qperret@google.com, jhubbard@nvidia.com, 
+	willy@infradead.org, shuah@kernel.org, brauner@kernel.org, bfoster@redhat.com, 
+	kent.overstreet@linux.dev, pvorel@suse.cz, rppt@kernel.org, 
+	richard.weiyang@gmail.com, anup@brainfault.org, haibo1.xu@intel.com, 
+	ajones@ventanamicro.com, vkuznets@redhat.com, maciej.wieczor-retman@intel.com, 
+	pgonda@google.com, oliver.upton@linux.dev, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Yan Zhao <yan.y.zhao@intel.com> writes:
+Peter Xu <peterx@redhat.com> writes:
 
-> On Tue, Sep 10, 2024 at 11:44:10PM +0000, Ackerley Tng wrote:
->> +/*
->> + * Allocates and then caches a folio in the filemap. Returns a folio with
->> + * refcount of 2: 1 after allocation, and 1 taken by the filemap.
->> + */
->> +static struct folio *kvm_gmem_hugetlb_alloc_and_cache_folio(struct inode *inode,
->> +							    pgoff_t index)
->> +{
->> +	struct kvm_gmem_hugetlb *hgmem;
->> +	pgoff_t aligned_index;
->> +	struct folio *folio;
->> +	int nr_pages;
->> +	int ret;
->> +
->> +	hgmem = kvm_gmem_hgmem(inode);
->> +	folio = kvm_gmem_hugetlb_alloc_folio(hgmem->h, hgmem->spool);
->> +	if (IS_ERR(folio))
->> +		return folio;
->> +
->> +	nr_pages = 1UL << huge_page_order(hgmem->h);
->> +	aligned_index = round_down(index, nr_pages);
-> Maybe a gap here.
->
-> When a guest_memfd is bound to a slot where slot->base_gfn is not aligned to
-> 2M/1G and slot->gmem.pgoff is 0, even if an index is 2M/1G aligned, the
-> corresponding GFN is not 2M/1G aligned.
-
-Thanks for looking into this.
-
-In 1G page support for guest_memfd, the offset and size are always
-hugepage aligned to the hugepage size requested at guest_memfd creation
-time, and it is true that when binding to a memslot, slot->base_gfn and
-slot->npages may not be hugepage aligned.
-
->
-> However, TDX requires that private huge pages be 2M aligned in GFN.
->
-
-IIUC other factors also contribute to determining the mapping level in
-the guest page tables, like lpage_info and .private_max_mapping_level()
-in kvm_x86_ops.
-
-If slot->base_gfn and slot->npages are not hugepage aligned, lpage_info
-will track that and not allow faulting into guest page tables at higher
-granularity.
-
-Hence I think it is okay to leave it to KVM to fault pages into the
-guest correctly. For guest_memfd will just maintain the invariant that
-offset and size are hugepage aligned, but not require that
-slot->base_gfn and slot->npages are hugepage aligned. This behavior will
-be consistent with other backing memory for guests like regular shmem or
-HugeTLB.
-
->> +	ret = kvm_gmem_hugetlb_filemap_add_folio(inode->i_mapping, folio,
->> +						 aligned_index,
->> +						 htlb_alloc_mask(hgmem->h));
->> +	WARN_ON(ret);
->> +
->>  	spin_lock(&inode->i_lock);
->>  	inode->i_blocks += blocks_per_huge_page(hgmem->h);
->>  	spin_unlock(&inode->i_lock);
+> On Tue, Sep 10, 2024 at 11:43:57PM +0000, Ackerley Tng wrote:
+>> @@ -1079,12 +1152,20 @@ static struct inode *kvm_gmem_inode_make_secure_inode(const char *name,
+>>  	if (err)
+>>  		goto out;
 >>  
->> -	return page_folio(requested_page);
->> +	return folio;
->> +}
+>> +	err = -ENOMEM;
+>> +	private = kzalloc(sizeof(*private), GFP_KERNEL);
+>> +	if (!private)
+>> +		goto out;
+>> +
+>>  	if (flags & KVM_GUEST_MEMFD_HUGETLB) {
+>> -		err = kvm_gmem_hugetlb_setup(inode, size, flags);
+>> +		err = kvm_gmem_hugetlb_setup(inode, private, size, flags);
+>>  		if (err)
+>> -			goto out;
+>> +			goto free_private;
+>>  	}
+>>  
+>> +	xa_init(&private->faultability);
+>> +	inode->i_mapping->i_private_data = private;
+>> +
+>>  	inode->i_private = (void *)(unsigned long)flags;
+>
+> Looks like inode->i_private isn't used before this series; the flags was
+> always zero before anyway.  Maybe it could keep kvm_gmem_inode_private
+> instead? Then make the flags be part of the struct.
+>
+> It avoids two separate places (inode->i_mapping->i_private_data,
+> inode->i_private) to store gmem private info.
+>
+
+Weakly-held opinion: I think the advantage of re-using inode->i_private
+to store flags is that in some cases, e.g. non-hugetlb, we might be able
+to avoid an allocation (of kvm_gmem_inode_private).
+
+Does anyone else have any thoughts on this?
+
+>>  	inode->i_op = &kvm_gmem_iops;
+>>  	inode->i_mapping->a_ops = &kvm_gmem_aops;
+>> @@ -1097,6 +1178,8 @@ static struct inode *kvm_gmem_inode_make_secure_inode(const char *name,
+>>  
+>>  	return inode;
+>>  
+>> +free_private:
+>> +	kfree(private);
+>>  out:
+>>  	iput(inode);
+>>  
+>> -- 
+>> 2.46.0.598.g6f2099f65c-goog
+>> 
+>
+> -- 
+> Peter Xu
 
