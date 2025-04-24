@@ -1,88 +1,111 @@
-Return-Path: <kvm+bounces-44117-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44118-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52A4FA9AA92
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 12:39:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38162A9AB0D
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 12:53:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C9331941AE6
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 10:39:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB4117A3E10
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 10:45:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8217F23A9AE;
-	Thu, 24 Apr 2025 10:35:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 725EB232386;
+	Thu, 24 Apr 2025 10:39:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="ZFQbXmZ2"
+	dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b="XaJ7BtUC";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="nLTnflKt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a4-smtp.messagingengine.com (fhigh-a4-smtp.messagingengine.com [103.168.172.155])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAE0A230BF8
-	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 10:35:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A2E922688C;
+	Thu, 24 Apr 2025 10:39:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745490947; cv=none; b=V5PBBIs0/fg/VgwxE6jUd8iTK0onFiDSoMJxcSGVE/7Bd5b6Tt28h71D5VoPNs9lPbNGVzWmg3RipNM962d0HDWrQMGm5vcaNUCPRf8Ig36U16T7nU8f+9JepAr32tX2Nj/EUriKaTfPRMawX4wA/DWnx0zJbn3WL/avmBKw2JY=
+	t=1745491172; cv=none; b=XM5iY4iLavvsRqJyiPkl1L2LeKrOTahCMf2jMpW1xcFZMyNF9sdfo0uPlAaKX0j8iaBnfem2P06UIGlBRhtP2a/elaoHVwV/FZSB7KF62Nzco5zewWZ7T7gAC8GU6WOm4/7fUggXoIqWXk6v/e25gkhUtPdhMha+QnAZy+XPsRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745490947; c=relaxed/simple;
-	bh=B0ZiRolrSfi+H6wyYXiznygVH1gb8LyA5qmriNgEOfs=;
+	s=arc-20240116; t=1745491172; c=relaxed/simple;
+	bh=M/GTo3I52NXu8ighvWmgklVXc8dRXzoeIiGkIZjkk1U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TQwIR0TagMpc4Qx+TCoznJpmJFL4rSIBaT9TP50Gltp5O45Fn2yfEAgFLynP3Qk4A0oW5JRB/3agrJrFPIblRoCMhMC8yhXP9kp2hNjcvh0s1uM93+BxqhW78uIsz1MwO98dwxhyeU877VsyxMS6LYnWEKChWenfMQqgbJ6glDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=ZFQbXmZ2; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3913958ebf2so662449f8f.3
-        for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 03:35:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1745490943; x=1746095743; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IUR+h4PX+3NwGH8BQZC0fWxB3CoxerSbNXDHvlU8Qy0=;
-        b=ZFQbXmZ2pgZiTTwC8vIgEVrWdleenTd89g3orkew/QSipa8UVf+VNYI3jl31pjpW28
-         8Kxt/6F+GF+cvHEZ5nRUZ4oWcvhHAiDxfSXvv9FeEQ12bVYudrbcCZ9hp8zBIRF3AXYg
-         BFHApXv65WomT6OKxDoHcdfW6tia9GmZ56JUWZ+Coek9/DqcQA+3RSn+z9u1WjgQYHkQ
-         VmFF8bPKvrncxBmPf5+DkeBbIzihTKqvIEhdwTVDfXC6zg4pYSveQNVSV7F38U3C0gbt
-         53ELJ6sMijN1ZrzRHNp8u8Mn4BwCkwxph+YAgrKb1bRAZgOEsZOiwQTsz3dS19lpLsYr
-         txDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745490943; x=1746095743;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IUR+h4PX+3NwGH8BQZC0fWxB3CoxerSbNXDHvlU8Qy0=;
-        b=ABEj6lHu4zacQWxFivJTtTQ0xmCqBSVRnbQmet3gRHSKSGp2jbSoEQdCGGfv8FLdbu
-         d/nDa1kp1ojYNz3iV+eygsrVslbC7w5CUWDnx4sCyluF9SQkUNoFYOzbRGSZTRv8Ptb9
-         WKgBf55O/tU+kWdOGSplGRFpZcIUbhRKvQfgdUqls97jjyCC0cl4LvE8TFdi1G7Z3NBV
-         Coev1MGylUTNknyZUN72gRl8rZK5tf5Dw1DNPgB2MXZsvTPHLCLeusfBnvfriPye6YHC
-         fvWZeRQ1Y+zric+2d0QhZpCWiqGSvmJNCK+f4sGmW4f2Crjd4AwOEFg66OlHXEdNp9p4
-         HgYA==
-X-Forwarded-Encrypted: i=1; AJvYcCV2PPUtmTQoIq5aW1vFeHXjRx/nMeJ4MEIbWMkWgKbxY3ll68gVyAVRZnPiUUWFL4NpEQg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOyBVd0U/2IHImCC+tu70O8SuAFtn28OS0Ex+kavL+ttM//rHt
-	ZETHeS3of3hFUvXoIE9hzWbEt/zzTP7T5WXwgZ+8A9nGpO22lYfN+3WAFYg79+Q=
-X-Gm-Gg: ASbGncupmz9N674J+22nfg8cFxCWwM0IfDAUoFXnRauj/4fzqJdc++HB+j60fFpbmwi
-	y4t23Wpam2+/DOIkMQvut2s6TtspTXU+WmtPuptMFY8RcX4iDRZ03D3Q3hr/iq1W0pTrvSJEKRW
-	zNGg50eAbHPirPV031yUbq7uCoWEE9FOqCu373RAjS6y3zPPf9TLqpwM431DQk1qLGsNI6jRrMf
-	/avvOAWQXo9LTszVkDlNQveG+qa80n7nH7vYSn1W2C9RmlSRRueH/+SdJ4AVmfsKS0ITc7gej0j
-	+dVBWbtITv7FsFI4VdLRQkIcydKw
-X-Google-Smtp-Source: AGHT+IEMMNUAVFSZJW72EDWo3VFnQwnHK3P23aJgYipjy3Fyv7YBKouXm/RCEBGe7MUaHxg7wn5VXw==
-X-Received: by 2002:a05:6000:4022:b0:39c:1f11:bb2 with SMTP id ffacd0b85a97d-3a06cf5ee5amr1527452f8f.22.1745490942932;
-        Thu, 24 Apr 2025 03:35:42 -0700 (PDT)
-Received: from localhost ([2a02:8308:a00c:e200::f716])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a06d4c30ccsm1653633f8f.49.2025.04.24.03.35.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Apr 2025 03:35:42 -0700 (PDT)
-Date: Thu, 24 Apr 2025 12:35:41 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Alexandre Ghiti <alexghiti@rivosinc.com>
-Cc: Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Alexandre Ghiti <alex@ghiti.fr>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH 1/3] riscv: Fix typo EXRACT -> EXTRACT
-Message-ID: <20250424-93c64fdbb15c142ee458d857@orel>
-References: <20250422082545.450453-1-alexghiti@rivosinc.com>
- <20250422082545.450453-2-alexghiti@rivosinc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=mVXZoOJuu1WaJZFPabrDfj/HeHwJvYFndwzLK4nqD5v4f+qw9L2U4Fg1ROkzkaEx5ErvFmuvIfnppqrs+LCyPbZSpMBjf+OIqjDlMuXasdpvDlt4T/DN3oo26OODgmWGQuKLTkkbqG6VUhEIf6AaA+UNIUTIh6hniQ1V9dt7Bq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name; spf=pass smtp.mailfrom=shutemov.name; dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b=XaJ7BtUC; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=nLTnflKt; arc=none smtp.client-ip=103.168.172.155
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shutemov.name
+Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 7680111402A5;
+	Thu, 24 Apr 2025 06:39:28 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-04.internal (MEProxy); Thu, 24 Apr 2025 06:39:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1745491168; x=
+	1745577568; bh=stUVXB5LohVz9IeHVm96Fl6lmKlj3bOnocGi8pRm1/Y=; b=X
+	aJ7BtUCCatjEciLWCpniIwMLq4h2m1/ix8TadWZOEFjaGZ18e3KulGeqXi9TT9zo
+	wr+RPBsmcSzRTXJCpRcLplLKFkmGcrm7BPO162pJL/AHrLIJg5QJ7KBLQJDXOuW4
+	WEh/AYJ5dan3s8CeSMdZUfifeFK9qJAT6+GvD+tj+G7aLPDKLN2RwcjHK+4j7BbK
+	xzpFMJGK97cd+Gubjyxh4b6meIxe7XttVzep6uyDVRzfrT1UlQ/lN86nMuShnv4m
+	h5AajxCk2EfJxfpj+SMid9+NBLBekvYYNPY4WuTg1k7lR5mUtXE/zzuxxyH6ntYt
+	O2tZ3HP71hCRmRQlKr0lA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1745491168; x=1745577568; bh=stUVXB5LohVz9IeHVm96Fl6lmKlj3bOnocG
+	i8pRm1/Y=; b=nLTnflKtwf4i8QRFq+9jVOy76nvqf1H1sJ4Ia1Pg+xwXP3UOao3
+	EXXlSDYGQ5A/o9O7jyENCTm/JjzoWNuNKnNZTlc1S2uFgORIMcTcgU3lHR3idEcQ
+	BTHu7gUuyZqJG9hMMY0hgAvC1Y2i+X5mjEjPZmbn20EN9Q5/UCQJUHZbjsXNPWjJ
+	7vu16B393ezu2R2KVccU+MkTRCQPGNfCjMPouYvl6xwVP4y/EeVBvE9l8KzjnyoI
+	EmJKAuC69csVS5/EHmBuKQ94bJhJ/IlbCMdhzcWjnCmruOzC8Lz9Xj3gbxfttxxZ
+	iEehC2hq8wgLKFtLSFPe5F8f7s3NulwHyNw==
+X-ME-Sender: <xms:4BQKaOkp1gNliTZV6NevYnYdrK9T5NUC_f7y1VOFWyJQhIPZjAMOyA>
+    <xme:4BQKaF1KmQQrhzYeBNhDU752ua-WE9gzf5g1zoeytpUepmlW5L6zpfaHM1nCru_yK
+    a2xfwQFVLkPZZclCmY>
+X-ME-Received: <xmr:4BQKaMqPMNnXRikdPY_Klf1Ia9D5JWdkirRNeVeiizfFMV_XY9M-oA0ko5jRlIQ1nrSDRw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvgeelvdehucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtsfdttddt
+    vdenucfhrhhomhepfdfmihhrihhllhcutedrucfuhhhuthgvmhhovhdfuceokhhirhhilh
+    hlsehshhhuthgvmhhovhdrnhgrmhgvqeenucggtffrrghtthgvrhhnpeffvdevueetudfh
+    hfffveelhfetfeevveekleevjeduudevvdduvdelteduvefhkeenucevlhhushhtvghruf
+    hiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehkihhrihhllhesshhhuhhtvghm
+    ohhvrdhnrghmvgdpnhgspghrtghpthhtohepvdegpdhmohguvgepshhmthhpohhuthdprh
+    gtphhtthhopeihrghnrdihrdiihhgrohesihhnthgvlhdrtghomhdprhgtphhtthhopehp
+    sghonhiiihhnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepshgvrghnjhgtsehgoh
+    hoghhlvgdrtghomhdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhk
+    vghrnhgvlhdrohhrghdprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorh
+    hgpdhrtghpthhtohepgiekieeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprhhitghk
+    rdhprdgvughgvggtohhmsggvsehinhhtvghlrdgtohhmpdhrtghpthhtohepuggrvhgvrd
+    hhrghnshgvnhesihhnthgvlhdrtghomhdprhgtphhtthhopehkihhrihhllhdrshhhuhht
+    vghmohhvsehinhhtvghlrdgtohhm
+X-ME-Proxy: <xmx:4BQKaCkh-Blx2Tv3Kt-HkpPHS1ogLxkmj_zt7yscutvFNBZs1ZeEPQ>
+    <xmx:4BQKaM24gFjQ0S7aeTsO7CYQh8CJZqFg4B0wWv39hvL1TsJr8b73Gg>
+    <xmx:4BQKaJt5ufiIVthjrFD5gklpscjXlt8Ryz1wXG5zZhPWm0E05VagJg>
+    <xmx:4BQKaIWau4EAGBYbom84VhXVcoov3RQ_zjEzPpAFmToaLMFtrA35fQ>
+    <xmx:4BQKaEZ7pzCdYK0SlWcjK190XoMX_EsTwIsibo7G6d4REGnCyxAB0GlE>
+Feedback-ID: ie3994620:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 24 Apr 2025 06:39:20 -0400 (EDT)
+Date: Thu, 24 Apr 2025 13:39:16 +0300
+From: "Kirill A. Shutemov" <kirill@shutemov.name>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: pbonzini@redhat.com, seanjc@google.com, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, x86@kernel.org, rick.p.edgecombe@intel.com, 
+	dave.hansen@intel.com, kirill.shutemov@intel.com, tabba@google.com, 
+	ackerleytng@google.com, quic_eberman@quicinc.com, michael.roth@amd.com, david@redhat.com, 
+	vannapurve@google.com, vbabka@suse.cz, jroedel@suse.de, thomas.lendacky@amd.com, 
+	pgonda@google.com, zhiquan1.li@intel.com, fan.du@intel.com, jun.miao@intel.com, 
+	ira.weiny@intel.com, chao.p.peng@intel.com
+Subject: Re: [RFC PATCH 00/21] KVM: TDX huge page support for private memory
+Message-ID: <y6k6j3kzoaze3gk4duhxhca6vq6mll2n3iabrm32o4mi3qi2hz@4nanpujhbkib>
+References: <20250424030033.32635-1-yan.y.zhao@intel.com>
+ <e735cpugrs3k5gncjcbjyycft3tuhkm75azpwv6ctwqfjr6gkg@rsf4lyq4gqoj>
+ <aAn3SSocw0XvaRye@yzhao56-desk.sh.intel.com>
+ <6vdj4mfxlyvypn743klxq5twda66tkugwzljdt275rug2gmwwl@zdziylxpre6y>
+ <aAoJHXsAbdOx+ljo@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -91,46 +114,20 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250422082545.450453-2-alexghiti@rivosinc.com>
+In-Reply-To: <aAoJHXsAbdOx+ljo@yzhao56-desk.sh.intel.com>
 
-On Tue, Apr 22, 2025 at 10:25:43AM +0200, Alexandre Ghiti wrote:
-> Simply fix a typo.
+On Thu, Apr 24, 2025 at 05:49:17PM +0800, Yan Zhao wrote:
+> > Accepting everything at 4k level is a stupid, but valid behaviour on the
+> > guest behalf. This splitting case has to be supported before the patchset
+> > hits the mainline.
+> Hmm. If you think this is a valid behavior, patches to introduce more locks
+> in TDX are required :)
 > 
-> Signed-off-by: Alexandre Ghiti <alexghiti@rivosinc.com>
-> ---
->  arch/riscv/include/asm/insn.h | 2 +-
->  arch/riscv/kernel/vector.c    | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/riscv/include/asm/insn.h b/arch/riscv/include/asm/insn.h
-> index 09fde95a5e8f..2a589a58b291 100644
-> --- a/arch/riscv/include/asm/insn.h
-> +++ b/arch/riscv/include/asm/insn.h
-> @@ -352,7 +352,7 @@ static __always_inline bool riscv_insn_is_c_jalr(u32 code)
->  	({typeof(x) x_ = (x); RV_X(x_, RVFDQ_FL_FS_WIDTH_OFF, \
->  				   RVFDQ_FL_FS_WIDTH_MASK); })
->  
-> -#define RVV_EXRACT_VL_VS_WIDTH(x) RVFDQ_EXTRACT_FL_FS_WIDTH(x)
-> +#define RVV_EXTRACT_VL_VS_WIDTH(x) RVFDQ_EXTRACT_FL_FS_WIDTH(x)
->  
->  /*
->   * Get the immediate from a J-type instruction.
-> diff --git a/arch/riscv/kernel/vector.c b/arch/riscv/kernel/vector.c
-> index 184f780c932d..901e67adf576 100644
-> --- a/arch/riscv/kernel/vector.c
-> +++ b/arch/riscv/kernel/vector.c
-> @@ -93,7 +93,7 @@ bool insn_is_vector(u32 insn_buf)
->  		return true;
->  	case RVV_OPCODE_VL:
->  	case RVV_OPCODE_VS:
-> -		width = RVV_EXRACT_VL_VS_WIDTH(insn_buf);
-> +		width = RVV_EXTRACT_VL_VS_WIDTH(insn_buf);
->  		if (width == RVV_VL_VS_WIDTH_8 || width == RVV_VL_VS_WIDTH_16 ||
->  		    width == RVV_VL_VS_WIDTH_32 || width == RVV_VL_VS_WIDTH_64)
->  			return true;
-> -- 
-> 2.39.2
->
+> Not sure about the value of supporting it though, as it's also purely
+> hypothetical and couldn't exist in Linux guests.
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+Linux is not the only possible guest.
+
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
 
