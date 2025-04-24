@@ -1,300 +1,212 @@
-Return-Path: <kvm+bounces-44100-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44101-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C653EA9A622
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 10:36:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7F2FA9A64E
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 10:39:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10F8A3A6CF3
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 08:36:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E06074662D4
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 08:39:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1586221269;
-	Thu, 24 Apr 2025 08:35:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98A7D21C160;
+	Thu, 24 Apr 2025 08:37:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WK4Eif0S"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QSDER3bN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF0F214A7A;
-	Thu, 24 Apr 2025 08:35:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745483752; cv=fail; b=C5MP0Bw9ut7P+qIGEHJb2s3IkEAtG28nPZt9qH3gX2C3iD2lUuej2ajDs419XAVhGjx/bJ/o1xAx2cRKHMe/jD7kpNRgOS9S9t2wgcaneBsNOO6GjTcCTnH2bnIrdzKaoDGaRXSQscjssGw7NkUvH3nx9HAJuqLmZRsmEydb37Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745483752; c=relaxed/simple;
-	bh=NGvKPHEvgi9zGsAZVQJhJb9bGI2LU1A4IJLOkINwxbY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=YHnrnfx4TOHI1HGb6oMNXnZ64UduG7sqARJqOmEy1Ca7OaW9sqfIfzpu3eeId1eKJ8myxuMB7jrbjU9gWvmGyvsC4sJAFkTQUWwPtbhyYlkhp90vgZBpH5QvFr5x4X7vnWtjW+sWyievqwF4+OM7nu1iowR39Cr65JV/c8Gn7pg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WK4Eif0S; arc=fail smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745483751; x=1777019751;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=NGvKPHEvgi9zGsAZVQJhJb9bGI2LU1A4IJLOkINwxbY=;
-  b=WK4Eif0ScvdTrKcZIC7bQmGetd61/kjbAU02r/r7RhIj+yHu6ACWNakt
-   o2b6OCnIwZ3x6dmdnVMxnztdmQNMOb5eBMSZ8C4trrwpTqEAEb8TlpfLA
-   SC7kHVqqxPDojqZxU843EWq3mKhws9EKD10edXyspnw2CBO1q4zP8ixIl
-   df4SwjkF2tRktBe6RwxXQV3qXVTaz+0RKKa8eW1cZ8rb80cmFH3u8iCpz
-   rH8gSyD69fIy20gs0/kd7kD3LnXwnif+v4SF9tr7qS2btXx3fPxq2Bm9r
-   LtKl3Qy0Z/QCn31XG7EatHVyuYyPGcxgkfVII1jWIH6JAxdZMjw0ys+oG
-   A==;
-X-CSE-ConnectionGUID: Rq8LXIk4T8eTm0hOxzoi8Q==
-X-CSE-MsgGUID: SuAiJD1lQEWxVfEqok0zjQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11412"; a="50927479"
-X-IronPort-AV: E=Sophos;i="6.15,235,1739865600"; 
-   d="scan'208";a="50927479"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 01:35:49 -0700
-X-CSE-ConnectionGUID: 2mza6vS9T1+BdiRKEDbOqA==
-X-CSE-MsgGUID: v9KAVLsySXmA6JEB/o59eA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,235,1739865600"; 
-   d="scan'208";a="155782126"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 01:35:49 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Thu, 24 Apr 2025 01:35:48 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Thu, 24 Apr 2025 01:35:48 -0700
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.43) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Thu, 24 Apr 2025 01:35:47 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=AeKb2fZWbqTBcraR7VZFvSVUYM+jtA3XFbm8/a/cKSwwQyWL0dFV3R8wArXyzpJ/JgaPV8zwzVJ5DjiD7mAPORahNOyKkrRmVI3vLJkCnWJ/USLTE3pg3W5h+WTMJZAUr35TS+4UOOFMW2hjcXGqYDVwT4pAc1Q2wwn4cPPpJsqIsge126+wOjlUp0Ew9OLuHMjTQx4IGB32BlQYUvGQX0dohruWXEAVnoHdCxV/baFWzPYq/FDpQcX9lGwyzHozHkIjc7FjntPqlb6IjF4l87rquVCM8cnYQu5NuGc9kUl+Qd1BPB8zMQkYNpL71NvvkVPPCZA02P9DJOvSn0mvvA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WMNeXhT933T+rFBvkXXoR/pQuiIBJAQIfrREtBd5UoY=;
- b=bdLdg0UaKSe9hYDSTlBowsZLMFa/xZTEuTsbWicJgugR4F3265FHwpVeRETH5fOfs7m4T2gwHn+4vtC+I/zfPkH/w2HiR12Wt6ltWkLrilweBPIckTsWEdaucVfUtreIkjQh1g/yZe/mkoUIrZVUXiMEHMKdA3eN7/9Tn/YhayyIIHbnqG4uzdITOoWHBhSRQsek7qUTM7CNP7giXYnn81FFhiHHSujfM2Y6uF4COJjzlTy9qoAE0AKYxPMtEJKo5m0CRXmdxmKLpZT7saPVacpPQYYYv5q9sYQxpZRMUxllyKGikFyPDtwjTA5SxTzFE5n1DcbseHRJyWpeMavIwg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- DS0PR11MB7957.namprd11.prod.outlook.com (2603:10b6:8:f8::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8678.23; Thu, 24 Apr 2025 08:35:10 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca%6]) with mapi id 15.20.8678.021; Thu, 24 Apr 2025
- 08:35:10 +0000
-Date: Thu, 24 Apr 2025 16:33:13 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: "Kirill A. Shutemov" <kirill@shutemov.name>
-CC: <pbonzini@redhat.com>, <seanjc@google.com>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, <x86@kernel.org>,
-	<rick.p.edgecombe@intel.com>, <dave.hansen@intel.com>,
-	<kirill.shutemov@intel.com>, <tabba@google.com>, <ackerleytng@google.com>,
-	<quic_eberman@quicinc.com>, <michael.roth@amd.com>, <david@redhat.com>,
-	<vannapurve@google.com>, <vbabka@suse.cz>, <jroedel@suse.de>,
-	<thomas.lendacky@amd.com>, <pgonda@google.com>, <zhiquan1.li@intel.com>,
-	<fan.du@intel.com>, <jun.miao@intel.com>, <ira.weiny@intel.com>,
-	<chao.p.peng@intel.com>
-Subject: Re: [RFC PATCH 00/21] KVM: TDX huge page support for private memory
-Message-ID: <aAn3SSocw0XvaRye@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20250424030033.32635-1-yan.y.zhao@intel.com>
- <e735cpugrs3k5gncjcbjyycft3tuhkm75azpwv6ctwqfjr6gkg@rsf4lyq4gqoj>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <e735cpugrs3k5gncjcbjyycft3tuhkm75azpwv6ctwqfjr6gkg@rsf4lyq4gqoj>
-X-ClientProxiedBy: SI1PR02CA0006.apcprd02.prod.outlook.com
- (2603:1096:4:1f7::11) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0190E213240
+	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 08:37:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745483827; cv=none; b=EJ9QBho3hnouXDNb+QZd1PlM0v8v5thisymlQzGdJjBgt+Zyb2aob7NKw3dni67lT5gQeNfkm3ezvYAdVrrSEdOEEdiDPeTzzDEYEFpPF851mhXiy7DlB2hpGadAyDhnmIeZcbej9oeyZxZopsvPkUTkjS1RHJIFkmYfiUEGiW4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745483827; c=relaxed/simple;
+	bh=fPeja0QKwMSDRTJx03tZ5pM4veCCSXRBmgYEmRDUSpA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BDY9oAG9veNJwMQc6H6oB4ig8w8W102zeavQTjyql3uoZwJxrIJZen1KolcKgv5O70QsWNiqsyqRIHJiNaj5XQnjp519IFWi7ny+gWHGV1CxEXQBneJ1i8nbj7aj/hLxML1aPcXnJhRGFe9Eat4VFjk+hTvMGAizkQ/7nEEW1LA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QSDER3bN; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745483824;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6fmlstr9ginyDig4RAQsNh+6aO603AT1tDfj5LgGrKc=;
+	b=QSDER3bNjEG3DoJ5cgTOeYkA8DFQwSuzDt++EK4PYruWxb4HhJ66WkTS7XNVUs8bdwf+uG
+	2rvdhco54CJ77sDgDMQAbPCyaQadrc6MWhSBUHSI7q2UBc18BgNf/8rMIaEarwLgc6sb1Y
+	FTVi2HVWYTPQD2U4WSwYfPEeo4Ods5w=
+Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
+ [209.85.219.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-465-1ACLkvSnNcu3r9yQpAOHsQ-1; Thu, 24 Apr 2025 04:37:02 -0400
+X-MC-Unique: 1ACLkvSnNcu3r9yQpAOHsQ-1
+X-Mimecast-MFC-AGG-ID: 1ACLkvSnNcu3r9yQpAOHsQ_1745483821
+Received: by mail-yb1-f197.google.com with SMTP id 3f1490d57ef6-e72b79ffc44so1076162276.0
+        for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 01:37:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745483821; x=1746088621;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6fmlstr9ginyDig4RAQsNh+6aO603AT1tDfj5LgGrKc=;
+        b=D257s01udd1/6nr2SIo4K9lDMSNEUVHoWIdgYzWZ3jeQabshhIgBpw2bEL6QWY27GV
+         VDn/tOJp7RfsmTn/Uvs8q1YwwR1X3ddEVN8LdtGFH6KflU5y3qWXdoX+6wwa5bacFy7E
+         AxWQzc8xMzfYOwBkza2EvJrdMrDwzCNIwz8zUI125y1BSoozR2cbiZPEDD32qCK4X/FP
+         OPTy8xzDrVZQEeJJzbaixN+sSOkFGoOQJi8o9OBRrfDSfAGyZrNWtW61iveEDQ+RwJP6
+         u+WxQX5M3nR6CYTi8IAemRr4OISd5X0VXMVyheEJVLdMd9eBOxUmeennkSQmScDyt0f9
+         KsnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWDub29JM91bvIBtXpPT6pBl0NxhapSXFilMB1LI4Na7gNCO7YyrVqT+kMyzkyVx2oAkak=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzw4r8rGMdwKJMH0+nh+BAOzhGrlSgOjw9eSiVp8KCa6WoYAQPC
+	WRmK7UZsiiZdKNVgB9AEUR0C6Gv4Nm0FnTg57Ee/OGeFdFfw6s6CahJgUoV4CzI26oKFdMSukc1
+	bplZIJT09sHOusLJIyWsJnS/fVej0O6TNCCbs1obSG3/M6o0qBhaxBulUu0F2agYAsDTcuMmeu+
+	ttrGFPAH+TPbgF5Gm2mYK9fM8r
+X-Gm-Gg: ASbGncu4Z1OMXdA0dR/2z+ylRdtoIcyDzA5LymINb+tGgJbmZxCgqlZI1mqYOt65hoK
+	I+dgwnjfwjfeZjr3lFhXruUC7d2OtAo2TvwaY3ctkeRyvJ+2RpM9ZMsUednkEUCd3+BOoEwk=
+X-Received: by 2002:a05:6902:2186:b0:e72:9693:7b36 with SMTP id 3f1490d57ef6-e73036372e0mr2271534276.42.1745483821375;
+        Thu, 24 Apr 2025 01:37:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHUfymtjS1vLei+DBOMXzLqv89tvpRz1tTcENml/8LK4mc8Ke+xAHKIP1Qw42phxCq+/NuBAxZdcPmq6bth+u8=
+X-Received: by 2002:a05:6902:2186:b0:e72:9693:7b36 with SMTP id
+ 3f1490d57ef6-e73036372e0mr2271517276.42.1745483821066; Thu, 24 Apr 2025
+ 01:37:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|DS0PR11MB7957:EE_
-X-MS-Office365-Filtering-Correlation-Id: 74ab6136-3585-4349-390b-08dd830aec78
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?MdBNJO4QU0CiRtta6fCEsiRpwaxfEMhjFrjV32v7293bVVdXlfxb5MaCf1bO?=
- =?us-ascii?Q?/MrUJgURWz1g2tfcj8URSbFHWps0OitoeQwQbTpFkyV5H6CzqKYs3IWPF8n8?=
- =?us-ascii?Q?XBT9aHXUNwe5EEQZwYCJHidMGITe3wFJa7JUzjPQW3t66wgL0eqO3Aq+dWMP?=
- =?us-ascii?Q?NyR9GclPmqbS4s5lT15BnBcvGx8OuxbZFaL77CbwuvIbbAMwbtuWL+jScK2B?=
- =?us-ascii?Q?E7mtOv6fymJwNCP4viLIuLTTgi8lg7Q8nf7zDqJ2M7e+Ksz1vusX4oEdc/Le?=
- =?us-ascii?Q?rR8xUHr5w4bXJHYpxIYlWhNQrZCKmKyJMcXfV8MlTCWawp+4j21RzlcVL3KH?=
- =?us-ascii?Q?Vo+JVszlZ3wHrMMMOwXrqZt6nmI+A9HTS2yW6XpMTXIFvvaEDxanB+wpH1Dq?=
- =?us-ascii?Q?IRSsV6Pae8hgvUyOORogLPT7Aap3YsRD4pfqBw5VjLrPGilVv4rvYddTlftv?=
- =?us-ascii?Q?H1zs9WCIbAQKwqxR8uSVj6MZqs0cbJ9A3bg1UN+7uYMgIX4lsp92lqOxxUOr?=
- =?us-ascii?Q?R7Hdg4u8kcOY9PDDcsBViD4ztlzB3UEc9vXz6IpMFXUpBLXu5FUmgnfR/oWo?=
- =?us-ascii?Q?OnAR4UEUv5TcPMkXYOMdPY5wnbmhd7ge/xd+T+/X1lu3FZFF44VdSeVoNxLU?=
- =?us-ascii?Q?1mdxUjWmEZZkQ1/d7Ec4mhbeDWBjBrWVuLFtoxeHl1lQ1wWiuEgayTRyWQX7?=
- =?us-ascii?Q?zqyG7fZDqD35usEyl2khCEnnqeTLePgwmWtdNhuDV0aKVEMCvPNhPMUnMKwW?=
- =?us-ascii?Q?bkRlKjxA2EID+25ksH+3nhO7rBbDXTrQmMCWZigrwaKQXSAOGyexHdwKkW3d?=
- =?us-ascii?Q?n9+GzS9XNQqRzG5LvcXBBz7mvhTyN9p+NKhV7Q596honubBaHc3FenCjh0p2?=
- =?us-ascii?Q?IhpShvg357RePue0BTxpdC9935q+huwLrXZ4syIV55sX/2OoQETeSiK3zt17?=
- =?us-ascii?Q?ygulG0jfWntXuCR91LYd8IJaKqZR6ogWxjAMN+U9ZnkX4kayvm6NK6IeueDh?=
- =?us-ascii?Q?yqLNJT/Zzm/pHRRVlwftVXQKYZiLitQS8FqVbUAq5QJSA75xVIf2UVSBmx89?=
- =?us-ascii?Q?SV63ByArOWyNolCVGgTMP4leB33dohxiTeuqwDexhEZsnB8zmC/B2EeIXD2K?=
- =?us-ascii?Q?lBxKCFnzMcaL42DNbzD99/ZkG8Q/Lz4IIGtM5TecBuOTfUlKboiQ3tp6O/O+?=
- =?us-ascii?Q?iE4BNq99BZpSnf4dqR0I//uehBMOyIo6fRKVQxtOxHgPA4V6RMOtiO/P7YrG?=
- =?us-ascii?Q?CTdCws3ismG+YgPB0Rwqvzl+664TPQPdNo0EgnjUwhe6KLLbdGMt6q+qeO3H?=
- =?us-ascii?Q?0DkJIad4x1PUqqMGkHE4aaiU9eKqPIJz1KxZ8n4mzNr5N/jV/TPG7+zG+Qsn?=
- =?us-ascii?Q?9mw1CcsaQ24946wz7yj5DVjMkGtWgLh6D0Sq5USwVFZxfBnHuVEYUc78UAtE?=
- =?us-ascii?Q?TVc/UBcEOEM=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?giWyik20UmVfTfJFFa1lO743oT6VN1LvCkby+dO0GOweIW71IBnQvSNU0YMZ?=
- =?us-ascii?Q?Tmwm4bH2FYyJ3/jHJ7KHCS6jHCzQNyBSkrFrlNA02cI/a/KIVKhPBRzLUyy2?=
- =?us-ascii?Q?8bftsx+08hZjtCiZFRLUvIJe+bjFrjgIeIW9NskMSaJ+MwUrLkShPJLpha3k?=
- =?us-ascii?Q?ZjzUJwnlZx9NIUPotiJgRsKFyiMOJSDAtcSVBxIXQDhl3ITtQ35siXsxosTW?=
- =?us-ascii?Q?bITKO+/G86PluQTMfi+9f0cNAdh+7auTjp9sybrFNXzges0pY4TB/Xz5JtUA?=
- =?us-ascii?Q?X9MARr/Yh7cNIl8cxjj45b6A4xwrvNnKY7dpVRB+IgzBndFae+fx3be8xkE6?=
- =?us-ascii?Q?Y/d4uo0OM+AIp3Hsg5may1u9HzBSNSy1ugXzcogA7rp/Ic4SGNObtXdJ996/?=
- =?us-ascii?Q?Xa/h4Gok5LoAub3dh0DNXySd6ECm4hIrn8dN1kkaK5BQFvFdtgVwN8rJTFPa?=
- =?us-ascii?Q?dzWa8EqGE4ute6DMODpaaFLFWZ0zH0n8I3RYWTLYouG5QygpQ4uuAMVyOatX?=
- =?us-ascii?Q?BPZbqCeh9pGZLJ/MgXc+L4gF9n2ql4ZKEg7ckv18/BfC9teE9zyPgTOOmNfk?=
- =?us-ascii?Q?aEJ3kYXUO5I9/Lh6K2SAN36z6XYdxN4NTrwXU3zm6JPrmXt0Tfcfz5+lOhxk?=
- =?us-ascii?Q?vj8CxlZmUU0w1RsfIRYJRm7P6OuQn+bXtpoMKEkOU3xMte/2KzP/gPPsTeuQ?=
- =?us-ascii?Q?1OEKPL6sshhaSPPPVNcIvZl0C8Sq3gExsbIB9qzaxGYUS6OGTKVvXdU+QeeA?=
- =?us-ascii?Q?U0dffLUAQ3NWRggYwT5Q0kfg5MuJSy+EAWB9jO4WtD0/qKXRyL1tRGYGWEje?=
- =?us-ascii?Q?TrLlnjzYxMg2f+UppvuHTID1VMDNJ24KtxYKi8oC1NRXdp1/ICqyC6tI4+hG?=
- =?us-ascii?Q?EiMbMRQX6CgSQd8Qhuxqz54ktYoICsn3UNAtpUweNM76aHoZqWKjs6mknnif?=
- =?us-ascii?Q?gLM2sASlDJnPj0eT9lg8BfhqC19YA0HzatGcrni6/QYt8JWjGn26cSLfhXil?=
- =?us-ascii?Q?WxBtqEWUAYoAc7Nrs+VjXwuogM1Qb4LKbHcErIzDi/WV51hOgWHvHx1OWSrQ?=
- =?us-ascii?Q?4UVumDCjBF5XenvDWOJrz67KAqSiPLLPzEWpLGnPBLzn8R4LpCtOh6DurnsW?=
- =?us-ascii?Q?pwSb9nVDxo3WIs1d8ciS3aTKEzNRCBDmBhw71BwwC5I7UAHh/C1i/snCq21Z?=
- =?us-ascii?Q?he/jXC+ujHpLWH2zms7ISW2VAPYe0aNOmxvcG6XYvCrg+uTCa1LreuDmgZAz?=
- =?us-ascii?Q?QxQckCrWmnr8fIcKv8ncnwbG3AbI0cU9qY1GK/NkUzWM74XhDbU8lhaBjRyI?=
- =?us-ascii?Q?nsLL3AfoOUBH0coCpJCzTcVWtJjqCWYeItcUEoN07UYAqHMBf6hEr0ckgrup?=
- =?us-ascii?Q?D7XMDyA2aDm+nr8iPj+xkMzoDAsUxzGzRO/ZmmXMz2mhzPmSME8t8xVoa80t?=
- =?us-ascii?Q?AO4BEh5V0415jJwAuCcp/PTzID9K7HLDGRHwdAdBd4WLB86Wa5IVdyPr9cDs?=
- =?us-ascii?Q?lOrSaqWxUswa5KIvXL0NVsff7DzSWoO5zwacWtEZz6BG70oMfYu40K0vJB1z?=
- =?us-ascii?Q?iszKR2zmiNFFo61jsfcfHbyEXRMGHGG56QoTeuPa?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 74ab6136-3585-4349-390b-08dd830aec78
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2025 08:35:09.8859
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YrTNgw3ls8YLgqbvDZlv9tFQz+NPwilNsGLHOWTVdZL77l9XB/aIiJBKM0Ai4jm/hxhsNXjdb2TyGUSm6hd8Fg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7957
-X-OriginatorOrg: intel.com
+References: <20250421-vsock-linger-v2-0-fe9febd64668@rbox.co>
+ <20250421-vsock-linger-v2-1-fe9febd64668@rbox.co> <km2nad6hkdi3ngtho2xexyhhosh4aq37scir2hgxkcfiwes2wd@5dyliiq7cpuh>
+ <k47d2h7dwn26eti2p6nv2fupuybabvbexwinvxv7jnfbn6o3ep@cqtbaqlqyfrq>
+ <ee09df9b-9804-49de-b43b-99ccd4cbe742@rbox.co> <wnonuiluxgy6ixoioi57lwlixfgcu27kcewv4ajb3k3hihi773@nv3om2t3tsgo>
+ <5a4f8925-0e4d-4e4c-9230-6c69af179d3e@rbox.co>
+In-Reply-To: <5a4f8925-0e4d-4e4c-9230-6c69af179d3e@rbox.co>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Thu, 24 Apr 2025 10:36:49 +0200
+X-Gm-Features: ATxdqUF_58noK2_e9QPMXCT-pjwdIdBihMopt3yWeIxTGLAFMTKaBY4Kl-orunU
+Message-ID: <CAGxU2F6YSwrpV4wXH=mWSgK698sjxfQ=zzXS8tVmo3D84-bBqw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 1/3] vsock: Linger on unsent data
+To: Michal Luczaj <mhal@rbox.co>
+Cc: Luigi Leonardi <leonardi@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Apr 24, 2025 at 10:35:47AM +0300, Kirill A. Shutemov wrote:
-> On Thu, Apr 24, 2025 at 11:00:32AM +0800, Yan Zhao wrote:
-> > Basic huge page mapping/unmapping
-> > ---------------------------------
-> > - TD build time
-> >   This series enforces that all private mappings be 4KB during the TD build
-> >   phase, due to the TDX module's requirement that tdh_mem_page_add(), the
-> >   SEAMCALL for adding private pages during TD build time, only supports 4KB
-> >   mappings. Enforcing 4KB mappings also simplifies the implementation of
-> >   code for TD build time, by eliminating the need to consider merging or
-> >   splitting in the mirror page table during TD build time.
-> >   
-> >   The underlying pages allocated from guest_memfd during TD build time
-> >   phase can still be large, allowing for potential merging into 2MB
-> >   mappings once the TD is running.
-> 
-> It can be done before TD is running. The merging is allowed on TD build
-> stage.
-> 
-> But, yes, for simplicity we can skip it for initial enabling.
-Yes, to avoid complicating kvm_tdx->nr_premapped calculation.
-I also don't see any benefit to allow merging during TD build stage.
+On Thu, 24 Apr 2025 at 09:53, Michal Luczaj <mhal@rbox.co> wrote:
+>
+> On 4/24/25 09:28, Stefano Garzarella wrote:
+> > On Wed, Apr 23, 2025 at 11:06:33PM +0200, Michal Luczaj wrote:
+> >> On 4/23/25 18:34, Stefano Garzarella wrote:
+> >>> On Wed, Apr 23, 2025 at 05:53:12PM +0200, Luigi Leonardi wrote:
+> >>>> Hi Michal,
+> >>>>
+> >>>> On Mon, Apr 21, 2025 at 11:50:41PM +0200, Michal Luczaj wrote:
+> >>>>> Currently vsock's lingering effectively boils down to waiting (or timing
+> >>>>> out) until packets are consumed or dropped by the peer; be it by receiving
+> >>>>> the data, closing or shutting down the connection.
+> >>>>>
+> >>>>> To align with the semantics described in the SO_LINGER section of man
+> >>>>> socket(7) and to mimic AF_INET's behaviour more closely, change the logic
+> >>>>> of a lingering close(): instead of waiting for all data to be handled,
+> >>>>> block until data is considered sent from the vsock's transport point of
+> >>>>> view. That is until worker picks the packets for processing and decrements
+> >>>>> virtio_vsock_sock::bytes_unsent down to 0.
+> >>>>>
+> >>>>> Note that such lingering is limited to transports that actually implement
+> >>>>> vsock_transport::unsent_bytes() callback. This excludes Hyper-V and VMCI,
+> >>>>> under which no lingering would be observed.
+> >>>>>
+> >>>>> The implementation does not adhere strictly to man page's interpretation of
+> >>>>> SO_LINGER: shutdown() will not trigger the lingering. This follows AF_INET.
+> >>>>>
+> >>>>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> >>>>> ---
+> >>>>> net/vmw_vsock/virtio_transport_common.c | 13 +++++++++++--
+> >>>>> 1 file changed, 11 insertions(+), 2 deletions(-)
+> >>>>>
+> >>>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> >>>>> index 7f7de6d8809655fe522749fbbc9025df71f071bd..aeb7f3794f7cfc251dde878cb44fdcc54814c89c 100644
+> >>>>> --- a/net/vmw_vsock/virtio_transport_common.c
+> >>>>> +++ b/net/vmw_vsock/virtio_transport_common.c
+> >>>>> @@ -1196,12 +1196,21 @@ static void virtio_transport_wait_close(struct sock *sk, long timeout)
+> >>>>> {
+> >>>>>   if (timeout) {
+> >>>>>           DEFINE_WAIT_FUNC(wait, woken_wake_function);
+> >>>>> +         ssize_t (*unsent)(struct vsock_sock *vsk);
+> >>>>> +         struct vsock_sock *vsk = vsock_sk(sk);
+> >>>>> +
+> >>>>> +         /* Some transports (Hyper-V, VMCI) do not implement
+> >>>>> +          * unsent_bytes. For those, no lingering on close().
+> >>>>> +          */
+> >>>>> +         unsent = vsk->transport->unsent_bytes;
+> >>>>> +         if (!unsent)
+> >>>>> +                 return;
+> >>>>
+> >>>> IIUC if `unsent_bytes` is not implemented, virtio_transport_wait_close
+> >>>> basically does nothing. My concern is that we are breaking the
+> >>>> userspace due to a change in the behavior: Before this patch, with a
+> >>>> vmci/hyper-v transport, this function would wait for SOCK_DONE to be
+> >>>> set, but not anymore.
+> >>>
+> >>> Wait, we are in virtio_transport_common.c, why we are talking about
+> >>> Hyper-V and VMCI?
+> >>>
+> >>> I asked to check `vsk->transport->unsent_bytes` in the v1, because this
+> >>> code was part of af_vsock.c, but now we are back to virtio code, so I'm
+> >>> confused...
+> >>
+> >> Might your confusion be because of similar names?
+> >
+> > In v1 this code IIRC was in af_vsock.c, now you pushed back on virtio
+> > common code, so I still don't understand how
+> > virtio_transport_wait_close() can be called with vmci or hyper-v
+> > transports.
+> >
+> > Can you provide an example?
+>
+> You're right, it was me who was confused. VMCI and Hyper-V have their own
+> vsock_transport::release callbacks that do not call
+> virtio_transport_wait_close().
+>
+> So VMCI and Hyper-V never lingered anyway?
 
-> 
-> > Page splitting (page demotion)
-> > ------------------------------
-> > Page splitting occurs in two paths:
-> > (a) with exclusive kvm->mmu_lock, triggered by zapping operations,
-> > 
-> >     For normal VMs, if zapping a narrow region that would need to split a
-> >     huge page, KVM can simply zap the surrounding GFNs rather than
-> >     splitting a huge page. The pages can then be faulted back in, where KVM
-> >     can handle mapping them at a 4KB level.
-> > 
-> >     The reason why TDX can't use the normal VM solution is that zapping
-> >     private memory that is accepted cannot easily be re-faulted, since it
-> >     can only be re-faulted as unaccepted. So KVM will have to sometimes do
-> >     the page splitting as part of the zapping operations.
-> > 
-> >     These zapping operations can occur for few reasons:
-> >     1. VM teardown.
-> >     2. Memslot removal.
-> >     3. Conversion of private pages to shared.
-> >     4. Userspace does a hole punch to guest_memfd for some reason.
-> > 
-> >     For case 1 and 2, splitting before zapping is unnecessary because
-> >     either the entire range will be zapped or huge pages do not span
-> >     memslots.
-> >     
-> >     Case 3 or case 4 requires splitting, which is also followed by a
-> >     backend page splitting in guest_memfd.
-> > 
-> > (b) with shared kvm->mmu_lock, triggered by fault.
-> > 
-> >     Splitting in this path is not accompanied by a backend page splitting
-> >     (since backend page splitting necessitates a splitting and zapping
-> >      operation in the former path).  It is triggered when KVM finds that a
-> >     non-leaf entry is replacing a huge entry in the fault path, which is
-> >     usually caused by vCPUs' concurrent ACCEPT operations at different
-> >     levels.
-> 
-> Hm. This sounds like funky behaviour on the guest side.
-> 
-> You only saw it in a synthetic test, right? No real guest OS should do
-> this.
-Right. In selftest only.
-Also in case of any guest bugs.
+I think so.
 
-> It can only be possible if guest is reckless enough to be exposed to
-> double accept attacks.
-> 
-> We should consider putting a warning if we detect such case on KVM side.
-Is it acceptable to put warnings in host kernel in case of guest bugs or
-attacks?
+Indeed I was happy with v1, since I think this should be supported by
+the vsock core and should not depend on the transport.
+But we can do also later.
 
+Stefano
 
-> >     This series simply ignores the splitting request in the fault path to
-> >     avoid unnecessary bounces between levels. The vCPU that performs ACCEPT
-> >     at a lower level would finally figures out the page has been accepted
-> >     at a higher level by another vCPU.
-> > 
-> >     A rare case that could lead to splitting in the fault path is when a TD
-> >     is configured to receive #VE and accesses memory before the ACCEPT
-> >     operation. By the time a vCPU accesses a private GFN, due to the lack
-> >     of any guest preferred level, KVM could create a mapping at 2MB level.
-> >     If the TD then only performs the ACCEPT operation at 4KB level,
-> >     splitting in the fault path will be triggered. However, this is not
-> >     regarded as a typical use case, as usually TD always accepts pages in
-> >     the order from 1GB->2MB->4KB. The worst outcome to ignore the resulting
-> >     splitting request is an endless EPT violation. This would not happen
-> >     for a Linux guest, which does not expect any #VE.
-> 
-> Even if guest accepts memory in response to #VE, it still has to serialize
-> ACCEPT requests to the same memory block. And track what has been
-> accepted.
-> 
-> Double accept is a guest bug.
-In the rare case, there're no double accept.
-1. Guest acceses a private GPA
-2. KVM creates a 2MB mapping in PENDING state and returns to guest.
-3. Guest re-accesses, causing the TDX module to inject a #VE.
-4. Guest accepts at 4KB level only.
-5. EPT violation to KVM for page splitting.
+>
+> >> vsock_transport::unsent_bytes != virtio_vsock_sock::bytes_unsent
+> >>
+> >> I agree with Luigi, it is a breaking change for userspace depending on a
+> >> non-standard behaviour. What's the protocol here; do it anyway, then see if
+> >> anyone complains?
+> >>
+> >> As for Hyper-V and VMCI losing the "lingering", do we care? And if we do,
+> >> take Hyper-V, is it possible to test any changes without access to
+> >> proprietary host/hypervisor?
+> >>
+> >
+> > Again, how this code can be called when using vmci or hyper-v
+> > transports?
+>
+> It cannot, you're right.
+>
+> > If we go back on v1 implementation, I can understand it, but with this
+> > version I really don't understand the scenario.
+> >
+> > Stefano
+> >
+>
 
-Here, we expect a normal guest to accept from GB->2MB->4KB in step 4.
 
