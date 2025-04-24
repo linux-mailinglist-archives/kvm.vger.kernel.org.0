@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-44083-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44084-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6EB2A9A32A
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 09:17:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 869FEA9A408
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 09:33:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 939F3448586
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 07:17:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC7D65A4692
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 07:33:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21DDB1F4177;
-	Thu, 24 Apr 2025 07:17:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8877D231C8D;
+	Thu, 24 Apr 2025 07:22:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="d86S+IGY"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="EzvxVtK1"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50A7ACA52;
-	Thu, 24 Apr 2025 07:17:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D1831F153C;
+	Thu, 24 Apr 2025 07:22:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745479029; cv=none; b=GiUQNiClpf+CXIefEbJ/PEMFELusBV7E7Y65a5dDAPNSTP9gZ8ucBw0UEF5tjzlMlMZbGELQOaN/NsPQomXUSXySaWk9FVktuYPt+/H0bzMeZs2vOBzmEYNWqOdYBEEt1AQ4AG7QzMGFUPwxBEgWFGM/4K/JyObjNGFeoqT4l4M=
+	t=1745479345; cv=none; b=icMPohdLPIwAt2pSctN8Fx+Gg0PVaoRPWsaa1l4fV60zNwQJT19cLD9Zy1uVGrHnEDZzdIA7e4R4N+Z2PVrequ2Qp/Zb4qsX9MhTUM5ArRPK65BFK28IX6gd0ETxOhe78o28L4k03iVmwjrV5dOCvvFHMEi9luoBe45ECn/TN7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745479029; c=relaxed/simple;
-	bh=yZRYHLcKw89EP37KcoFX6g4T9W70k7GQ0wfSXH5Btoc=;
+	s=arc-20240116; t=1745479345; c=relaxed/simple;
+	bh=O9DVYPK4RZY6YYB7/ewtc8a7TzxiyHmBlNZob9ULLMA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iirmojiO+tiLqDyvN6wajs7Twr0mTtUyGUhLAtekGQ12eIh43X12b6knr7rDluDLnehbR27rxfoe/NO7CCb3QADiWkctqdVTMqzf/qNKAkYP/8yuqptDjrurzD7WG7wOyFx/i3+AhQnnY/losUJOGirCFuO3PkRzFg8YKZdiWvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=d86S+IGY; arc=none smtp.client-ip=198.137.202.136
+	 In-Reply-To:Content-Type; b=CBVWjKKVZsiZB4JXbNeP67ry5IgaYl/MkrRiVmJLnRnycpl5+NDSJP+DnRut5i7ZVugmnDdu6PiVFlVgzrxn3mPUMgplUVlq55xyjzhdiGfcEjipqH6saDirb3WsXOz6h9USPvTNTWt+vCbBFm5xmkJhd87dc/hFM+9cw96r8o0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=EzvxVtK1; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from [192.168.7.202] ([71.202.166.45])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53O7G7xQ675155
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53O7LZ5g680960
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Thu, 24 Apr 2025 00:16:08 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53O7G7xQ675155
+	Thu, 24 Apr 2025 00:21:35 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53O7LZ5g680960
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1745478973;
-	bh=Odag7AUDgfyRP0+2u/H+HenPnfgl0J1B2VMW9HL/hPY=;
+	s=2025042001; t=1745479299;
+	bh=O9DVYPK4RZY6YYB7/ewtc8a7TzxiyHmBlNZob9ULLMA=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=d86S+IGYG3p4vXYzf5tU1fqwwhzwlqPeOdX0LxBP3GXABuT8mjfDO+CBUKCW848SQ
-	 DZKTS3GVQ63kEDbEoH3UczKm0cOKJPG2Qwh++9GOGJTM5UuSqDcynKa2xFyNgkdz4Z
-	 R9VFC+6vru/Wbfh93IBkm1anEKXEw+f4obbh3WSLvTlHMYA93DY/dXGOsfOOtd92xQ
-	 oizB71iApse9+ri55DZ2jAGUU+LSC2awjvDaoHQvrkRDvdKdRaoFx+ISpI70XSxFPc
-	 jqSmnMNMNsT/GqweC5nu+VfxFOHe7P5xgOsr9wU+7mhYoBfhtU+mMKTul67uGxqWuB
-	 yTuvbW0WLwpCw==
-Message-ID: <2ce9ab5c-89a5-4504-91d2-fbc12c68117a@zytor.com>
-Date: Thu, 24 Apr 2025 00:16:06 -0700
+	b=EzvxVtK1RQzG5pBpbz5wweMmUbLdbX/ewshxBSEyzwL/iSqjs/faWzfoVSom8e2bU
+	 rmtjJO6WWsw5MRs+zFMZdhntary9psA+7pGR0qJdm5RToXkkDchyg/7J6wq+MXnydS
+	 UyLEA/gHD031cZVbQISWf2vqYtuDBOavy4tsFM7jHVW35I0N3LU2ji43dZuWviNu+n
+	 FFLmIt3g5crz4RF3ksAJwKElGMES6WqszkBNO0xqtkqsXJyqbnXEZbMYTHwHd3awyK
+	 c6+7Hh3YMNGJO193usGiO/3RsTuBx8nz3JVH/XdAf95WQAP9Kvgb0r/sHpAcHBWEwG
+	 PsB6OXwrQJnjg==
+Message-ID: <45f95d01-4b98-457c-8272-c396a52b3844@zytor.com>
+Date: Thu, 24 Apr 2025 00:21:34 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,8 +56,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 11/34] x86/msr: Remove calling
- native_{read,write}_msr{,_safe}() in pmu_msr_{read,write}()
+Subject: Re: [RFC PATCH v2 12/34] x86/msr: Remove pmu_msr_{read,write}()
 To: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
         linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
@@ -77,8 +76,8 @@ Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
         haiyangz@microsoft.com, decui@microsoft.com
 References: <20250422082216.1954310-1-xin@zytor.com>
- <20250422082216.1954310-12-xin@zytor.com>
- <20471e53-c228-4cf6-83e6-3ab49f32f19f@linux.intel.com>
+ <20250422082216.1954310-13-xin@zytor.com>
+ <7c44da88-72bb-4d1f-9f38-bf0e7e79b7a0@linux.intel.com>
 Content-Language: en-US
 From: Xin Li <xin@zytor.com>
 Autocrypt: addr=xin@zytor.com; keydata=
@@ -115,28 +114,19 @@ Autocrypt: addr=xin@zytor.com; keydata=
  PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
  gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
  l75w1xInsg==
-In-Reply-To: <20471e53-c228-4cf6-83e6-3ab49f32f19f@linux.intel.com>
+In-Reply-To: <7c44da88-72bb-4d1f-9f38-bf0e7e79b7a0@linux.intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 4/23/2025 11:25 PM, Mi, Dapeng wrote:
+On 4/23/2025 11:33 PM, Mi, Dapeng wrote:
+> Could we merge this patch and previous patch into a single patch? It's
+> unnecessary to just modify the pmu_msr_read()/pmu_msr_write() in previous
+> patch and delete them immediately. It just wastes the effort.
 
->> -bool pmu_msr_read(unsigned int msr, uint64_t *val, int *err)
->> +bool pmu_msr_read(u32 msr, u64 *val)
-> 
-> The function name is some kind of misleading right now. With the change,
-> this function only read PMU MSR's value if it's emulated, otherwise it
-> won't really read PMU MSR. How about changing the name to
-> "pmu_emulated_msr_read" or something similar?
+No, it's not wasting effort, it's for easier review.
 
-This makes sense!
+Look at this patch, you can easily tell that pmu_msr_read() and
+pmu_msr_write() are nothing more than pmu_msr_chk_emulated(), and
+then removing them makes a lot of sense.
 
->> -bool pmu_msr_read(unsigned int msr, uint64_t *val, int *err);
->> -bool pmu_msr_write(unsigned int msr, uint32_t low, uint32_t high, int *err);
->> +bool pmu_msr_read(u32 msr, u64 *val);
-> 
-> The prototype of pmu_msr_read() has been changed, but why there is no
-> corresponding change in its caller (xen_do_read_msr())?
-
-Good catch.  I didn't compile one by one thus missed it.
 
