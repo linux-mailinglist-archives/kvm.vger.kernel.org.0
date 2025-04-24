@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-44057-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44059-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B046A99FE0
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 06:04:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F8EDA99FE5
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 06:05:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19AF55A8551
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 04:04:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9368E19464B0
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 04:05:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A00E1E571A;
-	Thu, 24 Apr 2025 04:03:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 811621B4141;
+	Thu, 24 Apr 2025 04:03:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="reapeS/6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sTnzVxQV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BABC819A
-	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 04:03:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B28881E51E1
+	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 04:03:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745467392; cv=none; b=p9ZWyb6QL5w66MCn4uYnnacF4DkcQiDZCFqPRlAbnJ5JIaMHQYH2UY9S1p61w09yq/x37OT2sGZAsNjflXhTYhfPKJdDp4bu96x2GtOG3Q2BpepESJIcTNpVa51ybXowvgJswca1uylWkteaGVrlzsvFyQSCnr2/7Ajz5Qtn7ws=
+	t=1745467396; cv=none; b=nl2UIY0YKHQwTCsqnH/u2YDg99gWufID6Tvxe+sLE5ZSYkX/P27lHVQrL8liUyxm0NdrtLRfsrw4+tm2iHf5BJ24KBvQtQpbU1nEcevOgefDUXAbe00/prYh5f7aOv5tXk6rV6Gq97BKN6o7KHQljHtsZsNeRD2jkPkp0iDMTm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745467392; c=relaxed/simple;
-	bh=M+EoVe0iz3z6LK0bpxKAqvjY9FNWAhMyDmmOVRhy0yk=;
+	s=arc-20240116; t=1745467396; c=relaxed/simple;
+	bh=QDLXXaueecCgO5Axw+Nyu5EgxIhVwC4DuRcRjtwAJ5E=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dXRAy48zKIwV4r744/n58ht1ayJsr2cMjdn62DqTiKn1N9Un/Z2zwmWmt2bRARPk18JXuD7X9gSK1wC0vxiL1VxvJdP5h48kU+AwsmKljtH1gaYHzP8WdTbh5bZvZVVVDQA+90sHhVN2fbtlMjN+1hOYPvthytHewRLE9pG5EKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=reapeS/6; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=uEykVbH2d6EIY/kcx5XxbqzQyCaVoxaMuFb3Zh31cd6IR5zqUOjKDZLRVyyRxMP1FhBo0owpcc9R5qH4+NvzJ02EZB4oJGmckzQB1gYs+iDj4kh+kC0bLkZ2YEOJBrjhB8XHrq1bISRVoN+WfzyivhjxtenNs6VBv41flOPGbpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sTnzVxQV; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3011bee1751so591161a91.1
-        for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 21:03:09 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-309c6e43a9aso811444a91.2
+        for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 21:03:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745467389; x=1746072189; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1745467393; x=1746072193; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UorbkxOGoi+kM8R/LRA30UsUBgYSiSm724ks3SFR6rA=;
-        b=reapeS/6Aij6kj0doQ65kjNWJ513OBXnD6jImAb6/JpOhaHZ3k9ZOFdg9a4emRhw07
-         XviKAl9Qt9VEPBVhh33pH1wOcgcaIma5Cx+JbmoJJCi4xdJSklYKSYT/swLj1h+N08pj
-         9R2UHO66eLjLyKT2U1XfNbvLvUUnBl20IiYpXFKBxVO3X9e+icLw6Cp7OGcf1CrKi9+O
-         KaFzA+L5XzZbWH6feK2X3zeP/OYEN0Yxb27fFmwWwByWhS2InkB7bujb+zigI9eLDq7g
-         9bb62YS7NOeYRHFQ+GjJJU1q2KhKNKXR+pf1hTqaXF+O9gy4e2NnDzNTZ18kyvq81Lcv
-         H2Iw==
+        bh=8s7bJQK9mVBiBVARPJ5kkauQHM9lxUZX4qjjEP+CsW4=;
+        b=sTnzVxQVdhbgUb1hJpIpuSNo+o+MCvmzgCb+ytxDh76N/7/QVfzWDPJlgJi2kdRjHk
+         qm6FLI6BoCR1gMuNwd++WgVq761Sr+1AGU+TJl9i2gL4fAD8mz3pxtXnlNhZl+XI4m4X
+         pGQOCEteKBzZEpya/E9uRBN9w1jS6s0D7OTzHH5t8VhGsEStsIqUt4g7EMX398psrt6v
+         WkiQi3h/pFqf9rRcY8mHGZmuys9xttdfLhQ4njB4DA8LrzWuSH/5DKYMaUL7XNj4OXb7
+         M00nvD4Eaon2iNUjM18lSh+K+vmtSg38cq6tKOpp+QUihfdg0xHfFNLyRdz9WyK1WeRg
+         wUYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745467389; x=1746072189;
+        d=1e100.net; s=20230601; t=1745467393; x=1746072193;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UorbkxOGoi+kM8R/LRA30UsUBgYSiSm724ks3SFR6rA=;
-        b=m7A6R5GmTOpYj92umFRlD3zR9p/LT3wkXjpQfUjkwX5EBgc3ds54ZhSMruxrdinF1p
-         xMNtOlJ8zyWjpbEOrwTRbAyy9W2Qlqe4lNpPY9Gm2CKqnKY4v4mBnC77CRIpkm5F5i3K
-         8DpFMFkwiaJ5Z4gGYJHKH9qKbCgz08XmvpOymIF0M0bfq02y+cAmUzsIot0Xf6yTT/4h
-         Apir+KyOBMXd+DGhqK4igOqUS31BnEAeB0YVZafNhLVyLnw/n7BMM5s0bKeCtE9DCV0S
-         Lqk8lX74P1iuRXwb4m6jqOvMva9i7rxFb7VyGFOOQ+F1hAAU6F4HpPqnk88pQMRuK39h
-         XcSA==
-X-Forwarded-Encrypted: i=1; AJvYcCV4GD7pamhw0ssqN85tT9SnxgcahMa9ohXy2zI9SRMRrssFylQgGOLaUiDrsoQlfx5+jHM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1fOrXgRby6YFSFh0GbKtaRHyaqj8cJkiXY8svU83LazuECjvy
-	KOu/YoR3SCqin3dWjvrV85/UMSb4TWVDozs33OZCK2lNXNkdicPCi4oB/TI0ABjiHYJoaYoB7NG
-	Qr1qdHuqVCasdJn7r4oo0QQ==
-X-Google-Smtp-Source: AGHT+IE6UfSjjJaPb2Ixl4liBZlhcJYxBQp412BWCqCF1iqcJPfPbLJAycJrYuatJLsoDyOBxR3XgGhO3tRPxthSew==
-X-Received: from pjvf14.prod.google.com ([2002:a17:90a:da8e:b0:309:da3b:15d1])
+        bh=8s7bJQK9mVBiBVARPJ5kkauQHM9lxUZX4qjjEP+CsW4=;
+        b=VVfy5eztfdGnnEs7Fd5at9Dh54an6NdaZ1T5LVjonADIihVvlc/CQP9Gv+1mxcoEX8
+         hIQRSctU3X4+VHaZkGlllgT6yi8JgBtc4SR4IIcXgf8WCc7OiU34JaJPTQWIWfQ4HyVO
+         PkE5eV4nwfxkaF+xyU0ZunAXkEXanLOBEFk9POJ8Bs3EjtRIu/m5/QDDmsQM0MnVMr7d
+         Xxf+3PHbRSPHkcGFtZlUt7dQtFcdW0dt3u+76ShmYJke14Zubq5p5ZGzQf3I0V/uWGo3
+         s1i2omxV9xq2eN42wxvfjSxB31Nf+PDQq9q3EJ82JWUXVYlHWd3JHxIB2JItKcuz8iLq
+         v5Ig==
+X-Forwarded-Encrypted: i=1; AJvYcCXZsc72s/7p1i89JV0ECp02kLtBf2wasRWcBSifR3HLDvnrvVJhqXFTPgJFKDa6Whp1Z5I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRjUaCt90Xb0resIAWUM1tw6Si+9YK1uvZZiVWzpBcWISRBswr
+	EfcH62V7pzGqrBMbohS1AiMTi+t8GOHDsjokYFh2xl8ax6Hbbawh8/XQXED1zpRhwsLLsDTFGlx
+	rgnGU9lz8ijBmAL0Cvvmpyg==
+X-Google-Smtp-Source: AGHT+IFDmjk5qYhlVEvcaWV/6HkyWEY6bOujBoJ8R/I3J2khGHfAvgsbrDZnCgnzdM+djzfP0cvjIoh5gcQPKiQEqg==
+X-Received: from pjbsc15.prod.google.com ([2002:a17:90b:510f:b0:301:2679:9aa])
  (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:5445:b0:305:2d27:7cb0 with SMTP id 98e67ed59e1d1-309ed29ce8bmr1728461a91.21.1745467388941;
- Wed, 23 Apr 2025 21:03:08 -0700 (PDT)
-Date: Thu, 24 Apr 2025 04:02:55 +0000
+ 2002:a17:90a:c2d0:b0:2ee:f687:6acb with SMTP id 98e67ed59e1d1-309ed271ad4mr1819350a91.13.1745467392967;
+ Wed, 23 Apr 2025 21:03:12 -0700 (PDT)
+Date: Thu, 24 Apr 2025 04:02:57 +0000
 In-Reply-To: <20250424040301.2480876-1-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250424040301.2480876-1-almasrymina@google.com>
 X-Mailer: git-send-email 2.49.0.805.g082f7c87e0-goog
-Message-ID: <20250424040301.2480876-4-almasrymina@google.com>
-Subject: [PATCH net-next v11 3/8] net: devmem: TCP tx netlink api
+Message-ID: <20250424040301.2480876-6-almasrymina@google.com>
+Subject: [PATCH net-next v11 5/8] net: add devmem TCP TX documentation
 From: Mina Almasry <almasrymina@google.com>
 To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	linux-doc@vger.kernel.org, io-uring@vger.kernel.org, 
@@ -95,135 +95,200 @@ Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.ne
 	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Stanislav Fomichev <sdf@fomichev.me>
+Add documentation outlining the usage and details of the devmem TCP TX
+API.
 
-Add bind-tx netlink call to attach dmabuf for TX; queue is not
-required, only ifindex and dmabuf fd for attachment.
-
-Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 Signed-off-by: Mina Almasry <almasrymina@google.com>
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
 ---
 
-v3:
-- Fix ynl-regen.sh error (Simon).
+v5:
+- Address comments from Stan and Bagas
+
+v4:
+- Mention SO_BINDTODEVICE is recommended (me/Pavel).
+
+v2:
+- Update documentation for iov_base is the dmabuf offset (Stan)
 
 ---
- Documentation/netlink/specs/netdev.yaml | 12 ++++++++++++
- include/uapi/linux/netdev.h             |  1 +
- net/core/netdev-genl-gen.c              | 13 +++++++++++++
- net/core/netdev-genl-gen.h              |  1 +
- net/core/netdev-genl.c                  |  6 ++++++
- tools/include/uapi/linux/netdev.h       |  1 +
- 6 files changed, 34 insertions(+)
+ Documentation/networking/devmem.rst | 150 +++++++++++++++++++++++++++-
+ 1 file changed, 146 insertions(+), 4 deletions(-)
 
-diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-index f5e0750ab71db..c0ef6d0d77865 100644
---- a/Documentation/netlink/specs/netdev.yaml
-+++ b/Documentation/netlink/specs/netdev.yaml
-@@ -743,6 +743,18 @@ operations:
-             - defer-hard-irqs
-             - gro-flush-timeout
-             - irq-suspend-timeout
-+    -
-+      name: bind-tx
-+      doc: Bind dmabuf to netdev for TX
-+      attribute-set: dmabuf
-+      do:
-+        request:
-+          attributes:
-+            - ifindex
-+            - fd
-+        reply:
-+          attributes:
-+            - id
+diff --git a/Documentation/networking/devmem.rst b/Documentation/networking/devmem.rst
+index eb678ca454968..a6cd7236bfbd2 100644
+--- a/Documentation/networking/devmem.rst
++++ b/Documentation/networking/devmem.rst
+@@ -62,15 +62,15 @@ More Info
+     https://lore.kernel.org/netdev/20240831004313.3713467-1-almasrymina@google.com/
  
- kernel-family:
-   headers: [ "net/netdev_netlink.h"]
-diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-index 7600bf62dbdf0..7eb9571786b83 100644
---- a/include/uapi/linux/netdev.h
-+++ b/include/uapi/linux/netdev.h
-@@ -219,6 +219,7 @@ enum {
- 	NETDEV_CMD_QSTATS_GET,
- 	NETDEV_CMD_BIND_RX,
- 	NETDEV_CMD_NAPI_SET,
-+	NETDEV_CMD_BIND_TX,
  
- 	__NETDEV_CMD_MAX,
- 	NETDEV_CMD_MAX = (__NETDEV_CMD_MAX - 1)
-diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
-index 739f7b6506a6a..4fc44587f4936 100644
---- a/net/core/netdev-genl-gen.c
-+++ b/net/core/netdev-genl-gen.c
-@@ -99,6 +99,12 @@ static const struct nla_policy netdev_napi_set_nl_policy[NETDEV_A_NAPI_IRQ_SUSPE
- 	[NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT] = { .type = NLA_UINT, },
- };
+-Interface
+-=========
++RX Interface
++============
  
-+/* NETDEV_CMD_BIND_TX - do */
-+static const struct nla_policy netdev_bind_tx_nl_policy[NETDEV_A_DMABUF_FD + 1] = {
-+	[NETDEV_A_DMABUF_IFINDEX] = NLA_POLICY_MIN(NLA_U32, 1),
-+	[NETDEV_A_DMABUF_FD] = { .type = NLA_U32, },
-+};
+ 
+ Example
+ -------
+ 
+-tools/testing/selftests/net/ncdevmem.c:do_server shows an example of setting up
+-the RX path of this API.
++./tools/testing/selftests/drivers/net/hw/ncdevmem:do_server shows an example of
++setting up the RX path of this API.
+ 
+ 
+ NIC Setup
+@@ -235,6 +235,148 @@ can be less than the tokens provided by the user in case of:
+ (a) an internal kernel leak bug.
+ (b) the user passed more than 1024 frags.
+ 
++TX Interface
++============
 +
- /* Ops table for netdev */
- static const struct genl_split_ops netdev_nl_ops[] = {
- 	{
-@@ -190,6 +196,13 @@ static const struct genl_split_ops netdev_nl_ops[] = {
- 		.maxattr	= NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT,
- 		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
- 	},
-+	{
-+		.cmd		= NETDEV_CMD_BIND_TX,
-+		.doit		= netdev_nl_bind_tx_doit,
-+		.policy		= netdev_bind_tx_nl_policy,
-+		.maxattr	= NETDEV_A_DMABUF_FD,
-+		.flags		= GENL_CMD_CAP_DO,
-+	},
- };
- 
- static const struct genl_multicast_group netdev_nl_mcgrps[] = {
-diff --git a/net/core/netdev-genl-gen.h b/net/core/netdev-genl-gen.h
-index 17d39fd64c948..cf3fad74511f5 100644
---- a/net/core/netdev-genl-gen.h
-+++ b/net/core/netdev-genl-gen.h
-@@ -34,6 +34,7 @@ int netdev_nl_qstats_get_dumpit(struct sk_buff *skb,
- 				struct netlink_callback *cb);
- int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info);
- int netdev_nl_napi_set_doit(struct sk_buff *skb, struct genl_info *info);
-+int netdev_nl_bind_tx_doit(struct sk_buff *skb, struct genl_info *info);
- 
- enum {
- 	NETDEV_NLGRP_MGMT,
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index 2c104947d224f..410df19d98d78 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -934,6 +934,12 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
- 	return err;
- }
- 
-+/* stub */
-+int netdev_nl_bind_tx_doit(struct sk_buff *skb, struct genl_info *info)
-+{
-+	return 0;
-+}
 +
- void netdev_nl_sock_priv_init(struct netdev_nl_sock *priv)
- {
- 	INIT_LIST_HEAD(&priv->bindings);
-diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
-index 7600bf62dbdf0..7eb9571786b83 100644
---- a/tools/include/uapi/linux/netdev.h
-+++ b/tools/include/uapi/linux/netdev.h
-@@ -219,6 +219,7 @@ enum {
- 	NETDEV_CMD_QSTATS_GET,
- 	NETDEV_CMD_BIND_RX,
- 	NETDEV_CMD_NAPI_SET,
-+	NETDEV_CMD_BIND_TX,
++Example
++-------
++
++./tools/testing/selftests/drivers/net/hw/ncdevmem:do_client shows an example of
++setting up the TX path of this API.
++
++
++NIC Setup
++---------
++
++The user must bind a TX dmabuf to a given NIC using the netlink API::
++
++        struct netdev_bind_tx_req *req = NULL;
++        struct netdev_bind_tx_rsp *rsp = NULL;
++        struct ynl_error yerr;
++
++        *ys = ynl_sock_create(&ynl_netdev_family, &yerr);
++
++        req = netdev_bind_tx_req_alloc();
++        netdev_bind_tx_req_set_ifindex(req, ifindex);
++        netdev_bind_tx_req_set_fd(req, dmabuf_fd);
++
++        rsp = netdev_bind_tx(*ys, req);
++
++        tx_dmabuf_id = rsp->id;
++
++
++The netlink API returns a dmabuf_id: a unique ID that refers to this dmabuf
++that has been bound.
++
++The user can unbind the dmabuf from the netdevice by closing the netlink socket
++that established the binding. We do this so that the binding is automatically
++unbound even if the userspace process crashes.
++
++Note that any reasonably well-behaved dmabuf from any exporter should work with
++devmem TCP, even if the dmabuf is not actually backed by devmem. An example of
++this is udmabuf, which wraps user memory (non-devmem) in a dmabuf.
++
++Socket Setup
++------------
++
++The user application must use MSG_ZEROCOPY flag when sending devmem TCP. Devmem
++cannot be copied by the kernel, so the semantics of the devmem TX are similar
++to the semantics of MSG_ZEROCOPY::
++
++	setsockopt(socket_fd, SOL_SOCKET, SO_ZEROCOPY, &opt, sizeof(opt));
++
++It is also recommended that the user binds the TX socket to the same interface
++the dma-buf has been bound to via SO_BINDTODEVICE::
++
++	setsockopt(socket_fd, SOL_SOCKET, SO_BINDTODEVICE, ifname, strlen(ifname) + 1);
++
++
++Sending data
++------------
++
++Devmem data is sent using the SCM_DEVMEM_DMABUF cmsg.
++
++The user should create a msghdr where,
++
++* iov_base is set to the offset into the dmabuf to start sending from
++* iov_len is set to the number of bytes to be sent from the dmabuf
++
++The user passes the dma-buf id to send from via the dmabuf_tx_cmsg.dmabuf_id.
++
++The example below sends 1024 bytes from offset 100 into the dmabuf, and 2048
++from offset 2000 into the dmabuf. The dmabuf to send from is tx_dmabuf_id::
++
++       char ctrl_data[CMSG_SPACE(sizeof(struct dmabuf_tx_cmsg))];
++       struct dmabuf_tx_cmsg ddmabuf;
++       struct msghdr msg = {};
++       struct cmsghdr *cmsg;
++       struct iovec iov[2];
++
++       iov[0].iov_base = (void*)100;
++       iov[0].iov_len = 1024;
++       iov[1].iov_base = (void*)2000;
++       iov[1].iov_len = 2048;
++
++       msg.msg_iov = iov;
++       msg.msg_iovlen = 2;
++
++       msg.msg_control = ctrl_data;
++       msg.msg_controllen = sizeof(ctrl_data);
++
++       cmsg = CMSG_FIRSTHDR(&msg);
++       cmsg->cmsg_level = SOL_SOCKET;
++       cmsg->cmsg_type = SCM_DEVMEM_DMABUF;
++       cmsg->cmsg_len = CMSG_LEN(sizeof(struct dmabuf_tx_cmsg));
++
++       ddmabuf.dmabuf_id = tx_dmabuf_id;
++
++       *((struct dmabuf_tx_cmsg *)CMSG_DATA(cmsg)) = ddmabuf;
++
++       sendmsg(socket_fd, &msg, MSG_ZEROCOPY);
++
++
++Reusing TX dmabufs
++------------------
++
++Similar to MSG_ZEROCOPY with regular memory, the user should not modify the
++contents of the dma-buf while a send operation is in progress. This is because
++the kernel does not keep a copy of the dmabuf contents. Instead, the kernel
++will pin and send data from the buffer available to the userspace.
++
++Just as in MSG_ZEROCOPY, the kernel notifies the userspace of send completions
++using MSG_ERRQUEUE::
++
++        int64_t tstop = gettimeofday_ms() + waittime_ms;
++        char control[CMSG_SPACE(100)] = {};
++        struct sock_extended_err *serr;
++        struct msghdr msg = {};
++        struct cmsghdr *cm;
++        int retries = 10;
++        __u32 hi, lo;
++
++        msg.msg_control = control;
++        msg.msg_controllen = sizeof(control);
++
++        while (gettimeofday_ms() < tstop) {
++                if (!do_poll(fd)) continue;
++
++                ret = recvmsg(fd, &msg, MSG_ERRQUEUE);
++
++                for (cm = CMSG_FIRSTHDR(&msg); cm; cm = CMSG_NXTHDR(&msg, cm)) {
++                        serr = (void *)CMSG_DATA(cm);
++
++                        hi = serr->ee_data;
++                        lo = serr->ee_info;
++
++                        fprintf(stdout, "tx complete [%d,%d]\n", lo, hi);
++                }
++        }
++
++After the associated sendmsg has been completed, the dmabuf can be reused by
++the userspace.
++
++
+ Implementation & Caveats
+ ========================
  
- 	__NETDEV_CMD_MAX,
- 	NETDEV_CMD_MAX = (__NETDEV_CMD_MAX - 1)
 -- 
 2.49.0.805.g082f7c87e0-goog
 
