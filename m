@@ -1,289 +1,238 @@
-Return-Path: <kvm+bounces-44106-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44107-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9106EA9A715
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 10:56:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4E02A9A756
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 11:05:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4414F7B18B5
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 08:55:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D568F188A64F
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 09:05:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1ACD22129B;
-	Thu, 24 Apr 2025 08:53:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88C8921507F;
+	Thu, 24 Apr 2025 09:05:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JAhP6//O"
+	dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b="JWo++Zv4";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="cUJo6TVp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from fhigh-a3-smtp.messagingengine.com (fhigh-a3-smtp.messagingengine.com [103.168.172.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1EBD221264;
-	Thu, 24 Apr 2025 08:53:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81E0B1DED49;
+	Thu, 24 Apr 2025 09:05:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745484803; cv=none; b=ks8Z3wFs0x8IYC9sK4AqWcY6NzDgzlzcxExfKm6Pj9V2k5ZigoO4b0DbvcXMbY3Tux5JhcsLQbbtcb16UXoOSqnQtaIQTNlgCHmd1pMx/jxotsh5Cien4RUX4d7/mDnC5UGhspWkZZ9xvF3ZNw7tm0qQvT5ln2exwigcugrY2gw=
+	t=1745485531; cv=none; b=aYXnEb0mNjYMYJNpOB/VF5vUVVw9tiUcOc1OK0ujFAVxnQk4TgmiZY5WHtUbAFvTs95BV4SWWU1JKlQjBoH3FlmHHgkeFgAcsUaLbvIzfyKyy1Tws9iEbgHnwv/nKS8cpV4cpZ9IrLcLGufvK9O7NEnIM8tNxmrnmVDtUsmEMJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745484803; c=relaxed/simple;
-	bh=t2hZm27dRntJXSA1F5KCv9d+KIKNQGiBzVbzp6VvGv0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DwdBxCDMe5VKSrXawdCpFiwGDoOZ6jw8pRuMuiuTSZLHBImlY0+JRroFP8SuhelGSQYn09BXsCT7fNPQRiySBmejLrMhOwiwYiYDj9WO5TzggEBOnuaOYS3JL7jaDS8pklDXSJJTVRKhcY+qO7CNg518OTfUe8wcsWpgdQBZls8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JAhP6//O; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745484802; x=1777020802;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=t2hZm27dRntJXSA1F5KCv9d+KIKNQGiBzVbzp6VvGv0=;
-  b=JAhP6//OGHgAQW3pr5oUx06TIsT/XrvNwoXmc3XRCMjFwzDAGq9nGZts
-   VLsFTJwPdHiU8nUTfTV64++l1Xd8qH2v5KcRyZGV9M/xzNsexwPcUIBJl
-   /hWvnnM5sjip24uEVuGDRzinBpr7fceTXYXdEb8KjI/WydKFmnZe5ULy2
-   u4snwFk1JuU7Uw9ooc9yBOKYZu4rNO/5+XlJFsFyj5WKdyUb1K71Uc+DT
-   WW/gS2rIj32KBjVttS10CpJlHRJ8avozDiUcBxQ8XV5yZFzI/9FmvthcQ
-   Jt6Qo5V3ld4Df4/SVK7HtBIVb8r7Nu6yhQQzXtHouHrEsfwtFe3hHAldZ
-   Q==;
-X-CSE-ConnectionGUID: QcRks7VNRKmL4Ru2MwjuaQ==
-X-CSE-MsgGUID: XzSSvQY9TwS5dfdbevKfmA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11412"; a="58477654"
-X-IronPort-AV: E=Sophos;i="6.15,235,1739865600"; 
-   d="scan'208";a="58477654"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 01:53:19 -0700
-X-CSE-ConnectionGUID: KOncYxVFQCeB6YNE+6eqcQ==
-X-CSE-MsgGUID: ju8qnH2pQOOyrTYpZtcVtw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,235,1739865600"; 
-   d="scan'208";a="163535709"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 01:53:14 -0700
-Message-ID: <27175b8e-144d-42cb-b149-04031e9aa698@linux.intel.com>
-Date: Thu, 24 Apr 2025 16:53:11 +0800
+	s=arc-20240116; t=1745485531; c=relaxed/simple;
+	bh=50vd7qIUHMnzv9CAMiYeR7AbsK9P/LKaHFBGTd7omq0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RPp489ysIdj3I5TExKY/0I0/wJDaVQpu9SAi5TbZa5wKc45USyEGCTkkBu3f2HTwX3F3MH81Awj8SU0fZWTyia56s3gN4pJ+pKdP40/GBDkAI8DyUwHpkhAWlH/35Y9P+eogdy/LwbTfBWf4p+o1MTvd9im3FOVF2n9Y9qhNcfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name; spf=pass smtp.mailfrom=shutemov.name; dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b=JWo++Zv4; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=cUJo6TVp; arc=none smtp.client-ip=103.168.172.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shutemov.name
+Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 68701114013D;
+	Thu, 24 Apr 2025 05:05:27 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-01.internal (MEProxy); Thu, 24 Apr 2025 05:05:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1745485527; x=
+	1745571927; bh=2As2w1BwDQyaM6DUrbYQpuGL7hUCrqE3Q33vpD0Y0zI=; b=J
+	Wo++Zv46QlCkYs5I7it+L8wIZ8GSwaLe/qgof63amQL0zRNsGVTpEWrQNyTPa15X
+	/v6ljWVQsanwCMkEJkbn4pCrLngqxbd2sLHza2SCtuW+iuOqziRDjg8ADOpVyGlf
+	mpUiudRP/NOct1vE7u1kqP/bVuLkmIjYzs5IGpncHN1AX53+Yh5vSRAAGwxZr54d
+	h7V/5DIFCmZhwqmQe4erJd+BVHumuC/RgZpGz3BfExYO9tllaEKGei/ww9Cm+OhN
+	M2b+inxO73AEN1CGk+F3KZfbeoG1iriJg6nbN9i8PCftjTJDFgwpc4mSDiaIUnHD
+	aAEugfGGU2D5xmnATPlRQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1745485527; x=1745571927; bh=2As2w1BwDQyaM6DUrbYQpuGL7hUCrqE3Q33
+	vpD0Y0zI=; b=cUJo6TVpMFYz4IoHK9yxdcvVz7tawy5cOsAIxgoM7VWPjopvfDL
+	hMKRt84CXIHXTYfd81chbCzLx3UVmV70pyC2UjKuCcbteq9UAbwwjtBf1wA5213Y
+	dqi19Tww64vM9dRBnoQqZInczvdGXZgx4ykSB4K/zJXQ0cyH6oPDxr2xG33t0X6c
+	e5Qh2SWjDG2uxs7wKJSyH688Z15NW5rc4WCqXD7yV/gmInIhjZh2r/MtgIaBQsff
+	sDSbOkrRCrsVSzMeecp7K19BF+HzgHqQWiKFo86Kl6O8lcsSO/GKX6sALjNlMGJh
+	mrvceh7f7AMKjyvkW+nOogm6WykRT1JCGfQ==
+X-ME-Sender: <xms:1v4JaPICWRcPzo1DEbbHLdL-0FtFCSSVDK1vWP9abN8tksGKDMZ3IQ>
+    <xme:1v4JaDLJmcTSUYXiWYRCStCzyd2EXyrBqPSp5LLYQzy_fVV29REUMGdeq1fOrFnz8
+    6mGilr4I1XV-4oZZyY>
+X-ME-Received: <xmr:1v4JaHvuta3gMwk9IAcIgSq6CAxNKCoJakiNBg-y8IkbLlR5VpbBgJmkyozbv5OJiNdH6w>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvgeeltdeiucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtsfdttddt
+    vdenucfhrhhomhepfdfmihhrihhllhcutedrucfuhhhuthgvmhhovhdfuceokhhirhhilh
+    hlsehshhhuthgvmhhovhdrnhgrmhgvqeenucggtffrrghtthgvrhhnpeffvdevueetudfh
+    hfffveelhfetfeevveekleevjeduudevvdduvdelteduvefhkeenucevlhhushhtvghruf
+    hiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehkihhrihhllhesshhhuhhtvghm
+    ohhvrdhnrghmvgdpnhgspghrtghpthhtohepvdegpdhmohguvgepshhmthhpohhuthdprh
+    gtphhtthhopeihrghnrdihrdiihhgrohesihhnthgvlhdrtghomhdprhgtphhtthhopehp
+    sghonhiiihhnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepshgvrghnjhgtsehgoh
+    hoghhlvgdrtghomhdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhk
+    vghrnhgvlhdrohhrghdprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorh
+    hgpdhrtghpthhtohepgiekieeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprhhitghk
+    rdhprdgvughgvggtohhmsggvsehinhhtvghlrdgtohhmpdhrtghpthhtohepuggrvhgvrd
+    hhrghnshgvnhesihhnthgvlhdrtghomhdprhgtphhtthhopehkihhrihhllhdrshhhuhht
+    vghmohhvsehinhhtvghlrdgtohhm
+X-ME-Proxy: <xmx:1v4JaIZ4ADNQNmVi9HtE2rXd9i0Ym-JAoxNoGZCn7XoLmPrM783Qfg>
+    <xmx:1v4JaGZ5R6_biFA0zatPwBkn-QK_MWINsOtEWoIc2B8xu3wNho8nzg>
+    <xmx:1v4JaMDwbrfnshL6Wd56bP-ZP-Y38lPrsCRtLv-pqC1hMwSRV55HHg>
+    <xmx:1v4JaEaTJqq5L1U6u0TpRPzzoicxFnFypxu6LwBupenmUi5QJCC1cw>
+    <xmx:1_4JaG-uxwI1Onyt8i2vN4bcqYH0RMfJp6h6-KFd30FfanKebf-1B73r>
+Feedback-ID: ie3994620:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 24 Apr 2025 05:05:19 -0400 (EDT)
+Date: Thu, 24 Apr 2025 12:05:15 +0300
+From: "Kirill A. Shutemov" <kirill@shutemov.name>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: pbonzini@redhat.com, seanjc@google.com, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, x86@kernel.org, rick.p.edgecombe@intel.com, 
+	dave.hansen@intel.com, kirill.shutemov@intel.com, tabba@google.com, 
+	ackerleytng@google.com, quic_eberman@quicinc.com, michael.roth@amd.com, david@redhat.com, 
+	vannapurve@google.com, vbabka@suse.cz, jroedel@suse.de, thomas.lendacky@amd.com, 
+	pgonda@google.com, zhiquan1.li@intel.com, fan.du@intel.com, jun.miao@intel.com, 
+	ira.weiny@intel.com, chao.p.peng@intel.com
+Subject: Re: [RFC PATCH 00/21] KVM: TDX huge page support for private memory
+Message-ID: <6vdj4mfxlyvypn743klxq5twda66tkugwzljdt275rug2gmwwl@zdziylxpre6y>
+References: <20250424030033.32635-1-yan.y.zhao@intel.com>
+ <e735cpugrs3k5gncjcbjyycft3tuhkm75azpwv6ctwqfjr6gkg@rsf4lyq4gqoj>
+ <aAn3SSocw0XvaRye@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: kvm guests crash when running "perf kvm top"
-To: Seth Forshee <sforshee@kernel.org>, Peter Zijlstra
- <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: x86@kernel.org, linux-perf-users@vger.kernel.org, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <Z_VUswFkWiTYI0eD@do-x1carbon>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <Z_VUswFkWiTYI0eD@do-x1carbon>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aAn3SSocw0XvaRye@yzhao56-desk.sh.intel.com>
 
-Is the command "perf kvm top" executed in host or guest when you see gues=
-t
-crash? Is it easy to be reproduced? Could you please provide the detailed=
+On Thu, Apr 24, 2025 at 04:33:13PM +0800, Yan Zhao wrote:
+> On Thu, Apr 24, 2025 at 10:35:47AM +0300, Kirill A. Shutemov wrote:
+> > On Thu, Apr 24, 2025 at 11:00:32AM +0800, Yan Zhao wrote:
+> > > Basic huge page mapping/unmapping
+> > > ---------------------------------
+> > > - TD build time
+> > >   This series enforces that all private mappings be 4KB during the TD build
+> > >   phase, due to the TDX module's requirement that tdh_mem_page_add(), the
+> > >   SEAMCALL for adding private pages during TD build time, only supports 4KB
+> > >   mappings. Enforcing 4KB mappings also simplifies the implementation of
+> > >   code for TD build time, by eliminating the need to consider merging or
+> > >   splitting in the mirror page table during TD build time.
+> > >   
+> > >   The underlying pages allocated from guest_memfd during TD build time
+> > >   phase can still be large, allowing for potential merging into 2MB
+> > >   mappings once the TD is running.
+> > 
+> > It can be done before TD is running. The merging is allowed on TD build
+> > stage.
+> > 
+> > But, yes, for simplicity we can skip it for initial enabling.
+> Yes, to avoid complicating kvm_tdx->nr_premapped calculation.
+> I also don't see any benefit to allow merging during TD build stage.
+> 
+> > 
+> > > Page splitting (page demotion)
+> > > ------------------------------
+> > > Page splitting occurs in two paths:
+> > > (a) with exclusive kvm->mmu_lock, triggered by zapping operations,
+> > > 
+> > >     For normal VMs, if zapping a narrow region that would need to split a
+> > >     huge page, KVM can simply zap the surrounding GFNs rather than
+> > >     splitting a huge page. The pages can then be faulted back in, where KVM
+> > >     can handle mapping them at a 4KB level.
+> > > 
+> > >     The reason why TDX can't use the normal VM solution is that zapping
+> > >     private memory that is accepted cannot easily be re-faulted, since it
+> > >     can only be re-faulted as unaccepted. So KVM will have to sometimes do
+> > >     the page splitting as part of the zapping operations.
+> > > 
+> > >     These zapping operations can occur for few reasons:
+> > >     1. VM teardown.
+> > >     2. Memslot removal.
+> > >     3. Conversion of private pages to shared.
+> > >     4. Userspace does a hole punch to guest_memfd for some reason.
+> > > 
+> > >     For case 1 and 2, splitting before zapping is unnecessary because
+> > >     either the entire range will be zapped or huge pages do not span
+> > >     memslots.
+> > >     
+> > >     Case 3 or case 4 requires splitting, which is also followed by a
+> > >     backend page splitting in guest_memfd.
+> > > 
+> > > (b) with shared kvm->mmu_lock, triggered by fault.
+> > > 
+> > >     Splitting in this path is not accompanied by a backend page splitting
+> > >     (since backend page splitting necessitates a splitting and zapping
+> > >      operation in the former path).  It is triggered when KVM finds that a
+> > >     non-leaf entry is replacing a huge entry in the fault path, which is
+> > >     usually caused by vCPUs' concurrent ACCEPT operations at different
+> > >     levels.
+> > 
+> > Hm. This sounds like funky behaviour on the guest side.
+> > 
+> > You only saw it in a synthetic test, right? No real guest OS should do
+> > this.
+> Right. In selftest only.
+> Also in case of any guest bugs.
+> 
+> > It can only be possible if guest is reckless enough to be exposed to
+> > double accept attacks.
+> > 
+> > We should consider putting a warning if we detect such case on KVM side.
+> Is it acceptable to put warnings in host kernel in case of guest bugs or
+> attacks?
 
-steps to reproduce the issue with 6.15-rc1 kernel?
+pr_warn_once() shouldn't be a big deal.
 
+> > >     This series simply ignores the splitting request in the fault path to
+> > >     avoid unnecessary bounces between levels. The vCPU that performs ACCEPT
+> > >     at a lower level would finally figures out the page has been accepted
+> > >     at a higher level by another vCPU.
+> > > 
+> > >     A rare case that could lead to splitting in the fault path is when a TD
+> > >     is configured to receive #VE and accesses memory before the ACCEPT
+> > >     operation. By the time a vCPU accesses a private GFN, due to the lack
+> > >     of any guest preferred level, KVM could create a mapping at 2MB level.
+> > >     If the TD then only performs the ACCEPT operation at 4KB level,
+> > >     splitting in the fault path will be triggered. However, this is not
+> > >     regarded as a typical use case, as usually TD always accepts pages in
+> > >     the order from 1GB->2MB->4KB. The worst outcome to ignore the resulting
+> > >     splitting request is an endless EPT violation. This would not happen
+> > >     for a Linux guest, which does not expect any #VE.
+> > 
+> > Even if guest accepts memory in response to #VE, it still has to serialize
+> > ACCEPT requests to the same memory block. And track what has been
+> > accepted.
+> > 
+> > Double accept is a guest bug.
+> In the rare case, there're no double accept.
+> 1. Guest acceses a private GPA
+> 2. KVM creates a 2MB mapping in PENDING state and returns to guest.
+> 3. Guest re-accesses, causing the TDX module to inject a #VE.
+> 4. Guest accepts at 4KB level only.
+> 5. EPT violation to KVM for page splitting.
+> 
+> Here, we expect a normal guest to accept from GB->2MB->4KB in step 4.
 
-On 4/9/2025 12:54 AM, Seth Forshee wrote:
-> A colleague of mine reported kvm guest hangs when running "perf kvm top=
-"
-> with a 6.1 kernel. Initially it looked like the problem might be fixed
-> in newer kernels, but it turned out to be perf changes which must avoid=
+Okay, I think I misunderstood this case. I thought there is competing 4k
+vs 2M ACCEPT requests to the same memory block.
 
-> triggering the issue. I was able to reproduce the guest crashes with
-> 6.15-rc1 in both the host and the guest when using an older version of
-> perf. A bisect of perf landed on 7b100989b4f6 "perf evlist: Remove
-> __evlist__add_default", but this doesn't look to be fixing any kind of
-> issue like this.
->
-> This box has an Ice Lake CPU, and we can reproduce on other Ice Lakes
-> but could not reproduce on another box with Broadwell. On Broadwell
-> guests would crash with older kernels in the host, but this was fixed b=
-y
-> 971079464001 "KVM: x86/pmu: fix masking logic for
-> MSR_CORE_PERF_GLOBAL_CTRL". That does not fix the issues we see on Ice
-> Lake.
->
-> When the guests crash we aren't getting any output on the serial
-> console, but I got this from a memory dump:
->
-> BUG: unable to handle page fault for address: fffffe76ffbaf00000
-> BUG: unable to handle page fault for address: fffffe76ffbaf00000
-> #PF: supervisor write access in kernel mode
-> #PF: error_code(0x0002) - not-present page
-> BUG: unable to handle page fault for address: fffffe76ffbaf00000
-> #PF: supervisor write access in kernel mode
-> #PF: error_code(0x0002) - not-present page
-> PGD 2e044067 P4D 3ec42067 PUD 3ec41067 PMD 3ec40067 PTE ffffffffff120
-> Oops: Oops: 0002 [#1] SMP NOPTI
-> BUG: unable to handle page fault for address: fffffe76ffbaf00000
-> #PF: supervisor write access in kernel mode
-> #PF: error_code(0x0002) - not-present page
-> PGD 2e044067 P4D 3ec42067 PUD 3ec41067 PMD 3ec40067 PTE ffffffffff120
-> Oops: Oops: 0002 [#2] SMP NOPTI
-> CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.15.0-rc1 #3 VOLUNTAR=
-Y
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009)/Incus, BIOS unknown =
-02/02/2022
-> BUG: unable to handle page fault for address: fffffe76ffbaf00000
-> #PF: supervisor write access in kernel mode
-> #PF: error_code(0x0002) - not-present page
-> PGD 2e044067 P4D 3ec42067 PUD 3ec41067 PMD 3ec40067 PTE ffffffffff120
-> Oops: Oops: 0002 [#3] SMP NOPTI
-> CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.15.0-rc1 #3 VOLUNTAR=
-Y
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009)/Incus, BIOS unknown =
-02/02/2022
->
-> We got something different though from an ubuntu VM running their 6.8
-> kernel:
->
-> BUG: kernel NULL pointer dereference, address: 000000000000002828
-> BUG: kernel NULL pointer dereference, address: 000000000000002828
-> #PF: supervisor read access in kernel mode
-> #PF: error_code(0x0000) - not-present page
-> PGD 10336a067 P4D 0=20
-> Oops: 0000 [#1] PREEMPT SMP NOPTI
-> BUG: kernel NULL pointer dereference, address: 000000000000002828
-> #PF: supervisor read access in kernel mode
-> #PF: error_code(0x0000) - not-present page
-> PGD 10336a067 P4D 0=20
-> Oops: 0000 [#2] PREEMPT SMP NOPTI
-> BUG: kernel NULL pointer dereference, address: 000000000000002828
-> #PF: supervisor read access in kernel mode
-> #PF: error_code(0x0000) - not-present page
-> PGD 10336a067 P4D 0=20
-> Oops: 0000 [#3] PREEMPT SMP NOPTI
-> CPU: 1 PID: 0 Comm: swapper/1 Not tainted 6.8.0-56-generic #58-Ubuntu
-> BUG: kernel NULL pointer dereference, address: 000000000000002828
-> #PF: supervisor read access in kernel mode
-> #PF: error_code(0x0000) - not-present page
-> PGD 10336a067 P4D 0=20
-> Oops: 0000 [#4] PREEMPT SMP NOPTI
-> CPU: 1 PID: 0 Comm: swapper/1 Not tainted 6.8.0-56-generic #58-Ubuntu
-> BUG: kernel NULL pointer dereference, address: 000000000000002828
-> #PF: supervisor read access in kernel mode
-> #PF: error_code(0x0000) - not-present page
-> PGD 10336a067 P4D 0=20
-> Oops: 0000 [#5] PREEMPT SMP NOPTI
-> CPU: 1 PID: 0 Comm: swapper/1 Not tainted 6.8.0-56-generic #58-Ubuntu
-> RIP: 0010:__sprint_symbol.isra.0+0x6/0x120
-> Code: ff e8 0e 9d 00 01 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 90 90=
- 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 55 <48> 89 e5 4=
-1 57 49 89 f7 41 56 4c 63 f2 4c 8d 45 b8 48 8d 55 c0 41
-> RSP: 0018:ff25e52d000e6ff8 EFLAGS: 00000046
-> BUG: #DF stack guard page was hit at 0000000040b441e1 (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
-> BUG: #DF stack guard page was hit at 000000002fed44fb (stack is 0000000=
-0a1788787..000000008e7f4216)
->
-> CPU information from one of the boxes where we see this:
->
-> processor	: 0
-> vendor_id	: GenuineIntel
-> cpu family	: 6
-> model		: 106
-> model name	: Intel(R) Xeon(R) Gold 5318Y CPU @ 2.10GHz
-> stepping	: 6
-> microcode	: 0xd0003f5
-> cpu MHz		: 800.000
-> cache size	: 36864 KB
-> physical id	: 0
-> siblings	: 44
-> core id		: 0
-> cpu cores	: 22
-> apicid		: 0
-> initial apicid	: 0
-> fpu		: yes
-> fpu_exception	: yes
-> cpuid level	: 27
-> wp		: yes
-> flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov =
-pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe=
-1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopol=
-ogy nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx =
-smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic m=
-ovbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dno=
-wprefetch cpuid_fault epb cat_l3 intel_ppin ssbd mba ibrs ibpb stibp ibrs=
-_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi=
-1 avx2 smep bmi2 erms invpcid cqm rdt_a avx512f avx512dq rdseed adx smap =
-avx512ifma clflushopt clwb intel_pt avx512cd sha_ni avx512bw avx512vl xsa=
-veopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_l=
-ocal split_lock_detect wbnoinvd dtherm ida arat pln pts hwp hwp_act_windo=
-w hwp_epp hwp_pkg_req vnmi avx512vbmi umip pku ospke avx512_vbmi2 gfni va=
-es vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq la57 rdpid fsrm =
-md_clear pconfig flush_l1d arch_capabilities
-> vmx flags	: vnmi preemption_timer posted_intr invvpid ept_x_only ept_ad=
- ept_1gb ept_5level flexpriority apicv tsc_offset vtpr mtf vapic ept vpid=
- unrestricted_guest vapic_reg vid ple shadow_vmcs pml ept_violation_ve ep=
-t_mode_based_exec tsc_scaling
-> bugs		: spectre_v1 spectre_v2 spec_store_bypass swapgs mmio_stale_data =
-eibrs_pbrsb gds bhi spectre_v2_user
-> bogomips	: 4000.00
-> clflush size	: 64
-> cache_alignment	: 64
-> address sizes	: 46 bits physical, 57 bits virtual
-> power management:
->
-> Let me know if I can provide any additional information or testing.
->
-> Thanks,
-> Seth
->
+Accepting everything at 4k level is a stupid, but valid behaviour on the
+guest behalf. This splitting case has to be supported before the patchset
+hits the mainline.
+
+BTW, there's no 1G ACCEPT. I know that guest is written as if it is a
+thing, but TDX module only supports 4k and 2M. 1G is only reachable via
+promotion.
+
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
 
