@@ -1,89 +1,87 @@
-Return-Path: <kvm+bounces-44103-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44104-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8700A9A6B7
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 10:48:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 39994A9A6BE
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 10:49:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15C88927405
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 08:48:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3932D3AD3C8
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 08:48:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 009F52147F5;
-	Thu, 24 Apr 2025 08:45:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC29022156E;
+	Thu, 24 Apr 2025 08:46:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="n6DmAHWV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uSR+lBTu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66BAF20D51E
-	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 08:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C19071F75A9;
+	Thu, 24 Apr 2025 08:46:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745484351; cv=none; b=CmQltjYMFrRKjw0v7aGXyNhjM31NJt7jefxUoyZCB1Vxd2CKJ6HtgNV262TtHvqp6hjn7WDKfJcN2j3ZNg1puDxtKEnRSn5YTz+w7pLHebnUoVa2ZKZJKYMcDwPPFBJjjSUidcYh20efgbuXm/EJfZWa0UlCs4sv09Mmi95WnL4=
+	t=1745484392; cv=none; b=pL9DsDAkCX/fxLcXEJxof8o9OgwUfHfuBYY6ZPZS4okvKofoHWnXxbbTudwOx9yKStz+nl/1B/bnLPyTqiXPECu/YLMiVoet7M61JIeA5a+fxiMzuhItLS366x1L8moLq3kNNXI/9srDg5U8ENc2K2HCwM+D1xBlyxp77Fnc8Mo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745484351; c=relaxed/simple;
-	bh=3ztsM8qbbkFemqNafDPhupNpXzWGGUyIKfomTM+y6cQ=;
+	s=arc-20240116; t=1745484392; c=relaxed/simple;
+	bh=ki3q6dIyPVLY9OlwYT9gx2mvHOve0ih8UQqOIXQy4sw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RgJfyK2RzPkJ8NQ3Mgi2oSbTxNzYOZLCKeHhJRrfPucCy6gX1DZAS2ZpKkrhW75NG31/JHL182mLeFY24AJpdQ2buoFG+G/N5koXygQt5MOmBEbElQie0IYIpE60HtfA56FS2Tj9ddoXQV60Uneh5kWjQ3LoiXpzanhDJ8sedj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=n6DmAHWV; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-39c1efc457bso483387f8f.2
-        for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 01:45:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1745484348; x=1746089148; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cpfniZwlegMvSvblIXZcmgKGzHhGwzkwQ2fo2qopaps=;
-        b=n6DmAHWVU+sarZLPyZDn18L6HTCYbqsYsMDdWUM1X+Vu4gS5c4ejyQPhCuzK5q8lR+
-         ULQj7ErlXDNvarWN/32PUGn/a/XCggcEbvSDz15Iz7q4AxQ1RZik8ITK5GwF+HPGn9w5
-         o+3nWADk73IKPNW6+i102UeFzw41PCbGVIi0GUViLq3R8avPiB7A9aKPc77awINNGawz
-         fjtmmALJ4TpYH7HqffN2ohKnEgpPG11iLBWUZ1Uj3tgbVZHKxYJ2Qv4KgoRidvqpPPEH
-         YkppobmsKy75l3tddp4WRK0Ugb1X/XwUUkX5wlPI2C9tEa4v2VKrl75yJzkv7Giq9Dlo
-         3DKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745484348; x=1746089148;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cpfniZwlegMvSvblIXZcmgKGzHhGwzkwQ2fo2qopaps=;
-        b=bQ9tvx9EdLuPsJ2ZQBapL+C31qwanFsuDO836p/7KIWYSy4rFX5TCRe7rVBATDvFaZ
-         Pc9ofIeaWBLsSCI5kwQLibKu0Y7N1hXBNsPwV+F0J+uqLJQsgq6AEM7/o3fKgxBv7CPk
-         4k7QQjvbZh//Q6EiPTSXtR0DV9QBReew6D91qehuGbcZKdzd9viuytRELKrx+EIoMPL7
-         IV/fUtM868LXTexs/vq56FtfzR77dcIwR+E/PoEHjnHLBUnssxVl+i9yuEidaY6tmReD
-         ENbIY9rOioYg/2BsnwT4qoDsLkiklgBfUQLxc3jSUPHuyqiTokZYUMo6gTq8GRacF2Fu
-         eRtg==
-X-Forwarded-Encrypted: i=1; AJvYcCVv/wv5NndCUXy+Ajrpv3sVwaSQAUBmy4VSEiq+3EUYdZMfNfLNAvzrO7xvK9nUZ2jifck=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwhIOJ/wo/QMFTw1/bOKCEi1K3b4sxXrgZrMNm+UjkPBpDyP1wz
-	bUSAl2DqGxw5SiDZdwRVjjWGwTuchNTPID/hMud1Syz2m7CK3pqxoQL66w/LYUU=
-X-Gm-Gg: ASbGncs2P/Gle1VR3f2s6JxZXXaWVJE02ysTeqgG5/2vVPtUJnAP3j2g9/hF/fY4IoW
-	JlU7hmFaYNeo/caGnNvl3mRJ0o+vk/XvGTwbPM8dm+GWFX2tq/q61dT/DziJoxFmOuCgdMz9RC9
-	k8vtry4HNyaDySCH7AIpZiZ/NfQF18kaWwhYvSwBth4IQa8BCu7RjkfZJw0VG5LP4XXR//ZpUcc
-	AmlJNaQ8hQZtGGbzSTz/41Vbd2/MhNbeW2NQp3Vu0b9WS5B+l/WBHMfCiKJGapUvOGYBxpUU9e6
-	hhBl/oWayFqZ3ttQkmayf9uKopal
-X-Google-Smtp-Source: AGHT+IHa85PG4qEjs29oVTV0lIFZzwktXz39JAxGkANuBNfdNGLagzd4Kpk6GR7N5o12prPoNooS8w==
-X-Received: by 2002:a5d:47ab:0:b0:39c:1257:c96f with SMTP id ffacd0b85a97d-3a06cfab9bdmr1392834f8f.59.1745484347709;
-        Thu, 24 Apr 2025 01:45:47 -0700 (PDT)
-Received: from localhost ([2a02:8308:a00c:e200::f716])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a06d4a80bbsm1362860f8f.11.2025.04.24.01.45.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Apr 2025 01:45:47 -0700 (PDT)
-Date: Thu, 24 Apr 2025 10:45:46 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Alexandre Ghiti <alexghiti@rivosinc.com>
-Cc: Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Alexandre Ghiti <alex@ghiti.fr>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH 2/3] riscv: Strengthen duplicate and inconsistent
- definition of RV_X()
-Message-ID: <20250424-f322adab22126ae97dd7c5b4@orel>
-References: <20250422082545.450453-1-alexghiti@rivosinc.com>
- <20250422082545.450453-3-alexghiti@rivosinc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=jwQxNc/ZuT3VuulgzV2KYPEtABJ4/9dQc8PpG6UTr1vR0kb0kMiATqo2p3awTQc/Lj1BdgDs5Zc6nTeeDU+WbrtfK5NK8Ui8Wc3i9tx6jmv3oiUNM/5ZS1H5bvCWjH+LYA+dq+1zbZJVB2IN/BC6oHREtYldPLccPYer0w+CZ7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uSR+lBTu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F4A0C4CEED;
+	Thu, 24 Apr 2025 08:46:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745484392;
+	bh=ki3q6dIyPVLY9OlwYT9gx2mvHOve0ih8UQqOIXQy4sw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uSR+lBTuzs9lAfUp6ETUwd/e83HDQBPN+bi2x6d+WcXRuXqISLxR1KnZmPcANDNPl
+	 XcusVwWrcgl5ZwxaQMTClZZp6wv04VyBadsXr0ChBep2yGTn0yT6aRBkv0qe3YHnsu
+	 Xbfy/GOWPkZiF5ouAX9EAiGXmE23jYsBtArkcpCT8edU46pm2SHyttUmmiowtlF9le
+	 jBdsLZ0dV8tCc+abgC1OkQo4yqWtl296bgiFLL3P131EcMwOFukXU6T1YRIKWY0DCS
+	 vfhRiecYS5EGzJ47VScGPAGcWrDrAIXqhECCrbNzQ/i5dx+Y8dYPFcg8gKvkI2s3k1
+	 MO9hwaOX8jurQ==
+Date: Thu, 24 Apr 2025 11:46:26 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>,
+	Mika =?iso-8859-1?Q?Penttil=E4?= <mpenttil@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+	Jake Edge <jake@lwn.net>, Jonathan Corbet <corbet@lwn.net>,
+	Zhu Yanjun <zyjzyj2000@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>
+Subject: Re: [PATCH v9 10/24] mm/hmm: let users to tag specific PFN with DMA
+ mapped bit
+Message-ID: <20250424084626.GQ48485@unreal>
+References: <cover.1745394536.git.leon@kernel.org>
+ <0a7c1e06269eee12ff8912fe0da4b7692081fcde.1745394536.git.leon@kernel.org>
+ <7185c055-fc9e-4510-a9bf-6245673f2f92@redhat.com>
+ <20250423181706.GT1213339@ziepe.ca>
+ <36891b0e-d5fa-4cf8-a181-599a20af1da3@redhat.com>
+ <20250423233335.GW1213339@ziepe.ca>
+ <20250424080744.GP48485@unreal>
+ <20250424081101.GA22989@lst.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -92,36 +90,46 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250422082545.450453-3-alexghiti@rivosinc.com>
+In-Reply-To: <20250424081101.GA22989@lst.de>
 
-On Tue, Apr 22, 2025 at 10:25:44AM +0200, Alexandre Ghiti wrote:
-> RV_X() macro is defined in two different ways which is error prone.
+On Thu, Apr 24, 2025 at 10:11:01AM +0200, Christoph Hellwig wrote:
+> On Thu, Apr 24, 2025 at 11:07:44AM +0300, Leon Romanovsky wrote:
+> > > I see, so yes order occupies 5 bits [-4,-5,-6,-7,-8] and the
+> > > DMA_MAPPED overlaps, it should be 9 not 7 because of the backwardness.
+> > 
+> > Thanks for the fix.
 > 
-> So harmonize its first definition and add another macro RV_X_mask() for
-> the second one.
+> Maybe we can use the chance to make the scheme less fragile?  i.e.
+> put flags in the high bits and derive the first valid bit from the
+> pfn order?
 > 
-> Signed-off-by: Alexandre Ghiti <alexghiti@rivosinc.com>
-> ---
->  arch/riscv/include/asm/insn.h        | 39 ++++++++++++++--------------
->  arch/riscv/kernel/elf_kexec.c        |  1 -
->  arch/riscv/kernel/traps_misaligned.c |  1 -
->  arch/riscv/kvm/vcpu_insn.c           |  1 -
->  4 files changed, 20 insertions(+), 22 deletions(-)
-> 
-> diff --git a/arch/riscv/include/asm/insn.h b/arch/riscv/include/asm/insn.h
-> index 2a589a58b291..4063ca35be9b 100644
-> --- a/arch/riscv/include/asm/insn.h
-> +++ b/arch/riscv/include/asm/insn.h
-> @@ -288,43 +288,44 @@ static __always_inline bool riscv_insn_is_c_jalr(u32 code)
->  
->  #define RV_IMM_SIGN(x) (-(((x) >> 31) & 1))
->  #define RVC_IMM_SIGN(x) (-(((x) >> 12) & 1))
-> -#define RV_X(X, s, mask)  (((X) >> (s)) & (mask))
-> -#define RVC_X(X, s, mask) RV_X(X, s, mask)
-> +#define RV_X(X, s, n) (((X) >> (s)) & ((1 << (n)) - 1))
 
-Assuming n is arbitrary then we should be using BIT_ULL.
+It can be done too. This is what I got:
 
-Thanks,
-drew
+   38 enum hmm_pfn_flags {
+   39         /* Output fields and flags */
+   40         HMM_PFN_VALID = 1UL << (BITS_PER_LONG - 1),
+   41         HMM_PFN_WRITE = 1UL << (BITS_PER_LONG - 2),
+   42         HMM_PFN_ERROR = 1UL << (BITS_PER_LONG - 3),
+   43         /*
+   44          * Sticky flags, carried from input to output,
+   45          * don't forget to update HMM_PFN_INOUT_FLAGS
+   46          */
+   47         HMM_PFN_DMA_MAPPED = 1UL << (BITS_PER_LONG - 4),
+   48         HMM_PFN_P2PDMA     = 1UL << (BITS_PER_LONG - 5),
+   49         HMM_PFN_P2PDMA_BUS = 1UL << (BITS_PER_LONG - 6),
+   50
+   51         HMM_PFN_ORDER_SHIFT = (BITS_PER_LONG - 11),
+   52
+   53         /* Input flags */
+   54         HMM_PFN_REQ_FAULT = HMM_PFN_VALID,
+   55         HMM_PFN_REQ_WRITE = HMM_PFN_WRITE,
+   56
+   57         HMM_PFN_FLAGS = ~((1UL << HMM_PFN_ORDER_SHIFT) - 1),
+   58 };
+
+So now, we just need to move HMM_PFN_ORDER_SHIFT if we add new flags
+and HMM_PFN_FLAGS will be updated automatically.
+
+Thanks
 
