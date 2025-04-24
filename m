@@ -1,316 +1,228 @@
-Return-Path: <kvm+bounces-44068-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44070-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23039A9A0C6
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 08:00:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C367A9A23A
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 08:32:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A6153B4169
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 05:59:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A52A179D6C
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 06:30:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9DE31DDC37;
-	Thu, 24 Apr 2025 05:59:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C29A207A22;
+	Thu, 24 Apr 2025 06:26:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="GY84tNQ4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="frtjTorX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7C02701B8
-	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 05:59:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CC3E1DDC21;
+	Thu, 24 Apr 2025 06:26:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745474387; cv=none; b=fEq4XLuVbXPh3mzXf2XZfyLfD2lbgWl3RLjmAhanl/gKUpKmuH5fgutXpNBsvxLgOsqOxxMsucDkRrRxPQbRzeNe1N8MHiK2/RdKXtqc/GVrJNHwiWZFhKp0n+tzeLjDMSXlka9EufeAQafi4gR9zr7DSnVtDP/XT+cQ4K3ViP0=
+	t=1745475970; cv=none; b=qFzSV8mWf6pXHaxl+6szdoc/RyPCdCAwXAI/iTmxa1HyPaoTsLsh2PuZSBqwtG1X6QzOw0q3edysS61U3+GGhlHWlMsNoLD/Wv9zzOAwZkKaKdULVNwMPZsqyDLunQMb7gPVRshThYfQVEzIydUHRl0iWAVCtE0gSLxFAzJuIQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745474387; c=relaxed/simple;
-	bh=hiPf2uuxKovUAilc6pORWqnZdumqIKqwr6lEQrBemUE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Wz+pKBgkUfeJCbSnzrETaNuYbFh4h4bYTifv4rrVFkRyjP12KTKGp/+fWbeomfetXVaRj5GqDjalsrs5v/i/e5BjEIeCwKYrOcPEeTz25XlbSDIARNhKAg8DsM3vr9Y1eHEx+iqphWjsc0q9bW4zf3D810rnabFLUSQMwBTj6dc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=GY84tNQ4; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-54addb5a139so621313e87.0
-        for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 22:59:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1745474383; x=1746079183; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l8EjCM2lBy6AuI49OeRHOnLU2LUGHM/myVgsFDXFDU0=;
-        b=GY84tNQ46rbisBCkPykwWTjZKItprMfGflW0+0fvqaVIpu3ql1gV6Vn9o28ndyJAag
-         ACLeuxzJRxW9R9Y3FvndYiVVQK2PzTkDzzW1wc5MoJweci3M7uJRA84GpVlC3Pi/sBIV
-         LOiWCU2stMgfkqHcxPmMse94CgiEpjVEPJFmQZR52hADkBCWm2Ngzeu8Ldn4k+hT0VKw
-         eU8d49nDT+pGyUSknvmVHRim8aERpDUwp8bzBc+EPfRpafUzonaUKJvRCE5A8s+fvnAX
-         TF3EtCoCHnuYR8AS92Eibm+sgDbgjqMlrz1jzi06l7SpX8/yDFHhkIUFZAL4YyM1Vi7i
-         FPtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745474383; x=1746079183;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=l8EjCM2lBy6AuI49OeRHOnLU2LUGHM/myVgsFDXFDU0=;
-        b=g+ve6448ESmDzPbO7uVVFOTxSNZKqCeIdNYmlKMKCg90BMEHrdA7LDhLN+yoDEKh7a
-         R3bq+DHsyFZ+XdD3GG4CeJjCYvkZ1eAGX0NfRyy+ZI4sBIJghmVeUQehiGbEzqm2ZUXi
-         OIRdd8J4kEQB6IXPXE2/p3cgGZgDrvVVEnLAYaUTYsm7U3/10qPpPAHN0Q0uj9NTspLG
-         JjwI2Q1b3p3fbAqN3nXk2uVsMWVgTJ/PzU0UBQUD4F8aMVqLs9AtJS6uj/XLtu3F4CvQ
-         yo2bOAyWfFGHKmsQvNxJggVwjR7gBpxOp9bBruWE0BqxyuKxPBw1hLk+smYEJu/cIE5v
-         gpMA==
-X-Forwarded-Encrypted: i=1; AJvYcCVWbca3Cii1kWEHyOmpyPaNvbko6XIxlA13E+azyo2DkTh647tDKkqRRitYfKNpjRrqPFA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuKv1wIUipFNi6ggzzCx14gzooNE5Yr/zsPZiyXTX5s+7cd7sG
-	eLlyxPLkqlNKBUmtj1SAgP8Nf9ym9VsODekgqg0ZEiKyR46WnQi07mPm2MKtdEyHx/sT142Kq1b
-	pmE7zQvJX7l/sAdYYOdDkNZ8aUG0PEKPuP3Pydg==
-X-Gm-Gg: ASbGnctvNFDW5hjpk+ioIZQFvh3vNbI8aQMT+tWd10KJKVGBH7SSyjj7PiRlla+PdbZ
-	NhBiYzNKZ7/0alz7v0hMfSBVlEPY0GYe2CkOuBs4Gmg657JB+ed14RhR3jbEkCf7O4QqaOe+FCb
-	4j2bLyY62uprMOQtOIDEVkBvQ=
-X-Google-Smtp-Source: AGHT+IEN+MWOjzpH7blf3QMNUgLL+BNvt0FUh2F5EhSBqlgnkvtgg6esyh/FVsX/KnmKuZTBl/+Tzk7X7uOLNmaBFFA=
-X-Received: by 2002:a05:6512:3e1f:b0:549:4e79:dd5f with SMTP id
- 2adb3069b0e04-54e7c41a85bmr544306e87.37.1745474382720; Wed, 23 Apr 2025
- 22:59:42 -0700 (PDT)
+	s=arc-20240116; t=1745475970; c=relaxed/simple;
+	bh=r9pnF53EyyaRucMwNVgQLeGE6Ab0R4f4MEaSIMBKOXs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IE2zI/x8j13CcPvtXUwjzDePmkBTb7TjM9rnQOnmIur2rDvdsRBIniA1UgeEM+g2R/sMrElMfkFk9q2R+/KgRnfHzGbSeSyAjynlSKaibPRBgAMaaTmk8QGgiTGzKz4DPkC9eldQmAvl9+FMgkKXNgn7h1D6GG4DxrJ6pGdMJZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=frtjTorX; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1745475966; x=1777011966;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=r9pnF53EyyaRucMwNVgQLeGE6Ab0R4f4MEaSIMBKOXs=;
+  b=frtjTorXnnyRNojO/uMNvHpfb8o8jg6AILywkYb0KIv7SI4HsdlatWLi
+   4q79+bYdQluLuCFzEC0Y0QYqjp91xKftuKGiJ3Oq6sb9lwO2fs5WMWjbE
+   29PSOIZf4TBuVUGFe9aSM+s6Y41b5BQuDnfB1uMHuXqxt21pny0n2aHFW
+   u50qo8Rqooqz4I8E9ReYRHLeSQOpPnKZwJuQorYio/u64jEaWxNHf4Lwn
+   aTE8ge/fEdVzPOCMoJ6w0TLR6dHMPkMS6HIKD+aND3du8P72ZLecYoUwj
+   LWsW/ZMh0joA7wL60wBWfChehZi8bj+QlrdADgtiBFTXDH0pM9hTE6Vyt
+   g==;
+X-CSE-ConnectionGUID: Z1dpGu+eQHW25lxJoYL7Aw==
+X-CSE-MsgGUID: 9HrqRHW1RMKp0TVWhdoWtw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11412"; a="47187615"
+X-IronPort-AV: E=Sophos;i="6.15,235,1739865600"; 
+   d="scan'208";a="47187615"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 23:26:05 -0700
+X-CSE-ConnectionGUID: Ejvh0aUHTACVpOK/Jqvr7Q==
+X-CSE-MsgGUID: i3jvGnxIQpSi7EjKCit1UA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,235,1739865600"; 
+   d="scan'208";a="132432771"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 23:25:52 -0700
+Message-ID: <20471e53-c228-4cf6-83e6-3ab49f32f19f@linux.intel.com>
+Date: Thu, 24 Apr 2025 14:25:49 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250326065644.73765-1-apatel@ventanamicro.com>
- <20250326065644.73765-9-apatel@ventanamicro.com> <20250412-bafd9ea6c4e3314f8da06a26@orel>
-In-Reply-To: <20250412-bafd9ea6c4e3314f8da06a26@orel>
-From: Anup Patel <apatel@ventanamicro.com>
-Date: Thu, 24 Apr 2025 11:29:31 +0530
-X-Gm-Features: ATxdqUGQuvaFA4L6h9jicLgVys8uu3ezJCfevD3zpn2O0JMRzdVPUVgq8NsNbJE
-Message-ID: <CAK9=C2XKpf0sgtxfavaagu4S1Y=PzeCGsOYuJRHO_LKgbOfNLA@mail.gmail.com>
-Subject: Re: [kvmtool PATCH 08/10] riscv: Include single-letter extensions in isa_info_arr[]
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: Will Deacon <will@kernel.org>, julien.thierry.kdev@gmail.com, maz@kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Atish Patra <atishp@atishpatra.org>, 
-	Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 11/34] x86/msr: Remove calling
+ native_{read,write}_msr{,_safe}() in pmu_msr_{read,write}()
+To: "Xin Li (Intel)" <xin@zytor.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-pm@vger.kernel.org, linux-edac@vger.kernel.org,
+ xen-devel@lists.xenproject.org, linux-acpi@vger.kernel.org,
+ linux-hwmon@vger.kernel.org, netdev@vger.kernel.org,
+ platform-driver-x86@vger.kernel.org
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, acme@kernel.org,
+ jgross@suse.com, andrew.cooper3@citrix.com, peterz@infradead.org,
+ namhyung@kernel.org, mark.rutland@arm.com,
+ alexander.shishkin@linux.intel.com, jolsa@kernel.org, irogers@google.com,
+ adrian.hunter@intel.com, kan.liang@linux.intel.com, wei.liu@kernel.org,
+ ajay.kaher@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
+ tony.luck@intel.com, pbonzini@redhat.com, vkuznets@redhat.com,
+ seanjc@google.com, luto@kernel.org, boris.ostrovsky@oracle.com,
+ kys@microsoft.com, haiyangz@microsoft.com, decui@microsoft.com
+References: <20250422082216.1954310-1-xin@zytor.com>
+ <20250422082216.1954310-12-xin@zytor.com>
+Content-Language: en-US
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <20250422082216.1954310-12-xin@zytor.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sat, Apr 12, 2025 at 6:06=E2=80=AFPM Andrew Jones <ajones@ventanamicro.c=
-om> wrote:
->
-> On Wed, Mar 26, 2025 at 12:26:42PM +0530, Anup Patel wrote:
-> > Currently, the isa_info_arr[] only include multi-letter extensions but
-> > the KVM ONE_REG interface covers both single-letter and multi-letter
-> > extensions so extend isa_info_arr[] to include single-letter extensions=
-.
-> >
-> > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> > ---
-> >  riscv/fdt.c | 138 +++++++++++++++++++++++++++++-----------------------
-> >  1 file changed, 76 insertions(+), 62 deletions(-)
-> >
-> > diff --git a/riscv/fdt.c b/riscv/fdt.c
-> > index 251821e..46efb47 100644
-> > --- a/riscv/fdt.c
-> > +++ b/riscv/fdt.c
-> > @@ -12,71 +12,81 @@
-> >  struct isa_ext_info {
-> >       const char *name;
-> >       unsigned long ext_id;
-> > +     bool multi_letter;
-> >  };
-> >
-> >  struct isa_ext_info isa_info_arr[] =3D {
-> > -     /* sorted alphabetically */
-> > -     {"smnpm", KVM_RISCV_ISA_EXT_SMNPM},
-> > -     {"smstateen", KVM_RISCV_ISA_EXT_SMSTATEEN},
-> > -     {"ssaia", KVM_RISCV_ISA_EXT_SSAIA},
-> > -     {"sscofpmf", KVM_RISCV_ISA_EXT_SSCOFPMF},
-> > -     {"ssnpm", KVM_RISCV_ISA_EXT_SSNPM},
-> > -     {"sstc", KVM_RISCV_ISA_EXT_SSTC},
-> > -     {"svade", KVM_RISCV_ISA_EXT_SVADE},
-> > -     {"svadu", KVM_RISCV_ISA_EXT_SVADU},
-> > -     {"svinval", KVM_RISCV_ISA_EXT_SVINVAL},
-> > -     {"svnapot", KVM_RISCV_ISA_EXT_SVNAPOT},
-> > -     {"svpbmt", KVM_RISCV_ISA_EXT_SVPBMT},
-> > -     {"svvptc", KVM_RISCV_ISA_EXT_SVVPTC},
-> > -     {"zabha", KVM_RISCV_ISA_EXT_ZABHA},
-> > -     {"zacas", KVM_RISCV_ISA_EXT_ZACAS},
-> > -     {"zawrs", KVM_RISCV_ISA_EXT_ZAWRS},
-> > -     {"zba", KVM_RISCV_ISA_EXT_ZBA},
-> > -     {"zbb", KVM_RISCV_ISA_EXT_ZBB},
-> > -     {"zbc", KVM_RISCV_ISA_EXT_ZBC},
-> > -     {"zbkb", KVM_RISCV_ISA_EXT_ZBKB},
-> > -     {"zbkc", KVM_RISCV_ISA_EXT_ZBKC},
-> > -     {"zbkx", KVM_RISCV_ISA_EXT_ZBKX},
-> > -     {"zbs", KVM_RISCV_ISA_EXT_ZBS},
-> > -     {"zca", KVM_RISCV_ISA_EXT_ZCA},
-> > -     {"zcb", KVM_RISCV_ISA_EXT_ZCB},
-> > -     {"zcd", KVM_RISCV_ISA_EXT_ZCD},
-> > -     {"zcf", KVM_RISCV_ISA_EXT_ZCF},
-> > -     {"zcmop", KVM_RISCV_ISA_EXT_ZCMOP},
-> > -     {"zfa", KVM_RISCV_ISA_EXT_ZFA},
-> > -     {"zfh", KVM_RISCV_ISA_EXT_ZFH},
-> > -     {"zfhmin", KVM_RISCV_ISA_EXT_ZFHMIN},
-> > -     {"zicbom", KVM_RISCV_ISA_EXT_ZICBOM},
-> > -     {"zicboz", KVM_RISCV_ISA_EXT_ZICBOZ},
-> > -     {"ziccrse", KVM_RISCV_ISA_EXT_ZICCRSE},
-> > -     {"zicntr", KVM_RISCV_ISA_EXT_ZICNTR},
-> > -     {"zicond", KVM_RISCV_ISA_EXT_ZICOND},
-> > -     {"zicsr", KVM_RISCV_ISA_EXT_ZICSR},
-> > -     {"zifencei", KVM_RISCV_ISA_EXT_ZIFENCEI},
-> > -     {"zihintntl", KVM_RISCV_ISA_EXT_ZIHINTNTL},
-> > -     {"zihintpause", KVM_RISCV_ISA_EXT_ZIHINTPAUSE},
-> > -     {"zihpm", KVM_RISCV_ISA_EXT_ZIHPM},
-> > -     {"zimop", KVM_RISCV_ISA_EXT_ZIMOP},
-> > -     {"zknd", KVM_RISCV_ISA_EXT_ZKND},
-> > -     {"zkne", KVM_RISCV_ISA_EXT_ZKNE},
-> > -     {"zknh", KVM_RISCV_ISA_EXT_ZKNH},
-> > -     {"zkr", KVM_RISCV_ISA_EXT_ZKR},
-> > -     {"zksed", KVM_RISCV_ISA_EXT_ZKSED},
-> > -     {"zksh", KVM_RISCV_ISA_EXT_ZKSH},
-> > -     {"zkt", KVM_RISCV_ISA_EXT_ZKT},
-> > -     {"ztso", KVM_RISCV_ISA_EXT_ZTSO},
-> > -     {"zvbb", KVM_RISCV_ISA_EXT_ZVBB},
-> > -     {"zvbc", KVM_RISCV_ISA_EXT_ZVBC},
-> > -     {"zvfh", KVM_RISCV_ISA_EXT_ZVFH},
-> > -     {"zvfhmin", KVM_RISCV_ISA_EXT_ZVFHMIN},
-> > -     {"zvkb", KVM_RISCV_ISA_EXT_ZVKB},
-> > -     {"zvkg", KVM_RISCV_ISA_EXT_ZVKG},
-> > -     {"zvkned", KVM_RISCV_ISA_EXT_ZVKNED},
-> > -     {"zvknha", KVM_RISCV_ISA_EXT_ZVKNHA},
-> > -     {"zvknhb", KVM_RISCV_ISA_EXT_ZVKNHB},
-> > -     {"zvksed", KVM_RISCV_ISA_EXT_ZVKSED},
-> > -     {"zvksh", KVM_RISCV_ISA_EXT_ZVKSH},
-> > -     {"zvkt", KVM_RISCV_ISA_EXT_ZVKT},
-> > +     /* single-letter */
-> > +     {"a", KVM_RISCV_ISA_EXT_A, false},
-> > +     {"c", KVM_RISCV_ISA_EXT_C, false},
-> > +     {"d", KVM_RISCV_ISA_EXT_D, false},
-> > +     {"f", KVM_RISCV_ISA_EXT_F, false},
-> > +     {"h", KVM_RISCV_ISA_EXT_H, false},
-> > +     {"i", KVM_RISCV_ISA_EXT_I, false},
-> > +     {"m", KVM_RISCV_ISA_EXT_M, false},
-> > +     {"v", KVM_RISCV_ISA_EXT_V, false},
-> > +     /* multi-letter sorted alphabetically */
-> > +     {"smnpm", KVM_RISCV_ISA_EXT_SMNPM, true},
-> > +     {"smstateen", KVM_RISCV_ISA_EXT_SMSTATEEN, true},
-> > +     {"ssaia", KVM_RISCV_ISA_EXT_SSAIA, true},
-> > +     {"sscofpmf", KVM_RISCV_ISA_EXT_SSCOFPMF, true},
-> > +     {"ssnpm", KVM_RISCV_ISA_EXT_SSNPM, true},
-> > +     {"sstc", KVM_RISCV_ISA_EXT_SSTC, true},
-> > +     {"svade", KVM_RISCV_ISA_EXT_SVADE, true},
-> > +     {"svadu", KVM_RISCV_ISA_EXT_SVADU, true},
-> > +     {"svinval", KVM_RISCV_ISA_EXT_SVINVAL, true},
-> > +     {"svnapot", KVM_RISCV_ISA_EXT_SVNAPOT, true},
-> > +     {"svpbmt", KVM_RISCV_ISA_EXT_SVPBMT, true},
-> > +     {"svvptc", KVM_RISCV_ISA_EXT_SVVPTC, true},
-> > +     {"zabha", KVM_RISCV_ISA_EXT_ZABHA, true},
-> > +     {"zacas", KVM_RISCV_ISA_EXT_ZACAS, true},
-> > +     {"zawrs", KVM_RISCV_ISA_EXT_ZAWRS, true},
-> > +     {"zba", KVM_RISCV_ISA_EXT_ZBA, true},
-> > +     {"zbb", KVM_RISCV_ISA_EXT_ZBB, true},
-> > +     {"zbc", KVM_RISCV_ISA_EXT_ZBC, true},
-> > +     {"zbkb", KVM_RISCV_ISA_EXT_ZBKB, true},
-> > +     {"zbkc", KVM_RISCV_ISA_EXT_ZBKC, true},
-> > +     {"zbkx", KVM_RISCV_ISA_EXT_ZBKX, true},
-> > +     {"zbs", KVM_RISCV_ISA_EXT_ZBS, true},
-> > +     {"zca", KVM_RISCV_ISA_EXT_ZCA, true},
-> > +     {"zcb", KVM_RISCV_ISA_EXT_ZCB, true},
-> > +     {"zcd", KVM_RISCV_ISA_EXT_ZCD, true},
-> > +     {"zcf", KVM_RISCV_ISA_EXT_ZCF, true},
-> > +     {"zcmop", KVM_RISCV_ISA_EXT_ZCMOP, true},
-> > +     {"zfa", KVM_RISCV_ISA_EXT_ZFA, true},
-> > +     {"zfh", KVM_RISCV_ISA_EXT_ZFH, true},
-> > +     {"zfhmin", KVM_RISCV_ISA_EXT_ZFHMIN, true},
-> > +     {"zicbom", KVM_RISCV_ISA_EXT_ZICBOM, true},
-> > +     {"zicboz", KVM_RISCV_ISA_EXT_ZICBOZ, true},
-> > +     {"ziccrse", KVM_RISCV_ISA_EXT_ZICCRSE, true},
-> > +     {"zicntr", KVM_RISCV_ISA_EXT_ZICNTR, true},
-> > +     {"zicond", KVM_RISCV_ISA_EXT_ZICOND, true},
-> > +     {"zicsr", KVM_RISCV_ISA_EXT_ZICSR, true},
-> > +     {"zifencei", KVM_RISCV_ISA_EXT_ZIFENCEI, true},
-> > +     {"zihintntl", KVM_RISCV_ISA_EXT_ZIHINTNTL, true},
-> > +     {"zihintpause", KVM_RISCV_ISA_EXT_ZIHINTPAUSE, true},
-> > +     {"zihpm", KVM_RISCV_ISA_EXT_ZIHPM, true},
-> > +     {"zimop", KVM_RISCV_ISA_EXT_ZIMOP, true},
-> > +     {"zknd", KVM_RISCV_ISA_EXT_ZKND, true},
-> > +     {"zkne", KVM_RISCV_ISA_EXT_ZKNE, true},
-> > +     {"zknh", KVM_RISCV_ISA_EXT_ZKNH, true},
-> > +     {"zkr", KVM_RISCV_ISA_EXT_ZKR, true},
-> > +     {"zksed", KVM_RISCV_ISA_EXT_ZKSED, true},
-> > +     {"zksh", KVM_RISCV_ISA_EXT_ZKSH, true},
-> > +     {"zkt", KVM_RISCV_ISA_EXT_ZKT, true},
-> > +     {"ztso", KVM_RISCV_ISA_EXT_ZTSO, true},
-> > +     {"zvbb", KVM_RISCV_ISA_EXT_ZVBB, true},
-> > +     {"zvbc", KVM_RISCV_ISA_EXT_ZVBC, true},
-> > +     {"zvfh", KVM_RISCV_ISA_EXT_ZVFH, true},
-> > +     {"zvfhmin", KVM_RISCV_ISA_EXT_ZVFHMIN, true},
-> > +     {"zvkb", KVM_RISCV_ISA_EXT_ZVKB, true},
-> > +     {"zvkg", KVM_RISCV_ISA_EXT_ZVKG, true},
-> > +     {"zvkned", KVM_RISCV_ISA_EXT_ZVKNED, true},
-> > +     {"zvknha", KVM_RISCV_ISA_EXT_ZVKNHA, true},
-> > +     {"zvknhb", KVM_RISCV_ISA_EXT_ZVKNHB, true},
-> > +     {"zvksed", KVM_RISCV_ISA_EXT_ZVKSED, true},
-> > +     {"zvksh", KVM_RISCV_ISA_EXT_ZVKSH, true},
-> > +     {"zvkt", KVM_RISCV_ISA_EXT_ZVKT, true},
->
-> nit: I think I would add a 'misa' boolean member instead of 'multi_letter=
-'
-> and then rework this table to look like this
 
-"misa" is not appropriate because misa CSR is only available
-in M-mode.
-
-We do have the notion of "single-letter" extensions
-in RISC-V unpriv ISA conventions chapter so let me
-use that instead.
-
+On 4/22/2025 4:21 PM, Xin Li (Intel) wrote:
+> hpa found that pmu_msr_write() is actually a completely pointless
+> function [1]: all it does is shuffle some arguments, then calls
+> pmu_msr_chk_emulated() and if it returns true AND the emulated flag
+> is clear then does *exactly the same thing* that the calling code
+> would have done if pmu_msr_write() itself had returned true.  And
+> pmu_msr_read() does the equivalent stupidity.
 >
->         {"a",           KVM_RISCV_ISA_EXT_A, .misa =3D true       },
->         {"c",           KVM_RISCV_ISA_EXT_C, .misa =3D true       },
->         {"d",           KVM_RISCV_ISA_EXT_D, .misa =3D true       },
->         {"f",           KVM_RISCV_ISA_EXT_F, .misa =3D true       },
->         {"h",           KVM_RISCV_ISA_EXT_H, .misa =3D true       },
->         {"i",           KVM_RISCV_ISA_EXT_I, .misa =3D true       },
->         {"m",           KVM_RISCV_ISA_EXT_M, .misa =3D true       },
->         {"v",           KVM_RISCV_ISA_EXT_V, .misa =3D true       },
+> Remove the calls to native_{read,write}_msr{,_safe}() within
+> pmu_msr_{read,write}().  Instead reuse the existing calling code
+> that decides whether to call native_{read,write}_msr{,_safe}() based
+> on the return value from pmu_msr_{read,write}().  Consequently,
+> eliminate the need to pass an error pointer to pmu_msr_{read,write}().
 >
->         /* multi-letter sorted alphabetically */
->         {"smnpm",       KVM_RISCV_ISA_EXT_SMNPM,                },
->         {"smstateen",   KVM_RISCV_ISA_EXT_SMSTATEEN,            },
->         ...
+> While at it, refactor pmu_msr_write() to take the MSR value as a u64
+> argument, replacing the current dual u32 arguments, because the dual
+> u32 arguments were only used to call native_write_msr{,_safe}(), which
+> has now been removed.
 >
-> The benefit is that only the misa extensions need another field.
+> [1]: https://lore.kernel.org/lkml/0ec48b84-d158-47c6-b14c-3563fd14bcc4@zytor.com/
+>
+> Suggested-by: H. Peter Anvin (Intel) <hpa@zytor.com>
+> Sign-off-by: Xin Li (Intel) <xin@zytor.com>
+> ---
+>  arch/x86/xen/enlighten_pv.c |  6 +++++-
+>  arch/x86/xen/pmu.c          | 27 ++++-----------------------
+>  arch/x86/xen/xen-ops.h      |  4 ++--
+>  3 files changed, 11 insertions(+), 26 deletions(-)
+>
+> diff --git a/arch/x86/xen/enlighten_pv.c b/arch/x86/xen/enlighten_pv.c
+> index 9fbe187aff00..1418758b57ff 100644
+> --- a/arch/x86/xen/enlighten_pv.c
+> +++ b/arch/x86/xen/enlighten_pv.c
+> @@ -1132,6 +1132,8 @@ static void set_seg(unsigned int which, unsigned int low, unsigned int high,
+>  static void xen_do_write_msr(unsigned int msr, unsigned int low,
+>  			     unsigned int high, int *err)
+>  {
+> +	u64 val;
+> +
+>  	switch (msr) {
+>  	case MSR_FS_BASE:
+>  		set_seg(SEGBASE_FS, low, high, err);
+> @@ -1158,7 +1160,9 @@ static void xen_do_write_msr(unsigned int msr, unsigned int low,
+>  		break;
+>  
+>  	default:
+> -		if (!pmu_msr_write(msr, low, high, err)) {
+> +		val = (u64)high << 32 | low;
+> +
+> +		if (!pmu_msr_write(msr, val)) {
+>  			if (err)
+>  				*err = native_write_msr_safe(msr, low, high);
+>  			else
+> diff --git a/arch/x86/xen/pmu.c b/arch/x86/xen/pmu.c
+> index 9c1682af620a..95caae97a394 100644
+> --- a/arch/x86/xen/pmu.c
+> +++ b/arch/x86/xen/pmu.c
+> @@ -313,37 +313,18 @@ static bool pmu_msr_chk_emulated(unsigned int msr, uint64_t *val, bool is_read,
+>  	return true;
+>  }
+>  
+> -bool pmu_msr_read(unsigned int msr, uint64_t *val, int *err)
+> +bool pmu_msr_read(u32 msr, u64 *val)
 
-See above comment.
+The function name is some kind of misleading right now. With the change,
+this function only read PMU MSR's value if it's emulated, otherwise it
+won't really read PMU MSR. How about changing the name to
+"pmu_emulated_msr_read" or something similar?
 
->
-> >  };
-> >
-> >  static void dump_fdt(const char *dtb_file, void *fdt)
-> > @@ -129,6 +139,10 @@ static void generate_cpu_nodes(void *fdt, struct k=
-vm *kvm)
-> >               }
-> >
-> >               for (i =3D 0; i < arr_sz; i++) {
-> > +                     /* Skip single-letter extensions since these are =
-taken care */
->
-> We should finish the comment with 'of by "whatever takes care of them"'
 
-Okay, I will update.
+>  {
+>  	bool emulated;
+>  
+> -	if (!pmu_msr_chk_emulated(msr, val, true, &emulated))
+> -		return false;
+> -
+> -	if (!emulated) {
+> -		*val = err ? native_read_msr_safe(msr, err)
+> -			   : native_read_msr(msr);
+> -	}
+> -
+> -	return true;
+> +	return pmu_msr_chk_emulated(msr, val, true, &emulated) && emulated;
+>  }
+>  
+> -bool pmu_msr_write(unsigned int msr, uint32_t low, uint32_t high, int *err)
+> +bool pmu_msr_write(u32 msr, u64 val)
 
->
-> > +                     if (!isa_info_arr[i].multi_letter)
-> > +                             continue;
-> > +
-> >                       reg.id =3D RISCV_ISA_EXT_REG(isa_info_arr[i].ext_=
-id);
-> >                       reg.addr =3D (unsigned long)&isa_ext_out;
-> >                       if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) <=
- 0)
-> > --
-> > 2.43.0
-> >
->
-> Thanks,
-> drew
+ditto.
 
-Regards,
-Anup
+
+>  {
+> -	uint64_t val = ((uint64_t)high << 32) | low;
+>  	bool emulated;
+>  
+> -	if (!pmu_msr_chk_emulated(msr, &val, false, &emulated))
+> -		return false;
+> -
+> -	if (!emulated) {
+> -		if (err)
+> -			*err = native_write_msr_safe(msr, low, high);
+> -		else
+> -			native_write_msr(msr, low, high);
+> -	}
+> -
+> -	return true;
+> +	return pmu_msr_chk_emulated(msr, &val, false, &emulated) && emulated;
+>  }
+>  
+>  static u64 xen_amd_read_pmc(int counter)
+> diff --git a/arch/x86/xen/xen-ops.h b/arch/x86/xen/xen-ops.h
+> index dc886c3cc24d..a1875e10be31 100644
+> --- a/arch/x86/xen/xen-ops.h
+> +++ b/arch/x86/xen/xen-ops.h
+> @@ -271,8 +271,8 @@ void xen_pmu_finish(int cpu);
+>  static inline void xen_pmu_init(int cpu) {}
+>  static inline void xen_pmu_finish(int cpu) {}
+>  #endif
+> -bool pmu_msr_read(unsigned int msr, uint64_t *val, int *err);
+> -bool pmu_msr_write(unsigned int msr, uint32_t low, uint32_t high, int *err);
+> +bool pmu_msr_read(u32 msr, u64 *val);
+
+The prototype of pmu_msr_read() has been changed, but why there is no
+corresponding change in its caller (xen_do_read_msr())?
+
+
+> +bool pmu_msr_write(u32 msr, u64 val);
+>  int pmu_apic_update(uint32_t reg);
+>  u64 xen_read_pmc(int counter);
+>  
 
