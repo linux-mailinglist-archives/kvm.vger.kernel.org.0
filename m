@@ -1,498 +1,418 @@
-Return-Path: <kvm+bounces-44064-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44065-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF8AEA9A029
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 06:40:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E45FCA9A047
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 06:55:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 543F45A2567
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 04:40:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3036C7AE4FE
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 04:53:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 180541C6FE7;
-	Thu, 24 Apr 2025 04:40:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B8781C5499;
+	Thu, 24 Apr 2025 04:54:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="u5+DPu8A"
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="yaVc5T8x";
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="bIm4a54m"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2067.outbound.protection.outlook.com [40.107.92.67])
+Received: from mx0a-002c1b01.pphosted.com (mx0a-002c1b01.pphosted.com [148.163.151.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41ADA1B0420;
-	Thu, 24 Apr 2025 04:40:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBBFAF510
+	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 04:54:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.151.68
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745469610; cv=fail; b=ecW+yAKnpe5GLlMTpYmkQN1fT1A9CrUSE3I8i1I72x7PI5Ui7gEGpPvAYC7gMkIr3pTqFGO4JcONqX53rXhnIp+E2BRbwhWahKNhA54Iz3rFOCLvCz5kB0uPUfIm68M13Y+l+LFVuIzF4LPW194rx3oSzUDJvogYclAl7yjFRh4=
+	t=1745470495; cv=fail; b=JnufbmW/HcrzTKSQKEh1zk/xuEXNW9YXUlkcpG1WEOigGr0Pq1AvKVuw7towMp6Z8gA1CGMiqINIBWX5tqycAkU6BelSXEmzZ4U6+Bnr3L4YiAeXs1rV0Fc0ZWkM52Szu9rYjjmsQDehh5Zv5wag14PiXbueWmvIB8M+FeatWxE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745469610; c=relaxed/simple;
-	bh=SmKI3GfNez1nNaLZ5SOWrvgILQxTcAoDvJhanu+GTaY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=YOGJdGSiHNaxpm3Ik7/6ZEdcydT2PPE3TfPlzSErhy5A5JExw5lyiaRfIiOtwinuJ7Cgphjzp7ylpcXHVEY9Zi/YGBkCO7MfHrd7HrYWKWSphUjbpj11Jx+CMxp4kQwXOG+uo2FWDmppbP2Flb0a9LIzHulreCBSqeUOHTyJTnI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=u5+DPu8A; arc=fail smtp.client-ip=40.107.92.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1745470495; c=relaxed/simple;
+	bh=w6ReKxD/14pNfr+TuExgmiLlLorrwqV71ZSncx0/Ej0=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=NG2oCWrfnOR4hn2VE6jMQR/iDJf+VU1sCd3DYWANWlNIacx+8UQ5WdsJ1TtnMh9frCfbokBJ7LCFqRmdZsqpFh4pKBG+Cs08vN+xOFEKY9p2h5OwqKnivJ5QSWal0/+I/58i/hPpQEj86ixqLJ3AaBE+6ZjOPjfNi473NI5QvZk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com; spf=pass smtp.mailfrom=nutanix.com; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=yaVc5T8x; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=bIm4a54m; arc=fail smtp.client-ip=148.163.151.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nutanix.com
+Received: from pps.filterd (m0127837.ppops.net [127.0.0.1])
+	by mx0a-002c1b01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53NJlF07025312;
+	Wed, 23 Apr 2025 21:54:31 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	proofpoint20171006; bh=tNVD8JE/tmmFATMd5ePDxph8Uel2yOqbxua1l3DOG
+	Wc=; b=yaVc5T8xHwbHIKhC7To+o0wN9beyXO9IpruVu/82OTUD+ecVyduYjEoEH
+	broSmm4WyBlG26it27AFgySgHw29sGx3XBpiY/cSq7goPIyOZDUYOo2qKLp1GFBa
+	2ltDpdwQS3ODmchKYQvYmTC0GJD1/3HJBl8U0EAPORVZiczjMU4p+S/eVLA9XSKT
+	IVH4Kg2T61Nl2E/QUiAST+2tPAOdOb8ZeC/YFlgJnOzyzsQsGX36vl4NojZMlr+a
+	m9uST+qmLUssTX+8+FfvI5kH/mN+xH2Ai6ZMh4r9CuJFZRUiIDrQDl0lfVlD+WD0
+	tzjidsZ10aJEEgMXUy0NrTG0tkbKQ==
+Received: from sn4pr2101cu001.outbound.protection.outlook.com (mail-southcentralusazlp17012012.outbound.protection.outlook.com [40.93.14.12])
+	by mx0a-002c1b01.pphosted.com (PPS) with ESMTPS id 466jhvkffg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 23 Apr 2025 21:54:30 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sl0tUyt4aDxjpglFd49NZRHpOa92LiNe6Z7yaMNyqABqu/uMgiKw+DIONPXx6rVmVHDCYVVkn1DJXpoYsz5GV3rgW0R1egBfYetJLOEcTg9HnwVTTefc8777l3f4Ih6XMg42y6p+v8blW2aQyHHOhuxOoJwDR+u7o48CGrXCb3XEmFCL1RrGvr84Yav7BI0mbyuR1eB6AH5YMzMnmpHD4k0Pwjw0wn/dbH6UhBSMODg5OpRco6/wnVQeFxux6NLEoQw/9PhBylz2+zf4Q7su7d1mTRbMYgImjaZi5IfB/pPsNKDJ0uHA0jr3kyCEdOJ1GhNv0kY/p5vr6Ue7CUeRHQ==
+ b=r13SAG0JRXCgv5G9ysrKLLiJ2uuxDa1C3JV1SOZnwvlWylzbEmdBWsz5qgCpu1GubzEI+PLFDY/RxiGpmkbHCAHXhZpTTc7ch06e2NvSVFf9p02x+W7uyrLX4dDyQhxgaxPprBd8Znatj6foR+YRLQpymW0S39Ha+pokGmNMdFDEzTJCtLpJNsGq2baoRzNOQdSDsHZuYJRxEwW/bXiQf4ee1SzIW6H+uHi7Xq38jlxbEgSFWyyZjHxrTh455j+sdCf+TOpr1cxoudBlck9DKt53w/FxDNJhTGetZxNkNMopMJtqF8LSbbk6SkLh02j+tqNbHuPmW+4Yi2+/WRzrOg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6euvhKUaDaRGdDRW7q02t0Ih2rsnvPGUAq6hlzFwKZA=;
- b=jCzh5YS3S7cdJaWXgMCCpL8cg41iD9Dx6hYhfu9/rfOVyC1Gw38mnUVGvFgyWAcfWVtaeMKhLTustXMsSfp/iVcI2PFlEFvxdO7R1+lYZl9L3R/k8m9y2Y91d+QdXUWMPEeu65HCRnjJTQroeGi3yAeCXN3K/1KxpOset9jKDJswzslGObb0awlBMd8yb8Hurs8n123yv92urBThYhFTjO93P6CiY4q7TD0GeDyadtFYkBclGf8CQGJzyfEQQBrS93SE1qn2d0dsJR0YrB4He3kyDngCVN6UsIx2eFlWJ2qPKsj6OubEiHs6uM5sigw3k1Gow1Puw+jCZHEMMa8GOQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ bh=tNVD8JE/tmmFATMd5ePDxph8Uel2yOqbxua1l3DOGWc=;
+ b=Q+ZqXQa969qcgmbjps97DiOHtwnr1aviEWwIVgjZr4R2Tl9e5lyOz744Ouq4aLVB5bCiZ9ItFSbytEsrAinmjL3X3hEYJwS7vTcJ5s1ZQ2U23c23hYu9OHatDKw3xzrTOjzJVg5SDtqPetlIpX2Jei5MH0e2ZrpCl3bWqPxxVmCQVeA4viVN98n5MHXQuooAGbEr1VSMqS1BxbPxYtFJY5q4v59VHX6VxfNpDWOLLZLCnBMYa3jH/Qh4/oc1eO/n+b7eenSAb+txK+Z+t6jAd+fQ0FV7t1RuWDBQQ3a+jOQhqDt/xNbga16YWDJ+nKRY6kF/AFQFlqmOIoamYb1nRA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6euvhKUaDaRGdDRW7q02t0Ih2rsnvPGUAq6hlzFwKZA=;
- b=u5+DPu8A9vb3U2czO0vbvqC6LlLcCk7EkHN9qiqhYf+6u16F8dudnTv9adRRjrWOrq/BubBVNXVey5y1dBa6Hk62ELVXLwyOBGWHwbfZ4svEaCz9reBgaa/HG7WEeE/RKGCf4uBMjIIMixwrsL5h758lyRF6UB86RZHAyfBb5bw=
-Received: from SJ0PR13CA0184.namprd13.prod.outlook.com (2603:10b6:a03:2c3::9)
- by MW4PR12MB7016.namprd12.prod.outlook.com (2603:10b6:303:218::14) with
+ bh=tNVD8JE/tmmFATMd5ePDxph8Uel2yOqbxua1l3DOGWc=;
+ b=bIm4a54mjzhfw2jDovzoy+9pyGk6OYHfi/1Csejldkr5ZvRxuOJkqz9bgJWn8x9O8HfjMxdIAKpab5ewWx3qyrsGVcwJdXu4TtYVhfP39W7TaYWU37Gh+TjaLeKvQRxZwAiC3LtDSUfuYxT/a6jnKvD0B/MYLNu5gA44GWJkT95TiLboL4fnDsnKr+pRCskkg2D1T6qdrZe0Yc5vhxEXYY+UGGvz8fdO8P0MW3YwMJCscI/A/3se6GdoBttE26RBAMZcn9d2rhG4rKX8oa9hZsK5CFBenjl+nbez/xWZsYT83DASAPMFH8ZN4GPdsjfnJcs44zWgoFwx4ggkaywsdQ==
+Received: from BN0PR02MB8080.namprd02.prod.outlook.com (2603:10b6:408:16f::21)
+ by MW4PR02MB7490.namprd02.prod.outlook.com (2603:10b6:303:65::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.23; Thu, 24 Apr
- 2025 04:40:00 +0000
-Received: from SJ1PEPF00001CE1.namprd05.prod.outlook.com
- (2603:10b6:a03:2c3:cafe::aa) by SJ0PR13CA0184.outlook.office365.com
- (2603:10b6:a03:2c3::9) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8655.15 via Frontend Transport; Thu,
- 24 Apr 2025 04:40:00 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ1PEPF00001CE1.mail.protection.outlook.com (10.167.242.9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8655.12 via Frontend Transport; Thu, 24 Apr 2025 04:40:00 +0000
-Received: from [10.85.41.53] (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 23 Apr
- 2025 23:39:56 -0500
-Message-ID: <1fa0f7f8-be88-4617-a0b2-57d4204c6d6f@amd.com>
-Date: Thu, 24 Apr 2025 10:09:49 +0530
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.10; Thu, 24 Apr
+ 2025 04:54:16 +0000
+Received: from BN0PR02MB8080.namprd02.prod.outlook.com
+ ([fe80::822a:86bb:d867:447f]) by BN0PR02MB8080.namprd02.prod.outlook.com
+ ([fe80::822a:86bb:d867:447f%5]) with mapi id 15.20.8699.005; Thu, 24 Apr 2025
+ 04:54:15 +0000
+Message-ID: <315d76f0-d81c-43ed-a13e-ef9b8e6a0e75@nutanix.com>
+Date: Thu, 24 Apr 2025 10:24:04 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 05/10] i386/cpu: Introduce cache model for SapphireRapids
+To: Zhao Liu <zhao1.liu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>
+Cc: Babu Moger <babu.moger@amd.com>, Ewan Hai <ewanhai-oc@zhaoxin.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>, Jason Zeng <jason.zeng@intel.com>,
+        Manish Mishra <manish.mishra@nutanix.com>, Tao Su <tao1.su@intel.com>,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20250423114702.1529340-1-zhao1.liu@intel.com>
+ <20250423114702.1529340-6-zhao1.liu@intel.com>
+Content-Language: en-US
+From: Tejus GK <tejus.gk@nutanix.com>
+In-Reply-To: <20250423114702.1529340-6-zhao1.liu@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MAXPR01CA0097.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a00:5d::15) To BN0PR02MB8080.namprd02.prod.outlook.com
+ (2603:10b6:408:16f::21)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 33/67] KVM: x86: Dedup AVIC vs. PI code for identifying
- target vCPU
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
-	<pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>, David Woodhouse
-	<dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>
-CC: <kvm@vger.kernel.org>, <iommu@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, Maxim Levitsky <mlevitsk@redhat.com>, Joao
- Martins <joao.m.martins@oracle.com>, David Matlack <dmatlack@google.com>
-References: <20250404193923.1413163-1-seanjc@google.com>
- <20250404193923.1413163-34-seanjc@google.com>
-Content-Language: en-US
-From: Sairaj Kodilkar <sarunkod@amd.com>
-In-Reply-To: <20250404193923.1413163-34-seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE1:EE_|MW4PR12MB7016:EE_
-X-MS-Office365-Filtering-Correlation-Id: dddddae9-5812-4185-52a7-08dd82ea12df
+X-MS-TrafficTypeDiagnostic: BN0PR02MB8080:EE_|MW4PR02MB7490:EE_
+X-MS-Office365-Filtering-Correlation-Id: 606b325e-5d04-4fb7-0234-08dd82ec1022
+x-proofpoint-crosstenant: true
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014|7416014|7053199007;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?QXhZZDhZc3plTmppOURLeExFejZQdnF5NW1qdS9nR2ZEbEVZZFZPMDFnZUkx?=
- =?utf-8?B?UEs4a3ZldVNML0xOMFI2cC9XZkF5eWt3ZzVkY0ZROU9FdDArQTc2VXhuQk5n?=
- =?utf-8?B?NGJBcFdEcHJ0MVNXNHJxNDNxcUhCM29NanpwWW5MaDIxTnppeHV3ZDU1RUhr?=
- =?utf-8?B?LzA3bUM4UlpTZ2lzMERZU20zSjVnR3IwTE9kVXRWRDB1SE02TkxSSy82cDRj?=
- =?utf-8?B?SnZ4K25tbHVQYWFiTkVHdDR6ZGhVbFBjUHdHNmxsMDZvZjdacDh0R29HYUxl?=
- =?utf-8?B?dUhTeWtCSFkzYzJSbnBxRjRIdS8vbDJWakhWWUdzQVg2Q0MzdEVQZklNSGJE?=
- =?utf-8?B?dzArSjZ2S04zL3RCRUxQcU9LZko2ZnlwY1ExSDhHSVkxb3FaaUtIeGN1a2Yx?=
- =?utf-8?B?VzcvcGRiRjlaMXBUZkxiWGVJNUdybmVXb09BcjZ6UXB1RmpqekJzUnlIY0xl?=
- =?utf-8?B?YUY1VllHZ3JxSTlMTVhXWFZFT1NzUWNGeDU2bHYzRGttenBBWGFCK1ZtREtZ?=
- =?utf-8?B?N0Z6YW1ycEpDaXBnazZzVE9kTjRyaHBybGFkK2FNNTRERHhhZUtTWGFQNVZk?=
- =?utf-8?B?RGNHTXhzUHhQN2R4UU1Qek13L1llWVBCN0wwZUgwaDM1WXhNRnFJLzhjQ3Vo?=
- =?utf-8?B?djlKVitMNjBBZ09Ia1Jpc1ZEYzZKcHN3NkVUTGZvUlkxeGhlcGt4SUkzR1ls?=
- =?utf-8?B?dHBqeUJFZzJacE1sWUNXc1pXWWJSUHVSejY3WjhsSm5vQjJyL241R2c2TWZE?=
- =?utf-8?B?M29lQXhxNEM1RHNESi91TEFrWUxpVWxGdGRlZXh4Zlc1alJ0eEhlV1g5RUJO?=
- =?utf-8?B?YXdObXJnNkxDeGxybU9NaTRVMXRjdTRiN2RzS1VsS01nODE1ME9ScVRlaTVM?=
- =?utf-8?B?dFU0YStvVUFXaVhEZWtjQlBVRjNHdEdnWWtreWpReGlSNUc4NW1BWldzdlNU?=
- =?utf-8?B?aHdaV1gyQnNoTk54Sndtb1FlTXovdmxhZE9NMHQwbFN5bWI5cXNaUDgza2lp?=
- =?utf-8?B?ck1MbHhyU3EyV1BhTklhTjY5d0h6ZFFrVURJRjBFcmpTT1JNWkU0bmFYbFdh?=
- =?utf-8?B?N3BIcUJ5T1R3UHAvQUxZZUI3OFlHN3RFU1hTenNZNmFnNUh6Ky9IZXlTT2Ro?=
- =?utf-8?B?UmZnN2l3Wm5kYzBLbXlmUjkzRXRsOHducDd3SytvTjA0aDJRTk44QWNGVkdZ?=
- =?utf-8?B?ZGNsOU1IRDFURmhzbmpQSXFoZmN3Q3dUejgxL1Z6Ym1jSEp4a2h1WFQ4bHFo?=
- =?utf-8?B?c3VwV3YxQ2gyUklLQzgySXk0MWVvQ3FiSmNRTkZiMFdxVTVTNlNCOVhGcEFn?=
- =?utf-8?B?azN1Um14K2Q2S09vdm9qOXhHelhjcmk0VEpyS1VnTGdHNy9JS3FoTzh4ajJt?=
- =?utf-8?B?NkVYREJzWWhCc3JRK2dFVmxYY1RkdkFCYlFTVCtCbkVKbStJMk5QWnFENXdX?=
- =?utf-8?B?Ui9ZY1c4SFdOZEQ0Qld5RFZVbm1pRlJOOWRmcEpRUTlYaG9YOHg3cWZUNGxQ?=
- =?utf-8?B?cUxIQ0dMczZXR2ZaT1JGUGZXUzM4U05WNnI1RGg5aEpodFpjSnBTSnRhYWxk?=
- =?utf-8?B?N25kTUR5anhIL1hkVEF4M0gvTnpRbDA0Z09SSjJDUnQyS2RsTmZNcFBYM1Bi?=
- =?utf-8?B?RzRuUXVXUG9DeWl2YjR6bWNQSEVzTW16MkRqQjRmWk9OT3hKZ0NtYndSU2hT?=
- =?utf-8?B?dDJVS1ptdHg3ejFDWGw2VXFXbmJtYnEwUGhBcEY0cEhuUm1neG9UcVZqdTFh?=
- =?utf-8?B?QVJEUERZbEtINHR1M0dqckVGTTB6cmhwVkFKeC9pUFREOGtMVjF6NjJGVlJz?=
- =?utf-8?B?Q041OEkzVWk4b2d1aEFzcTIxOUpmTnNMelNXazBiSlFZaXpoVGZ1azlHUDBj?=
- =?utf-8?B?L2hDVkxRU29zSHVhdTIydVplMXlEN2JDZDI0YmZ4VmthcG1vanI4Mm9Jckxx?=
- =?utf-8?B?c2t4VVY5OGJGbDZzNWxxVWlSeXdnYTRZYVE0Z3dPUm9mUEJScTJtRUN5cU5W?=
- =?utf-8?B?eVl6Y05Md1lkcW5yN3Y3RXBIc3BWUGhxQVRkOGZ2ZGcyZXRueE03Tlp6c3VE?=
- =?utf-8?Q?rIjire?=
+	=?utf-8?B?T1dGUnBGMDNjQWtPbThPeEo4UlU4SExjSitPMHQvT0xRVGF0TlB3V1BIU2RD?=
+ =?utf-8?B?OXBwWXN5MCtFQjBhNlVzUXFPRjVSQSs4Vk1Ma0wweCtlWWlwQnZsS08vbWpk?=
+ =?utf-8?B?bHBvdWE1YUVzVWlWdkJadFdPd2Y5UWlpMDRnbjJCMVZBMFNpUE44cVczTjBr?=
+ =?utf-8?B?djQ5YnZTcXlnOGhVSnd4cjlZMHJRODVaNGJKQ0RUMlAyVkpXUzA0WkowYk9O?=
+ =?utf-8?B?cjRZQ0hDVFd2N0gyRWpGMmNaTjlzQ2JLNVJLcmRrczNqMU8vZGRrdTJwdms5?=
+ =?utf-8?B?bkxZbjR2ODErY3MrYjFxb09aYWVQVEd2Q1ZxZGg0YVFMNXc0NmxWcWh5MmVy?=
+ =?utf-8?B?TzR2ek8zcmRaUC9MWGJlOUFDRGExVHFTZVg1L3hheEZ2LytyZ01waCtpS2FV?=
+ =?utf-8?B?R1h1ZU5BQTFoR1VOVmJCVTNyUXFMNjBsZlJSVjd4RGIxanZFcEFTRzB2UUZa?=
+ =?utf-8?B?QkJjWUoreDg3Qkl6ZG8wQmpHTWhXSjZBb0hUVkxrcG1sdkQzcXVWc2RDVURK?=
+ =?utf-8?B?ZXFrZ090SXh1M3dSNGZ5K0hEbkcwSVZzV2plR0JUUUt4YmdUL294bDdmVjhj?=
+ =?utf-8?B?L0ZGbmZ4RVIyYjY1eGpiaHcxVGl2NUhndlgwU2J2NWJFblIwcEhFdVZlb2w1?=
+ =?utf-8?B?ZVdJSUNWSEFVaEpSbEVrYVN3R01hQTIzeFdaeW5vVkRnRGVkRUJFajM3dDVB?=
+ =?utf-8?B?bzl0NmYrMmkxanpQd2tKVkp1UUpPT3ZxWDArUEYzaTVJMkp4aW1mbGtjcG9H?=
+ =?utf-8?B?SkhzakRJWjdqT09zZnAyZnFlc3h2d1J3ZnZDMkUrTmY4NndGSDJXYzF4bE03?=
+ =?utf-8?B?dFROOXZwd05xeTRxd25mYUNlZ2JsaDg5b09hd3FGb3g2VW9JU3JiTGRQZFpO?=
+ =?utf-8?B?TFBHaTZsaVhtakNIanVQWWQxT2graVgwOU9JWTJObkZQTHFiVksvL1I2NFBI?=
+ =?utf-8?B?R004MVJKRi9KQzdTdDZrZkhEKzR5S1hHU2lTb1lEZVRJd2ZRcFVGeUxUcXVT?=
+ =?utf-8?B?R3QzeUJKcEJaSDN6dlptYitEcHBvaC9QZDNBQWRZWWs3bjhMdjJyQ1dUSmdY?=
+ =?utf-8?B?bC9GOUg2WWRvei9hb0tyWm43TkJ0NENFL0JXVWtmcmRnRWQvdCt1RXhVbHVL?=
+ =?utf-8?B?RFI2L05FdkRTa00rOERkMjZMMktVeG5WaG5MOGVIZmtPS1VWSkpTK2JHNDE5?=
+ =?utf-8?B?cXg0VFMzS2hFYW8rSUFXUlVEdkJNZk9Kbi84OTlKRThTdmQ1NUNuVG1BOVZP?=
+ =?utf-8?B?b2U1YTdmVUhWWnhLcjdiUW9MMjVoT3BuNGNMM1Y2QkMyS3VzZnFOL0UvbGZO?=
+ =?utf-8?B?RHVDeGtNOHh1bXhNZUt1SlRtTzFMS3M4YzVCRVBVNjhjZmZuODdlZ1ZvM1lt?=
+ =?utf-8?B?amJNVnF6VW8vbnA1MXBta2VFZ25yeDMwblV4cEFOTEpnU3JjOE13VCt4VGgy?=
+ =?utf-8?B?d3VWM3gyR2dsQ0laQ2ErQU91aENGM1RyUHQrZ1J3bUFtK1Ura2RZS0QvSk1q?=
+ =?utf-8?B?WktEcC9PSy9DdXhSeDBzS01IWEFVbnBCZUMyWUF3N1lEQnFGN0FxYVAyZW1U?=
+ =?utf-8?B?Qkh3TXZ5akZmUEhNUG1UQk4vc05rVDlJblhLTE4wSkNlNVN0V0xrZ0hBUWdH?=
+ =?utf-8?B?NjJmVHoyM0kwcUpRSmJDRTM2RUwvdGFnWDhKbTZCa2psb3NWd3U2YlV5MGZV?=
+ =?utf-8?B?bkpaU3psUFlMTUVoSndDMktHZWJGMjMwOXJidm1MZkp3bHgyL0xJeVRvbUVv?=
+ =?utf-8?B?SDlwOE1oNEhNWU5OMVhCQmROSHR5ZW5ZWk4vNGpOOHBuM2U1OXdVTzMrRGVn?=
+ =?utf-8?B?dE9vTzJtcmVucUxmdEF6RjNwWnhjZzlaZkRwZnF4TTc5WkZubmVVZ0I4VGk3?=
+ =?utf-8?B?RHg4dkxVNEVTcFdXamw3UWJYTmZYeHo1VVFTbDkrVDZpL2lpS0JCTFB5R29R?=
+ =?utf-8?Q?+rjNW3W+jk4=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014)(7416014)(7053199007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2025 04:40:00.5343
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR02MB8080.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?em1PL0tqQ001dmRJdXVvMHVkYWUwdVo1ZXFoMDE1ZzQwWTcvMUxjdTZzK3dN?=
+ =?utf-8?B?V1Q1YlA4N3pqM0JYYzVuc2M0RUdHdHB6Y2l0WkJJeGRxbjBpdjFIMVdvdXgx?=
+ =?utf-8?B?SUttMnRaWkplK3ZBNlR2c0Y3Q0RVbFhCRWRuYjNWWFpESHVteFVHdnY5dzZw?=
+ =?utf-8?B?OE1uY2lOZExxSWU0RXRhTUIvQ3BFVCtKUFZrcS9zR3BualRSSzdKSUZLSW9J?=
+ =?utf-8?B?cW1nczYvL1loSXJYRUptYkhXbzZlNjd6TnM2L05ENmhOdURsd1BWb3BwN1A0?=
+ =?utf-8?B?WXF3cU9CRjQzd0c3SWQzQTlDWHRiL0gySmJCZ25iNEZ2eGEyN0I2YmJ2b1hv?=
+ =?utf-8?B?dWRjRHpMbUtYTk82dGw5UEZBTW9pVmlqZW9RNktpR1c1ZElxZzhEc2s0RCt1?=
+ =?utf-8?B?WFFmaUVqSW1wcmtWZDk4Vmd2K1B5OXZuNUFvRFZMRnVncEd1cHYzZnc0Zk4r?=
+ =?utf-8?B?SHM2UlZ3RlVPK0pzZy92dm5XMGNNM3VGK2krUTZTM2VuKzBYL2lXWXVqV0px?=
+ =?utf-8?B?eExRaFhMOXlsNkpFaW53RW1uMkl4bHdsWm1uMmNCQ2tUcnhqRlYzZ2ZCYmx0?=
+ =?utf-8?B?SVRZRjNCek1Lcm5KM21ZVEFEaWI4bHN6NHVjQTRSNXBJUmlQbXUwTTNiMjhW?=
+ =?utf-8?B?b1VSYWFFTk5obU1tWlVZTFVNdHBWVk9xaHRHb21oMkJEdnlIcUdrL2w4Zmtj?=
+ =?utf-8?B?QkcwU0FtSVlnN2ZlL2NybUlyQ1RlcWtacXpRb3Y1N1phUW5CWE1qMTFoaGVq?=
+ =?utf-8?B?M3RZMVRtTUxJMUc5a3EzZWYzZkNTaEN0bWlSbU9nU2JxM20rd1dDV21mRkJO?=
+ =?utf-8?B?ckV4OElIVzZwTWtldkQ4Y1Z3ajZhdVZQVTJaZFk0aUt5N01vLzB6MTBKZHA5?=
+ =?utf-8?B?VTlKRjlNZDMxRG9DcWVycDFsdFRXUHA2VFpCK0V5RmRDN0ppajA1cmkvRmFC?=
+ =?utf-8?B?SndmenhJRDUzdDdVWmQzUnA5TStDcVpLMXBzNkgzZjFEQ0JFOXI4VFFzVWhX?=
+ =?utf-8?B?QzVTbnNpTjl1YnZKMFdRZHVnZ0I2dk5xUDJ5R2hZWGZuRFp1S2gxeHNzQXd0?=
+ =?utf-8?B?bzFaZDEwSGQ4TGZrc3pCOXhlalZCN0NrUXZ0T3JnZ0lmVnJYUU1ZZGRsbEo4?=
+ =?utf-8?B?aDFub2ZLV0lMaEsyVmt6bktGWFJVSW81aFpERHhBUHZBMjF5SDFjVVVLVHZK?=
+ =?utf-8?B?NUpIWlBDZ0FzbXl0cllUSFVqMHZSYklSNjVUNk4zTlN6N2trRm10M1VITlY5?=
+ =?utf-8?B?RmdEVFZqblV6MGgrTUNRZ1JDNU04aXBjZHR0K2ozaEV6VFNtOFdEc3Rld3k2?=
+ =?utf-8?B?RlVEa1paY1JKeWhKODliWmJNeWFFbUxLaU0zZ0dUZ1YrMjZOUW5JZ2d5SVk4?=
+ =?utf-8?B?YWprNWhuTUpOa3dnc2JSMm1CTWNMcVdaaHcxM2RhK3YxQkxPNlNUenVRdjFo?=
+ =?utf-8?B?U25ORGZpR0pzdnozQ2NEREt4eTd1c3I0SGJ4U3YrZW9xSlVYYm5PUlVEOUpW?=
+ =?utf-8?B?YmtHQnF1VVpLUzhIRTJlY1IxRTRsZFZiTVBRZFRKMHJsVWQzRUlxNzJFMFJo?=
+ =?utf-8?B?QlY2MEoyZm9ibUM2UGF2cDV4MmZxT3ZHVHdhdlhVL0k0SUMxYWo4azBZR3cw?=
+ =?utf-8?B?cktMZXBRTWxVeTlNVUtrN2tYTnVobFl6SnExd0JSbXRod1JBS0VkblQ4bXp4?=
+ =?utf-8?B?aktFM0Z1SzdWS1FXUU52eGJNQXJONVVxVTlzMkdHb2JqZWxQTFlJeUJvOUtT?=
+ =?utf-8?B?K0kyRGF5Tk9rbHVvVndQVkVyS1kzVm9PdXIrR3JUbDhrS0E0R1FaWHhWT20w?=
+ =?utf-8?B?NGpGd1VUVEdLNWpVdVdDUkRaaFlqZmR4RDlWV205ZHZjTHArMytsU2pOU3hU?=
+ =?utf-8?B?R0hQclFRZEhFNFlJWUsrWXRRTzBZUDBLTEJvVWc4cyt3L01WcEhEOWRtY01n?=
+ =?utf-8?B?SThlZkVSNVpmQWlTUnZxK3VXdUlWcEUzZkpjL1NSVkMyVXNIMHVJellDdW9S?=
+ =?utf-8?B?TFpaZjZlNzd5R0Z3TkhEZk5aUnNnYXFxZDZkVzNvZEt2VU5yRXJ4ZVV2ckpx?=
+ =?utf-8?B?a1dpdDJJK2x2YUJZeFE5M2dad085QU9iUlFDT2ZNOVRvSHFEdjZTOHc5ZW9B?=
+ =?utf-8?Q?bI6DRYltsIRg8YDbjlP28eMXk?=
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 606b325e-5d04-4fb7-0234-08dd82ec1022
+X-MS-Exchange-CrossTenant-AuthSource: BN0PR02MB8080.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2025 04:54:15.4608
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: dddddae9-5812-4185-52a7-08dd82ea12df
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00001CE1.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7016
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: CLBQF87hzsp/ZjR6inB+ySO50W92O3J868tf98wPabOVnGV9lBpTk4EGndI0HirH2JKrUltNZ8Cq43h+4Fjpew==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR02MB7490
+X-Proofpoint-ORIG-GUID: GHgw4rvm_dy_Lw6PdxTTaYeO3UxSD95T
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI0MDAyOSBTYWx0ZWRfXyFp3VDsbDoKG GFxW74Qtg7x+VoisiBjWcLGh1bds3SCKq20oJrbB5EfT9KxCxerTD1X2kApYybEzYNM7qNmBwx7 F8b0KKsVlNN4+9/7BiFX8t8txSl0siwqDvSlfQgrHV63BnOjGm1aPVTf+MdzeeJaXHLLazEJKp8
+ kzPx+eIw0f9nCZ8EA4+QQouQDSszvXAXP0W9ziSDf+EtUrwT7TD4ey8Q9Fg0/sHpR0xsEszh3u5 0I0Jw50qYXpfPdd3qNyNfA2VSOv8+gLX4erPrTF8IsBqE0VIS9Ifq0vS0uuVujZZYs2mPQsqt4M 9VsQewgA9zdTxrVK/hjDizwQxBaZaF/KjJB28IUDEuREysxUqK86ZSepzHuFSFfEiuiozaQDfN4
+ vHiU6YjMSAZ8FYt8oUE2JxyesSfF50WodqT5TFu7nQLB59AWLQab4NPcEnr5Z2+SYB/CwMgn
+X-Authority-Analysis: v=2.4 cv=U52SDfru c=1 sm=1 tr=0 ts=6809c407 cx=c_pps a=rJOuE113HAlAKDwVaFkQAw==:117 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=XR8D0OoHHMoA:10 a=0kUYKlekyDsA:10 a=64Cc0HZtAAAA:8 a=QyXUC8HyAAAA:8 a=20KFwNOVAAAA:8 a=QX6PcPXmvLdf8_MoLAAA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: GHgw4rvm_dy_Lw6PdxTTaYeO3UxSD95T
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.680,FMLib:17.12.80.40
+ definitions=2025-04-24_01,2025-04-22_01,2025-02-21_01
+X-Proofpoint-Spam-Reason: safe
 
-On 4/5/2025 1:08 AM, Sean Christopherson wrote:
-> Hoist the logic for identifying the target vCPU for a posted interrupt
-> into common x86.  The code is functionally identical between Intel and
-> AMD.
+On 23/04/25 5:16 PM, Zhao Liu wrote:
+> !-------------------------------------------------------------------|
+>    CAUTION: External Email
 > 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> |-------------------------------------------------------------------!
+> 
+> Add the cache model to SapphireRapids (v4) to better emulate its
+> environment.
+> 
+> The cache model is based on SapphireRapids-SP (Scalable Performance):
+> 
+>        --- cache 0 ---
+>        cache type                         = data cache (1)
+>        cache level                        = 0x1 (1)
+>        self-initializing cache level      = true
+>        fully associative cache            = false
+>        maximum IDs for CPUs sharing cache = 0x1 (1)
+>        maximum IDs for cores in pkg       = 0x3f (63)
+>        system coherency line size         = 0x40 (64)
+>        physical line partitions           = 0x1 (1)
+>        ways of associativity              = 0xc (12)
+>        number of sets                     = 0x40 (64)
+>        WBINVD/INVD acts on lower caches   = false
+>        inclusive to lower caches          = false
+>        complex cache indexing             = false
+>        number of sets (s)                 = 64
+>        (size synth)                       = 49152 (48 KB)
+>        --- cache 1 ---
+>        cache type                         = instruction cache (2)
+>        cache level                        = 0x1 (1)
+>        self-initializing cache level      = true
+>        fully associative cache            = false
+>        maximum IDs for CPUs sharing cache = 0x1 (1)
+>        maximum IDs for cores in pkg       = 0x3f (63)
+>        system coherency line size         = 0x40 (64)
+>        physical line partitions           = 0x1 (1)
+>        ways of associativity              = 0x8 (8)
+>        number of sets                     = 0x40 (64)
+>        WBINVD/INVD acts on lower caches   = false
+>        inclusive to lower caches          = false
+>        complex cache indexing             = false
+>        number of sets (s)                 = 64
+>        (size synth)                       = 32768 (32 KB)
+>        --- cache 2 ---
+>        cache type                         = unified cache (3)
+>        cache level                        = 0x2 (2)
+>        self-initializing cache level      = true
+>        fully associative cache            = false
+>        maximum IDs for CPUs sharing cache = 0x1 (1)
+>        maximum IDs for cores in pkg       = 0x3f (63)
+>        system coherency line size         = 0x40 (64)
+>        physical line partitions           = 0x1 (1)
+>        ways of associativity              = 0x10 (16)
+>        number of sets                     = 0x800 (2048)
+>        WBINVD/INVD acts on lower caches   = false
+>        inclusive to lower caches          = false
+>        complex cache indexing             = false
+>        number of sets (s)                 = 2048
+>        (size synth)                       = 2097152 (2 MB)
+>        --- cache 3 ---
+>        cache type                         = unified cache (3)
+>        cache level                        = 0x3 (3)
+>        self-initializing cache level      = true
+>        fully associative cache            = false
+>        maximum IDs for CPUs sharing cache = 0x7f (127)
+>        maximum IDs for cores in pkg       = 0x3f (63)
+>        system coherency line size         = 0x40 (64)
+>        physical line partitions           = 0x1 (1)
+>        ways of associativity              = 0xf (15)
+>        number of sets                     = 0x10000 (65536)
+>        WBINVD/INVD acts on lower caches   = false
+>        inclusive to lower caches          = false
+>        complex cache indexing             = true
+>        number of sets (s)                 = 65536
+>        (size synth)                       = 62914560 (60 MB)
+>        --- cache 4 ---
+>        cache type                         = no more caches (0)
+> 
+> Suggested-by: Tejus GK <tejus.gk@nutanix.com>
+> Suggested-by: Jason Zeng <jason.zeng@intel.com>
+> Suggested-by: "Daniel P . Berrangé" <berrange@redhat.com>
+> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 > ---
->   arch/x86/include/asm/kvm_host.h |  3 +-
->   arch/x86/kvm/svm/avic.c         | 83 ++++++++-------------------------
->   arch/x86/kvm/svm/svm.h          |  3 +-
->   arch/x86/kvm/vmx/posted_intr.c  | 56 ++++++----------------
->   arch/x86/kvm/vmx/posted_intr.h  |  3 +-
->   arch/x86/kvm/x86.c              | 46 +++++++++++++++---
->   6 files changed, 81 insertions(+), 113 deletions(-)
+>   target/i386/cpu.c | 96 +++++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 96 insertions(+)
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 85f45fc5156d..cb98d8d3c6c2 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1838,7 +1838,8 @@ struct kvm_x86_ops {
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 00e4a8372c28..d90e048d48f2 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -2453,6 +2453,97 @@ static const CPUCaches epyc_genoa_cache_info = {
+>       },
+>   };
 >   
->   	int (*pi_update_irte)(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
->   			      unsigned int host_irq, uint32_t guest_irq,
-> -			      struct kvm_kernel_irq_routing_entry *new);
-> +			      struct kvm_kernel_irq_routing_entry *new,
-> +			      struct kvm_vcpu *vcpu, u32 vector);
->   	void (*pi_start_assignment)(struct kvm *kvm);
->   	void (*apicv_pre_state_restore)(struct kvm_vcpu *vcpu);
->   	void (*apicv_post_state_restore)(struct kvm_vcpu *vcpu);
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index ea6eae72b941..666f518340a7 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -812,52 +812,13 @@ static int svm_ir_list_add(struct vcpu_svm *svm,
->   	return 0;
->   }
->   
-> -/*
-> - * Note:
-> - * The HW cannot support posting multicast/broadcast
-> - * interrupts to a vCPU. So, we still use legacy interrupt
-> - * remapping for these kind of interrupts.
-> - *
-> - * For lowest-priority interrupts, we only support
-> - * those with single CPU as the destination, e.g. user
-> - * configures the interrupts via /proc/irq or uses
-> - * irqbalance to make the interrupts single-CPU.
-> - */
-> -static int
-> -get_pi_vcpu_info(struct kvm *kvm, struct kvm_kernel_irq_routing_entry *e,
-> -		 struct vcpu_data *vcpu_info, struct kvm_vcpu **vcpu)
-> -{
-> -	struct kvm_lapic_irq irq;
-> -	*vcpu = NULL;
-> -
-> -	kvm_set_msi_irq(kvm, e, &irq);
-> -
-> -	if (!kvm_intr_is_single_vcpu(kvm, &irq, vcpu) ||
-> -	    !kvm_irq_is_postable(&irq)) {
-> -		pr_debug("SVM: %s: use legacy intr remap mode for irq %u\n",
-> -			 __func__, irq.vector);
-> -		return -1;
-> -	}
-> -
-> -	pr_debug("SVM: %s: use GA mode for irq %u\n", __func__,
-> -		 irq.vector);
-> -	vcpu_info->vector = irq.vector;
-> -
-> -	return 0;
-> -}
-> -
->   int avic_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
->   			unsigned int host_irq, uint32_t guest_irq,
-> -			struct kvm_kernel_irq_routing_entry *new)
-> +			struct kvm_kernel_irq_routing_entry *new,
-> +			struct kvm_vcpu *vcpu, u32 vector)
->   {
-> -	bool enable_remapped_mode = true;
-> -	struct vcpu_data vcpu_info;
-> -	struct kvm_vcpu *vcpu = NULL;
->   	int ret = 0;
->   
-> -	if (!kvm_arch_has_assigned_device(kvm) || !kvm_arch_has_irq_bypass())
-> -		return 0;
-> -
->   	/*
->   	 * If the IRQ was affined to a different vCPU, remove the IRTE metadata
->   	 * from the *previous* vCPU's list.
-> @@ -865,7 +826,7 @@ int avic_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
->   	svm_ir_list_del(irqfd);
->   
->   	pr_debug("SVM: %s: host_irq=%#x, guest_irq=%#x, set=%#x\n",
-> -		 __func__, host_irq, guest_irq, !!new);
-> +		 __func__, host_irq, guest_irq, !!vcpu);
->   
->   	/**
->   	 * Here, we setup with legacy mode in the following cases:
-> @@ -874,23 +835,23 @@ int avic_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
->   	 * 3. APIC virtualization is disabled for the vcpu.
->   	 * 4. IRQ has incompatible delivery mode (SMI, INIT, etc)
->   	 */
-> -	if (new && new && new->type == KVM_IRQ_ROUTING_MSI &&
-> -	    !get_pi_vcpu_info(kvm, new, &vcpu_info, &vcpu) &&
-> -	    kvm_vcpu_apicv_active(vcpu)) {
-> -		struct amd_iommu_pi_data pi;
-> -
-> -		enable_remapped_mode = false;
-> -
-> -		vcpu_info.pi_desc_addr = avic_get_backing_page_address(to_svm(vcpu));
-> -
-> +	if (vcpu && kvm_vcpu_apicv_active(vcpu)) {
->   		/*
->   		 * Try to enable guest_mode in IRTE.  Note, the address
->   		 * of the vCPU's AVIC backing page is passed to the
->   		 * IOMMU via vcpu_info->pi_desc_addr.
->   		 */
-> -		pi.ga_tag = AVIC_GATAG(to_kvm_svm(kvm)->avic_vm_id, vcpu->vcpu_id);
-> -		pi.is_guest_mode = true;
-> -		pi.vcpu_data = &vcpu_info;
-> +		struct vcpu_data vcpu_info = {
-> +			.pi_desc_addr = avic_get_backing_page_address(to_svm(vcpu)),
-> +			.vector = vector,
-> +		};
+> +static const CPUCaches xeon_spr_cache_info = {
+> +    .l1d_cache = &(CPUCacheInfo) {
+> +        // CPUID 0x4.0x0.EAX
+> +        .type = DATA_CACHE,
+> +        .level = 1,
+> +        .self_init = true,
 > +
-> +		struct amd_iommu_pi_data pi = {
-> +			.ga_tag = AVIC_GATAG(to_kvm_svm(kvm)->avic_vm_id, vcpu->vcpu_id),
-> +			.is_guest_mode = true,
-> +			.vcpu_data = &vcpu_info,
-> +		};
+> +        // CPUID 0x4.0x0.EBX
+> +        .line_size = 64,
+> +        .partitions = 1,
+> +        .associativity = 12,
 > +
->   		ret = irq_set_vcpu_affinity(host_irq, &pi);
->   
->   		/**
-> @@ -902,12 +863,11 @@ int avic_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
->   		 */
->   		if (!ret)
->   			ret = svm_ir_list_add(to_svm(vcpu), irqfd, &pi);
-> -	}
->   
-> -	if (!ret && vcpu) {
-> -		trace_kvm_pi_irte_update(host_irq, vcpu->vcpu_id,
-> -					 guest_irq, vcpu_info.vector,
-> -					 vcpu_info.pi_desc_addr, !!new);
-> +		trace_kvm_pi_irte_update(host_irq, vcpu->vcpu_id, guest_irq,
-> +					 vector, vcpu_info.pi_desc_addr, true);
-> +	} else {
-> +		ret = irq_set_vcpu_affinity(host_irq, NULL);
->   	}
->   
->   	if (ret < 0) {
-> @@ -915,10 +875,7 @@ int avic_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
->   		goto out;
->   	}
->   
-> -	if (enable_remapped_mode)
-> -		ret = irq_set_vcpu_affinity(host_irq, NULL);
-> -	else
-> -		ret = 0;
-> +	ret = 0;
->   out:
->   	return ret;
->   }
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 6ad0aa86f78d..5ce240085ee0 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -741,7 +741,8 @@ void avic_apicv_post_state_restore(struct kvm_vcpu *vcpu);
->   void avic_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu);
->   int avic_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
->   			unsigned int host_irq, uint32_t guest_irq,
-> -			struct kvm_kernel_irq_routing_entry *new);
-> +			struct kvm_kernel_irq_routing_entry *new,
-> +			struct kvm_vcpu *vcpu, u32 vector);
->   void avic_vcpu_blocking(struct kvm_vcpu *vcpu);
->   void avic_vcpu_unblocking(struct kvm_vcpu *vcpu);
->   void avic_ring_doorbell(struct kvm_vcpu *vcpu);
-> diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-> index 786912cee3f8..fd5f6a125614 100644
-> --- a/arch/x86/kvm/vmx/posted_intr.c
-> +++ b/arch/x86/kvm/vmx/posted_intr.c
-> @@ -266,46 +266,20 @@ void vmx_pi_start_assignment(struct kvm *kvm)
->   
->   int vmx_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
->   		       unsigned int host_irq, uint32_t guest_irq,
-> -		       struct kvm_kernel_irq_routing_entry *new)
-> +		       struct kvm_kernel_irq_routing_entry *new,
-> +		       struct kvm_vcpu *vcpu, u32 vector)
->   {
-> -	struct kvm_lapic_irq irq;
-> -	struct kvm_vcpu *vcpu;
-> -	struct vcpu_data vcpu_info;
-> -
-> -	if (!vmx_can_use_vtd_pi(kvm))
-> -		return 0;
-> -
-> -	/*
-> -	 * VT-d PI cannot support posting multicast/broadcast
-> -	 * interrupts to a vCPU, we still use interrupt remapping
-> -	 * for these kind of interrupts.
-> -	 *
-> -	 * For lowest-priority interrupts, we only support
-> -	 * those with single CPU as the destination, e.g. user
-> -	 * configures the interrupts via /proc/irq or uses
-> -	 * irqbalance to make the interrupts single-CPU.
-> -	 *
-> -	 * We will support full lowest-priority interrupt later.
-> -	 *
-> -	 * In addition, we can only inject generic interrupts using
-> -	 * the PI mechanism, refuse to route others through it.
-> -	 */
-> -	if (!new || new->type != KVM_IRQ_ROUTING_MSI)
-> -		goto do_remapping;
-> -
-> -	kvm_set_msi_irq(kvm, new, &irq);
-> -
-> -	if (!kvm_intr_is_single_vcpu(kvm, &irq, &vcpu) ||
-> -	    !kvm_irq_is_postable(&irq))
-> -		goto do_remapping;
-> -
-> -	vcpu_info.pi_desc_addr = __pa(vcpu_to_pi_desc(vcpu));
-> -	vcpu_info.vector = irq.vector;
-> -
-> -	trace_kvm_pi_irte_update(host_irq, vcpu->vcpu_id, guest_irq,
-> -				 vcpu_info.vector, vcpu_info.pi_desc_addr, true);
-> -
-> -	return irq_set_vcpu_affinity(host_irq, &vcpu_info);
-> -do_remapping:
-> -	return irq_set_vcpu_affinity(host_irq, NULL);
-> +	if (vcpu) {
-> +		struct vcpu_data vcpu_info = {
-> +			.pi_desc_addr = __pa(vcpu_to_pi_desc(vcpu)),
-> +			.vector = vector,
-> +		};
+> +        // CPUID 0x4.0x0.ECX
+> +        .sets = 64,
 > +
-> +		trace_kvm_pi_irte_update(host_irq, vcpu->vcpu_id, guest_irq,
-> +					 vcpu_info.vector, vcpu_info.pi_desc_addr, true);
+> +        // CPUID 0x4.0x0.EDX
+> +        .no_invd_sharing = false,
+> +        .inclusive = false,
+> +        .complex_indexing = false,
 > +
-> +		return irq_set_vcpu_affinity(host_irq, &vcpu_info);
-> +	} else {
-> +		return irq_set_vcpu_affinity(host_irq, NULL);
-> +	}
->   }
-> diff --git a/arch/x86/kvm/vmx/posted_intr.h b/arch/x86/kvm/vmx/posted_intr.h
-> index a586d6aaf862..ee3e19e976ac 100644
-> --- a/arch/x86/kvm/vmx/posted_intr.h
-> +++ b/arch/x86/kvm/vmx/posted_intr.h
-> @@ -15,7 +15,8 @@ void __init pi_init_cpu(int cpu);
->   bool pi_has_pending_interrupt(struct kvm_vcpu *vcpu);
->   int vmx_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
->   		       unsigned int host_irq, uint32_t guest_irq,
-> -		       struct kvm_kernel_irq_routing_entry *new);
-> +		       struct kvm_kernel_irq_routing_entry *new,
-> +		       struct kvm_vcpu *vcpu, u32 vector);
->   void vmx_pi_start_assignment(struct kvm *kvm);
->   
->   static inline int pi_find_highest_vector(struct pi_desc *pi_desc)
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index b8b259847d05..0ab818bba743 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -13567,6 +13567,43 @@ bool kvm_arch_has_irq_bypass(void)
->   }
->   EXPORT_SYMBOL_GPL(kvm_arch_has_irq_bypass);
->   
-> +static int kvm_pi_update_irte(struct kvm_kernel_irqfd *irqfd,
-> +			      struct kvm_kernel_irq_routing_entry *old,
+> +        .size = 48 * KiB,
+> +        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
+> +    },
+> +    .l1i_cache = &(CPUCacheInfo) {
+> +        // CPUID 0x4.0x1.EAX
+> +        .type = INSTRUCTION_CACHE,
+> +        .level = 1,
+> +        .self_init = true,
+> +
+> +        // CPUID 0x4.0x1.EBX
+> +        .line_size = 64,
+> +        .partitions = 1,
+> +        .associativity = 8,
+> +
+> +        // CPUID 0x4.0x1.ECX
+> +        .sets = 64,
+> +
+> +        // CPUID 0x4.0x1.EDX
+> +        .no_invd_sharing = false,
+> +        .inclusive = false,
+> +        .complex_indexing = false,
+> +
+> +        .size = 32 * KiB,
+> +        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
+> +    },
+> +    .l2_cache = &(CPUCacheInfo) {
+> +        // CPUID 0x4.0x2.EAX
+> +        .type = UNIFIED_CACHE,
+> +        .level = 2,
+> +        .self_init = true,
+> +
+> +        // CPUID 0x4.0x2.EBX
+> +        .line_size = 64,
+> +        .partitions = 1,
+> +        .associativity = 16,
+> +
+> +        // CPUID 0x4.0x2.ECX
+> +        .sets = 2048,
+> +
+> +        // CPUID 0x4.0x2.EDX
+> +        .no_invd_sharing = false,
+> +        .inclusive = false,
+> +        .complex_indexing = false,
+> +
+> +        .size = 2 * MiB,
+> +        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
+> +    },
+> +    .l3_cache = &(CPUCacheInfo) {
+> +        // CPUID 0x4.0x3.EAX
+> +        .type = UNIFIED_CACHE,
+> +        .level = 3,
+> +        .self_init = true,
+> +
+> +        // CPUID 0x4.0x3.EBX
+> +        .line_size = 64,
+> +        .partitions = 1,
+> +        .associativity = 15,
+> +
+> +        // CPUID 0x4.0x3.ECX
+> +        .sets = 65536,
+> +
+> +        // CPUID 0x4.0x3.EDX
+> +        .no_invd_sharing = false,
+> +        .inclusive = false,
+> +        .complex_indexing = true,
+> +
+> +        .size = 60 * MiB,
+> +        .share_level = CPU_TOPOLOGY_LEVEL_SOCKET,
+> +    },
+> +};
+> +
+>   static const CPUCaches xeon_gnr_cache_info = {
+>       .l1d_cache = &(CPUCacheInfo) {
+>           // CPUID 0x4.0x0.EAX
+> @@ -4455,6 +4546,11 @@ static const X86CPUDefinition builtin_x86_defs[] = {
+>                       { /* end of list */ }
+>                   }
+>               },
+> +            {
+> +                .version = 4,
+> +                .note = "with spr-sp cache model",
+> +                .cache_info = &xeon_spr_cache_info,
+> +            },
+>               { /* end of list */ }
+>           }
+>       },
 
-the argument 'old' is redundant in this function.
 
-Regards
-Sairaj Kodilkar
+Thank you for this improvement! I see that even within the SPR-SP line 
+of Processors, the cache sizes vary across different models. What 
+happens for an instance when a processor only has 37.5 MiB of L3 per 
+socket, but the CPU Model exposes 60 MiB of L3 to the VM?
 
-> +			      struct kvm_kernel_irq_routing_entry *new)
-> +{
-> +	struct kvm *kvm = irqfd->kvm;
-> +	struct kvm_vcpu *vcpu = NULL;
-> +	struct kvm_lapic_irq irq;
-> +
-> +	if (!irqchip_in_kernel(kvm) ||
-> +	    !kvm_arch_has_irq_bypass() ||
-> +	    !kvm_arch_has_assigned_device(kvm))
-> +		return 0;
-> +
-> +	if (new && new->type == KVM_IRQ_ROUTING_MSI) {
-> +		kvm_set_msi_irq(kvm, new, &irq);
-> +
-> +		/*
-> +		 * Force remapped mode if hardware doesn't support posting the
-> +		 * virtual interrupt to a vCPU.  Only IRQs are postable (NMIs,
-> +		 * SMIs, etc. are not), and neither AMD nor Intel IOMMUs support
-> +		 * posting multicast/broadcast IRQs.  If the interrupt can't be
-> +		 * posted, the device MSI needs to be routed to the host so that
-> +		 * the guest's desired interrupt can be synthesized by KVM.
-> +		 *
-> +		 * This means that KVM can only post lowest-priority interrupts
-> +		 * if they have a single CPU as the destination, e.g. only if
-> +		 * the guest has affined the interrupt to a single vCPU.
-> +		 */
-> +		if (!kvm_intr_is_single_vcpu(kvm, &irq, &vcpu) ||
-> +		    !kvm_irq_is_postable(&irq))
-> +			vcpu = NULL;
-> +	}
-> +
-> +	return kvm_x86_call(pi_update_irte)(irqfd, irqfd->kvm, irqfd->producer->irq,
-> +					    irqfd->gsi, new, vcpu, irq.vector);
-> +}
-> +
->   int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
->   				      struct irq_bypass_producer *prod)
->   {
-> @@ -13581,8 +13618,7 @@ int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
->   	irqfd->producer = prod;
->   
->   	if (irqfd->irq_entry.type == KVM_IRQ_ROUTING_MSI) {
-> -		ret = kvm_x86_call(pi_update_irte)(irqfd, irqfd->kvm, prod->irq,
-> -						   irqfd->gsi, &irqfd->irq_entry);
-> +		ret = kvm_pi_update_irte(irqfd, NULL, &irqfd->irq_entry);
->   		if (ret)
->   			kvm_arch_end_assignment(irqfd->kvm);
->   	}
-> @@ -13610,8 +13646,7 @@ void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
->   	spin_lock_irq(&kvm->irqfds.lock);
->   
->   	if (irqfd->irq_entry.type == KVM_IRQ_ROUTING_MSI) {
-> -		ret = kvm_x86_call(pi_update_irte)(irqfd, irqfd->kvm, prod->irq,
-> -						   irqfd->gsi, NULL);
-> +		ret = kvm_pi_update_irte(irqfd, &irqfd->irq_entry, NULL);
->   		if (ret)
->   			pr_info("irq bypass consumer (token %p) unregistration fails: %d\n",
->   				irqfd->consumer.token, ret);
-> @@ -13628,8 +13663,7 @@ int kvm_arch_update_irqfd_routing(struct kvm_kernel_irqfd *irqfd,
->   				  struct kvm_kernel_irq_routing_entry *old,
->   				  struct kvm_kernel_irq_routing_entry *new)
->   {
-> -	return kvm_x86_call(pi_update_irte)(irqfd, irqfd->kvm, irqfd->producer->irq,
-> -					    irqfd->gsi, new);
-> +	return kvm_pi_update_irte(irqfd, old, new);
->   }
->   
->   bool kvm_arch_irqfd_route_changed(struct kvm_kernel_irq_routing_entry *old,
+regards,
+Tejus
 
 
