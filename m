@@ -1,339 +1,288 @@
-Return-Path: <kvm+bounces-44098-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44097-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EA01A9A592
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 10:16:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73534A9A586
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 10:14:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 743771B82FEA
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 08:16:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABB7C4623C5
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 08:14:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C57D20A5E1;
-	Thu, 24 Apr 2025 08:16:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4020620A5EC;
+	Thu, 24 Apr 2025 08:14:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eaGJ3siy"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="g5ipNrlQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AA7B1EFF88;
-	Thu, 24 Apr 2025 08:15:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745482560; cv=fail; b=XaFfSq2wQt9o9b5kR9vqQYO5YGSKlatrTZU2qBi5R6CjpxCEmjKWFmgfN5SAdP9b/Gxjxnjt2quSjixGQxJlOrM9CmNafMePq8ab8PkEp/nshuFZKACcVH/rrewUXz1X3IChxUumeA2r8Hicta0ZRvOAktxeLEHK5Qg2b8z5abk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745482560; c=relaxed/simple;
-	bh=ltjblWd4f43GK/sxvJSJg+GgEPw6Gu7Z3G9EkP0LarA=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=LPT4a7RSG9L9stA7INtZriZPvbk87bIV0gSfGIwiYnr8Kv7LjyLUUB8OYnFS//5U946gAxjG7UtPQ25HZpgc5gCq64vEhE6Um0tmqXzXfyNHkNMT2TPJyidBauHzNU2jaDGgt2uGrGPYtdCrRdwyLoM8quaJlM4ZEDiyk0frils=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eaGJ3siy; arc=fail smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745482559; x=1777018559;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=ltjblWd4f43GK/sxvJSJg+GgEPw6Gu7Z3G9EkP0LarA=;
-  b=eaGJ3siywHjJ5kfppQ/2wFweTeMlA6/emjsVBdoi8BQp72CavD0hhjRU
-   NtdGU94RHrGnQg+qsJ7u0FGu/N38OchgfQzyjUNLvn68qCF9xDoU1q54D
-   zQMrO3J8M2JpvLcBSlyD/4AiYpIKb48IQEmXo2k3TdhTuZ20vxGlqgITS
-   u3U5gPDwCcvig08KZ7slYdxtvobISZyyPCw4lPHatusCkvrW3OC1bw0yn
-   +fBJ65PogerZHmiYIjnZAXTYiPWhM6HplzxUZ58mDq4svZjZS/acrMXZA
-   IkeH712WFpGd0q9cEwR1/lMRS5VeEH/kg3fwfIV19gqHh8lpZjQH4aWhp
-   w==;
-X-CSE-ConnectionGUID: P8KyJplVRiWP7L8yX6t3zg==
-X-CSE-MsgGUID: A9u+IdJBQlaX3akTGF1qDg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11412"; a="47013687"
-X-IronPort-AV: E=Sophos;i="6.15,235,1739865600"; 
-   d="scan'208";a="47013687"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 01:15:49 -0700
-X-CSE-ConnectionGUID: DqSG8NsNQ5+ZJ40yEPkU8Q==
-X-CSE-MsgGUID: zAUhEzZfRaWOP0qOa1pFEA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,235,1739865600"; 
-   d="scan'208";a="132433337"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 01:15:48 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Thu, 24 Apr 2025 01:15:47 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Thu, 24 Apr 2025 01:15:47 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.171)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Thu, 24 Apr 2025 01:15:47 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZbCzdLG/ve0QPzJDfmyqWf5GfG+x+es/+y2AgAQ6HZJqfcEs1q1hWORhuG5MGPTM+NFBMsb7B3B2iZXs80Uw939Fv1Kx7BX7+2YR69EoTlvVJVWa8DPOg0Tw0/DbnyZY9HR7emBzJGzOaNFZoLTRos3N8ka9Ifuyuc8B5VutDrcamVT84vrJByEWlcfEA4FQvQx9XHsU/QR6TiK65BjXYquP+9WNtCKAceAZPXIVYNiKTdMZGXAMpd8pIHw2vQOeoZeLzIBP5j3y48N0Ublm/tm960Q2alV9PZU7LXVnrNYMngCNsy9/hXoGLQyCRVsLC4uZsFeszZa9Ej8wqpDAFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mcSKCipI5MW3H59AqWRf4+QFXBiaC+xSuQgNq+0bies=;
- b=lvFveJq8niygIWKpTphMCeYlL7BifS1H97HNLPGeWLYpERtzmJowEIMfDYPyYgYkoZmNufwEHhi1VeqinS4VvGHUTVmpT5xI6yLrPcDWiXPwMERf+eMTXA0u4c/tU2pxUuxsErfBHek30BkPCa3fKURbfL0z/sciJqZ1bQQW9dlABFa8inb+APqHHp+afZh9H4+v97lwsDCS/sNDdeMJoqve9T3cuxuAydFeudSkgTX3QL6d6AC+b9/cEnF2NbDl4148/ZBflmKcT9OnPskE09mEQMB11fKQ55zpsN7dSZ0m6RD4T9pL1P/ZrnuPVdMqpvm0r+ss5/7J5V/RnszgzA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- DS7PR11MB7859.namprd11.prod.outlook.com (2603:10b6:8:da::22) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8678.23; Thu, 24 Apr 2025 08:15:40 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca%6]) with mapi id 15.20.8678.021; Thu, 24 Apr 2025
- 08:15:40 +0000
-Date: Thu, 24 Apr 2025 16:13:40 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Chenyi Qiang <chenyi.qiang@intel.com>
-CC: Ackerley Tng <ackerleytng@google.com>, <tabba@google.com>,
-	<quic_eberman@quicinc.com>, <roypat@amazon.co.uk>, <jgg@nvidia.com>,
-	<peterx@redhat.com>, <david@redhat.com>, <rientjes@google.com>,
-	<fvdl@google.com>, <jthoughton@google.com>, <seanjc@google.com>,
-	<pbonzini@redhat.com>, <zhiquan1.li@intel.com>, <fan.du@intel.com>,
-	<jun.miao@intel.com>, <isaku.yamahata@intel.com>, <muchun.song@linux.dev>,
-	<erdemaktas@google.com>, <vannapurve@google.com>, <qperret@google.com>,
-	<jhubbard@nvidia.com>, <willy@infradead.org>, <shuah@kernel.org>,
-	<brauner@kernel.org>, <bfoster@redhat.com>, <kent.overstreet@linux.dev>,
-	<pvorel@suse.cz>, <rppt@kernel.org>, <richard.weiyang@gmail.com>,
-	<anup@brainfault.org>, <haibo1.xu@intel.com>, <ajones@ventanamicro.com>,
-	<vkuznets@redhat.com>, <maciej.wieczor-retman@intel.com>,
-	<pgonda@google.com>, <oliver.upton@linux.dev>,
-	<linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>, <kvm@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>
-Subject: Re: [RFC PATCH 39/39] KVM: guest_memfd: Dynamically
- split/reconstruct HugeTLB page
-Message-ID: <aAnytM/E6sIdvKNq@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <cover.1726009989.git.ackerleytng@google.com>
- <38723c5d5e9b530e52f28b9f9f4a6d862ed69bcd.1726009989.git.ackerleytng@google.com>
- <Z+6AGxEvBRFkN5mN@yzhao56-desk.sh.intel.com>
- <diqzh62ezgdh.fsf@ackerleytng-ctop.c.googlers.com>
- <aAmPQssuN9Zba//b@yzhao56-desk.sh.intel.com>
- <aAm9OHGt6Ag7ztqs@yzhao56-desk.sh.intel.com>
- <c4dae65f-b5e6-44fa-b5ab-8614f1d47cb5@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <c4dae65f-b5e6-44fa-b5ab-8614f1d47cb5@intel.com>
-X-ClientProxiedBy: SG2PR01CA0175.apcprd01.prod.exchangelabs.com
- (2603:1096:4:28::31) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C015E1F8BA6
+	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 08:14:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745482467; cv=none; b=uuyz2Sz9CPfVSaOeSNs6AhE4a2AjhBmP3pLqkd4PTAh57c9W3/ZB0IoHOO7Uug4qPopu+RcEboGjec4keNY0iDXOrMFGOsOUwRFYqszAgPFqT/9lMCJAU+usVW1AeznEiH9tY2q/SpB4rygUu01+ov2y5KiUWfuhMEAD4ZCy8Hc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745482467; c=relaxed/simple;
+	bh=008EJSG/phqGVPmxi0nDH3NCIHBvP55QLSxmr4tKYHM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=W8V9Emy9daREXB+aSzbdGKKmQm2VoVvk5aio7zcTqL+YG5y7mFbhlCzlLm+BQaPvgFe24Jmdk741bdA9sWnuofubJ539lQzuOZTzHFXMhOB23wp9JBokhjxRw+YHntKQaZSFGXbkteFuaqNn+vTOjET42TkmMh0rpsXRBm2LOa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=g5ipNrlQ; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43cebe06e9eso4312735e9.3
+        for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 01:14:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1745482463; x=1746087263; darn=vger.kernel.org;
+        h=in-reply-to:autocrypt:from:content-language:references:cc:to
+         :subject:user-agent:mime-version:date:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=008EJSG/phqGVPmxi0nDH3NCIHBvP55QLSxmr4tKYHM=;
+        b=g5ipNrlQnbWNQDx5PIdtRQxcoYaTUktowF593eplhxCKnKvGsx8xL5Io9JUFqMREuH
+         uifLo70GGibNxkA8BZJteNwZ6EAF6s3nY8zDad3SPCPDHIW8oJyJtj9ld22kl1EUa7/q
+         Lq1uEOedlXyJ23cirzmv3C2OhC5i7BWJ9jmtvolAe7r3Pk+oDVHQQqFcu1K6F0Ym2RYk
+         XNmFokhCNHR0lp3MdXn/d2pua9jvTf3BLD4icK36KM7xmjCMjXw6Btf/U1t7BPZNU1mu
+         n7zr9HdwCu+uMliMO3ktz7yD82fUwnl47w0KptodS04C/vn7at/8RzvBzNPnfB/xHfev
+         zt8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745482463; x=1746087263;
+        h=in-reply-to:autocrypt:from:content-language:references:cc:to
+         :subject:user-agent:mime-version:date:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=008EJSG/phqGVPmxi0nDH3NCIHBvP55QLSxmr4tKYHM=;
+        b=Jnl3yk1SHBcBLiYuQW66ft0NQclZfFvh011o/60xHMxeLgRVqsi+tHbx7pBCSPhHXS
+         /rk/waZOuBjPAt7zruHk+4a2H7eWtp/GdcgfNEdD+1StS+OSHoiNlFk3YaI/Oz8+DPzn
+         V02BBEziZpd+wojRi+2sk+g7JGmJafYZGzLIhtFLEhv64aFyP0r42D7T0LQar+jORI2E
+         weSqahRCXLtkIwBSMPbJ0XGorHHmzT/QHJ9kzvFYiIRZpaSKoIld1d2HL6GkhNOIrzOj
+         4BdWCseRsNOTejaaQI//IdNg29uo6AC4mlG4OoM39m/v7PI9qu71dLqeuTHP7NafSjV1
+         3RKw==
+X-Forwarded-Encrypted: i=1; AJvYcCXRBLjv83It+mpL7FjfoYRYsrycoqOcAwPKxj5Rh2Hbudi4uv/XrG6qPq1HW98XX6hL5LQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9uiSBsEj60pKJJQ8pNR2bPO9MGbPWQcqUJIYAnTxyoLjxQvVG
+	k29D3CNgRuYl/2Tyb0z1WSZXZ8UqR9JSMhMCPYzYk+Zzq55U32yrd/KE08rYKVg=
+X-Gm-Gg: ASbGncvRJbpKgr3z4j6Tjd9/8jtmzeFZGTIWzQFhI4riuYq5xbGU89VURpXREe6Bz04
+	oh4/i6VqNXUM66Q53c6K1ASiw+NeQ1T/E6alN535SEE7OdsS3hVu37/5GgjvVbdylNXB69qRlJr
+	5hMFovu3CYgLOXTpfuNtgH6y8D0U1Eg7z14AdNZRChD+S5qCKlHv9tfof84kdXfy1/05GS4I4JU
+	sNcrVdzUPG3WrK1AQPTl9T7hHxejtwbyAMbRQdX/Qyx3pfGv1v5q9b8FQ6su34Oz3xjRPcFy6Gt
+	jzEyobAscHCYn3l5Uhq9uQi2gFOi49kbFfsD0FK7IoRvO1uZ7D6IuNfO1kEfvpoShrb6Su4llSD
+	kBpqKfBSpdOOrk716lSrWCTAA3ac5hmiIgr3ghfWeNbVCMkImL2r9aThpwsQxw0pjbA==
+X-Google-Smtp-Source: AGHT+IFyv2kCFIwtSgJfhMLoeL4umabM8GMXtTutcFH/tZ4GaYnDHHb5JDeYCLMrA1sChvoEPbh09w==
+X-Received: by 2002:a05:600c:1d03:b0:43d:db5:7b1a with SMTP id 5b1f17b1804b1-4409bd2225dmr12614855e9.12.1745482462951;
+        Thu, 24 Apr 2025 01:14:22 -0700 (PDT)
+Received: from ?IPV6:2003:e5:870f:e000:6c64:75fd:2c51:3fef? (p200300e5870fe0006c6475fd2c513fef.dip0.t-ipconnect.de. [2003:e5:870f:e000:6c64:75fd:2c51:3fef])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4409d2bfa93sm10528525e9.37.2025.04.24.01.14.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Apr 2025 01:14:22 -0700 (PDT)
+Message-ID: <0cdc6e9d-88eb-4ead-8d55-985474257d53@suse.com>
+Date: Thu, 24 Apr 2025 10:14:20 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|DS7PR11MB7859:EE_
-X-MS-Office365-Filtering-Correlation-Id: 575a5f65-cbd8-4e60-1201-08dd8308335f
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|7416014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?Kz9UvTi+xhCH60lueSaqr4qm2Jxnr/qMysjXobvGTjnZJhHgjdN0sFyTeYxd?=
- =?us-ascii?Q?cVqyOOFiKGap6uyAejFM4X/sLFj7VZ+m2LwFHYnCX2w6dv+wWHCAxHlI2j23?=
- =?us-ascii?Q?dfSKQno0WaQFuj0CUlrePZUESsqevPCwUYTPQ7NTSdleXYUt3GLQDPg0CrVB?=
- =?us-ascii?Q?c86b0wQwaWwt96PgDFzHA+zFWuMpttjnVxvjd4mrcL+3yxO9gbCfgPFViVuG?=
- =?us-ascii?Q?e9aHx/rTPibqGMRXy1PerT+ax9XT+OE1IAgkIW2qqo6qeQSCJXKdou3Tn9AI?=
- =?us-ascii?Q?BEa4RxAHSz0DpJoNPPXtRBmPpnmZHunWtxKRZKPQOgE9HQBhyaKuzxyzP2vS?=
- =?us-ascii?Q?GyXOqzl5CeZuO8fbpLukla+oE46DCON9Y5FqodRfGNygsJeCBNlJ37x50ABF?=
- =?us-ascii?Q?QPYfJzJpmI+uDx8+Qt003WGsQW92CnRAxh5rLJGGNw1NYuaU5udnRZFEPiCd?=
- =?us-ascii?Q?tVzom3FSnO4P//0id0VdBZIdyAC1fV/lOaNhFS0kx5gu2rd38YOtAQHIbCN6?=
- =?us-ascii?Q?elGtJ/dlCJmxxrQn3f8SI6dIovD46UEO5UGybN5Y+TIg36wSTXk6iN96d2/J?=
- =?us-ascii?Q?XbRkVxDJtVThCje7xoQZjxWNAUcr79NXeWmnCoblOlNkw3zHj/u72aRCHmmB?=
- =?us-ascii?Q?DIs+OXfIGsBKuReXgBy7AR9Ylh4EblB5iRYV31BREsLWdmjYl6JYUW+49cWA?=
- =?us-ascii?Q?Zb8HLh6AjIoZf/GvK/kCCog3H297+L7wgB7ddQd8uhge+DLkLlwBIZCEW8yV?=
- =?us-ascii?Q?0pQaJurBuZQAd1a9up0DwISYC0ukKg5fWG+cqz5dX09aLAobe7oplpBlKL8I?=
- =?us-ascii?Q?69shNd2cwszrKkFZYgvA51b1Lq/ZZmRB1xKxnYDgjKzHFHWwt+qdJ3vHoNbq?=
- =?us-ascii?Q?vlh1a3lU08sGUu+YFGBbqkWkvRwCpX8HGXKgXbYXAlcxcZNgEi8XqmaWEeKa?=
- =?us-ascii?Q?/nzddk2yseHn78n8hjxLfyPG8qP/rU8pTB4/GfnBKkab6Y1S9Nzx1atdOYze?=
- =?us-ascii?Q?l09yfrYzOSHqyWAyElgrjgy5X7y/AT3m7hp8NbyHzMk/YR6f5ZmQl5Fv6wNf?=
- =?us-ascii?Q?sNk7n1QlaoaTztFAE1JN0OF6L7Zf+RqNkA2S1q7Bevp9Tk4f2VBKIBju/n2K?=
- =?us-ascii?Q?MG46NcU3urglbYUq0qf//fu6fFUcUi5nosVPMVf3SXKrhfTS8uoxms6kuPha?=
- =?us-ascii?Q?ithHahBfXefl/hico56a3qRtO34eR5VWyJPXmwh2wW/T6xhrVkGJz26AT1tO?=
- =?us-ascii?Q?6Ug4dfdeSx79KMqyXtfYvORVX9bbdRnPCBl5SqxccxFsyBC9fTaEw4kTkNB5?=
- =?us-ascii?Q?dlIWh6pZYi/KkoBhq2pOm3PJOU1sz3ozlcDg0CSgsnBlzrN+5foyfpNLrSjA?=
- =?us-ascii?Q?kpJu97QhgymO/ZKfq7nqvj192cRmFmEH+UnYiD0+W4oKxCELdoWbXuPeP1iG?=
- =?us-ascii?Q?FzcrIvSETgE=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(7416014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?KcR3QxpAe7W9Z3ylz7yw+LshTDkSx8akkfhy938Gpbtulk5/OyfESjrfxmda?=
- =?us-ascii?Q?VggQsuBcYcj+d8hKiPL4B9kgDZkL8hEXgtJVG4fmZNTnZHcRE/xoHPHX8RsK?=
- =?us-ascii?Q?Wp9Q08B/1zkTavXVyHGG4iFtgEcRy/iqhOMr3XC0UGs47CKbtZdhR4rv/con?=
- =?us-ascii?Q?TWk+pnpL7QvJMiJvW1ipBTQQIYzONr5gP0DN11hEgBXq+TOkORE4UUlJqXtn?=
- =?us-ascii?Q?unj4YalkJCTdMlNc/nNoSTKhPa+/FYEmgc65fXLiaCxbdWZ6pjU+PWfnxCad?=
- =?us-ascii?Q?UYqa+ub+msf+KGgVHcUok4gDqeqoJhEMUJ8X4J7NHBYYnwFM68dtzq2RCWjw?=
- =?us-ascii?Q?O1WfyJx/HXMktIQNUM0h1kMr1M68xQo1NiKaSRhO9kdiewfjbUrykRgaeu7e?=
- =?us-ascii?Q?oCgySbn+nkJL0N+Vz7j/ZqrkcOqIGtjVqOMObVPM7rUUYo4/vk8No5RZtZBV?=
- =?us-ascii?Q?V7QIhNmuH0OWUrqdZxHr6IGbp+NKGiOMsAQF2l+xFyxXpaxuN9aLF7tg4Y4S?=
- =?us-ascii?Q?iB7YXrNnyg2UVTqA7N7QrvBpUVA/OaUX7p/7EogXaKUt4m8GdRgNO+/duIZ/?=
- =?us-ascii?Q?UpMmgIW/5M643NUiY88rJKvZL3Zfu5tkUkgtiG+XFTxn/qrM/5Q9itkqZpWY?=
- =?us-ascii?Q?srWXeq5BCRDmrNVP/yCts6L9TANlDE6NWqyZ2NOgE2Wufk7bEDuH4AcK+JG0?=
- =?us-ascii?Q?fnpNuSpNqIEOkjiCpDmwWLvDPg2MFwTZ6xEeIKINsUnTnVfk+JrsJY2BcEte?=
- =?us-ascii?Q?j4pesRqZw56pmbtusOsXPQpR51QjLgIbGzGLhjdxYAEqF/SUQewlLrX/cO9s?=
- =?us-ascii?Q?liYRg4kDbqoQzjea2MRJFSbo0+mG/4M/FZRtnv8Js/avGoFlDBX+mVfNH7iT?=
- =?us-ascii?Q?ioyVLzQHzNqcpbBXLBXTrhEwzS4/8CujZ6BzWSxFiKUdVg/F2/ttPqvy42+p?=
- =?us-ascii?Q?MHIuhAE7lgYoKe2VU8UIF5QdQBGVjpntFWSQFJFHrITb1OTqu+9se8umBcXS?=
- =?us-ascii?Q?hCxNzuq4/NcXZAYHFiF1eIi4GS4omnPZnFkWuXp3RZUOwk0gEB2pIpympkkI?=
- =?us-ascii?Q?hZlRIq1xUywYh0KgsQCST/pzNEm9rfI6u+YEOtwmILKnqSghXHTnjKbHv6xS?=
- =?us-ascii?Q?e02Bs0iA9BrcopVtjV7Ss3oGgfUT9F69y5HctNMrzUHpo0vMzoXzsEBHCB1f?=
- =?us-ascii?Q?eomMm6jtXLXpne1iLx5AiF21oLD2TI57Pom1EuuK/H0ncPbVIPRtOVd5MlwX?=
- =?us-ascii?Q?hBZCU52QJvWhzBWuH8FL8FJZSpgo4Fb7Qr9cuT/0U0xauqhvmGOfxOTwRvf3?=
- =?us-ascii?Q?MbKvlF0kY2YZ/mro7eWAk04mtvr9VpkCyxFHZeDfmLLz2USS3VtHqSKqSG9g?=
- =?us-ascii?Q?TbWsfoZA2ZrxXV0WA/KFGon8wkERb8PDROy00PZrknlpaaWp9jFyWkbBW/Mm?=
- =?us-ascii?Q?Xe7UzGg5HkKcQKuUfPChTlJ2FLBl5TskQQsZMlzA2pe5BtE7L25JlXPKTUug?=
- =?us-ascii?Q?gn460Xjk4SqfCRR1oDcZG2/KAmXQSMnYjcBL0IEjwMiRSVlegFUSRZjxNmLE?=
- =?us-ascii?Q?5ThPI54QLO3D68Py26yjMlAS3OfbhRY+jtky7W+v?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 575a5f65-cbd8-4e60-1201-08dd8308335f
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2025 08:15:40.2742
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VDBr9pmb7dow5JGv2sw/etmJt85J7/4s9xqs6ftPkkbrm/VTwUkCliQwJvpCfvrOv2xmbVfNx8eEGRsRmct63g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB7859
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 21/34] x86/msr: Utilize the alternatives mechanism
+ to write MSR
+To: Xin Li <xin@zytor.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-pm@vger.kernel.org, linux-edac@vger.kernel.org,
+ xen-devel@lists.xenproject.org, linux-acpi@vger.kernel.org,
+ linux-hwmon@vger.kernel.org, netdev@vger.kernel.org,
+ platform-driver-x86@vger.kernel.org
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, acme@kernel.org,
+ andrew.cooper3@citrix.com, peterz@infradead.org, namhyung@kernel.org,
+ mark.rutland@arm.com, alexander.shishkin@linux.intel.com, jolsa@kernel.org,
+ irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
+ wei.liu@kernel.org, ajay.kaher@broadcom.com,
+ bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
+ pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
+ luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
+ haiyangz@microsoft.com, decui@microsoft.com
+References: <20250422082216.1954310-1-xin@zytor.com>
+ <20250422082216.1954310-22-xin@zytor.com>
+ <b2624e84-6fab-44a3-affc-ce0847cd3da4@suse.com>
+ <f7198308-e8f8-4cc5-b884-24bc5f408a2a@zytor.com>
+ <37c88ea3-dd24-4607-9ee1-0f19025aaef3@suse.com>
+ <bb8f6b85-4e7d-440a-a8c3-0e0da45864b8@zytor.com>
+Content-Language: en-US
+From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+Autocrypt: addr=jgross@suse.com; keydata=
+ xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOB
+ ycWxw3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJve
+ dYm8Of8Zd621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJ
+ NwQpd369y9bfIhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvx
+ XP3FAp2pkW0xqG7/377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEB
+ AAHNH0p1ZXJnZW4gR3Jvc3MgPGpncm9zc0BzdXNlLmNvbT7CwHkEEwECACMFAlOMcK8CGwMH
+ CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRCw3p3WKL8TL8eZB/9G0juS/kDY9LhEXseh
+ mE9U+iA1VsLhgDqVbsOtZ/S14LRFHczNd/Lqkn7souCSoyWsBs3/wO+OjPvxf7m+Ef+sMtr0
+ G5lCWEWa9wa0IXx5HRPW/ScL+e4AVUbL7rurYMfwCzco+7TfjhMEOkC+va5gzi1KrErgNRHH
+ kg3PhlnRY0Udyqx++UYkAsN4TQuEhNN32MvN0Np3WlBJOgKcuXpIElmMM5f1BBzJSKBkW0Jc
+ Wy3h2Wy912vHKpPV/Xv7ZwVJ27v7KcuZcErtptDevAljxJtE7aJG6WiBzm+v9EswyWxwMCIO
+ RoVBYuiocc51872tRGywc03xaQydB+9R7BHPzsBNBFOMcBYBCADLMfoA44MwGOB9YT1V4KCy
+ vAfd7E0BTfaAurbG+Olacciz3yd09QOmejFZC6AnoykydyvTFLAWYcSCdISMr88COmmCbJzn
+ sHAogjexXiif6ANUUlHpjxlHCCcELmZUzomNDnEOTxZFeWMTFF9Rf2k2F0Tl4E5kmsNGgtSa
+ aMO0rNZoOEiD/7UfPP3dfh8JCQ1VtUUsQtT1sxos8Eb/HmriJhnaTZ7Hp3jtgTVkV0ybpgFg
+ w6WMaRkrBh17mV0z2ajjmabB7SJxcouSkR0hcpNl4oM74d2/VqoW4BxxxOD1FcNCObCELfIS
+ auZx+XT6s+CE7Qi/c44ibBMR7hyjdzWbABEBAAHCwF8EGAECAAkFAlOMcBYCGwwACgkQsN6d
+ 1ii/Ey9D+Af/WFr3q+bg/8v5tCknCtn92d5lyYTBNt7xgWzDZX8G6/pngzKyWfedArllp0Pn
+ fgIXtMNV+3t8Li1Tg843EXkP7+2+CQ98MB8XvvPLYAfW8nNDV85TyVgWlldNcgdv7nn1Sq8g
+ HwB2BHdIAkYce3hEoDQXt/mKlgEGsLpzJcnLKimtPXQQy9TxUaLBe9PInPd+Ohix0XOlY+Uk
+ QFEx50Ki3rSDl2Zt2tnkNYKUCvTJq7jvOlaPd6d/W0tZqpyy7KVay+K4aMobDsodB3dvEAs6
+ ScCnh03dDAFgIq5nsB11j3KPKdVoPlfucX2c7kGNH+LUMbzqV6beIENfNexkOfxHfw==
+In-Reply-To: <bb8f6b85-4e7d-440a-a8c3-0e0da45864b8@zytor.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------VMSl19Ws92VaJ19wHUdCoQEK"
 
-On Thu, Apr 24, 2025 at 01:55:51PM +0800, Chenyi Qiang wrote:
-> 
-> 
-> On 4/24/2025 12:25 PM, Yan Zhao wrote:
-> > On Thu, Apr 24, 2025 at 09:09:22AM +0800, Yan Zhao wrote:
-> >> On Wed, Apr 23, 2025 at 03:02:02PM -0700, Ackerley Tng wrote:
-> >>> Yan Zhao <yan.y.zhao@intel.com> writes:
-> >>>
-> >>>> On Tue, Sep 10, 2024 at 11:44:10PM +0000, Ackerley Tng wrote:
-> >>>>> +/*
-> >>>>> + * Allocates and then caches a folio in the filemap. Returns a folio with
-> >>>>> + * refcount of 2: 1 after allocation, and 1 taken by the filemap.
-> >>>>> + */
-> >>>>> +static struct folio *kvm_gmem_hugetlb_alloc_and_cache_folio(struct inode *inode,
-> >>>>> +							    pgoff_t index)
-> >>>>> +{
-> >>>>> +	struct kvm_gmem_hugetlb *hgmem;
-> >>>>> +	pgoff_t aligned_index;
-> >>>>> +	struct folio *folio;
-> >>>>> +	int nr_pages;
-> >>>>> +	int ret;
-> >>>>> +
-> >>>>> +	hgmem = kvm_gmem_hgmem(inode);
-> >>>>> +	folio = kvm_gmem_hugetlb_alloc_folio(hgmem->h, hgmem->spool);
-> >>>>> +	if (IS_ERR(folio))
-> >>>>> +		return folio;
-> >>>>> +
-> >>>>> +	nr_pages = 1UL << huge_page_order(hgmem->h);
-> >>>>> +	aligned_index = round_down(index, nr_pages);
-> >>>> Maybe a gap here.
-> >>>>
-> >>>> When a guest_memfd is bound to a slot where slot->base_gfn is not aligned to
-> >>>> 2M/1G and slot->gmem.pgoff is 0, even if an index is 2M/1G aligned, the
-> >>>> corresponding GFN is not 2M/1G aligned.
-> >>>
-> >>> Thanks for looking into this.
-> >>>
-> >>> In 1G page support for guest_memfd, the offset and size are always
-> >>> hugepage aligned to the hugepage size requested at guest_memfd creation
-> >>> time, and it is true that when binding to a memslot, slot->base_gfn and
-> >>> slot->npages may not be hugepage aligned.
-> >>>
-> >>>>
-> >>>> However, TDX requires that private huge pages be 2M aligned in GFN.
-> >>>>
-> >>>
-> >>> IIUC other factors also contribute to determining the mapping level in
-> >>> the guest page tables, like lpage_info and .private_max_mapping_level()
-> >>> in kvm_x86_ops.
-> >>>
-> >>> If slot->base_gfn and slot->npages are not hugepage aligned, lpage_info
-> >>> will track that and not allow faulting into guest page tables at higher
-> >>> granularity.
-> >>  
-> >> lpage_info only checks the alignments of slot->base_gfn and
-> >> slot->base_gfn + npages. e.g.,
-> >>
-> >> if slot->base_gfn is 8K, npages is 8M, then for this slot,
-> >> lpage_info[2M][0].disallow_lpage = 1, which is for GFN [4K, 2M+8K);
-> >> lpage_info[2M][1].disallow_lpage = 0, which is for GFN [2M+8K, 4M+8K);
-> >> lpage_info[2M][2].disallow_lpage = 0, which is for GFN [4M+8K, 6M+8K);
-> >> lpage_info[2M][3].disallow_lpage = 1, which is for GFN [6M+8K, 8M+8K);
-> 
-> Should it be?
-> lpage_info[2M][0].disallow_lpage = 1, which is for GFN [8K, 2M);
-> lpage_info[2M][1].disallow_lpage = 0, which is for GFN [2M, 4M);
-> lpage_info[2M][2].disallow_lpage = 0, which is for GFN [4M, 6M);
-> lpage_info[2M][3].disallow_lpage = 0, which is for GFN [6M, 8M);
-> lpage_info[2M][4].disallow_lpage = 1, which is for GFN [8M, 8M+8K);
-Right. Good catch. Thanks!
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------VMSl19Ws92VaJ19wHUdCoQEK
+Content-Type: multipart/mixed; boundary="------------0vp5F0mv6hCcRHQUu1aj0a9v";
+ protected-headers="v1"
+From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+To: Xin Li <xin@zytor.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-pm@vger.kernel.org, linux-edac@vger.kernel.org,
+ xen-devel@lists.xenproject.org, linux-acpi@vger.kernel.org,
+ linux-hwmon@vger.kernel.org, netdev@vger.kernel.org,
+ platform-driver-x86@vger.kernel.org
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, acme@kernel.org,
+ andrew.cooper3@citrix.com, peterz@infradead.org, namhyung@kernel.org,
+ mark.rutland@arm.com, alexander.shishkin@linux.intel.com, jolsa@kernel.org,
+ irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
+ wei.liu@kernel.org, ajay.kaher@broadcom.com,
+ bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
+ pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
+ luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
+ haiyangz@microsoft.com, decui@microsoft.com
+Message-ID: <0cdc6e9d-88eb-4ead-8d55-985474257d53@suse.com>
+Subject: Re: [RFC PATCH v2 21/34] x86/msr: Utilize the alternatives mechanism
+ to write MSR
+References: <20250422082216.1954310-1-xin@zytor.com>
+ <20250422082216.1954310-22-xin@zytor.com>
+ <b2624e84-6fab-44a3-affc-ce0847cd3da4@suse.com>
+ <f7198308-e8f8-4cc5-b884-24bc5f408a2a@zytor.com>
+ <37c88ea3-dd24-4607-9ee1-0f19025aaef3@suse.com>
+ <bb8f6b85-4e7d-440a-a8c3-0e0da45864b8@zytor.com>
+In-Reply-To: <bb8f6b85-4e7d-440a-a8c3-0e0da45864b8@zytor.com>
 
-Let me update the example as below:
-slot->base_gfn is 2 (for GPA 8KB), npages 2000 (for a 8MB range)
+--------------0vp5F0mv6hCcRHQUu1aj0a9v
+Content-Type: multipart/mixed; boundary="------------0yeVN4sI0bLxwrBqbg5RE1SY"
 
-lpage_info[2M][0].disallow_lpage = 1, which is for GPA [8KB, 2MB);
-lpage_info[2M][1].disallow_lpage = 0, which is for GPA [2MB, 4MB);
-lpage_info[2M][2].disallow_lpage = 0, which is for GPA [4MB, 6MB);
-lpage_info[2M][3].disallow_lpage = 0, which is for GPA [6MB, 8MB);
-lpage_info[2M][4].disallow_lpage = 1, which is for GPA [8MB, 8MB+8KB);
+--------------0yeVN4sI0bLxwrBqbg5RE1SY
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-lpage_info indicates that a 2MB mapping is alllowed to cover GPA 4MB and GPA
-4MB+16KB. However, their aligned_index values lead guest_memfd to allocate two
-2MB folios, whose physical addresses may not be contiguous.
+T24gMjQuMDQuMjUgMTA6MDYsIFhpbiBMaSB3cm90ZToNCj4gT24gNC8yMy8yMDI1IDk6MDUg
+QU0sIErDvHJnZW4gR3Jvw58gd3JvdGU6DQo+Pj4gSXQncyBub3QgYSBtYWpvciBjaGFuZ2Us
+IGJ1dCB3aGVuIGl0IGlzIHBhdGNoZWQgdG8gdXNlIHRoZSBpbW1lZGlhdGUgZm9ybSBNU1Ig
+DQo+Pj4gd3JpdGUgaW5zdHJ1Y3Rpb24sIGl0J3Mgc3RyYWlnaHRmb3J3YXJkbHkgc3RyZWFt
+bGluZWQuDQo+Pg0KPj4gSXQgc2hvdWxkIGJlIHJhdGhlciBlYXN5IHRvIHN3aXRjaCB0aGUg
+Y3VycmVudCB3cm1zci9yZG1zciBwYXJhdmlydCBwYXRjaGluZw0KPj4gbG9jYXRpb25zIHRv
+IHVzZSB0aGUgcmRtc3Ivd3Jtc3IgaW5zdHJ1Y3Rpb25zIGluc3RlYWQgb2YgZG9pbmcgYSBj
+YWxsIHRvDQo+PiBuYXRpdmVfKm1zcigpLg0KPj4NCj4+IFRoZSBjYXNlIG9mIHRoZSBuZXcg
+aW1tZWRpYXRlIGZvcm0gY291bGQgYmUgaGFuZGxlZCB0aGUgc2FtZSB3YXkuDQo+IA0KPiBB
+Y3R1YWxseSwgdGhhdCBpcyBob3cgd2UgZ2V0IHRoaXMgcGF0Y2ggd2l0aCB0aGUgZXhpc3Rp
+bmcgYWx0ZXJuYXRpdmVzDQo+IGluZnJhc3RydWN0dXJlLsKgIEFuZCB3ZSB0b29rIGEgc3Rl
+cCBmdXJ0aGVyIHRvIGFsc28gcmVtb3ZlIHRoZSBwdl9vcHMNCj4gTVNSIEFQSXMuLi4NCg0K
+QW5kIHRoaXMgaXMgd2hhdCBJJ20gcXVlc3Rpb25pbmcuIElNSE8gdGhpcyBhcHByb2FjaCBp
+cyBhZGRpbmcgbW9yZQ0KY29kZSBieSByZW1vdmluZyB0aGUgcHZfb3BzIE1TUl9BUElzIGp1
+c3QgYmVjYXVzZSAicHZfb3BzIGlzIGJhZCIuIEFuZA0KSSBiZWxpZXZlIG1vc3QgcmVmdXNh
+bCBvZiBwdl9vcHMgaXMgYmFzZWQgb24gbm8gbG9uZ2VyIHZhbGlkIHJlYXNvbmluZy4NCg0K
+PiBJdCBsb29rcyB0byBtZSB0aGF0IHlvdSB3YW50IHRvIGFkZCBhIG5ldyBmYWNpbGl0eSB0
+byB0aGUgYWx0ZXJuYXRpdmVzDQo+IGluZnJhc3RydWN0dXJlIGZpcnN0Pw0KDQpXaHkgd291
+bGQgd2UgbmVlZCBhIG5ldyBmYWNpbGl0eSBpbiB0aGUgYWx0ZXJuYXRpdmVzIGluZnJhc3Ry
+dWN0dXJlPw0KDQoNCkp1ZXJnZW4NCg==
+--------------0yeVN4sI0bLxwrBqbg5RE1SY
+Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
 
-Additionally, if the guest accesses two GPAs, e.g., GPA 2MB+8KB and GPA 4MB,
-KVM could create two 2MB mappings to cover GPA ranges [2MB, 4MB), [4MB, 6MB).
-However, guest_memfd just allocates the same 2MB folio for both faults.
+-----BEGIN PGP PUBLIC KEY BLOCK-----
 
+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
+kt+z4drzFUyEjLM1vVvIMjkUoJs=3D
+=3DeeAB
+-----END PGP PUBLIC KEY BLOCK-----
 
-> 
-> >>
-> >>   ---------------------------------------------------------
-> >>   |          |  |          |  |          |  |          |  |
-> >>   8K        2M 2M+8K      4M  4M+8K     6M  6M+8K     8M  8M+8K
-> >>
-> >> For GFN 6M and GFN 6M+4K, as they both belong to lpage_info[2M][2], huge
-> >> page is allowed. Also, they have the same aligned_index 2 in guest_memfd.
-> >> So, guest_memfd allocates the same huge folio of 2M order for them.
-> > Sorry, sent too fast this morning. The example is not right. The correct
-> > one is:
-> > 
-> > For GFN 4M and GFN 4M+16K, lpage_info indicates that 2M is allowed. So,
-> > KVM will create a 2M mapping for them.
-> > 
-> > However, in guest_memfd, GFN 4M and GFN 4M+16K do not correspond to the
-> > same 2M folio and physical addresses may not be contiguous.
-> > 
-> > 
-> >> However, for TDX, GFN 6M and GFN 6M+4K should not belong to the same folio.
-> >> It's also weird for a 2M mapping in KVM to stride across 2 huge folios.
-> >>
-> >>> Hence I think it is okay to leave it to KVM to fault pages into the
-> >>> guest correctly. For guest_memfd will just maintain the invariant that
-> >>> offset and size are hugepage aligned, but not require that
-> >>> slot->base_gfn and slot->npages are hugepage aligned. This behavior will
-> >>> be consistent with other backing memory for guests like regular shmem or
-> >>> HugeTLB.
-> >>>
-> >>>>> +	ret = kvm_gmem_hugetlb_filemap_add_folio(inode->i_mapping, folio,
-> >>>>> +						 aligned_index,
-> >>>>> +						 htlb_alloc_mask(hgmem->h));
-> >>>>> +	WARN_ON(ret);
-> >>>>> +
-> >>>>>  	spin_lock(&inode->i_lock);
-> >>>>>  	inode->i_blocks += blocks_per_huge_page(hgmem->h);
-> >>>>>  	spin_unlock(&inode->i_lock);
-> >>>>>  
-> >>>>> -	return page_folio(requested_page);
-> >>>>> +	return folio;
-> >>>>> +}
-> > 
-> 
+--------------0yeVN4sI0bLxwrBqbg5RE1SY--
+
+--------------0vp5F0mv6hCcRHQUu1aj0a9v--
+
+--------------VMSl19Ws92VaJ19wHUdCoQEK
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmgJ8twFAwAAAAAACgkQsN6d1ii/Ey8k
+sgf/bXb/yPNEYKqkydqe/bdDkpvmLpSFUpdHMovM4PRMGt6zioNmVWczEr+IQ53jJEK1EgOrz1V5
+CSe5GF6AQ52FukYXR+nsdEhvJ3SQbHcC1jjQ0KBbi7qxCIl5hNUVmyEEjIxdE5u2TPCMWxoot6t1
+yNRYVLJOfCGc+rtLzkqT+DCZhmL5bJV7aHjBV/gGYMQs5mZvFWky2orA31cQd87ZQ01sJsXhSyK5
+kyPT2DLGT2EUSFgkADIATsccYzDmoFGHujoktt1Dvy7KAp5Ij89J1F9z/bJPieoeXbxYM6WgXK6i
+mL8fdLmqdHH+xIxH3Fw7vjbOQPVv3Q5NLHeDBr80mQ==
+=oHe8
+-----END PGP SIGNATURE-----
+
+--------------VMSl19Ws92VaJ19wHUdCoQEK--
 
