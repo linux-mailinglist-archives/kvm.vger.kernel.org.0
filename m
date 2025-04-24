@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-44112-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44113-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67731A9A99D
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 12:11:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E519A9A9D2
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 12:16:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4CB4467373
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 10:11:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A6627AB84A
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 10:15:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96FFC223DDA;
-	Thu, 24 Apr 2025 10:11:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED33E221FB7;
+	Thu, 24 Apr 2025 10:16:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="IUUurXWB"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Uc1LIfFS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E660221FAD
-	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 10:11:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B1DA21146C
+	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 10:16:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745489478; cv=none; b=g120RNvQFGVZGFWY3+OBPEiKwCPDdALhEq5lRiNaVLLHBhHKrCX4wxAwcWkuzSctYpW44XaU/jJPsxS3/XMcR6HZHKjP7/g9kNf41pwIT9lP1BElldarvldx/9FWn0HYqBJ3Z9hL6Toc8wcgmOHnhSld5GE/8ddBvdpGThttIS8=
+	t=1745489789; cv=none; b=sIvfCaZ8DCwnnv2yoOhL2uS/+1zBSljspnGE2gsANrzLioxj8/8As0brSEokWBVU4Vo6IemXi+ute5ZewF5obPL6qJat+yanQnDlQF1/tnDLBlMpJYnHmtuwL7otMx0Oe26LgGFnujh39jB/xqd2IuCRLB0tYPPmRN40uo+ss+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745489478; c=relaxed/simple;
-	bh=fdSwYuBhxOdnqF7xkOxhz3DelClCI0K6T6vVUCDVKjQ=;
+	s=arc-20240116; t=1745489789; c=relaxed/simple;
+	bh=7yeb9KlYqqGD/ZehSL+UaW5Mu1Sv69xuG2EIsa3T9HE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jMouPgjzJZteZ3TVMMG5ymDEf0zdp4K8Igo9CAUd6DeVtHOxoBmPy4GV0k+2JQkpkYzji5WxIBM0yUeF3aJOmMHePT4H68pRw6l6pa/A6sYre+c9CjtevyZ681jQDnCLjMl7ARntR9ussqM9jKBVXKO5zwlwhqyktnspbTrEFvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=IUUurXWB; arc=none smtp.client-ip=209.85.218.46
+	 In-Reply-To:Content-Type; b=cRezB9pmbd6ng4UgItfewHugKztJvjZtElhGmc1sBIf6Qb6IL4wZ/4FQ1NJUwImJlhvzI7jgoFEj8Z5Utqiy8vOaR2Z2WVYuJifT/hW/L0zVNaCNmmN08EoMgL77wL19DWXSNsWC4CcDyAhfEmp8UrUHzO68Aqv3sz8hsp5PX0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Uc1LIfFS; arc=none smtp.client-ip=209.85.218.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-acb5ec407b1so139239466b.1
-        for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 03:11:16 -0700 (PDT)
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-acbb85ce788so174348666b.3
+        for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 03:16:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1745489475; x=1746094275; darn=vger.kernel.org;
+        d=suse.com; s=google; t=1745489784; x=1746094584; darn=vger.kernel.org;
         h=in-reply-to:autocrypt:from:content-language:references:cc:to
          :subject:user-agent:mime-version:date:message-id:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=fdSwYuBhxOdnqF7xkOxhz3DelClCI0K6T6vVUCDVKjQ=;
-        b=IUUurXWBFYBMfrDYElqCnC7MV2jmQ0hg8XI2PRDBzoWHqinMtr6mLcKo1IlBbqdsHs
-         ILZUEQ57yRXpxwfcyrL3MMPr8RbGEfGCfSooF3VY5LxKFzXLkwztcqNYOrF3+1jzcQuh
-         b5sVo3ajxlRgPokkXdifwptxe2y3kHZ8/suXL1WBPq6Tbxqind0C+WfyAQVfJQdA7kkr
-         awoPvXZTEbf6vIdOb1TEMYNkO/pclY7atJWXifVU2QpFTFQaY0Qcd9GsVwuGko12nvAv
-         yxEJ3Rlw6ANnhkQygbz9Qa8sEXCOJQGTt5bgUMw9OEHbxyrN66gZzDlAlzZCsKKhRpwK
-         9P2A==
+        bh=7yeb9KlYqqGD/ZehSL+UaW5Mu1Sv69xuG2EIsa3T9HE=;
+        b=Uc1LIfFSDIHNQ23wMS5iHv24uVL5h9lN210nzT7FaSizPbik0nQTdA9QkYqCPBx4BG
+         lko+Fozdla4PPvEkvWF90NLY4byvoeV/wC8ea15qjAF+pqysPNTaJf5Nm6+H4mHfnsL+
+         XNruFElKeCgdQszJHWaqhOXtVXMIRglK18ueuTFOY6riRw3u6uxJLR1G1FUPiZbYctZx
+         QanAHAbVecEhPTp12dAgBCbZZx2Mpw6srdJ5MubqXxWAvMI1+Lnz7tfRQ8GryKLlCKU0
+         eZLzaQ0nGc4fqSq6nqpw0BE6XRGe29/3q+akS9bdzgVSlde1Aoqyuy/mUC/dMHZQgHAS
+         NVrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745489475; x=1746094275;
+        d=1e100.net; s=20230601; t=1745489784; x=1746094584;
         h=in-reply-to:autocrypt:from:content-language:references:cc:to
          :subject:user-agent:mime-version:date:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=fdSwYuBhxOdnqF7xkOxhz3DelClCI0K6T6vVUCDVKjQ=;
-        b=JSajZC058NbOp1AV67xvdXrcIJUF1N9jqCPDoP507EKHWxcSAicsgGrwL5+coxEqak
-         usnMxLUN75pr2lHgubACQI67NyB0Abrsgsnc7I86CXP37Ogwm3KK0geAeHdKVQBLsMdU
-         4sO02G+vz6ibjReD8cSP7jq+3aOC5mClgmFP+CvBwxw58/6IPSkRjmbs1D/WTTTjgD08
-         RBbdaKOQok52ZVuXMBKg7neKdUEYFubD1TEaTSMYHbPVm5fl/BpDv8Z6mld3GUTE8rN9
-         e/10/ppbHcxLdWB1cRQWUtPQQZhRpMQvWS1FyLngw1e/mbUGtJZT9bxP+M4j3cRVFijB
-         eFJA==
-X-Forwarded-Encrypted: i=1; AJvYcCXJC4AFjaZMq7+BfU3QZmVbMKm3yQ5ZvC/mC1qW+62DHFDlbSpd/oiccjEhFq1DIXPW1/c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YywsK+YrLPEqNouQuFGJI2CAlEVkcT60yZ2X2mUzGFg/GVuJcYD
-	qj3+4miDKlTxdLeVHt56w3lwe4aI21tKLZzkroptXO0BB6uaHeoyO+t+9IzzG3Q=
-X-Gm-Gg: ASbGnctwUPZl565RANEY1TZXWEZQp/mO2f823qS06tZwir38W6X2FNjqoXLTfbBNa9O
-	c3uivrMe3/aux1UEUOpIEy7CpzWz2SqExHnZ/hNd2fFUk+4aJ75ApZO6/GtUVCN/IJ0vkXsgyOc
-	x2XigFm2oudnEkWuwHWK4EbqCsWtOomtpQlvHEZ2yQ8fg6n109VIqq1eyCPtj6lWziqSzjkRXYh
-	7uN/rtiebgLzyailGZICg+GhgpeHwP0cItsYcXO8FoDaYe7tOwyaDo6sYaj7ICAnuhLWMSAtvzT
-	hj+ZqrFMtMLL4zX25xvve/lOjqSNcoGEv2e+dbXk2FXamsr6qXQrzoaHvZ+KHWK/M57n1IMiG6j
-	fFRAEpK7foHL7V7sLnTjp5+qjm+FUIUUK7wVDH6vF0SGGgVXGvlyrzAkX7+sHnoIbDQ==
-X-Google-Smtp-Source: AGHT+IEbbmIPPrsikvb3BTzA0vI8qHnxarVzFktNTu67SixW/XcJ61OviQ7YGJJWqIAYONft+vNyww==
-X-Received: by 2002:a17:907:7d8d:b0:ac3:4373:e8bf with SMTP id a640c23a62f3a-ace572204b7mr216108466b.10.1745489474688;
-        Thu, 24 Apr 2025 03:11:14 -0700 (PDT)
+        bh=7yeb9KlYqqGD/ZehSL+UaW5Mu1Sv69xuG2EIsa3T9HE=;
+        b=v2wA2ocLEYm5dLBsSDzU5WdwfWN5gcG2l8I6GMLHq6BZyswnFn7prN6QOTu3vr2oU/
+         1IrdjFQWq2kB6COTWhJYjqN2fjrqd1DTPXfRB4Wy17KyipAfMVhowT2IA+pVeAq1CoFB
+         u1lMwhQcn+pW1FTMNN5x0dUCV4A61u3DYa9VqsoFFLhFqKP1e2gmQU0OhrB/7iPvCyQ+
+         y53ln9tmUdfjVNilE/mo+kzAv0uTRHaRm+kOqfViw7u+KOSt4pLp3FkFD9uoVO9eiDky
+         0S6xwyKHWJzoC7enmvlBa02OGwZV5Z8Y+6Kt7IH1edWYIUHpqa8kONLwy8x0mGuZQzq3
+         ZcBw==
+X-Forwarded-Encrypted: i=1; AJvYcCWYfmVZiW7FkOuWXPqVMwcs9UuieUxeim0LOczDmlphp8L0KYzVquCcMbFLUJ5n69h6F6Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGGh6lw36iLMRecfNPhGHe9uoe+2weIhf5Msbn3LUlBtfGxM6u
+	c0ExTw6h11HvFtKw7ZUBwUL5IZ8wmivkUIcN+SsyT6QWRRnmo5qMY6PlYEEFTgQ=
+X-Gm-Gg: ASbGncsZssJ5MoX+ouPNtAzqu5RVDJr0/3o+c2kz44GmPjUGAPz9oHHyKkSQLgAEB2J
+	J2tqGXH8d8VYiVXIdPDDCSlSSu4E6G9Fuw0PqUO6Ac315PIIYk03ern/vYhqS9xtCB4fDsFtKyd
+	t6xZbDSlv1qYci7tbaXvYzVAYkEn+9E5rqiBCaex/RIBDbNCAosnn0doYJUzoMNg5UbwBQkSGss
+	SIAowtSnjQV5sfq0JO7PWJn92JyMrqOendoamM2SKDZ1y4sksH7Z0EW1FizNf1z/exo6kuGfLQx
+	d2u3dzBdpKO5Tn8MmbjSDMedPbcyWOdNwrQBLYSAKMs5ZTPoAFjutxrLKFrd+tE+V+JzMPv+sDK
+	pUpz9mw/DRvL0uvHAvQtaJti7qCCndhtbKleO8AoYBTPSEjAZWcwYxcRUE7C5HDuKwA==
+X-Google-Smtp-Source: AGHT+IEm0tqe1Y6NrZYwZAPw8mP7gfJu/rS857Ou/Nw00s8avdEvZrPp9A2s5JSOi+lWLJhyNrhoNw==
+X-Received: by 2002:a17:907:3f9e:b0:aca:d4f6:440d with SMTP id a640c23a62f3a-ace5723afaemr234662066b.17.1745489783619;
+        Thu, 24 Apr 2025 03:16:23 -0700 (PDT)
 Received: from ?IPV6:2003:e5:870f:e000:6c64:75fd:2c51:3fef? (p200300e5870fe0006c6475fd2c513fef.dip0.t-ipconnect.de. [2003:e5:870f:e000:6c64:75fd:2c51:3fef])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ace59897e30sm83112766b.44.2025.04.24.03.11.13
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ace59c5e9ccsm85183966b.178.2025.04.24.03.16.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Apr 2025 03:11:14 -0700 (PDT)
-Message-ID: <7c7de4be-e8d0-45b9-9212-186d79e95512@suse.com>
-Date: Thu, 24 Apr 2025 12:11:12 +0200
+        Thu, 24 Apr 2025 03:16:23 -0700 (PDT)
+Message-ID: <054eec5c-1f36-454b-9220-b7f975d2717b@suse.com>
+Date: Thu, 24 Apr 2025 12:16:21 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,8 +82,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 13/34] x86/xen/msr: Remove the error pointer
- argument from set_reg()
+Subject: Re: [RFC PATCH v2 14/34] x86/msr: refactor
+ pv_cpu_ops.write_msr{_safe}()
 To: "Xin Li (Intel)" <xin@zytor.com>, linux-kernel@vger.kernel.org,
  kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
  linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
@@ -102,7 +102,7 @@ Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
  luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
  haiyangz@microsoft.com, decui@microsoft.com
 References: <20250422082216.1954310-1-xin@zytor.com>
- <20250422082216.1954310-14-xin@zytor.com>
+ <20250422082216.1954310-15-xin@zytor.com>
 Content-Language: en-US
 From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
 Autocrypt: addr=jgross@suse.com; keydata=
@@ -128,14 +128,14 @@ Autocrypt: addr=jgross@suse.com; keydata=
  HwB2BHdIAkYce3hEoDQXt/mKlgEGsLpzJcnLKimtPXQQy9TxUaLBe9PInPd+Ohix0XOlY+Uk
  QFEx50Ki3rSDl2Zt2tnkNYKUCvTJq7jvOlaPd6d/W0tZqpyy7KVay+K4aMobDsodB3dvEAs6
  ScCnh03dDAFgIq5nsB11j3KPKdVoPlfucX2c7kGNH+LUMbzqV6beIENfNexkOfxHfw==
-In-Reply-To: <20250422082216.1954310-14-xin@zytor.com>
+In-Reply-To: <20250422082216.1954310-15-xin@zytor.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="------------S0T23vorp0xJmxsOKDfgVss5"
+ boundary="------------pWVoNv7WLwVBgb4mHgM007fn"
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------S0T23vorp0xJmxsOKDfgVss5
-Content-Type: multipart/mixed; boundary="------------e7SX2BGON4oOR8X6gtLTAdYZ";
+--------------pWVoNv7WLwVBgb4mHgM007fn
+Content-Type: multipart/mixed; boundary="------------b3S9hpqWlrcvhJkKaKAw7Czp";
  protected-headers="v1"
 From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
 To: "Xin Li (Intel)" <xin@zytor.com>, linux-kernel@vger.kernel.org,
@@ -155,32 +155,58 @@ Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
  pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
  luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
  haiyangz@microsoft.com, decui@microsoft.com
-Message-ID: <7c7de4be-e8d0-45b9-9212-186d79e95512@suse.com>
-Subject: Re: [RFC PATCH v2 13/34] x86/xen/msr: Remove the error pointer
- argument from set_reg()
+Message-ID: <054eec5c-1f36-454b-9220-b7f975d2717b@suse.com>
+Subject: Re: [RFC PATCH v2 14/34] x86/msr: refactor
+ pv_cpu_ops.write_msr{_safe}()
 References: <20250422082216.1954310-1-xin@zytor.com>
- <20250422082216.1954310-14-xin@zytor.com>
-In-Reply-To: <20250422082216.1954310-14-xin@zytor.com>
+ <20250422082216.1954310-15-xin@zytor.com>
+In-Reply-To: <20250422082216.1954310-15-xin@zytor.com>
 
---------------e7SX2BGON4oOR8X6gtLTAdYZ
-Content-Type: multipart/mixed; boundary="------------8yUdmrKCo5lfdOTdqXAp6QOj"
+--------------b3S9hpqWlrcvhJkKaKAw7Czp
+Content-Type: multipart/mixed; boundary="------------BppMQx0iku6Wc7Pk9I10DjXt"
 
---------------8yUdmrKCo5lfdOTdqXAp6QOj
+--------------BppMQx0iku6Wc7Pk9I10DjXt
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: base64
 
-T24gMjIuMDQuMjUgMTA6MjEsIFhpbiBMaSAoSW50ZWwpIHdyb3RlOg0KPiBzZXRfcmVnKCkg
-aXMgdXNlZCB0byB3cml0ZSB0aGUgZm9sbG93aW5nIE1TUnMgb24gWGVuOg0KPiANCj4gICAg
-ICBNU1JfRlNfQkFTRQ0KPiAgICAgIE1TUl9LRVJORUxfR1NfQkFTRQ0KPiAgICAgIE1TUl9H
-U19CQVNFDQo+IA0KPiBCdXQgbm9uZSBvZiB0aGVzZSBNU1JzIGFyZSB3cml0dGVuIHVzaW5n
-IGFueSBNU1Igd3JpdGUgc2FmZSBBUEkuDQo+IFRoZXJlZm9yZSB0aGVyZSBpcyBubyBuZWVk
-IHRvIHBhc3MgYW4gZXJyb3IgcG9pbnRlciBhcmd1bWVudCB0bw0KPiBzZXRfcmVnKCkgZm9y
-IHJldHVybmluZyBhbiBlcnJvciBjb2RlIHRvIGJlIHVzZWQgaW4gTVNSIHNhZmUgQVBJcy4N
-Cg0Kc2V0X3NlZygpLCBwbGVhc2UgKGZ1cnRoZXIgdXAsIHRvbykuDQoNCj4gDQo+IFJlbW92
-ZSB0aGUgZXJyb3IgcG9pbnRlciBhcmd1bWVudC4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IFhp
-biBMaSAoSW50ZWwpIDx4aW5Aenl0b3IuY29tPg0KDQpSZXZpZXdlZC1ieTogSnVlcmdlbiBH
-cm9zcyA8amdyb3NzQHN1c2UuY29tPg0KDQoNCkp1ZXJnZW4NCg==
---------------8yUdmrKCo5lfdOTdqXAp6QOj
+T24gMjIuMDQuMjUgMTA6MjEsIFhpbiBMaSAoSW50ZWwpIHdyb3RlOg0KPiBBbiBNU1IgdmFs
+dWUgaXMgcmVwcmVzZW50ZWQgYXMgYSA2NC1iaXQgdW5zaWduZWQgaW50ZWdlciwgd2l0aCBl
+eGlzdGluZw0KPiBNU1IgaW5zdHJ1Y3Rpb25zIHN0b3JpbmcgaXQgaW4gRURYOkVBWCBhcyB0
+d28gMzItYml0IHNlZ21lbnRzLg0KPiANCj4gVGhlIG5ldyBpbW1lZGlhdGUgZm9ybSBNU1Ig
+aW5zdHJ1Y3Rpb25zLCBob3dldmVyLCB1dGlsaXplIGEgNjQtYml0DQo+IGdlbmVyYWwtcHVy
+cG9zZSByZWdpc3RlciB0byBzdG9yZSB0aGUgTVNSIHZhbHVlLiAgVG8gdW5pZnkgdGhlIHVz
+YWdlIG9mDQo+IGFsbCBNU1IgaW5zdHJ1Y3Rpb25zLCBsZXQgdGhlIGRlZmF1bHQgTVNSIGFj
+Y2VzcyBBUElzIGFjY2VwdCBhbiBNU1INCj4gdmFsdWUgYXMgYSBzaW5nbGUgNjQtYml0IGFy
+Z3VtZW50IGluc3RlYWQgb2YgdHdvIDMyLWJpdCBzZWdtZW50cy4NCj4gDQo+IFRoZSBkdWFs
+IDMyLWJpdCBBUElzIGFyZSBzdGlsbCBhdmFpbGFibGUgYXMgY29udmVuaWVudCB3cmFwcGVy
+cyBvdmVyIHRoZQ0KPiBBUElzIHRoYXQgaGFuZGxlIGFuIE1TUiB2YWx1ZSBhcyBhIHNpbmds
+ZSA2NC1iaXQgYXJndW1lbnQuDQo+IA0KPiBUaGUgZm9sbG93aW5nIGlsbHVzdHJhdGVzIHRo
+ZSB1cGRhdGVkIGRlcml2YXRpb24gb2YgdGhlIE1TUiB3cml0ZSBBUElzOg0KPiANCj4gICAg
+ICAgICAgICAgICAgICAgX193cm1zcnEodTMyIG1zciwgdTY0IHZhbCkNCj4gICAgICAgICAg
+ICAgICAgICAgICAvICAgICAgICAgICAgICAgICAgXA0KPiAgICAgICAgICAgICAgICAgICAg
+LyAgICAgICAgICAgICAgICAgICAgXA0KPiAgICAgICAgICAgICBuYXRpdmVfd3Jtc3JxKG1z
+ciwgdmFsKSAgICBuYXRpdmVfd3Jtc3IobXNyLCBsb3csIGhpZ2gpDQo+ICAgICAgICAgICAg
+ICAgICAgIHwNCj4gICAgICAgICAgICAgICAgICAgfA0KPiAgICAgICAgICAgICBuYXRpdmVf
+d3JpdGVfbXNyKG1zciwgdmFsKQ0KPiAgICAgICAgICAgICAgICAgIC8gICAgICAgICAgXA0K
+PiAgICAgICAgICAgICAgICAgLyAgICAgICAgICAgIFwNCj4gICAgICAgICB3cm1zcnEobXNy
+LCB2YWwpICAgIHdybXNyKG1zciwgbG93LCBoaWdoKQ0KPiANCj4gV2hlbiBDT05GSUdfUEFS
+QVZJUlQgaXMgZW5hYmxlZCwgd3Jtc3JxKCkgYW5kIHdybXNyKCkgYXJlIGRlZmluZWQgb24g
+dG9wDQo+IG9mIHBhcmF2aXJ0X3dyaXRlX21zcigpOg0KPiANCj4gICAgICAgICAgICAgIHBh
+cmF2aXJ0X3dyaXRlX21zcih1MzIgbXNyLCB1NjQgdmFsKQ0KPiAgICAgICAgICAgICAgICAg
+LyAgICAgICAgICAgICBcDQo+ICAgICAgICAgICAgICAgIC8gICAgICAgICAgICAgICBcDQo+
+ICAgICAgICAgICAgd3Jtc3JxKG1zciwgdmFsKSAgICB3cm1zcihtc3IsIGxvdywgaGlnaCkN
+Cj4gDQo+IHBhcmF2aXJ0X3dyaXRlX21zcigpIGludm9rZXMgY3B1LndyaXRlX21zcihtc3Is
+IHZhbCksIGFuIGluZGlyZWN0IGxheWVyDQo+IG9mIHB2X29wcyBNU1Igd3JpdGUgY2FsbDoN
+Cj4gDQo+ICAgICAgSWYgb24gbmF0aXZlOg0KPiANCj4gICAgICAgICAgICAgIGNwdS53cml0
+ZV9tc3IgPSBuYXRpdmVfd3JpdGVfbXNyDQo+IA0KPiAgICAgIElmIG9uIFhlbjoNCj4gDQo+
+ICAgICAgICAgICAgICBjcHUud3JpdGVfbXNyID0geGVuX3dyaXRlX21zcg0KPiANCj4gVGhl
+cmVmb3JlLCByZWZhY3RvciBwdl9jcHVfb3BzLndyaXRlX21zcntfc2FmZX0oKSB0byBhY2Nl
+cHQgYW4gTVNSIHZhbHVlDQo+IGluIGEgc2luZ2xlIHU2NCBhcmd1bWVudCwgcmVwbGFjaW5n
+IHRoZSBjdXJyZW50IGR1YWwgdTMyIGFyZ3VtZW50cy4NCj4gDQo+IE5vIGZ1bmN0aW9uYWwg
+Y2hhbmdlIGludGVuZGVkLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogWGluIExpIChJbnRlbCkg
+PHhpbkB6eXRvci5jb20+DQoNClJldmlld2VkLWJ5OiBKdWVyZ2VuIEdyb3NzIDxqZ3Jvc3NA
+c3VzZS5jb20+DQoNCg0KSnVlcmdlbg0K
+--------------BppMQx0iku6Wc7Pk9I10DjXt
 Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
 Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
 Content-Description: OpenPGP public key
@@ -247,25 +273,25 @@ kt+z4drzFUyEjLM1vVvIMjkUoJs=3D
 =3DeeAB
 -----END PGP PUBLIC KEY BLOCK-----
 
---------------8yUdmrKCo5lfdOTdqXAp6QOj--
+--------------BppMQx0iku6Wc7Pk9I10DjXt--
 
---------------e7SX2BGON4oOR8X6gtLTAdYZ--
+--------------b3S9hpqWlrcvhJkKaKAw7Czp--
 
---------------S0T23vorp0xJmxsOKDfgVss5
+--------------pWVoNv7WLwVBgb4mHgM007fn
 Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmgKDkAFAwAAAAAACgkQsN6d1ii/Ey8n
-iAf/Q6AJZFMakTRIVTgS05wIOPuMydvp8L3b0MHg2v83cNkEIg7troXAv1WpNireLBumlMqQPsna
-E7/sncIbwOKkbZ2HKMnSFRDvYBp08xO7ZVbM8lGRYaJ/1vx3pvkls9dvrK3kQiKeLIN2j6+cCKXV
-uPsdSv++pBdBiHP+4jqnP1xus8szgWgbgxb6MrFbo/5sqMGIKVn0RggRKVSI74Bk3ohbrhKbkPSd
-RmqEioBJsYwKvBLXcwVeDsT5mMAnoPh4J0s1i0qH4xeF/07FSclbHljXeLQ+CCmK0BrOuG/CIwuL
-g9vlmHLxYyJ+Fkhk0Ebh1uIdY+8KGzFGtrSV+tRLyQ==
-=TDhx
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmgKD3UFAwAAAAAACgkQsN6d1ii/Ey8e
+hQf+IyaGfaANfYLf1gQb5JWLRkUgyz/njZG+UwVqy+rsaIYD+pEhdKw5SCCnD0k0rYwGX+humDna
+09S/SBtqSMJ6op9sp+0UMcix59tVByTG+d8H/RBLf2IWAPI0XKU6b3m310+4u3nyopkvf/rjeJWt
+SfFxXPA+0soMqiPgLiqLfQOcImvL7By/Ic4k7iCcQ8r2tUX4e49qE7Ceu6m2OhnWo7gegbiK3g3a
+o5e9jvL464VbQ0jA76OH8KY4kcOV8y0TQXP2dC3WWvN7O1iNoEL9KIIg3/K4iTHOY10ayy/UVXOd
+NK1TCl85M2LuLTmu8q4pp9E3JwXRobXErwdZe+JYvQ==
+=xegw
 -----END PGP SIGNATURE-----
 
---------------S0T23vorp0xJmxsOKDfgVss5--
+--------------pWVoNv7WLwVBgb4mHgM007fn--
 
