@@ -1,86 +1,54 @@
-Return-Path: <kvm+bounces-44218-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44219-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 222F2A9B587
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 19:39:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C2D7A9B5BC
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 19:51:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5500B4A628F
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 17:39:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7B153BE396
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 17:51:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FF9828E5E1;
-	Thu, 24 Apr 2025 17:38:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C62628F50B;
+	Thu, 24 Apr 2025 17:51:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EmtN6D7r"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="Qmcxq/0p"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D11C2288C90
-	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 17:38:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 501E8214226;
+	Thu, 24 Apr 2025 17:51:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745516308; cv=none; b=UdUqHVZ2/vey/D3/jssHVwWHvZZ6FQwOcQ+3C/Ip0UdNxHAzwaNyiwmRuke9dp2+KfYlRVXANSfGgcLdeXTbt06dWSSVJlP0dyUImN3LMESAB2rZICJqHTi+vHBl/0oCrM7hvWU9ox4otnP/O6nF0n8zcjheyerXWz32ig5JlbE=
+	t=1745517083; cv=none; b=KuTkVq6JKBpykfoDfi9+iwQ+s3A/lZFodBAg5rkqYw3SSDuFspcejTVK2yiI4HfA5ZP40P5nojl+I/QqQ1/Xs/4/09aZMQXV2gZlCmMAjSTktdXnA07qxS0a/zIUVwRz1Z56WaM+KTwM+Nwi18mPplffhzh6oKzAzlrZWRowce0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745516308; c=relaxed/simple;
-	bh=+3qGCQZl/U0MkFm/X6EpDwwucSxPvMb3L7QjZX6gyww=;
+	s=arc-20240116; t=1745517083; c=relaxed/simple;
+	bh=gvbYniVbuVocg2kp9+4ascSzdv/YlycfcP4FMoMbya4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p0eI47cRahi/EFdIxWr+FrVgGnHekxnKuoz3BT5ccg29LOyP1PFIFznPc7HieP0y6451TIPJ/gYsIM8F82ZxkTH7LxxNrXt6kHJEBcmdwrR/q01RRC2mpW+UZO6V5gNweipeSv6gQSdso02yzicl7Qia25+DiemhnUUtR9uaFrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EmtN6D7r; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745516305;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=M6iPlq0+lPq47ekL78NC2y1kZ/SereiKHjDQ5zOpW38=;
-	b=EmtN6D7r6qRve19fzndwv1QRoLJCC+mNVJcvlr++59DqT/MJDBvPU/S9qntx9ses+cJg+6
-	v+oGLCe5vOZqRlOhVZ6tPZZ09QbtdkqLbt7dJSqPciv/FVw0GH/zAlxUei6dWVxNMorRCi
-	YzkxAvsQVEFmGCdpyx9Z+Ilc6JTeLf0=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-443-jkK183CbMwGpTVDGjyOgvg-1; Thu, 24 Apr 2025 13:38:24 -0400
-X-MC-Unique: jkK183CbMwGpTVDGjyOgvg-1
-X-Mimecast-MFC-AGG-ID: jkK183CbMwGpTVDGjyOgvg_1745516303
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43ceb011ea5so8264665e9.2
-        for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 10:38:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745516303; x=1746121103;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=M6iPlq0+lPq47ekL78NC2y1kZ/SereiKHjDQ5zOpW38=;
-        b=NdXBG1RqcDkaYNceZr+pbbVkr/V2WfnnymeDq1Z5g1Nr0qvooQhdQF0v9O11wNLRNE
-         FZnye2LPDUs6lOAuHKQgDolBQA7UFI3Dp0jP1Jfb5Nc2lw05mIZB3nVW5TcYE8WY50Rz
-         yBU7ih2R7R6TZ000FApnn//JOh3HptN86nyG8L2kmY5Mgt3TD5nJJtbD5J0uYGw7ySj7
-         xJCoZFhuvQ2J4HYvGw1rKfhSJTTcwXckCNJjYP5E276XhK3k9nXmu/Wy4QYEyh9e8BiE
-         im8pG0FeZhO5O/vUOh+nYf5W59H1JfCI796HnY5WIC+2mKjvFAJihRZtw4vd9njzkrB7
-         IQhg==
-X-Gm-Message-State: AOJu0YyCGb3qJx4/r3XojVm51dQbbRWr5YqOt9YFHXw872IoVep4oAF5
-	IhGlbjUl7PtQUfzrv3pL+omD7ksVZIqdg9q49VZ1Z4evVdmv+2eBhdx1f9pfF/6gCXW3YykfLWN
-	VURkT6PvD2Uz3nijfqPe2vDsxIOoi/Hcv6D0wd30ntTUWUITkJw==
-X-Gm-Gg: ASbGncutv3Pf7g79tBZ1RmN93gWfjG0269KzB7aM1D+UaaexmogCoK361eIqXJxFgsx
-	zAXE/pOJFyYB/rT6wCLmUnMxuk4PEySlKuZWLgfAOhgb4MtIG5NqKMAky63mO7frvUQje7zmh8g
-	2MlO/J3joBtJM5cWdFATtVRZ3J0yyrbBCfEmMpkpUDVrePfFURINBc1+0mYRakl6HuYANyNSUqY
-	olHlKy99xJj/erhAA9EyyfbtBXb2euw/rxwJWQvp1mXp5rYza62gKBpRMrfkvBLx/cuLpU8fFc/
-	8uXUD3HHS/40
-X-Received: by 2002:a5d:47cd:0:b0:391:2fe3:24ec with SMTP id ffacd0b85a97d-3a072a85d1emr194606f8f.14.1745516303022;
-        Thu, 24 Apr 2025 10:38:23 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG5D2IdhVkkhzZ2u4E9jNLM9y6rqvZsJQWcjcm75UgkS2t3YqrF/hXRwT+JfZpueEpjqert+g==
-X-Received: by 2002:a5d:47cd:0:b0:391:2fe3:24ec with SMTP id ffacd0b85a97d-3a072a85d1emr194592f8f.14.1745516302620;
-        Thu, 24 Apr 2025 10:38:22 -0700 (PDT)
-Received: from [192.168.1.84] ([93.56.161.39])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3a06d4a804fsm2858556f8f.10.2025.04.24.10.38.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Apr 2025 10:38:22 -0700 (PDT)
-Message-ID: <df3b44a7-70b8-4952-a7d7-231e69c8d3eb@redhat.com>
-Date: Thu, 24 Apr 2025 19:38:21 +0200
+	 In-Reply-To:Content-Type; b=uTlPznozpSVQjTnG8cVpKI4wNHFkJy6+udEdqBz0ZJuHdVY4t1OYsXBCYSf9eg0rJHlDfTiSkEoLK1AqxNPQhcT/YrOn7gOCx/FmRnUdPu5Co/sL2OxZpu8TrKr5M/nQnSHq9tTxmTPgJf1YqhJgut/C75N3FwziPQZnLYuGX4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=Qmcxq/0p; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.202] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53OHo0ch1382184
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Thu, 24 Apr 2025 10:50:01 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53OHo0ch1382184
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025042001; t=1745517004;
+	bh=s//FslW+O7Kn/IezyVBmG0EeFGCYGlqoMCN23p8kepQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Qmcxq/0pRXzN/V+n0zvhvv/OoLvqqvKKiVDhNOGC1sz6osmqDDUYrR+tqqy3ga/u7
+	 JZpvT18GGm7u7JMxdWjZSYChBiJHXKChUd2j3U39ORZs5MDVb4G7VtVtmZRcbpeLMt
+	 m3iEcT7ggWGzwceuQ2WNjjW5bkmHSlTac6xC2kFMvWFQzV9xA4ABxyzXK56cpGvVXB
+	 Z2GE+XuHwAbGxdx+vxfyvWePtTx/85Pa22tSKDMjJILyluCkPpeG0HBau04zqCZjI0
+	 PP1ixyRBjfPn514E7EZwguUuURA8RzDzTFyQbM8I27ftfQ+nYl+1piEjuJAyk3NecS
+	 iN/TMRiJOd+JA==
+Message-ID: <ca088501-2fbe-4a32-b191-04f7be6a2713@zytor.com>
+Date: Thu, 24 Apr 2025 10:49:59 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,84 +56,76 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: linux-next: build failure after merge of the kvm-fixes tree
-To: Sean Christopherson <seanjc@google.com>,
- Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: KVM <kvm@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Next Mailing List <linux-next@vger.kernel.org>
-References: <20250422124310.2e9aee0d@canb.auug.org.au>
- <20250422173341.0901ebaf@canb.auug.org.au> <aAeg8A7DMvTAjqVO@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [RFC PATCH v2 12/34] x86/msr: Remove pmu_msr_{read,write}()
+To: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        virtualization@lists.linux.dev, linux-pm@vger.kernel.org,
+        linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org,
+        linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org,
+        netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        acme@kernel.org, andrew.cooper3@citrix.com, peterz@infradead.org,
+        namhyung@kernel.org, mark.rutland@arm.com,
+        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
+        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
+        wei.liu@kernel.org, ajay.kaher@broadcom.com,
+        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
+        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
+        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
+        haiyangz@microsoft.com, decui@microsoft.com
+References: <20250422082216.1954310-1-xin@zytor.com>
+ <20250422082216.1954310-13-xin@zytor.com>
+ <8944b510-6d70-472c-99a2-52a60517733d@suse.com>
 Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <aAeg8A7DMvTAjqVO@google.com>
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <8944b510-6d70-472c-99a2-52a60517733d@suse.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 4/22/25 16:00, Sean Christopherson wrote:
-> On Tue, Apr 22, 2025, Stephen Rothwell wrote:
->> Hi all,
->>
->> On Tue, 22 Apr 2025 12:43:10 +1000 Stephen Rothwell <sfr@canb.auug.org.au> wrote:
->>>
->>> After merging the kvm-fixes tree, today's linux-next build (x86_64
->>> allmodconfig) failed like this:
->>>
->>> ERROR: modpost: "kvm_arch_has_irq_bypass" [arch/x86/kvm/kvm-amd.ko] undefined!
->>>
->>> Caused by commit
->>>
->>>    73e0c567c24a ("KVM: SVM: Don't update IRTEs if APICv/AVIC is disabled")
->>>
->>> I have used the kvm-fixes tree from next-20250417 for today.
->>
->> I also had to use the kvm tree from next-20250417.
+On 4/24/2025 3:05 AM, Jürgen Groß wrote:
 > 
-> It's a known issue[*], just waiting on Paolo to resurface.  :-/
+> May I suggest to get rid of the "emul" parameter of pmu_msr_chk_emulated()?
+> It has no real value, as pmu_msr_chk_emulated() could easily return 
+> false in
+> the cases where it would set *emul to false.
 
-*bubbles noise*
+Good idea!
 
-Done, pushed to kvm/master and will resend the PR to Linus as soon as 
-Stephen updates linux-next.
-
-Paolo
-
-> [*] https://lore.kernel.org/all/20250418171609.231588-1-pbonzini@redhat.com
-> 
-
+The function type is a bit of weird but I didn't think of change it.
 
