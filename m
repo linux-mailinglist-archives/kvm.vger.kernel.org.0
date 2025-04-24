@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-44046-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44047-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 470D6A99F5F
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 05:10:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FED7A99F62
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 05:11:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D172D3A4C84
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 03:10:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B02F3B06E9
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 03:10:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 528631A0BFD;
-	Thu, 24 Apr 2025 03:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 482171AAE2E;
+	Thu, 24 Apr 2025 03:10:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Mo9dpWki"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z4OycyqF"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8F6E1A7AF7;
-	Thu, 24 Apr 2025 03:10:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DB591A7AF7;
+	Thu, 24 Apr 2025 03:10:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745464210; cv=none; b=LcOZE8QFWvSu1umpCZE7OWv+UppK1LUHoJHDf9Feiou+SqRHWNGS4UWGAVAV41d0JzGsyNMnTZJx9q6kWf3COmWxYNazBdi1M7EOBtjxdXGcj+H06lXgMCo4OaLrdx8TqLPsan2cUV3RSHrHDvzo6fCsNL06QAhpmnWv+SZLPME=
+	t=1745464224; cv=none; b=pTCjFQqofw1mMByT67ybiFzxnUjROxhSrVq2+XkgBG95g55IsJO/f2u61xPubnxSOp5Te/unQVs77ZHcQ8mERBki2GaBXXxKoq9u6iszCea6BJmc+dYnoOPULXLj4e+ukyxFVAIYfKXKuJJ9ppIHZNYNP7sTrhUw3TjZuPwmDcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745464210; c=relaxed/simple;
-	bh=zFnyPwzoJYit0t/0dszQ5iB4piLEtR7Lb01bHjsRmB8=;
+	s=arc-20240116; t=1745464224; c=relaxed/simple;
+	bh=qk/fSOpi4sXPyeZrVbdyvuUmugkNkiPMIYQeoVSNvEA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tfGR0bCpkswM8cayaV5+xocPAhNOn9D47vHxgT2h5EEMDDBKsYOj9X8jIEg0apY0SJx8ogi6fG0mBSzbVyxSSt5aDxHX0U5KPvs/b+C48wloHlkqgbFop/1qN03hshwaPIkk6+dxSeAd75tkXi2BP6EmT1XSEJhpIxdlKprOkxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Mo9dpWki; arc=none smtp.client-ip=198.175.65.17
+	 MIME-Version; b=smSHiSqHWaibNHK7zqRcAbXI78wkjKsdKIvNVYmnLPc0Qd5DzgcMgYl7zWOhSy38Wvv+SgL8dQJIb5wJLBm/0hmPIrKL2AQOKu+T5He4oZ7MRD5Lsw3/QWiufvLkY5TwniT6MeNjXprqRCi6tCTf7ARKlgpudzkyzv2iNK7XGt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z4OycyqF; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745464209; x=1777000209;
+  t=1745464222; x=1777000222;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=zFnyPwzoJYit0t/0dszQ5iB4piLEtR7Lb01bHjsRmB8=;
-  b=Mo9dpWkiAE+dWh+Q2pqfaXy76WN9jd9X/3KNk+SPwZEIE99F92NSQjb4
-   E8fUbpp64+S2woIQHkAFNbo9I63U8geKdnD2jzk6ZSVCzNPJ0mMAe0uXT
-   gZ+r3mkQ03ALyJ0+gzpSIrzUhM/d7TBKIc/XYAzAD4w/by3HzMHssWexQ
-   7xM/d9gf9ewsiosJDjk2Ls2c5Q/ficgw4/nUTUwcEI817REusjiBO+QPY
-   C1QvwIBZoNFBOAJxsZqir1MZQ7YHrT7W4/taq045cCuhtC91xbB6naJCc
-   y6FshpgAjD1aDSmkAUDtUIKuhx/ouZ8uTjShCwRHxhFURFO2Od+4LGHCQ
+  bh=qk/fSOpi4sXPyeZrVbdyvuUmugkNkiPMIYQeoVSNvEA=;
+  b=Z4OycyqF4fFh81z7WJava12qFusHDQ8RWVHmmIxa1Ag3DA/N8MvhWUBs
+   hjtZWzYVwuFtFCLJ6GInnPUifQZ/QDDz5ky1XOYfHT29S+nWCYnY1FUea
+   /MsCE1BGJHvXul4QDCcwghk0CubNLf63KT3g3rrQeAqsbAAkox8NX6DcL
+   yD3wUwIk8Kz5aGC5JazT/N8YBFR9OXM0zZJp75NBn28oCZxSuqLIy/LN4
+   GY7gsAo3pEZCqQIFR9a0VoKPsusSpZ4ENFtCE0H0kvgoGscPFr71k8NIk
+   7yF8/Nrj9CpGVByZJDnPw5i+3TuxdECQMGVVx80s1kR56jC+f9MXQOetw
    Q==;
-X-CSE-ConnectionGUID: eTleJ/sjSQyip5fTH/5IzQ==
-X-CSE-MsgGUID: 8VfeT0bwTd+xDal13n7LQw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11412"; a="47094573"
+X-CSE-ConnectionGUID: xNu1PJPHR0OgnUdGZ3mTOQ==
+X-CSE-MsgGUID: 4JBe1ssmTWqINqTe/4+oFg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11412"; a="47094595"
 X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
-   d="scan'208";a="47094573"
+   d="scan'208";a="47094595"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 20:10:08 -0700
-X-CSE-ConnectionGUID: vM1tSbwKR/2THgoiFeulkg==
-X-CSE-MsgGUID: 3p5fTlWnTEeNOHyae2cQeQ==
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 20:10:22 -0700
+X-CSE-ConnectionGUID: ItOqydL4QkmjprsHQDQUIw==
+X-CSE-MsgGUID: KcNI2OtbSvm7nkKajY5ROw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
-   d="scan'208";a="132332111"
+   d="scan'208";a="132332131"
 Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 20:10:02 -0700
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 20:10:16 -0700
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com
@@ -86,9 +86,9 @@ Cc: linux-kernel@vger.kernel.org,
 	binbin.wu@linux.intel.com,
 	chao.p.peng@intel.com,
 	Yan Zhao <yan.y.zhao@intel.com>
-Subject: [RFC PATCH 16/21] KVM: x86/mmu: Introduce kvm_split_boundary_leafs() to split boundary leafs
-Date: Thu, 24 Apr 2025 11:08:16 +0800
-Message-ID: <20250424030816.470-1-yan.y.zhao@intel.com>
+Subject: [RFC PATCH 17/21] KVM: Change the return type of gfn_handler_t() from bool to int
+Date: Thu, 24 Apr 2025 11:08:29 +0800
+Message-ID: <20250424030829.486-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20250424030033.32635-1-yan.y.zhao@intel.com>
 References: <20250424030033.32635-1-yan.y.zhao@intel.com>
@@ -100,242 +100,313 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce kvm_split_boundary_leafs() to manage the splitting of boundary
-leafs within the mirror root.
+Modify the return type of gfn_handler_t() from bool to int. A negative
+return value indicates failure, while a return value of 1 signifies success
+with a flush required, and 0 denotes success without a flush required.
 
-Before zapping a specific GFN range in the mirror root, split any huge leaf
-that intersects with the boundary of the GFN range to ensure that the
-subsequent zap operation does not impact any GFN outside the specified
-range. This is crucial for the mirror root as the private page table
-requires the guest's ACCEPT operation after faulting back a GFN.
+This adjustment prepares for a future change that will enable
+kvm_pre_set_memory_attributes() to fail.
 
-This function should be called while kvm->mmu_lock is held for writing. The
-kvm->mmu_lock is temporarily released to allocate memory for sp for split.
-The only expected error is -ENOMEM.
+No functional changes expected.
 
-Opportunistically, WARN in tdp_mmu_zap_leafs() if zapping a huge leaf in
-the mirror root affects a GFN outside the specified range.
-
-Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
- arch/x86/kvm/mmu/mmu.c     |  21 +++++++
- arch/x86/kvm/mmu/tdp_mmu.c | 116 ++++++++++++++++++++++++++++++++++++-
- arch/x86/kvm/mmu/tdp_mmu.h |   1 +
- include/linux/kvm_host.h   |   1 +
- 4 files changed, 136 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/mmu.c             |  4 ++--
+ arch/loongarch/kvm/mmu.c         |  4 ++--
+ arch/mips/kvm/mmu.c              |  4 ++--
+ arch/powerpc/kvm/book3s.c        |  4 ++--
+ arch/powerpc/kvm/e500_mmu_host.c |  4 ++--
+ arch/riscv/kvm/mmu.c             |  4 ++--
+ arch/x86/kvm/mmu/mmu.c           | 12 ++++++------
+ include/linux/kvm_host.h         | 12 ++++++------
+ virt/kvm/kvm_main.c              | 25 ++++++++++++++++---------
+ 9 files changed, 40 insertions(+), 33 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 0e227199d73e..0d49c69b6b55 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1640,6 +1640,27 @@ static bool __kvm_rmap_zap_gfn_range(struct kvm *kvm,
- 				 start, end - 1, can_yield, true, flush);
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 754f2fe0cc67..4bd8f61e9319 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1973,7 +1973,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	return false;
  }
  
-+/*
-+ * Split large leafs at the boundary of the specified range for the mirror root
-+ *
-+ * Return value:
-+ * 0 : success, no flush is required;
-+ * 1 : success, flush is required;
-+ * <0: failure.
-+ */
-+int kvm_split_boundary_leafs(struct kvm *kvm, struct kvm_gfn_range *range)
-+{
-+	bool ret = 0;
-+
-+	lockdep_assert_once(kvm->mmu_invalidate_in_progress ||
-+			    lockdep_is_held(&kvm->slots_lock));
-+
-+	if (tdp_mmu_enabled)
-+		ret = kvm_tdp_mmu_gfn_range_split_boundary(kvm, range);
-+
-+	return ret;
-+}
-+
- bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+-bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
  {
- 	bool flush = false;
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 0f683753a7bb..d3fba5d11ea2 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -324,6 +324,8 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
- 				u64 old_spte, u64 new_spte, int level,
- 				bool shared);
+ 	u64 size = (range->end - range->start) << PAGE_SHIFT;
  
-+static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
-+				   struct kvm_mmu_page *sp, bool shared);
- static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(bool mirror);
- static void *get_external_spt(gfn_t gfn, u64 new_spte, int level);
+@@ -1989,7 +1989,7 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	 */
+ }
  
-@@ -962,6 +964,19 @@ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+-bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	u64 size = (range->end - range->start) << PAGE_SHIFT;
+ 
+diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
+index 4d203294767c..5e97fee941b9 100644
+--- a/arch/loongarch/kvm/mmu.c
++++ b/arch/loongarch/kvm/mmu.c
+@@ -511,7 +511,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ 			range->end << PAGE_SHIFT, &ctx);
+ }
+ 
+-bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	kvm_ptw_ctx ctx;
+ 
+@@ -523,7 +523,7 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 				range->end << PAGE_SHIFT, &ctx);
+ }
+ 
+-bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	gpa_t gpa = range->start << PAGE_SHIFT;
+ 	kvm_pte_t *ptep = kvm_populate_gpa(kvm, NULL, gpa, 0);
+diff --git a/arch/mips/kvm/mmu.c b/arch/mips/kvm/mmu.c
+index d2c3b6b41f18..2df3a53e23e9 100644
+--- a/arch/mips/kvm/mmu.c
++++ b/arch/mips/kvm/mmu.c
+@@ -444,12 +444,12 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
  	return true;
  }
  
-+static inline bool iter_split_required(struct kvm *kvm, struct kvm_mmu_page *root,
-+				       struct tdp_iter *iter, gfn_t start, gfn_t end)
-+{
-+	if (!is_mirror_sp(root) || !is_large_pte(iter->old_spte))
-+		return false;
-+
-+	/* Fully contained, no need to split */
-+	if (iter->gfn >= start && iter->gfn + KVM_PAGES_PER_HPAGE(iter->level) <= end)
-+		return false;
-+
-+	return true;
-+}
-+
- /*
-  * If can_yield is true, will release the MMU lock and reschedule if the
-  * scheduler needs the CPU or there is contention on the MMU lock. If this
-@@ -991,6 +1006,8 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
- 		    !is_last_spte(iter.old_spte, iter.level))
- 			continue;
- 
-+		WARN_ON_ONCE(iter_split_required(kvm, root, &iter, start, end));
-+
- 		tdp_mmu_iter_set_spte(kvm, &iter, SHADOW_NONPRESENT_VALUE);
- 
- 		/*
-@@ -1246,9 +1263,6 @@ static int tdp_mmu_link_sp(struct kvm *kvm, struct tdp_iter *iter,
- 	return 0;
+-bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	return kvm_mips_mkold_gpa_pt(kvm, range->start, range->end);
  }
  
--static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
--				   struct kvm_mmu_page *sp, bool shared);
--
- /*
-  * Handle a TDP page fault (NPT/EPT violation/misconfiguration) by installing
-  * page tables and SPTEs to translate the faulting guest physical address.
-@@ -1341,6 +1355,102 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 	return ret;
+-bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	gpa_t gpa = range->start << PAGE_SHIFT;
+ 	pte_t *gpa_pte = kvm_mips_pte_for_gpa(kvm, NULL, gpa);
+diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
+index d79c5d1098c0..9bf6e1cf64f1 100644
+--- a/arch/powerpc/kvm/book3s.c
++++ b/arch/powerpc/kvm/book3s.c
+@@ -886,12 +886,12 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	return kvm->arch.kvm_ops->unmap_gfn_range(kvm, range);
  }
  
-+/*
-+ * Split large leafs at the boundary of the specified range for the mirror root
-+ */
-+static int tdp_mmu_split_boundary_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
-+					gfn_t start, gfn_t end, bool can_yield, bool *flush)
-+{
-+	struct kvm_mmu_page *sp = NULL;
-+	struct tdp_iter iter;
-+
-+	WARN_ON_ONCE(!can_yield);
-+
-+	if (!is_mirror_sp(root))
-+		return 0;
-+
-+	end = min(end, tdp_mmu_max_gfn_exclusive());
-+
-+	lockdep_assert_held_write(&kvm->mmu_lock);
-+
-+	rcu_read_lock();
-+
-+	for_each_tdp_pte_min_level(iter, kvm, root, PG_LEVEL_4K, start, end) {
-+retry:
-+		if (can_yield &&
-+		    tdp_mmu_iter_cond_resched(kvm, &iter, *flush, false)) {
-+			*flush = false;
-+			continue;
-+		}
-+
-+		if (!is_shadow_present_pte(iter.old_spte) ||
-+		    !is_last_spte(iter.old_spte, iter.level) ||
-+		    !iter_split_required(kvm, root, &iter, start, end))
-+			continue;
-+
-+		if (!sp) {
-+			rcu_read_unlock();
-+
-+			write_unlock(&kvm->mmu_lock);
-+
-+			sp = tdp_mmu_alloc_sp_for_split(true);
-+
-+			write_lock(&kvm->mmu_lock);
-+
-+			if (!sp) {
-+				trace_kvm_mmu_split_huge_page(iter.gfn, iter.old_spte,
-+							      iter.level, -ENOMEM);
-+				return -ENOMEM;
-+			}
-+			rcu_read_lock();
-+
-+			iter.yielded = true;
-+			continue;
-+		}
-+		tdp_mmu_init_child_sp(sp, &iter);
-+
-+		if (tdp_mmu_split_huge_page(kvm, &iter, sp, false))
-+			goto retry;
-+
-+		sp = NULL;
-+		/*
-+		 * Set yielded in case after splitting to a lower level,
-+		 * the new iter requires furter splitting.
-+		 */
-+		iter.yielded = true;
-+		*flush = true;
-+	}
-+
-+	rcu_read_unlock();
-+
-+	/* Leave it here though it should be impossible for the mirror root */
-+	if (sp)
-+		tdp_mmu_free_sp(sp);
-+	return 0;
-+}
-+
-+int kvm_tdp_mmu_gfn_range_split_boundary(struct kvm *kvm, struct kvm_gfn_range *range)
-+{
-+	enum kvm_tdp_mmu_root_types types;
-+	struct kvm_mmu_page *root;
-+	bool flush = false;
-+	int ret;
-+
-+	types = kvm_gfn_range_filter_to_root_types(kvm, range->attr_filter) | KVM_INVALID_ROOTS;
-+
-+	__for_each_tdp_mmu_root_yield_safe(kvm, root, range->slot->as_id, types) {
-+		ret = tdp_mmu_split_boundary_leafs(kvm, root, range->start, range->end,
-+						   range->may_block, &flush);
-+		if (ret < 0) {
-+			if (flush)
-+				kvm_flush_remote_tlbs(kvm);
-+
-+			return ret;
-+		}
-+	}
-+	return flush;
-+}
-+
- /* Used by mmu notifier via kvm_unmap_gfn_range() */
- bool kvm_tdp_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range,
- 				 bool flush)
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index 52acf99d40a0..806a21d4f0e3 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -69,6 +69,7 @@ void kvm_tdp_mmu_zap_all(struct kvm *kvm);
- void kvm_tdp_mmu_invalidate_roots(struct kvm *kvm,
- 				  enum kvm_tdp_mmu_root_types root_types);
- void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm, bool shared);
-+int kvm_tdp_mmu_gfn_range_split_boundary(struct kvm *kvm, struct kvm_gfn_range *range);
+-bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	return kvm->arch.kvm_ops->age_gfn(kvm, range);
+ }
  
- int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
+-bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	return kvm->arch.kvm_ops->test_age_gfn(kvm, range);
+ }
+diff --git a/arch/powerpc/kvm/e500_mmu_host.c b/arch/powerpc/kvm/e500_mmu_host.c
+index 06caf8bbbe2b..debe1ecb4bfd 100644
+--- a/arch/powerpc/kvm/e500_mmu_host.c
++++ b/arch/powerpc/kvm/e500_mmu_host.c
+@@ -697,13 +697,13 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	return kvm_e500_mmu_unmap_gfn(kvm, range);
+ }
  
+-bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	/* XXX could be more clever ;) */
+ 	return false;
+ }
+ 
+-bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	/* XXX could be more clever ;) */
+ 	return false;
+diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+index 1087ea74567b..581bd1bc6675 100644
+--- a/arch/riscv/kvm/mmu.c
++++ b/arch/riscv/kvm/mmu.c
+@@ -550,7 +550,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	return false;
+ }
+ 
+-bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	pte_t *ptep;
+ 	u32 ptep_level = 0;
+@@ -568,7 +568,7 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	return ptep_test_and_clear_young(NULL, 0, ptep);
+ }
+ 
+-bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	pte_t *ptep;
+ 	u32 ptep_level = 0;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 0d49c69b6b55..ba993445a00e 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1778,7 +1778,7 @@ static bool kvm_may_have_shadow_mmu_sptes(struct kvm *kvm)
+ 	return !tdp_mmu_enabled || READ_ONCE(kvm->arch.indirect_shadow_pages);
+ }
+ 
+-bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	bool young = false;
+ 
+@@ -1791,7 +1791,7 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	return young;
+ }
+ 
+-bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	bool young = false;
+ 
+@@ -7691,8 +7691,8 @@ void kvm_mmu_pre_destroy_vm(struct kvm *kvm)
+ }
+ 
+ #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+-bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
+-					struct kvm_gfn_range *range)
++int kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
++				       struct kvm_gfn_range *range)
+ {
+ 	/*
+ 	 * Zap SPTEs even if the slot can't be mapped PRIVATE.  KVM x86 only
+@@ -7752,8 +7752,8 @@ static bool hugepage_has_attrs(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 	return true;
+ }
+ 
+-bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+-					 struct kvm_gfn_range *range)
++int kvm_arch_post_set_memory_attributes(struct kvm *kvm,
++					struct kvm_gfn_range *range)
+ {
+ 	unsigned long attrs = range->arg.attributes;
+ 	struct kvm_memory_slot *slot = range->slot;
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 655d36e1f4db..19d7a577e7ed 100644
+index 19d7a577e7ed..ec47f2374fdf 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -272,6 +272,7 @@ struct kvm_gfn_range {
+@@ -270,8 +270,8 @@ struct kvm_gfn_range {
+ 	bool lockless;
+ };
  bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range);
- bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range);
- bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range);
-+int kvm_split_boundary_leafs(struct kvm *kvm, struct kvm_gfn_range *range);
+-bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range);
+-bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range);
++int kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range);
++int kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range);
+ int kvm_split_boundary_leafs(struct kvm *kvm, struct kvm_gfn_range *range);
  #endif
  
- enum {
+@@ -1526,7 +1526,7 @@ void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
+ void kvm_mmu_invalidate_begin(struct kvm *kvm);
+ void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end);
+ void kvm_mmu_invalidate_end(struct kvm *kvm);
+-bool kvm_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range);
++int kvm_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range);
+ 
+ long kvm_arch_dev_ioctl(struct file *filp,
+ 			unsigned int ioctl, unsigned long arg);
+@@ -2504,10 +2504,10 @@ static inline unsigned long kvm_get_memory_attributes(struct kvm *kvm, gfn_t gfn
+ 
+ bool kvm_range_has_memory_attributes(struct kvm *kvm, gfn_t start, gfn_t end,
+ 				     unsigned long mask, unsigned long attrs);
+-bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
++int kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
++				       struct kvm_gfn_range *range);
++int kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+ 					struct kvm_gfn_range *range);
+-bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+-					 struct kvm_gfn_range *range);
+ 
+ static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+ {
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 5ea1c442e339..72bd98c100cf 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -511,7 +511,7 @@ static inline struct kvm *mmu_notifier_to_kvm(struct mmu_notifier *mn)
+ 	return container_of(mn, struct kvm, mmu_notifier);
+ }
+ 
+-typedef bool (*gfn_handler_t)(struct kvm *kvm, struct kvm_gfn_range *range);
++typedef int (*gfn_handler_t)(struct kvm *kvm, struct kvm_gfn_range *range);
+ 
+ typedef void (*on_lock_fn_t)(struct kvm *kvm);
+ 
+@@ -595,6 +595,7 @@ static __always_inline kvm_mn_ret_t kvm_handle_hva_range(struct kvm *kvm,
+ 		kvm_for_each_memslot_in_hva_range(node, slots,
+ 						  range->start, range->end - 1) {
+ 			unsigned long hva_start, hva_end;
++			int ret;
+ 
+ 			slot = container_of(node, struct kvm_memory_slot, hva_node[slots->node_idx]);
+ 			hva_start = max_t(unsigned long, range->start, slot->userspace_addr);
+@@ -635,7 +636,9 @@ static __always_inline kvm_mn_ret_t kvm_handle_hva_range(struct kvm *kvm,
+ 						goto mmu_unlock;
+ 				}
+ 			}
+-			r.ret |= range->handler(kvm, &gfn_range);
++			ret = range->handler(kvm, &gfn_range);
++			WARN_ON_ONCE(ret < 0);
++			r.ret |= ret;
+ 		}
+ 	}
+ 
+@@ -721,7 +724,7 @@ void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end)
+ 	}
+ }
+ 
+-bool kvm_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	kvm_mmu_invalidate_range_add(kvm, range->start, range->end);
+ 	return kvm_unmap_gfn_range(kvm, range);
+@@ -2413,7 +2416,8 @@ static __always_inline void kvm_handle_gfn_range(struct kvm *kvm,
+ 	struct kvm_memslots *slots;
+ 	struct kvm_memslot_iter iter;
+ 	bool found_memslot = false;
+-	bool ret = false;
++	bool flush = false;
++	int ret = 0;
+ 	int i;
+ 
+ 	gfn_range.arg = range->arg;
+@@ -2446,19 +2450,22 @@ static __always_inline void kvm_handle_gfn_range(struct kvm *kvm,
+ 					range->on_lock(kvm);
+ 			}
+ 
+-			ret |= range->handler(kvm, &gfn_range);
++			ret = range->handler(kvm, &gfn_range);
++			if (ret < 0)
++				goto err;
++			flush |= ret;
+ 		}
+ 	}
+-
+-	if (range->flush_on_ret && ret)
++err:
++	if (range->flush_on_ret && flush)
+ 		kvm_flush_remote_tlbs(kvm);
+ 
+ 	if (found_memslot)
+ 		KVM_MMU_UNLOCK(kvm);
+ }
+ 
+-static bool kvm_pre_set_memory_attributes(struct kvm *kvm,
+-					  struct kvm_gfn_range *range)
++static int kvm_pre_set_memory_attributes(struct kvm *kvm,
++					 struct kvm_gfn_range *range)
+ {
+ 	/*
+ 	 * Unconditionally add the range to the invalidation set, regardless of
 -- 
 2.43.2
 
