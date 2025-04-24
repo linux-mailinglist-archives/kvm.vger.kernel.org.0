@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-44042-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44043-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD5FAA99F56
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 05:09:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1790A99F58
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 05:10:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 142E47AF4CA
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 03:08:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 185241946D1D
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 03:10:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E9251B0439;
-	Thu, 24 Apr 2025 03:09:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DD811AD403;
+	Thu, 24 Apr 2025 03:09:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nbg5MOi9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B+qDNIXr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB0451AA1D8;
-	Thu, 24 Apr 2025 03:09:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 084A01A9B49;
+	Thu, 24 Apr 2025 03:09:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745464149; cv=none; b=HLCGEuXFJ0h5bwUelNiYgRe2LSzqqhAcSh8snpJhWcBeJZO6Cj72Y2aFi8suaLwURYpl81e6jDvQUjsxLWLenlg1BKNK8A59rII9RcEDAeKSjfFcBjJsopAMxYArQpYH3jQHOFSwviOokwoJF+Y6BEYJJ5XsbfLE2g5IyZoUgXw=
+	t=1745464163; cv=none; b=Mv2F+uGs5+Pw5FSHb4NrwQORtHSraI1pLmkjPsyvMIQIafumzrb+7wCvKqlB/mlPP1lz0MakZZzyKaaRXZQ4WV+tVd59mijzAv126m60fqepgvCvGv8rIg2qJvTaA1/ebUAuS5Qjklq674lkGpfKgA1X13CMq4dReGS5f2im0FE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745464149; c=relaxed/simple;
-	bh=KeWQF6JOZCE1U2cXc5jw2hofVfb7DCC9G33zg4hMCIg=;
+	s=arc-20240116; t=1745464163; c=relaxed/simple;
+	bh=N450r3oIUt49XWDQC3IXoi1jJfPAZl0q0onXGgJ/nOY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WLeggjxm2pZCiOckdb0MLD31s1/Mxn+FfCR/a7/mJQjYSmoWiOgu1rLK/Rlj0DuT58U//z7Z3zVZngklAcZnjops3LVoQSS09kgTAf+kqyWJr/+f6FUEB0IXmhT/fiqG8h5Wp2nNyzDmsiGLXgoX6gol9jlPjhvGlBguMKJPyOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Nbg5MOi9; arc=none smtp.client-ip=192.198.163.11
+	 MIME-Version; b=kaPmRCb20cvgan/qJUr9Gc1pGI4ovt+gI7PeLDRmlmiiwwGR4NKzVja3nR1WXhct+tVf5yiOT/6Eq7p52zQOymX9knywXwsgbkUCfROFzHpQR2zgrQEsGXk12yN6V45qKPouuqF/DnhCZ0BE+2IUKCDh+XfPqptvqbsc+PTlrhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=B+qDNIXr; arc=none smtp.client-ip=198.175.65.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745464148; x=1777000148;
+  t=1745464162; x=1777000162;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=KeWQF6JOZCE1U2cXc5jw2hofVfb7DCC9G33zg4hMCIg=;
-  b=Nbg5MOi9+0pJ4Tjwts2B56Knee24idFtKsryIkrvWUNQB7lP5km7Z70m
-   lie2HRAEXdMhfw1rJEFZ3iZ+lGU0m5t7MaNAYv6gGRW9HnvONq2dkChRD
-   1aAdeK/6dAmujSDzUi5szIheADTcf0lbN513A7doBbpOkLfpkppBKDaWE
-   zgX99dHB3JjNIn7xD2Y2vdfLFVoBPkskLu3ee3PS5iGHYrKatCc9k138Z
-   39JxGN3UDd0/40T3GkE4yf0oG3kTOoR26hVrwaps6+Nn6n+CA8RYuSL97
-   JUM3fr3VE/YBdMhDCQLqI1gjhgtPR9iXzz8alwlUA9D28t2jd//RK6MXl
-   Q==;
-X-CSE-ConnectionGUID: 2IjuW3rUQNWW+a3s4iXzTQ==
-X-CSE-MsgGUID: q/jfgQdxS0CjLO74uQGiUA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11412"; a="57727367"
+  bh=N450r3oIUt49XWDQC3IXoi1jJfPAZl0q0onXGgJ/nOY=;
+  b=B+qDNIXr5Jd6Y8JDTasKbouNuWbWna1wjJkEX4C8VPfw5akOQznur1hy
+   ljkC+ZTiBhQVzkFg0PxBZiN0YXkHVUtrBydw22Nc3X1JJOCQLHvDZ3xrn
+   ZO7lq9AIzwn+TCjw2BtHHwPwpAbQoOgaAAkO/J4PvmnOr8Ef6xZlPYHpy
+   55chb375c7TEyW+mvzf47zVJY3PHsKBna+t2EnfZJzJ+zB/a5bsD1SGBE
+   kEokEAEXrs/oejgPHpELx8VXU5OnBiIi8zF3dXf/kkoQO6zYebkJ8Kz7E
+   RDBs+sTIfc/66LrelY318VJyatPFMPLNovKJcItkit2/5NxYVycAEBj93
+   g==;
+X-CSE-ConnectionGUID: chI7OZ0wTgCErgOU8BxofA==
+X-CSE-MsgGUID: ZHoyt8wvSdudiZkpQ0Gs1Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11412"; a="58072824"
 X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
-   d="scan'208";a="57727367"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 20:09:06 -0700
-X-CSE-ConnectionGUID: IV8EalImTd2EO6sMLYfQog==
-X-CSE-MsgGUID: p42shN4AQMeg7I0S9md/xQ==
+   d="scan'208";a="58072824"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 20:09:21 -0700
+X-CSE-ConnectionGUID: UBl7Bk0MTea9sCp6DEx9Lg==
+X-CSE-MsgGUID: T8qLEEmDTD6lwWBuE8tRhQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
-   d="scan'208";a="137286490"
+   d="scan'208";a="137659102"
 Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 20:09:00 -0700
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 20:09:15 -0700
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com
@@ -86,9 +86,9 @@ Cc: linux-kernel@vger.kernel.org,
 	binbin.wu@linux.intel.com,
 	chao.p.peng@intel.com,
 	Yan Zhao <yan.y.zhao@intel.com>
-Subject: [RFC PATCH 12/21] KVM: TDX: Determine max mapping level according to vCPU's ACCEPT level
-Date: Thu, 24 Apr 2025 11:07:13 +0800
-Message-ID: <20250424030713.403-1-yan.y.zhao@intel.com>
+Subject: [RFC PATCH 13/21] KVM: x86/tdp_mmu: Alloc external_spt page for mirror page table splitting
+Date: Thu, 24 Apr 2025 11:07:28 +0800
+Message-ID: <20250424030728.419-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20250424030033.32635-1-yan.y.zhao@intel.com>
 References: <20250424030033.32635-1-yan.y.zhao@intel.com>
@@ -100,143 +100,66 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Determine the max mapping level of a private GFN according to the vCPU's
-ACCEPT level specified in the TDCALL TDG.MEM.PAGE.ACCEPT.
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-When an EPT violation occurs due to a vCPU invoking TDG.MEM.PAGE.ACCEPT
-before any actual memory access, the vCPU's ACCEPT level is available in
-the extended exit qualification. Set the vCPU's ACCEPT level as the max
-mapping level for the faulting GFN. This is necessary because if KVM
-specifies a mapping level greater than the vCPU's ACCEPT level, and no
-other vCPUs are accepting at KVM's mapping level, TDG.MEM.PAGE.ACCEPT will
-produce another EPT violation on the vCPU after re-entering the TD, with
-the vCPU's ACCEPT level indicated in the extended exit qualification.
+Enhance tdp_mmu_alloc_sp_split() to allocate the external page table page
+for splitting the mirror page table.
 
-Introduce "violation_gfn_start", "violation_gfn_end", and
-"violation_request_level" in "struct vcpu_tdx" to pass the vCPU's ACCEPT
-level to TDX's private_max_mapping_level hook for determining the max
-mapping level.
+[Yan: Rebased and simplified the code ]
 
-Instead of taking some bits of the error_code passed to
-kvm_mmu_page_fault() and requiring KVM MMU core to check the error_code for
-a fault's max_level, having TDX's private_max_mapping_level hook check for
-request level avoids changes to the KVM MMU core. This approach also
-accommodates future scenarios where the requested mapping level is unknown
-at the start of tdx_handle_ept_violation() (i.e., before invoking
-kvm_mmu_page_fault()).
-
-Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
- arch/x86/kvm/vmx/tdx.c      | 36 +++++++++++++++++++++++++++++++++++-
- arch/x86/kvm/vmx/tdx.h      |  4 ++++
- arch/x86/kvm/vmx/tdx_arch.h |  3 +++
- 3 files changed, 42 insertions(+), 1 deletion(-)
+ arch/x86/kvm/mmu/tdp_mmu.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 86775af85cd8..dd63a634e633 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1859,10 +1859,34 @@ static inline bool tdx_is_sept_violation_unexpected_pending(struct kvm_vcpu *vcp
- 	return !(eq & EPT_VIOLATION_PROT_MASK) && !(eq & EPT_VIOLATION_EXEC_FOR_RING3_LIN);
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 8ee01277cc07..799a08f91bf9 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -324,6 +324,8 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 				u64 old_spte, u64 new_spte, int level,
+ 				bool shared);
+ 
++static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(bool mirror);
++
+ static void tdp_account_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+ {
+ 	kvm_account_pgtable_pages((void *)sp->spt, +1);
+@@ -1475,7 +1477,7 @@ bool kvm_tdp_mmu_wrprot_slot(struct kvm *kvm,
+ 	return spte_set;
  }
  
-+static inline void tdx_get_accept_level(struct kvm_vcpu *vcpu, gpa_t gpa)
-+{
-+	struct vcpu_tdx *tdx = to_tdx(vcpu);
-+	int level = -1;
-+
-+	u64 eeq_type = tdx->ext_exit_qualification & TDX_EXT_EXIT_QUAL_TYPE_MASK;
-+
-+	u32 eeq_info = (tdx->ext_exit_qualification & TDX_EXT_EXIT_QUAL_INFO_MASK) >>
-+			TDX_EXT_EXIT_QUAL_INFO_SHIFT;
-+
-+	if (eeq_type == TDX_EXT_EXIT_QUAL_TYPE_ACCEPT) {
-+		level = (eeq_info & GENMASK(2, 0)) + 1;
-+
-+		tdx->violation_gfn_start = gfn_round_for_level(gpa_to_gfn(gpa), level);
-+		tdx->violation_gfn_end = tdx->violation_gfn_start + KVM_PAGES_PER_HPAGE(level);
-+		tdx->violation_request_level = level;
-+	} else {
-+		tdx->violation_gfn_start = -1;
-+		tdx->violation_gfn_end = -1;
-+		tdx->violation_request_level = -1;
+-static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(void)
++static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(bool mirror)
+ {
+ 	struct kvm_mmu_page *sp;
+ 
+@@ -1489,6 +1491,15 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(void)
+ 		return NULL;
+ 	}
+ 
++	if (mirror) {
++		sp->external_spt = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
++		if (!sp->external_spt) {
++			free_page((unsigned long)sp->spt);
++			kmem_cache_free(mmu_page_header_cache, sp);
++			return NULL;
++		}
 +	}
-+}
 +
- static int tdx_handle_ept_violation(struct kvm_vcpu *vcpu)
- {
- 	unsigned long exit_qual;
--	gpa_t gpa = to_tdx(vcpu)->exit_gpa;
-+	struct vcpu_tdx *tdx = to_tdx(vcpu);
-+	gpa_t gpa = tdx->exit_gpa;
- 	bool local_retry = false;
- 	int ret;
- 
-@@ -1884,6 +1908,8 @@ static int tdx_handle_ept_violation(struct kvm_vcpu *vcpu)
- 		 */
- 		exit_qual = EPT_VIOLATION_ACC_WRITE;
- 
-+		tdx_get_accept_level(vcpu, gpa);
-+
- 		/* Only private GPA triggers zero-step mitigation */
- 		local_retry = true;
- 	} else {
-@@ -2917,6 +2943,9 @@ static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
- 
- 	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
- 
-+	tdx->violation_gfn_start = -1;
-+	tdx->violation_gfn_end = -1;
-+	tdx->violation_request_level = -1;
- 	return 0;
- 
- free_tdcx:
-@@ -3260,9 +3289,14 @@ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
- 
- int tdx_gmem_private_max_mapping_level(struct kvm_vcpu *vcpu, kvm_pfn_t pfn, gfn_t gfn)
- {
-+	struct vcpu_tdx *tdx = to_tdx(vcpu);
-+
- 	if (unlikely(to_kvm_tdx(vcpu->kvm)->state != TD_STATE_RUNNABLE))
- 		return PG_LEVEL_4K;
- 
-+	if (gfn >= tdx->violation_gfn_start && gfn < tdx->violation_gfn_end)
-+		return tdx->violation_request_level;
-+
- 	return PG_LEVEL_2M;
+ 	return sp;
  }
  
-diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-index 51f98443e8a2..6e13895813c5 100644
---- a/arch/x86/kvm/vmx/tdx.h
-+++ b/arch/x86/kvm/vmx/tdx.h
-@@ -70,6 +70,10 @@ struct vcpu_tdx {
+@@ -1568,7 +1579,7 @@ static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
+ 			else
+ 				write_unlock(&kvm->mmu_lock);
  
- 	u64 map_gpa_next;
- 	u64 map_gpa_end;
-+
-+	u64 violation_gfn_start;
-+	u64 violation_gfn_end;
-+	int violation_request_level;
- };
+-			sp = tdp_mmu_alloc_sp_for_split();
++			sp = tdp_mmu_alloc_sp_for_split(is_mirror_sp(root));
  
- void tdh_vp_rd_failed(struct vcpu_tdx *tdx, char *uclass, u32 field, u64 err);
-diff --git a/arch/x86/kvm/vmx/tdx_arch.h b/arch/x86/kvm/vmx/tdx_arch.h
-index a30e880849e3..af006a73ee05 100644
---- a/arch/x86/kvm/vmx/tdx_arch.h
-+++ b/arch/x86/kvm/vmx/tdx_arch.h
-@@ -82,7 +82,10 @@ struct tdx_cpuid_value {
- #define TDX_TD_ATTR_PERFMON		BIT_ULL(63)
- 
- #define TDX_EXT_EXIT_QUAL_TYPE_MASK	GENMASK(3, 0)
-+#define TDX_EXT_EXIT_QUAL_TYPE_ACCEPT  1
- #define TDX_EXT_EXIT_QUAL_TYPE_PENDING_EPT_VIOLATION  6
-+#define TDX_EXT_EXIT_QUAL_INFO_MASK	GENMASK(63, 32)
-+#define TDX_EXT_EXIT_QUAL_INFO_SHIFT	32
- /*
-  * TD_PARAMS is provided as an input to TDH_MNG_INIT, the size of which is 1024B.
-  */
+ 			if (shared)
+ 				read_lock(&kvm->mmu_lock);
 -- 
 2.43.2
 
