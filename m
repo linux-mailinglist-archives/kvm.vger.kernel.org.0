@@ -1,142 +1,164 @@
-Return-Path: <kvm+bounces-44200-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44201-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F4C9A9B4BF
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 18:57:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CF41FA9B534
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 19:28:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3360D3BFF4C
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 16:57:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 611549257EA
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 17:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF8D428B4E8;
-	Thu, 24 Apr 2025 16:57:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B3CC28D827;
+	Thu, 24 Apr 2025 17:28:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LlhhasIs"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="anS+6W0Q"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13C1E27FD53;
-	Thu, 24 Apr 2025 16:57:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9400E28A40A
+	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 17:28:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745513838; cv=none; b=szPMwO4SE0jWeOfDMfKLV6Mu0QRzqSCbZtzVbbO412IorACE2uU04niU3vFenNhSi9hdJ/qiTSOGFuSuxmJHJEs7m8cedJxJTlcU2/7cpdMoXbhvzrusjc0XUURTIn4XpZ8duML65gobVq/AnuGZgW/z1l8icQ2dNtt5oXYCg5s=
+	t=1745515721; cv=none; b=dAM0L1CaIuRdR7yH7F2DB5uuA6gZzRKvSLabhtLv5M+thkvwv/RThinCRviO8mbQa8bCwp+K72TOoAaerox6UhXXkOLveJeFXNIGjjzHnT5m6f0/gyjR29+WGZKjhnYc5HE7DtakzezQwlCZgOqSqM2sqlgGsWFKZSKg+EbmzwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745513838; c=relaxed/simple;
-	bh=MZYbKW86/HMaRiBQ4n+IZSKyzM9Ux5Yala+dzSbAgCY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hPY/M5e0uSoesiejGrLJGHJrDWPn+d8IvunIzqblbdgqsAnzyXy9EjUF79Ntk6P/8tKru1sOG87X/IJobZhF/kb4owg9YPWtdKiETEBLe4eWFCIlEm5jSubzxuUbF/NsVpqAcPDgwyyDuk545h+JIaiJduMPLgiEm7Nr0OkSFnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LlhhasIs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 794E1C4CEE8;
-	Thu, 24 Apr 2025 16:57:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745513837;
-	bh=MZYbKW86/HMaRiBQ4n+IZSKyzM9Ux5Yala+dzSbAgCY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LlhhasIsoavw/7NHjZZLeXJJpSHC8/xpWdCwOEHhmAyNdXrFUKgxTLFX21nEp8IGe
-	 En+atfR3S91hqgFj3lbmdLhHCnN+v3SVODgISBHm/L2mtrKvORnTd55itoeOL/pxXf
-	 36EhX0LcqYeGFbeJsklgwrQrNrBJwNPDQ58oY0ip7ZLzfmAONrLA5zBAHXn8gWSg/j
-	 hA9Zy0eaCf1VJfJn2MctM6QSLbCEoLghCQStI7XxROWvS85G/x5GfnC4k0b9ZI3+vB
-	 Gm68DJs7pGOZOH7k/TXFWCBRaO1D0JNZH/qjheQ+MUhIexcUSjph2WNq2S9GGX3hVe
-	 2FK9MXd7ju1oA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1u7zsw-008TLp-Rz;
-	Thu, 24 Apr 2025 17:57:15 +0100
-Date: Thu, 24 Apr 2025 17:57:14 +0100
-Message-ID: <86ikmtjy51.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Karim Manaouil <karim.manaouil@linaro.org>, Oliver Upton <oliver.upton@linux.dev>
-Cc: 	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	Alexander Graf <graf@amazon.com>,
-	Alex Elder <elder@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Mark Brown <broonie@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Prakruthi Deepak Heragu <quic_pheragu@quicinc.com>,
-	Quentin Perret <qperret@google.com>,
-	Rob Herring <robh@kernel.org>,
-	Srinivas Kandagatla <srini@kernel.org>,
-	Srivatsa Vaddagiri <quic_svaddagi@quicinc.com>,
-	Will Deacon <will@kernel.org>,
-	Haripranesh S <haripran@qti.qualcomm.com>,
-	Carl van Schaik <cvanscha@qti.qualcomm.com>,
-	Murali Nalajala <mnalajal@quicinc.com>,
-	Sreenivasulu Chalamcharla <sreeniva@qti.qualcomm.com>,
-	Trilok Soni <tsoni@quicinc.com>,
-	Stefan Schmidt <stefan.schmidt@linaro.org>
-Subject: Re: [RFC PATCH 00/34] Running Qualcomm's Gunyah Guests via KVM in EL1
-In-Reply-To: <aApaGnFPhsWBZoQ2@linux.dev>
-References: <20250424141341.841734-1-karim.manaouil@linaro.org>
-	<aApaGnFPhsWBZoQ2@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1745515721; c=relaxed/simple;
+	bh=1HqLQ3YZh70ZNkGmU2mK9InfcNAWorDdlkXLec74Sqk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nO3Z/MjKG1VocpNZxVfab2YfBMHzzXQYtHbwdxaMMkLUZ2ztibKJ2XswEB59q7lU2JPrYCbjr8nLBMYvZ3VtFXbdoZNYRSUGTf6m5pPKK5j7pFny4dVVsFOHKP6peJGHYvNJJainDTf7zFNdsHtO2i2m5nsooLvxMQ2vMtwZTWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=anS+6W0Q; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745515718;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=9ZG9YrbKiFItvh1cWxjw3CM1aJWpjuP1SdA+uk1qv0I=;
+	b=anS+6W0QwYvLYI+Zyxy6Y/z5NTCG5umSG8Ek09oAP0EbgleK9hmHLr0xi2NIAVm7AJHVyT
+	tOGaDZEK6edcqVDSvCHMjHG9VUe3dWN1iE95pVPdmnGXnmdNn6YbhcpqhP4nccnZv4OzUc
+	kI7AdbY6z/vWrjQRJ7l5VAwer4srpJ4=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-303--wJBHBPbP0WIvcChOE1VOQ-1; Thu,
+ 24 Apr 2025 13:28:35 -0400
+X-MC-Unique: -wJBHBPbP0WIvcChOE1VOQ-1
+X-Mimecast-MFC-AGG-ID: -wJBHBPbP0WIvcChOE1VOQ_1745515714
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E6E8D1800879;
+	Thu, 24 Apr 2025 17:28:33 +0000 (UTC)
+Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 367381800374;
+	Thu, 24 Apr 2025 17:28:33 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Cc: seanjc@google.com,
+	oliver.upton@linux.dev
+Subject: [PATCH v2] KVM: arm64, x86: make kvm_arch_has_irq_bypass() inline
+Date: Thu, 24 Apr 2025 13:28:32 -0400
+Message-ID: <20250424172832.401651-1-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: karim.manaouil@linaro.org, oliver.upton@linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, graf@amazon.com, elder@kernel.org, catalin.marinas@arm.com, tabba@google.com, joey.gouly@arm.com, corbet@lwn.net, broonie@kernel.org, mark.rutland@arm.com, pbonzini@redhat.com, quic_pheragu@quicinc.com, qperret@google.com, robh@kernel.org, srini@kernel.org, quic_svaddagi@quicinc.com, will@kernel.org, haripran@qti.qualcomm.com, cvanscha@qti.qualcomm.com, mnalajal@quicinc.com, sreeniva@qti.qualcomm.com, tsoni@quicinc.com, stefan.schmidt@linaro.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Thu, 24 Apr 2025 16:34:50 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Thu, Apr 24, 2025 at 03:13:07PM +0100, Karim Manaouil wrote:
-> > This series introduces the capability of running Gunyah guests via KVM on
-> > Qualcomm SoCs shipped with Gunyah hypervisor [1] (e.g. RB3 Gen2).
-> > 
-> > The goal of this work is to port the existing Gunyah hypervisor support from a
-> > standalone driver interface [2] to KVM, with the aim of leveraging as much of the
-> > existing KVM infrastructure as possible to reduce duplication of effort around
-> > memory management (e.g. guest_memfd), irqfd, and other core components.
-> > 
-> > In short, Gunyah is a Type-1 hypervisor, meaning that it runs independently of any
-> > high-level OS kernel such as Linux and runs in a higher CPU privilege level than VMs.
-> > Gunyah is shipped as firmware and guests typically talk with Gunyah via hypercalls.
-> > KVM is designed to run as Type-2 hypervisor. This port allows KVM to run in EL1 and
-> > serve as the interface for VM lifecycle management,while offloading virtualization
-> > to Gunyah.
-> 
-> If you're keen on running your own hypervisor then I'm sorry, you get to
-> deal with it soup to nuts. Other hypervisors (e.g. mshv) have their own
-> kernel drivers for managing the host / UAPI parts of driving VMs.
-> 
-> The KVM arch interface is *internal* to KVM, not something to be
-> (ab)used for cramming in a non-KVM hypervisor. KVM and other hypervisors
-> can still share other bits of truly common infrastructure, like
-> guest_memfd.
-> 
-> I understand the value in what you're trying to do, but if you want it
-> to smell like KVM you may as well just let the user run it at EL2.
+kvm_arch_has_irq_bypass() is a small function and even though it does
+not appear in any *really* hot paths, it's also not entirely rare.
+Make it inline---it also works out nicely in preparation for using it in
+kvm-intel.ko and kvm-amd.ko, since the function is not currently exported.
 
-+1. KVM is not a generic interface for random third party hypervisors.
+Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+Acked-by: Oliver Upton <oliver.upton@linux.dev>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+v1->v2: leave extern declaration in place and don't touch arch/powerpc [Sean]
 
-If you want to run KVM on your Qualcomm HW, boot at EL2, and enjoy the
-real thing -- it is worth it. If Gunyah is what you want, then there
-is enough code out there to use it with crosvm.
+ arch/arm64/include/asm/kvm_host.h | 5 +++++
+ arch/arm64/kvm/arm.c              | 5 -----
+ arch/x86/include/asm/kvm_host.h   | 6 ++++++
+ arch/x86/kvm/x86.c                | 5 -----
+ 4 files changed, 11 insertions(+), 10 deletions(-)
 
-But mixing the two is not happening, sorry.
-
-	M.
-
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index e98cfe7855a6..08ba91e6fb03 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1588,4 +1588,9 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
+ #define kvm_has_s1poe(k)				\
+ 	(kvm_has_feat((k), ID_AA64MMFR3_EL1, S1POE, IMP))
+ 
++static inline bool kvm_arch_has_irq_bypass(void)
++{
++	return true;
++}
++
+ #endif /* __ARM64_KVM_HOST_H__ */
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 68fec8c95fee..19ca57def629 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -2743,11 +2743,6 @@ bool kvm_arch_irqchip_in_kernel(struct kvm *kvm)
+ 	return irqchip_in_kernel(kvm);
+ }
+ 
+-bool kvm_arch_has_irq_bypass(void)
+-{
+-	return true;
+-}
+-
+ int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
+ 				      struct irq_bypass_producer *prod)
+ {
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 3bdae454a959..7bc174a1f1cb 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -35,6 +35,7 @@
+ #include <asm/mtrr.h>
+ #include <asm/msr-index.h>
+ #include <asm/asm.h>
++#include <asm/irq_remapping.h>
+ #include <asm/kvm_page_track.h>
+ #include <asm/kvm_vcpu_regs.h>
+ #include <asm/reboot.h>
+@@ -2423,4 +2424,9 @@ int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages);
+  */
+ #define KVM_EXIT_HYPERCALL_MBZ		GENMASK_ULL(31, 1)
+ 
++static inline bool kvm_arch_has_irq_bypass(void)
++{
++	return enable_apicv && irq_remapping_cap(IRQ_POSTING_CAP);
++}
++
+ #endif /* _ASM_X86_KVM_HOST_H */
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 3712dde0bf9d..c1fdd527044c 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -13556,11 +13556,6 @@ bool kvm_arch_has_noncoherent_dma(struct kvm *kvm)
+ }
+ EXPORT_SYMBOL_GPL(kvm_arch_has_noncoherent_dma);
+ 
+-bool kvm_arch_has_irq_bypass(void)
+-{
+-	return enable_apicv && irq_remapping_cap(IRQ_POSTING_CAP);
+-}
+-
+ int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
+ 				      struct irq_bypass_producer *prod)
+ {
 -- 
-Without deviation from the norm, progress is not possible.
+2.43.5
+
 
