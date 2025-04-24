@@ -1,285 +1,285 @@
-Return-Path: <kvm+bounces-44143-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44145-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E76B5A9B03C
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 16:10:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC883A9B054
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 16:14:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DA6C46690E
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 14:10:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E92297A3591
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 14:13:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA8E11993B9;
-	Thu, 24 Apr 2025 14:10:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F4CA19E7E2;
+	Thu, 24 Apr 2025 14:13:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tO0+FS0F"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L30fUIYb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5311D17D346
-	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 14:10:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45BBC19C558
+	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 14:13:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745503843; cv=none; b=c0IlOQFMsz9RcRVtxuo2XRF70NJ8hkAARWXbJMoWGG1tsxazPJGbXSytaHS+diQCCTnRnjcTNe7rKnFx3sKdI4Pp4WGXKOsuHFzOj77YTLJKv44FLq/yK7Dy9cXTVwjykWnfGzIO4VjpGPN24HBCWRnmduYOJaANBpqScwEVO68=
+	t=1745504029; cv=none; b=A8EbCozelEuMks0sbQG7U4I8MtT4vHvKAqpnVPKq438mzMhlrYvBHkhKpJhU/tNsr+3/YooezUV28Aw9Lf0i239Gu9X0uarnZkZH+yuiiYqqQB1p5Cn5X9WnMYR7mbRBUghIOxKR+ZgXUWPzgik0hqojD3h+cdts1EFUckVsH6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745503843; c=relaxed/simple;
-	bh=F+Wja2ADrz1zv00eM7+FHcJd4flj4VeWlpXuRLNxVCo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qmg6wzrVb1KqIM4wZFWS56q0jQQcbnO9/4gnYqkOIrTs+BEWLRaIlqh9ccwB46TBGpXZGusAzX4gupDzD+DCkhaMRj+3gudlOOoEHH9Go2wQJWthjmB09WLcRhLFZf/HcDGLGAqy/rECU5gC7ikg6nZ6Or3cd/qx46TvOWpDg/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tO0+FS0F; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2264c9d0295so250025ad.0
-        for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 07:10:41 -0700 (PDT)
+	s=arc-20240116; t=1745504029; c=relaxed/simple;
+	bh=gE5B+DRuvYdm1Xx80LASYKx8JQnPdEVc7dWEXx/LEcw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=GjWqdF1+Wxywf3J2xq5WWrUVcVTYLaqeZ2hNGjiszq0ShFq021Gj3khxZC6QzuO/NCUTlejd89N0ptBxkpr6yG64jw09KepQ0odtZQzzW+n8/rV8YzrTzdo0HT0ThZepuaDDTQs/+NnpNREGfNDhdp1zXuT+V3AZh+enS729YUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=L30fUIYb; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-39ee57c0b8cso1148130f8f.0
+        for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 07:13:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745503841; x=1746108641; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KMrvBQHRfYfkGh/Um2a6kp7PNJoeWsTC0p7ApqTxhJ4=;
-        b=tO0+FS0FKIRYHGZ8PWrzhQywfXGvjj7t+Ahs4Ir8XMcJ8fmnVV51W6F9YSXfJw2gFy
-         B9ydyVFoetFUCIbttukmOA2VXv+nN2n9g3BER2/pcx5RcUMYHsG3rfnKZ7G/47tgTJX3
-         c3sHBmfQ823B+7c1GgqBJ1jG1jbOxI9BkYZPgla7rBqGu9qbok82AKIuOzpg8Bi4MM9Y
-         94GzNZ2ezRzl6/OVUyN1X2TDSZjtWIqQYmQ9DZcfLHyO6XXVzmFGIPHRIXiT8zniSt5v
-         KlBd+MZxvm63an9z2Y5pn1MPN0KO6U5tfsiCsjXX2RFx9XqWtPcITBDZuxF+Hbzd6L9Q
-         b6BA==
+        d=linaro.org; s=google; t=1745504025; x=1746108825; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+Gp3+Ahd9oztFC0Ee90Z+LBETEK7lh7obhrs3g0E+vA=;
+        b=L30fUIYb5JBN77jCSMwgyW5pKUwPqUM4yzfK8KF1xgSViaHtNmTFByb/Xrw22XVTol
+         OhNIBDAjhDqFQoFFbUOo/9MV2kx0iC5Zwb/kYO4CWG2YFyTspcbJ3zq+D8s393xt8TNP
+         lOb8BXDv8XiK9aHG1j6brRnyMulh9TmXmQt5Ggx+NM3QDsW1u9UnMDQgMS0dVywh6uQL
+         I7Nslb69i/TLlBemvu/3YYL2vI3yXR8t4N9r+IrVMGbRFLqXrvqZF11pk0TkqUade2T7
+         sDJ+Y3K2v6GPCwyCntKP0LorzPsJWQDtLEFX3vfOjNaZxB0nSUnzflSyzyTHihzkv6wX
+         JjfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745503841; x=1746108641;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KMrvBQHRfYfkGh/Um2a6kp7PNJoeWsTC0p7ApqTxhJ4=;
-        b=tCyOx0i2N6ENHVjTHxcwdJBFfsebsdJ9iEH69wL/AZ9Q6zXScShZnTcLfCNBxXwyfS
-         7WrhChBvsTtpdSUf5QiLk0TzQWfx9pJpbGAu/R0Orxv3khjtjuvjDSSL39xlUAfuqb/E
-         df8JDxLgx+iM5emgDD/ZCwJt4MF9KUNpWnXXw6YpIcnyLSyfvp+2soBSBlEvbUI8gFXU
-         +ScX9PQB7kJiBFi4JTw7WLsqCYoBBCCfuVJ7fnT6nDlolt++5hr5TChiVmt1abzM+q6j
-         InGUqxvLRhtSbngx2WEMGG6y1ulJ5MMz2bbTIE+/tsjwAHYRqbSq0USnFt9equkjd1zN
-         7XAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUDXhUxWCoE9Y+LUXt55pfp6WNk7TrAg7buDSwpqJTADQavWBF4DT21h3UCb+SRYkPEOrk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw71rbeDdd/BmA6VYGVD+N6DBKHpU8ScLO66QiBtzMZ4xkimH1a
-	GvG8AQVums96dM1c8LYXnSzZ7b2GYpT7CeVOOdVuQ+RoNP+KdVYS5dRm5umdFOMKVAZ8yZ5WYxm
-	O1+/F9xDqQLD8fSclHEplKTcnRhbqgUSJkZ79
-X-Gm-Gg: ASbGnctM+AaDAwSQPVd/iLVEuoFAbNEqYAKOkskp0bg9390hv/EcM9+SIQYry76c+tz
-	9zJUDk8nm7/6pMVn+E5AOwzRbvO9dwNv7Ub6GJBIEmSf7k0ERBPcVLHDJs5IZictziddEQmJQHc
-	2Hp+2ns9mdx20QvyvOedrTaNX33qNBAv9oCNAxV5mLsafc+bROeeaQwA==
-X-Google-Smtp-Source: AGHT+IFD9PMIDjYVZIu4XeDCEmXm5JJ9kqk0ET3qsJ1IGuscVnIeFyKraOFTxsj8pEhDs0FmSrqFKcRZTv0WGcRk6BM=
-X-Received: by 2002:a17:903:190d:b0:223:7f8f:439b with SMTP id
- d9443c01a7336-22db331d4fcmr2342005ad.29.1745503840777; Thu, 24 Apr 2025
- 07:10:40 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1745504025; x=1746108825;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+Gp3+Ahd9oztFC0Ee90Z+LBETEK7lh7obhrs3g0E+vA=;
+        b=mElvp5/FXDge4KkiYxAqEvKmfrRJOcRIjFQxUYAbPuPgMQHx8ZB0M6EGkAld0+SyQI
+         enMm3ssTsxYJrXbpc26UtkHTDtlu4a4ayfknzf1B7UupE4uMtWG1Ia1Svd58m/IeD1p0
+         mlECFsuw/2yasyR2YlvApIhhSyOukOHQaLcWPVv3KiVolTJm405DLrYQfgzN1qSXP+Ru
+         C6BxtSsQrxcBK3QZGcqHTEs5WBn3V+X+LgE6FKvvzZ/AQQN9hR5lV3ZxYgXW147WRW0Q
+         s9EL2WnP5y/pXVSoGR+gJX6PZjgHWyjPoFSdK2SVyx/2Vt+WvX4uPy9qwBqgreqvA8J1
+         WaHw==
+X-Forwarded-Encrypted: i=1; AJvYcCUM2tZcYmI/nAdp3gh0dCxP5oqdKcKp7C4Z3Lr8ex5MUMOOqm3ciZ8G/lVsN+V7e2rS4PY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXxZdocXLFkbjoQDZOGNJzXGzQW5yljXt0RopRrcb9mPtKjBmT
+	5Qz1fa73chqL+gUf4EpLv67+U3McCjhBXXGrFCgr4OMLFUfZ3mOXA1P9Ay0NSFM=
+X-Gm-Gg: ASbGncvkKlaziDdHZB15vSb2wXodm3yQIjQTEWyEYWFrWc/B3W7Zx/p/Q1+YognR8jC
+	owwGi9zQal8djiMaA2eLseS/HyYlwi5KTA+1qnWcWOdUeZAdP1cDaoHBv61wMzfPOkvWNf5QZ0R
+	LU31cFU2CppmQRn9w5slFm8zAy/oC/lU+qyJumys9G9fxSOsvVdXBHDTSnub4C7jhKSJnn/PW6l
+	1Gyu4RUsZIfEikUlAPvkeV83XGbbPZNGGiCEr7tlMonQp144Az+QiDV3cO7kLgyT7WaDqcyUaIl
+	j1lwNmyioFBw4C03t0urLEPaQiYiD5YCFg+veH77Upa2Pyj3Y0zSHbo2p3ZJsAp5lFhaVvnKCDD
+	fD7B1oSnkmiAC1cmL
+X-Google-Smtp-Source: AGHT+IG84/KbH73HJzgia5gWQQPbSCf6KDXX629rg6dbolYAjXdYgdIHXLTmBvWlH/T2NybxvuuICA==
+X-Received: by 2002:a05:6000:4304:b0:39c:1257:cd40 with SMTP id ffacd0b85a97d-3a06cfb31damr2275855f8f.58.1745504025160;
+        Thu, 24 Apr 2025 07:13:45 -0700 (PDT)
+Received: from seksu.systems-nuts.com (stevens.inf.ed.ac.uk. [129.215.164.122])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a06d4a8150sm2199951f8f.7.2025.04.24.07.13.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Apr 2025 07:13:44 -0700 (PDT)
+From: Karim Manaouil <karim.manaouil@linaro.org>
+To: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Cc: Karim Manaouil <karim.manaouil@linaro.org>,
+	Alexander Graf <graf@amazon.com>,
+	Alex Elder <elder@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Prakruthi Deepak Heragu <quic_pheragu@quicinc.com>,
+	Quentin Perret <qperret@google.com>,
+	Rob Herring <robh@kernel.org>,
+	Srinivas Kandagatla <srini@kernel.org>,
+	Srivatsa Vaddagiri <quic_svaddagi@quicinc.com>,
+	Will Deacon <will@kernel.org>,
+	Haripranesh S <haripran@qti.qualcomm.com>,
+	Carl van Schaik <cvanscha@qti.qualcomm.com>,
+	Murali Nalajala <mnalajal@quicinc.com>,
+	Sreenivasulu Chalamcharla <sreeniva@qti.qualcomm.com>,
+	Trilok Soni <tsoni@quicinc.com>,
+	Stefan Schmidt <stefan.schmidt@linaro.org>
+Subject: [RFC PATCH 00/34] Running Qualcomm's Gunyah Guests via KVM in EL1
+Date: Thu, 24 Apr 2025 15:13:07 +0100
+Message-Id: <20250424141341.841734-1-karim.manaouil@linaro.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1726009989.git.ackerleytng@google.com> <38723c5d5e9b530e52f28b9f9f4a6d862ed69bcd.1726009989.git.ackerleytng@google.com>
- <Z+6AGxEvBRFkN5mN@yzhao56-desk.sh.intel.com> <diqzh62ezgdh.fsf@ackerleytng-ctop.c.googlers.com>
- <aAmPQssuN9Zba//b@yzhao56-desk.sh.intel.com> <aAm9OHGt6Ag7ztqs@yzhao56-desk.sh.intel.com>
- <c4dae65f-b5e6-44fa-b5ab-8614f1d47cb5@intel.com> <aAnytM/E6sIdvKNq@yzhao56-desk.sh.intel.com>
-In-Reply-To: <aAnytM/E6sIdvKNq@yzhao56-desk.sh.intel.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Thu, 24 Apr 2025 07:10:28 -0700
-X-Gm-Features: ATxdqUEQE_t-BEFR1W0udJMvfpqwrx52O_-L1cdq80rEE8HhadLoddGPwZuyCFg
-Message-ID: <CAGtprH-Ana5A2hz_D+CQ0NYRVxfpR6e0Sojssym-UtUnYpOPqg@mail.gmail.com>
-Subject: Re: [RFC PATCH 39/39] KVM: guest_memfd: Dynamically split/reconstruct
- HugeTLB page
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Chenyi Qiang <chenyi.qiang@intel.com>, Ackerley Tng <ackerleytng@google.com>, tabba@google.com, 
-	quic_eberman@quicinc.com, roypat@amazon.co.uk, jgg@nvidia.com, 
-	peterx@redhat.com, david@redhat.com, rientjes@google.com, fvdl@google.com, 
-	jthoughton@google.com, seanjc@google.com, pbonzini@redhat.com, 
-	zhiquan1.li@intel.com, fan.du@intel.com, jun.miao@intel.com, 
-	isaku.yamahata@intel.com, muchun.song@linux.dev, erdemaktas@google.com, 
-	qperret@google.com, jhubbard@nvidia.com, willy@infradead.org, 
-	shuah@kernel.org, brauner@kernel.org, bfoster@redhat.com, 
-	kent.overstreet@linux.dev, pvorel@suse.cz, rppt@kernel.org, 
-	richard.weiyang@gmail.com, anup@brainfault.org, haibo1.xu@intel.com, 
-	ajones@ventanamicro.com, vkuznets@redhat.com, maciej.wieczor-retman@intel.com, 
-	pgonda@google.com, oliver.upton@linux.dev, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Apr 24, 2025 at 1:15=E2=80=AFAM Yan Zhao <yan.y.zhao@intel.com> wro=
-te:
->
-> On Thu, Apr 24, 2025 at 01:55:51PM +0800, Chenyi Qiang wrote:
-> >
-> >
-> > On 4/24/2025 12:25 PM, Yan Zhao wrote:
-> > > On Thu, Apr 24, 2025 at 09:09:22AM +0800, Yan Zhao wrote:
-> > >> On Wed, Apr 23, 2025 at 03:02:02PM -0700, Ackerley Tng wrote:
-> > >>> Yan Zhao <yan.y.zhao@intel.com> writes:
-> > >>>
-> > >>>> On Tue, Sep 10, 2024 at 11:44:10PM +0000, Ackerley Tng wrote:
-> > >>>>> +/*
-> > >>>>> + * Allocates and then caches a folio in the filemap. Returns a f=
-olio with
-> > >>>>> + * refcount of 2: 1 after allocation, and 1 taken by the filemap=
-.
-> > >>>>> + */
-> > >>>>> +static struct folio *kvm_gmem_hugetlb_alloc_and_cache_folio(stru=
-ct inode *inode,
-> > >>>>> +                                                           pgoff=
-_t index)
-> > >>>>> +{
-> > >>>>> +       struct kvm_gmem_hugetlb *hgmem;
-> > >>>>> +       pgoff_t aligned_index;
-> > >>>>> +       struct folio *folio;
-> > >>>>> +       int nr_pages;
-> > >>>>> +       int ret;
-> > >>>>> +
-> > >>>>> +       hgmem =3D kvm_gmem_hgmem(inode);
-> > >>>>> +       folio =3D kvm_gmem_hugetlb_alloc_folio(hgmem->h, hgmem->s=
-pool);
-> > >>>>> +       if (IS_ERR(folio))
-> > >>>>> +               return folio;
-> > >>>>> +
-> > >>>>> +       nr_pages =3D 1UL << huge_page_order(hgmem->h);
-> > >>>>> +       aligned_index =3D round_down(index, nr_pages);
-> > >>>> Maybe a gap here.
-> > >>>>
-> > >>>> When a guest_memfd is bound to a slot where slot->base_gfn is not =
-aligned to
-> > >>>> 2M/1G and slot->gmem.pgoff is 0, even if an index is 2M/1G aligned=
-, the
-> > >>>> corresponding GFN is not 2M/1G aligned.
-> > >>>
-> > >>> Thanks for looking into this.
-> > >>>
-> > >>> In 1G page support for guest_memfd, the offset and size are always
-> > >>> hugepage aligned to the hugepage size requested at guest_memfd crea=
-tion
-> > >>> time, and it is true that when binding to a memslot, slot->base_gfn=
- and
-> > >>> slot->npages may not be hugepage aligned.
-> > >>>
-> > >>>>
-> > >>>> However, TDX requires that private huge pages be 2M aligned in GFN=
-.
-> > >>>>
-> > >>>
-> > >>> IIUC other factors also contribute to determining the mapping level=
- in
-> > >>> the guest page tables, like lpage_info and .private_max_mapping_lev=
-el()
-> > >>> in kvm_x86_ops.
-> > >>>
-> > >>> If slot->base_gfn and slot->npages are not hugepage aligned, lpage_=
-info
-> > >>> will track that and not allow faulting into guest page tables at hi=
-gher
-> > >>> granularity.
-> > >>
-> > >> lpage_info only checks the alignments of slot->base_gfn and
-> > >> slot->base_gfn + npages. e.g.,
-> > >>
-> > >> if slot->base_gfn is 8K, npages is 8M, then for this slot,
-> > >> lpage_info[2M][0].disallow_lpage =3D 1, which is for GFN [4K, 2M+8K)=
-;
-> > >> lpage_info[2M][1].disallow_lpage =3D 0, which is for GFN [2M+8K, 4M+=
-8K);
-> > >> lpage_info[2M][2].disallow_lpage =3D 0, which is for GFN [4M+8K, 6M+=
-8K);
-> > >> lpage_info[2M][3].disallow_lpage =3D 1, which is for GFN [6M+8K, 8M+=
-8K);
-> >
-> > Should it be?
-> > lpage_info[2M][0].disallow_lpage =3D 1, which is for GFN [8K, 2M);
-> > lpage_info[2M][1].disallow_lpage =3D 0, which is for GFN [2M, 4M);
-> > lpage_info[2M][2].disallow_lpage =3D 0, which is for GFN [4M, 6M);
-> > lpage_info[2M][3].disallow_lpage =3D 0, which is for GFN [6M, 8M);
-> > lpage_info[2M][4].disallow_lpage =3D 1, which is for GFN [8M, 8M+8K);
-> Right. Good catch. Thanks!
->
-> Let me update the example as below:
-> slot->base_gfn is 2 (for GPA 8KB), npages 2000 (for a 8MB range)
->
-> lpage_info[2M][0].disallow_lpage =3D 1, which is for GPA [8KB, 2MB);
-> lpage_info[2M][1].disallow_lpage =3D 0, which is for GPA [2MB, 4MB);
-> lpage_info[2M][2].disallow_lpage =3D 0, which is for GPA [4MB, 6MB);
-> lpage_info[2M][3].disallow_lpage =3D 0, which is for GPA [6MB, 8MB);
-> lpage_info[2M][4].disallow_lpage =3D 1, which is for GPA [8MB, 8MB+8KB);
->
-> lpage_info indicates that a 2MB mapping is alllowed to cover GPA 4MB and =
-GPA
-> 4MB+16KB. However, their aligned_index values lead guest_memfd to allocat=
-e two
-> 2MB folios, whose physical addresses may not be contiguous.
->
-> Additionally, if the guest accesses two GPAs, e.g., GPA 2MB+8KB and GPA 4=
-MB,
-> KVM could create two 2MB mappings to cover GPA ranges [2MB, 4MB), [4MB, 6=
-MB).
-> However, guest_memfd just allocates the same 2MB folio for both faults.
->
->
-> >
-> > >>
-> > >>   ---------------------------------------------------------
-> > >>   |          |  |          |  |          |  |          |  |
-> > >>   8K        2M 2M+8K      4M  4M+8K     6M  6M+8K     8M  8M+8K
-> > >>
-> > >> For GFN 6M and GFN 6M+4K, as they both belong to lpage_info[2M][2], =
-huge
-> > >> page is allowed. Also, they have the same aligned_index 2 in guest_m=
-emfd.
-> > >> So, guest_memfd allocates the same huge folio of 2M order for them.
-> > > Sorry, sent too fast this morning. The example is not right. The corr=
-ect
-> > > one is:
-> > >
-> > > For GFN 4M and GFN 4M+16K, lpage_info indicates that 2M is allowed. S=
-o,
-> > > KVM will create a 2M mapping for them.
-> > >
-> > > However, in guest_memfd, GFN 4M and GFN 4M+16K do not correspond to t=
-he
-> > > same 2M folio and physical addresses may not be contiguous.
+This series introduces the capability of running Gunyah guests via KVM on
+Qualcomm SoCs shipped with Gunyah hypervisor [1] (e.g. RB3 Gen2).
 
-Then during binding, guest memfd offset misalignment with hugepage
-should be same as gfn misalignment. i.e.
+The goal of this work is to port the existing Gunyah hypervisor support from a
+standalone driver interface [2] to KVM, with the aim of leveraging as much of the
+existing KVM infrastructure as possible to reduce duplication of effort around
+memory management (e.g. guest_memfd), irqfd, and other core components.
 
-(offset & ~huge_page_mask(h)) =3D=3D ((slot->base_gfn << PAGE_SHIFT) &
-~huge_page_mask(h));
+In short, Gunyah is a Type-1 hypervisor, meaning that it runs independently of any
+high-level OS kernel such as Linux and runs in a higher CPU privilege level than VMs.
+Gunyah is shipped as firmware and guests typically talk with Gunyah via hypercalls.
+KVM is designed to run as Type-2 hypervisor. This port allows KVM to run in EL1 and
+serve as the interface for VM lifecycle management,while offloading virtualization
+to Gunyah.
 
-For non guest_memfd backed scenarios, KVM allows slot gfn ranges that
-are not hugepage aligned, so guest_memfd should also be able to
-support non-hugepage aligned memslots.
+This series is heavily based on previous work from Elliot Berman and others,
+available at:
+https://lore.kernel.org/lkml/20240222-gunyah-v17-0-1e9da6763d38@quicinc.com/
 
-> > >
-> > >
-> > >> However, for TDX, GFN 6M and GFN 6M+4K should not belong to the same=
- folio.
-> > >> It's also weird for a 2M mapping in KVM to stride across 2 huge foli=
-os.
-> > >>
-> > >>> Hence I think it is okay to leave it to KVM to fault pages into the
-> > >>> guest correctly. For guest_memfd will just maintain the invariant t=
-hat
-> > >>> offset and size are hugepage aligned, but not require that
-> > >>> slot->base_gfn and slot->npages are hugepage aligned. This behavior=
- will
-> > >>> be consistent with other backing memory for guests like regular shm=
-em or
-> > >>> HugeTLB.
-> > >>>
-> > >>>>> +       ret =3D kvm_gmem_hugetlb_filemap_add_folio(inode->i_mappi=
-ng, folio,
-> > >>>>> +                                                aligned_index,
-> > >>>>> +                                                htlb_alloc_mask(=
-hgmem->h));
-> > >>>>> +       WARN_ON(ret);
-> > >>>>> +
-> > >>>>>         spin_lock(&inode->i_lock);
-> > >>>>>         inode->i_blocks +=3D blocks_per_huge_page(hgmem->h);
-> > >>>>>         spin_unlock(&inode->i_lock);
-> > >>>>>
-> > >>>>> -       return page_folio(requested_page);
-> > >>>>> +       return folio;
-> > >>>>> +}
-> > >
-> >
+Many commits in this series are identical to or derived from previous work. To
+preserve authorship and attribution, original `Author:` and `Signed-off-by:` tags
+have been retained where appropriate, and occasionally `Reviewed-by:` lines were
+kept as well.
+
+While this series builds on much of the original Gunyah implementation, it drops
+certain parts in favor of existing upstream features:
+  - `gunyah_memfd` is dropped (currently using pinned anonymous pages — see below).
+  - `gunyah_irqfd` is dropped in favor of KVM's irqfd.
+  - Resource management, vCPU creation, and VM lifecycle are integrated directly
+    into KVM’s architecture hooks.
+
+At this stage, the port is functional but still **work in progress**. Notably:
+  - Memory for guests is currently backed by **pinned anonymous pages**. This is a
+    temporary solution: we intend to migrate to `guest_memfd`.
+  - Memory compaction or swap must be avoided for now, as pages donated to Gunyah
+    are no longer accessible from the host once mapped into the guest.
+  - SMP boot is not available at the moment because Gunyah does not yet
+    forward PSCI hypercalls to the host.
+  - Virtio is not supported yet.
+
+There is a lot of room for performance improvment. For example, ATM.
+there is a lot of privilege level switching between EL1, EL2 (and
+possible EL3). As well as context swicthing between guest kernel space
+and guest userspace. For those interested, I have a compiled some slides
+here to summarise the issues:
+https://docs.google.com/presentation/d/1fL1TM1oxBrWFSL8KKw4jQtMDh7NOvyqbWWVu8iQxvoI/edit?usp=sharing
+
+To test the port, a modified version of Qemu is needed. A version can be
+found here:
+https://github.com/karim-manaouil/qemu-for-gunyah
+
+The series is based on linux-next as of today. A git tree is also
+available here (gunyah-kvm branch):
+https://github.com/karim-manaouil/linux-next
+
+To test the guest, run (with the modified qemu):
+./qemu-system-aarch64 \
+	-enable-kvm \
+	-machine virt,highmem=off \
+	-cpu host \
+	-smp 1 \
+	-m 1G \
+	-nographic \
+	-kernel Image \
+	-initrd initrd.img \
+	-append "console=ttyAMA0 earlycon rdinit=/bin/sh"
+
+Feedback Welcome!
+
+[1] https://www.qualcomm.com/developer/blog/2024/08/learn-about-gunyah--qualcomm-s-open-source--lightweight-hypervis
+[2] https://lore.kernel.org/lkml/20240222-gunyah-v17-0-1e9da6763d38@quicinc.com/
+
+Elliot Berman (20):
+  docs: gunyah: Introduce Gunyah Hypervisor
+  dt-bindings: Add binding for gunyah hypervisor
+  gunyah: Common types and error codes for Gunyah hypercalls
+  gunyah: Add hypercalls to identify Gunyah
+  gunyah: Add hypervisor driver
+  gunyah: Add hypercalls to send and receive messages
+  gunyah: Add resource manager RPC core
+  gunyah: Add VM lifecycle RPC
+  gunyah: Translate gh_rm_hyp_resource into gunyah_resource
+  gunyah: Add resource tickets
+  gunyah: Add hypercalls for running a vCPU
+  gunyah: Add hypercalls for demand paging
+  gunyah: Add memory parcel RPC
+  gunyah: Add interfaces to map memory into guest address space
+  gunyah: Add platform ops on mem_lend/mem_reclaim
+  gunyah: Add Qualcomm Gunyah platform ops
+  gunyah: Share guest VM dtb configuration to Gunyah
+  gunyah: Add RPC to enable demand paging
+  gunyah: Add RPC to set VM boot context
+  gunyah: Add hypercalls for sending doorbell
+
+Karim Manaouil (14):
+  KVM: Allow arch-specific vCPU allocation and freeing
+  KVM: irqfd: Add architecture hooks for irqfd allocation and
+    initialization
+  KVM: irqfd: Allow KVM backends to override IRQ injection via set_irq
+    callback
+  KVM: Add weak stubs for irqchip-related functions for Gunyah builds
+  KVM: Add KVM_SET_DTB_ADDRESS ioctl to pass guest DTB address from
+    userspace
+  KVM: gunyah: Add initial Gunyah backend support
+  KVM: gunyah: Pin guest memory
+  gunyah: Add basic VM lifecycle management
+  gunyah: add proxy-scheduled vCPUs
+  gunyah: Share memory parcels
+  gunyah: Enable demand paging
+  gunyah: allow userspace to set boot cpu context
+  KVM: gunyah: Implement irqfd interface
+  KVM: gunyah: enable KVM for Gunyah
+
+ .../bindings/firmware/gunyah-hypervisor.yaml  |   82 +
+ Documentation/virt/gunyah/index.rst           |  135 ++
+ Documentation/virt/gunyah/message-queue.rst   |   68 +
+ Documentation/virt/index.rst                  |    1 +
+ arch/arm64/Kbuild                             |    1 +
+ arch/arm64/gunyah/Makefile                    |    3 +
+ arch/arm64/gunyah/gunyah_hypercall.c          |  279 +++
+ arch/arm64/include/asm/gunyah.h               |   57 +
+ arch/arm64/include/asm/kvm_host.h             |   10 +-
+ arch/arm64/include/asm/virt.h                 |    7 +
+ arch/arm64/kernel/cpufeature.c                |    4 +
+ arch/arm64/kernel/image-vars.h                |    2 +-
+ arch/arm64/kvm/Kconfig                        |   22 +-
+ arch/arm64/kvm/Makefile                       |   14 +-
+ arch/arm64/kvm/gunyah.c                       | 2085 +++++++++++++++++
+ drivers/virt/Kconfig                          |    2 +
+ drivers/virt/Makefile                         |    1 +
+ drivers/virt/gunyah/Kconfig                   |   29 +
+ drivers/virt/gunyah/Makefile                  |    7 +
+ drivers/virt/gunyah/gunyah.c                  |   55 +
+ drivers/virt/gunyah/gunyah_platform_hooks.c   |  117 +
+ drivers/virt/gunyah/gunyah_qcom.c             |  220 ++
+ drivers/virt/gunyah/rsc_mgr.c                 |  792 +++++++
+ drivers/virt/gunyah/rsc_mgr_rpc.c             |  572 +++++
+ include/kvm/arm_pmu.h                         |    2 +-
+ include/linux/gunyah.h                        |  425 ++++
+ include/linux/gunyah_rsc_mgr.h                |  182 ++
+ include/linux/irqchip/arm-vgic-info.h         |    2 +-
+ include/linux/kvm_host.h                      |    3 +
+ include/linux/kvm_irqfd.h                     |    5 +
+ include/linux/perf/arm_pmu.h                  |    2 +-
+ include/uapi/linux/kvm.h                      |   14 +-
+ virt/kvm/eventfd.c                            |   56 +-
+ virt/kvm/kvm_main.c                           |   24 +-
+ 34 files changed, 5258 insertions(+), 22 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/firmware/gunyah-hypervisor.yaml
+ create mode 100644 Documentation/virt/gunyah/index.rst
+ create mode 100644 Documentation/virt/gunyah/message-queue.rst
+ create mode 100644 arch/arm64/gunyah/Makefile
+ create mode 100644 arch/arm64/gunyah/gunyah_hypercall.c
+ create mode 100644 arch/arm64/include/asm/gunyah.h
+ create mode 100644 arch/arm64/kvm/gunyah.c
+ create mode 100644 drivers/virt/gunyah/Kconfig
+ create mode 100644 drivers/virt/gunyah/Makefile
+ create mode 100644 drivers/virt/gunyah/gunyah.c
+ create mode 100644 drivers/virt/gunyah/gunyah_platform_hooks.c
+ create mode 100644 drivers/virt/gunyah/gunyah_qcom.c
+ create mode 100644 drivers/virt/gunyah/rsc_mgr.c
+ create mode 100644 drivers/virt/gunyah/rsc_mgr_rpc.c
+ create mode 100644 include/linux/gunyah.h
+ create mode 100644 include/linux/gunyah_rsc_mgr.h
+
+-- 
+2.39.5
+
 
