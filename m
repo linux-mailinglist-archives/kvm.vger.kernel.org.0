@@ -1,161 +1,157 @@
-Return-Path: <kvm+bounces-44027-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44028-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19EF6A99ED0
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 04:31:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01235A99F04
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 04:56:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EA8E194683A
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 02:31:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C97B3BE8E7
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 02:56:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B03119D065;
-	Thu, 24 Apr 2025 02:31:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R5GgT0FA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E87F1A0BFD;
+	Thu, 24 Apr 2025 02:56:41 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from baidu.com (mx24.baidu.com [111.206.215.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74E162701BD
-	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 02:31:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81D3A19CCEA;
+	Thu, 24 Apr 2025 02:56:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.206.215.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745461894; cv=none; b=NnTyAqYAZo7FAL+SVg1BAg60apSkwILzdueg8+RJNOf9AWM/7Mu02/y9KDg862Qesdcf2eEQLPJGVFi13UgB/rXv/ohg8aW2A13x3ZwKS7KYtBg8ouDOX76Qk1KdylCY7VTe6ZGzMn94qzBDbIacCxQA87laS9Rn5fM8f1CBRMY=
+	t=1745463401; cv=none; b=pARz3S7Zmm74HrBQVaTy+O6lFLEaKkDZBJDUaeBwpx9Sa9AT22KeOFfFC+22FNbbMBFZiWVUENhMvPudsTOrt3nW+r3WtMrBvCaYycOSBqr2D7VKbRz/6dlf200/FGOB9LC4X7ivz7t4XVREewMdHTSmtRy78xicVXdk7q9cbko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745461894; c=relaxed/simple;
-	bh=Ekg2qfsM9bPBGyQiZZJL+MMvwd2ayI0bu7Qyc0F1u/8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qB50lY+qyfUOL+2Imf9Vgh14kblLOTGZa6PC2JUmpHgVu0VKx1CsQBN0Xk5T+H+MXVuugf3VIQa2PBLfwutZToUSlCBeaNwmLdASzwt45e9Dk3QJNMBYYrTqci8Dyi37b44t0mhSxIG8hOQarq9Z21SgOcZ0wyoZi7BlPpPmnA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R5GgT0FA; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745461892; x=1776997892;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=Ekg2qfsM9bPBGyQiZZJL+MMvwd2ayI0bu7Qyc0F1u/8=;
-  b=R5GgT0FAFX8kNEh2xfzjBzEAizxEelD/rJ94BplZeR7IGi2WtSEyp6uH
-   bUymRKj/FEMNyp2++4OqogQPxcDxBot9ve5Yjy9tr45hi0HTrSEwnYF5p
-   m10bT41I93nQCmlcGgFo7XARpLGs78b9Z1H8hxBif3mgcn1/cnd+2dYFY
-   vYdnEwE2Uvbbb/9oM1sAWJaq7k+wZkGj8BT2cBRxpbBTTlR7WWXO2pqrB
-   AoH2I/zKCBFICVEBPKCKFL0EyJS8FNho9TMkGBTqyk/XQ/OegeYLhTzFN
-   8tXjHzg/1504YIW5tYIoNGufZoSKwcD0XM3TYrue0DQ2ip6gm+njAE9ii
-   g==;
-X-CSE-ConnectionGUID: 4bBuvt7hQO+24I7tuZSm3Q==
-X-CSE-MsgGUID: M6N7TYmeQeif2F1e2n2AGw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11412"; a="57724971"
-X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
-   d="scan'208";a="57724971"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 19:31:31 -0700
-X-CSE-ConnectionGUID: 3zhve+q3R8inQ1NaKVLnag==
-X-CSE-MsgGUID: UH0bjNOcTgOH3Yrd3jjvvA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
-   d="scan'208";a="132788659"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
-  by fmviesa008.fm.intel.com with ESMTP; 23 Apr 2025 19:31:28 -0700
-Date: Thu, 24 Apr 2025 10:52:24 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	Babu Moger <babu.moger@amd.com>, Ewan Hai <ewanhai-oc@zhaoxin.com>,
-	Tejus GK <tejus.gk@nutanix.com>, Jason Zeng <jason.zeng@intel.com>,
-	Manish Mishra <manish.mishra@nutanix.com>,
-	Tao Su <tao1.su@intel.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org
-Subject: Re: [RFC 01/10] i386/cpu: Mark CPUID[0x80000005] as reserved for
- Intel
-Message-ID: <aAmnaAbrELVl3UiT@intel.com>
-References: <20250423114702.1529340-1-zhao1.liu@intel.com>
- <20250423114702.1529340-2-zhao1.liu@intel.com>
- <596c7a44-797b-4a16-bd7e-0f0dc5c2e593@intel.com>
+	s=arc-20240116; t=1745463401; c=relaxed/simple;
+	bh=zQalGsbxTBX06jBm/oT6wKizmyMtivzPZ9QWHX/5RRI=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=LRASfcQECnp9gukdUUiK1XtPj+llpwe9ZIZ0qyiOzsRlg9KIbpaiVDBfn69jMd+4dFVnlEpX0g0RFN40XcovNdKFi1j6nn/Mwl4yTs27p5Lj3S6J+L8JfMbZfahYad4yNZIrKQivDmlXr8CYrDa5eZp/Q4Mln3D8npMZ0luvBgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=111.206.215.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
+From: "Li,Rongqing" <lirongqing@baidu.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: "pbonzini@redhat.com" <pbonzini@redhat.com>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "Li,Zhaoxin(ACG CCN)" <lizhaoxin04@baidu.com>
+Subject: =?gb2312?B?tPC4tDogWz8/Pz9dIFJlOiBbUEFUQ0hdIEtWTTogVXNlIGNhbGxfcmN1KCkg?=
+ =?gb2312?B?aW4ga3ZtX2lvX2J1c19yZWdpc3Rlcl9kZXY=?=
+Thread-Topic: [????] Re: [PATCH] KVM: Use call_rcu() in
+ kvm_io_bus_register_dev
+Thread-Index: AQHbtDGgrzSppzuzck+TBQD3uwy4MbOw0jWAgAFLEUA=
+Date: Thu, 24 Apr 2025 02:56:22 +0000
+Message-ID: <4bfe7a8f5020448e903e6335173afc75@baidu.com>
+References: <20250423092509.3162-1-lirongqing@baidu.com>
+ <aAkAY40UbqzQNr8m@google.com>
+In-Reply-To: <aAkAY40UbqzQNr8m@google.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <596c7a44-797b-4a16-bd7e-0f0dc5c2e593@intel.com>
+X-FEAS-Client-IP: 172.31.50.16
+X-FE-Last-Public-Client-IP: 100.100.100.38
+X-FE-Policy-ID: 52:10:53:SYSTEM
 
-> > +        /*
-> > +         * cache info (L1 cache)
-> > +         *
-> > +         * For !vendor_cpuid_only case, non-AMD CPU would get the wrong
-> > +         * information, i.e., get AMD's cache model. It doesn't matter,
-> > +         * vendor_cpuid_only has been turned on by default since
-> > +         * PC machine v6.1.
-> > +         */
-> 
-> We need to define a new compat property for it other than vendor_cpuid_only,
-> for 10.1.
-> 
-> I proposed some change to leaf FEAT_8000_0001_EDX[1], and I was told by
-> Paolo (privately) that vendor_cpuid_only doesn't suffice.
-> 
->  On Fri, Oct 11, 2024 at 6:22 PM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
->  >
->  > On 10/11/2024 11:30 PM, Paolo Bonzini wrote:
->  > > On Fri, Oct 11, 2024 at 4:55 PM Xiaoyao Li <xiaoyao.li@intel.com>
-> wrote:
->  > >>
->  > >> I think patch 8 is also a general issue> Without it, the
->  > >> CPUID_EXT2_AMD_ALIASES bits are exposed to Intel VMs which are
->  > >> reserved bits for Intel.
->  > >
->  > > Yes but you'd have to add compat properties for these. If you can do
->  > > it for TDX only, that's easier.
->  >
->  > Does vendor_cpuid_only suffice?
-> 
->  Unfortunately not, because it is turned off only for <=6.0 machine
->  types. Here you'd have to turn it off for <=9.1 machine types.
-> 
-> 
-> [1] https://lore.kernel.org/qemu-devel/20240814075431.339209-9-xiaoyao.li@intel.com/
-
-For the patch link, you wanted to mark it as unavailiable but it would
-break the machine <= 6.0 (with vendor_cpuid_only turned off), correct?
-
-For this patch:
- * vendor_cpuid_only turns off for <= 6.0 machine, no change.
- * vendor_cpuid_only turns on for > 6.0 machine, I treated it as a
-   "direct" fix because original codes encode the AMD cache model info
-   on non-AMD platform (in ecx & edx). This doesn't make sense. Non-AMD
-   platform should use cache_info_cpuid4 or 0 here. If it is considered
-   a fix, it may be more appropriate to use cache_info_cpuid4.
-
-I think it's somehow similar to the “trade-offs” Daniel indicated [2].
-
-This case can also be fixed by compat option. Then we don't  need to
-encode cache_info_cpuid4 info for non-AMD platforms in this leaf.
-
-Do you still need the patches in your links? (I didn't find the related
-patch merged.) If so, I can add the compat option in the next version
-which could also help you land your previous patches v10.1 as well.
-
-[2]: https://lore.kernel.org/qemu-devel/Z08j2Ii-QuZk3lTY@redhat.com/
-
-> > +        if (cpu->vendor_cpuid_only &&
-> > +            (IS_INTEL_CPU(env) || IS_ZHAOXIN_CPU(env))) {
-> > +            *eax = *ebx = *ecx = *edx = 0;
-> > +            break;
-> > +        } else if (cpu->cache_info_passthrough) {
-> >               x86_cpu_get_cache_cpuid(index, 0, eax, ebx, ecx, edx);
-> >               break;
-> >           }
-> > +
-> >           *eax = (L1_DTLB_2M_ASSOC << 24) | (L1_DTLB_2M_ENTRIES << 16) |
-> >                  (L1_ITLB_2M_ASSOC <<  8) | (L1_ITLB_2M_ENTRIES);
-> >           *ebx = (L1_DTLB_4K_ASSOC << 24) | (L1_DTLB_4K_ENTRIES << 16) |
-> 
+DQo+IE9uIFdlZCwgQXByIDIzLCAyMDI1LCBsaXJvbmdxaW5nIHdyb3RlOg0KPiA+IEZyb206IExp
+IFJvbmdRaW5nIDxsaXJvbmdxaW5nQGJhaWR1LmNvbT4NCj4gPg0KPiA+IFVzZSBjYWxsX3JjdSgp
+IGluc3RlYWQgb2YgY29zdGx5IHN5bmNocm9uaXplX3NyY3VfZXhwZWRpdGVkKCksIHRoaXMNCj4g
+PiBjYW4gcmVkdWNlIHRoZSBWTSBib290dXAgdGltZSwgYW5kIHJlZHVjZSBWTSBtaWdyYXRpb24g
+ZG93bnRpbWUNCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IGxpemhhb3hpbiA8bGl6aGFveGluMDRA
+YmFpZHUuY29tPg0KPiANCj4gSWYgbGl6aGFveGluIGlzIGEgY28tYXV0aG9yLCB0aGVuIHRoaXMg
+bmVlZHM6DQo+IA0KPiAgIENvLWRldmVsb3BlZC1ieTogbGl6aGFveGluIDxsaXpoYW94aW4wNEBi
+YWlkdS5jb20+DQo+IA0KDQpUaGFua3MsIEkgd2lsbCBhZGQNCg0KPiBJZiB0aGV5IGFyZSBfdGhl
+XyBhdXRob3IsIHRoZW4gdGhlIEZyb206IGFib3ZlIGlzIHdyb25nLg0KPiANCj4gPiBTaWduZWQt
+b2ZmLWJ5OiBMaSBSb25nUWluZyA8bGlyb25ncWluZ0BiYWlkdS5jb20+DQo+ID4gLS0tDQo+ID4g
+IGluY2x1ZGUvbGludXgva3ZtX2hvc3QuaCB8ICAxICsNCj4gPiAgdmlydC9rdm0va3ZtX21haW4u
+YyAgICAgIHwgMTEgKysrKysrKysrLS0NCj4gPiAgMiBmaWxlcyBjaGFuZ2VkLCAxMCBpbnNlcnRp
+b25zKCspLCAyIGRlbGV0aW9ucygtKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvbGlu
+dXgva3ZtX2hvc3QuaCBiL2luY2x1ZGUvbGludXgva3ZtX2hvc3QuaCBpbmRleA0KPiA+IDI5MWQ0
+OWIuLmU3NzI3MDQgMTAwNjQ0DQo+ID4gLS0tIGEvaW5jbHVkZS9saW51eC9rdm1faG9zdC5oDQo+
+ID4gKysrIGIvaW5jbHVkZS9saW51eC9rdm1faG9zdC5oDQo+ID4gQEAgLTIwMyw2ICsyMDMsNyBA
+QCBzdHJ1Y3Qga3ZtX2lvX3JhbmdlIHsgICNkZWZpbmUgTlJfSU9CVVNfREVWUw0KPiAxMDAwDQo+
+ID4NCj4gPiAgc3RydWN0IGt2bV9pb19idXMgew0KPiA+ICsJc3RydWN0IHJjdV9oZWFkIHJjdTsN
+Cj4gPiAgCWludCBkZXZfY291bnQ7DQo+ID4gIAlpbnQgaW9ldmVudGZkX2NvdW50Ow0KPiA+ICAJ
+c3RydWN0IGt2bV9pb19yYW5nZSByYW5nZVtdOw0KPiA+IGRpZmYgLS1naXQgYS92aXJ0L2t2bS9r
+dm1fbWFpbi5jIGIvdmlydC9rdm0va3ZtX21haW4uYyBpbmRleA0KPiA+IDJlNTkxY2MuLmFmNzMw
+YTUgMTAwNjQ0DQo+ID4gLS0tIGEvdmlydC9rdm0va3ZtX21haW4uYw0KPiA+ICsrKyBiL3ZpcnQv
+a3ZtL2t2bV9tYWluLmMNCj4gPiBAQCAtNTg2NSw2ICs1ODY1LDEzIEBAIGludCBrdm1faW9fYnVz
+X3JlYWQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LA0KPiBlbnVtIGt2bV9idXMgYnVzX2lkeCwgZ3Bh
+X3QgYWRkciwNCj4gPiAgCXJldHVybiByIDwgMCA/IHIgOiAwOw0KPiA+ICB9DQo+ID4NCj4gPiAr
+c3RhdGljIHZvaWQgZnJlZV9rdm1faW9fYnVzKHN0cnVjdCByY3VfaGVhZCAqcmN1KSB7DQo+ID4g
+KwlzdHJ1Y3Qga3ZtX2lvX2J1cyAqYnVzID0gY29udGFpbmVyX29mKHJjdSwgc3RydWN0IGt2bV9p
+b19idXMsIHJjdSk7DQo+ID4gKw0KPiA+ICsJa2ZyZWUoYnVzKTsNCj4gPiArfQ0KPiA+ICsNCj4g
+PiAgaW50IGt2bV9pb19idXNfcmVnaXN0ZXJfZGV2KHN0cnVjdCBrdm0gKmt2bSwgZW51bSBrdm1f
+YnVzIGJ1c19pZHgsDQo+IGdwYV90IGFkZHIsDQo+ID4gIAkJCSAgICBpbnQgbGVuLCBzdHJ1Y3Qg
+a3ZtX2lvX2RldmljZSAqZGV2KSAgeyBAQCAtNTkwMyw4ICs1OTEwLDgNCj4gQEANCj4gPiBpbnQg
+a3ZtX2lvX2J1c19yZWdpc3Rlcl9kZXYoc3RydWN0IGt2bSAqa3ZtLCBlbnVtIGt2bV9idXMgYnVz
+X2lkeCwgZ3BhX3QNCj4gYWRkciwNCj4gPiAgCW1lbWNweShuZXdfYnVzLT5yYW5nZSArIGkgKyAx
+LCBidXMtPnJhbmdlICsgaSwNCj4gPiAgCQkoYnVzLT5kZXZfY291bnQgLSBpKSAqIHNpemVvZihz
+dHJ1Y3Qga3ZtX2lvX3JhbmdlKSk7DQo+ID4gIAlyY3VfYXNzaWduX3BvaW50ZXIoa3ZtLT5idXNl
+c1tidXNfaWR4XSwgbmV3X2J1cyk7DQo+ID4gLQlzeW5jaHJvbml6ZV9zcmN1X2V4cGVkaXRlZCgm
+a3ZtLT5zcmN1KTsNCj4gPiAtCWtmcmVlKGJ1cyk7DQo+ID4gKw0KPiA+ICsJY2FsbF9zcmN1KCZr
+dm0tPnNyY3UsICZidXMtPnJjdSwgZnJlZV9rdm1faW9fYnVzKTsNCj4gDQo+IEkgZG9uJ3QgdGhp
+bmsgdGhpcyBpcyBzYWZlIGZyb20gYSBmdW5jdGlvbmFsIGNvcnJlY3RuZXNzIHBlcnNwZWN0aXZl
+LCBhcyBLVk0gbXVzdA0KPiBndWFyYW50ZWUgYWxsIHJlYWRlcnMgc2VlIHRoZSBuZXcgZGV2aWNl
+IGJlZm9yZSBLVk0gcmV0dXJucyBjb250cm9sIHRvDQo+IHVzZXJzcGFjZS4NCj4gRS5nLiBJJ20g
+cHJldHR5IHN1cmUgS1ZNX1JFR0lTVEVSX0NPQUxFU0NFRF9NTUlPIGlzIHVzZWQgd2hpbGUgdkNQ
+VXMgYXJlDQo+IGFjdGl2ZS4NCj4gDQo+IEhvd2V2ZXIsIEknbSBwcmV0dHkgc3VyZSB0aGUgb25s
+eSByZWFkZXJzIHRoYXQgYWN0dWFsbHkgcmVseSBvbiBTUkNVIGFyZSB2Q1BVcywNCj4gc28gSSBf
+dGhpbmtfIHRoZSBzeW5jaHJvbml6ZV9zcmN1X2V4cGVkaXRlZCgpIGlzIG5lY2Vzc2FyeSBpZiBh
+bmQgb25seSBpZiB2Q1BVcw0KPiBoYXZlIGJlZW4gY3JlYXRlZC4NCj4gDQo+IFRoYXQgY291bGQg
+cmFjZSB3aXRoIGNvbmN1cnJlbnQgdkNQVSBjcmVhdGlvbiBpbiBhIGZldyBmbG93cyB0aGF0IGRv
+bid0IHRha2UNCj4ga3ZtLT5sb2NrLCBidXQgdGhhdCBzaG91bGQgYmUgb2sgZnJvbSBhbiBBQkkg
+cGVyc3BlY3RpdmUuICBGYWxzZQ0KPiBrdm0tPnBvc2l0aXZlcyAodkNQVQ0KPiBjcmVhdGlvbiBm
+YWlscykgYXJlIGJlbmlnbiwgYW5kIGZhbHNlIG5lZ2F0aXZlcyAodkNQVSBjcmVhdGVkIGFmdGVy
+IHRoZSBjaGVjaykgYXJlDQo+IGluaGVyZW50bHkgcmFjeSwgaS5lLiB1c2Vyc3BhY2UgY2FuJ3Qg
+Z3VhcmFudGVlIHRoZSB2Q1BVIHNlZXMgYW55IHBhcnRpY3VsYXINCj4gb3JkZXJpbmcuDQo+IA0K
+PiBTbyB0aGlzPw0KPiANCj4gCWlmIChSRUFEX09OQ0Uoa3ZtLT5jcmVhdGVkX3ZjcHVzKSkgew0K
+PiAJCXN5bmNocm9uaXplX3NyY3VfZXhwZWRpdGVkKCZrdm0tPnNyY3UpOw0KPiAJCWtmcmVlKGJ1
+cyk7DQo+IAl9IGVsc2Ugew0KPiAJCWNhbGxfc3JjdSgma3ZtLT5zcmN1LCAmYnVzLT5yY3UsIGZy
+ZWVfa3ZtX2lvX2J1cyk7DQo+IAl9DQoNCg0KSWYgY2FsbF9zcmN1IGlzIGFibGUgdG8gdXNlZCBv
+bmx5IGJlZm9yZSBjcmVhdGluZyB2Q1BVLCB0aGUgdXBwZXIgd2lsbCBoYXZlIGxpdHRsZSBlZmZl
+Y3QsIHNpbmNlIG1vc3QgZGV2aWNlIGFyZSBjcmVhdGVkIGFmdGVyIGNyZWF0aW5nIHZDUFUNCg0K
+V2Ugd2FudCB0byBvcHRpbWl6ZSB0aGUgaW9ldmVudGZkIGNyZWF0aW9uLCBzaW5jZSBhIFZNIHdp
+bGwgY3JlYXRlIGxvdHMgb2YgaW9ldmVudGZkLCBjYW4gaW9ldmVudGZkIHVzZXMgY2FsbF9zcmN1
+Pw0KDQpMaWtlOg0KDQoNCi0tLSBhL3ZpcnQva3ZtL2V2ZW50ZmQuYw0KKysrIGIvdmlydC9rdm0v
+ZXZlbnRmZC5jDQpAQCAtODUzLDggKzg1Myw4IEBAIHN0YXRpYyBpbnQga3ZtX2Fzc2lnbl9pb2V2
+ZW50ZmRfaWR4KHN0cnVjdCBrdm0gKmt2bSwNCg0KICAgICAgICBrdm1faW9kZXZpY2VfaW5pdCgm
+cC0+ZGV2LCAmaW9ldmVudGZkX29wcyk7DQoNCi0gICAgICAgcmV0ID0ga3ZtX2lvX2J1c19yZWdp
+c3Rlcl9kZXYoa3ZtLCBidXNfaWR4LCBwLT5hZGRyLCBwLT5sZW5ndGgsDQotICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICZwLT5kZXYpOw0KKyAgICAgICByZXQgPSBfX2t2bV9p
+b19idXNfcmVnaXN0ZXJfZGV2KGt2bSwgYnVzX2lkeCwgcC0+YWRkciwgcC0+bGVuZ3RoLA0KKyAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAmcC0+ZGV2LCBmYWxzZSk7DQogICAg
+ICAgIGlmIChyZXQgPCAwKQ0KICAgICAgICAgICAgICAgIGdvdG8gdW5sb2NrX2ZhaWw7DQoNCmRp
+ZmYgLS1naXQgYS92aXJ0L2t2bS9rdm1fbWFpbi5jIGIvdmlydC9rdm0va3ZtX21haW4uYw0KaW5k
+ZXggMmU1OTFjYy4uZmYyOTRiMCAxMDA2NDQNCi0tLSBhL3ZpcnQva3ZtL2t2bV9tYWluLmMNCisr
+KyBiL3ZpcnQva3ZtL2t2bV9tYWluLmMNCkBAIC01ODY1LDggKzU4NjUsMTUgQEAgaW50IGt2bV9p
+b19idXNfcmVhZChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGVudW0ga3ZtX2J1cyBidXNfaWR4LCBn
+cGFfdCBhZGRyLA0KICAgICAgICByZXR1cm4gciA8IDAgPyByIDogMDsNCiB9DQoNCi1pbnQga3Zt
+X2lvX2J1c19yZWdpc3Rlcl9kZXYoc3RydWN0IGt2bSAqa3ZtLCBlbnVtIGt2bV9idXMgYnVzX2lk
+eCwgZ3BhX3QgYWRkciwNCi0gICAgICAgICAgICAgICAgICAgICAgICAgICBpbnQgbGVuLCBzdHJ1
+Y3Qga3ZtX2lvX2RldmljZSAqZGV2KQ0KK3N0YXRpYyB2b2lkIGZyZWVfa3ZtX2lvX2J1cyhzdHJ1
+Y3QgcmN1X2hlYWQgKnJjdSkNCit7DQorICAgICAgIHN0cnVjdCBrdm1faW9fYnVzICpidXMgPSBj
+b250YWluZXJfb2YocmN1LCBzdHJ1Y3Qga3ZtX2lvX2J1cywgcmN1KTsNCisNCisgICAgICAga2Zy
+ZWUoYnVzKTsNCit9DQorDQoraW50IF9fa3ZtX2lvX2J1c19yZWdpc3Rlcl9kZXYoc3RydWN0IGt2
+bSAqa3ZtLCBlbnVtIGt2bV9idXMgYnVzX2lkeCwgZ3BhX3QgYWRkciwNCisgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBpbnQgbGVuLCBzdHJ1Y3Qga3ZtX2lvX2RldmljZSAqZGV2LCBib29sIHN5
+bmMpDQogew0KICAgICAgICBpbnQgaTsNCiAgICAgICAgc3RydWN0IGt2bV9pb19idXMgKm5ld19i
+dXMsICpidXM7DQpAQCAtNTkwMywxMiArNTkxMCwyMiBAQCBpbnQga3ZtX2lvX2J1c19yZWdpc3Rl
+cl9kZXYoc3RydWN0IGt2bSAqa3ZtLCBlbnVtIGt2bV9idXMgYnVzX2lkeCwgZ3BhX3QgYWRkciwN
+CiAgICAgICAgbWVtY3B5KG5ld19idXMtPnJhbmdlICsgaSArIDEsIGJ1cy0+cmFuZ2UgKyBpLA0K
+ICAgICAgICAgICAgICAgIChidXMtPmRldl9jb3VudCAtIGkpICogc2l6ZW9mKHN0cnVjdCBrdm1f
+aW9fcmFuZ2UpKTsNCiAgICAgICAgcmN1X2Fzc2lnbl9wb2ludGVyKGt2bS0+YnVzZXNbYnVzX2lk
+eF0sIG5ld19idXMpOw0KLSAgICAgICBzeW5jaHJvbml6ZV9zcmN1X2V4cGVkaXRlZCgma3ZtLT5z
+cmN1KTsNCi0gICAgICAga2ZyZWUoYnVzKTsNCisNCisgICAgICAgaWYgKHN5bmMpIHsNCisgICAg
+ICAgICAgICAgICBzeW5jaHJvbml6ZV9zcmN1X2V4cGVkaXRlZCgma3ZtLT5zcmN1KTsNCisgICAg
+ICAgICAgICAgICBrZnJlZShidXMpOw0KKyAgICAgICB9DQorICAgICAgIGVsc2UNCisgICAgICAg
+ICAgICAgICBjYWxsX3NyY3UoJmt2bS0+c3JjdSwgJmJ1cy0+cmN1LCBmcmVlX2t2bV9pb19idXMp
+Ow0KDQogICAgICAgIHJldHVybiAwOw0KIH0gDQoNCg0KVGhhbmtzDQoNCi1MaQ0K
 
