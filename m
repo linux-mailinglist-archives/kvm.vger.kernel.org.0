@@ -1,212 +1,258 @@
-Return-Path: <kvm+bounces-44101-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44102-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7F2FA9A64E
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 10:39:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB3D4A9A69A
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 10:45:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E06074662D4
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 08:39:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D3EE9212F9
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 08:45:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98A7D21C160;
-	Thu, 24 Apr 2025 08:37:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADA4F1E0083;
+	Thu, 24 Apr 2025 08:43:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QSDER3bN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FLEgsN+W"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0190E213240
-	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 08:37:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745483827; cv=none; b=EJ9QBho3hnouXDNb+QZd1PlM0v8v5thisymlQzGdJjBgt+Zyb2aob7NKw3dni67lT5gQeNfkm3ezvYAdVrrSEdOEEdiDPeTzzDEYEFpPF851mhXiy7DlB2hpGadAyDhnmIeZcbej9oeyZxZopsvPkUTkjS1RHJIFkmYfiUEGiW4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745483827; c=relaxed/simple;
-	bh=fPeja0QKwMSDRTJx03tZ5pM4veCCSXRBmgYEmRDUSpA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BDY9oAG9veNJwMQc6H6oB4ig8w8W102zeavQTjyql3uoZwJxrIJZen1KolcKgv5O70QsWNiqsyqRIHJiNaj5XQnjp519IFWi7ny+gWHGV1CxEXQBneJ1i8nbj7aj/hLxML1aPcXnJhRGFe9Eat4VFjk+hTvMGAizkQ/7nEEW1LA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QSDER3bN; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745483824;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6fmlstr9ginyDig4RAQsNh+6aO603AT1tDfj5LgGrKc=;
-	b=QSDER3bNjEG3DoJ5cgTOeYkA8DFQwSuzDt++EK4PYruWxb4HhJ66WkTS7XNVUs8bdwf+uG
-	2rvdhco54CJ77sDgDMQAbPCyaQadrc6MWhSBUHSI7q2UBc18BgNf/8rMIaEarwLgc6sb1Y
-	FTVi2HVWYTPQD2U4WSwYfPEeo4Ods5w=
-Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
- [209.85.219.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-465-1ACLkvSnNcu3r9yQpAOHsQ-1; Thu, 24 Apr 2025 04:37:02 -0400
-X-MC-Unique: 1ACLkvSnNcu3r9yQpAOHsQ-1
-X-Mimecast-MFC-AGG-ID: 1ACLkvSnNcu3r9yQpAOHsQ_1745483821
-Received: by mail-yb1-f197.google.com with SMTP id 3f1490d57ef6-e72b79ffc44so1076162276.0
-        for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 01:37:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745483821; x=1746088621;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6fmlstr9ginyDig4RAQsNh+6aO603AT1tDfj5LgGrKc=;
-        b=D257s01udd1/6nr2SIo4K9lDMSNEUVHoWIdgYzWZ3jeQabshhIgBpw2bEL6QWY27GV
-         VDn/tOJp7RfsmTn/Uvs8q1YwwR1X3ddEVN8LdtGFH6KflU5y3qWXdoX+6wwa5bacFy7E
-         AxWQzc8xMzfYOwBkza2EvJrdMrDwzCNIwz8zUI125y1BSoozR2cbiZPEDD32qCK4X/FP
-         OPTy8xzDrVZQEeJJzbaixN+sSOkFGoOQJi8o9OBRrfDSfAGyZrNWtW61iveEDQ+RwJP6
-         u+WxQX5M3nR6CYTi8IAemRr4OISd5X0VXMVyheEJVLdMd9eBOxUmeennkSQmScDyt0f9
-         KsnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWDub29JM91bvIBtXpPT6pBl0NxhapSXFilMB1LI4Na7gNCO7YyrVqT+kMyzkyVx2oAkak=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzw4r8rGMdwKJMH0+nh+BAOzhGrlSgOjw9eSiVp8KCa6WoYAQPC
-	WRmK7UZsiiZdKNVgB9AEUR0C6Gv4Nm0FnTg57Ee/OGeFdFfw6s6CahJgUoV4CzI26oKFdMSukc1
-	bplZIJT09sHOusLJIyWsJnS/fVej0O6TNCCbs1obSG3/M6o0qBhaxBulUu0F2agYAsDTcuMmeu+
-	ttrGFPAH+TPbgF5Gm2mYK9fM8r
-X-Gm-Gg: ASbGncu4Z1OMXdA0dR/2z+ylRdtoIcyDzA5LymINb+tGgJbmZxCgqlZI1mqYOt65hoK
-	I+dgwnjfwjfeZjr3lFhXruUC7d2OtAo2TvwaY3ctkeRyvJ+2RpM9ZMsUednkEUCd3+BOoEwk=
-X-Received: by 2002:a05:6902:2186:b0:e72:9693:7b36 with SMTP id 3f1490d57ef6-e73036372e0mr2271534276.42.1745483821375;
-        Thu, 24 Apr 2025 01:37:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHUfymtjS1vLei+DBOMXzLqv89tvpRz1tTcENml/8LK4mc8Ke+xAHKIP1Qw42phxCq+/NuBAxZdcPmq6bth+u8=
-X-Received: by 2002:a05:6902:2186:b0:e72:9693:7b36 with SMTP id
- 3f1490d57ef6-e73036372e0mr2271517276.42.1745483821066; Thu, 24 Apr 2025
- 01:37:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A5620E700;
+	Thu, 24 Apr 2025 08:43:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745484217; cv=fail; b=gthyoLJOGeyC2X7zHDoMsGB2SCvp6fh6JYr7AOYoWwCU0zQuU+lkNEdrYc3GBaxNRD/6Ik2phoLCVDrdviPgAHaylCFjbD4nk8XcDpua08l0ftuoPVINZn+MiqKUz7QzZ/xWO4xtnpH+L/VqT2/8zgVVDUmyjFiMDJ8lr+FXnII=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745484217; c=relaxed/simple;
+	bh=EYOWwe4UKaWipw8WllJchdoqW3qI5vZ921/dD5A8TFY=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=QlHEimmB/YlXXbl+FnS+yvSqJP/0mdYn/LiGLTD1k58UFZV0LobEYiMHx6aIQ/VK8XkTcSbg9RFLnp5A1VDfiEFG3J2eIO59RgEwGIxVQqaZY/1FVP26SxztrLyKDjLPB6GHgUdjFE/pTsa/dZO+V/kQjo8gxAfkv5B4ORgQUSA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FLEgsN+W; arc=fail smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1745484216; x=1777020216;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=EYOWwe4UKaWipw8WllJchdoqW3qI5vZ921/dD5A8TFY=;
+  b=FLEgsN+WY3gMAK2cv9WxBe6xElGKXLAdXdXi233OA+cln89XFuM3otIb
+   /J7P/sGm6gp+RNW/1WcjAqoBCVO3a7tCvX1ZO8KBsxz/Uac7ulfq5nuRZ
+   g9tkHOKwmgIRE3y96TX+am2Aa2O1kjKeJdKHS5uEfnrXoBYqTjwJNcAEd
+   LFF+XJYEQm5KBQ4/4voMtqRyMA+y4Dx/GQTnxMU3vlVP2mUzX+pRh6M1m
+   J/X/3BTV8MyKdlJv3whScNqcUAj/RWyAc3hJMbDe298uXA037Vz1jPE4k
+   wvMqcWS3m5aEgc0snP8XU/xwpPUjmVdxJK4rAcZquY4UnQuO4R1/dW/FF
+   g==;
+X-CSE-ConnectionGUID: Nj688IJiRfGTzcqG6K222g==
+X-CSE-MsgGUID: wuuyTB0oRX6jf1P3WofvwQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11412"; a="58468234"
+X-IronPort-AV: E=Sophos;i="6.15,235,1739865600"; 
+   d="scan'208";a="58468234"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 01:43:35 -0700
+X-CSE-ConnectionGUID: SgYMNpxkTrCn9gqTfxEceA==
+X-CSE-MsgGUID: 79bxD2d7QsySqYsR1OJZoA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,235,1739865600"; 
+   d="scan'208";a="132291021"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 01:43:33 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Thu, 24 Apr 2025 01:43:32 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Thu, 24 Apr 2025 01:43:32 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.177)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Thu, 24 Apr 2025 01:43:31 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BkINh8kRYqeLPR/+5cXQmjI+eGdG+Picig/zjON4gOrRjfJ6G+lSOxowAvJFi5o+rtvPyZGImejaIJJvLnuUaJD+EhYQ9Rz9aQXidKTnDN17NRMvqR1gPPIMW83bEECSlw9HGzwnthOF42n22YwTPiJryoAWWnXUDG4k7B0sR7w1WJeAuokYO/WydKsfwsm8s4R6kgP/+clp7iq3u+t6Eyl0SPtu8dBRD9aDeaCYvJmrIDY0o4RJc9+bYG2u7qmnO5ERxBdjVjrxtTCVIVGZE+gLhpZBqHcTheFmIC1qbl/GI2L7FpMHbeaxIt9elk8Nj209OrMkyd7vMK71G4FIRg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=J4VCX2hCxqLggVifr4Y0jTYy7YH9t/B/Br1mnOwMWv8=;
+ b=jmt1YJb7+HKZzxKRCF1NvyVX28gtAYW4Mxeu6KFwCat5PTMDnEhRgWME+7znthtlsZwtOePNb8NhoytHwUbKjtbufpDSqcp2NzQbWxkaPc0jzZLkLpfrcZe4N9zBZnIy6i0RCsrW+3Oci7W7W2Mhq+vSJ4zawdXx2rm1dUF+oZJu8yH7HfYumLZYwXPc0zJqwMBIWceq2Z9Z/758I+Tm4QAkdBtrTzCA1qw+RAe1WsHYdtnVOmBO2cqehz4VqlTfc2IrJTKHYLchkRjk1rKq3VAt4nIey4to+aXu0CdC/dXdTc8de/SMPZ6pYOW54jWB72UCEILDM4UHDV03q11iRg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ DM4PR11MB7376.namprd11.prod.outlook.com (2603:10b6:8:100::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8678.23; Thu, 24 Apr 2025 08:43:26 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca%6]) with mapi id 15.20.8678.021; Thu, 24 Apr 2025
+ 08:43:26 +0000
+Date: Thu, 24 Apr 2025 16:41:30 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: "Kirill A. Shutemov" <kirill@shutemov.name>
+CC: <pbonzini@redhat.com>, <seanjc@google.com>,
+	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, <x86@kernel.org>,
+	<rick.p.edgecombe@intel.com>, <dave.hansen@intel.com>,
+	<kirill.shutemov@intel.com>, <tabba@google.com>, <ackerleytng@google.com>,
+	<quic_eberman@quicinc.com>, <michael.roth@amd.com>, <david@redhat.com>,
+	<vannapurve@google.com>, <vbabka@suse.cz>, <jroedel@suse.de>,
+	<thomas.lendacky@amd.com>, <pgonda@google.com>, <zhiquan1.li@intel.com>,
+	<fan.du@intel.com>, <jun.miao@intel.com>, <ira.weiny@intel.com>,
+	<isaku.yamahata@intel.com>, <xiaoyao.li@intel.com>,
+	<binbin.wu@linux.intel.com>, <chao.p.peng@intel.com>
+Subject: Re: [RFC PATCH 02/21] x86/virt/tdx: Enhance tdh_mem_page_aug() to
+ support huge pages
+Message-ID: <aAn5OlQiBKNw0rH8@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20250424030033.32635-1-yan.y.zhao@intel.com>
+ <20250424030428.32687-1-yan.y.zhao@intel.com>
+ <stswyrtsciz3ujhzhs72ncpozax7nawg5sbg7gbsclb5jgw5vt@y5fxmsstslca>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <stswyrtsciz3ujhzhs72ncpozax7nawg5sbg7gbsclb5jgw5vt@y5fxmsstslca>
+X-ClientProxiedBy: SI2PR01CA0023.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:192::17) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250421-vsock-linger-v2-0-fe9febd64668@rbox.co>
- <20250421-vsock-linger-v2-1-fe9febd64668@rbox.co> <km2nad6hkdi3ngtho2xexyhhosh4aq37scir2hgxkcfiwes2wd@5dyliiq7cpuh>
- <k47d2h7dwn26eti2p6nv2fupuybabvbexwinvxv7jnfbn6o3ep@cqtbaqlqyfrq>
- <ee09df9b-9804-49de-b43b-99ccd4cbe742@rbox.co> <wnonuiluxgy6ixoioi57lwlixfgcu27kcewv4ajb3k3hihi773@nv3om2t3tsgo>
- <5a4f8925-0e4d-4e4c-9230-6c69af179d3e@rbox.co>
-In-Reply-To: <5a4f8925-0e4d-4e4c-9230-6c69af179d3e@rbox.co>
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Thu, 24 Apr 2025 10:36:49 +0200
-X-Gm-Features: ATxdqUF_58noK2_e9QPMXCT-pjwdIdBihMopt3yWeIxTGLAFMTKaBY4Kl-orunU
-Message-ID: <CAGxU2F6YSwrpV4wXH=mWSgK698sjxfQ=zzXS8tVmo3D84-bBqw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 1/3] vsock: Linger on unsent data
-To: Michal Luczaj <mhal@rbox.co>
-Cc: Luigi Leonardi <leonardi@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|DM4PR11MB7376:EE_
+X-MS-Office365-Filtering-Correlation-Id: de09a1db-b4d5-4ceb-60fe-08dd830c14af
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?CIwrypF9WAelsm938wWouuTU7OTlv85pFRiY5kL2sUWY8yPifs+RHTu7kyT1?=
+ =?us-ascii?Q?PTcqcHJ4DXjphJGoT4iEdExYHsbey4Kn/11JrIctXL+zapGs8YYtLedjRyxd?=
+ =?us-ascii?Q?z25HJtmiSOpsqhUE+a9ZtJGuwF7SNjM0CArZ82/8EEoBizq2m2cDGm7Q/OqJ?=
+ =?us-ascii?Q?3VCbt02VZQoMRPpWpTc6iGJbVwr3Vn802NG3WCtdK07V0Vt7l5aq2dImVEBk?=
+ =?us-ascii?Q?nm4Go/8uQ+MmKrocNI+fghIw68ocedGSXCVyRgl5784nUY6pq7ZmNyg6DZFO?=
+ =?us-ascii?Q?D6RcRrKW31MBQZjCuv7M/NLvecNVKKzzxF+pWZEZeVqpmVpTKgd/LBrmPwao?=
+ =?us-ascii?Q?u0Rrd/U72//ZkYpMnTFIG1RSJKs6zOGv3jS76dWDNH0KO36zvthUbztZQyaY?=
+ =?us-ascii?Q?aFQVIyNYn42dlrB8qzURncScKGdiyCMGW65DU5evyjgXsODS33wrCnD1fkty?=
+ =?us-ascii?Q?RQfG1z5vgy8fJ+N1vLobhy6ke6YDTCICxc6buDUlDE6PbOBefm4vcacyWmjQ?=
+ =?us-ascii?Q?K/phStBfP87IxwX+lfjYc/6OePiUwchkcflwUusVIDL1E5u2dGL9y5B6yDD5?=
+ =?us-ascii?Q?NHtpOh5GW2ReYGliYrbSZorhAV0zmQm9vEsA2/f9nFoJ8J3L9eFtMPc5HcFz?=
+ =?us-ascii?Q?mmfC8ni1f4sa9oSSfIoR3/wzShWJWDllPNRVjUh+LOAKHvKFCEFAgNEItlTK?=
+ =?us-ascii?Q?xderD68sINod/i6saLHWEoptmkmw2iGp7e6yGpCQFkSY+x+eLJr+bo81/0Mb?=
+ =?us-ascii?Q?eg7TsGodvA9M5aiH/Wi5bk6X9MYAiYhZCZodHZQDPHwQ9LwEKrBSe/F/CgxH?=
+ =?us-ascii?Q?L5xaVZvG9Yt4UOV1xcaphGFSAQ+oOfRxq2//8pHeigkSxsSilCicx5hW4Joy?=
+ =?us-ascii?Q?RHjMzPsz2kZA2jEVgXC93C7RkFPmfalbNNX7isJyxnzus1jxX/jXkFh8/PkV?=
+ =?us-ascii?Q?mpA1Egir/CRGfSfOWwqC1nMpP7zLnknle2uhvE9fd5Vg3n+q/HQNO50nIMe9?=
+ =?us-ascii?Q?jvrebbqmBdO0kwB6+2Z8joCj+YK3vuJKgdBJpvT+nYUvCCtiBeVUMPmIJ60L?=
+ =?us-ascii?Q?uDlrgA+re5J+91slG6bkP4osguFg6JRhEWVV8ld+LMGmhxKP9L8dkPRm/BrE?=
+ =?us-ascii?Q?D3KhBlmfN50xH+7ErqUBQQZLp2csZLsegFb5j7z2/8yKYMaQic9FqveumgBK?=
+ =?us-ascii?Q?mQ2Fz3rNmNFN3usL5cJchR/rM898EJyxG82yg1LXKzlc8tpLOzrwafL2hBw0?=
+ =?us-ascii?Q?R9UAGKybBxbA1iqDt3AYK1xInc3P8Ksh9NeztDIYPJJukMCDrhC6vXFMo2ah?=
+ =?us-ascii?Q?tL6ysB+yDgUSsDJ/agBArpuq1eQ9UnaGb6D116Es5OQYCywnV32KomI4zkCA?=
+ =?us-ascii?Q?sYrb1nAhm2fddRVXhqx8LoVhMvLOyYteStDyLoEtEf4Wr1njN1kBjV5H31AZ?=
+ =?us-ascii?Q?t0z2+9xpXp4=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Crjhe0Rt0bxLYUbRZhRJr7AYhB3egf4cygfQEPdnhXrneO6r+43C1bCCXObU?=
+ =?us-ascii?Q?0ha0xMd552WMnFEYeKfwDjBbbMAE274Ysbj94eWlGagzMdAxNYIkO+qvFJQC?=
+ =?us-ascii?Q?NeJwmVO6/Lj1VV8x3gD4IFOWq3KkoQTuh1u1M7ES004wUOuxxbHmHkU7hvys?=
+ =?us-ascii?Q?bPrI7fzbNzw/nd+sF+PuNIUtW9JLmz9i5uyQhFOEZP4Sc6nZy5+mQzUZBHsI?=
+ =?us-ascii?Q?9WDqVTADDgFJPOmnCgb+3x9nTKJAajEhdMDXz5qP1ztwizSjNMKEqtEWWwhg?=
+ =?us-ascii?Q?svbG14Tchu638avepEUgj4TgypO+R9Vh0Sk0URfQbsjeacJSbJRGdbyUhG7A?=
+ =?us-ascii?Q?KrPiuRilLD4z/Q1lx9LrOrG3+5juRcfI1IbhBTEkfPugQWGNdMlD1kNpoeLG?=
+ =?us-ascii?Q?0lClt+7OCpEmT2QAniTTfgfDRPRx8dCWBqn/q8olZIudijYF6yDpdRfPwhaI?=
+ =?us-ascii?Q?OPrDnpDLQvBGHwI+tDgxy34SCzxoeEOWKBpge0stl3iNlfvBs4+Arl2+o86Y?=
+ =?us-ascii?Q?nyXbd1kWq+/w3UekPGz32d0U1ZT4EKhzu4TFjtHa74gzPB7zc5gwlnhDlHyX?=
+ =?us-ascii?Q?DQ0mn0BTETXio0rraBdfb+auRGE5xv4TxDMdtTQCk323BC2u7oEN/Gg87qgc?=
+ =?us-ascii?Q?fj3sKWLmqAC3WUgYKCKcTBHf/zauq3HAI2Kf3hcHug9sePDouY4nlN7jqBET?=
+ =?us-ascii?Q?D8jS0EV2O+slYnwcUnRVmEiGvV3cdUal5L1rm3cuIVFq8RduvtWZg9bqWP7/?=
+ =?us-ascii?Q?mTFtqIKbCJbX69FfYtACrpJDXbjBz6luxPTu5OmliSRJ9KTZ+6KbWB3Ze+KY?=
+ =?us-ascii?Q?vB54wr67OtkgJN6WVcivJTc2ef9CUjvInUYWSqa2TKaG5NW6ZI4HyncbkjwZ?=
+ =?us-ascii?Q?0vcbnyjwomGKT5kslqWu/0DfUr1oPxOsIiuWXoP69/HPZ3UZiiZk4TsWfKLo?=
+ =?us-ascii?Q?w2RfxKC5WLJoAwxOOJbThpwp1RtzicOO5PuIZFfm1EzrEiZKNhJwy6LYoikA?=
+ =?us-ascii?Q?lLx7AoK3aHRoR5APbUa+8CK0QioXGCq0m9BCNjobNGq6ktuzSs8xcGEAnizv?=
+ =?us-ascii?Q?hUdBWl0yOdMYEq/mF+Kz3vFuDizSx2nbBkIk4H68dOJlh/FxwQTxrNF+3SRe?=
+ =?us-ascii?Q?+ywJ2O2on7aI1OE7043gxML1v9vKC4D55zuMyLGJMAijpul9srDvf7Q964bZ?=
+ =?us-ascii?Q?ASm7oBhOdHQRZufUmq5Nv2jvNnYf3l9XqLgZUmdF/F7Xrnjl4xOWgGB7OIRX?=
+ =?us-ascii?Q?aw3mFqfYpOGdNpCIz7+mnlL2/NE9fo0nSunluQyFg3ABE0JU6hmhQzvAMFrD?=
+ =?us-ascii?Q?WGoEpnqd1wBOetPImG8Io7ob3jYVrmicuNDjaeAYhT0rkADZLQXBWTYXPyTO?=
+ =?us-ascii?Q?HMw5HF2MtrrgXZe5qhnGIsww4GcPOQzL8QChZKIs0Bew1O+HVaEsZVUalWaY?=
+ =?us-ascii?Q?feWqs5eHyredvYhNH9+yf82hmazRsL2xiWl3XbOap5by1B7s5UoKmhbWezu0?=
+ =?us-ascii?Q?OoAthBfbFmdjtYQPZSf9eEDiaQ+4qXqTECbWlxQE7pjPGCvEQMEIg0Mv+I33?=
+ =?us-ascii?Q?BzIcuPd0HB9T1DGKEkIGruAomoikmQhMBhoLSCd9ju8wBbdSOxs9O+z4SsGo?=
+ =?us-ascii?Q?4Q=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: de09a1db-b4d5-4ceb-60fe-08dd830c14af
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2025 08:43:26.7896
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: B5uoA4xKWDBAHuk+ynL1hIMzSlkOgssX/HGqX4/Xc0KxnYRfOPG6G/s/5fUPlFSi3pwUQPw4R78qObdCk1HeWw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB7376
+X-OriginatorOrg: intel.com
 
-On Thu, 24 Apr 2025 at 09:53, Michal Luczaj <mhal@rbox.co> wrote:
->
-> On 4/24/25 09:28, Stefano Garzarella wrote:
-> > On Wed, Apr 23, 2025 at 11:06:33PM +0200, Michal Luczaj wrote:
-> >> On 4/23/25 18:34, Stefano Garzarella wrote:
-> >>> On Wed, Apr 23, 2025 at 05:53:12PM +0200, Luigi Leonardi wrote:
-> >>>> Hi Michal,
-> >>>>
-> >>>> On Mon, Apr 21, 2025 at 11:50:41PM +0200, Michal Luczaj wrote:
-> >>>>> Currently vsock's lingering effectively boils down to waiting (or timing
-> >>>>> out) until packets are consumed or dropped by the peer; be it by receiving
-> >>>>> the data, closing or shutting down the connection.
-> >>>>>
-> >>>>> To align with the semantics described in the SO_LINGER section of man
-> >>>>> socket(7) and to mimic AF_INET's behaviour more closely, change the logic
-> >>>>> of a lingering close(): instead of waiting for all data to be handled,
-> >>>>> block until data is considered sent from the vsock's transport point of
-> >>>>> view. That is until worker picks the packets for processing and decrements
-> >>>>> virtio_vsock_sock::bytes_unsent down to 0.
-> >>>>>
-> >>>>> Note that such lingering is limited to transports that actually implement
-> >>>>> vsock_transport::unsent_bytes() callback. This excludes Hyper-V and VMCI,
-> >>>>> under which no lingering would be observed.
-> >>>>>
-> >>>>> The implementation does not adhere strictly to man page's interpretation of
-> >>>>> SO_LINGER: shutdown() will not trigger the lingering. This follows AF_INET.
-> >>>>>
-> >>>>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
-> >>>>> ---
-> >>>>> net/vmw_vsock/virtio_transport_common.c | 13 +++++++++++--
-> >>>>> 1 file changed, 11 insertions(+), 2 deletions(-)
-> >>>>>
-> >>>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> >>>>> index 7f7de6d8809655fe522749fbbc9025df71f071bd..aeb7f3794f7cfc251dde878cb44fdcc54814c89c 100644
-> >>>>> --- a/net/vmw_vsock/virtio_transport_common.c
-> >>>>> +++ b/net/vmw_vsock/virtio_transport_common.c
-> >>>>> @@ -1196,12 +1196,21 @@ static void virtio_transport_wait_close(struct sock *sk, long timeout)
-> >>>>> {
-> >>>>>   if (timeout) {
-> >>>>>           DEFINE_WAIT_FUNC(wait, woken_wake_function);
-> >>>>> +         ssize_t (*unsent)(struct vsock_sock *vsk);
-> >>>>> +         struct vsock_sock *vsk = vsock_sk(sk);
-> >>>>> +
-> >>>>> +         /* Some transports (Hyper-V, VMCI) do not implement
-> >>>>> +          * unsent_bytes. For those, no lingering on close().
-> >>>>> +          */
-> >>>>> +         unsent = vsk->transport->unsent_bytes;
-> >>>>> +         if (!unsent)
-> >>>>> +                 return;
-> >>>>
-> >>>> IIUC if `unsent_bytes` is not implemented, virtio_transport_wait_close
-> >>>> basically does nothing. My concern is that we are breaking the
-> >>>> userspace due to a change in the behavior: Before this patch, with a
-> >>>> vmci/hyper-v transport, this function would wait for SOCK_DONE to be
-> >>>> set, but not anymore.
-> >>>
-> >>> Wait, we are in virtio_transport_common.c, why we are talking about
-> >>> Hyper-V and VMCI?
-> >>>
-> >>> I asked to check `vsk->transport->unsent_bytes` in the v1, because this
-> >>> code was part of af_vsock.c, but now we are back to virtio code, so I'm
-> >>> confused...
-> >>
-> >> Might your confusion be because of similar names?
-> >
-> > In v1 this code IIRC was in af_vsock.c, now you pushed back on virtio
-> > common code, so I still don't understand how
-> > virtio_transport_wait_close() can be called with vmci or hyper-v
-> > transports.
-> >
-> > Can you provide an example?
->
-> You're right, it was me who was confused. VMCI and Hyper-V have their own
-> vsock_transport::release callbacks that do not call
-> virtio_transport_wait_close().
->
-> So VMCI and Hyper-V never lingered anyway?
+On Thu, Apr 24, 2025 at 10:48:53AM +0300, Kirill A. Shutemov wrote:
+> On Thu, Apr 24, 2025 at 11:04:28AM +0800, Yan Zhao wrote:
+> > Enhance the SEAMCALL wrapper tdh_mem_page_aug() to support huge pages.
+> > 
+> > Verify the validity of the level and ensure that the mapping range is fully
+> > contained within the page folio.
+> > 
+> > As a conservative solution, perform CLFLUSH on all pages to be mapped into
+> > the TD before invoking the SEAMCALL TDH_MEM_PAGE_AUG. This ensures that any
+> > dirty cache lines do not write back later and clobber TD memory.
+> > 
+> > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> > ---
+> >  arch/x86/virt/vmx/tdx/tdx.c | 11 ++++++++++-
+> >  1 file changed, 10 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+> > index f5e2a937c1e7..a66d501b5677 100644
+> > --- a/arch/x86/virt/vmx/tdx/tdx.c
+> > +++ b/arch/x86/virt/vmx/tdx/tdx.c
+> > @@ -1595,9 +1595,18 @@ u64 tdh_mem_page_aug(struct tdx_td *td, u64 gpa, int level, struct page *page, u
+> >  		.rdx = tdx_tdr_pa(td),
+> >  		.r8 = page_to_phys(page),
+> >  	};
+> > +	unsigned long nr_pages = 1 << (level * 9);
+> 
+> PTE_SHIFT.
+Yes. Thanks.
 
-I think so.
+> > +	struct folio *folio = page_folio(page);
+> > +	unsigned long idx = 0;
+> >  	u64 ret;
+> >  
+> > -	tdx_clflush_page(page);
+> > +	if (!(level >= TDX_PS_4K && level < TDX_PS_NR) ||
+> 
+> Do we even need this check?
+Maybe not if tdh_mem_page_aug() trusts KVM :)
 
-Indeed I was happy with v1, since I think this should be supported by
-the vsock core and should not depend on the transport.
-But we can do also later.
-
-Stefano
-
->
-> >> vsock_transport::unsent_bytes != virtio_vsock_sock::bytes_unsent
-> >>
-> >> I agree with Luigi, it is a breaking change for userspace depending on a
-> >> non-standard behaviour. What's the protocol here; do it anyway, then see if
-> >> anyone complains?
-> >>
-> >> As for Hyper-V and VMCI losing the "lingering", do we care? And if we do,
-> >> take Hyper-V, is it possible to test any changes without access to
-> >> proprietary host/hypervisor?
-> >>
-> >
-> > Again, how this code can be called when using vmci or hyper-v
-> > transports?
->
-> It cannot, you're right.
->
-> > If we go back on v1 implementation, I can understand it, but with this
-> > version I really don't understand the scenario.
-> >
-> > Stefano
-> >
->
-
+The consideration is to avoid nr_pages being too huge to cause too many
+tdx_clflush_page()s on any reckless error.
+ 
+> > +	    (folio_page_idx(folio, page) + nr_pages > folio_nr_pages(folio)))
+> > +		return -EINVAL;
+> > +
+> > +	while (nr_pages--)
+> > +		tdx_clflush_page(nth_page(page, idx++));
+> > +
+> >  	ret = seamcall_ret(TDH_MEM_PAGE_AUG, &args);
+> >  
+> >  	*ext_err1 = args.rcx;
+> > -- 
+> > 2.43.2
+> > 
+> 
+> -- 
+>   Kiryl Shutsemau / Kirill A. Shutemov
 
