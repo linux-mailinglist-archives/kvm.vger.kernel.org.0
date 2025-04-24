@@ -1,184 +1,207 @@
-Return-Path: <kvm+bounces-44122-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44123-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2272A9ABA8
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 13:25:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D170A9AC2C
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 13:38:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD7D918958BA
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 11:25:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD41A4A5539
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 11:38:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5C89224AE4;
-	Thu, 24 Apr 2025 11:25:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D135230BC0;
+	Thu, 24 Apr 2025 11:34:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="MBgYNqNU"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="FGyyfJ3z"
 X-Original-To: kvm@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A13342701B1;
-	Thu, 24 Apr 2025 11:25:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7B3A2253B0
+	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 11:34:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745493919; cv=none; b=keJvIdU4fEC0BtUoP8L/udZnhCH+MOtadUtqhXC/F4/z5Nh23db8p9b2GdIxVhwgBY3XUs3lHQse/Wm57SxObqKPShPK5yq8dxZkVyyyiC6wFjtEbRGs5NmYEPd/5k/07KPn6hw6oB9v+wwDjWxmdWLOAJqhVpTxuhKhIQrY2sQ=
+	t=1745494465; cv=none; b=aatPKZKvBsbzYKQXhMFlUZw2IFlJNXLlNl4HQl41iqqJiERdWf+4E+R0X3ddpEKc4JfMJQqRyV02EnfZl4ZgU5i3gufzQX0TgT+LemAgTKocDe6v2LKJ1MUoxzklEqcVZoCzx9TWTCsmDNZDKp45zLPYKtxVTJ/47cPt4laLhM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745493919; c=relaxed/simple;
-	bh=W6tJpgnftyybvOmgb91AxxJLH5thveT4lxoF8PvYsBk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ksNIWGrZW2jlk6GzyLTTA6aLBGneqbbVTV/R56qgKND7XJ+zlRhTwutnTL1ChgZJMAuRUUF5v7z4csSA1e8dczCaBxzOcTQuabCTMc6tmiPQSmIEU2bgmLuJxZiMeZUvyrQr/KduX/jsT4xqpdFFTKeYkhw297kd410pRa29xq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=MBgYNqNU; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1u7uhV-0085bP-6Z; Thu, 24 Apr 2025 13:25:05 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=JZApLhOYYL7Gqypq3hjscSfsYIt3RrbmRWc33u1K0sM=; b=MBgYNqNU8d5LkneO5n1eRve+2j
-	0MyfUPk7oUhulA17+g9hJlICQl5cM3Ssy2rXQOj+dsBKFkUT0Ia/Q1a3Y7FTAjwQ5rWajb43VkFZe
-	HnGNDotLiq6yd4B3k945gHHumhhKnco6TlpHOnD/o9Jk1mwn/gxFQQXKJ+fkQoIvCqUlGm2ZS2afk
-	+pKKNDqXh/Zt7hUwbVkl6qXQItx/bM99j5iUcfXLsh2tFfbpYaecdF2w0mry/ftAl8O5DUrWanXQ8
-	av+AEUYYE4Oe/drgfFqY901lk7pUp0Mv+W7sSlVCXirbIJb2AjgiFE4Ok1D+1YwUxdH/bdUZsA3gX
-	tGpDJItQ==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1u7uhT-00051C-If; Thu, 24 Apr 2025 13:25:03 +0200
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1u7uhR-003pnq-DJ; Thu, 24 Apr 2025 13:25:01 +0200
-Message-ID: <81940d67-1a9b-42e1-8594-33af86397df6@rbox.co>
-Date: Thu, 24 Apr 2025 13:24:59 +0200
+	s=arc-20240116; t=1745494465; c=relaxed/simple;
+	bh=IXZ8njn3lHnMF+wZnne8sz6AGB4un/zdAulPyviKX2U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K9o2MOUhXejpuJU0uQhgb4pn1Yx6vSs5Ne5Ce/ZgZq/5tTLiZ3IBiG/B2EoM7ft65CuF67GtyR3DwHTI1Z6G5i4dmCBqAv+5lcEK4ArRw9tVyqW3r/RtPXOAas+hs84H7gFLsFGjw6rsXCSW3ZLNdsGNd2S0xnGp+ztxqQbzJ/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=FGyyfJ3z; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-39c0dfba946so633243f8f.3
+        for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 04:34:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1745494462; x=1746099262; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=8kNEaxbnoW9g1fYmJXQwSNKTdFbvmREbcFtvdLnT5Xc=;
+        b=FGyyfJ3zg9bv6mloDJ2FkB2yKg3eCFZBZzb60PEmUrgTOvN+NHVnzs/bxebUlVPYr4
+         L9IB4We2faZXga9kaduTRsNiDGFaMFnOFvA8kJgTvo1qdhniaZvBIH4EvtY/hD8SCSzX
+         gVF5JMFsSTetIM9xznaCFyoaUljkjGVD7fUR6gp7t4nt80FdPBm5Hq+AV0qcMi6RqNao
+         mz/WXQkm+4axtum9KMbIByJJ+Cyd3pIz+cJMOYSFMOHLVAy/KlgrHEuPob3Jx3K9dpVY
+         fojQl77MQQwRfLguAdJ89kmk5UP/6ISH0HCRqnL/fqKgUGLrbgs9iHXudcdVLBczXbMW
+         KZHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745494462; x=1746099262;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8kNEaxbnoW9g1fYmJXQwSNKTdFbvmREbcFtvdLnT5Xc=;
+        b=eClNQB82Vj22XUBzOSWKTGD1mUL/D5zXnd3bFZUgSni6zdfIGRhnQIE8Di07bcHDCu
+         qX5rqbJ3wE/pKYvGYYpYGG2sHP1ojbI5QlczDVSx+m/vb546lMeXKEmfp71XMrt8hzoO
+         rzpNSnnFJcdbmxpIHY/bS1FaJsKdZswEFpVn5bFMnaxTm7ScSUAVt6pgDpxF4dWtbtFo
+         shdx11+IovMmkqIQuyDtP4DsrpgwK1eqsPVXsJzmMYo/hm5v6Dk9OZ2AGh0Mdj7QtkIf
+         XyXSBUPMIwJWAN6z8wjAodyDFxRcvlya53cmCnqfyRaFwmgLS0RY8AMo5Fu//T4QrmvT
+         yXyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUEWZ3WFV0qjurmjjfRqy7mGNw/Yer9Wo3uS/BSVYZAqWpBg91YyWqluuHZp5ul1FlbV2M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbFkUnZ46QF0+UO/+ylytDrpsHibc2891gdOZbAbvwXYzdDl2V
+	/V4e181jdO/kGmGvkktvqsmaV2bBF69udocM3q4tX9by3RpsdSaEotA+CnlhMBI=
+X-Gm-Gg: ASbGncsWg874agLlWUvkNfN6rBZvnHlEMOIFG972MhdItYa8VTEIHMQJD2paLMfrMDn
+	CqGBZSi90CGftxQPNVGvaD36bbw1Q/eTvNESXo+goMgBX02D4gbrqI7bwQ0TvfslgCeZGmEkErn
+	0i/IbdKq7OPJUS4eFT+YbgSSmq9ShtpqMTni0DUCTdHOVnVb2Yh5MmHUf64JVXhXw6cCq7nlbwA
+	r/LuiW8xG+ofHVSRucZK8pX/XJBSCt+wTUtT67zghXfZuzmHbPjs4PDNYEx7ke4XFArA2DGZpFH
+	BSoHTztYKCcuCIoq8Ezk/Y8kTnJz
+X-Google-Smtp-Source: AGHT+IH+Hg3/PqfVx4rNvlrTeNa+fBCY/aumfjJWzS9tER7WilSZAHlxfjRytvmLaoteiiEk+m6uJg==
+X-Received: by 2002:a5d:4a8e:0:b0:39a:c9d9:877b with SMTP id ffacd0b85a97d-3a06cf5f4fcmr1401332f8f.27.1745494461931;
+        Thu, 24 Apr 2025 04:34:21 -0700 (PDT)
+Received: from localhost ([2a02:8308:a00c:e200::f716])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a06d4bf781sm1830579f8f.37.2025.04.24.04.34.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Apr 2025 04:34:21 -0700 (PDT)
+Date: Thu, 24 Apr 2025 13:34:20 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+Cc: Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
+	Samuel Holland <samuel.holland@sifive.com>, Deepak Gupta <debug@rivosinc.com>
+Subject: Re: [PATCH v5 13/13] RISC-V: KVM: add support for
+ SBI_FWFT_MISALIGNED_DELEG
+Message-ID: <20250424-ae24464169f7143c509cbab5@orel>
+References: <20250417122337.547969-1-cleger@rivosinc.com>
+ <20250417122337.547969-14-cleger@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/3] vsock: Linger on unsent data
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Luigi Leonardi <leonardi@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20250421-vsock-linger-v2-0-fe9febd64668@rbox.co>
- <20250421-vsock-linger-v2-1-fe9febd64668@rbox.co>
- <km2nad6hkdi3ngtho2xexyhhosh4aq37scir2hgxkcfiwes2wd@5dyliiq7cpuh>
- <k47d2h7dwn26eti2p6nv2fupuybabvbexwinvxv7jnfbn6o3ep@cqtbaqlqyfrq>
- <ee09df9b-9804-49de-b43b-99ccd4cbe742@rbox.co>
- <wnonuiluxgy6ixoioi57lwlixfgcu27kcewv4ajb3k3hihi773@nv3om2t3tsgo>
- <5a4f8925-0e4d-4e4c-9230-6c69af179d3e@rbox.co>
- <CAGxU2F6YSwrpV4wXH=mWSgK698sjxfQ=zzXS8tVmo3D84-bBqw@mail.gmail.com>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <CAGxU2F6YSwrpV4wXH=mWSgK698sjxfQ=zzXS8tVmo3D84-bBqw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250417122337.547969-14-cleger@rivosinc.com>
 
-On 4/24/25 10:36, Stefano Garzarella wrote:
-> On Thu, 24 Apr 2025 at 09:53, Michal Luczaj <mhal@rbox.co> wrote:
->>
->> On 4/24/25 09:28, Stefano Garzarella wrote:
->>> On Wed, Apr 23, 2025 at 11:06:33PM +0200, Michal Luczaj wrote:
->>>> On 4/23/25 18:34, Stefano Garzarella wrote:
->>>>> On Wed, Apr 23, 2025 at 05:53:12PM +0200, Luigi Leonardi wrote:
->>>>>> Hi Michal,
->>>>>>
->>>>>> On Mon, Apr 21, 2025 at 11:50:41PM +0200, Michal Luczaj wrote:
->>>>>>> Currently vsock's lingering effectively boils down to waiting (or timing
->>>>>>> out) until packets are consumed or dropped by the peer; be it by receiving
->>>>>>> the data, closing or shutting down the connection.
->>>>>>>
->>>>>>> To align with the semantics described in the SO_LINGER section of man
->>>>>>> socket(7) and to mimic AF_INET's behaviour more closely, change the logic
->>>>>>> of a lingering close(): instead of waiting for all data to be handled,
->>>>>>> block until data is considered sent from the vsock's transport point of
->>>>>>> view. That is until worker picks the packets for processing and decrements
->>>>>>> virtio_vsock_sock::bytes_unsent down to 0.
->>>>>>>
->>>>>>> Note that such lingering is limited to transports that actually implement
->>>>>>> vsock_transport::unsent_bytes() callback. This excludes Hyper-V and VMCI,
->>>>>>> under which no lingering would be observed.
->>>>>>>
->>>>>>> The implementation does not adhere strictly to man page's interpretation of
->>>>>>> SO_LINGER: shutdown() will not trigger the lingering. This follows AF_INET.
->>>>>>>
->>>>>>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
->>>>>>> ---
->>>>>>> net/vmw_vsock/virtio_transport_common.c | 13 +++++++++++--
->>>>>>> 1 file changed, 11 insertions(+), 2 deletions(-)
->>>>>>>
->>>>>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->>>>>>> index 7f7de6d8809655fe522749fbbc9025df71f071bd..aeb7f3794f7cfc251dde878cb44fdcc54814c89c 100644
->>>>>>> --- a/net/vmw_vsock/virtio_transport_common.c
->>>>>>> +++ b/net/vmw_vsock/virtio_transport_common.c
->>>>>>> @@ -1196,12 +1196,21 @@ static void virtio_transport_wait_close(struct sock *sk, long timeout)
->>>>>>> {
->>>>>>>   if (timeout) {
->>>>>>>           DEFINE_WAIT_FUNC(wait, woken_wake_function);
->>>>>>> +         ssize_t (*unsent)(struct vsock_sock *vsk);
->>>>>>> +         struct vsock_sock *vsk = vsock_sk(sk);
->>>>>>> +
->>>>>>> +         /* Some transports (Hyper-V, VMCI) do not implement
->>>>>>> +          * unsent_bytes. For those, no lingering on close().
->>>>>>> +          */
->>>>>>> +         unsent = vsk->transport->unsent_bytes;
->>>>>>> +         if (!unsent)
->>>>>>> +                 return;
->>>>>>
->>>>>> IIUC if `unsent_bytes` is not implemented, virtio_transport_wait_close
->>>>>> basically does nothing. My concern is that we are breaking the
->>>>>> userspace due to a change in the behavior: Before this patch, with a
->>>>>> vmci/hyper-v transport, this function would wait for SOCK_DONE to be
->>>>>> set, but not anymore.
->>>>>
->>>>> Wait, we are in virtio_transport_common.c, why we are talking about
->>>>> Hyper-V and VMCI?
->>>>>
->>>>> I asked to check `vsk->transport->unsent_bytes` in the v1, because this
->>>>> code was part of af_vsock.c, but now we are back to virtio code, so I'm
->>>>> confused...
->>>>
->>>> Might your confusion be because of similar names?
->>>
->>> In v1 this code IIRC was in af_vsock.c, now you pushed back on virtio
->>> common code, so I still don't understand how
->>> virtio_transport_wait_close() can be called with vmci or hyper-v
->>> transports.
->>>
->>> Can you provide an example?
->>
->> You're right, it was me who was confused. VMCI and Hyper-V have their own
->> vsock_transport::release callbacks that do not call
->> virtio_transport_wait_close().
->>
->> So VMCI and Hyper-V never lingered anyway?
+On Thu, Apr 17, 2025 at 02:20:00PM +0200, Clément Léger wrote:
+> SBI_FWFT_MISALIGNED_DELEG needs hedeleg to be modified to delegate
+> misaligned load/store exceptions. Save and restore it during CPU
+> load/put.
 > 
-> I think so.
+> Signed-off-by: Clément Léger <cleger@rivosinc.com>
+> Reviewed-by: Deepak Gupta <debug@rivosinc.com>
+> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> ---
+>  arch/riscv/kvm/vcpu.c          |  3 +++
+>  arch/riscv/kvm/vcpu_sbi_fwft.c | 36 ++++++++++++++++++++++++++++++++++
+>  2 files changed, 39 insertions(+)
 > 
-> Indeed I was happy with v1, since I think this should be supported by
-> the vsock core and should not depend on the transport.
-> But we can do also later.
+> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> index 542747e2c7f5..d98e379945c3 100644
+> --- a/arch/riscv/kvm/vcpu.c
+> +++ b/arch/riscv/kvm/vcpu.c
+> @@ -646,6 +646,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>  {
+>  	void *nsh;
+>  	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
+> +	struct kvm_vcpu_config *cfg = &vcpu->arch.cfg;
+>  
+>  	vcpu->cpu = -1;
+>  
+> @@ -671,6 +672,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>  		csr->vstval = nacl_csr_read(nsh, CSR_VSTVAL);
+>  		csr->hvip = nacl_csr_read(nsh, CSR_HVIP);
+>  		csr->vsatp = nacl_csr_read(nsh, CSR_VSATP);
+> +		cfg->hedeleg = nacl_csr_read(nsh, CSR_HEDELEG);
+>  	} else {
+>  		csr->vsstatus = csr_read(CSR_VSSTATUS);
+>  		csr->vsie = csr_read(CSR_VSIE);
+> @@ -681,6 +683,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>  		csr->vstval = csr_read(CSR_VSTVAL);
+>  		csr->hvip = csr_read(CSR_HVIP);
+>  		csr->vsatp = csr_read(CSR_VSATP);
+> +		cfg->hedeleg = csr_read(CSR_HEDELEG);
+>  	}
+>  }
+>  
+> diff --git a/arch/riscv/kvm/vcpu_sbi_fwft.c b/arch/riscv/kvm/vcpu_sbi_fwft.c
+> index b0f66c7bf010..237edaefa267 100644
+> --- a/arch/riscv/kvm/vcpu_sbi_fwft.c
+> +++ b/arch/riscv/kvm/vcpu_sbi_fwft.c
+> @@ -14,6 +14,8 @@
+>  #include <asm/kvm_vcpu_sbi.h>
+>  #include <asm/kvm_vcpu_sbi_fwft.h>
+>  
+> +#define MIS_DELEG (BIT_ULL(EXC_LOAD_MISALIGNED) | BIT_ULL(EXC_STORE_MISALIGNED))
+> +
+>  struct kvm_sbi_fwft_feature {
+>  	/**
+>  	 * @id: Feature ID
+> @@ -68,7 +70,41 @@ static bool kvm_fwft_is_defined_feature(enum sbi_fwft_feature_t feature)
+>  	return false;
+>  }
+>  
+> +static bool kvm_sbi_fwft_misaligned_delegation_supported(struct kvm_vcpu *vcpu)
+> +{
+> +	return misaligned_traps_can_delegate();
+> +}
+> +
+> +static long kvm_sbi_fwft_set_misaligned_delegation(struct kvm_vcpu *vcpu,
+> +					struct kvm_sbi_fwft_config *conf,
+> +					unsigned long value)
+> +{
+> +	if (value == 1)
+> +		csr_set(CSR_HEDELEG, MIS_DELEG);
+> +	else if (value == 0)
+> +		csr_clear(CSR_HEDELEG, MIS_DELEG);
+> +	else
+> +		return SBI_ERR_INVALID_PARAM;
+> +
+> +	return SBI_SUCCESS;
+> +}
+> +
+> +static long kvm_sbi_fwft_get_misaligned_delegation(struct kvm_vcpu *vcpu,
+> +					struct kvm_sbi_fwft_config *conf,
+> +					unsigned long *value)
+> +{
+> +	*value = (csr_read(CSR_HEDELEG) & MIS_DELEG) != 0;
 
-OK, for now let me fix this nonsense in comment and commit message.
+This should be
 
-But I'll wait for your opinion on [1] (drop, squash, change order of
-patches?) before posting v3.
+  (csr_read(CSR_HEDELEG) & MIS_DELEG) == MIS_DELEG;
 
-[1]:
-https://lore.kernel.org/netdev/20250421-vsock-linger-v2-2-fe9febd64668@rbox.co/
+> +
+> +	return SBI_SUCCESS;
+> +}
+> +
+>  static const struct kvm_sbi_fwft_feature features[] = {
+> +	{
+> +		.id = SBI_FWFT_MISALIGNED_EXC_DELEG,
+> +		.supported = kvm_sbi_fwft_misaligned_delegation_supported,
+> +		.set = kvm_sbi_fwft_set_misaligned_delegation,
+> +		.get = kvm_sbi_fwft_get_misaligned_delegation,
+> +	},
+>  };
+>  
+>  static struct kvm_sbi_fwft_config *
+> -- 
+> 2.49.0
+>
 
 Thanks,
-Michal
-
+drew
 
