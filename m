@@ -1,172 +1,315 @@
-Return-Path: <kvm+bounces-44126-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44127-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ED0EA9ACFB
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 14:14:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52799A9AD17
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 14:18:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA7B67B5205
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 12:11:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89C19462D71
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 12:18:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCFED230BE1;
-	Thu, 24 Apr 2025 12:11:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAB3422B595;
+	Thu, 24 Apr 2025 12:18:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dECc4yBA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eXPYnWkO"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D8D322F776
-	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 12:11:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E83D225A40
+	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 12:18:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745496674; cv=none; b=IvUmWce75+/EYuFrqMVgvB+3gSGxk1nP5zr9MtcnxZ7j/E5uuHNsUGOlbfKk9jf0H8Kf8h4g/YzrmGl7NPP7Z+GQQI0PDaxgEQHaedmZb4Z5ZRuPl5h/XBZiIKA+PmCUmdDYwFfS+S0WAoC/RaW26ltkOpv4uaCdpEDz2UYTTDs=
+	t=1745497120; cv=none; b=bDzr/5a7/DoCWpyXpjTDbJnXnxTMV4ktwIxmn6e3j05NyaddhKN6xaN7poMTRaRo6O6kZQFJ6kaq2AW6xZGuCfXV4z8MnheUEPtXrKGsvNpt3egzk6EcwrICLqY8V57Du+q/A+Lr4ZjTaoXe4r0OH0rH0j0LN2yUCuWYKKDcZLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745496674; c=relaxed/simple;
-	bh=bz4+/X497RFI15mRxsIqRhNBIwSZjCmNalMcue3pcXU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WYFegglGxn5HBPS4doK3Dul2vBFq3ClMbyAGHC3YEdIKdGLpEjTY8aYjADdQE6qugdfYgK+hRin1d88fesXR8zOjIKLySicL6DS+CjM6qmEnUmVj/brKY8rurxE6kuqeeEorlwnsaIMy8wIeOTD6xl+AWEeSBg5ENZi3i7KV7EU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dECc4yBA; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1745497120; c=relaxed/simple;
+	bh=mcKkQ09cqsVRLUDUXb0u2KP55QQ/vNPz3pJzQ9VsnJU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=iYJDf+lpxw7YNOIRtLaR1NPoLVbMthyQloiedBJ8BplS9ZuilOilA2ZxynIpVdb+YzPAfzhSfrEDrtvaxwXhBL2L0K4plv+809F6Z1eoUrl7Q6gZw014f02nhthSyAt0oVayfN+S9MAK8i1TS/2hzQ7czaM3cqB4XjbsszaOhFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eXPYnWkO; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745496671;
+	s=mimecast20190719; t=1745497113;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=J+iBi7KEPHVPdl78TuinUFRyNTsFrvN4I3oDOUPKzwc=;
-	b=dECc4yBAK2Q3Ny4QcaGaquISrQBsBZB6BvVlYm5MGNH4M7Ki/RZQ39avYm09k7Y1gGNlkI
-	qAqnLyivqOgqAiDW+ooUlap4M46db4RpRjEt9bQbyAOgZHkij8Jdd8O9sJwH0LInA8PHDr
-	0fC8+3kx+Vtx3W4D5Ip3AbtHxGgujPI=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-578-dDCb8ty3MiC5EUBznaJdhA-1; Thu, 24 Apr 2025 08:11:09 -0400
-X-MC-Unique: dDCb8ty3MiC5EUBznaJdhA-1
-X-Mimecast-MFC-AGG-ID: dDCb8ty3MiC5EUBznaJdhA_1745496669
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-44059976a1fso3526655e9.1
-        for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 05:11:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745496668; x=1746101468;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J+iBi7KEPHVPdl78TuinUFRyNTsFrvN4I3oDOUPKzwc=;
-        b=G/y3GbbM01aHTpTECEOWw9v2PQEFa+OPpdOlPLs7+/cS7Mbk1zMwpfrd+3xmwBhrZ7
-         i1U2hH9pwouWPYR9WCSElnvJqQa8P1Jf+aWGO9Vjz+OnaREbMLBKg1qvs7adgSzXPND7
-         yG/StQquWeLtYdVH0ogm3hXxjr0Ra48qvtJ+7RGUvW4EKPAdwrhn6CmGtXrhQCYuHXar
-         QSJGnGQ+TRM0c9bupNDIKXJo0mjpRYAO7Yd7BzLSHCn39/SOw56BDUrfbs95ZLferLtf
-         WulmOkuFPfZhikRU9GYl/djNIgeAGoVVMMfneI2F2dx7gBDmBK8wA/tfOyzWSnRCxDEP
-         O9gg==
-X-Forwarded-Encrypted: i=1; AJvYcCWwv7PugPy/PicRCrachRrJ8TYW/K3/9AredDVlMu+wWDLI2XyATlhXMbueN7GNgzKCmr0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfqShJyjcI7mkOCbqYOEzBDqSMO6g2mIuUmQz+PQN8X7hhzpbl
-	cvQiTDbycptis44OxG7UkhdCV1gx/sudCXnN23xKyxebe8dQhz0zqoAoix7Q4Us4c4csQjl8XE0
-	Eqgv1HBnfzgvyaTV6rEusAjhxfTCzva8eI4FF3vpGLkouG2NVbJZR3wRIzw==
-X-Gm-Gg: ASbGnctNDv5HEMcU2oekV1QL8aow7mp7op4Jci3xzxJAcP/YWuw7c3UrphysS0eOlbC
-	HUGYrRiR6ijGdic75AAvQ2serahKauLJhnbuFop7zbP/p/YMf7r50bPFe5nf1edTYjpRJu7PCGC
-	JbQ7c7FIQ5tfohCU8Lb9HqcEEPykshooD6ylMMFts6AzZKNjrFTFyNU4ultxSCDzFM33xTZ75bL
-	uV1EmR8lW3gtXcn8+o9VSFI35QnahHB8nHcIyUoGujzf1USWP+TPVQETX+cBjwRM6KJ3yEyV3as
-	zRFEew==
-X-Received: by 2002:a05:600c:1395:b0:43c:f616:f08 with SMTP id 5b1f17b1804b1-4409bd17dfdmr21734085e9.8.1745496668282;
-        Thu, 24 Apr 2025 05:11:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE9n0roJbpJf5HRR05saKucJsNpfjrLxCLOXtUJbPRGicV0Zxwyv2cOdsaG6FPN2tpgup02FQ==
-X-Received: by 2002:a05:600c:1395:b0:43c:f616:f08 with SMTP id 5b1f17b1804b1-4409bd17dfdmr21733875e9.8.1745496667950;
-        Thu, 24 Apr 2025 05:11:07 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4409d2b77f9sm18718025e9.25.2025.04.24.05.11.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Apr 2025 05:11:07 -0700 (PDT)
-Date: Thu, 24 Apr 2025 08:11:03 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jon Kohler <jon@nutanix.com>, Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] vhost/net: Defer TX queue re-enable until
- after sendmsg
-Message-ID: <20250424080749-mutt-send-email-mst@kernel.org>
-References: <20250420010518.2842335-1-jon@nutanix.com>
- <a0894275-6b23-4cff-9e36-a635f776c403@redhat.com>
+	bh=Eqa/wyHkA5Rds0zkDQ8ijbjXqasl+g3gbnyFVrmdGMA=;
+	b=eXPYnWkOKkcEH7+jkZPvy01rKO873Vlt5r/JTSqjXOKNbZky0W8oAbraXrL7QhKaHgENRJ
+	bBG6qOdSZP71twOdkXLIlUpxR+un/Ed7QNQ4MsDBIWWihvaqmhj08/bDbLu/otl4tT+0A/
+	PuphcsCQ6mcEI0BfRxtFSrAW6vQ65AU=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-635-eDini4p0PFG706XdvBSijg-1; Thu,
+ 24 Apr 2025 08:18:30 -0400
+X-MC-Unique: eDini4p0PFG706XdvBSijg-1
+X-Mimecast-MFC-AGG-ID: eDini4p0PFG706XdvBSijg_1745497109
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7EA4F1800368;
+	Thu, 24 Apr 2025 12:18:27 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.45.242.5])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 77833180047F;
+	Thu, 24 Apr 2025 12:18:25 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 08CA921E66C3; Thu, 24 Apr 2025 14:18:23 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Zhao Liu <zhao1.liu@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,  Eric Blake <eblake@redhat.com>,
+  Michael Roth <michael.roth@amd.com>,  Daniel P . =?utf-8?Q?Berrang=C3=A9?=
+ <berrange@redhat.com>,  Eduardo Habkost <eduardo@habkost.net>,  Marcelo
+ Tosatti <mtosatti@redhat.com>,  Shaoqin Huang <shahuang@redhat.com>,  Eric
+ Auger <eauger@redhat.com>,  Peter Maydell <peter.maydell@linaro.org>,
+  Laurent Vivier <lvivier@redhat.com>,  Thomas Huth <thuth@redhat.com>,
+  Sebastian Ott <sebott@redhat.com>,  Gavin Shan <gshan@redhat.com>,
+  qemu-devel@nongnu.org,  kvm@vger.kernel.org,  qemu-arm@nongnu.org,
+  Dapeng Mi <dapeng1.mi@intel.com>,  Yi Lai <yi1.lai@intel.com>
+Subject: Re: [PATCH 1/5] qapi/qom: Introduce kvm-pmu-filter object
+In-Reply-To: <20250409082649.14733-2-zhao1.liu@intel.com> (Zhao Liu's message
+	of "Wed, 9 Apr 2025 16:26:45 +0800")
+References: <20250409082649.14733-1-zhao1.liu@intel.com>
+	<20250409082649.14733-2-zhao1.liu@intel.com>
+Date: Thu, 24 Apr 2025 14:18:22 +0200
+Message-ID: <87tt6d4usx.fsf@pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a0894275-6b23-4cff-9e36-a635f776c403@redhat.com>
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Thu, Apr 24, 2025 at 01:48:53PM +0200, Paolo Abeni wrote:
-> On 4/20/25 3:05 AM, Jon Kohler wrote:
-> > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> > index b9b9e9d40951..9b04025eea66 100644
-> > --- a/drivers/vhost/net.c
-> > +++ b/drivers/vhost/net.c
-> > @@ -769,13 +769,17 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
-> >  			break;
-> >  		/* Nothing new?  Wait for eventfd to tell us they refilled. */
-> >  		if (head == vq->num) {
-> > +			/* If interrupted while doing busy polling, requeue
-> > +			 * the handler to be fair handle_rx as well as other
-> > +			 * tasks waiting on cpu
-> > +			 */
-> >  			if (unlikely(busyloop_intr)) {
-> >  				vhost_poll_queue(&vq->poll);
-> > -			} else if (unlikely(vhost_enable_notify(&net->dev,
-> > -								vq))) {
-> > -				vhost_disable_notify(&net->dev, vq);
-> > -				continue;
-> >  			}
-> > +			/* Kicks are disabled at this point, break loop and
-> > +			 * process any remaining batched packets. Queue will
-> > +			 * be re-enabled afterwards.
-> > +			 */
-> >  			break;
-> >  		}
-> 
-> It's not clear to me why the zerocopy path does not need a similar change.
+Zhao Liu <zhao1.liu@intel.com> writes:
 
-It can have one, it's just that Jon has a separate patch to drop
-it completely. A commit log comment mentioning this would be a good
-idea, yes.
+> Introduce the kvm-pmu-filter object and support the PMU event with raw
+> format.
+>
+> The raw format, as a native PMU event code representation, can be used
+> for several architectures.
+>
+> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+> Tested-by: Yi Lai <yi1.lai@intel.com>
 
-> > @@ -825,7 +829,14 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
-> >  		++nvq->done_idx;
-> >  	} while (likely(!vhost_exceeds_weight(vq, ++sent_pkts, total_len)));
-> >  
-> > +	/* Kicks are still disabled, dispatch any remaining batched msgs. */
-> >  	vhost_tx_batch(net, nvq, sock, &msg);
-> > +
-> > +	/* All of our work has been completed; however, before leaving the
-> > +	 * TX handler, do one last check for work, and requeue handler if
-> > +	 * necessary. If there is no work, queue will be reenabled.
-> > +	 */
-> > +	vhost_net_busy_poll_try_queue(net, vq);
-> 
-> This will call vhost_poll_queue() regardless of the 'busyloop_intr' flag
-> value, while AFAICS prior to this patch vhost_poll_queue() is only
-> performed with busyloop_intr == true. Why don't we need to take care of
-> such flag here?
+[...]
 
-Hmm I agree this is worth trying, a free if possibly small performance
-gain, why not. Jon want to try?
+> diff --git a/qapi/accelerator.json b/qapi/accelerator.json
+> new file mode 100644
+> index 000000000000..1fe0d64be113
+> --- /dev/null
+> +++ b/qapi/accelerator.json
+> @@ -0,0 +1,14 @@
+> +# -*- Mode: Python -*-
+> +# vim: filetype=python
+> +#
+> +# Copyright (C) 2025 Intel Corporation.
+> +#
+> +# Author: Zhao Liu <zhao1.liu@intel.com>
+> +#
+> +# SPDX-License-Identifier: GPL-2.0-or-later
+> +
+> +##
+> +# = Accelerators
+> +##
+> +
+> +{ 'include': 'kvm.json' }
+> diff --git a/qapi/kvm.json b/qapi/kvm.json
+> new file mode 100644
+> index 000000000000..1861d86a9726
+> --- /dev/null
+> +++ b/qapi/kvm.json
+> @@ -0,0 +1,84 @@
+> +# -*- Mode: Python -*-
+> +# vim: filetype=python
+> +#
+> +# Copyright (C) 2025 Intel Corporation.
+> +#
+> +# Author: Zhao Liu <zhao1.liu@intel.com>
+> +#
+> +# SPDX-License-Identifier: GPL-2.0-or-later
+> +
+> +##
+> +# == KVM
+> +##
 
+There's KVM-specific stuff elsewhere in the schema.  Some if of it
+should probably be moved here.  Can you have a look?  This is not a
+demand; it's fine if you can't.  If you can: separate patch preceding
+this one to create kvm.json and move stuff there.
 
-> @Michael: I assume you prefer that this patch will go through the
-> net-next tree, right?
-> 
-> Thanks,
-> 
-> Paolo
+> +
+> +##
+> +# === PMU stuff (KVM related)
 
-I don't mind and this seems to be what Jon wants.
-I could queue it too, but extra review  it gets in the net tree is good.
+The KVM subsection contains just this subsubsection.  Awkward.  Can we
+do without this subsubsection now?  We can always add it later, when we
+have enough KVM stuff to warrant structuring it into subsubsections.
 
--- 
-MST
+If we decide we want it:
+
+   # === KVM performance monitor unit (PMU)
+
+> +##
+> +
+> +##
+> +# @KvmPmuFilterAction:
+> +#
+> +# Actions that KVM PMU filter supports.
+> +#
+> +# @deny: disable the PMU event/counter in KVM PMU filter.
+> +#
+> +# @allow: enable the PMU event/counter in KVM PMU filter.
+> +#
+> +# Since 10.1
+> +##
+> +{ 'enum': 'KvmPmuFilterAction',
+> +  'data': ['allow', 'deny'] }
+> +
+> +##
+> +# @KvmPmuEventFormat:
+
+Maybe KvmPmuFilterEventFormat?  Or is that too long?
+
+> +#
+> +# Encoding formats of PMU event that QEMU/KVM supports.
+> +#
+> +# @raw: the encoded event code that KVM can directly consume.
+
+Suggest
+
+   # @raw: raw KVM PMU event code.
+
+> +#
+> +# Since 10.1
+> +##
+> +{ 'enum': 'KvmPmuEventFormat',
+> +  'data': ['raw'] }
+> +
+> +##
+> +# @KvmPmuRawEvent:
+
+Maybe KvmPmuFilterEventRaw?  Or is that too long?
+
+> +#
+> +# Raw PMU event code.
+> +#
+> +# @code: the raw value that has been encoded, and QEMU could deliver
+> +#     to KVM directly.
+
+Suggest
+
+   ##
+   # @KvmPmuRawEvent
+   #
+   # @code: raw KVM PMU event code, to be passed verbatim to KVM.
+
+> +#
+> +# Since 10.1
+> +##
+> +{ 'struct': 'KvmPmuRawEvent',
+> +  'data': { 'code': 'uint64' } }
+> +
+> +##
+> +# @KvmPmuFilterEvent:
+> +#
+> +# PMU event filtered by KVM.
+
+Suggest
+
+   # A KVM PMU event specification.
+
+> +#
+> +# @format: PMU event format.
+> +#
+> +# Since 10.1
+> +##
+> +{ 'union': 'KvmPmuFilterEvent',
+> +  'base': { 'format': 'KvmPmuEventFormat' },
+> +  'discriminator': 'format',
+> +  'data': { 'raw': 'KvmPmuRawEvent' } }
+> +
+> +##
+> +# @KvmPmuFilterProperties:
+> +#
+> +# Properties of KVM PMU Filter.
+> +#
+> +# @action: action that KVM PMU filter will take for selected PMU events.
+> +#
+> +# @events: list of selected PMU events.
+
+Here's my try:
+
+   # Properties of kvm-pmu-filter objects.  A kvm-pmu-filter object
+   # restricts the guest's access to the PMU with either an allowlist or
+   # a denylist.
+   #
+   # @action: whether @events is an allowlist or a denylist.
+   #
+   # @events: list of KVM PMU event specifications.
+
+> +#
+> +# Since 10.1
+> +##
+> +{ 'struct': 'KvmPmuFilterProperties',
+> +  'data': { 'action': 'KvmPmuFilterAction',
+> +            '*events': ['KvmPmuFilterEvent'] } }
+> diff --git a/qapi/meson.build b/qapi/meson.build
+> index eadde4db307f..dba27ebc7489 100644
+> --- a/qapi/meson.build
+> +++ b/qapi/meson.build
+> @@ -37,6 +37,7 @@ qapi_all_modules = [
+>    'error',
+>    'introspect',
+>    'job',
+> +  'kvm',
+>    'machine-common',
+>    'machine',
+>    'machine-target',
+> diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
+> index c41c01eb2ab9..c7fed7940af7 100644
+> --- a/qapi/qapi-schema.json
+> +++ b/qapi/qapi-schema.json
+> @@ -66,6 +66,7 @@
+>  { 'include': 'compat.json' }
+>  { 'include': 'control.json' }
+>  { 'include': 'introspect.json' }
+> +{ 'include': 'accelerator.json' }
+>  { 'include': 'qom.json' }
+>  { 'include': 'qdev.json' }
+>  { 'include': 'machine-common.json' }
+> diff --git a/qapi/qom.json b/qapi/qom.json
+> index 28ce24cd8d08..517f4c06c260 100644
+> --- a/qapi/qom.json
+> +++ b/qapi/qom.json
+> @@ -8,6 +8,7 @@
+>  { 'include': 'block-core.json' }
+>  { 'include': 'common.json' }
+>  { 'include': 'crypto.json' }
+> +{ 'include': 'kvm.json' }
+>  
+>  ##
+>  # = QEMU Object Model (QOM)
+> @@ -1108,6 +1109,7 @@
+>        'if': 'CONFIG_LINUX' },
+>      'iommufd',
+>      'iothread',
+> +    'kvm-pmu-filter',
+>      'main-loop',
+>      { 'name': 'memory-backend-epc',
+>        'if': 'CONFIG_LINUX' },
+> @@ -1183,6 +1185,7 @@
+>                                        'if': 'CONFIG_LINUX' },
+>        'iommufd':                    'IOMMUFDProperties',
+>        'iothread':                   'IothreadProperties',
+> +      'kvm-pmu-filter':             'KvmPmuFilterProperties',
+>        'main-loop':                  'MainLoopProperties',
+>        'memory-backend-epc':         { 'type': 'MemoryBackendEpcProperties',
+>                                        'if': 'CONFIG_LINUX' },
 
 
