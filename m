@@ -1,320 +1,293 @@
-Return-Path: <kvm+bounces-44025-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44026-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38AB8A99C3B
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 01:50:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CD2C2A99DD9
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 03:11:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EBAD17B747
-	for <lists+kvm@lfdr.de>; Wed, 23 Apr 2025 23:50:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EE3344816D
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 01:11:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1765D244664;
-	Wed, 23 Apr 2025 23:49:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18D5716EB7C;
+	Thu, 24 Apr 2025 01:11:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m22b7eh7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OxaEJGoq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 696D021FF28
-	for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 23:49:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745452188; cv=none; b=TMvZ1FQSGX/EiJvaByAXmGnqtq9zu/sd4/FxlijQt5aVfqtAq6majr2/FtZVxSBtsIY/m3P0zZd2odifx6sHrY8xjZwZH+1yFeKTrgIiuVMr3UHwt6YNvk6gZCXhQKVl96JNOBg4PUf0HtvYY9IayoMEh+YkshzcV30owalszOU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745452188; c=relaxed/simple;
-	bh=2VepqBRKfk+JUtYK6Opi6yC4PoH9lRaO6DVRy49F788=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mzL+MurKEnKw1q/tynqxPt0HOjsbmmkqRYFBSGniQGRDH9w1xCdkHNDFvazEOwSim7a0i5CPyySeK5unkLbGnJ52Zt9GfKWNfUpgqu4EW7uk2ZCTZROZwnVUmvz9vplM+T9eznCuOdEREps1+M0o37FqAGJqaFn2kUubEmvJ1QU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m22b7eh7; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2242ac37caeso40935ad.1
-        for <kvm@vger.kernel.org>; Wed, 23 Apr 2025 16:49:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745452184; x=1746056984; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZgkZ0Ext9iMP/JpiGlrjV0G3sg7KUzWq6I5onInGXLo=;
-        b=m22b7eh7ZBAWuwp7bnnFNPDsGXVQsJgKx+hykA/dVSbsJgYAf5w2hfu5xArKlpaCHf
-         jt+IWwYEfNrRJzlhCsLsw6WR+n+EGP7r+VoSB54JXwSHboVNzntSz3/Z6Hodfr7a/15u
-         8+k3QfiC/wMJz6eYAM+iuFiBEtLs6dzI2Rw3y1IaqESHzvdXk4jyVgAwLdrssEtEL6D6
-         3HPrHD5dd6IpQaMzXB76bNq9QUljv+CaRttURfXotriwapSQ+0U0HB0sFCfZpQEANqfA
-         +TqfHvmWI3VIMd8qdr3Qf1kohOYK4cwoxuwjmUzJA6/Pf+DokhIf64GtClz7SkLog/1d
-         VyEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745452184; x=1746056984;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZgkZ0Ext9iMP/JpiGlrjV0G3sg7KUzWq6I5onInGXLo=;
-        b=w6b2/LFO1z00p9qlsHTn9WZahDrbfWEkmgDBUwAjv1itLGFkbTLm7yyZlctSKw/dTY
-         dE1a92VYmtat3ETssPbFFY+fhBfV/BML1pGl+Od69ZOcKPhYQoeDgyDEnh8np4hSbfJI
-         e0nnvr7hKZxgqAyjQCfjB8PKW9TUDXqjWYweC1r/4vvcnwoi1SNsVJ7YZ/peFS6/Ez23
-         K9qHFhjBUTAhK0NCLuR03TNFXkTG3jzuHsL1V72fWcEUcQW1T4OeEQ5QZbliIYsxviF0
-         sWozlaf7Lox2gbCtyIOtp6Fa8i4ds4t7ImmuJImYmIojjzQlTw28LKt2KBBsLH8yK1gs
-         xo7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWWL9Wk+WXxq3byx03gU598KRH6IUHbKUKKgJvWOcY4IlkZptIWpoj4r85qaC8d0pHJBo8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysBwW37EYpigTWBLD+jfJj7f4w8h5ebwG1N10gBrrMlD5kX8e3
-	1jkrwQJ9WZWnSAdeJsIuS29KOMmfl8QxTofWqdGTL1/kmOAPwlAKO+mNPPTtScvy3He5Cy0S+cW
-	YFOntTBkCcMWAMQZ7HQUy1Lrf5S7fyZfJzCzv
-X-Gm-Gg: ASbGncsUuFAUZvv9ybYfeK4whgfWiN74bM65hFgGe/Mzi3sh+GuLVIXfGmC0xFKNn3o
-	gthiLS5NVBBvqgkFF2Ayj7CA1yEBq0YcgIXmXeBZrvIwUpf2sjPbY2nDZrr+Uv3ZvSvuswpLWK7
-	aDh269BWzl5QbgoLf12Jpk2ieN57OS8db/vmo2VwsBdR8swLp8dxc9
-X-Google-Smtp-Source: AGHT+IGX7LK2aizJTPRrsUG1SCwbT2wY7Q85CyE+4DCuBGCQwpCEAfBGkW2ltJ7AcRFVxOQFDMwRmDSguzDhCxxr7Yc=
-X-Received: by 2002:a17:903:46c6:b0:21f:3c4a:136f with SMTP id
- d9443c01a7336-22db2214bfcmr1400785ad.28.1745452183416; Wed, 23 Apr 2025
- 16:49:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D1913A3F2;
+	Thu, 24 Apr 2025 01:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745457106; cv=fail; b=JjYO307LN9mUAYXG6PTIOj/gnq41fxriqjdUyS3e7trrUm7r8AQisSSQ9qukCMEcoX7xnyb99mLrWk7b+nOurCH7ly2Acok7tf5LxGaA0MaHHPKTaWyvVEGKMb2+GeIaIg2l4AtQbHix1ldjreg3VLm747CkOgjly8tDojMtQmI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745457106; c=relaxed/simple;
+	bh=b0e65BCuFqZboFg2Hui3/Sc3YbyJ6UgaT1WtU6AWMik=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=fDHNH6/PXaVKixzMyu81GljrQpvIm42rgkdFBiG+YtsjjYGOMCMynqlBsZvzbckD/g3b9rQSXNzyyHm9eYrjs61azEqt0kIXNUsvLFeBY5iGQt5cXV5irVx84OsHR7M/5HNf1zQD8rGAIwSSRF5jBmyrENYYJHoJHc5jLpkzed4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OxaEJGoq; arc=fail smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1745457104; x=1776993104;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=b0e65BCuFqZboFg2Hui3/Sc3YbyJ6UgaT1WtU6AWMik=;
+  b=OxaEJGoqTLsQqQtEGmidFj5s3JXwdzLfewYRzk59HDkwMshVv6Ij1Bxj
+   jt+GopQYQPXvCR+9qDFXKusuQBjPTw4NQcS1tGUDF5tt96Venzn+iSDPW
+   TTEI3hxEf0CRRYORkXznZoO++bMpEOM2pDu923Ujozrve1mFdu77rHKhN
+   df7zJ85AqgDK95QRWz6K2+MxqTBQePK/lWltcP+mckipv+E9oODYj60A0
+   +7R0urMKfwir/iF8DGEqql3cSH7tWm5k/anM/oq8GgmS5KnH5GYhw94sV
+   xnlcStGzhCBbYlQr9Yv6xTFTwp7y96VU9C8pro46+F71fYhCh0KTysZJA
+   w==;
+X-CSE-ConnectionGUID: RIRst9+uQ4W+eEEdvus9bA==
+X-CSE-MsgGUID: oU527AYiRO6dNS1N8L74Ug==
+X-IronPort-AV: E=McAfee;i="6700,10204,11412"; a="46192382"
+X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
+   d="scan'208";a="46192382"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 18:11:42 -0700
+X-CSE-ConnectionGUID: B+GFs0zDQ4e5byQIFbETOw==
+X-CSE-MsgGUID: ftCYJxPvTcqhDQISSpMxxQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
+   d="scan'208";a="137640773"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 18:11:42 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Wed, 23 Apr 2025 18:11:41 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Wed, 23 Apr 2025 18:11:41 -0700
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.40) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Wed, 23 Apr 2025 18:11:39 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=U+gjt/mymgw2UiwmVUbnanLiBSaNFX9l4/E999zmGJ/iqAJ7sLnXjAzvgvHVJMcRWJek2ibpf3OtgJUj6+kAgPsjQw2FwQiwfBWzsqEtBk3ykr8pWtueS9fdpXxHkvwxhsPnqD9845ug76lFU52va8/Ikxgp7B2fn8h9AQHzewKlbml0ATDUdtq5KauXdhZ4difhLOvTK1jh9momK34gs8RFHL7kthOofJo9Jym8rmrJ1x/N1T7b8QP6u7EKFHzmOgUAM5ryBiyI42VI6Zzit5bBhBJOiQcOmvwNCtr6FOpoYDMAdM81XN9z1crM7eEmtz8j47bDZFAfgUwVel/BAQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VBCC/sjtlo5q33neWo1CeJ8eRPX4O8dGue7tBQiubkc=;
+ b=yX9UY17tdWnZSIYF2UxR9l21puxEsVgJHncEuuYqIacBDprUIVmErxnzeSU2V93JDRpv0V/ilEBDHf9yWzKK2GpdzpcQI5BnBEzA4PxeOsA4XUvp9Ji4rqXvKKZF+og+iwXEfEKoTpKYvupENr7FawwaE25r0YymP5keOYVKTPhAcUuT78N3zrHP0j9Tch3hN47Ega7u/Wip2pdMQ7cB7xSjJV0jqtH59nzXaGQRUzuVZZlEF2NzObkbdF5JoY+YHrHLXOzPKCW3RcJY+wR5K9t/QEcS85wyHyF1Hx3EnUh6rSWgnZd8550d29wA3vwDWBvfUm2AxpHzFCqPLQPM8w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN0PR11MB5964.namprd11.prod.outlook.com (2603:10b6:208:373::17)
+ by SA1PR11MB7697.namprd11.prod.outlook.com (2603:10b6:806:33a::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8655.35; Thu, 24 Apr
+ 2025 01:11:24 +0000
+Received: from MN0PR11MB5964.namprd11.prod.outlook.com
+ ([fe80::7a0e:21e8:dce9:dbee]) by MN0PR11MB5964.namprd11.prod.outlook.com
+ ([fe80::7a0e:21e8:dce9:dbee%3]) with mapi id 15.20.8655.037; Thu, 24 Apr 2025
+ 01:11:24 +0000
+Date: Thu, 24 Apr 2025 09:09:22 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Ackerley Tng <ackerleytng@google.com>
+CC: <tabba@google.com>, <quic_eberman@quicinc.com>, <roypat@amazon.co.uk>,
+	<jgg@nvidia.com>, <peterx@redhat.com>, <david@redhat.com>,
+	<rientjes@google.com>, <fvdl@google.com>, <jthoughton@google.com>,
+	<seanjc@google.com>, <pbonzini@redhat.com>, <zhiquan1.li@intel.com>,
+	<fan.du@intel.com>, <jun.miao@intel.com>, <isaku.yamahata@intel.com>,
+	<muchun.song@linux.dev>, <erdemaktas@google.com>, <vannapurve@google.com>,
+	<qperret@google.com>, <jhubbard@nvidia.com>, <willy@infradead.org>,
+	<shuah@kernel.org>, <brauner@kernel.org>, <bfoster@redhat.com>,
+	<kent.overstreet@linux.dev>, <pvorel@suse.cz>, <rppt@kernel.org>,
+	<richard.weiyang@gmail.com>, <anup@brainfault.org>, <haibo1.xu@intel.com>,
+	<ajones@ventanamicro.com>, <vkuznets@redhat.com>,
+	<maciej.wieczor-retman@intel.com>, <pgonda@google.com>,
+	<oliver.upton@linux.dev>, <linux-kernel@vger.kernel.org>,
+	<linux-mm@kvack.org>, <kvm@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>
+Subject: Re: [RFC PATCH 39/39] KVM: guest_memfd: Dynamically
+ split/reconstruct HugeTLB page
+Message-ID: <aAmPQssuN9Zba//b@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <cover.1726009989.git.ackerleytng@google.com>
+ <38723c5d5e9b530e52f28b9f9f4a6d862ed69bcd.1726009989.git.ackerleytng@google.com>
+ <Z+6AGxEvBRFkN5mN@yzhao56-desk.sh.intel.com>
+ <diqzh62ezgdh.fsf@ackerleytng-ctop.c.googlers.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <diqzh62ezgdh.fsf@ackerleytng-ctop.c.googlers.com>
+X-ClientProxiedBy: SI2PR02CA0038.apcprd02.prod.outlook.com
+ (2603:1096:4:196::22) To MN0PR11MB5964.namprd11.prod.outlook.com
+ (2603:10b6:208:373::17)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250423031117.907681-1-almasrymina@google.com>
- <20250423031117.907681-5-almasrymina@google.com> <20250423140931-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20250423140931-mutt-send-email-mst@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 23 Apr 2025 16:49:30 -0700
-X-Gm-Features: ATxdqUHdLn2wP88hj2tffPEL1QlUjkAMN1_0DSb5R09qEYsDQJ9iaUC4P8x0YMU
-Message-ID: <CAHS8izNRk1MOs-R1RmWMQ5zMBOo70YpTzOdt8=OrrjrD7JQTfA@mail.gmail.com>
-Subject: Re: [PATCH net-next v10 4/9] net: devmem: Implement TX path
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, io-uring@vger.kernel.org, 
-	virtualization@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Jeroen de Borst <jeroendb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, Jens Axboe <axboe@kernel.dk>, 
-	Pavel Begunkov <asml.silence@gmail.com>, David Ahern <dsahern@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Stefano Garzarella <sgarzare@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, dw@davidwei.uk, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>, 
-	Kaiyuan Zhang <kaiyuanz@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN0PR11MB5964:EE_|SA1PR11MB7697:EE_
+X-MS-Office365-Filtering-Correlation-Id: 04271af8-7c1f-4692-7228-08dd82ccee2c
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?fZZXymp5xS0e+Myqn7yhBKd2ajlCztxsgKRYx5hGflA1hLZ2xWwL3R1GARwI?=
+ =?us-ascii?Q?PdRaPkizyzY9ietBGmBDNZMiaZB0OzJ+n3h4FnhSrYKjwi1gxDzRyhN0/ZEH?=
+ =?us-ascii?Q?lHrNJPxxffi52ssmkKUxgR90uDkATBKsLkNncZeg/JUM8KyfPIVwXJk3DHK9?=
+ =?us-ascii?Q?PWu1zTg7wUec4f0RaBR60xRD8UwiTsYCQZvAmJz0tBfqMKp46pHOjqqol5DA?=
+ =?us-ascii?Q?AMHRuYmzgTr+X0s3fN/B14oS0i2CFLWaUIW8/5mpQH2oxq4rXcnwLBZqeuji?=
+ =?us-ascii?Q?2vvjQ5NVk+dzoFAZ2ekMfR1kFs+xiNGCU9IggYpcpzIxrgIk7aAGSWhIi/Bo?=
+ =?us-ascii?Q?aP1Zwpz6Xxn8GN9Jvt6BSCEBagdOr/+nDCtMDujJGKd5eYe9rLBgWuqt1fxB?=
+ =?us-ascii?Q?ufttY/vuwsiHisvDPzKr6ImXnWl+bnhlY9JpCZg+rNdRRfR1Dz3fDKwEgZWd?=
+ =?us-ascii?Q?PBylCSaAxo9J3r2x5G08M27gk0x0qJBQYiqC2MX7nglmsmsmKmGAMWFEnYeS?=
+ =?us-ascii?Q?kaCcu6Ky530nO46pSS6Vnl4hsgemv2ZfEeQ5jUh7pU2uokJA2pcGsiP8xlu3?=
+ =?us-ascii?Q?SJDieyjBWfIeeTBXVJKnmKIlXSIE1ib8gGD0Os6etuRN8C9CMw3pmgH4430k?=
+ =?us-ascii?Q?tFbGodolUfL+8a7MRNz0tTooHJizQZVG5z/IgxaSZ+87ufDZrzCfGhNEefsV?=
+ =?us-ascii?Q?9b5YICMykF8Qa9KVqaZjCDsvUrbdU9/tSfYW6CGdh9DwHy728+smxKb3rPJn?=
+ =?us-ascii?Q?6GU6OQTM4Om+xF5N0S9db4Zn2G2c2GvkhISYVLitwQMkwmjVr/2z7e2Fgo+t?=
+ =?us-ascii?Q?WMB1zxZ5o8PmKv0JhbfJwxlX6jSh3ptM1h8aZsDwCJbO8b1cfZB5v5c4GC2S?=
+ =?us-ascii?Q?iikJec1lYvmE5COvayoveytbgcXr7fHFv3u3lpnNR3KvdoQ+XkThvXgStO6u?=
+ =?us-ascii?Q?2tGoHfftxySl+0PUD388yQL/JALpS+Rgb/WIhsgXj4QFetBYcE6smRUoMeNk?=
+ =?us-ascii?Q?785/QRCvMTvaJ7pu2k95r8P9TYeS6liWJrXENo59l/UTOSLuWsXgonklLp8b?=
+ =?us-ascii?Q?yMqhBOStRR/SRxl9F7MPwgjg59YmXaUhXNy2ef38zDJuGGhJtsfsYic08KLN?=
+ =?us-ascii?Q?FwkraDz2L1Stt1il/cHNYwU8QY5gpFauRu/9j5mnaYmzoKB8dBzL4LfEHgnG?=
+ =?us-ascii?Q?evOH6TGO3Vuo8T6rE3JUIVDdHGFujoh45a6Pp6zm3V5QpT8lcwhId8BXlY3U?=
+ =?us-ascii?Q?MoOUp6FWP6zG6ppe+9VET3eHeg1VqrMsO+vYXE8GDninnkDpXLevUdsSTi2T?=
+ =?us-ascii?Q?Zc2H0Ac9QI+C5PCDhpxCFdhQM4RB+72GgduR2fPkRxCq/JnwisNL0sC9Z64A?=
+ =?us-ascii?Q?3rscftDBjfWc1MX8FXLXGfMAQpSMI1iH2sGmA+2KdP+i0dLTg7tCj0Caz5TJ?=
+ =?us-ascii?Q?6qzgIgjZgZo=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5964.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?7Jh+RP/18oYGZMN4T4orqgutcHGAG4IPEaOA/+ANKUSC+pTh2yBMy7faJqtS?=
+ =?us-ascii?Q?cGr5dOGfPsd4XFX53uKfxV9M6ere0IFeYLManHhsmMbvBiDPp+nFr4/zwFig?=
+ =?us-ascii?Q?yH3YaZRMy7LBbxVWLQWuXVXJ5HA38fS9++JCNViH2keef7C+46TgZDsxUC2m?=
+ =?us-ascii?Q?xQ0rLb52gmVgJw736jaSTZvVIFKbXv7CsXShTFfDRVVDRDPbXGd88qdL0ena?=
+ =?us-ascii?Q?JSsKIHEZLl2247EuM17y+9DNUN22Aa+PqFvCjliFcGdsIwxRUzaG2ZabpGFg?=
+ =?us-ascii?Q?GJhYPxxnyAyesO0Lj94p9xMuqjCc59kRbJ+rMMl0l3VLOvIYGj1MK6ROgSDY?=
+ =?us-ascii?Q?hP8k0AwOmmWHxeqZC4fXmw5bCAERx4ABYyL+ikwEFbO69Xkon1l9+Fv/6Ee1?=
+ =?us-ascii?Q?ak8FJ8GHwng6Zm+As8LqQxK+zeuzNDvlk00JbSabPEptsFu+GvYDHUexujgY?=
+ =?us-ascii?Q?S0lxTSokv8AEIiBHDzMRheivZBw9o6pK6GI5Jub3413A3ihshmOC2qcju88l?=
+ =?us-ascii?Q?xmZgSHmiW4z7gKJXzEZuenTry8UXQwEITq+ilv5/XIklr6RZDoM8pB4Rwfr3?=
+ =?us-ascii?Q?f3QDNKAFB+402Rfs0VjOvmjAaOf7pKzUyvCSMHhY/uLB64cD5Ecz5gH/99pR?=
+ =?us-ascii?Q?TkbOe71V2Aa91v0TNtKuZmQaaY6YOJuGyHZ6i4DhXNTPxb3RFhQLU9TDl486?=
+ =?us-ascii?Q?eyRkabYHVxREgo8QfUUhJn1bRHA0KbXVQHC1zDmhn9FvZ3uwdAR7Nl3d+KDO?=
+ =?us-ascii?Q?B/0jhSmk0iHl04ubUE71Utp8vHzxik6HaKYu9QtZeeoVrjJQNDB7K/HPeKEd?=
+ =?us-ascii?Q?t5VYSvLowMj3YJnaZFClFywiWrAYvsjsRiyyBcpZ0mwx0KfRTSGeVnZhczGP?=
+ =?us-ascii?Q?9v/KOHktDyn0ykde4totK9MMR8GZXe59jDsk0cxttjKZrFzzpe5AFuDukLiz?=
+ =?us-ascii?Q?I4vdITNV4AhGgvWOrwdMxH4+4esnjB0ZqTu23nvNl+H8ZoiX0/LdCvik70Ts?=
+ =?us-ascii?Q?tt09npmdJSEgCwt4+KyX4c5rpa9iMiqrrUMaJaXxQjKgHgAFVoYHjwSbaB/i?=
+ =?us-ascii?Q?qmrkFJpNzbdg3OXYfTfo5roZZU7FEdBDjOO6auytB9MnmuRpMhGGQiJQ3+zV?=
+ =?us-ascii?Q?YCeH17SVQgb2qaedlcG5B3I8L3PPT5v63wR7100WybZDqgVOFIDvlxNXg46p?=
+ =?us-ascii?Q?LjiOg4PI4WhdbmDVBQZ5aKcnlvJWpVuIts66JwwoIQF7J7+iLylyfVszH/ip?=
+ =?us-ascii?Q?p7ji3IbLfrHqxvaSVn7npnqqN3eJdEFa9InsLY9iUI2sZL+yN3Q9gNgcHtLl?=
+ =?us-ascii?Q?0ESjpP37BdXafPrOzFR5XyQK/Kdk4eGa7u0d9EZ4XhGiMtL4wdlrGd7l2oF+?=
+ =?us-ascii?Q?ZkDipfHHzFmOlTWQv/9SC+8jQOWZCqx17myzPV8z158J7biHCaaxVXQ6SUKz?=
+ =?us-ascii?Q?YFtf2Uj0RGsF5MallxtCtv1oK3/zlcixYuYYkkfiU0OBny4ZWa2jbrLimsLK?=
+ =?us-ascii?Q?8bbC1qEUKIIJ+CvKWpvSVvV1/RVoKnySZKYCcy5W2p/QGKqGLWCU5Vb2nKFj?=
+ =?us-ascii?Q?etl2uvFGuyX1A6o10BrpEeuDv76sNym8eRb9RQUE?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 04271af8-7c1f-4692-7228-08dd82ccee2c
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5964.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2025 01:11:23.9388
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zxTRCQ0jR7NfDWxXvFwh/q6W3DkHh9Ok3Sev8c51yMO39k6dA3iE/scWV8g2isZqVFwK1wIphdaXmz/Ol2rWvw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB7697
+X-OriginatorOrg: intel.com
 
-On Wed, Apr 23, 2025 at 11:24=E2=80=AFAM Michael S. Tsirkin <mst@redhat.com=
-> wrote:
->
-> some nits
->
-> On Wed, Apr 23, 2025 at 03:11:11AM +0000, Mina Almasry wrote:
-> > @@ -189,43 +200,44 @@ net_devmem_bind_dmabuf(struct net_device *dev, un=
-signed int dmabuf_fd,
-> >       }
+On Wed, Apr 23, 2025 at 03:02:02PM -0700, Ackerley Tng wrote:
+> Yan Zhao <yan.y.zhao@intel.com> writes:
+> 
+> > On Tue, Sep 10, 2024 at 11:44:10PM +0000, Ackerley Tng wrote:
+> >> +/*
+> >> + * Allocates and then caches a folio in the filemap. Returns a folio with
+> >> + * refcount of 2: 1 after allocation, and 1 taken by the filemap.
+> >> + */
+> >> +static struct folio *kvm_gmem_hugetlb_alloc_and_cache_folio(struct inode *inode,
+> >> +							    pgoff_t index)
+> >> +{
+> >> +	struct kvm_gmem_hugetlb *hgmem;
+> >> +	pgoff_t aligned_index;
+> >> +	struct folio *folio;
+> >> +	int nr_pages;
+> >> +	int ret;
+> >> +
+> >> +	hgmem = kvm_gmem_hgmem(inode);
+> >> +	folio = kvm_gmem_hugetlb_alloc_folio(hgmem->h, hgmem->spool);
+> >> +	if (IS_ERR(folio))
+> >> +		return folio;
+> >> +
+> >> +	nr_pages = 1UL << huge_page_order(hgmem->h);
+> >> +	aligned_index = round_down(index, nr_pages);
+> > Maybe a gap here.
 > >
-> >       binding->dev =3D dev;
-> > -
-> > -     err =3D xa_alloc_cyclic(&net_devmem_dmabuf_bindings, &binding->id=
-,
-> > -                           binding, xa_limit_32b, &id_alloc_next,
-> > -                           GFP_KERNEL);
-> > -     if (err < 0)
-> > -             goto err_free_binding;
-> > -
-> >       xa_init_flags(&binding->bound_rxqs, XA_FLAGS_ALLOC);
-> > -
-> >       refcount_set(&binding->ref, 1);
-> > -
-> >       binding->dmabuf =3D dmabuf;
+> > When a guest_memfd is bound to a slot where slot->base_gfn is not aligned to
+> > 2M/1G and slot->gmem.pgoff is 0, even if an index is 2M/1G aligned, the
+> > corresponding GFN is not 2M/1G aligned.
+> 
+> Thanks for looking into this.
+> 
+> In 1G page support for guest_memfd, the offset and size are always
+> hugepage aligned to the hugepage size requested at guest_memfd creation
+> time, and it is true that when binding to a memslot, slot->base_gfn and
+> slot->npages may not be hugepage aligned.
+> 
 > >
+> > However, TDX requires that private huge pages be 2M aligned in GFN.
+> >
+> 
+> IIUC other factors also contribute to determining the mapping level in
+> the guest page tables, like lpage_info and .private_max_mapping_level()
+> in kvm_x86_ops.
 >
-> given you keep iterating, don't tweak whitespace in the same patch-
-> will make the review a tiny bit easier.
->
+> If slot->base_gfn and slot->npages are not hugepage aligned, lpage_info
+> will track that and not allow faulting into guest page tables at higher
+> granularity.
+ 
+lpage_info only checks the alignments of slot->base_gfn and
+slot->base_gfn + npages. e.g.,
 
-Sure.
+if slot->base_gfn is 8K, npages is 8M, then for this slot,
+lpage_info[2M][0].disallow_lpage = 1, which is for GFN [4K, 2M+8K);
+lpage_info[2M][1].disallow_lpage = 0, which is for GFN [2M+8K, 4M+8K);
+lpage_info[2M][2].disallow_lpage = 0, which is for GFN [4M+8K, 6M+8K);
+lpage_info[2M][3].disallow_lpage = 1, which is for GFN [6M+8K, 8M+8K);
 
->
-> >       binding->attachment =3D dma_buf_attach(binding->dmabuf, dev->dev.=
-parent);
-> >       if (IS_ERR(binding->attachment)) {
-> >               err =3D PTR_ERR(binding->attachment);
-> >               NL_SET_ERR_MSG(extack, "Failed to bind dmabuf to device")=
-;
-> > -             goto err_free_id;
-> > +             goto err_free_binding;
-> >       }
-> >
-> >       binding->sgt =3D dma_buf_map_attachment_unlocked(binding->attachm=
-ent,
-> > -                                                    DMA_FROM_DEVICE);
-> > +                                                    direction);
-> >       if (IS_ERR(binding->sgt)) {
-> >               err =3D PTR_ERR(binding->sgt);
-> >               NL_SET_ERR_MSG(extack, "Failed to map dmabuf attachment")=
-;
-> >               goto err_detach;
-> >       }
-> >
-> > +     if (direction =3D=3D DMA_TO_DEVICE) {
-> > +             binding->tx_vec =3D kvmalloc_array(dmabuf->size / PAGE_SI=
-ZE,
-> > +                                              sizeof(struct net_iov *)=
-,
-> > +                                              GFP_KERNEL);
-> > +             if (!binding->tx_vec) {
-> > +                     err =3D -ENOMEM;
-> > +                     goto err_unmap;
-> > +             }
-> > +     }
-> > +
-> >       /* For simplicity we expect to make PAGE_SIZE allocations, but th=
-e
-> >        * binding can be much more flexible than that. We may be able to
-> >        * allocate MTU sized chunks here. Leave that for future work...
-> >        */
-> > -     binding->chunk_pool =3D
-> > -             gen_pool_create(PAGE_SHIFT, dev_to_node(&dev->dev));
-> > +     binding->chunk_pool =3D gen_pool_create(PAGE_SHIFT,
-> > +                                           dev_to_node(&dev->dev));
-> >       if (!binding->chunk_pool) {
-> >               err =3D -ENOMEM;
-> > -             goto err_unmap;
-> > +             goto err_tx_vec;
-> >       }
-> >
-> >       virtual =3D 0;
-> > @@ -270,24 +282,34 @@ net_devmem_bind_dmabuf(struct net_device *dev, un=
-signed int dmabuf_fd,
-> >                       niov->owner =3D &owner->area;
-> >                       page_pool_set_dma_addr_netmem(net_iov_to_netmem(n=
-iov),
-> >                                                     net_devmem_get_dma_=
-addr(niov));
-> > +                     if (direction =3D=3D DMA_TO_DEVICE)
-> > +                             binding->tx_vec[owner->area.base_virtual =
-/ PAGE_SIZE + i] =3D niov;
-> >               }
-> >
-> >               virtual +=3D len;
-> >       }
-> >
-> > +     err =3D xa_alloc_cyclic(&net_devmem_dmabuf_bindings, &binding->id=
-,
-> > +                           binding, xa_limit_32b, &id_alloc_next,
-> > +                           GFP_KERNEL);
-> > +     if (err < 0)
-> > +             goto err_free_id;
-> > +
-> >       return binding;
-> >
-> > +err_free_id:
-> > +     xa_erase(&net_devmem_dmabuf_bindings, binding->id);
-> >  err_free_chunks:
-> >       gen_pool_for_each_chunk(binding->chunk_pool,
-> >                               net_devmem_dmabuf_free_chunk_owner, NULL)=
-;
-> >       gen_pool_destroy(binding->chunk_pool);
-> > +err_tx_vec:
-> > +     kvfree(binding->tx_vec);
-> >  err_unmap:
-> >       dma_buf_unmap_attachment_unlocked(binding->attachment, binding->s=
-gt,
-> >                                         DMA_FROM_DEVICE);
-> >  err_detach:
-> >       dma_buf_detach(dmabuf, binding->attachment);
-> > -err_free_id:
-> > -     xa_erase(&net_devmem_dmabuf_bindings, binding->id);
-> >  err_free_binding:
-> >       kfree(binding);
-> >  err_put_dmabuf:
-> > @@ -295,6 +317,21 @@ net_devmem_bind_dmabuf(struct net_device *dev, uns=
-igned int dmabuf_fd,
-> >       return ERR_PTR(err);
-> >  }
-> >
-> > +struct net_devmem_dmabuf_binding *net_devmem_lookup_dmabuf(u32 id)
-> > +{
-> > +     struct net_devmem_dmabuf_binding *binding;
-> > +
-> > +     rcu_read_lock();
-> > +     binding =3D xa_load(&net_devmem_dmabuf_bindings, id);
-> > +     if (binding) {
-> > +             if (!net_devmem_dmabuf_binding_get(binding))
-> > +                     binding =3D NULL;
-> > +     }
-> > +     rcu_read_unlock();
-> > +
-> > +     return binding;
-> > +}
-> > +
-> >  void net_devmem_get_net_iov(struct net_iov *niov)
-> >  {
-> >       net_devmem_dmabuf_binding_get(net_devmem_iov_binding(niov));
-> > @@ -305,6 +342,53 @@ void net_devmem_put_net_iov(struct net_iov *niov)
-> >       net_devmem_dmabuf_binding_put(net_devmem_iov_binding(niov));
-> >  }
-> >
-> > +struct net_devmem_dmabuf_binding *net_devmem_get_binding(struct sock *=
-sk,
-> > +                                                      unsigned int dma=
-buf_id)
-> > +{
-> > +     struct net_devmem_dmabuf_binding *binding;
-> > +     struct dst_entry *dst =3D __sk_dst_get(sk);
-> > +     int err =3D 0;
-> > +
-> > +     binding =3D net_devmem_lookup_dmabuf(dmabuf_id);
->
-> why not initialize binding together with the declaration?
->
+  ---------------------------------------------------------
+  |          |  |          |  |          |  |          |  |
+  8K        2M 2M+8K      4M  4M+8K     6M  6M+8K     8M  8M+8K
 
-I find it stylistically much better to error check this right after
-it's assigned.
+For GFN 6M and GFN 6M+4K, as they both belong to lpage_info[2M][2], huge
+page is allowed. Also, they have the same aligned_index 2 in guest_memfd.
+So, guest_memfd allocates the same huge folio of 2M order for them.
 
-> > +     if (!binding || !binding->tx_vec) {
-> > +             err =3D -EINVAL;
-> > +             goto out_err;
-> > +     }
-> > +
-> > +     /* The dma-addrs in this binding are only reachable to the corres=
-ponding
-> > +      * net_device.
-> > +      */
-> > +     if (!dst || !dst->dev || dst->dev->ifindex !=3D binding->dev->ifi=
-ndex) {
-> > +             err =3D -ENODEV;
-> > +             goto out_err;
-> > +     }
-> > +
-> > +     return binding;
-> > +
-> > +out_err:
-> > +     if (binding)
-> > +             net_devmem_dmabuf_binding_put(binding);
-> > +
-> > +     return ERR_PTR(err);
-> > +}
-> > +
-> > +struct net_iov *
-> > +net_devmem_get_niov_at(struct net_devmem_dmabuf_binding *binding,
-> > +                    size_t virt_addr, size_t *off, size_t *size)
-> > +{
-> > +     size_t idx;
-> > +
-> > +     if (virt_addr >=3D binding->dmabuf->size)
-> > +             return NULL;
-> > +
-> > +     idx =3D virt_addr / PAGE_SIZE;
->
-> init this at where it's declared?
-> or where it's used.
->
+However, for TDX, GFN 6M and GFN 6M+4K should not belong to the same folio.
+It's also weird for a 2M mapping in KVM to stride across 2 huge folios.
 
-I think probably a local variable isn't warranted. Will remove.
-
---=20
-Thanks,
-Mina
+> Hence I think it is okay to leave it to KVM to fault pages into the
+> guest correctly. For guest_memfd will just maintain the invariant that
+> offset and size are hugepage aligned, but not require that
+> slot->base_gfn and slot->npages are hugepage aligned. This behavior will
+> be consistent with other backing memory for guests like regular shmem or
+> HugeTLB.
+> 
+> >> +	ret = kvm_gmem_hugetlb_filemap_add_folio(inode->i_mapping, folio,
+> >> +						 aligned_index,
+> >> +						 htlb_alloc_mask(hgmem->h));
+> >> +	WARN_ON(ret);
+> >> +
+> >>  	spin_lock(&inode->i_lock);
+> >>  	inode->i_blocks += blocks_per_huge_page(hgmem->h);
+> >>  	spin_unlock(&inode->i_lock);
+> >>  
+> >> -	return page_folio(requested_page);
+> >> +	return folio;
+> >> +}
 
