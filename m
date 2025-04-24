@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-44175-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44176-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40B35A9B0B6
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 16:25:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6BE2A9B0CC
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 16:28:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C03C53B3808
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 14:25:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79EC57B9455
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 14:25:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBF492957D3;
-	Thu, 24 Apr 2025 14:14:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15BF929617E;
+	Thu, 24 Apr 2025 14:14:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BCIEvZRv"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XbJe9QFr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000082949FE
-	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 14:14:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A4B32951AF
+	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 14:14:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745504069; cv=none; b=Kweft5yTubyvlasxowVwO+/56HX1HShi9/aLabYmFF1FfvbSby2QRXDyxv33AlWI0zFgT/AUQtkkwRDLMbQcYR/lGgzpIrcot8sMe+UlAJBgRLsFhsaDBlcdlBHMZOEjJ8DebbIpvGWCq2hUVmPbVa+tXVsfjY3mv+hT8yM2idU=
+	t=1745504070; cv=none; b=L8KBj+STWicXMZAzlnO4XrbJeXfN8XQpB7VWKThnse8JJbpXI1yXQ9vb9LohIpA7sltTY9UKKu3tHLJatRiXezfdE72amncnTPwnFlum52iyU4LO0lwcXXy+1aP8OmfX7QeO7xuzIqbYdQHG7ncswnPMyP16ET9JLoMOewPgM/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745504069; c=relaxed/simple;
-	bh=KiBOPw2VoeUP9jPtQen3QJ8+JIhOTaUQt1mQ67vK+Wk=;
+	s=arc-20240116; t=1745504070; c=relaxed/simple;
+	bh=lrb7r2WDY6/wiV70trrJFyhVfjh+ttGLRTnjEamSc+I=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GGL9LHXg9+HR5h6753XVg+drvr3VT4BYcKujWGdg8GzV2oNY+fe3H2ak+U/ED0hnsD2cD3e/snvMOOyCmBBX3sXqPJ36Tfn8bmF5OfLPW6jLE+UI4+5BvIZtZ+OEzcZalCAklZnUVdUrnNQAKHeqU5h3UnTf1iHbCGkzdj5Tn50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=BCIEvZRv; arc=none smtp.client-ip=209.85.221.52
+	 MIME-Version; b=h/J6fzF5X8nvGHoGZxh80tTZ7uM1Qcu0XZLkjt1FGKak9bizYFWdP2EPxetXZhmEKwYdnrCuVmvdXrWEtoxqt3VrCrF35agOdvhQG9LWoHJBFjj7LEp1BWE1DP6auc1rWvYSEKmdFPESyu9Pm0DYzzpI0Pbr+tHRcXA/OdFLccc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=XbJe9QFr; arc=none smtp.client-ip=209.85.128.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-39c1ef4acf2so878193f8f.0
-        for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 07:14:26 -0700 (PDT)
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-43d04dc73b7so9635255e9.3
+        for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 07:14:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1745504065; x=1746108865; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1745504066; x=1746108866; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Fkw6jo/oeFh6qnWXDp6jlBdNEq901uF/wqE5/ZMg0xQ=;
-        b=BCIEvZRv2R68O63R8brL2WfAmdo925iFx38XKdTQ0t+jxsjdLI1JKc/L5tWtXUgyok
-         xDFWVlpPvWYx3toLYNTof9Xh1eEc4LiLVBxk/xTOK8U9tAr4RdU8PEjKTFoM+KdjiQWz
-         pCiFnyymKrfV9BdBIiFf7Gf3o5zHiH04R18oZMKpjtiX9CWwCovgdK9tgLDSRknqUzkM
-         pAupuCjzcAsPWd8wmZa1UTKIuC8oavN0xCcVzBzPMBzOVC6AKRg3Sx0z2ncIHuz4FWqM
-         vFWHksGt5xY/giD2q9cuPyRcRZmD5RZoZP3Vb3qdL1mGwMuAsRjqhT70yzTBAX9WrW8k
-         sZyw==
+        bh=Z+7xBf3XhJMHfpZe6B0obtpZq77mLhIssmTOLfcblvc=;
+        b=XbJe9QFr/198bFBMe0kDnmRcwfggZDJWfbsXRfz0KwxrS2sZZlklMbpaxSGQxDkso+
+         8ZXyoRzxGpnaCcazFtAGjzLP1pIclvwLO3OZ82s8nmcercWkwXZw8VibNb3/naT9Ch7t
+         lg4UXSgMyYgXagUHDHFgvj01YQsKI9EPC3slYHdT8pudV5tBWXWWe/Tom8r43tad1QHM
+         LhYy7YlW9awbC0iyAv+MA/R4vKbUctEshurVcj6pQcQIczcjshb1apYJ50NtfCBgRg9j
+         xvoFgWgGCU4Rfum3+xIrinWqTd7Gsi9yE21RS8LOJsCn1TS3Iq/dvVZHkPePYPAwuMLX
+         EB9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745504065; x=1746108865;
+        d=1e100.net; s=20230601; t=1745504066; x=1746108866;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Fkw6jo/oeFh6qnWXDp6jlBdNEq901uF/wqE5/ZMg0xQ=;
-        b=vze9HDDhJG71AJKw/fQke5bO9g0d/dUrcwUyr47Cmcj7KbUuaz+HFZSrUGKFturh0M
-         Uk72wyQsAnPmPyPZIG+9iLS4HfsdXZ2Zr4Lz/xS5W2U0iaMZZ18Iyq7Evfs83U/nn97S
-         r7vhUQ9dMZ6LaGVLyUIurB5hgADbIichSe4PyIky7TmlX8x5yqPRu/zRCtsyNrR5uBrN
-         wlpHvW1dNyzqDn4lfHly7G9Cm99N/9c6/+AnrcDKSGsulE0IYronIcLvYlYYNDBJexLj
-         9Jbc22nlmuIiueGusXBREN+Q1SaTaRawMoJOiQs7sASNc8OLPgjBb3ke3d6rEms37rbw
-         291Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWA9/K+RmLBPXGoOc1XZ2nUaZ3U5RkAa24o/Gvzf8gvtxTBksKEFPZhyUZ/i6y8J+uxNXA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzA8AQbuF2IClq8s3NvBN31ML5f3xuTjgz6vkdP9YuBMnBIG+np
-	WoxbfSEHmzYi4Y8GDJx2yBD4bVUlIkIEmLQpFiM+g+R6GsKAny6VlXxgFsYMwAM=
-X-Gm-Gg: ASbGncut1W5OMsSyF4sEEN3n34h8NbPMjRomFmTjgaPcA2GyOkr5We86F+Kbe32Y5ah
-	EUFMMKWWS6d3TR1UKfBnz0l+JGY2ICrQ6obzj9BT3Yd6RXjHaoPAWx2TPPNGwvkVYmNSoFqHb1i
-	9VBp/Q7ubGIv9u5oE+heEUck4ptYILfdv7BKdN4h/hnS3M78DY0DfOMv3JAGtJI7nb05NM8NO78
-	q4Hlllvomx1fAvhuwe5LYwtshKHsl0gG/pG6k6mtlm4ZWkEmR5l+SCKv8SvJ2kLe/vEGTr8szIv
-	aScQuSFumX5fYsr3k28gsLpcbOePc5mIfgG/R2zKKv+/ODU5RHSlB9rKr2Rs4C7bU41MiSI9GAy
-	0F65BTYz2cNhGvEc7
-X-Google-Smtp-Source: AGHT+IELqmSvaP6OfocDnjzMS7mUki3w51itbTq+w393mXtO1Vl290MnI9dSMs1K0cj071gNYf3OVQ==
-X-Received: by 2002:a5d:6da2:0:b0:39e:cc0c:9789 with SMTP id ffacd0b85a97d-3a06cf4f2f6mr2251923f8f.11.1745504065280;
-        Thu, 24 Apr 2025 07:14:25 -0700 (PDT)
+        bh=Z+7xBf3XhJMHfpZe6B0obtpZq77mLhIssmTOLfcblvc=;
+        b=TPcX+qAoz37NGwPqmv60O6ac+ILVLeKV+qCqlFj5DfHHltDLm+hX8DG/ACBekKwBXO
+         RYn00CNri8QFCpbd9GlNIy7MfYYrC2/agLIRGPJtp31UHUe4/jnMsVjvAIeM1dSVUHdp
+         nTTcKDDFS89xv1uElU0LUHFGgYjbGHoA0xEcQJveGKYixwa4drlE3xtRO3desGshf5LS
+         K8RVYl2mAI1elTDXPyjUh6IMaEdfi/c9kbsRCzs6LEmNa4oM72d3B4Gxb6bQ1TfBsfUP
+         tYbG4Vkj7xh1pp4m1KD1cOHbq0tl4BpmgbTimNT5GxT1qLx4whIjtjeFzFHTmzVzJv+V
+         /anA==
+X-Forwarded-Encrypted: i=1; AJvYcCWJUFfaEfneKHwFcw+gaHoG3YIrRda5byjRSI3zoFpSKV4hyNfJYIjYQ0+FEYEG4mZOKQk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCIysKLwxTkyPhAxTbc0NJiagA9z/LchzmICcUVqIGFTT+rBZv
+	zzqjnJqNVQPR46HBuZpcV3gvt97KceHovPZE0kJwTOPOZlBDKkrnwrmfQxjUxUs=
+X-Gm-Gg: ASbGncs2SQfxAUmNedJDkkeAt6W+fIiD+hS5w4aj9xZckxrhLN8+zhoTKYzjxh1jk1o
+	8gNPO/+dstRdcaq7O2uNmBF01oahjJmLxrt7g8XOYbQndjxLF2LpnqfizbnXcmETsIIcoVD5bLu
+	YnTf/7zJzMDcj5XshJ+bfZZ6UhJbBos2VKnj7n/0wdGrrUEan6trpk7xb6dWufxSxL935vlFwtS
+	4gV2YwGP9gKYpyiiCF4vPoYeDPfS0hHEsH96PdB9X6fmkhkMQ3aiskGL6iSt9iIWAI+8FVIRH7M
+	M53ufH6lvSlAx7HuJoDeBhaqX3fdWstErakA+aFSHl4PBDu2aqvhRcbmQvVCU5ERz32LGsO2Xei
+	MkQ5keCq3EKGpQTLB
+X-Google-Smtp-Source: AGHT+IHRjNQ9hktsGOI0gDbs88pFfwmyof1gAXg0Su1amTrqhLAxn7c+kspUyHkoAKmkYrrR9nwrhw==
+X-Received: by 2002:a5d:48ca:0:b0:39c:1257:cd41 with SMTP id ffacd0b85a97d-3a06cfd462dmr1866395f8f.59.1745504066490;
+        Thu, 24 Apr 2025 07:14:26 -0700 (PDT)
 Received: from seksu.systems-nuts.com (stevens.inf.ed.ac.uk. [129.215.164.122])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a06d4a8150sm2199951f8f.7.2025.04.24.07.14.24
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a06d4a8150sm2199951f8f.7.2025.04.24.07.14.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Apr 2025 07:14:24 -0700 (PDT)
+        Thu, 24 Apr 2025 07:14:26 -0700 (PDT)
 From: Karim Manaouil <karim.manaouil@linaro.org>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
@@ -102,11 +102,10 @@ Cc: Karim Manaouil <karim.manaouil@linaro.org>,
 	Murali Nalajala <mnalajal@quicinc.com>,
 	Sreenivasulu Chalamcharla <sreeniva@qti.qualcomm.com>,
 	Trilok Soni <tsoni@quicinc.com>,
-	Stefan Schmidt <stefan.schmidt@linaro.org>,
-	Elliot Berman <quic_eberman@quicinc.com>
-Subject: [RFC PATCH 30/34] gunyah: Add RPC to set VM boot context
-Date: Thu, 24 Apr 2025 15:13:37 +0100
-Message-Id: <20250424141341.841734-31-karim.manaouil@linaro.org>
+	Stefan Schmidt <stefan.schmidt@linaro.org>
+Subject: [RFC PATCH 31/34] gunyah: allow userspace to set boot cpu context
+Date: Thu, 24 Apr 2025 15:13:38 +0100
+Message-Id: <20250424141341.841734-32-karim.manaouil@linaro.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250424141341.841734-1-karim.manaouil@linaro.org>
 References: <20250424141341.841734-1-karim.manaouil@linaro.org>
@@ -118,82 +117,56 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Elliot Berman <quic_eberman@quicinc.com>
+Allow userspace hypervisor (e.g. Qemu) to set the context of the boot
+cpu. At the moment, only the program counter (PC) is needed.
 
-The initial context of a the primary vCPU can be initialized by
-performing RM RPC calls.
-
-Signed-off-by: Elliot Berman <quic_eberman@quicinc.com>
-Reviewed-by: Srivatsa Vaddagiri <quic_svaddagi@quicinc.com>
 Signed-off-by: Karim Manaouil <karim.manaouil@linaro.org>
 ---
- drivers/virt/gunyah/rsc_mgr_rpc.c | 32 +++++++++++++++++++++++++++++++
- include/linux/gunyah_rsc_mgr.h    |  2 ++
- 2 files changed, 34 insertions(+)
+ arch/arm64/kvm/gunyah.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/drivers/virt/gunyah/rsc_mgr_rpc.c b/drivers/virt/gunyah/rsc_mgr_rpc.c
-index 7fccd871cc0b..78c4d1d5d42a 100644
---- a/drivers/virt/gunyah/rsc_mgr_rpc.c
-+++ b/drivers/virt/gunyah/rsc_mgr_rpc.c
-@@ -106,6 +106,15 @@ struct gunyah_rm_vm_config_image_req {
- 	__le64 dtb_size;
- } __packed;
- 
-+/* Call: VM_SET_BOOT_CONTEXT */
-+struct gunyah_rm_vm_set_boot_context_req {
-+	__le16 vmid;
-+	u8 reg_set;
-+	u8 reg_index;
-+	__le32 _padding;
-+	__le64 value;
-+} __packed;
-+
- /* Call: VM_SET_DEMAND_PAGING */
- struct gunyah_rm_vm_set_demand_paging_req {
- 	__le16 vmid;
-@@ -447,6 +456,29 @@ int gunyah_rm_vm_init(struct gunyah_rm *rm, u16 vmid)
+diff --git a/arch/arm64/kvm/gunyah.c b/arch/arm64/kvm/gunyah.c
+index e8037d636e8f..df922be2429e 100644
+--- a/arch/arm64/kvm/gunyah.c
++++ b/arch/arm64/kvm/gunyah.c
+@@ -1703,6 +1703,24 @@ static int gunyah_vm_rm_notification(struct notifier_block *nb,
+ 	}
  }
- ALLOW_ERROR_INJECTION(gunyah_rm_vm_init, ERRNO);
  
-+/**
-+ * gunyah_rm_vm_set_boot_context() - set the initial boot context of the primary vCPU
-+ * @rm: Handle to a Gunyah resource manager
-+ * @vmid: VM identifier
-+ * @reg_set: See &enum gunyah_vm_boot_context_reg
-+ * @reg_index: Which register to set; must be 0 for REG_SET_PC
-+ * @value: Value to set in the register
++/*
++ * We only need to set PC to start of kernel
 + */
-+int gunyah_rm_vm_set_boot_context(struct gunyah_rm *rm, u16 vmid, u8 reg_set,
-+				  u8 reg_index, u64 value)
++static int gunyah_vm_set_boot_ctx(struct gunyah_vm *ghvm)
 +{
-+	struct gunyah_rm_vm_set_boot_context_req req_payload = {
-+		.vmid = cpu_to_le16(vmid),
-+		.reg_set = reg_set,
-+		.reg_index = reg_index,
-+		.value = cpu_to_le64(value),
-+	};
++	struct kvm_vcpu *vcpu = kvm_get_vcpu(&ghvm->kvm, 0);
++	u64 core_reg = KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE;
++	struct kvm_one_reg reg;
++	u64 *regaddr;
 +
-+	return gunyah_rm_call(rm, GUNYAH_RM_RPC_VM_SET_BOOT_CONTEXT,
-+			      &req_payload, sizeof(req_payload), NULL, NULL);
++	reg.id = core_reg | KVM_REG_ARM_CORE_REG(regs.pc);
++	regaddr = core_reg_addr(vcpu, &reg);
++
++	/* We only need to set PC atm. regset is 1 */
++	return gunyah_rm_vm_set_boot_context(
++			ghvm->rm, ghvm->vmid, 1, 0, *regaddr);
 +}
-+ALLOW_ERROR_INJECTION(gunyah_rm_vm_set_boot_context, ERRNO);
 +
- /**
-  * gunyah_rm_get_hyp_resources() - Retrieve hypervisor resources (capabilities) associated with a VM
-  * @rm: Handle to a Gunyah resource manager
-diff --git a/include/linux/gunyah_rsc_mgr.h b/include/linux/gunyah_rsc_mgr.h
-index f16e64af9273..6a07fe25b0ba 100644
---- a/include/linux/gunyah_rsc_mgr.h
-+++ b/include/linux/gunyah_rsc_mgr.h
-@@ -126,6 +126,8 @@ int gunyah_rm_vm_configure(struct gunyah_rm *rm, u16 vmid,
- 			   u32 mem_handle, u64 image_offset, u64 image_size,
- 			   u64 dtb_offset, u64 dtb_size);
- int gunyah_rm_vm_init(struct gunyah_rm *rm, u16 vmid);
-+int gunyah_rm_vm_set_boot_context(struct gunyah_rm *rm, u16 vmid, u8 reg_set,
-+				  u8 reg_index, u64 value);
+ static void gunyah_vm_stop(struct gunyah_vm *ghvm)
+ {
+ 	int ret;
+@@ -1790,6 +1808,12 @@ static int gunyah_vm_start(struct gunyah_vm *ghvm)
+ 	}
+ 	ghvm->vm_status = GUNYAH_RM_VM_STATUS_READY;
  
- struct gunyah_rm_hyp_resource {
- 	u8 type;
++	ret = gunyah_vm_set_boot_ctx(ghvm);
++	if (ret) {
++		pr_warn("Failed to setup boot context: %d\n", ret);
++		goto err;
++	}
++
+ 	ret = gunyah_rm_get_hyp_resources(ghvm->rm, ghvm->vmid, &resources);
+ 	if (ret) {
+ 		pr_warn("Failed to get hyp resources for VM: %d\n", ret);
 -- 
 2.39.5
 
