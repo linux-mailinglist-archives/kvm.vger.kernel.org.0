@@ -1,207 +1,158 @@
-Return-Path: <kvm+bounces-44123-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44124-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D170A9AC2C
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 13:38:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B7D9A9AC6B
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 13:50:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD41A4A5539
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 11:38:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 053261B6699E
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 11:50:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D135230BC0;
-	Thu, 24 Apr 2025 11:34:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B3E523024D;
+	Thu, 24 Apr 2025 11:49:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="FGyyfJ3z"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iKwecSQj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7B3A2253B0
-	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 11:34:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E4222C321
+	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 11:48:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745494465; cv=none; b=aatPKZKvBsbzYKQXhMFlUZw2IFlJNXLlNl4HQl41iqqJiERdWf+4E+R0X3ddpEKc4JfMJQqRyV02EnfZl4ZgU5i3gufzQX0TgT+LemAgTKocDe6v2LKJ1MUoxzklEqcVZoCzx9TWTCsmDNZDKp45zLPYKtxVTJ/47cPt4laLhM4=
+	t=1745495341; cv=none; b=hVfmelaxpP1c7kY682Ti+bMiuSQS0t+G5TJ+B4H/MSGrKqOwXwLi2BG3/FmxLrXxw4m3WJqjXgLOrUSmm6nuAYUMjN2Da76C8u9stpCd5j8WOTiXRFhMZtKbaeCYAaYTPRjySWrVUONc7FLSddV4PtB9d88lL9SELXWeSC9gEmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745494465; c=relaxed/simple;
-	bh=IXZ8njn3lHnMF+wZnne8sz6AGB4un/zdAulPyviKX2U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K9o2MOUhXejpuJU0uQhgb4pn1Yx6vSs5Ne5Ce/ZgZq/5tTLiZ3IBiG/B2EoM7ft65CuF67GtyR3DwHTI1Z6G5i4dmCBqAv+5lcEK4ArRw9tVyqW3r/RtPXOAas+hs84H7gFLsFGjw6rsXCSW3ZLNdsGNd2S0xnGp+ztxqQbzJ/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=FGyyfJ3z; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-39c0dfba946so633243f8f.3
-        for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 04:34:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1745494462; x=1746099262; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=8kNEaxbnoW9g1fYmJXQwSNKTdFbvmREbcFtvdLnT5Xc=;
-        b=FGyyfJ3zg9bv6mloDJ2FkB2yKg3eCFZBZzb60PEmUrgTOvN+NHVnzs/bxebUlVPYr4
-         L9IB4We2faZXga9kaduTRsNiDGFaMFnOFvA8kJgTvo1qdhniaZvBIH4EvtY/hD8SCSzX
-         gVF5JMFsSTetIM9xznaCFyoaUljkjGVD7fUR6gp7t4nt80FdPBm5Hq+AV0qcMi6RqNao
-         mz/WXQkm+4axtum9KMbIByJJ+Cyd3pIz+cJMOYSFMOHLVAy/KlgrHEuPob3Jx3K9dpVY
-         fojQl77MQQwRfLguAdJ89kmk5UP/6ISH0HCRqnL/fqKgUGLrbgs9iHXudcdVLBczXbMW
-         KZHg==
+	s=arc-20240116; t=1745495341; c=relaxed/simple;
+	bh=8b1jn4QM3miujpAVj4Ao/BPpGT15pdXb8SsrQOErUjo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=GjHYvfhzTp3jtuVy8AGI8X9k+yJ1WbxoyTpJJ43TO+CsVkBHjVK1P1BHxwsdHG46+TzYVEc5lUgcKR7cdvM2FoIYo+wZy3b5QTDr9DsVpMHjMnv5CGzh3HDanMkYKRRuzH0/r80GTo+nvxfB3MEzCF2lViLi7eWV/rL+iduzOZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iKwecSQj; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745495338;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4htAbypt1PAw8cs1ZfgYILn5gui78YIttCMWVT2xuTY=;
+	b=iKwecSQj4yu2VFFcDETPL+F0SBFp6lwhEWPiN/F/s39NuBAvkVfsWQhNGizpkgT4Zrz0e/
+	6nj1BXZYxzl2JnehFShoSXSwMkhkpMCtdiXAOnFaIYmxFz1i2SmJ/RYSm1RbrWrUOWK0vL
+	1+IAbCE5nZB+V/+iaJDMALyWGQ2kA2Y=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-630-FTnFQpJ_Ozy3XSLqgfvQMw-1; Thu, 24 Apr 2025 07:48:57 -0400
+X-MC-Unique: FTnFQpJ_Ozy3XSLqgfvQMw-1
+X-Mimecast-MFC-AGG-ID: FTnFQpJ_Ozy3XSLqgfvQMw_1745495335
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43e9a3d2977so6749225e9.1
+        for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 04:48:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745494462; x=1746099262;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1745495335; x=1746100135;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8kNEaxbnoW9g1fYmJXQwSNKTdFbvmREbcFtvdLnT5Xc=;
-        b=eClNQB82Vj22XUBzOSWKTGD1mUL/D5zXnd3bFZUgSni6zdfIGRhnQIE8Di07bcHDCu
-         qX5rqbJ3wE/pKYvGYYpYGG2sHP1ojbI5QlczDVSx+m/vb546lMeXKEmfp71XMrt8hzoO
-         rzpNSnnFJcdbmxpIHY/bS1FaJsKdZswEFpVn5bFMnaxTm7ScSUAVt6pgDpxF4dWtbtFo
-         shdx11+IovMmkqIQuyDtP4DsrpgwK1eqsPVXsJzmMYo/hm5v6Dk9OZ2AGh0Mdj7QtkIf
-         XyXSBUPMIwJWAN6z8wjAodyDFxRcvlya53cmCnqfyRaFwmgLS0RY8AMo5Fu//T4QrmvT
-         yXyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUEWZ3WFV0qjurmjjfRqy7mGNw/Yer9Wo3uS/BSVYZAqWpBg91YyWqluuHZp5ul1FlbV2M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwbFkUnZ46QF0+UO/+ylytDrpsHibc2891gdOZbAbvwXYzdDl2V
-	/V4e181jdO/kGmGvkktvqsmaV2bBF69udocM3q4tX9by3RpsdSaEotA+CnlhMBI=
-X-Gm-Gg: ASbGncsWg874agLlWUvkNfN6rBZvnHlEMOIFG972MhdItYa8VTEIHMQJD2paLMfrMDn
-	CqGBZSi90CGftxQPNVGvaD36bbw1Q/eTvNESXo+goMgBX02D4gbrqI7bwQ0TvfslgCeZGmEkErn
-	0i/IbdKq7OPJUS4eFT+YbgSSmq9ShtpqMTni0DUCTdHOVnVb2Yh5MmHUf64JVXhXw6cCq7nlbwA
-	r/LuiW8xG+ofHVSRucZK8pX/XJBSCt+wTUtT67zghXfZuzmHbPjs4PDNYEx7ke4XFArA2DGZpFH
-	BSoHTztYKCcuCIoq8Ezk/Y8kTnJz
-X-Google-Smtp-Source: AGHT+IH+Hg3/PqfVx4rNvlrTeNa+fBCY/aumfjJWzS9tER7WilSZAHlxfjRytvmLaoteiiEk+m6uJg==
-X-Received: by 2002:a5d:4a8e:0:b0:39a:c9d9:877b with SMTP id ffacd0b85a97d-3a06cf5f4fcmr1401332f8f.27.1745494461931;
-        Thu, 24 Apr 2025 04:34:21 -0700 (PDT)
-Received: from localhost ([2a02:8308:a00c:e200::f716])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a06d4bf781sm1830579f8f.37.2025.04.24.04.34.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Apr 2025 04:34:21 -0700 (PDT)
-Date: Thu, 24 Apr 2025 13:34:20 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-Cc: Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
-	Samuel Holland <samuel.holland@sifive.com>, Deepak Gupta <debug@rivosinc.com>
-Subject: Re: [PATCH v5 13/13] RISC-V: KVM: add support for
- SBI_FWFT_MISALIGNED_DELEG
-Message-ID: <20250424-ae24464169f7143c509cbab5@orel>
-References: <20250417122337.547969-1-cleger@rivosinc.com>
- <20250417122337.547969-14-cleger@rivosinc.com>
+        bh=4htAbypt1PAw8cs1ZfgYILn5gui78YIttCMWVT2xuTY=;
+        b=sH/LT2CyZpI+AbVqtE1VY0q1IGG6F6PYVzJmjQHagR3cVRzTOrW9dk1hKeoPSAZ+WZ
+         E5S2duXynkNZORvA/jd9Jd6PPFgHUB3bJrBTTllYOebQuJ0XCuElV0l/3nuybFOhoDmw
+         +sKhmxZwjNcKZjBFl2DDPvkcTcl7rOvA+ozCSh9M5XrRFAX8JSBIUZ/d/W80MP444Ef3
+         mxMAdoF4yXFbRyMmOBHJ9AgfU9gIsEa0AXbu84SYbQNJ0Tyd9yNwzZLUM86541QpHYmi
+         /tI26MOqjqSsAUQ9iSNoRwmY8eCCRgXI9VjtcOKxD5CJCBo18mcfhsL6eDJAVcSSV5G7
+         jIfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVW/+BkzbIUIbzfdNu4/6RctpzyneuFLffJi/aCrpBPLhguRC3Xn+xnV5Z+BsGmiLhXzV8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVo8M3HD98kJRuJxgbfSShAS4OoHM6bdbGNnGZbVn7opNeV2Wz
+	FJzm8r0LA5SmGJqnyATsNP8WYPCCcZN++V8WSgklfmf/Wn7+oadGpeNAReteIc/xpWFrnJotaeD
+	h8E394sqECd137IMu9o3iCmyx87NPCf11VMjEzKiozJY0l+IuoQ==
+X-Gm-Gg: ASbGncuh4Wyt8Ja0zqOdlC7kLY5GFFnvvsz7/eQnRLSApOheiZiibRWl4qAeIB3lwuU
+	mtXvrSqSh0l7oHem/G8rS7praLC19J55lx3Ain3wl6hZQs4zJ7m0qB9cqL2jmV5XFghwUOyunce
+	AczW+cVytpBwYF4twyqOtV2ufR9spjGT7oQmL5qYh+E3gDW0LNerz67oI4gUCnZKcNUJQjAIKbU
+	cc3z919PSjVCYe7EWZwNh9W6FyI2wJWpX0VAhgzIK0q6bUJcxKJyDYjeBA0FZSKjTArcA7hLKsN
+	S894kAMdXSFX7sIq4/468o+lEBeLoWR3yxNa/i4=
+X-Received: by 2002:a05:600c:1d02:b0:43d:738:4a9 with SMTP id 5b1f17b1804b1-4409bdae980mr22059515e9.27.1745495335342;
+        Thu, 24 Apr 2025 04:48:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFUZLkMc35rnp4BTi5uk6IdrLmESnS6O2NJ+BKK5UJ777FxcQysn8JyDJpuHccKf//6qU8xMA==
+X-Received: by 2002:a05:600c:1d02:b0:43d:738:4a9 with SMTP id 5b1f17b1804b1-4409bdae980mr22059295e9.27.1745495334986;
+        Thu, 24 Apr 2025 04:48:54 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-7-183.dyn.eolo.it. [146.241.7.183])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4409d29b990sm19004865e9.4.2025.04.24.04.48.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Apr 2025 04:48:54 -0700 (PDT)
+Message-ID: <a0894275-6b23-4cff-9e36-a635f776c403@redhat.com>
+Date: Thu, 24 Apr 2025 13:48:53 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250417122337.547969-14-cleger@rivosinc.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] vhost/net: Defer TX queue re-enable until
+ after sendmsg
+To: Jon Kohler <jon@nutanix.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250420010518.2842335-1-jon@nutanix.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250420010518.2842335-1-jon@nutanix.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 17, 2025 at 02:20:00PM +0200, Clément Léger wrote:
-> SBI_FWFT_MISALIGNED_DELEG needs hedeleg to be modified to delegate
-> misaligned load/store exceptions. Save and restore it during CPU
-> load/put.
-> 
-> Signed-off-by: Clément Léger <cleger@rivosinc.com>
-> Reviewed-by: Deepak Gupta <debug@rivosinc.com>
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> ---
->  arch/riscv/kvm/vcpu.c          |  3 +++
->  arch/riscv/kvm/vcpu_sbi_fwft.c | 36 ++++++++++++++++++++++++++++++++++
->  2 files changed, 39 insertions(+)
-> 
-> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> index 542747e2c7f5..d98e379945c3 100644
-> --- a/arch/riscv/kvm/vcpu.c
-> +++ b/arch/riscv/kvm/vcpu.c
-> @@ -646,6 +646,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->  {
->  	void *nsh;
->  	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
-> +	struct kvm_vcpu_config *cfg = &vcpu->arch.cfg;
->  
->  	vcpu->cpu = -1;
->  
-> @@ -671,6 +672,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->  		csr->vstval = nacl_csr_read(nsh, CSR_VSTVAL);
->  		csr->hvip = nacl_csr_read(nsh, CSR_HVIP);
->  		csr->vsatp = nacl_csr_read(nsh, CSR_VSATP);
-> +		cfg->hedeleg = nacl_csr_read(nsh, CSR_HEDELEG);
->  	} else {
->  		csr->vsstatus = csr_read(CSR_VSSTATUS);
->  		csr->vsie = csr_read(CSR_VSIE);
-> @@ -681,6 +683,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->  		csr->vstval = csr_read(CSR_VSTVAL);
->  		csr->hvip = csr_read(CSR_HVIP);
->  		csr->vsatp = csr_read(CSR_VSATP);
-> +		cfg->hedeleg = csr_read(CSR_HEDELEG);
->  	}
->  }
->  
-> diff --git a/arch/riscv/kvm/vcpu_sbi_fwft.c b/arch/riscv/kvm/vcpu_sbi_fwft.c
-> index b0f66c7bf010..237edaefa267 100644
-> --- a/arch/riscv/kvm/vcpu_sbi_fwft.c
-> +++ b/arch/riscv/kvm/vcpu_sbi_fwft.c
-> @@ -14,6 +14,8 @@
->  #include <asm/kvm_vcpu_sbi.h>
->  #include <asm/kvm_vcpu_sbi_fwft.h>
->  
-> +#define MIS_DELEG (BIT_ULL(EXC_LOAD_MISALIGNED) | BIT_ULL(EXC_STORE_MISALIGNED))
-> +
->  struct kvm_sbi_fwft_feature {
->  	/**
->  	 * @id: Feature ID
-> @@ -68,7 +70,41 @@ static bool kvm_fwft_is_defined_feature(enum sbi_fwft_feature_t feature)
->  	return false;
->  }
->  
-> +static bool kvm_sbi_fwft_misaligned_delegation_supported(struct kvm_vcpu *vcpu)
-> +{
-> +	return misaligned_traps_can_delegate();
-> +}
-> +
-> +static long kvm_sbi_fwft_set_misaligned_delegation(struct kvm_vcpu *vcpu,
-> +					struct kvm_sbi_fwft_config *conf,
-> +					unsigned long value)
-> +{
-> +	if (value == 1)
-> +		csr_set(CSR_HEDELEG, MIS_DELEG);
-> +	else if (value == 0)
-> +		csr_clear(CSR_HEDELEG, MIS_DELEG);
-> +	else
-> +		return SBI_ERR_INVALID_PARAM;
-> +
-> +	return SBI_SUCCESS;
-> +}
-> +
-> +static long kvm_sbi_fwft_get_misaligned_delegation(struct kvm_vcpu *vcpu,
-> +					struct kvm_sbi_fwft_config *conf,
-> +					unsigned long *value)
-> +{
-> +	*value = (csr_read(CSR_HEDELEG) & MIS_DELEG) != 0;
+On 4/20/25 3:05 AM, Jon Kohler wrote:
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index b9b9e9d40951..9b04025eea66 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -769,13 +769,17 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
+>  			break;
+>  		/* Nothing new?  Wait for eventfd to tell us they refilled. */
+>  		if (head == vq->num) {
+> +			/* If interrupted while doing busy polling, requeue
+> +			 * the handler to be fair handle_rx as well as other
+> +			 * tasks waiting on cpu
+> +			 */
+>  			if (unlikely(busyloop_intr)) {
+>  				vhost_poll_queue(&vq->poll);
+> -			} else if (unlikely(vhost_enable_notify(&net->dev,
+> -								vq))) {
+> -				vhost_disable_notify(&net->dev, vq);
+> -				continue;
+>  			}
+> +			/* Kicks are disabled at this point, break loop and
+> +			 * process any remaining batched packets. Queue will
+> +			 * be re-enabled afterwards.
+> +			 */
+>  			break;
+>  		}
 
-This should be
+It's not clear to me why the zerocopy path does not need a similar change.
 
-  (csr_read(CSR_HEDELEG) & MIS_DELEG) == MIS_DELEG;
-
-> +
-> +	return SBI_SUCCESS;
-> +}
-> +
->  static const struct kvm_sbi_fwft_feature features[] = {
-> +	{
-> +		.id = SBI_FWFT_MISALIGNED_EXC_DELEG,
-> +		.supported = kvm_sbi_fwft_misaligned_delegation_supported,
-> +		.set = kvm_sbi_fwft_set_misaligned_delegation,
-> +		.get = kvm_sbi_fwft_get_misaligned_delegation,
-> +	},
->  };
+> @@ -825,7 +829,14 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
+>  		++nvq->done_idx;
+>  	} while (likely(!vhost_exceeds_weight(vq, ++sent_pkts, total_len)));
 >  
->  static struct kvm_sbi_fwft_config *
-> -- 
-> 2.49.0
->
+> +	/* Kicks are still disabled, dispatch any remaining batched msgs. */
+>  	vhost_tx_batch(net, nvq, sock, &msg);
+> +
+> +	/* All of our work has been completed; however, before leaving the
+> +	 * TX handler, do one last check for work, and requeue handler if
+> +	 * necessary. If there is no work, queue will be reenabled.
+> +	 */
+> +	vhost_net_busy_poll_try_queue(net, vq);
+
+This will call vhost_poll_queue() regardless of the 'busyloop_intr' flag
+value, while AFAICS prior to this patch vhost_poll_queue() is only
+performed with busyloop_intr == true. Why don't we need to take care of
+such flag here?
+
+@Michael: I assume you prefer that this patch will go through the
+net-next tree, right?
 
 Thanks,
-drew
+
+Paolo
+
 
